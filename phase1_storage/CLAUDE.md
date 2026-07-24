@@ -86,14 +86,14 @@ P1 nicht abgeschlossen, egal wie viel Code existiert.
 |---|---|---|---|---|
 | 1 | Repo-Skelett, `pyproject.toml`, dev_install | 0 | ✅ | 0 |
 | 2 | `models.py`, `frontmatter.py` | 1 | ✅ | 9 |
-| 3 | `files.py` (atomarer Write, IDs, Slugs) | 2 | ⬜ | – |
+| 3 | `files.py` (atomarer Write, IDs, Slugs) | 2 | ✅ | 12 |
 | 4 | `index.py` (SQLite, Rebuild) | 3 | ⬜ | – |
 | 5 | `store.py` (API, Lock, Versionierung) | 4 | ⬜ | – |
 | 6 | `history.py` (Git) | 5 | ⬜ | – |
 | 7 | Query-Layer in `store.py` | 6 | ⬜ | – |
 | 8 | `scripts/space_cli.py` | 7 | ⬜ | – |
 
-**Gesamt: 9 Tests.** Zielgröße am Phasenende: grob 60–90, davon mindestens die vier
+**Gesamt: 21 Tests.** Zielgröße am Phasenende: grob 60–90, davon mindestens die vier
 Konflikt-Tests aus Step 4. Step 0 hat bewusst keine Tests (reines Skelett) — `pytest`
 lief dort grün mit `exit 5` („no tests ran", nicht `exit 0`); das ist die korrekte
 Bedeutung von „0 Tests", kein Fehlerzustand.
@@ -106,7 +106,7 @@ nach Phasenabschluss ist eine Scope-Änderung und braucht eine Entscheidung, kei
 
 ---
 
-## Session stopped — 2026-07-24 (Step 0 + Step 1 abgeschlossen)
+## Session stopped — 2026-07-24 (Step 0 + Step 1 + Step 2 abgeschlossen)
 
 **Ergebnis:** Code-Repo initialisiert (`git init` in `/home/savefyx/dev/savefxy`, lokale Git-Identity
 gesetzt, da auf der Maschine keine existierte). Erster Commit checkt die Projektdokumente aus der
@@ -152,20 +152,38 @@ gegenprüfen, bevor P2 darauf aufbaut.**
 Property-Test-Fixture mit Umlauten/mehrzeiligem Body/unbekanntem Feld/leerem Body; 3
 `test_models.py` als Konstruktions-Smoke-Test).
 
-**Nächster Schritt (konkret):** Step 2 — `storage/files.py`: ID-Erzeugung (`itm_` + 8 Hex aus
-`secrets.token_hex(4)`), Slugify mit korrekter Umlaut-Transliteration (`ä→ae` etc.),
-Pfadauflösung `<id>__<slug>.md`, atomarer Write (tmp + `os.replace` + Verzeichnis-`fsync`),
-Umbenennung bei Titeländerung. Done-Kriterium laut Plan: Test schreibt 200 Items, eine
-`kill -9`-Simulation per Monkeypatch zwischen tmp und `replace` hinterlässt keine halb
-geschriebene Zieldatei, Slug-Kollisionen überschreiben nichts (ID im Namen garantiert
-Eindeutigkeit).
+**Step 2 Ergebnis:** `storage/files.py` — `generate_id()` (`itm_` + 8 Hex aus
+`secrets.token_hex(4)`), `slugify()` (deutsche Umlaute per `str.translate`-Tabelle: `ä→ae`,
+`ö→oe`, `ü→ue`, `ß→ss`, dann lowercase, non-alnum → `-`, Kollaps + Strip, Fallback `"item"` bei
+leerem Ergebnis), `item_filename`/`item_path` (`<id>__<slug>.md`), `atomic_write()` (tmp im
+selben Verzeichnis + fsync der Datei + `os.replace` + fsync des Verzeichnisses — bei Exception
+Best-effort-Cleanup der tmp-Datei, Ziel bleibt garantiert unangetastet, da `os.replace` eine
+atomare Rename-Syscall ist), `rename_for_new_slug()` (gleiche Replace+fsync-Logik für
+Titeländerungen, No-op wenn sich der Slug nicht ändert). `files.py` kennt bewusst kein
+YAML/Frontmatter — bekommt fertigen Dateitext von der aufrufenden Schicht.
+
+**Verifiziert (live):** `pytest -v` → 21/21 grün (12 neue in `test_files.py`): 200-Item-Write-Test,
+`kill -9`-Simulation per `monkeypatch.setattr("storage.files.os.replace", boom)` in zwei Varianten
+(neue Datei bleibt inexistent / bestehende Datei bleibt beim alten Inhalt), Slug-Kollision zweier
+Items mit identischem Titel überschreibt nichts (unterschiedliche IDs im Dateinamen), Rename-Test.
+
+**Nächster Schritt (konkret):** Step 3 — `storage/index.py`: SQLite-Schema (`items(id PK, space,
+type, title, status, due, tags_json, links_json, created, updated, version, path, mtime, size,
+sha256)`), Insert/Update/Delete, `rebuild_index()` (Verzeichnis scannen, alles neu), WAL-Modus.
+Dazu der Startup-Dateisystem-Check aus Plan §3.2: Dateisystem von `DATA_ROOT` ermitteln, bei
+allem außer `ext4`/`xfs`/`btrfs` → `logger.critical`, kein Abbruch. `DATA_ROOT` ist jetzt bekannt
+(`/home/savefyx/savefyx-data`, ext4, siehe oben) — Step 3 kann direkt dagegen testen, sofern das
+Verzeichnis existiert; falls nicht, mit dem Nikinger klären, ob es angelegt werden soll oder ob
+Tests ausschließlich gegen `tmp_path` laufen (letzteres ist ohnehin Pflicht laut CLAUDE.md
+„keine Unit-Tests gegen das echte DATA_ROOT").
 
 **Offene `[VERIFY]` in diesem Track:** Namenskollision `IndexError_` (Plan §1, noch nicht
-gebraucht — `errors.py` existiert erst ab dem Step, der den ersten Fehlertyp braucht) · Methode
-zur Dateisystem-Ermittlung unter Ubuntu (Plan Step 3) · Snippet-/Listing-Größenziel 3 KB (Plan
+gebraucht — `errors.py` existiert erst ab dem Step, der den ersten Fehlertyp braucht, voraussichtlich
+Step 3 für einen Index-Fehler oder Step 4 für `ConflictError`) · Methode zur Dateisystem-Ermittlung
+unter Ubuntu (Plan Step 3, jetzt unmittelbar relevant) · Snippet-/Listing-Größenziel 3 KB (Plan
 Step 6).
-**Aufgelöst seit Step 0/1:** `flock` auf ext4 (Step 0) · `python-frontmatter`-Roundtrip → verworfen,
-eigener Parser (Step 1, siehe oben).
+**Aufgelöst seit Step 0–2:** `flock` auf ext4 (Step 0) · `python-frontmatter`-Roundtrip → verworfen,
+eigener Parser (Step 1).
 
 **Kleine Korrektur zum Plan:** „`pytest` grün mit null Tests" (Step 0, Done-when) bedeutet in der
 Praxis `exit 5` („no tests ran"), nicht `exit 0` — pytest markiert eine leere Testsammlung so.
