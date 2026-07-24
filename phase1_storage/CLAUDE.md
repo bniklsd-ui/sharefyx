@@ -6,7 +6,7 @@ detail: L2
 up: ../CLAUDE.md
 down:
   - ../docs/concepts/phase1_storage_plan.md   # voller Plan, Entscheidungen A–H, Steps 0–7
-  - SESSIONS_ARCHIVE.md                       # ältere Session-Blöcke (entsteht bei der 2. Session)
+  - SESSIONS_ARCHIVE.md                       # ältere Session-Blöcke
 updated: 2026-07-24
 ---
 # CLAUDE.md — Phase 1: Storage-Kern (`phase1_storage/`)
@@ -84,7 +84,7 @@ P1 nicht abgeschlossen, egal wie viel Code existiert.
 
 | # | Modul | Step | Status | Tests |
 |---|---|---|---|---|
-| 1 | Repo-Skelett, `pyproject.toml`, dev_install | 0 | ⬜ | – |
+| 1 | Repo-Skelett, `pyproject.toml`, dev_install | 0 | ✅ | 0 |
 | 2 | `models.py`, `frontmatter.py` | 1 | ⬜ | – |
 | 3 | `files.py` (atomarer Write, IDs, Slugs) | 2 | ⬜ | – |
 | 4 | `index.py` (SQLite, Rebuild) | 3 | ⬜ | – |
@@ -94,7 +94,9 @@ P1 nicht abgeschlossen, egal wie viel Code existiert.
 | 8 | `scripts/space_cli.py` | 7 | ⬜ | – |
 
 **Gesamt: 0 Tests.** Zielgröße am Phasenende: grob 60–90, davon mindestens die vier
-Konflikt-Tests aus Step 4.
+Konflikt-Tests aus Step 4. Step 0 hat bewusst keine Tests (reines Skelett) — `pytest`
+läuft grün mit `exit 5` („no tests ran", nicht `exit 0`); das ist die korrekte
+Bedeutung von „0 Tests", kein Fehlerzustand.
 
 ## Geerbte Contracts
 
@@ -104,32 +106,41 @@ nach Phasenabschluss ist eine Scope-Änderung und braucht eine Entscheidung, kei
 
 ---
 
-## Session stopped — 2026-07-24 (Planung abgeschlossen, Bau noch nicht gestartet)
+## Session stopped — 2026-07-24 (Step 0 abgeschlossen)
 
-**Ergebnis:** Die initialen Projektdokumente wurden in einer Browser-Planungssession erstellt
-(Root-`CLAUDE.md`, `AGENTS.md`, `README.md`, `ROADMAP.md`, `docs/INDEX.md`, dieser Phase-Head,
-`docs/concepts/phase1_storage_plan.md`). Rahmenentscheidungen R1–R6 sind in der Root-`CLAUDE.md`
-gelockt, die Phase-1-Entscheidungen A–H im Plan. **Es existiert noch kein Code und kein Repo.**
+**Ergebnis:** Code-Repo initialisiert (`git init` in `/home/savefyx/dev/savefxy`, lokale Git-Identity
+gesetzt, da auf der Maschine keine existierte). Erster Commit checkt die Projektdokumente aus der
+Browser-Planungssession ein; zweiter Commit liefert das Step-0-Skelett: `phase1_storage/pyproject.toml`
+(Paket `storage`, editable installierbar), `phase1_storage/storage/__init__.py` (`__version__ = "0.1.0"`),
+`phase1_storage/tests/` (leer, `conftest.py` als Platzhalter), Root-`pytest.ini`
+(`testpaths = phase1_storage/tests`), Root-`scripts/dev_install.sh` (installiert alle `phase*_*/`-Pakete
+editable, generisch für kommende Phasen), Root-`.gitignore` (`.venv`, `__pycache__`, `*.egg-info`,
+`.index.sqlite3`, `.pytest_cache`, plus `.claude/`/`.agents/`/Lockfiles als Harness-lokaler Zustand).
 
-**Nächster Schritt (konkret):** In Claude Code Step 0 des Plans ausführen — Repo initialisieren,
-diese Dokumente als ersten Commit einchecken, `pyproject.toml` mit Paket `storage` nested als
-`phase1_storage/storage/` anlegen, `scripts/dev_install.sh` schreiben, `pytest` grün mit null
-Tests. Danach Step 1.
+**Verifiziert (live, nicht nur gelesen):** `python3 -m venv .venv && ./scripts/dev_install.sh` lief
+durch; `pytest` läuft grün mit `exit 5` / „no tests ran" (0 Tests, korrekt für ein reines Skelett);
+`from storage import __version__` importiert `"0.1.0"`.
 
-**Vor dem Start zu erledigen (Blocker für Step 0):**
-1. ~~`docs/DOC_LAYERS_CONVENTION.md` kopieren~~ → **erledigt 2026-07-24**, byte-identisch
-   übernommen, Index-Zeile gesetzt.
-2. **`DATA_ROOT`-Pfad festlegen** (konkreter Pfad auf der VM). Die Dateisystemfrage ist
-   beantwortet: VMware-VM mit Ubuntu, lokale virtuelle Platte → **ext4**, `flock` verlässlich
-   (Plan §3.2, `[VERIFY]` aufgelöst). Offen bleibt nur, *welches* Verzeichnis es wird — und die
-   Zusage, es nicht auf einen Shared Folder oder ein Backup-Share zu legen.
+**Blocker aufgelöst:** `DATA_ROOT = /home/savefyx/savefyx-data` (Nikinger-Entscheidung, ext4,
+lokale Platte, kein Shared Folder). System-Dependency-Lücke (`pip`/`ensurepip` fehlten unter Ubuntu)
+über `sudo apt install python3-venv python3-pip -y` durch den Nikinger behoben — Claude Code hat
+in dieser Sandbox kein `sudo`.
 
-**Offene `[VERIFY]` in diesem Track:** Round-Trip-Treue von `python-frontmatter` (Plan Step 1) ·
-Namenskollision `IndexError_` (Plan §1) · Methode zur Dateisystem-Ermittlung unter Ubuntu
-(Plan Step 3) · Snippet-/Listing-Größenziel 3 KB (Plan Step 6).
-**Aufgelöst:** `flock` auf dem Ziel-Dateisystem (ext4 bestätigt, 2026-07-24).
+**Nächster Schritt (konkret):** Step 1 — `storage/models.py` (`Item`, `SpaceInfo`, `SearchResult`,
+`IndexStats` als Dataclasses) und `storage/frontmatter.py` (parse/serialize). Zuerst das
+`[VERIFY]` zu `python-frontmatter` auflösen (erhält die Bibliothek unbekannte Felder und
+Feldreihenfolge beim Roundtrip? Plan Step 1) — wenn nicht, eigener Parser über `PyYAML`, da
+Round-Trip-Treue nicht verhandelbar ist (Entscheidung A). Done-Kriterium: Property-Test
+`serialize(parse(x)) == x` byte-identisch, Fixture mit Umlauten, mehrzeiligem Body, unbekanntem
+Zusatzfeld, leerem Body.
 
-**Ehrlich geflaggt:** Dieser Plan wurde **ohne** Repo geschrieben — es gibt nichts, wogegen die
-Contracts verifiziert werden konnten. Jede Signatur hier ist ein Vorschlag der Planung, kein
-verifizierter Repo-Stand. Abweichungen beim Bau sind erwartbar und gehören als datierte
-Korrekturnotiz in dieses Dokument, nicht in einen stillen Fix.
+**Offene `[VERIFY]` in diesem Track (unverändert seit der Planung):** Round-Trip-Treue von
+`python-frontmatter` (Plan Step 1) · Namenskollision `IndexError_` (Plan §1) · Methode zur
+Dateisystem-Ermittlung unter Ubuntu (Plan Step 3) · Snippet-/Listing-Größenziel 3 KB (Plan Step 6).
+
+**Kleine Korrektur zum Plan:** „`pytest` grün mit null Tests" (Step 0, Done-when) bedeutet in der
+Praxis `exit 5` („no tests ran"), nicht `exit 0` — pytest markiert eine leere Testsammlung so.
+Kein Fehler, nur eine Präzisierung; siehe Modul-Status-Tabelle oben.
+
+**Der vorherige Session-Block (Planungsabschluss) ist verbatim nach `SESSIONS_ARCHIVE.md`
+gewandert — Rotationsregel, ab dieser (zweiten) Session aktiv.**
