@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-07-24
+updated: 2026-07-25
 ---
 # Doc Index (L0)
 
@@ -22,7 +22,7 @@ updated: 2026-07-24
 
 ## Root & governance
 
-- [CLAUDE.md](../CLAUDE.md) — 📗 ~7KB · rules, core principle, hard rules, working style, current state; auto-loaded every session
+- [CLAUDE.md](../CLAUDE.md) — 📗 ~9KB · rules, core principle, hard rules, working style, current state; auto-loaded every session
 - [AGENTS.md](../AGENTS.md) — 📗 ~1KB · harness-neutral entry point for non-Claude-Code agents; points to `CLAUDE.md` + doc-layers navigation
 - [README.md](../README.md) — 📗 ~4KB · human overview + machine setup (venv, keyring, run, smoke test)
 - [ROADMAP.md](../ROADMAP.md) — 📗 ~5KB · Phases 1–5, scope in/out per phase, status
@@ -31,7 +31,7 @@ updated: 2026-07-24
 
 ## Active phase (1 — Storage-Kern)
 
-- [phase1_storage/CLAUDE.md](../phase1_storage/CLAUDE.md) — 🔄 ~32KB · phase head; Steps 0–7 ✅, Phase 1 fachlich fertig (2026-07-24), offizieller Phasen-Abschluss steht noch aus; read + newest Session-stopped block first
+- [phase1_storage/CLAUDE.md](../phase1_storage/CLAUDE.md) — 🔄 ~32KB · phase head; Steps 0–7 ✅, Phase 1 fachlich fertig (2026-07-25), offizieller Phasen-Abschluss steht noch aus; read + newest Session-stopped block first
 - [docs/concepts/phase1_storage_plan.md](./concepts/phase1_storage_plan.md) — 📕 ~13KB · ausführungsreifer P1-Plan (Entscheidungen A–H, Steps 0–7)
 - [phase1_storage/SESSIONS_ARCHIVE.md](../phase1_storage/SESSIONS_ARCHIVE.md) — 📦 ~2KB · archivierte Session-stopped-Blöcke, verbatim, newest-first
 

@@ -8,7 +8,7 @@ down:
   - ROADMAP.md                          # Phasenplan + Status je Phase
   - docs/INDEX.md                       # L0-Karte aller .md
   - phase1_storage/CLAUDE.md            # aktive Phase
-updated: 2026-07-24
+updated: 2026-07-25
 ---
 # CLAUDE.md — Project Instructions
 
@@ -128,8 +128,16 @@ Snapshots. Rotationsregel ab Tag 1 scharf: ein Phase-Head trägt **genau einen**
 ## Current state
 
 **Aktive Phase:** Phase 1 — Storage-Kern (`phase1_storage/`, Paket `storage`):
-⬜ **noch nicht gestartet.** Plan liegt ausführungsreif vor:
-`docs/concepts/phase1_storage_plan.md` (Entscheidungen A–H gelockt, Steps 0–7).
+🟡 **code-complete, nicht live-bewiesen.** Alle acht Module (Steps 0–7) fertig, 70 Tests grün —
+Frontmatter/Modelle, atomarer Datei-Store, SQLite-Index, Versionierung + Konfliktbehandlung,
+Git-Commit je Write, Query-Layer, `space_cli.py` als Beweis (manueller Durchlauf gegen ein
+Scratch-Verzeichnis: Space + drei Items anlegen, wiederfinden, Konflikt provozieren und
+verständlich anzeigen). **Korrektur (2026-07-25):** dieser Abschnitt stand seit dem ersten
+Code-Commit auf „noch nicht gestartet" — Quelle der Wahrheit ist der Code (`phase1_storage/`),
+nicht dieses Dokument; siehe `phase1_storage/CLAUDE.md` für Modul-Status und Session-Historie.
+Offen bis zum offiziellen Phasenabschluss: ein Lauf gegen den echten `DATA_ROOT` (Nikinger-Sache,
+nicht Claude Code) und der Phasen-Abschluss-Prompt selbst (`docs/PROMPTS.md`). Plan liegt weiter
+unverändert vor: `docs/concepts/phase1_storage_plan.md` (Entscheidungen A–H gelockt, Steps 0–7).
 
 **Gelockte Rahmenentscheidungen (Nikinger, 2026-07-24, Browser-Planung):**
 

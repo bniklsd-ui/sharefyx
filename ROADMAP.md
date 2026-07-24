@@ -6,7 +6,7 @@ detail: L2
 up: CLAUDE.md
 down:
   - docs/concepts/phase1_storage_plan.md   # ausführungsreifer P1-Plan
-updated: 2026-07-24
+updated: 2026-07-25
 ---
 # ROADMAP — Space-Server
 
@@ -17,7 +17,7 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 
 | Phase | Verzeichnis / Paket | Inhalt | Status |
 |---|---|---|---|
-| **P1** | `phase1_storage/` · `storage` | Datei-Store + Index + Versionierung. Kein Netz. | ⬜ |
+| **P1** | `phase1_storage/` · `storage` | Datei-Store + Index + Versionierung. Kein Netz. | 🟡 |
 | **P2** | `phase2_mcp/` · `mcpserver` | MCP-Server, Token-Auth, 6 Tools. Lokal erreichbar. | ⬜ |
 | **P3** | `phase3_edge/` | Tunnel, systemd, Health, Logging, Ops-Skripte. Öffentlich erreichbar. | ⬜ |
 | **P4** | `phase4_ui/` · `webui` | REST-API + Web-UI für Menschen. | ⬜ |
@@ -37,6 +37,13 @@ benutzen können, ohne sich gegenseitig zu überschreiben. Das ist der harte Tei
   und stiller Datenverlust wird erst bemerkt, wenn er nicht mehr reparabel ist.
 
 Plan: `docs/concepts/phase1_storage_plan.md`. Phase-Head: `phase1_storage/CLAUDE.md`.
+
+**Korrektur (2026-07-25):** Alle acht Module (Steps 0–7) sind fertig, 70 Tests grün, inklusive
+der `space_cli.py` als Beweis (manueller Durchlauf: Space anlegen, Items finden, Konflikt
+provozieren und verständlich anzeigen — alles gegen ein Scratch-Verzeichnis, nicht den echten
+`DATA_ROOT`). Status **🟡, nicht ✅**: der offizielle Phasen-Abschluss (eigener Prompt, siehe
+`docs/PROMPTS.md`) und ein Lauf gegen den echten `DATA_ROOT` stehen noch aus — Letzteres ist
+Nikinger-Sache (Hard Rule: kein Test gegen den echten DATA_ROOT durch Claude Code).
 
 ## Phase 2 — MCP-Server
 

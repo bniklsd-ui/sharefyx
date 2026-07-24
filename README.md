@@ -4,7 +4,7 @@ purpose: Menschliche Übersicht + Maschinen-Setup (venv, Keyring, Datenverzeichn
 read-when: erstes Setup auf einer neuen Maschine, oder wenn jemand wissen will, was das Ding überhaupt ist
 detail: L2
 up: docs/INDEX.md
-updated: 2026-07-24
+updated: 2026-07-25
 ---
 # Space-Server
 
@@ -54,8 +54,9 @@ Adapter darüber — deshalb wird der Kern zuerst gebaut und offline bewiesen.
 
 ## Setup
 
-> **Stand 2026-07-24: Es existiert noch kein Code.** Dieser Abschnitt beschreibt das Zielbild
-> und wird mit Step 0 der Phase 1 real. Bis dahin ist er eine Absichtserklärung.
+> **Stand 2026-07-25:** Phase 1 (Storage-Kern) ist code-complete — 70 Tests, `space_cli.py` als
+> Beweis. Die Befehle unten funktionieren real, nicht nur als Zielbild. Phase 2 (MCP-Server) ist
+> noch nicht begonnen; bis dahin gibt es keinen Netzpfad, nur den lokalen Storage-Kern + CLI.
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
