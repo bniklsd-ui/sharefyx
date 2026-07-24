@@ -1,0 +1,341 @@
+"""`Store` — die öffentliche API des Pakets (Plan §2). Bindet `files.py`, `frontmatter.py`,
+`index.py` und `models.py` zusammen. Kein Netz, kein MCP — Phase 1 ist vollständig offline
+testbar (siehe Phase-Mission in `phase1_storage/CLAUDE.md`).
+"""
+from __future__ import annotations
+
+import fcntl
+import sqlite3
+import threading
+from contextlib import contextmanager
+from dataclasses import replace
+from datetime import date, datetime, timezone
+from pathlib import Path
+from typing import Any, Callable
+
+from . import files, index
+from .errors import ConflictError, ItemNotFound, ValidationError
+from .frontmatter import parse as parse_frontmatter
+from .frontmatter import serialize as serialize_frontmatter
+from .models import IndexStats, Item, ItemSummary, SearchResult, SpaceInfo
+
+_KNOWN_FIELDS = {
+    "id", "space", "type", "title", "status", "due", "tags", "links",
+    "created", "updated", "version",
+}
+_DEFAULT_STATUS = {"task": "open", "note": "active"}
+# Vom Store selbst verwaltet — dürfen nie über **fields/**changes hereinkommen, sonst
+# überschreibt `Item.extra` beim Schreiben (`fields.update(item.extra)`) die berechneten Werte.
+_SYSTEM_MANAGED_FIELDS = {"id", "space", "created", "updated", "version"}
+
+
+def _default_now() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+def _coerce_due(value: Any) -> date | None:
+    if value is None:
+        return None
+    if isinstance(value, date):
+        return value
+    if isinstance(value, str):
+        return date.fromisoformat(value)
+    raise ValidationError(f"'due' muss date, ISO-String oder None sein, nicht {type(value)!r}")
+
+
+def _parse_dt(value: str) -> datetime:
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
+def _format_dt(value: datetime) -> str:
+    return value.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _item_from_text(text: str, *, version_override: int | None = None) -> Item:
+    fields, body = parse_frontmatter(text)
+    extra = {k: v for k, v in fields.items() if k not in _KNOWN_FIELDS}
+    return Item(
+        id=fields["id"],
+        space=fields["space"],
+        type=fields["type"],
+        title=fields["title"],
+        status=fields["status"],
+        body=body,
+        due=date.fromisoformat(fields["due"]) if fields.get("due") else None,
+        tags=list(fields.get("tags", []) or []),
+        links=list(fields.get("links", []) or []),
+        created=_parse_dt(fields["created"]),
+        updated=_parse_dt(fields["updated"]),
+        version=version_override if version_override is not None else fields["version"],
+        extra=extra,
+    )
+
+
+def _item_to_text(item: Item) -> str:
+    fields: dict[str, Any] = {
+        "id": item.id,
+        "space": item.space,
+        "type": item.type,
+        "title": item.title,
+        "status": item.status,
+    }
+    if item.due is not None:
+        fields["due"] = item.due.isoformat()
+    fields["tags"] = list(item.tags)
+    fields["links"] = list(item.links)
+    fields["created"] = _format_dt(item.created)
+    fields["updated"] = _format_dt(item.updated)
+    fields["version"] = item.version
+    fields.update(item.extra)
+    return serialize_frontmatter(fields, item.body)
+
+
+def _snippet(body: str, *, length: int = 160) -> str:
+    text = " ".join(body.split())
+    if len(text) <= length:
+        return text
+    cut = text.rfind(" ", 0, length)
+    if cut <= 0:
+        cut = length
+    return text[:cut] + "…"
+
+
+def _summary(item: Item) -> ItemSummary:
+    return ItemSummary(
+        id=item.id, space=item.space, type=item.type, title=item.title, status=item.status,
+        due=item.due, tags=list(item.tags), links=list(item.links),
+        created=item.created, updated=item.updated, version=item.version,
+        snippet=_snippet(item.body),
+    )
+
+
+class Store:
+    def __init__(
+        self,
+        data_root: Path,
+        *,
+        now_fn: Callable[[], datetime] = _default_now,
+        git: bool = True,
+    ) -> None:
+        self._data_root = Path(data_root)
+        self._now_fn = now_fn
+        self._git_enabled = git  # Git-Anbindung folgt in Step 5 (history.py)
+        self._lock = threading.RLock()
+        self._db_path = self._data_root / ".index.sqlite3"
+        self._conn = index.connect(self._db_path)
+
+    # -- Sperren -----------------------------------------------------------------
+
+    @contextmanager
+    def _file_write_lock(self):
+        """`flock` auf `<DATA_ROOT>/.write.lock` — schützt gegen andere Prozesse (nicht gegen
+        den Menschen im Editor, siehe Plan §3.2). Nur um den eigentlichen Dateischreibvorgang.
+        """
+        lock_path = self._data_root / ".write.lock"
+        lock_path.touch(exist_ok=True)
+        with open(lock_path, "r+") as f:
+            fcntl.flock(f, fcntl.LOCK_EX)
+            try:
+                yield
+            finally:
+                fcntl.flock(f, fcntl.LOCK_UN)
+
+    # -- Interne Helfer ------------------------------------------------------------
+
+    def _row_to_item(self, row: sqlite3.Row) -> Item:
+        path = self._data_root / row["path"]
+        return _item_from_text(path.read_text(encoding="utf-8"), version_override=row["version"])
+
+    def _reconcile_and_get_row(self, item_id: str) -> sqlite3.Row:
+        """Liest die Indexzeile, erkennt externe Edits (Entscheidung D) und reindiziert bei
+        Bedarf. Muss unter `self._lock` aufgerufen werden.
+        """
+        row = index.get_item_row(self._conn, item_id)
+        if row is None:
+            raise ItemNotFound(item_id)
+        path = self._data_root / row["path"]
+        if not path.exists():
+            raise ItemNotFound(item_id)
+        stat = path.stat()
+        if stat.st_mtime != row["mtime"] or stat.st_size != row["size"]:
+            fresh = index.row_from_file(self._data_root, path)
+            if fresh["sha256"] != row["sha256"]:
+                fresh["version"] = row["version"] + 1
+            else:
+                fresh["version"] = row["version"]
+            index.upsert_item(self._conn, fresh)
+            row = index.get_item_row(self._conn, item_id)
+        return row
+
+    def _write_item_file(self, item: Item, *, old_path: Path | None) -> Path:
+        """Schreibt `item` an den (ggf. neuen) Pfad, benennt bei Titeländerung um, aktualisiert
+        den Index. Muss unter `self._lock` **und** `self._file_write_lock()` aufgerufen werden.
+        """
+        slug = files.slugify(item.title)
+        target_path = files.item_path(self._data_root, item.space, item.id, slug)
+        write_path = old_path if old_path is not None else target_path
+        write_path.parent.mkdir(parents=True, exist_ok=True)
+        files.atomic_write(write_path, _item_to_text(item))
+        if old_path is not None and old_path != target_path:
+            files.move_file(write_path, target_path)
+        row = index.row_from_file(self._data_root, target_path)
+        index.upsert_item(self._conn, row)
+        return target_path
+
+    # -- Öffentliche API (Plan §2) ---------------------------------------------------
+
+    def list_spaces(self) -> list[SpaceInfo]:
+        with self._lock:
+            counts: dict[str, int] = {}
+            for row in index.all_rows(self._conn):
+                counts[row["space"]] = counts.get(row["space"], 0) + 1
+            return [SpaceInfo(name=name, item_count=count) for name, count in sorted(counts.items())]
+
+    def search(
+        self,
+        query: str | None = None,
+        *,
+        space: str | None = None,
+        type: str | None = None,
+        status: str | None = None,
+        tag: str | None = None,
+        due_before: date | None = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> SearchResult:
+        with self._lock:
+            rows = index.all_rows(self._conn)
+
+        items = [self._row_to_item(r) for r in rows]
+
+        def matches(item: Item) -> bool:
+            if space is not None and item.space != space:
+                return False
+            if type is not None and item.type != type:
+                return False
+            if status is not None and item.status != status:
+                return False
+            if tag is not None and tag not in item.tags:
+                return False
+            if due_before is not None and (item.due is None or item.due >= due_before):
+                return False
+            if query:
+                haystack = f"{item.title} {' '.join(item.tags)}".lower()
+                if query.lower() not in haystack:
+                    return False
+            return True
+
+        filtered = [i for i in items if matches(i)]
+        filtered.sort(
+            key=lambda i: (
+                i.status != "open" and i.status != "active",
+                i.due or date.max,
+                -(i.updated.timestamp()),
+            )
+        )
+        total = len(filtered)
+        page = filtered[offset : offset + limit]
+        return SearchResult(
+            items=[_summary(i) for i in page], total=total, limit=limit, offset=offset,
+        )
+
+    def get(self, item_id: str) -> Item:
+        with self._lock:
+            row = self._reconcile_and_get_row(item_id)
+            return self._row_to_item(row)
+
+    def create(self, space: str, *, type: str, title: str, body: str = "", **fields) -> Item:
+        with self._lock, self._file_write_lock():
+            reserved = _SYSTEM_MANAGED_FIELDS & fields.keys()
+            if reserved:
+                raise ValidationError(f"Felder {sorted(reserved)} sind vom Store verwaltet")
+            now = self._now_fn()
+            status = fields.pop("status", _DEFAULT_STATUS.get(type, "active"))
+            due = _coerce_due(fields.pop("due", None))
+            tags = fields.pop("tags", [])
+            links = fields.pop("links", [])
+            item = Item(
+                id=files.generate_id(), space=space, type=type, title=title, status=status,
+                body=body, due=due, tags=list(tags), links=list(links),
+                created=now, updated=now, version=1, extra=fields,
+            )
+            self._write_item_file(item, old_path=None)
+            return item
+
+    def update(self, item_id: str, *, version: int, **changes) -> Item:
+        with self._lock, self._file_write_lock():
+            row = self._reconcile_and_get_row(item_id)
+            current = self._row_to_item(row)
+            if current.version != version:
+                raise ConflictError(item_id, expected_version=version, current=current)
+            if current.status == "archived":
+                raise ValidationError(f"Item {item_id} ist archiviert — update verboten")
+
+            old_path = self._data_root / row["path"]
+            updated_extra = dict(current.extra)
+            known_updatable = {"type", "title", "status", "body", "due", "tags", "links"}
+            kwargs: dict[str, Any] = {}
+            for key, value in changes.items():
+                if key in _SYSTEM_MANAGED_FIELDS:
+                    raise ValidationError(f"Feld '{key}' ist vom Store verwaltet, nicht änderbar")
+                if key == "due":
+                    kwargs["due"] = _coerce_due(value)
+                elif key in known_updatable:
+                    kwargs[key] = value
+                else:
+                    updated_extra[key] = value
+
+            new_item = replace(
+                current,
+                **kwargs,
+                extra=updated_extra,
+                version=current.version + 1,
+                updated=self._now_fn(),
+            )
+            self._write_item_file(new_item, old_path=old_path)
+            return new_item
+
+    def append(self, item_id: str, *, version: int, text: str) -> Item:
+        with self._lock, self._file_write_lock():
+            row = self._reconcile_and_get_row(item_id)
+            current = self._row_to_item(row)
+            if current.version != version:
+                raise ConflictError(item_id, expected_version=version, current=current)
+            if current.status == "archived":
+                raise ValidationError(f"Item {item_id} ist archiviert — append verboten")
+
+            old_path = self._data_root / row["path"]
+            separator = "\n" if current.body and not current.body.endswith("\n") else ""
+            new_item = replace(
+                current,
+                body=current.body + separator + text,
+                version=current.version + 1,
+                updated=self._now_fn(),
+            )
+            self._write_item_file(new_item, old_path=old_path)
+            return new_item
+
+    def archive(self, item_id: str, *, version: int) -> Item:
+        with self._lock, self._file_write_lock():
+            row = self._reconcile_and_get_row(item_id)
+            current = self._row_to_item(row)
+            if current.version != version:
+                raise ConflictError(item_id, expected_version=version, current=current)
+
+            old_path = self._data_root / row["path"]
+            new_item = replace(
+                current, status="archived", version=current.version + 1, updated=self._now_fn(),
+            )
+            slug = files.slugify(new_item.title)
+            archive_path = (
+                self._data_root / new_item.space / "_archive" / files.item_filename(new_item.id, slug)
+            )
+            files.atomic_write(old_path, _item_to_text(new_item))
+            files.move_file(old_path, archive_path)
+            row2 = index.row_from_file(self._data_root, archive_path)
+            index.upsert_item(self._conn, row2)
+            return new_item
+
+    def rebuild_index(self) -> IndexStats:
+        with self._lock:
+            return index.rebuild_index(self._data_root, self._conn)

@@ -76,14 +76,24 @@ def atomic_write(path: Path, content: str, *, encoding: str = "utf-8") -> None:
             os.close(dir_fd)
 
 
-def rename_for_new_slug(old_path: Path, item_id: str, new_slug: str) -> Path:
-    """Benennt die Datei bei Titeländerung um. Die ID im Namen bleibt, nur der Slug wechselt."""
-    new_path = old_path.parent / item_filename(item_id, new_slug)
-    if new_path != old_path:
-        os.replace(old_path, new_path)
-        dir_fd = os.open(old_path.parent, os.O_RDONLY)
+def move_file(old_path: Path, new_path: Path) -> None:
+    """Atomarer Move (auch über Verzeichnisse hinweg, z. B. nach `_archive/`), mit
+    Verzeichnis-fsync auf Quelle und Ziel. No-op wenn `old_path == new_path`.
+    """
+    if old_path == new_path:
+        return
+    new_path.parent.mkdir(parents=True, exist_ok=True)
+    os.replace(old_path, new_path)
+    for directory in {old_path.parent, new_path.parent}:
+        dir_fd = os.open(directory, os.O_RDONLY)
         try:
             os.fsync(dir_fd)
         finally:
             os.close(dir_fd)
+
+
+def rename_for_new_slug(old_path: Path, item_id: str, new_slug: str) -> Path:
+    """Benennt die Datei bei Titeländerung um. Die ID im Namen bleibt, nur der Slug wechselt."""
+    new_path = old_path.parent / item_filename(item_id, new_slug)
+    move_file(old_path, new_path)
     return new_path

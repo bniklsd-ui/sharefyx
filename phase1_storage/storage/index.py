@@ -56,7 +56,10 @@ def connect(db_path: Path) -> sqlite3.Connection:
 
 
 def _open_and_init(db_path: Path) -> sqlite3.Connection:
-    conn = sqlite3.connect(db_path)
+    # check_same_thread=False: Store serialisiert jeden Zugriff selbst über sein eigenes Lock
+    # (Plan §3.1, "ein Prozess reicht"). Ohne das hier würde sqlite3 jeden Cross-Thread-Zugriff
+    # ablehnen, auch wenn er durch das Store-Lock längst serialisiert ist.
+    conn = sqlite3.connect(db_path, check_same_thread=False)
     try:
         conn.execute("PRAGMA journal_mode=WAL")
         conn.execute(_SCHEMA)

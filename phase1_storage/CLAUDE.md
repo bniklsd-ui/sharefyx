@@ -88,12 +88,12 @@ P1 nicht abgeschlossen, egal wie viel Code existiert.
 | 2 | `models.py`, `frontmatter.py` | 1 | ✅ | 9 |
 | 3 | `files.py` (atomarer Write, IDs, Slugs) | 2 | ✅ | 12 |
 | 4 | `index.py` (SQLite, Rebuild) | 3 | ✅ | 9 |
-| 5 | `store.py` (API, Lock, Versionierung) | 4 | ⬜ | – |
+| 5 | `store.py` (API, Lock, Versionierung) | 4 | ✅ | 17 |
 | 6 | `history.py` (Git) | 5 | ⬜ | – |
 | 7 | Query-Layer in `store.py` | 6 | ⬜ | – |
 | 8 | `scripts/space_cli.py` | 7 | ⬜ | – |
 
-**Gesamt: 30 Tests.** Zielgröße am Phasenende: grob 60–90, davon mindestens die vier
+**Gesamt: 47 Tests.** Zielgröße am Phasenende: grob 60–90, davon mindestens die vier
 Konflikt-Tests aus Step 4. Step 0 hat bewusst keine Tests (reines Skelett) — `pytest`
 lief dort grün mit `exit 5` („no tests ran", nicht `exit 0`); das ist die korrekte
 Bedeutung von „0 Tests", kein Fehlerzustand.
@@ -106,7 +106,7 @@ nach Phasenabschluss ist eine Scope-Änderung und braucht eine Entscheidung, kei
 
 ---
 
-## Session stopped — 2026-07-24 (Step 0–3 abgeschlossen)
+## Session stopped — 2026-07-24 (Step 0–4 abgeschlossen — der Phasenbeweis steht)
 
 **Ergebnis:** Code-Repo initialisiert (`git init` in `/home/savefyx/dev/savefxy`, lokale Git-Identity
 gesetzt, da auf der Maschine keine existierte). Erster Commit checkt die Projektdokumente aus der
@@ -196,24 +196,62 @@ per `rebuild_index()` befüllen, `check_filesystem()` loggt bei `nfs4` genau ein
 **Erledigt nebenbei:** `DATA_ROOT` (`/home/savefyx/savefyx-data`) angelegt, per `findmnt`
 bestätigt `ext4` (Nikinger-Wunsch, `mkdir` statt Aufschieben).
 
-**Nächster Schritt (konkret):** Step 4 — `storage/store.py`, der eigentliche Beweis der Phase.
-Die API aus Plan §2 (`Store.__init__`, `list_spaces`, `search`, `get`, `create`, `update`,
-`append`, `archive`, `rebuild_index`), Prozessweiter Write-Lock + `fcntl.flock` auf
-`<DATA_ROOT>/.write.lock`, Versionsprüfung, `ConflictError` (trägt das aktuelle Item — hier
-entsteht `storage/errors.py` zum ersten Mal, inkl. der `IndexError_`-Namensentscheidung),
-Drift-Erkennung nach Entscheidung D über `(mtime, size, sha256)` aus `index.py`. **Die vier
-Pflicht-Tests aus Plan §4 Step 4 sind non-negotiable** — ohne sie ist P1 laut Phase-Head nicht
-abgeschlossen, unabhängig vom sonstigen Codeumfang: (1) zwei sequenzielle `update` mit gleicher
-Version → zweiter wirft `ConflictError` mit aktuellem Item, (2) externer Edit → nächster `get`
-zeigt neuen Inhalt mit erhöhter Version, `update` mit alter Version wirft, (3) zwei parallele
-`update` aus zwei Threads → genau einer gewinnt, (4) `update` auf archiviertes Item wirft statt
-reaktiviert.
+**Step 4 Ergebnis — der Phasenbeweis steht:** `storage/errors.py` (neu: `SpaceError`,
+`ItemNotFound`, `SpaceNotFound`, `ConflictError` trägt `current: Item`, `ValidationError`,
+`IndexCorrupt` — `IndexError_` wie geplant umbenannt, da Kollision mit dem Python-Builtin
+`IndexError`; bislang ungenutzt, `index.connect()` heilt Korruption still). `storage/store.py`:
+volle API aus Plan §2 (`list_spaces`, `search`, `get`, `create`, `update`, `append`, `archive`,
+`rebuild_index`). Ein `threading.RLock()` serialisiert **jeden** Store-Aufruf innerhalb des
+Prozesses (Plan §3.1: „ein Prozess reicht"), zusätzlich `fcntl.flock` auf
+`<DATA_ROOT>/.write.lock` nur um die eigentlichen Dateischreibvorgänge (create/update/append/
+archive) — schützt gegen andere Prozesse, nicht gegen den Menschen im Editor (siehe Plan §3.2,
+weiterhin gültig). `Item.version` wird beim Lesen **immer aus dem Index** genommen, nicht aus
+dem rohen Frontmatter-Feld — dadurch funktioniert Drift-Erkennung (Entscheidung D) sauber: bei
+`(mtime, size)`-Abweichung wird `sha256` nachgerechnet, bei echter Änderung `version` im Index
++1 gesetzt, ohne die Datei anzufassen; der nächste offizielle Write schreibt die gebumpte Version
+dann auch ins Frontmatter zurück und bringt beides wieder in Sync.
 
-**Offene `[VERIFY]` in diesem Track:** Namenskollision `IndexError_` — muss in Step 4 real
-entschieden werden, wenn `errors.py` entsteht (Plan-Vorschlag: `IndexCorrupt`) · Snippet-/
-Listing-Größenziel 3 KB (Plan Step 6, noch nicht relevant).
-**Aufgelöst seit Step 0–3:** `flock` auf ext4 (Step 0) · `python-frontmatter`-Roundtrip →
-verworfen, eigener Parser (Step 1) · Dateisystem-Ermittlung via `/proc/mounts` (Step 3).
+**Zwei Bugs vor dem ersten Testlauf gefunden und gefixt (Design-Review, nicht Testfund):**
+(1) `due` kam aus `**fields`/`**changes` ungefiltert durch — ein ISO-String hätte beim Schreiben
+an `item.due.isoformat()` gecrasht. Fix: `_coerce_due()` akzeptiert `date`, ISO-String oder
+`None`. (2) System-verwaltete Felder (`id`, `space`, `created`, `updated`, `version`) landeten
+bei unbekannten Keys in `Item.extra` — und `_item_to_text()` schreibt `fields.update(item.extra)`
+**nach** den berechneten Werten, hätte sie also lautlos überschrieben. Fix:
+`_SYSTEM_MANAGED_FIELDS`-Guard in `create()` und `update()`, wirft `ValidationError` statt
+still zu korrumpieren.
+
+**Ein echter Testfund:** `sqlite3.connect()` lehnt standardmäßig Zugriffe aus einem anderen
+Thread ab als dem, der die Connection geöffnet hat — Test 3 (zwei Threads) crashte beide Threads
+mit `ProgrammingError`, nicht mit dem erwarteten `ConflictError`. Fix in `index.py`:
+`check_same_thread=False` beim `connect()`, mit Kommentar warum das hier sicher ist (Store
+serialisiert bereits selbst über sein eigenes Lock). `test_3` 20× wiederholt laufen lassen,
+keine Flakiness.
+
+**Verifiziert (live):** `pytest -v` → 47/47 grün (17 neue in `test_store.py`, davon die vier
+Pflicht-Tests namentlich `test_1_…` bis `test_4_…`). Zusätzlich Basisabdeckung: Status-Defaults
+nach `type`, Rename bei Titeländerung, `extra`-Felder überleben Updates, `archive()` verschiebt
+nach `_archive/`, `search()` liefert nur Summaries (kein `body`-Attribut), `list_spaces()`
+zählt korrekt pro Space.
+
+**Bewusst nicht Step-4-fertig (gehört zu Step 6):** `search()` existiert und funktioniert
+(Filter, einfache Sortierung, Snippet via `_snippet()`), ist aber **nicht** gegen das
+3-KB-Listing-Ziel kalibriert und die Sortierstabilität ist ein Platzhalter
+(`status != open/active` zuerst, dann `due`, dann `updated` absteigend) — Plan Step 6 macht das
+verbindlich. Modul-Status-Zeile 7 bleibt deshalb ⬜.
+
+**Nächster Schritt (konkret):** Step 5 — `storage/history.py`: Git-Repo-Init in `DATA_ROOT`
+falls nötig, ein Commit nach jedem erfolgreichen Write (`<op> <item_id> [<space>]`), `git: bool`-
+Schalter (in `Store.__init__` bereits als `self._git_enabled` vorhanden, aber noch **folgenlos**
+— Step 5 muss `store.py` an den vier Schreibstellen `_write_item_file`/`archive()` tatsächlich an
+`history.py` anschließen). Git-Fehler → `logger.critical`, niemals den Write abbrechen.
+Done-Kriterium: 3 Writes → `git log` zeigt 3 Commits mit erwarteten Messages; ein kaputtes
+Git-Repo lässt Writes weiterlaufen und loggt `critical`.
+
+**Offene `[VERIFY]` in diesem Track:** Snippet-/Listing-Größenziel 3 KB (Plan Step 6 — jetzt der
+nächste inhaltliche Block nach Step 5).
+**Aufgelöst seit Step 0–4:** `flock` auf ext4 (Step 0) · `python-frontmatter`-Roundtrip →
+verworfen, eigener Parser (Step 1) · Dateisystem-Ermittlung via `/proc/mounts` (Step 3) ·
+`IndexError_` → `IndexCorrupt` (Step 4).
 
 **Kleine Korrektur zum Plan:** „`pytest` grün mit null Tests" (Step 0, Done-when) bedeutet in der
 Praxis `exit 5` („no tests ran"), nicht `exit 0` — pytest markiert eine leere Testsammlung so.
