@@ -88,12 +88,12 @@ P1 nicht abgeschlossen, egal wie viel Code existiert.
 | 2 | `models.py`, `frontmatter.py` | 1 | ✅ | 9 |
 | 3 | `files.py` (atomarer Write, IDs, Slugs) | 2 | ✅ | 12 |
 | 4 | `index.py` (SQLite, Rebuild) | 3 | ✅ | 9 |
-| 5 | `store.py` (API, Lock, Versionierung) | 4 | ✅ | 17 |
+| 5 | `store.py` (API, Lock, Versionierung) | 4 | ✅ | 18 |
 | 6 | `history.py` (Git) | 5 | ⬜ | – |
 | 7 | Query-Layer in `store.py` | 6 | ⬜ | – |
 | 8 | `scripts/space_cli.py` | 7 | ⬜ | – |
 
-**Gesamt: 47 Tests.** Zielgröße am Phasenende: grob 60–90, davon mindestens die vier
+**Gesamt: 48 Tests.** Zielgröße am Phasenende: grob 60–90, davon mindestens die vier
 Konflikt-Tests aus Step 4. Step 0 hat bewusst keine Tests (reines Skelett) — `pytest`
 lief dort grün mit `exit 5` („no tests ran", nicht `exit 0`); das ist die korrekte
 Bedeutung von „0 Tests", kein Fehlerzustand.
@@ -233,6 +233,36 @@ nach `type`, Rename bei Titeländerung, `extra`-Felder überleben Updates, `arch
 nach `_archive/`, `search()` liefert nur Summaries (kein `body`-Attribut), `list_spaces()`
 zählt korrekt pro Space.
 
+**Nachtrag zu Step 4 — Advisor-Fund, per Nikinger-Entscheidung gefixt (noch vor Step 5):**
+Der Advisor (Opus 4.8, vom Nikinger nach der Review-Pause aktiviert) fand einen echten
+Konflikt zwischen zwei gelockten Entscheidungen, den `store.py` lautlos aufgelöst hatte, statt
+ihn sichtbar zu machen — genau der Fall, den die Root-`CLAUDE.md` mit „Widersprechende Evidenz
+wird ein expliziter Befund für den Menschen, nie eine stille Abweichung" adressiert:
+
+Die durch Drift-Erkennung (Entscheidung D) erhöhte Version lebte **nur im Index**. Ein
+`rebuild_index()` (Entscheidung A, „jederzeit erlaubt" — und läuft laut Entscheidung G bei
+jedem Start) liest die Version aus dem Frontmatter, das der Mensch nie angefasst hat, und setzt
+sie damit lautlos wieder auf den alten Stand zurück. Da `version` der Lock-Guard selbst ist,
+öffnet das nach jedem Neustart erneut ein Fenster, in dem ein Client mit veralteter `version`
+einen menschlichen Edit überschreiben kann, ohne dass `ConflictError` greift. Empirisch
+reproduziert (`get()` nach externem Edit → Version 2, nach `rebuild_index()` → zurück auf 1).
+
+**Nikinger-Entscheidung (2026-07-24):** Die Datei bleibt die Wahrheit — der Bump wird ins
+Frontmatter zurückgeschrieben. Umgesetzt: `_reconcile_and_get_row()` schreibt bei echter
+Inhaltsänderung (`sha256` weicht ab) nur das `version`-Feld neu (`_rewrite_version_in_file()`,
+minimaler Fußabdruck, alles andere bleibt byte-identisch). Locking dafür neu geordnet:
+`get()` hält jetzt **auch** `self._file_write_lock()` (nicht mehr nur `self._lock`), und
+`_reconcile_and_get_row`/`_rewrite_version_in_file` verwalten **kein eigenes** Lock mehr —
+verschachteltes `flock` auf demselben Lockfile hätte sich selbst blockiert, sobald
+`update`/`append`/`archive` (die den Write-Lock bereits halten) intern hier reinlaufen.
+Regressionstest `test_drift_bumped_version_survives_rebuild_index` in `test_store.py` fixiert
+das Verhalten. Re-verifiziert: 48/48 grün.
+
+**Für Step 5 vorgemerkt:** `get()` ist jetzt ein potenzieller Writer (wenn Drift real bumpt).
+Sobald `history.py` an die vier bekannten Schreibstellen angeschlossen wird, muss diese
+fünfte — bislang unsichtbare — Schreibstelle mitgedacht werden, sonst fehlt für einen
+drift-ausgelösten Rewrite der Git-Commit.
+
 **Bewusst nicht Step-4-fertig (gehört zu Step 6):** `search()` existiert und funktioniert
 (Filter, einfache Sortierung, Snippet via `_snippet()`), ist aber **nicht** gegen das
 3-KB-Listing-Ziel kalibriert und die Sortierstabilität ist ein Platzhalter
@@ -242,8 +272,10 @@ verbindlich. Modul-Status-Zeile 7 bleibt deshalb ⬜.
 **Nächster Schritt (konkret):** Step 5 — `storage/history.py`: Git-Repo-Init in `DATA_ROOT`
 falls nötig, ein Commit nach jedem erfolgreichen Write (`<op> <item_id> [<space>]`), `git: bool`-
 Schalter (in `Store.__init__` bereits als `self._git_enabled` vorhanden, aber noch **folgenlos**
-— Step 5 muss `store.py` an den vier Schreibstellen `_write_item_file`/`archive()` tatsächlich an
-`history.py` anschließen). Git-Fehler → `logger.critical`, niemals den Write abbrechen.
+— Step 5 muss `store.py` an den **fünf** Schreibstellen tatsächlich an `history.py` anschließen:
+`_write_item_file()` (create/update/append), `archive()`, **und** `_rewrite_version_in_file()`
+im Drift-Pfad von `_reconcile_and_get_row()` — die fünfte kam erst nach der Step-4-Review dazu,
+siehe Nachtrag oben). Git-Fehler → `logger.critical`, niemals den Write abbrechen.
 Done-Kriterium: 3 Writes → `git log` zeigt 3 Commits mit erwarteten Messages; ein kaputtes
 Git-Repo lässt Writes weiterlaufen und loggt `critical`.
 

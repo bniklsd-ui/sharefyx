@@ -212,3 +212,27 @@ def test_rebuild_index_repopulates_from_files(store, tmp_path):
 
     stats = store.rebuild_index()
     assert stats.items_indexed == 2
+
+
+def test_drift_bumped_version_survives_rebuild_index(store, tmp_path):
+    """Regression: die durch Drift-Erkennung (Entscheidung D) erhöhte Version muss ins
+    Frontmatter zurückgeschrieben werden. Täte sie das nicht, würde `rebuild_index()`
+    (Entscheidung A, läuft laut Plan G bei jedem Start) sie lautlos wieder auf den alten
+    Dateistand zurücksetzen — und das Konfliktschutz-Fenster erneut öffnen. Advisor-Fund,
+    2026-07-24, siehe Session-stopped-Block.
+    """
+    item = store.create("nikinger", type="note", title="Einkaufsliste", body="Milch\n")
+    path = tmp_path / "nikinger" / f"{item.id}__einkaufsliste.md"
+
+    path.write_text(path.read_text().replace("Milch", "Milch, Butter"))
+    later = path.stat().st_mtime + 5
+    os.utime(path, (later, later))
+
+    bumped = store.get(item.id)
+    assert bumped.version == item.version + 1
+    assert "version: 2" in path.read_text()
+
+    store.rebuild_index()
+
+    after_rebuild = store.get(item.id)
+    assert after_rebuild.version == bumped.version

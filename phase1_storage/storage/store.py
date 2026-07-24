@@ -148,7 +148,16 @@ class Store:
 
     def _reconcile_and_get_row(self, item_id: str) -> sqlite3.Row:
         """Liest die Indexzeile, erkennt externe Edits (Entscheidung D) und reindiziert bei
-        Bedarf. Muss unter `self._lock` aufgerufen werden.
+        Bedarf. Bei echter Inhaltsänderung wird die gebumpte Version **ins Frontmatter
+        zurückgeschrieben** — sonst würde ein `rebuild_index()` (Entscheidung A, jederzeit
+        erlaubt, läuft laut Plan G beim Start) die Version wieder auf den alten Dateistand
+        zurücksetzen und das Konfliktschutz-Fenster lautlos wieder öffnen (Nikinger-Entscheidung
+        2026-07-24, siehe Session-stopped-Block).
+
+        Muss unter `self._lock` **und** `self._file_write_lock()` aufgerufen werden — diese
+        Methode kann schreiben (deshalb keine eigene Lock-Verwaltung: verschachteltes `flock`
+        auf demselben Lockfile würde sich selbst blockieren, wenn `update`/`append`/`archive`
+        den Write-Lock bereits halten und intern hierher reinlaufen).
         """
         row = index.get_item_row(self._conn, item_id)
         if row is None:
@@ -160,12 +169,23 @@ class Store:
         if stat.st_mtime != row["mtime"] or stat.st_size != row["size"]:
             fresh = index.row_from_file(self._data_root, path)
             if fresh["sha256"] != row["sha256"]:
-                fresh["version"] = row["version"] + 1
+                new_version = row["version"] + 1
+                self._rewrite_version_in_file(path, new_version)
+                fresh = index.row_from_file(self._data_root, path)
             else:
                 fresh["version"] = row["version"]
             index.upsert_item(self._conn, fresh)
             row = index.get_item_row(self._conn, item_id)
         return row
+
+    def _rewrite_version_in_file(self, path: Path, new_version: int) -> None:
+        """Schreibt nur das `version`-Feld neu — sonst nichts. Minimaler Fußabdruck: die Datei
+        bleibt bis auf dieses eine Feld exakt so, wie der Mensch sie hinterlassen hat.
+        """
+        text = path.read_text(encoding="utf-8")
+        fields, body = parse_frontmatter(text)
+        fields["version"] = new_version
+        files.atomic_write(path, serialize_frontmatter(fields, body))
 
     def _write_item_file(self, item: Item, *, old_path: Path | None) -> Path:
         """Schreibt `item` an den (ggf. neuen) Pfad, benennt bei Titeländerung um, aktualisiert
@@ -240,7 +260,7 @@ class Store:
         )
 
     def get(self, item_id: str) -> Item:
-        with self._lock:
+        with self._lock, self._file_write_lock():
             row = self._reconcile_and_get_row(item_id)
             return self._row_to_item(row)
 
