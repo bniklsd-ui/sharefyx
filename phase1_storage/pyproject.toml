@@ -7,7 +7,7 @@ name = "storage"
 version = "0.1.0"
 description = "Storage-Kern des Space-Servers (Phase 1) — Dateien + Index + Versionierung"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = ["pyyaml>=6.0"]
 
 [project.optional-dependencies]
 dev = ["pytest"]

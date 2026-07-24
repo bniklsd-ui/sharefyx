@@ -85,7 +85,7 @@ P1 nicht abgeschlossen, egal wie viel Code existiert.
 | # | Modul | Step | Status | Tests |
 |---|---|---|---|---|
 | 1 | Repo-Skelett, `pyproject.toml`, dev_install | 0 | ✅ | 0 |
-| 2 | `models.py`, `frontmatter.py` | 1 | ⬜ | – |
+| 2 | `models.py`, `frontmatter.py` | 1 | ✅ | 9 |
 | 3 | `files.py` (atomarer Write, IDs, Slugs) | 2 | ⬜ | – |
 | 4 | `index.py` (SQLite, Rebuild) | 3 | ⬜ | – |
 | 5 | `store.py` (API, Lock, Versionierung) | 4 | ⬜ | – |
@@ -93,9 +93,9 @@ P1 nicht abgeschlossen, egal wie viel Code existiert.
 | 7 | Query-Layer in `store.py` | 6 | ⬜ | – |
 | 8 | `scripts/space_cli.py` | 7 | ⬜ | – |
 
-**Gesamt: 0 Tests.** Zielgröße am Phasenende: grob 60–90, davon mindestens die vier
+**Gesamt: 9 Tests.** Zielgröße am Phasenende: grob 60–90, davon mindestens die vier
 Konflikt-Tests aus Step 4. Step 0 hat bewusst keine Tests (reines Skelett) — `pytest`
-läuft grün mit `exit 5` („no tests ran", nicht `exit 0`); das ist die korrekte
+lief dort grün mit `exit 5` („no tests ran", nicht `exit 0`); das ist die korrekte
 Bedeutung von „0 Tests", kein Fehlerzustand.
 
 ## Geerbte Contracts
@@ -106,7 +106,7 @@ nach Phasenabschluss ist eine Scope-Änderung und braucht eine Entscheidung, kei
 
 ---
 
-## Session stopped — 2026-07-24 (Step 0 abgeschlossen)
+## Session stopped — 2026-07-24 (Step 0 + Step 1 abgeschlossen)
 
 **Ergebnis:** Code-Repo initialisiert (`git init` in `/home/savefyx/dev/savefxy`, lokale Git-Identity
 gesetzt, da auf der Maschine keine existierte). Erster Commit checkt die Projektdokumente aus der
@@ -126,17 +126,46 @@ lokale Platte, kein Shared Folder). System-Dependency-Lücke (`pip`/`ensurepip` 
 über `sudo apt install python3-venv python3-pip -y` durch den Nikinger behoben — Claude Code hat
 in dieser Sandbox kein `sudo`.
 
-**Nächster Schritt (konkret):** Step 1 — `storage/models.py` (`Item`, `SpaceInfo`, `SearchResult`,
-`IndexStats` als Dataclasses) und `storage/frontmatter.py` (parse/serialize). Zuerst das
-`[VERIFY]` zu `python-frontmatter` auflösen (erhält die Bibliothek unbekannte Felder und
-Feldreihenfolge beim Roundtrip? Plan Step 1) — wenn nicht, eigener Parser über `PyYAML`, da
-Round-Trip-Treue nicht verhandelbar ist (Entscheidung A). Done-Kriterium: Property-Test
-`serialize(parse(x)) == x` byte-identisch, Fixture mit Umlauten, mehrzeiligem Body, unbekanntem
-Zusatzfeld, leerem Body.
+**Step 1 Ergebnis:** `[VERIFY]` zu `python-frontmatter` empirisch aufgelöst — **verworfen**.
+Probe (`frontmatter.loads`/`dumps` auf einem Fixture mit Umlauten, unbekanntem Feld,
+ISO-Timestamp) zeigte zwei Verstöße gegen Entscheidung A: Keys werden alphabetisch sortiert
+(`sort_keys` nicht exponiert) und Timestamps werden zu `datetime` gecastet und in einem anderen
+Format zurückgeschrieben (`2026-07-24T18:20:00Z` → `2026-07-24 18:20:00+00:00`). Stattdessen:
+eigener, dünner Parser in `storage/frontmatter.py` über PyYAML — `SafeLoader`/`SafeDumper` mit
+entferntem Timestamp-Resolver (auf **beiden** Seiten, sonst quotet der Dumper datumsartige
+Strings trotzdem, da sein `Resolver` unabhängig vom Loader ist), `sort_keys=False`,
+`allow_unicode=True`. `storage/models.py` liefert `Item`, `SpaceInfo`, `ItemSummary`,
+`SearchResult`, `IndexStats` als `@dataclass(kw_only=True)` — `kw_only` vermeiden das
+Default-Reihenfolge-Problem bei Pflichtfeldern wie `created`/`updated` ohne Default neben
+optionalen wie `due`.
 
-**Offene `[VERIFY]` in diesem Track (unverändert seit der Planung):** Round-Trip-Treue von
-`python-frontmatter` (Plan Step 1) · Namenskollision `IndexError_` (Plan §1) · Methode zur
-Dateisystem-Ermittlung unter Ubuntu (Plan Step 3) · Snippet-/Listing-Größenziel 3 KB (Plan Step 6).
+**Implementierungsentscheidung (Plan unterspezifiziert, hier getroffen):** Plan §4 Step 1 nennt
+nur vier Dataclasses, aber `SearchResult` soll laut Plan §2 „ausschließlich Frontmatter plus
+Snippet, niemals volle Bodies" tragen — dafür reicht `Item` nicht (hat `body`, kein `snippet`).
+Deshalb zusätzlich `ItemSummary` (Frontmatter-Felder + `snippet: str`, kein `body`) als
+Element-Typ von `SearchResult.items`. `SpaceInfo` bekam `name: str` + `item_count: int`
+(im Plan nicht spezifiziert, aber ohne Count ist ein Space-Listing nutzlos). Beides ist ab
+Phasenende Contract für P2 (siehe „Geerbte Contracts" oben) — **bei Bedarf mit dem Nikinger
+gegenprüfen, bevor P2 darauf aufbaut.**
+
+**Verifiziert (live):** `pytest -v` → 9/9 grün (6 `test_frontmatter.py`, davon die geforderte
+Property-Test-Fixture mit Umlauten/mehrzeiligem Body/unbekanntem Feld/leerem Body; 3
+`test_models.py` als Konstruktions-Smoke-Test).
+
+**Nächster Schritt (konkret):** Step 2 — `storage/files.py`: ID-Erzeugung (`itm_` + 8 Hex aus
+`secrets.token_hex(4)`), Slugify mit korrekter Umlaut-Transliteration (`ä→ae` etc.),
+Pfadauflösung `<id>__<slug>.md`, atomarer Write (tmp + `os.replace` + Verzeichnis-`fsync`),
+Umbenennung bei Titeländerung. Done-Kriterium laut Plan: Test schreibt 200 Items, eine
+`kill -9`-Simulation per Monkeypatch zwischen tmp und `replace` hinterlässt keine halb
+geschriebene Zieldatei, Slug-Kollisionen überschreiben nichts (ID im Namen garantiert
+Eindeutigkeit).
+
+**Offene `[VERIFY]` in diesem Track:** Namenskollision `IndexError_` (Plan §1, noch nicht
+gebraucht — `errors.py` existiert erst ab dem Step, der den ersten Fehlertyp braucht) · Methode
+zur Dateisystem-Ermittlung unter Ubuntu (Plan Step 3) · Snippet-/Listing-Größenziel 3 KB (Plan
+Step 6).
+**Aufgelöst seit Step 0/1:** `flock` auf ext4 (Step 0) · `python-frontmatter`-Roundtrip → verworfen,
+eigener Parser (Step 1, siehe oben).
 
 **Kleine Korrektur zum Plan:** „`pytest` grün mit null Tests" (Step 0, Done-when) bedeutet in der
 Praxis `exit 5` („no tests ran"), nicht `exit 0` — pytest markiert eine leere Testsammlung so.
