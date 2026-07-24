@@ -90,10 +90,10 @@ P1 nicht abgeschlossen, egal wie viel Code existiert.
 | 4 | `index.py` (SQLite, Rebuild) | 3 | ✅ | 9 |
 | 5 | `store.py` (API, Lock, Versionierung) | 4 | ✅ | 18 |
 | 6 | `history.py` (Git) | 5 | ✅ | 11 |
-| 7 | Query-Layer in `store.py` | 6 | ⬜ | – |
+| 7 | Query-Layer in `store.py` | 6 | ✅ | 2 (in `test_store.py`) |
 | 8 | `scripts/space_cli.py` | 7 | ⬜ | – |
 
-**Gesamt: 59 Tests.** Zielgröße am Phasenende: grob 60–90, davon mindestens die vier
+**Gesamt: 61 Tests.** Zielgröße am Phasenende: grob 60–90, davon mindestens die vier
 Konflikt-Tests aus Step 4. Step 0 hat bewusst keine Tests (reines Skelett) — `pytest`
 lief dort grün mit `exit 5` („no tests ran", nicht `exit 0`); das ist die korrekte
 Bedeutung von „0 Tests", kein Fehlerzustand.
@@ -331,16 +331,54 @@ neuen Tests, nur verschärfte Assertions.
 veralteten „Step 0 ✅, Steps 1–7 offen" — beim Session-Einstieg dieser Session bemerkt, hier
 mit Datum korrigiert (2026-07-24) und auf den echten Stand nach Step 5 gebracht.
 
-**Nächster Schritt (konkret):** Step 6 — Query-Layer in `store.py` fertigstellen: `search()`
-existiert bereits (Filter, einfache Sortierung, Snippet), aber Volltext explizit auf `title` +
-`tags` begrenzen (nicht Bodies, P2-fremd), Snippet-/Listing-Größenziel **`[VERIFY]`** gegen
-echte Beispieldaten kalibrieren (Plan nennt 3 KB als Schätzung), stabile Sortierung
-(`status` offen zuerst, dann `due`, dann `updated` absteigend — teilweise schon vorhanden,
-Plan Step 6 macht sie verbindlich). Done-Kriterium: Listing über 30 Items serialisiert zu
-<3 KB JSON (oder kalibrierter Wert), ein Test misst das.
+**Step 6 Ergebnis:** Query-Layer geprüft statt neu gebaut — `search()` erfüllte bereits seit
+Step 4 alle Anforderungen (Volltext nur über `title`+`tags`, nie Bodies; Snippet via
+`_snippet()`; Paginierung; Sortierung `status offen zuerst → due aufsteigend → updated
+absteigend`). Kein Produktivcode geändert, `store.py` unangetastet (per Diff verifiziert) —
+Step 6 war reines Testen/Kalibrieren/Verbindlich-Machen, kein Bau.
 
-**Offene `[VERIFY]` in diesem Track:** Snippet-/Listing-Größenziel 3 KB (Plan Step 6 — jetzt der
-nächste inhaltliche Block).
+**`[VERIFY]` 3-KB-Ziel empirisch aufgelöst — Schätzung war strukturell nicht erreichbar, nicht
+nur ungenau:** Drei Stufen gegen `ItemSummary` (12 Felder) gemessen, jeweils 30 Items,
+korrekte ISO-Z-Zeitstempel (`%Y-%m-%dT%H:%M:%SZ`, nicht Pythons `str(datetime)` — letzteres
+kostet 5 B/Feld extra):
+- **Floor** (leerer Titel, kein Tag, kein `due`, leerer Body): ~7,0 KB (~233 B/Item) — allein
+  der JSON-Rahmen der 12 Felder (Keys, Anführungszeichen, Klammern) ohne jeden Inhalt.
+- **Realistisch** (normaler Titel, 2 Tags, `due`, kurzer Body → kurzer Snippet): ~10,3 KB
+  (~345 B/Item).
+- **Ceiling** (langer Titel, 3 Tags, `due`, Body lang genug für vollen 160-Zeichen-Snippet):
+  ~14,0 KB (~467 B/Item), davon allein ~4,7 KB (34 %) der volle Snippet-Anteil.
+Selbst der Floor liegt über dem Doppelten des geschätzten Ziels — 3 KB war bei diesem
+Feldsatz kein erreichbarer Wert, kein Kalibrierungsfehler um ein bisschen. **Kalibrierter,
+jetzt verbindlich getesteter Wert: <16 KB** (Marge über dem gemessenen Ceiling),
+`test_search_listing_of_30_items_stays_within_calibrated_json_bound` pinnt Titel/Tags/Body/Uhr
+fest (nicht abhängig davon, was `create()` gerade produziert — sonst liefe die Schwelle der
+Fixture hinterher statt etwas zu prüfen).
+
+**Befund für den Nikinger (keine eigenmächtige Änderung, nur Empfehlung):** Plan §2 behauptet
+„Ein Listing über 30 Items muss in wenigen hundert Tokens passen" als Design-Eigenschaft der
+Token-Sparmaßnahme (keine volle Bodies in `SearchResult`). Das stimmt in der Tendenz (Bodies
+wären um Größenordnungen teurer), aber die konkrete Zahl hält nicht: 30 Items landen real bei
+~2.500–3.500 Tokens (grobe 4-Zeichen/Token-Schätzung), nicht bei „ein paar hundert". Größter
+Hebel, falls das zu grob ist: der 160-Zeichen-Snippet-Cap (34 % vom Ceiling) oder ein kleinerer
+Default-`limit`. Beides wäre eine `ItemSummary`/API-Entscheidung, also Nikinger-Sache — aktueller
+Feldsatz bleibt unverändert, bis das entschieden ist.
+
+**Sortierung verbindlich gemacht:** `test_search_sort_order_locks_status_then_due_then_updated_desc`
+pinnt die seit Step 4 als „Platzhalter" markierte Reihenfolge fest — empirisch verifiziert:
+Test bricht, wenn das `updated`-Tiebreak-Vorzeichen kippt (Regressionsschutz bestätigt, nicht
+nur angenommen).
+
+**Verifiziert (live):** `pytest -v` → 61/61 grün (2 neue in `test_store.py`, kein neues Modul).
+`git diff` bestätigt: nur `tests/test_store.py` geändert, `storage/` unangetastet.
+
+**Nächster Schritt (konkret):** Step 7 — `scripts/space_cli.py`: `create`, `list`, `search`,
+`show`, `update`, `archive`, `reindex`. Logging → stderr, Ausgabe wahlweise Text oder `--json`
+auf stdout — das ist die erste Stelle, an der `ItemSummary`/`SearchResult` tatsächlich zu JSON
+serialisiert werden (Step 6 hat das nur test-lokal nachgebaut, keine öffentliche Serialisierung
+eingeführt). Done-Kriterium: ein manueller Durchlauf legt einen Space an, erstellt drei Items,
+findet sie wieder, provoziert bewusst einen Konflikt und zeigt ihn verständlich an — komplett
+ohne Netz.
+
 **Aufgelöst seit Step 0–4:** `flock` auf ext4 (Step 0) · `python-frontmatter`-Roundtrip →
 verworfen, eigener Parser (Step 1) · Dateisystem-Ermittlung via `/proc/mounts` (Step 3) ·
 `IndexError_` → `IndexCorrupt` (Step 4).

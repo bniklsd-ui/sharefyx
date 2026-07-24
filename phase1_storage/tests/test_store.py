@@ -1,8 +1,10 @@
+import json
 import logging
 import os
 import shutil
 import subprocess
 import threading
+from dataclasses import asdict
 from datetime import date, datetime, timedelta, timezone
 
 import pytest
@@ -214,6 +216,28 @@ def test_search_returns_summaries_not_full_bodies(store):
     assert not hasattr(result.items[0], "body")
 
 
+def test_search_sort_order_locks_status_then_due_then_updated_desc(store, clock):
+    """Plan §4 Step 6 macht die Sortierung verbindlich (war seit Step 4 ein Platzhalter,
+    ungetestet). Reihenfolge: (1) offener Status (`open`/`active`) vor allem anderen,
+    (2) innerhalb dessen `due` aufsteigend, kein `due` sortiert zuletzt, (3) bei gleichem
+    `due` der zuletzt aktualisierte zuerst.
+    """
+    early = store.create("nikinger", type="task", title="Early", due="2026-08-01")
+    late = store.create("nikinger", type="task", title="Late", due="2026-09-01")
+    no_due = store.create("nikinger", type="task", title="NoDue")
+    done = store.create("nikinger", type="task", title="Done", due="2026-07-25")
+    store.update(done.id, version=done.version, status="done")
+
+    # gleiches due wie 'early', aber zuletzt aktualisiert -> muss vor 'early' stehen
+    clock.advance(10)
+    same_due_newer = store.create("nikinger", type="task", title="SameDueNewer", due="2026-08-01")
+
+    result = store.search(space="nikinger", limit=50)
+    titles = [i.title for i in result.items]
+
+    assert titles == ["SameDueNewer", "Early", "Late", "NoDue", "Done"]
+
+
 def test_search_filters_by_space_type_status_tag(store):
     store.create("nikinger", type="task", title="A", tags=["work"])
     store.create("nikinger", type="note", title="B", tags=["personal"])
@@ -221,6 +245,48 @@ def test_search_filters_by_space_type_status_tag(store):
 
     result = store.search(space="nikinger", type="task", tag="work")
     assert [i.title for i in result.items] == ["A"]
+
+
+def test_search_listing_of_30_items_stays_within_calibrated_json_bound(store, clock):
+    """Plan §4 Step 6 Done-when: 'Listing über 30 Items serialisiert zu <3 KB JSON'. Der
+    3-KB-Schätzwert war `[VERIFY]` und ist gegen echte Beispieldaten empirisch widerlegt --
+    schon der reine JSON-Rahmen von `ItemSummary` (12 Felder, leere Werte) kostet ~230 B/Item
+    (~7 KB/30 Items), ein realistisches Item mit 2 Tags + kurzem Snippet ~345 B (~10.3 KB/30),
+    das Maximum (3 Tags + voll ausgeschöpfter 160-Zeichen-Snippet) ~470 B (~14 KB/30) -- alle
+    drei Stufen gemessen 2026-07-24 (Details im Session-stopped-Block der Phase-Head-Doku).
+    3 KB ist bei diesem Feldsatz strukturell nicht erreichbar. Kalibrierter, hier verbindlich
+    getesteter Wert: **12–16 KB** (Marge unter und über dem gemessenen Maximum).
+
+    Nur die Ceiling-Stufe wird hier tatsächlich geprüft (feste Titel/Tags/Body, deterministische
+    Uhr, nicht abhängig von dem, was `create()` gerade produziert -- sonst würde die Schwelle der
+    Fixture hinterherlaufen statt etwas zu prüfen). Floor und Realistisch sind Out-of-Band-Messungen
+    vom 2026-07-24, festgehalten im Session-stopped-Block, hier nicht mitgetestet -- diese
+    einzelne Grenze schützt nicht alle drei Stufen. Die Untergrenze ist bewusst Teil der Assertion:
+    ein Regression, der die Listing-Größe schrumpfen lässt (z.B. `snippet` verschwindet aus
+    `ItemSummary` oder `_snippet`s Cap sinkt drastisch), soll auffallen -- das wäre eine
+    `ItemSummary`-Feldsatz-Änderung und damit Nikinger-Sache, kein stiller Nebeneffekt.
+    """
+    long_body = (
+        "Ein realistischer Body-Text mit ein paar Saetzen, damit der Snippet auch wirklich "
+        "etwas zu schneiden hat und nicht nur ein Wort lang ist. "
+    ) * 2
+    for i in range(30):
+        store.create(
+            "nikinger", type="task",
+            title=f"Testaufgabe Nummer {i} mit etwas laengerem Titel",
+            body=long_body, tags=["infra", "mcp", "phase1"], due="2026-08-02",
+        )
+
+    result = store.search(limit=50)
+    payload = asdict(result)
+    for item in payload["items"]:
+        item["created"] = item["created"].strftime("%Y-%m-%dT%H:%M:%SZ")
+        item["updated"] = item["updated"].strftime("%Y-%m-%dT%H:%M:%SZ")
+    text = json.dumps(payload, default=str, ensure_ascii=False)
+
+    size = len(text.encode("utf-8"))
+    assert len(result.items) == 30
+    assert 12 * 1024 < size < 16 * 1024
 
 
 def test_rebuild_index_repopulates_from_files(store, tmp_path):
