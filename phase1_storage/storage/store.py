@@ -13,7 +13,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
-from . import files, index
+from . import files, history, index
 from .errors import ConflictError, ItemNotFound, ValidationError
 from .frontmatter import parse as parse_frontmatter
 from .frontmatter import serialize as serialize_frontmatter
@@ -119,10 +119,12 @@ class Store:
     ) -> None:
         self._data_root = Path(data_root)
         self._now_fn = now_fn
-        self._git_enabled = git  # Git-Anbindung folgt in Step 5 (history.py)
+        self._git_enabled = git
         self._lock = threading.RLock()
         self._db_path = self._data_root / ".index.sqlite3"
         self._conn = index.connect(self._db_path)
+        if self._git_enabled:
+            history.ensure_repo(self._data_root)
 
     # -- Sperren -----------------------------------------------------------------
 
@@ -139,6 +141,16 @@ class Store:
                 yield
             finally:
                 fcntl.flock(f, fcntl.LOCK_UN)
+
+    def _commit(self, op: str, item_id: str, space: str) -> None:
+        """Git-Commit nach einem erfolgreichen Write (Entscheidung E), Message `<op> <id>
+        [<space>]`. Wird ausschließlich aus Aufrufern heraus benutzt, die bereits
+        `self._file_write_lock()` halten — das serialisiert die Git-Aufrufe auch über
+        Prozessgrenzen hinweg (siehe `history.commit`-Docstring). Nie fatal: `history.commit`
+        loggt selbst `critical` und wirft nie.
+        """
+        if self._git_enabled:
+            history.commit(self._data_root, f"{op} {item_id} [{space}]")
 
     # -- Interne Helfer ------------------------------------------------------------
 
@@ -171,6 +183,7 @@ class Store:
             if fresh["sha256"] != row["sha256"]:
                 new_version = row["version"] + 1
                 self._rewrite_version_in_file(path, new_version)
+                self._commit("drift", item_id, row["space"])
                 fresh = index.row_from_file(self._data_root, path)
             else:
                 fresh["version"] = row["version"]
@@ -187,9 +200,10 @@ class Store:
         fields["version"] = new_version
         files.atomic_write(path, serialize_frontmatter(fields, body))
 
-    def _write_item_file(self, item: Item, *, old_path: Path | None) -> Path:
+    def _write_item_file(self, item: Item, *, old_path: Path | None, op: str) -> Path:
         """Schreibt `item` an den (ggf. neuen) Pfad, benennt bei Titeländerung um, aktualisiert
-        den Index. Muss unter `self._lock` **und** `self._file_write_lock()` aufgerufen werden.
+        den Index und committet (`op` benennt den Git-Commit, z.B. "create"/"update"/"append").
+        Muss unter `self._lock` **und** `self._file_write_lock()` aufgerufen werden.
         """
         slug = files.slugify(item.title)
         target_path = files.item_path(self._data_root, item.space, item.id, slug)
@@ -200,6 +214,7 @@ class Store:
             files.move_file(write_path, target_path)
         row = index.row_from_file(self._data_root, target_path)
         index.upsert_item(self._conn, row)
+        self._commit(op, item.id, item.space)
         return target_path
 
     # -- Öffentliche API (Plan §2) ---------------------------------------------------
@@ -279,7 +294,7 @@ class Store:
                 body=body, due=due, tags=list(tags), links=list(links),
                 created=now, updated=now, version=1, extra=fields,
             )
-            self._write_item_file(item, old_path=None)
+            self._write_item_file(item, old_path=None, op="create")
             return item
 
     def update(self, item_id: str, *, version: int, **changes) -> Item:
@@ -312,7 +327,7 @@ class Store:
                 version=current.version + 1,
                 updated=self._now_fn(),
             )
-            self._write_item_file(new_item, old_path=old_path)
+            self._write_item_file(new_item, old_path=old_path, op="update")
             return new_item
 
     def append(self, item_id: str, *, version: int, text: str) -> Item:
@@ -332,7 +347,7 @@ class Store:
                 version=current.version + 1,
                 updated=self._now_fn(),
             )
-            self._write_item_file(new_item, old_path=old_path)
+            self._write_item_file(new_item, old_path=old_path, op="append")
             return new_item
 
     def archive(self, item_id: str, *, version: int) -> Item:
@@ -354,6 +369,7 @@ class Store:
             files.move_file(old_path, archive_path)
             row2 = index.row_from_file(self._data_root, archive_path)
             index.upsert_item(self._conn, row2)
+            self._commit("archive", new_item.id, new_item.space)
             return new_item
 
     def rebuild_index(self) -> IndexStats:

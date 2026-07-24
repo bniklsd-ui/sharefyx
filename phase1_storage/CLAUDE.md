@@ -89,11 +89,11 @@ P1 nicht abgeschlossen, egal wie viel Code existiert.
 | 3 | `files.py` (atomarer Write, IDs, Slugs) | 2 | ✅ | 12 |
 | 4 | `index.py` (SQLite, Rebuild) | 3 | ✅ | 9 |
 | 5 | `store.py` (API, Lock, Versionierung) | 4 | ✅ | 18 |
-| 6 | `history.py` (Git) | 5 | ⬜ | – |
+| 6 | `history.py` (Git) | 5 | ✅ | 11 |
 | 7 | Query-Layer in `store.py` | 6 | ⬜ | – |
 | 8 | `scripts/space_cli.py` | 7 | ⬜ | – |
 
-**Gesamt: 48 Tests.** Zielgröße am Phasenende: grob 60–90, davon mindestens die vier
+**Gesamt: 59 Tests.** Zielgröße am Phasenende: grob 60–90, davon mindestens die vier
 Konflikt-Tests aus Step 4. Step 0 hat bewusst keine Tests (reines Skelett) — `pytest`
 lief dort grün mit `exit 5` („no tests ran", nicht `exit 0`); das ist die korrekte
 Bedeutung von „0 Tests", kein Fehlerzustand.
@@ -269,18 +269,66 @@ drift-ausgelösten Rewrite der Git-Commit.
 (`status != open/active` zuerst, dann `due`, dann `updated` absteigend) — Plan Step 6 macht das
 verbindlich. Modul-Status-Zeile 7 bleibt deshalb ⬜.
 
-**Nächster Schritt (konkret):** Step 5 — `storage/history.py`: Git-Repo-Init in `DATA_ROOT`
-falls nötig, ein Commit nach jedem erfolgreichen Write (`<op> <item_id> [<space>]`), `git: bool`-
-Schalter (in `Store.__init__` bereits als `self._git_enabled` vorhanden, aber noch **folgenlos**
-— Step 5 muss `store.py` an den **fünf** Schreibstellen tatsächlich an `history.py` anschließen:
-`_write_item_file()` (create/update/append), `archive()`, **und** `_rewrite_version_in_file()`
-im Drift-Pfad von `_reconcile_and_get_row()` — die fünfte kam erst nach der Step-4-Review dazu,
-siehe Nachtrag oben). Git-Fehler → `logger.critical`, niemals den Write abbrechen.
-Done-Kriterium: 3 Writes → `git log` zeigt 3 Commits mit erwarteten Messages; ein kaputtes
-Git-Repo lässt Writes weiterlaufen und loggt `critical`.
+**Step 5 Ergebnis:** `storage/history.py` — `ensure_repo()` (init `.git` in `DATA_ROOT` falls
+nötig, schreibt dabei `.gitignore` mit `.index.sqlite3*` inkl. WAL-/SHM-Sidecars und
+`.write.lock` — sonst hätte der erste Commit den derivierten Index eingecheckt, direkter
+Verstoß gegen Entscheidung A) und `commit()` (`git add -A` + `git commit -m <message>`). Beide
+über `subprocess.run(["git", "-C", ...])`, nie fatal: jeder Fehlerpfad (Binary fehlt, kaputtes
+Repo, nichts zu committen) landet in `logger.critical`, nie in einer Exception — ein Write darf
+nie an Git scheitern (Entscheidung E).
+
+**Verifiziert auf Nikinger-Hinweis (SSH-Key + `gh auth login` vorhanden):** `gh auth status`
+zeigt nur GitHub-Auth fürs Pushen/Pullen (SSH, Account `bniklsd-ui`) — orthogonal zur lokalen
+Commit-Identity. Kein `~/.gitconfig`, kein `/etc/gitconfig`, keine `GIT_AUTHOR_*`/
+`GIT_COMMITTER_*`-Env-Vars gefunden; einzige existierende `user.name`/`user.email` ist lokal im
+Code-Repo (`savefxy/.git/config`, `Nikinger`/`nikinger@savefyx.local`, extra für dieses Repo
+gesetzt). Deshalb setzt `ensure_repo()` in `DATA_ROOT` eine **eigene** lokale Identity
+(`Space Server <space-server@localhost>`) — aber nur wenn dort noch **keine** existiert (auch
+wenn `.git` schon von Hand angelegt wurde, nicht nur beim frischen Init), sonst würde jeder
+Commit für immer fehlschlagen und `critical` spammen. Überschreibt nie eine vorhandene Identity.
+
+**Anschluss in `store.py`:** alle **fünf** Schreibstellen aus dem Nachtrag oben sind jetzt
+verdrahtet — `_write_item_file()` bekam einen `op`-Parameter (`"create"`/`"update"`/`"append"`)
+und committet am Ende selbst; `archive()` (eigener Schreibpfad, nicht über `_write_item_file`)
+committet direkt danach; `_reconcile_and_get_row()` committet mit `op="drift"` direkt nach
+`_rewrite_version_in_file()` im echten-Drift-Zweig. Neuer `Store._commit(op, item_id, space)`-
+Helper baut die Message `<op> <item_id> [<space>]` (Entscheidung E) und ruft `history.commit()`
+nur wenn `self._git_enabled`. **Wichtig, als Kommentar im Code festgehalten:** `_commit()` wird
+ausschließlich aus Aufrufern heraus benutzt, die bereits `self._file_write_lock()` halten — das
+serialisiert Git-Aufrufe auch über Prozessgrenzen hinweg und verhindert, dass zwei gleichzeitige
+`git commit`-Prozesse sich über `.git/index.lock` in die Quere kommen.
+
+**Bewusst nicht extra behandelt (eine Zeile statt Extra-Code):** ein leerer Commit ist von
+keinem Store-Pfad aus erreichbar (`version`/`updated` ändern den Dateitext bei jedem Write), ein
+Nicht-Null-Exit wird trotzdem einheitlich als `critical` behandelt; `git add -A` erfasst auch
+einen zeitgleichen menschlichen Edit mit — laut Entscheidung E ist das "ein Git-Commit im
+Datenverzeichnis", kein Commit nur der eigenen Änderung, und die Undo-Historie bleibt vollständig.
+
+**Verifiziert (live):** `pytest -v` → 59/59 grün (7 neue in `test_history.py`: Init/Idempotenz/
+Identity-gesetzt-wenn-fehlt/Identity-nicht-überschrieben/Commit-Message exakt/kaputtes-Repo-
+loggt-critical/Git-Binary-fehlt-loggt-critical; 4 neue in `test_store.py` mit neuer
+`store_git`-Fixture: 3 Writes → 3 Commits mit erwarteten Messages in Reihenfolge,
+`append`-Commit, `drift`-Commit nach externem Edit + `get()`, **echt** kaputtes Repo
+`.git`-Verzeichnis durch Datei ersetzt → `create()` liefert trotzdem ein valides Item, Datei
+existiert, `caplog` enthält `critical`). Die vier Pflicht-Tests aus Step 4 bleiben unverändert
+auf `git=False` — Konfliktlogik, kein Git-Test. Manueller Smoke-Test zusätzlich live
+nachvollzogen: `Store(tmp_path, git=True)` → ein `create()` → `git log --oneline` zeigt genau
+einen Commit (Step-5-Done-when wörtlich).
+
+**Kleine Korrektur (Doc-Drift):** `docs/INDEX.md` Zeile 34 stand seit Steps 1–4 auf dem
+veralteten „Step 0 ✅, Steps 1–7 offen" — beim Session-Einstieg dieser Session bemerkt, hier
+mit Datum korrigiert (2026-07-24) und auf den echten Stand nach Step 5 gebracht.
+
+**Nächster Schritt (konkret):** Step 6 — Query-Layer in `store.py` fertigstellen: `search()`
+existiert bereits (Filter, einfache Sortierung, Snippet), aber Volltext explizit auf `title` +
+`tags` begrenzen (nicht Bodies, P2-fremd), Snippet-/Listing-Größenziel **`[VERIFY]`** gegen
+echte Beispieldaten kalibrieren (Plan nennt 3 KB als Schätzung), stabile Sortierung
+(`status` offen zuerst, dann `due`, dann `updated` absteigend — teilweise schon vorhanden,
+Plan Step 6 macht sie verbindlich). Done-Kriterium: Listing über 30 Items serialisiert zu
+<3 KB JSON (oder kalibrierter Wert), ein Test misst das.
 
 **Offene `[VERIFY]` in diesem Track:** Snippet-/Listing-Größenziel 3 KB (Plan Step 6 — jetzt der
-nächste inhaltliche Block nach Step 5).
+nächste inhaltliche Block).
 **Aufgelöst seit Step 0–4:** `flock` auf ext4 (Step 0) · `python-frontmatter`-Roundtrip →
 verworfen, eigener Parser (Step 1) · Dateisystem-Ermittlung via `/proc/mounts` (Step 3) ·
 `IndexError_` → `IndexCorrupt` (Step 4).

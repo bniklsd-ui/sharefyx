@@ -1,4 +1,7 @@
+import logging
 import os
+import shutil
+import subprocess
 import threading
 from datetime import date, datetime, timedelta, timezone
 
@@ -25,6 +28,20 @@ def clock():
 @pytest.fixture
 def store(tmp_path, clock):
     return Store(tmp_path, now_fn=clock, git=False)
+
+
+@pytest.fixture
+def store_git(tmp_path, clock):
+    return Store(tmp_path, now_fn=clock, git=True)
+
+
+def _git_log(tmp_path) -> list[str]:
+    """Commit-Messages newest-first, wie `git log` sie liefert."""
+    result = subprocess.run(
+        ["git", "-C", str(tmp_path), "log", "--format=%s"],
+        capture_output=True, text=True, check=True,
+    )
+    return result.stdout.strip().splitlines()
 
 
 # -- Die vier Pflicht-Tests aus Plan §4 Step 4 --------------------------------------------
@@ -236,3 +253,64 @@ def test_drift_bumped_version_survives_rebuild_index(store, tmp_path):
 
     after_rebuild = store.get(item.id)
     assert after_rebuild.version == bumped.version
+
+
+# -- Step 5: Git-Commit je Write -----------------------------------------------------------
+#
+# Die vier Pflicht-Tests oben bleiben bewusst auf `git=False` -- das ist Konfliktlogik, kein
+# Git-Test. Diese Tests decken stattdessen Plan §4 Step 5 "Done when" ab: 3 Writes -> 3 Commits
+# mit den erwarteten Messages, und ein kaputtes Git-Repo blockiert Writes nicht.
+
+
+def test_git_enabled_commits_one_per_write_with_expected_messages(store_git, tmp_path):
+    item = store_git.create("nikinger", type="task", title="Kühlschrank prüfen")
+    updated = store_git.update(item.id, version=item.version, title="Kühlschrank geputzt")
+    store_git.archive(updated.id, version=updated.version)
+
+    log = _git_log(tmp_path)  # newest-first
+
+    assert log[2].startswith(f"create {item.id} [nikinger]")
+    assert log[1].startswith(f"update {item.id} [nikinger]")
+    assert log[0].startswith(f"archive {item.id} [nikinger]")
+
+
+def test_git_enabled_append_commits_with_append_message(store_git, tmp_path):
+    item = store_git.create("nikinger", type="note", title="Notiz", body="Zeile 1\n")
+    store_git.append(item.id, version=item.version, text="Zeile 2")
+
+    log = _git_log(tmp_path)
+
+    assert log[0].startswith(f"append {item.id} [nikinger]")
+
+
+def test_git_enabled_drift_rewrite_commits_with_drift_message(store_git, tmp_path):
+    item = store_git.create("nikinger", type="note", title="Einkaufsliste", body="Milch\n")
+    path = tmp_path / "nikinger" / f"{item.id}__einkaufsliste.md"
+    path.write_text(path.read_text().replace("Milch", "Milch, Butter"))
+    later = path.stat().st_mtime + 5
+    os.utime(path, (later, later))
+
+    store_git.get(item.id)  # triggert Drift-Erkennung (Entscheidung D) -> Version-Rewrite
+
+    log = _git_log(tmp_path)
+
+    assert log[0].startswith(f"drift {item.id} [nikinger]")
+
+
+def test_git_enabled_broken_repo_does_not_block_write_and_logs_critical(
+    store_git, tmp_path, caplog
+):
+    """Echt kaputtes Repo, kein Mock: `.git` wird durch eine gewöhnliche Datei ersetzt, jeder
+    folgende `git`-Aufruf in diesem Verzeichnis schlägt fehl. Der Write muss trotzdem
+    durchlaufen (Entscheidung E: Git-Fehler sind best-effort, nie fatal).
+    """
+    shutil.rmtree(tmp_path / ".git")
+    (tmp_path / ".git").write_text("kaputt, kein Repo\n")
+
+    with caplog.at_level(logging.CRITICAL, logger="storage.history"):
+        item = store_git.create("nikinger", type="task", title="Trotzdem geschrieben")
+
+    path = tmp_path / "nikinger" / f"{item.id}__trotzdem-geschrieben.md"
+    assert path.exists()
+    critical_records = [r for r in caplog.records if r.levelno == logging.CRITICAL]
+    assert len(critical_records) >= 1
