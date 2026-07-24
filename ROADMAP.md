@@ -17,7 +17,7 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 
 | Phase | Verzeichnis / Paket | Inhalt | Status |
 |---|---|---|---|
-| **P1** | `phase1_storage/` · `storage` | Datei-Store + Index + Versionierung. Kein Netz. | 🟡 |
+| **P1** | `phase1_storage/` · `storage` | Datei-Store + Index + Versionierung. Kein Netz. | ✅ |
 | **P2** | `phase2_mcp/` · `mcpserver` | MCP-Server, Token-Auth, 6 Tools. Lokal erreichbar. | ⬜ |
 | **P3** | `phase3_edge/` | Tunnel, systemd, Health, Logging, Ops-Skripte. Öffentlich erreichbar. | ⬜ |
 | **P4** | `phase4_ui/` · `webui` | REST-API + Web-UI für Menschen. | ⬜ |
@@ -38,12 +38,14 @@ benutzen können, ohne sich gegenseitig zu überschreiben. Das ist der harte Tei
 
 Plan: `docs/concepts/phase1_storage_plan.md`. Phase-Head: `phase1_storage/CLAUDE.md`.
 
-**Korrektur (2026-07-25):** Alle acht Module (Steps 0–7) sind fertig, 70 Tests grün, inklusive
-der `space_cli.py` als Beweis (manueller Durchlauf: Space anlegen, Items finden, Konflikt
-provozieren und verständlich anzeigen — alles gegen ein Scratch-Verzeichnis, nicht den echten
-`DATA_ROOT`). Status **🟡, nicht ✅**: der offizielle Phasen-Abschluss (eigener Prompt, siehe
-`docs/PROMPTS.md`) und ein Lauf gegen den echten `DATA_ROOT` stehen noch aus — Letzteres ist
-Nikinger-Sache (Hard Rule: kein Test gegen den echten DATA_ROOT durch Claude Code).
+**Korrektur (2026-07-25):** Alle acht Module (Steps 0–7) fertig, 70 Tests grün, `space_cli.py`
+als Beweis. Status jetzt **✅ live-verifiziert**: der Nikinger hat den Lauf gegen den echten
+`DATA_ROOT` (`/home/savefyx/savefyx-data`) selbst ausgeführt (Hard Rule: kein Test gegen den
+echten DATA_ROOT durch Claude Code) — `create`/`list`/`search` funktionieren, der Git-Commit im
+Datenverzeichnis landet real, `.gitignore` hält `.index.sqlite3`/`.write.lock` draußen (die
+reale Probe auf den Advisor-Fund aus Step 5). Details + Transkript:
+`phase1_storage/CLAUDE.md`, Session-Block. Offizieller Phasen-Abschluss (Browser-Prompt laut
+`docs/PROMPTS.md`) folgt im Anschluss.
 
 ## Phase 2 — MCP-Server
 

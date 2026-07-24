@@ -31,7 +31,7 @@ updated: 2026-07-25
 
 ## Active phase (1 — Storage-Kern)
 
-- [phase1_storage/CLAUDE.md](../phase1_storage/CLAUDE.md) — 🔄 ~32KB · phase head; Steps 0–7 ✅, Phase 1 fachlich fertig (2026-07-25), offizieller Phasen-Abschluss steht noch aus; read + newest Session-stopped block first
+- [phase1_storage/CLAUDE.md](../phase1_storage/CLAUDE.md) — 🔄 ~34KB · phase head; Steps 0–7 ✅, live-verifiziert gegen den echten DATA_ROOT (2026-07-25), offizieller Phasen-Abschluss-Prompt steht noch aus; read + newest Session-stopped block first
 - [docs/concepts/phase1_storage_plan.md](./concepts/phase1_storage_plan.md) — 📕 ~13KB · ausführungsreifer P1-Plan (Entscheidungen A–H, Steps 0–7)
 - [phase1_storage/SESSIONS_ARCHIVE.md](../phase1_storage/SESSIONS_ARCHIVE.md) — 📦 ~2KB · archivierte Session-stopped-Blöcke, verbatim, newest-first
 

@@ -7,7 +7,7 @@ up: ../CLAUDE.md
 down:
   - ../docs/concepts/phase1_storage_plan.md   # voller Plan, Entscheidungen A–H, Steps 0–7
   - SESSIONS_ARCHIVE.md                       # ältere Session-Blöcke
-updated: 2026-07-24
+updated: 2026-07-25
 ---
 # CLAUDE.md — Phase 1: Storage-Kern (`phase1_storage/`)
 
@@ -447,17 +447,52 @@ Space angelegt, drei Items erstellt, `search` findet sie wieder, Konflikt bewuss
 verständlich angezeigt (Titel + Status + Zeitpunkt der konkurrierenden Version, nicht nur ein
 nackter Fehlercode) — Step-7-Done-when wörtlich erfüllt, komplett ohne Netz.
 
-## Phase 1 ist damit fachlich abgeschlossen (alle acht Module ✅, 70 Tests)
+## Phase 1 ist live-verifiziert (alle acht Module ✅, 70 Tests, echter DATA_ROOT bestätigt)
+
+**Live-Verify durch den Nikinger (2026-07-25), gegen den echten `DATA_ROOT`
+(`/home/savefyx/savefyx-data`), nicht Claude Code (Hard Rule):**
+
+```
+$ space_cli --data-root /home/savefyx/savefyx-data create nikinger --type task \
+    --title "Erster echter Space-Server-Eintrag" --tag test
+itm_7a6f9f7f  [nikinger]  task  v1  status=open
+$ space_cli --data-root /home/savefyx/savefyx-data list
+nikinger: 1 Item(s)
+$ space_cli --data-root /home/savefyx/savefyx-data search
+1 Treffer (zeige 1, offset=0, limit=50)
+  itm_7a6f9f7f  [nikinger]  open  tags=test  Erster echter Space-Server-Eintrag
+$ git -C /home/savefyx/savefyx-data log --oneline
+4e2eb29 (HEAD -> master) create itm_7a6f9f7f [nikinger]
+```
+
+**Claude Code hat den entstandenen Zustand danach read-only nachgeprüft** (kein Write meinerseits
+gegen den echten `DATA_ROOT`, nur Lesen/`git status`/`git log`):
+- Datei `nikinger/itm_7a6f9f7f__erster-echter-space-server-eintrag.md` — Frontmatter exakt wie
+  erwartet (`id`/`space`/`type`/`title`/`status`/`tags`/`links`/`created`/`updated`/`version`,
+  ISO-Z-Zeitstempel).
+- `.gitignore` korrekt angelegt (`.index.sqlite3*`, `.write.lock`) — **das ist die reale Probe
+  auf den Advisor-Fund aus Step 5**: `git status` im Datenverzeichnis ist clean, obwohl
+  `.index.sqlite3` und `.write.lock` auf der Platte liegen. Ohne den Fix wären beide hier jetzt
+  im ersten Commit gelandet.
+- Commit-Identity `Space Server <space-server@localhost>` — genau wie in `ensure_repo()`
+  vorgesehen, weil diese Maschine keine globale Git-Identity hat (bereits in Step 5 geprüft).
+- Dateisystem `ext4` (per `findmnt`), wie seit Step 0/3 angenommen.
+- Branch im Datenverzeichnis heißt `master` (Git-Default ohne `init.defaultBranch`, nicht `main`
+  wie im Code-Repo) — kosmetisch, kein Fix nötig: dieses Repo hat keinen Remote, niemand
+  referenziert den Branchnamen.
+
+Damit ist Phase 1 nicht nur code-complete, sondern **live-bewiesen** — Status auf ✅ gehoben
+(siehe Modul-Status/ROADMAP.md, beide im selben Commit aktualisiert).
 
 **Geerbte Contracts für P2 jetzt final** (siehe „Geerbte Contracts" oben, Plan §1/§2): Frontmatter-
 Schema, `Item`/`SpaceInfo`/`ItemSummary`/`SearchResult`/`IndexStats`, `Store`-Signaturen. Änderung
 daran nach diesem Punkt ist eine Scope-Änderung, kein Refactoring.
 
-**Nächster Schritt (konkret):** Phase 1 ist fachlich fertig, aber noch nicht offiziell
-abgeschlossen — das braucht laut `docs/PROMPTS.md` einen eigenen Phasen-Abschluss-Prompt
-(nicht Teil dieser Session-Definition) und danach eine neue Browser-Planungssession für Phase 2
-(MCP-Server, Auth, Cross-Space-Autorisierung — siehe `ROADMAP.md`). Bis dahin: keine P2-Arbeit
-vorziehen, auch wenn der Contract jetzt feststeht.
+**Nächster Schritt (konkret):** Der offizielle Phasen-Abschluss läuft laut `docs/PROMPTS.md` als
+eigener Prompt im Browser-Webchat (Nikinger, direkt im Anschluss an diese Session) — dieser
+Commit liefert dafür den fertigen, live-verifizierten Stand. Danach: neue Browser-
+Planungssession für Phase 2 (MCP-Server, Auth, Cross-Space-Autorisierung — siehe `ROADMAP.md`).
+Bis dahin: keine P2-Arbeit vorziehen, auch wenn der Contract jetzt feststeht.
 
 **Aufgelöst seit Step 0–4:** `flock` auf ext4 (Step 0) · `python-frontmatter`-Roundtrip →
 verworfen, eigener Parser (Step 1) · Dateisystem-Ermittlung via `/proc/mounts` (Step 3) ·

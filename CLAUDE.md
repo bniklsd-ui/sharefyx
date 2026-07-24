@@ -128,16 +128,15 @@ Snapshots. Rotationsregel ab Tag 1 scharf: ein Phase-Head trägt **genau einen**
 ## Current state
 
 **Aktive Phase:** Phase 1 — Storage-Kern (`phase1_storage/`, Paket `storage`):
-🟡 **code-complete, nicht live-bewiesen.** Alle acht Module (Steps 0–7) fertig, 70 Tests grün —
-Frontmatter/Modelle, atomarer Datei-Store, SQLite-Index, Versionierung + Konfliktbehandlung,
-Git-Commit je Write, Query-Layer, `space_cli.py` als Beweis (manueller Durchlauf gegen ein
-Scratch-Verzeichnis: Space + drei Items anlegen, wiederfinden, Konflikt provozieren und
-verständlich anzeigen). **Korrektur (2026-07-25):** dieser Abschnitt stand seit dem ersten
-Code-Commit auf „noch nicht gestartet" — Quelle der Wahrheit ist der Code (`phase1_storage/`),
-nicht dieses Dokument; siehe `phase1_storage/CLAUDE.md` für Modul-Status und Session-Historie.
-Offen bis zum offiziellen Phasenabschluss: ein Lauf gegen den echten `DATA_ROOT` (Nikinger-Sache,
-nicht Claude Code) und der Phasen-Abschluss-Prompt selbst (`docs/PROMPTS.md`). Plan liegt weiter
-unverändert vor: `docs/concepts/phase1_storage_plan.md` (Entscheidungen A–H gelockt, Steps 0–7).
+✅ **live-verifiziert.** Alle acht Module (Steps 0–7) fertig, 70 Tests grün — Frontmatter/Modelle,
+atomarer Datei-Store, SQLite-Index, Versionierung + Konfliktbehandlung, Git-Commit je Write,
+Query-Layer, `space_cli.py` als Beweis. Der Nikinger hat den Lauf gegen den echten `DATA_ROOT`
+(`/home/savefyx/savefyx-data`) selbst ausgeführt (2026-07-25, Hard Rule: kein Test gegen den
+echten DATA_ROOT durch Claude Code) — `create`/`list`/`search` funktionieren, der Git-Commit
+landet real im Datenverzeichnis, `.gitignore` hält `.index.sqlite3`/`.write.lock` draußen.
+Details + Transkript: `phase1_storage/CLAUDE.md`, Session-Block. Offen: der offizielle
+Phasen-Abschluss-Prompt selbst (`docs/PROMPTS.md`, Browser-Session). Plan:
+`docs/concepts/phase1_storage_plan.md` (Entscheidungen A–H gelockt, Steps 0–7).
 
 **Gelockte Rahmenentscheidungen (Nikinger, 2026-07-24, Browser-Planung):**
 
