@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+
+# venv
+.venv/
+
+# derived index (Entscheidung A — nie eingecheckt)
+.index.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+
+# test artifacts
+.pytest_cache/
+
+# harness-local tool state (not project source)
+.claude/
+.agents/
+package-lock.json
+skills-lock.json
