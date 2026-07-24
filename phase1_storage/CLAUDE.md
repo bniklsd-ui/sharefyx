@@ -91,9 +91,9 @@ P1 nicht abgeschlossen, egal wie viel Code existiert.
 | 5 | `store.py` (API, Lock, Versionierung) | 4 | ✅ | 18 |
 | 6 | `history.py` (Git) | 5 | ✅ | 11 |
 | 7 | Query-Layer in `store.py` | 6 | ✅ | 2 (in `test_store.py`) |
-| 8 | `scripts/space_cli.py` | 7 | ⬜ | – |
+| 8 | `scripts/space_cli.py` | 7 | ✅ | 9 |
 
-**Gesamt: 61 Tests.** Zielgröße am Phasenende: grob 60–90, davon mindestens die vier
+**Gesamt: 70 Tests.** Zielgröße am Phasenende: grob 60–90, davon mindestens die vier
 Konflikt-Tests aus Step 4. Step 0 hat bewusst keine Tests (reines Skelett) — `pytest`
 lief dort grün mit `exit 5` („no tests ran", nicht `exit 0`); das ist die korrekte
 Bedeutung von „0 Tests", kein Fehlerzustand.
@@ -363,6 +363,10 @@ Hebel, falls das zu grob ist: der 160-Zeichen-Snippet-Cap (34 % vom Ceiling) ode
 Default-`limit`. Beides wäre eine `ItemSummary`/API-Entscheidung, also Nikinger-Sache — aktueller
 Feldsatz bleibt unverändert, bis das entschieden ist.
 
+**Nikinger-Entscheidung (2026-07-24):** ~2.500–3.000 Tokens für ein 30-Item-Listing sind okay.
+`ItemSummary`-Feldsatz bleibt wie gemessen — kein Snippet-Cap, kein Default-`limit` geändert.
+Befund damit aufgelöst, nicht mehr offen.
+
 **Sortierung verbindlich gemacht:** `test_search_sort_order_locks_status_then_due_then_updated_desc`
 pinnt die seit Step 4 als „Platzhalter" markierte Reihenfolge fest — empirisch verifiziert:
 Test bricht, wenn das `updated`-Tiebreak-Vorzeichen kippt (Regressionsschutz bestätigt, nicht
@@ -371,13 +375,89 @@ nur angenommen).
 **Verifiziert (live):** `pytest -v` → 61/61 grün (2 neue in `test_store.py`, kein neues Modul).
 `git diff` bestätigt: nur `tests/test_store.py` geändert, `storage/` unangetastet.
 
-**Nächster Schritt (konkret):** Step 7 — `scripts/space_cli.py`: `create`, `list`, `search`,
-`show`, `update`, `archive`, `reindex`. Logging → stderr, Ausgabe wahlweise Text oder `--json`
-auf stdout — das ist die erste Stelle, an der `ItemSummary`/`SearchResult` tatsächlich zu JSON
-serialisiert werden (Step 6 hat das nur test-lokal nachgebaut, keine öffentliche Serialisierung
-eingeführt). Done-Kriterium: ein manueller Durchlauf legt einen Space an, erstellt drei Items,
-findet sie wieder, provoziert bewusst einen Konflikt und zeigt ihn verständlich an — komplett
-ohne Netz.
+**Step 7 Ergebnis — Phase 1 abgeschlossen:** `phase1_storage/scripts/space_cli.py`, alle sieben
+Subcommands (`create`/`list`/`search`/`show`/`update`/`archive`/`reindex`), dünner Wrapper um
+`Store` — kein neuer Produktivcode in `storage/`. Bewusst **kein** Python-Package (kein
+`packages=["scripts"]` in `pyproject.toml`): "scripts" ist ein Name, den künftige Phasen mit
+hoher Wahrscheinlichkeit wiederverwenden, ein zweites editable-installiertes Top-Level-Package
+gleichen Namens würde beim `dev_install.sh`-Loop über alle `phase*_*/`-Verzeichnisse kollidieren.
+Deshalb Tests über echten Subprozess (`sys.executable` + Skriptpfad), nicht Import — zugleich
+die wörtlichste Prüfung für "die CLI als Beweis".
+
+Erste Stelle im Projekt, an der `Item`/`ItemSummary`/`SearchResult`/`IndexStats` tatsächlich zu
+JSON serialisiert werden (`_dump_json()`, `dataclasses.asdict` + `json.dumps(default=...)` für
+`date`/`datetime` → ISO-Z). Bewusst CLI-lokal, kein neuer Store-/Contract-Export — Step 6 hatte
+das schon entschieden (test-lokale Serialisierung statt neue §2-Fläche), Step 7 zieht die gleiche
+Grenze für die Präsentationsschicht.
+
+**Zwei echte Funde, beide vor dem Commit gefixt:**
+1. Erster Wurf hatte `--json` nur auf dem Top-Level-Parser, vor dem Subcommand. Manueller
+   Smoke-Test zeigte: `search --json` (die natürliche Position, wie bei den meisten CLIs)
+   scheitert mit "unrecognized arguments". Fix: `--json` nur noch über einen gemeinsamen
+   `parents=[common]`-Parser auf jedem Subcommand — sonst hätte argparse beim Subparsing seinen
+   eigenen Default erneut in den Namespace geschrieben und einen vor dem Subcommand übergebenen
+   `--json` stumm zurückgesetzt. Regressionstest `test_json_flag_works_after_subcommand`.
+2. `Store.update(..., status=...)` validiert den Statuswert nicht (kein `[VERIFY]`/Contract-
+   Thema, vorbestehendes Verhalten seit Step 4). Ohne Einschränkung auf CLI-Ebene wäre die CLI
+   das Einfallstor für z.B. `status: bogus`, das `search()`s Sortierung dann still als "nicht
+   offen" einsortiert. Fix: `--status` auf der CLI mit `choices=["open","done","active",
+  "archived"]`. Store-seitige Validierung wäre eine §2-Änderung — hier nur vermerkt, nicht gefixt.
+
+**Exit-Codes bewusst unterscheidbar:** 0 Erfolg, 1 sonstiger `SpaceError`, **2** `ConflictError`
+— damit ein aufrufendes Skript "stale, neu lesen und retry" von "kein solches Item" trennen kann,
+ohne stdout/stderr zu parsen.
+
+**Verifiziert (live):** `pytest -v` → 70/70 grün (9 neue in `test_space_cli.py`). Zusätzlich ein
+echter manueller Durchlauf in einem Scratch-Verzeichnis (nicht der echte `DATA_ROOT`), Transkript:
+
+```
+$ space_cli --data-root <scratch> create nikinger --type task --title "MCP-Server Grundgerüst" --tag infra --tag mcp --due 2026-08-02
+itm_b057422b  [nikinger]  task  v1  status=open
+  Titel: MCP-Server Grundgerüst
+  Fällig: 2026-08-02
+  Tags: infra, mcp
+$ space_cli --data-root <scratch> create nikinger --type note --title "Einkaufsliste" --body "Milch, Butter, Brot"
+itm_755eb431  [nikinger]  note  v1  status=active
+$ space_cli --data-root <scratch> create nikinger --type task --title "Tunnel einrichten" --tag infra
+itm_e4c62375  [nikinger]  task  v1  status=open
+
+$ space_cli --data-root <scratch> list
+nikinger: 3 Item(s)
+
+$ space_cli --data-root <scratch> search --tag infra
+2 Treffer (zeige 2, offset=0, limit=50)
+  itm_b057422b  [nikinger]  open  fällig=2026-08-02  tags=infra,mcp  MCP-Server Grundgerüst
+  itm_e4c62375  [nikinger]  open  tags=infra  Tunnel einrichten
+
+$ space_cli --data-root <scratch> update itm_b057422b --version 1 --title "MCP-Server Grundgerüst (angepasst)"
+itm_b057422b  [nikinger]  task  v2  status=open
+  Titel: MCP-Server Grundgerüst (angepasst)
+
+# jemand anderes schreibt zuerst -- wir versuchen mit der jetzt veralteten Version 1 erneut
+$ space_cli --data-root <scratch> update itm_b057422b --version 1 --title "Konkurrierender Schreibversuch"
+Konflikt bei itm_b057422b: erwartete Version 1, aktuell 2
+  Aktueller Titel:      'MCP-Server Grundgerüst (angepasst)'
+  Aktueller Status:     open
+  Zuletzt aktualisiert: 2026-07-24T21:35:25+00:00
+$ echo $?
+2
+```
+
+Space angelegt, drei Items erstellt, `search` findet sie wieder, Konflikt bewusst provoziert und
+verständlich angezeigt (Titel + Status + Zeitpunkt der konkurrierenden Version, nicht nur ein
+nackter Fehlercode) — Step-7-Done-when wörtlich erfüllt, komplett ohne Netz.
+
+## Phase 1 ist damit fachlich abgeschlossen (alle acht Module ✅, 70 Tests)
+
+**Geerbte Contracts für P2 jetzt final** (siehe „Geerbte Contracts" oben, Plan §1/§2): Frontmatter-
+Schema, `Item`/`SpaceInfo`/`ItemSummary`/`SearchResult`/`IndexStats`, `Store`-Signaturen. Änderung
+daran nach diesem Punkt ist eine Scope-Änderung, kein Refactoring.
+
+**Nächster Schritt (konkret):** Phase 1 ist fachlich fertig, aber noch nicht offiziell
+abgeschlossen — das braucht laut `docs/PROMPTS.md` einen eigenen Phasen-Abschluss-Prompt
+(nicht Teil dieser Session-Definition) und danach eine neue Browser-Planungssession für Phase 2
+(MCP-Server, Auth, Cross-Space-Autorisierung — siehe `ROADMAP.md`). Bis dahin: keine P2-Arbeit
+vorziehen, auch wenn der Contract jetzt feststeht.
 
 **Aufgelöst seit Step 0–4:** `flock` auf ext4 (Step 0) · `python-frontmatter`-Roundtrip →
 verworfen, eigener Parser (Step 1) · Dateisystem-Ermittlung via `/proc/mounts` (Step 3) ·
