@@ -315,6 +315,18 @@ auf `git=False` — Konfliktlogik, kein Git-Test. Manueller Smoke-Test zusätzli
 nachvollzogen: `Store(tmp_path, git=True)` → ein `create()` → `git log --oneline` zeigt genau
 einen Commit (Step-5-Done-when wörtlich).
 
+**Nachtrag zu Step 5 — Advisor-Fund, noch im selben Schritt gefixt:** `ensure_repo()` schrieb
+die `.gitignore` nur im frischen-Init-Zweig. Ein von Hand angelegtes oder aus einem Backup
+wiederhergestelltes `DATA_ROOT`-Repo (bereits `.git`, kein Init-Zweig durchlaufen) hätte damit
+nie eine `.gitignore` bekommen — der erste `commit()` hätte `.index.sqlite3` samt WAL/SHM und
+`.write.lock` mit eingecheckt, derselbe Entscheidung-A-Verstoß, den die Identity-Fix-Diskussion
+schon einmal aufgeworfen hatte. Fix: `.gitignore`-Schreibung aus dem Init-Zweig herausgezogen,
+läuft jetzt unconditional (wie die Identity-Prüfung). `test_ensure_repo_does_not_overwrite_existing_identity`
+um eine `.gitignore`-Assertion ergänzt — empirisch bestätigt: schlägt gegen den alten Code fehl,
+grün gegen den Fix (diskriminierender Test, nicht nur Feel-Good). Zusätzlich `test_git_enabled_commits_one_per_write_with_expected_messages`
+um `len(log) == 3` verschärft (Done-when nennt explizit die Anzahl). 59/59 weiterhin grün, keine
+neuen Tests, nur verschärfte Assertions.
+
 **Kleine Korrektur (Doc-Drift):** `docs/INDEX.md` Zeile 34 stand seit Steps 1–4 auf dem
 veralteten „Step 0 ✅, Steps 1–7 offen" — beim Session-Einstieg dieser Session bemerkt, hier
 mit Datum korrigiert (2026-07-24) und auf den echten Stand nach Step 5 gebracht.

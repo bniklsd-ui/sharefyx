@@ -42,9 +42,14 @@ def ensure_repo(data_root: Path) -> None:
                 "git init in %s fehlgeschlagen: %s", data_root, result.stderr if result else ""
             )
             return
-        gitignore = data_root / ".gitignore"
-        if not gitignore.exists():
-            gitignore.write_text(_GITIGNORE_CONTENT, encoding="utf-8")
+
+    # Unconditional (nicht nur beim frischen Init): ein von Hand angelegtes oder aus einem
+    # Backup wiederhergestelltes DATA_ROOT-Repo hätte sonst nie eine .gitignore und der erste
+    # commit() würde .index.sqlite3 (+ WAL/SHM) und .write.lock einchecken — Verstoß gegen
+    # Entscheidung A.
+    gitignore = data_root / ".gitignore"
+    if not gitignore.exists():
+        gitignore.write_text(_GITIGNORE_CONTENT, encoding="utf-8")
 
     identity_check = _run_git(data_root, "config", "--local", "user.email")
     if identity_check is not None and identity_check.returncode != 0:

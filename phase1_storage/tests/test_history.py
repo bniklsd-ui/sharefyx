@@ -6,7 +6,7 @@ import pytest
 from storage import history
 
 
-def _log(text: str, path) -> str:
+def _log(path) -> str:
     return subprocess.run(
         ["git", "-C", str(path), "log", "--format=%s"],
         capture_output=True, text=True, check=True,
@@ -66,6 +66,9 @@ def test_ensure_repo_does_not_overwrite_existing_identity(tmp_path):
         capture_output=True, text=True,
     ).stdout.strip()
     assert name == "Custom"
+    # Diskriminierender Teil: ein von Hand angelegtes Repo (kein Init-Zweig durchlaufen) muss
+    # trotzdem eine .gitignore bekommen, sonst versioniert der erste commit() den Index mit.
+    assert (tmp_path / ".gitignore").exists()
 
 
 def test_commit_creates_commit_with_exact_message(tmp_path):
@@ -75,7 +78,7 @@ def test_commit_creates_commit_with_exact_message(tmp_path):
 
     history.commit(tmp_path, "create itm_a1b2c3d4 [nikinger]")
 
-    log = _log("create", tmp_path)
+    log = _log(tmp_path)
     assert log.strip() == "create itm_a1b2c3d4 [nikinger]"
 
 

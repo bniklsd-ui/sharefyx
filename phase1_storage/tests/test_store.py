@@ -269,6 +269,7 @@ def test_git_enabled_commits_one_per_write_with_expected_messages(store_git, tmp
 
     log = _git_log(tmp_path)  # newest-first
 
+    assert len(log) == 3
     assert log[2].startswith(f"create {item.id} [nikinger]")
     assert log[1].startswith(f"update {item.id} [nikinger]")
     assert log[0].startswith(f"archive {item.id} [nikinger]")
