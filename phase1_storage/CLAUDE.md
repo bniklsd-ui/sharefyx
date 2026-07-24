@@ -87,13 +87,13 @@ P1 nicht abgeschlossen, egal wie viel Code existiert.
 | 1 | Repo-Skelett, `pyproject.toml`, dev_install | 0 | ✅ | 0 |
 | 2 | `models.py`, `frontmatter.py` | 1 | ✅ | 9 |
 | 3 | `files.py` (atomarer Write, IDs, Slugs) | 2 | ✅ | 12 |
-| 4 | `index.py` (SQLite, Rebuild) | 3 | ⬜ | – |
+| 4 | `index.py` (SQLite, Rebuild) | 3 | ✅ | 9 |
 | 5 | `store.py` (API, Lock, Versionierung) | 4 | ⬜ | – |
 | 6 | `history.py` (Git) | 5 | ⬜ | – |
 | 7 | Query-Layer in `store.py` | 6 | ⬜ | – |
 | 8 | `scripts/space_cli.py` | 7 | ⬜ | – |
 
-**Gesamt: 21 Tests.** Zielgröße am Phasenende: grob 60–90, davon mindestens die vier
+**Gesamt: 30 Tests.** Zielgröße am Phasenende: grob 60–90, davon mindestens die vier
 Konflikt-Tests aus Step 4. Step 0 hat bewusst keine Tests (reines Skelett) — `pytest`
 lief dort grün mit `exit 5` („no tests ran", nicht `exit 0`); das ist die korrekte
 Bedeutung von „0 Tests", kein Fehlerzustand.
@@ -106,7 +106,7 @@ nach Phasenabschluss ist eine Scope-Änderung und braucht eine Entscheidung, kei
 
 ---
 
-## Session stopped — 2026-07-24 (Step 0 + Step 1 + Step 2 abgeschlossen)
+## Session stopped — 2026-07-24 (Step 0–3 abgeschlossen)
 
 **Ergebnis:** Code-Repo initialisiert (`git init` in `/home/savefyx/dev/savefxy`, lokale Git-Identity
 gesetzt, da auf der Maschine keine existierte). Erster Commit checkt die Projektdokumente aus der
@@ -167,23 +167,53 @@ YAML/Frontmatter — bekommt fertigen Dateitext von der aufrufenden Schicht.
 (neue Datei bleibt inexistent / bestehende Datei bleibt beim alten Inhalt), Slug-Kollision zweier
 Items mit identischem Titel überschreibt nichts (unterschiedliche IDs im Dateinamen), Rename-Test.
 
-**Nächster Schritt (konkret):** Step 3 — `storage/index.py`: SQLite-Schema (`items(id PK, space,
-type, title, status, due, tags_json, links_json, created, updated, version, path, mtime, size,
-sha256)`), Insert/Update/Delete, `rebuild_index()` (Verzeichnis scannen, alles neu), WAL-Modus.
-Dazu der Startup-Dateisystem-Check aus Plan §3.2: Dateisystem von `DATA_ROOT` ermitteln, bei
-allem außer `ext4`/`xfs`/`btrfs` → `logger.critical`, kein Abbruch. `DATA_ROOT` ist jetzt bekannt
-(`/home/savefyx/savefyx-data`, ext4, siehe oben) — Step 3 kann direkt dagegen testen, sofern das
-Verzeichnis existiert; falls nicht, mit dem Nikinger klären, ob es angelegt werden soll oder ob
-Tests ausschließlich gegen `tmp_path` laufen (letzteres ist ohnehin Pflicht laut CLAUDE.md
-„keine Unit-Tests gegen das echte DATA_ROOT").
+**Step 3 Ergebnis:** `storage/index.py` — Schema exakt wie im Plan (`items` mit `tags_json`/
+`links_json` als JSON-Strings), `connect()` (WAL-Modus, Schema-Anlage, **Selbstheilung**: ein
+korrupter DB-File wird bei jedem der beiden möglichen Fehlerorte — `PRAGMA`/Schema-Erzeugung
+oder der nachgelagerten Sanity-Probe `SELECT COUNT(*)` — abgefangen, verworfen samt
+`-wal`/`-shm`-Sidecars, und leer neu angelegt; kein Crash, keine Eskalation), `upsert_item`/
+`delete_item`/`get_item_row`/`all_rows` als CRUD-Grundlage für `store.py`, `row_from_file()`
+(liest eine Datei rein lesend, berechnet `sha256` über die Rohbytes für Entscheidung D),
+`rebuild_index()` (löscht Tabelleninhalt, scannt alle Space-Verzeichnisse **inklusive
+`_archive/`** rekursiv nach `*.md`, baut alles neu — liefert `IndexStats` aus `models.py`).
+`space` wird für jede Zeile aus dem Pfad abgeleitet (erstes Segment relativ zu `data_root`), nicht
+aus dem Frontmatter-Feld — konsistent mit „Dateien sind die Wahrheit": ein Mensch kann `space:`
+im Frontmatter verstellen, der Ordner lügt nicht.
 
-**Offene `[VERIFY]` in diesem Track:** Namenskollision `IndexError_` (Plan §1, noch nicht
-gebraucht — `errors.py` existiert erst ab dem Step, der den ersten Fehlertyp braucht, voraussichtlich
-Step 3 für einen Index-Fehler oder Step 4 für `ConflictError`) · Methode zur Dateisystem-Ermittlung
-unter Ubuntu (Plan Step 3, jetzt unmittelbar relevant) · Snippet-/Listing-Größenziel 3 KB (Plan
-Step 6).
-**Aufgelöst seit Step 0–2:** `flock` auf ext4 (Step 0) · `python-frontmatter`-Roundtrip → verworfen,
-eigener Parser (Step 1).
+**`[VERIFY]` Dateisystem-Ermittlung aufgelöst:** `os.statvfs` liefert den Typ tatsächlich nicht
+direkt (bestätigt); `/proc/mounts` zeilenweise parsen und den am tiefsten passenden Mountpoint
+nehmen ist zuverlässig und funktioniert ohne Subprocess/Zusatzpaket. `detect_filesystem_type()`
+macht genau das; `check_filesystem()` nimmt zusätzlich ein `fstype`-Override für Tests, damit sie
+nicht auf `/proc/mounts` angewiesen sind. Live gegen `tmp_path` verifiziert: liefert `"ext4"`
+(kein Verstoß gegen „nie gegen DATA_ROOT testen" — `tmp_path` ist pytest-eigen).
+
+**Verifiziert (live):** `pytest -v` → 30/30 grün (9 neue in `test_index.py`): CRUD-Roundtrip,
+Rebuild == manuelle Upserts (inkl. archivierter Items), Rebuild-vor/nach-Löschen liefert
+identische Zeilen, korrupter Index-File crasht `connect()` nicht und lässt sich anschließend
+per `rebuild_index()` befüllen, `check_filesystem()` loggt bei `nfs4` genau eine
+`critical`-Zeile und bei `ext4` keine, `detect_filesystem_type(tmp_path)` liefert real `"ext4"`.
+
+**Erledigt nebenbei:** `DATA_ROOT` (`/home/savefyx/savefyx-data`) angelegt, per `findmnt`
+bestätigt `ext4` (Nikinger-Wunsch, `mkdir` statt Aufschieben).
+
+**Nächster Schritt (konkret):** Step 4 — `storage/store.py`, der eigentliche Beweis der Phase.
+Die API aus Plan §2 (`Store.__init__`, `list_spaces`, `search`, `get`, `create`, `update`,
+`append`, `archive`, `rebuild_index`), Prozessweiter Write-Lock + `fcntl.flock` auf
+`<DATA_ROOT>/.write.lock`, Versionsprüfung, `ConflictError` (trägt das aktuelle Item — hier
+entsteht `storage/errors.py` zum ersten Mal, inkl. der `IndexError_`-Namensentscheidung),
+Drift-Erkennung nach Entscheidung D über `(mtime, size, sha256)` aus `index.py`. **Die vier
+Pflicht-Tests aus Plan §4 Step 4 sind non-negotiable** — ohne sie ist P1 laut Phase-Head nicht
+abgeschlossen, unabhängig vom sonstigen Codeumfang: (1) zwei sequenzielle `update` mit gleicher
+Version → zweiter wirft `ConflictError` mit aktuellem Item, (2) externer Edit → nächster `get`
+zeigt neuen Inhalt mit erhöhter Version, `update` mit alter Version wirft, (3) zwei parallele
+`update` aus zwei Threads → genau einer gewinnt, (4) `update` auf archiviertes Item wirft statt
+reaktiviert.
+
+**Offene `[VERIFY]` in diesem Track:** Namenskollision `IndexError_` — muss in Step 4 real
+entschieden werden, wenn `errors.py` entsteht (Plan-Vorschlag: `IndexCorrupt`) · Snippet-/
+Listing-Größenziel 3 KB (Plan Step 6, noch nicht relevant).
+**Aufgelöst seit Step 0–3:** `flock` auf ext4 (Step 0) · `python-frontmatter`-Roundtrip →
+verworfen, eigener Parser (Step 1) · Dateisystem-Ermittlung via `/proc/mounts` (Step 3).
 
 **Kleine Korrektur zum Plan:** „`pytest` grün mit null Tests" (Step 0, Done-when) bedeutet in der
 Praxis `exit 5` („no tests ran"), nicht `exit 0` — pytest markiert eine leere Testsammlung so.
