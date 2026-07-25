@@ -4,7 +4,7 @@ purpose: Menschliche Übersicht + Maschinen-Setup (venv, Keyring, Datenverzeichn
 read-when: erstes Setup auf einer neuen Maschine, oder wenn jemand wissen will, was das Ding überhaupt ist
 detail: L2
 up: docs/INDEX.md
-updated: 2026-07-25
+updated: 2026-07-26
 ---
 # Space-Server
 
@@ -85,6 +85,26 @@ abrufbar. Der Keyring speichert nur den sha256-Hash, nie das Token selbst. Wenn 
 verloren geht: neu ausgeben (`--space`), den alten Hash mit `--revoke` entfernen, danach die
 Connector-URL in Claude aktualisieren (der alte Pfad-Token funktioniert ab dem Revoke nicht
 mehr).
+
+## MCP-Server smoke-testen
+
+```bash
+python phase2_mcp/scripts/mcp_smoke.py            # Text-Report
+python phase2_mcp/scripts/mcp_smoke.py --json     # maschinenlesbar auf stdout
+```
+
+Baut ein **temporäres** `DATA_ROOT` (nie das echte), zwei Fixture-Spaces und zwei Tokens, die
+nur in diesem Lauf existieren — der echte Keyring (Service `nikinger-space`) bleibt unangetastet.
+Fährt die sechs Tools einmal komplett durch (beide Rule-4-Fälle: fremd lesen mit Wrap, fremd
+schreiben mit `write_denied`) und misst die Antwortgröße je Aufruf. Exit-Code `0` nur, wenn alle
+Prüfungen grün sind.
+
+Lokal ohne Tunnel starten (Phase 3 baut die öffentliche Erreichbarkeit):
+
+```bash
+SPACE_DATA_ROOT=/pfad/zu/einem/testverzeichnis python phase2_mcp/scripts/serve.py
+curl http://127.0.0.1:8765/health
+```
 
 ## Bewusst akzeptierte Kompromisse
 

@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase2_mcp_plan.md          # voller Plan, Entscheidungen P2-A–P2-N, Steps 0–7
   - ../docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md # Herkunft der Entscheidungen D1–D6
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
-updated: 2026-07-26 (Step 6)
+updated: 2026-07-26 (Step 7)
 ---
 # CLAUDE.md — Phase 2: MCP-Server (`phase2_mcp/`)
 
@@ -81,7 +81,7 @@ Fehlerabbildung mit handlungsfähigem Text (N).
 | 5 | `auth.py`, `permissions.py`, `context.py`, `asgi.py`, `logging_setup.py` | 4 | ✅ | 14 |
 | 6 | `server.py`, `app.py`, `scripts/serve.py` | 5 | ✅ | 8 (`test_app.py`) |
 | 7 | `tools.py` (die sechs Tools) | 6 | ✅ | 22 (`test_tools.py`) |
-| 8 | `scripts/mcp_smoke.py`, Runbook, Größenmessung | 7 | ⬜ | — |
+| 8 | `scripts/mcp_smoke.py`, Runbook, Größenmessung | 7 | ✅ (code-complete — Live-Probe steht beim Nikinger aus) | 3 (`test_mcp_smoke.py`) |
 
 **Zeile 7, Step 6 abgeschlossen:** `search_items`, `get_item`, `create_item`, `update_item`,
 `append_to_item` lösen ihre seit Step 5 bestehenden `NotImplementedError`-Platzhalter ein
@@ -89,13 +89,19 @@ Fehlerabbildung mit handlungsfähigem Text (N).
 wuchs um einen sechsten Test (`test_all_six_tools_are_callable_over_http`), der Step 6s eigenes
 Done-when „alle sechs Tools über den ASGI-Testclient aufrufbar" gegen den echten Stack aus
 Step 5 beweist — `test_tools.py` allein kann das nicht, weil dort der Guard gemockt ist (siehe
-Session-Block).
+SESSIONS_ARCHIVE.md).
 
-**Gesamt: 53 Tests** in `phase2_mcp/tests/` (3 `test_config.py` + 6 `test_credentials.py` + 4
+**Zeile 8, Step 7 abgeschlossen:** `mcp_smoke.py` (Gegenstück zu `space_cli.py` aus P1) plus
+Runbook „Quick-Tunnel-Probe" oben und README-Abschnitt „MCP-Server smoke-testen". Grün gegen
+ein temporäres `DATA_ROOT` verifiziert (Session-Block). Phase 2 ist damit **code-complete**;
+„live-verifiziert" (§5.9) folgt erst, wenn der Nikinger die Quick-Tunnel-Probe gemeldet hat —
+siehe `ROADMAP.md`, Status 🟡.
+
+**Gesamt: 56 Tests** in `phase2_mcp/tests/` (3 `test_config.py` + 6 `test_credentials.py` + 4
 `test_auth.py` + 3 `test_permissions.py` + 1 `test_logging.py` + 2 `test_context.py` + 4
-`test_asgi.py` + 8 `test_app.py` + 22 `test_tools.py`). Acht weitere Tests aus Step 2 liegen in
-`phase1_storage/tests/` (siehe Modul-Status Zeile 3 und `phase1_storage/CLAUDE.md`), werden dort
-mitgezählt, nicht hier.
+`test_asgi.py` + 8 `test_app.py` + 22 `test_tools.py` + 3 `test_mcp_smoke.py`). Acht weitere
+Tests aus Step 2 liegen in `phase1_storage/tests/` (siehe Modul-Status Zeile 3 und
+`phase1_storage/CLAUDE.md`), werden dort mitgezählt, nicht hier.
 
 ## Geerbte Contracts
 
@@ -130,72 +136,115 @@ Begründung, warum OAuth trotzdem hinter P3 bleibt statt vorgezogen zu werden.
 Store; genutzt wird es ab Step 6 (`tools.py :: get_item`, §3.4). Dort ist `version` in fremden
 Spaces informativ, nicht autoritativ — es gibt dort per Architektur keine Writes.
 
+## Runbook „Quick-Tunnel-Probe" (führt der Nikinger aus, nicht Claude Code)
+
+Der Tunnel-Schritt wird **nicht committet** — kein Skript, keine Config, kein Hostname im Repo
+(das ist P3). Diese Anleitung ist reine Dokumentation des Ablaufs (Plan §4 Step 7):
+
+```
+1. python phase2_mcp/scripts/issue_token.py --space niklas      # Token einmal notieren
+2. SPACE_DATA_ROOT=/home/savefyx/savefyx-data python phase2_mcp/scripts/serve.py \
+       --allowed-host '<subdomain>.trycloudflare.com'
+3. cloudflared tunnel --url http://127.0.0.1:8765
+4. curl https://<subdomain>.trycloudflare.com/health        → {"status":"ok",…}
+5. Claude → Settings → Connectors → Add custom connector:
+       https://<subdomain>.trycloudflare.com/mcp/<token>
+6. Neue Konversation, Connector aktivieren, ein Read und ein Write ausführen.
+```
+
+`[VERIFY]` bei Ausführung gegen die aktuelle Anthropic-Doku: Custom Connectors auf **Pro** ohne
+Owner-Gate (Stand 2026-07-25 dokumentiert für Free/Pro/Max/Team/Enterprise; Free ist auf einen
+Connector begrenzt). Diese Prüfung ist Sache des Nikingers beim Ausführen, nicht von Claude
+Code — der Tunnel-/Connector-Schritt liegt außerhalb des P2-Scopes (§7).
+
+**Ergebnis melden:** ein erfolgreicher Read und ein erfolgreicher Write über den echten
+Connector heben Phase 2 von „code-complete" auf „live-verifiziert" (Akzeptanzkriterium §5.9) —
+analog zu Phase 1s Live-Verify durch den Nikinger gegen den echten `DATA_ROOT`.
+
 ---
 
-## Session stopped — 2026-07-26 (Step 6: Die sechs Tools)
+## Session stopped — 2026-07-26 (Step 7: Smoke-Test, Messung, Runbook)
 
-**Ergebnis:** `mcpserver/tools.py` fertig — `search_items`, `get_item`, `create_item`,
-`update_item`, `append_to_item` lösen ihre `NotImplementedError`-Platzhalter aus Step 5 ein.
-Neue Modul-Helfer wie im Plan gefordert: `wrap_untrusted()` (§3.5, Ersatzstring wörtlich aus
-dem Plan übernommen), `summary_to_dict()`, `item_to_filetext()` (dupliziert bewusst
-`storage.store._item_to_text`s Feldreihenfolge — der P1-Contract ist seit Step 2 „wieder zu",
-eine weitere Erweiterung wäre keine „einmalige" mehr), `compact_json()`, `map_storage_error()`
-(§3.6, alle sechs Fehlerfälle inkl. `PermissionDenied` als P2-eigenem Typ). `test_tools.py` neu
-mit allen 20 im Plan benannten Tests plus zwei zusätzlichen (siehe unten). `test_app.py` bekam
-einen siebten … achten Test: `test_all_six_tools_are_callable_over_http`, der Step 6s eigenes
-Done-when „alle sechs Tools über den ASGI-Testclient aufrufbar" gegen den echten Stack aus
-Step 5 beweist (ein voller Rundlauf: `list_spaces` → `create_item` → `search_items` →
-`get_item` eigen/fremd → `append_to_item` → `update_item`-Konflikt → `update_item(status=
-archived)`).
+**Ergebnis:** `phase2_mcp/scripts/mcp_smoke.py` — Gegenstück zu `space_cli.py` aus P1. Baut ein
+**temporäres** `DATA_ROOT` (`tempfile.TemporaryDirectory`, nie das echte), zwei Fixture-Spaces
+(`alpha`/`beta`), startet `create_app()` in-process über `httpx.ASGITransport` (kein echter
+Port, kein Netz — dasselbe Muster wie `test_app.py`) und fährt alle acht Prüfpunkte aus dem
+Plan durch: `list_spaces`, `create_item` ×3, `search_items`, `get_item` eigen/fremd, ein
+`update_item`-Konflikt, `append_to_item`, `update_item(status=archived)`, ein `update_item` auf
+einen fremden Space. `--json` für maschinenlesbare Ausgabe, sonst Textreport; Exit-Code `1` bei
+jeder fehlgeschlagenen Prüfung. README bekam den Abschnitt „MCP-Server smoke-testen", der
+Phase-Head diesen hier stehenden Runbook-Abschnitt „Quick-Tunnel-Probe" (oben, dauerhaft, nicht
+nur im Session-Block — der Tunnel-Schritt selbst bleibt außerhalb des Repos).
 
-**Testdesign-Entscheidung, hier festgehalten statt stillschweigend:** `test_tools.py` mockt
-`context.assert_principal_matches_request` auf ein No-op (autouse-Fixture) und ruft die von
-`tools.register()` zurückgegebenen rohen Tool-Funktionen direkt auf — `@mcp.tool(...)` gibt die
-unveränderte Python-Funktion zurück, nicht ein `FunctionTool`-Objekt (empirisch geprüft, nicht
-angenommen: ein `type(foo)` nach der Dekoration ist weiterhin `function`). Begründung: die
-komplette HTTP/ASGI/Guard-Kette ist bereits in `test_app.py::test_principal_isolation_under_
-concurrency` (Step 5) end-to-end bewiesen; zwanzig Tests bräuchten sonst zwanzigmal eine echte
-FastMCP-App. `test_create_item_has_no_space_parameter` prüft deshalb `inspect.signature()`
-direkt auf der zurückgegebenen Funktion.
+**Kein echter Keyring, bewusst:** `mcp_smoke.py` importiert `keyring` nicht direkt — die beiden
+Tokens entstehen über `credentials.generate_token()`/`hash_token()` (reine Funktionen) und
+werden per injiziertem `load_map` in einen `KeyringTokenResolver` gereicht, exakt das Muster
+aus den Unit-Tests. Ein Skript, das beliebig oft laufen soll, darf die reale Token→Space-Map
+unter `nikinger-space` nicht anfassen. Empirisch geprüft (nicht nur behauptet): `load_space_map()`
+gegen den echten Keyring zeigt nach mehreren `mcp_smoke.py`-Läufen weiterhin nur den einen
+`nikinger`-Eintrag aus Step 3 — keine `alpha`/`beta`-Verschmutzung.
 
-**Echter Fund während der Implementierung, nicht nur ein Advisor-Verdacht bestätigt:** die
-Step-4-Advisor-Notiz („`map_storage_error()` in Step 6 muss die `AuthError`-als-Tool-Fehler-
-Abbildung bewusst treffen, nicht zufällig") war zunächst NICHT umgesetzt — jeder Tool-Body rief
-`context.current_principal()` + `context.assert_principal_matches_request()` direkt auf, außerhalb
-jedes `try`/`except`. Ein Guard-`AuthError` wäre also roh durchgefallen statt über
-`map_storage_error()` zu laufen. Gefunden im Advisor-Review vor dem Commit, behoben durch
-`_authenticated_principal()` (bündelt Schritt 1+2 aus §3.3, fängt `AuthError` und wirft den
-gemappten `ToolError`). Regressionstest `test_guard_auth_error_is_mapped_to_tool_error` beweist
-es. **Kleinere Selbstkorrektur direkt danach:** ein automatisiertes Suchen/Ersetzen beim Umbau
-auf `_authenticated_principal()` hatte dessen eigenen Funktionskörper versehentlich auf sich
-selbst umgeschrieben (Endlosrekursion) — vor dem ersten Testlauf bemerkt und korrigiert, aber
-festgehalten, weil genau der neue Regressionstest diesen Fehler auch bei einem stillen Commit
-gefangen hätte.
+**Ein echter Fund beim ersten Lauf, kein Advisor-Vorgriff:** `list_spaces` schlug beim ersten
+Durchlauf fehl (`Spaces=['beta']` statt beider). Ursache: `Store.list_spaces()` leitet Spaces
+ausschließlich aus vorhandenen Items ab (P1, keine separate Space-Registry) — `alpha` hatte zum
+Zeitpunkt des ersten `list_spaces`-Aufrufs (Plan-Reihenfolge: Prüfpunkt 1, vor jedem
+`create_item`) schlicht noch kein Item und war deshalb unsichtbar. Kein Bug in `tools.py`, ein
+Fixture-Fehler im Smoke-Skript: `alpha` bekommt jetzt denselben Seed-Eintrag wie `beta`, bevor
+die Prüfungen beginnen.
 
-**Advisor-Review vor dem Commit, drei weitere Funde, alle behoben:**
-1. `test_search_limit_is_clamped_to_max` prüfte nur das im Payload echoete `limit`-Feld gegen
-   einem Store mit einem einzigen Item — hätte auch mit einem ungeklemmten Limit bestanden.
-   Jetzt >100 Items, Assertion zusätzlich auf `len(payload["items"]) == MAX_LIMIT`.
-2. Plan §2.2 nennt `search_items` ausdrücklich als den Pfad, an dem `total`/Paginierung falsch
-   werden, sobald `can_read` nicht mehr konstant `True` ist — der `_OwnSpaceOnlyVisible`-Test-
-   Double bewies den Seam bisher nur für `list_spaces`. Neuer Test
-   `test_search_filters_by_can_read_and_reports_filtered_total` beweist ihn jetzt auch für
-   `search_items` (`total` zählt die gefilterte, nicht die rohe Trefferzahl).
-3. `test_search_result_size_budget` maß den günstigsten Fall (leere Bodies → leere Snippets).
-   Fixture jetzt mit realistischer Body-Länge (volles 160-Zeichen-Snippet) und einer Mischung
-   aus eigenem und fremdem Space (Wrap-Overhead fließt ins Budget ein) — Budget hält weiterhin.
+**Automatisiert statt nur manuell bewiesen** (wie `space_cli.py` in P1 per Subprozess-Tests):
+`test_mcp_smoke.py` neu, 3 Tests, ruft `mcp_smoke.py` als echten Subprozess auf (kein Import —
+gleiche Begründung wie bei `space_cli.py`: Namenskollisionsgefahr über künftige Phasen hinweg,
+realistischste Prüfung). Prüft `--json`-Exit-Code 0 und dass alle Checks grün sind (Anzahl
+bewusst **nicht** hartkodiert — der Exit-Code trägt das Pass/Fail-Signal, ein `len(checks) ==
+N` würde bei jeder künftigen zusätzlichen Prüfung unnötig brechen), den Text-Report per Regex,
+und statisch (Quelltext-Grep), dass das Skript `keyring` nicht direkt importiert.
 
-**Bekannte, dokumentierte Grenze (kein Bug):** `search_items` holt bis zu `_STORE_FETCH_LIMIT =
-5000` Treffer vom Store (der ohnehin jede Datei pro Aufruf scannt, D6), filtert/paginiert
-`include_archived`/Rechte/`offset`/`limit` selbst in `tools.py`. Über dieser Grenze würde
-`total` still unterzählen — für den Zwei-Personen-Space-Server um Größenordnungen entfernt,
-als `[SEAM]`-Kommentar im Code und hier festgehalten statt später neu entdeckt zu werden.
+**Advisor-Review vor dem Commit, ein Fund korrigiert (blockierend), zwei kleinere mitgenommen:**
+Die erste Fassung der Größenmessung maß `search_items` gegen nur 5 vorhandene Treffer (1058 B)
+— das beantwortet nicht die Frage, für die Step 7s eigenes Done-when eine Größentabelle
+verlangt: hält das Token-Budget bei einem **echten Default-Listing** (§5 Kriterium 5, 20 Items
+< 12 KB)? `mcp_smoke.py` seedet jetzt 17 zusätzliche Füll-Items mit realistischer Body-Länge
+(vor den drei `create_item`-Aufrufen, damit diese als jüngste Items sicher im ersten
+20er-Fenster bleiben) — `search_items` misst jetzt tatsächlich eine volle 20-Item-Seite.
+Kleinere Fixes im selben Aufwasch: der Subprozess-Test hartkodierte die Checkanzahl (`== 11`,
+siehe oben) und der YAML-Feld-Extraktor `_extract_field` bekam einen Kommentar zur stillen
+Reihenfolge-Abhängigkeit (Frontmatter kommt immer vor dem Body, deshalb gewinnt bei
+`re.search` nie eine zufällig gleichlautende Body-Zeile).
 
-**Verifiziert (live):** 22 Tests in `test_tools.py`, `test_app.py` von 7 auf 8 gewachsen.
-`pytest -v` → **129/129 grün** (76 P1 + 53 P2).
+**Größenmessung (Bytes je Antwort, Live-Lauf gegen ein temporäres `DATA_ROOT`):**
 
-**Nächster Schritt (konkret):** Step 7 — `scripts/mcp_smoke.py` (Gegenstück zu `space_cli.py`
-aus P1, temporäres `DATA_ROOT`, nie das echte), README-Runbook „Quick-Tunnel-Probe", Größen-
-messung im Session-Block. Der Tunnel-Schritt selbst läuft beim Nikinger, nicht in Claude Code
-(kein Skript/Config/Hostname wird committet). Danach ist Phase 2 code-complete; die Quick-
-Tunnel-Probe (ein Read, ein Write über den echten Claude-Connector) macht sie live-verifiziert.
+| Operation | Bytes |
+|---|---|
+| `list_spaces` | 98 |
+| `create_item` #1 | 172 |
+| `create_item` #2 | 172 |
+| `create_item` #3 | 172 |
+| `search_items` (Default-Listing, 20 von 22 Treffern) | 6403 |
+| `get_item` (eigen) | 172 |
+| `get_item` (fremd, gewrappt) | 242 |
+| `update_item` (Konflikt) | 140 |
+| `append_to_item` | 183 |
+| `update_item` (archivieren) | 187 |
+| `update_item` (fremder Space, `write_denied`) | 65 |
+
+`search_items` bei 6403 B liegt klar unter dem §5-Budget (20 Items < 12 KB) — jetzt eine echte
+Antwort auf die Kriteriumsfrage, nicht nur ein Bestwert-Artefakt. Ergänzt, nicht ersetzt durch
+`test_tools.py::test_search_result_size_budget` (Step 6, 20/30-Item-Grenzfälle als
+Pass/Fail-Assertion in der Testsuite statt als gemeldete Zahl im Session-Block).
+
+**Verifiziert (live):** `pytest -v` → **132/132 grün** (76 P1 + 56 P2). `mcp_smoke.py` manuell
+ausgeführt (Text und `--json`, nach dem Advisor-Fix erneut), alle elf Prüfungen grün,
+temporäres Verzeichnis nach Lauf sauber entfernt (`ls /tmp/mcp_smoke_*` findet nichts mehr).
+
+**Phase 2 ist damit code-complete** (ROADMAP.md: 🟡). Fehlt für ✅ „live-verifiziert" (§5.9):
+die Quick-Tunnel-Probe durch den Nikinger (Runbook oben) — ein echter Read und ein echter Write
+über den Claude-Connector gegen den echten `DATA_ROOT`. Das ist die einzige verbleibende
+Handlung dieser Phase, die Claude Code nicht selbst ausführen darf (Hard Rule: kein Test gegen
+den echten `DATA_ROOT` durch Claude Code; Tunnel/Connector-Einrichtung ist ohnehin
+Nikinger-Sache).
+
+**Nächster Schritt (konkret):** Nikinger führt die Quick-Tunnel-Probe aus (Runbook oben) und
+meldet das Ergebnis. Danach: offizieller Phasenabschluss P2 (laut `docs/PROMPTS.md` als eigener
+Prompt im Browser-Webchat, analog zu Phase 1s Abschluss) — Status auf ✅, Handover-Dokument für
+P3 (Tunnel/systemd/Ops), neue Browser-Planungssession für Phase 3.

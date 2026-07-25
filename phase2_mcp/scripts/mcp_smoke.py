@@ -1,0 +1,317 @@
+#!/usr/bin/env python3
+"""mcp_smoke.py — Gegenstück zu `space_cli.py` aus P1 (Plan §4 Step 7). Baut ein **temporäres**
+`DATA_ROOT` (nie das echte), zwei Fixture-Spaces, startet `create_app()` in-process (kein
+echter Port, kein Netz — `httpx.ASGITransport`, dasselbe Muster wie `test_app.py`) und fährt
+die sechs Tools einmal vollständig durch: `list_spaces`, `create_item` ×3, `search_items`,
+`get_item` eigen/fremd, ein `update_item`-Konflikt, `append_to_item`, `update_item(status=
+archived)`, ein `update_item` auf einen fremden Space. Am Ende eine Größenmessung (Bytes je
+Antwort) als Tabelle.
+
+**Kein echter Keyring.** Ein Skript, das man beliebig oft laufen lassen soll, darf die echte
+Token→Space-Map unter dem Service `nikinger-space` nicht anfassen. Die beiden Tokens hier
+entstehen über `credentials.generate_token()`/`hash_token()` (reine Funktionen, kein
+Keyring-Zugriff) und werden per injiziertem `load_map` in einen `KeyringTokenResolver`
+gereicht — dasselbe Muster wie in den Unit-Tests.
+
+Ausgabe: Text (Standard) oder `--json` auf stdout; Logs auf stderr (Hard Rule 7).
+"""
+from __future__ import annotations
+
+import argparse
+import asyncio
+import json
+import logging
+import re
+import sys
+import tempfile
+from dataclasses import asdict, dataclass
+from pathlib import Path
+
+import httpx
+from fastmcp import Client
+from fastmcp.client.transports import StreamableHttpTransport
+
+from mcpserver import credentials
+from mcpserver.app import create_app
+from mcpserver.auth import KeyringTokenResolver
+from mcpserver.config import Settings
+from storage.store import Store
+
+logger = logging.getLogger("mcp_smoke")
+
+# Fixture-Namen, keine Nikinger-typischen Spacenamen (Plan §2.2 Erweiterungspfad).
+SPACE_OWN = "alpha"
+SPACE_FOREIGN = "beta"
+
+EXIT_OK = 0
+EXIT_FAILED = 1
+
+
+@dataclass
+class Check:
+    name: str
+    ok: bool
+    detail: str
+    response_bytes: int | None = None
+
+
+def _issue_smoke_token(space: str, mapping: dict[str, str]) -> str:
+    token = credentials.generate_token()
+    mapping[credentials.hash_token(token)] = space
+    return token
+
+
+def _client_factory(app):
+    transport = httpx.ASGITransport(app=app)
+
+    def factory(**kwargs) -> httpx.AsyncClient:
+        return httpx.AsyncClient(transport=transport, base_url="http://smoke.local", **kwargs)
+
+    return factory
+
+
+def _mcp_client(app, token: str) -> Client:
+    transport = StreamableHttpTransport(
+        url=f"http://smoke.local/mcp/{token}", httpx_client_factory=_client_factory(app)
+    )
+    return Client(transport)
+
+
+def _extract_field(filetext: str, field: str) -> str | None:
+    """Liest einen Frontmatter-Wert (`id: itm_...`, `version: 2`, …) aus dem von den Tools
+    zurückgegebenen Dateitext — kein YAML-Parser nötig für ein Smoke-Skript, das nur wenige
+    bekannte Felder ausliest. Sucht über den gesamten Dateitext (Frontmatter + Body), nicht nur
+    den Frontmatter-Block: sicher, weil `re.search` den ERSTEN Treffer nimmt und das Frontmatter
+    immer vor dem Body steht — ein Body mit einer zufällig gleichlautenden Zeile (z. B. eine
+    Notiz über "version: 2") würde sonst mit einer strikteren Grenze verwechselt, hier aber
+    nie gewinnen, weil das Frontmatter-Feld immer zuerst auftaucht."""
+    match = re.search(rf"^{field}: (.+)$", filetext, re.MULTILINE)
+    return match.group(1).strip() if match else None
+
+
+async def _run(data_root: Path, checks: list[Check]) -> None:
+    # Zwei Einträge in der Map (auch wenn dieses Skript nur mit dem eigenen Token verbindet)
+    # bewiesen bereits in test_app.py über echte parallele Requests — hier geht es um den
+    # Tool-Ablauf aus EINER Principal-Sicht (own), gegen einen Space, der ihr selbst gehört
+    # (alpha) und einen, der es nicht tut (beta).
+    mapping: dict[str, str] = {}
+    own_token = _issue_smoke_token(SPACE_OWN, mapping)
+    _issue_smoke_token(SPACE_FOREIGN, mapping)
+    resolver = KeyringTokenResolver(load_map=lambda: mapping)
+
+    store = Store(data_root, git=False)
+    # `Store.list_spaces()` leitet Spaces ausschließlich aus vorhandenen Items ab (P1, keine
+    # separate Space-Registry) — ohne diesen Seed-Eintrag wäre `alpha` beim ersten `list_spaces`-
+    # Aufruf (Schritt 1, vor jedem `create_item`) unsichtbar, weil noch leer.
+    store.create(SPACE_OWN, type="note", title="Ausgangspunkt", body="Anfangszustand.")
+    store.create(SPACE_FOREIGN, type="note", title="Fremde Notiz", body="Fremder Inhalt.")
+    # Auffüllen auf eine echte Default-Listing-Größe (§5 Kriterium 5: 20 Items < 12 KB) — ohne
+    # das würde die Größenmessung für `search_items` nur 5 Treffer zeigen und die eigentliche
+    # Frage ("hält das Token-Budget bei einem vollen Default-Listing") gar nicht beantworten
+    # (Advisor-Review, Step 7). Realistische Body-Länge wie in
+    # `test_tools.py::test_search_result_size_budget` — ein leerer Body macht jedes Snippet
+    # trivial und würde die Messung schönen. Vor `create_item` #1–3, damit diese (als jüngste
+    # Items) sicher im ersten 20er-Fenster landen, nicht die Füll-Items selbst.
+    filler_body = (
+        "Realistischer Notizinhalt für die Größenmessung, lang genug für ein volles "
+        "160-Zeichen-Snippet statt eines trivialen leeren Bodys. " * 2
+    )
+    for i in range(17):
+        store.create(SPACE_OWN, type="note", title=f"Füll-Item {i + 1}", body=filler_body)
+
+    settings = Settings(data_root=data_root)
+    app = create_app(settings=settings, resolver=resolver, store=store)
+
+    async with app.router.lifespan_context(app):
+        async with _mcp_client(app, own_token) as own:
+            # 1. list_spaces — beide Spaces sichtbar, genau einer writable.
+            spaces_text = (await own.call_tool("list_spaces", {})).data
+            spaces = json.loads(spaces_text)
+            by_name = {s["name"]: s for s in spaces}
+            writable = [s["name"] for s in spaces if s["writable"]]
+            checks.append(
+                Check(
+                    "list_spaces",
+                    set(by_name) == {SPACE_OWN, SPACE_FOREIGN} and writable == [SPACE_OWN],
+                    f"Spaces={sorted(by_name)}, writable={writable}",
+                    len(spaces_text.encode("utf-8")),
+                )
+            )
+
+            # 2. create_item x3 im eigenen Space.
+            created_ids: list[str] = []
+            for i in range(3):
+                text = (
+                    await own.call_tool(
+                        "create_item", {"type": "task", "title": f"Smoke-Item {i + 1}"}
+                    )
+                ).data
+                item_id = _extract_field(text, "id")
+                if item_id:
+                    created_ids.append(item_id)
+                checks.append(
+                    Check(
+                        f"create_item #{i + 1}",
+                        item_id is not None and f"space: {SPACE_OWN}" in text,
+                        item_id or "keine id im Dateitext gefunden",
+                        len(text.encode("utf-8")),
+                    )
+                )
+
+            # 3. search_items — Treffer, Default-Limit, keine archivierten.
+            search_text = (await own.call_tool("search_items", {})).data
+            search_payload = json.loads(search_text)
+            found_ids = {entry["id"] for entry in search_payload["items"]}
+            checks.append(
+                Check(
+                    "search_items",
+                    all(i in found_ids for i in created_ids)
+                    and search_payload["limit"] == 20
+                    and not any(e["status"] == "archived" for e in search_payload["items"]),
+                    f"total={search_payload['total']}, limit={search_payload['limit']}",
+                    len(search_text.encode("utf-8")),
+                )
+            )
+
+            # 4. get_item eigen -> Klartext; fremd -> gewrappt.
+            own_text = (await own.call_tool("get_item", {"item_id": created_ids[0]})).data
+            checks.append(
+                Check(
+                    "get_item (eigen)",
+                    "<untrusted_content" not in own_text,
+                    "Klartext ohne Wrap",
+                    len(own_text.encode("utf-8")),
+                )
+            )
+
+            foreign_search = json.loads(
+                (await own.call_tool("search_items", {"space": SPACE_FOREIGN})).data
+            )
+            foreign_id = foreign_search["items"][0]["id"]
+            foreign_text = (await own.call_tool("get_item", {"item_id": foreign_id})).data
+            checks.append(
+                Check(
+                    "get_item (fremd)",
+                    "<untrusted_content" in foreign_text and f'space="{SPACE_FOREIGN}"' in foreign_text,
+                    "Body gewrappt",
+                    len(foreign_text.encode("utf-8")),
+                )
+            )
+
+            # 5. update_item mit falscher Version -> lesbarer Konflikt.
+            conflict = await own.call_tool(
+                "update_item",
+                {"item_id": created_ids[0], "version": 999, "title": "Sollte scheitern"},
+                raise_on_error=False,
+            )
+            conflict_text = conflict.content[0].text if conflict.content else ""
+            checks.append(
+                Check(
+                    "update_item (falsche Version)",
+                    conflict.is_error and "conflict" in conflict_text and "999" in conflict_text,
+                    conflict_text,
+                    len(conflict_text.encode("utf-8")),
+                )
+            )
+
+            # 6. append_to_item -> Version +1.
+            appended_text = (
+                await own.call_tool(
+                    "append_to_item",
+                    {"item_id": created_ids[0], "version": 1, "text": "Angehängt."},
+                )
+            ).data
+            version_after_append = _extract_field(appended_text, "version")
+            checks.append(
+                Check(
+                    "append_to_item",
+                    version_after_append == "2" and "Angehängt." in appended_text,
+                    f"version={version_after_append}",
+                    len(appended_text.encode("utf-8")),
+                )
+            )
+
+            # 7. update_item(status=archived) -> Datei in _archive/.
+            archived_text = (
+                await own.call_tool(
+                    "update_item",
+                    {"item_id": created_ids[0], "version": 2, "status": "archived"},
+                )
+            ).data
+            archive_dir = data_root / SPACE_OWN / "_archive"
+            file_moved = any(p.name.startswith(created_ids[0]) for p in archive_dir.glob("*.md"))
+            checks.append(
+                Check(
+                    "update_item (archivieren)",
+                    file_moved and "status: archived" in archived_text,
+                    "Datei liegt in _archive/" if file_moved else "Datei NICHT in _archive/ gefunden",
+                    len(archived_text.encode("utf-8")),
+                )
+            )
+
+            # 8. update_item auf ein fremdes Item -> write_denied.
+            denial = await own.call_tool(
+                "update_item",
+                {"item_id": foreign_id, "version": 1, "title": "Fremdzugriff"},
+                raise_on_error=False,
+            )
+            denial_text = denial.content[0].text if denial.content else ""
+            checks.append(
+                Check(
+                    "update_item (fremder Space)",
+                    denial.is_error and "write_denied" in denial_text,
+                    denial_text,
+                    len(denial_text.encode("utf-8")),
+                )
+            )
+
+
+def _print_report(checks: list[Check]) -> None:
+    name_width = max(len(c.name) for c in checks)
+    print("Sharefyx MCP — Smoke-Test\n")
+    for c in checks:
+        status = "OK  " if c.ok else "FAIL"
+        print(f"[{status}] {c.name.ljust(name_width)}  {c.detail}")
+
+    print("\nGrößenmessung (Bytes je Antwort):")
+    for c in checks:
+        size = f"{c.response_bytes} B" if c.response_bytes is not None else "—"
+        print(f"  {c.name.ljust(name_width)}  {size}")
+
+    failed = [c for c in checks if not c.ok]
+    print()
+    if failed:
+        print(f"{len(failed)} von {len(checks)} Prüfung(en) fehlgeschlagen.", file=sys.stderr)
+    else:
+        print(f"Alle {len(checks)} Prüfungen grün.")
+
+
+def main(argv: list[str] | None = None) -> int:
+    logging.basicConfig(
+        stream=sys.stderr, level=logging.INFO, format="%(levelname)s %(name)s: %(message)s"
+    )
+    parser = argparse.ArgumentParser(
+        prog="mcp_smoke",
+        description="End-to-End-Smoke-Test der sechs MCP-Tools gegen ein temporäres DATA_ROOT "
+        "(nie das echte). Kein echter Port, kein Netz, kein Keyring.",
+    )
+    parser.add_argument(
+        "--json", action="store_true", help="Maschinenlesbare Ausgabe auf stdout statt Text"
+    )
+    args = parser.parse_args(argv)
+
+    checks: list[Check] = []
+    with tempfile.TemporaryDirectory(prefix="mcp_smoke_") as tmp:
+        logger.info("temporäres DATA_ROOT: %s", tmp)
+        asyncio.run(_run(Path(tmp), checks))
+
+    if args.json:
+        print(json.dumps([asdict(c) for c in checks], ensure_ascii=False, indent=2))
+    else:
+        _print_report(checks)
+
+    return EXIT_OK if all(c.ok for c in checks) else EXIT_FAILED
+
+
+if __name__ == "__main__":
+    sys.exit(main())

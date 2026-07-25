@@ -4,9 +4,79 @@ purpose: Archiv älterer Session-stopped-Blöcke aus phase2_mcp/CLAUDE.md, newes
 read-when: Audit vergangener Sessions dieser Phase; NICHT für normalen Session-Start
 detail: L3
 up: CLAUDE.md
-updated: 2026-07-26 (Step 6)
+updated: 2026-07-26 (Step 7)
 ---
 # Session-Archiv — Phase 2 MCP-Server
+
+## Session stopped — 2026-07-26 (Step 6: Die sechs Tools)
+
+**Ergebnis:** `mcpserver/tools.py` fertig — `search_items`, `get_item`, `create_item`,
+`update_item`, `append_to_item` lösen ihre `NotImplementedError`-Platzhalter aus Step 5 ein.
+Neue Modul-Helfer wie im Plan gefordert: `wrap_untrusted()` (§3.5, Ersatzstring wörtlich aus
+dem Plan übernommen), `summary_to_dict()`, `item_to_filetext()` (dupliziert bewusst
+`storage.store._item_to_text`s Feldreihenfolge — der P1-Contract ist seit Step 2 „wieder zu",
+eine weitere Erweiterung wäre keine „einmalige" mehr), `compact_json()`, `map_storage_error()`
+(§3.6, alle sechs Fehlerfälle inkl. `PermissionDenied` als P2-eigenem Typ). `test_tools.py` neu
+mit allen 20 im Plan benannten Tests plus zwei zusätzlichen (siehe unten). `test_app.py` bekam
+einen siebten … achten Test: `test_all_six_tools_are_callable_over_http`, der Step 6s eigenes
+Done-when „alle sechs Tools über den ASGI-Testclient aufrufbar" gegen den echten Stack aus
+Step 5 beweist (ein voller Rundlauf: `list_spaces` → `create_item` → `search_items` →
+`get_item` eigen/fremd → `append_to_item` → `update_item`-Konflikt → `update_item(status=
+archived)`).
+
+**Testdesign-Entscheidung, hier festgehalten statt stillschweigend:** `test_tools.py` mockt
+`context.assert_principal_matches_request` auf ein No-op (autouse-Fixture) und ruft die von
+`tools.register()` zurückgegebenen rohen Tool-Funktionen direkt auf — `@mcp.tool(...)` gibt die
+unveränderte Python-Funktion zurück, nicht ein `FunctionTool`-Objekt (empirisch geprüft, nicht
+angenommen: ein `type(foo)` nach der Dekoration ist weiterhin `function`). Begründung: die
+komplette HTTP/ASGI/Guard-Kette ist bereits in `test_app.py::test_principal_isolation_under_
+concurrency` (Step 5) end-to-end bewiesen; zwanzig Tests bräuchten sonst zwanzigmal eine echte
+FastMCP-App. `test_create_item_has_no_space_parameter` prüft deshalb `inspect.signature()`
+direkt auf der zurückgegebenen Funktion.
+
+**Echter Fund während der Implementierung, nicht nur ein Advisor-Verdacht bestätigt:** die
+Step-4-Advisor-Notiz („`map_storage_error()` in Step 6 muss die `AuthError`-als-Tool-Fehler-
+Abbildung bewusst treffen, nicht zufällig") war zunächst NICHT umgesetzt — jeder Tool-Body rief
+`context.current_principal()` + `context.assert_principal_matches_request()` direkt auf, außerhalb
+jedes `try`/`except`. Ein Guard-`AuthError` wäre also roh durchgefallen statt über
+`map_storage_error()` zu laufen. Gefunden im Advisor-Review vor dem Commit, behoben durch
+`_authenticated_principal()` (bündelt Schritt 1+2 aus §3.3, fängt `AuthError` und wirft den
+gemappten `ToolError`). Regressionstest `test_guard_auth_error_is_mapped_to_tool_error` beweist
+es. **Kleinere Selbstkorrektur direkt danach:** ein automatisiertes Suchen/Ersetzen beim Umbau
+auf `_authenticated_principal()` hatte dessen eigenen Funktionskörper versehentlich auf sich
+selbst umgeschrieben (Endlosrekursion) — vor dem ersten Testlauf bemerkt und korrigiert, aber
+festgehalten, weil genau der neue Regressionstest diesen Fehler auch bei einem stillen Commit
+gefangen hätte.
+
+**Advisor-Review vor dem Commit, drei weitere Funde, alle behoben:**
+1. `test_search_limit_is_clamped_to_max` prüfte nur das im Payload echoete `limit`-Feld gegen
+   einem Store mit einem einzigen Item — hätte auch mit einem ungeklemmten Limit bestanden.
+   Jetzt >100 Items, Assertion zusätzlich auf `len(payload["items"]) == MAX_LIMIT`.
+2. Plan §2.2 nennt `search_items` ausdrücklich als den Pfad, an dem `total`/Paginierung falsch
+   werden, sobald `can_read` nicht mehr konstant `True` ist — der `_OwnSpaceOnlyVisible`-Test-
+   Double bewies den Seam bisher nur für `list_spaces`. Neuer Test
+   `test_search_filters_by_can_read_and_reports_filtered_total` beweist ihn jetzt auch für
+   `search_items` (`total` zählt die gefilterte, nicht die rohe Trefferzahl).
+3. `test_search_result_size_budget` maß den günstigsten Fall (leere Bodies → leere Snippets).
+   Fixture jetzt mit realistischer Body-Länge (volles 160-Zeichen-Snippet) und einer Mischung
+   aus eigenem und fremdem Space (Wrap-Overhead fließt ins Budget ein) — Budget hält weiterhin.
+
+**Bekannte, dokumentierte Grenze (kein Bug):** `search_items` holt bis zu `_STORE_FETCH_LIMIT =
+5000` Treffer vom Store (der ohnehin jede Datei pro Aufruf scannt, D6), filtert/paginiert
+`include_archived`/Rechte/`offset`/`limit` selbst in `tools.py`. Über dieser Grenze würde
+`total` still unterzählen — für den Zwei-Personen-Space-Server um Größenordnungen entfernt,
+als `[SEAM]`-Kommentar im Code und hier festgehalten statt später neu entdeckt zu werden.
+
+**Verifiziert (live):** 22 Tests in `test_tools.py`, `test_app.py` von 7 auf 8 gewachsen.
+`pytest -v` → **129/129 grün** (76 P1 + 53 P2).
+
+**Nächster Schritt (konkret):** Step 7 — `scripts/mcp_smoke.py` (Gegenstück zu `space_cli.py`
+aus P1, temporäres `DATA_ROOT`, nie das echte), README-Runbook „Quick-Tunnel-Probe", Größen-
+messung im Session-Block. Der Tunnel-Schritt selbst läuft beim Nikinger, nicht in Claude Code
+(kein Skript/Config/Hostname wird committet). Danach ist Phase 2 code-complete; die Quick-
+Tunnel-Probe (ein Read, ein Write über den echten Claude-Connector) macht sie live-verifiziert.
+
+---
 
 ## Session stopped — 2026-07-26 (Step 5: Server und App)
 

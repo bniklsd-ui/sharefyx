@@ -6,7 +6,7 @@ detail: L2
 up: CLAUDE.md
 down:
   - docs/concepts/phase1_storage_plan.md   # ausführungsreifer P1-Plan
-updated: 2026-07-25
+updated: 2026-07-26
 ---
 # ROADMAP — Space-Server
 
@@ -18,7 +18,7 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 | Phase | Verzeichnis / Paket | Inhalt | Status |
 |---|---|---|---|
 | **P1** | `phase1_storage/` · `storage` | Datei-Store + Index + Versionierung. Kein Netz. | ✅ |
-| **P2** | `phase2_mcp/` · `mcpserver` | MCP-Server, Token-Auth, 6 Tools. Lokal erreichbar. | 🔄 |
+| **P2** | `phase2_mcp/` · `mcpserver` | MCP-Server, Token-Auth, 6 Tools. Lokal erreichbar. | 🟡 |
 | **P3** | `phase3_edge/` | Tunnel, systemd, Health, Logging, Ops-Skripte. Öffentlich erreichbar. | ⬜ |
 | **P4** | `phase4_auth/` · `auth` | OAuth 2.1 + DCR; ersetzt den Pfad-Token. | ⬜ |
 | **P5** | `phase5_ui/` · `webui` | REST-API + Web-UI für Menschen. | ⬜ |
@@ -65,6 +65,13 @@ reale Probe auf den Advisor-Fund aus Step 5). Details + Transkript:
   Wer Resources ergänzen will, muss es vorher messen, nicht annehmen.
 
 Plan: `docs/concepts/phase2_mcp_plan.md`. Phase-Head: `phase2_mcp/CLAUDE.md`.
+
+**Stand 2026-07-26 (Step 7):** alle acht Module (Steps 0–7) fertig, 132 Tests grün (76 P1 +
+56 P2), `mcp_smoke.py` als Beweis (Gegenstück zu `space_cli.py` aus P1) — läuft grün gegen ein
+temporäres `DATA_ROOT`, alle sechs Tools über den echten ASGI-Stack, beide Rule-4-Fälle
+bewiesen. Status **🟡 code-complete, nicht live-bewiesen**: die Quick-Tunnel-Probe (ein
+echter Read/Write über den Claude-Connector) ist Sache des Nikingers, nicht von Claude Code —
+Runbook dafür steht in `phase2_mcp/CLAUDE.md`. Hebt Status auf ✅, sobald gemeldet.
 
 ### Zurückgestellt aus P2 (bewusst, nicht vergessen)
 

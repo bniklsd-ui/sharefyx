@@ -8,7 +8,7 @@ down:
   - ROADMAP.md                          # Phasenplan + Status je Phase
   - docs/INDEX.md                       # L0-Karte aller .md
   - phase2_mcp/CLAUDE.md                # aktive Phase
-updated: 2026-07-25
+updated: 2026-07-26
 ---
 # CLAUDE.md — Project Instructions
 
@@ -130,7 +130,8 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 
 ## Current state
 
-**Aktive Phase:** Phase 2 — MCP-Server (`phase2_mcp/`, Paket `mcpserver`, im Aufbau):
+**Aktive Phase:** Phase 2 — MCP-Server (`phase2_mcp/`, Paket `mcpserver`, **code-complete seit
+Step 7, 2026-07-26** — Quick-Tunnel-Probe durch den Nikinger noch offen, siehe unten):
 Claude soll lesend und schreibend über einen lokalen `fastmcp`-Server auf den P1-Storage-Kern
 zugreifen — Token→Space-Auflösung, sechs Tools, `<untrusted_content>`-Wrapping fremder Bodies.
 Noch kein Netz nach außen (kein Tunnel, das ist P3). Plan: `docs/concepts/phase2_mcp_plan.md`
