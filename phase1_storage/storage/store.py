@@ -17,7 +17,7 @@ from . import files, history, index
 from .errors import ConflictError, ItemNotFound, ValidationError
 from .frontmatter import parse as parse_frontmatter
 from .frontmatter import serialize as serialize_frontmatter
-from .models import IndexStats, Item, ItemSummary, SearchResult, SpaceInfo
+from .models import IndexStats, Item, ItemSummary, SearchResult, SpaceInfo, STATUS_VALUES, valid_statuses
 
 _KNOWN_FIELDS = {
     "id", "space", "type", "title", "status", "due", "tags", "links",
@@ -100,6 +100,21 @@ def _snippet(body: str, *, length: int = 160) -> str:
     return text[:cut] + "…"
 
 
+def _check_type_and_status(item_type: str, status: str) -> None:
+    """Wirft `ValidationError` bei unbekanntem `type` oder einem `status`, der laut
+    `models.STATUS_VALUES` für diesen `type` nicht erlaubt ist (Entscheidung D2). Einmal hier
+    statt in jedem Adapter (CLI, MCP) neu — die CLI hielt das bisher nur über `argparse choices`
+    ab, was ein zweiter Eingang (MCP) umgangen hätte.
+    """
+    allowed = valid_statuses(item_type)
+    if not allowed:
+        raise ValidationError(f"Unbekannter type {item_type!r} — erlaubt: {sorted(STATUS_VALUES)}")
+    if status not in allowed:
+        raise ValidationError(
+            f"Status {status!r} nicht erlaubt für type {item_type!r} — erlaubt: {sorted(allowed)}"
+        )
+
+
 def _summary(item: Item) -> ItemSummary:
     return ItemSummary(
         id=item.id, space=item.space, type=item.type, title=item.title, status=item.status,
@@ -158,13 +173,19 @@ class Store:
         path = self._data_root / row["path"]
         return _item_from_text(path.read_text(encoding="utf-8"), version_override=row["version"])
 
-    def _reconcile_and_get_row(self, item_id: str) -> sqlite3.Row:
+    def _reconcile_and_get_row(self, item_id: str, *, repair_drift: bool = True) -> sqlite3.Row:
         """Liest die Indexzeile, erkennt externe Edits (Entscheidung D) und reindiziert bei
         Bedarf. Bei echter Inhaltsänderung wird die gebumpte Version **ins Frontmatter
         zurückgeschrieben** — sonst würde ein `rebuild_index()` (Entscheidung A, jederzeit
         erlaubt, läuft laut Plan G beim Start) die Version wieder auf den alten Dateistand
         zurücksetzen und das Konfliktschutz-Fenster lautlos wieder öffnen (Nikinger-Entscheidung
         2026-07-24, siehe Session-stopped-Block).
+
+        `repair_drift=False` (P2 Step 2, Entscheidung D3): bei erkannter Inhaltsänderung wird
+        **nicht** ins Frontmatter zurückgeschrieben und **kein** Git-Commit erzeugt — nur der
+        Index wird nachgezogen (reine Ableitung, kein Cross-Space-Write). Für fremde Spaces:
+        ein Lesezugriff dort fasst keine Datei an (Rule 4); `version` ist dort informativ, nicht
+        autoritativ, weil es dort per Architektur keine Writes gibt.
 
         Muss unter `self._lock` **und** `self._file_write_lock()` aufgerufen werden — diese
         Methode kann schreiben (deshalb keine eigene Lock-Verwaltung: verschachteltes `flock`
@@ -181,10 +202,13 @@ class Store:
         if stat.st_mtime != row["mtime"] or stat.st_size != row["size"]:
             fresh = index.row_from_file(self._data_root, path)
             if fresh["sha256"] != row["sha256"]:
-                new_version = row["version"] + 1
-                self._rewrite_version_in_file(path, new_version)
-                self._commit("drift", item_id, row["space"])
-                fresh = index.row_from_file(self._data_root, path)
+                if repair_drift:
+                    new_version = row["version"] + 1
+                    self._rewrite_version_in_file(path, new_version)
+                    self._commit("drift", item_id, row["space"])
+                    fresh = index.row_from_file(self._data_root, path)
+                # sonst: `fresh["version"]` trägt bereits die Version aus der Datei selbst
+                # (der Mensch hat sie nie angefasst) — nichts weiter zu tun.
             else:
                 fresh["version"] = row["version"]
             index.upsert_item(self._conn, fresh)
@@ -225,6 +249,17 @@ class Store:
             for row in index.all_rows(self._conn):
                 counts[row["space"]] = counts.get(row["space"], 0) + 1
             return [SpaceInfo(name=name, item_count=count) for name, count in sorted(counts.items())]
+
+    def space_of(self, item_id: str) -> str:
+        """Space eines Items, ausschließlich über den Index. Schreibt nichts, liest keine Datei.
+        Wird von der Autorisierungsschicht (P2) gebraucht, BEVOR entschieden ist, ob ein
+        Zugriff überhaupt erlaubt ist — ein Rechtefehler darf den Store sonst nicht erreichen.
+        """
+        with self._lock:
+            row = index.get_item_row(self._conn, item_id)
+        if row is None:
+            raise ItemNotFound(item_id)
+        return row["space"]
 
     def search(
         self,
@@ -274,9 +309,9 @@ class Store:
             items=[_summary(i) for i in page], total=total, limit=limit, offset=offset,
         )
 
-    def get(self, item_id: str) -> Item:
+    def get(self, item_id: str, *, repair_drift: bool = True) -> Item:
         with self._lock, self._file_write_lock():
-            row = self._reconcile_and_get_row(item_id)
+            row = self._reconcile_and_get_row(item_id, repair_drift=repair_drift)
             return self._row_to_item(row)
 
     def create(self, space: str, *, type: str, title: str, body: str = "", **fields) -> Item:
@@ -286,6 +321,7 @@ class Store:
                 raise ValidationError(f"Felder {sorted(reserved)} sind vom Store verwaltet")
             now = self._now_fn()
             status = fields.pop("status", _DEFAULT_STATUS.get(type, "active"))
+            _check_type_and_status(type, status)
             due = _coerce_due(fields.pop("due", None))
             tags = fields.pop("tags", [])
             links = fields.pop("links", [])
@@ -319,6 +355,10 @@ class Store:
                     kwargs[key] = value
                 else:
                     updated_extra[key] = value
+
+            _check_type_and_status(
+                kwargs.get("type", current.type), kwargs.get("status", current.status)
+            )
 
             new_item = replace(
                 current,

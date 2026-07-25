@@ -381,3 +381,84 @@ def test_git_enabled_broken_repo_does_not_block_write_and_logs_critical(
     assert path.exists()
     critical_records = [r for r in caplog.records if r.levelno == logging.CRITICAL]
     assert len(critical_records) >= 1
+
+
+# -- P2 Step 2: P1-Contract-Erweiterungen (space_of, repair_drift, Statusvalidierung) ------
+
+def test_space_of_returns_space(store):
+    item = store.create("nikinger", type="task", title="X")
+    assert store.space_of(item.id) == "nikinger"
+
+
+def test_space_of_unknown_raises_item_not_found(store):
+    with pytest.raises(ItemNotFound):
+        store.space_of("itm_deadbeef")
+
+
+def test_get_repair_drift_false_leaves_file_untouched(store, tmp_path):
+    item = store.create("nikinger", type="note", title="Fremd gelesen", body="Original\n")
+    path = tmp_path / "nikinger" / f"{item.id}__fremd-gelesen.md"
+
+    original_text = path.read_text()
+    path.write_text(original_text.replace("Original", "Verändert von außen"))
+    later = path.stat().st_mtime + 5
+    os.utime(path, (later, later))
+    mtime_before = path.stat().st_mtime
+    bytes_before = path.read_bytes()
+
+    fetched = store.get(item.id, repair_drift=False)
+
+    assert "Verändert von außen" in fetched.body
+    assert fetched.version == item.version  # nicht gebumpt — Datei blieb unangetastet
+    assert path.stat().st_mtime == mtime_before
+    assert path.read_bytes() == bytes_before
+
+
+def test_get_repair_drift_false_creates_no_commit(store_git, tmp_path):
+    item = store_git.create("nikinger", type="note", title="Ohne Commit", body="Original\n")
+    path = tmp_path / "nikinger" / f"{item.id}__ohne-commit.md"
+    log_before = _git_log(tmp_path)
+
+    original_text = path.read_text()
+    path.write_text(original_text.replace("Original", "Verändert von außen"))
+    later = path.stat().st_mtime + 5
+    os.utime(path, (later, later))
+
+    store_git.get(item.id, repair_drift=False)
+
+    assert _git_log(tmp_path) == log_before
+
+
+def test_get_repair_drift_true_still_bumps(store, tmp_path):
+    item = store.create("nikinger", type="note", title="Muss bumpen", body="Original\n")
+    path = tmp_path / "nikinger" / f"{item.id}__muss-bumpen.md"
+
+    original_text = path.read_text()
+    path.write_text(original_text.replace("Original", "Verändert von außen"))
+    later = path.stat().st_mtime + 5
+    os.utime(path, (later, later))
+
+    fetched = store.get(item.id, repair_drift=True)
+
+    assert fetched.version == item.version + 1
+
+
+def test_create_rejects_unknown_status(store):
+    with pytest.raises(ValidationError):
+        store.create("nikinger", type="task", title="X", status="bogus")
+
+
+def test_update_rejects_unknown_status(store):
+    item = store.create("nikinger", type="task", title="X")
+    with pytest.raises(ValidationError):
+        store.update(item.id, version=item.version, status="bogus")
+
+
+def test_update_accepts_valid_status_per_type(store):
+    task = store.create("nikinger", type="task", title="T")
+    updated_task = store.update(task.id, version=task.version, status="done")
+    assert updated_task.status == "done"
+
+    note = store.create("nikinger", type="note", title="N")
+    updated_note = store.update(note.id, version=note.version, status="archived")
+    assert updated_note.status == "archived"

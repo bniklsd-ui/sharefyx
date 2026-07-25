@@ -8,6 +8,49 @@ updated: 2026-07-25
 ---
 # Session-Archiv — Phase 2 MCP-Server
 
+## Session stopped — 2026-07-25 (Step 1: Paketgerüst)
+
+**Ergebnis:** `phase2_mcp/pyproject.toml` (Paket `mcpserver`, spiegelt
+`phase1_storage/pyproject.toml` exakt bis auf Name/Description/Dependencies —
+`dependencies = ["storage", "fastmcp>=3.4,<3.5", "keyring>=25"]`,
+`dev = ["pytest", "pytest-asyncio", "httpx"]`), `mcpserver/__init__.py`
+(`__version__ = "0.1.0"`), `mcpserver/config.py` (`Settings`-Dataclass `frozen, kw_only`:
+`data_root: Path` Pflicht ohne Default, `host="127.0.0.1"`, `port=8765`, `log_level="INFO"`;
+`load_settings(env)` liest `SPACE_DATA_ROOT`/`SPACE_HOST`/`SPACE_PORT`/`SPACE_LOG_LEVEL`, wirft
+`ValueError` bei fehlendem `SPACE_DATA_ROOT` oder nicht-parsbarem `SPACE_PORT`). Kein Secret in
+`Settings` — `config.py` kennt laut Modulübersicht „nichts", importiert entsprechend nur
+Standardbibliothek.
+
+**Drift gegenüber dem Plan, dated:** Plan §4 Step 1 nennt `tests/__init__.py` als Datei. P1 hat
+in `phase1_storage/tests/` nie ein `__init__.py`, sondern ein leeres `conftest.py` als
+Platzhalter (Step 0 des P1-Plans). Hier aus Konsistenzgründen mit dem bereits etablierten
+Repo-Vorbild identisch gehalten: `phase2_mcp/tests/conftest.py` (leer) statt `__init__.py`.
+Funktional gleichwertig für `pytest`-Discovery.
+
+**Notwendige Ergänzung, die der Plan nicht auflistete:** `pytest.ini` (`testpaths =
+phase1_storage/tests`) hätte `phase2_mcp/tests/` nie gefunden. Erweitert auf
+`testpaths = phase1_storage/tests phase2_mcp/tests` — sonst wären alle P2-Tests ab hier
+unsichtbar für `pytest` gewesen, ohne dass ein Fehler das angezeigt hätte.
+
+**Verifiziert (live):** `./scripts/dev_install.sh` fand `phase2_mcp/` automatisch über den
+`phase*_*/`-Glob (keine Änderung am Skript nötig, wie im Plan erwartet), installierte `storage`
+und `mcpserver` editable, zog `fastmcp==3.4.4` (exakt die in Step 0 als aktuellste 3.4.x-Version
+verifizierte) und `keyring==25.7.0` echt aus PyPI. `from mcpserver import __version__` →
+`"0.1.0"`. `pytest -v` → **71/71 grün** (68 aus P1 + 3 neue in `test_config.py`:
+`test_load_settings_requires_data_root`, `test_load_settings_defaults`,
+`test_load_settings_port_invalid_raises`).
+
+**V5 (Keyring-Backend) weiter aufgelöst, noch nicht endgültig:** `keyring --list-backends` nach
+echter Installation zeigt `keyring.backends.SecretService.Keyring` mit Priorität 5 (höchste) —
+das in Step 0 vermutete Backend ist real verfügbar, nicht nur plausibel. Endgültig verifiziert
+ist V5 erst, wenn Step 3 tatsächlich einen Wert schreibt und zurückliest (`credentials.py`
+existiert noch nicht).
+
+**Nächster Schritt (konkret):** Step 2 — die drei freigegebenen P1-Contract-Erweiterungen
+(`space_of()`, `get(..., repair_drift=)`, Statusvalidierung) in `phase1_storage/storage/`.
+Kein weiterer Haltepunkt vorgesehen (Plan §4 Step 2 ist mechanisch, Erweiterungen sind bereits
+freigegeben).
+
 ## Session stopped — 2026-07-25 (Step 0: Haushalt + Verifikationsdurchlauf)
 
 **Ergebnis:** Erster Claude-Code-Durchlauf für Phase 2. Kein Feature-Code — Step 0 ist reiner

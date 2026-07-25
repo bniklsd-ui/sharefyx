@@ -71,3 +71,19 @@ class IndexStats:
 
     items_indexed: int
     duration_seconds: float
+
+
+# Statusvokabular je `type` (P2 Step 2, Entscheidung D2). Die CLI hielt ungültige Werte bisher
+# nur über `argparse choices` ab — ein zweiter Adapter (MCP) wäre daran vorbeigelaufen. Deshalb
+# einmal im Kern statt in jedem Adapter neu.
+STATUS_VALUES: dict[str, frozenset[str]] = {
+    "note": frozenset({"active", "archived"}),
+    "task": frozenset({"open", "done", "archived"}),
+}
+
+
+def valid_statuses(item_type: str) -> frozenset[str]:
+    """Erlaubte Statuswerte für `item_type`. Leeres Frozenset bei unbekanntem Typ — der
+    Aufrufer unterscheidet damit explizit zwischen "Typ unbekannt" und "Status unbekannt"
+    (siehe `store.py` `create()`/`update()`)."""
+    return STATUS_VALUES.get(item_type, frozenset())

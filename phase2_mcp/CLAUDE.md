@@ -76,24 +76,27 @@ Fehlerabbildung mit handlungsfähigem Text (N).
 |---|---|---|---|---|
 | 1 | Haushalt, Verifikationsdurchlauf, Rotationsregel operationalisiert | 0 | ✅ | 0 (kein Feature-Code) |
 | 2 | Paketgerüst `phase2_mcp/`, `mcpserver/config.py` | 1 | ✅ | 3 |
-| 3 | P1-Contract-Erweiterungen (`space_of`, `repair_drift`, Statusvalidierung) | 2 | ⬜ | — |
+| 3 | P1-Contract-Erweiterungen (`space_of`, `repair_drift`, Statusvalidierung) | 2 | ✅ | 8 (in `phase1_storage/tests/`) |
 | 4 | `credentials.py`, `scripts/issue_token.py` | 3 | ⬜ | — |
 | 5 | `auth.py`, `permissions.py`, `context.py`, `asgi.py`, `logging_setup.py` | 4 | ⬜ | — |
 | 6 | `server.py`, `app.py`, `scripts/serve.py` | 5 | ⬜ | — |
 | 7 | `tools.py` (die sechs Tools) | 6 | ⬜ | — |
 | 8 | `scripts/mcp_smoke.py`, Runbook, Größenmessung | 7 | ⬜ | — |
 
-**Gesamt: 3 Tests** (`test_config.py`). Step 2 (P1-Erweiterungen) fügt acht weitere Tests in
-`phase1_storage/tests/` hinzu, nicht hier — dieser Head zählt nur `phase2_mcp/tests/`.
+**Gesamt: 3 Tests** (`test_config.py`) — dieser Head zählt nur `phase2_mcp/tests/`. Step 2 fügte
+acht weitere Tests in `phase1_storage/tests/` hinzu (siehe Modul-Status Zeile 3 und
+`phase1_storage/CLAUDE.md`), die dort mitgezählt werden, nicht hier.
 
 ## Geerbte Contracts
 
 Aus P1 (`phase1_storage/CLAUDE.md`, `docs/concepts/phase1_storage_plan.md` §1/§2): Frontmatter-
 Schema, `Item`/`SpaceInfo`/`ItemSummary`/`SearchResult`/`IndexStats`, `Store`-Signaturen
 (`list_spaces`/`search`/`get`/`create`/`update`/`append`/`archive`/`rebuild_index`),
-Fehlertypen inkl. `ConflictError.current`. Drei einmalige, vom Nikinger freigegebene
-Erweiterungen kommen in Step 2 dieser Phase (`space_of()`, `get(..., repair_drift=)`,
-Statusvalidierung) — danach ist der Contract wieder zu.
+Fehlertypen inkl. `ConflictError.current`. **[2026-07-25, Step 2 abgeschlossen]** Drei
+einmalige, vom Nikinger freigegebene Erweiterungen sind eingebracht (`space_of()`,
+`get(..., repair_drift=)`, Statusvalidierung über `models.STATUS_VALUES`) — Details, Tests und
+Begründung stehen in `phase1_storage/CLAUDE.md` unter „Geerbte Contracts" (dort, nicht doppelt
+hier, da Code-nah). **Der Contract ist ab jetzt wieder zu.**
 
 **D1, festgehalten statt stillschweigend übernommen:** `docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md`
 verlangte ausdrücklich Gegenprüfung von `ItemSummary` und `SpaceInfo.name`/`.item_count` (beides
@@ -112,51 +115,40 @@ gegen Cloudflare (R4 — Cloudflare sieht bei P3 ohnehin Klartext), gültig bis 
 P2-Plan §0.3 für die Begründung, warum OAuth trotzdem hinter P3 bleibt statt vorgezogen zu
 werden.
 
-**`version` in fremden Spaces** (vorgezogen aus Plan §3.4, wird in Step 3 wirksam): sobald
-`get(..., repair_drift=)` existiert, ist `version` in fremden Spaces informativ, nicht
-autoritativ — dort gibt es per Architektur keine Writes.
+**`version` in fremden Spaces** (Plan §3.4): `get(..., repair_drift=)` existiert seit Step 2 im
+Store; genutzt wird es ab Step 6 (`tools.py :: get_item`, §3.4). Dort ist `version` in fremden
+Spaces informativ, nicht autoritativ — es gibt dort per Architektur keine Writes.
 
 ---
 
-## Session stopped — 2026-07-25 (Step 1: Paketgerüst)
+## Session stopped — 2026-07-25 (Step 2: P1-Contract-Erweiterungen)
 
-**Ergebnis:** `phase2_mcp/pyproject.toml` (Paket `mcpserver`, spiegelt
-`phase1_storage/pyproject.toml` exakt bis auf Name/Description/Dependencies —
-`dependencies = ["storage", "fastmcp>=3.4,<3.5", "keyring>=25"]`,
-`dev = ["pytest", "pytest-asyncio", "httpx"]`), `mcpserver/__init__.py`
-(`__version__ = "0.1.0"`), `mcpserver/config.py` (`Settings`-Dataclass `frozen, kw_only`:
-`data_root: Path` Pflicht ohne Default, `host="127.0.0.1"`, `port=8765`, `log_level="INFO"`;
-`load_settings(env)` liest `SPACE_DATA_ROOT`/`SPACE_HOST`/`SPACE_PORT`/`SPACE_LOG_LEVEL`, wirft
-`ValueError` bei fehlendem `SPACE_DATA_ROOT` oder nicht-parsbarem `SPACE_PORT`). Kein Secret in
-`Settings` — `config.py` kennt laut Modulübersicht „nichts", importiert entsprechend nur
-Standardbibliothek.
+**Ergebnis:** Die drei vom Nikinger freigegebenen, einmaligen Erweiterungen (Plan §0.4 Punkt L,
+§4 Step 2) in `phase1_storage/storage/` eingebracht:
+- `models.py`: `STATUS_VALUES` (Statusvokabular je `type`) + `valid_statuses()`.
+- `store.py`: neuer Helper `_check_type_and_status()`, aufgerufen aus `create()` und `update()`
+  — wirft `ValidationError` bei unbekanntem `type` oder unerlaubtem `status` (D2).
+- `store.py :: space_of(item_id)` — reiner Index-Lookup, kein Datei-Read, `ItemNotFound` bei
+  unbekannter ID.
+- `store.py :: get(item_id, *, repair_drift=True)` + `_reconcile_and_get_row(...,
+  repair_drift=True)` — bei `repair_drift=False` und erkannter Drift wird nur der Index
+  nachgezogen, kein Frontmatter-Rewrite, kein Git-Commit (D3). Default `True` lässt jedes
+  bestehende P1-Verhalten unverändert.
 
-**Drift gegenüber dem Plan, dated:** Plan §4 Step 1 nennt `tests/__init__.py` als Datei. P1 hat
-in `phase1_storage/tests/` nie ein `__init__.py`, sondern ein leeres `conftest.py` als
-Platzhalter (Step 0 des P1-Plans). Hier aus Konsistenzgründen mit dem bereits etablierten
-Repo-Vorbild identisch gehalten: `phase2_mcp/tests/conftest.py` (leer) statt `__init__.py`.
-Funktional gleichwertig für `pytest`-Discovery.
+**Details, Code-Anker und die vollständige Begründung stehen in `phase1_storage/CLAUDE.md`**
+unter „Geerbte Contracts" (Code-nah, nicht hier dupliziert — Vorgabe aus diesem Head selbst,
+„Was hier bewusst NICHT steht").
 
-**Notwendige Ergänzung, die der Plan nicht auflistete:** `pytest.ini` (`testpaths =
-phase1_storage/tests`) hätte `phase2_mcp/tests/` nie gefunden. Erweitert auf
-`testpaths = phase1_storage/tests phase2_mcp/tests` — sonst wären alle P2-Tests ab hier
-unsichtbar für `pytest` gewesen, ohne dass ein Fehler das angezeigt hätte.
+**Verifiziert (live):** acht neue Tests in `phase1_storage/tests/test_store.py`
+(`test_space_of_returns_space`, `test_space_of_unknown_raises_item_not_found`,
+`test_get_repair_drift_false_leaves_file_untouched`, `test_get_repair_drift_false_creates_no_commit`,
+`test_get_repair_drift_true_still_bumps`, `test_create_rejects_unknown_status`,
+`test_update_rejects_unknown_status`, `test_update_accepts_valid_status_per_type`). Gesamtsuite
+`pytest -v` → **79/79 grün** (76 in `phase1_storage/tests/` inkl. dieser acht, 3 in
+`phase2_mcp/tests/`). Keine bestehende P1-Test musste angepasst werden — die einzigen
+Store-Aufrufe mit explizitem `status=` in `test_store.py` (`status="open"` auf einem `task`,
+`status="done"` auf einem `task`) waren bereits typkonform.
 
-**Verifiziert (live):** `./scripts/dev_install.sh` fand `phase2_mcp/` automatisch über den
-`phase*_*/`-Glob (keine Änderung am Skript nötig, wie im Plan erwartet), installierte `storage`
-und `mcpserver` editable, zog `fastmcp==3.4.4` (exakt die in Step 0 als aktuellste 3.4.x-Version
-verifizierte) und `keyring==25.7.0` echt aus PyPI. `from mcpserver import __version__` →
-`"0.1.0"`. `pytest -v` → **71/71 grün** (68 aus P1 + 3 neue in `test_config.py`:
-`test_load_settings_requires_data_root`, `test_load_settings_defaults`,
-`test_load_settings_port_invalid_raises`).
-
-**V5 (Keyring-Backend) weiter aufgelöst, noch nicht endgültig:** `keyring --list-backends` nach
-echter Installation zeigt `keyring.backends.SecretService.Keyring` mit Priorität 5 (höchste) —
-das in Step 0 vermutete Backend ist real verfügbar, nicht nur plausibel. Endgültig verifiziert
-ist V5 erst, wenn Step 3 tatsächlich einen Wert schreibt und zurückliest (`credentials.py`
-existiert noch nicht).
-
-**Nächster Schritt (konkret):** Step 2 — die drei freigegebenen P1-Contract-Erweiterungen
-(`space_of()`, `get(..., repair_drift=)`, Statusvalidierung) in `phase1_storage/storage/`.
-Kein weiterer Haltepunkt vorgesehen (Plan §4 Step 2 ist mechanisch, Erweiterungen sind bereits
-freigegeben).
+**Nächster Schritt (konkret):** Step 3 — `credentials.py` + `scripts/issue_token.py`. Braucht
+eine Nikinger-Rückmeldung, sobald der finale Funktionstest (`keyring`-Wert schreiben und
+zurücklesen) gelaufen ist — V5 ist bis dahin „vielversprechend", nicht „bestätigt".

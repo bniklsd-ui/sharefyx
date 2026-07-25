@@ -89,14 +89,15 @@ P1 nicht abgeschlossen, egal wie viel Code existiert.
 | 2 | `models.py`, `frontmatter.py` | 1 | ✅ | 9 |
 | 3 | `files.py` (atomarer Write, IDs, Slugs) | 2 | ✅ | 10 |
 | 4 | `index.py` (SQLite, Rebuild) | 3 | ✅ | 9 |
-| 5 | `store.py` (API, Lock, Versionierung) | 4 | ✅ | 18 |
+| 5 | `store.py` (API, Lock, Versionierung) | 4 | ✅ | 26 |
 | 6 | `history.py` (Git) | 5 | ✅ | 11 |
 | 7 | Query-Layer in `store.py` | 6 | ✅ | 2 (in `test_store.py`) |
 | 8 | `scripts/space_cli.py` | 7 | ✅ | 9 |
 
-**Gesamt: 68 Tests** (`70 Tests` war der Stand bei Phasenabschluss; **[2026-07-25 Korrektur,
-P2 Step 0]:** `rename_for_new_slug()` samt zweier Tests entfernt, siehe Session-Block unten).
-Zielgröße am Phasenende: grob 60–90, davon mindestens die vier
+**Gesamt: 76 Tests** (`70 Tests` war der Stand bei Phasenabschluss; **[2026-07-25 Korrektur,
+P2 Step 0]:** `rename_for_new_slug()` samt zweier Tests entfernt, 70→68; **[2026-07-25,
+P2 Step 2]:** acht neue Tests für die drei freigegebenen Contract-Erweiterungen, 68→76 — siehe
+„Geerbte Contracts" unten). Zielgröße am Phasenende: grob 60–90, davon mindestens die vier
 Konflikt-Tests aus Step 4. Step 0 hat bewusst keine Tests (reines Skelett) — `pytest`
 lief dort grün mit `exit 5` („no tests ran", nicht `exit 0`); das ist die korrekte
 Bedeutung von „0 Tests", kein Fehlerzustand.
@@ -106,6 +107,27 @@ Bedeutung von „0 Tests", kein Fehlerzustand.
 Keine — dies ist die erste Phase. **Die in Plan §1/§2 definierten Frontmatter-Felder und
 Store-Signaturen werden mit Abschluss dieser Phase zum Contract für P2.** Eine Änderung daran
 nach Phasenabschluss ist eine Scope-Änderung und braucht eine Entscheidung, kein Refactoring.
+
+**[2026-07-25, P2 Step 2] Drei vom Nikinger freigegebene, einmalige Contract-Erweiterungen**
+(`docs/concepts/phase2_mcp_plan.md` §0.4 Punkt L, §4 Step 2) — danach ist der Contract wieder
+zu, keine stille Abweichung:
+- `models.py`: `STATUS_VALUES`/`valid_statuses()` — Statusvokabular je `type`
+  (`note`: `active`/`archived`; `task`: `open`/`done`/`archived`). `store.py :: create()`/
+  `update()` werfen jetzt `ValidationError` bei unbekanntem `type` oder unerlaubtem `status`
+  statt es unvalidiert durchzulassen (Entscheidung D2) — die CLI hielt das bisher nur über
+  `argparse choices` ab, ein zweiter Adapter (MCP) wäre daran vorbeigelaufen.
+- `store.py :: space_of(item_id)` — Space eines Items ausschließlich über den Index, kein
+  Datei-Lesezugriff. Für die P2-Autorisierungsschicht: sie muss wissen, welchem Space ein Item
+  gehört, **bevor** feststeht, ob der Zugriff überhaupt erlaubt ist.
+- `store.py :: get(item_id, *, repair_drift=True)` / `_reconcile_and_get_row(...,
+  repair_drift=True)` — bei `repair_drift=False` wird eine erkannte externe Inhaltsänderung
+  **nur** im Index nachgezogen, nicht ins Frontmatter zurückgeschrieben und ohne Git-Commit
+  (Entscheidung D3). Für fremde Spaces: ein Lesezugriff dort fasst keine Datei an (Rule 4);
+  `version` ist dort informativ, nicht autoritativ, weil es dort per Architektur keine Writes
+  gibt. Default bleibt `True` — jedes bestehende P1-Verhalten (inkl. CLI) ist unverändert.
+
+Acht neue Tests in `phase1_storage/tests/test_store.py`, alle 76 Tests grün (siehe Modul-Status
+oben).
 
 ---
 
