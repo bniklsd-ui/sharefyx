@@ -204,3 +204,58 @@ async def test_principal_isolation_under_concurrency(app):
         foreign_space = "beta" if i % 2 == 0 else "alpha"
         assert by_name[own_space]["writable"] is True
         assert by_name[foreign_space]["writable"] is False
+
+
+@pytest.mark.asyncio
+async def test_all_six_tools_are_callable_over_http(app):
+    """Step 6 Done-when: alle sechs Tools über den ASGI-Testclient aufrufbar — nicht nur als
+    Python-Funktion (`test_tools.py`, Guard gemockt), sondern durch den echten Stack aus Step 5
+    (`TokenPathASGI`, Guard, laufende FastMCP-App). Ein Rundlauf pro Tool reicht hier; die
+    granulare Semantik (Wrapping, Klemmung, Fehlertexte) ist bereits in `test_tools.py`
+    bewiesen.
+    """
+    async with app.router.lifespan_context(app):
+        async with _mcp_client(app, TOKEN_ALPHA) as alpha, _mcp_client(app, TOKEN_BETA) as beta:
+            spaces = json.loads((await alpha.call_tool("list_spaces", {})).data)
+            assert {s["name"] for s in spaces} == {"alpha", "beta"}
+
+            created_text = (
+                await alpha.call_tool(
+                    "create_item", {"type": "task", "title": "Über HTTP angelegt"}
+                )
+            ).data
+            assert "space: alpha" in created_text
+            new_id = created_text.splitlines()[1].split("id: ")[1].strip()
+
+            search_payload = json.loads(
+                (await alpha.call_tool("search_items", {"query": "HTTP"})).data
+            )
+            assert any(item["id"] == new_id for item in search_payload["items"])
+
+            own_text = (await alpha.call_tool("get_item", {"item_id": new_id})).data
+            assert "<untrusted_content" not in own_text
+
+            foreign_text = (await beta.call_tool("get_item", {"item_id": new_id})).data
+            assert "<untrusted_content" in foreign_text
+
+            appended_text = (
+                await alpha.call_tool(
+                    "append_to_item", {"item_id": new_id, "version": 1, "text": "Angehängt."}
+                )
+            ).data
+            assert "Angehängt." in appended_text
+
+            conflict = await alpha.call_tool(
+                "update_item",
+                {"item_id": new_id, "version": 1, "title": "Veraltete Version"},
+                raise_on_error=False,
+            )
+            assert conflict.is_error is True
+            assert "conflict" in conflict.content[0].text
+
+            archived_text = (
+                await alpha.call_tool(
+                    "update_item", {"item_id": new_id, "version": 2, "status": "archived"}
+                )
+            ).data
+            assert "status: archived" in archived_text

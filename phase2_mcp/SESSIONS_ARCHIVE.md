@@ -4,9 +4,87 @@ purpose: Archiv älterer Session-stopped-Blöcke aus phase2_mcp/CLAUDE.md, newes
 read-when: Audit vergangener Sessions dieser Phase; NICHT für normalen Session-Start
 detail: L3
 up: CLAUDE.md
-updated: 2026-07-26
+updated: 2026-07-26 (Step 6)
 ---
 # Session-Archiv — Phase 2 MCP-Server
+
+## Session stopped — 2026-07-26 (Step 5: Server und App)
+
+**Ergebnis:** `server.py` (`build_mcp(store, permissions, *, name=...)`), `app.py`
+(`create_app(*, settings, resolver, store, allowed_hosts=None)` — `OwnSpaceWritable()` wird
+dort instanziiert, nicht injiziert, per Plan §2.2 Erweiterungspfad), `scripts/serve.py`
+(`--allowed-host`, `access_log=False`). `mcpserver/tools.py` musste dafür bereits entstehen
+(siehe Modul-Status-Anmerkung Zeile 7 — kein stiller Contract-Vorgriff): `list_spaces` ist
+vollständig implementiert, die übrigen fünf Tools sind mit finaler Signatur/Annotations
+registriert und werfen `NotImplementedError` bis Step 6.
+
+**Vom Advisor vor Beginn geprüfte Spannung im Plan-Text, aufgelöst statt blind übernommen:**
+Step 5s eigenes „Done when" verlangt `tools/list` mit sechs annotierten Tools und einen
+Isolationstest mit echtem Tool-Verhalten — Step 5s Dateiliste nennt aber nur
+`server.py`/`app.py`/`serve.py`, `tools.py` steht explizit unter Step 6. Auflösung (bestätigt
+gegen §1.2 Abhängigkeitstabelle „`server.py` kennt `tools`" und §7-Warnung vor Vorziehen):
+`tools.py` wird in Step 5 mit allen sechs Registrierungen angelegt, aber nur so viel echtem
+Verhalten wie der Isolationstest braucht (`list_spaces`) — Step 6 bleibt für Wrapping/
+Fehlerabbildung/Token-Budget zuständig, keine Vorwegnahme.
+
+**V2 final bestätigt (nicht nur `[VERIFY]` übernommen):** `fastmcp==3.4.4`,
+`FastMCP.http_app(path=…, stateless_http=…, allowed_hosts=…, …)` — Signatur exakt wie geplant,
+per `inspect.signature` gegen das echte Paket geprüft, nicht nur gelesen.
+
+**V4 aufgelöst, empirisch gegen eine echte FastMCP-App, nicht nur gegen den Fake-Innen-App aus
+Step 4:** die in `asgi.py` (Step 4) implementierte Pfad-Arithmetik (`route_path =
+path[len(root_path):]`, `new_path = root_path + "/" + rest if rest else root_path + "/"`)
+funktioniert unverändert, wenn `TokenPathASGI` zusätzlich hinter einem echten
+`Mount("/mcp", …)` sitzt. Grund, empirisch nachvollzogen: Starlettes `Mount.matches()` ändert
+`scope["path"]` **nicht** — nur `scope["root_path"]` wächst um den Mount-Präfix (`""` → `"/mcp"`).
+Für den Normalfall `POST /mcp/<token>` (kein weiteres Pfadsegment) liefert die Arithmetik
+`rest=""` und damit `new_path = "/mcp/"` — genau der `route_path == "/"`, den die innere
+FastMCP-App erwartet (erzeugt mit `path="/"`). Verifiziert per Wegwerfskript gegen ein echtes
+`FastMCP`+`Starlette`-Setup (kein Fake): `GET /health` → 200, `POST /mcp/<gültiges-token>` mit
+einer echten `initialize`-Anfrage → 200 mit korrekter MCP-Antwort, `POST /mcp/<unbekannt>` →
+401 leer. Keine Code-Änderung an `asgi.py`/`context.py` nötig — Step 4s Lösung trägt durch den
+echten Mount hindurch.
+
+**Isolationstest (`test_app.py::test_principal_isolation_under_concurrency`) — die wichtigste
+Zusicherung der Phase, jetzt grün gegen eine echte, laufende FastMCP-App:** zehn `list_spaces`-
+Aufrufe über `asyncio.gather`, alternierend zwei Tokens (`alpha`/`beta`, Fixture-Namen statt
+Nikinger/Kollege — Plan §2.2), echte Nebenläufigkeit auf einem Event-Loop (nicht sequenziell).
+Jeder Aufruf sieht `writable=true` exakt für den eigenen und `writable=false` für den fremden
+Space — kein Cross-Space-Leak. Technischer Unterbau: `httpx.ASGITransport` (kein echter Port,
+kein Netz) + `fastmcp.Client`/`StreamableHttpTransport` mit injiziertem
+`httpx_client_factory`; Lifespan manuell über `app.router.lifespan_context(app)` statt
+simulierter ASGI-Lifespan-Nachrichten — Starlettes eigener Mechanismus, ohne
+Zusatzabhängigkeit (`asgi-lifespan` ist nicht installiert und wurde bewusst nicht ergänzt).
+
+**Advisor-Review vor dem Commit — ein Fund korrigiert, einer verschärft:**
+1. `test_mcp_requires_token` deckte `POST /mcp/` (leeres Credential → unser 401) und
+   `POST /mcp/<unbekannt>` ab, aber nicht `POST /mcp` **ohne** Trailing-Slash. Empirisch geprüft:
+   das trifft Starlettes eigenes `redirect_slashes` **vor** `TokenPathASGI` und antwortet mit
+   **307** nach `/mcp/`, leerer Body, `Location`-Header ohne Space-/Pfad-/Tokendaten.
+   Kein Verstoß gegen P2-N (das 307 sagt nichts über Tokengültigkeit — in diesem Request gibt es
+   noch gar kein Token-Segment), aber eine dritte, von außen unterscheidbare Antwortform, die
+   sonst erst bei der Live-Tunnel-Probe aufgefallen wäre. Jetzt eigener Test:
+   `test_mcp_bare_mount_redirects_without_leaking`.
+2. `test_health_leaks_no_space_names` prüfte nur auf Teilstrings (`"alpha" not in body_text`)
+   gegen eine Antwort, die strukturell gar keine Space-Daten enthalten kann — vacuous. `test_health_ok`
+   prüft jetzt zusätzlich die exakte Schlüsselmenge (`{"status","service","version"}`), das
+   fängt eine spätere Feldergänzung ab, nicht nur zufällig gewählte Fixture-Namen.
+
+**Verifiziert (live):** 7 Tests in `test_app.py` — `test_health_ok`,
+`test_health_leaks_no_space_names`, `test_mcp_requires_token`,
+`test_mcp_bare_mount_redirects_without_leaking`, `test_tools_list_returns_six_tools`,
+`test_tools_list_annotations_present`, `test_principal_isolation_under_concurrency`.
+`pytest -v` → **106/106 grün** (76 P1 + 30 P2).
+
+**Nächster Schritt (konkret):** Step 6 — `mcpserver/tools.py` fertigstellen: `search_items`,
+`get_item`, `create_item`, `update_item`, `append_to_item` (§3.2/§3.4), `<untrusted_content>`-
+Wrapping + Escaping (§3.5), Fehlerabbildung inkl. des in Step 4 vermerkten
+`AuthError`-als-Tool-Fehler-Falls (§3.6), Token-Budget-Klemmung (`DEFAULT_LIMIT`/`MAX_LIMIT`,
+bereits als Modulkonstanten in `tools.py` vorhanden). `test_tools.py` neu, `list_spaces`
+braucht dort keine erneute Grundimplementierung, nur ggf. Härtung/Formatkonsistenz mit den
+anderen fünf Tools.
+
+---
 
 ## Session stopped — 2026-07-25 (Step 4: Auth, Rechte, Request-Kontext)
 

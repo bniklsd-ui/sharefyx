@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase2_mcp_plan.md          # voller Plan, Entscheidungen P2-A–P2-N, Steps 0–7
   - ../docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md # Herkunft der Entscheidungen D1–D6
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
-updated: 2026-07-26
+updated: 2026-07-26 (Step 6)
 ---
 # CLAUDE.md — Phase 2: MCP-Server (`phase2_mcp/`)
 
@@ -79,24 +79,21 @@ Fehlerabbildung mit handlungsfähigem Text (N).
 | 3 | P1-Contract-Erweiterungen (`space_of`, `repair_drift`, Statusvalidierung) | 2 | ✅ | 8 (in `phase1_storage/tests/`) |
 | 4 | `credentials.py`, `scripts/issue_token.py` | 3 | ✅ (echter Keyring-Roundtrip vom Nikinger bestätigt) | 6 |
 | 5 | `auth.py`, `permissions.py`, `context.py`, `asgi.py`, `logging_setup.py` | 4 | ✅ | 14 |
-| 6 | `server.py`, `app.py`, `scripts/serve.py` | 5 | ✅ | 7 (`test_app.py`) |
-| 7 | `tools.py` (die sechs Tools) | 6 | ⬜ (siehe Anmerkung) | — |
+| 6 | `server.py`, `app.py`, `scripts/serve.py` | 5 | ✅ | 8 (`test_app.py`) |
+| 7 | `tools.py` (die sechs Tools) | 6 | ✅ | 22 (`test_tools.py`) |
 | 8 | `scripts/mcp_smoke.py`, Runbook, Größenmessung | 7 | ⬜ | — |
 
-**Anmerkung zu Zeile 7 — kein stiller Contract-Vorgriff:** `mcpserver/tools.py` existiert bereits
-seit Step 5, nicht erst seit Step 6. Grund: `server.py :: build_mcp()` registriert die sechs
-Tools, und Step 5s eigenes Done-when (`tools/list` liefert sechs Tools mit Annotations,
-`test_principal_isolation_under_concurrency`) braucht dafür sowohl alle sechs Registrierungen
-(Name/Signatur/Titel/Annotations) als auch **ein** echt funktionierendes Tool. `list_spaces` ist
-deshalb bereits vollständig implementiert (Plan §3.2); die übrigen fünf (`search_items`,
-`get_item`, `create_item`, `update_item`, `append_to_item`) sind mit finaler Signatur und
-Annotations registriert, werfen aber bewusst `NotImplementedError` — ihre Semantik (Wrapping
-§3.5, Fehlerabbildung §3.6, Token-Budget P2-J) bleibt Step 6. Zeile 7 wird erst mit Step 6 auf
-✅ gehoben.
+**Zeile 7, Step 6 abgeschlossen:** `search_items`, `get_item`, `create_item`, `update_item`,
+`append_to_item` lösen ihre seit Step 5 bestehenden `NotImplementedError`-Platzhalter ein
+(§3.2/§3.4/§3.5/§3.6) — `list_spaces` war seit Step 5 bereits fertig. Zeile 6 (`test_app.py`)
+wuchs um einen sechsten Test (`test_all_six_tools_are_callable_over_http`), der Step 6s eigenes
+Done-when „alle sechs Tools über den ASGI-Testclient aufrufbar" gegen den echten Stack aus
+Step 5 beweist — `test_tools.py` allein kann das nicht, weil dort der Guard gemockt ist (siehe
+Session-Block).
 
-**Gesamt: 30 Tests** in `phase2_mcp/tests/` (3 `test_config.py` + 6 `test_credentials.py` + 4
+**Gesamt: 53 Tests** in `phase2_mcp/tests/` (3 `test_config.py` + 6 `test_credentials.py` + 4
 `test_auth.py` + 3 `test_permissions.py` + 1 `test_logging.py` + 2 `test_context.py` + 4
-`test_asgi.py` + 7 `test_app.py`). Acht weitere Tests aus Step 2 liegen in
+`test_asgi.py` + 8 `test_app.py` + 22 `test_tools.py`). Acht weitere Tests aus Step 2 liegen in
 `phase1_storage/tests/` (siehe Modul-Status Zeile 3 und `phase1_storage/CLAUDE.md`), werden dort
 mitgezählt, nicht hier.
 
@@ -135,78 +132,70 @@ Spaces informativ, nicht autoritativ — es gibt dort per Architektur keine Writ
 
 ---
 
-## Session stopped — 2026-07-26 (Step 5: Server und App)
+## Session stopped — 2026-07-26 (Step 6: Die sechs Tools)
 
-**Ergebnis:** `server.py` (`build_mcp(store, permissions, *, name=...)`), `app.py`
-(`create_app(*, settings, resolver, store, allowed_hosts=None)` — `OwnSpaceWritable()` wird
-dort instanziiert, nicht injiziert, per Plan §2.2 Erweiterungspfad), `scripts/serve.py`
-(`--allowed-host`, `access_log=False`). `mcpserver/tools.py` musste dafür bereits entstehen
-(siehe Modul-Status-Anmerkung Zeile 7 — kein stiller Contract-Vorgriff): `list_spaces` ist
-vollständig implementiert, die übrigen fünf Tools sind mit finaler Signatur/Annotations
-registriert und werfen `NotImplementedError` bis Step 6.
+**Ergebnis:** `mcpserver/tools.py` fertig — `search_items`, `get_item`, `create_item`,
+`update_item`, `append_to_item` lösen ihre `NotImplementedError`-Platzhalter aus Step 5 ein.
+Neue Modul-Helfer wie im Plan gefordert: `wrap_untrusted()` (§3.5, Ersatzstring wörtlich aus
+dem Plan übernommen), `summary_to_dict()`, `item_to_filetext()` (dupliziert bewusst
+`storage.store._item_to_text`s Feldreihenfolge — der P1-Contract ist seit Step 2 „wieder zu",
+eine weitere Erweiterung wäre keine „einmalige" mehr), `compact_json()`, `map_storage_error()`
+(§3.6, alle sechs Fehlerfälle inkl. `PermissionDenied` als P2-eigenem Typ). `test_tools.py` neu
+mit allen 20 im Plan benannten Tests plus zwei zusätzlichen (siehe unten). `test_app.py` bekam
+einen siebten … achten Test: `test_all_six_tools_are_callable_over_http`, der Step 6s eigenes
+Done-when „alle sechs Tools über den ASGI-Testclient aufrufbar" gegen den echten Stack aus
+Step 5 beweist (ein voller Rundlauf: `list_spaces` → `create_item` → `search_items` →
+`get_item` eigen/fremd → `append_to_item` → `update_item`-Konflikt → `update_item(status=
+archived)`).
 
-**Vom Advisor vor Beginn geprüfte Spannung im Plan-Text, aufgelöst statt blind übernommen:**
-Step 5s eigenes „Done when" verlangt `tools/list` mit sechs annotierten Tools und einen
-Isolationstest mit echtem Tool-Verhalten — Step 5s Dateiliste nennt aber nur
-`server.py`/`app.py`/`serve.py`, `tools.py` steht explizit unter Step 6. Auflösung (bestätigt
-gegen §1.2 Abhängigkeitstabelle „`server.py` kennt `tools`" und §7-Warnung vor Vorziehen):
-`tools.py` wird in Step 5 mit allen sechs Registrierungen angelegt, aber nur so viel echtem
-Verhalten wie der Isolationstest braucht (`list_spaces`) — Step 6 bleibt für Wrapping/
-Fehlerabbildung/Token-Budget zuständig, keine Vorwegnahme.
+**Testdesign-Entscheidung, hier festgehalten statt stillschweigend:** `test_tools.py` mockt
+`context.assert_principal_matches_request` auf ein No-op (autouse-Fixture) und ruft die von
+`tools.register()` zurückgegebenen rohen Tool-Funktionen direkt auf — `@mcp.tool(...)` gibt die
+unveränderte Python-Funktion zurück, nicht ein `FunctionTool`-Objekt (empirisch geprüft, nicht
+angenommen: ein `type(foo)` nach der Dekoration ist weiterhin `function`). Begründung: die
+komplette HTTP/ASGI/Guard-Kette ist bereits in `test_app.py::test_principal_isolation_under_
+concurrency` (Step 5) end-to-end bewiesen; zwanzig Tests bräuchten sonst zwanzigmal eine echte
+FastMCP-App. `test_create_item_has_no_space_parameter` prüft deshalb `inspect.signature()`
+direkt auf der zurückgegebenen Funktion.
 
-**V2 final bestätigt (nicht nur `[VERIFY]` übernommen):** `fastmcp==3.4.4`,
-`FastMCP.http_app(path=…, stateless_http=…, allowed_hosts=…, …)` — Signatur exakt wie geplant,
-per `inspect.signature` gegen das echte Paket geprüft, nicht nur gelesen.
+**Echter Fund während der Implementierung, nicht nur ein Advisor-Verdacht bestätigt:** die
+Step-4-Advisor-Notiz („`map_storage_error()` in Step 6 muss die `AuthError`-als-Tool-Fehler-
+Abbildung bewusst treffen, nicht zufällig") war zunächst NICHT umgesetzt — jeder Tool-Body rief
+`context.current_principal()` + `context.assert_principal_matches_request()` direkt auf, außerhalb
+jedes `try`/`except`. Ein Guard-`AuthError` wäre also roh durchgefallen statt über
+`map_storage_error()` zu laufen. Gefunden im Advisor-Review vor dem Commit, behoben durch
+`_authenticated_principal()` (bündelt Schritt 1+2 aus §3.3, fängt `AuthError` und wirft den
+gemappten `ToolError`). Regressionstest `test_guard_auth_error_is_mapped_to_tool_error` beweist
+es. **Kleinere Selbstkorrektur direkt danach:** ein automatisiertes Suchen/Ersetzen beim Umbau
+auf `_authenticated_principal()` hatte dessen eigenen Funktionskörper versehentlich auf sich
+selbst umgeschrieben (Endlosrekursion) — vor dem ersten Testlauf bemerkt und korrigiert, aber
+festgehalten, weil genau der neue Regressionstest diesen Fehler auch bei einem stillen Commit
+gefangen hätte.
 
-**V4 aufgelöst, empirisch gegen eine echte FastMCP-App, nicht nur gegen den Fake-Innen-App aus
-Step 4:** die in `asgi.py` (Step 4) implementierte Pfad-Arithmetik (`route_path =
-path[len(root_path):]`, `new_path = root_path + "/" + rest if rest else root_path + "/"`)
-funktioniert unverändert, wenn `TokenPathASGI` zusätzlich hinter einem echten
-`Mount("/mcp", …)` sitzt. Grund, empirisch nachvollzogen: Starlettes `Mount.matches()` ändert
-`scope["path"]` **nicht** — nur `scope["root_path"]` wächst um den Mount-Präfix (`""` → `"/mcp"`).
-Für den Normalfall `POST /mcp/<token>` (kein weiteres Pfadsegment) liefert die Arithmetik
-`rest=""` und damit `new_path = "/mcp/"` — genau der `route_path == "/"`, den die innere
-FastMCP-App erwartet (erzeugt mit `path="/"`). Verifiziert per Wegwerfskript gegen ein echtes
-`FastMCP`+`Starlette`-Setup (kein Fake): `GET /health` → 200, `POST /mcp/<gültiges-token>` mit
-einer echten `initialize`-Anfrage → 200 mit korrekter MCP-Antwort, `POST /mcp/<unbekannt>` →
-401 leer. Keine Code-Änderung an `asgi.py`/`context.py` nötig — Step 4s Lösung trägt durch den
-echten Mount hindurch.
+**Advisor-Review vor dem Commit, drei weitere Funde, alle behoben:**
+1. `test_search_limit_is_clamped_to_max` prüfte nur das im Payload echoete `limit`-Feld gegen
+   einem Store mit einem einzigen Item — hätte auch mit einem ungeklemmten Limit bestanden.
+   Jetzt >100 Items, Assertion zusätzlich auf `len(payload["items"]) == MAX_LIMIT`.
+2. Plan §2.2 nennt `search_items` ausdrücklich als den Pfad, an dem `total`/Paginierung falsch
+   werden, sobald `can_read` nicht mehr konstant `True` ist — der `_OwnSpaceOnlyVisible`-Test-
+   Double bewies den Seam bisher nur für `list_spaces`. Neuer Test
+   `test_search_filters_by_can_read_and_reports_filtered_total` beweist ihn jetzt auch für
+   `search_items` (`total` zählt die gefilterte, nicht die rohe Trefferzahl).
+3. `test_search_result_size_budget` maß den günstigsten Fall (leere Bodies → leere Snippets).
+   Fixture jetzt mit realistischer Body-Länge (volles 160-Zeichen-Snippet) und einer Mischung
+   aus eigenem und fremdem Space (Wrap-Overhead fließt ins Budget ein) — Budget hält weiterhin.
 
-**Isolationstest (`test_app.py::test_principal_isolation_under_concurrency`) — die wichtigste
-Zusicherung der Phase, jetzt grün gegen eine echte, laufende FastMCP-App:** zehn `list_spaces`-
-Aufrufe über `asyncio.gather`, alternierend zwei Tokens (`alpha`/`beta`, Fixture-Namen statt
-Nikinger/Kollege — Plan §2.2), echte Nebenläufigkeit auf einem Event-Loop (nicht sequenziell).
-Jeder Aufruf sieht `writable=true` exakt für den eigenen und `writable=false` für den fremden
-Space — kein Cross-Space-Leak. Technischer Unterbau: `httpx.ASGITransport` (kein echter Port,
-kein Netz) + `fastmcp.Client`/`StreamableHttpTransport` mit injiziertem
-`httpx_client_factory`; Lifespan manuell über `app.router.lifespan_context(app)` statt
-simulierter ASGI-Lifespan-Nachrichten — Starlettes eigener Mechanismus, ohne
-Zusatzabhängigkeit (`asgi-lifespan` ist nicht installiert und wurde bewusst nicht ergänzt).
+**Bekannte, dokumentierte Grenze (kein Bug):** `search_items` holt bis zu `_STORE_FETCH_LIMIT =
+5000` Treffer vom Store (der ohnehin jede Datei pro Aufruf scannt, D6), filtert/paginiert
+`include_archived`/Rechte/`offset`/`limit` selbst in `tools.py`. Über dieser Grenze würde
+`total` still unterzählen — für den Zwei-Personen-Space-Server um Größenordnungen entfernt,
+als `[SEAM]`-Kommentar im Code und hier festgehalten statt später neu entdeckt zu werden.
 
-**Advisor-Review vor dem Commit — ein Fund korrigiert, einer verschärft:**
-1. `test_mcp_requires_token` deckte `POST /mcp/` (leeres Credential → unser 401) und
-   `POST /mcp/<unbekannt>` ab, aber nicht `POST /mcp` **ohne** Trailing-Slash. Empirisch geprüft:
-   das trifft Starlettes eigenes `redirect_slashes` **vor** `TokenPathASGI` und antwortet mit
-   **307** nach `/mcp/`, leerer Body, `Location`-Header ohne Space-/Pfad-/Tokendaten.
-   Kein Verstoß gegen P2-N (das 307 sagt nichts über Tokengültigkeit — in diesem Request gibt es
-   noch gar kein Token-Segment), aber eine dritte, von außen unterscheidbare Antwortform, die
-   sonst erst bei der Live-Tunnel-Probe aufgefallen wäre. Jetzt eigener Test:
-   `test_mcp_bare_mount_redirects_without_leaking`.
-2. `test_health_leaks_no_space_names` prüfte nur auf Teilstrings (`"alpha" not in body_text`)
-   gegen eine Antwort, die strukturell gar keine Space-Daten enthalten kann — vacuous. `test_health_ok`
-   prüft jetzt zusätzlich die exakte Schlüsselmenge (`{"status","service","version"}`), das
-   fängt eine spätere Feldergänzung ab, nicht nur zufällig gewählte Fixture-Namen.
+**Verifiziert (live):** 22 Tests in `test_tools.py`, `test_app.py` von 7 auf 8 gewachsen.
+`pytest -v` → **129/129 grün** (76 P1 + 53 P2).
 
-**Verifiziert (live):** 7 Tests in `test_app.py` — `test_health_ok`,
-`test_health_leaks_no_space_names`, `test_mcp_requires_token`,
-`test_mcp_bare_mount_redirects_without_leaking`, `test_tools_list_returns_six_tools`,
-`test_tools_list_annotations_present`, `test_principal_isolation_under_concurrency`.
-`pytest -v` → **106/106 grün** (76 P1 + 30 P2).
-
-**Nächster Schritt (konkret):** Step 6 — `mcpserver/tools.py` fertigstellen: `search_items`,
-`get_item`, `create_item`, `update_item`, `append_to_item` (§3.2/§3.4), `<untrusted_content>`-
-Wrapping + Escaping (§3.5), Fehlerabbildung inkl. des in Step 4 vermerkten
-`AuthError`-als-Tool-Fehler-Falls (§3.6), Token-Budget-Klemmung (`DEFAULT_LIMIT`/`MAX_LIMIT`,
-bereits als Modulkonstanten in `tools.py` vorhanden). `test_tools.py` neu, `list_spaces`
-braucht dort keine erneute Grundimplementierung, nur ggf. Härtung/Formatkonsistenz mit den
-anderen fünf Tools.
+**Nächster Schritt (konkret):** Step 7 — `scripts/mcp_smoke.py` (Gegenstück zu `space_cli.py`
+aus P1, temporäres `DATA_ROOT`, nie das echte), README-Runbook „Quick-Tunnel-Probe", Größen-
+messung im Session-Block. Der Tunnel-Schritt selbst läuft beim Nikinger, nicht in Claude Code
+(kein Skript/Config/Hostname wird committet). Danach ist Phase 2 code-complete; die Quick-
+Tunnel-Probe (ein Read, ein Write über den echten Claude-Connector) macht sie live-verifiziert.
