@@ -4,9 +4,76 @@ purpose: Archiv älterer Session-stopped-Blöcke aus phase2_mcp/CLAUDE.md, newes
 read-when: Audit vergangener Sessions dieser Phase; NICHT für normalen Session-Start
 detail: L3
 up: CLAUDE.md
-updated: 2026-07-25
+updated: 2026-07-26
 ---
 # Session-Archiv — Phase 2 MCP-Server
+
+## Session stopped — 2026-07-25 (Step 4: Auth, Rechte, Request-Kontext)
+
+**Ergebnis:** `auth.py` (`Principal` frozen dataclass mit gekürztem `__repr__`,
+`AuthError`, `SpaceResolver`-Protokoll, `KeyringTokenResolver` mit injiziertem `load_map`,
+Dict-Lookup über `sha256(credential)`), `permissions.py` (`Permissions`-Protokoll,
+`OwnSpaceWritable`), `logging_setup.py` (`configure_logging()`, `TokenScrubbingFilter` —
+ersetzt `/mcp/<segment>` durch `/mcp/<redacted>` in Message **und** Args), `context.py` +
+`asgi.py` (`TokenPathASGI`, Details siehe **wichtiger Fund** unten).
+
+**V3 aufgelöst:** `fastmcp.server.dependencies.get_http_request` importiert sauber gegen das
+echte `fastmcp==3.4.4` — der im Plan dokumentierte Importpfad stimmt, `fastmcp.dependencies.
+CurrentRequest()` ist eine andere (Dependency-Injection-)API für denselben Zweck, nicht die
+hier gebrauchte direkte Funktion.
+
+**Wichtiger Fund (empirisch, nicht nur gelesen) — §2.4 ist an einer Stelle nicht umsetzbar wie
+geschrieben:** Der Plan beschreibt `assert_principal_matches_request()` als „zieht das
+Token-Segment aus dessen Pfad". Das geht nicht: `TokenPathASGI` muss das Token-Segment aus dem
+Pfad entfernen, **bevor** es an die innere FastMCP-App delegiert (sonst sieht FastMCPs eigenes
+Routing das Segment als Teil des MCP-Pfads und die Anfrage schlägt fehl). Ein Tool, das während
+seiner Ausführung `get_http_request().url.path` liest, sieht deshalb nur noch den bereinigten
+Pfad.
+
+Zwei ASGI-Mounting-Techniken gegen ein echtes `fastmcp==3.4.4` + `starlette`-Setup
+(`httpx.ASGITransport`/`starlette.testclient.TestClient`) durchprobiert:
+1. **`root_path`-Akkumulation** (Starlettes eigene Technik, `scope["path"]` bleibt unverändert,
+   nur `root_path` wächst) — scheitert an `redirect_slashes`: ein Credential-Segment ohne
+   nachfolgenden Pfad lässt `route_path` leer statt `"/"` werden, Starlette antwortet mit 307
+   auf eine URL mit angehängtem `/`, bevor die innere App je läuft.
+2. **Direkte `path`/`raw_path`-Kürzung** (Plan-Wortlaut) — funktioniert für das Routing
+   (kein Redirect, Tool wird aufgerufen), aber `get_http_request().url.path` liefert dann
+   nachweislich `"/mcp/"`, nicht das Token — bestätigt das Problem oben empirisch, nicht nur
+   theoretisch.
+
+**Lösung:** `TokenPathASGI` hinterlegt `token_hash` in `scope["state"]`, **bevor** es den Pfad
+kürzt (Technik 2 bleibt fürs Routing). `scope["state"]` überlebt die Weiterleitung unverändert —
+Starlettes offizieller Mechanismus, um Zustand über eine ASGI-Kette hinweg mitzugeben, per
+Testprobe bestätigt: `request.state.token_hash` kam im Tool korrekt an. Die
+Sicherheitseigenschaft ist identisch zur Plan-Absicht: der Guard vergleicht „was hat unsere
+eigene ASGI-Schicht für DIESEN Request aufgelöst" (`scope["state"]["token_hash"]`, gesetzt von
+`TokenPathASGI`) gegen „was liefert `get_http_request()` gerade zurück" (`current_principal()`
+aus dem ContextVar) und schlägt bei jeder Abweichung laut fehl (`AuthError`) — nicht mehr über
+den Pfad, aber mit derselben Garantie. Vollständige Begründung im Docstring von `context.py`.
+**Kein Test dafür in Step 4** (braucht einen echten laufenden Request-Kontext) — end-to-end
+geprüft in Step 5 über `test_app.py::test_principal_isolation_under_concurrency`.
+
+**Verifiziert (live):** 14 neue Tests (`test_auth.py` ×4, `test_permissions.py` ×3,
+`test_logging.py` ×1, `test_context.py` ×2 — nicht im Plan gefordert, aber `current_principal`/
+`set_principal`/`reset_principal` sind eigenständige, netzunabhängige Logik —,
+`test_asgi.py` ×4 gegen einen Fake-Resolver + Fake-Innen-App, keine echte FastMCP-App nötig für
+diese Schicht). `pytest -v` → **99/99 grün** (76 P1 + 23 P2). `test_principal_reset_after_request`
+bestätigt: nach dem Request wirft `current_principal()` wieder `AuthError` — kein Leck zwischen
+Requests.
+
+**Anmerkung des Advisors, hier festgehalten statt in Step 6 neu zu entdecken:** P2-N sagt
+„`AuthError` → HTTP 401, nie ein Tool-Fehler". Der Guard läuft aber *innerhalb* eines
+Tool-Aufrufs (§3.3 Schritt 2) — das 401-Fenster ist zu diesem Zeitpunkt vorbei, ein
+Guard-`AuthError` muss also zwangsläufig als Tool-Fehler auftauchen. Das ist kein Defekt (immer
+noch fail-closed, keine fremden Daten), aber `map_storage_error()` in Step 6 muss diese
+Abbildung bewusst treffen, nicht zufällig.
+
+**Nächster Schritt (konkret):** Step 5 — `server.py`, `app.py`, `scripts/serve.py`. Das ist die
+Stelle, an der `TokenPathASGI` erstmals gegen eine echte FastMCP-App läuft — V4 (`Mount`-
+Verhalten) und der `assert_principal_matches_request()`-Guard werden dort erstmals end-to-end
+statt isoliert geprüft.
+
+---
 
 ## Session stopped — 2026-07-25 (Step 3: Credentials + Token-Ausgabe)
 

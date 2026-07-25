@@ -7,7 +7,7 @@ name = "mcpserver"
 version = "0.1.0"
 description = "MCP-Server des Space-Servers (Phase 2) — Streamable HTTP, Token-Auth, sechs Tools"
 requires-python = ">=3.10"
-dependencies = ["storage", "fastmcp>=3.4,<3.5", "keyring>=25"]
+dependencies = ["storage", "fastmcp>=3.4,<3.5", "keyring>=25", "uvicorn>=0.30"]
 
 [project.optional-dependencies]
 dev = ["pytest", "pytest-asyncio", "httpx"]

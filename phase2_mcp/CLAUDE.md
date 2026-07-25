@@ -7,8 +7,8 @@ up: ../CLAUDE.md
 down:
   - ../docs/concepts/phase2_mcp_plan.md          # voller Plan, Entscheidungen P2-A–P2-N, Steps 0–7
   - ../docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md # Herkunft der Entscheidungen D1–D6
-  - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke (noch leer)
-updated: 2026-07-25
+  - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
+updated: 2026-07-26
 ---
 # CLAUDE.md — Phase 2: MCP-Server (`phase2_mcp/`)
 
@@ -79,14 +79,26 @@ Fehlerabbildung mit handlungsfähigem Text (N).
 | 3 | P1-Contract-Erweiterungen (`space_of`, `repair_drift`, Statusvalidierung) | 2 | ✅ | 8 (in `phase1_storage/tests/`) |
 | 4 | `credentials.py`, `scripts/issue_token.py` | 3 | ✅ (echter Keyring-Roundtrip vom Nikinger bestätigt) | 6 |
 | 5 | `auth.py`, `permissions.py`, `context.py`, `asgi.py`, `logging_setup.py` | 4 | ✅ | 14 |
-| 6 | `server.py`, `app.py`, `scripts/serve.py` | 5 | ⬜ | — |
-| 7 | `tools.py` (die sechs Tools) | 6 | ⬜ | — |
+| 6 | `server.py`, `app.py`, `scripts/serve.py` | 5 | ✅ | 7 (`test_app.py`) |
+| 7 | `tools.py` (die sechs Tools) | 6 | ⬜ (siehe Anmerkung) | — |
 | 8 | `scripts/mcp_smoke.py`, Runbook, Größenmessung | 7 | ⬜ | — |
 
-**Gesamt: 23 Tests** in `phase2_mcp/tests/` (3 `test_config.py` + 6 `test_credentials.py` + 4
+**Anmerkung zu Zeile 7 — kein stiller Contract-Vorgriff:** `mcpserver/tools.py` existiert bereits
+seit Step 5, nicht erst seit Step 6. Grund: `server.py :: build_mcp()` registriert die sechs
+Tools, und Step 5s eigenes Done-when (`tools/list` liefert sechs Tools mit Annotations,
+`test_principal_isolation_under_concurrency`) braucht dafür sowohl alle sechs Registrierungen
+(Name/Signatur/Titel/Annotations) als auch **ein** echt funktionierendes Tool. `list_spaces` ist
+deshalb bereits vollständig implementiert (Plan §3.2); die übrigen fünf (`search_items`,
+`get_item`, `create_item`, `update_item`, `append_to_item`) sind mit finaler Signatur und
+Annotations registriert, werfen aber bewusst `NotImplementedError` — ihre Semantik (Wrapping
+§3.5, Fehlerabbildung §3.6, Token-Budget P2-J) bleibt Step 6. Zeile 7 wird erst mit Step 6 auf
+✅ gehoben.
+
+**Gesamt: 30 Tests** in `phase2_mcp/tests/` (3 `test_config.py` + 6 `test_credentials.py` + 4
 `test_auth.py` + 3 `test_permissions.py` + 1 `test_logging.py` + 2 `test_context.py` + 4
-`test_asgi.py`). Acht weitere Tests aus Step 2 liegen in `phase1_storage/tests/` (siehe
-Modul-Status Zeile 3 und `phase1_storage/CLAUDE.md`), werden dort mitgezählt, nicht hier.
+`test_asgi.py` + 7 `test_app.py`). Acht weitere Tests aus Step 2 liegen in
+`phase1_storage/tests/` (siehe Modul-Status Zeile 3 und `phase1_storage/CLAUDE.md`), werden dort
+mitgezählt, nicht hier.
 
 ## Geerbte Contracts
 
@@ -123,67 +135,78 @@ Spaces informativ, nicht autoritativ — es gibt dort per Architektur keine Writ
 
 ---
 
-## Session stopped — 2026-07-25 (Step 4: Auth, Rechte, Request-Kontext)
+## Session stopped — 2026-07-26 (Step 5: Server und App)
 
-**Ergebnis:** `auth.py` (`Principal` frozen dataclass mit gekürztem `__repr__`,
-`AuthError`, `SpaceResolver`-Protokoll, `KeyringTokenResolver` mit injiziertem `load_map`,
-Dict-Lookup über `sha256(credential)`), `permissions.py` (`Permissions`-Protokoll,
-`OwnSpaceWritable`), `logging_setup.py` (`configure_logging()`, `TokenScrubbingFilter` —
-ersetzt `/mcp/<segment>` durch `/mcp/<redacted>` in Message **und** Args), `context.py` +
-`asgi.py` (`TokenPathASGI`, Details siehe **wichtiger Fund** unten).
+**Ergebnis:** `server.py` (`build_mcp(store, permissions, *, name=...)`), `app.py`
+(`create_app(*, settings, resolver, store, allowed_hosts=None)` — `OwnSpaceWritable()` wird
+dort instanziiert, nicht injiziert, per Plan §2.2 Erweiterungspfad), `scripts/serve.py`
+(`--allowed-host`, `access_log=False`). `mcpserver/tools.py` musste dafür bereits entstehen
+(siehe Modul-Status-Anmerkung Zeile 7 — kein stiller Contract-Vorgriff): `list_spaces` ist
+vollständig implementiert, die übrigen fünf Tools sind mit finaler Signatur/Annotations
+registriert und werfen `NotImplementedError` bis Step 6.
 
-**V3 aufgelöst:** `fastmcp.server.dependencies.get_http_request` importiert sauber gegen das
-echte `fastmcp==3.4.4` — der im Plan dokumentierte Importpfad stimmt, `fastmcp.dependencies.
-CurrentRequest()` ist eine andere (Dependency-Injection-)API für denselben Zweck, nicht die
-hier gebrauchte direkte Funktion.
+**Vom Advisor vor Beginn geprüfte Spannung im Plan-Text, aufgelöst statt blind übernommen:**
+Step 5s eigenes „Done when" verlangt `tools/list` mit sechs annotierten Tools und einen
+Isolationstest mit echtem Tool-Verhalten — Step 5s Dateiliste nennt aber nur
+`server.py`/`app.py`/`serve.py`, `tools.py` steht explizit unter Step 6. Auflösung (bestätigt
+gegen §1.2 Abhängigkeitstabelle „`server.py` kennt `tools`" und §7-Warnung vor Vorziehen):
+`tools.py` wird in Step 5 mit allen sechs Registrierungen angelegt, aber nur so viel echtem
+Verhalten wie der Isolationstest braucht (`list_spaces`) — Step 6 bleibt für Wrapping/
+Fehlerabbildung/Token-Budget zuständig, keine Vorwegnahme.
 
-**Wichtiger Fund (empirisch, nicht nur gelesen) — §2.4 ist an einer Stelle nicht umsetzbar wie
-geschrieben:** Der Plan beschreibt `assert_principal_matches_request()` als „zieht das
-Token-Segment aus dessen Pfad". Das geht nicht: `TokenPathASGI` muss das Token-Segment aus dem
-Pfad entfernen, **bevor** es an die innere FastMCP-App delegiert (sonst sieht FastMCPs eigenes
-Routing das Segment als Teil des MCP-Pfads und die Anfrage schlägt fehl). Ein Tool, das während
-seiner Ausführung `get_http_request().url.path` liest, sieht deshalb nur noch den bereinigten
-Pfad.
+**V2 final bestätigt (nicht nur `[VERIFY]` übernommen):** `fastmcp==3.4.4`,
+`FastMCP.http_app(path=…, stateless_http=…, allowed_hosts=…, …)` — Signatur exakt wie geplant,
+per `inspect.signature` gegen das echte Paket geprüft, nicht nur gelesen.
 
-Zwei ASGI-Mounting-Techniken gegen ein echtes `fastmcp==3.4.4` + `starlette`-Setup
-(`httpx.ASGITransport`/`starlette.testclient.TestClient`) durchprobiert:
-1. **`root_path`-Akkumulation** (Starlettes eigene Technik, `scope["path"]` bleibt unverändert,
-   nur `root_path` wächst) — scheitert an `redirect_slashes`: ein Credential-Segment ohne
-   nachfolgenden Pfad lässt `route_path` leer statt `"/"` werden, Starlette antwortet mit 307
-   auf eine URL mit angehängtem `/`, bevor die innere App je läuft.
-2. **Direkte `path`/`raw_path`-Kürzung** (Plan-Wortlaut) — funktioniert für das Routing
-   (kein Redirect, Tool wird aufgerufen), aber `get_http_request().url.path` liefert dann
-   nachweislich `"/mcp/"`, nicht das Token — bestätigt das Problem oben empirisch, nicht nur
-   theoretisch.
+**V4 aufgelöst, empirisch gegen eine echte FastMCP-App, nicht nur gegen den Fake-Innen-App aus
+Step 4:** die in `asgi.py` (Step 4) implementierte Pfad-Arithmetik (`route_path =
+path[len(root_path):]`, `new_path = root_path + "/" + rest if rest else root_path + "/"`)
+funktioniert unverändert, wenn `TokenPathASGI` zusätzlich hinter einem echten
+`Mount("/mcp", …)` sitzt. Grund, empirisch nachvollzogen: Starlettes `Mount.matches()` ändert
+`scope["path"]` **nicht** — nur `scope["root_path"]` wächst um den Mount-Präfix (`""` → `"/mcp"`).
+Für den Normalfall `POST /mcp/<token>` (kein weiteres Pfadsegment) liefert die Arithmetik
+`rest=""` und damit `new_path = "/mcp/"` — genau der `route_path == "/"`, den die innere
+FastMCP-App erwartet (erzeugt mit `path="/"`). Verifiziert per Wegwerfskript gegen ein echtes
+`FastMCP`+`Starlette`-Setup (kein Fake): `GET /health` → 200, `POST /mcp/<gültiges-token>` mit
+einer echten `initialize`-Anfrage → 200 mit korrekter MCP-Antwort, `POST /mcp/<unbekannt>` →
+401 leer. Keine Code-Änderung an `asgi.py`/`context.py` nötig — Step 4s Lösung trägt durch den
+echten Mount hindurch.
 
-**Lösung:** `TokenPathASGI` hinterlegt `token_hash` in `scope["state"]`, **bevor** es den Pfad
-kürzt (Technik 2 bleibt fürs Routing). `scope["state"]` überlebt die Weiterleitung unverändert —
-Starlettes offizieller Mechanismus, um Zustand über eine ASGI-Kette hinweg mitzugeben, per
-Testprobe bestätigt: `request.state.token_hash` kam im Tool korrekt an. Die
-Sicherheitseigenschaft ist identisch zur Plan-Absicht: der Guard vergleicht „was hat unsere
-eigene ASGI-Schicht für DIESEN Request aufgelöst" (`scope["state"]["token_hash"]`, gesetzt von
-`TokenPathASGI`) gegen „was liefert `get_http_request()` gerade zurück" (`current_principal()`
-aus dem ContextVar) und schlägt bei jeder Abweichung laut fehl (`AuthError`) — nicht mehr über
-den Pfad, aber mit derselben Garantie. Vollständige Begründung im Docstring von `context.py`.
-**Kein Test dafür in Step 4** (braucht einen echten laufenden Request-Kontext) — end-to-end
-geprüft in Step 5 über `test_app.py::test_principal_isolation_under_concurrency`.
+**Isolationstest (`test_app.py::test_principal_isolation_under_concurrency`) — die wichtigste
+Zusicherung der Phase, jetzt grün gegen eine echte, laufende FastMCP-App:** zehn `list_spaces`-
+Aufrufe über `asyncio.gather`, alternierend zwei Tokens (`alpha`/`beta`, Fixture-Namen statt
+Nikinger/Kollege — Plan §2.2), echte Nebenläufigkeit auf einem Event-Loop (nicht sequenziell).
+Jeder Aufruf sieht `writable=true` exakt für den eigenen und `writable=false` für den fremden
+Space — kein Cross-Space-Leak. Technischer Unterbau: `httpx.ASGITransport` (kein echter Port,
+kein Netz) + `fastmcp.Client`/`StreamableHttpTransport` mit injiziertem
+`httpx_client_factory`; Lifespan manuell über `app.router.lifespan_context(app)` statt
+simulierter ASGI-Lifespan-Nachrichten — Starlettes eigener Mechanismus, ohne
+Zusatzabhängigkeit (`asgi-lifespan` ist nicht installiert und wurde bewusst nicht ergänzt).
 
-**Verifiziert (live):** 14 neue Tests (`test_auth.py` ×4, `test_permissions.py` ×3,
-`test_logging.py` ×1, `test_context.py` ×2 — nicht im Plan gefordert, aber `current_principal`/
-`set_principal`/`reset_principal` sind eigenständige, netzunabhängige Logik —,
-`test_asgi.py` ×4 gegen einen Fake-Resolver + Fake-Innen-App, keine echte FastMCP-App nötig für
-diese Schicht). `pytest -v` → **99/99 grün** (76 P1 + 23 P2). `test_principal_reset_after_request`
-bestätigt: nach dem Request wirft `current_principal()` wieder `AuthError` — kein Leck zwischen
-Requests.
+**Advisor-Review vor dem Commit — ein Fund korrigiert, einer verschärft:**
+1. `test_mcp_requires_token` deckte `POST /mcp/` (leeres Credential → unser 401) und
+   `POST /mcp/<unbekannt>` ab, aber nicht `POST /mcp` **ohne** Trailing-Slash. Empirisch geprüft:
+   das trifft Starlettes eigenes `redirect_slashes` **vor** `TokenPathASGI` und antwortet mit
+   **307** nach `/mcp/`, leerer Body, `Location`-Header ohne Space-/Pfad-/Tokendaten.
+   Kein Verstoß gegen P2-N (das 307 sagt nichts über Tokengültigkeit — in diesem Request gibt es
+   noch gar kein Token-Segment), aber eine dritte, von außen unterscheidbare Antwortform, die
+   sonst erst bei der Live-Tunnel-Probe aufgefallen wäre. Jetzt eigener Test:
+   `test_mcp_bare_mount_redirects_without_leaking`.
+2. `test_health_leaks_no_space_names` prüfte nur auf Teilstrings (`"alpha" not in body_text`)
+   gegen eine Antwort, die strukturell gar keine Space-Daten enthalten kann — vacuous. `test_health_ok`
+   prüft jetzt zusätzlich die exakte Schlüsselmenge (`{"status","service","version"}`), das
+   fängt eine spätere Feldergänzung ab, nicht nur zufällig gewählte Fixture-Namen.
 
-**Anmerkung des Advisors, hier festgehalten statt in Step 6 neu zu entdecken:** P2-N sagt
-„`AuthError` → HTTP 401, nie ein Tool-Fehler". Der Guard läuft aber *innerhalb* eines
-Tool-Aufrufs (§3.3 Schritt 2) — das 401-Fenster ist zu diesem Zeitpunkt vorbei, ein
-Guard-`AuthError` muss also zwangsläufig als Tool-Fehler auftauchen. Das ist kein Defekt (immer
-noch fail-closed, keine fremden Daten), aber `map_storage_error()` in Step 6 muss diese
-Abbildung bewusst treffen, nicht zufällig.
+**Verifiziert (live):** 7 Tests in `test_app.py` — `test_health_ok`,
+`test_health_leaks_no_space_names`, `test_mcp_requires_token`,
+`test_mcp_bare_mount_redirects_without_leaking`, `test_tools_list_returns_six_tools`,
+`test_tools_list_annotations_present`, `test_principal_isolation_under_concurrency`.
+`pytest -v` → **106/106 grün** (76 P1 + 30 P2).
 
-**Nächster Schritt (konkret):** Step 5 — `server.py`, `app.py`, `scripts/serve.py`. Das ist die
-Stelle, an der `TokenPathASGI` erstmals gegen eine echte FastMCP-App läuft — V4 (`Mount`-
-Verhalten) und der `assert_principal_matches_request()`-Guard werden dort erstmals end-to-end
-statt isoliert geprüft.
+**Nächster Schritt (konkret):** Step 6 — `mcpserver/tools.py` fertigstellen: `search_items`,
+`get_item`, `create_item`, `update_item`, `append_to_item` (§3.2/§3.4), `<untrusted_content>`-
+Wrapping + Escaping (§3.5), Fehlerabbildung inkl. des in Step 4 vermerkten
+`AuthError`-als-Tool-Fehler-Falls (§3.6), Token-Budget-Klemmung (`DEFAULT_LIMIT`/`MAX_LIMIT`,
+bereits als Modulkonstanten in `tools.py` vorhanden). `test_tools.py` neu, `list_spaces`
+braucht dort keine erneute Grundimplementierung, nur ggf. Härtung/Formatkonsistenz mit den
+anderen fünf Tools.
