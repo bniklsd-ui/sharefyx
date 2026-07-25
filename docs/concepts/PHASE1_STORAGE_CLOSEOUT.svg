@@ -1,0 +1,192 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080" font-family="'SF Mono','DejaVu Sans Mono',Menlo,Consolas,monospace">
+
+  <!-- ============ Tokens ============
+       cabinet  #17211F   Aktenschrank-Stahl (Hintergrund)
+       card     #DED7C6   Karteikarte
+       ink      #23211C   Haupttext
+       soft     #5F5A4E   Sekundärtext
+       rule     #9DB3C0   Kartenlinierung (blass blau)
+       oxide    #9C3A2C   Randlinie + Stempel
+       green    #2E6A4C   verifiziert
+       amber    #8A6A1F   offen / zu entscheiden
+  ================================== -->
+
+  <rect width="1080" height="1080" fill="#17211F"/>
+  <rect x="42" y="42" width="1008" height="1008" rx="3" fill="#0C1211" opacity="0.55"/>
+  <rect x="36" y="36" width="1008" height="1008" rx="3" fill="#DED7C6"/>
+
+  <!-- roter Randstrich der Karteikarte, liegt hinter allem -->
+  <line x1="112" y1="36" x2="112" y2="1044" stroke="#9C3A2C" stroke-width="1.5" opacity="0.28"/>
+
+  <!-- ============================ KOPF ============================ -->
+  <text x="124" y="82" font-size="12.5" letter-spacing="4.2" fill="#5F5A4E">SHAREFYX · SPACE-SERVER · PHASENABSCHLUSS</text>
+  <text x="124" y="130" font-family="Georgia,'Iowan Old Style','Times New Roman',serif" font-size="43" font-weight="700" fill="#23211C">Phase 1 — Storage-Kern</text>
+  <text x="124" y="158" font-size="13" fill="#3E3A32">Ein Mensch im Editor und mehrere Claude-Instanzen schreiben gleichzeitig</text>
+  <text x="124" y="177" font-size="13" fill="#3E3A32">in dieselben Dateien — ohne dass jemand still Daten verliert.</text>
+
+  <!-- Stempel: das Signaturelement -->
+  <g transform="rotate(-5 876 122)">
+    <rect x="752" y="76" width="248" height="92" rx="2" fill="none" stroke="#9C3A2C" stroke-width="3.5" opacity="0.85"/>
+    <rect x="759" y="83" width="234" height="78" rx="1" fill="none" stroke="#9C3A2C" stroke-width="1.2" opacity="0.7"/>
+    <text x="876" y="118" text-anchor="middle" font-size="19.5" font-weight="700" letter-spacing="0.8" fill="#9C3A2C" opacity="0.9">LIVE-VERIFIZIERT</text>
+    <text x="876" y="139" text-anchor="middle" font-size="11" letter-spacing="0.6" fill="#9C3A2C" opacity="0.85">2026-07-25 · ECHTER DATA_ROOT</text>
+    <text x="876" y="155" text-anchor="middle" font-size="9.5" letter-spacing="0.9" fill="#9C3A2C" opacity="0.7">LAUF DURCH DEN NIKINGER</text>
+  </g>
+
+  <line x1="124" y1="196" x2="1000" y2="196" stroke="#23211C" stroke-width="1.6" opacity="0.75"/>
+
+  <!-- ====================== SCHREIBPFAD ====================== -->
+  <text x="124" y="224" font-size="11.5" letter-spacing="3.4" fill="#5F5A4E">SCHREIBPFAD — EIN WRITE, END-TO-END</text>
+
+  <g font-size="11">
+    <!-- 1 -->
+    <rect x="124" y="240" width="160" height="96" rx="2" fill="#D3CBB7" stroke="#23211C" stroke-width="1.2"/>
+    <text x="204" y="264" text-anchor="middle" font-size="9.5" letter-spacing="1.8" fill="#5F5A4E">1 · AUFRUF</text>
+    <text x="204" y="291" text-anchor="middle" fill="#23211C">update(id,</text>
+    <text x="204" y="308" text-anchor="middle" fill="#23211C">version=n)</text>
+    <text x="204" y="326" text-anchor="middle" font-size="9.5" fill="#5F5A4E">Plan §2</text>
+
+    <!-- 2 -->
+    <rect x="303" y="240" width="160" height="96" rx="2" fill="#D3CBB7" stroke="#23211C" stroke-width="1.2"/>
+    <text x="383" y="264" text-anchor="middle" font-size="9.5" letter-spacing="1.8" fill="#5F5A4E">2 · SPERREN</text>
+    <text x="383" y="291" text-anchor="middle" fill="#23211C">RLock (Prozess)</text>
+    <text x="383" y="308" text-anchor="middle" fill="#23211C">flock .write.lock</text>
+    <text x="383" y="326" text-anchor="middle" font-size="9.5" fill="#5F5A4E">Plan §3</text>
+
+    <!-- 3 -->
+    <rect x="482" y="240" width="160" height="96" rx="2" fill="#CFC4A8" stroke="#9C3A2C" stroke-width="2"/>
+    <text x="562" y="264" text-anchor="middle" font-size="9.5" letter-spacing="1.8" fill="#9C3A2C">3 · PRÜFEN</text>
+    <text x="562" y="291" text-anchor="middle" fill="#23211C">version == n ?</text>
+    <text x="562" y="308" text-anchor="middle" fill="#9C3A2C">sonst ConflictError</text>
+    <text x="562" y="326" text-anchor="middle" font-size="9.5" fill="#5F5A4E">Entscheidung C</text>
+
+    <!-- 4 -->
+    <rect x="661" y="240" width="160" height="96" rx="2" fill="#D3CBB7" stroke="#23211C" stroke-width="1.2"/>
+    <text x="741" y="264" text-anchor="middle" font-size="9.5" letter-spacing="1.8" fill="#5F5A4E">4 · SCHREIBEN</text>
+    <text x="741" y="291" text-anchor="middle" fill="#23211C">tmp → os.replace</text>
+    <text x="741" y="308" text-anchor="middle" fill="#23211C">→ fsync(dir)</text>
+    <text x="741" y="326" text-anchor="middle" font-size="9.5" fill="#5F5A4E">Entscheidung E</text>
+
+    <!-- 5 -->
+    <rect x="840" y="240" width="160" height="96" rx="2" fill="#D3CBB7" stroke="#23211C" stroke-width="1.2"/>
+    <text x="920" y="264" text-anchor="middle" font-size="9.5" letter-spacing="1.8" fill="#5F5A4E">5 · NACHZIEHEN</text>
+    <text x="920" y="291" text-anchor="middle" fill="#23211C">Index upsert</text>
+    <text x="920" y="308" text-anchor="middle" fill="#23211C">git commit</text>
+    <text x="920" y="326" text-anchor="middle" font-size="9.5" fill="#5F5A4E">Entscheidung A/E</text>
+  </g>
+
+  <g fill="#23211C">
+    <polygon points="288,283 300,288 288,293"/>
+    <polygon points="467,283 479,288 467,293"/>
+    <polygon points="646,283 658,288 646,293"/>
+    <polygon points="825,283 837,288 825,293"/>
+  </g>
+
+  <!-- ====================== DRIFT ====================== -->
+  <text x="124" y="368" font-size="11.5" letter-spacing="3.4" fill="#5F5A4E">ENTSCHEIDUNG D · DRIFT — DER MENSCH BUMPT KEINE VERSION</text>
+
+  <g font-size="11">
+    <rect x="124" y="382" width="278" height="72" rx="2" fill="none" stroke="#5F5A4E" stroke-width="1.2" stroke-dasharray="5 4"/>
+    <text x="263" y="410" text-anchor="middle" fill="#23211C">Mensch editiert die Datei direkt</text>
+    <text x="263" y="432" text-anchor="middle" font-size="9.5" fill="#5F5A4E">Editor nimmt kein flock</text>
+
+    <rect x="423" y="382" width="278" height="72" rx="2" fill="none" stroke="#5F5A4E" stroke-width="1.2" stroke-dasharray="5 4"/>
+    <text x="562" y="410" text-anchor="middle" fill="#23211C">(mtime, size) ab → sha256</text>
+    <text x="562" y="432" text-anchor="middle" font-size="9.5" fill="#5F5A4E">der Index hasht, statt zu vertrauen</text>
+
+    <rect x="722" y="382" width="278" height="72" rx="2" fill="none" stroke="#5F5A4E" stroke-width="1.2" stroke-dasharray="5 4"/>
+    <text x="861" y="410" text-anchor="middle" fill="#23211C">version +1 → ins Frontmatter</text>
+    <text x="861" y="432" text-anchor="middle" font-size="9.5" fill="#5F5A4E">Advisor-Fund: sonst frisst Rebuild den Bump</text>
+  </g>
+
+  <g fill="#5F5A4E">
+    <polygon points="406,414 418,419 406,424"/>
+    <polygon points="705,414 717,419 705,424"/>
+  </g>
+
+  <text x="124" y="480" font-size="11.5" fill="#9C3A2C">flock ist advisory. Gegen den Menschen im Editor schützt allein D — nie der Lock.</text>
+
+  <!-- ====================== MODULE ====================== -->
+  <text x="124" y="516" font-size="11.5" letter-spacing="3.4" fill="#5F5A4E">MODULE — STEPS 0–7, JE EIN COMMIT</text>
+
+  <g font-size="10" letter-spacing="1.6" fill="#5F5A4E">
+    <text x="132" y="540">STEP</text>
+    <text x="190" y="540">MODUL</text>
+    <text x="470" y="540">WAS ES BEWEIST</text>
+    <text x="970" y="540" text-anchor="end">TESTS</text>
+  </g>
+  <line x1="124" y1="548" x2="1000" y2="548" stroke="#23211C" stroke-width="1" opacity="0.6"/>
+
+  <g font-size="12.5" fill="#23211C">
+    <text x="132" y="574">0</text><text x="190" y="574">pyproject · dev_install</text><text x="470" y="574">Skelett, editable install, pytest grün (0 Tests)</text><text x="970" y="574" text-anchor="end">0</text>
+    <text x="132" y="604">1</text><text x="190" y="604">models · frontmatter</text><text x="470" y="604">Round-Trip byte-identisch, eigener PyYAML-Parser</text><text x="970" y="604" text-anchor="end">9</text>
+    <text x="132" y="634">2</text><text x="190" y="634">files.py</text><text x="470" y="634">tmp → replace → fsync: nie eine halbe Datei</text><text x="970" y="634" text-anchor="end">12</text>
+    <text x="132" y="664">3</text><text x="190" y="664">index.py</text><text x="470" y="664">Index löschbar, Rebuild == Dateistand, FS-Check</text><text x="970" y="664" text-anchor="end">9</text>
+    <text x="132" y="694" fill="#9C3A2C">4</text><text x="190" y="694" fill="#9C3A2C">store.py</text><text x="470" y="694" fill="#9C3A2C">Konflikt statt Last-Write-Wins — der Phasenbeweis</text><text x="970" y="694" text-anchor="end" fill="#9C3A2C">18</text>
+    <text x="132" y="724">5</text><text x="190" y="724">history.py</text><text x="470" y="724">ein Git-Commit je Write, Fehler nie fatal</text><text x="970" y="724" text-anchor="end">11</text>
+    <text x="132" y="754">6</text><text x="190" y="754">store.search()</text><text x="470" y="754">nur Frontmatter + Snippet, Sortierung gepinnt</text><text x="970" y="754" text-anchor="end">2</text>
+    <text x="132" y="784">7</text><text x="190" y="784">scripts/space_cli.py</text><text x="470" y="784">sieben Subcommands, Konflikt sichtbar (exit 2)</text><text x="970" y="784" text-anchor="end">9</text>
+  </g>
+
+  <g stroke="#9DB3C0" stroke-width="1" opacity="0.55">
+    <line x1="124" y1="582" x2="1000" y2="582"/>
+    <line x1="124" y1="612" x2="1000" y2="612"/>
+    <line x1="124" y1="642" x2="1000" y2="642"/>
+    <line x1="124" y1="672" x2="1000" y2="672"/>
+    <line x1="124" y1="702" x2="1000" y2="702"/>
+    <line x1="124" y1="732" x2="1000" y2="732"/>
+    <line x1="124" y1="762" x2="1000" y2="762"/>
+    <line x1="124" y1="792" x2="1000" y2="792"/>
+  </g>
+
+  <g fill="#2E6A4C">
+    <rect x="984" y="567" width="7" height="7" transform="rotate(45 987.5 570.5)"/>
+    <rect x="984" y="597" width="7" height="7" transform="rotate(45 987.5 600.5)"/>
+    <rect x="984" y="627" width="7" height="7" transform="rotate(45 987.5 630.5)"/>
+    <rect x="984" y="657" width="7" height="7" transform="rotate(45 987.5 660.5)"/>
+    <rect x="984" y="687" width="7" height="7" transform="rotate(45 987.5 690.5)"/>
+    <rect x="984" y="717" width="7" height="7" transform="rotate(45 987.5 720.5)"/>
+    <rect x="984" y="747" width="7" height="7" transform="rotate(45 987.5 750.5)"/>
+    <rect x="984" y="777" width="7" height="7" transform="rotate(45 987.5 780.5)"/>
+  </g>
+
+  <!-- ====================== DREI SPALTEN ====================== -->
+  <g font-size="11" letter-spacing="2.8">
+    <text x="124" y="828" fill="#2E6A4C">BILANZ</text>
+    <text x="427" y="828" fill="#23211C">CONTRACT FÜR P2 — AB JETZT FIX</text>
+    <text x="730" y="828" fill="#8A6A1F">VOR P2 ZU ENTSCHEIDEN</text>
+  </g>
+  <g stroke-width="1.4">
+    <line x1="124" y1="838" x2="394" y2="838" stroke="#2E6A4C"/>
+    <line x1="427" y1="838" x2="697" y2="838" stroke="#23211C"/>
+    <line x1="730" y1="838" x2="1000" y2="838" stroke="#8A6A1F"/>
+  </g>
+
+  <g font-size="11.5" fill="#3E3A32">
+    <text x="124" y="862">70 Tests grün · 8 von 8 Modulen</text>
+    <text x="124" y="882">8 Entscheidungen A–H gelockt</text>
+    <text x="124" y="902">5 von 5 [VERIFY] aufgelöst</text>
+    <text x="124" y="922">Phase-Head 34 KB / Softcap 40 KB</text>
+    <text x="124" y="942">kein Netz, kein MCP, keine Auth</text>
+
+    <text x="427" y="862">Frontmatter-Schema (Plan §1)</text>
+    <text x="427" y="882">Item · ItemSummary · SpaceInfo</text>
+    <text x="427" y="902">SearchResult · IndexStats</text>
+    <text x="427" y="922">Store-Signaturen (Plan §2)</text>
+    <text x="427" y="942">Änderung = Scope-Entscheidung</text>
+
+    <text x="730" y="862">status wird im Store nicht</text>
+    <text x="730" y="882">validiert — nur die CLI hält</text>
+    <text x="730" y="902">get() schreibt bei Drift, auch</text>
+    <text x="730" y="922">in fremden Spaces</text>
+    <text x="730" y="942">search() liest jede Datei</text>
+  </g>
+
+  <line x1="124" y1="972" x2="1000" y2="972" stroke="#23211C" stroke-width="1" opacity="0.45"/>
+
+  <text x="124" y="996" font-size="10.5" fill="#5F5A4E">phase1_storage/CLAUDE.md · docs/concepts/phase1_storage_plan.md · docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md</text>
+  <text x="1000" y="1018" text-anchor="end" font-size="11" letter-spacing="2.4" fill="#9C3A2C">NÄCHSTE PHASE — P2 MCP-SERVER</text>
+
+  <circle cx="540" cy="1022" r="8" fill="#17211F"/>
+  <circle cx="540" cy="1022" r="8" fill="none" stroke="#0C1211" stroke-width="1" opacity="0.5"/>
+</svg>

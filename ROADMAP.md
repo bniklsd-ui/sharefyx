@@ -18,10 +18,14 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 | Phase | Verzeichnis / Paket | Inhalt | Status |
 |---|---|---|---|
 | **P1** | `phase1_storage/` · `storage` | Datei-Store + Index + Versionierung. Kein Netz. | ✅ |
-| **P2** | `phase2_mcp/` · `mcpserver` | MCP-Server, Token-Auth, 6 Tools. Lokal erreichbar. | ⬜ |
+| **P2** | `phase2_mcp/` · `mcpserver` | MCP-Server, Token-Auth, 6 Tools. Lokal erreichbar. | 🔄 |
 | **P3** | `phase3_edge/` | Tunnel, systemd, Health, Logging, Ops-Skripte. Öffentlich erreichbar. | ⬜ |
-| **P4** | `phase4_ui/` · `webui` | REST-API + Web-UI für Menschen. | ⬜ |
-| **P5** | `phase5_auth/` · `auth` | OAuth 2.1 + DCR; ersetzt den Pfad-Token. | ⬜ |
+| **P4** | `phase4_auth/` · `auth` | OAuth 2.1 + DCR; ersetzt den Pfad-Token. | ⬜ |
+| **P5** | `phase5_ui/` · `webui` | REST-API + Web-UI für Menschen. | ⬜ |
+
+**Korrektur (2026-07-25, P2-Planungssession):** OAuth rückt von „ganz am Ende" auf „direkt nach
+P3" — der Pfad-Token soll kurz leben, und die UI ist die Phase, die laut Build-Reihenfolge unter
+Druck wegfallen darf, OAuth nicht. Begründung: `docs/concepts/phase2_mcp_plan.md` §0.3.
 
 ---
 
@@ -38,14 +42,15 @@ benutzen können, ohne sich gegenseitig zu überschreiben. Das ist der harte Tei
 
 Plan: `docs/concepts/phase1_storage_plan.md`. Phase-Head: `phase1_storage/CLAUDE.md`.
 
-**Korrektur (2026-07-25):** Alle acht Module (Steps 0–7) fertig, 70 Tests grün, `space_cli.py`
-als Beweis. Status jetzt **✅ live-verifiziert**: der Nikinger hat den Lauf gegen den echten
-`DATA_ROOT` (`/home/savefyx/savefyx-data`) selbst ausgeführt (Hard Rule: kein Test gegen den
-echten DATA_ROOT durch Claude Code) — `create`/`list`/`search` funktionieren, der Git-Commit im
-Datenverzeichnis landet real, `.gitignore` hält `.index.sqlite3`/`.write.lock` draußen (die
+**Korrektur (2026-07-25):** Alle acht Module (Steps 0–7) fertig, 68 Tests grün (70 bei
+Phasenabschluss, minus zwei bei Entfernung toten Codes — `rename_for_new_slug()` — in P2 Step 0),
+`space_cli.py` als Beweis. Status **✅ live-verifiziert**: der Nikinger hat den Lauf gegen den
+echten `DATA_ROOT` (`/home/savefyx/savefyx-data`) selbst ausgeführt (Hard Rule: kein Test gegen
+den echten DATA_ROOT durch Claude Code) — `create`/`list`/`search` funktionieren, der Git-Commit
+im Datenverzeichnis landet real, `.gitignore` hält `.index.sqlite3`/`.write.lock` draußen (die
 reale Probe auf den Advisor-Fund aus Step 5). Details + Transkript:
-`phase1_storage/CLAUDE.md`, Session-Block. Offizieller Phasen-Abschluss (Browser-Prompt laut
-`docs/PROMPTS.md`) folgt im Anschluss.
+`phase1_storage/CLAUDE.md`, Session-Block. Handover an P2:
+`docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md`.
 
 ## Phase 2 — MCP-Server
 
@@ -59,6 +64,21 @@ reale Probe auf den Advisor-Fund aus Step 5). Details + Transkript:
 - **Explizit gegen MCP Resources entschieden:** Tools sind der verlässliche Pfad in Claude.ai.
   Wer Resources ergänzen will, muss es vorher messen, nicht annehmen.
 
+Plan: `docs/concepts/phase2_mcp_plan.md`. Phase-Head: `phase2_mcp/CLAUDE.md`.
+
+### Zurückgestellt aus P2 (bewusst, nicht vergessen)
+
+- **D6 — `Store.search()` liest jede indizierte Datei von der Platte.** Gefiltert/sortiert wird
+  in Python, nicht in SQL. Bei zwei Nutzern und einigen hundert Items unkritisch, aber P2 hängt
+  das an einen Mobilfunk-Uplink. Kostenfrage, kein Bug — SQL-Filterung ist eine
+  contract-neutrale Optimierung im `storage`-Paket, kein Adapter-Thema.
+- **MCP-Revision 2026-07-28** (Sessions entfallen, `Mcp-Method`/`Mcp-Name`-Header werden Pflicht)
+  — Migrationspunkt nach P3, nicht in P2 adressiert.
+- **Lese-Rechte zwischen Spaces.** Der Seam existiert ab P2 (`Permissions.can_read`, heute immer
+  `True`, aber schon von jedem Lesepfad aufgerufen), die Policy fehlt bewusst. Siehe „Bewusst
+  nicht auf der Roadmap" unten — der Satz dort bleibt richtig, der Seam macht ihn nur nicht mehr
+  unumkehrbar.
+
 ## Phase 3 — Exposure & Betrieb
 
 **Mission:** Der Connector steht in beiden Claude-Accounts und bleibt stehen.
@@ -71,7 +91,20 @@ reale Probe auf den Advisor-Fund aus Step 5). Details + Transkript:
   „Disconnected" mit minimaler Diagnose — deshalb ist das Log kein Nice-to-have, sondern
   Teil des Scope.
 
-## Phase 4 — Web-UI
+## Phase 4 — OAuth 2.1
+
+**Mission:** Der Pfad-Token verschwindet.
+
+- **DRIN:** Protected Resource Metadata, Authorization Server, Dynamic Client Registration,
+  PKCE, Token-Rotation. `[VERIFY]` Callback-URLs und unterstützte Auth-Spec-Version gegen die
+  aktuelle Anthropic-Doku — das ändert sich schneller als dieses Dokument.
+- **Warum direkt nach P3 statt ganz am Ende (Korrektur 2026-07-25):** der Pfad-Token soll kurz
+  leben; P2 baut den Seam dafür bereits (`SpaceResolver` liefert einen `Principal`, egal ob aus
+  Pfad-Token oder OAuth-Access-Token — der Umbau berührt keine Zeile Tool-Code). Nicht
+  optional-für-immer: P4 ist der lehrreichste Teil des gesamten Projekts. Wer ihn dauerhaft
+  überspringt, hat ein Ablagesystem gebaut und nichts gelernt.
+
+## Phase 5 — Web-UI
 
 **Mission:** Menschen legen Aufgaben und Notizen ohne Editor an.
 
@@ -79,18 +112,10 @@ reale Probe auf den Advisor-Fund aus Step 5). Details + Transkript:
 - **DRAUSSEN:** Realtime/Collaboration, Anhänge, Mobile-App.
 - **Offene Entscheidung:** Neubau vs. Adaption des `Notizheft_example.html`. Dessen
   clientseitige Verschlüsselung ist mit R4 unvereinbar und müsste entfallen — was den
-  Anpassungsaufwand womöglich über den eines Neubaus hebt. Vor P4 in einer Planungssession
+  Anpassungsaufwand womöglich über den eines Neubaus hebt. Vor P5 in einer Planungssession
   klären, nicht während der Implementierung.
-
-## Phase 5 — OAuth 2.1
-
-**Mission:** Der Pfad-Token verschwindet.
-
-- **DRIN:** Protected Resource Metadata, Authorization Server, Dynamic Client Registration,
-  PKCE, Token-Rotation. `[VERIFY]` Callback-URLs und unterstützte Auth-Spec-Version gegen die
-  aktuelle Anthropic-Doku — das ändert sich schneller als dieses Dokument.
-- **Warum zuletzt und trotzdem nicht optional:** P5 ist der lehrreichste Teil des gesamten
-  Projekts. Wer ihn dauerhaft überspringt, hat ein Ablagesystem gebaut und nichts gelernt.
+- **Rückt hinter OAuth (Korrektur 2026-07-25):** die UI ist die Phase, die unter Zeit-/Token-
+  Druck wegfallen darf; OAuth nicht.
 
 ---
 
@@ -99,6 +124,8 @@ reale Probe auf den Advisor-Fund aus Step 5). Details + Transkript:
 - **Semantische Suche / Embeddings.** Verstößt gegen das Bauprinzip. Bei zwei Nutzern und
   einigen hundert Items schlägt Frontmatter-Filterung jede Vektorsuche in Präzision und Kosten.
 - **Feingranulare Rechte.** Zwei Personen, gegenseitiges Vertrauen. Cross-Space-Read ist
-  standardmäßig an. Der Schutz gegen fremde Inhalte ist Rule 4, nicht ein ACL-Modell.
+  standardmäßig an. Der Schutz gegen fremde Inhalte ist Rule 4, nicht ein ACL-Modell. **Ergänzung
+  2026-07-25:** P2 baut den Seam dafür (`Permissions.can_read`), damit es später kein Umbau wird
+  — die Policy selbst bleibt bewusst `True` für alle, siehe „Zurückgestellt aus P2".
 - **Mehrmandantenfähigkeit.** Wenn ein dritter Nutzer dazukommt, ist das eine Planungssession,
   kein `if`-Zweig.

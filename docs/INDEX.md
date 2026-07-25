@@ -24,21 +24,29 @@ updated: 2026-07-25
 
 - [CLAUDE.md](../CLAUDE.md) — 📗 ~9KB · rules, core principle, hard rules, working style, current state; auto-loaded every session
 - [AGENTS.md](../AGENTS.md) — 📗 ~1KB · harness-neutral entry point for non-Claude-Code agents; points to `CLAUDE.md` + doc-layers navigation
-- [README.md](../README.md) — 📗 ~4KB · human overview + machine setup (venv, keyring, run, smoke test)
-- [ROADMAP.md](../ROADMAP.md) — 📗 ~5KB · Phases 1–5, scope in/out per phase, status
+- [README.md](../README.md) — 📗 ~5KB · human overview + machine setup (venv, keyring, run, smoke test)
+- [ROADMAP.md](../ROADMAP.md) — 📗 ~7KB · Phases 1–5, scope in/out per phase, status
 - [docs/DOC_LAYERS_CONVENTION.md](./DOC_LAYERS_CONVENTION.md) — 📗 ~5KB · Doc-Layers-Spec (v1, 2026-07-06) · **byte-identische Kopie aus dem Trading-Bot-Repo — nicht projektspezifisch anpassen, sonst divergieren zwei Kopien derselben Regel**
-- [docs/PROMPTS.md](./PROMPTS.md) — 📗 ~9KB · die drei Workflow-Prompts (Claude-Code-Session-Start, Phasen-Kickoff, Phasen-Abschluss); lesen beim Start eines neuen Chats, nicht mitten in einer Session
+- [docs/PROMPTS.md](./PROMPTS.md) — 📗 ~11KB · die drei Workflow-Prompts (Claude-Code-Session-Start, Phasen-Kickoff, Phasen-Abschluss); lesen beim Start eines neuen Chats, nicht mitten in einer Session
 
-## Active phase (1 — Storage-Kern)
+## Active phase (2 — MCP-Server)
 
-- [phase1_storage/CLAUDE.md](../phase1_storage/CLAUDE.md) — 🔄 ~34KB · phase head; Steps 0–7 ✅, live-verifiziert gegen den echten DATA_ROOT (2026-07-25), offizieller Phasen-Abschluss-Prompt steht noch aus; read + newest Session-stopped block first
-- [docs/concepts/phase1_storage_plan.md](./concepts/phase1_storage_plan.md) — 📕 ~13KB · ausführungsreifer P1-Plan (Entscheidungen A–H, Steps 0–7)
-- [phase1_storage/SESSIONS_ARCHIVE.md](../phase1_storage/SESSIONS_ARCHIVE.md) — 📦 ~2KB · archivierte Session-stopped-Blöcke, verbatim, newest-first
+- [phase2_mcp/CLAUDE.md](../phase2_mcp/CLAUDE.md) — 🔄 ~13KB · phase head; Step 0 (Haushalt + Verifikationsdurchlauf) ✅, Steps 1–7 offen; read + newest Session-stopped block first
+- [docs/concepts/phase2_mcp_plan.md](./concepts/phase2_mcp_plan.md) — 📕 ~46KB · ausführungsreifer P2-Plan (Entscheidungen P2-A–P2-N, Steps 0–7); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
+- [phase2_mcp/SESSIONS_ARCHIVE.md](../phase2_mcp/SESSIONS_ARCHIVE.md) — 📦 leer · noch keine archivierten Blöcke, erste Rotation folgt ab dem zweiten Session-Block
+
+## Completed phases
+
+- [phase1_storage/CLAUDE.md](../phase1_storage/CLAUDE.md) — 📗 ~9KB · phase head; alle acht Module ✅, 68 Tests, live-verifiziert gegen den echten DATA_ROOT (2026-07-25); Frontmatter-Schema + `Store`-Signaturen jetzt Contract für P2
+- [docs/concepts/phase1_storage_plan.md](./concepts/phase1_storage_plan.md) — 📕 ~15KB · ausführungsreifer P1-Plan (Entscheidungen A–H, Steps 0–7)
+- [phase1_storage/SESSIONS_ARCHIVE.md](../phase1_storage/SESSIONS_ARCHIVE.md) — 📦 ~27KB · archivierte Session-stopped-Blöcke, verbatim, newest-first
+- [docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md](./concepts/PHASE1_CLOSEOUT_HANDOVER.md) — 📕 ~12KB · Abschluss-Handover P1→P2: Status, Delta, Contract, offene Entscheidungen D1–D6, `[VERIFY]`-Bilanz
 
 ## Concept docs (📕 snapshots — the plan a phase was built from)
 
-*(noch keine weiteren — P2–P5 werden vor ihrem Start je in einer Browser-Planungssession
-geschrieben; Konvention: ein Dokument pro Phase, kein Konzept+Plan+Handover-Trio)*
+*(noch keine weiteren — P3–P5 werden vor ihrem Start je in einer Browser-Planungssession
+geschrieben; Konvention: ein Dokument pro Phase, kein Konzept+Plan+Handover-Trio. P1- und
+P2-Pläne stehen oben bei ihrer jeweiligen Phase, nicht doppelt hier gelistet.)*
 
 ## Externe Referenz (nicht im Repo)
 

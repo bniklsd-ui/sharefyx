@@ -54,9 +54,10 @@ Adapter darüber — deshalb wird der Kern zuerst gebaut und offline bewiesen.
 
 ## Setup
 
-> **Stand 2026-07-25:** Phase 1 (Storage-Kern) ist code-complete — 70 Tests, `space_cli.py` als
-> Beweis. Die Befehle unten funktionieren real, nicht nur als Zielbild. Phase 2 (MCP-Server) ist
-> noch nicht begonnen; bis dahin gibt es keinen Netzpfad, nur den lokalen Storage-Kern + CLI.
+> **Stand 2026-07-25:** Phase 1 (Storage-Kern) ist abgeschlossen und live-verifiziert — 68 Tests
+> (70 bei Phasenabschluss, minus zwei bei Entfernung toten Codes in P2 Step 0), `space_cli.py`
+> als Beweis. Die Befehle unten funktionieren real, nicht nur als Zielbild. Phase 2 (MCP-Server)
+> ist im Aufbau; bis sie steht, gibt es keinen Netzpfad, nur den lokalen Storage-Kern + CLI.
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
@@ -85,6 +86,16 @@ Damit sie niemand später „entdeckt" und für einen Bug hält:
   werden, den Space zu lesen.
 
 Details und Begründungen: `CLAUDE.md` → „Current state" → Rahmenentscheidungen R1–R6.
+
+## Eingefrorene Schreibweisen (Nikinger-Entscheidung, 2026-07-25)
+
+Drei uneinheitliche Schreibweisen für denselben Ort sind **bewusst eingefroren, nicht
+„repariert"**: Repo/Drive heißt `sharefyx`, VM-Pfade beginnen mit `/home/savefyx/…`, das
+Code-Repo-Verzeichnis heißt `/home/savefyx/dev/savefxy` (Buchstabendreher gegenüber den beiden
+anderen). Ebenso: `DATA_ROOT` steht auf Branch `master`, das Code-Repo auf `main` — kosmetisch,
+kein Remote betroffen. Eine Umbenennung jetzt würde Pfade brechen, die Phase 3 wortwörtlich in
+systemd-Units schreibt. Wer eine dieser Schreibweisen antastet, macht eine Scope-Entscheidung,
+keine Aufräumarbeit.
 
 ## Navigation
 

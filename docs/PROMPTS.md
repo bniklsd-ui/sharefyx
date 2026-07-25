@@ -7,7 +7,7 @@ up: CLAUDE.md
 down:
   - DOC_LAYERS_CONVENTION.md   # Navigationsregeln, auf die Prompt 1 verweist
   - ../ROADMAP.md              # Phasenübersicht
-updated: 2026-07-24
+updated: 2026-07-25
 ---
 # Workflow-Prompts
 
@@ -42,7 +42,8 @@ correction; if it is not minor, stop and ask the Nikinger.
 You may record gained knowledge in the corresponding .md file — even outside the current phase
 scope. Knowledge is power, storage is cheap: write everything down, as long as it is organized
 and traceable for you. But respect the ≤40KB soft cap and the rotation rule: one current
-session block per head, the previous one moves verbatim to SESSIONS_ARCHIVE.md.
+session block per head, the previous one moves verbatim to SESSIONS_ARCHIVE.md via
+`scripts/rotate_session_block.sh <phase_verzeichnis>`, never by hand.
 Only edit code belonging to the current phase, except a) a plan file demands it, or
 b) it is genuinely necessary — and then only after checking with me (Nikinger).
 The phase is split into steps and progress is tracked; keep it current and edit it the moment
@@ -172,8 +173,9 @@ Auftrag:
    Claude-Code-Plans wissen muss. Namensschema fortführen: PHASE[X]_CLOSEOUT_HANDOVER.md in
    docs/concepts/, plus Indexzeile.
 4. Rotationsprüfung: trägt der Phase-Head genau einen Session-Block? Falls nicht, ältere Blöcke
-   verbatim nach SESSIONS_ARCHIVE.md verschieben (mechanisch, nie abtippen, Reassemblierung
-   byte-identisch prüfen).
+   über `scripts/rotate_session_block.sh <phase_verzeichnis>` verbatim nach SESSIONS_ARCHIVE.md
+   verschieben lassen (nie abtippen) — der Prüfschritt (Reassemblierung byte-identisch) bleibt,
+   das Skript ersetzt nur die Ausführung.
 
 Zum Handover an sich:
 Handover = Status + Delta seit dem letzten Handover + offene Entscheidungen + Dateipfade als

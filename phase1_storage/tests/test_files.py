@@ -7,7 +7,6 @@ from storage.files import (
     generate_id,
     item_filename,
     item_path,
-    rename_for_new_slug,
     slugify,
 )
 
@@ -112,30 +111,3 @@ def test_slug_collision_does_not_overwrite(tmp_path):
     assert path_a.read_text() == "Liste A\n"
     assert path_b.read_text() == "Liste B\n"
     assert len(list(space.glob("*.md"))) == 2
-
-
-def test_rename_for_new_slug(tmp_path):
-    space = tmp_path / "nikinger"
-    space.mkdir()
-    item_id = generate_id()
-    old_path = item_path(tmp_path, "nikinger", item_id, "alter-titel")
-    atomic_write(old_path, "Inhalt bleibt gleich\n")
-
-    new_path = rename_for_new_slug(old_path, item_id, "neuer-titel")
-
-    assert new_path == item_path(tmp_path, "nikinger", item_id, "neuer-titel")
-    assert not old_path.exists()
-    assert new_path.read_text() == "Inhalt bleibt gleich\n"
-
-
-def test_rename_for_new_slug_is_noop_when_slug_unchanged(tmp_path):
-    space = tmp_path / "nikinger"
-    space.mkdir()
-    item_id = generate_id()
-    path = item_path(tmp_path, "nikinger", item_id, "titel")
-    atomic_write(path, "Inhalt\n")
-
-    result = rename_for_new_slug(path, item_id, "titel")
-
-    assert result == path
-    assert path.read_text() == "Inhalt\n"

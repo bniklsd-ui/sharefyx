@@ -7,7 +7,7 @@ up: docs/INDEX.md
 down:
   - ROADMAP.md                          # Phasenplan + Status je Phase
   - docs/INDEX.md                       # L0-Karte aller .md
-  - phase1_storage/CLAUDE.md            # aktive Phase
+  - phase2_mcp/CLAUDE.md                # aktive Phase
 updated: 2026-07-25
 ---
 # CLAUDE.md — Project Instructions
@@ -119,6 +119,7 @@ Kurzform: **L0** = `docs/INDEX.md` · **L1** = ≤15-Zeilen-Header-Card oben in 
 Dokument · **L2** = schlanke Bodies, Softcap **≤40 KB** · **L3** = Archive und datierte
 Snapshots. Rotationsregel ab Tag 1 scharf: ein Phase-Head trägt **genau einen** aktuellen
 `## Session stopped`-Block; der vorherige wandert **verbatim** nach `SESSIONS_ARCHIVE.md`.
+Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie von Hand.
 
 > Diese Regel gilt hier ab dem ersten Commit, nicht als späterer Rettungseinsatz. Im
 > Trading-Bot-Repo wuchs `phase8_scheduler/CLAUDE.md` auf 211 KB, bevor sie eingeführt wurde.
@@ -127,16 +128,24 @@ Snapshots. Rotationsregel ab Tag 1 scharf: ein Phase-Head trägt **genau einen**
 
 ## Current state
 
-**Aktive Phase:** Phase 1 — Storage-Kern (`phase1_storage/`, Paket `storage`):
-✅ **live-verifiziert.** Alle acht Module (Steps 0–7) fertig, 70 Tests grün — Frontmatter/Modelle,
-atomarer Datei-Store, SQLite-Index, Versionierung + Konfliktbehandlung, Git-Commit je Write,
-Query-Layer, `space_cli.py` als Beweis. Der Nikinger hat den Lauf gegen den echten `DATA_ROOT`
-(`/home/savefyx/savefyx-data`) selbst ausgeführt (2026-07-25, Hard Rule: kein Test gegen den
-echten DATA_ROOT durch Claude Code) — `create`/`list`/`search` funktionieren, der Git-Commit
-landet real im Datenverzeichnis, `.gitignore` hält `.index.sqlite3`/`.write.lock` draußen.
-Details + Transkript: `phase1_storage/CLAUDE.md`, Session-Block. Offen: der offizielle
-Phasen-Abschluss-Prompt selbst (`docs/PROMPTS.md`, Browser-Session). Plan:
-`docs/concepts/phase1_storage_plan.md` (Entscheidungen A–H gelockt, Steps 0–7).
+**Aktive Phase:** Phase 2 — MCP-Server (`phase2_mcp/`, Paket `mcpserver`, im Aufbau):
+Claude soll lesend und schreibend über einen lokalen `fastmcp`-Server auf den P1-Storage-Kern
+zugreifen — Token→Space-Auflösung, sechs Tools, `<untrusted_content>`-Wrapping fremder Bodies.
+Noch kein Netz nach außen (kein Tunnel, das ist P3). Plan: `docs/concepts/phase2_mcp_plan.md`
+(Entscheidungen P2-A–P2-N gelockt, Steps 0–7). Herkunft/Contract:
+`docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md`. Phase-Head: `phase2_mcp/CLAUDE.md`.
+
+**Phase 1 — Storage-Kern** (`phase1_storage/`, Paket `storage`): ✅ **abgeschlossen,
+live-verifiziert.** Alle acht Module (Steps 0–7), 68 Tests grün (70 bei Phasenabschluss, minus
+zwei bei Entfernung toten Codes in P2 Step 0 — siehe `phase1_storage/CLAUDE.md`) —
+Frontmatter/Modelle, atomarer Datei-Store, SQLite-Index, Versionierung + Konfliktbehandlung,
+Git-Commit je Write, Query-Layer, `space_cli.py` als Beweis. Der Nikinger hat den Lauf gegen den
+echten `DATA_ROOT` (`/home/savefyx/savefyx-data`) selbst ausgeführt (2026-07-25, Hard Rule: kein
+Test gegen den echten DATA_ROOT durch Claude Code). Details + Transkript:
+`phase1_storage/CLAUDE.md`, Session-Block. Plan: `docs/concepts/phase1_storage_plan.md`
+(Entscheidungen A–H gelockt, Steps 0–7). Die dort definierten Frontmatter-Felder und
+`Store`-Signaturen sind ab jetzt Contract für P2 (drei einmalige, freigegebene Erweiterungen in
+P2 Step 2 — siehe P2-Plan §0.4 Punkt L).
 
 **Gelockte Rahmenentscheidungen (Nikinger, 2026-07-24, Browser-Planung):**
 
