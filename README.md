@@ -72,6 +72,20 @@ Es wird nie in dieses Repo eingecheckt.
 `LoadCredential`. Nicht in `.env`, nicht in einer Config, nicht in einer Shell-Variable. Wenn
 irgendwo in diesem Projekt ein Token in einer Datei auftaucht, ist das ein Incident.
 
+## Token ausgeben, rotieren, widerrufen
+
+```bash
+python phase2_mcp/scripts/issue_token.py --space nikinger    # neues Token ausgeben
+python phase2_mcp/scripts/issue_token.py --list              # Spaces + gekürzte Hashes
+python phase2_mcp/scripts/issue_token.py --revoke nikinger   # alle Tokens dieses Space widerrufen
+```
+
+**Das Token wird genau einmal angezeigt** — direkt nach `--space` auf stdout, kein zweites Mal
+abrufbar. Der Keyring speichert nur den sha256-Hash, nie das Token selbst. Wenn ein Token
+verloren geht: neu ausgeben (`--space`), den alten Hash mit `--revoke` entfernen, danach die
+Connector-URL in Claude aktualisieren (der alte Pfad-Token funktioniert ab dem Revoke nicht
+mehr).
+
 ## Bewusst akzeptierte Kompromisse
 
 Damit sie niemand später „entdeckt" und für einen Bug hält:

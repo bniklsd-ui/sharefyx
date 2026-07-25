@@ -62,6 +62,8 @@ und er importiert Prompt-Injection direkt in den Speicherpfad.
    YAML oder Config. Space-Tokens und Tunnel-Credentials leben ausschließlich im OS-Keyring
    (Service `nikinger-space`) bzw. als systemd `LoadCredential`. Zugriff über
    `storage/credentials.py`. Ein Token in einem Commit ist ein Incident, kein Schönheitsfehler.
+   **[2026-07-25 Korrektur, P2 Step 3]:** `storage/credentials.py` wurde nie gebaut — der
+   reale Pfad ist `phase2_mcp/mcpserver/credentials.py`. Die Regel selbst bleibt unverändert.
 
 2. **Dateien sind die Wahrheit, der Index ist Ableitung.** SQLite darf jederzeit gelöscht und
    aus den `.md`-Dateien vollständig rekonstruiert werden. Nie umgekehrt. Wer den Index als

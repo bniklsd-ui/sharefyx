@@ -77,15 +77,16 @@ Fehlerabbildung mit handlungsfähigem Text (N).
 | 1 | Haushalt, Verifikationsdurchlauf, Rotationsregel operationalisiert | 0 | ✅ | 0 (kein Feature-Code) |
 | 2 | Paketgerüst `phase2_mcp/`, `mcpserver/config.py` | 1 | ✅ | 3 |
 | 3 | P1-Contract-Erweiterungen (`space_of`, `repair_drift`, Statusvalidierung) | 2 | ✅ | 8 (in `phase1_storage/tests/`) |
-| 4 | `credentials.py`, `scripts/issue_token.py` | 3 | ⬜ | — |
+| 4 | `credentials.py`, `scripts/issue_token.py` | 3 | 🟡 (code+Tests grün, echter Keyring-Roundtrip steht beim Nikinger aus) | 6 |
 | 5 | `auth.py`, `permissions.py`, `context.py`, `asgi.py`, `logging_setup.py` | 4 | ⬜ | — |
 | 6 | `server.py`, `app.py`, `scripts/serve.py` | 5 | ⬜ | — |
 | 7 | `tools.py` (die sechs Tools) | 6 | ⬜ | — |
 | 8 | `scripts/mcp_smoke.py`, Runbook, Größenmessung | 7 | ⬜ | — |
 
-**Gesamt: 3 Tests** (`test_config.py`) — dieser Head zählt nur `phase2_mcp/tests/`. Step 2 fügte
-acht weitere Tests in `phase1_storage/tests/` hinzu (siehe Modul-Status Zeile 3 und
-`phase1_storage/CLAUDE.md`), die dort mitgezählt werden, nicht hier.
+**Gesamt: 9 Tests** in `phase2_mcp/tests/` (3 `test_config.py` + 6 `test_credentials.py`, alle
+gegen einen gefakten Keyring-Backend — siehe Session-Block unten). Acht weitere Tests aus Step 2
+liegen in `phase1_storage/tests/` (siehe Modul-Status Zeile 3 und `phase1_storage/CLAUDE.md`),
+werden dort mitgezählt, nicht hier.
 
 ## Geerbte Contracts
 
@@ -106,14 +107,15 @@ das zählt als Bestätigung durch die Browser-Planungssession mit dem Nikinger. 
 explizit vermerkt: **gilt als bestätigt, wenn der Nikinger nicht widerspricht** (siehe
 Step-0-Session-Block unten).
 
-**Warum nur Hashes im Keyring** (vorgezogen aus Plan §2.3, wird in Step 3 mit Code belegt): der
-Server muss ein Token nur *wiedererkennen*, nie *vorzeigen*. Wer diese Eigenschaft aufgibt, um
-„das Token nochmal anzeigen" zu können, macht aus dem Keyring eine Passwortliste.
+**Warum nur Hashes im Keyring** (Plan §2.3, seit Step 3 in `mcpserver/credentials.py` real
+umgesetzt): der Server muss ein Token nur *wiedererkennen*, nie *vorzeigen*. `issue()` gibt das
+Token genau einmal zurück; ab dann existiert im Keyring nur noch
+`{sha256(token): space}`. Wer diese Eigenschaft aufgibt, um „das Token nochmal anzeigen" zu
+können, macht aus dem Keyring eine Passwortliste.
 
-**Was der Pfad-Token nicht ist** (vorgezogen aus Plan §2.3): kein OAuth-Ersatz, kein Schutz
-gegen Cloudflare (R4 — Cloudflare sieht bei P3 ohnehin Klartext), gültig bis P3+1. Siehe
-P2-Plan §0.3 für die Begründung, warum OAuth trotzdem hinter P3 bleibt statt vorgezogen zu
-werden.
+**Was der Pfad-Token nicht ist** (Plan §2.3): kein OAuth-Ersatz, kein Schutz gegen Cloudflare
+(R4 — Cloudflare sieht bei P3 ohnehin Klartext), gültig bis P3+1. Siehe P2-Plan §0.3 für die
+Begründung, warum OAuth trotzdem hinter P3 bleibt statt vorgezogen zu werden.
 
 **`version` in fremden Spaces** (Plan §3.4): `get(..., repair_drift=)` existiert seit Step 2 im
 Store; genutzt wird es ab Step 6 (`tools.py :: get_item`, §3.4). Dort ist `version` in fremden
@@ -121,34 +123,47 @@ Spaces informativ, nicht autoritativ — es gibt dort per Architektur keine Writ
 
 ---
 
-## Session stopped — 2026-07-25 (Step 2: P1-Contract-Erweiterungen)
+## Session stopped — 2026-07-25 (Step 3: Credentials + Token-Ausgabe)
 
-**Ergebnis:** Die drei vom Nikinger freigegebenen, einmaligen Erweiterungen (Plan §0.4 Punkt L,
-§4 Step 2) in `phase1_storage/storage/` eingebracht:
-- `models.py`: `STATUS_VALUES` (Statusvokabular je `type`) + `valid_statuses()`.
-- `store.py`: neuer Helper `_check_type_and_status()`, aufgerufen aus `create()` und `update()`
-  — wirft `ValidationError` bei unbekanntem `type` oder unerlaubtem `status` (D2).
-- `store.py :: space_of(item_id)` — reiner Index-Lookup, kein Datei-Read, `ItemNotFound` bei
-  unbekannter ID.
-- `store.py :: get(item_id, *, repair_drift=True)` + `_reconcile_and_get_row(...,
-  repair_drift=True)` — bei `repair_drift=False` und erkannter Drift wird nur der Index
-  nachgezogen, kein Frontmatter-Rewrite, kein Git-Commit (D3). Default `True` lässt jedes
-  bestehende P1-Verhalten unverändert.
+**Ergebnis:** `mcpserver/credentials.py` (`KEYRING_SERVICE = "nikinger-space"`,
+`KEYRING_KEY_SPACES = "spaces"`, `generate_token()` → `secrets.token_urlsafe(32)`,
+`hash_token()` → sha256-Hex, `load_space_map()`/`save_space_map()`, `issue(space) -> str`,
+`revoke(space) -> int`). `keyring` wird ausschließlich in diesem Modul importiert. Im Keyring
+liegt nur `{sha256(token): space}` — kein umkehrbares Geheimnis. `phase2_mcp/scripts/
+issue_token.py` (`--space`/`--revoke`/`--list`, mutually exclusive): das Token ist das
+**einzige** stdout dieses Skripts, und nur beim Ausgeben; alles andere (Warnhinweis, Revoke-
+Bestätigung, die Listing-Zeilen) geht auf stderr (Hard Rule 7 — hier besonders eng ausgelegt,
+weil das Skript mit dem Geheimnis selbst hantiert).
 
-**Details, Code-Anker und die vollständige Begründung stehen in `phase1_storage/CLAUDE.md`**
-unter „Geerbte Contracts" (Code-nah, nicht hier dupliziert — Vorgabe aus diesem Head selbst,
-„Was hier bewusst NICHT steht").
+**Verifiziert (live):** sechs neue Tests in `phase2_mcp/tests/test_credentials.py`
+(`test_hash_token_is_stable_hex64`, `test_generate_token_length_and_uniqueness`,
+`test_load_space_map_missing_key_returns_empty`, `test_save_load_roundtrip_with_fake_backend`,
+`test_issue_stores_only_hash`, `test_revoke_removes_all_hashes_of_space`) — alle gegen einen per
+`monkeypatch` gefakten `keyring.get_password`/`set_password` (In-Memory-Dict), fassen den
+echten Keyring nie an. `test_issue_stores_only_hash` prüft explizit, dass weder das Klartext-
+Token noch irgendein Wert der Map dem Token entspricht — nur der Hash. `pytest -v` →
+**85/85 grün** (76 P1 + 9 P2, davon 3 `test_config.py` + 6 `test_credentials.py`).
 
-**Verifiziert (live):** acht neue Tests in `phase1_storage/tests/test_store.py`
-(`test_space_of_returns_space`, `test_space_of_unknown_raises_item_not_found`,
-`test_get_repair_drift_false_leaves_file_untouched`, `test_get_repair_drift_false_creates_no_commit`,
-`test_get_repair_drift_true_still_bumps`, `test_create_rejects_unknown_status`,
-`test_update_rejects_unknown_status`, `test_update_accepts_valid_status_per_type`). Gesamtsuite
-`pytest -v` → **79/79 grün** (76 in `phase1_storage/tests/` inkl. dieser acht, 3 in
-`phase2_mcp/tests/`). Keine bestehende P1-Test musste angepasst werden — die einzigen
-Store-Aufrufe mit explizitem `status=` in `test_store.py` (`status="open"` auf einem `task`,
-`status="done"` auf einem `task`) waren bereits typkonform.
+**V5 — Status nach diesem Schritt:** `keyring --list-backends` zeigt weiterhin
+`SecretService.Keyring` (Priorität 5) als real installiertes Backend (aus Step 1). Ein echter
+Schreib-/Lese-Roundtrip **gegen dieses Backend** (nicht den Test-Fake) wurde von mir bewusst
+**nicht** ausgeführt — das würde in den echten, produktiven Keyring-Eintrag unter Service
+`nikinger-space` schreiben, denselben, den P3 später für den echten Connector benutzt. Das ist
+strukturell derselbe Fall wie „nie gegen den echten `DATA_ROOT` testen": ein echtes Secret in
+einem echten System-Backend ist kein Objekt für einen Probe-Write durch Claude Code. **Modul-
+Status Zeile 4 bleibt deshalb 🟡, nicht ✅**, bis der Nikinger einmal real
+`python phase2_mcp/scripts/issue_token.py --space nikinger` laufen lässt und das Ergebnis
+bestätigt (Token erscheint auf stdout, `--list` zeigt danach den Space mit gekürztem Hash).
 
-**Nächster Schritt (konkret):** Step 3 — `credentials.py` + `scripts/issue_token.py`. Braucht
-eine Nikinger-Rückmeldung, sobald der finale Funktionstest (`keyring`-Wert schreiben und
-zurücklesen) gelaufen ist — V5 ist bis dahin „vielversprechend", nicht „bestätigt".
+**Doku-Pflichten aus Plan §2.3, im selben Commit:** `README.md` — neuer Abschnitt „Token
+ausgeben, rotieren, widerrufen" (die drei Kommandos, „genau einmal angezeigt", Vorgehen bei
+Verlust). Root-`CLAUDE.md` Hard Rule 1 — datierte Korrekturnotiz (`storage/credentials.py`
+wurde nie gebaut, realer Pfad ist `phase2_mcp/mcpserver/credentials.py`; die Regel selbst
+unverändert). Dieser Head — die beiden vorgezogenen Absätze „Warum nur Hashes im Keyring" und
+„Was der Pfad-Token nicht ist" von „vorgezogen, Step 3 liefert Code" auf den realen Codestand
+aktualisiert.
+
+**Nächster Schritt (konkret):** Step 4 — `auth.py`, `permissions.py`, `context.py`, `asgi.py`,
+`logging_setup.py`. Kein Keyring-Zugriff dort direkt (nur über injizierte `load_map`), also kein
+weiterer V5-Haltepunkt nötig — der steht weiterhin offen, bis der Nikinger den echten Roundtrip
+bestätigt.

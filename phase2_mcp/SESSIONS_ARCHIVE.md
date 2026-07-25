@@ -8,6 +8,38 @@ updated: 2026-07-25
 ---
 # Session-Archiv — Phase 2 MCP-Server
 
+## Session stopped — 2026-07-25 (Step 2: P1-Contract-Erweiterungen)
+
+**Ergebnis:** Die drei vom Nikinger freigegebenen, einmaligen Erweiterungen (Plan §0.4 Punkt L,
+§4 Step 2) in `phase1_storage/storage/` eingebracht:
+- `models.py`: `STATUS_VALUES` (Statusvokabular je `type`) + `valid_statuses()`.
+- `store.py`: neuer Helper `_check_type_and_status()`, aufgerufen aus `create()` und `update()`
+  — wirft `ValidationError` bei unbekanntem `type` oder unerlaubtem `status` (D2).
+- `store.py :: space_of(item_id)` — reiner Index-Lookup, kein Datei-Read, `ItemNotFound` bei
+  unbekannter ID.
+- `store.py :: get(item_id, *, repair_drift=True)` + `_reconcile_and_get_row(...,
+  repair_drift=True)` — bei `repair_drift=False` und erkannter Drift wird nur der Index
+  nachgezogen, kein Frontmatter-Rewrite, kein Git-Commit (D3). Default `True` lässt jedes
+  bestehende P1-Verhalten unverändert.
+
+**Details, Code-Anker und die vollständige Begründung stehen in `phase1_storage/CLAUDE.md`**
+unter „Geerbte Contracts" (Code-nah, nicht hier dupliziert — Vorgabe aus diesem Head selbst,
+„Was hier bewusst NICHT steht").
+
+**Verifiziert (live):** acht neue Tests in `phase1_storage/tests/test_store.py`
+(`test_space_of_returns_space`, `test_space_of_unknown_raises_item_not_found`,
+`test_get_repair_drift_false_leaves_file_untouched`, `test_get_repair_drift_false_creates_no_commit`,
+`test_get_repair_drift_true_still_bumps`, `test_create_rejects_unknown_status`,
+`test_update_rejects_unknown_status`, `test_update_accepts_valid_status_per_type`). Gesamtsuite
+`pytest -v` → **79/79 grün** (76 in `phase1_storage/tests/` inkl. dieser acht, 3 in
+`phase2_mcp/tests/`). Keine bestehende P1-Test musste angepasst werden — die einzigen
+Store-Aufrufe mit explizitem `status=` in `test_store.py` (`status="open"` auf einem `task`,
+`status="done"` auf einem `task`) waren bereits typkonform.
+
+**Nächster Schritt (konkret):** Step 3 — `credentials.py` + `scripts/issue_token.py`. Braucht
+eine Nikinger-Rückmeldung, sobald der finale Funktionstest (`keyring`-Wert schreiben und
+zurücklesen) gelaufen ist — V5 ist bis dahin „vielversprechend", nicht „bestätigt".
+
 ## Session stopped — 2026-07-25 (Step 1: Paketgerüst)
 
 **Ergebnis:** `phase2_mcp/pyproject.toml` (Paket `mcpserver`, spiegelt
