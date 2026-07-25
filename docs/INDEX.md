@@ -31,9 +31,9 @@ updated: 2026-07-25
 
 ## Active phase (2 — MCP-Server)
 
-- [phase2_mcp/CLAUDE.md](../phase2_mcp/CLAUDE.md) — 🔄 ~12KB · phase head; Steps 0–3 ✅ (Step 3 inkl. echtem Keyring-Roundtrip + Token-Rotationsvorfall, vom Nikinger bestätigt), Steps 4–7 offen; read + newest Session-stopped block first
+- [phase2_mcp/CLAUDE.md](../phase2_mcp/CLAUDE.md) — 🔄 ~12KB · phase head; Steps 0–4 ✅, Steps 5–7 offen; read + newest Session-stopped block first
 - [docs/concepts/phase2_mcp_plan.md](./concepts/phase2_mcp_plan.md) — 📕 ~46KB · ausführungsreifer P2-Plan (Entscheidungen P2-A–P2-N, Steps 0–7); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
-- [phase2_mcp/SESSIONS_ARCHIVE.md](../phase2_mcp/SESSIONS_ARCHIVE.md) — 📦 ~11.5KB · drei archivierte Session-Blöcke (Step 0–2), verbatim, newest-first
+- [phase2_mcp/SESSIONS_ARCHIVE.md](../phase2_mcp/SESSIONS_ARCHIVE.md) — 📦 ~16KB · vier archivierte Session-Blöcke (Step 0–3), verbatim, newest-first
 
 ## Completed phases
 

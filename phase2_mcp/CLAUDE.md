@@ -78,15 +78,15 @@ Fehlerabbildung mit handlungsfähigem Text (N).
 | 2 | Paketgerüst `phase2_mcp/`, `mcpserver/config.py` | 1 | ✅ | 3 |
 | 3 | P1-Contract-Erweiterungen (`space_of`, `repair_drift`, Statusvalidierung) | 2 | ✅ | 8 (in `phase1_storage/tests/`) |
 | 4 | `credentials.py`, `scripts/issue_token.py` | 3 | ✅ (echter Keyring-Roundtrip vom Nikinger bestätigt) | 6 |
-| 5 | `auth.py`, `permissions.py`, `context.py`, `asgi.py`, `logging_setup.py` | 4 | ⬜ | — |
+| 5 | `auth.py`, `permissions.py`, `context.py`, `asgi.py`, `logging_setup.py` | 4 | ✅ | 14 |
 | 6 | `server.py`, `app.py`, `scripts/serve.py` | 5 | ⬜ | — |
 | 7 | `tools.py` (die sechs Tools) | 6 | ⬜ | — |
 | 8 | `scripts/mcp_smoke.py`, Runbook, Größenmessung | 7 | ⬜ | — |
 
-**Gesamt: 9 Tests** in `phase2_mcp/tests/` (3 `test_config.py` + 6 `test_credentials.py`, alle
-gegen einen gefakten Keyring-Backend — siehe Session-Block unten). Acht weitere Tests aus Step 2
-liegen in `phase1_storage/tests/` (siehe Modul-Status Zeile 3 und `phase1_storage/CLAUDE.md`),
-werden dort mitgezählt, nicht hier.
+**Gesamt: 23 Tests** in `phase2_mcp/tests/` (3 `test_config.py` + 6 `test_credentials.py` + 4
+`test_auth.py` + 3 `test_permissions.py` + 1 `test_logging.py` + 2 `test_context.py` + 4
+`test_asgi.py`). Acht weitere Tests aus Step 2 liegen in `phase1_storage/tests/` (siehe
+Modul-Status Zeile 3 und `phase1_storage/CLAUDE.md`), werden dort mitgezählt, nicht hier.
 
 ## Geerbte Contracts
 
@@ -123,64 +123,67 @@ Spaces informativ, nicht autoritativ — es gibt dort per Architektur keine Writ
 
 ---
 
-## Session stopped — 2026-07-25 (Step 3: Credentials + Token-Ausgabe)
+## Session stopped — 2026-07-25 (Step 4: Auth, Rechte, Request-Kontext)
 
-**Ergebnis:** `mcpserver/credentials.py` (`KEYRING_SERVICE = "nikinger-space"`,
-`KEYRING_KEY_SPACES = "spaces"`, `generate_token()` → `secrets.token_urlsafe(32)`,
-`hash_token()` → sha256-Hex, `load_space_map()`/`save_space_map()`, `issue(space) -> str`,
-`revoke(space) -> int`). `keyring` wird ausschließlich in diesem Modul importiert. Im Keyring
-liegt nur `{sha256(token): space}` — kein umkehrbares Geheimnis. `phase2_mcp/scripts/
-issue_token.py` (`--space`/`--revoke`/`--list`, mutually exclusive): das Token ist das
-**einzige** stdout dieses Skripts, und nur beim Ausgeben; alles andere (Warnhinweis, Revoke-
-Bestätigung, die Listing-Zeilen) geht auf stderr (Hard Rule 7 — hier besonders eng ausgelegt,
-weil das Skript mit dem Geheimnis selbst hantiert).
+**Ergebnis:** `auth.py` (`Principal` frozen dataclass mit gekürztem `__repr__`,
+`AuthError`, `SpaceResolver`-Protokoll, `KeyringTokenResolver` mit injiziertem `load_map`,
+Dict-Lookup über `sha256(credential)`), `permissions.py` (`Permissions`-Protokoll,
+`OwnSpaceWritable`), `logging_setup.py` (`configure_logging()`, `TokenScrubbingFilter` —
+ersetzt `/mcp/<segment>` durch `/mcp/<redacted>` in Message **und** Args), `context.py` +
+`asgi.py` (`TokenPathASGI`, Details siehe **wichtiger Fund** unten).
 
-**Verifiziert (live):** sechs neue Tests in `phase2_mcp/tests/test_credentials.py`
-(`test_hash_token_is_stable_hex64`, `test_generate_token_length_and_uniqueness`,
-`test_load_space_map_missing_key_returns_empty`, `test_save_load_roundtrip_with_fake_backend`,
-`test_issue_stores_only_hash`, `test_revoke_removes_all_hashes_of_space`) — alle gegen einen per
-`monkeypatch` gefakten `keyring.get_password`/`set_password` (In-Memory-Dict), fassen den
-echten Keyring nie an. `test_issue_stores_only_hash` prüft explizit, dass weder das Klartext-
-Token noch irgendein Wert der Map dem Token entspricht — nur der Hash. `pytest -v` →
-**85/85 grün** (76 P1 + 9 P2, davon 3 `test_config.py` + 6 `test_credentials.py`).
+**V3 aufgelöst:** `fastmcp.server.dependencies.get_http_request` importiert sauber gegen das
+echte `fastmcp==3.4.4` — der im Plan dokumentierte Importpfad stimmt, `fastmcp.dependencies.
+CurrentRequest()` ist eine andere (Dependency-Injection-)API für denselben Zweck, nicht die
+hier gebrauchte direkte Funktion.
 
-**V5 — Status nach diesem Schritt:** `keyring --list-backends` zeigt weiterhin
-`SecretService.Keyring` (Priorität 5) als real installiertes Backend (aus Step 1). Ein echter
-Schreib-/Lese-Roundtrip **gegen dieses Backend** (nicht den Test-Fake) wurde von mir bewusst
-**nicht** ausgeführt — das würde in den echten, produktiven Keyring-Eintrag unter Service
-`nikinger-space` schreiben, denselben, den P3 später für den echten Connector benutzt. Das ist
-strukturell derselbe Fall wie „nie gegen den echten `DATA_ROOT` testen": ein echtes Secret in
-einem echten System-Backend ist kein Objekt für einen Probe-Write durch Claude Code. **Modul-
-Status Zeile 4 bleibt deshalb 🟡, nicht ✅**, bis der Nikinger einmal real
-`python phase2_mcp/scripts/issue_token.py --space nikinger` laufen lässt und das Ergebnis
-bestätigt (Token erscheint auf stdout, `--list` zeigt danach den Space mit gekürztem Hash).
+**Wichtiger Fund (empirisch, nicht nur gelesen) — §2.4 ist an einer Stelle nicht umsetzbar wie
+geschrieben:** Der Plan beschreibt `assert_principal_matches_request()` als „zieht das
+Token-Segment aus dessen Pfad". Das geht nicht: `TokenPathASGI` muss das Token-Segment aus dem
+Pfad entfernen, **bevor** es an die innere FastMCP-App delegiert (sonst sieht FastMCPs eigenes
+Routing das Segment als Teil des MCP-Pfads und die Anfrage schlägt fehl). Ein Tool, das während
+seiner Ausführung `get_http_request().url.path` liest, sieht deshalb nur noch den bereinigten
+Pfad.
 
-**Nachtrag (Nikinger-Bestätigung + Incident, 2026-07-25):** Der Nikinger hat den echten Roundtrip
-gefahren. **V5 damit vollständig bestätigt** — `issue_token.py --space nikinger` lief gegen das
-echte `SecretService`-Backend, Token erschien einmalig auf stdout, `--list` zeigte danach
-`nikinger: <hash-prefix>…` auf stderr. Modul-Status Zeile 4 auf ✅ gehoben.
+Zwei ASGI-Mounting-Techniken gegen ein echtes `fastmcp==3.4.4` + `starlette`-Setup
+(`httpx.ASGITransport`/`starlette.testclient.TestClient`) durchprobiert:
+1. **`root_path`-Akkumulation** (Starlettes eigene Technik, `scope["path"]` bleibt unverändert,
+   nur `root_path` wächst) — scheitert an `redirect_slashes`: ein Credential-Segment ohne
+   nachfolgenden Pfad lässt `route_path` leer statt `"/"` werden, Starlette antwortet mit 307
+   auf eine URL mit angehängtem `/`, bevor die innere App je läuft.
+2. **Direkte `path`/`raw_path`-Kürzung** (Plan-Wortlaut) — funktioniert für das Routing
+   (kein Redirect, Tool wird aufgerufen), aber `get_http_request().url.path` liefert dann
+   nachweislich `"/mcp/"`, nicht das Token — bestätigt das Problem oben empirisch, nicht nur
+   theoretisch.
 
-**Incident, kein stiller Vorbeigang:** Der erste Testlauf wurde vom Nikinger komplett samt
-Klartext-Token in den Chat eingefügt — nicht nur der Hash, das Bearer-Token selbst landete damit
-in einer Konversation außerhalb des Keyrings, strukturell gleichwertig zu „Token in einem
-Commit" (Hard Rule 1: Incident, kein Schönheitsfehler). Sofort erkannt und gemeldet, statt
-stillschweigend weiterzumachen. **Behoben durch Rotation:** der Nikinger hat
-`--revoke nikinger` (1 Token entfernt) gefolgt von einem neuen `--space nikinger` ausgeführt und
-das neue Token diesmal **nicht** in den Chat eingefügt, sondern lokal in
-`../nikinger only/bearer_token.md` (außerhalb dieses Code-Repos, nicht Teil von `DATA_ROOT`
-oder eines Git-Trackings hier) abgelegt. `--list` bestätigt genau einen aktuellen Eintrag für
-`nikinger`. Für künftige Sessions: **Klartext-Tokens gehören nie in den Chat-Verlauf**, auch
-nicht „nur zum Testen" — dieselbe Regel wie für Commits.
+**Lösung:** `TokenPathASGI` hinterlegt `token_hash` in `scope["state"]`, **bevor** es den Pfad
+kürzt (Technik 2 bleibt fürs Routing). `scope["state"]` überlebt die Weiterleitung unverändert —
+Starlettes offizieller Mechanismus, um Zustand über eine ASGI-Kette hinweg mitzugeben, per
+Testprobe bestätigt: `request.state.token_hash` kam im Tool korrekt an. Die
+Sicherheitseigenschaft ist identisch zur Plan-Absicht: der Guard vergleicht „was hat unsere
+eigene ASGI-Schicht für DIESEN Request aufgelöst" (`scope["state"]["token_hash"]`, gesetzt von
+`TokenPathASGI`) gegen „was liefert `get_http_request()` gerade zurück" (`current_principal()`
+aus dem ContextVar) und schlägt bei jeder Abweichung laut fehl (`AuthError`) — nicht mehr über
+den Pfad, aber mit derselben Garantie. Vollständige Begründung im Docstring von `context.py`.
+**Kein Test dafür in Step 4** (braucht einen echten laufenden Request-Kontext) — end-to-end
+geprüft in Step 5 über `test_app.py::test_principal_isolation_under_concurrency`.
 
-**Doku-Pflichten aus Plan §2.3, im selben Commit:** `README.md` — neuer Abschnitt „Token
-ausgeben, rotieren, widerrufen" (die drei Kommandos, „genau einmal angezeigt", Vorgehen bei
-Verlust). Root-`CLAUDE.md` Hard Rule 1 — datierte Korrekturnotiz (`storage/credentials.py`
-wurde nie gebaut, realer Pfad ist `phase2_mcp/mcpserver/credentials.py`; die Regel selbst
-unverändert). Dieser Head — die beiden vorgezogenen Absätze „Warum nur Hashes im Keyring" und
-„Was der Pfad-Token nicht ist" von „vorgezogen, Step 3 liefert Code" auf den realen Codestand
-aktualisiert.
+**Verifiziert (live):** 14 neue Tests (`test_auth.py` ×4, `test_permissions.py` ×3,
+`test_logging.py` ×1, `test_context.py` ×2 — nicht im Plan gefordert, aber `current_principal`/
+`set_principal`/`reset_principal` sind eigenständige, netzunabhängige Logik —,
+`test_asgi.py` ×4 gegen einen Fake-Resolver + Fake-Innen-App, keine echte FastMCP-App nötig für
+diese Schicht). `pytest -v` → **99/99 grün** (76 P1 + 23 P2). `test_principal_reset_after_request`
+bestätigt: nach dem Request wirft `current_principal()` wieder `AuthError` — kein Leck zwischen
+Requests.
 
-**Nächster Schritt (konkret):** Step 4 — `auth.py`, `permissions.py`, `context.py`, `asgi.py`,
-`logging_setup.py`. Kein Keyring-Zugriff dort direkt (nur über injizierte `load_map`), also kein
-weiterer V5-Haltepunkt nötig — der steht weiterhin offen, bis der Nikinger den echten Roundtrip
-bestätigt.
+**Anmerkung des Advisors, hier festgehalten statt in Step 6 neu zu entdecken:** P2-N sagt
+„`AuthError` → HTTP 401, nie ein Tool-Fehler". Der Guard läuft aber *innerhalb* eines
+Tool-Aufrufs (§3.3 Schritt 2) — das 401-Fenster ist zu diesem Zeitpunkt vorbei, ein
+Guard-`AuthError` muss also zwangsläufig als Tool-Fehler auftauchen. Das ist kein Defekt (immer
+noch fail-closed, keine fremden Daten), aber `map_storage_error()` in Step 6 muss diese
+Abbildung bewusst treffen, nicht zufällig.
+
+**Nächster Schritt (konkret):** Step 5 — `server.py`, `app.py`, `scripts/serve.py`. Das ist die
+Stelle, an der `TokenPathASGI` erstmals gegen eine echte FastMCP-App läuft — V4 (`Mount`-
+Verhalten) und der `assert_principal_matches_request()`-Guard werden dort erstmals end-to-end
+statt isoliert geprüft.
