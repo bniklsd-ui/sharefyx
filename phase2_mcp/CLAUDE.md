@@ -77,7 +77,7 @@ Fehlerabbildung mit handlungsfähigem Text (N).
 | 1 | Haushalt, Verifikationsdurchlauf, Rotationsregel operationalisiert | 0 | ✅ | 0 (kein Feature-Code) |
 | 2 | Paketgerüst `phase2_mcp/`, `mcpserver/config.py` | 1 | ✅ | 3 |
 | 3 | P1-Contract-Erweiterungen (`space_of`, `repair_drift`, Statusvalidierung) | 2 | ✅ | 8 (in `phase1_storage/tests/`) |
-| 4 | `credentials.py`, `scripts/issue_token.py` | 3 | 🟡 (code+Tests grün, echter Keyring-Roundtrip steht beim Nikinger aus) | 6 |
+| 4 | `credentials.py`, `scripts/issue_token.py` | 3 | ✅ (echter Keyring-Roundtrip vom Nikinger bestätigt) | 6 |
 | 5 | `auth.py`, `permissions.py`, `context.py`, `asgi.py`, `logging_setup.py` | 4 | ⬜ | — |
 | 6 | `server.py`, `app.py`, `scripts/serve.py` | 5 | ⬜ | — |
 | 7 | `tools.py` (die sechs Tools) | 6 | ⬜ | — |
@@ -154,6 +154,23 @@ einem echten System-Backend ist kein Objekt für einen Probe-Write durch Claude 
 Status Zeile 4 bleibt deshalb 🟡, nicht ✅**, bis der Nikinger einmal real
 `python phase2_mcp/scripts/issue_token.py --space nikinger` laufen lässt und das Ergebnis
 bestätigt (Token erscheint auf stdout, `--list` zeigt danach den Space mit gekürztem Hash).
+
+**Nachtrag (Nikinger-Bestätigung + Incident, 2026-07-25):** Der Nikinger hat den echten Roundtrip
+gefahren. **V5 damit vollständig bestätigt** — `issue_token.py --space nikinger` lief gegen das
+echte `SecretService`-Backend, Token erschien einmalig auf stdout, `--list` zeigte danach
+`nikinger: <hash-prefix>…` auf stderr. Modul-Status Zeile 4 auf ✅ gehoben.
+
+**Incident, kein stiller Vorbeigang:** Der erste Testlauf wurde vom Nikinger komplett samt
+Klartext-Token in den Chat eingefügt — nicht nur der Hash, das Bearer-Token selbst landete damit
+in einer Konversation außerhalb des Keyrings, strukturell gleichwertig zu „Token in einem
+Commit" (Hard Rule 1: Incident, kein Schönheitsfehler). Sofort erkannt und gemeldet, statt
+stillschweigend weiterzumachen. **Behoben durch Rotation:** der Nikinger hat
+`--revoke nikinger` (1 Token entfernt) gefolgt von einem neuen `--space nikinger` ausgeführt und
+das neue Token diesmal **nicht** in den Chat eingefügt, sondern lokal in
+`../nikinger only/bearer_token.md` (außerhalb dieses Code-Repos, nicht Teil von `DATA_ROOT`
+oder eines Git-Trackings hier) abgelegt. `--list` bestätigt genau einen aktuellen Eintrag für
+`nikinger`. Für künftige Sessions: **Klartext-Tokens gehören nie in den Chat-Verlauf**, auch
+nicht „nur zum Testen" — dieselbe Regel wie für Commits.
 
 **Doku-Pflichten aus Plan §2.3, im selben Commit:** `README.md` — neuer Abschnitt „Token
 ausgeben, rotieren, widerrufen" (die drei Kommandos, „genau einmal angezeigt", Vorgehen bei
