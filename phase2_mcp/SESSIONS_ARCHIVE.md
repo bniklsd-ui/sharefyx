@@ -4,9 +4,95 @@ purpose: Archiv älterer Session-stopped-Blöcke aus phase2_mcp/CLAUDE.md, newes
 read-when: Audit vergangener Sessions dieser Phase; NICHT für normalen Session-Start
 detail: L3
 up: CLAUDE.md
-updated: 2026-07-26 (Step 7)
+updated: 2026-07-26 (Step 7 archiviert)
 ---
 # Session-Archiv — Phase 2 MCP-Server
+
+## Session stopped — 2026-07-26 (Step 7: Smoke-Test, Messung, Runbook)
+
+**Ergebnis:** `phase2_mcp/scripts/mcp_smoke.py` — Gegenstück zu `space_cli.py` aus P1. Baut ein
+**temporäres** `DATA_ROOT` (`tempfile.TemporaryDirectory`, nie das echte), zwei Fixture-Spaces
+(`alpha`/`beta`), startet `create_app()` in-process über `httpx.ASGITransport` (kein echter
+Port, kein Netz — dasselbe Muster wie `test_app.py`) und fährt alle acht Prüfpunkte aus dem
+Plan durch: `list_spaces`, `create_item` ×3, `search_items`, `get_item` eigen/fremd, ein
+`update_item`-Konflikt, `append_to_item`, `update_item(status=archived)`, ein `update_item` auf
+einen fremden Space. `--json` für maschinenlesbare Ausgabe, sonst Textreport; Exit-Code `1` bei
+jeder fehlgeschlagenen Prüfung. README bekam den Abschnitt „MCP-Server smoke-testen", der
+Phase-Head diesen hier stehenden Runbook-Abschnitt „Quick-Tunnel-Probe" (oben, dauerhaft, nicht
+nur im Session-Block — der Tunnel-Schritt selbst bleibt außerhalb des Repos).
+
+**Kein echter Keyring, bewusst:** `mcp_smoke.py` importiert `keyring` nicht direkt — die beiden
+Tokens entstehen über `credentials.generate_token()`/`hash_token()` (reine Funktionen) und
+werden per injiziertem `load_map` in einen `KeyringTokenResolver` gereicht, exakt das Muster
+aus den Unit-Tests. Ein Skript, das beliebig oft laufen soll, darf die reale Token→Space-Map
+unter `nikinger-space` nicht anfassen. Empirisch geprüft (nicht nur behauptet): `load_space_map()`
+gegen den echten Keyring zeigt nach mehreren `mcp_smoke.py`-Läufen weiterhin nur den einen
+`nikinger`-Eintrag aus Step 3 — keine `alpha`/`beta`-Verschmutzung.
+
+**Ein echter Fund beim ersten Lauf, kein Advisor-Vorgriff:** `list_spaces` schlug beim ersten
+Durchlauf fehl (`Spaces=['beta']` statt beider). Ursache: `Store.list_spaces()` leitet Spaces
+ausschließlich aus vorhandenen Items ab (P1, keine separate Space-Registry) — `alpha` hatte zum
+Zeitpunkt des ersten `list_spaces`-Aufrufs (Plan-Reihenfolge: Prüfpunkt 1, vor jedem
+`create_item`) schlicht noch kein Item und war deshalb unsichtbar. Kein Bug in `tools.py`, ein
+Fixture-Fehler im Smoke-Skript: `alpha` bekommt jetzt denselben Seed-Eintrag wie `beta`, bevor
+die Prüfungen beginnen.
+
+**Automatisiert statt nur manuell bewiesen** (wie `space_cli.py` in P1 per Subprozess-Tests):
+`test_mcp_smoke.py` neu, 3 Tests, ruft `mcp_smoke.py` als echten Subprozess auf (kein Import —
+gleiche Begründung wie bei `space_cli.py`: Namenskollisionsgefahr über künftige Phasen hinweg,
+realistischste Prüfung). Prüft `--json`-Exit-Code 0 und dass alle Checks grün sind (Anzahl
+bewusst **nicht** hartkodiert — der Exit-Code trägt das Pass/Fail-Signal, ein `len(checks) ==
+N` würde bei jeder künftigen zusätzlichen Prüfung unnötig brechen), den Text-Report per Regex,
+und statisch (Quelltext-Grep), dass das Skript `keyring` nicht direkt importiert.
+
+**Advisor-Review vor dem Commit, ein Fund korrigiert (blockierend), zwei kleinere mitgenommen:**
+Die erste Fassung der Größenmessung maß `search_items` gegen nur 5 vorhandene Treffer (1058 B)
+— das beantwortet nicht die Frage, für die Step 7s eigenes Done-when eine Größentabelle
+verlangt: hält das Token-Budget bei einem **echten Default-Listing** (§5 Kriterium 5, 20 Items
+< 12 KB)? `mcp_smoke.py` seedet jetzt 17 zusätzliche Füll-Items mit realistischer Body-Länge
+(vor den drei `create_item`-Aufrufen, damit diese als jüngste Items sicher im ersten
+20er-Fenster bleiben) — `search_items` misst jetzt tatsächlich eine volle 20-Item-Seite.
+Kleinere Fixes im selben Aufwasch: der Subprozess-Test hartkodierte die Checkanzahl (`== 11`,
+siehe oben) und der YAML-Feld-Extraktor `_extract_field` bekam einen Kommentar zur stillen
+Reihenfolge-Abhängigkeit (Frontmatter kommt immer vor dem Body, deshalb gewinnt bei
+`re.search` nie eine zufällig gleichlautende Body-Zeile).
+
+**Größenmessung (Bytes je Antwort, Live-Lauf gegen ein temporäres `DATA_ROOT`):**
+
+| Operation | Bytes |
+|---|---|
+| `list_spaces` | 98 |
+| `create_item` #1 | 172 |
+| `create_item` #2 | 172 |
+| `create_item` #3 | 172 |
+| `search_items` (Default-Listing, 20 von 22 Treffern) | 6403 |
+| `get_item` (eigen) | 172 |
+| `get_item` (fremd, gewrappt) | 242 |
+| `update_item` (Konflikt) | 140 |
+| `append_to_item` | 183 |
+| `update_item` (archivieren) | 187 |
+| `update_item` (fremder Space, `write_denied`) | 65 |
+
+`search_items` bei 6403 B liegt klar unter dem §5-Budget (20 Items < 12 KB) — jetzt eine echte
+Antwort auf die Kriteriumsfrage, nicht nur ein Bestwert-Artefakt. Ergänzt, nicht ersetzt durch
+`test_tools.py::test_search_result_size_budget` (Step 6, 20/30-Item-Grenzfälle als
+Pass/Fail-Assertion in der Testsuite statt als gemeldete Zahl im Session-Block).
+
+**Verifiziert (live):** `pytest -v` → **132/132 grün** (76 P1 + 56 P2). `mcp_smoke.py` manuell
+ausgeführt (Text und `--json`, nach dem Advisor-Fix erneut), alle elf Prüfungen grün,
+temporäres Verzeichnis nach Lauf sauber entfernt (`ls /tmp/mcp_smoke_*` findet nichts mehr).
+
+**Phase 2 ist damit code-complete** (ROADMAP.md: 🟡). Fehlt für ✅ „live-verifiziert" (§5.9):
+die Quick-Tunnel-Probe durch den Nikinger (Runbook oben) — ein echter Read und ein echter Write
+über den Claude-Connector gegen den echten `DATA_ROOT`. Das ist die einzige verbleibende
+Handlung dieser Phase, die Claude Code nicht selbst ausführen darf (Hard Rule: kein Test gegen
+den echten `DATA_ROOT` durch Claude Code; Tunnel/Connector-Einrichtung ist ohnehin
+Nikinger-Sache).
+
+**Nächster Schritt (konkret):** Nikinger führt die Quick-Tunnel-Probe aus (Runbook oben) und
+meldet das Ergebnis. Danach: offizieller Phasenabschluss P2 (laut `docs/PROMPTS.md` als eigener
+Prompt im Browser-Webchat, analog zu Phase 1s Abschluss) — Status auf ✅, Handover-Dokument für
+P3 (Tunnel/systemd/Ops), neue Browser-Planungssession für Phase 3.
 
 ## Session stopped — 2026-07-26 (Step 6: Die sechs Tools)
 

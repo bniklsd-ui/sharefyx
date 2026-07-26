@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-07-25
+updated: 2026-07-26
 ---
 # Doc Index (L0)
 
@@ -31,9 +31,10 @@ updated: 2026-07-25
 
 ## Active phase (2 — MCP-Server)
 
-- [phase2_mcp/CLAUDE.md](../phase2_mcp/CLAUDE.md) — 🔄 ~18KB · phase head; Steps 0–7 ✅ (code-complete, Quick-Tunnel-Probe durch den Nikinger noch offen); read + newest Session-stopped block first
+- [phase2_mcp/CLAUDE.md](../phase2_mcp/CLAUDE.md) — 🔄 ~21KB · phase head; Steps 0–7 ✅, **live-verifiziert** (Quick-Tunnel-Probe + Adapter-Abnahme durch den Nikinger, 2026-07-26); read + newest Session-stopped block first
 - [docs/concepts/phase2_mcp_plan.md](./concepts/phase2_mcp_plan.md) — 📕 ~46KB · ausführungsreifer P2-Plan (Entscheidungen P2-A–P2-N, Steps 0–7); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
-- [phase2_mcp/SESSIONS_ARCHIVE.md](../phase2_mcp/SESSIONS_ARCHIVE.md) — 📦 ~32KB · sieben archivierte Session-Blöcke (Step 0–6), verbatim, newest-first
+- [docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md](./concepts/P2_ADAPTER_ABNAHME_2026-07-26.md) — 📕 ~10KB · Abnahmeprotokoll über den echten Custom Connector, 21/21 Prüfungen, zwei nicht-blockierende Befunde (B1 behoben, B2 offen — Nikinger-Entscheidung auf dem echten `DATA_ROOT`)
+- [phase2_mcp/SESSIONS_ARCHIVE.md](../phase2_mcp/SESSIONS_ARCHIVE.md) — 📦 ~38KB · acht archivierte Session-Blöcke (Step 0–7), verbatim, newest-first
 
 ## Completed phases
 

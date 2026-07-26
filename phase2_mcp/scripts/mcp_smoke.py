@@ -158,18 +158,39 @@ async def _run(data_root: Path, checks: list[Check]) -> None:
                     )
                 )
 
-            # 3. search_items — Treffer, Default-Limit, keine archivierten.
+            # 3. search_items — Default-Limit, keine archivierten, Größenmessung.
+            # Bewusst OHNE Prüfung "sind die drei create_item-Treffer in dieser Seite" — bei
+            # 20+ Items im Space sortiert Store.search() nach Aktualität, und dieses Skript
+            # legt alle Items in einer engen Schleife über die reale Systemuhr an (kein
+            # injizierter now_fn wie in den Unit-Tests). Auf einer schnellen VM können mehrere
+            # Items denselben `updated`-Zeitstempel bekommen; unter dieser Bindung entscheidet
+            # die stabile Sortierung über die Indexreihenfolge, nicht über die Anlegereihenfolge
+            # — das drückte gelegentlich eines der drei `create_item`-Items aus der Top-20-Seite
+            # heraus. Kein Bug in `tools.py`/`store.py`, sondern eine reale Zeitstempel-Kollision
+            # dieses Smoke-Skripts. Die Fundbarkeit wird stattdessen unten über eine gezielte
+            # Suche geprüft (kleines, eindeutiges Ergebnis, unabhängig von der Seitengröße).
             search_text = (await own.call_tool("search_items", {})).data
             search_payload = json.loads(search_text)
-            found_ids = {entry["id"] for entry in search_payload["items"]}
             checks.append(
                 Check(
-                    "search_items",
-                    all(i in found_ids for i in created_ids)
-                    and search_payload["limit"] == 20
+                    "search_items (Default-Listing)",
+                    search_payload["limit"] == 20
                     and not any(e["status"] == "archived" for e in search_payload["items"]),
                     f"total={search_payload['total']}, limit={search_payload['limit']}",
                     len(search_text.encode("utf-8")),
+                )
+            )
+
+            targeted_text = (
+                await own.call_tool("search_items", {"query": "Smoke-Item"})
+            ).data
+            targeted_ids = {entry["id"] for entry in json.loads(targeted_text)["items"]}
+            checks.append(
+                Check(
+                    "search_items (eigene Items auffindbar)",
+                    all(i in targeted_ids for i in created_ids),
+                    f"{len(targeted_ids)} Treffer für 'Smoke-Item'",
+                    len(targeted_text.encode("utf-8")),
                 )
             )
 

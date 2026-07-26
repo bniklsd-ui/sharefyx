@@ -26,7 +26,7 @@ from fastmcp.exceptions import ToolError
 
 from storage.errors import ConflictError, ItemNotFound, SpaceNotFound, ValidationError
 from storage.frontmatter import serialize as serialize_frontmatter
-from storage.models import Item, ItemSummary
+from storage.models import Item, ItemSummary, SpaceInfo
 from storage.store import Store
 
 from . import context
@@ -198,6 +198,20 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
     def list_spaces() -> str:
         principal = _authenticated_principal()
         spaces = store.list_spaces()
+        # Fund B1 aus der Live-Adapter-Abnahme (docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md):
+        # `Store.list_spaces()` leitet Spaces ausschließlich aus vorhandenen Indexzeilen ab (P1,
+        # keine separate Space-Registry) — ein Space ohne ein einziges Item taucht dort schlicht
+        # nicht auf. Ohne diesen Fallback sähe eine frische Claude-Sitzung mit einem leeren
+        # eigenen Space AUSSCHLIESSLICH Spaces, in die sie nicht schreiben darf, und hätte keine
+        # Möglichkeit, den eigenen Space-Namen zu erfahren, bevor sie blind `create_item` ruft.
+        # `create_item` selbst ist davon nicht betroffen (der Ziel-Space kommt aus dem Principal,
+        # nie aus `list_spaces`), aber die Orientierung des Modells ist es. Deshalb: der eigene
+        # Space wird immer in die Antwort aufgenommen, notfalls mit `item_count=0` — kein
+        # Store-Eingriff, reine Tool-Schicht-Ergänzung.
+        if principal.space not in {s.name for s in spaces}:
+            spaces = sorted(
+                [*spaces, SpaceInfo(name=principal.space, item_count=0)], key=lambda s: s.name
+            )
         visible_names = set(
             permissions.visible_spaces(principal.space, [s.name for s in spaces])
         )

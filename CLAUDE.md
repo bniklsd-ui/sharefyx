@@ -130,13 +130,16 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 
 ## Current state
 
-**Aktive Phase:** Phase 2 — MCP-Server (`phase2_mcp/`, Paket `mcpserver`, **code-complete seit
-Step 7, 2026-07-26** — Quick-Tunnel-Probe durch den Nikinger noch offen, siehe unten):
-Claude soll lesend und schreibend über einen lokalen `fastmcp`-Server auf den P1-Storage-Kern
-zugreifen — Token→Space-Auflösung, sechs Tools, `<untrusted_content>`-Wrapping fremder Bodies.
-Noch kein Netz nach außen (kein Tunnel, das ist P3). Plan: `docs/concepts/phase2_mcp_plan.md`
-(Entscheidungen P2-A–P2-N gelockt, Steps 0–7). Herkunft/Contract:
-`docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md`. Phase-Head: `phase2_mcp/CLAUDE.md`.
+**Aktive Phase:** Phase 2 — MCP-Server (`phase2_mcp/`, Paket `mcpserver`, **live-verifiziert seit
+2026-07-26** — Quick-Tunnel-Probe + vollständige Adapter-Abnahme über den echten Custom
+Connector durch den Nikinger, 21/21 Prüfungen, siehe `docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md`):
+Claude liest und schreibt über einen lokalen `fastmcp`-Server auf den P1-Storage-Kern —
+Token→Space-Auflösung, sechs Tools, `<untrusted_content>`-Wrapping fremder Bodies. Noch kein
+dauerhaftes Netz nach außen (nur Quick Tunnel probeweise, dauerhaft ist P3). Plan:
+`docs/concepts/phase2_mcp_plan.md` (Entscheidungen P2-A–P2-N gelockt, Steps 0–7).
+Herkunft/Contract: `docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md`. Phase-Head:
+`phase2_mcp/CLAUDE.md`. Formaler Phasenabschluss (Browser-Webchat, analog Phase 1) und
+P3-Planung stehen noch aus.
 
 **Phase 1 — Storage-Kern** (`phase1_storage/`, Paket `storage`): ✅ **abgeschlossen,
 live-verifiziert.** Alle acht Module (Steps 0–7), 68 Tests grün (70 bei Phasenabschluss, minus

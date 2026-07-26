@@ -89,6 +89,22 @@ def test_list_spaces_marks_own_space_writable(tools_map, store):
     assert by_name[SPACE_B]["writable"] is False
 
 
+def test_list_spaces_includes_empty_own_space(tools_map, store):
+    """Fund B1 aus der Live-Adapter-Abnahme (docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md):
+    eine frische Sitzung, deren eigener Space noch kein Item hat, muss den eigenen Space
+    trotzdem sehen (mit item_count=0) — sonst kennt sie nur fremde, nicht schreibbare Spaces
+    und hat keine Orientierung, bevor sie blind `create_item` ruft."""
+    store.create(SPACE_B, type="task", title="B")
+    # SPACE_A (der eigene Space des Principals) hat bewusst noch KEIN Item.
+
+    with _as(SPACE_A):
+        payload = json.loads(tools_map["list_spaces"]())
+
+    by_name = {entry["name"]: entry for entry in payload}
+    assert by_name[SPACE_A] == {"name": SPACE_A, "item_count": 0, "writable": True}
+    assert SPACE_B in by_name
+
+
 def test_list_spaces_filters_by_can_read(store):
     store.create(SPACE_A, type="task", title="A")
     store.create(SPACE_B, type="task", title="B")

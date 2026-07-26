@@ -18,7 +18,7 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 | Phase | Verzeichnis / Paket | Inhalt | Status |
 |---|---|---|---|
 | **P1** | `phase1_storage/` · `storage` | Datei-Store + Index + Versionierung. Kein Netz. | ✅ |
-| **P2** | `phase2_mcp/` · `mcpserver` | MCP-Server, Token-Auth, 6 Tools. Lokal erreichbar. | 🟡 |
+| **P2** | `phase2_mcp/` · `mcpserver` | MCP-Server, Token-Auth, 6 Tools. Lokal erreichbar. | ✅ |
 | **P3** | `phase3_edge/` | Tunnel, systemd, Health, Logging, Ops-Skripte. Öffentlich erreichbar. | ⬜ |
 | **P4** | `phase4_auth/` · `auth` | OAuth 2.1 + DCR; ersetzt den Pfad-Token. | ⬜ |
 | **P5** | `phase5_ui/` · `webui` | REST-API + Web-UI für Menschen. | ⬜ |
@@ -66,12 +66,14 @@ reale Probe auf den Advisor-Fund aus Step 5). Details + Transkript:
 
 Plan: `docs/concepts/phase2_mcp_plan.md`. Phase-Head: `phase2_mcp/CLAUDE.md`.
 
-**Stand 2026-07-26 (Step 7):** alle acht Module (Steps 0–7) fertig, 132 Tests grün (76 P1 +
-56 P2), `mcp_smoke.py` als Beweis (Gegenstück zu `space_cli.py` aus P1) — läuft grün gegen ein
-temporäres `DATA_ROOT`, alle sechs Tools über den echten ASGI-Stack, beide Rule-4-Fälle
-bewiesen. Status **🟡 code-complete, nicht live-bewiesen**: die Quick-Tunnel-Probe (ein
-echter Read/Write über den Claude-Connector) ist Sache des Nikingers, nicht von Claude Code —
-Runbook dafür steht in `phase2_mcp/CLAUDE.md`. Hebt Status auf ✅, sobald gemeldet.
+**Stand 2026-07-26:** alle acht Module (Steps 0–7) fertig, 133 Tests grün (76 P1 + 57 P2),
+`mcp_smoke.py` als Beweis (Gegenstück zu `space_cli.py` aus P1). Status **✅ live-verifiziert**:
+der Nikinger hat die Quick-Tunnel-Probe **und** eine vollständige Adapter-Abnahme über den
+echten Custom Connector gefahren — 21 von 21 Prüfungen gegen den echten `DATA_ROOT`, mit
+Rohantworten als Beweis. Protokoll: `docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md`. Ein Fund
+(fehlende Sichtbarkeit des eigenen, noch leeren Space in `list_spaces`) wurde noch am selben Tag
+behoben; ein zweiter (Space-Namen `nikinger`/`niklas` gemischt) bleibt eine offene, bewusst
+nicht blockierende Entscheidung des Nikingers auf dem echten `DATA_ROOT`.
 
 ### Zurückgestellt aus P2 (bewusst, nicht vergessen)
 
