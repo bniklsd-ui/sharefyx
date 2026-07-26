@@ -31,7 +31,7 @@ updated: 2026-07-25
 
 ## Active phase (2 — MCP-Server)
 
-- [phase2_mcp/CLAUDE.md](../phase2_mcp/CLAUDE.md) — 🔄 ~15KB · phase head; Steps 0–7 ✅ (code-complete, Quick-Tunnel-Probe durch den Nikinger noch offen); read + newest Session-stopped block first
+- [phase2_mcp/CLAUDE.md](../phase2_mcp/CLAUDE.md) — 🔄 ~18KB · phase head; Steps 0–7 ✅ (code-complete, Quick-Tunnel-Probe durch den Nikinger noch offen); read + newest Session-stopped block first
 - [docs/concepts/phase2_mcp_plan.md](./concepts/phase2_mcp_plan.md) — 📕 ~46KB · ausführungsreifer P2-Plan (Entscheidungen P2-A–P2-N, Steps 0–7); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
 - [phase2_mcp/SESSIONS_ARCHIVE.md](../phase2_mcp/SESSIONS_ARCHIVE.md) — 📦 ~32KB · sieben archivierte Session-Blöcke (Step 0–6), verbatim, newest-first
 

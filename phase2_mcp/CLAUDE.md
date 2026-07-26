@@ -139,18 +139,71 @@ Spaces informativ, nicht autoritativ — es gibt dort per Architektur keine Writ
 ## Runbook „Quick-Tunnel-Probe" (führt der Nikinger aus, nicht Claude Code)
 
 Der Tunnel-Schritt wird **nicht committet** — kein Skript, keine Config, kein Hostname im Repo
-(das ist P3). Diese Anleitung ist reine Dokumentation des Ablaufs (Plan §4 Step 7):
+(das ist P3). Diese Anleitung ist reine Dokumentation des Ablaufs (Plan §4 Step 7).
+
+**[2026-07-26 Korrektur, vom Nikinger beim ersten Live-Lauf gefunden]** Die ursprüngliche
+Reihenfolge (`serve.py --allowed-host` vor `cloudflared`) war zirkulär: die trycloudflare.com-
+Subdomain wird von `cloudflared` **zufällig bei jedem Start neu vergeben**, existiert also erst
+NACH Schritt „Tunnel starten" — sie kann nicht vorher in `--allowed-host` stehen. Reihenfolge
+jetzt korrekt (Tunnel zuerst, Subdomain ablesen, danach `serve.py` mit der bekannten Subdomain
+starten). Kein Bug im Code — `serve.py`/`app.py` hatten von Anfang an einen `--allowed-host`-
+Parameter genau für diesen Zweck, nur die Runbook-Reihenfolge war falsch:
 
 ```
 1. python phase2_mcp/scripts/issue_token.py --space niklas      # Token einmal notieren
-2. SPACE_DATA_ROOT=/home/savefyx/savefyx-data python phase2_mcp/scripts/serve.py \
-       --allowed-host '<subdomain>.trycloudflare.com'
-3. cloudflared tunnel --url http://127.0.0.1:8765
+2. cloudflared tunnel --url http://127.0.0.1:8765
+       # Ausgabe abwarten: "Your quick Tunnel has been created!" mit der zugewiesenen
+       # https://<subdomain>.trycloudflare.com — läuft in diesem Terminal weiter
+3. SPACE_DATA_ROOT=/home/savefyx/savefyx-data python phase2_mcp/scripts/serve.py \
+       --allowed-host '<subdomain>.trycloudflare.com'      # die aus Schritt 2 bekannte Subdomain
 4. curl https://<subdomain>.trycloudflare.com/health        → {"status":"ok",…}
 5. Claude → Settings → Connectors → Add custom connector:
        https://<subdomain>.trycloudflare.com/mcp/<token>
 6. Neue Konversation, Connector aktivieren, ein Read und ein Write ausführen.
 ```
+
+Bei jedem Neustart von `cloudflared` ändert sich die Subdomain — `serve.py` muss dann mit der
+neuen Subdomain neu gestartet werden (Schritt 3 wiederholen).
+
+**Live-Stand (2026-07-26):** Schritte 1–4 vom Nikinger erfolgreich durchgeführt — Token
+ausgegeben, Tunnel verbunden (`https://flyer-only-gaming-cpu.trycloudflare.com`, Frankfurt-Edge,
+CONNECTIVITY PRE-CHECKS alle PASS), `serve.py` mit korrektem `--allowed-host` gestartet,
+`curl .../health` → `{"status":"ok",...}`. Das beweist die Tunnel-Infrastruktur (R3) durch das
+CGNAT-Mobilfunk-Uplink hindurch — **nicht** aber Akzeptanzkriterium §5.9: `/health` ist
+unauthentifiziert und durchläuft weder `TokenPathASGI` noch ein einziges Tool. Schritte 5–6
+(Connector in Claude anlegen, ein echter Read und ein echter Write aus einer Konversation)
+stehen noch aus — erst danach wechselt `ROADMAP.md` von 🟡 auf ✅.
+
+### Cloudflare-Voraussetzungen (vor Schritt 2)
+
+**Kurz: nichts von Cloudflare nötig.** Schritt 2 benutzt Cloudflares **Quick Tunnel**
+(`cloudflared tunnel --url ...`) — keine Registrierung, kein Account, keine Domain, kein
+API-Token, kein `cloudflared login`. Nur der `cloudflared`-Client muss auf der VM installiert
+sein. **Falle:** die meisten Cloudflare-Tutorials im Netz beschreiben stattdessen „Named
+Tunnels" (`cloudflared tunnel create ...`), die einen Account **und** eine bei Cloudflare
+verwaltete Domain brauchen — das ist ein anderer, schwererer Weg, nicht der hier benutzte.
+
+`cloudflared` installieren, zwei Wege:
+
+```bash
+# Weg A — offizielles apt-Repo (sauber aktualisierbar)
+sudo mkdir -p --mode=0755 /usr/share/keyrings
+curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
+echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/cloudflared.list
+sudo apt update && sudo apt install cloudflared
+
+# Weg B — einzelnes Binary (schneller, kein Repo, reicht für einen einmaligen Test)
+uname -m   # x86_64 -> amd64, aarch64 -> arm64
+curl -Lo cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+chmod +x cloudflared && sudo mv cloudflared /usr/local/bin/
+```
+
+`cloudflared --version` zur Kontrolle. `cloudflared tunnel --url ...` gibt sofort eine
+zufällige `https://….trycloudflare.com`-URL aus, ohne Login-Prompt. Diese URL ist **ephemer**
+— sie ändert sich bei jedem Neustart von `cloudflared`, für den einmaligen Probe-Lauf egal,
+aber genau der Grund, warum R3 das als Übergang vor VPS+WireGuard (P3) behandelt, nicht als
+Dauerlösung. Cloudflare sieht dabei weiterhin Klartext (R4, bereits akzeptiert). Weiches Limit
+von ca. 200 gleichzeitigen Requests je Quick Tunnel — für einen manuellen Test irrelevant.
 
 `[VERIFY]` bei Ausführung gegen die aktuelle Anthropic-Doku: Custom Connectors auf **Pro** ohne
 Owner-Gate (Stand 2026-07-25 dokumentiert für Free/Pro/Max/Team/Enterprise; Free ist auf einen
