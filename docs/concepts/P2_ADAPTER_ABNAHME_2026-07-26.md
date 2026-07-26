@@ -230,6 +230,12 @@ mit `item_count: 0`, genau wie hier vorgeschlagen. Umgesetzt in `mcpserver/tools
 **B2 bleibt offen** — Entscheidung beim Nikinger, siehe oben. Dieses Dokument bleibt als
 Snapshot des Abnahme-Laufs unverändert stehen, der Nachtrag ergänzt nur den Status.
 
+**B2 behoben [2026-07-26, Folgesession]** — der Nikinger hat Option 1 gewählt (`niklas` bleibt,
+professionellerer Name als `nikinger`): `nikinger/` → `niklas/` umbenannt, Frontmatter-`space:`
+im einzigen betroffenen Item mitgezogen, `reindex` gegen den echten `DATA_ROOT`. Verifiziert:
+`space_cli list` → `niklas: 3 Item(s)`, kein `nikinger` mehr. Details:
+`phase2_mcp/CLAUDE.md`, aktueller Session-Block.
+
 **Sicherheitshinweis, nicht Teil der ursprünglichen Abnahme:** der begleitende Screenshot dieser
 Sitzung zeigte die Connector-URL mit dem Pfad-Token im Klartext. Bewusst **nicht** in dieses
 Repo übernommen (Hard Rule 1) — das Token wurde vom Nikinger rotiert. Details in

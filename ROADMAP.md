@@ -72,8 +72,9 @@ der Nikinger hat die Quick-Tunnel-Probe **und** eine vollständige Adapter-Abnah
 echten Custom Connector gefahren — 21 von 21 Prüfungen gegen den echten `DATA_ROOT`, mit
 Rohantworten als Beweis. Protokoll: `docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md`. Ein Fund
 (fehlende Sichtbarkeit des eigenen, noch leeren Space in `list_spaces`) wurde noch am selben Tag
-behoben; ein zweiter (Space-Namen `nikinger`/`niklas` gemischt) bleibt eine offene, bewusst
-nicht blockierende Entscheidung des Nikingers auf dem echten `DATA_ROOT`.
+behoben; ein zweiter (Space-Namen `nikinger`/`niklas` gemischt) wurde vom Nikinger direkt am
+echten `DATA_ROOT` behoben (`nikinger/` → `niklas/`, siehe `phase2_mcp/CLAUDE.md`). Keine
+offenen Findings mehr. Fehlt noch: der formale Phasenabschluss (Browser-Webchat).
 
 ### Zurückgestellt aus P2 (bewusst, nicht vergessen)
 

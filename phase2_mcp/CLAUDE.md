@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase2_mcp_plan.md          # voller Plan, Entscheidungen P2-A–P2-N, Steps 0–7
   - ../docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md # Herkunft der Entscheidungen D1–D6
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
-updated: 2026-07-26 (live-verifiziert)
+updated: 2026-07-26 (B2 behoben)
 ---
 # CLAUDE.md — Phase 2: MCP-Server (`phase2_mcp/`)
 
@@ -109,8 +109,18 @@ Möglichkeit, den eigenen Space-Namen vor dem ersten `create_item` zu erfahren. 
 wurde:** `mcpserver/tools.py :: list_spaces()` nimmt den eigenen Space jetzt immer in die
 Antwort auf, notfalls mit `item_count: 0` — reine Tool-Schicht-Ergänzung, kein Store-Eingriff,
 kein Contract-Bruch. Neuer Test `test_list_spaces_includes_empty_own_space`
-(`test_tools.py`). Fund B2 (Space-Namen `nikinger`/`niklas` gemischt) bleibt bewusst offen —
-Entscheidung des Nikingers auf dem echten `DATA_ROOT`, kein Code-Thema.
+(`test_tools.py`).
+
+**Fund B2, behoben (2026-07-26, vom Nikinger auf dem echten `DATA_ROOT`):** Space-Namen
+`nikinger`/`niklas` waren gemischt (Token gehörte zu `niklas`, das einzige Item aus dem
+P1-Livetest lag unter `nikinger/`). Der Nikinger hat sich für Option 1 aus
+`docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md` §4 entschieden: `nikinger/` → `niklas/`
+umbenannt (`git mv`, Frontmatter-`space:`-Feld im einzigen betroffenen Item vorher per `sed`
+mitgezogen, damit Datei und Verzeichnis nie auseinanderlaufen), danach `reindex` gegen den
+echten `DATA_ROOT`. Verifiziert: `space_cli list` zeigt jetzt ausschließlich `niklas: 3
+Item(s)`, `nikinger` existiert nicht mehr. Kein Code-Eingriff — reine Datenoperation auf dem
+echten `DATA_ROOT`, wie in §4 vorgesehen von Claude Code nicht selbst ausgeführt. Damit sind
+beide Befunde aus der Abnahme geschlossen.
 
 **Nebenbefund beim Nachtesten, nicht Teil der Abnahme:** `mcp_smoke.py`s eigener
 `search_items`-Check war intermittierend flakig. Ursache: das Skript legt über 20 Items in
@@ -274,8 +284,7 @@ auf ✅. Details siehe Modul-Status-Tabelle oben (Zeile 8).
 **Fund B1, behoben:** `list_spaces` zeigte den eigenen Space nicht, solange er kein Item hatte.
 `mcpserver/tools.py :: list_spaces()` nimmt den eigenen Space jetzt immer in die Antwort auf,
 notfalls mit `item_count: 0` — reine Tool-Schicht-Ergänzung, kein Store-Eingriff. Neuer Test
-`test_list_spaces_includes_empty_own_space`. Fund B2 (Space-Namen `nikinger`/`niklas` gemischt)
-bleibt offen — Entscheidung des Nikingers auf dem echten `DATA_ROOT`, kein Code-Thema.
+`test_list_spaces_includes_empty_own_space`.
 
 **`mcp_smoke.py`-Flakiness behoben:** das Skript legt Items in einer engen Schleife über die
 reale Systemuhr an; auf einer schnellen VM konnten mehrere Items denselben `updated`-Zeitstempel
@@ -300,11 +309,25 @@ um eine datierte Korrekturnotiz ergänzt (die Aussage selbst wird nicht rückwir
 — das Dokument ist ein 📕-Snapshot). Lehre: eine Doku-Aussage über den Repo-Zustand ist erst
 wahr, wenn `git status` sie bestätigt, nicht wenn die Absicht dokumentiert wurde.
 
+**Fund B2, behoben (2026-07-26, vom Nikinger auf dem echten `DATA_ROOT`):** Space-Namen
+`nikinger`/`niklas` waren gemischt. Der Nikinger hat Option 1 aus
+`docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md` §4 gewählt — professionellerer Name, `niklas`
+bleibt: `nikinger/` → `niklas/` umbenannt, dabei das Frontmatter-`space:`-Feld des einzigen
+betroffenen Items (`itm_7a6f9f7f`) per `sed` mitgezogen (sonst widerspräche Frontmatter dem
+Verzeichnis), `git mv` statt Kopie (Historie bleibt erhalten), danach `space_cli reindex`.
+Verifiziert direkt vom Nikinger: `space_cli list` → `niklas: 3 Item(s)`, kein `nikinger` mehr.
+Reine Datenoperation auf dem echten `DATA_ROOT`, wie in §4 vorgesehen nicht von Claude Code
+selbst ausgeführt — Claude Code lieferte nur die Befehlsfolge. Damit sind beide Befunde aus der
+Abnahme geschlossen, keine offenen Findings mehr.
+
 **Verifiziert:** `pytest -v` → **133/133 grün** (76 P1 + 57 P2, Aufschlüsselung je Testdatei
 gegen die Modul-Status-Tabelle nachgezählt, exakt deckungsgleich). `mcp_smoke.py --json` → 12/12
 Checks grün. `git status` nach der Bereinigung → `docs/test-results/` existiert nicht mehr.
+B2-Fix vom Nikinger direkt am echten `DATA_ROOT` verifiziert (`space_cli list`/`search`-Ausgabe
+oben).
 
-**Nächster Schritt (konkret):** B2 ist die einzige offene Entscheidung dieser Phase und liegt
-beim Nikinger (zwei Wege, siehe `docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md` §4). Danach:
-offizieller Phasenabschluss P2 (Browser-Webchat, analog Phase 1s Abschluss), Handover-Dokument
-für P3 (Tunnel/systemd/Ops), neue Browser-Planungssession für Phase 3.
+**Nächster Schritt (konkret):** Keine offenen Code- oder Daten-Findings mehr in P2. Es fehlt
+nur noch der **formale** Phasenabschluss — laut `docs/PROMPTS.md` ein eigener Prompt im
+Browser-Webchat (analog Phase 1s Abschluss), inklusive Handover-Dokument für P3
+(Tunnel/systemd/Ops). Das ist Sache des Nikingers, nicht etwas, das Claude Code aus einem
+Code-Commit heraus erklären kann. Danach: neue Browser-Planungssession für Phase 3.
