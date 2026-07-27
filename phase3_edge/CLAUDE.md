@@ -286,3 +286,35 @@ kein Code, keine neuen Tests — `pytest` bleibt bei 168/168.
 echte Infrastruktur; Claude Code liefert die Befehlsfolge aus dem Plan und wertet die
 Ergebnisse aus, führt aber nichts davon selbst aus (echter `DATA_ROOT`, echter Keyring, echte
 Token, echte Claude-Accounts).
+
+**[2026-07-27, während der Live-Abnahme] Fund B3, behoben — `sharefyx-backup.service` scheiterte
+real auf der VM:** `mkdir: cannot create directory '/var/backups/sharefyx': Permission denied`.
+Ursache: der Dienst läuft als unprivilegierter `User=savefyx`; `/var/backups` gehört auf
+Debian/Ubuntu root und ist für andere Nutzer nicht beschreibbar. Kein Unit-Test hat das
+gefangen, weil `test_units.py` reines Textparsen ist und nie einen echten systemd-Prozess unter
+echtem `User=`-Sandbox startet — genau die Klasse Fund, die laut Plan nur unter echter
+Infrastruktur (V9-Nachbarschaft) sichtbar wird.
+
+**Behoben:** `phase3_edge/systemd/sharefyx-backup.service` benutzt jetzt `StateDirectory=
+sharefyx-backup` statt eines literalen `/var/backups/sharefyx`. systemd legt
+`/var/lib/sharefyx-backup` bei **jedem** Start selbst an, bereits mit der richtigen
+Eigentümerschaft (`User=`/`Group=` des Dienstes) — kein manuelles `chown`, auf keiner Maschine,
+jemals nötig (dieselbe Maschinenunabhängigkeits-Logik wie bei den vier `local.env`-Variablen).
+`SHAREFYX_BACKUP_DIR` zeigt entsprechend jetzt auf `/var/lib/sharefyx-backup` statt
+`/var/backups/sharefyx` — `/var/lib` ist ohnehin die FHS-korrekte Konvention für
+dienst-verwaltete Zustandsdaten, `/var/backups` eher für administrator-initiierte Backups mit
+Root-Rechten gedacht.
+
+**Auf der VM anzuwenden:** `sudo phase3_edge/scripts/install_units.sh` erneut laufen lassen
+(re-templated die Unit, `daemon-reload`, `sharefyx-mcp` erneut `enable --now` — unschädlich,
+bereits laufend), danach `sudo systemctl start sharefyx-backup.service` erneut versuchen.
+
+**Nebenbefund, nicht behoben (gehört nicht mir):** `phase3_edge/scripts/abnahme_run.sh` — vom
+Nikinger über eine parallele Claude-Sitzung geschrieben, nicht Teil dieser Session — hat
+weiterhin `/var/backups/sharefyx` als Default für `SHAREFYX_BACKUP_DIR` (Zeile 27). Beim nächsten
+Lauf `SHAREFYX_BACKUP_DIR=/var/lib/sharefyx-backup` explizit exportieren, sonst findet Test 13
+das neue Bundle nicht. Bewusst nicht eigenmächtig editiert — das Skript gehört einer anderen
+Sitzung, die den Nikinger direkt informiert bekommt.
+
+**Tests:** keine Änderung nötig, `.venv/bin/python -m pytest -q` → weiterhin **168/168 grün**
+(kein Test prüfte den literalen Pfadwert, nur Secret-Shape und `/home/savefyx`-Freiheit).
