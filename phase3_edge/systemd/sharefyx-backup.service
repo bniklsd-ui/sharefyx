@@ -6,6 +6,7 @@ Documentation=file://__REPO_ROOT__/phase3_edge/CLAUDE.md
 Type=oneshot
 User=savefyx
 Group=savefyx
+WorkingDirectory=__REPO_ROOT__
 StateDirectory=sharefyx-backup
 Environment=SHAREFYX_DATA_ROOT=__DATA_ROOT__
 Environment=SHAREFYX_BACKUP_DIR=/var/lib/sharefyx-backup

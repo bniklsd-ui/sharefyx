@@ -318,3 +318,37 @@ Sitzung, die den Nikinger direkt informiert bekommt.
 
 **Tests:** keine Änderung nötig, `.venv/bin/python -m pytest -q` → weiterhin **168/168 grün**
 (kein Test prüfte den literalen Pfadwert, nur Secret-Shape und `/home/savefyx`-Freiheit).
+
+**[2026-07-27, dieselbe Live-Abnahme] Fund B4, behoben — nächster Fehlschlag, nachdem B3 den
+Weg freigemacht hatte:** `backup_data_root.sh` erstellte das Bundle jetzt korrekt (B3-Fix
+funktioniert), scheiterte aber bei der Verifikation:
+`error: need a repository to verify a bundle`. Ursache: `git bundle verify "$bundle"` lief ohne
+`-C`/`--git-dir` — `git bundle verify` braucht zwingend eine Repo-Umgebung zum Dispatchen (auch
+ohne externe Prerequisites zu prüfen), und ohne `WorkingDirectory=` im Unit ist das
+Arbeitsverzeichnis unter systemd `/`, kein Git-Repo. `git bundle create` (Zeile davor) hatte
+bereits korrekt `-C "$DATA_ROOT"` — die `verify`-Zeile war die einzige Lücke.
+
+**Warum kein Test das gefangen hat, obwohl `test_backup_creates_verifiable_bundle` genau diesen
+Pfad prüft:** `subprocess.run(["bash", str(BACKUP_SCRIPT)], ...)` ohne `cwd=` erbt pytests
+eigenes Arbeitsverzeichnis — und das ist zufällig dieses Repo selbst, also zufällig ein
+Git-Repo. Der Test bestand, weil der Testkontext unbeabsichtigt genau die Bedingung lieferte,
+die unter systemd fehlt. Klassischer „bestanden aus Zufall, nicht aus Korrektheit"-Fall.
+
+**Behoben, zweifach (Skript + Unit, nicht nur eins von beiden):**
+- `backup_data_root.sh`: `git bundle verify` → `git -C "$DATA_ROOT" bundle verify` — die
+  eigentliche Korrektur, unabhängig von jeder Unit-Konfiguration richtig.
+- `phase3_edge/systemd/sharefyx-backup.service`: `WorkingDirectory=__REPO_ROOT__` ergänzt
+  (fehlte bisher, `sharefyx-mcp.service` hat es bereits) — Verteidigung in der Tiefe, falls ein
+  künftiges Skript in dieser Unit denselben Fehler macht.
+- **Testlücke geschlossen, nicht nur der Bug:** alle `subprocess.run`-Aufrufe in
+  `test_backup_scripts.py`, die die Skripte direkt starten, laufen jetzt mit `cwd="/"` —
+  reproduziert exakt die systemd-Realität ohne `WorkingDirectory=`, statt sich auf das
+  zufällige Repo-cwd von pytest zu verlassen. Der Fake-`git`-Wrapper im
+  Korruptions-Test musste dafür von einer festen `$1`/`$2`-Positionsprüfung auf einen
+  Substring-Check (`"bundle verify"` irgendwo in `"$*"`) umgestellt werden, weil `-C
+  "$DATA_ROOT"` jetzt vor `bundle verify` steht.
+
+**Tests:** `.venv/bin/python -m pytest -q` → **168/168 grün**, `test_backup_scripts.py` einzeln
+gegen `cwd="/"` gegengeprüft (alle sieben grün) — die Testverschärfung selbst wurde vor dem Fix
+kurz gegen den ungefixten Stand laufen lassen und schlug dort korrekt fehl (Beweis, dass sie den
+echten Fehler jetzt fängt), nicht nur behauptet.

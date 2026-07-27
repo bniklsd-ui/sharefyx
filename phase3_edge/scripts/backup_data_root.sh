@@ -29,7 +29,11 @@ echo "erstelle Bundle: $bundle" >&2
 git -C "$DATA_ROOT" bundle create "$bundle" --all
 
 echo "verifiziere Bundle" >&2
-if ! git bundle verify "$bundle" >&2; then
+# -C "$DATA_ROOT" ist Pflicht, nicht Stil: "git bundle verify" braucht ZWINGEND eine
+# Repo-Umgebung zum Dispatchen, auch ohne externe Prerequisites zu prüfen. Unter systemd ist das
+# Arbeitsverzeichnis ohne WorkingDirectory= "/", kein Git-Repo — ohne -C bricht der Aufruf mit
+# "error: need a repository to verify a bundle" ab, bevor überhaupt etwas geprüft wird.
+if ! git -C "$DATA_ROOT" bundle verify "$bundle" >&2; then
   rm -f "$bundle"
   echo "ABBRUCH: Bundle-Verifikation fehlgeschlagen, Datei gelöscht: $bundle" >&2
   exit 1

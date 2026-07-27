@@ -32,14 +32,21 @@ def _run_backup(data_root: Path, backup_dir: Path, keep: str | None = None) -> s
     env["SHAREFYX_BACKUP_DIR"] = str(backup_dir)
     if keep is not None:
         env["SHAREFYX_BACKUP_KEEP"] = keep
-    return subprocess.run(["bash", str(BACKUP_SCRIPT)], capture_output=True, text=True, env=env)
+    # cwd="/" statt des Default-cwd (= dieses Repo, zufällig selbst ein Git-Repo): reproduziert
+    # exakt die systemd-Realität ohne `WorkingDirectory=` (Fund B3, Live-Abnahme 2026-07-27) —
+    # das Skript muss unabhängig vom Aufruf-cwd korrekt sein, nicht nur zufällig unter pytest.
+    return subprocess.run(
+        ["bash", str(BACKUP_SCRIPT)], capture_output=True, text=True, env=env, cwd="/"
+    )
 
 
 def _run_restore(data_root: Path, backup_dir: Path) -> subprocess.CompletedProcess:
     env = dict(os.environ)
     env["SHAREFYX_DATA_ROOT"] = str(data_root)
     env["SHAREFYX_BACKUP_DIR"] = str(backup_dir)
-    return subprocess.run(["bash", str(RESTORE_SCRIPT)], capture_output=True, text=True, env=env)
+    return subprocess.run(
+        ["bash", str(RESTORE_SCRIPT)], capture_output=True, text=True, env=env, cwd="/"
+    )
 
 
 @pytest.fixture
@@ -104,7 +111,10 @@ def test_backup_fails_and_cleans_up_on_corrupt_bundle(tmp_path, data_root):
     fake_git = fake_bin / "git"
     fake_git.write_text(
         "#!/usr/bin/env bash\n"
-        'if [[ "$1" == "bundle" && "$2" == "verify" ]]; then\n'
+        # Substring-Check statt fixer Positionen ($1/$2): das Skript ruft "git -C <DATA_ROOT>
+        # bundle verify <bundle>" auf (Fix für Fund B3), "bundle verify" steht dort nicht mehr
+        # an Position 1/2.
+        'if [[ "$*" == *"bundle verify"* ]]; then\n'
         "  exit 1\n"
         "fi\n"
         f'exec "{real_git_path}" "$@"\n'
@@ -116,7 +126,9 @@ def test_backup_fails_and_cleans_up_on_corrupt_bundle(tmp_path, data_root):
     env["SHAREFYX_BACKUP_DIR"] = str(backup_dir)
     env["PATH"] = f"{fake_bin}:{env['PATH']}"
 
-    result = subprocess.run(["bash", str(BACKUP_SCRIPT)], capture_output=True, text=True, env=env)
+    result = subprocess.run(
+        ["bash", str(BACKUP_SCRIPT)], capture_output=True, text=True, env=env, cwd="/"
+    )
 
     assert result.returncode != 0
     assert list(backup_dir.glob("*.bundle")) == []
