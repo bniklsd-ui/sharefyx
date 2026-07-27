@@ -4,10 +4,78 @@ purpose: Archiv älterer Session-stopped-Blöcke aus phase3_edge/CLAUDE.md, newe
 read-when: Audit vergangener Sessions dieser Phase; NICHT für normalen Session-Start
 detail: L3
 up: CLAUDE.md
-updated: 2026-07-27 (Step 4 archiviert)
+updated: 2026-07-27 (Step 5 archiviert)
 ---
 
 # Session-Archiv — Phase 3 Exposure & Betrieb
+
+## Session stopped — 2026-07-27 (Step 5: Backup und Restore-Nachweis)
+
+**Ergebnis:** Step 5 abgeschlossen. `backup_data_root.sh` (git bundle + Verify + Retention),
+`restore_check.sh` (Klon + HEAD/Tree-Vergleich), `sharefyx-backup.service`/`.timer` (Platzhalter,
+nicht installiert — Step 7).
+
+**`git bundle create` schlägt auf einem leeren Repo fehl** ("Refusing to create empty bundle") —
+jede Testfixture (`data_root`) legt deshalb einen echten Commit an, nicht nur ein leeres
+`git init`.
+
+**Zeitstempel-Kollisionsfalle umgangen, nicht nur vermieden (Advisor-Fund, dieselbe Klasse Fehler
+wie `mcp_smoke.py` in P2, siehe archivierter Step-7-Block):** `test_backup_retention_keeps_newest_n`
+läuft das Skript **nicht** in einer Schleife (bei Sekundenauflösung würden mehrere Bundles
+denselben Dateinamen bekommen und sich überschreiben). Stattdessen legt der Test fünf Fake-Bundles
+mit distinktem, sortierbarem Namen vor und ruft das Skript nur einmal für das echte, aktuelle
+Bundle auf. Der Dateiname selbst trägt jetzt zusätzlich Mikrosekunden (`%6N`, keine Doppelpunkte)
+statt nur Sekunden — doppelte Absicherung für den Fall eines künftigen Schleifen-Aufrufs.
+
+**`test_backup_fails_and_cleans_up_on_corrupt_bundle` — echte Korruption, nicht simuliert
+(Advisor-Vorschlag umgesetzt):** ein frisch geschriebenes, gültiges Bundle besteht die eigene
+`git bundle verify` selbstverständlich. Der Test schiebt stattdessen einen Fake-`git`-Wrapper vor
+den echten auf `$PATH`, der `bundle verify` immer mit Exit 1 abbrechen lässt und alles andere an
+das echte `git` durchreicht — prüft damit den tatsächlichen Cleanup-Zweig (`rm -f` + Exit ≠ 0),
+nicht nur seine Absicht.
+
+**`git bundle verify` schreibt die Ref-Liste auf stdout, die Bestätigung auf stderr** (empirisch
+geprüft, nicht angenommen) — im Skript deshalb explizit `>&2` umgeleitet, sonst hätte Hard Rule 7
+(stdout nur maschinenlesbares JSON) auf einem Zwischenschritt gebrochen, den der Plan nicht
+erwähnt.
+
+**`SHAREFYX_BACKUP_DIR` ist Konfiguration im Skript (Umgebungsvariable, kein Literal), aber ein
+fester Wert in der Unit** (`/var/backups/sharefyx`, Plan §4 Step 5 "Ziel ist Konfiguration ...,
+kein Literal im Skript"). Bewusst **kein** fünfter Platzhalter/`local.env`-Eintrag: anders als
+`REPO_ROOT`/`DATA_ROOT` ist ein Backup-Zielverzeichnis kein Wert, der zwischen Maschinen
+tatsächlich variieren muss — ein FHS-üblicher Pfad reicht, ohne `install_units.sh` und
+`local.env.example` um eine fünfte Variable zu erweitern.
+
+**`install_units.sh` unverändert lauffähig für die neuen Units:** es verarbeitet generisch alle
+`*.service`/`*.timer` in `phase3_edge/systemd/` (so in Step 4 vorbereitet) — die zwei neuen
+Backup-Units laufen ohne Skriptänderung durch dieselbe Platzhalter-Ersetzung und
+Unresolved-Placeholder-Prüfung.
+
+**`test_units.py` (Step 4) erweitert, nicht dupliziert:** zwei neue Tests
+(`test_all_units_have_no_secret_shaped_value`, `test_all_units_have_no_hardcoded_machine_paths`)
+laufen über **alle** Unit-Dateien im Verzeichnis, nicht nur die MCP-Unit — sonst hätte die
+Token-Klartext-Versicherung aus Step 4 die beiden neuen Backup-Units stillschweigend
+ausgenommen.
+
+**Tests** (`phase3_edge/tests/test_backup_scripts.py`, alle sieben aus dem Plan, gegen
+Wegwerf-Git-Repos unter `tmp_path`, nie den echten `DATA_ROOT`): `test_backup_creates_verifiable_bundle`,
+`test_backup_emits_single_json_line_on_stdout`, `test_backup_retention_keeps_newest_n`,
+`test_backup_fails_and_cleans_up_on_corrupt_bundle`, `test_restore_check_matches_head_and_tree`,
+`test_restore_check_detects_divergence`, `test_scripts_have_no_hardcoded_paths`. Plus zwei in
+`phase3_edge/tests/test_units.py` (siehe oben).
+
+**Verifiziert:** `.venv/bin/python -m pytest -q` → **168/168 grün** (159 + 9 neue).
+
+**Modul-Status oben nachgezogen** (Zeile 6: ⬜ → ✅, 9 Tests).
+
+**Offen für den Nikinger, weiterhin unverändert:**
+1. `mcp_smoke.py`/P3-N-Grenzfrage aus Step 2.
+2. Tailscale ist auf dieser VM weiterhin nicht installiert — einziges Gate vor Step 7.
+
+**Nächster Schritt (konkret):** Step 6 — Runbooks, `diagnose.sh`, Cloudflare-Rückbau. Der
+Cloudflare-Uninstall selbst ist ein Befehl **für den Nikinger** (destruktive Aktion auf der
+realen Maschine, außerhalb des Repos) — Claude Code liefert nur den Runbook-Text, führt ihn
+nicht aus.
 
 ## Session stopped — 2026-07-27 (Step 4: systemd-Units)
 

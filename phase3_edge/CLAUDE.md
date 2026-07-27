@@ -64,7 +64,7 @@ hier `tools.py` anfasst, ist in der falschen Phase.
 | 4 | `credentials.py` LoadCredential-Pfad, `export_space_map.py` | 3 | ✅ | 6 |
 | 5 | systemd-Units, `install_units.sh`, `/health.uptime_s` (P3-I) | 4 | ✅ | 6 |
 | 6 | Backup/Restore-Skripte, Backup-Timer | 5 | ✅ | 9 (7 in `test_backup_scripts.py`, 2 in `test_units.py`) |
-| 7 | Runbooks, `diagnose.sh`, Cloudflare-Rückbau | 6 | ⬜ | — |
+| 7 | Runbooks, `diagnose.sh`, Cloudflare-Rückbau | 6 | ✅ | 0 (Runbook/Skript, keine automatisierten Tests laut Plan) |
 | 8 | Live-Abnahme (Nikinger) | 7 | ⬜ | — |
 
 ## Umgebungsstand (Step 0, Details im Archiv)
@@ -87,75 +87,123 @@ den vorherigen Block verbatim nach `SESSIONS_ARCHIVE.md`.
 
 ## Runbooks
 
-Werden in Step 6 (Diagnose/Disconnected) und Step 7 (Inbetriebnahme) befüllt — Platzhalter
-bewusst leer, siehe Plan §4 Step 6/7.
+### „Connector zeigt Disconnected"
+
+`phase3_edge/scripts/diagnose.sh` automatisiert genau diesen Entscheidungsbaum — bei der ersten
+fehlschlagenden Prüfung gibt es eine Diagnose plus einen Handlungssatz aus und stoppt. Von Hand
+dieselbe Reihenfolge:
+
+1. **`systemctl is-active sharefyx-mcp`** — nicht aktiv? → `journalctl -u sharefyx-mcp -n 50`.
+   Das ist die häufigste Ursache und die billigste Prüfung, deshalb zuerst.
+2. **`curl -sf http://127.0.0.1:8765/health`** — Dienst läuft, antwortet aber nicht? → Port
+   belegt oder der Start hängt (z. B. `ProtectSystem`/`ReadWritePaths` verhindert einen
+   Git-Commit im `DATA_ROOT`, siehe V9). `journalctl` prüfen.
+3. **`tailscale status`** — Node offline? → Uplink oder `tailscaled` selbst prüfen. Das ist
+   „deren Infrastruktur", nicht „unser Dienst" — P3 hat hierfür kein Monitoring (Risiko 1).
+4. **`tailscale funnel status`** — Funnel aus? → `tailscale funnel --bg 8765`.
+5. **`curl -sf https://<node>.<tailnet>.ts.net/health`** — lokal ok, öffentlich nicht?
+   → **der dokumentierte Fallstrick:**
+
+   > **`funnel status` sagt „on", aber öffentlich hängt der TLS-Handshake.** Symptom: aus dem
+   > Tailnet antwortet `curl` sofort, von außen bleibt die Verbindung nach dem ClientHello
+   > stehen. Ursache in fast allen berichteten Fällen: das **`funnel`-Attribut fehlt im
+   > `nodeAttrs`-Block des Tailnet-Policy-Files**. Der lokale Status weiß davon nichts — er
+   > zeigt „on", weil der lokale Teil der Konfiguration korrekt ist.
+
+6. **`journalctl -u sharefyx-mcp --since -1h | grep '"status":401' | wc -l`** — reines
+   Rauschen (Scanner, altes Bookmark) oder ein tatsächlich falsches/rotiertes Token, das ein
+   `systemctl restart` vergessen hat (P3-M)?
+
+`[VERIFY]`: Schritt 4/`diagnose.sh`s Grep-Muster gegen `tailscale funnel status` ist bisher
+**nicht** gegen ein echtes Tailscale auf dieser VM geprüft (Tailscale fehlt, siehe
+„Umgebungsstand" oben) — beim ersten echten Lauf in Step 7 verifizieren, bei Abweichung
+`diagnose.sh` korrigieren.
+
+### Cloudflare-Rückbau (führt der Nikinger aus, nicht Claude Code)
+
+`cloudflared` ist auf dieser VM installiert (Step 0 C: `/usr/local/bin/cloudflared`, kein
+systemd-Service — nur die manuelle P2-Quick-Tunnel-Nutzung). Zwei parallele Wege nach außen sind
+ein Diagnoseproblem, kein Fallback (Plan §4 Step 6). Deinstallation ist eine destruktive Aktion
+auf der realen Maschine, außerhalb des Repos — deshalb hier nur der Befehl, nicht ausgeführt:
+
+```bash
+sudo rm -f /usr/local/bin/cloudflared
+# Falls Weg A (apt-Repo) benutzt wurde statt des Einzel-Binaries:
+#   sudo apt remove cloudflared
+#   sudo rm -f /etc/apt/sources.list.d/cloudflared.list /usr/share/keyrings/cloudflare-main.gpg
+```
+
+Cloudflare Named Tunnel bleibt als dokumentierter Ausweichweg bestehen (`phase2_mcp/CLAUDE.md`)
+— dieser Rückbau betrifft nur den installierten `cloudflared`-Client, nicht die Doku-Option.
+
+### „Inbetriebnahme" (einmalig)
+
+Wird in Step 7 befüllt — das ist der Lauf, den der Nikinger gegen die echte Infrastruktur
+ausführt (Plan §4 Step 7).
 
 ---
 
-## Session stopped — 2026-07-27 (Step 5: Backup und Restore-Nachweis)
+## Session stopped — 2026-07-27 (Step 6: Runbooks, `diagnose.sh`, Cloudflare-Rückbau)
 
-**Ergebnis:** Step 5 abgeschlossen. `backup_data_root.sh` (git bundle + Verify + Retention),
-`restore_check.sh` (Klon + HEAD/Tree-Vergleich), `sharefyx-backup.service`/`.timer` (Platzhalter,
-nicht installiert — Step 7).
+**Ergebnis:** Step 6 abgeschlossen. `phase3_edge/scripts/diagnose.sh` (sechs Prüfungen,
+degradiert sauber), Runbook „Connector zeigt Disconnected" + „Cloudflare-Rückbau" +
+„Inbetriebnahme"-Platzhalter im Phase-Head. `phase2_mcp/CLAUDE.md`s Quick-Tunnel-Runbook durch
+einen Verweis ersetzt.
 
-**`git bundle create` schlägt auf einem leeren Repo fehl** ("Refusing to create empty bundle") —
-jede Testfixture (`data_root`) legt deshalb einen echten Commit an, nicht nur ein leeres
-`git init`.
+**`diagnose.sh` real auf dieser VM gelaufen (read-only, kein Schreibzugriff):** Ergebnis —
+Prüfung 1 (`systemctl is-active sharefyx-mcp`) schlägt korrekt fehl, weil die Unit hier noch
+nicht installiert ist (Step 7). Ausgabe: `DIAGNOSE: sharefyx-mcp ist nicht aktiv (oder nicht
+installiert). NÄCHSTER SCHRITT: journalctl -u sharefyx-mcp -n 50`, Exit 1. Das ist ein
+korrekter, sauberer Abbruch — **nicht** das im Plan beschriebene „läuft durch, auch mit
+absichtlich gestopptem Dienst" (dafür bräuchte es einen tatsächlich laufenden und dann gestoppten
+Dienst). Die vollständige Prüfung aller sechs Schritte gegen einen echten, installierten Dienst
+verschiebt sich damit explizit nach Step 7 — hier festgehalten, nicht stillschweigend als „Done"
+gemeldet.
 
-**Zeitstempel-Kollisionsfalle umgangen, nicht nur vermieden (Advisor-Fund, dieselbe Klasse Fehler
-wie `mcp_smoke.py` in P2, siehe archivierter Step-7-Block):** `test_backup_retention_keeps_newest_n`
-läuft das Skript **nicht** in einer Schleife (bei Sekundenauflösung würden mehrere Bundles
-denselben Dateinamen bekommen und sich überschreiben). Stattdessen legt der Test fünf Fake-Bundles
-mit distinktem, sortierbarem Namen vor und ruft das Skript nur einmal für das echte, aktuelle
-Bundle auf. Der Dateiname selbst trägt jetzt zusätzlich Mikrosekunden (`%6N`, keine Doppelpunkte)
-statt nur Sekunden — doppelte Absicherung für den Fall eines künftigen Schleifen-Aufrufs.
+**`[VERIFY]` neu, benannt statt verschwiegen:** Prüfung 4s Grep-Muster gegen
+`tailscale funnel status` (`"127.0.0.1:8765"`) beruht auf Tailscales dokumentiertem
+Ausgabeformat, war aber auf dieser VM nie gegen ein echtes Tailscale zu verifizieren (Tailscale
+fehlt seit Step 0). Erster echter Test in Step 7; bei Abweichung `diagnose.sh` dort korrigieren,
+nicht den Fund hier überschreiben.
 
-**`test_backup_fails_and_cleans_up_on_corrupt_bundle` — echte Korruption, nicht simuliert
-(Advisor-Vorschlag umgesetzt):** ein frisch geschriebenes, gültiges Bundle besteht die eigene
-`git bundle verify` selbstverständlich. Der Test schiebt stattdessen einen Fake-`git`-Wrapper vor
-den echten auf `$PATH`, der `bundle verify` immer mit Exit 1 abbrechen lässt und alles andere an
-das echte `git` durchreicht — prüft damit den tatsächlichen Cleanup-Zweig (`rm -f` + Exit ≠ 0),
-nicht nur seine Absicht.
+**Check 6s Grep-Muster (`'"status":401'`) passt zum echten `AccessLogASGI`-Output** — geprüft
+gegen `request_log.py`s kompaktes `json.dumps(..., separators=(",", ":"))` (kein Leerzeichen
+nach dem Doppelpunkt), nicht nur angenommen.
 
-**`git bundle verify` schreibt die Ref-Liste auf stdout, die Bestätigung auf stderr** (empirisch
-geprüft, nicht angenommen) — im Skript deshalb explizit `>&2` umgeleitet, sonst hätte Hard Rule 7
-(stdout nur maschinenlesbares JSON) auf einem Zwischenschritt gebrochen, den der Plan nicht
-erwähnt.
+**Cloudflare-Rückbau ist ein Runbook-Eintrag, keine ausgeführte Aktion (Advisor-Vorgabe,
+dieselbe Klasse wie `install_units.sh`):** `cloudflared` ist auf dieser VM installiert
+(Step 0 C), aber die Deinstallation ist destruktiv und außerhalb des Repos — der Befehl steht im
+Phase-Head-Runbook, der Nikinger führt ihn selbst aus.
 
-**`SHAREFYX_BACKUP_DIR` ist Konfiguration im Skript (Umgebungsvariable, kein Literal), aber ein
-fester Wert in der Unit** (`/var/backups/sharefyx`, Plan §4 Step 5 "Ziel ist Konfiguration ...,
-kein Literal im Skript"). Bewusst **kein** fünfter Platzhalter/`local.env`-Eintrag: anders als
-`REPO_ROOT`/`DATA_ROOT` ist ein Backup-Zielverzeichnis kein Wert, der zwischen Maschinen
-tatsächlich variieren muss — ein FHS-üblicher Pfad reicht, ohne `install_units.sh` und
-`local.env.example` um eine fünfte Variable zu erweitern.
+**`phase2_mcp/CLAUDE.md` — Quick-Tunnel-Runbook ersetzt, nicht gelöscht:** die historischen
+Abschnitte „Live-Stand"/„Sicherheitsvorfall" standen bereits vollständig in
+`docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md` und im archivierten P2-Step-7-Session-Block
+(`phase2_mcp/SESSIONS_ARCHIVE.md`) — kein Informationsverlust durch das Kürzen. Die
+Überschrift behält bewusst den Wortlaut „Quick-Tunnel-Probe", damit der bestehende Verweis
+weiter oben im selben Dokument („Runbook „Quick-Tunnel-Probe" oben") gültig bleibt, statt eine
+zweite Textstelle mitziehen zu müssen. Ersetzt durch einen dreiteiligen Verweis (P2-Nachweis,
+P3-Betriebsweg, Verweis `phase3_edge/CLAUDE.md`) plus einem eigenen Absatz zu Cloudflare Named
+Tunnel als dokumentiertem Ausweichweg — wie im Plan gefordert.
 
-**`install_units.sh` unverändert lauffähig für die neuen Units:** es verarbeitet generisch alle
-`*.service`/`*.timer` in `phase3_edge/systemd/` (so in Step 4 vorbereitet) — die zwei neuen
-Backup-Units laufen ohne Skriptänderung durch dieselbe Platzhalter-Ersetzung und
-Unresolved-Placeholder-Prüfung.
+**Größenänderung:** `phase2_mcp/CLAUDE.md` von ~23KB auf ~19KB (Kürzung um die Cloudflare-
+Voraussetzungen), `docs/INDEX.md`-Zeile nachgezogen.
 
-**`test_units.py` (Step 4) erweitert, nicht dupliziert:** zwei neue Tests
-(`test_all_units_have_no_secret_shaped_value`, `test_all_units_have_no_hardcoded_machine_paths`)
-laufen über **alle** Unit-Dateien im Verzeichnis, nicht nur die MCP-Unit — sonst hätte die
-Token-Klartext-Versicherung aus Step 4 die beiden neuen Backup-Units stillschweigend
-ausgenommen.
+**Tests:** keine neuen — Plan sieht für Step 6 keine automatisierten Tests vor (Runbook-Text und
+ein Bash-Skript, das gegen eine echte Infrastruktur läuft). `.venv/bin/python -m pytest -q` →
+**168/168 grün**, unverändert gegenüber Step 5 (Kontrollzahl, keine Regression durch die
+Doku-Änderungen).
 
-**Tests** (`phase3_edge/tests/test_backup_scripts.py`, alle sieben aus dem Plan, gegen
-Wegwerf-Git-Repos unter `tmp_path`, nie den echten `DATA_ROOT`): `test_backup_creates_verifiable_bundle`,
-`test_backup_emits_single_json_line_on_stdout`, `test_backup_retention_keeps_newest_n`,
-`test_backup_fails_and_cleans_up_on_corrupt_bundle`, `test_restore_check_matches_head_and_tree`,
-`test_restore_check_detects_divergence`, `test_scripts_have_no_hardcoded_paths`. Plus zwei in
-`phase3_edge/tests/test_units.py` (siehe oben).
+**Modul-Status oben nachgezogen** (Zeile 7: ⬜ → ✅, 0 Tests — begründet).
 
-**Verifiziert:** `.venv/bin/python -m pytest -q` → **168/168 grün** (159 + 9 neue).
+**Offen für den Nikinger, vor Step 7 zu klären (Zusammenfassung, unverändert seit früheren
+Steps, hier gebündelt vor dem Abschlussbericht):**
+1. `mcp_smoke.py`/P3-N-Grenzfrage (Step 2) — `logging.basicConfig` → `configure_logging`
+   umstellen oder nicht.
+2. Tailscale-Installation + Tailnet-Voraussetzungen (Step 0) — einziges echtes Gate vor Step 7.
+3. Cloudflare-Rückbau (dieser Step) — Befehl steht im Runbook, Ausführung ist Sache des
+   Nikingers.
 
-**Modul-Status oben nachgezogen** (Zeile 6: ⬜ → ✅, 9 Tests).
-
-**Offen für den Nikinger, weiterhin unverändert:**
-1. `mcp_smoke.py`/P3-N-Grenzfrage aus Step 2.
-2. Tailscale ist auf dieser VM weiterhin nicht installiert — einziges Gate vor Step 7.
-
-**Nächster Schritt (konkret):** Step 6 — Runbooks, `diagnose.sh`, Cloudflare-Rückbau. Der
-Cloudflare-Uninstall selbst ist ein Befehl **für den Nikinger** (destruktive Aktion auf der
-realen Maschine, außerhalb des Repos) — Claude Code liefert nur den Runbook-Text, führt ihn
-nicht aus.
+**Nächster Schritt (konkret):** Step 7 — Live-Abnahme. Läuft komplett beim Nikinger gegen die
+echte Infrastruktur; Claude Code liefert die Befehlsfolge aus dem Plan und wertet die
+Ergebnisse aus, führt aber nichts davon selbst aus (echter `DATA_ROOT`, echter Keyring, echte
+Token, echte Claude-Accounts).

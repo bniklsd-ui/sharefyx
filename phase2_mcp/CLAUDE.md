@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase2_mcp_plan.md          # voller Plan, Entscheidungen P2-A–P2-N, Steps 0–7
   - ../docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md # Herkunft der Entscheidungen D1–D6
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
-updated: 2026-07-27 (Scope-`[VERIFY]` entfernt, P3 übernommen)
+updated: 2026-07-27 (Quick-Tunnel-Runbook durch P3-Verweis ersetzt)
 ---
 # CLAUDE.md — Phase 2: MCP-Server (`phase2_mcp/`)
 
@@ -190,86 +190,20 @@ Begründung, warum OAuth trotzdem hinter P3 bleibt statt vorgezogen zu werden.
 Store; genutzt wird es ab Step 6 (`tools.py :: get_item`, §3.4). Dort ist `version` in fremden
 Spaces informativ, nicht autoritativ — es gibt dort per Architektur keine Writes.
 
-## Runbook „Quick-Tunnel-Probe" (führt der Nikinger aus, nicht Claude Code)
+## Runbook „Quick-Tunnel-Probe" — historisch, ersetzt (P3 Step 6)
 
-Der Tunnel-Schritt wird **nicht committet** — kein Skript, keine Config, kein Hostname im Repo
-(das ist P3). Diese Anleitung ist reine Dokumentation des Ablaufs (Plan §4 Step 7).
+Quick Tunnel war der **einmalige P2-Nachweis** (live-verifiziert 2026-07-26, 21 Tool-Aufrufe über
+eine echte Konversation, Protokoll: `docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md`). Der
+**Betriebsweg ist ab P3 Tailscale Funnel** — stabiler Hostname statt einer bei jedem
+`cloudflared`-Neustart neu vergebenen Subdomain. Runbooks, Voraussetzungen und die
+Inbetriebnahme-Anleitung: `phase3_edge/CLAUDE.md`.
 
-**[2026-07-26 Korrektur, vom Nikinger beim ersten Live-Lauf gefunden]** Die ursprüngliche
-Reihenfolge (`serve.py --allowed-host` vor `cloudflared`) war zirkulär: die trycloudflare.com-
-Subdomain wird von `cloudflared` **zufällig bei jedem Start neu vergeben**, existiert also erst
-NACH Schritt „Tunnel starten" — sie kann nicht vorher in `--allowed-host` stehen. Reihenfolge
-jetzt korrekt (Tunnel zuerst, Subdomain ablesen, danach `serve.py` mit der bekannten Subdomain
-starten). Kein Bug im Code — `serve.py`/`app.py` hatten von Anfang an einen `--allowed-host`-
-Parameter genau für diesen Zweck, nur die Runbook-Reihenfolge war falsch:
-
-```
-1. python phase2_mcp/scripts/issue_token.py --space niklas      # Token einmal notieren
-2. cloudflared tunnel --url http://127.0.0.1:8765
-       # Ausgabe abwarten: "Your quick Tunnel has been created!" mit der zugewiesenen
-       # https://<subdomain>.trycloudflare.com — läuft in diesem Terminal weiter
-3. SPACE_DATA_ROOT=/home/savefyx/savefyx-data python phase2_mcp/scripts/serve.py \
-       --allowed-host '<subdomain>.trycloudflare.com'      # die aus Schritt 2 bekannte Subdomain
-4. curl https://<subdomain>.trycloudflare.com/health        → {"status":"ok",…}
-5. Claude → Settings → Connectors → Add custom connector:
-       https://<subdomain>.trycloudflare.com/mcp/<token>
-6. Neue Konversation, Connector aktivieren, ein Read und ein Write ausführen.
-```
-
-Bei jedem Neustart von `cloudflared` ändert sich die Subdomain — `serve.py` muss dann mit der
-neuen Subdomain neu gestartet werden (Schritt 3 wiederholen).
-
-**Live-Stand (2026-07-26):** Alle sechs Schritte vom Nikinger erfolgreich durchgeführt — Token
-ausgegeben, Tunnel verbunden (`https://flyer-only-gaming-cpu.trycloudflare.com`, Frankfurt-Edge,
-CONNECTIVITY PRE-CHECKS alle PASS), `serve.py` mit korrektem `--allowed-host` gestartet,
-`curl .../health` → `{"status":"ok",...}`, Connector in Claude angelegt, **21 Tool-Aufrufe über
-eine echte Konversation** statt nur ein Read und ein Write. Vollständiges Protokoll:
-`docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md`. `ROADMAP.md` steht auf ✅.
-
-**Sicherheitsvorfall im selben Lauf:** ein Screenshot des Connectors zeigte die Verbindungs-URL
-inklusive Pfad-Token im Klartext, und der Token wurde beim Erklären des Fundes zusätzlich im
-Chat wiederholt — strukturell derselbe Vorfall wie in Step 3. Sofort erkannt, Token vom
-Nikinger rotiert, Screenshot nie versioniert (Korrektur oben unter Modul-Status).
-
-### Cloudflare-Voraussetzungen (vor Schritt 2)
-
-**Kurz: nichts von Cloudflare nötig.** Schritt 2 benutzt Cloudflares **Quick Tunnel**
-(`cloudflared tunnel --url ...`) — keine Registrierung, kein Account, keine Domain, kein
-API-Token, kein `cloudflared login`. Nur der `cloudflared`-Client muss auf der VM installiert
-sein. **Falle:** die meisten Cloudflare-Tutorials im Netz beschreiben stattdessen „Named
-Tunnels" (`cloudflared tunnel create ...`), die einen Account **und** eine bei Cloudflare
-verwaltete Domain brauchen — das ist ein anderer, schwererer Weg, nicht der hier benutzte.
-
-`cloudflared` installieren, zwei Wege:
-
-```bash
-# Weg A — offizielles apt-Repo (sauber aktualisierbar)
-sudo mkdir -p --mode=0755 /usr/share/keyrings
-curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
-echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/cloudflared.list
-sudo apt update && sudo apt install cloudflared
-
-# Weg B — einzelnes Binary (schneller, kein Repo, reicht für einen einmaligen Test)
-uname -m   # x86_64 -> amd64, aarch64 -> arm64
-curl -Lo cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
-chmod +x cloudflared && sudo mv cloudflared /usr/local/bin/
-```
-
-`cloudflared --version` zur Kontrolle. `cloudflared tunnel --url ...` gibt sofort eine
-zufällige `https://….trycloudflare.com`-URL aus, ohne Login-Prompt. Diese URL ist **ephemer**
-— sie ändert sich bei jedem Neustart von `cloudflared`, für den einmaligen Probe-Lauf egal,
-aber genau der Grund, warum R3 das als Übergang vor VPS+WireGuard (P3) behandelt, nicht als
-Dauerlösung. Cloudflare sieht dabei weiterhin Klartext (R4, bereits akzeptiert). Weiches Limit
-von ca. 200 gleichzeitigen Requests je Quick Tunnel — für einen manuellen Test irrelevant.
-
-`[VERIFY]` bei Ausführung gegen die aktuelle Anthropic-Doku: Custom Connectors auf **Pro** ohne
-Owner-Gate (Stand 2026-07-25 dokumentiert für Free/Pro/Max/Team/Enterprise; Free ist auf einen
-Connector begrenzt). Diese Prüfung ist Sache des Nikingers beim Ausführen, nicht von Claude
-Code — der Tunnel-/Connector-Schritt liegt außerhalb des P2-Scopes (§7).
-
-**Ergebnis melden:** ein erfolgreicher Read und ein erfolgreicher Write über den echten
-Connector heben Phase 2 von „code-complete" auf „live-verifiziert" (Akzeptanzkriterium §5.9) —
-analog zu Phase 1s Live-Verify durch den Nikinger gegen den echten `DATA_ROOT`.
+**Cloudflare Named Tunnel** bleibt als dokumentierter Ausweichweg stehen, falls Funnel einmal
+ausfällt (Plan §8 Risiko 1) — Voraussetzung dafür ist eine eigene, bei Cloudflare verwaltete
+Domain (anders als der oben benutzte Quick Tunnel, der ohne Account/Domain auskam). Details bei
+Bedarf neu recherchieren; hier bewusst nicht dupliziert, um keine zwei Wege nach außen in der
+Doku parallel zu pflegen (P3 Step 6 baut zudem den `cloudflared`-Rückbau auf dieser VM in das
+Runbook ein, siehe `phase3_edge/CLAUDE.md`).
 
 ---
 
