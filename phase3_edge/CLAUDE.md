@@ -65,7 +65,7 @@ hier `tools.py` anfasst, ist in der falschen Phase.
 | 5 | systemd-Units, `install_units.sh`, `/health.uptime_s` (P3-I) | 4 | ✅ | 6 |
 | 6 | Backup/Restore-Skripte, Backup-Timer | 5 | ✅ | 9 (7 in `test_backup_scripts.py`, 2 in `test_units.py`) |
 | 7 | Runbooks, `diagnose.sh`, Cloudflare-Rückbau | 6 | ✅ | 0 (Runbook/Skript, keine automatisierten Tests laut Plan) |
-| 8 | Live-Abnahme (Nikinger) | 7 | ⬜ | — |
+| 8 | Live-Abnahme (Nikinger) | 7 | 🔄 in Arbeit — 8/14 Zeilen belegt, B3+B4 gefunden und behoben | — |
 
 ## Umgebungsstand (Step 0, Details im Archiv)
 
@@ -214,141 +214,59 @@ gegen `tailscale funnel status` (nie gegen ein echtes Tailscale getestet, siehe 
 
 ---
 
-## Session stopped — 2026-07-27 (Step 6: Runbooks, `diagnose.sh`, Cloudflare-Rückbau)
+## Session stopped — 2026-07-27 (Live-Abnahme im Gang, für kalten Leser: 8/14 belegt, keine offenen Bugs)
 
-**Ergebnis:** Step 6 abgeschlossen. `phase3_edge/scripts/diagnose.sh` (sechs Prüfungen,
-degradiert sauber), Runbook „Connector zeigt Disconnected" + „Cloudflare-Rückbau" +
-„Inbetriebnahme"-Platzhalter im Phase-Head. `phase2_mcp/CLAUDE.md`s Quick-Tunnel-Runbook durch
-einen Verweis ersetzt.
+**Für den nächsten, kalten Leser (Mensch oder Claude): das Wichtigste zuerst.** B3 und B4 sind
+**behoben und in Produktion bestätigt** — `systemctl status sharefyx-backup.service` zeigt
+für **beide** `ExecStart`-Prozesse `status=0/SUCCESS`. Die drei `FEHLER`-Zeilen im letzten
+`abnahme_run.sh`-Lauf (#8, #12, #13) sind **keine neuen Bugs** — sie erklären sich vollständig
+aus der Art, wie der Lauf aufgerufen wurde (siehe unten). Nicht erneut debuggen, nur korrekt
+aufrufen.
 
-**`diagnose.sh` real auf dieser VM gelaufen (read-only, kein Schreibzugriff):** Ergebnis —
-Prüfung 1 (`systemctl is-active sharefyx-mcp`) schlägt korrekt fehl, weil die Unit hier noch
-nicht installiert ist (Step 7). Ausgabe: `DIAGNOSE: sharefyx-mcp ist nicht aktiv (oder nicht
-installiert). NÄCHSTER SCHRITT: journalctl -u sharefyx-mcp -n 50`, Exit 1. Das ist ein
-korrekter, sauberer Abbruch — **nicht** das im Plan beschriebene „läuft durch, auch mit
-absichtlich gestopptem Dienst" (dafür bräuchte es einen tatsächlich laufenden und dann gestoppten
-Dienst). Die vollständige Prüfung aller sechs Schritte gegen einen echten, installierten Dienst
-verschiebt sich damit explizit nach Step 7 — hier festgehalten, nicht stillschweigend als „Done"
-gemeldet.
+**Woher das kommt:** dieselbe Session hat P3 Steps 0–6 gebaut (Commits `eb2038a`…`b228bcd`),
+dann live gegen die echte VM abgenommen (Commits `7368f57` B3, `d05464e` B4). Ein **zweiter,
+paralleler** Claude-Chat hat `phase3_edge/scripts/abnahme_run.sh` (Test-Runner) und
+`docs/concepts/P3_ABNAHME_2026-07-27.md` (Protokollvorlage) geschrieben — beide geprüft
+(kein Prompt-Injection-Risiko, kein `sudo`-Missbrauch), beide noch **uncommitted**, gehören
+nicht dieser Session.
 
-**`[VERIFY]` neu, benannt statt verschwiegen:** Prüfung 4s Grep-Muster gegen
-`tailscale funnel status` (`"127.0.0.1:8765"`) beruht auf Tailscales dokumentiertem
-Ausgabeformat, war aber auf dieser VM nie gegen ein echtes Tailscale zu verifizieren (Tailscale
-fehlt seit Step 0). Erster echter Test in Step 7; bei Abweichung `diagnose.sh` dort korrigieren,
-nicht den Fund hier überschreiben.
+**Ehrlicher Stand der 14 Abnahmezeilen** (Plan §4 Step 7 / `phase3_edge/CLAUDE.md` Runbook):
 
-**Check 6s Grep-Muster (`'"status":401'`) passt zum echten `AccessLogASGI`-Output** — geprüft
-gegen `request_log.py`s kompaktes `json.dumps(..., separators=(",", ":"))` (kein Leerzeichen
-nach dem Doppelpunkt), nicht nur angenommen.
+| # | Zeile | Status | Beleg |
+|---|---|---|---|
+| 1 | `/health` außen | ✅ | mehrfach bestätigt, `uptime_s` vorhanden |
+| 2 | Connector `niklas` R+W | ✅ | `itm_53cf4e92`/`itm_cc4866f3` real angelegt — kein sauberer Einzel-Lauf-Beleg |
+| 3 | Connector `fabian` R+W | ⬜ | **noch nicht gemacht** |
+| 4 | Cross-Space | ⬜ | **noch nicht gemacht** |
+| 5 | `list_spaces` leerer `fabian` | ⬜ | **noch nicht gemacht** |
+| 6 | Reboot-Test | ⬜ | Nikinger: „noch nicht möglich" (Stand vor dieser Notiz) |
+| 7 | Kill-Test | ✅ | `abnahme_run.sh --with-kill`-Lauf: „wieder gesund", `uptime_s: 4` |
+| 8 | Request-Log | ✅ **funktional**, ⬜ **im Skript unbewiesen** | 3 echte `"ev":"tool"`-Zeilen direkt im Journal gefunden (`list_spaces`, 2× `create_item`) — liegen nur außerhalb des `--since`-Fensters, weil Tests 2–5 nie unmittelbar vor einem `run` gemacht wurden |
+| 9 | Token-Grep | ✅ | mehrfach leer |
+| 10 | Titel-/Body-Grep | ✅ | mehrfach leer |
+| 11 | Fremdzugriff → 401 | ✅ | 401 + `<redacted>` im Log |
+| 12 | Backup-Timer | ⬜ **echt offen** | Timer nie selbst ausgelöst (nur der Service manuell) — `LastTriggerUSec` bleibt leer, bis der Timer selbst feuert (`NEXT` laut `list-timers`: 2026-07-28 00:04:56 CEST, `RandomizedDelaySec=900`) |
+| 13 | Restore-Nachweis | ✅ **mechanisch bewiesen**, Skript-Check zeigt trotzdem FEHLER | `systemctl status` zweifelsfrei `status=0/SUCCESS` für `restore_check.sh` — `abnahme_run.sh`s **eigener** Default für `SHAREFYX_BACKUP_DIR` ist noch `/var/backups/sharefyx` (alt), nicht `/var/lib/sharefyx-backup` (B3-Fix); ohne `export SHAREFYX_BACKUP_DIR=/var/lib/sharefyx-backup` findet der Skript-Check das Bundle nicht — das Skript gehört nicht dieser Session, wurde bewusst nicht selbst editiert |
+| 14 | Größenbudget | ⬜ | optional, noch nicht angefasst |
 
-**Cloudflare-Rückbau ist ein Runbook-Eintrag, keine ausgeführte Aktion (Advisor-Vorgabe,
-dieselbe Klasse wie `install_units.sh`):** `cloudflared` ist auf dieser VM installiert
-(Step 0 C), aber die Deinstallation ist destruktiv und außerhalb des Repos — der Befehl steht im
-Phase-Head-Runbook, der Nikinger führt ihn selbst aus.
+**Für den nächsten sauberen Lauf, in dieser Reihenfolge:**
 
-**`phase2_mcp/CLAUDE.md` — Quick-Tunnel-Runbook ersetzt, nicht gelöscht:** die historischen
-Abschnitte „Live-Stand"/„Sicherheitsvorfall" standen bereits vollständig in
-`docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md` und im archivierten P2-Step-7-Session-Block
-(`phase2_mcp/SESSIONS_ARCHIVE.md`) — kein Informationsverlust durch das Kürzen. Die
-Überschrift behält bewusst den Wortlaut „Quick-Tunnel-Probe", damit der bestehende Verweis
-weiter oben im selben Dokument („Runbook „Quick-Tunnel-Probe" oben") gültig bleibt, statt eine
-zweite Textstelle mitziehen zu müssen. Ersetzt durch einen dreiteiligen Verweis (P2-Nachweis,
-P3-Betriebsweg, Verweis `phase3_edge/CLAUDE.md`) plus einem eigenen Absatz zu Cloudflare Named
-Tunnel als dokumentiertem Ausweichweg — wie im Plan gefordert.
+```bash
+export SHAREFYX_HOST=savefyx-vmware-virtual-platform.tail89fc2a.ts.net
+export SHAREFYX_DATA_ROOT=/home/savefyx/savefyx-data
+export SHAREFYX_BACKUP_DIR=/var/lib/sharefyx-backup   # B3-Fix — abnahme_run.sh kennt den neuen Pfad nicht selbst
+./phase3_edge/scripts/abnahme_run.sh start
+# → JETZT sofort, ohne Pause: Connector-Tests 2–5 fahren (niklas UND fabian, Cross-Space,
+#   list_spaces bei leerem fabian) — das füllt gleichzeitig #2–#5 UND liefert die Tool-Events,
+#   die #8 im richtigen Zeitfenster braucht
+sudo -E ./phase3_edge/scripts/abnahme_run.sh run --with-kill | tee /tmp/p3-abnahme.txt
+```
 
-**Größenänderung:** `phase2_mcp/CLAUDE.md` von ~23KB auf ~19KB (Kürzung um die Cloudflare-
-Voraussetzungen), `docs/INDEX.md`-Zeile nachgezogen.
+Danach bleibt real nur noch offen: #6 (Reboot, Nikinger-Zeitfrage), #12 (Timer muss selbst
+feuern — warten oder als „Mechanismus bewiesen, Zeitplan nicht" akzeptieren, siehe §4 des
+Protokolls), #14 (optional). Ergebnis in `docs/concepts/P3_ABNAHME_2026-07-27.md` §3.1 kleben,
+dann an diese Session zurückgeben — Abschluss (Token-Rotation, Protokoll fertigstellen,
+`ROADMAP.md`/`docs/INDEX.md`/dieser Phase-Head auf ✅) ist der letzte Schritt.
 
-**Tests:** keine neuen — Plan sieht für Step 6 keine automatisierten Tests vor (Runbook-Text und
-ein Bash-Skript, das gegen eine echte Infrastruktur läuft). `.venv/bin/python -m pytest -q` →
-**168/168 grün**, unverändert gegenüber Step 5 (Kontrollzahl, keine Regression durch die
-Doku-Änderungen).
-
-**Modul-Status oben nachgezogen** (Zeile 7: ⬜ → ✅, 0 Tests — begründet).
-
-**Offen für den Nikinger, vor Step 7 zu klären (Zusammenfassung, unverändert seit früheren
-Steps, hier gebündelt vor dem Abschlussbericht):**
-1. `mcp_smoke.py`/P3-N-Grenzfrage (Step 2) — `logging.basicConfig` → `configure_logging`
-   umstellen oder nicht.
-2. Tailscale-Installation + Tailnet-Voraussetzungen (Step 0) — einziges echtes Gate vor Step 7.
-3. Cloudflare-Rückbau (dieser Step) — Befehl steht im Runbook, Ausführung ist Sache des
-   Nikingers.
-
-**Nachtrag zu diesem Block (Advisor-Fund, nach dem ursprünglichen Commit ergänzt):** der
-„Inbetriebnahme"-Runbook-Abschnitt oben war noch der leere Platzhalter aus Step 0/1 —
-nachgezogen mit der vollständigen Befehlsfolge und der 14-Zeilen-Abnahmematrix aus Plan §4
-Step 7, angepasst an das tatsächlich Gebaute (vier `local.env`-Variablen, zwei Backup-Units,
-`diagnose.sh` als Vorab-Check vor Schritt 7). Ohne diese Ergänzung hätte der Nikinger für Step 7
-den 46KB-Plan öffnen müssen, obwohl der Phase-Head genau dafür da ist. Reine Doku-Ergänzung,
-kein Code, keine neuen Tests — `pytest` bleibt bei 168/168.
-
-**Nächster Schritt (konkret):** Step 7 — Live-Abnahme. Läuft komplett beim Nikinger gegen die
-echte Infrastruktur; Claude Code liefert die Befehlsfolge aus dem Plan und wertet die
-Ergebnisse aus, führt aber nichts davon selbst aus (echter `DATA_ROOT`, echter Keyring, echte
-Token, echte Claude-Accounts).
-
-**[2026-07-27, während der Live-Abnahme] Fund B3, behoben — `sharefyx-backup.service` scheiterte
-real auf der VM:** `mkdir: cannot create directory '/var/backups/sharefyx': Permission denied`.
-Ursache: der Dienst läuft als unprivilegierter `User=savefyx`; `/var/backups` gehört auf
-Debian/Ubuntu root und ist für andere Nutzer nicht beschreibbar. Kein Unit-Test hat das
-gefangen, weil `test_units.py` reines Textparsen ist und nie einen echten systemd-Prozess unter
-echtem `User=`-Sandbox startet — genau die Klasse Fund, die laut Plan nur unter echter
-Infrastruktur (V9-Nachbarschaft) sichtbar wird.
-
-**Behoben:** `phase3_edge/systemd/sharefyx-backup.service` benutzt jetzt `StateDirectory=
-sharefyx-backup` statt eines literalen `/var/backups/sharefyx`. systemd legt
-`/var/lib/sharefyx-backup` bei **jedem** Start selbst an, bereits mit der richtigen
-Eigentümerschaft (`User=`/`Group=` des Dienstes) — kein manuelles `chown`, auf keiner Maschine,
-jemals nötig (dieselbe Maschinenunabhängigkeits-Logik wie bei den vier `local.env`-Variablen).
-`SHAREFYX_BACKUP_DIR` zeigt entsprechend jetzt auf `/var/lib/sharefyx-backup` statt
-`/var/backups/sharefyx` — `/var/lib` ist ohnehin die FHS-korrekte Konvention für
-dienst-verwaltete Zustandsdaten, `/var/backups` eher für administrator-initiierte Backups mit
-Root-Rechten gedacht.
-
-**Auf der VM anzuwenden:** `sudo phase3_edge/scripts/install_units.sh` erneut laufen lassen
-(re-templated die Unit, `daemon-reload`, `sharefyx-mcp` erneut `enable --now` — unschädlich,
-bereits laufend), danach `sudo systemctl start sharefyx-backup.service` erneut versuchen.
-
-**Nebenbefund, nicht behoben (gehört nicht mir):** `phase3_edge/scripts/abnahme_run.sh` — vom
-Nikinger über eine parallele Claude-Sitzung geschrieben, nicht Teil dieser Session — hat
-weiterhin `/var/backups/sharefyx` als Default für `SHAREFYX_BACKUP_DIR` (Zeile 27). Beim nächsten
-Lauf `SHAREFYX_BACKUP_DIR=/var/lib/sharefyx-backup` explizit exportieren, sonst findet Test 13
-das neue Bundle nicht. Bewusst nicht eigenmächtig editiert — das Skript gehört einer anderen
-Sitzung, die den Nikinger direkt informiert bekommt.
-
-**Tests:** keine Änderung nötig, `.venv/bin/python -m pytest -q` → weiterhin **168/168 grün**
-(kein Test prüfte den literalen Pfadwert, nur Secret-Shape und `/home/savefyx`-Freiheit).
-
-**[2026-07-27, dieselbe Live-Abnahme] Fund B4, behoben — nächster Fehlschlag, nachdem B3 den
-Weg freigemacht hatte:** `backup_data_root.sh` erstellte das Bundle jetzt korrekt (B3-Fix
-funktioniert), scheiterte aber bei der Verifikation:
-`error: need a repository to verify a bundle`. Ursache: `git bundle verify "$bundle"` lief ohne
-`-C`/`--git-dir` — `git bundle verify` braucht zwingend eine Repo-Umgebung zum Dispatchen (auch
-ohne externe Prerequisites zu prüfen), und ohne `WorkingDirectory=` im Unit ist das
-Arbeitsverzeichnis unter systemd `/`, kein Git-Repo. `git bundle create` (Zeile davor) hatte
-bereits korrekt `-C "$DATA_ROOT"` — die `verify`-Zeile war die einzige Lücke.
-
-**Warum kein Test das gefangen hat, obwohl `test_backup_creates_verifiable_bundle` genau diesen
-Pfad prüft:** `subprocess.run(["bash", str(BACKUP_SCRIPT)], ...)` ohne `cwd=` erbt pytests
-eigenes Arbeitsverzeichnis — und das ist zufällig dieses Repo selbst, also zufällig ein
-Git-Repo. Der Test bestand, weil der Testkontext unbeabsichtigt genau die Bedingung lieferte,
-die unter systemd fehlt. Klassischer „bestanden aus Zufall, nicht aus Korrektheit"-Fall.
-
-**Behoben, zweifach (Skript + Unit, nicht nur eins von beiden):**
-- `backup_data_root.sh`: `git bundle verify` → `git -C "$DATA_ROOT" bundle verify` — die
-  eigentliche Korrektur, unabhängig von jeder Unit-Konfiguration richtig.
-- `phase3_edge/systemd/sharefyx-backup.service`: `WorkingDirectory=__REPO_ROOT__` ergänzt
-  (fehlte bisher, `sharefyx-mcp.service` hat es bereits) — Verteidigung in der Tiefe, falls ein
-  künftiges Skript in dieser Unit denselben Fehler macht.
-- **Testlücke geschlossen, nicht nur der Bug:** alle `subprocess.run`-Aufrufe in
-  `test_backup_scripts.py`, die die Skripte direkt starten, laufen jetzt mit `cwd="/"` —
-  reproduziert exakt die systemd-Realität ohne `WorkingDirectory=`, statt sich auf das
-  zufällige Repo-cwd von pytest zu verlassen. Der Fake-`git`-Wrapper im
-  Korruptions-Test musste dafür von einer festen `$1`/`$2`-Positionsprüfung auf einen
-  Substring-Check (`"bundle verify"` irgendwo in `"$*"`) umgestellt werden, weil `-C
-  "$DATA_ROOT"` jetzt vor `bundle verify` steht.
-
-**Tests:** `.venv/bin/python -m pytest -q` → **168/168 grün**, `test_backup_scripts.py` einzeln
-gegen `cwd="/"` gegengeprüft (alle sieben grün) — die Testverschärfung selbst wurde vor dem Fix
-kurz gegen den ungefixten Stand laufen lassen und schlug dort korrekt fehl (Beweis, dass sie den
-echten Fehler jetzt fängt), nicht nur behauptet.
+**Nächster Schritt (konkret):** wie oben — sauberer Lauf, dann zurück an Claude Code für den
+Abschluss.
