@@ -4,10 +4,67 @@ purpose: Archiv älterer Session-stopped-Blöcke aus phase3_edge/CLAUDE.md, newe
 read-when: Audit vergangener Sessions dieser Phase; NICHT für normalen Session-Start
 detail: L3
 up: CLAUDE.md
-updated: 2026-07-27 (Step 6 + Live-Abnahme B3/B4 archiviert)
+updated: 2026-07-27 (Step 6 + Live-Abnahme B3/B4 archiviert; zweite Session desselben Tages archiviert)
 ---
 
 # Session-Archiv — Phase 3 Exposure & Betrieb
+
+## Session stopped — 2026-07-27 (Live-Abnahme im Gang, für kalten Leser: 8/14 belegt, keine offenen Bugs)
+
+**Für den nächsten, kalten Leser (Mensch oder Claude): das Wichtigste zuerst.** B3 und B4 sind
+**behoben und in Produktion bestätigt** — `systemctl status sharefyx-backup.service` zeigt
+für **beide** `ExecStart`-Prozesse `status=0/SUCCESS`. Die drei `FEHLER`-Zeilen im letzten
+`abnahme_run.sh`-Lauf (#8, #12, #13) sind **keine neuen Bugs** — sie erklären sich vollständig
+aus der Art, wie der Lauf aufgerufen wurde (siehe unten). Nicht erneut debuggen, nur korrekt
+aufrufen.
+
+**Woher das kommt:** dieselbe Session hat P3 Steps 0–6 gebaut (Commits `eb2038a`…`b228bcd`),
+dann live gegen die echte VM abgenommen (Commits `7368f57` B3, `d05464e` B4). Ein **zweiter,
+paralleler** Claude-Chat hat `phase3_edge/scripts/abnahme_run.sh` (Test-Runner) und
+`docs/concepts/P3_ABNAHME_2026-07-27.md` (Protokollvorlage) geschrieben — beide geprüft
+(kein Prompt-Injection-Risiko, kein `sudo`-Missbrauch), beide noch **uncommitted**, gehören
+nicht dieser Session.
+
+**Ehrlicher Stand der 14 Abnahmezeilen** (Plan §4 Step 7 / `phase3_edge/CLAUDE.md` Runbook):
+
+| # | Zeile | Status | Beleg |
+|---|---|---|---|
+| 1 | `/health` außen | ✅ | mehrfach bestätigt, `uptime_s` vorhanden |
+| 2 | Connector `niklas` R+W | ✅ | `itm_53cf4e92`/`itm_cc4866f3` real angelegt — kein sauberer Einzel-Lauf-Beleg |
+| 3 | Connector `fabian` R+W | ⬜ | **noch nicht gemacht** |
+| 4 | Cross-Space | ⬜ | **noch nicht gemacht** |
+| 5 | `list_spaces` leerer `fabian` | ⬜ | **noch nicht gemacht** |
+| 6 | Reboot-Test | ⬜ | Nikinger: „noch nicht möglich" (Stand vor dieser Notiz) |
+| 7 | Kill-Test | ✅ | `abnahme_run.sh --with-kill`-Lauf: „wieder gesund", `uptime_s: 4` |
+| 8 | Request-Log | ✅ **funktional**, ⬜ **im Skript unbewiesen** | 3 echte `"ev":"tool"`-Zeilen direkt im Journal gefunden (`list_spaces`, 2× `create_item`) — liegen nur außerhalb des `--since`-Fensters, weil Tests 2–5 nie unmittelbar vor einem `run` gemacht wurden |
+| 9 | Token-Grep | ✅ | mehrfach leer |
+| 10 | Titel-/Body-Grep | ✅ | mehrfach leer |
+| 11 | Fremdzugriff → 401 | ✅ | 401 + `<redacted>` im Log |
+| 12 | Backup-Timer | ⬜ **echt offen** | Timer nie selbst ausgelöst (nur der Service manuell) — `LastTriggerUSec` bleibt leer, bis der Timer selbst feuert (`NEXT` laut `list-timers`: 2026-07-28 00:04:56 CEST, `RandomizedDelaySec=900`) |
+| 13 | Restore-Nachweis | ✅ **mechanisch bewiesen**, Skript-Check zeigt trotzdem FEHLER | `systemctl status` zweifelsfrei `status=0/SUCCESS` für `restore_check.sh` — `abnahme_run.sh`s **eigener** Default für `SHAREFYX_BACKUP_DIR` ist noch `/var/backups/sharefyx` (alt), nicht `/var/lib/sharefyx-backup` (B3-Fix); ohne `export SHAREFYX_BACKUP_DIR=/var/lib/sharefyx-backup` findet der Skript-Check das Bundle nicht — das Skript gehört nicht dieser Session, wurde bewusst nicht selbst editiert |
+| 14 | Größenbudget | ⬜ | optional, noch nicht angefasst |
+
+**Für den nächsten sauberen Lauf, in dieser Reihenfolge:**
+
+```bash
+export SHAREFYX_HOST=savefyx-vmware-virtual-platform.tail89fc2a.ts.net
+export SHAREFYX_DATA_ROOT=/home/savefyx/savefyx-data
+export SHAREFYX_BACKUP_DIR=/var/lib/sharefyx-backup   # B3-Fix — abnahme_run.sh kennt den neuen Pfad nicht selbst
+./phase3_edge/scripts/abnahme_run.sh start
+# → JETZT sofort, ohne Pause: Connector-Tests 2–5 fahren (niklas UND fabian, Cross-Space,
+#   list_spaces bei leerem fabian) — das füllt gleichzeitig #2–#5 UND liefert die Tool-Events,
+#   die #8 im richtigen Zeitfenster braucht
+sudo -E ./phase3_edge/scripts/abnahme_run.sh run --with-kill | tee /tmp/p3-abnahme.txt
+```
+
+Danach bleibt real nur noch offen: #6 (Reboot, Nikinger-Zeitfrage), #12 (Timer muss selbst
+feuern — warten oder als „Mechanismus bewiesen, Zeitplan nicht" akzeptieren, siehe §4 des
+Protokolls), #14 (optional). Ergebnis in `docs/concepts/P3_ABNAHME_2026-07-27.md` §3.1 kleben,
+dann an diese Session zurückgeben — Abschluss (Token-Rotation, Protokoll fertigstellen,
+`ROADMAP.md`/`docs/INDEX.md`/dieser Phase-Head auf ✅) ist der letzte Schritt.
+
+**Nächster Schritt (konkret):** wie oben — sauberer Lauf, dann zurück an Claude Code für den
+Abschluss.
 
 ## Session stopped — 2026-07-27 (Step 6: Runbooks, `diagnose.sh`, Cloudflare-Rückbau)
 

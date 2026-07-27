@@ -31,9 +31,10 @@ updated: 2026-07-27
 
 ## Active phase (3 — Exposure & Betrieb)
 
-- [phase3_edge/CLAUDE.md](../phase3_edge/CLAUDE.md) — 🔄 ~16KB · phase head; Steps 0–6 ✅, Step 7 (Live-Abnahme) 🔄 in Arbeit — 8/14 Zeilen belegt, Funde B3+B4 behoben; read + newest Session-stopped block first
+- [phase3_edge/CLAUDE.md](../phase3_edge/CLAUDE.md) — 🔄 ~17KB · phase head; Steps 0–6 ✅, Step 7 (Live-Abnahme) 🔄 in Arbeit — 7/13 Pflichtzeilen belegt (Zähler ohne die optionale Zeile 14, keine Regression ggü. „8/14"), Funde B3+B4 behoben, B5+B6 dokumentiert, V9 live geschlossen; read + newest Session-stopped block first
 - [docs/concepts/phase3_edge_plan.md](./concepts/phase3_edge_plan.md) — 📕 ~46KB · ausführungsreifer P3-Plan (Entscheidungen P3-A–P3-N, Steps 0–7); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
-- [phase3_edge/SESSIONS_ARCHIVE.md](../phase3_edge/SESSIONS_ARCHIVE.md) — 📦 ~39KB · sieben archivierte Session-Blöcke (Step 0–6, inkl. Live-Abnahme-Funde B3/B4), verbatim, newest-first
+- [phase3_edge/SESSIONS_ARCHIVE.md](../phase3_edge/SESSIONS_ARCHIVE.md) — 📦 ~44KB · acht archivierte Session-Blöcke (Step 0–6, inkl. Live-Abnahme-Funde B3/B4), verbatim, newest-first
+- [docs/concepts/P3_ABNAHME_2026-07-27.md](./concepts/P3_ABNAHME_2026-07-27.md) — 📕 ~13KB · Abnahmeprotokoll Phase 3: 13 Prüfungen gegen den dauerhaft erreichbaren Dienst, 7/13 bestanden (Stand 2026-07-27 20:40), CLI-Ausschnitt als Beleg, Befunde B5/B6
 
 ## Completed phases
 

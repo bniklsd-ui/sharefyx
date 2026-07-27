@@ -65,7 +65,7 @@ hier `tools.py` anfasst, ist in der falschen Phase.
 | 5 | systemd-Units, `install_units.sh`, `/health.uptime_s` (P3-I) | 4 | ✅ | 6 |
 | 6 | Backup/Restore-Skripte, Backup-Timer | 5 | ✅ | 9 (7 in `test_backup_scripts.py`, 2 in `test_units.py`) |
 | 7 | Runbooks, `diagnose.sh`, Cloudflare-Rückbau | 6 | ✅ | 0 (Runbook/Skript, keine automatisierten Tests laut Plan) |
-| 8 | Live-Abnahme (Nikinger) | 7 | 🔄 in Arbeit — 8/14 Zeilen belegt, B3+B4 gefunden und behoben | — |
+| 8 | Live-Abnahme (Nikinger) | 7 | 🔄 in Arbeit — 7/13 Pflichtzeilen belegt (Zähler ohne optionale Zeile 14, keine Regression ggü. „8/14"), B3+B4 behoben, B5+B6 dokumentiert, V9 live geschlossen | — |
 
 ## Umgebungsstand (Step 0, Details im Archiv)
 
@@ -208,65 +208,82 @@ curl -s https://<node>.<tailnet>.ts.net/health
    und Indexzeile — Konvention aus P2 (`P2_ADAPTER_ABNAHME_2026-07-26.md`).
 3. `ROADMAP.md` P3 auf ✅, `docs/INDEX.md` und dieser Phase-Head nachziehen.
 
-**Offene `[VERIFY]`, die nur unter echter Infrastruktur schließen:** V9 (`ProtectHome=read-only`
-+ `ReadWritePaths` erlaubt Git-Commits im `DATA_ROOT`) und `diagnose.sh` Prüfung 4s Grep-Muster
-gegen `tailscale funnel status` (nie gegen ein echtes Tailscale getestet, siehe „Umgebungsstand").
+**Offene `[VERIFY]`, die nur unter echter Infrastruktur schließen:** `diagnose.sh` Prüfung 4s
+Grep-Muster gegen `tailscale funnel status` (nie gegen ein echtes Tailscale getestet, siehe
+„Umgebungsstand"). **V9 geschlossen** (2026-07-27, zweite Live-Abnahme-Session):
+`ProtectHome=read-only` + `ReadWritePaths` erlaubt Git-Commits im `DATA_ROOT` — live bestätigt,
+der `append_to_item`-Aufruf aus Zeile 2 der Abnahme erzeugte exakt zeitgleich (20:39:58) den
+Top-Commit `a400221c` im `DATA_ROOT`. Details: `docs/concepts/P3_ABNAHME_2026-07-27.md` Befund B5.
 
 ---
 
-## Session stopped — 2026-07-27 (Live-Abnahme im Gang, für kalten Leser: 8/14 belegt, keine offenen Bugs)
+## Session stopped — 2026-07-27 (zweite Session, sauberer Lauf gefahren: 7/13, zwei neue Befunde B5+B6, kein neuer Bug)
 
-**Für den nächsten, kalten Leser (Mensch oder Claude): das Wichtigste zuerst.** B3 und B4 sind
-**behoben und in Produktion bestätigt** — `systemctl status sharefyx-backup.service` zeigt
-für **beide** `ExecStart`-Prozesse `status=0/SUCCESS`. Die drei `FEHLER`-Zeilen im letzten
-`abnahme_run.sh`-Lauf (#8, #12, #13) sind **keine neuen Bugs** — sie erklären sich vollständig
-aus der Art, wie der Lauf aufgerufen wurde (siehe unten). Nicht erneut debuggen, nur korrekt
-aufrufen.
+**Für den nächsten, kalten Leser:** dieser Block folgt direkt auf den vorigen vom selben Tag
+(2026-07-27) — der vorige stammt aus der Session, die P3 Steps 0–6 gebaut und B3/B4 live
+gefunden/behoben hat; dieser hier ist eine neue, separate Session, die den "sauberen Lauf" aus
+dem vorigen Block nachgeholt hat. Ergebnis: **kein neuer Bug**, aber zwei neue Befunde (B5, B6),
+die die restlichen Lücken erklären. Volles Protokoll:
+`docs/concepts/P3_ABNAHME_2026-07-27.md` (jetzt mit echten Belegen statt Platzhaltern).
 
-**Woher das kommt:** dieselbe Session hat P3 Steps 0–6 gebaut (Commits `eb2038a`…`b228bcd`),
-dann live gegen die echte VM abgenommen (Commits `7368f57` B3, `d05464e` B4). Ein **zweiter,
-paralleler** Claude-Chat hat `phase3_edge/scripts/abnahme_run.sh` (Test-Runner) und
-`docs/concepts/P3_ABNAHME_2026-07-27.md` (Protokollvorlage) geschrieben — beide geprüft
-(kein Prompt-Injection-Risiko, kein `sudo`-Missbrauch), beide noch **uncommitted**, gehören
-nicht dieser Session.
+**Was diese Session gemacht hat, in Reihenfolge:**
+1. `abnahme_run.sh start` gesetzt (Startzeitpunkt für `--since`).
+2. Zeile 2 (Connector niklas Read+Write) **selbst** über die in dieser Session verfügbaren
+   MCP-Connector-Tools gefahren (`savefyx_pashe_3_test`-Adapter) — echter `get_item` +
+   `append_to_item` auf dem bestehenden Testitem `itm_53cf4e92` (v1→v2), kein neues Item
+   angelegt. Vorher per `search_items` geprüft, dass die Testitems aus der vorigen Session noch
+   da sind (`itm_53cf4e92`, `itm_cc4866f3`) — Wiederverwendung statt Duplikat, wie vom Nikinger
+   angewiesen.
+3. `abnahme_run.sh run </dev/null` (kein `--with-kill`: Zeile 7 bereits bestanden, außerdem
+   kein passwordless sudo in dieser Shell verfügbar — der Nikinger hat beides bestätigt/für
+   unnötig erklärt) gegen den echten Host gefahren.
 
-**Ehrlicher Stand der 14 Abnahmezeilen** (Plan §4 Step 7 / `phase3_edge/CLAUDE.md` Runbook):
+**Ehrlicher Stand nach diesem Lauf** (Details + CLI-Beleg: `P3_ABNAHME_2026-07-27.md` §2/§3):
 
-| # | Zeile | Status | Beleg |
+| # | Zeile | Status | Delta zum vorigen Block |
 |---|---|---|---|
-| 1 | `/health` außen | ✅ | mehrfach bestätigt, `uptime_s` vorhanden |
-| 2 | Connector `niklas` R+W | ✅ | `itm_53cf4e92`/`itm_cc4866f3` real angelegt — kein sauberer Einzel-Lauf-Beleg |
-| 3 | Connector `fabian` R+W | ⬜ | **noch nicht gemacht** |
-| 4 | Cross-Space | ⬜ | **noch nicht gemacht** |
-| 5 | `list_spaces` leerer `fabian` | ⬜ | **noch nicht gemacht** |
-| 6 | Reboot-Test | ⬜ | Nikinger: „noch nicht möglich" (Stand vor dieser Notiz) |
-| 7 | Kill-Test | ✅ | `abnahme_run.sh --with-kill`-Lauf: „wieder gesund", `uptime_s: 4` |
-| 8 | Request-Log | ✅ **funktional**, ⬜ **im Skript unbewiesen** | 3 echte `"ev":"tool"`-Zeilen direkt im Journal gefunden (`list_spaces`, 2× `create_item`) — liegen nur außerhalb des `--since`-Fensters, weil Tests 2–5 nie unmittelbar vor einem `run` gemacht wurden |
-| 9 | Token-Grep | ✅ | mehrfach leer |
-| 10 | Titel-/Body-Grep | ✅ | mehrfach leer |
-| 11 | Fremdzugriff → 401 | ✅ | 401 + `<redacted>` im Log |
-| 12 | Backup-Timer | ⬜ **echt offen** | Timer nie selbst ausgelöst (nur der Service manuell) — `LastTriggerUSec` bleibt leer, bis der Timer selbst feuert (`NEXT` laut `list-timers`: 2026-07-28 00:04:56 CEST, `RandomizedDelaySec=900`) |
-| 13 | Restore-Nachweis | ✅ **mechanisch bewiesen**, Skript-Check zeigt trotzdem FEHLER | `systemctl status` zweifelsfrei `status=0/SUCCESS` für `restore_check.sh` — `abnahme_run.sh`s **eigener** Default für `SHAREFYX_BACKUP_DIR` ist noch `/var/backups/sharefyx` (alt), nicht `/var/lib/sharefyx-backup` (B3-Fix); ohne `export SHAREFYX_BACKUP_DIR=/var/lib/sharefyx-backup` findet der Skript-Check das Bundle nicht — das Skript gehört nicht dieser Session, wurde bewusst nicht selbst editiert |
-| 14 | Größenbudget | ⬜ | optional, noch nicht angefasst |
+| 1 | `/health` außen | ✅ | unverändert |
+| 2 | Connector niklas R+W | ✅ | **jetzt sauber belegt** (v1→v2, echter Aufruf aus dieser Session) statt nur behauptet |
+| 3 | Connector fabian R+W | ⬜ | unverändert — **B6: kein fabian-Connector in dieser Session** |
+| 4 | Cross-Space | ⬜ | unverändert — B6, muss **nach** Zeile 5 kommen (Reihenfolge!) |
+| 5 | `list_spaces` leerer fabian | ⬜ | unverändert — B6, muss **vor** Zeile 3 kommen |
+| 6 | Reboot-Test | ⬜ | unverändert — Nikinger |
+| 7 | Kill-Test | ✅ | unverändert (bewusst nicht wiederholt) |
+| 8 | Request-Log | ✅ | **jetzt vollständig belegt** — 3 echte Tool-Ereignisse im `--since`-Fenster (`get_item`, `append_to_item`, `search_items`), keine Zeitfenster-Lücke mehr |
+| 9 | Token-Grep | ✅ | Beleg weiter aus dem 09:xx-Lauf, bewusst nicht wiederholt (kein Token in diesen Prozess füttern) |
+| 10 | Titel-/Body-Grep | ✅ | frisch bestätigt, leer |
+| 11 | Fremdzugriff → 401 | ✅ | frisch bestätigt |
+| 12 | Backup-Timer | ⬜ **real offen** | unverändert — `LastTriggerUSec` leer, Timer feuert erst `2026-07-28T00:00:35` (`RandomizedDelaySec=900`); auf Nikinger-Entscheidung **akzeptiert, nicht abgewartet** |
+| 13 | Restore-Nachweis | ❌ **neu, aber kein Bug — B5** | Skript-Check schlägt heute fehl, weil das einzige Bundle (11:12 UTC) älter ist als der aktuelle HEAD (u. a. durch Zeile 2 selbst) — Mechanismus war unmittelbar nach diesem Bundle bereits `status=0/SUCCESS` (voriger Block). Löst sich von selbst, sobald der Timer heute Nacht ein frisches Bundle zieht und der Check direkt danach läuft, ohne dazwischenliegende Schreibvorgänge |
 
-**Für den nächsten sauberen Lauf, in dieser Reihenfolge:**
+**Nebenbefund (B6, Details im Protokoll):** `list_spaces` auf dem `niklas`-Token zeigt `fabian`
+nicht einmal als fremden, lesbaren Space — nur `niklas` selbst. Erwartbar (fabian ist der Space
+des Kollegen, eigener Connector in dessen eigenem Account, R2), aber `[VERIFY]` wert gegen Hard
+Rule 4 / `tools.py`-Sichtbarkeitslogik bei Gelegenheit — außerhalb der P3-Berührungsfläche
+(P3-N), hier nur notiert, nicht geprüft oder angefasst.
 
-```bash
-export SHAREFYX_HOST=savefyx-vmware-virtual-platform.tail89fc2a.ts.net
-export SHAREFYX_DATA_ROOT=/home/savefyx/savefyx-data
-export SHAREFYX_BACKUP_DIR=/var/lib/sharefyx-backup   # B3-Fix — abnahme_run.sh kennt den neuen Pfad nicht selbst
-./phase3_edge/scripts/abnahme_run.sh start
-# → JETZT sofort, ohne Pause: Connector-Tests 2–5 fahren (niklas UND fabian, Cross-Space,
-#   list_spaces bei leerem fabian) — das füllt gleichzeitig #2–#5 UND liefert die Tool-Events,
-#   die #8 im richtigen Zeitfenster braucht
-sudo -E ./phase3_edge/scripts/abnahme_run.sh run --with-kill | tee /tmp/p3-abnahme.txt
-```
+**Was noch offen ist, für den nächsten Schritt:**
+- Zeilen 3–5 (fabian) — **nur der Nikinger**, in dessen eigenem Claude-Account mit
+  fabian-Connector. Reihenfolge zwingend: **5 → 4 → 3** (fabian muss beim `list_spaces`-Test
+  noch leer sein; Zeile 3 schreibt hinein).
+- Zeile 6 (Reboot) — Nikinger-Zeitfrage, unverändert.
+- Zeile 12 (Backup-Timer) — bewusst akzeptiert, nicht abgewartet (Nikinger-Entscheidung
+  2026-07-27). Zeile 13 löst sich vermutlich mit demselben Timer-Lauf von selbst, wurde aber
+  nicht eigens abgewartet.
+- Zeile 14 (optional, Größenbudget) — weiterhin nicht angefasst.
+- `phase3_edge/scripts/abnahme_run.sh` und `docs/concepts/P3_ABNAHME_2026-07-27.md` sind
+  **weiterhin nicht von dieser Session verfasst** — diese Session hat nur den vom Nikinger
+  autorisierten Teil editiert (Ausfüllen von §1–§4 im Protokoll mit echten Belegen). Das Skript
+  selbst wurde nicht angefasst; der bekannte `SHAREFYX_BACKUP_DIR`-Default-Fehler (`/var/backups/
+  sharefyx` statt `/var/lib/sharefyx-backup`) besteht im Skript weiterhin, wurde aber diesmal
+  per Environment-Variable umgangen.
+- Commit dieser Änderungen (dieser Head, `docs/INDEX.md`, das Abnahmeprotokoll) steht noch aus —
+  bewusst zurückgestellt bis zur Rückmeldung des Nikinger, da Zeilen 3–6 und 12 real offen
+  bleiben und der Abschluss (Token-Rotation, `ROADMAP.md`/Index/Head auf ✅) erst nach Zeilen
+  3–6 sinnvoll ist.
 
-Danach bleibt real nur noch offen: #6 (Reboot, Nikinger-Zeitfrage), #12 (Timer muss selbst
-feuern — warten oder als „Mechanismus bewiesen, Zeitplan nicht" akzeptieren, siehe §4 des
-Protokolls), #14 (optional). Ergebnis in `docs/concepts/P3_ABNAHME_2026-07-27.md` §3.1 kleben,
-dann an diese Session zurückgeben — Abschluss (Token-Rotation, Protokoll fertigstellen,
-`ROADMAP.md`/`docs/INDEX.md`/dieser Phase-Head auf ✅) ist der letzte Schritt.
-
-**Nächster Schritt (konkret):** wie oben — sauberer Lauf, dann zurück an Claude Code für den
-Abschluss.
+**Nächster Schritt (konkret):** Nikinger fährt Zeilen 5→4→3 im fabian-Connector und Zeile 6
+(Reboot) nach eigenem Zeitplan; danach zurück an Claude Code zum Eintragen in
+`P3_ABNAHME_2026-07-27.md` und für den Abschluss (Token-Rotation, Testitems archivieren,
+`ROADMAP.md`/`docs/INDEX.md`/dieser Phase-Head auf ✅, alles im selben Commit wie die
+Doc-Aktualisierung, Hard Rule 8).
