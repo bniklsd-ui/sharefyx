@@ -4,10 +4,58 @@ purpose: Archiv älterer Session-stopped-Blöcke aus phase3_edge/CLAUDE.md, newe
 read-when: Audit vergangener Sessions dieser Phase; NICHT für normalen Session-Start
 detail: L3
 up: CLAUDE.md
-updated: 2026-07-27 (Step 0 archiviert)
+updated: 2026-07-27 (Step 1 archiviert)
 ---
 
 # Session-Archiv — Phase 3 Exposure & Betrieb
+
+## Session stopped — 2026-07-27 (Step 1: Gerüst und `SPACE_ALLOWED_HOSTS`)
+
+**Ergebnis:** Step 1 abgeschlossen. `phase3_edge/` ist jetzt ein vollständiges (Nicht-Python-)
+Verzeichnis mit Test-Anschluss; `SPACE_ALLOWED_HOSTS` existiert als Konfiguration statt
+CLI-Zufall (P3-C).
+
+**Dateien:**
+- `phase3_edge/local.env.example` — Vorlage mit vier Platzhaltern (`REPO_ROOT`, `DATA_ROOT`,
+  `VENV`, `ALLOWED_HOSTS`), ausschließlich Kommentare + Beispielpfade, kein echter Hostname,
+  kein Token. `phase3_edge/local.env` selbst ist ab jetzt in `.gitignore` (Kommentar erklärt
+  warum: Maschinenpfade, kein Geheimnis — der Hostname steht ohnehin in CT-Logs).
+- `phase3_edge/tests/__init__.py` — leer, wie im Plan-Dateibaum vorgesehen (P1/P2 kommen ohne
+  aus, P3 bekommt es laut Plan explizit, hier übernommen statt hinterfragt).
+- `pytest.ini`: `testpaths` um `phase3_edge/tests` erweitert.
+- `mcpserver/config.py`: `Settings.allowed_hosts: tuple[str, ...] = ()` neu, geparst über
+  `_parse_allowed_hosts()` aus `SPACE_ALLOWED_HOSTS` (Komma-getrennt, `strip()`, leere Einträge
+  verworfen, fehlende Variable → leeres Tupel — dieselbe Kein-Default-auf-echten-Wert-Logik wie
+  bei `SPACE_DATA_ROOT`).
+- `mcpserver/app.py`: `create_app()` berechnet `hosts = list(allowed_hosts) if allowed_hosts
+  else (list(settings.allowed_hosts) or None)` — expliziter Parameter gewinnt, danach Settings,
+  sonst FastMCPs eigener Default. Docstring ergänzt.
+- `scripts/serve.py`: **unverändert**, wie geplant — `--allowed-host` bleibt `action="append"`,
+  `default=None`; die neue Präzedenz lebt vollständig in `create_app()`.
+
+**Tests** (`phase2_mcp/tests/test_config.py`, `test_app.py`, alle fünf aus dem Plan):
+`test_allowed_hosts_defaults_to_empty`, `test_allowed_hosts_parses_comma_list`,
+`test_allowed_hosts_strips_whitespace_and_drops_empties`,
+`test_create_app_prefers_explicit_allowed_hosts_over_settings`,
+`test_create_app_uses_settings_allowed_hosts`. Die beiden `app.py`-Tests patchen
+`mcpserver.app.build_mcp` gegen eine `_CapturingFastMCP`-Stub-Klasse (`http_app()` zeichnet den
+übergebenen `allowed_hosts`-Wert auf) statt den vollen FastMCP-Stack zu starten — Präzedenz ist
+reine Verdrahtungslogik in `create_app()`, kein FastMCP-Verhalten (das deckt bereits
+`test_asgi.py`/der Rest von `test_app.py` aus P2 ab).
+
+**Verifiziert:**
+- `.venv/bin/python -m pytest -q` → **138/138 grün** (133 Baseline + 5 neue).
+- `bash scripts/dev_install.sh` (venv aktiviert) lief durch: nur `storage` und `mcpserver`
+  editable installiert, `phase3_edge/` lautlos übersprungen (kein `pyproject.toml`) — Plan-Aussage
+  in §1.2 damit real geprüft, nicht nur zitiert.
+
+**Modul-Status oben nachgezogen** (Zeile 2: ⬜ → ✅, 5 Tests). Ab diesem Block gilt die
+Rotationsregel: der Step-0-Block wandert über `scripts/rotate_session_block.sh phase3_edge`
+nach `SESSIONS_ARCHIVE.md`.
+
+**Nächster Schritt (konkret):** Step 2 — `mcpserver/request_log.py` (Tool- und HTTP-Log). Der
+wichtigste Test dort ist `test_tool_event_never_contains_item_title` — er prüft eine Zusage,
+keine Implementierung.
 
 ## Session stopped — 2026-07-27 (Step 0: Doku-Drift, Verifikation, Umgebungsinventar)
 

@@ -20,6 +20,7 @@ from .asgi import TokenPathASGI
 from .auth import SpaceResolver
 from .config import Settings
 from .permissions import OwnSpaceWritable
+from .request_log import ToolCallLogMiddleware
 from .server import build_mcp
 
 
@@ -46,6 +47,7 @@ def create_app(
     Argumentliste. Der explizite Parameter gewinnt, wenn gesetzt; danach die Settings; sonst
     FastMCPs eigener Default."""
     mcp = build_mcp(store, OwnSpaceWritable())
+    mcp.add_middleware(ToolCallLogMiddleware())
     hosts = list(allowed_hosts) if allowed_hosts else (list(settings.allowed_hosts) or None)
     mcp_app = mcp.http_app(path="/", stateless_http=True, allowed_hosts=hosts)
     return Starlette(

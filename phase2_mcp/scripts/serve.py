@@ -15,6 +15,7 @@ from mcpserver.app import create_app
 from mcpserver.auth import KeyringTokenResolver
 from mcpserver.config import load_settings
 from mcpserver.logging_setup import configure_logging
+from mcpserver.request_log import AccessLogASGI
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -41,9 +42,13 @@ def main(argv: list[str] | None = None) -> int:
         store=store,
         allowed_hosts=args.allowed_hosts,
     )
+    # AccessLogASGI hier und nicht in create_app() (Plan §3.3): test_app.py läuft damit
+    # unverändert gegen die nackte App, das Access-Log bleibt separat testbar.
+    app = AccessLogASGI(app)
 
-    # access_log=False (Hard Rule, §8 Risiko 3): das Access-Log schreibt die komplette URL
-    # inklusive Token — der wahrscheinlichste Weg, wie dieses Projekt sein Geheimnis verliert.
+    # uvicorns eigenes access_log=False bleibt bestehen (Hard Rule, §8 Risiko 3 aus P2): dessen
+    # Access-Log schreibt die komplette URL inklusive Token. AccessLogASGI ersetzt es durch die
+    # token-redigierte, whitelist-begrenzte Variante aus request_log.py.
     uvicorn.run(
         app,
         host=settings.host,

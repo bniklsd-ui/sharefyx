@@ -77,6 +77,9 @@ class _CapturingFastMCP:
     def __init__(self) -> None:
         self.received_allowed_hosts: list[str] | None = "not-called"
 
+    def add_middleware(self, middleware) -> None:
+        pass
+
     def http_app(self, *, path, stateless_http, allowed_hosts):
         self.received_allowed_hosts = allowed_hosts
 

@@ -60,7 +60,7 @@ hier `tools.py` anfasst, ist in der falschen Phase.
 |---|---|---|---|---|
 | 1 | Haushalt, Doku-Drift, Verifikationslauf, Umgebungsinventar | 0 | ✅ | 0 (kein Feature-Code) |
 | 2 | Paketgerüst `phase3_edge/`, `SPACE_ALLOWED_HOSTS` in `config.py`/`app.py` | 1 | ✅ | 5 |
-| 3 | `mcpserver/request_log.py` (Tool- + HTTP-Log) | 2 | ⬜ | — |
+| 3 | `mcpserver/request_log.py` (Tool- + HTTP-Log) | 2 | ✅ | 9 (8 in `test_request_log.py`, 1 in `test_logging.py`) |
 | 4 | `credentials.py` LoadCredential-Pfad, `export_space_map.py` | 3 | ⬜ | — |
 | 5 | systemd-Units, `install_units.sh` | 4 | ⬜ | — |
 | 6 | Backup/Restore-Skripte, Backup-Timer | 5 | ⬜ | — |
@@ -92,50 +92,88 @@ bewusst leer, siehe Plan §4 Step 6/7.
 
 ---
 
-## Session stopped — 2026-07-27 (Step 1: Gerüst und `SPACE_ALLOWED_HOSTS`)
+## Session stopped — 2026-07-27 (Step 2: Request-Log)
 
-**Ergebnis:** Step 1 abgeschlossen. `phase3_edge/` ist jetzt ein vollständiges (Nicht-Python-)
-Verzeichnis mit Test-Anschluss; `SPACE_ALLOWED_HOSTS` existiert als Konfiguration statt
-CLI-Zufall (P3-C).
+**Ergebnis:** Step 2 abgeschlossen. `mcpserver/request_log.py` (neu) liefert beide Ereignisarten
+aus Plan §3; `ToolCallLogMiddleware` läuft in `create_app()`, `AccessLogASGI` in `serve.py`.
 
-**Dateien:**
-- `phase3_edge/local.env.example` — Vorlage mit vier Platzhaltern (`REPO_ROOT`, `DATA_ROOT`,
-  `VENV`, `ALLOWED_HOSTS`), ausschließlich Kommentare + Beispielpfade, kein echter Hostname,
-  kein Token. `phase3_edge/local.env` selbst ist ab jetzt in `.gitignore` (Kommentar erklärt
-  warum: Maschinenpfade, kein Geheimnis — der Hostname steht ohnehin in CT-Logs).
-- `phase3_edge/tests/__init__.py` — leer, wie im Plan-Dateibaum vorgesehen (P1/P2 kommen ohne
-  aus, P3 bekommt es laut Plan explizit, hier übernommen statt hinterfragt).
-- `pytest.ini`: `testpaths` um `phase3_edge/tests` erweitert.
-- `mcpserver/config.py`: `Settings.allowed_hosts: tuple[str, ...] = ()` neu, geparst über
-  `_parse_allowed_hosts()` aus `SPACE_ALLOWED_HOSTS` (Komma-getrennt, `strip()`, leere Einträge
-  verworfen, fehlende Variable → leeres Tupel — dieselbe Kein-Default-auf-echten-Wert-Logik wie
-  bei `SPACE_DATA_ROOT`).
-- `mcpserver/app.py`: `create_app()` berechnet `hosts = list(allowed_hosts) if allowed_hosts
-  else (list(settings.allowed_hosts) or None)` — expliziter Parameter gewinnt, danach Settings,
-  sonst FastMCPs eigener Default. Docstring ergänzt.
-- `scripts/serve.py`: **unverändert**, wie geplant — `--allowed-host` bleibt `action="append"`,
-  `default=None`; die neue Präzedenz lebt vollständig in `create_app()`.
+**`[VERIFY]` V3 aufgelöst, gegen den echten `fastmcp==3.4.4`-Code, nicht nur die Doku geprüft:**
+`Middleware.on_call_tool(context: MiddlewareContext[CallToolRequestParams], call_next)`,
+`context.message.name` trägt den Tool-Namen, Registrierung über `mcp.add_middleware(...)` in
+`app.py :: create_app()` — alles wie im Plan angenommen. **Eine Abweichung vom Plan-Wortlaut,
+empirisch begründet:** `request_log.py`s Moduldocstring-Skizze nennt `ERROR_CLASSES:
+dict[type[Exception], str]`. Das ist mit dem echten `FastMCP.call_tool()`-Pfad nicht umsetzbar —
+gelesen bis in `server.py`: die Middleware-Kette ruft die Kernlogik über `call_next()` auf, und
+jede dort erhobene `FastMCPError`/`ToolError` (`ToolError` erbt von `FastMCPError`) wird
+unverändert weitergereicht. `tools.py :: map_storage_error()` hat die ursprüngliche
+`storage`-Exception zu diesem Zeitpunkt bereits in eine `ToolError` mit Präfix-Text übersetzt
+(`"conflict: …"`, `"item_not_found: …"`, …) — ein Typ-Dict würde hier immer denselben einen Typ
+treffen. `classify_error()` parst deshalb den Nachrichtenpräfix vor dem ersten `":"` statt den
+Exception-Typ zu prüfen. Volle Begründung im Moduldocstring von `request_log.py`.
 
-**Tests** (`phase2_mcp/tests/test_config.py`, `test_app.py`, alle fünf aus dem Plan):
-`test_allowed_hosts_defaults_to_empty`, `test_allowed_hosts_parses_comma_list`,
-`test_allowed_hosts_strips_whitespace_and_drops_empties`,
-`test_create_app_prefers_explicit_allowed_hosts_over_settings`,
-`test_create_app_uses_settings_allowed_hosts`. Die beiden `app.py`-Tests patchen
-`mcpserver.app.build_mcp` gegen eine `_CapturingFastMCP`-Stub-Klasse (`http_app()` zeichnet den
-übergebenen `allowed_hosts`-Wert auf) statt den vollen FastMCP-Stack zu starten — Präzedenz ist
-reine Verdrahtungslogik in `create_app()`, kein FastMCP-Verhalten (das deckt bereits
-`test_asgi.py`/der Rest von `test_app.py` aus P2 ab).
+**`space`-Feld — Semantik bewusst festgelegt, nicht nur implizit:** `_current_space()` liefert
+den **authentifizierten Aufrufer** (`Principal.space`), nicht den Zielraum des Tool-Aufrufs. Bei
+`get_item`/`update_item` gegen einen fremden Space steht im Log also weiterhin der eigene Space,
+nicht der fremde. Das beantwortet Plan §3.4 Frage 2 ("mein Account oder der des Kollegen?")
+korrekt; für einen Rule-4-Nachweis (wer hat wohin geschrieben) ist das Request-Log bewusst nicht
+die Quelle — das leisten die Tool-Fehlerklasse (`write_denied`) und `test_tools.py`/`test_app.py`
+(Advisor-Fund, sonst hätte ein kalter Leser beim Debuggen einer Cross-Space-Ablehnung den
+Zielraum im Log vermutet).
 
-**Verifiziert:**
-- `.venv/bin/python -m pytest -q` → **138/138 grün** (133 Baseline + 5 neue).
-- `bash scripts/dev_install.sh` (venv aktiviert) lief durch: nur `storage` und `mcpserver`
-  editable installiert, `phase3_edge/` lautlos übersprungen (kein `pyproject.toml`) — Plan-Aussage
-  in §1.2 damit real geprüft, nicht nur zitiert.
+**`err: "internal"` ist ein Sammelbecken, nicht nur der Whitelist-Fallback — festgehalten für
+Step 7:** die Whitelist (`conflict`, `item_not_found`, `write_denied`, `invalid`) lässt
+`auth_error`, `space_not_found` und FastMCPs generisches `"Error calling tool …"` alle in
+`internal` fallen. Das ist Plan-konform, bedeutet aber: `err: "internal"` in `journald` kann
+sowohl „ungültiger Token mitten im Aufruf" als auch „echter Store-Bug" heißen. Kein Blocker für
+P3 (keine Abnahmezeile hängt an der Unterscheidung), aber falls Step 7 auf `internal`-Zeilen
+stößt, ist das der erste Ort zum Nachschauen, nicht ein Bug im Logging.
 
-**Modul-Status oben nachgezogen** (Zeile 2: ⬜ → ✅, 5 Tests). Ab diesem Block gilt die
-Rotationsregel: der Step-0-Block wandert über `scripts/rotate_session_block.sh phase3_edge`
-nach `SESSIONS_ARCHIVE.md`.
+**`TokenScrubbingFilter` erweitert** (`logging_setup.py`, im P3-N-Berührungsbereich): scrubbt
+jetzt auch String-Werte innerhalb eines Dict-`record.msg` (vorher nur reine String-Messages) —
+sonst wäre der Filter auf dem Request-Log-Pfad ein stiller No-op gewesen, praktisch redundant zu
+`AccessLogASGI`s eigener Pfad-Redaktion, aber echte Verteidigung in der Tiefe statt einer
+Behauptung. Eigener Test in `test_logging.py`
+(`test_scrubbing_filter_redacts_token_in_dict_message`), da die P3-Tests den Filter nicht über
+`configure_logging()` einbinden.
 
-**Nächster Schritt (konkret):** Step 2 — `mcpserver/request_log.py` (Tool- und HTTP-Log). Der
-wichtigste Test dort ist `test_tool_event_never_contains_item_title` — er prüft eine Zusage,
-keine Implementierung.
+**Zirkelimport vermieden:** `request_log.py` importiert `_TOKEN_SEGMENT_RE` aus
+`logging_setup.py` auf Modulebene; `logging_setup.py :: configure_logging()` importiert
+`JsonLineFormatter`/`LOGGER_NAME` aus `request_log.py` **lazy** (innerhalb der Funktion) — zum
+Aufrufzeitpunkt ist `logging_setup` bereits vollständig geladen, kein Zirkelbezug beim
+Modul-Import.
+
+**`mcp_smoke.py` bewusst nicht angefasst — P3-N-Grenzfall, an den Nikinger gemeldet:** Step 2s
+„Done when" verlangt einen manuellen `mcp_smoke.py`-Lauf mit sichtbaren JSON-Zeilen. `mcp_smoke.py`
+ruft aber `logging.basicConfig()` statt `configure_logging()` und geht nie durch `serve.py`
+(reines In-Process-`ASGITransport`, kein `AccessLogASGI`) — selbst mit funktionierendem
+Tool-Log wäre die Ausgabe ein Python-Dict-Repr, kein JSON. `mcp_smoke.py` steht nicht in P3-Ns
+„genau anfassen"-Liste; sie ist als abschließende Aufzählung gelesen worden (wie schon bei
+`tools.py`/`server.py`), deshalb keine Änderung dort. Stattdessen manuell gegen ein Wegwerf-Skript
+(nie eingecheckt, aus dem Scratchpad gelöscht) verifiziert, das genau den echten Produktionspfad
+fährt — `configure_logging()` + `create_app()` + `AccessLogASGI`, `FakeResolver` statt echtem
+Keyring, temporäres `DATA_ROOT`: `GET /health` und ein Fremdzugriff mit falschem Token erzeugten
+korrekt geformte, redigierte JSON-Zeilen auf stderr (`{"ts":"…","ev":"http","method":"GET",
+"path":"/health","status":200,"ms":0}` bzw. mit `path":"/mcp/<redacted>","status":401`). Das ist
+strengeres Beweismaterial als `mcp_smoke.py` liefern könnte, weil es den echten `serve.py`-Pfad
+inklusive `AccessLogASGI` prüft, den `mcp_smoke.py` konstruktionsbedingt nie durchläuft. Für den
+Nikinger: falls `mcp_smoke.py` künftig JSON-Request-Logs zeigen soll, ist das eine bewusste
+P3-N-Erweiterung (ein Zweizeiler: `logging.basicConfig` → `configure_logging`), keine
+Kleinigkeit, die einfach nachgezogen wird.
+
+**Tests** (alle acht aus dem Plan, `phase2_mcp/tests/test_request_log.py`, plus einer in
+`test_logging.py` für die Filter-Erweiterung): `test_json_line_is_valid_json`,
+`test_tool_event_has_tool_space_and_duration`, `test_tool_event_error_carries_class_not_message`,
+`test_tool_event_never_contains_item_title` (gestärkt gegen eine Tautologie-Falle — prüft jetzt
+zuerst `len(tool_events) == 6`, bevor die Abwesenheit des Markers behauptet wird; Advisor-Fund:
+sonst wäre der Test identisch grün gegen eine Middleware geblieben, die gar nichts loggt),
+`test_http_event_redacts_token_segment`, `test_http_event_logs_401_status`,
+`test_logging_failure_does_not_break_tool_call`, `test_request_logger_does_not_propagate_to_root`,
+`test_scrubbing_filter_redacts_token_in_dict_message`.
+
+**Verifiziert:** `.venv/bin/python -m pytest -q` → **147/147 grün** (138 + 9 neue).
+
+**Modul-Status oben nachgezogen** (Zeile 3: ⬜ → ✅, 9 Tests). Rotation läuft nach diesem Commit.
+
+**Nächster Schritt (konkret):** Step 3 — `credentials.py` LoadCredential-Pfad,
+`export_space_map.py`. Alle Tests mit `monkeypatch` auf `$CREDENTIALS_DIRECTORY` und einem
+Fake-Keyring, nie der echte Keyring.
