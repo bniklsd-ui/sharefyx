@@ -6,7 +6,9 @@ detail: L2
 up: CLAUDE.md
 down:
   - docs/concepts/phase1_storage_plan.md   # ausführungsreifer P1-Plan
-updated: 2026-07-26
+  - docs/concepts/phase2_mcp_plan.md       # ausführungsreifer P2-Plan
+  - docs/concepts/phase3_edge_plan.md      # ausführungsreifer P3-Plan
+updated: 2026-07-27
 ---
 # ROADMAP — Space-Server
 
@@ -19,7 +21,7 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 |---|---|---|---|
 | **P1** | `phase1_storage/` · `storage` | Datei-Store + Index + Versionierung. Kein Netz. | ✅ |
 | **P2** | `phase2_mcp/` · `mcpserver` | MCP-Server, Token-Auth, 6 Tools. Lokal erreichbar. | ✅ |
-| **P3** | `phase3_edge/` | Tunnel, systemd, Health, Logging, Ops-Skripte. Öffentlich erreichbar. | ⬜ |
+| **P3** | `phase3_edge/` | Tunnel, systemd, Health, Logging, Ops-Skripte. Öffentlich erreichbar. | 🔄 |
 | **P4** | `phase4_auth/` · `auth` | OAuth 2.1 + DCR; ersetzt den Pfad-Token. | ⬜ |
 | **P5** | `phase5_ui/` · `webui` | REST-API + Web-UI für Menschen. | ⬜ |
 
@@ -56,7 +58,7 @@ reale Probe auf den Advisor-Fund aus Step 5). Details + Transkript:
 
 **Mission:** Claude kann lesen und schreiben — lokal, ohne Tunnel.
 
-- **DRIN:** `fastmcp` über Streamable HTTP `[VERIFY]`, Token→Space-Auflösung, sechs Tools
+- **DRIN:** `fastmcp` über Streamable HTTP, Token→Space-Auflösung, sechs Tools
   (`list_spaces`, `search_items`, `get_item`, `create_item`, `update_item`, `append_to_item`),
   `<untrusted_content>`-Wrapping fremder Bodies, Token-Budget-Disziplin im Listing.
 - **DRAUSSEN:** Löschen (`status: archived` reicht), MCP Resources, MCP Prompts, OAuth,
@@ -74,7 +76,7 @@ Rohantworten als Beweis. Protokoll: `docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26
 (fehlende Sichtbarkeit des eigenen, noch leeren Space in `list_spaces`) wurde noch am selben Tag
 behoben; ein zweiter (Space-Namen `nikinger`/`niklas` gemischt) wurde vom Nikinger direkt am
 echten `DATA_ROOT` behoben (`nikinger/` → `niklas/`, siehe `phase2_mcp/CLAUDE.md`). Keine
-offenen Findings mehr. Fehlt noch: der formale Phasenabschluss (Browser-Webchat).
+offenen Findings mehr. Handover an P3: `docs/concepts/PHASE2_CLOSEOUT_HANDOVER.md`.
 
 ### Zurückgestellt aus P2 (bewusst, nicht vergessen)
 
@@ -83,7 +85,11 @@ offenen Findings mehr. Fehlt noch: der formale Phasenabschluss (Browser-Webchat)
   das an einen Mobilfunk-Uplink. Kostenfrage, kein Bug — SQL-Filterung ist eine
   contract-neutrale Optimierung im `storage`-Paket, kein Adapter-Thema.
 - **MCP-Revision 2026-07-28** (Sessions entfallen, `Mcp-Method`/`Mcp-Name`-Header werden Pflicht)
-  — Migrationspunkt nach P3, nicht in P2 adressiert.
+  — nicht in P2 adressiert. **Korrektur (2026-07-27, P3 Step 0):** Migration hängt an einem
+  **Trigger, nicht an einem Datum** — erstes `fastmcp`-Release mit Support für die neue Revision.
+  P3-E (`docs/concepts/phase3_edge_plan.md`) begründet das: `fastmcp` 3.4.4 hat noch keinen
+  Support, bestehende 2025-11-25-Server brechen laut MCP-Blog nicht, neue Clients handeln
+  herunter. Watch-Item, keine Terminfrage.
 - **Lese-Rechte zwischen Spaces.** Der Seam existiert ab P2 (`Permissions.can_read`, heute immer
   `True`, aber schon von jedem Lesepfad aufgerufen), die Policy fehlt bewusst. Siehe „Bewusst
   nicht auf der Roadmap" unten — der Satz dort bleibt richtig, der Seam macht ihn nur nicht mehr

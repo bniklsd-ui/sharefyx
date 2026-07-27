@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-07-26
+updated: 2026-07-27
 ---
 # Doc Index (L0)
 
@@ -29,15 +29,19 @@ updated: 2026-07-26
 - [docs/DOC_LAYERS_CONVENTION.md](./DOC_LAYERS_CONVENTION.md) — 📗 ~5KB · Doc-Layers-Spec (v1, 2026-07-06) · **byte-identische Kopie aus dem Trading-Bot-Repo — nicht projektspezifisch anpassen, sonst divergieren zwei Kopien derselben Regel**
 - [docs/PROMPTS.md](./PROMPTS.md) — 📗 ~11KB · die drei Workflow-Prompts (Claude-Code-Session-Start, Phasen-Kickoff, Phasen-Abschluss); lesen beim Start eines neuen Chats, nicht mitten in einer Session
 
-## Active phase (2 — MCP-Server)
+## Active phase (3 — Exposure & Betrieb)
 
-- [phase2_mcp/CLAUDE.md](../phase2_mcp/CLAUDE.md) — 🔄 ~23KB · phase head; Steps 0–7 ✅, **live-verifiziert** (Quick-Tunnel-Probe + Adapter-Abnahme durch den Nikinger, 2026-07-26); read + newest Session-stopped block first
-- [docs/concepts/phase2_mcp_plan.md](./concepts/phase2_mcp_plan.md) — 📕 ~46KB · ausführungsreifer P2-Plan (Entscheidungen P2-A–P2-N, Steps 0–7); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
-- [docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md](./concepts/P2_ADAPTER_ABNAHME_2026-07-26.md) — 📕 ~11KB · Abnahmeprotokoll über den echten Custom Connector, 21/21 Prüfungen, beide Befunde behoben (B1, B2 — siehe Nachtrag)
-- [phase2_mcp/SESSIONS_ARCHIVE.md](../phase2_mcp/SESSIONS_ARCHIVE.md) — 📦 ~38KB · acht archivierte Session-Blöcke (Step 0–7), verbatim, newest-first
+- [phase3_edge/CLAUDE.md](../phase3_edge/CLAUDE.md) — 🔄 ~7KB · phase head; Step 0 ✅, Scope/Runbooks folgen Step 1; read + newest Session-stopped block first
+- [docs/concepts/phase3_edge_plan.md](./concepts/phase3_edge_plan.md) — 📕 ~46KB · ausführungsreifer P3-Plan (Entscheidungen P3-A–P3-N, Steps 0–7); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
+- [phase3_edge/SESSIONS_ARCHIVE.md](../phase3_edge/SESSIONS_ARCHIVE.md) — 📦 ~1KB · leer angelegt, wird ab dem zweiten Session-Block befüllt
 
 ## Completed phases
 
+- [phase2_mcp/CLAUDE.md](../phase2_mcp/CLAUDE.md) — 📗 ~23KB · phase head; Steps 0–7 ✅, **live-verifiziert** (Quick-Tunnel-Probe + Adapter-Abnahme durch den Nikinger, 2026-07-26); read + newest Session-stopped block first
+- [docs/concepts/phase2_mcp_plan.md](./concepts/phase2_mcp_plan.md) — 📕 ~46KB · ausführungsreifer P2-Plan (Entscheidungen P2-A–P2-N, Steps 0–7); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
+- [docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md](./concepts/P2_ADAPTER_ABNAHME_2026-07-26.md) — 📕 ~11KB · Abnahmeprotokoll über den echten Custom Connector, 21/21 Prüfungen, beide Befunde behoben (B1, B2 — siehe Nachtrag)
+- [phase2_mcp/SESSIONS_ARCHIVE.md](../phase2_mcp/SESSIONS_ARCHIVE.md) — 📦 ~38KB · acht archivierte Session-Blöcke (Step 0–7), verbatim, newest-first
+- [docs/concepts/PHASE2_CLOSEOUT_HANDOVER.md](./concepts/PHASE2_CLOSEOUT_HANDOVER.md) — 📕 ~11KB · Abschluss-Handover P2→P3: Status, Delta seit dem P1-Handover, offene Entscheidungen für die Exposure-Phase, [VERIFY]-Bilanz V1–V9
 - [phase1_storage/CLAUDE.md](../phase1_storage/CLAUDE.md) — 📗 ~11KB · phase head; alle acht Module ✅, 76 Tests (inkl. acht P2-Contract-Erweiterungstests), live-verifiziert gegen den echten DATA_ROOT (2026-07-25); Frontmatter-Schema + `Store`-Signaturen jetzt Contract für P2
 - [docs/concepts/phase1_storage_plan.md](./concepts/phase1_storage_plan.md) — 📕 ~15KB · ausführungsreifer P1-Plan (Entscheidungen A–H, Steps 0–7)
 - [phase1_storage/SESSIONS_ARCHIVE.md](../phase1_storage/SESSIONS_ARCHIVE.md) — 📦 ~27KB · archivierte Session-stopped-Blöcke, verbatim, newest-first
@@ -45,9 +49,9 @@ updated: 2026-07-26
 
 ## Concept docs (📕 snapshots — the plan a phase was built from)
 
-*(noch keine weiteren — P3–P5 werden vor ihrem Start je in einer Browser-Planungssession
-geschrieben; Konvention: ein Dokument pro Phase, kein Konzept+Plan+Handover-Trio. P1- und
-P2-Pläne stehen oben bei ihrer jeweiligen Phase, nicht doppelt hier gelistet.)*
+*(noch keine weiteren — P4–P5 werden vor ihrem Start je in einer Browser-Planungssession
+geschrieben; Konvention: ein Dokument pro Phase, kein Konzept+Plan+Handover-Trio. P1-, P2- und
+P3-Pläne stehen oben bei ihrer jeweiligen Phase, nicht doppelt hier gelistet.)*
 
 ## Externe Referenz (nicht im Repo)
 

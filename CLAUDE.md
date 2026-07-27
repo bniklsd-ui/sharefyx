@@ -7,8 +7,8 @@ up: docs/INDEX.md
 down:
   - ROADMAP.md                          # Phasenplan + Status je Phase
   - docs/INDEX.md                       # L0-Karte aller .md
-  - phase2_mcp/CLAUDE.md                # aktive Phase
-updated: 2026-07-26
+  - phase3_edge/CLAUDE.md               # aktive Phase
+updated: 2026-07-27
 ---
 # CLAUDE.md — Project Instructions
 
@@ -130,16 +130,21 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 
 ## Current state
 
-**Aktive Phase:** Phase 2 — MCP-Server (`phase2_mcp/`, Paket `mcpserver`, **live-verifiziert seit
-2026-07-26** — Quick-Tunnel-Probe + vollständige Adapter-Abnahme über den echten Custom
-Connector durch den Nikinger, 21/21 Prüfungen, siehe `docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md`):
-Claude liest und schreibt über einen lokalen `fastmcp`-Server auf den P1-Storage-Kern —
-Token→Space-Auflösung, sechs Tools, `<untrusted_content>`-Wrapping fremder Bodies. Noch kein
-dauerhaftes Netz nach außen (nur Quick Tunnel probeweise, dauerhaft ist P3). Plan:
-`docs/concepts/phase2_mcp_plan.md` (Entscheidungen P2-A–P2-N gelockt, Steps 0–7).
-Herkunft/Contract: `docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md`. Phase-Head:
-`phase2_mcp/CLAUDE.md`. Formaler Phasenabschluss (Browser-Webchat, analog Phase 1) und
-P3-Planung stehen noch aus.
+**Aktive Phase:** Phase 3 — Exposure & Betrieb (`phase3_edge/`, kein eigenes Python-Paket —
+Servercode bleibt in `mcpserver`). Mission: der Connector steht in beiden Claude-Accounts und
+bleibt stehen — Tailscale Funnel, systemd-Unit, `/health`, strukturiertes Request-Log,
+Backup/Restore. Plan: `docs/concepts/phase3_edge_plan.md` (Entscheidungen P3-A–P3-N gelockt,
+Steps 0–7, ausführungsreif). Herkunft/offene Entscheidungen:
+`docs/concepts/PHASE2_CLOSEOUT_HANDOVER.md`. Phase-Head: `phase3_edge/CLAUDE.md`.
+
+**Phase 2 — MCP-Server** (`phase2_mcp/`, Paket `mcpserver`): ✅ **abgeschlossen,
+live-verifiziert seit 2026-07-26** — Quick-Tunnel-Probe + vollständige Adapter-Abnahme über den
+echten Custom Connector durch den Nikinger, 21/21 Prüfungen, siehe
+`docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md`. Claude liest und schreibt über einen lokalen
+`fastmcp`-Server auf den P1-Storage-Kern — Token→Space-Auflösung, sechs Tools,
+`<untrusted_content>`-Wrapping fremder Bodies. Formaler Abschluss-Handover an P3:
+`docs/concepts/PHASE2_CLOSEOUT_HANDOVER.md`. Plan: `docs/concepts/phase2_mcp_plan.md`
+(Entscheidungen P2-A–P2-N, Steps 0–7). Phase-Head: `phase2_mcp/CLAUDE.md`.
 
 **Phase 1 — Storage-Kern** (`phase1_storage/`, Paket `storage`): ✅ **abgeschlossen,
 live-verifiziert.** Alle acht Module (Steps 0–7), 68 Tests grün (70 bei Phasenabschluss, minus
@@ -160,8 +165,8 @@ P2 Step 2 — siehe P2-Plan §0.4 Punkt L).
 | R1 | Plan/Ausführung | Planung im Browser-Chat, Ausführung in Claude Code — wie im Trading-Bot-Projekt. |
 | R2 | Plan-Tier | Beide Nutzer auf **Claude Pro**. Custom Connectors sind auf Pro verfügbar; jeder fügt seinen Connector selbst hinzu (kein Owner-Gate wie bei Team/Enterprise). `[VERIFY]` bei Ausführung gegen die aktuelle Doku. |
 | R3 | Erreichbarkeit | **CGNAT** (RUT X50, Mobilfunk). Start mit **Cloudflare Tunnel** (schnellster Weg zum ersten Erlebnis), Migration auf **VPS + WireGuard** als P3-Option. Der MCP-Server ändert sich dabei nicht. |
-| R4 | Vertraulichkeit | Bewusst akzeptiert: bei Cloudflare Tunnel terminiert Cloudflare TLS und sieht Klartext. **Kein E2E.** Der Server muss lesen können, damit Claude lesen kann — das schließt das Krypto-Modell des `Notizheft_example.html` aus. |
-| R5 | Auth v0 | Token im Pfad (`/mcp/<token>`), Token = Identität = Space. Ehrlich benannter Kompromiss (Bearer-Passwort in einer URL, landet in Logs). **OAuth 2.1 + DCR ist Phase 5**, nicht optional-für-immer. |
+| R4 | Vertraulichkeit | Bewusst akzeptiert: bei Cloudflare Tunnel terminiert Cloudflare TLS und sieht Klartext. **Kein E2E.** Der Server muss lesen können, damit Claude lesen kann — das schließt das Krypto-Modell des `Notizheft_example.html` aus. **[2026-07-27 Ergänzung, P3 Step 0]:** Ab P3 läuft der Weg über Tailscale Funnel; dort terminiert die Node selbst TLS, siehe `docs/concepts/phase3_edge_plan.md` §0.4. Der Relay-Betreiber sieht Notizinhalte damit nicht mehr im Klartext — „kein E2E" bleibt trotzdem richtig, denn Tailscale bleibt vertrauenswürdige Infrastruktur (Koordinationsserver, DNS, Relays). |
+| R5 | Auth v0 | Token im Pfad (`/mcp/<token>`), Token = Identität = Space. Ehrlich benannter Kompromiss (Bearer-Passwort in einer URL, landet in Logs). **OAuth 2.1 + DCR ist Phase 4**, nicht optional-für-immer. |
 | R6 | Zweck | **Lernprojekt**, später evtl. Arbeitswerkzeug. Bei Zielkonflikt gewinnt Lerneffekt über Bequemlichkeit — außer bei Safety/Secrets, dort gewinnt immer die sichere Variante. |
 
 **Noch nicht entschieden (bewusst offen, für spätere Planungssessions):**

@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase2_mcp_plan.md          # voller Plan, Entscheidungen P2-A–P2-N, Steps 0–7
   - ../docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md # Herkunft der Entscheidungen D1–D6
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
-updated: 2026-07-26 (B2 behoben)
+updated: 2026-07-27 (Scope-`[VERIFY]` entfernt, P3 übernommen)
 ---
 # CLAUDE.md — Phase 2: MCP-Server (`phase2_mcp/`)
 
@@ -35,7 +35,7 @@ einbauen will → **stop**.
 
 ## Scope
 
-- **DRIN:** `fastmcp` über Streamable HTTP `[VERIFY]`, Token→Space-Auflösung, sechs Tools
+- **DRIN:** `fastmcp` über Streamable HTTP, Token→Space-Auflösung, sechs Tools
   (`list_spaces`, `search_items`, `get_item`, `create_item`, `update_item`, `append_to_item`),
   `<untrusted_content>`-Wrapping fremder Bodies + Snippets, Token-Budget-Disziplin im Listing,
   `/health`.
