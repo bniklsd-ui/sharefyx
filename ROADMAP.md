@@ -21,7 +21,7 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 |---|---|---|---|
 | **P1** | `phase1_storage/` · `storage` | Datei-Store + Index + Versionierung. Kein Netz. | ✅ |
 | **P2** | `phase2_mcp/` · `mcpserver` | MCP-Server, Token-Auth, 6 Tools. Lokal erreichbar. | ✅ |
-| **P3** | `phase3_edge/` | Tunnel, systemd, Health, Logging, Ops-Skripte. Öffentlich erreichbar. | 🔄 |
+| **P3** | `phase3_edge/` | Tunnel, systemd, Health, Logging, Ops-Skripte. Öffentlich erreichbar. | 🟡 |
 | **P4** | `phase4_auth/` · `auth` | OAuth 2.1 + DCR; ersetzt den Pfad-Token. | ⬜ |
 | **P5** | `phase5_ui/` · `webui` | REST-API + Web-UI für Menschen. | ⬜ |
 
@@ -106,6 +106,14 @@ offenen Findings mehr. Handover an P3: `docs/concepts/PHASE2_CLOSEOUT_HANDOVER.m
 - **Bekanntes Risiko:** Mobilfunk-Uplink. Claude zeigt bei Nichterreichbarkeit nur
   „Disconnected" mit minimaler Diagnose — deshalb ist das Log kein Nice-to-have, sondern
   Teil des Scope.
+
+**Status 🟡 (2026-07-27, Live-Abnahme zweite Session):** 10 von 13 Abnahmezeilen live bestanden
+(Details: `docs/concepts/P3_ABNAHME_2026-07-27.md`). Nikinger-Entscheidung: Reboot-Test (Zeile
+6), Backup-Timer-Lauf (Zeile 12) und Restore-Nachweis (Zeile 13) werden nicht mehr aktiv
+nachgeholt, sondern auf die nächste Phase verschoben — ein unbeabsichtigter Reboot ist ohnehin
+der reale Prüffall, 12/13 lösen sich mit dem nächsten Backup-Zyklus. Erst nach einem
+beobachteten echten Reboot wechselt der Status auf ✅ (Statusglyphen-Definition:
+„live-verifiziert").
 
 ## Phase 4 — OAuth 2.1
 

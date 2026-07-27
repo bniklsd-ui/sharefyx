@@ -65,7 +65,7 @@ hier `tools.py` anfasst, ist in der falschen Phase.
 | 5 | systemd-Units, `install_units.sh`, `/health.uptime_s` (P3-I) | 4 | ✅ | 6 |
 | 6 | Backup/Restore-Skripte, Backup-Timer | 5 | ✅ | 9 (7 in `test_backup_scripts.py`, 2 in `test_units.py`) |
 | 7 | Runbooks, `diagnose.sh`, Cloudflare-Rückbau | 6 | ✅ | 0 (Runbook/Skript, keine automatisierten Tests laut Plan) |
-| 8 | Live-Abnahme (Nikinger) | 7 | 🔄 in Arbeit — 10/13 Pflichtzeilen belegt, nur noch Zeile 6 (Reboot) real offen, B3+B4+B5+B6 dokumentiert, V9 live geschlossen | — |
+| 8 | Live-Abnahme (Nikinger) | 7 | 🟡 funktional beendet — 10/13 live, Zeilen 6/12/13 auf nächste Phase verschoben (Nikinger-Entscheidung 2026-07-27), B3–B6 dokumentiert, V9 live geschlossen; Token-Rotation steht noch aus | — |
 
 ## Umgebungsstand (Step 0, Details im Archiv)
 
@@ -202,11 +202,16 @@ curl -s https://<node>.<tailnet>.ts.net/health
 | 14 | Größenbudget | `search_items` gegen den echten Bestand — geerbtes `[VERIFY]` V8 aus P2 |
 
 **Abschluss, in dieser Reihenfolge:**
-1. Beide Token rotieren (`--revoke` + neu), exportieren, `systemctl restart`, Connector-URLs in
-   beiden Accounts aktualisieren (P3-M — README.md, Abschnitt „Rotation im Dienstbetrieb").
+1. Alle drei Token rotieren (`--revoke` + neu — für `fabian` ist das die erste reguläre
+   Ausgabe, kein Vorgänger), exportieren, `systemctl restart`, Connector-URLs in beiden Accounts
+   aktualisieren (P3-M — README.md, Abschnitt „Rotation im Dienstbetrieb"). **Führt der
+   Nikinger aus** (Keyring + `sudo systemd-creds` + Connector-URLs in den Claude-Accounts).
 2. Abnahmeprotokoll `docs/concepts/P3_ABNAHME_<YYYY-MM-DD>.md` mit L1-Card, Prüfmatrix, Belegen
    und Indexzeile — Konvention aus P2 (`P2_ADAPTER_ABNAHME_2026-07-26.md`).
-3. `ROADMAP.md` P3 auf ✅, `docs/INDEX.md` und dieser Phase-Head nachziehen.
+3. `ROADMAP.md` P3 auf 🟡, `docs/INDEX.md` und dieser Phase-Head nachziehen. **Nikinger-Entscheidung
+   2026-07-27:** Zeilen 6/12/13 auf die nächste Phase verschoben statt aktiv nachgeholt (Details:
+   Abnahmeprotokoll §1). ✅ erst nach einem beobachteten echten Reboot (Statusglyphen-Definition
+   in `ROADMAP.md`: ✅ = „live-verifiziert").
 
 **Offene `[VERIFY]`, die nur unter echter Infrastruktur schließen:** `diagnose.sh` Prüfung 4s
 Grep-Muster gegen `tailscale funnel status` (nie gegen ein echtes Tailscale getestet, siehe
@@ -270,21 +275,41 @@ Zeitpunkt schlicht noch nicht. Nach dem ersten `create_item` über den neuen Con
 `niklas`s `list_spaces` `fabian` korrekt als fremden Space (`item_count:1`, `writable:false`).
 Rule 4 funktioniert wie entworfen, kein `tools.py`-Befund.
 
+**Nikinger-Entscheidung 2026-07-27, 21:1x CEST:** Zeilen 6 (Reboot), 12 (Backup-Timer) und 13
+(Restore-Nachweis) werden **nicht mehr aktiv nachgeholt**, sondern auf die nächste Phase
+verschoben — ein unbeabsichtigter Reboot ist ohnehin der reale Prüffall für Zeile 6; 12/13
+lösen sich mit dem nächsten Backup-Zyklus (B5). Damit ist die Live-Abnahme für den P3-Abschluss
+funktional beendet, aber **Status bleibt 🟡, nicht ✅** — `ROADMAP.md`s Statusglyphen definieren
+✅ als „live-verifiziert", und Zeile 6 ist das per Definition nicht, solange kein echter Reboot
+beobachtet wurde. `ROADMAP.md` entsprechend gesetzt (2026-07-27).
+
+**Was diese Session zusätzlich erledigt hat:**
+- Testitems archiviert: `itm_53cf4e92`, `itm_cc4866f3` (beide niklas, `status=archived`).
+  `itm_2dda3690` (fabian) bleibt bewusst aktiv bis nach der Token-Rotation — einziges Item im
+  fabian-Space, Beleg für Zeile 5.
+- Dabei ein eigener Fehler sofort korrigiert: ein `append_to_item` hatte Zeilen 9/10
+  versehentlich als „nicht leer" statt „leer" protokolliert (Tippfehler beim Schreiben, kein
+  tatsächlicher Befund) — im selben Item mit einer KORREKTUR-Zeile richtiggestellt, bevor
+  archiviert wurde.
+
 **Was noch offen ist, für den nächsten Schritt:**
-- Zeile 6 (Reboot) — Nikinger-Zeitfrage, einzige real noch nicht durchgeführte Pflichtzeile.
-- Zeile 12 — bewusst akzeptiert, nicht abgewartet. Zeile 13 löst sich vermutlich mit demselben
-  nächtlichen Timer-Lauf von selbst, wurde aber nicht eigens abgewartet.
+- Zeile 6 (Reboot) — verschoben, passive Beobachtung beim nächsten echten Vorfall.
+- Zeilen 12/13 — verschoben, siehe B5.
 - Zeile 14 (optional, Größenbudget) — weiterhin nicht angefasst.
-- Der temporäre `sharefyx_phase_3_fabian`-Connector/-Token ist als „temporär" eingeführt worden
-  — vor dem Abschluss entfernen oder in die reguläre Token-Rotation (P3-M) überführen.
+- **Token-Rotation aller drei Token** (niklas, fabian, und der temporäre
+  `sharefyx_phase_3_fabian` — für fabian ist das die erste reguläre Ausgabe, kein Vorgänger zum
+  Zurückfallen) — **führt der Nikinger aus**, Details/Befehle: README.md „Rotation im
+  Dienstbetrieb", `phase3_edge/CLAUDE.md` Runbook „Abschluss". Claude Code hat keinen
+  passwordless-sudo-Zugriff auf diese Shell und darf Keyring/Connector-URLs ohnehin nicht
+  selbst anfassen (Hard Rule 1).
+- Nach der Rotation: `itm_2dda3690` archivieren, temporären Connector entfernen/regulär
+  ersetzen.
 - `phase3_edge/scripts/abnahme_run.sh` bleibt unangetastet (nicht von dieser Session verfasst);
   der bekannte `SHAREFYX_BACKUP_DIR`-Default-Fehler (`/var/backups/sharefyx` statt
   `/var/lib/sharefyx-backup`) besteht im Skript weiterhin, wurde per Environment-Variable
   umgangen.
-- Abschluss (Token-Rotation aller drei Token, Testitems archivieren, `ROADMAP.md`/Index/Head auf
-  ✅) noch offen — sinnvollerweise erst nach Zeile 6, damit nicht zweimal rotiert werden muss.
 
-**Nächster Schritt (konkret):** Nikinger fährt Zeile 6 (Reboot) nach eigenem Zeitplan; danach
-zurück an Claude Code für den Abschluss (alle Token rotieren inkl. des temporären
-fabian-Tokens, Testitems archivieren, `ROADMAP.md`/`docs/INDEX.md`/dieser Phase-Head auf ✅,
-alles im selben Commit wie die Doc-Aktualisierung, Hard Rule 8).
+**Nächster Schritt (konkret):** Nikinger rotiert alle drei Token nach README.md-Anleitung,
+aktualisiert die Connector-URLs in beiden Claude-Accounts; danach `itm_2dda3690` archivieren
+und den temporären Connector entfernen. Erst nach einem beobachteten echten Reboot wechselt
+P3 von 🟡 auf ✅.

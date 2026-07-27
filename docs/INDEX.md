@@ -25,16 +25,16 @@ updated: 2026-07-27
 - [CLAUDE.md](../CLAUDE.md) — 📗 ~9KB · rules, core principle, hard rules, working style, current state; auto-loaded every session
 - [AGENTS.md](../AGENTS.md) — 📗 ~1KB · harness-neutral entry point for non-Claude-Code agents; points to `CLAUDE.md` + doc-layers navigation
 - [README.md](../README.md) — 📗 ~5KB · human overview + machine setup (venv, keyring, run, smoke test)
-- [ROADMAP.md](../ROADMAP.md) — 📗 ~7KB · Phases 1–5, scope in/out per phase, status
+- [ROADMAP.md](../ROADMAP.md) — 📗 ~9KB · Phases 1–5, scope in/out per phase, status
 - [docs/DOC_LAYERS_CONVENTION.md](./DOC_LAYERS_CONVENTION.md) — 📗 ~5KB · Doc-Layers-Spec (v1, 2026-07-06) · **byte-identische Kopie aus dem Trading-Bot-Repo — nicht projektspezifisch anpassen, sonst divergieren zwei Kopien derselben Regel**
 - [docs/PROMPTS.md](./PROMPTS.md) — 📗 ~11KB · die drei Workflow-Prompts (Claude-Code-Session-Start, Phasen-Kickoff, Phasen-Abschluss); lesen beim Start eines neuen Chats, nicht mitten in einer Session
 
 ## Active phase (3 — Exposure & Betrieb)
 
-- [phase3_edge/CLAUDE.md](../phase3_edge/CLAUDE.md) — 🔄 ~17KB · phase head; Steps 0–6 ✅, Step 7 (Live-Abnahme) 🔄 in Arbeit — 10/13 Pflichtzeilen belegt, nur noch Reboot (Zeile 6) real offen, Funde B3–B6 dokumentiert, V9 live geschlossen; read + newest Session-stopped block first
+- [phase3_edge/CLAUDE.md](../phase3_edge/CLAUDE.md) — 🔄 ~20KB · phase head; Steps 0–6 ✅, Step 7 (Live-Abnahme) 🟡 funktional beendet — 10/13, Zeilen 6/12/13 auf nächste Phase verschoben (Nikinger-Entscheidung 2026-07-27), Token-Rotation steht aus; read + newest Session-stopped block first
 - [docs/concepts/phase3_edge_plan.md](./concepts/phase3_edge_plan.md) — 📕 ~46KB · ausführungsreifer P3-Plan (Entscheidungen P3-A–P3-N, Steps 0–7); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
 - [phase3_edge/SESSIONS_ARCHIVE.md](../phase3_edge/SESSIONS_ARCHIVE.md) — 📦 ~44KB · acht archivierte Session-Blöcke (Step 0–6, inkl. Live-Abnahme-Funde B3/B4), verbatim, newest-first
-- [docs/concepts/P3_ABNAHME_2026-07-27.md](./concepts/P3_ABNAHME_2026-07-27.md) — 📕 ~17KB · Abnahmeprotokoll Phase 3: 13 Prüfungen gegen den dauerhaft erreichbaren Dienst, 10/13 bestanden (Stand 2026-07-27 21:05), CLI-Ausschnitt als Beleg, Befunde B5/B6
+- [docs/concepts/P3_ABNAHME_2026-07-27.md](./concepts/P3_ABNAHME_2026-07-27.md) — 📕 ~19KB · Abnahmeprotokoll Phase 3: 10/13 live bestanden, Zeilen 6/12/13 per Nikinger-Entscheidung auf nächste Phase verschoben, CLI-Ausschnitt als Beleg, Befunde B5/B6
 
 ## Completed phases
 
