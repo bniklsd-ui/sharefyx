@@ -136,10 +136,81 @@ sudo rm -f /usr/local/bin/cloudflared
 Cloudflare Named Tunnel bleibt als dokumentierter Ausweichweg bestehen (`phase2_mcp/CLAUDE.md`)
 — dieser Rückbau betrifft nur den installierten `cloudflared`-Client, nicht die Doku-Option.
 
-### „Inbetriebnahme" (einmalig)
+### „Inbetriebnahme" (einmalig, führt der Nikinger aus, nicht Claude Code)
 
-Wird in Step 7 befüllt — das ist der Lauf, den der Nikinger gegen die echte Infrastruktur
-ausführt (Plan §4 Step 7).
+Claude Code liefert diese Befehlsfolge und wertet die Ergebnisse aus; alles, was den echten
+`DATA_ROOT`, den echten Keyring, echte Token oder die Claude-Accounts berührt, führt der
+Nikinger selbst aus (Plan §4 Step 7). Angepasst an das tatsächlich Gebaute — vier Variablen in
+`local.env` (nicht mehr), zwei Backup-Units, `diagnose.sh` als Vorab-Check.
+
+```
+# 0) Tailnet-Voraussetzungen (Tailscale Admin-Konsole, einmalig)
+#    MagicDNS an · HTTPS-Zertifikate an · nodeAttrs: "funnel" für diesen Node
+tailscale status                       # Node-Name und Tailnet-Name notieren
+
+# 1) Funnel dauerhaft einschalten
+tailscale funnel --bg 8765
+tailscale funnel status                # muss den Node-Namen und Port 443 zeigen
+
+# 2) Konfiguration eintragen
+cp phase3_edge/local.env.example phase3_edge/local.env
+#    REPO_ROOT, DATA_ROOT, VENV, ALLOWED_HOSTS=<node>.<tailnet>.ts.net
+
+# 3) Token für beide Spaces ausgeben (je einmal anzeigen, sicher notieren)
+python phase2_mcp/scripts/issue_token.py --space niklas
+python phase2_mcp/scripts/issue_token.py --space fabian
+
+# 4) Space-Map verschlüsselt bereitstellen — ohne Klartext auf Platte
+sudo mkdir -p /etc/sharefyx
+python phase3_edge/scripts/export_space_map.py \
+  | sudo systemd-creds encrypt --name=spaces - /etc/sharefyx/spaces.cred
+sudo chmod 600 /etc/sharefyx/spaces.cred
+
+# 5) Units installieren und starten (sharefyx-mcp + die beiden Backup-Units aus Step 5)
+sudo phase3_edge/scripts/install_units.sh
+systemctl status sharefyx-mcp
+sudo systemctl enable --now sharefyx-backup.timer
+
+# 6) Vorab-Diagnose, bevor von außen getestet wird
+phase3_edge/scripts/diagnose.sh
+
+# 7) Erreichbarkeit
+curl -s http://127.0.0.1:8765/health
+curl -s https://<node>.<tailnet>.ts.net/health
+
+# 8) Connector in beiden Accounts
+#    https://<node>.<tailnet>.ts.net/mcp/<token>
+```
+
+**Abnahmematrix** — jede Zeile mit Beleg (Ausgabe oder Screenshot **ohne Token**):
+
+| # | Prüfung | Erwartung |
+|---|---|---|
+| 1 | `/health` von außen | `{"status":"ok",…,"uptime_s":…}` |
+| 2 | Connector `niklas` | Ein Read und ein Write erfolgreich |
+| 3 | Connector `fabian` | Ein Read und ein Write erfolgreich, **eigener Space** |
+| 4 | Cross-Space | `fabian` sieht `niklas` gewrappt und darf dort nicht schreiben |
+| 5 | `list_spaces` bei leerem `fabian` | Eigener Space erscheint mit `item_count: 0` (B1-Fix, P2) |
+| 6 | **Reboot-Test** | VM neu starten, ohne Handgriff: Connector funktioniert, URL unverändert |
+| 7 | **Kill-Test** | `sudo systemctl kill -s KILL sharefyx-mcp` → binnen 10 s wieder `ok` |
+| 8 | Request-Log | `journalctl -u sharefyx-mcp` zeigt je Tool-Aufruf Name, Space, `ms` |
+| 9 | **Token-Grep** | `journalctl -u sharefyx-mcp --since <Start> \| grep -F "<token>"` → **leer** |
+| 10 | Titel-Grep | Ein Item mit markantem Titel anlegen, danach im Log suchen → **leer** |
+| 11 | Fremdzugriff | `curl https://<host>/mcp/falsch` → 401, Logzeile mit `<redacted>` |
+| 12 | Backup-Timer | `systemctl list-timers sharefyx-backup` zeigt einen Lauf |
+| 13 | **Restore-Nachweis** | `restore_check.sh` grün, HEAD identisch |
+| 14 | Größenbudget | `search_items` gegen den echten Bestand — geerbtes `[VERIFY]` V8 aus P2 |
+
+**Abschluss, in dieser Reihenfolge:**
+1. Beide Token rotieren (`--revoke` + neu), exportieren, `systemctl restart`, Connector-URLs in
+   beiden Accounts aktualisieren (P3-M — README.md, Abschnitt „Rotation im Dienstbetrieb").
+2. Abnahmeprotokoll `docs/concepts/P3_ABNAHME_<YYYY-MM-DD>.md` mit L1-Card, Prüfmatrix, Belegen
+   und Indexzeile — Konvention aus P2 (`P2_ADAPTER_ABNAHME_2026-07-26.md`).
+3. `ROADMAP.md` P3 auf ✅, `docs/INDEX.md` und dieser Phase-Head nachziehen.
+
+**Offene `[VERIFY]`, die nur unter echter Infrastruktur schließen:** V9 (`ProtectHome=read-only`
++ `ReadWritePaths` erlaubt Git-Commits im `DATA_ROOT`) und `diagnose.sh` Prüfung 4s Grep-Muster
+gegen `tailscale funnel status` (nie gegen ein echtes Tailscale getestet, siehe „Umgebungsstand").
 
 ---
 
@@ -202,6 +273,14 @@ Steps, hier gebündelt vor dem Abschlussbericht):**
 2. Tailscale-Installation + Tailnet-Voraussetzungen (Step 0) — einziges echtes Gate vor Step 7.
 3. Cloudflare-Rückbau (dieser Step) — Befehl steht im Runbook, Ausführung ist Sache des
    Nikingers.
+
+**Nachtrag zu diesem Block (Advisor-Fund, nach dem ursprünglichen Commit ergänzt):** der
+„Inbetriebnahme"-Runbook-Abschnitt oben war noch der leere Platzhalter aus Step 0/1 —
+nachgezogen mit der vollständigen Befehlsfolge und der 14-Zeilen-Abnahmematrix aus Plan §4
+Step 7, angepasst an das tatsächlich Gebaute (vier `local.env`-Variablen, zwei Backup-Units,
+`diagnose.sh` als Vorab-Check vor Schritt 7). Ohne diese Ergänzung hätte der Nikinger für Step 7
+den 46KB-Plan öffnen müssen, obwohl der Phase-Head genau dafür da ist. Reine Doku-Ergänzung,
+kein Code, keine neuen Tests — `pytest` bleibt bei 168/168.
 
 **Nächster Schritt (konkret):** Step 7 — Live-Abnahme. Läuft komplett beim Nikinger gegen die
 echte Infrastruktur; Claude Code liefert die Befehlsfolge aus dem Plan und wertet die

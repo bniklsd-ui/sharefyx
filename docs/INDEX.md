@@ -31,7 +31,7 @@ updated: 2026-07-27
 
 ## Active phase (3 — Exposure & Betrieb)
 
-- [phase3_edge/CLAUDE.md](../phase3_edge/CLAUDE.md) — 🔄 ~12KB · phase head; Steps 0–6 ✅, Scope + Modulstatus + beide Runbooks vollständig; read + newest Session-stopped block first
+- [phase3_edge/CLAUDE.md](../phase3_edge/CLAUDE.md) — 🔄 ~16KB · phase head; Steps 0–6 ✅, Scope + Modulstatus + beide Runbooks (inkl. Step-7-Befehlsfolge + Abnahmematrix) vollständig; read + newest Session-stopped block first
 - [docs/concepts/phase3_edge_plan.md](./concepts/phase3_edge_plan.md) — 📕 ~46KB · ausführungsreifer P3-Plan (Entscheidungen P3-A–P3-N, Steps 0–7); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
 - [phase3_edge/SESSIONS_ARCHIVE.md](../phase3_edge/SESSIONS_ARCHIVE.md) — 📦 ~30KB · sechs archivierte Session-Blöcke (Step 0–5), verbatim, newest-first
 
