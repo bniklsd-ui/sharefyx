@@ -61,7 +61,7 @@ hier `tools.py` anfasst, ist in der falschen Phase.
 | 1 | Haushalt, Doku-Drift, Verifikationslauf, Umgebungsinventar | 0 | ✅ | 0 (kein Feature-Code) |
 | 2 | Paketgerüst `phase3_edge/`, `SPACE_ALLOWED_HOSTS` in `config.py`/`app.py` | 1 | ✅ | 5 |
 | 3 | `mcpserver/request_log.py` (Tool- + HTTP-Log) | 2 | ✅ | 9 (8 in `test_request_log.py`, 1 in `test_logging.py`) |
-| 4 | `credentials.py` LoadCredential-Pfad, `export_space_map.py` | 3 | ⬜ | — |
+| 4 | `credentials.py` LoadCredential-Pfad, `export_space_map.py` | 3 | ✅ | 6 |
 | 5 | systemd-Units, `install_units.sh` | 4 | ⬜ | — |
 | 6 | Backup/Restore-Skripte, Backup-Timer | 5 | ⬜ | — |
 | 7 | Runbooks, `diagnose.sh`, Cloudflare-Rückbau | 6 | ⬜ | — |
@@ -92,88 +92,67 @@ bewusst leer, siehe Plan §4 Step 6/7.
 
 ---
 
-## Session stopped — 2026-07-27 (Step 2: Request-Log)
+## Session stopped — 2026-07-27 (Step 3: Credentials über systemd)
 
-**Ergebnis:** Step 2 abgeschlossen. `mcpserver/request_log.py` (neu) liefert beide Ereignisarten
-aus Plan §3; `ToolCallLogMiddleware` läuft in `create_app()`, `AccessLogASGI` in `serve.py`.
+**Ergebnis:** Step 3 abgeschlossen. `credentials.py :: load_space_map()` liest jetzt zuerst ein
+von systemd bereitgestelltes Credentials-Verzeichnis, Keyring bleibt Fallback.
+`phase3_edge/scripts/export_space_map.py` (neu) exportiert die Space-Map aus dem Keyring als
+JSON auf stdout, für `systemd-creds encrypt`.
 
-**`[VERIFY]` V3 aufgelöst, gegen den echten `fastmcp==3.4.4`-Code, nicht nur die Doku geprüft:**
-`Middleware.on_call_tool(context: MiddlewareContext[CallToolRequestParams], call_next)`,
-`context.message.name` trägt den Tool-Namen, Registrierung über `mcp.add_middleware(...)` in
-`app.py :: create_app()` — alles wie im Plan angenommen. **Eine Abweichung vom Plan-Wortlaut,
-empirisch begründet:** `request_log.py`s Moduldocstring-Skizze nennt `ERROR_CLASSES:
-dict[type[Exception], str]`. Das ist mit dem echten `FastMCP.call_tool()`-Pfad nicht umsetzbar —
-gelesen bis in `server.py`: die Middleware-Kette ruft die Kernlogik über `call_next()` auf, und
-jede dort erhobene `FastMCPError`/`ToolError` (`ToolError` erbt von `FastMCPError`) wird
-unverändert weitergereicht. `tools.py :: map_storage_error()` hat die ursprüngliche
-`storage`-Exception zu diesem Zeitpunkt bereits in eine `ToolError` mit Präfix-Text übersetzt
-(`"conflict: …"`, `"item_not_found: …"`, …) — ein Typ-Dict würde hier immer denselben einen Typ
-treffen. `classify_error()` parst deshalb den Nachrichtenpräfix vor dem ersten `":"` statt den
-Exception-Typ zu prüfen. Volle Begründung im Moduldocstring von `request_log.py`.
+**`[VERIFY]` V4 und V5 — bereits in Step 0 beantwortet, hier nur referenziert (kein zweiter
+Inventarlauf):** V4 (`systemd-creds` vorhanden, systemd 255 ≥ 250, `has-tpm2` → partial →
+Host-Key-Verschlüsselung) und V5 (`keyring.backends.SecretService.Keyring`, Priorität 5) stehen
+im „Umgebungsstand"-Abschnitt oben und in `SESSIONS_ARCHIVE.md`, Step-0-Block.
 
-**`space`-Feld — Semantik bewusst festgelegt, nicht nur implizit:** `_current_space()` liefert
-den **authentifizierten Aufrufer** (`Principal.space`), nicht den Zielraum des Tool-Aufrufs. Bei
-`get_item`/`update_item` gegen einen fremden Space steht im Log also weiterhin der eigene Space,
-nicht der fremde. Das beantwortet Plan §3.4 Frage 2 ("mein Account oder der des Kollegen?")
-korrekt; für einen Rule-4-Nachweis (wer hat wohin geschrieben) ist das Request-Log bewusst nicht
-die Quelle — das leisten die Tool-Fehlerklasse (`write_denied`) und `test_tools.py`/`test_app.py`
-(Advisor-Fund, sonst hätte ein kalter Leser beim Debuggen einer Cross-Space-Ablehnung den
-Zielraum im Log vermutet).
+**Plan §2.3 war mit sich selbst im Widerspruch — aufgelöst, nicht stillschweigend
+weggelesen:** der Plantext sagt, `export_space_map.py` solle
+„`credentials.load_space_map()` **aus dem Keyring** (explizit, nicht über die neue
+Verzweigung)" lesen — aber `load_space_map()` **ist** ab diesem Step die neue Verzweigung, ein
+Aufruf kann nicht zugleich sie selbst und ihre Umgehung sein. Auflösung (Advisor-Review): die
+reine Keyring-Leselogik wurde in eine eigene Funktion `load_space_map_from_keyring()`
+ausgelagert. `load_space_map()` ruft sie als Fallback; `export_space_map.py` ruft sie direkt.
+Ein Leser, zwei Aufrufer, keine Verzweigung im Export-Pfad. `issue()`/`revoke()` bleiben laut
+Plan-Vorgabe **unverändert** (0 Zeilen Diff) und rufen weiterhin `load_space_map()` auf — das ist
+unschädlich, weil `$CREDENTIALS_DIRECTORY` in ihrem einzigen realen Aufrufkontext
+(`issue_token.py`, interaktiv) nie gesetzt ist.
 
-**`err: "internal"` ist ein Sammelbecken, nicht nur der Whitelist-Fallback — festgehalten für
-Step 7:** die Whitelist (`conflict`, `item_not_found`, `write_denied`, `invalid`) lässt
-`auth_error`, `space_not_found` und FastMCPs generisches `"Error calling tool …"` alle in
-`internal` fallen. Das ist Plan-konform, bedeutet aber: `err: "internal"` in `journald` kann
-sowohl „ungültiger Token mitten im Aufruf" als auch „echter Store-Bug" heißen. Kein Blocker für
-P3 (keine Abnahmezeile hängt an der Unterscheidung), aber falls Step 7 auf `internal`-Zeilen
-stößt, ist das der erste Ort zum Nachschauen, nicht ein Bug im Logging.
+**Der Fallback-Warnhinweis geht auf den Modul-Logger, nicht auf `sharefyx.request`**
+(Advisor-Fund): fehlt die Credential-Datei trotz gesetztem Verzeichnis, loggt `load_space_map()`
+über `logging.getLogger(__name__)` — landet also auf dem normalen stderr-Handler aus
+`configure_logging()`, nicht im JSON-Request-Log. Der Request-Logger ist laut Plan §3.1 für
+`ev="tool"`/`ev="http"` reserviert; eine freie Textmeldung dort wäre zwar gültiges JSON
+(`JsonLineFormatter` serialisiert auch einen bloßen String), aber strukturell falsch auf einem
+Stream, dessen Vertrag eine Feld-Whitelist ist.
 
-**`TokenScrubbingFilter` erweitert** (`logging_setup.py`, im P3-N-Berührungsbereich): scrubbt
-jetzt auch String-Werte innerhalb eines Dict-`record.msg` (vorher nur reine String-Messages) —
-sonst wäre der Filter auf dem Request-Log-Pfad ein stiller No-op gewesen, praktisch redundant zu
-`AccessLogASGI`s eigener Pfad-Redaktion, aber echte Verteidigung in der Tiefe statt einer
-Behauptung. Eigener Test in `test_logging.py`
-(`test_scrubbing_filter_redacts_token_in_dict_message`), da die P3-Tests den Filter nicht über
-`configure_logging()` einbinden.
+**Test-Ladepfad für `export_space_map.py` (Advisor-Fund):** `phase3_edge/` ist kein Python-Paket
+(Plan §1.2), ein normaler `import` aus `phase2_mcp/tests/test_credentials.py` funktioniert
+deshalb nicht. Geladen über `importlib.util.spec_from_file_location(...)` gegen den absoluten
+Pfad — hält `capsys` für den stdout/stderr-Split nutzbar, im Unterschied zu einem
+Subprocess-Aufruf. Da `export_space_map.py`s `from mcpserver import credentials` denselben
+gecachten Modul-Objekt-Namen trifft wie der Testcode, wirkt der `fake_keyring`-Monkeypatch aus
+`test_credentials.py` transparent auch dort — kein zweiter Fake nötig.
 
-**Zirkelimport vermieden:** `request_log.py` importiert `_TOKEN_SEGMENT_RE` aus
-`logging_setup.py` auf Modulebene; `logging_setup.py :: configure_logging()` importiert
-`JsonLineFormatter`/`LOGGER_NAME` aus `request_log.py` **lazy** (innerhalb der Funktion) — zum
-Aufrufzeitpunkt ist `logging_setup` bereits vollständig geladen, kein Zirkelbezug beim
-Modul-Import.
+**Doku:** `README.md`, Abschnitt „Token ausgeben, rotieren, widerrufen" um „Rotation im
+Dienstbetrieb (ab P3)" erweitert — der volle Vierschritt aus P3-M (Token neu ausgeben → Export →
+`systemctl restart` → Connector-URL aktualisieren), inklusive des Satzes, dass ein vergessener
+Restart wie „Connector kaputt" aussieht, aber ein 401 auf die alte Credential-Datei im tmpfs ist.
 
-**`mcp_smoke.py` bewusst nicht angefasst — P3-N-Grenzfall, an den Nikinger gemeldet:** Step 2s
-„Done when" verlangt einen manuellen `mcp_smoke.py`-Lauf mit sichtbaren JSON-Zeilen. `mcp_smoke.py`
-ruft aber `logging.basicConfig()` statt `configure_logging()` und geht nie durch `serve.py`
-(reines In-Process-`ASGITransport`, kein `AccessLogASGI`) — selbst mit funktionierendem
-Tool-Log wäre die Ausgabe ein Python-Dict-Repr, kein JSON. `mcp_smoke.py` steht nicht in P3-Ns
-„genau anfassen"-Liste; sie ist als abschließende Aufzählung gelesen worden (wie schon bei
-`tools.py`/`server.py`), deshalb keine Änderung dort. Stattdessen manuell gegen ein Wegwerf-Skript
-(nie eingecheckt, aus dem Scratchpad gelöscht) verifiziert, das genau den echten Produktionspfad
-fährt — `configure_logging()` + `create_app()` + `AccessLogASGI`, `FakeResolver` statt echtem
-Keyring, temporäres `DATA_ROOT`: `GET /health` und ein Fremdzugriff mit falschem Token erzeugten
-korrekt geformte, redigierte JSON-Zeilen auf stderr (`{"ts":"…","ev":"http","method":"GET",
-"path":"/health","status":200,"ms":0}` bzw. mit `path":"/mcp/<redacted>","status":401`). Das ist
-strengeres Beweismaterial als `mcp_smoke.py` liefern könnte, weil es den echten `serve.py`-Pfad
-inklusive `AccessLogASGI` prüft, den `mcp_smoke.py` konstruktionsbedingt nie durchläuft. Für den
-Nikinger: falls `mcp_smoke.py` künftig JSON-Request-Logs zeigen soll, ist das eine bewusste
-P3-N-Erweiterung (ein Zweizeiler: `logging.basicConfig` → `configure_logging`), keine
-Kleinigkeit, die einfach nachgezogen wird.
+**Tests** (`phase2_mcp/tests/test_credentials.py`, alle sechs aus dem Plan, mit `monkeypatch`
+auf `$CREDENTIALS_DIRECTORY` und dem bestehenden `fake_keyring`-Fixture — nie der echte
+Keyring): `test_load_space_map_prefers_credentials_dir`,
+`test_load_space_map_falls_back_when_credentials_dir_unset`,
+`test_load_space_map_falls_back_when_credential_file_missing`,
+`test_load_space_map_raises_on_malformed_credential`,
+`test_export_writes_json_to_stdout_and_note_to_stderr`,
+`test_export_contains_no_plaintext_token`.
 
-**Tests** (alle acht aus dem Plan, `phase2_mcp/tests/test_request_log.py`, plus einer in
-`test_logging.py` für die Filter-Erweiterung): `test_json_line_is_valid_json`,
-`test_tool_event_has_tool_space_and_duration`, `test_tool_event_error_carries_class_not_message`,
-`test_tool_event_never_contains_item_title` (gestärkt gegen eine Tautologie-Falle — prüft jetzt
-zuerst `len(tool_events) == 6`, bevor die Abwesenheit des Markers behauptet wird; Advisor-Fund:
-sonst wäre der Test identisch grün gegen eine Middleware geblieben, die gar nichts loggt),
-`test_http_event_redacts_token_segment`, `test_http_event_logs_401_status`,
-`test_logging_failure_does_not_break_tool_call`, `test_request_logger_does_not_propagate_to_root`,
-`test_scrubbing_filter_redacts_token_in_dict_message`.
+**Verifiziert:** `.venv/bin/python -m pytest -q` → **153/153 grün** (147 + 6 neue). Alle
+bestehenden `test_credentials.py`-Tests (die alte `load_space_map()`-Aufrufe machen) liefen
+unverändert grün weiter — `$CREDENTIALS_DIRECTORY` ist in der Testumgebung nie gesetzt, der
+Fallback greift transparent.
 
-**Verifiziert:** `.venv/bin/python -m pytest -q` → **147/147 grün** (138 + 9 neue).
+**Modul-Status oben nachgezogen** (Zeile 4: ⬜ → ✅, 6 Tests).
 
-**Modul-Status oben nachgezogen** (Zeile 3: ⬜ → ✅, 9 Tests). Rotation läuft nach diesem Commit.
-
-**Nächster Schritt (konkret):** Step 3 — `credentials.py` LoadCredential-Pfad,
-`export_space_map.py`. Alle Tests mit `monkeypatch` auf `$CREDENTIALS_DIRECTORY` und einem
-Fake-Keyring, nie der echte Keyring.
+**Nächster Schritt (konkret):** Step 4 — systemd-Units (`sharefyx-mcp.service`,
+`install_units.sh`). `test_unit_has_no_secret_shaped_value` ist die billigste Versicherung gegen
+den Token-Klartext-Vorfall, der in P2 zweimal passiert ist.

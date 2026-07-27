@@ -86,6 +86,28 @@ verloren geht: neu ausgeben (`--space`), den alten Hash mit `--revoke` entfernen
 Connector-URL in Claude aktualisieren (der alte Pfad-Token funktioniert ab dem Revoke nicht
 mehr).
 
+### Rotation im Dienstbetrieb (ab P3)
+
+Läuft der Server als systemd-Dienst (`sharefyx-mcp.service`, siehe „Betrieb" unten), liest er die
+Space-Map **nicht** aus dem Keyring, sondern aus einer verschlüsselten Credential-Datei
+(`LoadCredentialEncrypted`, `mcpserver/credentials.py :: load_space_map()`). Eine Token-Rotation
+braucht deshalb vier Schritte in dieser Reihenfolge (P3-M):
+
+```bash
+python phase2_mcp/scripts/issue_token.py --revoke niklas
+python phase2_mcp/scripts/issue_token.py --space niklas        # 1. Token neu ausgeben (Keyring)
+
+python phase3_edge/scripts/export_space_map.py \                # 2. Export
+  | sudo systemd-creds encrypt --name=spaces - /etc/sharefyx/spaces.cred
+
+sudo systemctl restart sharefyx-mcp                              # 3. Neustart
+#    ohne diesen Schritt bleibt die ALTE Space-Map im tmpfs — der Dienst liefert dann 401 auf
+#    das neue Token, obwohl der Export erfolgreich war. Das sieht wie „Connector kaputt" aus,
+#    ist aber ein vergessener Restart.
+
+# 4. Connector-URL mit dem neuen Token in beiden Claude-Accounts aktualisieren
+```
+
 ## MCP-Server smoke-testen
 
 ```bash
