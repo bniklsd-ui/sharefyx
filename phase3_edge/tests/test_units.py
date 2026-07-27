@@ -13,6 +13,9 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 UNIT_PATH = REPO_ROOT / "phase3_edge" / "systemd" / "sharefyx-mcp.service"
 INSTALL_SCRIPT = REPO_ROOT / "phase3_edge" / "scripts" / "install_units.sh"
+ALL_UNIT_PATHS = sorted((REPO_ROOT / "phase3_edge" / "systemd").glob("*.service")) + sorted(
+    (REPO_ROOT / "phase3_edge" / "systemd").glob("*.timer")
+)
 
 
 def _unit_text() -> str:
@@ -53,6 +56,24 @@ def test_unit_placeholders_are_unresolved_in_repo():
     text = _unit_text()
     for placeholder in ("__REPO_ROOT__", "__DATA_ROOT__", "__VENV__", "__ALLOWED_HOSTS__"):
         assert placeholder in text
+
+
+def test_all_units_have_no_secret_shaped_value():
+    """Wie `test_unit_has_no_secret_shaped_value`, aber über **alle** Unit-Dateien in
+    `phase3_edge/systemd/` — Step 5 (Backup) fügt zwei weitere hinzu, ohne dass diese
+    Versicherung stillschweigend nur für die MCP-Unit gilt."""
+    secret_shaped = re.compile(r"[A-Za-z0-9_-]{32,}")
+    assert len(ALL_UNIT_PATHS) >= 3, "erwartet mindestens sharefyx-mcp + sharefyx-backup(.timer)"
+    for path in ALL_UNIT_PATHS:
+        for value in _environment_values(path.read_text(encoding="utf-8")):
+            assert not secret_shaped.search(value), f"{path.name}: sieht wie ein Secret aus: {value!r}"
+
+
+def test_all_units_have_no_hardcoded_machine_paths():
+    """Kein `/home/savefyx`/`/home/<user>`-Pfad in einer committeten Unit — Maschinenzustand
+    gehört über `local.env` eingesetzt, nicht ins Repo (Plan §5 Akzeptanzkriterium 8)."""
+    for path in ALL_UNIT_PATHS:
+        assert "/home/savefyx" not in path.read_text(encoding="utf-8"), path.name
 
 
 def test_install_script_refuses_without_local_env(tmp_path):

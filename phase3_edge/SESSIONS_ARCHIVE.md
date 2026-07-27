@@ -4,10 +4,75 @@ purpose: Archiv älterer Session-stopped-Blöcke aus phase3_edge/CLAUDE.md, newe
 read-when: Audit vergangener Sessions dieser Phase; NICHT für normalen Session-Start
 detail: L3
 up: CLAUDE.md
-updated: 2026-07-27 (Step 3 archiviert)
+updated: 2026-07-27 (Step 4 archiviert)
 ---
 
 # Session-Archiv — Phase 3 Exposure & Betrieb
+
+## Session stopped — 2026-07-27 (Step 4: systemd-Units)
+
+**Ergebnis:** Step 4 abgeschlossen. `phase3_edge/systemd/sharefyx-mcp.service` (Platzhalter,
+nicht auf der VM installiert), `phase3_edge/scripts/install_units.sh`, plus `/health` trägt jetzt
+`uptime_s` (P3-I).
+
+**`uptime_s` war im Plan §4 keinem Step zugewiesen — Lücke geschlossen, nicht stillschweigend
+übersprungen (Advisor-Fund):** P3-I ("genau ein neues Feld") steht in §0.5, §1.1 und in Step 7s
+Abnahmematrix (Zeile 1), aber in keinem der Steps 0–7 als Liefergegenstand. Step 6
+(`diagnose.sh`, Prüfung 2) und der Disconnected-Runbook setzen das Feld aber voraus. Hier in
+Step 4 gebaut, bevor Step 6 es braucht: `app.py :: create_app()` setzt `app.state.start_time =
+time.monotonic()` **pro App-Instanz** (nicht Modulebene — sonst teilten sich mehrere
+`create_app()`-Aufrufe, z. B. in Tests, einen Startzeitpunkt), `_health()` berechnet
+`uptime_s = int(time.monotonic() - request.app.state.start_time)`. `app.py` steht in P3-Ns
+Berührungsliste, keine Scope-Erweiterung.
+
+**`test_health_ok` aus P2 korrekt rot geworden, wie von seinem eigenen Kommentar angekündigt:**
+der Test prüft absichtlich die exakte Schlüsselmenge der `/health`-Antwort ("fängt eine spätere
+Erweiterung um ein zusätzliches Feld ab"). Mit `uptime_s` dazu aktualisiert
+(`{"status","service","version","uptime_s"}`), `isinstance(..., int)` und `>= 0` geprüft.
+`test_health_leaks_no_space_names` bleibt unverändert grün — `uptime_s` leakt nichts.
+
+**`local.env.example` trug echte Maschinenpfade dieser VM — korrigiert (Advisor-Fund):**
+`REPO_ROOT`/`DATA_ROOT`/`VENV` zeigten auf `/home/savefyx/...`. P3-Js eigene Begründung für das
+Platzhalterschema ist Maschinenunabhängigkeit ("der Kollege oder eine zweite VM sollen dasselbe
+Repo benutzen können"), und §5 Akzeptanzkriterium 8 nennt „kein Maschinenzustand im Repo" — ein
+kopiertes Beispiel mit dieser VMs echten Pfaden hätte plausibel, aber falsch ausgesehen. Jetzt
+`/path/to/savefxy` etc.
+
+**`install_units.sh` bricht vor jedem `/etc`- oder `systemctl`-Zugriff ab, wenn `local.env`
+fehlt** — genau der Pfad, den der Test ausübt, ohne root-Rechte oder einen echten systemd
+anzufassen. Verarbeitet generisch alle `*.service`/`*.timer` in `phase3_edge/systemd/` (Step 5
+liefert die Backup-Units in dasselbe Verzeichnis, ohne dass dieses Skript sich ändern muss),
+prüft nach der Platzhalter-Ersetzung per Regex, ob `__[A-Z_]+__` noch irgendwo übrig ist, und
+löscht eine unvollständige Zieldatei sofort statt sie stehen zu lassen. **Die Unit ist nach
+diesem Step bewusst noch nicht auf der VM installiert** — das ist Step 7.
+
+**`V9` (`ProtectHome=read-only` + `ReadWritePaths` erlaubt Git-Commits im `DATA_ROOT`) bleibt
+offen** — laut Plan nur zur Laufzeit prüfbar, `test_units.py` ist reines Textparsen. Der bereits
+in Step 0 bestätigte Fund (Git-Identität `Space Server`/`space-server@localhost` liegt im
+`DATA_ROOT` selbst, nicht nur in `~/.gitconfig`) ist der Ausgangspunkt für den ersten
+Write-Test in Step 7 — dorthin verschoben, nicht hier vorweggenommen.
+
+**Tests** (`phase3_edge/tests/test_units.py`, alle sechs aus dem Plan):
+`test_unit_restarts_on_failure`, `test_unit_loads_credential_encrypted`,
+`test_unit_binds_loopback_only`, `test_unit_has_no_secret_shaped_value`,
+`test_unit_placeholders_are_unresolved_in_repo`,
+`test_install_script_refuses_without_local_env` (kopiert `scripts/`+`systemd/` in ein
+Wegwerf-Verzeichnis ohne `local.env` — hermetisch, unabhängig davon, ob auf dieser Maschine
+zufällig ein echtes `phase3_edge/local.env` existiert). Plus die aktualisierten
+`test_health_ok`/-Assertions in `phase2_mcp/tests/test_app.py`.
+
+**Verifiziert:** `.venv/bin/python -m pytest -q` → **159/159 grün** (153 + 6 neue).
+
+**Modul-Status oben nachgezogen** (Zeile 5: ⬜ → ✅, 6 Tests).
+
+**Offen für den Nikinger (nicht blockierend für Steps 5–6, aber noch nicht gemeldet):**
+1. `mcp_smoke.py`/P3-N-Grenzfrage aus Step 2 — ob `mcp_smoke.py` auf `configure_logging()`
+   umgestellt werden soll (Zweizeiler), steht weiterhin offen.
+2. Tailscale ist auf dieser VM weiterhin nicht installiert (Step 0) — einziges Gate vor Step 7.
+
+**Nächster Schritt (konkret):** Step 5 — Backup- und Restore-Skripte (`git bundle` + Verify +
+Retention), Backup-Timer. Beide Skripte laufen in Tests ausschließlich gegen Wegwerf-Git-Repos
+unter `tmp_path`, nie gegen den echten `DATA_ROOT`.
 
 ## Session stopped — 2026-07-27 (Step 3: Credentials über systemd)
 

@@ -1,0 +1,10 @@
+[Unit]
+Description=Täglicher Sharefyx-Backup-Lauf (Backup + Restore-Verifikation)
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=900
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,13 @@
+[Unit]
+Description=Sharefyx Backup (git bundle) + Restore-Verifikation
+Documentation=file://__REPO_ROOT__/phase3_edge/CLAUDE.md
+
+[Service]
+Type=oneshot
+User=savefyx
+Group=savefyx
+Environment=SHAREFYX_DATA_ROOT=__DATA_ROOT__
+Environment=SHAREFYX_BACKUP_DIR=/var/backups/sharefyx
+Environment=SHAREFYX_BACKUP_KEEP=14
+ExecStart=__REPO_ROOT__/phase3_edge/scripts/backup_data_root.sh
+ExecStart=__REPO_ROOT__/phase3_edge/scripts/restore_check.sh
