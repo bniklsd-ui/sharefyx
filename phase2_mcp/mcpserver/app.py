@@ -39,9 +39,15 @@ def create_app(
     """`allowed_hosts` ist optional und Standardmäßig `None` (FastMCPs eigener Default greift,
     d. h. `localhost`/`127.0.0.1`). Wird von `scripts/serve.py --allowed-host` durchgereicht —
     ohne diesen Schalter scheitert die Quick-Tunnel-Probe in Step 7 an FastMCPs
-    DNS-Rebinding-Schutz, weil der Host hinter einem Tunnel nicht localhost ist."""
+    DNS-Rebinding-Schutz, weil der Host hinter einem Tunnel nicht localhost ist.
+
+    Fällt der explizite Parameter leer aus, greift `settings.allowed_hosts`
+    (`SPACE_ALLOWED_HOSTS`, P3-C) — die systemd-Unit pflegt eine `Environment=`-Zeile, keine
+    Argumentliste. Der explizite Parameter gewinnt, wenn gesetzt; danach die Settings; sonst
+    FastMCPs eigener Default."""
     mcp = build_mcp(store, OwnSpaceWritable())
-    mcp_app = mcp.http_app(path="/", stateless_http=True, allowed_hosts=allowed_hosts)
+    hosts = list(allowed_hosts) if allowed_hosts else (list(settings.allowed_hosts) or None)
+    mcp_app = mcp.http_app(path="/", stateless_http=True, allowed_hosts=hosts)
     return Starlette(
         routes=[
             Route("/health", _health, methods=["GET"]),

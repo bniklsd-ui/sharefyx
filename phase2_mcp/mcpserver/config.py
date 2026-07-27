@@ -16,6 +16,13 @@ class Settings:
     host: str = DEFAULT_HOST
     port: int = DEFAULT_PORT
     log_level: str = DEFAULT_LOG_LEVEL
+    allowed_hosts: tuple[str, ...] = ()
+
+
+def _parse_allowed_hosts(raw: str | None) -> tuple[str, ...]:
+    if not raw:
+        return ()
+    return tuple(host for host in (part.strip() for part in raw.split(",")) if host)
 
 
 def load_settings(env: Mapping[str, str] | None = None) -> Settings:
@@ -40,4 +47,5 @@ def load_settings(env: Mapping[str, str] | None = None) -> Settings:
         host=source.get("SPACE_HOST", DEFAULT_HOST),
         port=port,
         log_level=source.get("SPACE_LOG_LEVEL", DEFAULT_LOG_LEVEL),
+        allowed_hosts=_parse_allowed_hosts(source.get("SPACE_ALLOWED_HOSTS")),
     )

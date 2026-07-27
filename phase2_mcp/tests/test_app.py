@@ -10,6 +10,7 @@ from __future__ import annotations
 import asyncio
 import json
 from collections.abc import Callable
+from contextlib import asynccontextmanager
 
 import httpx
 import pytest
@@ -66,6 +67,54 @@ def resolver() -> _FakeResolver:
 def app(tmp_path, store, resolver) -> Starlette:
     settings = Settings(data_root=tmp_path)
     return create_app(settings=settings, resolver=resolver, store=store)
+
+
+class _CapturingFastMCP:
+    """Ersetzt `build_mcp()`'s Rückgabewert nur, um zu sehen, welcher `allowed_hosts`-Wert bei
+    `http_app()` ankommt — P3-C testet die Präzedenz explizit vs. Settings, nicht FastMCP selbst
+    (das ist bereits Gegenstand von `test_asgi.py`/`test_app.py` aus P2)."""
+
+    def __init__(self) -> None:
+        self.received_allowed_hosts: list[str] | None = "not-called"
+
+    def http_app(self, *, path, stateless_http, allowed_hosts):
+        self.received_allowed_hosts = allowed_hosts
+
+        @asynccontextmanager
+        async def _lifespan(app):
+            yield
+
+        class _FakeMcpApp:
+            lifespan = _lifespan
+
+        return _FakeMcpApp()
+
+
+def test_create_app_prefers_explicit_allowed_hosts_over_settings(
+    monkeypatch, tmp_path, store, resolver
+):
+    fake_mcp = _CapturingFastMCP()
+    monkeypatch.setattr("mcpserver.app.build_mcp", lambda *a, **kw: fake_mcp)
+    settings = Settings(data_root=tmp_path, allowed_hosts=("from-settings.example",))
+
+    create_app(
+        settings=settings,
+        resolver=resolver,
+        store=store,
+        allowed_hosts=["explicit.example"],
+    )
+
+    assert fake_mcp.received_allowed_hosts == ["explicit.example"]
+
+
+def test_create_app_uses_settings_allowed_hosts(monkeypatch, tmp_path, store, resolver):
+    fake_mcp = _CapturingFastMCP()
+    monkeypatch.setattr("mcpserver.app.build_mcp", lambda *a, **kw: fake_mcp)
+    settings = Settings(data_root=tmp_path, allowed_hosts=("from-settings.example",))
+
+    create_app(settings=settings, resolver=resolver, store=store, allowed_hosts=None)
+
+    assert fake_mcp.received_allowed_hosts == ["from-settings.example"]
 
 
 def _http_client_factory(app: Starlette) -> Callable[..., httpx.AsyncClient]:

@@ -21,3 +21,6 @@ dist/
 .agents/
 package-lock.json
 skills-lock.json
+
+# machine-local deployment config (P3) — Pfade + Hostname, kein Secret, aber maschinenspezifisch
+phase3_edge/local.env

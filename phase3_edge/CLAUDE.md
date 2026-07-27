@@ -59,7 +59,7 @@ hier `tools.py` anfasst, ist in der falschen Phase.
 | # | Modul | Step | Status | Tests |
 |---|---|---|---|---|
 | 1 | Haushalt, Doku-Drift, Verifikationslauf, Umgebungsinventar | 0 | ✅ | 0 (kein Feature-Code) |
-| 2 | Paketgerüst `phase3_edge/`, `SPACE_ALLOWED_HOSTS` in `config.py`/`app.py` | 1 | ⬜ | — |
+| 2 | Paketgerüst `phase3_edge/`, `SPACE_ALLOWED_HOSTS` in `config.py`/`app.py` | 1 | ✅ | 5 |
 | 3 | `mcpserver/request_log.py` (Tool- + HTTP-Log) | 2 | ⬜ | — |
 | 4 | `credentials.py` LoadCredential-Pfad, `export_space_map.py` | 3 | ⬜ | — |
 | 5 | systemd-Units, `install_units.sh` | 4 | ⬜ | — |
@@ -67,10 +67,23 @@ hier `tools.py` anfasst, ist in der falschen Phase.
 | 7 | Runbooks, `diagnose.sh`, Cloudflare-Rückbau | 6 | ⬜ | — |
 | 8 | Live-Abnahme (Nikinger) | 7 | ⬜ | — |
 
+## Umgebungsstand (Step 0, Details im Archiv)
+
+Vier Fakten, die spätere Steps direkt gaten — volle Inventartabelle in `SESSIONS_ARCHIVE.md`:
+
+- venv für `ExecStart` (V6): `/home/savefyx/dev/savefxy/.venv/bin/python`.
+- `fastmcp` **3.4.4** bereits installiert — deckt sich mit dem P3-D-Pin, keine Änderung nötig.
+- `systemd-creds` vorhanden, `has-tpm2` → partial → `encrypt` läuft über Host-Key statt TPM2 (für
+  P3-F ausreichend, siehe Plan-Begründung).
+- **Tailscale ist auf dieser VM nicht installiert.** Blockiert nicht Steps 1–6, blockiert
+  **Step 7** — Nikinger-Aktion vor der Live-Abnahme (installieren, Tailnet beitreten, MagicDNS +
+  HTTPS-Zertifikate an, `nodeAttrs: funnel` im Policy-File).
+
 ## Rotationsregel
 
-Ab dem **zweiten** Session-Block läuft `scripts/rotate_session_block.sh phase3_edge` — nie von
-Hand. Dieser erste Block bleibt hier stehen, bis der zweite ihn verdrängt.
+Ein Phase-Head trägt genau **einen** aktuellen `## Session stopped`-Block. Sobald ein neuer
+dazukommt, läuft `scripts/rotate_session_block.sh phase3_edge` — nie von Hand — und verschiebt
+den vorherigen Block verbatim nach `SESSIONS_ARCHIVE.md`.
 
 ## Runbooks
 
@@ -79,81 +92,50 @@ bewusst leer, siehe Plan §4 Step 6/7.
 
 ---
 
-## Session stopped — 2026-07-27 (Step 0: Doku-Drift, Verifikation, Umgebungsinventar)
+## Session stopped — 2026-07-27 (Step 1: Gerüst und `SPACE_ALLOWED_HOSTS`)
 
-**Ergebnis:** Step 0 abgeschlossen. Kein Feature-Code — Haushalt vor dem ersten Baustein.
+**Ergebnis:** Step 1 abgeschlossen. `phase3_edge/` ist jetzt ein vollständiges (Nicht-Python-)
+Verzeichnis mit Test-Anschluss; `SPACE_ALLOWED_HOSTS` existiert als Konfiguration statt
+CLI-Zufall (P3-C).
 
-**A · Doku-Drift geschlossen** (Quelle: `PHASE2_CLOSEOUT_HANDOVER.md` §6 + Plan §0.4/§6):
-- Root-`CLAUDE.md`: R5 „OAuth ist Phase 5" → **Phase 4** korrigiert (deckt sich mit der
-  ROADMAP-Korrektur vom 2026-07-25, die bereits vorher galt, aber in R5 nicht nachgezogen war).
-- Root-`CLAUDE.md`: R4 um die datierte Ergänzung zu Tailscale Funnel erweitert (§0.4 des Plans,
-  wörtlich übernommen) — der ursprüngliche Cloudflare-Satz bleibt stehen, er beschreibt weiterhin
-  korrekt, was dort gilt.
-- Root-`CLAUDE.md`, „Current state": aktive Phase auf **P3** umgestellt, P2 in einen eigenen
-  ✅-Absatz nach dem Muster von Phase 1 verschoben (inkl. Hinweis, dass der formale
-  Abschluss-Handover jetzt existiert — der Satz „Formaler Phasenabschluss … steht noch aus" war
-  mit `PHASE2_CLOSEOUT_HANDOVER.md` bereits überholt). `down:`-Karte von `phase2_mcp/CLAUDE.md`
-  auf `phase3_edge/CLAUDE.md` umgehängt.
-- `ROADMAP.md` und `phase2_mcp/CLAUDE.md`: `` `fastmcp` über Streamable HTTP `[VERIFY]` `` →
-  Marker entfernt (live widerlegt, siehe P2-Abnahme).
-- `ROADMAP.md`, Header-Card `down:`: `phase2_mcp_plan.md` und `phase3_edge_plan.md` ergänzt.
-- `ROADMAP.md`, P3-Zeile: ⬜ → 🔄.
-- `ROADMAP.md`, „Zurückgestellt aus P2": MCP-Revisions-Eintrag von Datum auf **Trigger**
-  umgestellt (P3-E) — „erstes `fastmcp`-Release mit Support", nicht der 2026-07-28-Termin.
-- `docs/INDEX.md`: neuer Abschnitt „Active phase (3)" mit drei Zeilen (Plan, Phase-Head, leeres
-  Archiv); P2-Abschnitt nach „Completed phases" verschoben (🔄 → 📗); Zeile für
-  `PHASE2_CLOSEOUT_HANDOVER.md` ergänzt; „Concept docs"-Fußnote von „P3–P5"/„P1- und P2-Pläne"
-  auf „P4–P5"/„P1-, P2- und P3-Pläne" korrigiert.
-- `ROADMAP.md`, P2-Abschnitt: der Satz „Fehlt noch: der formale Phasenabschluss (Browser-Webchat)"
-  war mit `PHASE2_CLOSEOUT_HANDOVER.md` bereits überholt und stand — anders als in Root-`CLAUDE.md`
-  — noch drin. Ersetzt durch „Handover an P3: `docs/concepts/PHASE2_CLOSEOUT_HANDOVER.md`",
-  spiegelt jetzt den P1-Abschnitt, der denselben Satz für P1→P2 trägt.
-- `phase2_mcp/CLAUDE.md`: `updated:`-Feld der Header-Card war bei diesem Commit stehen geblieben
-  (`2026-07-26 (B2 behoben)`), obwohl der Scope-Absatz sich änderte — auf 2026-07-27 nachgezogen.
+**Dateien:**
+- `phase3_edge/local.env.example` — Vorlage mit vier Platzhaltern (`REPO_ROOT`, `DATA_ROOT`,
+  `VENV`, `ALLOWED_HOSTS`), ausschließlich Kommentare + Beispielpfade, kein echter Hostname,
+  kein Token. `phase3_edge/local.env` selbst ist ab jetzt in `.gitignore` (Kommentar erklärt
+  warum: Maschinenpfade, kein Geheimnis — der Hostname steht ohnehin in CT-Logs).
+- `phase3_edge/tests/__init__.py` — leer, wie im Plan-Dateibaum vorgesehen (P1/P2 kommen ohne
+  aus, P3 bekommt es laut Plan explizit, hier übernommen statt hinterfragt).
+- `pytest.ini`: `testpaths` um `phase3_edge/tests` erweitert.
+- `mcpserver/config.py`: `Settings.allowed_hosts: tuple[str, ...] = ()` neu, geparst über
+  `_parse_allowed_hosts()` aus `SPACE_ALLOWED_HOSTS` (Komma-getrennt, `strip()`, leere Einträge
+  verworfen, fehlende Variable → leeres Tupel — dieselbe Kein-Default-auf-echten-Wert-Logik wie
+  bei `SPACE_DATA_ROOT`).
+- `mcpserver/app.py`: `create_app()` berechnet `hosts = list(allowed_hosts) if allowed_hosts
+  else (list(settings.allowed_hosts) or None)` — expliziter Parameter gewinnt, danach Settings,
+  sonst FastMCPs eigener Default. Docstring ergänzt.
+- `scripts/serve.py`: **unverändert**, wie geplant — `--allowed-host` bleibt `action="append"`,
+  `default=None`; die neue Präzedenz lebt vollständig in `create_app()`.
 
-**Abweichung vom Plan, benannt:** `phase3_edge/CLAUDE.md` und `SESSIONS_ARCHIVE.md` (Plan-Step 1)
-wurden bereits in Step 0 angelegt — minimal (L1-Card, Modul-Status, dieser Block), Scope/Runbooks
-folgen wie geplant in Step 1. Grund: Hard Rule 8 verlangt den Phase-Head im selben Commit wie
-jeden Step-Abschluss, und `docs/INDEX.md` braucht in diesem Commit bereits einen realen
-Link-Empfänger statt eines toten Links.
+**Tests** (`phase2_mcp/tests/test_config.py`, `test_app.py`, alle fünf aus dem Plan):
+`test_allowed_hosts_defaults_to_empty`, `test_allowed_hosts_parses_comma_list`,
+`test_allowed_hosts_strips_whitespace_and_drops_empties`,
+`test_create_app_prefers_explicit_allowed_hosts_over_settings`,
+`test_create_app_uses_settings_allowed_hosts`. Die beiden `app.py`-Tests patchen
+`mcpserver.app.build_mcp` gegen eine `_CapturingFastMCP`-Stub-Klasse (`http_app()` zeichnet den
+übergebenen `allowed_hosts`-Wert auf) statt den vollen FastMCP-Stack zu starten — Präzedenz ist
+reine Verdrahtungslogik in `create_app()`, kein FastMCP-Verhalten (das deckt bereits
+`test_asgi.py`/der Rest von `test_app.py` aus P2 ab).
 
-**Sicherheits-Check vor dem Commit:** Die drei neuen, unversionierten Dateien
-(`PHASE2_CLOSEOUT_HANDOVER.md`, `phase3_edge_plan.md`, `phase2_mcp_uebersicht.svg`) wurden vor
-dem Staging mit `grep -aoE '[A-Za-z0-9_-]{32,}'` auf token-förmige Strings geprüft — Treffer
-waren ausschließlich Testfunktionsnamen aus dem Plan. Das SVG (P2-Architekturdiagramm) enthält
-nur den literalen Platzhalter `‹token›`, keinen echten Wert. Die SVG ist kein `.md` und damit
-laut `docs/INDEX.md`-Scope („L0 map of every project .md") nicht indexpflichtig — bewusst nicht
-aufgenommen, hier vermerkt statt stillschweigend übergangen.
+**Verifiziert:**
+- `.venv/bin/python -m pytest -q` → **138/138 grün** (133 Baseline + 5 neue).
+- `bash scripts/dev_install.sh` (venv aktiviert) lief durch: nur `storage` und `mcpserver`
+  editable installiert, `phase3_edge/` lautlos übersprungen (kein `pyproject.toml`) — Plan-Aussage
+  in §1.2 damit real geprüft, nicht nur zitiert.
 
-**B · Verifikationsdurchlauf:**
-- `git status` vor dem Commit: nur die drei erwarteten neuen Dateien untracked, sonst sauber.
-- `docs/test-results/` existiert nicht (per `ls`, nicht per Doku-Aussage geprüft).
-- Oversize-Check (`find … -size +40k`): zwei Treffer, `phase2_mcp_plan.md` und
-  `phase3_edge_plan.md` — beide 📕, damit erlaubt.
-- `pytest -q` über `.venv/bin/python -m pytest` (nicht System-Python): **133/133 grün**, deckt
-  sich mit ROADMAP/Handover-Baseline.
+**Modul-Status oben nachgezogen** (Zeile 2: ⬜ → ✅, 5 Tests). Ab diesem Block gilt die
+Rotationsregel: der Step-0-Block wandert über `scripts/rotate_session_block.sh phase3_edge`
+nach `SESSIONS_ARCHIVE.md`.
 
-**C · Umgebungsinventar** (alles `[VERIFY]`, read-only, kein Eingriff in echten `DATA_ROOT`/Keyring/Token):
-
-| Prüfung | Ergebnis |
-|---|---|
-| Python | 3.12.3 |
-| venv (für `ExecStart`, V6) | `/home/savefyx/dev/savefxy/.venv/bin/python` — Symlink-Kette über `python3` → System-`/usr/bin/python3.12`; der venv-Pfad selbst ist der korrekte `ExecStart`-Wert (aktiviert `pyvenv.cfg`/site-packages), nicht das Symlink-Ziel |
-| `fastmcp` (V2) | **3.4.4 exakt installiert** — deckt sich bereits mit dem P3-D-Pin, keine Änderung nötig |
-| Keyring-Backend (V5) | `keyring.backends.SecretService.Keyring` (priority 5), Chainer als Default-Frontend — deckt sich mit dem in P2 vom Nikinger bestätigten Roundtrip |
-| systemd (V4) | Version 255 (≥250 ✓) |
-| `systemd-creds` (V4) | vorhanden; `has-tpm2` → **„partial"**, kein volles TPM2-Sealing verfügbar (`+system`/`+subsystem`/`+libraries`, `-firmware`/`-driver`), Exit 3. `systemd-creds encrypt` fällt in diesem Fall auf Host-Key-Verschlüsselung zurück — für P3-F ausreichend (die Datei ist eine Hash-Map, kein umkehrbares Geheimnis; siehe Plan-Begründung) |
-| Tailscale (V7) | **NICHT installiert** — `tailscale: command not found`. Echter Befund, kein „nichts zu tun": vor Step 7 (und vor jedem Live-Test von Step 4/6 gegen einen echten Funnel) muss der Nikinger Tailscale installieren, dem Tailnet beitreten, MagicDNS + HTTPS-Zertifikate aktivieren und `nodeAttrs: funnel` im Policy-File setzen. Blockiert **nicht** Steps 1–6 (reiner Code/Test-Weg), blockiert **Step 7**. |
-| Dateisystem `DATA_ROOT` | `ext4` bestätigt — P1-Bedingung für `flock` weiterhin erfüllt |
-| `cloudflared` | vorhanden unter `/usr/local/bin/cloudflared`, **kein** systemd-Service registriert (nur die P2-Quick-Tunnel-Nutzung von Hand) — Rückbau bleibt wie geplant Aufgabe von Step 6 |
-| Git-Identität in `DATA_ROOT` | vorhanden (`Space Server` / `space-server@localhost`) — relevant für den in Plan §4 Step 4 benannten `ProtectSystem=strict`/Git-Commit-Fallstrick, dort real zu prüfen |
-
-**Verifiziert:** `pytest -q` (via `.venv/bin/python -m pytest`) → 133/133 grün. `git status` vor
-Commit sauber bis auf die drei erwarteten neuen Dateien. Secret-Scan der drei Dateien negativ.
-
-**Nächster Schritt (konkret):** Step 1 — `phase3_edge/`-Gerüst vervollständigen
-(`local.env.example`, `tests/__init__.py`, `.gitignore`-Ergänzung, `pytest.ini`-Erweiterung) und
-Konfiguration (`SPACE_ALLOWED_HOSTS` in `config.py`/`app.py`, fünf Tests laut Plan). **Vor
-Step 7** braucht es zusätzlich eine Nikinger-Aktion außerhalb des Plans selbst: Tailscale auf
-dieser VM installieren und die Tailnet-Voraussetzungen (V7) einrichten — sonst lässt sich der
-Runbook-Teil aus Step 7 nicht gegenprüfen.
+**Nächster Schritt (konkret):** Step 2 — `mcpserver/request_log.py` (Tool- und HTTP-Log). Der
+wichtigste Test dort ist `test_tool_event_never_contains_item_title` — er prüft eine Zusage,
+keine Implementierung.
