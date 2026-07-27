@@ -148,8 +148,14 @@ async def test_health_ok(app):
     body = response.json()
     # Exakte Schlüsselmenge statt nur Teilstring-Checks — fängt eine spätere Erweiterung um ein
     # zusätzliches Feld ab, nicht nur zufällig gewählte Weltnamen (Finding aus dem Advisor-Review).
-    assert set(body.keys()) == {"status", "service", "version"}
-    assert body == {"status": "ok", "service": "sharefyx-mcp", "version": __version__}
+    # `uptime_s` kam in P3 Step 4 dazu (P3-I) — dieser Test hat die Erweiterung wie vorgesehen
+    # rot gemeldet, statt sie stillschweigend durchzulassen.
+    assert set(body.keys()) == {"status", "service", "version", "uptime_s"}
+    assert body["status"] == "ok"
+    assert body["service"] == "sharefyx-mcp"
+    assert body["version"] == __version__
+    assert isinstance(body["uptime_s"], int)
+    assert body["uptime_s"] >= 0
 
 
 @pytest.mark.asyncio

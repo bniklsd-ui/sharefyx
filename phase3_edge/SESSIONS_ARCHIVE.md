@@ -4,10 +4,75 @@ purpose: Archiv älterer Session-stopped-Blöcke aus phase3_edge/CLAUDE.md, newe
 read-when: Audit vergangener Sessions dieser Phase; NICHT für normalen Session-Start
 detail: L3
 up: CLAUDE.md
-updated: 2026-07-27 (Step 2 archiviert)
+updated: 2026-07-27 (Step 3 archiviert)
 ---
 
 # Session-Archiv — Phase 3 Exposure & Betrieb
+
+## Session stopped — 2026-07-27 (Step 3: Credentials über systemd)
+
+**Ergebnis:** Step 3 abgeschlossen. `credentials.py :: load_space_map()` liest jetzt zuerst ein
+von systemd bereitgestelltes Credentials-Verzeichnis, Keyring bleibt Fallback.
+`phase3_edge/scripts/export_space_map.py` (neu) exportiert die Space-Map aus dem Keyring als
+JSON auf stdout, für `systemd-creds encrypt`.
+
+**`[VERIFY]` V4 und V5 — bereits in Step 0 beantwortet, hier nur referenziert (kein zweiter
+Inventarlauf):** V4 (`systemd-creds` vorhanden, systemd 255 ≥ 250, `has-tpm2` → partial →
+Host-Key-Verschlüsselung) und V5 (`keyring.backends.SecretService.Keyring`, Priorität 5) stehen
+im „Umgebungsstand"-Abschnitt oben und in `SESSIONS_ARCHIVE.md`, Step-0-Block.
+
+**Plan §2.3 war mit sich selbst im Widerspruch — aufgelöst, nicht stillschweigend
+weggelesen:** der Plantext sagt, `export_space_map.py` solle
+„`credentials.load_space_map()` **aus dem Keyring** (explizit, nicht über die neue
+Verzweigung)" lesen — aber `load_space_map()` **ist** ab diesem Step die neue Verzweigung, ein
+Aufruf kann nicht zugleich sie selbst und ihre Umgehung sein. Auflösung (Advisor-Review): die
+reine Keyring-Leselogik wurde in eine eigene Funktion `load_space_map_from_keyring()`
+ausgelagert. `load_space_map()` ruft sie als Fallback; `export_space_map.py` ruft sie direkt.
+Ein Leser, zwei Aufrufer, keine Verzweigung im Export-Pfad. `issue()`/`revoke()` bleiben laut
+Plan-Vorgabe **unverändert** (0 Zeilen Diff) und rufen weiterhin `load_space_map()` auf — das ist
+unschädlich, weil `$CREDENTIALS_DIRECTORY` in ihrem einzigen realen Aufrufkontext
+(`issue_token.py`, interaktiv) nie gesetzt ist.
+
+**Der Fallback-Warnhinweis geht auf den Modul-Logger, nicht auf `sharefyx.request`**
+(Advisor-Fund): fehlt die Credential-Datei trotz gesetztem Verzeichnis, loggt `load_space_map()`
+über `logging.getLogger(__name__)` — landet also auf dem normalen stderr-Handler aus
+`configure_logging()`, nicht im JSON-Request-Log. Der Request-Logger ist laut Plan §3.1 für
+`ev="tool"`/`ev="http"` reserviert; eine freie Textmeldung dort wäre zwar gültiges JSON
+(`JsonLineFormatter` serialisiert auch einen bloßen String), aber strukturell falsch auf einem
+Stream, dessen Vertrag eine Feld-Whitelist ist.
+
+**Test-Ladepfad für `export_space_map.py` (Advisor-Fund):** `phase3_edge/` ist kein Python-Paket
+(Plan §1.2), ein normaler `import` aus `phase2_mcp/tests/test_credentials.py` funktioniert
+deshalb nicht. Geladen über `importlib.util.spec_from_file_location(...)` gegen den absoluten
+Pfad — hält `capsys` für den stdout/stderr-Split nutzbar, im Unterschied zu einem
+Subprocess-Aufruf. Da `export_space_map.py`s `from mcpserver import credentials` denselben
+gecachten Modul-Objekt-Namen trifft wie der Testcode, wirkt der `fake_keyring`-Monkeypatch aus
+`test_credentials.py` transparent auch dort — kein zweiter Fake nötig.
+
+**Doku:** `README.md`, Abschnitt „Token ausgeben, rotieren, widerrufen" um „Rotation im
+Dienstbetrieb (ab P3)" erweitert — der volle Vierschritt aus P3-M (Token neu ausgeben → Export →
+`systemctl restart` → Connector-URL aktualisieren), inklusive des Satzes, dass ein vergessener
+Restart wie „Connector kaputt" aussieht, aber ein 401 auf die alte Credential-Datei im tmpfs ist.
+
+**Tests** (`phase2_mcp/tests/test_credentials.py`, alle sechs aus dem Plan, mit `monkeypatch`
+auf `$CREDENTIALS_DIRECTORY` und dem bestehenden `fake_keyring`-Fixture — nie der echte
+Keyring): `test_load_space_map_prefers_credentials_dir`,
+`test_load_space_map_falls_back_when_credentials_dir_unset`,
+`test_load_space_map_falls_back_when_credential_file_missing`,
+`test_load_space_map_raises_on_malformed_credential`,
+`test_export_writes_json_to_stdout_and_note_to_stderr`,
+`test_export_contains_no_plaintext_token`.
+
+**Verifiziert:** `.venv/bin/python -m pytest -q` → **153/153 grün** (147 + 6 neue). Alle
+bestehenden `test_credentials.py`-Tests (die alte `load_space_map()`-Aufrufe machen) liefen
+unverändert grün weiter — `$CREDENTIALS_DIRECTORY` ist in der Testumgebung nie gesetzt, der
+Fallback greift transparent.
+
+**Modul-Status oben nachgezogen** (Zeile 4: ⬜ → ✅, 6 Tests).
+
+**Nächster Schritt (konkret):** Step 4 — systemd-Units (`sharefyx-mcp.service`,
+`install_units.sh`). `test_unit_has_no_secret_shaped_value` ist die billigste Versicherung gegen
+den Token-Klartext-Vorfall, der in P2 zweimal passiert ist.
 
 ## Session stopped — 2026-07-27 (Step 2: Request-Log)
 

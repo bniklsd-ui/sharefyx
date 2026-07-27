@@ -62,7 +62,7 @@ hier `tools.py` anfasst, ist in der falschen Phase.
 | 2 | Paketgerüst `phase3_edge/`, `SPACE_ALLOWED_HOSTS` in `config.py`/`app.py` | 1 | ✅ | 5 |
 | 3 | `mcpserver/request_log.py` (Tool- + HTTP-Log) | 2 | ✅ | 9 (8 in `test_request_log.py`, 1 in `test_logging.py`) |
 | 4 | `credentials.py` LoadCredential-Pfad, `export_space_map.py` | 3 | ✅ | 6 |
-| 5 | systemd-Units, `install_units.sh` | 4 | ⬜ | — |
+| 5 | systemd-Units, `install_units.sh`, `/health.uptime_s` (P3-I) | 4 | ✅ | 6 |
 | 6 | Backup/Restore-Skripte, Backup-Timer | 5 | ⬜ | — |
 | 7 | Runbooks, `diagnose.sh`, Cloudflare-Rückbau | 6 | ⬜ | — |
 | 8 | Live-Abnahme (Nikinger) | 7 | ⬜ | — |
@@ -92,67 +92,67 @@ bewusst leer, siehe Plan §4 Step 6/7.
 
 ---
 
-## Session stopped — 2026-07-27 (Step 3: Credentials über systemd)
+## Session stopped — 2026-07-27 (Step 4: systemd-Units)
 
-**Ergebnis:** Step 3 abgeschlossen. `credentials.py :: load_space_map()` liest jetzt zuerst ein
-von systemd bereitgestelltes Credentials-Verzeichnis, Keyring bleibt Fallback.
-`phase3_edge/scripts/export_space_map.py` (neu) exportiert die Space-Map aus dem Keyring als
-JSON auf stdout, für `systemd-creds encrypt`.
+**Ergebnis:** Step 4 abgeschlossen. `phase3_edge/systemd/sharefyx-mcp.service` (Platzhalter,
+nicht auf der VM installiert), `phase3_edge/scripts/install_units.sh`, plus `/health` trägt jetzt
+`uptime_s` (P3-I).
 
-**`[VERIFY]` V4 und V5 — bereits in Step 0 beantwortet, hier nur referenziert (kein zweiter
-Inventarlauf):** V4 (`systemd-creds` vorhanden, systemd 255 ≥ 250, `has-tpm2` → partial →
-Host-Key-Verschlüsselung) und V5 (`keyring.backends.SecretService.Keyring`, Priorität 5) stehen
-im „Umgebungsstand"-Abschnitt oben und in `SESSIONS_ARCHIVE.md`, Step-0-Block.
+**`uptime_s` war im Plan §4 keinem Step zugewiesen — Lücke geschlossen, nicht stillschweigend
+übersprungen (Advisor-Fund):** P3-I ("genau ein neues Feld") steht in §0.5, §1.1 und in Step 7s
+Abnahmematrix (Zeile 1), aber in keinem der Steps 0–7 als Liefergegenstand. Step 6
+(`diagnose.sh`, Prüfung 2) und der Disconnected-Runbook setzen das Feld aber voraus. Hier in
+Step 4 gebaut, bevor Step 6 es braucht: `app.py :: create_app()` setzt `app.state.start_time =
+time.monotonic()` **pro App-Instanz** (nicht Modulebene — sonst teilten sich mehrere
+`create_app()`-Aufrufe, z. B. in Tests, einen Startzeitpunkt), `_health()` berechnet
+`uptime_s = int(time.monotonic() - request.app.state.start_time)`. `app.py` steht in P3-Ns
+Berührungsliste, keine Scope-Erweiterung.
 
-**Plan §2.3 war mit sich selbst im Widerspruch — aufgelöst, nicht stillschweigend
-weggelesen:** der Plantext sagt, `export_space_map.py` solle
-„`credentials.load_space_map()` **aus dem Keyring** (explizit, nicht über die neue
-Verzweigung)" lesen — aber `load_space_map()` **ist** ab diesem Step die neue Verzweigung, ein
-Aufruf kann nicht zugleich sie selbst und ihre Umgehung sein. Auflösung (Advisor-Review): die
-reine Keyring-Leselogik wurde in eine eigene Funktion `load_space_map_from_keyring()`
-ausgelagert. `load_space_map()` ruft sie als Fallback; `export_space_map.py` ruft sie direkt.
-Ein Leser, zwei Aufrufer, keine Verzweigung im Export-Pfad. `issue()`/`revoke()` bleiben laut
-Plan-Vorgabe **unverändert** (0 Zeilen Diff) und rufen weiterhin `load_space_map()` auf — das ist
-unschädlich, weil `$CREDENTIALS_DIRECTORY` in ihrem einzigen realen Aufrufkontext
-(`issue_token.py`, interaktiv) nie gesetzt ist.
+**`test_health_ok` aus P2 korrekt rot geworden, wie von seinem eigenen Kommentar angekündigt:**
+der Test prüft absichtlich die exakte Schlüsselmenge der `/health`-Antwort ("fängt eine spätere
+Erweiterung um ein zusätzliches Feld ab"). Mit `uptime_s` dazu aktualisiert
+(`{"status","service","version","uptime_s"}`), `isinstance(..., int)` und `>= 0` geprüft.
+`test_health_leaks_no_space_names` bleibt unverändert grün — `uptime_s` leakt nichts.
 
-**Der Fallback-Warnhinweis geht auf den Modul-Logger, nicht auf `sharefyx.request`**
-(Advisor-Fund): fehlt die Credential-Datei trotz gesetztem Verzeichnis, loggt `load_space_map()`
-über `logging.getLogger(__name__)` — landet also auf dem normalen stderr-Handler aus
-`configure_logging()`, nicht im JSON-Request-Log. Der Request-Logger ist laut Plan §3.1 für
-`ev="tool"`/`ev="http"` reserviert; eine freie Textmeldung dort wäre zwar gültiges JSON
-(`JsonLineFormatter` serialisiert auch einen bloßen String), aber strukturell falsch auf einem
-Stream, dessen Vertrag eine Feld-Whitelist ist.
+**`local.env.example` trug echte Maschinenpfade dieser VM — korrigiert (Advisor-Fund):**
+`REPO_ROOT`/`DATA_ROOT`/`VENV` zeigten auf `/home/savefyx/...`. P3-Js eigene Begründung für das
+Platzhalterschema ist Maschinenunabhängigkeit ("der Kollege oder eine zweite VM sollen dasselbe
+Repo benutzen können"), und §5 Akzeptanzkriterium 8 nennt „kein Maschinenzustand im Repo" — ein
+kopiertes Beispiel mit dieser VMs echten Pfaden hätte plausibel, aber falsch ausgesehen. Jetzt
+`/path/to/savefxy` etc.
 
-**Test-Ladepfad für `export_space_map.py` (Advisor-Fund):** `phase3_edge/` ist kein Python-Paket
-(Plan §1.2), ein normaler `import` aus `phase2_mcp/tests/test_credentials.py` funktioniert
-deshalb nicht. Geladen über `importlib.util.spec_from_file_location(...)` gegen den absoluten
-Pfad — hält `capsys` für den stdout/stderr-Split nutzbar, im Unterschied zu einem
-Subprocess-Aufruf. Da `export_space_map.py`s `from mcpserver import credentials` denselben
-gecachten Modul-Objekt-Namen trifft wie der Testcode, wirkt der `fake_keyring`-Monkeypatch aus
-`test_credentials.py` transparent auch dort — kein zweiter Fake nötig.
+**`install_units.sh` bricht vor jedem `/etc`- oder `systemctl`-Zugriff ab, wenn `local.env`
+fehlt** — genau der Pfad, den der Test ausübt, ohne root-Rechte oder einen echten systemd
+anzufassen. Verarbeitet generisch alle `*.service`/`*.timer` in `phase3_edge/systemd/` (Step 5
+liefert die Backup-Units in dasselbe Verzeichnis, ohne dass dieses Skript sich ändern muss),
+prüft nach der Platzhalter-Ersetzung per Regex, ob `__[A-Z_]+__` noch irgendwo übrig ist, und
+löscht eine unvollständige Zieldatei sofort statt sie stehen zu lassen. **Die Unit ist nach
+diesem Step bewusst noch nicht auf der VM installiert** — das ist Step 7.
 
-**Doku:** `README.md`, Abschnitt „Token ausgeben, rotieren, widerrufen" um „Rotation im
-Dienstbetrieb (ab P3)" erweitert — der volle Vierschritt aus P3-M (Token neu ausgeben → Export →
-`systemctl restart` → Connector-URL aktualisieren), inklusive des Satzes, dass ein vergessener
-Restart wie „Connector kaputt" aussieht, aber ein 401 auf die alte Credential-Datei im tmpfs ist.
+**`V9` (`ProtectHome=read-only` + `ReadWritePaths` erlaubt Git-Commits im `DATA_ROOT`) bleibt
+offen** — laut Plan nur zur Laufzeit prüfbar, `test_units.py` ist reines Textparsen. Der bereits
+in Step 0 bestätigte Fund (Git-Identität `Space Server`/`space-server@localhost` liegt im
+`DATA_ROOT` selbst, nicht nur in `~/.gitconfig`) ist der Ausgangspunkt für den ersten
+Write-Test in Step 7 — dorthin verschoben, nicht hier vorweggenommen.
 
-**Tests** (`phase2_mcp/tests/test_credentials.py`, alle sechs aus dem Plan, mit `monkeypatch`
-auf `$CREDENTIALS_DIRECTORY` und dem bestehenden `fake_keyring`-Fixture — nie der echte
-Keyring): `test_load_space_map_prefers_credentials_dir`,
-`test_load_space_map_falls_back_when_credentials_dir_unset`,
-`test_load_space_map_falls_back_when_credential_file_missing`,
-`test_load_space_map_raises_on_malformed_credential`,
-`test_export_writes_json_to_stdout_and_note_to_stderr`,
-`test_export_contains_no_plaintext_token`.
+**Tests** (`phase3_edge/tests/test_units.py`, alle sechs aus dem Plan):
+`test_unit_restarts_on_failure`, `test_unit_loads_credential_encrypted`,
+`test_unit_binds_loopback_only`, `test_unit_has_no_secret_shaped_value`,
+`test_unit_placeholders_are_unresolved_in_repo`,
+`test_install_script_refuses_without_local_env` (kopiert `scripts/`+`systemd/` in ein
+Wegwerf-Verzeichnis ohne `local.env` — hermetisch, unabhängig davon, ob auf dieser Maschine
+zufällig ein echtes `phase3_edge/local.env` existiert). Plus die aktualisierten
+`test_health_ok`/-Assertions in `phase2_mcp/tests/test_app.py`.
 
-**Verifiziert:** `.venv/bin/python -m pytest -q` → **153/153 grün** (147 + 6 neue). Alle
-bestehenden `test_credentials.py`-Tests (die alte `load_space_map()`-Aufrufe machen) liefen
-unverändert grün weiter — `$CREDENTIALS_DIRECTORY` ist in der Testumgebung nie gesetzt, der
-Fallback greift transparent.
+**Verifiziert:** `.venv/bin/python -m pytest -q` → **159/159 grün** (153 + 6 neue).
 
-**Modul-Status oben nachgezogen** (Zeile 4: ⬜ → ✅, 6 Tests).
+**Modul-Status oben nachgezogen** (Zeile 5: ⬜ → ✅, 6 Tests).
 
-**Nächster Schritt (konkret):** Step 4 — systemd-Units (`sharefyx-mcp.service`,
-`install_units.sh`). `test_unit_has_no_secret_shaped_value` ist die billigste Versicherung gegen
-den Token-Klartext-Vorfall, der in P2 zweimal passiert ist.
+**Offen für den Nikinger (nicht blockierend für Steps 5–6, aber noch nicht gemeldet):**
+1. `mcp_smoke.py`/P3-N-Grenzfrage aus Step 2 — ob `mcp_smoke.py` auf `configure_logging()`
+   umgestellt werden soll (Zweizeiler), steht weiterhin offen.
+2. Tailscale ist auf dieser VM weiterhin nicht installiert (Step 0) — einziges Gate vor Step 7.
+
+**Nächster Schritt (konkret):** Step 5 — Backup- und Restore-Skripte (`git bundle` + Verify +
+Retention), Backup-Timer. Beide Skripte laufen in Tests ausschließlich gegen Wegwerf-Git-Repos
+unter `tmp_path`, nie gegen den echten `DATA_ROOT`.

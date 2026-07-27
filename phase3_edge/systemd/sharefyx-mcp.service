@@ -1,0 +1,33 @@
+[Unit]
+Description=Sharefyx MCP-Server (Phase 2 Adapter, Phase 3 Betrieb)
+Documentation=file://__REPO_ROOT__/phase3_edge/CLAUDE.md
+After=network-online.target tailscaled.service
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=savefyx
+Group=savefyx
+WorkingDirectory=__REPO_ROOT__
+Environment=SPACE_DATA_ROOT=__DATA_ROOT__
+Environment=SPACE_HOST=127.0.0.1
+Environment=SPACE_PORT=8765
+Environment=SPACE_LOG_LEVEL=INFO
+Environment=SPACE_ALLOWED_HOSTS=__ALLOWED_HOSTS__
+LoadCredentialEncrypted=spaces:/etc/sharefyx/spaces.cred
+ExecStart=__VENV__/bin/python __REPO_ROOT__/phase2_mcp/scripts/serve.py
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=__DATA_ROOT__
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+MemoryDenyWriteExecute=true
+SystemCallFilter=@system-service
+
+[Install]
+WantedBy=multi-user.target

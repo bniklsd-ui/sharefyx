@@ -8,6 +8,8 @@ Konstruktor-Austausch an dieser einen Stelle, kein Umbau von `tools.py`/`server.
 """
 from __future__ import annotations
 
+import time
+
 from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import JSONResponse
@@ -25,9 +27,19 @@ from .server import build_mcp
 
 
 async def _health(request: Request) -> JSONResponse:
-    # Unauthentifiziert (Plan §4 Step 5) — deshalb bewusst keine Space-Namen, keine Pfade,
-    # keine Item-Zahlen in dieser Antwort.
-    return JSONResponse({"status": "ok", "service": "sharefyx-mcp", "version": __version__})
+    # Unauthentifiziert (Plan §4 Step 5, P3-I) — deshalb bewusst keine Space-Namen, keine Pfade,
+    # keine Item-Zahlen in dieser Antwort. `uptime_s` (P3-I, einziges neues Feld in P3) erlaubt
+    # dem Disconnected-Runbook (Step 6), von außen "Dienst läuft durch" von "Dienst ist gerade
+    # neu gestartet" zu unterscheiden, ohne SSH.
+    uptime_s = int(time.monotonic() - request.app.state.start_time)
+    return JSONResponse(
+        {
+            "status": "ok",
+            "service": "sharefyx-mcp",
+            "version": __version__,
+            "uptime_s": uptime_s,
+        }
+    )
 
 
 def create_app(
@@ -50,7 +62,7 @@ def create_app(
     mcp.add_middleware(ToolCallLogMiddleware())
     hosts = list(allowed_hosts) if allowed_hosts else (list(settings.allowed_hosts) or None)
     mcp_app = mcp.http_app(path="/", stateless_http=True, allowed_hosts=hosts)
-    return Starlette(
+    app = Starlette(
         routes=[
             Route("/health", _health, methods=["GET"]),
             Mount("/mcp", app=TokenPathASGI(mcp_app, resolver=resolver)),
@@ -59,3 +71,7 @@ def create_app(
         # Streamable-HTTP-Session-Manager nie (Plan §4 Step 5).
         lifespan=mcp_app.lifespan,
     )
+    # Pro App-Instanz, nicht Modulebene — sonst würden mehrere `create_app()`-Aufrufe (z. B. in
+    # Tests) sich einen Startzeitpunkt teilen.
+    app.state.start_time = time.monotonic()
+    return app
