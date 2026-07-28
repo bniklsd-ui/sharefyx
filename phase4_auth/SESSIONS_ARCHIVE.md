@@ -8,8 +8,113 @@ updated: 2026-07-28
 ---
 # Session-Archiv — Phase 4 OAuth 2.1 + DCR
 
-Newest-first. Vier Rotationen bisher, alle 2026-07-28 (Abschluss Step 3, dann Step 4, dann
-Step 5, dann Step 6a) — via `scripts/rotate_session_block.sh phase4_auth`, nie von Hand.
+Newest-first. Fünf Rotationen bisher, alle 2026-07-28 (Abschluss Step 3, dann Step 4, dann
+Step 5, dann Step 6a, dann Step 6b) — via `scripts/rotate_session_block.sh phase4_auth`, nie von
+Hand.
+
+## Session stopped — 2026-07-28 (Step 6a)
+
+**Ergebnis:** Step 6a (Resolver + Bearer-Auflösung + `create_app()`-Verdrahtung) abgeschlossen.
+`pytest -q` → **315/315 grün** (296 Vorlauf + 19 neue: 6 `test_resolver.py` + 13
+`test_asgi_bearer.py`). `test_app.py` separat gelaufen (10/10) und per `git diff --stat`
+byte-identisch zum Stand vor diesem Commit bestätigt.
+
+**Gebaut:** `authserver/resolver.py`, `mcpserver/asgi.py` (`BearerAuthASGI`, `AuthModeASGI`,
+`_credential_from_path`-Extraktion), `mcpserver/app.py` (`OAuthConfig`, `oauth=None`-Parameter,
+root-`TrustedHostMiddleware`). Details + alle additiven Funde in der Modul-Status-Tabelle oben
+(Zeile 7a), nicht hier dupliziert.
+
+**Split von Step 6 in 6a/6b, vor der Umsetzung mit dem Advisor abgestimmt:** die volle
+Plan-Dateiliste für Step 6 (`resolver.py` + Test, sechs `mcpserver`-Dateien, `oauth_smoke.py`,
+`request_log.py`/`logging_setup.py`-Erweiterung, zwei weitere Tests) ist deutlich größer als
+jeder vorige Step und enthält mit `oauth_smoke.py` ein zweites Deliverable im Gewand eines
+Testhelfers — das Skript ist der Beweis der ganzen Phase (RFC-9700-Replay ohne Browser), nicht
+etwas, das nebenbei in einem bereits vollen Commit entsteht. Begründung + Aufteilung: siehe
+Modul-Status-Zeile 7a oben.
+
+**Zwei Advisor-Durchläufe, beide fündig, derselbe Musterfehler wie in Step 4/5 — ein Test war
+zunächst nur gegen ein Fake bewiesen, nicht gegen den echten Stack:**
+
+1. **Vor der Umsetzung** bestätigte der Advisor den 6a/6b-Split und markierte drei Stellen, an
+   denen die Plan-Beschreibung („Guard bekommt einen Authorization-Header-Vergleich") vermutlich
+   nicht mehr zum real gebauten `context.py` (state-basiert seit P2 Step 4, siehe dortige
+   Abweichungsnotiz) passt — mit der Anweisung, das zu verifizieren statt blind zu übernehmen.
+2. **Nach der ersten Implementierung** fand ein zweiter Durchlauf, dass genau diese Verifikation
+   nur gegen Fakes lief: `test_valid_bearer_sets_principal_space` prüft einen Hash-Vergleich in
+   einer Fake-Inner-App, `test_guard_rejects_principal_from_other_request` monkeypatcht
+   `get_http_request` auf ein handgebautes Fake-Objekt — keiner der beiden lässt ein echtes
+   Bearer-Token durch die echte FastMCP-App bis zu `tools.py`s echtem Guard-Aufruf laufen.
+   Nachgezogen: `test_bearer_token_reaches_a_real_tool_call` (voller Stack, echtes
+   `list_spaces`-Ergebnis). Zusätzlich fehlte jede Instanziierung von `TrustedHostMiddleware` —
+   die einzige bisherige Integrationsprobe hatte `allowed_hosts=()`, die Bedingung griff nie.
+   Nachgezogen: `test_trusted_host_middleware_protects_root_app_when_configured` (erlaubter vs.
+   fremder Host, `/health` bleibt erreichbar).
+
+**Lehre, dieselbe wie am Ende von Step 5, jetzt ein drittes Mal bestätigt:** eine Behauptung über
+unveränderten/korrekten Code ("`context.py` braucht keine Änderung") ist erst ein Fund, wenn ein
+Test sie gegen den echten Aufrufpfad beweist — ein Test gegen ein Fake beweist nur, dass das Fake
+tut, was erwartet wird.
+
+**Doku-Fund, nicht Teil des Codes:** `phase2_mcp/CLAUDE.md`s Testzahl-Zeile stand auf 57 und war
+bereits vor dieser Session falsch (fehlendes `test_request_log.py`, mehrere stumm gewachsene
+Einzelzahlen) — dieselbe Drift-Kategorie wie die root-`CLAUDE.md`-Korrektur aus Step 5, diesmal
+in einer bereits **abgeschlossenen** Phase gefunden, weil P4 Step 6a eine ihrer Dateien anfasst.
+Korrigiert im selben Commit, siehe dortige datierte Korrekturnotiz — die historischen
+Modul-Status-Zeilen von P2 selbst bleiben unangetastet.
+
+**Nächster Schritt (konkret):** Step 6b — `mcpserver/request_log.py` (`ev="oauth"`, Felder
+`stage`/`client_id`/`grant`, `OAuthLogASGI` als neuer ASGI-Wrapper nach dem Vorbild von
+`AccessLogASGI`: **außerhalb** von `create_app()`, in `scripts/serve.py`, damit `test_app.py`
+weiterhin unverändert läuft — Begründung identisch zu `AccessLogASGI`s eigener Platzierung),
+`mcpserver/logging_setup.py` (`_SECRET_PATTERNS`-Satz erweitert um `code=`, `access_token`,
+`refresh_token`, `password`, `totp`, `Authorization: Bearer …`), `phase4_auth/scripts/
+oauth_smoke.py` (Gegenstück zu `space_cli.py`/`mcp_smoke.py`: Discovery → DCR → `/authorize` →
+Formular-POST mit Passwort + errechnetem TOTP → Code → Token → `tools/call` mit Bearer → Refresh
+→ Reuse mit dem alten Refresh-Token, muss `invalid_grant` liefern und die Familie töten),
+`scripts/serve.py`-Verdrahtung (liest `SPACE_AUTH_MODE`, baut bei `oauth`/`both` `AuthSettings` +
+`AuthStore` + `load_users()` und reicht sie als `OAuthConfig` an `create_app()`).
+**Entscheidungspunkt vor dem Schreiben — gelockt (Nikinger, 2026-07-28, vor der 6b-Session):**
+zwei unabhängige Weichen, nicht eine. (1) Ob `serve.py` überhaupt ein `OAuthConfig`-Bündel baut
+(`AuthSettings`/`AuthStore`/`load_users()`) — das entscheidet, ob der P3-Dev-Pfad ohne jede neue
+Env-Var weiterläuft. (2) `SPACE_AUTH_MODE` selbst (`token`/`both`/`oauth`, Default `oauth`),
+die einzig steuert, wie `AuthModeASGI` `/mcp` bedient, **sobald** das Bündel existiert.
+`load_auth_settings()` regelt (2) bereits korrekt und laut — fehlendes `SPACE_PUBLIC_BASE_URL`
+in `oauth`/`both` wirft, das ist gewollt (gleiches Fail-Closed-Muster wie `SPACE_DATA_ROOT`).
+Die Lücke lag ausschließlich bei (1): ein unbedingter `load_auth_settings()`-Aufruf zwänge auch
+einen lokalen Lauf ohne jede Absicht, P4 zu testen, durch (2)s Validierung.
+
+**Entscheidung:** `serve.py` prüft die **rohe Env-Var-Anwesenheit** `"SPACE_AUTH_MODE" in
+os.environ` — nicht den bereits gedefaulteten Rückgabewert von `load_auth_settings()` — als
+alleinige Weiche für (1). Fehlt sie: `oauth=None`, exakt der heutige P3-Pfad, keine neue
+Anforderung. Ist sie gesetzt (jeder der drei Werte): `load_auth_settings()` läuft echt, Bündel
+wird gebaut, ein Konfigurationsfehler stirbt laut — kein `try/except` um den Aufruf, das wäre
+ein stiller Fallback auf schwächere Auth genau dort, wo P4 das verhindern soll. Sicher für den
+echten Produktionspfad: die Step-7-Unit-Vorlage setzt `Environment=SPACE_AUTH_MODE=
+__AUTH_MODE__` ohnehin immer explizit — die Weiche ist kein neuer Sonderfall, sie spiegelt nur,
+wie die Unit bereits geplant war. Plan §4/§5 Step 6, Dateiliste dort. Zwei verbleibende benannte Tests: `test_oauth_log_never_contains_
+secrets` (treibt über `oauth_smoke.py`, Markerwerte `ZZZ-PASSWORD`/`ZZZ-CODE`, prüft den ganzen
+Logpuffer), `test_oauth_events_carry_stage_and_duration`. **`OAuthLogASGI`s `stage`-Ableitung
+darf keinen Request-Body lesen** (der trägt `code_verifier`/`refresh_token`) — Methode+Pfad
+reichen für `register`/`authorize_get`/`authorize_post`/`token_code`-oder-`token_refresh`; wenn
+sich `token_code` und `token_refresh` ohne Body-Zugriff nicht unterscheiden lassen, ist
+`stage="token"` (ohne die Grant-Unterscheidung) der akzeptierte Kompromiss, dokumentiert statt
+stillschweigend gelöst (Advisor-Vorgabe dieser Session). Step 6b Done-when (Plan): `pytest`
+grün, `oauth_smoke.py` 11/11, die sechs Tools verhalten sich unter Bearer-Auth exakt wie unter
+Pfad-Token (Antwort-Diff im Session-Block).
+
+**Kurznotiz für die 6b-Session:** `serve.py`-Gate ist bereits gelockt (siehe Entscheidungspunkt
+oben) — nicht neu entscheiden, nur umsetzen (`"SPACE_AUTH_MODE" in os.environ` als alleinige
+Weiche fürs Bündel, `load_auth_settings()` sonst wie gehabt laut scheitern lassen). Zwei
+Dateien anfassen, die nicht in der Step-6-Liste stehen, aber betroffen sein könnten:
+`README.md`/`phase3_edge/CLAUDE.md`, falls das Runbook „lokal starten" den Fall ohne
+`SPACE_AUTH_MODE` erwähnt — kurz gegenprüfen, ob dort eine Zeile nachgezogen werden muss.
+`oauth_smoke.py` zuerst schreiben (es ist der Beweis, nicht ein Nebenprodukt), Logging danach.
+Advisor **vor** dem Schreiben von `OAuthLogASGI` fragen (die Body-Lesen-vs-`stage`-Genauigkeit
+ist ein echter Kompromiss, siehe oben) und **nach** der ersten Implementierung — beide Male hat
+das in Step 5 und 6a echte Funde gebracht, nicht nur in Step 5. Vor jeder neuen Testdatei
+`find . -name "test_<name>.py"` gegen den ganzen Baum prüfen (Kollisionsregel aus Step 3, gilt
+weiter). `test_app.py` nach der `serve.py`-Änderung separat laufen lassen und `git diff --stat`
+dagegen prüfen — bleibt es unverändert, ist das Gate richtig gebaut.
 
 ## Session stopped — 2026-07-28 (Step 5)
 

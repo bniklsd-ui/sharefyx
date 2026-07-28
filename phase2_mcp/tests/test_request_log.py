@@ -21,6 +21,7 @@ from mcpserver.request_log import (
     LOGGER_NAME,
     AccessLogASGI,
     JsonLineFormatter,
+    OAuthLogASGI,
     ToolCallLogMiddleware,
     log_event,
 )
@@ -237,6 +238,76 @@ async def test_http_event_logs_401_status(request_log_handler):
     assert len(http_events) == 1
     assert http_events[0]["status"] == 401
     assert http_events[0]["method"] == "POST"
+
+
+async def _ok_app(scope, receive, send):
+    await send({"type": "http.response.start", "status": 200, "headers": []})
+    await send({"type": "http.response.body", "body": b""})
+
+
+@pytest.mark.asyncio
+async def test_oauth_events_carry_stage_and_duration(request_log_handler):
+    """Plan §4/§5 Step 6: `ev="oauth"`-Zeilen tragen `stage` und `ms`. `client_id` nur bei
+    `authorize_get` (Query-Parameter, kein Body-Read) — die anderen drei Routen bleiben ohne."""
+    wrapped = OAuthLogASGI(_ok_app)
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=wrapped), base_url="http://testserver"
+    ) as client:
+        await client.get("/oauth/authorize", params={"client_id": "cli_abc123"})
+        await client.post("/oauth/authorize", data={})
+        await client.post("/oauth/register", json={})
+        await client.post("/oauth/token", data={})
+
+    oauth_events = [r.msg for r in request_log_handler.records if r.msg.get("ev") == "oauth"]
+    by_stage = {e["stage"]: e for e in oauth_events}
+    assert set(by_stage) == {"authorize_get", "authorize_post", "register", "token"}
+    for event in oauth_events:
+        assert isinstance(event["ms"], int)
+        assert event["ok"] is True
+
+    assert by_stage["authorize_get"]["client_id"] == "cli_abc123"
+    for stage in ("authorize_post", "register", "token"):
+        assert "client_id" not in by_stage[stage]
+        assert "err" not in by_stage[stage]
+        assert "grant" not in by_stage[stage]
+        assert "space" not in by_stage[stage]
+
+
+@pytest.mark.asyncio
+async def test_oauth_log_skips_discovery_and_mcp_paths(request_log_handler):
+    """`OAuthLogASGI` loggt ausschließlich `/oauth/*` — Discovery/`/health`/`/mcp` bleiben
+    `AccessLogASGI`s alleinige `ev="http"`-Zeile, keine doppelte Protokollierung derselben
+    Anfrage (Plan §4, Advisor-Vorgabe P4 Step 6b)."""
+    wrapped = OAuthLogASGI(_ok_app)
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=wrapped), base_url="http://testserver"
+    ) as client:
+        await client.get("/.well-known/oauth-protected-resource")
+        await client.get("/health")
+        await client.post("/mcp/sometoken", json={})
+
+    oauth_events = [r.msg for r in request_log_handler.records if r.msg.get("ev") == "oauth"]
+    assert oauth_events == []
+
+
+@pytest.mark.asyncio
+async def test_oauth_log_reflects_error_status(request_log_handler):
+    """`ok` ist HTTP-Status-Ebene (siehe `OAuthLogASGI`-Docstring) — ein 400 (z. B.
+    `invalid_grant`) muss als `ok=False` erscheinen, ohne dass die Klasse dafür den Body liest."""
+
+    async def _error_app(scope, receive, send):
+        await send({"type": "http.response.start", "status": 400, "headers": []})
+        await send({"type": "http.response.body", "body": b""})
+
+    wrapped = OAuthLogASGI(_error_app)
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=wrapped), base_url="http://testserver"
+    ) as client:
+        await client.post("/oauth/token", data={})
+
+    oauth_events = [r.msg for r in request_log_handler.records if r.msg.get("ev") == "oauth"]
+    assert len(oauth_events) == 1
+    assert oauth_events[0]["ok"] is False
 
 
 @pytest.mark.asyncio

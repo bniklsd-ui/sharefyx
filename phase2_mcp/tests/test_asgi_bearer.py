@@ -26,6 +26,7 @@ from mcpserver.app import OAuthConfig, create_app
 from mcpserver.asgi import AuthModeASGI, BearerAuthASGI, TokenPathASGI
 from mcpserver.auth import AuthError, Principal
 from mcpserver.config import Settings
+from storage.frontmatter import parse as parse_frontmatter
 from storage.store import Store
 
 CHALLENGE = (
@@ -432,3 +433,166 @@ async def test_trusted_host_middleware_protects_root_app_when_configured(tmp_pat
     assert allowed.status_code == 200
     assert rejected.status_code == 400
     assert wellknown.status_code == 200
+
+
+def _invariant_fields(filetext: str) -> dict:
+    """Frontmatter minus {id, created, updated} — die drei Felder, die JEDER Aufruf neu
+    erzeugt (Zufalls-ID, echte Systemuhr), unabhängig vom Credential-Typ. Ein Vergleich, der
+    diese drei mit einschließt, kann nie gleich ausfallen und würde nichts über Bearer-vs-
+    Pfad-Token-Gleichheit aussagen (siehe Testdocstring unten)."""
+    fields, body = parse_frontmatter(filetext)
+    for volatile in ("id", "created", "updated"):
+        fields.pop(volatile, None)
+    return {**fields, "body": body}
+
+
+@pytest.mark.asyncio
+async def test_six_tools_behave_identically_under_bearer_and_path_token(tmp_path):
+    """Plan §5 Step 6, dritte Done-when-Klausel: "die sechs Tools verhalten sich unter
+    Bearer-Auth exakt wie unter Pfad-Token". Bisher nur durch Einzelaufrufe von `list_spaces`
+    belegt (hier `test_bearer_token_reaches_a_real_tool_call`) — nie durch einen Diff über alle
+    sechs. Ohne diesen Test wäre "Step 6 ist vollständig" derselbe unbelegte Musterfehler wie in
+    Step 4/5/6a: eine Behauptung, die erst durch einen Test gegen den echten Aufrufpfad zum Fund
+    wird (siehe Step 6a Session-Block, "Lehre ... jetzt ein drittes Mal bestätigt").
+
+    Ein Store, EIN Space (`alpha`) mit zwei Principals darauf — ein Pfad-Token-Principal und
+    eine OAuth-Token-Familie, `mode="both"` erlaubt beide gleichzeitig. Lese-Tools laufen VOR
+    jedem Schreib-Tool und sind deshalb byte-identisch vergleichbar (kein Zustand hat sich
+    zwischen den beiden Aufrufen geändert). Schreib-Tools erzeugen je Aufruf eine neue `id` und
+    neue `created`/`updated`-Zeitstempel — das ist Konstruktion, keine Abweichung — verglichen
+    wird deshalb `_invariant_fields()` (alles außer diesen dreien)."""
+    auth_settings = AuthSettings(
+        base_url="https://space.example.ts.net", db_path=tmp_path / "auth.sqlite3", mode="both",
+    )
+    auth_store = AuthStore(auth_settings.db_path, now_fn=lambda: datetime.now(timezone.utc))
+    access_token, _family_id = _issue_token(auth_store, space="alpha")
+
+    data_root = tmp_path / "data"
+    data_root.mkdir()
+    settings = Settings(data_root=data_root)
+    notes = Store(data_root, git=False)
+    own_seed = notes.create("alpha", type="task", title="Gemeinsames Item")
+    foreign_seed = notes.create("beta", type="note", title="Fremde Notiz")
+
+    path_token = "tok123"
+    path_resolver = _FakePathResolver(
+        {path_token: Principal(space="alpha", token_hash="deadbeef")}
+    )
+
+    app = create_app(
+        settings=settings,
+        resolver=path_resolver,
+        store=notes,
+        oauth=OAuthConfig(settings=auth_settings, store=auth_store, users={}),
+    )
+
+    def _path_client() -> Client:
+        transport = StreamableHttpTransport(
+            url=f"http://testserver/mcp/{path_token}",
+            httpx_client_factory=lambda **kwargs: httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=app), base_url="http://testserver", **kwargs
+            ),
+        )
+        return Client(transport)
+
+    def _bearer_client() -> Client:
+        transport = StreamableHttpTransport(
+            url="http://testserver/mcp/",
+            headers={"Authorization": f"Bearer {access_token}"},
+            httpx_client_factory=lambda **kwargs: httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=app), base_url="http://testserver", **kwargs
+            ),
+        )
+        return Client(transport)
+
+    async with app.router.lifespan_context(app):
+        # -- Lese-Tools: byte-identisch, kein Schreibzugriff dazwischen ---------------------
+        async with _path_client() as path, _bearer_client() as bearer:
+            spaces_via_path = (await path.call_tool("list_spaces", {})).data
+            spaces_via_bearer = (await bearer.call_tool("list_spaces", {})).data
+            assert spaces_via_path == spaces_via_bearer
+
+            search_via_path = (await path.call_tool("search_items", {})).data
+            search_via_bearer = (await bearer.call_tool("search_items", {})).data
+            assert search_via_path == search_via_bearer
+
+            own_via_path = (
+                await path.call_tool("get_item", {"item_id": own_seed.id})
+            ).data
+            own_via_bearer = (
+                await bearer.call_tool("get_item", {"item_id": own_seed.id})
+            ).data
+            assert own_via_path == own_via_bearer
+            assert "<untrusted_content" not in own_via_path  # sanity: eigenes Item, kein Wrap
+
+            foreign_via_path = (
+                await path.call_tool("get_item", {"item_id": foreign_seed.id})
+            ).data
+            foreign_via_bearer = (
+                await bearer.call_tool("get_item", {"item_id": foreign_seed.id})
+            ).data
+            assert foreign_via_path == foreign_via_bearer
+            assert "<untrusted_content" in foreign_via_path  # sanity: fremdes Item, gewrappt
+
+            # -- Schreib-Tools: je Credential ein eigenes Item, invariante Felder verglichen -
+            created_via_path = (
+                await path.call_tool(
+                    "create_item", {"type": "task", "title": "Schreibtest"}
+                )
+            ).data
+            created_via_bearer = (
+                await bearer.call_tool(
+                    "create_item", {"type": "task", "title": "Schreibtest"}
+                )
+            ).data
+            assert _invariant_fields(created_via_path) == _invariant_fields(created_via_bearer)
+
+            path_id = parse_frontmatter(created_via_path)[0]["id"]
+            bearer_id = parse_frontmatter(created_via_bearer)[0]["id"]
+
+            updated_via_path = (
+                await path.call_tool(
+                    "update_item",
+                    {"item_id": path_id, "version": 1, "title": "Geändert"},
+                )
+            ).data
+            updated_via_bearer = (
+                await bearer.call_tool(
+                    "update_item",
+                    {"item_id": bearer_id, "version": 1, "title": "Geändert"},
+                )
+            ).data
+            assert _invariant_fields(updated_via_path) == _invariant_fields(updated_via_bearer)
+
+            appended_via_path = (
+                await path.call_tool(
+                    "append_to_item",
+                    {"item_id": path_id, "version": 2, "text": "Angehängt."},
+                )
+            ).data
+            appended_via_bearer = (
+                await bearer.call_tool(
+                    "append_to_item",
+                    {"item_id": bearer_id, "version": 2, "text": "Angehängt."},
+                )
+            ).data
+            assert _invariant_fields(appended_via_path) == _invariant_fields(appended_via_bearer)
+
+            # -- Cross-Space-Schreibversuch: write_denied unter beiden Credentials gleich ----
+            denial_via_path = await path.call_tool(
+                "update_item",
+                {"item_id": foreign_seed.id, "version": 1, "title": "Fremdzugriff"},
+                raise_on_error=False,
+            )
+            denial_via_bearer = await bearer.call_tool(
+                "update_item",
+                {"item_id": foreign_seed.id, "version": 1, "title": "Fremdzugriff"},
+                raise_on_error=False,
+            )
+            denial_path_text = denial_via_path.content[0].text if denial_via_path.content else ""
+            denial_bearer_text = (
+                denial_via_bearer.content[0].text if denial_via_bearer.content else ""
+            )
+            assert denial_via_path.is_error and denial_via_bearer.is_error
+            assert "write_denied" in denial_path_text
+            assert "write_denied" in denial_bearer_text

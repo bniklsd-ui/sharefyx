@@ -1,13 +1,15 @@
 """Request-Log (Plan §3, P3 Step 2) — das einzige neue Modul dieser Phase in `mcpserver/`.
 
-Zwei Ereignisarten auf einem eigenen, nicht propagierenden Logger (`sharefyx.request`):
-`ev="tool"` (`ToolCallLogMiddleware`, FastMCP-Tool-Ebene) und `ev="http"` (`AccessLogASGI`,
-Starlette-Wurzel-Ebene, eingebaut in `scripts/serve.py`, nicht in `app.py :: create_app()` —
-damit `test_app.py` unverändert gegen die nackte App läuft). Beide schreiben ausschließlich über
-`log_event()`, das die Feld-Whitelist erzwingt.
+Drei Ereignisarten auf einem eigenen, nicht propagierenden Logger (`sharefyx.request`):
+`ev="tool"` (`ToolCallLogMiddleware`, FastMCP-Tool-Ebene), `ev="http"` (`AccessLogASGI`,
+Starlette-Wurzel-Ebene) und `ev="oauth"` (`OAuthLogASGI`, P4 Step 6b, gleiche Wurzel-Ebene, nur
+`/oauth/*`). Alle drei sind eingebaut in `scripts/serve.py`, nicht in `app.py :: create_app()` —
+damit `test_app.py` unverändert gegen die nackte App läuft. Alle drei schreiben ausschließlich
+über `log_event()`, das die Feld-Whitelist erzwingt.
 
-**Feld-Whitelist** (Plan §3.1): `ts` · `ev` · `tool` · `space` · `ms` · `ok` · `err` · `method` ·
-`path` · `status`. Alles andere wird von `log_event()` stillschweigend verworfen — insbesondere
+**Feld-Whitelist** (Plan §3.1, erweitert P4 §4): `ts` · `ev` · `tool` · `space` · `ms` · `ok` ·
+`err` · `method` · `path` · `status` · `stage` · `client_id` · `grant`. Alles andere wird von
+`log_event()` stillschweigend verworfen — insbesondere
 darf hier **nie** ein Token, ein Item-Titel/Body/Snippet, eine Item-ID oder eine rohe
 Fehlermeldung landen (`map_storage_error()`-Texte wie `conflict: itm_… wurde geändert (…)`
 enthalten IDs und potenziell Titel). Deshalb geht in `err` nur die **Klasse**
@@ -31,6 +33,7 @@ import logging
 import time
 from datetime import datetime, timezone
 from typing import Any
+from urllib.parse import parse_qs
 
 from fastmcp.server.middleware import CallNext, Middleware, MiddlewareContext
 
@@ -41,8 +44,14 @@ from .logging_setup import _TOKEN_SEGMENT_RE
 LOGGER_NAME = "sharefyx.request"
 
 # Feld-Whitelist — einzige Stelle, die entscheidet, was in eine Logzeile darf (siehe Moduldocstring).
+# `stage`/`client_id`/`grant` sind P4 Step 6b (Plan §4) — die Whitelist ERLAUBT alle drei, aber
+# `OAuthLogASGI` (unten) füllt nur `stage` und `client_id`; siehe dessen Docstring, warum `err`,
+# `grant` und `space` dort nie gesetzt werden (bräuchten einen Body-Read).
 _ALLOWED_FIELDS = frozenset(
-    {"ts", "ev", "tool", "space", "ms", "ok", "err", "method", "path", "status"}
+    {
+        "ts", "ev", "tool", "space", "ms", "ok", "err", "method", "path", "status",
+        "stage", "client_id", "grant",
+    }
 )
 
 # Bekannte Fehlerklassen, wie von `tools.py :: map_storage_error()` als Nachrichten-Präfix
@@ -160,3 +169,80 @@ class AccessLogASGI:
                 status=status_holder.get("status"),
                 ms=ms,
             )
+
+
+# (method, path) -> stage (Plan §4). `/oauth/token` bedient sowohl `authorization_code` als auch
+# `refresh_token` — die Unterscheidung steht nur im Formular-Body (`grant_type`), den
+# `OAuthLogASGI` bewusst nie liest (siehe Klassen-Docstring). `stage="token"` (ohne
+# Grant-Unterscheidung) ist deshalb der akzeptierte Kompromiss (P4 Step 6b, Advisor-Vorgabe) —
+# dokumentiert statt still auf `token_code`/`token_refresh` „geraten".
+_STAGE_BY_ROUTE: dict[tuple[str, str], str] = {
+    ("POST", "/oauth/register"): "register",
+    ("GET", "/oauth/authorize"): "authorize_get",
+    ("POST", "/oauth/authorize"): "authorize_post",
+    ("POST", "/oauth/token"): "token",
+}
+
+
+class OAuthLogASGI:
+    """Umschließt die Wurzel-App wie `AccessLogASGI` (`scripts/serve.py`, nicht `create_app()`
+    — Plan §3.3s Begründung gilt gleich: `test_app.py` läuft damit unverändert gegen die nackte
+    App). Loggt **nur** `/oauth/*`-Anfragen (`ev="oauth"`) — Discovery (`/.well-known/*`),
+    `/health` und `/mcp` bekommen weiterhin ausschließlich `AccessLogASGI`s `ev="http"`-Zeile,
+    keine doppelte Protokollierung derselben Anfrage.
+
+    **Kein Body-, kein Header-Read.** `stage` kommt ausschließlich aus Methode+Pfad
+    (`_STAGE_BY_ROUTE`), `client_id` ausschließlich aus dem Query-String von `GET
+    /oauth/authorize` (dort ein Klartext-Parameter, keine Kopie eines Geheimnisses). Damit
+    fallen `err`, `grant` und `space` aus Plan §4s Beispielzeilen bewusst weg — jedes der drei
+    bräuchte einen Formular- oder JSON-Body-Read (`space`/`password`/`totp` auf
+    `authorize_post`, `grant_type` auf `token`), und ein Body-Read hier wäre genau die Umkehrung
+    der Regel, die `stage`s Body-Freiheit erst sicher macht (Advisor-Vorgabe, P4 Step 6b). Die
+    Whitelist in `_ALLOWED_FIELDS` erlaubt alle drei Felder trotzdem (Plan §4 wörtlich), nur
+    füllt sie hier niemand.
+
+    **`ok` ist HTTP-Status-Ebene, nicht Fluss-Ebene:** ein abgelehntes Consent (`action=deny`)
+    liefert einen 302-Redirect mit `error=access_denied` — das ist aus Sicht dieser Klasse ein
+    **Erfolg** (`ok=True`), weil die Anfrage selbst korrekt beantwortet wurde. Wer wissen will,
+    ob der *Fluss* erfolgreich war, braucht die Redirect-Query, nicht dieses Log."""
+
+    def __init__(self, app: Any) -> None:
+        self._app = app
+
+    async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
+        path = scope.get("path", "") if scope.get("type") == "http" else ""
+        if scope.get("type") != "http" or not path.startswith("/oauth/"):
+            await self._app(scope, receive, send)
+            return
+
+        stage = _STAGE_BY_ROUTE.get((scope.get("method"), path))
+        client_id: str | None = None
+        if stage == "authorize_get":
+            query = parse_qs(scope.get("query_string", b"").decode("utf-8"))
+            values = query.get("client_id")
+            client_id = values[0] if values else None
+
+        start = time.perf_counter()
+        status_holder: dict[str, int] = {}
+
+        async def _send(message: dict[str, Any]) -> None:
+            if message["type"] == "http.response.start":
+                status_holder["status"] = message["status"]
+            await send(message)
+
+        try:
+            await self._app(scope, receive, _send)
+        finally:
+            ms = round((time.perf_counter() - start) * 1000)
+            status = status_holder.get("status")
+            fields: dict[str, Any] = {
+                "ev": "oauth", "ms": ms, "ok": bool(status) and status < 400,
+            }
+            # `stage` bleibt weg statt `null` zu loggen, wenn Methode+Pfad nicht auf eine der
+            # vier bekannten Routen passen (z. B. GET /oauth/token) — hält den Feldwert innerhalb
+            # von Plan §4s Enum, keinen fünften Wert einführen.
+            if stage is not None:
+                fields["stage"] = stage
+            if client_id is not None:
+                fields["client_id"] = client_id
+            log_event(**fields)

@@ -134,6 +134,11 @@ SPACE_DATA_ROOT=/pfad/zu/einem/testverzeichnis python phase2_mcp/scripts/serve.p
 curl http://127.0.0.1:8765/health
 ```
 
+**[2026-07-28, P4 Step 6b]** Ohne `SPACE_AUTH_MODE` bleibt dieser Start exakt der P3-Pfad
+(`oauth=None`, Pfad-Token wie bisher) — die Umgebungsvariable ist absichtlich keine neue
+Voraussetzung für einen lokalen Testlauf. Details zum OAuth-Modus (`token`/`both`/`oauth`):
+`phase4_auth/CLAUDE.md`.
+
 ## Bewusst akzeptierte Kompromisse
 
 Damit sie niemand später „entdeckt" und für einen Bug hält:

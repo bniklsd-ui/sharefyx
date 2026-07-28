@@ -162,13 +162,22 @@ Zeit driftende Summenzeile wird korrigiert. Gleiche Fund-Kategorie wie die root-
 Korrektur im selben Commit: „aktive Phase ist P4" ist kein Freibrief, Dateien anzufassen und
 ihre Zähl-Zeile stehen zu lassen.
 
-**Gesamt: 90 Tests** in `phase2_mcp/tests/` (6 `test_config.py` + 12 `test_credentials.py` + 4
-`test_auth.py` + 3 `test_permissions.py` + 2 `test_logging.py` + 2 `test_context.py` + 4
-`test_asgi.py` + 10 `test_app.py` + 23 `test_tools.py` + 3 `test_mcp_smoke.py` + 8
-`test_request_log.py` + 13 `test_asgi_bearer.py` [P4 Step 6a, neu: `BearerAuthASGI`/
-`AuthModeASGI`, Details `phase4_auth/CLAUDE.md`]). Acht weitere Tests aus Step 2 liegen in
-`phase1_storage/tests/` (siehe Modul-Status Zeile 3 und `phase1_storage/CLAUDE.md`), werden dort
-mitgezählt, nicht hier.
+**[2026-07-28 Korrektur, P4 Step 6b]:** dieselbe Drift-Kategorie trat ein zweites Mal ein, einen
+Step später — `test_logging.py` wuchs 2→8 (sechs neue parametrisierte `_SECRET_PATTERNS`-Fälle),
+`test_request_log.py` 8→11 (drei neue `OAuthLogASGI`-Tests) und `test_asgi_bearer.py` 13→14 (Plan
+§5 Step 6s dritte Done-when-Klausel — Diff aller sechs Tools unter Bearer vs. Pfad-Token, bisher
+unbelegt), alle drei P4-Q-Berührungen, ohne dass ein Step-6a-Abschluss-Commit diese Zeile für die
+eigenen zukünftigen Änderungen vorgemerkt hätte. Reale Zahl wieder per `pytest --collect-only -q`
+je Datei neu gezählt.
+
+**Gesamt: 100 Tests** in `phase2_mcp/tests/` (6 `test_config.py` + 12 `test_credentials.py` + 4
+`test_auth.py` + 3 `test_permissions.py` + 8 `test_logging.py` [P4 Step 6b, neu:
+`_SECRET_PATTERNS`] + 2 `test_context.py` + 4 `test_asgi.py` + 10 `test_app.py` + 23
+`test_tools.py` + 3 `test_mcp_smoke.py` + 11 `test_request_log.py` [P4 Step 6b, neu:
+`OAuthLogASGI`] + 14 `test_asgi_bearer.py` [P4 Step 6a: `BearerAuthASGI`/`AuthModeASGI`; P4 Step
+6b, ein weiterer neu: sechs Tools unter Bearer vs. Pfad-Token verglichen, Details
+`phase4_auth/CLAUDE.md`]). Acht weitere Tests aus Step 2 liegen in `phase1_storage/tests/` (siehe
+Modul-Status Zeile 3 und `phase1_storage/CLAUDE.md`), werden dort mitgezählt, nicht hier.
 
 ## Geerbte Contracts
 

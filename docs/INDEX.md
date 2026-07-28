@@ -22,7 +22,7 @@ updated: 2026-07-28
 
 ## Root & governance
 
-- [CLAUDE.md](../CLAUDE.md) — 📗 ~9KB · rules, core principle, hard rules, working style, current state; auto-loaded every session
+- [CLAUDE.md](../CLAUDE.md) — 📗 ~14KB · rules, core principle, hard rules, working style, current state; auto-loaded every session
 - [AGENTS.md](../AGENTS.md) — 📗 ~1KB · harness-neutral entry point for non-Claude-Code agents; points to `CLAUDE.md` + doc-layers navigation
 - [README.md](../README.md) — 📗 ~5KB · human overview + machine setup (venv, keyring, run, smoke test)
 - [ROADMAP.md](../ROADMAP.md) — 📗 ~9KB · Phases 1–5, scope in/out per phase, status
@@ -31,9 +31,9 @@ updated: 2026-07-28
 
 ## Active phase (4 — OAuth 2.1 + DCR)
 
-- [phase4_auth/CLAUDE.md](../phase4_auth/CLAUDE.md) — 🔄 ~27KB · phase head; Step 0 (Haushalt, Drift, kritischer Keyring-Fund) ✅, Step 1 (Gerüst, Konfiguration, Kryptobausteine) ✅, Step 2 (Passwörter, TOTP, Nutzerakten) ✅, Step 3 (Persistenz + Fehlversuchsbremse, Code-/Refresh-Replay-Tötung) ✅, Step 4 (Metadaten + DCR) ✅, Step 5 (Autorisierungsfluss) ✅, Step 6a (Resolver + Bearer-Auflösung, `create_app()`-Verdrahtung) ✅ — Step 6b (Logging, `oauth_smoke.py`) offen; read + newest Session-stopped block first
+- [phase4_auth/CLAUDE.md](../phase4_auth/CLAUDE.md) — 🔄 ~31KB · phase head; Step 0 (Haushalt, Drift, kritischer Keyring-Fund) ✅, Step 1 (Gerüst, Konfiguration, Kryptobausteine) ✅, Step 2 (Passwörter, TOTP, Nutzerakten) ✅, Step 3 (Persistenz + Fehlversuchsbremse, Code-/Refresh-Replay-Tötung) ✅, Step 4 (Metadaten + DCR) ✅, Step 5 (Autorisierungsfluss) ✅, Step 6a (Resolver + Bearer-Auflösung, `create_app()`-Verdrahtung) ✅, Step 6b (`oauth_smoke.py` 11/11, `OAuthLogASGI`, `serve.py`-`SPACE_AUTH_MODE`-Gate, sechs Tools Bearer-vs-Pfad-Token-Diff) ✅ — Step 6 damit vollständig (alle drei Done-when-Klauseln belegt), Step 7 (Betrieb, Live-Abnahme, Schnitt) offen; read + newest Session-stopped block first
 - [docs/concepts/phase4_auth_plan.md](./concepts/phase4_auth_plan.md) — 📕 ~76KB · ausführungsreifer P4-Plan (Entscheidungen P4-A–P4-R, Steps 0–7, eigener Authorization Server, Argon2id + TOTP, opake Token); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen; Autor Browser-Planungssession 2026-07-28, **ohne frischen Repo-Zugriff geschrieben** — Anker sind Funktionsnamen/Suchstrings, keine Zeilennummern
-- [phase4_auth/SESSIONS_ARCHIVE.md](../phase4_auth/SESSIONS_ARCHIVE.md) — 📦 ~21KB · vier archivierte Session-Blöcke (Step 0+1+2, Step 3, V14+Step 4, Step 5), verbatim, newest-first
+- [phase4_auth/SESSIONS_ARCHIVE.md](../phase4_auth/SESSIONS_ARCHIVE.md) — 📦 ~29KB · fünf archivierte Session-Blöcke (Step 0+1+2, Step 3, V14+Step 4, Step 5, Step 6a), verbatim, newest-first
 
 ## Completed phases
 
@@ -43,7 +43,7 @@ updated: 2026-07-28
 - [docs/concepts/P3_ABNAHME_2026-07-27.md](./concepts/P3_ABNAHME_2026-07-27.md) — 📕 ~19KB · Abnahmeprotokoll Phase 3: 10/13 live bestanden, Zeilen 6/12/13 per Nikinger-Entscheidung auf nächste Phase verschoben, CLI-Ausschnitt als Beleg, Befunde B5/B6
 - [docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md](./concepts/PHASE3_CLOSEOUT_HANDOVER.md) — 📕 ~17KB · Abschluss-Handover P3→P4: Status, Delta seit dem P2-Handover, [VERIFY]-Bilanz V1–V13, geerbte Abnahmezeilen 6/12/13, Doku-Drift-Liste aus der Autocompact-Session inkl. Nachträgen zum nikinger-Token-Fund, offene Entscheidungen für die OAuth-Planung
 - [docs/concepts/phase3_edge_uebersicht.svg](./concepts/phase3_edge_uebersicht.svg) — 📕 Übersichtsgrafik Phase 3 (Request-Weg, Komponenten)
-- [phase2_mcp/CLAUDE.md](../phase2_mcp/CLAUDE.md) — 📗 ~19KB · phase head; Steps 0–7 ✅, **live-verifiziert** (Quick-Tunnel-Probe + Adapter-Abnahme durch den Nikinger, 2026-07-26); Quick-Tunnel-Runbook seit P3 Step 6 durch Verweis ersetzt; read + newest Session-stopped block first
+- [phase2_mcp/CLAUDE.md](../phase2_mcp/CLAUDE.md) — 📗 ~20KB · phase head; Steps 0–7 ✅, **live-verifiziert** (Quick-Tunnel-Probe + Adapter-Abnahme durch den Nikinger, 2026-07-26); Quick-Tunnel-Runbook seit P3 Step 6 durch Verweis ersetzt; read + newest Session-stopped block first
 - [docs/concepts/phase2_mcp_plan.md](./concepts/phase2_mcp_plan.md) — 📕 ~46KB · ausführungsreifer P2-Plan (Entscheidungen P2-A–P2-N, Steps 0–7); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
 - [docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md](./concepts/P2_ADAPTER_ABNAHME_2026-07-26.md) — 📕 ~11KB · Abnahmeprotokoll über den echten Custom Connector, 21/21 Prüfungen, beide Befunde behoben (B1, B2 — siehe Nachtrag)
 - [phase2_mcp/SESSIONS_ARCHIVE.md](../phase2_mcp/SESSIONS_ARCHIVE.md) — 📦 ~38KB · acht archivierte Session-Blöcke (Step 0–7), verbatim, newest-first

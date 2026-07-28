@@ -146,17 +146,25 @@ zweites Mal ein — die vorige Korrektur brachte diese Zeile auf Step 3, aber di
 Step-5-Abschluss-Commits zogen sie danach drei Steps lang nicht nach. Root-`CLAUDE.md` ist nicht
 die Quelle der Wahrheit für den Phase-Fortschritt (das ist `phase4_auth/CLAUDE.md`), aber diese
 Zeile hier muss trotzdem mitlaufen, sonst degradiert Hard Rule 8 zu einer Regel, die nur für den
-Phase-Head gilt.**]** Step 0 (Haushalt, Drift, geerbte Abnahme), Step 1 (Gerüst, Konfiguration,
-Kryptobausteine), Step 2 (Passwörter, TOTP, Nutzerakten), Step 3 (Persistenz +
-Fehlversuchsbremse — Code-/Refresh-Replay-Tötung nach RFC 9700), Step 4 (Metadaten + dynamische
-Registrierung) und Step 5 (Autorisierungsfluss — `/oauth/authorize`, `/oauth/token`, TOTP-Replay-
-Schutz, Enumerationsschutz) sind durchgelaufen. Kritischer Fund in Step 0: ein nie widerrufener
-Keyring-Token für einen dritten, seit P2-B2 umbenannten Space (`nikinger`) — live und
-schreibfähig, aber ohne zugehöriges Verzeichnis unter `DATA_ROOT`. Nikinger-Entscheidung:
-widerrufen (Keyring), Export + `sudo systemctl restart sharefyx-mcp` nachgezogen (2026-07-28
-14:12) — live gegen `diagnose.sh` und `export_space_map.py` bestätigt, Token auch im laufenden
-Dienst tot. Details: `docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md` §5 Nachtrag. Details zu Step
-2–5: Session-Blöcke in `phase4_auth/CLAUDE.md` bzw. `phase4_auth/SESSIONS_ARCHIVE.md`.
+Phase-Head gilt.**]**
+
+**[2026-07-28 dritte Korrektur, im Step-6b-Commit gefunden:** dieselbe Drift-Kategorie trat ein
+drittes Mal ein — der Step-6a-Abschluss-Commit zog diese Zeile nicht nach, obwohl er zwischen
+Step 5 und Step 6b lag. Diese Zeile jetzt auf Step 6b gebracht, jeweils bei ihrem eigenen
+Abschluss-Commit nachzuziehen, nicht erst wenn die Drift wieder auffällt.**]** Step 0 (Haushalt,
+Drift, geerbte Abnahme), Step 1 (Gerüst, Konfiguration, Kryptobausteine), Step 2 (Passwörter,
+TOTP, Nutzerakten), Step 3 (Persistenz + Fehlversuchsbremse — Code-/Refresh-Replay-Tötung nach
+RFC 9700), Step 4 (Metadaten + dynamische Registrierung), Step 5 (Autorisierungsfluss —
+`/oauth/authorize`, `/oauth/token`, TOTP-Replay-Schutz, Enumerationsschutz), Step 6a (Resolver,
+Bearer-Auflösung, `create_app()`-Verdrahtung) und Step 6b (`oauth_smoke.py` 11/11, `OAuthLogASGI`,
+`serve.py`-`SPACE_AUTH_MODE`-Gate — Step 6 damit vollständig) sind durchgelaufen. Kritischer Fund
+in Step 0: ein nie widerrufener Keyring-Token für einen dritten, seit P2-B2 umbenannten Space
+(`nikinger`) — live und schreibfähig, aber ohne zugehöriges Verzeichnis unter `DATA_ROOT`.
+Nikinger-Entscheidung: widerrufen (Keyring), Export + `sudo systemctl restart sharefyx-mcp`
+nachgezogen (2026-07-28 14:12) — live gegen `diagnose.sh` und `export_space_map.py` bestätigt,
+Token auch im laufenden Dienst tot. Details: `docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md` §5
+Nachtrag. Details zu Step 2–6b: Session-Blöcke in `phase4_auth/CLAUDE.md` bzw.
+`phase4_auth/SESSIONS_ARCHIVE.md`.
 
 **Phase 3 — Exposure & Betrieb** (`phase3_edge/`, kein eigenes Python-Paket — Servercode bleibt
 in `mcpserver`): 🟡 **code-complete, nicht live-bewiesen** — 10 von 13 Abnahmezeilen live
