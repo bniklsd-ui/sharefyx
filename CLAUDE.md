@@ -137,13 +137,18 @@ ausführungsreif — geschrieben ohne frischen Repo-Zugriff, siehe Plan-Kopf).
 Herkunft/offene Entscheidungen: `docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md`. Phase-Head:
 `phase4_auth/CLAUDE.md`.
 
-**[2026-07-28, P4 Step 0+1]:** Step 0 (Haushalt, Drift, geerbte Abnahme) und Step 1 (Gerüst,
-Konfiguration, Kryptobausteine) sind durchgelaufen. Kritischer Fund in Step 0: ein nie
-widerrufener Keyring-Token für einen dritten, seit P2-B2 umbenannten Space (`nikinger`) — live
-und schreibfähig, aber ohne zugehöriges Verzeichnis unter `DATA_ROOT`. Nikinger-Entscheidung:
-widerrufen (Keyring), Export + `sudo systemctl restart sharefyx-mcp` nachgezogen (2026-07-28
-14:12) — live gegen `diagnose.sh` und `export_space_map.py` bestätigt, Token auch im laufenden
-Dienst tot. Details: `docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md` §5 Nachtrag.
+**[2026-07-28 Korrektur:** diese Zeile stand hier zwischenzeitlich auf „P4 Step 0+1", obwohl
+Step 2 und Step 3 im selben Tag folgten — Drift durch fehlendes Nachziehen dieser Datei bei
+Step-Abschluss-Commits, jetzt behoben.**]** Step 0 (Haushalt, Drift, geerbte Abnahme), Step 1
+(Gerüst, Konfiguration, Kryptobausteine), Step 2 (Passwörter, TOTP, Nutzerakten) und Step 3
+(Persistenz + Fehlversuchsbremse — Code-/Refresh-Replay-Tötung nach RFC 9700) sind durchgelaufen.
+Kritischer Fund in Step 0: ein nie widerrufener Keyring-Token für einen dritten, seit P2-B2
+umbenannten Space (`nikinger`) — live und schreibfähig, aber ohne zugehöriges Verzeichnis unter
+`DATA_ROOT`. Nikinger-Entscheidung: widerrufen (Keyring), Export + `sudo systemctl restart
+sharefyx-mcp` nachgezogen (2026-07-28 14:12) — live gegen `diagnose.sh` und
+`export_space_map.py` bestätigt, Token auch im laufenden Dienst tot. Details:
+`docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md` §5 Nachtrag. Details zu Step 2/3: Session-Blöcke
+in `phase4_auth/CLAUDE.md` bzw. `phase4_auth/SESSIONS_ARCHIVE.md`.
 
 **Phase 3 — Exposure & Betrieb** (`phase3_edge/`, kein eigenes Python-Paket — Servercode bleibt
 in `mcpserver`): 🟡 **code-complete, nicht live-bewiesen** — 10 von 13 Abnahmezeilen live

@@ -50,9 +50,11 @@ hier `tools.py` anfasst, ist in der falschen Phase (P4-Q).
   Starlette, SQLite, `argon2-cffi`. Test: `test_authserver_does_not_import_mcpserver`.
 - **P4-D — Token opak.** `secrets.token_urlsafe(32)`, gespeichert wird ausschließlich
   `sha256`-Hex. Kein JWT, kein JWKS, kein Signing-Key.
-- **P4-F — Argon2id, nicht scrypt.** `t=2, m=19456 KiB, p=1` (OWASP + BSI TR-02102-1). `[VERIFY]`
-  V17: Dauer eines echten Durchlaufs auf dieser VM messen, Zielkorridor 50–250 ms, Wert
-  dokumentieren statt raten.
+- **P4-F — Argon2id, nicht scrypt.** `m=19456 KiB, p=1` (OWASP + BSI TR-02102-1).
+  **[2026-07-28 Korrektur, P4 Step 2]:** `t=2` war der Plan-Default, nicht der scharfe Wert —
+  `[VERIFY]` V17 maß auf dieser VM ~15 ms damit (unter dem Zielkorridor 50–250 ms), Code läuft
+  seit Step 2 mit **`t=8`** (~53–55 ms, gemessen). Konstante: `authserver/passwords.py ::
+  ARGON2_TIME_COST`. V17 geschlossen, kein offener Punkt mehr.
 - **P4-I — Ausnahme von Hard Rule 2.** Die Auth-SQLite (`/var/lib/sharefyx/auth.sqlite3`) ist
   autoritativ, keine Ableitung aus Dateien — benannte Ausnahme, berührt keine Nutzdaten.
 - **P4-Q — Berührungsfläche.** P4 darf in `phase2_mcp/` genau anfassen: `mcpserver/asgi.py`,
@@ -100,13 +102,34 @@ Abweichungsnotiz unten). `ratelimit.py` (`LoginThrottle`): Eskalationsformel sel
 Vorlauf + 19 neue: 14 `test_authserver_store.py` + 5 `test_ratelimit.py`). SQL-Containment-Grep
 bestätigt: kein SQL außerhalb `store.py` (Ergebnis im Session-Block unten).
 
-**Abweichung vom Plan, dokumentiert statt still übernommen:** der Plan sah `phase4_auth/tests/
-__init__.py` vor. Das kollidiert real mit dem bereits bestehenden `phase3_edge/tests/__init__.py`
-— beide würden pytest als dasselbe Top-Level-Modul `tests` gelten (kein gemeinsames Elternpaket,
-kein `--import-mode=importlib` konfiguriert). Behoben durch Weglassen, wie in
-`phase1_storage/tests`/`phase2_mcp/tests` bereits gehandhabt (kein `__init__.py`). Zweite Folge:
-ein `test_config.py` hätte mit `phase2_mcp/tests/test_config.py` kollidiert (gleicher Basename,
-keine Pakete) — Datei heißt deshalb `test_authserver_config.py`.
+**Abweichung vom Plan, dokumentiert statt still übernommen — Testdatei-Namenskollisionen
+(gilt für den ganzen Baum, nicht nur einzelne Steps; kein `--import-mode=importlib`
+konfiguriert, kein gemeinsames Elternpaket zwischen den Phasen-`tests`-Verzeichnissen):**
+- Der Plan sah `phase4_auth/tests/__init__.py` vor. Das kollidiert real mit dem bereits
+  bestehenden `phase3_edge/tests/__init__.py` — beide würden pytest als dasselbe
+  Top-Level-Modul `tests` gelten. Behoben durch Weglassen, wie in `phase1_storage/tests`/
+  `phase2_mcp/tests` bereits gehandhabt (kein `__init__.py`).
+- `test_config.py` hätte mit `phase2_mcp/tests/test_config.py` kollidiert (gleicher Basename,
+  keine Pakete) — Datei heißt deshalb `test_authserver_config.py` (Step 1).
+- **[2026-07-28, P4 Step 3]:** dieselbe Klasse traf real ein zweites Mal, nicht nur theoretisch
+  — der erste volle `pytest -q`-Lauf dieser Session brach mit `import file mismatch` ab, weil
+  `phase4_auth/tests/test_store.py` mit dem bereits bestehenden `phase1_storage/tests/
+  test_store.py` kollidiert. Behoben: Datei heißt `test_authserver_store.py`. **Regel für
+  künftige Steps:** vor dem Anlegen einer neuen Testdatei `find . -name "test_<name>.py"`
+  gegen den ganzen Baum prüfen, nicht nur gegen den Plan-Dateinamen — die Kollision ist am
+  Basename festgemacht, nicht am Phasenverzeichnis.
+
+**Additive `AuthStore`-Methoden, nicht in der Plan-"fix"-Liste (Step 3, für `flows.py` in Step 5
+relevant):** `create_family` (FK `auth_codes.family_id` erzwingt eine Familie vor dem ersten
+Code), `get_login_attempt`/`upsert_login_attempt`/`clear_login_attempt` (weil `ratelimit.py`
+selbst kein SQL führen darf). `rotate_refresh(refresh_token, *, access_ttl_s, refresh_ttl_s)`
+nimmt zusätzlich die beiden TTLs entgegen statt sie aus dem Bestand abzuleiten — eine
+Bestands-Ableitung hätte nach `purge_expired()` auf einer bereits gelöschten Access-Token-Zeile
+gecrasht (Advisor-Fund, kein Randfall). **Hinweis für `flows.py` (Step 5):** `issue_token_pair`
+liest die Familie ohne `AND revoked_at IS NULL` — sicher, weil `lookup_access_token` den
+`revoked_at`-JOIN als eigene Prüfung hat (die Mission-Garantie "Replay tötet die Familie" hängt
+also an `lookup_access_token`, nicht an `issue_token_pair`). Diesen JOIN in Step 5 nicht als
+redundant wegvereinfachen.
 
 ## Geerbte Contracts
 
