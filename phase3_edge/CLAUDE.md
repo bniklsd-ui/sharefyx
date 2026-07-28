@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase3_edge_plan.md          # voller Plan, Entscheidungen P3-A–P3-N, Steps 0–7
   - ../docs/concepts/PHASE2_CLOSEOUT_HANDOVER.md  # Herkunft der offenen Entscheidungen 1–8
   - SESSIONS_ARCHIVE.md                            # ältere Session-Blöcke, newest-first
-updated: 2026-07-27
+updated: 2026-07-28
 ---
 
 # CLAUDE.md — Phase 3: Exposure & Betrieb (`phase3_edge/`)
@@ -65,7 +65,7 @@ hier `tools.py` anfasst, ist in der falschen Phase.
 | 5 | systemd-Units, `install_units.sh`, `/health.uptime_s` (P3-I) | 4 | ✅ | 6 |
 | 6 | Backup/Restore-Skripte, Backup-Timer | 5 | ✅ | 9 (7 in `test_backup_scripts.py`, 2 in `test_units.py`) |
 | 7 | Runbooks, `diagnose.sh`, Cloudflare-Rückbau | 6 | ✅ | 0 (Runbook/Skript, keine automatisierten Tests laut Plan) |
-| 8 | Live-Abnahme (Nikinger) | 7 | 🟡 funktional beendet — 10/13 live, Zeilen 6/12/13 auf nächste Phase verschoben (Nikinger-Entscheidung 2026-07-27), B3–B6 dokumentiert, V9 live geschlossen; Token-Rotation steht noch aus | — |
+| 8 | Live-Abnahme (Nikinger) | 7 | 🟡 funktional beendet — 10/13 live, Zeilen 6/12/13 auf nächste Phase verschoben (Nikinger-Entscheidung 2026-07-27), B3–B6 dokumentiert, V9 live geschlossen, Token-Rotation live bestätigt (2026-07-28); ✅ erst nach beobachtetem echtem Reboot | — |
 
 ## Umgebungsstand (Step 0, Details im Archiv)
 
@@ -202,14 +202,17 @@ curl -s https://<node>.<tailnet>.ts.net/health
 | 14 | Größenbudget | `search_items` gegen den echten Bestand — geerbtes `[VERIFY]` V8 aus P2 |
 
 **Abschluss, in dieser Reihenfolge:**
-1. Alle drei Token rotieren (`--revoke` + neu — für `fabian` ist das die erste reguläre
-   Ausgabe, kein Vorgänger), exportieren, `systemctl restart`, Connector-URLs in beiden Accounts
-   aktualisieren (P3-M — README.md, Abschnitt „Rotation im Dienstbetrieb"). **Führt der
-   Nikinger aus** (Keyring + `sudo systemd-creds` + Connector-URLs in den Claude-Accounts).
-2. Abnahmeprotokoll `docs/concepts/P3_ABNAHME_<YYYY-MM-DD>.md` mit L1-Card, Prüfmatrix, Belegen
-   und Indexzeile — Konvention aus P2 (`P2_ADAPTER_ABNAHME_2026-07-26.md`).
-3. `ROADMAP.md` P3 auf 🟡, `docs/INDEX.md` und dieser Phase-Head nachziehen. **Nikinger-Entscheidung
-   2026-07-27:** Zeilen 6/12/13 auf die nächste Phase verschoben statt aktiv nachgeholt (Details:
+1. ✅ **Erledigt (2026-07-28).** Alle drei Token rotiert (`--revoke` + neu — für `fabian` war
+   das die erste reguläre Ausgabe, kein Vorgänger), exportiert, `systemctl restart`,
+   Connector-URLs in beiden Accounts aktualisiert (neue Adapter: `phase_3_final_niklas_sharefyx`,
+   `phase_3_final_sharefyx_fabian`) — live gegen `list_spaces` bestätigt. **Vom Nikinger
+   ausgeführt** (Keyring + `sudo systemd-creds` + Connector-URLs in den Claude-Accounts).
+2. ✅ **Erledigt (2026-07-27).** Abnahmeprotokoll `docs/concepts/P3_ABNAHME_2026-07-27.md` mit
+   L1-Card, Prüfmatrix, Belegen und Indexzeile — Konvention aus P2
+   (`P2_ADAPTER_ABNAHME_2026-07-26.md`).
+3. ✅ **Erledigt (2026-07-27, seither laufend nachgezogen).** `ROADMAP.md` P3 auf 🟡,
+   `docs/INDEX.md` und dieser Phase-Head nachgezogen. **Nikinger-Entscheidung 2026-07-27:**
+   Zeilen 6/12/13 auf die nächste Phase verschoben statt aktiv nachgeholt (Details:
    Abnahmeprotokoll §1). ✅ erst nach einem beobachteten echten Reboot (Statusglyphen-Definition
    in `ROADMAP.md`: ✅ = „live-verifiziert").
 
@@ -222,94 +225,37 @@ Top-Commit `a400221c` im `DATA_ROOT`. Details: `docs/concepts/P3_ABNAHME_2026-07
 
 ---
 
-## Session stopped — 2026-07-27 (zweite Session, 10/13 belegt, nur noch Reboot + zwei akzeptierte Lücken offen)
+## Session stopped — 2026-07-28 (Token-Rotation live bestätigt, Abschluss-Punkte erledigt)
 
-**Für den nächsten, kalten Leser:** dieser Block folgt direkt auf den vorigen vom selben Tag
-(2026-07-27) — der vorige stammt aus der Session, die P3 Steps 0–6 gebaut und B3/B4 live
-gefunden/behoben hat; dieser hier ist eine neue, separate Session. **Kein neuer Bug.** Zwei
-Befunde (B5, B6) erklären die verbleibenden Lücken vollständig, B6 hat sich während der Session
-selbst aufgelöst. Volles Protokoll mit allen Belegen: `docs/concepts/P3_ABNAHME_2026-07-27.md`.
+**Für den nächsten, kalten Leser:** direkte Fortsetzung des vorigen Blocks vom 2026-07-27 —
+der Nikinger hat die dort skizzierte Rotationsfolge (niklas zuerst, dann fabians Erstausgabe)
+selbst ausgeführt und die Session neu geladen. Diese Session hat nur noch die Bestätigung
+und den Abschluss-Aufräumschritt gemacht, keine neuen Findings.
 
-**Was diese Session gemacht hat, in Reihenfolge:**
-1. `abnahme_run.sh start` gesetzt (Startzeitpunkt für `--since`).
-2. Zeile 2 (Connector niklas Read+Write) selbst über die in dieser Session verfügbaren
-   MCP-Connector-Tools gefahren (`savefyx_pashe_3_test`-Adapter) — echter `get_item` +
-   `append_to_item` auf dem bestehenden Testitem `itm_53cf4e92` (v1→v2), kein neues Item
-   angelegt (Wiederverwendung statt Duplikat, wie vom Nikinger angewiesen).
-3. Erster `abnahme_run.sh run` — Zeilen 3–5 zu dem Zeitpunkt noch nicht möglich (kein
-   fabian-Connector in der Session), B6 dokumentiert.
-4. **Der Nikinger hat währenddessen einen temporären Connector `sharefyx_phase_3_fabian`
-   hinzugefügt** (echter fabian-Token) — nach Session-Reload sichtbar. Damit Zeilen 5→4→3
-   nachgeholt (Reihenfolge zwingend eingehalten: fabian musste bei Zeile 5 noch leer sein):
-   `list_spaces` (leer, fremd niklas sichtbar) → `get_item` auf ein niklas-Item (gewrappt) →
-   `append_to_item`-Versuch darauf (→ `write_denied`) → `create_item` + `get_item` im eigenen
-   Space (`itm_2dda3690`).
-5. Zweiter `abnahme_run.sh run` — fängt alle 10 Tool-Ereignisse aus beiden Spaces im selben
-   `--since`-Fenster ein, inkl. des abgelehnten Schreibversuchs.
+**Was passiert ist:**
+1. Der Nikinger hat alle vier Rotationsschritte (Revoke+Issue, Export, `systemd-creds
+   encrypt`, `systemctl restart`) für niklas und für fabians erste reguläre Ausgabe
+   ausgeführt, danach die Connector-URLs in beiden Claude-Accounts aktualisiert (neue
+   Adapter-Namen: `phase_3_final_niklas_sharefyx`, `phase_3_final_sharefyx_fabian`) und die
+   Session neu geladen.
+2. Beide neuen Connectors live gegen `list_spaces` geprüft: niklas sieht `{fabian:
+   item_count 1, writable:false}` + `{niklas: item_count 5, writable:true}`; fabian sieht
+   das Spiegelbild. Rule 4 (fremd sichtbar, fremd nicht schreibbar) hält nach der Rotation
+   unverändert. Für niklas ist das die geprüfte Tiefe (`list_spaces`, `writable:true` korrekt
+   gesetzt); ein echter Write über den neuen niklas-Connector wurde diese Session nicht
+   zusätzlich gefahren — derselbe Principal-Resolution-Pfad wie beim fabian-Write unten, aber
+   nicht separat belegt.
+3. `itm_2dda3690` (fabian-Testitem, zuletzt Beleg für Zeile 5) über den neuen fabian-Connector
+   archiviert (`update_item`, `status: archived`, v1→v2 — ein echter Write, geprüft) — der
+   temporäre `sharefyx_phase_3_fabian`-Adapter ist damit vollständig durch die reguläre Ausgabe
+   ersetzt, keine offenen Wegwerf-Items mehr.
 
-**Ehrlicher Stand nach dieser Session** (Details + CLI-Beleg: `P3_ABNAHME_2026-07-27.md` §2/§3):
+**Damit erledigt aus der „noch offen"-Liste des vorigen Blocks:** Token-Rotation aller drei
+Token, Archivierung von `itm_2dda3690`, Ablösung des temporären Connectors. **Weiterhin offen,
+unverändert:** Zeile 6 (Reboot, passive Beobachtung), Zeilen 12/13 (nächste Phase, siehe B5),
+Zeile 14 (optional, V8 geerbt).
 
-| # | Zeile | Status | Beleg |
-|---|---|---|---|
-| 1 | `/health` außen | ✅ | unverändert |
-| 2 | Connector niklas R+W | ✅ | echter `get_item`+`append_to_item`, v1→v2 |
-| 3 | Connector fabian R+W | ✅ | echter `create_item`+`get_item`, `itm_2dda3690` |
-| 4 | Cross-Space | ✅ | `get_item` gewrappt, `append_to_item` → `write_denied: niklas ist nicht dein Space` |
-| 5 | `list_spaces` leerer fabian | ✅ | `item_count:0`, `writable:true`, vor Zeile 3/4 geprüft |
-| 6 | Reboot-Test | ⬜ | Nikinger-Zeitfrage, weiterhin offen |
-| 7 | Kill-Test | ✅ | aus vorigem Block, bewusst nicht wiederholt |
-| 8 | Request-Log | ✅ | 10 echte Tool-Ereignisse im Fenster, beide Spaces, inkl. `"ok":false,"err":"write_denied"` |
-| 9 | Token-Grep | ✅ | Beleg aus dem 09:xx-Lauf, bewusst nicht wiederholt (kein Token in den Prozess füttern) |
-| 10 | Titel-/Body-Grep | ✅ | frisch bestätigt, leer |
-| 11 | Fremdzugriff → 401 | ✅ | frisch bestätigt, 2×401 |
-| 12 | Backup-Timer | ⬜ **real offen, akzeptiert** | `LastTriggerUSec` leer, Timer feuert erst `2026-07-28T00:00:35`; Nikinger-Entscheidung: akzeptieren statt abwarten |
-| 13 | Restore-Nachweis | ❌ **kein Bug — B5** | Skript-Check negativ, weil das einzige Bundle (11:12 UTC) älter ist als der aktuelle HEAD; per `merge-base --is-ancestor` verifiziert (reine Zeitfrage, keine divergente Historie). Mechanismus selbst war unmittelbar nach diesem Bundle bereits `status=0/SUCCESS` |
-
-**Nebenertrag:** `[VERIFY]` **V9 live geschlossen** — der `append_to_item`-Aufruf aus Zeile 2
-erzeugte exakt zeitgleich (20:39:58) den erwarteten Commit im `DATA_ROOT`, damit ist bestätigt,
-dass die systemd-Sandbox (`ProtectHome=read-only` + `ReadWritePaths`) Git-Commits dort zulässt.
-
-**B6 aufgelöst:** die anfänglich fehlende Sichtbarkeit von `fabian` im `niklas`-`list_spaces`
-war keine Rule-4-Lücke, sondern eine Henne-Ei-Situation — der Space `fabian` existierte zu dem
-Zeitpunkt schlicht noch nicht. Nach dem ersten `create_item` über den neuen Connector zeigt
-`niklas`s `list_spaces` `fabian` korrekt als fremden Space (`item_count:1`, `writable:false`).
-Rule 4 funktioniert wie entworfen, kein `tools.py`-Befund.
-
-**Nikinger-Entscheidung 2026-07-27, 21:1x CEST:** Zeilen 6 (Reboot), 12 (Backup-Timer) und 13
-(Restore-Nachweis) werden **nicht mehr aktiv nachgeholt**, sondern auf die nächste Phase
-verschoben — ein unbeabsichtigter Reboot ist ohnehin der reale Prüffall für Zeile 6; 12/13
-lösen sich mit dem nächsten Backup-Zyklus (B5). Damit ist die Live-Abnahme für den P3-Abschluss
-funktional beendet, aber **Status bleibt 🟡, nicht ✅** — `ROADMAP.md`s Statusglyphen definieren
-✅ als „live-verifiziert", und Zeile 6 ist das per Definition nicht, solange kein echter Reboot
-beobachtet wurde. `ROADMAP.md` entsprechend gesetzt (2026-07-27).
-
-**Was diese Session zusätzlich erledigt hat:**
-- Testitems archiviert: `itm_53cf4e92`, `itm_cc4866f3` (beide niklas, `status=archived`).
-  `itm_2dda3690` (fabian) bleibt bewusst aktiv bis nach der Token-Rotation — einziges Item im
-  fabian-Space, Beleg für Zeile 5.
-- Dabei ein eigener Fehler sofort korrigiert: ein `append_to_item` hatte Zeilen 9/10
-  versehentlich als „nicht leer" statt „leer" protokolliert (Tippfehler beim Schreiben, kein
-  tatsächlicher Befund) — im selben Item mit einer KORREKTUR-Zeile richtiggestellt, bevor
-  archiviert wurde.
-
-**Was noch offen ist, für den nächsten Schritt:**
-- Zeile 6 (Reboot) — verschoben, passive Beobachtung beim nächsten echten Vorfall.
-- Zeilen 12/13 — verschoben, siehe B5.
-- Zeile 14 (optional, Größenbudget) — weiterhin nicht angefasst.
-- **Token-Rotation aller drei Token** (niklas, fabian, und der temporäre
-  `sharefyx_phase_3_fabian` — für fabian ist das die erste reguläre Ausgabe, kein Vorgänger zum
-  Zurückfallen) — **führt der Nikinger aus**, Details/Befehle: README.md „Rotation im
-  Dienstbetrieb", `phase3_edge/CLAUDE.md` Runbook „Abschluss". Claude Code hat keinen
-  passwordless-sudo-Zugriff auf diese Shell und darf Keyring/Connector-URLs ohnehin nicht
-  selbst anfassen (Hard Rule 1).
-- Nach der Rotation: `itm_2dda3690` archivieren, temporären Connector entfernen/regulär
-  ersetzen.
-- `phase3_edge/scripts/abnahme_run.sh` bleibt unangetastet (nicht von dieser Session verfasst);
-  der bekannte `SHAREFYX_BACKUP_DIR`-Default-Fehler (`/var/backups/sharefyx` statt
-  `/var/lib/sharefyx-backup`) besteht im Skript weiterhin, wurde per Environment-Variable
-  umgangen.
-
-**Nächster Schritt (konkret):** Nikinger rotiert alle drei Token nach README.md-Anleitung,
-aktualisiert die Connector-URLs in beiden Claude-Accounts; danach `itm_2dda3690` archivieren
-und den temporären Connector entfernen. Erst nach einem beobachteten echten Reboot wechselt
-P3 von 🟡 auf ✅.
+**Nächster Schritt (konkret):** nichts Aktives mehr für P3 — abwarten, bis ein echter Reboot
+(geplant oder Vorfall) beobachtet wird, dann Zeile 6 nachtragen und `ROADMAP.md`/Phase-Head/
+Index von 🟡 auf ✅ heben. Bis dahin bleibt P3 funktional beendet, aber nicht live-verifiziert
+im Sinne der Statusglyphen-Definition.
