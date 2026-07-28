@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "authserver"
+version = "0.1.0"
+description = "Authorization Server des Space-Servers (Phase 4) — OAuth 2.1 + DCR, ersetzt den Pfad-Token"
+requires-python = ">=3.10"
+dependencies = ["argon2-cffi==25.1.0"]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.setuptools]
+packages = ["authserver"]

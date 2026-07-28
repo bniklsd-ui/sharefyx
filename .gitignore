@@ -13,6 +13,9 @@ dist/
 *.sqlite3-wal
 *.sqlite3-shm
 
+# P4: Auth-Zustand (Clients, Codes, Token-Hashes) — autoritativ, aber nie im Repo (P4-I/V21)
+*.sqlite3
+
 # test artifacts
 .pytest_cache/
 
