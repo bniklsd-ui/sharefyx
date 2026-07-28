@@ -43,6 +43,33 @@ hier `tools.py` anfasst, ist in der falschen Phase (P4-Q).
   feingranulare Lese-Rechte, Off-site-Backup, Monitoring, `/oauth/revoke`, `/oauth/introspect`,
   Recovery-Codes für den zweiten Faktor, CIMD (Seam vorhanden, siehe Plan §2.6 `[SEAM]`).
 
+**[2026-07-28 Nachtrag, `[VERIFY]` V14 vor Step 4]:** Web-Recherche gegen die aktuelle
+Anthropic-Doku (`claude.com/docs/connectors/building/{authentication,lazy-authentication}`,
+live geprüft) bestätigt 13 von 14 Plan-Annahmen aus §0.6 wortgleich oder sinngleich — **eine
+Ausnahme:** native/Loopback-Clients (RFC 8252 §7.3) sind inzwischen ein **dokumentiertes,
+aktuelles** Anthropic-Verhalten, nicht mehr nur eine Erweiterungs-Idee. Claude Code deklariert
+laut aktueller Doku `http://127.0.0.1/callback` **und** `http://localhost/callback` in seinem
+CIMD, Port ignoriert, und Anthropic verlangt von AS-Betreibern, beide zu akzeptieren.
+
+**Nikinger-Entscheidung (2026-07-28):** trotzdem draußen lassen für Step 4 — weniger Variablen,
+die parallel getestet werden müssten. Rejection von `application_type: native` bleibt wie
+geplant (§2.6). Diese Notiz dokumentiert den **einfacheren Weg für später**, damit er bei
+Bedarf nicht neu recherchiert werden muss:
+
+1. **Redirect-Matching ist der leichte Teil**, nicht der ganze Umfang: `redirect_uri_allowed()`
+   (das `[SEAM]` aus Plan §2.6) bräuchte eine zweite Vergleichsregel für Loopback-URIs mit
+   ignoriertem Port — genau wie der Docstring dort bereits vorwegnimmt.
+2. **Der eigentliche Umfang ist CIMD, nicht DCR.** Claude Code identifiziert sich laut Doku über
+   eine CIMD-URL als `client_id`, nicht über `/oauth/register`. Das heißt: nicht nur die
+   Redirect-Prüfung lockern, sondern eine zweite Client-Identifizierungsart (CIMD-Dokument per
+   HTTP abrufen, statt DCR-Registrierungszeile aus `clients`-Tabelle lesen) zusätzlich zu DCR
+   bauen. Das ist der eigentliche Aufwand, nicht die Redirect-URI-Regel.
+3. **`client_id_metadata_document_supported` bleibt abwesend** in den AS-Metadaten (Plan §2.2),
+   bis Punkt 2 gebaut ist — die Anwesenheit dieses Felds ist laut Doku das Signal, mit dem
+   Claude auf CIMD statt DCR umschaltet.
+4. Quelle/Zeitpunkt: Agent-Recherche dieser Session, 2026-07-28, gegen die oben genannten
+   Live-Seiten — kein `[VERIFY]`-Rest, das war bereits die Verifikation.
+
 ## Harte Regeln dieser Phase (nicht verhandelbar)
 
 - **P4-A/P4-C — Eigener AS, strikte Abhängigkeitsrichtung.** `mcpserver → authserver`, niemals
