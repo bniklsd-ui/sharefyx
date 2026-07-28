@@ -54,7 +54,7 @@ def store(tmp_path):
 
 @pytest.fixture
 def app(settings, store):
-    return Starlette(routes=oauth_routes(settings, store))
+    return Starlette(routes=oauth_routes(settings, store, {}))
 
 
 @pytest.mark.asyncio

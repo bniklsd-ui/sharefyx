@@ -8,8 +8,65 @@ updated: 2026-07-28
 ---
 # Session-Archiv — Phase 4 OAuth 2.1 + DCR
 
-Newest-first. Zwei Rotationen bisher, beide 2026-07-28 (Abschluss Step 3, dann Abschluss
-Step 4) — via `scripts/rotate_session_block.sh phase4_auth`, nie von Hand.
+Newest-first. Drei Rotationen bisher, alle 2026-07-28 (Abschluss Step 3, dann Step 4, dann
+Step 5) — via `scripts/rotate_session_block.sh phase4_auth`, nie von Hand.
+
+## Session stopped — 2026-07-28 (V14 + Step 4)
+
+**Ergebnis:** `[VERIFY]` V14 abgeschlossen, Step 4 (Metadaten und dynamische Registrierung)
+abgeschlossen. `pytest -q` → **260/260 grün** (244 Vorlauf + 16 neue).
+
+**V14, vor Step 4 verlangt:** Web-Recherche gegen die aktuelle Anthropic-Connector-Doku
+bestätigte 13 von 14 Plan-Annahmen aus §0.6 wortgleich. Eine Ausnahme: native/Loopback-Clients
+(Claude Code) sind inzwischen dokumentiertes Anthropic-Verhalten, nicht mehr nur eine
+Erweiterungs-Idee — Details, Nikinger-Entscheidung (draußen lassen) und der dokumentierte
+einfachere Weg für später stehen im Scope-Abschnitt oben, nicht hier dupliziert.
+
+**Step 4:** `metadata.py`, `clients.py`, erste Hälfte `routes.py` gebaut — Details in der
+Modul-Status-Tabelle oben (Zeile 5) inkl. aller additiven Abweichungen (`DCRError`,
+`increment_register_window`, `starlette`-Deklaration, `oauth_routes()`-Signaturwachstum,
+Content-Type-vor-Bremse-Reihenfolge). Nicht dort erwähnt, weil es kein Feature-Delta ist,
+sondern ein Doku-Integritäts-Fund: **`test_authserver_does_not_import_mcpserver` existierte
+nicht**, obwohl die Harte-Regeln-Zeile P4-A/P4-C sie seit Step 1 namentlich als Beleg zitiert
+("Test: `test_authserver_does_not_import_mcpserver`"). Vier Steps lang unbelegt, jetzt in
+`test_authserver_config.py` geschlossen. Lehre: eine im Fließtext genannte Testfunktion ist erst
+ein Beleg, wenn `pytest --collect-only` sie auch findet — nicht wenn der Name plausibel klingt.
+Wer diese Tabelle künftig liest, sollte die anderen dort zitierten Testnamen bei Gelegenheit
+stichprobenartig gegen den echten Testbaum prüfen, nicht blind vertrauen.
+
+**Advisor-Reviews dieser Session (zwei, vor und nach der Implementierung):** vor dem Schreiben
+bestätigte der Advisor die fünf offenen Designfragen (DCR-Fehlercode-Trennung,
+Security-Header-Umfang, Middleware- vs. Handler-Header, `starlette`-Pin-Politik,
+`register_attempts`-Modulzugehörigkeit) und flaggte zusätzlich ein ungetestetes Risiko:
+Starlette 1.3.1 liegt weit jenseits dessen, was `phase2_mcp` bereits benutzt
+(`BaseHTTPMiddleware`, `await request.json()`, benutzerdefinierte Header auf Nicht-200-Antworten
+— keins davon im Repo vorher geprüft). Eine Wegwerf-Probe (`httpx.ASGITransport` gegen eine
+Zwei-Routen-Spielzeug-App mit Header-Middleware) lief vor jeder echten Implementierung grün —
+API-Kompatibilität war damit belegt, nicht angenommen. Nach der Implementierung fand ein zweiter
+Advisor-Durchlauf eine echte Lücke: `test_register_requires_json_content_type` allein hätte auch
+bei vertauschter Prüfreihenfolge (Bremse vor Content-Type) grün bleiben können — die
+Reihenfolge-Entscheidung war getroffen, aber nicht gepinnt. Nachgezogen:
+`test_register_rejected_content_type_does_not_consume_rate_limit`.
+
+**Design-Entscheidung, dokumentiert:** Security-Header direkt in den `routes.py`-Handlern statt
+über eine Starlette-`Middleware`. Grund: `oauth_routes()` liefert eine flache Routenliste, die
+der Wurzel-App **vorangestellt** wird (Plan §3.3), kein eigenes `Mount`/Sub-App — eine app-weite
+Middleware in der Wurzel-App träfe auch `/health` und `/mcp`, ein zweites pfadgebundenes Mounten
+sieht der Plan an dieser Stelle nicht vor. Vollständiges Set (CSP, Referrer-Policy,
+X-Content-Type-Options, X-Frame-Options, Cache-Control, ggf. HSTS) auf beiden
+Metadatendokumenten; nur `Cache-Control: no-store` auf `/oauth/register` (Plan §2.6: die
+Cache-Control-Zeile überschreibt ihren eigenen Tabellenkopf ausdrücklich mit "auf allen
+OAuth-Antworten").
+
+**Nächster Schritt (konkret):** Step 5 — Autorisierungsfluss (`authserver/{flows,templates}.py`,
+`routes.py` vervollständigt um `/oauth/authorize` und `/oauth/token`, `test_flows.py`,
+`test_routes.py`, `test_templates.py`). Plan §2.4/§5 Step 5. `oauth_routes()` bekommt dabei
+voraussichtlich den dritten Parameter `users` (siehe Abweichungsnotiz oben). Die beiden
+wichtigsten Tests des Steps laut Plan: ein Fehler vor Prüfung von `client_id`/`redirect_uri`
+darf **nie** zu einer Umleitung führen (`test_authorize_rejects_unknown_client_without_redirect`,
+`test_authorize_rejects_unregistered_redirect_uri_without_redirect`).
+
+---
 
 ## Session stopped — 2026-07-28 (Step 3)
 

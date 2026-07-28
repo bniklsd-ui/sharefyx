@@ -70,6 +70,15 @@ def test_verify_rejects_wrong_code():
     assert verify(secret, bad, now=now) is None
 
 
+def test_verify_never_raises_on_malformed_secret_or_unknown_algo():
+    """Additiv (Step 5): eine kaputte Nutzerakte (ungültiges Base32, unbekannter `totp_alg`) darf
+    beim Login nie zu einem 500 statt "Anmeldung fehlgeschlagen." führen (spiegelt
+    `passwords.verify_password`s Nie-wirft-Vertrag, `flows.submit_consent` verlässt sich darauf)."""
+    now = 1_700_000_000.0
+    assert verify("not-valid-base32-!!!", "123456", now=now) is None
+    assert verify(generate_secret(), "123456", now=now, algo="ROT13") is None
+
+
 def test_generate_secret_has_no_padding_and_is_base32():
     secret = generate_secret()
     assert "=" not in secret

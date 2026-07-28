@@ -102,6 +102,7 @@ Bedarf nicht neu recherchiert werden muss:
 | 3 | `authserver/{passwords,totp,users}.py`, `scripts/{provision_user,export_auth_users}.py` | 2 | ✅ | 37 (6 `test_passwords.py` + 21 `test_totp.py` + 10 `test_users.py`) |
 | 4 | `authserver/{store,ratelimit}.py` | 3 | ✅ | 19 (14 `test_authserver_store.py` + 5 `test_ratelimit.py`) |
 | 5 | `authserver/{metadata,clients}.py`, erste Hälfte `routes.py` | 4 | ✅ | 16 (7 `test_metadata.py` + 8 `test_clients.py` + 1 neu in `test_authserver_config.py`) |
+| 6 | `authserver/{flows,templates}.py`, `routes.py` vervollständigt (`/oauth/authorize`, `/oauth/token`) | 5 | ✅ | 36 (22 `test_flows.py` + 9 `test_routes.py` + 4 `test_templates.py` + 1 neu in `test_totp.py`) |
 
 **Zeile 1, Step 0:** kritischer Fund — ein nie widerrufener Keyring-Token für einen dritten,
 seit P2-B2 umbenannten Space (`nikinger`), live und schreibfähig. Details, Zeitachse und
@@ -200,6 +201,60 @@ vorangestellt, kein eigenes `Mount`, eine app-weite Middleware träfe auch `/hea
   falsch typisierte Anfrage verbraucht kein Kontingent. Bewusst, gegen einen Selbstläufer-Fehler
   gepinnt (`test_register_rejected_content_type_does_not_consume_rate_limit`).
 
+**Zeile 6, Step 5:** `flows.py` (neu, bewusst frei von jedem HTTP-Framework-Import — `start_
+authorize`/`submit_consent`/`issue_token` geben kleine eingefrorene Ergebnis-Typen zurück,
+`routes.py` übersetzt sie; sonst wäre der Fluss nur über HTTP testbar, siehe Modul-Docstring),
+`templates.py` (neu, Wegwerf-UI), `routes.py` vervollständigt um `GET`/`POST /oauth/authorize`
+und `POST /oauth/token`. `pytest -q` → **296/296 grün** (260 Vorlauf + 36 neue). SQL-Containment-
+und `redirect_uri_allowed`-Containment-Greps weiterhin sauber (Belege im Session-Block unten).
+
+**Additive Änderungen außerhalb der Step-5-Dateiliste:**
+- `store.py :: now()` — exponiert die injizierte `now_fn` des Stores, damit `ratelimit.
+  LoginThrottle` und `totp.verify()` in `flows.py` **dieselbe** Uhr benutzen statt eine zweite zu
+  injizieren (Advisor-Fund: ein eingefrorener Test-Clock im Store, aber echte Zeit anderswo,
+  wäre ein stiller Drift-Herd). `oauth_routes()` baut `LoginThrottle(auth_store, now_fn=auth_
+  store.now)` intern selbst — Plan §3.3 ankert weiterhin genau drei Parameter für Step 6
+  (`auth_settings, auth_store, users`), eine vierte `now_fn` wäre unnötig gewesen.
+- `store.py :: get_totp_counter()`/`set_totp_counter()` — die Tabelle `totp_replay` existiert
+  seit Step 3, aber ohne Zugriffsmethode (gleiches additives Muster wie `increment_register_
+  window` in Step 4). Zähler wird **nur** nach vollständigem Erfolg (Passwort UND TOTP)
+  hochgesetzt, nicht schon bei richtigem TOTP mit falschem Passwort — sonst könnte, wer einen
+  TOTP-Code beobachtet (z. B. über die Schulter), das aktuelle Zeitfenster des echten Nutzers
+  verbrennen, ohne selbst das Passwort zu kennen.
+- `totp.py :: verify()` gehärtet (Step 2 baute die Funktion, Step 5 fand die Lücke): ein
+  unbekannter `totp_alg` oder ein nicht valides Base32-`secret` aus einer kaputten Nutzerakte
+  warfen zuvor einen unbehandelten `ValueError` statt `None` zurückzugeben — ein 500 statt
+  "Anmeldung fehlgeschlagen." Jetzt spiegelt `verify()` `passwords.verify_password`s
+  Nie-wirft-Vertrag. Test: `test_verify_never_raises_on_malformed_secret_or_unknown_algo`
+  (`test_totp.py`).
+- `oauth_routes()` — dritter Parameter `users` jetzt gebaut (Plan §3.3 ankerte ihn bereits für
+  Step 6, siehe Abweichungsnotiz Step 4 oben), ohne Default — die beiden bestehenden Fixtures in
+  `test_clients.py`/`test_metadata.py` (`Starlette(routes=oauth_routes(settings, store))`)
+  entsprechend auf `oauth_routes(settings, store, {})` erweitert.
+- `_security_headers()`/`_token_headers()` getrennt: `Pragma: no-cache` steht in Plan §2.4 nur
+  beim Token-Endpunkt, nicht in der allgemeinen Header-Tabelle §2.6 — ein gemeinsames Set hätte
+  den Header auf die Metadatendokumente und das Consent-Formular mitgeschleift, wo er nicht
+  gefordert ist.
+- `RedirectError` trägt zusätzlich `error_description` (Plan §2.4: "Ab jetzt gehen Fehler als
+  Redirect mit `error`, `error_description`, `state` und `iss` zurück" — im ersten Entwurf
+  übersehen, im Advisor-Review dieser Session gefunden). Feste, statische Texte je Fehlercode
+  (`flows.py :: _ERROR_DESCRIPTIONS`), keine Unterscheidung nach Ursache innerhalb eines Codes.
+- `redirect_uri_allowed()` wird jetzt auch aus `start_authorize()` aufgerufen, nicht nur aus
+  `register_client()` (Plan §2.6: "Sie wird von `/oauth/register` **und** von `/oauth/authorize`
+  aufgerufen" — im ersten Entwurf ebenfalls übersehen, gleicher Advisor-Fund). Verteidigung in
+  der Tiefe: eine später verschärfte Allowlist muss auch längst registrierte Redirects neu
+  bewerten, nicht nur neue Registrierungen ablehnen.
+- POST-`/oauth/authorize`-Fehlschläge (falsches Passwort/TOTP, gesperrtes Konto, abgelaufene/
+  verbrauchte `AuthRequest`) rendern eine **Fehlerseite**, kein erneutes Formular — nur
+  `action == "deny"` erzeugt einen Redirect (`access_denied`). Das ist Plan-Wortlaut (§2.4:
+  "Fehlerseite", nicht "Formular erneut"), hier ausdrücklich benannt, weil es von der
+  intuitiveren "bei Fehlschlag Formular mit Meldung erneut zeigen" abweicht.
+- Enumerationsschutz: für einen unbekannten Space läuft ein echter Argon2id-Verify gegen
+  `passwords.DUMMY_HASH`, aber **kein** `totp.verify()`-Aufruf — Argon2id bei `t=8` (~55 ms)
+  dominiert die TOTP-HMAC-Prüfung um Größenordnungen, das Weglassen ist deshalb kein
+  Timing-Orakel (Advisor-Review, durch `test_wrong_password_and_unknown_space_give_identical_
+  response` mit Aufruf-Zähler statt Wanduhr-Messung belegt).
+
 ## Geerbte Contracts
 
 Aus P2 (`phase2_mcp/CLAUDE.md`, `docs/concepts/phase2_mcp_plan.md` §2/§3): sechs Tools,
@@ -210,57 +265,73 @@ P4 ändert `asgi.py`/`context.py` (P4-Q), fasst `tools.py`/`permissions.py`/`aut
 
 ---
 
-## Session stopped — 2026-07-28 (V14 + Step 4)
+## Session stopped — 2026-07-28 (Step 5)
 
-**Ergebnis:** `[VERIFY]` V14 abgeschlossen, Step 4 (Metadaten und dynamische Registrierung)
-abgeschlossen. `pytest -q` → **260/260 grün** (244 Vorlauf + 16 neue).
+**Ergebnis:** Step 5 (Autorisierungsfluss) abgeschlossen. `pytest -q` → **296/296 grün** (260
+Vorlauf + 36 neue: 22 `test_flows.py` + 9 `test_routes.py` + 4 `test_templates.py` + 1 neu in
+`test_totp.py`).
 
-**V14, vor Step 4 verlangt:** Web-Recherche gegen die aktuelle Anthropic-Connector-Doku
-bestätigte 13 von 14 Plan-Annahmen aus §0.6 wortgleich. Eine Ausnahme: native/Loopback-Clients
-(Claude Code) sind inzwischen dokumentiertes Anthropic-Verhalten, nicht mehr nur eine
-Erweiterungs-Idee — Details, Nikinger-Entscheidung (draußen lassen) und der dokumentierte
-einfachere Weg für später stehen im Scope-Abschnitt oben, nicht hier dupliziert.
+**Gebaut:** `flows.py` (`start_authorize`, `submit_consent`, `issue_token` — frei von jedem
+HTTP-Framework-Import, kleine eingefrorene Ergebnis-Typen statt Starlette-`Response`),
+`templates.py` (Wegwerf-UI, kein JS/CSS-Build/Cookie), `routes.py` vervollständigt um
+`GET`/`POST /oauth/authorize` und `POST /oauth/token`. Details + alle additiven Abweichungen
+(`store.now()`, `get_totp_counter`/`set_totp_counter`, `totp.verify()`-Härtung, `oauth_routes()`-
+dritter-Parameter, `_token_headers()`, `error_description`, `redirect_uri_allowed()` jetzt auch
+in `start_authorize`, POST-Fehlerseite statt erneutem Formular, Enumerationsschutz-Timing-
+Begründung) in der Modul-Status-Tabelle oben (Zeile 6), nicht hier dupliziert.
 
-**Step 4:** `metadata.py`, `clients.py`, erste Hälfte `routes.py` gebaut — Details in der
-Modul-Status-Tabelle oben (Zeile 5) inkl. aller additiven Abweichungen (`DCRError`,
-`increment_register_window`, `starlette`-Deklaration, `oauth_routes()`-Signaturwachstum,
-Content-Type-vor-Bremse-Reihenfolge). Nicht dort erwähnt, weil es kein Feature-Delta ist,
-sondern ein Doku-Integritäts-Fund: **`test_authserver_does_not_import_mcpserver` existierte
-nicht**, obwohl die Harte-Regeln-Zeile P4-A/P4-C sie seit Step 1 namentlich als Beleg zitiert
-("Test: `test_authserver_does_not_import_mcpserver`"). Vier Steps lang unbelegt, jetzt in
-`test_authserver_config.py` geschlossen. Lehre: eine im Fließtext genannte Testfunktion ist erst
-ein Beleg, wenn `pytest --collect-only` sie auch findet — nicht wenn der Name plausibel klingt.
-Wer diese Tabelle künftig liest, sollte die anderen dort zitierten Testnamen bei Gelegenheit
-stichprobenartig gegen den echten Testbaum prüfen, nicht blind vertrauen.
+**Zwei Advisor-Durchläufe (vor und nach der Implementierung), beide fündig:**
 
-**Advisor-Reviews dieser Session (zwei, vor und nach der Implementierung):** vor dem Schreiben
-bestätigte der Advisor die fünf offenen Designfragen (DCR-Fehlercode-Trennung,
-Security-Header-Umfang, Middleware- vs. Handler-Header, `starlette`-Pin-Politik,
-`register_attempts`-Modulzugehörigkeit) und flaggte zusätzlich ein ungetestetes Risiko:
-Starlette 1.3.1 liegt weit jenseits dessen, was `phase2_mcp` bereits benutzt
-(`BaseHTTPMiddleware`, `await request.json()`, benutzerdefinierte Header auf Nicht-200-Antworten
-— keins davon im Repo vorher geprüft). Eine Wegwerf-Probe (`httpx.ASGITransport` gegen eine
-Zwei-Routen-Spielzeug-App mit Header-Middleware) lief vor jeder echten Implementierung grün —
-API-Kompatibilität war damit belegt, nicht angenommen. Nach der Implementierung fand ein zweiter
-Advisor-Durchlauf eine echte Lücke: `test_register_requires_json_content_type` allein hätte auch
-bei vertauschter Prüfreihenfolge (Bremse vor Content-Type) grün bleiben können — die
-Reihenfolge-Entscheidung war getroffen, aber nicht gepinnt. Nachgezogen:
-`test_register_rejected_content_type_does_not_consume_rate_limit`.
+*Vor der Implementierung* bestätigte der Advisor den Grundriss (kleine Ergebnis-Typen statt
+Starlette-Responses in `flows.py`) und benannte drei Lücken gegenüber der reinen Dateiliste, die
+alle blockierend waren: fehlende `totp_replay`-Zugriffsmethoden im Store, der noch nicht
+gebaute dritte `oauth_routes()`-Parameter (inkl. der beiden bestehenden Fixtures, die dadurch
+brechen würden), und das fehlende `Pragma: no-cache` auf der Token-Antwort. Außerdem die
+Timing-Analyse zum Enumerationsschutz (Argon2id dominiert TOTP, das Weglassen von `totp.verify()`
+für einen unbekannten Space ist deshalb kein Orakel) und der Hinweis, den TOTP-Zähler erst nach
+vollständigem Erfolg hochzusetzen, nicht schon bei richtigem TOTP mit falschem Passwort.
 
-**Design-Entscheidung, dokumentiert:** Security-Header direkt in den `routes.py`-Handlern statt
-über eine Starlette-`Middleware`. Grund: `oauth_routes()` liefert eine flache Routenliste, die
-der Wurzel-App **vorangestellt** wird (Plan §3.3), kein eigenes `Mount`/Sub-App — eine app-weite
-Middleware in der Wurzel-App träfe auch `/health` und `/mcp`, ein zweites pfadgebundenes Mounten
-sieht der Plan an dieser Stelle nicht vor. Vollständiges Set (CSP, Referrer-Policy,
-X-Content-Type-Options, X-Frame-Options, Cache-Control, ggf. HSTS) auf beiden
-Metadatendokumenten; nur `Cache-Control: no-store` auf `/oauth/register` (Plan §2.6: die
-Cache-Control-Zeile überschreibt ihren eigenen Tabellenkopf ausdrücklich mit "auf allen
-OAuth-Antworten").
+*Nach der Implementierung* fand ein zweiter Durchlauf vier weitere Lücken, obwohl alle 20 im
+Plan benannten Tests bereits grün liefen — die Prüfung war "alle benannten Tests bestehen",
+nicht "jeder Fehlerpfad aus §2.4 hat genau einen Test" (das eigentliche Plan-Done-when):
 
-**Nächster Schritt (konkret):** Step 5 — Autorisierungsfluss (`authserver/{flows,templates}.py`,
-`routes.py` vervollständigt um `/oauth/authorize` und `/oauth/token`, `test_flows.py`,
-`test_routes.py`, `test_templates.py`). Plan §2.4/§5 Step 5. `oauth_routes()` bekommt dabei
-voraussichtlich den dritten Parameter `users` (siehe Abweichungsnotiz oben). Die beiden
-wichtigsten Tests des Steps laut Plan: ein Fehler vor Prüfung von `client_id`/`redirect_uri`
-darf **nie** zu einer Umleitung führen (`test_authorize_rejects_unknown_client_without_redirect`,
-`test_authorize_rejects_unregistered_redirect_uri_without_redirect`).
+1. **Ein Test war grün aus dem falschen Grund.** `test_all_token_errors_use_invalid_grant` baute
+   drei Codes vorab in einer Liste, die Uhr rückte dabei kumulativ vor — der zweite Code traf
+   exakt auf seine eigene `expires_at`-Grenze (`code_ttl_s=60`, Uhr bei Verwendung genau +60s
+   seit Ausstellung) und schlug über "abgelaufen" fehl, nicht über den geprüften Client-ID-
+   Mismatch. Behoben: jeder Fall stellt seinen Code unmittelbar vor seinem eigenen
+   `pytest.raises`-Block aus, nicht vorab. Dieselbe Reihenfolge-Lehre wie Step 4
+   (`test_register_requires_json_content_type`), jetzt zum zweiten Mal real eingetreten.
+2. **Kein Test für TOTP-Replay** — der Fehlerpfad aus Plan §2.4 POST-Schritt 6 hatte keine
+   Abdeckung, und die neuen Store-Methoden `get_totp_counter`/`set_totp_counter` liefen nur in
+   der Richtung, die den Schutz umgeht (`_issue_code` rückt die Uhr bewusst vor, damit
+   aufeinanderfolgende Logins in einem Test nicht kollidieren). Nachgezogen:
+   `test_totp_replay_is_rejected_without_burning_the_stored_counter`.
+3. **Kein `invalid_scope`-Test** — Plan §2.4 GET-Schritt 3 nennt ihn, `start_authorize`
+   implementiert ihn, nichts prüfte ihn. Nachgezogen:
+   `test_authorize_rejects_scope_outside_allowlist`.
+4. Zwei günstige Ergänzungen ebenfalls nachgezogen: `iss` auf dem Erfolgs-Redirect war nur beim
+   Fehlerfall geprüft (`test_authorize_success_redirect_carries_iss`), und die neue
+   Nie-wirft-Härtung von `totp.verify()` selbst hatte keinen Test
+   (`test_verify_never_raises_on_malformed_secret_or_unknown_algo` in `test_totp.py`).
+
+**Lehre für künftige Steps:** "alle im Plan benannten Tests sind grün" ist eine schwächere Prüfung
+als "jeder Fehlerpfad hat genau einen Test" — ein Test kann aus einem anderen als dem
+beabsichtigten Grund grün sein (Fund 1), oder ein im Plan nur in Prosa erwähnter Fehlerpfad kann
+ganz ohne Test bleiben (Funde 2–3), ohne dass die benannte Testliste das anzeigt.
+
+**Root-`CLAUDE.md`-Drift geschlossen:** die letzte Aktualisierung dort (Commit `766bf53`) blieb
+bei Step 1 stehen — Step 2, Step 3 und Step 4 hatten das „Current state"-Kapitel nicht
+nachgezogen, drei Steps stumm stale (dieselbe Kategorie Fund wie die Korrektur in `766bf53`
+selbst). In diesem Commit mitgezogen, siehe dortige datierte Korrekturnotiz.
+
+**Nächster Schritt (konkret):** Step 6 — Anbindung an den Resource Server (`mcpserver/asgi.py`,
+`mcpserver/context.py`, `mcpserver/app.py`, Plan §3/§5 Step 6). `oauth_routes()` trägt bereits
+den vollen Drei-Parameter-Anker (`auth_settings, auth_store, users`) — Step 6 muss ihn nur noch
+aus `create_app()` heraus mit echten `load_users()`-Daten aufrufen, nichts an der Signatur ändern.
+`AuthModeASGI` ersetzt `TokenPathASGI` unter `Mount("/mcp", ...)`; `assert_principal_matches_
+request()` bekommt den `Authorization`-Header-Vergleich zusätzlich zum bestehenden Pfadsegment-
+Vergleich (P4-Q: `mcpserver/context.py`/`app.py`/`asgi.py` gehören zur erlaubten
+Berührungsfläche, `tools.py`/`permissions.py`/`auth.py` nicht). Das ist der Step, der den
+Plan-Umbau erstmals gegen den echten `mcpserver` verdrahtet — bisher lief alles ausschließlich
+innerhalb von `authserver`.

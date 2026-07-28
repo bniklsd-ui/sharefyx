@@ -155,6 +155,13 @@ class AuthStore:
                 (SCHEMA_VERSION,),
             )
 
+    def now(self) -> datetime:
+        """Additiv (Step 5): exponiert die injizierte Uhr für Aufrufer, die dieselbe Uhr wie
+        der Store brauchen (`ratelimit.LoginThrottle`, `totp.verify` in `flows.py`) statt eine
+        zweite, potenziell abweichende `now_fn` zu injizieren (Advisor-Fund dieser Session:
+        "ein Clock, nicht zwei" — sonst driftet ein eingefrorener Test-Clock gegen echte Zeit)."""
+        return self._now_fn()
+
     @contextmanager
     def _transaction(self):
         with self._lock:
@@ -507,6 +514,26 @@ class AuthStore:
     def clear_login_attempt(self, space: str) -> None:
         with self._lock:
             self._conn.execute("DELETE FROM login_attempts WHERE space = ?", (space,))
+
+    # -- TOTP-Replay-Zähler (für flows.py — kein SQL dort) -----------------------------
+
+    def get_totp_counter(self, space: str) -> int | None:
+        """Additiv (Step 5), nicht in der Plan-"fix"-Liste — die Tabelle `totp_replay` existiert
+        seit Step 3, aber ohne Zugriffsmethode (gleiches Muster wie `increment_register_window`
+        in Step 4)."""
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT last_counter FROM totp_replay WHERE space = ?", (space,)
+            ).fetchone()
+        return row["last_counter"] if row is not None else None
+
+    def set_totp_counter(self, space: str, counter: int) -> None:
+        with self._lock:
+            self._conn.execute(
+                "INSERT INTO totp_replay (space, last_counter) VALUES (?, ?) "
+                "ON CONFLICT(space) DO UPDATE SET last_counter = excluded.last_counter",
+                (space, counter),
+            )
 
     # -- Registrierungsbremse (für clients.py — kein SQL dort) -------------------------
 

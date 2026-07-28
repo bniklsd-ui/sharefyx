@@ -1,6 +1,7 @@
 """Starlette-Routen des Authorization Servers, dünn: parsen, Modullogik aufrufen, antworten
 (Plan §5 Step 4/5 — Step 4 baut Metadaten + Registrierung, Step 5 ergänzt `/oauth/authorize`
-und `/oauth/token`). Kein SQL, keine Zustandslogik hier — beides lebt in `store.py`/`clients.py`.
+und `/oauth/token`). Kein SQL, keine Zustandslogik hier — beides lebt in `store.py`/`clients.py`/
+`flows.py`.
 
 `oauth_routes()` ist der Anker für Step 6 (`mcpserver/app.py`, Plan §3.3): die zurückgegebene
 Routenliste wird der Wurzel-App **vorangestellt**, kein eigenes `Mount`/Sub-App. Deshalb tragen
@@ -10,14 +11,19 @@ pfadgebundenes Mounten sieht Plan §3.3 nicht vor ("vorangestellt", nicht `Mount
 """
 from __future__ import annotations
 
+from collections.abc import Mapping
+from urllib.parse import urlencode
+
 from starlette.requests import Request
-from starlette.responses import JSONResponse
+from starlette.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 from starlette.routing import Route
 
+from . import flows, templates
 from .clients import check_register_rate_limit, register_client
 from .config import AuthSettings
-from .errors import DCRError
+from .errors import DCRError, OAuthError
 from .metadata import authorization_server_metadata, protected_resource_metadata
+from .ratelimit import LoginThrottle
 from .store import AuthStore
 
 
@@ -38,13 +44,27 @@ def _security_headers(settings: AuthSettings) -> dict[str, str]:
     return headers
 
 
+def _token_headers(settings: AuthSettings) -> dict[str, str]:
+    """Additiv (Step 5): `Pragma: no-cache` steht in Plan §2.4 nur beim Token-Endpunkt, nicht in
+    der allgemeinen Header-Tabelle §2.6 — deshalb kein Teil von `_security_headers()`."""
+    return {**_security_headers(settings), "Pragma": "no-cache"}
+
+
 def _dcr_error_response(exc: DCRError) -> JSONResponse:
     return JSONResponse(
         {"error": exc.code}, status_code=400, headers={"Cache-Control": "no-store"}
     )
 
 
-def oauth_routes(auth_settings: AuthSettings, auth_store: AuthStore) -> list[Route]:
+def oauth_routes(
+    auth_settings: AuthSettings,
+    auth_store: AuthStore,
+    users: Mapping[str, Mapping[str, str]],
+) -> list[Route]:
+    # Dieselbe Uhr wie `auth_store` (Advisor-Fund: "ein Clock, nicht zwei") — `AuthStore.now()`
+    # exponiert genau dafür die injizierte `now_fn` des Stores, statt eine zweite anzulegen.
+    throttle = LoginThrottle(auth_store, now_fn=auth_store.now)
+
     async def _prm(request: Request) -> JSONResponse:
         return JSONResponse(
             protected_resource_metadata(auth_settings), headers=_security_headers(auth_settings)
@@ -98,9 +118,90 @@ def oauth_routes(auth_settings: AuthSettings, auth_store: AuthStore) -> list[Rou
             headers={"Cache-Control": "no-store"},
         )
 
+    def _authorize_response(result: flows.AuthorizeResult) -> Response:
+        headers = _security_headers(auth_settings)
+        if isinstance(result, flows.ErrorPage):
+            return HTMLResponse(
+                templates.render_error_page(result.message), status_code=400, headers=headers
+            )
+        if isinstance(result, flows.RenderForm):
+            return HTMLResponse(templates.render_login_form(result.request_id), headers=headers)
+
+        params: dict[str, str] = {"state": result.state, "iss": result.iss}
+        if isinstance(result, flows.RedirectSuccess):
+            params["code"] = result.code
+        else:
+            params["error"] = result.error
+            params["error_description"] = result.error_description
+        query = urlencode({k: v for k, v in params.items() if v is not None})
+        return RedirectResponse(f"{result.redirect_uri}?{query}", status_code=302, headers=headers)
+
+    async def _authorize_get(request: Request) -> Response:
+        q = request.query_params
+        result = flows.start_authorize(
+            store=auth_store,
+            settings=auth_settings,
+            client_id=q.get("client_id", ""),
+            redirect_uri=q.get("redirect_uri", ""),
+            response_type=q.get("response_type", ""),
+            state=q.get("state"),
+            code_challenge=q.get("code_challenge", ""),
+            code_challenge_method=q.get("code_challenge_method", ""),
+            scope=q.get("scope"),
+            resource=q.get("resource"),
+        )
+        return _authorize_response(result)
+
+    async def _authorize_post(request: Request) -> Response:
+        form = await request.form()
+        result = flows.submit_consent(
+            store=auth_store,
+            settings=auth_settings,
+            users=users,
+            throttle=throttle,
+            now_fn=auth_store.now,
+            request_id=form.get("request_id", ""),
+            space=form.get("space", ""),
+            password=form.get("password", ""),
+            totp_code=form.get("totp", ""),
+            action=form.get("action", ""),
+        )
+        return _authorize_response(result)
+
+    async def _token(request: Request) -> Response:
+        form = await request.form()
+        try:
+            result = flows.issue_token(
+                store=auth_store,
+                settings=auth_settings,
+                grant_type=form.get("grant_type"),
+                code=form.get("code"),
+                redirect_uri=form.get("redirect_uri"),
+                client_id=form.get("client_id"),
+                code_verifier=form.get("code_verifier"),
+                refresh_token=form.get("refresh_token"),
+            )
+        except OAuthError as exc:
+            return JSONResponse(
+                {"error": exc.code}, status_code=400, headers=_token_headers(auth_settings)
+            )
+        return JSONResponse(
+            {
+                "access_token": result.access_token,
+                "token_type": "Bearer",
+                "expires_in": result.expires_in,
+                "refresh_token": result.refresh_token,
+                "scope": result.scope,
+            },
+            headers=_token_headers(auth_settings),
+        )
+
     return [
         Route("/.well-known/oauth-protected-resource", _prm, methods=["GET"]),
         Route("/.well-known/oauth-protected-resource/mcp", _prm, methods=["GET"]),
         Route("/.well-known/oauth-authorization-server", _as_metadata, methods=["GET"]),
         Route("/oauth/register", _register, methods=["POST"]),
+        Route("/oauth/authorize", _authorize_get, methods=["GET"]),
+        Route("/oauth/authorize", _authorize_post, methods=["POST"]),
+        Route("/oauth/token", _token, methods=["POST"]),
     ]

@@ -54,13 +54,22 @@ def verify(
 ) -> int | None:
     """Prüft `code` gegen die Zähler `[now/step - window, now/step + window]`. Zähler
     `<= last_counter` werden übersprungen (Replay). Gibt den akzeptierten Zähler zurück, sonst
-    `None` — nie eine Ausnahme bei einem falschen Code.
-    """
+    `None` — nie eine Ausnahme bei einem falschen Code, **auch nicht bei einer kaputten
+    Nutzerakte** (Step 5: `algo` unbekannt oder `secret` kein valides Base32 wären sonst ein
+    unbehandelter `ValueError` aus `totp_at`/`b32decode` — 500 statt "Anmeldung fehlgeschlagen.",
+    spiegelt `passwords.verify_password`s Nie-wirft-Vertrag)."""
+    if algo not in _ALGOS:
+        return None
+    try:
+        padded = secret + "=" * (-len(secret) % 8)
+        key = base64.b32decode(padded, casefold=True)
+    except ValueError:
+        return None
     current = int(now // step_s)
     for counter in range(current - window, current + window + 1):
         if last_counter is not None and counter <= last_counter:
             continue
-        candidate = totp_at(secret, counter, digits=digits, algo=algo)
+        candidate = _hotp(key, counter, digits=digits, algo=_ALGOS[algo])
         if hmac.compare_digest(candidate, code):
             return counter
     return None
