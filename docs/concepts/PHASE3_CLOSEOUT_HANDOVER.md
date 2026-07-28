@@ -125,15 +125,12 @@ widerrufen (`issue_token.py --revoke nikinger`, 2026-07-28) — `export_space_ma
 wieder genau zwei Spaces. **Fund 1 dieser Tabelle wird nicht rückwirkend korrigiert** (📕-Snapshot-
 Konvention) — dieser Nachtrag ist die richtige Zahl.
 
-**Wichtig, offen:** der Keyring-Widerruf ist noch **nicht** im laufenden Dienst wirksam.
-`sharefyx-mcp.service` liest die Space-Map nicht live aus dem Keyring, sondern aus der
-exportierten, verschlüsselten Datei (`LoadCredentialEncrypted`, geladen beim Start —
-`spaces.cred` und `ActiveEnterTimestamp` liegen beide auf 2026-07-28 05:51, also vor diesem
-Widerruf). **Der `nikinger`-Token authentifiziert über den öffentlichen Funnel-Endpunkt aktuell
-weiterhin.** Fehlende Schritte aus dem README-Runbook „Rotation im Dienstbetrieb": Export
-(`export_space_map.py \| sudo systemd-creds encrypt --name=spaces - /etc/sharefyx/spaces.cred`)
-und `sudo systemctl restart sharefyx-mcp` — beides mit `sudo` und kurzer Downtime für beide
-Accounts, deshalb bewusst nicht von Claude Code ausgeführt (wie in P3 bereits gehandhabt).
+**Nachtrag 2, live geschlossen (2026-07-28 14:12):** der Nikinger hat Export + `sudo systemctl
+restart sharefyx-mcp` gefahren. `spaces.cred`-mtime und `ActiveEnterTimestamp` liegen beide auf
+14:12:49, nach dem Widerruf; `diagnose.sh` komplett grün (Funnel + öffentliches `/health`, 0
+401er in der letzten Stunde); `export_space_map.py` bestätigt danach erneut genau zwei Spaces.
+Der `nikinger`-Token ist damit **auch im laufenden Dienst tot**, nicht nur im Keyring. Fund
+vollständig geschlossen.
 
 **Methode für die restliche Suche** — nicht alles lesen, sondern gezielt greppen:
 

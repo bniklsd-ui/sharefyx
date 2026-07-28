@@ -140,12 +140,10 @@ Phase-Head: noch nicht angelegt (Step 1).
 **[2026-07-28, P4 Step 0]:** Step 0 (Haushalt, Drift, geerbte Abnahme) ist durchgelaufen.
 Kritischer Fund dabei: ein nie widerrufener Keyring-Token für einen dritten, seit P2-B2
 umbenannten Space (`nikinger`) — live und schreibfähig, aber ohne zugehöriges Verzeichnis unter
-`DATA_ROOT`. Nikinger-Entscheidung: widerrufen, im Keyring ausgeführt. **Im laufenden Dienst
-noch nicht wirksam** — `sharefyx-mcp.service` liest die Space-Map aus der exportierten
-`LoadCredentialEncrypted`-Datei, geladen beim letzten Start (2026-07-28 05:51, vor dem
-Widerruf); der Token authentifiziert über den öffentlichen Funnel-Endpunkt weiterhin, bis
-Export + `sudo systemctl restart sharefyx-mcp` nachgezogen sind (Nikinger-Aktion, README-Runbook
-„Rotation im Dienstbetrieb"). Details: `docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md` §5 Nachtrag.
+`DATA_ROOT`. Nikinger-Entscheidung: widerrufen (Keyring), Export + `sudo systemctl restart
+sharefyx-mcp` nachgezogen (2026-07-28 14:12) — live gegen `diagnose.sh` und
+`export_space_map.py` bestätigt, Token auch im laufenden Dienst tot. Details:
+`docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md` §5 Nachtrag.
 
 **Phase 3 — Exposure & Betrieb** (`phase3_edge/`, kein eigenes Python-Paket — Servercode bleibt
 in `mcpserver`): 🟡 **code-complete, nicht live-bewiesen** — 10 von 13 Abnahmezeilen live
