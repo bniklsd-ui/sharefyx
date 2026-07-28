@@ -332,6 +332,11 @@ aus `create_app()` heraus mit echten `load_users()`-Daten aufrufen, nichts an de
 `AuthModeASGI` ersetzt `TokenPathASGI` unter `Mount("/mcp", ...)`; `assert_principal_matches_
 request()` bekommt den `Authorization`-Header-Vergleich zusätzlich zum bestehenden Pfadsegment-
 Vergleich (P4-Q: `mcpserver/context.py`/`app.py`/`asgi.py` gehören zur erlaubten
-Berührungsfläche, `tools.py`/`permissions.py`/`auth.py` nicht). Das ist der Step, der den
-Plan-Umbau erstmals gegen den echten `mcpserver` verdrahtet — bisher lief alles ausschließlich
-innerhalb von `authserver`.
+Berührungsfläche, `tools.py`/`permissions.py`/`auth.py` nicht). Plan §3.3 pinnt zusätzlich die
+Form der `create_app()`-Erweiterung selbst: genau **ein** optionaler Parameter `oauth=None` —
+fehlt er, verhält sich `create_app` exakt wie in P3, damit die bestehenden `test_app.py`-Tests
+unverändert gültig bleiben (Bedingung dafür, dass ein Testfehler in P4 auch nachweisbar aus P4
+stammt, nicht aus einer stillen Signaturverschiebung). Nicht drei separate Parameter
+(`auth_settings`/`auth_store`/`users`) einzeln in `create_app` durchreichen. Das ist der Step,
+der den Plan-Umbau erstmals gegen den echten `mcpserver` verdrahtet — bisher lief alles
+ausschließlich innerhalb von `authserver`.
