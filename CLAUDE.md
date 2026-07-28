@@ -7,8 +7,8 @@ up: docs/INDEX.md
 down:
   - ROADMAP.md                          # Phasenplan + Status je Phase
   - docs/INDEX.md                       # L0-Karte aller .md
-  - phase3_edge/CLAUDE.md               # aktive Phase
-updated: 2026-07-27
+  - docs/concepts/phase4_auth_plan.md   # aktive Phase, Plan (Phase-Head existiert erst ab Step 1)
+updated: 2026-07-28
 ---
 # CLAUDE.md — Project Instructions
 
@@ -130,12 +130,28 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 
 ## Current state
 
-**Aktive Phase:** Phase 3 — Exposure & Betrieb (`phase3_edge/`, kein eigenes Python-Paket —
-Servercode bleibt in `mcpserver`). Mission: der Connector steht in beiden Claude-Accounts und
-bleibt stehen — Tailscale Funnel, systemd-Unit, `/health`, strukturiertes Request-Log,
-Backup/Restore. Plan: `docs/concepts/phase3_edge_plan.md` (Entscheidungen P3-A–P3-N gelockt,
-Steps 0–7, ausführungsreif). Herkunft/offene Entscheidungen:
-`docs/concepts/PHASE2_CLOSEOUT_HANDOVER.md`. Phase-Head: `phase3_edge/CLAUDE.md`.
+**Aktive Phase:** Phase 4 — OAuth 2.1 + DCR (`phase4_auth/`, Paket `authserver`, existiert ab
+Step 1). Mission: der Pfad-Token verschwindet, ein eigener Authorization Server ersetzt ihn
+(DCR, PKCE, Argon2id + TOTP). Plan: `docs/concepts/phase4_auth_plan.md` (Entscheidungen
+P4-A–P4-R gelockt, Steps 0–7, ausführungsreif — geschrieben ohne frischen Repo-Zugriff, siehe
+Plan-Kopf). Herkunft/offene Entscheidungen: `docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md`.
+Phase-Head: noch nicht angelegt (Step 1).
+
+**[2026-07-28, P4 Step 0]:** Step 0 (Haushalt, Drift, geerbte Abnahme) ist durchgelaufen.
+Kritischer Fund dabei: ein nie widerrufener Keyring-Token für einen dritten, seit P2-B2
+umbenannten Space (`nikinger`) — live und schreibfähig, aber ohne zugehöriges Verzeichnis unter
+`DATA_ROOT`. Nikinger-Entscheidung: widerrufen, ausgeführt. Details:
+`docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md` §5 Nachtrag.
+
+**Phase 3 — Exposure & Betrieb** (`phase3_edge/`, kein eigenes Python-Paket — Servercode bleibt
+in `mcpserver`): 🟡 **code-complete, nicht live-bewiesen** — 10 von 13 Abnahmezeilen live
+bestanden (Details: `docs/concepts/P3_ABNAHME_2026-07-27.md`). Zeilen 6 (Reboot), 12
+(Backup-Timer-Lauf) und 13 (Restore-Nachweis) sind laut Nikinger-Entscheidung an P4 vererbt,
+nicht vergessen — Zeile 12 ist inzwischen (P4 Step 0) durch einen realen Timer-Lauf erfüllt,
+Zeile 13 bewusst noch nicht nachgeholt (braucht ein frisches Bundle, siehe P4 Step 0). ✅ erst
+nach einem beobachteten echten Reboot. Formaler Abschluss-Handover an P4:
+`docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md`. Plan: `docs/concepts/phase3_edge_plan.md`
+(Entscheidungen P3-A–P3-N gelockt, Steps 0–7). Phase-Head: `phase3_edge/CLAUDE.md`.
 
 **Phase 2 — MCP-Server** (`phase2_mcp/`, Paket `mcpserver`): ✅ **abgeschlossen,
 live-verifiziert seit 2026-07-26** — Quick-Tunnel-Probe + vollständige Adapter-Abnahme über den
@@ -164,7 +180,7 @@ P2 Step 2 — siehe P2-Plan §0.4 Punkt L).
 |---|---|---|
 | R1 | Plan/Ausführung | Planung im Browser-Chat, Ausführung in Claude Code — wie im Trading-Bot-Projekt. |
 | R2 | Plan-Tier | Beide Nutzer auf **Claude Pro**. Custom Connectors sind auf Pro verfügbar; jeder fügt seinen Connector selbst hinzu (kein Owner-Gate wie bei Team/Enterprise). `[VERIFY]` bei Ausführung gegen die aktuelle Doku. |
-| R3 | Erreichbarkeit | **CGNAT** (RUT X50, Mobilfunk). Start mit **Cloudflare Tunnel** (schnellster Weg zum ersten Erlebnis), Migration auf **VPS + WireGuard** als P3-Option. Der MCP-Server ändert sich dabei nicht. |
+| R3 | Erreichbarkeit | **CGNAT** (RUT X50, Mobilfunk). Start mit **Cloudflare Tunnel** (schnellster Weg zum ersten Erlebnis), Migration auf **VPS + WireGuard** als P3-Option. Der MCP-Server ändert sich dabei nicht. **[2026-07-28 Ergänzung, P4 Step 0]:** Gebaut wurde stattdessen **Tailscale Funnel** (P3-A) — weder Cloudflare Tunnel noch VPS+WireGuard. Die Beschlusslage oben bleibt historisch korrekt stehen; Details zum tatsächlichen Weg: `docs/concepts/phase3_edge_plan.md` §0.4. |
 | R4 | Vertraulichkeit | Bewusst akzeptiert: bei Cloudflare Tunnel terminiert Cloudflare TLS und sieht Klartext. **Kein E2E.** Der Server muss lesen können, damit Claude lesen kann — das schließt das Krypto-Modell des `Notizheft_example.html` aus. **[2026-07-27 Ergänzung, P3 Step 0]:** Ab P3 läuft der Weg über Tailscale Funnel; dort terminiert die Node selbst TLS, siehe `docs/concepts/phase3_edge_plan.md` §0.4. Der Relay-Betreiber sieht Notizinhalte damit nicht mehr im Klartext — „kein E2E" bleibt trotzdem richtig, denn Tailscale bleibt vertrauenswürdige Infrastruktur (Koordinationsserver, DNS, Relays). |
 | R5 | Auth v0 | Token im Pfad (`/mcp/<token>`), Token = Identität = Space. Ehrlich benannter Kompromiss (Bearer-Passwort in einer URL, landet in Logs). **OAuth 2.1 + DCR ist Phase 4**, nicht optional-für-immer. |
 | R6 | Zweck | **Lernprojekt**, später evtl. Arbeitswerkzeug. Bei Zielkonflikt gewinnt Lerneffekt über Bequemlichkeit — außer bei Safety/Secrets, dort gewinnt immer die sichere Variante. |
@@ -172,4 +188,8 @@ P2 Step 2 — siehe P2-Plan §0.4 Punkt L).
 **Noch nicht entschieden (bewusst offen, für spätere Planungssessions):**
 - Web-UI: Neubau gegen die REST-API vs. Adaption des `Notizheft_example.html` (dessen
   Vault-/Krypto-Schicht ist mit R4 unvereinbar und müsste entfallen).
-- Ob der Kollege einen eigenen Server-Prozess oder nur einen eigenen Space bekommt.
+
+**[2026-07-28 Korrektur, P4 Step 0]:** Der Punkt „Ob der Kollege einen eigenen Server-Prozess
+oder nur einen eigenen Space bekommt" stand hier fälschlich noch als offen. Das ist seit P3-G
+entschieden und live bewiesen: **ein Prozess, ein Space je Person.** Zwei Spaces existieren real
+(`niklas`, `fabian`), beide über denselben `sharefyx-mcp.service`.

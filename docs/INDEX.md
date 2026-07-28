@@ -35,6 +35,8 @@ updated: 2026-07-28
 - [docs/concepts/phase3_edge_plan.md](./concepts/phase3_edge_plan.md) — 📕 ~46KB · ausführungsreifer P3-Plan (Entscheidungen P3-A–P3-N, Steps 0–7); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
 - [phase3_edge/SESSIONS_ARCHIVE.md](../phase3_edge/SESSIONS_ARCHIVE.md) — 📦 ~50KB · neun archivierte Session-Blöcke (Step 0–6, inkl. Live-Abnahme-Funde B3/B4, beide Live-Abnahme-Sessions vom 2026-07-27), verbatim, newest-first
 - [docs/concepts/P3_ABNAHME_2026-07-27.md](./concepts/P3_ABNAHME_2026-07-27.md) — 📕 ~19KB · Abnahmeprotokoll Phase 3: 10/13 live bestanden, Zeilen 6/12/13 per Nikinger-Entscheidung auf nächste Phase verschoben, CLI-Ausschnitt als Beleg, Befunde B5/B6
+- [docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md](./concepts/PHASE3_CLOSEOUT_HANDOVER.md) — 📕 ~16KB · Abschluss-Handover P3→P4: Status, Delta seit dem P2-Handover, [VERIFY]-Bilanz V1–V13, geerbte Abnahmezeilen 6/12/13, Doku-Drift-Liste aus der Autocompact-Session, offene Entscheidungen für die OAuth-Planung
+- [docs/concepts/phase3_edge_uebersicht.svg](./concepts/phase3_edge_uebersicht.svg) — 📕 Übersichtsgrafik Phase 3 (Request-Weg, Komponenten)
 
 ## Completed phases
 
@@ -50,9 +52,11 @@ updated: 2026-07-28
 
 ## Concept docs (📕 snapshots — the plan a phase was built from)
 
-*(noch keine weiteren — P4–P5 werden vor ihrem Start je in einer Browser-Planungssession
-geschrieben; Konvention: ein Dokument pro Phase, kein Konzept+Plan+Handover-Trio. P1-, P2- und
-P3-Pläne stehen oben bei ihrer jeweiligen Phase, nicht doppelt hier gelistet.)*
+- [docs/concepts/phase4_auth_plan.md](./concepts/phase4_auth_plan.md) — 📕 ~76KB · ausführungsreifer P4-Plan (Entscheidungen P4-A–P4-R, Steps 0–7, eigener Authorization Server, Argon2id + TOTP, opake Token); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen; Autor Browser-Planungssession 2026-07-28, **ohne frischen Repo-Zugriff geschrieben** — Anker sind Funktionsnamen/Suchstrings, keine Zeilennummern; `phase4_auth/CLAUDE.md` als Phase-Head existiert erst ab Step 1
+
+*(P5 wird vor ihrem Start in einer eigenen Browser-Planungssession geschrieben; Konvention: ein
+Dokument pro Phase, kein Konzept+Plan+Handover-Trio. P1-, P2- und P3-Pläne stehen oben bei ihrer
+jeweiligen Phase, nicht doppelt hier gelistet.)*
 
 ## Externe Referenz (nicht im Repo)
 

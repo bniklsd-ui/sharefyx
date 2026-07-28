@@ -4,14 +4,14 @@ purpose: Menschliche Übersicht + Maschinen-Setup (venv, Keyring, Datenverzeichn
 read-when: erstes Setup auf einer neuen Maschine, oder wenn jemand wissen will, was das Ding überhaupt ist
 detail: L2
 up: docs/INDEX.md
-updated: 2026-07-26
+updated: 2026-07-28
 ---
 # Space-Server
 
 Ein geteilter Kontext-Speicher für zwei Personen und ihre Claude-Instanzen.
 
 Notizen und Aufgaben liegen als **Markdown-Dateien mit YAML-Frontmatter** in einem
-Git-Repository auf einer Heim-VM. Menschen bearbeiten sie im Editor oder (ab Phase 4) in einer
+Git-Repository auf einer Heim-VM. Menschen bearbeiten sie im Editor oder (ab Phase 5) in einer
 Web-UI. Claude greift über einen **Remote-MCP-Custom-Connector** darauf zu — jeder Nutzer hat
 einen eigenen Space, beide dürfen den des anderen lesen.
 
@@ -40,24 +40,30 @@ löschbar und aus den Dateien rekonstruierbar.
 Claude (Web/Desktop/Mobile)
    │  HTTPS, Verbindung kommt von Anthropics Backend
    ▼
-Tunnel (Cloudflare, ausgehend — CGNAT-tauglich)
+Tailscale Funnel (ausgehend — CGNAT-tauglich, TLS terminiert auf der Node)
    ▼
 MCP-Server (Streamable HTTP, Token→Space)      [Phase 2]
    ▼
 Storage-Kern: Dateien + Index + Locking        [Phase 1]
    ▲
-REST-API + Web-UI für Menschen                 [Phase 4]
+REST-API + Web-UI für Menschen                 [Phase 5]
 ```
+
+**Korrektur (2026-07-28, P4 Step 0):** ersetzt Cloudflare Tunnel — P3 hat stattdessen Tailscale
+Funnel gebaut (P3-A). Systemd-Unit, `/health`, Request-Log und Backup/Restore aus P3 sind hier
+noch keine eigene Zeile, siehe `phase3_edge/CLAUDE.md`.
 
 Der Storage-Kern ist die einzige Komponente, die Daten anfasst. MCP und REST sind zwei dünne
 Adapter darüber — deshalb wird der Kern zuerst gebaut und offline bewiesen.
 
 ## Setup
 
-> **Stand 2026-07-25:** Phase 1 (Storage-Kern) ist abgeschlossen und live-verifiziert — 68 Tests
-> (70 bei Phasenabschluss, minus zwei bei Entfernung toten Codes in P2 Step 0), `space_cli.py`
-> als Beweis. Die Befehle unten funktionieren real, nicht nur als Zielbild. Phase 2 (MCP-Server)
-> ist im Aufbau; bis sie steht, gibt es keinen Netzpfad, nur den lokalen Storage-Kern + CLI.
+> **Stand 2026-07-28:** Phase 1 (Storage-Kern) und Phase 2 (MCP-Server) sind abgeschlossen und
+> live-verifiziert. Phase 3 (Exposure & Betrieb, Tailscale Funnel + systemd) ist code-complete,
+> 🟡 — 10 von 13 Live-Abnahmezeilen bestanden, siehe `phase3_edge/CLAUDE.md`. Der Connector läuft
+> öffentlich unter einem stabilen Tailscale-Hostnamen, aktuell noch mit Pfad-Token-Auth. Phase 4
+> (OAuth 2.1 + DCR, Plan: `docs/concepts/phase4_auth_plan.md`) ist ausführungsreif geplant; siehe
+> Root-`CLAUDE.md` „Current state" für den verbindlichen aktiven Phasenstand.
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
@@ -75,9 +81,9 @@ irgendwo in diesem Projekt ein Token in einer Datei auftaucht, ist das ein Incid
 ## Token ausgeben, rotieren, widerrufen
 
 ```bash
-python phase2_mcp/scripts/issue_token.py --space nikinger    # neues Token ausgeben
+python phase2_mcp/scripts/issue_token.py --space niklas      # neues Token ausgeben
 python phase2_mcp/scripts/issue_token.py --list              # Spaces + gekürzte Hashes
-python phase2_mcp/scripts/issue_token.py --revoke nikinger   # alle Tokens dieses Space widerrufen
+python phase2_mcp/scripts/issue_token.py --revoke niklas     # alle Tokens dieses Space widerrufen
 ```
 
 **Das Token wird genau einmal angezeigt** — direkt nach `--space` auf stdout, kein zweites Mal
@@ -133,9 +139,11 @@ curl http://127.0.0.1:8765/health
 Damit sie niemand später „entdeckt" und für einen Bug hält:
 
 - **Keine Ende-zu-Ende-Verschlüsselung.** Der Server muss lesen können, damit Claude lesen kann.
-  Bei Cloudflare Tunnel sieht zusätzlich Cloudflare den Klartext.
+  **[2026-07-28]** Seit P3 läuft der Weg über Tailscale Funnel, die Node terminiert TLS selbst —
+  kein Relay-Betreiber sieht mehr Klartext, aber Tailscale bleibt vertrauenswürdige
+  Infrastruktur (R4).
 - **Auth v0 ist ein Token in der URL.** Ein Bearer-Passwort, das in Logs landet. Bewusst als
-  Zwischenschritt gewählt; OAuth 2.1 ist Phase 5 und nicht optional.
+  Zwischenschritt gewählt; OAuth 2.1 ist Phase 4 und nicht optional.
 - **Single Point of Failure.** Eine VM an einem Mobilfunk-Uplink. Fällt sie aus, zeigt Claude
   nur „Disconnected".
 - **Kein Hintergrundgedächtnis.** Siehe oben — Claude muss in jeder Konversation angewiesen

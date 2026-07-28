@@ -8,7 +8,7 @@ down:
   - docs/concepts/phase1_storage_plan.md   # ausführungsreifer P1-Plan
   - docs/concepts/phase2_mcp_plan.md       # ausführungsreifer P2-Plan
   - docs/concepts/phase3_edge_plan.md      # ausführungsreifer P3-Plan
-updated: 2026-07-27
+updated: 2026-07-28
 ---
 # ROADMAP — Space-Server
 
@@ -22,7 +22,7 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 | **P1** | `phase1_storage/` · `storage` | Datei-Store + Index + Versionierung. Kein Netz. | ✅ |
 | **P2** | `phase2_mcp/` · `mcpserver` | MCP-Server, Token-Auth, 6 Tools. Lokal erreichbar. | ✅ |
 | **P3** | `phase3_edge/` | Tunnel, systemd, Health, Logging, Ops-Skripte. Öffentlich erreichbar. | 🟡 |
-| **P4** | `phase4_auth/` · `auth` | OAuth 2.1 + DCR; ersetzt den Pfad-Token. | ⬜ |
+| **P4** | `phase4_auth/` · `authserver` | OAuth 2.1 + DCR; ersetzt den Pfad-Token. | 🔄 |
 | **P5** | `phase5_ui/` · `webui` | REST-API + Web-UI für Menschen. | ⬜ |
 
 **Korrektur (2026-07-25, P2-Planungssession):** OAuth rückt von „ganz am Ende" auf „direkt nach
@@ -99,9 +99,10 @@ offenen Findings mehr. Handover an P3: `docs/concepts/PHASE2_CLOSEOUT_HANDOVER.m
 
 **Mission:** Der Connector steht in beiden Claude-Accounts und bleibt stehen.
 
-- **DRIN:** Cloudflare Tunnel, systemd-Unit (`Restart=on-failure`, `LoadCredential`),
-  `/health`, strukturiertes Request-Log mit Tool-Name und Dauer, Backup des Datenverzeichnisses,
-  Runbook „Connector zeigt Disconnected".
+- **DRIN:** Tailscale Funnel (Korrektur 2026-07-28: ersetzt die ursprünglich geplante
+  Cloudflare-Tunnel-Zeile, siehe P3-A), systemd-Unit (`Restart=on-failure`,
+  `LoadCredentialEncrypted`), `/health`, strukturiertes Request-Log mit Tool-Name und Dauer,
+  Backup des Datenverzeichnisses, Runbook „Connector zeigt Disconnected".
 - **DRAUSSEN:** VPS-Migration (dokumentierte Option, eigener Track), Monitoring/Alerting.
 - **Bekanntes Risiko:** Mobilfunk-Uplink. Claude zeigt bei Nichterreichbarkeit nur
   „Disconnected" mit minimaler Diagnose — deshalb ist das Log kein Nice-to-have, sondern
@@ -127,6 +128,10 @@ beobachteten echten Reboot wechselt der Status auf ✅ (Statusglyphen-Definition
   Pfad-Token oder OAuth-Access-Token — der Umbau berührt keine Zeile Tool-Code). Nicht
   optional-für-immer: P4 ist der lehrreichste Teil des gesamten Projekts. Wer ihn dauerhaft
   überspringt, hat ein Ablagesystem gebaut und nichts gelernt.
+- **Korrektur (2026-07-28, P4-Planungssession):** Paketname ist `authserver`, nicht `auth` wie
+  oben in der Tabelle ursprünglich vorgesehen — `mcpserver/auth.py` existiert seit P2, ein
+  zweites Top-Level-Paket `auth` daneben wäre für Menschen und `grep` eine Falle
+  (`docs/concepts/phase4_auth_plan.md`, Entscheidung P4-B). Tabelle oben bereits korrigiert.
 
 ## Phase 5 — Web-UI
 

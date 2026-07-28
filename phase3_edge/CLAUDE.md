@@ -77,7 +77,9 @@ Vier Fakten, die spätere Steps direkt gaten — volle Inventartabelle in `SESSI
   P3-F ausreichend, siehe Plan-Begründung).
 - **Tailscale ist auf dieser VM nicht installiert.** Blockiert nicht Steps 1–6, blockiert
   **Step 7** — Nikinger-Aktion vor der Live-Abnahme (installieren, Tailnet beitreten, MagicDNS +
-  HTTPS-Zertifikate an, `nodeAttrs: funnel` im Policy-File).
+  HTTPS-Zertifikate an, `nodeAttrs: funnel` im Policy-File). **[2026-07-28 Korrektur, P4 Step
+  0]:** Stand aus Step 0, inzwischen falsch — Tailscale ist installiert, der Funnel läuft
+  öffentlich (siehe V13 unten).
 
 ## Rotationsregel
 
@@ -114,10 +116,9 @@ dieselbe Reihenfolge:
    Rauschen (Scanner, altes Bookmark) oder ein tatsächlich falsches/rotiertes Token, das ein
    `systemctl restart` vergessen hat (P3-M)?
 
-`[VERIFY]`: Schritt 4/`diagnose.sh`s Grep-Muster gegen `tailscale funnel status` ist bisher
-**nicht** gegen ein echtes Tailscale auf dieser VM geprüft (Tailscale fehlt, siehe
-„Umgebungsstand" oben) — beim ersten echten Lauf in Step 7 verifizieren, bei Abweichung
-`diagnose.sh` korrigieren.
+**V13 geschlossen (2026-07-28, P4 Step 0):** `diagnose.sh` einmal komplett gegen das reale
+`tailscale funnel status` gelaufen lassen — alle sechs Prüfungen grün, Schritt 4s Grep-Muster
+matcht die echte Ausgabe unverändert. Kein Korrekturbedarf am Skript.
 
 ### Cloudflare-Rückbau (führt der Nikinger aus, nicht Claude Code)
 

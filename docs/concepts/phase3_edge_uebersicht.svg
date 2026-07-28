@@ -1,0 +1,177 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080" font-family="Inter, 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <style>
+      .bg     { fill: #0F1720; }
+      .panel  { fill: #16212D; stroke: #263A4D; stroke-width: 1; }
+      .box    { fill: #1B2836; stroke: #2C4358; stroke-width: 1; }
+      .boxNew { fill: #16303A; stroke: #35C2B0; stroke-width: 1.4; }
+      .boxOld { fill: #1A2330; stroke: #33465C; stroke-width: 1; stroke-dasharray: 4 3; }
+      .h1     { fill: #F2F7FB; font-size: 34px; font-weight: 700; }
+      .h2     { fill: #8AA0B4; font-size: 15px; }
+      .sec    { fill: #E6EDF3; font-size: 16px; font-weight: 700; letter-spacing: .06em; }
+      .lbl    { fill: #E6EDF3; font-size: 14px; font-weight: 600; }
+      .sub    { fill: #90A6B9; font-size: 11.5px; }
+      .mono   { font-family: 'JetBrains Mono', 'DejaVu Sans Mono', Menlo, monospace; font-size: 11px; fill: #9FD8CF; }
+      .monod  { font-family: 'JetBrains Mono', 'DejaVu Sans Mono', Menlo, monospace; font-size: 11px; fill: #8AA0B4; }
+      .tag    { font-size: 9.5px; font-weight: 700; letter-spacing: .1em; }
+      .teal   { fill: #35C2B0; } .amber { fill: #E0A33E; } .violet { fill: #9B8CFF; }
+      .green  { fill: #55C57A; } .red   { fill: #E2685F; } .muted { fill: #6F849A; }
+      .arrow  { stroke: #3D5870; stroke-width: 1.6; fill: none; marker-end: url(#a); }
+    </style>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#3D5870"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1080" height="1080"/>
+  <rect x="0" y="0" width="1080" height="6" fill="#35C2B0"/>
+
+  <!-- ============ HEADER ============ -->
+  <text class="h1" x="44" y="62">Phase 3 — Exposure &amp; Betrieb</text>
+  <text class="h2" x="44" y="88">Sharefyx Space-Server · <tspan class="mono" font-size="13">phase3_edge/</tspan> · kein Python-Paket · abgeschlossen 2026-07-28</text>
+  <rect x="836" y="34" width="200" height="52" rx="8" fill="#2A2416" stroke="#E0A33E"/>
+  <text class="tag amber" x="936" y="54" text-anchor="middle">STATUS</text>
+  <text class="lbl amber" x="936" y="74" text-anchor="middle" font-size="15">code-complete · 10/13 live</text>
+
+  <!-- ============ A · REQUEST PATH ============ -->
+  <text class="sec" x="44" y="140">1 · DER WEG EINES REQUESTS</text>
+
+  <g>
+    <rect class="box"    x="44" y="152" width="500" height="46" rx="7"/>
+    <text class="lbl"    x="60" y="172">Claude — zwei Accounts</text>
+    <text class="monod"  x="60" y="188">niklas · fabian   POST /mcp/&lt;token&gt;</text>
+
+    <rect class="box"    x="44" y="204" width="500" height="46" rx="7"/>
+    <text class="lbl teal" x="60" y="224">Tailscale-Funnel-Relay</text>
+    <text class="sub"    x="60" y="240">leitet weiter — entschlüsselt nicht (P3-A, Ergänzung zu R4)</text>
+
+    <rect class="box"    x="44" y="256" width="500" height="46" rx="7"/>
+    <text class="lbl teal" x="60" y="276">tailscaled auf der VM</text>
+    <text class="sub"    x="60" y="292">TLS terminiert HIER · Zertifikat liegt HIER</text>
+
+    <rect class="boxNew" x="44" y="308" width="500" height="46" rx="7"/>
+    <text class="tag teal" x="518" y="322" text-anchor="end">NEU IN P3</text>
+    <text class="lbl"    x="60" y="328">AccessLogASGI</text>
+    <text class="mono"   x="60" y="345">{"ev":"http","method":…,"path":"/mcp/&lt;redacted&gt;","status":401}</text>
+
+    <rect class="boxNew" x="44" y="360" width="500" height="46" rx="7"/>
+    <text class="tag teal" x="518" y="374" text-anchor="end">ERWEITERT</text>
+    <text class="lbl"    x="60" y="380">Starlette · GET /health</text>
+    <text class="mono"   x="60" y="397">{"status":"ok","service":…,"version":…,"uptime_s":30143}</text>
+
+    <rect class="boxOld" x="44" y="412" width="500" height="46" rx="7"/>
+    <text class="tag muted" x="518" y="426" text-anchor="end">UNVERÄNDERT · P2</text>
+    <text class="lbl"    x="60" y="432">TokenPathASGI → Principal</text>
+    <text class="sub"    x="60" y="448">der einzige Codepfad, der Token auflöst — P3 hat ihn nicht angefasst</text>
+
+    <rect class="boxNew" x="44" y="464" width="500" height="46" rx="7"/>
+    <text class="tag teal" x="518" y="478" text-anchor="end">NEU IN P3</text>
+    <text class="lbl"    x="60" y="484">ToolCallLogMiddleware</text>
+    <text class="mono"   x="60" y="501">{"ev":"tool","tool":"append_to_item","space":"niklas","ms":16}</text>
+
+    <rect class="boxOld" x="44" y="516" width="500" height="46" rx="7"/>
+    <text class="tag muted" x="518" y="530" text-anchor="end">UNVERÄNDERT · P2</text>
+    <text class="lbl"    x="60" y="536">sechs Tools · Rule 4 · untrusted_content</text>
+    <text class="sub"    x="60" y="552">P3 enthält keine Fachlogik. Wer tools.py anfasst, ist in der falschen Phase.</text>
+
+    <rect class="boxOld" x="44" y="568" width="500" height="46" rx="7"/>
+    <text class="tag muted" x="518" y="582" text-anchor="end">UNVERÄNDERT · P1</text>
+    <text class="lbl"    x="60" y="588">Store → DATA_ROOT · Markdown + git</text>
+    <text class="monod"  x="60" y="604">/home/savefyx/savefyx-data</text>
+
+    <path class="arrow" d="M294 198 L294 202"/>
+    <path class="arrow" d="M294 250 L294 254"/>
+    <path class="arrow" d="M294 302 L294 306"/>
+    <path class="arrow" d="M294 354 L294 358"/>
+    <path class="arrow" d="M294 410 L294 410"/>
+    <path class="arrow" d="M294 458 L294 462"/>
+    <path class="arrow" d="M294 510 L294 514"/>
+    <path class="arrow" d="M294 562 L294 566"/>
+  </g>
+
+  <!-- ============ B · SYSTEMD ============ -->
+  <rect class="panel" x="568" y="152" width="468" height="222" rx="10"/>
+  <text class="sec amber" x="590" y="180">2 · SYSTEMD — SELBSTHEILUNG</text>
+
+  <text class="lbl"   x="590" y="206">sharefyx-mcp.service</text>
+  <text class="monod" x="590" y="224">Restart=on-failure · RestartSec=5</text>
+  <text class="monod" x="590" y="240">LoadCredentialEncrypted=spaces:…</text>
+  <text class="monod" x="590" y="256">ProtectHome=read-only + ReadWritePaths</text>
+  <text class="monod" x="590" y="272">SPACE_HOST=127.0.0.1 — nie 0.0.0.0 (P3-B)</text>
+
+  <text class="lbl"   x="590" y="300">sharefyx-backup.service + .timer</text>
+  <text class="monod" x="590" y="318">OnCalendar=daily · Persistent=true</text>
+
+  <text class="sub"   x="590" y="344">Units liegen mit Platzhaltern im Repo; install_units.sh</text>
+  <text class="sub"   x="590" y="360">füllt sie aus local.env — gitignored, maschinenspezifisch.</text>
+
+  <!-- ============ C · SECRETS ============ -->
+  <rect class="panel" x="568" y="390" width="468" height="224" rx="10"/>
+  <text class="sec violet" x="590" y="418">3 · WIE DIE SPACE-MAP IN DEN DIENST KOMMT</text>
+
+  <text class="monod" x="590" y="444">issue_token.py    →  Keyring (nikinger-space)</text>
+  <text class="monod" x="590" y="462">export_space_map.py  →  JSON auf stdout</text>
+  <text class="monod" x="590" y="480">| systemd-creds encrypt --name=spaces -</text>
+  <text class="monod" x="590" y="498">→ /etc/sharefyx/spaces.cred   (Host-Key, kein TPM2)</text>
+  <text class="monod" x="590" y="516">→ $CREDENTIALS_DIRECTORY/spaces   (tmpfs)</text>
+
+  <rect x="590" y="532" width="424" height="62" rx="6" fill="#1D1A2E" stroke="#4A3F7A"/>
+  <text class="sub violet" x="604" y="552">Die Pipe ist der Punkt: kein Klartext auf Platte.</text>
+  <text class="sub" x="604" y="570">Der Inhalt ist eine sha256-Map — kein umkehrbares</text>
+  <text class="sub" x="604" y="586">Geheimnis. Die Verschlüsselung ist Regeltreue für P4.</text>
+
+  <!-- ============ D · REQUEST-LOG ============ -->
+  <rect class="panel" x="44" y="632" width="500" height="196" rx="10"/>
+  <text class="sec teal" x="66" y="660">4 · REQUEST-LOG — JOURNALD, KEINE LOGDATEI</text>
+
+  <text class="sub"   x="66" y="684">Whitelist — was drin stehen darf:</text>
+  <text class="mono"  x="66" y="702">ts · ev · tool · space · ms · ok · err · method · path · status</text>
+
+  <text class="sub red" x="66" y="728">Was niemals drin steht:</text>
+  <text class="monod" x="66" y="746">Token · Titel · Body · Fehlermeldung (nur die Klasse)</text>
+
+  <rect x="66" y="758" width="456" height="52" rx="6" fill="#14262B" stroke="#2E5A55"/>
+  <text class="sub green" x="80" y="778">Live belegt: 10 Tool-Ereignisse über beide Spaces,</text>
+  <text class="sub" x="80" y="796">Token-Grep leer, Titel-Grep leer, 2×401 mit &lt;redacted&gt;.</text>
+
+  <!-- ============ E · BACKUP ============ -->
+  <rect class="panel" x="568" y="632" width="468" height="196" rx="10"/>
+  <text class="sec amber" x="590" y="660">5 · BACKUP — MIT RESTORE-NACHWEIS</text>
+
+  <text class="monod" x="590" y="686">git bundle --all → git bundle verify → Retention 14</text>
+  <text class="monod" x="590" y="704">restore_check.sh: HEAD + HEAD^{tree} vergleichen</text>
+  <text class="monod" x="590" y="722">Ziel: /var/lib/sharefyx-backup</text>
+
+  <rect x="590" y="736" width="424" height="74" rx="6" fill="#2A2416" stroke="#7A5F2A"/>
+  <text class="sub amber" x="604" y="756">B5 — Restore-Check rot, aber kein Defekt:</text>
+  <text class="sub" x="604" y="774">das Bundle war älter als der lebende HEAD.</text>
+  <text class="monod" x="604" y="792">merge-base --is-ancestor → true (nur Zeit, nicht Inhalt)</text>
+
+  <!-- ============ F · ABNAHME ============ -->
+  <text class="sec" x="44" y="864">6 · LIVE-ABNAHME — 13 ZEILEN, EHRLICH GEZÄHLT</text>
+
+  <g>
+    <g><rect x="63"  y="878" width="66" height="52" rx="6" fill="#16302270" stroke="#55C57A"/><text class="sub"  x="96"  y="898" text-anchor="middle">1</text><text class="lbl green" x="96"  y="919" text-anchor="middle">✓</text></g>
+    <g><rect x="137" y="878" width="66" height="52" rx="6" fill="#16302270" stroke="#55C57A"/><text class="sub"  x="170" y="898" text-anchor="middle">2</text><text class="lbl green" x="170" y="919" text-anchor="middle">✓</text></g>
+    <g><rect x="211" y="878" width="66" height="52" rx="6" fill="#16302270" stroke="#55C57A"/><text class="sub"  x="244" y="898" text-anchor="middle">3</text><text class="lbl green" x="244" y="919" text-anchor="middle">✓</text></g>
+    <g><rect x="285" y="878" width="66" height="52" rx="6" fill="#16302270" stroke="#55C57A"/><text class="sub"  x="318" y="898" text-anchor="middle">4</text><text class="lbl green" x="318" y="919" text-anchor="middle">✓</text></g>
+    <g><rect x="359" y="878" width="66" height="52" rx="6" fill="#16302270" stroke="#55C57A"/><text class="sub"  x="392" y="898" text-anchor="middle">5</text><text class="lbl green" x="392" y="919" text-anchor="middle">✓</text></g>
+    <g><rect x="433" y="878" width="66" height="52" rx="6" fill="#2A2416" stroke="#E0A33E"/><text class="sub"  x="466" y="898" text-anchor="middle">6</text><text class="lbl amber" x="466" y="919" text-anchor="middle">□</text></g>
+    <g><rect x="507" y="878" width="66" height="52" rx="6" fill="#16302270" stroke="#55C57A"/><text class="sub"  x="540" y="898" text-anchor="middle">7</text><text class="lbl green" x="540" y="919" text-anchor="middle">✓</text></g>
+    <g><rect x="581" y="878" width="66" height="52" rx="6" fill="#16302270" stroke="#55C57A"/><text class="sub"  x="614" y="898" text-anchor="middle">8</text><text class="lbl green" x="614" y="919" text-anchor="middle">✓</text></g>
+    <g><rect x="655" y="878" width="66" height="52" rx="6" fill="#16302270" stroke="#55C57A"/><text class="sub"  x="688" y="898" text-anchor="middle">9</text><text class="lbl green" x="688" y="919" text-anchor="middle">✓</text></g>
+    <g><rect x="729" y="878" width="66" height="52" rx="6" fill="#16302270" stroke="#55C57A"/><text class="sub"  x="762" y="898" text-anchor="middle">10</text><text class="lbl green" x="762" y="919" text-anchor="middle">✓</text></g>
+    <g><rect x="803" y="878" width="66" height="52" rx="6" fill="#16302270" stroke="#55C57A"/><text class="sub"  x="836" y="898" text-anchor="middle">11</text><text class="lbl green" x="836" y="919" text-anchor="middle">✓</text></g>
+    <g><rect x="877" y="878" width="66" height="52" rx="6" fill="#2E1C1B" stroke="#E2685F"/><text class="sub"  x="910" y="898" text-anchor="middle">12</text><text class="lbl red" x="910" y="919" text-anchor="middle">✗</text></g>
+    <g><rect x="951" y="878" width="66" height="52" rx="6" fill="#2E1C1B" stroke="#E2685F"/><text class="sub"  x="984" y="898" text-anchor="middle">13</text><text class="lbl red" x="984" y="919" text-anchor="middle">✗</text></g>
+  </g>
+
+  <text class="sub" x="63" y="954">Zeile 6 Reboot — passiv abwarten · 12 Backup-Timer-Lauf · 13 Restore-Nachweis (B5).</text>
+  <text class="sub" x="63" y="972">Nikinger-Entscheidung 2026-07-27: nicht aktiv nachgeholt, sondern an P4 vererbt.</text>
+  <text class="sub amber" x="63" y="990">Deshalb 🟡 und nicht ✅ — ✅ heißt in diesem Projekt „live-verifiziert“, nicht „gebaut“.</text>
+
+  <!-- ============ FOOTER ============ -->
+  <rect x="44" y="1010" width="992" height="44" rx="8" fill="#16212D" stroke="#263A4D"/>
+  <text class="sub" x="64" y="1028">Steps 0–7 gebaut · +35 Tests (133 → 168) · fastmcp 3.4.4 exakt gepinnt · Befunde B3–B6 · zwei Spaces real: niklas + fabian</text>
+  <text class="sub muted" x="64" y="1045">Plan: docs/concepts/phase3_edge_plan.md · Abnahme: docs/concepts/P3_ABNAHME_2026-07-27.md · Handover: PHASE3_CLOSEOUT_HANDOVER.md</text>
+</svg>
