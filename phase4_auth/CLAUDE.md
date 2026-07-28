@@ -103,6 +103,7 @@ Bedarf nicht neu recherchiert werden muss:
 | 4 | `authserver/{store,ratelimit}.py` | 3 | ✅ | 19 (14 `test_authserver_store.py` + 5 `test_ratelimit.py`) |
 | 5 | `authserver/{metadata,clients}.py`, erste Hälfte `routes.py` | 4 | ✅ | 16 (7 `test_metadata.py` + 8 `test_clients.py` + 1 neu in `test_authserver_config.py`) |
 | 6 | `authserver/{flows,templates}.py`, `routes.py` vervollständigt (`/oauth/authorize`, `/oauth/token`) | 5 | ✅ | 36 (22 `test_flows.py` + 9 `test_routes.py` + 4 `test_templates.py` + 1 neu in `test_totp.py`) |
+| 7a | `authserver/resolver.py`; `mcpserver/{asgi,context,app}.py` verdrahtet (Bearer-Auflösung, `AuthModeASGI`, `oauth=None`) | 6a | ✅ | 19 (6 `test_resolver.py` + 13 `test_asgi_bearer.py`) |
 
 **Zeile 1, Step 0:** kritischer Fund — ein nie widerrufener Keyring-Token für einen dritten,
 seit P2-B2 umbenannten Space (`nikinger`), live und schreibfähig. Details, Zeitachse und
@@ -255,88 +256,137 @@ und `redirect_uri_allowed`-Containment-Greps weiterhin sauber (Belege im Session
   Timing-Orakel (Advisor-Review, durch `test_wrong_password_and_unknown_space_give_identical_
   response` mit Aufruf-Zähler statt Wanduhr-Messung belegt).
 
+**Zeile 7a, Step 6a:** `authserver/resolver.py` (`OAuthTokenResolver`, `ResolvedPrincipal`,
+`ResolveError` — erfüllt `mcpserver.auth.SpaceResolver` strukturell, ohne `mcpserver` zu
+importieren, Plan §1.3). `mcpserver/asgi.py`: `BearerAuthASGI` (Authorization-Header →
+`ResolvedPrincipal` → echter `Principal`), `AuthModeASGI` (P4-N-Weiche), `_credential_from_path`
+aus `TokenPathASGI` herausgezogen (geteilt mit `AuthModeASGI`s `both`-Dispatch, verhaltensgleich).
+`mcpserver/app.py`: `create_app(..., oauth: OAuthConfig | None = None)` — **ein** optionaler
+Parameter (Plan §3.3), root-`TrustedHostMiddleware` nur wenn `oauth is not None` **und**
+`allowed_hosts` gesetzt ist. `mcpserver/context.py` **unverändert** — siehe Fund unten.
+`pytest -q` → **315/315 grün** (296 Vorlauf + 19 neue: 6 `test_resolver.py` + 13
+`test_asgi_bearer.py`). `test_app.py` explizit separat gegen den unveränderten Diff laufen
+lassen (`git diff --stat`, leer) — Bedingung für „`oauth=None` verhält sich exakt wie P3".
+
+**Fund statt Umsetzung — `context.py` brauchte keine Änderung:** Plan §3.2 kündigt an, der Guard
+solle „den `Authorization`-Header desselben Requests lesen und dessen `sha256` vergleichen".
+Real gebraucht wurde das nicht: `BearerAuthASGI` schreibt `token_hash` in **denselben**
+`scope["state"]`-Slot, mit **derselben** `sha256`-Funktion (`authserver.crypto.hash_secret` ==
+`credentials.hash_token`, byte-identisch), den `TokenPathASGI` bereits seit P2 benutzt —
+`assert_principal_matches_request()` liest diesen Slot bereits generisch, ganz ohne
+Moduswissen. Nicht nur behauptet: `test_bearer_token_reaches_a_real_tool_call` treibt ein
+echtes Bearer-Token durch den vollen Stack (`create_app()` → `AuthModeASGI` → `BearerAuthASGI` →
+FastMCP → `tools.py :: list_spaces` → der echte Guard) bis zu einem echten Tool-Ergebnis; wäre
+der Guard falsch verdrahtet, würde hier `AuthError` auftreten, nicht in einem Fake. Zweiter
+Advisor-Durchlauf dieser Session verlangte genau diesen Beweis — die erste Fassung hatte den
+Fund nur gegen einen Fake-Resolver (`test_valid_bearer_sets_principal_space`) und einen
+handgebauten Fake-Request (`test_guard_rejects_principal_from_other_request`) belegt, keiner
+von beiden lässt `scope["state"]` tatsächlich durch die echte FastMCP-App laufen.
+
+**Zweiter Advisor-Fund derselben Session:** `TrustedHostMiddleware` (P4-P) wurde von keinem Test
+tatsächlich instanziiert — die einzige bestehende Integrationsprobe hatte `allowed_hosts=()`,
+die Bedingung `hosts is not None` griff also nie. Nachgezogen:
+`test_trusted_host_middleware_protects_root_app_when_configured` — erlaubter Host → 200 auf
+`/health` **und** `/.well-known/oauth-protected-resource`, fremder Host → 400. Wichtig für Step 7:
+`/health` muss unter der Middleware weiter antworten, P3s Disconnected-Runbook hängt daran.
+
+**Notiz für Step 7 (nicht verteidigt, nur dokumentiert):** in `both`-Modus routet ein
+Pfad-Segment, das vorhanden aber **ungültig** ist, zu `TokenPathASGI` und bekommt ein blankes
+401 ohne `WWW-Authenticate` — ein Bearer-Client, der je einen Unterpfad von `/mcp/` anspricht,
+verliert den Discovery-Hinweis. Mit `path="/"` (Mount-Wurzel) und `stateless_http=True` sollte
+das unerreichbar sein; falls Step 7s Live-Abnahme das anders zeigt, ist das hier vorgemerkt,
+kein neuer Fund.
+
+**Split-Entscheidung (Advisor, vor der Umsetzung):** Step 6 ist laut Plan-Dateiliste deutlich
+größer als jeder vorige Step — `authserver/resolver.py` + Test, sechs geänderte
+`mcpserver`-Dateien, `oauth_smoke.py` (das eigentliche Phasenbeweis-Skript, RFC-9700-Replay
+inklusive), `request_log.py`/`logging_setup.py`-Erweiterung, zwei weitere Tests. Aufgeteilt in
+**6a** (dieser Commit: Resolver, `BearerAuthASGI`/`AuthModeASGI`, `create_app()`-Verdrahtung,
+zehn der zwölf Plan-Tests) und **6b** (nächste Session: Logging-Erweiterung, `oauth_smoke.py`,
+`scripts/serve.py`-Verdrahtung, die beiden verbleibenden Tests). Begründung: `oauth_smoke.py`
+ist der Beweis der ganzen Phase, kein Testhelfer — verdient eine eigene Session, keinen
+Seitenast eines bereits vollen Commits.
+
 ## Geerbte Contracts
 
 Aus P2 (`phase2_mcp/CLAUDE.md`, `docs/concepts/phase2_mcp_plan.md` §2/§3): sechs Tools,
 Tool-Contract, Fehlerabbildung, `SpaceResolver` → `Principal`, `Permissions`-Seam. Aus P3
 (`phase3_edge/CLAUDE.md`, `docs/concepts/phase3_edge_plan.md` §2/§3): Credential-Weg systemd →
 Prozess, Request-Log-Format, Unit-Platzhalter-Mechanik. **Der Contract ist ab jetzt wieder zu** —
-P4 ändert `asgi.py`/`context.py` (P4-Q), fasst `tools.py`/`permissions.py`/`auth.py` nicht an.
+P4 ändert `asgi.py`/`app.py` (P4-Q). **[2026-07-28, Step 6a]:** `context.py` stand hier
+ursprünglich mit auf der Änderungsliste (Plan §3.2 kündigt eine an) — real geändert wurde es
+nicht, siehe Zeile 7a unten. P4 fasst `tools.py`/`permissions.py`/`auth.py` weiterhin nicht an.
 
 ---
 
-## Session stopped — 2026-07-28 (Step 5)
+## Session stopped — 2026-07-28 (Step 6a)
 
-**Ergebnis:** Step 5 (Autorisierungsfluss) abgeschlossen. `pytest -q` → **296/296 grün** (260
-Vorlauf + 36 neue: 22 `test_flows.py` + 9 `test_routes.py` + 4 `test_templates.py` + 1 neu in
-`test_totp.py`).
+**Ergebnis:** Step 6a (Resolver + Bearer-Auflösung + `create_app()`-Verdrahtung) abgeschlossen.
+`pytest -q` → **315/315 grün** (296 Vorlauf + 19 neue: 6 `test_resolver.py` + 13
+`test_asgi_bearer.py`). `test_app.py` separat gelaufen (10/10) und per `git diff --stat`
+byte-identisch zum Stand vor diesem Commit bestätigt.
 
-**Gebaut:** `flows.py` (`start_authorize`, `submit_consent`, `issue_token` — frei von jedem
-HTTP-Framework-Import, kleine eingefrorene Ergebnis-Typen statt Starlette-`Response`),
-`templates.py` (Wegwerf-UI, kein JS/CSS-Build/Cookie), `routes.py` vervollständigt um
-`GET`/`POST /oauth/authorize` und `POST /oauth/token`. Details + alle additiven Abweichungen
-(`store.now()`, `get_totp_counter`/`set_totp_counter`, `totp.verify()`-Härtung, `oauth_routes()`-
-dritter-Parameter, `_token_headers()`, `error_description`, `redirect_uri_allowed()` jetzt auch
-in `start_authorize`, POST-Fehlerseite statt erneutem Formular, Enumerationsschutz-Timing-
-Begründung) in der Modul-Status-Tabelle oben (Zeile 6), nicht hier dupliziert.
+**Gebaut:** `authserver/resolver.py`, `mcpserver/asgi.py` (`BearerAuthASGI`, `AuthModeASGI`,
+`_credential_from_path`-Extraktion), `mcpserver/app.py` (`OAuthConfig`, `oauth=None`-Parameter,
+root-`TrustedHostMiddleware`). Details + alle additiven Funde in der Modul-Status-Tabelle oben
+(Zeile 7a), nicht hier dupliziert.
 
-**Zwei Advisor-Durchläufe (vor und nach der Implementierung), beide fündig:**
+**Split von Step 6 in 6a/6b, vor der Umsetzung mit dem Advisor abgestimmt:** die volle
+Plan-Dateiliste für Step 6 (`resolver.py` + Test, sechs `mcpserver`-Dateien, `oauth_smoke.py`,
+`request_log.py`/`logging_setup.py`-Erweiterung, zwei weitere Tests) ist deutlich größer als
+jeder vorige Step und enthält mit `oauth_smoke.py` ein zweites Deliverable im Gewand eines
+Testhelfers — das Skript ist der Beweis der ganzen Phase (RFC-9700-Replay ohne Browser), nicht
+etwas, das nebenbei in einem bereits vollen Commit entsteht. Begründung + Aufteilung: siehe
+Modul-Status-Zeile 7a oben.
 
-*Vor der Implementierung* bestätigte der Advisor den Grundriss (kleine Ergebnis-Typen statt
-Starlette-Responses in `flows.py`) und benannte drei Lücken gegenüber der reinen Dateiliste, die
-alle blockierend waren: fehlende `totp_replay`-Zugriffsmethoden im Store, der noch nicht
-gebaute dritte `oauth_routes()`-Parameter (inkl. der beiden bestehenden Fixtures, die dadurch
-brechen würden), und das fehlende `Pragma: no-cache` auf der Token-Antwort. Außerdem die
-Timing-Analyse zum Enumerationsschutz (Argon2id dominiert TOTP, das Weglassen von `totp.verify()`
-für einen unbekannten Space ist deshalb kein Orakel) und der Hinweis, den TOTP-Zähler erst nach
-vollständigem Erfolg hochzusetzen, nicht schon bei richtigem TOTP mit falschem Passwort.
+**Zwei Advisor-Durchläufe, beide fündig, derselbe Musterfehler wie in Step 4/5 — ein Test war
+zunächst nur gegen ein Fake bewiesen, nicht gegen den echten Stack:**
 
-*Nach der Implementierung* fand ein zweiter Durchlauf vier weitere Lücken, obwohl alle 20 im
-Plan benannten Tests bereits grün liefen — die Prüfung war "alle benannten Tests bestehen",
-nicht "jeder Fehlerpfad aus §2.4 hat genau einen Test" (das eigentliche Plan-Done-when):
+1. **Vor der Umsetzung** bestätigte der Advisor den 6a/6b-Split und markierte drei Stellen, an
+   denen die Plan-Beschreibung („Guard bekommt einen Authorization-Header-Vergleich") vermutlich
+   nicht mehr zum real gebauten `context.py` (state-basiert seit P2 Step 4, siehe dortige
+   Abweichungsnotiz) passt — mit der Anweisung, das zu verifizieren statt blind zu übernehmen.
+2. **Nach der ersten Implementierung** fand ein zweiter Durchlauf, dass genau diese Verifikation
+   nur gegen Fakes lief: `test_valid_bearer_sets_principal_space` prüft einen Hash-Vergleich in
+   einer Fake-Inner-App, `test_guard_rejects_principal_from_other_request` monkeypatcht
+   `get_http_request` auf ein handgebautes Fake-Objekt — keiner der beiden lässt ein echtes
+   Bearer-Token durch die echte FastMCP-App bis zu `tools.py`s echtem Guard-Aufruf laufen.
+   Nachgezogen: `test_bearer_token_reaches_a_real_tool_call` (voller Stack, echtes
+   `list_spaces`-Ergebnis). Zusätzlich fehlte jede Instanziierung von `TrustedHostMiddleware` —
+   die einzige bisherige Integrationsprobe hatte `allowed_hosts=()`, die Bedingung griff nie.
+   Nachgezogen: `test_trusted_host_middleware_protects_root_app_when_configured` (erlaubter vs.
+   fremder Host, `/health` bleibt erreichbar).
 
-1. **Ein Test war grün aus dem falschen Grund.** `test_all_token_errors_use_invalid_grant` baute
-   drei Codes vorab in einer Liste, die Uhr rückte dabei kumulativ vor — der zweite Code traf
-   exakt auf seine eigene `expires_at`-Grenze (`code_ttl_s=60`, Uhr bei Verwendung genau +60s
-   seit Ausstellung) und schlug über "abgelaufen" fehl, nicht über den geprüften Client-ID-
-   Mismatch. Behoben: jeder Fall stellt seinen Code unmittelbar vor seinem eigenen
-   `pytest.raises`-Block aus, nicht vorab. Dieselbe Reihenfolge-Lehre wie Step 4
-   (`test_register_requires_json_content_type`), jetzt zum zweiten Mal real eingetreten.
-2. **Kein Test für TOTP-Replay** — der Fehlerpfad aus Plan §2.4 POST-Schritt 6 hatte keine
-   Abdeckung, und die neuen Store-Methoden `get_totp_counter`/`set_totp_counter` liefen nur in
-   der Richtung, die den Schutz umgeht (`_issue_code` rückt die Uhr bewusst vor, damit
-   aufeinanderfolgende Logins in einem Test nicht kollidieren). Nachgezogen:
-   `test_totp_replay_is_rejected_without_burning_the_stored_counter`.
-3. **Kein `invalid_scope`-Test** — Plan §2.4 GET-Schritt 3 nennt ihn, `start_authorize`
-   implementiert ihn, nichts prüfte ihn. Nachgezogen:
-   `test_authorize_rejects_scope_outside_allowlist`.
-4. Zwei günstige Ergänzungen ebenfalls nachgezogen: `iss` auf dem Erfolgs-Redirect war nur beim
-   Fehlerfall geprüft (`test_authorize_success_redirect_carries_iss`), und die neue
-   Nie-wirft-Härtung von `totp.verify()` selbst hatte keinen Test
-   (`test_verify_never_raises_on_malformed_secret_or_unknown_algo` in `test_totp.py`).
+**Lehre, dieselbe wie am Ende von Step 5, jetzt ein drittes Mal bestätigt:** eine Behauptung über
+unveränderten/korrekten Code ("`context.py` braucht keine Änderung") ist erst ein Fund, wenn ein
+Test sie gegen den echten Aufrufpfad beweist — ein Test gegen ein Fake beweist nur, dass das Fake
+tut, was erwartet wird.
 
-**Lehre für künftige Steps:** "alle im Plan benannten Tests sind grün" ist eine schwächere Prüfung
-als "jeder Fehlerpfad hat genau einen Test" — ein Test kann aus einem anderen als dem
-beabsichtigten Grund grün sein (Fund 1), oder ein im Plan nur in Prosa erwähnter Fehlerpfad kann
-ganz ohne Test bleiben (Funde 2–3), ohne dass die benannte Testliste das anzeigt.
+**Doku-Fund, nicht Teil des Codes:** `phase2_mcp/CLAUDE.md`s Testzahl-Zeile stand auf 57 und war
+bereits vor dieser Session falsch (fehlendes `test_request_log.py`, mehrere stumm gewachsene
+Einzelzahlen) — dieselbe Drift-Kategorie wie die root-`CLAUDE.md`-Korrektur aus Step 5, diesmal
+in einer bereits **abgeschlossenen** Phase gefunden, weil P4 Step 6a eine ihrer Dateien anfasst.
+Korrigiert im selben Commit, siehe dortige datierte Korrekturnotiz — die historischen
+Modul-Status-Zeilen von P2 selbst bleiben unangetastet.
 
-**Root-`CLAUDE.md`-Drift geschlossen:** die letzte Aktualisierung dort (Commit `766bf53`) blieb
-bei Step 1 stehen — Step 2, Step 3 und Step 4 hatten das „Current state"-Kapitel nicht
-nachgezogen, drei Steps stumm stale (dieselbe Kategorie Fund wie die Korrektur in `766bf53`
-selbst). In diesem Commit mitgezogen, siehe dortige datierte Korrekturnotiz.
-
-**Nächster Schritt (konkret):** Step 6 — Anbindung an den Resource Server (`mcpserver/asgi.py`,
-`mcpserver/context.py`, `mcpserver/app.py`, Plan §3/§5 Step 6). `oauth_routes()` trägt bereits
-den vollen Drei-Parameter-Anker (`auth_settings, auth_store, users`) — Step 6 muss ihn nur noch
-aus `create_app()` heraus mit echten `load_users()`-Daten aufrufen, nichts an der Signatur ändern.
-`AuthModeASGI` ersetzt `TokenPathASGI` unter `Mount("/mcp", ...)`; `assert_principal_matches_
-request()` bekommt den `Authorization`-Header-Vergleich zusätzlich zum bestehenden Pfadsegment-
-Vergleich (P4-Q: `mcpserver/context.py`/`app.py`/`asgi.py` gehören zur erlaubten
-Berührungsfläche, `tools.py`/`permissions.py`/`auth.py` nicht). Plan §3.3 pinnt zusätzlich die
-Form der `create_app()`-Erweiterung selbst: genau **ein** optionaler Parameter `oauth=None` —
-fehlt er, verhält sich `create_app` exakt wie in P3, damit die bestehenden `test_app.py`-Tests
-unverändert gültig bleiben (Bedingung dafür, dass ein Testfehler in P4 auch nachweisbar aus P4
-stammt, nicht aus einer stillen Signaturverschiebung). Nicht drei separate Parameter
-(`auth_settings`/`auth_store`/`users`) einzeln in `create_app` durchreichen. Das ist der Step,
-der den Plan-Umbau erstmals gegen den echten `mcpserver` verdrahtet — bisher lief alles
-ausschließlich innerhalb von `authserver`.
+**Nächster Schritt (konkret):** Step 6b — `mcpserver/request_log.py` (`ev="oauth"`, Felder
+`stage`/`client_id`/`grant`, `OAuthLogASGI` als neuer ASGI-Wrapper nach dem Vorbild von
+`AccessLogASGI`: **außerhalb** von `create_app()`, in `scripts/serve.py`, damit `test_app.py`
+weiterhin unverändert läuft — Begründung identisch zu `AccessLogASGI`s eigener Platzierung),
+`mcpserver/logging_setup.py` (`_SECRET_PATTERNS`-Satz erweitert um `code=`, `access_token`,
+`refresh_token`, `password`, `totp`, `Authorization: Bearer …`), `phase4_auth/scripts/
+oauth_smoke.py` (Gegenstück zu `space_cli.py`/`mcp_smoke.py`: Discovery → DCR → `/authorize` →
+Formular-POST mit Passwort + errechnetem TOTP → Code → Token → `tools/call` mit Bearer → Refresh
+→ Reuse mit dem alten Refresh-Token, muss `invalid_grant` liefern und die Familie töten),
+`scripts/serve.py`-Verdrahtung (liest `SPACE_AUTH_MODE`, baut bei `oauth`/`both` `AuthSettings` +
+`AuthStore` + `load_users()` und reicht sie als `OAuthConfig` an `create_app()`). Plan §4/§5
+Step 6, Dateiliste dort. Zwei verbleibende benannte Tests: `test_oauth_log_never_contains_
+secrets` (treibt über `oauth_smoke.py`, Markerwerte `ZZZ-PASSWORD`/`ZZZ-CODE`, prüft den ganzen
+Logpuffer), `test_oauth_events_carry_stage_and_duration`. **`OAuthLogASGI`s `stage`-Ableitung
+darf keinen Request-Body lesen** (der trägt `code_verifier`/`refresh_token`) — Methode+Pfad
+reichen für `register`/`authorize_get`/`authorize_post`/`token_code`-oder-`token_refresh`; wenn
+sich `token_code` und `token_refresh` ohne Body-Zugriff nicht unterscheiden lassen, ist
+`stage="token"` (ohne die Grant-Unterscheidung) der akzeptierte Kompromiss, dokumentiert statt
+stillschweigend gelöst (Advisor-Vorgabe dieser Session). Step 6b Done-when (Plan): `pytest`
+grün, `oauth_smoke.py` 11/11, die sechs Tools verhalten sich unter Bearer-Auth exakt wie unter
+Pfad-Token (Antwort-Diff im Session-Block).

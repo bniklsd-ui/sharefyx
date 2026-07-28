@@ -8,8 +8,86 @@ updated: 2026-07-28
 ---
 # Session-Archiv — Phase 4 OAuth 2.1 + DCR
 
-Newest-first. Drei Rotationen bisher, alle 2026-07-28 (Abschluss Step 3, dann Step 4, dann
-Step 5) — via `scripts/rotate_session_block.sh phase4_auth`, nie von Hand.
+Newest-first. Vier Rotationen bisher, alle 2026-07-28 (Abschluss Step 3, dann Step 4, dann
+Step 5, dann Step 6a) — via `scripts/rotate_session_block.sh phase4_auth`, nie von Hand.
+
+## Session stopped — 2026-07-28 (Step 5)
+
+**Ergebnis:** Step 5 (Autorisierungsfluss) abgeschlossen. `pytest -q` → **296/296 grün** (260
+Vorlauf + 36 neue: 22 `test_flows.py` + 9 `test_routes.py` + 4 `test_templates.py` + 1 neu in
+`test_totp.py`).
+
+**Gebaut:** `flows.py` (`start_authorize`, `submit_consent`, `issue_token` — frei von jedem
+HTTP-Framework-Import, kleine eingefrorene Ergebnis-Typen statt Starlette-`Response`),
+`templates.py` (Wegwerf-UI, kein JS/CSS-Build/Cookie), `routes.py` vervollständigt um
+`GET`/`POST /oauth/authorize` und `POST /oauth/token`. Details + alle additiven Abweichungen
+(`store.now()`, `get_totp_counter`/`set_totp_counter`, `totp.verify()`-Härtung, `oauth_routes()`-
+dritter-Parameter, `_token_headers()`, `error_description`, `redirect_uri_allowed()` jetzt auch
+in `start_authorize`, POST-Fehlerseite statt erneutem Formular, Enumerationsschutz-Timing-
+Begründung) in der Modul-Status-Tabelle oben (Zeile 6), nicht hier dupliziert.
+
+**Zwei Advisor-Durchläufe (vor und nach der Implementierung), beide fündig:**
+
+*Vor der Implementierung* bestätigte der Advisor den Grundriss (kleine Ergebnis-Typen statt
+Starlette-Responses in `flows.py`) und benannte drei Lücken gegenüber der reinen Dateiliste, die
+alle blockierend waren: fehlende `totp_replay`-Zugriffsmethoden im Store, der noch nicht
+gebaute dritte `oauth_routes()`-Parameter (inkl. der beiden bestehenden Fixtures, die dadurch
+brechen würden), und das fehlende `Pragma: no-cache` auf der Token-Antwort. Außerdem die
+Timing-Analyse zum Enumerationsschutz (Argon2id dominiert TOTP, das Weglassen von `totp.verify()`
+für einen unbekannten Space ist deshalb kein Orakel) und der Hinweis, den TOTP-Zähler erst nach
+vollständigem Erfolg hochzusetzen, nicht schon bei richtigem TOTP mit falschem Passwort.
+
+*Nach der Implementierung* fand ein zweiter Durchlauf vier weitere Lücken, obwohl alle 20 im
+Plan benannten Tests bereits grün liefen — die Prüfung war "alle benannten Tests bestehen",
+nicht "jeder Fehlerpfad aus §2.4 hat genau einen Test" (das eigentliche Plan-Done-when):
+
+1. **Ein Test war grün aus dem falschen Grund.** `test_all_token_errors_use_invalid_grant` baute
+   drei Codes vorab in einer Liste, die Uhr rückte dabei kumulativ vor — der zweite Code traf
+   exakt auf seine eigene `expires_at`-Grenze (`code_ttl_s=60`, Uhr bei Verwendung genau +60s
+   seit Ausstellung) und schlug über "abgelaufen" fehl, nicht über den geprüften Client-ID-
+   Mismatch. Behoben: jeder Fall stellt seinen Code unmittelbar vor seinem eigenen
+   `pytest.raises`-Block aus, nicht vorab. Dieselbe Reihenfolge-Lehre wie Step 4
+   (`test_register_requires_json_content_type`), jetzt zum zweiten Mal real eingetreten.
+2. **Kein Test für TOTP-Replay** — der Fehlerpfad aus Plan §2.4 POST-Schritt 6 hatte keine
+   Abdeckung, und die neuen Store-Methoden `get_totp_counter`/`set_totp_counter` liefen nur in
+   der Richtung, die den Schutz umgeht (`_issue_code` rückt die Uhr bewusst vor, damit
+   aufeinanderfolgende Logins in einem Test nicht kollidieren). Nachgezogen:
+   `test_totp_replay_is_rejected_without_burning_the_stored_counter`.
+3. **Kein `invalid_scope`-Test** — Plan §2.4 GET-Schritt 3 nennt ihn, `start_authorize`
+   implementiert ihn, nichts prüfte ihn. Nachgezogen:
+   `test_authorize_rejects_scope_outside_allowlist`.
+4. Zwei günstige Ergänzungen ebenfalls nachgezogen: `iss` auf dem Erfolgs-Redirect war nur beim
+   Fehlerfall geprüft (`test_authorize_success_redirect_carries_iss`), und die neue
+   Nie-wirft-Härtung von `totp.verify()` selbst hatte keinen Test
+   (`test_verify_never_raises_on_malformed_secret_or_unknown_algo` in `test_totp.py`).
+
+**Lehre für künftige Steps:** "alle im Plan benannten Tests sind grün" ist eine schwächere Prüfung
+als "jeder Fehlerpfad hat genau einen Test" — ein Test kann aus einem anderen als dem
+beabsichtigten Grund grün sein (Fund 1), oder ein im Plan nur in Prosa erwähnter Fehlerpfad kann
+ganz ohne Test bleiben (Funde 2–3), ohne dass die benannte Testliste das anzeigt.
+
+**Root-`CLAUDE.md`-Drift geschlossen:** die letzte Aktualisierung dort (Commit `766bf53`) blieb
+bei Step 1 stehen — Step 2, Step 3 und Step 4 hatten das „Current state"-Kapitel nicht
+nachgezogen, drei Steps stumm stale (dieselbe Kategorie Fund wie die Korrektur in `766bf53`
+selbst). In diesem Commit mitgezogen, siehe dortige datierte Korrekturnotiz.
+
+**Nächster Schritt (konkret):** Step 6 — Anbindung an den Resource Server (`mcpserver/asgi.py`,
+`mcpserver/context.py`, `mcpserver/app.py`, Plan §3/§5 Step 6). `oauth_routes()` trägt bereits
+den vollen Drei-Parameter-Anker (`auth_settings, auth_store, users`) — Step 6 muss ihn nur noch
+aus `create_app()` heraus mit echten `load_users()`-Daten aufrufen, nichts an der Signatur ändern.
+`AuthModeASGI` ersetzt `TokenPathASGI` unter `Mount("/mcp", ...)`; `assert_principal_matches_
+request()` bekommt den `Authorization`-Header-Vergleich zusätzlich zum bestehenden Pfadsegment-
+Vergleich (P4-Q: `mcpserver/context.py`/`app.py`/`asgi.py` gehören zur erlaubten
+Berührungsfläche, `tools.py`/`permissions.py`/`auth.py` nicht). Plan §3.3 pinnt zusätzlich die
+Form der `create_app()`-Erweiterung selbst: genau **ein** optionaler Parameter `oauth=None` —
+fehlt er, verhält sich `create_app` exakt wie in P3, damit die bestehenden `test_app.py`-Tests
+unverändert gültig bleiben (Bedingung dafür, dass ein Testfehler in P4 auch nachweisbar aus P4
+stammt, nicht aus einer stillen Signaturverschiebung). Nicht drei separate Parameter
+(`auth_settings`/`auth_store`/`users`) einzeln in `create_app` durchreichen. Das ist der Step,
+der den Plan-Umbau erstmals gegen den echten `mcpserver` verdrahtet — bisher lief alles
+ausschließlich innerhalb von `authserver`.
+
+---
 
 ## Session stopped — 2026-07-28 (V14 + Step 4)
 

@@ -151,11 +151,24 @@ gelöscht. Lehre ergänzt: eine Doku-Aussage über den Repo-Zustand ist erst wah
 status` sie bestätigt, nicht wenn die Absicht dokumentiert wurde. Details: aktueller
 Session-Block.
 
-**Gesamt: 57 Tests** in `phase2_mcp/tests/` (3 `test_config.py` + 6 `test_credentials.py` + 4
-`test_auth.py` + 3 `test_permissions.py` + 1 `test_logging.py` + 2 `test_context.py` + 4
-`test_asgi.py` + 8 `test_app.py` + 23 `test_tools.py` + 3 `test_mcp_smoke.py`). Acht weitere
-Tests aus Step 2 liegen in `phase1_storage/tests/` (siehe Modul-Status Zeile 3 und
-`phase1_storage/CLAUDE.md`), werden dort mitgezählt, nicht hier.
+**[2026-07-28 Korrektur, P4 Step 6a]:** die Zeile unten stand auf 57 und war bereits vor dieser
+Session falsch — `test_request_log.py` (P3 Step 2, `ev="oauth"`-Vorlauf) fehlte in der Aufzählung
+komplett, und mehrere Einzelzahlen waren stumm gewachsen (`test_config.py` 3→6,
+`test_credentials.py` 6→12, `test_logging.py` 1→2, `test_app.py` 8→10), ohne dass ein
+P3-Abschluss-Commit diese Zeile nachzog. Reale Zahl per `pytest --collect-only -q` je Datei
+neu gezählt, nicht aus der alten Summe hochgerechnet. Die historischen Modul-Status-Zeilen oben
+(P2s eigene, längst abgeschlossene Steps) bleiben unangetastet — nur diese eine, unten mit der
+Zeit driftende Summenzeile wird korrigiert. Gleiche Fund-Kategorie wie die root-`CLAUDE.md`-
+Korrektur im selben Commit: „aktive Phase ist P4" ist kein Freibrief, Dateien anzufassen und
+ihre Zähl-Zeile stehen zu lassen.
+
+**Gesamt: 90 Tests** in `phase2_mcp/tests/` (6 `test_config.py` + 12 `test_credentials.py` + 4
+`test_auth.py` + 3 `test_permissions.py` + 2 `test_logging.py` + 2 `test_context.py` + 4
+`test_asgi.py` + 10 `test_app.py` + 23 `test_tools.py` + 3 `test_mcp_smoke.py` + 8
+`test_request_log.py` + 13 `test_asgi_bearer.py` [P4 Step 6a, neu: `BearerAuthASGI`/
+`AuthModeASGI`, Details `phase4_auth/CLAUDE.md`]). Acht weitere Tests aus Step 2 liegen in
+`phase1_storage/tests/` (siehe Modul-Status Zeile 3 und `phase1_storage/CLAUDE.md`), werden dort
+mitgezählt, nicht hier.
 
 ## Geerbte Contracts
 
