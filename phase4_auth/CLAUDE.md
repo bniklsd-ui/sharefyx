@@ -70,6 +70,7 @@ hier `tools.py` anfasst, ist in der falschen Phase (P4-Q).
 |---|---|---|---|---|
 | 1 | Haushalt, Drift, geerbte Abnahme, kritischer Keyring-Fund (nikinger-Token) | 0 | ✅ | 0 (kein Feature-Code) |
 | 2 | Paketgerüst `phase4_auth/`, `authserver/{config,models,crypto,errors}.py` | 1 | ✅ | 20 (5 `test_crypto.py` + 12 `test_authserver_config.py` + 3 `test_errors.py`) |
+| 3 | `authserver/{passwords,totp,users}.py`, `scripts/{provision_user,export_auth_users}.py` | 2 | ✅ | 37 (6 `test_passwords.py` + 21 `test_totp.py` + 10 `test_users.py`) |
 
 **Zeile 1, Step 0:** kritischer Fund — ein nie widerrufener Keyring-Token für einen dritten,
 seit P2-B2 umbenannten Space (`nikinger`), live und schreibfähig. Details, Zeitachse und
@@ -106,10 +107,11 @@ P4 ändert `asgi.py`/`context.py` (P4-Q), fasst `tools.py`/`permissions.py`/`aut
 
 ---
 
-## Session stopped — 2026-07-28 (Step 0 + Step 1)
+## Session stopped — 2026-07-28 (Step 0 + Step 1 + Step 2)
 
-**Ergebnis:** Step 0 (Haushalt, Drift, geerbte Abnahme) und Step 1 (Gerüst, Konfiguration,
-Kryptobausteine) abgeschlossen. `pytest -q` → **188/188 grün** (168 P1+P2+P3 + 20 neue P4-Tests).
+**Ergebnis:** Step 0 (Haushalt, Drift, geerbte Abnahme), Step 1 (Gerüst, Konfiguration,
+Kryptobausteine) und Step 2 (Passwörter, TOTP, Nutzerakten) abgeschlossen. `pytest -q` →
+**225/225 grün** (168 P1+P2+P3 + 57 neue P4-Tests: 20 Step 1 + 37 Step 2).
 
 **Kritischer Fund, geschlossen:** `export_space_map.py` zeigte zu Sessionbeginn drei aktive
 Spaces (`fabian`, `niklas`, `nikinger`) statt der erwarteten zwei — ein Keyring-Token aus P2
@@ -149,7 +151,25 @@ keine Aktion (V25: nur beobachten).
 (siehe Modul-Status oben) — Ursache Namenskollisionen mit bestehenden `tests`-Verzeichnissen,
 nicht antizipierbar ohne Repo-Zugriff (der Plan wurde ohne diesen geschrieben, siehe Plan-Kopf).
 
-**Nächster Schritt (konkret):** Step 2 — Passwörter, TOTP, Nutzerakten
-(`authserver/{passwords,totp,users}.py`, `phase4_auth/scripts/{provision_user,
-export_auth_users}.py`). Argon2id-Parameter sind bereits gemessen (P4-R-Notiz oben) und werden
-dort als Modulkonstanten eingesetzt, nicht neu hergeleitet.
+**Step 2:** `passwords.py` (Argon2id über `argon2-cffi`, `verify_password` wirft nie —
+`InvalidHashError` erbt von `ValueError`, nicht von `Argon2Error`, ein Test
+(`test_verify_returns_false_on_garbage_hash`) deckte das sofort auf, `DUMMY_HASH` für den
+Enumerationsschutz), `totp.py` (RFC 6238 über RFC 4226, stdlib, alle 15 Appendix-B-Vektoren
+SHA1/SHA256/SHA512 grün, Replay-Schutz über injizierten `last_counter`), `users.py` (spiegelt
+`credentials.py :: load_space_map()` bewusst — Credentials-Verzeichnis zuerst, Keyring-Fallback,
+`warning` bei fehlender Datei, Ausnahme bei kaputtem Inhalt). `provision_user.py`/
+`export_auth_users.py` nach `issue_token.py`/`export_space_map.py`-Muster, gegen Fake-Keyring
++ injizierten `get_password` getestet — **nicht** gegen den echten Keyring ausgeführt, gleiche
+Grenze wie bei P2 Step 3s `--space nikinger`-Roundtrip (Sache des Nikingers, nicht Claude Codes).
+
+**`[VERIFY]` V17, gemessen (nicht geraten):** Argon2id mit den Plan-Default-Parametern
+(`t=2, m=19456, p=1`) maß auf dieser VM **~15 ms** je Durchlauf — deutlich unter dem
+Zielkorridor 50–250 ms. Nach Plan-Vorgabe `t` erhöht: `t=8` misst **~53 ms** (`m`/`p`
+unverändert), fünf Läufe, Werte im Session-Log oben unter „Step 2" nachvollziehbar. Konstante
+in `passwords.py` dokumentiert den gemessenen statt einen geratenen Wert.
+
+**Nächster Schritt (konkret):** Step 3 — Persistenz und Bremse (`authserver/{store,
+ratelimit}.py`, `test_store.py`, `test_ratelimit.py`). Schema aus Plan §2.3, `AuthStore`
+kapselt **jede** SQL-Anweisung (kein SQL außerhalb dieses Moduls, per Grep im Session-Block zu
+belegen), `now_fn` injiziert. Der Kern der Phase — Code-Replay/Refresh-Replay-Tötungsregeln
+(RFC 9700) sind hier, nicht später.
