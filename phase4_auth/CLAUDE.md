@@ -327,16 +327,25 @@ Formular-POST mit Passwort + errechnetem TOTP → Code → Token → `tools/call
 → Reuse mit dem alten Refresh-Token, muss `invalid_grant` liefern und die Familie töten),
 `scripts/serve.py`-Verdrahtung (liest `SPACE_AUTH_MODE`, baut bei `oauth`/`both` `AuthSettings` +
 `AuthStore` + `load_users()` und reicht sie als `OAuthConfig` an `create_app()`).
-**Entscheidungspunkt vor dem Schreiben (Advisor-Fund, noch offen):** `load_auth_settings()`
-verlangt in `mode ∈ {oauth, both}` zwingend `SPACE_PUBLIC_BASE_URL` und wirft, wenn weder
-`SPACE_AUTH_DB` noch `STATE_DIRECTORY` gesetzt sind — Default-`mode` ist `oauth`. Ruft
-`serve.py` das unbedingt auf, stirbt ein lokales `python scripts/serve.py` ohne Env-Vars (der
-P3-Entwicklerpfad, der die ganze Phase über funktionierte) beim Start. Unter systemd unkritisch
-(Step 7 liefert beides), aber **hier** ist der Punkt, an dem sich das Verhalten ändert — vor dem
-Schreiben entscheiden: entweder `serve.py` baut das `oauth`-Bundle nur bei einem expliziten
-Signal (sonst `oauth=None`, P3-Pfad bleibt tot einfach da), oder der Fehlschlag ist gewollt und
-gehört als Startvoraussetzung ins README/Runbook. Nicht erst beim Live-Bring-up in Step 7
-entdecken. Plan §4/§5 Step 6, Dateiliste dort. Zwei verbleibende benannte Tests: `test_oauth_log_never_contains_
+**Entscheidungspunkt vor dem Schreiben — gelockt (Nikinger, 2026-07-28, vor der 6b-Session):**
+zwei unabhängige Weichen, nicht eine. (1) Ob `serve.py` überhaupt ein `OAuthConfig`-Bündel baut
+(`AuthSettings`/`AuthStore`/`load_users()`) — das entscheidet, ob der P3-Dev-Pfad ohne jede neue
+Env-Var weiterläuft. (2) `SPACE_AUTH_MODE` selbst (`token`/`both`/`oauth`, Default `oauth`),
+die einzig steuert, wie `AuthModeASGI` `/mcp` bedient, **sobald** das Bündel existiert.
+`load_auth_settings()` regelt (2) bereits korrekt und laut — fehlendes `SPACE_PUBLIC_BASE_URL`
+in `oauth`/`both` wirft, das ist gewollt (gleiches Fail-Closed-Muster wie `SPACE_DATA_ROOT`).
+Die Lücke lag ausschließlich bei (1): ein unbedingter `load_auth_settings()`-Aufruf zwänge auch
+einen lokalen Lauf ohne jede Absicht, P4 zu testen, durch (2)s Validierung.
+
+**Entscheidung:** `serve.py` prüft die **rohe Env-Var-Anwesenheit** `"SPACE_AUTH_MODE" in
+os.environ` — nicht den bereits gedefaulteten Rückgabewert von `load_auth_settings()` — als
+alleinige Weiche für (1). Fehlt sie: `oauth=None`, exakt der heutige P3-Pfad, keine neue
+Anforderung. Ist sie gesetzt (jeder der drei Werte): `load_auth_settings()` läuft echt, Bündel
+wird gebaut, ein Konfigurationsfehler stirbt laut — kein `try/except` um den Aufruf, das wäre
+ein stiller Fallback auf schwächere Auth genau dort, wo P4 das verhindern soll. Sicher für den
+echten Produktionspfad: die Step-7-Unit-Vorlage setzt `Environment=SPACE_AUTH_MODE=
+__AUTH_MODE__` ohnehin immer explizit — die Weiche ist kein neuer Sonderfall, sie spiegelt nur,
+wie die Unit bereits geplant war. Plan §4/§5 Step 6, Dateiliste dort. Zwei verbleibende benannte Tests: `test_oauth_log_never_contains_
 secrets` (treibt über `oauth_smoke.py`, Markerwerte `ZZZ-PASSWORD`/`ZZZ-CODE`, prüft den ganzen
 Logpuffer), `test_oauth_events_carry_stage_and_duration`. **`OAuthLogASGI`s `stage`-Ableitung
 darf keinen Request-Body lesen** (der trägt `code_verifier`/`refresh_token`) — Methode+Pfad
