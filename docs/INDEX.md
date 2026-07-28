@@ -31,7 +31,7 @@ updated: 2026-07-28
 
 ## Active phase (4 — OAuth 2.1 + DCR)
 
-- [phase4_auth/CLAUDE.md](../phase4_auth/CLAUDE.md) — 🔄 ~30KB · phase head; Step 0 (Haushalt, Drift, kritischer Keyring-Fund) ✅, Step 1 (Gerüst, Konfiguration, Kryptobausteine) ✅, Step 2 (Passwörter, TOTP, Nutzerakten) ✅, Step 3 (Persistenz + Fehlversuchsbremse, Code-/Refresh-Replay-Tötung) ✅, Step 4 (Metadaten + DCR) ✅, Step 5 (Autorisierungsfluss) ✅, Step 6a (Resolver + Bearer-Auflösung, `create_app()`-Verdrahtung) ✅ — Step 6b (Logging, `oauth_smoke.py`) offen; read + newest Session-stopped block first
+- [phase4_auth/CLAUDE.md](../phase4_auth/CLAUDE.md) — 🔄 ~27KB · phase head; Step 0 (Haushalt, Drift, kritischer Keyring-Fund) ✅, Step 1 (Gerüst, Konfiguration, Kryptobausteine) ✅, Step 2 (Passwörter, TOTP, Nutzerakten) ✅, Step 3 (Persistenz + Fehlversuchsbremse, Code-/Refresh-Replay-Tötung) ✅, Step 4 (Metadaten + DCR) ✅, Step 5 (Autorisierungsfluss) ✅, Step 6a (Resolver + Bearer-Auflösung, `create_app()`-Verdrahtung) ✅ — Step 6b (Logging, `oauth_smoke.py`) offen; read + newest Session-stopped block first
 - [docs/concepts/phase4_auth_plan.md](./concepts/phase4_auth_plan.md) — 📕 ~76KB · ausführungsreifer P4-Plan (Entscheidungen P4-A–P4-R, Steps 0–7, eigener Authorization Server, Argon2id + TOTP, opake Token); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen; Autor Browser-Planungssession 2026-07-28, **ohne frischen Repo-Zugriff geschrieben** — Anker sind Funktionsnamen/Suchstrings, keine Zeilennummern
 - [phase4_auth/SESSIONS_ARCHIVE.md](../phase4_auth/SESSIONS_ARCHIVE.md) — 📦 ~21KB · vier archivierte Session-Blöcke (Step 0+1+2, Step 3, V14+Step 4, Step 5), verbatim, newest-first
 

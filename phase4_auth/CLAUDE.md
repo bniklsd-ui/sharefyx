@@ -113,94 +113,37 @@ Handover behoben (siehe dortiger Commit-Verlauf, nicht hier dupliziert). Geerbte
 Zeile 12 (Backup-Timer) durch echten Lauf bestätigt, V13 (`diagnose.sh` vs. echtes Tailscale)
 geschlossen; Zeile 6 (Reboot) und Zeile 13 (Restore-Nachweis) bleiben bewusst offen.
 
-**Zeile 2, Step 1:** `config.py` (`AuthSettings`/`load_auth_settings`, Env-Validierung inkl.
-`SPACE_PUBLIC_BASE_URL`-Härtung), `crypto.py` (opake Token, `sha256`, PKCE gegen den
-RFC-7636-Appendix-B-Vektor getestet, nicht gegen einen selbst berechneten Wert), `errors.py`
-(RFC-6749-Fehlercode-Whitelist, `OAuthError`), `models.py` (Step 1: Platzhalter — seit Step 3
-gefüllt, siehe Zeile 4 unten). `argon2-cffi==25.1.0` exakt gepinnt (P4-R, in Step 0 gemessen).
-`dev_install.sh` nimmt `phase4_auth/` ohne Änderung auf (V16 bestätigt). `.gitignore` um
-`*.sqlite3` erweitert (V21 — vorher griff nur `.index.sqlite3` spezifisch, `auth.sqlite3` wäre
-committebar gewesen).
+**Zeile 2, Step 1 (komprimiert 2026-07-28, Step 6a — settled, testgepinnt, nicht mehr
+Arbeitskontext):** `config.py`, `crypto.py` (PKCE gegen RFC-7636-Appendix-B), `errors.py`
+(`OAuthError`), `models.py` (Step 1 Platzhalter, seit Step 3 gefüllt). `argon2-cffi==25.1.0`
+exakt gepinnt. `.gitignore` um `*.sqlite3` erweitert (V21).
 
-**Zeile 4, Step 3:** `models.py` gefüllt (`Client`, `PendingAuthRequest`, `AuthorizationCode`,
-`AccessTokenRecord`, `LoginAttempt` — frozen dataclasses, kein SQL). `store.py` (`AuthStore`):
-volles Schema aus Plan §2.3 (`CREATE TABLE IF NOT EXISTS`, idempotent für `test_reopen_is_
-idempotent`), alle Methoden der Plan-"fix"-Liste plus vier additive (`create_family`,
-`get_login_attempt`, `upsert_login_attempt`, `clear_login_attempt` — Begründung siehe
-Abweichungsnotiz unten). `ratelimit.py` (`LoginThrottle`): Eskalationsformel selbst festgelegt
-(Plan gibt nur Konstanten vor), führt kein eigenes SQL. `pytest -q` → **244/244 grün** (225
-Vorlauf + 19 neue: 14 `test_authserver_store.py` + 5 `test_ratelimit.py`). SQL-Containment-Grep
-bestätigt: kein SQL außerhalb `store.py` (Ergebnis im Session-Block unten).
+**Zeile 4, Step 3 (komprimiert):** `models.py` gefüllt, `store.py`/`AuthStore` (volles Schema
+Plan §2.3), `ratelimit.py`/`LoginThrottle` (Eskalationsformel selbst festgelegt). `pytest -q` →
+244/244. Additive Methoden, nicht in der Plan-"fix"-Liste: `create_family`,
+`get_login_attempt`/`upsert_login_attempt`/`clear_login_attempt` (`ratelimit.py` führt kein
+eigenes SQL). `rotate_refresh(..., access_ttl_s, refresh_ttl_s)` nimmt die TTLs explizit entgegen
+statt sie aus dem Bestand abzuleiten — eine Ableitung crasht nach `purge_expired()` auf einer
+bereits gelöschten Access-Token-Zeile (kein Randfall). **Hält weiter:** `issue_token_pair` liest
+ohne `AND revoked_at IS NULL` — sicher, weil `lookup_access_token`s `revoked_at`-JOIN die
+Mission-Garantie trägt, nicht `issue_token_pair`; diesen JOIN nie als redundant vereinfachen.
+**Testdatei-Namenskollisionen** (gilt für den ganzen Baum, kein `--import-mode=importlib`): vor
+jeder neuen Testdatei `find . -name "test_<name>.py"` gegen den ganzen Baum prüfen, nicht nur
+gegen den Plan-Dateinamen — traf real zweimal zu (`test_config.py`→`test_authserver_config.py`,
+`test_store.py`→`test_authserver_store.py`).
 
-**Abweichung vom Plan, dokumentiert statt still übernommen — Testdatei-Namenskollisionen
-(gilt für den ganzen Baum, nicht nur einzelne Steps; kein `--import-mode=importlib`
-konfiguriert, kein gemeinsames Elternpaket zwischen den Phasen-`tests`-Verzeichnissen):**
-- Der Plan sah `phase4_auth/tests/__init__.py` vor. Das kollidiert real mit dem bereits
-  bestehenden `phase3_edge/tests/__init__.py` — beide würden pytest als dasselbe
-  Top-Level-Modul `tests` gelten. Behoben durch Weglassen, wie in `phase1_storage/tests`/
-  `phase2_mcp/tests` bereits gehandhabt (kein `__init__.py`).
-- `test_config.py` hätte mit `phase2_mcp/tests/test_config.py` kollidiert (gleicher Basename,
-  keine Pakete) — Datei heißt deshalb `test_authserver_config.py` (Step 1).
-- **[2026-07-28, P4 Step 3]:** dieselbe Klasse traf real ein zweites Mal, nicht nur theoretisch
-  — der erste volle `pytest -q`-Lauf dieser Session brach mit `import file mismatch` ab, weil
-  `phase4_auth/tests/test_store.py` mit dem bereits bestehenden `phase1_storage/tests/
-  test_store.py` kollidiert. Behoben: Datei heißt `test_authserver_store.py`. **Regel für
-  künftige Steps:** vor dem Anlegen einer neuen Testdatei `find . -name "test_<name>.py"`
-  gegen den ganzen Baum prüfen, nicht nur gegen den Plan-Dateinamen — die Kollision ist am
-  Basename festgemacht, nicht am Phasenverzeichnis.
-
-**Additive `AuthStore`-Methoden, nicht in der Plan-"fix"-Liste (Step 3, für `flows.py` in Step 5
-relevant):** `create_family` (FK `auth_codes.family_id` erzwingt eine Familie vor dem ersten
-Code), `get_login_attempt`/`upsert_login_attempt`/`clear_login_attempt` (weil `ratelimit.py`
-selbst kein SQL führen darf). `rotate_refresh(refresh_token, *, access_ttl_s, refresh_ttl_s)`
-nimmt zusätzlich die beiden TTLs entgegen statt sie aus dem Bestand abzuleiten — eine
-Bestands-Ableitung hätte nach `purge_expired()` auf einer bereits gelöschten Access-Token-Zeile
-gecrasht (Advisor-Fund, kein Randfall). **Hinweis für `flows.py` (Step 5):** `issue_token_pair`
-liest die Familie ohne `AND revoked_at IS NULL` — sicher, weil `lookup_access_token` den
-`revoked_at`-JOIN als eigene Prüfung hat (die Mission-Garantie "Replay tötet die Familie" hängt
-also an `lookup_access_token`, nicht an `issue_token_pair`). Diesen JOIN in Step 5 nicht als
-redundant wegvereinfachen.
-
-**Zeile 5, Step 4:** `metadata.py` (PRM + AS-Metadaten, reine Funktionen aus `AuthSettings`,
-`client_id_metadata_document_supported` bewusst abwesend), `clients.py` (DCR, `redirect_uri_
-allowed()` als `[SEAM]`, `check_register_rate_limit()`), `routes.py` (erste Hälfte: beide
-`.well-known`-Pfade, AS-Metadaten, `/oauth/register` — Anker `oauth_routes(auth_settings,
-auth_store)` für Step 6, Plan §3.3). Security-Header direkt in den Handlern statt über
-Middleware (Begründung im `routes.py`-Modul-Docstring: die Routen werden der Wurzel-App
-vorangestellt, kein eigenes `Mount`, eine app-weite Middleware träfe auch `/health`/`/mcp`).
-`pytest -q` → **260/260 grün** (244 Vorlauf + 16 neue). SQL-Containment-Grep weiterhin sauber
-(nur `store.py`).
-
-**Additive Änderungen außerhalb der Step-4-Dateiliste (`metadata.py`/`clients.py`/`routes.py`):**
-- `errors.py :: DCRError`/`DCR_ERROR_CODES` — RFC-7591-Fehlercodes für `/oauth/register`,
-  bewusst **getrennt** von `OAuthError`/`OAUTH_ERROR_CODES`: eine Vermischung hätte
-  `invalid_redirect_uri`/`invalid_client_metadata` fälschlich auch aus `/oauth/authorize` oder
-  `/oauth/token` als gültige Antworten erscheinen lassen (relevant für Step 5s
-  `test_all_token_errors_use_invalid_grant`).
-- `store.py :: increment_register_window()` — stündliches, epoch-ausgerichtetes Fenster für die
-  grobe `/oauth/register`-Bremse (Plan §2.7, `register_attempts`-Tabelle existierte bereits seit
-  Step 3, nur ohne Zugriffsmethode). Kein `reset()` wie bei `login_attempts`: jede Registrierung
-  zählt gegen das Kontingent, unabhängig vom Ausgang — deshalb lebt die Policy-Konstante
-  (`MAX_REGISTRATIONS_PER_WINDOW = 20`) in `clients.py`, nicht in `ratelimit.py`, dessen
-  Docstring sich ausdrücklich auf Login pro Space bezieht.
-- **`test_authserver_does_not_import_mcpserver` fehlte, seit die Zeile P4-A/P4-C ("nicht
-  verhandelbar") sie in Step 1 erstmals namentlich referenzierte — vier Steps lang unbelegt.**
-  Geschlossen in `test_authserver_config.py`: Grep über `authserver/*.py` mit
-  zeilenanfang-verankertem Regex (`re.MULTILINE`), damit Prosa-Erwähnungen (z. B. in
-  `users.py`s eigenem Docstring) nicht mitzählen, nur echte `import`/`from`-Statements.
-- `starlette>=1.3,<2` neu **deklariert** in `phase4_auth/pyproject.toml` (P4-A/C nennt Starlette
-  bereits als erwartete Abhängigkeit) — war zuvor bereits transitiv installiert (`mcp`/
-  `sse-starlette`), `dev_install.sh` zeigt deshalb keine sichtbare Änderung; das ist kein
-  vergessener Schritt. `httpx`/`pytest-asyncio` als Dev-Extras ergänzt, gleiches Testmuster wie
-  `phase2_mcp/tests/test_app.py` (`httpx.ASGITransport`, `@pytest.mark.asyncio`, kein
-  `asyncio_mode`-Config nötig, Default-„strict"-Modus).
-- `oauth_routes(auth_settings, auth_store)` — zwei Parameter in Step 4. Plan §3.3 ankert die
-  **Step-6-Aufrufform** mit drei Parametern (`..., users`) — Step 5 erweitert die Signatur, wenn
-  die Login-Routen `users` tatsächlich brauchen. Das ist erwartetes Wachstum über „Step 4 baut
-  die erste Hälfte, Step 5 vervollständigt", keine Drift.
-- Reihenfolge in `_register`: Content-Type-Prüfung **vor** der Registrierungsbremse — eine
-  falsch typisierte Anfrage verbraucht kein Kontingent. Bewusst, gegen einen Selbstläufer-Fehler
-  gepinnt (`test_register_rejected_content_type_does_not_consume_rate_limit`).
+**Zeile 5, Step 4 (komprimiert):** `metadata.py` (PRM + AS-Metadaten), `clients.py` (DCR,
+`redirect_uri_allowed()` als `[SEAM]`), `routes.py` erste Hälfte (`.well-known`-Pfade,
+`/oauth/register`). Security-Header direkt in den Handlern statt Middleware (Routen werden der
+Wurzel-App vorangestellt, kein eigenes `Mount`). `pytest -q` → 260/260. Additive Funde: `errors.py
+:: DCRError`/`DCR_ERROR_CODES` bewusst getrennt von `OAuthError` (sonst erschienen
+`invalid_redirect_uri`/`invalid_client_metadata` fälschlich auch aus `/oauth/authorize`/
+`/oauth/token` als gültig); `store.py :: increment_register_window()` (stündliches Fenster, kein
+`reset()` — jede Registrierung zählt, unabhängig vom Ausgang); `test_authserver_does_not_
+import_mcpserver` fehlte trotz Zitat in P4-A/C seit Step 1, vier Steps lang unbelegt, jetzt
+geschlossen; `oauth_routes(auth_settings, auth_store)` zwei Parameter (Plan §3.3 ankert die
+Step-6-Form mit drei — erwartetes Wachstum, keine Drift); Content-Type-Prüfung läuft vor der
+Registrierungsbremse (falsch typisierte Anfrage verbraucht kein Kontingent, gepinnt).
 
 **Zeile 6, Step 5:** `flows.py` (neu, bewusst frei von jedem HTTP-Framework-Import — `start_
 authorize`/`submit_consent`/`issue_token` geben kleine eingefrorene Ergebnis-Typen zurück,
@@ -264,6 +207,10 @@ aus `TokenPathASGI` herausgezogen (geteilt mit `AuthModeASGI`s `both`-Dispatch, 
 `mcpserver/app.py`: `create_app(..., oauth: OAuthConfig | None = None)` — **ein** optionaler
 Parameter (Plan §3.3), root-`TrustedHostMiddleware` nur wenn `oauth is not None` **und**
 `allowed_hosts` gesetzt ist. `mcpserver/context.py` **unverändert** — siehe Fund unten.
+`mcpserver/config.py` geprüft und **unverändert gelassen**: Plan §1.2 listet es unter „GEÄNDERT:
+… neue Settings", real gebraucht wurde keine — `AuthSettings.mode`/TTLs/`base_url` decken alles
+ab, `Settings.allowed_hosts` existiert bereits seit P4-P für genau diesen Zweck. Kein erfundenes
+Feld, um die Plan-Dateiliste zu erfüllen (gleiche Regel wie `errors.py` in Step 5).
 `pytest -q` → **315/315 grün** (296 Vorlauf + 19 neue: 6 `test_resolver.py` + 13
 `test_asgi_bearer.py`). `test_app.py` explizit separat gegen den unveränderten Diff laufen
 lassen (`git diff --stat`, leer) — Bedingung für „`oauth=None` verhält sich exakt wie P3".
@@ -379,8 +326,17 @@ oauth_smoke.py` (Gegenstück zu `space_cli.py`/`mcp_smoke.py`: Discovery → DCR
 Formular-POST mit Passwort + errechnetem TOTP → Code → Token → `tools/call` mit Bearer → Refresh
 → Reuse mit dem alten Refresh-Token, muss `invalid_grant` liefern und die Familie töten),
 `scripts/serve.py`-Verdrahtung (liest `SPACE_AUTH_MODE`, baut bei `oauth`/`both` `AuthSettings` +
-`AuthStore` + `load_users()` und reicht sie als `OAuthConfig` an `create_app()`). Plan §4/§5
-Step 6, Dateiliste dort. Zwei verbleibende benannte Tests: `test_oauth_log_never_contains_
+`AuthStore` + `load_users()` und reicht sie als `OAuthConfig` an `create_app()`).
+**Entscheidungspunkt vor dem Schreiben (Advisor-Fund, noch offen):** `load_auth_settings()`
+verlangt in `mode ∈ {oauth, both}` zwingend `SPACE_PUBLIC_BASE_URL` und wirft, wenn weder
+`SPACE_AUTH_DB` noch `STATE_DIRECTORY` gesetzt sind — Default-`mode` ist `oauth`. Ruft
+`serve.py` das unbedingt auf, stirbt ein lokales `python scripts/serve.py` ohne Env-Vars (der
+P3-Entwicklerpfad, der die ganze Phase über funktionierte) beim Start. Unter systemd unkritisch
+(Step 7 liefert beides), aber **hier** ist der Punkt, an dem sich das Verhalten ändert — vor dem
+Schreiben entscheiden: entweder `serve.py` baut das `oauth`-Bundle nur bei einem expliziten
+Signal (sonst `oauth=None`, P3-Pfad bleibt tot einfach da), oder der Fehlschlag ist gewollt und
+gehört als Startvoraussetzung ins README/Runbook. Nicht erst beim Live-Bring-up in Step 7
+entdecken. Plan §4/§5 Step 6, Dateiliste dort. Zwei verbleibende benannte Tests: `test_oauth_log_never_contains_
 secrets` (treibt über `oauth_smoke.py`, Markerwerte `ZZZ-PASSWORD`/`ZZZ-CODE`, prüft den ganzen
 Logpuffer), `test_oauth_events_carry_stage_and_duration`. **`OAuthLogASGI`s `stage`-Ableitung
 darf keinen Request-Body lesen** (der trägt `code_verifier`/`refresh_token`) — Methode+Pfad
