@@ -355,3 +355,17 @@ sich `token_code` und `token_refresh` ohne Body-Zugriff nicht unterscheiden lass
 stillschweigend gelöst (Advisor-Vorgabe dieser Session). Step 6b Done-when (Plan): `pytest`
 grün, `oauth_smoke.py` 11/11, die sechs Tools verhalten sich unter Bearer-Auth exakt wie unter
 Pfad-Token (Antwort-Diff im Session-Block).
+
+**Kurznotiz für die 6b-Session:** `serve.py`-Gate ist bereits gelockt (siehe Entscheidungspunkt
+oben) — nicht neu entscheiden, nur umsetzen (`"SPACE_AUTH_MODE" in os.environ` als alleinige
+Weiche fürs Bündel, `load_auth_settings()` sonst wie gehabt laut scheitern lassen). Zwei
+Dateien anfassen, die nicht in der Step-6-Liste stehen, aber betroffen sein könnten:
+`README.md`/`phase3_edge/CLAUDE.md`, falls das Runbook „lokal starten" den Fall ohne
+`SPACE_AUTH_MODE` erwähnt — kurz gegenprüfen, ob dort eine Zeile nachgezogen werden muss.
+`oauth_smoke.py` zuerst schreiben (es ist der Beweis, nicht ein Nebenprodukt), Logging danach.
+Advisor **vor** dem Schreiben von `OAuthLogASGI` fragen (die Body-Lesen-vs-`stage`-Genauigkeit
+ist ein echter Kompromiss, siehe oben) und **nach** der ersten Implementierung — beide Male hat
+das in Step 5 und 6a echte Funde gebracht, nicht nur in Step 5. Vor jeder neuen Testdatei
+`find . -name "test_<name>.py"` gegen den ganzen Baum prüfen (Kollisionsregel aus Step 3, gilt
+weiter). `test_app.py` nach der `serve.py`-Änderung separat laufen lassen und `git diff --stat`
+dagegen prüfen — bleibt es unverändert, ist das Gate richtig gebaut.
