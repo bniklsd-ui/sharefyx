@@ -1,8 +1,27 @@
+import re
 from pathlib import Path
 
 import pytest
 
 from authserver.config import load_auth_settings
+
+_FORBIDDEN_IMPORT = re.compile(r"^\s*(import|from)\s+(mcpserver|storage)\b", re.MULTILINE)
+
+
+def test_authserver_does_not_import_mcpserver():
+    """P4-A/P4-C, „nicht verhandelbar" (Phase-Head, Harte Regeln): `authserver` kennt weder
+    `mcpserver` noch `storage`. Referenziert seit Step 1 im Phase-Head, aber nie geschrieben —
+    Lücke geschlossen in Step 4, als drei neue Dateien (`clients.py`, `metadata.py`,
+    `routes.py`) unter dieselbe Regel fielen. Grep über den Quellcode (nicht nur Docstrings:
+    `re.MULTILINE`-Anker auf Zeilenanfang schließt Erwähnungen in Prosa aus, echte
+    `import`/`from`-Statements stehen immer am Zeilenanfang)."""
+    authserver_dir = Path(__file__).resolve().parent.parent / "authserver"
+    offenders = [
+        f"{path.name}: {match.group(0).strip()}"
+        for path in sorted(authserver_dir.glob("*.py"))
+        for match in _FORBIDDEN_IMPORT.finditer(path.read_text(encoding="utf-8"))
+    ]
+    assert offenders == [], f"authserver importiert mcpserver/storage: {offenders}"
 
 
 def test_load_auth_settings_requires_base_url_in_oauth_mode():

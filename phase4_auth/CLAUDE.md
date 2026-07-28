@@ -101,6 +101,7 @@ Bedarf nicht neu recherchiert werden muss:
 | 2 | Paketgerüst `phase4_auth/`, `authserver/{config,models,crypto,errors}.py` | 1 | ✅ | 20 (5 `test_crypto.py` + 12 `test_authserver_config.py` + 3 `test_errors.py`) |
 | 3 | `authserver/{passwords,totp,users}.py`, `scripts/{provision_user,export_auth_users}.py` | 2 | ✅ | 37 (6 `test_passwords.py` + 21 `test_totp.py` + 10 `test_users.py`) |
 | 4 | `authserver/{store,ratelimit}.py` | 3 | ✅ | 19 (14 `test_authserver_store.py` + 5 `test_ratelimit.py`) |
+| 5 | `authserver/{metadata,clients}.py`, erste Hälfte `routes.py` | 4 | ✅ | 16 (7 `test_metadata.py` + 8 `test_clients.py` + 1 neu in `test_authserver_config.py`) |
 
 **Zeile 1, Step 0:** kritischer Fund — ein nie widerrufener Keyring-Token für einen dritten,
 seit P2-B2 umbenannten Space (`nikinger`), live und schreibfähig. Details, Zeitachse und
@@ -158,6 +159,47 @@ liest die Familie ohne `AND revoked_at IS NULL` — sicher, weil `lookup_access_
 also an `lookup_access_token`, nicht an `issue_token_pair`). Diesen JOIN in Step 5 nicht als
 redundant wegvereinfachen.
 
+**Zeile 5, Step 4:** `metadata.py` (PRM + AS-Metadaten, reine Funktionen aus `AuthSettings`,
+`client_id_metadata_document_supported` bewusst abwesend), `clients.py` (DCR, `redirect_uri_
+allowed()` als `[SEAM]`, `check_register_rate_limit()`), `routes.py` (erste Hälfte: beide
+`.well-known`-Pfade, AS-Metadaten, `/oauth/register` — Anker `oauth_routes(auth_settings,
+auth_store)` für Step 6, Plan §3.3). Security-Header direkt in den Handlern statt über
+Middleware (Begründung im `routes.py`-Modul-Docstring: die Routen werden der Wurzel-App
+vorangestellt, kein eigenes `Mount`, eine app-weite Middleware träfe auch `/health`/`/mcp`).
+`pytest -q` → **260/260 grün** (244 Vorlauf + 16 neue). SQL-Containment-Grep weiterhin sauber
+(nur `store.py`).
+
+**Additive Änderungen außerhalb der Step-4-Dateiliste (`metadata.py`/`clients.py`/`routes.py`):**
+- `errors.py :: DCRError`/`DCR_ERROR_CODES` — RFC-7591-Fehlercodes für `/oauth/register`,
+  bewusst **getrennt** von `OAuthError`/`OAUTH_ERROR_CODES`: eine Vermischung hätte
+  `invalid_redirect_uri`/`invalid_client_metadata` fälschlich auch aus `/oauth/authorize` oder
+  `/oauth/token` als gültige Antworten erscheinen lassen (relevant für Step 5s
+  `test_all_token_errors_use_invalid_grant`).
+- `store.py :: increment_register_window()` — stündliches, epoch-ausgerichtetes Fenster für die
+  grobe `/oauth/register`-Bremse (Plan §2.7, `register_attempts`-Tabelle existierte bereits seit
+  Step 3, nur ohne Zugriffsmethode). Kein `reset()` wie bei `login_attempts`: jede Registrierung
+  zählt gegen das Kontingent, unabhängig vom Ausgang — deshalb lebt die Policy-Konstante
+  (`MAX_REGISTRATIONS_PER_WINDOW = 20`) in `clients.py`, nicht in `ratelimit.py`, dessen
+  Docstring sich ausdrücklich auf Login pro Space bezieht.
+- **`test_authserver_does_not_import_mcpserver` fehlte, seit die Zeile P4-A/P4-C ("nicht
+  verhandelbar") sie in Step 1 erstmals namentlich referenzierte — vier Steps lang unbelegt.**
+  Geschlossen in `test_authserver_config.py`: Grep über `authserver/*.py` mit
+  zeilenanfang-verankertem Regex (`re.MULTILINE`), damit Prosa-Erwähnungen (z. B. in
+  `users.py`s eigenem Docstring) nicht mitzählen, nur echte `import`/`from`-Statements.
+- `starlette>=1.3,<2` neu **deklariert** in `phase4_auth/pyproject.toml` (P4-A/C nennt Starlette
+  bereits als erwartete Abhängigkeit) — war zuvor bereits transitiv installiert (`mcp`/
+  `sse-starlette`), `dev_install.sh` zeigt deshalb keine sichtbare Änderung; das ist kein
+  vergessener Schritt. `httpx`/`pytest-asyncio` als Dev-Extras ergänzt, gleiches Testmuster wie
+  `phase2_mcp/tests/test_app.py` (`httpx.ASGITransport`, `@pytest.mark.asyncio`, kein
+  `asyncio_mode`-Config nötig, Default-„strict"-Modus).
+- `oauth_routes(auth_settings, auth_store)` — zwei Parameter in Step 4. Plan §3.3 ankert die
+  **Step-6-Aufrufform** mit drei Parametern (`..., users`) — Step 5 erweitert die Signatur, wenn
+  die Login-Routen `users` tatsächlich brauchen. Das ist erwartetes Wachstum über „Step 4 baut
+  die erste Hälfte, Step 5 vervollständigt", keine Drift.
+- Reihenfolge in `_register`: Content-Type-Prüfung **vor** der Registrierungsbremse — eine
+  falsch typisierte Anfrage verbraucht kein Kontingent. Bewusst, gegen einen Selbstläufer-Fehler
+  gepinnt (`test_register_rejected_content_type_does_not_consume_rate_limit`).
+
 ## Geerbte Contracts
 
 Aus P2 (`phase2_mcp/CLAUDE.md`, `docs/concepts/phase2_mcp_plan.md` §2/§3): sechs Tools,
@@ -168,76 +210,57 @@ P4 ändert `asgi.py`/`context.py` (P4-Q), fasst `tools.py`/`permissions.py`/`aut
 
 ---
 
-## Session stopped — 2026-07-28 (Step 3)
+## Session stopped — 2026-07-28 (V14 + Step 4)
 
-**Ergebnis:** Step 3 (Persistenz und Bremse) abgeschlossen. `pytest -q` → **244/244 grün**
-(225 Vorlauf + 19 neue: 14 `test_authserver_store.py` + 5 `test_ratelimit.py`).
+**Ergebnis:** `[VERIFY]` V14 abgeschlossen, Step 4 (Metadaten und dynamische Registrierung)
+abgeschlossen. `pytest -q` → **260/260 grün** (244 Vorlauf + 16 neue).
 
-**Advisor-Review vor der Implementierung** (Hard Rule aus dem Session-Auftrag: Advisor vor
-substanzieller Arbeit) fand einen echten Absturzmodus im ursprünglichen Entwurf: `rotate_refresh`
-sollte die neue Access-Token-Laufzeit aus der jüngsten `access_tokens`-Zeile der Familie ableiten.
-Nach einem `purge_expired()`-Lauf (auch über `authctl.py purge-expired`, Plan §1.2) existiert
-diese Zeile bei einem Client, der erst nach Ablauf des Access-Tokens (60 min) aber innerhalb der
-Refresh-Gültigkeit (30 d) rotiert, nicht mehr — kein Randfall, der Normalpfad einer langlebigen
-Session. Behoben, bevor Code geschrieben wurde: `rotate_refresh` nimmt jetzt `access_ttl_s`/
-`refresh_ttl_s` explizit entgegen (siehe Abweichungsnotiz unten). Regressionstest:
-`test_rotate_refresh_after_access_token_purged`.
+**V14, vor Step 4 verlangt:** Web-Recherche gegen die aktuelle Anthropic-Connector-Doku
+bestätigte 13 von 14 Plan-Annahmen aus §0.6 wortgleich. Eine Ausnahme: native/Loopback-Clients
+(Claude Code) sind inzwischen dokumentiertes Anthropic-Verhalten, nicht mehr nur eine
+Erweiterungs-Idee — Details, Nikinger-Entscheidung (draußen lassen) und der dokumentierte
+einfachere Weg für später stehen im Scope-Abschnitt oben, nicht hier dupliziert.
 
-**Abweichungen vom Plan-Methodenskelett** (dokumentiert, nicht still übernommen — Plan-Kopf
-warnt selbst, dass er ohne frischen Repo-Zugriff geschrieben wurde):
-- **`create_family`** — nicht in der Plan-"fix"-Liste, aber durch die FK
-  `auth_codes.family_id` erzwungen: eine `token_families`-Zeile muss existieren, bevor
-  `issue_code` einen Code an sie binden kann (Plan §2.4 POST /oauth/authorize Schritt 8 nennt
-  zwei Schritte — Familie anlegen, dann Code erzeugen — für die es zwei Store-Aufrufe braucht).
-- **`rotate_refresh(refresh_token, *, access_ttl_s, refresh_ttl_s)`** statt nur
-  `refresh_token` — siehe Advisor-Fund oben. Kleinere Drift als der Absturzmodus einer
-  Bestands-Ableitung.
-- **`get_login_attempt`/`upsert_login_attempt`/`clear_login_attempt`** — nicht in der
-  Plan-"fix"-Liste, aber notwendig, weil `ratelimit.py` selbst kein SQL führen darf (Step-3-Regel:
-  SQL nur in `store.py`) und `login_attempts` sonst nirgends anfassbar wäre.
-- **Eskalationsformel in `ratelimit.py` selbst festgelegt** — der Plan gibt nur die vier
-  Konstanten vor (`MAX_FAILURES=5`, `WINDOW_S=900`, `BASE_LOCKOUT_S=900`, `MAX_LOCKOUT_S=86400`),
-  keine Formel. Gewählt: `failures` zählt monoton, bei jedem Vielfachen von `MAX_FAILURES` eine
-  neue Sperre mit `BASE_LOCKOUT_S * 2**(n-1)` (gedeckelt bei `MAX_LOCKOUT_S`), `WINDOW_S`-Vergessen
-  nur solange `locked_until IS NULL` (also bevor es je zu einer Sperre kam) — danach bleibt das
-  Fenster für den Space bewusst tot bis zu einem erfolgreichen Login (`reset()`). Grund: die
-  erste Sperrdauer (900 s) liegt in derselben Größenordnung wie `WINDOW_S`; ein Fenster-Reset
-  nach Sperrablauf würde die Eskalation bei jedem erneuten Versuch auf Stufe 1 zurückwerfen.
-  Dokumentiert im Docstring von `ratelimit.py`, hier verlinkt statt dupliziert.
-- **`CREATE TABLE`/`CREATE INDEX ... IF NOT EXISTS`** statt der Plan-Rohform — macht
-  `initialise()` und damit `test_reopen_is_idempotent` erst korrekt (Reconnect auf denselben
-  Pfad darf nicht auf bereits existierenden Tabellen scheitern).
-- **Testdatei `test_authserver_store.py`, nicht `test_store.py`** — dieselbe Namenskollision
-  wie in Step 1 bei `test_authserver_config.py`, diesmal mit `phase1_storage/tests/test_store.py`
-  (kein gemeinsames Elternpaket, kein `--import-mode=importlib`). Kollidierte real beim ersten
-  vollen `pytest -q`-Lauf dieser Session (`import file mismatch`), nicht nur theoretisch — siehe
-  Fund unten.
+**Step 4:** `metadata.py`, `clients.py`, erste Hälfte `routes.py` gebaut — Details in der
+Modul-Status-Tabelle oben (Zeile 5) inkl. aller additiven Abweichungen (`DCRError`,
+`increment_register_window`, `starlette`-Deklaration, `oauth_routes()`-Signaturwachstum,
+Content-Type-vor-Bremse-Reihenfolge). Nicht dort erwähnt, weil es kein Feature-Delta ist,
+sondern ein Doku-Integritäts-Fund: **`test_authserver_does_not_import_mcpserver` existierte
+nicht**, obwohl die Harte-Regeln-Zeile P4-A/P4-C sie seit Step 1 namentlich als Beleg zitiert
+("Test: `test_authserver_does_not_import_mcpserver`"). Vier Steps lang unbelegt, jetzt in
+`test_authserver_config.py` geschlossen. Lehre: eine im Fließtext genannte Testfunktion ist erst
+ein Beleg, wenn `pytest --collect-only` sie auch findet — nicht wenn der Name plausibel klingt.
+Wer diese Tabelle künftig liest, sollte die anderen dort zitierten Testnamen bei Gelegenheit
+stichprobenartig gegen den echten Testbaum prüfen, nicht blind vertrauen.
 
-**SQL-Containment-Grep** (Step-3-Done-when, `authserver/` + `phase4_auth/scripts/`):
-```
-$ grep -rniE "SELECT |INSERT INTO|UPDATE .* SET|DELETE FROM|CREATE TABLE|CREATE INDEX|PRAGMA |executescript|conn\.execute|\.execute\(" phase4_auth/authserver phase4_auth/scripts --include="*.py" -l
-phase4_auth/authserver/store.py
-```
-Einziger Treffer — kein SQL außerhalb `store.py`.
+**Advisor-Reviews dieser Session (zwei, vor und nach der Implementierung):** vor dem Schreiben
+bestätigte der Advisor die fünf offenen Designfragen (DCR-Fehlercode-Trennung,
+Security-Header-Umfang, Middleware- vs. Handler-Header, `starlette`-Pin-Politik,
+`register_attempts`-Modulzugehörigkeit) und flaggte zusätzlich ein ungetestetes Risiko:
+Starlette 1.3.1 liegt weit jenseits dessen, was `phase2_mcp` bereits benutzt
+(`BaseHTTPMiddleware`, `await request.json()`, benutzerdefinierte Header auf Nicht-200-Antworten
+— keins davon im Repo vorher geprüft). Eine Wegwerf-Probe (`httpx.ASGITransport` gegen eine
+Zwei-Routen-Spielzeug-App mit Header-Middleware) lief vor jeder echten Implementierung grün —
+API-Kompatibilität war damit belegt, nicht angenommen. Nach der Implementierung fand ein zweiter
+Advisor-Durchlauf eine echte Lücke: `test_register_requires_json_content_type` allein hätte auch
+bei vertauschter Prüfreihenfolge (Bremse vor Content-Type) grün bleiben können — die
+Reihenfolge-Entscheidung war getroffen, aber nicht gepinnt. Nachgezogen:
+`test_register_rejected_content_type_does_not_consume_rate_limit`.
 
-**Fund während der Arbeit, behoben:** erster `pytest -q`-Gesamtlauf brach mit `import file
-mismatch` ab (`phase4_auth/tests/test_store.py` vs. bereits importiertes
-`phase1_storage/tests/test_store.py`) — exakt die Namenskollisionsklasse, vor der die
-Special-Task-Notiz zu Beginn dieser Session warnte (dort für `test_config.py`/`tests/__init__.py`
-aus Step 1 dokumentiert). Behoben durch Umbenennung auf `test_authserver_store.py`, dazu
-`__pycache__` in allen `tests/`-Verzeichnissen gelöscht (stand noch vom vorherigen Lauf).
-Nicht: die Plan-Dateinamen zurück auf `test_store.py` erzwingen — das war exakt die Warnung.
+**Design-Entscheidung, dokumentiert:** Security-Header direkt in den `routes.py`-Handlern statt
+über eine Starlette-`Middleware`. Grund: `oauth_routes()` liefert eine flache Routenliste, die
+der Wurzel-App **vorangestellt** wird (Plan §3.3), kein eigenes `Mount`/Sub-App — eine app-weite
+Middleware in der Wurzel-App träfe auch `/health` und `/mcp`, ein zweites pfadgebundenes Mounten
+sieht der Plan an dieser Stelle nicht vor. Vollständiges Set (CSP, Referrer-Policy,
+X-Content-Type-Options, X-Frame-Options, Cache-Control, ggf. HSTS) auf beiden
+Metadatendokumenten; nur `Cache-Control: no-store` auf `/oauth/register` (Plan §2.6: die
+Cache-Control-Zeile überschreibt ihren eigenen Tabellenkopf ausdrücklich mit "auf allen
+OAuth-Antworten").
 
-**`test_no_plaintext_secret_in_database`:** treibt den vollen Fluss (Auth-Request, Code, Token,
-Rotation) mit echten erzeugten Geheimnissen, liest `auth.sqlite3` **und** `auth.sqlite3-wal`
-(WAL-Modus — das Geheimnis kann im WAL-File statt im Hauptfile stehen), prüft Abwesenheit der
-vier Klartext-Geheimnisse (`request_id`, `code`, `access_token`, `refresh_token`) **und**
-Anwesenheit mindestens eines `sha256`-Hex-Hashes — eine reine Abwesenheitsprüfung wäre auch bei
-einem still no-op-gebliebenen Fluss grün gelaufen (Advisor-Hinweis).
-
-**Nächster Schritt (konkret):** Step 4 — Metadaten und dynamische Registrierung
-(`authserver/{metadata,clients}.py`, erste Hälfte von `routes.py`, `test_metadata.py`,
-`test_clients.py`). PRM/AS-Metadatendokumente (RFC 9728/8414), DCR (RFC 7591),
-Redirect-Origin-Allowlist inkl. `[SEAM]`-Funktion `redirect_uri_allowed` (Plan §2.2/§2.6, §5
-Step 4). Vor Beginn: `[VERIFY]` V14 — die Anthropic-Auth-Doku einmal gegenlesen, sie ist laut
-Plan die einzige Quelle, die sich ohne Vorwarnung ändert.
+**Nächster Schritt (konkret):** Step 5 — Autorisierungsfluss (`authserver/{flows,templates}.py`,
+`routes.py` vervollständigt um `/oauth/authorize` und `/oauth/token`, `test_flows.py`,
+`test_routes.py`, `test_templates.py`). Plan §2.4/§5 Step 5. `oauth_routes()` bekommt dabei
+voraussichtlich den dritten Parameter `users` (siehe Abweichungsnotiz oben). Die beiden
+wichtigsten Tests des Steps laut Plan: ein Fehler vor Prüfung von `client_id`/`redirect_uri`
+darf **nie** zu einer Umleitung führen (`test_authorize_rejects_unknown_client_without_redirect`,
+`test_authorize_rejects_unregistered_redirect_uri_without_redirect`).

@@ -8,8 +8,84 @@ updated: 2026-07-28
 ---
 # Session-Archiv — Phase 4 OAuth 2.1 + DCR
 
-Newest-first. Erste Rotation dieser Phase (2026-07-28, beim Abschluss von Step 3) — via
-`scripts/rotate_session_block.sh phase4_auth`, nie von Hand.
+Newest-first. Zwei Rotationen bisher, beide 2026-07-28 (Abschluss Step 3, dann Abschluss
+Step 4) — via `scripts/rotate_session_block.sh phase4_auth`, nie von Hand.
+
+## Session stopped — 2026-07-28 (Step 3)
+
+**Ergebnis:** Step 3 (Persistenz und Bremse) abgeschlossen. `pytest -q` → **244/244 grün**
+(225 Vorlauf + 19 neue: 14 `test_authserver_store.py` + 5 `test_ratelimit.py`).
+
+**Advisor-Review vor der Implementierung** (Hard Rule aus dem Session-Auftrag: Advisor vor
+substanzieller Arbeit) fand einen echten Absturzmodus im ursprünglichen Entwurf: `rotate_refresh`
+sollte die neue Access-Token-Laufzeit aus der jüngsten `access_tokens`-Zeile der Familie ableiten.
+Nach einem `purge_expired()`-Lauf (auch über `authctl.py purge-expired`, Plan §1.2) existiert
+diese Zeile bei einem Client, der erst nach Ablauf des Access-Tokens (60 min) aber innerhalb der
+Refresh-Gültigkeit (30 d) rotiert, nicht mehr — kein Randfall, der Normalpfad einer langlebigen
+Session. Behoben, bevor Code geschrieben wurde: `rotate_refresh` nimmt jetzt `access_ttl_s`/
+`refresh_ttl_s` explizit entgegen (siehe Abweichungsnotiz unten). Regressionstest:
+`test_rotate_refresh_after_access_token_purged`.
+
+**Abweichungen vom Plan-Methodenskelett** (dokumentiert, nicht still übernommen — Plan-Kopf
+warnt selbst, dass er ohne frischen Repo-Zugriff geschrieben wurde):
+- **`create_family`** — nicht in der Plan-"fix"-Liste, aber durch die FK
+  `auth_codes.family_id` erzwungen: eine `token_families`-Zeile muss existieren, bevor
+  `issue_code` einen Code an sie binden kann (Plan §2.4 POST /oauth/authorize Schritt 8 nennt
+  zwei Schritte — Familie anlegen, dann Code erzeugen — für die es zwei Store-Aufrufe braucht).
+- **`rotate_refresh(refresh_token, *, access_ttl_s, refresh_ttl_s)`** statt nur
+  `refresh_token` — siehe Advisor-Fund oben. Kleinere Drift als der Absturzmodus einer
+  Bestands-Ableitung.
+- **`get_login_attempt`/`upsert_login_attempt`/`clear_login_attempt`** — nicht in der
+  Plan-"fix"-Liste, aber notwendig, weil `ratelimit.py` selbst kein SQL führen darf (Step-3-Regel:
+  SQL nur in `store.py`) und `login_attempts` sonst nirgends anfassbar wäre.
+- **Eskalationsformel in `ratelimit.py` selbst festgelegt** — der Plan gibt nur die vier
+  Konstanten vor (`MAX_FAILURES=5`, `WINDOW_S=900`, `BASE_LOCKOUT_S=900`, `MAX_LOCKOUT_S=86400`),
+  keine Formel. Gewählt: `failures` zählt monoton, bei jedem Vielfachen von `MAX_FAILURES` eine
+  neue Sperre mit `BASE_LOCKOUT_S * 2**(n-1)` (gedeckelt bei `MAX_LOCKOUT_S`), `WINDOW_S`-Vergessen
+  nur solange `locked_until IS NULL` (also bevor es je zu einer Sperre kam) — danach bleibt das
+  Fenster für den Space bewusst tot bis zu einem erfolgreichen Login (`reset()`). Grund: die
+  erste Sperrdauer (900 s) liegt in derselben Größenordnung wie `WINDOW_S`; ein Fenster-Reset
+  nach Sperrablauf würde die Eskalation bei jedem erneuten Versuch auf Stufe 1 zurückwerfen.
+  Dokumentiert im Docstring von `ratelimit.py`, hier verlinkt statt dupliziert.
+- **`CREATE TABLE`/`CREATE INDEX ... IF NOT EXISTS`** statt der Plan-Rohform — macht
+  `initialise()` und damit `test_reopen_is_idempotent` erst korrekt (Reconnect auf denselben
+  Pfad darf nicht auf bereits existierenden Tabellen scheitern).
+- **Testdatei `test_authserver_store.py`, nicht `test_store.py`** — dieselbe Namenskollision
+  wie in Step 1 bei `test_authserver_config.py`, diesmal mit `phase1_storage/tests/test_store.py`
+  (kein gemeinsames Elternpaket, kein `--import-mode=importlib`). Kollidierte real beim ersten
+  vollen `pytest -q`-Lauf dieser Session (`import file mismatch`), nicht nur theoretisch — siehe
+  Fund unten.
+
+**SQL-Containment-Grep** (Step-3-Done-when, `authserver/` + `phase4_auth/scripts/`):
+```
+$ grep -rniE "SELECT |INSERT INTO|UPDATE .* SET|DELETE FROM|CREATE TABLE|CREATE INDEX|PRAGMA |executescript|conn\.execute|\.execute\(" phase4_auth/authserver phase4_auth/scripts --include="*.py" -l
+phase4_auth/authserver/store.py
+```
+Einziger Treffer — kein SQL außerhalb `store.py`.
+
+**Fund während der Arbeit, behoben:** erster `pytest -q`-Gesamtlauf brach mit `import file
+mismatch` ab (`phase4_auth/tests/test_store.py` vs. bereits importiertes
+`phase1_storage/tests/test_store.py`) — exakt die Namenskollisionsklasse, vor der die
+Special-Task-Notiz zu Beginn dieser Session warnte (dort für `test_config.py`/`tests/__init__.py`
+aus Step 1 dokumentiert). Behoben durch Umbenennung auf `test_authserver_store.py`, dazu
+`__pycache__` in allen `tests/`-Verzeichnissen gelöscht (stand noch vom vorherigen Lauf).
+Nicht: die Plan-Dateinamen zurück auf `test_store.py` erzwingen — das war exakt die Warnung.
+
+**`test_no_plaintext_secret_in_database`:** treibt den vollen Fluss (Auth-Request, Code, Token,
+Rotation) mit echten erzeugten Geheimnissen, liest `auth.sqlite3` **und** `auth.sqlite3-wal`
+(WAL-Modus — das Geheimnis kann im WAL-File statt im Hauptfile stehen), prüft Abwesenheit der
+vier Klartext-Geheimnisse (`request_id`, `code`, `access_token`, `refresh_token`) **und**
+Anwesenheit mindestens eines `sha256`-Hex-Hashes — eine reine Abwesenheitsprüfung wäre auch bei
+einem still no-op-gebliebenen Fluss grün gelaufen (Advisor-Hinweis).
+
+**Nächster Schritt (konkret):** Step 4 — Metadaten und dynamische Registrierung
+(`authserver/{metadata,clients}.py`, erste Hälfte von `routes.py`, `test_metadata.py`,
+`test_clients.py`). PRM/AS-Metadatendokumente (RFC 9728/8414), DCR (RFC 7591),
+Redirect-Origin-Allowlist inkl. `[SEAM]`-Funktion `redirect_uri_allowed` (Plan §2.2/§2.6, §5
+Step 4). Vor Beginn: `[VERIFY]` V14 — die Anthropic-Auth-Doku einmal gegenlesen, sie ist laut
+Plan die einzige Quelle, die sich ohne Vorwarnung ändert.
+
+---
 
 ## Session stopped — 2026-07-28 (Step 0 + Step 1 + Step 2)
 

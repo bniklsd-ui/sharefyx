@@ -507,3 +507,26 @@ class AuthStore:
     def clear_login_attempt(self, space: str) -> None:
         with self._lock:
             self._conn.execute("DELETE FROM login_attempts WHERE space = ?", (space,))
+
+    # -- Registrierungsbremse (für clients.py — kein SQL dort) -------------------------
+
+    def increment_register_window(self) -> int:
+        """Additiv (Step 4), nicht in der Plan-"fix"-Liste. Grobe, globale Bremse für
+        `/oauth/register` (Plan §2.7: 20 pro Stunde insgesamt) — stündliches, epoch-
+        ausgerichtetes Fenster (Minute/Sekunde/Mikrosekunde der aktuellen Zeit gekappt). Anders
+        als `login_attempts` gibt es hier kein `reset()`: jede Registrierung zählt gegen das
+        Kontingent, unabhängig vom Ausgang; das Fenster verfällt von selbst zur nächsten vollen
+        Stunde. Gibt den neuen Zähler dieses Fensters zurück."""
+        now = self._now_fn()
+        window_start = now.replace(minute=0, second=0, microsecond=0)
+        window_key = _format_dt(window_start)
+        with self._transaction() as conn:
+            conn.execute(
+                "INSERT INTO register_attempts (window_start, count) VALUES (?, 1) "
+                "ON CONFLICT(window_start) DO UPDATE SET count = count + 1",
+                (window_key,),
+            )
+            row = conn.execute(
+                "SELECT count FROM register_attempts WHERE window_start = ?", (window_key,)
+            ).fetchone()
+            return row["count"]
