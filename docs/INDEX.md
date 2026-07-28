@@ -31,9 +31,9 @@ updated: 2026-07-28
 
 ## Active phase (4 — OAuth 2.1 + DCR)
 
-- [phase4_auth/CLAUDE.md](../phase4_auth/CLAUDE.md) — 🔄 phase head; Step 0 (Haushalt, Drift, kritischer Keyring-Fund) ✅, Step 1 (Gerüst, Konfiguration, Kryptobausteine) ✅; read + newest Session-stopped block first
+- [phase4_auth/CLAUDE.md](../phase4_auth/CLAUDE.md) — 🔄 ~13KB · phase head; Step 0 (Haushalt, Drift, kritischer Keyring-Fund) ✅, Step 1 (Gerüst, Konfiguration, Kryptobausteine) ✅, Step 2 (Passwörter, TOTP, Nutzerakten) ✅, Step 3 (Persistenz + Fehlversuchsbremse, Code-/Refresh-Replay-Tötung) ✅; read + newest Session-stopped block first
 - [docs/concepts/phase4_auth_plan.md](./concepts/phase4_auth_plan.md) — 📕 ~76KB · ausführungsreifer P4-Plan (Entscheidungen P4-A–P4-R, Steps 0–7, eigener Authorization Server, Argon2id + TOTP, opake Token); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen; Autor Browser-Planungssession 2026-07-28, **ohne frischen Repo-Zugriff geschrieben** — Anker sind Funktionsnamen/Suchstrings, keine Zeilennummern
-- [phase4_auth/SESSIONS_ARCHIVE.md](../phase4_auth/SESSIONS_ARCHIVE.md) — 📦 noch leer, newest-first sobald ein zweiter Session-Block rotiert
+- [phase4_auth/SESSIONS_ARCHIVE.md](../phase4_auth/SESSIONS_ARCHIVE.md) — 📦 ~5KB · ein archivierter Session-Block (Step 0+1+2), verbatim, newest-first
 
 ## Completed phases
 
