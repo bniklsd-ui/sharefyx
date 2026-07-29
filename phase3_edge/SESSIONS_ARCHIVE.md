@@ -4,10 +4,45 @@ purpose: Archiv älterer Session-stopped-Blöcke aus phase3_edge/CLAUDE.md, newe
 read-when: Audit vergangener Sessions dieser Phase; NICHT für normalen Session-Start
 detail: L3
 up: CLAUDE.md
-updated: 2026-07-28 (Step 6 + Live-Abnahme B3/B4 archiviert; zweite Session vom 2026-07-27 archiviert)
+updated: 2026-07-29 (2026-07-28-Session „Token-Rotation live bestätigt" archiviert)
 ---
 
 # Session-Archiv — Phase 3 Exposure & Betrieb
+
+## Session stopped — 2026-07-28 (Token-Rotation live bestätigt, Abschluss-Punkte erledigt)
+
+**Für den nächsten, kalten Leser:** direkte Fortsetzung des vorigen Blocks vom 2026-07-27 —
+der Nikinger hat die dort skizzierte Rotationsfolge (niklas zuerst, dann fabians Erstausgabe)
+selbst ausgeführt und die Session neu geladen. Diese Session hat nur noch die Bestätigung
+und den Abschluss-Aufräumschritt gemacht, keine neuen Findings.
+
+**Was passiert ist:**
+1. Der Nikinger hat alle vier Rotationsschritte (Revoke+Issue, Export, `systemd-creds
+   encrypt`, `systemctl restart`) für niklas und für fabians erste reguläre Ausgabe
+   ausgeführt, danach die Connector-URLs in beiden Claude-Accounts aktualisiert (neue
+   Adapter-Namen: `phase_3_final_niklas_sharefyx`, `phase_3_final_sharefyx_fabian`) und die
+   Session neu geladen.
+2. Beide neuen Connectors live gegen `list_spaces` geprüft: niklas sieht `{fabian:
+   item_count 1, writable:false}` + `{niklas: item_count 5, writable:true}`; fabian sieht
+   das Spiegelbild. Rule 4 (fremd sichtbar, fremd nicht schreibbar) hält nach der Rotation
+   unverändert. Für niklas ist das die geprüfte Tiefe (`list_spaces`, `writable:true` korrekt
+   gesetzt); ein echter Write über den neuen niklas-Connector wurde diese Session nicht
+   zusätzlich gefahren — derselbe Principal-Resolution-Pfad wie beim fabian-Write unten, aber
+   nicht separat belegt.
+3. `itm_2dda3690` (fabian-Testitem, zuletzt Beleg für Zeile 5) über den neuen fabian-Connector
+   archiviert (`update_item`, `status: archived`, v1→v2 — ein echter Write, geprüft) — der
+   temporäre `sharefyx_phase_3_fabian`-Adapter ist damit vollständig durch die reguläre Ausgabe
+   ersetzt, keine offenen Wegwerf-Items mehr.
+
+**Damit erledigt aus der „noch offen"-Liste des vorigen Blocks:** Token-Rotation aller drei
+Token, Archivierung von `itm_2dda3690`, Ablösung des temporären Connectors. **Weiterhin offen,
+unverändert:** Zeile 6 (Reboot, passive Beobachtung), Zeilen 12/13 (nächste Phase, siehe B5),
+Zeile 14 (optional, V8 geerbt).
+
+**Nächster Schritt (konkret):** nichts Aktives mehr für P3 — abwarten, bis ein echter Reboot
+(geplant oder Vorfall) beobachtet wird, dann Zeile 6 nachtragen und `ROADMAP.md`/Phase-Head/
+Index von 🟡 auf ✅ heben. Bis dahin bleibt P3 funktional beendet, aber nicht live-verifiziert
+im Sinne der Statusglyphen-Definition.
 
 ## Session stopped — 2026-07-27 (zweite Session, 10/13 belegt, nur noch Reboot + zwei akzeptierte Lücken offen)
 

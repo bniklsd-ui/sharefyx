@@ -173,12 +173,16 @@ Nachtrag. Details zu Step 2–6b: Session-Blöcke in `phase4_auth/CLAUDE.md` bzw
 `phase4_auth/SESSIONS_ARCHIVE.md`.
 
 **Phase 3 — Exposure & Betrieb** (`phase3_edge/`, kein eigenes Python-Paket — Servercode bleibt
-in `mcpserver`): 🟡 **code-complete, nicht live-bewiesen** — 10 von 13 Abnahmezeilen live
-bestanden (Details: `docs/concepts/P3_ABNAHME_2026-07-27.md`). Zeilen 6 (Reboot), 12
-(Backup-Timer-Lauf) und 13 (Restore-Nachweis) sind laut Nikinger-Entscheidung an P4 vererbt,
-nicht vergessen — Zeile 12 ist inzwischen (P4 Step 0) durch einen realen Timer-Lauf erfüllt,
-Zeile 13 bewusst noch nicht nachgeholt (braucht ein frisches Bundle, siehe P4 Step 0). ✅ erst
-nach einem beobachteten echten Reboot. Formaler Abschluss-Handover an P4:
+in `mcpserver`): 🟡 **code-complete, nicht vollständig live-bewiesen** — inzwischen 12 von 13
+Abnahmezeilen live bestanden (Ursprungsstand 10/13: `docs/concepts/P3_ABNAHME_2026-07-27.md`).
+Zeilen 6 (Reboot), 12 (Backup-Timer-Lauf) und 13 (Restore-Nachweis) sind laut
+Nikinger-Entscheidung an P4 vererbt, nicht vergessen — Zeile 12 ist (P4 Step 0) durch einen
+realen Timer-Lauf erfüllt. **[2026-07-29 Ergänzung:]** Zeile 6 ist jetzt ebenfalls ✅ — ein
+unbeabsichtigter Reboot der VM (Neustart des Windows-Hosts des Nikingers) lieferte genau den
+in der Nikinger-Entscheidung vom 2026-07-27 vorgesehenen Prüffall; Belege (Boot-Zeit,
+Auto-Start ohne Handgriff, echter Tool-Traffic danach, unveränderte Funnel-URL, live `HTTP
+200`) in `phase3_edge/CLAUDE.md`, Session-Block 2026-07-29. Einzig Zeile 13 (Restore-Nachweis,
+braucht ein frisches Bundle) blockiert noch den Wechsel von 🟡 auf ✅. Formaler Abschluss-Handover an P4:
 `docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md`. Plan: `docs/concepts/phase3_edge_plan.md`
 (Entscheidungen P3-A–P3-N gelockt, Steps 0–7). Phase-Head: `phase3_edge/CLAUDE.md`.
 

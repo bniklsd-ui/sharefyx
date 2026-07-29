@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-07-28
+updated: 2026-07-29
 ---
 # Doc Index (L0)
 
@@ -37,9 +37,9 @@ updated: 2026-07-28
 
 ## Completed phases
 
-- [phase3_edge/CLAUDE.md](../phase3_edge/CLAUDE.md) — 📗 ~17KB · phase head; Steps 0–6 ✅, Step 7 (Live-Abnahme) 🟡 funktional beendet — 10/13, Zeilen 6/12/13 auf nächste Phase verschoben (Nikinger-Entscheidung 2026-07-27), Backup-Timer-Lauf + V13 in P4 Step 0 live bestätigt; ✅ erst nach beobachtetem echtem Reboot; **[P4 Step 7]** MCP-Unit zog nach `phase4_auth/systemd/` um; read + newest Session-stopped block first
+- [phase3_edge/CLAUDE.md](../phase3_edge/CLAUDE.md) — 📗 ~19KB · phase head; Steps 0–6 ✅, Step 7 (Live-Abnahme) 🟡 funktional beendet — jetzt 12/13 (Zeile 12 in P4 Step 0, Zeile 6 am 2026-07-29 durch einen unbeabsichtigten Reboot passiv erfüllt, beide live bestätigt); nur Zeile 13 (Restore-Nachweis) fehlt noch für ✅; **[P4 Step 7]** MCP-Unit zog nach `phase4_auth/systemd/` um; read + newest Session-stopped block first
 - [docs/concepts/phase3_edge_plan.md](./concepts/phase3_edge_plan.md) — 📕 ~46KB · ausführungsreifer P3-Plan (Entscheidungen P3-A–P3-N, Steps 0–7); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
-- [phase3_edge/SESSIONS_ARCHIVE.md](../phase3_edge/SESSIONS_ARCHIVE.md) — 📦 ~50KB · neun archivierte Session-Blöcke (Step 0–6, inkl. Live-Abnahme-Funde B3/B4, beide Live-Abnahme-Sessions vom 2026-07-27), verbatim, newest-first
+- [phase3_edge/SESSIONS_ARCHIVE.md](../phase3_edge/SESSIONS_ARCHIVE.md) — 📦 ~53KB · zehn archivierte Session-Blöcke (Step 0–6, inkl. Live-Abnahme-Funde B3/B4, beide Live-Abnahme-Sessions vom 2026-07-27, Token-Rotation-Session vom 2026-07-28), verbatim, newest-first
 - [docs/concepts/P3_ABNAHME_2026-07-27.md](./concepts/P3_ABNAHME_2026-07-27.md) — 📕 ~19KB · Abnahmeprotokoll Phase 3: 10/13 live bestanden, Zeilen 6/12/13 per Nikinger-Entscheidung auf nächste Phase verschoben, CLI-Ausschnitt als Beleg, Befunde B5/B6
 - [docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md](./concepts/PHASE3_CLOSEOUT_HANDOVER.md) — 📕 ~17KB · Abschluss-Handover P3→P4: Status, Delta seit dem P2-Handover, [VERIFY]-Bilanz V1–V13, geerbte Abnahmezeilen 6/12/13, Doku-Drift-Liste aus der Autocompact-Session inkl. Nachträgen zum nikinger-Token-Fund, offene Entscheidungen für die OAuth-Planung
 - [docs/concepts/phase3_edge_uebersicht.svg](./concepts/phase3_edge_uebersicht.svg) — 📕 Übersichtsgrafik Phase 3 (Request-Weg, Komponenten)

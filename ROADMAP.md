@@ -108,13 +108,16 @@ offenen Findings mehr. Handover an P3: `docs/concepts/PHASE2_CLOSEOUT_HANDOVER.m
   „Disconnected" mit minimaler Diagnose — deshalb ist das Log kein Nice-to-have, sondern
   Teil des Scope.
 
-**Status 🟡 (2026-07-27, Live-Abnahme zweite Session):** 10 von 13 Abnahmezeilen live bestanden
-(Details: `docs/concepts/P3_ABNAHME_2026-07-27.md`). Nikinger-Entscheidung: Reboot-Test (Zeile
-6), Backup-Timer-Lauf (Zeile 12) und Restore-Nachweis (Zeile 13) werden nicht mehr aktiv
-nachgeholt, sondern auf die nächste Phase verschoben — ein unbeabsichtigter Reboot ist ohnehin
-der reale Prüffall, 12/13 lösen sich mit dem nächsten Backup-Zyklus. Erst nach einem
-beobachteten echten Reboot wechselt der Status auf ✅ (Statusglyphen-Definition:
-„live-verifiziert").
+**Status 🟡 (2026-07-27, Live-Abnahme zweite Session; 2026-07-29 fortgeschrieben):** 10 von 13
+Abnahmezeilen live bestanden am 2026-07-27 (Details: `docs/concepts/P3_ABNAHME_2026-07-27.md`).
+Nikinger-Entscheidung: Reboot-Test (Zeile 6), Backup-Timer-Lauf (Zeile 12) und Restore-Nachweis
+(Zeile 13) werden nicht mehr aktiv nachgeholt, sondern auf die nächste Phase verschoben — ein
+unbeabsichtigter Reboot ist ohnehin der reale Prüffall, 12/13 lösen sich mit dem nächsten
+Backup-Zyklus. **[2026-07-29:]** Zeile 12 löste sich mit dem P4-Step-0-Backup-Zyklus, Zeile 6
+mit einem unbeabsichtigten Reboot der VM (Windows-Host-Neustart des Nikingers) — beide jetzt
+✅, Belege in `phase3_edge/CLAUDE.md` Session-Block 2026-07-29. Damit stehen **12 von 13**;
+nur Zeile 13 (Restore-Nachweis) fehlt noch für den Wechsel des Gesamtstatus auf ✅
+(Statusglyphen-Definition: „live-verifiziert").
 
 ## Phase 4 — OAuth 2.1
 
