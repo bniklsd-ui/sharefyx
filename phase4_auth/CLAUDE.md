@@ -107,6 +107,7 @@ Bedarf nicht neu recherchiert werden muss:
 | 7b | `phase4_auth/scripts/oauth_smoke.py`; `mcpserver/{request_log,logging_setup}.py` erweitert (`OAuthLogASGI`, `_SECRET_PATTERNS`); `scripts/serve.py` verdrahtet (`SPACE_AUTH_MODE`-Gate) | 6b | ✅ | 6 neu in `test_oauth_smoke.py` (neue Datei, 11/11 `oauth_smoke.py` + fünf Regressionstests) + 3 neu in `test_request_log.py` + 6 neu in `test_logging.py` + 1 neu in `test_asgi_bearer.py` (Plan-Done-when-Klausel 3: sechs Tools unter Bearer vs. Pfad-Token) |
 | 8 | `phase4_auth/scripts/authctl.py` (+ `store.py :: list_clients`/`list_families`, `config.py :: resolve_db_path`); `phase4_auth/systemd/sharefyx-mcp.service` (`StateDirectory`, zweites Credential, `SPACE_AUTH_MODE`/`SPACE_PUBLIC_BASE_URL`); `install_units.sh`/`local.env.example` erweitert; `oauth_smoke.py --base-url` (echtes Netz) | 7 | 🟡 **Code-Vorbereitung fertig — Live-Teile stehen aus, Sache des Nikingers** (Provisionierung, `sudo systemd-creds`, `systemctl restart`, Connector in beiden Accounts, Abnahmematrix) | 21 neu: 9 `test_authctl.py` (neue Datei) + 5 neu in `test_authserver_store.py` + 3 neu in `test_units.py` (`phase3_edge/tests/`, davon 2 aus S1) + 4 neu in `test_oauth_smoke.py` |
 | 8a | **Befund S1** (2026-07-29): `ALLOWED_HOSTS` ohne `127.0.0.1` machte Runbook-Schritt 4 unausführbar — `local.env.example` + `install_units.sh`-Warnung + Runbook korrigiert, kein Servercode geändert | 7 | ✅ | 2 neu in `test_units.py` (in Zeile 8 mitgezählt) |
+| 8b | `phase4_auth/scripts/abnahme_run.sh` (2026-07-29) — automatisiert die acht maschinell prüfbaren Abnahmezeilen (1,2,3,10,11,12,13,16), spiegelt Aufbau/Redaktionsmuster von `phase3_edge/scripts/abnahme_run.sh` 1:1. Live gegen den echten Dienst probegelaufen (Zeilen 1/2/3/12 ok, 13/16 korrekt übersprungen, 10/11 korrekt übersprungen ohne echtes Passwort). Kein Ersatz für Zeilen 4–9/14/15 — eine curl-Nachbildung des Login-Formulars wäre eine zweite, ungetestete OAuth-Implementierung | 7 | ✅ | 0 (Runbook/Skript, gleiche Ausnahme wie `diagnose.sh`/`phase3_edge/scripts/abnahme_run.sh` — kein Unit-Test für ein Skript, das echten `systemd`/`journalctl`/Netzzugriff braucht) |
 
 **Zeile 1, Step 0:** kritischer Fund — ein nie widerrufener Keyring-Token für einen dritten,
 seit P2-B2 umbenannten Space (`nikinger`), live und schreibfähig. Details, Zeitachse und
@@ -321,6 +322,16 @@ curl -s https://<node>.<tailnet>.ts.net/.well-known/oauth-authorization-server
 #    Behauptungen. docs/concepts/P4_ABNAHME_<Datum>.md erst NACH diesem Schritt schreiben
 #    (ein Ergebnis-Protokoll für eine Matrix, die noch nicht gelaufen ist, wäre ein
 #    fabriziertes Protokoll — Advisor-Vorgabe dieser Session).
+#    [2026-07-29] phase4_auth/scripts/abnahme_run.sh deckt die acht maschinell prüfbaren
+#    Zeilen ab (1,2,3,10,11,12,13,16 — Zeile 16 erst nach Schritt 8 sinnvoll) und schreibt
+#    einen redigierten, einreichbaren CLI-Ausschnitt:
+export SHAREFYX_HOST=savefyx-vmware-virtual-platform.tail89fc2a.ts.net
+phase4_auth/scripts/abnahme_run.sh start      # vor den manuellen Zeilen 4–9
+#    ... Zeilen 4–9 im echten Connector fahren (Notizen mitschreiben) ...
+phase4_auth/scripts/abnahme_run.sh run  | tee ~/sharefyx-p4-abnahme-<Datum>.txt
+#    Ausgabe liegt bewusst AUSSERHALB des Repos (~/, nicht docs/) — dieselbe Lehre wie der
+#    Screenshot-Vorfall in P2 (phase2_mcp/CLAUDE.md): erst nach Sichtprüfung ohne jedes
+#    Geheimnis in docs/concepts/P4_ABNAHME_<Datum>.md übernehmen.
 
 # 8) Schnitt (NICHT auf einen Termin warten — Plan-Wortlaut: „ein both-Modus, der auf einen
 #    Termin wartet, ist genau das Risiko, dessentwegen P4 vorgezogen wurde")
@@ -448,9 +459,32 @@ Testinstanz — Prozesse nur per PID beenden, nie per Musterabgleich.
 11/11. Produktionsdienst nach allen Arbeiten unverändert aktiv (`uptime_s` durchgehend
 monoton).
 
-**Nächster Schritt (konkret):** Runbook Schritt 3 erneut — `sudo phase3_edge/scripts/install_units.sh`
-(läuft jetzt durch, `local.env` ist vollständig), danach `systemctl cat sharefyx-mcp` prüfen, ob
-`SPACE_ALLOWED_HOSTS` beide Werte trägt, dann Schritt 4. Fällt Schritt 4 erneut, ist es **nicht**
-mehr S1. Danach unverändert Schritte 5–8. Vor dem Schnitt (Schritt 8) entscheiden, welche der
-Befunde S2–S8 noch in P4 gefixt werden.
+**Nachtrag, selbe Session (Schritt 4/5 danach live durchlaufen, Schritt 6/7 im Gang):** der
+Nikinger fuhr Schritt 3 erneut (`install_units.sh` lief jetzt durch), Schritt 4
+(`oauth_smoke.py --base-url http://127.0.0.1:8765 --space niklas`) → **11/11 grün**, S1 damit
+live bestätigt behoben. Schritt 5 (Discovery von außen) ebenfalls grün. Beim ersten
+Connector-Login (Schritt 6) dann „Anmeldung fehlgeschlagen" (HTTP 400) — **kein neuer Befund**:
+Lesen von `login_attempts`/`totp_replay` in der echten `auth.sqlite3` (read-only, kein Write)
+zeigte, `totp_replay.last_counter` für `niklas` stand exakt auf dem Zeitstempel des
+`oauth_smoke.py`-Laufs (15:02:30Z) und rührte sich über vier weitere Browser-Versuche nicht —
+der TOTP-Replay-Schutz (RFC 6238, genau Abnahmezeile 8) griff, weil derselbe/ein bereits
+verbrauchter Code aus dem Smoke-Test erneut eingegeben wurde. `niklas` stand danach bei 3 von 5
+Fehlversuchen (noch nicht gesperrt). Mit einem frischen TOTP-Code aus der Authenticator-App
+klappte der Login. **Lehre fürs Runbook:** Smoke-Test und ersten Connector-Login nicht mit
+demselben TOTP-Code versuchen — auf einen neuen Code warten.
+
+Auf Nachfrage, wie die Abnahmematrix dokumentierbar/wiederholbar bleibt: neues
+`phase4_auth/scripts/abnahme_run.sh` gebaut (Details Zeile 8b oben), live gegen den echten
+Dienst probegelaufen — Zeilen 1/2/3/12 ok, 13/16 korrekt übersprungen (kein Passwort
+eingegeben bzw. `SPACE_AUTH_MODE` noch nicht `oauth`), 10/11 korrekt übersprungen im Probelauf
+(smoke-Pfad absichtlich deaktiviert, kein echtes Passwort angefasst). Ein echter Bug beim
+Probelauf gefunden und behoben, bevor der Nikinger ihn hätte treffen können: `POST /mcp` ohne
+Trailing Slash trifft Starlettes eigenes Mount-Redirect (307) **vor** jeder Auth-Prüfung — kein
+Server-Bug, aber ein falscher Negativbefund für Zeile 2, wenn man ohne Slash testet. Skript
+korrigiert auf `/mcp/`.
+
+**Nächster Schritt (konkret):** Runbook Schritt 6 mit frischem TOTP-Code wiederholen, dann
+Schritt 7 (Abnahmematrix) über `abnahme_run.sh start` → Zeilen 4–9 manuell im Connector →
+`abnahme_run.sh run`. Zeilen 14/15 mit Fabian. Vor dem Schnitt (Schritt 8) entscheiden, welche
+der Befunde S2–S8 noch in P4 gefixt werden.
 
