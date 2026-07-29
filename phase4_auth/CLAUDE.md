@@ -345,6 +345,17 @@ sudo systemctl restart sharefyx-mcp
 #    reduzieren — Codeentfernung IM SELBEN COMMIT wie die Abnahme (Plan-Wortlaut), nicht vorab.
 ```
 
+**`authctl.py` braucht `STATE_DIRECTORY`, außerhalb von systemd nicht automatisch gesetzt**
+(live gefunden, 2026-07-29): `config.py :: resolve_db_path()` verweigert bewusst einen stillen
+Fallback ins Arbeitsverzeichnis — jeder `authctl.py`-Aufruf aus einer interaktiven Shell (nicht
+nur `unlock`, auch `list-clients`/`list-tokens`/`revoke`/`purge-expired`) braucht:
+```
+STATE_DIRECTORY=/var/lib/sharefyx python phase4_auth/scripts/authctl.py <befehl> …
+```
+Kein `sudo` nötig — `/var/lib/sharefyx` gehört `savefyx`. Innerhalb des Dienstes exportiert
+systemd `$STATE_DIRECTORY` selbst (`StateDirectory=sharefyx`), deshalb tauchte das in keinem
+Test auf (`test_authctl.py` setzt `SPACE_AUTH_DB` direkt).
+
 **Abnahmematrix** (16 Zeilen, Protokoll nach P2/P3-Konvention — Belege statt Behauptungen):
 
 | # | Prüfung | Erwartung | Braucht Fabian |
