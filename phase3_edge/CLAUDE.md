@@ -67,6 +67,19 @@ hier `tools.py` anfasst, ist in der falschen Phase.
 | 7 | Runbooks, `diagnose.sh`, Cloudflare-Rückbau | 6 | ✅ | 0 (Runbook/Skript, keine automatisierten Tests laut Plan) |
 | 8 | Live-Abnahme (Nikinger) | 7 | 🟡 funktional beendet — 10/13 live, Zeilen 6/12/13 auf nächste Phase verschoben (Nikinger-Entscheidung 2026-07-27), B3–B6 dokumentiert, V9 live geschlossen, Token-Rotation live bestätigt (2026-07-28); ✅ erst nach beobachtetem echtem Reboot | — |
 
+**[2026-07-29 Korrektur, P4 Step 7]:** Zeile 5 nennt „systemd-Units" — `sharefyx-mcp.service`
+ist davon inzwischen nicht mehr eine. Die MCP-Unit zog nach `phase4_auth/systemd/` um (Plan §5
+Step 7: „ERSETZT die P3-Fassung", inhaltlich jetzt eine P4-Unit — `StateDirectory`, zweites
+Credential für die Auth-Nutzerakten, zwei neue `Environment=`-Zeilen für `SPACE_AUTH_MODE`/
+`SPACE_PUBLIC_BASE_URL`). Die beiden Backup-Units (`sharefyx-backup.service`/`.timer`, Zeile 6)
+bleiben unverändert unter `phase3_edge/systemd/`. `install_units.sh` bleibt P3-Eigentum, liest
+jetzt aber aus **beiden** Verzeichnissen (`phase3_edge/local.env.example` um `AUTH_MODE`/
+`PUBLIC_BASE_URL` ergänzt). `phase3_edge/tests/test_units.py` folgt dem neuen Pfad — keine
+Test-Semantik geändert, nur der Quellort; die historischen Zähl-Zeilen 5/6 oben bleiben
+unangetastet (dieselbe Regel wie in `phase2_mcp/CLAUDE.md`s Korrekturen: nur die driftende
+Aussage wird korrigiert, nicht die abgeschlossene Historie umgeschrieben). Details, Session-Block
+in `phase4_auth/CLAUDE.md`.
+
 ## Umgebungsstand (Step 0, Details im Archiv)
 
 Vier Fakten, die spätere Steps direkt gaten — volle Inventartabelle in `SESSIONS_ARCHIVE.md`:

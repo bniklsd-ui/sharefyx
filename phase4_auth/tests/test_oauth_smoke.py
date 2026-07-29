@@ -19,6 +19,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 SMOKE_PATH = Path(__file__).resolve().parents[1] / "scripts" / "oauth_smoke.py"
 
 
@@ -155,3 +157,104 @@ def test_oauth_log_never_contains_secrets(tmp_path):
     )
     for secret in [*observed_secrets, *oauth_smoke.MARKER_SECRETS]:
         assert secret not in full_text, f"Geheimnis im Log gefunden: {secret!r}"
+
+
+def test_base_url_requires_space():
+    result = _run("--base-url", "http://127.0.0.1:1")
+    assert result.returncode != 0
+    assert "--space" in result.stderr
+
+
+def test_space_without_base_url_is_rejected():
+    result = _run("--space", "alpha")
+    assert result.returncode != 0
+    assert "--base-url" in result.stderr
+
+
+def test_smoke_script_never_puts_secrets_in_argv():
+    """Regressionstest: `--base-url`-Modus fragt Passwort/TOTP-Seed über `getpass.getpass()` ab
+    (Moduldocstring) — kein `--password`/`--totp-secret`-Argument, das in `~/.bash_history` und
+    `ps` landen würde (zwei dokumentierte Klartext-Token-Vorfälle in diesem Repo,
+    `phase2_mcp/CLAUDE.md`)."""
+    source = SMOKE_PATH.read_text()
+    assert "getpass" in source
+    assert "--password" not in source
+    assert "--totp-secret" not in source
+
+
+@pytest.mark.asyncio
+async def test_network_mode_runs_against_a_real_server(tmp_path):
+    """`_run_network()` gegen einen ECHTEN, lokal auf `127.0.0.1` lauschenden `uvicorn`-Server
+    (kein `ASGITransport`) — der eigentliche Beweis für Plan §5 Step 7 Punkt 4
+    (`oauth_smoke.py gegen 127.0.0.1:8765`). Baut die App genau wie `oauth_smoke._run()` selbst
+    (gleiche Verdrahtung: `AccessLogASGI(OAuthLogASGI(raw_app))`), aber mit einem bekannten
+    Passwort/TOTP-Seed, die der Test wie ein `--base-url`-Aufrufer von außen liefert."""
+    from datetime import datetime, timezone
+
+    import uvicorn
+
+    from authserver import passwords as _passwords
+    from authserver import totp as _totp
+    from authserver.config import AuthSettings
+    from authserver.store import AuthStore
+    from mcpserver.app import OAuthConfig, create_app
+    from mcpserver.auth import KeyringTokenResolver
+    from mcpserver.config import Settings
+    from mcpserver.request_log import AccessLogASGI, OAuthLogASGI
+    from storage.store import Store
+
+    oauth_smoke = _load_oauth_smoke_module()
+
+    space = "alpha"
+    password = "real-password-not-a-marker"
+    totp_secret = _totp.generate_secret()
+
+    auth_settings = AuthSettings(
+        base_url="https://space.example.ts.net", db_path=tmp_path / "auth.sqlite3"
+    )
+    auth_store = AuthStore(auth_settings.db_path, now_fn=lambda: datetime.now(timezone.utc))
+    users = {
+        space: {
+            "pwd": _passwords.hash_password(password),
+            "totp": totp_secret,
+            "totp_alg": "SHA1",
+            "created_at": "2026-07-29T00:00:00Z",
+        }
+    }
+    notes_root = tmp_path / "notes"
+    notes_root.mkdir()
+    store = Store(notes_root, git=False)
+    settings = Settings(data_root=notes_root)
+    raw_app = create_app(
+        settings=settings,
+        resolver=KeyringTokenResolver(load_map=lambda: {}),
+        store=store,
+        oauth=OAuthConfig(settings=auth_settings, store=auth_store, users=users),
+    )
+    app = AccessLogASGI(OAuthLogASGI(raw_app))
+
+    config = uvicorn.Config(app, host="127.0.0.1", port=0, log_level="warning", lifespan="on")
+    server = uvicorn.Server(config)
+    serve_task = asyncio.create_task(server.serve())
+    try:
+        while not server.started:
+            await asyncio.sleep(0.01)
+        port = server.servers[0].sockets[0].getsockname()[1]
+
+        checks: list = []
+        observed_secrets: list[str] = []
+        await oauth_smoke._run_network(
+            f"http://127.0.0.1:{port}",
+            space=space,
+            password=password,
+            totp_secret=totp_secret,
+            checks=checks,
+            observed_secrets=observed_secrets,
+        )
+    finally:
+        server.should_exit = True
+        await serve_task
+        sys.modules.pop("oauth_smoke", None)
+
+    assert checks and all(c.ok for c in checks), [c for c in checks if not c.ok]
+    assert len(checks) == 11

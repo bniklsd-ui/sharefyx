@@ -145,6 +145,50 @@ def test_revoke_family_kills_access_and_refresh_tokens(store):
     assert store.rotate_refresh(refresh, access_ttl_s=3600, refresh_ttl_s=2_592_000) is None
 
 
+def test_list_clients_returns_all_registered_clients(store):
+    c1 = store.create_client(client_name="a", application_type="web", redirect_uris=["https://x/cb"])
+    c2 = store.create_client(client_name="b", application_type="web", redirect_uris=["https://y/cb"])
+
+    listed = store.list_clients()
+
+    assert {c.client_id for c in listed} == {c1.client_id, c2.client_id}
+
+
+def test_list_clients_empty_store_returns_empty_list(store):
+    assert store.list_clients() == []
+
+
+def test_list_families_returns_all_by_default(store):
+    f1 = _family(store, space="niklas")
+    f2 = _family(store, space="fabian")
+
+    listed = store.list_families()
+
+    assert {f.family_id for f in listed} == {f1, f2}
+
+
+def test_list_families_filters_by_space(store):
+    f1 = _family(store, space="niklas")
+    _family(store, space="fabian")
+
+    listed = store.list_families(space="niklas")
+
+    assert [f.family_id for f in listed] == [f1]
+
+
+def test_list_families_reflects_revocation(store):
+    """Der Aufrufer (`authctl.py list-tokens`) muss zwischen aktiven und widerrufenen Familien
+    unterscheiden können, ohne eine zweite Abfrage zu bauen — `revoked_at`/`revoked_reason` sind
+    deshalb Teil des zurückgegebenen `TokenFamily`, nicht nur intern in `store.py` genutzt."""
+    family_id = _family(store)
+    store.revoke_family(family_id, "operator")
+
+    (listed,) = store.list_families()
+
+    assert listed.revoked_at is not None
+    assert listed.revoked_reason == "operator"
+
+
 def test_lookup_access_token_rejects_expired(store, clock):
     family_id = _family(store)
     access, _refresh = store.issue_token_pair(family_id, access_ttl_s=60, refresh_ttl_s=2_592_000)

@@ -151,15 +151,21 @@ Phase-Head gilt.**]**
 **[2026-07-28 dritte Korrektur, im Step-6b-Commit gefunden:** dieselbe Drift-Kategorie trat ein
 drittes Mal ein — der Step-6a-Abschluss-Commit zog diese Zeile nicht nach, obwohl er zwischen
 Step 5 und Step 6b lag. Diese Zeile jetzt auf Step 6b gebracht, jeweils bei ihrem eigenen
-Abschluss-Commit nachzuziehen, nicht erst wenn die Drift wieder auffällt.**]** Step 0 (Haushalt,
-Drift, geerbte Abnahme), Step 1 (Gerüst, Konfiguration, Kryptobausteine), Step 2 (Passwörter,
-TOTP, Nutzerakten), Step 3 (Persistenz + Fehlversuchsbremse — Code-/Refresh-Replay-Tötung nach
-RFC 9700), Step 4 (Metadaten + dynamische Registrierung), Step 5 (Autorisierungsfluss —
-`/oauth/authorize`, `/oauth/token`, TOTP-Replay-Schutz, Enumerationsschutz), Step 6a (Resolver,
-Bearer-Auflösung, `create_app()`-Verdrahtung) und Step 6b (`oauth_smoke.py` 11/11, `OAuthLogASGI`,
-`serve.py`-`SPACE_AUTH_MODE`-Gate — Step 6 damit vollständig) sind durchgelaufen. Kritischer Fund
-in Step 0: ein nie widerrufener Keyring-Token für einen dritten, seit P2-B2 umbenannten Space
-(`nikinger`) — live und schreibfähig, aber ohne zugehöriges Verzeichnis unter `DATA_ROOT`.
+Abschluss-Commit nachzuziehen, nicht erst wenn die Drift wieder auffällt.**]**
+**[2026-07-29:** Step 7 nachgetragen — Code-Vorbereitung fertig, Live-Teile (Provisionierung,
+`systemd-creds`, `systemctl restart`, Connector, Abnahmematrix) stehen aus, Sache des
+Nikingers.**]** Step 0 (Haushalt, Drift, geerbte Abnahme), Step 1 (Gerüst, Konfiguration,
+Kryptobausteine), Step 2 (Passwörter, TOTP, Nutzerakten), Step 3 (Persistenz +
+Fehlversuchsbremse — Code-/Refresh-Replay-Tötung nach RFC 9700), Step 4 (Metadaten + dynamische
+Registrierung), Step 5 (Autorisierungsfluss — `/oauth/authorize`, `/oauth/token`,
+TOTP-Replay-Schutz, Enumerationsschutz), Step 6a (Resolver, Bearer-Auflösung,
+`create_app()`-Verdrahtung) und Step 6b (`oauth_smoke.py` 11/11, `OAuthLogASGI`,
+`serve.py`-`SPACE_AUTH_MODE`-Gate — Step 6 damit vollständig) sind durchgelaufen. Step 7
+(`authctl.py`, Unit-Umzug nach `phase4_auth/systemd/`, `oauth_smoke.py --base-url`) ist
+**code-vorbereitet, nicht live-abgenommen** — 🟡, nicht ✅ (Details:
+`phase4_auth/CLAUDE.md`-Runbook). Kritischer Fund in Step 0: ein nie widerrufener Keyring-Token
+für einen dritten, seit P2-B2 umbenannten Space (`nikinger`) — live und schreibfähig, aber ohne
+zugehöriges Verzeichnis unter `DATA_ROOT`.
 Nikinger-Entscheidung: widerrufen (Keyring), Export + `sudo systemctl restart sharefyx-mcp`
 nachgezogen (2026-07-28 14:12) — live gegen `diagnose.sh` und `export_space_map.py` bestätigt,
 Token auch im laufenden Dienst tot. Details: `docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md` §5

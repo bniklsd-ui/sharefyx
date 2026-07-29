@@ -57,3 +57,18 @@ class LoginAttempt:
     failures: int
     first_failure_at: datetime | None
     locked_until: datetime | None
+
+
+@dataclass(frozen=True, kw_only=True)
+class TokenFamily:
+    """P4 Step 7: Lesezugriff auf `token_families` für `authctl.py list-tokens`/`revoke`.
+    Additiv wie `LoginAttempt` — nicht im Plan-Schema-Kommentar benannt, dieselbe Tabelle."""
+
+    family_id: str
+    space: str
+    client_id: str
+    scope: str
+    resource: str
+    created_at: datetime
+    revoked_at: datetime | None
+    revoked_reason: str | None

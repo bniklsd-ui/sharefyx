@@ -25,7 +25,14 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from . import crypto
-from .models import AccessTokenRecord, AuthorizationCode, Client, LoginAttempt, PendingAuthRequest
+from .models import (
+    AccessTokenRecord,
+    AuthorizationCode,
+    Client,
+    LoginAttempt,
+    PendingAuthRequest,
+    TokenFamily,
+)
 
 SCHEMA_VERSION = "1"
 
@@ -132,6 +139,19 @@ def _client_from_row(row: sqlite3.Row) -> Client:
     )
 
 
+def _family_from_row(row: sqlite3.Row) -> TokenFamily:
+    return TokenFamily(
+        family_id=row["family_id"],
+        space=row["space"],
+        client_id=row["client_id"],
+        scope=row["scope"],
+        resource=row["resource"],
+        created_at=_parse_dt(row["created_at"]),
+        revoked_at=_parse_dt_opt(row["revoked_at"]),
+        revoked_reason=row["revoked_reason"],
+    )
+
+
 class AuthStore:
     def __init__(self, path: Path, *, now_fn: Callable[[], datetime]) -> None:
         self._path = Path(path)
@@ -207,6 +227,13 @@ class AuthStore:
                 "SELECT * FROM clients WHERE client_id = ?", (client_id,)
             ).fetchone()
         return _client_from_row(row) if row is not None else None
+
+    def list_clients(self) -> list[Client]:
+        """P4 Step 7: `authctl.py list-clients`. Reine Lesehilfe, kein Plan-Skelett-Eintrag —
+        additiv wie `create_family` (siehe Moduldocstring)."""
+        with self._lock:
+            rows = self._conn.execute("SELECT * FROM clients ORDER BY created_at").fetchall()
+        return [_client_from_row(row) for row in rows]
 
     # -- Auth-Requests ---------------------------------------------------------------
 
@@ -302,6 +329,21 @@ class AuthStore:
         access_cur = conn.execute("DELETE FROM access_tokens WHERE family_id = ?", (family_id,))
         refresh_cur = conn.execute("DELETE FROM refresh_tokens WHERE family_id = ?", (family_id,))
         return access_cur.rowcount + refresh_cur.rowcount
+
+    def list_families(self, *, space: str | None = None) -> list[TokenFamily]:
+        """P4 Step 7: `authctl.py list-tokens`/`revoke` (die Familie ist die Widerrufseinheit,
+        Plan §2.1 — `revoke --family-id` nimmt genau die `family_id` entgegen, die diese Methode
+        zurückgibt). Additiv, kein Plan-Skelett-Eintrag."""
+        with self._lock:
+            if space is None:
+                rows = self._conn.execute(
+                    "SELECT * FROM token_families ORDER BY created_at"
+                ).fetchall()
+            else:
+                rows = self._conn.execute(
+                    "SELECT * FROM token_families WHERE space = ? ORDER BY created_at", (space,)
+                ).fetchall()
+        return [_family_from_row(row) for row in rows]
 
     # -- Codes und Token ------------------------------------------------------------
 

@@ -105,6 +105,7 @@ Bedarf nicht neu recherchiert werden muss:
 | 6 | `authserver/{flows,templates}.py`, `routes.py` vervollständigt (`/oauth/authorize`, `/oauth/token`) | 5 | ✅ | 36 (22 `test_flows.py` + 9 `test_routes.py` + 4 `test_templates.py` + 1 neu in `test_totp.py`) |
 | 7a | `authserver/resolver.py`; `mcpserver/{asgi,context,app}.py` verdrahtet (Bearer-Auflösung, `AuthModeASGI`, `oauth=None`) | 6a | ✅ | 19 (6 `test_resolver.py` + 13 `test_asgi_bearer.py`) |
 | 7b | `phase4_auth/scripts/oauth_smoke.py`; `mcpserver/{request_log,logging_setup}.py` erweitert (`OAuthLogASGI`, `_SECRET_PATTERNS`); `scripts/serve.py` verdrahtet (`SPACE_AUTH_MODE`-Gate) | 6b | ✅ | 6 neu in `test_oauth_smoke.py` (neue Datei, 11/11 `oauth_smoke.py` + fünf Regressionstests) + 3 neu in `test_request_log.py` + 6 neu in `test_logging.py` + 1 neu in `test_asgi_bearer.py` (Plan-Done-when-Klausel 3: sechs Tools unter Bearer vs. Pfad-Token) |
+| 8 | `phase4_auth/scripts/authctl.py` (+ `store.py :: list_clients`/`list_families`, `config.py :: resolve_db_path`); `phase4_auth/systemd/sharefyx-mcp.service` (`StateDirectory`, zweites Credential, `SPACE_AUTH_MODE`/`SPACE_PUBLIC_BASE_URL`); `install_units.sh`/`local.env.example` erweitert; `oauth_smoke.py --base-url` (echtes Netz) | 7 | 🟡 **Code-Vorbereitung fertig — Live-Teile stehen aus, Sache des Nikingers** (Provisionierung, `sudo systemd-creds`, `systemctl restart`, Connector in beiden Accounts, Abnahmematrix) | 19 neu: 9 `test_authctl.py` (neue Datei) + 5 neu in `test_authserver_store.py` + 1 neu in `test_units.py` (`phase3_edge/tests/`) + 4 neu in `test_oauth_smoke.py` |
 
 **Zeile 1, Step 0:** kritischer Fund — ein nie widerrufener Keyring-Token für einen dritten,
 seit P2-B2 umbenannten Space (`nikinger`), live und schreibfähig. Details, Zeitachse und
@@ -265,130 +266,166 @@ P4 ändert `asgi.py`/`app.py` (P4-Q). **[2026-07-28, Step 6a]:** `context.py` st
 ursprünglich mit auf der Änderungsliste (Plan §3.2 kündigt eine an) — real geändert wurde es
 nicht, siehe Zeile 7a unten. P4 fasst `tools.py`/`permissions.py`/`auth.py` weiterhin nicht an.
 
+## Runbook „Inbetriebnahme" (Step 7, live — führt der Nikinger aus, nicht Claude Code)
+
+Claude Code liefert Code, Units und diese Befehlsfolge; alles, was den echten `DATA_ROOT`, den
+echten Keyring, echte Nutzerakten/Token oder die Claude-Accounts berührt, führt der Nikinger
+selbst aus (Plan §5 Step 7) — dieselbe Arbeitsteilung wie P3s „Inbetriebnahme"
+(`phase3_edge/CLAUDE.md`). **Reihenfolge ist der halbe Runbook** (Plan-Wortlaut).
+
+```
+# 0) Vorbereitung — bereits erledigt (dieser Commit)
+#    phase4_auth/systemd/sharefyx-mcp.service, install_units.sh + local.env.example erweitert,
+#    authctl.py, oauth_smoke.py --base-url. local.env um AUTH_MODE=both, PUBLIC_BASE_URL
+#    ergänzen (cp phase3_edge/local.env.example phase3_edge/local.env, falls noch nicht
+#    geschehen — die sechs Werte eintragen).
+
+# 1) Nutzerakten provisionieren (TOTP-Seeds SOFORT in die Authenticator-Apps, QR aus der
+#    otpauth://-URI — provision_user.py zeigt sie genau einmal)
+python phase4_auth/scripts/provision_user.py --space niklas
+python phase4_auth/scripts/provision_user.py --space fabian
+
+# 2) Nutzerakten verschlüsselt bereitstellen — immer als Pipe, nie über eine Zwischendatei
+#    (P3 §2.1, höherer Einsatz als bei spaces.cred: hier sind es echte TOTP-Seeds)
+python phase4_auth/scripts/export_auth_users.py \
+  | sudo systemd-creds encrypt --name=auth-users - /etc/sharefyx/auth-users.cred
+sudo chmod 600 /etc/sharefyx/auth-users.cred
+
+# 3) Units installieren, Dienst neu starten (AUTH_MODE=both aus local.env — Pfad-Token UND
+#    Bearer laufen parallel, nichts fällt während der Abnahme aus)
+sudo phase3_edge/scripts/install_units.sh
+systemctl status sharefyx-mcp
+
+# 4) oauth_smoke.py gegen den lokalen Port — BEVOR irgendjemand einen Connector anfasst
+python phase4_auth/scripts/oauth_smoke.py --base-url http://127.0.0.1:8765 --space niklas
+#    Fragt Passwort + TOTP-Seed interaktiv ab (getpass, nie als Argument). 11/11 erwartet.
+
+# 5) Discovery von außen — resource gegen die geplante Connector-URL halten
+curl -s https://<node>.<tailnet>.ts.net/.well-known/oauth-protected-resource
+curl -s https://<node>.<tailnet>.ts.net/.well-known/oauth-authorization-server
+
+# 6) Connector in BEIDEN Accounts neu anlegen: https://<node>.<tailnet>.ts.net/mcp
+#    Ohne Client-ID, ohne Secret. Connect -> Passwort + TOTP -> Consent.
+
+# 7) Abnahmematrix fahren (unten) — Protokoll nach P2/P3-Konvention, mit Belegen statt
+#    Behauptungen. docs/concepts/P4_ABNAHME_<Datum>.md erst NACH diesem Schritt schreiben
+#    (ein Ergebnis-Protokoll für eine Matrix, die noch nicht gelaufen ist, wäre ein
+#    fabriziertes Protokoll — Advisor-Vorgabe dieser Session).
+
+# 8) Schnitt (NICHT auf einen Termin warten — Plan-Wortlaut: „ein both-Modus, der auf einen
+#    Termin wartet, ist genau das Risiko, dessentwegen P4 vorgezogen wurde")
+#    AUTH_MODE=oauth in local.env, install_units.sh erneut, restart.
+python phase2_mcp/scripts/issue_token.py --revoke niklas
+python phase2_mcp/scripts/issue_token.py --revoke fabian
+python phase3_edge/scripts/export_space_map.py \
+  | sudo systemd-creds encrypt --name=spaces - /etc/sharefyx/spaces.cred
+sudo systemctl restart sharefyx-mcp
+#    Danach TokenPathASGI/AuthModeASGI aus dem Code entfernen, SPACE_AUTH_MODE auf zwei Werte
+#    reduzieren — Codeentfernung IM SELBEN COMMIT wie die Abnahme (Plan-Wortlaut), nicht vorab.
+```
+
+**Abnahmematrix** (16 Zeilen, Protokoll nach P2/P3-Konvention — Belege statt Behauptungen):
+
+| # | Prüfung | Erwartung | Braucht Fabian |
+|---|---|---|---|
+| 1 | `/health` von außen | unverändert, unauthentifiziert | nein |
+| 2 | `POST /mcp` ohne Token | **401** mit korrektem `WWW-Authenticate` | nein |
+| 3 | Discovery von außen | beide `.well-known` liefern, `resource` exakt | nein |
+| 4 | Connect `niklas` | DCR → Consent → Tool-Aufruf erfolgreich | nein |
+| 5 | Falsches Passwort | generische Meldung, keine Enumeration | nein |
+| 6 | Fünf Fehlversuche | Sperre greift, `authctl.py unlock --space niklas` hebt sie | nein |
+| 7 | Falscher TOTP-Code | Fehlschlag; korrekter Code danach erfolgreich | nein |
+| 8 | TOTP-Replay | derselbe Code ein zweites Mal → Fehlschlag | nein |
+| 9 | Access-Token-Ablauf | TTL kurz setzen, Claude refresht selbständig | nein |
+| 10 | Refresh-Replay | `oauth_smoke.py` → `invalid_grant`, Familie tot | nein |
+| 11 | Code-Replay | `oauth_smoke.py` → `invalid_grant`, Familie tot | nein |
+| 12 | Fremdregistrierung | `redirect_uri` auf fremder Domain → abgelehnt | nein |
+| 13 | Secret-Grep im journald | **leer** | nein |
+| 14 | Connect `fabian` | eigener Space, eigener Login | **ja** |
+| 15 | Cross-Space unter OAuth | fremder Body gewrappt, Schreibversuch `write_denied` | **ja** |
+| 16 | Pfad-Token tot | alte URL → 401 | nein |
+
+**Terminrisiko (Nikinger-Entscheidung 2026-07-28, im Plan gelockt):** Zeilen 14/15 brauchen
+Fabian — ein Terminrisiko, das die Phase nicht blockieren soll. 14/16 bestanden → 🟡
+code-complete (P5 darf beginnen); ✅ erst nach beiden Zwei-Personen-Zeilen. Schritt 8 (Schnitt)
+darf **nicht** auf einen Termin warten, siehe Runbook oben.
+
+**Done when** (Plan §5 Step 7): 14/16 bestanden, Schnitt vollzogen, Pfad-Token widerrufen,
+`TokenPathASGI` entfernt, Protokoll geschrieben, `ROADMAP.md`/`docs/INDEX.md`/Phase-Head
+nachgezogen.
+
 ---
 
-## Session stopped — 2026-07-28 (Step 6b)
+## Session stopped — 2026-07-29 (Step 7, Code-Vorbereitung)
 
-**Ergebnis:** Step 6b (`oauth_smoke.py`, Logging-Erweiterung, `serve.py`-Gate) abgeschlossen.
-`pytest -q` → **331/331 grün** (315 Vorlauf + 16 neue: 6 `test_oauth_smoke.py` + 3 neu in
-`test_request_log.py` + 6 neu in `test_logging.py` + 1 neu in `test_asgi_bearer.py`). Reihenfolge
-wie in der Kurznotiz der Vorsession festgelegt: `oauth_smoke.py` zuerst, Logging danach,
-`serve.py`-Gate zuletzt.
-
-**Alle drei Done-when-Klauseln aus Plan §5 Step 6 jetzt belegt, nicht nur die ersten beiden.**
-Advisor-Fund beim Abschluss-Review (siehe unten): `pytest` grün und `oauth_smoke.py` 11/11 waren
-da, die dritte Klausel („die sechs Tools verhalten sich unter Bearer-Auth exakt wie unter
-Pfad-Token, Diff der Antworten im Session-Block") war unbelegt — `oauth_smoke.py` und Step 6as
-`test_bearer_token_reaches_a_real_tool_call` rufen beide nur `list_spaces`. Nachgezogen:
-`test_six_tools_behave_identically_under_bearer_and_path_token` (`test_asgi_bearer.py`, ein
-Store, ein Space, `mode="both"`, ein Pfad-Token-Principal und eine OAuth-Familie auf demselben
-Space). Ergebnis, **qualifiziert statt pauschal** (Plan-Wortlaut "exakt wie" trifft nicht
-unbesehen zu):
-- **Drei Lese-Tools byte-identisch:** `list_spaces`, `search_items`, `get_item` (eigen **und**
-  fremd, inklusive `<untrusted_content>`-Wrap) — beide Aufrufe laufen vor jedem Schreibzugriff
-  gegen denselben, unveränderten Store-Zustand.
-- **Drei Schreib-Tools identisch bis auf `id`/`created`/`updated`:** `create_item`,
-  `update_item`, `append_to_item` erzeugen je Aufruf eine neue Zufalls-ID und einen neuen
-  Zeitstempel der echten Systemuhr — das ist Konstruktion, keine Abweichung. Verglichen wird das
-  restliche Frontmatter + Body (`_invariant_fields()`-Helfer).
-- **Cross-Space-Schreibversuch:** `write_denied` unter beiden Credentials gleich.
+**Ergebnis:** Alles, was Step 7 **ohne** echte VM/echten Keyring/echte Claude-Accounts bauen
+lässt, ist fertig — die Live-Teile (Provisionierung, `systemd-creds`, `systemctl restart`,
+Connector, Abnahmematrix) sind Sache des Nikingers (Runbook oben). `pytest -q` →
+**350/350 grün** (331 Vorlauf + 19 neue). **Phase 4 bleibt 🟡, nicht ✅** — Step 7 selbst ist
+nicht abgeschlossen, nur code-vorbereitet.
 
 **Gebaut:**
-- `phase4_auth/scripts/oauth_smoke.py` (neu) — Gegenstück zu `mcp_smoke.py`, treibt den vollen
-  Fluss ohne Browser: Discovery → DCR → `GET`/`POST /oauth/authorize` → Code → Token → echter
-  Tool-Aufruf mit Bearer → Refresh → Refresh-Replay (`invalid_grant`, Familie tot) → zweite,
-  unabhängige Runde nur für den Code-Replay-Nachweis (die erste Familie ist nach dem
-  Refresh-Replay bereits tot) → Code-Replay (`invalid_grant`, Familie tot). **11/11 Prüfungen**
-  (Plan §6 Abnahmezeilen 10/11: Refresh- **und** Code-Replay, beide über dieses Skript) — Runde 1
-  ist in `authorize_get`/`authorize_post` aufgeteilt, Runde 2 bündelt GET+POST+Token-Tausch in
-  einer Prüfung (sonst wären es zwölf), dokumentiert im Moduldocstring statt still abweichend.
-  Baut `AuthSettings`/die eine Nutzerakte direkt über `passwords.hash_password()`/
-  `totp.generate_secret()` — nie `load_users()`/`load_auth_settings()`, TOTP-Seed ist ein echtes,
-  umkehrbares Geheimnis (anders als P2/P3s Token-Hashes). `test_oauth_smoke.py` (neu, sechs
-  Tests): JSON/Text-Report grün, exakt 11 Prüfungen (Regressionstest gegen die Zählungsentscheidung),
-  Refresh-/Code-Replay-Checks existieren namentlich, kein Keyring-/Nutzerakten-Import,
-  `test_oauth_log_never_contains_secrets`.
-- `mcpserver/request_log.py`: `_ALLOWED_FIELDS` um `stage`/`client_id`/`grant` erweitert (Plan
-  §4 wörtlich — erlaubt alle drei, `OAuthLogASGI` füllt aber nur zwei, siehe unten).
-  `OAuthLogASGI` (neu, nach dem Vorbild von `AccessLogASGI`): loggt **ausschließlich**
-  `/oauth/*` (Discovery/`/health`/`/mcp` bleiben bei `AccessLogASGI`s `ev="http"`, keine
-  Doppelprotokollierung derselben Anfrage). `stage` kommt ausschließlich aus Methode+Pfad
-  (`_STAGE_BY_ROUTE`), `client_id` ausschließlich aus dem Query-String von `GET
-  /oauth/authorize`. **Kein Body-, kein Header-Read** — deshalb bleiben `err`, `grant` und
-  `space` aus Plan §4s Beispielzeilen bewusst leer (jedes bräuchte einen Formular-/JSON-Body-
-  Read); `token_code`/`token_refresh` kollabieren mangels Body-Zugriff auf `stage="token"`
-  (Kompromiss aus der Vorsession, hier umgesetzt). `stage` bleibt ganz weg (nicht `null`) für
-  Anfragen unter `/oauth/` ohne passende Route. `ok` ist HTTP-Status-Ebene: ein abgelehntes
-  Consent (`action=deny`) loggt `ok=True`, weil die Anfrage selbst korrekt beantwortet wurde —
-  wer den *Fluss* beurteilen will, braucht die Redirect-Query, nicht dieses Log.
-- `mcpserver/logging_setup.py`: `_TOKEN_SEGMENT_RE` unverändert (Pfad-Redaktion). Neu
-  `_SECRET_PATTERNS` (Verteidigung in der Tiefe, praktisch redundant zur Feld-Whitelist/
-  `OAuthLogASGI`s Body-Freiheit): `_kv_pattern()`-Helfer deckt sowohl Form-Encoding
-  (`password=…`) als auch JSON (`"access_token": "…"`) mit einem Muster ab, plus ein Muster für
-  `Authorization: Bearer …`. `TokenScrubbingFilter` benutzt jetzt `_scrub()` (alle Muster) statt
-  nur `_TOKEN_SEGMENT_RE`.
-- `scripts/serve.py`: `SPACE_AUTH_MODE`-Gate exakt wie in der Vorsession gelockt umgesetzt —
-  `"SPACE_AUTH_MODE" in os.environ` entscheidet, ob überhaupt ein `OAuthConfig`-Bündel gebaut
-  wird (`load_auth_settings()` **ungefangen**, kein `try/except`); fehlt die Variable bleibt
-  `oauth=None`, exakt der P3-Pfad. `AccessLogASGI(OAuthLogASGI(app))` **unbedingt** verdrahtet
-  (nicht nur wenn `oauth is not None`) — ohne `/oauth/*`-Routen ist `OAuthLogASGI` ein reiner
-  No-op, Dev- und Prod-Pfad bleiben damit strukturell gleich verdrahtet.
+- `phase4_auth/systemd/sharefyx-mcp.service` — **umgezogen** von `phase3_edge/systemd/` (Plan
+  §5 Step 7: „ERSETZT die P3-Fassung", inhaltlich jetzt eine P4-Unit). `git mv`, nicht Kopie
+  (Historie bleibt erhalten, keine zwei Quellen für dieselbe Unit — ein zweiter Advisor-Fund
+  dieser Session: eine Kopie-statt-Move hätte ein stilles Doppel-Install-Risiko über
+  Glob-Reihenfolge geschaffen). Ergänzt: `StateDirectory=sharefyx`, `StateDirectoryMode=0700`,
+  `LoadCredentialEncrypted=auth-users:…`, `Environment=SPACE_AUTH_MODE=__AUTH_MODE__`/
+  `SPACE_PUBLIC_BASE_URL=__PUBLIC_BASE_URL__`. `Documentation=` zeigt jetzt auf dieses Dokument.
+  **`StateDirectory=sharefyx` allein reicht** für den Auth-DB-Pfad — systemd exportiert
+  `$STATE_DIRECTORY`, `authserver/config.py` liest exakt diesen Namen, keine zusätzliche
+  `Environment=SPACE_AUTH_DB=`-Zeile nötig (geprüft, nicht angenommen).
+- `phase3_edge/scripts/install_units.sh` (P4-berührt, bleibt P3-Eigentum): liest jetzt aus
+  **zwei** Verzeichnissen (`phase3_edge/systemd/` **und** `phase4_auth/systemd/`); zwei neue
+  Platzhalter im Sed-Kommando **und** in der Pflichtvariablen-Prüfung (ein stiller
+  Leerstring-Fallback bei fehlendem `local.env`-Eintrag wäre der falsche Fehlermodus). `phase3_
+  edge/local.env.example` um `AUTH_MODE`/`PUBLIC_BASE_URL` ergänzt.
+- `phase3_edge/tests/test_units.py` (P4-berührt, dieselbe „genuinely necessary"-Begründung wie
+  jede andere P4-Q-artige Cross-Phase-Berührung): `UNIT_PATH`/`ALL_UNIT_PATHS` folgen dem Umzug,
+  zwei neue Tests (`StateDirectory`, zweites Credential). Kein Test-Verhalten geändert, nur der
+  Quellpfad — `pytest phase3_edge/tests/test_units.py` war der Beweis dafür, nicht nur eine
+  Behauptung (Advisor-Vorgabe: „das ist der Arbiter, nicht noch eine Runde Nachdenken").
+  `phase3_edge/CLAUDE.md` Zeile 5 bekam dieselbe Art datierte Korrekturnotiz wie
+  `phase2_mcp/CLAUDE.md`s Testzahl-Drift — historische Zähl-Zeilen bleiben unangetastet.
+- `authserver/store.py :: list_clients()`/`list_families(space=)` (additiv, kein Plan-Skelett-
+  Eintrag — gleiches Muster wie `create_family` in Step 3), neues `TokenFamily`-Dataclass in
+  `models.py`. `authserver/config.py :: resolve_db_path()` aus `load_auth_settings()`
+  herausgezogen — ein Operator-Werkzeug, das für „eine Familie widerrufen" plötzlich
+  `SPACE_PUBLIC_BASE_URL` verlangt, wäre eine unnötige Hürde für eine SSH-Sitzung.
+- `phase4_auth/scripts/authctl.py` (neu) — fünf dünne Unterbefehle (`list-clients`,
+  `list-tokens [--space]`, `revoke --family-id`, `unlock --space`, `purge-expired`), je einer
+  über eine bestehende `AuthStore`-Methode. **`revoke` kennt nur `--family-id`**, keinen
+  `--space`-Sammelwiderruf — komponierbar aus `list-tokens --space` + mehreren `revoke`-Aufrufen,
+  bewusst keine zweite Fläche dafür (Advisor-Vorgabe).
+- `phase4_auth/scripts/oauth_smoke.py`: `--base-url`-Modus (Plan §5 Step 7 Punkt 4). Passwort/
+  TOTP-Seed über `getpass.getpass()`, **nie** als Argument (zwei dokumentierte
+  Klartext-Token-Vorfälle in diesem Repo, keinen dritten produzieren). Die elf Prüfungen sind
+  jetzt in `_run_checks()` ausgelagert, parametrisiert über `client`/`mcp_client_factory` — vom
+  Default- UND vom `--base-url`-Modus gleichermaßen benutzt.
+  **Echter Korrekturbedarf beim Refactor gefunden, nicht nur Umbau:** die Discovery-Prüfungen
+  verglichen `resource`/`issuer` bisher gegen einen vorab bekannten `AuthSettings`-Wert — im
+  `--base-url`-Modus meldet ein echter Server seine echte `SPACE_PUBLIC_BASE_URL`
+  (`https://<node>.ts.net`), nicht `http://127.0.0.1:8765`, unter dem das Skript ihn gerade
+  anspricht. Ein Vergleich gegen einen vorberechneten Erwartungswert wäre dort strukturell
+  falsch gewesen. Jetzt: Selbstkonsistenz-Prüfung (`resource == f"{issuer}/mcp"`, aus der
+  Antwort selbst gelesen) — stärkere Prüfung, gilt in jedem Modus gleich, kein Sonderfall nötig.
+  Getestet gegen einen **echten** lokal lauschenden `uvicorn`-Server (`test_
+  network_mode_runs_against_a_real_server`, kein `ASGITransport`) — der eigentliche Beweis für
+  Punkt 4, nicht nur Argument-Parsing.
 
-**Drei Advisor-Durchläufe — die ersten zwei wie in der Vorsession angewiesen, der dritte beim
-Abschluss-Review dieser Session hinzugekommen:**
+**Ein bewusster Rückzieher in dieser Session, dokumentiert statt verschwiegen:** die erste
+Advisor-Antwort empfahl, den physischen Verbleib der Unit in `phase3_edge/systemd/` zu belassen
+(Begründung: `install_units.sh`s Verzeichnis ist im Skript fest verdrahtet, „nur
+Platzhalterliste" schien das zu bestätigen). Beim Lesen von `phase3_edge/tests/test_units.py`
+(auf Advisor-Anraten, bevor irgendetwas angefasst wurde) zeigte sich: ein Verbleib hätte
+denselben Widerspruch nur verschoben, nicht aufgelöst. Ein zweiter Advisor-Durchlauf mit dem
+Fund bestätigte den Umzug als richtig — Details siehe oben. Genau die Art Kurskorrektur, die
+dieses Repo für den Menschen sichtbar machen soll, nicht still im Diff verschwinden lassen
+(Working-Style-Regel „Widersprechende Evidenz wird ein expliziter Befund").
 
-1. **Vor `OAuthLogASGI`:** bestätigte, dass `err`/`grant`/`space` keinen Test brauchen und
-   verworfen werden können (Body-Read wäre die Umkehrung der Regel, die `stage`s Body-Freiheit
-   erst sicher macht); korrigierte die Scope-Frage auf `/oauth/*` **ohne** `/.well-known/*`
-   (Discovery hat keine Stage im Plan-Enum); `client_id` nur aus dem Query-String von
-   `authorize_get`, kein Response-Body-Reader für `/oauth/register`/`/oauth/token`.
-2. **Nach der ersten Implementierung:** fand denselben Musterfehler wie in Step 4/5/6a ein
-   drittes/viertes Mal — `test_oauth_log_never_contains_secrets` prüfte eine Abwesenheit
-   (`secret not in full_text`) ohne zu beweisen, dass `full_text` überhaupt Inhalt hatte; ein
-   leerer Logpuffer (z. B. durch entfernte Verdrahtung oder Loggername-Drift) hätte denselben
-   Test unbemerkt grün gelassen. Nachgezogen: eine Prüfung, dass alle vier `stage`-Werte aus dem
-   echten Lauf tatsächlich im Logpuffer stehen, **bevor** die Abwesenheitsprüfung läuft. Zusätzlich
-   gefunden: `stage=None` wurde als `"stage": null` geloggt statt weggelassen (jetzt behoben,
-   hält den Feldwert innerhalb von Plan §4s Enum); `_load_oauth_smoke_module()` ließ
-   `sys.modules["oauth_smoke"]` nach dem Test stehen (jetzt `try/finally`-bereinigt).
-3. **Beim Abschluss-Review, vor dem Commit:** derselbe Musterfehler noch einmal, diesmal auf
-   Ebene der ganzen Step-Behauptung statt eines einzelnen Tests — die Session-Notiz „Step 6 ist
-   vollständig" stand bereits im Entwurf, bevor die dritte Done-when-Klausel (Bearer-vs-
-   Pfad-Token-Diff über alle sechs Tools) überhaupt geprüft war. Nachgezogen:
-   `test_six_tools_behave_identically_under_bearer_and_path_token`, siehe oben. Ohne diesen
-   Durchlauf wäre die Lücke erst in Step 7 oder später aufgefallen.
-
-**Bewusste Design-Entscheidung, dokumentiert statt Überraschung für einen kalten Leser:**
-`test_oauth_log_never_contains_secrets` fängt **bewusst ohne** `TokenScrubbingFilter` im
-Aufnahmepfad (ein bloßer `logging.Handler`, gleiches Muster wie
-`test_request_log.py::_CapturingHandler`) — der Filter würde ein echtes Leck nachträglich
-verdecken. Der Test prüft die **primäre** Sicherung (Feld-Whitelist + `OAuthLogASGI`s Body-/
-Header-Freiheit), nicht die Verteidigung in der Tiefe; der Filter selbst ist separat getestet
-(`test_logging.py`, sechs neue parametrisierte Fälle für `_SECRET_PATTERNS`).
-
-**Doku-Funde, nicht Teil des Codes:**
-- `phase2_mcp/CLAUDE.md`s „Gesamt: 90 Tests"-Zeile war durch diese Session erneut falsch
-  geworden (dieselbe Drift-Kategorie wie in Step 6a, jetzt ein zweites Mal in dieser Phase
-  gefunden): `test_logging.py` wuchs 2→8, `test_request_log.py` 8→11, `test_asgi_bearer.py`
-  13→14 (alle drei P4-Q-Berührungen, nicht auf Plan §5 Step 6s eigener Dateiliste — dieselbe Art
-  erwarteten Wachstums wie `oauth_routes()`s dritter Parameter in Step 4/5). Korrigiert im
-  selben Commit auf **100 Tests** (`pytest --collect-only -q` je Datei nachgezählt, nicht aus der
-  alten Summe hochgerechnet).
-- `README.md`s „Lokal ohne Tunnel starten"-Beispiel erwähnte `SPACE_AUTH_MODE` gar nicht — das
-  ist korrekt (der Default-Pfad braucht die Variable nicht), aber für einen kalten Leser nicht
-  von einer vergessenen Aktualisierung zu unterscheiden. Eine Zeile ergänzt, die das explizit
-  macht und auf diesen Head verweist.
-
-**Nächster Schritt (konkret):** Step 6 ist jetzt mit allen drei Done-when-Klauseln belegt;
-**Step 7 — Betrieb, Live-Abnahme,
-Schnitt** ist der nächste, siehe Plan §5 Step 7 und die Abnahmematrix (16 Zeilen, davon 14 ohne
-den Kollegen fahrbar). Kein offener Code-Fund aus Step 6b. `phase4_auth/scripts/authctl.py` und
-die Unit-Ergänzungen (`StateDirectory`, `LoadCredentialEncrypted=auth-users`,
-`Environment=SPACE_AUTH_MODE=__AUTH_MODE__`/`SPACE_PUBLIC_BASE_URL=__PUBLIC_BASE_URL__`) existieren
-noch nicht — erster konkreter Schritt der 7er-Session.
-
-**Bekannte Lücke für Step 7, jetzt schon benannt statt erst dort entdeckt:** `oauth_smoke.py`
-läuft heute nur in-process (`ASGITransport`, kein `--base-url`-Schalter). Plan §5 Step 7 Punkt 4
-will es gegen `127.0.0.1:8765` fahren, **bevor** irgendjemand einen Connector anfasst — dieser
-Netzwerk-Modus fehlt noch und ist bewusst nicht spekulativ in 6b gebaut (nichts, wogegen er in
-diesem Step hätte verifiziert werden können). Teil der 7er-Session, nicht vergessen.
+**Nächster Schritt (konkret):** Das Runbook oben, Schritt 1 (`provision_user.py`) — Sache des
+Nikingers. Danach Schritte 2–8 in genau dieser Reihenfolge. `docs/concepts/
+P4_ABNAHME_<Datum>.md` erst nach Schritt 7 schreiben (Advisor-Vorgabe: ein Ergebnis-Protokoll
+für eine noch nicht gelaufene Matrix wäre ein fabriziertes Protokoll). Schritt 8 (Schnitt,
+inklusive `TokenPathASGI`/`AuthModeASGI`-Entfernung) läuft **im selben Commit** wie die
+Abnahme, nicht vorgezogen.

@@ -4,13 +4,139 @@ purpose: Archiv älterer Session-stopped-Blöcke aus phase4_auth/CLAUDE.md, newe
 read-when: Audit vergangener Sessions dieser Phase; NICHT für normalen Session-Start
 detail: L3
 up: CLAUDE.md
-updated: 2026-07-28
+updated: 2026-07-29
 ---
 # Session-Archiv — Phase 4 OAuth 2.1 + DCR
 
-Newest-first. Fünf Rotationen bisher, alle 2026-07-28 (Abschluss Step 3, dann Step 4, dann
-Step 5, dann Step 6a, dann Step 6b) — via `scripts/rotate_session_block.sh phase4_auth`, nie von
-Hand.
+Newest-first. Sechs Rotationen bisher (Abschluss Step 3, dann Step 4, dann Step 5, dann Step 6a,
+dann Step 6b, dann die Step-7-Code-Vorbereitung, 2026-07-28/29) — via
+`scripts/rotate_session_block.sh phase4_auth`, nie von Hand.
+
+## Session stopped — 2026-07-28 (Step 6b)
+
+**Ergebnis:** Step 6b (`oauth_smoke.py`, Logging-Erweiterung, `serve.py`-Gate) abgeschlossen.
+`pytest -q` → **331/331 grün** (315 Vorlauf + 16 neue: 6 `test_oauth_smoke.py` + 3 neu in
+`test_request_log.py` + 6 neu in `test_logging.py` + 1 neu in `test_asgi_bearer.py`). Reihenfolge
+wie in der Kurznotiz der Vorsession festgelegt: `oauth_smoke.py` zuerst, Logging danach,
+`serve.py`-Gate zuletzt.
+
+**Alle drei Done-when-Klauseln aus Plan §5 Step 6 jetzt belegt, nicht nur die ersten beiden.**
+Advisor-Fund beim Abschluss-Review (siehe unten): `pytest` grün und `oauth_smoke.py` 11/11 waren
+da, die dritte Klausel („die sechs Tools verhalten sich unter Bearer-Auth exakt wie unter
+Pfad-Token, Diff der Antworten im Session-Block") war unbelegt — `oauth_smoke.py` und Step 6as
+`test_bearer_token_reaches_a_real_tool_call` rufen beide nur `list_spaces`. Nachgezogen:
+`test_six_tools_behave_identically_under_bearer_and_path_token` (`test_asgi_bearer.py`, ein
+Store, ein Space, `mode="both"`, ein Pfad-Token-Principal und eine OAuth-Familie auf demselben
+Space). Ergebnis, **qualifiziert statt pauschal** (Plan-Wortlaut "exakt wie" trifft nicht
+unbesehen zu):
+- **Drei Lese-Tools byte-identisch:** `list_spaces`, `search_items`, `get_item` (eigen **und**
+  fremd, inklusive `<untrusted_content>`-Wrap) — beide Aufrufe laufen vor jedem Schreibzugriff
+  gegen denselben, unveränderten Store-Zustand.
+- **Drei Schreib-Tools identisch bis auf `id`/`created`/`updated`:** `create_item`,
+  `update_item`, `append_to_item` erzeugen je Aufruf eine neue Zufalls-ID und einen neuen
+  Zeitstempel der echten Systemuhr — das ist Konstruktion, keine Abweichung. Verglichen wird das
+  restliche Frontmatter + Body (`_invariant_fields()`-Helfer).
+- **Cross-Space-Schreibversuch:** `write_denied` unter beiden Credentials gleich.
+
+**Gebaut:**
+- `phase4_auth/scripts/oauth_smoke.py` (neu) — Gegenstück zu `mcp_smoke.py`, treibt den vollen
+  Fluss ohne Browser: Discovery → DCR → `GET`/`POST /oauth/authorize` → Code → Token → echter
+  Tool-Aufruf mit Bearer → Refresh → Refresh-Replay (`invalid_grant`, Familie tot) → zweite,
+  unabhängige Runde nur für den Code-Replay-Nachweis (die erste Familie ist nach dem
+  Refresh-Replay bereits tot) → Code-Replay (`invalid_grant`, Familie tot). **11/11 Prüfungen**
+  (Plan §6 Abnahmezeilen 10/11: Refresh- **und** Code-Replay, beide über dieses Skript) — Runde 1
+  ist in `authorize_get`/`authorize_post` aufgeteilt, Runde 2 bündelt GET+POST+Token-Tausch in
+  einer Prüfung (sonst wären es zwölf), dokumentiert im Moduldocstring statt still abweichend.
+  Baut `AuthSettings`/die eine Nutzerakte direkt über `passwords.hash_password()`/
+  `totp.generate_secret()` — nie `load_users()`/`load_auth_settings()`, TOTP-Seed ist ein echtes,
+  umkehrbares Geheimnis (anders als P2/P3s Token-Hashes). `test_oauth_smoke.py` (neu, sechs
+  Tests): JSON/Text-Report grün, exakt 11 Prüfungen (Regressionstest gegen die Zählungsentscheidung),
+  Refresh-/Code-Replay-Checks existieren namentlich, kein Keyring-/Nutzerakten-Import,
+  `test_oauth_log_never_contains_secrets`.
+- `mcpserver/request_log.py`: `_ALLOWED_FIELDS` um `stage`/`client_id`/`grant` erweitert (Plan
+  §4 wörtlich — erlaubt alle drei, `OAuthLogASGI` füllt aber nur zwei, siehe unten).
+  `OAuthLogASGI` (neu, nach dem Vorbild von `AccessLogASGI`): loggt **ausschließlich**
+  `/oauth/*` (Discovery/`/health`/`/mcp` bleiben bei `AccessLogASGI`s `ev="http"`, keine
+  Doppelprotokollierung derselben Anfrage). `stage` kommt ausschließlich aus Methode+Pfad
+  (`_STAGE_BY_ROUTE`), `client_id` ausschließlich aus dem Query-String von `GET
+  /oauth/authorize`. **Kein Body-, kein Header-Read** — deshalb bleiben `err`, `grant` und
+  `space` aus Plan §4s Beispielzeilen bewusst leer (jedes bräuchte einen Formular-/JSON-Body-
+  Read); `token_code`/`token_refresh` kollabieren mangels Body-Zugriff auf `stage="token"`
+  (Kompromiss aus der Vorsession, hier umgesetzt). `stage` bleibt ganz weg (nicht `null`) für
+  Anfragen unter `/oauth/` ohne passende Route. `ok` ist HTTP-Status-Ebene: ein abgelehntes
+  Consent (`action=deny`) loggt `ok=True`, weil die Anfrage selbst korrekt beantwortet wurde —
+  wer den *Fluss* beurteilen will, braucht die Redirect-Query, nicht dieses Log.
+- `mcpserver/logging_setup.py`: `_TOKEN_SEGMENT_RE` unverändert (Pfad-Redaktion). Neu
+  `_SECRET_PATTERNS` (Verteidigung in der Tiefe, praktisch redundant zur Feld-Whitelist/
+  `OAuthLogASGI`s Body-Freiheit): `_kv_pattern()`-Helfer deckt sowohl Form-Encoding
+  (`password=…`) als auch JSON (`"access_token": "…"`) mit einem Muster ab, plus ein Muster für
+  `Authorization: Bearer …`. `TokenScrubbingFilter` benutzt jetzt `_scrub()` (alle Muster) statt
+  nur `_TOKEN_SEGMENT_RE`.
+- `scripts/serve.py`: `SPACE_AUTH_MODE`-Gate exakt wie in der Vorsession gelockt umgesetzt —
+  `"SPACE_AUTH_MODE" in os.environ` entscheidet, ob überhaupt ein `OAuthConfig`-Bündel gebaut
+  wird (`load_auth_settings()` **ungefangen**, kein `try/except`); fehlt die Variable bleibt
+  `oauth=None`, exakt der P3-Pfad. `AccessLogASGI(OAuthLogASGI(app))` **unbedingt** verdrahtet
+  (nicht nur wenn `oauth is not None`) — ohne `/oauth/*`-Routen ist `OAuthLogASGI` ein reiner
+  No-op, Dev- und Prod-Pfad bleiben damit strukturell gleich verdrahtet.
+
+**Drei Advisor-Durchläufe — die ersten zwei wie in der Vorsession angewiesen, der dritte beim
+Abschluss-Review dieser Session hinzugekommen:**
+
+1. **Vor `OAuthLogASGI`:** bestätigte, dass `err`/`grant`/`space` keinen Test brauchen und
+   verworfen werden können (Body-Read wäre die Umkehrung der Regel, die `stage`s Body-Freiheit
+   erst sicher macht); korrigierte die Scope-Frage auf `/oauth/*` **ohne** `/.well-known/*`
+   (Discovery hat keine Stage im Plan-Enum); `client_id` nur aus dem Query-String von
+   `authorize_get`, kein Response-Body-Reader für `/oauth/register`/`/oauth/token`.
+2. **Nach der ersten Implementierung:** fand denselben Musterfehler wie in Step 4/5/6a ein
+   drittes/viertes Mal — `test_oauth_log_never_contains_secrets` prüfte eine Abwesenheit
+   (`secret not in full_text`) ohne zu beweisen, dass `full_text` überhaupt Inhalt hatte; ein
+   leerer Logpuffer (z. B. durch entfernte Verdrahtung oder Loggername-Drift) hätte denselben
+   Test unbemerkt grün gelassen. Nachgezogen: eine Prüfung, dass alle vier `stage`-Werte aus dem
+   echten Lauf tatsächlich im Logpuffer stehen, **bevor** die Abwesenheitsprüfung läuft. Zusätzlich
+   gefunden: `stage=None` wurde als `"stage": null` geloggt statt weggelassen (jetzt behoben,
+   hält den Feldwert innerhalb von Plan §4s Enum); `_load_oauth_smoke_module()` ließ
+   `sys.modules["oauth_smoke"]` nach dem Test stehen (jetzt `try/finally`-bereinigt).
+3. **Beim Abschluss-Review, vor dem Commit:** derselbe Musterfehler noch einmal, diesmal auf
+   Ebene der ganzen Step-Behauptung statt eines einzelnen Tests — die Session-Notiz „Step 6 ist
+   vollständig" stand bereits im Entwurf, bevor die dritte Done-when-Klausel (Bearer-vs-
+   Pfad-Token-Diff über alle sechs Tools) überhaupt geprüft war. Nachgezogen:
+   `test_six_tools_behave_identically_under_bearer_and_path_token`, siehe oben. Ohne diesen
+   Durchlauf wäre die Lücke erst in Step 7 oder später aufgefallen.
+
+**Bewusste Design-Entscheidung, dokumentiert statt Überraschung für einen kalten Leser:**
+`test_oauth_log_never_contains_secrets` fängt **bewusst ohne** `TokenScrubbingFilter` im
+Aufnahmepfad (ein bloßer `logging.Handler`, gleiches Muster wie
+`test_request_log.py::_CapturingHandler`) — der Filter würde ein echtes Leck nachträglich
+verdecken. Der Test prüft die **primäre** Sicherung (Feld-Whitelist + `OAuthLogASGI`s Body-/
+Header-Freiheit), nicht die Verteidigung in der Tiefe; der Filter selbst ist separat getestet
+(`test_logging.py`, sechs neue parametrisierte Fälle für `_SECRET_PATTERNS`).
+
+**Doku-Funde, nicht Teil des Codes:**
+- `phase2_mcp/CLAUDE.md`s „Gesamt: 90 Tests"-Zeile war durch diese Session erneut falsch
+  geworden (dieselbe Drift-Kategorie wie in Step 6a, jetzt ein zweites Mal in dieser Phase
+  gefunden): `test_logging.py` wuchs 2→8, `test_request_log.py` 8→11, `test_asgi_bearer.py`
+  13→14 (alle drei P4-Q-Berührungen, nicht auf Plan §5 Step 6s eigener Dateiliste — dieselbe Art
+  erwarteten Wachstums wie `oauth_routes()`s dritter Parameter in Step 4/5). Korrigiert im
+  selben Commit auf **100 Tests** (`pytest --collect-only -q` je Datei nachgezählt, nicht aus der
+  alten Summe hochgerechnet).
+- `README.md`s „Lokal ohne Tunnel starten"-Beispiel erwähnte `SPACE_AUTH_MODE` gar nicht — das
+  ist korrekt (der Default-Pfad braucht die Variable nicht), aber für einen kalten Leser nicht
+  von einer vergessenen Aktualisierung zu unterscheiden. Eine Zeile ergänzt, die das explizit
+  macht und auf diesen Head verweist.
+
+**Nächster Schritt (konkret):** Step 6 ist jetzt mit allen drei Done-when-Klauseln belegt;
+**Step 7 — Betrieb, Live-Abnahme,
+Schnitt** ist der nächste, siehe Plan §5 Step 7 und die Abnahmematrix (16 Zeilen, davon 14 ohne
+den Kollegen fahrbar). Kein offener Code-Fund aus Step 6b. `phase4_auth/scripts/authctl.py` und
+die Unit-Ergänzungen (`StateDirectory`, `LoadCredentialEncrypted=auth-users`,
+`Environment=SPACE_AUTH_MODE=__AUTH_MODE__`/`SPACE_PUBLIC_BASE_URL=__PUBLIC_BASE_URL__`) existieren
+noch nicht — erster konkreter Schritt der 7er-Session.
+
+**Bekannte Lücke für Step 7, jetzt schon benannt statt erst dort entdeckt:** `oauth_smoke.py`
+läuft heute nur in-process (`ASGITransport`, kein `--base-url`-Schalter). Plan §5 Step 7 Punkt 4
+will es gegen `127.0.0.1:8765` fahren, **bevor** irgendjemand einen Connector anfasst — dieser
+Netzwerk-Modus fehlt noch und ist bewusst nicht spekulativ in 6b gebaut (nichts, wogegen er in
+diesem Step hätte verifiziert werden können). Teil der 7er-Session, nicht vergessen.
 
 ## Session stopped — 2026-07-28 (Step 6a)
 

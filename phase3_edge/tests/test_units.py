@@ -2,6 +2,12 @@
 die Unit-Datei — kein systemd nötig. `install_units.sh` läuft nur in seinem Abbruchpfad (fehlende
 `local.env`), nie bis zu `systemctl`/`/etc` — die echte Installation ist Step 7, Sache des
 Nikingers.
+
+**[2026-07-29 Korrektur, P4 Step 7]:** `sharefyx-mcp.service` zog nach `phase4_auth/systemd/`
+um (Plan §5 Step 7: „ERSETZT die P3-Fassung" — inhaltlich jetzt eine P4-Unit, StateDirectory +
+zweites Credential). `install_units.sh` bleibt P3-Eigentum, liest aber jetzt aus zwei
+Verzeichnissen; `UNIT_PATH`/`ALL_UNIT_PATHS` unten folgen dem, kein Test-Verhalten geändert,
+nur der Quellpfad.
 """
 from __future__ import annotations
 
@@ -11,10 +17,11 @@ import subprocess
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-UNIT_PATH = REPO_ROOT / "phase3_edge" / "systemd" / "sharefyx-mcp.service"
+UNIT_PATH = REPO_ROOT / "phase4_auth" / "systemd" / "sharefyx-mcp.service"
 INSTALL_SCRIPT = REPO_ROOT / "phase3_edge" / "scripts" / "install_units.sh"
-ALL_UNIT_PATHS = sorted((REPO_ROOT / "phase3_edge" / "systemd").glob("*.service")) + sorted(
-    (REPO_ROOT / "phase3_edge" / "systemd").glob("*.timer")
+SYSTEMD_DIRS = (REPO_ROOT / "phase3_edge" / "systemd", REPO_ROOT / "phase4_auth" / "systemd")
+ALL_UNIT_PATHS = sorted(
+    path for d in SYSTEMD_DIRS for path in (*d.glob("*.service"), *d.glob("*.timer"))
 )
 
 
@@ -35,6 +42,19 @@ def test_unit_restarts_on_failure():
 def test_unit_loads_credential_encrypted():
     text = _unit_text()
     assert "LoadCredentialEncrypted=spaces:/etc/sharefyx/spaces.cred" in text
+    # P4 Step 7: zweites Credential für die Nutzerakten (TOTP-Seeds, echte umkehrbare Geheimnisse
+    # — anders als die reinen Token-Hashes hinter "spaces").
+    assert "LoadCredentialEncrypted=auth-users:/etc/sharefyx/auth-users.cred" in text
+
+
+def test_unit_declares_state_directory():
+    """P4 Step 7: `StateDirectory=sharefyx` liefert `$STATE_DIRECTORY` (`/var/lib/sharefyx`),
+    genau das, was `authserver/config.py :: load_auth_settings()` für die Auth-SQLite liest —
+    kein zusätzliches `Environment=SPACE_AUTH_DB=` nötig, systemd exportiert die Variable
+    selbst."""
+    text = _unit_text()
+    assert "StateDirectory=sharefyx" in text
+    assert "StateDirectoryMode=0700" in text
 
 
 def test_unit_binds_loopback_only():
@@ -54,14 +74,17 @@ def test_unit_has_no_secret_shaped_value():
 
 def test_unit_placeholders_are_unresolved_in_repo():
     text = _unit_text()
-    for placeholder in ("__REPO_ROOT__", "__DATA_ROOT__", "__VENV__", "__ALLOWED_HOSTS__"):
+    for placeholder in (
+        "__REPO_ROOT__", "__DATA_ROOT__", "__VENV__", "__ALLOWED_HOSTS__",
+        "__AUTH_MODE__", "__PUBLIC_BASE_URL__",  # P4 Step 7
+    ):
         assert placeholder in text
 
 
 def test_all_units_have_no_secret_shaped_value():
     """Wie `test_unit_has_no_secret_shaped_value`, aber über **alle** Unit-Dateien in
-    `phase3_edge/systemd/` — Step 5 (Backup) fügt zwei weitere hinzu, ohne dass diese
-    Versicherung stillschweigend nur für die MCP-Unit gilt."""
+    `phase3_edge/systemd/` **und** `phase4_auth/systemd/` (P4 Step 7) — Step 5 (Backup) fügt
+    zwei weitere hinzu, ohne dass diese Versicherung stillschweigend nur für die MCP-Unit gilt."""
     secret_shaped = re.compile(r"[A-Za-z0-9_-]{32,}")
     assert len(ALL_UNIT_PATHS) >= 3, "erwartet mindestens sharefyx-mcp + sharefyx-backup(.timer)"
     for path in ALL_UNIT_PATHS:
@@ -80,7 +103,8 @@ def test_install_script_refuses_without_local_env(tmp_path):
     """Kopiert `scripts/` + `systemd/` in ein Wegwerf-Verzeichnis OHNE `local.env` und ruft das
     Skript von dort auf — hermetisch, unabhängig davon, ob auf dieser Maschine zufällig ein
     echtes `phase3_edge/local.env` existiert. Der Abbruch passiert vor jedem `/etc`- oder
-    `systemctl`-Zugriff."""
+    `systemctl`-Zugriff — noch vor dem Zwei-Verzeichnis-Glob (P4 Step 7), `phase4_auth/systemd/`
+    muss deshalb in dieser hermetischen Kopie nicht existieren, um diesen Pfad zu beweisen."""
     phase_copy = tmp_path / "phase3_edge"
     shutil.copytree(REPO_ROOT / "phase3_edge" / "scripts", phase_copy / "scripts")
     shutil.copytree(REPO_ROOT / "phase3_edge" / "systemd", phase_copy / "systemd")

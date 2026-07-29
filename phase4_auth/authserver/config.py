@@ -66,6 +66,25 @@ def _validate_base_url(base_url: str) -> None:
         raise ValueError("SPACE_PUBLIC_BASE_URL darf keine Query/Fragment enthalten")
 
 
+def resolve_db_path(source: Mapping[str, str]) -> Path:
+    """`SPACE_AUTH_DB` zuerst, sonst `STATE_DIRECTORY`/`auth.sqlite3` — kein stiller Fallback
+    ins Arbeitsverzeichnis. Ausgelagert aus `load_auth_settings()` (P4 Step 7): `authctl.py`
+    braucht nur den DB-Pfad, nicht `SPACE_AUTH_MODE`/`SPACE_PUBLIC_BASE_URL` — ein Operator-
+    Werkzeug, das für „eine Familie widerrufen" plötzlich eine öffentliche Basis-URL verlangt,
+    wäre eine unnötige Hürde für eine SSH-Sitzung (`ratelimit.py`-Docstring: „eine SSH-Sitzung
+    entfernt")."""
+    db_path_raw = source.get("SPACE_AUTH_DB")
+    if db_path_raw:
+        return Path(db_path_raw)
+    state_dir = source.get("STATE_DIRECTORY")
+    if not state_dir:
+        raise ValueError(
+            "SPACE_AUTH_DB fehlt und STATE_DIRECTORY ist nicht gesetzt — kein stiller "
+            "Fallback ins Arbeitsverzeichnis"
+        )
+    return Path(state_dir) / "auth.sqlite3"
+
+
 def load_auth_settings(env: Mapping[str, str] | None = None) -> AuthSettings:
     """Liest AuthSettings aus Umgebungsvariablen. Kein Secret hier — Passwort-/TOTP-Nutzerakten
     kommen über `users.py` aus systemd-Credential/Keyring, nicht aus dieser Funktion.
@@ -84,17 +103,7 @@ def load_auth_settings(env: Mapping[str, str] | None = None) -> AuthSettings:
     else:
         base_url = base_url or ""
 
-    db_path_raw = source.get("SPACE_AUTH_DB")
-    if db_path_raw:
-        db_path = Path(db_path_raw)
-    else:
-        state_dir = source.get("STATE_DIRECTORY")
-        if not state_dir:
-            raise ValueError(
-                "SPACE_AUTH_DB fehlt und STATE_DIRECTORY ist nicht gesetzt — kein stiller "
-                "Fallback ins Arbeitsverzeichnis"
-            )
-        db_path = Path(state_dir) / "auth.sqlite3"
+    db_path = resolve_db_path(source)
 
     return AuthSettings(
         base_url=base_url,

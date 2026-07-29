@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""oauth_smoke.py — Gegenstück zu `mcp_smoke.py` (P2) für den OAuth-Fluss (Plan §5 Step 6):
-fährt **ohne Browser** den vollständigen Fluss gegen ein in-process gestartetes
+"""oauth_smoke.py — Gegenstück zu `mcp_smoke.py` (P2) für den OAuth-Fluss (Plan §5 Step 6/7):
+fährt **ohne Browser** den vollständigen Fluss, wahlweise gegen ein in-process gestartetes
 `create_app(oauth=...)` (kein echter Port, kein Netz — `httpx.ASGITransport`, dasselbe Muster
-wie `mcp_smoke.py`). Baut ein temporäres `DATA_ROOT` **und** eine temporäre `auth.sqlite3` (nie
-die echten).
+wie `mcp_smoke.py`, **Default**) oder gegen einen echten laufenden Server (`--base-url`, P4
+Step 7 Punkt 4: `oauth_smoke.py gegen 127.0.0.1:8765` — bevor irgendjemand einen Connector
+anfasst). Im Default-Modus baut das Skript ein temporäres `DATA_ROOT` **und** eine temporäre
+`auth.sqlite3` (nie die echten).
 
 **Kein echter Keyring, kein `load_users()`/`load_auth_settings()`.** Beide lesen echten Zustand
 (Keyring bzw. echte Umgebungsvariablen) — dieses Skript baut seine `AuthSettings` direkt und
@@ -11,22 +13,33 @@ seine eine Nutzerakte über `passwords.hash_password()`/`totp.generate_secret()`
 Funktionen), genau wie `mcp_smoke.py` seine Tokens über `credentials.generate_token()`/
 `hash_token()` baut statt den echten Keyring anzufassen. Ein TOTP-Seed ist ein echtes,
 umkehrbares Geheimnis (anders als ein Token-Hash) — ein Grund mehr, hier nie die echten
-Nutzerakten zu lesen.
+Nutzerakten zu lesen. Im `--base-url`-Modus sind Passwort/TOTP-Seed die **echten** Geheimnisse
+eines bereits provisionierten Space (Plan §5 Step 7 Punkt 1) — deshalb interaktiv über
+`getpass.getpass()` abgefragt, **nie** als Kommandozeilenargument (ein Klartext-Geheimnis in
+argv landet in `~/.bash_history` und ist über `ps` für jeden lokalen Nutzer sichtbar — dieses
+Repo hat zwei dokumentierte Klartext-Token-Vorfälle, siehe `phase2_mcp/CLAUDE.md`, keinen
+dritten dieser Art produzieren).
 
-Ablauf: Discovery (PRM + AS-Metadaten) → DCR → `GET /oauth/authorize` → Formular-`POST`
-(Passwort + errechneter TOTP-Code) → Code → Token → echter Tool-Aufruf mit Bearer → Refresh →
-Reuse des alten Refresh-Tokens (muss `invalid_grant` liefern und die Token-Familie töten) → eine
-**zweite, unabhängige** Authorize-Runde nur für den Code-Replay-Nachweis (die erste Familie ist
-nach dem Refresh-Replay bereits tot, kann also nicht auch noch den Code-Replay beweisen).
-**11 Prüfungen** (Plan §6, Abnahmezeilen 10/11: Refresh- **und** Code-Replay, beide über dieses
-Skript). Die zweite Runde bündelt Formular + Code-Tausch in einer Prüfung, sonst wären es zwölf
-— bewusste Zählungsentscheidung, hier dokumentiert statt still abweichend.
+Ablauf: Discovery (PRM + AS-Metadaten, **Selbstkonsistenz-Prüfung** — `resource`/`issuer`
+kommen aus der Antwort selbst, nicht aus einem vorab bekannten Wert, damit dieselbe Prüfung im
+Default- UND im `--base-url`-Modus stimmt, wo der Server seine echte öffentliche
+`SPACE_PUBLIC_BASE_URL` meldet, nicht `127.0.0.1:8765`) → DCR → `GET /oauth/authorize` →
+Formular-`POST` (Passwort + errechneter TOTP-Code) → Code → Token → echter Tool-Aufruf mit
+Bearer → Refresh → Reuse des alten Refresh-Tokens (muss `invalid_grant` liefern und die
+Token-Familie töten) → eine **zweite, unabhängige** Authorize-Runde nur für den
+Code-Replay-Nachweis (die erste Familie ist nach dem Refresh-Replay bereits tot, kann also nicht
+auch noch den Code-Replay beweisen). **11 Prüfungen** (Plan §6, Abnahmezeilen 10/11: Refresh-
+**und** Code-Replay, beide über dieses Skript). Die zweite Runde bündelt Formular + Code-Tausch
+in einer Prüfung, sonst wären es zwölf — bewusste Zählungsentscheidung, hier dokumentiert statt
+still abweichend.
 
-Markerwerte (für `test_oauth_log_never_contains_secrets`, P4 Step 6b): Werte, die dieses Skript
-selbst wählt (Passwort, `state`, PKCE-`code_verifier`), tragen ein `ZZZ-`-Präfix und stehen in
-`MARKER_SECRETS`. Serverseitig erzeugte Geheimnisse (Autorisierungscode, Access-/Refresh-Token,
-der errechnete TOTP-Code) sind echte Zufallswerte — die kann man nicht vorab markieren; `_run()`
-sammelt sie in `observed_secrets`, damit ein Aufrufer sie gegen einen Logpuffer prüfen kann.
+Markerwerte (für `test_oauth_log_never_contains_secrets`, P4 Step 6b — nur Default-Modus, ein
+Live-Lauf gegen echte Nutzerdaten hat keinen kontrollierten Logpuffer zum Prüfen): Werte, die
+dieses Skript selbst wählt (Passwort im Default-Modus, `state`, PKCE-`code_verifier`), tragen
+ein `ZZZ-`-Präfix und stehen in `MARKER_SECRETS`. Serverseitig erzeugte Geheimnisse
+(Autorisierungscode, Access-/Refresh-Token, der errechnete TOTP-Code) sind echte Zufallswerte —
+die kann man nicht vorab markieren; `_run()` sammelt sie in `observed_secrets`, damit ein
+Aufrufer sie gegen einen Logpuffer prüfen kann.
 
 Ausgabe: Text (Standard) oder `--json` auf stdout; Logs auf stderr (Hard Rule 7).
 """
@@ -34,12 +47,14 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import getpass
 import json
 import logging
 import re
 import sys
 import tempfile
 import time
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -61,7 +76,8 @@ from storage.store import Store
 
 logger = logging.getLogger("oauth_smoke")
 
-# Fixture-Space, kein Nikinger-typischer Name (gleiche Begründung wie mcp_smoke.py SPACE_OWN).
+# Fixture-Space, kein Nikinger-typischer Name (gleiche Begründung wie mcp_smoke.py SPACE_OWN) —
+# nur im Default-Modus benutzt; im --base-url-Modus kommt der Space vom Aufrufer (--space).
 SPACE = "alpha"
 REDIRECT_URI = "https://claude.ai/callback"
 
@@ -72,6 +88,8 @@ VERIFIER_MARKER_R1 = "ZZZ-VERIFIER-1-" + "A" * 40
 VERIFIER_MARKER_R2 = "ZZZ-VERIFIER-2-" + "B" * 40
 
 # Client-kontrollierte Werte — dürfen laut Plan §4 ebenfalls nie in einer Logzeile stehen.
+# state/verifier gelten in JEDEM Modus (das Skript wählt sie immer selbst); PASSWORD_MARKER gilt
+# nur, solange das Passwort nicht von außen kommt (--base-url-Modus benutzt ein echtes Passwort).
 MARKER_SECRETS: tuple[str, ...] = (
     PASSWORD_MARKER,
     STATE_MARKER_R1,
@@ -110,11 +128,20 @@ def _client_factory(app):
     return factory
 
 
-def _mcp_client(app, token: str) -> Client:
+def _mcp_client_in_process(app, token: str) -> Client:
     transport = StreamableHttpTransport(
         url="http://smoke.local/mcp/",
         headers={"Authorization": f"Bearer {token}"},
         httpx_client_factory=_client_factory(app),
+    )
+    return Client(transport)
+
+
+def _mcp_client_network(base_url: str, token: str) -> Client:
+    """Echtes Netz, kein `ASGITransport` — Default-`httpx.AsyncClient` der `StreamableHttp
+    Transport`s, spricht wirklich über TCP mit `base_url` (Plan §5 Step 7 Punkt 4)."""
+    transport = StreamableHttpTransport(
+        url=f"{base_url}/mcp/", headers={"Authorization": f"Bearer {token}"}
     )
     return Client(transport)
 
@@ -130,9 +157,307 @@ async def _bearer_status(client: httpx.AsyncClient, token: str) -> int:
     return resp.status_code
 
 
-async def _run(
-    data_root: Path, checks: list[Check], observed_secrets: list[str]
+async def _run_checks(
+    client: httpx.AsyncClient,
+    *,
+    space: str,
+    password: str,
+    totp_secret: str,
+    mcp_client_factory: Callable[[str], Client],
+    checks: list[Check],
+    observed_secrets: list[str],
 ) -> None:
+    """Die elf Prüfungen, unabhängig vom Modus (`client` zeigt entweder auf ein in-process
+    `ASGITransport` oder auf einen echten Server; `mcp_client_factory(token)` baut den
+    FastMCP-`Client` für den Tool-Aufruf passend zum selben Modus). `resource`/`issuer` werden
+    NICHT vorab übergeben, sondern aus den Discovery-Antworten selbst gelesen — im
+    `--base-url`-Modus meldet ein echter Server seine echte `SPACE_PUBLIC_BASE_URL`, nicht die
+    Adresse, unter der dieses Skript ihn gerade anspricht (`127.0.0.1:8765` vs.
+    `https://<node>.ts.net`); ein Vergleich gegen einen vorab berechneten Erwartungswert wäre
+    im Live-Modus deshalb strukturell falsch. Die Selbstkonsistenz-Prüfung (PRM-`resource` und
+    AS-`issuer` müssen zueinander passen) ist die stärkere Prüfung und gilt in jedem Modus
+    gleich."""
+    # 1. Protected Resource Metadata (RFC 9728).
+    prm_resp = await client.get("/.well-known/oauth-protected-resource")
+    prm = prm_resp.json() if prm_resp.status_code == 200 else {}
+    resource = prm.get("resource")
+    checks.append(
+        Check(
+            "discovery_protected_resource",
+            prm_resp.status_code == 200
+            and isinstance(resource, str)
+            and resource.endswith("/mcp")
+            and prm.get("authorization_servers") == [resource.removesuffix("/mcp")],
+            f"status={prm_resp.status_code}, resource={resource!r}",
+        )
+    )
+
+    # 2. Authorization Server Metadata (RFC 8414) — issuer muss zu Schritt 1s resource passen.
+    as_resp = await client.get("/.well-known/oauth-authorization-server")
+    as_meta = as_resp.json() if as_resp.status_code == 200 else {}
+    issuer = as_meta.get("issuer")
+    checks.append(
+        Check(
+            "discovery_authorization_server",
+            as_resp.status_code == 200
+            and isinstance(issuer, str)
+            and as_meta.get("token_endpoint") == f"{issuer}/oauth/token"
+            and isinstance(resource, str)
+            and resource == f"{issuer}/mcp",
+            f"status={as_resp.status_code}, issuer={issuer!r}",
+        )
+    )
+
+    # 3. Dynamic Client Registration (RFC 7591).
+    register_resp = await client.post(
+        "/oauth/register",
+        headers={"Content-Type": "application/json"},
+        json={
+            "client_name": "oauth_smoke",
+            "application_type": "web",
+            "redirect_uris": [REDIRECT_URI],
+        },
+    )
+    register_body = register_resp.json() if register_resp.status_code == 201 else {}
+    client_id = register_body.get("client_id")
+    checks.append(
+        Check(
+            "register_client",
+            register_resp.status_code == 201 and client_id is not None,
+            f"status={register_resp.status_code}, client_id={client_id!r}",
+        )
+    )
+
+    async def _authorize_get(*, verifier: str, state: str) -> str:
+        """`GET /oauth/authorize` — gibt die `request_id` aus dem gerenderten Consent-Formular
+        zurück. Wirft `AssertionError` bei jeder Abweichung."""
+        challenge = crypto.pkce_challenge(verifier)
+        get_resp = await client.get(
+            "/oauth/authorize",
+            params={
+                "client_id": client_id,
+                "redirect_uri": REDIRECT_URI,
+                "response_type": "code",
+                "state": state,
+                "code_challenge": challenge,
+                "code_challenge_method": "S256",
+                "scope": "space",
+                "resource": resource,
+            },
+        )
+        if get_resp.status_code != 200:
+            raise AssertionError(f"GET /oauth/authorize -> {get_resp.status_code}")
+        request_id = _extract_request_id(get_resp.text)
+        if request_id is None:
+            raise AssertionError("kein request_id im Formular gefunden")
+        return request_id
+
+    async def _authorize_post(
+        *, request_id: str, counter_offset: int = 0
+    ) -> tuple[str, str, str]:
+        """`POST /oauth/authorize` (Formular-Submit) — gibt `(auth_code, returned_state, iss)`
+        aus dem Redirect zurück. Wirft `AssertionError` bei jeder Abweichung.
+
+        `counter_offset` schiebt den errechneten TOTP-Zähler nach vorn (Runde 2 braucht `+1`):
+        `totp.verify()` verlangt einen Zähler **größer** als der zuletzt akzeptierte
+        (Replay-Schutz, `store.py :: get_totp_counter`) — läuft Runde 2 im selben
+        30-Sekunden-Fenster wie Runde 1 (üblich bei einem Skript, kein Warten dazwischen), wäre
+        der „aktuelle" Zähler sonst identisch zu Runde 1s bereits verbrauchtem und würde als
+        Replay abgelehnt, nicht weil der Fluss falsch wäre."""
+        counter = int(time.time() // 30) + counter_offset
+        totp_code = totp.totp_at(totp_secret, counter)
+        observed_secrets.append(totp_code)
+
+        post_resp = await client.post(
+            "/oauth/authorize",
+            data={
+                "request_id": request_id,
+                "space": space,
+                "password": password,
+                "totp": totp_code,
+                "action": "allow",
+            },
+            follow_redirects=False,
+        )
+        if post_resp.status_code != 302:
+            raise AssertionError(
+                f"POST /oauth/authorize -> {post_resp.status_code} (erwartet 302), "
+                f"Body: {post_resp.text[:200]!r}"
+            )
+        query = _redirect_query(post_resp.headers["location"])
+        code = query.get("code")
+        if code is None:
+            raise AssertionError(f"keine 'code' im Redirect: {query}")
+        observed_secrets.append(code)
+        return code, query.get("state", ""), query.get("iss", "")
+
+    # 4. Erste Runde, Schritt 1: Formular rendern.
+    try:
+        request_id_r1 = await _authorize_get(verifier=VERIFIER_MARKER_R1, state=STATE_MARKER_R1)
+        checks.append(Check("authorize_get", True, f"request_id={request_id_r1!r}"))
+    except AssertionError as exc:
+        checks.append(Check("authorize_get", False, str(exc)))
+        return
+
+    # 5. Erste Runde, Schritt 2: Login-Formular absenden, inklusive RFC-9207-`iss`-Prüfung.
+    try:
+        code_r1, returned_state_r1, iss_r1 = await _authorize_post(request_id=request_id_r1)
+        checks.append(
+            Check(
+                "authorize_post",
+                returned_state_r1 == STATE_MARKER_R1 and iss_r1 == issuer,
+                f"state={returned_state_r1!r}, iss={iss_r1!r}",
+            )
+        )
+    except AssertionError as exc:
+        checks.append(Check("authorize_post", False, str(exc)))
+        return
+
+    # 6. Code -> Token (erste Runde).
+    token_resp = await client.post(
+        "/oauth/token",
+        data={
+            "grant_type": "authorization_code",
+            "code": code_r1,
+            "redirect_uri": REDIRECT_URI,
+            "client_id": client_id,
+            "code_verifier": VERIFIER_MARKER_R1,
+        },
+    )
+    token_body = token_resp.json() if token_resp.status_code == 200 else {}
+    access_r1 = token_body.get("access_token")
+    refresh_r1 = token_body.get("refresh_token")
+    if access_r1:
+        observed_secrets.append(access_r1)
+    if refresh_r1:
+        observed_secrets.append(refresh_r1)
+    checks.append(
+        Check(
+            "token_code_exchange",
+            token_resp.status_code == 200 and access_r1 is not None and refresh_r1 is not None,
+            f"status={token_resp.status_code}",
+        )
+    )
+
+    # 7. Echter Tool-Aufruf mit Bearer — kein Fake, voller Stack bis list_spaces.
+    async with mcp_client_factory(access_r1) as mcp:
+        result = await mcp.call_tool("list_spaces", {})
+    spaces = {entry["name"] for entry in json.loads(result.data)}
+    checks.append(
+        Check("tool_call_with_bearer", space in spaces, f"spaces={sorted(spaces)}")
+    )
+
+    # 8. Refresh — rotiert, neues Paar.
+    refresh_resp = await client.post(
+        "/oauth/token", data={"grant_type": "refresh_token", "refresh_token": refresh_r1}
+    )
+    refresh_body = refresh_resp.json() if refresh_resp.status_code == 200 else {}
+    access_r1b = refresh_body.get("access_token")
+    refresh_r1b = refresh_body.get("refresh_token")
+    if access_r1b:
+        observed_secrets.append(access_r1b)
+    if refresh_r1b:
+        observed_secrets.append(refresh_r1b)
+    checks.append(
+        Check(
+            "token_refresh",
+            refresh_resp.status_code == 200
+            and access_r1b is not None
+            and refresh_r1b is not None
+            and refresh_r1b != refresh_r1,
+            f"status={refresh_resp.status_code}",
+        )
+    )
+
+    # 9. Refresh-Replay mit dem ALTEN Refresh-Token — muss invalid_grant liefern UND die
+    # Familie töten (RFC 9700). Beleg für "Familie tot": der frisch rotierte Access-Token aus
+    # Schritt 8 funktioniert danach ebenfalls nicht mehr.
+    replay_resp = await client.post(
+        "/oauth/token", data={"grant_type": "refresh_token", "refresh_token": refresh_r1}
+    )
+    replay_body = replay_resp.json() if replay_resp.status_code == 400 else {}
+    family_dead_status = await _bearer_status(client, access_r1b) if access_r1b else None
+    checks.append(
+        Check(
+            "refresh_replay_kills_family",
+            replay_resp.status_code == 400
+            and replay_body.get("error") == "invalid_grant"
+            and family_dead_status == 401,
+            f"replay_status={replay_resp.status_code}, error={replay_body.get('error')!r}, "
+            f"post_replay_access_status={family_dead_status}",
+        )
+    )
+
+    # 10. Zweite, unabhängige Runde — die erste Familie ist jetzt tot, der Code-Replay-Nachweis
+    # (Zeile 11) braucht eine frische. Bündelt GET+POST+Token-Tausch in EINE Prüfung (anders als
+    # Runde 1, die aus Schritten 4/5 einzeln besteht) — sonst wären es zwölf Prüfungen statt der
+    # elf aus Plan §6/§5 Step 6; Runde 2 dient nur als Vorbereitung für den Code-Replay-Nachweis,
+    # nicht als eigener Beweisschritt.
+    try:
+        request_id_r2 = await _authorize_get(verifier=VERIFIER_MARKER_R2, state=STATE_MARKER_R2)
+        code_r2, returned_state_r2, iss_r2 = await _authorize_post(
+            request_id=request_id_r2, counter_offset=1
+        )
+        token_resp_2 = await client.post(
+            "/oauth/token",
+            data={
+                "grant_type": "authorization_code",
+                "code": code_r2,
+                "redirect_uri": REDIRECT_URI,
+                "client_id": client_id,
+                "code_verifier": VERIFIER_MARKER_R2,
+            },
+        )
+        token_body_2 = token_resp_2.json() if token_resp_2.status_code == 200 else {}
+        access_r2 = token_body_2.get("access_token")
+        refresh_r2 = token_body_2.get("refresh_token")
+        if access_r2:
+            observed_secrets.append(access_r2)
+        if refresh_r2:
+            observed_secrets.append(refresh_r2)
+        checks.append(
+            Check(
+                "second_authorize_round",
+                returned_state_r2 == STATE_MARKER_R2
+                and iss_r2 == issuer
+                and token_resp_2.status_code == 200
+                and access_r2 is not None,
+                f"state={returned_state_r2!r}, token_status={token_resp_2.status_code}",
+            )
+        )
+    except AssertionError as exc:
+        checks.append(Check("second_authorize_round", False, str(exc)))
+        return
+
+    # 11. Code-Replay — derselbe Code aus Runde 2 ein zweites Mal einlösen: muss invalid_grant
+    # liefern UND die (zweite) Familie töten.
+    code_replay_resp = await client.post(
+        "/oauth/token",
+        data={
+            "grant_type": "authorization_code",
+            "code": code_r2,
+            "redirect_uri": REDIRECT_URI,
+            "client_id": client_id,
+            "code_verifier": VERIFIER_MARKER_R2,
+        },
+    )
+    code_replay_body = code_replay_resp.json() if code_replay_resp.status_code == 400 else {}
+    family_dead_status_2 = await _bearer_status(client, access_r2) if access_r2 else None
+    checks.append(
+        Check(
+            "code_replay_kills_family",
+            code_replay_resp.status_code == 400
+            and code_replay_body.get("error") == "invalid_grant"
+            and family_dead_status_2 == 401,
+            f"replay_status={code_replay_resp.status_code}, "
+            f"error={code_replay_body.get('error')!r}, "
+            f"post_replay_access_status={family_dead_status_2}",
+        )
+    )
+
+
+async def _run(data_root: Path, checks: list[Check], observed_secrets: list[str]) -> None:
+    """Default-Modus: in-process, eigenes `DATA_ROOT`/`auth.sqlite3`, eigene Nutzerakte."""
     auth_settings = AuthSettings(
         base_url="https://space.example.ts.net", db_path=data_root / "auth.sqlite3"
     )
@@ -173,298 +498,39 @@ async def _run(
         async with httpx.AsyncClient(
             transport=httpx.ASGITransport(app=app), base_url=auth_settings.base_url
         ) as client:
-            # 1. Protected Resource Metadata (RFC 9728).
-            prm_resp = await client.get("/.well-known/oauth-protected-resource")
-            prm = prm_resp.json() if prm_resp.status_code == 200 else {}
-            checks.append(
-                Check(
-                    "discovery_protected_resource",
-                    prm_resp.status_code == 200
-                    and prm.get("resource") == auth_settings.resource
-                    and prm.get("authorization_servers") == [auth_settings.issuer],
-                    f"status={prm_resp.status_code}, resource={prm.get('resource')!r}",
-                )
+            await _run_checks(
+                client,
+                space=SPACE,
+                password=PASSWORD_MARKER,
+                totp_secret=totp_secret,
+                mcp_client_factory=lambda token: _mcp_client_in_process(app, token),
+                checks=checks,
+                observed_secrets=observed_secrets,
             )
 
-            # 2. Authorization Server Metadata (RFC 8414).
-            as_resp = await client.get("/.well-known/oauth-authorization-server")
-            as_meta = as_resp.json() if as_resp.status_code == 200 else {}
-            checks.append(
-                Check(
-                    "discovery_authorization_server",
-                    as_resp.status_code == 200
-                    and as_meta.get("issuer") == auth_settings.issuer
-                    and as_meta.get("token_endpoint") == f"{auth_settings.issuer}/oauth/token",
-                    f"status={as_resp.status_code}, issuer={as_meta.get('issuer')!r}",
-                )
-            )
 
-            # 3. Dynamic Client Registration (RFC 7591).
-            register_resp = await client.post(
-                "/oauth/register",
-                headers={"Content-Type": "application/json"},
-                json={
-                    "client_name": "oauth_smoke",
-                    "application_type": "web",
-                    "redirect_uris": [REDIRECT_URI],
-                },
-            )
-            register_body = register_resp.json() if register_resp.status_code == 201 else {}
-            client_id = register_body.get("client_id")
-            checks.append(
-                Check(
-                    "register_client",
-                    register_resp.status_code == 201 and client_id is not None,
-                    f"status={register_resp.status_code}, client_id={client_id!r}",
-                )
-            )
-
-            async def _authorize_get(*, verifier: str, state: str) -> str:
-                """`GET /oauth/authorize` — gibt die `request_id` aus dem gerenderten
-                Consent-Formular zurück. Wirft `AssertionError` bei jeder Abweichung."""
-                challenge = crypto.pkce_challenge(verifier)
-                get_resp = await client.get(
-                    "/oauth/authorize",
-                    params={
-                        "client_id": client_id,
-                        "redirect_uri": REDIRECT_URI,
-                        "response_type": "code",
-                        "state": state,
-                        "code_challenge": challenge,
-                        "code_challenge_method": "S256",
-                        "scope": "space",
-                        "resource": auth_settings.resource,
-                    },
-                )
-                if get_resp.status_code != 200:
-                    raise AssertionError(f"GET /oauth/authorize -> {get_resp.status_code}")
-                request_id = _extract_request_id(get_resp.text)
-                if request_id is None:
-                    raise AssertionError("kein request_id im Formular gefunden")
-                return request_id
-
-            async def _authorize_post(
-                *, request_id: str, counter_offset: int = 0
-            ) -> tuple[str, str, str]:
-                """`POST /oauth/authorize` (Formular-Submit) — gibt
-                `(auth_code, returned_state, iss)` aus dem Redirect zurück. Wirft
-                `AssertionError` bei jeder Abweichung.
-
-                `counter_offset` schiebt den errechneten TOTP-Zähler nach vorn (Runde 2 braucht
-                `+1`): `totp.verify()` verlangt einen Zähler **größer** als der zuletzt akzeptierte
-                (Replay-Schutz, `store.py :: get_totp_counter`) — läuft Runde 2 im selben
-                30-Sekunden-Fenster wie Runde 1 (üblich bei einem Skript, kein Warten dazwischen),
-                wäre der „aktuelle" Zähler sonst identisch zu Runde 1s bereits verbrauchtem und
-                würde als Replay abgelehnt, nicht weil der Fluss falsch wäre."""
-                counter = int(time.time() // 30) + counter_offset
-                totp_code = totp.totp_at(totp_secret, counter)
-                observed_secrets.append(totp_code)
-
-                post_resp = await client.post(
-                    "/oauth/authorize",
-                    data={
-                        "request_id": request_id,
-                        "space": SPACE,
-                        "password": PASSWORD_MARKER,
-                        "totp": totp_code,
-                        "action": "allow",
-                    },
-                    follow_redirects=False,
-                )
-                if post_resp.status_code != 302:
-                    raise AssertionError(
-                        f"POST /oauth/authorize -> {post_resp.status_code} (erwartet 302), "
-                        f"Body: {post_resp.text[:200]!r}"
-                    )
-                query = _redirect_query(post_resp.headers["location"])
-                code = query.get("code")
-                if code is None:
-                    raise AssertionError(f"keine 'code' im Redirect: {query}")
-                observed_secrets.append(code)
-                return code, query.get("state", ""), query.get("iss", "")
-
-            # 4. Erste Runde, Schritt 1: Formular rendern.
-            try:
-                request_id_r1 = await _authorize_get(
-                    verifier=VERIFIER_MARKER_R1, state=STATE_MARKER_R1
-                )
-                checks.append(Check("authorize_get", True, f"request_id={request_id_r1!r}"))
-            except AssertionError as exc:
-                checks.append(Check("authorize_get", False, str(exc)))
-                return
-
-            # 5. Erste Runde, Schritt 2: Login-Formular absenden, inklusive
-            # RFC-9207-`iss`-Prüfung.
-            try:
-                code_r1, returned_state_r1, iss_r1 = await _authorize_post(
-                    request_id=request_id_r1
-                )
-                checks.append(
-                    Check(
-                        "authorize_post",
-                        returned_state_r1 == STATE_MARKER_R1 and iss_r1 == auth_settings.issuer,
-                        f"state={returned_state_r1!r}, iss={iss_r1!r}",
-                    )
-                )
-            except AssertionError as exc:
-                checks.append(Check("authorize_post", False, str(exc)))
-                return
-
-            # 6. Code -> Token (erste Runde).
-            token_resp = await client.post(
-                "/oauth/token",
-                data={
-                    "grant_type": "authorization_code",
-                    "code": code_r1,
-                    "redirect_uri": REDIRECT_URI,
-                    "client_id": client_id,
-                    "code_verifier": VERIFIER_MARKER_R1,
-                },
-            )
-            token_body = token_resp.json() if token_resp.status_code == 200 else {}
-            access_r1 = token_body.get("access_token")
-            refresh_r1 = token_body.get("refresh_token")
-            if access_r1:
-                observed_secrets.append(access_r1)
-            if refresh_r1:
-                observed_secrets.append(refresh_r1)
-            checks.append(
-                Check(
-                    "token_code_exchange",
-                    token_resp.status_code == 200
-                    and access_r1 is not None
-                    and refresh_r1 is not None,
-                    f"status={token_resp.status_code}",
-                )
-            )
-
-            # 7. Echter Tool-Aufruf mit Bearer — kein Fake, voller Stack bis list_spaces.
-            async with _mcp_client(app, access_r1) as mcp:
-                result = await mcp.call_tool("list_spaces", {})
-            spaces = {entry["name"] for entry in json.loads(result.data)}
-            checks.append(
-                Check(
-                    "tool_call_with_bearer",
-                    SPACE in spaces,
-                    f"spaces={sorted(spaces)}",
-                )
-            )
-
-            # 8. Refresh — rotiert, neues Paar.
-            refresh_resp = await client.post(
-                "/oauth/token", data={"grant_type": "refresh_token", "refresh_token": refresh_r1}
-            )
-            refresh_body = refresh_resp.json() if refresh_resp.status_code == 200 else {}
-            access_r1b = refresh_body.get("access_token")
-            refresh_r1b = refresh_body.get("refresh_token")
-            if access_r1b:
-                observed_secrets.append(access_r1b)
-            if refresh_r1b:
-                observed_secrets.append(refresh_r1b)
-            checks.append(
-                Check(
-                    "token_refresh",
-                    refresh_resp.status_code == 200
-                    and access_r1b is not None
-                    and refresh_r1b is not None
-                    and refresh_r1b != refresh_r1,
-                    f"status={refresh_resp.status_code}",
-                )
-            )
-
-            # 9. Refresh-Replay mit dem ALTEN Refresh-Token — muss invalid_grant liefern UND die
-            # Familie töten (RFC 9700). Beleg für "Familie tot": der frisch rotierte Access-Token
-            # aus Schritt 8 funktioniert danach ebenfalls nicht mehr.
-            replay_resp = await client.post(
-                "/oauth/token", data={"grant_type": "refresh_token", "refresh_token": refresh_r1}
-            )
-            replay_body = replay_resp.json() if replay_resp.status_code == 400 else {}
-            family_dead_status = (
-                await _bearer_status(client, access_r1b) if access_r1b else None
-            )
-            checks.append(
-                Check(
-                    "refresh_replay_kills_family",
-                    replay_resp.status_code == 400
-                    and replay_body.get("error") == "invalid_grant"
-                    and family_dead_status == 401,
-                    f"replay_status={replay_resp.status_code}, error={replay_body.get('error')!r}, "
-                    f"post_replay_access_status={family_dead_status}",
-                )
-            )
-
-            # 10. Zweite, unabhängige Runde — die erste Familie ist jetzt tot, der Code-Replay-
-            # Nachweis (Zeile 11) braucht eine frische. Bündelt GET+POST+Token-Tausch in EINE
-            # Prüfung (anders als Runde 1, die aus Schritten 4/5 einzeln besteht) — sonst wären
-            # es zwölf Prüfungen statt der elf aus Plan §6/§5 Step 6; Runde 2 dient nur als
-            # Vorbereitung für den Code-Replay-Nachweis, nicht als eigener Beweisschritt.
-            try:
-                request_id_r2 = await _authorize_get(
-                    verifier=VERIFIER_MARKER_R2, state=STATE_MARKER_R2
-                )
-                code_r2, returned_state_r2, iss_r2 = await _authorize_post(
-                    request_id=request_id_r2, counter_offset=1
-                )
-                token_resp_2 = await client.post(
-                    "/oauth/token",
-                    data={
-                        "grant_type": "authorization_code",
-                        "code": code_r2,
-                        "redirect_uri": REDIRECT_URI,
-                        "client_id": client_id,
-                        "code_verifier": VERIFIER_MARKER_R2,
-                    },
-                )
-                token_body_2 = token_resp_2.json() if token_resp_2.status_code == 200 else {}
-                access_r2 = token_body_2.get("access_token")
-                refresh_r2 = token_body_2.get("refresh_token")
-                if access_r2:
-                    observed_secrets.append(access_r2)
-                if refresh_r2:
-                    observed_secrets.append(refresh_r2)
-                checks.append(
-                    Check(
-                        "second_authorize_round",
-                        returned_state_r2 == STATE_MARKER_R2
-                        and iss_r2 == auth_settings.issuer
-                        and token_resp_2.status_code == 200
-                        and access_r2 is not None,
-                        f"state={returned_state_r2!r}, token_status={token_resp_2.status_code}",
-                    )
-                )
-            except AssertionError as exc:
-                checks.append(Check("second_authorize_round", False, str(exc)))
-                return
-
-            # 11. Code-Replay — derselbe Code aus Runde 2 ein zweites Mal einlösen: muss
-            # invalid_grant liefern UND die (zweite) Familie töten.
-            code_replay_resp = await client.post(
-                "/oauth/token",
-                data={
-                    "grant_type": "authorization_code",
-                    "code": code_r2,
-                    "redirect_uri": REDIRECT_URI,
-                    "client_id": client_id,
-                    "code_verifier": VERIFIER_MARKER_R2,
-                },
-            )
-            code_replay_body = (
-                code_replay_resp.json() if code_replay_resp.status_code == 400 else {}
-            )
-            family_dead_status_2 = (
-                await _bearer_status(client, access_r2) if access_r2 else None
-            )
-            checks.append(
-                Check(
-                    "code_replay_kills_family",
-                    code_replay_resp.status_code == 400
-                    and code_replay_body.get("error") == "invalid_grant"
-                    and family_dead_status_2 == 401,
-                    f"replay_status={code_replay_resp.status_code}, "
-                    f"error={code_replay_body.get('error')!r}, "
-                    f"post_replay_access_status={family_dead_status_2}",
-                )
-            )
+async def _run_network(
+    base_url: str,
+    *,
+    space: str,
+    password: str,
+    totp_secret: str,
+    checks: list[Check],
+    observed_secrets: list[str],
+) -> None:
+    """`--base-url`-Modus (Plan §5 Step 7 Punkt 4): echtes Netz gegen einen bereits laufenden,
+    bereits provisionierten Server. Baut nichts selbst — Nutzerakte, `DATA_ROOT` und Prozess
+    existieren schon, das ist der Punkt dieses Modus."""
+    async with httpx.AsyncClient(base_url=base_url) as client:
+        await _run_checks(
+            client,
+            space=space,
+            password=password,
+            totp_secret=totp_secret,
+            mcp_client_factory=lambda token: _mcp_client_network(base_url, token),
+            checks=checks,
+            observed_secrets=observed_secrets,
+        )
 
 
 def _print_report(checks: list[Check]) -> None:
@@ -482,25 +548,57 @@ def _print_report(checks: list[Check]) -> None:
         print(f"Alle {len(checks)} Prüfungen grün.")
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: list[str] | None = None, *, get_secret=getpass.getpass) -> int:
     logging.basicConfig(
         stream=sys.stderr, level=logging.INFO, format="%(levelname)s %(name)s: %(message)s"
     )
     parser = argparse.ArgumentParser(
         prog="oauth_smoke",
-        description="End-to-End-Smoke-Test des OAuth-Flusses gegen ein temporäres DATA_ROOT/"
-        "auth.sqlite3 (nie die echten). Kein echter Port, kein Netz, kein Keyring.",
+        description="End-to-End-Smoke-Test des OAuth-Flusses. Default: in-process gegen ein "
+        "temporäres DATA_ROOT/auth.sqlite3 (nie die echten), kein echter Port, kein Netz, kein "
+        "Keyring. Mit --base-url: echtes Netz gegen einen laufenden Server (Plan §5 Step 7 "
+        "Punkt 4) — Passwort/TOTP-Seed werden interaktiv abgefragt, nie als Argument.",
     )
     parser.add_argument(
         "--json", action="store_true", help="Maschinenlesbare Ausgabe auf stdout statt Text"
     )
+    parser.add_argument(
+        "--base-url",
+        metavar="URL",
+        default=None,
+        help="Echten Server ansprechen statt in-process, z. B. http://127.0.0.1:8765. "
+        "Erfordert --space; fragt Passwort und TOTP-Seed interaktiv ab.",
+    )
+    parser.add_argument(
+        "--space", metavar="NAME", default=None, help="Nur mit --base-url: der zu testende Space."
+    )
     args = parser.parse_args(argv)
+
+    if args.base_url and not args.space:
+        parser.error("--base-url erfordert --space")
+    if args.space and not args.base_url:
+        parser.error("--space ohne --base-url ist wirkungslos")
 
     checks: list[Check] = []
     observed_secrets: list[str] = []
-    with tempfile.TemporaryDirectory(prefix="oauth_smoke_") as tmp:
-        logger.info("temporäres DATA_ROOT/auth.sqlite3 unter: %s", tmp)
-        asyncio.run(_run(Path(tmp), checks, observed_secrets))
+
+    if args.base_url:
+        password = get_secret(f"Passwort für '{args.space}': ")
+        totp_secret = get_secret(f"TOTP-Seed (Base32) für '{args.space}': ")
+        asyncio.run(
+            _run_network(
+                args.base_url,
+                space=args.space,
+                password=password,
+                totp_secret=totp_secret,
+                checks=checks,
+                observed_secrets=observed_secrets,
+            )
+        )
+    else:
+        with tempfile.TemporaryDirectory(prefix="oauth_smoke_") as tmp:
+            logger.info("temporäres DATA_ROOT/auth.sqlite3 unter: %s", tmp)
+            asyncio.run(_run(Path(tmp), checks, observed_secrets))
 
     if args.json:
         print(json.dumps([asdict(c) for c in checks], ensure_ascii=False, indent=2))
