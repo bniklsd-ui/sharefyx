@@ -105,7 +105,7 @@ Bedarf nicht neu recherchiert werden muss:
 | 6 | `authserver/{flows,templates}.py`, `routes.py` vervollständigt (`/oauth/authorize`, `/oauth/token`) | 5 | ✅ | 36 (22 `test_flows.py` + 9 `test_routes.py` + 4 `test_templates.py` + 1 neu in `test_totp.py`) |
 | 7a | `authserver/resolver.py`; `mcpserver/{asgi,context,app}.py` verdrahtet (Bearer-Auflösung, `AuthModeASGI`, `oauth=None`) | 6a | ✅ | 19 (6 `test_resolver.py` + 13 `test_asgi_bearer.py`) |
 | 7b | `phase4_auth/scripts/oauth_smoke.py`; `mcpserver/{request_log,logging_setup}.py` erweitert (`OAuthLogASGI`, `_SECRET_PATTERNS`); `scripts/serve.py` verdrahtet (`SPACE_AUTH_MODE`-Gate) | 6b | ✅ | 6 neu in `test_oauth_smoke.py` (neue Datei, 11/11 `oauth_smoke.py` + fünf Regressionstests) + 3 neu in `test_request_log.py` + 6 neu in `test_logging.py` + 1 neu in `test_asgi_bearer.py` (Plan-Done-when-Klausel 3: sechs Tools unter Bearer vs. Pfad-Token) |
-| 8 | `phase4_auth/scripts/authctl.py` (+ `store.py :: list_clients`/`list_families`, `config.py :: resolve_db_path`); `phase4_auth/systemd/sharefyx-mcp.service` (`StateDirectory`, zweites Credential, `SPACE_AUTH_MODE`/`SPACE_PUBLIC_BASE_URL`); `install_units.sh`/`local.env.example` erweitert; `oauth_smoke.py --base-url` (echtes Netz) | 7 | 🟡 **Code-Vorbereitung fertig — Live-Teile stehen aus, Sache des Nikingers** (Provisionierung, `sudo systemd-creds`, `systemctl restart`, Connector in beiden Accounts, Abnahmematrix) | 21 neu: 9 `test_authctl.py` (neue Datei) + 5 neu in `test_authserver_store.py` + 3 neu in `test_units.py` (`phase3_edge/tests/`, davon 2 aus S1) + 4 neu in `test_oauth_smoke.py` |
+| 8 | `phase4_auth/scripts/authctl.py` (+ `store.py :: list_clients`/`list_families`, `config.py :: resolve_db_path`); `phase4_auth/systemd/sharefyx-mcp.service` (`StateDirectory`, zweites Credential, `SPACE_AUTH_MODE`/`SPACE_PUBLIC_BASE_URL`); `install_units.sh`/`local.env.example` erweitert; `oauth_smoke.py --base-url` (echtes Netz) | 7 | 🟡 **Live-Abnahme läuft — 12/16 bestanden** (2026-07-29, Protokoll `docs/concepts/P4_ABNAHME_2026-07-29.md`); offen: Zeile 9 (nächste Session), 14/15 (Fabian, morgen), 16 (nach dem Schnitt) | 21 neu: 9 `test_authctl.py` (neue Datei) + 5 neu in `test_authserver_store.py` + 3 neu in `test_units.py` (`phase3_edge/tests/`, davon 2 aus S1) + 4 neu in `test_oauth_smoke.py` |
 | 8a | **Befund S1** (2026-07-29): `ALLOWED_HOSTS` ohne `127.0.0.1` machte Runbook-Schritt 4 unausführbar — `local.env.example` + `install_units.sh`-Warnung + Runbook korrigiert, kein Servercode geändert | 7 | ✅ | 2 neu in `test_units.py` (in Zeile 8 mitgezählt) |
 | 8b | `phase4_auth/scripts/abnahme_run.sh` (2026-07-29) — automatisiert die acht maschinell prüfbaren Abnahmezeilen (1,2,3,10,11,12,13,16), spiegelt Aufbau/Redaktionsmuster von `phase3_edge/scripts/abnahme_run.sh` 1:1. Live gegen den echten Dienst probegelaufen (Zeilen 1/2/3/12 ok, 13/16 korrekt übersprungen, 10/11 korrekt übersprungen ohne echtes Passwort). Kein Ersatz für Zeilen 4–9/14/15 — eine curl-Nachbildung des Login-Formulars wäre eine zweite, ungetestete OAuth-Implementierung | 7 | ✅ | 0 (Runbook/Skript, gleiche Ausnahme wie `diagnose.sh`/`phase3_edge/scripts/abnahme_run.sh` — kein Unit-Test für ein Skript, das echten `systemd`/`journalctl`/Netzzugriff braucht) |
 
@@ -356,6 +356,11 @@ Kein `sudo` nötig — `/var/lib/sharefyx` gehört `savefyx`. Innerhalb des Dien
 systemd `$STATE_DIRECTORY` selbst (`StateDirectory=sharefyx`), deshalb tauchte das in keinem
 Test auf (`test_authctl.py` setzt `SPACE_AUTH_DB` direkt).
 
+**Stand 2026-07-29: 12 von 16 live bestanden.** Protokoll mit Belegen:
+`../docs/concepts/P4_ABNAHME_2026-07-29.md`. Offen: Zeile 9 (auf nächste Session vertagt, mit
+genauer Anleitung dann), Zeilen 14/15 (Fabian, verabredet für morgen), Zeile 16 (erst nach dem
+Schnitt möglich).
+
 **Abnahmematrix** (16 Zeilen, Protokoll nach P2/P3-Konvention — Belege statt Behauptungen):
 
 | # | Prüfung | Erwartung | Braucht Fabian |
@@ -494,8 +499,30 @@ Trailing Slash trifft Starlettes eigenes Mount-Redirect (307) **vor** jeder Auth
 Server-Bug, aber ein falscher Negativbefund für Zeile 2, wenn man ohne Slash testet. Skript
 korrigiert auf `/mcp/`.
 
-**Nächster Schritt (konkret):** Runbook Schritt 6 mit frischem TOTP-Code wiederholen, dann
-Schritt 7 (Abnahmematrix) über `abnahme_run.sh start` → Zeilen 4–9 manuell im Connector →
-`abnahme_run.sh run`. Zeilen 14/15 mit Fabian. Vor dem Schnitt (Schritt 8) entscheiden, welche
-der Befunde S2–S8 noch in P4 gefixt werden.
+**Zweiter Nachtrag, Abschluss dieser Session — Live-Abnahme, 12/16:** Runbook Schritt 6 erneut
+gefahren, diesmal mit einem frischen TOTP-Code — Login erfolgreich. Danach Schritt 7
+(Abnahmematrix) über `abnahme_run.sh` durchgeführt. Zeile 6 (Fehlversuchsbremse) lief dabei live
+in genau die erwartete Sperre: 5 Fehlversuche `16:06:28 → 16:07:20`, `locked_until` exakt
+`16:07:20 + 900s` — deckungsgleich mit `ratelimit.py`s Eskalationsformel. `authctl.py unlock
+--space niklas` schlug dabei zuerst mit `ABBRUCH: SPACE_AUTH_DB fehlt und STATE_DIRECTORY ist
+nicht gesetzt` fehl (**Befund B1**, siehe unten) — außerhalb von systemd exportiert niemand
+`$STATE_DIRECTORY`, `test_authctl.py` deckte das nie auf, weil es dort direkt `SPACE_AUTH_DB`
+setzt. Behoben (reine Doku-Ergänzung, Commit `f614188`): `STATE_DIRECTORY=/var/lib/sharefyx`
+vor jedem interaktiven `authctl.py`-Aufruf. Danach lief `abnahme_run.sh run` vollständig durch:
+Zeilen 1/2/3/10/11/12/13 alle `[ok]`, Zeile 16 korrekt übersprungen (`SPACE_AUTH_MODE` noch
+`both`). Zeilen 4/5/7/8 aus dem Chat-Verlauf dieser Session bereits belegt. **Ergebnis: 12 von
+16 Abnahmezeilen live bestanden**, Protokoll mit vollständigen Belegen (CLI-Ausschnitt,
+DB-Gegenprobe, Journal-Zeitleiste) in `../docs/concepts/P4_ABNAHME_2026-07-29.md`.
+
+**Bewusst vertagt, keine stille Lücke:** Zeile 9 (Access-Token-Ablauf/Auto-Refresh unter der
+echten Claude-UI) auf die nächste Session — Nikinger-Entscheidung, mit vorab geschriebener
+genauer Anleitung als Voraussetzung. Zeilen 14/15 morgen mit Fabian verabredet. Zeile 16 bleibt
+strukturell an den Schnitt (Schritt 8) gebunden.
+
+**Verifiziert:** `pytest -q` → **352/352 grün** (unverändert). Befunde B1–B3 im Abnahmeprotokoll
+dokumentiert, nicht hier verdoppelt.
+
+**Nächster Schritt (konkret):** Zeile 9 in der nächsten Session — Anleitung dann erstellen
+(TTL-Override, Neustart, Beobachtung über die echte Claude-UI). Zeilen 14/15 mit Fabian. Vor dem
+Schnitt (Schritt 8) entscheiden, welche der Befunde S2–S8 noch in P4 gefixt werden.
 

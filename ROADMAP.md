@@ -22,7 +22,7 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 | **P1** | `phase1_storage/` · `storage` | Datei-Store + Index + Versionierung. Kein Netz. | ✅ |
 | **P2** | `phase2_mcp/` · `mcpserver` | MCP-Server, Token-Auth, 6 Tools. Lokal erreichbar. | ✅ |
 | **P3** | `phase3_edge/` | Tunnel, systemd, Health, Logging, Ops-Skripte. Öffentlich erreichbar. | 🟡 |
-| **P4** | `phase4_auth/` · `authserver` | OAuth 2.1 + DCR; ersetzt den Pfad-Token. | 🔄 |
+| **P4** | `phase4_auth/` · `authserver` | OAuth 2.1 + DCR; ersetzt den Pfad-Token. | 🟡 |
 | **P5** | `phase5_ui/` · `webui` | REST-API + Web-UI für Menschen. | ⬜ |
 
 **Korrektur (2026-07-25, P2-Planungssession):** OAuth rückt von „ganz am Ende" auf „direkt nach
@@ -122,6 +122,13 @@ nur Zeile 13 (Restore-Nachweis) fehlt noch für den Wechsel des Gesamtstatus auf
 ## Phase 4 — OAuth 2.1
 
 **Mission:** Der Pfad-Token verschwindet.
+
+**Status 🟡 (2026-07-29, Live-Abnahme):** 12 von 16 Prüfungen live bestanden — Discovery, DCR,
+Consent, Token-Ausgabe, beide RFC-9700-Replay-Abwehren, Rule 4 unter echtem OAuth,
+Fehlversuchsbremse. Offen: Zeile 9 (Token-Ablauf/Auto-Refresh, nächste Session), Zeilen 14/15
+(brauchen Fabian, verabredet), Zeile 16 (erst nach dem Schnitt auf `SPACE_AUTH_MODE=oauth`).
+Protokoll: `docs/concepts/P4_ABNAHME_2026-07-29.md`. Sicherheits-Review (kein Auth-Bypass, kein
+Cross-Space-Leck) in `docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`.
 
 - **DRIN:** Protected Resource Metadata, Authorization Server, Dynamic Client Registration,
   PKCE, Token-Rotation. `[VERIFY]` Callback-URLs und unterstützte Auth-Spec-Version gegen die

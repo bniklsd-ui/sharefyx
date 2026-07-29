@@ -164,7 +164,15 @@ unausführbar. Behoben in `local.env.example`/`install_units.sh`/Runbook, **ohne
 vollständiges Sicherheits-Review von P3+P4: **keine Auth-Umgehung, kein Cross-Space-Leck, kein
 Secret-Leak**; sieben kleinere offene Befunde S2–S8 plus Betriebsnotiz O1, bewusst **nicht**
 gefixt, bis der Nikinger über die Reihenfolge gegenüber der Abnahmematrix entschieden hat.
-Volles Dokument: `docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`.**]** Step 0 (Haushalt, Drift, geerbte Abnahme), Step 1 (Gerüst, Konfiguration,
+Volles Dokument: `docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`.**]**
+**[2026-07-29, dritter Nachtrag:** Live-Abnahme durchgeführt — **12 von 16 Zeilen bestanden**
+(Refresh-/Code-Replay live mit echter Token-Familie, Fehlversuchsbremse mit exakter
+Sperrzeit-Formel, Rule 4 unter echtem OAuth beobachtet). Bewusst offen: Zeile 9
+(Token-Ablauf/Auto-Refresh, nächste Session mit vorbereiteter Anleitung), Zeilen 14/15 (Fabian,
+verabredet), Zeile 16 (erst nach dem Schnitt). Zwei kleine Live-Funde behoben (B1: `authctl.py`
+braucht `STATE_DIRECTORY` außerhalb von systemd; B2: `abnahme_run.sh` musste `/mcp/` mit
+Trailing Slash prüfen, sonst falscher Negativbefund). Protokoll:
+`docs/concepts/P4_ABNAHME_2026-07-29.md`.**]** Step 0 (Haushalt, Drift, geerbte Abnahme), Step 1 (Gerüst, Konfiguration,
 Kryptobausteine), Step 2 (Passwörter, TOTP, Nutzerakten), Step 3 (Persistenz +
 Fehlversuchsbremse — Code-/Refresh-Replay-Tötung nach RFC 9700), Step 4 (Metadaten + dynamische
 Registrierung), Step 5 (Autorisierungsfluss — `/oauth/authorize`, `/oauth/token`,
