@@ -32,6 +32,17 @@ fi
 # shellcheck disable=SC1090
 source "$LOCAL_ENV"
 
+# Warnung, kein Abbruch (P4 Step 7, 2026-07-29): ohne 127.0.0.1 in ALLOWED_HOSTS beantwortet der
+# Dienst unter AUTH_MODE=both|oauth jede lokale Anfrage mit "400 Invalid host header" — das
+# TrustedHostMiddleware der Wurzel-App bekommt genau diese Liste (mcpserver/app.py ::
+# create_app()). Betroffen: oauth_smoke.py --base-url (P4-Runbook Schritt 4), diagnose.sh
+# Prüfung 2, jedes lokale curl auf /health. Kein Abbruch, weil eine Maschine, die nie lokal
+# geprüft wird, damit legitim laufen kann.
+if [[ -n "${ALLOWED_HOSTS:-}" && "${AUTH_MODE:-}" != "token" && ",${ALLOWED_HOSTS}," != *",127.0.0.1,"* ]]; then
+  echo "WARNUNG: ALLOWED_HOSTS enthält kein 127.0.0.1 — lokale Aufrufe (oauth_smoke.py" \
+       "--base-url, diagnose.sh, curl /health) bekommen '400 Invalid host header'." >&2
+fi
+
 for var in REPO_ROOT DATA_ROOT VENV ALLOWED_HOSTS AUTH_MODE PUBLIC_BASE_URL; do
   if [[ -z "${!var:-}" ]]; then
     echo "ABBRUCH: $var ist in $LOCAL_ENV leer oder fehlt." >&2

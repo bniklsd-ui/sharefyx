@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase4_auth_plan.md          # voller Plan, Entscheidungen P4-A–P4-R, Steps 0–7
   - ../docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md  # Herkunft der offenen Entscheidungen, Doku-Drift, [VERIFY]-Bilanz
   - SESSIONS_ARCHIVE.md                            # ältere Session-Blöcke, newest-first
-updated: 2026-07-28
+updated: 2026-07-29
 ---
 
 # CLAUDE.md — Phase 4: OAuth 2.1 + DCR (`phase4_auth/`)
@@ -105,7 +105,8 @@ Bedarf nicht neu recherchiert werden muss:
 | 6 | `authserver/{flows,templates}.py`, `routes.py` vervollständigt (`/oauth/authorize`, `/oauth/token`) | 5 | ✅ | 36 (22 `test_flows.py` + 9 `test_routes.py` + 4 `test_templates.py` + 1 neu in `test_totp.py`) |
 | 7a | `authserver/resolver.py`; `mcpserver/{asgi,context,app}.py` verdrahtet (Bearer-Auflösung, `AuthModeASGI`, `oauth=None`) | 6a | ✅ | 19 (6 `test_resolver.py` + 13 `test_asgi_bearer.py`) |
 | 7b | `phase4_auth/scripts/oauth_smoke.py`; `mcpserver/{request_log,logging_setup}.py` erweitert (`OAuthLogASGI`, `_SECRET_PATTERNS`); `scripts/serve.py` verdrahtet (`SPACE_AUTH_MODE`-Gate) | 6b | ✅ | 6 neu in `test_oauth_smoke.py` (neue Datei, 11/11 `oauth_smoke.py` + fünf Regressionstests) + 3 neu in `test_request_log.py` + 6 neu in `test_logging.py` + 1 neu in `test_asgi_bearer.py` (Plan-Done-when-Klausel 3: sechs Tools unter Bearer vs. Pfad-Token) |
-| 8 | `phase4_auth/scripts/authctl.py` (+ `store.py :: list_clients`/`list_families`, `config.py :: resolve_db_path`); `phase4_auth/systemd/sharefyx-mcp.service` (`StateDirectory`, zweites Credential, `SPACE_AUTH_MODE`/`SPACE_PUBLIC_BASE_URL`); `install_units.sh`/`local.env.example` erweitert; `oauth_smoke.py --base-url` (echtes Netz) | 7 | 🟡 **Code-Vorbereitung fertig — Live-Teile stehen aus, Sache des Nikingers** (Provisionierung, `sudo systemd-creds`, `systemctl restart`, Connector in beiden Accounts, Abnahmematrix) | 19 neu: 9 `test_authctl.py` (neue Datei) + 5 neu in `test_authserver_store.py` + 1 neu in `test_units.py` (`phase3_edge/tests/`) + 4 neu in `test_oauth_smoke.py` |
+| 8 | `phase4_auth/scripts/authctl.py` (+ `store.py :: list_clients`/`list_families`, `config.py :: resolve_db_path`); `phase4_auth/systemd/sharefyx-mcp.service` (`StateDirectory`, zweites Credential, `SPACE_AUTH_MODE`/`SPACE_PUBLIC_BASE_URL`); `install_units.sh`/`local.env.example` erweitert; `oauth_smoke.py --base-url` (echtes Netz) | 7 | 🟡 **Code-Vorbereitung fertig — Live-Teile stehen aus, Sache des Nikingers** (Provisionierung, `sudo systemd-creds`, `systemctl restart`, Connector in beiden Accounts, Abnahmematrix) | 21 neu: 9 `test_authctl.py` (neue Datei) + 5 neu in `test_authserver_store.py` + 3 neu in `test_units.py` (`phase3_edge/tests/`, davon 2 aus S1) + 4 neu in `test_oauth_smoke.py` |
+| 8a | **Befund S1** (2026-07-29): `ALLOWED_HOSTS` ohne `127.0.0.1` machte Runbook-Schritt 4 unausführbar — `local.env.example` + `install_units.sh`-Warnung + Runbook korrigiert, kein Servercode geändert | 7 | ✅ | 2 neu in `test_units.py` (in Zeile 8 mitgezählt) |
 
 **Zeile 1, Step 0:** kritischer Fund — ein nie widerrufener Keyring-Token für einen dritten,
 seit P2-B2 umbenannten Space (`nikinger`), live und schreibfähig. Details, Zeitachse und
@@ -279,6 +280,8 @@ selbst aus (Plan §5 Step 7) — dieselbe Arbeitsteilung wie P3s „Inbetriebnah
 #    authctl.py, oauth_smoke.py --base-url. local.env um AUTH_MODE=both, PUBLIC_BASE_URL
 #    ergänzen (cp phase3_edge/local.env.example phase3_edge/local.env, falls noch nicht
 #    geschehen — die sechs Werte eintragen).
+#    [2026-07-29] ALLOWED_HOSTS MUSS 127.0.0.1 enthalten, sonst ist Schritt 4 unausführbar:
+#    <node>.<tailnet>.ts.net,127.0.0.1 — siehe Befund S1 unten.
 
 # 1) Nutzerakten provisionieren (TOTP-Seeds SOFORT in die Authenticator-Apps, QR aus der
 #    otpauth://-URI — provision_user.py zeigt sie genau einmal)
@@ -299,6 +302,13 @@ systemctl status sharefyx-mcp
 # 4) oauth_smoke.py gegen den lokalen Port — BEVOR irgendjemand einen Connector anfasst
 python phase4_auth/scripts/oauth_smoke.py --base-url http://127.0.0.1:8765 --space niklas
 #    Fragt Passwort + TOTP-Seed interaktiv ab (getpass, nie als Argument). 11/11 erwartet.
+#    Alle Prüfungen status=400 / "Invalid host header"? Dann fehlt 127.0.0.1 in der
+#    SPACE_ALLOWED_HOSTS der INSTALLIERTEN Unit (systemctl cat sharefyx-mcp) — Befund S1:
+#    local.env korrigieren, install_units.sh erneut, restart. Eine Änderung an local.env
+#    allein wirkt nicht, die Unit unter /etc trägt den alten Wert bis zum Neu-Installieren.
+#    [2026-07-29] Wurde provision_user.py zwischendurch erneut gelaufen (Passwort/TOTP neu)?
+#    Dann vorher `sudo systemctl restart sharefyx-mcp` — die Nutzerakten werden EINMAL beim
+#    Start gelesen (Befund O1). Gilt genauso für die Abnahmezeilen 6 und 7.
 
 # 5) Discovery von außen — resource gegen die geplante Connector-URL halten
 curl -s https://<node>.<tailnet>.ts.net/.well-known/oauth-protected-resource
@@ -354,78 +364,93 @@ darf **nicht** auf einen Termin warten, siehe Runbook oben.
 `TokenPathASGI` entfernt, Protokoll geschrieben, `ROADMAP.md`/`docs/INDEX.md`/Phase-Head
 nachgezogen.
 
+## Sicherheits-Review 2026-07-29 — offene Befunde S2–S8
+
+Vollständiges Dokument mit Fehlfällen, Fix-Skizzen und der Liste der **geprüften und in Ordnung
+befundenen** Punkte: `../docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`. Kurzfassung:
+
+| # | Befund | Schwere | Datei |
+|---|---|---|---|
+| S1 | `ALLOWED_HOSTS` ohne `127.0.0.1` → `400 Invalid host header` lokal, Runbook-Schritt 4 unausführbar | Blocker | `local.env` / `install_units.sh` — ✅ **behoben** |
+| S2 | `refresh_token`-Grant prüft `client_id` nicht (RFC 6749 §6) | niedrig | `flows.py`, `store.py :: rotate_refresh` |
+| S3 | Kein Audience-Check: `AccessTokenRecord.resource` wird nie gegen `settings.resource` geprüft | niedrig (heute) | `resolver.py` |
+| S4 | `scope` wird beim Zugriff nie durchgesetzt | niedrig | `resolver.py` |
+| S5 | `f"{redirect_uri}?{query}"` zerlegt einen Redirect mit vorhandenem Query | niedrig | `routes.py :: _authorize_response` |
+| S6 | `record["pwd"]`/`record["totp"]` → `KeyError` → 500 bricht den „wirft nie"-Vertrag daneben | niedrig-mittel | `flows.py :: submit_consent` |
+| S7 | Unbegrenztes Zeilenwachstum aus unauth. Eingabe, `purge_expired()` nur manuell (kein Timer) | niedrig-mittel | `store.py` |
+| S8 | `sudo install_units.sh` sourced eine nutzerschreibbare Datei als root | sehr niedrig | `install_units.sh` |
+| O1 | Nutzerakten werden **einmal beim Start** gelesen — Provisionierung wirkt erst nach Restart | Betriebsnotiz | `scripts/serve.py` |
+
+**Keiner von S2–S8 ist gefixt.** Bewusst: die Abnahmematrix läuft als Nächstes gegen genau diesen
+Code; eine Verhaltensänderung an `flows.py`/`store.py` davor hieße, dass die Matrix etwas anderes
+abnimmt als das Reviewte. Reihenfolge entscheidet der Nikinger.
+
 ---
 
-## Session stopped — 2026-07-29 (Step 7, Code-Vorbereitung)
+## Session stopped — 2026-07-29 (Step 7 live blockiert: Befund S1 + Sicherheits-Review)
 
-**Ergebnis:** Alles, was Step 7 **ohne** echte VM/echten Keyring/echte Claude-Accounts bauen
-lässt, ist fertig — die Live-Teile (Provisionierung, `systemd-creds`, `systemctl restart`,
-Connector, Abnahmematrix) sind Sache des Nikingers (Runbook oben). `pytest -q` →
-**350/350 grün** (331 Vorlauf + 19 neue). **Phase 4 bleibt 🟡, nicht ✅** — Step 7 selbst ist
-nicht abgeschlossen, nur code-vorbereitet.
+**Für den nächsten, kalten Leser:** der Nikinger stand mitten im Step-7-Runbook, Schritt 4
+(`oauth_smoke.py --base-url http://127.0.0.1:8765`) schlug mit **4/4 Prüfungen `status=400`**
+fehl. Auftrag: Ursache finden **und** das Auth-Bündel aus P3/P4 sicherheitstechnisch
+durchsehen („I have the suspicion there's some underlying issue here").
 
-**Gebaut:**
-- `phase4_auth/systemd/sharefyx-mcp.service` — **umgezogen** von `phase3_edge/systemd/` (Plan
-  §5 Step 7: „ERSETZT die P3-Fassung", inhaltlich jetzt eine P4-Unit). `git mv`, nicht Kopie
-  (Historie bleibt erhalten, keine zwei Quellen für dieselbe Unit — ein zweiter Advisor-Fund
-  dieser Session: eine Kopie-statt-Move hätte ein stilles Doppel-Install-Risiko über
-  Glob-Reihenfolge geschaffen). Ergänzt: `StateDirectory=sharefyx`, `StateDirectoryMode=0700`,
-  `LoadCredentialEncrypted=auth-users:…`, `Environment=SPACE_AUTH_MODE=__AUTH_MODE__`/
-  `SPACE_PUBLIC_BASE_URL=__PUBLIC_BASE_URL__`. `Documentation=` zeigt jetzt auf dieses Dokument.
-  **`StateDirectory=sharefyx` allein reicht** für den Auth-DB-Pfad — systemd exportiert
-  `$STATE_DIRECTORY`, `authserver/config.py` liest exakt diesen Namen, keine zusätzliche
-  `Environment=SPACE_AUTH_DB=`-Zeile nötig (geprüft, nicht angenommen).
-- `phase3_edge/scripts/install_units.sh` (P4-berührt, bleibt P3-Eigentum): liest jetzt aus
-  **zwei** Verzeichnissen (`phase3_edge/systemd/` **und** `phase4_auth/systemd/`); zwei neue
-  Platzhalter im Sed-Kommando **und** in der Pflichtvariablen-Prüfung (ein stiller
-  Leerstring-Fallback bei fehlendem `local.env`-Eintrag wäre der falsche Fehlermodus). `phase3_
-  edge/local.env.example` um `AUTH_MODE`/`PUBLIC_BASE_URL` ergänzt.
-- `phase3_edge/tests/test_units.py` (P4-berührt, dieselbe „genuinely necessary"-Begründung wie
-  jede andere P4-Q-artige Cross-Phase-Berührung): `UNIT_PATH`/`ALL_UNIT_PATHS` folgen dem Umzug,
-  zwei neue Tests (`StateDirectory`, zweites Credential). Kein Test-Verhalten geändert, nur der
-  Quellpfad — `pytest phase3_edge/tests/test_units.py` war der Beweis dafür, nicht nur eine
-  Behauptung (Advisor-Vorgabe: „das ist der Arbiter, nicht noch eine Runde Nachdenken").
-  `phase3_edge/CLAUDE.md` Zeile 5 bekam dieselbe Art datierte Korrekturnotiz wie
-  `phase2_mcp/CLAUDE.md`s Testzahl-Drift — historische Zähl-Zeilen bleiben unangetastet.
-- `authserver/store.py :: list_clients()`/`list_families(space=)` (additiv, kein Plan-Skelett-
-  Eintrag — gleiches Muster wie `create_family` in Step 3), neues `TokenFamily`-Dataclass in
-  `models.py`. `authserver/config.py :: resolve_db_path()` aus `load_auth_settings()`
-  herausgezogen — ein Operator-Werkzeug, das für „eine Familie widerrufen" plötzlich
-  `SPACE_PUBLIC_BASE_URL` verlangt, wäre eine unnötige Hürde für eine SSH-Sitzung.
-- `phase4_auth/scripts/authctl.py` (neu) — fünf dünne Unterbefehle (`list-clients`,
-  `list-tokens [--space]`, `revoke --family-id`, `unlock --space`, `purge-expired`), je einer
-  über eine bestehende `AuthStore`-Methode. **`revoke` kennt nur `--family-id`**, keinen
-  `--space`-Sammelwiderruf — komponierbar aus `list-tokens --space` + mehreren `revoke`-Aufrufen,
-  bewusst keine zweite Fläche dafür (Advisor-Vorgabe).
-- `phase4_auth/scripts/oauth_smoke.py`: `--base-url`-Modus (Plan §5 Step 7 Punkt 4). Passwort/
-  TOTP-Seed über `getpass.getpass()`, **nie** als Argument (zwei dokumentierte
-  Klartext-Token-Vorfälle in diesem Repo, keinen dritten produzieren). Die elf Prüfungen sind
-  jetzt in `_run_checks()` ausgelagert, parametrisiert über `client`/`mcp_client_factory` — vom
-  Default- UND vom `--base-url`-Modus gleichermaßen benutzt.
-  **Echter Korrekturbedarf beim Refactor gefunden, nicht nur Umbau:** die Discovery-Prüfungen
-  verglichen `resource`/`issuer` bisher gegen einen vorab bekannten `AuthSettings`-Wert — im
-  `--base-url`-Modus meldet ein echter Server seine echte `SPACE_PUBLIC_BASE_URL`
-  (`https://<node>.ts.net`), nicht `http://127.0.0.1:8765`, unter dem das Skript ihn gerade
-  anspricht. Ein Vergleich gegen einen vorberechneten Erwartungswert wäre dort strukturell
-  falsch gewesen. Jetzt: Selbstkonsistenz-Prüfung (`resource == f"{issuer}/mcp"`, aus der
-  Antwort selbst gelesen) — stärkere Prüfung, gilt in jedem Modus gleich, kein Sonderfall nötig.
-  Getestet gegen einen **echten** lokal lauschenden `uvicorn`-Server (`test_
-  network_mode_runs_against_a_real_server`, kein `ASGITransport`) — der eigentliche Beweis für
-  Punkt 4, nicht nur Argument-Parsing.
+**Ursache (Befund S1), empirisch belegt statt vermutet:** kein Sicherheitsloch, sondern das
+Wurzel-`TrustedHostMiddleware` aus `mcpserver/app.py :: create_app()`. Es bekommt
+`SPACE_ALLOWED_HOSTS`; die installierte Unit trug dort **nur** den Funnel-Hostnamen. Damit
+beantwortet der Dienst jede Anfrage mit `Host: 127.0.0.1:8765` mit `400 Invalid host header` —
+vor jedem Handler, also auch `/health`, beide `.well-known` und `/mcp`. Beleg: dieselbe URL mit
+`-H 'Host: savefyx-…ts.net'` liefert `200` und das vollständige AS-Metadatendokument.
+**Das ist ein Defekt im Step-7-Deliverable, nicht Layer 8:** das Runbook schreibt einen Befehl
+vor, den die mitgelieferte Unit-Vorlage strukturell ablehnt.
 
-**Ein bewusster Rückzieher in dieser Session, dokumentiert statt verschwiegen:** die erste
-Advisor-Antwort empfahl, den physischen Verbleib der Unit in `phase3_edge/systemd/` zu belassen
-(Begründung: `install_units.sh`s Verzeichnis ist im Skript fest verdrahtet, „nur
-Platzhalterliste" schien das zu bestätigen). Beim Lesen von `phase3_edge/tests/test_units.py`
-(auf Advisor-Anraten, bevor irgendetwas angefasst wurde) zeigte sich: ein Verbleib hätte
-denselben Widerspruch nur verschoben, nicht aufgelöst. Ein zweiter Advisor-Durchlauf mit dem
-Fund bestätigte den Umzug als richtig — Details siehe oben. Genau die Art Kurskorrektur, die
-dieses Repo für den Menschen sichtbar machen soll, nicht still im Diff verschwinden lassen
-(Working-Style-Regel „Widersprechende Evidenz wird ein expliziter Befund").
+**Fix — bewusst ohne jede Verhaltensänderung am Server:** `local.env.example` erklärt die
+`127.0.0.1`-Pflicht mit Begründung, `install_units.sh` warnt (nicht-fatal) wenn sie fehlt und
+`AUTH_MODE != token`, das Runbook nennt sie bei Schritt 3 und trägt bei Schritt 4 die
+Fehlerdiagnose. `phase3_edge/local.env` auf dieser VM repariert: `PUBLIC_BASE_URL` fehlte
+komplett (deshalb der `install_units.sh`-Abbruch, den der Nikinger vorher sah), Kommentarkopf
+stand noch auf der alten Vier-Variablen-Fassung. Backup der Vorfassung im Scratchpad dieser
+Session.
 
-**Nächster Schritt (konkret):** Das Runbook oben, Schritt 1 (`provision_user.py`) — Sache des
-Nikingers. Danach Schritte 2–8 in genau dieser Reihenfolge. `docs/concepts/
-P4_ABNAHME_<Datum>.md` erst nach Schritt 7 schreiben (Advisor-Vorgabe: ein Ergebnis-Protokoll
-für eine noch nicht gelaufene Matrix wäre ein fabriziertes Protokoll). Schritt 8 (Schnitt,
-inklusive `TokenPathASGI`/`AuthModeASGI`-Entfernung) läuft **im selben Commit** wie die
-Abnahme, nicht vorgezogen.
+**Verifiziert, nicht behauptet:** eine zweite, wegwerfbare Instanz (Port 8799, `tmp`-`DATA_ROOT`,
+eigene `auth.sqlite3`, Test-Nutzerakte über `CREDENTIALS_DIRECTORY` — **nie** der echte
+`DATA_ROOT`, **nie** der echte Keyring) mit `SPACE_ALLOWED_HOSTS=127.0.0.1` lieferte
+`oauth_smoke.py --base-url http://127.0.0.1:8799` → **11/11 grün**, inklusive
+`tool_call_with_bearer`. Das war der Punkt, der ohne Test hätte schiefgehen können: `hosts` geht
+an **zwei** Prüfer (Wurzel-`TrustedHostMiddleware` **und** FastMCPs eigenen Rebinding-Schutz in
+`mcp.http_app(allowed_hosts=…)`) — ein Fix, der nur die Discovery repariert und am Tool-Aufruf
+stirbt, ist damit ausgeschlossen. Der Produktionsdienst wurde ausschließlich read-only angefasst.
+
+**Sicherheits-Review:** vollständiger Durchgang durch `authserver/` (alle 16 Module) plus die
+P3-Betriebsschicht. **Keine Auth-Umgehung, kein Cross-Space-Leck, kein Secret-Leak gefunden.**
+Sieben kleinere Befunde S2–S8 plus Betriebsnotiz O1, alle mit Fehlfall und Fix-Skizze in
+`../docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`; Kurztabelle oben. Fünfzehn ausdrücklich
+geprüfte und **in Ordnung** befundene Punkte stehen dort ebenfalls, damit sie niemand erneut
+prüft — darunter die einzige Prüfung, die alles andere überholt hätte: der Fail-Closed-Guard
+`assert_principal_matches_request()` läuft tatsächlich auf dem echten Tool-Pfad (`tools.py ::
+_authenticated_principal()`, von **allen sechs** Tools gerufen), ist also nicht bloß definiert
+und getestet.
+
+**Bewusst NICHT getan:** keiner der Befunde S2–S8 wurde gefixt. Die Abnahmematrix läuft als
+Nächstes gegen genau diesen Code; eine Änderung an `flows.py`/`store.py` jetzt hieße, dass die
+Matrix etwas anderes abnimmt als das Reviewte. Das ist eine Entscheidung des Nikingers, keine
+Claude-Code-Eigenmacht.
+
+**Beinahe-Fehler, dokumentiert statt verschwiegen:** beim Aufräumen der Testinstanz lief ein
+`pkill -f "serve.py"` — dasselbe Muster trifft die `ExecStart`-Zeile des **Produktionsdienstes**.
+Es hat ihn nicht getroffen (die Shell selbst starb zuerst am eigenen Muster; `Active since
+16:11:35` blieb unverändert, per `systemctl status` und `/health uptime_s` gegengeprüft), aber
+das war Glück, nicht Vorsicht. Aufgeräumt wurde danach über die konkrete PID. Lehre für die
+nächste Session: auf dieser VM läuft ein echter Dienst mit demselben `ExecStart` wie jede
+Testinstanz — Prozesse nur per PID beenden, nie per Musterabgleich.
+
+**Verifiziert:** `pytest -q` → **352/352 grün** (350 Vorlauf + 2 neue in
+`phase3_edge/tests/test_units.py`). `oauth_smoke.py --base-url` gegen die Wegwerf-Instanz →
+11/11. Produktionsdienst nach allen Arbeiten unverändert aktiv (`uptime_s` durchgehend
+monoton).
+
+**Nächster Schritt (konkret):** Runbook Schritt 3 erneut — `sudo phase3_edge/scripts/install_units.sh`
+(läuft jetzt durch, `local.env` ist vollständig), danach `systemctl cat sharefyx-mcp` prüfen, ob
+`SPACE_ALLOWED_HOSTS` beide Werte trägt, dann Schritt 4. Fällt Schritt 4 erneut, ist es **nicht**
+mehr S1. Danach unverändert Schritte 5–8. Vor dem Schnitt (Schritt 8) entscheiden, welche der
+Befunde S2–S8 noch in P4 gefixt werden.
+

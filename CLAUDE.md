@@ -154,7 +154,17 @@ Step 5 und Step 6b lag. Diese Zeile jetzt auf Step 6b gebracht, jeweils bei ihre
 Abschluss-Commit nachzuziehen, nicht erst wenn die Drift wieder auffällt.**]**
 **[2026-07-29:** Step 7 nachgetragen — Code-Vorbereitung fertig, Live-Teile (Provisionierung,
 `systemd-creds`, `systemctl restart`, Connector, Abnahmematrix) stehen aus, Sache des
-Nikingers.**]** Step 0 (Haushalt, Drift, geerbte Abnahme), Step 1 (Gerüst, Konfiguration,
+Nikingers.**]**
+**[2026-07-29, zweiter Nachtrag:** Der erste Live-Versuch von Runbook-Schritt 4
+(`oauth_smoke.py --base-url`) scheiterte 4/4 mit `status=400` — Ursache **Befund S1**:
+`SPACE_ALLOWED_HOSTS` ohne `127.0.0.1` lässt das Wurzel-`TrustedHostMiddleware` jede lokale
+Anfrage mit `400 Invalid host header` beantworten, der Runbook-Schritt war damit strukturell
+unausführbar. Behoben in `local.env.example`/`install_units.sh`/Runbook, **ohne** Servercode zu
+ändern; gegen eine Wegwerf-Instanz mit `tmp`-`DATA_ROOT` als 11/11 belegt. Im selben Zug ein
+vollständiges Sicherheits-Review von P3+P4: **keine Auth-Umgehung, kein Cross-Space-Leck, kein
+Secret-Leak**; sieben kleinere offene Befunde S2–S8 plus Betriebsnotiz O1, bewusst **nicht**
+gefixt, bis der Nikinger über die Reihenfolge gegenüber der Abnahmematrix entschieden hat.
+Volles Dokument: `docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`.**]** Step 0 (Haushalt, Drift, geerbte Abnahme), Step 1 (Gerüst, Konfiguration,
 Kryptobausteine), Step 2 (Passwörter, TOTP, Nutzerakten), Step 3 (Persistenz +
 Fehlversuchsbremse — Code-/Refresh-Replay-Tötung nach RFC 9700), Step 4 (Metadaten + dynamische
 Registrierung), Step 5 (Autorisierungsfluss — `/oauth/authorize`, `/oauth/token`,

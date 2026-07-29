@@ -117,3 +117,56 @@ def test_install_script_refuses_without_local_env(tmp_path):
 
     assert result.returncode != 0
     assert "local.env" in result.stderr
+
+
+def test_install_script_warns_when_allowed_hosts_lacks_loopback(tmp_path):
+    """P4 Step 7 (2026-07-29): ohne `127.0.0.1` in `ALLOWED_HOSTS` antwortet der Dienst unter
+    `AUTH_MODE=both|oauth` auf **jede** lokale Anfrage mit `400 Invalid host header` — das
+    `TrustedHostMiddleware` der Wurzel-App bekommt genau diese Liste (`mcpserver/app.py ::
+    create_app()`). Genau daran scheiterte Runbook-Schritt 4 (`oauth_smoke.py --base-url
+    http://127.0.0.1:8765` → 4/4 Prüfungen mit `status=400`) live beim Nikinger.
+
+    Hermetisch wie der Test darüber: die `local.env` lässt `PUBLIC_BASE_URL` weg, damit das
+    Skript nach der Warnung am Pflichtfeld-Check abbricht — die Warnung ist damit belegt, ohne
+    dass das Skript je `/etc` oder `systemctl` erreicht.
+    """
+    phase_copy = tmp_path / "phase3_edge"
+    shutil.copytree(REPO_ROOT / "phase3_edge" / "scripts", phase_copy / "scripts")
+    shutil.copytree(REPO_ROOT / "phase3_edge" / "systemd", phase_copy / "systemd")
+    (phase_copy / "local.env").write_text(
+        "REPO_ROOT=/tmp/repo\nDATA_ROOT=/tmp/data\nVENV=/tmp/repo/.venv\n"
+        "ALLOWED_HOSTS=node.tailnet.ts.net\nAUTH_MODE=both\n",
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        ["bash", str(phase_copy / "scripts" / "install_units.sh")],
+        capture_output=True,
+        text=True,
+    )
+
+    assert "WARNUNG" in result.stderr and "127.0.0.1" in result.stderr
+    assert result.returncode != 0
+    assert "PUBLIC_BASE_URL" in result.stderr
+
+
+def test_install_script_stays_quiet_when_loopback_present(tmp_path):
+    """Gegenprobe zum Test darüber: mit `127.0.0.1` in der Liste erscheint die Warnung nicht.
+    Ohne diese Hälfte würde ein Skript, das *immer* warnt, den Test oben ebenfalls bestehen."""
+    phase_copy = tmp_path / "phase3_edge"
+    shutil.copytree(REPO_ROOT / "phase3_edge" / "scripts", phase_copy / "scripts")
+    shutil.copytree(REPO_ROOT / "phase3_edge" / "systemd", phase_copy / "systemd")
+    (phase_copy / "local.env").write_text(
+        "REPO_ROOT=/tmp/repo\nDATA_ROOT=/tmp/data\nVENV=/tmp/repo/.venv\n"
+        "ALLOWED_HOSTS=node.tailnet.ts.net,127.0.0.1\nAUTH_MODE=both\n",
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        ["bash", str(phase_copy / "scripts" / "install_units.sh")],
+        capture_output=True,
+        text=True,
+    )
+
+    assert "WARNUNG" not in result.stderr
+    assert result.returncode != 0  # bricht weiterhin an PUBLIC_BASE_URL ab

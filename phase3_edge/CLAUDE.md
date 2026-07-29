@@ -150,6 +150,14 @@ dieselbe Reihenfolge:
    Rauschen (Scanner, altes Bookmark) oder ein tatsächlich falsches/rotiertes Token, das ein
    `systemctl restart` vergessen hat (P3-M)?
 
+**[2026-07-29 Ergänzung, P4-Befund S1]:** Prüfung 2 (`curl -sf http://127.0.0.1:8765/health`)
+schlägt unter `SPACE_AUTH_MODE=both|oauth` auch dann fehl, wenn der Dienst völlig gesund ist —
+nämlich wenn `SPACE_ALLOWED_HOSTS` kein `127.0.0.1` enthält (`400 Invalid host header` aus dem
+Wurzel-`TrustedHostMiddleware`, das `create_app()` ab P4 zusätzlich über die Wurzel-App legt).
+Die Diagnose „Dienst läuft, antwortet aber nicht lokal" ist dann falsch. Gegenprobe:
+`curl -s -H 'Host: <node>.<tailnet>.ts.net' http://127.0.0.1:8765/health` — kommt `200`, ist es
+S1 und nicht der Dienst. Details: `../docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`.
+
 **V13 geschlossen (2026-07-28, P4 Step 0):** `diagnose.sh` einmal komplett gegen das reale
 `tailscale funnel status` gelaufen lassen — alle sechs Prüfungen grün, Schritt 4s Grep-Muster
 matcht die echte Ausgabe unverändert. Kein Korrekturbedarf am Skript.
@@ -189,7 +197,11 @@ tailscale funnel status                # muss den Node-Namen und Port 443 zeigen
 
 # 2) Konfiguration eintragen
 cp phase3_edge/local.env.example phase3_edge/local.env
-#    REPO_ROOT, DATA_ROOT, VENV, ALLOWED_HOSTS=<node>.<tailnet>.ts.net
+#    REPO_ROOT, DATA_ROOT, VENV, ALLOWED_HOSTS=<node>.<tailnet>.ts.net,127.0.0.1
+#    [2026-07-29, P4 Step 7, Befund S1] 127.0.0.1 gehört mit in die Liste, sobald AUTH_MODE
+#    nicht "token" ist — sonst antwortet die Wurzel-App (TrustedHostMiddleware) auf JEDE lokale
+#    Anfrage mit "400 Invalid host header", inklusive Prüfung 2 dieses Runbooks und Schritt 7
+#    unten. Ab P4 hat local.env außerdem sechs Werte, nicht vier (AUTH_MODE, PUBLIC_BASE_URL).
 
 # 3) Token für beide Spaces ausgeben (je einmal anzeigen, sicher notieren)
 python phase2_mcp/scripts/issue_token.py --space niklas

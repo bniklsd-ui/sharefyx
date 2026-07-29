@@ -8,9 +8,84 @@ updated: 2026-07-29
 ---
 # Session-Archiv — Phase 4 OAuth 2.1 + DCR
 
-Newest-first. Sechs Rotationen bisher (Abschluss Step 3, dann Step 4, dann Step 5, dann Step 6a,
-dann Step 6b, dann die Step-7-Code-Vorbereitung, 2026-07-28/29) — via
+Newest-first. Sieben Rotationen bisher (Abschluss Step 3, dann Step 4, dann Step 5, dann Step
+6a, dann Step 6b, dann die Step-7-Code-Vorbereitung, dann Befund S1 + Sicherheits-Review,
+2026-07-28/29) — via
 `scripts/rotate_session_block.sh phase4_auth`, nie von Hand.
+
+## Session stopped — 2026-07-29 (Step 7, Code-Vorbereitung)
+
+**Ergebnis:** Alles, was Step 7 **ohne** echte VM/echten Keyring/echte Claude-Accounts bauen
+lässt, ist fertig — die Live-Teile (Provisionierung, `systemd-creds`, `systemctl restart`,
+Connector, Abnahmematrix) sind Sache des Nikingers (Runbook oben). `pytest -q` →
+**350/350 grün** (331 Vorlauf + 19 neue). **Phase 4 bleibt 🟡, nicht ✅** — Step 7 selbst ist
+nicht abgeschlossen, nur code-vorbereitet.
+
+**Gebaut:**
+- `phase4_auth/systemd/sharefyx-mcp.service` — **umgezogen** von `phase3_edge/systemd/` (Plan
+  §5 Step 7: „ERSETZT die P3-Fassung", inhaltlich jetzt eine P4-Unit). `git mv`, nicht Kopie
+  (Historie bleibt erhalten, keine zwei Quellen für dieselbe Unit — ein zweiter Advisor-Fund
+  dieser Session: eine Kopie-statt-Move hätte ein stilles Doppel-Install-Risiko über
+  Glob-Reihenfolge geschaffen). Ergänzt: `StateDirectory=sharefyx`, `StateDirectoryMode=0700`,
+  `LoadCredentialEncrypted=auth-users:…`, `Environment=SPACE_AUTH_MODE=__AUTH_MODE__`/
+  `SPACE_PUBLIC_BASE_URL=__PUBLIC_BASE_URL__`. `Documentation=` zeigt jetzt auf dieses Dokument.
+  **`StateDirectory=sharefyx` allein reicht** für den Auth-DB-Pfad — systemd exportiert
+  `$STATE_DIRECTORY`, `authserver/config.py` liest exakt diesen Namen, keine zusätzliche
+  `Environment=SPACE_AUTH_DB=`-Zeile nötig (geprüft, nicht angenommen).
+- `phase3_edge/scripts/install_units.sh` (P4-berührt, bleibt P3-Eigentum): liest jetzt aus
+  **zwei** Verzeichnissen (`phase3_edge/systemd/` **und** `phase4_auth/systemd/`); zwei neue
+  Platzhalter im Sed-Kommando **und** in der Pflichtvariablen-Prüfung (ein stiller
+  Leerstring-Fallback bei fehlendem `local.env`-Eintrag wäre der falsche Fehlermodus). `phase3_
+  edge/local.env.example` um `AUTH_MODE`/`PUBLIC_BASE_URL` ergänzt.
+- `phase3_edge/tests/test_units.py` (P4-berührt, dieselbe „genuinely necessary"-Begründung wie
+  jede andere P4-Q-artige Cross-Phase-Berührung): `UNIT_PATH`/`ALL_UNIT_PATHS` folgen dem Umzug,
+  zwei neue Tests (`StateDirectory`, zweites Credential). Kein Test-Verhalten geändert, nur der
+  Quellpfad — `pytest phase3_edge/tests/test_units.py` war der Beweis dafür, nicht nur eine
+  Behauptung (Advisor-Vorgabe: „das ist der Arbiter, nicht noch eine Runde Nachdenken").
+  `phase3_edge/CLAUDE.md` Zeile 5 bekam dieselbe Art datierte Korrekturnotiz wie
+  `phase2_mcp/CLAUDE.md`s Testzahl-Drift — historische Zähl-Zeilen bleiben unangetastet.
+- `authserver/store.py :: list_clients()`/`list_families(space=)` (additiv, kein Plan-Skelett-
+  Eintrag — gleiches Muster wie `create_family` in Step 3), neues `TokenFamily`-Dataclass in
+  `models.py`. `authserver/config.py :: resolve_db_path()` aus `load_auth_settings()`
+  herausgezogen — ein Operator-Werkzeug, das für „eine Familie widerrufen" plötzlich
+  `SPACE_PUBLIC_BASE_URL` verlangt, wäre eine unnötige Hürde für eine SSH-Sitzung.
+- `phase4_auth/scripts/authctl.py` (neu) — fünf dünne Unterbefehle (`list-clients`,
+  `list-tokens [--space]`, `revoke --family-id`, `unlock --space`, `purge-expired`), je einer
+  über eine bestehende `AuthStore`-Methode. **`revoke` kennt nur `--family-id`**, keinen
+  `--space`-Sammelwiderruf — komponierbar aus `list-tokens --space` + mehreren `revoke`-Aufrufen,
+  bewusst keine zweite Fläche dafür (Advisor-Vorgabe).
+- `phase4_auth/scripts/oauth_smoke.py`: `--base-url`-Modus (Plan §5 Step 7 Punkt 4). Passwort/
+  TOTP-Seed über `getpass.getpass()`, **nie** als Argument (zwei dokumentierte
+  Klartext-Token-Vorfälle in diesem Repo, keinen dritten produzieren). Die elf Prüfungen sind
+  jetzt in `_run_checks()` ausgelagert, parametrisiert über `client`/`mcp_client_factory` — vom
+  Default- UND vom `--base-url`-Modus gleichermaßen benutzt.
+  **Echter Korrekturbedarf beim Refactor gefunden, nicht nur Umbau:** die Discovery-Prüfungen
+  verglichen `resource`/`issuer` bisher gegen einen vorab bekannten `AuthSettings`-Wert — im
+  `--base-url`-Modus meldet ein echter Server seine echte `SPACE_PUBLIC_BASE_URL`
+  (`https://<node>.ts.net`), nicht `http://127.0.0.1:8765`, unter dem das Skript ihn gerade
+  anspricht. Ein Vergleich gegen einen vorberechneten Erwartungswert wäre dort strukturell
+  falsch gewesen. Jetzt: Selbstkonsistenz-Prüfung (`resource == f"{issuer}/mcp"`, aus der
+  Antwort selbst gelesen) — stärkere Prüfung, gilt in jedem Modus gleich, kein Sonderfall nötig.
+  Getestet gegen einen **echten** lokal lauschenden `uvicorn`-Server (`test_
+  network_mode_runs_against_a_real_server`, kein `ASGITransport`) — der eigentliche Beweis für
+  Punkt 4, nicht nur Argument-Parsing.
+
+**Ein bewusster Rückzieher in dieser Session, dokumentiert statt verschwiegen:** die erste
+Advisor-Antwort empfahl, den physischen Verbleib der Unit in `phase3_edge/systemd/` zu belassen
+(Begründung: `install_units.sh`s Verzeichnis ist im Skript fest verdrahtet, „nur
+Platzhalterliste" schien das zu bestätigen). Beim Lesen von `phase3_edge/tests/test_units.py`
+(auf Advisor-Anraten, bevor irgendetwas angefasst wurde) zeigte sich: ein Verbleib hätte
+denselben Widerspruch nur verschoben, nicht aufgelöst. Ein zweiter Advisor-Durchlauf mit dem
+Fund bestätigte den Umzug als richtig — Details siehe oben. Genau die Art Kurskorrektur, die
+dieses Repo für den Menschen sichtbar machen soll, nicht still im Diff verschwinden lassen
+(Working-Style-Regel „Widersprechende Evidenz wird ein expliziter Befund").
+
+**Nächster Schritt (konkret):** Das Runbook oben, Schritt 1 (`provision_user.py`) — Sache des
+Nikingers. Danach Schritte 2–8 in genau dieser Reihenfolge. `docs/concepts/
+P4_ABNAHME_<Datum>.md` erst nach Schritt 7 schreiben (Advisor-Vorgabe: ein Ergebnis-Protokoll
+für eine noch nicht gelaufene Matrix wäre ein fabriziertes Protokoll). Schritt 8 (Schnitt,
+inklusive `TokenPathASGI`/`AuthModeASGI`-Entfernung) läuft **im selben Commit** wie die
+Abnahme, nicht vorgezogen.
 
 ## Session stopped — 2026-07-28 (Step 6b)
 

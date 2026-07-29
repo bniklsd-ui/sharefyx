@@ -31,9 +31,10 @@ updated: 2026-07-29
 
 ## Active phase (4 — OAuth 2.1 + DCR)
 
-- [phase4_auth/CLAUDE.md](../phase4_auth/CLAUDE.md) — 🔄 ~33KB · phase head; Steps 0–6 ✅ (Step 6 mit allen drei Done-when-Klauseln belegt), Step 7 (Betrieb, Live-Abnahme, Schnitt) 🟡 **Code-Vorbereitung fertig** (`authctl.py`, Unit-Umzug nach `phase4_auth/systemd/`, `oauth_smoke.py --base-url`) — **Live-Teile stehen aus, Sache des Nikingers** (Runbook im Kopf); read + newest Session-stopped block first
+- [phase4_auth/CLAUDE.md](../phase4_auth/CLAUDE.md) — 🔄 ~35KB · phase head; Steps 0–6 ✅ (Step 6 mit allen drei Done-when-Klauseln belegt), Step 7 (Betrieb, Live-Abnahme, Schnitt) 🟡 **Code-Vorbereitung fertig** (`authctl.py`, Unit-Umzug nach `phase4_auth/systemd/`, `oauth_smoke.py --base-url`) — **Live-Teile stehen aus, Sache des Nikingers** (Runbook im Kopf); enthält seit 2026-07-29 die Kurztabelle der Sicherheitsbefunde S1–S8/O1; read + newest Session-stopped block first
+- [docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md](./concepts/P4_SECURITY_REVIEW_2026-07-29.md) — 📕 ~13KB · Sicherheits-Review P3+P4 vor der Live-Abnahme: Befund S1 (`ALLOWED_HOSTS` ohne `127.0.0.1` → `400 Invalid host header`, machte Runbook-Schritt 4 unausführbar, behoben) plus S2–S8/O1 offen, **und** 15 ausdrücklich geprüfte, in Ordnung befundene Punkte (verified negatives) — vor jedem Fix an einem der Befunde lesen
 - [docs/concepts/phase4_auth_plan.md](./concepts/phase4_auth_plan.md) — 📕 ~76KB · ausführungsreifer P4-Plan (Entscheidungen P4-A–P4-R, Steps 0–7, eigener Authorization Server, Argon2id + TOTP, opake Token); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen; Autor Browser-Planungssession 2026-07-28, **ohne frischen Repo-Zugriff geschrieben** — Anker sind Funktionsnamen/Suchstrings, keine Zeilennummern
-- [phase4_auth/SESSIONS_ARCHIVE.md](../phase4_auth/SESSIONS_ARCHIVE.md) — 📦 ~39KB · sechs archivierte Session-Blöcke (Step 0+1+2, Step 3, V14+Step 4, Step 5, Step 6a, Step 6b), verbatim, newest-first
+- [phase4_auth/SESSIONS_ARCHIVE.md](../phase4_auth/SESSIONS_ARCHIVE.md) — 📦 ~45KB · sieben archivierte Session-Blöcke (Step 0+1+2, Step 3, V14+Step 4, Step 5, Step 6a, Step 6b, Step-7-Code-Vorbereitung), verbatim, newest-first
 
 ## Completed phases
 
