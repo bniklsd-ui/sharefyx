@@ -35,6 +35,17 @@ class AuthSettings:
     def resource(self) -> str:
         return f"{self.base_url}/mcp"
 
+    @property
+    def csp_form_action(self) -> str:
+        """`form-action`-Direktivenwert für `routes.py :: _security_headers()` — hier statt
+        dort gebaut, damit `allowed_redirect_origins` außerhalb von `config.py`/`clients.py`
+        weiterhin nicht auftaucht (`test_redirect_uri_allowed_is_the_only_matching_path`, Plan
+        §2.6 [SEAM]). Kein Widerspruch zu diesem Seam: hier wird nichts gegen eine Redirect-URI
+        verglichen, die Liste wird nur in einen Header-Wert übersetzt — trotzdem an der Stelle
+        gebaut, an der `allowed_redirect_origins` schon lesbar ist, statt eine zweite Stelle zu
+        öffnen."""
+        return " ".join(("'self'", *self.allowed_redirect_origins))
+
 
 def _parse_redirect_origins(raw: str | None) -> tuple[str, ...]:
     if not raw:

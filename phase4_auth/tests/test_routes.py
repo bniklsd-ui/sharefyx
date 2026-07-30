@@ -208,6 +208,19 @@ async def test_html_responses_carry_security_headers(client_factory, client_reco
 
 
 @pytest.mark.asyncio
+async def test_csp_form_action_allows_the_oauth_redirect_target(client_factory, client_record):
+    """Live-Fund 2026-07-30: Chromium prüft `form-action` auch gegen das Redirect-Ziel einer
+    Formular-Antwort, nicht nur gegen das unmittelbare `action`-Attribut — `POST
+    /oauth/authorize` antwortet bei Erfolg mit einem 302 nach `settings.allowed_redirect_origins`.
+    Fehlt einer dieser Origins in `form-action`, blockiert der Browser den Redirect lautlos
+    (kein Fehler auf der Seite, der Server selbst antwortet korrekt mit 302 + gültigem Code)."""
+    async with client_factory() as client:
+        resp = await client.get("/oauth/authorize", params=_authorize_query(client_record.client_id))
+    csp = resp.headers["content-security-policy"]
+    assert "form-action 'self' https://claude.ai https://claude.com" in csp
+
+
+@pytest.mark.asyncio
 async def test_no_cookie_is_ever_set(client_factory, client_record):
     """Belegt P4-O (kein Cookie, nirgends) über den vollständigen Fluss: GET-Formular,
     POST-Consent, POST-Token-Tausch."""

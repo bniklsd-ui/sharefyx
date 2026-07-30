@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase4_auth_plan.md          # voller Plan, Entscheidungen P4-A–P4-R, Steps 0–7
   - ../docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md  # Herkunft der offenen Entscheidungen, Doku-Drift, [VERIFY]-Bilanz
   - SESSIONS_ARCHIVE.md                            # ältere Session-Blöcke, newest-first
-updated: 2026-07-29
+updated: 2026-07-30
 ---
 
 # CLAUDE.md — Phase 4: OAuth 2.1 + DCR (`phase4_auth/`)
@@ -108,6 +108,7 @@ Bedarf nicht neu recherchiert werden muss:
 | 8 | `phase4_auth/scripts/authctl.py` (+ `store.py :: list_clients`/`list_families`, `config.py :: resolve_db_path`); `phase4_auth/systemd/sharefyx-mcp.service` (`StateDirectory`, zweites Credential, `SPACE_AUTH_MODE`/`SPACE_PUBLIC_BASE_URL`); `install_units.sh`/`local.env.example` erweitert; `oauth_smoke.py --base-url` (echtes Netz) | 7 | 🟡 **Live-Abnahme läuft — 12/16 bestanden** (2026-07-29, Protokoll `docs/concepts/P4_ABNAHME_2026-07-29.md`); offen: Zeile 9 (nächste Session), 14/15 (Fabian, morgen), 16 (nach dem Schnitt) | 21 neu: 9 `test_authctl.py` (neue Datei) + 5 neu in `test_authserver_store.py` + 3 neu in `test_units.py` (`phase3_edge/tests/`, davon 2 aus S1) + 4 neu in `test_oauth_smoke.py` |
 | 8a | **Befund S1** (2026-07-29): `ALLOWED_HOSTS` ohne `127.0.0.1` machte Runbook-Schritt 4 unausführbar — `local.env.example` + `install_units.sh`-Warnung + Runbook korrigiert, kein Servercode geändert | 7 | ✅ | 2 neu in `test_units.py` (in Zeile 8 mitgezählt) |
 | 8b | `phase4_auth/scripts/abnahme_run.sh` (2026-07-29) — automatisiert die acht maschinell prüfbaren Abnahmezeilen (1,2,3,10,11,12,13,16), spiegelt Aufbau/Redaktionsmuster von `phase3_edge/scripts/abnahme_run.sh` 1:1. Live gegen den echten Dienst probegelaufen (Zeilen 1/2/3/12 ok, 13/16 korrekt übersprungen, 10/11 korrekt übersprungen ohne echtes Passwort). Kein Ersatz für Zeilen 4–9/14/15 — eine curl-Nachbildung des Login-Formulars wäre eine zweite, ungetestete OAuth-Implementierung | 7 | ✅ | 0 (Runbook/Skript, gleiche Ausnahme wie `diagnose.sh`/`phase3_edge/scripts/abnahme_run.sh` — kein Unit-Test für ein Skript, das echten `systemd`/`journalctl`/Netzzugriff braucht) |
+| 8c | **Live-Fund 2026-07-30:** `routes.py :: _security_headers()` — `form-action` trug nur `'self'`, Chromium prüft es aber auch gegen das Redirect-Ziel einer Formular-Antwort (hier: `302` nach `https://claude.ai/...`) und blockierte Fabians Verbindung lautlos nach jedem erfolgreichen Login. Fix: `config.py :: AuthSettings.csp_form_action` (neue Property, hält den Seam `test_redirect_uri_allowed_is_the_only_matching_path` intakt), `form-action 'self' https://claude.ai https://claude.com`. **Nicht auf `sharefyx-mcp` deployt** — braucht `sudo systemctl restart`, dann Fabian erneut testen lassen | 7 | 🟡 **code-fertig, nicht live geprüft** | 1 neu in `test_routes.py` |
 
 **Zeile 1, Step 0:** kritischer Fund — ein nie widerrufener Keyring-Token für einen dritten,
 seit P2-B2 umbenannten Space (`nikinger`), live und schreibfähig. Details, Zeitachse und
@@ -414,115 +415,60 @@ abnimmt als das Reviewte. Reihenfolge entscheidet der Nikinger.
 
 ---
 
-## Session stopped — 2026-07-29 (Step 7 live blockiert: Befund S1 + Sicherheits-Review)
+## Session stopped — 2026-07-30 (Zeilen 14/15: Fabian-Login schlug fehl — Root Cause gefunden + gefixt, noch nicht deployt)
 
-**Für den nächsten, kalten Leser:** der Nikinger stand mitten im Step-7-Runbook, Schritt 4
-(`oauth_smoke.py --base-url http://127.0.0.1:8765`) schlug mit **4/4 Prüfungen `status=400`**
-fehl. Auftrag: Ursache finden **und** das Auth-Bündel aus P3/P4 sicherheitstechnisch
-durchsehen („I have the suspicion there's some underlying issue here").
+**Für den nächsten, kalten Leser:** Fabian versuchte Zeile 14 (eigener Connector-Login) —
+Passwort/TOTP eingegeben, „Anmelden" geklickt, scheinbar nichts passiert; zweiter Klick zeigte
+„Anfrage ungültig oder abgelaufen". Auftrag: Ursache finden.
 
-**Ursache (Befund S1), empirisch belegt statt vermutet:** kein Sicherheitsloch, sondern das
-Wurzel-`TrustedHostMiddleware` aus `mcpserver/app.py :: create_app()`. Es bekommt
-`SPACE_ALLOWED_HOSTS`; die installierte Unit trug dort **nur** den Funnel-Hostnamen. Damit
-beantwortet der Dienst jede Anfrage mit `Host: 127.0.0.1:8765` mit `400 Invalid host header` —
-vor jedem Handler, also auch `/health`, beide `.well-known` und `/mcp`. Beleg: dieselbe URL mit
-`-H 'Host: savefyx-…ts.net'` liefert `200` und das vollständige AS-Metadatendokument.
-**Das ist ein Defekt im Step-7-Deliverable, nicht Layer 8:** das Runbook schreibt einen Befehl
-vor, den die mitgelieferte Unit-Vorlage strukturell ablehnt.
+**Diagnose, in zwei Schritten:**
+1. Read-only gegen die echte `auth.sqlite3`/`journalctl`: **sechs** vollständige, erfolgreiche
+   Login-Runden für `fabian` in diesem Zeitfenster — jede erzeugte eine echte `token_families`-
+   Zeile (Passwort **und** TOTP korrekt), aber **keine einzige** gefolgt von einem
+   `POST /oauth/token`. Zum Vergleich: `niklas`s eigener Reconnect im selben Fenster (06:00:22)
+   lief vollständig durch, inklusive Tool-Aufrufen. Der Bruch lag also zwischen „Server sendet
+   302" und „Client tauscht den Code ein" — nicht im Server selbst.
+2. Der Nikinger lieferte einen Screenshot von Fabians DevTools (Network + Console): `POST
+   /oauth/authorize` → `302` mit korrektem `Location`-Header nach
+   `https://claude.ai/api/mcp/auth_callback?...&code=...` — **und** eine Konsolen-Meldung:
+   „Sending form data to '.../oauth/authorize' violates … Content Security Policy directive:
+   'form-action self'. The request has been blocked." Browser: Chromium/Edge 150
+   (`Sec-Ch-Ua`).
 
-**Fix — bewusst ohne jede Verhaltensänderung am Server:** `local.env.example` erklärt die
-`127.0.0.1`-Pflicht mit Begründung, `install_units.sh` warnt (nicht-fatal) wenn sie fehlt und
-`AUTH_MODE != token`, das Runbook nennt sie bei Schritt 3 und trägt bei Schritt 4 die
-Fehlerdiagnose. `phase3_edge/local.env` auf dieser VM repariert: `PUBLIC_BASE_URL` fehlte
-komplett (deshalb der `install_units.sh`-Abbruch, den der Nikinger vorher sah), Kommentarkopf
-stand noch auf der alten Vier-Variablen-Fassung. Backup der Vorfassung im Scratchpad dieser
-Session.
+**Root Cause:** `routes.py :: _security_headers()` setzte `form-action 'self'`. Chromium prüft
+`form-action` nicht nur gegen das unmittelbare `action`-Ziel eines Formulars, sondern **auch**
+gegen das Redirect-Ziel, wenn die Antwort auf den `POST` selbst ein Redirect ist — genau der
+Fall hier (`POST /oauth/authorize` antwortet bei Erfolg immer mit `302` nach
+`https://claude.ai/...`). Ohne `https://claude.ai`/`https://claude.com` in `form-action`
+blockiert der Browser diesen Redirect **lautlos** (kein Fehler auf der Seite, nur eine
+Konsolen-Meldung, die kein Nutzer je sieht) — der Server hatte in jedem der sechs Versuche
+bereits korrekt geantwortet, der Bruch passierte ausschließlich im Browser danach. Der zweite
+Klick auf das (bereits erfolgreich abgeschickte, aber nie weitergeleitete) Formular traf dann
+auf `consume_auth_request()`s Einmal-Regel — „ungültig" ist dabei korrektes Verhalten auf einen
+Doppel-Submit, kein zweiter Bug.
 
-**Verifiziert, nicht behauptet:** eine zweite, wegwerfbare Instanz (Port 8799, `tmp`-`DATA_ROOT`,
-eigene `auth.sqlite3`, Test-Nutzerakte über `CREDENTIALS_DIRECTORY` — **nie** der echte
-`DATA_ROOT`, **nie** der echte Keyring) mit `SPACE_ALLOWED_HOSTS=127.0.0.1` lieferte
-`oauth_smoke.py --base-url http://127.0.0.1:8799` → **11/11 grün**, inklusive
-`tool_call_with_bearer`. Das war der Punkt, der ohne Test hätte schiefgehen können: `hosts` geht
-an **zwei** Prüfer (Wurzel-`TrustedHostMiddleware` **und** FastMCPs eigenen Rebinding-Schutz in
-`mcp.http_app(allowed_hosts=…)`) — ein Fix, der nur die Discovery repariert und am Tool-Aufruf
-stirbt, ist damit ausgeschlossen. Der Produktionsdienst wurde ausschließlich read-only angefasst.
+**Fix:** `config.py :: AuthSettings.csp_form_action` (neue Property) baut
+`'self' https://claude.ai https://claude.com` aus derselben Origin-Liste, gegen die
+`clients.py :: redirect_uri_allowed()` bereits prüft — keine zweite, hartkodierte Quelle.
+`routes.py` referenziert die rohe Liste bewusst **nicht** direkt (dafür die neue Property),
+damit `test_redirect_uri_allowed_is_the_only_matching_path` (Plan §2.6 [SEAM]: genau eine
+Vergleichsstelle für Redirect-URIs) intakt bleibt — beim ersten Versuch geprüft und korrigiert,
+nicht nur behauptet. Neuer Test `test_csp_form_action_allows_the_oauth_redirect_target`.
 
-**Sicherheits-Review:** vollständiger Durchgang durch `authserver/` (alle 16 Module) plus die
-P3-Betriebsschicht. **Keine Auth-Umgehung, kein Cross-Space-Leck, kein Secret-Leak gefunden.**
-Sieben kleinere Befunde S2–S8 plus Betriebsnotiz O1, alle mit Fehlfall und Fix-Skizze in
-`../docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`; Kurztabelle oben. Fünfzehn ausdrücklich
-geprüfte und **in Ordnung** befundene Punkte stehen dort ebenfalls, damit sie niemand erneut
-prüft — darunter die einzige Prüfung, die alles andere überholt hätte: der Fail-Closed-Guard
-`assert_principal_matches_request()` läuft tatsächlich auf dem echten Tool-Pfad (`tools.py ::
-_authenticated_principal()`, von **allen sechs** Tools gerufen), ist also nicht bloß definiert
-und getestet.
+**Verifiziert, nicht nur behauptet:** eine dritte Wegwerf-Instanz (Port 8798, `tmp`-`DATA_ROOT`,
+eigene `auth.sqlite3` — **nie** der echte `DATA_ROOT`, **nie** der echte Keyring) zeigt den
+korrekten Header: `form-action 'self' https://claude.ai https://claude.com`. `pytest -q` →
+**353/353 grün**. Produktionsdienst ausschließlich read-only angefasst.
 
-**Bewusst NICHT getan:** keiner der Befunde S2–S8 wurde gefixt. Die Abnahmematrix läuft als
-Nächstes gegen genau diesen Code; eine Änderung an `flows.py`/`store.py` jetzt hieße, dass die
-Matrix etwas anderes abnimmt als das Reviewte. Das ist eine Entscheidung des Nikingers, keine
-Claude-Code-Eigenmacht.
+**Noch NICHT getan, bewusst:** der Fix ist **nicht auf `sharefyx-mcp` deployt** — braucht
+`sudo phase3_edge/scripts/install_units.sh`-unabhängigen einfachen `sudo systemctl restart
+sharefyx-mcp` (kein `local.env`/Unit-Änderung, reiner Code-Fix). Zeilen 14/15 bleiben offen, bis
+Fabian nach dem Restart einen echten, vollständigen Login-Erfolg zeigt (inkl. Tool-Aufruf) — der
+Server hat vorher schon sechsmal korrekt reagiert, das beweist noch keinen erfolgreichen
+End-to-End-Connect.
 
-**Beinahe-Fehler, dokumentiert statt verschwiegen:** beim Aufräumen der Testinstanz lief ein
-`pkill -f "serve.py"` — dasselbe Muster trifft die `ExecStart`-Zeile des **Produktionsdienstes**.
-Es hat ihn nicht getroffen (die Shell selbst starb zuerst am eigenen Muster; `Active since
-16:11:35` blieb unverändert, per `systemctl status` und `/health uptime_s` gegengeprüft), aber
-das war Glück, nicht Vorsicht. Aufgeräumt wurde danach über die konkrete PID. Lehre für die
-nächste Session: auf dieser VM läuft ein echter Dienst mit demselben `ExecStart` wie jede
-Testinstanz — Prozesse nur per PID beenden, nie per Musterabgleich.
-
-**Verifiziert:** `pytest -q` → **352/352 grün** (350 Vorlauf + 2 neue in
-`phase3_edge/tests/test_units.py`). `oauth_smoke.py --base-url` gegen die Wegwerf-Instanz →
-11/11. Produktionsdienst nach allen Arbeiten unverändert aktiv (`uptime_s` durchgehend
-monoton).
-
-**Nachtrag, selbe Session (Schritt 4/5 danach live durchlaufen, Schritt 6/7 im Gang):** der
-Nikinger fuhr Schritt 3 erneut (`install_units.sh` lief jetzt durch), Schritt 4
-(`oauth_smoke.py --base-url http://127.0.0.1:8765 --space niklas`) → **11/11 grün**, S1 damit
-live bestätigt behoben. Schritt 5 (Discovery von außen) ebenfalls grün. Beim ersten
-Connector-Login (Schritt 6) dann „Anmeldung fehlgeschlagen" (HTTP 400) — **kein neuer Befund**:
-Lesen von `login_attempts`/`totp_replay` in der echten `auth.sqlite3` (read-only, kein Write)
-zeigte, `totp_replay.last_counter` für `niklas` stand exakt auf dem Zeitstempel des
-`oauth_smoke.py`-Laufs (15:02:30Z) und rührte sich über vier weitere Browser-Versuche nicht —
-der TOTP-Replay-Schutz (RFC 6238, genau Abnahmezeile 8) griff, weil derselbe/ein bereits
-verbrauchter Code aus dem Smoke-Test erneut eingegeben wurde. `niklas` stand danach bei 3 von 5
-Fehlversuchen (noch nicht gesperrt). Mit einem frischen TOTP-Code aus der Authenticator-App
-klappte der Login. **Lehre fürs Runbook:** Smoke-Test und ersten Connector-Login nicht mit
-demselben TOTP-Code versuchen — auf einen neuen Code warten.
-
-Auf Nachfrage, wie die Abnahmematrix dokumentierbar/wiederholbar bleibt: neues
-`phase4_auth/scripts/abnahme_run.sh` gebaut (Details Zeile 8b oben), live gegen den echten
-Dienst probegelaufen — Zeilen 1/2/3/12 ok, 13/16 korrekt übersprungen (kein Passwort
-eingegeben bzw. `SPACE_AUTH_MODE` noch nicht `oauth`), 10/11 korrekt übersprungen im Probelauf
-(smoke-Pfad absichtlich deaktiviert, kein echtes Passwort angefasst). Ein echter Bug beim
-Probelauf gefunden und behoben, bevor der Nikinger ihn hätte treffen können: `POST /mcp` ohne
-Trailing Slash trifft Starlettes eigenes Mount-Redirect (307) **vor** jeder Auth-Prüfung — kein
-Server-Bug, aber ein falscher Negativbefund für Zeile 2, wenn man ohne Slash testet. Skript
-korrigiert auf `/mcp/`.
-
-**Zweiter Nachtrag, Abschluss dieser Session — Live-Abnahme, 12/16:** Runbook Schritt 6 erneut
-gefahren, diesmal mit einem frischen TOTP-Code — Login erfolgreich. Danach Schritt 7
-(Abnahmematrix) über `abnahme_run.sh` durchgeführt. Zeile 6 (Fehlversuchsbremse) lief dabei live
-in genau die erwartete Sperre: 5 Fehlversuche `16:06:28 → 16:07:20`, `locked_until` exakt
-`16:07:20 + 900s` — deckungsgleich mit `ratelimit.py`s Eskalationsformel. `authctl.py unlock
---space niklas` schlug dabei zuerst mit `ABBRUCH: SPACE_AUTH_DB fehlt und STATE_DIRECTORY ist
-nicht gesetzt` fehl (**Befund B1**, siehe unten) — außerhalb von systemd exportiert niemand
-`$STATE_DIRECTORY`, `test_authctl.py` deckte das nie auf, weil es dort direkt `SPACE_AUTH_DB`
-setzt. Behoben (reine Doku-Ergänzung, Commit `f614188`): `STATE_DIRECTORY=/var/lib/sharefyx`
-vor jedem interaktiven `authctl.py`-Aufruf. Danach lief `abnahme_run.sh run` vollständig durch:
-Zeilen 1/2/3/10/11/12/13 alle `[ok]`, Zeile 16 korrekt übersprungen (`SPACE_AUTH_MODE` noch
-`both`). Zeilen 4/5/7/8 aus dem Chat-Verlauf dieser Session bereits belegt. **Ergebnis: 12 von
-16 Abnahmezeilen live bestanden**, Protokoll mit vollständigen Belegen (CLI-Ausschnitt,
-DB-Gegenprobe, Journal-Zeitleiste) in `../docs/concepts/P4_ABNAHME_2026-07-29.md`.
-
-**Bewusst vertagt, keine stille Lücke:** Zeile 9 (Access-Token-Ablauf/Auto-Refresh unter der
-echten Claude-UI) auf die nächste Session — Nikinger-Entscheidung, mit vorab geschriebener
-genauer Anleitung als Voraussetzung. Zeilen 14/15 morgen mit Fabian verabredet. Zeile 16 bleibt
-strukturell an den Schnitt (Schritt 8) gebunden.
-
-**Verifiziert:** `pytest -q` → **352/352 grün** (unverändert). Befunde B1–B3 im Abnahmeprotokoll
-dokumentiert, nicht hier verdoppelt.
-
-**Nächster Schritt (konkret):** Zeile 9 in der nächsten Session — Anleitung dann erstellen
-(TTL-Override, Neustart, Beobachtung über die echte Claude-UI). Zeilen 14/15 mit Fabian. Vor dem
-Schnitt (Schritt 8) entscheiden, welche der Befunde S2–S8 noch in P4 gefixt werden.
+**Nächster Schritt (konkret):** `sudo systemctl restart sharefyx-mcp`, dann Fabian erneut
+verbinden lassen — dieses Mal nur **einmal** klicken und kurz warten. Danach `list_spaces`/einen
+Tool-Aufruf über Fabians Connector bestätigen (Zeile 14), dann Cross-Space-Schreibversuch gegen
+`niklas` (Zeile 15). Zeile 9 weiterhin offen (siehe voriger Block).
 

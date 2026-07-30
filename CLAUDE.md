@@ -172,7 +172,15 @@ Sperrzeit-Formel, Rule 4 unter echtem OAuth beobachtet). Bewusst offen: Zeile 9
 verabredet), Zeile 16 (erst nach dem Schnitt). Zwei kleine Live-Funde behoben (B1: `authctl.py`
 braucht `STATE_DIRECTORY` außerhalb von systemd; B2: `abnahme_run.sh` musste `/mcp/` mit
 Trailing Slash prüfen, sonst falscher Negativbefund). Protokoll:
-`docs/concepts/P4_ABNAHME_2026-07-29.md`.**]** Step 0 (Haushalt, Drift, geerbte Abnahme), Step 1 (Gerüst, Konfiguration,
+`docs/concepts/P4_ABNAHME_2026-07-29.md`.**]**
+**[2026-07-30:** Zeilen 14/15 (Fabian) scheiterten zunächst — Login gelang serverseitig sechsmal
+in Folge (echte Token-Familien, Passwort+TOTP korrekt), aber Chromium blockierte den `302`-
+Redirect zurück zu `claude.ai` lautlos: `form-action 'self'` in der CSP wird gegen das
+Redirect-Ziel geprüft, nicht nur gegen das unmittelbare Formular-`action`. Root Cause über einen
+DevTools-Screenshot des Nikingers bestätigt, gefixt (`AuthSettings.csp_form_action`, `form-action
+'self' https://claude.ai https://claude.com`), Seam-Test `test_redirect_uri_allowed_is_the_only_
+matching_path` blieb dabei intakt. **Noch nicht auf `sharefyx-mcp` deployt** — braucht
+`systemctl restart`, dann Fabian erneut testen.**]** Step 0 (Haushalt, Drift, geerbte Abnahme), Step 1 (Gerüst, Konfiguration,
 Kryptobausteine), Step 2 (Passwörter, TOTP, Nutzerakten), Step 3 (Persistenz +
 Fehlversuchsbremse — Code-/Refresh-Replay-Tötung nach RFC 9700), Step 4 (Metadaten + dynamische
 Registrierung), Step 5 (Autorisierungsfluss — `/oauth/authorize`, `/oauth/token`,

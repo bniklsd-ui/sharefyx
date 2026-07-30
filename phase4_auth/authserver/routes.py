@@ -28,10 +28,28 @@ from .store import AuthStore
 
 
 def _security_headers(settings: AuthSettings) -> dict[str, str]:
-    """Plan §2.6 — volles Set für HTML-Antworten und beide Metadatendokumente."""
+    """Plan §2.6 — volles Set für HTML-Antworten und beide Metadatendokumente.
+
+    **Live-Fund 2026-07-30:** `form-action` muss die erlaubten Redirect-Origins explizit nennen,
+    nicht nur `'self'`. Chromium (bestätigt: Microsoft Edge 150, Fabians Verbindungsversuch)
+    prüft `form-action` nicht nur gegen das unmittelbare `action`-Ziel des Formulars, sondern
+    auch gegen das Redirect-Ziel, wenn die Antwort auf den `POST` selbst ein Redirect ist (genau
+    der Fall hier: `POST /oauth/authorize` antwortet bei Erfolg mit `302` nach
+    `https://claude.ai/...`). Ohne `https://claude.ai`/`https://claude.com` in `form-action`
+    blockiert der Browser diesen Redirect **lautlos** — kein Fehler auf der Seite, nur eine
+    Konsolen-Meldung, die kein Nutzer je sieht. Der Server selbst liefert dabei einen korrekten
+    `302` mit gültigem Code (siehe `token_families` — die Anmeldung war jedes Mal erfolgreich);
+    der Bruch passiert ausschließlich im Browser, nach der Antwort. Ein zweiter Klick auf das
+    (bereits erfolgreich abgeschickte, aber nie weitergeleitete) Formular trifft dann auf
+    `consume_auth_request()`s Einmal-Regel und zeigt "Anfrage ungueltig oder abgelaufen" — beide
+    Symptome aus demselben einen Fund erklärt.
+
+    `settings.csp_form_action` statt der rohen Redirect-Origin-Liste direkt: der Wert wird in
+    `config.py` gebaut (siehe dortiger Docstring), damit dieses Modul die Liste nirgends selbst
+    anfasst (`test_redirect_uri_allowed_is_the_only_matching_path`, Plan §2.6 [SEAM])."""
     headers = {
         "Content-Security-Policy": (
-            "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; "
+            f"default-src 'none'; style-src 'unsafe-inline'; form-action {settings.csp_form_action}; "
             "frame-ancestors 'none'; base-uri 'none'"
         ),
         "Referrer-Policy": "no-referrer",
