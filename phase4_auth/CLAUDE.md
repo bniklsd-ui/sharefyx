@@ -357,11 +357,46 @@ Kein `sudo` nötig — `/var/lib/sharefyx` gehört `savefyx`. Innerhalb des Dien
 systemd `$STATE_DIRECTORY` selbst (`StateDirectory=sharefyx`), deshalb tauchte das in keinem
 Test auf (`test_authctl.py` setzt `SPACE_AUTH_DB` direkt).
 
+**Anleitung Zeile 9** (Access-Token-Ablauf, Claude refresht selbständig): über einen
+systemd-Drop-in, nicht `local.env`/`install_units.sh` — Wegwerf-Testwert, eine Zeile zum
+Entfernen statt ein Diff in einer getrackten Datei.
+
+```
+# 1) Kurze TTL (60s: reicht für eine Nachricht, kurz genug zum Abwarten)
+sudo mkdir -p /etc/systemd/system/sharefyx-mcp.service.d
+printf '[Service]\nEnvironment=SPACE_OAUTH_ACCESS_TTL_S=60\n' \
+  | sudo tee /etc/systemd/system/sharefyx-mcp.service.d/override.conf
+sudo systemctl daemon-reload && sudo systemctl restart sharefyx-mcp
+
+# 2) Gegenprüfen, nicht behaupten
+systemctl cat sharefyx-mcp | grep SPACE_OAUTH_ACCESS_TTL_S
+
+# 3) WICHTIG: ein bereits verbundener Connector hält noch ein Token mit ALTER 1h-TTL — der
+#    Neustart setzt dessen Ablauf nicht zurück. Connector einmal trennen und neu verbinden
+#    (oder Reconnect, falls angeboten), damit ein Token unter der 60s-TTL entsteht.
+
+# 4) ~90s warten, dann im SELBEN Chat einen weiteren Tool-Aufruf (z.B. list_spaces) —
+#    kein neuer Connect, kein Consent-Screen. Soll einfach funktionieren.
+
+# 5) Danach Override entfernen, sonst laufen echte Sessions dauerhaft mit 60s-Tokens
+sudo rm /etc/systemd/system/sharefyx-mcp.service.d/override.conf
+sudo systemctl daemon-reload
+sudo systemctl restart sharefyx-mcp
+```
+
+**Beleg, nicht Gefühl:** danach gegenprüfen (Claude Code) — Journal zwischen Schritt 3/4 zeigt
+ein zweites `"stage":"token"`, **ohne** neuen `authorize_get`/`authorize_post` davor (sonst
+Login statt Refresh). `auth.sqlite3` read-only: dieselbe `family_id`, mehrere `access_tokens`
+mit späteren `created_at`.
+
+**`429 rate_limited` beim Neuverbinden?** DCR-Bremse ist global, 20/h (Plan §2.7) — nach dem
+vielen Testen heute ggf. ausgereizt. Bis zur nächsten vollen Stunde warten, kein Bug.
+
 **Stand 2026-07-30: 14 von 16 live bestanden — 🟡-code-complete-Schwelle erreicht (Terminrisiko-
 Entscheidung 2026-07-28: „14/16 bestanden → P5 darf beginnen").** Protokoll mit Belegen:
 `../docs/concepts/P4_ABNAHME_2026-07-29.md` (Nachtrag 2026-07-30 für Zeilen 14/15). Offen: Zeile
-9 (auf nächste Session vertagt, mit genauer Anleitung dann), Zeile 16 (strukturell erst nach
-dem Schnitt möglich — kein Terminrisiko, sondern Reihenfolge).
+9 (Anleitung oben), Zeile 16 (strukturell erst nach dem Schnitt möglich — kein Terminrisiko,
+sondern Reihenfolge).
 
 **Abnahmematrix** (16 Zeilen, Protokoll nach P2/P3-Konvention — Belege statt Behauptungen):
 
@@ -474,34 +509,13 @@ Tool-Aufruf über Fabians Connector bestätigen (Zeile 14), dann Cross-Space-Sch
 `niklas` (Zeile 15). Zeile 9 weiterhin offen (siehe voriger Block).
 
 **Nachtrag, selbe Session — CSP-Fix deployt, Zeilen 14/15 bestanden:** Restart durchgeführt,
-Fabian erneut verbunden — diesmal ein einziger Klick, sofortiger Erfolg. Fabian fuhr danach von
-sich aus ein vollständiges Sechs-Tool-Protokoll, deutlich über den Matrix-Mindestbeleg hinaus:
+Fabian erneut verbunden — ein Klick, sofortiger Erfolg. Fabian fuhr von sich aus ein
+vollständiges Sechs-Tool-Protokoll plus zwei Negativtests (`conflict`, `write_denied`), deutlich
+über den Matrix-Mindestbeleg hinaus — volle Tabelle + Details:
+`../docs/concepts/P4_ABNAHME_2026-07-29.md`, Nachtrag 2026-07-30.
 
-| Tool | Ergebnis |
-|---|---|
-| `list_spaces` | `fabian` (writable), `niklas` (read-only) |
-| `search_items` | 2 aktive Items bei `niklas`, 6 mit `include_archived=true` |
-| `get_item` (fremd) | Body korrekt in `<untrusted_content>` gekapselt |
-| `create_item` | `itm_1156c679` im eigenen Space, `tags`/`status` übernommen |
-| `append_to_item` | `version: 1 → 2` |
-| `update_item` | archiviert, `version: 2 → 3` |
-
-Plus zwei selbst gewählte Negativtests: veraltete `version` beim Update → `conflict` mit
-Neu-Lese-Hinweis (Optimistic Locking), Archivierungsversuch auf einem `niklas`-Item →
-`write_denied` (Cross-Space-Schreibschutz). Beides architektonisch erwartet (P2/Rule 4), hier
-zum ersten Mal unter echtem OAuth **und** einem zweiten, unabhängigen Nutzer beobachtet — nicht
-nur unit-getestet.
-
-**Ergebnis: 14 von 16 Abnahmezeilen live bestanden.** Damit ist die im Runbook gelockte
-Terminrisiko-Schwelle erreicht — „14/16 bestanden → 🟡 code-complete, P5 darf beginnen"
-(Nikinger-Entscheidung 2026-07-28). ✅ (voll live-verifiziert) bleibt an Zeile 9 (nächste Session)
-und Zeile 16 (erst nach dem Schnitt) hängen. Protokoll-Nachtrag in
-`../docs/concepts/P4_ABNAHME_2026-07-29.md`.
-
-**Verifiziert:** `pytest -q` weiterhin **353/353 grün** (keine weitere Code-Änderung in diesem
-Nachtrag). Produktionsdienst lief nach dem einen `systemctl restart` durchgehend.
-
-**Nächster Schritt (konkret):** Zeile 9 in einer eigenen Session (TTL-Override, Neustart,
-Beobachtung über die echte Claude-UI — Anleitung dann schreiben). Danach Schnitt
-(Runbook-Schritt 8), Zeile 16, ✅-Status.
+**Ergebnis: 14 von 16 Abnahmezeilen live bestanden** — Terminrisiko-Schwelle erreicht
+(„14/16 → 🟡 code-complete, P5 darf beginnen", Nikinger-Entscheidung 2026-07-28). `pytest -q` →
+**353/353 grün**. ✅ bleibt an Zeile 9 (Anleitung jetzt im Runbook oben) und Zeile 16 (nach dem
+Schnitt) hängen.
 
