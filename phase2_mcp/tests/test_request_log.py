@@ -2,11 +2,17 @@
 
 `test_tool_event_never_contains_item_title` ist der wichtigste Test dieses Moduls (Plan §4
 Step 2): er prüft eine Zusage — das Log ist Betriebsdaten, nie Inhalt —, keine Implementierung.
+
+**Schnitt, 2026-07-30 (Runbook-Schritt 8):** die drei Tests, die über den `app`-Fixture einen
+echten Tool-Aufruf fahren, benutzen seither einen echten Bearer-Token aus einer temporären
+`AuthStore` statt eines Pfad-Token-Fakes (`TokenPathASGI` ist entfernt) — siehe `test_app.py` für
+dasselbe Muster.
 """
 from __future__ import annotations
 
 import json
 import logging
+from datetime import datetime, timezone
 
 import httpx
 import pytest
@@ -14,8 +20,10 @@ from fastmcp import Client
 from fastmcp.client.transports import StreamableHttpTransport
 from starlette.applications import Starlette
 
-from mcpserver.app import create_app
-from mcpserver.auth import AuthError, Principal
+from authserver.config import AuthSettings
+from authserver.store import AuthStore
+
+from mcpserver.app import OAuthConfig, create_app
 from mcpserver.config import Settings
 from mcpserver.request_log import (
     LOGGER_NAME,
@@ -26,22 +34,6 @@ from mcpserver.request_log import (
     log_event,
 )
 from storage.store import Store
-
-TOKEN_ALPHA = "tok-alpha"
-TOKEN_BETA = "tok-beta"
-
-
-class _FakeResolver:
-    """Wie in `test_app.py`/`test_asgi.py` — kein echter Keyring."""
-
-    def __init__(self, mapping: dict[str, Principal]) -> None:
-        self._mapping = mapping
-
-    def resolve(self, credential: str) -> Principal:
-        principal = self._mapping.get(credential)
-        if principal is None:
-            raise AuthError("unbekannt")
-        return principal
 
 
 class _CapturingHandler(logging.Handler):
@@ -79,24 +71,43 @@ def store(tmp_path) -> Store:
 
 
 @pytest.fixture
-def resolver() -> _FakeResolver:
-    return _FakeResolver(
-        {
-            TOKEN_ALPHA: Principal(space="alpha", token_hash="hash-alpha"),
-            TOKEN_BETA: Principal(space="beta", token_hash="hash-beta"),
-        }
+def auth_settings(tmp_path) -> AuthSettings:
+    return AuthSettings(
+        base_url="https://space.example.ts.net", db_path=tmp_path / "auth.sqlite3"
     )
 
 
 @pytest.fixture
-def app(tmp_path, store, resolver) -> Starlette:
+def auth_store(auth_settings) -> AuthStore:
+    return AuthStore(auth_settings.db_path, now_fn=lambda: datetime.now(timezone.utc))
+
+
+@pytest.fixture
+def oauth(auth_settings, auth_store) -> OAuthConfig:
+    return OAuthConfig(settings=auth_settings, store=auth_store, users={})
+
+
+@pytest.fixture
+def token_alpha(auth_store, auth_settings) -> str:
+    family_id = auth_store.create_family(
+        space="alpha", client_id="c1", scope="space", resource=auth_settings.resource
+    )
+    access_token, _refresh = auth_store.issue_token_pair(
+        family_id, access_ttl_s=3600, refresh_ttl_s=2592000
+    )
+    return access_token
+
+
+@pytest.fixture
+def app(tmp_path, store, oauth) -> Starlette:
     settings = Settings(data_root=tmp_path)
-    return create_app(settings=settings, resolver=resolver, store=store)
+    return create_app(settings=settings, store=store, oauth=oauth)
 
 
 def _mcp_client(app: Starlette, token: str) -> Client:
     transport = StreamableHttpTransport(
-        url=f"http://testserver/mcp/{token}",
+        url="http://testserver/mcp/",
+        headers={"Authorization": f"Bearer {token}"},
         httpx_client_factory=lambda **kwargs: httpx.AsyncClient(
             transport=httpx.ASGITransport(app=app), base_url="http://testserver", **kwargs
         ),
@@ -124,9 +135,9 @@ def test_json_line_is_valid_json(request_log_handler):
 
 
 @pytest.mark.asyncio
-async def test_tool_event_has_tool_space_and_duration(app, request_log_handler):
+async def test_tool_event_has_tool_space_and_duration(app, token_alpha, request_log_handler):
     async with app.router.lifespan_context(app):
-        async with _mcp_client(app, TOKEN_ALPHA) as client:
+        async with _mcp_client(app, token_alpha) as client:
             await client.call_tool("list_spaces", {})
 
     tool_events = [r.msg for r in request_log_handler.records if r.msg.get("ev") == "tool"]
@@ -140,9 +151,9 @@ async def test_tool_event_has_tool_space_and_duration(app, request_log_handler):
 
 
 @pytest.mark.asyncio
-async def test_tool_event_error_carries_class_not_message(app, request_log_handler):
+async def test_tool_event_error_carries_class_not_message(app, token_alpha, request_log_handler):
     async with app.router.lifespan_context(app):
-        async with _mcp_client(app, TOKEN_ALPHA) as client:
+        async with _mcp_client(app, token_alpha) as client:
             created = json.loads((await client.call_tool("list_spaces", {})).data)
             assert created  # sanity: alpha existiert
 
@@ -172,11 +183,11 @@ async def test_tool_event_error_carries_class_not_message(app, request_log_handl
 
 
 @pytest.mark.asyncio
-async def test_tool_event_never_contains_item_title(app, request_log_handler):
+async def test_tool_event_never_contains_item_title(app, token_alpha, request_log_handler):
     marker = "ZZZ-MARKER-TITLE"
 
     async with app.router.lifespan_context(app):
-        async with _mcp_client(app, TOKEN_ALPHA) as client:
+        async with _mcp_client(app, token_alpha) as client:
             created_text = (
                 await client.call_tool("create_item", {"type": "task", "title": marker})
             ).data

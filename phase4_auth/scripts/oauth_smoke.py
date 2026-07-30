@@ -69,7 +69,6 @@ from authserver.config import AuthSettings
 from authserver.store import AuthStore
 
 from mcpserver.app import OAuthConfig, create_app
-from mcpserver.auth import KeyringTokenResolver
 from mcpserver.config import Settings
 from mcpserver.request_log import AccessLogASGI, OAuthLogASGI
 from storage.store import Store
@@ -477,14 +476,9 @@ async def _run(data_root: Path, checks: list[Check], observed_secrets: list[str]
     notes_root.mkdir()
     store = Store(notes_root, git=False)
     settings = Settings(data_root=notes_root)
-    # Leere Map: der Pfad-Weg wird unter `mode="oauth"` (Default) nie angefragt
-    # (`AuthModeASGI.mode == "oauth"` dispatcht immer an `BearerAuthASGI`), reine Vollständigkeit
-    # des Parameters — kein echter Keyring-Zugriff (`load_map` injiziert, wie in `mcp_smoke.py`).
-    path_resolver = KeyringTokenResolver(load_map=lambda: {})
 
     raw_app = create_app(
         settings=settings,
-        resolver=path_resolver,
         store=store,
         oauth=OAuthConfig(settings=auth_settings, store=auth_store, users=users),
     )

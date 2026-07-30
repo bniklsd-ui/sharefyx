@@ -12,7 +12,16 @@ DEFAULT_REFRESH_TTL_S = 2592000
 DEFAULT_CODE_TTL_S = 60
 DEFAULT_REQUEST_TTL_S = 600
 
-_VALID_MODES = ("token", "both", "oauth")
+# **Schnitt, 2026-07-30 (Runbook-Schritt 8, Plan §5 Step 7 Punkt 8):** vormals ("token", "both",
+# "oauth") — "both" existierte nur für die Live-Abnahme, "token" starb mit `TokenPathASGI`
+# (mcpserver/asgi.py, seither entfernt). Plan-Wortlaut sagte an dieser Stelle "auf zwei Werte
+# reduzieren" (Plan §5 Step 7 Punkt 8) — ohne frischen Repo-Zugriff geschrieben (siehe Plan-Kopf)
+# und ungenau: nur "oauth" hat nach der vollen TokenPathASGI-Entfernung noch eine Implementierung,
+# genau wie Akzeptanzkriterium §6.10 und das Step-7-Done-when es verlangen ("SPACE_AUTH_MODE ist
+# oauth"). Ein Wert bleibt validiert statt der Variable ihre Bedeutung zu nehmen: ein
+# fehlkonfiguriertes "both"/"token" auf der laufenden Unit soll laut beim Start scheitern, nicht
+# still auf eine schwächere Auth zurückfallen.
+_VALID_MODES = ("oauth",)
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -107,12 +116,9 @@ def load_auth_settings(env: Mapping[str, str] | None = None) -> AuthSettings:
         raise ValueError(f"SPACE_AUTH_MODE muss einer von {_VALID_MODES} sein, war: {mode!r}")
 
     base_url = source.get("SPACE_PUBLIC_BASE_URL")
-    if mode in ("oauth", "both"):
-        if not base_url:
-            raise ValueError("SPACE_PUBLIC_BASE_URL ist Pflicht bei SPACE_AUTH_MODE=oauth|both")
-        _validate_base_url(base_url)
-    else:
-        base_url = base_url or ""
+    if not base_url:
+        raise ValueError("SPACE_PUBLIC_BASE_URL ist Pflicht")
+    _validate_base_url(base_url)
 
     db_path = resolve_db_path(source)
 

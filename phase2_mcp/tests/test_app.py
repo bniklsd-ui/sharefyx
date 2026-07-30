@@ -1,9 +1,16 @@
 """End-to-End-Tests gegen eine echte `create_app()`-Instanz — kein echter Port, kein Netz
-(`httpx.ASGITransport`), kein Keyring (Fake-Resolver). Plan §4 Step 5.
+(`httpx.ASGITransport`), keine echte, dauerhafte `AuthStore` (temporäre Datei je Test). Plan §4
+Step 5.
 
 `test_principal_isolation_under_concurrency` ist die wichtigste Zusicherung der Phase (Mission,
 Plan §5 Punkt 4): zwei gleichzeitige Tool-Aufrufe mit zwei verschiedenen Tokens müssen zwei
 verschiedene Spaces sehen. Fällt dieser Test, ist es ein Cross-Space-Leak, kein Testproblem.
+
+**Schnitt, 2026-07-30 (Runbook-Schritt 8):** `TokenPathASGI`/`AuthModeASGI` sind entfernt,
+`create_app()` verlangt jetzt immer ein `OAuthConfig`. Die beiden Fixture-Token (vormals feste
+Strings `tok-alpha`/`tok-beta` im Pfad) entstehen seither als echte, opake OAuth-Access-Token
+gegen eine temporäre `AuthStore` (`token_alpha`/`token_beta`-Fixtures) und reisen als
+`Authorization: Bearer <token>`-Header, nicht mehr im Pfad.
 """
 from __future__ import annotations
 
@@ -11,6 +18,7 @@ import asyncio
 import json
 from collections.abc import Callable
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 
 import httpx
 import pytest
@@ -18,30 +26,16 @@ from fastmcp import Client
 from fastmcp.client.transports import StreamableHttpTransport
 from starlette.applications import Starlette
 
+from authserver.config import AuthSettings
+from authserver.store import AuthStore
+
 from mcpserver import __version__
-from mcpserver.app import create_app
-from mcpserver.auth import AuthError, Principal
+from mcpserver.app import OAuthConfig, create_app
 from mcpserver.config import Settings
 from storage.store import Store
 
 # Bewusst keine Nikinger-typischen Spacenamen (Plan §2.2 Erweiterungspfad: "Space-Namen kommen
 # in keinem Produktivcode und in keinem Test vor") — Fixture-Namen wie im Plan gefordert.
-TOKEN_ALPHA = "tok-alpha"
-TOKEN_BETA = "tok-beta"
-
-
-class _FakeResolver:
-    """Wie in `test_asgi.py` — kein echter Keyring, direkter Dict-Lookup über den Klartext-
-    Credential-String (Step 5 testet TokenPathASGI, nicht KeyringTokenResolver erneut)."""
-
-    def __init__(self, mapping: dict[str, Principal]) -> None:
-        self._mapping = mapping
-
-    def resolve(self, credential: str) -> Principal:
-        principal = self._mapping.get(credential)
-        if principal is None:
-            raise AuthError("unbekannt")
-        return principal
 
 
 @pytest.fixture
@@ -54,25 +48,51 @@ def store(tmp_path) -> Store:
 
 
 @pytest.fixture
-def resolver() -> _FakeResolver:
-    return _FakeResolver(
-        {
-            TOKEN_ALPHA: Principal(space="alpha", token_hash="hash-alpha"),
-            TOKEN_BETA: Principal(space="beta", token_hash="hash-beta"),
-        }
+def auth_settings(tmp_path) -> AuthSettings:
+    return AuthSettings(
+        base_url="https://space.example.ts.net", db_path=tmp_path / "auth.sqlite3"
     )
 
 
 @pytest.fixture
-def app(tmp_path, store, resolver) -> Starlette:
+def auth_store(auth_settings) -> AuthStore:
+    return AuthStore(auth_settings.db_path, now_fn=lambda: datetime.now(timezone.utc))
+
+
+@pytest.fixture
+def oauth(auth_settings, auth_store) -> OAuthConfig:
+    return OAuthConfig(settings=auth_settings, store=auth_store, users={})
+
+
+def _issue_bearer_token(auth_store: AuthStore, auth_settings: AuthSettings, *, space: str) -> str:
+    family_id = auth_store.create_family(
+        space=space, client_id="c1", scope="space", resource=auth_settings.resource
+    )
+    access_token, _refresh = auth_store.issue_token_pair(
+        family_id, access_ttl_s=3600, refresh_ttl_s=2592000
+    )
+    return access_token
+
+
+@pytest.fixture
+def token_alpha(auth_store, auth_settings) -> str:
+    return _issue_bearer_token(auth_store, auth_settings, space="alpha")
+
+
+@pytest.fixture
+def token_beta(auth_store, auth_settings) -> str:
+    return _issue_bearer_token(auth_store, auth_settings, space="beta")
+
+
+@pytest.fixture
+def app(tmp_path, store, oauth) -> Starlette:
     settings = Settings(data_root=tmp_path)
-    return create_app(settings=settings, resolver=resolver, store=store)
+    return create_app(settings=settings, store=store, oauth=oauth)
 
 
 class _CapturingFastMCP:
     """Ersetzt `build_mcp()`'s Rückgabewert nur, um zu sehen, welcher `allowed_hosts`-Wert bei
-    `http_app()` ankommt — P3-C testet die Präzedenz explizit vs. Settings, nicht FastMCP selbst
-    (das ist bereits Gegenstand von `test_asgi.py`/`test_app.py` aus P2)."""
+    `http_app()` ankommt — P3-C testet die Präzedenz explizit vs. Settings, nicht FastMCP selbst."""
 
     def __init__(self) -> None:
         self.received_allowed_hosts: list[str] | None = "not-called"
@@ -93,29 +113,27 @@ class _CapturingFastMCP:
         return _FakeMcpApp()
 
 
-def test_create_app_prefers_explicit_allowed_hosts_over_settings(
-    monkeypatch, tmp_path, store, resolver
-):
+def test_create_app_prefers_explicit_allowed_hosts_over_settings(monkeypatch, tmp_path, store, oauth):
     fake_mcp = _CapturingFastMCP()
     monkeypatch.setattr("mcpserver.app.build_mcp", lambda *a, **kw: fake_mcp)
     settings = Settings(data_root=tmp_path, allowed_hosts=("from-settings.example",))
 
     create_app(
         settings=settings,
-        resolver=resolver,
         store=store,
+        oauth=oauth,
         allowed_hosts=["explicit.example"],
     )
 
     assert fake_mcp.received_allowed_hosts == ["explicit.example"]
 
 
-def test_create_app_uses_settings_allowed_hosts(monkeypatch, tmp_path, store, resolver):
+def test_create_app_uses_settings_allowed_hosts(monkeypatch, tmp_path, store, oauth):
     fake_mcp = _CapturingFastMCP()
     monkeypatch.setattr("mcpserver.app.build_mcp", lambda *a, **kw: fake_mcp)
     settings = Settings(data_root=tmp_path, allowed_hosts=("from-settings.example",))
 
-    create_app(settings=settings, resolver=resolver, store=store, allowed_hosts=None)
+    create_app(settings=settings, store=store, oauth=oauth, allowed_hosts=None)
 
     assert fake_mcp.received_allowed_hosts == ["from-settings.example"]
 
@@ -131,7 +149,8 @@ def _http_client_factory(app: Starlette) -> Callable[..., httpx.AsyncClient]:
 
 def _mcp_client(app: Starlette, token: str) -> Client:
     transport = StreamableHttpTransport(
-        url=f"http://testserver/mcp/{token}",
+        url="http://testserver/mcp/",
+        headers={"Authorization": f"Bearer {token}"},
         httpx_client_factory=_http_client_factory(app),
     )
     return Client(transport)
@@ -176,21 +195,24 @@ async def test_mcp_requires_token(app):
         transport=httpx.ASGITransport(app=app), base_url="http://testserver"
     ) as client:
         missing = await client.post("/mcp/", json={})
-        unknown = await client.post("/mcp/not-a-real-token", json={})
+        unknown = await client.post(
+            "/mcp/", json={}, headers={"Authorization": "Bearer not-a-real-token"}
+        )
 
     assert missing.status_code == 401
     assert missing.text == ""
+    assert "WWW-Authenticate" in missing.headers
     assert unknown.status_code == 401
     assert unknown.text == ""
+    assert "WWW-Authenticate" in unknown.headers
 
 
 @pytest.mark.asyncio
 async def test_mcp_bare_mount_redirects_without_leaking(app):
-    """`POST /mcp` (ohne Trailing-Slash, kein Token-Segment überhaupt) trifft Starlettes eigenes
-    `redirect_slashes` **vor** `TokenPathASGI` — das ist eine dritte, von 401 unterscheidbare
-    Antwortform (307), aber sie sagt nichts über Tokengültigkeit aus (es gibt in diesem Request
-    gar kein Token-Segment) und trägt keine Space- oder Pfaddaten. Festgehalten, damit dieses
-    Verhalten nicht erst bei der Live-Probe überrascht (Advisor-Review, Step 5)."""
+    """`POST /mcp` (ohne Trailing-Slash) trifft Starlettes eigenes `redirect_slashes` **vor**
+    `BearerAuthASGI` — das ist eine dritte, von 401 unterscheidbare Antwortform (307), trägt aber
+    keine Space- oder Pfaddaten. Festgehalten, damit dieses Verhalten nicht erst bei der
+    Live-Probe überrascht (Advisor-Review, Step 5)."""
     async with httpx.AsyncClient(
         transport=httpx.ASGITransport(app=app),
         base_url="http://testserver",
@@ -204,9 +226,9 @@ async def test_mcp_bare_mount_redirects_without_leaking(app):
 
 
 @pytest.mark.asyncio
-async def test_tools_list_returns_six_tools(app):
+async def test_tools_list_returns_six_tools(app, token_alpha):
     async with app.router.lifespan_context(app):
-        async with _mcp_client(app, TOKEN_ALPHA) as client:
+        async with _mcp_client(app, token_alpha) as client:
             tools = await client.list_tools()
 
     names = {tool.name for tool in tools}
@@ -221,9 +243,9 @@ async def test_tools_list_returns_six_tools(app):
 
 
 @pytest.mark.asyncio
-async def test_tools_list_annotations_present(app):
+async def test_tools_list_annotations_present(app, token_alpha):
     async with app.router.lifespan_context(app):
-        async with _mcp_client(app, TOKEN_ALPHA) as client:
+        async with _mcp_client(app, token_alpha) as client:
             tools = await client.list_tools()
 
     for tool in tools:
@@ -237,7 +259,7 @@ async def test_tools_list_annotations_present(app):
 
 
 @pytest.mark.asyncio
-async def test_principal_isolation_under_concurrency(app):
+async def test_principal_isolation_under_concurrency(app, token_alpha, token_beta):
     """Der wichtigste Test der Phase (Plan §4 Step 5, §5 Punkt 4, Mission). Zehn verschachtelte
     Aufrufe über zwei Tokens via `asyncio.gather` — echte Nebenläufigkeit auf demselben Event-
     Loop, nicht zwei sequenzielle Aufrufe. Jeder Aufruf muss `writable` exakt für den eigenen
@@ -251,7 +273,7 @@ async def test_principal_isolation_under_concurrency(app):
 
     async with app.router.lifespan_context(app):
         calls = [
-            call(TOKEN_ALPHA) if i % 2 == 0 else call(TOKEN_BETA) for i in range(10)
+            call(token_alpha) if i % 2 == 0 else call(token_beta) for i in range(10)
         ]
         results = await asyncio.gather(*calls)
 
@@ -265,15 +287,15 @@ async def test_principal_isolation_under_concurrency(app):
 
 
 @pytest.mark.asyncio
-async def test_all_six_tools_are_callable_over_http(app):
+async def test_all_six_tools_are_callable_over_http(app, token_alpha, token_beta):
     """Step 6 Done-when: alle sechs Tools über den ASGI-Testclient aufrufbar — nicht nur als
     Python-Funktion (`test_tools.py`, Guard gemockt), sondern durch den echten Stack aus Step 5
-    (`TokenPathASGI`, Guard, laufende FastMCP-App). Ein Rundlauf pro Tool reicht hier; die
+    (`BearerAuthASGI`, Guard, laufende FastMCP-App). Ein Rundlauf pro Tool reicht hier; die
     granulare Semantik (Wrapping, Klemmung, Fehlertexte) ist bereits in `test_tools.py`
     bewiesen.
     """
     async with app.router.lifespan_context(app):
-        async with _mcp_client(app, TOKEN_ALPHA) as alpha, _mcp_client(app, TOKEN_BETA) as beta:
+        async with _mcp_client(app, token_alpha) as alpha, _mcp_client(app, token_beta) as beta:
             spaces = json.loads((await alpha.call_tool("list_spaces", {})).data)
             assert {s["name"] for s in spaces} == {"alpha", "beta"}
 

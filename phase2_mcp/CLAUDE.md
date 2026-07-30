@@ -170,13 +170,21 @@ unbelegt), alle drei P4-Q-Berührungen, ohne dass ein Step-6a-Abschluss-Commit d
 eigenen zukünftigen Änderungen vorgemerkt hätte. Reale Zahl wieder per `pytest --collect-only -q`
 je Datei neu gezählt.
 
-**Gesamt: 100 Tests** in `phase2_mcp/tests/` (6 `test_config.py` + 12 `test_credentials.py` + 4
-`test_auth.py` + 3 `test_permissions.py` + 8 `test_logging.py` [P4 Step 6b, neu:
-`_SECRET_PATTERNS`] + 2 `test_context.py` + 4 `test_asgi.py` + 10 `test_app.py` + 23
-`test_tools.py` + 3 `test_mcp_smoke.py` + 11 `test_request_log.py` [P4 Step 6b, neu:
-`OAuthLogASGI`] + 14 `test_asgi_bearer.py` [P4 Step 6a: `BearerAuthASGI`/`AuthModeASGI`; P4 Step
-6b, ein weiterer neu: sechs Tools unter Bearer vs. Pfad-Token verglichen, Details
-`phase4_auth/CLAUDE.md`]). Acht weitere Tests aus Step 2 liegen in `phase1_storage/tests/` (siehe
+**[2026-07-30 Korrektur, P4 Schnitt (Runbook-Schritt 8)]:** dieselbe Drift-Kategorie trat ein
+drittes Mal ein, in die andere Richtung — `TokenPathASGI`/`AuthModeASGI` sind entfernt,
+`test_asgi.py` (nur `TokenPathASGI`) gelöscht, `test_asgi_bearer.py` von 14 auf 10 gekürzt (die
+Bearer-vs-Pfad-Token-Vergleichstests aus P4 Step 6a/6b haben keinen Vergleichspartner mehr).
+Reale Zahl wieder per `pytest --collect-only -q` je Datei neu gezählt, nicht aus der alten Summe
+heruntergerechnet.
+
+**Gesamt: 94 Tests** in `phase2_mcp/tests/` (6 `test_config.py` + 12 `test_credentials.py` + 4
+`test_auth.py` + 3 `test_permissions.py` + 8 `test_logging.py` + 2 `test_context.py` + 10
+`test_app.py` + 23 `test_tools.py` + 3 `test_mcp_smoke.py` + 11 `test_request_log.py` + 10
+`test_asgi_bearer.py` [seit dem Schnitt: nur noch `BearerAuthASGI`, kein `TokenPathASGI`/
+`AuthModeASGI` mehr, Details `phase4_auth/CLAUDE.md`] + 2 `test_serve.py` [neu, Schnitt:
+`serve.py :: main()`s Verdrahtung bis `uvicorn.run()`, vorher ungetestet]). Acht weitere Tests
+aus Step 2 liegen in
+`phase1_storage/tests/` (siehe
 Modul-Status Zeile 3 und `phase1_storage/CLAUDE.md`), werden dort mitgezählt, nicht hier.
 
 ## Geerbte Contracts

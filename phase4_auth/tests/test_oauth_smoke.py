@@ -198,7 +198,6 @@ async def test_network_mode_runs_against_a_real_server(tmp_path):
     from authserver.config import AuthSettings
     from authserver.store import AuthStore
     from mcpserver.app import OAuthConfig, create_app
-    from mcpserver.auth import KeyringTokenResolver
     from mcpserver.config import Settings
     from mcpserver.request_log import AccessLogASGI, OAuthLogASGI
     from storage.store import Store
@@ -227,7 +226,6 @@ async def test_network_mode_runs_against_a_real_server(tmp_path):
     settings = Settings(data_root=notes_root)
     raw_app = create_app(
         settings=settings,
-        resolver=KeyringTokenResolver(load_map=lambda: {}),
         store=store,
         oauth=OAuthConfig(settings=auth_settings, store=auth_store, users=users),
     )

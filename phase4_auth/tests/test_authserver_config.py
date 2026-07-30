@@ -94,10 +94,17 @@ def test_load_auth_settings_rejects_unknown_mode():
         )
 
 
-def test_load_auth_settings_token_mode_does_not_require_base_url():
-    settings = load_auth_settings({"SPACE_AUTH_MODE": "token", "SPACE_AUTH_DB": "/tmp/auth.sqlite3"})
-    assert settings.mode == "token"
-    assert settings.base_url == ""
+def test_load_auth_settings_rejects_token_mode_after_the_cut():
+    """Schnitt, 2026-07-30 (Runbook-Schritt 8): `token`/`both` sind mit `TokenPathASGI`/
+    `AuthModeASGI` entfernt — `_VALID_MODES` lässt nur noch `oauth` zu, siehe `config.py`."""
+    with pytest.raises(ValueError):
+        load_auth_settings(
+            {
+                "SPACE_AUTH_MODE": "token",
+                "SPACE_PUBLIC_BASE_URL": "https://example.ts.net",
+                "SPACE_AUTH_DB": "/tmp/auth.sqlite3",
+            }
+        )
 
 
 def test_load_auth_settings_hsts_can_be_disabled():

@@ -8,11 +8,87 @@ updated: 2026-07-30
 ---
 # Session-Archiv — Phase 4 OAuth 2.1 + DCR
 
-Newest-first. Acht Rotationen bisher (Abschluss Step 3, dann Step 4, dann Step 5, dann Step
+Newest-first. Neun Rotationen bisher (Abschluss Step 3, dann Step 4, dann Step 5, dann Step
 6a, dann Step 6b, dann die Step-7-Code-Vorbereitung, dann Befund S1 + Sicherheits-Review, dann
-die 12/16-Live-Abnahme,
+die 12/16-Live-Abnahme, dann CSP-Fix + Zeilen 14/15 + Zeile 9 (15/16),
 2026-07-28/29/30) — via
 `scripts/rotate_session_block.sh phase4_auth`, nie von Hand.
+
+## Session stopped — 2026-07-30 (Zeilen 14/15: Fabian-Login schlug fehl — Root Cause gefunden + gefixt, noch nicht deployt)
+
+**Für den nächsten, kalten Leser:** Fabian versuchte Zeile 14 (eigener Connector-Login) —
+Passwort/TOTP eingegeben, „Anmelden" geklickt, scheinbar nichts passiert; zweiter Klick zeigte
+„Anfrage ungültig oder abgelaufen". Auftrag: Ursache finden.
+
+**Diagnose, in zwei Schritten:**
+1. Read-only gegen die echte `auth.sqlite3`/`journalctl`: **sechs** vollständige, erfolgreiche
+   Login-Runden für `fabian` in diesem Zeitfenster — jede erzeugte eine echte `token_families`-
+   Zeile (Passwort **und** TOTP korrekt), aber **keine einzige** gefolgt von einem
+   `POST /oauth/token`. Zum Vergleich: `niklas`s eigener Reconnect im selben Fenster (06:00:22)
+   lief vollständig durch, inklusive Tool-Aufrufen. Der Bruch lag also zwischen „Server sendet
+   302" und „Client tauscht den Code ein" — nicht im Server selbst.
+2. Der Nikinger lieferte einen Screenshot von Fabians DevTools (Network + Console): `POST
+   /oauth/authorize` → `302` mit korrektem `Location`-Header nach
+   `https://claude.ai/api/mcp/auth_callback?...&code=...` — **und** eine Konsolen-Meldung:
+   „Sending form data to '.../oauth/authorize' violates … Content Security Policy directive:
+   'form-action self'. The request has been blocked." Browser: Chromium/Edge 150
+   (`Sec-Ch-Ua`).
+
+**Root Cause:** `routes.py :: _security_headers()` setzte `form-action 'self'`. Chromium prüft
+`form-action` nicht nur gegen das unmittelbare `action`-Ziel eines Formulars, sondern **auch**
+gegen das Redirect-Ziel, wenn die Antwort auf den `POST` selbst ein Redirect ist — genau der
+Fall hier (`POST /oauth/authorize` antwortet bei Erfolg immer mit `302` nach
+`https://claude.ai/...`). Ohne `https://claude.ai`/`https://claude.com` in `form-action`
+blockiert der Browser diesen Redirect **lautlos** (kein Fehler auf der Seite, nur eine
+Konsolen-Meldung, die kein Nutzer je sieht) — der Server hatte in jedem der sechs Versuche
+bereits korrekt geantwortet, der Bruch passierte ausschließlich im Browser danach. Der zweite
+Klick auf das (bereits erfolgreich abgeschickte, aber nie weitergeleitete) Formular traf dann
+auf `consume_auth_request()`s Einmal-Regel — „ungültig" ist dabei korrektes Verhalten auf einen
+Doppel-Submit, kein zweiter Bug.
+
+**Fix:** `config.py :: AuthSettings.csp_form_action` (neue Property) baut
+`'self' https://claude.ai https://claude.com` aus derselben Origin-Liste, gegen die
+`clients.py :: redirect_uri_allowed()` bereits prüft — keine zweite, hartkodierte Quelle.
+`routes.py` referenziert die rohe Liste bewusst **nicht** direkt (dafür die neue Property),
+damit `test_redirect_uri_allowed_is_the_only_matching_path` (Plan §2.6 [SEAM]: genau eine
+Vergleichsstelle für Redirect-URIs) intakt bleibt — beim ersten Versuch geprüft und korrigiert,
+nicht nur behauptet. Neuer Test `test_csp_form_action_allows_the_oauth_redirect_target`.
+
+**Verifiziert, nicht nur behauptet:** eine dritte Wegwerf-Instanz (Port 8798, `tmp`-`DATA_ROOT`,
+eigene `auth.sqlite3` — **nie** der echte `DATA_ROOT`, **nie** der echte Keyring) zeigt den
+korrekten Header: `form-action 'self' https://claude.ai https://claude.com`. `pytest -q` →
+**353/353 grün**. Produktionsdienst ausschließlich read-only angefasst.
+
+**Noch NICHT getan, bewusst:** der Fix ist **nicht auf `sharefyx-mcp` deployt** — braucht
+`sudo phase3_edge/scripts/install_units.sh`-unabhängigen einfachen `sudo systemctl restart
+sharefyx-mcp` (kein `local.env`/Unit-Änderung, reiner Code-Fix). Zeilen 14/15 bleiben offen, bis
+Fabian nach dem Restart einen echten, vollständigen Login-Erfolg zeigt (inkl. Tool-Aufruf) — der
+Server hat vorher schon sechsmal korrekt reagiert, das beweist noch keinen erfolgreichen
+End-to-End-Connect.
+
+**Nächster Schritt (konkret):** `sudo systemctl restart sharefyx-mcp`, dann Fabian erneut
+verbinden lassen — dieses Mal nur **einmal** klicken und kurz warten. Danach `list_spaces`/einen
+Tool-Aufruf über Fabians Connector bestätigen (Zeile 14), dann Cross-Space-Schreibversuch gegen
+`niklas` (Zeile 15). Zeile 9 weiterhin offen (siehe voriger Block).
+
+**Nachtrag, selbe Session — CSP-Fix deployt, Zeilen 14/15 bestanden:** Restart durchgeführt,
+Fabian erneut verbunden — ein Klick, sofortiger Erfolg. Fabian fuhr von sich aus ein
+vollständiges Sechs-Tool-Protokoll plus zwei Negativtests (`conflict`, `write_denied`), deutlich
+über den Matrix-Mindestbeleg hinaus — volle Tabelle + Details:
+`../docs/concepts/P4_ABNAHME_2026-07-29.md`, Nachtrag 2026-07-30.
+
+**Ergebnis: 14 von 16 Abnahmezeilen live bestanden** — Terminrisiko-Schwelle erreicht
+(„14/16 → 🟡 code-complete, P5 darf beginnen", Nikinger-Entscheidung 2026-07-28). `pytest -q` →
+**353/353 grün**. ✅ bleibt an Zeile 9 (Anleitung jetzt im Runbook oben) und Zeile 16 (nach dem
+Schnitt) hängen.
+
+**Dritter Nachtrag, selbe Session — Zeile 9 bestanden:** TTL-Drop-in, Reconnect, `create_item` →
+90s Pause → `append_to_item` ohne erneuten Login. DB-Gegenprobe (read-only): 14 `access_tokens`
+derselben `family_id`, Refresh **on-demand** exakt beim ersten Aufruf nach Ablauf, kein
+Hintergrund-Timer. **15/16 bestanden.** Details: `../docs/concepts/P4_ABNAHME_2026-07-29.md`,
+zweiter Nachtrag. TTL-Drop-in noch nicht entfernt (Runbook-Schritt 5 steht aus).
+
+**Einzig verbleibend: der Schnitt (Runbook-Schritt 8).** Danach Zeile 16, 16/16, ROADMAP.md ✅.
 
 ## Session stopped — 2026-07-29 (Step 7 live blockiert: Befund S1 + Sicherheits-Review)
 

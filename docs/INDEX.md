@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-07-29
+updated: 2026-07-30
 ---
 # Doc Index (L0)
 
@@ -29,16 +29,13 @@ updated: 2026-07-29
 - [docs/DOC_LAYERS_CONVENTION.md](./DOC_LAYERS_CONVENTION.md) — 📗 ~5KB · Doc-Layers-Spec (v1, 2026-07-06) · **byte-identische Kopie aus dem Trading-Bot-Repo — nicht projektspezifisch anpassen, sonst divergieren zwei Kopien derselben Regel**
 - [docs/PROMPTS.md](./PROMPTS.md) — 📗 ~11KB · die drei Workflow-Prompts (Claude-Code-Session-Start, Phasen-Kickoff, Phasen-Abschluss); lesen beim Start eines neuen Chats, nicht mitten in einer Session
 
-## Active phase (4 — OAuth 2.1 + DCR)
-
-- [phase4_auth/CLAUDE.md](../phase4_auth/CLAUDE.md) — 🔄 ~40KB · phase head; Steps 0–6 ✅ (Step 6 mit allen drei Done-when-Klauseln belegt), Step 7 (Betrieb, Live-Abnahme, Schnitt) 🟡 **15/16 Abnahmezeilen live bestanden — nur noch Zeile 16, gebunden an den Schnitt** (2026-07-30); enthält die Kurztabelle der Sicherheitsbefunde S1–S8/O1; read + newest Session-stopped block first
-- [docs/concepts/P4_ABNAHME_2026-07-29.md](./concepts/P4_ABNAHME_2026-07-29.md) — 📕 ~15KB · Abnahmeprotokoll Phase 4: 15/16 live bestanden (zwei Nachträge 2026-07-30: Zeilen 14/15, dann Zeile 9), CLI-Ausschnitt + DB-Gegenprobe als Beleg, Befunde B1–B3 (alle klein, zwei behoben)
-- [docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md](./concepts/P4_SECURITY_REVIEW_2026-07-29.md) — 📕 ~13KB · Sicherheits-Review P3+P4 vor der Live-Abnahme: Befund S1 (`ALLOWED_HOSTS` ohne `127.0.0.1` → `400 Invalid host header`, machte Runbook-Schritt 4 unausführbar, behoben) plus S2–S8/O1 offen, **und** 15 ausdrücklich geprüfte, in Ordnung befundene Punkte (verified negatives) — vor jedem Fix an einem der Befunde lesen
-- [docs/concepts/phase4_auth_plan.md](./concepts/phase4_auth_plan.md) — 📕 ~76KB · ausführungsreifer P4-Plan (Entscheidungen P4-A–P4-R, Steps 0–7, eigener Authorization Server, Argon2id + TOTP, opake Token); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen; Autor Browser-Planungssession 2026-07-28, **ohne frischen Repo-Zugriff geschrieben** — Anker sind Funktionsnamen/Suchstrings, keine Zeilennummern
-- [phase4_auth/SESSIONS_ARCHIVE.md](../phase4_auth/SESSIONS_ARCHIVE.md) — 📦 ~53KB · acht archivierte Session-Blöcke (Step 0+1+2, Step 3, V14+Step 4, Step 5, Step 6a, Step 6b, Step-7-Code-Vorbereitung, Befund S1+Sicherheits-Review+12/16-Abnahme), verbatim, newest-first
-
 ## Completed phases
 
+- [phase4_auth/CLAUDE.md](../phase4_auth/CLAUDE.md) — 📗 ~44KB · phase head; Steps 0–7 ✅ (alle acht Steps, Schnitt vollzogen, `TokenPathASGI` entfernt) — **16/16 Abnahmezeilen live bestanden, Phase 4 ✅** (2026-07-30); über dem 40KB-Softcap, noch ohne eigene Rotation dagegen — vorgemerkt, kein akuter Fund; enthält die Kurztabelle der Sicherheitsbefunde S1–S8/O1; read + newest Session-stopped block first
+- [docs/concepts/P4_ABNAHME_2026-07-29.md](./concepts/P4_ABNAHME_2026-07-29.md) — 📕 ~24KB · Abnahmeprotokoll Phase 4: **16/16 live bestanden** (drei Nachträge 2026-07-30: Zeilen 14/15, Zeile 9, Schnitt+Zeile 16), CLI-Ausschnitt + DB-Gegenprobe als Beleg, Befunde B1–B3 (alle klein, zwei behoben)
+- [docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md](./concepts/P4_SECURITY_REVIEW_2026-07-29.md) — 📕 ~13KB · Sicherheits-Review P3+P4 vor der Live-Abnahme: Befund S1 (`ALLOWED_HOSTS` ohne `127.0.0.1` → `400 Invalid host header`, machte Runbook-Schritt 4 unausführbar, behoben) plus S2–S8/O1 offen, **und** 15 ausdrücklich geprüfte, in Ordnung befundene Punkte (verified negatives) — vor jedem Fix an einem der Befunde lesen
+- [docs/concepts/phase4_auth_plan.md](./concepts/phase4_auth_plan.md) — 📕 ~76KB · ausführungsreifer P4-Plan (Entscheidungen P4-A–P4-R, Steps 0–7, eigener Authorization Server, Argon2id + TOTP, opake Token); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen; Autor Browser-Planungssession 2026-07-28, **ohne frischen Repo-Zugriff geschrieben** — Anker sind Funktionsnamen/Suchstrings, keine Zeilennummern
+- [phase4_auth/SESSIONS_ARCHIVE.md](../phase4_auth/SESSIONS_ARCHIVE.md) — 📦 ~59KB · neun archivierte Session-Blöcke (Step 0+1+2, Step 3, V14+Step 4, Step 5, Step 6a, Step 6b, Step-7-Code-Vorbereitung, Befund S1+Sicherheits-Review+12/16-Abnahme, CSP-Fix+Zeilen 14/15+Zeile 9/15/16), verbatim, newest-first
 - [phase3_edge/CLAUDE.md](../phase3_edge/CLAUDE.md) — 📗 ~19KB · phase head; Steps 0–6 ✅, Step 7 (Live-Abnahme) 🟡 funktional beendet — jetzt 12/13 (Zeile 12 in P4 Step 0, Zeile 6 am 2026-07-29 durch einen unbeabsichtigten Reboot passiv erfüllt, beide live bestätigt); nur Zeile 13 (Restore-Nachweis) fehlt noch für ✅; **[P4 Step 7]** MCP-Unit zog nach `phase4_auth/systemd/` um; read + newest Session-stopped block first
 - [docs/concepts/phase3_edge_plan.md](./concepts/phase3_edge_plan.md) — 📕 ~46KB · ausführungsreifer P3-Plan (Entscheidungen P3-A–P3-N, Steps 0–7); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
 - [phase3_edge/SESSIONS_ARCHIVE.md](../phase3_edge/SESSIONS_ARCHIVE.md) — 📦 ~53KB · zehn archivierte Session-Blöcke (Step 0–6, inkl. Live-Abnahme-Funde B3/B4, beide Live-Abnahme-Sessions vom 2026-07-27, Token-Rotation-Session vom 2026-07-28), verbatim, newest-first

@@ -64,6 +64,10 @@ und er importiert Prompt-Injection direkt in den Speicherpfad.
    `storage/credentials.py`. Ein Token in einem Commit ist ein Incident, kein Schönheitsfehler.
    **[2026-07-25 Korrektur, P2 Step 3]:** `storage/credentials.py` wurde nie gebaut — der
    reale Pfad ist `phase2_mcp/mcpserver/credentials.py`. Die Regel selbst bleibt unverändert.
+   **[2026-07-30 Ergänzung, P4 Schnitt]:** Ab Phase 4 liegen dort **echte** Geheimnisse (TOTP-
+   Seeds, umkehrbar) neben den reinen Token-Hashes aus P2/P3 — `phase4_auth/authserver/users.py`,
+   Service weiterhin `nikinger-space`. Ein TOTP-Seed ist bei Kompromittierung nutzbar, ein
+   Token-Hash nicht; dieselbe Hard Rule, höherer Einsatz.
 
 2. **Dateien sind die Wahrheit, der Index ist Ableitung.** SQLite darf jederzeit gelöscht und
    aus den `.md`-Dateien vollständig rekonstruiert werden. Nie umgekehrt. Wer den Index als
@@ -130,12 +134,15 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 
 ## Current state
 
-**Aktive Phase:** Phase 4 — OAuth 2.1 + DCR (`phase4_auth/`, Paket `authserver`). Mission: der
-Pfad-Token verschwindet, ein eigener Authorization Server ersetzt ihn (DCR, PKCE, Argon2id +
-TOTP). Plan: `docs/concepts/phase4_auth_plan.md` (Entscheidungen P4-A–P4-R gelockt, Steps 0–7,
-ausführungsreif — geschrieben ohne frischen Repo-Zugriff, siehe Plan-Kopf).
-Herkunft/offene Entscheidungen: `docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md`. Phase-Head:
-`phase4_auth/CLAUDE.md`.
+**Aktive Phase:** Phase 4 — OAuth 2.1 + DCR (`phase4_auth/`, Paket `authserver`) — **✅
+abgeschlossen, 2026-07-30.** Mission erfüllt: der Pfad-Token ist verschwunden, ein eigener
+Authorization Server ersetzt ihn (DCR, PKCE, Argon2id + TOTP), Schnitt vollzogen, 16/16
+Abnahmezeilen live bestanden. Plan: `docs/concepts/phase4_auth_plan.md` (Entscheidungen
+P4-A–P4-R gelockt, Steps 0–7, ausführungsreif — geschrieben ohne frischen Repo-Zugriff, siehe
+Plan-Kopf). Herkunft/offene Entscheidungen: `docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md`.
+Phase-Head: `phase4_auth/CLAUDE.md`. **Nächster Schritt:** formaler Phasenabschluss (Handover-
+Dokument, Browser-Planungssession für Phase 5) — Sache des Nikingers, nicht aus einem
+Code-Commit heraus.
 
 **[2026-07-28 Korrektur:** diese Zeile stand hier zwischenzeitlich auf „P4 Step 0+1", obwohl
 Step 2 und Step 3 im selben Tag folgten — Drift durch fehlendes Nachziehen dieser Datei bei
@@ -193,16 +200,44 @@ durchgeführt — kurze TTL via systemd-Drop-in, Connector neu verbunden, ein Au
 nach Ablauf ohne erneuten Login. DB-Gegenprobe: Refresh lief **on-demand** (erst beim ersten
 Aufruf nach Ablauf, kein Hintergrund-Timer), belegt über 14 `access_tokens`-Zeilen derselben
 Token-Familie. **15 von 16 Abnahmezeilen live bestanden — einzig verbleibend: der Schnitt
-(Runbook-Schritt 8), danach Zeile 16 und der volle ✅-Status.**]** Step 0 (Haushalt, Drift, geerbte Abnahme), Step 1 (Gerüst, Konfiguration,
+(Runbook-Schritt 8), danach Zeile 16 und der volle ✅-Status.**]**
+**[2026-07-30, vierter Nachtrag — Schnitt vollzogen, 16/16, Phase 4 ✅:** der Nikinger hat
+Runbook-Schritt 8 live ausgeführt (`SPACE_AUTH_MODE=oauth`, `install_units.sh`, Restart, beide
+Pfad-Token widerrufen, `spaces.cred` neu geschrieben, zweiter Restart) — **vor** jeder
+Code-Änderung, wie der Plan-Wortlaut verlangt. Claude Code hat das read-only gegenverifiziert,
+nicht nur die Session-Zusammenfassung übernommen (Advisor-Vorgabe dieser Session, nach einem
+Context-Compaction-Verlust der Details): `systemctl cat sharefyx-mcp` → `SPACE_AUTH_MODE=oauth`;
+`export_space_map.py` → `0 Einträge`, beide Pfad-Token also tot; `curl` gegen die alte
+Pfad-Token-URL → `401`; `/health` weiterhin `200` (Dienst gesund, `uptime_s` seit dem Restart
+plausibel). **Zeile 16 damit live bestanden, 16/16.** Danach `TokenPathASGI`/`AuthModeASGI` aus
+`phase2_mcp/mcpserver/asgi.py`/`app.py` entfernt (der `resolver`-Parameter aus `create_app()`
+entfällt ersatzlos mit), `SPACE_AUTH_MODE` auf einen Wert reduziert (`_VALID_MODES=("oauth",)`
+— der Plan-Wortlaut „zwei Werte" war ohne frischen Repo-Zugriff geschrieben und ungenau, siehe
+`authserver/config.py`-Korrekturnotiz; mit dem Nikinger vorab abgestimmt statt still
+abgewichen), `serve.py`s Step-6b-Gate entfernt (`oauth` jetzt immer Pflicht — reversiert eine
+gelockte Entscheidung, ebenfalls mit dem Nikinger abgestimmt), `mcp_smoke.py`/`oauth_smoke.py`/
+`test_oauth_smoke.py`/`test_app.py`/`test_asgi_bearer.py`/`test_request_log.py` auf echte
+Bearer-Token gegen eine temporäre `AuthStore` umgestellt (Pfad-Token-Fakes gab es sonst nirgends
+mehr zu bedienen), `test_asgi.py` (nur `TokenPathASGI`) gelöscht, `test_serve.py` (neu, deckt
+`serve.py :: main()`s Verdrahtung bis `uvicorn.run()` ab — vorher ungetestet, siehe Advisor-Fund
+im Session-Block). `pytest -q` → **347/347 grün** (vorher 353 — die Differenz ist die Nettosumme
+aus gelöschten/gekürzten Pfad-Token-Tests minus den zwei neuen `test_serve.py`-Tests, keine
+neue Lücke, siehe `phase2_mcp/CLAUDE.md`/`phase4_auth/CLAUDE.md` für die Aufschlüsselung je
+Datei). `git diff` auf `tools.py`/`permissions.py`/`server.py`/`storage/` bleibt **leer**
+(Akzeptanzkriterium §6.9). `mcp_smoke.py` (12/12) und `oauth_smoke.py` (11/11, In-Process-Modus)
+zusätzlich real gegen den vollen Stack gelaufen, nicht nur `pytest` grün behauptet. **Phase 4 ist
+damit ✅ — Steps 0–7 vollständig, Abnahmematrix 16/16, Schnitt vollzogen.** Protokoll-Nachtrag:
+`docs/concepts/P4_ABNAHME_2026-07-29.md`.**]**
+Step 0 (Haushalt, Drift, geerbte Abnahme), Step 1 (Gerüst, Konfiguration,
 Kryptobausteine), Step 2 (Passwörter, TOTP, Nutzerakten), Step 3 (Persistenz +
 Fehlversuchsbremse — Code-/Refresh-Replay-Tötung nach RFC 9700), Step 4 (Metadaten + dynamische
 Registrierung), Step 5 (Autorisierungsfluss — `/oauth/authorize`, `/oauth/token`,
 TOTP-Replay-Schutz, Enumerationsschutz), Step 6a (Resolver, Bearer-Auflösung,
-`create_app()`-Verdrahtung) und Step 6b (`oauth_smoke.py` 11/11, `OAuthLogASGI`,
-`serve.py`-`SPACE_AUTH_MODE`-Gate — Step 6 damit vollständig) sind durchgelaufen. Step 7
-(`authctl.py`, Unit-Umzug nach `phase4_auth/systemd/`, `oauth_smoke.py --base-url`) ist
-**code-vorbereitet, nicht live-abgenommen** — 🟡, nicht ✅ (Details:
-`phase4_auth/CLAUDE.md`-Runbook). Kritischer Fund in Step 0: ein nie widerrufener Keyring-Token
+`create_app()`-Verdrahtung), Step 6b (`oauth_smoke.py` 11/11, `OAuthLogASGI`,
+`serve.py`-`SPACE_AUTH_MODE`-Gate — Step 6 damit vollständig) und Step 7 (`authctl.py`,
+Unit-Umzug nach `phase4_auth/systemd/`, `oauth_smoke.py --base-url`, Live-Abnahme 16/16, Schnitt,
+`TokenPathASGI`-Entfernung) sind durchgelaufen — **alle acht Steps ✅.** Kritischer Fund in
+Step 0: ein nie widerrufener Keyring-Token
 für einen dritten, seit P2-B2 umbenannten Space (`nikinger`) — live und schreibfähig, aber ohne
 zugehöriges Verzeichnis unter `DATA_ROOT`.
 Nikinger-Entscheidung: widerrufen (Keyring), Export + `sudo systemctl restart sharefyx-mcp`
@@ -254,7 +289,7 @@ P2 Step 2 — siehe P2-Plan §0.4 Punkt L).
 | R2 | Plan-Tier | Beide Nutzer auf **Claude Pro**. Custom Connectors sind auf Pro verfügbar; jeder fügt seinen Connector selbst hinzu (kein Owner-Gate wie bei Team/Enterprise). `[VERIFY]` bei Ausführung gegen die aktuelle Doku. |
 | R3 | Erreichbarkeit | **CGNAT** (RUT X50, Mobilfunk). Start mit **Cloudflare Tunnel** (schnellster Weg zum ersten Erlebnis), Migration auf **VPS + WireGuard** als P3-Option. Der MCP-Server ändert sich dabei nicht. **[2026-07-28 Ergänzung, P4 Step 0]:** Gebaut wurde stattdessen **Tailscale Funnel** (P3-A) — weder Cloudflare Tunnel noch VPS+WireGuard. Die Beschlusslage oben bleibt historisch korrekt stehen; Details zum tatsächlichen Weg: `docs/concepts/phase3_edge_plan.md` §0.4. |
 | R4 | Vertraulichkeit | Bewusst akzeptiert: bei Cloudflare Tunnel terminiert Cloudflare TLS und sieht Klartext. **Kein E2E.** Der Server muss lesen können, damit Claude lesen kann — das schließt das Krypto-Modell des `Notizheft_example.html` aus. **[2026-07-27 Ergänzung, P3 Step 0]:** Ab P3 läuft der Weg über Tailscale Funnel; dort terminiert die Node selbst TLS, siehe `docs/concepts/phase3_edge_plan.md` §0.4. Der Relay-Betreiber sieht Notizinhalte damit nicht mehr im Klartext — „kein E2E" bleibt trotzdem richtig, denn Tailscale bleibt vertrauenswürdige Infrastruktur (Koordinationsserver, DNS, Relays). |
-| R5 | Auth v0 | Token im Pfad (`/mcp/<token>`), Token = Identität = Space. Ehrlich benannter Kompromiss (Bearer-Passwort in einer URL, landet in Logs). **OAuth 2.1 + DCR ist Phase 4**, nicht optional-für-immer. |
+| R5 | Auth v0 | Token im Pfad (`/mcp/<token>`), Token = Identität = Space. Ehrlich benannter Kompromiss (Bearer-Passwort in einer URL, landet in Logs). **OAuth 2.1 + DCR ist Phase 4**, nicht optional-für-immer. **[2026-07-30 abgelöst, P4 Schnitt:]** Der Pfad-Token existiert nicht mehr — `TokenPathASGI` ist aus dem Code entfernt, beide Pfad-Token live widerrufen, `SPACE_AUTH_MODE` lässt nur noch `oauth` zu. Der Connector authentifiziert sich seither über OAuth 2.1 + DCR (Passwort + TOTP), siehe P4. |
 | R6 | Zweck | **Lernprojekt**, später evtl. Arbeitswerkzeug. Bei Zielkonflikt gewinnt Lerneffekt über Bequemlichkeit — außer bei Safety/Secrets, dort gewinnt immer die sichere Variante. |
 
 **Noch nicht entschieden (bewusst offen, für spätere Planungssessions):**

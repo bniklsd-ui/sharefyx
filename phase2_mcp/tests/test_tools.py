@@ -1,6 +1,6 @@
 """Unit-Tests für die sechs Tools (Plan §4 Step 6). `tools.register()` gibt die rohen,
 undekorierten Tool-Funktionen zurück (`@mcp.tool(...)` reicht die Originalfunktion unverändert
-durch), die hier direkt aufgerufen werden — die reale HTTP/FastMCP-Kette (`TokenPathASGI`,
+durch), die hier direkt aufgerufen werden — die reale HTTP/FastMCP-Kette (`BearerAuthASGI`,
 Guard, Nebenläufigkeit) ist bereits in
 `test_app.py::test_principal_isolation_under_concurrency` (Step 5) end-to-end bewiesen. Hier
 geht es um die Tool-eigene Semantik (Wrapping, Rechte, Fehlerabbildung, Token-Budget) — deshalb

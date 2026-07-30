@@ -58,12 +58,13 @@ Adapter darüber — deshalb wird der Kern zuerst gebaut und offline bewiesen.
 
 ## Setup
 
-> **Stand 2026-07-28:** Phase 1 (Storage-Kern) und Phase 2 (MCP-Server) sind abgeschlossen und
+> **Stand 2026-07-30:** Phase 1 (Storage-Kern) und Phase 2 (MCP-Server) sind abgeschlossen und
 > live-verifiziert. Phase 3 (Exposure & Betrieb, Tailscale Funnel + systemd) ist code-complete,
-> 🟡 — 10 von 13 Live-Abnahmezeilen bestanden, siehe `phase3_edge/CLAUDE.md`. Der Connector läuft
-> öffentlich unter einem stabilen Tailscale-Hostnamen, aktuell noch mit Pfad-Token-Auth. Phase 4
-> (OAuth 2.1 + DCR, Plan: `docs/concepts/phase4_auth_plan.md`) ist ausführungsreif geplant; siehe
-> Root-`CLAUDE.md` „Current state" für den verbindlichen aktiven Phasenstand.
+> 🟡 — 12 von 13 Live-Abnahmezeilen bestanden, siehe `phase3_edge/CLAUDE.md`. Phase 4 (OAuth 2.1
+> + DCR, Plan: `docs/concepts/phase4_auth_plan.md`) ist **live-verifiziert** — der Schnitt
+> (Runbook-Schritt 8) ist vollzogen, der Connector läuft ausschließlich über OAuth 2.1 + DCR,
+> der Pfad-Token existiert nicht mehr. Siehe Root-`CLAUDE.md` „Current state" für den
+> verbindlichen aktiven Phasenstand.
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
@@ -79,6 +80,14 @@ Es wird nie in dieses Repo eingecheckt.
 irgendwo in diesem Projekt ein Token in einer Datei auftaucht, ist das ein Incident.
 
 ## Token ausgeben, rotieren, widerrufen
+
+**[2026-07-30 Korrektur, Schnitt (Runbook-Schritt 8)]** Dieser Abschnitt beschreibt den
+**Pfad-Token** aus P2 — seit dem Schnitt in Phase 4 verbindet sich niemand mehr darüber, beide
+bestehenden Token sind live widerrufen und `TokenPathASGI` (der Code, der sie akzeptierte) ist
+entfernt. `issue_token.py`/der Keyring bleiben trotzdem im Repo: reines Bestandswerkzeug, nicht
+mehr Teil des Connect-Wegs. Die echte Anmeldung läuft ab jetzt über OAuth 2.1 + DCR (Passwort +
+TOTP), siehe `phase4_auth/CLAUDE.md` — Runbook „Inbetriebnahme" (`provision_user.py`,
+`authctl.py unlock`).
 
 ```bash
 python phase2_mcp/scripts/issue_token.py --space niklas      # neues Token ausgeben
@@ -130,14 +139,28 @@ Prüfungen grün sind.
 Lokal ohne Tunnel starten (Phase 3 baut die öffentliche Erreichbarkeit):
 
 ```bash
-SPACE_DATA_ROOT=/pfad/zu/einem/testverzeichnis python phase2_mcp/scripts/serve.py
+SPACE_DATA_ROOT=/pfad/zu/einem/testverzeichnis \
+SPACE_PUBLIC_BASE_URL=https://localhost.example \
+SPACE_AUTH_DB=/tmp/sharefyx-dev-auth.sqlite3 \
+python phase2_mcp/scripts/serve.py
 curl http://127.0.0.1:8765/health
 ```
 
-**[2026-07-28, P4 Step 6b]** Ohne `SPACE_AUTH_MODE` bleibt dieser Start exakt der P3-Pfad
-(`oauth=None`, Pfad-Token wie bisher) — die Umgebungsvariable ist absichtlich keine neue
-Voraussetzung für einen lokalen Testlauf. Details zum OAuth-Modus (`token`/`both`/`oauth`):
-`phase4_auth/CLAUDE.md`.
+**[2026-07-30 Korrektur, Schnitt (Runbook-Schritt 8)]** Ersetzt den vorigen Stand („ohne
+`SPACE_AUTH_MODE` bleibt dieser Start der P3-Pfad", P4 Step 6b): `TokenPathASGI`/`AuthModeASGI`
+sind entfernt, `create_app()` verlangt jetzt immer ein `OAuthConfig`-Bündel — auch ein lokaler
+Testlauf ohne Tunnel braucht `SPACE_PUBLIC_BASE_URL` (ein beliebiger `https://`-Platzhalter, wird
+nicht kontaktiert) und einen DB-Pfad (`SPACE_AUTH_DB` oder `STATE_DIRECTORY`). `/mcp` selbst ist
+darüber nicht per `curl` testbar (braucht einen echten Bearer-Token) — dafür ist
+`mcp_smoke.py` da, das seinen eigenen Token direkt gegen eine temporäre `AuthStore` ausstellt.
+Details zum OAuth-Modus (nur noch `oauth`, seit dem Schnitt): `phase4_auth/CLAUDE.md`.
+
+**Nebeneffekt, der vorher nicht existierte:** `serve.py` ruft `load_users()` jetzt **immer** auf
+(vorher nur, wenn `SPACE_AUTH_MODE` gesetzt war). Außerhalb von systemd (kein
+`CREDENTIALS_DIRECTORY`) fällt das auf den **echten** Keyring (Service `nikinger-space`) zurück
+— ein lokaler `serve.py`-Lauf auf dieser Maschine liest damit echte Nutzerakten, auch wenn er nie
+einen Login-Versuch bekommt. Kein Schreibzugriff, aber ein neuer Lesezugriff, den es vor dem
+Schnitt nicht gab.
 
 ## Bewusst akzeptierte Kompromisse
 
@@ -147,8 +170,12 @@ Damit sie niemand später „entdeckt" und für einen Bug hält:
   **[2026-07-28]** Seit P3 läuft der Weg über Tailscale Funnel, die Node terminiert TLS selbst —
   kein Relay-Betreiber sieht mehr Klartext, aber Tailscale bleibt vertrauenswürdige
   Infrastruktur (R4).
-- **Auth v0 ist ein Token in der URL.** Ein Bearer-Passwort, das in Logs landet. Bewusst als
-  Zwischenschritt gewählt; OAuth 2.1 ist Phase 4 und nicht optional.
+- **Bearer-Token bleiben Bearer-Token.** **[2026-07-30]** Löst den vorigen Satz über den Token
+  in der URL ab (Phase 4, Schnitt vollzogen — der Pfad-Token existiert nicht mehr). RFC 9700
+  empfiehlt Sender-Constraining über DPoP oder mTLS; der Client unterstützt beides nicht. Ein
+  abgeflossener Access-Token ist bis zu 60 Minuten nutzbar, ein Refresh-Token bis zur nächsten
+  Rotation. Gegenmittel und ihre Grenze: kurze Lebensdauer, Rotation mit Reuse-Erkennung,
+  sofortige Widerrufbarkeit über `authctl.py` (Plan §9 Risiko 3).
 - **Single Point of Failure.** Eine VM an einem Mobilfunk-Uplink. Fällt sie aus, zeigt Claude
   nur „Disconnected".
 - **Kein Hintergrundgedächtnis.** Siehe oben — Claude muss in jeder Konversation angewiesen

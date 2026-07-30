@@ -8,7 +8,7 @@ down:
   - docs/concepts/phase1_storage_plan.md   # ausführungsreifer P1-Plan
   - docs/concepts/phase2_mcp_plan.md       # ausführungsreifer P2-Plan
   - docs/concepts/phase3_edge_plan.md      # ausführungsreifer P3-Plan
-updated: 2026-07-28
+updated: 2026-07-30
 ---
 # ROADMAP — Space-Server
 
@@ -22,7 +22,7 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 | **P1** | `phase1_storage/` · `storage` | Datei-Store + Index + Versionierung. Kein Netz. | ✅ |
 | **P2** | `phase2_mcp/` · `mcpserver` | MCP-Server, Token-Auth, 6 Tools. Lokal erreichbar. | ✅ |
 | **P3** | `phase3_edge/` | Tunnel, systemd, Health, Logging, Ops-Skripte. Öffentlich erreichbar. | 🟡 |
-| **P4** | `phase4_auth/` · `authserver` | OAuth 2.1 + DCR; ersetzt den Pfad-Token. | 🟡 |
+| **P4** | `phase4_auth/` · `authserver` | OAuth 2.1 + DCR; ersetzt den Pfad-Token. | ✅ |
 | **P5** | `phase5_ui/` · `webui` | REST-API + Web-UI für Menschen. | ⬜ |
 
 **Korrektur (2026-07-25, P2-Planungssession):** OAuth rückt von „ganz am Ende" auf „direkt nach
@@ -123,13 +123,18 @@ nur Zeile 13 (Restore-Nachweis) fehlt noch für den Wechsel des Gesamtstatus auf
 
 **Mission:** Der Pfad-Token verschwindet.
 
-**Status 🟡 (2026-07-30, Live-Abnahme):** 15 von 16 Prüfungen live bestanden — Discovery, DCR,
-Consent, Token-Ausgabe, beide RFC-9700-Replay-Abwehren, Rule 4 unter echtem OAuth **und** einem
-zweiten, unabhängigen Nutzer (Fabian), Fehlversuchsbremse, Token-Ablauf/Auto-Refresh (belegt
-on-demand, kein Hintergrund-Timer). Terminrisiko-Schwelle „code-complete" längst überschritten.
-**Einzig verbleibend: Zeile 16, gebunden an den Schnitt (Runbook-Schritt 8) — danach ✅.**
-Protokoll: `docs/concepts/P4_ABNAHME_2026-07-29.md` (zwei Nachträge, 2026-07-30). Sicherheits-Review (kein
-Auth-Bypass, kein Cross-Space-Leck) in `docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`.
+**Status ✅ (2026-07-30, Schnitt vollzogen):** 16 von 16 Prüfungen live bestanden — Discovery,
+DCR, Consent, Token-Ausgabe, beide RFC-9700-Replay-Abwehren, Rule 4 unter echtem OAuth **und**
+einem zweiten, unabhängigen Nutzer (Fabian), Fehlversuchsbremse, Token-Ablauf/Auto-Refresh
+(belegt on-demand, kein Hintergrund-Timer), Pfad-Token tot (Runbook-Schritt 8, live
+gegenverifiziert: `SPACE_AUTH_MODE=oauth`, `export_space_map.py` → 0 Einträge, alte
+Pfad-Token-URL → 401). `TokenPathASGI`/`AuthModeASGI` sind im selben Commit wie die Abnahme aus
+dem Code entfernt, `SPACE_AUTH_MODE` auf einen Wert reduziert (`oauth`) — Plan-Wortlaut „auf
+zwei Werte reduzieren" war ohne frischen Repo-Zugriff geschrieben und ungenau, siehe
+`authserver/config.py`. Protokoll: `docs/concepts/P4_ABNAHME_2026-07-29.md` (drei Nachträge,
+2026-07-30). Sicherheits-Review (kein Auth-Bypass, kein Cross-Space-Leck) in
+`docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md` — Befunde S2–S8/O1 bleiben offen, bewusst nicht
+Teil dieses Schnitts.
 
 - **DRIN:** Protected Resource Metadata, Authorization Server, Dynamic Client Registration,
   PKCE, Token-Rotation. `[VERIFY]` Callback-URLs und unterstützte Auth-Spec-Version gegen die

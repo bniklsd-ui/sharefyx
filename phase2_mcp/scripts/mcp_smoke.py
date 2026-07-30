@@ -7,11 +7,13 @@ die sechs Tools einmal vollständig durch: `list_spaces`, `create_item` ×3, `se
 archived)`, ein `update_item` auf einen fremden Space. Am Ende eine Größenmessung (Bytes je
 Antwort) als Tabelle.
 
-**Kein echter Keyring.** Ein Skript, das man beliebig oft laufen lassen soll, darf die echte
-Token→Space-Map unter dem Service `nikinger-space` nicht anfassen. Die beiden Tokens hier
-entstehen über `credentials.generate_token()`/`hash_token()` (reine Funktionen, kein
-Keyring-Zugriff) und werden per injiziertem `load_map` in einen `KeyringTokenResolver`
-gereicht — dasselbe Muster wie in den Unit-Tests.
+**Schnitt, 2026-07-30 (Runbook-Schritt 8):** `create_app()` verlangt seither immer ein
+`OAuthConfig` (`TokenPathASGI`/`AuthModeASGI` sind entfernt) — die beiden Fixture-Tokens hier
+entstehen deshalb nicht mehr über `credentials.generate_token()`/einen `KeyringTokenResolver`,
+sondern als echte, opake OAuth-Access-Token direkt gegen eine **temporäre** `AuthStore`
+(`create_family()` + `issue_token_pair()`, dasselbe Muster wie in `test_asgi_bearer.py`) — kein
+Login-Flow nötig, kein echter Keyring, keine echten Nutzerakten. `SPACE_PUBLIC_BASE_URL` ist ein
+Platzhalter (`https://smoke.local`), er wird nie kontaktiert.
 
 Ausgabe: Text (Standard) oder `--json` auf stdout; Logs auf stderr (Hard Rule 7).
 """
@@ -25,15 +27,17 @@ import re
 import sys
 import tempfile
 from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 
 import httpx
 from fastmcp import Client
 from fastmcp.client.transports import StreamableHttpTransport
 
-from mcpserver import credentials
-from mcpserver.app import create_app
-from mcpserver.auth import KeyringTokenResolver
+from authserver.config import AuthSettings
+from authserver.store import AuthStore
+
+from mcpserver.app import OAuthConfig, create_app
 from mcpserver.config import Settings
 from storage.store import Store
 
@@ -55,10 +59,14 @@ class Check:
     response_bytes: int | None = None
 
 
-def _issue_smoke_token(space: str, mapping: dict[str, str]) -> str:
-    token = credentials.generate_token()
-    mapping[credentials.hash_token(token)] = space
-    return token
+def _issue_smoke_token(auth_store: AuthStore, *, space: str, resource: str) -> str:
+    family_id = auth_store.create_family(
+        space=space, client_id="mcp_smoke", scope="space", resource=resource
+    )
+    access_token, _refresh_token = auth_store.issue_token_pair(
+        family_id, access_ttl_s=3600, refresh_ttl_s=2592000
+    )
+    return access_token
 
 
 def _client_factory(app):
@@ -72,7 +80,9 @@ def _client_factory(app):
 
 def _mcp_client(app, token: str) -> Client:
     transport = StreamableHttpTransport(
-        url=f"http://smoke.local/mcp/{token}", httpx_client_factory=_client_factory(app)
+        url="http://smoke.local/mcp/",
+        headers={"Authorization": f"Bearer {token}"},
+        httpx_client_factory=_client_factory(app),
     )
     return Client(transport)
 
@@ -90,14 +100,16 @@ def _extract_field(filetext: str, field: str) -> str | None:
 
 
 async def _run(data_root: Path, checks: list[Check]) -> None:
-    # Zwei Einträge in der Map (auch wenn dieses Skript nur mit dem eigenen Token verbindet)
-    # bewiesen bereits in test_app.py über echte parallele Requests — hier geht es um den
-    # Tool-Ablauf aus EINER Principal-Sicht (own), gegen einen Space, der ihr selbst gehört
-    # (alpha) und einen, der es nicht tut (beta).
-    mapping: dict[str, str] = {}
-    own_token = _issue_smoke_token(SPACE_OWN, mapping)
-    _issue_smoke_token(SPACE_FOREIGN, mapping)
-    resolver = KeyringTokenResolver(load_map=lambda: mapping)
+    # Zwei Token (auch wenn dieses Skript nur mit dem eigenen verbindet) — bewiesen bereits in
+    # test_app.py über echte parallele Requests; hier geht es um den Tool-Ablauf aus EINER
+    # Principal-Sicht (own), gegen einen Space, der ihr selbst gehört (alpha) und einen, der es
+    # nicht tut (beta).
+    auth_settings = AuthSettings(
+        base_url="https://smoke.local", db_path=data_root / "_smoke_auth.sqlite3"
+    )
+    auth_store = AuthStore(auth_settings.db_path, now_fn=lambda: datetime.now(timezone.utc))
+    own_token = _issue_smoke_token(auth_store, space=SPACE_OWN, resource=auth_settings.resource)
+    _issue_smoke_token(auth_store, space=SPACE_FOREIGN, resource=auth_settings.resource)
 
     store = Store(data_root, git=False)
     # `Store.list_spaces()` leitet Spaces ausschließlich aus vorhandenen Items ab (P1, keine
@@ -120,7 +132,8 @@ async def _run(data_root: Path, checks: list[Check]) -> None:
         store.create(SPACE_OWN, type="note", title=f"Füll-Item {i + 1}", body=filler_body)
 
     settings = Settings(data_root=data_root)
-    app = create_app(settings=settings, resolver=resolver, store=store)
+    oauth = OAuthConfig(settings=auth_settings, store=auth_store, users={})
+    app = create_app(settings=settings, store=store, oauth=oauth)
 
     async with app.router.lifespan_context(app):
         async with _mcp_client(app, own_token) as own:

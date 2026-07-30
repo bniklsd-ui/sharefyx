@@ -9,13 +9,17 @@ während seiner Ausführung `get_http_request().url.path` aufruft, sieht deshalb
 bereits bereinigten Pfad — empirisch verifiziert gegen echtes `fastmcp==3.4.4` +
 `starlette` (Testprobe: `get_http_request().url.path` lieferte `"/mcp/"`, nicht den Token).
 
-Stattdessen: `TokenPathASGI` hinterlegt `token_hash` in `scope["state"]` **bevor** es den Pfad
-kürzt. `scope["state"]` überlebt die Weiterleitung an die innere App unverändert (dieselbe
-Testprobe bestätigte `request.state.token_hash` korrekt gesetzt) — Starlettes offizieller
-Mechanismus für genau diesen Zweck (Zustand über die ASGI-Kette hinweg mitgeben). Die
-Sicherheitseigenschaft ist identisch: der Guard vergleicht "was hat unsere eigene ASGI-Schicht
-für DIESEN Request aufgelöst" gegen "was liefert `get_http_request()` gerade zurück" und
+Stattdessen: die ASGI-Auth-Schicht hinterlegt `token_hash` in `scope["state"]`, bevor sie an die
+innere App delegiert. `scope["state"]` überlebt die Weiterleitung an die innere App unverändert
+(dieselbe Testprobe bestätigte `request.state.token_hash` korrekt gesetzt) — Starlettes
+offizieller Mechanismus für genau diesen Zweck (Zustand über die ASGI-Kette hinweg mitgeben).
+Die Sicherheitseigenschaft ist identisch: der Guard vergleicht "was hat unsere eigene ASGI-
+Schicht für DIESEN Request aufgelöst" gegen "was liefert `get_http_request()` gerade zurück" und
 schlägt bei jeder Abweichung laut fehl.
+
+**Schnitt, 2026-07-30:** `TokenPathASGI` (P2) ist entfernt, `BearerAuthASGI` (P4) ist seither die
+einzige ASGI-Auth-Schicht — sie hinterlegt denselben Slot, dieser Guard brauchte auch dafür keine
+Änderung (siehe `asgi.py`-Moduldocstring).
 """
 from __future__ import annotations
 
@@ -27,7 +31,9 @@ _principal_var: ContextVar[Principal] = ContextVar("principal")
 
 
 def set_principal(principal: Principal) -> Token:
-    """Von `TokenPathASGI` benutzt. Gibt das Token für den späteren `reset_principal()` zurück."""
+    """Von `BearerAuthASGI` benutzt (bis 2026-07-30 auch von `TokenPathASGI`, seither entfernt
+    — siehe `asgi.py`-Moduldocstring). Gibt das Token für den späteren `reset_principal()`
+    zurück."""
     return _principal_var.set(principal)
 
 

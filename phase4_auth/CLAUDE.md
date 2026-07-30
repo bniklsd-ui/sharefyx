@@ -105,11 +105,12 @@ Bedarf nicht neu recherchiert werden muss:
 | 6 | `authserver/{flows,templates}.py`, `routes.py` vervollständigt (`/oauth/authorize`, `/oauth/token`) | 5 | ✅ | 36 (22 `test_flows.py` + 9 `test_routes.py` + 4 `test_templates.py` + 1 neu in `test_totp.py`) |
 | 7a | `authserver/resolver.py`; `mcpserver/{asgi,context,app}.py` verdrahtet (Bearer-Auflösung, `AuthModeASGI`, `oauth=None`) | 6a | ✅ | 19 (6 `test_resolver.py` + 13 `test_asgi_bearer.py`) |
 | 7b | `phase4_auth/scripts/oauth_smoke.py`; `mcpserver/{request_log,logging_setup}.py` erweitert (`OAuthLogASGI`, `_SECRET_PATTERNS`); `scripts/serve.py` verdrahtet (`SPACE_AUTH_MODE`-Gate) | 6b | ✅ | 6 neu in `test_oauth_smoke.py` (neue Datei, 11/11 `oauth_smoke.py` + fünf Regressionstests) + 3 neu in `test_request_log.py` + 6 neu in `test_logging.py` + 1 neu in `test_asgi_bearer.py` (Plan-Done-when-Klausel 3: sechs Tools unter Bearer vs. Pfad-Token) |
-| 8 | `phase4_auth/scripts/authctl.py` (+ `store.py :: list_clients`/`list_families`, `config.py :: resolve_db_path`); `phase4_auth/systemd/sharefyx-mcp.service` (`StateDirectory`, zweites Credential, `SPACE_AUTH_MODE`/`SPACE_PUBLIC_BASE_URL`); `install_units.sh`/`local.env.example` erweitert; `oauth_smoke.py --base-url` (echtes Netz) | 7 | 🟡 **Live-Abnahme läuft — 12/16 bestanden** (2026-07-29, Protokoll `docs/concepts/P4_ABNAHME_2026-07-29.md`); offen: Zeile 9 (nächste Session), 14/15 (Fabian, morgen), 16 (nach dem Schnitt) | 21 neu: 9 `test_authctl.py` (neue Datei) + 5 neu in `test_authserver_store.py` + 3 neu in `test_units.py` (`phase3_edge/tests/`, davon 2 aus S1) + 4 neu in `test_oauth_smoke.py` |
+| 8 | `phase4_auth/scripts/authctl.py` (+ `store.py :: list_clients`/`list_families`, `config.py :: resolve_db_path`); `phase4_auth/systemd/sharefyx-mcp.service` (`StateDirectory`, zweites Credential, `SPACE_AUTH_MODE`/`SPACE_PUBLIC_BASE_URL`); `install_units.sh`/`local.env.example` erweitert; `oauth_smoke.py --base-url` (echtes Netz) | 7 | ✅ **Live-Abnahme abgeschlossen — 16/16 bestanden** (2026-07-30, Protokoll `docs/concepts/P4_ABNAHME_2026-07-29.md`). **[2026-07-30 Korrektur:** diese Zeile stand hier bis zu diesem Commit noch auf „12/16, 2026-07-29" — Zeile 9, 14/15 und der Schnitt liefen danach alle noch in derselben bzw. der Folgesession durch, ohne dass ein Zwischen-Commit diese Tabellenzeile nachzog. Dieselbe Drift-Kategorie, die Root-`CLAUDE.md` mehrfach dokumentiert (dort ist die Zeile explizit gegen genau dieses Vergessen abgesichert, diese Tabellenzeile hier bisher nicht).**]** | 21 neu: 9 `test_authctl.py` (neue Datei) + 5 neu in `test_authserver_store.py` + 3 neu in `test_units.py` (`phase3_edge/tests/`, davon 2 aus S1) + 4 neu in `test_oauth_smoke.py` |
 | 8a | **Befund S1** (2026-07-29): `ALLOWED_HOSTS` ohne `127.0.0.1` machte Runbook-Schritt 4 unausführbar — `local.env.example` + `install_units.sh`-Warnung + Runbook korrigiert, kein Servercode geändert | 7 | ✅ | 2 neu in `test_units.py` (in Zeile 8 mitgezählt) |
 | 8b | `phase4_auth/scripts/abnahme_run.sh` (2026-07-29) — automatisiert die acht maschinell prüfbaren Abnahmezeilen (1,2,3,10,11,12,13,16), spiegelt Aufbau/Redaktionsmuster von `phase3_edge/scripts/abnahme_run.sh` 1:1. Live gegen den echten Dienst probegelaufen (Zeilen 1/2/3/12 ok, 13/16 korrekt übersprungen, 10/11 korrekt übersprungen ohne echtes Passwort). Kein Ersatz für Zeilen 4–9/14/15 — eine curl-Nachbildung des Login-Formulars wäre eine zweite, ungetestete OAuth-Implementierung | 7 | ✅ | 0 (Runbook/Skript, gleiche Ausnahme wie `diagnose.sh`/`phase3_edge/scripts/abnahme_run.sh` — kein Unit-Test für ein Skript, das echten `systemd`/`journalctl`/Netzzugriff braucht) |
 | 8c | **Live-Fund 2026-07-30:** `routes.py :: _security_headers()` — `form-action` trug nur `'self'`, Chromium prüft es aber auch gegen das Redirect-Ziel einer Formular-Antwort (hier: `302` nach `https://claude.ai/...`) und blockierte Fabians Verbindung lautlos nach jedem erfolgreichen Login. Fix: `config.py :: AuthSettings.csp_form_action` (neue Property, hält den Seam `test_redirect_uri_allowed_is_the_only_matching_path` intakt), `form-action 'self' https://claude.ai https://claude.com`. Deployt (`sudo systemctl restart`), Fabian erneut verbunden — **live bestätigt**: vollständiger Selbsttest aller sechs Tools (siehe Zeile 14/15 unten) | 7 | ✅ | 1 neu in `test_routes.py` |
 | 8d | **Zeile 9 durchgeführt (2026-07-30):** `SPACE_OAUTH_ACCESS_TTL_S=60` via systemd-Drop-in, Connector neu verbunden, `create_item` → 90s Pause → `append_to_item`. DB-Gegenprobe (Claude Code, read-only): 14 `access_tokens`-Zeilen derselben `family_id`, Refresh **on-demand** exakt beim ersten Aufruf nach Ablauf, kein Hintergrund-Timer, kein neuer Login | 7 | ✅ | 0 (Live-Test, kein Code) |
+| 8e | **Schnitt vollzogen (2026-07-30, Runbook-Schritt 8):** Nikinger führte `SPACE_AUTH_MODE=oauth`/`install_units.sh`/Restart/beide `--revoke`/`spaces.cred` neu/zweiter Restart live aus — **vor** jeder Code-Änderung (Plan-Reihenfolge). Claude Code verifizierte read-only (`systemctl cat` → `oauth`, `export_space_map.py` → 0 Einträge, alte Pfad-Token-URL → `401`, `/health` → `200`) und entfernte danach `TokenPathASGI`/`AuthModeASGI` aus `mcpserver/asgi.py`/`app.py` (`resolver`-Parameter aus `create_app()` entfällt mit), reduzierte `SPACE_AUTH_MODE` auf `_VALID_MODES=("oauth",)` (Plan-Wortlaut „zwei Werte" war ungenau, siehe `authserver/config.py`), entfernte `serve.py`s Step-6b-Gate (`oauth` jetzt Pflicht) — beide Nikinger-Entscheidungs-Reversierungen vorab per `AskUserQuestion` abgestimmt. **Zeile 16 damit live bestanden, 16/16, Phase 4 ✅.** | 7 | ✅ | 345 gesamt (vorher 353) — `test_asgi.py` gelöscht, `test_asgi_bearer.py` 14→10, restliche Dateien auf Bearer-Fixtures umgestellt, keine Nettolücke |
 
 **Zeile 1, Step 0:** kritischer Fund — ein nie widerrufener Keyring-Token für einen dritten,
 seit P2-B2 umbenannten Space (`nikinger`), live und schreibfähig. Details, Zeitachse und
@@ -343,9 +344,27 @@ python phase2_mcp/scripts/issue_token.py --revoke fabian
 python phase3_edge/scripts/export_space_map.py \
   | sudo systemd-creds encrypt --name=spaces - /etc/sharefyx/spaces.cred
 sudo systemctl restart sharefyx-mcp
-#    Danach TokenPathASGI/AuthModeASGI aus dem Code entfernen, SPACE_AUTH_MODE auf zwei Werte
-#    reduzieren — Codeentfernung IM SELBEN COMMIT wie die Abnahme (Plan-Wortlaut), nicht vorab.
+#    Danach TokenPathASGI/AuthModeASGI aus dem Code entfernen, SPACE_AUTH_MODE auf einen Wert
+#    reduzieren — Codeentfernung IM SELBEN COMMIT wie die Abnahme (Plan-Wortlaut sagte "zwei
+#    Werte", das war ohne frischen Repo-Zugriff geschrieben und ungenau: nur "oauth" hat nach
+#    der vollen TokenPathASGI-Entfernung noch eine Implementierung, siehe authserver/config.py).
 ```
+
+**Vollzogen, 2026-07-30 — dieser Schritt ist erledigt, kein offener Runbook-Punkt mehr.** Der
+Nikinger führte die obige Befehlsfolge live aus; Claude Code verifizierte read-only
+(`systemctl cat`, `export_space_map.py`, `curl` gegen die alte Pfad-Token-URL) und entfernte
+danach `TokenPathASGI`/`AuthModeASGI` im selben Commit wie diese Doku-Aktualisierung. Details:
+Modul-Status Zeile 8e oben, Session-Block unten.
+
+**Fund, nicht behoben (Advisor, zweiter Durchlauf dieser Session):** `spaces.cred` und der
+`export_space_map.py`-Schritt oben sind seit der Entfernung von `TokenPathASGI` **totes
+Gewicht** — `serve.py` liest die Space-Map nicht mehr, aber die installierte Unit trägt
+weiterhin `LoadCredentialEncrypted=spaces:/etc/sharefyx/spaces.cred` und verweigert den Start,
+wenn diese Datei fehlt. Wer sie als „obsoletes P2-Überbleibsel" aufräumt, bricht den Dienst.
+**Bewusst nicht angefasst** — die Unit-Datei zu ändern braucht `install_units.sh` + Restart
+(Nikinger-Aktion, nicht Teil dieses Commits) und `phase3_edge/scripts/issue_token.py`/
+`export_space_map.py`/`credentials.py` bleiben ohnehin außerhalb des P4-Q-Berührungsbereichs
+(siehe Modul-Status Zeile 8e). Vorgemerkt für den nächsten Unit-Umbau, kein akuter Blocker.
 
 **`authctl.py` braucht `STATE_DIRECTORY`, außerhalb von systemd nicht automatisch gesetzt**
 (live gefunden, 2026-07-29): `config.py :: resolve_db_path()` verweigert bewusst einen stillen
@@ -393,12 +412,13 @@ mit späteren `created_at`.
 **`429 rate_limited` beim Neuverbinden?** DCR-Bremse ist global, 20/h (Plan §2.7) — nach dem
 vielen Testen heute ggf. ausgereizt. Bis zur nächsten vollen Stunde warten, kein Bug.
 
-**Stand 2026-07-30: 15 von 16 live bestanden — nur noch Zeile 16 offen, gebunden an den
-Schnitt.** Protokoll mit Belegen: `../docs/concepts/P4_ABNAHME_2026-07-29.md` (zwei Nachträge
-2026-07-30: Zeilen 14/15, dann Zeile 9). Der Schnitt (Runbook-Schritt 8) ist damit der einzige
-verbleibende Schritt vor dem vollen ✅-Status.
+**Stand 2026-07-30: 16 von 16 live bestanden — Schnitt vollzogen, Phase 4 ✅.** Protokoll mit
+Belegen: `../docs/concepts/P4_ABNAHME_2026-07-29.md` (drei Nachträge 2026-07-30: Zeilen 14/15,
+Zeile 9, Schnitt+Zeile 16).
 
-**Abnahmematrix** (16 Zeilen, Protokoll nach P2/P3-Konvention — Belege statt Behauptungen):
+**Abnahmematrix** (16 Zeilen, Protokoll nach P2/P3-Konvention — Belege statt Behauptungen).
+**Stand 2026-07-30: alle 16 Zeilen live bestanden**, Belege je Zeile in
+`../docs/concepts/P4_ABNAHME_2026-07-29.md`:
 
 | # | Prüfung | Erwartung | Braucht Fabian |
 |---|---|---|---|
@@ -419,14 +439,14 @@ verbleibende Schritt vor dem vollen ✅-Status.
 | 15 | Cross-Space unter OAuth | fremder Body gewrappt, Schreibversuch `write_denied` | **ja** |
 | 16 | Pfad-Token tot | alte URL → 401 | nein |
 
-**Terminrisiko (Nikinger-Entscheidung 2026-07-28, im Plan gelockt):** Zeilen 14/15 brauchen
-Fabian — ein Terminrisiko, das die Phase nicht blockieren soll. 14/16 bestanden → 🟡
-code-complete (P5 darf beginnen); ✅ erst nach beiden Zwei-Personen-Zeilen. Schritt 8 (Schnitt)
-darf **nicht** auf einen Termin warten, siehe Runbook oben.
+**Terminrisiko (Nikinger-Entscheidung 2026-07-28, im Plan gelockt):** Zeilen 14/15 brauchten
+Fabian — ein Terminrisiko, das die Phase nicht blockieren sollte. 14/16 wurde am 2026-07-30
+erreicht (🟡 code-complete), beide Zwei-Personen-Zeilen folgten in derselben Session (✅). Schritt
+8 (Schnitt) wartete wie gefordert **nicht** auf einen Termin.
 
-**Done when** (Plan §5 Step 7): 14/16 bestanden, Schnitt vollzogen, Pfad-Token widerrufen,
-`TokenPathASGI` entfernt, Protokoll geschrieben, `ROADMAP.md`/`docs/INDEX.md`/Phase-Head
-nachgezogen.
+**Done when** (Plan §5 Step 7) — **alle Klauseln erfüllt, Step 7 ✅:** 16/16 bestanden, Schnitt
+vollzogen, Pfad-Token widerrufen, `TokenPathASGI` entfernt, Protokoll geschrieben,
+`ROADMAP.md`/`docs/INDEX.md`/Phase-Head nachgezogen.
 
 ## Sicherheits-Review 2026-07-29 — offene Befunde S2–S8
 
@@ -451,79 +471,112 @@ abnimmt als das Reviewte. Reihenfolge entscheidet der Nikinger.
 
 ---
 
-## Session stopped — 2026-07-30 (Zeilen 14/15: Fabian-Login schlug fehl — Root Cause gefunden + gefixt, noch nicht deployt)
+## Session stopped — 2026-07-30 (Schnitt vollzogen, 16/16, Phase 4 ✅ — TokenPathASGI entfernt)
 
-**Für den nächsten, kalten Leser:** Fabian versuchte Zeile 14 (eigener Connector-Login) —
-Passwort/TOTP eingegeben, „Anmelden" geklickt, scheinbar nichts passiert; zweiter Klick zeigte
-„Anfrage ungültig oder abgelaufen". Auftrag: Ursache finden.
+**Für den nächsten, kalten Leser:** vorige Session endete mit 15/16, einzig der Schnitt
+(Runbook-Schritt 8) stand aus. Diese Session begann nach einem Context-Compaction-Verlust — der
+einzige erhaltene Rest war eine Notiz: „16/16 confirmed — SPACE_AUTH_MODE=oauth is live, and the
+old path-token URL now returns 401". Auftrag laut CLAUDE.md-Root-Prompt: erst den echten
+Plan-Wortlaut lesen statt aus der eigenen Runbook-Paraphrase zu arbeiten, dann handeln.
 
-**Diagnose, in zwei Schritten:**
-1. Read-only gegen die echte `auth.sqlite3`/`journalctl`: **sechs** vollständige, erfolgreiche
-   Login-Runden für `fabian` in diesem Zeitfenster — jede erzeugte eine echte `token_families`-
-   Zeile (Passwort **und** TOTP korrekt), aber **keine einzige** gefolgt von einem
-   `POST /oauth/token`. Zum Vergleich: `niklas`s eigener Reconnect im selben Fenster (06:00:22)
-   lief vollständig durch, inklusive Tool-Aufrufen. Der Bruch lag also zwischen „Server sendet
-   302" und „Client tauscht den Code ein" — nicht im Server selbst.
-2. Der Nikinger lieferte einen Screenshot von Fabians DevTools (Network + Console): `POST
-   /oauth/authorize` → `302` mit korrektem `Location`-Header nach
-   `https://claude.ai/api/mcp/auth_callback?...&code=...` — **und** eine Konsolen-Meldung:
-   „Sending form data to '.../oauth/authorize' violates … Content Security Policy directive:
-   'form-action self'. The request has been blocked." Browser: Chromium/Edge 150
-   (`Sec-Ch-Ua`).
+**Erster Schritt, vor jeder Code-Änderung: die 16/16-Prämisse selbst verifizieren, nicht aus dem
+Kontext-Rest übernehmen.** `git status` stand auf `d06ced0` (15/16, Schnitt offen) — die Notiz
+allein wäre laut Repo-eigener Lehre („eine Doku-Aussage über den Repo-Zustand ist erst wahr,
+wenn `git status` sie bestätigt", `phase2_mcp/CLAUDE.md`) kein Beleg gewesen. Read-only
+gegengeprüft: `systemctl cat sharefyx-mcp` → `SPACE_AUTH_MODE=oauth`,
+`SPACE_PUBLIC_BASE_URL=https://savefyx-vmware-virtual-platform.tail89fc2a.ts.net`;
+`export_space_map.py` → `0 Einträge` (beide Pfad-Token tot); `curl` gegen die alte
+Pfad-Token-URL (`/mcp/<beliebig>`) → `401`; `/health` → `200`, `uptime_s` plausibel seit dem
+Restart. Der Nikinger hatte Runbook-Schritt 8 also tatsächlich bereits live ausgeführt, **vor**
+jeder Code-Änderung — genau die vom Plan verlangte Reihenfolge. **Zeile 16 damit live bestanden,
+16/16.**
 
-**Root Cause:** `routes.py :: _security_headers()` setzte `form-action 'self'`. Chromium prüft
-`form-action` nicht nur gegen das unmittelbare `action`-Ziel eines Formulars, sondern **auch**
-gegen das Redirect-Ziel, wenn die Antwort auf den `POST` selbst ein Redirect ist — genau der
-Fall hier (`POST /oauth/authorize` antwortet bei Erfolg immer mit `302` nach
-`https://claude.ai/...`). Ohne `https://claude.ai`/`https://claude.com` in `form-action`
-blockiert der Browser diesen Redirect **lautlos** (kein Fehler auf der Seite, nur eine
-Konsolen-Meldung, die kein Nutzer je sieht) — der Server hatte in jedem der sechs Versuche
-bereits korrekt geantwortet, der Bruch passierte ausschließlich im Browser danach. Der zweite
-Klick auf das (bereits erfolgreich abgeschickte, aber nie weitergeleitete) Formular traf dann
-auf `consume_auth_request()`s Einmal-Regel — „ungültig" ist dabei korrektes Verhalten auf einen
-Doppel-Submit, kein zweiter Bug.
+**Scope-Klärung vor dem Umbau, per `AskUserQuestion`:** der Plan-Satz „TokenPathASGI und
+AuthModeASGI aus dem Code entfernen" hat einen größeren Blast Radius als der Runbook-Kommentar
+nahelegt — `README.md`s Dev-Workflow, `phase2_mcp/scripts/mcp_smoke.py` und `serve.py`s
+Step-6b-`SPACE_AUTH_MODE`-Gate (eine gelockte Nikinger-Entscheidung vom 2026-07-28) hängen alle
+am `oauth=None`-Pfad, der mit `TokenPathASGI` verschwindet. Zwei Fragen dem Nikinger vorgelegt,
+nicht angenommen: (1) vollen Rückbau inklusive Dev-Pfad, oder Dev-Pfad als bewusste Ausnahme
+erhalten? (2) `SPACE_AUTH_MODE` auf einen Wert (`oauth`) oder zwei (Plan-Wortlaut, aber nach der
+vollen Entfernung funktional unbegründet) reduzieren? Antwort: **voller Rückbau**, **ein Wert**.
 
-**Fix:** `config.py :: AuthSettings.csp_form_action` (neue Property) baut
-`'self' https://claude.ai https://claude.com` aus derselben Origin-Liste, gegen die
-`clients.py :: redirect_uri_allowed()` bereits prüft — keine zweite, hartkodierte Quelle.
-`routes.py` referenziert die rohe Liste bewusst **nicht** direkt (dafür die neue Property),
-damit `test_redirect_uri_allowed_is_the_only_matching_path` (Plan §2.6 [SEAM]: genau eine
-Vergleichsstelle für Redirect-URIs) intakt bleibt — beim ersten Versuch geprüft und korrigiert,
-nicht nur behauptet. Neuer Test `test_csp_form_action_allows_the_oauth_redirect_target`.
+**Umsetzung, ein Commit:**
+- `phase2_mcp/mcpserver/asgi.py` — `TokenPathASGI`, `AuthModeASGI`, `_credential_from_path`,
+  `_send_401` gelöscht. Nur `BearerAuthASGI` bleibt.
+- `phase2_mcp/mcpserver/app.py` — `create_app()`: `resolver`-Parameter entfernt (diente nur dem
+  Bau von `TokenPathASGI`), `oauth: OAuthConfig` jetzt ohne Default, die `if oauth is None`-Weiche
+  entfällt, `Mount("/mcp")` bekommt `BearerAuthASGI` direkt.
+- `phase4_auth/authserver/config.py` — `_VALID_MODES=("oauth",)`, `base_url` unconditional
+  Pflicht (die `mode in ("oauth","both")`-Verzweigung war mit nur einem gültigen Wert tot).
+- `phase2_mcp/scripts/serve.py` — Step-6b-Gate (`"SPACE_AUTH_MODE" in os.environ`) entfernt,
+  `load_auth_settings()` läuft jetzt immer ungefangen.
+- `phase2_mcp/scripts/mcp_smoke.py`, `phase4_auth/scripts/oauth_smoke.py`,
+  `phase4_auth/tests/test_oauth_smoke.py`, `phase2_mcp/tests/test_app.py`,
+  `phase2_mcp/tests/test_asgi_bearer.py`, `phase2_mcp/tests/test_request_log.py` — Pfad-Token-
+  Fixtures (`KeyringTokenResolver`/`_FakePathResolver`/feste Token-Strings im Pfad) durch echte,
+  gegen eine temporäre `AuthStore` gemintete Bearer-Token ersetzt (`create_family()` +
+  `issue_token_pair()`, dasselbe Muster wie `test_asgi_bearer.py` es für P4 Step 6a schon nutzte).
+  **`mcp_smoke.py` steht nicht auf P4-Qs Berührungsliste** (die nennt `scripts/serve.py`, nicht
+  `scripts/mcp_smoke.py`) — dem Nikinger vorab per `AskUserQuestion` vorgelegt (Option nannte
+  die Datei explizit), gewählt: „Voller Rückbau". Genehmigt, nicht stillschweigend erweitert.
+- `phase2_mcp/tests/test_serve.py` (neu) — bisher deckte kein Test `serve.py :: main()`s
+  Verdrahtung ab (Settings → `AuthSettings` → `create_app()` → `uvicorn.run()`), beide
+  Smoke-Skripte bauen `create_app()` direkt und rufen `main()` nie auf. Ohne diesen Test wäre der
+  nächste `systemctl restart sharefyx-mcp` der erste echte Test dieser Verdrahtung gewesen
+  (Advisor-Fund, zweiter Durchlauf dieser Session). `uvicorn.run`/`load_users` gepatcht, nie der
+  echte Keyring oder ein echter Port.
+- `phase2_mcp/tests/test_asgi.py` gelöscht (testete ausschließlich `TokenPathASGI`).
+  `test_asgi_bearer.py` um `_FakePathResolver`, `test_auth_mode_token_preserves_p2_behaviour`,
+  `test_auth_mode_both_serves_bearer_and_path`, `test_default_auth_mode_is_oauth` und
+  `test_six_tools_behave_identically_under_bearer_and_path_token` gekürzt (14→10) — die
+  Bearer-vs-Pfad-Token-Vergleichstests hatten mit dem Wegfall der zweiten Seite keinen
+  Vergleichspartner mehr; **bewusst dokumentiert entfernt**, kein stilles Verschwinden (Advisor-
+  Vorgabe dieser Session).
+- `phase4_auth/tests/test_authserver_config.py` —
+  `test_load_auth_settings_token_mode_does_not_require_base_url` durch
+  `test_load_auth_settings_rejects_token_mode_after_the_cut` ersetzt.
+- `README.md`, `phase3_edge/local.env.example`, `phase4_auth/CLAUDE.md` (dieses Dokument),
+  `context.py`/`asgi.py`/`app.py`-Docstrings — auf den Schnitt nachgezogen.
 
-**Verifiziert, nicht nur behauptet:** eine dritte Wegwerf-Instanz (Port 8798, `tmp`-`DATA_ROOT`,
-eigene `auth.sqlite3` — **nie** der echte `DATA_ROOT`, **nie** der echte Keyring) zeigt den
-korrekten Header: `form-action 'self' https://claude.ai https://claude.com`. `pytest -q` →
-**353/353 grün**. Produktionsdienst ausschließlich read-only angefasst.
+**Verifiziert, nicht nur behauptet:** `pytest -q` → **347/347 grün** (vorher 353 — die Differenz
+ist die Nettosumme aus `test_asgi.py` [-4], `test_asgi_bearer.py` [14→10, -4] und dem neuen
+`test_serve.py` [+2, Advisor-Fund im zweiten Durchlauf: `serve.py :: main()`s Verdrahtung war
+bis dahin ungetestet — beide Smoke-Skripte bauen `create_app()` direkt und rufen `main()` nie
+auf], keine neue Lücke). `git diff --stat` auf `tools.py`/`permissions.py`/`server.py`/`storage/`
+→ **leer** (Akzeptanzkriterium §6.9). Zusätzlich real gelaufen, nicht nur `pytest` grün
+behauptet:
+`mcp_smoke.py --json` → 12/12 Checks grün gegen den vollen `create_app()`-Stack mit echten
+Bearer-Token; `oauth_smoke.py` (In-Process-Default) → **11/11 Prüfungen grün** (Discovery, DCR,
+Consent, Code-Tausch, echter Tool-Aufruf mit Bearer, Refresh, Refresh-Replay tötet die Familie,
+zweite Authorize-Runde, Code-Replay tötet die Familie) — der volle OAuth-Fluss funktioniert nach
+der Entfernung des `resolver`-Parameters unverändert.
 
-**Noch NICHT getan, bewusst:** der Fix ist **nicht auf `sharefyx-mcp` deployt** — braucht
-`sudo phase3_edge/scripts/install_units.sh`-unabhängigen einfachen `sudo systemctl restart
-sharefyx-mcp` (kein `local.env`/Unit-Änderung, reiner Code-Fix). Zeilen 14/15 bleiben offen, bis
-Fabian nach dem Restart einen echten, vollständigen Login-Erfolg zeigt (inkl. Tool-Aufruf) — der
-Server hat vorher schon sechsmal korrekt reagiert, das beweist noch keinen erfolgreichen
-End-to-End-Connect.
+**Ergebnis: 16 von 16 Abnahmezeilen live bestanden. Phase 4 ✅ — alle acht Steps (0–7)
+abgeschlossen.** `ROADMAP.md`, `docs/INDEX.md`, Root-`CLAUDE.md` im selben Commit nachgezogen
+(P4 auf ✅, R5 abschließend korrigiert, Hard Rule 1 um den TOTP-Seed-Satz ergänzt).
+`phase2_mcp/CLAUDE.md`s Test-Zähl-Zeile ebenfalls nachgezogen (100→94, `test_asgi.py`
+verschwunden, `test_asgi_bearer.py` 14→10, `test_serve.py` neu mit 2).
 
-**Nächster Schritt (konkret):** `sudo systemctl restart sharefyx-mcp`, dann Fabian erneut
-verbinden lassen — dieses Mal nur **einmal** klicken und kurz warten. Danach `list_spaces`/einen
-Tool-Aufruf über Fabians Connector bestätigen (Zeile 14), dann Cross-Space-Schreibversuch gegen
-`niklas` (Zeile 15). Zeile 9 weiterhin offen (siehe voriger Block).
+**Zweiter Advisor-Durchlauf dieser Session** (nach dem ersten Commit-Entwurf, vor dem
+tatsächlichen Commit) fand vier weitere Punkte: `serve.py :: main()` war ungetestet (behoben,
+`test_serve.py` oben), `test_mcp_requires_token` prüfte `401` ohne den `WWW-Authenticate`-Header
+zu prüfen (ergänzt — genau das ist Abnahmezeile 2), `spaces.cred` wurde totes Gewicht (dokumentiert
+oben im Runbook, nicht angefasst), `mcp_smoke.py` liegt außerhalb von P4-Qs Berührungsliste
+(bereits vorab mit dem Nikinger abgestimmt, hier nur nachträglich in den Papierpfad
+aufgenommen). Alle vier in diesem Commit behoben oder dokumentiert, keiner still liegen gelassen.
 
-**Nachtrag, selbe Session — CSP-Fix deployt, Zeilen 14/15 bestanden:** Restart durchgeführt,
-Fabian erneut verbunden — ein Klick, sofortiger Erfolg. Fabian fuhr von sich aus ein
-vollständiges Sechs-Tool-Protokoll plus zwei Negativtests (`conflict`, `write_denied`), deutlich
-über den Matrix-Mindestbeleg hinaus — volle Tabelle + Details:
-`../docs/concepts/P4_ABNAHME_2026-07-29.md`, Nachtrag 2026-07-30.
+**Dieses Dokument selbst liegt jetzt über dem 40KB-Softcap** (`docs/INDEX.md` zeigt ~44KB, vom
+📕-Regime der 📗-Docs ausgenommen laut Konvention nur, wenn es ein Snapshot ist — ist es nicht).
+**Bewusst nicht in diesem Commit komprimiert:** die Steps 0–6 sind laut ihrer eigenen Notiz
+(„settled, testgepinnt, nicht mehr Arbeitskontext") bereits verdichtungsreif, aber das ist reale
+Zusatzarbeit, kein Nebeneffekt des Schnitts — vorgemerkt für den P4→P5-Handover, nicht Teil
+dieses Auftrags.
 
-**Ergebnis: 14 von 16 Abnahmezeilen live bestanden** — Terminrisiko-Schwelle erreicht
-(„14/16 → 🟡 code-complete, P5 darf beginnen", Nikinger-Entscheidung 2026-07-28). `pytest -q` →
-**353/353 grün**. ✅ bleibt an Zeile 9 (Anleitung jetzt im Runbook oben) und Zeile 16 (nach dem
-Schnitt) hängen.
-
-**Dritter Nachtrag, selbe Session — Zeile 9 bestanden:** TTL-Drop-in, Reconnect, `create_item` →
-90s Pause → `append_to_item` ohne erneuten Login. DB-Gegenprobe (read-only): 14 `access_tokens`
-derselben `family_id`, Refresh **on-demand** exakt beim ersten Aufruf nach Ablauf, kein
-Hintergrund-Timer. **15/16 bestanden.** Details: `../docs/concepts/P4_ABNAHME_2026-07-29.md`,
-zweiter Nachtrag. TTL-Drop-in noch nicht entfernt (Runbook-Schritt 5 steht aus).
-
-**Einzig verbleibend: der Schnitt (Runbook-Schritt 8).** Danach Zeile 16, 16/16, ROADMAP.md ✅.
+**Nächster Schritt (konkret):** kein offener Code- oder Live-Punkt mehr in P4. Es fehlt nur noch
+der **formale** Phasenabschluss (Handover-Dokument P4→P5, analog `PHASE3_CLOSEOUT_HANDOVER.md`)
+— laut `docs/PROMPTS.md` ein eigener Prompt im Browser-Webchat, Sache des Nikingers. Dabei
+mitnehmen: diesen Kopf auf den Softcap komprimieren (siehe oben), `spaces.cred`/
+`export_space_map.py` aus der P4-Unit entfernen (siehe Runbook-Fund oben). Phase 3 bleibt bei
+🟡 stehen (nur Zeile 13, Restore-Nachweis, fehlt) — unverändert durch diese Session, nicht Teil
+ihres Auftrags.
 
