@@ -109,6 +109,7 @@ Bedarf nicht neu recherchiert werden muss:
 | 8a | **Befund S1** (2026-07-29): `ALLOWED_HOSTS` ohne `127.0.0.1` machte Runbook-Schritt 4 unausführbar — `local.env.example` + `install_units.sh`-Warnung + Runbook korrigiert, kein Servercode geändert | 7 | ✅ | 2 neu in `test_units.py` (in Zeile 8 mitgezählt) |
 | 8b | `phase4_auth/scripts/abnahme_run.sh` (2026-07-29) — automatisiert die acht maschinell prüfbaren Abnahmezeilen (1,2,3,10,11,12,13,16), spiegelt Aufbau/Redaktionsmuster von `phase3_edge/scripts/abnahme_run.sh` 1:1. Live gegen den echten Dienst probegelaufen (Zeilen 1/2/3/12 ok, 13/16 korrekt übersprungen, 10/11 korrekt übersprungen ohne echtes Passwort). Kein Ersatz für Zeilen 4–9/14/15 — eine curl-Nachbildung des Login-Formulars wäre eine zweite, ungetestete OAuth-Implementierung | 7 | ✅ | 0 (Runbook/Skript, gleiche Ausnahme wie `diagnose.sh`/`phase3_edge/scripts/abnahme_run.sh` — kein Unit-Test für ein Skript, das echten `systemd`/`journalctl`/Netzzugriff braucht) |
 | 8c | **Live-Fund 2026-07-30:** `routes.py :: _security_headers()` — `form-action` trug nur `'self'`, Chromium prüft es aber auch gegen das Redirect-Ziel einer Formular-Antwort (hier: `302` nach `https://claude.ai/...`) und blockierte Fabians Verbindung lautlos nach jedem erfolgreichen Login. Fix: `config.py :: AuthSettings.csp_form_action` (neue Property, hält den Seam `test_redirect_uri_allowed_is_the_only_matching_path` intakt), `form-action 'self' https://claude.ai https://claude.com`. Deployt (`sudo systemctl restart`), Fabian erneut verbunden — **live bestätigt**: vollständiger Selbsttest aller sechs Tools (siehe Zeile 14/15 unten) | 7 | ✅ | 1 neu in `test_routes.py` |
+| 8d | **Zeile 9 durchgeführt (2026-07-30):** `SPACE_OAUTH_ACCESS_TTL_S=60` via systemd-Drop-in, Connector neu verbunden, `create_item` → 90s Pause → `append_to_item`. DB-Gegenprobe (Claude Code, read-only): 14 `access_tokens`-Zeilen derselben `family_id`, Refresh **on-demand** exakt beim ersten Aufruf nach Ablauf, kein Hintergrund-Timer, kein neuer Login | 7 | ✅ | 0 (Live-Test, kein Code) |
 
 **Zeile 1, Step 0:** kritischer Fund — ein nie widerrufener Keyring-Token für einen dritten,
 seit P2-B2 umbenannten Space (`nikinger`), live und schreibfähig. Details, Zeitachse und
@@ -392,11 +393,10 @@ mit späteren `created_at`.
 **`429 rate_limited` beim Neuverbinden?** DCR-Bremse ist global, 20/h (Plan §2.7) — nach dem
 vielen Testen heute ggf. ausgereizt. Bis zur nächsten vollen Stunde warten, kein Bug.
 
-**Stand 2026-07-30: 14 von 16 live bestanden — 🟡-code-complete-Schwelle erreicht (Terminrisiko-
-Entscheidung 2026-07-28: „14/16 bestanden → P5 darf beginnen").** Protokoll mit Belegen:
-`../docs/concepts/P4_ABNAHME_2026-07-29.md` (Nachtrag 2026-07-30 für Zeilen 14/15). Offen: Zeile
-9 (Anleitung oben), Zeile 16 (strukturell erst nach dem Schnitt möglich — kein Terminrisiko,
-sondern Reihenfolge).
+**Stand 2026-07-30: 15 von 16 live bestanden — nur noch Zeile 16 offen, gebunden an den
+Schnitt.** Protokoll mit Belegen: `../docs/concepts/P4_ABNAHME_2026-07-29.md` (zwei Nachträge
+2026-07-30: Zeilen 14/15, dann Zeile 9). Der Schnitt (Runbook-Schritt 8) ist damit der einzige
+verbleibende Schritt vor dem vollen ✅-Status.
 
 **Abnahmematrix** (16 Zeilen, Protokoll nach P2/P3-Konvention — Belege statt Behauptungen):
 
@@ -518,4 +518,12 @@ vollständiges Sechs-Tool-Protokoll plus zwei Negativtests (`conflict`, `write_d
 („14/16 → 🟡 code-complete, P5 darf beginnen", Nikinger-Entscheidung 2026-07-28). `pytest -q` →
 **353/353 grün**. ✅ bleibt an Zeile 9 (Anleitung jetzt im Runbook oben) und Zeile 16 (nach dem
 Schnitt) hängen.
+
+**Dritter Nachtrag, selbe Session — Zeile 9 bestanden:** TTL-Drop-in, Reconnect, `create_item` →
+90s Pause → `append_to_item` ohne erneuten Login. DB-Gegenprobe (read-only): 14 `access_tokens`
+derselben `family_id`, Refresh **on-demand** exakt beim ersten Aufruf nach Ablauf, kein
+Hintergrund-Timer. **15/16 bestanden.** Details: `../docs/concepts/P4_ABNAHME_2026-07-29.md`,
+zweiter Nachtrag. TTL-Drop-in noch nicht entfernt (Runbook-Schritt 5 steht aus).
+
+**Einzig verbleibend: der Schnitt (Runbook-Schritt 8).** Danach Zeile 16, 16/16, ROADMAP.md ✅.
 
