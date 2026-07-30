@@ -180,7 +180,14 @@ Redirect-Ziel geprüft, nicht nur gegen das unmittelbare Formular-`action`. Root
 DevTools-Screenshot des Nikingers bestätigt, gefixt (`AuthSettings.csp_form_action`, `form-action
 'self' https://claude.ai https://claude.com`), Seam-Test `test_redirect_uri_allowed_is_the_only_
 matching_path` blieb dabei intakt. **Noch nicht auf `sharefyx-mcp` deployt** — braucht
-`systemctl restart`, dann Fabian erneut testen.**]** Step 0 (Haushalt, Drift, geerbte Abnahme), Step 1 (Gerüst, Konfiguration,
+`systemctl restart`, dann Fabian erneut testen.**]**
+**[2026-07-30, zweiter Nachtrag:** Fix deployt, Fabian mit einem Klick erfolgreich verbunden —
+er fuhr von sich aus ein vollständiges Sechs-Tool-Protokoll plus zwei Negativtests
+(Optimistic-Locking-`conflict`, Cross-Space-`write_denied`), alles bestanden. **14 von 16
+Abnahmezeilen live bestanden** — die im Runbook gelockte Terminrisiko-Schwelle ist erreicht:
+„14/16 bestanden → 🟡 code-complete, P5 darf beginnen" (Nikinger-Entscheidung 2026-07-28).
+Verbleibend: Zeile 9 (eigene Session), Zeile 16 (erst nach dem Schnitt). Details:
+`docs/concepts/P4_ABNAHME_2026-07-29.md`, Nachtrag 2026-07-30.**]** Step 0 (Haushalt, Drift, geerbte Abnahme), Step 1 (Gerüst, Konfiguration,
 Kryptobausteine), Step 2 (Passwörter, TOTP, Nutzerakten), Step 3 (Persistenz +
 Fehlversuchsbremse — Code-/Refresh-Replay-Tötung nach RFC 9700), Step 4 (Metadaten + dynamische
 Registrierung), Step 5 (Autorisierungsfluss — `/oauth/authorize`, `/oauth/token`,

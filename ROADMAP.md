@@ -123,12 +123,14 @@ nur Zeile 13 (Restore-Nachweis) fehlt noch für den Wechsel des Gesamtstatus auf
 
 **Mission:** Der Pfad-Token verschwindet.
 
-**Status 🟡 (2026-07-29, Live-Abnahme):** 12 von 16 Prüfungen live bestanden — Discovery, DCR,
-Consent, Token-Ausgabe, beide RFC-9700-Replay-Abwehren, Rule 4 unter echtem OAuth,
-Fehlversuchsbremse. Offen: Zeile 9 (Token-Ablauf/Auto-Refresh, nächste Session), Zeilen 14/15
-(brauchen Fabian, verabredet), Zeile 16 (erst nach dem Schnitt auf `SPACE_AUTH_MODE=oauth`).
-Protokoll: `docs/concepts/P4_ABNAHME_2026-07-29.md`. Sicherheits-Review (kein Auth-Bypass, kein
-Cross-Space-Leck) in `docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`.
+**Status 🟡 (2026-07-30, Live-Abnahme):** 14 von 16 Prüfungen live bestanden — Discovery, DCR,
+Consent, Token-Ausgabe, beide RFC-9700-Replay-Abwehren, Rule 4 unter echtem OAuth **und** einem
+zweiten, unabhängigen Nutzer (Fabian), Fehlversuchsbremse. Damit ist die im Runbook gelockte
+Terminrisiko-Schwelle erreicht — 14/16 → „code-complete, P5 darf beginnen"
+(Nikinger-Entscheidung 2026-07-28). Offen: Zeile 9 (Token-Ablauf/Auto-Refresh, eigene Session),
+Zeile 16 (erst nach dem Schnitt auf `SPACE_AUTH_MODE=oauth`). Protokoll:
+`docs/concepts/P4_ABNAHME_2026-07-29.md` (Nachtrag 2026-07-30). Sicherheits-Review (kein
+Auth-Bypass, kein Cross-Space-Leck) in `docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`.
 
 - **DRIN:** Protected Resource Metadata, Authorization Server, Dynamic Client Registration,
   PKCE, Token-Rotation. `[VERIFY]` Callback-URLs und unterstützte Auth-Spec-Version gegen die

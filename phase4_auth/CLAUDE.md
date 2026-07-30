@@ -108,7 +108,7 @@ Bedarf nicht neu recherchiert werden muss:
 | 8 | `phase4_auth/scripts/authctl.py` (+ `store.py :: list_clients`/`list_families`, `config.py :: resolve_db_path`); `phase4_auth/systemd/sharefyx-mcp.service` (`StateDirectory`, zweites Credential, `SPACE_AUTH_MODE`/`SPACE_PUBLIC_BASE_URL`); `install_units.sh`/`local.env.example` erweitert; `oauth_smoke.py --base-url` (echtes Netz) | 7 | 🟡 **Live-Abnahme läuft — 12/16 bestanden** (2026-07-29, Protokoll `docs/concepts/P4_ABNAHME_2026-07-29.md`); offen: Zeile 9 (nächste Session), 14/15 (Fabian, morgen), 16 (nach dem Schnitt) | 21 neu: 9 `test_authctl.py` (neue Datei) + 5 neu in `test_authserver_store.py` + 3 neu in `test_units.py` (`phase3_edge/tests/`, davon 2 aus S1) + 4 neu in `test_oauth_smoke.py` |
 | 8a | **Befund S1** (2026-07-29): `ALLOWED_HOSTS` ohne `127.0.0.1` machte Runbook-Schritt 4 unausführbar — `local.env.example` + `install_units.sh`-Warnung + Runbook korrigiert, kein Servercode geändert | 7 | ✅ | 2 neu in `test_units.py` (in Zeile 8 mitgezählt) |
 | 8b | `phase4_auth/scripts/abnahme_run.sh` (2026-07-29) — automatisiert die acht maschinell prüfbaren Abnahmezeilen (1,2,3,10,11,12,13,16), spiegelt Aufbau/Redaktionsmuster von `phase3_edge/scripts/abnahme_run.sh` 1:1. Live gegen den echten Dienst probegelaufen (Zeilen 1/2/3/12 ok, 13/16 korrekt übersprungen, 10/11 korrekt übersprungen ohne echtes Passwort). Kein Ersatz für Zeilen 4–9/14/15 — eine curl-Nachbildung des Login-Formulars wäre eine zweite, ungetestete OAuth-Implementierung | 7 | ✅ | 0 (Runbook/Skript, gleiche Ausnahme wie `diagnose.sh`/`phase3_edge/scripts/abnahme_run.sh` — kein Unit-Test für ein Skript, das echten `systemd`/`journalctl`/Netzzugriff braucht) |
-| 8c | **Live-Fund 2026-07-30:** `routes.py :: _security_headers()` — `form-action` trug nur `'self'`, Chromium prüft es aber auch gegen das Redirect-Ziel einer Formular-Antwort (hier: `302` nach `https://claude.ai/...`) und blockierte Fabians Verbindung lautlos nach jedem erfolgreichen Login. Fix: `config.py :: AuthSettings.csp_form_action` (neue Property, hält den Seam `test_redirect_uri_allowed_is_the_only_matching_path` intakt), `form-action 'self' https://claude.ai https://claude.com`. **Nicht auf `sharefyx-mcp` deployt** — braucht `sudo systemctl restart`, dann Fabian erneut testen lassen | 7 | 🟡 **code-fertig, nicht live geprüft** | 1 neu in `test_routes.py` |
+| 8c | **Live-Fund 2026-07-30:** `routes.py :: _security_headers()` — `form-action` trug nur `'self'`, Chromium prüft es aber auch gegen das Redirect-Ziel einer Formular-Antwort (hier: `302` nach `https://claude.ai/...`) und blockierte Fabians Verbindung lautlos nach jedem erfolgreichen Login. Fix: `config.py :: AuthSettings.csp_form_action` (neue Property, hält den Seam `test_redirect_uri_allowed_is_the_only_matching_path` intakt), `form-action 'self' https://claude.ai https://claude.com`. Deployt (`sudo systemctl restart`), Fabian erneut verbunden — **live bestätigt**: vollständiger Selbsttest aller sechs Tools (siehe Zeile 14/15 unten) | 7 | ✅ | 1 neu in `test_routes.py` |
 
 **Zeile 1, Step 0:** kritischer Fund — ein nie widerrufener Keyring-Token für einen dritten,
 seit P2-B2 umbenannten Space (`nikinger`), live und schreibfähig. Details, Zeitachse und
@@ -357,10 +357,11 @@ Kein `sudo` nötig — `/var/lib/sharefyx` gehört `savefyx`. Innerhalb des Dien
 systemd `$STATE_DIRECTORY` selbst (`StateDirectory=sharefyx`), deshalb tauchte das in keinem
 Test auf (`test_authctl.py` setzt `SPACE_AUTH_DB` direkt).
 
-**Stand 2026-07-29: 12 von 16 live bestanden.** Protokoll mit Belegen:
-`../docs/concepts/P4_ABNAHME_2026-07-29.md`. Offen: Zeile 9 (auf nächste Session vertagt, mit
-genauer Anleitung dann), Zeilen 14/15 (Fabian, verabredet für morgen), Zeile 16 (erst nach dem
-Schnitt möglich).
+**Stand 2026-07-30: 14 von 16 live bestanden — 🟡-code-complete-Schwelle erreicht (Terminrisiko-
+Entscheidung 2026-07-28: „14/16 bestanden → P5 darf beginnen").** Protokoll mit Belegen:
+`../docs/concepts/P4_ABNAHME_2026-07-29.md` (Nachtrag 2026-07-30 für Zeilen 14/15). Offen: Zeile
+9 (auf nächste Session vertagt, mit genauer Anleitung dann), Zeile 16 (strukturell erst nach
+dem Schnitt möglich — kein Terminrisiko, sondern Reihenfolge).
 
 **Abnahmematrix** (16 Zeilen, Protokoll nach P2/P3-Konvention — Belege statt Behauptungen):
 
@@ -471,4 +472,36 @@ End-to-End-Connect.
 verbinden lassen — dieses Mal nur **einmal** klicken und kurz warten. Danach `list_spaces`/einen
 Tool-Aufruf über Fabians Connector bestätigen (Zeile 14), dann Cross-Space-Schreibversuch gegen
 `niklas` (Zeile 15). Zeile 9 weiterhin offen (siehe voriger Block).
+
+**Nachtrag, selbe Session — CSP-Fix deployt, Zeilen 14/15 bestanden:** Restart durchgeführt,
+Fabian erneut verbunden — diesmal ein einziger Klick, sofortiger Erfolg. Fabian fuhr danach von
+sich aus ein vollständiges Sechs-Tool-Protokoll, deutlich über den Matrix-Mindestbeleg hinaus:
+
+| Tool | Ergebnis |
+|---|---|
+| `list_spaces` | `fabian` (writable), `niklas` (read-only) |
+| `search_items` | 2 aktive Items bei `niklas`, 6 mit `include_archived=true` |
+| `get_item` (fremd) | Body korrekt in `<untrusted_content>` gekapselt |
+| `create_item` | `itm_1156c679` im eigenen Space, `tags`/`status` übernommen |
+| `append_to_item` | `version: 1 → 2` |
+| `update_item` | archiviert, `version: 2 → 3` |
+
+Plus zwei selbst gewählte Negativtests: veraltete `version` beim Update → `conflict` mit
+Neu-Lese-Hinweis (Optimistic Locking), Archivierungsversuch auf einem `niklas`-Item →
+`write_denied` (Cross-Space-Schreibschutz). Beides architektonisch erwartet (P2/Rule 4), hier
+zum ersten Mal unter echtem OAuth **und** einem zweiten, unabhängigen Nutzer beobachtet — nicht
+nur unit-getestet.
+
+**Ergebnis: 14 von 16 Abnahmezeilen live bestanden.** Damit ist die im Runbook gelockte
+Terminrisiko-Schwelle erreicht — „14/16 bestanden → 🟡 code-complete, P5 darf beginnen"
+(Nikinger-Entscheidung 2026-07-28). ✅ (voll live-verifiziert) bleibt an Zeile 9 (nächste Session)
+und Zeile 16 (erst nach dem Schnitt) hängen. Protokoll-Nachtrag in
+`../docs/concepts/P4_ABNAHME_2026-07-29.md`.
+
+**Verifiziert:** `pytest -q` weiterhin **353/353 grün** (keine weitere Code-Änderung in diesem
+Nachtrag). Produktionsdienst lief nach dem einen `systemctl restart` durchgehend.
+
+**Nächster Schritt (konkret):** Zeile 9 in einer eigenen Session (TTL-Override, Neustart,
+Beobachtung über die echte Claude-UI — Anleitung dann schreiben). Danach Schnitt
+(Runbook-Schritt 8), Zeile 16, ✅-Status.
 
