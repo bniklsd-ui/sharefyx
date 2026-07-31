@@ -1,10 +1,10 @@
 ---
 status: live
-purpose: Archiv älterer Session-stopped-Blöcke aus phase4_auth/CLAUDE.md, newest-first, verbatim
-read-when: Audit vergangener Sessions dieser Phase; NICHT für normalen Session-Start
+purpose: Archiv älterer Session-stopped-Blöcke aus phase4_auth/CLAUDE.md (newest-first) plus die komprimierte Steps-0–6a-Detailnarrative, alles verbatim
+read-when: Audit vergangener Sessions/Steps dieser Phase; NICHT für normalen Session-Start
 detail: L3
 up: CLAUDE.md
-updated: 2026-07-30
+updated: 2026-07-31
 ---
 # Session-Archiv — Phase 4 OAuth 2.1 + DCR
 
@@ -12,7 +12,10 @@ Newest-first. Neun Rotationen bisher (Abschluss Step 3, dann Step 4, dann Step 5
 6a, dann Step 6b, dann die Step-7-Code-Vorbereitung, dann Befund S1 + Sicherheits-Review, dann
 die 12/16-Live-Abnahme, dann CSP-Fix + Zeilen 14/15 + Zeile 9 (15/16),
 2026-07-28/29/30) — via
-`scripts/rotate_session_block.sh phase4_auth`, nie von Hand.
+`scripts/rotate_session_block.sh phase4_auth`, nie von Hand. **Ans Ende angehängt (2026-07-31,
+kein Rotationslauf, kein Session-Block):** die Steps-0–6a-Detailnarrative aus dem Phase-Head,
+verschoben um den Kopf unter den 40KB-Softcap zu bringen — Details/Begründung im letzten
+Abschnitt dieser Datei.
 
 ## Session stopped — 2026-07-30 (Zeilen 14/15: Fabian-Login schlug fehl — Root Cause gefunden + gefixt, noch nicht deployt)
 
@@ -786,3 +789,162 @@ belegen), `now_fn` injiziert. Der Kern der Phase — Code-Replay/Refresh-Replay-
 
 ---
 
+## Steps 0–6a — Detailnarrative (aus dem Phase-Head komprimiert, 2026-07-31)
+
+**Verbatim aus `phase4_auth/CLAUDE.md`s „Modul-Status"-Abschnitt verschoben** (Nikinger-Auftrag,
+gleiche Rotationslogik wie bei den Session-Blöcken oben: nichts wird abgetippt, die
+Reassemblierung wurde gegen den Originalstand geprüft, bevor diese Datei geschrieben wurde). War
+dort seit Step 6a als „settled, testgepinnt, nicht mehr Arbeitskontext" markiert — dieser Move
+war der Grund, den Kopf unter den 40KB-Softcap zu bringen (`docs/INDEX.md`: jeder
+Softcap-Treffer muss 📕/📦 sein, nie 📗, `phase4_auth/CLAUDE.md` verletzte das mit ~44KB). Die
+Modul-Status-**Tabelle** (alle 16 Zeilen inkl. dieser hier beschriebenen Steps 0–6a) bleibt im
+Kopf stehen — nur die Prosa-Details darunter sind hierher gewandert.
+
+**Zeile 1, Step 0:** kritischer Fund — ein nie widerrufener Keyring-Token für einen dritten,
+seit P2-B2 umbenannten Space (`nikinger`), live und schreibfähig. Details, Zeitachse und
+Behebung (Keyring-Widerruf + Export + `systemctl restart`, beide Male live bestätigt):
+`docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md` §5 Nachträge. Übrige Autocompact-Drift-Funde aus dem
+Handover behoben (siehe dortiger Commit-Verlauf, nicht hier dupliziert). Geerbte P3-Abnahme:
+Zeile 12 (Backup-Timer) durch echten Lauf bestätigt, V13 (`diagnose.sh` vs. echtes Tailscale)
+geschlossen; Zeile 6 (Reboot) und Zeile 13 (Restore-Nachweis) bleiben bewusst offen.
+
+**Zeile 2, Step 1 (komprimiert 2026-07-28, Step 6a — settled, testgepinnt, nicht mehr
+Arbeitskontext):** `config.py`, `crypto.py` (PKCE gegen RFC-7636-Appendix-B), `errors.py`
+(`OAuthError`), `models.py` (Step 1 Platzhalter, seit Step 3 gefüllt). `argon2-cffi==25.1.0`
+exakt gepinnt. `.gitignore` um `*.sqlite3` erweitert (V21).
+
+**Zeile 4, Step 3 (komprimiert):** `models.py` gefüllt, `store.py`/`AuthStore` (volles Schema
+Plan §2.3), `ratelimit.py`/`LoginThrottle` (Eskalationsformel selbst festgelegt). `pytest -q` →
+244/244. Additive Methoden, nicht in der Plan-"fix"-Liste: `create_family`,
+`get_login_attempt`/`upsert_login_attempt`/`clear_login_attempt` (`ratelimit.py` führt kein
+eigenes SQL). `rotate_refresh(..., access_ttl_s, refresh_ttl_s)` nimmt die TTLs explizit entgegen
+statt sie aus dem Bestand abzuleiten — eine Ableitung crasht nach `purge_expired()` auf einer
+bereits gelöschten Access-Token-Zeile (kein Randfall). **Hält weiter:** `issue_token_pair` liest
+ohne `AND revoked_at IS NULL` — sicher, weil `lookup_access_token`s `revoked_at`-JOIN die
+Mission-Garantie trägt, nicht `issue_token_pair`; diesen JOIN nie als redundant vereinfachen.
+**Testdatei-Namenskollisionen** (gilt für den ganzen Baum, kein `--import-mode=importlib`): vor
+jeder neuen Testdatei `find . -name "test_<name>.py"` gegen den ganzen Baum prüfen, nicht nur
+gegen den Plan-Dateinamen — traf real zweimal zu (`test_config.py`→`test_authserver_config.py`,
+`test_store.py`→`test_authserver_store.py`).
+
+**Zeile 5, Step 4 (komprimiert):** `metadata.py` (PRM + AS-Metadaten), `clients.py` (DCR,
+`redirect_uri_allowed()` als `[SEAM]`), `routes.py` erste Hälfte (`.well-known`-Pfade,
+`/oauth/register`). Security-Header direkt in den Handlern statt Middleware (Routen werden der
+Wurzel-App vorangestellt, kein eigenes `Mount`). `pytest -q` → 260/260. Additive Funde: `errors.py
+:: DCRError`/`DCR_ERROR_CODES` bewusst getrennt von `OAuthError` (sonst erschienen
+`invalid_redirect_uri`/`invalid_client_metadata` fälschlich auch aus `/oauth/authorize`/
+`/oauth/token` als gültig); `store.py :: increment_register_window()` (stündliches Fenster, kein
+`reset()` — jede Registrierung zählt, unabhängig vom Ausgang); `test_authserver_does_not_
+import_mcpserver` fehlte trotz Zitat in P4-A/C seit Step 1, vier Steps lang unbelegt, jetzt
+geschlossen; `oauth_routes(auth_settings, auth_store)` zwei Parameter (Plan §3.3 ankert die
+Step-6-Form mit drei — erwartetes Wachstum, keine Drift); Content-Type-Prüfung läuft vor der
+Registrierungsbremse (falsch typisierte Anfrage verbraucht kein Kontingent, gepinnt).
+
+**Zeile 6, Step 5:** `flows.py` (neu, bewusst frei von jedem HTTP-Framework-Import — `start_
+authorize`/`submit_consent`/`issue_token` geben kleine eingefrorene Ergebnis-Typen zurück,
+`routes.py` übersetzt sie; sonst wäre der Fluss nur über HTTP testbar, siehe Modul-Docstring),
+`templates.py` (neu, Wegwerf-UI), `routes.py` vervollständigt um `GET`/`POST /oauth/authorize`
+und `POST /oauth/token`. `pytest -q` → **296/296 grün** (260 Vorlauf + 36 neue). SQL-Containment-
+und `redirect_uri_allowed`-Containment-Greps weiterhin sauber (Belege im Session-Block unten).
+
+**Additive Änderungen außerhalb der Step-5-Dateiliste:**
+- `store.py :: now()` — exponiert die injizierte `now_fn` des Stores, damit `ratelimit.
+  LoginThrottle` und `totp.verify()` in `flows.py` **dieselbe** Uhr benutzen statt eine zweite zu
+  injizieren (Advisor-Fund: ein eingefrorener Test-Clock im Store, aber echte Zeit anderswo,
+  wäre ein stiller Drift-Herd). `oauth_routes()` baut `LoginThrottle(auth_store, now_fn=auth_
+  store.now)` intern selbst — Plan §3.3 ankert weiterhin genau drei Parameter für Step 6
+  (`auth_settings, auth_store, users`), eine vierte `now_fn` wäre unnötig gewesen.
+- `store.py :: get_totp_counter()`/`set_totp_counter()` — die Tabelle `totp_replay` existiert
+  seit Step 3, aber ohne Zugriffsmethode (gleiches additives Muster wie `increment_register_
+  window` in Step 4). Zähler wird **nur** nach vollständigem Erfolg (Passwort UND TOTP)
+  hochgesetzt, nicht schon bei richtigem TOTP mit falschem Passwort — sonst könnte, wer einen
+  TOTP-Code beobachtet (z. B. über die Schulter), das aktuelle Zeitfenster des echten Nutzers
+  verbrennen, ohne selbst das Passwort zu kennen.
+- `totp.py :: verify()` gehärtet (Step 2 baute die Funktion, Step 5 fand die Lücke): ein
+  unbekannter `totp_alg` oder ein nicht valides Base32-`secret` aus einer kaputten Nutzerakte
+  warfen zuvor einen unbehandelten `ValueError` statt `None` zurückzugeben — ein 500 statt
+  "Anmeldung fehlgeschlagen." Jetzt spiegelt `verify()` `passwords.verify_password`s
+  Nie-wirft-Vertrag. Test: `test_verify_never_raises_on_malformed_secret_or_unknown_algo`
+  (`test_totp.py`).
+- `oauth_routes()` — dritter Parameter `users` jetzt gebaut (Plan §3.3 ankerte ihn bereits für
+  Step 6, siehe Abweichungsnotiz Step 4 oben), ohne Default — die beiden bestehenden Fixtures in
+  `test_clients.py`/`test_metadata.py` (`Starlette(routes=oauth_routes(settings, store))`)
+  entsprechend auf `oauth_routes(settings, store, {})` erweitert.
+- `_security_headers()`/`_token_headers()` getrennt: `Pragma: no-cache` steht in Plan §2.4 nur
+  beim Token-Endpunkt, nicht in der allgemeinen Header-Tabelle §2.6 — ein gemeinsames Set hätte
+  den Header auf die Metadatendokumente und das Consent-Formular mitgeschleift, wo er nicht
+  gefordert ist.
+- `RedirectError` trägt zusätzlich `error_description` (Plan §2.4: "Ab jetzt gehen Fehler als
+  Redirect mit `error`, `error_description`, `state` und `iss` zurück" — im ersten Entwurf
+  übersehen, im Advisor-Review dieser Session gefunden). Feste, statische Texte je Fehlercode
+  (`flows.py :: _ERROR_DESCRIPTIONS`), keine Unterscheidung nach Ursache innerhalb eines Codes.
+- `redirect_uri_allowed()` wird jetzt auch aus `start_authorize()` aufgerufen, nicht nur aus
+  `register_client()` (Plan §2.6: "Sie wird von `/oauth/register` **und** von `/oauth/authorize`
+  aufgerufen" — im ersten Entwurf ebenfalls übersehen, gleicher Advisor-Fund). Verteidigung in
+  der Tiefe: eine später verschärfte Allowlist muss auch längst registrierte Redirects neu
+  bewerten, nicht nur neue Registrierungen ablehnen.
+- POST-`/oauth/authorize`-Fehlschläge (falsches Passwort/TOTP, gesperrtes Konto, abgelaufene/
+  verbrauchte `AuthRequest`) rendern eine **Fehlerseite**, kein erneutes Formular — nur
+  `action == "deny"` erzeugt einen Redirect (`access_denied`). Das ist Plan-Wortlaut (§2.4:
+  "Fehlerseite", nicht "Formular erneut"), hier ausdrücklich benannt, weil es von der
+  intuitiveren "bei Fehlschlag Formular mit Meldung erneut zeigen" abweicht.
+- Enumerationsschutz: für einen unbekannten Space läuft ein echter Argon2id-Verify gegen
+  `passwords.DUMMY_HASH`, aber **kein** `totp.verify()`-Aufruf — Argon2id bei `t=8` (~55 ms)
+  dominiert die TOTP-HMAC-Prüfung um Größenordnungen, das Weglassen ist deshalb kein
+  Timing-Orakel (Advisor-Review, durch `test_wrong_password_and_unknown_space_give_identical_
+  response` mit Aufruf-Zähler statt Wanduhr-Messung belegt).
+
+**Zeile 7a, Step 6a:** `authserver/resolver.py` (`OAuthTokenResolver`, `ResolvedPrincipal`,
+`ResolveError` — erfüllt `mcpserver.auth.SpaceResolver` strukturell, ohne `mcpserver` zu
+importieren, Plan §1.3). `mcpserver/asgi.py`: `BearerAuthASGI` (Authorization-Header →
+`ResolvedPrincipal` → echter `Principal`), `AuthModeASGI` (P4-N-Weiche), `_credential_from_path`
+aus `TokenPathASGI` herausgezogen (geteilt mit `AuthModeASGI`s `both`-Dispatch, verhaltensgleich).
+`mcpserver/app.py`: `create_app(..., oauth: OAuthConfig | None = None)` — **ein** optionaler
+Parameter (Plan §3.3), root-`TrustedHostMiddleware` nur wenn `oauth is not None` **und**
+`allowed_hosts` gesetzt ist. `mcpserver/context.py` **unverändert** — siehe Fund unten.
+`mcpserver/config.py` geprüft und **unverändert gelassen**: Plan §1.2 listet es unter „GEÄNDERT:
+… neue Settings", real gebraucht wurde keine — `AuthSettings.mode`/TTLs/`base_url` decken alles
+ab, `Settings.allowed_hosts` existiert bereits seit P4-P für genau diesen Zweck. Kein erfundenes
+Feld, um die Plan-Dateiliste zu erfüllen (gleiche Regel wie `errors.py` in Step 5).
+`pytest -q` → **315/315 grün** (296 Vorlauf + 19 neue: 6 `test_resolver.py` + 13
+`test_asgi_bearer.py`). `test_app.py` explizit separat gegen den unveränderten Diff laufen
+lassen (`git diff --stat`, leer) — Bedingung für „`oauth=None` verhält sich exakt wie P3".
+
+**Fund statt Umsetzung — `context.py` brauchte keine Änderung:** Plan §3.2 kündigt an, der Guard
+solle „den `Authorization`-Header desselben Requests lesen und dessen `sha256` vergleichen".
+Real gebraucht wurde das nicht: `BearerAuthASGI` schreibt `token_hash` in **denselben**
+`scope["state"]`-Slot, mit **derselben** `sha256`-Funktion (`authserver.crypto.hash_secret` ==
+`credentials.hash_token`, byte-identisch), den `TokenPathASGI` bereits seit P2 benutzt —
+`assert_principal_matches_request()` liest diesen Slot bereits generisch, ganz ohne
+Moduswissen. Nicht nur behauptet: `test_bearer_token_reaches_a_real_tool_call` treibt ein
+echtes Bearer-Token durch den vollen Stack (`create_app()` → `AuthModeASGI` → `BearerAuthASGI` →
+FastMCP → `tools.py :: list_spaces` → der echte Guard) bis zu einem echten Tool-Ergebnis; wäre
+der Guard falsch verdrahtet, würde hier `AuthError` auftreten, nicht in einem Fake. Zweiter
+Advisor-Durchlauf dieser Session verlangte genau diesen Beweis — die erste Fassung hatte den
+Fund nur gegen einen Fake-Resolver (`test_valid_bearer_sets_principal_space`) und einen
+handgebauten Fake-Request (`test_guard_rejects_principal_from_other_request`) belegt, keiner
+von beiden lässt `scope["state"]` tatsächlich durch die echte FastMCP-App laufen.
+
+**Zweiter Advisor-Fund derselben Session:** `TrustedHostMiddleware` (P4-P) wurde von keinem Test
+tatsächlich instanziiert — die einzige bestehende Integrationsprobe hatte `allowed_hosts=()`,
+die Bedingung `hosts is not None` griff also nie. Nachgezogen:
+`test_trusted_host_middleware_protects_root_app_when_configured` — erlaubter Host → 200 auf
+`/health` **und** `/.well-known/oauth-protected-resource`, fremder Host → 400. Wichtig für Step 7:
+`/health` muss unter der Middleware weiter antworten, P3s Disconnected-Runbook hängt daran.
+
+**Notiz für Step 7 (nicht verteidigt, nur dokumentiert):** in `both`-Modus routet ein
+Pfad-Segment, das vorhanden aber **ungültig** ist, zu `TokenPathASGI` und bekommt ein blankes
+401 ohne `WWW-Authenticate` — ein Bearer-Client, der je einen Unterpfad von `/mcp/` anspricht,
+verliert den Discovery-Hinweis. Mit `path="/"` (Mount-Wurzel) und `stateless_http=True` sollte
+das unerreichbar sein; falls Step 7s Live-Abnahme das anders zeigt, ist das hier vorgemerkt,
+kein neuer Fund.
+
+**Split-Entscheidung (Advisor, vor der Umsetzung):** Step 6 ist laut Plan-Dateiliste deutlich
+größer als jeder vorige Step — `authserver/resolver.py` + Test, sechs geänderte
+`mcpserver`-Dateien, `oauth_smoke.py` (das eigentliche Phasenbeweis-Skript, RFC-9700-Replay
+inklusive), `request_log.py`/`logging_setup.py`-Erweiterung, zwei weitere Tests. Aufgeteilt in
+**6a** (dieser Commit: Resolver, `BearerAuthASGI`/`AuthModeASGI`, `create_app()`-Verdrahtung,
+zehn der zwölf Plan-Tests) und **6b** (nächste Session: Logging-Erweiterung, `oauth_smoke.py`,
+`scripts/serve.py`-Verdrahtung, die beiden verbleibenden Tests). Begründung: `oauth_smoke.py`
+ist der Beweis der ganzen Phase, kein Testhelfer — verdient eine eigene Session, keinen
+Seitenast eines bereits vollen Commits.
