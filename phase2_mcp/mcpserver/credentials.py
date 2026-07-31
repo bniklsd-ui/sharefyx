@@ -67,8 +67,14 @@ def credential_path() -> Path | None:
 
 def load_space_map() -> dict[str, str]:
     """Credentials-Verzeichnis zuerst (P3-F, `systemd LoadCredentialEncrypted`), Keyring als
-    Fallback. Das ist die Funktion, die der laufende Dienst (`auth.py :: KeyringTokenResolver`)
-    beim Auflösen eines Tokens benutzt."""
+    Fallback.
+
+    **[2026-07-31 Korrektur, P4 Schnitt]:** bis `TokenPathASGI` (P4 Step 7, Runbook-Schritt 8)
+    war dies die Funktion, die der laufende Dienst über `auth.py :: KeyringTokenResolver` beim
+    Auflösen eines Tokens pro Request benutzte. Seit dem Schnitt löst der Dienst ausschließlich
+    über OAuth-Bearer-Token auf (`authserver.resolver.OAuthTokenResolver`); `load_space_map()`
+    bleibt als eigenständiges Bestandswerkzeug bestehen (`issue_token.py`,
+    `export_space_map.py`), ist aber nicht mehr Teil des Live-Request-Pfads."""
     path = credential_path()
     if path is None:
         return load_space_map_from_keyring()

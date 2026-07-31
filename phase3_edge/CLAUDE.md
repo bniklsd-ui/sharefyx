@@ -151,12 +151,17 @@ dieselbe Reihenfolge:
    `systemctl restart` vergessen hat (P3-M)?
 
 **[2026-07-29 Ergänzung, P4-Befund S1]:** Prüfung 2 (`curl -sf http://127.0.0.1:8765/health`)
-schlägt unter `SPACE_AUTH_MODE=both|oauth` auch dann fehl, wenn der Dienst völlig gesund ist —
-nämlich wenn `SPACE_ALLOWED_HOSTS` kein `127.0.0.1` enthält (`400 Invalid host header` aus dem
-Wurzel-`TrustedHostMiddleware`, das `create_app()` ab P4 zusätzlich über die Wurzel-App legt).
-Die Diagnose „Dienst läuft, antwortet aber nicht lokal" ist dann falsch. Gegenprobe:
-`curl -s -H 'Host: <node>.<tailnet>.ts.net' http://127.0.0.1:8765/health` — kommt `200`, ist es
-S1 und nicht der Dienst. Details: `../docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`.
+schlägt auch dann fehl, wenn der Dienst völlig gesund ist — nämlich wenn `SPACE_ALLOWED_HOSTS`
+kein `127.0.0.1` enthält (`400 Invalid host header` aus dem Wurzel-`TrustedHostMiddleware`, das
+`create_app()` ab P4 über die Wurzel-App legt). Die Diagnose „Dienst läuft, antwortet aber nicht
+lokal" ist dann falsch. Gegenprobe: `curl -s -H 'Host: <node>.<tailnet>.ts.net'
+http://127.0.0.1:8765/health` — kommt `200`, ist es S1 und nicht der Dienst. Details:
+`../docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`.
+**[2026-07-31 Korrektur, P4 Schnitt]:** ursprünglich stand hier „unter `SPACE_AUTH_MODE=both|
+oauth`" — seit dem Schnitt (`TokenPathASGI`/`AuthModeASGI` entfernt, `phase4_auth/CLAUDE.md`)
+ist `create_app()` immer im OAuth-Modus, die Middleware also unconditional aktiv. Der
+Mode-Qualifier ist damit gegenstandslos, nicht nur veraltet — entfernt statt stehen gelassen,
+weil dies ein aktiv gelesenes Diagnose-Runbook ist, kein Snapshot.
 
 **V13 geschlossen (2026-07-28, P4 Step 0):** `diagnose.sh` einmal komplett gegen das reale
 `tailscale funnel status` gelaufen lassen — alle sechs Prüfungen grün, Schritt 4s Grep-Muster

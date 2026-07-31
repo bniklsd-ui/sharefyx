@@ -120,11 +120,15 @@ def test_install_script_refuses_without_local_env(tmp_path):
 
 
 def test_install_script_warns_when_allowed_hosts_lacks_loopback(tmp_path):
-    """P4 Step 7 (2026-07-29): ohne `127.0.0.1` in `ALLOWED_HOSTS` antwortet der Dienst unter
-    `AUTH_MODE=both|oauth` auf **jede** lokale Anfrage mit `400 Invalid host header` — das
-    `TrustedHostMiddleware` der Wurzel-App bekommt genau diese Liste (`mcpserver/app.py ::
-    create_app()`). Genau daran scheiterte Runbook-Schritt 4 (`oauth_smoke.py --base-url
-    http://127.0.0.1:8765` → 4/4 Prüfungen mit `status=400`) live beim Nikinger.
+    """P4 Step 7 (2026-07-29): ohne `127.0.0.1` in `ALLOWED_HOSTS` antwortet der Dienst auf
+    **jede** lokale Anfrage mit `400 Invalid host header` — das `TrustedHostMiddleware` der
+    Wurzel-App bekommt genau diese Liste (`mcpserver/app.py :: create_app()`). Genau daran
+    scheiterte Runbook-Schritt 4 (`oauth_smoke.py --base-url http://127.0.0.1:8765` → 4/4
+    Prüfungen mit `status=400`) live beim Nikinger. **[2026-07-31, P4 Schnitt]:** ursprünglich
+    stand hier „unter `AUTH_MODE=both|oauth`" — seit `TokenPathASGI`/`AuthModeASGI` entfernt sind
+    (`phase4_auth/CLAUDE.md`), ist die Middleware unconditional aktiv, der Mode-Qualifier war nur
+    noch für den Fixture-Wert unten (`AUTH_MODE=both`) relevant, den `install_units.sh` selbst
+    unverändert nur als Platzhalterwert behandelt (kein Python-seitiges `_VALID_MODES`).
 
     Hermetisch wie der Test darüber: die `local.env` lässt `PUBLIC_BASE_URL` weg, damit das
     Skript nach der Warnung am Pflichtfeld-Check abbricht — die Warnung ist damit belegt, ohne
