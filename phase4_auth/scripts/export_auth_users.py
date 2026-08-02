@@ -3,9 +3,10 @@
 `systemd-creds encrypt --name=auth-users - /etc/sharefyx/auth-users.cred` (Plan §2.5). Kein
 Schreibzugriff, keine Datei, kein `--out`.
 
-**Ausgabe enthält TOTP-Seeds im Klartext.** Nur in eine Pipe, nie in eine Datei — anders als
-`phase3_edge/scripts/export_space_map.py` (P3), das nur Token-Hashes exportiert, ist dieser
-Export ein echtes, umkehrbares Geheimnis.
+**Ausgabe enthält TOTP-Seeds im Klartext.** Nur in eine Pipe, nie in eine Datei — anders als das
+frühere `phase3_edge/scripts/export_space_map.py` (P3, nur Token-Hashes exportiert, seit dem
+P5-Rückbau gelöscht, `docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md` §4.5), ist dieser Export ein
+echtes, umkehrbares Geheimnis.
 """
 from __future__ import annotations
 

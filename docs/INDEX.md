@@ -31,7 +31,8 @@ updated: 2026-08-02
 
 ## Active phase (5 — Web-UI, REST-API, Auth-Selbstverwaltung)
 
-- [phase5_ui/CLAUDE.md](../phase5_ui/CLAUDE.md) — 🔄 ~12KB · phase head; Step 0 ✅ (Haushalt, Rückbau P2-Token-Reste, Doku-Drift, P3-Restore-Nachweis live geschlossen); read + newest Session-stopped block first
+- [phase5_ui/CLAUDE.md](../phase5_ui/CLAUDE.md) — 🔄 ~14KB · phase head; Step 0 🟡 (A.1–A.6 Rückbau + Doku-Drift ✅ code-seitig, A.7 Nikinger-Restart offen); read + newest Session-stopped block first
+- [phase5_ui/SESSIONS_ARCHIVE.md](../phase5_ui/SESSIONS_ARCHIVE.md) — 📦 ~0.5KB · noch leer, angelegt für die erste Rotation
 - [docs/concepts/phase5_ui_plan.md](./concepts/phase5_ui_plan.md) — 📕 ~80KB · ausführungsreifer P5-Plan: Entscheidungen P5-A–P5-AE, Steps 0–9 (Block A Sicherheit/Selbstverwaltung, Block B REST-API/UI), Designsystem, Abnahmematrix 1–20, [VERIFY]-Register V27–V38; über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
 
 ## Completed phases
@@ -43,7 +44,7 @@ updated: 2026-08-02
 - [docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md](./concepts/P4_SECURITY_REVIEW_2026-07-29.md) — 📕 ~13KB · Sicherheits-Review P3+P4 vor der Live-Abnahme: Befund S1 (`ALLOWED_HOSTS` ohne `127.0.0.1` → `400 Invalid host header`, machte Runbook-Schritt 4 unausführbar, behoben) plus S2–S8/O1 offen, **und** 15 ausdrücklich geprüfte, in Ordnung befundene Punkte (verified negatives) — vor jedem Fix an einem der Befunde lesen
 - [docs/concepts/phase4_auth_plan.md](./concepts/phase4_auth_plan.md) — 📕 ~76KB · ausführungsreifer P4-Plan (Entscheidungen P4-A–P4-R, Steps 0–7, eigener Authorization Server, Argon2id + TOTP, opake Token); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen; Autor Browser-Planungssession 2026-07-28, **ohne frischen Repo-Zugriff geschrieben** — Anker sind Funktionsnamen/Suchstrings, keine Zeilennummern
 - [phase4_auth/SESSIONS_ARCHIVE.md](../phase4_auth/SESSIONS_ARCHIVE.md) — 📦 ~73KB · neun archivierte Session-Blöcke (Step 0+1+2, Step 3, V14+Step 4, Step 5, Step 6a, Step 6b, Step-7-Code-Vorbereitung, Befund S1+Sicherheits-Review+12/16-Abnahme, CSP-Fix+Zeilen 14/15+Zeile 9/15/16) plus die komprimierte Steps-0–6a-Detailnarrative (2026-07-31, keine Session-Rotation, eigener Abschnitt), verbatim, newest-first
-- [phase3_edge/CLAUDE.md](../phase3_edge/CLAUDE.md) — 📗 ~20KB · phase head; alle 8 Steps ✅ — **13/13 Abnahmezeilen live bestanden, Phase 3 ✅** (Zeile 13/Restore-Nachweis am 2026-08-02 geschlossen, Zeilen 6/12 bereits zuvor); **[P4 Step 7]** MCP-Unit liegt in `phase4_auth/systemd/`; read + newest Session-stopped block first
+- [phase3_edge/CLAUDE.md](../phase3_edge/CLAUDE.md) — 📗 ~21KB · phase head; alle 8 Steps ✅, Live-Abnahme 🟡 — **12/13 Abnahmezeilen live bestanden**, Zeile 13 (Restore-Nachweis) am 2026-08-02 von Claude Code kandidiert (`ok:true`), Nikinger-Bestätigung aussteht; **[P4 Step 7]** MCP-Unit liegt in `phase4_auth/systemd/`; read + newest Session-stopped block first
 - [docs/concepts/phase3_edge_plan.md](./concepts/phase3_edge_plan.md) — 📕 ~46KB · ausführungsreifer P3-Plan (Entscheidungen P3-A–P3-N, Steps 0–7); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
 - [phase3_edge/SESSIONS_ARCHIVE.md](../phase3_edge/SESSIONS_ARCHIVE.md) — 📦 ~55KB · elf archivierte Session-Blöcke (Step 0–6, inkl. Live-Abnahme-Funde B3/B4, beide Live-Abnahme-Sessions vom 2026-07-27, Token-Rotation-Session vom 2026-07-28, Zeile-6-Reboot-Session vom 2026-07-29), verbatim, newest-first
 - [docs/concepts/P3_ABNAHME_2026-07-27.md](./concepts/P3_ABNAHME_2026-07-27.md) — 📕 ~19KB · Abnahmeprotokoll Phase 3: 10/13 live bestanden, Zeilen 6/12/13 per Nikinger-Entscheidung auf nächste Phase verschoben, CLI-Ausschnitt als Beleg, Befunde B5/B6

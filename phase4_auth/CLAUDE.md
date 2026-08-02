@@ -455,3 +455,20 @@ Browser-Webchat, Sache des Nikingers. Dabei mitnehmen: `spaces.cred`/`export_spa
 der P4-Unit entfernen (siehe Runbook-Fund oben). Phase 3 bleibt bei 🟡 stehen (nur Zeile 13,
 Restore-Nachweis, fehlt) — unverändert durch diese Session, nicht Teil ihres Auftrags.
 
+**Dritter Nachtrag, 2026-08-02 (P5 Step 0 A — Rückbau vollzogen, mehrere Stellen oben jetzt
+historisch):** der formale Phasenabschluss ist erledigt (`docs/concepts/
+PHASE4_CLOSEOUT_HANDOVER.md`, P5-Planungssession), und der „Fund, nicht behoben" oben
+(`spaces.cred`/`export_space_map.py` als totes Gewicht) ist geschlossen: beide Skripte
+(`phase2_mcp/scripts/issue_token.py`, `phase3_edge/scripts/export_space_map.py`) sind gelöscht,
+die `LoadCredentialEncrypted=spaces:…`-Zeile ist aus der Unit entfernt, `credentials.py` ist auf
+`hash_token()` reduziert (`auth.py :: KeyringTokenResolver` mit entfernt). Konsequenz für diesen
+Kopf: **die Runbook-Schritte 3/4 im „Schnitt"-Codeblock oben** (`issue_token.py --revoke`,
+`export_space_map.py | systemd-creds encrypt`) beschreiben ausschließlich, was am 2026-07-30
+tatsächlich lief — nicht mehr, was heute ausführbar wäre, beide Skripte existieren nicht mehr.
+Ebenso ist die Aussage „`load_space_map()` bleibt nur Bestandswerkzeug" (Nachtrag oben) durch den
+Rückbau überholt: die Funktion selbst ist entfernt, nicht nur ihr Docstring korrigiert. Beide
+Stellen bleiben als historischer Nachweis stehen (Prinzip wie im Rest dieses Kopfs: Session-Blöcke
+werden nicht rückwirkend umgeschrieben), diese Notiz macht die Drift nachvollziehbar. Details,
+Testzahlen und die (noch offene) Nikinger-Aktion A.7: `phase5_ui/CLAUDE.md` Session-Block
+2026-08-02.
+

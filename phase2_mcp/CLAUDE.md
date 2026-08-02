@@ -177,7 +177,16 @@ Bearer-vs-Pfad-Token-Vergleichstests aus P4 Step 6a/6b haben keinen Vergleichspa
 Reale Zahl wieder per `pytest --collect-only -q` je Datei neu gezählt, nicht aus der alten Summe
 heruntergerechnet.
 
-**Gesamt: 94 Tests** in `phase2_mcp/tests/` (6 `test_config.py` + 12 `test_credentials.py` + 4
+**[2026-08-02 Korrektur, P5 Step 0 A]:** die Zeile unten trug noch 94 mit
+`12 test_credentials.py + 4 test_auth.py` — der P5-Rückbau (`docs/concepts/
+PHASE4_CLOSEOUT_HANDOVER.md` §4.5) hat `issue_token.py`/`export_space_map.py`/
+`KeyringTokenResolver` entfernt und damit `test_credentials.py` auf 1 (nur `test_hash_token_
+is_stable_hex64`) und `test_auth.py` auf 1 (nur `test_principal_repr_hides_token`) gekürzt.
+Reale Zahl: **80**, nicht 94 — vierte Instanz derselben Drift-Kategorie, die diese Zeile schon
+dreimal betraf (siehe die drei Korrekturen oben), diesmal aber im selben Commit korrigiert statt
+erst später gefunden.
+
+**Gesamt: 80 Tests** in `phase2_mcp/tests/` (6 `test_config.py` + 1 `test_credentials.py` + 1
 `test_auth.py` + 3 `test_permissions.py` + 8 `test_logging.py` + 2 `test_context.py` + 10
 `test_app.py` + 23 `test_tools.py` + 3 `test_mcp_smoke.py` + 11 `test_request_log.py` + 10
 `test_asgi_bearer.py` [seit dem Schnitt: nur noch `BearerAuthASGI`, kein `TokenPathASGI`/

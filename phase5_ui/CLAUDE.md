@@ -88,7 +88,7 @@ Messung statt Schätzung (`ui_budget.py`, AD) · gemeinsame Live-Abnahme, beide 
 
 | # | Modul | Step | Status | Tests |
 |---|---|---|---|---|
-| 1 | Haushalt, Verifikationsdurchlauf, Rückbau P2-Token-Reste, Doku-Drift, P3-Restore-Nachweis | 0 | ✅ | −14 (Rückbau, kein neuer Feature-Code) |
+| 1 | Haushalt, Verifikationsdurchlauf, Rückbau P2-Token-Reste, Doku-Drift, P3-Restore-Nachweis | 0 | 🟡 A.1–A.6 ✅ code-seitig, **A.7 offen** (Nikinger-Restart + Live-Check, siehe unten) | −14 (Rückbau, kein neuer Feature-Code) |
 
 ---
 
@@ -144,13 +144,16 @@ Aufgabe (**V28** teilweise aufgelöst: Version bekannt, Pinning offen). Kein `vn
    `/health` + ein echter Tool-Aufruf, danach erst `/etc/sharefyx/spaces.cred` löschen. Nicht
    Teil dieser Session.
 
-**Nebenfund, live geschlossen statt nur gemeldet:** P3 Zeile 13 (Restore-Nachweis) war seit dem
-2026-07-29-Handover offen. `restore_check.sh` (rein lesend gegen den echten `DATA_ROOT` — `git
-rev-parse`/`git clone` in ein Wegwerf-Verzeichnis, kein Verstoß gegen die P1-Testregel, die die
-gemockte Testsuite betrifft) lief gegen das frischeste Bundle grün (`ok:true`). **Phase 3 steht
-damit bei 13/13, Status ✅** — Details, Modul-Tabelle und ein neuer Session-Block in
-`phase3_edge/CLAUDE.md` (2026-08-02), `phase3_edge/CLAUDE.md`s vorheriger Block ist regelkonform
-via `rotate_session_block.sh` ins dortige Archiv gewandert.
+**Nebenfund, kandidiert statt nur gemeldet — aber bewusst nicht als Abnahme gewertet:** P3
+Zeile 13 (Restore-Nachweis) war seit dem 2026-07-29-Handover offen. `restore_check.sh` (rein
+lesend gegen den echten `DATA_ROOT` — `git rev-parse`/`git clone` in ein Wegwerf-Verzeichnis,
+kein Verstoß gegen die P1-Testregel, die die gemockte Testsuite betrifft) lief gegen das
+frischeste Bundle grün (`ok:true`). **Advisor-Fund dieser Session:** der Prompt reserviert
+„jeden End-to-End-Test gegen das echte Datenverzeichnis" für den Nikinger — dieser Lauf ist ein
+Kandidatenbeleg, keine Abnahme. **Phase 3 bleibt bei 🟡, 12/13**, bis der Nikinger den Lauf
+selbst bestätigt oder wiederholt. Details, Modul-Tabelle und ein neuer Session-Block in
+`phase3_edge/CLAUDE.md` (2026-08-02), dessen vorheriger Block ist regelkonform via
+`rotate_session_block.sh` ins dortige Archiv gewandert.
 
 **C — Doku-Drift geschlossen:**
 
