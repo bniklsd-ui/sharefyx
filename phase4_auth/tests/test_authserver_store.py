@@ -113,7 +113,7 @@ def test_refresh_rotation_returns_new_pair(store):
     family_id = _family(store)
     access, refresh = store.issue_token_pair(family_id, access_ttl_s=3600, refresh_ttl_s=2_592_000)
 
-    result = store.rotate_refresh(refresh, access_ttl_s=3600, refresh_ttl_s=2_592_000)
+    result = store.rotate_refresh(refresh, client_id="c1", access_ttl_s=3600, refresh_ttl_s=2_592_000)
     assert result is not None
     new_access, new_refresh = result
     assert new_access != access
@@ -121,15 +121,42 @@ def test_refresh_rotation_returns_new_pair(store):
     assert store.lookup_access_token(new_access) is not None
 
 
+def test_refresh_rejects_wrong_client_id(store):
+    """S2 (Sicherheits-Review 2026-07-29): RFC 6749 §6/RFC 9700 verlangen eine
+    Client-Identifikation auch beim Refresh — `rotate_refresh()` prüfte `client_id` bisher gar
+    nicht."""
+    family_id = _family(store)  # client_id="c1"
+    _access, refresh = store.issue_token_pair(family_id, access_ttl_s=3600, refresh_ttl_s=2_592_000)
+
+    result = store.rotate_refresh(
+        refresh, client_id="other-client", access_ttl_s=3600, refresh_ttl_s=2_592_000
+    )
+    assert result is None
+
+
+def test_refresh_wrong_client_id_does_not_revoke_family(store):
+    """Die wichtigere Hälfte von S2 (Plan-Wortlaut): ein falscher `client_id` ist kein Replay —
+    die Familie muss intakt bleiben, sonst wird der neue Check selbst zu einem Fernauslöser, der
+    eine fremde, legitime Familie töten kann."""
+    family_id = _family(store)  # client_id="c1"
+    _access, refresh = store.issue_token_pair(family_id, access_ttl_s=3600, refresh_ttl_s=2_592_000)
+
+    store.rotate_refresh(refresh, client_id="other-client", access_ttl_s=3600, refresh_ttl_s=2_592_000)
+
+    # Die Familie lebt weiter — der ECHTE Client kann noch normal rotieren.
+    result = store.rotate_refresh(refresh, client_id="c1", access_ttl_s=3600, refresh_ttl_s=2_592_000)
+    assert result is not None
+
+
 def test_reused_refresh_reports_replay(store):
     family_id = _family(store)
     _access, refresh = store.issue_token_pair(family_id, access_ttl_s=3600, refresh_ttl_s=2_592_000)
 
-    first = store.rotate_refresh(refresh, access_ttl_s=3600, refresh_ttl_s=2_592_000)
+    first = store.rotate_refresh(refresh, client_id="c1", access_ttl_s=3600, refresh_ttl_s=2_592_000)
     assert first is not None
     new_access, _new_refresh = first
 
-    replay_result = store.rotate_refresh(refresh, access_ttl_s=3600, refresh_ttl_s=2_592_000)
+    replay_result = store.rotate_refresh(refresh, client_id="c1", access_ttl_s=3600, refresh_ttl_s=2_592_000)
     assert replay_result is None
     # Familie ist jetzt tot — auch der frisch rotierte Access-Token ist weg.
     assert store.lookup_access_token(new_access) is None
@@ -142,7 +169,7 @@ def test_revoke_family_kills_access_and_refresh_tokens(store):
     killed = store.revoke_family(family_id, "operator")
     assert killed == 2
     assert store.lookup_access_token(access) is None
-    assert store.rotate_refresh(refresh, access_ttl_s=3600, refresh_ttl_s=2_592_000) is None
+    assert store.rotate_refresh(refresh, client_id="c1", access_ttl_s=3600, refresh_ttl_s=2_592_000) is None
 
 
 def test_list_clients_returns_all_registered_clients(store):
@@ -247,7 +274,7 @@ def test_purge_expired_leaves_valid_rows(store, clock):
     assert counts["refresh_tokens"] == 0
 
     assert store.consume_auth_request(request_id) is None  # bereits weg, nicht nur abgelaufen
-    assert store.rotate_refresh(refresh, access_ttl_s=60, refresh_ttl_s=120) is not None
+    assert store.rotate_refresh(refresh, client_id="c1", access_ttl_s=60, refresh_ttl_s=120) is not None
 
 
 def test_rotate_refresh_after_access_token_purged(store, clock):
@@ -260,5 +287,5 @@ def test_rotate_refresh_after_access_token_purged(store, clock):
     _access, refresh = store.issue_token_pair(family_id, access_ttl_s=60, refresh_ttl_s=2_592_000)
     clock.advance(120)
     store.purge_expired()  # löscht die abgelaufene access_tokens-Zeile
-    result = store.rotate_refresh(refresh, access_ttl_s=3600, refresh_ttl_s=2_592_000)
+    result = store.rotate_refresh(refresh, client_id="c1", access_ttl_s=3600, refresh_ttl_s=2_592_000)
     assert result is not None

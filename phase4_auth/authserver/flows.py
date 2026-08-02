@@ -170,15 +170,23 @@ def submit_consent(
     # TOTP-HMAC-Prüfung um Größenordnungen, das Weglassen ist deshalb kein Timing-Orakel
     # (Advisor-Review dieser Session). Beide Ergebnisse werden trotzdem erst am Ende verknüpft,
     # kein früher `return`.
+    # S6 (Sicherheits-Review 2026-07-29): `record["pwd"]`/`record["totp"]` per Index brach den
+    # eigenen "wirft nie"-Vertrag von `verify_password()`/`totp.verify()` — ein unvollständiger
+    # Datensatz (halb geschriebene `auth-users.cred`, von Hand editierter Keyring-Eintrag) ergab
+    # einen `KeyError` -> HTTP 500 statt der generischen Meldung, und zwar nur für EXISTIERENDE
+    # Spaces — genau das Enumerations-Orakel, das der umgebende Code verhindern soll.
+    # `UserDirectory.get() -> UserRecord | None` (Plan §2.1) ersetzt diesen Zugriff strukturell
+    # erst in Step 2 (`authserver/userdir.py` existiert noch nicht); bis dahin gilt hier die vom
+    # Review selbst vorgeschlagene Fix-Skizze direkt auf dem aktuellen `Mapping`-Zugriff.
     record = users.get(space)
-    stored_hash = record["pwd"] if record is not None else passwords.DUMMY_HASH
+    stored_hash = (record.get("pwd") if record is not None else None) or passwords.DUMMY_HASH
     password_ok = passwords.verify_password(stored_hash, password)
 
     totp_ok = False
     accepted_counter: int | None = None
     if record is not None:
         accepted_counter = totp.verify(
-            record["totp"],
+            record.get("totp", ""),
             totp_code,
             now=now_fn().timestamp(),
             last_counter=store.get_totp_counter(space),
@@ -247,10 +255,11 @@ def issue_token(
             auth_code.family_id, access_ttl_s=settings.access_ttl_s, refresh_ttl_s=settings.refresh_ttl_s,
         )
     elif grant_type == "refresh_token":
-        if not refresh_token:
+        if not refresh_token or not client_id:
             raise OAuthError("invalid_request")
         pair = store.rotate_refresh(
-            refresh_token, access_ttl_s=settings.access_ttl_s, refresh_ttl_s=settings.refresh_ttl_s,
+            refresh_token, client_id=client_id,
+            access_ttl_s=settings.access_ttl_s, refresh_ttl_s=settings.refresh_ttl_s,
         )
         if pair is None:
             raise OAuthError("invalid_grant")

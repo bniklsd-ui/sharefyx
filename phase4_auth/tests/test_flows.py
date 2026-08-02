@@ -201,6 +201,46 @@ def test_wrong_password_and_unknown_space_give_identical_response(
     assert len(calls) == 2  # verify_password lief in BEIDEN Fällen — kein Timing-Orakel
 
 
+def test_broken_user_record_yields_generic_login_failure(store, settings, throttle, clock, client):
+    """S6: ein unvollständiger Datensatz (fehlendes `pwd`/`totp`-Feld — halb geschriebene
+    `auth-users.cred`, von Hand editierter Keyring-Eintrag) darf keinen `KeyError` werfen,
+    sondern muss dieselbe generische Fehlermeldung liefern wie ein falsches Passwort."""
+    broken_users = {SPACE: {}}  # weder "pwd" noch "totp"
+    request_id = _pending_request_id(store, settings, client)
+    result = flows.submit_consent(
+        store=store, settings=settings, users=broken_users, throttle=throttle, now_fn=clock,
+        request_id=request_id, space=SPACE, password="whatever", totp_code="000000",
+        action="allow",
+    )
+    assert isinstance(result, flows.ErrorPage)
+    assert result.message == "Anmeldung fehlgeschlagen."
+
+
+def test_unknown_space_and_broken_record_are_indistinguishable(
+    store, settings, throttle, clock, client
+):
+    """S6, Enumerationsschutz: ein Space mit kaputtem Datensatz darf sich von einem gar nicht
+    existierenden Space nicht unterscheiden lassen — beide Wege müssen exakt dasselbe
+    `ErrorPage` liefern."""
+    broken_users = {SPACE: {}}
+
+    request_id_broken = _pending_request_id(store, settings, client)
+    result_broken = flows.submit_consent(
+        store=store, settings=settings, users=broken_users, throttle=throttle, now_fn=clock,
+        request_id=request_id_broken, space=SPACE, password="whatever", totp_code="000000",
+        action="allow",
+    )
+
+    request_id_unknown = _pending_request_id(store, settings, client)
+    result_unknown = flows.submit_consent(
+        store=store, settings=settings, users={}, throttle=throttle, now_fn=clock,
+        request_id=request_id_unknown, space="ghost-space", password="whatever",
+        totp_code="000000", action="allow",
+    )
+
+    assert result_broken == result_unknown
+
+
 def test_login_failure_increments_throttle(store, settings, users, throttle, clock, client):
     request_id = _pending_request_id(store, settings, client)
     flows.submit_consent(
@@ -361,7 +401,7 @@ def test_refresh_rotates_and_returns_new_refresh(store, settings, users, throttl
     )
     second = flows.issue_token(
         store=store, settings=settings, grant_type="refresh_token",
-        refresh_token=first.refresh_token,
+        refresh_token=first.refresh_token, client_id=client.client_id,
     )
     assert second.access_token != first.access_token
     assert second.refresh_token != first.refresh_token
@@ -375,15 +415,31 @@ def test_refresh_replay_revokes_family(store, settings, users, throttle, clock, 
     )
     second = flows.issue_token(
         store=store, settings=settings, grant_type="refresh_token",
-        refresh_token=first.refresh_token,
+        refresh_token=first.refresh_token, client_id=client.client_id,
     )
     with pytest.raises(OAuthError) as exc_info:
         flows.issue_token(
             store=store, settings=settings, grant_type="refresh_token",
-            refresh_token=first.refresh_token,
+            refresh_token=first.refresh_token, client_id=client.client_id,
         )
     assert exc_info.value.code == "invalid_grant"
     assert store.lookup_access_token(second.access_token) is None
+
+
+def test_refresh_rejects_wrong_client_id(store, settings, users, throttle, clock, client):
+    """S2: `flows.issue_token()` reicht `client_id` an `rotate_refresh()` durch — ein zweiter,
+    per DCR registrierter Client darf ein fremdes Refresh-Token nicht einlösen."""
+    code = _issue_code(store, settings, users, throttle, clock, client)
+    first = flows.issue_token(
+        store=store, settings=settings, grant_type="authorization_code",
+        code=code, redirect_uri=REDIRECT_URI, client_id=client.client_id, code_verifier=VERIFIER,
+    )
+    with pytest.raises(OAuthError) as exc_info:
+        flows.issue_token(
+            store=store, settings=settings, grant_type="refresh_token",
+            refresh_token=first.refresh_token, client_id="a-different-client-id",
+        )
+    assert exc_info.value.code == "invalid_grant"
 
 
 def test_all_token_errors_use_invalid_grant(store, settings, users, throttle, clock, client):
@@ -428,7 +484,7 @@ def test_all_token_errors_use_invalid_grant(store, settings, users, throttle, cl
     with pytest.raises(OAuthError) as exc_info:
         flows.issue_token(
             store=store, settings=settings, grant_type="refresh_token",
-            refresh_token="never-issued-refresh-token",
+            refresh_token="never-issued-refresh-token", client_id=client.client_id,
         )
     assert exc_info.value.code == "invalid_grant"
 

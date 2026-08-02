@@ -13,6 +13,10 @@
 # Legt KEINE Credential-Datei an — das ist ein manueller Schritt des Nikingers (Plan §2.1,
 # README.md „Rotation im Dienstbetrieb").
 #
+# **P5 Step 1 (S7):** `phase5_ui/systemd/sharefyx-purge.{service,timer}` (Auth-Store-Purge,
+# `authctl.py purge-expired`) kommt als drittes Quellverzeichnis dazu — kein neuer Platzhalter,
+# dieselben sechs wie bisher.
+#
 # Aufruf: sudo phase3_edge/scripts/install_units.sh
 
 set -euo pipefail
@@ -21,7 +25,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PHASE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 REPO_DIR="$(cd "$PHASE_DIR/.." && pwd)"
 LOCAL_ENV="$PHASE_DIR/local.env"
-SYSTEMD_SRCS=("$PHASE_DIR/systemd" "$REPO_DIR/phase4_auth/systemd")
+SYSTEMD_SRCS=("$PHASE_DIR/systemd" "$REPO_DIR/phase4_auth/systemd" "$REPO_DIR/phase5_ui/systemd")
 SYSTEMD_DEST="/etc/systemd/system"
 
 if [[ ! -f "$LOCAL_ENV" ]]; then
@@ -29,8 +33,21 @@ if [[ ! -f "$LOCAL_ENV" ]]; then
   exit 1
 fi
 
-# shellcheck disable=SC1090
-source "$LOCAL_ENV"
+# S8 (Sicherheits-Review 2026-07-29): `local.env` gehört `savefyx`, dieses Skript läuft aber
+# unter `sudo` als root. `source` würde beliebigen Bash-Code aus einer `savefyx`-schreibbaren
+# Datei als root ausführen. Striktes KEY=VALUE-Parsen statt `source` schließt das — es wird nie
+# Shell-Code interpretiert, nur einfache Zuweisungen aus Zeilen, die exakt diesem Muster
+# entsprechen. (Das Review nennt genau dieses Parsen als eigene Fix-Skizze; die Plan-Tabelle
+# forderte stattdessen eine root-Ownership-Prüfung per `stat` — das widerspräche aber dem
+# dokumentierten Modell, in dem `savefyx` `local.env` selbst anlegt, siehe README.md/Runbook.)
+while IFS= read -r _line || [[ -n "$_line" ]]; do
+  [[ -z "$_line" || "$_line" == \#* ]] && continue
+  if [[ ! "$_line" =~ ^[A-Za-z_][A-Za-z0-9_]*\=.*$ ]]; then
+    echo "ABBRUCH: $LOCAL_ENV enthält eine Zeile, die kein KEY=VALUE ist: ${_line}" >&2
+    exit 1
+  fi
+  declare "${_line%%=*}=${_line#*=}"
+done < "$LOCAL_ENV"
 
 # Warnung, kein Abbruch (P4 Step 7, 2026-07-29): ohne 127.0.0.1 in ALLOWED_HOSTS beantwortet der
 # Dienst unter AUTH_MODE=both|oauth jede lokale Anfrage mit "400 Invalid host header" — das

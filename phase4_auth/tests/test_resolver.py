@@ -28,7 +28,7 @@ def store(tmp_path, clock):
 
 @pytest.fixture
 def resolver(store):
-    return OAuthTokenResolver(store)
+    return OAuthTokenResolver(store, expected_resource="https://x/mcp")
 
 
 def _issue_access_token(store, *, space="niklas") -> str:
@@ -77,6 +77,50 @@ def test_resolve_revoked_family_token_raises(store, resolver):
     store.revoke_family(family_id, "code_replay")
     with pytest.raises(ResolveError):
         resolver.resolve(access_token)
+
+
+def test_resolver_rejects_foreign_audience(store, resolver):
+    """S3: `record.resource` wurde bisher an keiner Stelle nach `/oauth/authorize` gegen die
+    erwartete Ressource geprüft (RFC 8707) — ein Token für eine andere Ressource durfte trotzdem
+    `/mcp` benutzen."""
+    family_id = store.create_family(
+        space="niklas", client_id="c1", scope="space", resource="https://other.example/mcp"
+    )
+    access_token, _refresh = store.issue_token_pair(
+        family_id, access_ttl_s=3600, refresh_ttl_s=2592000
+    )
+    with pytest.raises(ResolveError):
+        resolver.resolve(access_token)
+
+
+def test_resolver_accepts_own_audience(store, resolver):
+    token = _issue_access_token(store, space="niklas")
+    result = resolver.resolve(token)
+    assert result.space == "niklas"
+
+
+def test_resolver_rejects_token_without_space_scope(store, resolver):
+    """S4: `scope` wurde nach `/oauth/authorize` nie wieder durchgesetzt — ein Token mit nur
+    `offline_access` (ohne `space`) bekam trotzdem vollen Tool-Zugriff."""
+    family_id = store.create_family(
+        space="niklas", client_id="c1", scope="offline_access", resource="https://x/mcp"
+    )
+    access_token, _refresh = store.issue_token_pair(
+        family_id, access_ttl_s=3600, refresh_ttl_s=2592000
+    )
+    with pytest.raises(ResolveError):
+        resolver.resolve(access_token)
+
+
+def test_resolver_accepts_token_with_space_scope(store, resolver):
+    family_id = store.create_family(
+        space="niklas", client_id="c1", scope="space offline_access", resource="https://x/mcp"
+    )
+    access_token, _refresh = store.issue_token_pair(
+        family_id, access_ttl_s=3600, refresh_ttl_s=2592000
+    )
+    result = resolver.resolve(access_token)
+    assert result.space == "niklas"
 
 
 def test_resolve_does_not_return_mcpserver_principal_type(store, resolver):

@@ -1,0 +1,10 @@
+[Unit]
+Description=Täglicher Sharefyx Auth-Store-Purge-Lauf
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=900
+
+[Install]
+WantedBy=timers.target

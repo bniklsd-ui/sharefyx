@@ -19,7 +19,11 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 UNIT_PATH = REPO_ROOT / "phase4_auth" / "systemd" / "sharefyx-mcp.service"
 INSTALL_SCRIPT = REPO_ROOT / "phase3_edge" / "scripts" / "install_units.sh"
-SYSTEMD_DIRS = (REPO_ROOT / "phase3_edge" / "systemd", REPO_ROOT / "phase4_auth" / "systemd")
+SYSTEMD_DIRS = (
+    REPO_ROOT / "phase3_edge" / "systemd",
+    REPO_ROOT / "phase4_auth" / "systemd",
+    REPO_ROOT / "phase5_ui" / "systemd",  # P5 Step 1 (S7): sharefyx-purge.{service,timer}
+)
 ALL_UNIT_PATHS = sorted(
     path for d in SYSTEMD_DIRS for path in (*d.glob("*.service"), *d.glob("*.timer"))
 )
@@ -85,10 +89,11 @@ def test_unit_placeholders_are_unresolved_in_repo():
 
 def test_all_units_have_no_secret_shaped_value():
     """Wie `test_unit_has_no_secret_shaped_value`, aber über **alle** Unit-Dateien in
-    `phase3_edge/systemd/` **und** `phase4_auth/systemd/` (P4 Step 7) — Step 5 (Backup) fügt
-    zwei weitere hinzu, ohne dass diese Versicherung stillschweigend nur für die MCP-Unit gilt."""
+    `phase3_edge/systemd/`, `phase4_auth/systemd/` (P4 Step 7) **und** `phase5_ui/systemd/`
+    (P5 Step 1, S7-Purge-Timer) — jede neue Unit fügt sich automatisch hinzu, ohne dass diese
+    Versicherung stillschweigend nur für die MCP-Unit gilt."""
     secret_shaped = re.compile(r"[A-Za-z0-9_-]{32,}")
-    assert len(ALL_UNIT_PATHS) >= 3, "erwartet mindestens sharefyx-mcp + sharefyx-backup(.timer)"
+    assert len(ALL_UNIT_PATHS) >= 5, "erwartet sharefyx-mcp + backup(.timer) + purge(.timer)"
     for path in ALL_UNIT_PATHS:
         for value in _environment_values(path.read_text(encoding="utf-8")):
             assert not secret_shaped.search(value), f"{path.name}: sieht wie ein Secret aus: {value!r}"
@@ -99,6 +104,30 @@ def test_all_units_have_no_hardcoded_machine_paths():
     gehört über `local.env` eingesetzt, nicht ins Repo (Plan §5 Akzeptanzkriterium 8)."""
     for path in ALL_UNIT_PATHS:
         assert "/home/savefyx" not in path.read_text(encoding="utf-8"), path.name
+
+
+def test_purge_service_is_oneshot_calling_authctl():
+    """S7 (Sicherheits-Review 2026-07-29): `purge_expired()` lief bisher nur manuell über
+    `authctl.py` — kein Timer, abgelaufene Zeilen verschwanden nie von selbst."""
+    text = (REPO_ROOT / "phase5_ui" / "systemd" / "sharefyx-purge.service").read_text(encoding="utf-8")
+    assert "Type=oneshot" in text
+    assert "authctl.py purge-expired" in text
+    assert "StateDirectory=sharefyx" in text
+    assert "User=savefyx" in text
+
+
+def test_purge_timer_runs_daily_and_persistent():
+    text = (REPO_ROOT / "phase5_ui" / "systemd" / "sharefyx-purge.timer").read_text(encoding="utf-8")
+    assert "OnCalendar=daily" in text
+    assert "Persistent=true" in text
+
+
+def test_install_script_reads_phase5_ui_systemd_dir():
+    """Ein Timer, den `install_units.sh` nie installiert, ist totes Gewicht — die
+    `SYSTEMD_SRCS`-Liste muss `phase5_ui/systemd` tatsächlich enthalten, nicht nur die Unit
+    muss existieren."""
+    text = INSTALL_SCRIPT.read_text(encoding="utf-8")
+    assert "phase5_ui/systemd" in text
 
 
 def test_install_script_refuses_without_local_env(tmp_path):
@@ -176,3 +205,57 @@ def test_install_script_stays_quiet_when_loopback_present(tmp_path):
 
     assert "WARNUNG" not in result.stderr
     assert result.returncode != 0  # bricht weiterhin an PUBLIC_BASE_URL ab
+
+
+def test_install_script_refuses_world_writable_env(tmp_path):
+    """S8 (Sicherheits-Review 2026-07-29): `local.env` gehört `savefyx`, wird aber unter `sudo`
+    als root gelesen. Vorher lief das über `source` — jede Zeile, die kein `KEY=VALUE` ist
+    (Shell-Metazeichen, ein zweiter Befehl), wäre als root ausgeführt worden. Der neue Parser
+    liest strikt `KEY=VALUE`, führt nie Code aus — belegt hier über eine Zeile, die unter dem
+    alten `source`-Verhalten eine Datei angelegt hätte."""
+    phase_copy = tmp_path / "phase3_edge"
+    shutil.copytree(REPO_ROOT / "phase3_edge" / "scripts", phase_copy / "scripts")
+    shutil.copytree(REPO_ROOT / "phase3_edge" / "systemd", phase_copy / "systemd")
+    marker = tmp_path / "PWNED"
+    (phase_copy / "local.env").write_text(
+        "REPO_ROOT=/tmp/repo\nDATA_ROOT=/tmp/data\nVENV=/tmp/repo/.venv\n"
+        "ALLOWED_HOSTS=node.tailnet.ts.net,127.0.0.1\nAUTH_MODE=oauth\n"
+        "PUBLIC_BASE_URL=https://node.tailnet.ts.net\n"
+        f"touch {marker}\n",
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        ["bash", str(phase_copy / "scripts" / "install_units.sh")],
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode != 0
+    assert "KEY=VALUE" in result.stderr
+    assert not marker.exists()
+
+
+def test_install_script_ignores_comments_and_blank_lines(tmp_path):
+    """Gegenprobe: ein `local.env` im echten `local.env.example`-Stil (Kommentarblöcke,
+    Leerzeilen zwischen den sechs Werten) muss weiterhin klaglos geparst werden — sonst wäre der
+    strikte Parser aus dem Test oben zu strikt für den realen Anwendungsfall."""
+    phase_copy = tmp_path / "phase3_edge"
+    shutil.copytree(REPO_ROOT / "phase3_edge" / "scripts", phase_copy / "scripts")
+    shutil.copytree(REPO_ROOT / "phase3_edge" / "systemd", phase_copy / "systemd")
+    (phase_copy / "local.env").write_text(
+        "# Kommentar\n\nREPO_ROOT=/tmp/repo\n\n# noch ein Kommentar\nDATA_ROOT=/tmp/data\n"
+        "VENV=/tmp/repo/.venv\nALLOWED_HOSTS=node.tailnet.ts.net,127.0.0.1\nAUTH_MODE=oauth\n\n",
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        ["bash", str(phase_copy / "scripts" / "install_units.sh")],
+        capture_output=True,
+        text=True,
+    )
+
+    # Kommt bis zum Pflichtfeld-Check für PUBLIC_BASE_URL durch (nicht schon an einer
+    # Kommentar-/Leerzeile) — dieselbe Belegart wie die beiden Tests oben.
+    assert "PUBLIC_BASE_URL ist in" in result.stderr
+    assert "KEY=VALUE" not in result.stderr

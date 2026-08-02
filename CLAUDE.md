@@ -139,8 +139,12 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 Plan liegt vor (`docs/concepts/phase5_ui_plan.md`, Entscheidungen P5-A–P5-AE, Steps 0–9, zwei
 Blöcke: A = Sicherheit + Auth-Selbstverwaltung, B = REST-API + UI, harter Gate dazwischen).
 Herkunft/offene Entscheidungen: `docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md`. Phase-Head:
-`phase5_ui/CLAUDE.md`. **Nächster Schritt:** Step 0 (Haushalt, Rückbau der P2-Token-Reste,
-Doku-Drift) — läuft.
+`phase5_ui/CLAUDE.md`. **[2026-08-02 Korrektur, P5 Step 1:** diese Zeile stand hier auf „Step 0
+— läuft", obwohl Step 0 bereits im vorigen Commit abgeschlossen wurde und Step 1
+(Sicherheitsbefunde S2–S8) im selben Zug durchlief — dieselbe Drift-Kategorie, die diese Zeile
+schon dreimal in P4 betraf (siehe die drei Korrekturen weiter unten), diesmal aber im selben
+Commit korrigiert statt erst später gefunden.**]** **Nächster Schritt:** Step 2 (Auth-Datenmodell
+Schema 2, `secretbox.py`, `userdir.py`).
 
 **Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅
 abgeschlossen, 2026-07-30.** Mission erfüllt: der Pfad-Token ist verschwunden, ein eigener

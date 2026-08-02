@@ -313,21 +313,23 @@ vollzogen, Pfad-Token widerrufen, `TokenPathASGI` entfernt, Protokoll geschriebe
 Vollständiges Dokument mit Fehlfällen, Fix-Skizzen und der Liste der **geprüften und in Ordnung
 befundenen** Punkte: `../docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`. Kurzfassung:
 
-| # | Befund | Schwere | Datei |
-|---|---|---|---|
-| S1 | `ALLOWED_HOSTS` ohne `127.0.0.1` → `400 Invalid host header` lokal, Runbook-Schritt 4 unausführbar | Blocker | `local.env` / `install_units.sh` — ✅ **behoben** |
-| S2 | `refresh_token`-Grant prüft `client_id` nicht (RFC 6749 §6) | niedrig | `flows.py`, `store.py :: rotate_refresh` |
-| S3 | Kein Audience-Check: `AccessTokenRecord.resource` wird nie gegen `settings.resource` geprüft | niedrig (heute) | `resolver.py` |
-| S4 | `scope` wird beim Zugriff nie durchgesetzt | niedrig | `resolver.py` |
-| S5 | `f"{redirect_uri}?{query}"` zerlegt einen Redirect mit vorhandenem Query | niedrig | `routes.py :: _authorize_response` |
-| S6 | `record["pwd"]`/`record["totp"]` → `KeyError` → 500 bricht den „wirft nie"-Vertrag daneben | niedrig-mittel | `flows.py :: submit_consent` |
-| S7 | Unbegrenztes Zeilenwachstum aus unauth. Eingabe, `purge_expired()` nur manuell (kein Timer) | niedrig-mittel | `store.py` |
-| S8 | `sudo install_units.sh` sourced eine nutzerschreibbare Datei als root | sehr niedrig | `install_units.sh` |
-| O1 | Nutzerakten werden **einmal beim Start** gelesen — Provisionierung wirkt erst nach Restart | Betriebsnotiz | `scripts/serve.py` |
+| # | Befund | Schwere | Datei | Status |
+|---|---|---|---|---|
+| S1 | `ALLOWED_HOSTS` ohne `127.0.0.1` → `400 Invalid host header` lokal, Runbook-Schritt 4 unausführbar | Blocker | `local.env` / `install_units.sh` | ✅ **behoben** (2026-07-29) |
+| S2 | `refresh_token`-Grant prüft `client_id` nicht (RFC 6749 §6) | niedrig | `flows.py`, `store.py :: rotate_refresh` | ✅ **geschlossen** (P5 Step 1) |
+| S3 | Kein Audience-Check: `AccessTokenRecord.resource` wird nie gegen `settings.resource` geprüft | niedrig (heute) | `resolver.py` | ✅ **geschlossen** (P5 Step 1) |
+| S4 | `scope` wird beim Zugriff nie durchgesetzt | niedrig | `resolver.py` | ✅ **geschlossen** (P5 Step 1) |
+| S5 | `f"{redirect_uri}?{query}"` zerlegt einen Redirect mit vorhandenem Query | niedrig | `routes.py :: _authorize_response` | ✅ **geschlossen** (P5 Step 1) |
+| S6 | `record["pwd"]`/`record["totp"]` → `KeyError` → 500 bricht den „wirft nie"-Vertrag daneben | niedrig-mittel | `flows.py :: submit_consent` | ✅ **geschlossen** (P5 Step 1) |
+| S7 | Unbegrenztes Zeilenwachstum aus unauth. Eingabe, `purge_expired()` nur manuell (kein Timer) | niedrig-mittel | `store.py`, `ratelimit.py` | ✅ **geschlossen** (P5 Step 1) — Timer + Längenbegrenzung; `ui_sessions`/`invites`-Erweiterung folgt strukturell in P5 Step 2 (Tabellen existieren erst dort, siehe Plan §5 Step 1 Testliste) |
+| S8 | `sudo install_units.sh` sourced eine nutzerschreibbare Datei als root | sehr niedrig | `install_units.sh` | ✅ **geschlossen** (P5 Step 1) |
+| O1 | Nutzerakten werden **einmal beim Start** gelesen — Provisionierung wirkt erst nach Restart | Betriebsnotiz | `scripts/serve.py` | offen (Betriebsnotiz, kein Befund — unverändert) |
 
-**Keiner von S2–S8 ist gefixt.** Bewusst: die Abnahmematrix läuft als Nächstes gegen genau diesen
-Code; eine Verhaltensänderung an `flows.py`/`store.py` davor hieße, dass die Matrix etwas anderes
-abnimmt als das Reviewte. Reihenfolge entscheidet der Nikinger.
+**[2026-08-02 Korrektur, P5 Step 1]:** der Absatz „Keiner von S2–S8 ist gefixt" stand hier
+bewusst zwischen Step 7 und der Live-Abnahme — dieser Zustand ist jetzt überholt. Alle sieben
+Befunde S2–S8 sind in P5 Step 1 geschlossen (Details, Tests, Commit: `phase5_ui/CLAUDE.md`
+Session-Block 2026-08-02). Dieser Kopf ist ein 📗 live gepflegtes Dokument, kein 📕-Snapshot —
+die Tabelle wird hier direkt nachgezogen statt in einem separaten Nachtrag dupliziert.
 
 ---
 

@@ -12,7 +12,7 @@ pfadgebundenes Mounten sieht Plan §3.3 nicht vor ("vorangestellt", nicht `Mount
 from __future__ import annotations
 
 from collections.abc import Mapping
-from urllib.parse import urlencode
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
@@ -151,8 +151,16 @@ def oauth_routes(
         else:
             params["error"] = result.error
             params["error_description"] = result.error_description
-        query = urlencode({k: v for k, v in params.items() if v is not None})
-        return RedirectResponse(f"{result.redirect_uri}?{query}", status_code=302, headers=headers)
+
+        # S5 (Sicherheits-Review 2026-07-29): `f"{uri}?{query}"` hängte bedingungslos ein `?` an
+        # — ein registrierter Redirect mit eigenem Query-String (`https://x/cb?a=b`) bekam damit
+        # ein zweites `?`, das Teil des Werts von `a` wurde. `urlsplit`/`parse_qsl`/`urlunsplit`
+        # mischen stattdessen in die vorhandene Query hinein.
+        split = urlsplit(result.redirect_uri)
+        existing = parse_qsl(split.query, keep_blank_values=True)
+        merged = existing + [(k, v) for k, v in params.items() if v is not None]
+        location = urlunsplit(split._replace(query=urlencode(merged)))
+        return RedirectResponse(location, status_code=302, headers=headers)
 
     async def _authorize_get(request: Request) -> Response:
         q = request.query_params

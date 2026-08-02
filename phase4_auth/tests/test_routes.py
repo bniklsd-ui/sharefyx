@@ -221,6 +221,57 @@ async def test_csp_form_action_allows_the_oauth_redirect_target(client_factory, 
 
 
 @pytest.mark.asyncio
+async def test_redirect_with_existing_query_keeps_both_params(client_factory, store):
+    """S5: ein registrierter Redirect mit eigenem Query-String darf durch die Code-Antwort nicht
+    verstümmelt werden — `code`/`state` müssen dazukommen, nicht das erste `?` verdoppeln."""
+    redirect_with_query = "https://claude.ai/api/mcp/auth_callback?tenant=acme"
+    client_record = store.create_client(
+        client_name="Claude", application_type=None, redirect_uris=[redirect_with_query]
+    )
+    async with client_factory() as client:
+        get_resp = await client.get(
+            "/oauth/authorize", params=_authorize_query(client_record.client_id, redirect_uri=redirect_with_query)
+        )
+        request_id = _extract_request_id(get_resp.text)
+        post_resp = await client.post(
+            "/oauth/authorize",
+            data={
+                "request_id": request_id, "space": SPACE, "password": PASSWORD,
+                "totp": _totp_code(), "action": "allow",
+            },
+            follow_redirects=False,
+        )
+    location = post_resp.headers["location"]
+    split = urlsplit(location)
+    assert split.netloc == "claude.ai" and split.path == "/api/mcp/auth_callback"
+    query = parse_qs(split.query)
+    assert query["tenant"] == ["acme"]
+    assert query["code"]
+    assert query["state"] == ["xyz"]
+
+
+@pytest.mark.asyncio
+async def test_redirect_error_with_existing_query_keeps_both_params(client_factory, store):
+    redirect_with_query = "https://claude.ai/api/mcp/auth_callback?tenant=acme"
+    client_record = store.create_client(
+        client_name="Claude", application_type=None, redirect_uris=[redirect_with_query]
+    )
+    async with client_factory() as client:
+        get_resp = await client.get(
+            "/oauth/authorize", params=_authorize_query(client_record.client_id, redirect_uri=redirect_with_query)
+        )
+        request_id = _extract_request_id(get_resp.text)
+        resp = await client.post(
+            "/oauth/authorize",
+            data={"request_id": request_id, "space": SPACE, "password": "", "totp": "", "action": "deny"},
+            follow_redirects=False,
+        )
+    query = parse_qs(urlsplit(resp.headers["location"]).query)
+    assert query["tenant"] == ["acme"]
+    assert query["error"] == ["access_denied"]
+
+
+@pytest.mark.asyncio
 async def test_no_cookie_is_ever_set(client_factory, client_record):
     """Belegt P4-O (kein Cookie, nirgends) über den vollständigen Fluss: GET-Formular,
     POST-Consent, POST-Token-Tausch."""

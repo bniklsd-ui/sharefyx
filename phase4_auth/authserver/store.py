@@ -433,7 +433,7 @@ class AuthStore:
         return access_token, refresh_token
 
     def rotate_refresh(
-        self, refresh_token: str, *, access_ttl_s: int, refresh_ttl_s: int
+        self, refresh_token: str, *, client_id: str, access_ttl_s: int, refresh_ttl_s: int
     ) -> tuple[str, str] | None:
         """Abweichung vom Plan-Skelett: nimmt `access_ttl_s`/`refresh_ttl_s` entgegen statt sie
         aus vorhandenen Zeilen abzuleiten. Eine Ableitung aus dem jüngsten Access-Token der
@@ -442,17 +442,26 @@ class AuthStore:
         Access-Tokens (60 min) aber innerhalb der Refresh-Gültigkeit (30 d) rotiert, träfe dann
         auf keine Zeile und die Ableitung würde crashen — kein Randfall, der Normalpfad einer
         langlebigen Session. Explizite Parameter sind kleinere Drift als dieser Absturzmodus.
+
+        **S2 (Sicherheits-Review 2026-07-29):** `client_id` wird jetzt gegen
+        `token_families.client_id` geprüft. Ein Mismatch ist ein früher `return None`
+        (`invalid_grant`, ununterscheidbar von einem unbekannten Token) — **kein**
+        Familienwiderruf, ein falscher `client_id` ist kein Replay (anders als `rotated_at is
+        not None` unten).
         """
         token_hash = crypto.hash_secret(refresh_token)
         now = self._now_fn()
         with self._transaction() as conn:
             row = conn.execute(
                 "SELECT r.*, f.revoked_at AS family_revoked_at, f.space AS space, "
-                "f.scope AS scope, f.resource AS resource FROM refresh_tokens r "
+                "f.client_id AS client_id, f.scope AS scope, f.resource AS resource "
+                "FROM refresh_tokens r "
                 "JOIN token_families f ON f.family_id = r.family_id WHERE r.token_hash = ?",
                 (token_hash,),
             ).fetchone()
             if row is None or row["family_revoked_at"] is not None:
+                return None
+            if row["client_id"] != client_id:
                 return None
             if _parse_dt(row["expires_at"]) <= now:
                 return None

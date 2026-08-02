@@ -109,7 +109,7 @@ def store(tmp_path, clock):
 
 @pytest.fixture
 def resolver(store):
-    return OAuthTokenResolver(store)
+    return OAuthTokenResolver(store, expected_resource="https://x/mcp")
 
 
 def _issue_token(store, *, space="niklas", access_ttl_s=3600):

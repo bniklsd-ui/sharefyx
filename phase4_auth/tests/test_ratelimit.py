@@ -2,7 +2,13 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from authserver.ratelimit import BASE_LOCKOUT_S, MAX_FAILURES, MAX_LOCKOUT_S, LoginThrottle
+from authserver.ratelimit import (
+    BASE_LOCKOUT_S,
+    MAX_FAILURES,
+    MAX_LOCKOUT_S,
+    MAX_SPACE_LEN,
+    LoginThrottle,
+)
 from authserver.store import AuthStore
 
 
@@ -76,6 +82,21 @@ def test_success_resets_counter(throttle):
     for _ in range(MAX_FAILURES - 1):
         throttle.register_failure("niklas")
     assert throttle.check("niklas") is None
+
+
+def test_register_failure_ignores_oversized_space(throttle, store):
+    """S7 (Sicherheits-Review 2026-07-29): `space` kommt unauthentifiziert aus dem Formular und
+    landet als PRIMARY KEY in `login_attempts` — ohne Längenbegrenzung ein Disk-DoS-Vektor."""
+    huge_space = "x" * (MAX_SPACE_LEN + 1)
+    throttle.register_failure(huge_space)
+    assert store.get_login_attempt(huge_space) is None
+    assert throttle.check(huge_space) is None
+
+
+def test_register_failure_accepts_space_at_the_limit(throttle, store):
+    boundary_space = "x" * MAX_SPACE_LEN
+    throttle.register_failure(boundary_space)
+    assert store.get_login_attempt(boundary_space) is not None
 
 
 def test_check_is_readonly(throttle, store):

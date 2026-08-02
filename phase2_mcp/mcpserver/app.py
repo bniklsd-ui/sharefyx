@@ -106,7 +106,7 @@ def create_app(
     hosts = list(allowed_hosts) if allowed_hosts else (list(settings.allowed_hosts) or None)
     mcp_app = mcp.http_app(path="/", stateless_http=True, allowed_hosts=hosts)
 
-    oauth_resolver = OAuthTokenResolver(oauth.store)
+    oauth_resolver = OAuthTokenResolver(oauth.store, expected_resource=oauth.settings.resource)
     bearer = BearerAuthASGI(
         mcp_app, resolver=oauth_resolver, challenge=_bearer_challenge(oauth.settings)
     )

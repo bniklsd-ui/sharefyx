@@ -26,6 +26,12 @@ WINDOW_S = 900  # 15 min
 BASE_LOCKOUT_S = 900  # 15 min, verdoppelt je weiterer Sperre
 MAX_LOCKOUT_S = 86400  # 24 h Deckel
 
+# S7 (Sicherheits-Review 2026-07-29): `space` kommt hier direkt aus dem POST-Formular, komplett
+# vom Angreifer gewählt, und landet als PRIMARY KEY in `login_attempts` — ohne Existenzprüfung
+# (Enumerationsschutz, bewusst so) und bisher ohne Längenbegrenzung. Kein real existierender
+# Space-Name kommt in die Nähe dieser Grenze.
+MAX_SPACE_LEN = 128
+
 
 class LoginThrottle:
     def __init__(self, store: AuthStore, *, now_fn: Callable[[], datetime]) -> None:
@@ -43,6 +49,8 @@ class LoginThrottle:
         return int(remaining) if remaining > 0 else None
 
     def register_failure(self, space: str) -> None:
+        if len(space) > MAX_SPACE_LEN:
+            return  # S7: kein Zeilenwachstum aus beliebig langen, unauthentifizierten Strings
         now = self._now_fn()
         attempt = self._store.get_login_attempt(space)
 

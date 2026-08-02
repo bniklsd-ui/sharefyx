@@ -348,7 +348,10 @@ async def _run_checks(
 
     # 8. Refresh — rotiert, neues Paar.
     refresh_resp = await client.post(
-        "/oauth/token", data={"grant_type": "refresh_token", "refresh_token": refresh_r1}
+        "/oauth/token",
+        data={
+            "grant_type": "refresh_token", "refresh_token": refresh_r1, "client_id": client_id,
+        },
     )
     refresh_body = refresh_resp.json() if refresh_resp.status_code == 200 else {}
     access_r1b = refresh_body.get("access_token")
@@ -372,7 +375,10 @@ async def _run_checks(
     # Familie töten (RFC 9700). Beleg für "Familie tot": der frisch rotierte Access-Token aus
     # Schritt 8 funktioniert danach ebenfalls nicht mehr.
     replay_resp = await client.post(
-        "/oauth/token", data={"grant_type": "refresh_token", "refresh_token": refresh_r1}
+        "/oauth/token",
+        data={
+            "grant_type": "refresh_token", "refresh_token": refresh_r1, "client_id": client_id,
+        },
     )
     replay_body = replay_resp.json() if replay_resp.status_code == 400 else {}
     family_dead_status = await _bearer_status(client, access_r1b) if access_r1b else None
