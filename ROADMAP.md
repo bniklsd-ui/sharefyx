@@ -23,7 +23,7 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 |---|---|---|---|
 | **P1** | `phase1_storage/` · `storage` | Datei-Store + Index + Versionierung. Kein Netz. | ✅ |
 | **P2** | `phase2_mcp/` · `mcpserver` | MCP-Server, Token-Auth, 6 Tools. Lokal erreichbar. | ✅ |
-| **P3** | `phase3_edge/` | Tunnel, systemd, Health, Logging, Ops-Skripte. Öffentlich erreichbar. | 🟡 |
+| **P3** | `phase3_edge/` | Tunnel, systemd, Health, Logging, Ops-Skripte. Öffentlich erreichbar. | ✅ |
 | **P4** | `phase4_auth/` · `authserver` | OAuth 2.1 + DCR; ersetzt den Pfad-Token. | ✅ |
 | **P5** | `phase5_ui/` · `webui` | REST-API + Web-UI für Menschen. | 🔄 |
 
@@ -110,7 +110,7 @@ offenen Findings mehr. Handover an P3: `docs/concepts/PHASE2_CLOSEOUT_HANDOVER.m
   „Disconnected" mit minimaler Diagnose — deshalb ist das Log kein Nice-to-have, sondern
   Teil des Scope.
 
-**Status 🟡 (2026-07-27, Live-Abnahme zweite Session; 2026-07-29/2026-08-02 fortgeschrieben):**
+**Status ✅ (2026-07-27, Live-Abnahme zweite Session; 2026-07-29/2026-08-02 fortgeschrieben):**
 10 von 13 Abnahmezeilen live bestanden am 2026-07-27 (Details: `docs/concepts/
 P3_ABNAHME_2026-07-27.md`). Nikinger-Entscheidung: Reboot-Test (Zeile 6), Backup-Timer-Lauf
 (Zeile 12) und Restore-Nachweis (Zeile 13) werden nicht mehr aktiv nachgeholt, sondern auf die
@@ -118,14 +118,14 @@ nächste Phase verschoben — ein unbeabsichtigter Reboot ist ohnehin der reale 
 lösen sich mit dem nächsten Backup-Zyklus. **[2026-07-29:]** Zeile 12 löste sich mit dem
 P4-Step-0-Backup-Zyklus, Zeile 6 mit einem unbeabsichtigten Reboot der VM
 (Windows-Host-Neustart des Nikingers) — beide jetzt ✅, Belege in `phase3_edge/CLAUDE.md`.
-Damit stehen **12 von 13**. **[2026-08-02, P5 Step 0:]** Claude Code hat `restore_check.sh`
-(Zeile 13, Restore-Nachweis) read-only gegen das frischeste Backup-Bundle
-(`sharefyx-data-20260801T220156.234086Z.bundle`) gefahren — Ergebnis `ok:true`, HEAD und Baum
-identisch mit dem echten `DATA_ROOT`. **Bewusst noch nicht als ✅ gewertet:** dieser Prompt
-reserviert „jeden End-to-End-Test gegen das echte Datenverzeichnis" für den Nikinger selbst: der
-Lauf hier ist ein Kandidatenbeleg, keine Abnahme. Status bleibt 🟡, bis der Nikinger den Lauf
-bestätigt oder selbst wiederholt (ein Befehl, siehe `phase3_edge/CLAUDE.md` Session-Block
-2026-08-02).
+Damit stehen **12 von 13**. **[2026-08-02, P5 Step 0:]** Claude Code fuhr `restore_check.sh`
+(Zeile 13, Restore-Nachweis) zunächst selbst read-only gegen das frischeste Backup-Bundle
+(`sharefyx-data-20260801T220156.234086Z.bundle`, `ok:true`) — bewusst nur als Kandidatenbeleg
+gewertet, da dieser Prompt „jeden End-to-End-Test gegen das echte Datenverzeichnis" dem
+Nikinger vorbehält. **Der Nikinger hat denselben Lauf danach selbst ausgeführt** (identischer
+HEAD `3756c26a…`, `ok:true`) und im selben Zug Step-0-A.7 live nachgezogen
+(`install_units.sh`, Restart, `/health`, `spaces.cred` gelöscht). **13 von 13 Abnahmezeilen
+live bestanden — Status ✅.** Details: `phase3_edge/CLAUDE.md` Session-Block 2026-08-02.
 
 ## Phase 4 — OAuth 2.1
 

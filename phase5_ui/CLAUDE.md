@@ -88,7 +88,7 @@ Messung statt Schätzung (`ui_budget.py`, AD) · gemeinsame Live-Abnahme, beide 
 
 | # | Modul | Step | Status | Tests |
 |---|---|---|---|---|
-| 1 | Haushalt, Verifikationsdurchlauf, Rückbau P2-Token-Reste, Doku-Drift, P3-Restore-Nachweis | 0 | 🟡 A.1–A.6 ✅ code-seitig, **A.7 offen** (Nikinger-Restart + Live-Check, siehe unten) | −14 (Rückbau, kein neuer Feature-Code) |
+| 1 | Haushalt, Verifikationsdurchlauf, Rückbau P2-Token-Reste, Doku-Drift, P3-Restore-Nachweis | 0 | ✅ **vollständig** — A.7 vom Nikinger live ausgeführt, P3 Zeile 13 vom Nikinger bestätigt (13/13, Phase 3 ✅) | −14 (Rückbau, kein neuer Feature-Code) |
 
 ---
 
@@ -99,8 +99,10 @@ Kommandos für den Phasenstart; Step 0 B/D (rein lesend) liefen direkt in dieser
 Environment **ist** die VM — `savefyx-VMware-Virtual-Platform`, `/etc/sharefyx/*.cred`
 vorhanden), Step 0 A (Rückbau) und C (Doku-Drift) sind Claude-Code-Arbeit und liefen im Anschluss
 ebenfalls autonom, wie vom Nikinger freigegeben („start with the initial steps you can do now
-without needing me"). Kein Handgriff des Nikingers in dieser Session — Step 0 A.7
-(`install_units.sh` + Restart) steht als Nikinger-Aktion noch aus.
+without needing me"). Der Nikinger hat A.7 (`install_units.sh` + Restart + Live-Check +
+`spaces.cred`-Löschung) noch in derselben Session live nachgezogen, plus einen eigenen
+Restore-Check-Lauf und drei Lesezugriffe über den echten Connector — Details unten. **Step 0
+ist damit vollständig abgeschlossen.**
 
 **B — Verifikationsdurchlauf (vor jeder Änderung):** `pytest -q` → 347 grün (bestätigt den
 dokumentierten Ausgangsstand). Alle `up:`/`down:`/Markdown-Links in allen 26 `.md`-Dateien lösen
@@ -140,20 +142,41 @@ Aufgabe (**V28** teilweise aufgelöst: Version bekannt, Pinning offen). Kein `vn
    `test_units.py :: test_unit_loads_credential_encrypted` prüft jetzt zusätzlich die
    **Abwesenheit** der `spaces:`-Zeile statt nur ihre Anwesenheit.
    **`pytest -q` → 333 grün (347 − 14, Aufschlüsselung oben, keine neue Lücke).**
-8. **Nikinger-Aktion, noch offen:** `install_units.sh` + `systemctl restart sharefyx-mcp` +
-   `/health` + ein echter Tool-Aufruf, danach erst `/etc/sharefyx/spaces.cred` löschen. Nicht
-   Teil dieser Session.
+8. **Nikinger-Aktion, live ausgeführt (2026-08-02, gleiche Session):** `restore_check.sh`
+   selbst wiederholt (identischer HEAD, `ok:true` — siehe Nebenfund unten), danach
+   `sudo phase3_edge/scripts/install_units.sh` → `sudo systemctl restart sharefyx-mcp` →
+   `curl http://127.0.0.1:8765/health` → `{"status":"ok",…,"uptime_s":14}` → erst danach
+   `sudo rm -f /etc/sharefyx/spaces.cred`, exakt in dieser Reihenfolge. **Step 0 A damit
+   vollständig.**
 
-**Nebenfund, kandidiert statt nur gemeldet — aber bewusst nicht als Abnahme gewertet:** P3
-Zeile 13 (Restore-Nachweis) war seit dem 2026-07-29-Handover offen. `restore_check.sh` (rein
-lesend gegen den echten `DATA_ROOT` — `git rev-parse`/`git clone` in ein Wegwerf-Verzeichnis,
-kein Verstoß gegen die P1-Testregel, die die gemockte Testsuite betrifft) lief gegen das
-frischeste Bundle grün (`ok:true`). **Advisor-Fund dieser Session:** der Prompt reserviert
-„jeden End-to-End-Test gegen das echte Datenverzeichnis" für den Nikinger — dieser Lauf ist ein
-Kandidatenbeleg, keine Abnahme. **Phase 3 bleibt bei 🟡, 12/13**, bis der Nikinger den Lauf
-selbst bestätigt oder wiederholt. Details, Modul-Tabelle und ein neuer Session-Block in
-`phase3_edge/CLAUDE.md` (2026-08-02), dessen vorheriger Block ist regelkonform via
-`rotate_session_block.sh` ins dortige Archiv gewandert.
+**Nebenfund, jetzt echte Abnahme statt nur Kandidat:** P3 Zeile 13 (Restore-Nachweis) war seit
+dem 2026-07-29-Handover offen. Claude Code hatte `restore_check.sh` zunächst selbst gegen das
+frischeste Bundle gefahren (`ok:true`) — bewusst nur als Kandidatenbeleg gewertet, weil der
+Session-Auftrag „jeden End-to-End-Test gegen das echte Datenverzeichnis" dem Nikinger vorbehält
+(Advisor-Fund dieser Session). Der Nikinger hat den identischen Befehl danach selbst ausgeführt
+(`head: 3756c26a7d826def1246bb4dc826e9ee10e764b3`, `ok:true`, identisch zum Kandidatenlauf).
+**Phase 3 steht damit bei 13/13, Status ✅.** `phase3_edge/CLAUDE.md`, `ROADMAP.md`,
+Root-`CLAUDE.md` und `docs/INDEX.md` nachgezogen.
+
+**Live-Verifikation nach dem Restart (Nikinger, über den echten Connector):** drei Lesezugriffe
+gegen die neu gestartete Unit — `list_spaces` (`niklas`: 7 Items/`writable:true`, `fabian`:
+2 Items/`writable:false` — Rule 4 sichtbar korrekt) und `search_items` (3 aktive Items im
+eigenen Space, jüngstes `P4 TTL-Test` v2 vom 2026-07-30 — derselbe Datensatz wie beim
+P4-Abnahmezeile-9-Beweis, also Kontinuität über den Rückbau-Restart hinweg belegt). Kein
+Schreibzugriff (bewusst, war nicht gefragt).
+
+**Zwei P5-relevante Beobachtungen aus diesem Live-Check, für spätere Steps vorgemerkt:**
+
+- **`list_spaces`s `item_count` zählt inklusive Archiv, `search_items`s Default nicht.**
+  `niklas` zeigt 7 in `list_spaces`, aber nur 3 aktive Treffer in `search_items`
+  (`include_archived=false` per Default) — kein Bug, aber ein UI-Fallstrick: die Rail (Step 6)
+  würde „7" zeigen, während die Liste 3 Zeilen hat. **Für Step 6 vormerken:** entweder beide
+  Zahlen anzeigen (`3 von 7`) oder `item_count` explizit als „inklusive Archiv" beschriften,
+  bevor irgendein UI-Zähler daraus abgeleitet wird.
+- **`fabian`s Space hat bereits zwei echte Items**, kein Leerzustand. Für die
+  Zwei-Personen-Abnahme (Akzeptanzkriterium 12/17: fremder Space read-only, keine
+  Schreib-Bedienelemente im DOM) heißt das: es gibt schon echten Testinhalt, kein
+  künstlich anzulegender Leerraum nötig, wenn Fabian in Step 9 einsteigt.
 
 **C — Doku-Drift geschlossen:**
 
@@ -176,7 +199,7 @@ selbst bestätigt oder wiederholt. Details, Modul-Tabelle und ein neuer Session-
    für `phase3_edge/CLAUDE.md`/`SESSIONS_ARCHIVE.md` und `phase4_auth/CLAUDE.md`-Zeile
    (P3-Status) nachgezogen.
 
-**Nächster Schritt (konkret):** Step 0 A.7 ist Sache des Nikingers (`install_units.sh` +
-Restart + Live-Check, danach `/etc/sharefyx/spaces.cred` löschen). Parallel dazu kann Step 1
-(Sicherheitsbefunde S2–S8) beginnen, sobald der Nikinger grünes Licht gibt — kein Blocker
-zwischen den beiden.
+**Nächster Schritt (konkret):** Step 0 ist vollständig — keine offenen Punkte mehr, weder
+code- noch live-seitig. Step 1 (Sicherheitsbefunde S2–S8, `docs/concepts/
+P4_SECURITY_REVIEW_2026-07-29.md` vorher lesen) kann beginnen, sobald der Nikinger grünes Licht
+gibt.

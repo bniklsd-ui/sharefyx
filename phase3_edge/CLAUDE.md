@@ -65,7 +65,7 @@ hier `tools.py` anfasst, ist in der falschen Phase.
 | 5 | systemd-Units, `install_units.sh`, `/health.uptime_s` (P3-I) | 4 | ✅ | 6 |
 | 6 | Backup/Restore-Skripte, Backup-Timer | 5 | ✅ | 9 (7 in `test_backup_scripts.py`, 2 in `test_units.py`) |
 | 7 | Runbooks, `diagnose.sh`, Cloudflare-Rückbau | 6 | ✅ | 0 (Runbook/Skript, keine automatisierten Tests laut Plan) |
-| 8 | Live-Abnahme (Nikinger) | 7 | 🟡 **12/13 live, Zeile 13 kandidiert** — Zeile 6 (2026-07-29, unbeabsichtigter Reboot), Zeile 12 (P4 Step 0), Zeile 13 (2026-08-02, `restore_check.sh` von Claude Code gegen das frischeste Bundle gefahren, `ok:true` — **Kandidatenbeleg, keine Nikinger-Abnahme**, siehe Session-Block), B3–B6 dokumentiert, V9 live geschlossen, Token-Rotation live bestätigt (2026-07-28) | — |
+| 8 | Live-Abnahme (Nikinger) | 7 | ✅ **13/13 live** — Zeile 6 (2026-07-29, unbeabsichtigter Reboot), Zeile 12 (P4 Step 0), Zeile 13 (2026-08-02, `restore_check.sh` vom Nikinger selbst gegen das frischeste Bundle bestätigt, `ok:true`), B3–B6 dokumentiert, V9 live geschlossen, Token-Rotation live bestätigt (2026-07-28) | — |
 
 **[2026-07-29 Korrektur, P4 Step 7]:** Zeile 5 nennt „systemd-Units" — `sharefyx-mcp.service`
 ist davon inzwischen nicht mehr eine. Die MCP-Unit zog nach `phase4_auth/systemd/` um (Plan §5
@@ -286,26 +286,21 @@ Top-Commit `a400221c` im `DATA_ROOT`. Details: `docs/concepts/P3_ABNAHME_2026-07
 
 ---
 
-## Session stopped — 2026-08-02 (Zeile 13 kandidiert, Nikinger-Bestätigung ausstehend; Rückbau-Berührung aus P5 Step 0)
+## Session stopped — 2026-08-02 (Zeile 13 vom Nikinger bestätigt — 13/13, Phase 3 ✅; Rückbau-Berührung aus P5 Step 0)
 
 **Für den nächsten, kalten Leser:** kein aktiver P3-Arbeitsschritt — diese Session lief in P5
 Step 0 (Haushalt/Rückbau/Doku-Drift, siehe `phase5_ui/CLAUDE.md`), berührte diesen Head aber an
 zwei Stellen, beide read-only bzw. mechanisch, keine neue P3-Entscheidung.
 
-**1. Zeile 13 (Restore-Nachweis) kandidiert, noch nicht als Abnahme gewertet.**
-`SHAREFYX_DATA_ROOT=/home/savefyx/savefyx-data SHAREFYX_BACKUP_DIR=/var/lib/sharefyx-backup
-bash phase3_edge/scripts/restore_check.sh` gegen das frischeste Bundle
-(`sharefyx-data-20260801T220156.234086Z.bundle`) gefahren — read-only gegen den echten
-`DATA_ROOT` (nur `git rev-parse`/`git clone` in ein Wegwerf-Verzeichnis, keine
-Schreiboperation), kein Verstoß gegen die P1-Testregel (die betrifft die gemockte Testsuite,
-nicht dieses Betriebsskript). Ergebnis: `{"ok":true,"head":"3756c26a7d826def1246bb4dc826e9ee10e764b3",…}`
-— HEAD und Baum von Original und Restore identisch. **Trotzdem bewusst nicht als ✅ gewertet:**
-der Session-Auftrag reserviert „jeden End-to-End-Test gegen das echte Datenverzeichnis" für den
-Nikinger selbst, und die Nikinger-Entscheidung vom 2026-07-27 sah ausdrücklich einen Lauf **von
-ihm** vor (Antwort F4 im P5-Plan). Dieser Lauf ist ein Kandidatenbeleg, kein Ersatz dafür — der
-Befehl oben ist ein einziger Fünf-Sekunden-Aufruf, den der Nikinger selbst wiederholen oder
-per Bestätigung absegnen kann. **Status bleibt 🟡, 12/13**, bis das passiert ist. `ROADMAP.md`
-und `docs/INDEX.md` tragen dieselbe Zurückhaltung.
+**1. Zeile 13 (Restore-Nachweis) — vom Nikinger selbst bestätigt, jetzt Abnahme.** Claude Code
+hatte `restore_check.sh` zunächst selbst gegen das frischeste Bundle
+(`sharefyx-data-20260801T220156.234086Z.bundle`) gefahren (`ok:true`) — bewusst nur als
+Kandidatenbeleg gewertet, weil der Session-Auftrag „jeden End-to-End-Test gegen das echte
+Datenverzeichnis" dem Nikinger vorbehält. Der Nikinger hat denselben Befehl danach selbst
+ausgeführt: `{"ts":"2026-08-02T18:01:39.959Z","bundle":"…20260801T220156…","head":
+"3756c26a7d826def1246bb4dc826e9ee10e764b3","ok":true}` — identischer HEAD, echte Nikinger-Abnahme.
+**Damit stehen 13 von 13 Abnahmezeilen, Phase 3 wechselt von 🟡 auf ✅.** `ROADMAP.md`,
+Root-`CLAUDE.md` und `docs/INDEX.md` im selben Commit nachgezogen.
 
 **2. Rückbau-Konsequenz aus P5 Step 0 A dokumentiert.** `docs/concepts/
 PHASE4_CLOSEOUT_HANDOVER.md` §4.5 verlangte den Rückbau von `spaces.cred` und den P2-Token-Resten

@@ -255,18 +255,16 @@ Nachtrag. Details zu Step 2–6b: Session-Blöcke in `phase4_auth/CLAUDE.md` bzw
 `phase4_auth/SESSIONS_ARCHIVE.md`.
 
 **Phase 3 — Exposure & Betrieb** (`phase3_edge/`, kein eigenes Python-Paket — Servercode bleibt
-in `mcpserver`): 🟡 **code-complete, nicht vollständig live-bewiesen** — inzwischen 12 von 13
-Abnahmezeilen live bestanden (Ursprungsstand 10/13: `docs/concepts/P3_ABNAHME_2026-07-27.md`).
-Zeilen 6 (Reboot), 12 (Backup-Timer-Lauf) und 13 (Restore-Nachweis) sind laut
-Nikinger-Entscheidung an P4 vererbt, nicht vergessen — Zeile 12 ist (P4 Step 0) durch einen
-realen Timer-Lauf erfüllt. **[2026-07-29 Ergänzung:]** Zeile 6 ist jetzt ebenfalls ✅ — ein
-unbeabsichtigter Reboot der VM (Neustart des Windows-Hosts des Nikingers) lieferte genau den
-in der Nikinger-Entscheidung vom 2026-07-27 vorgesehenen Prüffall; Belege (Boot-Zeit,
-Auto-Start ohne Handgriff, echter Tool-Traffic danach, unveränderte Funnel-URL, live `HTTP
-200`) in `phase3_edge/CLAUDE.md`, Session-Block 2026-07-29. Einzig Zeile 13 (Restore-Nachweis,
-braucht ein frisches Bundle) blockiert noch den Wechsel von 🟡 auf ✅. Formaler Abschluss-Handover an P4:
-`docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md`. Plan: `docs/concepts/phase3_edge_plan.md`
-(Entscheidungen P3-A–P3-N gelockt, Steps 0–7). Phase-Head: `phase3_edge/CLAUDE.md`.
+in `mcpserver`): ✅ **live-verifiziert, 13/13** — Ursprungsstand 10/13
+(`docs/concepts/P3_ABNAHME_2026-07-27.md`). Zeile 6 (Reboot) löste sich am 2026-07-29 durch
+einen unbeabsichtigten Reboot der VM (Windows-Host-Neustart des Nikingers), Zeile 12
+(Backup-Timer-Lauf) durch einen realen Timer-Lauf in P4 Step 0. **[2026-08-02, P5 Step 0:]**
+Zeile 13 (Restore-Nachweis) ist die letzte gefallen — Claude Code fuhr `restore_check.sh`
+zunächst selbst als Kandidatenbeleg, der Nikinger führte denselben Lauf danach selbst aus
+(identischer HEAD, `ok:true`) — echte Abnahme. **Phase 3 damit vollständig ✅.** Formaler
+Abschluss-Handover an P4: `docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md`. Plan: `docs/concepts/
+phase3_edge_plan.md` (Entscheidungen P3-A–P3-N gelockt, Steps 0–7). Phase-Head:
+`phase3_edge/CLAUDE.md`.
 
 **Phase 2 — MCP-Server** (`phase2_mcp/`, Paket `mcpserver`): ✅ **abgeschlossen,
 live-verifiziert seit 2026-07-26** — Quick-Tunnel-Probe + vollständige Adapter-Abnahme über den
