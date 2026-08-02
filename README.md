@@ -58,12 +58,13 @@ Adapter darüber — deshalb wird der Kern zuerst gebaut und offline bewiesen.
 
 ## Setup
 
-> **Stand 2026-07-30:** Phase 1 (Storage-Kern) und Phase 2 (MCP-Server) sind abgeschlossen und
-> live-verifiziert. Phase 3 (Exposure & Betrieb, Tailscale Funnel + systemd) ist code-complete,
-> 🟡 — 12 von 13 Live-Abnahmezeilen bestanden, siehe `phase3_edge/CLAUDE.md`. Phase 4 (OAuth 2.1
-> + DCR, Plan: `docs/concepts/phase4_auth_plan.md`) ist **live-verifiziert** — der Schnitt
-> (Runbook-Schritt 8) ist vollzogen, der Connector läuft ausschließlich über OAuth 2.1 + DCR,
-> der Pfad-Token existiert nicht mehr. Siehe Root-`CLAUDE.md` „Current state" für den
+> **Stand 2026-08-02:** Phasen 1–4 (Storage-Kern, MCP-Server, Exposure & Betrieb, OAuth 2.1 +
+> DCR) sind abgeschlossen und live-verifiziert — Phase 3 zuletzt, mit dem Restore-Nachweis
+> (`restore_check.sh`, `docs/concepts/phase3_edge_plan.md`) als letzter offener Abnahmezeile.
+> Phase 4s Schnitt ist vollzogen, der Connector läuft ausschließlich über OAuth 2.1 + DCR, der
+> Pfad-Token existiert nicht mehr — und mit ihm nicht mehr die Skripte, die ihn ausgaben (siehe
+> unten). **Phase 5 (Web-UI, REST-API, Auth-Selbstverwaltung) ist gestartet**, Plan:
+> `docs/concepts/phase5_ui_plan.md`. Siehe Root-`CLAUDE.md` „Current state" für den
 > verbindlichen aktiven Phasenstand.
 
 ```bash
@@ -79,49 +80,21 @@ Es wird nie in dieses Repo eingecheckt.
 `LoadCredential`. Nicht in `.env`, nicht in einer Config, nicht in einer Shell-Variable. Wenn
 irgendwo in diesem Projekt ein Token in einer Datei auftaucht, ist das ein Incident.
 
-## Token ausgeben, rotieren, widerrufen
+## Anmeldung: OAuth 2.1 + DCR (ab Phase 4)
 
-**[2026-07-30 Korrektur, Schnitt (Runbook-Schritt 8)]** Dieser Abschnitt beschreibt den
-**Pfad-Token** aus P2 — seit dem Schnitt in Phase 4 verbindet sich niemand mehr darüber, beide
-bestehenden Token sind live widerrufen und `TokenPathASGI` (der Code, der sie akzeptierte) ist
-entfernt. `issue_token.py`/der Keyring bleiben trotzdem im Repo: reines Bestandswerkzeug, nicht
-mehr Teil des Connect-Wegs. Die echte Anmeldung läuft ab jetzt über OAuth 2.1 + DCR (Passwort +
-TOTP), siehe `phase4_auth/CLAUDE.md` — Runbook „Inbetriebnahme" (`provision_user.py`,
-`authctl.py unlock`).
+**[2026-08-02 Korrektur, P5 Step 0]** Dieser Abschnitt beschrieb bis P5 den **Pfad-Token** aus
+P2 (`issue_token.py`, `export_space_map.py`, `spaces.cred`). Seit dem P4-Schnitt verbindet sich
+niemand mehr darüber — beide Token waren live widerrufen, `TokenPathASGI` (der Code, der sie
+akzeptierte) war entfernt. Mit dem P5-Rückbau (`docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md` §4.5)
+sind jetzt auch die Skripte selbst sowie die zugehörige `LoadCredentialEncrypted`-Zeile
+gelöscht — es gibt keinen Weg mehr zurück zum Pfad-Token, auch nicht als totes Bestandswerkzeug.
 
-```bash
-python phase2_mcp/scripts/issue_token.py --space niklas      # neues Token ausgeben
-python phase2_mcp/scripts/issue_token.py --list              # Spaces + gekürzte Hashes
-python phase2_mcp/scripts/issue_token.py --revoke niklas     # alle Tokens dieses Space widerrufen
-```
-
-**Das Token wird genau einmal angezeigt** — direkt nach `--space` auf stdout, kein zweites Mal
-abrufbar. Der Keyring speichert nur den sha256-Hash, nie das Token selbst. Wenn ein Token
-verloren geht: neu ausgeben (`--space`), den alten Hash mit `--revoke` entfernen, danach die
-Connector-URL in Claude aktualisieren (der alte Pfad-Token funktioniert ab dem Revoke nicht
-mehr).
-
-### Rotation im Dienstbetrieb (ab P3)
-
-Läuft der Server als systemd-Dienst (`sharefyx-mcp.service`, siehe „Betrieb" unten), liest er die
-Space-Map **nicht** aus dem Keyring, sondern aus einer verschlüsselten Credential-Datei
-(`LoadCredentialEncrypted`, `mcpserver/credentials.py :: load_space_map()`). Eine Token-Rotation
-braucht deshalb vier Schritte in dieser Reihenfolge (P3-M):
-
-```bash
-python phase2_mcp/scripts/issue_token.py --revoke niklas
-python phase2_mcp/scripts/issue_token.py --space niklas        # 1. Token neu ausgeben (Keyring)
-
-python phase3_edge/scripts/export_space_map.py \                # 2. Export
-  | sudo systemd-creds encrypt --name=spaces - /etc/sharefyx/spaces.cred
-
-sudo systemctl restart sharefyx-mcp                              # 3. Neustart
-#    ohne diesen Schritt bleibt die ALTE Space-Map im tmpfs — der Dienst liefert dann 401 auf
-#    das neue Token, obwohl der Export erfolgreich war. Das sieht wie „Connector kaputt" aus,
-#    ist aber ein vergessener Restart.
-
-# 4. Connector-URL mit dem neuen Token in beiden Claude-Accounts aktualisieren
-```
+Die echte Anmeldung läuft über **OAuth 2.1 + DCR** (Passwort + TOTP): Erstvergabe über
+`provision_user.py`, Betrieb über `authctl.py` (Sperren/Entsperren, Widerruf), siehe
+`phase4_auth/CLAUDE.md` — Runbook „Inbetriebnahme". **P5 baut zusätzlich eine
+Selbstverwaltung** (Einladungslink, Passwort/TOTP/Recovery-Codes im Browser setzen, ohne SSH
+und ohne Neustart) — bis dahin bleibt `authctl.py`/SSH der einzige Weg,
+`docs/concepts/phase5_ui_plan.md` §2.8.
 
 ## MCP-Server smoke-testen
 

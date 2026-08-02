@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080" font-family="'DejaVu Sans','Segoe UI',Helvetica,Arial,sans-serif">
+
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a6b7d"/>
+    </marker>
+    <marker id="arG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2f7a4d"/>
+    </marker>
+    <marker id="arR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b03030"/>
+    </marker>
+  </defs>
+
+  <rect width="1080" height="1080" fill="#f7f8fa"/>
+
+  <!-- ================= Kopf ================= -->
+  <rect x="0" y="0" width="1080" height="86" fill="#1d2b3a"/>
+  <text x="36" y="40" font-size="26" font-weight="700" fill="#ffffff">Phase 4 — OAuth 2.1 + Dynamic Client Registration</text>
+  <text x="36" y="68" font-size="15" fill="#9db2c6">Sharefyx · phase4_auth/ · Paket authserver · abgeschlossen 2026-07-30 · 16/16 Abnahmezeilen live bestanden</text>
+  <rect x="898" y="24" width="146" height="40" rx="20" fill="#2f7a4d"/>
+  <text x="971" y="50" font-size="17" font-weight="700" fill="#ffffff" text-anchor="middle">Phase 4 ✅</text>
+
+  <!-- ================= Mission ================= -->
+  <rect x="36" y="106" width="1008" height="58" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="132" font-size="16" font-weight="700" fill="#1d2b3a">Mission: Der Pfad-Token verschwindet.</text>
+  <text x="56" y="153" font-size="13.5" fill="#4a5a6b">
+    <tspan font-family="monospace" fill="#b03030" text-decoration="line-through">https://&lt;host&gt;/mcp/&lt;token&gt;</tspan>
+    <tspan dx="10">→</tspan>
+    <tspan dx="10" font-family="monospace" fill="#2f7a4d">https://&lt;host&gt;/mcp</tspan>
+    <tspan dx="14">— kein Geheimnis mehr in der URL, kein Bearer-Passwort mehr im Log.</tspan>
+  </text>
+
+  <!-- ================= Flussdiagramm ================= -->
+  <rect x="36" y="182" width="1008" height="416" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="208" font-size="15" font-weight="700" fill="#1d2b3a">Der Weg einer neuen Verbindung — sieben Schritte, alle live durchlaufen</text>
+
+  <!-- Client -->
+  <rect x="56" y="226" width="164" height="82" rx="6" fill="#e8eef5" stroke="#7f9ab5"/>
+  <text x="138" y="252" font-size="14" font-weight="700" fill="#1d2b3a" text-anchor="middle">Claude</text>
+  <text x="138" y="272" font-size="11.5" fill="#4a5a6b" text-anchor="middle">Custom Connector</text>
+  <text x="138" y="290" font-size="11.5" fill="#4a5a6b" text-anchor="middle">zwei Pro-Accounts</text>
+
+  <!-- 1 401 -->
+  <line x1="220" y1="252" x2="322" y2="252" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <text x="271" y="245" font-size="11" fill="#4a5a6b" text-anchor="middle">POST /mcp</text>
+  <line x1="322" y1="278" x2="220" y2="278" stroke="#b03030" stroke-width="1.6" marker-end="url(#arR)"/>
+  <text x="271" y="295" font-size="11" fill="#b03030" text-anchor="middle" font-weight="600">401 + WWW-Authenticate</text>
+
+  <rect x="322" y="226" width="182" height="82" rx="6" fill="#fdecec" stroke="#d99b9b"/>
+  <text x="413" y="250" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">1 · Challenge</text>
+  <text x="413" y="270" font-size="11" fill="#4a5a6b" text-anchor="middle">Nur ein echter 401 erzeugt</text>
+  <text x="413" y="286" font-size="11" fill="#4a5a6b" text-anchor="middle">den Connect-Button</text>
+
+  <!-- 2 discovery -->
+  <line x1="504" y1="267" x2="596" y2="267" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <rect x="596" y="226" width="188" height="82" rx="6" fill="#eef4ee" stroke="#8fb59a"/>
+  <text x="690" y="250" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">2 · Discovery</text>
+  <text x="690" y="269" font-size="10.5" font-family="monospace" fill="#4a5a6b" text-anchor="middle">/.well-known/</text>
+  <text x="690" y="284" font-size="10.5" font-family="monospace" fill="#4a5a6b" text-anchor="middle">oauth-protected-resource</text>
+  <text x="690" y="299" font-size="10" fill="#6b7b8c" text-anchor="middle">RFC 9728 + RFC 8414</text>
+
+  <!-- 3 DCR -->
+  <line x1="784" y1="267" x2="862" y2="267" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <rect x="862" y="226" width="162" height="82" rx="6" fill="#eef4ee" stroke="#8fb59a"/>
+  <text x="943" y="250" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">3 · DCR</text>
+  <text x="943" y="269" font-size="10.5" font-family="monospace" fill="#4a5a6b" text-anchor="middle">POST /oauth/register</text>
+  <text x="943" y="286" font-size="10" fill="#6b7b8c" text-anchor="middle">RFC 7591 · Origin-</text>
+  <text x="943" y="299" font-size="10" fill="#6b7b8c" text-anchor="middle">Allowlist claude.ai</text>
+
+  <!-- Pfeil runter -->
+  <path d="M 943 308 L 943 336 L 138 336 L 138 366" fill="none" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <text x="540" y="330" font-size="10.5" fill="#6b7b8c" text-anchor="middle">Browser öffnet sich</text>
+
+  <!-- 4 Login -->
+  <rect x="56" y="366" width="230" height="106" rx="6" fill="#fff6e5" stroke="#d9b476"/>
+  <text x="171" y="390" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">4 · Login + Consent</text>
+  <text x="171" y="410" font-size="11" fill="#4a5a6b" text-anchor="middle">ein Formular, keine Cookies</text>
+  <text x="171" y="428" font-size="11" fill="#4a5a6b" text-anchor="middle">Passwort → Argon2id (t=8)</text>
+  <text x="171" y="446" font-size="11" fill="#4a5a6b" text-anchor="middle">2. Faktor → TOTP (RFC 6238)</text>
+  <text x="171" y="464" font-size="10" fill="#8a6d3b" text-anchor="middle">Wegwerf-UI — wird in P5 ersetzt</text>
+
+  <!-- 5 Code -->
+  <line x1="286" y1="419" x2="366" y2="419" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <rect x="366" y="366" width="212" height="106" rx="6" fill="#eef4ee" stroke="#8fb59a"/>
+  <text x="472" y="390" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">5 · Code + PKCE</text>
+  <text x="472" y="410" font-size="11" fill="#4a5a6b" text-anchor="middle">S256 Pflicht, plain abgelehnt</text>
+  <text x="472" y="428" font-size="11" fill="#4a5a6b" text-anchor="middle">TTL 60 s, genau einmal gültig</text>
+  <text x="472" y="446" font-size="11" fill="#4a5a6b" text-anchor="middle">302 zurück mit code, state, iss</text>
+  <text x="472" y="464" font-size="10" fill="#6b7b8c" text-anchor="middle">RFC 7636 + RFC 9207</text>
+
+  <!-- 6 Token -->
+  <line x1="578" y1="419" x2="658" y2="419" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <rect x="658" y="366" width="212" height="106" rx="6" fill="#eef4ee" stroke="#8fb59a"/>
+  <text x="764" y="390" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">6 · Token</text>
+  <text x="764" y="410" font-size="11" fill="#4a5a6b" text-anchor="middle">opak, 256 Bit Zufall</text>
+  <text x="764" y="428" font-size="11" fill="#4a5a6b" text-anchor="middle">access 60 min · refresh 30 d</text>
+  <text x="764" y="446" font-size="11" fill="#4a5a6b" text-anchor="middle">gespeichert nur als sha256</text>
+  <text x="764" y="464" font-size="10" fill="#6b7b8c" text-anchor="middle">Rotation bei jeder Nutzung</text>
+
+  <!-- 7 Bearer -->
+  <path d="M 870 419 L 950 419 L 950 500 L 138 500 L 138 472" fill="none" stroke="#2f7a4d" stroke-width="2" marker-end="url(#arG)"/>
+  <rect x="330" y="512" width="420" height="34" rx="6" fill="#e6f2ea" stroke="#2f7a4d"/>
+  <text x="540" y="534" font-size="12.5" font-weight="600" fill="#1d5c37" text-anchor="middle">7 · POST /mcp mit Authorization: Bearer … → sechs Tools wie gehabt</text>
+
+  <!-- Replay-Abwehr -->
+  <rect x="56" y="558" width="968" height="26" rx="5" fill="#fdecec" stroke="#d99b9b"/>
+  <text x="70" y="576" font-size="12" fill="#8a2b2b">
+    <tspan font-weight="700">Der eigentliche Härtetest war der Fehlschlag:</tspan>
+    <tspan dx="8">Code-Replay und Refresh-Replay töten die gesamte Token-Familie (RFC 9700) — live bewiesen, nicht nur getestet.</tspan>
+  </text>
+
+  <!-- ================= Bausteine ================= -->
+  <rect x="36" y="616" width="496" height="248" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="642" font-size="15" font-weight="700" fill="#1d2b3a">Was gebaut wurde — Paket authserver</text>
+  <text x="56" y="663" font-size="11.5" fill="#6b7b8c">Strikte Richtung: mcpserver → authserver, niemals umgekehrt.</text>
+
+  <g font-size="11.5" font-family="monospace" fill="#33475b">
+    <text x="60" y="690">config · models · crypto · errors</text>
+    <text x="60" y="712">passwords (Argon2id) · totp · users</text>
+    <text x="60" y="734">store (SQLite) · ratelimit</text>
+    <text x="60" y="756">metadata · clients (DCR + Allowlist)</text>
+    <text x="60" y="778">flows · templates · routes</text>
+    <text x="60" y="800">resolver → erfüllt SpaceResolver aus P2</text>
+  </g>
+  <g font-size="10.5" fill="#6b7b8c">
+    <text x="330" y="690">Step 1</text>
+    <text x="330" y="712">Step 2</text>
+    <text x="330" y="734">Step 3</text>
+    <text x="330" y="756">Step 4</text>
+    <text x="330" y="778">Step 5</text>
+    <text x="330" y="800">Step 6</text>
+  </g>
+  <rect x="56" y="816" width="456" height="34" rx="5" fill="#f2f5f8" stroke="#cdd6e0"/>
+  <text x="70" y="838" font-size="11.5" fill="#33475b">Werkzeuge: provision_user · export_auth_users · authctl · oauth_smoke · abnahme_run</text>
+
+  <!-- ================= Ergebnis ================= -->
+  <rect x="548" y="616" width="496" height="248" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="568" y="642" font-size="15" font-weight="700" fill="#1d2b3a">Ergebnis</text>
+
+  <rect x="568" y="658" width="140" height="62" rx="6" fill="#e6f2ea" stroke="#8fb59a"/>
+  <text x="638" y="686" font-size="22" font-weight="700" fill="#1d5c37" text-anchor="middle">16/16</text>
+  <text x="638" y="706" font-size="11" fill="#4a5a6b" text-anchor="middle">Abnahmezeilen live</text>
+
+  <rect x="724" y="658" width="140" height="62" rx="6" fill="#e6f2ea" stroke="#8fb59a"/>
+  <text x="794" y="686" font-size="22" font-weight="700" fill="#1d5c37" text-anchor="middle">347</text>
+  <text x="794" y="706" font-size="11" fill="#4a5a6b" text-anchor="middle">Tests grün, gemockt</text>
+
+  <rect x="880" y="658" width="140" height="62" rx="6" fill="#e6f2ea" stroke="#8fb59a"/>
+  <text x="950" y="686" font-size="22" font-weight="700" fill="#1d5c37" text-anchor="middle">8/8</text>
+  <text x="950" y="706" font-size="11" fill="#4a5a6b" text-anchor="middle">Steps abgeschlossen</text>
+
+  <text x="568" y="748" font-size="12.5" font-weight="700" fill="#1d2b3a">Der Seam aus P2 hat gehalten</text>
+  <text x="568" y="768" font-size="11.5" fill="#4a5a6b">git diff auf tools.py, permissions.py, server.py, storage/</text>
+  <text x="568" y="786" font-size="11.5" fill="#4a5a6b">blieb über die gesamte Phase <tspan font-weight="700" fill="#1d5c37">leer</tspan> — die Auth wurde</text>
+  <text x="568" y="804" font-size="11.5" fill="#4a5a6b">komplett ausgetauscht, ohne eine Zeile Tool-Code.</text>
+
+  <rect x="568" y="816" width="456" height="34" rx="5" fill="#f2f5f8" stroke="#cdd6e0"/>
+  <text x="582" y="838" font-size="11.5" fill="#33475b">Entfernt: TokenPathASGI, AuthModeASGI · beide Pfad-Token widerrufen</text>
+
+  <!-- ================= Offen ================= -->
+  <rect x="36" y="880" width="1008" height="160" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="906" font-size="15" font-weight="700" fill="#1d2b3a">Bewusst offen gelassen — kein Blocker, aber auch nicht vergessen</text>
+
+  <rect x="56" y="920" width="316" height="100" rx="6" fill="#fff6e5" stroke="#d9b476"/>
+  <text x="72" y="942" font-size="12.5" font-weight="700" fill="#8a6d3b">Sicherheits-Review S2–S8</text>
+  <text x="72" y="962" font-size="11" fill="#4a5a6b">Kein Auth-Bypass, kein Cross-Space-Leck,</text>
+  <text x="72" y="978" font-size="11" fill="#4a5a6b">kein Secret-Leak. Sieben kleinere Befunde:</text>
+  <text x="72" y="994" font-size="11" fill="#4a5a6b">Audience- und Scope-Check fehlen, kein</text>
+  <text x="72" y="1010" font-size="11" fill="#4a5a6b">Purge-Timer. S3 wird mit P5 relevant.</text>
+
+  <rect x="384" y="920" width="316" height="100" rx="6" fill="#fff6e5" stroke="#d9b476"/>
+  <text x="400" y="942" font-size="12.5" font-weight="700" fill="#8a6d3b">Benutzbarkeit</text>
+  <text x="400" y="962" font-size="11" fill="#4a5a6b">Es gibt keine Passwortvergabe für</text>
+  <text x="400" y="978" font-size="11" fill="#4a5a6b">Menschen — nur provision_user.py über</text>
+  <text x="400" y="994" font-size="11" fill="#4a5a6b">SSH. Ohne initiale Passwort-Logik und</text>
+  <text x="400" y="1010" font-size="11" fill="#4a5a6b">echte UI bleibt das Werkzeug unbenutzbar.</text>
+
+  <rect x="712" y="920" width="312" height="100" rx="6" fill="#fff6e5" stroke="#d9b476"/>
+  <text x="728" y="942" font-size="12.5" font-weight="700" fill="#8a6d3b">Geerbt und vorgemerkt</text>
+  <text x="728" y="962" font-size="11" fill="#4a5a6b">P3 Zeile 13 (Restore-Nachweis) hält</text>
+  <text x="728" y="978" font-size="11" fill="#4a5a6b">Phase 3 weiterhin auf 🟡.</text>
+  <text x="728" y="994" font-size="11" fill="#4a5a6b">spaces.cred ist totes Gewicht, bricht</text>
+  <text x="728" y="1010" font-size="11" fill="#4a5a6b">aber den Dienst, wenn es jemand löscht.</text>
+
+  <text x="1044" y="1062" font-size="10.5" fill="#8a97a5" text-anchor="end">Sharefyx · Phasenabschluss-Grafik · Stand 2026-08-01</text>
+</svg>

@@ -40,11 +40,13 @@ def test_unit_restarts_on_failure():
 
 
 def test_unit_loads_credential_encrypted():
+    """**[2026-08-02 Korrektur, P5 Step 0 A]:** die zweite `LoadCredentialEncrypted`-Zeile
+    (`spaces:/etc/sharefyx/spaces.cred`, reine Token-Hashes aus P2/P3) ist mit dem P5-Rückbau
+    entfernt (`docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md` §4.5) — die Unit braucht nur noch das
+    Credential für die echten, umkehrbaren Nutzerakten-Geheimnisse (TOTP-Seeds)."""
     text = _unit_text()
-    assert "LoadCredentialEncrypted=spaces:/etc/sharefyx/spaces.cred" in text
-    # P4 Step 7: zweites Credential für die Nutzerakten (TOTP-Seeds, echte umkehrbare Geheimnisse
-    # — anders als die reinen Token-Hashes hinter "spaces").
     assert "LoadCredentialEncrypted=auth-users:/etc/sharefyx/auth-users.cred" in text
+    assert "spaces:/etc/sharefyx/spaces.cred" not in text
 
 
 def test_unit_declares_state_directory():

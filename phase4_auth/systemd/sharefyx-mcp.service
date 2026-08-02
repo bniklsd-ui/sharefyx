@@ -18,7 +18,6 @@ Environment=SPACE_AUTH_MODE=__AUTH_MODE__
 Environment=SPACE_PUBLIC_BASE_URL=__PUBLIC_BASE_URL__
 StateDirectory=sharefyx
 StateDirectoryMode=0700
-LoadCredentialEncrypted=spaces:/etc/sharefyx/spaces.cred
 LoadCredentialEncrypted=auth-users:/etc/sharefyx/auth-users.cred
 ExecStart=__VENV__/bin/python __REPO_ROOT__/phase2_mcp/scripts/serve.py
 Restart=on-failure

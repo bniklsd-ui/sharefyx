@@ -10,9 +10,12 @@ Konstruktor-Austausch an dieser einen Stelle, kein Umbau von `tools.py`/`server.
 mehr optional — `TokenPathASGI`/`AuthModeASGI` (P4 Step 6a) und damit der `oauth=None`-Pfad
 (P3-Verhalten) sind entfernt, beide Pfad-Token live widerrufen. Der `resolver`-Parameter
 (`SpaceResolver`, P2-D) entfällt ersatzlos aus dieser Funktion — er diente ausschließlich dem
-Bau von `TokenPathASGI`. `mcpserver/auth.py :: SpaceResolver`/`KeyringTokenResolver` selbst
-bleiben unverändert (weiterhin gebraucht von `issue_token.py`/dem Keyring-Tooling), nur
-`create_app()` braucht sie nicht mehr.
+Bau von `TokenPathASGI`.
+
+**[2026-08-02 Korrektur, P5 Step 0 A]:** `issue_token.py`/`export_space_map.py`/
+`KeyringTokenResolver` sind inzwischen ebenfalls entfernt (`docs/concepts/
+PHASE4_CLOSEOUT_HANDOVER.md` §4.5) — `mcpserver/auth.py :: SpaceResolver` bleibt nur noch als
+Protokoll stehen, `create_app()` brauchte es ohnehin schon seit dem Schnitt nicht mehr.
 """
 from __future__ import annotations
 

@@ -4,10 +4,55 @@ purpose: Archiv älterer Session-stopped-Blöcke aus phase3_edge/CLAUDE.md, newe
 read-when: Audit vergangener Sessions dieser Phase; NICHT für normalen Session-Start
 detail: L3
 up: CLAUDE.md
-updated: 2026-07-29 (2026-07-28-Session „Token-Rotation live bestätigt" archiviert)
+updated: 2026-08-02 (2026-07-29-Session „Zeile 6 passiv erfüllt" archiviert)
 ---
 
 # Session-Archiv — Phase 3 Exposure & Betrieb
+
+## Session stopped — 2026-07-29 (Zeile 6 passiv erfüllt — unbeabsichtigter Reboot)
+
+**Für den nächsten, kalten Leser:** kein aktiver P3-Arbeitsschritt — diese Session lief in P4
+(Step 7, siehe `phase4_auth/CLAUDE.md`), fand aber genau den in der vorigen Notiz erwarteten
+Auslöser vor: der Windows-Host des Nikingers startete neu (Absturz/Neustart), die VM als Gast
+rebootete unbeabsichtigt mit. Auftrag des Nikingers: nachsehen, ob das die ausstehende
+Reboot-Zeile erfüllt, bevor die Journal-Evidenz mit dem nächsten Boot verfällt.
+
+**Was geprüft wurde (alles read-only, kein Handgriff, kein `sudo reboot` nötig):**
+1. `uptime -s` / `who -b` → Boot 2026-07-29 07:20:45.
+2. `systemctl is-enabled sharefyx-mcp.service` → `enabled`; `systemctl show -p
+   ActiveEnterTimestamp,ActiveState,SubState` → aktiv seit 07:20:51, 6 s nach Boot, ohne
+   Nikinger-Zutun.
+3. `journalctl -b -u sharefyx-mcp.service` → Start um 07:20:51, danach echter Tool-Traffic
+   (POST `/mcp/<redacted>`, Status 200/202) um 07:57 und 08:02 — kein bloßes „active", echte
+   Nutzung nach dem Reboot.
+4. `tailscale funnel status` → `https://savefyx-vmware-virtual-platform.tail89fc2a.ts.net`,
+   identisch zur in `P3_ABNAHME_2026-07-27.md` Zeile 84 notierten URL.
+5. `curl -sf https://savefyx-vmware-virtual-platform.tail89fc2a.ts.net/health` → `HTTP 200`,
+   live zum Prüfzeitpunkt.
+6. Zur Einordnung nebenbei geprüft, nicht der eigentliche Auftrag: `systemctl list-timers` zeigt
+   `sharefyx-backup.timer` mit echtem `LAST` (2026-07-29 00:13:22) — deckt sich mit der bereits
+   in `phase4_auth/CLAUDE.md`/Root-`CLAUDE.md` dokumentierten P4-Step-0-Bestätigung von Zeile 12,
+   kein neuer Fund.
+
+**Ergebnis:** Zeile 6 der P3-Abnahmematrix ist damit ✅ — Nikinger-Entscheidung vom 2026-07-27
+sah genau diesen unbeabsichtigten Vorfall als Prüffall vor, kein erzwungener `sudo reboot`.
+Zusammen mit Zeile 12 (bereits P4 Step 0) stehen jetzt 12/13 Abnahmezeilen. Root-`CLAUDE.md`,
+`ROADMAP.md` und `docs/INDEX.md` im selben Commit nachgezogen. `docs/concepts/
+P3_ABNAHME_2026-07-27.md` bleibt als 📕-Snapshot unangetastet — die Evidenz lebt hier und in der
+Korrekturnotiz oben im Modul-Status-Abschnitt.
+
+**Ausdrücklich nicht behauptet:** dass die neue `phase4_auth/systemd/`-Unit (P4 Step 7,
+uncommitted) einen Reboot überlebt hat — installiert war zum Boot-Zeitpunkt noch die P3-Fassung.
+Das ist exakt die Unit, die Zeile 6 prüfen soll, also ein gültiger Beleg für P3, aber kein
+Beleg für den späteren P4-Unit-Umzug.
+
+**Weiterhin offen, unverändert:** Zeile 13 (Restore-Nachweis, braucht ein frisches Bundle,
+siehe B5) — einzige verbleibende Blockade für den Wechsel von 🟡 auf ✅. Zeile 14 (optional, V8
+geerbt) unverändert offen.
+
+**Nächster Schritt (konkret):** nichts Aktives für P3 — Zeile 13 löst sich mit einem frischen
+Backup-Bundle + `restore_check.sh`-Lauf (Sache einer künftigen Session oder des nächsten
+regulären Zyklus, siehe B5). Danach P3 formal auf ✅ heben.
 
 ## Session stopped — 2026-07-28 (Token-Rotation live bestätigt, Abschluss-Punkte erledigt)
 

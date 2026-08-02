@@ -8,7 +8,9 @@ down:
   - docs/concepts/phase1_storage_plan.md   # ausführungsreifer P1-Plan
   - docs/concepts/phase2_mcp_plan.md       # ausführungsreifer P2-Plan
   - docs/concepts/phase3_edge_plan.md      # ausführungsreifer P3-Plan
-updated: 2026-07-30
+  - docs/concepts/phase4_auth_plan.md      # ausführungsreifer P4-Plan
+  - docs/concepts/phase5_ui_plan.md        # ausführungsreifer P5-Plan
+updated: 2026-08-02
 ---
 # ROADMAP — Space-Server
 
@@ -21,9 +23,9 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 |---|---|---|---|
 | **P1** | `phase1_storage/` · `storage` | Datei-Store + Index + Versionierung. Kein Netz. | ✅ |
 | **P2** | `phase2_mcp/` · `mcpserver` | MCP-Server, Token-Auth, 6 Tools. Lokal erreichbar. | ✅ |
-| **P3** | `phase3_edge/` | Tunnel, systemd, Health, Logging, Ops-Skripte. Öffentlich erreichbar. | 🟡 |
+| **P3** | `phase3_edge/` | Tunnel, systemd, Health, Logging, Ops-Skripte. Öffentlich erreichbar. | ✅ |
 | **P4** | `phase4_auth/` · `authserver` | OAuth 2.1 + DCR; ersetzt den Pfad-Token. | ✅ |
-| **P5** | `phase5_ui/` · `webui` | REST-API + Web-UI für Menschen. | ⬜ |
+| **P5** | `phase5_ui/` · `webui` | REST-API + Web-UI für Menschen. | 🔄 |
 
 **Korrektur (2026-07-25, P2-Planungssession):** OAuth rückt von „ganz am Ende" auf „direkt nach
 P3" — der Pfad-Token soll kurz leben, und die UI ist die Phase, die laut Build-Reihenfolge unter
@@ -108,16 +110,18 @@ offenen Findings mehr. Handover an P3: `docs/concepts/PHASE2_CLOSEOUT_HANDOVER.m
   „Disconnected" mit minimaler Diagnose — deshalb ist das Log kein Nice-to-have, sondern
   Teil des Scope.
 
-**Status 🟡 (2026-07-27, Live-Abnahme zweite Session; 2026-07-29 fortgeschrieben):** 10 von 13
+**Status ✅ (2026-08-02, Restore-Nachweis live geschlossen — siehe Nachtrag unten):** 10 von 13
 Abnahmezeilen live bestanden am 2026-07-27 (Details: `docs/concepts/P3_ABNAHME_2026-07-27.md`).
 Nikinger-Entscheidung: Reboot-Test (Zeile 6), Backup-Timer-Lauf (Zeile 12) und Restore-Nachweis
 (Zeile 13) werden nicht mehr aktiv nachgeholt, sondern auf die nächste Phase verschoben — ein
 unbeabsichtigter Reboot ist ohnehin der reale Prüffall, 12/13 lösen sich mit dem nächsten
 Backup-Zyklus. **[2026-07-29:]** Zeile 12 löste sich mit dem P4-Step-0-Backup-Zyklus, Zeile 6
 mit einem unbeabsichtigten Reboot der VM (Windows-Host-Neustart des Nikingers) — beide jetzt
-✅, Belege in `phase3_edge/CLAUDE.md` Session-Block 2026-07-29. Damit stehen **12 von 13**;
-nur Zeile 13 (Restore-Nachweis) fehlt noch für den Wechsel des Gesamtstatus auf ✅
-(Statusglyphen-Definition: „live-verifiziert").
+✅, Belege in `phase3_edge/CLAUDE.md`. **[2026-08-02, P5 Step 0:]** Zeile 13
+(Restore-Nachweis) live geschlossen — `restore_check.sh` gegen das frischeste Backup-Bundle
+(`sharefyx-data-20260801T220156.234086Z.bundle`) lief grün (`ok:true`, HEAD und Baum identisch
+mit dem echten `DATA_ROOT`). **13 von 13 Abnahmezeilen live bestanden — Status ✅.** Details:
+`phase3_edge/CLAUDE.md` Session-Block 2026-08-02.
 
 ## Phase 4 — OAuth 2.1
 
@@ -155,12 +159,23 @@ Teil dieses Schnitts.
 
 - **DRIN:** REST-API über demselben Storage-Kern, UI gegen diese API.
 - **DRAUSSEN:** Realtime/Collaboration, Anhänge, Mobile-App.
-- **Offene Entscheidung:** Neubau vs. Adaption des `Notizheft_example.html`. Dessen
-  clientseitige Verschlüsselung ist mit R4 unvereinbar und müsste entfallen — was den
-  Anpassungsaufwand womöglich über den eines Neubaus hebt. Vor P5 in einer Planungssession
-  klären, nicht während der Implementierung.
+- ~~**Offene Entscheidung:** Neubau vs. Adaption des `Notizheft_example.html`.~~ **[2026-08-02
+  Korrektur, P5-Planungssession, Entscheidung P5-V]:** entschieden — **Neubau mit Ernte**.
+  Übernommen werden Layout-Ideen sowie `sanitizeHtml`/`markdownToHtml`; verworfen wird die
+  clientseitige Vault-Verschlüsselung (unvereinbar mit R4), `localStorage`/IndexedDB als
+  Speicher und `connect-src 'none'`. Details: `docs/concepts/phase5_ui_plan.md` §0.5.
 - **Rückt hinter OAuth (Korrektur 2026-07-25):** die UI ist die Phase, die unter Zeit-/Token-
-  Druck wegfallen darf; OAuth nicht.
+  Druck wegfallen darf; OAuth nicht. Innerhalb der Phase gilt dieselbe Regel eine Ebene tiefer:
+  unter Druck fällt Block B (REST-API/UI) weg, nicht Block A (Sicherheit/Auth-Selbstverwaltung).
+- **Erweiterung (2026-08-02 Planungssession):** Scope wächst gegenüber der ursprünglichen
+  Roadmap-Zeile um **Auth-Selbstverwaltung** (Einladung, Passwort/TOTP/Recovery-Code selbst
+  setzen, ohne SSH/Neustart) — kommt aus `docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md` §4.1 und
+  ist ausdrücklich Block A der Phase, nicht optional. Ohne sie ist die UI eine Oberfläche auf
+  einem Konto, das nur per SSH existiert.
+
+**Status 🔄 (2026-08-02):** Planungssession abgeschlossen, ausführungsreifer Plan liegt vor
+(`docs/concepts/phase5_ui_plan.md`, Entscheidungen P5-A–P5-AE, Steps 0–9). Step 0 (Haushalt,
+Rückbau, Doku-Drift) läuft. Phase-Head: `phase5_ui/CLAUDE.md`.
 
 ---
 

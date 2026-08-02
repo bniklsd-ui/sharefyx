@@ -7,8 +7,8 @@ up: docs/INDEX.md
 down:
   - ROADMAP.md                          # Phasenplan + Status je Phase
   - docs/INDEX.md                       # L0-Karte aller .md
-  - phase4_auth/CLAUDE.md               # aktive Phase
-updated: 2026-07-28
+  - phase5_ui/CLAUDE.md                 # aktive Phase
+updated: 2026-08-02
 ---
 # CLAUDE.md — Project Instructions
 
@@ -134,15 +134,23 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 
 ## Current state
 
-**Aktive Phase:** Phase 4 — OAuth 2.1 + DCR (`phase4_auth/`, Paket `authserver`) — **✅
+**Aktive Phase:** Phase 5 — Web-UI, REST-API und Auth-Selbstverwaltung (`phase5_ui/`, Paket
+`webui`) — **🔄 gestartet, 2026-08-02.** Browser-Planungssession abgeschlossen, ausführungsreifer
+Plan liegt vor (`docs/concepts/phase5_ui_plan.md`, Entscheidungen P5-A–P5-AE, Steps 0–9, zwei
+Blöcke: A = Sicherheit + Auth-Selbstverwaltung, B = REST-API + UI, harter Gate dazwischen).
+Herkunft/offene Entscheidungen: `docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md`. Phase-Head:
+`phase5_ui/CLAUDE.md`. **Nächster Schritt:** Step 0 (Haushalt, Rückbau der P2-Token-Reste,
+Doku-Drift) — läuft.
+
+**Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅
 abgeschlossen, 2026-07-30.** Mission erfüllt: der Pfad-Token ist verschwunden, ein eigener
 Authorization Server ersetzt ihn (DCR, PKCE, Argon2id + TOTP), Schnitt vollzogen, 16/16
 Abnahmezeilen live bestanden. Plan: `docs/concepts/phase4_auth_plan.md` (Entscheidungen
 P4-A–P4-R gelockt, Steps 0–7, ausführungsreif — geschrieben ohne frischen Repo-Zugriff, siehe
 Plan-Kopf). Herkunft/offene Entscheidungen: `docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md`.
-Phase-Head: `phase4_auth/CLAUDE.md`. **Nächster Schritt:** formaler Phasenabschluss (Handover-
-Dokument, Browser-Planungssession für Phase 5) — Sache des Nikingers, nicht aus einem
-Code-Commit heraus.
+Phase-Head: `phase4_auth/CLAUDE.md`. **[2026-08-02 Nachtrag:]** der formale Phasenabschluss ist
+erledigt — `docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md` und die P5-Planungssession liegen vor,
+Phase 5 ist gestartet (siehe oben).
 
 **[2026-07-28 Korrektur:** diese Zeile stand hier zwischenzeitlich auf „P4 Step 0+1", obwohl
 Step 2 und Step 3 im selben Tag folgten — Drift durch fehlendes Nachziehen dieser Datei bei
@@ -293,8 +301,14 @@ P2 Step 2 — siehe P2-Plan §0.4 Punkt L).
 | R6 | Zweck | **Lernprojekt**, später evtl. Arbeitswerkzeug. Bei Zielkonflikt gewinnt Lerneffekt über Bequemlichkeit — außer bei Safety/Secrets, dort gewinnt immer die sichere Variante. |
 
 **Noch nicht entschieden (bewusst offen, für spätere Planungssessions):**
-- Web-UI: Neubau gegen die REST-API vs. Adaption des `Notizheft_example.html` (dessen
-  Vault-/Krypto-Schicht ist mit R4 unvereinbar und müsste entfallen).
+- *(aktuell keine offenen Punkte auf dieser Ebene — der einzige verbliebene, „Web-UI: Neubau vs.
+  Adaption", ist mit P5-V entschieden, siehe Korrekturnotiz direkt darunter.)*
+
+**[2026-08-02 Korrektur, P5-Planungssession]:** der bis dahin offene Punkt „Web-UI: Neubau gegen
+die REST-API vs. Adaption des `Notizheft_example.html`" ist entschieden — **Neubau mit Ernte**
+(Entscheidung P5-V, `docs/concepts/phase5_ui_plan.md` §0.5): Layout-Ideen sowie
+`sanitizeHtml`/`markdownToHtml` werden übernommen, die clientseitige Vault-Verschlüsselung
+(unvereinbar mit R4), `localStorage`/IndexedDB und `connect-src 'none'` werden verworfen.
 
 **[2026-07-28 Korrektur, P4 Step 0]:** Der Punkt „Ob der Kollege einen eigenen Server-Prozess
 oder nur einen eigenen Space bekommt" stand hier fälschlich noch als offen. Das ist seit P3-G
