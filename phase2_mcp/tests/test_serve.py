@@ -1,13 +1,21 @@
 """Testet `scripts/serve.py :: main()` — nicht als Subprozess (der würde echt `uvicorn.run()`
-aufrufen und blockieren), sondern in-process mit `uvicorn.run` und `load_users` gepatcht.
+aufrufen und blockieren), sondern in-process mit `uvicorn.run` und `load_data_encryption_key`
+gepatcht.
 
 **Schnitt, 2026-07-30 (Runbook-Schritt 8):** `serve.py` verlangt seither immer eine gültige
 `OAuthConfig` (kein `oauth=None`-Pfad mehr) — bisher deckte kein Test die Verdrahtung von
 `load_settings()`/`load_auth_settings()`/`create_app()` bis zum `uvicorn.run()`-Aufruf ab, beide
 Smoke-Skripte bauen `create_app()` direkt und rufen `main()` nie auf. Das nächste `systemctl
 restart sharefyx-mcp` wäre sonst der erste echte Test dieser Verdrahtung — zu spät für einen
-falschen Parameternamen. `load_users` wird gepatcht, damit dieser Test nie den echten Keyring
-(Service `nikinger-space`) anfasst, gleiches Muster wie `mcp_smoke.py`/`oauth_smoke.py`.
+falschen Parameternamen.
+
+**P5 Step 2:** `serve.py` liest Nutzerakten seither über `UserDirectory` aus `auth.sqlite3`
+(schließt O1), nicht mehr über `authserver.users.load_users()`. `load_data_encryption_key` wird
+auf `lambda: None` gepatcht — sonst würde dieser Test den echten Keyring (Service
+`nikinger-space`) anfassen, um einen DEK zu suchen, den es dort nicht geben soll (gleiche
+Schutzregel wie zuvor bei `load_users`). `None` ist hier zulässig, weil das frische, leere
+`auth.sqlite3` in `tmp_path` keine `users`-Zeile hat — `UserDirectory.__init__` verlangt einen
+DEK nur, wenn die Tabelle nicht leer ist (Plan §2.4).
 """
 from __future__ import annotations
 
@@ -36,7 +44,7 @@ def test_main_wires_a_real_app_and_calls_uvicorn_run(tmp_path, monkeypatch):
     monkeypatch.setenv("SPACE_AUTH_DB", str(tmp_path / "auth.sqlite3"))
 
     serve = _load_serve_module()
-    monkeypatch.setattr(serve, "load_users", lambda: {})
+    monkeypatch.setattr(serve, "load_data_encryption_key", lambda: None)
 
     calls: list[dict] = []
 
@@ -63,7 +71,7 @@ def test_main_dies_loudly_without_public_base_url(tmp_path, monkeypatch):
     monkeypatch.setenv("SPACE_AUTH_DB", str(tmp_path / "auth.sqlite3"))
 
     serve = _load_serve_module()
-    monkeypatch.setattr(serve, "load_users", lambda: {})
+    monkeypatch.setattr(serve, "load_data_encryption_key", lambda: None)
     monkeypatch.setattr(serve.uvicorn, "run", lambda app, **kwargs: None)
 
     try:

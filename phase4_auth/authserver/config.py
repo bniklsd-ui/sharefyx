@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+import base64
+import binascii
 import os
+import secrets
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
+
+import keyring
 
 DEFAULT_MODE = "oauth"
 DEFAULT_ALLOWED_REDIRECT_ORIGINS: tuple[str, ...] = ("https://claude.ai", "https://claude.com")
@@ -151,3 +156,60 @@ def load_auth_settings(env: Mapping[str, str] | None = None) -> AuthSettings:
         ),
         hsts=_parse_bool(source.get("SPACE_OAUTH_HSTS"), default=True),
     )
+
+
+# -- Verschlüsselungsschlüssel für secretbox.py (Plan §2.4, P5-J) --------------------------
+
+KEYRING_SERVICE = "nikinger-space"  # dieselbe Konstante wie in users.py — Hard-Rule-1-Wert,
+# bewusst hier erneut definiert statt importiert (kein neuer Modul-Kopplungspunkt für einen
+# einzelnen String, der ohnehin projektweit fix ist, siehe Root-CLAUDE.md).
+KEYRING_KEY_DEK = "auth-dek"
+CREDENTIAL_NAME_DEK = "auth-dek"
+DEK_LEN = 32
+
+
+def generate_data_encryption_key() -> bytes:
+    return secrets.token_bytes(DEK_LEN)
+
+
+def encode_data_encryption_key(key: bytes) -> str:
+    """Symmetrisch zum Decoding in `load_data_encryption_key()` — Text statt Rohbytes, damit
+    sowohl die Credential-Datei als auch der Keyring-Eintrag dasselbe Format tragen (genau wie
+    TOTP-Seeds als Base32-Text, nicht als Binärdatei, in `users.py`)."""
+    if len(key) != DEK_LEN:
+        raise ValueError(f"Schlüssel muss {DEK_LEN} Byte lang sein, war {len(key)}")
+    return base64.urlsafe_b64encode(key).rstrip(b"=").decode("ascii")
+
+
+def decode_data_encryption_key(raw: str, *, origin: str) -> bytes:
+    padded = raw + "=" * (-len(raw) % 4)
+    try:
+        key = base64.urlsafe_b64decode(padded)
+    except (ValueError, binascii.Error) as exc:
+        raise ValueError(f"DEK aus {origin} ist kein gültiges Base64") from exc
+    if len(key) != DEK_LEN:
+        raise ValueError(f"DEK aus {origin} hat {len(key)} Byte, erwartet {DEK_LEN}")
+    return key
+
+
+def load_data_encryption_key(source: Mapping[str, str] | None = None) -> bytes | None:
+    """Gleiche Verzweigungslogik wie `users.load_users()`: `CREDENTIALS_DIRECTORY/auth-dek`
+    (systemd `LoadCredentialEncrypted`) zuerst, sonst Keyring `nikinger-space`/`auth-dek` (nur
+    Entwicklung). Gibt `None` zurück, wenn keine der beiden Quellen einen Wert liefert — anders
+    als `load_users()` **kein** `warning`-und-Keyring-Fallback bei einer fehlenden, aber
+    erwarteten Datei, weil das Fehlen hier für den Aufrufer selbst entscheidungsrelevant ist
+    (Plan §2.4: „fehlt beides UND `users`-Tabelle ist nicht leer → Start scheitert laut" — diese
+    Entscheidung trifft der Aufrufer, nicht diese Funktion). Malformtes Material (falsche Länge,
+    kein gültiges Base64) ist dagegen immer ein sofortiger `ValueError`, nie ein stilles `None`.
+    """
+    env = source if source is not None else os.environ
+    credentials_dir = env.get("CREDENTIALS_DIRECTORY")
+    if credentials_dir:
+        path = Path(credentials_dir) / CREDENTIAL_NAME_DEK
+        if path.exists():
+            return decode_data_encryption_key(path.read_text(encoding="utf-8").strip(), origin=str(path))
+
+    raw = keyring.get_password(KEYRING_SERVICE, KEYRING_KEY_DEK)
+    if raw is None:
+        return None
+    return decode_data_encryption_key(raw, origin="Keyring")

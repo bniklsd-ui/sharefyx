@@ -3,7 +3,15 @@ from pathlib import Path
 
 import pytest
 
-from authserver.config import load_auth_settings
+from authserver import config
+from authserver.config import (
+    DEK_LEN,
+    decode_data_encryption_key,
+    encode_data_encryption_key,
+    generate_data_encryption_key,
+    load_auth_settings,
+    load_data_encryption_key,
+)
 
 _FORBIDDEN_IMPORT = re.compile(r"^\s*(import|from)\s+(mcpserver|storage)\b", re.MULTILINE)
 
@@ -138,3 +146,75 @@ def test_load_auth_settings_invalid_ttl_raises():
                 "SPACE_OAUTH_ACCESS_TTL_S": "not-a-number",
             }
         )
+
+
+# -- load_data_encryption_key (Plan §2.4, P5-J) --------------------------------------------
+
+
+@pytest.fixture
+def fake_keyring(monkeypatch):
+    """Wie `test_users.py`s gleichnamige Fixture, hier gegen `config.keyring` statt
+    `users.keyring` — zwei Module importieren `keyring` jetzt (siehe Docstring-Korrektur in
+    `users.py`), jedes über sein eigenes In-Memory-Double."""
+    store: dict[tuple[str, str], str] = {}
+
+    def fake_get_password(service, username):
+        return store.get((service, username))
+
+    def fake_set_password(service, username, password):
+        store[(service, username)] = password
+
+    monkeypatch.setattr(config.keyring, "get_password", fake_get_password)
+    monkeypatch.setattr(config.keyring, "set_password", fake_set_password)
+    return store
+
+
+def test_generate_encode_decode_roundtrip():
+    key = generate_data_encryption_key()
+    assert len(key) == DEK_LEN
+    encoded = encode_data_encryption_key(key)
+    assert decode_data_encryption_key(encoded, origin="test") == key
+
+
+def test_encode_rejects_wrong_length():
+    with pytest.raises(ValueError):
+        encode_data_encryption_key(b"too-short")
+
+
+def test_decode_rejects_wrong_length():
+    with pytest.raises(ValueError):
+        decode_data_encryption_key(encode_data_encryption_key(b"x" * 16), origin="test")
+
+
+def test_decode_rejects_invalid_base64():
+    with pytest.raises(ValueError):
+        decode_data_encryption_key("not base64 at all!!", origin="test")
+
+
+def test_load_dek_returns_none_when_absent(fake_keyring):
+    assert load_data_encryption_key({}) is None
+
+
+def test_load_dek_prefers_credentials_dir(tmp_path, fake_keyring):
+    key = generate_data_encryption_key()
+    (tmp_path / "auth-dek").write_text(encode_data_encryption_key(key), encoding="utf-8")
+    fake_keyring[("nikinger-space", "auth-dek")] = encode_data_encryption_key(
+        generate_data_encryption_key()
+    )  # muss ignoriert werden
+
+    result = load_data_encryption_key({"CREDENTIALS_DIRECTORY": str(tmp_path)})
+    assert result == key
+
+
+def test_load_dek_falls_back_to_keyring(tmp_path, fake_keyring):
+    key = generate_data_encryption_key()
+    fake_keyring[("nikinger-space", "auth-dek")] = encode_data_encryption_key(key)
+
+    result = load_data_encryption_key({"CREDENTIALS_DIRECTORY": str(tmp_path)})  # Datei fehlt
+    assert result == key
+
+
+def test_load_dek_raises_on_malformed_credential_file(tmp_path, fake_keyring):
+    (tmp_path / "auth-dek").write_text("not-valid-base64!!", encoding="utf-8")
+    with pytest.raises(ValueError):
+        load_data_encryption_key({"CREDENTIALS_DIRECTORY": str(tmp_path)})

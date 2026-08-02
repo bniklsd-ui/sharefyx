@@ -72,3 +72,47 @@ class TokenFamily:
     created_at: datetime
     revoked_at: datetime | None
     revoked_reason: str | None
+
+
+# -- Schema 2 (P5 Step 2, Plan §2.2/§2.3) --------------------------------------------------
+
+
+@dataclass(frozen=True, kw_only=True)
+class UserRow:
+    """Rohzeile aus `users` — `totp_secret_enc` ist **verschlüsselt** (AES-256-GCM-Blob);
+    entschlüsselt wird ausschließlich in `userdir.py`, nie hier und nie in `store.py`."""
+
+    space: str
+    password_hash: str
+    password_changed_at: datetime | None
+    totp_secret_enc: bytes | None
+    totp_alg: str
+    totp_confirmed_at: datetime | None
+    status: str
+    created_at: datetime
+
+
+@dataclass(frozen=True, kw_only=True)
+class InviteRow:
+    space: str
+    purpose: str
+    created_at: datetime
+    expires_at: datetime
+    consumed_at: datetime | None
+
+
+@dataclass(frozen=True, kw_only=True)
+class SessionRow:
+    """`session_hash`/`csrf_hash` — wie bei Token/Codes wird nur der Hash gespeichert (P5-K),
+    das Klartext-Cookiepaar existiert nur im Moment von `create_session()`s Rückgabe. `csrf_hash`
+    ist trotzdem Teil der Zeile: die Double-Submit-Prüfung (Step 3) vergleicht
+    `hash_secret(eingereichter_wert) == csrf_hash`, ohne den Klartext je zu speichern."""
+
+    session_hash: str
+    space: str
+    csrf_hash: str
+    created_at: datetime
+    last_seen_at: datetime
+    absolute_expires_at: datetime
+    revoked_at: datetime | None
+    revoked_reason: str | None

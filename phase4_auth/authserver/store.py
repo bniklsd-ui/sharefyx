@@ -29,12 +29,20 @@ from .models import (
     AccessTokenRecord,
     AuthorizationCode,
     Client,
+    InviteRow,
     LoginAttempt,
     PendingAuthRequest,
+    SessionRow,
     TokenFamily,
+    UserRow,
 )
 
-SCHEMA_VERSION = "1"
+SCHEMA_VERSION = "2"
+
+# S7-Ergänzung (P5 Step 2): wie lange eine widerrufene `ui_sessions`-Zeile bzw. eine konsumierte
+# `invites`-Zeile nach dem Ereignis noch existiert, bevor `purge_expired()` sie entfernt — genug
+# Zeit für ein Audit ("wer hat wann welche Sitzung beendet"), aber kein unbegrenztes Wachstum.
+RETENTION_AFTER_REVOKE_OR_CONSUME_S = 7 * 86400
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -115,6 +123,49 @@ CREATE INDEX IF NOT EXISTS ix_refresh_family ON refresh_tokens(family_id);
 CREATE INDEX IF NOT EXISTS ix_access_exp     ON access_tokens(expires_at);
 """
 
+# Schema 2 (P5 Step 2, Plan §2.2) — rein additiv, keine Änderung an _SCHEMA. Nutzerakten wandern
+# hier aus dem Keyring/Credential-JSON (P4) in die Auth-SQLite (P5-I); `totp_secret_enc` ist ein
+# AES-256-GCM-Blob, entschlüsselt wird ausschließlich in `userdir.py`.
+_SCHEMA_V2 = """
+CREATE TABLE IF NOT EXISTS users (
+  space               TEXT PRIMARY KEY,
+  password_hash       TEXT NOT NULL,
+  password_changed_at TEXT,
+  totp_secret_enc     BLOB,
+  totp_alg            TEXT NOT NULL DEFAULT 'SHA1',
+  totp_confirmed_at   TEXT,
+  status              TEXT NOT NULL DEFAULT 'active',
+  created_at          TEXT NOT NULL);
+
+CREATE TABLE IF NOT EXISTS invites (
+  token_hash  TEXT PRIMARY KEY,
+  space       TEXT NOT NULL,
+  purpose     TEXT NOT NULL,
+  created_at  TEXT NOT NULL,
+  expires_at  TEXT NOT NULL,
+  consumed_at TEXT);
+
+CREATE TABLE IF NOT EXISTS recovery_codes (
+  code_hash  TEXT PRIMARY KEY,
+  space      TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  used_at    TEXT);
+
+CREATE TABLE IF NOT EXISTS ui_sessions (
+  session_hash        TEXT PRIMARY KEY,
+  space               TEXT NOT NULL,
+  csrf_hash           TEXT NOT NULL,
+  created_at          TEXT NOT NULL,
+  last_seen_at        TEXT NOT NULL,
+  absolute_expires_at TEXT NOT NULL,
+  revoked_at          TEXT,
+  revoked_reason      TEXT);
+
+CREATE INDEX IF NOT EXISTS ix_sessions_space  ON ui_sessions(space);
+CREATE INDEX IF NOT EXISTS ix_recovery_space  ON recovery_codes(space);
+CREATE INDEX IF NOT EXISTS ix_invites_space   ON invites(space);
+"""
+
 
 def _format_dt(value: datetime) -> str:
     return value.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -170,8 +221,10 @@ class AuthStore:
     def initialise(self) -> None:
         with self._lock:
             self._conn.executescript(_SCHEMA)
+            self._conn.executescript(_SCHEMA_V2)
             self._conn.execute(
-                "INSERT OR IGNORE INTO schema_meta (key, value) VALUES ('schema_version', ?)",
+                "INSERT INTO schema_meta (key, value) VALUES ('schema_version', ?) "
+                "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
                 (SCHEMA_VERSION,),
             )
 
@@ -515,7 +568,15 @@ class AuthStore:
         )
 
     def purge_expired(self) -> dict[str, int]:
-        now_s = _format_dt(self._now_fn())
+        """**S7-Ergänzung (P5 Step 2):** `ui_sessions`/`invites` waren beim ersten S7-Fix (Step
+        1) noch nicht möglich — die Tabellen existierten nicht (Schema 1). Jetzt mit dabei:
+        `ui_sessions` absolut abgelaufen ODER länger als `RETENTION_AFTER_REVOKE_OR_CONSUME_S`
+        widerrufen; `invites` abgelaufen ODER länger als dieselbe Frist konsumiert."""
+        now = self._now_fn()
+        now_s = _format_dt(now)
+        retention_cutoff_s = _format_dt(
+            now - timedelta(seconds=RETENTION_AFTER_REVOKE_OR_CONSUME_S)
+        )
         with self._transaction() as conn:
             counts = {}
             # Tabellennamen kommen aus dem festen Tupel oben, nicht aus Nutzereingabe — sicher
@@ -523,6 +584,20 @@ class AuthStore:
             for table in ("auth_requests", "auth_codes", "access_tokens", "refresh_tokens"):
                 cur = conn.execute(f"DELETE FROM {table} WHERE expires_at <= ?", (now_s,))
                 counts[table] = cur.rowcount
+
+            cur = conn.execute(
+                "DELETE FROM ui_sessions WHERE absolute_expires_at <= ? "
+                "OR (revoked_at IS NOT NULL AND revoked_at <= ?)",
+                (now_s, retention_cutoff_s),
+            )
+            counts["ui_sessions"] = cur.rowcount
+
+            cur = conn.execute(
+                "DELETE FROM invites WHERE expires_at <= ? "
+                "OR (consumed_at IS NOT NULL AND consumed_at <= ?)",
+                (now_s, retention_cutoff_s),
+            )
+            counts["invites"] = cur.rowcount
         return counts
 
     # -- Login-Fehlversuche (für ratelimit.py — kein SQL dort) ------------------------
@@ -608,3 +683,290 @@ class AuthStore:
                 "SELECT count FROM register_attempts WHERE window_start = ?", (window_key,)
             ).fetchone()
             return row["count"]
+
+    # -- Nutzerakten (Schema 2, P5 Step 2, Plan §2.3) -----------------------------------
+
+    def _user_from_row(self, row: sqlite3.Row) -> UserRow:
+        return UserRow(
+            space=row["space"],
+            password_hash=row["password_hash"],
+            password_changed_at=_parse_dt_opt(row["password_changed_at"]),
+            totp_secret_enc=row["totp_secret_enc"],
+            totp_alg=row["totp_alg"],
+            totp_confirmed_at=_parse_dt_opt(row["totp_confirmed_at"]),
+            status=row["status"],
+            created_at=_parse_dt(row["created_at"]),
+        )
+
+    def get_user(self, space: str) -> UserRow | None:
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT * FROM users WHERE space = ?", (space,)
+            ).fetchone()
+        return self._user_from_row(row) if row is not None else None
+
+    def list_users(self) -> list[UserRow]:
+        with self._lock:
+            rows = self._conn.execute("SELECT * FROM users ORDER BY created_at").fetchall()
+        return [self._user_from_row(row) for row in rows]
+
+    def upsert_user(
+        self,
+        space: str,
+        *,
+        password_hash: str,
+        totp_secret_enc: bytes | None,
+        totp_alg: str,
+        totp_confirmed_at: datetime | None,
+        status: str,
+    ) -> None:
+        """Legt an oder überschreibt vollständig (bis auf `created_at`, das beim ersten Insert
+        gesetzt und danach nie mehr verändert wird, und `password_changed_at`, das ausschließlich
+        `set_password_hash()` gehört — ein `upsert_user()`-Aufruf ist keine Passwortänderung im
+        Sinne von P5-P/Q, sondern eine Bestandsübernahme, z. B. aus `import_users_to_db.py`)."""
+        now = self._now_fn()
+        with self._lock:
+            self._conn.execute(
+                "INSERT INTO users (space, password_hash, password_changed_at, "
+                "totp_secret_enc, totp_alg, totp_confirmed_at, status, created_at) "
+                "VALUES (?, ?, NULL, ?, ?, ?, ?, ?) "
+                "ON CONFLICT(space) DO UPDATE SET password_hash = excluded.password_hash, "
+                "totp_secret_enc = excluded.totp_secret_enc, totp_alg = excluded.totp_alg, "
+                "totp_confirmed_at = excluded.totp_confirmed_at, status = excluded.status",
+                (
+                    space, password_hash, totp_secret_enc, totp_alg,
+                    _format_dt(totp_confirmed_at) if totp_confirmed_at is not None else None,
+                    status, _format_dt(now),
+                ),
+            )
+
+    def set_password_hash(self, space: str, password_hash: str) -> None:
+        now = self._now_fn()
+        with self._lock:
+            self._conn.execute(
+                "UPDATE users SET password_hash = ?, password_changed_at = ? WHERE space = ?",
+                (password_hash, _format_dt(now), space),
+            )
+
+    def set_totp(self, space: str, *, secret_enc: bytes, alg: str) -> None:
+        with self._lock:
+            self._conn.execute(
+                "UPDATE users SET totp_secret_enc = ?, totp_alg = ?, totp_confirmed_at = NULL "
+                "WHERE space = ?",
+                (secret_enc, alg, space),
+            )
+
+    def confirm_totp(self, space: str) -> None:
+        now = self._now_fn()
+        with self._lock:
+            self._conn.execute(
+                "UPDATE users SET totp_confirmed_at = ? WHERE space = ?",
+                (_format_dt(now), space),
+            )
+
+    def set_user_status(self, space: str, status: str) -> None:
+        with self._lock:
+            self._conn.execute("UPDATE users SET status = ? WHERE space = ?", (status, space))
+
+    # -- Einladungen (Schema 2, P5 Step 2) -----------------------------------------------
+
+    def _invite_from_row(self, row: sqlite3.Row, *, consumed_at: datetime | None = None) -> InviteRow:
+        return InviteRow(
+            space=row["space"],
+            purpose=row["purpose"],
+            created_at=_parse_dt(row["created_at"]),
+            expires_at=_parse_dt(row["expires_at"]),
+            consumed_at=consumed_at if consumed_at is not None else _parse_dt_opt(row["consumed_at"]),
+        )
+
+    def create_invite(self, *, space: str, purpose: str, ttl_s: int) -> str:
+        token = crypto.new_secret(32)
+        now = self._now_fn()
+        expires_at = now + timedelta(seconds=ttl_s)
+        with self._lock:
+            self._conn.execute(
+                "INSERT INTO invites (token_hash, space, purpose, created_at, expires_at, "
+                "consumed_at) VALUES (?, ?, ?, ?, ?, NULL)",
+                (
+                    crypto.hash_secret(token), space, purpose, _format_dt(now),
+                    _format_dt(expires_at),
+                ),
+            )
+        return token
+
+    def peek_invite(self, token: str) -> InviteRow | None:
+        """Rein lesend, für GET — zeigt z. B. eine Einladungsseite an, ohne sie zu verbrauchen."""
+        token_hash = crypto.hash_secret(token)
+        now = self._now_fn()
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT * FROM invites WHERE token_hash = ?", (token_hash,)
+            ).fetchone()
+        if row is None or row["consumed_at"] is not None:
+            return None
+        if _parse_dt(row["expires_at"]) <= now:
+            return None
+        return self._invite_from_row(row)
+
+    def consume_invite(self, token: str) -> InviteRow | None:
+        """Einmalig, für POST — analog zu `consume_auth_request()`."""
+        token_hash = crypto.hash_secret(token)
+        now = self._now_fn()
+        with self._transaction() as conn:
+            row = conn.execute(
+                "SELECT * FROM invites WHERE token_hash = ?", (token_hash,)
+            ).fetchone()
+            if row is None or row["consumed_at"] is not None:
+                return None
+            if _parse_dt(row["expires_at"]) <= now:
+                return None
+            conn.execute(
+                "UPDATE invites SET consumed_at = ? WHERE token_hash = ?",
+                (_format_dt(now), token_hash),
+            )
+        return self._invite_from_row(row, consumed_at=now)
+
+    # -- Recovery-Codes (Schema 2, P5 Step 2) --------------------------------------------
+
+    def replace_recovery_codes(self, space: str, codes: Iterable[str]) -> None:
+        now = self._now_fn()
+        with self._transaction() as conn:
+            conn.execute("DELETE FROM recovery_codes WHERE space = ?", (space,))
+            conn.executemany(
+                "INSERT INTO recovery_codes (code_hash, space, created_at, used_at) "
+                "VALUES (?, ?, ?, NULL)",
+                [(crypto.hash_secret(code), space, _format_dt(now)) for code in codes],
+            )
+
+    def consume_recovery_code(self, space: str, code: str) -> bool:
+        code_hash = crypto.hash_secret(code)
+        now = self._now_fn()
+        with self._transaction() as conn:
+            row = conn.execute(
+                "SELECT used_at FROM recovery_codes WHERE code_hash = ? AND space = ?",
+                (code_hash, space),
+            ).fetchone()
+            if row is None or row["used_at"] is not None:
+                return False
+            conn.execute(
+                "UPDATE recovery_codes SET used_at = ? WHERE code_hash = ?",
+                (_format_dt(now), code_hash),
+            )
+        return True
+
+    def count_unused_recovery_codes(self, space: str) -> int:
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT COUNT(*) AS n FROM recovery_codes WHERE space = ? AND used_at IS NULL",
+                (space,),
+            ).fetchone()
+        return row["n"]
+
+    # -- UI-Sessions (Schema 2, P5 Step 2) ------------------------------------------------
+
+    def create_session(
+        self, *, space: str, idle_ttl_s: int, absolute_ttl_s: int
+    ) -> tuple[str, str]:
+        """`idle_ttl_s` steht im Signatur-Vertrag (Plan §2.3), wird hier aber nicht ausgewertet:
+        die Idle-Grenze wird erst bei `touch_session()` gegen `last_seen_at` geprüft, nie beim
+        Anlegen selbst (`last_seen_at` ist beim Anlegen immer `now`, kann also nie schon
+        abgelaufen sein). Der Parameter existiert für eine einheitliche Aufrufer-Signatur —
+        `SessionManager` (Step 3) reicht dieselben zwei TTLs an beide Methoden durch."""
+        session_id = crypto.new_secret(32)
+        csrf_token = crypto.new_secret(32)
+        now = self._now_fn()
+        absolute_expires_at = now + timedelta(seconds=absolute_ttl_s)
+        with self._lock:
+            self._conn.execute(
+                "INSERT INTO ui_sessions (session_hash, space, csrf_hash, created_at, "
+                "last_seen_at, absolute_expires_at, revoked_at, revoked_reason) "
+                "VALUES (?, ?, ?, ?, ?, ?, NULL, NULL)",
+                (
+                    crypto.hash_secret(session_id), space, crypto.hash_secret(csrf_token),
+                    _format_dt(now), _format_dt(now), _format_dt(absolute_expires_at),
+                ),
+            )
+        return session_id, csrf_token
+
+    def touch_session(self, session_id: str, *, idle_ttl_s: int) -> SessionRow | None:
+        """Einziger Lesepfad einer Sitzung (Plan §2.3): prüfen (nicht widerrufen, nicht absolut
+        abgelaufen, `last_seen_at` nicht älter als `idle_ttl_s`), `last_seen_at` aktualisieren,
+        Zeile zurückgeben — alles in einer Transaktion, damit keine Route „gültig" liest,
+        während eine andere „abgelaufen" sähe."""
+        session_hash = crypto.hash_secret(session_id)
+        now = self._now_fn()
+        with self._transaction() as conn:
+            row = conn.execute(
+                "SELECT * FROM ui_sessions WHERE session_hash = ?", (session_hash,)
+            ).fetchone()
+            if row is None or row["revoked_at"] is not None:
+                return None
+            if _parse_dt(row["absolute_expires_at"]) <= now:
+                return None
+            if (now - _parse_dt(row["last_seen_at"])).total_seconds() > idle_ttl_s:
+                return None
+            conn.execute(
+                "UPDATE ui_sessions SET last_seen_at = ? WHERE session_hash = ?",
+                (_format_dt(now), session_hash),
+            )
+        return SessionRow(
+            session_hash=session_hash,
+            space=row["space"],
+            csrf_hash=row["csrf_hash"],
+            created_at=_parse_dt(row["created_at"]),
+            last_seen_at=now,
+            absolute_expires_at=_parse_dt(row["absolute_expires_at"]),
+            revoked_at=None,
+            revoked_reason=None,
+        )
+
+    def revoke_session(self, session_id: str, reason: str) -> None:
+        session_hash = crypto.hash_secret(session_id)
+        now = self._now_fn()
+        with self._lock:
+            self._conn.execute(
+                "UPDATE ui_sessions SET revoked_at = ?, revoked_reason = ? "
+                "WHERE session_hash = ? AND revoked_at IS NULL",
+                (_format_dt(now), reason, session_hash),
+            )
+
+    def revoke_sessions_for_space(
+        self, space: str, *, except_session_id: str | None, reason: str
+    ) -> int:
+        now = self._now_fn()
+        except_hash = (
+            crypto.hash_secret(except_session_id) if except_session_id is not None else None
+        )
+        with self._lock:
+            if except_hash is not None:
+                cur = self._conn.execute(
+                    "UPDATE ui_sessions SET revoked_at = ?, revoked_reason = ? "
+                    "WHERE space = ? AND revoked_at IS NULL AND session_hash != ?",
+                    (_format_dt(now), reason, space, except_hash),
+                )
+            else:
+                cur = self._conn.execute(
+                    "UPDATE ui_sessions SET revoked_at = ?, revoked_reason = ? "
+                    "WHERE space = ? AND revoked_at IS NULL",
+                    (_format_dt(now), reason, space),
+                )
+        return cur.rowcount
+
+    def list_sessions(self, space: str) -> list[SessionRow]:
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT * FROM ui_sessions WHERE space = ? ORDER BY created_at", (space,)
+            ).fetchall()
+        return [
+            SessionRow(
+                session_hash=row["session_hash"],
+                space=row["space"],
+                csrf_hash=row["csrf_hash"],
+                created_at=_parse_dt(row["created_at"]),
+                last_seen_at=_parse_dt(row["last_seen_at"]),
+                absolute_expires_at=_parse_dt(row["absolute_expires_at"]),
+                revoked_at=_parse_dt_opt(row["revoked_at"]),
+                revoked_reason=row["revoked_reason"],
+            )
+            for row in rows
+        ]

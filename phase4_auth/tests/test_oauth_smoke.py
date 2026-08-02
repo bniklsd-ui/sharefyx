@@ -195,8 +195,10 @@ async def test_network_mode_runs_against_a_real_server(tmp_path):
 
     from authserver import passwords as _passwords
     from authserver import totp as _totp
-    from authserver.config import AuthSettings
+    from authserver.config import AuthSettings, generate_data_encryption_key
+    from authserver.secretbox import seal
     from authserver.store import AuthStore
+    from authserver.userdir import UserDirectory
     from mcpserver.app import OAuthConfig, create_app
     from mcpserver.config import Settings
     from mcpserver.request_log import AccessLogASGI, OAuthLogASGI
@@ -212,14 +214,16 @@ async def test_network_mode_runs_against_a_real_server(tmp_path):
         base_url="https://space.example.ts.net", db_path=tmp_path / "auth.sqlite3"
     )
     auth_store = AuthStore(auth_settings.db_path, now_fn=lambda: datetime.now(timezone.utc))
-    users = {
-        space: {
-            "pwd": _passwords.hash_password(password),
-            "totp": totp_secret,
-            "totp_alg": "SHA1",
-            "created_at": "2026-07-29T00:00:00Z",
-        }
-    }
+    dek = generate_data_encryption_key()
+    auth_store.upsert_user(
+        space,
+        password_hash=_passwords.hash_password(password),
+        totp_secret_enc=seal(totp_secret.encode("ascii"), key=dek, aad=space.encode("utf-8")),
+        totp_alg="SHA1",
+        totp_confirmed_at=datetime.now(timezone.utc),
+        status="active",
+    )
+    users = UserDirectory(auth_store, dek=dek)
     notes_root = tmp_path / "notes"
     notes_root.mkdir()
     store = Store(notes_root, git=False)

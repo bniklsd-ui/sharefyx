@@ -6,7 +6,7 @@ Ergebnis-Typen statt Starlette-`Response`-Objekten — sonst würden `test_flows
 """
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -16,6 +16,7 @@ from .config import AuthSettings
 from .errors import OAuthError
 from .ratelimit import LoginThrottle
 from .store import AuthStore
+from .userdir import UserDirectory, looks_like_recovery_code
 
 SUPPORTED_SCOPES = frozenset({"space", "offline_access"})
 
@@ -135,7 +136,7 @@ def submit_consent(
     *,
     store: AuthStore,
     settings: AuthSettings,
-    users: Mapping[str, Mapping[str, str]],
+    users: UserDirectory,
     throttle: LoginThrottle,
     now_fn: Callable[[], datetime],
     request_id: str,
@@ -170,29 +171,38 @@ def submit_consent(
     # TOTP-HMAC-Prüfung um Größenordnungen, das Weglassen ist deshalb kein Timing-Orakel
     # (Advisor-Review dieser Session). Beide Ergebnisse werden trotzdem erst am Ende verknüpft,
     # kein früher `return`.
-    # S6 (Sicherheits-Review 2026-07-29): `record["pwd"]`/`record["totp"]` per Index brach den
-    # eigenen "wirft nie"-Vertrag von `verify_password()`/`totp.verify()` — ein unvollständiger
-    # Datensatz (halb geschriebene `auth-users.cred`, von Hand editierter Keyring-Eintrag) ergab
-    # einen `KeyError` -> HTTP 500 statt der generischen Meldung, und zwar nur für EXISTIERENDE
-    # Spaces — genau das Enumerations-Orakel, das der umgebende Code verhindern soll.
-    # `UserDirectory.get() -> UserRecord | None` (Plan §2.1) ersetzt diesen Zugriff strukturell
-    # erst in Step 2 (`authserver/userdir.py` existiert noch nicht); bis dahin gilt hier die vom
-    # Review selbst vorgeschlagene Fix-Skizze direkt auf dem aktuellen `Mapping`-Zugriff.
+    # S6 (Sicherheits-Review 2026-07-29): jetzt strukturell geschlossen — `UserDirectory.get()`
+    # gibt `UserRecord | None` zurück (nie ein Datensatz mit fehlenden Feldern; `store.get_user()`
+    # liest über feste Spalten, keine dict-Indizierung mehr). Die in Step 1 übergangsweise
+    # eingesetzte `record.get(...)`-Fix-Skizze ist damit gegenstandslos und entfernt (P5 Step 2).
     record = users.get(space)
-    stored_hash = (record.get("pwd") if record is not None else None) or passwords.DUMMY_HASH
+    stored_hash = record.password_hash if record is not None else passwords.DUMMY_HASH
     password_ok = passwords.verify_password(stored_hash, password)
 
+    # Enumerationsschutz gilt unverändert (siehe Absatz oben): Argon2id läuft in JEDEM Fall,
+    # der TOTP-/Recovery-Zweig nur, wenn der Space existiert.
     totp_ok = False
     accepted_counter: int | None = None
     if record is not None:
-        accepted_counter = totp.verify(
-            record.get("totp", ""),
-            totp_code,
-            now=now_fn().timestamp(),
-            last_counter=store.get_totp_counter(space),
-            algo=record.get("totp_alg", "SHA1"),
-        )
-        totp_ok = accepted_counter is not None
+        # P5-Ergänzung: ein Recovery-Code funktioniert auch im OAuth-Consent-Formular, sonst
+        # wäre ein Nutzer ohne Authenticator zwar in der UI, aber nicht am Connector
+        # handlungsfähig (Plan §2.5). Die Formerkennung lebt einzig in `looks_like_recovery_code()`
+        # — kein zweiter, hier abgeleiteter Literal-Check.
+        if looks_like_recovery_code(totp_code):
+            # `consume_recovery_code()` mutiert (stempelt `used_at`) — nur bei richtigem
+            # Passwort aufrufen, sonst verbrennt ein Tippfehler im Passwortfeld einen von zehn
+            # Codes ohne jede Rückmeldung. Spiegelt den `accepted_counter`-Guard unten (gleiche
+            # Lehre, TOTP-Zweig), Advisor-Fund vor diesem Commit.
+            totp_ok = password_ok and users.consume_recovery_code(space, totp_code)
+        else:
+            accepted_counter = totp.verify(
+                record.totp_secret or "",
+                totp_code,
+                now=now_fn().timestamp(),
+                last_counter=store.get_totp_counter(space),
+                algo=record.totp_alg,
+            )
+            totp_ok = accepted_counter is not None
 
     if not (password_ok and totp_ok):
         throttle.register_failure(space)
@@ -201,8 +211,12 @@ def submit_consent(
     # Zähler erst nach einem VOLLSTÄNDIGEN Erfolg hochsetzen (Passwort UND TOTP) — ein
     # frühzeitiges Hochsetzen bei richtigem TOTP aber falschem Passwort würde das aktuelle
     # Zeitfenster für den echten Nutzer verbrennen, beobachtbar von jedem, der den Code sieht.
+    # Ein Recovery-Code hat keinen Zähler (`accepted_counter` bleibt `None`) — `set_totp_counter`
+    # darf dann nicht laufen, sonst überschreibt ein Recovery-Login stillschweigend den
+    # TOTP-Replay-Zähler mit `None`.
     throttle.reset(space)
-    store.set_totp_counter(space, accepted_counter)
+    if accepted_counter is not None:
+        store.set_totp_counter(space, accepted_counter)
 
     family_id = store.create_family(
         space=space,

@@ -321,9 +321,9 @@ befundenen** Punkte: `../docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`. Kurzfa
 | S4 | `scope` wird beim Zugriff nie durchgesetzt | niedrig | `resolver.py` | ✅ **geschlossen** (P5 Step 1) |
 | S5 | `f"{redirect_uri}?{query}"` zerlegt einen Redirect mit vorhandenem Query | niedrig | `routes.py :: _authorize_response` | ✅ **geschlossen** (P5 Step 1) |
 | S6 | `record["pwd"]`/`record["totp"]` → `KeyError` → 500 bricht den „wirft nie"-Vertrag daneben | niedrig-mittel | `flows.py :: submit_consent` | ✅ **geschlossen** (P5 Step 1) |
-| S7 | Unbegrenztes Zeilenwachstum aus unauth. Eingabe, `purge_expired()` nur manuell (kein Timer) | niedrig-mittel | `store.py`, `ratelimit.py` | ✅ **geschlossen** (P5 Step 1) — Timer + Längenbegrenzung; `ui_sessions`/`invites`-Erweiterung folgt strukturell in P5 Step 2 (Tabellen existieren erst dort, siehe Plan §5 Step 1 Testliste) |
+| S7 | Unbegrenztes Zeilenwachstum aus unauth. Eingabe, `purge_expired()` nur manuell (kein Timer) | niedrig-mittel | `store.py`, `ratelimit.py` | ✅ **vollständig geschlossen** (P5 Step 1: Timer + Längenbegrenzung; P5 Step 2: `purge_expired()` deckt jetzt auch `ui_sessions`/`invites` ab, sobald diese Tabellen mit Schema 2 existierten) |
 | S8 | `sudo install_units.sh` sourced eine nutzerschreibbare Datei als root | sehr niedrig | `install_units.sh` | ✅ **geschlossen** (P5 Step 1) |
-| O1 | Nutzerakten werden **einmal beim Start** gelesen — Provisionierung wirkt erst nach Restart | Betriebsnotiz | `scripts/serve.py` | offen (Betriebsnotiz, kein Befund — unverändert) |
+| O1 | Nutzerakten werden **einmal beim Start** gelesen — Provisionierung wirkt erst nach Restart | Betriebsnotiz | `scripts/serve.py` | ✅ **geschlossen im Code** (P5 Step 2 — `UserDirectory.get()` liest live, kein Cache mehr); **live wirksam erst nach dem Migrations-Runbook** (`phase5_ui/CLAUDE.md` Session-Block 2026-08-02), bis dahin läuft der Dienst noch auf dem alten Build |
 
 **[2026-08-02 Korrektur, P5 Step 1]:** der Absatz „Keiner von S2–S8 ist gefixt" stand hier
 bewusst zwischen Step 7 und der Live-Abnahme — dieser Zustand ist jetzt überholt. Alle sieben

@@ -31,6 +31,7 @@ from fastmcp.client.transports import StreamableHttpTransport
 from authserver.config import AuthSettings
 from authserver.resolver import OAuthTokenResolver, ResolveError, ResolvedPrincipal
 from authserver.store import AuthStore
+from authserver.userdir import UserDirectory
 from mcpserver import context
 from mcpserver.app import OAuthConfig, create_app
 from mcpserver.asgi import BearerAuthASGI
@@ -287,7 +288,9 @@ async def test_bearer_token_reaches_a_real_tool_call(tmp_path):
     app = create_app(
         settings=settings,
         store=store,
-        oauth=OAuthConfig(settings=auth_settings, store=auth_store, users={}),
+        oauth=OAuthConfig(
+            settings=auth_settings, store=auth_store, users=UserDirectory(auth_store, dek=None),
+        ),
     )
 
     transport = StreamableHttpTransport(
@@ -324,7 +327,9 @@ async def test_trusted_host_middleware_protects_root_app_when_configured(tmp_pat
     app = create_app(
         settings=settings,
         store=store,
-        oauth=OAuthConfig(settings=auth_settings, store=auth_store, users={}),
+        oauth=OAuthConfig(
+            settings=auth_settings, store=auth_store, users=UserDirectory(auth_store, dek=None),
+        ),
     )
 
     async with httpx.AsyncClient(

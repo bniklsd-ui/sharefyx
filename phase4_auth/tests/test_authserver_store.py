@@ -1,9 +1,10 @@
 import hashlib
+import sqlite3
 from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from authserver.store import AuthStore
+from authserver.store import _SCHEMA, RETENTION_AFTER_REVOKE_OR_CONSUME_S, AuthStore
 
 
 @pytest.fixture
@@ -44,10 +45,11 @@ def test_schema_is_created_and_versioned(store, tmp_path):
     expected = {
         "schema_meta", "clients", "auth_requests", "token_families", "auth_codes",
         "access_tokens", "refresh_tokens", "login_attempts", "totp_replay", "register_attempts",
+        "users", "invites", "recovery_codes", "ui_sessions",
     }
     assert expected <= tables
     row = conn.execute("SELECT value FROM schema_meta WHERE key = 'schema_version'").fetchone()
-    assert row[0] == "1"
+    assert row[0] == "2"
     conn.close()
 
 
@@ -289,3 +291,277 @@ def test_rotate_refresh_after_access_token_purged(store, clock):
     store.purge_expired()  # löscht die abgelaufene access_tokens-Zeile
     result = store.rotate_refresh(refresh, client_id="c1", access_ttl_s=3600, refresh_ttl_s=2_592_000)
     assert result is not None
+
+
+# -- Schema 2 (P5 Step 2) --------------------------------------------------------------------
+
+
+def test_schema_migrates_from_v1_to_v2_without_data_loss(tmp_path, clock):
+    """Baut eine echte Schema-1-Datenbank von Hand (nur `_SCHEMA`, kein `_SCHEMA_V2`, wie eine
+    reale P4-Instanz sie hinterlassen hätte), füllt eine Zeile, öffnet sie danach über den
+    normalen `AuthStore`-Konstruktor (führt beide Schemata + den Versions-Bump aus) und prüft:
+    die alte Zeile lebt weiter, die vier neuen Tabellen existieren, `schema_version` steht auf
+    `"2"`."""
+    path = tmp_path / "auth.sqlite3"
+    conn = sqlite3.connect(path)
+    conn.executescript(_SCHEMA)
+    conn.execute(
+        "INSERT OR IGNORE INTO schema_meta (key, value) VALUES ('schema_version', '1')"
+    )
+    conn.execute(
+        "INSERT INTO clients (client_id, client_name, application_type, redirect_uris, "
+        "created_at, last_used_at) VALUES ('c1', 'Alt-Client', 'web', '[\"https://x/cb\"]', "
+        "'2026-01-01T00:00:00Z', NULL)"
+    )
+    conn.commit()
+    conn.close()
+
+    store = AuthStore(path, now_fn=clock)
+
+    assert store.get_client("c1") is not None
+    assert store.get_client("c1").client_name == "Alt-Client"
+
+    conn2 = sqlite3.connect(path)
+    tables = {row[0] for row in conn2.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+    assert {"users", "invites", "recovery_codes", "ui_sessions"} <= tables
+    version = conn2.execute(
+        "SELECT value FROM schema_meta WHERE key = 'schema_version'"
+    ).fetchone()[0]
+    assert version == "2"
+    conn2.close()
+
+
+def test_schema_version_is_two_after_initialise(store, tmp_path):
+    conn = sqlite3.connect(tmp_path / "auth.sqlite3")
+    version = conn.execute(
+        "SELECT value FROM schema_meta WHERE key = 'schema_version'"
+    ).fetchone()[0]
+    assert version == "2"
+    conn.close()
+
+
+def test_upsert_and_get_user_roundtrip(store, clock):
+    assert store.get_user("niklas") is None
+    store.upsert_user(
+        "niklas", password_hash="$argon2id$...", totp_secret_enc=b"\x01\x02",
+        totp_alg="SHA1", totp_confirmed_at=clock(), status="active",
+    )
+    row = store.get_user("niklas")
+    assert row is not None
+    assert row.password_hash == "$argon2id$..."
+    assert row.totp_secret_enc == b"\x01\x02"
+    assert row.totp_alg == "SHA1"
+    assert row.totp_confirmed_at == clock()
+    assert row.status == "active"
+    assert row.password_changed_at is None  # upsert_user setzt es bewusst nicht
+
+
+def test_upsert_user_preserves_created_at_on_conflict(store, clock):
+    store.upsert_user(
+        "niklas", password_hash="h1", totp_secret_enc=None, totp_alg="SHA1",
+        totp_confirmed_at=None, status="active",
+    )
+    first_created_at = store.get_user("niklas").created_at
+
+    clock.advance(3600)
+    store.upsert_user(
+        "niklas", password_hash="h2", totp_secret_enc=b"\x99", totp_alg="SHA1",
+        totp_confirmed_at=None, status="active",
+    )
+    row = store.get_user("niklas")
+    assert row.password_hash == "h2"
+    assert row.created_at == first_created_at
+
+
+def test_list_users_returns_all(store):
+    store.upsert_user(
+        "niklas", password_hash="h1", totp_secret_enc=None, totp_alg="SHA1",
+        totp_confirmed_at=None, status="active",
+    )
+    store.upsert_user(
+        "fabian", password_hash="h2", totp_secret_enc=None, totp_alg="SHA1",
+        totp_confirmed_at=None, status="active",
+    )
+    assert {row.space for row in store.list_users()} == {"niklas", "fabian"}
+
+
+def test_set_password_updates_password_changed_at(store, clock):
+    store.upsert_user(
+        "niklas", password_hash="old", totp_secret_enc=None, totp_alg="SHA1",
+        totp_confirmed_at=None, status="active",
+    )
+    assert store.get_user("niklas").password_changed_at is None
+
+    store.set_password_hash("niklas", "new")
+    row = store.get_user("niklas")
+    assert row.password_hash == "new"
+    assert row.password_changed_at == clock()
+
+
+def test_set_totp_clears_confirmed_at(store, clock):
+    store.upsert_user(
+        "niklas", password_hash="h", totp_secret_enc=b"\x01", totp_alg="SHA1",
+        totp_confirmed_at=clock(), status="active",
+    )
+    store.set_totp("niklas", secret_enc=b"\x02\x02", alg="SHA256")
+    row = store.get_user("niklas")
+    assert row.totp_secret_enc == b"\x02\x02"
+    assert row.totp_alg == "SHA256"
+    assert row.totp_confirmed_at is None
+
+
+def test_confirm_totp_sets_timestamp(store, clock):
+    store.upsert_user(
+        "niklas", password_hash="h", totp_secret_enc=b"\x01", totp_alg="SHA1",
+        totp_confirmed_at=None, status="active",
+    )
+    store.confirm_totp("niklas")
+    assert store.get_user("niklas").totp_confirmed_at == clock()
+
+
+def test_set_user_status(store):
+    store.upsert_user(
+        "niklas", password_hash="h", totp_secret_enc=None, totp_alg="SHA1",
+        totp_confirmed_at=None, status="active",
+    )
+    store.set_user_status("niklas", "disabled")
+    assert store.get_user("niklas").status == "disabled"
+
+
+def test_invite_is_single_use(store):
+    token = store.create_invite(space="niklas", purpose="initial", ttl_s=3600)
+    peeked = store.peek_invite(token)
+    assert peeked is not None
+    assert peeked.space == "niklas"
+    assert peeked.purpose == "initial"
+    assert peeked.consumed_at is None
+
+    consumed = store.consume_invite(token)
+    assert consumed is not None
+    assert consumed.consumed_at is not None
+
+    assert store.peek_invite(token) is None
+    assert store.consume_invite(token) is None
+
+
+def test_invite_expires(store, clock):
+    token = store.create_invite(space="niklas", purpose="reset", ttl_s=60)
+    clock.advance(61)
+    assert store.peek_invite(token) is None
+    assert store.consume_invite(token) is None
+
+
+def test_recovery_codes_replace_and_consume(store):
+    store.replace_recovery_codes("niklas", ["aaaa-bbbb-c", "dddd-eeee-f"])
+    assert store.count_unused_recovery_codes("niklas") == 2
+
+    assert store.consume_recovery_code("niklas", "aaaa-bbbb-c") is True
+    assert store.count_unused_recovery_codes("niklas") == 1
+    # ein zweites Mal derselbe Code: schon verbraucht
+    assert store.consume_recovery_code("niklas", "aaaa-bbbb-c") is False
+
+
+def test_recovery_code_is_scoped_to_its_space(store):
+    store.replace_recovery_codes("niklas", ["niklas-code-1"])
+    store.replace_recovery_codes("fabian", ["fabian-code-1"])
+    # niklas' Code funktioniert nicht für fabians Space, obwohl die Zeile existiert.
+    assert store.consume_recovery_code("fabian", "niklas-code-1") is False
+    assert store.consume_recovery_code("niklas", "niklas-code-1") is True
+
+
+def test_replace_recovery_codes_deletes_old_ones(store):
+    store.replace_recovery_codes("niklas", ["code-a"])
+    store.replace_recovery_codes("niklas", ["code-b"])
+    assert store.consume_recovery_code("niklas", "code-a") is False
+    assert store.consume_recovery_code("niklas", "code-b") is True
+
+
+def test_create_and_touch_session(store, clock):
+    session_id, csrf_token = store.create_session(space="niklas", idle_ttl_s=3600, absolute_ttl_s=604800)
+    row = store.touch_session(session_id, idle_ttl_s=3600)
+    assert row is not None
+    assert row.space == "niklas"
+    assert row.csrf_hash == hashlib.sha256(csrf_token.encode("utf-8")).hexdigest()
+
+
+def test_touch_session_rejects_idle_timeout(store, clock):
+    session_id, _csrf = store.create_session(space="niklas", idle_ttl_s=60, absolute_ttl_s=604800)
+    clock.advance(61)
+    assert store.touch_session(session_id, idle_ttl_s=60) is None
+
+
+def test_touch_session_rejects_absolute_timeout(store, clock):
+    session_id, _csrf = store.create_session(space="niklas", idle_ttl_s=3600, absolute_ttl_s=60)
+    clock.advance(61)
+    assert store.touch_session(session_id, idle_ttl_s=3600) is None
+
+
+def test_touch_session_rejects_revoked(store, clock):
+    session_id, _csrf = store.create_session(space="niklas", idle_ttl_s=3600, absolute_ttl_s=604800)
+    store.revoke_session(session_id, "logout")
+    assert store.touch_session(session_id, idle_ttl_s=3600) is None
+
+
+def test_touch_session_updates_last_seen(store, clock):
+    session_id, _csrf = store.create_session(space="niklas", idle_ttl_s=3600, absolute_ttl_s=604800)
+    clock.advance(30)
+    row = store.touch_session(session_id, idle_ttl_s=3600)
+    assert row.last_seen_at == clock()
+
+
+def test_revoke_sessions_for_space_keeps_the_excepted_one(store, clock):
+    keep_id, _ = store.create_session(space="niklas", idle_ttl_s=3600, absolute_ttl_s=604800)
+    other_id, _ = store.create_session(space="niklas", idle_ttl_s=3600, absolute_ttl_s=604800)
+
+    killed = store.revoke_sessions_for_space("niklas", except_session_id=keep_id, reason="password_change")
+    assert killed == 1
+    assert store.touch_session(keep_id, idle_ttl_s=3600) is not None
+    assert store.touch_session(other_id, idle_ttl_s=3600) is None
+
+
+def test_revoke_sessions_for_space_without_exception_kills_all(store, clock):
+    a_id, _ = store.create_session(space="niklas", idle_ttl_s=3600, absolute_ttl_s=604800)
+    b_id, _ = store.create_session(space="niklas", idle_ttl_s=3600, absolute_ttl_s=604800)
+
+    killed = store.revoke_sessions_for_space("niklas", except_session_id=None, reason="password_change")
+    assert killed == 2
+    assert store.touch_session(a_id, idle_ttl_s=3600) is None
+    assert store.touch_session(b_id, idle_ttl_s=3600) is None
+
+
+def test_list_sessions_returns_only_the_given_space(store, clock):
+    store.create_session(space="niklas", idle_ttl_s=3600, absolute_ttl_s=604800)
+    store.create_session(space="fabian", idle_ttl_s=3600, absolute_ttl_s=604800)
+    listed = store.list_sessions("niklas")
+    assert len(listed) == 1
+    assert listed[0].space == "niklas"
+
+
+def test_purge_removes_expired_sessions_and_invites(store, clock):
+    """S7-Ergänzung (P5 Step 2 — im Plan als Nachtrag zu Step 1 vorgesehen): `ui_sessions`
+    absolut abgelaufen oder lang genug widerrufen, `invites` abgelaufen oder lang genug
+    konsumiert, verschwinden über `purge_expired()`."""
+    expired_session_id, _ = store.create_session(space="niklas", idle_ttl_s=3600, absolute_ttl_s=60)
+    kept_session_id, _ = store.create_session(space="niklas", idle_ttl_s=3600, absolute_ttl_s=2_592_000)
+    revoked_session_id, _ = store.create_session(space="niklas", idle_ttl_s=3600, absolute_ttl_s=604800)
+    store.revoke_session(revoked_session_id, "logout")
+
+    expired_invite = store.create_invite(space="niklas", purpose="reset", ttl_s=60)
+    kept_invite = store.create_invite(space="niklas", purpose="reset", ttl_s=2_592_000)
+    consumed_invite = store.create_invite(space="niklas", purpose="reset", ttl_s=604800)
+    store.consume_invite(consumed_invite)
+
+    clock.advance(61)  # expired_session/expired_invite abgelaufen; revoked noch innerhalb der Frist
+    counts = store.purge_expired()
+    assert counts["ui_sessions"] == 1  # nur die absolut abgelaufene
+    assert counts["invites"] == 1  # nur die abgelaufene, nicht die frisch konsumierte
+
+    clock.advance(RETENTION_AFTER_REVOKE_OR_CONSUME_S + 1)
+    counts = store.purge_expired()
+    assert counts["ui_sessions"] == 1  # jetzt die widerrufene (Frist überschritten)
+    assert counts["invites"] == 1  # jetzt die konsumierte (Frist überschritten)
+
+    # großzügiges idle_ttl_s: dieser Check gilt der PURGE (existiert die Zeile noch?), nicht der
+    # Idle-Gültigkeit, die mit den vielen `clock.advance()`-Sprüngen dieses Tests längst abgelaufen wäre.
+    assert store.touch_session(kept_session_id, idle_ttl_s=RETENTION_AFTER_REVOKE_OR_CONSUME_S * 10) is not None
+    assert store.peek_invite(kept_invite) is not None

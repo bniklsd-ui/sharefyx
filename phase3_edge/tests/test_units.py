@@ -46,10 +46,20 @@ def test_unit_restarts_on_failure():
 def test_unit_loads_credential_encrypted():
     """**[2026-08-02 Korrektur, P5 Step 0 A]:** die zweite `LoadCredentialEncrypted`-Zeile
     (`spaces:/etc/sharefyx/spaces.cred`, reine Token-Hashes aus P2/P3) ist mit dem P5-Rückbau
-    entfernt (`docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md` §4.5) — die Unit braucht nur noch das
-    Credential für die echten, umkehrbaren Nutzerakten-Geheimnisse (TOTP-Seeds)."""
+    entfernt (`docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md` §4.5).
+
+    **[2026-08-02 Korrektur, P5 Step 2]:** `auth-users:/etc/sharefyx/auth-users.cred` ist jetzt
+    ebenfalls entfernt, nicht mehr nur `spaces:` — `serve.py` liest Nutzerakten seit dem Umstieg
+    auf `UserDirectory` live aus `auth.sqlite3` (Schema 2), nicht mehr aus dem
+    Credential-JSON/Keyring. Stattdessen `auth-dek:/etc/sharefyx/auth-dek.cred` — der
+    AES-256-GCM-Schlüssel für die verschlüsselten TOTP-Seeds in der Datenbank (P5-J). **Achtung
+    beim nächsten Live-Rollout:** dieses Credential MUSS existieren, bevor die Unit mit dieser
+    Zeile neu installiert/gestartet wird — `LoadCredentialEncrypted` lässt den Dienst sonst gar
+    nicht erst starten (dieselbe Falle wie `spaces.cred` in P4), siehe Runbook-Reihenfolge in
+    `phase5_ui/CLAUDE.md`."""
     text = _unit_text()
-    assert "LoadCredentialEncrypted=auth-users:/etc/sharefyx/auth-users.cred" in text
+    assert "LoadCredentialEncrypted=auth-dek:/etc/sharefyx/auth-dek.cred" in text
+    assert "auth-users:/etc/sharefyx/auth-users.cred" not in text
     assert "spaces:/etc/sharefyx/spaces.cred" not in text
 
 

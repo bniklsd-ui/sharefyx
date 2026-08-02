@@ -20,13 +20,13 @@ Protokoll stehen, `create_app()` brauchte es ohnehin schon seit dem Schnitt nich
 from __future__ import annotations
 
 import time
-from collections.abc import Mapping
 from dataclasses import dataclass
 
 from authserver.config import AuthSettings
 from authserver.resolver import OAuthTokenResolver
 from authserver.routes import oauth_routes
 from authserver.store import AuthStore
+from authserver.userdir import UserDirectory
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
@@ -51,7 +51,7 @@ class OAuthConfig:
 
     settings: AuthSettings
     store: AuthStore
-    users: Mapping[str, Mapping[str, str]]
+    users: UserDirectory
 
 
 def _bearer_challenge(auth_settings: AuthSettings) -> str:

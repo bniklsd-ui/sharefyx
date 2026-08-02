@@ -15,7 +15,9 @@ from authserver import passwords, totp
 from authserver.config import AuthSettings
 from authserver.crypto import pkce_challenge
 from authserver.routes import oauth_routes
+from authserver.secretbox import KEY_LEN, seal
 from authserver.store import AuthStore
+from authserver.userdir import UserDirectory
 
 REDIRECT_URI = "https://claude.ai/api/mcp/auth_callback"
 SPACE = "niklas"
@@ -37,10 +39,23 @@ def store(tmp_path):
 
 
 @pytest.fixture
-def users():
-    return {
-        SPACE: {"pwd": passwords.hash_password(PASSWORD), "totp": TOTP_SECRET, "totp_alg": "SHA1"}
-    }
+def dek() -> bytes:
+    return bytes([0x5A]) * KEY_LEN
+
+
+@pytest.fixture
+def users(store, dek):
+    """P5 Step 2: `UserDirectory` statt eines rohen `Mapping` — nur die Fixture-Konstruktion
+    ändert sich, Testdaten und Assertions in diesem Modul bleiben unverändert."""
+    store.upsert_user(
+        SPACE,
+        password_hash=passwords.hash_password(PASSWORD),
+        totp_secret_enc=seal(TOTP_SECRET.encode("ascii"), key=dek, aad=SPACE.encode("utf-8")),
+        totp_alg="SHA1",
+        totp_confirmed_at=None,
+        status="active",
+    )
+    return UserDirectory(store, dek=dek)
 
 
 @pytest.fixture

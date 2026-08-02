@@ -65,8 +65,10 @@ from fastmcp import Client
 from fastmcp.client.transports import StreamableHttpTransport
 
 from authserver import crypto, passwords, totp
-from authserver.config import AuthSettings
+from authserver.config import AuthSettings, generate_data_encryption_key
+from authserver.secretbox import seal
 from authserver.store import AuthStore
+from authserver.userdir import UserDirectory
 
 from mcpserver.app import OAuthConfig, create_app
 from mcpserver.config import Settings
@@ -468,15 +470,21 @@ async def _run(data_root: Path, checks: list[Check], observed_secrets: list[str]
     )
     auth_store = AuthStore(auth_settings.db_path, now_fn=lambda: datetime.now(timezone.utc))
 
+    # P5 Step 2: Nutzerakten leben jetzt in `auth.sqlite3` (Schema 2) statt in einem
+    # Dict/Keyring-Mapping — derselbe DEK-basierte Verschlüsselungspfad wie im echten Betrieb,
+    # nur mit einem Wegwerf-DEK statt dem echten `auth-dek`-Credential.
+    dek = generate_data_encryption_key()
     totp_secret = totp.generate_secret()
-    users = {
-        SPACE: {
-            "pwd": passwords.hash_password(PASSWORD_MARKER),
-            "totp": totp_secret,
-            "totp_alg": "SHA1",
-            "created_at": datetime.now(timezone.utc).isoformat(),
-        }
-    }
+    now = datetime.now(timezone.utc)
+    auth_store.upsert_user(
+        SPACE,
+        password_hash=passwords.hash_password(PASSWORD_MARKER),
+        totp_secret_enc=seal(totp_secret.encode("ascii"), key=dek, aad=SPACE.encode("utf-8")),
+        totp_alg="SHA1",
+        totp_confirmed_at=now,
+        status="active",
+    )
+    users = UserDirectory(auth_store, dek=dek)
 
     notes_root = data_root / "notes"
     notes_root.mkdir()

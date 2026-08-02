@@ -11,7 +11,6 @@ pfadgebundenes Mounten sieht Plan §3.3 nicht vor ("vorangestellt", nicht `Mount
 """
 from __future__ import annotations
 
-from collections.abc import Mapping
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from starlette.requests import Request
@@ -25,6 +24,7 @@ from .errors import DCRError, OAuthError
 from .metadata import authorization_server_metadata, protected_resource_metadata
 from .ratelimit import LoginThrottle
 from .store import AuthStore
+from .userdir import UserDirectory
 
 
 def _security_headers(settings: AuthSettings) -> dict[str, str]:
@@ -77,7 +77,7 @@ def _dcr_error_response(exc: DCRError) -> JSONResponse:
 def oauth_routes(
     auth_settings: AuthSettings,
     auth_store: AuthStore,
-    users: Mapping[str, Mapping[str, str]],
+    users: UserDirectory,
 ) -> list[Route]:
     # Dieselbe Uhr wie `auth_store` (Advisor-Fund: "ein Clock, nicht zwei") — `AuthStore.now()`
     # exponiert genau dafür die injizierte `now_fn` des Stores, statt eine zweite anzulegen.

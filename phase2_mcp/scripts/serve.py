@@ -19,9 +19,9 @@ from datetime import datetime, timezone
 
 import uvicorn
 
-from authserver.config import load_auth_settings
+from authserver.config import load_auth_settings, load_data_encryption_key
 from authserver.store import AuthStore
-from authserver.users import load_users
+from authserver.userdir import UserDirectory
 
 from storage.store import Store
 
@@ -49,7 +49,13 @@ def main(argv: list[str] | None = None) -> int:
 
     auth_settings = load_auth_settings()
     auth_store = AuthStore(auth_settings.db_path, now_fn=lambda: datetime.now(timezone.utc))
-    oauth = OAuthConfig(settings=auth_settings, store=auth_store, users=load_users())
+    # P5 Step 2: `UserDirectory` liest live aus `auth.sqlite3` statt einmalig aus dem
+    # Keyring/Credential-JSON (P4) — schließt O1 (Provisionierung wirkte bisher erst nach einem
+    # Restart). `UserDirectory.__init__` scheitert laut, wenn kein DEK geladen werden kann, aber
+    # die `users`-Tabelle nicht leer ist (Plan §2.4) — bewusst ungefangen, wie
+    # `load_auth_settings()` direkt darüber.
+    users = UserDirectory(auth_store, dek=load_data_encryption_key())
+    oauth = OAuthConfig(settings=auth_settings, store=auth_store, users=users)
 
     store = Store(settings.data_root)
     app = create_app(

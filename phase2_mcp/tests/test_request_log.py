@@ -22,6 +22,7 @@ from starlette.applications import Starlette
 
 from authserver.config import AuthSettings
 from authserver.store import AuthStore
+from authserver.userdir import UserDirectory
 
 from mcpserver.app import OAuthConfig, create_app
 from mcpserver.config import Settings
@@ -84,7 +85,9 @@ def auth_store(auth_settings) -> AuthStore:
 
 @pytest.fixture
 def oauth(auth_settings, auth_store) -> OAuthConfig:
-    return OAuthConfig(settings=auth_settings, store=auth_store, users={})
+    return OAuthConfig(
+        settings=auth_settings, store=auth_store, users=UserDirectory(auth_store, dek=None)
+    )
 
 
 @pytest.fixture

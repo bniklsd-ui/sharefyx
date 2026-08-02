@@ -12,7 +12,9 @@ from authserver.config import AuthSettings
 from authserver.crypto import pkce_challenge
 from authserver.errors import OAuthError
 from authserver.ratelimit import MAX_FAILURES, LoginThrottle
+from authserver.secretbox import KEY_LEN, seal
 from authserver.store import AuthStore
+from authserver.userdir import UserDirectory
 
 REDIRECT_URI = "https://claude.ai/api/mcp/auth_callback"
 SPACE = "niklas"
@@ -52,14 +54,25 @@ def throttle(store, clock):
 
 
 @pytest.fixture
-def users():
-    return {
-        SPACE: {
-            "pwd": passwords.hash_password(PASSWORD),
-            "totp": TOTP_SECRET,
-            "totp_alg": "SHA1",
-        }
-    }
+def dek() -> bytes:
+    return bytes([0x5A]) * KEY_LEN
+
+
+@pytest.fixture
+def users(store, dek):
+    """P5 Step 2: `UserDirectory` statt eines rohen `Mapping` — die Fixture-Konstruktion ändert
+    sich, die Testdaten (SPACE/PASSWORD/TOTP_SECRET) und alle Assertions in diesem Modul
+    bleiben unverändert (Advisor-Vorgabe: der `UserDirectory`-Umbau muss verhaltensneutral
+    bleiben, nicht durch umgeschriebene Tests nur behauptet werden)."""
+    store.upsert_user(
+        SPACE,
+        password_hash=passwords.hash_password(PASSWORD),
+        totp_secret_enc=seal(TOTP_SECRET.encode("ascii"), key=dek, aad=SPACE.encode("utf-8")),
+        totp_alg="SHA1",
+        totp_confirmed_at=None,
+        status="active",
+    )
+    return UserDirectory(store, dek=dek)
 
 
 @pytest.fixture
@@ -109,6 +122,14 @@ def _issue_code(store, settings, users, throttle, clock, client, *, code_challen
     )
     assert isinstance(result, flows.RedirectSuccess), result
     return result.code
+
+
+def test_flows_still_authenticate_with_userdirectory(store, settings, users, throttle, clock, client):
+    """Plan §5 Step 2 „Done when": der Umstieg von `Mapping[str, Mapping[str, str]]` auf
+    `UserDirectory` muss verhaltensneutral sein — ein vollständiger Login (Passwort + TOTP)
+    funktioniert unverändert über die neue Fixture-Konstruktion."""
+    code = _issue_code(store, settings, users, throttle, clock, client)
+    assert code
 
 
 # -- GET /oauth/authorize ---------------------------------------------------------------
@@ -201,15 +222,33 @@ def test_wrong_password_and_unknown_space_give_identical_response(
     assert len(calls) == 2  # verify_password lief in BEIDEN Fällen — kein Timing-Orakel
 
 
-def test_broken_user_record_yields_generic_login_failure(store, settings, throttle, clock, client):
+def test_broken_user_record_yields_generic_login_failure(store, settings, throttle, clock, client, dek):
     """S6: ein unvollständiger Datensatz (fehlendes `pwd`/`totp`-Feld — halb geschriebene
     `auth-users.cred`, von Hand editierter Keyring-Eintrag) darf keinen `KeyError` werfen,
-    sondern muss dieselbe generische Fehlermeldung liefern wie ein falsches Passwort."""
-    broken_users = {SPACE: {}}  # weder "pwd" noch "totp"
+    sondern muss dieselbe generische Fehlermeldung liefern wie ein falsches Passwort.
+
+    **[2026-08-02 Korrektur, P5 Step 2]:** der ursprüngliche Testfall (`{SPACE: {}}`, ein Dict
+    ohne `"pwd"`/`"totp"`) ist mit dem Umstieg auf `UserDirectory`/Schema 2 nicht mehr
+    herstellbar — `store.get_user()` liefert entweder eine vollständige Zeile (alle Spalten
+    `NOT NULL` bis auf die TOTP-Felder) oder `None`, nie ein Zwischending. Das IST die
+    strukturelle Schließung von S6 (Plan: „entfällt strukturell mit `UserDirectory.get()`").
+    Der jetzt tatsächlich erreichbare "kaputte Datensatz"-Fall ist ein TOTP-Seed, der mit einem
+    ANDEREN Schlüssel versiegelt wurde, als `UserDirectory` gerade lädt — z. B. nach einem
+    DEK-Rotationsfehler. `UserDirectory.get()` fängt den `SecretBoxError` ab (`totp_secret=None`
+    statt einer Ausnahme); dieser Test beweist, dass genau das bis in `submit_consent()` als
+    generischer Fehlschlag ankommt, nicht als 500."""
+    wrong_dek = bytes([0x99]) * KEY_LEN
+    store.upsert_user(
+        SPACE, password_hash=passwords.hash_password(PASSWORD),
+        totp_secret_enc=seal(TOTP_SECRET.encode("ascii"), key=wrong_dek, aad=SPACE.encode("utf-8")),
+        totp_alg="SHA1", totp_confirmed_at=None, status="active",
+    )
+    broken_users = UserDirectory(store, dek=dek)  # dek != wrong_dek -> Entschlüsselung schlägt fehl
+
     request_id = _pending_request_id(store, settings, client)
     result = flows.submit_consent(
         store=store, settings=settings, users=broken_users, throttle=throttle, now_fn=clock,
-        request_id=request_id, space=SPACE, password="whatever", totp_code="000000",
+        request_id=request_id, space=SPACE, password=PASSWORD, totp_code=_totp_code(clock),
         action="allow",
     )
     assert isinstance(result, flows.ErrorPage)
@@ -217,24 +256,34 @@ def test_broken_user_record_yields_generic_login_failure(store, settings, thrott
 
 
 def test_unknown_space_and_broken_record_are_indistinguishable(
-    store, settings, throttle, clock, client
+    store, settings, throttle, clock, client, dek
 ):
-    """S6, Enumerationsschutz: ein Space mit kaputtem Datensatz darf sich von einem gar nicht
-    existierenden Space nicht unterscheiden lassen — beide Wege müssen exakt dasselbe
-    `ErrorPage` liefern."""
-    broken_users = {SPACE: {}}
+    """S6, Enumerationsschutz: ein Space mit kaputtem (nicht entschlüsselbarem) TOTP-Seed darf
+    sich von einem gar nicht existierenden Space nicht unterscheiden lassen — beide Wege müssen
+    exakt dasselbe `ErrorPage` liefern. Siehe Korrekturnotiz im Test oben: der alte
+    dict-basierte "kaputte Datensatz" ist strukturell ausgeschlossen, dieser Test benutzt den
+    jetzt einzig erreichbaren Fall."""
+    wrong_dek = bytes([0x99]) * KEY_LEN
+    store.upsert_user(
+        SPACE, password_hash=passwords.hash_password(PASSWORD),
+        totp_secret_enc=seal(TOTP_SECRET.encode("ascii"), key=wrong_dek, aad=SPACE.encode("utf-8")),
+        totp_alg="SHA1", totp_confirmed_at=None, status="active",
+    )
+    broken_users = UserDirectory(store, dek=dek)
 
     request_id_broken = _pending_request_id(store, settings, client)
     result_broken = flows.submit_consent(
         store=store, settings=settings, users=broken_users, throttle=throttle, now_fn=clock,
-        request_id=request_id_broken, space=SPACE, password="whatever", totp_code="000000",
+        request_id=request_id_broken, space=SPACE, password="wrong-password-too", totp_code="000000",
         action="allow",
     )
 
+    # "ghost-space" hat keine Zeile in `users` — dieselbe `UserDirectory`-Instanz genügt, `get()`
+    # liest ohnehin live (kein Cache, P5-L).
     request_id_unknown = _pending_request_id(store, settings, client)
     result_unknown = flows.submit_consent(
-        store=store, settings=settings, users={}, throttle=throttle, now_fn=clock,
-        request_id=request_id_unknown, space="ghost-space", password="whatever",
+        store=store, settings=settings, users=broken_users, throttle=throttle, now_fn=clock,
+        request_id=request_id_unknown, space="ghost-space", password="wrong-password-too",
         totp_code="000000", action="allow",
     )
 
@@ -314,6 +363,54 @@ def test_totp_replay_is_rejected_without_burning_the_stored_counter(
     )
     assert isinstance(second, flows.ErrorPage)
     assert store.get_totp_counter(SPACE) == counter_after_success  # unverändert, kein Vorrücken
+
+
+def test_recovery_code_login_does_not_touch_totp_counter(
+    store, settings, users, throttle, clock, client
+):
+    """Advisor-Fund (P5 Step 2, vor dem Commit): der Recovery-Code-Zweig in `submit_consent`
+    liefert nie einen `accepted_counter` (der bleibt `None`) — `store.set_totp_counter()` darf
+    danach nicht laufen, sonst würde ein Recovery-Login den TOTP-Replay-Zähler stillschweigend
+    zurücksetzen. Der Guard (`if accepted_counter is not None:`) war bisher ungetestet, weil
+    `test_totp_replay_is_rejected_without_burning_the_stored_counter` ausschließlich den
+    TOTP-Zweig durchläuft."""
+    assert store.get_totp_counter(SPACE) is None
+    codes = users.issue_recovery_codes(SPACE)
+
+    request_id = _pending_request_id(store, settings, client)
+    result = flows.submit_consent(
+        store=store, settings=settings, users=users, throttle=throttle, now_fn=clock,
+        request_id=request_id, space=SPACE, password=PASSWORD, totp_code=codes[0],
+        action="allow",
+    )
+    assert isinstance(result, flows.RedirectSuccess)
+    assert store.get_totp_counter(SPACE) is None  # unverändert — kein Zähler bei Recovery-Login
+
+
+def test_wrong_password_with_valid_recovery_code_does_not_burn_it(
+    store, settings, users, throttle, clock, client
+):
+    """Advisor-Fund (P5 Step 2, vor dem Commit, zweiter Durchlauf): `consume_recovery_code()`
+    mutiert (stempelt `used_at`) — sie darf nicht laufen, bevor das Passwort feststeht, sonst
+    verbrennt ein Tippfehler im Passwortfeld einen von zehn Codes ohne jede Rückmeldung. Spiegelt
+    dieselbe Lehre wie der `accepted_counter`-Guard im TOTP-Zweig, hier für den Recovery-Zweig."""
+    codes = users.issue_recovery_codes(SPACE)
+
+    request_id_1 = _pending_request_id(store, settings, client)
+    first = flows.submit_consent(
+        store=store, settings=settings, users=users, throttle=throttle, now_fn=clock,
+        request_id=request_id_1, space=SPACE, password="wrong-password", totp_code=codes[0],
+        action="allow",
+    )
+    assert isinstance(first, flows.ErrorPage)
+
+    request_id_2 = _pending_request_id(store, settings, client)
+    second = flows.submit_consent(
+        store=store, settings=settings, users=users, throttle=throttle, now_fn=clock,
+        request_id=request_id_2, space=SPACE, password=PASSWORD, totp_code=codes[0],
+        action="allow",
+    )
+    assert isinstance(second, flows.RedirectSuccess)  # derselbe Code funktioniert noch
 
 
 def test_consent_deny_redirects_with_access_denied(store, settings, users, throttle, clock, client):

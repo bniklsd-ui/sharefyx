@@ -143,8 +143,13 @@ Herkunft/offene Entscheidungen: `docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md`. Pha
 — läuft", obwohl Step 0 bereits im vorigen Commit abgeschlossen wurde und Step 1
 (Sicherheitsbefunde S2–S8) im selben Zug durchlief — dieselbe Drift-Kategorie, die diese Zeile
 schon dreimal in P4 betraf (siehe die drei Korrekturen weiter unten), diesmal aber im selben
-Commit korrigiert statt erst später gefunden.**]** **Nächster Schritt:** Step 2 (Auth-Datenmodell
-Schema 2, `secretbox.py`, `userdir.py`).
+Commit korrigiert statt erst später gefunden.**]** **[2026-08-02 zweite Korrektur, P5 Step 2:**
+dieselbe Drift-Kategorie ein weiteres Mal — diese Zeile stand hier noch auf „Nächster Schritt:
+Step 2", obwohl Step 2 (Schema 2, `secretbox.py`, `userdir.py`, Migrationsskript) im selben
+Commit-Vorlauf durchlief; Advisor-Review vor dem Commit fand die Lücke, diesmal noch vor dem
+Commit statt erst danach geschlossen.**]** **Nächster Schritt:** Step 3 (Sessions, CSRF,
+Login-Seiten — neues Paket `phase5_ui/webui/{config,security,sessions,pages,routes_auth,
+errors}.py`).
 
 **Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅
 abgeschlossen, 2026-07-30.** Mission erfüllt: der Pfad-Token ist verschwunden, ein eigener

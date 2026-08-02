@@ -36,6 +36,7 @@ from fastmcp.client.transports import StreamableHttpTransport
 
 from authserver.config import AuthSettings
 from authserver.store import AuthStore
+from authserver.userdir import UserDirectory
 
 from mcpserver.app import OAuthConfig, create_app
 from mcpserver.config import Settings
@@ -132,7 +133,9 @@ async def _run(data_root: Path, checks: list[Check]) -> None:
         store.create(SPACE_OWN, type="note", title=f"Füll-Item {i + 1}", body=filler_body)
 
     settings = Settings(data_root=data_root)
-    oauth = OAuthConfig(settings=auth_settings, store=auth_store, users={})
+    oauth = OAuthConfig(
+        settings=auth_settings, store=auth_store, users=UserDirectory(auth_store, dek=None)
+    )
     app = create_app(settings=settings, store=store, oauth=oauth)
 
     async with app.router.lifespan_context(app):

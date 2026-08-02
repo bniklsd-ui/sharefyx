@@ -28,6 +28,7 @@ from starlette.applications import Starlette
 
 from authserver.config import AuthSettings
 from authserver.store import AuthStore
+from authserver.userdir import UserDirectory
 
 from mcpserver import __version__
 from mcpserver.app import OAuthConfig, create_app
@@ -61,7 +62,9 @@ def auth_store(auth_settings) -> AuthStore:
 
 @pytest.fixture
 def oauth(auth_settings, auth_store) -> OAuthConfig:
-    return OAuthConfig(settings=auth_settings, store=auth_store, users={})
+    return OAuthConfig(
+        settings=auth_settings, store=auth_store, users=UserDirectory(auth_store, dek=None)
+    )
 
 
 def _issue_bearer_token(auth_store: AuthStore, auth_settings: AuthSettings, *, space: str) -> str:

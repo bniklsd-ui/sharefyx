@@ -1,9 +1,11 @@
 """Nutzerakten (Passwort-Hash, TOTP-Seed) — spiegelt `mcpserver/credentials.py ::
 load_space_map()` bewusst (Plan §2.5): Credentials-Verzeichnis zuerst (systemd
 `LoadCredentialEncrypted`), Keyring als Fallback, `warning` statt Ausnahme bei fehlender Datei,
-Ausnahme bei kaputtem Inhalt. `keyring` wird **nur** hier importiert — `authserver` importiert
-nichts aus `mcpserver` (P4-C), deshalb ist das eine bewusste Duplikation des Musters, kein
-Re-Use des P2-Moduls.
+Ausnahme bei kaputtem Inhalt. **[2026-08-02 Korrektur, P5 Step 2]:** „`keyring` wird nur hier
+importiert" stimmte bis zu diesem Commit — `authserver/config.py :: load_data_encryption_key()`
+importiert es jetzt ebenfalls, dieselbe Verzweigungslogik für den AES-256-GCM-Schlüssel (P5-J).
+Beide Module bleiben unabhängig voneinander (kein Import zwischen ihnen); `authserver` importiert
+weiterhin nichts aus `mcpserver` (P4-C).
 
 Format je Space (Klartext-Struktur, das Geheimnis selbst ist der Argon2id-Hash + TOTP-Seed):
 `{"<space>": {"pwd": "$argon2id$...", "totp": "<BASE32-SEED>", "totp_alg": "SHA1",
@@ -51,8 +53,13 @@ def save_users(mapping: dict[str, dict[str, str]]) -> None:
 
 def load_users() -> dict[str, dict[str, str]]:
     """Credentials-Verzeichnis zuerst (systemd `LoadCredentialEncrypted`), Keyring als Fallback.
-    Das ist die Funktion, die der laufende Dienst (`flows.py`) beim Login benutzt.
-    """
+
+    **[2026-08-02 Korrektur, P5 Step 2]:** „Das ist die Funktion, die der laufende Dienst beim
+    Login benutzt" stimmte bis zu diesem Commit — `scripts/serve.py` liest Nutzerakten seither
+    über `UserDirectory` aus `auth.sqlite3` (Schema 2), ruft diese Funktion also nicht mehr auf.
+    Bewusst nicht gelöscht (außerhalb der Step-2-Dateiliste, kein akuter Blocker) — Kandidat für
+    einen künftigen Rückbau, sobald `auth-users.cred`/der Keyring-Eintrag laut Runbook-Reihenfolge
+    formal abgelöst sind (`import_users_to_db.py`-Docstring)."""
     path = credential_path()
     if path is None:
         return load_users_from_keyring()
