@@ -18,8 +18,16 @@ class UiError(Exception):
 
 
 class CsrfError(UiError):
-    """Wird von `security.require_csrf()` geworfen (Plan §2.7) — immer 403, nie eine
-    unterscheidbare Detailmeldung nach außen (dieselbe Enumerationsdisziplin wie OAuth)."""
+    """Wird von `security.require_csrf()` geworfen (Plan §2.7) — immer 403. **Korrektur
+    2026-08-03:** dieser Docstring behauptete bis dahin „nie eine unterscheidbare Detailmeldung
+    nach außen (dieselbe Enumerationsdisziplin wie OAuth)" — das war schon immer falsch,
+    `require_csrf()` wirft drei unterscheidbare Klartextmeldungen ("Herkunft (Origin) stimmt
+    nicht", "Herkunft nicht bestimmbar", "CSRF-Token fehlt oder stimmt nicht"), nicht erst seit
+    ein Live-Fund des Nikingers `exc.message` auf einer Retry-Seite sichtbar machte
+    (`routes_auth.py :: _enroll_confirm`). Das ist unbedenklich: anders als beim OAuth-/UI-Login
+    verrät keine dieser drei Meldungen, ob ein Space existiert — sie unterscheiden nur
+    Transport-/Formularzustände (fehlende Herkunft, falsche Herkunft, falscher Token), keine
+    Kontoexistenz. Docstring korrigiert, Verhalten unverändert."""
 
     def __init__(self, message: str = "Anfrage abgelehnt (CSRF-Prüfung fehlgeschlagen)") -> None:
         super().__init__(message, status_code=403)

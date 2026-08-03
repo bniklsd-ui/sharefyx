@@ -205,6 +205,25 @@ def ui_auth_routes(
         return response
 
     async def _enroll_confirm(request: Request) -> Response:
+        def _enrollment_retry(*, space: str, csrf_token: str, error: str, status_code: int) -> Response:
+            # Gemeinsam für „falscher Code" UND „CSRF-Fehlschlag" (Advisor-Fund-artiger
+            # Live-Fund des Nikingers, 2026-08-03): eine fehlgeschlagene `require_csrf()`-Prüfung
+            # landete bisher auf `pages.render_error_page()` — einer Sackgasse ohne Formular,
+            # ohne Zurück. `begin_totp_enrollment()` erneut aufzurufen würde den bereits
+            # gescannten Secret entwerten, deshalb wird hier derselbe Secret nur erneut gelesen,
+            # nicht neu gemintet.
+            record = users.get(space)
+            otpauth_uri = totp.provisioning_uri(
+                record.totp_secret or "" if record else "", space=space, issuer=TOTP_ISSUER,
+            )
+            return HTMLResponse(
+                pages.render_enrollment_page(
+                    secret=(record.totp_secret or "") if record else "", otpauth_uri=otpauth_uri,
+                    csrf_token=csrf_token, error=error,
+                ),
+                status_code=status_code, headers=headers,
+            )
+
         headers = ui_security_headers(settings)
         session = sessions.load(request)
         if session is None:
@@ -218,25 +237,22 @@ def ui_auth_routes(
         try:
             require_csrf(request, session, settings=settings, form_token=csrf_value)
         except CsrfError as exc:
-            return HTMLResponse(
-                pages.render_error_page(exc.message), status_code=exc.status_code, headers=headers
+            # Die Sitzung bleibt gültig (kein Widerruf bei einem CSRF-Fehlschlag) — derselbe
+            # `csrf_token`, den `_invite_post`/der vorige Versuch bereits ausgegeben hat, ist
+            # weiterhin der einzig gültige Wert gegen `session.csrf_hash` (der Vergleich selbst
+            # wurde ja nie erreicht, die Origin-Prüfung schlug vorher fehl) — einfach erneut
+            # einbetten, kein neuer Token nötig.
+            return _enrollment_retry(
+                space=session.space, csrf_token=str(csrf_value or ""), error=exc.message,
+                status_code=exc.status_code,
             )
 
         code = str(form.get("code", ""))
         ok = users.confirm_totp_enrollment(session.space, code, now=store.now().timestamp())
         if not ok:
-            # Kein neuer Seed — `begin_totp_enrollment()` erneut aufzurufen würde den bereits
-            # gescannten Secret entwerten. Derselbe Secret wird einfach erneut gelesen.
-            record = users.get(session.space)
-            otpauth_uri = totp.provisioning_uri(
-                record.totp_secret or "", space=session.space, issuer=TOTP_ISSUER,
-            )
-            return HTMLResponse(
-                pages.render_enrollment_page(
-                    secret=record.totp_secret or "", otpauth_uri=otpauth_uri,
-                    csrf_token=str(csrf_value), error="Code ungültig, bitte erneut versuchen.",
-                ),
-                status_code=422, headers=headers,
+            return _enrollment_retry(
+                space=session.space, csrf_token=str(csrf_value),
+                error="Code ungültig, bitte erneut versuchen.", status_code=422,
             )
 
         codes = users.issue_recovery_codes(session.space)

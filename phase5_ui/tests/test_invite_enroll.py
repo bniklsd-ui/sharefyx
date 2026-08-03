@@ -132,6 +132,41 @@ async def test_totp_confirm_requires_valid_code(app, store, clock):
 
 
 @pytest.mark.asyncio
+async def test_enroll_confirm_csrf_failure_offers_a_retry_not_a_dead_end(app, store, clock):
+    """Live-Fund des Nikingers, 2026-08-03: ein `require_csrf()`-Fehlschlag (z. B. „Herkunft
+    (Origin) stimmt nicht") landete bisher auf `pages.render_error_page()` — einer Sackgasse
+    ohne Formular, ohne Zurück; der einzige Ausweg wäre eine neue Einladung gewesen, aber die
+    war ja schon verbraucht (Einmal-Token). Jetzt: dieselbe Enrollment-Seite mit Fehlermeldung,
+    derselbe QR/Secret, derselbe CSRF-Token bleibt gültig — ein echter zweiter Versuch."""
+    token = store.create_invite(space=SPACE, purpose="initial", ttl_s=3600)
+    async with _client(app) as client:
+        invite_response = await client.post(
+            f"/ui/invite/{token}", data={"password": NEW_PASSWORD}, headers={"Origin": BASE_URL}
+        )
+        secret = _SECRET_RE.search(invite_response.text).group(1).replace(" ", "")
+        csrf = _CSRF_RE.search(invite_response.text).group(1)
+
+        wrong_origin = await client.post(
+            "/ui/enroll/confirm", data={"code": "000000", "csrf": csrf},
+            headers={"Origin": "https://boese.example"},
+        )
+        assert wrong_origin.status_code == 403
+        assert 'action="/ui/enroll/confirm"' in wrong_origin.text
+        retry_secret = _SECRET_RE.search(wrong_origin.text)
+        assert retry_secret is not None
+        assert retry_secret.group(1).replace(" ", "") == secret
+
+        # Derselbe CSRF-Token, jetzt mit korrekter Origin und korrektem Code — muss noch gültig
+        # sein, die Sitzung wurde vom CSRF-Fehlschlag nicht widerrufen.
+        counter = int(clock().timestamp() // 30)
+        code = totp.totp_at(secret, counter, algo="SHA1")
+        right = await client.post(
+            "/ui/enroll/confirm", data={"code": code, "csrf": csrf}, headers={"Origin": BASE_URL},
+        )
+        assert right.status_code == 200
+
+
+@pytest.mark.asyncio
 async def test_recovery_codes_are_shown_exactly_once(app, store, clock, users):
     token = store.create_invite(space=SPACE, purpose="initial", ttl_s=3600)
     async with _client(app) as client:

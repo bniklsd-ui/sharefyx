@@ -94,6 +94,7 @@ Messung statt Schätzung (`ui_budget.py`, AD) · gemeinsame Live-Abnahme, beide 
 | 4 | Neues Paket `phase5_ui/` (`pyproject.toml`, `webui/{__init__,config,security,sessions,pages,routes_auth,errors}.py`, `phase5_ui/tests/`): Sessions, CSRF, Login/Logout | 3 | ✅ **vollständig** — `/ui/login`, `/ui/logout` gegen eine echte In-Process-`Starlette`-App durchgespielt; **V35 geschlossen** (`dev_install.sh`s `phase*_*/`-Glob nimmt `phase5_ui/` ohne Skriptänderung auf) | +22 (5 `test_sessions.py` + 7 `test_security.py` + 7 `test_routes_auth.py` + 3 `test_isolation.py`, vier neue Testdateien + `conftest.py`) |
 | 5 | Selbstverwaltung: Einladung/Enrollment, Passwort, TOTP, Recovery, Connectoren (`webui/{account,reauth,passwords_policy}.py`, `webui/blocklist.txt`, `webui/{pages,routes_auth,errors}.py` erweitert; `authctl.py`-Erweiterung um `invite`/`list-users`/`disable-user`/`enable-user`/`list-sessions`/`revoke-sessions`; `authserver/store.py` um `revoke_families_for_space()`/`revoke_invites_for_space()`; `authserver/flows.py :: submit_consent()` um den Status-Gate) | 4 | ✅ **vollständig** — **V30 geschlossen** (Blocklist-Herkunft: `SecLists`-10k-Liste, siehe `passwords_policy.py`-Docstring); zwei Advisor-Funde vor dem Commit behoben (**S9** in `phase4_auth/CLAUDE.md`s Befund-Tabelle: `disable-user` blockierte den Login nicht; verworfener CSRF-Token nach Passwortwechsel — beide Details im Session-Block unten) | +31 (7 `test_account.py` + 7 `test_invite_enroll.py` + 3 `test_passwords_policy.py` + 1 `test_reauth.py`, vier neue Testdateien; +1 `test_routes_auth.py`; P4-seitig +1 `test_flows.py` + 8 `test_authctl.py` + 3 `test_authserver_store.py`) |
 | 6 | `/ui/*` aus Step 5 vorgezogen verdrahtet: `mcpserver/app.py :: create_app()` mountet `ui_auth_routes()`+`account_routes()` (kein neuer Parameter, `UiSettings`/`SessionManager` aus dem vorhandenen `oauth`-Bündel gebaut) | 4→5 (Gate-Voraussetzung) | ✅ **vollständig** — Live-Fund des Nikingers (`/ui/invite/…` → `404`) UND ein Plan-Widerspruch (§1.2 verbietet `mcpserver→webui`, §1.5 verlangt es) gemeinsam geschlossen, Entscheidung + Details im Session-Block unten | +3 (`phase2_mcp/tests/test_app.py`: `test_create_app_mounts_ui_routes_without_import_cycle`, `test_ui_login_reachable_through_create_app`, `test_ui_invite_reachable_through_create_app`) |
+| 7 | `/ui/enroll/confirm`: CSRF-Fehlschlag rendert jetzt einen Retry (`routes_auth.py :: _enrollment_retry()`, geteilt mit „falscher Code") statt `render_error_page()`s Sackgasse | 4 (Gate-Live-Fund) | 🟡 **Sackgasse beseitigt, Ursache der Origin-Abweichung offen** — DevTools-Beleg vom Nikinger ausstehend, siehe Session-Block unten; `errors.py :: CsrfError`s Docstring korrigiert (unabhängiger, vorbestehender Fund) | +1 (`test_enroll_confirm_csrf_failure_offers_a_retry_not_a_dead_end`, `phase5_ui/tests/test_invite_enroll.py`) |
 
 ---
 
@@ -285,15 +286,68 @@ Code. Der laufende `sharefyx-mcp`-Dienst führt noch den alten Build — „`/ui
 Migrations-Runbook nötig, reiner Code-Deploy). Ohne diesen Restart liefert ein erneuter Versuch
 mit dem Invite-Link wieder `404`, und der Fix sähe fälschlich kaputt aus.
 
-**Nächster Schritt (konkret):** nach dem Restart — der harte Gate vor Block B, Abnahmezeilen 1–9
-(§6) live, Sache des Nikingers (Passwort/TOTP/Recovery/Session/Connector-Selbstverwaltung im
-echten Browser gegen den echten Dienst). Danach erst Step 5 (REST-API v1) — **teilweise, nicht
-vollständig vorgezogen** (Advisor-Korrektur: die erste Fassung dieses Absatzes behauptete „bereits
-erledigt", das überzieht): Plan §1.5 zeigt `webui_routes(ui_settings, auth_store, userdir, store,
-sessions)` mit einem `store`-Parameter (dem `storage.Store`, für `/api/v1/items/*`) — dieser
-Nachtrag mountet nur `ui_auth_routes()`/`account_routes()`, die diesen Parameter nicht brauchen.
-Step 5 baut `webui/api.py`/`serializers.py` und braucht dafür einen weiteren, kleinen Edit an
-`create_app()` (den `store`-Parameter zusätzlich durchreichen), keine komplette Neuverdrahtung,
-aber eben auch keine Nullarbeit. Die drei liegen gebliebenen Live-Aktionen
+**Zweiter Nachtrag, noch später am selben Tag — Sackgasse bei `/ui/enroll/confirm` beseitigt,
+Ursache noch OFFEN, nicht behauptungsweise geschlossen:** der Nikinger kam beim Gate bis zum
+TOTP-Enrollment und bekam dort `403 Herkunft (Origin) stimmt nicht` — `security.py ::
+require_csrf()`s Origin-Prüfung schlug fehl. **Was diese Session behebt:** die Antwort auf einen
+`CsrfError` in `routes_auth.py :: _enroll_confirm()` war bisher `pages.render_error_page()` —
+eine echte Sackgasse ohne Formular, ohne Zurück, und die Einladung war schon verbraucht
+(Einmal-Token), also auch keine neue Einladung als Ausweg. Jetzt: derselbe Codepfad, den „falscher
+TOTP-Code" schon hatte (`_enrollment_retry()`, neu extrahiert, beide Fälle teilen sich die
+Logik), rendert dieselbe Enrollment-Seite mit Fehlermeldung erneut — derselbe CSRF-Token bleibt
+gültig (die Sitzung wird bei einem CSRF-Fehlschlag nicht widerrufen), kein neuer Login nötig.
+Test `test_enroll_confirm_csrf_failure_offers_a_retry_not_a_dead_end`
+(`phase5_ui/tests/test_invite_enroll.py`).
+
+**Was diese Session NICHT behebt, Advisor-Korrektur vor dem Commit:** die erste Fassung dieses
+Absatzes klang, als sei das Problem gelöst — ist es nicht. Wenn die Origin-Abweichung
+**strukturell** ist (z. B. eine zweite, in der Praxis benutzte URL-Variante, die
+`settings.base_url` nicht kennt), sendet der Browser beim erneuten Absenden desselben Formulars
+dieselbe falsche Origin erneut — der Nutzer landet dann auf einer freundlicheren, aber ebenso
+endlosen Schleife statt einer Sackgasse. **Root Cause noch nicht gefunden:**
+`systemctl cat sharefyx-mcp` bestätigt `SPACE_PUBLIC_BASE_URL=https://savefyx-vmware-virtual-
+platform.tail89fc2a.ts.net` — das ist eine Ableitung, kein Beleg für das, was der Browser
+tatsächlich als `Origin`-Header sendet. Zwei Dinge sprechen gegen einen reinen Tippfehler in der
+Config: `_invite_post` prüft gar kein CSRF (Einmal-Token ist dort das Gate) — der Fehler trat
+also plausibel von Anfang an auf, nur unbemerkt, bis der erste CSRF-geprüfte Schritt kam; und
+das `__Host-`-Cookie kam zurück (sonst „Sitzung abgelaufen" statt des Origin-Fehlers), also läuft
+der Browser auf **irgendeiner** echten HTTPS-Origin, nicht auf `http://127.0.0.1` o. ä. — das
+grenzt auf „HTTPS, aber ein anderer Host-String als der konfigurierte" ein, mehr nicht.
+
+**Nikinger-Aktion vor dem nächsten Versuch:** DevTools → Network → den fehlschlagenden `POST
+/ui/enroll/confirm` → Request Headers → `Origin` — Wert Zeichen für Zeichen gegen
+`https://savefyx-vmware-virtual-platform.tail89fc2a.ts.net` halten. Gleiches Muster wie der
+`form-action`-CSP-Fund in P4 (2026-07-30, `phase4_auth/CLAUDE.md`) — auch dort führte erst ein
+DevTools-Beleg zur echten Ursache, keine Ableitung aus der Config. **Falls sich eine zweite,
+legitime Origin herausstellt** (z. B. eine andere URL, unter der der Dienst ebenfalls erreichbar
+ist): das ist eine Entscheidung für den Nikinger (`require_csrf()` auf eine Origin-Menge
+auszuweiten wäre eine Sicherheitsentscheidung, keine, die hier auf eigene Initiative getroffen
+wird), nicht stillschweigend im Code vorwegzunehmen.
+
+**Verwandte, nicht angefasste Stelle:** `_logout` hat denselben `render_error_page()`-Sackgassen-
+Musterfehler bei einem CSRF-Fehlschlag — bewusst nicht mitgefixt (nicht angefragt, kleinerer
+Schaden: ein Logout-Fehlschlag lässt die Sitzung einfach bestehen, kein Datenverlust). Falls die
+Origin-Ursache strukturell ist, träfe sie `_logout` genauso — dann ist das dieselbe Ursache,
+kein neuer Fund, wenn er auftaucht.
+
+**Verifiziert:** `pytest -q` (Repo-Wurzel) → **471/471 grün** (470 vor diesem Nachtrag, +1).
+`errors.py :: CsrfError`s Docstring korrigiert (behauptete fälschlich „nie eine unterscheidbare
+Detailmeldung nach außen" — `require_csrf()` warf schon immer drei unterscheidbare Klartexte,
+unbedenklich, weil keine davon Kontoexistenz verrät, aber die Doku-Aussage war seit ihrem
+ursprünglichen Commit falsch, unabhängig von diesem Nachtrag).
+
+**Nächster Schritt (konkret):** Restart (derselbe ausstehende wie oben, kein zweiter nötig —
+`sudo phase3_edge/scripts/install_units.sh && sudo systemctl restart sharefyx-mcp`), dann im
+Browser DevTools den `Origin`-Header des fehlschlagenden Requests belegen (siehe oben) — **erst
+danach** ist klar, ob der Gate mit dem jetzt freundlicheren Retry tatsächlich durchläuft oder ob
+eine echte Config-/Entscheidungsfrage aussteht. Danach der harte Gate vor Block B, Abnahmezeilen
+1–9 (§6) live. Danach erst Step 5 (REST-API v1) — **teilweise, nicht vollständig vorgezogen**
+(Advisor-Korrektur zum ersten Nachtrag: „bereits erledigt" überzog): Plan §1.5 zeigt
+`webui_routes(ui_settings, auth_store, userdir, store, sessions)` mit einem `store`-Parameter
+(dem `storage.Store`, für `/api/v1/items/*`) — dieser Nachtrag mountet nur `ui_auth_routes()`/
+`account_routes()`, die diesen Parameter nicht brauchen. Step 5 baut `webui/api.py`/
+`serializers.py` und braucht dafür einen weiteren, kleinen Edit an `create_app()` (den
+`store`-Parameter zusätzlich durchreichen), keine komplette Neuverdrahtung, aber eben auch keine
+Nullarbeit. Die drei liegen gebliebenen Live-Aktionen
 aus Step 1/2 (S3/S4-Gegenprobe, Purge-Timer aktivieren, Migrations-Runbook) bleiben unverändert
 offen, blockieren weiterhin keinen Code-Step.

@@ -173,11 +173,22 @@ korrigiert (Plan selbst bleibt 📕 unverändert). Kein Zirkelimport: `mcpserver
 testgehalten. 470/470 Tests, Tabu-Pfade weiterhin leer. **Ändert nur den Code** — der laufende
 Dienst führt noch den alten Build, `sudo phase3_edge/scripts/install_units.sh && sudo systemctl
 restart sharefyx-mcp` ist Schritt null vor dem Gate, sonst liefert der Invite-Link wieder `404`.
-Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-03.**]** **Nächster Schritt:** Restart,
-dann der harte Gate vor Block B — Abnahmezeilen 1–9 live, Sache des Nikingers. Danach erst Step 5
-(REST-API v1) — nur teilweise vorgezogen: `webui/api.py` braucht bei seinem Bau noch einen
-zweiten, kleinen `create_app()`-Edit für den `store`-Parameter, den `ui_auth_routes()`/
-`account_routes()` nicht brauchten.
+Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-03.**]** **[2026-08-03, vierter Nachtrag:**
+beim Gate selbst dann `403 Herkunft (Origin) stimmt nicht` beim TOTP-Enrollment
+(`/ui/enroll/confirm`) — die Sackgasse dahinter (`CsrfError` landete auf `render_error_page()`,
+kein Formular, kein Zurück, die Einladung war schon verbraucht) ist behoben (derselbe
+Retry-Codepfad wie „falscher TOTP-Code", geteilt über `_enrollment_retry()`). **Die eigentliche
+Ursache der Origin-Abweichung ist NICHT gefunden** — `SPACE_PUBLIC_BASE_URL` in der laufenden
+Unit stimmt, das beweist aber nichts über das, was der Browser tatsächlich als `Origin` sendet.
+Nikinger-Aktion vor dem nächsten Versuch: DevTools-Beleg des tatsächlichen `Origin`-Headers
+(gleiches Muster wie der P4-`form-action`-Fund). Nebenbei: `errors.py :: CsrfError`s Docstring
+behauptete fälschlich „nie eine unterscheidbare Detailmeldung" — korrigiert, Verhalten
+unverändert, unabhängiger Vorbestandsfund. 471/471 Tests. Details:
+`phase5_ui/CLAUDE.md` Session-Block 2026-08-03.**]** **Nächster Schritt:** Restart (derselbe
+ausstehende, kein zweiter), dann DevTools-Origin-Beleg vom Nikinger, dann der harte Gate vor
+Block B — Abnahmezeilen 1–9 live. Danach erst Step 5 (REST-API v1) — nur teilweise vorgezogen:
+`webui/api.py` braucht bei seinem Bau noch einen zweiten, kleinen `create_app()`-Edit für den
+`store`-Parameter, den `ui_auth_routes()`/`account_routes()` nicht brauchten.
 
 **Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅
 abgeschlossen, 2026-07-30.** Mission erfüllt: der Pfad-Token ist verschwunden, ein eigener
