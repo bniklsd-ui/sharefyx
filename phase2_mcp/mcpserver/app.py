@@ -16,6 +16,51 @@ Bau von `TokenPathASGI`.
 `KeyringTokenResolver` sind inzwischen ebenfalls entfernt (`docs/concepts/
 PHASE4_CLOSEOUT_HANDOVER.md` §4.5) — `mcpserver/auth.py :: SpaceResolver` bleibt nur noch als
 Protokoll stehen, `create_app()` brauchte es ohnehin schon seit dem Schnitt nicht mehr.
+
+**[2026-08-03, P5 Step 4 Nachtrag — `/ui/*` vorgezogen verdrahtet, WAS/WO/WARUM:**
+
+*WAS:* `webui.routes_auth :: ui_auth_routes()` und `webui.account :: account_routes()` (beide
+seit P5 Step 3/4 fertig und getestet, aber bis hierhin nie in den echten Prozess gemountet)
+hängen jetzt in der Routenliste, direkt hinter `oauth_routes()` und vor `/health`/`Mount("/mcp")`
+— exakt die Reihenfolge, die Plan §1.5s Route-Landkarte für das dortige `webui_routes(...)`
+vorzeichnet. Keine neuen Parameter an `create_app()`: `UiSettings`/`SessionManager` werden hier
+intern aus dem bereits vorhandenen `oauth`-Bündel gebaut (`oauth.settings.base_url`,
+`oauth.store`, `oauth.users`) — dieselbe `AuthStore`/`UserDirectory`-Instanz, die auch die
+OAuth-Seite bedient, kein zweiter DB-Handle.
+
+*WARUM JETZT, nicht erst in Step 5 wie geplant:* Block A live-abzunehmen (Plan §6, Zeilen 1–9)
+verlangt einen echten Browser gegen `/ui/login`/`/ui/invite/{token}` — die gab es im laufenden
+Dienst schlicht nicht, `create_app()` kannte bis zu diesem Nachtrag nur `oauth_routes()` und
+`Mount("/mcp")`. Live-Fund des Nikingers: `invite`-Link → `404`. Plan §5 Step 5 listet die
+Verdrahtung offiziell erst dort auf ("Verdrahtung in `mcpserver/app.py`
+(`webui_routes(...)` in die Routenliste, vor `Mount("/mcp")`)") — aber Step 5 selbst ist laut
+Plan **hinter** dem Block-A-Gate verriegelt, der wiederum genau diese Route braucht. Ein Zirkel
+im Plan-Text, keine Interpretationsfrage. Dem Nikinger vorgelegt, Entscheidung: die minimale
+Verdrahtung jetzt vorziehen (nur `ui_auth_routes()`+`account_routes()`, **nicht** `webui/api.py`
+— das existiert noch gar nicht, ist echter Step-5-Scope), damit der Gate überhaupt durchführbar
+wird.
+
+*WARUM DAS EINEN GELOCKTEN PLAN-WIDERSPRUCH AUFLÖST, NICHT NUR EINE LÜCKE FÜLLT:* Plan §1.2s
+Paketgrenzen-Tabelle verbietet `mcpserver` ausdrücklich den Import von `webui`
+("`mcpserver` … darf **nicht** importieren: `webui`"), aber §1.5s eigene Route-Landkarte zeigt
+`create_app()` beim Aufruf von `webui_routes(...)` — genau das. Beide Stellen stehen im selben
+📕-Plandokument, das Nikinger-Entscheidungen P5-A–P5-AE trägt; §1.2 ist keine der benannten,
+einzeln gelockten Entscheidungen, sondern eine Ableitungstabelle, die mit der ebenso im Plan
+stehenden Architektur nicht zusammenpasst. **Nicht** stillschweigend nach einer Seite
+aufgelöst — dem Nikinger vorgelegt (`phase5_ui/CLAUDE.md`-Nachtrag unten trägt die
+Entscheidung), hier nur die Umsetzung.
+
+*WARUM DAS KEINEN Zirkelimport ERZEUGT* (das eigentliche Risiko hinter dem §1.2-Verbot):
+`webui` importiert heute noch **nichts** aus `mcpserver` — das eine erlaubte Symbol
+(`permissions.OwnSpaceWritable`, P5-B) ist erst für `webui/api.py` in Step 5 vorgesehen, diese
+Datei existiert noch nicht. `mcpserver/permissions.py` selbst importiert nur `collections.abc`/
+`typing` — kein Pfad zurück zu `mcpserver.app` oder zu `webui`. Selbst wenn Step 5 `webui/api.py`
+baut und von dort `mcpserver.permissions` importiert, bleibt der Graph azyklisch: Python lädt
+`mcpserver.permissions` als eigenständiges Submodul, unabhängig davon, dass `mcpserver.app`
+(der ursprüngliche Importeinstieg) noch nicht fertig geladen ist — ein Zyklus entstünde nur,
+wenn `mcpserver.permissions` selbst wieder `mcpserver.app` oder `webui` importierte, was es
+nicht tut. Test `test_create_app_mounts_ui_routes_without_import_cycle`
+(`phase2_mcp/tests/test_app.py`) hält diese Prämisse fest, nicht nur behauptet.
 """
 from __future__ import annotations
 
@@ -35,6 +80,10 @@ from starlette.responses import JSONResponse
 from starlette.routing import Mount, Route
 
 from storage.store import Store
+from webui.account import account_routes
+from webui.config import UiSettings
+from webui.routes_auth import ui_auth_routes
+from webui.sessions import SessionManager
 
 from . import __version__
 from .asgi import BearerAuthASGI
@@ -111,7 +160,15 @@ def create_app(
         mcp_app, resolver=oauth_resolver, challenge=_bearer_challenge(oauth.settings)
     )
 
+    # `/ui/*` vorgezogen aus P5 Step 5 (siehe Moduldocstring oben, Nachtrag 2026-08-03) — kein
+    # zweiter DB-Handle: `UiSettings`/`SessionManager` laufen über dieselbe `oauth.store`/
+    # `oauth.users`-Instanz, die auch `oauth_routes()` bedient.
+    ui_settings = UiSettings(base_url=oauth.settings.base_url)
+    ui_sessions = SessionManager(oauth.store, settings=ui_settings)
+
     routes: list[Route | Mount] = list(oauth_routes(oauth.settings, oauth.store, oauth.users))
+    routes += ui_auth_routes(ui_settings, oauth.store, oauth.users, ui_sessions)
+    routes += account_routes(ui_settings, oauth.store, oauth.users, ui_sessions)
     middleware: list[Middleware] = []
     if hosts is not None:
         middleware.append(Middleware(TrustedHostMiddleware, allowed_hosts=hosts))

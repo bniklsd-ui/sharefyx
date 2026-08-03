@@ -93,6 +93,7 @@ Messung statt Schätzung (`ui_budget.py`, AD) · gemeinsame Live-Abnahme, beide 
 | 3 | Auth-Datenmodell: Schema 2, `secretbox.py`, `userdir.py`, `flows.py`/`app.py`/`serve.py` auf `UserDirectory` umgestellt, `import_users_to_db.py` | 2 | ✅ **vollständig** — schließt O1 strukturell (kein Cache mehr) und die S7/S6-Restarbeit aus Step 1 (`ui_sessions`/`invites`-Purge, `UserDirectory.get()` ersetzt den Übergangs-Fix) | +61 (7 `test_secretbox.py` + 8 `test_authserver_config.py` + 23 `test_authserver_store.py` + 13 `test_userdir.py` + 3 `test_flows.py` + 7 `test_import_users_to_db.py`, drei neue Dateien) |
 | 4 | Neues Paket `phase5_ui/` (`pyproject.toml`, `webui/{__init__,config,security,sessions,pages,routes_auth,errors}.py`, `phase5_ui/tests/`): Sessions, CSRF, Login/Logout | 3 | ✅ **vollständig** — `/ui/login`, `/ui/logout` gegen eine echte In-Process-`Starlette`-App durchgespielt; **V35 geschlossen** (`dev_install.sh`s `phase*_*/`-Glob nimmt `phase5_ui/` ohne Skriptänderung auf) | +22 (5 `test_sessions.py` + 7 `test_security.py` + 7 `test_routes_auth.py` + 3 `test_isolation.py`, vier neue Testdateien + `conftest.py`) |
 | 5 | Selbstverwaltung: Einladung/Enrollment, Passwort, TOTP, Recovery, Connectoren (`webui/{account,reauth,passwords_policy}.py`, `webui/blocklist.txt`, `webui/{pages,routes_auth,errors}.py` erweitert; `authctl.py`-Erweiterung um `invite`/`list-users`/`disable-user`/`enable-user`/`list-sessions`/`revoke-sessions`; `authserver/store.py` um `revoke_families_for_space()`/`revoke_invites_for_space()`; `authserver/flows.py :: submit_consent()` um den Status-Gate) | 4 | ✅ **vollständig** — **V30 geschlossen** (Blocklist-Herkunft: `SecLists`-10k-Liste, siehe `passwords_policy.py`-Docstring); zwei Advisor-Funde vor dem Commit behoben (**S9** in `phase4_auth/CLAUDE.md`s Befund-Tabelle: `disable-user` blockierte den Login nicht; verworfener CSRF-Token nach Passwortwechsel — beide Details im Session-Block unten) | +31 (7 `test_account.py` + 7 `test_invite_enroll.py` + 3 `test_passwords_policy.py` + 1 `test_reauth.py`, vier neue Testdateien; +1 `test_routes_auth.py`; P4-seitig +1 `test_flows.py` + 8 `test_authctl.py` + 3 `test_authserver_store.py`) |
+| 6 | `/ui/*` aus Step 5 vorgezogen verdrahtet: `mcpserver/app.py :: create_app()` mountet `ui_auth_routes()`+`account_routes()` (kein neuer Parameter, `UiSettings`/`SessionManager` aus dem vorhandenen `oauth`-Bündel gebaut) | 4→5 (Gate-Voraussetzung) | ✅ **vollständig** — Live-Fund des Nikingers (`/ui/invite/…` → `404`) UND ein Plan-Widerspruch (§1.2 verbietet `mcpserver→webui`, §1.5 verlangt es) gemeinsam geschlossen, Entscheidung + Details im Session-Block unten | +3 (`phase2_mcp/tests/test_app.py`: `test_create_app_mounts_ui_routes_without_import_cycle`, `test_ui_login_reachable_through_create_app`, `test_ui_invite_reachable_through_create_app`) |
 
 ---
 
@@ -218,8 +219,81 @@ gebaut und getestet wurde (`test_authserver_store.py :: test_recovery_codes_repl
 Repo-Zugriff geschrieben (wie alle P4/P5-Pläne) und zählt Verhalten aus einem früheren Step
 erneut auf. Kein Deckungsloch, nur eine Namensabweichung.
 
-**Nächster Schritt (konkret):** der harte Gate vor Block B — Abnahmezeilen 1–9 (§6) live, Sache
-des Nikingers (Passwort/TOTP/Recovery/Session/Connector-Selbstverwaltung im echten Browser gegen
-den echten Dienst). Danach erst Step 5 (REST-API v1). Die drei liegen gebliebenen Live-Aktionen
+**Nachtrag, später am selben Tag — `/ui/*` aus Step 5 vorgezogen verdrahtet, Live-Fund des
+Nikingers während des Block-A-Gates:** `authctl.py invite niklas` lieferte einen
+`/ui/invite/<token>`-Link, der Aufruf im Browser lieferte **`404`**. Ursache: `webui`s
+Auth-Routen (`ui_auth_routes()`/`account_routes()`, Step 3/4, vollständig getestet) waren nie in
+den echten Prozess gemountet — `mcpserver/app.py :: create_app()` kannte bis dahin ausschließlich
+`oauth_routes()` und `Mount("/mcp")`. Grund: Plan §5 Step 5 listet genau diese Verdrahtung
+("`webui_routes(...)` in die Routenliste") als **eigenen** Schritt, aber Step 5 selbst ist laut
+Plan hinter dem Block-A-Gate verriegelt — und der Gate selbst verlangt Live-Zeilen 1–9 gegen
+`/ui/login`/`/ui/invite/{token}` (§6). **Ein Zirkel im Plan-Text**, kein Interpretationsspielraum:
+der Gate kann nicht bestehen, bevor der Schritt läuft, der hinter dem Gate liegt.
+
+**Zweiter, unabhängiger Fund beim Nachlesen des Plans wegen desselben Themas:** Plan §1.2s
+Paketgrenzen-Tabelle verbietet `mcpserver` ausdrücklich den Import von `webui`
+("`mcpserver` … darf **nicht** importieren: `webui`") — aber §1.5s eigene Route-Landkarte zeigt
+`create_app()` genau das tun (`routes += webui_routes(...)`). Beide Stellen stehen im selben
+📕-Plandokument; §1.2 ist keine der 30 einzeln benannten, gelockten Entscheidungen (P5-A–P5-AE),
+sondern eine Ableitungstabelle, die mit der im selben Dokument gezeichneten Architektur nicht
+zusammenpasst.
+
+**Beides dem Nikinger vorgelegt statt still aufgelöst** (Root-`CLAUDE.md`: „Widersprechende
+Evidenz wird ein expliziter Befund für den Menschen, nie eine stille Abweichung"). Entscheidung:
+**minimale Verdrahtung jetzt vorziehen** — nur `ui_auth_routes()`+`account_routes()` (beide
+fertig, getestet), **nicht** `webui/api.py` (existiert noch nicht, echter Step-5-Scope) — damit
+der Gate durchführbar wird, plus eine Korrektur der §1.2-Aussage hier im Phase-Head (📕-Plan
+selbst bleibt unverändert, wie bei jeder Plan-Korrektur in diesem Projekt — siehe z. B.
+`authserver/passwords.py :: ARGON2_TIME_COST`s Korrekturnotiz zum selben Muster).
+
+**§1.2-Korrektur:** „`mcpserver` darf `webui` nicht importieren" gilt ab diesem Nachtrag **nicht
+mehr uneingeschränkt** — `mcpserver/app.py :: create_app()` importiert `webui.routes_auth`/
+`webui.account`, mit Begründung. Was UNVERÄNDERT gilt: `webui` importiert weiterhin höchstens ein
+Symbol aus `mcpserver` (`permissions.OwnSpaceWritable`, P5-B, noch ungenutzt — kommt erst mit
+`webui/api.py` in Step 5). Die Richtung des Verbots war die, die einen Zyklus verhindern sollte
+(`mcpserver → webui → mcpserver`); ein reiner `mcpserver → webui`-Import ohne Rückweg ist
+architektonisch unbedenklich. Geprüft, nicht nur behauptet: `mcpserver/permissions.py` (das
+einzige `mcpserver`-Symbol, das `webui` je ziehen darf) importiert selbst nur `collections.abc`/
+`typing` — kein Pfad zurück zu `mcpserver.app` oder `webui`, auch nicht sobald `webui/api.py` in
+Step 5 dazukommt. Test `test_create_app_mounts_ui_routes_without_import_cycle`
+(`phase2_mcp/tests/test_app.py`) hält diese Prämisse fest.
+
+**Umsetzung, ein Commit:** `mcpserver/app.py :: create_app()` baut `UiSettings`/`SessionManager`
+intern aus dem bereits vorhandenen `oauth`-Bündel (`oauth.settings.base_url`, `oauth.store`,
+`oauth.users` — dieselbe `AuthStore`/`UserDirectory`-Instanz wie die OAuth-Seite, kein zweiter
+DB-Handle), mountet `ui_auth_routes()`+`account_routes()` zwischen `oauth_routes()` und
+`/health`/`Mount("/mcp")` — exakt die von §1.5 vorgezeichnete Reihenfolge. **Keine neuen
+`create_app()`-Parameter.** Drei neue Tests in `phase2_mcp/tests/test_app.py`:
+`test_create_app_mounts_ui_routes_without_import_cycle` (siehe oben),
+`test_ui_login_reachable_through_create_app`, `test_ui_invite_reachable_through_create_app` —
+beide Letzteren bauen bewusst die ECHTE `create_app()`-App (die `app`-Fixture, dieselbe wie die
+MCP-Tests), nicht `phase5_ui/tests`s eigenständige `Starlette(routes=ui_auth_routes(…))`-Testapp
+— genau der Unterschied, den der Live-Fund aufgedeckt hat: Step 3/4s Done-when-Nachweis lief nie
+gegen den echten Prozess.
+
+**Verifiziert:** `pytest -q` (Repo-Wurzel) → **470/470 grün** (467 vor diesem Nachtrag, +3).
+`git diff --stat` auf `storage/`, `mcpserver/tools.py`/`permissions.py`/`server.py` bleibt leer
+(Akzeptanzkriterium §6.18) — nur `mcpserver/app.py` und die beiden Testdateien geändert.
+`phase2_mcp/CLAUDE.md`s Testzahl-Zeile im selben Commit nachgezogen (80→83).
+`python -c "from mcpserver.app import create_app"` lief vor dem Testlauf zusätzlich isoliert
+durch, um einen Importfehler von einem Testfehler zu unterscheiden.
+
+**Schritt null vor dem Gate, nicht optional (Advisor-Hinweis):** dieser Nachtrag ändert nur den
+Code. Der laufende `sharefyx-mcp`-Dienst führt noch den alten Build — „`/ui/login`/
+`/ui/invite/{token}` sind live erreichbar" gilt erst nach
+`sudo phase3_edge/scripts/install_units.sh && sudo systemctl restart sharefyx-mcp` (kein
+Migrations-Runbook nötig, reiner Code-Deploy). Ohne diesen Restart liefert ein erneuter Versuch
+mit dem Invite-Link wieder `404`, und der Fix sähe fälschlich kaputt aus.
+
+**Nächster Schritt (konkret):** nach dem Restart — der harte Gate vor Block B, Abnahmezeilen 1–9
+(§6) live, Sache des Nikingers (Passwort/TOTP/Recovery/Session/Connector-Selbstverwaltung im
+echten Browser gegen den echten Dienst). Danach erst Step 5 (REST-API v1) — **teilweise, nicht
+vollständig vorgezogen** (Advisor-Korrektur: die erste Fassung dieses Absatzes behauptete „bereits
+erledigt", das überzieht): Plan §1.5 zeigt `webui_routes(ui_settings, auth_store, userdir, store,
+sessions)` mit einem `store`-Parameter (dem `storage.Store`, für `/api/v1/items/*`) — dieser
+Nachtrag mountet nur `ui_auth_routes()`/`account_routes()`, die diesen Parameter nicht brauchen.
+Step 5 baut `webui/api.py`/`serializers.py` und braucht dafür einen weiteren, kleinen Edit an
+`create_app()` (den `store`-Parameter zusätzlich durchreichen), keine komplette Neuverdrahtung,
+aber eben auch keine Nullarbeit. Die drei liegen gebliebenen Live-Aktionen
 aus Step 1/2 (S3/S4-Gegenprobe, Purge-Timer aktivieren, Migrations-Runbook) bleiben unverändert
 offen, blockieren weiterhin keinen Code-Step.

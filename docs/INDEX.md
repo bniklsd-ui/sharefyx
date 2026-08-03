@@ -22,7 +22,7 @@ updated: 2026-08-03
 
 ## Root & governance
 
-- [CLAUDE.md](../CLAUDE.md) — 📗 ~14KB · rules, core principle, hard rules, working style, current state; auto-loaded every session
+- [CLAUDE.md](../CLAUDE.md) — 📗 ~26KB · rules, core principle, hard rules, working style, current state; auto-loaded every session
 - [AGENTS.md](../AGENTS.md) — 📗 ~1KB · harness-neutral entry point for non-Claude-Code agents; points to `CLAUDE.md` + doc-layers navigation
 - [README.md](../README.md) — 📗 ~5KB · human overview + machine setup (venv, keyring, run, smoke test)
 - [ROADMAP.md](../ROADMAP.md) — 📗 ~9KB · Phases 1–5, scope in/out per phase, status
@@ -31,7 +31,7 @@ updated: 2026-08-03
 
 ## Active phase (5 — Web-UI, REST-API, Auth-Selbstverwaltung)
 
-- [phase5_ui/CLAUDE.md](../phase5_ui/CLAUDE.md) — 🔄 ~19KB · phase head; Step 0 ✅, Step 1 ✅ (S2–S8 geschlossen), Step 2 ✅ (Schema 2, `UserDirectory`, Migrationsskript), Step 3 ✅ (neues Paket `phase5_ui/webui`, Sessions/CSRF/Login/Logout), Step 4 ✅ (Selbstverwaltung: Einladung, Passwort, TOTP, Recovery, Connectoren; neuer Sicherheitsbefund S9 gefunden+geschlossen); read + newest Session-stopped block first
+- [phase5_ui/CLAUDE.md](../phase5_ui/CLAUDE.md) — 🔄 ~24KB · phase head; Step 0 ✅, Step 1 ✅ (S2–S8 geschlossen), Step 2 ✅ (Schema 2, `UserDirectory`, Migrationsskript), Step 3 ✅ (neues Paket `phase5_ui/webui`, Sessions/CSRF/Login/Logout), Step 4 ✅ (Selbstverwaltung: Einladung, Passwort, TOTP, Recovery, Connectoren; neuer Sicherheitsbefund S9 gefunden+geschlossen), `/ui/*` aus Step 5 vorgezogen in `mcpserver/app.py` gemountet (Block-A-Gate war sonst nicht live durchführbar); read + newest Session-stopped block first
 - [phase5_ui/SESSIONS_ARCHIVE.md](../phase5_ui/SESSIONS_ARCHIVE.md) — 📦 ~41KB · vier archivierte Session-Blöcke (Step 0, Step 1, Step 2, Step 3), verbatim
 - [docs/concepts/phase5_ui_plan.md](./concepts/phase5_ui_plan.md) — 📕 ~80KB · ausführungsreifer P5-Plan: Entscheidungen P5-A–P5-AE, Steps 0–9 (Block A Sicherheit/Selbstverwaltung, Block B REST-API/UI), Designsystem, Abnahmematrix 1–20, [VERIFY]-Register V27–V38; über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
 
@@ -50,7 +50,7 @@ updated: 2026-08-03
 - [docs/concepts/P3_ABNAHME_2026-07-27.md](./concepts/P3_ABNAHME_2026-07-27.md) — 📕 ~19KB · Abnahmeprotokoll Phase 3: 10/13 live bestanden, Zeilen 6/12/13 per Nikinger-Entscheidung auf nächste Phase verschoben, CLI-Ausschnitt als Beleg, Befunde B5/B6
 - [docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md](./concepts/PHASE3_CLOSEOUT_HANDOVER.md) — 📕 ~17KB · Abschluss-Handover P3→P4: Status, Delta seit dem P2-Handover, [VERIFY]-Bilanz V1–V13, geerbte Abnahmezeilen 6/12/13, Doku-Drift-Liste aus der Autocompact-Session inkl. Nachträgen zum nikinger-Token-Fund, offene Entscheidungen für die OAuth-Planung
 - [docs/concepts/phase3_edge_uebersicht.svg](./concepts/phase3_edge_uebersicht.svg) — 📕 Übersichtsgrafik Phase 3 (Request-Weg, Komponenten)
-- [phase2_mcp/CLAUDE.md](../phase2_mcp/CLAUDE.md) — 📗 ~20KB · phase head; Steps 0–7 ✅, **live-verifiziert** (Quick-Tunnel-Probe + Adapter-Abnahme durch den Nikinger, 2026-07-26); Quick-Tunnel-Runbook seit P3 Step 6 durch Verweis ersetzt; read + newest Session-stopped block first
+- [phase2_mcp/CLAUDE.md](../phase2_mcp/CLAUDE.md) — 📗 ~22KB · phase head; Steps 0–7 ✅, **live-verifiziert** (Quick-Tunnel-Probe + Adapter-Abnahme durch den Nikinger, 2026-07-26); Quick-Tunnel-Runbook seit P3 Step 6 durch Verweis ersetzt; **[2026-08-03]** `create_app()` mountet jetzt auch `webui`-Routen (P5 Step 4 Nachtrag, siehe `phase5_ui/CLAUDE.md`); read + newest Session-stopped block first
 - [docs/concepts/phase2_mcp_plan.md](./concepts/phase2_mcp_plan.md) — 📕 ~46KB · ausführungsreifer P2-Plan (Entscheidungen P2-A–P2-N, Steps 0–7); über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
 - [docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md](./concepts/P2_ADAPTER_ABNAHME_2026-07-26.md) — 📕 ~11KB · Abnahmeprotokoll über den echten Custom Connector, 21/21 Prüfungen, beide Befunde behoben (B1, B2 — siehe Nachtrag)
 - [phase2_mcp/SESSIONS_ARCHIVE.md](../phase2_mcp/SESSIONS_ARCHIVE.md) — 📦 ~38KB · acht archivierte Session-Blöcke (Step 0–7), verbatim, newest-first

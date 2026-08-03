@@ -159,6 +159,66 @@ def _mcp_client(app: Starlette, token: str) -> Client:
     return Client(transport)
 
 
+def test_create_app_mounts_ui_routes_without_import_cycle():
+    """P5 Step 4 Nachtrag (siehe `mcpserver/app.py`s Moduldocstring): `mcpserver.app` importiert
+    jetzt `webui.routes_auth`/`webui.account` — vorgezogen aus Step 5, damit Block As
+    Live-Abnahme (Plan §6, Zeilen 1–9) überhaupt eine echte `/ui/login`/`/ui/invite/{token}`
+    vorfindet. Das ist nur zyklenfrei, weil `mcpserver.permissions` (das einzige Symbol, das
+    `webui` künftig aus `mcpserver` ziehen darf, P5-B) selbst nichts aus `mcpserver.app` oder
+    `webui` importiert. Grep statt Laufzeitprüfung: ein echter Zyklus entstünde erst, sobald
+    `webui/api.py` (Step 5, existiert noch nicht) `mcpserver.permissions` importiert — dieser
+    Test hält die Prämisse fest, auf der die Sicherheit dieser Vorwegnahme beruht."""
+    import inspect
+
+    import mcpserver.permissions as permissions_module
+
+    source = inspect.getsource(permissions_module)
+    assert "mcpserver.app" not in source
+    assert "webui" not in source
+
+
+@pytest.mark.asyncio
+async def test_ui_login_reachable_through_create_app(app):
+    """Live-Fund des Nikingers, 2026-08-03: `authctl.py invite` lieferte einen `/ui/invite/…`
+    Link, aber der laufende Dienst kannte `/ui/*` gar nicht (`create_app()` mountete bis zu
+    diesem Nachtrag nur `oauth_routes()`+`Mount("/mcp")`) — `404`. Dieser Test baut die reale
+    `create_app()`-App (nicht `phase5_ui/tests`s eigenständige `Starlette(routes=ui_auth_routes(
+    …))`-Testapp) und beweist, dass `/ui/login` darüber erreichbar ist — genau die Lücke, die
+    live auffiel und in `phase5_ui/tests` nicht hätte auffallen können.
+
+    Zusätzlich (Advisor-Fund vor dem Commit): `oauth_routes()` und `ui_auth_routes()` laufen jetzt
+    in EINER Starlette-App — `security.py :: ui_security_headers()`s eigene, engere CSP
+    (`form-action 'self'`) darf dabei nicht mit `authserver/routes.py`s OAuth-CSP
+    (`form-action 'self' https://claude.ai https://claude.com`) verwechselt oder überschrieben
+    werden. `phase5_ui/tests/test_security.py` bewies die Trennung bisher nur für die
+    eigenständige Testapp — hier gegen den echten, zusammengesteckten Prozess."""
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app), base_url="http://testserver"
+    ) as client:
+        response = await client.get("/ui/login")
+
+    assert response.status_code == 200
+    assert 'action="/ui/login"' in response.text
+    csp = response.headers["content-security-policy"]
+    assert "form-action 'self'" in csp
+    assert "claude.ai" not in csp
+
+
+@pytest.mark.asyncio
+async def test_ui_invite_reachable_through_create_app(app, auth_store):
+    """Gegenstück zum Live-Fund: ein über `AuthStore.create_invite()` (dieselbe Methode, die
+    `authctl.py invite` aufruft) erzeugter Link muss über die reale App eine `200`-Einladeseite
+    liefern, kein `404`."""
+    token = auth_store.create_invite(space="alpha", purpose="initial", ttl_s=3600)
+
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app), base_url="http://testserver"
+    ) as client:
+        response = await client.get(f"/ui/invite/{token}")
+
+    assert response.status_code == 200
+
+
 @pytest.mark.asyncio
 async def test_health_ok(app):
     async with httpx.AsyncClient(

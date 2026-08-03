@@ -159,9 +159,25 @@ kein Login-Pfad prüfte je `users.status` — ein deaktivierter Space konnte sic
 einloggen bzw. neu autorisieren. In beiden Pfaden (`webui/routes_auth.py`,
 `authserver/flows.py :: submit_consent`) geschlossen, plus zwei kleinere Funde (verworfener
 CSRF-Token nach Passwortwechsel, offene Einladung überlebte `disable-user`), alle vor dem
-Commit behoben. Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-03.**]** **Nächster
-Schritt:** der harte Gate vor Block B — Abnahmezeilen 1–9 live, Sache des Nikingers. Danach erst
-Step 5 (REST-API v1).
+Commit behoben. Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-03.**]** **[2026-08-03,
+dritter Nachtrag:** der Nikinger stieß beim Gate live auf `/ui/invite/…` → `404` — `webui`s
+Auth-Routen waren nie in den echten Prozess gemountet, das ist laut Plan offiziell **Step
+5**-Scope, aber Step 5 liegt hinter demselben Gate, der genau diese Routen live braucht (Zirkel
+im Plan-Text). Dabei außerdem gefunden: Plan §1.2 verbietet `mcpserver→webui`-Importe, §1.5s
+eigene Route-Landkarte verlangt genau das — ein Widerspruch innerhalb desselben 📕-Plandokuments,
+kein Interpretationsspielraum. Beides dem Nikinger vorgelegt statt still aufgelöst; Entscheidung:
+minimale Verdrahtung vorziehen (`mcpserver/app.py :: create_app()` mountet `ui_auth_routes()`+
+`account_routes()`, kein neuer Parameter, keine neue `webui/api.py`), §1.2 im Phase-Head
+korrigiert (Plan selbst bleibt 📕 unverändert). Kein Zirkelimport: `mcpserver.permissions`
+(das einzige Symbol, das `webui` je aus `mcpserver` ziehen darf) importiert nichts zurück,
+testgehalten. 470/470 Tests, Tabu-Pfade weiterhin leer. **Ändert nur den Code** — der laufende
+Dienst führt noch den alten Build, `sudo phase3_edge/scripts/install_units.sh && sudo systemctl
+restart sharefyx-mcp` ist Schritt null vor dem Gate, sonst liefert der Invite-Link wieder `404`.
+Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-03.**]** **Nächster Schritt:** Restart,
+dann der harte Gate vor Block B — Abnahmezeilen 1–9 live, Sache des Nikingers. Danach erst Step 5
+(REST-API v1) — nur teilweise vorgezogen: `webui/api.py` braucht bei seinem Bau noch einen
+zweiten, kleinen `create_app()`-Edit für den `store`-Parameter, den `ui_auth_routes()`/
+`account_routes()` nicht brauchten.
 
 **Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅
 abgeschlossen, 2026-07-30.** Mission erfüllt: der Pfad-Token ist verschwunden, ein eigener

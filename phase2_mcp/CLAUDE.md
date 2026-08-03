@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase2_mcp_plan.md          # voller Plan, Entscheidungen P2-A–P2-N, Steps 0–7
   - ../docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md # Herkunft der Entscheidungen D1–D6
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
-updated: 2026-07-27 (Quick-Tunnel-Runbook durch P3-Verweis ersetzt)
+updated: 2026-08-03 (P5 Step 4 Nachtrag: create_app() mountet webui-Routen, Testzahl 80→83)
 ---
 # CLAUDE.md — Phase 2: MCP-Server (`phase2_mcp/`)
 
@@ -186,8 +186,15 @@ Reale Zahl: **80**, nicht 94 — vierte Instanz derselben Drift-Kategorie, die d
 dreimal betraf (siehe die drei Korrekturen oben), diesmal aber im selben Commit korrigiert statt
 erst später gefunden.
 
-**Gesamt: 80 Tests** in `phase2_mcp/tests/` (6 `test_config.py` + 1 `test_credentials.py` + 1
-`test_auth.py` + 3 `test_permissions.py` + 8 `test_logging.py` + 2 `test_context.py` + 10
+**[2026-08-03 Korrektur, P5 Step 4 Nachtrag]:** `test_app.py` 10→13 — `mcpserver/app.py ::
+create_app()` mountet jetzt `webui.routes_auth`/`webui.account` (vorgezogen aus P5 Step 5, siehe
+`phase5_ui/CLAUDE.md`s Session-Block 2026-08-03 für Anlass und Begründung). Dieselbe
+Berührungsfläche wie P4-Q (`mcpserver/app.py` ist dort explizit erlaubt) — P5-B erlaubt es
+ebenfalls. Kein Eigen-Auftrag dieser Phase, nur die Zähl-Zeile hier nachgezogen, dieselbe
+Disziplin wie bei den P4-Korrekturen oben.
+
+**Gesamt: 83 Tests** in `phase2_mcp/tests/` (6 `test_config.py` + 1 `test_credentials.py` + 1
+`test_auth.py` + 3 `test_permissions.py` + 8 `test_logging.py` + 2 `test_context.py` + 13
 `test_app.py` + 23 `test_tools.py` + 3 `test_mcp_smoke.py` + 11 `test_request_log.py` + 10
 `test_asgi_bearer.py` [seit dem Schnitt: nur noch `BearerAuthASGI`, kein `TokenPathASGI`/
 `AuthModeASGI` mehr, Details `phase4_auth/CLAUDE.md`] + 2 `test_serve.py` [neu, Schnitt:
