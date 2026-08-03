@@ -7,7 +7,7 @@ up: ../CLAUDE.md
 down:
   - ../docs/concepts/phase5_ui_plan.md             # voller Plan, Entscheidungen P5-A–P5-AE, Steps 0–9
   - ../docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.5, [VERIFY]-Bilanz V14–V26
-updated: 2026-08-02
+updated: 2026-08-03
 ---
 
 # CLAUDE.md — Phase 5: Web-UI, REST-API, Auth-Selbstverwaltung (`phase5_ui/`)
@@ -91,191 +91,126 @@ Messung statt Schätzung (`ui_budget.py`, AD) · gemeinsame Live-Abnahme, beide 
 | 1 | Haushalt, Verifikationsdurchlauf, Rückbau P2-Token-Reste, Doku-Drift, P3-Restore-Nachweis | 0 | ✅ **vollständig** — A.7 vom Nikinger live ausgeführt, P3 Zeile 13 vom Nikinger bestätigt (13/13, Phase 3 ✅) | −14 (Rückbau, kein neuer Feature-Code) |
 | 2 | Sicherheitsbefunde S2–S8 vollständig geschlossen (`authserver/{resolver,flows,store,ratelimit,routes}.py`, `phase3_edge/scripts/install_units.sh`, `phase5_ui/systemd/sharefyx-purge.{service,timer}`) | 1 | ✅ **vollständig** — 7/7 Befunde geschlossen, Meta-Test bestätigt keine offene Zeile mehr | +20 (2 `test_authserver_store.py` + 4 `test_resolver.py` + 2 `test_routes.py` + 3 `test_flows.py` + 2 `test_ratelimit.py` + 5 `test_units.py` + 2 `test_security_review_register.py`, neue Datei) |
 | 3 | Auth-Datenmodell: Schema 2, `secretbox.py`, `userdir.py`, `flows.py`/`app.py`/`serve.py` auf `UserDirectory` umgestellt, `import_users_to_db.py` | 2 | ✅ **vollständig** — schließt O1 strukturell (kein Cache mehr) und die S7/S6-Restarbeit aus Step 1 (`ui_sessions`/`invites`-Purge, `UserDirectory.get()` ersetzt den Übergangs-Fix) | +61 (7 `test_secretbox.py` + 8 `test_authserver_config.py` + 23 `test_authserver_store.py` + 13 `test_userdir.py` + 3 `test_flows.py` + 7 `test_import_users_to_db.py`, drei neue Dateien) |
+| 4 | Neues Paket `phase5_ui/` (`pyproject.toml`, `webui/{__init__,config,security,sessions,pages,routes_auth,errors}.py`, `phase5_ui/tests/`): Sessions, CSRF, Login/Logout | 3 | ✅ **vollständig** — `/ui/login`, `/ui/logout` gegen eine echte In-Process-`Starlette`-App durchgespielt; **V35 geschlossen** (`dev_install.sh`s `phase*_*/`-Glob nimmt `phase5_ui/` ohne Skriptänderung auf) | +22 (5 `test_sessions.py` + 7 `test_security.py` + 7 `test_routes_auth.py` + 3 `test_isolation.py`, vier neue Testdateien + `conftest.py`) |
 
 ---
 
-## Session stopped — 2026-08-02 (Step 2: Auth-Datenmodell Schema 2, `UserDirectory`, Migration)
+## Session stopped — 2026-08-03 (Step 3: neues Paket `phase5_ui/` — Sessions, CSRF, Login/Logout)
 
-**Für den nächsten, kalten Leser:** dritte Session der Phase, direkt im Anschluss an Step 1
-(„go on" nach der Zusammenfassung der beiden noch offenen Live-Aktionen). Plan §5 Step 2s
-eigene Reihenfolge (secretbox → Schema 2 + Store → `userdir.py` → `flows.py`/`app.py`-Umstieg →
-Migrationsskript) wurde genau so durchlaufen. `pytest -q` stand zu Beginn bei 353/353, am Ende
-bei **414/414** (+61, siehe Advisor-Nachtrag unten: zwei Tests kamen nach der ersten
-412/412-Marke noch dazu, ein zweiter Advisor-Durchlauf fand einen echten Bug zwischen ihnen).
+**Für den nächsten, kalten Leser:** vierte Session der Phase, direkt im Anschluss an Step 2
+(„weiter" nach der Advisor-Review + Commit von Step 2). Plan §5 Step 3 zeigt nur auf §2.7
+(Sessions/CSRF/Re-Auth) und §3.4 (Sicherheits-Header) — **nicht** auf §2.8 (Einladungs-/
+Enrollment-Fluss, braucht `webui/passwords_policy.py` aus Step 4) und **nicht** auf §2.9
+(Passwortpolitik). Entsprechend baut dieser Step ausschließlich Login/Logout, nicht
+`/ui/invite/{token}` — auch wenn §1.3s Modulkarte `routes_auth.py`/`pages.py` mit „Einladung,
+Enrollment" beschreibt: das ist die **finale** Form über mehrere Steps hinweg, nicht Step 3s
+Umfang. Mit dem Advisor vor dem ersten Code vorab geklärt (keine Ambiguität stillschweigend
+aufgelöst).
 
-**Plan-Drift, vor dem Umbau geklärt (Advisor-Review vor Beginn):** keine — die Reihenfolge und
-alle fünf Bauteile aus §2.2–§2.6 waren mit dem realen Repo-Stand deckungsgleich (Step 1 hatte
-`UserDirectory`/Schema 2 bereits als „noch nicht gebaut" markiert, genau das ist jetzt
-nachgeholt). Zwei Stellen, an denen bewusst über den Plan-Wortlaut hinausgegangen oder von ihm
-abgewichen wurde, beide vorab mit dem Advisor abgestimmt:
-
-- **Recovery-Code im OAuth-Consent-Formular** (§2.5, „ein Wert mit Bindestrich und Länge 11 wird
-  als Recovery-Code geprüft") ist bereits in diesem Step verdrahtet, nicht erst in Step 4 — die
-  Formerkennung lebt einzig in `userdir.py :: looks_like_recovery_code()`, `flows.py` leitet sie
-  nicht selbst her. Wichtiger Fallstrick, den der Advisor benannte: ein Recovery-Login hat keinen
-  TOTP-Zähler (`accepted_counter` bleibt `None`), `store.set_totp_counter()` darf deshalb NICHT
-  mehr unbedingt nach jedem Erfolg laufen (vorher tat es das) — sonst würde ein Recovery-Login
-  stillschweigend den TOTP-Replay-Zähler auf `None` zurücksetzen. Jetzt hinter
-  `if accepted_counter is not None:` gattert, Regressionsgefahr in einem eigenen Testfall nicht
-  extra geprüft (kein Recovery-Code existiert vor Step 4 für echte Nutzer, aber die Guard-Logik
-  selbst ist über `test_totp_replay_is_rejected_without_burning_the_stored_counter` weiterhin
-  abgedeckt, da dieser Test ausschließlich den TOTP-Zweig durchläuft).
-- **`UserDirectory.__init__` prüft „DEK fehlt UND `users` nicht leer" selbst**, nicht
-  `config.py` (der Plan nennt die Bedingung nur bei `secretbox.py`, ohne eine Datei festzulegen)
-  — Begründung: das ist die Stelle, die tatsächlich entschlüsseln muss und bei jedem
-  Prozessstart genau einmal läuft; `config.load_data_encryption_key()` bleibt eine reine
-  Lesefunktion ohne Kenntnis vom `AuthStore`.
+**Neues Paket, editable installiert:** `phase5_ui/pyproject.toml` (Paket `webui`, Abhängigkeit
+`authserver`), `webui/__init__.py`. `dev_install.sh`s `phase*_*/`-Glob nimmt das Verzeichnis ohne
+Skriptänderung auf — **V35 damit geschlossen**, keine Codeänderung nötig, nur geprüft. Root-
+`pytest.ini`s `testpaths` um `phase5_ui/tests` ergänzt (ohne diese Zeile hätte `pytest -q` vom
+Repo-Wurzelverzeichnis die neuen 22 Tests nie gesammelt — mit `pytest phase5_ui/tests` allein
+wäre das unbemerkt geblieben, Advisor-Hinweis).
 
 **Bauteile, in Reihenfolge:**
 
-1. **`secretbox.py`** — AES-256-GCM (`cryptography.hazmat...aead.AESGCM`), `nonce || ciphertext`
-   als ein `bytes`-Blob, `SecretBoxError` als einziger Fehlertyp (kein Unterschied nach Ursache
-   nach außen, dieselbe Enumerationslogik wie `passwords.verify_password`).
-2. **`config.py :: load_data_encryption_key()`** + `generate_/encode_/decode_data_encryption_key()`
-   — dieselbe Verzweigung wie `users.load_users()` (`CREDENTIALS_DIRECTORY/auth-dek` zuerst,
-   Keyring `nikinger-space`/`auth-dek` als Dev-Fallback), aber **kein** stiller
-   Warn-und-Keyring-Fallback bei fehlender Datei: Abwesenheit ist hier entscheidungsrelevant für
-   den Aufrufer (`UserDirectory.__init__`), nicht etwas, das diese Funktion selbst auflösen darf.
-   `users.py`s Docstring-Behauptung „`keyring` wird nur hier importiert" korrigiert (gilt seit
-   diesem Commit für zwei Module, unabhängig voneinander). **V28 geschlossen:** `cryptography`
-   war bereits im `.venv` (49.0.0), jetzt exakt in `phase4_auth/pyproject.toml` gepinnt.
-3. **Schema 2** (`store.py`) — vier neue Tabellen (`users`/`invites`/`recovery_codes`/
-   `ui_sessions`), rein additiv, `SCHEMA_VERSION` `"1"`→`"2"` per `INSERT ... ON CONFLICT DO
-   UPDATE` (vorher `INSERT OR IGNORE` — ein Prozess, der eine alte Schema-1-Datei öffnet,
-   migriert jetzt automatisch beim ersten Start). Vollständige Methodenliste aus Plan §2.3
-   (Nutzerakten/Einladungen/Recovery-Codes/UI-Sessions) 1:1 umgesetzt, neue Dataclasses
-   `UserRow`/`InviteRow`/`SessionRow` in `models.py` (`SessionRow` trägt `session_hash`/
-   `csrf_hash`, nie Klartext — dieselbe Hash-only-Disziplin wie Token/Codes, P5-K).
-   **S7 dabei vollständig geschlossen:** `purge_expired()` deckt jetzt auch `ui_sessions`
-   (absolut abgelaufen oder >7 Tage widerrufen) und `invites` (abgelaufen oder >7 Tage
-   konsumiert) ab — die in Step 1 dokumentierte Lücke („Tabellen existieren erst in Step 2")
-   ist damit geschlossen, `phase4_auth/CLAUDE.md`s S7-Zeile nachgezogen.
-4. **`userdir.py`** — `UserDirectory.get()` liest live (kein Cache, **schließt O1 strukturell**:
-   eine Provisionierung wirkt jetzt ohne Neustart), entschlüsselt `totp_secret_enc` mit AAD =
-   Space-Name, fängt `SecretBoxError` ab (Log-Warnung, `totp_secret=None` statt Absturz) — **das
-   ist S6s endgültige, strukturelle Schließung**, der `record.get(...)`-Übergangsfix aus Step 1
-   ist jetzt entfernt (Zeile im Findings-Register bei `phase4_auth/CLAUDE.md` entsprechend
-   nachgezogen: „geschlossen (P5 Step 1)" statt „strukturell erst in Step 2").
-5. **`flows.py`/`routes.py`/`mcpserver/app.py`/`scripts/serve.py` auf `UserDirectory` umgestellt**
-   — Advisor-Vorgabe befolgt: **verhaltensneutral**, nicht durch umgeschriebene Tests nur
-   behauptet. In `test_flows.py`/`test_routes.py` änderte sich ausschließlich die
-   `users`-Fixture-Konstruktion (jetzt `store.upsert_user(...)` + `UserDirectory(store, dek=...)`
-   statt eines rohen Dicts) — alle Assertions blieben unverändert. **Zwei Ausnahmen, explizit
-   dokumentiert statt still verschwunden:** `test_broken_user_record_yields_generic_login_failure`
-   und `test_unknown_space_and_broken_record_are_indistinguishable` konnten ihren ursprünglichen
-   Testfall (`{SPACE: {}}`, ein Dict ohne `"pwd"`/`"totp"`) nicht mehr herstellen — genau das IST
-   S6s strukturelle Schließung (`store.get_user()` liefert nie ein unvollständiges Zwischending).
-   Beide auf den jetzt einzig erreichbaren „kaputten Datensatz"-Fall umgestellt: ein TOTP-Seed,
-   der mit einem ANDEREN DEK versiegelt wurde (z. B. nach einem DEK-Rotationsfehler) — beweist
-   dieselbe Eigenschaft (generischer Fehlschlag, kein Absturz) unter der neuen Architektur.
-   Neuer expliziter Test `test_flows_still_authenticate_with_userdirectory` (Plan-Namensvorgabe).
-6. **`import_users_to_db.py`** — `--dry-run` Standard, `--apply` schreibt, `--force` überschreibt
-   vorhandene Zeilen. Liest ausschließlich `load_users_from_keyring()` (nie das
-   Credential-Snapshot). `totp_confirmed_at` übernimmt den ursprünglichen `created_at`-Wert (die
-   Seeds sind live bewiesen, kein „unconfirmed"-Zustand für Bestandsnutzer). Bricht laut ab,
-   wenn kein DEK geladen werden kann und der Keyring nicht leer ist.
+1. **`config.py`** — `UiSettings` (Cookie-Name `__Host-sfx_session`, `idle_ttl_s`/
+   `absolute_ttl_s` als Code-Konstanten 12h/7d nach P5-E, **nicht** über Umgebungsvariablen wie
+   `AuthSettings.access_ttl_s` — P5-E nennt keinen Live-Testbedarf wie
+   `SPACE_OAUTH_ACCESS_TTL_S` in P4, ein ungenutzter Konfigurationshaken wäre eine Fläche mehr,
+   die falsch gesetzt werden kann). **Bewusst OHNE Env-Loader** (anders als
+   `authserver.config.load_auth_settings()`, Advisor-Fund: eine erste Fassung hatte
+   `load_ui_settings()`, aber nichts rief sie auf und kein Test deckte sie ab — totes Gewicht,
+   Hard Rule 7 — entfernt statt ungetestet stehen gelassen). Ein eigenes `UiSettings`-Objekt,
+   keine gemeinsame Settings-Klasse mit `authserver` (würde beide Seiten koppeln); die echte
+   Umgebungsvariablen-Verdrahtung entscheidet sich erst in Step 5/6, wenn `/ui` real in
+   `scripts/serve.py` gemountet wird. `static_dir` fehlt aus demselben „noch kein Bedarf"-Grund
+   (§1.3s Modulkarte nennt es als Teil der finalen Form über mehrere Steps, nicht als
+   Step-3-Bedarf — Step 3 liefert keine statischen Dateien aus).
+2. **`errors.py`** — `CsrfError` (→403), kleinere Menge als `authserver/errors.py`: kein
+   RFC-Fehlercode-Vokabular, das kommt erst mit `ApiError` in Step 5.
+3. **`sessions.py :: SessionManager`** — `issue`/`load`/`rotate`/`clear` über die
+   Step-2-`AuthStore`-Methoden (`create_session`/`touch_session`/`revoke_session`), kein
+   eigenes SQL. Cookie exakt nach Plan: `Path=/`, `Secure`, `HttpOnly`, `SameSite=Strict`, kein
+   `Domain`, kein `Max-Age`.
+4. **`security.py`** — `ui_security_headers()` (eigene CSP, **getrennt** von
+   `authserver/routes.py :: _security_headers()` — die OAuth-Seite braucht `claude.ai` in
+   `form-action`, die UI nicht) und `require_csrf()`. **Dokumentierte Abweichung vom
+   Plan-Schnipsel** (mit dem Advisor vorab abgestimmt, kein Alleingang): die Plan-Signatur zeigt
+   nur `require_csrf(request, session)`, aber §2.7s Text selbst verlangt den Origin-Vergleich
+   gegen `settings.base_url` — die Funktion trägt deshalb zusätzlich `settings: UiSettings` und
+   `form_token: str | None` (der bereits aus dem Formular gelesene Wert, damit die Funktion den
+   Request-Body nicht selbst konsumieren und nicht `async` werden muss — ein Aufrufer, der
+   ohnehin `await request.form()` braucht, reicht das Feld einfach durch).
+5. **`pages.py`** — `render_login_page()`/`render_error_page()` nach dem Muster von
+   `authserver/templates.py` (kein Framework, kein `<script>`). **`render_logged_in_page()`
+   zusätzlich zum Plan-Wortlaut, dokumentiert statt stillschweigend:** `SessionManager.rotate()`
+   gibt den CSRF-Token nur EIN einziges Mal als Klartext zurück (`ui_sessions` speichert nur
+   `csrf_hash`) — ein bloßer `302`-Redirect nach erfolgreichem Login hätte diesen Wert
+   verworfen, und keine nachfolgende CSRF-geprüfte Anfrage (z. B. Logout) hätte je einen
+   gültigen Wert vorlegen können. Die Seite trägt den Token als verstecktes Feld in einem
+   Logout-Formular — Übergangslösung, **wird in Step 6 durch die echte App-Shell ersetzt**, kein
+   dauerhafter Bestandteil des Designs.
+6. **`routes_auth.py`** — `ui_auth_routes()`: `GET`/`POST /ui/login`, `POST /ui/logout`. Login
+   dupliziert bewusst die enumerationssichere Prüfung aus `flows.py :: submit_consent()`
+   (Argon2id unconditional, TOTP/Recovery nur wenn der Space existiert, dieselbe
+   `LoginThrottle`/`login_attempts`-Tabelle) statt sie zu teilen — P5-G hält UI-Sitzung und
+   OAuth-Consent architektonisch getrennt, eine gemeinsame Funktion wäre eine Kopplung, die der
+   Plan hier nicht vorsieht. `/ui/invite/{token}` bewusst NICHT gebaut (siehe oben).
 
-**Kollateralberührungen außerhalb der Step-2-Dateiliste, dokumentiert (gleiche Kategorie wie
-`oauth_smoke.py` in Step 1):** `phase2_mcp/scripts/serve.py` (Pflicht — `OAuthConfig.users`
-ändert den Typ), `phase2_mcp/scripts/mcp_smoke.py` + `phase4_auth/scripts/oauth_smoke.py` +
-`phase2_mcp/tests/{test_app,test_asgi_bearer,test_request_log,test_serve}.py` +
-`phase4_auth/tests/test_oauth_smoke.py` (alle bauten `OAuthConfig(...users=...)` mit einem
-rohen Dict). `phase4_auth/systemd/sharefyx-mcp.service` + `phase3_edge/tests/test_units.py`:
-`LoadCredentialEncrypted=auth-users:...` entfernt (der Code liest diese Datei seit diesem
-Commit nirgends mehr — dieselbe „totes Gewicht sofort abbauen"-Disziplin wie beim
-`spaces.cred`-Fund in P4, nicht wie damals erst beim nächsten Unit-Umbau liegen gelassen),
-`auth-dek:/etc/sharefyx/auth-dek.cred` dafür neu. `authserver/users.py :: load_users()` (die
-Credential-Datei-Variante, nicht `load_users_from_keyring()`) ist jetzt echter toter Code —
-bewusst NICHT gelöscht (außerhalb der Step-2-Dateiliste), Docstring korrigiert, vorgemerkt für
-einen künftigen Rückbau, sobald `auth-users.cred`/der Keyring-Eintrag laut Migrations-Reihenfolge
-unten formal abgelöst sind.
+**Advisor-Fund, vor dem Commit behoben — derselbe Fehler wie in P5 Step 2, eine Zeile über der
+Kopiervorlage übersehen:** die erste Fassung rief `store.set_totp_counter()` **innerhalb** des
+TOTP-Zweigs auf, sobald `accepted_counter is not None` — also potenziell **vor** dem
+Passwort-Gate weiter unten. Ein richtiger TOTP-Code mit falschem Passwort hätte damit das
+aktuelle 30-Sekunden-Zeitfenster für den echten Nutzer verbrannt, exakt die Lehre, die der
+Kommentar zwei Zeilen darüber in `flows.py` festhält (dort saß der Aufruf schon richtig, hinter
+dem Gate) — beim Nachbau hier trotzdem in den falschen Zweig gerutscht. Fix: `accepted_counter`
+vor der Verzweigung auf `None` initialisiert, `set_totp_counter()` erst nach
+`throttle.reset(space)` (also nach dem vollständigen Erfolg) aufgerufen, genau wie in
+`flows.py`. Neuer Test `test_correct_totp_with_wrong_password_does_not_burn_the_counter`
+(`test_routes_auth.py`): falsches Passwort + gültiger TOTP-Code → 401, Zähler bleibt `None`.
 
-**Verifiziert, nicht nur behauptet:** `pytest -q` → **414/414 grün** (412 zu Sessionsende, +2 aus
-den beiden Advisor-Nachträgen unten). Zusätzlich beide Smoke-Skripte real gelaufen (nicht nur
-`pytest` grün behauptet, dreimal — einmal zu Sessionsende, je einmal nach jedem Advisor-Fund):
-`mcp_smoke.py --json` → 12/12, `oauth_smoke.py --json` (In-Process-Default, echter
-`UserDirectory`+DEK-Pfad) → **11/11** — der volle OAuth-Login-Fluss (Passwort + TOTP, jetzt über
-verschlüsselte Seeds in `auth.sqlite3` statt einem Dict) funktioniert nach dem Umbau unverändert.
-`git diff` bleibt auf den Tabu-Pfaden (`storage/`, `mcpserver/tools.py`/`permissions.py`/
-`server.py`) leer.
+**Tests, vier neue Testdateien plus `conftest.py` (`phase5_ui/tests/`, gemeinsame Fixtures — Muster
+wie `test_flows.py`, `base_url` bewusst `https://…`: `__Host-`-Cookies verlangen `Secure`, httpx
+sendet ein `Secure`-Cookie nicht über `http://` zurück, sonst sähen die Session-Tests grün aus,
+ohne dass das Cookie je zurückreist):**
+- `test_sessions.py` (5) — Cookie-Flags, kein `Domain`, Session-ID nie im Klartext in
+  `ui_sessions` (direkte SQLite-Abfrage gegen die Testdatenbank, nicht nur Rückgabetyp-Prüfung),
+  Idle-/Absolut-Timeout.
+- `test_security.py` (7) — `require_csrf()` als reine Funktion (fehlender/falscher Token,
+  fremde Herkunft, `Sec-Fetch-Site`-Ersatz bei fehlendem `Origin`, `GET` braucht keinen Token),
+  CSP ohne `unsafe-inline`, `form-action` nur `'self'` (belegt: **nicht** die OAuth-Header).
+- `test_routes_auth.py` (7) — Enumerationsschutz (falsches Passwort/unbekannter Space
+  ununterscheidbar), Session-Rotation bei Login, Logout widerruft serverseitig, abgelaufenes
+  Cookie wird beim Logout-Response gelöscht (`Max-Age=0`), Sicherheits-Header auf UI-Seiten,
+  gemeinsame Fehlversuchsbremse mit dem OAuth-Consent-Login (fünf UI-Fehlversuche sperren auch
+  einen anschließenden `flows.submit_consent()`-Aufruf für denselben Space), der
+  TOTP-Zähler-Regressionstest oben.
+- `test_isolation.py` (3, Akzeptanzkriterium §6.19/P5-F/P5-G) — `/mcp` ignoriert ein echtes,
+  gültiges UI-Sitzungscookie (bleibt 401), `/oauth/authorize` liest niemals Cookies (identische
+  Anfrage mit/ohne Sitzungscookie liefert dasselbe Login-Formular, kein abgekürzter Consent),
+  `/api`-Bearer-Test als **dokumentierter Platzhalter** („nach Step 5 zu schärfen", Plan-Wortlaut
+  wörtlich übernommen) — `/api/v1/*` existiert erst ab Step 5, ein Mount hier vorzugreifen wäre
+  erfundener Scope; geprüft wird stattdessen, dass `SessionManager.load()` einen
+  `Authorization`-Header schlicht ignoriert (kein Cookie → `None`, unabhängig vom Bearer-Wert).
 
-**Zwei Advisor-Durchläufe vor dem Commit (dieselbe Session, wie in
-`feedback_advisor_before_commit` festgehalten), drei echte Lücken gefunden, alle vor dem Commit
-geschlossen, keine danach:**
+**Verifiziert, nicht nur behauptet:** `pytest -q` (Repo-Wurzel, `pytest.ini` inklusive
+`phase5_ui/tests`) → **436/436 grün** (414 zu Step-2-Ende, +22). `git diff` bleibt auf den
+Tabu-Pfaden (`storage/`, `mcpserver/tools.py`/`permissions.py`/`server.py`) leer — `webui`
+importiert in diesem Step nichts aus `mcpserver` (die P5-B-Ausnahme,
+`permissions.OwnSpaceWritable`, kommt erst mit der REST-API in Step 5/6;
+`test_webui_imports_exactly_one_mcpserver_symbol` deshalb bewusst noch nicht gebaut — ein Test
+für „genau ein Import" wäre bei null Imports nicht aussagekräftig). `Done when` aus Plan §5
+Step 3 („Login/Logout gegen eine In-Process-App durchgespielt") liegt buchstäblich vor:
+`test_routes_auth.py` fährt echte `POST /ui/login` → `POST /ui/logout`-Rundläufe gegen eine aus
+`ui_auth_routes()` gebaute `Starlette`-App, kein interner Kurzschluss über `SessionManager`
+allein.
 
-1. Diese Datei dokumentierte Step 2 bereits als abgeschlossen, aber Root-`CLAUDE.md`s „Nächster
-   Schritt" stand noch auf „Step 2" — dieselbe Drift-Kategorie, die diese Zeile in P4 schon
-   dreimal betraf. Nachgezogen auf Step 3, mit datierter Korrekturnotiz statt stillem Fix.
-2. Der neue `if accepted_counter is not None:`-Guard in `flows.py :: submit_consent()`
-   (Recovery-Code-Zweig) war unbewiesen — der Session-Text behauptete, er sei durch
-   `test_totp_replay_is_rejected_without_burning_the_stored_counter` gedeckt, aber dieser Test
-   durchläuft laut eigener Beschreibung ausschließlich den TOTP-Zweig, nie den Recovery-Zweig.
-   Neuer Test `test_recovery_code_login_does_not_touch_totp_counter` (`test_flows.py`) schließt
-   das: Login mit einem Recovery-Code, danach `store.get_totp_counter(SPACE)` weiterhin `None`.
-   Ohne diesen Test hätte eine Regression den TOTP-Replay-Zähler nach jedem Recovery-Login
-   stillschweigend auf `None` zurückgesetzt — sicherheitsrelevant, nicht kosmetisch.
-3. **Zweiter Durchlauf, echter Bug, nicht nur ein Test-Loch:** `users.consume_recovery_code()`
-   mutiert (stempelt `used_at` in derselben Transaktion) und wurde VOR dem Passwort-Gate
-   aufgerufen — ein Recovery-Code, korrekt eingegeben, aber mit einem Tippfehler im
-   Passwortfeld, wurde dabei unwiderruflich verbrannt, ohne dass der Login gelang. Exakt das
-   Spiegelbild der Lehre zwei Zeilen darunter im selben Modul („Zähler erst nach VOLLSTÄNDIGEM
-   Erfolg hochsetzen"), nur auf der anderen Verzweigung übersehen. Fix: `totp_ok = password_ok
-   and users.consume_recovery_code(...)` — Argon2id läuft weiterhin unconditional (Enumerations-
-   schutz unberührt, ~55ms dominieren die paar µs SQLite-Lookup um Größenordnungen). Neuer Test
-   `test_wrong_password_with_valid_recovery_code_does_not_burn_it`: falsches Passwort + gültiger
-   Code → `ErrorPage`, derselbe Code funktioniert im nächsten Versuch mit korrektem Passwort noch.
-
-Ein vom ersten Advisor-Durchlauf genannter Punkt (Schema-1→2-Migration gegen eine reale
-Alt-Datenbank, nicht nur eine frisch angelegte) war bereits vorhanden
-(`test_schema_migrates_from_v1_to_v2_without_data_loss`, baut eine echte Schema-1-DB von Hand,
-öffnet sie über den normalen `AuthStore`-Konstruktor, prüft Datenerhalt UND Versions-Bump) —
-falscher Alarm, im Advisor-Kontext fehlte lediglich der Diff-Ausschnitt, der das gezeigt hätte.
-
-**Live-Runbook „Migration der Nutzerakten" (Nikinger-Aktion, Reihenfolge ist entscheidend —
-Plan §2.6, Advisor-Vorgabe dieser Session):**
-
-```
-# 0) VORAUSSETZUNG, bevor irgendetwas installiert wird: der DEK muss existieren, BEVOR die
-#    neue Unit-Zeile (LoadCredentialEncrypted=auth-dek:...) aktiv wird — sonst startet der
-#    Dienst gar nicht mehr (dieselbe Falle wie spaces.cred in P4).
-python -c "from authserver.config import generate_data_encryption_key, encode_data_encryption_key; \
-  print(encode_data_encryption_key(generate_data_encryption_key()))" \
-  | sudo systemd-creds encrypt --name=auth-dek - /etc/sharefyx/auth-dek.cred
-sudo chmod 600 /etc/sharefyx/auth-dek.cred
-
-# 1) Units installieren (bringt die neue auth-dek-Zeile UND entfernt die alte auth-users-Zeile)
-sudo phase3_edge/scripts/install_units.sh
-sudo systemctl restart sharefyx-mcp   # `users`-Tabelle ist noch leer -> UserDirectory(dek=...)
-                                       # startet klaglos, aber noch niemand kann sich anmelden
-systemctl status sharefyx-mcp
-
-# 2) Migration, erst --dry-run, dann --apply (Backup vorher empfohlen, wie immer vor Schreiben
-#    gegen die reale auth.sqlite3)
-STATE_DIRECTORY=/var/lib/sharefyx python phase4_auth/scripts/import_users_to_db.py
-STATE_DIRECTORY=/var/lib/sharefyx python phase4_auth/scripts/import_users_to_db.py --apply
-
-# 3) Restart, damit UserDirectory die migrierten Zeilen sieht (O1 ist zwar geschlossen — kein
-#    Cache mehr —, aber die Zeilen existieren ja erst nach diesem --apply-Lauf)
-sudo systemctl restart sharefyx-mcp
-
-# 4) Beide Nutzer melden sich am Connector an (UI kommt erst in Step 3/6) — ERST DANACH weiter.
-#    Login niklas, Login fabian — beide mit unverändertem Passwort/TOTP.
-
-# 5) Erst nachdem Schritt 4 für BEIDE bestätigt ist: alte Credential-Datei + Keyring-Eintrag
-#    entfernen (nicht vorher — Lehre aus spaces.cred: eine Credential-Zeile und die Realität
-#    dürfen nie auseinanderlaufen).
-sudo rm -f /etc/sharefyx/auth-users.cred
-python -c "import keyring; keyring.delete_password('nikinger-space', 'auth-users')"
-```
-
-**Nächster Schritt (konkret):** Drei Dinge stehen aus, alle Sache des Nikingers, keine davon
-blockiert den nächsten Code-Step:
-
-1. **Aus Step 1 weiterhin offen:** die S3/S4-Live-Gegenprobe gegen `token_families`
-   (`resource`/`scope` der laufenden Verbindungen) vor dem nächsten Restart — siehe Absatz oben.
-2. **Aus Step 1 weiterhin offen:** `sudo systemctl enable --now sharefyx-purge.timer`.
-3. **Neu aus Step 2:** das Migrations-Runbook oben, in genau dieser Reihenfolge — kann mit (1)
-   kombiniert werden, da beide denselben `install_units.sh`-Lauf und Restart teilen.
-
-Code-seitig kann parallel weitergehen: Step 3 (Sessions, CSRF, Login-Seiten — neues Paket
-`phase5_ui/` mit `webui/{config,security,sessions,pages,routes_auth,errors}.py`).
+**Nächster Schritt (konkret):** Step 4 (Selbstverwaltung — Einladung, Passwort, TOTP, Recovery,
+Connectoren: `webui/{account,reauth,passwords_policy}.py`, `webui/blocklist.txt`,
+`authctl.py`-Erweiterungen). Danach der harte Gate vor Block B (Abnahmezeilen 1–9 live). Die
+drei liegen gebliebenen Live-Aktionen aus Step 1/2 (S3/S4-Gegenprobe, Purge-Timer aktivieren,
+Migrations-Runbook) bleiben unverändert offen, Sache des Nikingers, blockieren aber weiterhin
+keinen Code-Step.

@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "webui"
+version = "0.1.0"
+description = "Web-UI und REST-API des Space-Servers (Phase 5) — eigene Cookie-Session, kein OAuth"
+requires-python = ">=3.10"
+dependencies = ["authserver", "starlette>=1.3,<2"]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-asyncio", "httpx"]
+
+[tool.setuptools]
+packages = ["webui"]

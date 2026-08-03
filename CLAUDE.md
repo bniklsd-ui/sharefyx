@@ -147,9 +147,13 @@ Commit korrigiert statt erst später gefunden.**]** **[2026-08-02 zweite Korrekt
 dieselbe Drift-Kategorie ein weiteres Mal — diese Zeile stand hier noch auf „Nächster Schritt:
 Step 2", obwohl Step 2 (Schema 2, `secretbox.py`, `userdir.py`, Migrationsskript) im selben
 Commit-Vorlauf durchlief; Advisor-Review vor dem Commit fand die Lücke, diesmal noch vor dem
-Commit statt erst danach geschlossen.**]** **Nächster Schritt:** Step 3 (Sessions, CSRF,
-Login-Seiten — neues Paket `phase5_ui/webui/{config,security,sessions,pages,routes_auth,
-errors}.py`).
+Commit statt erst danach geschlossen.**]** **[2026-08-03:** Step 3 (Sessions, CSRF,
+Login/Logout, neues Paket `phase5_ui/webui/{config,security,sessions,pages,routes_auth,
+errors}.py`) im selben Commit wie diese Zeile abgeschlossen — 436/436 Tests, `/ui/login`/
+`/ui/logout` gegen eine echte In-Process-App durchgespielt.**]** **Nächster Schritt:** Step 4
+(Selbstverwaltung — Einladung, Passwort, TOTP, Recovery, Connectoren: `webui/{account,reauth,
+passwords_policy}.py`, `authctl.py`-Erweiterungen). Danach der harte Gate vor Block B
+(Abnahmezeilen 1–9 live).
 
 **Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅
 abgeschlossen, 2026-07-30.** Mission erfüllt: der Pfad-Token ist verschwunden, ein eigener
