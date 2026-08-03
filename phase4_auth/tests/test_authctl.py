@@ -152,3 +152,109 @@ def test_purge_expired_reports_a_count(env, capsys):
     assert rc == 0
     assert "abgelaufene Zeile(n) entfernt" in out
     assert "auth_requests" in out
+
+
+def test_invite_requires_base_url(env, capsys):
+    rc = authctl.main(["invite", "niklas"], env=env)  # env hat kein SPACE_PUBLIC_BASE_URL
+    assert rc == 1
+    assert "SPACE_PUBLIC_BASE_URL" in capsys.readouterr().err
+
+
+def test_invite_prints_the_link_once(env, store, capsys):
+    env = {**env, "SPACE_PUBLIC_BASE_URL": "https://space.example.ts.net"}
+    rc = authctl.main(["invite", "niklas"], env=env)
+
+    out = capsys.readouterr().out
+    assert rc == 0
+    links = [line for line in out.splitlines() if "/ui/invite/" in line]
+    assert len(links) == 1
+    assert links[0].startswith("https://space.example.ts.net/ui/invite/")
+
+
+def test_list_users_reports_status_and_recovery_code_count(env, store, capsys):
+    store.upsert_user(
+        "niklas", password_hash="x", totp_secret_enc=None, totp_alg="SHA1",
+        totp_confirmed_at=None, status="active",
+    )
+    store.replace_recovery_codes("niklas", ["a-code-1", "a-code-2"])
+
+    rc = authctl.main(["list-users"], env=env)
+
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "niklas" in out
+    assert "status='active'" in out
+    assert "offene_recovery_codes=2" in out
+    assert "x" not in out.split("niklas", 1)[1].split()[0]  # kein Passwort-Hash in der Ausgabe
+
+
+def test_disable_user_revokes_sessions_and_families(env, store, capsys):
+    store.upsert_user(
+        "niklas", password_hash="x", totp_secret_enc=None, totp_alg="SHA1",
+        totp_confirmed_at=None, status="active",
+    )
+    session_id, _ = store.create_session(space="niklas", idle_ttl_s=3600, absolute_ttl_s=604800)
+    family_id = store.create_family(space="niklas", client_id="c1", scope="space", resource="https://x/mcp")
+
+    rc = authctl.main(["disable-user", "--space", "niklas"], env=env)
+
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "deaktiviert" in out
+    assert store.get_user("niklas").status == "disabled"
+    assert store.touch_session(session_id, idle_ttl_s=3600) is None
+    (family,) = store.list_families(space="niklas")
+    assert family.family_id == family_id
+    assert family.revoked_at is not None
+
+
+def test_disable_user_also_revokes_outstanding_invites(env, store, capsys):
+    """Advisor-Fund: ohne dies bliebe eine noch nicht eingelöste Einladung gültig und würde
+    über `webui/routes_auth.py :: _invite_post`s `upsert_user(..., status="active")` die
+    Sperre umgehen."""
+    store.upsert_user(
+        "niklas", password_hash="x", totp_secret_enc=None, totp_alg="SHA1",
+        totp_confirmed_at=None, status="active",
+    )
+    token = store.create_invite(space="niklas", purpose="reset", ttl_s=3600)
+
+    rc = authctl.main(["disable-user", "--space", "niklas"], env=env)
+
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "1 Einladung(en) widerrufen" in out
+    assert store.peek_invite(token) is None
+
+
+def test_enable_user_reactivates(env, store, capsys):
+    store.upsert_user(
+        "niklas", password_hash="x", totp_secret_enc=None, totp_alg="SHA1",
+        totp_confirmed_at=None, status="disabled",
+    )
+
+    rc = authctl.main(["enable-user", "--space", "niklas"], env=env)
+
+    assert rc == 0
+    assert "aktiviert" in capsys.readouterr().out
+    assert store.get_user("niklas").status == "active"
+
+
+def test_list_sessions_shows_active_and_revoked(env, store, capsys):
+    store.create_session(space="niklas", idle_ttl_s=3600, absolute_ttl_s=604800)
+
+    rc = authctl.main(["list-sessions", "--space", "niklas"], env=env)
+
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "status=aktiv" in out
+
+
+def test_revoke_sessions_kills_all_of_a_space(env, store, capsys):
+    store.create_session(space="niklas", idle_ttl_s=3600, absolute_ttl_s=604800)
+    store.create_session(space="niklas", idle_ttl_s=3600, absolute_ttl_s=604800)
+
+    rc = authctl.main(["revoke-sessions", "--space", "niklas"], env=env)
+
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "2 Sitzung(en) widerrufen" in out

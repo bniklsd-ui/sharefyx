@@ -31,13 +31,13 @@ updated: 2026-08-03
 
 ## Active phase (5 — Web-UI, REST-API, Auth-Selbstverwaltung)
 
-- [phase5_ui/CLAUDE.md](../phase5_ui/CLAUDE.md) — 🔄 ~17KB · phase head; Step 0 ✅, Step 1 ✅ (S2–S8 geschlossen), Step 2 ✅ (Schema 2, `UserDirectory`, Migrationsskript), Step 3 ✅ (neues Paket `phase5_ui/webui`, Sessions/CSRF/Login/Logout); read + newest Session-stopped block first
-- [phase5_ui/SESSIONS_ARCHIVE.md](../phase5_ui/SESSIONS_ARCHIVE.md) — 📦 ~31KB · drei archivierte Session-Blöcke (Step 0, Step 1, Step 2), verbatim
+- [phase5_ui/CLAUDE.md](../phase5_ui/CLAUDE.md) — 🔄 ~19KB · phase head; Step 0 ✅, Step 1 ✅ (S2–S8 geschlossen), Step 2 ✅ (Schema 2, `UserDirectory`, Migrationsskript), Step 3 ✅ (neues Paket `phase5_ui/webui`, Sessions/CSRF/Login/Logout), Step 4 ✅ (Selbstverwaltung: Einladung, Passwort, TOTP, Recovery, Connectoren; neuer Sicherheitsbefund S9 gefunden+geschlossen); read + newest Session-stopped block first
+- [phase5_ui/SESSIONS_ARCHIVE.md](../phase5_ui/SESSIONS_ARCHIVE.md) — 📦 ~41KB · vier archivierte Session-Blöcke (Step 0, Step 1, Step 2, Step 3), verbatim
 - [docs/concepts/phase5_ui_plan.md](./concepts/phase5_ui_plan.md) — 📕 ~80KB · ausführungsreifer P5-Plan: Entscheidungen P5-A–P5-AE, Steps 0–9 (Block A Sicherheit/Selbstverwaltung, Block B REST-API/UI), Designsystem, Abnahmematrix 1–20, [VERIFY]-Register V27–V38; über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
 
 ## Completed phases
 
-- [phase4_auth/CLAUDE.md](../phase4_auth/CLAUDE.md) — 📗 ~38KB · phase head; Steps 0–7 ✅ (alle acht Steps, Schnitt vollzogen, `TokenPathASGI` entfernt) — **16/16 Abnahmezeilen live bestanden, Phase 4 ✅** (2026-07-30); Steps-0–6a-Detailnarrative 2026-07-31 nach `SESSIONS_ARCHIVE.md` komprimiert, unter dem 40KB-Softcap; enthält die Kurztabelle der Sicherheitsbefunde S1–S8/O1; read + newest Session-stopped block first
+- [phase4_auth/CLAUDE.md](../phase4_auth/CLAUDE.md) — 📗 ~40KB · phase head; Steps 0–7 ✅ (alle acht Steps, Schnitt vollzogen, `TokenPathASGI` entfernt) — **16/16 Abnahmezeilen live bestanden, Phase 4 ✅** (2026-07-30); Steps-0–6a-Detailnarrative 2026-07-31 nach `SESSIONS_ARCHIVE.md` komprimiert, unter dem 40KB-Softcap; enthält die Kurztabelle der Sicherheitsbefunde S1–S9/O1 (S9 neu, P5 Step 4 — `disable-user` blockierte den Login vorher nicht); read + newest Session-stopped block first
 - [docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md](./concepts/PHASE4_CLOSEOUT_HANDOVER.md) — 📕 ~18KB · Abschluss-Handover P4→P5: Status, Delta seit dem P3-Handover, offene Entscheidungen für die Web-UI-Planung §4.1–§4.5, [VERIFY]-Bilanz V14–V26
 - [docs/concepts/phase4_auth_uebersicht.svg](./concepts/phase4_auth_uebersicht.svg) — 📕 Übersichtsgrafik Phase 4 (Auth-Fluss, Komponenten)
 - [docs/concepts/P4_ABNAHME_2026-07-29.md](./concepts/P4_ABNAHME_2026-07-29.md) — 📕 ~24KB · Abnahmeprotokoll Phase 4: **16/16 live bestanden** (drei Nachträge 2026-07-30: Zeilen 14/15, Zeile 9, Schnitt+Zeile 16), CLI-Ausschnitt + DB-Gegenprobe als Beleg, Befunde B1–B3 (alle klein, zwei behoben)

@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase4_auth_plan.md          # voller Plan, Entscheidungen P4-A–P4-R, Steps 0–7
   - ../docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md  # Herkunft der offenen Entscheidungen, Doku-Drift, [VERIFY]-Bilanz
   - SESSIONS_ARCHIVE.md                            # ältere Session-Blöcke, newest-first
-updated: 2026-07-31
+updated: 2026-08-03
 ---
 
 # CLAUDE.md — Phase 4: OAuth 2.1 + DCR (`phase4_auth/`)
@@ -324,12 +324,31 @@ befundenen** Punkte: `../docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`. Kurzfa
 | S7 | Unbegrenztes Zeilenwachstum aus unauth. Eingabe, `purge_expired()` nur manuell (kein Timer) | niedrig-mittel | `store.py`, `ratelimit.py` | ✅ **vollständig geschlossen** (P5 Step 1: Timer + Längenbegrenzung; P5 Step 2: `purge_expired()` deckt jetzt auch `ui_sessions`/`invites` ab, sobald diese Tabellen mit Schema 2 existierten) |
 | S8 | `sudo install_units.sh` sourced eine nutzerschreibbare Datei als root | sehr niedrig | `install_units.sh` | ✅ **geschlossen** (P5 Step 1) |
 | O1 | Nutzerakten werden **einmal beim Start** gelesen — Provisionierung wirkt erst nach Restart | Betriebsnotiz | `scripts/serve.py` | ✅ **geschlossen im Code** (P5 Step 2 — `UserDirectory.get()` liest live, kein Cache mehr); **live wirksam erst nach dem Migrations-Runbook** (`phase5_ui/CLAUDE.md` Session-Block 2026-08-02), bis dahin läuft der Dienst noch auf dem alten Build |
+| S9 | `submit_consent()` prüfte `record.status` nie — ein per `authctl.py disable-user` gesperrter Space konnte sich über den OAuth-Consent-Login sofort eine neue Token-Familie holen, die Sperre war ohne UI-Anteil wirkungslos | niedrig-mittel | `flows.py :: submit_consent` | ✅ **geschlossen** (P5 Step 4) |
 
 **[2026-08-02 Korrektur, P5 Step 1]:** der Absatz „Keiner von S2–S8 ist gefixt" stand hier
 bewusst zwischen Step 7 und der Live-Abnahme — dieser Zustand ist jetzt überholt. Alle sieben
 Befunde S2–S8 sind in P5 Step 1 geschlossen (Details, Tests, Commit: `phase5_ui/CLAUDE.md`
 Session-Block 2026-08-02). Dieser Kopf ist ein 📗 live gepflegtes Dokument, kein 📕-Snapshot —
 die Tabelle wird hier direkt nachgezogen statt in einem separaten Nachtrag dupliziert.
+
+**[2026-08-03, P5 Step 4]:** ein neuer Befund **S9** (Tabelle oben) — eine geschlossene Phase
+mit einem 📗 live gepflegten Kopf bekommt bei Code-Änderungen dieselbe Behandlung wie S2–S8, kein
+stiller Abstand. `submit_consent()` (`flows.py`) prüft jetzt `record.status == "active"` als
+zusätzliches Erfolgskriterium neben Passwort/TOTP, enumerationssicher (kein eigener Fehlercode,
+läuft nach demselben unconditional Argon2id-Verify wie zuvor) — Gegenstück zur analogen Prüfung
+in `webui/routes_auth.py :: _login_post` (P5 Step 4). Auslöser: `authctl.py disable-user` (Step
+7, Modul-Status Zeile 8 oben) widerrief bisher nur Sitzungen und Token-Familien, aber kein
+Login-Pfad prüfte je `users.status` — ein deaktivierter Space konnte sich mit unverändertem
+Passwort/TOTP sofort neu einloggen bzw. neu autorisieren (Advisor-Fund, `phase5_ui/CLAUDE.md`
+Session-Block 2026-08-03 hat die volle Herleitung). Dieselbe Session ergänzte `store.py` um
+`revoke_families_for_space()` (P5-Q, Passwortwechsel widerruft ALLE Familien) und
+`revoke_invites_for_space()` (schließt eine verwandte Lücke: eine noch nicht eingelöste
+Einladung hätte `disable-user` sonst über `_invite_post`s `upsert_user(..., status="active")`
+umgangen) sowie `authctl.py` um `invite`/`list-users`/`disable-user`/`enable-user`/
+`list-sessions`/`revoke-sessions` (Step 4, Plan-Tabelle oben in „Runbook" fehlt dafür — die
+Unterbefehle sind neuer P5-Umfang, keine Ergänzung des P4-Runbooks). Details, Tests, Commit:
+`phase5_ui/CLAUDE.md` Session-Block 2026-08-03.
 
 ---
 

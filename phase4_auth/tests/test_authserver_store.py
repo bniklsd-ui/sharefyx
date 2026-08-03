@@ -218,6 +218,34 @@ def test_list_families_reflects_revocation(store):
     assert listed.revoked_reason == "operator"
 
 
+def test_revoke_families_for_space_kills_all_active_ones(store):
+    """P5-Q (Plan §0.5): ein Passwortwechsel widerruft ALLE Token-Familien des Space —
+    Gegenstück zu `revoke_sessions_for_space()`."""
+    f1 = _family(store, space="niklas")
+    f2 = _family(store, space="niklas")
+    foreign = _family(store, space="fabian")
+
+    killed = store.revoke_families_for_space("niklas", "password_changed")
+
+    assert killed == 2
+    by_id = {f.family_id: f for f in store.list_families()}
+    assert by_id[f1].revoked_at is not None
+    assert by_id[f1].revoked_reason == "password_changed"
+    assert by_id[f2].revoked_at is not None
+    assert by_id[foreign].revoked_at is None
+
+
+def test_revoke_families_for_space_skips_already_revoked(store):
+    """Zweiter Aufruf widerruft nichts mehr — dieselbe `revoked_at IS NULL`-Disziplin wie
+    `revoke_family()` (ein zweiter Widerruf überschreibt nicht den ursprünglichen Grund)."""
+    _family(store, space="niklas")
+    store.revoke_families_for_space("niklas", "password_changed")
+
+    killed_again = store.revoke_families_for_space("niklas", "second_call")
+
+    assert killed_again == 0
+
+
 def test_lookup_access_token_rejects_expired(store, clock):
     family_id = _family(store)
     access, _refresh = store.issue_token_pair(family_id, access_ttl_s=60, refresh_ttl_s=2_592_000)
@@ -449,6 +477,19 @@ def test_invite_expires(store, clock):
     clock.advance(61)
     assert store.peek_invite(token) is None
     assert store.consume_invite(token) is None
+
+
+def test_revoke_invites_for_space_only_touches_own_unconsumed_ones(store):
+    own_pending = store.create_invite(space="niklas", purpose="reset", ttl_s=3600)
+    own_consumed = store.create_invite(space="niklas", purpose="reset", ttl_s=3600)
+    store.consume_invite(own_consumed)
+    foreign = store.create_invite(space="fabian", purpose="reset", ttl_s=3600)
+
+    killed = store.revoke_invites_for_space("niklas")
+
+    assert killed == 1  # nur der eine noch offene, nicht der bereits konsumierte
+    assert store.peek_invite(own_pending) is None
+    assert store.peek_invite(foreign) is not None
 
 
 def test_recovery_codes_replace_and_consume(store):

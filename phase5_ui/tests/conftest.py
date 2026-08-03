@@ -1,10 +1,15 @@
-"""Gemeinsame Fixtures für die Step-3-Tests (Sessions, CSRF, Login/Logout) — Muster wie
-`phase4_auth/tests/test_flows.py`: eine injizierbare Uhr, eine temporäre `AuthStore`, ein
-provisionierter Nutzer. `base_url` ist bewusst `https://…` (nicht `http://testserver` wie in
-`phase2_mcp/tests/test_app.py`s Bearer-Tests): `__Host-`-Cookies verlangen `Secure`, httpx sendet
-ein `Secure`-Cookie nicht über `http://` zurück — ohne `https://` würden die Session-Tests grün
-aussehen, ohne dass das Cookie je tatsächlich zurückreist.
-"""
+"""Gemeinsame Fixtures für die Step-3/4-Tests (Sessions, CSRF, Login/Logout, Einladung/
+Enrollment, Selbstverwaltung) — Muster wie `phase4_auth/tests/test_flows.py`: eine injizierbare
+Uhr, eine temporäre `AuthStore`, provisionierte Nutzer. `base_url` ist bewusst `https://…` (nicht
+`http://testserver` wie in `phase2_mcp/tests/test_app.py`s Bearer-Tests): `__Host-`-Cookies
+verlangen `Secure`, httpx sendet ein `Secure`-Cookie nicht über `http://` zurück — ohne `https://`
+würden die Session-Tests grün aussehen, ohne dass das Cookie je tatsächlich zurückreist.
+
+**Step 4:** `users` (Step 3) bleibt UNBESTÄTIGT (`totp_confirmed_at=None`) — Step 3 brauchte das
+nicht, `account.py`s §2.8-Gate (Step 4) unterscheidet aber scharf zwischen unbestätigt und
+bestätigt. `confirmed_users` ist der Zwilling mit sofort bestätigtem TOTP, `full_app` mountet
+`ui_auth_routes()` UND `account_routes()` zusammen (Tests, die erst einloggen und dann eine
+Account-Route treffen, brauchen beide im selben Prozess)."""
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
@@ -16,6 +21,7 @@ from authserver.store import AuthStore
 from authserver.userdir import UserDirectory
 from starlette.applications import Starlette
 
+from webui.account import account_routes
 from webui.config import UiSettings
 from webui.routes_auth import ui_auth_routes
 from webui.sessions import SessionManager
@@ -69,6 +75,20 @@ def users(store, dek) -> UserDirectory:
 
 
 @pytest.fixture
+def confirmed_users(store, dek) -> UserDirectory:
+    store.upsert_user(
+        SPACE,
+        password_hash=passwords.hash_password(PASSWORD),
+        totp_secret_enc=seal(TOTP_SECRET.encode("ascii"), key=dek, aad=SPACE.encode("utf-8")),
+        totp_alg="SHA1",
+        totp_confirmed_at=None,
+        status="active",
+    )
+    store.confirm_totp(SPACE)
+    return UserDirectory(store, dek=dek)
+
+
+@pytest.fixture
 def sessions(store, ui_settings) -> SessionManager:
     return SessionManager(store, settings=ui_settings)
 
@@ -76,6 +96,14 @@ def sessions(store, ui_settings) -> SessionManager:
 @pytest.fixture
 def app(ui_settings, store, users, sessions) -> Starlette:
     return Starlette(routes=ui_auth_routes(ui_settings, store, users, sessions))
+
+
+@pytest.fixture
+def full_app(ui_settings, store, confirmed_users, sessions) -> Starlette:
+    routes = ui_auth_routes(ui_settings, store, confirmed_users, sessions) + account_routes(
+        ui_settings, store, confirmed_users, sessions
+    )
+    return Starlette(routes=routes)
 
 
 @pytest.fixture

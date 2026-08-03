@@ -290,6 +290,24 @@ def test_unknown_space_and_broken_record_are_indistinguishable(
     assert result_broken == result_unknown
 
 
+def test_disabled_account_cannot_consent(store, settings, users, throttle, clock, client):
+    """P5 Step 4: `authctl.py disable-user` setzt `users.status = 'disabled'` und widerruft
+    Sitzungen/Familien — ohne diese Prüfung konnte der Space sich über den OAuth-Consent-Login
+    mit unverändertem Passwort/TOTP sofort eine neue Token-Familie holen (Advisor-Fund vor
+    diesem Commit, Gegenstück zu `test_disabled_account_cannot_log_in` in
+    `phase5_ui/tests/test_routes_auth.py`). Exakt dieselbe Fehlermeldung wie ein falsches
+    Passwort — kein Enumerationsleck über einen eigenen Fehlercode."""
+    store.set_user_status(SPACE, "disabled")
+    request_id = _pending_request_id(store, settings, client)
+    result = flows.submit_consent(
+        store=store, settings=settings, users=users, throttle=throttle, now_fn=clock,
+        request_id=request_id, space=SPACE, password=PASSWORD, totp_code=_totp_code(clock),
+        action="allow",
+    )
+    assert isinstance(result, flows.ErrorPage)
+    assert result.message == "Anmeldung fehlgeschlagen."
+
+
 def test_login_failure_increments_throttle(store, settings, users, throttle, clock, client):
     request_id = _pending_request_id(store, settings, client)
     flows.submit_consent(

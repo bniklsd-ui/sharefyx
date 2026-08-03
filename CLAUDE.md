@@ -150,10 +150,18 @@ Commit-Vorlauf durchlief; Advisor-Review vor dem Commit fand die Lücke, diesmal
 Commit statt erst danach geschlossen.**]** **[2026-08-03:** Step 3 (Sessions, CSRF,
 Login/Logout, neues Paket `phase5_ui/webui/{config,security,sessions,pages,routes_auth,
 errors}.py`) im selben Commit wie diese Zeile abgeschlossen — 436/436 Tests, `/ui/login`/
-`/ui/logout` gegen eine echte In-Process-App durchgespielt.**]** **Nächster Schritt:** Step 4
-(Selbstverwaltung — Einladung, Passwort, TOTP, Recovery, Connectoren: `webui/{account,reauth,
-passwords_policy}.py`, `authctl.py`-Erweiterungen). Danach der harte Gate vor Block B
-(Abnahmezeilen 1–9 live).
+`/ui/logout` gegen eine echte In-Process-App durchgespielt.**]** **[2026-08-03, zweiter
+Nachtrag:** Step 4 (Selbstverwaltung — Einladung, Passwort, TOTP, Recovery, Connectoren:
+`webui/{account,reauth,passwords_policy}.py`, `authctl.py`-Erweiterungen) abgeschlossen —
+467/467 Tests. Advisor-Review vor der Dokumentation fand einen neuen Sicherheitsbefund (**S9**,
+`phase4_auth/CLAUDE.md`): `authctl.py disable-user` widerrief Sitzungen/Token-Familien, aber
+kein Login-Pfad prüfte je `users.status` — ein deaktivierter Space konnte sich sofort neu
+einloggen bzw. neu autorisieren. In beiden Pfaden (`webui/routes_auth.py`,
+`authserver/flows.py :: submit_consent`) geschlossen, plus zwei kleinere Funde (verworfener
+CSRF-Token nach Passwortwechsel, offene Einladung überlebte `disable-user`), alle vor dem
+Commit behoben. Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-03.**]** **Nächster
+Schritt:** der harte Gate vor Block B — Abnahmezeilen 1–9 live, Sache des Nikingers. Danach erst
+Step 5 (REST-API v1).
 
 **Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅
 abgeschlossen, 2026-07-30.** Mission erfüllt: der Pfad-Token ist verschwunden, ein eigener

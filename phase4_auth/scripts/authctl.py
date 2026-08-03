@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
-"""Operator-Werkzeug gegen die echte Auth-SQLite (Plan §5 Step 7) — fünf dünne Unterbefehle,
-je einer über eine bereits vorhandene `AuthStore`-Methode. Kein `/oauth/revoke`-Endpunkt (Plan
-§2.1: "Ein Client-Endpunkt dafür wäre toter Code") — Widerruf läuft ausschließlich hier, eine
-SSH-Sitzung entfernt (`ratelimit.py`-Docstring).
+"""Operator-Werkzeug gegen die echte Auth-SQLite (Plan §5 Step 7, erweitert Step 4 um
+Selbstverwaltungs-Notausgänge, Plan §5 Step 4) — dünne Unterbefehle, je einer über eine bereits
+vorhandene `AuthStore`-Methode. Kein `/oauth/revoke`-Endpunkt (Plan §2.1: "Ein Client-Endpunkt
+dafür wäre toter Code") — Widerruf läuft ausschließlich hier, eine SSH-Sitzung entfernt
+(`ratelimit.py`-Docstring).
 
 **`revoke` kennt nur `--family-id`**, keinen `--space`-Sammelwiderruf: `revoke_family()` nimmt
 genau eine `family_id` entgegen, und ein Bulk-Widerruf lässt sich aus `list-tokens --space NAME`
 + mehreren `revoke --family-id` zusammensetzen. Absichtlich keine zweite Fläche dafür — wird der
-Bedarf real, ist das ein eigener Fund, keine vorgezogene Annahme.
+Bedarf real, ist das ein eigener Fund, keine vorgezogene Annahme. **`revoke-sessions`/
+`disable-user` dürfen dagegen sammeln** (`revoke_sessions_for_space()`/`revoke_families_for_space()`,
+P5 Step 4): eine Sitzung/Familie ist kein Betreiber-Werkzeug wie ein DCR-Client, sondern genau
+der Notausgang, den Plan §5 Step 4 für `disable-user`/`revoke-sessions` verlangt.
 
 DB-Pfad über `authserver.config.resolve_db_path()` (nur `SPACE_AUTH_DB`/`STATE_DIRECTORY`, nicht
-das volle `load_auth_settings()` — dieses Werkzeug braucht weder `SPACE_AUTH_MODE` noch
-`SPACE_PUBLIC_BASE_URL`).
+das volle `load_auth_settings()` — dieses Werkzeug braucht für die meisten Unterbefehle weder
+`SPACE_AUTH_MODE` noch `SPACE_PUBLIC_BASE_URL`). **Ausnahme: `invite`** liest zusätzlich
+`SPACE_PUBLIC_BASE_URL` direkt (nicht über `load_auth_settings()`, das noch mehr verlangen würde,
+was `invite` nicht braucht), um den vollen Einladungslink auszugeben.
 
 Ausgabe: Text auf stdout, Logs/Fehler auf stderr (Hard Rule 7).
 """
@@ -84,11 +90,80 @@ def _cmd_purge_expired(store: AuthStore, args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_invite(store: AuthStore, args: argparse.Namespace, env: dict[str, str]) -> int:
+    base_url = env.get("SPACE_PUBLIC_BASE_URL")
+    if not base_url:
+        print("ABBRUCH: SPACE_PUBLIC_BASE_URL ist für 'invite' Pflicht.", file=sys.stderr)
+        return 1
+    token = store.create_invite(space=args.space, purpose=args.purpose, ttl_s=args.ttl)
+    # Klartext-Link EIN einziges Mal auf stdout — dieselbe Disziplin wie provision_user.py für
+    # TOTP-Seeds: kein zweiter Ort, an dem er stehen bleibt.
+    print(f"{base_url}/ui/invite/{token}")
+    print(f"(Space '{args.space}', Zweck '{args.purpose}', gültig {args.ttl}s)", file=sys.stderr)
+    return 0
+
+
+def _cmd_list_users(store: AuthStore, args: argparse.Namespace) -> int:
+    users = store.list_users()
+    if not users:
+        print("Keine Nutzerakten.")
+        return 0
+    for u in users:
+        changed = u.password_changed_at.isoformat() if u.password_changed_at is not None else "nie"
+        unused_codes = store.count_unused_recovery_codes(u.space)
+        print(
+            f"{u.space}  status={u.status!r}  totp_confirmed={u.totp_confirmed_at is not None}  "
+            f"password_changed={changed}  offene_recovery_codes={unused_codes}"
+        )
+    return 0
+
+
+def _cmd_disable_user(store: AuthStore, args: argparse.Namespace) -> int:
+    store.set_user_status(args.space, "disabled")
+    sessions_killed = store.revoke_sessions_for_space(args.space, except_session_id=None, reason="disabled")
+    families_killed = store.revoke_families_for_space(args.space, "disabled")
+    # Advisor-Fund: eine noch nicht eingelöste Einladung würde sonst über `upsert_user(...,
+    # status="active")` in `_invite_post` die Sperre umgehen (neue, aktive Nutzerakte).
+    invites_killed = store.revoke_invites_for_space(args.space)
+    print(
+        f"Space '{args.space}': deaktiviert, {sessions_killed} Sitzung(en), "
+        f"{families_killed} Token-Familie(n) und {invites_killed} Einladung(en) widerrufen."
+    )
+    return 0
+
+
+def _cmd_enable_user(store: AuthStore, args: argparse.Namespace) -> int:
+    store.set_user_status(args.space, "active")
+    print(f"Space '{args.space}': aktiviert.")
+    return 0
+
+
+def _cmd_list_sessions(store: AuthStore, args: argparse.Namespace) -> int:
+    rows = store.list_sessions(args.space)
+    if not rows:
+        print("Keine Sitzungen.")
+        return 0
+    for row in rows:
+        status = f"widerrufen ({row.revoked_reason}, {row.revoked_at.isoformat()})" if row.revoked_at else "aktiv"
+        print(
+            f"created={row.created_at.isoformat()}  last_seen={row.last_seen_at.isoformat()}  "
+            f"expires={row.absolute_expires_at.isoformat()}  status={status}"
+        )
+    return 0
+
+
+def _cmd_revoke_sessions(store: AuthStore, args: argparse.Namespace) -> int:
+    killed = store.revoke_sessions_for_space(args.space, except_session_id=None, reason="authctl")
+    print(f"Space '{args.space}': {killed} Sitzung(en) widerrufen.")
+    return 0
+
+
 def main(argv: list[str] | None = None, *, env: dict[str, str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="authctl",
         description="Operator-Werkzeug gegen die echte Auth-SQLite — list-clients, list-tokens, "
-        "revoke, unlock, purge-expired.",
+        "revoke, unlock, purge-expired, invite, list-users, disable-user, enable-user, "
+        "list-sessions, revoke-sessions.",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -105,10 +180,32 @@ def main(argv: list[str] | None = None, *, env: dict[str, str] | None = None) ->
 
     sub.add_parser("purge-expired", help="abgelaufene Codes/Token/Requests entfernen")
 
+    p_invite = sub.add_parser("invite", help="Einladung erzeugen, Link genau einmal ausgeben")
+    p_invite.add_argument("space", metavar="SPACE")
+    p_invite.add_argument("--purpose", choices=["initial", "reset"], default="initial")
+    p_invite.add_argument("--ttl", type=int, default=3600, metavar="SEKUNDEN")
+
+    sub.add_parser("list-users", help="Nutzerakten auflisten (keine Hashes, keine Seeds)")
+
+    p_disable = sub.add_parser(
+        "disable-user", help="Nutzerkonto sperren, alle Sitzungen und Token-Familien widerrufen"
+    )
+    p_disable.add_argument("--space", metavar="NAME", required=True)
+
+    p_enable = sub.add_parser("enable-user", help="Nutzerkonto reaktivieren")
+    p_enable.add_argument("--space", metavar="NAME", required=True)
+
+    p_lsessions = sub.add_parser("list-sessions", help="UI-Sitzungen eines Space auflisten")
+    p_lsessions.add_argument("--space", metavar="NAME", required=True)
+
+    p_rsessions = sub.add_parser("revoke-sessions", help="alle UI-Sitzungen eines Space widerrufen")
+    p_rsessions.add_argument("--space", metavar="NAME", required=True)
+
     args = parser.parse_args(argv)
+    resolved_env = env if env is not None else dict(os.environ)
 
     try:
-        store = _open_store(env if env is not None else dict(os.environ))
+        store = _open_store(resolved_env)
     except ValueError as exc:
         print(f"ABBRUCH: {exc}", file=sys.stderr)
         return 1
@@ -119,6 +216,12 @@ def main(argv: list[str] | None = None, *, env: dict[str, str] | None = None) ->
         "revoke": _cmd_revoke,
         "unlock": _cmd_unlock,
         "purge-expired": _cmd_purge_expired,
+        "invite": lambda s, a: _cmd_invite(s, a, resolved_env),
+        "list-users": _cmd_list_users,
+        "disable-user": _cmd_disable_user,
+        "enable-user": _cmd_enable_user,
+        "list-sessions": _cmd_list_sessions,
+        "revoke-sessions": _cmd_revoke_sessions,
     }
     return handlers[args.command](store, args)
 

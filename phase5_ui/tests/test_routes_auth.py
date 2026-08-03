@@ -48,6 +48,21 @@ async def test_login_wrong_password_and_unknown_space_are_indistinguishable(app,
 
 
 @pytest.mark.asyncio
+async def test_disabled_account_cannot_log_in(app, store, totp_code):
+    """`authctl.py disable-user` (P5 Step 4) setzt `users.status = 'disabled'` und widerruft
+    Sitzungen/Familien — ohne diese Prüfung konnte der Space sich mit unverändertem
+    Passwort/TOTP sofort wieder einloggen (Advisor-Fund vor diesem Commit). Erwartet: exakt
+    dieselbe Antwort wie ein falsches Passwort, kein eigener Fehlercode (Enumerationsschutz)."""
+    store.set_user_status(SPACE, "disabled")
+    async with _client(app) as client:
+        response = await client.post(
+            "/ui/login", data={"space": SPACE, "password": PASSWORD, "totp": totp_code()},
+        )
+    assert response.status_code == 401
+    assert "Anmeldung fehlgeschlagen" in response.text
+
+
+@pytest.mark.asyncio
 async def test_correct_totp_with_wrong_password_does_not_burn_the_counter(app, store, totp_code):
     """Advisor-Fund (P5 Step 3, vor dem Commit): die erste Fassung rief `set_totp_counter()`
     innerhalb des TOTP-Zweigs auf, VOR dem Passwort-Gate — ein richtiger TOTP-Code mit falschem

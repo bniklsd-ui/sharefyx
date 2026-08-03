@@ -383,6 +383,24 @@ class AuthStore:
         refresh_cur = conn.execute("DELETE FROM refresh_tokens WHERE family_id = ?", (family_id,))
         return access_cur.rowcount + refresh_cur.rowcount
 
+    def revoke_families_for_space(self, space: str, reason: str) -> int:
+        """P5-Q (Plan §0.5): ein Passwortwechsel widerruft ALLE Token-Familien des Space, nicht
+        nur eine — Gegenstück zu `revoke_sessions_for_space()`. Gibt die Anzahl widerrufener
+        FAMILIEN zurück (nicht gelöschter Token, anders als `_revoke_family_locked()`s
+        Rückgabewert — derselbe Zählvertrag wie `revoke_sessions_for_space()`, das ebenfalls
+        Sitzungen zählt, nicht Datenbankzeilen). Läuft in einer Transaktion, damit ein
+        teilweiser Widerruf (manche Familien tot, manche noch aktiv) nicht als Zwischenstand
+        sichtbar wird."""
+        with self._transaction() as conn:
+            rows = conn.execute(
+                "SELECT family_id FROM token_families WHERE space = ? AND revoked_at IS NULL",
+                (space,),
+            ).fetchall()
+            now = self._now_fn()
+            for row in rows:
+                self._revoke_family_locked(conn, row["family_id"], reason, now)
+            return len(rows)
+
     def list_families(self, *, space: str | None = None) -> list[TokenFamily]:
         """P4 Step 7: `authctl.py list-tokens`/`revoke` (die Familie ist die Widerrufseinheit,
         Plan §2.1 — `revoke --family-id` nimmt genau die `family_id` entgegen, die diese Methode
@@ -825,6 +843,28 @@ class AuthStore:
                 (_format_dt(now), token_hash),
             )
         return self._invite_from_row(row, consumed_at=now)
+
+    def revoke_invites_for_space(self, space: str) -> int:
+        """P5 Step 4 (Advisor-Fund): `authctl.py disable-user` widerruft Sitzungen und
+        Token-Familien, aber ohne diese Methode blieb eine noch nicht eingelöste Einladung für
+        denselben Space gültig — `_invite_post` legt über `upsert_user(..., status="active")`
+        anschließend einfach eine neue, aktive Nutzerakte an und hebt die Sperre damit auf.
+        Markiert alle noch nicht eingelösten Einladungen als eingelöst (`consumed_at = jetzt`) —
+        **inklusive bereits abgelaufener**, kein `expires_at`-Filter: eine abgelaufene Zeile wäre
+        über `peek_invite()`/`consume_invite()` ohnehin schon ungültig, der Filter würde nur die
+        zurückgegebene Zählung verkleinern, nicht das Ergebnis ändern. Kein eigenes „revoked"-Feld
+        nötig, `peek_invite()`/`consume_invite()` behandeln ein gesetztes `consumed_at` ohnehin
+        als ungültig. Gibt die Anzahl betroffener Zeilen zurück (kann daher höher liegen als die
+        Anzahl der zum Zeitpunkt des Aufrufs noch tatsächlich einlösbaren Einladungen), gleiche
+        Grundidee wie `revoke_sessions_for_space()`/`revoke_families_for_space()`, aber ohne
+        deren Live/Tot-Unterscheidung."""
+        with self._transaction() as conn:
+            now = self._now_fn()
+            cur = conn.execute(
+                "UPDATE invites SET consumed_at = ? WHERE space = ? AND consumed_at IS NULL",
+                (_format_dt(now), space),
+            )
+            return cur.rowcount
 
     # -- Recovery-Codes (Schema 2, P5 Step 2) --------------------------------------------
 

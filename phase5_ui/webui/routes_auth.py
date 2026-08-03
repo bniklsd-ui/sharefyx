@@ -1,11 +1,13 @@
-"""UI-Auth-Routen: `/ui/login`, `/ui/logout` (Plan §2.7, §5 Step 3). Dünn wie
-`authserver/routes.py`: parsen, `UserDirectory`/`AuthStore`/`SessionManager` aufrufen,
-antworten. Security-Header trägt jeder Handler selbst (gleicher Grund wie dort — kein
-app-weites Middleware, das auch `/mcp` träfe).
+"""UI-Auth-Routen: `/ui/login`, `/ui/logout` (Plan §2.7, §5 Step 3), `/ui/invite/{token}`,
+`/ui/enroll/confirm` (Plan §2.8, §5 Step 4). Dünn wie `authserver/routes.py`: parsen,
+`UserDirectory`/`AuthStore`/`SessionManager` aufrufen, antworten. Security-Header trägt jeder
+Handler selbst (gleicher Grund wie dort — kein app-weites Middleware, das auch `/mcp` träfe).
 
-`/ui/invite/{token}` (Einladung/Enrollment, Plan §2.8) ist NICHT Teil dieses Steps — Plan §5
-Step 3 zeigt nur auf §2.7/§3.4, die Einladungslogik braucht `webui/passwords_policy.py`
-(Step 4, Passwortpolitik-Prüfung ist Teil des Einladungs-Flows) und existiert hier noch nicht.
+`/ui/enroll/confirm` (statt `/api/v1/account/totp/confirm`, das dieselbe Operation JSON-only
+anbietet, Plan §3.3) existiert, weil `pages.py`s Formulare bewusst ohne JavaScript auskommen
+(dortiger Moduldocstring) — ein `<form>` ohne JS sendet immer `application/x-www-form-urlencoded`,
+nie JSON, und `/api` nimmt laut §3.1 kein Formular-Encoding an. Beide Wege rufen dieselbe
+`UserDirectory.confirm_totp_enrollment()` auf, keine doppelte Geschäftslogik.
 
 Der Login-Zweig dupliziert bewusst die enumerationssichere Prüfung aus
 `authserver/flows.py :: submit_consent()` (Argon2id unconditional, TOTP/Recovery nur wenn der
@@ -23,11 +25,17 @@ from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse, Response
 from starlette.routing import Route
 
-from . import pages
+from . import pages, passwords_policy
 from .config import COOKIE_NAME, UiSettings
 from .errors import CsrfError
 from .security import require_csrf, ui_security_headers
 from .sessions import SessionManager
+
+# Dieselbe Konstante wie `webui/account.py` — ein Authenticator zeigt diesen Namen als
+# Konto-Herkunft an. Absichtlich hier erneut definiert statt importiert (ein einzelner
+# projektweiter String ist kein neuer Modul-Kopplungspunkt wert, dieselbe Abwägung wie
+# `authserver/config.py :: KEYRING_SERVICE`).
+TOTP_ISSUER = "sharefyx"
 
 
 def ui_auth_routes(
@@ -81,7 +89,14 @@ def ui_auth_routes(
                 )
                 code_ok = accepted_counter is not None
 
-        if not (password_ok and code_ok):
+        # `record.status == "disabled"` (`authctl.py disable-user`) muss den Login exakt wie
+        # ein falsches Passwort ablehnen — derselbe Enumerationsschutz wie oben: kein eigener
+        # Fehlercode, keine Verzweigung vor `throttle.register_failure()`, sonst wäre ein
+        # deaktivierter, aber existierender Space von außen unterscheidbar (Advisor-Fund,
+        # vor diesem Commit: `disable-user` widerruft bisher nur Sitzungen/Familien, der
+        # betroffene Space konnte sich mit unverändertem Passwort/TOTP sofort neu einloggen).
+        account_active = record is not None and record.status == "active"
+        if not (password_ok and code_ok and account_active):
             throttle.register_failure(space)
             return HTMLResponse(
                 pages.render_login_page(error="Anmeldung fehlgeschlagen."),
@@ -128,8 +143,113 @@ def ui_auth_routes(
         sessions.clear(response, session_id, reason="logout")
         return response
 
+    async def _invite_get(request: Request) -> Response:
+        headers = ui_security_headers(settings)
+        token = request.path_params["token"]
+        if store.peek_invite(token) is None:
+            return HTMLResponse(
+                pages.render_error_page("Einladung ungültig oder abgelaufen."),
+                status_code=404, headers=headers,
+            )
+        return HTMLResponse(pages.render_invite_page(token=token), headers=headers)
+
+    async def _invite_post(request: Request) -> Response:
+        headers = ui_security_headers(settings)
+        token = request.path_params["token"]
+        form = await request.form()
+        new_password = str(form.get("password", ""))
+
+        # Passwortpolitik VOR dem Verbrauch prüfen (`consume_invite()` ist einmalig) — sonst
+        # würde ein Nutzer, der beim ersten Versuch ein zu schwaches Passwort eintippt, seine
+        # einzige Einladung verlieren, ohne je ein Konto zu bekommen.
+        peeked = store.peek_invite(token)
+        if peeked is None:
+            return HTMLResponse(
+                pages.render_error_page("Einladung ungültig oder abgelaufen."),
+                status_code=404, headers=headers,
+            )
+        reasons = passwords_policy.check(new_password, space=peeked.space)
+        if reasons:
+            return HTMLResponse(
+                pages.render_invite_page(token=token, error=" ".join(reasons)),
+                status_code=422, headers=headers,
+            )
+
+        invite = store.consume_invite(token)
+        if invite is None:
+            # Race: zwischen den beiden Store-Aufrufen von einem anderen Request verbraucht.
+            return HTMLResponse(
+                pages.render_error_page("Einladung ungültig oder abgelaufen."),
+                status_code=404, headers=headers,
+            )
+
+        # `users.set_password()`/`begin_totp_enrollment()` setzen beide nur eine BESTEHENDE
+        # `users`-Zeile per `UPDATE` (`store.py :: set_password_hash()`/`set_totp()`) — für einen
+        # brandneuen Space aus einer Einladung existiert noch keine. `store.upsert_user()` legt
+        # sie an (deckt zugleich `purpose="reset"` ab: eine bestehende Zeile wird dabei bewusst
+        # vollständig überschrieben, nicht nur das Passwort — ein Reset soll auch einen alten
+        # TOTP-Seed nicht überleben lassen).
+        store.upsert_user(
+            invite.space, password_hash=passwords.hash_password(new_password),
+            totp_secret_enc=None, totp_alg="SHA1", totp_confirmed_at=None, status="active",
+        )
+        secret = users.begin_totp_enrollment(invite.space)
+        otpauth_uri = totp.provisioning_uri(secret, space=invite.space, issuer=TOTP_ISSUER)
+
+        response = HTMLResponse("", headers=headers)
+        csrf_token = sessions.issue(response, space=invite.space)
+        response.body = pages.render_enrollment_page(
+            secret=secret, otpauth_uri=otpauth_uri, csrf_token=csrf_token,
+        ).encode("utf-8")
+        response.headers["content-length"] = str(len(response.body))
+        return response
+
+    async def _enroll_confirm(request: Request) -> Response:
+        headers = ui_security_headers(settings)
+        session = sessions.load(request)
+        if session is None:
+            return HTMLResponse(
+                pages.render_error_page("Sitzung abgelaufen. Bitte Einladung erneut öffnen."),
+                status_code=401, headers=headers,
+            )
+
+        form = await request.form()
+        csrf_value = form.get("csrf")
+        try:
+            require_csrf(request, session, settings=settings, form_token=csrf_value)
+        except CsrfError as exc:
+            return HTMLResponse(
+                pages.render_error_page(exc.message), status_code=exc.status_code, headers=headers
+            )
+
+        code = str(form.get("code", ""))
+        ok = users.confirm_totp_enrollment(session.space, code, now=store.now().timestamp())
+        if not ok:
+            # Kein neuer Seed — `begin_totp_enrollment()` erneut aufzurufen würde den bereits
+            # gescannten Secret entwerten. Derselbe Secret wird einfach erneut gelesen.
+            record = users.get(session.space)
+            otpauth_uri = totp.provisioning_uri(
+                record.totp_secret or "", space=session.space, issuer=TOTP_ISSUER,
+            )
+            return HTMLResponse(
+                pages.render_enrollment_page(
+                    secret=record.totp_secret or "", otpauth_uri=otpauth_uri,
+                    csrf_token=str(csrf_value), error="Code ungültig, bitte erneut versuchen.",
+                ),
+                status_code=422, headers=headers,
+            )
+
+        codes = users.issue_recovery_codes(session.space)
+        return HTMLResponse(
+            pages.render_recovery_codes_page(codes=codes, csrf_token=str(csrf_value)),
+            headers=headers,
+        )
+
     return [
         Route("/ui/login", _login_get, methods=["GET"]),
         Route("/ui/login", _login_post, methods=["POST"]),
         Route("/ui/logout", _logout, methods=["POST"]),
+        Route("/ui/invite/{token}", _invite_get, methods=["GET"]),
+        Route("/ui/invite/{token}", _invite_post, methods=["POST"]),
+        Route("/ui/enroll/confirm", _enroll_confirm, methods=["POST"]),
     ]

@@ -204,7 +204,13 @@ def submit_consent(
             )
             totp_ok = accepted_counter is not None
 
-    if not (password_ok and totp_ok):
+    # P5 Step 4: `record.status == "disabled"` (`authctl.py disable-user`) muss den Consent-
+    # Login exakt wie ein falsches Passwort ablehnen, gleicher Enumerationsschutz wie oben
+    # und dieselbe Lehre wie in `webui/routes_auth.py :: _login_post` (Advisor-Fund, vor
+    # diesem Commit: ohne diese Prüfung konnte ein deaktivierter Space sich hier weiterhin
+    # neue Token-Familien holen, obwohl `disable-user` alle bestehenden widerrufen hatte).
+    account_active = record is not None and record.status == "active"
+    if not (password_ok and totp_ok and account_active):
         throttle.register_failure(space)
         return ErrorPage("Anmeldung fehlgeschlagen.")
 
