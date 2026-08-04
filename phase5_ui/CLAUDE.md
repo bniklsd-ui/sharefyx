@@ -408,11 +408,24 @@ Blocker):**
   aber bisher nicht im Phase-Head vermerkt; jetzt hier, damit es beim Gate nicht als neuer Fund
   missverstanden wird.
 
-**Nächster Schritt (konkret):** Nikinger-Antwort auf die obige Tab-vs-Panel-Frage abwarten, dann
-den Einladungslink in einem normalen Top-Level-Tab erneut versuchen — bei Erfolg ist Zeile 3 (§6)
-live bestanden und der Rest des Gates (Zeilen 1–9) kann folgen. Kein weiterer Code-Fix für den
-Origin-Fund vorgesehen, außer die Diagnose zeigt einen echten, bisher unbekannten dritten
-Mechanismus. Danach erst Step 5 (REST-API v1) — **teilweise, nicht vollständig vorgezogen**
+**Siebter Nachtrag, 2026-08-04 — Nikinger-Rückfrage beantwortet, IDE-Panel UND In-App-Browser
+ausgeschlossen:** Link kopiert und in einen normalen Browser eingefügt (nicht getippt in der VM,
+kein eingebetteter Panel, keine Chat-/Mail-App als Zwischenschritt) — genau der „normale Tab",
+den `require_csrf()` erwartet. Damit bleibt als führende Hypothese eine **Browser-Extension**, die
+den `Origin`-Header auf `null` umschreibt (bekanntes Verhalten mancher Privacy-/Ad-Blocker-
+Extensions bei POST-Anfragen) — dieselbe Deutung, die die beiden unerklärten
+`utils.js`/„sandbox eval code"-CSP-Meldungen im Screenshot stützt (keine Datei aus diesem Repo,
+also von außen injiziert). **Kein Server-Code geändert** — `require_csrf()`s Ablehnung bleibt
+korrekt, unabhängig vom genauen Mechanismus.
+
+**Nächster Schritt (konkret):** Nikinger testet den Einladungslink in einem frischen
+Inkognito-/privaten Fenster mit deaktivierten Extensions (oder einem komplett anderen Browser) —
+kein Code-Schritt, reiner Live-Test. Bei Erfolg dort ist die Extension/das Privacy-Feature auf dem
+regulären Profil bestätigt (Nikinger entscheidet dann selbst, ob deaktivieren oder anderes Profil
+für die Abnahme), Zeile 3 (§6) gilt als live bestanden, der Rest des Gates (Zeilen 1–9) kann
+folgen. Bleibt `Origin: null` auch im sauberen Profil bestehen, ist das ein neuer, bisher nicht
+betrachteter Fund und braucht eine frische Diagnose (kein Code-Fix vorwegnehmen). Danach erst
+Step 5 (REST-API v1) — **teilweise, nicht vollständig vorgezogen**
 (Advisor-Korrektur zum ersten Nachtrag: „bereits erledigt" überzog): Plan §1.5 zeigt
 `webui_routes(ui_settings, auth_store, userdir, store, sessions)` mit einem `store`-Parameter
 (dem `storage.Store`, für `/api/v1/items/*`) — dieser Nachtrag mountet nur `ui_auth_routes()`/
