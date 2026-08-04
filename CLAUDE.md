@@ -190,13 +190,18 @@ zeigt ausnahmslos `403` auf jeden `/ui/enroll/confirm`-Versuch, nie `422` („Co
 Request erreicht die TOTP-Prüfung also nie. Config-Parität (Unit-Env, `local.env`, `tailscale
 funnel status`) stimmt exakt überein — die Abweichung liegt im tatsächlich gesendeten
 `Origin`-Header, der bisher nirgends geloggt wurde. Behoben: `require_csrf()` loggt den
-abgelehnten Origin jetzt serverseitig (stderr, nie in die Client-Antwort). **Root Cause weiterhin
-offen**, aber jetzt ohne DevTools belegbar — nächster fehlschlagender Versuch zeigt den Wert in
-`journalctl`. 472/472 Tests. Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-03, Fünfter
-Nachtrag 2026-08-04.**]** **Nächster Schritt:** Restart (derselbe ausstehende, kein zweiter),
-dann EIN Enrollment-Versuch, dann `journalctl -u sharefyx-mcp | grep -i "CSRF-Origin"` als Beleg
-(DevTools bleibt Rückfalloption), dann der harte Gate vor Block B — Abnahmezeilen 1–9 live.
-Danach erst Step 5 (REST-API v1) — nur teilweise vorgezogen: `webui/api.py` braucht bei seinem
+abgelehnten Origin jetzt serverseitig (stderr, nie in die Client-Antwort). **[2026-08-04, zweiter
+Nachtrag:** Root Cause gefunden — der Nikinger testete direkt nach dem Restart, geloggter Wert:
+`erhalten 'null', erwartet 'https://savefyx-vmware-virtual-platform.tail89fc2a.ts.net'`.
+`Origin: null` ist **keine** zweite legitime Origin (klassischer sandboxed-Iframe-/CSRF-Bypass-
+Wert) — `require_csrf()` bleibt bewusst unverändert, das Ablehnen ist korrekt. Ursache clientseitig
+vermutet (eingebettetes Vorschau-Panel oder Extension statt normaler Top-Level-Tab), Mechanismus
+noch nicht zwischen beiden unterschieden — offene Rückfrage an den Nikinger, kein Code-Fix
+vorgesehen.**]** 472/472 Tests. Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-03, Fünfter
++ Sechster Nachtrag 2026-08-04. **Nächster Schritt:** Nikinger-Antwort abwarten (normaler Tab vs.
+eingebettetes Panel?), Einladungslink in einem frischen Top-Level-Tab erneut versuchen, dann der
+harte Gate vor Block B — Abnahmezeilen 1–9 live. Danach erst Step 5 (REST-API v1) — nur teilweise
+vorgezogen: `webui/api.py` braucht bei seinem
 Bau noch einen zweiten, kleinen `create_app()`-Edit für den `store`-Parameter, den
 `ui_auth_routes()`/`account_routes()` nicht brauchten.
 

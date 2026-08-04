@@ -370,18 +370,49 @@ den String, der gegen `settings.base_url` verglichen wurde.
 
 **Verifiziert:** `pytest -q` (Repo-Wurzel) → **472/472 grün** (471 vor diesem Nachtrag, +1).
 
-**Nächster Schritt (konkret):** Restart (derselbe ausstehende wie oben, kein zweiter nötig —
-`sudo phase3_edge/scripts/install_units.sh && sudo systemctl restart sharefyx-mcp`), danach den
-Enrollment-Schritt im Browser **ein einziges Mal erneut versuchen** (falscher oder richtiger
-TOTP-Code ist für diesen Zweck egal, es geht nur um den Origin-Header) und sofort
-`journalctl -u sharefyx-mcp | grep -i "CSRF-Origin"` lesen — der geloggte Wert zeigt exakt, was
-vom erwarteten `https://savefyx-vmware-virtual-platform.tail89fc2a.ts.net` abweicht (zusätzlicher
-Port? Trailing Dot? andere Domain?). Browser-DevTools bleiben eine Rückfalloption, sind aber
-nicht mehr der einzige Weg. **Root Cause weiterhin nicht behoben, nur belegbar gemacht** — falls
-sich eine zweite, legitime Origin herausstellt, ist die Erweiterung von `require_csrf()` auf eine
-Origin-Menge weiterhin eine Nikinger-Entscheidung (siehe oben), nicht auf eigene Initiative
-umgesetzt. Danach unverändert: der harte Gate vor Block B, Abnahmezeilen 1–9 (§6) live. Danach
-erst Step 5 (REST-API v1) — **teilweise, nicht vollständig vorgezogen**
+**Sechster Nachtrag, 2026-08-04 — Root Cause gefunden: `Origin: null`, Server-Verhalten korrekt,
+Mechanismus noch offen:** der neu geloggte Wert (Nikinger-Beleg, unmittelbar nach dem Restart):
+
+```
+CSRF-Origin-Fehlschlag: erhalten 'null', erwartet 'https://savefyx-vmware-virtual-platform.tail89fc2a.ts.net'
+```
+
+**`Origin: null` ist keine zweite legitime Origin** — es ist der Wert, den ein sandboxed Iframe
+(kein `allow-same-origin`), ein `data:`/`file:`-Dokument oder ein manipuliertes Cross-Site-Formular
+sendet. Ein CSRF-Schutz, der `null` akzeptiert, ist ein Lehrbuch-Bypass (der Wert ist genau das,
+was ein Angreifer aus einem fremden Kontext erzeugen kann). **`require_csrf()` bleibt unverändert
+— das Verhalten ist richtig, keine Erweiterung auf `null` oder eine Origin-Menge.** Die
+DevTools-Konsole desselben Screenshots stützt das: zwei CSP-Meldungen zu `utils.js`/„sandbox eval
+code" — beides referenziert keine Datei aus diesem Repo (gegengeprüft, `grep -r "utils.js"` →
+leer) — legt nahe, dass die Seite nicht in einem gewöhnlichen Top-Level-Tab lief, sondern in einem
+eingebetteten/sandboxed Vorschau-Panel (z. B. ein IDE-„Simple Browser" o. ä.) oder unter dem
+Einfluss einer Browser-Extension, die Header/Skripte injiziert. **Zwei konkurrierende Mechanismen,
+noch nicht unterschieden** (Advisor-Einwand, ernst genommen statt vorschnell benannt): ein
+Cookie-Roundtrip war in der vorigen Session bereits belegt (`__Host-`-Cookie kam zurück) — ein
+vollständig sandboxed Iframe ohne `allow-same-origin` bricht üblicherweise auch den
+Cookie-Zugriff, was leicht in Spannung zu „Origin fehlt" steht. Die entscheidende, noch offene
+Frage an den Nikinger: **war das ein normaler Chrome/Firefox-Tab (Adressleiste zeigt die volle
+URL) oder ein Panel/eine Vorschau innerhalb eines anderen Programms (IDE, Tailscale-Helper,
+o. ä.)?** Bis geklärt: **Testschritt ist, den Einladungslink in einem frischen, normalen
+Top-Level-Tab zu öffnen** (idealerweise ohne Extensions) — das ist der Fix unabhängig vom
+Mechanismus, kein Code ändert sich dafür.
+
+**Zwei kleine, unabhängige Funde aus demselben Screenshot, notiert, nicht behoben (kein
+Blocker):**
+- `pages.py`s `render_enrollment_page()` (Zeile ~75) setzt `style="background:#fff;padding:8px;
+  display:inline-block"` inline auf den QR-Wrapper — die eigene `style-src 'self'`-CSP blockiert
+  das (`style-src-attr`), rein kosmetisch (der QR-Code selbst bleibt scanbar, nur der weiße
+  Rahmen fehlt). Braucht eine Klasse in `app.css`, sobald `/ui/static` existiert (Step 5/6).
+- `_PAGE`s `<link rel="stylesheet" href="/ui/static/app.css">` 404et auf jeder UI-Seite — bekannt
+  und erwartet (`config.py :: UiSettings`-Docstring: „`static_dir` fehlt aus demselben Grund"),
+  aber bisher nicht im Phase-Head vermerkt; jetzt hier, damit es beim Gate nicht als neuer Fund
+  missverstanden wird.
+
+**Nächster Schritt (konkret):** Nikinger-Antwort auf die obige Tab-vs-Panel-Frage abwarten, dann
+den Einladungslink in einem normalen Top-Level-Tab erneut versuchen — bei Erfolg ist Zeile 3 (§6)
+live bestanden und der Rest des Gates (Zeilen 1–9) kann folgen. Kein weiterer Code-Fix für den
+Origin-Fund vorgesehen, außer die Diagnose zeigt einen echten, bisher unbekannten dritten
+Mechanismus. Danach erst Step 5 (REST-API v1) — **teilweise, nicht vollständig vorgezogen**
 (Advisor-Korrektur zum ersten Nachtrag: „bereits erledigt" überzog): Plan §1.5 zeigt
 `webui_routes(ui_settings, auth_store, userdir, store, sessions)` mit einem `store`-Parameter
 (dem `storage.Store`, für `/api/v1/items/*`) — dieser Nachtrag mountet nur `ui_auth_routes()`/
