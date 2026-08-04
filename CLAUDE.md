@@ -194,13 +194,24 @@ abgelehnten Origin jetzt serverseitig (stderr, nie in die Client-Antwort). **[20
 Nachtrag:** Root Cause gefunden — der Nikinger testete direkt nach dem Restart, geloggter Wert:
 `erhalten 'null', erwartet 'https://savefyx-vmware-virtual-platform.tail89fc2a.ts.net'`.
 `Origin: null` ist **keine** zweite legitime Origin (klassischer sandboxed-Iframe-/CSRF-Bypass-
-Wert) — `require_csrf()` bleibt bewusst unverändert, das Ablehnen ist korrekt. Ursache clientseitig
-vermutet (eingebettetes Vorschau-Panel oder Extension statt normaler Top-Level-Tab), Mechanismus
-noch nicht zwischen beiden unterschieden — offene Rückfrage an den Nikinger, kein Code-Fix
-vorgesehen.**]** 472/472 Tests. Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-03, Fünfter
-+ Sechster Nachtrag 2026-08-04. **Nächster Schritt:** Nikinger-Antwort abwarten (normaler Tab vs.
-eingebettetes Panel?), Einladungslink in einem frischen Top-Level-Tab erneut versuchen, dann der
-harte Gate vor Block B — Abnahmezeilen 1–9 live. Danach erst Step 5 (REST-API v1) — nur teilweise
+Wert) — `require_csrf()` bleibt bewusst unverändert, das Ablehnen ist korrekt.**]** **[2026-08-04,
+dritter Nachtrag — beide Client-Hypothesen widerlegt, echte Ursache war der eigene Code:** weder
+„eingebetteter Vorschau-Panel" noch „Browser-Extension" (beide oben vermutet) hielten dem
+Nikinger-Test stand — sauberes Chrome-Inkognito-Fenster ohne Extensions, identischer
+Fehlschlag. Tatsächliche Ursache: `webui/security.py`s `Referrer-Policy: no-referrer` — die
+Fetch-Spec bestimmt den `Origin`-Header eines reinen HTML-`<form>`-POSTs (kein JavaScript) nach
+der Referrer-Policy des Dokuments, `no-referrer` liefert dabei **immer** `null`, auch bei einer
+echten Same-Origin-Anfrage. Fix: `Referrer-Policy` auf `strict-origin` geändert (nullt nur bei
+TLS-Downgrade, der hier nicht vorkommen kann; sendet nie den Pfad — bewusst nicht `same-origin`,
+das würde `/ui/invite/<token>`s Einmal-Secret im Pfad als `Referer` preisgeben).
+`authserver/routes.py`s identischer `no-referrer`-Wert für die OAuth-Seiten bewusst nicht
+mitgeändert (eigener, unbehobener Befund, andere Flows). Nicht von hier aus live verifizierbar
+(`curl` interpretiert keine Referrer-Policy) — ein Live-Retry steht noch aus. 473/473 Tests.
+Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-03, Fünfter–Achter Nachtrag
+2026-08-04.**]** **Nächster Schritt:** Restart, EIN erneuter Enrollment-Versuch (bereits
+gescannter Authenticator-Eintrag bleibt gültig), `journalctl -u sharefyx-mcp | grep -i
+"CSRF-Origin"` sollte danach leer bleiben — das ist der Live-Beweis. Bei Erfolg: harter Gate vor
+Block B, Abnahmezeilen 1–9 live. Danach erst Step 5 (REST-API v1) — nur teilweise
 vorgezogen: `webui/api.py` braucht bei seinem
 Bau noch einen zweiten, kleinen `create_app()`-Edit für den `store`-Parameter, den
 `ui_auth_routes()`/`account_routes()` nicht brauchten.

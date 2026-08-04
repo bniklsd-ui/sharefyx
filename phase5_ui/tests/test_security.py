@@ -98,6 +98,17 @@ def test_csrf_absent_origin_with_same_site_header_passes():
     require_csrf(request, _session("tok"), settings=_settings())  # wirft nicht
 
 
+def test_ui_referrer_policy_does_not_null_the_origin_header_on_same_origin_posts():
+    """Live-Fund 2026-08-04 (`phase5_ui/CLAUDE.md`): `Referrer-Policy: no-referrer` liess Chrome
+    (Fetch-Spec, „append a request Origin header") bei einem reinen HTML-`<form method="post">`
+    den `Origin`-Header auf `null` setzen, auch fuer eine echte Same-Origin-Anfrage --
+    `require_csrf()` lehnte danach jeden `/ui/enroll/confirm`-Versuch ab. `strict-origin` sendet
+    nie den Pfad (Einmal-Token in `/ui/invite/<token>`) und nullt den Origin nur bei einem
+    TLS-Downgrade, der hier (HTTPS-only) nicht vorkommen kann."""
+    headers = ui_security_headers(_settings())
+    assert headers["Referrer-Policy"] == "strict-origin"
+
+
 def test_ui_csp_has_no_unsafe_inline():
     headers = ui_security_headers(_settings())
     csp = headers["Content-Security-Policy"]

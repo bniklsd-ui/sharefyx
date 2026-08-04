@@ -418,14 +418,51 @@ Extensions bei POST-Anfragen) — dieselbe Deutung, die die beiden unerklärten
 also von außen injiziert). **Kein Server-Code geändert** — `require_csrf()`s Ablehnung bleibt
 korrekt, unabhängig vom genauen Mechanismus.
 
-**Nächster Schritt (konkret):** Nikinger testet den Einladungslink in einem frischen
-Inkognito-/privaten Fenster mit deaktivierten Extensions (oder einem komplett anderen Browser) —
-kein Code-Schritt, reiner Live-Test. Bei Erfolg dort ist die Extension/das Privacy-Feature auf dem
-regulären Profil bestätigt (Nikinger entscheidet dann selbst, ob deaktivieren oder anderes Profil
-für die Abnahme), Zeile 3 (§6) gilt als live bestanden, der Rest des Gates (Zeilen 1–9) kann
-folgen. Bleibt `Origin: null` auch im sauberen Profil bestehen, ist das ein neuer, bisher nicht
-betrachteter Fund und braucht eine frische Diagnose (kein Code-Fix vorwegnehmen). Danach erst
-Step 5 (REST-API v1) — **teilweise, nicht vollständig vorgezogen**
+**Achter Nachtrag, 2026-08-04 — beide bisherigen Hypothesen widerlegt, echte Ursache gefunden
+und behoben:** der Nikinger testete den vorgeschlagenen sauberen Kontext — Chrome, privates
+Fenster, Standardeinstellungen, keine Extensions gesetzt — **derselbe Fehlschlag.** Damit sind
+sowohl „eingebetteter Vorschau-Panel" (siebter Nachtrag, bereits durch die Rückfrage davor
+widerlegt) als auch „Browser-Extension" (siebter Nachtrag, hiermit widerlegt) vom Tisch —
+`Origin: null` war zu keinem Zeitpunkt ein Client-Umgebungsproblem.
+
+**Tatsächliche Ursache: der eigene `Referrer-Policy: no-referrer`-Header.** Die Fetch-Spec
+(„append a request `Origin` header") bestimmt den `Origin`-Header einer Nicht-CORS-
+Nicht-GET/HEAD-Anfrage — genau das, was `/ui/enroll/confirm`s reines HTML-`<form
+method="post">` ohne JavaScript ist (Plan §2.8) — nach der Referrer-Policy des sendenden
+Dokuments: `no-referrer` liefert dabei **immer** `Origin: null`, auch bei einer echten
+Same-Origin-Anfrage an den eigenen Host. `require_csrf()` lehnte diesen Wert korrekt ab (das ist
+der klassische CSRF-Bypass-String) — die eigene, zu strenge Referrer-Policy hat sich damit selbst
+ausgesperrt. Deterministisch, kein Zufall: das erklärt in derselben Bewegung, warum der Fehler in
+jedem bisherigen Versuch identisch auftrat (VM-Kontext, unbekannter Kontext, sauberes
+Inkognito-Profil) und bestätigt die eigene Vorhersage aus dem vierten Nachtrag oben, dass
+`_logout` (derselbe `require_csrf()`-Aufruf, dieselbe Referrer-Policy) genauso betroffen wäre.
+
+**Fix:** `webui/security.py :: ui_security_headers()` — `Referrer-Policy` von `no-referrer` auf
+**`strict-origin`** geändert. `strict-origin` nullt den `Origin`-Header nur bei einem
+TLS-Downgrade (kann hier nicht vorkommen, `_validate_base_url()` erzwingt `https://`) und sendet
+nie den Pfad — bewusst **nicht** `same-origin` gewählt (Advisor-Korrektur: `same-origin` würde
+bei einer echten Same-Origin-Anfrage den vollen Pfad als `Referer` senden, und
+`/ui/invite/<token>` trägt ein Einmal-Secret im Pfad, das sonst z. B. an `/ui/static/app.css`
+durchsickern würde). `authserver/routes.py :: _security_headers()` trägt denselben
+`no-referrer`-Wert für die OAuth-Seiten — **bewusst nicht mitgeändert** (andere Flows, 302 nach
+`claude.ai`, andere Konsequenzen, P4s `csp_form_action`-Historie zeigt genau diese Fläche als
+heikel) — als eigener, unbehobener Befund hier vermerkt, kein Blocker für Block A.
+
+Test `test_ui_referrer_policy_does_not_null_the_origin_header_on_same_origin_posts`
+(`test_security.py`) pinnt den neuen Header-Wert. **Nicht live verifizierbar von hier aus** —
+`curl` interpretiert keine `Referrer-Policy`, nur ein echter Browser entscheidet, was er sendet;
+der Test belegt ausschließlich, welchen String der Server jetzt schickt, nicht, dass der Browser
+danach den echten `Origin` sendet. `pytest -q` (Repo-Wurzel) → **473/473 grün** (472 vor diesem
+Nachtrag, +1).
+
+**Nächster Schritt (konkret):** Restart (`sudo phase3_edge/scripts/install_units.sh && sudo
+systemctl restart sharefyx-mcp`), dann EIN erneuter Enrollment-Versuch — der bereits gescannte
+Authenticator-Eintrag bleibt gültig (`_enrollment_retry()` mintet keinen neuen Seed), es kostet
+also nur einen Formular-Submit, keine neue Einladung. `journalctl -u sharefyx-mcp | grep -i
+"CSRF-Origin"` sollte danach **keine neue Zeile** mehr zeigen. Bleibt der Fehlschlag trotzdem
+bestehen, ist das ein echter, neuer, bisher nicht betrachteter Fund (kein dritter Rateversuch
+vorwegnehmen). Bei Erfolg: Zeile 3 (§6) live bestanden, dann der Rest des Gates (Zeilen 1–9).
+Danach erst Step 5 (REST-API v1) — **teilweise, nicht vollständig vorgezogen**
 (Advisor-Korrektur zum ersten Nachtrag: „bereits erledigt" überzog): Plan §1.5 zeigt
 `webui_routes(ui_settings, auth_store, userdir, store, sessions)` mit einem `store`-Parameter
 (dem `storage.Store`, für `/api/v1/items/*`) — dieser Nachtrag mountet nur `ui_auth_routes()`/

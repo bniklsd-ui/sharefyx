@@ -19,14 +19,33 @@ logger = logging.getLogger(__name__)
 def ui_security_headers(settings: UiSettings) -> dict[str, str]:
     """Plan §3.4. `img-src 'self' data:` ist die einzige Lockerung (Inline-SVG-QR-Code, Step 4).
     `script-src 'self'` ohne `unsafe-inline`: jedes Stück JavaScript liegt in `app.js`, kein
-    `onclick`-Attribut, kein `<script>`-Block."""
+    `onclick`-Attribut, kein `<script>`-Block.
+
+    **`Referrer-Policy: strict-origin`, NICHT `no-referrer` (Korrektur 2026-08-04, Live-Fund):**
+    die Fetch-Spec bestimmt den `Origin`-Header einer Nicht-CORS-Nicht-GET/HEAD-Anfrage (genau
+    das, was ein reines HTML-`<form method="post">` ohne JavaScript ist — Plan §2.8, siehe
+    `pages.py`) NACH der Referrer-Policy des sendenden Dokuments: `no-referrer` liefert dabei
+    zwingend `Origin: null`, auch bei einer Anfrage an den eigenen Host. `require_csrf()` lehnt
+    `null` korrekterweise ab (das ist der klassische CSRF-Bypass-Wert) — die eigene, zu strenge
+    Referrer-Policy hat sich damit selbst ausgesperrt. `strict-origin` sendet weiterhin nie einen
+    `Referer` bei einem TLS-Downgrade und **nie den Pfad** (wichtig: `/ui/invite/<token>` trägt
+    ein Einmal-Secret im Pfad, das über `Referer` nicht an eine Unterressource wie
+    `/ui/static/app.css` durchsickern darf) — anders als `same-origin`, das den vollen Pfad bei
+    einer echten Same-Origin-Anfrage senden würde. Für eine reine HTTPS-Same-Origin-POST-Anfrage
+    (kein Downgrade, `_validate_base_url()` erzwingt `https://`) bleibt der `Origin`-Header damit
+    intakt. Bug, nicht Client-Umgebung: live reproduziert in einem sauberen Chrome-Inkognito-
+    Fenster ohne Extensions, identisch zu jedem vorherigen Versuch — der Fehler war
+    deterministisch, kein Browser-/Profil-/Extension-Effekt. Details, inkl. der beiden
+    verworfenen Hypothesen (eingebetteter Panel, Extension): `phase5_ui/CLAUDE.md`
+    Session-Block 2026-08-04.
+    """
     headers = {
         "Content-Security-Policy": (
             "default-src 'none'; script-src 'self'; style-src 'self'; "
             "img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'self'; "
             "frame-ancestors 'none'; base-uri 'none'"
         ),
-        "Referrer-Policy": "no-referrer",
+        "Referrer-Policy": "strict-origin",
         "X-Content-Type-Options": "nosniff",
         "X-Frame-Options": "DENY",
         "Cross-Origin-Opener-Policy": "same-origin",
