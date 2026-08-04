@@ -455,13 +455,27 @@ der Test belegt ausschließlich, welchen String der Server jetzt schickt, nicht,
 danach den echten `Origin` sendet. `pytest -q` (Repo-Wurzel) → **473/473 grün** (472 vor diesem
 Nachtrag, +1).
 
-**Nächster Schritt (konkret):** Restart (`sudo phase3_edge/scripts/install_units.sh && sudo
-systemctl restart sharefyx-mcp`), dann EIN erneuter Enrollment-Versuch — der bereits gescannte
-Authenticator-Eintrag bleibt gültig (`_enrollment_retry()` mintet keinen neuen Seed), es kostet
-also nur einen Formular-Submit, keine neue Einladung. `journalctl -u sharefyx-mcp | grep -i
-"CSRF-Origin"` sollte danach **keine neue Zeile** mehr zeigen. Bleibt der Fehlschlag trotzdem
-bestehen, ist das ein echter, neuer, bisher nicht betrachteter Fund (kein dritter Rateversuch
-vorwegnehmen). Bei Erfolg: Zeile 3 (§6) live bestanden, dann der Rest des Gates (Zeilen 1–9).
+**Neunter Nachtrag, 2026-08-04 — live bestätigt, Fix hält, Zeile 3 (§6) bestanden:** Restart um
+18:34:38 (`systemctl show sharefyx-mcp -p ExecMainStartTimestamp`), danach EIN
+Enrollment-Versuch um 18:36:40 — `journalctl` zeigt `{"method":"POST",
+"path":"/ui/enroll/confirm","status":200,...}`, **keine** neue `CSRF-Origin-Fehlschlag`-Zeile
+(die drei vorhandenen Zeilen im `grep`-Ausschnitt des Nikingers stammen alle von vor dem
+Restart, 18:11/18:25/18:26). Kein Beleg aus zweiter Hand — Prozessstart-Zeitstempel UND
+Log-Zeile read-only gegengeprüft, nicht nur die Nikinger-Zusammenfassung übernommen (dieselbe
+Disziplin wie beim Phase-4-Schnitt). **Root Cause bestätigt: `Referrer-Policy: no-referrer` war
+die alleinige Ursache, `strict-origin` behebt sie vollständig.** TOTP-Seed, Verschlüsselung,
+Enrollment-Logik — alles war von Anfang an unbeteiligt.
+
+**Zeile 3 (§6, Abnahmematrix Block A) damit live bestanden:** „TOTP-Seed einmal angezeigt, in
+einer echten Authenticator-App aufgenommen, Code akzeptiert." Offen aus Block A bleiben Zeilen
+1, 2, 4–9 (Einladungslink-Einmaligkeit, Recovery-Codes, Passwortwechsel ohne Restart,
+Session-Widerruf, gemeinsame Fehlversuchsbremse, `authctl.py list-users`, `strings`-Grep gegen
+`auth.sqlite3`) — der harte Gate vor Block B ist damit **nicht** vollständig, nur der bisherige
+Blocker ist weg.
+
+**Nächster Schritt (konkret):** die restlichen Abnahmezeilen 1, 2, 4–9 (§6, Block A) live fahren
+— derselbe Einladungs-/Enrollment-Durchlauf von eben deckt bereits einen Teil von Zeile 1 ab
+(„Einladungslink erzeugt, Konto von null auf aktiv eingerichtet"), noch nicht protokolliert.
 Danach erst Step 5 (REST-API v1) — **teilweise, nicht vollständig vorgezogen**
 (Advisor-Korrektur zum ersten Nachtrag: „bereits erledigt" überzog): Plan §1.5 zeigt
 `webui_routes(ui_settings, auth_store, userdir, store, sessions)` mit einem `store`-Parameter

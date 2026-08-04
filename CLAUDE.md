@@ -205,13 +205,14 @@ echten Same-Origin-Anfrage. Fix: `Referrer-Policy` auf `strict-origin` geändert
 TLS-Downgrade, der hier nicht vorkommen kann; sendet nie den Pfad — bewusst nicht `same-origin`,
 das würde `/ui/invite/<token>`s Einmal-Secret im Pfad als `Referer` preisgeben).
 `authserver/routes.py`s identischer `no-referrer`-Wert für die OAuth-Seiten bewusst nicht
-mitgeändert (eigener, unbehobener Befund, andere Flows). Nicht von hier aus live verifizierbar
-(`curl` interpretiert keine Referrer-Policy) — ein Live-Retry steht noch aus. 473/473 Tests.
-Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-03, Fünfter–Achter Nachtrag
-2026-08-04.**]** **Nächster Schritt:** Restart, EIN erneuter Enrollment-Versuch (bereits
-gescannter Authenticator-Eintrag bleibt gültig), `journalctl -u sharefyx-mcp | grep -i
-"CSRF-Origin"` sollte danach leer bleiben — das ist der Live-Beweis. Bei Erfolg: harter Gate vor
-Block B, Abnahmezeilen 1–9 live. Danach erst Step 5 (REST-API v1) — nur teilweise
+mitgeändert (eigener, unbehobener Befund, andere Flows).**]** **[2026-08-04, vierter Nachtrag —
+live bestätigt, read-only gegengeprüft (nicht nur Nikinger-Zusammenfassung übernommen):**
+`systemctl show sharefyx-mcp -p ExecMainStartTimestamp` → Restart 18:34:38;
+`journalctl` → `POST /ui/enroll/confirm` um 18:36:40 → **`200`**, keine neue
+`CSRF-Origin-Fehlschlag`-Zeile danach. **Origin-Fund vollständig geschlossen — Zeile 3 (§6) live
+bestanden.** Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-03, Fünfter–Neunter Nachtrag
+2026-08-04.**]** **Nächster Schritt:** restliche Abnahmezeilen 1, 2, 4–9 (§6, Block A) live
+fahren, dann der harte Gate vor Block B. Danach erst Step 5 (REST-API v1) — nur teilweise
 vorgezogen: `webui/api.py` braucht bei seinem
 Bau noch einen zweiten, kleinen `create_app()`-Edit für den `store`-Parameter, den
 `ui_auth_routes()`/`account_routes()` nicht brauchten.
