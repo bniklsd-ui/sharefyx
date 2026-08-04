@@ -184,11 +184,21 @@ Nikinger-Aktion vor dem nächsten Versuch: DevTools-Beleg des tatsächlichen `Or
 (gleiches Muster wie der P4-`form-action`-Fund). Nebenbei: `errors.py :: CsrfError`s Docstring
 behauptete fälschlich „nie eine unterscheidbare Detailmeldung" — korrigiert, Verhalten
 unverändert, unabhängiger Vorbestandsfund. 471/471 Tests. Details:
-`phase5_ui/CLAUDE.md` Session-Block 2026-08-03.**]** **Nächster Schritt:** Restart (derselbe
-ausstehende, kein zweiter), dann DevTools-Origin-Beleg vom Nikinger, dann der harte Gate vor
-Block B — Abnahmezeilen 1–9 live. Danach erst Step 5 (REST-API v1) — nur teilweise vorgezogen:
-`webui/api.py` braucht bei seinem Bau noch einen zweiten, kleinen `create_app()`-Edit für den
-`store`-Parameter, den `ui_auth_routes()`/`account_routes()` nicht brauchten.
+`phase5_ui/CLAUDE.md` Session-Block 2026-08-03.**]** **[2026-08-04 Nachtrag:** vom Nikinger als
+„TOTP-Seed kaputt" gemeldet — **kein neuer Fund**, derselbe Origin-Fehlschlag: `journalctl`
+zeigt ausnahmslos `403` auf jeden `/ui/enroll/confirm`-Versuch, nie `422` („Code ungültig"), der
+Request erreicht die TOTP-Prüfung also nie. Config-Parität (Unit-Env, `local.env`, `tailscale
+funnel status`) stimmt exakt überein — die Abweichung liegt im tatsächlich gesendeten
+`Origin`-Header, der bisher nirgends geloggt wurde. Behoben: `require_csrf()` loggt den
+abgelehnten Origin jetzt serverseitig (stderr, nie in die Client-Antwort). **Root Cause weiterhin
+offen**, aber jetzt ohne DevTools belegbar — nächster fehlschlagender Versuch zeigt den Wert in
+`journalctl`. 472/472 Tests. Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-03, Fünfter
+Nachtrag 2026-08-04.**]** **Nächster Schritt:** Restart (derselbe ausstehende, kein zweiter),
+dann EIN Enrollment-Versuch, dann `journalctl -u sharefyx-mcp | grep -i "CSRF-Origin"` als Beleg
+(DevTools bleibt Rückfalloption), dann der harte Gate vor Block B — Abnahmezeilen 1–9 live.
+Danach erst Step 5 (REST-API v1) — nur teilweise vorgezogen: `webui/api.py` braucht bei seinem
+Bau noch einen zweiten, kleinen `create_app()`-Edit für den `store`-Parameter, den
+`ui_auth_routes()`/`account_routes()` nicht brauchten.
 
 **Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅
 abgeschlossen, 2026-07-30.** Mission erfüllt: der Pfad-Token ist verschwunden, ein eigener

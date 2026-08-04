@@ -73,6 +73,23 @@ def test_csrf_foreign_origin_is_403():
         require_csrf(request, _session("tok"), settings=_settings())
 
 
+def test_csrf_foreign_origin_logs_the_received_value_but_not_to_the_client(caplog):
+    """Live-Fund 2026-08-03/04 (`phase5_ui/CLAUDE.md`): eine strukturelle Origin-Abweichung war
+    ohne Browser-DevTools nicht belegbar, weil der abgelehnte Wert nirgends landete. Server-Log
+    ja (journalctl-belegbar), `CsrfError.message` weiterhin ohne den Wert (Enumerationsdisziplin
+    unveraendert, siehe `errors.py :: CsrfError`)."""
+    request = _request(
+        method="POST",
+        headers=[(b"origin", b"https://boese.example"), (b"x-csrf-token", b"tok")],
+    )
+    with caplog.at_level("WARNING", logger="webui.security"):
+        with pytest.raises(CsrfError) as excinfo:
+            require_csrf(request, _session("tok"), settings=_settings())
+    assert "https://boese.example" in caplog.text
+    assert BASE_URL in caplog.text
+    assert "https://boese.example" not in excinfo.value.message
+
+
 def test_csrf_absent_origin_with_same_site_header_passes():
     request = _request(
         method="POST",

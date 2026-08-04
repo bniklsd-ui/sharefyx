@@ -4,12 +4,16 @@
 """
 from __future__ import annotations
 
+import logging
+
 from authserver import crypto
 from authserver.models import SessionRow
 from starlette.requests import Request
 
 from .config import UiSettings
 from .errors import CsrfError
+
+logger = logging.getLogger(__name__)
 
 
 def ui_security_headers(settings: UiSettings) -> dict[str, str]:
@@ -59,6 +63,13 @@ def require_csrf(
     origin = request.headers.get("origin")
     if origin is not None:
         if origin != settings.base_url:
+            # Nur ins Server-Log (stderr, Hard Rule 7), nie in die Client-Antwort — der
+            # Klartextvergleich hier ist der einzige Weg, eine strukturelle Origin-Abweichung
+            # (zweite reale URL-Variante, Tippfehler in der Config, o.ä.) ohne Browser-DevTools
+            # zu belegen (offener Punkt seit 2026-08-03, `phase5_ui/CLAUDE.md`).
+            logger.warning(
+                "CSRF-Origin-Fehlschlag: erhalten %r, erwartet %r", origin, settings.base_url,
+            )
             raise CsrfError("Herkunft (Origin) stimmt nicht")
     elif request.headers.get("sec-fetch-site") != "same-origin":
         raise CsrfError("Herkunft nicht bestimmbar")

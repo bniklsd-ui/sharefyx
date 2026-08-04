@@ -7,7 +7,7 @@ up: ../CLAUDE.md
 down:
   - ../docs/concepts/phase5_ui_plan.md             # voller Plan, Entscheidungen P5-A–P5-AE, Steps 0–9
   - ../docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.5, [VERIFY]-Bilanz V14–V26
-updated: 2026-08-03
+updated: 2026-08-04
 ---
 
 # CLAUDE.md — Phase 5: Web-UI, REST-API, Auth-Selbstverwaltung (`phase5_ui/`)
@@ -336,12 +336,52 @@ Detailmeldung nach außen" — `require_csrf()` warf schon immer drei unterschei
 unbedenklich, weil keine davon Kontoexistenz verrät, aber die Doku-Aussage war seit ihrem
 ursprünglichen Commit falsch, unabhängig von diesem Nachtrag).
 
+**Fünfter Nachtrag, 2026-08-04 — Auftrag „TOTP-Seed kaputt", tatsächlich derselbe Origin-Fund,
+jetzt mit Beleg statt Verdacht:** der Nikinger meldete diese Session einen vermeintlich neuen
+Fehler („weder Copy-Paste noch QR-Scan liefert einen gültigen Code, Google Authenticator
+gegengetestet") — **kein neuer Fund**, sondern derselbe offene Origin-Fehlschlag von oben, nur
+falsch zugeordnet (das Symptom trifft jeden Enrollment-Versuch gleich, unabhängig vom
+TOTP-Eingabeweg, weil der Request nie bis zur TOTP-Prüfung kommt). Beleg statt Vermutung:
+`journalctl -u sharefyx-mcp` zeigt **jeden** `POST /ui/enroll/confirm` seit 2026-08-03 mit
+**Status 403**, keinen einzigen 422 („Code ungültig") oder 200 — bei einem echten TOTP-Problem
+wäre mindestens ein 422 zu erwarten (falscher Code, aber CSRF bestanden). Das schließt die
+Alternativhypothese „TOTP-Seed entschlüsselt nicht" aus (die hätte ebenfalls 422 erzeugt, nicht
+403), ohne dass die Live-Datenbank angefasst werden musste.
+
+Config-Parität read-only geprüft, alle drei Quellen stimmen exakt überein (kein Port-, kein
+Hostname-Unterschied): `systemctl show sharefyx-mcp --property=Environment` →
+`SPACE_PUBLIC_BASE_URL=https://savefyx-vmware-virtual-platform.tail89fc2a.ts.net`;
+`phase3_edge/local.env` → `PUBLIC_BASE_URL` byte-identisch; `tailscale funnel status` → dieselbe
+URL, Proxy-Ziel `127.0.0.1:8765`, Port 443 (kein 8443/10000). Root Cause also **nicht** eine
+falsch konfigurierte Base-URL — die Abweichung muss im tatsächlich vom Browser gesendeten
+`Origin`-Header liegen, und genau der Wert landete bisher **nirgends**, weder im Request-Log
+(`mcpserver/request_log.py` protokolliert keine Header) noch sonst irgendwo im Prozess.
+
+**Behoben — die Belegbarkeitslücke, nicht (noch) die Ursache selbst:** `webui/security.py ::
+require_csrf()` loggt den abgelehnten Origin-Fehlschlag jetzt serverseitig
+(`logger.warning("CSRF-Origin-Fehlschlag: erhalten %r, erwartet %r", origin, settings.base_url)`,
+stdlib `logging` → stderr, Hard Rule 7). **Nur ins Log, nie in die Client-Antwort** —
+`CsrfError.message` bleibt unverändert der generische Text, keine Erweiterung der
+Enumerationsfläche. Test `test_csrf_foreign_origin_logs_the_received_value_but_not_to_the_client`
+(`test_security.py`, `caplog`) hält beide Hälften fest: der Wert landet im Log, nicht in
+`exc.message`. Das macht den nächsten fehlschlagenden Live-Versuch selbstbelegend — kein
+DevTools-Screenshot mehr nötig, `journalctl -u sharefyx-mcp | grep -i "CSRF-Origin"` zeigt direkt
+den String, der gegen `settings.base_url` verglichen wurde.
+
+**Verifiziert:** `pytest -q` (Repo-Wurzel) → **472/472 grün** (471 vor diesem Nachtrag, +1).
+
 **Nächster Schritt (konkret):** Restart (derselbe ausstehende wie oben, kein zweiter nötig —
-`sudo phase3_edge/scripts/install_units.sh && sudo systemctl restart sharefyx-mcp`), dann im
-Browser DevTools den `Origin`-Header des fehlschlagenden Requests belegen (siehe oben) — **erst
-danach** ist klar, ob der Gate mit dem jetzt freundlicheren Retry tatsächlich durchläuft oder ob
-eine echte Config-/Entscheidungsfrage aussteht. Danach der harte Gate vor Block B, Abnahmezeilen
-1–9 (§6) live. Danach erst Step 5 (REST-API v1) — **teilweise, nicht vollständig vorgezogen**
+`sudo phase3_edge/scripts/install_units.sh && sudo systemctl restart sharefyx-mcp`), danach den
+Enrollment-Schritt im Browser **ein einziges Mal erneut versuchen** (falscher oder richtiger
+TOTP-Code ist für diesen Zweck egal, es geht nur um den Origin-Header) und sofort
+`journalctl -u sharefyx-mcp | grep -i "CSRF-Origin"` lesen — der geloggte Wert zeigt exakt, was
+vom erwarteten `https://savefyx-vmware-virtual-platform.tail89fc2a.ts.net` abweicht (zusätzlicher
+Port? Trailing Dot? andere Domain?). Browser-DevTools bleiben eine Rückfalloption, sind aber
+nicht mehr der einzige Weg. **Root Cause weiterhin nicht behoben, nur belegbar gemacht** — falls
+sich eine zweite, legitime Origin herausstellt, ist die Erweiterung von `require_csrf()` auf eine
+Origin-Menge weiterhin eine Nikinger-Entscheidung (siehe oben), nicht auf eigene Initiative
+umgesetzt. Danach unverändert: der harte Gate vor Block B, Abnahmezeilen 1–9 (§6) live. Danach
+erst Step 5 (REST-API v1) — **teilweise, nicht vollständig vorgezogen**
 (Advisor-Korrektur zum ersten Nachtrag: „bereits erledigt" überzog): Plan §1.5 zeigt
 `webui_routes(ui_settings, auth_store, userdir, store, sessions)` mit einem `store`-Parameter
 (dem `storage.Store`, für `/api/v1/items/*`) — dieser Nachtrag mountet nur `ui_auth_routes()`/
