@@ -17,6 +17,11 @@
 # `authctl.py purge-expired`) kommt als drittes Quellverzeichnis dazu — kein neuer Platzhalter,
 # dieselben sechs wie bisher.
 #
+# **P5 Step 8:** drei OPTIONALE Platzhalter für die Staging-Unit (`__STAGING_PORT__`,
+# `__STAGING_DATA_ROOT__`, `__STAGING_BASE_URL__`). Optional mit Default, nicht Pflicht: sonst
+# bräche dieses Skript auf jeder bestehenden Installation ab, sobald die neue Unit dazukommt.
+# Ebenfalls neu hier: `sharefyx-authbackup.{service,timer}` (P5-R) — keine eigenen Platzhalter.
+#
 # Aufruf: sudo phase3_edge/scripts/install_units.sh
 
 set -euo pipefail
@@ -67,6 +72,15 @@ for var in REPO_ROOT DATA_ROOT VENV ALLOWED_HOSTS AUTH_MODE PUBLIC_BASE_URL; do
   fi
 done
 
+# [2026-08-05, P5 Step 8] Staging-Platzhalter. Bewusst OPTIONAL mit Default statt Pflicht: eine
+# Maschine, die nur produktiv läuft, soll nicht plötzlich an einer fehlenden Zeile in local.env
+# scheitern — sonst würde dieses Skript beim nächsten `install_units.sh` auf jeder bestehenden
+# Installation abbrechen. Wer Staging nicht benutzt, bekommt eine installierte, aber nicht
+# aktivierte Unit (dieses Skript ruft `enable --now` nur für sharefyx-mcp.service auf).
+STAGING_PORT="${STAGING_PORT:-8766}"
+STAGING_DATA_ROOT="${STAGING_DATA_ROOT:-${DATA_ROOT}-staging}"
+STAGING_BASE_URL="${STAGING_BASE_URL:-${PUBLIC_BASE_URL}:${STAGING_PORT}}"
+
 shopt -s nullglob
 units=()
 for src in "${SYSTEMD_SRCS[@]}"; do
@@ -91,6 +105,9 @@ for unit in "${units[@]}"; do
     -e "s#__ALLOWED_HOSTS__#${ALLOWED_HOSTS}#g" \
     -e "s#__AUTH_MODE__#${AUTH_MODE}#g" \
     -e "s#__PUBLIC_BASE_URL__#${PUBLIC_BASE_URL}#g" \
+    -e "s#__STAGING_PORT__#${STAGING_PORT}#g" \
+    -e "s#__STAGING_DATA_ROOT__#${STAGING_DATA_ROOT}#g" \
+    -e "s#__STAGING_BASE_URL__#${STAGING_BASE_URL}#g" \
     "$unit" > "$dest"
 
   if grep -qE '__[A-Z_]+__' "$dest"; then

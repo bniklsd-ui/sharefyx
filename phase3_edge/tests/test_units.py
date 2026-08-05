@@ -132,6 +132,85 @@ def test_purge_timer_runs_daily_and_persistent():
     assert "Persistent=true" in text
 
 
+def test_authbackup_service_runs_as_root_and_verifies(_=None):
+    """P5-R, Step 8. `User=` fehlt hier ABSICHTLICH (= root): die `auth.sqlite3` liegt im
+    StateDirectory des MCP-Dienstes (0700), und `systemd-creds encrypt --with-key=host` liest
+    `/var/lib/systemd/credential.secret` (0600, root). Ein `User=savefyx` würde die Unit
+    still unbrauchbar machen — sie liefe, könnte aber nichts sichern."""
+    text = (REPO_ROOT / "phase5_ui" / "systemd" / "sharefyx-authbackup.service").read_text(
+        encoding="utf-8"
+    )
+    assert "Type=oneshot" in text
+    assert "authbackup.sh" in text
+    assert not re.search(r"^User=", text, re.MULTILINE), "läuft nicht mehr als root"
+    # Der Klartext-Zwischenstand entsteht in /tmp — ohne PrivateTmp sähe ihn jeder andere Dienst.
+    assert "PrivateTmp=true" in text
+
+
+def test_authbackup_timer_runs_daily_and_persistent():
+    text = (REPO_ROOT / "phase5_ui" / "systemd" / "sharefyx-authbackup.timer").read_text(
+        encoding="utf-8"
+    )
+    assert "OnCalendar=daily" in text
+    assert "Persistent=true" in text
+
+
+def test_staging_unit_uses_separate_state_directory():
+    """Eine Staging-Instanz, die sich `StateDirectory`, Port oder `DATA_ROOT` mit der
+    Produktivinstanz teilt, ist keine getrennte Instanz — sie ist ein zweiter Schreiber auf
+    denselben Daten."""
+    text = (REPO_ROOT / "phase5_ui" / "systemd" / "sharefyx-staging.service").read_text(
+        encoding="utf-8"
+    )
+    prod = (REPO_ROOT / "phase4_auth" / "systemd" / "sharefyx-mcp.service").read_text(
+        encoding="utf-8"
+    )
+    assert "StateDirectory=sharefyx-staging" in text
+    assert "StateDirectory=sharefyx\n" in prod and "StateDirectory=sharefyx\n" not in text
+    assert "Environment=SPACE_PORT=__STAGING_PORT__" in text
+    assert "Environment=SPACE_DATA_ROOT=__STAGING_DATA_ROOT__" in text
+    # Produktiv-Platzhalter dürfen in dieser Unit nirgends auftauchen, sonst zeigt Staging beim
+    # Einsetzen doch wieder auf die echten Daten.
+    assert "__DATA_ROOT__" not in text
+    assert "__PUBLIC_BASE_URL__" not in text
+
+
+def test_staging_unit_is_not_funnel_exposed():
+    """P5-AB: Staging ist tailnet-intern (`tailscale serve`), NIEMALS öffentlich (`funnel`).
+    Zwei prüfbare Zusicherungen: die Unit ruft an keiner Stelle `tailscale funnel` auf, und sie
+    bindet — wie die Produktivinstanz — nur auf die Loopback-Adresse. Die Freigabe bleibt damit
+    ein bewusster, separater Handgriff und kann nicht versehentlich aus der Unit fallen."""
+    text = (REPO_ROOT / "phase5_ui" / "systemd" / "sharefyx-staging.service").read_text(
+        encoding="utf-8"
+    )
+    assert "Environment=SPACE_HOST=127.0.0.1" in text
+    executable_lines = [
+        line for line in text.splitlines()
+        if line.startswith(("ExecStart", "ExecStartPre", "ExecStartPost", "ExecStop"))
+    ]
+    for line in executable_lines:
+        assert "funnel" not in line, f"Staging-Unit ruft funnel auf: {line}"
+
+
+def test_install_script_substitutes_the_staging_placeholders():
+    """Ein Platzhalter, den `install_units.sh` nicht kennt, lässt das Skript beim nächsten Lauf
+    mit „unaufgelöster Platzhalter" abbrechen — und zwar für ALLE Units, nicht nur die neue."""
+    text = INSTALL_SCRIPT.read_text(encoding="utf-8")
+    for placeholder in ("__STAGING_PORT__", "__STAGING_DATA_ROOT__", "__STAGING_BASE_URL__"):
+        assert placeholder in text, placeholder
+
+
+def test_every_placeholder_in_every_unit_is_known_to_the_install_script():
+    """Die allgemeine Fassung des Tests darüber: kein Platzhalter in irgendeiner Unit darf dem
+    Installationsskript unbekannt sein. Das fängt den Fall ab, dass jemand später eine Unit mit
+    einem neuen `__FOO__` hinzufügt und die `sed`-Kette dabei vergisst — der Abbruch käme sonst
+    erst beim `sudo install_units.sh` auf der echten Maschine."""
+    install_text = INSTALL_SCRIPT.read_text(encoding="utf-8")
+    for path in ALL_UNIT_PATHS:
+        for placeholder in set(re.findall(r"__[A-Z_]+__", path.read_text(encoding="utf-8"))):
+            assert f"s#{placeholder}#" in install_text, f"{path.name}: {placeholder} unbekannt"
+
+
 def test_install_script_reads_phase5_ui_systemd_dir():
     """Ein Timer, den `install_units.sh` nie installiert, ist totes Gewicht — die
     `SYSTEMD_SRCS`-Liste muss `phase5_ui/systemd` tatsächlich enthalten, nicht nur die Unit

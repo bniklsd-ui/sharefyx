@@ -258,9 +258,30 @@ das braucht zwei getrennte Sitzungen (zweites Profil oder privates Fenster), ein
 desselben Browsers teilt das Cookie und beweist nichts. **Gesamtstand jetzt 11/20 bestanden, 2
 teilweise, 7 offen** — die vollständige Matrix steht ab sofort an genau einer Stelle:
 `phase5_ui/CLAUDE.md`, Abschnitt „Abnahmestand (Plan §6)". Vorher lagen die Ergebnisse über sechs
-Session-Blöcke verteilt, mehrere davon schon archiviert.**]** **Nächster Schritt:** Step 8
-(Betrieb: Deploy, Rollback, Staging, Auth-Backup, Messung — Plan §5 Step 8). Zeile 6 ist mit
-einem privaten Fenster in zwei Minuten nachzuholen und blockiert Step 8 nicht.
+Session-Blöcke verteilt, mehrere davon schon archiviert.**]**
+**[2026-08-05, Step 8 gebaut — Betrieb:** `phase5_ui/scripts/{deploy,rollback,authbackup,
+restore_auth_check}.sh` + `ui_budget.py`, `phase5_ui/systemd/{sharefyx-authbackup.service,.timer,
+sharefyx-staging.service}`, vier neue `diagnose.sh`-Prüfungen, drei optionale Staging-Platzhalter
+in `install_units.sh`. **Der Ausgangszustand war schlechter, als er aussah:** der Dienst lief
+direkt aus dem Git-Arbeitsverzeichnis (ein Editor-Speichern wirkte sofort), es gab kein Rollback,
+und die `auth.sqlite3` mit den **umkehrbaren** TOTP-Seeds wurde von keinem Backup erfasst — nur
+der `DATA_ROOT`. **Messung (P5-AD) durchgeführt, `[VERIFY]` V10 damit aufgelöst:** alle fünf
+Größen deutlich im Zielkorridor (Trefferliste 22.4 KB roh / 1.2 KB gzip, Einzelitem 0.6 KB,
+statische Nutzlast 54.8 KB, Erstaufruf 58.2 KB) — Tabelle im Phase-Head. Drei dokumentierte
+Plan-Abweichungen, die wichtigste: **das Health-Gate führt keine „authentifizierte API-Probe"
+durch, wie der Plan sie verlangt** — dafür müssten Passwort und TOTP-Seed auf der Platte liegen,
+was Hard Rule 1 ausnahmslos verbietet; stattdessen vier Proben, die dasselbe beweisen
+(`/api/v1/me` ohne Cookie und `/mcp/` ohne Bearer müssen **401** liefern, sonst rollt der Deploy
+zurück). Eigener Fund beim echten Probelauf: ein zurückgerolltes Release wäre als jüngstes
+Verzeichnis zum nächsten Rollback-Ziel geworden — man wäre auf dem nachweislich kaputten Stand
+gelandet; es wird jetzt `*.failed` markiert und übersprungen. Nebenbei eine **V13-Drift in
+`phase3_edge/`** korrigiert (dort seit 2026-07-28 als geschlossen dokumentiert und 114 Zeilen
+weiter unten in derselben Datei noch als offen geführt). **570/570 Tests.** Details:
+`phase5_ui/CLAUDE.md` Session-Block 2026-08-05, vierter Nachtrag.**]** **Nächster Schritt:** die
+Live-Teile von Step 8 beim Nikinger (einmalige `/opt/sharefyx`-Einrichtung, erster Deploy,
+Cutover, Abnahmezeile 16, Auth-Backup-Timer + eigener `restore_auth_check.sh`-Lauf, Staging mit
+`tailscale serve`), dazu die weiter offene Zeile 6 (zweiter Browser). Danach Step 9 (gemeinsame
+Live-Abnahme beider Nutzer + Handover, P5-AE).
 
 **Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅
 abgeschlossen, 2026-07-30.** Mission erfüllt: der Pfad-Token ist verschwunden, ein eigener

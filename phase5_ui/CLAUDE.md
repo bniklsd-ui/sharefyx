@@ -99,6 +99,7 @@ Messung statt Schätzung (`ui_budget.py`, AD) · gemeinsame Live-Abnahme, beide 
 | 9 | UI-Gerüst: `webui/static_routes.py` (`GET /ui/` sitzungsgated, `GET /ui/static/{path}`), `webui/static/{app.html,app.css,app.js,fonts/}`, `webui/config.py :: UiSettings.static_dir`, `scripts/build_font_subset.sh` (echte Inter-Variable-Subsetting-Pipeline, schließt V27), `mcpserver/app.py` mountet `static_routes()` | 6 | ✅ **vollständig** — Navigation/Liste/Suche/schreibgeschützte Detailansicht gegen die echte REST-API aus Step 5; **kein** Editor, **kein** Markdown-Rendering, **kein** Versionsband (bewusst Step-7-Scope). Korrigiert einen Plan-Selbstwiderspruch (§1.5-Tabelle „`/ui/` Auth: keine" vs. der im selben Plan-Abschnitt verlangte Testname `test_index_route_requires_session`) zugunsten des Tests, Details im Session-Block unten | +8 (7 `test_static_routes.py`, neue Datei; `phase2_mcp/tests/test_app.py` +1 `test_ui_index_route_reachable_through_create_app`; JS bleibt laut Plan unit-ungetestet) |
 | 10 | Editor, Vorschau, Konflikt, Frontmatter-Felder: `webui/api.py` +`GET /api/v1/meta`; `webui/static/app.js` um Markdown-Parser/Sanitizer (geerntet + erweitert aus `docs/concepts/notiz_heft_example.html`), Editor-Zustand, Versionsband, Speichern/Konfliktdialog, Anlegen/Anhängen/Archivieren, Frontmatter-Felder, Entwurfsschutz, „Sitzung abgelaufen"-Karte, Formatierhilfen-Leiste erweitert; `webui/static/{app.css,app.html}` entsprechend erweitert | 7 | ✅ **vollständig** — kein Passwortänderungsdialog (eigener Nachtrag, Zeilen 5/6 der Block-A-Abnahme folgen dort), kein Deploy/Rollback (Step 8), keine zweite Formatvariante (P5-Z bleibt Seam). Umfangreiche Node/jsdom-gestützte End-to-End-Simulation (Scratchpad, nicht im Repo) fand und schloss zwei echte Funde vor dem Commit: (1) das Test-Mock selbst hatte einen `includes()`-Bug (`/api/v1/meta` matchte fälschlich auch `/api/v1/me`) — beim Beheben zusätzlich `reportUnexpectedError()` in `app.js` ergänzt, weil (2) `loadItems()`/`selectItem()`/`init()` bei einem `401` sonst eine unbehandelte Promise-Ablehnung hinterließen (im Browser nur eine Konsolenwarnung, in Node ein Prozessabbruch — trotzdem sauber behandelt, nicht auf das mildere Browser-Verhalten verlassen) | +4 (2 `test_meta.py`, neue Datei + 2 `test_api.py`: `test_conflict_response_current_item_matches_item_to_json_exactly`, `test_append_endpoint_concatenates_patch_endpoint_replaces`; JS bleibt laut Plan unit-ungetestet, die jsdom-Simulation ist eine Entwicklungshilfe dieser Session, kein Teil der Suite) |
 | 11 | UI-Überarbeitung nach Live-Feedback: Navigationsbaum + Übersichtsseite (`GET /api/v1/overview` neu, `GET /api/v1/meta` um `buckets` erweitert, `webui/serializers.py :: overview_row_to_json()`), plastische Bedienelemente + zwei farblich getrennte Editor-Paneele (`app.css` weitgehend neu), Toasts/Dirty-Gating/schließbarer Editor/entfernbare Chips (`app.js`), gestaltete Auth-Seiten (`pages.py` + `app.css`), Passwortwechsel-Dialog für die Block-A-Zeilen 5/6 | 7b | ✅ **vollständig** — **revidiert Plan §4.1 und §4.3** (Nikinger-Entscheidung 2026-08-05, Tabelle im Session-Block; die Plandatei bleibt als 📕-Snapshot unverändert). Schließt elf Live-Meldungen und sechs eigene Funde (F1–F6). Zwei Funde darüber hinaus: ein vierter Ordner **„Erledigt"** (eine `done`-Aufgabe war in der Oberfläche nirgends mehr auffindbar) und **Akzeptanzkriterium 12 war bisher nur halb erfüllt** — Editor/„+"/Anlegen-Dialog standen permanent in `app.html` und waren nur `hidden`; `app.js :: detachable()` hängt sie jetzt wirklich aus dem DOM aus. 51 jsdom-Prüfungen, `ui_smoke.py` 12/12 | +33 (7 `test_overview.py` + 24 `test_pages_markup.py`, zwei neue Dateien; +1 `test_meta.py`, +1 `test_static_routes.py`; `test_invite_enroll.py` und `scripts/ui_smoke.py` mussten ihre Seed-Suchregex auf das neue Klassen-Markup nachziehen, kein neuer Test) |
+| 12 | Betrieb: `phase5_ui/scripts/{deploy,rollback,authbackup,restore_auth_check}.sh` + `ui_budget.py`; `phase5_ui/systemd/{sharefyx-authbackup.service,.timer,sharefyx-staging.service}`; `install_units.sh` um drei **optionale** Staging-Platzhalter erweitert; `diagnose.sh` um vier Prüfungen (UI erreichbar, offene UI-Sitzungen, jüngstes Auth-Backup, aktives Release) | 8 | ✅ **gebaut, Live-Teile beim Nikinger** — **löst V10 auf** (Messtabelle im Session-Block, alle fünf Größen im Korridor) und korrigiert eine **V13-Drift in `phase3_edge/`** (dort seit 2026-07-28 als geschlossen dokumentiert und 114 Zeilen weiter unten in derselben Datei noch als offen geführt). Drei dokumentierte Plan-Abweichungen (Health-Gate ohne authentifizierte Probe — Hard Rule 1; dritter Staging-Platzhalter; Platzhalter optional statt Pflicht). Eigener Fund beim echten Probelauf: ein zurückgerolltes Release wäre das nächste Rollback-Ziel gewesen → `*.failed`-Markierung | +21 (15 `test_deploy_scripts.py`, neue Datei; +6 `test_units.py`, darunter `test_every_placeholder_in_every_unit_is_known_to_the_install_script` — allgemeiner als die im Plan genannten) |
 
 ---
 
@@ -125,156 +126,140 @@ nicht gebaut. Phase 5 bleibt 🟡, solange eine Zeile offen ist.**
 | 12 | Fremder Space sichtbar/lesbar, **ohne** Schreib-Bedienelemente im DOM | ✅ | Nikinger live in DevTools, 2026-08-05 nach Step 7b (vorher nur `hidden` — siehe F7-Umfeld im Session-Block) |
 | 13 | Unbekanntes Frontmatter-Feld überlebt eine UI-Bearbeitung unverändert | ⬜ offen | `extra` wird durchgereicht (`serializers.py`), live noch nicht belegt |
 | 14 | `format: markdown` erscheint nach dem ersten UI-Schreibvorgang und stört keinen Tool-Aufruf | ⬜ offen | |
-| 15 | `ui_budget.py` liefert alle vier Zahlen | ⬜ offen | Step 8 |
-| 16 | `deploy.sh` rollt bei kaputtem Health-Endpunkt automatisch zurück | ⬜ offen | Step 8 |
+| 15 | `ui_budget.py` liefert alle vier Zahlen | 🟡 **Kandidatenbeleg** | Von Claude Code gefahren, Ergebnis steht als Tabelle im Session-Block (alle fünf Größen im Korridor, **löst V10 auf**). Nach dem Muster von P3 Zeile 13 gilt das als Kandidat, nicht als Abnahme — **der Lauf des Nikingers macht die Zeile ✅** |
+| 16 | `deploy.sh` rollt bei kaputtem Health-Endpunkt automatisch zurück | 🟡 **Test + Wegwerf-Lauf grün** | `test_deploy_script_rolls_back_when_health_gate_fails` plus ein echter Lauf gegen ein `tmp`-Layout mit gestubbtem `systemctl`/`curl`. Der **Live**-Nachweis auf der VM steht aus (Runbook-Punkt 4 im Session-Block) |
 | 17 | Beide Nutzer benutzen UI **und** Connector am selben Tag gegen dieselbe Instanz | ⬜ offen | Step 9 (P5-AE) |
 | 18 | `git diff` auf `storage/`, `mcpserver/{tools,permissions,server}.py`: leer | ✅ | bei jedem Step-Commit geprüft, zuletzt Step 7b |
 | 19 | Cookie an `/mcp` ignoriert; Bearer an `/api` ignoriert | 🟡 | Testseite ✅ (`test_isolation.py`, `test_overview.py`); der im Plan zusätzlich verlangte **Live-`curl`** steht aus |
 | 20 | Reboot: UI, Connector, Timer kommen ohne Handgriff zurück | ⬜ offen | passiv zulässig (wie P3 Zeile 6) |
 
-**Kurz:** 11 von 20 live bestanden, 2 teilweise (6, 19), 7 offen — davon 4 an Step 8/9 gebunden.
+**Kurz:** 11 von 20 live bestanden, 4 teilweise (6, 15, 16, 19), 5 offen. Die vier „teilweise"
+sind allesamt Zeilen, bei denen die Code-Seite fertig ist und nur der Lauf des Nikingers fehlt —
+das ist Absicht und keine Nachlässigkeit: **✅ heißt live-verifiziert, nicht gebaut.**
 
 ---
 
-## Session stopped — 2026-08-05, dritter Nachtrag (Step 7b: UI-Überarbeitung nach Live-Feedback)
+## Session stopped — 2026-08-05, vierter Nachtrag (Step 8: Deploy, Rollback, Staging, Auth-Backup, Messung)
 
-**Ergebnis:** Der Nikinger hat Step 6/7 live benutzt und elf Punkte gemeldet; alle sind
-umgesetzt, dazu sechs eigene Funde. Die Oberfläche hat jetzt einen Navigationsbaum statt zweier
-flacher Rail-Blöcke, eine Übersichtsseite, plastische Bedienelemente, zwei farblich getrennte
-Editor-Paneele, Rückmeldung nach jedem Schreibvorgang und gestaltete Auth-Seiten. Ausführungsplan
-dieser Session: `/home/savefyx/.claude/plans/merry-tickling-elephant.md`.
+**Ergebnis:** Step 8 ist gebaut. Bis hierher lief der Dienst direkt aus dem
+Git-Arbeitsverzeichnis — ein Editor-Speichern wirkte sofort auf die laufende Instanz, ein
+Rollback gab es nicht, und die `auth.sqlite3` (Passwort-Hashes, **umkehrbare** TOTP-Seeds,
+Token-Familien) wurde von **keinem** Backup erfasst; gesichert war nur der `DATA_ROOT`. Ein
+Plattenschaden hätte die Notizen gerettet und beide Konten gekostet.
 
-**Zwei gelockte Entscheidungen revidiert — Nikinger-Entscheidung 2026-08-05, nicht still:**
+Neu: `phase5_ui/scripts/{deploy.sh,rollback.sh,authbackup.sh,restore_auth_check.sh,ui_budget.py}`,
+`phase5_ui/systemd/{sharefyx-authbackup.service,.timer,sharefyx-staging.service}`, vier weitere
+Prüfungen in `phase3_edge/scripts/diagnose.sh`, drei optionale Platzhalter in
+`install_units.sh`.
 
-| Gelockt | Bisher | Jetzt | Grund |
+**Nikinger-Entscheidungen dieser Planung (2026-08-05):** Deploy-Quelle ist das **lokale Repo**,
+nicht GitHub („von GitHub klonen nur Leute, die das Projekt selber hosten wollen") — `deploy.sh
+origin/main` funktioniert nach einem `git fetch` trotzdem, der Klon bringt die Remote-Refs mit.
+Staging wird **jetzt** gebaut, wie in P5-AB gelockt.
+
+**Drei dokumentierte Abweichungen vom Plan-Wortlaut:**
+1. **Health-Gate ohne „authentifizierte API-Probe".** Der Plan verlangt eine; eine echte
+   Anmeldung bräuchte Passwort **und** TOTP-Seed auf der Platte, und **Hard Rule 1 verbietet das
+   ausnahmslos**. Stattdessen vier Proben, die dasselbe beweisen, ohne ein Geheimnis anzulegen:
+   `/health` → 200, `/ui/login` → 200 (webui gemountet), `/api/v1/me` ohne Cookie → **401**,
+   `/mcp/` ohne Bearer → **401**. Ein Deploy, der versehentlich die Authentisierung ausbaut,
+   fällt damit auf — genau darum ging es bei der Forderung.
+2. **Drei Staging-Platzhalter statt zwei.** `__STAGING_BASE_URL__` kam dazu, weil
+   `SPACE_PUBLIC_BASE_URL` unter `AUTH_MODE=oauth` Pflicht ist (`authserver/config.py`) — mit nur
+   Port und `DATA_ROOT` wäre die Unit nicht startfähig gewesen.
+3. **Die Staging-Platzhalter sind optional mit Default, nicht Pflicht.** Sonst bräche
+   `install_units.sh` auf **jeder bestehenden Installation** ab, sobald die neue Unit dazukommt —
+   die `local.env` der VM kennt die Schlüssel ja noch nicht. Defaults: Port `8766`,
+   `<DATA_ROOT>-staging`, `<PUBLIC_BASE_URL>:<STAGING_PORT>`.
+
+**Zwei eigene Funde:**
+- **Ein zurückgerolltes Release wäre das nächste Rollback-Ziel gewesen.** Aufgefallen erst beim
+  echten Probelauf, nicht beim Schreiben: nach einem gescheiterten Health-Gate bleibt das
+  Release liegen (gewollt — man will hineinsehen können), ist aber das **jüngste** Verzeichnis.
+  Der nächste erfolgreiche Deploy hätte es damit zum „vorherigen" Release gemacht; ein Rollback
+  wäre auf genau dem Stand gelandet, der eben nachweislich den Gate gerissen hat. `deploy.sh`
+  markiert es jetzt als `*.failed`, `rollback.sh` schließt solche Verzeichnisse aus. Beides mit
+  einem Test festgehalten.
+- **V13-Drift in `phase3_edge/`.** `phase3_edge/CLAUDE.md` dokumentiert V13 seit dem 2026-07-28
+  als geschlossen — und führt es 114 Zeilen weiter unten in derselben Datei noch als offen; der
+  `[VERIFY]`-Kommentar in `diagnose.sh` trug dieselbe veraltete Aussage („bei Abweichung in
+  Step 7 korrigieren"). Beide Stellen mit datierter Notiz korrigiert. Kein `[VERIFY]` dieser Art
+  ist mehr offen.
+
+**Messung (P5-AD) — löst `[VERIFY]` V10 auf.** `ui_budget.py`, 220 synthetische Items,
+in-process gegen ein temporäres `DATA_ROOT`:
+
+| Messgröße | Gemessen | Ziel | |
 |---|---|---|---|
-| **Plan §4.1** | „Keine Verläufe, keine Schlagschatten außer einem einzigen für Modale" | Verlauf + Innenhighlight + Kante + weicher Schatten auf Bedienelementen; eingelassene Eingabefelder | Die Zurücknahme führte live dazu, dass Knöpfe nicht als Knöpfe erkennbar waren. |
-| **Plan §4.3** | Rail = zwei flache Blöcke (Spaces, Filter) | Rail = Baum (Übersicht · eigener Space ▸ Ordner · verbundene Spaces) + eigene Übersichtsseite | „Filter" sah aus wie eine zweite Top-Ebene neben „Spaces"; tatsächlich ist ein Filter immer an einen Space gebunden. Genau daher kam die Meldung „meine Notizen landen in *Notizen*, nicht in meinem Bereich". |
+| `GET /api/v1/items?limit=50` roh | **22.4 KB** | < 64 KB | ✅ |
+| `GET /api/v1/items?limit=50` gzip | **1.2 KB** | < 12 KB | ✅ |
+| `GET /api/v1/items/{id}` typisch | **0.6 KB** | < 8 KB | ✅ |
+| `app.js` + `app.css` + Font | **54.8 KB** | < 250 KB | ✅ (js 14.6 / css 6.3 / Font 33.9) |
+| Erstaufruf `/ui/` bis interaktiv | **58.2 KB** | < 400 KB | ✅ |
 
-Unverändert bleiben: Farbtoken, Typografie (§4.2), Versionsband (§4.4), Fokusring und
-120-ms-Bewegungsregel (§4.6), P5-U (kein WYSIWYG), P5-Y (kein serverseitiges Rendern), P5-W
-(keine Mobilversion). `docs/concepts/phase5_ui_plan.md` bleibt als 📕-Snapshot **unverändert** —
-dieselbe Handhabung wie beim §1.2-Widerspruch am 2026-08-03.
+Alle fünf im Korridor, mit großem Abstand. **Was die letzte Zahl NICHT ist:** ein
+Browser-Messwert. Sie summiert, was ein frischer Browser laden muss (`app.html` + statische
+Dateien gzip + die drei Bootstrap-Antworten `/api/v1/{me,meta,overview}`, die `init()` in genau
+dieser Reihenfolge holt) — ohne Verbindungsaufbau, TLS-Handshake und HTTP-Header. Eine
+Nachbildung, ehrlich benannt, keine Labormessung.
 
-**Die elf Meldungen des Nikingers und was daraus wurde:**
-1. *Keine Bestätigung beim Speichern* → Statuszeile `#toast` (§4.5 sah sie schon für „Dienst nicht
-   erreichbar" vor) nach jedem Schreibvorgang, mit Versionsnummer: „Gespeichert · v11".
-2. *Editor lässt sich nicht schließen* → `× Schließen` in der Kopfleiste, `Esc`, und die
-   Übersicht-Schaltfläche; bei ungespeicherten Änderungen erst eine Rückfrage.
-3. *Undurchsichtig, wo was hinkommt* → zwei beschriftete Paneele mit **verschiedenen Farben**:
-   „Text (Markdown)" kühl (`--panel-body`), „Kopfdaten (YAML-Frontmatter)" warm (`--panel-meta`),
-   zugeklappt vorbelegt (`<details>`, klappt also auch ohne JS) mit Zusammenfassungszeile und dem
-   Hinweis, dass diese Felder in der Regel ein verbundenes Claude pflegt.
-4. *„Ich kann in Fabis Space anlegen"* → **echter Fund, UI-seitig.** Der Server war immer korrekt
-   (`_items_post()` liest nie ein `space` aus dem Body, P5-A), aber die UI zeigte „+" und „Erste
-   Notiz anlegen" auch im fremden Space. Jetzt: Nur-lesen-Balken über der Liste, und die
-   Bedienelemente werden **aus dem DOM ausgehängt** (siehe eigener Fund 7 unten).
-5. *Eigene Notizen landen „in Notizen"* → strukturell durch den Baum gelöst; zusätzlich springt
-   der aktive Ordner nach dem Anlegen dorthin, wo das neue Item tatsächlich liegt.
-6. *UI-Umbau (Übersicht + Spaces als Überordner)* → umgesetzt, `GET /api/v1/overview` speist
-   Kacheln, „Zuletzt benutzt" und die Zähler-Plaketten im Baum.
-7. *Zu wenig Reaktion* → Toasts, Zähler im Baum nach jedem Schreibvorgang aktualisiert, aktiver
-   Pfad sichtbar, „Speichern" deaktiviert wenn es nichts zu speichern gibt.
-8. *Login-Seite unverändert* → alle sechs Seiten aus `pages.py` tragen jetzt die Karte
-   `.auth`/`.auth-card`. **Ursache war nicht Faulheit, sondern eine Lücke:** die Seiten luden
-   `app.css`, benutzten daraus aber keine einzige Klasse — ein Stylesheet-Link ohne Markup sieht
-   im Diff nach Gestaltung aus und ist keine. `test_pages_markup.py` hält das jetzt fest.
-9. *3D/Skeuomorphismus* → siehe Revision §4.1 oben.
-10. *Verschiedene Farben für Text- und YAML-Feld* → siehe Punkt 3.
-11. *Obsidian-artige Graph-Ansicht* → **Nikinger-Entscheidung: zurückgestellt.** Die Übersicht
-    ist so gebaut, dass sie später als weitere Kachel eingehängt werden kann.
+**`[SEAM]` Blue/Green (P5-AC), dokumentiert statt gebaut:** `deploy.sh` liest den Zielport aus
+**einer** Variablen (`SHAREFYX_PORT`) und benutzt sie an **einer** Stelle (der Health-Gate-URL).
+Der spätere Weg wäre eine Template-Unit `sharefyx-mcp@.service` plus Zielwechsel über
+`tailscale serve`/`funnel`. **Die Bedingung, unter der das überhaupt sinnvoll wird:** ab dann
+müssen alle Schemaänderungen expand/contract-fähig sein, weil zwei Farben dieselbe
+`auth.sqlite3`, denselben Index und dasselbe Git-Repo teilen. Solange das nicht gilt, wäre
+Blue/Green kein Sicherheitsgewinn, sondern zwei Prozesse, die sich gegenseitig die Daten
+umschreiben.
 
-**Sechs eigene Funde (F1–F6), alle behoben:**
-- **F1** `render_enrollment_page()` setzte den weißen QR-Hintergrund per `style="…"` — `security.py`
-  sendet `style-src 'self'` **ohne** `unsafe-inline`, das blockiert auch Style-Attribute. Die
-  Regel griff also nie: ein Fix, der wie einer aussah. Jetzt `class="qr-frame"`, mit Test.
-- **F2** `window.alert`/`window.confirm` an fünf Stellen → eigener `#confirm-dialog` und Toasts.
-- **F3** Nach dem Archivieren blieb das Item im Editor stehen, obwohl es aus der Liste
-  verschwunden war → Editor schließt sich, Toast bestätigt.
-- **F4** Der Leerzustand sagte immer „Keine Notizen in diesem Space", auch bei einer Suche ohne
-  Treffer → drei unterschiedene Zustände (§4.5 verlangt das ausdrücklich).
-- **F5** Filter-Chips wurden nur im Leerzustand gerendert und waren nicht entfernbar; `.chip__remove`
-  war totes CSS → Such-Chip immer sichtbar und entfernbar.
-- **F6** „Speichern" war immer aktiv → **das ist die Ursache des `v10`-Erlebnisses**, nicht nur die
-  fehlende Bestätigung. Ohne echte Änderung ist der Knopf jetzt deaktiviert (und sieht auch so aus).
-- **F7 — Advisor-Fund vor dem Commit, der schwerwiegendste der Session (Vorbestand aus Step 7).**
-  Alle drei Schreibpfade adressierten das Item über `state.selectedId`, nahmen die Version aber aus
-  `state.editingSnapshot`. `selectItem()` setzt `selectedId` **sofort**, `editingSnapshot` erst
-  wenn die Antwort da ist — dazwischen liegt ein Fenster, in dem beide zu verschiedenen Items
-  gehören. Ein `Strg+S` in diesem Moment schriebe den Inhalt von Item A unter der Kennung von Item
-  B, und wenn beide Versionen zufällig gleich sind, **ohne Konflikt**: ein stiller Überschreiber,
-  genau das, was Hard Rule 3 verbietet — nur clientseitig herbeigeführt, wo der Server nichts
-  merken kann. Ein zweiter Pfad kam **erst durch Step 7b** hinzu: über „Zuletzt benutzt" lässt sich
-  ein fremdes Item öffnen, ohne den Editor vorher zu verlassen; `showReadonlyItem()` hängte den
-  Editor zwar aus, setzte aber weder `detailEditorEl.hidden = true` noch
-  `state.editingSnapshot = null` — und `hidden` überlebt das Aushängen, der `Strg+S`-Wächter blieb
-  also scharf. Behoben: alle drei Schreibaufrufe adressieren über `state.editingSnapshot.id`
-  (Kennung und Version stammen damit beweisbar aus demselben Lesevorgang), plus die zwei fehlenden
-  Zeilen in `showReadonlyItem()`. **Gegenprobe gefahren, nicht nur behauptet:** die jsdom-Prüfung
-  „Strg+S bei offenem fremden Item schreibt nicht" wurde gegen eine Kopie mit zurückgenommenem Fix
-  laufen gelassen — dort **ein** Schreibaufruf, mit Fix **null**.
+**Verifiziert:** `pytest -q` → **570/570 grün** (549 vorher, +21: 15 `test_deploy_scripts.py`
+neu, +6 `test_units.py`). `pyflakes` und `bash -n` über alle neuen/geänderten Dateien sauber.
+`deploy.sh`/`rollback.sh` **real gefahren** gegen ein Wegwerf-Layout mit gestubbtem
+`systemctl`/`curl` und einem echten kleinen Git-Repo als Quelle — beide Fehlschlagpfade (rote
+Tests, gerissener Health-Gate) inklusive Prüfung, wohin der Symlink danach zeigt.
+`authbackup.sh`/`restore_auth_check.sh` real gegen eine echte kleine SQLite-Datei (Retention,
+`0600`, Zeilenzählung). `install_units.sh` hermetisch gegen eine Wegwerf-Kopie mit umgebogenem
+Ziel — alle acht Units ohne unaufgelösten Platzhalter. `git diff --stat` auf `storage/`,
+`mcpserver/{tools,permissions,server}.py` bleibt **leer** (Akzeptanzkriterium 18).
 
-**Zwei Funde, die über die Meldungen hinausgehen:**
-- **Vierter Ordner „Erledigt".** Die drei Ordner des Mockups decken `STATUS_VALUES["task"]` nicht
-  ab: eine auf `done` gesetzte Aufgabe fiel durch alle drei und war in der Oberfläche nirgends
-  mehr auffindbar, bis jemand sie archivierte. `_BUCKETS` hat jetzt vier Einträge; ein Test hält
-  fest, dass jeder Zähler exakt so viele Items meint, wie die Liste beim Klick zeigt.
-- **Akzeptanzkriterium 12 war bisher nur halb erfüllt.** Der Step-7-Session-Block behauptet, für
-  fremde Items würden „keine Editor-Elemente überhaupt gerendert" — tatsächlich standen Editor,
-  „+"-Knopf und Anlegen-Dialog permanent in `app.html` und waren nur `hidden`, mit DevTools also
-  auffindbar. Kriterium 12 sagt wörtlich „**ohne** Schreib-Bedienelemente **im DOM**". `app.js ::
-  detachable()` hängt diese drei Teilbäume jetzt wirklich aus dem Dokument aus und später wieder
-  ein; die jsdom-Simulation prüft beide Richtungen. **Korrektur an der Step-7-Zeile der
-  Modultabelle, nicht am Step-7-Block selbst** (der ist rotiert und bleibt verbatim).
+Ein Test verdient eine eigene Erwähnung, weil er über die im Plan genannten hinausgeht:
+`test_every_placeholder_in_every_unit_is_known_to_the_install_script` prüft **allgemein**, dass
+kein `__FOO__` in irgendeiner Unit dem Installationsskript unbekannt ist. Ohne ihn hätte die
+nächste Unit mit einem neuen Platzhalter erst beim `sudo install_units.sh` auf der echten
+Maschine einen Abbruch erzeugt — und zwar für **alle** Units, nicht nur die neue.
 
-**Neuer Endpunkt `GET /api/v1/overview`** (wie `/api/v1/meta` in Step 7 in keiner Plan-Routentabelle):
-je sichtbarem Space die vier Bucket-Zähler und die fünf zuletzt geänderten Items. Die Arbeit liegt
-bewusst serverseitig — der Plan lässt JavaScript ungetestet, Python nicht. Kein LLM, keine Deutung,
-nur Zählen und Sortieren; das Kernprinzip „der Server ist dumm" bleibt gewahrt. `GET /api/v1/meta`
-gibt zusätzlich `buckets` heraus, damit `app.js` das Ordnervokabular nicht ein zweites Mal
-definiert. `recent` trägt **kein** `snippet`: die Übersicht ist die erste Fläche, die mehrere
-Spaces nebeneinander zeigt, ohne dass man bewusst „in einen fremden Space gewechselt" ist — dort
-gehört fremder Fließtext nicht hin (Rule 4 dem Geiste nach). **Nebenwirkung, damit sie niemand
-sucht:** `GET /api/v1/spaces` hat damit keinen Aufrufer mehr in `app.js` (`init()` geht
-`/me` → `/meta` → `/overview`; `/overview` liefert die Space-Liste mit). Der Endpunkt bleibt —
-er ist Teil des §3.1-Vertrags und weiterhin getestet, nur eben nicht mehr von der eigenen
-Oberfläche benutzt.
+**Advisor:** in dieser Session **nicht erreichbar** („temporarily overloaded", beim Review vor
+dem Commit erneut versucht) — anders als in Step 7b, wo er mit F7 den schwersten Fund beisteuerte.
+Ersatz: der dokumentierte Fallback (`pytest` + `pyflakes` + `bash -n` + echte Probeläufe aller
+Skripte) plus ein gezielter Selbst-Review der riskantesten Stellen, der zwei Dinge ergab, beide
+behoben: (1) beim **allerersten** Deploy gibt es kein vorheriges Release, `rollback.sh` bricht
+dann korrekt ab — die Meldung sagt jetzt warum, und der Kommentar erklärt, weshalb das kein
+Betriebsproblem ist (vor dem Cutover zeigt die Unit noch aufs Arbeitsverzeichnis; genau deshalb
+steht der erste Deploy im Runbook **vor** dem Cutover). (2) `test_deploy_script_aborts_when_
+tests_fail` scheitert in Wahrheit daran, dass im Wegwerf-Release gar kein `pytest` installiert
+ist, nicht an einem absichtlich roten Test — der Docstring behauptete das Gegenteil und sagt es
+jetzt geradeheraus. Die Aussage des Tests bleibt gültig: `deploy.sh` unterscheidet nicht zwischen
+„Test rot" und „Testlauf nicht durchführbar", und beides muss denselben Abbruch auslösen.
 
-**Verifiziert:** `pytest -q` (Repo-Wurzel) → **549/549 grün** (516 vorher, +33: 7 `test_overview.py`
-+ 24 `test_pages_markup.py` (3 Aussagen × 8 Seiten) + 1 `test_meta.py` + 1 `test_static_routes.py`).
-`pyflakes` sauber, `node --check app.js` sauber. `scripts/ui_smoke.py` → **12/12** (die
-Seed-Suchregex musste auf das neue Klassen-Markup nachgezogen werden, gleiche Anpassung wie in
-`test_invite_enroll.py` — beide Stellen mit datierter Notiz). `git diff --stat` auf `storage/`,
-`mcpserver/tools.py`/`permissions.py`/`server.py` bleibt **leer** (Akzeptanzkriterium 18). Eine
-Node/jsdom-Simulation im Scratchpad (nichts davon im Repo) fuhr **53 Prüfungen** über den vollen
-Lebenszyklus — Baum, Übersicht, Anlegen mit Ordnersprung, Dirty-Gating (belegt: drei Klicks auf
-„Speichern" ohne Änderung erzeugen **einen** `PATCH`, nicht drei), Vorschau, Anhängen, Konflikt,
-Schließen mit und ohne Änderungen, fremder Space (fünf Prüfungen auf „nicht im DOM" plus die zwei
-F7-Prüfungen), Suche mit Chip, Archivieren, Passwortdialog inklusive CSRF-Rotation,
-Sitzungsablauf — alle grün. Ein Fehlschlag darin war ein Fehler der Simulation selbst
-(`getElementById` auf einem korrekt ausgehängten Knoten), kein `app.js`-Fund.
+**Manuell (Nikinger — alles, was Realität berührt):**
+1. **Einmalig:** `sudo mkdir -p /opt/sharefyx/releases && sudo chown -R savefyx:savefyx /opt/sharefyx`
+2. Erster Deploy aus dem Arbeitsverzeichnis:
+   `SHAREFYX_RELEASES_DIR=/opt/sharefyx/releases SHAREFYX_CURRENT_LINK=/opt/sharefyx/current
+   phase5_ui/scripts/deploy.sh main`
+3. **Cutover:** `REPO_ROOT=/opt/sharefyx/current` und `VENV=/opt/sharefyx/current/.venv` in
+   `phase3_edge/local.env`, dann `sudo phase3_edge/scripts/install_units.sh` + Restart.
+   **Ab hier ist „Datei ändern + `systemctl restart`" wirkungslos** — es zählt nur noch, was
+   deployt wurde. Escape-Hatch, falls nötig: den `current`-Symlink von Hand auf das
+   Arbeitsverzeichnis zeigen lassen.
+4. **Abnahmezeile 16:** Health-Endpunkt absichtlich unerreichbar machen (`SHAREFYX_PORT` auf
+   einen toten Port), deployen, beobachten, dass automatisch zurückgerollt wird.
+5. `sudo systemctl enable --now sharefyx-authbackup.timer`, danach `restore_auth_check.sh`
+   **selbst ausführen** — der Nachweis ist der Lauf, nicht das Skript (Lehre aus P3 Zeile 13).
+6. Staging hochziehen, `tailscale serve` prüfen — **V36:** nicht derselbe Port wie der Funnel.
+   Achtung: Staging hat eine **eigene** `auth.sqlite3`, die Produktivkonten gelten dort nicht.
+7. Unabhängig von Step 8 weiterhin offen: **Abnahmezeile 6** — zweiter Browser (privates
+   Fenster/zweites Profil) angemeldet lassen, Passwort ändern, prüfen dass genau der abgemeldet
+   wird und die aktuelle Sitzung weiterläuft.
 
-**Advisor:** beim ersten Versuch (vor dem Bauen) nicht erreichbar („temporarily overloaded",
-dasselbe Bild wie in der Step-6/7-Session), beim Review **vor dem Commit** dann erreichbar — und
-er fand mit **F7** den schwerwiegendsten Fehler der Session, den weder `pytest` noch die
-jsdom-Simulation in ihrer damaligen Fassung erreicht hatten (die Simulation prüfte
-DOM-Anwesenheit, betrat aber nie den Zustand „eigenes Item mit lebendem `editingSnapshot` →
-fremdes Item öffnen"). Zwei kleinere Advisor-Punkte ebenfalls übernommen: die Größenangabe für
-Root-`CLAUDE.md` in `docs/INDEX.md` (26 → 32 KB — genau die Drift-Kategorie, die diese Datei
-schon fünfmal getroffen hat) und der Hinweis, dass `/api/v1/spaces` keinen UI-Aufrufer mehr hat.
-
-**Manuell (Nikinger, nicht Teil dieses Steps):**
-- `sudo phase3_edge/scripts/install_units.sh && sudo systemctl restart sharefyx-mcp` — **Schritt
-  null**, sonst liefert der Dienst weiter den alten Build.
-- Sichtprüfung im echten Browser (Layout/Fokus/Tastatur verhalten sich in jsdom nicht identisch
-  zu Chrome): Übersicht, Baum, plastische Bedienelemente, die zwei Panelfarben, Login-Seite.
-- Fremder Space in DevTools: **kein** Schreib-Bedienelement im DOM (Akzeptanzkriterium 12).
-- **Block-A-Abnahmezeilen 5 und 6** sind jetzt ohne DevTools-Behelf testbar: `⚙ Konto` →
-  Passwort ändern ohne `systemctl restart`, neuer Login sofort gültig (Zeile 5); danach fordert
-  der Connector neue Autorisierung, eine zweite UI-Sitzung ist beendet, die aktuelle läuft weiter
-  (Zeile 6).
-
-**Nächster Schritt (konkret):** Zeilen 5/6 live abnehmen (siehe oben), danach Step 8 (Betrieb:
-Deploy, Rollback, Staging, Auth-Backup, Messung — Plan §5 Step 8).
-
----
+**Nächster Schritt (konkret):** die sieben Punkte oben, dann Step 9 (gemeinsame Live-Abnahme
+beider Nutzer + Handover, Plan §5 Step 9 / P5-AE).

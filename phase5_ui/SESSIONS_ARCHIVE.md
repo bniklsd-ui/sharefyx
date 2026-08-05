@@ -4,10 +4,153 @@ purpose: Archiv älterer Session-stopped-Blöcke aus phase5_ui/CLAUDE.md, newest
 read-when: Audit vergangener Sessions dieser Phase; NICHT für normalen Session-Start
 detail: L3
 up: CLAUDE.md
-updated: 2026-08-05 (achter Block archiviert, Rotation nach Step 7b)
+updated: 2026-08-05 (neunter Block archiviert, Rotation nach Step 8)
 ---
 
 # Session-Archiv — Phase 5 Web-UI, REST-API, Auth-Selbstverwaltung
+
+## Session stopped — 2026-08-05, dritter Nachtrag (Step 7b: UI-Überarbeitung nach Live-Feedback)
+
+**Ergebnis:** Der Nikinger hat Step 6/7 live benutzt und elf Punkte gemeldet; alle sind
+umgesetzt, dazu sechs eigene Funde. Die Oberfläche hat jetzt einen Navigationsbaum statt zweier
+flacher Rail-Blöcke, eine Übersichtsseite, plastische Bedienelemente, zwei farblich getrennte
+Editor-Paneele, Rückmeldung nach jedem Schreibvorgang und gestaltete Auth-Seiten. Ausführungsplan
+dieser Session: `/home/savefyx/.claude/plans/merry-tickling-elephant.md`.
+
+**Zwei gelockte Entscheidungen revidiert — Nikinger-Entscheidung 2026-08-05, nicht still:**
+
+| Gelockt | Bisher | Jetzt | Grund |
+|---|---|---|---|
+| **Plan §4.1** | „Keine Verläufe, keine Schlagschatten außer einem einzigen für Modale" | Verlauf + Innenhighlight + Kante + weicher Schatten auf Bedienelementen; eingelassene Eingabefelder | Die Zurücknahme führte live dazu, dass Knöpfe nicht als Knöpfe erkennbar waren. |
+| **Plan §4.3** | Rail = zwei flache Blöcke (Spaces, Filter) | Rail = Baum (Übersicht · eigener Space ▸ Ordner · verbundene Spaces) + eigene Übersichtsseite | „Filter" sah aus wie eine zweite Top-Ebene neben „Spaces"; tatsächlich ist ein Filter immer an einen Space gebunden. Genau daher kam die Meldung „meine Notizen landen in *Notizen*, nicht in meinem Bereich". |
+
+Unverändert bleiben: Farbtoken, Typografie (§4.2), Versionsband (§4.4), Fokusring und
+120-ms-Bewegungsregel (§4.6), P5-U (kein WYSIWYG), P5-Y (kein serverseitiges Rendern), P5-W
+(keine Mobilversion). `docs/concepts/phase5_ui_plan.md` bleibt als 📕-Snapshot **unverändert** —
+dieselbe Handhabung wie beim §1.2-Widerspruch am 2026-08-03.
+
+**Die elf Meldungen des Nikingers und was daraus wurde:**
+1. *Keine Bestätigung beim Speichern* → Statuszeile `#toast` (§4.5 sah sie schon für „Dienst nicht
+   erreichbar" vor) nach jedem Schreibvorgang, mit Versionsnummer: „Gespeichert · v11".
+2. *Editor lässt sich nicht schließen* → `× Schließen` in der Kopfleiste, `Esc`, und die
+   Übersicht-Schaltfläche; bei ungespeicherten Änderungen erst eine Rückfrage.
+3. *Undurchsichtig, wo was hinkommt* → zwei beschriftete Paneele mit **verschiedenen Farben**:
+   „Text (Markdown)" kühl (`--panel-body`), „Kopfdaten (YAML-Frontmatter)" warm (`--panel-meta`),
+   zugeklappt vorbelegt (`<details>`, klappt also auch ohne JS) mit Zusammenfassungszeile und dem
+   Hinweis, dass diese Felder in der Regel ein verbundenes Claude pflegt.
+4. *„Ich kann in Fabis Space anlegen"* → **echter Fund, UI-seitig.** Der Server war immer korrekt
+   (`_items_post()` liest nie ein `space` aus dem Body, P5-A), aber die UI zeigte „+" und „Erste
+   Notiz anlegen" auch im fremden Space. Jetzt: Nur-lesen-Balken über der Liste, und die
+   Bedienelemente werden **aus dem DOM ausgehängt** (siehe eigener Fund 7 unten).
+5. *Eigene Notizen landen „in Notizen"* → strukturell durch den Baum gelöst; zusätzlich springt
+   der aktive Ordner nach dem Anlegen dorthin, wo das neue Item tatsächlich liegt.
+6. *UI-Umbau (Übersicht + Spaces als Überordner)* → umgesetzt, `GET /api/v1/overview` speist
+   Kacheln, „Zuletzt benutzt" und die Zähler-Plaketten im Baum.
+7. *Zu wenig Reaktion* → Toasts, Zähler im Baum nach jedem Schreibvorgang aktualisiert, aktiver
+   Pfad sichtbar, „Speichern" deaktiviert wenn es nichts zu speichern gibt.
+8. *Login-Seite unverändert* → alle sechs Seiten aus `pages.py` tragen jetzt die Karte
+   `.auth`/`.auth-card`. **Ursache war nicht Faulheit, sondern eine Lücke:** die Seiten luden
+   `app.css`, benutzten daraus aber keine einzige Klasse — ein Stylesheet-Link ohne Markup sieht
+   im Diff nach Gestaltung aus und ist keine. `test_pages_markup.py` hält das jetzt fest.
+9. *3D/Skeuomorphismus* → siehe Revision §4.1 oben.
+10. *Verschiedene Farben für Text- und YAML-Feld* → siehe Punkt 3.
+11. *Obsidian-artige Graph-Ansicht* → **Nikinger-Entscheidung: zurückgestellt.** Die Übersicht
+    ist so gebaut, dass sie später als weitere Kachel eingehängt werden kann.
+
+**Sechs eigene Funde (F1–F6), alle behoben:**
+- **F1** `render_enrollment_page()` setzte den weißen QR-Hintergrund per `style="…"` — `security.py`
+  sendet `style-src 'self'` **ohne** `unsafe-inline`, das blockiert auch Style-Attribute. Die
+  Regel griff also nie: ein Fix, der wie einer aussah. Jetzt `class="qr-frame"`, mit Test.
+- **F2** `window.alert`/`window.confirm` an fünf Stellen → eigener `#confirm-dialog` und Toasts.
+- **F3** Nach dem Archivieren blieb das Item im Editor stehen, obwohl es aus der Liste
+  verschwunden war → Editor schließt sich, Toast bestätigt.
+- **F4** Der Leerzustand sagte immer „Keine Notizen in diesem Space", auch bei einer Suche ohne
+  Treffer → drei unterschiedene Zustände (§4.5 verlangt das ausdrücklich).
+- **F5** Filter-Chips wurden nur im Leerzustand gerendert und waren nicht entfernbar; `.chip__remove`
+  war totes CSS → Such-Chip immer sichtbar und entfernbar.
+- **F6** „Speichern" war immer aktiv → **das ist die Ursache des `v10`-Erlebnisses**, nicht nur die
+  fehlende Bestätigung. Ohne echte Änderung ist der Knopf jetzt deaktiviert (und sieht auch so aus).
+- **F7 — Advisor-Fund vor dem Commit, der schwerwiegendste der Session (Vorbestand aus Step 7).**
+  Alle drei Schreibpfade adressierten das Item über `state.selectedId`, nahmen die Version aber aus
+  `state.editingSnapshot`. `selectItem()` setzt `selectedId` **sofort**, `editingSnapshot` erst
+  wenn die Antwort da ist — dazwischen liegt ein Fenster, in dem beide zu verschiedenen Items
+  gehören. Ein `Strg+S` in diesem Moment schriebe den Inhalt von Item A unter der Kennung von Item
+  B, und wenn beide Versionen zufällig gleich sind, **ohne Konflikt**: ein stiller Überschreiber,
+  genau das, was Hard Rule 3 verbietet — nur clientseitig herbeigeführt, wo der Server nichts
+  merken kann. Ein zweiter Pfad kam **erst durch Step 7b** hinzu: über „Zuletzt benutzt" lässt sich
+  ein fremdes Item öffnen, ohne den Editor vorher zu verlassen; `showReadonlyItem()` hängte den
+  Editor zwar aus, setzte aber weder `detailEditorEl.hidden = true` noch
+  `state.editingSnapshot = null` — und `hidden` überlebt das Aushängen, der `Strg+S`-Wächter blieb
+  also scharf. Behoben: alle drei Schreibaufrufe adressieren über `state.editingSnapshot.id`
+  (Kennung und Version stammen damit beweisbar aus demselben Lesevorgang), plus die zwei fehlenden
+  Zeilen in `showReadonlyItem()`. **Gegenprobe gefahren, nicht nur behauptet:** die jsdom-Prüfung
+  „Strg+S bei offenem fremden Item schreibt nicht" wurde gegen eine Kopie mit zurückgenommenem Fix
+  laufen gelassen — dort **ein** Schreibaufruf, mit Fix **null**.
+
+**Zwei Funde, die über die Meldungen hinausgehen:**
+- **Vierter Ordner „Erledigt".** Die drei Ordner des Mockups decken `STATUS_VALUES["task"]` nicht
+  ab: eine auf `done` gesetzte Aufgabe fiel durch alle drei und war in der Oberfläche nirgends
+  mehr auffindbar, bis jemand sie archivierte. `_BUCKETS` hat jetzt vier Einträge; ein Test hält
+  fest, dass jeder Zähler exakt so viele Items meint, wie die Liste beim Klick zeigt.
+- **Akzeptanzkriterium 12 war bisher nur halb erfüllt.** Der Step-7-Session-Block behauptet, für
+  fremde Items würden „keine Editor-Elemente überhaupt gerendert" — tatsächlich standen Editor,
+  „+"-Knopf und Anlegen-Dialog permanent in `app.html` und waren nur `hidden`, mit DevTools also
+  auffindbar. Kriterium 12 sagt wörtlich „**ohne** Schreib-Bedienelemente **im DOM**". `app.js ::
+  detachable()` hängt diese drei Teilbäume jetzt wirklich aus dem Dokument aus und später wieder
+  ein; die jsdom-Simulation prüft beide Richtungen. **Korrektur an der Step-7-Zeile der
+  Modultabelle, nicht am Step-7-Block selbst** (der ist rotiert und bleibt verbatim).
+
+**Neuer Endpunkt `GET /api/v1/overview`** (wie `/api/v1/meta` in Step 7 in keiner Plan-Routentabelle):
+je sichtbarem Space die vier Bucket-Zähler und die fünf zuletzt geänderten Items. Die Arbeit liegt
+bewusst serverseitig — der Plan lässt JavaScript ungetestet, Python nicht. Kein LLM, keine Deutung,
+nur Zählen und Sortieren; das Kernprinzip „der Server ist dumm" bleibt gewahrt. `GET /api/v1/meta`
+gibt zusätzlich `buckets` heraus, damit `app.js` das Ordnervokabular nicht ein zweites Mal
+definiert. `recent` trägt **kein** `snippet`: die Übersicht ist die erste Fläche, die mehrere
+Spaces nebeneinander zeigt, ohne dass man bewusst „in einen fremden Space gewechselt" ist — dort
+gehört fremder Fließtext nicht hin (Rule 4 dem Geiste nach). **Nebenwirkung, damit sie niemand
+sucht:** `GET /api/v1/spaces` hat damit keinen Aufrufer mehr in `app.js` (`init()` geht
+`/me` → `/meta` → `/overview`; `/overview` liefert die Space-Liste mit). Der Endpunkt bleibt —
+er ist Teil des §3.1-Vertrags und weiterhin getestet, nur eben nicht mehr von der eigenen
+Oberfläche benutzt.
+
+**Verifiziert:** `pytest -q` (Repo-Wurzel) → **549/549 grün** (516 vorher, +33: 7 `test_overview.py`
++ 24 `test_pages_markup.py` (3 Aussagen × 8 Seiten) + 1 `test_meta.py` + 1 `test_static_routes.py`).
+`pyflakes` sauber, `node --check app.js` sauber. `scripts/ui_smoke.py` → **12/12** (die
+Seed-Suchregex musste auf das neue Klassen-Markup nachgezogen werden, gleiche Anpassung wie in
+`test_invite_enroll.py` — beide Stellen mit datierter Notiz). `git diff --stat` auf `storage/`,
+`mcpserver/tools.py`/`permissions.py`/`server.py` bleibt **leer** (Akzeptanzkriterium 18). Eine
+Node/jsdom-Simulation im Scratchpad (nichts davon im Repo) fuhr **53 Prüfungen** über den vollen
+Lebenszyklus — Baum, Übersicht, Anlegen mit Ordnersprung, Dirty-Gating (belegt: drei Klicks auf
+„Speichern" ohne Änderung erzeugen **einen** `PATCH`, nicht drei), Vorschau, Anhängen, Konflikt,
+Schließen mit und ohne Änderungen, fremder Space (fünf Prüfungen auf „nicht im DOM" plus die zwei
+F7-Prüfungen), Suche mit Chip, Archivieren, Passwortdialog inklusive CSRF-Rotation,
+Sitzungsablauf — alle grün. Ein Fehlschlag darin war ein Fehler der Simulation selbst
+(`getElementById` auf einem korrekt ausgehängten Knoten), kein `app.js`-Fund.
+
+**Advisor:** beim ersten Versuch (vor dem Bauen) nicht erreichbar („temporarily overloaded",
+dasselbe Bild wie in der Step-6/7-Session), beim Review **vor dem Commit** dann erreichbar — und
+er fand mit **F7** den schwerwiegendsten Fehler der Session, den weder `pytest` noch die
+jsdom-Simulation in ihrer damaligen Fassung erreicht hatten (die Simulation prüfte
+DOM-Anwesenheit, betrat aber nie den Zustand „eigenes Item mit lebendem `editingSnapshot` →
+fremdes Item öffnen"). Zwei kleinere Advisor-Punkte ebenfalls übernommen: die Größenangabe für
+Root-`CLAUDE.md` in `docs/INDEX.md` (26 → 32 KB — genau die Drift-Kategorie, die diese Datei
+schon fünfmal getroffen hat) und der Hinweis, dass `/api/v1/spaces` keinen UI-Aufrufer mehr hat.
+
+**Manuell (Nikinger, nicht Teil dieses Steps):**
+- `sudo phase3_edge/scripts/install_units.sh && sudo systemctl restart sharefyx-mcp` — **Schritt
+  null**, sonst liefert der Dienst weiter den alten Build.
+- Sichtprüfung im echten Browser (Layout/Fokus/Tastatur verhalten sich in jsdom nicht identisch
+  zu Chrome): Übersicht, Baum, plastische Bedienelemente, die zwei Panelfarben, Login-Seite.
+- Fremder Space in DevTools: **kein** Schreib-Bedienelement im DOM (Akzeptanzkriterium 12).
+- **Block-A-Abnahmezeilen 5 und 6** sind jetzt ohne DevTools-Behelf testbar: `⚙ Konto` →
+  Passwort ändern ohne `systemctl restart`, neuer Login sofort gültig (Zeile 5); danach fordert
+  der Connector neue Autorisierung, eine zweite UI-Sitzung ist beendet, die aktuelle läuft weiter
+  (Zeile 6).
+
+**Nächster Schritt (konkret):** Zeilen 5/6 live abnehmen (siehe oben), danach Step 8 (Betrieb:
+Deploy, Rollback, Staging, Auth-Backup, Messung — Plan §5 Step 8).
+
+---
 
 ## Session stopped — 2026-08-05, zweiter Nachtrag (Step 7: Editor, Vorschau, Konflikt, Frontmatter-Felder)
 

@@ -1,0 +1,27 @@
+[Unit]
+Description=Sharefyx Auth-Backup (verschlüsselte auth.sqlite3-Generation + Verifikation)
+Documentation=file://__REPO_ROOT__/phase5_ui/CLAUDE.md
+
+[Service]
+Type=oneshot
+# Bewusst OHNE User=/Group= — läuft als root. Zwei Gründe: die auth.sqlite3 liegt im
+# StateDirectory des MCP-Dienstes (0700), und `systemd-creds encrypt --with-key=host` liest
+# /var/lib/systemd/credential.secret (0600, root). Ein unprivilegierter Lauf könnte weder das
+# eine lesen noch das andere verschlüsseln.
+WorkingDirectory=__REPO_ROOT__
+Environment=SHAREFYX_AUTH_DB=/var/lib/sharefyx/auth.sqlite3
+Environment=SHAREFYX_AUTH_BACKUP_DIR=/var/lib/sharefyx-backup/auth
+Environment=SHAREFYX_AUTH_BACKUP_KEEP=7
+ExecStart=__REPO_ROOT__/phase5_ui/scripts/authbackup.sh
+# PrivateTmp: die einzige Stelle, an der die Datenbank im Klartext auf der Platte liegt, ist ein
+# mktemp-Verzeichnis in /tmp. Mit PrivateTmp sieht kein anderer Dienst es überhaupt.
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/sharefyx-backup
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX
+MemoryDenyWriteExecute=true
+SystemCallFilter=@system-service

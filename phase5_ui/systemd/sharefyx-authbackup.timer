@@ -1,0 +1,12 @@
+[Unit]
+Description=Tägliches Sharefyx-Auth-Backup (verschlüsselte auth.sqlite3-Generation)
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+# Versetzt gegenüber sharefyx-backup.timer (dort ebenfalls 900s): beide zu Tagesbeginn, aber
+# nicht zwingend gleichzeitig — das Auth-Backup liest dieselbe Platte wie das DATA_ROOT-Bundle.
+RandomizedDelaySec=900
+
+[Install]
+WantedBy=timers.target

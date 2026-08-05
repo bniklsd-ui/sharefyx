@@ -1,0 +1,50 @@
+[Unit]
+Description=Sharefyx Staging-Instanz (zweiter Prozess, geklonter DATA_ROOT, nur im Tailnet)
+Documentation=file://__REPO_ROOT__/phase5_ui/CLAUDE.md
+After=network-online.target tailscaled.service
+Wants=network-online.target
+
+# ERREICHBARKEIT — die wichtigste Zeile dieser Datei:
+# Diese Instanz wird ausschließlich über `tailscale serve` freigegeben (tailnet-intern, nur für
+# angemeldete Geräte), NIEMALS über `tailscale funnel` (öffentliches Internet). Die Unit selbst
+# bindet deshalb wie die Produktivinstanz nur auf 127.0.0.1 und ruft an keiner Stelle `tailscale
+# funnel` auf — die Freigabe ist ein bewusster, separater Handgriff des Nikingers.
+# [VERIFY] V36: Serve und Funnel dürfen denselben Port nicht gleichzeitig belegen; Staging
+# bekommt deshalb einen eigenen (__STAGING_PORT__, Vorschlag 8766). Live zu bestätigen.
+#
+# EIGENE AUTH-DATENBANK: `StateDirectory=sharefyx-staging` heißt, dass hier eine eigene
+# `auth.sqlite3` entsteht — Staging kennt die Produktivkonten NICHT. Ein Konto dort muss über
+# `authctl.py invite` separat angelegt werden. Das ist Absicht: eine Staging-Instanz, die
+# Produktivsitzungen und Produktiv-Token-Familien teilt, ist keine getrennte Instanz.
+
+[Service]
+Type=exec
+User=savefyx
+Group=savefyx
+WorkingDirectory=__REPO_ROOT__
+Environment=SPACE_DATA_ROOT=__STAGING_DATA_ROOT__
+Environment=SPACE_HOST=127.0.0.1
+Environment=SPACE_PORT=__STAGING_PORT__
+Environment=SPACE_LOG_LEVEL=INFO
+Environment=SPACE_ALLOWED_HOSTS=__ALLOWED_HOSTS__
+Environment=SPACE_AUTH_MODE=__AUTH_MODE__
+Environment=SPACE_PUBLIC_BASE_URL=__STAGING_BASE_URL__
+StateDirectory=sharefyx-staging
+StateDirectoryMode=0700
+LoadCredentialEncrypted=auth-dek:/etc/sharefyx/auth-dek.cred
+ExecStart=__VENV__/bin/python __REPO_ROOT__/phase2_mcp/scripts/serve.py
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=__STAGING_DATA_ROOT__
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+MemoryDenyWriteExecute=true
+SystemCallFilter=@system-service
+
+[Install]
+WantedBy=multi-user.target

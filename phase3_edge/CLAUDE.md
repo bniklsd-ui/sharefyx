@@ -277,9 +277,13 @@ curl -s https://<node>.<tailnet>.ts.net/health
    Abnahmeprotokoll §1). ✅ erst nach einem beobachteten echten Reboot (Statusglyphen-Definition
    in `ROADMAP.md`: ✅ = „live-verifiziert").
 
-**Offene `[VERIFY]`, die nur unter echter Infrastruktur schließen:** `diagnose.sh` Prüfung 4s
-Grep-Muster gegen `tailscale funnel status` (nie gegen ein echtes Tailscale getestet, siehe
-„Umgebungsstand"). **V9 geschlossen** (2026-07-27, zweite Live-Abnahme-Session):
+**[2026-08-05 Korrektur, P5 Step 8]:** dieser Absatz führte `diagnose.sh` Prüfung 4s Grep-Muster
+noch als offenes `[VERIFY]`, obwohl **V13 114 Zeilen weiter oben in derselben Datei seit dem
+2026-07-28 als geschlossen dokumentiert ist** — zwei Aussagen über denselben Sachverhalt in
+einem Dokument, die sich widersprechen. Der Vermerk im Skript selbst trug dieselbe veraltete
+Aussage und ist im selben Zug korrigiert. **Es ist damit kein `[VERIFY]` dieser Art mehr offen.**
+
+**V9 geschlossen** (2026-07-27, zweite Live-Abnahme-Session):
 `ProtectHome=read-only` + `ReadWritePaths` erlaubt Git-Commits im `DATA_ROOT` — live bestätigt,
 der `append_to_item`-Aufruf aus Zeile 2 der Abnahme erzeugte exakt zeitgleich (20:39:58) den
 Top-Commit `a400221c` im `DATA_ROOT`. Details: `docs/concepts/P3_ABNAHME_2026-07-27.md` Befund B5.
