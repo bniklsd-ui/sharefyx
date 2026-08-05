@@ -16,6 +16,18 @@ BACKUP_SCRIPT = REPO_ROOT / "phase3_edge" / "scripts" / "backup_data_root.sh"
 RESTORE_SCRIPT = REPO_ROOT / "phase3_edge" / "scripts" / "restore_check.sh"
 
 
+def _clean_environ() -> dict[str, str]:
+    """Umgebung ohne die `SHAREFYX_*`-Variablen des Aufrufers.
+
+    **[2026-08-05 Nachtrag, P5 Step 8]** Diese Datei erbte bisher `os.environ` und setzte nur
+    die zwei Variablen, die sie selbst braucht — ein exportiertes `SHAREFYX_BACKUP_KEEP` aus der
+    Shell hätte damit die Retention-Tests still verfälscht. Im Schwesterskript
+    (`phase5_ui/tests/test_deploy_scripts.py`) ist genau diese Kategorie live eskaliert: dort
+    schlug ein exportiertes `SHAREFYX_SYSTEMCTL` durch und die Testsuite startete den
+    Produktivdienst neu. Hier vorsorglich geschlossen, bevor es dieselbe Datei trifft."""
+    return {k: v for k, v in os.environ.items() if not k.startswith("SHAREFYX_")}
+
+
 def _init_repo_with_commit(path: Path) -> None:
     path.mkdir(parents=True, exist_ok=True)
     subprocess.run(["git", "init", "-q", str(path)], check=True)
@@ -27,7 +39,7 @@ def _init_repo_with_commit(path: Path) -> None:
 
 
 def _run_backup(data_root: Path, backup_dir: Path, keep: str | None = None) -> subprocess.CompletedProcess:
-    env = dict(os.environ)
+    env = _clean_environ()
     env["SHAREFYX_DATA_ROOT"] = str(data_root)
     env["SHAREFYX_BACKUP_DIR"] = str(backup_dir)
     if keep is not None:
@@ -41,7 +53,7 @@ def _run_backup(data_root: Path, backup_dir: Path, keep: str | None = None) -> s
 
 
 def _run_restore(data_root: Path, backup_dir: Path) -> subprocess.CompletedProcess:
-    env = dict(os.environ)
+    env = _clean_environ()
     env["SHAREFYX_DATA_ROOT"] = str(data_root)
     env["SHAREFYX_BACKUP_DIR"] = str(backup_dir)
     return subprocess.run(
@@ -121,7 +133,7 @@ def test_backup_fails_and_cleans_up_on_corrupt_bundle(tmp_path, data_root):
     )
     fake_git.chmod(0o755)
 
-    env = dict(os.environ)
+    env = _clean_environ()
     env["SHAREFYX_DATA_ROOT"] = str(data_root)
     env["SHAREFYX_BACKUP_DIR"] = str(backup_dir)
     env["PATH"] = f"{fake_bin}:{env['PATH']}"

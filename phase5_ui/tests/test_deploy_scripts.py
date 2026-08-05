@@ -105,8 +105,26 @@ def layout(tmp_path):
     return releases, tmp_path / "current"
 
 
+def _clean_environ() -> dict[str, str]:
+    """Die Umgebung **ohne** jede `SHAREFYX_*`/`SFX_*`-Variable des Aufrufers.
+
+    Fund vom 2026-08-05, live und schmerzhaft: `dict(os.environ)` erbte die Konfiguration der
+    Shell, aus der `pytest` gestartet wurde. Der Nikinger hatte für den ersten echten Deploy
+    `SHAREFYX_SYSTEMCTL="sudo systemctl"` exportiert — die Tests bauten damit ein `deploy.sh`,
+    das **`sudo systemctl restart sharefyx-mcp` auf der echten Maschine** aufrief. Das
+    PATH-Stubbing schützt davor NICHT: `sudo` findet das echte Binary über `secure_path`, nicht
+    über den vorangestellten Stub-Pfad. Da der `sudo`-Zeitstempel vom vorherigen `sudo -v` noch
+    galt, brauchte es nicht einmal ein Terminal — der Produktivdienst wurde im Testlauf
+    dutzendfach neu gestartet.
+
+    Ein Test, dessen Verhalten von der Shell des Aufrufers abhängt, ist kein Test. Und dieselbe
+    Regel, die für `DATA_ROOT` und Netz gilt („nie gegen die Realität"), gilt hier für die
+    Prozesssteuerung."""
+    return {k: v for k, v in os.environ.items() if not k.startswith(("SHAREFYX_", "SFX_"))}
+
+
 def _env(stubs: Path, tmp_path: Path, **extra: str) -> dict[str, str]:
-    env = dict(os.environ)
+    env = _clean_environ()
     env["PATH"] = f"{stubs}{os.pathsep}{env['PATH']}"
     env["SFX_SYSTEMCTL_LOG"] = str(tmp_path / "systemctl.log")
     env["SFX_CURL_CODES"] = str(tmp_path / "codes")
@@ -468,6 +486,27 @@ def test_systemctl_call_is_escalatable_in_both_scripts(stubs, tmp_path, layout, 
         stubs, tmp_path, releases, current, source_repo, SHAREFYX_SYSTEMCTL=str(marker)
     ).returncode != 0
     assert (tmp_path / "systemctl.log").read_text(encoding="utf-8").count("ESKALIERT restart") >= 2
+
+
+def test_harness_ignores_ambient_sharefyx_configuration(monkeypatch, stubs, tmp_path):
+    """Regressionstest zum Fund vom 2026-08-05 (siehe `_clean_environ()`): exportierte
+    `SHAREFYX_*`-Variablen des Aufrufers dürfen **niemals** in einen Testlauf durchschlagen.
+    `SHAREFYX_SYSTEMCTL` ist der gefährlichste Fall — damit griffe der Test am Stub vorbei auf
+    das echte `systemctl` und würde den Produktivdienst neu starten."""
+    monkeypatch.setenv("SHAREFYX_SYSTEMCTL", "sudo systemctl")
+    monkeypatch.setenv("SHAREFYX_RELEASES_DIR", "/opt/sharefyx/releases")
+    monkeypatch.setenv("SHAREFYX_KEEP_RELEASES", "99")
+    monkeypatch.setenv("SFX_CURL_CODES", "/etc/passwd")
+
+    env = _env(stubs, tmp_path, SHAREFYX_RELEASES_DIR=str(tmp_path / "releases"))
+
+    assert env["SHAREFYX_RELEASES_DIR"] == str(tmp_path / "releases")
+    assert "SHAREFYX_SYSTEMCTL" not in env, "ambientes systemctl-Override würde den echten Dienst treffen"
+    assert "SHAREFYX_KEEP_RELEASES" not in env
+    assert env["SFX_CURL_CODES"] == str(tmp_path / "codes")
+    # Alles, was übrig bleibt, muss der Test selbst gesetzt haben.
+    ours = {"SHAREFYX_RELEASES_DIR", "SFX_SYSTEMCTL_LOG", "SFX_CURL_CODES"}
+    assert {k for k in env if k.startswith(("SHAREFYX_", "SFX_"))} == ours
 
 
 def test_step8_scripts_have_no_hardcoded_paths():

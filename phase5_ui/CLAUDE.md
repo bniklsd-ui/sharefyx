@@ -241,6 +241,41 @@ ist, nicht an einem absichtlich roten Test — der Docstring behauptete das Gege
 jetzt geradeheraus. Die Aussage des Tests bleibt gültig: `deploy.sh` unterscheidet nicht zwischen
 „Test rot" und „Testlauf nicht durchführbar", und beides muss denselben Abbruch auslösen.
 
+**Nachtrag 2026-08-05, beim ersten echten Deploy des Nikingers — der schwerwiegendste Fund
+dieses Steps, und er stammt aus meinem eigenen Testcode:**
+
+Der Deploy brach ab („Tests im Release rot"), das Release wurde gelöscht, der Symlink blieb
+unberührt — **das Sicherheitsnetz hat exakt so funktioniert, wie es soll.** Die Ursache dahinter
+war aber keine echte Regression:
+
+`test_deploy_scripts.py :: _env()` baute die Testumgebung aus `dict(os.environ)` und setzte nur
+die Variablen, die es selbst braucht. Der Nikinger hatte für den Deploy
+`SHAREFYX_SYSTEMCTL="sudo systemctl"` **exportiert** — diese Variable rutschte damit in jeden
+Testlauf durch. Die Tests bauten also ein `deploy.sh`, das `sudo systemctl restart sharefyx-mcp`
+**auf der echten Maschine** aufrief. Das PATH-Stubbing schützt davor nicht: `sudo` findet das
+echte Binary über `secure_path`, nicht über den vorangestellten Stub-Pfad. Und weil unmittelbar
+vorher ein `sudo -v` gelaufen war, brauchte es nicht einmal ein Terminal.
+
+**Nachgeprüft, nicht vermutet:** `journalctl` zählte im Testfenster **52** Start-/Stop-Zeilen der
+Produktiv-Unit. Die Testsuite hat den laufenden Dienst dutzendfach neu gestartet. Folgenlos
+(ein Neustart ist harmlos, `/health` und `/ui/login` antworten wieder mit 200), aber es hätte nie
+passieren dürfen: dieselbe Regel, die für `DATA_ROOT` und Netz gilt — **nie gegen die Realität** —
+gilt für die Prozesssteuerung genauso.
+
+Behoben in **beiden** betroffenen Testdateien über ein gemeinsames `_clean_environ()`, das jede
+`SHAREFYX_*`/`SFX_*`-Variable des Aufrufers verwirft:
+`phase5_ui/tests/test_deploy_scripts.py` (dort eskaliert) und
+`phase3_edge/tests/test_backup_scripts.py` (dieselbe Bauart, dort hätte ein exportiertes
+`SHAREFYX_BACKUP_KEEP` die Retention-Tests still verfälscht — vorsorglich mitgeschlossen).
+Regressionstest `test_harness_ignores_ambient_sharefyx_configuration` hält fest, dass **nur**
+vom Test selbst gesetzte Variablen übrig bleiben. Gegenprobe gefahren: mit exportiertem
+`SHAREFYX_SYSTEMCTL`/`SHAREFYX_RELEASES_DIR`/`SHAREFYX_BACKUP_KEEP` waren vorher **3 Tests rot**,
+danach alle grün.
+
+**Die allgemeine Lehre, die über diesen Fall hinausgeht:** ein Test, dessen Verhalten von der
+Shell des Aufrufers abhängt, ist kein Test. Wenn eine Testsuite ein Programm gegen eine Attrappe
+laufen lässt, muss sie die Umgebung **konstruieren**, nicht erben.
+
 **Manuell (Nikinger — alles, was Realität berührt):**
 1. **Einmalig:** `sudo mkdir -p /opt/sharefyx/releases && sudo chown -R savefyx:savefyx /opt/sharefyx`
 2. Erster Deploy aus dem Arbeitsverzeichnis:
