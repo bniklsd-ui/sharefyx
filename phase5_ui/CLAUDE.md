@@ -102,6 +102,40 @@ Messung statt Schätzung (`ui_budget.py`, AD) · gemeinsame Live-Abnahme, beide 
 
 ---
 
+## Abnahmestand (Plan §6) — Stand 2026-08-05
+
+Die Ergebnisse entstanden über sechs Sessions verteilt, mehrere davon schon in
+`SESSIONS_ARCHIVE.md`. Diese Tabelle ist der **eine** Ort, an dem der Gesamtstand steht; sie
+wird bei jedem Live-Ergebnis nachgezogen. **Statusregel des Plans: ✅ heißt live-verifiziert,
+nicht gebaut. Phase 5 bleibt 🟡, solange eine Zeile offen ist.**
+
+| # | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| 1 | Einladungslink erzeugt, Konto von null auf aktiv | ✅ | Nikinger live, 2026-08-04 |
+| 2 | Einladungslink ein zweites Mal → abgelehnt | ✅ | Nikinger live, 2026-08-05 |
+| 3 | TOTP-Seed einmal gezeigt, Authenticator-Code akzeptiert | ✅ | Nikinger live, 2026-08-04 (nach dem `Referrer-Policy`/Origin-Fund) |
+| 4 | Recovery-Code ersetzt den TOTP-Code, danach abgelehnt | ✅ | Nikinger live, 2026-08-05 |
+| 5 | Passwort im Browser geändert **ohne** `systemctl restart`, neuer Login sofort gültig | ✅ | Nikinger live, 2026-08-05 nach Step 7b — **schließt Betriebsnotiz O1 auch live** |
+| 6 | Nach dem Passwortwechsel: Connector fordert neue Autorisierung · andere UI-Sitzung beendet · aktuelle läuft weiter | 🟡 **teilweise** | Connector-Reconnect ✅ und aktuelle Sitzung lief weiter ✅ (Nikinger, 2026-08-05). **Offen: ein zweiter, gleichzeitig angemeldeter Browser wurde nicht geprüft** — dafür braucht es zwei getrennte Sitzungen (zweites Profil oder privates Fenster), ein zweiter Tab desselben Browsers teilt das Cookie und beweist nichts |
+| 7 | Fehlversuchsbremse greift für UI-Login und OAuth-Consent gemeinsam | ✅ | Nikinger live, 2026-08-05 |
+| 8 | `authctl.py list-users` zeigt keinen Hash und keinen Seed | ✅ | Nikinger live, 2026-08-05 |
+| 9 | `auth.sqlite3` mit `strings`: kein Base32-Seed im Klartext | ✅ | Nikinger live, 2026-08-05 |
+| 10 | Anlegen/Bearbeiten/Anhängen/Archivieren über die UI; `.md` im `DATA_ROOT` korrekt **und** Git-Commit existiert | ⬜ offen | UI-Seite funktioniert live; der **Dateinachweis** (`git log` im Datenverzeichnis) steht aus |
+| 11 | Konflikt in zwei Tabs → Versionsband `--warn` + Dialog, kein stiller Überschreiber | ✅ | Nikinger live, 2026-08-05 nach Step 7b |
+| 12 | Fremder Space sichtbar/lesbar, **ohne** Schreib-Bedienelemente im DOM | ✅ | Nikinger live in DevTools, 2026-08-05 nach Step 7b (vorher nur `hidden` — siehe F7-Umfeld im Session-Block) |
+| 13 | Unbekanntes Frontmatter-Feld überlebt eine UI-Bearbeitung unverändert | ⬜ offen | `extra` wird durchgereicht (`serializers.py`), live noch nicht belegt |
+| 14 | `format: markdown` erscheint nach dem ersten UI-Schreibvorgang und stört keinen Tool-Aufruf | ⬜ offen | |
+| 15 | `ui_budget.py` liefert alle vier Zahlen | ⬜ offen | Step 8 |
+| 16 | `deploy.sh` rollt bei kaputtem Health-Endpunkt automatisch zurück | ⬜ offen | Step 8 |
+| 17 | Beide Nutzer benutzen UI **und** Connector am selben Tag gegen dieselbe Instanz | ⬜ offen | Step 9 (P5-AE) |
+| 18 | `git diff` auf `storage/`, `mcpserver/{tools,permissions,server}.py`: leer | ✅ | bei jedem Step-Commit geprüft, zuletzt Step 7b |
+| 19 | Cookie an `/mcp` ignoriert; Bearer an `/api` ignoriert | 🟡 | Testseite ✅ (`test_isolation.py`, `test_overview.py`); der im Plan zusätzlich verlangte **Live-`curl`** steht aus |
+| 20 | Reboot: UI, Connector, Timer kommen ohne Handgriff zurück | ⬜ offen | passiv zulässig (wie P3 Zeile 6) |
+
+**Kurz:** 11 von 20 live bestanden, 2 teilweise (6, 19), 7 offen — davon 4 an Step 8/9 gebunden.
+
+---
+
 ## Session stopped — 2026-08-05, dritter Nachtrag (Step 7b: UI-Überarbeitung nach Live-Feedback)
 
 **Ergebnis:** Der Nikinger hat Step 6/7 live benutzt und elf Punkte gemeldet; alle sind

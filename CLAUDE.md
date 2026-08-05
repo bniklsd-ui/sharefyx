@@ -247,9 +247,20 @@ detachable()` hängt sie jetzt wirklich aus. Neu: `GET /api/v1/overview` (Zähle
 geänderte Items je sichtbarem Space, ohne `snippet` — Rule 4 dem Geiste nach), `GET /api/v1/meta`
 gibt zusätzlich `buckets` heraus. **549/549 Tests**, `ui_smoke.py` 12/12, 51 jsdom-Prüfungen,
 Tabu-Diff leer. Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-05, dritter Nachtrag.**]**
-**Nächster Schritt:** Block-A-Abnahmezeilen 5/6 live abnehmen (Passwortwechsel im Browser — der
-Dialog existiert seit Step 7b, der DevTools-Behelf entfällt), danach Step 8 (Betrieb: Deploy,
-Rollback, Staging, Auth-Backup, Messung — Plan §5 Step 8).
+**[2026-08-05, Live-Abnahme nach Step 7b:** der Nikinger hat die überarbeitete Oberfläche
+durchgetestet. **Zeile 5 bestanden** (Passwort im Browser geändert, neuer Login ohne
+`systemctl restart` sofort gültig — damit ist O1 auch live geschlossen, nicht nur im Code),
+**Zeile 11 bestanden** (Konflikt in zwei Tabs, Dialog, Auflösung), **Zeile 12 bestanden**
+(Fabis Space in DevTools geprüft: kein Schreib-Bedienelement im DOM). **Zeile 6 nur teilweise:**
+der Connector forderte wie verlangt eine neue Autorisierung und die aktuelle Sitzung lief weiter,
+aber ob ein zweiter, gleichzeitig angemeldeter Browser abgemeldet wird, ist **nicht** geprüft —
+das braucht zwei getrennte Sitzungen (zweites Profil oder privates Fenster), ein zweiter Tab
+desselben Browsers teilt das Cookie und beweist nichts. **Gesamtstand jetzt 11/20 bestanden, 2
+teilweise, 7 offen** — die vollständige Matrix steht ab sofort an genau einer Stelle:
+`phase5_ui/CLAUDE.md`, Abschnitt „Abnahmestand (Plan §6)". Vorher lagen die Ergebnisse über sechs
+Session-Blöcke verteilt, mehrere davon schon archiviert.**]** **Nächster Schritt:** Step 8
+(Betrieb: Deploy, Rollback, Staging, Auth-Backup, Messung — Plan §5 Step 8). Zeile 6 ist mit
+einem privaten Fenster in zwei Minuten nachzuholen und blockiert Step 8 nicht.
 
 **Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅
 abgeschlossen, 2026-07-30.** Mission erfüllt: der Pfad-Token ist verschwunden, ein eigener
