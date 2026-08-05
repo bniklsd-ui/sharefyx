@@ -95,7 +95,11 @@ async def _run(data_root: Path, checks: list[Check]) -> None:
         invite_response = await client.post(
             f"/ui/invite/{invite_token}", data={"password": PASSWORD},
         )
-        secret_match = re.search(r"<code>([A-Z2-7 ]+)</code>", invite_response.text)
+        # [2026-08-05, Step 7b] `pages.py` hat Klassen-Markup bekommen; der Seed steht seither in
+        # `<code class="auth__seed">` (siehe dieselbe Anpassung in `tests/test_invite_enroll.py`).
+        secret_match = re.search(
+            r'<code class="auth__seed">([A-Z2-7 ]+)</code>', invite_response.text
+        )
         enroll_csrf = _CSRF_RE.search(invite_response.text)
         secret = secret_match.group(1).replace(" ", "") if secret_match else None
         checks.append(

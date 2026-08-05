@@ -60,6 +60,21 @@ def summary_to_json(s: ItemSummary) -> dict[str, Any]:
     }
 
 
+def overview_row_to_json(s: ItemSummary, *, own_space: str) -> dict[str, Any]:
+    """Zeile für `GET /api/v1/overview` — `summary_to_json()` **ohne** `snippet` (Step 7b).
+
+    Der Grund ist Rule 4 dem Geiste nach, nicht dem Buchstaben: ein `snippet` ist Fließtext aus
+    einem fremden Space. Die Übersichtsseite ist die erste Fläche, die Inhalte mehrerer Spaces
+    nebeneinander zeigt, ohne dass man vorher bewusst „in einen fremden Space gewechselt" hat —
+    dort gehört fremder Fließtext nicht hin. Titel und Metadaten reichen für den Zweck der Seite
+    („was war zuletzt los"), und sie landen in `app.js` ausschließlich über `textContent`.
+    """
+    row = summary_to_json(s)
+    row.pop("snippet")
+    row["readonly"] = s.space != own_space
+    return row
+
+
 def search_to_json(r: SearchResult, *, own_space: str) -> dict[str, Any]:
     return {
         "items": [

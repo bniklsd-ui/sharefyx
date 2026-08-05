@@ -223,10 +223,33 @@ gemountet — der `store`-Parameter existierte bereits (bediente bisher nur `bui
 neuer Parameter nötig. Eigener Fund: `storage.store.Store.archive()` schützt anders als
 `update()`/`append()` nicht vor doppeltem Archivieren — in `api.py` behoben (nicht in `storage/`,
 dort tabu). `scripts/ui_smoke.py` (neu) läuft In-Process durch den vollen Web-Flow, 12/12 grün.
-504/504 Tests. Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-05.**]** **Nächster
-Schritt:** Step 6 (UI-Gerüst: Shell, Tokens, Navigation, Liste, Suche — `webui/static/{app.html,
-app.css,app.js}`). Zeilen 5/6 der Block-A-Abnahme folgen, sobald Step 6 einen echten Klick-Pfad
-für `/api/v1/account/password` bietet.
+504/504 Tests. Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-05.**]**
+**[2026-08-05, Step 6 + Step 7 abgeschlossen:** UI-Gerüst (`webui/static/{app.html,app.css,app.js}`,
+`webui/static_routes.py`, echtes Inter-Subset — V27 geschlossen) und Editor/Vorschau/Konflikt/
+Frontmatter-Felder (`GET /api/v1/meta`, Markdown-Parser+Sanitizer aus
+`docs/concepts/notiz_heft_example.html` geerntet und erweitert) — 516/516 Tests.**]**
+**[2026-08-05, Step 7b — UI-Überarbeitung nach Live-Feedback des Nikingers:** der Nikinger hat die
+Oberfläche live benutzt und elf Punkte gemeldet; alle umgesetzt, dazu sechs eigene Funde.
+**Zwei gelockte Entscheidungen sind dabei revidiert worden — Nikinger-Entscheidung, nicht still:**
+Plan **§4.1** („keine Verläufe, keine Schlagschatten außer einem einzigen für Modale") — Knöpfe
+waren live nicht als Knöpfe erkennbar, es gibt jetzt eine plastische Schicht; und Plan **§4.3**
+(flache Rail aus „Spaces" + „Filter") — das legte nahe, Filter seien eine zweite Top-Ebene neben
+den Spaces, tatsächlich ist ein Filter immer an einen Space gebunden; daher kam die Meldung
+„meine Notizen landen in *Notizen*, nicht in meinem Bereich". Die Rail ist jetzt ein Baum
+(Übersicht · eigener Space ▸ Ordner · verbundene Spaces) mit eigener Übersichtsseite. Die
+Plandatei bleibt als 📕-Snapshot **unverändert**, dieselbe Handhabung wie beim §1.2-Widerspruch am
+2026-08-03. Zwei Funde über die Meldungen hinaus: ein vierter Ordner **„Erledigt"** (eine auf
+`done` gesetzte Aufgabe fiel durch alle drei Mockup-Ordner und war in der UI nirgends mehr
+auffindbar) und **Akzeptanzkriterium 12 war bisher nur halb erfüllt** — Editor, „+"-Knopf und
+Anlegen-Dialog standen permanent in `app.html` und waren nur `hidden`, also mit DevTools
+auffindbar; das Kriterium verlangt wörtlich „ohne Schreib-Bedienelemente **im DOM**", `app.js ::
+detachable()` hängt sie jetzt wirklich aus. Neu: `GET /api/v1/overview` (Zähler + zuletzt
+geänderte Items je sichtbarem Space, ohne `snippet` — Rule 4 dem Geiste nach), `GET /api/v1/meta`
+gibt zusätzlich `buckets` heraus. **549/549 Tests**, `ui_smoke.py` 12/12, 51 jsdom-Prüfungen,
+Tabu-Diff leer. Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-05, dritter Nachtrag.**]**
+**Nächster Schritt:** Block-A-Abnahmezeilen 5/6 live abnehmen (Passwortwechsel im Browser — der
+Dialog existiert seit Step 7b, der DevTools-Behelf entfällt), danach Step 8 (Betrieb: Deploy,
+Rollback, Staging, Auth-Backup, Messung — Plan §5 Step 8).
 
 **Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅
 abgeschlossen, 2026-07-30.** Mission erfüllt: der Pfad-Token ist verschwunden, ein eigener

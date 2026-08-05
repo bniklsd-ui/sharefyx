@@ -4,10 +4,92 @@ purpose: Archiv älterer Session-stopped-Blöcke aus phase5_ui/CLAUDE.md, newest
 read-when: Audit vergangener Sessions dieser Phase; NICHT für normalen Session-Start
 detail: L3
 up: CLAUDE.md
-updated: 2026-08-05 (siebter Block archiviert, Rotation nach Step 7)
+updated: 2026-08-05 (achter Block archiviert, Rotation nach Step 7b)
 ---
 
 # Session-Archiv — Phase 5 Web-UI, REST-API, Auth-Selbstverwaltung
+
+## Session stopped — 2026-08-05, zweiter Nachtrag (Step 7: Editor, Vorschau, Konflikt, Frontmatter-Felder)
+
+**Ergebnis:** Step 7 ist fertig — die Detail-Spalte ist jetzt ein echter Editor statt einer
+Leseansicht. Anlegen (kleines Inline-Formular, Typ+Titel), Bearbeiten mit Markdown-Vorschau,
+Anhängen (eigener API-Pfad, kein PATCH-Umweg), Archivieren, Frontmatter-Felder (Titel/Status/
+Fällig/Tags/Links, Status-Vokabular aus dem neuen `GET /api/v1/meta` statt in der UI dupliziert),
+Versionsband (§4.4, drei Zustände: Ruhe/ungespeichert/Konflikt), Konfliktdialog mit den zwei
+Optionen aus §4.5 (kein Auto-Merge), Entwurfsschutz über `sessionStorage`, „Sitzung
+abgelaufen"-Karte statt totem Redirect. Fremde Items bleiben strikt lesend (eigener Vorschau-
+Zweig, keine Editor-Elemente werden für sie überhaupt gerendert — Akzeptanzkriterium 12).
+
+**Harvest aus `docs/concepts/notiz_heft_example.html`** (vom Nikinger bereitgestellt, vorher
+nicht zugänglich — siehe vorherige Rückfrage in dieser Session): `sanitizeHtml()`/
+`markdownToHtml()`/`safeHref()` als Ausgangspunkt übernommen und erweitert (h1–h4 statt nur
+h1–h3, Zitate und GFM-Tabellen neu — beides hatte die Quelle nicht), `.rich-editor`s
+Formensprache für Zitat/Code/Tabelle/HR auf unsere Tokens umgesetzt. Bewusst NICHT übernommen:
+`sanitizeStyle()`/Style-Attribute (unsere `style-src 'self'`-CSP ohne `unsafe-inline` verhindert
+ohnehin, dass ein `style="..."` je greift), IMG/FIGURE/FONT/`data-asset-*` (kein Anhang-Feature,
+P5-AA), Task-Checklisten (nicht in §3.5s Markdown-Teilmenge), `tel:`/`#note:`/`#asset:` (§3.5
+nennt nur `http:`/`https:`/`mailto:`/`#item/<id>`). Die Symbolleiste selbst ist dort
+`document.execCommand` gegen ein `contenteditable`-Feld (WYSIWYG) — P5-U verbietet das
+ausdrücklich; übernommen wurde nur die Idee einer Leiste über dem Editor, die Buttons fügen hier
+Markdown-Syntax in die `<textarea>` ein.
+
+**Zwei Plan-Lücken/-Abweichungen, dokumentiert:**
+1. `GET /api/v1/meta` (neu) taucht in keiner Routentabelle des Plans auf, wird aber von Step 7s
+   eigenem Testnamen verlangt — session-gated, liefert `{"status_values": {...}}` direkt aus
+   `storage.models.STATUS_VALUES`.
+2. CSRF-Token-Übergabe/Sitzungsablauf-UX waren im Plan nicht spezifiziert — mit dem Nikinger vor
+   dem Bauen geklärt (AskUserQuestion, siehe Plan-Datei dieser Session): „Sitzung
+   abgelaufen"-Wiederanmeldung per Link zurück zu `/ui/login` (keine zweite Login-Implementierung,
+   der Bootstrap-Redirect nach `/ui/` bringt den Entwurf über `sessionStorage` mit zurück);
+   „Anlegen" als kleines Inline-Formular statt eines sofortigen Blanko-Items.
+
+**Advisor war während der GESAMTEN Session (Block-A-Gate-Fortsetzung UND Step 6 UND Step 7)
+nicht erreichbar** („temporarily overloaded", mehrfach erneut versucht). Ersatz — diesmal über
+den bisherigen Fallback (pyflakes + `pytest`) hinaus zusätzlich verschärft: eine echte,
+verhaltensgetriebene Node/jsdom-Simulation von `app.js` gegen die realen `app.html`/`app.css`-
+Dateien (im Scratchpad, nichts davon im Repo — `jsdom` ist kein Projekt-Dependency, P5-T/„kein
+Node im Projekt" bleibt unberührt). Diese Simulation fuhr den kompletten Lebenszyklus
+(Init→Anlegen→Bearbeiten→Vorschau→Speichern→Anhängen→Konflikt→Auflösen→Archivieren), den
+Nur-lesen-Pfad für fremde Items, die Tastaturkürzel und den Entwurfsschutz — und fand dabei zwei
+echte Funde vor dem Commit:
+1. Das Test-Mock selbst hatte einen `String.includes()`-Bug (`"/api/v1/meta".includes("/me")`
+   ist `true`, weil `/meta` mit `/me` beginnt) — reiner Test-Harness-Fehler, kein `app.js`-Bug,
+   aber ohne die Simulation nicht aufgefallen.
+2. Beim Beheben davon zeigte sich ein echter `app.js`-Fund: `loadItems()`/`selectItem()`/
+   `init()` hatten kein `.catch()` — ein `401` mitten in einer Suche hinterließ eine unbehandelte
+   Promise-Ablehnung. Im Browser nur eine Konsolenwarnung (die „Sitzung abgelaufen"-Karte
+   erscheint trotzdem, das passiert synchron in `api()` vor dem Verwerfen), in Node bricht das
+   den Prozess ab — der Unterschied machte den Fund erst in der Simulation sichtbar. Behoben:
+   neues `reportUnexpectedError()`, an allen drei „lose angestoßenen" Aufrufstellen als
+   `.catch()` ergänzt (die vier nutzergetriebenen Aktionen Speichern/Anhängen/Archivieren/
+   Anlegen hatten von Anfang an eigene Fehlerbehandlung).
+
+**Verifiziert:** `pytest -q` (Repo-Wurzel) → **516/516 grün** (512 vor diesem Step, +4: 2
+`test_meta.py`, neue Datei + 2 `test_api.py`). `pyflakes` über alle neuen/geänderten
+Python-Dateien sauber. `git diff --stat` auf `storage/`, `mcpserver/tools.py`/`permissions.py`/
+`server.py` bleibt leer (Akzeptanzkriterium §6.18). `node --check` auf `app.js` sauber. Die
+jsdom-Simulation (siehe oben) deckte praktisch die komplette Interaktionsfläche ab, ist aber
+ausdrücklich kein Ersatz für einen echten Browser — Layout/Fokus-Reihenfolge/Tastatur-Events
+verhalten sich in jsdom nicht immer identisch zu Chrome.
+
+**Import aus „Notepad Pro Local" — vom Nikinger angefragt, eingeschätzt, noch nicht begonnen:**
+machbar als einmaliges Skript (kein eigener Phasen-Aufwand), aber mit echtem Verlust bei Bildern
+(kein Anhang-Feature, P5-AA) und einer offenen Designfrage bei eingebetteten Aufgaben-Checklisten
+(Notizheft kennt keine eigenständigen Aufgaben-Objekte). Details/Aufwandsschätzung: Plan-Datei
+dieser Session (`/home/savefyx/.claude/plans/magical-stirring-meerkat.md`, Abschnitt „Import aus
+Notepad Pro Local"). Wartet auf eine Nikinger-Entscheidung, ob die echten Notizen Bilder
+enthalten, bevor der Umfang feststeht.
+
+**Manuell (Nikinger, nicht Teil dieses Steps):** das eigentliche Step-7-„Done when" — anlegen →
+bearbeiten (Vorschau sichtprüfen) → Konflikt mit einem zweiten Tab provozieren → auflösen →
+archivieren, in einem echten Browser gegen eine Wegwerf- oder die Live-Instanz.
+
+**Nächster Schritt (konkret):** Step 8 (Betrieb: Deploy, Rollback, Staging, Auth-Backup, Messung
+— Plan §5 Step 8) ODER zuerst ein kleiner Nachtrag für die Block-A-Abnahmezeilen 5/6
+(Passwortwechsel-Dialog gegen `/api/v1/account/password`, jetzt technisch möglich — die
+Editor-Infrastruktur aus diesem Step liefert Dialog-/Overlay-/Formular-Muster, die sich direkt
+wiederverwenden lassen). Reihenfolge ist eine Nikinger-Entscheidung, keine im Plan gelockte.
+
 
 ## Session stopped — 2026-08-05 (Step 6: UI-Gerüst — Shell, Tokens, Navigation, Liste, Suche)
 

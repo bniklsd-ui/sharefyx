@@ -8,7 +8,15 @@ einer der Schritte scheitert) über `_catch()` in eine JSON-Fehlerantwort übers
 Routentabelle nicht listet — dieselbe Kategorie kleiner, autonom geschlossener Lücke wie Step 6s
 `/ui/`-Sitzungsprüfung. Liefert `{"status_values": {...}}` direkt aus `storage.models.
 STATUS_VALUES`, damit `app.js` das Statusvokabular pro Typ nicht dupliziert (P5-U/§7: „`type`
-ist nach dem Anlegen nicht änderbar in der UI").
+ist nach dem Anlegen nicht änderbar in der UI"). **Step 7b** ergänzt `{"buckets": {...}}` — siehe
+`_BUCKETS` unten.
+
+**`GET /api/v1/overview` (Step 7b, ebenfalls in keiner Plan-Tabelle):** speist die neue
+Übersichtsseite und die Zähler-Plaketten im Navigationsbaum (Nikinger-Entscheidung 2026-08-05,
+revidiert §4.3). Liefert je sichtbarem Space die drei Bucket-Zähler und die fünf zuletzt
+geänderten Items. Die Arbeit liegt bewusst hier statt in `app.js`: der Plan lässt JavaScript
+ungetestet, Python nicht — was hier steht, ist mit `pytest` prüfbar. Kein LLM, keine Deutung,
+nur Zählen und Sortieren (Kernprinzip „der Server ist dumm" bleibt gewahrt).
 
 **Reihenfolge bei jedem Item-Endpunkt, wörtlich aus dem Plan, nicht verhandelbar:** erst
 `store.space_of(item_id)` (index-only, schreibt nichts, liest keine Datei — sicher aufzurufen
@@ -48,12 +56,36 @@ from storage.store import Store
 from .config import UiSettings
 from .errors import ApiError, CsrfError
 from .security import require_csrf
-from .serializers import item_to_json, search_to_json, space_to_json
+from .serializers import item_to_json, overview_row_to_json, search_to_json, space_to_json
 from .sessions import SessionManager
 
 DEFAULT_LIMIT = 50
 MAX_LIMIT = 200
 MAX_BODY_BYTES = 1 * 1024 * 1024  # Plan §3.1
+
+# Die drei Ordner des Navigationsbaums, einmal definiert (Step 7b). Vorher standen dieselben drei
+# Filterkombinationen ausschließlich in `app.js :: filterParams()` — die Übersichtszähler hätten
+# sie ein zweites Mal gebraucht, und zwei Kopien einer Filterdefinition driften. `GET
+# /api/v1/meta` gibt sie deshalb an `app.js` heraus, `_overview()` zählt mit denselben Werten.
+# „archived" ist bewusst typunabhängig: eine archivierte Aufgabe gehört ins Archiv, nicht unter
+# „Offen". Die Reihenfolge ist bedeutsam — `app.js :: bucketFor()` nimmt den ERSTEN passenden
+# Eintrag, und eine archivierte Aufgabe passt sowohl auf „archived" als auch (bis auf den Status)
+# auf „open"; „archived" steht deshalb zuletzt.
+#
+# „done" ist ein Fund dieses Steps, nicht aus dem Plan: die drei Ordner des Mockups (Offen,
+# Notizen, Archiv) decken `STATUS_VALUES["task"]` nicht vollständig ab — eine auf `done` gesetzte
+# Aufgabe fiel durch alle drei und war in der Oberfläche nirgends mehr auffindbar, bis sie jemand
+# archivierte. Vier Ordner statt drei schließen das Loch.
+_BUCKETS: dict[str, dict[str, str]] = {
+    "open": {"type": "task", "status": "open"},
+    "done": {"type": "task", "status": "done"},
+    "note": {"type": "note", "status": "active"},
+    "archived": {"status": "archived"},
+}
+
+# Zeilen unter „Zuletzt benutzt" je Space. Bewusst klein: die Übersicht soll orientieren, nicht
+# die Liste ersetzen.
+_RECENT_LIMIT = 5
 
 # [SEAM] Wie `mcpserver/tools.py :: _STORE_FETCH_LIMIT` (dieselbe Kostenabwägung, hier erneut
 # definiert statt importiert — ein Import aus `mcpserver.tools` wäre ein zweites `mcpserver`-
@@ -146,23 +178,62 @@ def api_routes(
         await _require_session(request)
         status_values = {kind: sorted(values) for kind, values in STATUS_VALUES.items()}
         return JSONResponse(
-            {"status_values": status_values}, headers={"Cache-Control": "no-store"}
+            {"status_values": status_values, "buckets": _BUCKETS},
+            headers={"Cache-Control": "no-store"},
         )
 
-    async def _spaces(request: Request) -> Response:
-        session = await _require_session(request)
+    def _visible_space_infos(own_space: str) -> list[SpaceInfo]:
+        """Sichtbare Spaces inklusive des B1-Sonderfalls — geteilt von `_spaces()` und
+        `_overview()` (Step 7b; vorher stand das nur in `_spaces()`)."""
         spaces = store.list_spaces()
         # Gleicher Fund wie `tools.py :: list_spaces()` (B1, P2-Adapter-Abnahme): ein Space ohne
         # ein einziges Item taucht in `list_spaces()` sonst gar nicht auf.
-        if session.space not in {s.name for s in spaces}:
+        if own_space not in {s.name for s in spaces}:
             spaces = sorted(
-                [*spaces, SpaceInfo(name=session.space, item_count=0)], key=lambda s: s.name
+                [*spaces, SpaceInfo(name=own_space, item_count=0)], key=lambda s: s.name
             )
         # Sichtbarkeit aus DIESER (ggf. um den leeren eigenen Space ergänzten) Liste berechnen,
         # nicht aus einem frischen `store.list_spaces()` — sonst würde ein eigener Space ohne
         # Items nie als sichtbar erkannt (derselbe Fund wie B1, nur eine Zeile weiter unten).
-        visible = _visible_spaces(session.space, [s.name for s in spaces])
-        payload = [space_to_json(s, own_space=session.space) for s in spaces if s.name in visible]
+        visible = _visible_spaces(own_space, [s.name for s in spaces])
+        return [s for s in spaces if s.name in visible]
+
+    async def _spaces(request: Request) -> Response:
+        session = await _require_session(request)
+        payload = [
+            space_to_json(s, own_space=session.space)
+            for s in _visible_space_infos(session.space)
+        ]
+        return JSONResponse(payload, headers={"Cache-Control": "no-store"})
+
+    async def _overview(request: Request) -> Response:
+        session = await _require_session(request)
+        payload = []
+        for space in _visible_space_infos(session.space):
+            # Je Bucket ein eigener `store.search()`-Aufruf statt einer selbst geschriebenen
+            # Zählschleife: die Zähler sind dadurch per Konstruktion identisch mit dem, was die
+            # Liste beim Klick auf denselben Ordner zeigt. Das kostet einen Indexdurchlauf je
+            # Bucket — bei einem Zwei-Personen-Space-Server irrelevant, und eine nachgebaute
+            # Filterlogik, die von `search()` abdriftet, wäre teurer als jeder Scan.
+            counts = {
+                bucket: store.search(space=space.name, limit=1, offset=0, **filters).total
+                for bucket, filters in _BUCKETS.items()
+            }
+            # `search()` sortiert nach (offen zuerst, Fälligkeit, zuletzt geändert) — für „zuletzt
+            # benutzt" ist nur das dritte Kriterium gemeint, deshalb hier nachsortieren statt
+            # `storage/` anzufassen (P5-B: tabu).
+            newest = sorted(
+                store.search(space=space.name, limit=_STORE_FETCH_LIMIT, offset=0).items,
+                key=lambda i: i.updated,
+                reverse=True,
+            )[:_RECENT_LIMIT]
+            payload.append({
+                "name": space.name,
+                "own": space.name == session.space,
+                "item_count": space.item_count,
+                "counts": counts,
+                "recent": [overview_row_to_json(i, own_space=session.space) for i in newest],
+            })
         return JSONResponse(payload, headers={"Cache-Control": "no-store"})
 
     async def _items_get(request: Request) -> Response:
@@ -335,6 +406,7 @@ def api_routes(
         Route("/api/v1/me", _catch(_me), methods=["GET"]),
         Route("/api/v1/spaces", _catch(_spaces), methods=["GET"]),
         Route("/api/v1/meta", _catch(_meta), methods=["GET"]),
+        Route("/api/v1/overview", _catch(_overview), methods=["GET"]),
         Route("/api/v1/items", _catch(_items_get), methods=["GET"]),
         Route("/api/v1/items", _catch(_items_post), methods=["POST"]),
         Route("/api/v1/items/{item_id}", _catch(_items_get_one), methods=["GET"]),

@@ -11,6 +11,8 @@ import httpx
 import pytest
 from storage.models import STATUS_VALUES
 
+from webui.api import _BUCKETS
+
 BASE_URL = "https://space.example.ts.net"
 SPACE = "niklas"
 PASSWORD = "correct horse battery staple"
@@ -38,6 +40,24 @@ async def test_meta_returns_status_values_matching_storage_models(full_app_items
     assert response.status_code == 200
     expected = {kind: sorted(values) for kind, values in STATUS_VALUES.items()}
     assert response.json()["status_values"] == expected
+
+
+@pytest.mark.asyncio
+async def test_meta_publishes_the_bucket_definitions_verbatim(full_app_items, totp_code):
+    """Step 7b: die Ordner des Navigationsbaums werden hier herausgegeben, damit `app.js` sie
+    nicht ein zweites Mal definiert (vorher standen sie ausschließlich in `filterParams()`).
+    Zusätzlich festgehalten, dass jeder Ordner nur aus Filtern besteht, die `/api/v1/items`
+    tatsächlich versteht — ein Bucket mit einem Fantasieparameter wäre in der UI eine leere
+    Liste ohne Fehlermeldung."""
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        buckets = (await client.get("/api/v1/meta")).json()["buckets"]
+
+    assert buckets == _BUCKETS
+    assert all(set(f) <= {"type", "status"} for f in buckets.values())
+    # `archived` steht zuletzt: `app.js :: bucketFor()` nimmt den ersten Treffer, und eine
+    # archivierte Aufgabe passt sonst nie ins Archiv (siehe `_BUCKETS`-Kommentar).
+    assert list(buckets)[-1] == "archived"
 
 
 @pytest.mark.asyncio

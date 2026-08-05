@@ -115,3 +115,30 @@ def test_app_js_makes_no_external_requests():
     js = (DEFAULT_STATIC_DIR / "app.js").read_text("utf-8")
     for needle in ("http://", "https://", "//cdn"):
         assert needle not in js, f"externe Referenz {needle!r} in app.js gefunden"
+
+
+def test_write_controls_live_inside_detachable_containers():
+    """Akzeptanzkriterium 12 verlangt bei einem fremden Space Schreib-Bedienelemente **nicht im
+    DOM** — nicht bloß `hidden`. Bis Step 7b standen Editor, „+"-Knopf und Anlegen-Dialog
+    permanent in `app.html` und waren nur ausgeblendet, also mit DevTools auffindbar; Step 7b
+    hängt sie in `app.js :: detachable()` bei Bedarf aus dem Dokument aus.
+
+    Dieser Test kann das Laufzeitverhalten nicht prüfen (JavaScript bleibt laut Plan
+    unit-ungetestet, dafür lief die jsdom-Simulation). Er hält die Voraussetzung fest, auf der
+    das Aushängen beruht: jedes Schreib-Bedienelement sitzt in genau einem der drei Container,
+    die `app.js` aushängt. Ein neuer Speichern-Knopf, den jemand außerhalb davon platziert,
+    fällt hier auf statt erst live."""
+    html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
+    js = (DEFAULT_STATIC_DIR / "app.js").read_text("utf-8")
+
+    for container in ("detailEditorEl", "newItemButtonEl", "createButtonEl", "createDialogEl"):
+        assert f"detachable({container})" in js, f"{container} wird nicht mehr ausgehängt"
+
+    # Die Knöpfe, die schreiben, stehen im Editor-Teilbaum — geprüft über ihre Position im
+    # Quelltext zwischen der öffnenden `#detail-editor`-Zeile und dem Anlegen-Dialog.
+    editor_start = html.index('<div id="detail-editor"')
+    editor_end = html.index('<div class="toast"')
+    editor_markup = html[editor_start:editor_end]
+    for control in ('id="save-button"', 'id="archive-button"', 'id="append-button"',
+                    'id="editor-textarea"'):
+        assert control in editor_markup, f"{control} liegt außerhalb von #detail-editor"

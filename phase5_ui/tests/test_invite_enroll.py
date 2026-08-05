@@ -14,7 +14,13 @@ BASE_URL = "https://space.example.ts.net"
 SPACE = "niklas"
 NEW_PASSWORD = "correct horse battery staple"
 
-_SECRET_RE = re.compile(r"<code>([A-Z0-9 ]+)</code>")
+# [2026-08-05, Step 7b] Der Seed steht jetzt in `<code class="auth__seed">` statt in einem
+# nackten `<code>` (`pages.py` bekam Klassen-Markup, damit die Auth-Seiten überhaupt gestaltet
+# sind). Der Ausdruck ist bewusst weiterhin an das Seed-Element gebunden und nicht an „irgendein
+# `<code>`": auf der Recovery-Seite stehen zehn weitere `<code>`-Elemente, und die Aussage
+# „genau EINMAL angezeigt" (Zeile 103) wäre mit einem lockereren Ausdruck nicht mehr die
+# Aussage, die der Test zu prüfen behauptet.
+_SECRET_RE = re.compile(r'<code class="auth__seed">([A-Z0-9 ]+)</code>')
 _CSRF_RE = re.compile(r'name="csrf" value="([^"]+)"')
 _RECOVERY_CODE_RE = re.compile(r"<code>([A-Za-z0-9-]+)</code>")
 

@@ -9,46 +9,54 @@
 <body>
 <div class="shell" data-view="list" id="shell">
   <nav class="rail" id="rail">
-    <div class="rail__section">
-      <h2 class="rail__heading">Spaces</h2>
-      <div id="rail-spaces"></div>
-    </div>
-    <div class="rail__section">
-      <h2 class="rail__heading">Filter</h2>
-      <button class="rail__filter" type="button" data-filter="open" aria-current="true">
-        <span class="rail__glyph">O</span><span class="rail__label">Offen</span>
-      </button>
-      <button class="rail__filter" type="button" data-filter="note">
-        <span class="rail__glyph">N</span><span class="rail__label">Notizen</span>
-      </button>
-      <button class="rail__filter" type="button" data-filter="archived">
-        <span class="rail__glyph">A</span><span class="rail__label">Archiv</span>
-      </button>
-    </div>
+    <div class="rail__brand">sharefyx</div>
+
+    <button class="rail__home" type="button" id="home-button" aria-current="true">
+      <span class="rail__glyph">&#8962;</span><span class="rail__label">&Uuml;bersicht</span>
+    </button>
+
+    <!-- Navigationsbaum (Step 7b): eigener Space mit seinen drei Ordnern, darunter die
+         verbundenen Spaces. Vollstaendig aus app.js gerendert, weil erst /api/v1/overview
+         weiss, welche Spaces sichtbar sind und wie viele Items in jedem Ordner liegen. -->
+    <div class="rail__tree" id="rail-tree"></div>
+
     <div class="rail__account">
-      <button class="rail__logout" type="button" id="logout-button">
+      <button class="rail__action" type="button" id="account-button">
+        <span class="rail__glyph">&#9881;</span><span class="rail__label">Konto</span>
+      </button>
+      <button class="rail__action" type="button" id="logout-button">
         <span class="rail__glyph">&#9211;</span><span class="rail__label">Abmelden</span>
       </button>
     </div>
   </nav>
 
   <section class="list" id="list">
-    <div class="list__search">
-      <input type="search" class="list__search-input" id="search-input" placeholder="Suche…" aria-label="Suche">
-      <button class="list__new-button" type="button" id="new-item-button" title="Neu anlegen">&#43;</button>
-    </div>
-    <div class="list__chips" id="list-chips"></div>
+    <header class="list__head">
+      <div class="list__crumb" id="list-crumb"></div>
+      <p class="list__readonly" id="list-readonly" hidden>Nur lesen &mdash; fremder Space</p>
+      <div class="list__search">
+        <input type="search" class="input list__search-input" id="search-input" placeholder="Suche&hellip;" aria-label="Suche">
+        <button class="btn btn--icon" type="button" id="new-item-button" title="Neu anlegen" aria-label="Neu anlegen">&#43;</button>
+      </div>
+      <div class="list__chips" id="list-chips"></div>
+    </header>
     <ol class="list__rows" id="list-rows"></ol>
     <div class="list__empty" id="list-empty" hidden>
-      <p>Keine Notizen in diesem Space.</p>
+      <p id="list-empty-text"></p>
       <button class="btn-primary" type="button" id="create-button">Erste Notiz anlegen</button>
     </div>
   </section>
 
   <section class="detail" id="detail">
-    <button class="detail__back" type="button" id="back-button">&larr; Zurück</button>
-    <div class="detail__empty" id="detail-empty">
-      <p>Kein Item ausgewählt.</p>
+    <button class="detail__back" type="button" id="back-button">&larr; Zur&uuml;ck</button>
+
+    <!-- Startansicht (Step 7b) -->
+    <div class="overview" id="detail-overview">
+      <h1 class="overview__title" id="overview-title"></h1>
+      <div class="overview__tiles" id="overview-tiles"></div>
+      <h2 class="overview__heading">Zuletzt benutzt</h2>
+      <ol class="overview__recent" id="overview-recent"></ol>
+      <div id="overview-foreign"></div>
     </div>
 
     <div id="detail-readonly" hidden>
@@ -59,49 +67,82 @@
       <div class="preview" id="ro-preview"></div>
     </div>
 
+    <!-- Editor. app.js loest diesen Teilbaum AUS DEM DOKUMENT, sobald ein fremdes Item oder ein
+         fremder Space aktiv ist (nicht nur `hidden`) — Akzeptanzkriterium 12 verlangt, dass in
+         diesem Fall kein Schreib-Bedienelement im DOM auffindbar ist. -->
     <div id="detail-editor" hidden>
-      <header class="detail__header">
+      <header class="editor__head">
         <input type="text" class="editor__title-input" id="field-title" placeholder="Titel" aria-label="Titel">
-        <div class="editor__fields">
-          <label>Status
-            <select class="input" id="field-status"></select>
-          </label>
-          <label>Fällig
-            <input type="date" class="input" id="field-due">
-          </label>
-          <input type="text" class="input" id="field-tags" placeholder="Tags, kommagetrennt" aria-label="Tags">
-          <input type="text" class="input" id="field-links" placeholder="Links, kommagetrennt" aria-label="Links">
-        </div>
-        <div class="editor__toolbar" id="editor-toolbar">
-          <button type="button" class="toolbar-btn" data-md="bold" title="Fett">B</button>
-          <button type="button" class="toolbar-btn" data-md="italic" title="Kursiv">I</button>
-          <button type="button" class="toolbar-btn" data-md="code" title="Code">&lt;/&gt;</button>
-          <button type="button" class="toolbar-btn" data-md="link" title="Link">&#128279;</button>
-          <button type="button" class="toolbar-btn" data-md="h" title="Überschrift">H</button>
-          <button type="button" class="toolbar-btn" data-md="quote" title="Zitat">&#8221;</button>
-          <button type="button" class="toolbar-btn" data-md="ul" title="Liste">&bull;</button>
-          <button type="button" class="toolbar-btn" data-md="ol" title="Nummerierung">1.</button>
-          <button type="button" class="toolbar-btn" data-md="hr" title="Trennlinie">&mdash;</button>
-          <span class="toolbar-spacer"></span>
-          <button type="button" class="toolbar-btn" id="toggle-preview">Vorschau</button>
-        </div>
-        <div class="editor__actions">
+        <div class="editor__head-actions">
+          <span class="editor__version tnum" id="editor-version"></span>
           <button type="button" class="btn-primary" id="save-button">Speichern</button>
           <button type="button" class="btn" id="archive-button">Archivieren</button>
+          <button type="button" class="btn btn--icon" id="close-button" title="Editor schlie&szlig;en" aria-label="Editor schlie&szlig;en">&times;</button>
         </div>
       </header>
-      <div class="editor__body" id="editor-body">
-        <div class="version-band" id="version-band"><span class="version-band__number" id="version-band-number"></span></div>
-        <textarea class="editor__textarea" id="editor-textarea" aria-label="Inhalt"></textarea>
-        <div class="preview editor__preview" id="editor-preview" hidden></div>
+
+      <!-- Kopfdaten: eigene Flaeche, eigene Farbe, standardmaessig zugeklappt. `<details>` statt
+           eigener Klapplogik — das Aufklappen funktioniert dann auch ohne app.js. -->
+      <details class="panel panel--meta" id="meta-panel">
+        <summary class="panel__head">
+          <span class="panel__title">Kopfdaten <span class="panel__sub">YAML-Frontmatter</span></span>
+          <span class="panel__digest" id="meta-digest"></span>
+        </summary>
+        <div class="panel__inner">
+          <p class="panel__hint">Diese Felder pflegt in der Regel ein verbundenes Claude &mdash; du musst hier nichts eintragen.</p>
+          <div class="editor__fields">
+            <label class="field">Status
+              <select class="input" id="field-status"></select>
+            </label>
+            <label class="field">F&auml;llig
+              <input type="date" class="input" id="field-due">
+            </label>
+            <label class="field field--wide">Tags
+              <input type="text" class="input" id="field-tags" placeholder="kommagetrennt">
+            </label>
+            <label class="field field--wide">Links
+              <input type="text" class="input" id="field-links" placeholder="kommagetrennt">
+            </label>
+          </div>
+        </div>
+      </details>
+
+      <!-- Notiztext: die grosse Flaeche, eigene Farbe. -->
+      <div class="panel panel--body">
+        <div class="panel__head">
+          <span class="panel__title">Text <span class="panel__sub">Markdown</span></span>
+          <div class="editor__toolbar" id="editor-toolbar">
+            <button type="button" class="toolbar-btn" data-md="bold" title="Fett">B</button>
+            <button type="button" class="toolbar-btn" data-md="italic" title="Kursiv">I</button>
+            <button type="button" class="toolbar-btn" data-md="code" title="Code">&lt;/&gt;</button>
+            <button type="button" class="toolbar-btn" data-md="link" title="Link">&#128279;</button>
+            <button type="button" class="toolbar-btn" data-md="h" title="&Uuml;berschrift">H</button>
+            <button type="button" class="toolbar-btn" data-md="quote" title="Zitat">&#8221;</button>
+            <button type="button" class="toolbar-btn" data-md="ul" title="Liste">&bull;</button>
+            <button type="button" class="toolbar-btn" data-md="ol" title="Nummerierung">1.</button>
+            <button type="button" class="toolbar-btn" data-md="hr" title="Trennlinie">&mdash;</button>
+            <button type="button" class="toolbar-btn toolbar-btn--wide" id="toggle-preview">Vorschau</button>
+          </div>
+        </div>
+        <div class="editor__body" id="editor-body">
+          <div class="version-band" id="version-band"><span class="version-band__number" id="version-band-number"></span></div>
+          <textarea class="editor__textarea" id="editor-textarea" aria-label="Inhalt"></textarea>
+          <div class="preview editor__preview" id="editor-preview" hidden></div>
+        </div>
       </div>
+
       <div class="editor__append">
-        <input type="text" class="input" id="append-input" placeholder="Notiz anhängen…" aria-label="Notiz anhängen">
-        <button type="button" class="btn" id="append-button">Anhängen</button>
+        <input type="text" class="input" id="append-input" placeholder="Zeile anh&auml;ngen&hellip;" aria-label="Zeile anh&auml;ngen">
+        <button type="button" class="btn" id="append-button">Anh&auml;ngen</button>
       </div>
     </div>
   </section>
 </div>
+
+<!-- Statuszeile (§4.5 sieht sie fuer „Dienst nicht erreichbar" vor; Step 7b traegt hier auch
+     Erfolgsmeldungen — bis dahin gab es fuer einen gelungenen Schreibvorgang gar keine
+     Rueckmeldung). -->
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <div class="overlay" id="create-dialog" hidden>
   <div class="overlay__panel">
@@ -127,6 +168,44 @@
       <button type="button" class="btn-primary" id="conflict-load-current">Aktuelle Fassung laden</button>
       <button type="button" class="btn" id="conflict-save-as-new">Meine Fassung als neues Item anlegen</button>
       <button type="button" class="btn" id="conflict-cancel">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Generischer Bestaetigungsdialog — ersetzt `window.confirm()` (Archivieren, Entwurf
+     verwerfen), damit alle Rueckfragen dieselbe Form haben. -->
+<div class="overlay" id="confirm-dialog" hidden>
+  <div class="overlay__panel">
+    <h2 id="confirm-title"></h2>
+    <p id="confirm-message"></p>
+    <div class="overlay__actions">
+      <button type="button" class="btn-primary" id="confirm-ok"></button>
+      <button type="button" class="btn" id="confirm-cancel">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="account-dialog" hidden>
+  <div class="overlay__panel">
+    <h2>Passwort &auml;ndern</h2>
+    <p class="overlay__hint">Danach musst du jeden Connector neu autorisieren, und andere
+      angemeldete Browser werden abgemeldet. Diese Sitzung bleibt bestehen.</p>
+    <p class="form-error" id="account-error" hidden></p>
+    <label>Aktuelles Passwort
+      <input type="password" class="input" id="account-current" autocomplete="current-password">
+    </label>
+    <label>Code aus der Authenticator-App
+      <input type="text" class="input" id="account-totp" autocomplete="one-time-code">
+    </label>
+    <label>Neues Passwort
+      <input type="password" class="input" id="account-new" autocomplete="new-password">
+    </label>
+    <label>Neues Passwort wiederholen
+      <input type="password" class="input" id="account-repeat" autocomplete="new-password">
+    </label>
+    <div class="overlay__actions">
+      <button type="button" class="btn-primary" id="account-submit">&Auml;ndern</button>
+      <button type="button" class="btn" id="account-cancel">Abbrechen</button>
     </div>
   </div>
 </div>

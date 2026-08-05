@@ -265,14 +265,26 @@ if (shellEl) {
 function initShell() {
   var API_BASE = "/api/v1";
 
+  // Beschriftung der Ordner. Die Ordner SELBST (und ihre Filterkombinationen) kommen aus
+  // `GET /api/v1/meta`, nicht von hier — sonst gäbe es zwei Definitionen desselben Vokabulars
+  // (siehe `api.py :: _BUCKETS`). Diese Tabelle liefert nur die deutschen Namen.
+  var BUCKET_LABELS = {
+    open: "Offen",
+    done: "Erledigt",
+    note: "Notizen",
+    archived: "Archiv",
+  };
+
   var state = {
-    spaces: [],
+    spaces: [],          // aus /overview: {name, own, item_count, counts, recent}
     ownSpace: null,
     activeSpace: null,
+    expanded: {},        // fremder Space-Name -> aufgeklappt?
     filter: "open",
     query: "",
     items: [],
     selectedId: null,
+    selectedReadonly: false,
     meta: null,
     mode: "edit",
     editingSnapshot: null,
@@ -319,38 +331,52 @@ function initShell() {
   }
 
   // Für Aufrufe, die aus Event-Handlern lose angestoßen werden (Laden, Auswählen, Init) statt
-  // aus einer Nutzeraktion mit eigener Fehlerbehandlung (Speichern/Anhängen/Archivieren/
-  // Anlegen haben je eigene `.catch()`): ohne dieses Netz bliebe die von `api()`s 401-Zweig
-  // zurückgegebene Promise unbehandelt — die "Sitzung abgelaufen"-Karte erscheint zwar trotzdem
-  // (das passiert synchron in `api()`, bevor verworfen wird), aber eine unbehandelte Ablehnung
-  // ist unnötiger Lärm in der Konsole und in strengeren Laufzeiten (Fund dieser Session: Node
-  // bricht bei einer unbehandelten Promise-Ablehnung den Prozess ab, ein Browser nur eine
-  // Konsolenwarnung — trotzdem sauber behandeln, nicht auf das mildere Browser-Verhalten
-  // verlassen).
+  // aus einer Nutzeraktion mit eigener Fehlerbehandlung: ohne dieses Netz bliebe die von `api()`s
+  // 401-Zweig zurückgegebene Promise unbehandelt — die "Sitzung abgelaufen"-Karte erscheint zwar
+  // trotzdem (das passiert synchron in `api()`, bevor verworfen wird), aber eine unbehandelte
+  // Ablehnung ist unnötiger Lärm in der Konsole und in strengeren Laufzeiten (Fund aus Step 7:
+  // Node bricht bei einer unbehandelten Promise-Ablehnung den Prozess ab, ein Browser gibt nur
+  // eine Konsolenwarnung — trotzdem sauber behandeln).
   function reportUnexpectedError(err) {
     if (err && err.message === "unauthenticated") return;
     console.error(err);
+    toast(err && err.message ? err.message : "Unerwarteter Fehler.", "error");
   }
 
   // -- DOM-Referenzen -----------------------------------------------------------------------
 
-  var railSpacesEl = document.getElementById("rail-spaces");
+  var railTreeEl = document.getElementById("rail-tree");
+  var homeButtonEl = document.getElementById("home-button");
+  var accountButtonEl = document.getElementById("account-button");
+
+  var listCrumbEl = document.getElementById("list-crumb");
+  var listReadonlyEl = document.getElementById("list-readonly");
   var listRowsEl = document.getElementById("list-rows");
   var listEmptyEl = document.getElementById("list-empty");
+  var listEmptyTextEl = document.getElementById("list-empty-text");
   var listChipsEl = document.getElementById("list-chips");
   var searchInputEl = document.getElementById("search-input");
   var createButtonEl = document.getElementById("create-button");
   var newItemButtonEl = document.getElementById("new-item-button");
 
-  var detailEmptyEl = document.getElementById("detail-empty");
+  var detailEl = document.getElementById("detail");
+  var overviewEl = document.getElementById("detail-overview");
+  var overviewTitleEl = document.getElementById("overview-title");
+  var overviewTilesEl = document.getElementById("overview-tiles");
+  var overviewRecentEl = document.getElementById("overview-recent");
+  var overviewForeignEl = document.getElementById("overview-foreign");
+
   var detailReadonlyEl = document.getElementById("detail-readonly");
   var roTitleEl = document.getElementById("ro-title");
   var roMetaEl = document.getElementById("ro-meta");
   var roPreviewEl = document.getElementById("ro-preview");
 
   var detailEditorEl = document.getElementById("detail-editor");
+  var editorVersionEl = document.getElementById("editor-version");
   var versionBandEl = document.getElementById("version-band");
   var versionBandNumberEl = document.getElementById("version-band-number");
+  var metaPanelEl = document.getElementById("meta-panel");
+  var metaDigestEl = document.getElementById("meta-digest");
   var fieldTitleEl = document.getElementById("field-title");
   var fieldStatusEl = document.getElementById("field-status");
   var fieldDueEl = document.getElementById("field-due");
@@ -362,6 +388,7 @@ function initShell() {
   var editorPreviewEl = document.getElementById("editor-preview");
   var saveButtonEl = document.getElementById("save-button");
   var archiveButtonEl = document.getElementById("archive-button");
+  var closeButtonEl = document.getElementById("close-button");
   var appendInputEl = document.getElementById("append-input");
   var appendButtonEl = document.getElementById("append-button");
 
@@ -377,7 +404,23 @@ function initShell() {
   var conflictSaveAsNewButtonEl = document.getElementById("conflict-save-as-new");
   var conflictCancelButtonEl = document.getElementById("conflict-cancel");
 
+  var confirmDialogEl = document.getElementById("confirm-dialog");
+  var confirmTitleEl = document.getElementById("confirm-title");
+  var confirmMessageEl = document.getElementById("confirm-message");
+  var confirmOkEl = document.getElementById("confirm-ok");
+  var confirmCancelEl = document.getElementById("confirm-cancel");
+
+  var accountDialogEl = document.getElementById("account-dialog");
+  var accountErrorEl = document.getElementById("account-error");
+  var accountCurrentEl = document.getElementById("account-current");
+  var accountTotpEl = document.getElementById("account-totp");
+  var accountNewEl = document.getElementById("account-new");
+  var accountRepeatEl = document.getElementById("account-repeat");
+  var accountSubmitEl = document.getElementById("account-submit");
+  var accountCancelEl = document.getElementById("account-cancel");
+
   var sessionExpiredCardEl = document.getElementById("session-expired-card");
+  var toastEl = document.getElementById("toast");
 
   function el(tag, className, text) {
     var node = document.createElement(tag);
@@ -390,27 +433,228 @@ function initShell() {
     sessionExpiredCardEl.hidden = false;
   }
 
-  // -- Rail/Liste (Step 6, unverändert) ------------------------------------------------------
+  // -- Statuszeile (§4.5) --------------------------------------------------------------------
+  // Bis Step 7b gab es für einen gelungenen Schreibvorgang gar keine Rückmeldung — der Nikinger
+  // klickte deshalb mehrfach auf "Speichern", jeder Klick zählte die Version hoch (Fund V10).
+  // Die zweite Hälfte dieses Fundes steckt in `updateVersionBand()`: "Speichern" ist ohne
+  // tatsächliche Änderung deaktiviert.
 
-  function renderRail() {
-    railSpacesEl.textContent = "";
-    state.spaces.forEach(function (space) {
-      var button = el("button", "rail__space");
-      button.type = "button";
-      button.dataset.space = space.name;
-      if (space.name === state.activeSpace) button.setAttribute("aria-current", "true");
-      var glyph = el("span", "rail__glyph", space.name.charAt(0).toUpperCase());
-      var label = el("span", "rail__label", space.name + (space.own ? "" : " · nur lesen"));
-      button.appendChild(glyph);
-      button.appendChild(label);
-      button.addEventListener("click", function () {
-        state.activeSpace = space.name;
-        renderRail();
-        loadItems();
-      });
-      railSpacesEl.appendChild(button);
+  var toastTimer = null;
+
+  function toast(message, kind) {
+    toastEl.textContent = message;
+    toastEl.className = "toast" + (kind ? " toast--" + kind : "");
+    toastEl.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.hidden = true; }, kind === "error" ? 6000 : 2800);
+  }
+
+  // -- Bedienelemente aus dem DOM lösen (Akzeptanzkriterium 12) -------------------------------
+  // "Fremder Space: sichtbar, lesbar, OHNE Schreib-Bedienelemente im DOM" heißt wörtlich: nicht
+  // `hidden`, sondern nicht vorhanden. Bis Step 7b standen Editor, "+"-Knopf und Anlegen-Dialog
+  // permanent im Dokument und waren nur ausgeblendet — mit DevTools also auffindbar. Diese
+  // Hilfsfunktion hängt den ganzen Teilbaum aus und später an derselben Elternstelle wieder ein;
+  // Kindreferenzen und Event-Listener überleben das unverändert.
+
+  function detachable(node) {
+    var parent = node.parentNode;
+    return {
+      attach: function () { if (!node.parentNode) parent.appendChild(node); },
+      detach: function () { if (node.parentNode) node.parentNode.removeChild(node); },
+    };
+  }
+
+  var editorPart = detachable(detailEditorEl);
+  var createTriggers = [detachable(newItemButtonEl), detachable(createButtonEl)];
+  var createDialogPart = detachable(createDialogEl);
+
+  function setCreateControlsPresent(present) {
+    createTriggers.forEach(function (part) { present ? part.attach() : part.detach(); });
+    // Der Dialog hängt NUR am Space, nicht an der Trefferlage — sonst könnte ein Listen-Neuladen
+    // einen gerade geöffneten Anlegen-Dialog aus dem Dokument reißen.
+    ownSpaceActive() ? createDialogPart.attach() : createDialogPart.detach();
+  }
+
+  function ownSpaceActive() {
+    return state.activeSpace !== null && state.activeSpace === state.ownSpace;
+  }
+
+  // -- Rückfragedialog (ersetzt window.confirm) ----------------------------------------------
+
+  var pendingConfirmCancel = null;
+
+  function confirmDialog(options) {
+    return new Promise(function (resolve) {
+      confirmTitleEl.textContent = options.title;
+      confirmMessageEl.textContent = options.message;
+      confirmOkEl.textContent = options.ok || "OK";
+      confirmDialogEl.hidden = false;
+      confirmOkEl.focus();
+
+      function finish(value) {
+        confirmDialogEl.hidden = true;
+        confirmOkEl.removeEventListener("click", onOk);
+        confirmCancelEl.removeEventListener("click", onCancel);
+        pendingConfirmCancel = null;
+        resolve(value);
+      }
+      function onOk() { finish(true); }
+      function onCancel() { finish(false); }
+
+      confirmOkEl.addEventListener("click", onOk);
+      confirmCancelEl.addEventListener("click", onCancel);
+      pendingConfirmCancel = onCancel;
     });
   }
+
+  // -- Navigationsbaum (Step 7b) --------------------------------------------------------------
+
+  function bucketNames() {
+    return state.meta ? Object.keys(state.meta.buckets) : [];
+  }
+
+  function navigate(spaceName, bucket) {
+    state.activeSpace = spaceName;
+    state.filter = bucket;
+    setCreateControlsPresent(ownSpaceActive());
+    renderRail();
+    renderCrumb();
+    return loadItems();
+  }
+
+  function renderFolders(space) {
+    var wrap = document.createDocumentFragment();
+    bucketNames().forEach(function (bucket) {
+      var button = el("button", "tree__folder");
+      button.type = "button";
+      button.dataset.space = space.name;
+      button.dataset.bucket = bucket;
+      if (space.name === state.activeSpace && bucket === state.filter) {
+        button.setAttribute("aria-current", "true");
+      }
+      button.appendChild(el("span", "rail__label", BUCKET_LABELS[bucket] || bucket));
+      button.appendChild(el("span", "tree__count", String(space.counts[bucket])));
+      button.addEventListener("click", function () {
+        navigate(space.name, bucket).catch(reportUnexpectedError);
+      });
+      wrap.appendChild(button);
+    });
+    return wrap;
+  }
+
+  function renderSpaceNode(space) {
+    var open = space.own || state.expanded[space.name] === true;
+    var row = el("button", "tree__space");
+    row.type = "button";
+    row.appendChild(el("span", "tree__twist", open ? "▾" : "▸"));
+    row.appendChild(el("span", "rail__glyph", space.name.charAt(0).toUpperCase()));
+    row.appendChild(el("span", "rail__label", space.name));
+    if (!space.own) row.appendChild(el("span", "tree__badge", "nur lesen"));
+    row.addEventListener("click", function () {
+      state.expanded[space.name] = !open;
+      renderRail();
+    });
+    railTreeEl.appendChild(row);
+    if (open) railTreeEl.appendChild(renderFolders(space));
+  }
+
+  function renderRail() {
+    railTreeEl.textContent = "";
+    var own = state.spaces.filter(function (s) { return s.own; });
+    var foreign = state.spaces.filter(function (s) { return !s.own; });
+
+    if (own.length) {
+      railTreeEl.appendChild(el("div", "tree__group", "Mein Space"));
+      own.forEach(renderSpaceNode);
+    }
+    if (foreign.length) {
+      railTreeEl.appendChild(el("div", "tree__group", "Verbundene Spaces"));
+      foreign.forEach(renderSpaceNode);
+    }
+    homeButtonEl.setAttribute("aria-current", state.selectedId === null ? "true" : "false");
+  }
+
+  // -- Übersichtsseite ------------------------------------------------------------------------
+
+  function spaceByName(name) {
+    for (var i = 0; i < state.spaces.length; i++) {
+      if (state.spaces[i].name === name) return state.spaces[i];
+    }
+    return null;
+  }
+
+  function renderOverview() {
+    var own = spaceByName(state.ownSpace);
+    overviewTitleEl.textContent = state.ownSpace || "";
+    overviewTilesEl.textContent = "";
+    overviewRecentEl.textContent = "";
+    overviewForeignEl.textContent = "";
+    if (!own) return;
+
+    bucketNames().forEach(function (bucket) {
+      var tile = el("button", "tile");
+      tile.type = "button";
+      tile.appendChild(el("span", "tile__count tnum", String(own.counts[bucket])));
+      tile.appendChild(el("span", "tile__label", BUCKET_LABELS[bucket] || bucket));
+      tile.addEventListener("click", function () {
+        navigate(own.name, bucket).catch(reportUnexpectedError);
+      });
+      overviewTilesEl.appendChild(tile);
+    });
+
+    if (own.recent.length === 0) {
+      overviewRecentEl.appendChild(el("li", "recent-row__meta", "Noch nichts vorhanden."));
+    }
+    own.recent.forEach(function (item) {
+      var li = el("li");
+      var row = el("button", "recent-row");
+      row.type = "button";
+      // Fremdtext ausschließlich über textContent, nie innerHTML — dieselbe Disziplin wie in
+      // renderList(). Die Übersicht zeigt bewusst keine Textausschnitte (siehe
+      // serializers.py :: overview_row_to_json()).
+      row.appendChild(el("span", "recent-row__title", item.title));
+      row.appendChild(el("span", "recent-row__meta tnum", "v" + item.version + " · " + item.updated.slice(0, 10)));
+      row.addEventListener("click", function () { openFromOverview(own.name, item); });
+      li.appendChild(row);
+      overviewRecentEl.appendChild(li);
+    });
+
+    var foreign = state.spaces.filter(function (s) { return !s.own; });
+    if (foreign.length) {
+      overviewForeignEl.appendChild(el("h2", "overview__heading", "Verbundene Spaces"));
+      foreign.forEach(function (space) {
+        var card = el("button", "space-card");
+        card.type = "button";
+        card.appendChild(el("span", "rail__glyph", space.name.charAt(0).toUpperCase()));
+        card.appendChild(el("span", null, space.name));
+        card.appendChild(el("span", "space-card__meta", space.item_count + " Items · nur lesen"));
+        card.addEventListener("click", function () {
+          state.expanded[space.name] = true;
+          navigate(space.name, "note").catch(reportUnexpectedError);
+        });
+        overviewForeignEl.appendChild(card);
+      });
+    }
+  }
+
+  function openFromOverview(spaceName, item) {
+    // Ein Klick in "Zuletzt benutzt" darf nicht in einem Ordner landen, der das Item gar nicht
+    // enthält — sonst ist die Liste daneben leer, während rechts das Item steht.
+    var bucket = bucketFor(item) || state.filter;
+    navigate(spaceName, bucket)
+      .then(function () { return selectItem(item.id); })
+      .catch(reportUnexpectedError);
+  }
+
+  function loadOverview() {
+    return api("/overview").then(function (spaces) {
+      state.spaces = spaces;
+      renderRail();
+      renderOverview();
+    });
+  }
+
+  // -- Liste ----------------------------------------------------------------------------------
 
   function itemMetaLine(item) {
     var parts = [item.type, item.status];
@@ -419,18 +663,55 @@ function initShell() {
     return parts.join(" · ");
   }
 
+  function renderCrumb() {
+    listCrumbEl.textContent = "";
+    var strong = el("strong", null, state.activeSpace || "");
+    listCrumbEl.appendChild(strong);
+    listCrumbEl.appendChild(document.createTextNode(" › " + (BUCKET_LABELS[state.filter] || state.filter)));
+    listReadonlyEl.hidden = ownSpaceActive();
+  }
+
+  function renderChips() {
+    // §4.5: die aktiven Filter als ENTFERNBARE Chips. Bis Step 7b wurden Chips nur im
+    // Leerzustand gezeigt und ließen sich nicht entfernen (`.chip__remove` war totes CSS).
+    listChipsEl.textContent = "";
+    if (!state.query) return;
+    var chip = el("span", "chip");
+    chip.appendChild(el("span", null, "Suche: " + state.query));
+    var remove = el("button", "chip__remove", "×");
+    remove.type = "button";
+    remove.title = "Suche zurücksetzen";
+    remove.addEventListener("click", function () {
+      state.query = "";
+      searchInputEl.value = "";
+      loadItems().catch(reportUnexpectedError);
+    });
+    chip.appendChild(remove);
+    listChipsEl.appendChild(chip);
+  }
+
   function renderList() {
     listRowsEl.textContent = "";
-    listChipsEl.textContent = "";
+    renderChips();
+
     if (state.items.length === 0) {
       listEmptyEl.hidden = false;
-      if (state.query || state.activeSpace !== state.ownSpace) {
-        var chip = el("span", "chip", "Filter: " + state.filter);
-        listChipsEl.appendChild(chip);
+      if (state.query) {
+        listEmptyTextEl.textContent = "Keine Treffer für „" + state.query + "“.";
+      } else if (!ownSpaceActive()) {
+        listEmptyTextEl.textContent = "In diesem Ordner liegt nichts.";
+      } else {
+        listEmptyTextEl.textContent =
+          "Noch nichts unter „" + (BUCKET_LABELS[state.filter] || state.filter) + "“.";
       }
+      // Der Anlegen-Knopf ist bei einer leeren Suche fehl am Platz (er legt kein Item mit dem
+      // Suchbegriff an) und bei einem fremden Space gar nicht erst im DOM.
+      if (ownSpaceActive()) setCreateControlsPresent(!state.query);
       return;
     }
+
     listEmptyEl.hidden = true;
+    if (ownSpaceActive()) setCreateControlsPresent(true);
     state.items.forEach(function (item) {
       var li = el("li");
       var button = el("button", "list__row");
@@ -439,18 +720,28 @@ function initShell() {
       if (item.id === state.selectedId) button.setAttribute("aria-current", "true");
       button.appendChild(el("div", "list__row-title", item.title));
       button.appendChild(el("div", "list__row-meta tnum", itemMetaLine(item)));
-      button.addEventListener("click", function () { selectItem(item.id); });
+      button.addEventListener("click", function () { selectItem(item.id).catch(reportUnexpectedError); });
       li.appendChild(button);
       listRowsEl.appendChild(li);
     });
   }
 
   function filterParams() {
-    // "Offen": Aufgaben ohne Abschluss. "Notizen": aktive Notizen. "Archiv": alles Archivierte,
-    // typunabhängig — dieselbe Aufteilung wie die drei Rail-Beschriftungen im Mockup (§4.3).
-    if (state.filter === "note") return { type: "note", status: "active" };
-    if (state.filter === "archived") return { status: "archived" };
-    return { type: "task", status: "open" };
+    // Die drei/vier Ordner kommen serverseitig aus `api.py :: _BUCKETS` und werden über
+    // `GET /api/v1/meta` geliefert — hier steht bewusst keine zweite Definition mehr.
+    var bucket = state.meta && state.meta.buckets[state.filter];
+    return Object.assign({}, bucket || {});
+  }
+
+  function bucketFor(item) {
+    var names = bucketNames();
+    for (var i = 0; i < names.length; i++) {
+      var f = state.meta.buckets[names[i]];
+      var typeOk = !f.type || f.type === item.type;
+      var statusOk = !f.status || f.status === item.status;
+      if (typeOk && statusOk) return names[i];
+    }
+    return null;
   }
 
   function loadItems() {
@@ -460,18 +751,27 @@ function initShell() {
     return api("/items?" + params.toString()).then(function (result) {
       state.items = result.items;
       renderList();
-    }).catch(reportUnexpectedError);
+    });
   }
 
-  // -- Detail: Nur-lesen (fremder Space) vs. Editor (eigener Space) -------------------------
+  // -- Detail: Nur-lesen (fremdes Item) vs. Editor (eigenes Item) -----------------------------
+
+  function showOverviewPane() {
+    overviewEl.hidden = false;
+    detailReadonlyEl.hidden = true;
+    detailEditorEl.hidden = true;
+    editorPart.detach();
+    shellEl.dataset.view = "list";
+  }
 
   function clearDetail() {
     state.selectedId = null;
+    state.selectedReadonly = false;
     state.editingSnapshot = null;
     state.conflictCurrent = null;
-    detailEmptyEl.hidden = false;
-    detailReadonlyEl.hidden = true;
-    detailEditorEl.hidden = true;
+    showOverviewPane();
+    renderRail();
+    renderList();
   }
 
   function snapshotFromItem(item) {
@@ -505,21 +805,39 @@ function initShell() {
       || current.links.join(",") !== snap.links.join(",");
   }
 
+  function renderMetaDigest() {
+    var v = currentFormValues();
+    var parts = [v.status];
+    if (v.due) parts.push("fällig " + v.due);
+    if (v.tags.length) parts.push(v.tags.join(", "));
+    metaDigestEl.textContent = parts.join(" · ");
+  }
+
   function updateVersionBand() {
     versionBandEl.classList.remove("is-dirty", "is-conflict");
     if (!state.editingSnapshot) {
       versionBandNumberEl.textContent = "";
+      editorVersionEl.textContent = "";
+      saveButtonEl.disabled = true;
       return;
     }
+    var dirty = isDirty();
+    // Der Kern des V10-Fundes: ohne echte Änderung gibt es nichts zu speichern, und ein Klick
+    // darf die Version nicht hochzählen.
+    saveButtonEl.disabled = !dirty;
     if (state.conflictCurrent) {
       versionBandEl.classList.add("is-conflict");
       versionBandNumberEl.textContent = "v" + state.editingSnapshot.version + " → v" + state.conflictCurrent.version;
-    } else if (isDirty()) {
+      editorVersionEl.textContent = "Konflikt";
+    } else if (dirty) {
       versionBandEl.classList.add("is-dirty");
       versionBandNumberEl.textContent = "v" + state.editingSnapshot.version + "+";
+      editorVersionEl.textContent = "ungespeichert";
     } else {
       versionBandNumberEl.textContent = "v" + state.editingSnapshot.version;
+      editorVersionEl.textContent = "v" + state.editingSnapshot.version + " gespeichert";
     }
+    renderMetaDigest();
   }
 
   // -- Entwurfsschutz (§4.5): sessionStorage, nie localStorage, nur für den eigenen Tab und
@@ -556,67 +874,117 @@ function initShell() {
   function setEditorMode(mode) {
     state.mode = mode;
     editorTextareaEl.hidden = mode !== "edit";
-    editorToolbarEl.hidden = mode !== "edit";
     editorPreviewEl.hidden = mode !== "preview";
     togglePreviewButtonEl.textContent = mode === "edit" ? "Vorschau" : "Bearbeiten";
+    // Die Formatierhilfen bleiben sichtbar (sie sitzen in derselben Leiste wie der
+    // Vorschau-Umschalter), sind in der Vorschau aber deaktiviert — sonst würden sie unsichtbar
+    // in die Textarea schreiben.
+    Array.prototype.forEach.call(editorToolbarEl.querySelectorAll("[data-md]"), function (b) {
+      b.disabled = mode !== "edit";
+    });
     if (mode === "preview") {
       editorPreviewEl.innerHTML = markdownToHtml(editorTextareaEl.value);
     }
   }
 
+  function showReadonlyItem(item) {
+    editorPart.detach();          // Akzeptanzkriterium 12
+    // Beides zwingend, nicht kosmetisch (Advisor-Fund, siehe F7 im Session-Block): `hidden`
+    // überlebt das Aushängen des Knotens, und der `Ctrl+S`-Wächter prüft genau dieses Flag
+    // zusammen mit `editingSnapshot`. Ohne diese zwei Zeilen bliebe der Editor-Zustand des
+    // ZULETZT geöffneten eigenen Items scharf, während rechts ein fremdes Item steht.
+    detailEditorEl.hidden = true;
+    state.editingSnapshot = null;
+    overviewEl.hidden = true;
+    detailReadonlyEl.hidden = false;
+    roTitleEl.textContent = item.title;
+    roMetaEl.textContent = "";
+    roMetaEl.appendChild(el("span", "detail__badge-readonly", "Nur lesen — fremder Space (" + item.space + ")"));
+    roMetaEl.appendChild(el("span", "tnum", "v" + item.version));
+    roMetaEl.appendChild(el("span", null, item.type + " · " + item.status));
+    if (item.due) roMetaEl.appendChild(el("span", "tnum", "fällig " + item.due));
+    roPreviewEl.innerHTML = markdownToHtml(item.body);
+  }
+
+  function showEditableItem(item) {
+    editorPart.attach();
+    overviewEl.hidden = true;
+    detailReadonlyEl.hidden = true;
+    detailEditorEl.hidden = false;
+
+    state.editingSnapshot = snapshotFromItem(item);
+    fieldTitleEl.value = item.title;
+    populateStatusSelect(item.type);
+    fieldStatusEl.value = item.status;
+    fieldDueEl.value = item.due || "";
+    fieldTagsEl.value = item.tags.join(", ");
+    fieldLinksEl.value = item.links.join(", ");
+    editorTextareaEl.value = item.body;
+    setEditorMode("edit");
+
+    var draft = loadDraftIfAny(item.id);
+    if (draft && (draft.title !== item.title || draft.body !== item.body)) {
+      confirmDialog({
+        title: "Ungespeicherter Entwurf",
+        message: "Für dieses Item liegt ein ungespeicherter Entwurf in diesem Tab. Wiederherstellen?",
+        ok: "Wiederherstellen",
+      }).then(function (restore) {
+        if (!restore) {
+          clearDraft(item.id);
+          return;
+        }
+        fieldTitleEl.value = draft.title;
+        editorTextareaEl.value = draft.body;
+        fieldStatusEl.value = draft.status;
+        fieldDueEl.value = draft.due || "";
+        fieldTagsEl.value = draft.tags.join(", ");
+        fieldLinksEl.value = draft.links.join(", ");
+        updateVersionBand();
+      });
+    }
+    updateVersionBand();
+  }
+
   function loadEditorFromItem(item) {
     state.selectedId = item.id;
+    state.selectedReadonly = !!item.readonly;
     state.conflictCurrent = null;
     conflictDialogEl.hidden = true;
-    detailEmptyEl.hidden = true;
 
-    if (item.readonly) {
-      detailEditorEl.hidden = true;
-      detailReadonlyEl.hidden = false;
-      roTitleEl.textContent = item.title;
-      roMetaEl.textContent = "";
-      roMetaEl.appendChild(el("span", "detail__badge-readonly", "Nur lesen — fremder Space (" + item.space + ")"));
-      roMetaEl.appendChild(el("span", "tnum", "v" + item.version));
-      roMetaEl.appendChild(el("span", null, item.type + " · " + item.status));
-      if (item.due) roMetaEl.appendChild(el("span", "tnum", "fällig " + item.due));
-      roPreviewEl.innerHTML = markdownToHtml(item.body);
-    } else {
-      detailReadonlyEl.hidden = true;
-      detailEditorEl.hidden = false;
-      state.editingSnapshot = snapshotFromItem(item);
-      fieldTitleEl.value = item.title;
-      populateStatusSelect(item.type);
-      fieldStatusEl.value = item.status;
-      fieldDueEl.value = item.due || "";
-      fieldTagsEl.value = item.tags.join(", ");
-      fieldLinksEl.value = item.links.join(", ");
-      editorTextareaEl.value = item.body;
-      setEditorMode("edit");
+    if (item.readonly) showReadonlyItem(item);
+    else showEditableItem(item);
 
-      var draft = loadDraftIfAny(item.id);
-      if (draft && (draft.title !== item.title || draft.body !== item.body)) {
-        if (window.confirm("Es gibt einen ungespeicherten Entwurf für dieses Item. Wiederherstellen?")) {
-          fieldTitleEl.value = draft.title;
-          editorTextareaEl.value = draft.body;
-          fieldStatusEl.value = draft.status;
-          fieldDueEl.value = draft.due || "";
-          fieldTagsEl.value = draft.tags.join(", ");
-          fieldLinksEl.value = draft.links.join(", ");
-        } else {
-          clearDraft(item.id);
-        }
-      }
-      updateVersionBand();
-    }
     shellEl.dataset.view = "detail";
+    renderRail();
     renderList();
   }
 
   function selectItem(id) {
     state.selectedId = id;
     renderList();
-    return api("/items/" + encodeURIComponent(id)).then(loadEditorFromItem).catch(reportUnexpectedError);
+    return api("/items/" + encodeURIComponent(id)).then(loadEditorFromItem);
   }
+
+  // -- Editor schließen (Meldung des Nikingers: der Editor blieb "immer" offen) ----------------
+
+  function closeEditor() {
+    if (!isDirty()) {
+      clearDetail();
+      return Promise.resolve(true);
+    }
+    return confirmDialog({
+      title: "Ungespeicherte Änderungen",
+      message: "Der Editor enthält Änderungen, die noch nicht gespeichert sind. Verwerfen?",
+      ok: "Verwerfen",
+    }).then(function (discard) {
+      if (!discard) return false;
+      clearDraft(state.selectedId);
+      clearDetail();
+      return true;
+    });
+  }
+
+  closeButtonEl.addEventListener("click", function () { closeEditor(); });
 
   // -- Speichern / Konflikt (§4.5, Akzeptanzkriterium 11) ------------------------------------
 
@@ -635,79 +1003,120 @@ function initShell() {
     updateVersionBand();
   }
 
+  // Nach jedem Schreibvorgang: Liste neu laden (Reihenfolge/Zugehörigkeit kann sich geändert
+  // haben) UND die Zähler im Baum, sonst zeigt die Navigation Zahlen von vorhin.
+  function afterWrite(item, message) {
+    clearDraft(item.id);
+    return loadItems()
+      .then(loadOverview)
+      .then(function () {
+        loadEditorFromItem(item);
+        toast(message);
+      });
+  }
+
+  function handleWriteError(err, fallback) {
+    if (err.code === "conflict" && err.detail && err.detail.current) {
+      showConflictDialog(err.detail.current);
+      return;
+    }
+    if (err.message === "unauthenticated") return;
+    toast(err.message || fallback, "error");
+  }
+
+  // Jeder Schreibvorgang adressiert das Item über `state.editingSnapshot.id`, NIE über
+  // `state.selectedId` (Advisor-Fund, F7 im Session-Block): `selectItem()` setzt `selectedId`
+  // sofort, `editingSnapshot` erst wenn die Antwort da ist. Zwischen beidem liegt ein Fenster, in
+  // dem `selectedId` schon auf Item B zeigt, während Version und Formularwerte noch zu Item A
+  // gehören — ein `Ctrl+S` in diesem Moment schriebe A's Inhalt unter B's Kennung, und wenn beide
+  // Versionen zufällig gleich sind, ohne Konflikt. Das ist genau der stille Überschreiber, den
+  // Hard Rule 3 verbietet, nur eben clientseitig herbeigeführt. Über den Schnappschuss adressiert
+  // stammen Kennung und Version beweisbar aus demselben Lesevorgang.
   function saveItem() {
+    if (!state.editingSnapshot || !isDirty()) return Promise.resolve();
     var payload = Object.assign(
       { version: state.editingSnapshot.version, format: "markdown" }, currentFormValues()
     );
-    return api("/items/" + encodeURIComponent(state.selectedId), {
+    return api("/items/" + encodeURIComponent(state.editingSnapshot.id), {
       method: "PATCH", body: JSON.stringify(payload),
     }).then(function (item) {
-      clearDraft(item.id);
-      return loadItems().then(function () { loadEditorFromItem(item); });
+      return afterWrite(item, "Gespeichert · v" + item.version);
     }).catch(function (err) {
-      if (err.code === "conflict") showConflictDialog(err.detail.current);
-      else if (err.message !== "unauthenticated") window.alert(err.message || "Speichern fehlgeschlagen.");
+      handleWriteError(err, "Speichern fehlgeschlagen.");
     });
   }
 
-  saveButtonEl.addEventListener("click", saveItem);
+  saveButtonEl.addEventListener("click", function () { saveItem(); });
 
   conflictLoadCurrentButtonEl.addEventListener("click", function () {
     var current = state.conflictCurrent;
     clearDraft(current.id);
     hideConflictDialog();
     loadEditorFromItem(current);
+    toast("Aktuelle Fassung geladen · v" + current.version, "warn");
   });
 
   conflictSaveAsNewButtonEl.addEventListener("click", function () {
     var values = currentFormValues();
     var payload = Object.assign({ type: state.editingSnapshot.type, format: "markdown" }, values);
-    var previousId = state.selectedId;
+    var previousId = state.editingSnapshot.id;   // siehe F7-Kommentar über `saveItem()`
     hideConflictDialog();
     api("/items", { method: "POST", body: JSON.stringify(payload) }).then(function (item) {
       clearDraft(previousId);
-      return loadItems().then(function () { loadEditorFromItem(item); });
+      return afterWrite(item, "Als neues Item angelegt · " + item.title);
     }).catch(function (err) {
-      if (err.message !== "unauthenticated") window.alert(err.message || "Anlegen fehlgeschlagen.");
+      handleWriteError(err, "Anlegen fehlgeschlagen.");
     });
   });
 
   conflictCancelButtonEl.addEventListener("click", hideConflictDialog);
 
-  // -- Anhängen (eigener Pfad, nicht über PATCH — siehe Moduldocstring-Pendant server-seitig) -
+  // -- Anhängen (eigener Pfad, nicht über PATCH) ----------------------------------------------
 
   appendButtonEl.addEventListener("click", function () {
     var text = appendInputEl.value.trim();
     if (!text || !state.editingSnapshot) return;
-    api("/items/" + encodeURIComponent(state.selectedId) + "/append", {
+    api("/items/" + encodeURIComponent(state.editingSnapshot.id) + "/append", {
       method: "POST", body: JSON.stringify({ version: state.editingSnapshot.version, text: text }),
     }).then(function (item) {
       appendInputEl.value = "";
-      return loadItems().then(function () { loadEditorFromItem(item); });
+      return afterWrite(item, "Angehängt · v" + item.version);
     }).catch(function (err) {
-      if (err.code === "conflict") showConflictDialog(err.detail.current);
-      else if (err.message !== "unauthenticated") window.alert(err.message || "Anhängen fehlgeschlagen.");
+      handleWriteError(err, "Anhängen fehlgeschlagen.");
     });
   });
 
-  // -- Archivieren ---------------------------------------------------------------------------
+  // -- Archivieren -----------------------------------------------------------------------------
 
   archiveButtonEl.addEventListener("click", function () {
     if (!state.editingSnapshot) return;
-    if (!window.confirm("Item wirklich archivieren?")) return;
-    api("/items/" + encodeURIComponent(state.selectedId) + "/archive", {
-      method: "POST", body: JSON.stringify({ version: state.editingSnapshot.version }),
-    }).then(function (item) {
-      clearDraft(item.id);
-      return loadItems().then(function () { loadEditorFromItem(item); });
-    }).catch(function (err) {
-      if (err.message !== "unauthenticated") window.alert(err.message || "Archivieren fehlgeschlagen.");
+    confirmDialog({
+      title: "Archivieren",
+      message: "Das Item wandert ins Archiv. Gelöscht wird nichts — du findest es unter „Archiv“ wieder.",
+      ok: "Archivieren",
+    }).then(function (ok) {
+      if (!ok) return;
+      return api("/items/" + encodeURIComponent(state.editingSnapshot.id) + "/archive", {
+        method: "POST", body: JSON.stringify({ version: state.editingSnapshot.version }),
+      }).then(function (item) {
+        // Nach dem Archivieren blieb das Item bis Step 7b im Editor stehen, obwohl es aus der
+        // Liste verschwunden war — der Editor zeigte etwas, das daneben nicht mehr existierte.
+        clearDraft(item.id);
+        state.editingSnapshot = null;
+        return loadItems().then(loadOverview).then(function () {
+          clearDetail();
+          toast("Archiviert · " + item.title);
+        });
+      }).catch(function (err) {
+        handleWriteError(err, "Archivieren fehlgeschlagen.");
+      });
     });
   });
 
   // -- Anlegen (P5-U: Typ nach dem Anlegen nicht mehr änderbar) ------------------------------
 
   function openCreateDialog() {
+    if (!ownSpaceActive()) return;   // sollte nicht erreichbar sein, der Knopf ist dann ausgehängt
     if (state.meta) {
       createTypeEl.textContent = "";
       Object.keys(state.meta.status_values).forEach(function (t) {
@@ -737,15 +1146,84 @@ function initShell() {
       method: "POST", body: JSON.stringify({ type: createTypeEl.value, title: title, body: "" }),
     }).then(function (item) {
       closeCreateDialog();
-      return loadItems().then(function () { loadEditorFromItem(item); });
+      // Meldung des Nikingers: eine angelegte Notiz "landete in Notizen", war im gerade
+      // sichtbaren Ordner also nicht zu sehen. Der aktive Ordner springt jetzt dorthin mit, wo
+      // das neue Item tatsächlich liegt.
+      state.query = "";
+      searchInputEl.value = "";
+      return navigate(state.ownSpace, bucketFor(item) || state.filter)
+        .then(loadOverview)
+        .then(function () {
+          loadEditorFromItem(item);
+          toast("Angelegt · " + item.title);
+          fieldTitleEl.focus();
+        });
     }).catch(function (err) {
-      if (err.message !== "unauthenticated") window.alert(err.message || "Anlegen fehlgeschlagen.");
+      handleWriteError(err, "Anlegen fehlgeschlagen.");
+    });
+  });
+
+  // -- Konto: Passwort ändern (Block-A-Abnahmezeilen 5/6) --------------------------------------
+
+  function openAccountDialog() {
+    accountErrorEl.hidden = true;
+    accountCurrentEl.value = "";
+    accountTotpEl.value = "";
+    accountNewEl.value = "";
+    accountRepeatEl.value = "";
+    accountDialogEl.hidden = false;
+    accountCurrentEl.focus();
+  }
+
+  function accountError(message) {
+    accountErrorEl.textContent = message;
+    accountErrorEl.hidden = false;
+  }
+
+  accountButtonEl.addEventListener("click", openAccountDialog);
+  accountCancelEl.addEventListener("click", function () { accountDialogEl.hidden = true; });
+
+  accountSubmitEl.addEventListener("click", function () {
+    if (accountNewEl.value !== accountRepeatEl.value) {
+      accountError("Die beiden neuen Passwörter stimmen nicht überein.");
+      return;
+    }
+    accountErrorEl.hidden = true;
+    accountSubmitEl.disabled = true;
+    fetch("/api/v1/account/password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken() || "" },
+      body: JSON.stringify({
+        password: accountCurrentEl.value,
+        totp: accountTotpEl.value,
+        new_password: accountNewEl.value,
+      }),
+    }).then(function (response) {
+      return response.json().catch(function () { return null; }).then(function (body) {
+        accountSubmitEl.disabled = false;
+        if (!response.ok) {
+          var reasons = body && body.detail && body.detail.reasons;
+          accountError(
+            (body && body.message ? body.message : "Passwortwechsel fehlgeschlagen.")
+            + (reasons && reasons.length ? " (" + reasons.join("; ") + ")" : "")
+          );
+          return;
+        }
+        // P5-E/P5-Q: der Wechsel rotiert die Sitzung. Der neue CSRF-Token kommt genau EINMAL in
+        // dieser Antwort — ohne diese Zeile schlüge jede folgende Schreibanfrage mit
+        // `403 csrf_failed` fehl.
+        if (body && body.csrf_token) sessionStorage.setItem("sfx:csrf", body.csrf_token);
+        accountDialogEl.hidden = true;
+        toast("Passwort geändert. Connectoren müssen neu autorisiert werden.", "warn");
+      });
+    }).catch(function () {
+      accountSubmitEl.disabled = false;
+      accountError("Der Dienst ist gerade nicht erreichbar.");
     });
   });
 
   // -- Formatierhilfen (P5-U: fügt Markdown-Syntax in die Textarea ein, kein `execCommand`,
-  // kein WYSIWYG — die Idee einer Symbolleiste ist aus dem Notizheft-Beispiel geerntet, die
-  // Umsetzung nicht: dort steuert die Leiste ein `contenteditable`-Feld) -----------------------
+  // kein WYSIWYG) -----------------------------------------------------------------------------
 
   function wrapSelection(textarea, marker) {
     var start = textarea.selectionStart;
@@ -820,29 +1298,15 @@ function initShell() {
         updateVersionBand();
         saveDraft();
       });
+      // `<select>`/`<input type=date>` feuern in manchen Browsern nur `change`, nicht `input`.
+      input.addEventListener("change", function () {
+        updateVersionBand();
+        saveDraft();
+      });
     }
   );
 
-  // -- Init ------------------------------------------------------------------------------
-
-  function init() {
-    return api("/me")
-      .then(function (me) {
-        state.ownSpace = me.space;
-        state.activeSpace = me.space;
-        return api("/spaces");
-      })
-      .then(function (spaces) {
-        state.spaces = spaces;
-        renderRail();
-        return api("/meta");
-      })
-      .then(function (meta) {
-        state.meta = meta;
-        return loadItems();
-      })
-      .catch(reportUnexpectedError);
-  }
+  metaPanelEl.addEventListener("toggle", renderMetaDigest);
 
   // -- Suche (200ms Debounce) -----------------------------------------------------------
 
@@ -850,23 +1314,14 @@ function initShell() {
   searchInputEl.addEventListener("input", function () {
     state.query = searchInputEl.value;
     clearTimeout(searchTimer);
-    searchTimer = setTimeout(loadItems, 200);
+    searchTimer = setTimeout(function () { loadItems().catch(reportUnexpectedError); }, 200);
   });
 
-  // -- Filter-Buttons ---------------------------------------------------------------------
+  // -- Übersicht / Logout / Zurück ---------------------------------------------------------
 
-  document.querySelectorAll(".rail__filter").forEach(function (button) {
-    button.addEventListener("click", function () {
-      document.querySelectorAll(".rail__filter").forEach(function (b) {
-        b.removeAttribute("aria-current");
-      });
-      button.setAttribute("aria-current", "true");
-      state.filter = button.dataset.filter;
-      loadItems();
-    });
-  });
-
-  // -- Logout / Zurück ---------------------------------------------------------------------
+  // `closeEditor()` räumt bereits auf (inklusive Rückfrage bei ungespeicherten Änderungen) und
+  // zeigt danach die Übersicht — hier ist nichts weiter zu tun.
+  homeButtonEl.addEventListener("click", function () { closeEditor(); });
 
   document.getElementById("logout-button").addEventListener("click", function () {
     fetch("/ui/logout", { method: "POST", headers: { "X-CSRF-Token": csrfToken() || "" } }).then(
@@ -880,6 +1335,11 @@ function initShell() {
 
   // -- Tastatur (§4.6) ----------------------------------------------------------------------
 
+  function anyOverlayOpen() {
+    return !conflictDialogEl.hidden || !createDialogEl.hidden
+      || !confirmDialogEl.hidden || !accountDialogEl.hidden;
+  }
+
   document.addEventListener("keydown", function (event) {
     var tag = document.activeElement && document.activeElement.tagName;
     var inField = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
@@ -890,8 +1350,11 @@ function initShell() {
       return;
     }
     if (event.key === "Escape") {
-      if (!conflictDialogEl.hidden) hideConflictDialog();
+      if (!confirmDialogEl.hidden && pendingConfirmCancel) pendingConfirmCancel();
+      else if (!conflictDialogEl.hidden) hideConflictDialog();
       else if (!createDialogEl.hidden) closeCreateDialog();
+      else if (!accountDialogEl.hidden) accountDialogEl.hidden = true;
+      else if (state.selectedId !== null) closeEditor();
       return;
     }
     if (event.key === "/" && !inField) {
@@ -899,17 +1362,40 @@ function initShell() {
       searchInputEl.focus();
       return;
     }
-    if ((event.key === "ArrowDown" || event.key === "ArrowUp") && !inField) {
+    if ((event.key === "ArrowDown" || event.key === "ArrowUp") && !inField && !anyOverlayOpen()) {
       event.preventDefault();
       var ids = state.items.map(function (item) { return item.id; });
       if (ids.length === 0) return;
       var currentIndex = ids.indexOf(state.selectedId);
       var step = event.key === "ArrowDown" ? 1 : -1;
       var nextIndex = currentIndex === -1 ? 0 : Math.min(ids.length - 1, Math.max(0, currentIndex + step));
-      selectItem(ids[nextIndex]);
+      selectItem(ids[nextIndex]).catch(reportUnexpectedError);
     }
   });
 
-  clearDetail();
+  // -- Init ------------------------------------------------------------------------------
+
+  function init() {
+    return api("/me")
+      .then(function (me) {
+        state.ownSpace = me.space;
+        state.activeSpace = me.space;
+        return api("/meta");
+      })
+      .then(function (meta) {
+        state.meta = meta;
+        var names = Object.keys(meta.buckets);
+        if (names.indexOf(state.filter) === -1) state.filter = names[0];
+        return loadOverview();
+      })
+      .then(function () {
+        setCreateControlsPresent(ownSpaceActive());
+        renderCrumb();
+        return loadItems();
+      })
+      .catch(reportUnexpectedError);
+  }
+
+  showOverviewPane();
   init();
 }
