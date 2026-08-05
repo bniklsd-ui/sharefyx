@@ -18,6 +18,7 @@
 #   SHAREFYX_SOURCE_REPO    Optional, Default: das Repo, in dem dieses Skript liegt
 #   SHAREFYX_KEEP_RELEASES  Optional, Default 5
 #   SHAREFYX_SERVICE        Optional, Default sharefyx-mcp
+#   SHAREFYX_SYSTEMCTL      Optional, Default "systemctl" — siehe unten
 #   SHAREFYX_PORT           Optional, Default 8765 — siehe [SEAM] unten
 #   SHAREFYX_HEALTH_TIMEOUT Optional, Default 30 (Sekunden)
 #   SHAREFYX_DATA_ROOT      Optional — wenn gesetzt, Pre-Deploy-Bundle des DATA_ROOT
@@ -49,6 +50,13 @@ CURRENT_LINK="${SHAREFYX_CURRENT_LINK:?SHAREFYX_CURRENT_LINK muss gesetzt sein}"
 SOURCE_REPO="${SHAREFYX_SOURCE_REPO:-$REPO_DIR}"
 KEEP="${SHAREFYX_KEEP_RELEASES:-5}"
 SERVICE="${SHAREFYX_SERVICE:-sharefyx-mcp}"
+# Warum konfigurierbar und nicht schlicht `systemctl`: dieses Skript MUSS als `savefyx` laufen,
+# nicht als root. `/var/lib/sharefyx-backup` gehört `savefyx` (der Backup-Timer läuft unter
+# diesem Konto); ein Pre-Deploy-Bundle, das root dort hineinschreibt, könnte der Timer bei seiner
+# nächsten Retention nicht mehr löschen — ein Backup-Verzeichnis, das langsam vollläuft und
+# niemandem auffällt. Nur der Neustart einer System-Unit braucht Rechte, und genau dieser eine
+# Aufruf wird deshalb eskaliert: SHAREFYX_SYSTEMCTL="sudo systemctl".
+SYSTEMCTL="${SHAREFYX_SYSTEMCTL:-systemctl}"
 PORT="${SHAREFYX_PORT:-8765}"
 HEALTH_TIMEOUT="${SHAREFYX_HEALTH_TIMEOUT:-30}"
 
@@ -140,7 +148,7 @@ echo "Symlink: $CURRENT_LINK -> $release" >&2
 
 # -- 6) Neustart ------------------------------------------------------------------------------
 echo "starte $SERVICE neu" >&2
-systemctl restart "$SERVICE" >&2 || true
+$SYSTEMCTL restart "$SERVICE" >&2 || true
 
 # -- 7) Health-Gate ---------------------------------------------------------------------------
 # ABWEICHUNG vom Plan-Wortlaut, bewusst und dokumentiert: der Plan verlangt „eine
@@ -189,7 +197,7 @@ if (( gate_ok == 0 )); then
   # laufenden Dienst bedeutungslos. Genau deshalb steht im Runbook der erste Deploy VOR dem
   # Cutover — ein erster Deploy, der schiefgeht, darf nichts umwerfen.
   SHAREFYX_RELEASES_DIR="$RELEASES_DIR" SHAREFYX_CURRENT_LINK="$CURRENT_LINK" \
-    SHAREFYX_SERVICE="$SERVICE" "$SCRIPT_DIR/rollback.sh" >/dev/null || \
+    SHAREFYX_SERVICE="$SERVICE" SHAREFYX_SYSTEMCTL="$SYSTEMCTL" "$SCRIPT_DIR/rollback.sh" >/dev/null || \
     echo "WARNUNG: kein Rollback möglich (kein vorheriges Release?) — von Hand prüfen!" >&2
 
   # Fund beim ersten echten Probelauf dieses Skripts: ein zurückgerolltes Release bleibt liegen

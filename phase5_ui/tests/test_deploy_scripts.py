@@ -441,6 +441,35 @@ def test_ui_budget_reports_all_four_metrics():
 # -- Meta -------------------------------------------------------------------------------------
 
 
+def test_systemctl_call_is_escalatable_in_both_scripts(stubs, tmp_path, layout, source_repo):
+    """`deploy.sh` muss als `savefyx` laufen, nicht als root: `/var/lib/sharefyx-backup` gehört
+    `savefyx` (der Backup-Timer läuft unter diesem Konto), und ein Pre-Deploy-Bundle, das root
+    dort hineinschreibt, könnte der Timer bei seiner Retention nicht mehr löschen. Nur der
+    Neustart der System-Unit braucht Rechte — `SHAREFYX_SYSTEMCTL` eskaliert genau diesen einen
+    Aufruf. Der Test prüft, dass die Variable wirklich durchschlägt (und `deploy.sh` sie an
+    `rollback.sh` weiterreicht), nicht bloß dass sie im Quelltext vorkommt."""
+    releases, current = layout
+    _set_codes(tmp_path)
+    marker = tmp_path / "bin" / "eskaliert"
+    _write_stub(marker, f'#!/usr/bin/env bash\necho "ESKALIERT $*" >> "{tmp_path}/systemctl.log"\n')
+
+    result = _run_deploy(
+        stubs, tmp_path, releases, current, source_repo, SHAREFYX_SYSTEMCTL=str(marker)
+    )
+    assert result.returncode == 0, result.stderr
+
+    log = (tmp_path / "systemctl.log").read_text(encoding="utf-8")
+    assert "ESKALIERT restart sharefyx-mcp" in log, log
+
+    # Und im Rollback-Zweig ebenso — dort wäre ein vergessenes Durchreichen besonders bitter:
+    # der Deploy merkt den Fehlschlag, kann aber nicht zurückrollen.
+    _set_codes(tmp_path, me="200")
+    assert _run_deploy(
+        stubs, tmp_path, releases, current, source_repo, SHAREFYX_SYSTEMCTL=str(marker)
+    ).returncode != 0
+    assert (tmp_path / "systemctl.log").read_text(encoding="utf-8").count("ESKALIERT restart") >= 2
+
+
 def test_step8_scripts_have_no_hardcoded_paths():
     """Gegenstück zu `phase3_edge/tests/test_backup_scripts.py :: test_scripts_have_no_hardcoded_paths`
     — jener Test kennt nur die zwei P3-Skripte, die neuen hier fallen nicht automatisch darunter.

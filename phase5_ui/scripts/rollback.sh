@@ -13,6 +13,8 @@
 #   SHAREFYX_RELEASES_DIR   Pflicht — Verzeichnis mit den Release-Verzeichnissen
 #   SHAREFYX_CURRENT_LINK   Pflicht — der Symlink, den der Dienst benutzt
 #   SHAREFYX_SERVICE        Optional, Default sharefyx-mcp
+#   SHAREFYX_SYSTEMCTL      Optional, Default "systemctl" — auf "sudo systemctl" setzen,
+#                           wenn das Skript als `savefyx` läuft (siehe deploy.sh)
 #
 # Ausgabe: genau eine JSON-Zeile auf stdout (Hard Rule 7), aller Fortschritt auf stderr.
 
@@ -21,6 +23,7 @@ set -euo pipefail
 RELEASES_DIR="${SHAREFYX_RELEASES_DIR:?SHAREFYX_RELEASES_DIR muss gesetzt sein}"
 CURRENT_LINK="${SHAREFYX_CURRENT_LINK:?SHAREFYX_CURRENT_LINK muss gesetzt sein}"
 SERVICE="${SHAREFYX_SERVICE:-sharefyx-mcp}"
+SYSTEMCTL="${SHAREFYX_SYSTEMCTL:-systemctl}"
 
 if [[ ! -L "$CURRENT_LINK" ]]; then
   echo "ABBRUCH: $CURRENT_LINK ist kein Symlink — hier gibt es nichts zurückzurollen." >&2
@@ -75,7 +78,7 @@ ln -s "$previous" "$tmp_link"
 mv -T "$tmp_link" "$CURRENT_LINK"
 
 echo "starte $SERVICE neu" >&2
-systemctl restart "$SERVICE" >&2
+$SYSTEMCTL restart "$SERVICE" >&2
 
 printf '{"ts":"%s","action":"rollback","from":"%s","to":"%s","service":"%s"}\n' \
   "$(date -u +%Y-%m-%dT%H:%M:%S.%3NZ)" "$current_target" "$previous" "$SERVICE"
