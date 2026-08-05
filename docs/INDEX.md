@@ -31,8 +31,8 @@ updated: 2026-08-03
 
 ## Active phase (5 — Web-UI, REST-API, Auth-Selbstverwaltung)
 
-- [phase5_ui/CLAUDE.md](../phase5_ui/CLAUDE.md) — 🔄 ~34KB · phase head; Step 0 ✅, Step 1 ✅ (S2–S8 geschlossen), Step 2 ✅ (Schema 2, `UserDirectory`, Migrationsskript), Step 3 ✅ (neues Paket `phase5_ui/webui`, Sessions/CSRF/Login/Logout), Step 4 ✅ (Selbstverwaltung: Einladung, Passwort, TOTP, Recovery, Connectoren; neuer Sicherheitsbefund S9 gefunden+geschlossen), `/ui/*` aus Step 5 vorgezogen in `mcpserver/app.py` gemountet (Block-A-Gate war sonst nicht live durchführbar); 🟡 Block A Zeilen 1,2,3,4,8,9 (§6) live bestanden; Zeilen 5/6 bewusst auf nach Step 5/6 verschoben (keine Klick-Oberfläche vor der App-Shell), Zeile 7 als Nächstes; read + newest Session-stopped block first
-- [phase5_ui/SESSIONS_ARCHIVE.md](../phase5_ui/SESSIONS_ARCHIVE.md) — 📦 ~41KB · vier archivierte Session-Blöcke (Step 0, Step 1, Step 2, Step 3), verbatim
+- [phase5_ui/CLAUDE.md](../phase5_ui/CLAUDE.md) — 🔄 ~14KB · phase head; Step 0 ✅, Step 1 ✅ (S2–S8 geschlossen), Step 2 ✅ (Schema 2, `UserDirectory`, Migrationsskript), Step 3 ✅ (neues Paket `phase5_ui/webui`, Sessions/CSRF/Login/Logout), Step 4 ✅ (Selbstverwaltung: Einladung, Passwort, TOTP, Recovery, Connectoren; neuer Sicherheitsbefund S9 gefunden+geschlossen), `/ui/*` aus Step 5 vorgezogen in `mcpserver/app.py` gemountet (Block-A-Gate war sonst nicht live durchführbar); 🟡 Block A (§6) vollständig bis auf Zeilen 5/6, die bewusst auf nach Step 5/6 verschoben sind (keine Klick-Oberfläche vor der App-Shell, DevTools-Behelf vom Nikinger abgelehnt); read + newest Session-stopped block first
+- [phase5_ui/SESSIONS_ARCHIVE.md](../phase5_ui/SESSIONS_ARCHIVE.md) — 📦 ~75KB · fünf archivierte Session-Blöcke (Step 0, Step 1, Step 2, Step 3, Step 4 inkl. Block-A-Gate/Origin-Fund), verbatim
 - [docs/concepts/phase5_ui_plan.md](./concepts/phase5_ui_plan.md) — 📕 ~80KB · ausführungsreifer P5-Plan: Entscheidungen P5-A–P5-AE, Steps 0–9 (Block A Sicherheit/Selbstverwaltung, Block B REST-API/UI), Designsystem, Abnahmematrix 1–20, [VERIFY]-Register V27–V38; über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
 
 ## Completed phases
