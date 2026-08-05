@@ -193,8 +193,15 @@ Berührungsfläche wie P4-Q (`mcpserver/app.py` ist dort explizit erlaubt) — P
 ebenfalls. Kein Eigen-Auftrag dieser Phase, nur die Zähl-Zeile hier nachgezogen, dieselbe
 Disziplin wie bei den P4-Korrekturen oben.
 
-**Gesamt: 83 Tests** in `phase2_mcp/tests/` (6 `test_config.py` + 1 `test_credentials.py` + 1
-`test_auth.py` + 3 `test_permissions.py` + 8 `test_logging.py` + 2 `test_context.py` + 13
+**[2026-08-05 Korrektur, P5 Step 5+6]:** dieselbe Drift-Kategorie wie oben, diesmal über zwei
+P5-Schritte hinweg aufgelaufen — weder der Step-5-Nachtrag (`test_api_items_reachable_through_
+create_app`, `test_app.py` 13→14) noch der Step-6-Commit (`test_ui_index_route_reachable_
+through_create_app`, 14→15) hatten diese Zeile nachgezogen. Reale Zahl wieder per `pytest
+--collect-only -q` je Datei neu gezählt, nicht aus der alten Summe hochgerechnet: **Gesamt: 85
+Tests.**
+
+**Gesamt: 85 Tests** in `phase2_mcp/tests/` (6 `test_config.py` + 1 `test_credentials.py` + 1
+`test_auth.py` + 3 `test_permissions.py` + 8 `test_logging.py` + 2 `test_context.py` + 15
 `test_app.py` + 23 `test_tools.py` + 3 `test_mcp_smoke.py` + 11 `test_request_log.py` + 10
 `test_asgi_bearer.py` [seit dem Schnitt: nur noch `BearerAuthASGI`, kein `TokenPathASGI`/
 `AuthModeASGI` mehr, Details `phase4_auth/CLAUDE.md`] + 2 `test_serve.py` [neu, Schnitt:

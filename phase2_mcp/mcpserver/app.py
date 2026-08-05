@@ -71,6 +71,12 @@ und vor `/health`/`Mount("/mcp")`. `store: Store` bediente bis hierhin ausschlie
 (`own_space_writable`) statt zweimal instanziiert — beide Verwendungsstellen teilen sich dieselbe
 (zustandslose) Instanz. Die Zirkelfreiheit von oben gilt unverändert: der zusätzliche Import ist
 exakt der eine vorhergesagte (`mcpserver.permissions.OwnSpaceWritable`), kein zweites Symbol.
+
+**[2026-08-05, P5 Step 6]:** `webui/static_routes.py` existiert jetzt (`GET /ui/` — die echte
+App-Shell, sitzungsgated — und `GET /ui/static/{path}`) und ist als `static_routes(ui_settings,
+ui_sessions)` gemountet, direkt hinter `ui_auth_routes()` (beide sind `/ui/*`-Belange) und vor
+`account_routes()`/`api_routes()`. Kein neuer `create_app()`-Parameter — `static_routes()`
+braucht nur, was hier ohnehin schon für `ui_auth_routes()` gebaut wird.
 """
 from __future__ import annotations
 
@@ -95,6 +101,7 @@ from webui.api import api_routes
 from webui.config import UiSettings
 from webui.routes_auth import ui_auth_routes
 from webui.sessions import SessionManager
+from webui.static_routes import static_routes
 
 from . import __version__
 from .asgi import BearerAuthASGI
@@ -180,6 +187,7 @@ def create_app(
 
     routes: list[Route | Mount] = list(oauth_routes(oauth.settings, oauth.store, oauth.users))
     routes += ui_auth_routes(ui_settings, oauth.store, oauth.users, ui_sessions)
+    routes += static_routes(ui_settings, ui_sessions)
     routes += account_routes(ui_settings, oauth.store, oauth.users, ui_sessions)
     routes += api_routes(ui_settings, store, ui_sessions, own_space_writable)
     middleware: list[Middleware] = []

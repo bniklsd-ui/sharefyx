@@ -31,17 +31,21 @@ def render_error_page(message: str) -> str:
 
 
 def render_logged_in_page(*, csrf_token: str) -> str:
-    """Übergangsseite bis Step 6 die echte App-Shell baut. Trägt den CSRF-Token als verstecktes
+    """Bootstrap-Seite zur echten App-Shell (Step 6). Trägt den CSRF-Token als verstecktes
     Formularfeld — derselbe Grund wie `request_id` in `authserver/templates.py ::
     render_login_form()`: der Token wird von `SessionManager.issue()`/`.rotate()` nur EIN
     einziges Mal als Klartext zurückgegeben (`ui_sessions` speichert nur `csrf_hash`), er muss
-    also in genau dieser Antwort an den Browser weitergereicht werden, sonst kann keine
-    nachfolgende, CSRF-geprüfte Anfrage (z. B. `/ui/logout`) je einen gültigen Wert vorlegen."""
+    also in genau dieser Antwort an den Browser weitergereicht werden. `app.js`s Bootstrap-Teil
+    (`webui/static/app.js`) liest genau dieses `<input name="csrf">` aus, legt den Wert in
+    `sessionStorage` ab und leitet dann nach `/ui/` weiter (Plan-Abweichung 2,
+    `phase5_ui/CLAUDE.md` Session-Block 2026-08-05) — das Logout-Formular bleibt zusätzlich ohne
+    JavaScript funktionsfähig, falls `app.js` aus irgendeinem Grund nicht lädt."""
     body = f"""<p>Angemeldet.</p>
 <form method="post" action="/ui/logout">
   <input type="hidden" name="csrf" value="{escape(csrf_token)}">
   <button type="submit">Abmelden</button>
-</form>"""
+</form>
+<script src="/ui/static/app.js" defer></script>"""
     return _PAGE.format(title="Angemeldet", body=body)
 
 

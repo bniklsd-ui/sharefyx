@@ -223,6 +223,35 @@ async def test_ui_invite_reachable_through_create_app(app, auth_store):
 
 
 @pytest.mark.asyncio
+async def test_ui_index_route_reachable_through_create_app(app, auth_store, auth_settings):
+    """Step 6: `GET /ui/` (die echte App-Shell) muss über die reale `create_app()`-App
+    erreichbar sein — ohne Sitzung ein `303` nach `/ui/login` (dieselbe Sitzungsprüfung wie
+    `webui/static_routes.py`s eigene Tests, hier gegen den zusammengesteckten Prozess statt eine
+    eigenständige Testapp), mit einer gültigen Sitzung `200` mit `app.html`-Inhalt."""
+    from webui.config import COOKIE_NAME, UiSettings
+    from webui.sessions import SessionManager
+
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app), base_url=auth_settings.base_url,
+    ) as client:
+        anonymous = await client.get("/ui/", follow_redirects=False)
+        assert anonymous.status_code == 303
+        assert anonymous.headers["location"] == "/ui/login"
+
+        ui_settings = UiSettings(base_url=auth_settings.base_url)
+        ui_sessions = SessionManager(auth_store, settings=ui_settings)
+        cookie_response = Response()
+        ui_sessions.issue(cookie_response, space="alpha")
+        session_id = cookie_response.headers["set-cookie"].split(";")[0].split("=", 1)[1]
+
+        authenticated = await client.get(
+            "/ui/", headers={"Cookie": f"{COOKIE_NAME}={session_id}"},
+        )
+    assert authenticated.status_code == 200
+    assert "<html" in authenticated.text
+
+
+@pytest.mark.asyncio
 async def test_api_items_reachable_through_create_app(app, auth_store, auth_settings):
     """Gegenstück zu `test_ui_login_reachable_through_create_app`, für Step 5: `webui/api.py`
     wird über dieselbe `oauth.store`/`oauth.users`-Instanz gemountet, kein zweiter DB-Handle —

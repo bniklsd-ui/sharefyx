@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sharefyx</title>
+<link rel="stylesheet" href="/ui/static/app.css">
+</head>
+<body>
+<div class="shell" data-view="list" id="shell">
+  <nav class="rail" id="rail">
+    <div class="rail__section">
+      <h2 class="rail__heading">Spaces</h2>
+      <div id="rail-spaces"></div>
+    </div>
+    <div class="rail__section">
+      <h2 class="rail__heading">Filter</h2>
+      <button class="rail__filter" type="button" data-filter="open" aria-current="true">
+        <span class="rail__glyph">O</span><span class="rail__label">Offen</span>
+      </button>
+      <button class="rail__filter" type="button" data-filter="note">
+        <span class="rail__glyph">N</span><span class="rail__label">Notizen</span>
+      </button>
+      <button class="rail__filter" type="button" data-filter="archived">
+        <span class="rail__glyph">A</span><span class="rail__label">Archiv</span>
+      </button>
+    </div>
+    <div class="rail__account">
+      <button class="rail__logout" type="button" id="logout-button">
+        <span class="rail__glyph">&#9211;</span><span class="rail__label">Abmelden</span>
+      </button>
+    </div>
+  </nav>
+
+  <section class="list" id="list">
+    <div class="list__search">
+      <input type="search" class="list__search-input" id="search-input" placeholder="Suche…" aria-label="Suche">
+    </div>
+    <div class="list__chips" id="list-chips"></div>
+    <ol class="list__rows" id="list-rows"></ol>
+    <div class="list__empty" id="list-empty" hidden>
+      <p>Keine Notizen in diesem Space.</p>
+      <button class="btn-primary" type="button" id="create-button" disabled title="Anlegen ab Step 7">Erste Notiz anlegen</button>
+    </div>
+  </section>
+
+  <section class="detail" id="detail">
+    <button class="detail__back" type="button" id="back-button">&larr; Zurück</button>
+    <div class="detail__empty" id="detail-empty">
+      <p>Kein Item ausgewählt.</p>
+    </div>
+    <div id="detail-content" hidden>
+      <header class="detail__header">
+        <h1 id="detail-title"></h1>
+        <div class="detail__meta" id="detail-meta"></div>
+      </header>
+      <pre class="detail__body" id="detail-body"></pre>
+    </div>
+  </section>
+</div>
+<script src="/ui/static/app.js" defer></script>
+</body>
+</html>
