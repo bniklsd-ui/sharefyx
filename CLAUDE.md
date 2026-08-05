@@ -210,9 +210,13 @@ live bestätigt, read-only gegengeprüft (nicht nur Nikinger-Zusammenfassung üb
 `systemctl show sharefyx-mcp -p ExecMainStartTimestamp` → Restart 18:34:38;
 `journalctl` → `POST /ui/enroll/confirm` um 18:36:40 → **`200`**, keine neue
 `CSRF-Origin-Fehlschlag`-Zeile danach. **Origin-Fund vollständig geschlossen — Zeile 3 (§6) live
-bestanden.** Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-03, Fünfter–Neunter Nachtrag
-2026-08-04.**]** **Nächster Schritt:** restliche Abnahmezeilen 1, 2, 4–9 (§6, Block A) live
-fahren, dann der harte Gate vor Block B. Danach erst Step 5 (REST-API v1) — nur teilweise
+bestanden.**]** **[2026-08-05:** Zeilen 1, 2, 4, 8, 9 live bestanden. Zeilen 5/6
+(Passwortwechsel/Session-Widerruf) auf **nach** Step 5/6 verschoben (Nikinger-Entscheidung) —
+Step 4 baute dafür nur die JSON-API, keine Klick-Oberfläche; ein DevTools-`fetch()`-Behelf wurde
+angeboten und vom Nikinger explizit als „Workaround, kein echter Test" abgelehnt. Details:
+`phase5_ui/CLAUDE.md` Session-Block 2026-08-03, Zehnter Nachtrag 2026-08-05.**]** **Nächster
+Schritt:** Zeile 7 (gemeinsame Fehlversuchsbremse) live fahren, dann ist Block A bis auf die
+verschobenen Zeilen 5/6 abgeschlossen. Danach erst Step 5 (REST-API v1) — nur teilweise
 vorgezogen: `webui/api.py` braucht bei seinem
 Bau noch einen zweiten, kleinen `create_app()`-Edit für den `store`-Parameter, den
 `ui_auth_routes()`/`account_routes()` nicht brauchten.

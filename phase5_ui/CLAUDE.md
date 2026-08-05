@@ -473,9 +473,36 @@ Session-Widerruf, gemeinsame Fehlversuchsbremse, `authctl.py list-users`, `strin
 `auth.sqlite3`) — der harte Gate vor Block B ist damit **nicht** vollständig, nur der bisherige
 Blocker ist weg.
 
-**Nächster Schritt (konkret):** die restlichen Abnahmezeilen 1, 2, 4–9 (§6, Block A) live fahren
-— derselbe Einladungs-/Enrollment-Durchlauf von eben deckt bereits einen Teil von Zeile 1 ab
-(„Einladungslink erzeugt, Konto von null auf aktiv eingerichtet"), noch nicht protokolliert.
+**Zehnter Nachtrag, 2026-08-05 — Zeilen 1, 2, 4, 8, 9 live bestanden; Zeilen 5/6 auf nach dem
+Step-5/6-App-Shell verschoben (Nikinger-Entscheidung):**
+- **Zeile 1** (Einladungslink → aktives Konto): bereits durch den Enrollment-Durchlauf oben
+  belegt.
+- **Zeile 2** (Einladungslink zweimal): Nikinger meldet „ungültiger Einladungslink" beim
+  zweiten Aufruf — bestanden.
+- **Zeile 4** (Recovery-Code ersetzt TOTP): erste Anmeldung mit Recovery-Code erfolgreich,
+  derselbe Code beim zweiten Versuch abgelehnt — bestanden.
+- **Zeile 8** (`authctl.py list-users`): von Claude Code read-only ausgeführt — `niklas`/
+  `fabian`, `status='active'`, `totp_confirmed=True`, kein Hash, kein Seed sichtbar — bestanden.
+- **Zeile 9** (`strings` gegen `auth.sqlite3`): Grep-Versuch von Claude Code selbst vom
+  Auto-Mode-Classifier blockiert (Zugriff auf die Rohdatei mit echten Secrets — genau die
+  Kategorie „echte Nutzerakten", die laut Root-`CLAUDE.md` dem Nikinger vorbehalten ist, nicht
+  umgangen). Nikinger führte denselben Befehl
+  (`strings /var/lib/sharefyx/auth.sqlite3 | grep -E '^[A-Z2-7]{26,32}$'`) selbst aus — leere
+  Ausgabe, kein Base32-Seed im Klartext — bestanden.
+- **Zeilen 5/6** (Passwortwechsel ohne Restart / Session-/Connector-Widerruf danach): kein
+  Klick-Pfad existiert dafür — Step 4 baute nur die JSON-API (`/api/v1/account/*`), keine
+  HTML-Seite; die App-Shell (`app.js`, echte Formulare) ist Step 5/6-Scope, der **nach** diesem
+  Gate liegt (dieselbe Plan-Reihenfolge-Spannung wie der `/ui/invite`-404-Fund oben). Ein
+  DevTools-`fetch()`-Workaround wurde angeboten, vom Nikinger explizit abgelehnt: „das ist ein
+  Workaround, kein echter Test." **Nikinger-Entscheidung: Zeilen 5/6 werden zurückgestellt, bis
+  die echte App-Shell existiert, dann mit einem echten Klick-Pfad nachgeholt — kein Ersatztest
+  jetzt.** Block-A-Gate bleibt bis dahin formal 🟡 (nicht vollständig „bestanden", zwei Zeilen
+  bewusst offen statt behelfsmäßig geschlossen), Zeile 7 wird als Nächstes getestet
+  (`authctl.py unlock --space niklas` von Claude Code ausgeführt, um die vom vorigen
+  Fehlversuchstest gesetzte Sperre für den Nikinger aufzuheben).
+
+**Nächster Schritt (konkret):** Zeile 7 (gemeinsame Fehlversuchsbremse UI-Login/OAuth-Consent)
+live fahren, danach ist Block A bis auf die bewusst verschobenen Zeilen 5/6 abgeschlossen.
 Danach erst Step 5 (REST-API v1) — **teilweise, nicht vollständig vorgezogen**
 (Advisor-Korrektur zum ersten Nachtrag: „bereits erledigt" überzog): Plan §1.5 zeigt
 `webui_routes(ui_settings, auth_store, userdir, store, sessions)` mit einem `store`-Parameter
