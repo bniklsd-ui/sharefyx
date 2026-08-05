@@ -97,101 +97,87 @@ Messung statt Schätzung (`ui_budget.py`, AD) · gemeinsame Live-Abnahme, beide 
 | 7 | `/ui/enroll/confirm`: CSRF-Fehlschlag rendert jetzt einen Retry (`routes_auth.py :: _enrollment_retry()`, geteilt mit „falscher Code") statt `render_error_page()`s Sackgasse; **Root Cause gefunden und behoben:** `webui/security.py`s `Referrer-Policy` von `no-referrer` auf `strict-origin` — `no-referrer` liess die Fetch-Spec den `Origin`-Header eines reinen HTML-`<form>`-POSTs auf `null` setzen, auch bei einer echten Same-Origin-Anfrage | 4 (Gate-Live-Fund) | ✅ **vollständig, live bestätigt** — Prozess-Neustart-Zeitstempel gegen die erste erfolgreiche `200`-Antwort auf `/ui/enroll/confirm` read-only gegengeprüft (nicht nur behauptet); `errors.py :: CsrfError`s Docstring korrigiert (unabhängiger, vorbestehender Fund); Details `SESSIONS_ARCHIVE.md` (Fünfter–Neunter Nachtrag, 2026-08-03/04) | +2 (`test_enroll_confirm_csrf_failure_offers_a_retry_not_a_dead_end`, `test_csrf_foreign_origin_logs_the_received_value_but_not_to_the_client`, `test_ui_referrer_policy_does_not_null_the_origin_header_on_same_origin_posts` — drei Tests, siehe Archiv für die Aufschlüsselung je Nachtrag) |
 | 8 | REST-API v1: `webui/{api,serializers}.py`, `mcpserver/app.py :: create_app()` mountet `api_routes(ui_settings, store, ui_sessions, own_space_writable)` (`OwnSpaceWritable()` jetzt einmal instanziiert, geteilt mit `build_mcp()`) | 5 | ✅ **vollständig** — `scripts/ui_smoke.py` (neu, Gegenstück zu `mcp_smoke.py`/`oauth_smoke.py`) läuft In-Process durch Einladung→Enrollment→Login→`/api/v1/{me,spaces,items,...}`, 12/12 Prüfungen grün; eigener Fund (nicht im Plan-Testliste): `storage.store.Store.archive()` hat anders als `update()`/`append()` keinen Schutz gegen ein bereits archiviertes Item — in `api.py` (nicht in `storage/`, dort tabu) mit einem zusätzlichen `store.get()`-Check NACH der Rechteprüfung geschlossen | +38 (23 `test_api.py` + 7 `test_serializers.py`, zwei neue Testdateien; `phase2_mcp/tests/test_app.py` +1 `test_api_items_reachable_through_create_app`; `phase5_ui/tests/test_isolation.py` `test_api_endpoint_ignores_bearer_token` geschärft — Platzhalter seit Step 3 gegen die echte, gemountete Route ersetzt, kein zusätzlicher Test) |
 | 9 | UI-Gerüst: `webui/static_routes.py` (`GET /ui/` sitzungsgated, `GET /ui/static/{path}`), `webui/static/{app.html,app.css,app.js,fonts/}`, `webui/config.py :: UiSettings.static_dir`, `scripts/build_font_subset.sh` (echte Inter-Variable-Subsetting-Pipeline, schließt V27), `mcpserver/app.py` mountet `static_routes()` | 6 | ✅ **vollständig** — Navigation/Liste/Suche/schreibgeschützte Detailansicht gegen die echte REST-API aus Step 5; **kein** Editor, **kein** Markdown-Rendering, **kein** Versionsband (bewusst Step-7-Scope). Korrigiert einen Plan-Selbstwiderspruch (§1.5-Tabelle „`/ui/` Auth: keine" vs. der im selben Plan-Abschnitt verlangte Testname `test_index_route_requires_session`) zugunsten des Tests, Details im Session-Block unten | +8 (7 `test_static_routes.py`, neue Datei; `phase2_mcp/tests/test_app.py` +1 `test_ui_index_route_reachable_through_create_app`; JS bleibt laut Plan unit-ungetestet) |
+| 10 | Editor, Vorschau, Konflikt, Frontmatter-Felder: `webui/api.py` +`GET /api/v1/meta`; `webui/static/app.js` um Markdown-Parser/Sanitizer (geerntet + erweitert aus `docs/concepts/notiz_heft_example.html`), Editor-Zustand, Versionsband, Speichern/Konfliktdialog, Anlegen/Anhängen/Archivieren, Frontmatter-Felder, Entwurfsschutz, „Sitzung abgelaufen"-Karte, Formatierhilfen-Leiste erweitert; `webui/static/{app.css,app.html}` entsprechend erweitert | 7 | ✅ **vollständig** — kein Passwortänderungsdialog (eigener Nachtrag, Zeilen 5/6 der Block-A-Abnahme folgen dort), kein Deploy/Rollback (Step 8), keine zweite Formatvariante (P5-Z bleibt Seam). Umfangreiche Node/jsdom-gestützte End-to-End-Simulation (Scratchpad, nicht im Repo) fand und schloss zwei echte Funde vor dem Commit: (1) das Test-Mock selbst hatte einen `includes()`-Bug (`/api/v1/meta` matchte fälschlich auch `/api/v1/me`) — beim Beheben zusätzlich `reportUnexpectedError()` in `app.js` ergänzt, weil (2) `loadItems()`/`selectItem()`/`init()` bei einem `401` sonst eine unbehandelte Promise-Ablehnung hinterließen (im Browser nur eine Konsolenwarnung, in Node ein Prozessabbruch — trotzdem sauber behandelt, nicht auf das mildere Browser-Verhalten verlassen) | +4 (2 `test_meta.py`, neue Datei + 2 `test_api.py`: `test_conflict_response_current_item_matches_item_to_json_exactly`, `test_append_endpoint_concatenates_patch_endpoint_replaces`; JS bleibt laut Plan unit-ungetestet, die jsdom-Simulation ist eine Entwicklungshilfe dieser Session, kein Teil der Suite) |
 
 ---
 
-## Session stopped — 2026-08-05 (Step 6: UI-Gerüst — Shell, Tokens, Navigation, Liste, Suche)
+## Session stopped — 2026-08-05, zweiter Nachtrag (Step 7: Editor, Vorschau, Konflikt, Frontmatter-Felder)
 
-**Ergebnis:** Step 6 ist fertig — `GET /ui/` liefert erstmals die echte App-Shell
-(`webui/static/{app.html,app.css,app.js}`) statt der Step-3-Übergangsseite, verdrahtet gegen
-`/api/v1/{me,spaces,items,items/{id}}` aus Step 5. Bewusst **kein** Editor, **kein**
-Markdown-Rendering (§3.5), **kein** Versionsband (§4.4), **kein** Konfliktdialog — das ist
-wörtlich Step 7s Aufgabenliste, nicht vorgezogen.
+**Ergebnis:** Step 7 ist fertig — die Detail-Spalte ist jetzt ein echter Editor statt einer
+Leseansicht. Anlegen (kleines Inline-Formular, Typ+Titel), Bearbeiten mit Markdown-Vorschau,
+Anhängen (eigener API-Pfad, kein PATCH-Umweg), Archivieren, Frontmatter-Felder (Titel/Status/
+Fällig/Tags/Links, Status-Vokabular aus dem neuen `GET /api/v1/meta` statt in der UI dupliziert),
+Versionsband (§4.4, drei Zustände: Ruhe/ungespeichert/Konflikt), Konfliktdialog mit den zwei
+Optionen aus §4.5 (kein Auto-Merge), Entwurfsschutz über `sessionStorage`, „Sitzung
+abgelaufen"-Karte statt totem Redirect. Fremde Items bleiben strikt lesend (eigener Vorschau-
+Zweig, keine Editor-Elemente werden für sie überhaupt gerendert — Akzeptanzkriterium 12).
 
-**Korrektur zu Plan §1.5s Routentabelle, vor dem Bau entschieden (nicht erst live gefunden):**
-die Tabelle trägt für `/ui/` in der Auth-Spalte „keine" ein, aber derselbe Plan-Abschnitt (§5
-Step 6) verlangt im selben Atemzug einen Test namens `test_index_route_requires_session` — ein
-direkter Widerspruch innerhalb desselben 📕-Dokuments, dieselbe Kategorie wie der
-`mcpserver→webui`-Zirkel aus P5 Step 4 (dort ebenfalls zugunsten des konkreteren Textes gegen
-eine Ableitungstabelle aufgelöst, siehe `SESSIONS_ARCHIVE.md`). Aufgelöst zugunsten des
-Testnamens: `GET /ui/` ohne gültige Sitzung → `303` nach `/ui/login` (`webui/static_routes.py ::
-_index()`), mit Sitzung → `200` mit `app.html`. Dem Nikinger nicht vorab zur Entscheidung
-vorgelegt (anders als der Zirkel-Fund in P5 Step 4) — die Kategorie ist dieselbe, aber die
-Auflösung war hier eindeutig genug (ein Tabellen-Zellwert gegen einen explizit benannten Test im
-selben Abschnitt), um sie als „kleine Drift" statt „entscheidungsbedürftig" einzustufen (Root-
-`CLAUDE.md`: „kleine Drift selbst fixen und datiert vermerken; wenn nicht klein, stoppen und
-fragen"). Wird hier vermerkt, nicht still verschwiegen.
+**Harvest aus `docs/concepts/notiz_heft_example.html`** (vom Nikinger bereitgestellt, vorher
+nicht zugänglich — siehe vorherige Rückfrage in dieser Session): `sanitizeHtml()`/
+`markdownToHtml()`/`safeHref()` als Ausgangspunkt übernommen und erweitert (h1–h4 statt nur
+h1–h3, Zitate und GFM-Tabellen neu — beides hatte die Quelle nicht), `.rich-editor`s
+Formensprache für Zitat/Code/Tabelle/HR auf unsere Tokens umgesetzt. Bewusst NICHT übernommen:
+`sanitizeStyle()`/Style-Attribute (unsere `style-src 'self'`-CSP ohne `unsafe-inline` verhindert
+ohnehin, dass ein `style="..."` je greift), IMG/FIGURE/FONT/`data-asset-*` (kein Anhang-Feature,
+P5-AA), Task-Checklisten (nicht in §3.5s Markdown-Teilmenge), `tel:`/`#note:`/`#asset:` (§3.5
+nennt nur `http:`/`https:`/`mailto:`/`#item/<id>`). Die Symbolleiste selbst ist dort
+`document.execCommand` gegen ein `contenteditable`-Feld (WYSIWYG) — P5-U verbietet das
+ausdrücklich; übernommen wurde nur die Idee einer Leiste über dem Editor, die Buttons fügen hier
+Markdown-Syntax in die `<textarea>` ein.
 
-**CSRF-Token-Übergabe an die Shell (im Plan nicht spezifiziert):** `SessionManager.rotate()`
-gibt den CSRF-Token nur EIN einziges Mal als Klartext zurück (`ui_sessions` speichert nur den
-Hash) — der Plan sagt nirgends, wie `app.js` daran kommt. Lösung: die seit Step 3 bestehende
-Login-Erfolgsseite (`pages.py :: render_logged_in_page()`) behält ihr `<input type="hidden"
-name="csrf" value="...">` unverändert und bekommt zusätzlich `<script src="/ui/static/app.js"
-defer>`. `app.js`s Bootstrap-Teil (läuft auf JEDER `/ui/*`-Seite, erkennt sich selbst an
-`document.getElementById('shell')`s Fehlen) liest das Feld aus, legt den Wert in
-`sessionStorage['sfx:csrf']` ab (kein `localStorage` — konsistent mit dem in §4.5 bereits
-gelockten Entwurfsschutz-Muster) und leitet per `location.replace('/ui/')` weiter. Ein `401
-unauthenticated` von irgendeinem API-Aufruf schickt in Step 6 schlicht zu `/ui/login` zurück —
-kein Entwurfsschutz nötig, es gibt in Step 6 noch nichts Eingetipptes zu verlieren; Step 7 baut
-dafür die volle „Sitzung abgelaufen"-Karte aus §4.5, sobald der Editor existiert. Logout bleibt
-ohne JavaScript funktionsfähig (das Formular aus Step 3 ist unverändert), `app.js` ergänzt nur
-einen bequemeren Weg (`fetch('/ui/logout', ...)` mit dem CSRF-Header statt Formular-Submit).
+**Zwei Plan-Lücken/-Abweichungen, dokumentiert:**
+1. `GET /api/v1/meta` (neu) taucht in keiner Routentabelle des Plans auf, wird aber von Step 7s
+   eigenem Testnamen verlangt — session-gated, liefert `{"status_values": {...}}` direkt aus
+   `storage.models.STATUS_VALUES`.
+2. CSRF-Token-Übergabe/Sitzungsablauf-UX waren im Plan nicht spezifiziert — mit dem Nikinger vor
+   dem Bauen geklärt (AskUserQuestion, siehe Plan-Datei dieser Session): „Sitzung
+   abgelaufen"-Wiederanmeldung per Link zurück zu `/ui/login` (keine zweite Login-Implementierung,
+   der Bootstrap-Redirect nach `/ui/` bringt den Entwurf über `sessionStorage` mit zurück);
+   „Anlegen" als kleines Inline-Formular statt eines sofortigen Blanko-Items.
 
-**Font (V27 im VERIFY-Register, hier geschlossen statt auf Systemstack ausgewichen):**
-`phase5_ui/scripts/build_font_subset.sh` (neu) lädt Inter Variable v4.1
-(`github.com/rsms/inter`, OFL-1.1, SHA256-geprüft), pinnt die optische Größe auf Textgröße
-(`opsz=14` — die einzige, die diese UI benutzt) und beschneidet die Gewichtsachse auf `380:620`
-(deckt 400/500/600 aus Plan §4.2 mit Marge ab), subsetzt danach auf den
-Google-Fonts-„latin"-Unicodebereich (deckt deutsche Umlaute/ß über Latin-1 Supplement ab) plus
-`tnum/lnum/pnum/kern/liga/calt`. Ergebnis: **34,7 KB** (Ziel < 120 KB), variable Gewichtsachse
-erhalten (`fvar: wght 380–620`), alle deutschen Sonderzeichen + `€` im `cmap` geprüft. Datei
-trägt einen Kurzhash des Inhalts (`InterVariable-subset.2fa9d1dc.woff2`) — macht sie zu einem
-echten „gehashten Asset" für `static_routes.py`s Cache-Header-Regel (unten), nicht nur einem
-hypothetischen Fall. `LICENSE.txt` liegt unverändert als `webui/static/fonts/OFL.txt` daneben.
-**Reproduzierbarkeit ist nicht Bit-Identität:** ein erneuter Lauf des Skripts kann eine andere
-Hex-Prüfsumme erzeugen (der `head`-Tabellen-Zeitstempel in TTF/WOFF2 ist nicht deterministisch
-über Compiler-Läufe hinweg) — das ist bei einem content-hashed Dateinamen erwartet und
-unschädlich, verlangt aber bei jedem Font-Rebuild eine manuelle Ein-Zeilen-Anpassung der
-`@font-face`-`src`-URL in `app.css`.
+**Advisor war während der GESAMTEN Session (Block-A-Gate-Fortsetzung UND Step 6 UND Step 7)
+nicht erreichbar** („temporarily overloaded", mehrfach erneut versucht). Ersatz — diesmal über
+den bisherigen Fallback (pyflakes + `pytest`) hinaus zusätzlich verschärft: eine echte,
+verhaltensgetriebene Node/jsdom-Simulation von `app.js` gegen die realen `app.html`/`app.css`-
+Dateien (im Scratchpad, nichts davon im Repo — `jsdom` ist kein Projekt-Dependency, P5-T/„kein
+Node im Projekt" bleibt unberührt). Diese Simulation fuhr den kompletten Lebenszyklus
+(Init→Anlegen→Bearbeiten→Vorschau→Speichern→Anhängen→Konflikt→Auflösen→Archivieren), den
+Nur-lesen-Pfad für fremde Items, die Tastaturkürzel und den Entwurfsschutz — und fand dabei zwei
+echte Funde vor dem Commit:
+1. Das Test-Mock selbst hatte einen `String.includes()`-Bug (`"/api/v1/meta".includes("/me")`
+   ist `true`, weil `/meta` mit `/me` beginnt) — reiner Test-Harness-Fehler, kein `app.js`-Bug,
+   aber ohne die Simulation nicht aufgefallen.
+2. Beim Beheben davon zeigte sich ein echter `app.js`-Fund: `loadItems()`/`selectItem()`/
+   `init()` hatten kein `.catch()` — ein `401` mitten in einer Suche hinterließ eine unbehandelte
+   Promise-Ablehnung. Im Browser nur eine Konsolenwarnung (die „Sitzung abgelaufen"-Karte
+   erscheint trotzdem, das passiert synchron in `api()` vor dem Verwerfen), in Node bricht das
+   den Prozess ab — der Unterschied machte den Fund erst in der Simulation sichtbar. Behoben:
+   neues `reportUnexpectedError()`, an allen drei „lose angestoßenen" Aufrufstellen als
+   `.catch()` ergänzt (die vier nutzergetriebenen Aktionen Speichern/Anhängen/Archivieren/
+   Anlegen hatten von Anfang an eigene Fehlerbehandlung).
 
-**Cache-Header-Regel (§3.4 „`no-store` außer für `/ui/static` mit gehashtem Namen"):**
-`static_routes.py :: _HASHED_NAME_RE` erkennt einen Kurzhash unmittelbar vor der Dateiendung
-(Punkt- oder Bindestrich-getrennt) — nur solche Dateien bekommen `public, max-age=31536000,
-immutable`. `app.html`/`app.css`/`app.js` tragen bewusst KEINEN Hash (kein Build-Step, P5-T —
-sie werden von Hand editiert; ein `immutable`-Cache auf einem unveränderten Dateinamen wäre nach
-der nächsten Änderung ein tagelang stiller Bug) und bekommen `no-store`.
+**Verifiziert:** `pytest -q` (Repo-Wurzel) → **516/516 grün** (512 vor diesem Step, +4: 2
+`test_meta.py`, neue Datei + 2 `test_api.py`). `pyflakes` über alle neuen/geänderten
+Python-Dateien sauber. `git diff --stat` auf `storage/`, `mcpserver/tools.py`/`permissions.py`/
+`server.py` bleibt leer (Akzeptanzkriterium §6.18). `node --check` auf `app.js` sauber. Die
+jsdom-Simulation (siehe oben) deckte praktisch die komplette Interaktionsfläche ab, ist aber
+ausdrücklich kein Ersatz für einen echten Browser — Layout/Fokus-Reihenfolge/Tastatur-Events
+verhalten sich in jsdom nicht immer identisch zu Chrome.
 
-**Scope innerhalb der Shell:** Rail (Spaces + Filter „Offen"/„Notizen"/„Archiv" + Logout),
-Liste (Suchfeld mit 200ms-Debounce, `↑`/`↓`-Navigation, `/`-Fokus-Shortcut), Detail
-(schreibgeschützte Ansicht: Titel/Status/Fällig/Tags/Version, Rohtext in `<pre>`, sichtbare
-„Nur lesen"-Kennzeichnung bei `item.readonly` — erfüllt den Geist von Akzeptanzkriterium 12
-schon jetzt, auch wenn die Live-Abnahme erst mit einem echten Editor in Step 7 sinnvoll ist).
-Rail-Kollaps ≤1280px und Liste-hinter-Zurück-Navigation <1024px (§4.3) sind gebaut, größtenteils
-reines CSS, ein `data-view`-Attribut auf `#shell` für die eine JS-Umschaltung. `Esc`/`Ctrl+S`
-bewusst NICHT gebunden (kein Dialog zu schließen, nichts zu speichern in Step 6) — im Code
-kommentiert, warum sie fehlen, statt sie tot zu binden.
+**Import aus „Notepad Pro Local" — vom Nikinger angefragt, eingeschätzt, noch nicht begonnen:**
+machbar als einmaliges Skript (kein eigener Phasen-Aufwand), aber mit echtem Verlust bei Bildern
+(kein Anhang-Feature, P5-AA) und einer offenen Designfrage bei eingebetteten Aufgaben-Checklisten
+(Notizheft kennt keine eigenständigen Aufgaben-Objekte). Details/Aufwandsschätzung: Plan-Datei
+dieser Session (`/home/savefyx/.claude/plans/magical-stirring-meerkat.md`, Abschnitt „Import aus
+Notepad Pro Local"). Wartet auf eine Nikinger-Entscheidung, ob die echten Notizen Bilder
+enthalten, bevor der Umfang feststeht.
 
-**Verifiziert:** `pytest -q` (Repo-Wurzel) → **512/512 grün** (504 vor diesem Step, +8: 7
-`test_static_routes.py`, neue Datei, + 1 `test_ui_index_route_reachable_through_create_app` in
-`phase2_mcp/tests/test_app.py`; `app.js` bleibt laut Plan unit-ungetestet, kein Node im
-Projekt). `pyflakes` über alle neuen/geänderten Python-Dateien sauber. `git diff --stat` auf
-`storage/`, `mcpserver/tools.py`/`permissions.py`/`server.py` bleibt leer (Akzeptanzkriterium
-§6.18). Zusätzlich ein manueller In-Process-Durchlauf (wie `ui_smoke.py`, kein echter Browser):
-anonymer `GET /ui/` → `303`/`/ui/login`, Login → Bootstrap-Seite mit `<script>`-Tag, `GET /ui/`
-mit Sitzung → `200`/`app.html`, `GET /ui/static/app.css` → `200`/`text/css`/`no-store`,
-`GET /ui/static/does-not-exist.css` → `404`. **Advisor-Review vor diesem Commit war nicht
-möglich** (Tool zweimal „temporarily overloaded" zurückgemeldet, wie schon beim Step-5-Nachtrag
-— derselbe dokumentierte Ersatz, nicht übersprungen): `pyflakes`, voller `pytest -q`, der
-manuelle In-Process-Durchlauf oben, Tabu-Pfad-Diff, alles vor dem Commit.
+**Manuell (Nikinger, nicht Teil dieses Steps):** das eigentliche Step-7-„Done when" — anlegen →
+bearbeiten (Vorschau sichtprüfen) → Konflikt mit einem zweiten Tab provozieren → auflösen →
+archivieren, in einem echten Browser gegen eine Wegwerf- oder die Live-Instanz.
 
-**Manuell (Nikinger, nicht Teil dieses Steps):** ein echter Browser-Blick auf `/ui/` gegen eine
-Wegwerf-Instanz — Layout/Typografie/die 1280px-/1024px-Breakpoints lassen sich nicht aus
-`pytest` beurteilen.
-
-**Nächster Schritt (konkret):** Step 7 (Editor, Vorschau, Konflikt, Frontmatter-Felder — Plan
-§3.5, §4.4, §4.5, P5-U). Baut auf der in Step 6 gelegten `app.js`-Struktur auf (State/Render-
-Funktionen, API-Client mit `sessionStorage`-CSRF, bereits vorbereiteter `X-CSRF-Token`-Pfad für
-Nicht-GET-Aufrufe). Ersetzt außerdem den einfachen `401`→`/ui/login`-Redirect aus Step 6 durch
-die volle „Sitzung abgelaufen"-Karte samt Entwurfsschutz (§4.5), sobald es etwas Eingetipptes
-gibt, das dabei verloren gehen könnte. Zeilen 5/6 der Block-A-Abnahme folgen weiterhin, sobald
-ein echter Klick-Pfad für `/api/v1/account/password` existiert.
+**Nächster Schritt (konkret):** Step 8 (Betrieb: Deploy, Rollback, Staging, Auth-Backup, Messung
+— Plan §5 Step 8) ODER zuerst ein kleiner Nachtrag für die Block-A-Abnahmezeilen 5/6
+(Passwortwechsel-Dialog gegen `/api/v1/account/password`, jetzt technisch möglich — die
+Editor-Infrastruktur aus diesem Step liefert Dialog-/Overlay-/Formular-Muster, die sich direkt
+wiederverwenden lassen). Reihenfolge ist eine Nikinger-Entscheidung, keine im Plan gelockte.

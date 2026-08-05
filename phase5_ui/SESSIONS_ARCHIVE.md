@@ -4,10 +4,108 @@ purpose: Archiv älterer Session-stopped-Blöcke aus phase5_ui/CLAUDE.md, newest
 read-when: Audit vergangener Sessions dieser Phase; NICHT für normalen Session-Start
 detail: L3
 up: CLAUDE.md
-updated: 2026-08-05 (sechster Block archiviert, Rotation nach Step 6)
+updated: 2026-08-05 (siebter Block archiviert, Rotation nach Step 7)
 ---
 
 # Session-Archiv — Phase 5 Web-UI, REST-API, Auth-Selbstverwaltung
+
+## Session stopped — 2026-08-05 (Step 6: UI-Gerüst — Shell, Tokens, Navigation, Liste, Suche)
+
+**Ergebnis:** Step 6 ist fertig — `GET /ui/` liefert erstmals die echte App-Shell
+(`webui/static/{app.html,app.css,app.js}`) statt der Step-3-Übergangsseite, verdrahtet gegen
+`/api/v1/{me,spaces,items,items/{id}}` aus Step 5. Bewusst **kein** Editor, **kein**
+Markdown-Rendering (§3.5), **kein** Versionsband (§4.4), **kein** Konfliktdialog — das ist
+wörtlich Step 7s Aufgabenliste, nicht vorgezogen.
+
+**Korrektur zu Plan §1.5s Routentabelle, vor dem Bau entschieden (nicht erst live gefunden):**
+die Tabelle trägt für `/ui/` in der Auth-Spalte „keine" ein, aber derselbe Plan-Abschnitt (§5
+Step 6) verlangt im selben Atemzug einen Test namens `test_index_route_requires_session` — ein
+direkter Widerspruch innerhalb desselben 📕-Dokuments, dieselbe Kategorie wie der
+`mcpserver→webui`-Zirkel aus P5 Step 4 (dort ebenfalls zugunsten des konkreteren Textes gegen
+eine Ableitungstabelle aufgelöst, siehe `SESSIONS_ARCHIVE.md`). Aufgelöst zugunsten des
+Testnamens: `GET /ui/` ohne gültige Sitzung → `303` nach `/ui/login` (`webui/static_routes.py ::
+_index()`), mit Sitzung → `200` mit `app.html`. Dem Nikinger nicht vorab zur Entscheidung
+vorgelegt (anders als der Zirkel-Fund in P5 Step 4) — die Kategorie ist dieselbe, aber die
+Auflösung war hier eindeutig genug (ein Tabellen-Zellwert gegen einen explizit benannten Test im
+selben Abschnitt), um sie als „kleine Drift" statt „entscheidungsbedürftig" einzustufen (Root-
+`CLAUDE.md`: „kleine Drift selbst fixen und datiert vermerken; wenn nicht klein, stoppen und
+fragen"). Wird hier vermerkt, nicht still verschwiegen.
+
+**CSRF-Token-Übergabe an die Shell (im Plan nicht spezifiziert):** `SessionManager.rotate()`
+gibt den CSRF-Token nur EIN einziges Mal als Klartext zurück (`ui_sessions` speichert nur den
+Hash) — der Plan sagt nirgends, wie `app.js` daran kommt. Lösung: die seit Step 3 bestehende
+Login-Erfolgsseite (`pages.py :: render_logged_in_page()`) behält ihr `<input type="hidden"
+name="csrf" value="...">` unverändert und bekommt zusätzlich `<script src="/ui/static/app.js"
+defer>`. `app.js`s Bootstrap-Teil (läuft auf JEDER `/ui/*`-Seite, erkennt sich selbst an
+`document.getElementById('shell')`s Fehlen) liest das Feld aus, legt den Wert in
+`sessionStorage['sfx:csrf']` ab (kein `localStorage` — konsistent mit dem in §4.5 bereits
+gelockten Entwurfsschutz-Muster) und leitet per `location.replace('/ui/')` weiter. Ein `401
+unauthenticated` von irgendeinem API-Aufruf schickt in Step 6 schlicht zu `/ui/login` zurück —
+kein Entwurfsschutz nötig, es gibt in Step 6 noch nichts Eingetipptes zu verlieren; Step 7 baut
+dafür die volle „Sitzung abgelaufen"-Karte aus §4.5, sobald der Editor existiert. Logout bleibt
+ohne JavaScript funktionsfähig (das Formular aus Step 3 ist unverändert), `app.js` ergänzt nur
+einen bequemeren Weg (`fetch('/ui/logout', ...)` mit dem CSRF-Header statt Formular-Submit).
+
+**Font (V27 im VERIFY-Register, hier geschlossen statt auf Systemstack ausgewichen):**
+`phase5_ui/scripts/build_font_subset.sh` (neu) lädt Inter Variable v4.1
+(`github.com/rsms/inter`, OFL-1.1, SHA256-geprüft), pinnt die optische Größe auf Textgröße
+(`opsz=14` — die einzige, die diese UI benutzt) und beschneidet die Gewichtsachse auf `380:620`
+(deckt 400/500/600 aus Plan §4.2 mit Marge ab), subsetzt danach auf den
+Google-Fonts-„latin"-Unicodebereich (deckt deutsche Umlaute/ß über Latin-1 Supplement ab) plus
+`tnum/lnum/pnum/kern/liga/calt`. Ergebnis: **34,7 KB** (Ziel < 120 KB), variable Gewichtsachse
+erhalten (`fvar: wght 380–620`), alle deutschen Sonderzeichen + `€` im `cmap` geprüft. Datei
+trägt einen Kurzhash des Inhalts (`InterVariable-subset.2fa9d1dc.woff2`) — macht sie zu einem
+echten „gehashten Asset" für `static_routes.py`s Cache-Header-Regel (unten), nicht nur einem
+hypothetischen Fall. `LICENSE.txt` liegt unverändert als `webui/static/fonts/OFL.txt` daneben.
+**Reproduzierbarkeit ist nicht Bit-Identität:** ein erneuter Lauf des Skripts kann eine andere
+Hex-Prüfsumme erzeugen (der `head`-Tabellen-Zeitstempel in TTF/WOFF2 ist nicht deterministisch
+über Compiler-Läufe hinweg) — das ist bei einem content-hashed Dateinamen erwartet und
+unschädlich, verlangt aber bei jedem Font-Rebuild eine manuelle Ein-Zeilen-Anpassung der
+`@font-face`-`src`-URL in `app.css`.
+
+**Cache-Header-Regel (§3.4 „`no-store` außer für `/ui/static` mit gehashtem Namen"):**
+`static_routes.py :: _HASHED_NAME_RE` erkennt einen Kurzhash unmittelbar vor der Dateiendung
+(Punkt- oder Bindestrich-getrennt) — nur solche Dateien bekommen `public, max-age=31536000,
+immutable`. `app.html`/`app.css`/`app.js` tragen bewusst KEINEN Hash (kein Build-Step, P5-T —
+sie werden von Hand editiert; ein `immutable`-Cache auf einem unveränderten Dateinamen wäre nach
+der nächsten Änderung ein tagelang stiller Bug) und bekommen `no-store`.
+
+**Scope innerhalb der Shell:** Rail (Spaces + Filter „Offen"/„Notizen"/„Archiv" + Logout),
+Liste (Suchfeld mit 200ms-Debounce, `↑`/`↓`-Navigation, `/`-Fokus-Shortcut), Detail
+(schreibgeschützte Ansicht: Titel/Status/Fällig/Tags/Version, Rohtext in `<pre>`, sichtbare
+„Nur lesen"-Kennzeichnung bei `item.readonly` — erfüllt den Geist von Akzeptanzkriterium 12
+schon jetzt, auch wenn die Live-Abnahme erst mit einem echten Editor in Step 7 sinnvoll ist).
+Rail-Kollaps ≤1280px und Liste-hinter-Zurück-Navigation <1024px (§4.3) sind gebaut, größtenteils
+reines CSS, ein `data-view`-Attribut auf `#shell` für die eine JS-Umschaltung. `Esc`/`Ctrl+S`
+bewusst NICHT gebunden (kein Dialog zu schließen, nichts zu speichern in Step 6) — im Code
+kommentiert, warum sie fehlen, statt sie tot zu binden.
+
+**Verifiziert:** `pytest -q` (Repo-Wurzel) → **512/512 grün** (504 vor diesem Step, +8: 7
+`test_static_routes.py`, neue Datei, + 1 `test_ui_index_route_reachable_through_create_app` in
+`phase2_mcp/tests/test_app.py`; `app.js` bleibt laut Plan unit-ungetestet, kein Node im
+Projekt). `pyflakes` über alle neuen/geänderten Python-Dateien sauber. `git diff --stat` auf
+`storage/`, `mcpserver/tools.py`/`permissions.py`/`server.py` bleibt leer (Akzeptanzkriterium
+§6.18). Zusätzlich ein manueller In-Process-Durchlauf (wie `ui_smoke.py`, kein echter Browser):
+anonymer `GET /ui/` → `303`/`/ui/login`, Login → Bootstrap-Seite mit `<script>`-Tag, `GET /ui/`
+mit Sitzung → `200`/`app.html`, `GET /ui/static/app.css` → `200`/`text/css`/`no-store`,
+`GET /ui/static/does-not-exist.css` → `404`. **Advisor-Review vor diesem Commit war nicht
+möglich** (Tool zweimal „temporarily overloaded" zurückgemeldet, wie schon beim Step-5-Nachtrag
+— derselbe dokumentierte Ersatz, nicht übersprungen): `pyflakes`, voller `pytest -q`, der
+manuelle In-Process-Durchlauf oben, Tabu-Pfad-Diff, alles vor dem Commit.
+
+**Manuell (Nikinger, nicht Teil dieses Steps):** ein echter Browser-Blick auf `/ui/` gegen eine
+Wegwerf-Instanz — Layout/Typografie/die 1280px-/1024px-Breakpoints lassen sich nicht aus
+`pytest` beurteilen.
+
+**Nächster Schritt (konkret):** Step 7 (Editor, Vorschau, Konflikt, Frontmatter-Felder — Plan
+§3.5, §4.4, §4.5, P5-U). Baut auf der in Step 6 gelegten `app.js`-Struktur auf (State/Render-
+Funktionen, API-Client mit `sessionStorage`-CSRF, bereits vorbereiteter `X-CSRF-Token`-Pfad für
+Nicht-GET-Aufrufe). Ersetzt außerdem den einfachen `401`→`/ui/login`-Redirect aus Step 6 durch
+die volle „Sitzung abgelaufen"-Karte samt Entwurfsschutz (§4.5), sobald es etwas Eingetipptes
+gibt, das dabei verloren gehen könnte. Zeilen 5/6 der Block-A-Abnahme folgen weiterhin, sobald
+ein echter Klick-Pfad für `/api/v1/account/password` existiert.
+
+---
 
 ## Session stopped — 2026-08-05 (Block-A-Gate live gefahren — Origin-Bug gefunden und behoben, 7/9 Zeilen bestanden)
 

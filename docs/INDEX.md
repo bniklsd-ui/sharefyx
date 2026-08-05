@@ -31,8 +31,8 @@ updated: 2026-08-03
 
 ## Active phase (5 — Web-UI, REST-API, Auth-Selbstverwaltung)
 
-- [phase5_ui/CLAUDE.md](../phase5_ui/CLAUDE.md) — 🔄 ~20KB · phase head; Step 0 ✅, Step 1 ✅ (S2–S8 geschlossen), Step 2 ✅ (Schema 2, `UserDirectory`, Migrationsskript), Step 3 ✅ (neues Paket `phase5_ui/webui`, Sessions/CSRF/Login/Logout), Step 4 ✅ (Selbstverwaltung: Einladung, Passwort, TOTP, Recovery, Connectoren; S9 gefunden+geschlossen), Origin-Fund (Block-A-Gate) gefunden+behoben+live bestätigt, Step 5 ✅ (REST-API v1: `webui/{api,serializers}.py`, `scripts/ui_smoke.py`), Step 6 ✅ (UI-Gerüst: `webui/static/{app.html,app.css,app.js}`, `webui/static_routes.py`, echtes Inter-Variable-Font-Subset — V27 geschlossen); 🟡 Block A (§6) vollständig bis auf Zeilen 5/6, bewusst auf nach Step 7 verschoben (echter Klick-Pfad für `/api/v1/account/password` fehlt noch); read + newest Session-stopped block first
-- [phase5_ui/SESSIONS_ARCHIVE.md](../phase5_ui/SESSIONS_ARCHIVE.md) — 📦 ~84KB · sechs archivierte Session-Blöcke (Step 0, Step 1, Step 2, Step 3, Step 4 inkl. Block-A-Gate/Origin-Fund, Block-A-Gate-Live-Lauf), verbatim
+- [phase5_ui/CLAUDE.md](../phase5_ui/CLAUDE.md) — 🔄 ~20KB · phase head; Step 0 ✅, Step 1 ✅ (S2–S8 geschlossen), Step 2 ✅ (Schema 2, `UserDirectory`, Migrationsskript), Step 3 ✅ (neues Paket `phase5_ui/webui`, Sessions/CSRF/Login/Logout), Step 4 ✅ (Selbstverwaltung: Einladung, Passwort, TOTP, Recovery, Connectoren; S9 gefunden+geschlossen), Origin-Fund (Block-A-Gate) gefunden+behoben+live bestätigt, Step 5 ✅ (REST-API v1: `webui/{api,serializers}.py`, `scripts/ui_smoke.py`), Step 6 ✅ (UI-Gerüst: `webui/static/{app.html,app.css,app.js}`, `webui/static_routes.py`, echtes Inter-Variable-Font-Subset — V27 geschlossen), Step 7 ✅ (Editor/Vorschau/Konflikt/Frontmatter-Felder: Markdown-Parser+Sanitizer aus `docs/concepts/notiz_heft_example.html` geerntet+erweitert, `GET /api/v1/meta`); 🟡 Block A (§6) vollständig bis auf Zeilen 5/6, warten auf einen eigenen Passwortwechsel-Dialog-Nachtrag (Editor-Infrastruktur aus Step 7 macht ihn technisch möglich); read + newest Session-stopped block first
+- [phase5_ui/SESSIONS_ARCHIVE.md](../phase5_ui/SESSIONS_ARCHIVE.md) — 📦 ~92KB · sieben archivierte Session-Blöcke (Step 0, Step 1, Step 2, Step 3, Step 4 inkl. Block-A-Gate/Origin-Fund, Block-A-Gate-Live-Lauf, Step 6), verbatim
 - [docs/concepts/phase5_ui_plan.md](./concepts/phase5_ui_plan.md) — 📕 ~80KB · ausführungsreifer P5-Plan: Entscheidungen P5-A–P5-AE, Steps 0–9 (Block A Sicherheit/Selbstverwaltung, Block B REST-API/UI), Designsystem, Abnahmematrix 1–20, [VERIFY]-Register V27–V38; über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
 
 ## Completed phases
@@ -66,8 +66,11 @@ updated: 2026-08-03
 Konzept+Plan+Handover-Trio. P1- bis P5-Pläne stehen oben bei ihrer jeweiligen Phase, nicht
 doppelt hier gelistet.)*
 
-## Externe Referenz (nicht im Repo)
+## Referenzmaterial (nicht Teil des Plan/Konzept/Handover-Trios)
 
-- `Notizheft_example.html` — 📕 UI-Vorlage aus dem Projektwissen. **Achtung:** enthält eine
-  clientseitige Vault-Verschlüsselung, die mit Rahmenentscheidung R4 unvereinbar ist. Nur als
-  Layout-/Interaktionsvorlage lesen, nicht als Architekturvorlage.
+- [docs/concepts/notiz_heft_example.html](./concepts/notiz_heft_example.html) — 📕 UI-Vorlage,
+  vom Nikinger in P5 Step 7 ins Repo gelegt (vorher nur im Projektwissen, für Claude Code nicht
+  zugänglich). **Achtung:** enthält eine clientseitige Vault-Verschlüsselung, die mit
+  Rahmenentscheidung R4 unvereinbar ist. Nur als Layout-/Interaktionsvorlage lesen, nicht als
+  Architekturvorlage — P5-V dokumentiert genau, was daraus geerntet wurde und was bewusst nicht
+  (`phase5_ui/CLAUDE.md`, Step-7-Session-Block).

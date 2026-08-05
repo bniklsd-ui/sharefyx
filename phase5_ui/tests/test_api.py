@@ -219,6 +219,34 @@ async def test_version_mismatch_returns_409_with_current_item(full_app_items, it
 
 
 @pytest.mark.asyncio
+async def test_conflict_response_current_item_matches_item_to_json_exactly(
+    full_app_items, item_store, totp_code,
+):
+    """Step 7: geht über `test_version_mismatch_returns_409_with_current_item` hinaus — der
+    Konfliktdialog (§4.5) rendert die „aktuelle Fassung" direkt aus `detail.current`, braucht
+    also mehr als Version/Titel: `format`/`extra`/`readonly` müssen exakt wie bei einem normalen
+    `item_to_json()`-Aufruf vorhanden sein, sonst müsste `app.js` für den Konfliktfall einen
+    zweiten Roundtrip fahren."""
+    item = item_store.create(SPACE, type="note", title="Original", body="Text", tags=["a"])
+    external = item_store.update(item.id, version=item.version, title="Extern geändert")
+
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.patch(
+            f"/api/v1/items/{item.id}", json={"version": item.version, "title": "Konflikt"},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 409
+    current = response.json()["detail"]["current"]
+    for key in ("id", "space", "type", "status", "body", "due", "tags", "links", "created",
+                "updated", "version", "format", "extra", "readonly"):
+        assert key in current, key
+    assert current["version"] == external.version
+    assert current["format"] == "markdown"
+    assert current["readonly"] is False
+
+
+@pytest.mark.asyncio
 async def test_validation_error_returns_422(full_app_items, item_store, totp_code):
     item = item_store.create(SPACE, type="note", title="Original")
     async with _client(full_app_items) as client:
@@ -371,6 +399,34 @@ async def test_append_to_archived_item_returns_422(full_app_items, item_store, t
             headers=_headers(csrf),
         )
     assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_append_endpoint_concatenates_patch_endpoint_replaces(
+    full_app_items, item_store, totp_code,
+):
+    """Step 7: `app.js` bildet „Notiz anhängen" auf `POST .../append` ab, nicht auf ein
+    read-modify-write über `PATCH` — dieser Test beweist den Verhaltensunterschied, den diese
+    UI-Entscheidung voraussetzt: `append` hängt an, `PATCH` mit einem `body`-Feld ersetzt
+    vollständig."""
+    appended = item_store.create(SPACE, type="note", title="A", body="Zeile eins")
+    replaced = item_store.create(SPACE, type="note", title="B", body="Zeile eins")
+
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        append_response = await client.post(
+            f"/api/v1/items/{appended.id}/append",
+            json={"version": appended.version, "text": "Zeile zwei"},
+            headers=_headers(csrf),
+        )
+        patch_response = await client.patch(
+            f"/api/v1/items/{replaced.id}",
+            json={"version": replaced.version, "body": "Zeile zwei"},
+            headers=_headers(csrf),
+        )
+
+    assert append_response.json()["body"] == "Zeile eins\nZeile zwei"
+    assert patch_response.json()["body"] == "Zeile zwei"
 
 
 # -- /api/v1/me, /api/v1/spaces ----------------------------------------------------------------

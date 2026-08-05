@@ -35,12 +35,13 @@
   <section class="list" id="list">
     <div class="list__search">
       <input type="search" class="list__search-input" id="search-input" placeholder="Suche…" aria-label="Suche">
+      <button class="list__new-button" type="button" id="new-item-button" title="Neu anlegen">&#43;</button>
     </div>
     <div class="list__chips" id="list-chips"></div>
     <ol class="list__rows" id="list-rows"></ol>
     <div class="list__empty" id="list-empty" hidden>
       <p>Keine Notizen in diesem Space.</p>
-      <button class="btn-primary" type="button" id="create-button" disabled title="Anlegen ab Step 7">Erste Notiz anlegen</button>
+      <button class="btn-primary" type="button" id="create-button">Erste Notiz anlegen</button>
     </div>
   </section>
 
@@ -49,15 +50,97 @@
     <div class="detail__empty" id="detail-empty">
       <p>Kein Item ausgewählt.</p>
     </div>
-    <div id="detail-content" hidden>
+
+    <div id="detail-readonly" hidden>
       <header class="detail__header">
-        <h1 id="detail-title"></h1>
-        <div class="detail__meta" id="detail-meta"></div>
+        <h1 id="ro-title"></h1>
+        <div class="detail__meta" id="ro-meta"></div>
       </header>
-      <pre class="detail__body" id="detail-body"></pre>
+      <div class="preview" id="ro-preview"></div>
+    </div>
+
+    <div id="detail-editor" hidden>
+      <header class="detail__header">
+        <input type="text" class="editor__title-input" id="field-title" placeholder="Titel" aria-label="Titel">
+        <div class="editor__fields">
+          <label>Status
+            <select class="input" id="field-status"></select>
+          </label>
+          <label>Fällig
+            <input type="date" class="input" id="field-due">
+          </label>
+          <input type="text" class="input" id="field-tags" placeholder="Tags, kommagetrennt" aria-label="Tags">
+          <input type="text" class="input" id="field-links" placeholder="Links, kommagetrennt" aria-label="Links">
+        </div>
+        <div class="editor__toolbar" id="editor-toolbar">
+          <button type="button" class="toolbar-btn" data-md="bold" title="Fett">B</button>
+          <button type="button" class="toolbar-btn" data-md="italic" title="Kursiv">I</button>
+          <button type="button" class="toolbar-btn" data-md="code" title="Code">&lt;/&gt;</button>
+          <button type="button" class="toolbar-btn" data-md="link" title="Link">&#128279;</button>
+          <button type="button" class="toolbar-btn" data-md="h" title="Überschrift">H</button>
+          <button type="button" class="toolbar-btn" data-md="quote" title="Zitat">&#8221;</button>
+          <button type="button" class="toolbar-btn" data-md="ul" title="Liste">&bull;</button>
+          <button type="button" class="toolbar-btn" data-md="ol" title="Nummerierung">1.</button>
+          <button type="button" class="toolbar-btn" data-md="hr" title="Trennlinie">&mdash;</button>
+          <span class="toolbar-spacer"></span>
+          <button type="button" class="toolbar-btn" id="toggle-preview">Vorschau</button>
+        </div>
+        <div class="editor__actions">
+          <button type="button" class="btn-primary" id="save-button">Speichern</button>
+          <button type="button" class="btn" id="archive-button">Archivieren</button>
+        </div>
+      </header>
+      <div class="editor__body" id="editor-body">
+        <div class="version-band" id="version-band"><span class="version-band__number" id="version-band-number"></span></div>
+        <textarea class="editor__textarea" id="editor-textarea" aria-label="Inhalt"></textarea>
+        <div class="preview editor__preview" id="editor-preview" hidden></div>
+      </div>
+      <div class="editor__append">
+        <input type="text" class="input" id="append-input" placeholder="Notiz anhängen…" aria-label="Notiz anhängen">
+        <button type="button" class="btn" id="append-button">Anhängen</button>
+      </div>
     </div>
   </section>
 </div>
+
+<div class="overlay" id="create-dialog" hidden>
+  <div class="overlay__panel">
+    <h2>Neu anlegen</h2>
+    <label>Typ
+      <select class="input" id="create-type"></select>
+    </label>
+    <label>Titel
+      <input type="text" class="input" id="create-title-input">
+    </label>
+    <div class="overlay__actions">
+      <button type="button" class="btn-primary" id="create-submit">Anlegen</button>
+      <button type="button" class="btn" id="create-cancel">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="conflict-dialog" hidden>
+  <div class="overlay__panel">
+    <h2>Konflikt</h2>
+    <p id="conflict-message"></p>
+    <div class="overlay__actions">
+      <button type="button" class="btn-primary" id="conflict-load-current">Aktuelle Fassung laden</button>
+      <button type="button" class="btn" id="conflict-save-as-new">Meine Fassung als neues Item anlegen</button>
+      <button type="button" class="btn" id="conflict-cancel">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="session-expired-card" hidden>
+  <div class="overlay__panel">
+    <h2>Sitzung abgelaufen</h2>
+    <p>Dein Entwurf bleibt in diesem Tab erhalten.</p>
+    <div class="overlay__actions">
+      <a class="btn-primary" href="/ui/login">Erneut anmelden</a>
+    </div>
+  </div>
+</div>
+
 <script src="/ui/static/app.js" defer></script>
 </body>
 </html>

@@ -285,14 +285,58 @@ h3 { font-size: 15px; }
   font-weight: 500;
 }
 
-.detail__body {
+/* -- Vorschau (§3.5): geteilt zwischen der Nur-lesen-Ansicht fremder Items (#ro-preview) und
+   dem Vorschau-Umschalter im eigenen Editor (#editor-preview). Formensprache für
+   Zitat/Code/Tabelle/HR aus docs/concepts/notiz_heft_example.html geerntet (.rich-editor),
+   auf unsere Tokens umgesetzt. */
+
+.preview {
   flex: 1;
   overflow: auto;
   padding: calc(var(--space) * 3);
+  line-height: 1.6;
+}
+
+.preview p { margin: 0 0 1em; }
+.preview h1, .preview h2, .preview h3, .preview h4 { margin: 1em 0 .5em; }
+.preview blockquote {
+  margin: 1em 0;
+  border-left: 3px solid var(--accent);
+  padding: .6em 1em;
+  background: var(--accent-quiet);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--text-muted);
+}
+.preview pre {
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space) calc(var(--space) * 1.5);
+  overflow: auto;
   font-family: var(--font-mono);
   font-size: 13px;
-  white-space: pre-wrap;
 }
+.preview code {
+  font-family: var(--font-mono);
+  background: var(--surface-raised);
+  border-radius: var(--radius-sm);
+  padding: 1px 5px;
+  font-size: 13px;
+}
+.preview pre code { background: none; padding: 0; }
+.preview a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.preview hr { border: 0; border-top: 1px solid var(--line); margin: calc(var(--space) * 2) 0; }
+.preview table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+.preview td, .preview th {
+  border: 1px solid var(--line-strong);
+  padding: 6px 10px;
+  vertical-align: top;
+  text-align: left;
+}
+.preview th { background: var(--surface-raised); font-weight: 600; }
+.preview .ta-c { text-align: center; }
+.preview .ta-r { text-align: right; }
+.preview ul, .preview ol { padding-left: 1.4em; margin: 0 0 1em; }
 
 .detail__back {
   display: none;
@@ -318,6 +362,173 @@ h3 { font-size: 15px; }
   background: var(--surface-raised);
   color: var(--text-faint);
   cursor: not-allowed;
+}
+
+.btn {
+  background: var(--surface-raised);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.btn:hover { border-color: var(--line-strong); }
+
+.input {
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  padding: 6px var(--space);
+}
+
+.list__new-button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 var(--space);
+}
+.list__new-button:hover { color: var(--text); }
+
+/* -- Editor (Step 7) ---------------------------------------------------------------------- */
+
+.editor__title-input {
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 22px;
+  font-weight: 600;
+  padding: 0;
+  margin-bottom: var(--space);
+}
+.editor__title-input:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.editor__fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space);
+  margin-bottom: var(--space);
+}
+.editor__fields .input { font-size: 12px; }
+.editor__fields #field-tags, .editor__fields #field-links { flex: 1; min-width: 140px; }
+
+.editor__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-top: 1px solid var(--line);
+  padding-top: var(--space);
+}
+.toolbar-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  min-width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+.toolbar-btn:hover { background: var(--surface-raised); color: var(--text); }
+.toolbar-spacer { flex: 1; }
+
+.editor__actions {
+  display: flex;
+  gap: var(--space);
+  margin-top: var(--space);
+}
+
+.editor__body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  padding-left: 12px;
+}
+.version-band {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--line);
+}
+.version-band.is-dirty { background: var(--accent); }
+.version-band.is-conflict { background: var(--warn); }
+.version-band__number {
+  position: absolute;
+  left: 9px;
+  bottom: var(--space);
+  font-size: 12px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.editor__textarea {
+  flex: 1;
+  min-width: 0;
+  resize: none;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  padding: calc(var(--space) * 3);
+}
+
+.editor__append {
+  display: flex;
+  gap: var(--space);
+  border-top: 1px solid var(--line);
+  padding: var(--space) calc(var(--space) * 3);
+}
+.editor__append .input { flex: 1; }
+
+/* -- Overlays: Konfliktdialog, Sitzung-abgelaufen-Karte, Anlegen-Formular (§4.1: der eine
+   erlaubte Schatten, ausschließlich für Modale) ---------------------------------------------- */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+.overlay__panel {
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, .55);
+  padding: calc(var(--space) * 3);
+  max-width: 420px;
+  width: 90%;
+}
+.overlay__panel h2 { margin-bottom: var(--space); }
+.overlay__panel label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: var(--space);
+}
+.overlay__panel label .input, .overlay__panel label select {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+}
+.overlay__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space);
+  margin-top: calc(var(--space) * 2);
 }
 
 [hidden] { display: none !important; }

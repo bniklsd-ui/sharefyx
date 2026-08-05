@@ -1,7 +1,14 @@
-"""`/api/v1/{me,spaces,items,items/{id},items/{id}/append,items/{id}/archive}` (Plan §3.1–§3.3,
-§5 Step 5). JSON durchgehend, dieselbe Struktur wie `webui/account.py`: Sitzung laden → CSRF
-(nur bei state-ändernden Routen) → Body parsen → Store aufrufen → `ApiError` (falls einer der
-Schritte scheitert) über `_catch()` in eine JSON-Fehlerantwort übersetzt.
+"""`/api/v1/{me,spaces,meta,items,items/{id},items/{id}/append,items/{id}/archive}` (Plan
+§3.1–§3.3, §5 Step 5/7). JSON durchgehend, dieselbe Struktur wie `webui/account.py`: Sitzung
+laden → CSRF (nur bei state-ändernden Routen) → Body parsen → Store aufrufen → `ApiError` (falls
+einer der Schritte scheitert) über `_catch()` in eine JSON-Fehlerantwort übersetzt.
+
+**`GET /api/v1/meta` (Step 7, in keiner Plan-Tabelle spezifiziert):** Step 7s eigener Testname
+(`test_status_values_endpoint_matches_storage_models`) verlangt einen Endpunkt, den §1.5s
+Routentabelle nicht listet — dieselbe Kategorie kleiner, autonom geschlossener Lücke wie Step 6s
+`/ui/`-Sitzungsprüfung. Liefert `{"status_values": {...}}` direkt aus `storage.models.
+STATUS_VALUES`, damit `app.js` das Statusvokabular pro Typ nicht dupliziert (P5-U/§7: „`type`
+ist nach dem Anlegen nicht änderbar in der UI").
 
 **Reihenfolge bei jedem Item-Endpunkt, wörtlich aus dem Plan, nicht verhandelbar:** erst
 `store.space_of(item_id)` (index-only, schreibt nichts, liest keine Datei — sicher aufzurufen
@@ -35,7 +42,7 @@ from starlette.routing import Route
 
 from mcpserver.permissions import OwnSpaceWritable
 from storage.errors import ConflictError, ItemNotFound, ValidationError
-from storage.models import SearchResult, SpaceInfo
+from storage.models import STATUS_VALUES, SearchResult, SpaceInfo
 from storage.store import Store
 
 from .config import UiSettings
@@ -134,6 +141,13 @@ def api_routes(
     async def _me(request: Request) -> Response:
         session = await _require_session(request)
         return JSONResponse({"space": session.space}, headers={"Cache-Control": "no-store"})
+
+    async def _meta(request: Request) -> Response:
+        await _require_session(request)
+        status_values = {kind: sorted(values) for kind, values in STATUS_VALUES.items()}
+        return JSONResponse(
+            {"status_values": status_values}, headers={"Cache-Control": "no-store"}
+        )
 
     async def _spaces(request: Request) -> Response:
         session = await _require_session(request)
@@ -320,6 +334,7 @@ def api_routes(
     return [
         Route("/api/v1/me", _catch(_me), methods=["GET"]),
         Route("/api/v1/spaces", _catch(_spaces), methods=["GET"]),
+        Route("/api/v1/meta", _catch(_meta), methods=["GET"]),
         Route("/api/v1/items", _catch(_items_get), methods=["GET"]),
         Route("/api/v1/items", _catch(_items_post), methods=["POST"]),
         Route("/api/v1/items/{item_id}", _catch(_items_get_one), methods=["GET"]),
