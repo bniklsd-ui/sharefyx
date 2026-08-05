@@ -25,6 +25,7 @@ import pytest
 from fastmcp import Client
 from fastmcp.client.transports import StreamableHttpTransport
 from starlette.applications import Starlette
+from starlette.responses import Response
 
 from authserver.config import AuthSettings
 from authserver.store import AuthStore
@@ -161,13 +162,15 @@ def _mcp_client(app: Starlette, token: str) -> Client:
 
 def test_create_app_mounts_ui_routes_without_import_cycle():
     """P5 Step 4 Nachtrag (siehe `mcpserver/app.py`s Moduldocstring): `mcpserver.app` importiert
-    jetzt `webui.routes_auth`/`webui.account` — vorgezogen aus Step 5, damit Block As
-    Live-Abnahme (Plan §6, Zeilen 1–9) überhaupt eine echte `/ui/login`/`/ui/invite/{token}`
-    vorfindet. Das ist nur zyklenfrei, weil `mcpserver.permissions` (das einzige Symbol, das
-    `webui` künftig aus `mcpserver` ziehen darf, P5-B) selbst nichts aus `mcpserver.app` oder
-    `webui` importiert. Grep statt Laufzeitprüfung: ein echter Zyklus entstünde erst, sobald
-    `webui/api.py` (Step 5, existiert noch nicht) `mcpserver.permissions` importiert — dieser
-    Test hält die Prämisse fest, auf der die Sicherheit dieser Vorwegnahme beruht."""
+    `webui.routes_auth`/`webui.account` — vorgezogen aus Step 5, damit Block As Live-Abnahme
+    (Plan §6, Zeilen 1–9) überhaupt eine echte `/ui/login`/`/ui/invite/{token}` vorfindet. Das
+    ist nur zyklenfrei, weil `mcpserver.permissions` (das einzige Symbol, das `webui` aus
+    `mcpserver` ziehen darf, P5-B) selbst nichts aus `mcpserver.app` oder `webui` importiert.
+    Grep statt Laufzeitprüfung. **[2026-08-05, P5 Step 5]:** `webui/api.py` existiert jetzt und
+    importiert tatsächlich `mcpserver.permissions.OwnSpaceWritable` — genau der Fall, den dieser
+    Test schon vorher als sicher belegt hatte (`mcpserver/permissions.py` importiert nichts aus
+    `mcpserver.app`/`webui`, unverändert seit damals); die Vorhersage „existiert noch nicht" ist
+    überholt, die Prämisse selbst weiterhin bewiesen."""
     import inspect
 
     import mcpserver.permissions as permissions_module
@@ -217,6 +220,35 @@ async def test_ui_invite_reachable_through_create_app(app, auth_store):
         response = await client.get(f"/ui/invite/{token}")
 
     assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_api_items_reachable_through_create_app(app, auth_store, auth_settings):
+    """Gegenstück zu `test_ui_login_reachable_through_create_app`, für Step 5: `webui/api.py`
+    wird über dieselbe `oauth.store`/`oauth.users`-Instanz gemountet, kein zweiter DB-Handle —
+    ein Item, über die `store`-Fixture dieser Datei angelegt (`space="alpha"`), muss über die
+    echte `create_app()`-App per Session-Cookie lesbar sein."""
+    from webui.config import COOKIE_NAME, UiSettings
+    from webui.sessions import SessionManager
+
+    ui_settings = UiSettings(base_url=auth_settings.base_url)
+    ui_sessions = SessionManager(auth_store, settings=ui_settings)
+    cookie_response = Response()
+    ui_sessions.issue(cookie_response, space="alpha")
+    session_id = cookie_response.headers["set-cookie"].split(";")[0].split("=", 1)[1]
+
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app), base_url=auth_settings.base_url,
+    ) as client:
+        response = await client.get(
+            "/api/v1/items", params={"space": "alpha"},
+            headers={"Cookie": f"{COOKIE_NAME}={session_id}"},
+        )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["total"] == 1  # "alpha" hat laut `store`-Fixture oben genau ein Item
+    assert payload["items"][0]["title"] == "Alpha-Item"
 
 
 @pytest.mark.asyncio

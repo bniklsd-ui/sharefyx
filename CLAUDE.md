@@ -217,10 +217,16 @@ Zeilen 5/6 (Passwortwechsel/Session-Widerruf) auf **nach** Step 5/6 verschoben
 DevTools-`fetch()`-Behelf wurde angeboten und vom Nikinger explizit als „Workaround, kein echter
 Test" abgelehnt. **Block A (§6) damit vollständig bis auf die bewusst verschobenen Zeilen 5/6.**
 Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-03, Zehnter Nachtrag 2026-08-05.**]**
-**Nächster Schritt:** Step 5 (REST-API v1) — nur teilweise
-vorgezogen: `webui/api.py` braucht bei seinem
-Bau noch einen zweiten, kleinen `create_app()`-Edit für den `store`-Parameter, den
-`ui_auth_routes()`/`account_routes()` nicht brauchten.
+**[2026-08-05, Step 5 abgeschlossen:** `webui/{api,serializers}.py` gebaut (`/api/v1/{me,spaces,
+items,items/{id},items/{id}/append,items/{id}/archive}`, Plan §3.1–§3.3), in `create_app()`
+gemountet — der `store`-Parameter existierte bereits (bediente bisher nur `build_mcp()`), kein
+neuer Parameter nötig. Eigener Fund: `storage.store.Store.archive()` schützt anders als
+`update()`/`append()` nicht vor doppeltem Archivieren — in `api.py` behoben (nicht in `storage/`,
+dort tabu). `scripts/ui_smoke.py` (neu) läuft In-Process durch den vollen Web-Flow, 12/12 grün.
+504/504 Tests. Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-05.**]** **Nächster
+Schritt:** Step 6 (UI-Gerüst: Shell, Tokens, Navigation, Liste, Suche — `webui/static/{app.html,
+app.css,app.js}`). Zeilen 5/6 der Block-A-Abnahme folgen, sobald Step 6 einen echten Klick-Pfad
+für `/api/v1/account/password` bietet.
 
 **Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅
 abgeschlossen, 2026-07-30.** Mission erfüllt: der Pfad-Token ist verschwunden, ein eigener

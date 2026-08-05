@@ -15,7 +15,6 @@ from authserver.userdir import UserDirectory
 from mcpserver.app import OAuthConfig, create_app
 from mcpserver.config import Settings
 from starlette.applications import Starlette
-from starlette.requests import Request
 from starlette.responses import Response
 from storage.store import Store
 
@@ -104,17 +103,37 @@ async def test_oauth_authorize_never_reads_cookies(tmp_path):
     assert 'name="request_id"' in with_cookie.text
 
 
-def test_api_endpoint_ignores_bearer_token(sessions):
-    """Platzhalter (Plan §5 Step 3: „nach Step 5 zu schärfen") — `/api/v1/*` existiert erst ab
-    Step 5, ein Mount hier vorzugreifen wäre erfundener Scope. Was jetzt schon geprüft werden
-    kann: `SessionManager`, der einzige Auth-Mechanismus, den die UI-Seite bislang hat, liest an
-    keiner Stelle einen `Authorization`-Header — ein Request, der ausschließlich ein
-    Bearer-Token trägt (kein Cookie), liefert `load()` grundsätzlich `None`."""
-    request = Request(
-        {
-            "type": "http",
-            "method": "GET",
-            "headers": [(b"authorization", b"Bearer irgendein-mcp-token")],
-        }
+@pytest.mark.asyncio
+async def test_api_endpoint_ignores_bearer_token(tmp_path):
+    """**Geschärft in P5 Step 5** (war bis dahin ein Platzhalter: „`/api/v1/*` existiert erst ab
+    Step 5, ein Mount hier vorzugreifen wäre erfundener Scope" — `webui/api.py` existiert jetzt,
+    also gegen die echte, gemountete Route, nicht mehr nur gegen `SessionManager.load()` isoliert
+    geprüft). Gegenstück zu `test_mcp_endpoint_ignores_session_cookie`: ein reales, gültiges
+    OAuth-Bearer-Token — `/api/v1/items` muss trotzdem 401 bleiben, es kennt nur die
+    Cookie-Sitzung, kein `Authorization`-Header (P5-F, Richtung 2)."""
+    auth_settings = AuthSettings(base_url=BASE_URL, db_path=tmp_path / "auth.sqlite3")
+    auth_store = AuthStore(auth_settings.db_path, now_fn=lambda: datetime.now(timezone.utc))
+    users = UserDirectory(auth_store, dek=None)
+    oauth = OAuthConfig(settings=auth_settings, store=auth_store, users=users)
+    data_root = tmp_path / "data"
+    data_root.mkdir()
+    store = Store(data_root, git=False)
+    settings = Settings(data_root=data_root)
+    app = create_app(settings=settings, store=store, oauth=oauth)
+
+    family_id = auth_store.create_family(
+        space=SPACE, client_id="c1", scope="space", resource=auth_settings.resource
     )
-    assert sessions.load(request) is None
+    access_token, _refresh = auth_store.issue_token_pair(
+        family_id, access_ttl_s=3600, refresh_ttl_s=2592000
+    )
+
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app), base_url="http://testserver"
+    ) as client:
+        result = await client.get(
+            "/api/v1/items", headers={"Authorization": f"Bearer {access_token}"}
+        )
+
+    assert result.status_code == 401
+    assert result.json()["error"] == "unauthenticated"

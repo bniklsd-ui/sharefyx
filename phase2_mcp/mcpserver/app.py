@@ -61,6 +61,16 @@ baut und von dort `mcpserver.permissions` importiert, bleibt der Graph azyklisch
 wenn `mcpserver.permissions` selbst wieder `mcpserver.app` oder `webui` importierte, was es
 nicht tut. Test `test_create_app_mounts_ui_routes_without_import_cycle`
 (`phase2_mcp/tests/test_app.py`) hält diese Prämisse fest, nicht nur behauptet.
+
+**[2026-08-05, P5 Step 5]:** `webui/api.py` existiert jetzt (der Absatz oben sprach noch von
+„diese Datei existiert noch nicht" — das ist damit überholt) und ist als `api_routes(ui_settings,
+store, ui_sessions, own_space_writable)` in die Routenliste gemountet, hinter `account_routes()`
+und vor `/health`/`Mount("/mcp")`. `store: Store` bediente bis hierhin ausschließlich
+`build_mcp()`; dieselbe Instanz läuft jetzt zusätzlich durch die REST-API, kein zweiter
+`Store`-Handle. `OwnSpaceWritable()` wird jetzt in einer lokalen Variablen gehalten
+(`own_space_writable`) statt zweimal instanziiert — beide Verwendungsstellen teilen sich dieselbe
+(zustandslose) Instanz. Die Zirkelfreiheit von oben gilt unverändert: der zusätzliche Import ist
+exakt der eine vorhergesagte (`mcpserver.permissions.OwnSpaceWritable`), kein zweites Symbol.
 """
 from __future__ import annotations
 
@@ -81,6 +91,7 @@ from starlette.routing import Mount, Route
 
 from storage.store import Store
 from webui.account import account_routes
+from webui.api import api_routes
 from webui.config import UiSettings
 from webui.routes_auth import ui_auth_routes
 from webui.sessions import SessionManager
@@ -150,7 +161,8 @@ def create_app(
     `allowed_hosts` wie die FastMCP-App (P4-P) — sie trägt öffentliche Auth-Routen. Nur gesetzt,
     wenn `hosts` nicht `None` ist: sonst würde ein Betrieb ohne `SPACE_ALLOWED_HOSTS`
     (Discovery über den Tailscale-Funnel-Hostnamen) durch die Middleware selbst blockiert."""
-    mcp = build_mcp(store, OwnSpaceWritable())
+    own_space_writable = OwnSpaceWritable()
+    mcp = build_mcp(store, own_space_writable)
     mcp.add_middleware(ToolCallLogMiddleware())
     hosts = list(allowed_hosts) if allowed_hosts else (list(settings.allowed_hosts) or None)
     mcp_app = mcp.http_app(path="/", stateless_http=True, allowed_hosts=hosts)
@@ -169,6 +181,7 @@ def create_app(
     routes: list[Route | Mount] = list(oauth_routes(oauth.settings, oauth.store, oauth.users))
     routes += ui_auth_routes(ui_settings, oauth.store, oauth.users, ui_sessions)
     routes += account_routes(ui_settings, oauth.store, oauth.users, ui_sessions)
+    routes += api_routes(ui_settings, store, ui_sessions, own_space_writable)
     middleware: list[Middleware] = []
     if hosts is not None:
         middleware.append(Middleware(TrustedHostMiddleware, allowed_hosts=hosts))

@@ -19,9 +19,12 @@ from authserver import passwords, totp
 from authserver.secretbox import KEY_LEN, seal
 from authserver.store import AuthStore
 from authserver.userdir import UserDirectory
+from mcpserver.permissions import OwnSpaceWritable
 from starlette.applications import Starlette
+from storage.store import Store
 
 from webui.account import account_routes
+from webui.api import api_routes
 from webui.config import UiSettings
 from webui.routes_auth import ui_auth_routes
 from webui.sessions import SessionManager
@@ -102,6 +105,34 @@ def app(ui_settings, store, users, sessions) -> Starlette:
 def full_app(ui_settings, store, confirmed_users, sessions) -> Starlette:
     routes = ui_auth_routes(ui_settings, store, confirmed_users, sessions) + account_routes(
         ui_settings, store, confirmed_users, sessions
+    )
+    return Starlette(routes=routes)
+
+
+@pytest.fixture
+def item_store(tmp_path) -> Store:
+    """`storage.store.Store` — Notiz-/Aufgaben-Kern, bewusst nicht `store` genannt: dieser Name
+    ist in diesem `conftest.py` bereits die `AuthStore` (Passwort/TOTP/Sessions), eine zweite
+    Bedeutung für denselben Fixture-Namen wäre in jeder Testdatei ein Stolperstein."""
+    data_root = tmp_path / "data"
+    data_root.mkdir()
+    return Store(data_root, git=False)
+
+
+@pytest.fixture
+def permissions() -> OwnSpaceWritable:
+    return OwnSpaceWritable()
+
+
+@pytest.fixture
+def full_app_items(ui_settings, store, confirmed_users, sessions, item_store, permissions) -> Starlette:
+    """Wie `full_app`, plus `/api/v1/items*`/`/api/v1/{me,spaces}` (Step 5) — Login/Logout,
+    Selbstverwaltung UND Items-API im selben Prozess, wie es `mcpserver/app.py :: create_app()`
+    live auch tut."""
+    routes = (
+        ui_auth_routes(ui_settings, store, confirmed_users, sessions)
+        + account_routes(ui_settings, store, confirmed_users, sessions)
+        + api_routes(ui_settings, item_store, sessions, permissions)
     )
     return Starlette(routes=routes)
 
