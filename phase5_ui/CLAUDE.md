@@ -282,6 +282,28 @@ danach alle grün.
 Shell des Aufrufers abhängt, ist kein Test. Wenn eine Testsuite ein Programm gegen eine Attrappe
 laufen lässt, muss sie die Umgebung **konstruieren**, nicht erben.
 
+**Nachtrag 2026-08-05/06 — Staging live, `[VERIFY]` V36 geschlossen:** der Nikinger hat den
+DATA_ROOT geklont, `sharefyx-staging.service` aktiviert und die Instanz über
+`sudo tailscale serve --bg --https=8766 8766` freigegeben. **Bewusst mit `sudo` statt
+`tailscale set --operator=savefyx`** (Nikinger-Entscheidung): die Serve-Konfiguration überlebt
+ohnehin im `tailscaled`-Zustand, ein dauerhaftes Operator-Recht würde dagegen genau dem Benutzer,
+unter dem `deploy.sh` läuft, erlauben, den **Produktiv**-Funnel umzustellen oder abzuschalten.
+Least privilege vor Bequemlichkeit.
+
+**V36 read-only gegengeprüft:** Funnel steht auf 443 → `127.0.0.1:8765` (öffentlich, unverändert),
+Serve auf 8766 → `127.0.0.1:8766` und ist als **`tailnet only`** ausgewiesen — kein gemeinsamer
+Port, Staging nie über Funnel (P5-AB). Staging antwortet über den Tailnet-Weg mit 200 auf
+`/health` und `/ui/login`, Produktiv unverändert 200.
+
+**Die Falle, die dabei nicht zugeschnappt ist** (und die ich vorher in `local.env.example`
+benannt habe): `STAGING_PORT` ist der **lokale** Port, `tailscale serve --https=<X>` bestimmt den,
+den der Browser sieht. Der Default `<PUBLIC_BASE_URL>:<STAGING_PORT>` stimmt **nur**, wenn beide
+gleich sind. Hier sind sie es (8766/8766), die eingesetzte `SPACE_PUBLIC_BASE_URL` deckt sich
+exakt mit der realen Serve-URL. Bei `--https=8443` wäre sie falsch gewesen — und der erste
+Einladungslink auf Staging wäre in demselben `403 Herkunft (Origin) stimmt nicht` gelandet, der
+in P4 und P5 je eine Session gekostet hat. Deshalb war die Reihenfolge „erst serven, dann
+ablesen, dann eintragen" keine Förmlichkeit.
+
 **Manuell (Nikinger — alles, was Realität berührt):**
 1. **Einmalig:** `sudo mkdir -p /opt/sharefyx/releases && sudo chown -R savefyx:savefyx /opt/sharefyx`
 2. Erster Deploy aus dem Arbeitsverzeichnis:
