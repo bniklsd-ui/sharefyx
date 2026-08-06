@@ -129,6 +129,7 @@ nicht gebaut. Phase 5 bleibt 🟡, solange eine Zeile offen ist.**
 | 15 | `ui_budget.py` liefert alle vier Zahlen | 🟡 **Kandidatenbeleg** | Von Claude Code gefahren, Ergebnis steht als Tabelle im Session-Block (alle fünf Größen im Korridor, **löst V10 auf**). Nach dem Muster von P3 Zeile 13 gilt das als Kandidat, nicht als Abnahme — **der Lauf des Nikingers macht die Zeile ✅** |
 | 16 | `deploy.sh` rollt bei kaputtem Health-Endpunkt automatisch zurück | ✅ | **Nikinger live, 2026-08-05 20:40**, nach dem Cutover auf `/opt/sharefyx/current`. `SHAREFYX_PORT=9999` zeigte das Gate auf einen toten Port (der Dienst selbst blieb gesund — simuliert wird ein kaputter Health-Endpunkt, nicht ein kaputter Dienst). Read-only gegengeprüft, nicht nur die Meldung übernommen: `current` zeigt wieder aufs erste Release, das gescheiterte liegt als `…Z.failed` daneben, `ExecMainStartTimestamp` passt zum Rollback-Neustart, alle vier Proben und der öffentliche Funnel-Weg wieder korrekt. **Der `.failed`-Fund vom selben Tag in Aktion:** ohne die Markierung wäre genau dieses Verzeichnis beim nächsten Rollback das Ziel gewesen |
 | 17 | Beide Nutzer benutzen UI **und** Connector am selben Tag gegen dieselbe Instanz | ⬜ offen | Step 9 (P5-AE) |
+| — | *(Staging war kein eigenes Akzeptanzkriterium — P5-AB nennt es im Scope, §6 prüft es nicht. Am 2026-08-06 abgeschaltet, Begründung im Session-Block.)* | | |
 | 18 | `git diff` auf `storage/`, `mcpserver/{tools,permissions,server}.py`: leer | ✅ | bei jedem Step-Commit geprüft, zuletzt Step 7b |
 | 19 | Cookie an `/mcp` ignoriert; Bearer an `/api` ignoriert | 🟡 | Testseite ✅ (`test_isolation.py`, `test_overview.py`); der im Plan zusätzlich verlangte **Live-`curl`** steht aus |
 | 20 | Reboot: UI, Connector, Timer kommen ohne Handgriff zurück | ⬜ offen | passiv zulässig (wie P3 Zeile 6) |
@@ -368,6 +369,44 @@ Gerät ist ebenso wenig im Tailnet) — **aber nicht bewiesen**: der Wortlaut la
 nicht „Verbindung verweigert", und ein TLS-Fehler erreicht den Server nie, es steht also nichts
 im Journal. Bleibt als offener, kleiner Punkt stehen, bis er wieder auftritt: exakter Wortlaut
 und die URL aus der Adresszeile genügen zur Einordnung.
+
+**Nachtrag 2026-08-06, dritter — Staging wird abgeschaltet. Revidiert P5-AB, Nikinger-Entscheidung.**
+
+Der Weg dorthin gehört zum Befund, weil er zweimal an einer Begriffsverwechslung hing: der
+Nikinger verstand „prod" als *die Umgebung, in der die Software produziert wird* (die Arbeitskopie
+unter `/dev`) und „staging" als *die Instanz für den Alltag*. Tatsächlich ist es umgekehrt —
+`sharefyx-mcp` hält die echten Notizen beider Personen, `sharefyx-staging` nur eine Kopie vom
+Vormittag. Erst als der reale Zustand als Tabelle nebeneinanderstand (welche Daten, welche
+Konten, wer kommt heran, welcher Code), war die Lage eindeutig. **Lehre: bei zwei Instanzen nie
+über Namen verhandeln, sondern über Daten, Erreichbarkeit und Code.**
+
+**Die Entscheidung und ihr Grund:** Staging ist überflüssig. Der Langzeittest der Software ist
+die tägliche Nutzung von `sharefyx-mcp` selbst; eine zweite Instanz, die niemand aufruft, testet
+nichts. Dazu kam die harte Randbedingung: die Hauptzugriffsrechner sind **Arbeitsrechner**, auf
+denen weder Tailscale installiert noch die Netzwerkkonfiguration geändert werden darf. Ein
+tailnet-only-Staging ist dort strukturell unerreichbar, und die VM nimmt hinter CGNAT auch keine
+SSH-Verbindung für einen Tunnel an. Es blieb nur „öffentlich per Funnel" — und eine zweite
+öffentliche Fläche für eine Instanz, die ihren Zweck ohnehin nicht erfüllt, ist ein schlechtes
+Geschäft.
+
+**Zwei eigene Funde, die diese Entscheidung mitgetragen haben:**
+1. **Staging konnte seinen Zweck gar nicht erfüllen** — Konstruktionsfehler meinerseits: die
+   Unit-Vorlage hat **einen** `__REPO_ROOT__`-Platzhalter, den beide Instanzen erben. Belegt über
+   `systemctl show`: beide `ExecStart` zeigen auf `/opt/sharefyx/current`. Staging konnte damit
+   andere *Daten* fahren, aber nie anderen *Code* — und „eine Änderung ausprobieren, bevor sie
+   live geht" war der Zweck laut Plan. Ein echtes Staging bräuchte einen eigenen Symlink
+   (`/opt/sharefyx/staging`) und ein Ziel-Argument in `deploy.sh`.
+2. Dadurch war meine erste Risikoeinschätzung („Funnel auf Staging setzt ungetesteten Code aus")
+   **für den heutigen Zustand zu streng** — es lief dieselbe Software. Für den Zustand, den
+   Staging haben *sollte*, war sie richtig. Beides dem Nikinger vorgelegt statt eine Empfehlung
+   stehenzulassen, deren Grundlage sich geändert hatte.
+
+**Was bleibt und warum:** Unit, Skripte, Platzhalter und die vier Tests bleiben **im Repo**. Sie
+sind gebaut, getestet und dokumentiert; abgeschaltet ist die *Inbetriebnahme*, nicht der Code.
+Sobald ein Rechner existiert, der ins Tailnet darf, ist Staging ein `install_units.sh` +
+`systemctl enable --now` + `tailscale serve` entfernt — **plus** der Release-Fix aus Fund 1, sonst
+fährt es wieder dieselbe Software wie Produktiv. Das steht hier, damit niemand später eine
+funktionierende Unit findet und annimmt, sie sei einsatzbereit.
 
 **Manuell (Nikinger — alles, was Realität berührt):**
 1. **Einmalig:** `sudo mkdir -p /opt/sharefyx/releases && sudo chown -R savefyx:savefyx /opt/sharefyx`
