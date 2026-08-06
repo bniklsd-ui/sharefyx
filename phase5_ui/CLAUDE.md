@@ -7,7 +7,7 @@ up: ../CLAUDE.md
 down:
   - ../docs/concepts/phase5_ui_plan.md             # voller Plan, Entscheidungen P5-A–P5-AE, Steps 0–9
   - ../docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.5, [VERIFY]-Bilanz V14–V26
-updated: 2026-08-05
+updated: 2026-08-06
 ---
 
 # CLAUDE.md — Phase 5: Web-UI, REST-API, Auth-Selbstverwaltung (`phase5_ui/`)
@@ -100,6 +100,7 @@ Messung statt Schätzung (`ui_budget.py`, AD) · gemeinsame Live-Abnahme, beide 
 | 10 | Editor, Vorschau, Konflikt, Frontmatter-Felder: `webui/api.py` +`GET /api/v1/meta`; `webui/static/app.js` um Markdown-Parser/Sanitizer (geerntet + erweitert aus `docs/concepts/notiz_heft_example.html`), Editor-Zustand, Versionsband, Speichern/Konfliktdialog, Anlegen/Anhängen/Archivieren, Frontmatter-Felder, Entwurfsschutz, „Sitzung abgelaufen"-Karte, Formatierhilfen-Leiste erweitert; `webui/static/{app.css,app.html}` entsprechend erweitert | 7 | ✅ **vollständig** — kein Passwortänderungsdialog (eigener Nachtrag, Zeilen 5/6 der Block-A-Abnahme folgen dort), kein Deploy/Rollback (Step 8), keine zweite Formatvariante (P5-Z bleibt Seam). Umfangreiche Node/jsdom-gestützte End-to-End-Simulation (Scratchpad, nicht im Repo) fand und schloss zwei echte Funde vor dem Commit: (1) das Test-Mock selbst hatte einen `includes()`-Bug (`/api/v1/meta` matchte fälschlich auch `/api/v1/me`) — beim Beheben zusätzlich `reportUnexpectedError()` in `app.js` ergänzt, weil (2) `loadItems()`/`selectItem()`/`init()` bei einem `401` sonst eine unbehandelte Promise-Ablehnung hinterließen (im Browser nur eine Konsolenwarnung, in Node ein Prozessabbruch — trotzdem sauber behandelt, nicht auf das mildere Browser-Verhalten verlassen) | +4 (2 `test_meta.py`, neue Datei + 2 `test_api.py`: `test_conflict_response_current_item_matches_item_to_json_exactly`, `test_append_endpoint_concatenates_patch_endpoint_replaces`; JS bleibt laut Plan unit-ungetestet, die jsdom-Simulation ist eine Entwicklungshilfe dieser Session, kein Teil der Suite) |
 | 11 | UI-Überarbeitung nach Live-Feedback: Navigationsbaum + Übersichtsseite (`GET /api/v1/overview` neu, `GET /api/v1/meta` um `buckets` erweitert, `webui/serializers.py :: overview_row_to_json()`), plastische Bedienelemente + zwei farblich getrennte Editor-Paneele (`app.css` weitgehend neu), Toasts/Dirty-Gating/schließbarer Editor/entfernbare Chips (`app.js`), gestaltete Auth-Seiten (`pages.py` + `app.css`), Passwortwechsel-Dialog für die Block-A-Zeilen 5/6 | 7b | ✅ **vollständig** — **revidiert Plan §4.1 und §4.3** (Nikinger-Entscheidung 2026-08-05, Tabelle im Session-Block; die Plandatei bleibt als 📕-Snapshot unverändert). Schließt elf Live-Meldungen und sechs eigene Funde (F1–F6). Zwei Funde darüber hinaus: ein vierter Ordner **„Erledigt"** (eine `done`-Aufgabe war in der Oberfläche nirgends mehr auffindbar) und **Akzeptanzkriterium 12 war bisher nur halb erfüllt** — Editor/„+"/Anlegen-Dialog standen permanent in `app.html` und waren nur `hidden`; `app.js :: detachable()` hängt sie jetzt wirklich aus dem DOM aus. 51 jsdom-Prüfungen, `ui_smoke.py` 12/12 | +33 (7 `test_overview.py` + 24 `test_pages_markup.py`, zwei neue Dateien; +1 `test_meta.py`, +1 `test_static_routes.py`; `test_invite_enroll.py` und `scripts/ui_smoke.py` mussten ihre Seed-Suchregex auf das neue Klassen-Markup nachziehen, kein neuer Test) |
 | 12 | Betrieb: `phase5_ui/scripts/{deploy,rollback,authbackup,restore_auth_check}.sh` + `ui_budget.py`; `phase5_ui/systemd/{sharefyx-authbackup.service,.timer,sharefyx-staging.service}`; `install_units.sh` um drei **optionale** Staging-Platzhalter erweitert; `diagnose.sh` um vier Prüfungen (UI erreichbar, offene UI-Sitzungen, jüngstes Auth-Backup, aktives Release) | 8 | ✅ **gebaut, Live-Teile beim Nikinger** — **löst V10 auf** (Messtabelle im Session-Block, alle fünf Größen im Korridor) und korrigiert eine **V13-Drift in `phase3_edge/`** (dort seit 2026-07-28 als geschlossen dokumentiert und 114 Zeilen weiter unten in derselben Datei noch als offen geführt). Drei dokumentierte Plan-Abweichungen (Health-Gate ohne authentifizierte Probe — Hard Rule 1; dritter Staging-Platzhalter; Platzhalter optional statt Pflicht). Eigener Fund beim echten Probelauf: ein zurückgerolltes Release wäre das nächste Rollback-Ziel gewesen → `*.failed`-Markierung | +21 (15 `test_deploy_scripts.py`, neue Datei; +6 `test_units.py`, darunter `test_every_placeholder_in_every_unit_is_known_to_the_install_script` — allgemeiner als die im Plan genannten) |
+| 13 | UI-Revision nach Live-Feedback des Nikingers (elf Punkte) + Review von Step 8/S10: OAuth-Consent-Seite gestaltet (`phase4_auth/authserver/{templates,routes}.py`, CSP `style-src`/`font-src` erweitert), Ordner-Wechsel schließt/fragt jetzt bei offenem Editor + Nur-lesen-Ansicht bekommt ein „×" (`app.js :: navigate()`/`showReadonlyItem()`), Anlegen-Dialog-Typ folgt dem aktiven Ordner, Editor öffnet standardmäßig in der Vorschau (zwei Ausnahmen: Neuanlage, Neuladen nach Schreibvorgang), Archivieren vom „×" weggerückt, Abmelden-Icon getauscht, Passwort-Sichtbarkeit (Konto-Dialog + Login-/Einladungsseite, `pages.py` lädt jetzt `app.js`), Zähler-Polling (20s + Fokus/Sichtbarkeit) | 8b (Live-Feedback, kein Plan-Step) | ✅ **vollständig, gebaut — Deploy steht noch aus** | +2 (`test_templates.py`: einer ersetzt, einer neu); JS bleibt laut Plan unit-ungetestet, 27 jsdom-Prüfungen im Scratchpad (nicht im Repo) gegen die neue Editor-Öffnen-/Navigations-/Toggle-Logik |
 
 ---
 
@@ -146,59 +147,125 @@ Rückweg, falls je nötig: `REPO_ROOT`/`VENV` in `phase3_edge/local.env` zurück
 
 ---
 
-## Session stopped — 2026-08-06 (Step 8 live abgeschlossen, Staging verworfen, Befund S10)
+## Session stopped — 2026-08-06 (Step 8b — Review + elf Live-Feedback-Punkte, zwei Befunde für den Nikinger)
 
-**Ergebnis:** Step 8 ist vollständig — gebaut **und** live. Der Dienst läuft seit dem Cutover aus
-`/opt/sharefyx/current`, Deploy/Rollback/Auth-Backup sind live nachgewiesen, Staging ist nach
-einer Nikinger-Entscheidung wieder abgeschaltet. **Abnahmestand: 13 von 20 live bestanden.**
+**Auftrag:** „Step 8 ist fertig, aber nicht commited" prüfen, Sicherheits-/Korrektheits-Review,
+dann so viel wie machbar aus einer Liste von elf Live-Meldungen des Nikingers umsetzen.
 
-**Live bestanden in dieser Session:** Zeile 6 (Passwortwechsel — zweiter Browser abgemeldet,
-Connector fordert neu, eigene Sitzung läuft weiter; in der DB gegengeprüft) und Zeile 16
-(Auto-Rollback bei gerissenem Health-Gate). Dazu ohne eigene Abnahmezeile: der Cutover, das
-verschlüsselte Auth-Backup mit **eigenem Restore-Lauf des Nikingers**, und `[VERIFY]` **V36**.
+**Erste Korrektur, bevor irgendetwas gebaut wurde:** die Prämisse „nicht commited" stimmte
+nicht — `git log` zeigte den S10-Abschluss-Commit bereits als `HEAD` (`e760f0e`), Arbeitsbaum
+sauber. Tatsächlicher Zustand, per `git fetch`/`git status -sb` belegt: **lokaler `main` liegt
+34 Commits vor `origin/main`, noch nie gepusht** — und `/opt/sharefyx/current` läuft auf dem
+Stand VOR dem S10-Fix (Deploy fällig, siehe voriger Session-Block). Zwei getrennte, beide beim
+Nikinger liegende Schritte: **Push** und **Deploy**, nicht einer. Diese Session hat keins von
+beiden ausgeführt (Hard Rule: was die reale Infrastruktur anfasst, macht der Nikinger).
+**Wichtig für den Nikinger: jede Änderung dieser Session ist erst nach einem Deploy sichtbar** —
+dieselbe Falle wie O1/S10 in den vorigen zwei Sessions.
 
-**Sechs Funde, alle aus dem echten Betrieb — keiner beim Lesen des Codes auffindbar:**
+**Review Step 8 + S10 (vor jeder Änderung):** `deploy.sh`/`rollback.sh`/`authbackup.sh` erneut
+gelesen (nicht nur die Doku übernommen) — Health-Gate, `*.failed`-Markierung, Pre-Deploy-Backup,
+`sqlite3 .backup`+Verifikation, alles wie dokumentiert. **`restore_auth_check.sh` war beim
+letzten Review nicht gelesen worden** (Lücke dieser Session behoben) — trägt dieselbe
+`mktemp -d`+`trap … EXIT`-Disziplin wie `authbackup.sh`, kein Klartext bleibt liegen. S10-Fix
+(`routes_auth.py :: _invite_post()`) noch einmal nachvollzogen: `revoke_families_for_space()`/
+`revoke_sessions_for_space()` rufen exakt dieselben, bereits seit P5-Q bestehenden Store-Methoden
+auf, kein neuer Codepfad. **Keine neuen Sicherheitsbefunde.**
 
-1. **Meine Testsuite startete den Produktivdienst 52-mal neu.** `_env()` erbte `os.environ`; das
-   für den Deploy exportierte `SHAREFYX_SYSTEMCTL="sudo systemctl"` schlug in jeden Testlauf
-   durch, und `deploy.sh` rief damit das echte `systemctl`. PATH-Stubbing schützt nicht — `sudo`
-   findet das Binary über `secure_path`; ein frisches `sudo -v` machte auch das Terminal
-   entbehrlich. In beiden betroffenen Testdateien über `_clean_environ()` geschlossen.
-2. **Ein zurückgerolltes Release wäre das nächste Rollback-Ziel gewesen** — es bleibt liegen und
-   ist das jüngste Verzeichnis. Jetzt `*.failed`, von `rollback.sh` übersprungen.
-3. **`authctl invite` baute den Link aus einer Variablen ohne Bezug zur beschriebenen Datenbank.**
-   Kostete eine Stunde Fehlersuche: die Staging-Einladung zeigte auf Produktiv, dort `404
-   „Einladung ungültig oder abgelaufen"` — was sich wie „Konto existiert bereits" liest. Jetzt
-   nennt die Ausgabe Datenbank **und** Ziel-URL mit `[PRODUKTIV]`/`[STAGING]`.
-4. **Staging konnte seinen Zweck nie erfüllen** (Konstruktionsfehler): ein `__REPO_ROOT__`-
-   Platzhalter für beide Units, also gleicher Code, nur andere Daten.
-5. **O2** — `clients`/`token_families` werden nie abgeräumt, 35 Registrierungen in einer Woche.
-   Offen, bewusst nicht still gefixt.
-6. **S10** — siehe unten, der schwerwiegendste.
+**Elf Live-Meldungen — neun umgesetzt, zwei als eigenständige Befunde für den Nikinger vorgelegt
+statt stillschweigend entschieden oder verworfen:**
 
-**Befund S10 (mittel, geschlossen):** ein Reset über eine Einladung widerrief **weder
-Token-Familien noch UI-Sitzungen**. Aufgefallen beim Verbuchen von Fabians Reset: neun
-Token-Familien vom 30.07. standen danach weiterhin auf „aktiv". Der Passwortwechsel widerruft
-seit Step 4 alles (P5-Q) — der Reset, die *stärkere* Operation, widerrief nichts. Wer ein altes
-Refresh-Token hielt, behielt vollen Zugriff, obwohl Passwort und TOTP ersetzt waren. Geschlossen
-in `routes_auth.py :: _invite_post()`, Test gegen den ungefixten Stand als rot gegengeprüft.
-Details: `phase4_auth/CLAUDE.md`, Befundtabelle.
+| # | Meldung | Ergebnis |
+|---|---|---|
+| 1 | Notiz lässt sich nach Space-Wechsel nicht schließen | ✅ Zwei Ursachen, beide behoben: die Nur-lesen-Ansicht (fremder Space) hatte **kein** „×" (Editor hatte eins) — jetzt `#ro-close-button`. Und ein Ordner-Klick im Baum ließ einen offen gebliebenen, ungespeicherten Editor unangetastet stehen, ohne Rückfrage — `navigate()`s Aufrufer im Baum ruft jetzt erst `closeEditor()` (fragt bei ungespeicherten Änderungen, Entwurf bleibt im `sessionStorage` erhalten), Abbrechen lässt den Editor unverändert stehen |
+| 2 | SubSpaces/Unterordner für fabi/niklas | 🔴 **Nicht umgesetzt — Befund F1 unten, Phase-6-Kandidat** |
+| 3 | „Task anlegen" zeigt „Notiz" | ✅ War kein reiner Beschriftungsfehler: `openCreateDialog()` selektierte nie etwas vor, das erste `<option>` (immer `note`, alphabetisch/Insertion-Order) blieb stehen — im „Offen"/„Erledigt"-Ordner (Typ `task`) legte „Anlegen" also immer eine Notiz an, unabhängig vom Klick. Jetzt: Vorauswahl folgt `state.meta.buckets[state.filter].type`. Dieselbe Ursache traf den „Erste Notiz anlegen"-Knopf im Leerzustand, jetzt ebenfalls ordner-abhängig |
+| 4 | Zähler geht nicht hoch, ohne wegzuklicken | ✅ Polling auf `GET /api/v1/overview` (bereits vorhanden), alle 20s + sofort bei Tab-Fokus/-Sichtbarkeit. **Kein Realtime/WebSocket** (Plan §0.5 draußen) — reines Nachfragen einer bestehenden Route, rührt den Editor nie an |
+| 5 | Items vollständig löschen | 🔴 **Nicht umgesetzt — Befund F2 unten** |
+| 6 | „später": Space, den nur der User beschreiben kann, Claude nicht | ⬜ Bewusst vom Nikinger selbst verschoben, hier nur protokolliert — keine Aktion |
+| 7 | Alte UI beim Connector-Neuanmelden | ✅ Root Cause: `authserver/templates.py`s `render_login_form()` war seit P4 das rohe Wegwerf-Formular — der Docstring sagte „wird in P5 ersetzt", P5-G verbietet aber genau das (getrennter Consent-Flow als Absicht). Nie nachgezogen. Jetzt: `.auth`/`.auth-card`-Kartendesign aus `app.css` wiederverwendet (`<link>`, kein Python-Import, P4-A bleibt intakt), `_security_headers()`s CSP von `style-src 'unsafe-inline'` (ohne `'self'` — ein `<link>` wäre geblockt worden, dieselbe Fehlerklasse wie der `style=`-Fund hinter dem QR-Code in Step 7b) auf `style-src 'self'; font-src 'self'` umgestellt. Bewusst **kein** `<script>` auf dieser Seite (sicherheitskritischer als `webui`, P5-G) |
+| 8 | Passwort-Sichtbarkeit beim Eintippen | ✅ `.pw-field`/`.pw-toggle` + `app.js :: initPasswordToggles()` (läuft unbedingt, nicht nur in `initShell()`). Konto-Dialog (3 Felder) sowie Login-/Einladungsseite (`pages.py` lädt jetzt `app.js`, reine Fortschreitung — ohne JS bleibt das Feld maskiert, das native Formular funktioniert unverändert) |
+| 9 | Archivieren zu nah am „×" | ✅ Reihenfolge getauscht (Archivieren jetzt am anderen Ende der Leiste) + `.editor__close-button { margin-left: … }` als zusätzlicher Abstand |
+| 10 | Shared Spaces ersetzen den Standard-eigenen-Space | 🔴 **Nicht umgesetzt — Befund F1 unten (mit #2 zusammengefasst), zwei Teilfragen** |
+| 11 | Editor öffnet standardmäßig in „Bearbeiten", soll „Vorschau" sein | ✅ `showEditableItem(item, opts)` — Vorgabe jetzt `preview`. Zwei Fallen (Advisor-Fund, vor dem Commit behoben): ein frisch angelegtes Item hat leeren Body, öffnet deshalb explizit mit `opts.mode:"edit"` (sonst leere Vorschau statt Textarea); ein Neuladen nach Speichern/Anhängen/Konflikt-„Aktuelle laden" behält den Modus bei, den man gerade benutzt hat (`afterWrite()`/`conflictLoadCurrentButtonEl` reichen `state.mode` durch), sonst risse ein `Ctrl+S` mitten im Tippen in die Vorschau |
+| — | Anderes Icon für Abmelden | ✅ `&#9211;` (Ein/Aus, zu nah am `&#9881;`-Zahnrad direkt daneben) → `&#9099;` (⎋, ISO-7000-Abmelde-Symbol) |
 
-**Staging verworfen — revidiert P5-AB.** Begründung und der Weg dorthin stehen im vorigen
-Session-Block (archiviert): Arbeitsrechner ohne Tailscale, CGNAT ohne SSH, also nur der Funnel —
-und eine zweite öffentliche Fläche für eine Instanz, die ihren Zweck nicht erfüllt, ist ein
-schlechtes Geschäft. Der Langzeittest ist die tägliche Nutzung von `sharefyx-mcp`. Code, Unit und
-Tests bleiben im Repo; abgeschaltet ist die Inbetriebnahme.
+**Bewusste Lücke bei Meldung 1, nicht übersehen:** nur `renderFolders()`s Klick-Handler (Baum)
+ruft jetzt `closeEditor()` vor der Navigation. `selectItem()` (Listenzeilen, Pfeiltasten) und
+`openFromOverview()` wechseln weiterhin OHNE Rückfrage direkt zum nächsten Item — bewusst nicht
+mitgezogen: der Entwurf bleibt in jedem Fall im `sessionStorage` erhalten (kein permanenter
+Verlust), und das war nicht die Meldung des Nikingers. Sollte sich das als zu leichtfertig
+erweisen, ist `closeEditor()` bereits die richtige Stelle zum Nachziehen.
 
-**Verifiziert:** `pytest -q` → **575/575**. Tabu-Diff leer. Dienst live gesund (öffentlich
-`/health` 200), drei Timer aktiv (`backup`, `purge`, `authbackup`), Staging `disabled`+`inactive`,
-Serve-Freigabe entfernt, beide Staging-Verzeichnisse gelöscht.
+**Akzeptanzkriterium 12 gegengeprüft, nicht nur angenommen:** `#ro-close-button` sitzt in
+`#detail-readonly`, außerhalb des `#detail-editor`-Teilbaums, den
+`test_write_controls_live_inside_detachable_containers` prüft — er schreibt nichts (nur
+`clearDetail()`) und ist ohnehin kein „Schreib-Bedienelement" im Sinne des Kriteriums. Zeile 12
+der Abnahmematrix bleibt unverändert ✅.
+
+**Advisor-Fund vor dem Commit, der schwerwiegendste dieser Session:** `pages.py`s `_PAGE` lädt
+seit Meldung 8 (Passwort-Sichtbarkeit) `app.js` auf JEDER servergerenderten Seite — auch auf
+`render_enrollment_page()` (TOTP-Seed/QR) und `render_recovery_codes_page()` (zehn
+Recovery-Codes), die BEIDE selbst ein `name="csrf"`-Feld tragen (fürs Logout-Formular). `app.js`s
+Bootstrap-Funktion (`bootstrapCsrf()`) suchte bis dahin nach JEDEM `input[name="csrf"]` außerhalb
+von `/ui/` und leitete sofort nach `/ui/` weiter — das hätte auf beiden Seiten ausgelöst und wäre
+von einem Geheimnis weggenavigiert, das nur EIN einziges Mal gezeigt wird, bevor ein Mensch den
+QR-Code fotografieren bzw. die Codes abschreiben konnte. Nie live beobachtet, vom Advisor vor dem
+Commit gefunden. Behoben: `render_logged_in_page()`s Feld trägt jetzt zusätzlich
+`id="bootstrap-csrf"`, `bootstrapCsrf()` sucht gezielt danach. Mit Playwright/Chromium
+(Scratchpad, temporäre Installation, nicht im Repo) gegen echte, gerenderte `pages.py`-Ausgaben
+gegengeprüft: kein Redirect auf Enrollment-/Recovery-Seite, Redirect weiterhin korrekt auf der
+Bootstrap-Seite. Dieselbe Session nutzte Playwright zusätzlich für einen echten
+Browser-Screenshot der Passwort-Sichtbarkeit (Login, Konto-Dialog) und des Editors (Vorschau-
+Vorgabe, Archivieren/Speichern/×-Reihenfolge) gegen einen temporären Dev-Server (tmp DATA_ROOT,
+tmp Auth-DB, Fake-DEK — nie die echte Infrastruktur) — alles wie im Code erwartet, keine
+CSS-Kaskaden-Überraschung (dieselbe Fehlerklasse, die dieses Projekt beim `style=`-QR-Hintergrund
+und dem `no-referrer`-Origin-Fund schon zweimal getroffen hat).
+
+**Befund F1 (SubSpaces + Shared Spaces, zusammengefasst — Meldungen #2 und #10 sind dieselbe
+Idee aus zwei Blickwinkeln):** nicht umgesetzt, **zwei unabhängige Teilentscheidungen** für den
+Nikinger, keine gemeinsame:
+  - **F1a — eigener Space standardmäßig nur für den User + dessen eigene Connectoren lesbar**
+    (nicht mehr „von jedem"): eine **Verschärfung** der Default-Leserechte. Fasst
+    `mcpserver/permissions.py` an (P5-B tabu für diese Phase), verletzt aber **keine** Hard Rule
+    — Rule 4 verbietet Cross-Space-*Writes*, nicht das Verengen von Reads. Vertretbar als eigener,
+    kleiner Schnitt.
+  - **F1b — ein „shared Space", in dem alle unabhängig volle Rechte haben** (bzw. einzelne
+    Dateien/Unterordner mit „shared"-Markierung): kollidiert **frontal** mit Hard Rule 4
+    („Fremde Spaces sind read-only … Cross-Space-Writes existieren architektonisch nicht — kein
+    Parameter, keine Codepfad-Variante", **„no exceptions"**), fasst `tools.py`+`permissions.py`
+    an (beide P5-B tabu, Akzeptanzkriterium 18 verlangt dort einen leeren Diff) und ändert das
+    Vertrauensmodell, auf dem `<untrusted_content>` beruht. **Phase-6-Kandidat, keine
+    Ad-hoc-Umsetzung.**
+  - Echte Unterordner (Meldung #2, unabhängig von Rechten gedacht) sind mit Tags **nicht**
+    sauber nachbaubar — ein Tag hat keine eigene Identität, „Anlegen" eines leeren Ordners
+    ergibt damit keinen Sinn, und sobald Ordner potenziell Rechtegrenzen tragen sollen (F1b),
+    ist ihr natürlicher Ort ein echtes Verzeichnis in `storage/` — ebenfalls tabu. Eine
+    Tag-basierte Notlösung jetzt wäre wahrscheinlich Wegwerfarbeit vor F1b.
+
+**Befund F2 (vollständiges Löschen):** nicht umgesetzt, zweifach blockiert — Plan §0.5 nennt
+„Löschen (bleibt `status: archived`)" wörtlich unter DRAUSSEN, und `storage.store.Store` hat
+keine Lösch-Methode; sie zu bauen hieße `storage/` anzufassen (P5-B tabu). Keine Ad-hoc-Lösung.
+
+**Verifiziert:** `pytest -q` → **576/576** (+1: `test_templates.py`s „kein `<link>`"-Test ersetzt
+durch einen, der den `<link>` bewusst erwartet — dieselbe Kategorie Test-Revision wie frühere
+gelockte-Entscheidung-Revisionen, dokumentiert statt still geändert). `scripts/ui_smoke.py` →
+12/12. Tabu-Diff (`storage/`, `mcpserver/{tools,permissions,server}.py`) → leer.
+`test_webui_imports_exactly_one_mcpserver_symbol` weiterhin grün. Zusätzlich: 27 jsdom-Prüfungen
+in einem Scratchpad-Harness (nicht im Repo, gleiche Praxis wie Step 7/7b) gegen die neue
+Editor-Öffnen-/Navigations-/Passwort-Toggle-Logik — insbesondere den Abbrechen/Bestätigen-Zyklus
+beim Ordner-Wechsel mit ungespeichertem Editor, den kein Python-Test erreichen kann.
+
+**Revidierter Test, dokumentiert statt still geändert:** `phase4_auth/tests/test_templates.py ::
+test_login_form_has_no_javascript_no_stylesheet_no_cookie_hint` pinnte „kein `<link>`" als
+Absicht (Phase-4-Ära, vor P5-G). Umbenannt/gesplittet in
+`test_login_form_has_no_javascript_no_cookie_hint` (Rest unverändert) +
+`test_login_form_loads_the_shared_stylesheet_via_link_not_inline_style` (neu, erwartet den
+`<link>`) — dieselbe Handhabung wie die §4.1/§4.3-Revisionen in Step 7b: Plan-/Test-Snapshot
+bleibt historisch stehen, der Code + die lebende Doku ziehen nach, mit datierter Begründung.
 
 **Offen für die nächste Session:**
-- **Deploy fällig** — S10 und die Werkzeugverbesserungen sind im Repo, nicht im Release. Der
-  laufende Dienst führt bis dahin den ungefixten Reset-Pfad.
-- **Fabians neun alte Token-Familien sind weiterhin aktiv** — der Fix wirkt nur für künftige
-  Resets. Aufräumen über `authctl.py list-tokens --space fabian` + `revoke --family-id …`.
-- **Zeile 15** (`ui_budget.py` vom Nikinger gefahren), **Zeile 19** (Live-`curl`), **Zeilen 10,
-  13, 14, 17, 20** (größtenteils Step 9, braucht Fabian).
-- **O2** — Entscheidung ausstehend.
+- **Push UND Deploy stehen beide aus** (siehe oben) — beides Sache des Nikingers.
+- **F1/F2 brauchen eine Nikinger-Entscheidung**, bevor daran weitergebaut wird.
+- Kein weiterer Plan-Step ist eigenständig ausführbar: Step 9 (P5-AE, gemeinsame Live-Abnahme)
+  braucht Fabian und den Nikinger live — nichts, das diese Session vorwegnehmen konnte.
+- Fabians neun alte Token-Familien (voriger Session-Block) und O2 bleiben unverändert offen.

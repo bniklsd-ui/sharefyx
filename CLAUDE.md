@@ -295,9 +295,24 @@ UI-Sitzungen, obwohl der schwächere Passwortwechsel genau das seit Step 4 tut; 
 **O2** (`clients`/`token_families` werden nie abgeräumt; offen). Dass meine eigene Testsuite dabei
 den Produktivdienst 52-mal neu startete, weil sie die Shell-Umgebung erbte, steht mit derselben
 Deutlichkeit im Session-Block. **575/575 Tests.** Details: `phase5_ui/CLAUDE.md`, Session-Block
-2026-08-06.**]** **Nächster Schritt:** **Deploy fällig** — S10 und die Werkzeugverbesserungen
-liegen im Repo, nicht im Release. Danach Zeile 15 (`ui_budget.py` vom Nikinger gefahren), Zeile 19
-(Live-`curl`) und Step 9 (gemeinsame Live-Abnahme beider Nutzer + Handover, P5-AE).
+2026-08-06.**]** **[2026-08-06, zweiter Nachtrag — Step 8b, elf Live-Feedback-Punkte des
+Nikingers geprüft + neun umgesetzt:** Korrektur zuerst — „Step 8 fertig, aber nicht commited" war
+ungenau, `git log` zeigte den S10-Commit bereits als `HEAD`; tatsächlich: lokaler `main` liegt
+**34 Commits vor `origin/main`** (nie gepusht) UND `/opt/sharefyx/current` läuft noch auf dem
+Stand vor dem S10-Fix (Deploy fällig, s.o.) — zwei getrennte, offene Schritte, beide beim
+Nikinger. Review von Step 8/S10 fand keine neuen Sicherheitsbefunde. Neun der elf Meldungen
+umgesetzt (Editor-Schließen bei Space-Wechsel, Anlegen-Typ folgt dem Ordner, Vorschau als
+Editor-Vorgabe, Passwort-Sichtbarkeit, Zähler-Polling, OAuth-Consent-Seite gestaltet — Root
+Cause war ein seit P4 nie eingelöstes „wird in P5 ersetzt", u.a.). **Zwei bewusst nicht
+umgesetzt, als Befunde F1/F2 vorgelegt statt still entschieden:** vollständiges Löschen (Plan
+§0.5 nennt es explizit draußen) und „Subspaces/shared Spaces" — Letzteres kollidiert in seiner
+vollen Form („alle haben unabhängig volle Rechte") **frontal mit Hard Rule 4** („Cross-Space-
+Writes existieren architektonisch nicht — kein Parameter, keine Codepfad-Variante", *no
+exceptions*) und ist ein Phase-6-Kandidat, keine Ad-hoc-Umsetzung. 576/576 Tests, Tabu-Diff
+leer. Details: `phase5_ui/CLAUDE.md`, Session-Block 2026-08-06 (Step 8b).**]** **Nächster
+Schritt:** **Push UND Deploy stehen beide aus**, Sache des Nikingers — danach F1/F2-Entscheidung,
+Zeile 15 (`ui_budget.py`), Zeile 19 (Live-`curl`) und Step 9 (gemeinsame Live-Abnahme beider
+Nutzer + Handover, P5-AE, braucht Fabian).
 
 **Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅
 abgeschlossen, 2026-07-30.** Mission erfüllt: der Pfad-Token ist verschwunden, ein eigener

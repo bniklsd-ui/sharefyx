@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase4_auth_plan.md          # voller Plan, Entscheidungen P4-A–P4-R, Steps 0–7
   - ../docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md  # Herkunft der offenen Entscheidungen, Doku-Drift, [VERIFY]-Bilanz
   - SESSIONS_ARCHIVE.md                            # ältere Session-Blöcke, newest-first
-updated: 2026-08-03
+updated: 2026-08-06
 ---
 
 # CLAUDE.md — Phase 4: OAuth 2.1 + DCR (`phase4_auth/`)
@@ -182,6 +182,16 @@ umgangen) sowie `authctl.py` um `invite`/`list-users`/`disable-user`/`enable-use
 `list-sessions`/`revoke-sessions` (Step 4, Plan-Tabelle oben in „Runbook" fehlt dafür — die
 Unterbefehle sind neuer P5-Umfang, keine Ergänzung des P4-Runbooks). Details, Tests, Commit:
 `phase5_ui/CLAUDE.md` Session-Block 2026-08-03.
+
+**[2026-08-06, P5 Step 8b, kein Sicherheitsbefund — Nikinger-Feedback „alte UI beim
+Connector-Neuanmelden"]:** `authserver/templates.py :: render_login_form()` trug seit P4 den
+Docstring „wird in Phase 5 ersetzt" — P5-G verbietet das aber ausdrücklich (getrennter
+Consent-Flow als Absicht, keine Übergangslösung), das Modul blieb dadurch die rohe
+Phase-4-Wegwerf-UI, während `webui/pages.py` seit Step 7b gestaltet ist. Behoben durch
+CSS-Wiederverwendung (`<link>` auf `/ui/static/app.css`, kein Python-Import — P4-A bleibt
+unverändert), `routes.py :: _security_headers()`s CSP dafür von `style-src 'unsafe-inline'`
+(ohne `'self'`) auf `style-src 'self'; font-src 'self'` umgestellt. Reine Gestaltungskorrektur,
+keine Rechte-/Auth-Änderung. Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-06 (Step 8b).
 
 ---
 

@@ -534,8 +534,19 @@ select.input {
 #detail-readonly { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 
 .detail__header {
+  position: relative;
   border-bottom: 1px solid var(--line);
   padding: calc(var(--space) * 2) calc(var(--space) * 3);
+}
+
+/* Meldung des Nikingers: ein fremdes (schreibgeschütztes) Item ließ sich nicht schließen, wenn
+   man währenddessen den Space wechselte — die Nur-lesen-Ansicht hatte anders als der Editor gar
+   kein "×". Gleiche Aktion wie der Editor-Schließen-Knopf (`closeEditor()`), hier aber immer
+   ohne Rückfrage: eine Nur-lesen-Ansicht hat kein `editingSnapshot`, also nichts Ungespeichertes. */
+#ro-close-button {
+  position: absolute;
+  top: calc(var(--space) * 2);
+  right: calc(var(--space) * 3);
 }
 
 .detail__meta {
@@ -659,6 +670,11 @@ select.input {
 }
 
 .editor__version { font-size: 12px; color: var(--text-faint); }
+
+/* Zusätzlicher Abstand vor dem Editor-Schließen-Knopf: "Archivieren" ist auf die andere Seite der
+   Leiste gewandert (app.html), dieser Rand hält das "×" trotzdem sichtbar abgesetzt von
+   "Speichern" — Meldung des Nikingers, siehe app.html-Kommentar an derselben Stelle. */
+.editor__close-button { margin-left: calc(var(--space) * 1.5); }
 
 /* Die zwei Paneele. Der Farbunterschied IST die Botschaft: kühl = dein Text, warm = Kopfdaten,
    die üblicherweise ein verbundenes Claude pflegt. */
@@ -880,6 +896,16 @@ select.input {
   margin-top: calc(var(--space) * 2);
 }
 
+/* Passwort-Sichtbarkeit (Meldung des Nikingers): Feld + Umschalt-Knopf in einer Reihe, in
+   Konto-Dialog UND Auth-Seiten (pages.py) gleichermaßen nutzbar. `flex:1` auf `.input` macht
+   dessen ererbtes `width:100%` für die Größe wirkungslos (Flex-Basis sticht Breite), das
+   ererbte `margin-top` (Abstand zur Beschriftung, `.auth__field`/`.overlay__panel label`)
+   verschöbe den Input aber sichtbar gegen den Knopf daneben — dieselbe gezielte
+   `!important`-Ausnahme wie `[hidden]` weiter oben, keine neue Gewohnheit. */
+.pw-field { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+.pw-field .input { flex: 1; min-width: 0; margin-top: 0 !important; }
+.pw-toggle { flex-shrink: 0; padding: 6px 10px; font-size: 12px; }
+
 .form-error {
   border: 1px solid var(--danger);
   border-left-width: 3px;
@@ -945,6 +971,12 @@ select.input {
 
 .auth__actions { margin-top: calc(var(--space) * 3); }
 .auth__actions .btn-primary { width: 100%; text-align: center; }
+
+/* Zwei Knöpfe nebeneinander (OAuth-Consent: Anmelden/Ablehnen) statt der 100%-Breiten-Regel
+   oben, die nur für eine einzelne Aktion passt. */
+.auth__actions--row { display: flex; gap: var(--space); }
+.auth__actions--row .btn-primary { width: auto; flex: 1; }
+.auth__actions--row .btn { flex: 1; }
 
 /* Weißer Rahmen hinter dem QR-Code. Bis Step 7b stand das als `style="…"`-Attribut im HTML und
    war damit wirkungslos: `security.py` setzt `style-src 'self'` OHNE `unsafe-inline`, das

@@ -24,8 +24,11 @@
       <button class="rail__action" type="button" id="account-button">
         <span class="rail__glyph">&#9881;</span><span class="rail__label">Konto</span>
       </button>
+      <!-- Meldung des Nikingers: Symbol wechselte von &#9211; (Wiedergabe/Ein-Aus, zu nah am
+           &#9881;-Zahnrad des Konto-Knopfs direkt daneben) zu &#9099; (Kreis mit Pfeil nach
+           links oben, das ISO-7000-Zeichen fuer "Abmelden"). -->
       <button class="rail__action" type="button" id="logout-button">
-        <span class="rail__glyph">&#9211;</span><span class="rail__label">Abmelden</span>
+        <span class="rail__glyph">&#9099;</span><span class="rail__label">Abmelden</span>
       </button>
     </div>
   </nav>
@@ -63,6 +66,7 @@
       <header class="detail__header">
         <h1 id="ro-title"></h1>
         <div class="detail__meta" id="ro-meta"></div>
+        <button type="button" class="btn btn--icon" id="ro-close-button" title="Schlie&szlig;en" aria-label="Schlie&szlig;en">&times;</button>
       </header>
       <div class="preview" id="ro-preview"></div>
     </div>
@@ -75,9 +79,13 @@
         <input type="text" class="editor__title-input" id="field-title" placeholder="Titel" aria-label="Titel">
         <div class="editor__head-actions">
           <span class="editor__version tnum" id="editor-version"></span>
-          <button type="button" class="btn-primary" id="save-button">Speichern</button>
+          <!-- Meldung des Nikingers: "Archivieren" lag direkt neben dem "×" -- ein Fehlklick war
+               leicht. Jetzt am anderen Ende der Leiste, mit zusaetzlichem Abstand vor dem "×"
+               (.editor__close-button in app.css), statt beider halb-destruktiven Aktionen
+               nebeneinander. -->
           <button type="button" class="btn" id="archive-button">Archivieren</button>
-          <button type="button" class="btn btn--icon" id="close-button" title="Editor schlie&szlig;en" aria-label="Editor schlie&szlig;en">&times;</button>
+          <button type="button" class="btn-primary" id="save-button">Speichern</button>
+          <button type="button" class="btn btn--icon editor__close-button" id="close-button" title="Editor schlie&szlig;en" aria-label="Editor schlie&szlig;en">&times;</button>
         </div>
       </header>
 
@@ -192,16 +200,25 @@
       angemeldete Browser werden abgemeldet. Diese Sitzung bleibt bestehen.</p>
     <p class="form-error" id="account-error" hidden></p>
     <label>Aktuelles Passwort
-      <input type="password" class="input" id="account-current" autocomplete="current-password">
+      <span class="pw-field">
+        <input type="password" class="input" id="account-current" autocomplete="current-password">
+        <button type="button" class="btn pw-toggle" data-target="account-current" aria-pressed="false">Anzeigen</button>
+      </span>
     </label>
     <label>Code aus der Authenticator-App
       <input type="text" class="input" id="account-totp" autocomplete="one-time-code">
     </label>
     <label>Neues Passwort
-      <input type="password" class="input" id="account-new" autocomplete="new-password">
+      <span class="pw-field">
+        <input type="password" class="input" id="account-new" autocomplete="new-password">
+        <button type="button" class="btn pw-toggle" data-target="account-new" aria-pressed="false">Anzeigen</button>
+      </span>
     </label>
     <label>Neues Passwort wiederholen
-      <input type="password" class="input" id="account-repeat" autocomplete="new-password">
+      <span class="pw-field">
+        <input type="password" class="input" id="account-repeat" autocomplete="new-password">
+        <button type="button" class="btn pw-toggle" data-target="account-repeat" aria-pressed="false">Anzeigen</button>
+      </span>
     </label>
     <div class="overlay__actions">
       <button type="button" class="btn-primary" id="account-submit">&Auml;ndern</button>

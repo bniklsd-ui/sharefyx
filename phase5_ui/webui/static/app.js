@@ -6,8 +6,18 @@
 // (`ui_sessions` speichert nur den Hash) — als verstecktes Feld auf genau dieser Seite. Diese
 // Datei läuft dort UND auf der echten Shell (`/ui/`); auf der Erfolgsseite existiert kein
 // `#shell`, das unterscheidet die beiden Fälle ohne zusätzliches Signal.
+//
+// **[2026-08-06, Advisor-Fund vor dem Commit]:** seit `pages.py`s `_PAGE` auf JEDER Seite
+// `app.js` lädt (Passwort-Sichtbarkeit), tragen `render_enrollment_page()` (TOTP-Seed/QR) und
+// `render_recovery_codes_page()` (zehn Recovery-Codes) IHRERSEITS ein `<input name="csrf">` —
+// beide zeigen ein Geheimnis, das nur EIN einziges Mal sichtbar ist. Ein Selektor auf
+// `input[name="csrf"]` hätte auf beiden Seiten sofort nach `/ui/` weitergeleitet, bevor der
+// Mensch den QR-Code fotografieren bzw. die Codes abschreiben konnte. Das Feld trägt deshalb
+// jetzt zusätzlich `id="bootstrap-csrf"` — NUR auf der echten Bootstrap-Seite
+// (`render_logged_in_page()`) — und dieser Selektor prüft explizit danach, nicht mehr nach
+// jedem `name="csrf"`.
 (function bootstrapCsrf() {
-  var csrfField = document.querySelector('input[name="csrf"]');
+  var csrfField = document.getElementById("bootstrap-csrf");
   if (csrfField && location.pathname !== "/ui/") {
     sessionStorage.setItem("sfx:csrf", csrfField.value);
     location.replace("/ui/");
@@ -257,6 +267,24 @@ function sanitizeHtml(html) {
   return template.innerHTML;
 }
 
+// -- Passwort-Sichtbarkeit (Meldung des Nikingers) -------------------------------------------
+// Läuft unbedingt, nicht erst in initShell(): `pages.py`s Login-/Einladungsseiten laden app.js
+// jetzt ebenfalls (siehe dortiger Docstring), tragen aber kein `#shell`. Reine Fortschreitung
+// (progressive enhancement) — lädt app.js aus irgendeinem Grund nicht, bleibt das Feld einfach
+// maskiert, das native `<form>` funktioniert unverändert weiter.
+(function initPasswordToggles() {
+  Array.prototype.forEach.call(document.querySelectorAll(".pw-toggle"), function (button) {
+    var target = document.getElementById(button.dataset.target);
+    if (!target) return;
+    button.addEventListener("click", function () {
+      var reveal = target.type === "password";
+      target.type = reveal ? "text" : "password";
+      button.textContent = reveal ? "Verbergen" : "Anzeigen";
+      button.setAttribute("aria-pressed", reveal ? "true" : "false");
+    });
+  });
+})();
+
 var shellEl = document.getElementById("shell");
 if (shellEl) {
   initShell();
@@ -273,6 +301,14 @@ function initShell() {
     done: "Erledigt",
     note: "Notizen",
     archived: "Archiv",
+  };
+
+  // Deutsche Beschriftung für `storage.models`s Typ-Vokabular ("task"/"note") — dieselbe
+  // Übersetzungstabelle wie BUCKET_LABELS, nur für den Anlegen-Dialog. `state.meta.status_values`
+  // bleibt die Quelle der WERTE (P5-U), diese Tabelle liefert nur die Anzeige.
+  var TYPE_LABELS = {
+    task: "Aufgabe",
+    note: "Notiz",
   };
 
   var state = {
@@ -370,6 +406,7 @@ function initShell() {
   var roTitleEl = document.getElementById("ro-title");
   var roMetaEl = document.getElementById("ro-meta");
   var roPreviewEl = document.getElementById("ro-preview");
+  var roCloseButtonEl = document.getElementById("ro-close-button");
 
   var detailEditorEl = document.getElementById("detail-editor");
   var editorVersionEl = document.getElementById("editor-version");
@@ -535,7 +572,16 @@ function initShell() {
       button.appendChild(el("span", "rail__label", BUCKET_LABELS[bucket] || bucket));
       button.appendChild(el("span", "tree__count", String(space.counts[bucket])));
       button.addEventListener("click", function () {
-        navigate(space.name, bucket).catch(reportUnexpectedError);
+        // Meldung des Nikingers: ein Ordner-/Space-Wechsel über den Baum ließ einen offen
+        // gebliebenen Editor unangetastet stehen — Liste und Baum sprangen auf den neuen Space,
+        // während rechts weiter der alte (u.U. ungespeicherte) Editor stand, ohne dass man ihn
+        // von dort noch schließen konnte. `closeEditor()` fragt bei ungespeicherten Änderungen
+        // nach (derselbe Dialog wie das "×" im Editor) und bricht bei "Abbrechen" die Navigation
+        // ab, statt sie durchzuführen und den Editor stumm zu verwerfen.
+        closeEditor().then(function (proceed) {
+          if (proceed === false) return;
+          return navigate(space.name, bucket);
+        }).catch(reportUnexpectedError);
       });
       wrap.appendChild(button);
     });
@@ -704,6 +750,12 @@ function initShell() {
         listEmptyTextEl.textContent =
           "Noch nichts unter „" + (BUCKET_LABELS[state.filter] || state.filter) + "“.";
       }
+      // Meldung des Nikingers, gleicher Fund wie der Anlegen-Dialog: der Knopf sagte immer
+      // "Notiz", auch im "Offen"/"Erledigt"-Ordner (Typ "task"). Folgt jetzt demselben Typ, den
+      // ein Klick tatsächlich anlegen würde (siehe openCreateDialog()).
+      var emptyBucket = state.meta && state.meta.buckets[state.filter];
+      var emptyType = (emptyBucket && emptyBucket.type) || "note";
+      createButtonEl.textContent = "Erste " + (TYPE_LABELS[emptyType] || emptyType) + " anlegen";
       // Der Anlegen-Knopf ist bei einer leeren Suche fehl am Platz (er legt kein Item mit dem
       // Suchbegriff an) und bei einem fremden Space gar nicht erst im DOM.
       if (ownSpaceActive()) setCreateControlsPresent(!state.query);
@@ -906,7 +958,8 @@ function initShell() {
     roPreviewEl.innerHTML = markdownToHtml(item.body);
   }
 
-  function showEditableItem(item) {
+  function showEditableItem(item, opts) {
+    opts = opts || {};
     editorPart.attach();
     overviewEl.hidden = true;
     detailReadonlyEl.hidden = true;
@@ -920,7 +973,12 @@ function initShell() {
     fieldTagsEl.value = item.tags.join(", ");
     fieldLinksEl.value = item.links.join(", ");
     editorTextareaEl.value = item.body;
-    setEditorMode("edit");
+    // Meldung des Nikingers: der Editor öffnete immer in der Bearbeiten-Ansicht, auch beim
+    // bloßen Betrachten. Vorgabe jetzt "Vorschau" — außer `opts.mode` sagt etwas anderes:
+    // ein frisch angelegtes Item (createSubmitButtonEl) will sofort tippen können ("edit"),
+    // und ein Neuladen NACH einem Schreibvorgang (afterWrite/Konflikt) behält den Modus bei,
+    // den man gerade benutzt hat, statt mitten im Tippen in die Vorschau zu springen.
+    setEditorMode(opts.mode || "preview");
 
     var draft = loadDraftIfAny(item.id);
     if (draft && (draft.title !== item.title || draft.body !== item.body)) {
@@ -940,19 +998,25 @@ function initShell() {
         fieldTagsEl.value = draft.tags.join(", ");
         fieldLinksEl.value = draft.links.join(", ");
         updateVersionBand();
+        // Advisor-Fund: `setEditorMode()` rendert die Vorschau nur BEIM WECHSEL nach "preview" —
+        // stehen wir (Vorgabe seit diesem Fund) schon dort, während der Entwurf asynchron
+        // ankommt, zeigte die Vorschau bis hierhin weiter den ALTEN, gespeicherten Text.
+        if (state.mode === "preview") {
+          editorPreviewEl.innerHTML = markdownToHtml(editorTextareaEl.value);
+        }
       });
     }
     updateVersionBand();
   }
 
-  function loadEditorFromItem(item) {
+  function loadEditorFromItem(item, opts) {
     state.selectedId = item.id;
     state.selectedReadonly = !!item.readonly;
     state.conflictCurrent = null;
     conflictDialogEl.hidden = true;
 
     if (item.readonly) showReadonlyItem(item);
-    else showEditableItem(item);
+    else showEditableItem(item, opts);
 
     shellEl.dataset.view = "detail";
     renderRail();
@@ -962,7 +1026,9 @@ function initShell() {
   function selectItem(id) {
     state.selectedId = id;
     renderList();
-    return api("/items/" + encodeURIComponent(id)).then(loadEditorFromItem);
+    return api("/items/" + encodeURIComponent(id)).then(function (item) {
+      return loadEditorFromItem(item);
+    });
   }
 
   // -- Editor schließen (Meldung des Nikingers: der Editor blieb "immer" offen) ----------------
@@ -986,6 +1052,10 @@ function initShell() {
 
   closeButtonEl.addEventListener("click", function () { closeEditor(); });
 
+  // Nur-lesen-Ansicht (fremdes Item): kein `editingSnapshot`, also nichts Ungespeichertes —
+  // schließt ohne Rückfrage, anders als `closeEditor()`.
+  roCloseButtonEl.addEventListener("click", function () { clearDetail(); });
+
   // -- Speichern / Konflikt (§4.5, Akzeptanzkriterium 11) ------------------------------------
 
   function showConflictDialog(current) {
@@ -1007,10 +1077,14 @@ function initShell() {
   // haben) UND die Zähler im Baum, sonst zeigt die Navigation Zahlen von vorhin.
   function afterWrite(item, message) {
     clearDraft(item.id);
+    // Modus VOR dem Neuladen einfangen: showEditableItem()s Vorgabe ist seit dem
+    // Vorschau-Default "preview", ein Schreibvorgang mitten im Tippen soll aber nicht aus dem
+    // Editor reißen — wer gerade bearbeitet, bleibt beim Bearbeiten.
+    var mode = state.mode;
     return loadItems()
       .then(loadOverview)
       .then(function () {
-        loadEditorFromItem(item);
+        loadEditorFromItem(item, { mode: mode });
         toast(message);
       });
   }
@@ -1050,9 +1124,10 @@ function initShell() {
 
   conflictLoadCurrentButtonEl.addEventListener("click", function () {
     var current = state.conflictCurrent;
+    var mode = state.mode;   // wer gerade bearbeitet hat, bleibt beim Bearbeiten (siehe afterWrite())
     clearDraft(current.id);
     hideConflictDialog();
-    loadEditorFromItem(current);
+    loadEditorFromItem(current, { mode: mode });
     toast("Aktuelle Fassung geladen · v" + current.version, "warn");
   });
 
@@ -1122,9 +1197,15 @@ function initShell() {
       Object.keys(state.meta.status_values).forEach(function (t) {
         var opt = document.createElement("option");
         opt.value = t;
-        opt.textContent = t;
+        opt.textContent = TYPE_LABELS[t] || t;
         createTypeEl.appendChild(opt);
       });
+      // Meldung des Nikingers: "wenn man einen Task machen will, steht auch Notiz" — der
+      // Dropdown behielt seinen Vorgabewert (das erste `<option>`, immer "note") unabhängig
+      // vom gerade offenen Ordner. Der aktive Ordner nennt seinen Typ selbst
+      // (`_BUCKETS`/`api.py`), "archived" nicht (typunabhängig) — dort bleibt die Vorgabe.
+      var bucket = state.meta.buckets[state.filter];
+      if (bucket && bucket.type) createTypeEl.value = bucket.type;
     }
     createTitleInputEl.value = "";
     createDialogEl.hidden = false;
@@ -1154,7 +1235,10 @@ function initShell() {
       return navigate(state.ownSpace, bucketFor(item) || state.filter)
         .then(loadOverview)
         .then(function () {
-          loadEditorFromItem(item);
+          // Trap beim Vorschau-Default (Advisor-Fund): ein frisch angelegtes Item hat einen
+          // leeren Body — in "preview" öffnend stünde man vor einer leeren Vorschau statt der
+          // Textarea, in die man eigentlich sofort tippen will.
+          loadEditorFromItem(item, { mode: "edit" });
           toast("Angelegt · " + item.title);
           fieldTitleEl.focus();
         });
@@ -1395,6 +1479,28 @@ function initShell() {
       })
       .catch(reportUnexpectedError);
   }
+
+  // -- Zähler-Synchronisation (Meldung des Nikingers: „wenn eine neue Notiz dazu kommt, geht der
+  // Counter nicht hoch") -----------------------------------------------------------------------
+  // Reines Polling auf der bereits vorhandenen REST-API — P5 schließt Realtime/WebSocket aus
+  // (Plan §0.5), nicht ein periodisches Nachfragen einer bestehenden Route. `loadOverview()`
+  // fasst ausschließlich Baum-Zähler und die (ohnehin nur ohne offenes Item sichtbare)
+  // Übersichtsseite an, nie den Editor — sicher neben einer laufenden Bearbeitung. 20s statt der
+  // vorgeschlagenen 5s: jeder Aufruf kostet einen `search()` je Bucket UND sichtbarem Space
+  // (`api.py :: _overview()`), 5s wäre für einen Zwei-Personen-Server unnötig oft. Pausiert,
+  // solange der Tab nicht sichtbar ist, holt dafür sofort bei Rückkehr/Fokus nach.
+  var COUNTER_POLL_MS = 20000;
+
+  function pollCounters() {
+    if (document.hidden) return;
+    loadOverview().catch(reportUnexpectedError);
+  }
+
+  window.setInterval(pollCounters, COUNTER_POLL_MS);
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) pollCounters();
+  });
+  window.addEventListener("focus", pollCounters);
 
   showOverviewPane();
   init();

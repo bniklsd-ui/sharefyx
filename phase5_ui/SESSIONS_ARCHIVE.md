@@ -4,10 +4,69 @@ purpose: Archiv älterer Session-stopped-Blöcke aus phase5_ui/CLAUDE.md, newest
 read-when: Audit vergangener Sessions dieser Phase; NICHT für normalen Session-Start
 detail: L3
 up: CLAUDE.md
-updated: 2026-08-06 (zehnter Block archiviert, Rotation nach dem Step-8-Live-Abschluss)
+updated: 2026-08-06 (elfter Block archiviert, Rotation nach Step 8b — Review + Live-Feedback)
 ---
 
 # Session-Archiv — Phase 5 Web-UI, REST-API, Auth-Selbstverwaltung
+
+## Session stopped — 2026-08-06 (Step 8 live abgeschlossen, Staging verworfen, Befund S10)
+
+**Ergebnis:** Step 8 ist vollständig — gebaut **und** live. Der Dienst läuft seit dem Cutover aus
+`/opt/sharefyx/current`, Deploy/Rollback/Auth-Backup sind live nachgewiesen, Staging ist nach
+einer Nikinger-Entscheidung wieder abgeschaltet. **Abnahmestand: 13 von 20 live bestanden.**
+
+**Live bestanden in dieser Session:** Zeile 6 (Passwortwechsel — zweiter Browser abgemeldet,
+Connector fordert neu, eigene Sitzung läuft weiter; in der DB gegengeprüft) und Zeile 16
+(Auto-Rollback bei gerissenem Health-Gate). Dazu ohne eigene Abnahmezeile: der Cutover, das
+verschlüsselte Auth-Backup mit **eigenem Restore-Lauf des Nikingers**, und `[VERIFY]` **V36**.
+
+**Sechs Funde, alle aus dem echten Betrieb — keiner beim Lesen des Codes auffindbar:**
+
+1. **Meine Testsuite startete den Produktivdienst 52-mal neu.** `_env()` erbte `os.environ`; das
+   für den Deploy exportierte `SHAREFYX_SYSTEMCTL="sudo systemctl"` schlug in jeden Testlauf
+   durch, und `deploy.sh` rief damit das echte `systemctl`. PATH-Stubbing schützt nicht — `sudo`
+   findet das Binary über `secure_path`; ein frisches `sudo -v` machte auch das Terminal
+   entbehrlich. In beiden betroffenen Testdateien über `_clean_environ()` geschlossen.
+2. **Ein zurückgerolltes Release wäre das nächste Rollback-Ziel gewesen** — es bleibt liegen und
+   ist das jüngste Verzeichnis. Jetzt `*.failed`, von `rollback.sh` übersprungen.
+3. **`authctl invite` baute den Link aus einer Variablen ohne Bezug zur beschriebenen Datenbank.**
+   Kostete eine Stunde Fehlersuche: die Staging-Einladung zeigte auf Produktiv, dort `404
+   „Einladung ungültig oder abgelaufen"` — was sich wie „Konto existiert bereits" liest. Jetzt
+   nennt die Ausgabe Datenbank **und** Ziel-URL mit `[PRODUKTIV]`/`[STAGING]`.
+4. **Staging konnte seinen Zweck nie erfüllen** (Konstruktionsfehler): ein `__REPO_ROOT__`-
+   Platzhalter für beide Units, also gleicher Code, nur andere Daten.
+5. **O2** — `clients`/`token_families` werden nie abgeräumt, 35 Registrierungen in einer Woche.
+   Offen, bewusst nicht still gefixt.
+6. **S10** — siehe unten, der schwerwiegendste.
+
+**Befund S10 (mittel, geschlossen):** ein Reset über eine Einladung widerrief **weder
+Token-Familien noch UI-Sitzungen**. Aufgefallen beim Verbuchen von Fabians Reset: neun
+Token-Familien vom 30.07. standen danach weiterhin auf „aktiv". Der Passwortwechsel widerruft
+seit Step 4 alles (P5-Q) — der Reset, die *stärkere* Operation, widerrief nichts. Wer ein altes
+Refresh-Token hielt, behielt vollen Zugriff, obwohl Passwort und TOTP ersetzt waren. Geschlossen
+in `routes_auth.py :: _invite_post()`, Test gegen den ungefixten Stand als rot gegengeprüft.
+Details: `phase4_auth/CLAUDE.md`, Befundtabelle.
+
+**Staging verworfen — revidiert P5-AB.** Begründung und der Weg dorthin stehen im vorigen
+Session-Block (archiviert): Arbeitsrechner ohne Tailscale, CGNAT ohne SSH, also nur der Funnel —
+und eine zweite öffentliche Fläche für eine Instanz, die ihren Zweck nicht erfüllt, ist ein
+schlechtes Geschäft. Der Langzeittest ist die tägliche Nutzung von `sharefyx-mcp`. Code, Unit und
+Tests bleiben im Repo; abgeschaltet ist die Inbetriebnahme.
+
+**Verifiziert:** `pytest -q` → **575/575**. Tabu-Diff leer. Dienst live gesund (öffentlich
+`/health` 200), drei Timer aktiv (`backup`, `purge`, `authbackup`), Staging `disabled`+`inactive`,
+Serve-Freigabe entfernt, beide Staging-Verzeichnisse gelöscht.
+
+**Offen für die nächste Session:**
+- **Deploy fällig** — S10 und die Werkzeugverbesserungen sind im Repo, nicht im Release. Der
+  laufende Dienst führt bis dahin den ungefixten Reset-Pfad.
+- **Fabians neun alte Token-Familien sind weiterhin aktiv** — der Fix wirkt nur für künftige
+  Resets. Aufräumen über `authctl.py list-tokens --space fabian` + `revoke --family-id …`.
+- **Zeile 15** (`ui_budget.py` vom Nikinger gefahren), **Zeile 19** (Live-`curl`), **Zeilen 10,
+  13, 14, 17, 20** (größtenteils Step 9, braucht Fabian).
+- **O2** — Entscheidung ausstehend.
+
+---
 
 ## Session stopped — 2026-08-05, vierter Nachtrag (Step 8: Deploy, Rollback, Staging, Auth-Backup, Messung)
 

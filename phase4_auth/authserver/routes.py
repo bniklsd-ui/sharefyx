@@ -46,10 +46,16 @@ def _security_headers(settings: AuthSettings) -> dict[str, str]:
 
     `settings.csp_form_action` statt der rohen Redirect-Origin-Liste direkt: der Wert wird in
     `config.py` gebaut (siehe dortiger Docstring), damit dieses Modul die Liste nirgends selbst
-    anfasst (`test_redirect_uri_allowed_is_the_only_matching_path`, Plan §2.6 [SEAM])."""
+    anfasst (`test_redirect_uri_allowed_is_the_only_matching_path`, Plan §2.6 [SEAM]).
+
+    **[2026-08-06]** `style-src`/`font-src` erweitert: `templates.py` lädt jetzt `/ui/static/
+    app.css` (dieselbe `webui`-Route, öffentlich erreichbar), um dieselbe Kartengestaltung wie
+    `webui/pages.py` zu zeigen statt des rohen Phase-4-Formulars. `'unsafe-inline'` entfällt
+    ersatzlos (kein `style="…"`-Attribut in diesem Modul)."""
     headers = {
         "Content-Security-Policy": (
-            f"default-src 'none'; style-src 'unsafe-inline'; form-action {settings.csp_form_action}; "
+            "default-src 'none'; style-src 'self'; font-src 'self'; "
+            f"form-action {settings.csp_form_action}; "
             "frame-ancestors 'none'; base-uri 'none'"
         ),
         "Referrer-Policy": "no-referrer",

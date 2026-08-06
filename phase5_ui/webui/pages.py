@@ -1,6 +1,14 @@
 """Servergerenderte HTML-Seiten für die Wege, auf denen es noch keine Sitzung gibt:
-Login, Einladung, Enrollment, Fehler. Bewusst OHNE JavaScript — diese Seiten müssen auch
-dann funktionieren, wenn app.js nicht lädt.
+Login, Einladung, Enrollment, Fehler. Bewusst OHNE JavaScript-**Abhängigkeit** — diese Seiten
+müssen auch dann vollständig funktionieren (Formular abschickbar), wenn app.js nicht lädt.
+
+**[2026-08-06, Nikinger-Feedback „Sichtbarkeitsmöglichkeit beim Passwort eintippen"]:** `_PAGE`
+lädt jetzt `app.js` (`defer`, dieselbe Datei, die `render_logged_in_page()` schon lud) für einen
+Anzeigen/Verbergen-Umschalter auf Passwortfeldern (`.pw-field`/`.pw-toggle`, `app.js ::
+initPasswordToggles()`) — reine Fortschreitung (progressive enhancement), kein `onclick`-Attribut
+(CSP `script-src 'self'` ohne `unsafe-inline` bliebe sonst wirkungslos). Lädt app.js nicht, bleibt
+das Feld einfach maskiert und das native `<form>` funktioniert unverändert — die Kerngarantie
+dieses Docstrings bleibt damit gewahrt, nur die JS-FREIHEIT nicht mehr.
 
 NICHT zu verwechseln mit authserver/templates.py: das ist die OAuth-Consent-Oberfläche und
 bleibt getrennt (P5-G — eine UI-Sitzung kürzt den Consent nicht ab).
@@ -33,7 +41,9 @@ _PAGE = """<!doctype html>
 <body><div class="auth"><div class="auth-card{extra_class}">
 <div class="auth__brand">sharefyx</div>
 {body}
-</div></div></body></html>"""
+</div></div>
+<script src="/ui/static/app.js" defer></script>
+</body></html>"""
 
 
 def _page(*, title: str, body: str, wide: bool = False) -> str:
@@ -59,17 +69,25 @@ def render_logged_in_page(*, csrf_token: str) -> str:
     render_login_form()`: der Token wird von `SessionManager.issue()`/`.rotate()` nur EIN
     einziges Mal als Klartext zurückgegeben (`ui_sessions` speichert nur `csrf_hash`), er muss
     also in genau dieser Antwort an den Browser weitergereicht werden. `app.js`s Bootstrap-Teil
-    (`webui/static/app.js`) liest genau dieses `<input name="csrf">` aus, legt den Wert in
-    `sessionStorage` ab und leitet dann nach `/ui/` weiter (Plan-Abweichung 2,
-    `phase5_ui/CLAUDE.md` Session-Block 2026-08-05) — das Logout-Formular bleibt zusätzlich ohne
-    JavaScript funktionsfähig, falls `app.js` aus irgendeinem Grund nicht lädt."""
+    (`webui/static/app.js`) liest genau dieses Feld aus, legt den Wert in `sessionStorage` ab und
+    leitet dann nach `/ui/` weiter (Plan-Abweichung 2, `phase5_ui/CLAUDE.md` Session-Block
+    2026-08-05) — das Logout-Formular bleibt zusätzlich ohne JavaScript funktionsfähig, falls
+    `app.js` aus irgendeinem Grund nicht lädt.
+    **[2026-08-06]** `<script>` steht jetzt in `_PAGE` (alle Seiten laden app.js — Passwort-
+    Sichtbarkeit, Nikinger-Feedback), hier also nicht mehr doppelt eingebunden. **Damit tragen
+    jetzt AUCH `render_enrollment_page()` und `render_recovery_codes_page()` ein
+    `name="csrf"`-Feld auf einer Seite, die app.js lädt** — `id="bootstrap-csrf"` markiert
+    deshalb EXPLIZIT nur dieses Feld hier als das Bootstrap-Signal; `app.js` sucht seit diesem
+    Fund gezielt danach, nicht mehr nach jedem `input[name="csrf"]`. Ohne diese Unterscheidung
+    hätte der Bootstrap-Redirect (`location.replace("/ui/")`) mitten von der TOTP-Seed-Seite oder
+    den zehn Recovery-Codes weg navigiert — beide werden nur EIN einziges Mal gezeigt, ein
+    Advisor-Fund vor dem Commit, nicht live beobachtet."""
     body = f"""<h1>Angemeldet</h1>
 <p>Einen Moment — die Oberfläche wird geladen.</p>
 <form method="post" action="/ui/logout">
-  <input type="hidden" name="csrf" value="{escape(csrf_token)}">
+  <input type="hidden" id="bootstrap-csrf" name="csrf" value="{escape(csrf_token)}">
   <div class="auth__actions"><button class="btn" type="submit">Abmelden</button></div>
-</form>
-<script src="/ui/static/app.js" defer></script>"""
+</form>"""
     return _page(title="Angemeldet", body=body)
 
 
@@ -87,7 +105,10 @@ def render_invite_page(*, token: str, error: str | None = None) -> str:
 {_error_block(error)}
 <form method="post" action="/ui/invite/{escape(token)}">
   <label class="auth__field">Neues Passwort
-    <input class="input" type="password" name="password" autocomplete="new-password">
+    <span class="pw-field">
+      <input class="input" type="password" name="password" id="invite-password" autocomplete="new-password">
+      <button type="button" class="btn pw-toggle" data-target="invite-password" aria-pressed="false">Anzeigen</button>
+    </span>
   </label>
   <div class="auth__actions"><button class="btn-primary" type="submit">Weiter</button></div>
 </form>"""
@@ -143,7 +164,10 @@ def render_login_page(*, error: str | None = None) -> str:
     <input class="input" type="text" name="space" autocomplete="username">
   </label>
   <label class="auth__field">Passwort
-    <input class="input" type="password" name="password" autocomplete="current-password">
+    <span class="pw-field">
+      <input class="input" type="password" name="password" id="login-password" autocomplete="current-password">
+      <button type="button" class="btn pw-toggle" data-target="login-password" aria-pressed="false">Anzeigen</button>
+    </span>
   </label>
   <label class="auth__field">Code
     <input class="input" type="text" name="totp" autocomplete="one-time-code"
