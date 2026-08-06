@@ -191,3 +191,30 @@ async def test_recovery_codes_are_shown_exactly_once(app, store, clock, users):
     assert len(codes) == 10
     assert len(set(codes)) == 10
     assert store.count_unused_recovery_codes(SPACE) == 10
+
+
+@pytest.mark.asyncio
+async def test_invite_reset_revokes_old_token_families_and_sessions(app, store, users):
+    """**Befund S10, live gefunden am 2026-08-06.** Ein Reset über eine Einladung ersetzte
+    Passwort-Hash und TOTP-Seed, ließ aber Token-Familien und UI-Sitzungen unangetastet — belegt
+    an einem echten Konto, wo nach dem Reset neun Familien vom 30.07. weiterhin aktiv waren.
+
+    Das ist genau verkehrt herum: der Passwortwechsel widerruft seit Step 4 alles (P5-Q), und der
+    **Reset** — die stärkere Operation, gefahren bei Verdacht auf Kompromittierung — widerrief
+    nichts. Wer ein altes Refresh-Token hielt, behielt vollen Zugriff, obwohl Passwort UND TOTP
+    ersetzt waren."""
+    family_id = store.create_family(
+        space=SPACE, client_id="alter-connector", scope="space", resource="https://x/mcp"
+    )
+    token = store.create_invite(space=SPACE, purpose="reset", ttl_s=3600)
+
+    async with _client(app) as client:
+        response = await client.post(
+            f"/ui/invite/{token}", data={"password": NEW_PASSWORD}, headers={"Origin": BASE_URL}
+        )
+
+    assert response.status_code == 200
+    families = [f for f in store.list_families(space=SPACE) if f.family_id == family_id]
+    assert len(families) == 1
+    assert families[0].revoked_at is not None, "alte Token-Familie hat den Reset überlebt"
+    assert families[0].revoked_reason == "invite_redeemed"

@@ -131,182 +131,13 @@ P4 ändert `asgi.py`/`app.py` (P4-Q). **[2026-07-28, Step 6a]:** `context.py` st
 ursprünglich mit auf der Änderungsliste (Plan §3.2 kündigt eine an) — real geändert wurde es
 nicht, siehe Zeile 7a unten. P4 fasst `tools.py`/`permissions.py`/`auth.py` weiterhin nicht an.
 
-## Runbook „Inbetriebnahme" (Step 7, live — führt der Nikinger aus, nicht Claude Code)
+## Runbook „Inbetriebnahme" (Step 7) — ausgeführt, nach `SESSIONS_ARCHIVE.md` verschoben
 
-Claude Code liefert Code, Units und diese Befehlsfolge; alles, was den echten `DATA_ROOT`, den
-echten Keyring, echte Nutzerakten/Token oder die Claude-Accounts berührt, führt der Nikinger
-selbst aus (Plan §5 Step 7) — dieselbe Arbeitsteilung wie P3s „Inbetriebnahme"
-(`phase3_edge/CLAUDE.md`). **Reihenfolge ist der halbe Runbook** (Plan-Wortlaut).
-
-```
-# 0) Vorbereitung — bereits erledigt (dieser Commit)
-#    phase4_auth/systemd/sharefyx-mcp.service, install_units.sh + local.env.example erweitert,
-#    authctl.py, oauth_smoke.py --base-url. local.env um AUTH_MODE=both, PUBLIC_BASE_URL
-#    ergänzen (cp phase3_edge/local.env.example phase3_edge/local.env, falls noch nicht
-#    geschehen — die sechs Werte eintragen).
-#    [2026-07-29] ALLOWED_HOSTS MUSS 127.0.0.1 enthalten, sonst ist Schritt 4 unausführbar:
-#    <node>.<tailnet>.ts.net,127.0.0.1 — siehe Befund S1 unten.
-
-# 1) Nutzerakten provisionieren (TOTP-Seeds SOFORT in die Authenticator-Apps, QR aus der
-#    otpauth://-URI — provision_user.py zeigt sie genau einmal)
-python phase4_auth/scripts/provision_user.py --space niklas
-python phase4_auth/scripts/provision_user.py --space fabian
-
-# 2) Nutzerakten verschlüsselt bereitstellen — immer als Pipe, nie über eine Zwischendatei
-#    (P3 §2.1, höherer Einsatz als bei spaces.cred: hier sind es echte TOTP-Seeds)
-python phase4_auth/scripts/export_auth_users.py \
-  | sudo systemd-creds encrypt --name=auth-users - /etc/sharefyx/auth-users.cred
-sudo chmod 600 /etc/sharefyx/auth-users.cred
-
-# 3) Units installieren, Dienst neu starten (AUTH_MODE=both aus local.env — Pfad-Token UND
-#    Bearer laufen parallel, nichts fällt während der Abnahme aus)
-sudo phase3_edge/scripts/install_units.sh
-systemctl status sharefyx-mcp
-
-# 4) oauth_smoke.py gegen den lokalen Port — BEVOR irgendjemand einen Connector anfasst
-python phase4_auth/scripts/oauth_smoke.py --base-url http://127.0.0.1:8765 --space niklas
-#    Fragt Passwort + TOTP-Seed interaktiv ab (getpass, nie als Argument). 11/11 erwartet.
-#    Alle Prüfungen status=400 / "Invalid host header"? Dann fehlt 127.0.0.1 in der
-#    SPACE_ALLOWED_HOSTS der INSTALLIERTEN Unit (systemctl cat sharefyx-mcp) — Befund S1:
-#    local.env korrigieren, install_units.sh erneut, restart. Eine Änderung an local.env
-#    allein wirkt nicht, die Unit unter /etc trägt den alten Wert bis zum Neu-Installieren.
-#    [2026-07-29] Wurde provision_user.py zwischendurch erneut gelaufen (Passwort/TOTP neu)?
-#    Dann vorher `sudo systemctl restart sharefyx-mcp` — die Nutzerakten werden EINMAL beim
-#    Start gelesen (Befund O1). Gilt genauso für die Abnahmezeilen 6 und 7.
-
-# 5) Discovery von außen — resource gegen die geplante Connector-URL halten
-curl -s https://<node>.<tailnet>.ts.net/.well-known/oauth-protected-resource
-curl -s https://<node>.<tailnet>.ts.net/.well-known/oauth-authorization-server
-
-# 6) Connector in BEIDEN Accounts neu anlegen: https://<node>.<tailnet>.ts.net/mcp
-#    Ohne Client-ID, ohne Secret. Connect -> Passwort + TOTP -> Consent.
-
-# 7) Abnahmematrix fahren (unten) — Protokoll nach P2/P3-Konvention, mit Belegen statt
-#    Behauptungen. docs/concepts/P4_ABNAHME_<Datum>.md erst NACH diesem Schritt schreiben
-#    (ein Ergebnis-Protokoll für eine Matrix, die noch nicht gelaufen ist, wäre ein
-#    fabriziertes Protokoll — Advisor-Vorgabe dieser Session).
-#    [2026-07-29] phase4_auth/scripts/abnahme_run.sh deckt die acht maschinell prüfbaren
-#    Zeilen ab (1,2,3,10,11,12,13,16 — Zeile 16 erst nach Schritt 8 sinnvoll) und schreibt
-#    einen redigierten, einreichbaren CLI-Ausschnitt:
-export SHAREFYX_HOST=savefyx-vmware-virtual-platform.tail89fc2a.ts.net
-phase4_auth/scripts/abnahme_run.sh start      # vor den manuellen Zeilen 4–9
-#    ... Zeilen 4–9 im echten Connector fahren (Notizen mitschreiben) ...
-phase4_auth/scripts/abnahme_run.sh run  | tee ~/sharefyx-p4-abnahme-<Datum>.txt
-#    Ausgabe liegt bewusst AUSSERHALB des Repos (~/, nicht docs/) — dieselbe Lehre wie der
-#    Screenshot-Vorfall in P2 (phase2_mcp/CLAUDE.md): erst nach Sichtprüfung ohne jedes
-#    Geheimnis in docs/concepts/P4_ABNAHME_<Datum>.md übernehmen.
-
-# 8) Schnitt (NICHT auf einen Termin warten — Plan-Wortlaut: „ein both-Modus, der auf einen
-#    Termin wartet, ist genau das Risiko, dessentwegen P4 vorgezogen wurde")
-#    AUTH_MODE=oauth in local.env, install_units.sh erneut, restart.
-python phase2_mcp/scripts/issue_token.py --revoke niklas
-python phase2_mcp/scripts/issue_token.py --revoke fabian
-python phase3_edge/scripts/export_space_map.py \
-  | sudo systemd-creds encrypt --name=spaces - /etc/sharefyx/spaces.cred
-sudo systemctl restart sharefyx-mcp
-#    Danach TokenPathASGI/AuthModeASGI aus dem Code entfernen, SPACE_AUTH_MODE auf einen Wert
-#    reduzieren — Codeentfernung IM SELBEN COMMIT wie die Abnahme (Plan-Wortlaut sagte "zwei
-#    Werte", das war ohne frischen Repo-Zugriff geschrieben und ungenau: nur "oauth" hat nach
-#    der vollen TokenPathASGI-Entfernung noch eine Implementierung, siehe authserver/config.py).
-```
-
-**Vollzogen, 2026-07-30 — dieser Schritt ist erledigt, kein offener Runbook-Punkt mehr.** Der
-Nikinger führte die obige Befehlsfolge live aus; Claude Code verifizierte read-only
-(`systemctl cat`, `export_space_map.py`, `curl` gegen die alte Pfad-Token-URL) und entfernte
-danach `TokenPathASGI`/`AuthModeASGI` im selben Commit wie diese Doku-Aktualisierung. Details:
-Modul-Status Zeile 8e oben, Session-Block unten.
-
-**Fund, nicht behoben (Advisor, zweiter Durchlauf dieser Session):** `spaces.cred` und der
-`export_space_map.py`-Schritt oben sind seit der Entfernung von `TokenPathASGI` **totes
-Gewicht** — `serve.py` liest die Space-Map nicht mehr, aber die installierte Unit trägt
-weiterhin `LoadCredentialEncrypted=spaces:/etc/sharefyx/spaces.cred` und verweigert den Start,
-wenn diese Datei fehlt. Wer sie als „obsoletes P2-Überbleibsel" aufräumt, bricht den Dienst.
-**Bewusst nicht angefasst** — die Unit-Datei zu ändern braucht `install_units.sh` + Restart
-(Nikinger-Aktion, nicht Teil dieses Commits) und `phase3_edge/scripts/issue_token.py`/
-`export_space_map.py`/`credentials.py` bleiben ohnehin außerhalb des P4-Q-Berührungsbereichs
-(siehe Modul-Status Zeile 8e). Vorgemerkt für den nächsten Unit-Umbau, kein akuter Blocker.
-
-**`authctl.py` braucht `STATE_DIRECTORY`, außerhalb von systemd nicht automatisch gesetzt**
-(live gefunden, 2026-07-29): `config.py :: resolve_db_path()` verweigert bewusst einen stillen
-Fallback ins Arbeitsverzeichnis — jeder `authctl.py`-Aufruf aus einer interaktiven Shell (nicht
-nur `unlock`, auch `list-clients`/`list-tokens`/`revoke`/`purge-expired`) braucht:
-```
-STATE_DIRECTORY=/var/lib/sharefyx python phase4_auth/scripts/authctl.py <befehl> …
-```
-Kein `sudo` nötig — `/var/lib/sharefyx` gehört `savefyx`. Innerhalb des Dienstes exportiert
-systemd `$STATE_DIRECTORY` selbst (`StateDirectory=sharefyx`), deshalb tauchte das in keinem
-Test auf (`test_authctl.py` setzt `SPACE_AUTH_DB` direkt).
-
-**Anleitung Zeile 9** (Access-Token-Ablauf, Claude refresht selbständig): über einen
-systemd-Drop-in, nicht `local.env`/`install_units.sh` — Wegwerf-Testwert, eine Zeile zum
-Entfernen statt ein Diff in einer getrackten Datei.
-
-```
-# 1) Kurze TTL (60s: reicht für eine Nachricht, kurz genug zum Abwarten)
-sudo mkdir -p /etc/systemd/system/sharefyx-mcp.service.d
-printf '[Service]\nEnvironment=SPACE_OAUTH_ACCESS_TTL_S=60\n' \
-  | sudo tee /etc/systemd/system/sharefyx-mcp.service.d/override.conf
-sudo systemctl daemon-reload && sudo systemctl restart sharefyx-mcp
-
-# 2) Gegenprüfen, nicht behaupten
-systemctl cat sharefyx-mcp | grep SPACE_OAUTH_ACCESS_TTL_S
-
-# 3) WICHTIG: ein bereits verbundener Connector hält noch ein Token mit ALTER 1h-TTL — der
-#    Neustart setzt dessen Ablauf nicht zurück. Connector einmal trennen und neu verbinden
-#    (oder Reconnect, falls angeboten), damit ein Token unter der 60s-TTL entsteht.
-
-# 4) ~90s warten, dann im SELBEN Chat einen weiteren Tool-Aufruf (z.B. list_spaces) —
-#    kein neuer Connect, kein Consent-Screen. Soll einfach funktionieren.
-
-# 5) Danach Override entfernen, sonst laufen echte Sessions dauerhaft mit 60s-Tokens
-sudo rm /etc/systemd/system/sharefyx-mcp.service.d/override.conf
-sudo systemctl daemon-reload
-sudo systemctl restart sharefyx-mcp
-```
-
-**Beleg, nicht Gefühl:** danach gegenprüfen (Claude Code) — Journal zwischen Schritt 3/4 zeigt
-ein zweites `"stage":"token"`, **ohne** neuen `authorize_get`/`authorize_post` davor (sonst
-Login statt Refresh). `auth.sqlite3` read-only: dieselbe `family_id`, mehrere `access_tokens`
-mit späteren `created_at`.
-
-**`429 rate_limited` beim Neuverbinden?** DCR-Bremse ist global, 20/h (Plan §2.7) — nach dem
-vielen Testen heute ggf. ausgereizt. Bis zur nächsten vollen Stunde warten, kein Bug.
-
-**Stand 2026-07-30: 16 von 16 live bestanden — Schnitt vollzogen, Phase 4 ✅.** Protokoll mit
-Belegen: `../docs/concepts/P4_ABNAHME_2026-07-29.md` (drei Nachträge 2026-07-30: Zeilen 14/15,
-Zeile 9, Schnitt+Zeile 16).
-
-**Abnahmematrix** (16 Zeilen, Protokoll nach P2/P3-Konvention — Belege statt Behauptungen).
-**Stand 2026-07-30: alle 16 Zeilen live bestanden**, Belege je Zeile in
-`../docs/concepts/P4_ABNAHME_2026-07-29.md`:
-
-| # | Prüfung | Erwartung | Braucht Fabian |
-|---|---|---|---|
-| 1 | `/health` von außen | unverändert, unauthentifiziert | nein |
-| 2 | `POST /mcp` ohne Token | **401** mit korrektem `WWW-Authenticate` | nein |
-| 3 | Discovery von außen | beide `.well-known` liefern, `resource` exakt | nein |
-| 4 | Connect `niklas` | DCR → Consent → Tool-Aufruf erfolgreich | nein |
-| 5 | Falsches Passwort | generische Meldung, keine Enumeration | nein |
-| 6 | Fünf Fehlversuche | Sperre greift, `authctl.py unlock --space niklas` hebt sie | nein |
-| 7 | Falscher TOTP-Code | Fehlschlag; korrekter Code danach erfolgreich | nein |
-| 8 | TOTP-Replay | derselbe Code ein zweites Mal → Fehlschlag | nein |
-| 9 | Access-Token-Ablauf | TTL kurz setzen, Claude refresht selbständig | nein |
-| 10 | Refresh-Replay | `oauth_smoke.py` → `invalid_grant`, Familie tot | nein |
-| 11 | Code-Replay | `oauth_smoke.py` → `invalid_grant`, Familie tot | nein |
-| 12 | Fremdregistrierung | `redirect_uri` auf fremder Domain → abgelehnt | nein |
-| 13 | Secret-Grep im journald | **leer** | nein |
-| 14 | Connect `fabian` | eigener Space, eigener Login | **ja** |
-| 15 | Cross-Space unter OAuth | fremder Body gewrappt, Schreibversuch `write_denied` | **ja** |
-| 16 | Pfad-Token tot | alte URL → 401 | nein |
-
-**Terminrisiko (Nikinger-Entscheidung 2026-07-28, im Plan gelockt):** Zeilen 14/15 brauchten
-Fabian — ein Terminrisiko, das die Phase nicht blockieren sollte. 14/16 wurde am 2026-07-30
-erreicht (🟡 code-complete), beide Zwei-Personen-Zeilen folgten in derselben Session (✅). Schritt
-8 (Schnitt) wartete wie gefordert **nicht** auf einen Termin.
-
-**Done when** (Plan §5 Step 7) — **alle Klauseln erfüllt, Step 7 ✅:** 16/16 bestanden, Schnitt
-vollzogen, Pfad-Token widerrufen, `TokenPathASGI` entfernt, Protokoll geschrieben,
-`ROADMAP.md`/`docs/INDEX.md`/Phase-Head nachgezogen.
+**[2026-08-06]** Phase 4 ist ✅ (16/16 live, Schnitt vollzogen); dieses Runbook wurde vom
+Nikinger vollständig ausgeführt und ist damit Historie, kein lebender Text mehr. Es steht
+**verbatim** in `SESSIONS_ARCHIVE.md` unter derselben Überschrift — verschoben, weil dieser
+Head sonst über dem 40-KB-Softcap der Doc-Layers-Konvention liegt (ein 📗 darf das nicht,
+ein 📦 schon). Wer die Inbetriebnahme nachvollziehen will, liest es dort.
 
 ## Sicherheits-Review 2026-07-29 — offene Befunde S2–S8
 
@@ -324,7 +155,8 @@ befundenen** Punkte: `../docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`. Kurzfa
 | S7 | Unbegrenztes Zeilenwachstum aus unauth. Eingabe, `purge_expired()` nur manuell (kein Timer) | niedrig-mittel | `store.py`, `ratelimit.py` | ✅ **vollständig geschlossen** (P5 Step 1: Timer + Längenbegrenzung; P5 Step 2: `purge_expired()` deckt jetzt auch `ui_sessions`/`invites` ab, sobald diese Tabellen mit Schema 2 existierten) |
 | S8 | `sudo install_units.sh` sourced eine nutzerschreibbare Datei als root | sehr niedrig | `install_units.sh` | ✅ **geschlossen** (P5 Step 1) |
 | O1 | Nutzerakten werden **einmal beim Start** gelesen — Provisionierung wirkt erst nach Restart | Betriebsnotiz | `scripts/serve.py` | ✅ **geschlossen im Code** (P5 Step 2 — `UserDirectory.get()` liest live, kein Cache mehr); **live wirksam erst nach dem Migrations-Runbook** (`phase5_ui/CLAUDE.md` Session-Block 2026-08-02), bis dahin läuft der Dienst noch auf dem alten Build |
-| O2 | **`clients` und `token_families` werden von `purge_expired()` nie abgeräumt** — beide wachsen unbegrenzt. Live gefunden am 2026-08-05 im Restore-Nachweis des Auth-Backups: **35 DCR-Client-Registrierungen in einer Woche für zwei Personen**, dazu 20 Token-Familien (9 aktiv, 11 widerrufen — Widerrufene bleiben ewig). Verschärfend: `clients.last_used_at` wird **nur bei der Registrierung auf `NULL` gesetzt und danach nirgends je geschrieben** (`store.py:265`, keine zweite Fundstelle) — die eine Spalte, an der man eine verwaiste Registrierung erkennen könnte, ist tot. **Sicherheitsrisiko gering** (eine Registrierung allein gewährt nichts, jede Autorisierung verlangt weiterhin Passwort **und** TOTP), aber: die Auth-DB und damit jede Backup-Generation wachsen mit, und ein Audit „welche Connectoren existieren eigentlich" ist ohne `last_used_at` nicht sinnvoll zu beantworten | Betriebsnotiz | `store.py :: purge_expired()`, `store.py:265` | 🔴 **offen** — bewusst **nicht** still gefixt: ein Aufräumkriterium braucht erst eine belastbare Spalte (`last_used_at` tatsächlich schreiben) und eine Entscheidung, ab wann eine Registrierung ohne aktive Token-Familie verfällt. Nikinger-Entscheidung ausstehend |
+| S10 | **Ein Reset über eine Einladung widerrief weder Token-Familien noch UI-Sitzungen** — der Passwortwechsel tut das seit P5 Step 4 (P5-Q), der *stärkere* Reset nicht. Ein altes Refresh-Token behielt vollen Zugriff, obwohl Passwort **und** TOTP ersetzt waren. Live gefunden: nach einem echten Reset standen neun Familien vom 30.07. weiter auf aktiv | mittel | `webui/routes_auth.py :: _invite_post()` | ✅ **geschlossen** (2026-08-06) — `revoke_families_for_space()` + `revoke_sessions_for_space()`, Grund `invite_redeemed`; Test gegen den ungefixten Stand als rot gegengeprüft. **Wirkt erst nach einem Deploy.** Herleitung: `phase5_ui/CLAUDE.md`, Session-Block 2026-08-06 |
+| O2 | **`clients` und `token_families` werden von `purge_expired()` nie abgeräumt** — beide wachsen unbegrenzt (live: 35 DCR-Registrierungen in einer Woche für zwei Personen, 20 Token-Familien). Verschärfend: `clients.last_used_at` wird nur bei der Registrierung auf `NULL` gesetzt und nie geschrieben — die eine Spalte, an der man eine verwaiste Registrierung erkennen könnte, ist tot. Sicherheitsrisiko gering (eine Registrierung allein gewährt nichts) | Betriebsnotiz | `store.py :: purge_expired()`, `store.py:265` | 🔴 **offen** — bewusst nicht still gefixt: ein Aufräumkriterium braucht erst eine belastbare Spalte und eine Entscheidung, ab wann eine Registrierung verfällt. Nikinger-Entscheidung ausstehend |
 | S9 | `submit_consent()` prüfte `record.status` nie — ein per `authctl.py disable-user` gesperrter Space konnte sich über den OAuth-Consent-Login sofort eine neue Token-Familie holen, die Sperre war ohne UI-Anteil wirkungslos | niedrig-mittel | `flows.py :: submit_consent` | ✅ **geschlossen** (P5 Step 4) |
 
 **[2026-08-02 Korrektur, P5 Step 1]:** der Absatz „Keiner von S2–S8 ist gefixt" stand hier

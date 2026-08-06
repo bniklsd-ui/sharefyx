@@ -4,10 +4,295 @@ purpose: Archiv älterer Session-stopped-Blöcke aus phase5_ui/CLAUDE.md, newest
 read-when: Audit vergangener Sessions dieser Phase; NICHT für normalen Session-Start
 detail: L3
 up: CLAUDE.md
-updated: 2026-08-05 (neunter Block archiviert, Rotation nach Step 8)
+updated: 2026-08-06 (zehnter Block archiviert, Rotation nach dem Step-8-Live-Abschluss)
 ---
 
 # Session-Archiv — Phase 5 Web-UI, REST-API, Auth-Selbstverwaltung
+
+## Session stopped — 2026-08-05, vierter Nachtrag (Step 8: Deploy, Rollback, Staging, Auth-Backup, Messung)
+
+**Ergebnis:** Step 8 ist gebaut. Bis hierher lief der Dienst direkt aus dem
+Git-Arbeitsverzeichnis — ein Editor-Speichern wirkte sofort auf die laufende Instanz, ein
+Rollback gab es nicht, und die `auth.sqlite3` (Passwort-Hashes, **umkehrbare** TOTP-Seeds,
+Token-Familien) wurde von **keinem** Backup erfasst; gesichert war nur der `DATA_ROOT`. Ein
+Plattenschaden hätte die Notizen gerettet und beide Konten gekostet.
+
+Neu: `phase5_ui/scripts/{deploy.sh,rollback.sh,authbackup.sh,restore_auth_check.sh,ui_budget.py}`,
+`phase5_ui/systemd/{sharefyx-authbackup.service,.timer,sharefyx-staging.service}`, vier weitere
+Prüfungen in `phase3_edge/scripts/diagnose.sh`, drei optionale Platzhalter in
+`install_units.sh`.
+
+**Nikinger-Entscheidungen dieser Planung (2026-08-05):** Deploy-Quelle ist das **lokale Repo**,
+nicht GitHub („von GitHub klonen nur Leute, die das Projekt selber hosten wollen") — `deploy.sh
+origin/main` funktioniert nach einem `git fetch` trotzdem, der Klon bringt die Remote-Refs mit.
+Staging wird **jetzt** gebaut, wie in P5-AB gelockt.
+
+**Drei dokumentierte Abweichungen vom Plan-Wortlaut:**
+1. **Health-Gate ohne „authentifizierte API-Probe".** Der Plan verlangt eine; eine echte
+   Anmeldung bräuchte Passwort **und** TOTP-Seed auf der Platte, und **Hard Rule 1 verbietet das
+   ausnahmslos**. Stattdessen vier Proben, die dasselbe beweisen, ohne ein Geheimnis anzulegen:
+   `/health` → 200, `/ui/login` → 200 (webui gemountet), `/api/v1/me` ohne Cookie → **401**,
+   `/mcp/` ohne Bearer → **401**. Ein Deploy, der versehentlich die Authentisierung ausbaut,
+   fällt damit auf — genau darum ging es bei der Forderung.
+2. **Drei Staging-Platzhalter statt zwei.** `__STAGING_BASE_URL__` kam dazu, weil
+   `SPACE_PUBLIC_BASE_URL` unter `AUTH_MODE=oauth` Pflicht ist (`authserver/config.py`) — mit nur
+   Port und `DATA_ROOT` wäre die Unit nicht startfähig gewesen.
+3. **Die Staging-Platzhalter sind optional mit Default, nicht Pflicht.** Sonst bräche
+   `install_units.sh` auf **jeder bestehenden Installation** ab, sobald die neue Unit dazukommt —
+   die `local.env` der VM kennt die Schlüssel ja noch nicht. Defaults: Port `8766`,
+   `<DATA_ROOT>-staging`, `<PUBLIC_BASE_URL>:<STAGING_PORT>`.
+
+**Zwei eigene Funde:**
+- **Ein zurückgerolltes Release wäre das nächste Rollback-Ziel gewesen.** Aufgefallen erst beim
+  echten Probelauf, nicht beim Schreiben: nach einem gescheiterten Health-Gate bleibt das
+  Release liegen (gewollt — man will hineinsehen können), ist aber das **jüngste** Verzeichnis.
+  Der nächste erfolgreiche Deploy hätte es damit zum „vorherigen" Release gemacht; ein Rollback
+  wäre auf genau dem Stand gelandet, der eben nachweislich den Gate gerissen hat. `deploy.sh`
+  markiert es jetzt als `*.failed`, `rollback.sh` schließt solche Verzeichnisse aus. Beides mit
+  einem Test festgehalten.
+- **V13-Drift in `phase3_edge/`.** `phase3_edge/CLAUDE.md` dokumentiert V13 seit dem 2026-07-28
+  als geschlossen — und führt es 114 Zeilen weiter unten in derselben Datei noch als offen; der
+  `[VERIFY]`-Kommentar in `diagnose.sh` trug dieselbe veraltete Aussage („bei Abweichung in
+  Step 7 korrigieren"). Beide Stellen mit datierter Notiz korrigiert. Kein `[VERIFY]` dieser Art
+  ist mehr offen.
+
+**Messung (P5-AD) — löst `[VERIFY]` V10 auf.** `ui_budget.py`, 220 synthetische Items,
+in-process gegen ein temporäres `DATA_ROOT`:
+
+| Messgröße | Gemessen | Ziel | |
+|---|---|---|---|
+| `GET /api/v1/items?limit=50` roh | **22.4 KB** | < 64 KB | ✅ |
+| `GET /api/v1/items?limit=50` gzip | **1.2 KB** | < 12 KB | ✅ |
+| `GET /api/v1/items/{id}` typisch | **0.6 KB** | < 8 KB | ✅ |
+| `app.js` + `app.css` + Font | **54.8 KB** | < 250 KB | ✅ (js 14.6 / css 6.3 / Font 33.9) |
+| Erstaufruf `/ui/` bis interaktiv | **58.2 KB** | < 400 KB | ✅ |
+
+Alle fünf im Korridor, mit großem Abstand. **Was die letzte Zahl NICHT ist:** ein
+Browser-Messwert. Sie summiert, was ein frischer Browser laden muss (`app.html` + statische
+Dateien gzip + die drei Bootstrap-Antworten `/api/v1/{me,meta,overview}`, die `init()` in genau
+dieser Reihenfolge holt) — ohne Verbindungsaufbau, TLS-Handshake und HTTP-Header. Eine
+Nachbildung, ehrlich benannt, keine Labormessung.
+
+**`[SEAM]` Blue/Green (P5-AC), dokumentiert statt gebaut:** `deploy.sh` liest den Zielport aus
+**einer** Variablen (`SHAREFYX_PORT`) und benutzt sie an **einer** Stelle (der Health-Gate-URL).
+Der spätere Weg wäre eine Template-Unit `sharefyx-mcp@.service` plus Zielwechsel über
+`tailscale serve`/`funnel`. **Die Bedingung, unter der das überhaupt sinnvoll wird:** ab dann
+müssen alle Schemaänderungen expand/contract-fähig sein, weil zwei Farben dieselbe
+`auth.sqlite3`, denselben Index und dasselbe Git-Repo teilen. Solange das nicht gilt, wäre
+Blue/Green kein Sicherheitsgewinn, sondern zwei Prozesse, die sich gegenseitig die Daten
+umschreiben.
+
+**Verifiziert:** `pytest -q` → **570/570 grün** (549 vorher, +21: 15 `test_deploy_scripts.py`
+neu, +6 `test_units.py`). `pyflakes` und `bash -n` über alle neuen/geänderten Dateien sauber.
+`deploy.sh`/`rollback.sh` **real gefahren** gegen ein Wegwerf-Layout mit gestubbtem
+`systemctl`/`curl` und einem echten kleinen Git-Repo als Quelle — beide Fehlschlagpfade (rote
+Tests, gerissener Health-Gate) inklusive Prüfung, wohin der Symlink danach zeigt.
+`authbackup.sh`/`restore_auth_check.sh` real gegen eine echte kleine SQLite-Datei (Retention,
+`0600`, Zeilenzählung). `install_units.sh` hermetisch gegen eine Wegwerf-Kopie mit umgebogenem
+Ziel — alle acht Units ohne unaufgelösten Platzhalter. `git diff --stat` auf `storage/`,
+`mcpserver/{tools,permissions,server}.py` bleibt **leer** (Akzeptanzkriterium 18).
+
+Ein Test verdient eine eigene Erwähnung, weil er über die im Plan genannten hinausgeht:
+`test_every_placeholder_in_every_unit_is_known_to_the_install_script` prüft **allgemein**, dass
+kein `__FOO__` in irgendeiner Unit dem Installationsskript unbekannt ist. Ohne ihn hätte die
+nächste Unit mit einem neuen Platzhalter erst beim `sudo install_units.sh` auf der echten
+Maschine einen Abbruch erzeugt — und zwar für **alle** Units, nicht nur die neue.
+
+**Advisor:** in dieser Session **nicht erreichbar** („temporarily overloaded", beim Review vor
+dem Commit erneut versucht) — anders als in Step 7b, wo er mit F7 den schwersten Fund beisteuerte.
+Ersatz: der dokumentierte Fallback (`pytest` + `pyflakes` + `bash -n` + echte Probeläufe aller
+Skripte) plus ein gezielter Selbst-Review der riskantesten Stellen, der zwei Dinge ergab, beide
+behoben: (1) beim **allerersten** Deploy gibt es kein vorheriges Release, `rollback.sh` bricht
+dann korrekt ab — die Meldung sagt jetzt warum, und der Kommentar erklärt, weshalb das kein
+Betriebsproblem ist (vor dem Cutover zeigt die Unit noch aufs Arbeitsverzeichnis; genau deshalb
+steht der erste Deploy im Runbook **vor** dem Cutover). (2) `test_deploy_script_aborts_when_
+tests_fail` scheitert in Wahrheit daran, dass im Wegwerf-Release gar kein `pytest` installiert
+ist, nicht an einem absichtlich roten Test — der Docstring behauptete das Gegenteil und sagt es
+jetzt geradeheraus. Die Aussage des Tests bleibt gültig: `deploy.sh` unterscheidet nicht zwischen
+„Test rot" und „Testlauf nicht durchführbar", und beides muss denselben Abbruch auslösen.
+
+**Nachtrag 2026-08-05, beim ersten echten Deploy des Nikingers — der schwerwiegendste Fund
+dieses Steps, und er stammt aus meinem eigenen Testcode:**
+
+Der Deploy brach ab („Tests im Release rot"), das Release wurde gelöscht, der Symlink blieb
+unberührt — **das Sicherheitsnetz hat exakt so funktioniert, wie es soll.** Die Ursache dahinter
+war aber keine echte Regression:
+
+`test_deploy_scripts.py :: _env()` baute die Testumgebung aus `dict(os.environ)` und setzte nur
+die Variablen, die es selbst braucht. Der Nikinger hatte für den Deploy
+`SHAREFYX_SYSTEMCTL="sudo systemctl"` **exportiert** — diese Variable rutschte damit in jeden
+Testlauf durch. Die Tests bauten also ein `deploy.sh`, das `sudo systemctl restart sharefyx-mcp`
+**auf der echten Maschine** aufrief. Das PATH-Stubbing schützt davor nicht: `sudo` findet das
+echte Binary über `secure_path`, nicht über den vorangestellten Stub-Pfad. Und weil unmittelbar
+vorher ein `sudo -v` gelaufen war, brauchte es nicht einmal ein Terminal.
+
+**Nachgeprüft, nicht vermutet:** `journalctl` zählte im Testfenster **52** Start-/Stop-Zeilen der
+Produktiv-Unit. Die Testsuite hat den laufenden Dienst dutzendfach neu gestartet. Folgenlos
+(ein Neustart ist harmlos, `/health` und `/ui/login` antworten wieder mit 200), aber es hätte nie
+passieren dürfen: dieselbe Regel, die für `DATA_ROOT` und Netz gilt — **nie gegen die Realität** —
+gilt für die Prozesssteuerung genauso.
+
+Behoben in **beiden** betroffenen Testdateien über ein gemeinsames `_clean_environ()`, das jede
+`SHAREFYX_*`/`SFX_*`-Variable des Aufrufers verwirft:
+`phase5_ui/tests/test_deploy_scripts.py` (dort eskaliert) und
+`phase3_edge/tests/test_backup_scripts.py` (dieselbe Bauart, dort hätte ein exportiertes
+`SHAREFYX_BACKUP_KEEP` die Retention-Tests still verfälscht — vorsorglich mitgeschlossen).
+Regressionstest `test_harness_ignores_ambient_sharefyx_configuration` hält fest, dass **nur**
+vom Test selbst gesetzte Variablen übrig bleiben. Gegenprobe gefahren: mit exportiertem
+`SHAREFYX_SYSTEMCTL`/`SHAREFYX_RELEASES_DIR`/`SHAREFYX_BACKUP_KEEP` waren vorher **3 Tests rot**,
+danach alle grün.
+
+**Die allgemeine Lehre, die über diesen Fall hinausgeht:** ein Test, dessen Verhalten von der
+Shell des Aufrufers abhängt, ist kein Test. Wenn eine Testsuite ein Programm gegen eine Attrappe
+laufen lässt, muss sie die Umgebung **konstruieren**, nicht erben.
+
+**Nachtrag 2026-08-05/06 — Staging live, `[VERIFY]` V36 geschlossen:** der Nikinger hat den
+DATA_ROOT geklont, `sharefyx-staging.service` aktiviert und die Instanz über
+`sudo tailscale serve --bg --https=8766 8766` freigegeben. **Bewusst mit `sudo` statt
+`tailscale set --operator=savefyx`** (Nikinger-Entscheidung): die Serve-Konfiguration überlebt
+ohnehin im `tailscaled`-Zustand, ein dauerhaftes Operator-Recht würde dagegen genau dem Benutzer,
+unter dem `deploy.sh` läuft, erlauben, den **Produktiv**-Funnel umzustellen oder abzuschalten.
+Least privilege vor Bequemlichkeit.
+
+**V36 read-only gegengeprüft:** Funnel steht auf 443 → `127.0.0.1:8765` (öffentlich, unverändert),
+Serve auf 8766 → `127.0.0.1:8766` und ist als **`tailnet only`** ausgewiesen — kein gemeinsamer
+Port, Staging nie über Funnel (P5-AB). Staging antwortet über den Tailnet-Weg mit 200 auf
+`/health` und `/ui/login`, Produktiv unverändert 200.
+
+**Die Falle, die dabei nicht zugeschnappt ist** (und die ich vorher in `local.env.example`
+benannt habe): `STAGING_PORT` ist der **lokale** Port, `tailscale serve --https=<X>` bestimmt den,
+den der Browser sieht. Der Default `<PUBLIC_BASE_URL>:<STAGING_PORT>` stimmt **nur**, wenn beide
+gleich sind. Hier sind sie es (8766/8766), die eingesetzte `SPACE_PUBLIC_BASE_URL` deckt sich
+exakt mit der realen Serve-URL. Bei `--https=8443` wäre sie falsch gewesen — und der erste
+Einladungslink auf Staging wäre in demselben `403 Herkunft (Origin) stimmt nicht` gelandet, der
+in P4 und P5 je eine Session gekostet hat. Deshalb war die Reihenfolge „erst serven, dann
+ablesen, dann eintragen" keine Förmlichkeit.
+
+**Nachtrag 2026-08-06 — der erste Staging-Einladungslink führte ins Leere, Ursache zweimal
+meine, behoben:** der Nikinger meldete „die Accounts waren noch aktiv, die Einladungslinks haben
+beide nicht funktioniert". Read-only nachgesehen statt geraten — und das Gegenteil belegt:
+**Staging hatte 0 Nutzer, 0 UI-Sitzungen, 2 unverbrauchte Einladungen und insgesamt 4 Anfragen**;
+Produktiv dagegen `niklas`/`fabian` aktiv. Das Journal zeigte den eigentlichen Vorgang wörtlich:
+`{"path":"/ui/invite/kktcp…","status":404}` **auf der Produktivinstanz**. Die Einladung war für
+die Staging-Datenbank erzeugt, der Link zeigte auf Produktiv. **Die Instanz-Trennung hat also
+exakt funktioniert** — nur war das Werkzeug irreführend:
+
+1. Mein Runbook-Befehl setzte nur `STATE_DIRECTORY`. `authctl.py invite` **verlangt** aber
+   zusätzlich `SPACE_PUBLIC_BASE_URL` (`authctl.py:94`) — der Nikinger musste die fehlende
+   Variable also selbst ergänzen, und der naheliegende Wert ist die Produktiv-URL.
+2. `authctl.py invite` schrieb den Token in die Datenbank aus `STATE_DIRECTORY`/`SPACE_AUTH_DB`
+   und baute den Link aus `SPACE_PUBLIC_BASE_URL` — **zwischen beiden gab es keinerlei
+   Verbindung und keinen Abgleich.** Die Fehlermeldung auf der falschen Instanz lautet
+   „Einladung ungültig oder abgelaufen", was sich wie „Konto existiert bereits" liest und in eine
+   ganz andere Richtung führt.
+
+Behoben (Nikinger-Anregung): `invite` nennt jetzt auf stderr die **beschriebene Datenbank mit
+Kennzeichnung `[PRODUKTIV]`/`[STAGING]`**, die **gebaute Ziel-URL** und eine Prüfaufforderung.
+Der Link selbst bleibt allein auf stdout (Hard Rule 7). Bewusst **keine** Heuristik, die aus der
+URL auf die Instanz schließt: die Staging-URL enthält das Wort „staging" nicht (sie unterscheidet
+sich nur im Port), eine solche Prüfung läge in der Hälfte der Fälle daneben. Das Werkzeug nennt
+die Hälfte, die es sicher weiß — welche Datenbank es beschrieben hat — und überlässt den Abgleich
+dem Menschen. **Der stärkere Weg wäre**, dass der Dienst seine `SPACE_PUBLIC_BASE_URL` beim Start
+in `schema_meta` hinterlegt; dann könnte `authctl` autoritativ widersprechen. Als möglicher
+Ausbau notiert, nicht gebaut — das berührt `authserver/store.py`s Startpfad und war für diesen
+Nachtrag zu viel.
+
+**Nachtrag 2026-08-06, zweiter Anlauf — „Proxy-Server verweigert die Verbindung" auf Staging:
+kein Fehler, sondern die Sicherheitseigenschaft bei der Arbeit.** Der Nikinger bekam die Meldung
+im Browser für `…ts.net:8766`. Serverseitig war alles gesund (Dienst `active`, `127.0.0.1:8766`
+→ 200, **und der Tailnet-Name `https://…:8766/health` von der VM aus ebenfalls → 200**,
+Serve-Konfiguration unverändert, `tailscaled` lauscht auf `100.118.131.68:8766`). Der Server
+nahm die Verbindung also an — der Browser kam nie an.
+
+`tailscale status` zeigt die Ursache in einer Zeile: **das Tailnet enthält genau ein Gerät**, die
+VM selbst. Keine Peers. Der Windows-Host des Nikingers ist **nicht** Mitglied.
+
+Der Grund, warum das nie auffiel:
+
+| | Weg | Tailnet-Mitgliedschaft nötig? |
+|---|---|---|
+| Produktiv (443) | `tailscale funnel` → öffentliches Internet | **nein** |
+| Staging (8766) | `tailscale serve` → nur Tailnet | **ja** |
+
+Die Produktiv-UI lief immer über den **öffentlichen Funnel**, nie über das Tailnet. Staging ist
+per P5-AB bewusst nicht öffentlich — also ist es aus einem Nicht-Tailnet-Browser korrekt
+unerreichbar. Firefox' Wortlaut („Proxy-Server verweigert…") ist dabei irreführend; es ist eine
+schlicht abgewiesene Verbindung, kein Proxy im Spiel (auf der VM sind weder Proxy-Umgebungs-
+variablen noch ein GNOME-Systemproxy gesetzt, und es existiert dort gar kein Firefox-Profil —
+der Browser läuft auf einem anderen Rechner).
+
+**Weg zum Zugang:** Tailscale auf dem Windows-Host installieren, mit demselben Konto anmelden.
+Bewusst **nicht** die Alternativen: ein SSH-Tunnel bräche die Basis-URL
+(`https://…:8766` gegen `http://localhost:8766` → exakt der Origin-Fehler aus P4/P5), und
+Staging über Funnel freizugeben verbietet P5-AB — eine Testinstanz gehört nicht ins öffentliche
+Internet.
+
+**Damit ist auch der „Zertifikatsfehler" bei Fabians Konto sehr wahrscheinlich erklärt** (Fabians
+Gerät ist ebenso wenig im Tailnet) — **aber nicht bewiesen**: der Wortlaut lautete „Zertifikat",
+nicht „Verbindung verweigert", und ein TLS-Fehler erreicht den Server nie, es steht also nichts
+im Journal. Bleibt als offener, kleiner Punkt stehen, bis er wieder auftritt: exakter Wortlaut
+und die URL aus der Adresszeile genügen zur Einordnung.
+
+**Nachtrag 2026-08-06, dritter — Staging wird abgeschaltet. Revidiert P5-AB, Nikinger-Entscheidung.**
+
+Der Weg dorthin gehört zum Befund, weil er zweimal an einer Begriffsverwechslung hing: der
+Nikinger verstand „prod" als *die Umgebung, in der die Software produziert wird* (die Arbeitskopie
+unter `/dev`) und „staging" als *die Instanz für den Alltag*. Tatsächlich ist es umgekehrt —
+`sharefyx-mcp` hält die echten Notizen beider Personen, `sharefyx-staging` nur eine Kopie vom
+Vormittag. Erst als der reale Zustand als Tabelle nebeneinanderstand (welche Daten, welche
+Konten, wer kommt heran, welcher Code), war die Lage eindeutig. **Lehre: bei zwei Instanzen nie
+über Namen verhandeln, sondern über Daten, Erreichbarkeit und Code.**
+
+**Die Entscheidung und ihr Grund:** Staging ist überflüssig. Der Langzeittest der Software ist
+die tägliche Nutzung von `sharefyx-mcp` selbst; eine zweite Instanz, die niemand aufruft, testet
+nichts. Dazu kam die harte Randbedingung: die Hauptzugriffsrechner sind **Arbeitsrechner**, auf
+denen weder Tailscale installiert noch die Netzwerkkonfiguration geändert werden darf. Ein
+tailnet-only-Staging ist dort strukturell unerreichbar, und die VM nimmt hinter CGNAT auch keine
+SSH-Verbindung für einen Tunnel an. Es blieb nur „öffentlich per Funnel" — und eine zweite
+öffentliche Fläche für eine Instanz, die ihren Zweck ohnehin nicht erfüllt, ist ein schlechtes
+Geschäft.
+
+**Zwei eigene Funde, die diese Entscheidung mitgetragen haben:**
+1. **Staging konnte seinen Zweck gar nicht erfüllen** — Konstruktionsfehler meinerseits: die
+   Unit-Vorlage hat **einen** `__REPO_ROOT__`-Platzhalter, den beide Instanzen erben. Belegt über
+   `systemctl show`: beide `ExecStart` zeigen auf `/opt/sharefyx/current`. Staging konnte damit
+   andere *Daten* fahren, aber nie anderen *Code* — und „eine Änderung ausprobieren, bevor sie
+   live geht" war der Zweck laut Plan. Ein echtes Staging bräuchte einen eigenen Symlink
+   (`/opt/sharefyx/staging`) und ein Ziel-Argument in `deploy.sh`.
+2. Dadurch war meine erste Risikoeinschätzung („Funnel auf Staging setzt ungetesteten Code aus")
+   **für den heutigen Zustand zu streng** — es lief dieselbe Software. Für den Zustand, den
+   Staging haben *sollte*, war sie richtig. Beides dem Nikinger vorgelegt statt eine Empfehlung
+   stehenzulassen, deren Grundlage sich geändert hatte.
+
+**Was bleibt und warum:** Unit, Skripte, Platzhalter und die vier Tests bleiben **im Repo**. Sie
+sind gebaut, getestet und dokumentiert; abgeschaltet ist die *Inbetriebnahme*, nicht der Code.
+Sobald ein Rechner existiert, der ins Tailnet darf, ist Staging ein `install_units.sh` +
+`systemctl enable --now` + `tailscale serve` entfernt — **plus** der Release-Fix aus Fund 1, sonst
+fährt es wieder dieselbe Software wie Produktiv. Das steht hier, damit niemand später eine
+funktionierende Unit findet und annimmt, sie sei einsatzbereit.
+
+**Manuell (Nikinger — alles, was Realität berührt):**
+1. **Einmalig:** `sudo mkdir -p /opt/sharefyx/releases && sudo chown -R savefyx:savefyx /opt/sharefyx`
+2. Erster Deploy aus dem Arbeitsverzeichnis:
+   `SHAREFYX_RELEASES_DIR=/opt/sharefyx/releases SHAREFYX_CURRENT_LINK=/opt/sharefyx/current
+   phase5_ui/scripts/deploy.sh main`
+3. **Cutover:** `REPO_ROOT=/opt/sharefyx/current` und `VENV=/opt/sharefyx/current/.venv` in
+   `phase3_edge/local.env`, dann `sudo phase3_edge/scripts/install_units.sh` + Restart.
+   **Ab hier ist „Datei ändern + `systemctl restart`" wirkungslos** — es zählt nur noch, was
+   deployt wurde. Escape-Hatch, falls nötig: den `current`-Symlink von Hand auf das
+   Arbeitsverzeichnis zeigen lassen.
+4. **Abnahmezeile 16:** Health-Endpunkt absichtlich unerreichbar machen (`SHAREFYX_PORT` auf
+   einen toten Port), deployen, beobachten, dass automatisch zurückgerollt wird.
+5. `sudo systemctl enable --now sharefyx-authbackup.timer`, danach `restore_auth_check.sh`
+   **selbst ausführen** — der Nachweis ist der Lauf, nicht das Skript (Lehre aus P3 Zeile 13).
+6. Staging hochziehen, `tailscale serve` prüfen — **V36:** nicht derselbe Port wie der Funnel.
+   Achtung: Staging hat eine **eigene** `auth.sqlite3`, die Produktivkonten gelten dort nicht.
+7. Unabhängig von Step 8 weiterhin offen: **Abnahmezeile 6** — zweiter Browser (privates
+   Fenster/zweites Profil) angemeldet lassen, Passwort ändern, prüfen dass genau der abgemeldet
+   wird und die aktuelle Sitzung weiterläuft.
+
+**Nächster Schritt (konkret):** die sieben Punkte oben, dann Step 9 (gemeinsame Live-Abnahme
+beider Nutzer + Handover, Plan §5 Step 9 / P5-AE).
 
 ## Session stopped — 2026-08-05, dritter Nachtrag (Step 7b: UI-Überarbeitung nach Live-Feedback)
 

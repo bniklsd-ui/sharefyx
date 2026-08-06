@@ -8,7 +8,7 @@ down:
   - ROADMAP.md                          # Phasenplan + Status je Phase
   - docs/INDEX.md                       # L0-Karte aller .md
   - phase5_ui/CLAUDE.md                 # aktive Phase
-updated: 2026-08-02
+updated: 2026-08-06
 ---
 # CLAUDE.md — Project Instructions
 
@@ -277,11 +277,27 @@ Verzeichnis zum nächsten Rollback-Ziel geworden — man wäre auf dem nachweisl
 gelandet; es wird jetzt `*.failed` markiert und übersprungen. Nebenbei eine **V13-Drift in
 `phase3_edge/`** korrigiert (dort seit 2026-07-28 als geschlossen dokumentiert und 114 Zeilen
 weiter unten in derselben Datei noch als offen geführt). **570/570 Tests.** Details:
-`phase5_ui/CLAUDE.md` Session-Block 2026-08-05, vierter Nachtrag.**]** **Nächster Schritt:** die
-Live-Teile von Step 8 beim Nikinger (einmalige `/opt/sharefyx`-Einrichtung, erster Deploy,
-Cutover, Abnahmezeile 16, Auth-Backup-Timer + eigener `restore_auth_check.sh`-Lauf, Staging mit
-`tailscale serve`), dazu die weiter offene Zeile 6 (zweiter Browser). Danach Step 9 (gemeinsame
-Live-Abnahme beider Nutzer + Handover, P5-AE).
+`phase5_ui/CLAUDE.md` Session-Block 2026-08-05, vierter Nachtrag.**]** **[2026-08-06, Step 8 live abgeschlossen:** der Nikinger hat alle
+Live-Teile ausgeführt. **Cutover vollzogen** — der Dienst läuft seit 20:37 aus
+`/opt/sharefyx/current` statt aus dem Git-Arbeitsverzeichnis; „Datei ändern + `systemctl
+restart`" ist damit wirkungslos, es zählt nur noch, was `deploy.sh` gebaut hat.
+**Abnahmezeilen 6 und 16 live bestanden** (Passwortwechsel mit zweitem Browser; Auto-Rollback bei
+gerissenem Health-Gate — beides read-only gegengeprüft, nicht nur die Meldung übernommen),
+Auth-Backup läuft mit eigenem Restore-Nachweis des Nikingers, `[VERIFY]` **V36** geschlossen.
+**Abnahmestand 13/20.** **Staging wieder abgeschaltet — revidiert P5-AB** (Nikinger-Entscheidung):
+die Hauptzugriffsrechner sind Arbeitsrechner ohne Tailscale, die VM nimmt hinter CGNAT keine
+SSH-Verbindung an, es bliebe nur ein öffentlicher Funnel — und Staging konnte seinen Zweck
+ohnehin nicht erfüllen (Konstruktionsfehler: ein `__REPO_ROOT__`-Platzhalter für beide Units,
+also gleicher Code, nur andere Daten). Der Langzeittest der Software ist die tägliche Nutzung
+von `sharefyx-mcp` selbst. **Sechs Funde aus dem echten Betrieb**, keiner beim Lesen des Codes
+auffindbar — darunter **S10** (ein Reset über eine Einladung widerrief weder Token-Familien noch
+UI-Sitzungen, obwohl der schwächere Passwortwechsel genau das seit Step 4 tut; geschlossen) und
+**O2** (`clients`/`token_families` werden nie abgeräumt; offen). Dass meine eigene Testsuite dabei
+den Produktivdienst 52-mal neu startete, weil sie die Shell-Umgebung erbte, steht mit derselben
+Deutlichkeit im Session-Block. **575/575 Tests.** Details: `phase5_ui/CLAUDE.md`, Session-Block
+2026-08-06.**]** **Nächster Schritt:** **Deploy fällig** — S10 und die Werkzeugverbesserungen
+liegen im Repo, nicht im Release. Danach Zeile 15 (`ui_budget.py` vom Nikinger gefahren), Zeile 19
+(Live-`curl`) und Step 9 (gemeinsame Live-Abnahme beider Nutzer + Handover, P5-AE).
 
 **Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅
 abgeschlossen, 2026-07-30.** Mission erfüllt: der Pfad-Token ist verschwunden, ein eigener

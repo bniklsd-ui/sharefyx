@@ -193,6 +193,29 @@ def ui_auth_routes(
             invite.space, password_hash=passwords.hash_password(new_password),
             totp_secret_enc=None, totp_alg="SHA1", totp_confirmed_at=None, status="active",
         )
+
+        # **Befund S10, live gefunden am 2026-08-06.** Bis hierher endete der Reset mit dem
+        # `upsert_user()` oben: Passwort-Hash und TOTP-Seed wurden ersetzt, **Token-Familien und
+        # UI-Sitzungen aber nicht angetastet.** Belegt an einem echten Konto — nach einem Reset
+        # standen dort neun Token-Familien vom 30.07. weiterhin auf „aktiv", neben der frisch
+        # angelegten.
+        #
+        # Das ist genau verkehrt herum: der *Passwortwechsel* (`account.py :: _password()`, P5-Q)
+        # widerruft seit Step 4 alles — und der **Reset**, die stärkere Operation, die man bei
+        # Verdacht auf Kompromittierung oder verlorenem Zugang fährt, widerrief nichts. Wer ein
+        # altes Refresh-Token hielt, behielt vollen Zugriff auf den Space, obwohl Passwort UND
+        # TOTP ersetzt waren. Der Kommentar oben nennt die Absicht ausdrücklich („ein Reset soll
+        # auch einen alten TOTP-Seed nicht überleben lassen") — die Absicht war richtig, sie war
+        # nur nicht zu Ende geführt.
+        #
+        # Kein `except_session_id` wie beim Passwortwechsel: dort läuft die Sitzung des Handelnden
+        # weiter, hier gibt es noch gar keine — die neue wird erst unten mit `sessions.issue()`
+        # ausgestellt. Ein Reset darf schlicht nichts Altes überleben lassen.
+        store.revoke_families_for_space(invite.space, "invite_redeemed")
+        store.revoke_sessions_for_space(
+            invite.space, except_session_id=None, reason="invite_redeemed"
+        )
+
         secret = users.begin_totp_enrollment(invite.space)
         otpauth_uri = totp.provisioning_uri(secret, space=invite.space, issuer=TOTP_ISSUER)
 
