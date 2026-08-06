@@ -304,6 +304,40 @@ Einladungslink auf Staging wäre in demselben `403 Herkunft (Origin) stimmt nich
 in P4 und P5 je eine Session gekostet hat. Deshalb war die Reihenfolge „erst serven, dann
 ablesen, dann eintragen" keine Förmlichkeit.
 
+**Nachtrag 2026-08-06 — der erste Staging-Einladungslink führte ins Leere, Ursache zweimal
+meine, behoben:** der Nikinger meldete „die Accounts waren noch aktiv, die Einladungslinks haben
+beide nicht funktioniert". Read-only nachgesehen statt geraten — und das Gegenteil belegt:
+**Staging hatte 0 Nutzer, 0 UI-Sitzungen, 2 unverbrauchte Einladungen und insgesamt 4 Anfragen**;
+Produktiv dagegen `niklas`/`fabian` aktiv. Das Journal zeigte den eigentlichen Vorgang wörtlich:
+`{"path":"/ui/invite/kktcp…","status":404}` **auf der Produktivinstanz**. Die Einladung war für
+die Staging-Datenbank erzeugt, der Link zeigte auf Produktiv. **Die Instanz-Trennung hat also
+exakt funktioniert** — nur war das Werkzeug irreführend:
+
+1. Mein Runbook-Befehl setzte nur `STATE_DIRECTORY`. `authctl.py invite` **verlangt** aber
+   zusätzlich `SPACE_PUBLIC_BASE_URL` (`authctl.py:94`) — der Nikinger musste die fehlende
+   Variable also selbst ergänzen, und der naheliegende Wert ist die Produktiv-URL.
+2. `authctl.py invite` schrieb den Token in die Datenbank aus `STATE_DIRECTORY`/`SPACE_AUTH_DB`
+   und baute den Link aus `SPACE_PUBLIC_BASE_URL` — **zwischen beiden gab es keinerlei
+   Verbindung und keinen Abgleich.** Die Fehlermeldung auf der falschen Instanz lautet
+   „Einladung ungültig oder abgelaufen", was sich wie „Konto existiert bereits" liest und in eine
+   ganz andere Richtung führt.
+
+Behoben (Nikinger-Anregung): `invite` nennt jetzt auf stderr die **beschriebene Datenbank mit
+Kennzeichnung `[PRODUKTIV]`/`[STAGING]`**, die **gebaute Ziel-URL** und eine Prüfaufforderung.
+Der Link selbst bleibt allein auf stdout (Hard Rule 7). Bewusst **keine** Heuristik, die aus der
+URL auf die Instanz schließt: die Staging-URL enthält das Wort „staging" nicht (sie unterscheidet
+sich nur im Port), eine solche Prüfung läge in der Hälfte der Fälle daneben. Das Werkzeug nennt
+die Hälfte, die es sicher weiß — welche Datenbank es beschrieben hat — und überlässt den Abgleich
+dem Menschen. **Der stärkere Weg wäre**, dass der Dienst seine `SPACE_PUBLIC_BASE_URL` beim Start
+in `schema_meta` hinterlegt; dann könnte `authctl` autoritativ widersprechen. Als möglicher
+Ausbau notiert, nicht gebaut — das berührt `authserver/store.py`s Startpfad und war für diesen
+Nachtrag zu viel.
+
+**Noch offen aus derselben Meldung:** ein „Zertifikatsfehler" bei Fabians Konto beim Anlegen von
+Items. Aus Logs nicht klärbar (ein TLS-Fehler erreicht den Server nie) und noch nicht eingeordnet
+— die Produktivinstanz zeigte im fraglichen Zeitraum 155 × `200` und erfolgreiche `201`/`202`.
+Nächstes Auftreten: exakter Wortlaut, URL in der Adresszeile, und ob Fabians Gerät im Tailnet ist.
+
 **Manuell (Nikinger — alles, was Realität berührt):**
 1. **Einmalig:** `sudo mkdir -p /opt/sharefyx/releases && sudo chown -R savefyx:savefyx /opt/sharefyx`
 2. Erster Deploy aus dem Arbeitsverzeichnis:

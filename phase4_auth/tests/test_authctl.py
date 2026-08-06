@@ -171,6 +171,44 @@ def test_invite_prints_the_link_once(env, store, capsys):
     assert links[0].startswith("https://space.example.ts.net/ui/invite/")
 
 
+def test_invite_names_the_database_it_wrote_and_the_url_it_built(env, store, capsys, tmp_path):
+    """**[2026-08-06, live gelernt]** Der Token landet in der Datenbank aus `STATE_DIRECTORY`,
+    der Link entsteht aus `SPACE_PUBLIC_BASE_URL` — zwischen beiden gibt es keine Verbindung.
+    Wer eine Staging-Einladung mit der Produktiv-Basis-URL in der Umgebung erzeugt, bekommt einen
+    Link, der auf der falschen Instanz „Einladung ungültig oder abgelaufen" liefert; das liest
+    sich wie „Konto existiert bereits" und führt in eine völlig andere Richtung. Genau so
+    geschehen. Die Ausgabe muss beides nebeneinander nennen, damit der Mensch es abgleichen kann.
+
+    Der Link selbst bleibt auf stdout (Hard Rule 7), die Einordnung geht auf stderr."""
+    env = {**env, "SPACE_PUBLIC_BASE_URL": "https://space.example.ts.net"}
+    rc = authctl.main(["invite", "niklas"], env=env)
+
+    err = capsys.readouterr().err
+    assert rc == 0
+    assert env["SPACE_AUTH_DB"] in err, "Datenbankpfad fehlt in der Ausgabe"
+    assert "https://space.example.ts.net" in err, "Ziel-URL fehlt in der Ausgabe"
+    assert "PRODUKTIV" in err
+
+
+def test_invite_labels_a_staging_database_as_such(env, capsys, tmp_path):
+    """Die Kennzeichnung hängt am Datenbankpfad, nicht an der URL: welche URL zu einer Instanz
+    gehört, kann `authctl` nicht wissen (der Dienst hinterlegt sie nirgends) — welche Datenbank
+    es gerade beschrieben hat, weiß es sicher. Lieber die sichere Hälfte klar benennen als eine
+    Heuristik raten, die bei einer Staging-URL ohne das Wort „staging" danebenliegt."""
+    state = tmp_path / "sharefyx-staging"
+    state.mkdir()
+    env = {
+        "SPACE_AUTH_DB": str(state / "auth.sqlite3"),
+        "SPACE_PUBLIC_BASE_URL": "https://space.example.ts.net:8766",
+    }
+    rc = authctl.main(["invite", "niklas"], env=env)
+
+    err = capsys.readouterr().err
+    assert rc == 0
+    assert "STAGING" in err
+    assert "PRODUKTIV" not in err
+
+
 def test_list_users_reports_status_and_recovery_code_count(env, store, capsys):
     store.upsert_user(
         "niklas", password_hash="x", totp_secret_enc=None, totp_alg="SHA1",

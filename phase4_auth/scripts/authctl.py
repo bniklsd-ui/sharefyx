@@ -95,11 +95,34 @@ def _cmd_invite(store: AuthStore, args: argparse.Namespace, env: dict[str, str])
     if not base_url:
         print("ABBRUCH: SPACE_PUBLIC_BASE_URL ist für 'invite' Pflicht.", file=sys.stderr)
         return 1
+    db_path = resolve_db_path(env)
     token = store.create_invite(space=args.space, purpose=args.purpose, ttl_s=args.ttl)
     # Klartext-Link EIN einziges Mal auf stdout — dieselbe Disziplin wie provision_user.py für
     # TOTP-Seeds: kein zweiter Ort, an dem er stehen bleibt.
     print(f"{base_url}/ui/invite/{token}")
+
+    # [2026-08-06] Diese vier Zeilen kosten den Nikinger sonst eine Stunde, live passiert:
+    # der Token wird in DIE DATENBANK geschrieben, auf die `STATE_DIRECTORY`/`SPACE_AUTH_DB`
+    # zeigt — der Link dagegen aus `SPACE_PUBLIC_BASE_URL` gebaut. Zwischen beiden gibt es
+    # KEINE Verbindung. Wer eine Staging-Einladung erzeugt und dabei die Produktiv-Basis-URL
+    # in der Umgebung stehen hat, bekommt einen Link, der auf der falschen Instanz `404
+    # Einladung ungültig oder abgelaufen` liefert — was sich liest wie „Konto existiert
+    # bereits" und in eine ganz andere Richtung führt. Genau so geschehen am 2026-08-06.
+    #
+    # Das Werkzeug kann NICHT wissen, unter welcher URL die Instanz zu dieser Datenbank
+    # ausgeliefert wird (dazu müsste der Dienst sie hinterlegen — siehe Phase-Head, als
+    # möglicher späterer Ausbau notiert). Was es sicher weiß, ist die Datenbank. Also nennt es
+    # beides nebeneinander und überlässt den Abgleich dem Menschen, statt eine Heuristik zu
+    # raten, die in der Hälfte der Fälle falsch liegt.
+    instanz = "STAGING" if "staging" in str(db_path).lower() else "PRODUKTIV"
     print(f"(Space '{args.space}', Zweck '{args.purpose}', gültig {args.ttl}s)", file=sys.stderr)
+    print(f"  Datenbank:  {db_path}   [{instanz}]", file=sys.stderr)
+    print(f"  Link zeigt: {base_url}", file=sys.stderr)
+    print(
+        f"  ⚠ Prüfen: gehört die URL zur {instanz}-Instanz? Der Token gilt NUR dort — "
+        "auf jeder anderen Instanz erscheint „Einladung ungültig oder abgelaufen\".",
+        file=sys.stderr,
+    )
     return 0
 
 
