@@ -309,10 +309,11 @@ umgesetzt, als Befunde F1/F2 vorgelegt statt still entschieden:** vollständiges
 vollen Form („alle haben unabhängig volle Rechte") **frontal mit Hard Rule 4** („Cross-Space-
 Writes existieren architektonisch nicht — kein Parameter, keine Codepfad-Variante", *no
 exceptions*) und ist ein Phase-6-Kandidat, keine Ad-hoc-Umsetzung. 576/576 Tests, Tabu-Diff
-leer. Details: `phase5_ui/CLAUDE.md`, Session-Block 2026-08-06 (Step 8b).**]** **Nächster
-Schritt:** **Push UND Deploy stehen beide aus**, Sache des Nikingers — danach F1/F2-Entscheidung,
-Zeile 15 (`ui_budget.py`), Zeile 19 (Live-`curl`) und Step 9 (gemeinsame Live-Abnahme beider
-Nutzer + Handover, P5-AE, braucht Fabian).
+leer. **F1/F2 entschieden (Nikinger):** beide auf eine spätere Phase verschoben (Subspaces/
+Shared Spaces, Archiv-Neugestaltung als Antwort auf F2); F2 selbst bleibt „kein Löschen, nur
+Archivieren". Details: `phase5_ui/CLAUDE.md`, Session-Block 2026-08-06 (Step 8b).**]** **Nächster
+Schritt:** Zeile 15 (`ui_budget.py`), Zeile 19 (Live-`curl`) und Step 9 (gemeinsame Live-Abnahme
+beider Nutzer + Handover, P5-AE, braucht Fabian).
 
 **Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅
 abgeschlossen, 2026-07-30.** Mission erfüllt: der Pfad-Token ist verschwunden, ein eigener

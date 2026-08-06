@@ -265,7 +265,17 @@ bleibt historisch stehen, der Code + die lebende Doku ziehen nach, mit datierter
 
 **Offen für die nächste Session:**
 - **Push UND Deploy stehen beide aus** (siehe oben) — beides Sache des Nikingers.
-- **F1/F2 brauchen eine Nikinger-Entscheidung**, bevor daran weitergebaut wird.
+- **F1/F2 entschieden (Nikinger, 2026-08-06):** F1a/F1b (Subspaces/Shared Spaces) sowie eine
+  Archiv-Neugestaltung (Gruppierung nach Datum/Thema für einen „aufgeräumten" Eindruck, als
+  Antwort auf F2) sind beide **auf eine spätere Phase verschoben**. F2 selbst bleibt bei „kein
+  Löschen, nur Archivieren" — keine Ad-hoc-Umsetzung.
+- **Klarstellung des Nikingers zu Testpraxis/`/opt/sharefyx`:** Langzeittests laufen gegen den
+  echten `sharefyx-mcp`-Dienst (kein separates Staging — bewusst so entschieden, s.o.),
+  Nachtests direkt nach einer Entwicklungssession laufen in einer Wegwerfinstanz (wie in dieser
+  Session) — Tailscale lässt sich auf den Arbeitslaptops (den Hauptzugriffsgeräten für die UI)
+  nicht installieren. Laut Step-8-Cutover läuft der Dienst seit 2026-08-05 aus
+  `/opt/sharefyx/current`, nicht mehr aus dem Git-Arbeitsverzeichnis — nur als Referenz notiert,
+  falls das der nächsten Session widerspricht, ist das ein Befund, keine stille Übernahme.
 - Kein weiterer Plan-Step ist eigenständig ausführbar: Step 9 (P5-AE, gemeinsame Live-Abnahme)
   braucht Fabian und den Nikinger live — nichts, das diese Session vorwegnehmen konnte.
 - Fabians neun alte Token-Familien (voriger Session-Block) und O2 bleiben unverändert offen.
