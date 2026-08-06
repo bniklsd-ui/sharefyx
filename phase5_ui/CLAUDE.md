@@ -333,10 +333,41 @@ in `schema_meta` hinterlegt; dann könnte `authctl` autoritativ widersprechen. A
 Ausbau notiert, nicht gebaut — das berührt `authserver/store.py`s Startpfad und war für diesen
 Nachtrag zu viel.
 
-**Noch offen aus derselben Meldung:** ein „Zertifikatsfehler" bei Fabians Konto beim Anlegen von
-Items. Aus Logs nicht klärbar (ein TLS-Fehler erreicht den Server nie) und noch nicht eingeordnet
-— die Produktivinstanz zeigte im fraglichen Zeitraum 155 × `200` und erfolgreiche `201`/`202`.
-Nächstes Auftreten: exakter Wortlaut, URL in der Adresszeile, und ob Fabians Gerät im Tailnet ist.
+**Nachtrag 2026-08-06, zweiter Anlauf — „Proxy-Server verweigert die Verbindung" auf Staging:
+kein Fehler, sondern die Sicherheitseigenschaft bei der Arbeit.** Der Nikinger bekam die Meldung
+im Browser für `…ts.net:8766`. Serverseitig war alles gesund (Dienst `active`, `127.0.0.1:8766`
+→ 200, **und der Tailnet-Name `https://…:8766/health` von der VM aus ebenfalls → 200**,
+Serve-Konfiguration unverändert, `tailscaled` lauscht auf `100.118.131.68:8766`). Der Server
+nahm die Verbindung also an — der Browser kam nie an.
+
+`tailscale status` zeigt die Ursache in einer Zeile: **das Tailnet enthält genau ein Gerät**, die
+VM selbst. Keine Peers. Der Windows-Host des Nikingers ist **nicht** Mitglied.
+
+Der Grund, warum das nie auffiel:
+
+| | Weg | Tailnet-Mitgliedschaft nötig? |
+|---|---|---|
+| Produktiv (443) | `tailscale funnel` → öffentliches Internet | **nein** |
+| Staging (8766) | `tailscale serve` → nur Tailnet | **ja** |
+
+Die Produktiv-UI lief immer über den **öffentlichen Funnel**, nie über das Tailnet. Staging ist
+per P5-AB bewusst nicht öffentlich — also ist es aus einem Nicht-Tailnet-Browser korrekt
+unerreichbar. Firefox' Wortlaut („Proxy-Server verweigert…") ist dabei irreführend; es ist eine
+schlicht abgewiesene Verbindung, kein Proxy im Spiel (auf der VM sind weder Proxy-Umgebungs-
+variablen noch ein GNOME-Systemproxy gesetzt, und es existiert dort gar kein Firefox-Profil —
+der Browser läuft auf einem anderen Rechner).
+
+**Weg zum Zugang:** Tailscale auf dem Windows-Host installieren, mit demselben Konto anmelden.
+Bewusst **nicht** die Alternativen: ein SSH-Tunnel bräche die Basis-URL
+(`https://…:8766` gegen `http://localhost:8766` → exakt der Origin-Fehler aus P4/P5), und
+Staging über Funnel freizugeben verbietet P5-AB — eine Testinstanz gehört nicht ins öffentliche
+Internet.
+
+**Damit ist auch der „Zertifikatsfehler" bei Fabians Konto sehr wahrscheinlich erklärt** (Fabians
+Gerät ist ebenso wenig im Tailnet) — **aber nicht bewiesen**: der Wortlaut lautete „Zertifikat",
+nicht „Verbindung verweigert", und ein TLS-Fehler erreicht den Server nie, es steht also nichts
+im Journal. Bleibt als offener, kleiner Punkt stehen, bis er wieder auftritt: exakter Wortlaut
+und die URL aus der Adresszeile genügen zur Einordnung.
 
 **Manuell (Nikinger — alles, was Realität berührt):**
 1. **Einmalig:** `sudo mkdir -p /opt/sharefyx/releases && sudo chown -R savefyx:savefyx /opt/sharefyx`
