@@ -311,9 +311,18 @@ Writes existieren architektonisch nicht — kein Parameter, keine Codepfad-Varia
 exceptions*) und ist ein Phase-6-Kandidat, keine Ad-hoc-Umsetzung. 576/576 Tests, Tabu-Diff
 leer. **F1/F2 entschieden (Nikinger):** beide auf eine spätere Phase verschoben (Subspaces/
 Shared Spaces, Archiv-Neugestaltung als Antwort auf F2); F2 selbst bleibt „kein Löschen, nur
-Archivieren". Details: `phase5_ui/CLAUDE.md`, Session-Block 2026-08-06 (Step 8b).**]** **Nächster
-Schritt:** Zeile 15 (`ui_budget.py`), Zeile 19 (Live-`curl`) und Step 9 (gemeinsame Live-Abnahme
-beider Nutzer + Handover, P5-AE, braucht Fabian).
+Archivieren". Details: `phase5_ui/CLAUDE.md`, Session-Block 2026-08-06 (Step 8b).**]**
+**[2026-08-06, Korrektur (Verifikationssession):** die Behauptung „lokaler `main` liegt 34
+Commits vor `origin/main`, nie gepusht" (voriger Nachtrag) ist überholt — `git status -sb` zeigt
+`main...origin/main` ohne Differenz, der Push ist erfolgt. **Deploy steht weiterhin aus:**
+`/opt/sharefyx/current` läuft auf Release `20260805T183144.605094Z` / Commit `6bf22e5`, **12
+Commits hinter `main`** (`8b11862`) — fehlend sind genau der S10-Fix, Step 8b und die
+F1/F2-Entscheidung. Live read-only gegengeprüft (`systemctl cat sharefyx-mcp`, `readlink -f`,
+`git log` im Release-Verzeichnis), nicht nur die vorige Notiz übernommen. Details:
+`phase5_ui/CLAUDE.md`, Session-Block 2026-08-06 (Verifikationssession).**]** **Nächster
+Schritt:** Deploy (Nikinger), danach Zeile 15 final bestätigen (`ui_budget.py`), Zeile 19
+(Live-`curl`) und Step 9 (gemeinsame Live-Abnahme beider Nutzer + Handover, P5-AE, braucht
+Fabian).
 
 **Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅
 abgeschlossen, 2026-07-30.** Mission erfüllt: der Pfad-Token ist verschwunden, ein eigener
