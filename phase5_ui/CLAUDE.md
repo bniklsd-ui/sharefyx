@@ -117,7 +117,7 @@ nicht gebaut. Phase 5 bleibt 🟡, solange eine Zeile offen ist.**
 | 3 | TOTP-Seed einmal gezeigt, Authenticator-Code akzeptiert | ✅ | Nikinger live, 2026-08-04 (nach dem `Referrer-Policy`/Origin-Fund) |
 | 4 | Recovery-Code ersetzt den TOTP-Code, danach abgelehnt | ✅ | Nikinger live, 2026-08-05 |
 | 5 | Passwort im Browser geändert **ohne** `systemctl restart`, neuer Login sofort gültig | ✅ | Nikinger live, 2026-08-05 nach Step 7b — **schließt Betriebsnotiz O1 auch live** |
-| 6 | Nach dem Passwortwechsel: Connector fordert neue Autorisierung · andere UI-Sitzung beendet · aktuelle läuft weiter | 🟡 **teilweise** | Connector-Reconnect ✅ und aktuelle Sitzung lief weiter ✅ (Nikinger, 2026-08-05). **Offen: ein zweiter, gleichzeitig angemeldeter Browser wurde nicht geprüft** — dafür braucht es zwei getrennte Sitzungen (zweites Profil oder privates Fenster), ein zweiter Tab desselben Browsers teilt das Cookie und beweist nichts |
+| 6 | Nach dem Passwortwechsel: Connector fordert neue Autorisierung · andere UI-Sitzung beendet · aktuelle läuft weiter | ✅ | **Nikinger live, 2026-08-05** mit einem privaten Fenster als zweiter Sitzung (ein zweiter Tab teilt das Cookie und beweist nichts). Das private Fenster bekam die „Sitzung abgelaufen"-Karte. **Read-only in der DB gegengeprüft statt den Screenshot zu übernehmen:** 7 × `ui_sessions.revoked_reason='password_changed'`, 7 × `token_families.revoked_reason='password_changed'` (Connector muss neu autorisieren), und 6 × `rotated` — genau P5-Q, die eigene Sitzung wird **rotiert, nicht widerrufen** |
 | 7 | Fehlversuchsbremse greift für UI-Login und OAuth-Consent gemeinsam | ✅ | Nikinger live, 2026-08-05 |
 | 8 | `authctl.py list-users` zeigt keinen Hash und keinen Seed | ✅ | Nikinger live, 2026-08-05 |
 | 9 | `auth.sqlite3` mit `strings`: kein Base32-Seed im Klartext | ✅ | Nikinger live, 2026-08-05 |
@@ -133,7 +133,7 @@ nicht gebaut. Phase 5 bleibt 🟡, solange eine Zeile offen ist.**
 | 19 | Cookie an `/mcp` ignoriert; Bearer an `/api` ignoriert | 🟡 | Testseite ✅ (`test_isolation.py`, `test_overview.py`); der im Plan zusätzlich verlangte **Live-`curl`** steht aus |
 | 20 | Reboot: UI, Connector, Timer kommen ohne Handgriff zurück | ⬜ offen | passiv zulässig (wie P3 Zeile 6) |
 
-**Kurz:** 12 von 20 live bestanden, 3 teilweise (6, 15, 19), 5 offen. Die drei „teilweise" sind
+**Kurz:** 13 von 20 live bestanden, 2 teilweise (15, 19), 5 offen. Die drei „teilweise" sind
 allesamt Zeilen, bei denen die Code-Seite fertig ist und nur der Lauf des Nikingers fehlt — das
 ist Absicht und keine Nachlässigkeit: **✅ heißt live-verifiziert, nicht gebaut.**
 
