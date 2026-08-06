@@ -133,7 +133,7 @@ nicht gebaut. Phase 5 bleibt 🟡, solange eine Zeile offen ist.**
 | 19 | Cookie an `/mcp` ignoriert; Bearer an `/api` ignoriert | 🟡 | Testseite ✅ (`test_isolation.py`, `test_overview.py`); der im Plan zusätzlich verlangte **Live-`curl`** steht aus |
 | 20 | Reboot: UI, Connector, Timer kommen ohne Handgriff zurück | ⬜ offen | passiv zulässig (wie P3 Zeile 6) |
 
-**Kurz:** 13 von 20 live bestanden, 2 teilweise (15, 19), 5 offen. Die drei „teilweise" sind
+**Kurz:** 13 von 20 live bestanden, 2 teilweise (15, 19), 5 offen. Die zwei „teilweise" sind
 allesamt Zeilen, bei denen die Code-Seite fertig ist und nur der Lauf des Nikingers fehlt — das
 ist Absicht und keine Nachlässigkeit: **✅ heißt live-verifiziert, nicht gebaut.**
 
