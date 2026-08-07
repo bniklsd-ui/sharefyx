@@ -324,11 +324,13 @@ F1/F2-Entscheidung. Live read-only gegengeprüft (`systemctl cat sharefyx-mcp`, 
 grün, `sha` = `a835d1d`), read-only gegengeprüft (`readlink -f`, `git log` im Release-Verzeichnis
 — deckt sich mit `main`-HEAD). **Zeile 15** (`ui_budget.py`, mit `.venv/bin/python`, alle 5
 Größen im Korridor) und **Zeile 19** (Live-`curl`: `/api/v1/me` ohne Auth → `401`, `/mcp/` mit
-gefälschtem Session-Cookie → `401`) vom Nikinger live bestanden. **Abnahmestand jetzt 15/20, 0
-teilweise, 5 offen** (10, 13, 14, 17, 20 — Details `phase5_ui/CLAUDE.md` §„Abnahmestand").**]**
-**Nächster Schritt:** Zeilen 10/13/14 (Nikinger-Live-Nutzung der UI) und Zeile 20 (passiver
-Reboot-Nachweis) können einzeln nebenbei fallen; der einzige verbleibende Plan-Step ist Step 9
-(gemeinsame Live-Abnahme beider Nutzer + Handover, P5-AE, braucht Fabian).
+gefälschtem Session-Cookie → `401`) vom Nikinger live bestanden, ebenso Zeilen 10/13/14 direkt im
+Anschluss (Details `phase5_ui/CLAUDE.md`, Session-Block-Nachtrag). **Abnahmestand jetzt 18/20, 0
+teilweise, 2 offen** (17, 20). Phase-6-Vormerkung: Client-Surface-Logging (claude.ai/Desktop vs.
+Claude Code, im Log, nicht in der UI) — Nikinger-Entscheidung 2026-08-07, kein Blocker, zusammen
+mit F1/F2 zu planen.**]** **Nächster Schritt:** Zeile 20 (passiver Reboot-Nachweis) kann
+nebenbei fallen; der einzige verbleibende Plan-Step ist Step 9 (gemeinsame Live-Abnahme beider
+Nutzer + Handover, P5-AE, braucht Fabian).
 
 **Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅
 abgeschlossen, 2026-07-30.** Mission erfüllt: der Pfad-Token ist verschwunden, ein eigener

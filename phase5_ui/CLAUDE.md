@@ -122,11 +122,11 @@ nicht gebaut. Phase 5 bleibt 🟡, solange eine Zeile offen ist.**
 | 7 | Fehlversuchsbremse greift für UI-Login und OAuth-Consent gemeinsam | ✅ | Nikinger live, 2026-08-05 |
 | 8 | `authctl.py list-users` zeigt keinen Hash und keinen Seed | ✅ | Nikinger live, 2026-08-05 |
 | 9 | `auth.sqlite3` mit `strings`: kein Base32-Seed im Klartext | ✅ | Nikinger live, 2026-08-05 |
-| 10 | Anlegen/Bearbeiten/Anhängen/Archivieren über die UI; `.md` im `DATA_ROOT` korrekt **und** Git-Commit existiert | ⬜ offen | UI-Seite funktioniert live; der **Dateinachweis** (`git log` im Datenverzeichnis) steht aus |
+| 10 | Anlegen/Bearbeiten/Anhängen/Archivieren über die UI; `.md` im `DATA_ROOT` korrekt **und** Git-Commit existiert | ✅ | **Nikinger live, 2026-08-07** — vier UI-Aktionen auf `itm_b252a444`, `git log --oneline` im Datenverzeichnis zeigt vier eigene Commits (`create`/`update`/`append`/`archive`), Datei liegt danach korrekt unter `_archive/` |
 | 11 | Konflikt in zwei Tabs → Versionsband `--warn` + Dialog, kein stiller Überschreiber | ✅ | Nikinger live, 2026-08-05 nach Step 7b |
 | 12 | Fremder Space sichtbar/lesbar, **ohne** Schreib-Bedienelemente im DOM | ✅ | Nikinger live in DevTools, 2026-08-05 nach Step 7b (vorher nur `hidden` — siehe F7-Umfeld im Session-Block) |
-| 13 | Unbekanntes Frontmatter-Feld überlebt eine UI-Bearbeitung unverändert | ⬜ offen | `extra` wird durchgereicht (`serializers.py`), live noch nicht belegt |
-| 14 | `format: markdown` erscheint nach dem ersten UI-Schreibvorgang und stört keinen Tool-Aufruf | ⬜ offen | |
+| 13 | Unbekanntes Frontmatter-Feld überlebt eine UI-Bearbeitung unverändert | ✅ | **Nikinger live, 2026-08-07** — `custom_test: roundtrip-check` per Hand in `itm_749d6a12`s Frontmatter eingefügt, danach eine UI-Bearbeitung gespeichert; Feld überlebte unverändert. Nebenfund: `version` sprang 3→5 statt 3→4 — kein Bug, `store.py :: _reconcile_and_get_row()` erkannte die externe Änderung, schrieb einen eigenen `drift`-Commit (Version-Repair, Entscheidung D), erst danach kam der `update`-Commit der UI obendrauf; `git log` zeigt beide Commits einzeln |
+| 14 | `format: markdown` erscheint nach dem ersten UI-Schreibvorgang und stört keinen Tool-Aufruf | ✅ | Feld war nach der ersten UI-Bearbeitung von `itm_749d6a12` bereits gesetzt; **Claude Code live über den echten MCP-Connector** (`get_item`, Space `niklas`) gegengeprüft — sauberer Read, keine Fehlermeldung, `format: markdown` unverändert im Ergebnis |
 | 15 | `ui_budget.py` liefert alle vier Zahlen | ✅ | **Nikinger live, 2026-08-07** (`.venv/bin/python phase5_ui/scripts/ui_budget.py`, nachdem ein bloßes `python3` mit `ModuleNotFoundError: httpx` scheiterte — falscher Interpreter, kein Befund). Alle 5 Messgrößen im Zielkorridor, deckungsgleich mit dem Kandidatenbeleg vom 2026-08-05 |
 | 16 | `deploy.sh` rollt bei kaputtem Health-Endpunkt automatisch zurück | ✅ | **Nikinger live, 2026-08-05 20:40**, nach dem Cutover auf `/opt/sharefyx/current`. `SHAREFYX_PORT=9999` zeigte das Gate auf einen toten Port (der Dienst selbst blieb gesund — simuliert wird ein kaputter Health-Endpunkt, nicht ein kaputter Dienst). Read-only gegengeprüft, nicht nur die Meldung übernommen: `current` zeigt wieder aufs erste Release, das gescheiterte liegt als `…Z.failed` daneben, `ExecMainStartTimestamp` passt zum Rollback-Neustart, alle vier Proben und der öffentliche Funnel-Weg wieder korrekt. **Der `.failed`-Fund vom selben Tag in Aktion:** ohne die Markierung wäre genau dieses Verzeichnis beim nächsten Rollback das Ziel gewesen |
 | 17 | Beide Nutzer benutzen UI **und** Connector am selben Tag gegen dieselbe Instanz | ⬜ offen | Step 9 (P5-AE) |
@@ -135,10 +135,10 @@ nicht gebaut. Phase 5 bleibt 🟡, solange eine Zeile offen ist.**
 | 19 | Cookie an `/mcp` ignoriert; Bearer an `/api` ignoriert | ✅ | Testseite ✅ (`test_isolation.py`, `test_overview.py`) **plus Nikinger live, 2026-08-07**: `curl` gegen `PUBLIC_BASE_URL` (aus `phase3_edge/local.env`) — `GET /api/v1/me` ohne Cookie/Bearer → `401`; `GET /mcp/` mit gefälschtem `__Host-sfx_session`-Cookie (kein Bearer) → `401` |
 | 20 | Reboot: UI, Connector, Timer kommen ohne Handgriff zurück | ⬜ offen | passiv zulässig (wie P3 Zeile 6) |
 
-**Kurz:** 15 von 20 live bestanden, 0 teilweise, 5 offen (10, 13, 14, 17, 20). Zeilen 15 und 19
-haben am 2026-08-07 den Sprung von „Code fertig" auf „Nikinger live" gemacht — **✅ heißt
-live-verifiziert, nicht gebaut.** Von den verbleibenden fünf braucht 17 zusätzlich Fabian
-(Step 9), die anderen vier reine Nikinger-Live-Nutzung.
+**Kurz:** 18 von 20 live bestanden, 0 teilweise, 2 offen (17, 20). Zeilen 10/13/14/15/19 sind am
+2026-08-07 den Sprung von „Code fertig" auf „Nikinger live" gegangen — **✅ heißt
+live-verifiziert, nicht gebaut.** Von den zwei verbleibenden braucht 17 Fabian (Step 9), 20 ist
+passiv (nächster echter Reboot oder ein bewusst ausgelöster).
 
 **Cutover auf Release-Verzeichnisse vollzogen (2026-08-05 20:37, Nikinger):** der Dienst läuft
 seither aus `/opt/sharefyx/current` statt aus dem Git-Arbeitsverzeichnis. „Datei ändern +
@@ -197,8 +197,37 @@ gegen `PUBLIC_BASE_URL` (`phase3_edge/local.env`) — `/api/v1/me` ohne Auth →
 gefälschtem Session-Cookie statt Bearer → `401`. **Abnahmestand jetzt 15/20, 0 teilweise.**
 Beide Zeilen in der Tabelle oben nachgezogen.
 
+**Nachtrag, 2026-08-07, zweiter — Zeilen 10/13/14 vom Nikinger live erledigt:**
+Zeile 10: vier UI-Aktionen (Anlegen/Bearbeiten/Anhängen/Archivieren) auf `itm_b252a444`,
+`git log` im `DATA_ROOT` zeigt vier eigene Commits, je einen pro Aktion (Hard Rule 5 hält unter
+echter Nutzung). Zeile 13: unbekanntes Frontmatter-Feld (`custom_test: roundtrip-check`) von
+Hand eingefügt, überlebte danach unverändert eine echte UI-Bearbeitung — Nebenfund dabei: die
+Version sprang zwei statt eins, weil `store.py`s Drift-Erkennung (Entscheidung D) die externe
+Änderung zuerst mit einem eigenen `drift`-Commit reparierte, bevor der `update`-Commit der UI
+folgte — kein Bug, dokumentiertes Verhalten, per `git log` einzeln nachvollzogen. Zeile 14: `Claude
+Code` selbst rief `get_item` über den echten, produktiven MCP-Connector (Space `niklas`) auf das
+Testitem auf — sauberer Read trotz `format: markdown`-Feld. **Abnahmestand jetzt 18/20, nur noch
+17 (Step 9) und 20 (Reboot) offen.**
+
+**Nebenfund dieser Session — nicht sicherheitsrelevant, aber ungeklärt bis eben:** der
+`get_item`-Aufruf oben lief über einen `claude_ai_`-präfigierten Connector-Tool-Namen, der laut
+Claude Code auf einen in eurem Anthropic-Account konfigurierten Custom Connector zeigt (dieselbe
+Autorisierung wie ein claude.ai-Web-/Desktop-Zugriff — der OAuth-Bearer unterscheidet laut Design
+nicht *welche* Claude-Oberfläche ihn benutzt, nur *welcher Space*). Bisher nie bewusst
+entschieden, nur nie aufgefallen. Nikinger-Entscheidung 2026-08-07: **kein Ausschluss** — sobald
+Unterordner/teambezogene Notizen existieren (siehe Befund F1, vorige Session), gibt es keinen
+Nachteil darin, dass auch Claude Code darauf schreiben kann. **Für später vorgemerkt, kein
+Blocker, kein Scope für diese Phase:** ein Log-Feld, das festhält, *welche* Client-Oberfläche
+(claude.ai/Desktop vs. Claude Code) einen Request gestellt hat — muss nicht in die UI, reicht im
+Log. Naheliegender Ort bei Umsetzung: derselbe Request-Log-Pfad, der schon Bearer-Requests
+protokolliert (`phase2_mcp/mcpserver`, `test_request_log.py`) — vermutlich über den
+`User-Agent`-Header, falls MCP-Clients den zuverlässig genug setzen; das ist bei Umsetzung zu
+verifizieren, nicht heute. Phase-6-Kandidat, gemeinsam mit F1/F2 zu betrachten.
+
 **Offen für die nächste Session:**
-- Fünf Zeilen offen: 10, 13, 14 (Nikinger-Live-Nutzung der UI), 17 (Step 9, braucht Fabian +
-  Nikinger gemeinsam), 20 (passiver Reboot-Nachweis wie P3 Zeile 6).
+- Zwei Zeilen offen: 17 (Step 9, braucht Fabian + Nikinger gemeinsam), 20 (passiver
+  Reboot-Nachweis wie P3 Zeile 6 — kann jederzeit nebenbei fallen, erzwungen oder natürlich).
 - Step 9 (P5-AE) ist der einzige verbleibende Plan-Step — braucht Fabian + Nikinger live,
   nichts, das eine Session ohne beide vorwegnehmen kann.
+- Phase-6-Vormerkung (siehe Nebenfund oben): Client-Surface-Logging, zusammen mit F1/F2 zu
+  planen, nicht isoliert.
