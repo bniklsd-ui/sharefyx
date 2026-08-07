@@ -319,10 +319,16 @@ Commits vor `origin/main`, nie gepusht" (voriger Nachtrag) ist überholt — `gi
 Commits hinter `main`** (`8b11862`) — fehlend sind genau der S10-Fix, Step 8b und die
 F1/F2-Entscheidung. Live read-only gegengeprüft (`systemctl cat sharefyx-mcp`, `readlink -f`,
 `git log` im Release-Verzeichnis), nicht nur die vorige Notiz übernommen. Details:
-`phase5_ui/CLAUDE.md`, Session-Block 2026-08-06 (Verifikationssession).**]** **Nächster
-Schritt:** Deploy (Nikinger), danach Zeile 15 final bestätigen (`ui_budget.py`), Zeile 19
-(Live-`curl`) und Step 9 (gemeinsame Live-Abnahme beider Nutzer + Handover, P5-AE, braucht
-Fabian).
+`phase5_ui/CLAUDE.md`, Session-Block 2026-08-06 (Verifikationssession).**]**
+**[2026-08-07, Nachtrag:** Deploy vom Nikinger live ausgeführt (`deploy.sh main`, Health-Gate
+grün, `sha` = `a835d1d`), read-only gegengeprüft (`readlink -f`, `git log` im Release-Verzeichnis
+— deckt sich mit `main`-HEAD). **Zeile 15** (`ui_budget.py`, mit `.venv/bin/python`, alle 5
+Größen im Korridor) und **Zeile 19** (Live-`curl`: `/api/v1/me` ohne Auth → `401`, `/mcp/` mit
+gefälschtem Session-Cookie → `401`) vom Nikinger live bestanden. **Abnahmestand jetzt 15/20, 0
+teilweise, 5 offen** (10, 13, 14, 17, 20 — Details `phase5_ui/CLAUDE.md` §„Abnahmestand").**]**
+**Nächster Schritt:** Zeilen 10/13/14 (Nikinger-Live-Nutzung der UI) und Zeile 20 (passiver
+Reboot-Nachweis) können einzeln nebenbei fallen; der einzige verbleibende Plan-Step ist Step 9
+(gemeinsame Live-Abnahme beider Nutzer + Handover, P5-AE, braucht Fabian).
 
 **Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅
 abgeschlossen, 2026-07-30.** Mission erfüllt: der Pfad-Token ist verschwunden, ein eigener
