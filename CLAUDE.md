@@ -139,8 +139,11 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 `/opt/sharefyx/current` seit 2026-08-05, `deploy.sh`-Zyklus läuft). Zwei Blöcke (A = Sicherheit +
 Auth-Selbstverwaltung, B = REST-API + UI) mit hartem Gate dazwischen, beide durchlaufen.
 
-**Abnahmestand (Plan §6), Stand 2026-08-07: 18/20 bestanden, 0 teilweise, 2 offen** — Zeile 17
-(Step 9, gemeinsame Live-Abnahme, braucht Fabian) und Zeile 20 (passiver Reboot-Nachweis). Die
+**Abnahmestand (Plan §6), Stand 2026-08-09: 19/20 bestanden, 0 teilweise, 1 offen** — nur noch
+Zeile 20 (passiver Reboot-Nachweis). Zeile 17 (Step 9, gemeinsame Live-Abnahme) ist seit
+2026-08-07 bestanden — Step 9 damit inhaltlich erledigt, offen bleiben die reinen
+Step-9-Abschlussarbeiten (Migrations-Runbook, Abnahmeprotokoll, Closeout-Handover), Details im
+Phase-Head-Session-Block. Die
 vollständige Matrix, der Modul-Status je Step und die gesamte Live-Debugging-Historie (u. a. der
 Origin/CSRF-Fund am Block-A-Gate, die Step-7b-Revision von Plan §4.1/§4.3, Sicherheitsbefund S9)
 stehen in `phase5_ui/CLAUDE.md` — read + newest Session-stopped-Block first, das ist die

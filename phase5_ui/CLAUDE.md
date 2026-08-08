@@ -129,15 +129,17 @@ nicht gebaut. Phase 5 bleibt 🟡, solange eine Zeile offen ist.**
 | 14 | `format: markdown` erscheint nach dem ersten UI-Schreibvorgang und stört keinen Tool-Aufruf | ✅ | Feld war nach der ersten UI-Bearbeitung von `itm_749d6a12` bereits gesetzt; **Claude Code live über den echten MCP-Connector** (`get_item`, Space `niklas`) gegengeprüft — sauberer Read, keine Fehlermeldung, `format: markdown` unverändert im Ergebnis |
 | 15 | `ui_budget.py` liefert alle vier Zahlen | ✅ | **Nikinger live, 2026-08-07** (`.venv/bin/python phase5_ui/scripts/ui_budget.py`, nachdem ein bloßes `python3` mit `ModuleNotFoundError: httpx` scheiterte — falscher Interpreter, kein Befund). Alle 5 Messgrößen im Zielkorridor, deckungsgleich mit dem Kandidatenbeleg vom 2026-08-05 |
 | 16 | `deploy.sh` rollt bei kaputtem Health-Endpunkt automatisch zurück | ✅ | **Nikinger live, 2026-08-05 20:40**, nach dem Cutover auf `/opt/sharefyx/current`. `SHAREFYX_PORT=9999` zeigte das Gate auf einen toten Port (der Dienst selbst blieb gesund — simuliert wird ein kaputter Health-Endpunkt, nicht ein kaputter Dienst). Read-only gegengeprüft, nicht nur die Meldung übernommen: `current` zeigt wieder aufs erste Release, das gescheiterte liegt als `…Z.failed` daneben, `ExecMainStartTimestamp` passt zum Rollback-Neustart, alle vier Proben und der öffentliche Funnel-Weg wieder korrekt. **Der `.failed`-Fund vom selben Tag in Aktion:** ohne die Markierung wäre genau dieses Verzeichnis beim nächsten Rollback das Ziel gewesen |
-| 17 | Beide Nutzer benutzen UI **und** Connector am selben Tag gegen dieselbe Instanz | ⬜ offen | Step 9 (P5-AE) |
+| 17 | Beide Nutzer benutzen UI **und** Connector am selben Tag gegen dieselbe Instanz | ✅ | **Nikinger + Fabian, 2026-08-07.** Read-only in `auth.sqlite3` gegengeprüft statt die Meldung zu übernehmen: `ui_sessions` zeigt aktive Sitzungen für **beide** Spaces `niklas` und `fabian` an diesem Tag (05:14–12:32 UTC) — Fabians UI-Login stammt aus seiner Einladung/Reset (Step 9); `journalctl` bestätigt echten `/mcp`-Traffic am selben Tag. **Eine Präzisierung dieser Session:** Fabians aktuell aktive Connector-Autorisierung (`token_families`) wurde bereits 2026-08-06 08:23 ausgestellt — **vor** dem S10-Fix (Commit 10:33, deployt 2026-08-07 05:23/restart 07:25). Sie ist also die Fortsetzung der alten Sitzung, kein frischer Re-Auth unter dem gefixten Code, und beweist damit nur die Connector-**Nutzung** an sich (Zeile 17s Kriterium), nicht S10s Revoke-Verhalten unter Live-Bedingungen — dafür siehe Nebenfund unten |
 | — | *(Staging war kein eigenes Akzeptanzkriterium — P5-AB nennt es im Scope, §6 prüft es nicht. Am 2026-08-06 abgeschaltet, Begründung im Session-Block.)* | | |
 | 18 | `git diff` auf `storage/`, `mcpserver/{tools,permissions,server}.py`: leer | ✅ | bei jedem Step-Commit geprüft, zuletzt Step 7b |
 | 19 | Cookie an `/mcp` ignoriert; Bearer an `/api` ignoriert | ✅ | Testseite ✅ (`test_isolation.py`, `test_overview.py`) **plus Nikinger live, 2026-08-07**: `curl` gegen `PUBLIC_BASE_URL` (aus `phase3_edge/local.env`) — `GET /api/v1/me` ohne Cookie/Bearer → `401`; `GET /mcp/` mit gefälschtem `__Host-sfx_session`-Cookie (kein Bearer) → `401` |
 | 20 | Reboot: UI, Connector, Timer kommen ohne Handgriff zurück | ⬜ offen | passiv zulässig (wie P3 Zeile 6) |
 
-**Kurz:** 18 von 20 live bestanden, 0 teilweise, 2 offen (17, 20). Zeilen 10/13/14/15/19 sind am
-2026-08-07 den Sprung von „Code fertig" auf „Nikinger live" gegangen — **✅ heißt
-live-verifiziert, nicht gebaut.** Von den zwei verbleibenden braucht 17 Fabian (Step 9), 20 ist
+**Kurz:** 19 von 20 live bestanden, 0 teilweise, 1 offen (20). Zeilen 10/13/14/15/17/19 sind am
+2026-08-07 den Sprung von „Code fertig" auf „live" gegangen — **✅ heißt live-verifiziert, nicht
+gebaut.** Zeile 17 war die letzte, die Fabian brauchte (Step 9) — Step 9 damit inhaltlich
+erledigt bis auf die Abschlussarbeiten (Migrations-Runbook-Abschluss, `P5_ABNAHME_<datum>.md`,
+Phasenübersicht, Closeout-Handover, Rotationsprüfung). Die einzige verbleibende Zeile 20 ist
 passiv (nächster echter Reboot oder ein bewusst ausgelöster).
 
 **Cutover auf Release-Verzeichnisse vollzogen (2026-08-05 20:37, Nikinger):** der Dienst läuft
@@ -237,10 +239,53 @@ genau einmal im Body vorkommt — Kollisionen würden so sichtbar scheitern stat
 18 leer bleiben) — keine Ad-hoc-Umsetzung. Zusammen mit F1/F2 als Phase-6-Vormerkung im Root-
 `CLAUDE.md` „Current state" eingetragen; hier der volle Wortlaut, dort nur der Verweis.
 
+**Nachtrag, 2026-08-09 — Zeile 17 (Step 9, P5-AE) live bestanden, gegen die Datenbank
+gegengeprüft statt die Meldung zu übernehmen:** Fabian ist am 2026-08-07 über eine frische
+Einladung neu eingestiegen (sein alter Account wurde dabei zurückgesetzt) und hat danach sowohl
+die UI als auch den Connector aktiv genutzt, parallel zu Nikinger, gegen dieselbe Instanz.
+Read-only gegen `/var/lib/sharefyx/auth.sqlite3` verifiziert: `ui_sessions` zeigt für **beide**
+Spaces (`niklas`, `fabian`) aktive Sitzungen am 2026-08-07 (05:14–12:32 UTC); `journalctl -u
+sharefyx-mcp` bestätigt echten `/mcp`-Traffic am selben Tag (176 Treffer). Zeile 17 selbst
+verlangt nur „beide nutzen UI und Connector am selben Tag" — das steht.
+
+**Nebenfund dabei, wichtiger als Zeile 17 selbst — S10 unter Live-Bedingungen noch nicht
+bewiesen:** Fabians aktuell aktive `token_families`-Zeile wurde bereits 2026-08-06 08:23
+ausgestellt, **vor** dem S10-Fix (Commit `e760f0e`, 10:33 desselben Tages; deployt erst
+2026-08-07 05:23, Restart 07:25). Sein Connector-Zugriff am 08-07 lief also über die
+Alt-Autorisierung weiter, nicht über einen frischen Re-Auth unter dem gefixten Code — die
+„frische Einladung" hat offenbar nur die UI-Anmeldedaten erneuert, nicht zwingend eine neue
+Connector-Autorisierung erzwungen. Fünf von Fabians Token-Familien vom 30.07. stehen zudem
+bis heute unwiderrufen in der DB (`revoked_at` leer) — das sind Altlasten aus **vor** dem Fix
+(dieselben neun, die S10 überhaupt erst auffindbar gemacht haben) und decken sich mit dem
+bereits offenen **Befund O2** („`clients`/`token_families` werden nie abgeräumt"), sind also
+keine neue Regression. Bewusst **kein** erzwungener Fabian-Reset zur Live-Probe: `_invite_post()`
+tauscht Passwort-Hash **und** TOTP-Seed und widerruft (seit S10) alle Familien/Sitzungen des
+Space — Fabian müsste komplett neu enrollen und den Connector neu autorisieren, nur um S10 ein
+zweites Mal zu beweisen. Stattdessen `test_invite_reset_revokes_old_token_families_and_sessions`
+(hinzugefügt mit dem S10-Fix) gezielt erneut laufen lassen: **grün**, und der Commit, der den
+Test einführt (`e760f0e`), ist Vorfahr des deployten Release-Commits — der Fix ist damit sowohl
+im Code bewiesen als auch tatsächlich im Live-System aktiv, nur eben noch nicht durch einen
+echten Reset **nach** dem Deploy ausgelöst worden. S10 bleibt ✅, dieser Nebenfund ist eine
+Präzisierung, keine Wiedereröffnung.
+
+**Damit war Step 9 der einzige verbleibende Plan-Step inhaltlich erledigt — offen
+bleiben nur noch die Step-9-Abschlussarbeiten** (Migrations-Runbook-Schritt 4: Credential/Keyring
+für die alte `auth-users`-Quelle entfernen; `docs/concepts/P5_ABNAHME_<datum>.md`;
+`phase5_ui_uebersicht.svg`; `PHASE5_CLOSEOUT_HANDOVER.md`; Rotationsprüfung auf diesem Head;
+Root-`CLAUDE.md`/`ROADMAP.md` auf ✅) **und Zeile 20** (passiver Reboot-Nachweis). **Ein
+Plan-Widerspruch bleibt als offener Befund stehen, nicht durch diese Session aufgelöst:** Step 9
+Punkt 3 verlangt eine „frische Einladung" für Fabian, §2.6 (Migrationsrunbook) beschreibt
+stattdessen eine reine Credential-Migration ohne neue Einladung — gelebt wurde hier der
+Step-9-Weg. Kein Code geändert, reine Doku-Nachführung nach Live-Bestätigung durch den Nikinger.
+
 **Offen für die nächste Session:**
-- Zwei Zeilen offen: 17 (Step 9, braucht Fabian + Nikinger gemeinsam), 20 (passiver
-  Reboot-Nachweis wie P3 Zeile 6 — kann jederzeit nebenbei fallen, erzwungen oder natürlich).
-- Step 9 (P5-AE) ist der einzige verbleibende Plan-Step — braucht Fabian + Nikinger live,
-  nichts, das eine Session ohne beide vorwegnehmen kann.
+- Eine Zeile offen: 20 (passiver Reboot-Nachweis wie P3 Zeile 6 — kann jederzeit nebenbei
+  fallen, erzwungen oder natürlich).
+- Step-9-Abschlussarbeiten (kein Fabian mehr nötig, reine Doku/Runbook-Arbeit): altes
+  `auth-users`-Credential/Keyring entfernen (Runbook-Schritt 4), `P5_ABNAHME_<datum>.md`,
+  `phase5_ui_uebersicht.svg`, `PHASE5_CLOSEOUT_HANDOVER.md`, Rotationsprüfung auf diesem Head,
+  Root-`CLAUDE.md`/`ROADMAP.md` auf ✅ — erst wenn auch Zeile 20 steht.
+- Offener Befund, nicht aufgelöst: Step 9 Punkt 3 („frische Einladung") widerspricht §2.6
+  (Migrationsrunbook, keine neue Einladung) — für den nächsten Plan-Review vormerken.
 - Phase-6-Vormerkungen (siehe oben, alle zusammen zu planen, nicht isoliert): F1/F2
   (Subspaces/Löschen), Client-Surface-Logging, `patch_item` (Werkzeug-Feedback 2026-08-08).
