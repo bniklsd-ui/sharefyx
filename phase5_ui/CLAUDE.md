@@ -224,10 +224,23 @@ protokolliert (`phase2_mcp/mcpserver`, `test_request_log.py`) — vermutlich üb
 `User-Agent`-Header, falls MCP-Clients den zuverlässig genug setzen; das ist bei Umsetzung zu
 verifizieren, nicht heute. Phase-6-Kandidat, gemeinsam mit F1/F2 zu betrachten.
 
+**Nachtrag, 2026-08-08 — Werkzeug-Feedback einer arbeitenden Claude-Instanz (`update_item`
+ersetzt immer den ganzen Body):** über den Nikinger weitergegeben, keine eigene Beobachtung
+dieser Session. Wortlaut der Rückmeldung: eine Drei-Zeilen-Korrektur an einem 45-KB-Dokument
+zwingt zum vollständigen Neusenden, weil `update_item` kein Zeilen-/Bereichs-Patchen kennt —
+teuer und riskant, weil ein Komplett-Rewrite bei einem Dokument, das jetzt Quelle der Wahrheit
+ist, mehr verlieren kann, als sofort auffällt. Konkreter Gegenvorschlag aus der Rückmeldung:
+`patch_item(item_id, version, old_text, new_text)`, das hart fehlschlägt, wenn `old_text` nicht
+genau einmal im Body vorkommt — Kollisionen würden so sichtbar scheitern statt still zu
+überschreiben, dieselbe Philosophie wie die `version`-Pflicht in Hard Rule 3. Berührt
+`mcpserver/tools.py` (P5-B tabu für diese Phase, `git diff` darauf muss laut Akzeptanzkriterium
+18 leer bleiben) — keine Ad-hoc-Umsetzung. Zusammen mit F1/F2 als Phase-6-Vormerkung im Root-
+`CLAUDE.md` „Current state" eingetragen; hier der volle Wortlaut, dort nur der Verweis.
+
 **Offen für die nächste Session:**
 - Zwei Zeilen offen: 17 (Step 9, braucht Fabian + Nikinger gemeinsam), 20 (passiver
   Reboot-Nachweis wie P3 Zeile 6 — kann jederzeit nebenbei fallen, erzwungen oder natürlich).
 - Step 9 (P5-AE) ist der einzige verbleibende Plan-Step — braucht Fabian + Nikinger live,
   nichts, das eine Session ohne beide vorwegnehmen kann.
-- Phase-6-Vormerkung (siehe Nebenfund oben): Client-Surface-Logging, zusammen mit F1/F2 zu
-  planen, nicht isoliert.
+- Phase-6-Vormerkungen (siehe oben, alle zusammen zu planen, nicht isoliert): F1/F2
+  (Subspaces/Löschen), Client-Surface-Logging, `patch_item` (Werkzeug-Feedback 2026-08-08).

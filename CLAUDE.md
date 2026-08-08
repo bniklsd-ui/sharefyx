@@ -8,7 +8,7 @@ down:
   - ROADMAP.md                          # Phasenplan + Status je Phase
   - docs/INDEX.md                       # L0-Karte aller .md
   - phase5_ui/CLAUDE.md                 # aktive Phase
-updated: 2026-08-06
+updated: 2026-08-08 (Kompression: P4/P5-Nachtragketten auf Zusammenfassung + Zeiger in die Phase-Heads reduziert, 40.7KB → 17KB, nichts verloren — Detail steht dort schon vollständig)
 ---
 # CLAUDE.md — Project Instructions
 
@@ -135,314 +135,61 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 ## Current state
 
 **Aktive Phase:** Phase 5 — Web-UI, REST-API und Auth-Selbstverwaltung (`phase5_ui/`, Paket
-`webui`) — **🔄 gestartet, 2026-08-02.** Browser-Planungssession abgeschlossen, ausführungsreifer
-Plan liegt vor (`docs/concepts/phase5_ui_plan.md`, Entscheidungen P5-A–P5-AE, Steps 0–9, zwei
-Blöcke: A = Sicherheit + Auth-Selbstverwaltung, B = REST-API + UI, harter Gate dazwischen).
-Herkunft/offene Entscheidungen: `docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md`. Phase-Head:
-`phase5_ui/CLAUDE.md`. **[2026-08-02 Korrektur, P5 Step 1:** diese Zeile stand hier auf „Step 0
-— läuft", obwohl Step 0 bereits im vorigen Commit abgeschlossen wurde und Step 1
-(Sicherheitsbefunde S2–S8) im selben Zug durchlief — dieselbe Drift-Kategorie, die diese Zeile
-schon dreimal in P4 betraf (siehe die drei Korrekturen weiter unten), diesmal aber im selben
-Commit korrigiert statt erst später gefunden.**]** **[2026-08-02 zweite Korrektur, P5 Step 2:**
-dieselbe Drift-Kategorie ein weiteres Mal — diese Zeile stand hier noch auf „Nächster Schritt:
-Step 2", obwohl Step 2 (Schema 2, `secretbox.py`, `userdir.py`, Migrationsskript) im selben
-Commit-Vorlauf durchlief; Advisor-Review vor dem Commit fand die Lücke, diesmal noch vor dem
-Commit statt erst danach geschlossen.**]** **[2026-08-03:** Step 3 (Sessions, CSRF,
-Login/Logout, neues Paket `phase5_ui/webui/{config,security,sessions,pages,routes_auth,
-errors}.py`) im selben Commit wie diese Zeile abgeschlossen — 436/436 Tests, `/ui/login`/
-`/ui/logout` gegen eine echte In-Process-App durchgespielt.**]** **[2026-08-03, zweiter
-Nachtrag:** Step 4 (Selbstverwaltung — Einladung, Passwort, TOTP, Recovery, Connectoren:
-`webui/{account,reauth,passwords_policy}.py`, `authctl.py`-Erweiterungen) abgeschlossen —
-467/467 Tests. Advisor-Review vor der Dokumentation fand einen neuen Sicherheitsbefund (**S9**,
-`phase4_auth/CLAUDE.md`): `authctl.py disable-user` widerrief Sitzungen/Token-Familien, aber
-kein Login-Pfad prüfte je `users.status` — ein deaktivierter Space konnte sich sofort neu
-einloggen bzw. neu autorisieren. In beiden Pfaden (`webui/routes_auth.py`,
-`authserver/flows.py :: submit_consent`) geschlossen, plus zwei kleinere Funde (verworfener
-CSRF-Token nach Passwortwechsel, offene Einladung überlebte `disable-user`), alle vor dem
-Commit behoben. Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-03.**]** **[2026-08-03,
-dritter Nachtrag:** der Nikinger stieß beim Gate live auf `/ui/invite/…` → `404` — `webui`s
-Auth-Routen waren nie in den echten Prozess gemountet, das ist laut Plan offiziell **Step
-5**-Scope, aber Step 5 liegt hinter demselben Gate, der genau diese Routen live braucht (Zirkel
-im Plan-Text). Dabei außerdem gefunden: Plan §1.2 verbietet `mcpserver→webui`-Importe, §1.5s
-eigene Route-Landkarte verlangt genau das — ein Widerspruch innerhalb desselben 📕-Plandokuments,
-kein Interpretationsspielraum. Beides dem Nikinger vorgelegt statt still aufgelöst; Entscheidung:
-minimale Verdrahtung vorziehen (`mcpserver/app.py :: create_app()` mountet `ui_auth_routes()`+
-`account_routes()`, kein neuer Parameter, keine neue `webui/api.py`), §1.2 im Phase-Head
-korrigiert (Plan selbst bleibt 📕 unverändert). Kein Zirkelimport: `mcpserver.permissions`
-(das einzige Symbol, das `webui` je aus `mcpserver` ziehen darf) importiert nichts zurück,
-testgehalten. 470/470 Tests, Tabu-Pfade weiterhin leer. **Ändert nur den Code** — der laufende
-Dienst führt noch den alten Build, `sudo phase3_edge/scripts/install_units.sh && sudo systemctl
-restart sharefyx-mcp` ist Schritt null vor dem Gate, sonst liefert der Invite-Link wieder `404`.
-Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-03.**]** **[2026-08-03, vierter Nachtrag:**
-beim Gate selbst dann `403 Herkunft (Origin) stimmt nicht` beim TOTP-Enrollment
-(`/ui/enroll/confirm`) — die Sackgasse dahinter (`CsrfError` landete auf `render_error_page()`,
-kein Formular, kein Zurück, die Einladung war schon verbraucht) ist behoben (derselbe
-Retry-Codepfad wie „falscher TOTP-Code", geteilt über `_enrollment_retry()`). **Die eigentliche
-Ursache der Origin-Abweichung ist NICHT gefunden** — `SPACE_PUBLIC_BASE_URL` in der laufenden
-Unit stimmt, das beweist aber nichts über das, was der Browser tatsächlich als `Origin` sendet.
-Nikinger-Aktion vor dem nächsten Versuch: DevTools-Beleg des tatsächlichen `Origin`-Headers
-(gleiches Muster wie der P4-`form-action`-Fund). Nebenbei: `errors.py :: CsrfError`s Docstring
-behauptete fälschlich „nie eine unterscheidbare Detailmeldung" — korrigiert, Verhalten
-unverändert, unabhängiger Vorbestandsfund. 471/471 Tests. Details:
-`phase5_ui/CLAUDE.md` Session-Block 2026-08-03.**]** **[2026-08-04 Nachtrag:** vom Nikinger als
-„TOTP-Seed kaputt" gemeldet — **kein neuer Fund**, derselbe Origin-Fehlschlag: `journalctl`
-zeigt ausnahmslos `403` auf jeden `/ui/enroll/confirm`-Versuch, nie `422` („Code ungültig"), der
-Request erreicht die TOTP-Prüfung also nie. Config-Parität (Unit-Env, `local.env`, `tailscale
-funnel status`) stimmt exakt überein — die Abweichung liegt im tatsächlich gesendeten
-`Origin`-Header, der bisher nirgends geloggt wurde. Behoben: `require_csrf()` loggt den
-abgelehnten Origin jetzt serverseitig (stderr, nie in die Client-Antwort). **[2026-08-04, zweiter
-Nachtrag:** Root Cause gefunden — der Nikinger testete direkt nach dem Restart, geloggter Wert:
-`erhalten 'null', erwartet 'https://savefyx-vmware-virtual-platform.tail89fc2a.ts.net'`.
-`Origin: null` ist **keine** zweite legitime Origin (klassischer sandboxed-Iframe-/CSRF-Bypass-
-Wert) — `require_csrf()` bleibt bewusst unverändert, das Ablehnen ist korrekt.**]** **[2026-08-04,
-dritter Nachtrag — beide Client-Hypothesen widerlegt, echte Ursache war der eigene Code:** weder
-„eingebetteter Vorschau-Panel" noch „Browser-Extension" (beide oben vermutet) hielten dem
-Nikinger-Test stand — sauberes Chrome-Inkognito-Fenster ohne Extensions, identischer
-Fehlschlag. Tatsächliche Ursache: `webui/security.py`s `Referrer-Policy: no-referrer` — die
-Fetch-Spec bestimmt den `Origin`-Header eines reinen HTML-`<form>`-POSTs (kein JavaScript) nach
-der Referrer-Policy des Dokuments, `no-referrer` liefert dabei **immer** `null`, auch bei einer
-echten Same-Origin-Anfrage. Fix: `Referrer-Policy` auf `strict-origin` geändert (nullt nur bei
-TLS-Downgrade, der hier nicht vorkommen kann; sendet nie den Pfad — bewusst nicht `same-origin`,
-das würde `/ui/invite/<token>`s Einmal-Secret im Pfad als `Referer` preisgeben).
-`authserver/routes.py`s identischer `no-referrer`-Wert für die OAuth-Seiten bewusst nicht
-mitgeändert (eigener, unbehobener Befund, andere Flows).**]** **[2026-08-04, vierter Nachtrag —
-live bestätigt, read-only gegengeprüft (nicht nur Nikinger-Zusammenfassung übernommen):**
-`systemctl show sharefyx-mcp -p ExecMainStartTimestamp` → Restart 18:34:38;
-`journalctl` → `POST /ui/enroll/confirm` um 18:36:40 → **`200`**, keine neue
-`CSRF-Origin-Fehlschlag`-Zeile danach. **Origin-Fund vollständig geschlossen — Zeile 3 (§6) live
-bestanden.**]** **[2026-08-05:** Zeilen 1, 2, 4, 7, 8, 9 live bestanden (Zeile 7: eine Sperre über
-`/ui/login` griff auch für den OAuth-Consent-Login desselben Space, dieselbe `LoginThrottle`).
-Zeilen 5/6 (Passwortwechsel/Session-Widerruf) auf **nach** Step 5/6 verschoben
-(Nikinger-Entscheidung) — Step 4 baute dafür nur die JSON-API, keine Klick-Oberfläche; ein
-DevTools-`fetch()`-Behelf wurde angeboten und vom Nikinger explizit als „Workaround, kein echter
-Test" abgelehnt. **Block A (§6) damit vollständig bis auf die bewusst verschobenen Zeilen 5/6.**
-Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-03, Zehnter Nachtrag 2026-08-05.**]**
-**[2026-08-05, Step 5 abgeschlossen:** `webui/{api,serializers}.py` gebaut (`/api/v1/{me,spaces,
-items,items/{id},items/{id}/append,items/{id}/archive}`, Plan §3.1–§3.3), in `create_app()`
-gemountet — der `store`-Parameter existierte bereits (bediente bisher nur `build_mcp()`), kein
-neuer Parameter nötig. Eigener Fund: `storage.store.Store.archive()` schützt anders als
-`update()`/`append()` nicht vor doppeltem Archivieren — in `api.py` behoben (nicht in `storage/`,
-dort tabu). `scripts/ui_smoke.py` (neu) läuft In-Process durch den vollen Web-Flow, 12/12 grün.
-504/504 Tests. Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-05.**]**
-**[2026-08-05, Step 6 + Step 7 abgeschlossen:** UI-Gerüst (`webui/static/{app.html,app.css,app.js}`,
-`webui/static_routes.py`, echtes Inter-Subset — V27 geschlossen) und Editor/Vorschau/Konflikt/
-Frontmatter-Felder (`GET /api/v1/meta`, Markdown-Parser+Sanitizer aus
-`docs/concepts/notiz_heft_example.html` geerntet und erweitert) — 516/516 Tests.**]**
-**[2026-08-05, Step 7b — UI-Überarbeitung nach Live-Feedback des Nikingers:** der Nikinger hat die
-Oberfläche live benutzt und elf Punkte gemeldet; alle umgesetzt, dazu sechs eigene Funde.
-**Zwei gelockte Entscheidungen sind dabei revidiert worden — Nikinger-Entscheidung, nicht still:**
-Plan **§4.1** („keine Verläufe, keine Schlagschatten außer einem einzigen für Modale") — Knöpfe
-waren live nicht als Knöpfe erkennbar, es gibt jetzt eine plastische Schicht; und Plan **§4.3**
-(flache Rail aus „Spaces" + „Filter") — das legte nahe, Filter seien eine zweite Top-Ebene neben
-den Spaces, tatsächlich ist ein Filter immer an einen Space gebunden; daher kam die Meldung
-„meine Notizen landen in *Notizen*, nicht in meinem Bereich". Die Rail ist jetzt ein Baum
-(Übersicht · eigener Space ▸ Ordner · verbundene Spaces) mit eigener Übersichtsseite. Die
-Plandatei bleibt als 📕-Snapshot **unverändert**, dieselbe Handhabung wie beim §1.2-Widerspruch am
-2026-08-03. Zwei Funde über die Meldungen hinaus: ein vierter Ordner **„Erledigt"** (eine auf
-`done` gesetzte Aufgabe fiel durch alle drei Mockup-Ordner und war in der UI nirgends mehr
-auffindbar) und **Akzeptanzkriterium 12 war bisher nur halb erfüllt** — Editor, „+"-Knopf und
-Anlegen-Dialog standen permanent in `app.html` und waren nur `hidden`, also mit DevTools
-auffindbar; das Kriterium verlangt wörtlich „ohne Schreib-Bedienelemente **im DOM**", `app.js ::
-detachable()` hängt sie jetzt wirklich aus. Neu: `GET /api/v1/overview` (Zähler + zuletzt
-geänderte Items je sichtbarem Space, ohne `snippet` — Rule 4 dem Geiste nach), `GET /api/v1/meta`
-gibt zusätzlich `buckets` heraus. **549/549 Tests**, `ui_smoke.py` 12/12, 51 jsdom-Prüfungen,
-Tabu-Diff leer. Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-05, dritter Nachtrag.**]**
-**[2026-08-05, Live-Abnahme nach Step 7b:** der Nikinger hat die überarbeitete Oberfläche
-durchgetestet. **Zeile 5 bestanden** (Passwort im Browser geändert, neuer Login ohne
-`systemctl restart` sofort gültig — damit ist O1 auch live geschlossen, nicht nur im Code),
-**Zeile 11 bestanden** (Konflikt in zwei Tabs, Dialog, Auflösung), **Zeile 12 bestanden**
-(Fabis Space in DevTools geprüft: kein Schreib-Bedienelement im DOM). **Zeile 6 nur teilweise:**
-der Connector forderte wie verlangt eine neue Autorisierung und die aktuelle Sitzung lief weiter,
-aber ob ein zweiter, gleichzeitig angemeldeter Browser abgemeldet wird, ist **nicht** geprüft —
-das braucht zwei getrennte Sitzungen (zweites Profil oder privates Fenster), ein zweiter Tab
-desselben Browsers teilt das Cookie und beweist nichts. **Gesamtstand jetzt 11/20 bestanden, 2
-teilweise, 7 offen** — die vollständige Matrix steht ab sofort an genau einer Stelle:
-`phase5_ui/CLAUDE.md`, Abschnitt „Abnahmestand (Plan §6)". Vorher lagen die Ergebnisse über sechs
-Session-Blöcke verteilt, mehrere davon schon archiviert.**]**
-**[2026-08-05, Step 8 gebaut — Betrieb:** `phase5_ui/scripts/{deploy,rollback,authbackup,
-restore_auth_check}.sh` + `ui_budget.py`, `phase5_ui/systemd/{sharefyx-authbackup.service,.timer,
-sharefyx-staging.service}`, vier neue `diagnose.sh`-Prüfungen, drei optionale Staging-Platzhalter
-in `install_units.sh`. **Der Ausgangszustand war schlechter, als er aussah:** der Dienst lief
-direkt aus dem Git-Arbeitsverzeichnis (ein Editor-Speichern wirkte sofort), es gab kein Rollback,
-und die `auth.sqlite3` mit den **umkehrbaren** TOTP-Seeds wurde von keinem Backup erfasst — nur
-der `DATA_ROOT`. **Messung (P5-AD) durchgeführt, `[VERIFY]` V10 damit aufgelöst:** alle fünf
-Größen deutlich im Zielkorridor (Trefferliste 22.4 KB roh / 1.2 KB gzip, Einzelitem 0.6 KB,
-statische Nutzlast 54.8 KB, Erstaufruf 58.2 KB) — Tabelle im Phase-Head. Drei dokumentierte
-Plan-Abweichungen, die wichtigste: **das Health-Gate führt keine „authentifizierte API-Probe"
-durch, wie der Plan sie verlangt** — dafür müssten Passwort und TOTP-Seed auf der Platte liegen,
-was Hard Rule 1 ausnahmslos verbietet; stattdessen vier Proben, die dasselbe beweisen
-(`/api/v1/me` ohne Cookie und `/mcp/` ohne Bearer müssen **401** liefern, sonst rollt der Deploy
-zurück). Eigener Fund beim echten Probelauf: ein zurückgerolltes Release wäre als jüngstes
-Verzeichnis zum nächsten Rollback-Ziel geworden — man wäre auf dem nachweislich kaputten Stand
-gelandet; es wird jetzt `*.failed` markiert und übersprungen. Nebenbei eine **V13-Drift in
-`phase3_edge/`** korrigiert (dort seit 2026-07-28 als geschlossen dokumentiert und 114 Zeilen
-weiter unten in derselben Datei noch als offen geführt). **570/570 Tests.** Details:
-`phase5_ui/CLAUDE.md` Session-Block 2026-08-05, vierter Nachtrag.**]** **[2026-08-06, Step 8 live abgeschlossen:** der Nikinger hat alle
-Live-Teile ausgeführt. **Cutover vollzogen** — der Dienst läuft seit 20:37 aus
-`/opt/sharefyx/current` statt aus dem Git-Arbeitsverzeichnis; „Datei ändern + `systemctl
-restart`" ist damit wirkungslos, es zählt nur noch, was `deploy.sh` gebaut hat.
-**Abnahmezeilen 6 und 16 live bestanden** (Passwortwechsel mit zweitem Browser; Auto-Rollback bei
-gerissenem Health-Gate — beides read-only gegengeprüft, nicht nur die Meldung übernommen),
-Auth-Backup läuft mit eigenem Restore-Nachweis des Nikingers, `[VERIFY]` **V36** geschlossen.
-**Abnahmestand 13/20.** **Staging wieder abgeschaltet — revidiert P5-AB** (Nikinger-Entscheidung):
-die Hauptzugriffsrechner sind Arbeitsrechner ohne Tailscale, die VM nimmt hinter CGNAT keine
-SSH-Verbindung an, es bliebe nur ein öffentlicher Funnel — und Staging konnte seinen Zweck
-ohnehin nicht erfüllen (Konstruktionsfehler: ein `__REPO_ROOT__`-Platzhalter für beide Units,
-also gleicher Code, nur andere Daten). Der Langzeittest der Software ist die tägliche Nutzung
-von `sharefyx-mcp` selbst. **Sechs Funde aus dem echten Betrieb**, keiner beim Lesen des Codes
-auffindbar — darunter **S10** (ein Reset über eine Einladung widerrief weder Token-Familien noch
-UI-Sitzungen, obwohl der schwächere Passwortwechsel genau das seit Step 4 tut; geschlossen) und
-**O2** (`clients`/`token_families` werden nie abgeräumt; offen). Dass meine eigene Testsuite dabei
-den Produktivdienst 52-mal neu startete, weil sie die Shell-Umgebung erbte, steht mit derselben
-Deutlichkeit im Session-Block. **575/575 Tests.** Details: `phase5_ui/CLAUDE.md`, Session-Block
-2026-08-06.**]** **[2026-08-06, zweiter Nachtrag — Step 8b, elf Live-Feedback-Punkte des
-Nikingers geprüft + neun umgesetzt:** Korrektur zuerst — „Step 8 fertig, aber nicht commited" war
-ungenau, `git log` zeigte den S10-Commit bereits als `HEAD`; tatsächlich: lokaler `main` liegt
-**34 Commits vor `origin/main`** (nie gepusht) UND `/opt/sharefyx/current` läuft noch auf dem
-Stand vor dem S10-Fix (Deploy fällig, s.o.) — zwei getrennte, offene Schritte, beide beim
-Nikinger. Review von Step 8/S10 fand keine neuen Sicherheitsbefunde. Neun der elf Meldungen
-umgesetzt (Editor-Schließen bei Space-Wechsel, Anlegen-Typ folgt dem Ordner, Vorschau als
-Editor-Vorgabe, Passwort-Sichtbarkeit, Zähler-Polling, OAuth-Consent-Seite gestaltet — Root
-Cause war ein seit P4 nie eingelöstes „wird in P5 ersetzt", u.a.). **Zwei bewusst nicht
-umgesetzt, als Befunde F1/F2 vorgelegt statt still entschieden:** vollständiges Löschen (Plan
-§0.5 nennt es explizit draußen) und „Subspaces/shared Spaces" — Letzteres kollidiert in seiner
-vollen Form („alle haben unabhängig volle Rechte") **frontal mit Hard Rule 4** („Cross-Space-
-Writes existieren architektonisch nicht — kein Parameter, keine Codepfad-Variante", *no
-exceptions*) und ist ein Phase-6-Kandidat, keine Ad-hoc-Umsetzung. 576/576 Tests, Tabu-Diff
-leer. **F1/F2 entschieden (Nikinger):** beide auf eine spätere Phase verschoben (Subspaces/
-Shared Spaces, Archiv-Neugestaltung als Antwort auf F2); F2 selbst bleibt „kein Löschen, nur
-Archivieren". Details: `phase5_ui/CLAUDE.md`, Session-Block 2026-08-06 (Step 8b).**]**
-**[2026-08-06, Korrektur (Verifikationssession):** die Behauptung „lokaler `main` liegt 34
-Commits vor `origin/main`, nie gepusht" (voriger Nachtrag) ist überholt — `git status -sb` zeigt
-`main...origin/main` ohne Differenz, der Push ist erfolgt. **Deploy steht weiterhin aus:**
-`/opt/sharefyx/current` läuft auf Release `20260805T183144.605094Z` / Commit `6bf22e5`, **12
-Commits hinter `main`** (`8b11862`) — fehlend sind genau der S10-Fix, Step 8b und die
-F1/F2-Entscheidung. Live read-only gegengeprüft (`systemctl cat sharefyx-mcp`, `readlink -f`,
-`git log` im Release-Verzeichnis), nicht nur die vorige Notiz übernommen. Details:
-`phase5_ui/CLAUDE.md`, Session-Block 2026-08-06 (Verifikationssession).**]**
-**[2026-08-07, Nachtrag:** Deploy vom Nikinger live ausgeführt (`deploy.sh main`, Health-Gate
-grün, `sha` = `a835d1d`), read-only gegengeprüft (`readlink -f`, `git log` im Release-Verzeichnis
-— deckt sich mit `main`-HEAD). **Zeile 15** (`ui_budget.py`, mit `.venv/bin/python`, alle 5
-Größen im Korridor) und **Zeile 19** (Live-`curl`: `/api/v1/me` ohne Auth → `401`, `/mcp/` mit
-gefälschtem Session-Cookie → `401`) vom Nikinger live bestanden, ebenso Zeilen 10/13/14 direkt im
-Anschluss (Details `phase5_ui/CLAUDE.md`, Session-Block-Nachtrag). **Abnahmestand jetzt 18/20, 0
-teilweise, 2 offen** (17, 20). Phase-6-Vormerkung: Client-Surface-Logging (claude.ai/Desktop vs.
-Claude Code, im Log, nicht in der UI) — Nikinger-Entscheidung 2026-08-07, kein Blocker, zusammen
-mit F1/F2 zu planen.**]** **Nächster Schritt:** Zeile 20 (passiver Reboot-Nachweis) kann
-nebenbei fallen; der einzige verbleibende Plan-Step ist Step 9 (gemeinsame Live-Abnahme beider
-Nutzer + Handover, P5-AE, braucht Fabian).
+`webui`) — **🔄 gestartet 2026-08-02, Steps 0–8b ✅ gebaut und deployt** (Cutover auf
+`/opt/sharefyx/current` seit 2026-08-05, `deploy.sh`-Zyklus läuft). Zwei Blöcke (A = Sicherheit +
+Auth-Selbstverwaltung, B = REST-API + UI) mit hartem Gate dazwischen, beide durchlaufen.
 
-**Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅
-abgeschlossen, 2026-07-30.** Mission erfüllt: der Pfad-Token ist verschwunden, ein eigener
-Authorization Server ersetzt ihn (DCR, PKCE, Argon2id + TOTP), Schnitt vollzogen, 16/16
-Abnahmezeilen live bestanden. Plan: `docs/concepts/phase4_auth_plan.md` (Entscheidungen
-P4-A–P4-R gelockt, Steps 0–7, ausführungsreif — geschrieben ohne frischen Repo-Zugriff, siehe
-Plan-Kopf). Herkunft/offene Entscheidungen: `docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md`.
-Phase-Head: `phase4_auth/CLAUDE.md`. **[2026-08-02 Nachtrag:]** der formale Phasenabschluss ist
-erledigt — `docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md` und die P5-Planungssession liegen vor,
-Phase 5 ist gestartet (siehe oben).
+**Abnahmestand (Plan §6), Stand 2026-08-07: 18/20 bestanden, 0 teilweise, 2 offen** — Zeile 17
+(Step 9, gemeinsame Live-Abnahme, braucht Fabian) und Zeile 20 (passiver Reboot-Nachweis). Die
+vollständige Matrix, der Modul-Status je Step und die gesamte Live-Debugging-Historie (u. a. der
+Origin/CSRF-Fund am Block-A-Gate, die Step-7b-Revision von Plan §4.1/§4.3, Sicherheitsbefund S9)
+stehen in `phase5_ui/CLAUDE.md` — read + newest Session-stopped-Block first, das ist die
+maßgebliche Quelle für diese Phase, nicht diese Zeile hier. Ältere Session-Blöcke:
+`phase5_ui/SESSIONS_ARCHIVE.md`.
 
-**[2026-07-28 Korrektur:** diese Zeile stand hier zwischenzeitlich auf „P4 Step 0+1", obwohl
-Step 2 und Step 3 im selben Tag folgten — Drift durch fehlendes Nachziehen dieser Datei bei
-Step-Abschluss-Commits, jetzt behoben.**]**
+Plan: `docs/concepts/phase5_ui_plan.md` (Entscheidungen P5-A–P5-AE, Steps 0–9). Herkunft/offene
+Entscheidungen: `docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md`.
 
-**[2026-07-28 weitere Korrektur, im Step-5-Commit gefunden:** dieselbe Drift-Kategorie trat ein
-zweites Mal ein — die vorige Korrektur brachte diese Zeile auf Step 3, aber die Step-4- und
-Step-5-Abschluss-Commits zogen sie danach drei Steps lang nicht nach. Root-`CLAUDE.md` ist nicht
-die Quelle der Wahrheit für den Phase-Fortschritt (das ist `phase4_auth/CLAUDE.md`), aber diese
-Zeile hier muss trotzdem mitlaufen, sonst degradiert Hard Rule 8 zu einer Regel, die nur für den
-Phase-Head gilt.**]**
+**Phase-6-Vormerkungen (nicht Scope dieser Phase, hier gesammelt für den nächsten Zuschnitt,
+Details im aktuellen `phase5_ui/CLAUDE.md`-Session-Block):**
+- **F1** — Subspaces/eigene Ordner + „shared Spaces" (Nikinger-Meldung, Step 8b): F1a
+  (Default-Leserechte auf eigene Connectoren verengen) ist ein kleiner eigener Schnitt; F1b (ein
+  Space, in dem alle unabhängig volle Rechte haben) kollidiert frontal mit Hard Rule 4, kein
+  Ad-hoc.
+- **F2** — vollständiges Löschen bleibt draußen (Plan §0.5 nennt es explizit), nur Archivieren.
+- **Client-Surface-Logging** (2026-08-07) — welche Claude-Oberfläche (claude.ai/Desktop vs.
+  Claude Code) einen Request stellte, ins Request-Log, nicht in die UI. Kein Blocker —
+  Nikinger-Entscheidung 2026-08-07: Claude Code darf den produktiven Connector wie jede andere
+  Oberfläche nutzen, das ist architektonisch identisch (Token → Space, nicht Token → Client).
+- **`patch_item`** (2026-08-08, Live-Feedback einer arbeitenden Claude-Instanz über den echten
+  Connector) — `update_item` ersetzt immer den kompletten Body; eine Drei-Zeilen-Korrektur an
+  einem großen Dokument erzwingt einen Komplett-Rewrite, teuer und riskant, weil dabei mehr
+  verloren gehen kann als bei einem gezielten Patch. Vorschlag aus der Rückmeldung:
+  `patch_item(item_id, version, old_text, new_text)`, schlägt hart fehl, wenn `old_text` nicht
+  genau einmal vorkommt (kein stilles Teil-Überschreiben). Betrifft `mcpserver/tools.py`
+  (P5-B tabu für diese Phase), also kein Ad-hoc-Fix — Kandidat für denselben späteren Zuschnitt
+  wie F1/F2.
 
-**[2026-07-28 dritte Korrektur, im Step-6b-Commit gefunden:** dieselbe Drift-Kategorie trat ein
-drittes Mal ein — der Step-6a-Abschluss-Commit zog diese Zeile nicht nach, obwohl er zwischen
-Step 5 und Step 6b lag. Diese Zeile jetzt auf Step 6b gebracht, jeweils bei ihrem eigenen
-Abschluss-Commit nachzuziehen, nicht erst wenn die Drift wieder auffällt.**]**
-**[2026-07-29:** Step 7 nachgetragen — Code-Vorbereitung fertig, Live-Teile (Provisionierung,
-`systemd-creds`, `systemctl restart`, Connector, Abnahmematrix) stehen aus, Sache des
-Nikingers.**]**
-**[2026-07-29, zweiter Nachtrag:** Der erste Live-Versuch von Runbook-Schritt 4
-(`oauth_smoke.py --base-url`) scheiterte 4/4 mit `status=400` — Ursache **Befund S1**:
-`SPACE_ALLOWED_HOSTS` ohne `127.0.0.1` lässt das Wurzel-`TrustedHostMiddleware` jede lokale
-Anfrage mit `400 Invalid host header` beantworten, der Runbook-Schritt war damit strukturell
-unausführbar. Behoben in `local.env.example`/`install_units.sh`/Runbook, **ohne** Servercode zu
-ändern; gegen eine Wegwerf-Instanz mit `tmp`-`DATA_ROOT` als 11/11 belegt. Im selben Zug ein
-vollständiges Sicherheits-Review von P3+P4: **keine Auth-Umgehung, kein Cross-Space-Leck, kein
-Secret-Leak**; sieben kleinere offene Befunde S2–S8 plus Betriebsnotiz O1, bewusst **nicht**
-gefixt, bis der Nikinger über die Reihenfolge gegenüber der Abnahmematrix entschieden hat.
-Volles Dokument: `docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`.**]**
-**[2026-07-29, dritter Nachtrag:** Live-Abnahme durchgeführt — **12 von 16 Zeilen bestanden**
-(Refresh-/Code-Replay live mit echter Token-Familie, Fehlversuchsbremse mit exakter
-Sperrzeit-Formel, Rule 4 unter echtem OAuth beobachtet). Bewusst offen: Zeile 9
-(Token-Ablauf/Auto-Refresh, nächste Session mit vorbereiteter Anleitung), Zeilen 14/15 (Fabian,
-verabredet), Zeile 16 (erst nach dem Schnitt). Zwei kleine Live-Funde behoben (B1: `authctl.py`
-braucht `STATE_DIRECTORY` außerhalb von systemd; B2: `abnahme_run.sh` musste `/mcp/` mit
-Trailing Slash prüfen, sonst falscher Negativbefund). Protokoll:
-`docs/concepts/P4_ABNAHME_2026-07-29.md`.**]**
-**[2026-07-30:** Zeilen 14/15 (Fabian) scheiterten zunächst — Login gelang serverseitig sechsmal
-in Folge (echte Token-Familien, Passwort+TOTP korrekt), aber Chromium blockierte den `302`-
-Redirect zurück zu `claude.ai` lautlos: `form-action 'self'` in der CSP wird gegen das
-Redirect-Ziel geprüft, nicht nur gegen das unmittelbare Formular-`action`. Root Cause über einen
-DevTools-Screenshot des Nikingers bestätigt, gefixt (`AuthSettings.csp_form_action`, `form-action
-'self' https://claude.ai https://claude.com`), Seam-Test `test_redirect_uri_allowed_is_the_only_
-matching_path` blieb dabei intakt. **Noch nicht auf `sharefyx-mcp` deployt** — braucht
-`systemctl restart`, dann Fabian erneut testen.**]**
-**[2026-07-30, zweiter Nachtrag:** Fix deployt, Fabian mit einem Klick erfolgreich verbunden —
-er fuhr von sich aus ein vollständiges Sechs-Tool-Protokoll plus zwei Negativtests
-(Optimistic-Locking-`conflict`, Cross-Space-`write_denied`), alles bestanden. **14 von 16
-Abnahmezeilen live bestanden** — die im Runbook gelockte Terminrisiko-Schwelle ist erreicht:
-„14/16 bestanden → 🟡 code-complete, P5 darf beginnen" (Nikinger-Entscheidung 2026-07-28).
-Verbleibend: Zeile 9 (eigene Session), Zeile 16 (erst nach dem Schnitt). Details:
-`docs/concepts/P4_ABNAHME_2026-07-29.md`, Nachtrag 2026-07-30.**]**
-**[2026-07-30, dritter Nachtrag:** Zeile 9 (Access-Token-Ablauf) noch in derselben Session
-durchgeführt — kurze TTL via systemd-Drop-in, Connector neu verbunden, ein Aufruf vor und einer
-nach Ablauf ohne erneuten Login. DB-Gegenprobe: Refresh lief **on-demand** (erst beim ersten
-Aufruf nach Ablauf, kein Hintergrund-Timer), belegt über 14 `access_tokens`-Zeilen derselben
-Token-Familie. **15 von 16 Abnahmezeilen live bestanden — einzig verbleibend: der Schnitt
-(Runbook-Schritt 8), danach Zeile 16 und der volle ✅-Status.**]**
-**[2026-07-30, vierter Nachtrag — Schnitt vollzogen, 16/16, Phase 4 ✅:** der Nikinger hat
-Runbook-Schritt 8 live ausgeführt (`SPACE_AUTH_MODE=oauth`, `install_units.sh`, Restart, beide
-Pfad-Token widerrufen, `spaces.cred` neu geschrieben, zweiter Restart) — **vor** jeder
-Code-Änderung, wie der Plan-Wortlaut verlangt. Claude Code hat das read-only gegenverifiziert,
-nicht nur die Session-Zusammenfassung übernommen (Advisor-Vorgabe dieser Session, nach einem
-Context-Compaction-Verlust der Details): `systemctl cat sharefyx-mcp` → `SPACE_AUTH_MODE=oauth`;
-`export_space_map.py` → `0 Einträge`, beide Pfad-Token also tot; `curl` gegen die alte
-Pfad-Token-URL → `401`; `/health` weiterhin `200` (Dienst gesund, `uptime_s` seit dem Restart
-plausibel). **Zeile 16 damit live bestanden, 16/16.** Danach `TokenPathASGI`/`AuthModeASGI` aus
-`phase2_mcp/mcpserver/asgi.py`/`app.py` entfernt (der `resolver`-Parameter aus `create_app()`
-entfällt ersatzlos mit), `SPACE_AUTH_MODE` auf einen Wert reduziert (`_VALID_MODES=("oauth",)`
-— der Plan-Wortlaut „zwei Werte" war ohne frischen Repo-Zugriff geschrieben und ungenau, siehe
-`authserver/config.py`-Korrekturnotiz; mit dem Nikinger vorab abgestimmt statt still
-abgewichen), `serve.py`s Step-6b-Gate entfernt (`oauth` jetzt immer Pflicht — reversiert eine
-gelockte Entscheidung, ebenfalls mit dem Nikinger abgestimmt), `mcp_smoke.py`/`oauth_smoke.py`/
-`test_oauth_smoke.py`/`test_app.py`/`test_asgi_bearer.py`/`test_request_log.py` auf echte
-Bearer-Token gegen eine temporäre `AuthStore` umgestellt (Pfad-Token-Fakes gab es sonst nirgends
-mehr zu bedienen), `test_asgi.py` (nur `TokenPathASGI`) gelöscht, `test_serve.py` (neu, deckt
-`serve.py :: main()`s Verdrahtung bis `uvicorn.run()` ab — vorher ungetestet, siehe Advisor-Fund
-im Session-Block). `pytest -q` → **347/347 grün** (vorher 353 — die Differenz ist die Nettosumme
-aus gelöschten/gekürzten Pfad-Token-Tests minus den zwei neuen `test_serve.py`-Tests, keine
-neue Lücke, siehe `phase2_mcp/CLAUDE.md`/`phase4_auth/CLAUDE.md` für die Aufschlüsselung je
-Datei). `git diff` auf `tools.py`/`permissions.py`/`server.py`/`storage/` bleibt **leer**
-(Akzeptanzkriterium §6.9). `mcp_smoke.py` (12/12) und `oauth_smoke.py` (11/11, In-Process-Modus)
-zusätzlich real gegen den vollen Stack gelaufen, nicht nur `pytest` grün behauptet. **Phase 4 ist
-damit ✅ — Steps 0–7 vollständig, Abnahmematrix 16/16, Schnitt vollzogen.** Protokoll-Nachtrag:
-`docs/concepts/P4_ABNAHME_2026-07-29.md`.**]**
-Step 0 (Haushalt, Drift, geerbte Abnahme), Step 1 (Gerüst, Konfiguration,
-Kryptobausteine), Step 2 (Passwörter, TOTP, Nutzerakten), Step 3 (Persistenz +
-Fehlversuchsbremse — Code-/Refresh-Replay-Tötung nach RFC 9700), Step 4 (Metadaten + dynamische
-Registrierung), Step 5 (Autorisierungsfluss — `/oauth/authorize`, `/oauth/token`,
-TOTP-Replay-Schutz, Enumerationsschutz), Step 6a (Resolver, Bearer-Auflösung,
-`create_app()`-Verdrahtung), Step 6b (`oauth_smoke.py` 11/11, `OAuthLogASGI`,
-`serve.py`-`SPACE_AUTH_MODE`-Gate — Step 6 damit vollständig) und Step 7 (`authctl.py`,
-Unit-Umzug nach `phase4_auth/systemd/`, `oauth_smoke.py --base-url`, Live-Abnahme 16/16, Schnitt,
-`TokenPathASGI`-Entfernung) sind durchgelaufen — **alle acht Steps ✅.** Kritischer Fund in
-Step 0: ein nie widerrufener Keyring-Token
-für einen dritten, seit P2-B2 umbenannten Space (`nikinger`) — live und schreibfähig, aber ohne
-zugehöriges Verzeichnis unter `DATA_ROOT`.
-Nikinger-Entscheidung: widerrufen (Keyring), Export + `sudo systemctl restart sharefyx-mcp`
-nachgezogen (2026-07-28 14:12) — live gegen `diagnose.sh` und `export_space_map.py` bestätigt,
-Token auch im laufenden Dienst tot. Details: `docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md` §5
-Nachtrag. Details zu Step 2–6b: Session-Blöcke in `phase4_auth/CLAUDE.md` bzw.
-`phase4_auth/SESSIONS_ARCHIVE.md`.
+**Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅ abgeschlossen,
+2026-07-30 — 16/16 Abnahmezeilen live bestanden, Schnitt vollzogen.** Der Pfad-Token ist
+verschwunden; ein eigener, im selben Prozess laufender Authorization Server (Discovery, Dynamic
+Client Registration, PKCE, Argon2id + TOTP, opake rotierende Token) authentifiziert seither jeden
+Connector. Kritischer Fund in Step 0: ein nie widerrufener Keyring-Token für einen seit P2
+umbenannten dritten Space (`nikinger`) — live und schreibfähig, aber ohne zugehöriges
+Verzeichnis; noch vor dem Schnitt widerrufen und live gegen `diagnose.sh`/
+`export_space_map.py` bestätigt (Details: `docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md` §5).
+
+Sicherheitsbefunde **S1–S10 / O1–O2** (S1–S8 und S10 geschlossen; O1 strukturell durch P5
+geschlossen; **O2 offen** — `clients`/`token_families` werden nie abgeräumt) stehen mit vollem
+Verlauf und Fundstellen in `phase4_auth/CLAUDE.md`, ebenso der Modul-Status aller acht Steps und
+das ausgeführte Inbetriebnahme-Runbook.
+
+Plan: `docs/concepts/phase4_auth_plan.md` (Entscheidungen P4-A–P4-R, Steps 0–7 — geschrieben ohne
+frischen Repo-Zugriff, siehe Plan-Kopf). Herkunft/offene Entscheidungen:
+`docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md`. Abnahmeprotokoll:
+`docs/concepts/P4_ABNAHME_2026-07-29.md`. Sicherheits-Review vor der Abnahme:
+`docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`. Formaler Abschluss-Handover an P5:
+`docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md`.
 
 **Phase 3 — Exposure & Betrieb** (`phase3_edge/`, kein eigenes Python-Paket — Servercode bleibt
 in `mcpserver`): ✅ **live-verifiziert, 13/13** — Ursprungsstand 10/13
