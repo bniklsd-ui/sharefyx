@@ -173,68 +173,26 @@ Muster (`## Active phase (6 — …)`), wie es P5 in Step 0 anlegte.
 oben) — Änderungen dieser Session sind ausschließlich Dokumentation + eine leere `conftest.py` +
 eine `pytest.ini`-Zeile, kein Feature-Code.
 
-**Nachtrag, 2026-08-09, zweiter — Advisor-Review vor Sessionende, vier Funde behoben:**
-(1) `docs/INDEX.md`s eigene Zeile für `ROADMAP.md` war seit vor dieser Session stale (nannte
-„Phases 1–5"/„Phase 6 not yet planned" und eine veraltete Größe) — korrigiert, jetzt „Phases 1–6"/
-„P6 🔄 gestartet"/~15KB. (2) Vollständigkeitsprüfung „jede `.md` hat eine Zeile in
-`docs/INDEX.md`" nachgeholt (Plan-Punkt 1, vorher nicht gelaufen): alle 32 `.md`-Dateien im Repo
-sind verlinkt, einzige Ausnahme `docs/INDEX.md` selbst (verlinkt sich nicht, erwartet). (3)
-Staleness-Grep über `README.md`/`AGENTS.md`/`docs/PROMPTS.md`/`phase5_ui/CLAUDE.md`: keine
-weiteren Funde — `phase5_ui/CLAUDE.md`s „Browser-Planungssession"-Erwähnungen stehen in seinem
-eingefrorenen Session-Block (Historie, nicht editieren); `README.md`s Stand-2026-08-02-Hinweis ist
-seit P4→P5 unverändert stale, disclaimt sich aber selbst explizit („siehe Root-`CLAUDE.md` für den
-verbindlichen Phasenstand") — bewusst nicht angefasst, außerhalb dieses Step-0-Scopes.
-(4) Zwei Dokumentationslücken geschlossen: `scripts/`-Auslassung jetzt im Minor-Drift-Absatz oben
-benannt (vorher nur in Gedanken, nicht aufgeschrieben); `ROADMAP.md`s
-„Mehrmandantenfähigkeit"-Absatz hatte sich selbst widersprochen (durchgestrichen **und** „nicht
-widerlegt" im selben Atemzug) — Durchstreichung entfernt, nur `Feingranulare Rechte` ist
-tatsächlich widerlegt (echtes ACL-Modell existiert jetzt), `Mehrmandantenfähigkeit` war erfüllt,
-nicht widerlegt. `pytest -q` danach erneut 576/576, Size-Sweep erneut sauber.
+**Nachtrag, 2026-08-09, zweiter — Advisor-Review vor Sessionende, vier Funde behoben** (Kurzform,
+settled): `docs/INDEX.md`s `ROADMAP.md`-Zeile war stale, korrigiert; Vollständigkeitsprüfung
+„jede `.md` hat eine INDEX-Zeile" nachgeholt, alle 32 verlinkt; Staleness-Grep über
+`README.md`/`AGENTS.md`/`docs/PROMPTS.md`/`phase5_ui/CLAUDE.md` — keine weiteren Funde;
+`ROADMAP.md`s „Mehrmandantenfähigkeit"-Absatz hatte sich selbst widersprochen, korrigiert.
+`pytest -q` → 576/576, Size-Sweep sauber.
 
-**Nachtrag, 2026-08-09, dritter — Step 1 (Werkzeug-Ergonomie) fertig, in derselben Sitzung
-fortgesetzt:** `storage/patch.py` (neu: `TextEdit`, `PatchError`, `PatchResult`, `apply_edits()`),
-`Store.patch()`, `mcpserver/receipts.py` (neu: `write_receipt()`), siebtes Tool `patch_item`,
-`return_body: bool = False` an allen vier Schreib-Tools, `update_item` lehnt `visibility`/
-`share_read`/`share_write` mit `ValidationError` ab. `mcp_smoke.py` um einen Patch-Durchgang
-erweitert, **13/13 grün**. `pytest -q`: **593 passed** (576 + 17 neue: 5 `phase6_shares/tests/
-test_patch.py` + 5 `phase1_storage/tests/test_store.py` + 7 `phase2_mcp/tests/test_tools.py`).
-
-**V48 empirisch geschlossen (fastmcp 3.4.4, installierte Version):** `list[TypedDict]` als
-Tool-Parameter rendert zu einem brauchbaren Schema — kein Fallback auf `list[dict[str,str]]`
-nötig. Beleg: `patch_item({"edits":[{"old_text":...,"new_text":...}]})` lief erfolgreich durch
-den echten `fastmcp.Client`/`StreamableHttpTransport`-Stack, sowohl in
-`test_app.py::test_all_seven_tools_are_callable_over_http` als auch in `mcp_smoke.py` — beide
-Wege validieren/serialisieren das Schema tatsächlich, kein Mock.
-
-**Drei Advisor-Funde vor dem Commit behoben, keiner davon im Plan explizit benannt:**
-1. **Kollateralschaden durch Quittungen-als-Default** — sieben bestehende Tests/Skript-Checks
-   gingen von Frontmatter-Text in `create_item`/`append_to_item`/`update_item`-Antworten aus
-   (`test_tools.py::test_create_item_uses_principal_space`, `mcp_smoke.py` Checks 2/6/7,
-   `test_request_log.py` ×2, `test_app.py` ×2). Alle auf JSON-Quittungsfelder umgestellt;
-   `test_app.py`s HTTP-Rundlauf nutzt an drei Stellen bewusst `return_body=True`, damit die
-   Inhaltsprüfungen dort weiterhin gegen echten Dateitext laufen.
-2. **`update_item`s Riegel ohne die drei Parameter ist wirkungslos** — ohne `visibility`/
-   `share_read`/`share_write` als echte Funktionsparameter hätte ein Aufruf mit diesen Feldern
-   nie `ValidationError` erreicht (Python/`fastmcp`-Schema hätte vorher abgelehnt). Alle drei als
-   `str | list[str] | None = None` ergänzt, geprüft **vor** der Zielraum-/Rechteauflösung.
-3. **`phase6_shares/tests/test_store_patch.py`/`test_tools_patch.py` (Plan-Namen) wären
-   fixture-los gewesen** — `phase1_storage/tests/conftest.py` und `phase2_mcp/tests/conftest.py`
-   sind beide leer, alle Fixtures (`store`/`store_git`/`clock`/`_git_log`/`tools_map`/`_as`) leben
-   lokal in `test_store.py`/`test_tools.py`. Plan §5s Zusammenfassungstabelle sagt für beide
-   ohnehin „erweitert", nicht „neue Datei" — dieser Tabelle gefolgt, nicht der Step-1-Fließtext-
-   Erwähnung. Die vier reinen `apply_edits()`-Funktionstests (kein Store, keine Fixture nötig)
-   stehen wie geplant in `phase6_shares/tests/test_patch.py`.
-
-**Kleine, bewusste Abweichungen von der Beispielquittung in Plan §1.5.3** (dokumentiert, nicht
-stillschweigend): kein `folder`-Feld (existiert erst ab Step 4, `Item.folder`); Archivieren über
-`update_item(status="archived")` liefert `op="update"`, nicht `op="archive"` — die Quittung bildet
-die vier Tools ab, nicht `Store`s interne Commit-Op-Namen (die kennen zusätzlich `"archive"`/
-`"drift"`). `appended_bytes` bei `append` ist `len(text.encode())` — die Länge des tatsächlich
-angehängten Texts, kein `Store`-Umbau nötig.
-
-**Verifiziert:** `pytest -q` → 593 passed. `mcp_smoke.py` (Text und `--json`) → 13/13. Tabu-Diff
-gewahrt: nur `storage/`, `mcpserver/{tools,receipts,patch aus storage}.py` und die drei Testdateien
-berührt — genau die in P6-C freigegebene Fläche.
+**Nachtrag, 2026-08-09, dritter — Step 1 (Werkzeug-Ergonomie) fertig** (Kurzform, settled):
+`storage/patch.py` (neu: `TextEdit`/`PatchError`/`PatchResult`/`apply_edits()`), `Store.patch()`,
+`mcpserver/receipts.py` (neu), siebtes Tool `patch_item`, `return_body` an allen vier
+Schreib-Tools, `update_item` lehnt `visibility`/`share_read`/`share_write` ab. `mcp_smoke.py`
+13/13. **V48 geschlossen:** `list[TypedDict]` rendert per `fastmcp` 3.4.4 zu einem brauchbaren
+Schema, kein Fallback nötig — belegt über den echten `fastmcp.Client`. Drei Advisor-Funde vor
+dem Commit: Kollateralschaden durch Quittungen-als-Default (sieben Tests auf JSON umgestellt),
+`update_item`s Riegel war ohne die drei echten Parameter wirkungslos (ergänzt, `fastmcp` hätte
+sonst vorher abgelehnt), Plan-Testdateinamen wären fixture-los gewesen (Fixtures folgen §5s
+Tabelle, nicht dem Fließtext). Kleine Quittungs-Abweichungen von Plan §1.5.3 dokumentiert:
+kein `folder` vor Step 4, Archivieren liefert `op="update"` nicht `op="archive"`. `pytest -q` →
+**593 passed** (+17: 5 `test_patch.py` + 5 `test_store.py` + 7 `test_tools.py`). Tabu-Diff
+gewahrt: nur `storage/`, `mcpserver/{tools,receipts}.py`, drei Testdateien.
 
 **Nachtrag, 2026-08-09, vierter — zweiter Advisor-Durchlauf, zwei Funde vor Sessionende
 behoben:** (1) Hard Rule 8 verlangte `phase1_storage/CLAUDE.md` und `phase2_mcp/CLAUDE.md` im
@@ -481,9 +439,7 @@ Reihenfolge für den Nikinger, über Step 2 und Step 3 hinweg, nicht nur Step 3 
    2026-08-09 datiert, trägt also nur am Tag des tatsächlichen Deploys; an einem späteren Tag
    entweder einen neuen Eintrag ergänzen oder `SHAREFYX_ALLOW_STALE_UPDATELOG=1` setzen (bewusst
    so, kein Bug).
-3. **Gate-A→B-Punkt 1+2+3** (`patch_item` über den echten Connector inkl. eines absichtlichen
-   mehrdeutigen `old_text`, Quittung statt Volltext sichtbar, `return_body=True` liefert
-   weiterhin den Volltext) — kann sofort nach dem Deploy laufen, unabhängig vom Rest.
+3. ~~Gate-A→B-Punkt 1+2~~ — **✅ live bestanden, 2026-08-09** (Nachtrag unten).
 4. **Gate-A→B-Punkt 4** — Update-Banner im echten Browser: erscheint, verschwindet nach
    „Verstanden", ist unter Konto → „Update-Log ansehen" wiederfindbar. **Und Fabian muss den
    Eintrag über die Sichtbarkeitsumstellung gesehen haben** — ohne Fabians Bestätigung schließt
@@ -491,13 +447,36 @@ Reihenfolge für den Nikinger, über Step 2 und Step 3 hinweg, nicht nur Step 3 
 5. **V42 (Step 2, weiterhin offen)** — zwei Tage echtes journald abwarten, danach prüfen, ob das
    `ua`-Feld reale Claude-Oberflächen unterscheidet (`grep '"ev":"http"'` in den Logs, `ua`-Werte
    vergleichen).
-6. **Gate-A→B-Punkt 3 (Step 2, weiterhin offen)** — realer Purge-Lauf: `clients`-Zeilenzahl vor
-   und nach `authctl.py purge-expired` notieren, muss sinken (oder mit Begründung stabil
-   bleiben, falls nichts alt genug ist).
+6. **Gate-A→B-Punkt 3** — **versucht, 2026-08-09, korrekt noch nicht abgeschlossen** (Nachtrag
+   unten): `clients`/`token_families` sind noch zu jung für die 30/90-Tage-Grenze. Frühestens
+   ab 2026-08-28 erneut prüfen (`authctl.py purge-expired`, gegen den echten Zeilenrückgang).
 
 Erst wenn alle vier Gate-Punkte stehen, beginnt Step 4 (Storage-Fundament, Block B) — nicht
-vorher, das Gate ist im Plan hart. V42 selbst blockiert das Gate nicht (Step 2s Modul-Status-
-Zeile trägt es als offen, nicht als Blocker), sollte aber nicht vergessen werden.
+vorher, das Gate ist im Plan hart. V42 blockiert das Gate nicht, sollte aber nicht vergessen
+werden.
+
+**Nachtrag, 2026-08-09, siebter — Gate-A→B-Punkte 1–3 live geprüft** (Claude Code direkt auf der
+VM, Connector zuvor vom Nikinger neu verbunden — die alte Verbindung hatte noch den 6-Tool-Stand
+von vor P6). **Punkte 1+2 ✅:** an `itm_1b4fd59e` (Wegwerf-Testitem, danach archiviert) —
+mehrdeutiger `old_text` schlägt fehl (`"edits[0] fand 2 Treffer (Zeilen 2, 4)"`), Datei
+unverändert (`version` blieb 1); drei Ersetzungen über zwei Aufrufe, erster ohne `return_body`
+liefert eine Quittung (`{"op":"patch",...,"replacements":2,"lines":[1,4],"bytes":{...}}`), zweiter
+mit `return_body=true` den vollen Text. Vier eigene Git-Commits in `DATA_ROOT` bestätigt (`create`/
+`patch`×2/`archive`). **Punkt 3 — Mechanismus bestätigt, Zahl noch nicht gesunken:**
+`SPACE_AUTH_DB=/var/lib/sharefyx/auth.sqlite3 authctl.py purge-expired` lief sauber, 7 reale
+abgelaufene Zeilen entfernt (1 `auth_codes` + 6 `access_tokens`) — aber `clients`/`token_families`
+beide `0`, **ehrlicher Grund, kein Fehlschlag:** die älteste tote Familie ist vom 2026-07-29, elf
+Tage alt, unter der 30-Tage-Grenze; kein Client ist 90 Tage alt (Dienst existiert erst seit
+2026-07-24/29). Zeitgleich stiegen `clients`/`token_families` sogar leicht (39→40, 22→23) — der
+Nikinger-Reconnect des Connectors registrierte einen neuen DCR-Client, reine Nebenwirkung der
+Live-Prüfung selbst. `journalctl -u sharefyx-purge.service` bestätigt zusätzlich: der tägliche
+Timer lief zuletzt Aug 9 00:04 (VOR dem heutigen Deploy) noch mit dem alten Purge-Code (Ausgabe
+ohne `token_families`/`clients`-Schlüssel) — der heutige manuelle Lauf war der erste mit dem neuen
+O2-Code, der nächste Timer-Lauf (Aug 10 00:02) läuft bereits dagegen. **Ob Schritt 1
+(Auth-Backup vor dem Deploy) lief, ist aus dem Chat nicht ersichtlich** — der Nikinger postete
+nur die `deploy.sh`-Ausgabe. Kein Vorfall, falls übersprungen (additive Migration, kein
+Datenverlustrisiko), aber im Nachhinein nicht mehr sinnvoll nachholbar — beim nächsten Deploy
+nicht vergessen.
 
 **Softcap-Warnung:** dieser Kopf ist nahe am 40KB-Softcap. Wenn Step 4 einen neuen `## Session
 stopped`-Block eröffnet, sind die Step-0/1/2-Nachträge die Kompressionskandidaten — verbatim
