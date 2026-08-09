@@ -27,7 +27,7 @@ updated: 2026-08-09 (Rotation phase5_ui/CLAUDE.md, Größen nachgezogen, Zeile 2
 - [README.md](../README.md) — 📗 ~5KB · human overview + machine setup (venv, keyring, run, smoke test)
 - [ROADMAP.md](../ROADMAP.md) — 📗 ~9KB · Phases 1–5, scope in/out per phase, status
 - [docs/DOC_LAYERS_CONVENTION.md](./DOC_LAYERS_CONVENTION.md) — 📗 ~5KB · Doc-Layers-Spec (v1, 2026-07-06) · **byte-identische Kopie aus dem Trading-Bot-Repo — nicht projektspezifisch anpassen, sonst divergieren zwei Kopien derselben Regel**
-- [docs/PROMPTS.md](./PROMPTS.md) — 📗 ~11KB · die drei Workflow-Prompts (Claude-Code-Session-Start, Phasen-Kickoff, Phasen-Abschluss); lesen beim Start eines neuen Chats, nicht mitten in einer Session
+- [docs/PROMPTS.md](./PROMPTS.md) — 📗 ~15KB · die drei Workflow-Prompts (Claude-Code-Session-Start, Phasen-Kickoff im Browser, Phasen-Abschluss); **[2026-08-09]** Phasen-Abschluss läuft jetzt in Claude Code statt Browser+Google-Drive (Nikinger-Entscheidung, Effizienz); lesen beim Start eines neuen Chats, nicht mitten in einer Session
 
 ## Active phase (5 — Web-UI, REST-API, Auth-Selbstverwaltung)
 

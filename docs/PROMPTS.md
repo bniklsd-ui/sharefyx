@@ -7,15 +7,19 @@ up: CLAUDE.md
 down:
   - DOC_LAYERS_CONVENTION.md   # Navigationsregeln, auf die Prompt 1 verweist
   - ../ROADMAP.md              # Phasenübersicht
-updated: 2026-07-25
+updated: 2026-08-09
 ---
 # Workflow-Prompts
 
-Drei Prompts, unverändert im Ablauf gegenüber dem Trading-Bot-Projekt: **Planung im Browser,
-Ausführung in Claude Code, Abschluss zurück im Browser.** Angepasst sind nur die Projektbezüge
-und drei Stellen, an denen der alte Wortlaut inzwischen der Doc-Layers-Konvention widerspricht
-(siehe „Was ich geändert habe" am Ende — das ist kein Kosmetikhinweis, sondern der Grund für
-die Anpassung).
+Drei Prompts. **[2026-08-09 Korrektur, Nikinger-Entscheidung]:** der Ablauf ist nicht mehr
+„Planung im Browser, Ausführung in Claude Code, Abschluss zurück im Browser" — **Abschluss läuft
+jetzt ebenfalls in Claude Code** (Prompt 3). Grund: Google Drive ist für diesen Zweck ineffizient,
+und Sharefyx selbst trägt noch keine ganzen Projekte (nur einzelne Notizen/Aufgaben) — beides
+macht den Umweg über den Browser-Chat unnötig teuer. Nur Prompt 2 (Phasen-Kickoff/Planung) bleibt
+vorerst im Browser; eine Änderung daran ist angekündigt, aber nicht Teil dieser Korrektur.
+Angepasst sind sonst nur die Projektbezüge und drei Stellen, an denen der alte Wortlaut der
+Doc-Layers-Konvention widersprach (siehe „Was ich geändert habe" am Ende — das ist kein
+Kosmetikhinweis, sondern der Grund für die Anpassung).
 
 `xxx` / `X` sind Platzhalter und werden je Einsatz gefüllt.
 
@@ -149,33 +153,52 @@ xxx
 
 ---
 
-## Prompt 3 — Phasen-Abschluss im aktuellen Chat
+## Prompt 3 — Phasen-Abschluss in Claude Code
 
 ```text
-Guten Tag Claude! Phase X des Space-Server-Projekts ist abgeschlossen.
+Guten Tag Claude! Phase X des Space-Server-Projekts „Sharefyx" ist abgeschlossen.
 
 Ergebnisse:
 - erfolgreich fertiggestellt
 - erfolgreich getestet (Unit, gemockt)
 - im Rahmen der Möglichkeiten live validiert
 - gepusht und committet
-- aktueller Stand auf Google Drive hochgeladen
 
 Hinweise/Rahmen:
-Aktualität: weichen Projektdokumente von den hier im Kontext hochgeladenen ab, aktualisiere
-bitte. Aktualisiere nicht nur Notizen, sondern auch deine direkten Erinnerungen.
-Du darfst Google Drive und den gesamten Projektkontext für diesen Auftrag nutzen.
+Aktualität: weichen Projektdokumente vom tatsächlichen Repo-/Code-Stand ab, aktualisiere sie im
+selben Commit wie den jeweiligen Fund. Aktualisiere bei Bedarf auch deine eigenen Memory-Dateien
+(insbesondere den Phasenstatus) — Code und committete Docs bleiben die Wahrheit, Memory ist eine
+Abkürzung dorthin, kein Zweitspeicher.
+Das ist ein Rückblick, kein normaler Session-Start: lies für Punkt 1 gründlicher als sonst — den
+kompletten Phase-Head, den vollständigen SESSIONS_ARCHIVE.md-Verlauf dieser Phase (newest-first),
+das Plan-Dokument und, falls vorhanden, das Abnahmeprotokoll. Das Minimal-Read-Prinzip aus
+Prompt 1 („nur Header-Karten, gezielt absteigen") gilt hier bewusst nicht — ein Rückblick, der
+Kapitel ausspart, ist keiner.
 
 Auftrag:
-1. Aufmerksame Analyse der beendeten Phase (via Google Drive).
+1. Aufmerksame Analyse der beendeten Phase — lokales Repo ist die einzige Quelle, kein Google
+   Drive mehr nötig (Grund: siehe Datei-Kopf).
 2. Detaillierte 1080x1080 SVG-Grafik, die die Phase darstellt und grob erklärt.
-3. Handover-File: die Dinge, die der Phase-X+1-Chat vor dem Entwurf des detaillierten
-   Claude-Code-Plans wissen muss. Namensschema fortführen: PHASE[X]_CLOSEOUT_HANDOVER.md in
-   docs/concepts/, plus Indexzeile.
+   - Reines SVG-Markup direkt als Datei schreiben — kein Plugin/Skill nötig, dieselbe Technik
+     wie bei den bestehenden `docs/concepts/phase*_uebersicht.svg`. Am Stil der jeweils
+     letzten vorhandenen Phase-Grafik orientieren: Kopfleiste mit Status-Badge, Mission-Box,
+     Flussdiagramm mit farbcodierten Pfeilen (grün=Erfolg, rot=Ablehnung/Fehler, grau=neutral),
+     DejaVu-Sans/Segoe-UI-Fontstack. Namensschema fortführen:
+     `docs/concepts/phase{N}_{kurzname}_uebersicht.svg`.
+   - Anders als im Browser-Chat gibt es keine automatische Artifact-Vorschau — das Ergebnis vor
+     dem Abschluss aktiv visuell gegenprüfen (Screenshot/Renderer, Weg selbst wählen oder kurz
+     abklären, falls keiner verfügbar ist), nicht ungesehen als fertig melden.
+3. Handover-File: die Dinge, die der Phase-X+1-Chat (weiterhin im Browser, siehe Prompt 2) vor
+   dem Entwurf des detaillierten Claude-Code-Plans wissen muss. Namensschema fortführen:
+   PHASE[X]_CLOSEOUT_HANDOVER.md in docs/concepts/, plus Indexzeile.
 4. Rotationsprüfung: trägt der Phase-Head genau einen Session-Block? Falls nicht, ältere Blöcke
    über `scripts/rotate_session_block.sh <phase_verzeichnis>` verbatim nach SESSIONS_ARCHIVE.md
    verschieben lassen (nie abtippen) — der Prüfschritt (Reassemblierung byte-identisch) bleibt,
    das Skript ersetzt nur die Ausführung.
+5. Commit: SVG, Handover, Indexzeile und eine ggf. nötige Rotation gehören in denselben Commit
+   (Hard Rule 8). Ob der formale Phasenschluss (ROADMAP.md/Root-CLAUDE.md auf ✅) Teil dieses
+   Commits ist oder eine eigene Entscheidung braucht, hängt vom Einzelfall ab — im Zweifel
+   fragen statt still mitziehen.
 
 Zum Handover an sich:
 Handover = Status + Delta seit dem letzten Handover + offene Entscheidungen + Dateipfade als
@@ -201,3 +224,7 @@ xxx
 | Vier harte Regeln explizit in Prompt 1 aufgenommen | Secrets, CGNAT, kein LLM im Server, kein Last-Write-Wins. Alle vier stehen in `CLAUDE.md` — aber diese vier sind die, deren Verletzung nicht durch einen Test auffällt, sondern erst durch Schaden. |
 | Rotationsregel in Prompt 1 und als Punkt 4 in Prompt 3 | Im Trading-Bot-Repo wurde die Regel eingeführt, *nachdem* ein Head auf 211 KB gewachsen war. Der Prompt ist die Stelle, an der sie tatsächlich greift. |
 | „Phase X+15" → „Phase X+1" | Vermutlich ein Tippfehler im Original. Falls nicht: sag Bescheid, dann drehe ich es zurück. |
+| **[2026-08-09]** Prompt 3 von „Browser-Chat + Google Drive" auf „Claude Code" umgestellt | Nikinger-Entscheidung: Google Drive ist für den Abschluss ineffizient, Sharefyx trägt noch keine ganzen Projekte. Geprüft statt angenommen: eine SVG wie die drei bestehenden `phase*_uebersicht.svg` ist reines von Hand geschriebenes SVG-Markup (kein Renderer, kein Bild-Tool) — Claude Code kann das genauso schreiben wie der Browser-Chat, **kein neues Skill/Plugin nötig**. Die reale Lücke liegt woanders: Claude Code hat keine automatische Vorschau wie die Artifact-Ansicht im Browser (auf dieser VM sind weder `rsvg-convert`/`cairosvg`/`inkscape` noch ein Browser für Screenshots installiert, Stand 2026-08-09) — deshalb Punkt 2 im Prompt explizit um „vor dem Abschluss visuell gegenprüfen, Weg selbst wählen oder abklären" ergänzt, statt eine Vorschaufähigkeit zu unterstellen, die nicht existiert. |
+| **[2026-08-09]** „aktueller Stand auf Google Drive hochgeladen" (Ergebnis-Bullet) gestrichen, „Du darfst Google Drive … nutzen" (Hinweise) ersetzt durch eine konkrete Leseanweisung | Folgt aus derselben Entscheidung — das Repo ist jetzt die einzige Quelle, ein Upload-Schritt entfällt ersatzlos. |
+| **[2026-08-09]** Punkt 5 (Commit) neu in Prompt 3 | Der Browser-Chat konnte nicht committen, Claude Code muss es per Hard Rule 8 („Commit ⇒ Doc-Update, im selben Commit"). Bewusst als eigener Punkt, nicht implizit in Punkt 3/4 versteckt — sonst wird das Bündeln zum Zufall statt zur Regel. |
+| **[2026-08-09]** „Aktualisiere … deine direkten Erinnerungen" konkretisiert auf Claude Codes eigene Memory-Dateien | Der Originalsatz war für den Browser-Chat formuliert (Konversationskontext). Claude Code hat ein eigenes, dateibasiertes Memory-System — der Hinweis bleibt sinnvoll, aber nur, wenn er auf den tatsächlichen Mechanismus zeigt. |
