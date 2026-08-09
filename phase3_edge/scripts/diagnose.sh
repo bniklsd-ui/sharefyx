@@ -125,5 +125,27 @@ else
   echo "INFO aktives Release: kein $current_link — der Dienst läuft aus einem Arbeitsverzeichnis" >&2
 fi
 
+# 11) Wann lief der Purge-Timer zuletzt? (P6 Step 2, O2 — `authserver/store.py :: purge_expired()`
+#     räumt seither auch `token_families`/`clients` ab, aber nur, wenn der Timer tatsächlich
+#     läuft. Kein Artefakt wie beim Auth-Backup — `authctl.py purge-expired` schreibt nur eine
+#     Logzeile, keine Datei — deshalb hier über systemd selbst, nicht über eine Datei im
+#     Dateisystem, gleiche INFO/WARNUNG-Kategorie wie Prüfung 9: ein stiller Purge ist ein
+#     Betriebsproblem, kein Abbruchgrund für diese Diagnose.)
+last_trigger="$(systemctl show sharefyx-purge.timer --property=LastTriggerUSec --value 2>/dev/null || true)"
+if [[ -z "$last_trigger" || "$last_trigger" == "n/a" ]]; then
+  echo "WARNUNG: sharefyx-purge.timer ist nie gelaufen —" \
+       "sudo systemctl enable --now sharefyx-purge.timer" >&2
+else
+  last_epoch="$(date -d "$last_trigger" +%s 2>/dev/null || echo 0)"
+  now_epoch="$(date -u +%s)"
+  age_s=$(( now_epoch - last_epoch ))
+  if (( last_epoch == 0 || age_s > 172800 )); then
+    echo "WARNUNG: letzter Purge-Lauf ist älter als 48h ($last_trigger) —" \
+         "journalctl -u sharefyx-purge -n 20" >&2
+  else
+    echo "INFO letzter Purge-Lauf: $last_trigger" >&2
+  fi
+fi
+
 echo "DIAGNOSE: alle Prüfungen bestanden." >&2
 exit 0

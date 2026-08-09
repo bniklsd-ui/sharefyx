@@ -4,7 +4,13 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from authserver.store import _SCHEMA, RETENTION_AFTER_REVOKE_OR_CONSUME_S, AuthStore
+from authserver.store import (
+    _SCHEMA,
+    CLIENT_RETENTION_S,
+    RETENTION_AFTER_REVOKE_OR_CONSUME_S,
+    TOKEN_FAMILY_RETENTION_S,
+    AuthStore,
+)
 
 
 @pytest.fixture
@@ -319,6 +325,108 @@ def test_rotate_refresh_after_access_token_purged(store, clock):
     store.purge_expired()  # löscht die abgelaufene access_tokens-Zeile
     result = store.rotate_refresh(refresh, client_id="c1", access_ttl_s=3600, refresh_ttl_s=2_592_000)
     assert result is not None
+
+
+# -- O2 (P6 Step 2): token_families/clients purge --------------------------------------------
+
+
+def test_purge_expired_removes_a_dead_old_family(store, clock):
+    """Abgebrochene Autorisierung: Familie angelegt, nie ein Token ausgestellt (kein Code
+    eingelöst) — tot von Anfang an. Alt genug (> TOKEN_FAMILY_RETENTION_S) wird sie entfernt."""
+    family_id = _family(store)
+    clock.advance(TOKEN_FAMILY_RETENTION_S + 86400)
+    counts = store.purge_expired()
+    assert counts["token_families"] == 1
+    with store._lock:
+        row = store._conn.execute(
+            "SELECT 1 FROM token_families WHERE family_id = ?", (family_id,)
+        ).fetchone()
+    assert row is None
+
+
+def test_purge_expired_keeps_a_dead_but_recent_family(store, clock):
+    """Dieselbe tote Familie, aber jünger als die Aufbewahrungsfrist — der Alters-Riegel greift
+    unabhängig vom Tot-Zustand."""
+    _family(store)
+    clock.advance(TOKEN_FAMILY_RETENTION_S - 86400)
+    counts = store.purge_expired()
+    assert counts["token_families"] == 0
+
+
+def test_purge_expired_keeps_a_live_family_regardless_of_age(store, clock):
+    """Eine Familie mit einem noch gültigen `refresh_tokens`-Eintrag bleibt stehen, auch wenn sie
+    älter als `TOKEN_FAMILY_RETENTION_S` ist — sie ist nicht tot, nur alt."""
+    family_id = _family(store)
+    store.issue_token_pair(family_id, access_ttl_s=60, refresh_ttl_s=TOKEN_FAMILY_RETENTION_S * 3)
+    clock.advance(TOKEN_FAMILY_RETENTION_S + 86400)
+    counts = store.purge_expired()
+    assert counts["token_families"] == 0
+
+
+def test_purge_expired_removes_a_revoked_old_family(store, clock):
+    """`revoke_family()` löscht Access-/Refresh-Zeilen synchron beim Widerruf (store.py:382f) —
+    dieselbe "tot"-Prüfung greift danach unverändert, ohne einen zweiten Codepfad zu brauchen."""
+    family_id = _family(store)
+    store.issue_token_pair(family_id, access_ttl_s=3600, refresh_ttl_s=TOKEN_FAMILY_RETENTION_S * 3)
+    store.revoke_family(family_id, "authctl")
+    clock.advance(TOKEN_FAMILY_RETENTION_S + 86400)
+    counts = store.purge_expired()
+    assert counts["token_families"] == 1
+
+
+def test_purge_expired_keeps_a_family_revoked_today_even_if_born_long_ago(store, clock):
+    """Regressionstest für den Advisor-Fund vor dem Commit dieser Session: die Altersgrenze muss
+    ab dem Widerruf zählen, nicht ab der Geburt der Familie. Eine per Replay-Erkennung getötete
+    Familie ist der Härtetest aus der Phase-4-Mission (`revoked_reason='refresh_replay'`) — ihr
+    einziger forensischer Beleg darf nicht verschwinden, nur weil die Familie selbst schon alt
+    war. Unter der ursprünglichen `created_at`-only-Prüfung wäre diese Zeile fälschlich mit
+    `token_families == 1` durchgefallen."""
+    family_id = _family(store)
+    store.issue_token_pair(family_id, access_ttl_s=3600, refresh_ttl_s=TOKEN_FAMILY_RETENTION_S * 3)
+    clock.advance(TOKEN_FAMILY_RETENTION_S + 86400)  # Familie ist jetzt "geboren vor 31 Tagen"
+    store.revoke_family(family_id, "refresh_replay")  # aber gerade erst (jetzt) widerrufen
+    counts = store.purge_expired()
+    assert counts["token_families"] == 0
+
+
+def test_purge_expired_keeps_a_client_with_a_live_family(store, clock):
+    """Ein Client mit einer weiterhin aktiven Familie bleibt stehen, egal wie alt die
+    `clients`-Zeile selbst ist."""
+    client = store.create_client(client_name="X", application_type=None, redirect_uris=["https://x/cb"])
+    family_id = store.create_family(
+        space="niklas", client_id=client.client_id, scope="space", resource="https://x/mcp"
+    )
+    store.issue_token_pair(family_id, access_ttl_s=60, refresh_ttl_s=CLIENT_RETENTION_S * 3)
+    clock.advance(CLIENT_RETENTION_S + 86400)
+    counts = store.purge_expired()
+    assert counts["clients"] == 0
+    assert store.get_client(client.client_id) is not None
+
+
+def test_purge_expired_removes_a_client_whose_only_family_just_died(store, clock):
+    """Familie und Client werden im selben `purge_expired()`-Aufruf entfernt — die Reihenfolge
+    (Familien zuerst, dann Clients) ist der Punkt: der Client sieht den post-Familien-Purge-
+    Zustand, nicht den Stand vor der eigenen Transaktion."""
+    client = store.create_client(client_name="X", application_type=None, redirect_uris=["https://x/cb"])
+    store.create_family(space="niklas", client_id=client.client_id, scope="space", resource="https://x/mcp")
+    clock.advance(max(TOKEN_FAMILY_RETENTION_S, CLIENT_RETENTION_S) + 86400)
+    counts = store.purge_expired()
+    assert counts["token_families"] == 1
+    assert counts["clients"] == 1
+    assert store.get_client(client.client_id) is None
+
+
+def test_purge_expired_keeps_a_family_less_client_that_is_still_recent(store, clock):
+    """Die Familie ist tot und alt genug für ihre eigene Frist, der Client aber jünger als
+    `CLIENT_RETENTION_S` — zwei getrennte Konstanten, zwei getrennte Ergebnisse in einem Lauf."""
+    client = store.create_client(client_name="X", application_type=None, redirect_uris=["https://x/cb"])
+    store.create_family(space="niklas", client_id=client.client_id, scope="space", resource="https://x/mcp")
+    assert TOKEN_FAMILY_RETENTION_S < CLIENT_RETENTION_S
+    clock.advance(TOKEN_FAMILY_RETENTION_S + 86400)
+    counts = store.purge_expired()
+    assert counts["token_families"] == 1
+    assert counts["clients"] == 0
+    assert store.get_client(client.client_id) is not None
 
 
 # -- Schema 2 (P5 Step 2) --------------------------------------------------------------------

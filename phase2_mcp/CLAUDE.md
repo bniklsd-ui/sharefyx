@@ -93,6 +93,7 @@ Streichung.
 | 7 | `tools.py` (die sechs Tools) | 6 | ✅ | 23 (`test_tools.py`) |
 | 8 | `scripts/mcp_smoke.py`, Runbook, Größenmessung | 7 | ✅ **live-verifiziert** | 3 (`test_mcp_smoke.py`) |
 | 9 | Siebtes Tool `patch_item` (P6-E/F/G) + `mcpserver/receipts.py` (neu, Quittungen statt Volltext, P6-H) + `return_body` an allen vier Schreib-Tools + `update_item` lehnt `visibility`/`share_read`/`share_write` ab (P6-M) | P6 Step 1 | ✅ | +7 (`test_tools.py` 23→30), Kollateralkorrekturen in `test_app.py`/`test_request_log.py`/`mcp_smoke.py` (keine neuen Tests, nur Assertions auf JSON statt Frontmatter-Text umgestellt) |
+| 10 | Client-Surface-Logging (V42): `ua`-Feld auf der `ev="http"`-Zeile (`AccessLogASGI`), gekürzt auf 120 Zeichen, läuft durch `TokenScrubbingFilter` wie jedes andere Feld. Bewusst **nicht** auf `ev="tool"` — `context.py` ist nicht auf P6 Step 2s Berührungsliste | P6 Step 2 | ✅ **gebaut** — V42 selbst (setzen reale MCP-Clients `User-Agent` verlässlich?) braucht zwei Tage echtes journald, Nikinger-Sache | +3 (`test_request_log.py` 11→13, `test_logging.py` 8→9) |
 
 **Zeile 7, Step 6 abgeschlossen:** `search_items`, `get_item`, `create_item`, `update_item`,
 `append_to_item` lösen ihre seit Step 5 bestehenden `NotImplementedError`-Platzhalter ein
@@ -217,9 +218,14 @@ Korrekturen oben) — `test_tools.py` wuchs 23→30 (siebtes Tool `patch_item` +
 später gefunden. Reale Zahl wieder per `pytest --collect-only -q` je Datei neu gezählt: **Gesamt:
 92 Tests.**
 
-**Gesamt: 92 Tests** in `phase2_mcp/tests/` (6 `test_config.py` + 1 `test_credentials.py` + 1
-`test_auth.py` + 3 `test_permissions.py` + 8 `test_logging.py` + 2 `test_context.py` + 15
-`test_app.py` + 30 `test_tools.py` + 3 `test_mcp_smoke.py` + 11 `test_request_log.py` + 10
+**[2026-08-09 Korrektur, P6 Step 2]:** neunte Instanz, im selben Commit korrigiert —
+`test_request_log.py` 11→13 (`ua`-Feld: Kürzung, Abwesenheit) und `test_logging.py` 8→9 (`ua`
+durch `TokenScrubbingFilter`), Modul-Status Zeile 10. Reale Zahl wieder per `pytest
+--collect-only -q` je Datei neu gezählt: **Gesamt: 95 Tests.**
+
+**Gesamt: 95 Tests** in `phase2_mcp/tests/` (6 `test_config.py` + 1 `test_credentials.py` + 1
+`test_auth.py` + 3 `test_permissions.py` + 9 `test_logging.py` + 2 `test_context.py` + 15
+`test_app.py` + 30 `test_tools.py` + 3 `test_mcp_smoke.py` + 13 `test_request_log.py` + 10
 `test_asgi_bearer.py` [seit dem Schnitt: nur noch `BearerAuthASGI`, kein `TokenPathASGI`/
 `AuthModeASGI` mehr, Details `phase4_auth/CLAUDE.md`] + 2 `test_serve.py` [neu, Schnitt:
 `serve.py :: main()`s Verdrahtung bis `uvicorn.run()`, vorher ungetestet]). Acht weitere Tests

@@ -254,6 +254,45 @@ async def test_http_event_logs_401_status(request_log_handler):
     assert http_events[0]["method"] == "POST"
 
 
+@pytest.mark.asyncio
+async def test_http_event_carries_ua_truncated_at_120_chars(request_log_handler):
+    """P6 Step 2 (V42/Client-Surface-Logging): der `User-Agent`-Header landet als `ua`, gekürzt
+    auf `_UA_MAX_LEN` (120) — ein Client-kontrollierter String darf die Logzeile nicht sprengen."""
+    wrapped = AccessLogASGI(_ok_app)
+    long_ua = "claude-code/" + "x" * 200
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=wrapped), base_url="http://testserver",
+        headers={"User-Agent": long_ua},
+    ) as client:
+        await client.get("/mcp")
+
+    http_events = [r.msg for r in request_log_handler.records if r.msg.get("ev") == "http"]
+    assert len(http_events) == 1
+    assert http_events[0]["ua"] == long_ua[:120]
+    assert len(http_events[0]["ua"]) == 120
+
+
+@pytest.mark.asyncio
+async def test_http_event_omits_ua_when_header_absent(request_log_handler):
+    """Direkter ASGI-Aufruf ohne `headers` im Scope (kein `httpx`-Default-`User-Agent`
+    dazwischen, `httpx.AsyncClient` setzt sonst immer einen) — `ua` fehlt dann ganz, statt
+    `null` zu tragen (gleiches Muster wie `stage`/`client_id` in `OAuthLogASGI`)."""
+    wrapped = AccessLogASGI(_ok_app)
+    scope = {"type": "http", "method": "GET", "path": "/mcp", "headers": []}
+
+    async def receive():
+        return {"type": "http.request", "body": b""}
+
+    async def send(message):
+        pass
+
+    await wrapped(scope, receive, send)
+
+    http_events = [r.msg for r in request_log_handler.records if r.msg.get("ev") == "http"]
+    assert len(http_events) == 1
+    assert "ua" not in http_events[0]
+
+
 async def _ok_app(scope, receive, send):
     await send({"type": "http.response.start", "status": 200, "headers": []})
     await send({"type": "http.response.body", "body": b""})

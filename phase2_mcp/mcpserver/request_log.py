@@ -7,13 +7,25 @@ Starlette-Wurzel-Ebene) und `ev="oauth"` (`OAuthLogASGI`, P4 Step 6b, gleiche Wu
 damit `test_app.py` unverändert gegen die nackte App läuft. Alle drei schreiben ausschließlich
 über `log_event()`, das die Feld-Whitelist erzwingt.
 
-**Feld-Whitelist** (Plan §3.1, erweitert P4 §4): `ts` · `ev` · `tool` · `space` · `ms` · `ok` ·
-`err` · `method` · `path` · `status` · `stage` · `client_id` · `grant`. Alles andere wird von
-`log_event()` stillschweigend verworfen — insbesondere
+**Feld-Whitelist** (Plan §3.1, erweitert P4 §4, P6 Step 2): `ts` · `ev` · `tool` · `space` · `ms` ·
+`ok` · `err` · `method` · `path` · `status` · `stage` · `client_id` · `grant` · `ua`. Alles andere
+wird von `log_event()` stillschweigend verworfen — insbesondere
 darf hier **nie** ein Token, ein Item-Titel/Body/Snippet, eine Item-ID oder eine rohe
 Fehlermeldung landen (`map_storage_error()`-Texte wie `conflict: itm_… wurde geändert (…)`
 enthalten IDs und potenziell Titel). Deshalb geht in `err` nur die **Klasse**
 (`classify_error()`), nie `str(exc)`.
+
+**`ua` (P6 Step 2, Client-Surface-Logging, V42):** der `User-Agent`-Header von
+`AccessLogASGI`, gekürzt auf 120 Zeichen — das erste **externe, frei wählbare** Feld auf dieser
+Log-Zeile, jedes andere ist entweder server-generiert (`ts`, `ms`, `ok`), bereits redigiert
+(`path`) oder eine server-ausgestellte opake ID (`client_id`). Zwei Verteidigungen, nicht eine:
+die 120-Zeichen-Kürzung hier UND `logging_setup.py :: TokenScrubbingFilter`, das (seit der P3-
+Erweiterung dort) auch String-**Werte innerhalb** des Feld-Dicts scrubbt, nicht nur
+`record.msg` als Ganzes — läuft vor `JsonLineFormatter.format()`, trifft `ua` also genauso wie
+jedes andere Feld. Nie im Tool-Log (`ev="tool"`): `ToolCallLogMiddleware` hat keinen ASGI-Scope-
+Zugriff, und `context.py` steht nicht auf P6 Step 2s Berührungsliste — ein Zusammenführen mit
+`ev="http"` über den gemeinsamen Zeitstempel reicht für V42 (welche Oberfläche stellte diese
+Anfrage), ohne die Tool-Schicht anzufassen.
 
 **Warum `classify_error()` den Nachrichtentext parst statt den Exception-Typ zu prüfen:**
 Bis diese Middleware eine Exception sieht, hat `tools.py :: map_storage_error()` sie bereits in
@@ -50,9 +62,15 @@ LOGGER_NAME = "sharefyx.request"
 _ALLOWED_FIELDS = frozenset(
     {
         "ts", "ev", "tool", "space", "ms", "ok", "err", "method", "path", "status",
-        "stage", "client_id", "grant",
+        "stage", "client_id", "grant", "ua",
     }
 )
+
+# P6 Step 2 (V42): maximale Länge des `ua`-Felds — ein Header ist Client-kontrolliert und damit
+# beliebig lang; die Kürzung ist keine Stilfrage, sondern eine Grenze gegen eine überlange
+# Logzeile aus unauthentifizierter (bzw. bei `/mcp` erst nach Bearer-Prüfung authentifizierter,
+# aber immer noch client-gewählter) Eingabe.
+_UA_MAX_LEN = 120
 
 # Bekannte Fehlerklassen, wie von `tools.py :: map_storage_error()` als Nachrichten-Präfix
 # festgelegt. Alles Unbekannte (inklusive `auth_error`, `space_not_found`, `internal_error`)
@@ -139,7 +157,8 @@ class ToolCallLogMiddleware(Middleware):
 class AccessLogASGI:
     """Umschließt die Wurzel-App (`scripts/serve.py`, nicht `create_app()`). Misst Dauer, fängt
     den Status aus dem `http.response.start`-Event ab, loggt Methode, Pfad (token-redacted) und
-    Status. Kein Body, keine Header."""
+    Status. Kein Body. **Seit P6 Step 2 genau ein Header:** `User-Agent`, für `ua` (siehe
+    Moduldocstring) — sonst weiterhin keine Header."""
 
     def __init__(self, app: Any) -> None:
         self._app = app
@@ -151,6 +170,9 @@ class AccessLogASGI:
 
         start = time.perf_counter()
         status_holder: dict[str, int] = {}
+        headers = dict(scope.get("headers") or [])
+        raw_ua = headers.get(b"user-agent")
+        ua = raw_ua.decode("utf-8", errors="replace")[:_UA_MAX_LEN] if raw_ua else None
 
         async def _send(message: dict[str, Any]) -> None:
             if message["type"] == "http.response.start":
@@ -162,13 +184,16 @@ class AccessLogASGI:
         finally:
             ms = round((time.perf_counter() - start) * 1000)
             path = _TOKEN_SEGMENT_RE.sub(r"\1<redacted>", scope.get("path", ""))
-            log_event(
-                ev="http",
-                method=scope.get("method"),
-                path=path,
-                status=status_holder.get("status"),
-                ms=ms,
-            )
+            fields: dict[str, Any] = {
+                "ev": "http",
+                "method": scope.get("method"),
+                "path": path,
+                "status": status_holder.get("status"),
+                "ms": ms,
+            }
+            if ua is not None:
+                fields["ua"] = ua
+            log_event(**fields)
 
 
 # (method, path) -> stage (Plan §4). `/oauth/token` bedient sowohl `authorization_code` als auch

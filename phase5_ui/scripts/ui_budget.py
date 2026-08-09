@@ -26,6 +26,25 @@ Reihenfolge holt. Das ist eine Nachbildung, kein Browser-Messwert: Verbindungsau
 TLS-Handshake und HTTP-Header sind nicht enthalten. Der Phase-Head sagt das dazu, damit die Zahl
 nicht als etwas gelesen wird, das sie nicht ist.
 
+**P6 Step 2 (P6-I/P6-S) — Latenzmessung, getrennt von den vier Größen-`Metric`s oben:**
+`_measure_latency()` misst `search_items`/`get_item` (echter `mcpserver.app :: create_app()`,
+gleicher `fastmcp.Client`/`StreamableHttpTransport`-Stack wie `phase2_mcp/scripts/
+mcp_smoke.py`) und `GET /api/v1/overview`. **Eigene `LatencyMetric`-Dataclass, ohne `budget_bytes`/
+`ok`** — würde Millisekunden in `Metric` gepresst, wäre `main()`s Exit-Code plötzlich
+zeitabhängig, und der ist ein live-verifiziertes Abnahme-Artefakt (P5 Zeile 15, Nikinger
+2026-08-07): eine ausgelastete VM dürfte einen bestehenden grünen Lauf nicht rot färben, für eine
+Messung, die laut P6-I/P6-S ohnehin nur Zahlen für die nächste Entscheidung liefern soll, kein
+Budget ist. Läuft NACH `_measure()`, gegen denselben `data_root` (die dort gesäten 220 Items
+werden wiederverwendet — Hard Rule 2: ein frischer `Store` rekonstruiert seinen Index immer aus
+den Dateien, kein erneutes Seeding nötig), aber mit einer eigenen `AuthStore`-Datei je Fläche
+(MCP-Bearer-Token, UI-Session) statt `_measure()`s Auth-Zustand mitzubenutzen — hält beide
+Messungen unabhängig voneinander nachvollziehbar. **Jede der drei Messungen macht einen
+verworfenen Aufwärmlauf vor dem gemessenen Aufruf** (Advisor-Fund): ein einzelner kalter Aufruf
+gegen eine gerade erst gebaute App/Verbindung trägt Routen-Setup, ersten Import bzw. (bei den
+MCP-Tools) die Session-Verhandlung mit — genau die Frage, die P6-I/P6-S beantworten sollen
+(„ist die Werkzeug-/API-Fläche selbst zu langsam"), würde sonst mit einer Frage beantwortet, die
+niemand gestellt hat („wie lange dauert ein Kaltstart").
+
 Ausgabe: Text (Standard) oder `--json` auf stdout; Logs auf stderr (Hard Rule 7).
 """
 from __future__ import annotations
@@ -38,6 +57,7 @@ import logging
 import re
 import sys
 import tempfile
+import time
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -46,13 +66,17 @@ import httpx
 from authserver.config import AuthSettings
 from authserver.store import AuthStore
 from authserver.userdir import UserDirectory
+from fastmcp import Client
+from fastmcp.client.transports import StreamableHttpTransport
+from mcpserver.app import OAuthConfig, create_app
+from mcpserver.config import Settings as McpSettings
 from mcpserver.permissions import OwnSpaceWritable
 from starlette.applications import Starlette
 from storage.store import Store
 
 from webui.account import account_routes
 from webui.api import api_routes
-from webui.config import DEFAULT_STATIC_DIR, UiSettings
+from webui.config import COOKIE_NAME, DEFAULT_STATIC_DIR, UiSettings
 from webui.routes_auth import ui_auth_routes
 from webui.sessions import SessionManager
 from webui.static_routes import static_routes
@@ -80,6 +104,16 @@ class Metric:
     @property
     def ok(self) -> bool:
         return self.value_bytes < self.budget_bytes
+
+
+@dataclass
+class LatencyMetric:
+    """P6 Step 2 (P6-I/P6-S) — bewusst kein `budget_bytes`/`ok`, siehe Moduldocstring: eine
+    Zeitmessung ist hier informativ, kein Gate."""
+    name: str
+    ms: float
+    response_bytes: int
+    detail: str
 
 
 def _kb(value: int) -> str:
@@ -232,6 +266,104 @@ async def _measure(data_root: Path) -> list[Metric]:
     return metrics
 
 
+async def _measure_latency(data_root: Path) -> list[LatencyMetric]:
+    """P6 Step 2 (P6-I/P6-S) — siehe Moduldocstring für die Begründung, warum das eine eigene
+    Funktion mit eigener Dataclass ist, kein Umbau von `_measure()`. Läuft gegen denselben
+    `data_root`, den `_measure()` bereits mit 220 Items gefüllt hat, mit eigenen, unabhängigen
+    `AuthStore`-Dateien für die MCP- und die REST-Fläche."""
+    item_store = Store(data_root, git=False)
+
+    latency: list[LatencyMetric] = []
+
+    # -- MCP-Tool-Fläche: search_items, get_item — echter mcpserver.app::create_app(), gleicher
+    #    Client/Transport-Stack wie phase2_mcp/scripts/mcp_smoke.py (bewusst dieselbe, bereits
+    #    live-verifizierte Verdrahtung, kein Nachbau).
+    mcp_auth_settings = AuthSettings(
+        base_url="https://ui-budget.local", db_path=data_root / "_budget_mcp_auth.sqlite3"
+    )
+    mcp_auth_store = AuthStore(mcp_auth_settings.db_path, now_fn=lambda: datetime.now(timezone.utc))
+    family_id = mcp_auth_store.create_family(
+        space=SPACE, client_id="ui_budget", scope="space", resource=mcp_auth_settings.resource
+    )
+    access_token, _refresh = mcp_auth_store.issue_token_pair(
+        family_id, access_ttl_s=3600, refresh_ttl_s=2_592_000
+    )
+    mcp_oauth = OAuthConfig(
+        settings=mcp_auth_settings, store=mcp_auth_store,
+        users=UserDirectory(mcp_auth_store, dek=None),
+    )
+    mcp_app = create_app(settings=McpSettings(data_root=data_root), store=item_store, oauth=mcp_oauth)
+
+    def _mcp_client_factory(app: object) -> object:
+        transport = httpx.ASGITransport(app=app)
+
+        def factory(**kwargs: object) -> httpx.AsyncClient:
+            return httpx.AsyncClient(
+                transport=transport, base_url="https://ui-budget.local", **kwargs
+            )
+
+        return factory
+
+    mcp_transport = StreamableHttpTransport(
+        url="https://ui-budget.local/mcp/",
+        headers={"Authorization": f"Bearer {access_token}"},
+        httpx_client_factory=_mcp_client_factory(mcp_app),
+    )
+
+    async with mcp_app.router.lifespan_context(mcp_app):
+        async with Client(mcp_transport) as mcp_client:
+            # Aufwärmlauf, siehe Docstring — verworfen. Der erste Aufruf über einen frischen
+            # `Client` trägt die MCP-Session-Verhandlung (`initialize` + `ListTools`, im
+            # Server-Log als eigene Requests sichtbar) mit, kein realistischer Wert für "wie
+            # schnell ist DIESES Tool", sondern nur "wie schnell ist eine kalte Verbindung".
+            await mcp_client.call_tool("search_items", {"limit": 1})
+            start = time.perf_counter()
+            search_result = await mcp_client.call_tool("search_items", {"limit": 50})
+            ms = (time.perf_counter() - start) * 1000
+            search_payload = json.loads(search_result.data)
+            latency.append(LatencyMetric(
+                "search_items (MCP, limit=50)", ms, len(search_result.data.encode("utf-8")),
+                f"{len(search_payload['items'])} von {search_payload['total']} Treffern",
+            ))
+
+            item_id = search_payload["items"][0]["id"]
+            start = time.perf_counter()
+            get_result = await mcp_client.call_tool("get_item", {"item_id": item_id})
+            ms = (time.perf_counter() - start) * 1000
+            latency.append(LatencyMetric(
+                "get_item (MCP)", ms, len(get_result.data.encode("utf-8")), item_id,
+            ))
+
+    # -- REST-Fläche: GET /api/v1/overview — Session-Cookie direkt gemintet (`create_session()`
+    #    braucht keine `users`-Zeile, `authserver/store.py:961-983`), kein Einladung/Enrollment/
+    #    Login-Umweg nötig für eine reine Lesemessung.
+    ui_auth_settings = AuthSettings(
+        base_url="https://ui-budget.local", db_path=data_root / "_budget_ui_auth.sqlite3"
+    )
+    ui_auth_store = AuthStore(ui_auth_settings.db_path, now_fn=lambda: datetime.now(timezone.utc))
+    ui_settings = UiSettings(base_url=ui_auth_settings.base_url)
+    session_id, _csrf = ui_auth_store.create_session(
+        space=SPACE, idle_ttl_s=ui_settings.idle_ttl_s, absolute_ttl_s=ui_settings.absolute_ttl_s,
+    )
+    sessions = SessionManager(ui_auth_store, settings=ui_settings)
+    rest_app = Starlette(routes=api_routes(ui_settings, item_store, sessions, OwnSpaceWritable()))
+
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=rest_app), base_url="https://ui-budget.local",
+        cookies={COOKIE_NAME: session_id},
+    ) as client:
+        await client.get("/api/v1/overview")  # Aufwärmlauf, siehe Docstring — verworfen
+        start = time.perf_counter()
+        overview = await client.get("/api/v1/overview")
+        ms = (time.perf_counter() - start) * 1000
+        assert overview.status_code == 200, overview.status_code
+        latency.append(LatencyMetric(
+            "GET /api/v1/overview", ms, len(overview.content), "",
+        ))
+
+    return latency
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--json", action="store_true", help="Ergebnis als JSON auf stdout")
@@ -243,11 +375,13 @@ def main(argv: list[str] | None = None) -> int:
 
     with tempfile.TemporaryDirectory(prefix="sharefyx-budget-") as tmp:
         metrics = asyncio.run(_measure(Path(tmp)))
+        latency = asyncio.run(_measure_latency(Path(tmp)))
 
     if args.json:
         print(json.dumps(
             {"metrics": [asdict(m) | {"ok": m.ok} for m in metrics],
-             "all_within_budget": all(m.ok for m in metrics)},
+             "all_within_budget": all(m.ok for m in metrics),
+             "latency": [asdict(m) for m in latency]},
             ensure_ascii=False,
         ))
     else:
@@ -267,6 +401,14 @@ def main(argv: list[str] | None = None) -> int:
             print(f"{len(over)} von {len(metrics)} Messgrößen ÜBER dem Zielkorridor.")
         else:
             print(f"Alle {len(metrics)} Messgrößen im Zielkorridor.")
+
+        # P6 Step 2 (P6-I/P6-S): rein informativ, siehe Moduldocstring — kein Einfluss auf den
+        # Exit-Code unten, der bewusst ausschließlich von `metrics` abhängt.
+        print("\nLatenz- und Größenmessung Werkzeug-/API-Fläche (P6-I/P6-S, informativ):\n")
+        for m in latency:
+            print(f"[INFO] {m.name:<32} {m.ms:>8.1f} ms   {_kb(m.response_bytes):>10}")
+            if m.detail:
+                print(f"         {m.detail}")
 
     return EXIT_OK if all(m.ok for m in metrics) else EXIT_OVER_BUDGET
 

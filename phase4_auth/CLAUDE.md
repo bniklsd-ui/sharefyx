@@ -156,7 +156,7 @@ befundenen** Punkte: `../docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`. Kurzfa
 | S8 | `sudo install_units.sh` sourced eine nutzerschreibbare Datei als root | sehr niedrig | `install_units.sh` | ✅ **geschlossen** (P5 Step 1) |
 | O1 | Nutzerakten werden **einmal beim Start** gelesen — Provisionierung wirkt erst nach Restart | Betriebsnotiz | `scripts/serve.py` | ✅ **geschlossen im Code** (P5 Step 2 — `UserDirectory.get()` liest live, kein Cache mehr); **live wirksam erst nach dem Migrations-Runbook** (`phase5_ui/CLAUDE.md` Session-Block 2026-08-02), bis dahin läuft der Dienst noch auf dem alten Build |
 | S10 | **Ein Reset über eine Einladung widerrief weder Token-Familien noch UI-Sitzungen** — der Passwortwechsel tut das seit P5 Step 4 (P5-Q), der *stärkere* Reset nicht. Ein altes Refresh-Token behielt vollen Zugriff, obwohl Passwort **und** TOTP ersetzt waren. Live gefunden: nach einem echten Reset standen neun Familien vom 30.07. weiter auf aktiv | mittel | `webui/routes_auth.py :: _invite_post()` | ✅ **geschlossen** (2026-08-06) — `revoke_families_for_space()` + `revoke_sessions_for_space()`, Grund `invite_redeemed`; Test gegen den ungefixten Stand als rot gegengeprüft. **Wirkt erst nach einem Deploy.** Herleitung: `phase5_ui/CLAUDE.md`, Session-Block 2026-08-06 |
-| O2 | **`clients` und `token_families` werden von `purge_expired()` nie abgeräumt** — beide wachsen unbegrenzt (live: 35 DCR-Registrierungen in einer Woche für zwei Personen, 20 Token-Familien). Verschärfend: `clients.last_used_at` wird nur bei der Registrierung auf `NULL` gesetzt und nie geschrieben — die eine Spalte, an der man eine verwaiste Registrierung erkennen könnte, ist tot. Sicherheitsrisiko gering (eine Registrierung allein gewährt nichts) | Betriebsnotiz | `store.py :: purge_expired()`, `store.py:265` | 🔴 **offen** — bewusst nicht still gefixt: ein Aufräumkriterium braucht erst eine belastbare Spalte und eine Entscheidung, ab wann eine Registrierung verfällt. Nikinger-Entscheidung ausstehend |
+| O2 | **`clients` und `token_families` werden von `purge_expired()` nie abgeräumt** — beide wachsen unbegrenzt (live: 35 DCR-Registrierungen in einer Woche für zwei Personen, 20 Token-Familien). Verschärfend: `clients.last_used_at` wird nur bei der Registrierung auf `NULL` gesetzt und nie geschrieben — die eine Spalte, an der man eine verwaiste Registrierung erkennen könnte, ist tot. Sicherheitsrisiko gering (eine Registrierung allein gewährt nichts) | Betriebsnotiz | `store.py :: purge_expired()`, `store.py:265` | ✅ **geschlossen im Code** (2026-08-09, P6 Step 2) — `purge_expired()` löscht jetzt auch tote `token_families` (widerrufen ODER natürlich abgelaufen: keine Kind-Zeile mehr in `access_tokens`/`refresh_tokens`/`auth_codes`) und `clients` ohne verbliebene Familie, je mit eigener Altersgrenze (`TOKEN_FAMILY_RETENTION_S`=30d, `CLIENT_RETENTION_S`=90d — länger, weil ein Passwortwechsel Familien sofort widerruft, während die Client-Registrierung im Claude-Account bestehen bleibt). `clients.last_used_at` bleibt tot wie beschrieben, wird für dieses Kriterium nicht gebraucht. **Wirkt erst nach einem Deploy, live-Purge-Lauf ist Nikinger-Sache** (`phase6_shares/CLAUDE.md` Step-2-Session-Block, Gate A→B Punkt 3) |
 | S9 | `submit_consent()` prüfte `record.status` nie — ein per `authctl.py disable-user` gesperrter Space konnte sich über den OAuth-Consent-Login sofort eine neue Token-Familie holen, die Sperre war ohne UI-Anteil wirkungslos | niedrig-mittel | `flows.py :: submit_consent` | ✅ **geschlossen** (P5 Step 4) |
 
 **[2026-08-02 Korrektur, P5 Step 1]:** der Absatz „Keiner von S2–S8 ist gefixt" stand hier
@@ -192,6 +192,14 @@ CSS-Wiederverwendung (`<link>` auf `/ui/static/app.css`, kein Python-Import — 
 unverändert), `routes.py :: _security_headers()`s CSP dafür von `style-src 'unsafe-inline'`
 (ohne `'self'`) auf `style-src 'self'; font-src 'self'` umgestellt. Reine Gestaltungskorrektur,
 keine Rechte-/Auth-Änderung. Details: `phase5_ui/CLAUDE.md` Session-Block 2026-08-06 (Step 8b).
+
+**[2026-08-09, P6 Step 2 — O2 geschlossen]:** `store.py :: purge_expired()` räumt jetzt auch
+`token_families`/`clients` ab (zwei neue Konstanten, `TOKEN_FAMILY_RETENTION_S`/
+`CLIENT_RETENTION_S`, +8 Tests in `test_authserver_store.py`, 250→258). Volle Herleitung
+(Prädikat, FK-Reihenfolge, warum zwei getrennte Fristen) und der Rest von Step 2 (Client-
+Surface-Logging, `diagnose.sh`, `ui_budget.py`): `phase6_shares/CLAUDE.md` Step-2-Session-Block —
+lebt dort, nicht doppelt hier, weil P4 formal abgeschlossen ist und dieser Kopf nur die O2-Zeile
+selbst nachzieht.
 
 ---
 

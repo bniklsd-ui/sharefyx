@@ -167,6 +167,12 @@ weil dies ein aktiv gelesenes Diagnose-Runbook ist, kein Snapshot.
 `tailscale funnel status` gelaufen lassen — alle sechs Prüfungen grün, Schritt 4s Grep-Muster
 matcht die echte Ausgabe unverändert. Kein Korrekturbedarf am Skript.
 
+**[2026-08-09 Ergänzung, P6 Step 2 — O2]:** Prüfung 11 (INFO-Kategorie, kein Abbruchgrund, gleiche
+Einordnung wie Prüfung 9 daneben) — Alter des letzten `sharefyx-purge.timer`-Laufs über
+`systemctl show ... --property=LastTriggerUSec`, WARNUNG mit dem Enable-Befehl, falls der Timer
+nie gelaufen ist, sonst WARNUNG ab > 48h. Kein Test (Skript ohne automatisierte Tests, wie der
+Rest von `diagnose.sh`). Volle Herleitung: `phase6_shares/CLAUDE.md` Step-2-Session-Block.
+
 ### Cloudflare-Rückbau (führt der Nikinger aus, nicht Claude Code)
 
 `cloudflared` ist auf dieser VM installiert (Step 0 C: `/usr/local/bin/cloudflared`, kein

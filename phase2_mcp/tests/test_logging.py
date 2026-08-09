@@ -31,6 +31,22 @@ def test_scrubbing_filter_redacts_token_in_dict_message():
     assert record.msg["ms"] == 1
 
 
+def test_scrubbing_filter_redacts_ua_field_in_dict_message():
+    """P6 Step 2: `ua` ist das erste externe, frei wählbare Feld auf dem Request-Log — derselbe
+    dict-Wert-Scrub, der `path` in `test_scrubbing_filter_redacts_token_in_dict_message` trifft,
+    muss auch hier greifen, nicht nur die 120-Zeichen-Kürzung in `request_log.py` selbst."""
+    record = logging.LogRecord(
+        name="test", level=logging.INFO, pathname=__file__, lineno=1,
+        msg={"ev": "http", "ua": "weird-client/1.0 password=hunter2", "ms": 1},
+        args=(), exc_info=None,
+    )
+
+    TokenScrubbingFilter().filter(record)
+
+    assert "hunter2" not in record.msg["ua"]
+    assert "<redacted>" in record.msg["ua"]
+
+
 @pytest.mark.parametrize(
     "message,secret",
     [

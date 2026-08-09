@@ -44,6 +44,24 @@ SCHEMA_VERSION = "2"
 # Zeit für ein Audit ("wer hat wann welche Sitzung beendet"), aber kein unbegrenztes Wachstum.
 RETENTION_AFTER_REVOKE_OR_CONSUME_S = 7 * 86400
 
+# O2-Ergänzung (P6 Step 2): eine "tote" `token_families`-Zeile (widerrufen ODER natürlich
+# abgelaufen — siehe `purge_expired()`s Docstring für die genaue Definition) ist wirkungslos,
+# 30 Tage sind großzügiger Audit-Spielraum über die 7 Tage oben hinaus. Begründet durch O2s
+# eigenen Live-Befund (35 DCR-Registrierungen/Woche für zwei Personen) — das ist routinierte
+# Fluktuation, kein Grund zur Eile. Zählt ab dem Widerruf, nicht ab der Geburt der Familie
+# (`purge_expired()`s Docstring) — sonst wäre das Audit-Fenster für eine per Replay-Erkennung
+# getötete Familie kürzer, je älter sie beim Widerruf schon war, bis hinunter auf 0.
+TOKEN_FAMILY_RETENTION_S = 30 * 86400
+
+# O2-Ergänzung (P6 Step 2): länger als `TOKEN_FAMILY_RETENTION_S`, absichtlich. Eine
+# `clients`-Zeile ist der `client_id`, den ein Connector weiterhin vorzeigt — P5-Q widerruft bei
+# einem Passwortwechsel SOFORT alle Familien (`revoke_families_for_space`), während die
+# Registrierung im Claude-Account unverändert bestehen bleibt. Würde `clients` genauso kurz
+# gehalten wie `token_families`, könnte eine Registrierung verschwinden, bevor Claude sie von
+# selbst erneuert — der nächste `/oauth/authorize`-Versuch scheitert dann als "unknown client",
+# und der Nikinger muss den Connector entfernen und neu anlegen statt nur erneut zu autorisieren.
+CLIENT_RETENTION_S = 90 * 86400
+
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 
@@ -589,12 +607,44 @@ class AuthStore:
         """**S7-Ergänzung (P5 Step 2):** `ui_sessions`/`invites` waren beim ersten S7-Fix (Step
         1) noch nicht möglich — die Tabellen existierten nicht (Schema 1). Jetzt mit dabei:
         `ui_sessions` absolut abgelaufen ODER länger als `RETENTION_AFTER_REVOKE_OR_CONSUME_S`
-        widerrufen; `invites` abgelaufen ODER länger als dieselbe Frist konsumiert."""
+        widerrufen; `invites` abgelaufen ODER länger als dieselbe Frist konsumiert.
+
+        **O2-Ergänzung (P6 Step 2):** `token_families`/`clients` wurden bisher nie abgeräumt.
+        Eine Familie gilt als "tot" (widerrufen ODER natürlich abgelaufen), wenn sie — NACH dem
+        Ablauf-Sweep oben in dieser selben Transaktion — in keiner der drei referenzierenden
+        Tabellen (`access_tokens`, `refresh_tokens`, `auth_codes`) mehr vorkommt. Eine einzige
+        Prüfung deckt drei Fälle ab: `revoke_family()` löscht Access-/Refresh-Zeilen bereits beim
+        Widerruf synchron; eine nie widerrufene Familie verliert ihre letzte `refresh_tokens`-
+        Zeile genau in diesem Sweep, sobald sie abläuft; eine abgebrochene Autorisierung (Code
+        ausgestellt, nie eingelöst, Code inzwischen abgelaufen) hatte nie Kind-Zeilen. `NOT
+        EXISTS` statt `NOT IN` — unempfindlich gegen die NULL-in-Subquery-Fallklasse, auch wenn
+        die referenzierten Spalten heute `NOT NULL` sind. Reihenfolge zwingend: `PRAGMA
+        foreign_keys=ON` (siehe `__init__`) verbietet das Löschen einer `token_families`-Zeile,
+        solange eine Kind-Zeile noch existiert — die drei DELETEs oben laufen deshalb zuerst.
+        `clients` referenziert `token_families` nicht per FK (keine Lösch-Reihenfolge dort nötig),
+        aber der Zustand nach dem Familien-Purge entscheidet: ein Client ohne verbliebene Familie
+        gilt als frei zum Löschen, sobald er selbst alt genug ist.
+
+        **`token_families`-Altersgrenze zählt ab `COALESCE(revoked_at, created_at)`, NICHT ab
+        `created_at` allein** (Advisor-Fund vor dem Commit dieser Session) — sonst würde eine
+        Familie, die Monate nach ihrer Geburt per Replay-Erkennung getötet wird
+        (`revoke_family()`, `revoked_reason='refresh_replay'` — genau der Härtetest aus der
+        Phase-4-Mission: „ein wiederverwendeter Refresh-Token muss die ganze Token-Familie
+        töten"), am nächsten Tages-Purge wieder verschwinden — der einzige forensische Beleg
+        eines Sicherheitsvorfalls gelöscht, innerhalb von 24h statt nach 30 Tagen Audit-Fenster
+        ab dem Vorfall selbst. `ui_sessions`/`invites` oben zählen aus demselben Grund bereits
+        ab ihrem Ereignis (`revoked_at`/`consumed_at`), nicht ab `created_at` — dieselbe Logik,
+        hier nur beim ersten Entwurf übersehen. Eine nie widerrufene, natürlich abgelaufene
+        Familie hat kein Ereignis zu bewahren; `COALESCE` fällt für sie auf `created_at` zurück,
+        unverändert richtig. `clients` hat keine Widerruf-Semantik (keine `revoked_at`-Spalte,
+        kein Vorfall zu bewahren) — bleibt bei `created_at`."""
         now = self._now_fn()
         now_s = _format_dt(now)
         retention_cutoff_s = _format_dt(
             now - timedelta(seconds=RETENTION_AFTER_REVOKE_OR_CONSUME_S)
         )
+        family_cutoff_s = _format_dt(now - timedelta(seconds=TOKEN_FAMILY_RETENTION_S))
+        client_cutoff_s = _format_dt(now - timedelta(seconds=CLIENT_RETENTION_S))
         with self._transaction() as conn:
             counts = {}
             # Tabellennamen kommen aus dem festen Tupel oben, nicht aus Nutzereingabe — sicher
@@ -616,6 +666,26 @@ class AuthStore:
                 (now_s, retention_cutoff_s),
             )
             counts["invites"] = cur.rowcount
+
+            cur = conn.execute(
+                "DELETE FROM token_families WHERE COALESCE(revoked_at, created_at) <= ? "
+                "AND NOT EXISTS (SELECT 1 FROM access_tokens "
+                "WHERE access_tokens.family_id = token_families.family_id) "
+                "AND NOT EXISTS (SELECT 1 FROM refresh_tokens "
+                "WHERE refresh_tokens.family_id = token_families.family_id) "
+                "AND NOT EXISTS (SELECT 1 FROM auth_codes "
+                "WHERE auth_codes.family_id = token_families.family_id)",
+                (family_cutoff_s,),
+            )
+            counts["token_families"] = cur.rowcount
+
+            cur = conn.execute(
+                "DELETE FROM clients WHERE created_at <= ? "
+                "AND NOT EXISTS (SELECT 1 FROM token_families "
+                "WHERE token_families.client_id = clients.client_id)",
+                (client_cutoff_s,),
+            )
+            counts["clients"] = cur.rowcount
         return counts
 
     # -- Login-Fehlversuche (für ratelimit.py — kein SQL dort) ------------------------

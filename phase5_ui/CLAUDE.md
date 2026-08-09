@@ -102,6 +102,21 @@ Messung statt Schätzung (`ui_budget.py`, AD) · gemeinsame Live-Abnahme, beide 
 | 12 | Betrieb: `phase5_ui/scripts/{deploy,rollback,authbackup,restore_auth_check}.sh` + `ui_budget.py`; `phase5_ui/systemd/{sharefyx-authbackup.service,.timer,sharefyx-staging.service}`; `install_units.sh` um drei **optionale** Staging-Platzhalter erweitert; `diagnose.sh` um vier Prüfungen (UI erreichbar, offene UI-Sitzungen, jüngstes Auth-Backup, aktives Release) | 8 | ✅ **gebaut, Live-Teile beim Nikinger** — **löst V10 auf** (Messtabelle im Session-Block, alle fünf Größen im Korridor) und korrigiert eine **V13-Drift in `phase3_edge/`** (dort seit 2026-07-28 als geschlossen dokumentiert und 114 Zeilen weiter unten in derselben Datei noch als offen geführt). Drei dokumentierte Plan-Abweichungen (Health-Gate ohne authentifizierte Probe — Hard Rule 1; dritter Staging-Platzhalter; Platzhalter optional statt Pflicht). Eigener Fund beim echten Probelauf: ein zurückgerolltes Release wäre das nächste Rollback-Ziel gewesen → `*.failed`-Markierung | +21 (15 `test_deploy_scripts.py`, neue Datei; +6 `test_units.py`, darunter `test_every_placeholder_in_every_unit_is_known_to_the_install_script` — allgemeiner als die im Plan genannten) |
 | 13 | UI-Revision nach Live-Feedback des Nikingers (elf Punkte) + Review von Step 8/S10: OAuth-Consent-Seite gestaltet (`phase4_auth/authserver/{templates,routes}.py`, CSP `style-src`/`font-src` erweitert), Ordner-Wechsel schließt/fragt jetzt bei offenem Editor + Nur-lesen-Ansicht bekommt ein „×" (`app.js :: navigate()`/`showReadonlyItem()`), Anlegen-Dialog-Typ folgt dem aktiven Ordner, Editor öffnet standardmäßig in der Vorschau (zwei Ausnahmen: Neuanlage, Neuladen nach Schreibvorgang), Archivieren vom „×" weggerückt, Abmelden-Icon getauscht, Passwort-Sichtbarkeit (Konto-Dialog + Login-/Einladungsseite, `pages.py` lädt jetzt `app.js`), Zähler-Polling (20s + Fokus/Sichtbarkeit) | 8b (Live-Feedback, kein Plan-Step) | ✅ **vollständig, gebaut und deployt** (2026-08-07) | +2 (`test_templates.py`: einer ersetzt, einer neu); JS bleibt laut Plan unit-ungetestet, 27 jsdom-Prüfungen im Scratchpad (nicht im Repo) gegen die neue Editor-Öffnen-/Navigations-/Toggle-Logik |
 
+**[2026-08-09 Ergänzung, P6 Step 2 — P6-I/P6-S]:** `scripts/ui_budget.py` bekommt eine zweite,
+informative Messfunktion `_measure_latency()` (eigene `LatencyMetric`-Dataclass, kein
+`budget_bytes`/`ok`) für `search_items`/`get_item` (MCP, echter `mcpserver.app::create_app()`)
+und `GET /api/v1/overview` — bewusst getrennt von den vier live-verifizierten Größen-`Metric`s
+oben (Zeile 12, Abnahmezeile 15): eine Zeitmessung darf `main()`s Exit-Code nicht
+zeitabhängig machen. Jede der drei Messungen macht einen verworfenen Aufwärmlauf vor dem
+gemessenen Aufruf (Advisor-Fund vor dem Commit dieser Session — ein einzelner kalter Aufruf
+misst sonst Routen-Setup/Session-Verhandlung statt der Fläche selbst). Dreifach reproduzierter
+Lauf gegen ein temporäres `DATA_ROOT` (dieser Session, nicht real-live): `search_items`
+95–96 ms/20 KB, `get_item` 5 ms/0,5 KB, `GET /api/v1/overview` **438–453 ms/1,5 KB** —
+konstant über alle Läufe, also keine Kaltstart-Zahl, sondern eine reproduzierbare Kostenstelle
+(P6-S: `Store.search()` liest weiterhin jede indizierte Datei). Kein neuer Test (`ui_budget.py`
+hat wie `mcp_smoke.py` keine Unit-Tests, nur den realen Lauf als Beweis). Volle Herleitung:
+`phase6_shares/CLAUDE.md` Step-2-Session-Block.
+
 ---
 
 ## Abnahmestand (Plan §6) — Stand 2026-08-09

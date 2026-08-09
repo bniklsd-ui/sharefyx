@@ -149,8 +149,9 @@ eigenes Python-Paket) — **🔄 gestartet, 2026-08-09.** Ausführungsreifer Pla
 (`docs/concepts/phase6_shares_plan.md`, Entscheidungen P6-A–P6-AC, Steps 0–10, drei Blöcke: A =
 Werkzeuge/Betrieb/Update-Banner, B = Dateisystem, C = Bilder, hartes Gate zwischen A und B).
 Herkunft/offene Entscheidungen: `docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` §4.1–§4.6. Phase-Head:
-`phase6_shares/CLAUDE.md`. **Nächster Schritt:** Step 1 (Werkzeug-Ergonomie — `patch_item`,
-Quittungen statt Volltext).
+`phase6_shares/CLAUDE.md`. Step 0 ✅, Step 1 ✅ (`patch_item`, Quittungen statt Volltext), Step 2
+✅ **gebaut, Live-Teile beim Nikinger** (O2 geschlossen, `ua`-Feld/V42, `diagnose.sh`/
+`ui_budget.py`-Ergänzungen). **Nächster Schritt:** Step 3 (Update-Log und Banner).
 
 **Phase 5 — Web-UI, REST-API und Auth-Selbstverwaltung** (`phase5_ui/`, Paket `webui`) — **✅
 abgeschlossen, 2026-08-09 — 20/20 Abnahmezeilen live bestanden, 0 teilweise, 0 offen.** Zwei
