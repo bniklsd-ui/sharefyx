@@ -234,6 +234,17 @@ angehängten Texts, kein `Store`-Umbau nötig.
 gewahrt: nur `storage/`, `mcpserver/{tools,receipts,patch aus storage}.py` und die drei Testdateien
 berührt — genau die in P6-C freigegebene Fläche.
 
+**Nachtrag, 2026-08-09, vierter — zweiter Advisor-Durchlauf, zwei Funde vor Sessionende
+behoben:** (1) Hard Rule 8 verlangte `phase1_storage/CLAUDE.md` und `phase2_mcp/CLAUDE.md` im
+**selben** Commit wie `storage/patch.py`/`tools.py` — waren stattdessen einen Commit zu spät
+nachgezogen. Beide jetzt aktuell: Modul-Status-Zeilen (P6 Step 1 als Zeile 9 je Paket),
+Testzahlen 81/92 (`pytest --collect-only -q` nachgezählt), `phase2_mcp/CLAUDE.md`s P2-K-
+Entscheidung („kein siebtes Tool") mit datierter Korrektur versehen, dritte Contract-Öffnung in
+`phase1_storage/CLAUDE.md` dokumentiert. (2) `test_patch_creates_exactly_one_git_commit` prüfte
+`len(log) == 2` (absolute Commitzahl im ganzen Test-Repo) statt das Delta — wäre auch bei einem
+Bug in `create()`s Commit-Anzahl grün geblieben. Auf Vorher/Nachher-Differenz umgestellt. 593/593
+weiterhin grün, eigener Commit (nicht `--amend`).
+
 **Nächster Schritt (konkret):** Step 2 — Betrieb. O2 (Purge um `clients`/`token_families`
 erweitern), Client-Surface-Logging (`ua`-Feld, V42 messen statt annehmen),
 `diagnose.sh`-Erweiterung, `ui_budget.py`-Latenzmessung. Plan §4 Step 2.
