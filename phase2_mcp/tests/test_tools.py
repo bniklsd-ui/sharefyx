@@ -275,9 +275,9 @@ def test_get_item_foreign_space_does_not_write_file(tools_map, store, tmp_path):
 
 def test_create_item_uses_principal_space(tools_map, store):
     with _as(SPACE_A):
-        text = tools_map["create_item"](type="task", title="Neu")
+        receipt = json.loads(tools_map["create_item"](type="task", title="Neu"))
 
-    assert f"space: {SPACE_A}" in text
+    assert receipt["space"] == SPACE_A
     counts = {s.name: s.item_count for s in store.list_spaces()}
     assert counts[SPACE_A] == 1
 
@@ -344,6 +344,139 @@ def test_update_item_invalid_status_rejected(tools_map, store):
 
 
 # -- Guard-Fehlerabbildung (Step-4-Advisor-Fund) -----------------------------------------
+
+
+def test_patch_item_foreign_space_denied(tools_map, store):
+    item = store.create(SPACE_B, type="note", title="Fremd", body="Text")
+
+    with _as(SPACE_A), pytest.raises(ToolError, match="write_denied"):
+        tools_map["patch_item"](
+            item.id, version=item.version, edits=[{"old_text": "Text", "new_text": "Hack"}]
+        )
+
+
+def test_patch_item_zero_match_error_maps_to_patch_failed_tool_error(tools_map, store):
+    item = store.create(SPACE_A, type="note", title="Patch-Fehler", body="Vorhanden")
+
+    with _as(SPACE_A), pytest.raises(ToolError) as excinfo:
+        tools_map["patch_item"](
+            item.id, version=item.version,
+            edits=[{"old_text": "Nicht da", "new_text": "X"}],
+        )
+
+    message = str(excinfo.value)
+    assert "patch_failed" in message
+    assert "edits[0]" in message
+    assert "0 Treffer" in message
+
+
+def test_patch_item_multi_match_error_names_the_lines(tools_map, store):
+    item = store.create(SPACE_A, type="note", title="Mehrdeutig", body="X\nX\nX\n")
+
+    with _as(SPACE_A), pytest.raises(ToolError) as excinfo:
+        tools_map["patch_item"](
+            item.id, version=item.version, edits=[{"old_text": "X", "new_text": "Y"}]
+        )
+
+    message = str(excinfo.value)
+    assert "patch_failed" in message
+    assert "3 Treffer" in message
+    assert "Zeilen 1, 2" in message
+
+
+# -- P6 Step 1: Quittungen statt Volltext (P6-H) -----------------------------------------
+
+
+def test_write_tools_return_receipt_by_default(tools_map, store):
+    with _as(SPACE_A):
+        created = json.loads(tools_map["create_item"](type="task", title="Quittung"))
+        assert created["op"] == "create"
+        assert created["id"].startswith("itm_")
+        assert created["space"] == SPACE_A
+        item_id = created["id"]
+
+        appended = json.loads(
+            tools_map["append_to_item"](item_id, version=1, text="Zusatz")
+        )
+        assert appended["op"] == "append"
+        assert appended["version"] == 2
+
+        patched = json.loads(
+            tools_map["patch_item"](
+                item_id, version=2, edits=[{"old_text": "Zusatz", "new_text": "Geändert"}]
+            )
+        )
+        assert patched["op"] == "patch"
+        assert patched["version"] == 3
+        assert patched["replacements"] == 1
+
+        updated = json.loads(tools_map["update_item"](item_id, version=3, title="Neuer Titel"))
+        assert updated["op"] == "update"
+        assert updated["version"] == 4
+
+
+def test_write_tools_return_full_filetext_when_return_body_true(tools_map, store):
+    with _as(SPACE_A):
+        created_text = tools_map["create_item"](
+            type="task", title="Volltext", return_body=True
+        )
+        assert "id: itm_" in created_text and f"space: {SPACE_A}" in created_text
+        item_id = created_text.splitlines()[1].split("id: ")[1].strip()
+
+        appended_text = tools_map["append_to_item"](
+            item_id, version=1, text="Zusatz", return_body=True
+        )
+        assert "Zusatz" in appended_text
+
+        patched_text = tools_map["patch_item"](
+            item_id, version=2,
+            edits=[{"old_text": "Zusatz", "new_text": "Geändert"}],
+            return_body=True,
+        )
+        assert "Geändert" in patched_text
+
+        updated_text = tools_map["update_item"](
+            item_id, version=3, title="Neuer Titel", return_body=True
+        )
+        assert "title: Neuer Titel" in updated_text
+
+
+def test_receipt_never_contains_body_text(tools_map, store):
+    marker = "GEHEIMER-BODY-MARKER"
+
+    with _as(SPACE_A):
+        created = tools_map["create_item"](type="note", title="Marker-Item", body=marker)
+        assert marker not in created
+        item_id = json.loads(created)["id"]
+
+        appended = tools_map["append_to_item"](item_id, version=1, text="unabhaengiger Text")
+        assert marker not in appended
+
+        patched = tools_map["patch_item"](
+            item_id, version=2, edits=[{"old_text": marker, "new_text": marker + "-patched"}]
+        )
+        assert marker not in patched
+
+        updated = tools_map["update_item"](item_id, version=3, body=marker + "-updated")
+        assert marker not in updated
+
+        # Gegenprobe: mit return_body=True taucht der Marker tatsächlich auf -- sonst wäre der
+        # Test oben vakuos (er würde auch bestehen, wenn die Tools kaputt wären).
+        full_text = tools_map["get_item"](item_id)
+        assert marker in full_text
+
+
+def test_update_item_rejects_share_fields(tools_map, store):
+    item = store.create(SPACE_A, type="note", title="X")
+
+    with _as(SPACE_A):
+        for field, value in (
+            ("visibility", "human"),
+            ("share_read", ["beta"]),
+            ("share_write", ["beta"]),
+        ):
+            with pytest.raises(ToolError, match="invalid"):
+                tools_map["update_item"](item.id, version=item.version, **{field: value})
 
 
 def test_guard_auth_error_is_mapped_to_tool_error(tools_map, store, monkeypatch):

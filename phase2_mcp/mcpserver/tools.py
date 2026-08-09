@@ -1,10 +1,19 @@
-"""Die sechs MCP-Tools (Plan §3). Registrierung über `register(mcp, store=..., permissions=...)`,
-damit `server.py :: build_mcp()` `tools.py` kennt, aber `tools.py` selbst weder HTTP noch Token
-kennt — nur einen Principal (`context.py`) und eine Policy (`permissions.py`), siehe Plan §1.2.
+"""Die MCP-Tools (P2 Plan §3, seit P6 Step 1 sieben statt sechs). Registrierung über
+`register(mcp, store=..., permissions=...)`, damit `server.py :: build_mcp()` `tools.py` kennt,
+aber `tools.py` selbst weder HTTP noch Token kennt — nur einen Principal (`context.py`) und eine
+Policy (`permissions.py`), siehe Plan §1.2.
 
-**Step 6 (dieser Stand):** alle sechs Tools sind vollständig implementiert (§3.2/§3.4/§3.5/§3.6).
-`list_spaces` war bereits seit Step 5 fertig (Voraussetzung für den End-to-End-Isolationstest in
-`test_app.py`); die übrigen fünf lösen hier ihre `NotImplementedError`-Platzhalter ab.
+**Step 6 (P2, historisch):** alle sechs damaligen Tools vollständig implementiert
+(§3.2/§3.4/§3.5/§3.6). `list_spaces` war bereits seit Step 5 fertig (Voraussetzung für den
+End-to-End-Isolationstest in `test_app.py`); die übrigen fünf lösen hier ihre
+`NotImplementedError`-Platzhalter ab.
+
+**P6 Step 1:** siebtes Tool `patch_item` (P6-E/F/G, `storage/patch.py`). Alle vier Schreib-Tools
+(`create_item`/`update_item`/`append_to_item`/`patch_item`) liefern per Default eine kompakte
+Quittung (`mcpserver/receipts.py :: write_receipt()`) statt des vollen Dateitexts; `return_body:
+bool = False` an jedem von ihnen holt ihn zurück (P6-H). `update_item` lehnt `visibility`/
+`share_read`/`share_write` mit `ValidationError` ab — die Felder existieren im Modell erst ab
+Step 4/5, der Riegel entsteht bewusst vorher (P6-M).
 
 **`item_to_filetext()` dupliziert bewusst die Feldreihenfolge von `storage.store._item_to_text`**
 statt eine neue Store-Methode zu verlangen: der P1-Contract ist seit Step 2 "wieder zu" (siehe
@@ -27,11 +36,13 @@ from fastmcp.exceptions import ToolError
 from storage.errors import ConflictError, ItemNotFound, SpaceNotFound, ValidationError
 from storage.frontmatter import serialize as serialize_frontmatter
 from storage.models import Item, ItemSummary, SpaceInfo
+from storage.patch import PatchError, TextEdit
 from storage.store import Store
 
 from . import context
 from .auth import AuthError
 from .permissions import Permissions
+from .receipts import write_receipt
 
 logger = logging.getLogger(__name__)
 
@@ -143,6 +154,22 @@ def map_storage_error(exc: Exception) -> ToolError:
             f"aktuell {current.version}, zuletzt {_format_dt(current.updated)}) — lies neu mit "
             "get_item und wiederhole"
         )
+    if isinstance(exc, PatchError):
+        # Muss VOR der generischen ValidationError-Prüfung stehen -- PatchError ist eine
+        # ValidationError (P6-F), soll aber den spezifischeren "patch_failed"-Text bekommen,
+        # nicht das generische "invalid: ...".
+        if exc.found == 0:
+            return ToolError(
+                f"patch_failed: edits[{exc.index}] fand 0 Treffer — lies das Item neu mit "
+                "get_item und prüfe den exakten Text"
+            )
+        shown = ", ".join(str(n) for n in exc.lines)
+        if exc.found > len(exc.lines):
+            shown += ", …"
+        return ToolError(
+            f"patch_failed: edits[{exc.index}] fand {exc.found} Treffer (Zeilen {shown}) — "
+            "mach old_text eindeutiger"
+        )
     if isinstance(exc, ValidationError):
         return ToolError(f"invalid: {exc}")
     if isinstance(exc, SpaceNotFound):
@@ -174,7 +201,7 @@ def _authenticated_principal():
 
 
 def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[str, Callable[..., str]]:
-    """Registriert alle sechs Tools auf `mcp`. Reihenfolge in jedem Tool-Body wie Plan §3.3:
+    """Registriert alle sieben Tools auf `mcp`. Reihenfolge in jedem Tool-Body wie Plan §3.3:
     `current_principal()` → Guard → Zielraum → Rechte → Store → Formatieren. `@mcp.tool(...)`
     gibt die unveränderte Python-Funktion zurück (nicht das interne `FunctionTool`-Objekt) —
     `register()` sammelt genau diese Funktionen und gibt sie zurück, damit Tests sie direkt
@@ -320,7 +347,11 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
 
     @mcp.tool(
         title="Item anlegen",
-        description="Legt ein neues Item im eigenen Space an — der Ziel-Space ist immer der Principal.",
+        description=(
+            "Legt ein neues Item im eigenen Space an — der Ziel-Space ist immer der Principal. "
+            "Liefert standardmäßig eine Quittung statt des vollen Texts — return_body=True holt "
+            "ihn zurück."
+        ),
         annotations={
             "readOnlyHint": False,
             "destructiveHint": False,
@@ -336,6 +367,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         links: list[str] | None = None,
         due: str | None = None,
         status: str | None = None,
+        return_body: bool = False,
     ) -> str:
         principal = _authenticated_principal()
         # Keine Rechteprüfung nötig — es gibt keinen `space`-Parameter (P2-G, Rule 4
@@ -349,13 +381,17 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             item = store.create(principal.space, type=type, title=title, body=body, **kwargs)
         except ValidationError as exc:
             raise map_storage_error(exc) from exc
-        return item_to_filetext(item)
+        if return_body:
+            return item_to_filetext(item)
+        return write_receipt(item, op="create")
 
     @mcp.tool(
         title="Item aktualisieren",
         description=(
             "Aktualisiert ein Item im eigenen Space, oder archiviert es über status=archived. "
-            "Braucht die zuletzt gelesene version."
+            "Braucht die zuletzt gelesene version. Liefert standardmäßig eine Quittung statt "
+            "des vollen Texts — return_body=True holt ihn zurück. Sichtbarkeit/Freigaben "
+            "(visibility/share_read/share_write) gehen über kein Tool, nur über die UI."
         ),
         annotations={
             "readOnlyHint": False,
@@ -374,8 +410,23 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         links: list[str] | None = None,
         due: str | None = None,
         type: str | None = None,
+        visibility: str | None = None,
+        share_read: list[str] | None = None,
+        share_write: list[str] | None = None,
+        return_body: bool = False,
     ) -> str:
         principal = _authenticated_principal()
+        # P6-M: Freigaben/Sichtbarkeit sind über kein MCP-Tool änderbar — der Riegel entsteht
+        # hier, VOR dem eigentlichen Feld (das erst P6 Step 4/5 ins Modell bringt), damit ein
+        # späterer Step ihn nicht vergisst.
+        if visibility is not None or share_read is not None or share_write is not None:
+            raise map_storage_error(
+                ValidationError(
+                    "visibility/share_read/share_write sind über kein MCP-Tool änderbar — das "
+                    "geht nur ein Mensch in der UI"
+                )
+            ) from None
+
         try:
             target_space = store.space_of(item_id)
         except ItemNotFound as exc:
@@ -411,11 +462,17 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
                 item = store.update(item_id, version=version, **changes)
         except (ItemNotFound, ConflictError, ValidationError) as exc:
             raise map_storage_error(exc) from exc
-        return item_to_filetext(item)
+        if return_body:
+            return item_to_filetext(item)
+        return write_receipt(item, op="update")
 
     @mcp.tool(
         title="Text an Item anhängen",
-        description="Hängt Text an den Body eines Items im eigenen Space an. Braucht die zuletzt gelesene version.",
+        description=(
+            "Hängt Text an den Body eines Items im eigenen Space an. Braucht die zuletzt "
+            "gelesene version. Liefert standardmäßig eine Quittung statt des vollen Texts — "
+            "return_body=True holt ihn zurück."
+        ),
         annotations={
             "readOnlyHint": False,
             "destructiveHint": False,
@@ -423,7 +480,9 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             "openWorldHint": False,
         },
     )
-    def append_to_item(item_id: str, version: int, text: str) -> str:
+    def append_to_item(
+        item_id: str, version: int, text: str, return_body: bool = False
+    ) -> str:
         principal = _authenticated_principal()
         try:
             target_space = store.space_of(item_id)
@@ -437,7 +496,49 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             item = store.append(item_id, version=version, text=text)
         except (ItemNotFound, ConflictError, ValidationError) as exc:
             raise map_storage_error(exc) from exc
-        return item_to_filetext(item)
+        if return_body:
+            return item_to_filetext(item)
+        return write_receipt(item, op="append", appended_bytes=len(text.encode("utf-8")))
+
+    @mcp.tool(
+        title="Item punktuell ändern",
+        description=(
+            "Ersetzt exakte Textstellen im Body eines Items, ohne den Rest neu zu schreiben. "
+            "Jedes old_text muss genau einmal vorkommen; sonst schlägt der ganze Aufruf fehl "
+            "und nichts wird geschrieben. Braucht die zuletzt gelesene version. Liefert "
+            "standardmäßig eine Quittung statt des vollen Texts — return_body=True holt ihn "
+            "zurück."
+        ),
+        annotations={
+            "readOnlyHint": False,
+            "destructiveHint": True,
+            "idempotentHint": False,
+            "openWorldHint": False,
+        },
+    )
+    def patch_item(
+        item_id: str, version: int, edits: list[TextEdit], return_body: bool = False
+    ) -> str:
+        principal = _authenticated_principal()
+        try:
+            target_space = store.space_of(item_id)
+        except ItemNotFound as exc:
+            raise map_storage_error(exc) from exc
+
+        if not permissions.can_write(principal.space, target_space):
+            raise map_storage_error(PermissionDenied(target_space)) from None
+
+        try:
+            result = store.patch(item_id, version=version, edits=edits)
+        except (ItemNotFound, ConflictError, ValidationError) as exc:
+            raise map_storage_error(exc) from exc
+        if return_body:
+            return item_to_filetext(result.item)
+        return write_receipt(
+            result.item, op="patch", replacements=result.replacements,
+            lines=list(result.lines), bytes_before=result.bytes_before,
+            bytes_after=result.bytes_after,
+        )
 
     return {
         "list_spaces": list_spaces,
@@ -446,4 +547,5 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         "create_item": create_item,
         "update_item": update_item,
         "append_to_item": append_to_item,
+        "patch_item": patch_item,
     }

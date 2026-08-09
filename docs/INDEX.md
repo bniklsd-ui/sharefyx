@@ -31,7 +31,7 @@ updated: 2026-08-09 (Phase 6 🔄 gestartet — Active-phase-Abschnitt wieder an
 
 ## Active phase (6 — Freigaben, Ordner, Werkzeug-Ergonomie)
 
-- [phase6_shares/CLAUDE.md](../phase6_shares/CLAUDE.md) — 🔄 ~12KB · phase head; Step 0 ✅ (Haushalt, Verifikationsdurchlauf V39–V41, Regeländerungen §0.7 a/b/c, Phase-Head angelegt); read + newest Session-stopped block first
+- [phase6_shares/CLAUDE.md](../phase6_shares/CLAUDE.md) — 🔄 ~17KB · phase head; Step 0 ✅ (Haushalt, Verifikationsdurchlauf V39–V41, Regeländerungen §0.7 a/b/c) + Step 1 ✅ (Werkzeug-Ergonomie — `patch_item`, Quittungen statt Volltext, `mcp_smoke.py` 13/13); read + newest Session-stopped block first
 - [docs/concepts/phase6_shares_plan.md](./concepts/phase6_shares_plan.md) — 📕 ~58KB · ausführungsreifer P6-Plan: Entscheidungen P6-A–P6-AC, Steps 0–10 (Block A Werkzeuge/Betrieb, Block B Dateisystem, Block C Bilder, hartes Gate A→B), Rechtemodell §1.2, Abnahmematrix 1–24, [VERIFY]-Register V39–V51; über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen; Autor Browser-Planungssession 2026-08-09 gegen den Drive-Snapshot `2026_08_09_sharefyx-main`
 
 ## Completed phases

@@ -7,6 +7,7 @@ from __future__ import annotations
 import fcntl
 import sqlite3
 import threading
+from collections.abc import Sequence
 from contextlib import contextmanager
 from dataclasses import replace
 from datetime import date, datetime, timezone
@@ -18,6 +19,7 @@ from .errors import ConflictError, ItemNotFound, ValidationError
 from .frontmatter import parse as parse_frontmatter
 from .frontmatter import serialize as serialize_frontmatter
 from .models import IndexStats, Item, ItemSummary, SearchResult, SpaceInfo, STATUS_VALUES, valid_statuses
+from .patch import PatchResult, TextEdit, apply_edits
 
 _KNOWN_FIELDS = {
     "id", "space", "type", "title", "status", "due", "tags", "links",
@@ -389,6 +391,35 @@ class Store:
             )
             self._write_item_file(new_item, old_path=old_path, op="append")
             return new_item
+
+    def patch(self, item_id: str, *, version: int, edits: Sequence[TextEdit]) -> PatchResult:
+        """Ersetzt exakte Textstellen im Body, ohne ihn komplett neu zu schreiben (P6-E).
+        Reihenfolge wie `update`/`append`, mit einem zusätzlichen Schritt: `apply_edits()`
+        läuft auf einer Kopie des Bodys, **bevor** irgendetwas geschrieben wird — ein
+        `PatchError` (Treffer ≠ 1) verlässt diese Methode, ohne dass Datei, Index oder Version
+        angefasst wurden.
+        """
+        with self._lock, self._file_write_lock():
+            row = self._reconcile_and_get_row(item_id)
+            current = self._row_to_item(row)
+            if current.version != version:
+                raise ConflictError(item_id, expected_version=version, current=current)
+            if current.status == "archived":
+                raise ValidationError(f"Item {item_id} ist archiviert — patch verboten")
+
+            old_path = self._data_root / row["path"]
+            bytes_before = len(current.body.encode("utf-8"))
+            new_body, lines = apply_edits(current.body, edits)
+            bytes_after = len(new_body.encode("utf-8"))
+
+            new_item = replace(
+                current, body=new_body, version=current.version + 1, updated=self._now_fn(),
+            )
+            self._write_item_file(new_item, old_path=old_path, op="patch")
+            return PatchResult(
+                item=new_item, replacements=len(edits), lines=lines,
+                bytes_before=bytes_before, bytes_after=bytes_after,
+            )
 
     def archive(self, item_id: str, *, version: int) -> Item:
         with self._lock, self._file_write_lock():

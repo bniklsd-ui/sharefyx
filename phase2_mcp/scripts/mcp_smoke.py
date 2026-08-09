@@ -2,10 +2,17 @@
 """mcp_smoke.py — Gegenstück zu `space_cli.py` aus P1 (Plan §4 Step 7). Baut ein **temporäres**
 `DATA_ROOT` (nie das echte), zwei Fixture-Spaces, startet `create_app()` in-process (kein
 echter Port, kein Netz — `httpx.ASGITransport`, dasselbe Muster wie `test_app.py`) und fährt
-die sechs Tools einmal vollständig durch: `list_spaces`, `create_item` ×3, `search_items`,
-`get_item` eigen/fremd, ein `update_item`-Konflikt, `append_to_item`, `update_item(status=
-archived)`, ein `update_item` auf einen fremden Space. Am Ende eine Größenmessung (Bytes je
-Antwort) als Tabelle.
+die sieben Tools einmal vollständig durch: `list_spaces`, `create_item` ×3, `search_items`,
+`get_item` eigen/fremd, ein `update_item`-Konflikt, `append_to_item`, `patch_item`,
+`update_item(status=archived)`, ein `update_item` auf einen fremden Space. Am Ende eine
+Größenmessung (Bytes je Antwort) als Tabelle.
+
+**P6 Step 1:** `create_item`/`append_to_item`/`update_item`/`patch_item` liefern seither per
+Default eine Quittung statt Dateitext (P6-H) — die betroffenen Prüfungen unten lesen die
+Quittungsfelder direkt, keine Frontmatter-Regex mehr auf diesen vier Antworten. Der ambiguous-
+old_text-Fehlversuch von `patch_item` ist bewusst nicht hier, sondern Teil der Live-Abnahme
+(Gate A→B #1) — dieses Skript beweist den Erfolgspfad, kein zweiter Fehlerpfad-Katalog neben
+`test_tools.py`.
 
 **Schnitt, 2026-07-30 (Runbook-Schritt 8):** `create_app()` verlangt seither immer ein
 `OAuthConfig` (`TokenPathASGI`/`AuthModeASGI` sind entfernt) — die beiden Fixture-Tokens hier
@@ -154,7 +161,9 @@ async def _run(data_root: Path, checks: list[Check]) -> None:
                 )
             )
 
-            # 2. create_item x3 im eigenen Space.
+            # 2. create_item x3 im eigenen Space. Seit P6 Step 1 liefert create_item per Default
+            # eine Quittung (JSON), keinen Dateitext mehr (P6-H) — _extract_field() (Frontmatter-
+            # Regex) passt hier nicht mehr, die Prüfung liest die Quittungsfelder direkt.
             created_ids: list[str] = []
             for i in range(3):
                 text = (
@@ -162,14 +171,17 @@ async def _run(data_root: Path, checks: list[Check]) -> None:
                         "create_item", {"type": "task", "title": f"Smoke-Item {i + 1}"}
                     )
                 ).data
-                item_id = _extract_field(text, "id")
+                receipt = json.loads(text)
+                item_id = receipt.get("id")
                 if item_id:
                     created_ids.append(item_id)
                 checks.append(
                     Check(
                         f"create_item #{i + 1}",
-                        item_id is not None and f"space: {SPACE_OWN}" in text,
-                        item_id or "keine id im Dateitext gefunden",
+                        item_id is not None
+                        and receipt.get("space") == SPACE_OWN
+                        and receipt.get("op") == "create",
+                        item_id or "keine id in der Quittung gefunden",
                         len(text.encode("utf-8")),
                     )
                 )
@@ -251,28 +263,62 @@ async def _run(data_root: Path, checks: list[Check]) -> None:
                 )
             )
 
-            # 6. append_to_item -> Version +1.
+            # 6. append_to_item -> Version +1. Seit P6 Step 1 eine Quittung statt Dateitext
+            # (P6-H); Body-Inhalt gehört nie in eine Quittung (Regressionsschutz für genau das
+            # unten), deshalb keine "Angehängt."-Textsuche mehr — `appended_bytes` beweist die
+            # Länge des tatsächlich angehängten Texts.
             appended_text = (
                 await own.call_tool(
                     "append_to_item",
                     {"item_id": created_ids[0], "version": 1, "text": "Angehängt."},
                 )
             ).data
-            version_after_append = _extract_field(appended_text, "version")
+            appended = json.loads(appended_text)
             checks.append(
                 Check(
                     "append_to_item",
-                    version_after_append == "2" and "Angehängt." in appended_text,
-                    f"version={version_after_append}",
+                    appended.get("version") == 2
+                    and appended.get("appended_bytes") == len("Angehängt.".encode("utf-8"))
+                    and "Angehängt." not in appended_text,
+                    f"version={appended.get('version')}, appended_bytes={appended.get('appended_bytes')}",
                     len(appended_text.encode("utf-8")),
                 )
             )
 
-            # 7. update_item(status=archived) -> Datei in _archive/.
+            # 6b. patch_item -- punktuelle Ersetzung statt Komplett-Rewrite (P6-E), die Mission
+            # dieser Phase. Ambiguous-old_text-Fehlversuch ist Teil der LIVE-Abnahme (Gate A→B
+            # #1, `docs/concepts/phase6_shares_plan.md` §6 Zeile 2), nicht dieses Smoke-Skripts.
+            patched_text = (
+                await own.call_tool(
+                    "patch_item",
+                    {
+                        "item_id": created_ids[0], "version": 2,
+                        "edits": [
+                            {"old_text": "Angehängt.", "new_text": "Angehängt. Gepatcht."}
+                        ],
+                    },
+                )
+            ).data
+            patched = json.loads(patched_text)
+            checks.append(
+                Check(
+                    "patch_item",
+                    patched.get("version") == 3
+                    and patched.get("replacements") == 1
+                    and patched.get("lines") == [1]
+                    and "Gepatcht." not in patched_text,
+                    f"version={patched.get('version')}, replacements={patched.get('replacements')}, "
+                    f"lines={patched.get('lines')}",
+                    len(patched_text.encode("utf-8")),
+                )
+            )
+
+            # 7. update_item(status=archived) -> Datei in _archive/. Version jetzt 3 (nach
+            # append + patch), Quittung statt Dateitext -- Datei-Ortsprüfung trägt den Beweis.
             archived_text = (
                 await own.call_tool(
                     "update_item",
-                    {"item_id": created_ids[0], "version": 2, "status": "archived"},
+                    {"item_id": created_ids[0], "version": 3, "status": "archived"},
                 )
             ).data
             archive_dir = data_root / SPACE_OWN / "_archive"
@@ -280,7 +326,7 @@ async def _run(data_root: Path, checks: list[Check]) -> None:
             checks.append(
                 Check(
                     "update_item (archivieren)",
-                    file_moved and "status: archived" in archived_text,
+                    file_moved,
                     "Datei liegt in _archive/" if file_moved else "Datei NICHT in _archive/ gefunden",
                     len(archived_text.encode("utf-8")),
                 )

@@ -350,7 +350,7 @@ async def test_mcp_bare_mount_redirects_without_leaking(app):
 
 
 @pytest.mark.asyncio
-async def test_tools_list_returns_six_tools(app, token_alpha):
+async def test_tools_list_returns_seven_tools(app, token_alpha):
     async with app.router.lifespan_context(app):
         async with _mcp_client(app, token_alpha) as client:
             tools = await client.list_tools()
@@ -363,6 +363,7 @@ async def test_tools_list_returns_six_tools(app, token_alpha):
         "create_item",
         "update_item",
         "append_to_item",
+        "patch_item",
     }
 
 
@@ -411,12 +412,15 @@ async def test_principal_isolation_under_concurrency(app, token_alpha, token_bet
 
 
 @pytest.mark.asyncio
-async def test_all_six_tools_are_callable_over_http(app, token_alpha, token_beta):
-    """Step 6 Done-when: alle sechs Tools über den ASGI-Testclient aufrufbar — nicht nur als
-    Python-Funktion (`test_tools.py`, Guard gemockt), sondern durch den echten Stack aus Step 5
-    (`BearerAuthASGI`, Guard, laufende FastMCP-App). Ein Rundlauf pro Tool reicht hier; die
-    granulare Semantik (Wrapping, Klemmung, Fehlertexte) ist bereits in `test_tools.py`
-    bewiesen.
+async def test_all_seven_tools_are_callable_over_http(app, token_alpha, token_beta):
+    """Step 6 Done-when (P2), um `patch_item` erweitert (P6 Step 1): alle sieben Tools über den
+    ASGI-Testclient aufrufbar — nicht nur als Python-Funktion (`test_tools.py`, Guard gemockt),
+    sondern durch den echten Stack aus Step 5 (`BearerAuthASGI`, Guard, laufende FastMCP-App).
+    Ein Rundlauf pro Tool reicht hier; die granulare Semantik (Wrapping, Klemmung, Fehlertexte,
+    Quittungsformat) ist bereits in `test_tools.py` bewiesen — `create_item`/`append_to_item`/
+    `update_item(status=archived)` benutzen hier bewusst `return_body=True`, damit die
+    Inhaltsprüfungen unten (space/id/„Angehängt."/„status: archived") weiterhin gegen echten
+    Dateitext laufen statt gegen die seit P6 Step 1 standardmäßige Quittung.
     """
     async with app.router.lifespan_context(app):
         async with _mcp_client(app, token_alpha) as alpha, _mcp_client(app, token_beta) as beta:
@@ -425,7 +429,8 @@ async def test_all_six_tools_are_callable_over_http(app, token_alpha, token_beta
 
             created_text = (
                 await alpha.call_tool(
-                    "create_item", {"type": "task", "title": "Über HTTP angelegt"}
+                    "create_item",
+                    {"type": "task", "title": "Über HTTP angelegt", "return_body": True},
                 )
             ).data
             assert "space: alpha" in created_text
@@ -444,10 +449,32 @@ async def test_all_six_tools_are_callable_over_http(app, token_alpha, token_beta
 
             appended_text = (
                 await alpha.call_tool(
-                    "append_to_item", {"item_id": new_id, "version": 1, "text": "Angehängt."}
+                    "append_to_item",
+                    {
+                        "item_id": new_id, "version": 1, "text": "Angehängt.",
+                        "return_body": True,
+                    },
                 )
             ).data
             assert "Angehängt." in appended_text
+
+            patched_receipt = json.loads(
+                (
+                    await alpha.call_tool(
+                        "patch_item",
+                        {
+                            "item_id": new_id, "version": 2,
+                            "edits": [{"old_text": "Angehängt.", "new_text": "Angehängt. Gepatcht."}],
+                        },
+                    )
+                ).data
+            )
+            assert patched_receipt == {
+                "op": "patch", "id": new_id, "space": "alpha", "title": "Über HTTP angelegt",
+                "version": 3, "updated": patched_receipt["updated"],
+                "replacements": 1, "lines": [1],
+                "bytes": {"before": len("Angehängt.".encode()), "after": len("Angehängt. Gepatcht.".encode())},
+            }
 
             conflict = await alpha.call_tool(
                 "update_item",
@@ -459,7 +486,11 @@ async def test_all_six_tools_are_callable_over_http(app, token_alpha, token_beta
 
             archived_text = (
                 await alpha.call_tool(
-                    "update_item", {"item_id": new_id, "version": 2, "status": "archived"}
+                    "update_item",
+                    {
+                        "item_id": new_id, "version": 3, "status": "archived",
+                        "return_body": True,
+                    },
                 )
             ).data
             assert "status: archived" in archived_text

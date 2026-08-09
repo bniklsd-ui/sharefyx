@@ -89,6 +89,7 @@ weiter ohne Build-Step (AC).
 | # | Modul | Step | Status | Tests |
 |---|---|---|---|---|
 | 1 | Haushalt, Verifikationsdurchlauf (V39/V40/V41), Regeländerungen (§0.7 a/b/c), Phase-Head angelegt | 0 | ✅ **vollständig** | 0 (bewusst — reines Skelett, wie P1 Step 0; `phase6_shares/tests/conftest.py` leer angelegt) |
+| 2 | Werkzeug-Ergonomie: `storage/patch.py` (neu), `storage/store.py :: patch()`, `mcpserver/receipts.py` (neu), siebtes Tool `patch_item`, `return_body` an allen vier Schreib-Tools, `update_item` lehnt `visibility`/`share_read`/`share_write` ab | 1 | ✅ **vollständig** — `mcp_smoke.py` 13/13 grün | +17 (5 `phase6_shares/tests/test_patch.py`, neue Datei + 5 `phase1_storage/tests/test_store.py` + 7 `phase2_mcp/tests/test_tools.py`); 593 gesamt |
 
 ## Geerbte Contracts
 
@@ -188,7 +189,51 @@ widerlegt" im selben Atemzug) — Durchstreichung entfernt, nur `Feingranulare R
 tatsächlich widerlegt (echtes ACL-Modell existiert jetzt), `Mehrmandantenfähigkeit` war erfüllt,
 nicht widerlegt. `pytest -q` danach erneut 576/576, Size-Sweep erneut sauber.
 
-**Nächster Schritt (konkret):** Step 1 — Werkzeug-Ergonomie. `storage/patch.py` (neu),
-`Store.patch()`, `mcpserver/receipts.py` (neu), `patch_item`-Tool registrieren, `return_body` an
-alle vier Schreib-Tools. Testliste steht in Plan §4 Step 1. V48 (rendert `fastmcp` 3.4.x
-`list[TypedDict]` brauchbar?) ist dort empirisch zu klären, nicht vorher.
+**Nachtrag, 2026-08-09, dritter — Step 1 (Werkzeug-Ergonomie) fertig, in derselben Sitzung
+fortgesetzt:** `storage/patch.py` (neu: `TextEdit`, `PatchError`, `PatchResult`, `apply_edits()`),
+`Store.patch()`, `mcpserver/receipts.py` (neu: `write_receipt()`), siebtes Tool `patch_item`,
+`return_body: bool = False` an allen vier Schreib-Tools, `update_item` lehnt `visibility`/
+`share_read`/`share_write` mit `ValidationError` ab. `mcp_smoke.py` um einen Patch-Durchgang
+erweitert, **13/13 grün**. `pytest -q`: **593 passed** (576 + 17 neue: 5 `phase6_shares/tests/
+test_patch.py` + 5 `phase1_storage/tests/test_store.py` + 7 `phase2_mcp/tests/test_tools.py`).
+
+**V48 empirisch geschlossen (fastmcp 3.4.4, installierte Version):** `list[TypedDict]` als
+Tool-Parameter rendert zu einem brauchbaren Schema — kein Fallback auf `list[dict[str,str]]`
+nötig. Beleg: `patch_item({"edits":[{"old_text":...,"new_text":...}]})` lief erfolgreich durch
+den echten `fastmcp.Client`/`StreamableHttpTransport`-Stack, sowohl in
+`test_app.py::test_all_seven_tools_are_callable_over_http` als auch in `mcp_smoke.py` — beide
+Wege validieren/serialisieren das Schema tatsächlich, kein Mock.
+
+**Drei Advisor-Funde vor dem Commit behoben, keiner davon im Plan explizit benannt:**
+1. **Kollateralschaden durch Quittungen-als-Default** — sieben bestehende Tests/Skript-Checks
+   gingen von Frontmatter-Text in `create_item`/`append_to_item`/`update_item`-Antworten aus
+   (`test_tools.py::test_create_item_uses_principal_space`, `mcp_smoke.py` Checks 2/6/7,
+   `test_request_log.py` ×2, `test_app.py` ×2). Alle auf JSON-Quittungsfelder umgestellt;
+   `test_app.py`s HTTP-Rundlauf nutzt an drei Stellen bewusst `return_body=True`, damit die
+   Inhaltsprüfungen dort weiterhin gegen echten Dateitext laufen.
+2. **`update_item`s Riegel ohne die drei Parameter ist wirkungslos** — ohne `visibility`/
+   `share_read`/`share_write` als echte Funktionsparameter hätte ein Aufruf mit diesen Feldern
+   nie `ValidationError` erreicht (Python/`fastmcp`-Schema hätte vorher abgelehnt). Alle drei als
+   `str | list[str] | None = None` ergänzt, geprüft **vor** der Zielraum-/Rechteauflösung.
+3. **`phase6_shares/tests/test_store_patch.py`/`test_tools_patch.py` (Plan-Namen) wären
+   fixture-los gewesen** — `phase1_storage/tests/conftest.py` und `phase2_mcp/tests/conftest.py`
+   sind beide leer, alle Fixtures (`store`/`store_git`/`clock`/`_git_log`/`tools_map`/`_as`) leben
+   lokal in `test_store.py`/`test_tools.py`. Plan §5s Zusammenfassungstabelle sagt für beide
+   ohnehin „erweitert", nicht „neue Datei" — dieser Tabelle gefolgt, nicht der Step-1-Fließtext-
+   Erwähnung. Die vier reinen `apply_edits()`-Funktionstests (kein Store, keine Fixture nötig)
+   stehen wie geplant in `phase6_shares/tests/test_patch.py`.
+
+**Kleine, bewusste Abweichungen von der Beispielquittung in Plan §1.5.3** (dokumentiert, nicht
+stillschweigend): kein `folder`-Feld (existiert erst ab Step 4, `Item.folder`); Archivieren über
+`update_item(status="archived")` liefert `op="update"`, nicht `op="archive"` — die Quittung bildet
+die vier Tools ab, nicht `Store`s interne Commit-Op-Namen (die kennen zusätzlich `"archive"`/
+`"drift"`). `appended_bytes` bei `append` ist `len(text.encode())` — die Länge des tatsächlich
+angehängten Texts, kein `Store`-Umbau nötig.
+
+**Verifiziert:** `pytest -q` → 593 passed. `mcp_smoke.py` (Text und `--json`) → 13/13. Tabu-Diff
+gewahrt: nur `storage/`, `mcpserver/{tools,receipts,patch aus storage}.py` und die drei Testdateien
+berührt — genau die in P6-C freigegebene Fläche.
+
+**Nächster Schritt (konkret):** Step 2 — Betrieb. O2 (Purge um `clients`/`token_families`
+erweitern), Client-Surface-Logging (`ua`-Feld, V42 messen statt annehmen),
+`diagnose.sh`-Erweiterung, `ui_budget.py`-Latenzmessung. Plan §4 Step 2.

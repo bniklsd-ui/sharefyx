@@ -462,3 +462,81 @@ def test_update_accepts_valid_status_per_type(store):
     note = store.create("nikinger", type="note", title="N")
     updated_note = store.update(note.id, version=note.version, status="archived")
     assert updated_note.status == "archived"
+
+
+# -- P6 Step 1: patch() (P6-E/F/G) ----------------------------------------------------------
+#
+# Plan §4 Step 1 nennt eine eigene Datei `phase6_shares/tests/test_store_patch.py` dafür --
+# `phase1_storage/tests/conftest.py` ist aber leer (P1-Präzedenzfall, siehe dessen leeren
+# Inhalt): `clock`/`store`/`store_git`/`_git_log` leben alle lokal in dieser Datei, eine
+# fixture-lose Schwesterdatei könnte sie nicht sehen. Plan §5s Testliste sagt ohnehin
+# "test_store.py -- erweitert", nicht "neue Datei" -- dieser Widerspruch wird zugunsten der
+# Zusammenfassungstabelle aufgelöst, dieselbe Kategorie Drift wie in P6 Step 0 (siehe
+# `phase6_shares/CLAUDE.md`s Session-Block). Die reinen `apply_edits()`-Funktionstests (ohne
+# Store) stehen tatsächlich in `phase6_shares/tests/test_patch.py` -- die haben keine
+# Fixture-Abhängigkeit und passen dort.
+
+
+def test_patch_bumps_version_once_for_many_edits(store):
+    item = store.create("nikinger", type="note", title="Multi-Patch", body="Alpha\nBeta\nGamma\n")
+
+    result = store.patch(
+        item.id, version=item.version,
+        edits=[
+            {"old_text": "Alpha", "new_text": "Erste"},
+            {"old_text": "Beta", "new_text": "Zweite"},
+            {"old_text": "Gamma", "new_text": "Dritte"},
+        ],
+    )
+
+    assert result.item.version == item.version + 1
+    assert result.replacements == 3
+    assert result.lines == (1, 2, 3)
+    assert result.item.body == "Erste\nZweite\nDritte\n"
+    assert result.bytes_before == len("Alpha\nBeta\nGamma\n".encode("utf-8"))
+    assert result.bytes_after == len("Erste\nZweite\nDritte\n".encode("utf-8"))
+
+
+def test_patch_creates_exactly_one_git_commit(store_git, tmp_path):
+    item = store_git.create("nikinger", type="note", title="Patch-Commit", body="X\n")
+
+    store_git.patch(item.id, version=item.version, edits=[{"old_text": "X", "new_text": "Y"}])
+
+    log = _git_log(tmp_path)
+    assert len(log) == 2  # create + patch
+    assert log[0].startswith(f"patch {item.id} [nikinger]")
+
+
+def test_patch_on_version_mismatch_raises_conflict_and_leaves_file_untouched(store, tmp_path):
+    item = store.create("nikinger", type="note", title="Konflikt", body="Original\n")
+    path = tmp_path / "nikinger" / f"{item.id}__konflikt.md"
+    original_bytes = path.read_bytes()
+
+    with pytest.raises(ConflictError):
+        store.patch(item.id, version=999, edits=[{"old_text": "Original", "new_text": "Neu"}])
+
+    assert path.read_bytes() == original_bytes
+
+
+def test_patch_on_archived_item_is_rejected(store):
+    item = store.create("nikinger", type="task", title="Erledigt", body="X\n")
+    archived = store.archive(item.id, version=item.version)
+
+    with pytest.raises(ValidationError):
+        store.patch(
+            archived.id, version=archived.version, edits=[{"old_text": "X", "new_text": "Y"}]
+        )
+
+
+def test_patch_preserves_unknown_frontmatter_fields(store, tmp_path):
+    item = store.create(
+        "nikinger", type="note", title="Mit Zusatzfeld", body="Original\n", eigenes_feld="bleibt"
+    )
+
+    result = store.patch(
+        item.id, version=item.version, edits=[{"old_text": "Original", "new_text": "Geändert"}]
+    )
+
+    assert result.item.extra == {"eigenes_feld": "bleibt"}
+    path = tmp_path / "nikinger" / f"{item.id}__mit-zusatzfeld.md"
+    assert "eigenes_feld: bleibt" in path.read_text()

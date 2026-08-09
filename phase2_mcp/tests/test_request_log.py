@@ -157,13 +157,13 @@ async def test_tool_event_has_tool_space_and_duration(app, token_alpha, request_
 async def test_tool_event_error_carries_class_not_message(app, token_alpha, request_log_handler):
     async with app.router.lifespan_context(app):
         async with _mcp_client(app, token_alpha) as client:
-            created = json.loads((await client.call_tool("list_spaces", {})).data)
-            assert created  # sanity: alpha existiert
+            spaces = json.loads((await client.call_tool("list_spaces", {})).data)
+            assert spaces  # sanity: alpha existiert
 
-            created_text = (
-                await client.call_tool("create_item", {"type": "task", "title": "Für Konflikt"})
-            ).data
-            item_id = created_text.splitlines()[1].split("id: ")[1].strip()
+            created = json.loads(
+                (await client.call_tool("create_item", {"type": "task", "title": "Für Konflikt"})).data
+            )
+            item_id = created["id"]
 
             conflict = await client.call_tool(
                 "update_item",
@@ -191,10 +191,10 @@ async def test_tool_event_never_contains_item_title(app, token_alpha, request_lo
 
     async with app.router.lifespan_context(app):
         async with _mcp_client(app, token_alpha) as client:
-            created_text = (
-                await client.call_tool("create_item", {"type": "task", "title": marker})
-            ).data
-            item_id = created_text.splitlines()[1].split("id: ")[1].strip()
+            created = json.loads(
+                (await client.call_tool("create_item", {"type": "task", "title": marker})).data
+            )
+            item_id = created["id"]
 
             await client.call_tool("list_spaces", {})
             await client.call_tool("search_items", {"query": marker})
