@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-08-09 (Phase 5 formal auf ✅ geschlossen — Active-phase-Abschnitt entfernt, phase5_ui-Zeilen nach Completed phases verschoben, PHASE5_CLOSEOUT_HANDOVER.md + phase5_ui_uebersicht.svg ergänzt)
+updated: 2026-08-09 (Phase 6 🔄 gestartet — Active-phase-Abschnitt wieder angelegt, phase6_shares/CLAUDE.md + phase6_shares_plan.md ergänzt)
 ---
 # Doc Index (L0)
 
@@ -28,6 +28,11 @@ updated: 2026-08-09 (Phase 5 formal auf ✅ geschlossen — Active-phase-Abschni
 - [ROADMAP.md](../ROADMAP.md) — 📗 ~13KB · Phases 1–5, scope in/out per phase, status (all ✅, Phase 6 not yet planned) — size annotation was stale at ~9KB before this commit, corrected
 - [docs/DOC_LAYERS_CONVENTION.md](./DOC_LAYERS_CONVENTION.md) — 📗 ~5KB · Doc-Layers-Spec (v1, 2026-07-06) · **byte-identische Kopie aus dem Trading-Bot-Repo — nicht projektspezifisch anpassen, sonst divergieren zwei Kopien derselben Regel**
 - [docs/PROMPTS.md](./PROMPTS.md) — 📗 ~15KB · die drei Workflow-Prompts (Claude-Code-Session-Start, Phasen-Kickoff im Browser, Phasen-Abschluss); **[2026-08-09]** Phasen-Abschluss läuft jetzt in Claude Code statt Browser+Google-Drive (Nikinger-Entscheidung, Effizienz); lesen beim Start eines neuen Chats, nicht mitten in einer Session
+
+## Active phase (6 — Freigaben, Ordner, Werkzeug-Ergonomie)
+
+- [phase6_shares/CLAUDE.md](../phase6_shares/CLAUDE.md) — 🔄 ~12KB · phase head; Step 0 ✅ (Haushalt, Verifikationsdurchlauf V39–V41, Regeländerungen §0.7 a/b/c, Phase-Head angelegt); read + newest Session-stopped block first
+- [docs/concepts/phase6_shares_plan.md](./concepts/phase6_shares_plan.md) — 📕 ~58KB · ausführungsreifer P6-Plan: Entscheidungen P6-A–P6-AC, Steps 0–10 (Block A Werkzeuge/Betrieb, Block B Dateisystem, Block C Bilder, hartes Gate A→B), Rechtemodell §1.2, Abnahmematrix 1–24, [VERIFY]-Register V39–V51; über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen; Autor Browser-Planungssession 2026-08-09 gegen den Drive-Snapshot `2026_08_09_sharefyx-main`
 
 ## Completed phases
 

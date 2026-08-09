@@ -10,7 +10,8 @@ down:
   - docs/concepts/phase3_edge_plan.md      # ausführungsreifer P3-Plan
   - docs/concepts/phase4_auth_plan.md      # ausführungsreifer P4-Plan
   - docs/concepts/phase5_ui_plan.md        # ausführungsreifer P5-Plan
-updated: 2026-08-09 (Phase 5 auf ✅ — Abnahmematrix 20/20 vollständig)
+  - docs/concepts/phase6_shares_plan.md    # ausführungsreifer P6-Plan
+updated: 2026-08-09 (Phase 6 🔄 gestartet — neue Zeile + zwei korrigierte Absätze unter „Bewusst nicht auf der Roadmap")
 ---
 # ROADMAP — Space-Server
 
@@ -26,6 +27,7 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 | **P3** | `phase3_edge/` | Tunnel, systemd, Health, Logging, Ops-Skripte. Öffentlich erreichbar. | ✅ |
 | **P4** | `phase4_auth/` · `authserver` | OAuth 2.1 + DCR; ersetzt den Pfad-Token. | ✅ |
 | **P5** | `phase5_ui/` · `webui` | REST-API + Web-UI für Menschen. | ✅ |
+| **P6** | `phase6_shares/` (kein eigenes Paket) | Freigaben, Ordner, `patch_item`, Update-Log, Bilder. | 🔄 |
 
 **Korrektur (2026-07-25, P2-Planungssession):** OAuth rückt von „ganz am Ende" auf „direkt nach
 P3" — der Pfad-Token soll kurz leben, und die UI ist die Phase, die laut Build-Reihenfolge unter
@@ -186,13 +188,42 @@ Formaler Abschluss-Handover an P6: `docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md`. 
 
 ---
 
+## Phase 6 — Freigaben, Ordner, Werkzeug-Ergonomie
+
+**Mission:** Drei Dinge beweisbar — punktuelle Textkorrektur statt Komplett-Rewrite
+(`patch_item`), Menschen entscheiden pro Item wer es sieht plus Orte, an denen mehrere gemeinsam
+schreiben, und das System verträgt einen dritten Nutzer ohne Codeänderung.
+
+- **DRIN:** `patch_item` + Quittungen statt Volltext, Sichtbarkeitsstufen (`private`/`human`),
+  Item- und Ordner-/Space-Freigaben, echte Ordner, Update-Log/Banner, Bild-Assets als verlinkte
+  Dateien.
+- **DRAUSSEN:** Löschen von Items, FastMCP-4/CIMD/DPoP, Volltext-/semantische Suche, Realtime,
+  Mobilversion, Rechteverwaltung über MCP-Tools, HEIC, serverseitiges Bild-Rendering.
+- Steht in **keiner** ursprünglichen Roadmap-Zeile — ein QoS-Schnitt aus echtem Betrieb (siehe
+  „Phase-6-Vormerkungen" in Root-`CLAUDE.md`, jetzt hier eingepflegt). Drei Blöcke, ein hartes
+  Gate: A = Werkzeuge/Betrieb/Update-Banner, B = Dateisystem, C = Bilder — unter Druck fällt
+  zuerst C weg, dann Bs geteilte Spaces, **nie Block A**.
+
+**Status 🔄 (2026-08-09, gestartet):** Plan ausführungsreif, Step 0 (Haushalt/Verifikation/
+Regeländerungen) läuft. Herkunft: `docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` §4.1–§4.6. Plan:
+`docs/concepts/phase6_shares_plan.md` (Entscheidungen P6-A–P6-AC, Steps 0–10). Phase-Head:
+`phase6_shares/CLAUDE.md`.
+
+---
+
 ## Bewusst nicht auf der Roadmap
 
 - **Semantische Suche / Embeddings.** Verstößt gegen das Bauprinzip. Bei zwei Nutzern und
   einigen hundert Items schlägt Frontmatter-Filterung jede Vektorsuche in Präzision und Kosten.
-- **Feingranulare Rechte.** Zwei Personen, gegenseitiges Vertrauen. Cross-Space-Read ist
-  standardmäßig an. Der Schutz gegen fremde Inhalte ist Rule 4, nicht ein ACL-Modell. **Ergänzung
-  2026-07-25:** P2 baut den Seam dafür (`Permissions.can_read`), damit es später kein Umbau wird
-  — die Policy selbst bleibt bewusst `True` für alle, siehe „Zurückgestellt aus P2".
-- **Mehrmandantenfähigkeit.** Wenn ein dritter Nutzer dazukommt, ist das eine Planungssession,
-  kein `if`-Zweig.
+- ~~**Feingranulare Rechte.** Zwei Personen, gegenseitiges Vertrauen. Cross-Space-Read ist
+  standardmäßig an. Der Schutz gegen fremde Inhalte ist Rule 4, nicht ein ACL-Modell.~~
+  **Ergänzung 2026-07-25:** P2 baut den Seam dafür (`Permissions.can_read`), damit es später kein
+  Umbau wird — die Policy selbst bleibt bewusst `True` für alle, siehe „Zurückgestellt aus P2".
+  **[2026-08-09 Korrektur, P6-Planungssession]:** Der Satz war bis heute richtig; mit Phase 6
+  wird er widerlegt — Sichtbarkeitsstufen und Item-/Ordner-Freigaben (P6-J/K) sind jetzt Scope.
+  Details: `docs/concepts/phase6_shares_plan.md` §0.5.
+- ~~**Mehrmandantenfähigkeit.** Wenn ein dritter Nutzer dazukommt, ist das eine Planungssession,
+  kein `if`-Zweig.~~ **[2026-08-09 Korrektur, P6-Planungssession]:** Die Planungssession hat am
+  2026-08-09 stattgefunden — ein dritter Nutzer wird in Phase 6 real angelegt, geprüft und wieder
+  entfernt (P6-W). Der Satz war richtig, nicht widerlegt: es blieb bei einer Planungssession, kein
+  stiller `if`-Zweig.
