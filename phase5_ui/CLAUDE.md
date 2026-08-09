@@ -7,7 +7,7 @@ up: ../CLAUDE.md
 down:
   - ../docs/concepts/phase5_ui_plan.md             # voller Plan, Entscheidungen P5-A–P5-AE, Steps 0–9
   - ../docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.5, [VERIFY]-Bilanz V14–V26
-updated: 2026-08-06
+updated: 2026-08-09
 ---
 
 # CLAUDE.md — Phase 5: Web-UI, REST-API, Auth-Selbstverwaltung (`phase5_ui/`)
@@ -104,12 +104,14 @@ Messung statt Schätzung (`ui_budget.py`, AD) · gemeinsame Live-Abnahme, beide 
 
 ---
 
-## Abnahmestand (Plan §6) — Stand 2026-08-07
+## Abnahmestand (Plan §6) — Stand 2026-08-09
 
-Die Ergebnisse entstanden über sechs Sessions verteilt, mehrere davon schon in
+Die Ergebnisse entstanden über sieben Sessions verteilt, mehrere davon schon in
 `SESSIONS_ARCHIVE.md`. Diese Tabelle ist der **eine** Ort, an dem der Gesamtstand steht; sie
 wird bei jedem Live-Ergebnis nachgezogen. **Statusregel des Plans: ✅ heißt live-verifiziert,
-nicht gebaut. Phase 5 bleibt 🟡, solange eine Zeile offen ist.**
+nicht gebaut.** Alle 20 Zeilen stehen ✅ (2026-08-09) — die Matrix ist damit vollständig, den
+formalen Phasenschluss (Root-`CLAUDE.md`/`ROADMAP.md`) markieren erst die
+Step-9-Abschlussarbeiten, siehe Session-Block.
 
 | # | Kriterium | Stand | Beleg |
 |---|---|---|---|
@@ -133,14 +135,15 @@ nicht gebaut. Phase 5 bleibt 🟡, solange eine Zeile offen ist.**
 | — | *(Staging war kein eigenes Akzeptanzkriterium — P5-AB nennt es im Scope, §6 prüft es nicht. Am 2026-08-06 abgeschaltet, Begründung im Session-Block.)* | | |
 | 18 | `git diff` auf `storage/`, `mcpserver/{tools,permissions,server}.py`: leer | ✅ | bei jedem Step-Commit geprüft, zuletzt Step 7b |
 | 19 | Cookie an `/mcp` ignoriert; Bearer an `/api` ignoriert | ✅ | Testseite ✅ (`test_isolation.py`, `test_overview.py`) **plus Nikinger live, 2026-08-07**: `curl` gegen `PUBLIC_BASE_URL` (aus `phase3_edge/local.env`) — `GET /api/v1/me` ohne Cookie/Bearer → `401`; `GET /mcp/` mit gefälschtem `__Host-sfx_session`-Cookie (kein Bearer) → `401` |
-| 20 | Reboot: UI, Connector, Timer kommen ohne Handgriff zurück | ⬜ offen | passiv zulässig (wie P3 Zeile 6) |
+| 20 | Reboot: UI, Connector, Timer kommen ohne Handgriff zurück | ✅ | **Nikinger live, 2026-08-09** — unbewusst ausgelöster VM-Reboot (nicht `sudo reboot`), gleicher Prüffall wie P3 Zeile 6. Details im Session-Block |
 
-**Kurz:** 19 von 20 live bestanden, 0 teilweise, 1 offen (20). Zeilen 10/13/14/15/17/19 sind am
+**Kurz:** 20 von 20 live bestanden, 0 teilweise, 0 offen. Zeilen 10/13/14/15/17/19 sind am
 2026-08-07 den Sprung von „Code fertig" auf „live" gegangen — **✅ heißt live-verifiziert, nicht
-gebaut.** Zeile 17 war die letzte, die Fabian brauchte (Step 9) — Step 9 damit inhaltlich
-erledigt bis auf die Abschlussarbeiten (Migrations-Runbook-Abschluss, `P5_ABNAHME_<datum>.md`,
-Phasenübersicht, Closeout-Handover, Rotationsprüfung). Die einzige verbleibende Zeile 20 ist
-passiv (nächster echter Reboot oder ein bewusst ausgelöster).
+gebaut.** Zeile 17 war die letzte, die Fabian brauchte (Step 9); Zeile 20 (2026-08-09) war die
+letzte insgesamt. **Abnahmematrix vollständig — Step 9 inhaltlich erledigt bis auf die
+Abschlussarbeiten** (Migrations-Runbook-Abschluss, `P5_ABNAHME_<datum>.md`, Phasenübersicht,
+Closeout-Handover, Rotationsprüfung); Root-`CLAUDE.md`/`ROADMAP.md` erst auf ✅ nach diesen
+Abschlussarbeiten, nicht in diesem Commit.
 
 **Cutover auf Release-Verzeichnisse vollzogen (2026-08-05 20:37, Nikinger):** der Dienst läuft
 seither aus `/opt/sharefyx/current` statt aus dem Git-Arbeitsverzeichnis. „Datei ändern +
@@ -150,142 +153,28 @@ Rückweg, falls je nötig: `REPO_ROOT`/`VENV` in `phase3_edge/local.env` zurück
 
 ---
 
-## Session stopped — 2026-08-06 (Verifikationssession: Push bestätigt, Deploy-Lücke quantifiziert)
+## Session stopped — 2026-08-09 (Zeile 20 live bestanden — Abnahmematrix vollständig, 20/20)
 
-**Auftrag:** Sanity-Check des einen offenen Punkts aus dem letzten Handover — die Behauptung
-„Dienst läuft seit dem Step-8-Cutover aus `/opt/sharefyx/current`" —, plus generelle Orientierung
-zu Sessionbeginn. Kein Code angefasst, keine Live-Aktion ausgeführt (nur read-only).
+**Auftrag:** Nikinger meldete einen soeben erfolgten, unbewusst ausgelösten VM-Reboot ohne
+eigenen Handgriff danach — der passive Prüffall für die letzte offene Abnahmezeile (20).
+Read-only-Verifikation nach dem Maßstab von P3 Zeile 6 (`phase3_edge/CLAUDE.md`,
+Korrekturnotiz 2026-07-29): Service-Autostart, Connector-Traffic, UI-Erreichbarkeit,
+Funnel-Persistenz, Timer-Enable-Status. Details, alle Belege und der volle Nachtrag-Text stehen
+im vorigen Session-Block, jetzt in `SESSIONS_ARCHIVE.md` (Rotation im selben Commit).
 
-**Cutover-Behauptung live gegengeprüft, nicht nur übernommen:** `systemctl cat sharefyx-mcp` →
-`WorkingDirectory=/opt/sharefyx/current`, `ExecStart=/opt/sharefyx/current/.venv/bin/python
-/opt/sharefyx/current/phase2_mcp/scripts/serve.py`. Bestätigt.
+**Ergebnis: Zeile 20 ✅. Abnahmematrix 20/20, 0 teilweise, 0 offen.** Matrix in diesem Head
+sowie `docs/INDEX.md` nachgezogen. Root-`CLAUDE.md`/`ROADMAP.md` bewusst noch nicht auf
+„Phase 5 ✅" gesetzt — das hängt an den Step-9-Abschlussarbeiten, nicht an der Matrix allein.
 
-**Korrektur einer veralteten Behauptung im vorigen Session-Block:** dort steht „lokaler `main`
-liegt 34 Commits vor `origin/main`, nie gepusht". `git status -sb` → `main...origin/main`
-(0 Commits Differenz in beide Richtungen) — **der Push ist inzwischen erfolgt** (vom Nikinger,
-außerhalb dieser Session). Root-`CLAUDE.md`s identische Behauptung trägt dieselbe Korrektur.
-
-**Deploy-Lücke präzise quantifiziert statt nur „Deploy fällig" zu wiederholen:**
-`/opt/sharefyx/current` → `readlink -f` → `/opt/sharefyx/releases/20260805T183144.605094Z` →
-dort `git log` → `HEAD` = `6bf22e5`. `git log --oneline 6bf22e5..HEAD` (lokal) zeigt **12
-Commits**, darunter genau die drei, die der vorige Session-Block als „erst nach Deploy sichtbar"
-benannt hatte: den S10-Fix (`e760f0e`), Step 8b (`2237c0f`) und die F1/F2-Entscheidung
-(`8b11862`). Deploy bleibt Sache des Nikingers (Hard Rule: reale Infrastruktur).
-
-**Kein eigenständig ausführbarer Schritt gefunden:** Abnahmematrix (`phase5_ui/CLAUDE.md`
-§„Abnahmestand") erneut gegen die Session-Notiz geprüft — alle sieben nicht-✅-Zeilen (10, 13,
-14, 15, 17, 19, 20) sind entweder Kandidatenbeleg (15, bereits von Claude Code gefahren, braucht
-den Lauf des Nikingers) oder verlangen laut eigenem „Beleg"-Feld explizit einen Live-Vorgang
-(Browser-Nutzung, `curl`, Reboot, Step 9 mit Fabian). Kein Widerspruch zwischen Root-`CLAUDE.md`s
-„Nächster Schritt: Zeile 15/19/Step 9" und diesem Head — Abnahme-*Zeilen* sind keine Plan-*Steps*,
-aber beide landen am selben Ort: beim Nikinger.
-
-**Verifiziert:** keine Testsuite gelaufen (kein Code geändert, `pytest`/`ui_budget.py` also nicht
-nötig — beide würden ohnehin eine bereinigte Shell-Umgebung brauchen,
-[[feedback_test_harness_never_inherits_env]]). Tabu-Diff nicht relevant (kein Diff).
-
-**Nachtrag, 2026-08-07 — Deploy + Zeilen 15/19 vom Nikinger live erledigt:**
-`SHAREFYX_RELEASES_DIR=/opt/sharefyx/releases SHAREFYX_CURRENT_LINK=/opt/sharefyx/current
-SHAREFYX_DATA_ROOT=/home/savefyx/savefyx-data SHAREFYX_BACKUP_DIR=/var/lib/sharefyx-backup
-phase5_ui/scripts/deploy.sh main` lief durch (576/576 Tests im Release, Health-Gate `/ui/login`→
-`200`, `/api/v1/me`→`401`, `/mcp/`→`401`), JSON-Zeile bestätigt `"result":"ok"`,
-`"sha":"a835d1d..."`. Read-only gegengeprüft, nicht nur die Meldung übernommen: `readlink -f
-/opt/sharefyx/current` → neues Release-Verzeichnis, `git log --oneline -1` darin → `a835d1d`,
-identisch mit dem lokalen `main`-HEAD zum Deploy-Zeitpunkt. **Deploy-Lücke damit geschlossen.**
-Zeile 15: `ui_budget.py` scheiterte beim ersten Versuch mit bloßem `python3`
-(`ModuleNotFoundError: httpx`) — falscher Interpreter, kein Befund; mit `.venv/bin/python`
-liefen alle 5 Messgrößen im Korridor, deckungsgleich mit dem Kandidatenbeleg. Zeile 19: `curl`
-gegen `PUBLIC_BASE_URL` (`phase3_edge/local.env`) — `/api/v1/me` ohne Auth → `401`, `/mcp/` mit
-gefälschtem Session-Cookie statt Bearer → `401`. **Abnahmestand jetzt 15/20, 0 teilweise.**
-Beide Zeilen in der Tabelle oben nachgezogen.
-
-**Nachtrag, 2026-08-07, zweiter — Zeilen 10/13/14 vom Nikinger live erledigt:**
-Zeile 10: vier UI-Aktionen (Anlegen/Bearbeiten/Anhängen/Archivieren) auf `itm_b252a444`,
-`git log` im `DATA_ROOT` zeigt vier eigene Commits, je einen pro Aktion (Hard Rule 5 hält unter
-echter Nutzung). Zeile 13: unbekanntes Frontmatter-Feld (`custom_test: roundtrip-check`) von
-Hand eingefügt, überlebte danach unverändert eine echte UI-Bearbeitung — Nebenfund dabei: die
-Version sprang zwei statt eins, weil `store.py`s Drift-Erkennung (Entscheidung D) die externe
-Änderung zuerst mit einem eigenen `drift`-Commit reparierte, bevor der `update`-Commit der UI
-folgte — kein Bug, dokumentiertes Verhalten, per `git log` einzeln nachvollzogen. Zeile 14: `Claude
-Code` selbst rief `get_item` über den echten, produktiven MCP-Connector (Space `niklas`) auf das
-Testitem auf — sauberer Read trotz `format: markdown`-Feld. **Abnahmestand jetzt 18/20, nur noch
-17 (Step 9) und 20 (Reboot) offen.**
-
-**Nebenfund dieser Session — nicht sicherheitsrelevant, aber ungeklärt bis eben:** der
-`get_item`-Aufruf oben lief über einen `claude_ai_`-präfigierten Connector-Tool-Namen, der laut
-Claude Code auf einen in eurem Anthropic-Account konfigurierten Custom Connector zeigt (dieselbe
-Autorisierung wie ein claude.ai-Web-/Desktop-Zugriff — der OAuth-Bearer unterscheidet laut Design
-nicht *welche* Claude-Oberfläche ihn benutzt, nur *welcher Space*). Bisher nie bewusst
-entschieden, nur nie aufgefallen. Nikinger-Entscheidung 2026-08-07: **kein Ausschluss** — sobald
-Unterordner/teambezogene Notizen existieren (siehe Befund F1, vorige Session), gibt es keinen
-Nachteil darin, dass auch Claude Code darauf schreiben kann. **Für später vorgemerkt, kein
-Blocker, kein Scope für diese Phase:** ein Log-Feld, das festhält, *welche* Client-Oberfläche
-(claude.ai/Desktop vs. Claude Code) einen Request gestellt hat — muss nicht in die UI, reicht im
-Log. Naheliegender Ort bei Umsetzung: derselbe Request-Log-Pfad, der schon Bearer-Requests
-protokolliert (`phase2_mcp/mcpserver`, `test_request_log.py`) — vermutlich über den
-`User-Agent`-Header, falls MCP-Clients den zuverlässig genug setzen; das ist bei Umsetzung zu
-verifizieren, nicht heute. Phase-6-Kandidat, gemeinsam mit F1/F2 zu betrachten.
-
-**Nachtrag, 2026-08-08 — Werkzeug-Feedback einer arbeitenden Claude-Instanz (`update_item`
-ersetzt immer den ganzen Body):** über den Nikinger weitergegeben, keine eigene Beobachtung
-dieser Session. Wortlaut der Rückmeldung: eine Drei-Zeilen-Korrektur an einem 45-KB-Dokument
-zwingt zum vollständigen Neusenden, weil `update_item` kein Zeilen-/Bereichs-Patchen kennt —
-teuer und riskant, weil ein Komplett-Rewrite bei einem Dokument, das jetzt Quelle der Wahrheit
-ist, mehr verlieren kann, als sofort auffällt. Konkreter Gegenvorschlag aus der Rückmeldung:
-`patch_item(item_id, version, old_text, new_text)`, das hart fehlschlägt, wenn `old_text` nicht
-genau einmal im Body vorkommt — Kollisionen würden so sichtbar scheitern statt still zu
-überschreiben, dieselbe Philosophie wie die `version`-Pflicht in Hard Rule 3. Berührt
-`mcpserver/tools.py` (P5-B tabu für diese Phase, `git diff` darauf muss laut Akzeptanzkriterium
-18 leer bleiben) — keine Ad-hoc-Umsetzung. Zusammen mit F1/F2 als Phase-6-Vormerkung im Root-
-`CLAUDE.md` „Current state" eingetragen; hier der volle Wortlaut, dort nur der Verweis.
-
-**Nachtrag, 2026-08-09 — Zeile 17 (Step 9, P5-AE) live bestanden, gegen die Datenbank
-gegengeprüft statt die Meldung zu übernehmen:** Fabian ist am 2026-08-07 über eine frische
-Einladung neu eingestiegen (sein alter Account wurde dabei zurückgesetzt) und hat danach sowohl
-die UI als auch den Connector aktiv genutzt, parallel zu Nikinger, gegen dieselbe Instanz.
-Read-only gegen `/var/lib/sharefyx/auth.sqlite3` verifiziert: `ui_sessions` zeigt für **beide**
-Spaces (`niklas`, `fabian`) aktive Sitzungen am 2026-08-07 (05:14–12:32 UTC); `journalctl -u
-sharefyx-mcp` bestätigt echten `/mcp`-Traffic am selben Tag (176 Treffer). Zeile 17 selbst
-verlangt nur „beide nutzen UI und Connector am selben Tag" — das steht.
-
-**Nebenfund dabei, wichtiger als Zeile 17 selbst — S10 unter Live-Bedingungen noch nicht
-bewiesen:** Fabians aktuell aktive `token_families`-Zeile wurde bereits 2026-08-06 08:23
-ausgestellt, **vor** dem S10-Fix (Commit `e760f0e`, 10:33 desselben Tages; deployt erst
-2026-08-07 05:23, Restart 07:25). Sein Connector-Zugriff am 08-07 lief also über die
-Alt-Autorisierung weiter, nicht über einen frischen Re-Auth unter dem gefixten Code — die
-„frische Einladung" hat offenbar nur die UI-Anmeldedaten erneuert, nicht zwingend eine neue
-Connector-Autorisierung erzwungen. Fünf von Fabians Token-Familien vom 30.07. stehen zudem
-bis heute unwiderrufen in der DB (`revoked_at` leer) — das sind Altlasten aus **vor** dem Fix
-(dieselben neun, die S10 überhaupt erst auffindbar gemacht haben) und decken sich mit dem
-bereits offenen **Befund O2** („`clients`/`token_families` werden nie abgeräumt"), sind also
-keine neue Regression. Bewusst **kein** erzwungener Fabian-Reset zur Live-Probe: `_invite_post()`
-tauscht Passwort-Hash **und** TOTP-Seed und widerruft (seit S10) alle Familien/Sitzungen des
-Space — Fabian müsste komplett neu enrollen und den Connector neu autorisieren, nur um S10 ein
-zweites Mal zu beweisen. Stattdessen `test_invite_reset_revokes_old_token_families_and_sessions`
-(hinzugefügt mit dem S10-Fix) gezielt erneut laufen lassen: **grün**, und der Commit, der den
-Test einführt (`e760f0e`), ist Vorfahr des deployten Release-Commits — der Fix ist damit sowohl
-im Code bewiesen als auch tatsächlich im Live-System aktiv, nur eben noch nicht durch einen
-echten Reset **nach** dem Deploy ausgelöst worden. S10 bleibt ✅, dieser Nebenfund ist eine
-Präzisierung, keine Wiedereröffnung.
-
-**Damit war Step 9 der einzige verbleibende Plan-Step inhaltlich erledigt — offen
-bleiben nur noch die Step-9-Abschlussarbeiten** (Migrations-Runbook-Schritt 4: Credential/Keyring
-für die alte `auth-users`-Quelle entfernen; `docs/concepts/P5_ABNAHME_<datum>.md`;
-`phase5_ui_uebersicht.svg`; `PHASE5_CLOSEOUT_HANDOVER.md`; Rotationsprüfung auf diesem Head;
-Root-`CLAUDE.md`/`ROADMAP.md` auf ✅) **und Zeile 20** (passiver Reboot-Nachweis). **Ein
-Plan-Widerspruch bleibt als offener Befund stehen, nicht durch diese Session aufgelöst:** Step 9
-Punkt 3 verlangt eine „frische Einladung" für Fabian, §2.6 (Migrationsrunbook) beschreibt
-stattdessen eine reine Credential-Migration ohne neue Einladung — gelebt wurde hier der
-Step-9-Weg. Kein Code geändert, reine Doku-Nachführung nach Live-Bestätigung durch den Nikinger.
+**Verifiziert:** keine Testsuite gelaufen (keine Code-Änderung, nur Doku). Tabu-Diff nicht
+relevant (kein Diff außerhalb `.md`).
 
 **Offen für die nächste Session:**
-- Eine Zeile offen: 20 (passiver Reboot-Nachweis wie P3 Zeile 6 — kann jederzeit nebenbei
-  fallen, erzwungen oder natürlich).
-- Step-9-Abschlussarbeiten (kein Fabian mehr nötig, reine Doku/Runbook-Arbeit): altes
-  `auth-users`-Credential/Keyring entfernen (Runbook-Schritt 4), `P5_ABNAHME_<datum>.md`,
-  `phase5_ui_uebersicht.svg`, `PHASE5_CLOSEOUT_HANDOVER.md`, Rotationsprüfung auf diesem Head,
-  Root-`CLAUDE.md`/`ROADMAP.md` auf ✅ — erst wenn auch Zeile 20 steht.
+- Step-9-Abschlussarbeiten (vollständig entsperrt, kein Fabian mehr nötig): altes
+  `auth-users`-Credential/Keyring entfernen (Runbook-Schritt 4 — reale Infrastruktur,
+  Nikinger), `P5_ABNAHME_<datum>.md`, `phase5_ui_uebersicht.svg`,
+  `PHASE5_CLOSEOUT_HANDOVER.md`, danach erst Root-`CLAUDE.md`/`ROADMAP.md` auf „Phase 5 ✅".
 - Offener Befund, nicht aufgelöst: Step 9 Punkt 3 („frische Einladung") widerspricht §2.6
   (Migrationsrunbook, keine neue Einladung) — für den nächsten Plan-Review vormerken.
-- Phase-6-Vormerkungen (siehe oben, alle zusammen zu planen, nicht isoliert): F1/F2
-  (Subspaces/Löschen), Client-Surface-Logging, `patch_item` (Werkzeug-Feedback 2026-08-08).
+- Phase-6-Vormerkungen (alle zusammen zu planen, nicht isoliert): F1/F2 (Subspaces/Löschen),
+  Client-Surface-Logging, `patch_item` (Werkzeug-Feedback 2026-08-08).
