@@ -93,14 +93,17 @@ P1 nicht abgeschlossen, egal wie viel Code existiert.
 | 6 | `history.py` (Git) | 5 | ✅ | 11 |
 | 7 | Query-Layer in `store.py` | 6 | ✅ | 2 (in `test_store.py`) |
 | 8 | `scripts/space_cli.py` | 7 | ✅ | 9 |
+| 9 | `patch.py` (neu) + `store.py :: patch()` | P6 Step 1 | ✅ | 5 (in `test_store.py`; die vier reinen `apply_edits()`-Funktionstests liegen in `phase6_shares/tests/test_patch.py`, außerhalb dieses Pakets) |
 
-**Gesamt: 76 Tests** (`70 Tests` war der Stand bei Phasenabschluss; **[2026-07-25 Korrektur,
+**Gesamt: 81 Tests** (`70 Tests` war der Stand bei Phasenabschluss; **[2026-07-25 Korrektur,
 P2 Step 0]:** `rename_for_new_slug()` samt zweier Tests entfernt, 70→68; **[2026-07-25,
 P2 Step 2]:** acht neue Tests für die drei freigegebenen Contract-Erweiterungen, 68→76 — siehe
-„Geerbte Contracts" unten). Zielgröße am Phasenende: grob 60–90, davon mindestens die vier
-Konflikt-Tests aus Step 4. Step 0 hat bewusst keine Tests (reines Skelett) — `pytest`
-lief dort grün mit `exit 5` („no tests ran", nicht `exit 0`); das ist die korrekte
-Bedeutung von „0 Tests", kein Fehlerzustand.
+„Geerbte Contracts" unten; **[2026-08-09, P6 Step 1]:** fünf neue Tests für `Store.patch()`
+(dritte, benannte Contract-Öffnung, siehe unten), 76→81). Zielgröße am Phasenende: grob 60–90,
+davon mindestens die vier Konflikt-Tests aus Step 4 — diese Zielgröße galt für den P1-Abschluss,
+P6 öffnet den Contract erneut benannt, siehe unten. Step 0 hat bewusst keine Tests (reines
+Skelett) — `pytest` lief dort grün mit `exit 5` („no tests ran", nicht `exit 0`); das ist die
+korrekte Bedeutung von „0 Tests", kein Fehlerzustand.
 
 ## Geerbte Contracts
 
@@ -125,6 +128,13 @@ zu, keine stille Abweichung:
   (Entscheidung D3). Für fremde Spaces: ein Lesezugriff dort fasst keine Datei an (Rule 4);
   `version` ist dort informativ, nicht autoritativ, weil es dort per Architektur keine Writes
   gibt. Default bleibt `True` — jedes bestehende P1-Verhalten (inkl. CLI) ist unverändert.
+
+**[2026-08-09, P6 Step 1] Dritte, benannte Contract-Öffnung** (`docs/concepts/phase6_shares_plan.md`
+§1.4, angekündigt bereits in `phase6_shares/CLAUDE.md`s Step-0-Block) — `store.py :: patch(item_id,
+*, version, edits) -> PatchResult` (neu, punktuelle Textersetzung statt Komplett-Rewrite, P6-E) und
+das neue Modul `patch.py` (`TextEdit`/`PatchError`/`PatchResult`/`apply_edits()`). Rest der P6-Step-
+4-Erweiterung (`folder`/`visibility`/`share_*`, `acl_of()`, `list_spaces()`-Verzeichnisbasis) folgt
+erst dort — diese Öffnung deckt nur Step 1. Fünf neue Tests in `test_store.py`.
 
 Acht neue Tests in `phase1_storage/tests/test_store.py`, alle 76 Tests grün (siehe Modul-Status
 oben).

@@ -499,11 +499,12 @@ def test_patch_bumps_version_once_for_many_edits(store):
 
 def test_patch_creates_exactly_one_git_commit(store_git, tmp_path):
     item = store_git.create("nikinger", type="note", title="Patch-Commit", body="X\n")
+    commits_before = len(_git_log(tmp_path))
 
     store_git.patch(item.id, version=item.version, edits=[{"old_text": "X", "new_text": "Y"}])
 
     log = _git_log(tmp_path)
-    assert len(log) == 2  # create + patch
+    assert len(log) - commits_before == 1
     assert log[0].startswith(f"patch {item.id} [nikinger]")
 
 

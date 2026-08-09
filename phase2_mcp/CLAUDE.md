@@ -38,7 +38,10 @@ einbauen will → **stop**.
 - **DRIN:** `fastmcp` über Streamable HTTP, Token→Space-Auflösung, sechs Tools
   (`list_spaces`, `search_items`, `get_item`, `create_item`, `update_item`, `append_to_item`),
   `<untrusted_content>`-Wrapping fremder Bodies + Snippets, Token-Budget-Disziplin im Listing,
-  `/health`.
+  `/health`. **[2026-08-09 Korrektur, P6 Step 1]:** ein siebtes Tool ist dazugekommen —
+  `patch_item` (P6-E, `storage/patch.py`) — siehe Modul-Status unten und
+  `phase6_shares/CLAUDE.md`. Die P2-eigene Entscheidungsliste K unten bleibt als historischer
+  Beschluss stehen, ist aber überholt (Korrekturnotiz dort).
 - **DRAUSSEN:** Löschen (`status: archived` reicht), MCP Resources, MCP Prompts, OAuth,
   öffentliche Erreichbarkeit/Tunnel (P3), SQL-Filterung in `Store.search()` (D6, zurückgestellt).
 
@@ -70,6 +73,13 @@ Archivieren nur über `update_item(status="archived")`, kein siebtes Tool (K) ·
 P1-Contract-Erweiterungen (L, Step 2) · OAuth bleibt hinter P3, Seam wird gebaut (M) ·
 Fehlerabbildung mit handlungsfähigem Text (N).
 
+**[2026-08-09 Korrektur, P6 Step 1]:** K ist überholt — `patch_item` ist ein siebtes Tool
+(P6-E/F/G, `phase6_shares_plan.md`). Der Teil von K, der Archivieren betrifft
+(„nur über `update_item(status=archived)`") bleibt unverändert richtig; nur der Nebensatz
+„kein siebtes Tool" ist mit P6 nicht mehr haltbar. K bleibt hier historisch stehen (P2s
+Beschlusslage war zum Zeitpunkt richtig), die Korrektur ist die Ersetzung, keine stille
+Streichung.
+
 ## Modul-Status
 
 | # | Modul | Step | Status | Tests |
@@ -82,6 +92,7 @@ Fehlerabbildung mit handlungsfähigem Text (N).
 | 6 | `server.py`, `app.py`, `scripts/serve.py` | 5 | ✅ | 8 (`test_app.py`) |
 | 7 | `tools.py` (die sechs Tools) | 6 | ✅ | 23 (`test_tools.py`) |
 | 8 | `scripts/mcp_smoke.py`, Runbook, Größenmessung | 7 | ✅ **live-verifiziert** | 3 (`test_mcp_smoke.py`) |
+| 9 | Siebtes Tool `patch_item` (P6-E/F/G) + `mcpserver/receipts.py` (neu, Quittungen statt Volltext, P6-H) + `return_body` an allen vier Schreib-Tools + `update_item` lehnt `visibility`/`share_read`/`share_write` ab (P6-M) | P6 Step 1 | ✅ | +7 (`test_tools.py` 23→30), Kollateralkorrekturen in `test_app.py`/`test_request_log.py`/`mcp_smoke.py` (keine neuen Tests, nur Assertions auf JSON statt Frontmatter-Text umgestellt) |
 
 **Zeile 7, Step 6 abgeschlossen:** `search_items`, `get_item`, `create_item`, `update_item`,
 `append_to_item` lösen ihre seit Step 5 bestehenden `NotImplementedError`-Platzhalter ein
@@ -200,9 +211,15 @@ through_create_app`, 14→15) hatten diese Zeile nachgezogen. Reale Zahl wieder 
 --collect-only -q` je Datei neu gezählt, nicht aus der alten Summe hochgerechnet: **Gesamt: 85
 Tests.**
 
-**Gesamt: 85 Tests** in `phase2_mcp/tests/` (6 `test_config.py` + 1 `test_credentials.py` + 1
+**[2026-08-09 Korrektur, P6 Step 1]:** achte Instanz derselben Drift-Kategorie (siehe die sieben
+Korrekturen oben) — `test_tools.py` wuchs 23→30 (siebtes Tool `patch_item` + Quittungsformat-Tests
++ `update_item`-Riegel-Test, Modul-Status Zeile 9), diesmal im selben Commit korrigiert statt
+später gefunden. Reale Zahl wieder per `pytest --collect-only -q` je Datei neu gezählt: **Gesamt:
+92 Tests.**
+
+**Gesamt: 92 Tests** in `phase2_mcp/tests/` (6 `test_config.py` + 1 `test_credentials.py` + 1
 `test_auth.py` + 3 `test_permissions.py` + 8 `test_logging.py` + 2 `test_context.py` + 15
-`test_app.py` + 23 `test_tools.py` + 3 `test_mcp_smoke.py` + 11 `test_request_log.py` + 10
+`test_app.py` + 30 `test_tools.py` + 3 `test_mcp_smoke.py` + 11 `test_request_log.py` + 10
 `test_asgi_bearer.py` [seit dem Schnitt: nur noch `BearerAuthASGI`, kein `TokenPathASGI`/
 `AuthModeASGI` mehr, Details `phase4_auth/CLAUDE.md`] + 2 `test_serve.py` [neu, Schnitt:
 `serve.py :: main()`s Verdrahtung bis `uvicorn.run()`, vorher ungetestet]). Acht weitere Tests
