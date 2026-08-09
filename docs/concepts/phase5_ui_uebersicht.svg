@@ -1,0 +1,165 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080" font-family="'DejaVu Sans','Segoe UI',Helvetica,Arial,sans-serif">
+
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a6b7d"/>
+    </marker>
+    <marker id="arG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2f7a4d"/>
+    </marker>
+    <marker id="arR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b03030"/>
+    </marker>
+  </defs>
+
+  <rect width="1080" height="1080" fill="#f7f8fa"/>
+
+  <!-- ================= Kopf ================= -->
+  <rect x="0" y="0" width="1080" height="86" fill="#1d2b3a"/>
+  <text x="36" y="40" font-size="26" font-weight="700" fill="#ffffff">Phase 5 — Web-UI, REST-API, Auth-Selbstverwaltung</text>
+  <text x="36" y="68" font-size="15" fill="#9db2c6">Sharefyx · phase5_ui/ · Paket webui · Abnahmematrix vollständig, 2026-08-09</text>
+  <rect x="898" y="24" width="146" height="40" rx="20" fill="#2f7a4d"/>
+  <text x="971" y="50" font-size="17" font-weight="700" fill="#ffffff" text-anchor="middle">20/20 ✅</text>
+
+  <!-- ================= Mission ================= -->
+  <rect x="36" y="106" width="1008" height="58" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="132" font-size="16" font-weight="700" fill="#1d2b3a">Mission: Menschen benutzen das System ohne SSH und ohne Editor.</text>
+  <text x="56" y="153" font-size="13.5" fill="#4a5a6b">Der Härtetest ist nicht die Oberfläche, sondern <tspan font-weight="700" fill="#1d2b3a">Block A vor Block B</tspan>: ein Mensch kann sein Passwort selbst setzen, ohne SSH.</text>
+
+  <!-- ================= Flussdiagramm ================= -->
+  <rect x="36" y="182" width="1008" height="416" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="208" font-size="15" font-weight="700" fill="#1d2b3a">Zwei Wege, ein Speicher — die Trennung, die die ganze Phase trägt</text>
+
+  <!-- Row A: Akteure -->
+  <rect x="56" y="226" width="230" height="66" rx="6" fill="#e8eef5" stroke="#7f9ab5"/>
+  <text x="171" y="252" font-size="14" font-weight="700" fill="#1d2b3a" text-anchor="middle">Mensch</text>
+  <text x="171" y="271" font-size="11.5" fill="#4a5a6b" text-anchor="middle">Browser, ohne SSH</text>
+  <text x="171" y="285" font-size="10" fill="#6b7b8c" text-anchor="middle">Niklas · Fabian</text>
+
+  <rect x="794" y="226" width="230" height="66" rx="6" fill="#e8eef5" stroke="#7f9ab5"/>
+  <text x="909" y="252" font-size="14" font-weight="700" fill="#1d2b3a" text-anchor="middle">Claude</text>
+  <text x="909" y="271" font-size="11.5" fill="#4a5a6b" text-anchor="middle">Custom Connector</text>
+  <text x="909" y="285" font-size="10" fill="#6b7b8c" text-anchor="middle">OAuth 2.1, seit Phase 4</text>
+
+  <!-- arrows A -> B -->
+  <line x1="171" y1="292" x2="171" y2="320" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <line x1="909" y1="292" x2="909" y2="320" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <!-- Row B: Auth-Mechanismus -->
+  <rect x="56" y="322" width="230" height="66" rx="6" fill="#eef4ee" stroke="#8fb59a"/>
+  <text x="171" y="345" font-size="12.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">/ui/login — Cookie</text>
+  <text x="171" y="364" font-size="10.5" font-family="monospace" fill="#4a5a6b" text-anchor="middle">__Host-sfx_session</text>
+  <text x="171" y="379" font-size="10" fill="#6b7b8c" text-anchor="middle">Idle 12h / Absolut 7d · P5-D/E</text>
+
+  <rect x="794" y="322" width="230" height="66" rx="6" fill="#eef4ee" stroke="#8fb59a"/>
+  <text x="909" y="345" font-size="12.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">/mcp — Bearer-Token</text>
+  <text x="909" y="364" font-size="10.5" fill="#4a5a6b" text-anchor="middle">opak, unverändert seit P4</text>
+  <text x="909" y="379" font-size="10" fill="#6b7b8c" text-anchor="middle">niemals Cookies gelesen</text>
+
+  <!-- Isolations-Badge -->
+  <rect x="356" y="336" width="368" height="40" rx="20" fill="#fdecec" stroke="#d99b9b"/>
+  <text x="540" y="356" font-size="12" font-weight="700" fill="#8a2b2b" text-anchor="middle">✕ Cookie an /mcp ignoriert · ✕ Bearer an /api ignoriert</text>
+  <text x="540" y="370" font-size="10" fill="#8a2b2b" text-anchor="middle">architektonisch getrennt, nicht per if — P5-F, Kriterium 19</text>
+
+  <!-- Referrer-Policy Fund, kleine Zeile -->
+  <text x="540" y="404" font-size="11" fill="#6b7b8c" text-anchor="middle" font-style="italic">Live-Härtefund am eigenen Gate: <tspan font-family="monospace" fill="#b03030">Referrer-Policy: no-referrer</tspan> nullte den eigenen <tspan font-family="monospace">Origin</tspan>-Header — behoben mit <tspan font-family="monospace" fill="#2f7a4d">strict-origin</tspan></text>
+
+  <!-- arrows B -> C, konvergierend -->
+  <path d="M 171 388 L 171 410 L 315 430" fill="none" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <path d="M 909 388 L 909 410 L 765 430" fill="none" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <!-- Row C: Endpunkte -->
+  <rect x="150" y="432" width="330" height="64" rx="6" fill="#fff6e5" stroke="#d9b476"/>
+  <text x="315" y="454" font-size="12.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">webui — neu in Phase 5</text>
+  <text x="315" y="472" font-size="10.5" font-family="monospace" fill="#4a5a6b" text-anchor="middle">/ui/* (Block A) · /api/v1/* (Block B)</text>
+  <text x="315" y="486" font-size="9.5" fill="#8a6d3b" text-anchor="middle">Selbstverwaltung, Editor, Konflikt, Betrieb</text>
+
+  <rect x="600" y="432" width="330" height="64" rx="6" fill="#eef4ee" stroke="#8fb59a"/>
+  <text x="765" y="454" font-size="12.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">mcpserver — unverändert</text>
+  <text x="765" y="472" font-size="10.5" font-family="monospace" fill="#4a5a6b" text-anchor="middle">/mcp, sechs Tools</text>
+  <text x="765" y="486" font-size="9.5" fill="#4a5a6b" text-anchor="middle">seit P2, außer app.py (Mounts) unangetastet</text>
+
+  <!-- arrows C -> D -->
+  <path d="M 315 496 L 315 512 L 460 528" fill="none" stroke="#2f7a4d" stroke-width="2" marker-end="url(#arG)"/>
+  <path d="M 765 496 L 765 512 L 620 528" fill="none" stroke="#2f7a4d" stroke-width="2" marker-end="url(#arG)"/>
+
+  <!-- Row D: Storage-Kern -->
+  <rect x="290" y="530" width="500" height="52" rx="6" fill="#e6f2ea" stroke="#2f7a4d"/>
+  <text x="540" y="552" font-size="13" font-weight="700" fill="#1d5c37" text-anchor="middle">Storage-Kern — storage/, tools.py, permissions.py, server.py</text>
+  <text x="540" y="570" font-size="10.5" fill="#1d5c37" text-anchor="middle">git diff blieb über die ganze Phase leer (Kriterium 18) — derselbe Code für UI und Connector</text>
+
+  <!-- ================= Bausteine ================= -->
+  <rect x="36" y="616" width="496" height="248" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="642" font-size="15" font-weight="700" fill="#1d2b3a">Was gebaut wurde — Paket webui</text>
+  <text x="56" y="663" font-size="11.5" fill="#6b7b8c">Berührungsfläche P5-B: authserver/, mcpserver/{app,asgi}.py — sonst nichts.</text>
+
+  <g font-size="11.5" font-family="monospace" fill="#33475b">
+    <text x="60" y="690">config · security · sessions · errors</text>
+    <text x="60" y="712">pages · routes_auth</text>
+    <text x="60" y="734">account · reauth · passwords_policy</text>
+    <text x="60" y="756">api · serializers</text>
+    <text x="60" y="778">static_routes · app.{html,css,js}</text>
+    <text x="60" y="800">scripts: deploy · rollback · authbackup</text>
+  </g>
+  <g font-size="10.5" fill="#6b7b8c">
+    <text x="386" y="690">Step 3</text>
+    <text x="386" y="712">Step 3/4/7</text>
+    <text x="386" y="734">Step 4</text>
+    <text x="386" y="756">Step 5</text>
+    <text x="386" y="778">Step 6/7b</text>
+    <text x="386" y="800">Step 8</text>
+  </g>
+  <rect x="56" y="816" width="456" height="34" rx="5" fill="#f2f5f8" stroke="#cdd6e0"/>
+  <text x="70" y="838" font-size="11.5" fill="#33475b">Werkzeuge: authctl (invite/list-users/…) · ui_smoke.py · ui_budget.py</text>
+
+  <!-- ================= Ergebnis ================= -->
+  <rect x="548" y="616" width="496" height="248" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="568" y="642" font-size="15" font-weight="700" fill="#1d2b3a">Ergebnis</text>
+
+  <rect x="568" y="658" width="140" height="62" rx="6" fill="#e6f2ea" stroke="#8fb59a"/>
+  <text x="638" y="686" font-size="22" font-weight="700" fill="#1d5c37" text-anchor="middle">20/20</text>
+  <text x="638" y="706" font-size="11" fill="#4a5a6b" text-anchor="middle">Abnahmezeilen live</text>
+
+  <rect x="724" y="658" width="140" height="62" rx="6" fill="#e6f2ea" stroke="#8fb59a"/>
+  <text x="794" y="686" font-size="22" font-weight="700" fill="#1d5c37" text-anchor="middle">576</text>
+  <text x="794" y="706" font-size="11" fill="#4a5a6b" text-anchor="middle">Tests grün, gemockt</text>
+
+  <rect x="880" y="658" width="140" height="62" rx="6" fill="#e6f2ea" stroke="#8fb59a"/>
+  <text x="950" y="686" font-size="22" font-weight="700" fill="#1d5c37" text-anchor="middle">2</text>
+  <text x="950" y="706" font-size="11" fill="#4a5a6b" text-anchor="middle">Nutzer, 1 Instanz, 1 Tag</text>
+
+  <text x="568" y="748" font-size="12.5" font-weight="700" fill="#1d2b3a">Der Seam aus P2/P4 hat gehalten</text>
+  <text x="568" y="768" font-size="11.5" fill="#4a5a6b">Eine komplette Web-UI + REST-API entstand,</text>
+  <text x="568" y="786" font-size="11.5" fill="#4a5a6b">ohne <tspan font-weight="700" fill="#1d5c37">eine einzige Zeile</tspan> Tool-Code anzufassen —</text>
+  <text x="568" y="804" font-size="11.5" fill="#4a5a6b">derselbe Beweis wie in Phase 4, ein Level höher.</text>
+
+  <rect x="568" y="816" width="456" height="34" rx="5" fill="#f2f5f8" stroke="#cdd6e0"/>
+  <text x="582" y="838" font-size="11.5" fill="#33475b">Cutover 2026-08-05: Dienst läuft aus /opt/sharefyx/current</text>
+
+  <!-- ================= Offen ================= -->
+  <rect x="36" y="880" width="1008" height="160" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="906" font-size="15" font-weight="700" fill="#1d2b3a">Bewusst offen gelassen — kein Blocker, aber auch nicht vergessen</text>
+
+  <rect x="56" y="920" width="316" height="100" rx="6" fill="#fff6e5" stroke="#d9b476"/>
+  <text x="72" y="942" font-size="12.5" font-weight="700" fill="#8a6d3b">F1/F2 — Subspaces &amp; Löschen</text>
+  <text x="72" y="962" font-size="11" fill="#4a5a6b">Nikinger-Meldung, bewusst nicht gebaut.</text>
+  <text x="72" y="978" font-size="11" fill="#4a5a6b">F1b (ein Space mit vollen Rechten für</text>
+  <text x="72" y="994" font-size="11" fill="#4a5a6b">alle) kollidiert frontal mit Hard Rule 4.</text>
+  <text x="72" y="1010" font-size="11" fill="#4a5a6b">Phase-6-Kandidat, keine Ad-hoc-Lösung.</text>
+
+  <rect x="384" y="920" width="316" height="100" rx="6" fill="#fff6e5" stroke="#d9b476"/>
+  <text x="400" y="942" font-size="12.5" font-weight="700" fill="#8a6d3b">patch_item</text>
+  <text x="400" y="962" font-size="11" fill="#4a5a6b">Werkzeug-Feedback aus dem echten</text>
+  <text x="400" y="978" font-size="11" fill="#4a5a6b">Betrieb: update_item ersetzt immer den</text>
+  <text x="400" y="994" font-size="11" fill="#4a5a6b">ganzen Body. Berührt tools.py — P5-B</text>
+  <text x="400" y="1010" font-size="11" fill="#4a5a6b">tabu, Phase-6-Kandidat mit F1/F2.</text>
+
+  <rect x="712" y="920" width="312" height="100" rx="6" fill="#fff6e5" stroke="#d9b476"/>
+  <text x="728" y="942" font-size="12.5" font-weight="700" fill="#8a6d3b">O2 / S10-Nebenfund</text>
+  <text x="728" y="962" font-size="11" fill="#4a5a6b">clients/token_families werden nie</text>
+  <text x="728" y="978" font-size="11" fill="#4a5a6b">abgeräumt (geerbt aus P4). S10-Fix ist</text>
+  <text x="728" y="994" font-size="11" fill="#4a5a6b">live aktiv, aber noch nicht durch einen</text>
+  <text x="728" y="1010" font-size="11" fill="#4a5a6b">echten Reset nach Deploy bewiesen.</text>
+
+  <text x="1044" y="1062" font-size="10.5" fill="#8a97a5" text-anchor="end">Sharefyx · Phasenabschluss-Grafik · Stand 2026-08-09</text>
+</svg>

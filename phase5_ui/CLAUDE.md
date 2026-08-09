@@ -96,7 +96,7 @@ Messung statt Schätzung (`ui_budget.py`, AD) · gemeinsame Live-Abnahme, beide 
 | 6 | `/ui/*` aus Step 5 vorgezogen verdrahtet: `mcpserver/app.py :: create_app()` mountet `ui_auth_routes()`+`account_routes()` (kein neuer Parameter, `UiSettings`/`SessionManager` aus dem vorhandenen `oauth`-Bündel gebaut) | 4→5 (Gate-Voraussetzung) | ✅ **vollständig** — Live-Fund des Nikingers (`/ui/invite/…` → `404`) UND ein Plan-Widerspruch (§1.2 verbietet `mcpserver→webui`, §1.5 verlangt es) gemeinsam geschlossen, Entscheidung + Details im Session-Block unten | +3 (`phase2_mcp/tests/test_app.py`: `test_create_app_mounts_ui_routes_without_import_cycle`, `test_ui_login_reachable_through_create_app`, `test_ui_invite_reachable_through_create_app`) |
 | 7 | `/ui/enroll/confirm`: CSRF-Fehlschlag rendert jetzt einen Retry (`routes_auth.py :: _enrollment_retry()`, geteilt mit „falscher Code") statt `render_error_page()`s Sackgasse; **Root Cause gefunden und behoben:** `webui/security.py`s `Referrer-Policy` von `no-referrer` auf `strict-origin` — `no-referrer` liess die Fetch-Spec den `Origin`-Header eines reinen HTML-`<form>`-POSTs auf `null` setzen, auch bei einer echten Same-Origin-Anfrage | 4 (Gate-Live-Fund) | ✅ **vollständig, live bestätigt** — Prozess-Neustart-Zeitstempel gegen die erste erfolgreiche `200`-Antwort auf `/ui/enroll/confirm` read-only gegengeprüft (nicht nur behauptet); `errors.py :: CsrfError`s Docstring korrigiert (unabhängiger, vorbestehender Fund); Details `SESSIONS_ARCHIVE.md` (Fünfter–Neunter Nachtrag, 2026-08-03/04) | +2 (`test_enroll_confirm_csrf_failure_offers_a_retry_not_a_dead_end`, `test_csrf_foreign_origin_logs_the_received_value_but_not_to_the_client`, `test_ui_referrer_policy_does_not_null_the_origin_header_on_same_origin_posts` — drei Tests, siehe Archiv für die Aufschlüsselung je Nachtrag) |
 | 8 | REST-API v1: `webui/{api,serializers}.py`, `mcpserver/app.py :: create_app()` mountet `api_routes(ui_settings, store, ui_sessions, own_space_writable)` (`OwnSpaceWritable()` jetzt einmal instanziiert, geteilt mit `build_mcp()`) | 5 | ✅ **vollständig** — `scripts/ui_smoke.py` (neu, Gegenstück zu `mcp_smoke.py`/`oauth_smoke.py`) läuft In-Process durch Einladung→Enrollment→Login→`/api/v1/{me,spaces,items,...}`, 12/12 Prüfungen grün; eigener Fund (nicht im Plan-Testliste): `storage.store.Store.archive()` hat anders als `update()`/`append()` keinen Schutz gegen ein bereits archiviertes Item — in `api.py` (nicht in `storage/`, dort tabu) mit einem zusätzlichen `store.get()`-Check NACH der Rechteprüfung geschlossen | +38 (23 `test_api.py` + 7 `test_serializers.py`, zwei neue Testdateien; `phase2_mcp/tests/test_app.py` +1 `test_api_items_reachable_through_create_app`; `phase5_ui/tests/test_isolation.py` `test_api_endpoint_ignores_bearer_token` geschärft — Platzhalter seit Step 3 gegen die echte, gemountete Route ersetzt, kein zusätzlicher Test) |
-| 9 | UI-Gerüst: `webui/static_routes.py` (`GET /ui/` sitzungsgated, `GET /ui/static/{path}`), `webui/static/{app.html,app.css,app.js,fonts/}`, `webui/config.py :: UiSettings.static_dir`, `scripts/build_font_subset.sh` (echte Inter-Variable-Subsetting-Pipeline, schließt V27), `mcpserver/app.py` mountet `static_routes()` | 6 | ✅ **vollständig** — Navigation/Liste/Suche/schreibgeschützte Detailansicht gegen die echte REST-API aus Step 5; **kein** Editor, **kein** Markdown-Rendering, **kein** Versionsband (bewusst Step-7-Scope). Korrigiert einen Plan-Selbstwiderspruch (§1.5-Tabelle „`/ui/` Auth: keine" vs. der im selben Plan-Abschnitt verlangte Testname `test_index_route_requires_session`) zugunsten des Tests, Details im Session-Block unten | +8 (7 `test_static_routes.py`, neue Datei; `phase2_mcp/tests/test_app.py` +1 `test_ui_index_route_reachable_through_create_app`; JS bleibt laut Plan unit-ungetestet) |
+| 9 | UI-Gerüst: `webui/static_routes.py` (`GET /ui/` sitzungsgated, `GET /ui/static/{path}`), `webui/static/{app.html,app.css,app.js,fonts/}`, `webui/config.py :: UiSettings.static_dir`, `scripts/build_font_subset.sh` (echte Inter-Variable-Subsetting-Pipeline, schließt V31 — **[2026-08-09 Korrektur, Closeout-Session]:** hier ursprünglich fälschlich als „V27" bezeichnet, das ist tatsächlich `permissions.py`s Klassennamen aus Step 5, siehe `phase5_ui_plan.md` §8), `mcpserver/app.py` mountet `static_routes()` | 6 | ✅ **vollständig** — Navigation/Liste/Suche/schreibgeschützte Detailansicht gegen die echte REST-API aus Step 5; **kein** Editor, **kein** Markdown-Rendering, **kein** Versionsband (bewusst Step-7-Scope). Korrigiert einen Plan-Selbstwiderspruch (§1.5-Tabelle „`/ui/` Auth: keine" vs. der im selben Plan-Abschnitt verlangte Testname `test_index_route_requires_session`) zugunsten des Tests, Details im Session-Block unten | +8 (7 `test_static_routes.py`, neue Datei; `phase2_mcp/tests/test_app.py` +1 `test_ui_index_route_reachable_through_create_app`; JS bleibt laut Plan unit-ungetestet) |
 | 10 | Editor, Vorschau, Konflikt, Frontmatter-Felder: `webui/api.py` +`GET /api/v1/meta`; `webui/static/app.js` um Markdown-Parser/Sanitizer (geerntet + erweitert aus `docs/concepts/notiz_heft_example.html`), Editor-Zustand, Versionsband, Speichern/Konfliktdialog, Anlegen/Anhängen/Archivieren, Frontmatter-Felder, Entwurfsschutz, „Sitzung abgelaufen"-Karte, Formatierhilfen-Leiste erweitert; `webui/static/{app.css,app.html}` entsprechend erweitert | 7 | ✅ **vollständig** — kein Passwortänderungsdialog (eigener Nachtrag, Zeilen 5/6 der Block-A-Abnahme folgen dort), kein Deploy/Rollback (Step 8), keine zweite Formatvariante (P5-Z bleibt Seam). Umfangreiche Node/jsdom-gestützte End-to-End-Simulation (Scratchpad, nicht im Repo) fand und schloss zwei echte Funde vor dem Commit: (1) das Test-Mock selbst hatte einen `includes()`-Bug (`/api/v1/meta` matchte fälschlich auch `/api/v1/me`) — beim Beheben zusätzlich `reportUnexpectedError()` in `app.js` ergänzt, weil (2) `loadItems()`/`selectItem()`/`init()` bei einem `401` sonst eine unbehandelte Promise-Ablehnung hinterließen (im Browser nur eine Konsolenwarnung, in Node ein Prozessabbruch — trotzdem sauber behandelt, nicht auf das mildere Browser-Verhalten verlassen) | +4 (2 `test_meta.py`, neue Datei + 2 `test_api.py`: `test_conflict_response_current_item_matches_item_to_json_exactly`, `test_append_endpoint_concatenates_patch_endpoint_replaces`; JS bleibt laut Plan unit-ungetestet, die jsdom-Simulation ist eine Entwicklungshilfe dieser Session, kein Teil der Suite) |
 | 11 | UI-Überarbeitung nach Live-Feedback: Navigationsbaum + Übersichtsseite (`GET /api/v1/overview` neu, `GET /api/v1/meta` um `buckets` erweitert, `webui/serializers.py :: overview_row_to_json()`), plastische Bedienelemente + zwei farblich getrennte Editor-Paneele (`app.css` weitgehend neu), Toasts/Dirty-Gating/schließbarer Editor/entfernbare Chips (`app.js`), gestaltete Auth-Seiten (`pages.py` + `app.css`), Passwortwechsel-Dialog für die Block-A-Zeilen 5/6 | 7b | ✅ **vollständig** — **revidiert Plan §4.1 und §4.3** (Nikinger-Entscheidung 2026-08-05, Tabelle im Session-Block; die Plandatei bleibt als 📕-Snapshot unverändert). Schließt elf Live-Meldungen und sechs eigene Funde (F1–F6). Zwei Funde darüber hinaus: ein vierter Ordner **„Erledigt"** (eine `done`-Aufgabe war in der Oberfläche nirgends mehr auffindbar) und **Akzeptanzkriterium 12 war bisher nur halb erfüllt** — Editor/„+"/Anlegen-Dialog standen permanent in `app.html` und waren nur `hidden`; `app.js :: detachable()` hängt sie jetzt wirklich aus dem DOM aus. 51 jsdom-Prüfungen, `ui_smoke.py` 12/12 | +33 (7 `test_overview.py` + 24 `test_pages_markup.py`, zwei neue Dateien; +1 `test_meta.py`, +1 `test_static_routes.py`; `test_invite_enroll.py` und `scripts/ui_smoke.py` mussten ihre Seed-Suchregex auf das neue Klassen-Markup nachziehen, kein neuer Test) |
 | 12 | Betrieb: `phase5_ui/scripts/{deploy,rollback,authbackup,restore_auth_check}.sh` + `ui_budget.py`; `phase5_ui/systemd/{sharefyx-authbackup.service,.timer,sharefyx-staging.service}`; `install_units.sh` um drei **optionale** Staging-Platzhalter erweitert; `diagnose.sh` um vier Prüfungen (UI erreichbar, offene UI-Sitzungen, jüngstes Auth-Backup, aktives Release) | 8 | ✅ **gebaut, Live-Teile beim Nikinger** — **löst V10 auf** (Messtabelle im Session-Block, alle fünf Größen im Korridor) und korrigiert eine **V13-Drift in `phase3_edge/`** (dort seit 2026-07-28 als geschlossen dokumentiert und 114 Zeilen weiter unten in derselben Datei noch als offen geführt). Drei dokumentierte Plan-Abweichungen (Health-Gate ohne authentifizierte Probe — Hard Rule 1; dritter Staging-Platzhalter; Platzhalter optional statt Pflicht). Eigener Fund beim echten Probelauf: ein zurückgerolltes Release wäre das nächste Rollback-Ziel gewesen → `*.failed`-Markierung | +21 (15 `test_deploy_scripts.py`, neue Datei; +6 `test_units.py`, darunter `test_every_placeholder_in_every_unit_is_known_to_the_install_script` — allgemeiner als die im Plan genannten) |
@@ -109,9 +109,9 @@ Messung statt Schätzung (`ui_budget.py`, AD) · gemeinsame Live-Abnahme, beide 
 Die Ergebnisse entstanden über sieben Sessions verteilt, mehrere davon schon in
 `SESSIONS_ARCHIVE.md`. Diese Tabelle ist der **eine** Ort, an dem der Gesamtstand steht; sie
 wird bei jedem Live-Ergebnis nachgezogen. **Statusregel des Plans: ✅ heißt live-verifiziert,
-nicht gebaut.** Alle 20 Zeilen stehen ✅ (2026-08-09) — die Matrix ist damit vollständig, den
-formalen Phasenschluss (Root-`CLAUDE.md`/`ROADMAP.md`) markieren erst die
-Step-9-Abschlussarbeiten, siehe Session-Block.
+nicht gebaut.** Alle 20 Zeilen stehen ✅ (2026-08-09) — die Matrix ist damit vollständig, und mit
+den Step-9-Abschlussarbeiten (vierter Nachtrag unten) ist auch der formale Phasenschluss
+(Root-`CLAUDE.md`/`ROADMAP.md` auf ✅) vollzogen. **Phase 5 ✅.**
 
 | # | Kriterium | Stand | Beleg |
 |---|---|---|---|
@@ -142,9 +142,10 @@ Step-9-Abschlussarbeiten, siehe Session-Block.
 gebaut.** Zeile 17 war die letzte, die Fabian brauchte (Step 9); Zeile 20 (2026-08-09) war die
 letzte insgesamt. **Abnahmematrix vollständig, Abnahmeprotokoll geschrieben**
 (`docs/concepts/P5_ABNAHME_2026-08-09.md`), Migrations-Runbook-Schritt 4 bereits erledigt
-vorgefunden (kein Kommando nötig, Session-Block). Verbleibend vor dem formalen Phasenschluss:
-`phase5_ui_uebersicht.svg`, `PHASE5_CLOSEOUT_HANDOVER.md` (aktuell Webchat-Job, Session-Block);
-Root-`CLAUDE.md`/`ROADMAP.md` erst danach auf ✅.
+vorgefunden (kein Kommando nötig, Session-Block). Alle Step-9-Abschlussarbeiten sind erledigt —
+`phase5_ui_uebersicht.svg`, `PHASE5_CLOSEOUT_HANDOVER.md`, Rotationsprüfung (weiterhin genau ein
+Session-Block, kein Rotieren nötig) und Root-`CLAUDE.md`/`ROADMAP.md` auf ✅, alle im selben
+Commit (vierter Nachtrag unten). **Phase 5 formal abgeschlossen, 2026-08-09.**
 
 **Cutover auf Release-Verzeichnisse vollzogen (2026-08-05 20:37, Nikinger):** der Dienst läuft
 seither aus `/opt/sharefyx/current` statt aus dem Git-Arbeitsverzeichnis. „Datei ändern +
@@ -187,12 +188,41 @@ Unit-Redeploy in Step 2. Danach `docs/concepts/P5_ABNAHME_2026-08-09.md` geschri
 Webchat-Job — Planänderung dazu angekündigt, nicht Teil dieser Session), `docs/INDEX.md` im
 selben Commit nachgezogen.
 
-**Offen für die nächste Session:**
-- Step-9-Abschlussarbeiten, verbleibend: `phase5_ui_uebersicht.svg`,
-  `PHASE5_CLOSEOUT_HANDOVER.md` — nach Nikinger-Planung aktuell Webchat-Job, Änderung dazu
-  angekündigt für einen späteren Schritt. Danach erst Root-`CLAUDE.md`/`ROADMAP.md` auf
-  „Phase 5 ✅".
+**Nachtrag, 2026-08-09, vierter — Step-9-Abschlussarbeiten fertig, formaler Phasenschluss
+vollzogen (Claude-Code-Session statt Webchat, Nikinger-Entscheidung — Details
+`docs/PROMPTS.md`):** `docs/concepts/phase5_ui_uebersicht.svg` (1080×1080, Stil der
+Vorgänger-Grafiken, zweimal gerendert und visuell gegengeprüft — erst Header/Mission-Box-Overflow
+und eine Zeilenkollision in der Bausteine-Spalte gefunden und behoben, danach ein
+`mcpserver/asgi.py`-Bezug korrigiert, der Datei nie in P5 geändert war) und
+`docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` (Status/Delta/offene Entscheidungen §4.1–§4.6/
+`[VERIFY]`-Bilanz V27–V38 für P6, Skelett von `PHASE4_CLOSEOUT_HANDOVER.md` übernommen)
+geschrieben. Rotationsprüfung: dieser Head trägt weiterhin **genau einen** Session-Block (dieser,
+jetzt mit vier Nachträgen) — kein Rotieren nötig.
+
+**Formaler Phasenschluss, Nikinger-Entscheidung (AskUserQuestion dieser Session, „im selben
+Commit"):** `ROADMAP.md`s P5-Zeile und Status-Absatz auf ✅, Root-`CLAUDE.md`s „Current state"
+auf „keine aktive Phase, Phase 5 ✅, Phase 6 noch nicht geplant" umgeschrieben (vorheriger
+🔄-Absatz durch dieselbe Textform ersetzt, die Phase 4 beim eigenen Abschluss bekam),
+`docs/INDEX.md`s Abschnitt „Active phase" entfernt und die `phase5_ui`-Zeilen samt der beiden
+neuen Dateien nach „Completed phases" verschoben. Nebenbei eine bereits vorher stale
+Größenangabe korrigiert (`ROADMAP.md` stand mit „~9KB" im Index, tatsächlich ~13KB — unabhängig
+von dieser Session entstanden, beiläufig mit demselben Commit behoben). Alles zusammen mit
+diesem Head in **einem** Commit (Hard Rule 8).
+
+**Push:** lokaler `main` lag zu Sessionbeginn 4 Commits vor `origin/main` — auf ausdrücklichen
+Nikinger-Wunsch dieser Session direkt nach dem Abschluss-Commit gepusht (holt damit auch die
+vier vorher schon lokal fertigen, noch ungepushten Commits nach).
+
+**Verifiziert:** keine Testsuite gelaufen (nur `.md`/`.svg`-Änderungen, kein Code). Tabu-Diff
+nicht relevant. SVG zweimal mit `~/.claude-code-tools/svg_to_png.py` gerendert und per `Read`
+visuell geprüft, nicht ungesehen übernommen.
+
+**Offen für die nächste Session (P6 — Browser-Planungssession, kein Claude-Code-Step):**
+- `docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` **vor** dem Plan-Entwurf einmal ganz lesen — das
+  ist der Einstiegspunkt, nicht dieser Head.
 - Offener Befund, nicht aufgelöst: Step 9 Punkt 3 („frische Einladung") widerspricht §2.6
   (Migrationsrunbook, keine neue Einladung) — für den nächsten Plan-Review vormerken.
 - Phase-6-Vormerkungen (alle zusammen zu planen, nicht isoliert): F1/F2 (Subspaces/Löschen),
-  Client-Surface-Logging, `patch_item` (Werkzeug-Feedback 2026-08-08).
+  Client-Surface-Logging, `patch_item` (Werkzeug-Feedback 2026-08-08), O2 (geerbt aus P4).
+- `[VERIFY]` V33 (Anthropic-Connector-Doku erneut gegenlesen) wurde in P5 nie explizit
+  bearbeitet — echt offen, siehe Handover §5.1.

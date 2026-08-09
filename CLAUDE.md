@@ -7,8 +7,8 @@ up: docs/INDEX.md
 down:
   - ROADMAP.md                          # Phasenplan + Status je Phase
   - docs/INDEX.md                       # L0-Karte aller .md
-  - phase5_ui/CLAUDE.md                 # aktive Phase
-updated: 2026-08-08 (Kompression: P4/P5-Nachtragketten auf Zusammenfassung + Zeiger in die Phase-Heads reduziert, 40.7KB → 17KB, nichts verloren — Detail steht dort schon vollständig)
+  - phase5_ui/CLAUDE.md                 # letzte abgeschlossene Phase
+updated: 2026-08-09 (Phase 5 auf ✅, keine aktive Phase — Formalschluss nach Abnahmematrix 20/20)
 ---
 # CLAUDE.md — Project Instructions
 
@@ -134,29 +134,33 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 
 ## Current state
 
-**Aktive Phase:** Phase 5 — Web-UI, REST-API und Auth-Selbstverwaltung (`phase5_ui/`, Paket
-`webui`) — **🔄 gestartet 2026-08-02, Steps 0–8b ✅ gebaut und deployt** (Cutover auf
-`/opt/sharefyx/current` seit 2026-08-05, `deploy.sh`-Zyklus läuft). Zwei Blöcke (A = Sicherheit +
-Auth-Selbstverwaltung, B = REST-API + UI) mit hartem Gate dazwischen, beide durchlaufen.
+**Aktive Phase:** keine. Phase 5 ist **✅ abgeschlossen** (2026-08-09), Phase 6 ist noch nicht
+geplant — nächster Schritt ist eine Browser-Planungssession
+(`docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` lesen, dann Q&A, dann Plan), kein Claude-Code-Step.
+Kandidaten für den Zuschnitt stehen unten unter „Phase-6-Vormerkungen".
 
-**Abnahmestand (Plan §6), Stand 2026-08-09: 20/20 bestanden, 0 teilweise, 0 offen** — Zeile 20
-(passiver Reboot-Nachweis) live bestanden nach einem unbewusst ausgelösten VM-Reboot, gleicher
-Prüffall wie P3 Zeile 6. Zeile 17 (Step 9, gemeinsame Live-Abnahme) ist seit 2026-08-07
-bestanden — Step 9 damit inhaltlich erledigt, offen bleiben die reinen
-Step-9-Abschlussarbeiten (Migrations-Runbook, Abnahmeprotokoll, Closeout-Handover); die Matrix
-ist vollständig, aber Phase 5 wird erst nach diesen Abschlussarbeiten auf ✅ gesetzt, Details im
-Phase-Head-Session-Block. Die
-vollständige Matrix, der Modul-Status je Step und die gesamte Live-Debugging-Historie (u. a. der
+**Phase 5 — Web-UI, REST-API und Auth-Selbstverwaltung** (`phase5_ui/`, Paket `webui`) — **✅
+abgeschlossen, 2026-08-09 — 20/20 Abnahmezeilen live bestanden, 0 teilweise, 0 offen.** Zwei
+Blöcke (A = Sicherheit + Auth-Selbstverwaltung, B = REST-API + UI) mit hartem Gate dazwischen,
+beide durchlaufen. Menschen setzen ihr Passwort jetzt selbst im Browser, ohne SSH und ohne
+Neustart (schließt Betriebsnotiz O1 auch live). Cutover auf `/opt/sharefyx/current` seit
+2026-08-05, `deploy.sh`-Zyklus läuft. `git diff` auf `storage/`,
+`mcpserver/{tools,permissions,server}.py` blieb über die gesamte Phase leer (Kriterium 18) —
+derselbe Seam-Beweis wie in Phase 4, eine API-Fläche höher.
+
+Vollständige Matrix, Modul-Status je Step und die gesamte Live-Debugging-Historie (u. a. der
 Origin/CSRF-Fund am Block-A-Gate, die Step-7b-Revision von Plan §4.1/§4.3, Sicherheitsbefund S9)
 stehen in `phase5_ui/CLAUDE.md` — read + newest Session-stopped-Block first, das ist die
 maßgebliche Quelle für diese Phase, nicht diese Zeile hier. Ältere Session-Blöcke:
 `phase5_ui/SESSIONS_ARCHIVE.md`.
 
 Plan: `docs/concepts/phase5_ui_plan.md` (Entscheidungen P5-A–P5-AE, Steps 0–9). Herkunft/offene
-Entscheidungen: `docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md`.
+Entscheidungen: `docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md`. Abnahmeprotokoll:
+`docs/concepts/P5_ABNAHME_2026-08-09.md`. Formaler Abschluss-Handover an P6:
+`docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md`.
 
-**Phase-6-Vormerkungen (nicht Scope dieser Phase, hier gesammelt für den nächsten Zuschnitt,
-Details im aktuellen `phase5_ui/CLAUDE.md`-Session-Block):**
+**Phase-6-Vormerkungen (kein Scope, für die nächste Planungssession gesammelt — Details +
+weitere Funde in `docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` §4):**
 - **F1** — Subspaces/eigene Ordner + „shared Spaces" (Nikinger-Meldung, Step 8b): F1a
   (Default-Leserechte auf eigene Connectoren verengen) ist ein kleiner eigener Schnitt; F1b (ein
   Space, in dem alle unabhängig volle Rechte haben) kollidiert frontal mit Hard Rule 4, kein

@@ -10,7 +10,7 @@ down:
   - docs/concepts/phase3_edge_plan.md      # ausführungsreifer P3-Plan
   - docs/concepts/phase4_auth_plan.md      # ausführungsreifer P4-Plan
   - docs/concepts/phase5_ui_plan.md        # ausführungsreifer P5-Plan
-updated: 2026-08-02
+updated: 2026-08-09 (Phase 5 auf ✅ — Abnahmematrix 20/20 vollständig)
 ---
 # ROADMAP — Space-Server
 
@@ -25,7 +25,7 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 | **P2** | `phase2_mcp/` · `mcpserver` | MCP-Server, Token-Auth, 6 Tools. Lokal erreichbar. | ✅ |
 | **P3** | `phase3_edge/` | Tunnel, systemd, Health, Logging, Ops-Skripte. Öffentlich erreichbar. | ✅ |
 | **P4** | `phase4_auth/` · `authserver` | OAuth 2.1 + DCR; ersetzt den Pfad-Token. | ✅ |
-| **P5** | `phase5_ui/` · `webui` | REST-API + Web-UI für Menschen. | 🔄 |
+| **P5** | `phase5_ui/` · `webui` | REST-API + Web-UI für Menschen. | ✅ |
 
 **Korrektur (2026-07-25, P2-Planungssession):** OAuth rückt von „ganz am Ende" auf „direkt nach
 P3" — der Pfad-Token soll kurz leben, und die UI ist die Phase, die laut Build-Reihenfolge unter
@@ -177,9 +177,12 @@ Teil dieses Schnitts.
   ist ausdrücklich Block A der Phase, nicht optional. Ohne sie ist die UI eine Oberfläche auf
   einem Konto, das nur per SSH existiert.
 
-**Status 🔄 (2026-08-02):** Planungssession abgeschlossen, ausführungsreifer Plan liegt vor
-(`docs/concepts/phase5_ui_plan.md`, Entscheidungen P5-A–P5-AE, Steps 0–9). Step 0 (Haushalt,
-Rückbau, Doku-Drift) läuft. Phase-Head: `phase5_ui/CLAUDE.md`.
+**Status ✅ (2026-08-09):** Abnahmematrix vollständig — 20/20 Zeilen live bestanden, 0 teilweise,
+0 offen (`docs/concepts/P5_ABNAHME_2026-08-09.md`). Beide Blöcke (A Sicherheit/
+Auth-Selbstverwaltung, B REST-API/UI) durch das harte Gate. `git diff` auf `storage/`,
+`mcpserver/{tools,permissions,server}.py` blieb über die gesamte Phase leer (Kriterium 18).
+Formaler Abschluss-Handover an P6: `docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md`. Phase-Head:
+`phase5_ui/CLAUDE.md`.
 
 ---
 
