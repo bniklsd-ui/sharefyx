@@ -186,8 +186,12 @@ Auftrag:
      DejaVu-Sans/Segoe-UI-Fontstack. Namensschema fortführen:
      `docs/concepts/phase{N}_{kurzname}_uebersicht.svg`.
    - Anders als im Browser-Chat gibt es keine automatische Artifact-Vorschau — das Ergebnis vor
-     dem Abschluss aktiv visuell gegenprüfen (Screenshot/Renderer, Weg selbst wählen oder kurz
-     abklären, falls keiner verfügbar ist), nicht ungesehen als fertig melden.
+     dem Abschluss aktiv visuell gegenprüfen, nicht ungesehen als fertig melden. Render-Werkzeug
+     ist installiert (2026-08-09, headless Chromium via Playwright, bewusst außerhalb des Repos
+     unter `~/.claude-code-tools/`, keine Projektabhängigkeit — der Server bleibt dumm):
+     `~/.claude-code-tools/svg-venv/bin/python3 ~/.claude-code-tools/svg_to_png.py <in.svg>
+     <out.png>` schreibt ein pixelgenaues PNG, das sich mit `Read` betrachten lässt. Fehlt das
+     Werkzeug auf einer anderen Maschine, kurz abklären statt neu zu improvisieren.
 3. Handover-File: die Dinge, die der Phase-X+1-Chat (weiterhin im Browser, siehe Prompt 2) vor
    dem Entwurf des detaillierten Claude-Code-Plans wissen muss. Namensschema fortführen:
    PHASE[X]_CLOSEOUT_HANDOVER.md in docs/concepts/, plus Indexzeile.
@@ -224,7 +228,7 @@ xxx
 | Vier harte Regeln explizit in Prompt 1 aufgenommen | Secrets, CGNAT, kein LLM im Server, kein Last-Write-Wins. Alle vier stehen in `CLAUDE.md` — aber diese vier sind die, deren Verletzung nicht durch einen Test auffällt, sondern erst durch Schaden. |
 | Rotationsregel in Prompt 1 und als Punkt 4 in Prompt 3 | Im Trading-Bot-Repo wurde die Regel eingeführt, *nachdem* ein Head auf 211 KB gewachsen war. Der Prompt ist die Stelle, an der sie tatsächlich greift. |
 | „Phase X+15" → „Phase X+1" | Vermutlich ein Tippfehler im Original. Falls nicht: sag Bescheid, dann drehe ich es zurück. |
-| **[2026-08-09]** Prompt 3 von „Browser-Chat + Google Drive" auf „Claude Code" umgestellt | Nikinger-Entscheidung: Google Drive ist für den Abschluss ineffizient, Sharefyx trägt noch keine ganzen Projekte. Geprüft statt angenommen: eine SVG wie die drei bestehenden `phase*_uebersicht.svg` ist reines von Hand geschriebenes SVG-Markup (kein Renderer, kein Bild-Tool) — Claude Code kann das genauso schreiben wie der Browser-Chat, **kein neues Skill/Plugin nötig**. Die reale Lücke liegt woanders: Claude Code hat keine automatische Vorschau wie die Artifact-Ansicht im Browser (auf dieser VM sind weder `rsvg-convert`/`cairosvg`/`inkscape` noch ein Browser für Screenshots installiert, Stand 2026-08-09) — deshalb Punkt 2 im Prompt explizit um „vor dem Abschluss visuell gegenprüfen, Weg selbst wählen oder abklären" ergänzt, statt eine Vorschaufähigkeit zu unterstellen, die nicht existiert. |
+| **[2026-08-09]** Prompt 3 von „Browser-Chat + Google Drive" auf „Claude Code" umgestellt | Nikinger-Entscheidung: Google Drive ist für den Abschluss ineffizient, Sharefyx trägt noch keine ganzen Projekte. Geprüft statt angenommen: eine SVG wie die drei bestehenden `phase*_uebersicht.svg` ist reines von Hand geschriebenes SVG-Markup (kein Renderer, kein Bild-Tool) — Claude Code kann das genauso schreiben wie der Browser-Chat, **kein neues Skill/Plugin nötig**. Die reale Lücke lag woanders: Claude Code hatte keine automatische Vorschau wie die Artifact-Ansicht im Browser (auf dieser VM waren weder `rsvg-convert`/`cairosvg`/`inkscape` noch ein Browser für Screenshots installiert, Stand 2026-08-09 morgens) — **noch am selben Tag geschlossen:** headless Chromium über Playwright, isoliert unter `~/.claude-code-tools/` installiert (kein `sudo`, keine Projektabhängigkeit, Nikinger-Auftrag „optimale Kontrolle, keine Abstriche"), Testrender gegen `phase4_auth_uebersicht.svg` per `Read` visuell bestätigt. Konkretes Kommando jetzt direkt in Punkt 2 des Prompts. |
 | **[2026-08-09]** „aktueller Stand auf Google Drive hochgeladen" (Ergebnis-Bullet) gestrichen, „Du darfst Google Drive … nutzen" (Hinweise) ersetzt durch eine konkrete Leseanweisung | Folgt aus derselben Entscheidung — das Repo ist jetzt die einzige Quelle, ein Upload-Schritt entfällt ersatzlos. |
 | **[2026-08-09]** Punkt 5 (Commit) neu in Prompt 3 | Der Browser-Chat konnte nicht committen, Claude Code muss es per Hard Rule 8 („Commit ⇒ Doc-Update, im selben Commit"). Bewusst als eigener Punkt, nicht implizit in Punkt 3/4 versteckt — sonst wird das Bündeln zum Zufall statt zur Regel. |
 | **[2026-08-09]** „Aktualisiere … deine direkten Erinnerungen" konkretisiert auf Claude Codes eigene Memory-Dateien | Der Originalsatz war für den Browser-Chat formuliert (Konversationskontext). Claude Code hat ein eigenes, dateibasiertes Memory-System — der Hinweis bleibt sinnvoll, aber nur, wenn er auf den tatsächlichen Mechanismus zeigt. |
