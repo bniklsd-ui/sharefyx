@@ -222,8 +222,8 @@ Regeländerungen) läuft. Herkunft: `docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` 
   **[2026-08-09 Korrektur, P6-Planungssession]:** Der Satz war bis heute richtig; mit Phase 6
   wird er widerlegt — Sichtbarkeitsstufen und Item-/Ordner-Freigaben (P6-J/K) sind jetzt Scope.
   Details: `docs/concepts/phase6_shares_plan.md` §0.5.
-- ~~**Mehrmandantenfähigkeit.** Wenn ein dritter Nutzer dazukommt, ist das eine Planungssession,
-  kein `if`-Zweig.~~ **[2026-08-09 Korrektur, P6-Planungssession]:** Die Planungssession hat am
-  2026-08-09 stattgefunden — ein dritter Nutzer wird in Phase 6 real angelegt, geprüft und wieder
-  entfernt (P6-W). Der Satz war richtig, nicht widerlegt: es blieb bei einer Planungssession, kein
-  stiller `if`-Zweig.
+- **Mehrmandantenfähigkeit.** Wenn ein dritter Nutzer dazukommt, ist das eine Planungssession,
+  kein `if`-Zweig. **[2026-08-09 Korrektur, P6-Planungssession]:** Der Satz ist **erfüllt, nicht
+  widerlegt** — die Planungssession hat am 2026-08-09 stattgefunden und genau daraus ist Phase 6
+  entstanden; ein dritter Nutzer wird darin real angelegt, geprüft und wieder entfernt (P6-W),
+  über eine echte Planungssession, keinen stillen `if`-Zweig.

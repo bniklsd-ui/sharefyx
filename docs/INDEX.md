@@ -25,7 +25,7 @@ updated: 2026-08-09 (Phase 6 🔄 gestartet — Active-phase-Abschnitt wieder an
 - [CLAUDE.md](../CLAUDE.md) — 📗 ~17KB · rules, core principle, hard rules, working style, current state; auto-loaded every session — 2026-08-08 komprimiert (war ~41KB), P4/P5-Detailhistorie lebt jetzt nur noch in den jeweiligen Phase-Heads
 - [AGENTS.md](../AGENTS.md) — 📗 ~1KB · harness-neutral entry point for non-Claude-Code agents; points to `CLAUDE.md` + doc-layers navigation
 - [README.md](../README.md) — 📗 ~5KB · human overview + machine setup (venv, keyring, run, smoke test)
-- [ROADMAP.md](../ROADMAP.md) — 📗 ~13KB · Phases 1–5, scope in/out per phase, status (all ✅, Phase 6 not yet planned) — size annotation was stale at ~9KB before this commit, corrected
+- [ROADMAP.md](../ROADMAP.md) — 📗 ~15KB · Phases 1–6, scope in/out per phase, status (P1–P5 ✅, P6 🔄 gestartet)
 - [docs/DOC_LAYERS_CONVENTION.md](./DOC_LAYERS_CONVENTION.md) — 📗 ~5KB · Doc-Layers-Spec (v1, 2026-07-06) · **byte-identische Kopie aus dem Trading-Bot-Repo — nicht projektspezifisch anpassen, sonst divergieren zwei Kopien derselben Regel**
 - [docs/PROMPTS.md](./PROMPTS.md) — 📗 ~15KB · die drei Workflow-Prompts (Claude-Code-Session-Start, Phasen-Kickoff im Browser, Phasen-Abschluss); **[2026-08-09]** Phasen-Abschluss läuft jetzt in Claude Code statt Browser+Google-Drive (Nikinger-Entscheidung, Effizienz); lesen beim Start eines neuen Chats, nicht mitten in einer Session
 

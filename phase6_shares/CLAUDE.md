@@ -158,6 +158,10 @@ Muster (`## Active phase (6 — …)`), wie es P5 in Step 0 anlegte.
   selben Commit") verbietet das Vorgreifen. Verschoben auf Step 3.
 - `phase6_shares/tests/conftest.py` bewusst leer angelegt (P1-Step-0-Präzedenzfall: „Step 0 hat
   bewusst keine Tests, reines Skelett" — `phase1_storage/tests/conftest.py` ist bis heute leer).
+- Plan-Punkt 5 nennt auch `scripts/` als Step-0-Deliverable. Git verfolgt keine leeren
+  Verzeichnisse, und der erste reale Inhalt (`spacectl.py`/`migrate_visibility.py`) entsteht laut
+  Plan erst in Step 6 — `scripts/` entsteht implizit mit der ersten Datei dort, nicht als leerer
+  Platzhalter in diesem Commit.
 
 **Phase-Head angelegt** (dieses Dokument), `docs/INDEX.md` um Plan + Phase-Head ergänzt, Root-
 `CLAUDE.md`s „Current state" auf 🔄 Phase 6 gestellt.
@@ -165,6 +169,24 @@ Muster (`## Active phase (6 — …)`), wie es P5 in Step 0 anlegte.
 **Verifiziert:** `pytest -q` nach allen Änderungen erneut grün (siehe Verifikations-Task, Ergebnis
 oben) — Änderungen dieser Session sind ausschließlich Dokumentation + eine leere `conftest.py` +
 eine `pytest.ini`-Zeile, kein Feature-Code.
+
+**Nachtrag, 2026-08-09, zweiter — Advisor-Review vor Sessionende, vier Funde behoben:**
+(1) `docs/INDEX.md`s eigene Zeile für `ROADMAP.md` war seit vor dieser Session stale (nannte
+„Phases 1–5"/„Phase 6 not yet planned" und eine veraltete Größe) — korrigiert, jetzt „Phases 1–6"/
+„P6 🔄 gestartet"/~15KB. (2) Vollständigkeitsprüfung „jede `.md` hat eine Zeile in
+`docs/INDEX.md`" nachgeholt (Plan-Punkt 1, vorher nicht gelaufen): alle 32 `.md`-Dateien im Repo
+sind verlinkt, einzige Ausnahme `docs/INDEX.md` selbst (verlinkt sich nicht, erwartet). (3)
+Staleness-Grep über `README.md`/`AGENTS.md`/`docs/PROMPTS.md`/`phase5_ui/CLAUDE.md`: keine
+weiteren Funde — `phase5_ui/CLAUDE.md`s „Browser-Planungssession"-Erwähnungen stehen in seinem
+eingefrorenen Session-Block (Historie, nicht editieren); `README.md`s Stand-2026-08-02-Hinweis ist
+seit P4→P5 unverändert stale, disclaimt sich aber selbst explizit („siehe Root-`CLAUDE.md` für den
+verbindlichen Phasenstand") — bewusst nicht angefasst, außerhalb dieses Step-0-Scopes.
+(4) Zwei Dokumentationslücken geschlossen: `scripts/`-Auslassung jetzt im Minor-Drift-Absatz oben
+benannt (vorher nur in Gedanken, nicht aufgeschrieben); `ROADMAP.md`s
+„Mehrmandantenfähigkeit"-Absatz hatte sich selbst widersprochen (durchgestrichen **und** „nicht
+widerlegt" im selben Atemzug) — Durchstreichung entfernt, nur `Feingranulare Rechte` ist
+tatsächlich widerlegt (echtes ACL-Modell existiert jetzt), `Mehrmandantenfähigkeit` war erfüllt,
+nicht widerlegt. `pytest -q` danach erneut 576/576, Size-Sweep erneut sauber.
 
 **Nächster Schritt (konkret):** Step 1 — Werkzeug-Ergonomie. `storage/patch.py` (neu),
 `Store.patch()`, `mcpserver/receipts.py` (neu), `patch_item`-Tool registrieren, `return_body` an
