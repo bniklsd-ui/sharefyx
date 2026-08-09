@@ -1419,9 +1419,11 @@ function initShell() {
 
   // -- Tastatur (§4.6) ----------------------------------------------------------------------
 
+  var updateLogDialogEl = document.getElementById("update-log-dialog");
+
   function anyOverlayOpen() {
     return !conflictDialogEl.hidden || !createDialogEl.hidden
-      || !confirmDialogEl.hidden || !accountDialogEl.hidden;
+      || !confirmDialogEl.hidden || !accountDialogEl.hidden || !updateLogDialogEl.hidden;
   }
 
   document.addEventListener("keydown", function (event) {
@@ -1437,6 +1439,7 @@ function initShell() {
       if (!confirmDialogEl.hidden && pendingConfirmCancel) pendingConfirmCancel();
       else if (!conflictDialogEl.hidden) hideConflictDialog();
       else if (!createDialogEl.hidden) closeCreateDialog();
+      else if (!updateLogDialogEl.hidden) updateLogDialogEl.hidden = true;
       else if (!accountDialogEl.hidden) accountDialogEl.hidden = true;
       else if (state.selectedId !== null) closeEditor();
       return;
@@ -1501,6 +1504,11 @@ function initShell() {
     if (!document.hidden) pollCounters();
   });
   window.addEventListener("focus", pollCounters);
+
+  // -- Update-Banner (P6 Step 3) -----------------------------------------------------------
+  // `updates.js` muss VOR dieser Datei geladen sein (siehe dortiger Docstring), sonst existiert
+  // `window.SharefyxUpdates` an dieser Stelle noch nicht.
+  if (window.SharefyxUpdates) window.SharefyxUpdates.init({ api: api, toast: toast });
 
   showOverviewPane();
   init();

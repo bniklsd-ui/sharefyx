@@ -24,6 +24,7 @@
 #   SHAREFYX_DATA_ROOT      Optional — wenn gesetzt, Pre-Deploy-Bundle des DATA_ROOT
 #   SHAREFYX_BACKUP_DIR     Pflicht, sobald SHAREFYX_DATA_ROOT gesetzt ist
 #   SHAREFYX_SKIP_TESTS     Optional, "1" überspringt den pytest-Lauf im Release
+#   SHAREFYX_ALLOW_STALE_UPDATELOG  Optional, "1" überspringt das Update-Log-Gate (P6-X)
 #
 # [SEAM] Blue/Green (P5-AC): der Zielport steht in GENAU EINER Variablen (SHAREFYX_PORT) und wird
 # an GENAU EINER Stelle benutzt (der Health-Gate-Basis-URL unten). Der spätere Weg — Template-Unit
@@ -105,6 +106,33 @@ if ! git -C "$release" checkout --quiet "$GIT_REF" >&2; then
 fi
 release_sha="$(git -C "$release" rev-parse HEAD)"
 echo "Release-Stand: $release_sha ($GIT_REF)" >&2
+
+# -- 2.5) Update-Log-Gate ----------------------------------------------------------------------
+# P6-X: ein Deploy ohne frischen `docs/UPDATE_LOG.md`-Eintrag darf nicht durchlaufen — sonst
+# sieht ein Mensch eine funktionale Änderung (z. B. die künftige Sichtbarkeitsumstellung, P6-L)
+# nie im Banner, weil niemand daran gedacht hat, den Eintrag vor dem Deploy zu schreiben. Läuft
+# HIER, nicht erst nach venv/pip/pytest: ein sicher vermeidbarer Abbruch soll in Sekunden kommen,
+# nicht nach dem teuersten Teil des Skripts. Liest `$release/docs/UPDATE_LOG.md` — den Checkout,
+# nie die Arbeitskopie eines anderen Prozesses.
+if [[ "${SHAREFYX_ALLOW_STALE_UPDATELOG:-}" != "1" ]]; then
+  update_log="$release/docs/UPDATE_LOG.md"
+  # `|| true`: kein Treffer (fehlende Datei, kein `##`-Datum) ist ein erwarteter Fall, den die
+  # `if` unten behandelt — ohne das würde `pipefail` (`grep` liefert 1) die Zuweisung unter
+  # `set -e` als Skriptfehler werten und mit einer rohen Bash-Fehlermeldung statt der eigenen
+  # ABBRUCH-Zeile abbrechen.
+  top_date="$(grep -m1 -E '^## [0-9]{4}-[0-9]{2}-[0-9]{2}$' "$update_log" 2>/dev/null | sed -E 's/^## //' || true)"
+  # UTC UND lokal akzeptiert: das Skript ist sonst durchgehend UTC, aber ein Deploy kurz nach
+  # Mitternacht Lokalzeit liegt in UTC noch am Vortag — ein falscher Abbruch bei einem
+  # legitimen, tagesaktuellen Eintrag wäre der schlechtere Fehler als eine zu großzügige Prüfung.
+  today_utc="$(date -u +%F)"
+  today_local="$(date +%F)"
+  if [[ -z "$top_date" || ( "$top_date" != "$today_utc" && "$top_date" != "$today_local" ) ]]; then
+    cleanup_release
+    echo "ABBRUCH: docs/UPDATE_LOG.md trägt keinen Eintrag vom heutigen Tag (oberste Überschrift: '${top_date:-keine gefunden}', erwartet $today_utc oder $today_local). Neuen Eintrag ergänzen oder SHAREFYX_ALLOW_STALE_UPDATELOG=1 setzen." >&2
+    exit 1
+  fi
+  echo "Update-Log aktuell: $top_date" >&2
+fi
 
 # -- 3) venv + Installation -------------------------------------------------------------------
 # `scripts/dev_install.sh` DES RELEASES, nicht des Arbeitsverzeichnisses: die Paketliste gehört

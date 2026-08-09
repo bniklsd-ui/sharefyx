@@ -36,7 +36,22 @@ ohne dass sich am Zustand semantisch etwas ändert.
 **`webui` darf genau EIN Symbol aus `mcpserver` importieren** (P5-B): `OwnSpaceWritable`. Kein
 zweiter Import aus `mcpserver` — auch nicht das `Permissions`-Protokoll selbst, das läge im
 selben Modul und wäre ein zweites Symbol. Der Parameter unten ist deshalb konkret auf
-`OwnSpaceWritable` typisiert, nicht auf ein Protokoll.
+`OwnSpaceWritable` typisiert, nicht auf ein Protokoll. `AuthStore` (`authserver.store`) ist davon
+unberührt — dieselbe Bibliothek, die `account.py`/`sessions.py` bereits importieren, P5-B
+beschränkt nur `mcpserver`.
+
+**`GET /api/v1/updates`/`POST /api/v1/updates/seen` (P6 Step 3, Plan §1.8):** speist Banner +
+Einstellungsabschnitt „Update-Log". `api_routes()` bekommt dafür einen fünften Parameter,
+`auth_store: AuthStore` — der gesehen-Zustand (`users.seen_update_id`, Schema 3) lebt in der
+Auth-SQLite, nicht im `storage`-Kern; dieselbe `AuthStore`-Instanz, die `account_routes()` schon
+bekommt (`oauth.store` in `mcpserver/app.py`), kein zweiter DB-Handle. **Dokumentierte
+Abweichung vom Plan-Dateiwortlaut** (der für Step 3 nur `webui/api.py` nennt, nicht
+`mcpserver/app.py`): der Aufrufer muss den neuen Parameter mitgeben, `mcpserver/app.py`s
+`api_routes(...)`-Aufruf zieht deshalb im selben Commit nach (`oauth.store` als fünftes
+Argument) — dieselbe Kategorie wie P6 Step 1/2s dokumentierte Ein-Zeilen-Abweichungen. `POST
+.../seen` schreibt den vom Server aus dem Log berechneten `latest_id`, nie eine vom Client
+mitgeschickte ID — eine Client-ID wäre eine unnötige Validierungsfläche und ein Stale-Client-
+Rennen ohne Nutzen.
 """
 from __future__ import annotations
 
@@ -44,6 +59,7 @@ import json
 from datetime import date
 from typing import Any
 
+from authserver.store import AuthStore
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 from starlette.routing import Route
@@ -58,6 +74,7 @@ from .errors import ApiError, CsrfError
 from .security import require_csrf
 from .serializers import item_to_json, overview_row_to_json, search_to_json, space_to_json
 from .sessions import SessionManager
+from .updates import load_update_log
 
 DEFAULT_LIMIT = 50
 MAX_LIMIT = 200
@@ -139,7 +156,11 @@ def _parse_int(value: str | None, *, default: int) -> int:
 
 
 def api_routes(
-    settings: UiSettings, store: Store, sessions: SessionManager, permissions: OwnSpaceWritable,
+    settings: UiSettings,
+    store: Store,
+    sessions: SessionManager,
+    permissions: OwnSpaceWritable,
+    auth_store: AuthStore,
 ) -> list[Route]:
     async def _require_session(request: Request):
         session = sessions.load(request)
@@ -390,6 +411,25 @@ def api_routes(
             raise _map_store_error(exc) from exc
         return JSONResponse(item_to_json(item, readonly=False), headers={"Cache-Control": "no-store"})
 
+    async def _updates_get(request: Request) -> Response:
+        session = await _require_session(request)
+        entries = load_update_log(settings.update_log_path)
+        latest_id = entries[0].id if entries else None
+        payload = {
+            "entries": [{"id": e.id, "date": e.date, "lines": e.lines} for e in entries],
+            "latest_id": latest_id,
+            "seen_update_id": auth_store.get_seen_update_id(session.space),
+        }
+        return JSONResponse(payload, headers={"Cache-Control": "no-store"})
+
+    async def _updates_seen(request: Request) -> Response:
+        session = await _require_session(request)
+        await _require_csrf_json(request, session)
+        entries = load_update_log(settings.update_log_path)
+        if entries:
+            auth_store.set_seen_update_id(session.space, entries[0].id)
+        return JSONResponse({"ok": True}, headers={"Cache-Control": "no-store"})
+
     def _catch(handler):
         """Dasselbe Muster wie `webui/account.py :: _catch()` — vor dem `Route(...)`-Konstruktor
         angewendet, nicht danach (siehe dortiger Docstring für die Begründung)."""
@@ -407,6 +447,8 @@ def api_routes(
         Route("/api/v1/spaces", _catch(_spaces), methods=["GET"]),
         Route("/api/v1/meta", _catch(_meta), methods=["GET"]),
         Route("/api/v1/overview", _catch(_overview), methods=["GET"]),
+        Route("/api/v1/updates", _catch(_updates_get), methods=["GET"]),
+        Route("/api/v1/updates/seen", _catch(_updates_seen), methods=["POST"]),
         Route("/api/v1/items", _catch(_items_get), methods=["GET"]),
         Route("/api/v1/items", _catch(_items_post), methods=["POST"]),
         Route("/api/v1/items/{item_id}", _catch(_items_get_one), methods=["GET"]),

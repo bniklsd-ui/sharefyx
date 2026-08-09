@@ -201,6 +201,15 @@ Surface-Logging, `diagnose.sh`, `ui_budget.py`): `phase6_shares/CLAUDE.md` Step-
 lebt dort, nicht doppelt hier, weil P4 formal abgeschlossen ist und dieser Kopf nur die O2-Zeile
 selbst nachzieht.
 
+**[2026-08-09, P6 Step 3 — Schema 3]:** `store.py`s erste echte Spaltenerweiterung auf einer
+bereits gefüllten Tabelle (`users.seen_update_id TEXT`, additiv, `PRAGMA table_info()`-Check vor
+`ALTER TABLE`, da SQLite dafür kein `IF NOT EXISTS` kennt — anders als V1→V2, das nur neue
+Tabellen anlegte). `SCHEMA_VERSION` jetzt `"3"`, zwei neue Methoden
+(`get_seen_update_id`/`set_seen_update_id`), +3 Tests in `test_authserver_store.py` (258→261,
+darunter ein Migrationstest v2→v3 nach dem Muster des bestehenden v1→v2-Tests). Speist das
+Update-Log-Banner in `phase5_ui/webui/api.py`. Volle Herleitung: `phase6_shares/CLAUDE.md`
+Step-3-Session-Block — lebt dort, gleiche Begründung wie beim O2-Absatz oben.
+
 ---
 
 ## Session stopped — 2026-07-30 (Schnitt vollzogen, 16/16, Phase 4 ✅ — TokenPathASGI entfernt)

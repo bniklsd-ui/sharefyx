@@ -919,6 +919,57 @@ select.input {
 
 [hidden] { display: none !important; }
 
+/* -- Update-Banner (P6 Step 3) -------------------------------------------------------------
+   `position: fixed` statt eines echten Grid-Zeile in `.shell`: der bestehende Drei-Spalten-
+   Grid (§4.1) bleibt unangetastet, `body.has-update-banner` (js/updates.js) schiebt `.shell`
+   stattdessen unter die Leiste. */
+
+/* --banner-h ist ein FALLBACK für den Moment zwischen "Klasse gesetzt" und "JS hat die reale
+   Höhe gemessen" (js/updates.js :: showBanner(), `offsetHeight` nach dem Sichtbarmachen) —
+   grosszügig bemessen (drei Zeilen bei 13px), nicht die tatsächliche Höhe: der Bannertext ist
+   variabel lang (jeder UPDATE_LOG.md-Eintrag), eine feste `height` auf `.update-banner` hätte
+   mehrzeiligen Text abgeschnitten oder über die Rail-/Listenköpfe gelegt.
+   Erster Entwurf hatte genau das (`height: 44px` fest) — weder `pytest` noch die jsdom-
+   Simulation dieser Session hätten es je gefunden, keine der beiden Prüfstufen hat eine
+   Layout-Engine (jsdom kennt kein CSS-Rendering, `offsetHeight` liefert dort 0). Diese Klasse
+   Bug (Überlauf/Layout-Bruch bei variabler Textlänge) ist strukturell nur im echten Browser
+   sichtbar — genau das prüft Gate-A→B-Punkt 4. */
+:root { --banner-h: 80px; }
+
+.update-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--space) * 2);
+  background: linear-gradient(180deg, #1F262F, #151A21);
+  border-bottom: 1px solid var(--accent-line);
+  box-shadow: 0 8px 28px rgba(0,0,0,.35);
+  padding: var(--space) calc(var(--space) * 3);
+  font-size: 13px;
+}
+.update-banner__body { margin: 0; max-width: 70ch; }
+.update-banner__body p { margin: 0; }
+.update-banner__body ul { margin: 0; padding-left: 1.2em; }
+
+body.has-update-banner .shell { height: calc(100vh - var(--banner-h)); margin-top: var(--banner-h); }
+
+/* -- Update-Log (Einstellungsdialog, P6 Step 3) --------------------------------------------- */
+
+.account-updates-link { margin-bottom: calc(var(--space) * 2); }
+#update-log-list { max-height: 50vh; overflow-y: auto; }
+.update-log__date {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: calc(var(--space) * 2) 0 4px;
+}
+.update-log__date:first-child { margin-top: 0; }
+#update-log-list ul { margin: 0 0 var(--space); padding-left: 1.2em; }
+
 /* -- Auth-Seiten (pages.py, Step 7b) ------------------------------------------------------
    Login/Einladung/Enrollment/Recovery/Fehler teilen sich diese Karte. Diese Seiten laufen
    bewusst ohne JavaScript (siehe pages.py-Moduldocstring) — hier steht deshalb nur Layout. */

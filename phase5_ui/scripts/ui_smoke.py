@@ -84,7 +84,7 @@ async def _run(data_root: Path, checks: list[Check]) -> None:
     routes = (
         ui_auth_routes(ui_settings, auth_store, users, sessions)
         + account_routes(ui_settings, auth_store, users, sessions)
-        + api_routes(ui_settings, item_store, sessions, OwnSpaceWritable())
+        + api_routes(ui_settings, item_store, sessions, OwnSpaceWritable(), auth_store)
     )
     app = Starlette(routes=routes)
 

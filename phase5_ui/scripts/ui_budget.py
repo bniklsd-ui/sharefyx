@@ -171,7 +171,7 @@ async def _measure(data_root: Path) -> list[Metric]:
     routes = (
         ui_auth_routes(ui_settings, auth_store, users, sessions)
         + account_routes(ui_settings, auth_store, users, sessions)
-        + api_routes(ui_settings, item_store, sessions, OwnSpaceWritable())
+        + api_routes(ui_settings, item_store, sessions, OwnSpaceWritable(), auth_store)
         + static_routes(ui_settings, sessions)
     )
     app = Starlette(routes=routes)
@@ -346,7 +346,9 @@ async def _measure_latency(data_root: Path) -> list[LatencyMetric]:
         space=SPACE, idle_ttl_s=ui_settings.idle_ttl_s, absolute_ttl_s=ui_settings.absolute_ttl_s,
     )
     sessions = SessionManager(ui_auth_store, settings=ui_settings)
-    rest_app = Starlette(routes=api_routes(ui_settings, item_store, sessions, OwnSpaceWritable()))
+    rest_app = Starlette(
+        routes=api_routes(ui_settings, item_store, sessions, OwnSpaceWritable(), ui_auth_store)
+    )
 
     async with httpx.AsyncClient(
         transport=httpx.ASGITransport(app=rest_app), base_url="https://ui-budget.local",

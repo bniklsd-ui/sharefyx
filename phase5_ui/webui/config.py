@@ -18,6 +18,12 @@ ungetesteter, unaufgerufener Loader wäre totes Gewicht (Hard Rule 7).
 des Prozesses (systemd startet nicht notwendig aus dem Repo-Root). Keine Umgebungsvariable aus
 demselben Grund wie `idle_ttl_s`/`absolute_ttl_s` oben: kein Live-Testbedarf, der einen zweiten
 Wert je bräuchte.
+
+`update_log_path` (P6 Step 3, `webui/updates.py`): Default `.../phase5_ui/webui/config.py`s
+Großeltern-Verzeichnis `/ docs / UPDATE_LOG.md` — bei einem `deploy.sh`-Release ist das
+`$release/docs/UPDATE_LOG.md`, derselbe Checkout, den `deploy.sh`s eigenes Gate liest, nie die
+Arbeitskopie eines anderen Prozesses. Gleiches Feld-statt-Konstante-Muster wie `static_dir`:
+Tests injizieren einen `tmp_path`-Pfad, kein Live-Testbedarf für eine echte Env-Var.
 """
 from __future__ import annotations
 
@@ -28,6 +34,7 @@ COOKIE_NAME = "__Host-sfx_session"
 IDLE_TTL_S = 12 * 3600  # P5-E
 ABSOLUTE_TTL_S = 7 * 24 * 3600  # P5-E
 DEFAULT_STATIC_DIR = Path(__file__).resolve().parent / "static"
+DEFAULT_UPDATE_LOG_PATH = Path(__file__).resolve().parents[2] / "docs" / "UPDATE_LOG.md"
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -37,3 +44,4 @@ class UiSettings:
     absolute_ttl_s: int = ABSOLUTE_TTL_S
     hsts: bool = True
     static_dir: Path = field(default=DEFAULT_STATIC_DIR)
+    update_log_path: Path = field(default=DEFAULT_UPDATE_LOG_PATH)

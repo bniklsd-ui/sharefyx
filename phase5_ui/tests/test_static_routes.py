@@ -62,12 +62,29 @@ async def test_index_route_requires_session(static_app, totp_code):
 
 
 @pytest.mark.asyncio
+async def test_updates_js_loads_before_app_js(static_app, totp_code):
+    """P6 Step 3: `updates.js` ruft `app.js`s globale `markdownToHtml()`/`sanitizeHtml()` und
+    `app.js` ruft `window.SharefyxUpdates.init()` — beide `defer`-Skripte laufen in
+    Dokumentreihenfolge, also MUSS `js/updates.js` vor `app.js` im Markup stehen. Ein stiller
+    Regressionsfund hier wäre sonst ein Banner, das im Browser nie erscheint, während `pytest`
+    grün bleibt (JS bleibt laut Plan unit-ungetestet)."""
+    async with _client(static_app) as client:
+        await _login(client, totp_code)
+        response = await client.get("/ui/")
+    html = response.text
+    assert '/ui/static/js/updates.js"' in html
+    assert '/ui/static/app.js"' in html
+    assert html.index("js/updates.js") < html.index('static/app.js"')
+
+
+@pytest.mark.asyncio
 async def test_static_files_are_served_with_correct_content_type(static_app):
     font_name = _font_filename()
     cases = {
         "app.html": "text/html",
         "app.css": "text/css",
         "app.js": "text/javascript",
+        "js/updates.js": "text/javascript",
         f"fonts/{font_name}": "font/woff2",
     }
     async with _client(static_app) as client:

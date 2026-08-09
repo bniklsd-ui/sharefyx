@@ -6,6 +6,7 @@ import pytest
 
 from authserver.store import (
     _SCHEMA,
+    _SCHEMA_V2,
     CLIENT_RETENTION_S,
     RETENTION_AFTER_REVOKE_OR_CONSUME_S,
     TOKEN_FAMILY_RETENTION_S,
@@ -55,7 +56,7 @@ def test_schema_is_created_and_versioned(store, tmp_path):
     }
     assert expected <= tables
     row = conn.execute("SELECT value FROM schema_meta WHERE key = 'schema_version'").fetchone()
-    assert row[0] == "2"
+    assert row[0] == "3"
     conn.close()
 
 
@@ -463,17 +464,80 @@ def test_schema_migrates_from_v1_to_v2_without_data_loss(tmp_path, clock):
     version = conn2.execute(
         "SELECT value FROM schema_meta WHERE key = 'schema_version'"
     ).fetchone()[0]
-    assert version == "2"
+    # "3", not "2": AuthStore always applies every schema step up to SCHEMA_VERSION, this v1 DB
+    # never stops at v2 along the way (see test_schema_version_is_three_after_initialise below).
+    assert version == "3"
     conn2.close()
 
 
-def test_schema_version_is_two_after_initialise(store, tmp_path):
+def test_schema_version_is_three_after_initialise(store, tmp_path):
     conn = sqlite3.connect(tmp_path / "auth.sqlite3")
     version = conn.execute(
         "SELECT value FROM schema_meta WHERE key = 'schema_version'"
     ).fetchone()[0]
-    assert version == "2"
+    assert version == "3"
     conn.close()
+
+
+# -- Schema 3 (P6 Step 3) ---------------------------------------------------------------------
+
+
+def test_schema_migrates_from_v2_to_v3_adds_seen_update_id_column(tmp_path, clock):
+    """Baut eine echte Schema-2-Datenbank von Hand (`_SCHEMA` + `_SCHEMA_V2`, kein
+    `seen_update_id`), füllt eine Nutzerzeile, öffnet danach über `AuthStore` (führt die
+    additive `ALTER TABLE` aus) und prüft: die Zeile lebt weiter, die Spalte existiert, leer."""
+    path = tmp_path / "auth.sqlite3"
+    conn = sqlite3.connect(path)
+    conn.executescript(_SCHEMA)
+    conn.executescript(_SCHEMA_V2)
+    conn.execute(
+        "INSERT OR IGNORE INTO schema_meta (key, value) VALUES ('schema_version', '2')"
+    )
+    conn.execute(
+        "INSERT INTO users (space, password_hash, password_changed_at, totp_secret_enc, "
+        "totp_alg, totp_confirmed_at, status, created_at) VALUES "
+        "('niklas', 'h1', NULL, NULL, 'SHA1', NULL, 'active', '2026-01-01T00:00:00Z')"
+    )
+    conn.commit()
+    conn.close()
+
+    store = AuthStore(path, now_fn=clock)
+
+    row = store.get_user("niklas")
+    assert row is not None
+    assert row.password_hash == "h1"
+    assert store.get_seen_update_id("niklas") is None
+
+    conn2 = sqlite3.connect(path)
+    cols = {r[1] for r in conn2.execute("PRAGMA table_info(users)")}
+    assert "seen_update_id" in cols
+    version = conn2.execute(
+        "SELECT value FROM schema_meta WHERE key = 'schema_version'"
+    ).fetchone()[0]
+    assert version == "3"
+    conn2.close()
+
+
+def test_seen_update_id_defaults_to_none(store):
+    store.upsert_user(
+        "niklas", password_hash="h1", totp_secret_enc=None, totp_alg="SHA1",
+        totp_confirmed_at=None, status="active",
+    )
+    assert store.get_seen_update_id("niklas") is None
+
+
+def test_seen_update_id_roundtrip_is_per_space(store):
+    store.upsert_user(
+        "niklas", password_hash="h1", totp_secret_enc=None, totp_alg="SHA1",
+        totp_confirmed_at=None, status="active",
+    )
+    store.upsert_user(
+        "fabian", password_hash="h2", totp_secret_enc=None, totp_alg="SHA1",
+        totp_confirmed_at=None, status="active",
+    )
+    store.set_seen_update_id("niklas", "2026-08-09#1")
+    assert store.get_seen_update_id("niklas") == "2026-08-09#1"
+    assert store.get_seen_update_id("fabian") is None
 
 
 def test_upsert_and_get_user_roundtrip(store, clock):

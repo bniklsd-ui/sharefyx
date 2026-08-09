@@ -10,6 +10,7 @@ Tests vacuous bestehen lassen — `OwnSpaceWritable.can_read` ist heute immer `T
 Rechteverweigerung wirklich nie aufgerufen werden, nur dass die Antwort 403 ist."""
 from __future__ import annotations
 
+import dataclasses
 import re
 from datetime import datetime, timezone
 from unittest.mock import MagicMock
@@ -64,7 +65,7 @@ async def test_items_search_maps_all_store_parameters(
     mock_store.list_spaces.return_value = []
     app = Starlette(
         routes=ui_auth_routes(ui_settings, store, confirmed_users, sessions)
-        + api_routes(ui_settings, mock_store, sessions, permissions)
+        + api_routes(ui_settings, mock_store, sessions, permissions, store)
     )
     async with _client(app) as client:
         await _login(client, totp_code)
@@ -159,7 +160,7 @@ async def test_patch_foreign_item_is_403_and_never_reaches_store(
     mock_store.space_of.return_value = FOREIGN_SPACE
     app = Starlette(
         routes=ui_auth_routes(ui_settings, store, confirmed_users, sessions)
-        + api_routes(ui_settings, mock_store, sessions, permissions)
+        + api_routes(ui_settings, mock_store, sessions, permissions, store)
     )
     async with _client(app) as client:
         csrf = await _login(client, totp_code)
@@ -190,7 +191,7 @@ async def test_space_of_is_called_before_permission_check(
     mock_store.update.side_effect = lambda *a, **kw: (call_order.append("update"), fake_item)[1]
     app = Starlette(
         routes=ui_auth_routes(ui_settings, store, confirmed_users, sessions)
-        + api_routes(ui_settings, mock_store, sessions, permissions)
+        + api_routes(ui_settings, mock_store, sessions, permissions, store)
     )
     async with _client(app) as client:
         csrf = await _login(client, totp_code)
@@ -450,6 +451,54 @@ async def test_spaces_marks_own_space(full_app_items, item_store, totp_code):
     by_name = {s["name"]: s for s in response.json()}
     assert by_name[SPACE]["own"] is True
     assert by_name[FOREIGN_SPACE]["own"] is False
+
+
+# -- /api/v1/updates (P6 Step 3) ----------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_updates_get_reports_latest_and_unset_seen_state(
+    ui_settings, store, confirmed_users, sessions, permissions, item_store, totp_code, tmp_path
+):
+    log_path = tmp_path / "UPDATE_LOG.md"
+    log_path.write_text("## 2026-08-09\n- Erster Eintrag.\n", encoding="utf-8")
+    settings = dataclasses.replace(ui_settings, update_log_path=log_path)
+    app = Starlette(
+        routes=ui_auth_routes(settings, store, confirmed_users, sessions)
+        + api_routes(settings, item_store, sessions, permissions, store)
+    )
+    async with _client(app) as client:
+        await _login(client, totp_code)
+        response = await client.get("/api/v1/updates")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["entries"] == [
+        {"id": "2026-08-09#1", "date": "2026-08-09", "lines": ["Erster Eintrag."]}
+    ]
+    assert body["latest_id"] == "2026-08-09#1"
+    assert body["seen_update_id"] is None
+
+
+@pytest.mark.asyncio
+async def test_updates_seen_sets_latest_id_and_is_separated_per_space(
+    ui_settings, store, confirmed_users, sessions, permissions, item_store, totp_code, tmp_path
+):
+    log_path = tmp_path / "UPDATE_LOG.md"
+    log_path.write_text("## 2026-08-09\n- Eintrag.\n", encoding="utf-8")
+    settings = dataclasses.replace(ui_settings, update_log_path=log_path)
+    app = Starlette(
+        routes=ui_auth_routes(settings, store, confirmed_users, sessions)
+        + api_routes(settings, item_store, sessions, permissions, store)
+    )
+    async with _client(app) as client:
+        csrf = await _login(client, totp_code)
+        seen_response = await client.post("/api/v1/updates/seen", headers=_headers(csrf))
+        assert seen_response.status_code == 200
+        after = await client.get("/api/v1/updates")
+    assert after.json()["seen_update_id"] == "2026-08-09#1"
+    # Serverseitig berechnet, nicht clientseitig geschickt (Moduldocstring `api.py`) — UND pro
+    # Space getrennt: ein anderer Nutzer bleibt vom Klick des ersten unberührt.
+    assert store.get_seen_update_id(FOREIGN_SPACE) is None
 
 
 def test_webui_imports_exactly_one_mcpserver_symbol():

@@ -22,6 +22,7 @@ import os
 import sqlite3
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -128,6 +129,10 @@ def _env(stubs: Path, tmp_path: Path, **extra: str) -> dict[str, str]:
     env["PATH"] = f"{stubs}{os.pathsep}{env['PATH']}"
     env["SFX_SYSTEMCTL_LOG"] = str(tmp_path / "systemctl.log")
     env["SFX_CURL_CODES"] = str(tmp_path / "codes")
+    # P6 Step 3: `source_repo` trägt kein `docs/UPDATE_LOG.md` — ohne diesen Default würde jeder
+    # bestehende Test hier am neuen Update-Log-Gate scheitern, nicht nur die zwei, die es gezielt
+    # prüfen. Die beiden Gate-Tests unten setzen die Variable selbst explizit (leer bzw. "1").
+    env["SHAREFYX_ALLOW_STALE_UPDATELOG"] = "1"
     env.update(extra)
     return env
 
@@ -283,6 +288,49 @@ def test_deploy_refuses_an_unknown_git_ref(stubs, tmp_path, layout, source_repo)
     assert result.returncode != 0
     assert not current.exists()
     assert list(releases.iterdir()) == [], "Release-Rest nach unauflösbarem ref"
+
+
+def test_deploy_gate_blocks_without_a_fresh_update_log_entry(stubs, tmp_path, layout, source_repo):
+    """P6-X: `source_repo` (siehe Fixture oben) trägt gar kein `docs/UPDATE_LOG.md` — genau der
+    Fall, den das Gate abfangen soll. Läuft VOR venv/pytest (Advisor-Vorgabe dieser Session):
+    kein `pytest`-Aufruf in `systemctl.log`/`SFX_*` nötig, um das zu beweisen."""
+    releases, current = layout
+    _set_codes(tmp_path)
+    result = _run_deploy(
+        stubs, tmp_path, releases, current, source_repo, SHAREFYX_ALLOW_STALE_UPDATELOG=""
+    )
+    assert result.returncode != 0
+    assert "UPDATE_LOG" in result.stderr
+    assert not current.exists()
+    assert list(releases.iterdir()) == [], "Release-Rest nach geblocktem Update-Log-Gate"
+
+
+def test_deploy_gate_passes_with_a_dated_update_log_entry(stubs, tmp_path, layout, source_repo):
+    """Positivpfad: ein echter, heute datierter Eintrag lässt das Gate ohne Override durch —
+    beweist, dass das Gate den Normalfall nicht fälschlich blockiert, nicht nur, dass es den
+    Fehlerfall erkennt."""
+    releases, current = layout
+    _set_codes(tmp_path)
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    (source_repo / "docs").mkdir()
+    (source_repo / "docs" / "UPDATE_LOG.md").write_text(
+        f"## {today}\n- Test-Eintrag.\n", encoding="utf-8"
+    )
+    _git("-C", str(source_repo), "add", ".")
+    _git("-C", str(source_repo), "commit", "-q", "-m", "update log")
+    result = _run_deploy(
+        stubs, tmp_path, releases, current, source_repo, SHAREFYX_ALLOW_STALE_UPDATELOG=""
+    )
+    assert result.returncode == 0, result.stderr
+
+
+def test_deploy_gate_override_bypasses_a_missing_update_log(stubs, tmp_path, layout, source_repo):
+    releases, current = layout
+    _set_codes(tmp_path)
+    result = _run_deploy(
+        stubs, tmp_path, releases, current, source_repo, SHAREFYX_ALLOW_STALE_UPDATELOG="1"
+    )
+    assert result.returncode == 0, result.stderr
 
 
 # -- rollback.sh ------------------------------------------------------------------------------
@@ -505,7 +553,10 @@ def test_harness_ignores_ambient_sharefyx_configuration(monkeypatch, stubs, tmp_
     assert "SHAREFYX_KEEP_RELEASES" not in env
     assert env["SFX_CURL_CODES"] == str(tmp_path / "codes")
     # Alles, was übrig bleibt, muss der Test selbst gesetzt haben.
-    ours = {"SHAREFYX_RELEASES_DIR", "SFX_SYSTEMCTL_LOG", "SFX_CURL_CODES"}
+    ours = {
+        "SHAREFYX_RELEASES_DIR", "SFX_SYSTEMCTL_LOG", "SFX_CURL_CODES",
+        "SHAREFYX_ALLOW_STALE_UPDATELOG",
+    }
     assert {k for k in env if k.startswith(("SHAREFYX_", "SFX_"))} == ours
 
 

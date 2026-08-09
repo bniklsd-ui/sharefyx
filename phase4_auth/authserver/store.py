@@ -37,7 +37,7 @@ from .models import (
     UserRow,
 )
 
-SCHEMA_VERSION = "2"
+SCHEMA_VERSION = "3"
 
 # S7-Ergänzung (P5 Step 2): wie lange eine widerrufene `ui_sessions`-Zeile bzw. eine konsumierte
 # `invites`-Zeile nach dem Ereignis noch existiert, bevor `purge_expired()` sie entfernt — genug
@@ -184,6 +184,16 @@ CREATE INDEX IF NOT EXISTS ix_recovery_space  ON recovery_codes(space);
 CREATE INDEX IF NOT EXISTS ix_invites_space   ON invites(space);
 """
 
+# Schema 3 (P6 Step 3, Plan §1.8) — a genuine column addition, unlike V1->V2 (which only added
+# whole new tables via CREATE TABLE IF NOT EXISTS). `users` already carries real rows on a live
+# instance, so this can't be a fresh CREATE — and SQLite's ALTER TABLE ADD COLUMN has no IF NOT
+# EXISTS clause (unlike CREATE TABLE/INDEX above), so `_apply_schema_v3()` checks PRAGMA
+# table_info() itself before altering. `[VERIFY]` V44 asked how P5 did the V1->V2 migration; the
+# answer is "it didn't have this problem" — this is the first schema step that actually needs it.
+_SCHEMA_V3_COLUMNS: tuple[tuple[str, str, str], ...] = (
+    ("users", "seen_update_id", "TEXT"),
+)
+
 
 def _format_dt(value: datetime) -> str:
     return value.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -240,11 +250,18 @@ class AuthStore:
         with self._lock:
             self._conn.executescript(_SCHEMA)
             self._conn.executescript(_SCHEMA_V2)
+            self._apply_schema_v3()
             self._conn.execute(
                 "INSERT INTO schema_meta (key, value) VALUES ('schema_version', ?) "
                 "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
                 (SCHEMA_VERSION,),
             )
+
+    def _apply_schema_v3(self) -> None:
+        for table, column, decl in _SCHEMA_V3_COLUMNS:
+            cols = {row["name"] for row in self._conn.execute(f"PRAGMA table_info({table})")}
+            if column not in cols:
+                self._conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {decl}")
 
     def now(self) -> datetime:
         """Additiv (Step 5): exponiert die injizierte Uhr für Aufrufer, die dieselbe Uhr wie
@@ -855,6 +872,23 @@ class AuthStore:
     def set_user_status(self, space: str, status: str) -> None:
         with self._lock:
             self._conn.execute("UPDATE users SET status = ? WHERE space = ?", (status, space))
+
+    # -- Update-Log-Gesehen-Zustand (Schema 3, P6 Step 3, Plan §1.8) ---------------------
+    # Bewusst zwei schmale Methoden statt eines `UserRow`-Felds: `UserRow` läuft durch
+    # `authctl.py`/`userdir.py`/`import_users_to_db.py`, keiner davon braucht diesen Zustand.
+
+    def get_seen_update_id(self, space: str) -> str | None:
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT seen_update_id FROM users WHERE space = ?", (space,)
+            ).fetchone()
+        return row["seen_update_id"] if row is not None else None
+
+    def set_seen_update_id(self, space: str, update_id: str) -> None:
+        with self._lock:
+            self._conn.execute(
+                "UPDATE users SET seen_update_id = ? WHERE space = ?", (update_id, space)
+            )
 
     # -- Einladungen (Schema 2, P5 Step 2) -----------------------------------------------
 

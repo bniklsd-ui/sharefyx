@@ -223,6 +223,13 @@ später gefunden. Reale Zahl wieder per `pytest --collect-only -q` je Datei neu 
 durch `TokenScrubbingFilter`), Modul-Status Zeile 10. Reale Zahl wieder per `pytest
 --collect-only -q` je Datei neu gezählt: **Gesamt: 95 Tests.**
 
+**[2026-08-09, P6 Step 3]:** `create_app()` (`mcpserver/app.py`) reicht `oauth.store` jetzt als
+fünftes Argument an `api_routes(...)` durch — Update-Log-Banner braucht `AuthStore` (Schema 3,
+`seen_update_id`), dieselbe Instanz wie `account_routes()`. **Dokumentierte Ein-Zeilen-
+Abweichung** von P6 Step 3s Plan-Dateiliste (die nur `webui/api.py` nennt), kein Eigen-Auftrag
+dieser Phase — keine neue Testdatei hier, kein Test in `phase2_mcp/tests/` betroffen, Testzahl
+unverändert bei 95. Volle Herleitung: `phase6_shares/CLAUDE.md` Step-3-Session-Block.
+
 **Gesamt: 95 Tests** in `phase2_mcp/tests/` (6 `test_config.py` + 1 `test_credentials.py` + 1
 `test_auth.py` + 3 `test_permissions.py` + 9 `test_logging.py` + 2 `test_context.py` + 15
 `test_app.py` + 30 `test_tools.py` + 3 `test_mcp_smoke.py` + 13 `test_request_log.py` + 10

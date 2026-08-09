@@ -7,6 +7,14 @@
 <link rel="stylesheet" href="/ui/static/app.css">
 </head>
 <body>
+<!-- Update-Banner (P6 Step 3, Plan §1.8) -- ausserhalb von .shell (position:fixed in app.css),
+     damit der bestehende Drei-Spalten-Grid unveraendert bleibt. body.has-update-banner (von
+     js/updates.js gesetzt) schiebt .shell darunter statt es zu ueberdecken. -->
+<div class="update-banner" id="update-banner" hidden>
+  <div class="update-banner__body" id="update-banner-body"></div>
+  <button type="button" class="btn btn-primary" id="update-banner-dismiss">Verstanden</button>
+</div>
+
 <div class="shell" data-view="list" id="shell">
   <nav class="rail" id="rail">
     <div class="rail__brand">sharefyx</div>
@@ -198,6 +206,7 @@
     <h2>Passwort &auml;ndern</h2>
     <p class="overlay__hint">Danach musst du jeden Connector neu autorisieren, und andere
       angemeldete Browser werden abgemeldet. Diese Sitzung bleibt bestehen.</p>
+    <button type="button" class="btn account-updates-link" id="account-show-updates">Update-Log ansehen</button>
     <p class="form-error" id="account-error" hidden></p>
     <label>Aktuelles Passwort
       <span class="pw-field">
@@ -227,6 +236,16 @@
   </div>
 </div>
 
+<div class="overlay" id="update-log-dialog" hidden>
+  <div class="overlay__panel">
+    <h2>Update-Log</h2>
+    <div id="update-log-list"></div>
+    <div class="overlay__actions">
+      <button type="button" class="btn" id="update-log-close">Schlie&szlig;en</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="session-expired-card" hidden>
   <div class="overlay__panel">
     <h2>Sitzung abgelaufen</h2>
@@ -237,6 +256,7 @@
   </div>
 </div>
 
+<script src="/ui/static/js/updates.js" defer></script>
 <script src="/ui/static/app.js" defer></script>
 </body>
 </html>

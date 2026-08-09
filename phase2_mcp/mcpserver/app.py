@@ -77,6 +77,13 @@ App-Shell, sitzungsgated — und `GET /ui/static/{path}`) und ist als `static_ro
 ui_sessions)` gemountet, direkt hinter `ui_auth_routes()` (beide sind `/ui/*`-Belange) und vor
 `account_routes()`/`api_routes()`. Kein neuer `create_app()`-Parameter — `static_routes()`
 braucht nur, was hier ohnehin schon für `ui_auth_routes()` gebaut wird.
+
+**[2026-08-09, P6 Step 3]:** `api_routes()` bekommt hier ein fünftes Argument, `oauth.store`
+(`AuthStore`) — Update-Log-Banner (Plan §1.8) braucht `users.seen_update_id` (Schema 3), das
+lebt in derselben `AuthStore`-Instanz, die `account_routes()`/`ui_auth_routes()` schon bekommen,
+kein zweiter DB-Handle. **Dokumentierte Ein-Zeilen-Abweichung** von Step 3s Plan-Dateiliste (die
+nur `webui/api.py` nennt, nicht diese Datei) — Begründung im Moduldocstring von `webui/api.py`,
+gleiche Kategorie wie P6 Step 1/2s dokumentierte Abweichungen dort.
 """
 from __future__ import annotations
 
@@ -189,7 +196,7 @@ def create_app(
     routes += ui_auth_routes(ui_settings, oauth.store, oauth.users, ui_sessions)
     routes += static_routes(ui_settings, ui_sessions)
     routes += account_routes(ui_settings, oauth.store, oauth.users, ui_sessions)
-    routes += api_routes(ui_settings, store, ui_sessions, own_space_writable)
+    routes += api_routes(ui_settings, store, ui_sessions, own_space_writable, oauth.store)
     middleware: list[Middleware] = []
     if hosts is not None:
         middleware.append(Middleware(TrustedHostMiddleware, allowed_hosts=hosts))

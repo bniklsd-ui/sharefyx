@@ -117,6 +117,35 @@ konstant über alle Läufe, also keine Kaltstart-Zahl, sondern eine reproduzierb
 hat wie `mcp_smoke.py` keine Unit-Tests, nur den realen Lauf als Beweis). Volle Herleitung:
 `phase6_shares/CLAUDE.md` Step-2-Session-Block.
 
+**[2026-08-09 Ergänzung, P6 Step 3]:** Update-Log-Banner (Plan §1.8): `webui/updates.py` (neu,
+`parse_update_log()`/`load_update_log()`), `webui/config.py` (`UiSettings.update_log_path`,
+Default `docs/UPDATE_LOG.md` im Repo-/Release-Root), `webui/api.py` (+`GET /api/v1/updates`,
++`POST /api/v1/updates/seen`, fünfter Parameter `auth_store: AuthStore` an `api_routes()` — der
+gesehen-Zustand lebt in Schema 3, nicht im `storage`-Kern), `webui/static/js/updates.js` (neu,
+`window.SharefyxUpdates`, MUSS vor `app.js` geladen werden — beide `defer`, aber `updates.js`
+ruft `app.js`s globale `markdownToHtml()`/`sanitizeHtml()` und `app.js` ruft
+`SharefyxUpdates.init()` an seinem eigenen Ende), `app.html`/`app.css` (Banner + „Update-Log
+ansehen" im Konto-Dialog + Update-Log-Dialog, `position:fixed`-Banner + `body.has-update-banner`
+statt einer Grid-Änderung an `.shell`, damit §4.1s Drei-Spalten-Layout unangetastet bleibt).
+`deploy.sh` bekommt ein Gate (P6-X): bricht ab, wenn `docs/UPDATE_LOG.md`s oberste `##`-
+Überschrift nicht das heutige Datum (UTC oder lokal) trägt, `SHAREFYX_ALLOW_STALE_UPDATELOG=1`
+überspringt es — Default in `test_deploy_scripts.py`s `_env()`-Helfer gesetzt, sonst wären alle
+bestehenden Deploy-Tests am neuen Gate gescheitert (`source_repo`-Fixture trägt kein Log).
+`scripts/ui_budget.py`/`ui_smoke.py` mussten ihren direkten `api_routes(...)`-Aufruf um den
+neuen Parameter nachziehen (kein neuer Test, reiner Signatur-Fix). `docs/UPDATE_LOG.md` (neu,
+erster Eintrag datiert 2026-08-09, kündigt die künftige Sichtbarkeitsumstellung an, P6-L/H1).
++5 Tests in `phase5_ui/tests/` (`test_api.py` +2: GET/POST-Roundtrip, Banner-Zustand pro Space
+getrennt;
+`test_deploy_scripts.py` +3: Gate blockiert, Gate lässt einen echten datierten Eintrag durch,
+Override umgeht es — Meta-Test `test_harness_ignores_ambient_sharefyx_configuration` um die neue
+Env-Var ergänzt). Node/jsdom-Simulation (Scratchpad, nicht im Repo, gleiche Kategorie wie Step
+10/11): echte `<script>`-Tags statt `window.eval()` genutzt, nachdem eine erste Fassung mit
+`eval()` einen falschen Befund lieferte (`"use strict"`-Direct-Eval isoliert Top-Level-
+Deklarationen, ein echtes `<script defer>`-Tag tut das nicht) — Banner erscheint mit
+gerendertem Markdown, „Verstanden" versteckt es und postet `/updates/seen`, „Update-Log
+ansehen" öffnet den Dialog, ein bereits gesehener `latest_id` unterdrückt das Banner. Volle
+Herleitung: `phase6_shares/CLAUDE.md` Step-3-Session-Block.
+
 ---
 
 ## Abnahmestand (Plan §6) — Stand 2026-08-09
