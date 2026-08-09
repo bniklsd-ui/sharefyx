@@ -140,10 +140,11 @@ Step-9-Abschlussarbeiten, siehe Session-Block.
 **Kurz:** 20 von 20 live bestanden, 0 teilweise, 0 offen. Zeilen 10/13/14/15/17/19 sind am
 2026-08-07 den Sprung von „Code fertig" auf „live" gegangen — **✅ heißt live-verifiziert, nicht
 gebaut.** Zeile 17 war die letzte, die Fabian brauchte (Step 9); Zeile 20 (2026-08-09) war die
-letzte insgesamt. **Abnahmematrix vollständig — Step 9 inhaltlich erledigt bis auf die
-Abschlussarbeiten** (Migrations-Runbook-Abschluss, `P5_ABNAHME_<datum>.md`, Phasenübersicht,
-Closeout-Handover, Rotationsprüfung); Root-`CLAUDE.md`/`ROADMAP.md` erst auf ✅ nach diesen
-Abschlussarbeiten, nicht in diesem Commit.
+letzte insgesamt. **Abnahmematrix vollständig, Abnahmeprotokoll geschrieben**
+(`docs/concepts/P5_ABNAHME_2026-08-09.md`), Migrations-Runbook-Schritt 4 bereits erledigt
+vorgefunden (kein Kommando nötig, Session-Block). Verbleibend vor dem formalen Phasenschluss:
+`phase5_ui_uebersicht.svg`, `PHASE5_CLOSEOUT_HANDOVER.md` (aktuell Webchat-Job, Session-Block);
+Root-`CLAUDE.md`/`ROADMAP.md` erst danach auf ✅.
 
 **Cutover auf Release-Verzeichnisse vollzogen (2026-08-05 20:37, Nikinger):** der Dienst läuft
 seither aus `/opt/sharefyx/current` statt aus dem Git-Arbeitsverzeichnis. „Datei ändern +
@@ -169,11 +170,28 @@ sowie `docs/INDEX.md` nachgezogen. Root-`CLAUDE.md`/`ROADMAP.md` bewusst noch ni
 **Verifiziert:** keine Testsuite gelaufen (keine Code-Änderung, nur Doku). Tabu-Diff nicht
 relevant (kein Diff außerhalb `.md`).
 
+**Nachtrag, 2026-08-09, dritter — Runbook-Schritt 4 bereits erledigt vorgefunden, kein Kommando
+nötig:** Nikinger-Anfrage, ob das alte `auth-users`-Credential/Keyring gefahrlos entfernbar ist,
+ohne einen Re-Login bei Fabian anzustoßen. Read-only geprüft statt spekuliert: die live
+installierte Unit (`systemctl cat sharefyx-mcp`) trägt nur noch `LoadCredentialEncrypted=
+auth-dek:...`, keine `auth-users`-Zeile mehr (deckt sich mit `test_units.py`s Assertion aus der
+2026-08-02-Korrektur, P5 Step 2); `/etc/sharefyx/` enthält keine `auth-users.cred`-Datei; der
+Keyring-Eintrag `nikinger-space`/`auth-users` existiert nicht mehr
+(`keyring.get_password(...)` → `None`, `auth-dek` zum Vergleich `not None`). Codeseitig liest
+die Laufzeit (`flows.py`, `app.py`) ohnehin nur noch über `UserDirectory`/`auth.sqlite3` —
+`users.py :: load_users_from_keyring()` wird von keinem laufenden Prozess mehr aufgerufen, nur
+noch von den Admin-Skripten `provision_user.py`/`export_auth_users.py`. **Ergebnis: nichts zu
+tun, kein Kommando ausgegeben — der Schritt war schon vollzogen**, vermutlich beim
+Unit-Redeploy in Step 2. Danach `docs/concepts/P5_ABNAHME_2026-08-09.md` geschrieben
+(Nikinger-Auftrag: Abnahmeprotokoll ist Claude-Code-Job, Handover/SVG bleiben vorerst
+Webchat-Job — Planänderung dazu angekündigt, nicht Teil dieser Session), `docs/INDEX.md` im
+selben Commit nachgezogen.
+
 **Offen für die nächste Session:**
-- Step-9-Abschlussarbeiten (vollständig entsperrt, kein Fabian mehr nötig): altes
-  `auth-users`-Credential/Keyring entfernen (Runbook-Schritt 4 — reale Infrastruktur,
-  Nikinger), `P5_ABNAHME_<datum>.md`, `phase5_ui_uebersicht.svg`,
-  `PHASE5_CLOSEOUT_HANDOVER.md`, danach erst Root-`CLAUDE.md`/`ROADMAP.md` auf „Phase 5 ✅".
+- Step-9-Abschlussarbeiten, verbleibend: `phase5_ui_uebersicht.svg`,
+  `PHASE5_CLOSEOUT_HANDOVER.md` — nach Nikinger-Planung aktuell Webchat-Job, Änderung dazu
+  angekündigt für einen späteren Schritt. Danach erst Root-`CLAUDE.md`/`ROADMAP.md` auf
+  „Phase 5 ✅".
 - Offener Befund, nicht aufgelöst: Step 9 Punkt 3 („frische Einladung") widerspricht §2.6
   (Migrationsrunbook, keine neue Einladung) — für den nächsten Plan-Review vormerken.
 - Phase-6-Vormerkungen (alle zusammen zu planen, nicht isoliert): F1/F2 (Subspaces/Löschen),
