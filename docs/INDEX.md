@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-08-09 (Phase 6 Step 3 — Update-Log/Banner, Schema 3, neue `docs/UPDATE_LOG.md`-Zeile; Testzahlen/Größen der berührten Köpfe nachgezogen)
+updated: 2026-08-10 (phase6_shares/CLAUDE.md unter den Softcap rotiert, neue phase6_shares/SESSIONS_ARCHIVE.md-Zeile)
 ---
 # Doc Index (L0)
 
@@ -31,7 +31,8 @@ updated: 2026-08-09 (Phase 6 Step 3 — Update-Log/Banner, Schema 3, neue `docs/
 
 ## Active phase (6 — Freigaben, Ordner, Werkzeug-Ergonomie)
 
-- [phase6_shares/CLAUDE.md](../phase6_shares/CLAUDE.md) — 🔄 ~39KB (nahe am 40KB-Softcap, Rotation absehbar) · phase head; Step 0 ✅ (Haushalt, Verifikationsdurchlauf V39–V41, Regeländerungen §0.7 a/b/c) + Step 1 ✅ (Werkzeug-Ergonomie — `patch_item`, Quittungen statt Volltext, `mcp_smoke.py` 13/13) + Step 2 ✅ gebaut/Live-Teile beim Nikinger (Betrieb — O2 geschlossen, `ua`-Feld/V42, `diagnose.sh` Prüfung 11, `ui_budget.py`-Latenzmessung) + Step 3 ✅ gebaut/Live-Teile beim Nikinger (Update-Log und Banner — Schema 3, `webui/updates.py`, `deploy.sh`-Gate) — **Block A (Steps 0–3) damit vollständig gebaut, GATE A→B offen**; read + newest Session-stopped block first
+- [phase6_shares/CLAUDE.md](../phase6_shares/CLAUDE.md) — 🔄 ~26KB (2026-08-10 unter den Softcap rotiert) · phase head; Step 0 ✅ (Haushalt, Verifikationsdurchlauf V39–V41, Regeländerungen §0.7 a/b/c) + Step 1 ✅ (Werkzeug-Ergonomie — `patch_item`, Quittungen statt Volltext, `mcp_smoke.py` 13/13) + Step 2 ✅ gebaut/Live-Teile beim Nikinger (Betrieb — O2 geschlossen, `ua`-Feld/V42 Fenster ab 2026-08-10, `diagnose.sh` Prüfung 11, `ui_budget.py`-Latenzmessung) + Step 3 ✅ gebaut, ein Live-Teil beim Nikinger (Update-Log und Banner — Schema 3, `webui/updates.py`, `deploy.sh`-Gate; Gate-A→B-Punkt 4 Banner-Hälfte 2026-08-10 live bestätigt) — **Block A (Steps 0–3) damit vollständig gebaut, GATE A→B offen**; read + newest Session-stopped block first
+- [phase6_shares/SESSIONS_ARCHIVE.md](../phase6_shares/SESSIONS_ARCHIVE.md) — 📦 ~16KB · Steps 0–2 (Haushalt, Werkzeug-Ergonomie, Betrieb) verbatim aus `phase6_shares/CLAUDE.md` verschoben, 2026-08-10, Softcap-Rotation
 - [docs/concepts/phase6_shares_plan.md](./concepts/phase6_shares_plan.md) — 📕 ~58KB · ausführungsreifer P6-Plan: Entscheidungen P6-A–P6-AC, Steps 0–10 (Block A Werkzeuge/Betrieb, Block B Dateisystem, Block C Bilder, hartes Gate A→B), Rechtemodell §1.2, Abnahmematrix 1–24, [VERIFY]-Register V39–V51; über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen; Autor Browser-Planungssession 2026-08-09 gegen den Drive-Snapshot `2026_08_09_sharefyx-main`
 - [docs/UPDATE_LOG.md](./UPDATE_LOG.md) — 📗 <1KB · menschenlesbarer Änderungs-Log fürs Update-Banner in `/ui` (P6 Step 3, Plan §1.8/§2.4); streng geparst von `webui/updates.py :: parse_update_log()` (`## <ISO-Datum>` beginnt einen Eintrag, `- ` eine Zeile); neue Einträge werden **oben** eingefügt (Changelog-Konvention, oberster Eintrag = neuester); `deploy.sh` bricht ohne einen heute datierten obersten Eintrag ab (P6-X); erster Eintrag (2026-08-09) kündigt die künftige Sichtbarkeitsumstellung an
 
