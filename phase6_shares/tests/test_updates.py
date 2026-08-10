@@ -56,3 +56,32 @@ def test_load_update_log_reads_a_real_file(tmp_path):
     path.write_text("## 2026-08-09\n- Text.\n", encoding="utf-8")
     entries = load_update_log(path)
     assert entries == [UpdateEntry(id="2026-08-09#1", date="2026-08-09", lines=["Text."])]
+
+
+def test_real_update_log_has_no_swallowed_continuation_lines():
+    """Regressionstest gegen einen echten Live-Fund (2026-08-10): ein Eintrag in
+    `docs/UPDATE_LOG.md` war als weich umgebrochener Fließtext geschrieben (mehrere physische
+    Zeilen ohne eigenes führendes `- `) — der Parser ignoriert per Spezifikation (§2.4) jede
+    Zeile, die nicht mit `## `/`- ` beginnt, also verschluckte er die Fortsetzungszeilen
+    stillschweigend. Das Banner zeigte nur den ersten, mitten im Satz abgeschnittenen Teil.
+    Kein Parser-Bug (der tut exakt, was `test_parse_ignores_malformed_lines_and_headings` oben
+    verlangt) — ein Content-Bug, den nichts in dieser Suite bis dahin fangen konnte, weil kein
+    Test je die REALE Datei gelesen hat. Erlaubt: Leerzeilen, ein `<!-- ... -->`-Kommentarblock
+    (mehrzeilig, keine Zeile darin beginnt mit `## `/`- `)."""
+    path = Path(__file__).resolve().parents[2] / "docs" / "UPDATE_LOG.md"
+    text = path.read_text(encoding="utf-8")
+    in_comment = False
+    for lineno, raw_line in enumerate(text.splitlines(), start=1):
+        line = raw_line.rstrip()
+        if not line:
+            continue
+        if line.startswith("<!--"):
+            in_comment = True
+        if in_comment:
+            if "-->" in line:
+                in_comment = False
+            continue
+        assert line.startswith("## ") or line.startswith("- "), (
+            f"docs/UPDATE_LOG.md:{lineno} beginnt weder mit '## ' noch mit '- ' — der Parser "
+            f"würde diese Zeile stillschweigend verschlucken: {line!r}"
+        )

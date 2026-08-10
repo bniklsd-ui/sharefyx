@@ -440,10 +440,12 @@ Reihenfolge für den Nikinger, über Step 2 und Step 3 hinweg, nicht nur Step 3 
    entweder einen neuen Eintrag ergänzen oder `SHAREFYX_ALLOW_STALE_UPDATELOG=1` setzen (bewusst
    so, kein Bug).
 3. ~~Gate-A→B-Punkt 1+2~~ — **✅ live bestanden, 2026-08-09** (Nachtrag unten).
-4. **Gate-A→B-Punkt 4** — Update-Banner im echten Browser: erscheint, verschwindet nach
-   „Verstanden", ist unter Konto → „Update-Log ansehen" wiederfindbar. **Und Fabian muss den
-   Eintrag über die Sichtbarkeitsumstellung gesehen haben** — ohne Fabians Bestätigung schließt
-   dieser Punkt nicht, unabhängig davon, ob die Technik funktioniert.
+4. **Gate-A→B-Punkt 4 — teilweise, ein echter Fund korrigiert (Nachtrag „achter" unten):**
+   Banner erschien beim ersten echten Test, Text war aber mitten im Satz abgeschnitten
+   (Content-Bug in `docs/UPDATE_LOG.md`, nicht im Parser — behoben + Regressionstest). Bleibt
+   zu prüfen: Banner jetzt vollständig, verschwindet nach „Verstanden", unter Konto →
+   „Update-Log ansehen" wiederfindbar. **Und Fabian muss den Eintrag gesehen haben** — ohne
+   seine Bestätigung schließt dieser Punkt nicht.
 5. **V42 (Step 2, weiterhin offen)** — zwei Tage echtes journald abwarten, danach prüfen, ob das
    `ua`-Feld reale Claude-Oberflächen unterscheidet (`grep '"ev":"http"'` in den Logs, `ua`-Werte
    vergleichen).
@@ -477,6 +479,20 @@ O2-Code, der nächste Timer-Lauf (Aug 10 00:02) läuft bereits dagegen. **Ob Sch
 nur die `deploy.sh`-Ausgabe. Kein Vorfall, falls übersprungen (additive Migration, kein
 Datenverlustrisiko), aber im Nachhinein nicht mehr sinnvoll nachholbar — beim nächsten Deploy
 nicht vergessen.
+
+**Nachtrag, 2026-08-10, achter — Gate-A→B-Punkt 4: Content-Bug im Banner gefunden+behoben,
+Timer-Bestätigung nachgezogen.** Nikinger-Meldung: Banner sichtbar, Text abgeschnitten bei
+„…und alles Neue ist nach". **Kein Parser-Bug** (tut exakt, was Plan §2.4 verlangt: nur `## `/
+`- `-Zeilen zählen) — **ein Content-Bug:** der erste `docs/UPDATE_LOG.md`-Eintrag war weich
+umgebrochener Fließtext über vier physische Zeilen, der Parser verschluckte die drei
+Fortsetzungszeilen stillschweigend. Behoben: zwei echte `- `-Zeilen (je eine physische Zeile) +
+ein `<!-- -->`-Formathinweis am Dateianfang. **Regressionstest ergänzt, nicht nur die Datei
+gefixt:** `test_real_update_log_has_no_swallowed_continuation_lines` liest die REALE Datei, kein
+Test hatte das bis dahin getan. +1 Test (`test_updates.py` 7→8, 621 gesamt). Parser-Gegenprobe:
+beide Zeilen jetzt vollständig. **Purge-Timer bestätigt:** Lauf vom 2026-08-10 00:02 mit dem
+neuen O2-Code (`token_families`/`clients` beide `0`, konsistent — noch nichts alt genug).
+Punkt 4 bleibt offen bis der Nikinger den gefixten Banner erneut prüft und Fabian ihn gesehen
+hat.
 
 **Softcap-Warnung:** dieser Kopf ist nahe am 40KB-Softcap. Wenn Step 4 einen neuen `## Session
 stopped`-Block eröffnet, sind die Step-0/1/2-Nachträge die Kompressionskandidaten — verbatim
