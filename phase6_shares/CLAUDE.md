@@ -91,7 +91,7 @@ weiter ohne Build-Step (AC).
 | 1 | Haushalt, Verifikationsdurchlauf (V39/V40/V41), Regeländerungen (§0.7 a/b/c), Phase-Head angelegt | 0 | ✅ **vollständig** | 0 (bewusst — reines Skelett, wie P1 Step 0; `phase6_shares/tests/conftest.py` leer angelegt) |
 | 2 | Werkzeug-Ergonomie: `storage/patch.py` (neu), `storage/store.py :: patch()`, `mcpserver/receipts.py` (neu), siebtes Tool `patch_item`, `return_body` an allen vier Schreib-Tools, `update_item` lehnt `visibility`/`share_read`/`share_write` ab | 1 | ✅ **vollständig** — `mcp_smoke.py` 13/13 grün | +17 (5 `phase6_shares/tests/test_patch.py`, neue Datei + 5 `phase1_storage/tests/test_store.py` + 7 `phase2_mcp/tests/test_tools.py`); 593 gesamt |
 | 3 | Betrieb: O2 (`authserver/store.py :: purge_expired()` räumt `token_families`/`clients` ab, zwei neue Retention-Konstanten), Client-Surface-Logging (`ua`-Feld auf `AccessLogASGI`, V42), `diagnose.sh` Prüfung 11 (Purge-Frische, INFO), `ui_budget.py :: _measure_latency()` (P6-I/P6-S, eigene `LatencyMetric`, kein Exit-Code-Einfluss) | 2 | ✅ **gebaut, Live-Teile beim Nikinger** — V42 (echtes journald, zwei Tage) und Gate-A→B-Punkt 3 (realer Purge-Lauf, `clients`-Zeilenzahl sinkt) sind live-Aufgaben, nicht in dieser Session baubar | +11 (8 `phase4_auth/tests/test_authserver_store.py` + 2 `phase2_mcp/tests/test_request_log.py` + 1 `phase2_mcp/tests/test_logging.py`); 604 gesamt |
-| 4 | Update-Log und Banner: `authserver/store.py` Schema 3 (`users.seen_update_id`), `webui/updates.py` (neu, Parser), `webui/api.py` (+`GET /api/v1/updates`, +`POST /api/v1/updates/seen`), `webui/static/js/updates.js` (neu, Banner + Konto-Dialog-Link), `app.html`/`app.css`, `deploy.sh`-Gate (P6-X), `docs/UPDATE_LOG.md` (neu, erster Eintrag) | 3 | ✅ **gebaut, Live-Teile beim Nikinger** — Gate-A→B-Punkt 4 (Banner im echten Browser, Fabian hat den Eintrag gesehen) ist live-Aufgabe | +16 (3 `phase4_auth/tests/test_authserver_store.py` [258→261] + 7 `phase6_shares/tests/test_updates.py` [neue Datei] + 2 `phase5_ui/tests/test_api.py` + 3 `phase5_ui/tests/test_deploy_scripts.py` + 1 `phase5_ui/tests/test_static_routes.py`); 620 gesamt |
+| 4 | Update-Log und Banner: `authserver/store.py` Schema 3 (`users.seen_update_id`), `webui/updates.py` (neu, Parser), `webui/api.py` (+`GET /api/v1/updates`, +`POST /api/v1/updates/seen`), `webui/static/js/updates.js` (neu, Banner + Konto-Dialog-Link), `app.html`/`app.css`, `deploy.sh`-Gate (P6-X), `docs/UPDATE_LOG.md` (neu, erster Eintrag) | 3 | ✅ **gebaut, ein Live-Teil beim Nikinger** — Gate-A→B-Punkt 4s Banner-Hälfte 2026-08-10 live bestätigt (nach Content-Fix, siehe Session-Block), nur Fabians Bestätigung offen | +16 (3 `phase4_auth/tests/test_authserver_store.py` [258→261] + 7 `phase6_shares/tests/test_updates.py` [neue Datei] + 2 `phase5_ui/tests/test_api.py` + 3 `phase5_ui/tests/test_deploy_scripts.py` + 1 `phase5_ui/tests/test_static_routes.py`); 620 gesamt |
 
 ## Geerbte Contracts
 
@@ -419,10 +419,11 @@ Schema-3-Rollback-Sicherheit tatsächlich geprüft, nicht nur behauptet — Erge
 harmlose Fund (`schema_version` fällt nach einem Rollback vorübergehend auf „2") stehen im
 Absatz direkt darüber.
 
-**Status ehrlich, nicht optimistisch:** Step 3 kann nicht ✅ schließen. Gate-A→B-Punkt 4
-verlangt den echten Browser (Banner erscheint/verschwindet/ist wiederfindbar) **und** dass
-Fabian den Eintrag über die Sichtbarkeitsumstellung tatsächlich gesehen hat — beides
-Nikinger/Fabian-Sache. Status bewusst **„gebaut, Live-Teile beim Nikinger"**.
+**Status ehrlich, nicht optimistisch:** Step 3 kann nicht ✅ schließen. Gate-A→B-Punkt 4s erste
+Hälfte (Banner im echten Browser, nach dem Content-Fix vollständig lesbar) ist **2026-08-10 vom
+Nikinger live bestätigt** — die zweite Hälfte (Fabian hat den Eintrag über die
+Sichtbarkeitsumstellung tatsächlich gesehen) steht noch aus. Status bewusst **„gebaut, ein
+Live-Teil beim Nikinger"**.
 
 **Nächster Schritt (konkret):** Block A (Steps 0–3) ist damit vollständig **gebaut**, nichts
 davon ist live. Vor Block B steht **GATE A→B** (Plan §4, vier Punkte) — konsolidierte
@@ -440,12 +441,11 @@ Reihenfolge für den Nikinger, über Step 2 und Step 3 hinweg, nicht nur Step 3 
    entweder einen neuen Eintrag ergänzen oder `SHAREFYX_ALLOW_STALE_UPDATELOG=1` setzen (bewusst
    so, kein Bug).
 3. ~~Gate-A→B-Punkt 1+2~~ — **✅ live bestanden, 2026-08-09** (Nachtrag unten).
-4. **Gate-A→B-Punkt 4 — teilweise, ein echter Fund korrigiert (Nachtrag „achter" unten):**
-   Banner erschien beim ersten echten Test, Text war aber mitten im Satz abgeschnitten
-   (Content-Bug in `docs/UPDATE_LOG.md`, nicht im Parser — behoben + Regressionstest). Bleibt
-   zu prüfen: Banner jetzt vollständig, verschwindet nach „Verstanden", unter Konto →
-   „Update-Log ansehen" wiederfindbar. **Und Fabian muss den Eintrag gesehen haben** — ohne
-   seine Bestätigung schließt dieser Punkt nicht.
+4. ~~Gate-A→B-Punkt 4, Banner-Hälfte~~ — **✅ live bestanden, 2026-08-10**, nach einem echten
+   Fund (Nachtrag „achter" unten: Content-Bug in `docs/UPDATE_LOG.md`, nicht im Parser —
+   behoben + Regressionstest). Banner erscheint vollständig lesbar, Nikinger bestätigt. **Offen
+   bleibt nur noch:** Fabian muss den Eintrag über die Sichtbarkeitsumstellung selbst gesehen
+   haben — ohne seine Bestätigung schließt der Punkt nicht.
 5. **V42 (Step 2, weiterhin offen)** — zwei Tage echtes journald abwarten, danach prüfen, ob das
    `ua`-Feld reale Claude-Oberflächen unterscheidet (`grep '"ev":"http"'` in den Logs, `ua`-Werte
    vergleichen).
@@ -491,8 +491,13 @@ gefixt:** `test_real_update_log_has_no_swallowed_continuation_lines` liest die R
 Test hatte das bis dahin getan. +1 Test (`test_updates.py` 7→8, 621 gesamt). Parser-Gegenprobe:
 beide Zeilen jetzt vollständig. **Purge-Timer bestätigt:** Lauf vom 2026-08-10 00:02 mit dem
 neuen O2-Code (`token_families`/`clients` beide `0`, konsistent — noch nichts alt genug).
-Punkt 4 bleibt offen bis der Nikinger den gefixten Banner erneut prüft und Fabian ihn gesehen
-hat.
+**Nachtrag, 2026-08-10, zweiter Teil:** Nikinger bestätigt Banner jetzt vollständig lesbar,
+gerenderter Text stimmt mit dem korrigierten `docs/UPDATE_LOG.md` überein — Banner-Hälfte von
+Gate-A→B-Punkt 4 damit ✅. **Nebenbefund während der Live-Prüfung, kein Vorfall:** zwei
+transiente Connector-Aussetzer, beide Male griff der Retry, kein Datenverlust — Netzwerk-
+Flakiness (Nikingers Einschätzung), kein Server-Fund; `journalctl` zeigte im fraglichen Fenster
+keine Exceptions, keine Neustarts. **Offen bleibt nur noch Fabians Bestätigung** derselben
+Punkt-4-Zeile.
 
 **Softcap-Warnung:** dieser Kopf ist nahe am 40KB-Softcap. Wenn Step 4 einen neuen `## Session
 stopped`-Block eröffnet, sind die Step-0/1/2-Nachträge die Kompressionskandidaten — verbatim
