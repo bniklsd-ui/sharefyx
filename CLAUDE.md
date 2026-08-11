@@ -153,8 +153,9 @@ Herkunft/offene Entscheidungen: `docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` §4.
 ✅ **gebaut, Live-Teile beim Nikinger** (O2 geschlossen, `ua`-Feld/V42, `diagnose.sh`/
 `ui_budget.py`-Ergänzungen), Step 3 ✅ **gebaut, Live-Teile beim Nikinger** (Update-Log und
 Banner — Schema 3, `webui/updates.py`, `deploy.sh`-Gate). **Block A (Steps 0–3) damit
-vollständig gebaut.** **Nächster Schritt:** GATE A→B (vier Live-Punkte beim Nikinger/Fabian),
-danach Step 4 (Storage-Fundament, Block B).
+vollständig gebaut.** **GATE A→B: 3 von 4 Punkten live bestanden** (patch_item, Banner + Fabians
+Bestätigung) — nur noch Punkt 3 offen (Purge-Zeilenrückgang, frühestens 2026-08-28). **Nächster
+Schritt:** Punkt 3 abwarten, danach Step 4 (Storage-Fundament, Block B).
 
 **Phase 5 — Web-UI, REST-API und Auth-Selbstverwaltung** (`phase5_ui/`, Paket `webui`) — **✅
 abgeschlossen, 2026-08-09 — 20/20 Abnahmezeilen live bestanden, 0 teilweise, 0 offen.** Zwei
