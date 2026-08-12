@@ -395,7 +395,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         # werden darf (steuert repair_drift — ein fremdes, aber share_write-erlaubtes Item
         # darf den Drift-Repair-Write bekommen) ist unabhängig davon, ob gewrappt wird (P6-O
         # — ein fremdes Item bleibt fremder Body, auch wenn ich es ändern darf).
-        writable = permissions.can_write_item(principal.space, acl)
+        writable = permissions.can_write_item(principal.space, acl, surface=Surface.AGENT)
         item = store.get(item_id, repair_drift=writable)
         if acl.space != principal.space:
             item = replace(item, body=wrap_untrusted(item.body, space=item.space))
@@ -499,7 +499,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         except ItemNotFound as exc:
             raise map_storage_error(exc) from exc
 
-        if not permissions.can_write_item(principal.space, acl):
+        if not permissions.can_write_item(principal.space, acl, surface=Surface.AGENT):
             raise map_storage_error(PermissionDenied(acl.space)) from None
 
         # Fail-closed, Nikinger-Entscheidung 2026-08-12 (kein Plan-Text): `folder` ist zwar
@@ -572,7 +572,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         except ItemNotFound as exc:
             raise map_storage_error(exc) from exc
 
-        if not permissions.can_write_item(principal.space, acl):
+        if not permissions.can_write_item(principal.space, acl, surface=Surface.AGENT):
             raise map_storage_error(PermissionDenied(acl.space)) from None
 
         try:
@@ -608,7 +608,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         except ItemNotFound as exc:
             raise map_storage_error(exc) from exc
 
-        if not permissions.can_write_item(principal.space, acl):
+        if not permissions.can_write_item(principal.space, acl, surface=Surface.AGENT):
             raise map_storage_error(PermissionDenied(acl.space)) from None
 
         try:

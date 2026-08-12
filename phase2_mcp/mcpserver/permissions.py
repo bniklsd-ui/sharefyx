@@ -32,7 +32,7 @@ class Permissions(Protocol):
     def can_read(self, actor: str, target: str) -> bool: ...
     def can_write(self, actor: str, target: str) -> bool: ...
     def can_read_item(self, actor: str, acl: AclDecision, *, surface: Surface) -> bool: ...
-    def can_write_item(self, actor: str, acl: AclDecision) -> bool: ...
+    def can_write_item(self, actor: str, acl: AclDecision, *, surface: Surface) -> bool: ...
     def visible_spaces(self, actor: str, all_spaces: Sequence[str]) -> list[str]: ...
 
 
@@ -65,7 +65,17 @@ class SharePolicy:
             return True
         return actor in acl.read
 
-    def can_write_item(self, actor: str, acl: AclDecision) -> bool:
+    def can_write_item(self, actor: str, acl: AclDecision, *, surface: Surface) -> bool:
+        # **Fix, 2026-08-12, Advisor-Fund nach dem ersten Step-5-Commit:** `can_write_item`
+        # hatte ursprünglich (wie der Plan-Snippet in §1.2.4) keinen `surface`-Parameter — ein
+        # `visibility: human`-Item war damit für die Agentenfläche zwar unlesbar, aber weiterhin
+        # voll beschreibbar über den eigenen Space-Token (append/update erreichten `store.
+        # append()`/`update()`, ein Versionskonflikt hätte sogar Version/Zeitstempel des
+        # angeblich "vollständig nicht existenten" Items in der Fehlermeldung preisgegeben).
+        # Dieselbe Sperre wie `can_read_item` schließt das: kann die Agentenfläche es nicht
+        # lesen, darf sie es erst recht nicht schreiben.
+        if surface is Surface.AGENT and acl.visibility == "human":
+            return False
         if actor == acl.space:
             return True
         return actor in acl.write
@@ -78,6 +88,11 @@ class SharePolicy:
         liegt dagegen im selben Paket wie `Surface` und benutzt die allgemeine Methode direkt
         (Plan §1.2.4)."""
         return self.can_read_item(actor, acl, surface=Surface.HUMAN)
+
+    def can_write_item_as_human(self, actor: str, acl: AclDecision) -> bool:
+        """Bequemlichkeitsmethode, Zwilling zu `can_read_item_as_human()` — gleicher Grund
+        (P5-B, kein zweiter `mcpserver`-Import im REST-Adapter, anderes Paket)."""
+        return self.can_write_item(actor, acl, surface=Surface.HUMAN)
 
     def visible_spaces(self, actor: str, all_spaces: Sequence[str]) -> list[str]:
         return [space for space in all_spaces if self.can_read(actor, space)]

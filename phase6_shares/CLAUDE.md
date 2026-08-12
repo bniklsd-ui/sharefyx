@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase6_shares_plan.md         # voller Plan, Entscheidungen P6-A–P6-AC, Steps 0–10
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-3 verbatim (zwei Eintraege), L3, kein Softcap
-updated: 2026-08-12 (Step 5 gebaut -- SharePolicy/Surface ersetzt OwnSpaceWritable, item-level ACL in tools.py/webui/api.py, Folder-Move-Fail-Closed [Nikinger-Entscheidung], 691 Tests gruen)
+updated: 2026-08-12 (Step 5 gebaut -- SharePolicy/Surface ersetzt OwnSpaceWritable, item-level ACL in tools.py/webui/api.py, Folder-Move-Fail-Closed [Nikinger-Entscheidung], can_write_item-visibility-Fix [Advisor-Fund], 694 Tests gruen)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -94,7 +94,7 @@ weiter ohne Build-Step (AC).
 | 3 | Betrieb: O2 (`authserver/store.py :: purge_expired()` räumt `token_families`/`clients` ab, zwei neue Retention-Konstanten), Client-Surface-Logging (`ua`-Feld auf `AccessLogASGI`, **V42 geschlossen, 2026-08-12** — Befund unten), `diagnose.sh` Prüfung 11 (Purge-Frische, INFO), `ui_budget.py :: _measure_latency()` (P6-I/P6-S, eigene `LatencyMetric`, kein Exit-Code-Einfluss) | 2 | ✅ **gebaut, ein Live-Teil beim Nikinger** — Gate-A→B-Punkt 3 (realer Purge-Lauf, `clients`-Zeilenzahl sinkt) bleibt live-Aufgabe, frühestens 2026-08-28 | +11 (8 `phase4_auth/tests/test_authserver_store.py` + 2 `phase2_mcp/tests/test_request_log.py` + 1 `phase2_mcp/tests/test_logging.py`); 604 gesamt |
 | 4 | Update-Log und Banner: `authserver/store.py` Schema 3 (`users.seen_update_id`), `webui/updates.py` (neu, Parser), `webui/api.py` (+`GET /api/v1/updates`, +`POST /api/v1/updates/seen`), `webui/static/js/updates.js` (neu, Banner + Konto-Dialog-Link), `app.html`/`app.css`, `deploy.sh`-Gate (P6-X), `docs/UPDATE_LOG.md` (neu, erster Eintrag) | 3 | ✅ **gebaut, Gate-A→B-Punkt 4 vollständig live bestanden** (Banner-Hälfte 2026-08-10, Fabian-Hälfte 2026-08-11, siehe Session-Block) | +16 (3 `phase4_auth/tests/test_authserver_store.py` [258→261] + 7 `phase6_shares/tests/test_updates.py` [neue Datei] + 2 `phase5_ui/tests/test_api.py` + 3 `phase5_ui/tests/test_deploy_scripts.py` + 1 `phase5_ui/tests/test_static_routes.py`); 620 gesamt |
 | 5 | Storage-Fundament (Block B): Charakterisierungstests + Goldens zuerst (P6-D), `storage/acl.py` (neu), `models.py`/`files.py`/`index.py`/`store.py`-Erweiterung (`folder`/`visibility`/`share_*`, `acl_of()`, `list_spaces()`), `index.py`-Rebuild-Fix (V46), zweiter Advisor-Durchlauf: `folder` jetzt pfadabgeleitet statt indexvertraut | 4 | ✅ **gebaut, 2026-08-12** — Charakterisierung vor+nach byte-identisch grün, DoD aus Plan §4 Step 4 erfüllt; noch nicht live geprüft (kein eigener Abnahmematrix-Punkt für diesen Step) | +36 `phase1_storage/` (1 `test_models.py` + 11 `test_files.py` + 4 `test_index.py` + 20 `test_store.py`) + 10 `phase6_shares/tests/test_acl.py`; 671 gesamt |
-| 6 | Rechtepolitik (Block B): `storage/acl.py` +`grants_for_space()`/`decision_for()`, `store.py` +`acl_reader`-Property (kleine, dokumentierte Erweiterung über Step 5s Dateiliste hinaus), `mcpserver/permissions.py` (`Surface`, `SharePolicy` ersetzt `OwnSpaceWritable`), `mcpserver/app.py` (Verdrahtung über `store.acl_reader`), `mcpserver/tools.py` (alle sieben Tools auf `acl_of()`+`can_read_item`/`can_write_item` umgestellt, `search_items`/`list_spaces` item-weise statt space-weise gefiltert, `create_item(space=, folder=)`, `update_item(folder=)`), `webui/api.py`+`serializers.py` (dieselbe Umstellung, `Surface.HUMAN` über `SharePolicy.can_read_item_as_human()` gekapselt — P5-B erlaubt weiterhin nur ein `mcpserver`-Symbol) | 5 | ✅ **gebaut, 2026-08-12** — DoD aus Plan §4 Step 5 erfüllt, alle 12 Pflichttests + ein zusätzlicher Fail-Closed-Fund abgedeckt; noch nicht live geprüft (kein eigener Abnahmematrix-Punkt) | +9 `phase2_mcp/tests/test_tools.py` (30→39) + 7 `test_permissions.py` (3→10, Datei vollständig neu geschrieben) + 2 `phase5_ui/tests/test_api.py` (27→29) + 2 `test_serializers.py` (7→9), Kollateralkorrekturen in `phase2_mcp/tests/test_app.py`/`phase5_ui/tests/test_overview.py`/conftest-Fixtures (keine neuen Tests, nur Assertions auf die neue ACL nachgezogen); 691 gesamt |
+| 6 | Rechtepolitik (Block B): `storage/acl.py` +`grants_for_space()`/`decision_for()`, `store.py` +`acl_reader`-Property (kleine, dokumentierte Erweiterung über Step 5s Dateiliste hinaus), `mcpserver/permissions.py` (`Surface`, `SharePolicy` ersetzt `OwnSpaceWritable`), `mcpserver/app.py` (Verdrahtung über `store.acl_reader`), `mcpserver/tools.py` (alle sieben Tools auf `acl_of()`+`can_read_item`/`can_write_item` umgestellt, `search_items`/`list_spaces` item-weise statt space-weise gefiltert, `create_item(space=, folder=)`, `update_item(folder=)`), `webui/api.py`+`serializers.py` (dieselbe Umstellung, `Surface.HUMAN` über `SharePolicy.can_read_item_as_human()`/`can_write_item_as_human()` gekapselt — P5-B erlaubt weiterhin nur ein `mcpserver`-Symbol) | 5 | ✅ **gebaut, 2026-08-12** — DoD aus Plan §4 Step 5 erfüllt, alle 12 Pflichttests + Fail-Closed-Folder-Fund + `can_write_item`-visibility-Fix (Advisor-Fund nach dem ersten Commit) abgedeckt; noch nicht live geprüft (kein eigener Abnahmematrix-Punkt) | +10 `phase2_mcp/tests/test_tools.py` (30→40) + 9 `test_permissions.py` (3→12, Datei vollständig neu geschrieben) + 2 `phase5_ui/tests/test_api.py` (27→29) + 2 `test_serializers.py` (7→9), Kollateralkorrekturen in `phase2_mcp/tests/test_app.py`/`phase5_ui/tests/test_overview.py`/conftest-Fixtures (keine neuen Tests, nur Assertions auf die neue ACL nachgezogen); 694 gesamt |
 
 ## Geerbte Contracts
 
@@ -222,6 +222,27 @@ scripts/mcp_smoke.py --json` (13/13 `ok:true`), `phase5_ui/scripts/ui_smoke.py -
 Fail-Closed-Ergänzung grün, reale Skript-Läufe grün). Kein eigener Abnahmematrix-Punkt für
 diesen Step — die Live-Prüfung kommt mit den nutzerseitig sichtbaren Steps 6/7 (Verwaltung/
 Migration, UI), Zeilen 8–18 der Abnahmematrix.
+
+**Nachtrag, 2026-08-12, zweiter — Advisor-Fund nach dem ersten Step-5-Commit, sofort behoben
+statt als offener Befund liegen gelassen:** `can_write_item` hatte keinen `surface`-Parameter
+und keine `visibility`-Prüfung (Plan §1.2.4s Snippet gibt ihr keinen) — ein `visibility:
+human`-Item war damit für die Agentenfläche zwar unlesbar (`can_read_item` sperrte korrekt),
+aber weiterhin voll beschreibbar über den eigenen Space-Token: `append_to_item`/`update_item`
+erreichten `store.append()`/`update()` ungehindert, und ein Versionskonflikt hätte sogar
+Version/Zeitstempel des angeblich „vollständig nicht existenten" Items (P6-P) in der
+Fehlermeldung preisgegeben. Anders als der Folder-Fund oben war das kein Plan-Zweifelsfall,
+sondern ein Widerspruch zum Plan-Text selbst — kein Anlass für eine Nikinger-Rückfrage, sofort
+korrigiert: `can_write_item`/`Permissions`-Protokoll bekommen denselben `surface`-Parameter wie
+`can_read_item` (dieselbe Sperre: `Surface.AGENT` + `visibility=="human"` ⇒ `False`), plus
+`can_write_item_as_human()` als Zwilling zu `can_read_item_as_human()` (P5-B, kein zweiter
+`mcpserver`-Import im REST-Adapter). Alle sechs `tools.py`-Aufrufstellen und alle fünf
+`webui/api.py`-Aufrufstellen nachgezogen. Drei neue Tests
+(`test_can_write_item_human_only_blocks_agent_surface_even_for_owner`/
+`test_can_write_item_as_human_is_equivalent_to_explicit_human_surface` in
+`test_permissions.py`, `test_human_only_item_cannot_be_written_on_agent_surface` in
+`test_tools.py` — bewusst inklusive eines Versionskonflikt-Versuchs, um das Leck explizit
+auszuschließen, nicht nur den einfachen Schreibversuch). **694 Tests gesamt** (691 + 3).
+Charakterisierungs-Goldens und alle drei Live-Skripte erneut grün, nach dem Fix.
 
 **Nächster Schritt (konkret):** Step 6 (Verwaltung und Migration) — `phase6_shares/scripts/
 spacectl.py` (neu, `create-space`/`list-spaces`/`add-member`/`remove-member`/`show`/

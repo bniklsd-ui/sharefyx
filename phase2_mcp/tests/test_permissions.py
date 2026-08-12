@@ -83,11 +83,31 @@ def test_can_write_item_true_for_owner_and_write_set_false_otherwise(tmp_path):
     acl = AclDecision(
         space=SPACE_A, folder="", visibility="private", read=frozenset({SPACE_B}), write=frozenset(),
     )
-    assert policy.can_write_item(SPACE_A, acl) is True
-    assert policy.can_write_item(SPACE_B, acl) is False  # nur read, kein write
+    assert policy.can_write_item(SPACE_A, acl, surface=Surface.AGENT) is True
+    assert policy.can_write_item(SPACE_B, acl, surface=Surface.AGENT) is False  # nur read, kein write
 
     acl_write = AclDecision(
         space=SPACE_A, folder="", visibility="private",
         read=frozenset({SPACE_B}), write=frozenset({SPACE_B}),
     )
-    assert policy.can_write_item(SPACE_B, acl_write) is True
+    assert policy.can_write_item(SPACE_B, acl_write, surface=Surface.AGENT) is True
+
+
+def test_can_write_item_human_only_blocks_agent_surface_even_for_owner(tmp_path):
+    """Fix, 2026-08-12 (Advisor-Fund nach dem ersten Step-5-Commit): ohne diese Sperre wäre ein
+    `visibility: human`-Item für die Agentenfläche zwar unlesbar, aber weiterhin voll
+    beschreibbar über den eigenen Space-Token — genau die Lücke, die P6-P schließen sollte."""
+    policy = SharePolicy(AclReader(tmp_path))
+    acl = AclDecision(space=SPACE_A, folder="", visibility="human", read=frozenset(), write=frozenset())
+    assert policy.can_write_item(SPACE_A, acl, surface=Surface.AGENT) is False
+    assert policy.can_write_item(SPACE_A, acl, surface=Surface.HUMAN) is True
+
+
+def test_can_write_item_as_human_is_equivalent_to_explicit_human_surface(tmp_path):
+    policy = SharePolicy(AclReader(tmp_path))
+    acl = AclDecision(
+        space=SPACE_A, folder="", visibility="human", read=frozenset(), write=frozenset({SPACE_B}),
+    )
+    assert policy.can_write_item_as_human(SPACE_B, acl) == policy.can_write_item(
+        SPACE_B, acl, surface=Surface.HUMAN
+    )

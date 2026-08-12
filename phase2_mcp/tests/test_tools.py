@@ -273,6 +273,29 @@ def test_human_only_item_is_invisible_to_agent_surface_including_total(tools_map
             tools_map["get_item"](hidden.id)
 
 
+def test_human_only_item_cannot_be_written_on_agent_surface(tools_map, store):
+    """Fix, 2026-08-12 (Advisor-Fund nach dem ersten Step-5-Commit): `can_write_item` prüfte
+    ursprünglich keine `visibility` — ein Item, das `get_item`/`search_items` bereits verbargen,
+    war über `append_to_item`/`update_item` trotzdem beschreibbar, weil der Aufrufer sein
+    eigener Space war. Ein Versionskonflikt hätte dabei sogar Version/Zeitstempel des
+    angeblich "vollständig nicht existenten" Items preisgegeben."""
+    hidden = store.create(SPACE_A, type="note", title="Tagebuch", body="Geheim", visibility="human")
+
+    with _as(SPACE_A):
+        with pytest.raises(ToolError, match="write_denied"):
+            tools_map["update_item"](hidden.id, version=hidden.version, title="Verändert")
+        with pytest.raises(ToolError, match="write_denied"):
+            tools_map["append_to_item"](hidden.id, version=hidden.version, text="Mehr")
+        # Insbesondere kein Versionskonflikt-Leck über eine falsche Version.
+        with pytest.raises(ToolError, match="write_denied"):
+            tools_map["update_item"](hidden.id, version=999, title="Verändert")
+
+    unchanged = store.get(hidden.id)
+    assert unchanged.title == "Tagebuch"
+    assert unchanged.body == "Geheim"
+    assert unchanged.version == hidden.version
+
+
 def test_human_only_item_is_visible_on_the_human_surface(store):
     """Kontrastprobe zu oben: `visibility: human` sperrt nur `Surface.AGENT`, nicht die
     `SharePolicy` selbst — dieselbe `AclDecision` bleibt für `Surface.HUMAN` lesbar

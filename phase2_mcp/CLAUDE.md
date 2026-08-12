@@ -102,7 +102,7 @@ Streichung.
 | 8 | `scripts/mcp_smoke.py`, Runbook, Größenmessung | 7 | ✅ **live-verifiziert** | 3 (`test_mcp_smoke.py`) |
 | 9 | Siebtes Tool `patch_item` (P6-E/F/G) + `mcpserver/receipts.py` (neu, Quittungen statt Volltext, P6-H) + `return_body` an allen vier Schreib-Tools + `update_item` lehnt `visibility`/`share_read`/`share_write` ab (P6-M) | P6 Step 1 | ✅ | +7 (`test_tools.py` 23→30), Kollateralkorrekturen in `test_app.py`/`test_request_log.py`/`mcp_smoke.py` (keine neuen Tests, nur Assertions auf JSON statt Frontmatter-Text umgestellt) |
 | 10 | Client-Surface-Logging (V42): `ua`-Feld auf der `ev="http"`-Zeile (`AccessLogASGI`), gekürzt auf 120 Zeichen, läuft durch `TokenScrubbingFilter` wie jedes andere Feld. Bewusst **nicht** auf `ev="tool"` — `context.py` ist nicht auf P6 Step 2s Berührungsliste | P6 Step 2 | ✅ **gebaut, V42 geschlossen (2026-08-12, `phase6_shares/CLAUDE.md` Step-2/-3-Session-Block)** — zwei Tage echtes journald ausgewertet: `ua` wird von echten MCP-Clients zuverlässig gesetzt, unterscheidet aber NICHT zwischen Claude-Oberflächen (278/278 echte `/mcp`-Aufrufe trugen `"Claude-User"`, egal ob Claude Code oder claude.ai) — negativer, aber definitiver Befund | +3 (`test_request_log.py` 11→13, `test_logging.py` 8→9) |
-| 11 | Rechtepolitik (P6 Step 5): `permissions.py` (`Surface`, `SharePolicy` ersetzt `OwnSpaceWritable`), `tools.py` (alle sieben Tools auf `acl_of()`+`can_read_item`/`can_write_item`, `search_items`/`list_spaces` item-weise gefiltert, `create_item(space=,folder=)`, `update_item(folder=)` mit Fail-Closed-Riegel gegen Nicht-Eigentümer-Verschiebung — Nikinger-Entscheidung, kein Plan-Text), `app.py` (Verdrahtung über `store.acl_reader`) | P6 Step 5 | ✅ **gebaut** — Details, alle zwölf Pflichttests und die Fail-Closed-Ergänzung: `phase6_shares/CLAUDE.md` Step-5-Session-Block | +9 (`test_tools.py` 30→39), `test_permissions.py` vollständig neu (3→10 Tests, `OwnSpaceWritable`-Klasse entfernt), Kollateralkorrekturen in `test_app.py`/`mcp_smoke.py` (keine neuen Tests, Assertions auf die neue Fail-Closed-Sichtbarkeit umgestellt) |
+| 11 | Rechtepolitik (P6 Step 5): `permissions.py` (`Surface`, `SharePolicy` ersetzt `OwnSpaceWritable`, `can_read_item`/`can_write_item` beide surface-scharf inkl. `visibility` — Advisor-Fund am `can_write_item`, siehe Nachtrag im Phase-Head), `tools.py` (alle sieben Tools auf `acl_of()`+`can_read_item`/`can_write_item`, `search_items`/`list_spaces` item-weise gefiltert, `create_item(space=,folder=)`, `update_item(folder=)` mit Fail-Closed-Riegel gegen Nicht-Eigentümer-Verschiebung — Nikinger-Entscheidung, kein Plan-Text), `app.py` (Verdrahtung über `store.acl_reader`) | P6 Step 5 | ✅ **gebaut** — Details, alle zwölf Pflichttests, die Fail-Closed-Ergänzung und der `can_write_item`-Fix: `phase6_shares/CLAUDE.md` Step-5-Session-Block | +10 (`test_tools.py` 30→40), `test_permissions.py` vollständig neu (3→12 Tests, `OwnSpaceWritable`-Klasse entfernt), Kollateralkorrekturen in `test_app.py`/`mcp_smoke.py` (keine neuen Tests, Assertions auf die neue Fail-Closed-Sichtbarkeit umgestellt) |
 
 **Zeile 7, Step 6 abgeschlossen:** `search_items`, `get_item`, `create_item`, `update_item`,
 `append_to_item` lösen ihre seit Step 5 bestehenden `NotImplementedError`-Platzhalter ein
@@ -245,9 +245,14 @@ neuen Rechtepolitik, Modul-Status Zeile 11) und `test_permissions.py` 3→10 (Da
 neu geschrieben, `OwnSpaceWritable`-Klasse entfernt). Reale Zahl wieder per `pytest
 --collect-only -q` je Datei neu gezählt: **Gesamt: 111 Tests.**
 
-**Gesamt: 111 Tests** in `phase2_mcp/tests/` (6 `test_config.py` + 1 `test_credentials.py` + 1
-`test_auth.py` + 10 `test_permissions.py` + 9 `test_logging.py` + 2 `test_context.py` + 15
-`test_app.py` + 39 `test_tools.py` + 3 `test_mcp_smoke.py` + 13 `test_request_log.py` + 10
+**[2026-08-12 Korrektur, P6 Step 5 Nachtrag]:** elfte Instanz — Advisor-Fund nach dem ersten
+Step-5-Commit (`can_write_item` prüfte `visibility` nicht, siehe `phase6_shares/CLAUDE.md`s
+Step-5-Session-Block), sofort im Folgecommit behoben. `test_permissions.py` 10→12,
+`test_tools.py` 39→40. **Gesamt: 114 Tests.**
+
+**Gesamt: 114 Tests** in `phase2_mcp/tests/` (6 `test_config.py` + 1 `test_credentials.py` + 1
+`test_auth.py` + 12 `test_permissions.py` + 9 `test_logging.py` + 2 `test_context.py` + 15
+`test_app.py` + 40 `test_tools.py` + 3 `test_mcp_smoke.py` + 13 `test_request_log.py` + 10
 `test_asgi_bearer.py` [seit dem Schnitt: nur noch `BearerAuthASGI`, kein `TokenPathASGI`/
 `AuthModeASGI` mehr, Details `phase4_auth/CLAUDE.md`] + 2 `test_serve.py` [neu, Schnitt:
 `serve.py :: main()`s Verdrahtung bis `uvicorn.run()`, vorher ungetestet]). Acht weitere Tests

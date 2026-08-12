@@ -310,7 +310,7 @@ def api_routes(
         item_dicts = [
             summary_to_json(
                 i, own_space=session.space,
-                readonly=not permissions.can_write_item(session.space, _acl_for_summary(i)),
+                readonly=not permissions.can_write_item_as_human(session.space, _acl_for_summary(i)),
             )
             for i in page
         ]
@@ -356,7 +356,7 @@ def api_routes(
             raise _map_store_error(exc, own_space=session.space) from exc
         if not permissions.can_read_item_as_human(session.space, acl):
             raise ApiError("forbidden", "Kein Lesezugriff auf dieses Item.")
-        writable = permissions.can_write_item(session.space, acl)
+        writable = permissions.can_write_item_as_human(session.space, acl)
         item = store.get(item_id, repair_drift=writable)  # fremd ⇒ kein Dateischreibzugriff (Rule 4)
         return JSONResponse(
             item_to_json(item, readonly=not writable, own_space=session.space),
@@ -377,7 +377,7 @@ def api_routes(
             acl = store.acl_of(item_id)
         except ItemNotFound as exc:
             raise _map_store_error(exc, own_space=session.space) from exc
-        if not permissions.can_write_item(session.space, acl):
+        if not permissions.can_write_item_as_human(session.space, acl):
             raise ApiError("forbidden", "Kein Schreibzugriff auf dieses Item.")
 
         # Fail-closed, Nikinger-Entscheidung 2026-08-12 (kein Plan-Text, siehe
@@ -418,7 +418,7 @@ def api_routes(
             acl = store.acl_of(item_id)
         except ItemNotFound as exc:
             raise _map_store_error(exc, own_space=session.space) from exc
-        if not permissions.can_write_item(session.space, acl):
+        if not permissions.can_write_item_as_human(session.space, acl):
             raise ApiError("forbidden", "Kein Schreibzugriff auf dieses Item.")
 
         try:
@@ -444,7 +444,7 @@ def api_routes(
             acl = store.acl_of(item_id)
         except ItemNotFound as exc:
             raise _map_store_error(exc, own_space=session.space) from exc
-        if not permissions.can_write_item(session.space, acl):
+        if not permissions.can_write_item_as_human(session.space, acl):
             raise ApiError("forbidden", "Kein Schreibzugriff auf dieses Item.")
 
         # Siehe Moduldocstring: `store.archive()` hat keinen eigenen Schutz gegen ein bereits
