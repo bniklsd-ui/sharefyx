@@ -11,6 +11,7 @@ set -uo pipefail  # bewusst kein -e: jede Prüfung wertet ihren eigenen Exit-Cod
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PHASE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+REPO_TOP="$(cd "$PHASE_DIR/.." && pwd)"
 LOCAL_ENV="$PHASE_DIR/local.env"
 
 diagnose() {
@@ -144,6 +145,43 @@ else
          "journalctl -u sharefyx-purge -n 20" >&2
   else
     echo "INFO letzter Purge-Lauf: $last_trigger" >&2
+  fi
+fi
+
+# 12) Verwaiste oder kaputte `.share.yml`-Referenzen? (P6 Step 6, DoD: "diagnose.sh meldet
+#     keine verwaisten Namen". `spacectl.py check` kennt jede `.share.yml` unter DATA_ROOT und
+#     benutzt denselben YAML-Parser wie `AclReader` -- kein zweiter Parser hier in Bash (§2.2,
+#     V51). Braucht DATA_ROOT/VENV aus local.env wie Prüfung 5.)
+data_root=""
+venv_python=""
+if [[ -f "$LOCAL_ENV" ]]; then
+  # shellcheck disable=SC1090
+  eval "$(set -a && source "$LOCAL_ENV" && set +a && printf 'data_root=%q\nvenv_python=%q\n' \
+    "${DATA_ROOT:-}" "${VENV:-}/bin/python3")"
+fi
+if [[ -z "$data_root" ]]; then
+  echo "WARNUNG: kein DATA_ROOT aus $LOCAL_ENV ablesbar — Prüfung 12 übersprungen." >&2
+elif [[ ! -x "$venv_python" ]]; then
+  echo "WARNUNG: kein venv-Python unter $venv_python gefunden — Prüfung 12 übersprungen." >&2
+else
+  spacectl_py="$REPO_TOP/phase6_shares/scripts/spacectl.py"
+  check_json="$("$venv_python" "$spacectl_py" --data-root "$data_root" check --json 2>/dev/null || echo '{}')"
+  finding_count="$(printf '%s' "$check_json" | "$venv_python" -c '
+import json, sys
+try:
+    d = json.load(sys.stdin)
+    print(d.get("orphan_count", 0) + d.get("broken_count", 0))
+except Exception:
+    print(-1)
+' 2>/dev/null || echo -1)"
+  if [[ "$finding_count" == "-1" ]]; then
+    echo "WARNUNG: spacectl.py check konnte nicht ausgewertet werden — von Hand prüfen:" \
+         "$venv_python $spacectl_py --data-root $data_root check" >&2
+  elif [[ "$finding_count" -gt 0 ]]; then
+    echo "WARNUNG: $finding_count verwaiste/kaputte .share.yml-Referenz(en) —" \
+         "$venv_python $spacectl_py --data-root $data_root check" >&2
+  else
+    echo "INFO keine verwaisten oder kaputten .share.yml-Referenzen" >&2
   fi
 fi
 

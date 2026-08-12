@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-08-12 (P6 Step 5 gebaut -- SharePolicy/Surface ersetzt OwnSpaceWritable; Gate-A→B nur noch Punkt 3 offen)
+updated: 2026-08-12 (P6 Step 6 gebaut -- spacectl.py/migrate_visibility.py neu, diagnose.sh Pruefung 12; Gate-A→B nur noch Punkt 3 offen)
 ---
 # Doc Index (L0)
 
@@ -31,8 +31,8 @@ updated: 2026-08-12 (P6 Step 5 gebaut -- SharePolicy/Surface ersetzt OwnSpaceWri
 
 ## Active phase (6 — Freigaben, Ordner, Werkzeug-Ergonomie)
 
-- [phase6_shares/CLAUDE.md](../phase6_shares/CLAUDE.md) — 🔄 ~21KB · phase head; **Block A (Steps 0–3) vollständig gebaut** (Werkzeuge/Betrieb/Update-Banner — Details im Archiv, siehe unten), **GATE A→B nur noch Punkt 3 offen** (Purge-Zeilenrückgang, frühestens 2026-08-28); Step 4 (Storage-Fundament, Block B) **✅ gebaut** (2026-08-12, jetzt im Archiv); **[2026-08-12] Step 5 (Rechtepolitik, Block B: `SharePolicy`/`Surface` ersetzt `OwnSpaceWritable`, item-level ACL in `tools.py`/`webui/api.py`, Fail-Closed-Folder-Move [Nikinger-Entscheidung], `can_write_item`-visibility-Fix [Advisor-Fund]) ✅ gebaut** — 12 Pflichttests + 2 Ergänzungen grün, 694 Tests gesamt, `mcp_smoke.py`/`ui_smoke.py`/`ui_budget.py` real grün; Kopf am selben Tag unter Softcap rotiert (Step 4 → Archiv); read + newest Session-stopped block first
-- [phase6_shares/SESSIONS_ARCHIVE.md](../phase6_shares/SESSIONS_ARCHIVE.md) — 📦 ~50KB · drei Einträge, newest-first: Step 4 (Storage-Fundament, 2026-08-12-Rotation) + Steps 1–3 (Werkzeug-Ergonomie, Betrieb, Update-Log/Banner, 2026-08-12-Rotation) + Steps 0–2-Kurzfassung (2026-08-10-Rotation), alle verbatim aus `phase6_shares/CLAUDE.md`
+- [phase6_shares/CLAUDE.md](../phase6_shares/CLAUDE.md) — 🔄 ~21KB · phase head; **Block A (Steps 0–3) vollständig gebaut** (Werkzeuge/Betrieb/Update-Banner — Details im Archiv, siehe unten), **GATE A→B nur noch Punkt 3 offen** (Purge-Zeilenrückgang, frühestens 2026-08-28); Steps 4/5 (Storage-Fundament, Rechtepolitik, Block B) **✅ gebaut**, jetzt im Archiv; **[2026-08-12] Step 6 (Verwaltung und Migration, Block B: `phase6_shares/scripts/spacectl.py`/`migrate_visibility.py` neu, `diagnose.sh` Prüfung 12) ✅ gebaut** — 28 neue Tests grün, 722 Tests gesamt, DATA_ROOT-Auflösung + Commit-Batching real gegen ein Wegwerf-`DATA_ROOT` verifiziert, DoD-Live-Anteil (echter dritter Nutzer) beim Nikinger; Kopf am selben Tag unter Softcap rotiert (Step 5 → Archiv); read + newest Session-stopped block first
+- [phase6_shares/SESSIONS_ARCHIVE.md](../phase6_shares/SESSIONS_ARCHIVE.md) — 📦 ~64KB · vier Einträge, newest-first: Step 5 (Rechtepolitik, 2026-08-12-Rotation) + Step 4 (Storage-Fundament, 2026-08-12-Rotation) + Steps 1–3 (Werkzeug-Ergonomie, Betrieb, Update-Log/Banner, 2026-08-12-Rotation) + Steps 0–2-Kurzfassung (2026-08-10-Rotation), alle verbatim aus `phase6_shares/CLAUDE.md`
 - [docs/concepts/phase6_shares_plan.md](./concepts/phase6_shares_plan.md) — 📕 ~58KB · ausführungsreifer P6-Plan: Entscheidungen P6-A–P6-AC, Steps 0–10 (Block A Werkzeuge/Betrieb, Block B Dateisystem, Block C Bilder, hartes Gate A→B), Rechtemodell §1.2, Abnahmematrix 1–24, [VERIFY]-Register V39–V51; über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen; Autor Browser-Planungssession 2026-08-09 gegen den Drive-Snapshot `2026_08_09_sharefyx-main`
 - [docs/UPDATE_LOG.md](./UPDATE_LOG.md) — 📗 <1KB · menschenlesbarer Änderungs-Log fürs Update-Banner in `/ui` (P6 Step 3, Plan §1.8/§2.4); streng geparst von `webui/updates.py :: parse_update_log()` (`## <ISO-Datum>` beginnt einen Eintrag, `- ` eine Zeile); neue Einträge werden **oben** eingefügt (Changelog-Konvention, oberster Eintrag = neuester); `deploy.sh` bricht ohne einen heute datierten obersten Eintrag ab (P6-X); erster Eintrag (2026-08-09) kündigt die künftige Sichtbarkeitsumstellung an
 

@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase6_shares_plan.md         # voller Plan, Entscheidungen P6-A–P6-AC, Steps 0–10
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-3 verbatim (zwei Eintraege), L3, kein Softcap
-updated: 2026-08-12 (Step 5 gebaut -- SharePolicy/Surface ersetzt OwnSpaceWritable, item-level ACL in tools.py/webui/api.py, Folder-Move-Fail-Closed [Nikinger-Entscheidung], can_write_item-visibility-Fix [Advisor-Fund], 694 Tests gruen)
+updated: 2026-08-12 (Step 6 gebaut -- spacectl.py/migrate_visibility.py neu, diagnose.sh Pruefung 12, 721 Tests gruen)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -95,6 +95,7 @@ weiter ohne Build-Step (AC).
 | 4 | Update-Log und Banner: `authserver/store.py` Schema 3 (`users.seen_update_id`), `webui/updates.py` (neu, Parser), `webui/api.py` (+`GET /api/v1/updates`, +`POST /api/v1/updates/seen`), `webui/static/js/updates.js` (neu, Banner + Konto-Dialog-Link), `app.html`/`app.css`, `deploy.sh`-Gate (P6-X), `docs/UPDATE_LOG.md` (neu, erster Eintrag) | 3 | ✅ **gebaut, Gate-A→B-Punkt 4 vollständig live bestanden** (Banner-Hälfte 2026-08-10, Fabian-Hälfte 2026-08-11, siehe Session-Block) | +16 (3 `phase4_auth/tests/test_authserver_store.py` [258→261] + 7 `phase6_shares/tests/test_updates.py` [neue Datei] + 2 `phase5_ui/tests/test_api.py` + 3 `phase5_ui/tests/test_deploy_scripts.py` + 1 `phase5_ui/tests/test_static_routes.py`); 620 gesamt |
 | 5 | Storage-Fundament (Block B): Charakterisierungstests + Goldens zuerst (P6-D), `storage/acl.py` (neu), `models.py`/`files.py`/`index.py`/`store.py`-Erweiterung (`folder`/`visibility`/`share_*`, `acl_of()`, `list_spaces()`), `index.py`-Rebuild-Fix (V46), zweiter Advisor-Durchlauf: `folder` jetzt pfadabgeleitet statt indexvertraut | 4 | ✅ **gebaut, 2026-08-12** — Charakterisierung vor+nach byte-identisch grün, DoD aus Plan §4 Step 4 erfüllt; noch nicht live geprüft (kein eigener Abnahmematrix-Punkt für diesen Step) | +36 `phase1_storage/` (1 `test_models.py` + 11 `test_files.py` + 4 `test_index.py` + 20 `test_store.py`) + 10 `phase6_shares/tests/test_acl.py`; 671 gesamt |
 | 6 | Rechtepolitik (Block B): `storage/acl.py` +`grants_for_space()`/`decision_for()`, `store.py` +`acl_reader`-Property (kleine, dokumentierte Erweiterung über Step 5s Dateiliste hinaus), `mcpserver/permissions.py` (`Surface`, `SharePolicy` ersetzt `OwnSpaceWritable`), `mcpserver/app.py` (Verdrahtung über `store.acl_reader`), `mcpserver/tools.py` (alle sieben Tools auf `acl_of()`+`can_read_item`/`can_write_item` umgestellt, `search_items`/`list_spaces` item-weise statt space-weise gefiltert, `create_item(space=, folder=)`, `update_item(folder=)`), `webui/api.py`+`serializers.py` (dieselbe Umstellung, `Surface.HUMAN` über `SharePolicy.can_read_item_as_human()`/`can_write_item_as_human()` gekapselt — P5-B erlaubt weiterhin nur ein `mcpserver`-Symbol) | 5 | ✅ **gebaut, 2026-08-12** — DoD aus Plan §4 Step 5 erfüllt, alle 12 Pflichttests + Fail-Closed-Folder-Fund + `can_write_item`-visibility-Fix (Advisor-Fund nach dem ersten Commit) abgedeckt; noch nicht live geprüft (kein eigener Abnahmematrix-Punkt) | +10 `phase2_mcp/tests/test_tools.py` (30→40) + 9 `test_permissions.py` (3→12, Datei vollständig neu geschrieben) + 2 `phase5_ui/tests/test_api.py` (27→29) + 2 `test_serializers.py` (7→9), Kollateralkorrekturen in `phase2_mcp/tests/test_app.py`/`phase5_ui/tests/test_overview.py`/conftest-Fixtures (keine neuen Tests, nur Assertions auf die neue ACL nachgezogen); 694 gesamt |
+| 7 | Verwaltung und Migration (Block B): `phase6_shares/scripts/spacectl.py` (neu — `create-space`/`list-spaces`/`show`/`add-member`/`remove-member`/`remove-space`/`check`), `phase6_shares/scripts/migrate_visibility.py` (neu — `--dry-run` Default, **kein** Versionssprung), `phase3_edge/scripts/diagnose.sh` Prüfung 12 (verwaiste/kaputte `.share.yml`-Referenzen über `spacectl.py check --json`, INFO/WARNUNG, kein Abbruchkriterium) | 6 | ✅ **gebaut, 2026-08-12** — Details, beide Plan-Abweichungen (DATA_ROOT-Auflösung, kein Index-Rebuild) und die Advisor-Runde davor: Session-Block unten. DoD-Live-Teil (realer dritter Nutzer, echter `diagnose.sh`-Lauf) bleibt Nikinger-Sache wie bei Steps 4/5 | +28 (20 `phase6_shares/tests/test_spacectl.py` [neu] + 8 `test_migrate_visibility.py` [neu]); 722 gesamt |
 
 ## Geerbte Contracts
 
@@ -105,173 +106,142 @@ angekündigt — nach Phasenabschluss (Step 10) wieder geschlossen, siehe `phase
 
 ---
 
-## Session stopped — 2026-08-12 (Step 5 — Rechtepolitik, Block B)
+## Session stopped — 2026-08-12, dritter — (Step 6 — Verwaltung und Migration, Block B)
 
-**Auftrag:** Step 5 aus `docs/concepts/phase6_shares_plan.md` §4 — `SharePolicy`/`Surface`
-ersetzen `OwnSpaceWritable`, jeder item-level Lese-/Schreibpfad in `mcpserver/tools.py` und
-`webui/api.py` wechselt von `space_of()`+space-level `can_read`/`can_write` auf `acl_of()`+
-`can_read_item`/`can_write_item`. Vorbereitung: Advisor-Review des Plans vor dem Bau, gefolgt
-von einer expliziten Nikinger-Entscheidung zu einem Fund außerhalb des Plan-Texts (siehe unten).
+**Auftrag:** Nikinger-Sonderauftrag zu Sessionbeginn — vor jedem Deploy des Sichtbarkeits-
+Cutovers mindestens Step 6 bauen (`spacectl.py`/`migrate_visibility.py`), damit die Umstellung
+mit richtigem Werkzeug statt einer von Hand editierten `.share.yml` landet. Plan §4 Step 6 war
+bereits ausführungsreif (Dateiliste, Unterbefehle, Report-Format, DoD) — per Root-Prompt-Regel
+("wenn der Plan detailliert genug ist, das feststellen und atomar entlang seiner Schritte
+vorgehen") direkt umgesetzt, kein eigener Planungsdurchlauf nötig. Vor dem ersten Code
+`advisor()` konsultiert (Auftrag: unaufgefordert vor substanzieller Arbeit).
 
-**Advisor-Fund vor dem Build, dem Nikinger vorgelegt statt still entschieden:** `folder` ist
-seit Step 4 agenten-setzbar (`store.py`s Kommentar an `update()`s `folder`-Zweig sagte das
-bereits ausdrücklich). Ein `share_write`-Halter, der ein fremdes Item in einen Ordner mit
-breiterer `.share.yml` verschiebt, hätte dessen effektive Sichtbarkeit erweitert, ohne dass
-Step 7s `widens()`/Re-Auth-Gate das je sähe — dieses Gate existiert nur für den
-Menschen/UI-Pfad, die Agentenfläche hat grundsätzlich keinen Re-Auth-Mechanismus. **Nikinger-
-Entscheidung (AskUserQuestion, 2026-08-12):** ein Nicht-Eigentümer darf `folder` nie ändern,
-dauerhaft, nicht nur bis Step 7. Umgesetzt in beiden Adaptern (`tools.py::update_item`,
-`webui/api.py::_items_patch`), je ein `ValidationError`/`403 forbidden` **vor** dem Schreiben,
-je ein Test (`test_share_write_cannot_move_item_to_a_different_folder` in beiden Test-Dateien).
+**Advisor-Runde vor dem Bau, vier Punkte übernommen:**
+1. **Kein `version`-Sprung in `migrate_visibility.py`.** Ursprüngliche Annahme dieser Session
+   ("ein Versionssprung wäre vertretbar") war falsch — ein fehlendes `visibility`-Feld hat schon
+   vor der Migration den Default `private` (`models.py :: DEFAULT_VISIBILITY`, Frontmatter-
+   Vertrag §2.1), nichts Beobachtbares ändert sich. Ein Versionssprung hätte jeder laufenden
+   Claude-Instanz mit einer gerade gelesenen `version` einen `ConflictError` untergeschoben, der
+   keiner ist — am Tag des Cutovers, an dem Abnahmezeile 8 getestet wird. Bestimmt die gesamte
+   Architektur des Skripts: es ruft deshalb nie `Store.update()` auf (das würde pro Item
+   committen), sondern schreibt über `storage.files.atomic_write` direkt.
+2. **Kein Index-Rebuild nach `--apply` nötig — geprüft, nicht angenommen.** `storage/index.py ::
+   row_from_file()` gibt einem fehlenden `visibility`-Feld bereits denselben Default (`"private"`,
+   `fields.get("visibility", "private")`) — Datei und Index sagen vor und nach dem Lauf für jedes
+   Item dasselbe. Kein `store.rebuild_index()`-Aufruf im Skript.
+3. **`STATE_DIRECTORY`-Konvention aus dem Plan ist wörtlich unpassend, sinngemäß richtig.**
+   Gegengeprüft: `phase4_auth/systemd/sharefyx-mcp.service` setzt `SPACE_DATA_ROOT` über eine
+   eigene, direkt gesetzte `Environment=`-Zeile — unabhängig von `StateDirectory=sharefyx` (das
+   trägt nur die Auth-DB). Gemeint war die **Haltung** von `authctl.py :: resolve_db_path()`
+   ("aus der Umgebung auflösen, kein stiller Fallback ins Arbeitsverzeichnis"), nicht die
+   wörtliche Variable. `mcpserver.config.load_settings()` wäre wiederverwendbar gewesen, aber
+   Advisor riet zu einer eigenen vierzeiligen `_resolve_data_root()` je Skript statt einer neuen
+   `phase6_shares → phase2_mcp`-Importabhängigkeit für ein einzelnes Feld — kein bestehender
+   Code-Pfad außerhalb von `phase2_mcp`/`phase4_auth` importiert `mcpserver.config` bisher
+   (gegengeprüft per `grep`), diese Abhängigkeit wäre neu und unbegründet gewesen. Umgesetzt:
+   `--data-root`-Flag hat Vorrang, sonst `SPACE_DATA_ROOT` (Pflicht), in beiden Skripten identisch.
+4. **Lock einmal für den gesamten `--apply`-Lauf, nicht je Datei.** Ein Flock auf
+   `<data_root>/.write.lock` (dieselbe Datei wie `Store._file_write_lock()`, hier eigenständig
+   reimplementiert statt als neue `Store`-Fläche exportiert — dieselbe Zurückhaltung wie P6
+   Step 5) wird für die komplette Migration bzw. jeden `spacectl.py`-Schreibbefehl gehalten. Ein
+   über mehrere Locks interleaved halbmigrierter Zustand mit einem parallel schreibenden Dienst
+   wäre schwerer zu erklären als ein kurzzeitig blockierter Dienst.
 
-**`storage/acl.py` + `store.py` — kleine, dokumentierte Erweiterung über Step 5s Dateiliste
-hinaus** (P6-C erlaubt `storage/`-Touches in dieser Phase generell): `Store.__init__` baute
-bisher einen privaten `AclReader` ohne Zugriffspunkt — der Plan verlangt "ein Handle, kein
-zweiter" für `SharePolicy` und `Store`. `Store.acl_reader` (neue Property) gibt genau diese
-Instanz zurück. `AclReader.grants_for_space()` (neu, dünner Wrapper um `grants_for_dir()` auf
-der Space-Wurzel) und `AclReader.decision_for()` (neu — die Vereinigungslogik, die
-`Store.acl_of()` vorher inline berechnete) sind die Basis für `SharePolicy`s space-level
-`can_read`/`can_write` UND für die item-weise Filterung in `search_items`/`GET /api/v1/items`
-(eine `AclDecision` je `ItemSummary`-Zeile aus einem bereits geladenen `store.search()`-Ergebnis,
-kein zweiter Index-Roundtrip pro Treffer). `Store.acl_of()` delegiert jetzt an `decision_for()`
-statt die Logik zu duplizieren. Reine Refaktorierung, kein Verhalten geändert — die drei
-Charakterisierungs-Goldens liefen vor UND direkt nach dieser einen Änderung isoliert grün,
-bevor der Rest des Steps begann (P6-D, gezielt statt erst am Ende geprüft).
+**`phase6_shares/scripts/migrate_visibility.py` (neu):** `scan()` liest jedes `*.md` unter jedem
+Space (inkl. `_archive/` — archivierte Items brauchen `visibility` genauso), meldet nur Items
+ohne das Feld. `apply()` schreibt `visibility: private` je gemeldetem Item über
+`frontmatter.parse`/`serialize` + `files.atomic_write`, dann **ein** `history.commit()` je Space
+(`migrate visibility [<space>]`) — nicht je Item, wie Plan §2.3 verlangt (200 Commits wären
+Lärm). `history.ensure_repo()` wird defensiv selbst aufgerufen (nicht von einem vorherigen
+`Store()`-Aufruf vorausgesetzt) — sonst würde `history.commit()` gegen ein Verzeichnis ohne
+`.git` nur `logger.critical` loggen (nie fatal) und der geforderte Commit bliebe stillschweigend
+aus. `--dry-run` ist Default; Report als JSON-Zeilen (`{"id":…,"space":…,"path":…,"before":null,
+"after":"private"}`) plus eine Summenzeile (`items_migrated`, `spaces_touched`) auf stdout.
 
-**`mcpserver/permissions.py`:** `Surface(str, Enum)` (`AGENT`/`HUMAN`), `Permissions`-Protokoll
-um `can_read_item`/`can_write_item` erweitert, `SharePolicy(acl: AclReader)` ersetzt
-`OwnSpaceWritable` vollständig (nicht danebengestellt). **Ein Punkt, den der Plan-Text nicht
-auflöst und der beim Bau auffiel:** P5-B erlaubt dem UI-Paket genau ein Symbol aus `mcpserver`
-— der Plan sagt nur "das Symbol ändert sich zu `SharePolicy`", sagt aber nicht, wie der
-REST-Adapter dann `surface=Surface.HUMAN` an `can_read_item` übergeben soll, ohne `Surface`
-als zweites Symbol zu importieren. Gelöst über `SharePolicy.can_read_item_as_human()` — eine
-`SharePolicy`-eigene Bequemlichkeitsmethode, nicht Teil des `Permissions`-Protokolls, die
-`Surface.HUMAN` innerhalb von `mcpserver/permissions.py` kapselt. `test_webui_imports_exactly_
-one_mcpserver_symbol` (`phase5_ui/tests/test_api.py`) hält das jetzt gegen `{"mcpserver.
-permissions.SharePolicy"}` fest, nicht mehr gegen `OwnSpaceWritable`.
+**`phase6_shares/scripts/spacectl.py` (neu):** sieben Unterbefehle. `create-space` legt nur ein
+Verzeichnis an — **kein eigener Commit** (Git kennt keine leeren Verzeichnisse, der erste
+Item-Write erzeugt den ersten echten Commit), **aber jeder schreibende Unterbefehl inklusive
+`create-space` initialisiert über `_DataRootLock.__enter__()` beiläufig ein Git-Repo**
+(`history.ensure_repo()`, idempotent — derselbe Aufruf, den `Store.__init__` bei jedem
+Dienststart ohnehin macht), falls noch keins existiert. Bewusst genannt statt nur im Code
+sichtbar: `create-space` gegen ein brandneues `DATA_ROOT` initialisiert damit Git als
+Seiteneffekt, ohne selbst zu committen. `list-spaces`/`show` lesen über `Store`/`AclReader` (Wiederverwendung
+statt zweiter Lesepfad). `add-member`/`remove-member` schreiben `<space>/.share.yml` direkt
+(eigener, lauter YAML-Loader — anders als `AclReader`, der bei einem kaputten Bestand fail-closed
+still eine leere `Grant` zurückgibt, soll ein Operator, der gerade eine Freigabe bearbeitet, einen
+kaputten Bestand sofort sehen, nicht stillschweigend überschreiben); `write:` impliziert `read:`
+(Plan §1.2.2) — `add-member --write` trägt den Namen deshalb nur in `write:` ein, keine Dopplung
+in `read:`. `remove-member` entfernt aus beiden Listen (vollständiger Widerruf, kein Flag nötig)
+und löscht die Datei ganz, wenn danach nichts Nennenswertes übrig bleibt (`.share.yml`s eigene
+"leer = nicht vorhanden"-Disziplin, analog Frontmatter §2.1). `remove-space --force` löscht den
+Verzeichnisbaum (`shutil.rmtree` + ein Commit) — **nicht** ohne `--force` (Trockenlauf-Default,
+druckt nur eine Vorschau), warnt immer, dass Git-Historie/Backups den Inhalt trotzdem behalten
+(Hard Rule 4/F2), und scannt **vor** dem Löschen alle `.share.yml` im Bestand auf verbleibende
+Referenzen auf den zu löschenden Space (Advisor-Fund: sonst produziert `remove-space` selbst
+genau die verwaisten Namen, die `check`/Abnahmezeile 24 später melden). `check` (neu, nicht im
+Plan-Text benannt, aber von der Step-6-DoD verlangt — "`diagnose.sh` meldet keine verwaisten
+Namen" kann nur berichten, was ein YAML-Parser ausgewertet hat, kein zweiter Parser in Bash,
+§2.2/V51) meldet `orphan_count`/`broken_count` als JSON.
 
-**`mcpserver/app.py`:** `own_space_writable = OwnSpaceWritable()` → `permissions =
-SharePolicy(store.acl_reader)`, an `build_mcp()` und `api_routes()` unverändert durchgereicht
-(kein Signaturbruch, wie vom Plan vorhergesagt).
+**`phase3_edge/scripts/diagnose.sh`, Prüfung 12 (neu):** liest `DATA_ROOT`/`VENV` aus
+`local.env` (dasselbe Sourcing-Muster wie Prüfung 5), ruft `spacectl.py check --json` über den
+venv-Python auf, wertet `orphan_count + broken_count` aus (`python -c` auf dem JSON-Strom,
+dasselbe Muster wie `abnahme_run.sh` — kein `jq`, kein zweiter JSON-Parser im Repo). INFO/
+WARNUNG-Kategorie wie Prüfung 9/11, kein Abbruchkriterium — DATA_ROOT ist unter dem Dienst
+gesetzt, nicht unter der Bash-Session, ein fehlendes `local.env` ist kein Fehlerzustand für
+dieses Skript. **Manuell simuliert, nicht nur `bash -n`:** ein Wegwerf-`DATA_ROOT` mit zwei
+Spaces und einer Freigabe angelegt, den geteilten Space per `shutil.rmtree` entfernt, Block 12
+Zeile für Zeile gegen dieses Szenario gefahren — `orphan_count: 1`, korrekt den entfernten
+Namen benannt. Scratch-Verzeichnis danach entfernt.
 
-**`mcpserver/tools.py`, alle sieben Tools:** `get_item`/`update_item`/`append_to_item`/
-`patch_item` lösen ihre Rechte jetzt über `store.acl_of(item_id)` statt `store.space_of(item_id)`
-auf. `get_item` hält die „eigen"-Frage bewusst in zwei Variablen (Advisor-Fund, siehe Planungs-
-Session): `writable` (steuert `repair_drift`) ist nicht dasselbe wie „gehört der Space" (steuert
-den `<untrusted_content>`-Wrap, P6-O — ein geteiltes, aber schreibbares Item bleibt trotzdem
-gewrappt). `search_items` filtert jetzt item-weise über `can_read_item` statt space-weise über
-`visible_spaces` (Pflicht, nicht Komfort — sonst würde ein einzeln freigegebenes Item entweder
-seinen ganzen Ordner mit sichtbar machen oder space-weise verschwinden, je nachdem wie
-vorgefiltert würde) und bekommt einen `folder`-Parameter. `list_spaces` zeigt jetzt `members`/
-`folders` je Space und zieht `visibility: human`-Items aus den `item_count`-Zählern ab (P6-P
-gilt wörtlich auch für diese Zähler, nicht nur für `search_items/total`). `create_item` bekommt
-`space=`/`folder=` (P6-U: Ziel-Space per Default die eigene, ein anderer nur mit `write:` in
-deren `.share.yml`). `update_item` bekommt `folder=` (mit dem Fail-Closed-Riegel von oben);
-`visibility`/`share_read`/`share_write` bleiben verboten (P6-M, unverändert). Die generische
-`PermissionDenied`-Fehlermeldung (`map_storage_error`) wurde umformuliert — sie deckt jetzt drei
-Ursachen ab (fremder Space, ungeteiltes Item, `visibility: human`), die alte Formulierung
-("ist nicht dein Space") wäre für den dritten Fall (eigener Space, aber `visibility: human`)
-schlicht falsch gewesen.
+**Tests, beide Dateien neu (`importlib.util.spec_from_file_location`-Ladepfad wie
+`test_authctl.py`, Skripte liegen in keinem Python-Paket):** `test_spacectl.py` (20 Tests:
+DATA_ROOT-Auflösung, create/list/show, add/remove-member inkl. write-impliziert-read und
+Verwaisungswarnung, remove-space Dry-Run vs. `--force`, `check` sauber/verwaist/kaputt) +
+`test_migrate_visibility.py` (8 Tests: Dry-Run-Default schreibt nichts, Report-Inhalt, Version
+bleibt unverändert, bereits gesetztes `visibility` bleibt unangetastet, ein Commit je Space bei
+mehreren Items, zwei Commits bei zwei Spaces, DATA_ROOT-Auflösung). Beide Dateien injizieren
+`env` in `main()` (nie `os.environ` direkt) und filtern `SHAREFYX_*`/`SFX_*` vor dem Aufruf
+(P5-Lehre, memory `feedback_test_harness_never_inherits_env` — hier ohne reale Wirkung, da
+keines der Skripte `systemctl` aufruft, aber dieselbe Disziplin durchgehalten, nicht erst bei
+Bedarf nachgerüstet).
 
-**`webui/api.py` + `webui/serializers.py`:** dieselbe Umstellung mit `Surface.HUMAN` (über
-`can_read_item_as_human()`, siehe oben). `_items_get` filtert item-weise (inkl. `folder`-Query-
-Parameter); `_items_get_one`/`_items_patch`/`_items_append`/`_items_archive` auf `acl_of()`+
-`can_write_item` umgestellt. `serializers.py`: `item_to_json`/`summary_to_json` bekommen
-`folder`/`visibility`/`share_read`/`share_write`/`shared`; `readonly` wird weiterhin vom
-Aufrufer übergeben (keine Store-Aufrufe in `serializers.py`), jetzt aber ACL-basiert statt
-reiner Space-Identität. `search_to_json()` ist auf eine dünne Hülle um bereits fertige
-Item-Dicts geschrumpft (die ACL-Auflösung braucht `store.acl_reader`, das gehört in `api.py`,
-nicht in die reine Übersetzungsschicht). `space_to_json` bekommt `members`/`folders`.
-**Bewusst nicht Teil dieses Steps** (Step 5s Dateiliste nennt sie nicht, gehören zu Steps 7/8):
-`kind: own|shared|foreign` auf Spaces, `/api/v1/meta`s neue Felder, `/api/v1/items/{id}/share`,
-`GET /api/v1/overview`s `human`-Zähler (bräuchte einen `Store.search(visibility=)`-Filter, den
-es nicht gibt, oder einen Rohscan — `_overview()` bleibt unangetastet).
+**Zweite Advisor-Runde, nach dem ersten Entwurf, vor dem Commit — ein Fund übernommen:**
+`_cmd_remove_member` prüfte anders als `_cmd_add_member` nie, ob der Ziel-Space überhaupt
+existiert — bei einem Tippfehler im Space-Namen liefert `_load_share_file()` `{}` (Datei fehlt
+ja tatsächlich), `removed` bleibt leer, das Skript druckt „war in keiner Liste" und `EXIT_OK`.
+Harmlos im Ergebnis, aber aus dem falschen Grund: die „kein Schreibzugriff"-Eigenschaft hing an
+einer leeren Liste, nicht an einer Prüfung — ein Operator, der `remove-member niklsa fabian`
+tippt, bekommt eine fröhliche Erfolgsmeldung und glaubt, die Freigabe sei weg, obwohl nie ein
+echter Space namens `niklsa` existierte. Behoben: derselbe `ABBRUCH`-Guard wie in `add-member`,
+plus `test_remove_member_on_unknown_space_aborts_instead_of_false_success`. **20 statt 19 Tests
+in `test_spacectl.py`, 28 statt 27 insgesamt** — Zahlen unten schon korrigiert, nicht als
+spätere Drift stehen gelassen (die elf dokumentierten Instanzen dieser Drift-Kategorie in
+`phase2_mcp/CLAUDE.md` waren Warnung genug).
 
-**Testfolge, mandatiert vom Plan (§4 Step 5, zwölf Pflichttests) plus der eine Fail-Closed-
-Ergänzung:** elf der zwölf sind neu in `phase2_mcp/tests/test_tools.py`/`test_permissions.py`
-gebaut (die zwölfte, `test_acl_of_does_not_read_the_item_file`, existierte schon seit Step 4 in
-`phase1_storage/tests/test_store.py`). Mehrere bestehende Tests mussten auf die neuen Semantiken
-umgeschrieben werden, nicht nur die Fixtures — das ist die eigentliche Substanz dieser Session,
-kein Nebeneffekt: `OwnSpaceWritable` machte jeden fremden Space universell lesbar
-(`readonly=True`, aber `200`); ohne Freigabe ist ein fremdes Item jetzt unsichtbar/`403`
-(`test_get_item_from_foreign_space_without_share_is_forbidden` ersetzt das alte "immer
-lesbar"-Verhalten, `test_spaces_omits_foreign_space_without_a_share` ebenso auf der REST-Seite).
-Betroffen waren auch die beiden Isolationstests in `phase2_mcp/tests/test_app.py`
-(`test_principal_isolation_under_concurrency`, `test_all_seven_tools_are_callable_over_http`) —
-Ersterer bekam eine STRENGERE Zusicherung (fremder Space fehlt jetzt ganz, statt nur
-`writable=False`), Letzterer eine `.share.yml`, weil er den fremden Lese-Pfad ausdrücklich
-demonstriert. Dieselbe Anpassung war für `phase2_mcp/scripts/mcp_smoke.py` und
-`phase5_ui/scripts/ui_smoke.py` nötig (beide seeden seit P2/P5 einen fremden Space, ohne den
-wären ihre eigenen „fremd lesen"-Prüfungen ab jetzt am neuen Fail-Closed-Default gescheitert,
-nicht an einem Bug) — beide Skripte demonstrieren den Lese-Pfad in einen geteilten Space
-absichtlich, deshalb hier bewusst `read: [<eigener Space>]` gesetzt statt den Test zu entschärfen.
+**Verifiziert:** `pytest -q` (gesamtes Repo) → **722 passed** (694 + 20 + 8, keine Regression),
+Zahl der beiden neuen Dateien per `pytest --collect-only -q` nachgezählt, nicht aus dem
+Schreibprozess geschätzt. `git status --short` nach den Testläufen zeigt außerhalb der neuen
+Dateien nur `phase6_shares/CLAUDE.md`/`docs/INDEX.md` (Doc-Update) und `phase3_edge/scripts/
+diagnose.sh` — kein `storage/`/`mcpserver/`/`authserver/`-Touch, wie für einen reinen
+Tooling-Step erwartet.
 
-**Verifiziert:** `pytest -q` (gesamtes Repo) → **691 passed** (671 + 9 `test_tools.py` + 7
-`test_permissions.py` + 2 `test_api.py` + 2 `test_serializers.py`, keine Regression sonst).
-Charakterisierungs-Goldens liefen isoliert vor+direkt nach dem `storage/acl.py`/`store.py`-Schritt
-grün (oben) UND am Ende erneut. `git status --short` zeigt ausschließlich `storage/`,
-`mcpserver/`, `phase2_mcp/{scripts,tests}`, `phase5_ui/{scripts,tests,webui}` — kein
-`authserver/`-Touch, wie erwartet (P6-C erlaubt `storage`/`mcpserver`/`tools.py`/
-`permissions.py`, nicht `authserver`). **Real ausgeführt, nicht nur `pytest`** (`SHAREFYX_*`/
-`SFX_*` aus der Umgebung entfernt, wie nach dem 52-Neustart-Vorfall Pflicht): `phase2_mcp/
-scripts/mcp_smoke.py --json` (13/13 `ok:true`), `phase5_ui/scripts/ui_smoke.py --json` (12/12
-`ok:true`), `phase5_ui/scripts/ui_budget.py --json` (alle Budgets `ok:true`, echte
-220-Item-Messung, `all_within_budget:true`).
+**Status:** Step 6 ist **gebaut und unit-verifiziert**, nicht live geprüft — insbesondere ist
+`migrate_visibility.py --apply` bisher ausschließlich gegen `tmp_path`-Wegwerfverzeichnisse
+gelaufen, nie gegen den echten `DATA_ROOT` (Hard Rule: kein Test gegen den echten `DATA_ROOT`
+durch Claude Code). DoD hat einen Live-Anteil, der laut Root-Prompt Sache des Nikingers ist
+(echter dritter Nutzer, echter `diagnose.sh`-Lauf gegen den realen `DATA_ROOT`) — dieselbe
+Aufteilung wie bei Steps 4/5 ("noch nicht live geprüft, kein eigener Abnahmematrix-Punkt"). Kein
+MCP-Tool/`storage`-Kern-Code geändert — reine neue Operator-Skripte plus eine
+`diagnose.sh`-Prüfung, wie geplant.
 
-**Status:** Step 5 ist damit **gebaut**, DoD aus Plan §4 Step 5 erfüllt (zwölf Pflichttests +
-Fail-Closed-Ergänzung grün, reale Skript-Läufe grün). Kein eigener Abnahmematrix-Punkt für
-diesen Step — die Live-Prüfung kommt mit den nutzerseitig sichtbaren Steps 6/7 (Verwaltung/
-Migration, UI), Zeilen 8–18 der Abnahmematrix.
-
-**Nachtrag, 2026-08-12, zweiter — Advisor-Fund nach dem ersten Step-5-Commit, sofort behoben
-statt als offener Befund liegen gelassen:** `can_write_item` hatte keinen `surface`-Parameter
-und keine `visibility`-Prüfung (Plan §1.2.4s Snippet gibt ihr keinen) — ein `visibility:
-human`-Item war damit für die Agentenfläche zwar unlesbar (`can_read_item` sperrte korrekt),
-aber weiterhin voll beschreibbar über den eigenen Space-Token: `append_to_item`/`update_item`
-erreichten `store.append()`/`update()` ungehindert, und ein Versionskonflikt hätte sogar
-Version/Zeitstempel des angeblich „vollständig nicht existenten" Items (P6-P) in der
-Fehlermeldung preisgegeben. Anders als der Folder-Fund oben war das kein Plan-Zweifelsfall,
-sondern ein Widerspruch zum Plan-Text selbst — kein Anlass für eine Nikinger-Rückfrage, sofort
-korrigiert: `can_write_item`/`Permissions`-Protokoll bekommen denselben `surface`-Parameter wie
-`can_read_item` (dieselbe Sperre: `Surface.AGENT` + `visibility=="human"` ⇒ `False`), plus
-`can_write_item_as_human()` als Zwilling zu `can_read_item_as_human()` (P5-B, kein zweiter
-`mcpserver`-Import im REST-Adapter). Alle sechs `tools.py`-Aufrufstellen und alle fünf
-`webui/api.py`-Aufrufstellen nachgezogen. Drei neue Tests
-(`test_can_write_item_human_only_blocks_agent_surface_even_for_owner`/
-`test_can_write_item_as_human_is_equivalent_to_explicit_human_surface` in
-`test_permissions.py`, `test_human_only_item_cannot_be_written_on_agent_surface` in
-`test_tools.py` — bewusst inklusive eines Versionskonflikt-Versuchs, um das Leck explizit
-auszuschließen, nicht nur den einfachen Schreibversuch). **694 Tests gesamt** (691 + 3).
-Charakterisierungs-Goldens und alle drei Live-Skripte erneut grün, nach dem Fix.
-
-**Vier weitere Advisor-Funde, nicht blockierend, bewusst nicht hier gefixt — als Eingabe für
-spätere Steps festgehalten statt stillschweigend verloren:**
-1. **Diese Änderung kippt reales Verhalten schon vor Step 6.** Nichts im echten Betrieb trägt
-   heute eine `.share.yml`/`share_read` — sobald `deploy.sh` diesen Stand ausliefert, sieht
-   Fabian Niklas' Space in `/api/v1/spaces`/`/api/v1/items` nicht mehr (Abnahmezeile 8s
-   Zielzustand, nur **vor** `migrate_visibility.py`, nicht danach). Der Step-3-Banner hat das
-   angekündigt, ist also keine Überraschung — aber der Nikinger sollte den Deploy-Zeitpunkt
-   bewusst wählen, nicht nur das „ob".
-2. **Ein reiner Ordner-Share lässt den Space unauffindbar.** `can_read`/`visible_spaces` lesen
-   nur die Space-Wurzel-`.share.yml` (`grants_for_space`). Ein Space, der nur über
-   `space/ordner/.share.yml` geteilt ist, liefert über `search_items`/`GET /api/v1/items`
-   durchaus Treffer (item-weise gefiltert), taucht aber nie in `/api/v1/spaces` auf — Step 7s
-   Navigationsbaum baut genau darauf auf. Eingabe für Step 7, nicht hier zu lösen.
-3. **`get_item` auf ein ungeteiltes fremdes Item liefert `write_denied` statt eines
-   Existenz-neutralen Fehlers** — anders als Plan §1.7.3/Abnahmezeile 22 für Assets
-   ("404, nicht 403, kein Existenzleck"). IDs sind 8 Hex-Zeichen, Enumeration ist unpraktikabel,
-   aber die Asymmetrie ist jetzt ein erreichbarer Pfad (vorher totes `can_read`-Immer-True), kein
-   bloßer Seam mehr — eine bewusste Entscheidung wert, nicht automatisch nachziehen.
-4. **`acl_of()` liest `share_*` aus dem Index, nicht aus der Datei** (bewusst, index-only ist der
-   ganze Sinn) — ein Mensch, der eine Freigabe von Hand aus dem Frontmatter entfernt, sieht sie
-   im Index für ein Request-Fenster noch als aktiv, weil `acl_of()` bewusst vor jedem
-   drift-reparierenden `get()` läuft. Plan-gedeckt, aber das Fenster gehört benannt, damit Step 6s
-   `spacectl.py`/UI als der vorgesehene Weg verstanden wird, nicht nur als der bequeme.
-
-**Nächster Schritt (konkret):** Step 6 (Verwaltung und Migration) — `phase6_shares/scripts/
-spacectl.py` (neu, `create-space`/`list-spaces`/`add-member`/`remove-member`/`show`/
-`remove-space`), `phase6_shares/scripts/migrate_visibility.py` (neu, `--dry-run` Default,
-schreibt `visibility: private` in Bestandsdateien ohne das Feld), `phase3_edge/scripts/
-diagnose.sh`-Erweiterung. DoD: ein geteilter Space existiert real, ein dritter Nutzer ist
-angelegt, `diagnose.sh` meldet keine verwaisten Namen. Gate-A→B-Punkt-3-Erinnerung bleibt
-gültig (frühestens 2026-08-28), unabhängig vom Baufortschritt hier.
+**Nächster Schritt (konkret):** Sonderauftrag ("mindestens Step 6") ist erfüllt — Rückmeldung an
+den Nikinger vor Fortsetzung. **Empfehlung für den ersten echten Lauf, bevor der
+Sichtbarkeits-Cutover live geht:** `migrate_visibility.py --data-root <echter DATA_ROOT>`
+(Default `--dry-run`) einmal gegen den realen Bestand laufen lassen, den JSON-Report durchsehen
+(Anzahl migrierter Items plausibel? welche Spaces betroffen?), **erst danach** `--apply` — genau
+der Grund, warum dieses Skript existiert statt einer von Hand editierten `.share.yml`. Falls
+weiter im Plan: Step 7 (UI Dateisystem, `webui/shares.py`, `app.js`-Split, Freigabedialog +
+Re-Auth) ist der nächste Schritt, deutlich größerer Umfang (JS ohne Unit-Tests laut
+P5-Konvention, `[VERIFY]` V43/V50) — kein Selbstläufer aus dieser Session heraus.
+Gate-A→B-Punkt-3-Erinnerung bleibt unverändert gültig (frühestens 2026-08-28).
