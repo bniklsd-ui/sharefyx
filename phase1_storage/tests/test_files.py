@@ -1,13 +1,19 @@
 import re
+from pathlib import Path
 
 import pytest
 
+from storage.errors import ValidationError
 from storage.files import (
+    MAX_FOLDER_DEPTH,
+    RESERVED_DIR_NAMES,
     atomic_write,
+    folder_from_path,
     generate_id,
     item_filename,
     item_path,
     slugify,
+    validate_folder,
 )
 
 ID_RE = re.compile(r"\Aitm_[0-9a-f]{8}\Z")
@@ -93,6 +99,70 @@ def test_atomic_write_crash_preserves_existing_target(tmp_path, monkeypatch):
         atomic_write(target, "sollte nicht ankommen\n")
 
     assert target.read_text() == "alter inhalt\n"
+
+
+def test_item_path_places_file_under_folder(tmp_path):
+    path = item_path(tmp_path, "nikinger", "itm_a1b2c3d4", "kuehlschrank", folder="projekte/alpha")
+    assert path == tmp_path / "nikinger" / "projekte" / "alpha" / "itm_a1b2c3d4__kuehlschrank.md"
+
+
+def test_item_path_default_folder_is_unchanged():
+    assert item_path(Path("/root"), "s", "itm_x", "slug") == Path("/root/s/itm_x__slug.md")
+
+
+# -- P6 Step 4: validate_folder / folder_from_path -----------------------------------------
+
+
+def test_validate_folder_empty_stays_empty():
+    assert validate_folder("") == ""
+
+
+def test_validate_folder_slugifies_each_segment():
+    assert validate_folder("Projekte/Älpha") == "projekte/aelpha"
+
+
+def test_validate_folder_rejects_depth_beyond_max():
+    assert MAX_FOLDER_DEPTH == 2
+    with pytest.raises(ValidationError):
+        validate_folder("a/b/c")
+
+
+def test_validate_folder_rejects_reserved_names():
+    for reserved in RESERVED_DIR_NAMES:
+        with pytest.raises(ValidationError):
+            validate_folder(reserved)
+
+
+def test_validate_folder_rejects_deep_traversal_via_depth_check(tmp_path):
+    # ".." zaehlt als eigenes Segment -- bei genuegend Ebenen greift der Tiefen-Check, bevor
+    # slugify() ueberhaupt laeuft (Advisor-Fund: kein dedizierter Traversal-Check noetig, aber
+    # das Verhalten muss gepinnt sein, nicht nur "zufaellig sicher").
+    with pytest.raises(ValidationError):
+        validate_folder("../../etc")
+
+
+def test_validate_folder_shallow_traversal_is_rewritten_not_rejected():
+    # Innerhalb der erlaubten Tiefe wird ".." NICHT durchgereicht (kein Escape moeglich, path
+    # bleibt immer unter data_root/space) -- slugify("..") faellt auf den "item"-Fallback
+    # zurueck (kein alnum-Zeichen ueberlebt), das Ergebnis ist eine stille Umbenennung, kein
+    # Fehler. Bewusst gepinnt, nicht als Bug behandelt: der Aufrufer bekommt einen harmlosen,
+    # aber ueberraschenden Ordnernamen statt eines klaren Fehlers.
+    assert validate_folder("../x") == "item/x"
+
+
+def test_folder_from_path_roundtrips_with_item_path(tmp_path):
+    path = item_path(tmp_path, "nikinger", "itm_a1b2c3d4", "titel", folder="projekte/alpha")
+    assert folder_from_path(tmp_path, "nikinger", path) == "projekte/alpha"
+
+
+def test_folder_from_path_top_level_is_empty(tmp_path):
+    path = item_path(tmp_path, "nikinger", "itm_a1b2c3d4", "titel")
+    assert folder_from_path(tmp_path, "nikinger", path) == ""
+
+
+def test_folder_from_path_archive_is_never_a_folder(tmp_path):
+    path = tmp_path / "nikinger" / "_archive" / "itm_a1b2c3d4__titel.md"
+    assert folder_from_path(tmp_path, "nikinger", path) == ""
 
 
 def test_slug_collision_does_not_overwrite(tmp_path):

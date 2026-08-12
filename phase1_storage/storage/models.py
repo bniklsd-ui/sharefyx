@@ -9,6 +9,10 @@ from datetime import date, datetime
 from typing import Any
 
 
+VISIBILITY_VALUES: frozenset[str] = frozenset({"private", "human"})
+DEFAULT_VISIBILITY = "private"
+
+
 @dataclass(kw_only=True)
 class Item:
     """Ein Note- oder Task-Item. `type` unterscheidet die Bedeutung, keine Subklasse (Entscheidung B)."""
@@ -25,6 +29,11 @@ class Item:
     created: datetime
     updated: datetime
     version: int
+    # P6 Step 4 (Plan §1.4): `folder` ist abgeleitet aus dem Dateipfad, NIE Frontmatter.
+    folder: str = ""
+    visibility: str = DEFAULT_VISIBILITY
+    share_read: list[str] = field(default_factory=list)
+    share_write: list[str] = field(default_factory=list)
     # Unbekannte Frontmatter-Felder — überleben Round-Trips unangetastet (Entscheidung A).
     extra: dict[str, Any] = field(default_factory=dict)
 
@@ -35,6 +44,9 @@ class SpaceInfo:
 
     name: str
     item_count: int
+    # P6 Step 4: write-Mitglieder der Space-Wurzel-`.share.yml` bzw. vorhandene Ordner, sortiert.
+    members: tuple[str, ...] = ()
+    folders: tuple[str, ...] = ()
 
 
 @dataclass(kw_only=True)
@@ -53,6 +65,10 @@ class ItemSummary:
     updated: datetime
     version: int
     snippet: str
+    folder: str = ""
+    visibility: str = DEFAULT_VISIBILITY
+    share_read: list[str] = field(default_factory=list)
+    share_write: list[str] = field(default_factory=list)
 
 
 @dataclass(kw_only=True)

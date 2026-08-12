@@ -1,6 +1,14 @@
 from datetime import datetime, timezone
 
-from storage.models import IndexStats, Item, ItemSummary, SearchResult, SpaceInfo
+from storage.models import (
+    DEFAULT_VISIBILITY,
+    VISIBILITY_VALUES,
+    IndexStats,
+    Item,
+    ItemSummary,
+    SearchResult,
+    SpaceInfo,
+)
 
 
 def _now():
@@ -23,6 +31,16 @@ def test_item_defaults():
     assert item.tags == []
     assert item.links == []
     assert item.extra == {}
+    assert item.folder == ""
+    assert item.visibility == DEFAULT_VISIBILITY
+    assert item.share_read == []
+    assert item.share_write == []
+
+
+def test_visibility_values_and_default():
+    assert VISIBILITY_VALUES == frozenset({"private", "human"})
+    assert DEFAULT_VISIBILITY == "private"
+    assert DEFAULT_VISIBILITY in VISIBILITY_VALUES
 
 
 def test_search_result_holds_summaries_not_full_items():
@@ -43,5 +61,8 @@ def test_search_result_holds_summaries_not_full_items():
 
 
 def test_space_info_and_index_stats_construct():
-    SpaceInfo(name="nikinger", item_count=3)
+    info = SpaceInfo(name="nikinger", item_count=3)
+    assert info.members == ()
+    assert info.folders == ()
+    SpaceInfo(name="fabian", item_count=1, members=("dritter",), folders=("projekte",))
     IndexStats(items_indexed=3, duration_seconds=0.02)

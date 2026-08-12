@@ -5,6 +5,7 @@ testbar (siehe Phase-Mission in `phase1_storage/CLAUDE.md`).
 from __future__ import annotations
 
 import fcntl
+import json
 import sqlite3
 import threading
 from collections.abc import Sequence
@@ -15,15 +16,26 @@ from pathlib import Path
 from typing import Any, Callable
 
 from . import files, history, index
+from .acl import AclDecision, AclReader
 from .errors import ConflictError, ItemNotFound, ValidationError
 from .frontmatter import parse as parse_frontmatter
 from .frontmatter import serialize as serialize_frontmatter
-from .models import IndexStats, Item, ItemSummary, SearchResult, SpaceInfo, STATUS_VALUES, valid_statuses
+from .models import (
+    DEFAULT_VISIBILITY,
+    VISIBILITY_VALUES,
+    IndexStats,
+    Item,
+    ItemSummary,
+    SearchResult,
+    SpaceInfo,
+    STATUS_VALUES,
+    valid_statuses,
+)
 from .patch import PatchResult, TextEdit, apply_edits
 
 _KNOWN_FIELDS = {
     "id", "space", "type", "title", "status", "due", "tags", "links",
-    "created", "updated", "version",
+    "created", "updated", "version", "visibility", "share_read", "share_write",
 }
 _DEFAULT_STATUS = {"task": "open", "note": "active"}
 # Vom Store selbst verwaltet — dürfen nie über **fields/**changes hereinkommen, sonst
@@ -53,7 +65,7 @@ def _format_dt(value: datetime) -> str:
     return value.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def _item_from_text(text: str, *, version_override: int | None = None) -> Item:
+def _item_from_text(text: str, *, version_override: int | None = None, folder_override: str = "") -> Item:
     fields, body = parse_frontmatter(text)
     extra = {k: v for k, v in fields.items() if k not in _KNOWN_FIELDS}
     return Item(
@@ -69,6 +81,10 @@ def _item_from_text(text: str, *, version_override: int | None = None) -> Item:
         created=_parse_dt(fields["created"]),
         updated=_parse_dt(fields["updated"]),
         version=version_override if version_override is not None else fields["version"],
+        folder=folder_override,
+        visibility=fields.get("visibility", DEFAULT_VISIBILITY),
+        share_read=list(fields.get("share_read", []) or []),
+        share_write=list(fields.get("share_write", []) or []),
         extra=extra,
     )
 
@@ -88,6 +104,17 @@ def _item_to_text(item: Item) -> str:
     fields["created"] = _format_dt(item.created)
     fields["updated"] = _format_dt(item.updated)
     fields["version"] = item.version
+    # P6 Step 4: nur schreiben, wenn vom Default abweichend (Plan §2.1: "leer = nicht
+    # vorhanden") -- sonst bekäme jedes bestehende Item beim nächsten Write ein stilles
+    # `visibility: private`, obwohl das explizit Aufgabe von `migrate_visibility.py` (Step 6)
+    # ist, nicht ein Nebeneffekt dieses Schritts. `folder` erscheint hier nie -- abgeleitet,
+    # nie Frontmatter.
+    if item.visibility != DEFAULT_VISIBILITY:
+        fields["visibility"] = item.visibility
+    if item.share_read:
+        fields["share_read"] = list(item.share_read)
+    if item.share_write:
+        fields["share_write"] = list(item.share_write)
     fields.update(item.extra)
     return serialize_frontmatter(fields, item.body)
 
@@ -123,6 +150,8 @@ def _summary(item: Item) -> ItemSummary:
         due=item.due, tags=list(item.tags), links=list(item.links),
         created=item.created, updated=item.updated, version=item.version,
         snippet=_snippet(item.body),
+        folder=item.folder, visibility=item.visibility,
+        share_read=list(item.share_read), share_write=list(item.share_write),
     )
 
 
@@ -139,9 +168,16 @@ class Store:
         self._git_enabled = git
         self._lock = threading.RLock()
         self._db_path = self._data_root / ".index.sqlite3"
-        self._conn = index.connect(self._db_path)
+        self._conn, rebuilt = index.connect(self._db_path)
+        self._acl = AclReader(self._data_root)
         if self._git_enabled:
             history.ensure_repo(self._data_root)
+        if rebuilt:
+            # Das Schema wurde gerade leer (neu) angelegt (V46-Fix, siehe index.connect()) --
+            # ohne diesen Aufruf bliebe ein echter Dienst-Neustart nach einem Schema-Sprung
+            # dauerhaft mit leerem Index laufen, weil `serve.py` `rebuild_index()` sonst nie
+            # aufruft. Dateien sind die Wahrheit (Hard Rule 2), das hier ist billig.
+            self.rebuild_index()
 
     # -- Sperren -----------------------------------------------------------------
 
@@ -173,7 +209,17 @@ class Store:
 
     def _row_to_item(self, row: sqlite3.Row) -> Item:
         path = self._data_root / row["path"]
-        return _item_from_text(path.read_text(encoding="utf-8"), version_override=row["version"])
+        # `folder` wird aus dem Pfad NEU abgeleitet, nicht aus `row["folder"]` übernommen: die
+        # Index-Spalte ist reine Ableitung (Hard Rule 2), kein autoritativer Wert. Würde ein
+        # veralteter/falscher Index-Wert hier direkt durchgereicht, würde ihn `update()` beim
+        # nächsten Schreibvorgang über `_write_item_file`s Zielpfad-Berechnung ungefragt zur
+        # Wahrheit machen und die Datei verschieben — "ein Index-Fehler fasst nie eine Datei an"
+        # (`phase1_storage/CLAUDE.md`) gilt auch hier.
+        return _item_from_text(
+            path.read_text(encoding="utf-8"),
+            version_override=row["version"],
+            folder_override=files.folder_from_path(self._data_root, row["space"], path),
+        )
 
     def _reconcile_and_get_row(self, item_id: str, *, repair_drift: bool = True) -> sqlite3.Row:
         """Liest die Indexzeile, erkennt externe Edits (Entscheidung D) und reindiziert bei
@@ -232,7 +278,7 @@ class Store:
         Muss unter `self._lock` **und** `self._file_write_lock()` aufgerufen werden.
         """
         slug = files.slugify(item.title)
-        target_path = files.item_path(self._data_root, item.space, item.id, slug)
+        target_path = files.item_path(self._data_root, item.space, item.id, slug, folder=item.folder)
         write_path = old_path if old_path is not None else target_path
         write_path.parent.mkdir(parents=True, exist_ok=True)
         files.atomic_write(write_path, _item_to_text(item))
@@ -246,11 +292,63 @@ class Store:
     # -- Öffentliche API (Plan §2) ---------------------------------------------------
 
     def list_spaces(self) -> list[SpaceInfo]:
+        """Vereinigung aus Verzeichnissen unter `data_root` und Indexzeilen (P6 Step 4, Plan
+        §1.4) — ein frisch angelegter geteilter Space ohne Item wäre sonst unsichtbar (derselbe
+        Fund wie B1 aus der P2-Adapter-Abnahme, eine Ebene höher). `members` kommt aus der
+        Space-Wurzel-`.share.yml`, `folders` aus einem sortierten Verzeichnis-Walk ohne
+        `RESERVED_DIR_NAMES`.
+        """
         with self._lock:
             counts: dict[str, int] = {}
             for row in index.all_rows(self._conn):
                 counts[row["space"]] = counts.get(row["space"], 0) + 1
-            return [SpaceInfo(name=name, item_count=count) for name, count in sorted(counts.items())]
+            disk_spaces = {
+                p.name for p in self._data_root.iterdir()
+                if p.is_dir() and not p.name.startswith(".")
+            }
+            names = sorted(set(counts) | disk_spaces)
+            result = []
+            for name in names:
+                space_dir = self._data_root / name
+                members = tuple(sorted(self._acl.members_of_space(name)))
+                folders: tuple[str, ...] = ()
+                if space_dir.is_dir():
+                    folders = tuple(sorted(
+                        d.relative_to(space_dir).as_posix()
+                        for d in space_dir.rglob("*")
+                        if d.is_dir()
+                        and not any(part in files.RESERVED_DIR_NAMES for part in d.relative_to(space_dir).parts)
+                    ))
+                result.append(SpaceInfo(
+                    name=name, item_count=counts.get(name, 0), members=members, folders=folders,
+                ))
+            return result
+
+    def acl_of(self, item_id: str) -> AclDecision:
+        """Rechte eines Items, ausschließlich aus dem Index — liest die Item-DATEI NICHT
+        (gleiche Eigenschaft wie `space_of()`, P2: sicher aufrufbar, BEVOR feststeht, ob der
+        Zugriff überhaupt erlaubt ist).
+        """
+        with self._lock:
+            row = index.get_item_row(self._conn, item_id)
+        if row is None:
+            raise ItemNotFound(item_id)
+        space = row["space"]
+        # Wie in `_row_to_item()`: aus dem Pfad abgeleitet, nicht aus `row["folder"]`
+        # übernommen — reine Pfad-Arithmetik, kein Datei-Lesezugriff, verletzt also nicht den
+        # "liest die Item-DATEI NICHT"-Vertrag oben.
+        folder = files.folder_from_path(self._data_root, space, self._data_root / row["path"])
+        directory = self._data_root / space / folder if folder else self._data_root / space
+        grant = self._acl.grants_for_dir(directory)
+        item_read = frozenset(json.loads(row["share_read_json"]))
+        item_write = frozenset(json.loads(row["share_write_json"]))
+        return AclDecision(
+            space=space, folder=folder, visibility=row["visibility"],
+            # `share_write` impliziert `share_read`, dieselbe Regel wie in `.share.yml`
+            # (Plan §1.2.2) -- sonst hätte ein Item mit `share_write: [x]` aber leerem
+            # `share_read` einen Schreiber, der nicht lesen darf, was keinen Sinn ergibt.
+            read=grant.read | item_read | item_write, write=grant.write | item_write,
+        )
 
     def space_of(self, item_id: str) -> str:
         """Space eines Items, ausschließlich über den Index. Schreibt nichts, liest keine Datei.
@@ -268,6 +366,8 @@ class Store:
         query: str | None = None,
         *,
         space: str | None = None,
+        spaces: list[str] | None = None,
+        folder: str | None = None,
         type: str | None = None,
         status: str | None = None,
         tag: str | None = None,
@@ -282,6 +382,10 @@ class Store:
 
         def matches(item: Item) -> bool:
             if space is not None and item.space != space:
+                return False
+            if spaces is not None and item.space not in spaces:
+                return False
+            if folder is not None and item.folder != folder:
                 return False
             if type is not None and item.type != type:
                 return False
@@ -316,21 +420,33 @@ class Store:
             row = self._reconcile_and_get_row(item_id, repair_drift=repair_drift)
             return self._row_to_item(row)
 
-    def create(self, space: str, *, type: str, title: str, body: str = "", **fields) -> Item:
+    def create(
+        self, space: str, *, type: str, title: str, body: str = "", folder: str = "", **fields
+    ) -> Item:
         with self._lock, self._file_write_lock():
             reserved = _SYSTEM_MANAGED_FIELDS & fields.keys()
             if reserved:
                 raise ValidationError(f"Felder {sorted(reserved)} sind vom Store verwaltet")
+            folder = files.validate_folder(folder)
             now = self._now_fn()
             status = fields.pop("status", _DEFAULT_STATUS.get(type, "active"))
             _check_type_and_status(type, status)
             due = _coerce_due(fields.pop("due", None))
             tags = fields.pop("tags", [])
             links = fields.pop("links", [])
+            visibility = fields.pop("visibility", DEFAULT_VISIBILITY)
+            if visibility not in VISIBILITY_VALUES:
+                raise ValidationError(
+                    f"Unbekannte visibility {visibility!r} — erlaubt: {sorted(VISIBILITY_VALUES)}"
+                )
+            share_read = fields.pop("share_read", [])
+            share_write = fields.pop("share_write", [])
             item = Item(
                 id=files.generate_id(), space=space, type=type, title=title, status=status,
                 body=body, due=due, tags=list(tags), links=list(links),
-                created=now, updated=now, version=1, extra=fields,
+                created=now, updated=now, version=1, folder=folder,
+                visibility=visibility, share_read=list(share_read), share_write=list(share_write),
+                extra=fields,
             )
             self._write_item_file(item, old_path=None, op="create")
             return item
@@ -353,6 +469,20 @@ class Store:
                     raise ValidationError(f"Feld '{key}' ist vom Store verwaltet, nicht änderbar")
                 if key == "due":
                     kwargs["due"] = _coerce_due(value)
+                elif key == "folder":
+                    # `Store.update()` erlaubt das Setzen -- die Sperre für Agenten
+                    # (visibility/share_read/share_write) sitzt eine Schicht höher in
+                    # `mcpserver.tools.update_item` (P6-M), nicht hier (`folder` selbst ist
+                    # nicht gesperrt, Agenten dürfen Items in Ordner verschieben).
+                    kwargs["folder"] = files.validate_folder(value)
+                elif key == "visibility":
+                    if value not in VISIBILITY_VALUES:
+                        raise ValidationError(
+                            f"Unbekannte visibility {value!r} — erlaubt: {sorted(VISIBILITY_VALUES)}"
+                        )
+                    kwargs["visibility"] = value
+                elif key in ("share_read", "share_write"):
+                    kwargs[key] = list(value)
                 elif key in known_updatable:
                     kwargs[key] = value
                 else:
@@ -430,7 +560,8 @@ class Store:
 
             old_path = self._data_root / row["path"]
             new_item = replace(
-                current, status="archived", version=current.version + 1, updated=self._now_fn(),
+                current, status="archived", folder="",
+                version=current.version + 1, updated=self._now_fn(),
             )
             slug = files.slugify(new_item.title)
             archive_path = (

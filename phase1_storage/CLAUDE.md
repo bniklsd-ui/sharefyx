@@ -7,7 +7,7 @@ up: ../CLAUDE.md
 down:
   - ../docs/concepts/phase1_storage_plan.md   # voller Plan, Entscheidungen A–H, Steps 0–7
   - SESSIONS_ARCHIVE.md                       # ältere Session-Blöcke
-updated: 2026-07-25
+updated: 2026-08-12 (P6 Step 4 -- dritte Contract-Oeffnung fortgesetzt: folder/visibility/share_*, acl.py, index-Rebuild-Fix)
 ---
 # CLAUDE.md — Phase 1: Storage-Kern (`phase1_storage/`)
 
@@ -94,12 +94,15 @@ P1 nicht abgeschlossen, egal wie viel Code existiert.
 | 7 | Query-Layer in `store.py` | 6 | ✅ | 2 (in `test_store.py`) |
 | 8 | `scripts/space_cli.py` | 7 | ✅ | 9 |
 | 9 | `patch.py` (neu) + `store.py :: patch()` | P6 Step 1 | ✅ | 5 (in `test_store.py`; die vier reinen `apply_edits()`-Funktionstests liegen in `phase6_shares/tests/test_patch.py`, außerhalb dieses Pakets) |
+| 10 | `acl.py` (neu) + `folder`/`visibility`/`share_read`/`share_write` in `models.py`/`store.py`/`index.py`/`files.py` — `Store.acl_of()`, `list_spaces()` verzeichnisbasiert, `index.connect()` liefert `(conn, rebuilt)` | P6 Step 4 | ✅ | 36 (1 `test_models.py` + 11 `test_files.py` + 4 `test_index.py` + 20 `test_store.py`) + 10 `phase6_shares/tests/test_acl.py` (außerhalb dieses Pakets) |
 
-**Gesamt: 81 Tests** (`70 Tests` war der Stand bei Phasenabschluss; **[2026-07-25 Korrektur,
+**Gesamt: 117 Tests** (`70 Tests` war der Stand bei Phasenabschluss; **[2026-07-25 Korrektur,
 P2 Step 0]:** `rename_for_new_slug()` samt zweier Tests entfernt, 70→68; **[2026-07-25,
 P2 Step 2]:** acht neue Tests für die drei freigegebenen Contract-Erweiterungen, 68→76 — siehe
 „Geerbte Contracts" unten; **[2026-08-09, P6 Step 1]:** fünf neue Tests für `Store.patch()`
-(dritte, benannte Contract-Öffnung, siehe unten), 76→81). Zielgröße am Phasenende: grob 60–90,
+(dritte, benannte Contract-Öffnung, siehe unten), 76→81; **[2026-08-12, P6 Step 4]:** 36 neue
+Tests für `folder`/`visibility`/`share_*`/`acl_of()`/`list_spaces()` (Fortsetzung derselben
+dritten Öffnung, siehe unten), 81→117). Zielgröße am Phasenende: grob 60–90,
 davon mindestens die vier Konflikt-Tests aus Step 4 — diese Zielgröße galt für den P1-Abschluss,
 P6 öffnet den Contract erneut benannt, siehe unten. Step 0 hat bewusst keine Tests (reines
 Skelett) — `pytest` lief dort grün mit `exit 5` („no tests ran", nicht `exit 0`); das ist die
@@ -138,6 +141,53 @@ erst dort — diese Öffnung deckt nur Step 1. Fünf neue Tests in `test_store.p
 
 Acht neue Tests in `phase1_storage/tests/test_store.py`, alle 76 Tests grün (siehe Modul-Status
 oben).
+
+**[2026-08-12, P6 Step 4] Fortsetzung derselben dritten Öffnung** (Plan §1.4, nicht eine vierte —
+Step 1 und Step 4 sind ein zusammenhängender, benannter Ausschlag desselben Contracts, siehe
+`phase6_shares/CLAUDE.md`s Step-0-Ankündigung). Deckt jetzt auch den Rest:
+- `models.py`: `VISIBILITY_VALUES`/`DEFAULT_VISIBILITY`; `Item`/`ItemSummary` bekommen `folder`
+  (abgeleitet, NIE Frontmatter), `visibility`, `share_read`, `share_write`; `SpaceInfo` bekommt
+  `members`/`folders`.
+- `acl.py` (neu): `Grant`/`AclDecision`/`AclReader` — löst `.share.yml`-Freigaben auf, fail-closed,
+  `stat()`-invalidierter Cache. `RESERVED_DIR_NAMES`/`MAX_FOLDER_DEPTH` leben bewusst in `files.py`
+  statt hier (Ordnerpfad-Validierung ist bereits dessen Job) — kleine, dokumentierte Abweichung vom
+  Plan-Snippet in §1.2.3, `acl.py` importiert von dort.
+- `files.py`: `item_path(..., folder="")`, `validate_folder()`, `folder_from_path()`.
+- `index.py`: vier neue Spalten (`folder`/`visibility`/`share_read_json`/`share_write_json`),
+  `INDEX_SCHEMA_VERSION = 2` über `PRAGMA user_version` (V46 geschlossen).
+- `store.py :: acl_of(item_id) -> AclDecision` (neu, index-only wie `space_of()`) · `create()`/
+  `update()` akzeptieren `folder`/`visibility`/`share_read`/`share_write` · `search()` bekommt
+  `spaces=`/`folder=` · `list_spaces()` jetzt verzeichnis- UND indexbasiert, mit `members`/`folders`.
+
+**Zweiter Advisor-Fund vor dem Commit:** `_row_to_item()`/`acl_of()` übernahmen `row["folder"]`
+zunächst direkt aus dem Index statt es aus dem Pfad neu abzuleiten — ein Verstoß gegen Entscheidung
+**A**/Hard Rule 2 in diesem Kopf oben ("Ein Index-Fehler fasst nie eine Datei an"): ein veralteter
+oder falscher Spaltenwert hätte beim nächsten `update()` die Datei bewegt. Behoben: beide rufen
+jetzt `files.folder_from_path()` auf dem echten Pfad; `acl_of()` bleibt dabei index-only (reine
+Pfad-Arithmetik, kein Datei-Lesezugriff). Details + der Rollback-Pfad, der das real erreichbar
+macht (altes Binary gegen v2-Index), stehen in `phase6_shares/CLAUDE.md`s Session-Block.
+
+**Ein echter operativer Fund während der Umsetzung, kein Plan-Text:** `Store.__init__` rief
+`rebuild_index()` nie auf, und `phase2_mcp/scripts/serve.py` (der reale Diensteinstieg) auch
+nicht — einziger Aufrufer war der manuelle `space_cli.py`-Befehl. Ein reiner Schema-Sprung hätte
+den Produktivindex beim nächsten Deploy leer zurückgelassen. Behoben als Teil dieser Öffnung:
+`index.connect()` liefert jetzt `(conn, rebuilt: bool)`, `Store.__init__` ruft bei `rebuilt=True`
+selbst `rebuild_index()`. Das erfüllt tatsächlich Entscheidung **G** aus P1 (`rebuild_index()`
+öffentlich **und beim Start**) — die zweite Hälfte war dokumentiert, aber nie verdrahtet, bis
+jetzt. Live bestätigt (nicht nur in `pytest`, das jeden `tmp_path` immer frisch auf Schema-Version
+2 startet und den Fehlerfall verdeckt hätte): `phase5_ui/scripts/ui_budget.py --json` gegen ein
+brandneues Temp-`DATA_ROOT` geloggt exakt `Index ... hat Schema-Version 0 (erwartet 2) — wird
+verworfen und leer neu angelegt`, danach lief der komplette Lauf (220 Items, echte MCP- und
+REST-Requests) sauber durch.
+
+Charakterisierungstests (P6-D, `phase6_shares/tests/test_characterization.py`, drei Golden Files)
+liefen vor UND nach dieser Öffnung byte-identisch grün — das ist der Seam-Beweis für diesen
+Umbau, siehe `phase6_shares/CLAUDE.md`. 36 neue Tests in `phase1_storage/` (1 `test_models.py` +
+11 `test_files.py` + 4 `test_index.py` + 20 `test_store.py` — die zwei zusätzlichen
+`test_files.py`-Tests pinnen `validate_folder()`s Traversal-Verhalten, zweiter Advisor-Fund) + 10 in
+`phase6_shares/tests/test_acl.py` (außerhalb dieses Pakets, gleiche Kategorie wie
+`test_patch.py`/`test_updates.py`). `git diff` auf `mcpserver/`/`webui/`/`authserver/` blieb leer
+— Step 4 bleibt vollständig innerhalb `storage/`, wie geplant (P6-C).
 
 ---
 

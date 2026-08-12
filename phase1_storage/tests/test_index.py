@@ -30,17 +30,41 @@ def _write_item(data_root, space, item_id, slug, *, title, due=None, tags=None, 
 
 
 def test_connect_creates_empty_schema(tmp_path):
-    conn = index.connect(tmp_path / ".index.sqlite3")
+    conn, rebuilt = index.connect(tmp_path / ".index.sqlite3")
     assert index.all_rows(conn) == []
+    assert rebuilt is True  # Datei existierte noch nicht
+
+
+def test_connect_reopen_with_matching_version_does_not_signal_rebuild(tmp_path):
+    db_path = tmp_path / ".index.sqlite3"
+    conn1, rebuilt1 = index.connect(db_path)
+    assert rebuilt1 is True
+    conn1.close()
+
+    conn2, rebuilt2 = index.connect(db_path)
+    assert rebuilt2 is False
+
+
+def test_connect_schema_version_mismatch_discards_and_signals_rebuild(tmp_path):
+    db_path = tmp_path / ".index.sqlite3"
+    conn1, _ = index.connect(db_path)
+    conn1.execute("PRAGMA user_version = 1")  # simuliert eine ältere Schema-Generation
+    conn1.commit()
+    conn1.close()
+
+    conn2, rebuilt2 = index.connect(db_path)
+    assert rebuilt2 is True
+    assert conn2.execute("PRAGMA user_version").fetchone()[0] == index.INDEX_SCHEMA_VERSION
 
 
 def test_upsert_get_delete_roundtrip(tmp_path):
-    conn = index.connect(tmp_path / ".index.sqlite3")
+    conn, _ = index.connect(tmp_path / ".index.sqlite3")
     row = {
         "id": "itm_a1b2c3d4", "space": "nikinger", "type": "task", "title": "Test",
         "status": "open", "due": None, "tags_json": "[]", "links_json": "[]",
         "created": "2026-07-24T18:20:00Z", "updated": "2026-07-24T18:20:00Z", "version": 1,
         "path": "nikinger/itm_a1b2c3d4__test.md", "mtime": 0.0, "size": 10, "sha256": "x",
+        "folder": "", "visibility": "private", "share_read_json": "[]", "share_write_json": "[]",
     }
     index.upsert_item(conn, row)
 
@@ -69,6 +93,35 @@ def test_row_from_file_extracts_expected_fields(tmp_path):
     assert row["tags_json"] == '["infra"]'
     assert row["path"] == "nikinger/itm_a1b2c3d4__kuehlschrank.md"
     assert row["size"] == path.stat().st_size
+    assert row["folder"] == ""
+    assert row["visibility"] == "private"
+    assert row["share_read_json"] == "[]"
+    assert row["share_write_json"] == "[]"
+
+
+def test_row_from_file_derives_folder_from_path(tmp_path):
+    nested = tmp_path / "nikinger" / "projekte" / "alpha"
+    nested.mkdir(parents=True)
+    _write_item(tmp_path, "nikinger", "itm_a1b2c3d4", "im-ordner", title="Im Ordner")
+    src = tmp_path / "nikinger" / "itm_a1b2c3d4__im-ordner.md"
+    dest = nested / "itm_a1b2c3d4__im-ordner.md"
+    src.replace(dest)
+
+    row = index.row_from_file(tmp_path, dest)
+    assert row["folder"] == "projekte/alpha"
+
+
+def test_row_from_file_archive_folder_is_empty(tmp_path):
+    archive_dir = tmp_path / "nikinger" / "_archive"
+    archive_dir.mkdir(parents=True)
+    _write_item(tmp_path, "nikinger", "itm_a1b2c3d4", "archiviert", title="Archiviert",
+                status="archived")
+    src = tmp_path / "nikinger" / "itm_a1b2c3d4__archiviert.md"
+    dest = archive_dir / "itm_a1b2c3d4__archiviert.md"
+    src.replace(dest)
+
+    row = index.row_from_file(tmp_path, dest)
+    assert row["folder"] == ""
 
 
 def test_rebuild_index_matches_manual_upserts(tmp_path):
@@ -79,7 +132,7 @@ def test_rebuild_index_matches_manual_upserts(tmp_path):
     (tmp_path / "nikinger" / "_archive").mkdir()
     _write_item(tmp_path, "nikinger", "itm_00000004", "viertes", title="Viertes", status="archived")
 
-    conn = index.connect(tmp_path / ".index.sqlite3")
+    conn, _ = index.connect(tmp_path / ".index.sqlite3")
     stats = index.rebuild_index(tmp_path, conn)
 
     assert stats.items_indexed == 4
@@ -92,7 +145,7 @@ def test_rebuild_after_delete_is_identical_to_before(tmp_path):
     _write_item(tmp_path, "nikinger", "itm_00000002", "zweites", title="Zweites", due="2026-08-02")
 
     db_path = tmp_path / ".index.sqlite3"
-    conn = index.connect(db_path)
+    conn, _ = index.connect(db_path)
     index.rebuild_index(tmp_path, conn)
     before = [dict(r) for r in index.all_rows(conn)]
     conn.close()
@@ -101,7 +154,7 @@ def test_rebuild_after_delete_is_identical_to_before(tmp_path):
     (tmp_path / ".index.sqlite3-wal").unlink(missing_ok=True)
     (tmp_path / ".index.sqlite3-shm").unlink(missing_ok=True)
 
-    conn2 = index.connect(db_path)
+    conn2, _ = index.connect(db_path)
     index.rebuild_index(tmp_path, conn2)
     after = [dict(r) for r in index.all_rows(conn2)]
 
@@ -112,9 +165,10 @@ def test_corrupt_index_file_is_discarded_not_crashed(tmp_path):
     db_path = tmp_path / ".index.sqlite3"
     db_path.write_bytes(b"das ist keine sqlite datei, nur muell")
 
-    conn = index.connect(db_path)  # darf nicht raisen
+    conn, rebuilt = index.connect(db_path)  # darf nicht raisen
 
     assert index.all_rows(conn) == []
+    assert rebuilt is True
 
     _write_item(tmp_path, "nikinger", "itm_00000001", "erstes", title="Erstes")
     stats = index.rebuild_index(tmp_path, conn)

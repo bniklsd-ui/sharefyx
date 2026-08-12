@@ -541,3 +541,197 @@ def test_patch_preserves_unknown_frontmatter_fields(store, tmp_path):
     assert result.item.extra == {"eigenes_feld": "bleibt"}
     path = tmp_path / "nikinger" / f"{item.id}__mit-zusatzfeld.md"
     assert "eigenes_feld: bleibt" in path.read_text()
+
+
+# -- P6 Step 4: folder/visibility/share_*, acl_of(), list_spaces() ------------------------
+
+
+def test_create_with_folder_places_file_under_it(store, tmp_path):
+    item = store.create("nikinger", type="note", title="Im Ordner", folder="projekte/alpha")
+    assert item.folder == "projekte/alpha"
+    path = tmp_path / "nikinger" / "projekte" / "alpha" / f"{item.id}__im-ordner.md"
+    assert path.exists()
+    assert store.get(item.id).folder == "projekte/alpha"
+
+
+def test_create_rejects_folder_deeper_than_max(store):
+    with pytest.raises(ValidationError):
+        store.create("nikinger", type="note", title="Zu tief", folder="a/b/c")
+
+
+def test_create_defaults_visibility_and_share_fields_and_omits_them_from_file(store, tmp_path):
+    # Offener Punkt (nicht diese Phase's Aufgabe, siehe phase6_shares/CLAUDE.md Session-Block):
+    # eine explizit gesetzte `visibility: private` verschwindet beim naechsten `update()` wieder
+    # aus der Datei (Default wird nie geschrieben) -- kollidiert potenziell mit Abnahmezeile 8
+    # ("jedes Item traegt visibility"), je nachdem wie der Nikinger die Zeile bei der Live-
+    # Abnahme liest. Funktional harmlos (fehlend == "private" beim naechsten Lesen), aber vor
+    # Step 6s Migrationsabnahme zu klaeren.
+    item = store.create("nikinger", type="note", title="Standard")
+    assert item.visibility == "private"
+    assert item.share_read == []
+    assert item.share_write == []
+    path = tmp_path / "nikinger" / f"{item.id}__standard.md"
+    text = path.read_text()
+    assert "visibility" not in text
+    assert "share_read" not in text
+    assert "share_write" not in text
+
+
+def test_create_with_explicit_visibility_and_shares_is_written(store, tmp_path):
+    item = store.create(
+        "nikinger", type="note", title="Geteilt",
+        visibility="human", share_read=["fabian"], share_write=["fabian"],
+    )
+    assert item.visibility == "human"
+    assert item.share_read == ["fabian"]
+    assert item.share_write == ["fabian"]
+    path = tmp_path / "nikinger" / f"{item.id}__geteilt.md"
+    text = path.read_text()
+    assert "visibility: human" in text
+    assert "share_read" in text and "fabian" in text
+
+
+def test_create_rejects_unknown_visibility(store):
+    with pytest.raises(ValidationError):
+        store.create("nikinger", type="note", title="X", visibility="oeffentlich")
+
+
+def test_update_moves_item_between_folders(store, tmp_path):
+    item = store.create("nikinger", type="note", title="Wandert", folder="alt")
+    old_path = tmp_path / "nikinger" / "alt" / f"{item.id}__wandert.md"
+    assert old_path.exists()
+
+    moved = store.update(item.id, version=item.version, folder="neu/unterordner")
+
+    assert moved.folder == "neu/unterordner"
+    assert not old_path.exists()
+    new_path = tmp_path / "nikinger" / "neu" / "unterordner" / f"{item.id}__wandert.md"
+    assert new_path.exists()
+
+
+def test_update_out_of_folder_back_to_root(store, tmp_path):
+    item = store.create("nikinger", type="note", title="Zurueck", folder="irgendwo")
+    moved = store.update(item.id, version=item.version, folder="")
+    assert moved.folder == ""
+    assert (tmp_path / "nikinger" / f"{item.id}__zurueck.md").exists()
+
+
+def test_update_sets_visibility_and_shares(store):
+    item = store.create("nikinger", type="note", title="Wird geteilt")
+    updated = store.update(
+        item.id, version=item.version,
+        visibility="human", share_read=["fabian"], share_write=[],
+    )
+    assert updated.visibility == "human"
+    assert updated.share_read == ["fabian"]
+    assert updated.share_write == []
+
+
+def test_update_rejects_unknown_visibility(store):
+    item = store.create("nikinger", type="note", title="X")
+    with pytest.raises(ValidationError):
+        store.update(item.id, version=item.version, visibility="oeffentlich")
+
+
+def test_archive_forces_folder_empty(store, tmp_path):
+    item = store.create("nikinger", type="task", title="Im Ordner archiviert", folder="projekte")
+    archived = store.archive(item.id, version=item.version)
+    assert archived.folder == ""
+    archive_path = tmp_path / "nikinger" / "_archive" / f"{item.id}__im-ordner-archiviert.md"
+    assert archive_path.exists()
+
+
+def test_acl_of_returns_defaults_for_plain_item(store):
+    item = store.create("nikinger", type="note", title="Ohne Freigabe")
+    acl = store.acl_of(item.id)
+    assert acl.space == "nikinger"
+    assert acl.folder == ""
+    assert acl.visibility == "private"
+    assert acl.read == frozenset()
+    assert acl.write == frozenset()
+
+
+def test_acl_of_unions_item_shares_with_share_yml(store, tmp_path):
+    (tmp_path / "nikinger").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "nikinger" / ".share.yml").write_text("read: [fabian]\n", encoding="utf-8")
+    item = store.create("nikinger", type="note", title="Zusatzfreigabe", share_write=["dritter"])
+
+    acl = store.acl_of(item.id)
+
+    assert acl.read == frozenset({"fabian", "dritter"})  # write impliziert read
+    assert acl.write == frozenset({"dritter"})
+
+
+def test_acl_of_does_not_read_the_item_file(store, tmp_path, monkeypatch):
+    item = store.create("nikinger", type="note", title="Ungelesen")
+    path = tmp_path / "nikinger" / f"{item.id}__ungelesen.md"
+
+    def boom(*args, **kwargs):
+        raise AssertionError("acl_of() darf die Item-Datei nicht lesen")
+
+    monkeypatch.setattr(type(path), "read_text", boom)
+    monkeypatch.setattr(type(path), "read_bytes", boom)
+
+    store.acl_of(item.id)  # darf nicht raisen
+
+
+def test_acl_of_raises_item_not_found(store):
+    with pytest.raises(ItemNotFound):
+        store.acl_of("itm_deadbeef")
+
+
+def test_list_spaces_reports_members_and_folders(store, tmp_path):
+    store.create("nikinger", type="note", title="Eins", folder="projekte/alpha")
+    store.create("nikinger", type="note", title="Zwei")
+    (tmp_path / "nikinger" / ".share.yml").write_text("write: [fabian]\n", encoding="utf-8")
+
+    spaces = store.list_spaces()
+
+    nikinger = next(s for s in spaces if s.name == "nikinger")
+    assert nikinger.item_count == 2
+    assert nikinger.members == ("fabian",)
+    assert nikinger.folders == ("projekte", "projekte/alpha")
+
+
+def test_list_spaces_includes_empty_space_directory_without_items(store, tmp_path):
+    (tmp_path / "fabian").mkdir()
+    spaces = store.list_spaces()
+    fabian = next(s for s in spaces if s.name == "fabian")
+    assert fabian.item_count == 0
+    assert fabian.folders == ()
+
+
+def test_list_spaces_excludes_archive_and_assets_from_folders(store, tmp_path):
+    item = store.create("nikinger", type="task", title="Wird archiviert")
+    store.archive(item.id, version=item.version)
+    (tmp_path / "nikinger" / "_assets").mkdir(exist_ok=True)
+
+    nikinger = next(s for s in store.list_spaces() if s.name == "nikinger")
+    assert nikinger.folders == ()
+
+
+def test_search_filters_by_folder(store):
+    store.create("nikinger", type="note", title="Drin", folder="projekte")
+    store.create("nikinger", type="note", title="Draussen")
+
+    result = store.search(folder="projekte")
+
+    assert result.total == 1
+    assert result.items[0].title == "Drin"
+
+
+def test_search_filters_by_spaces_list(store):
+    store.create("nikinger", type="note", title="Eigenes")
+    store.create("fabian", type="note", title="Fremdes")
+
+    result = store.search(spaces=["nikinger"])
+
+    assert result.total == 1
+    assert result.items[0].space == "nikinger"
+
+
+def test_search_summary_carries_folder_and_visibility(store):
+    store.create("nikinger", type="note", title="Mit Ordner", folder="projekte", visibility="human")
+    result = store.search()
+    assert result.items[0].folder == "projekte"
+    assert result.items[0].visibility == "human"
