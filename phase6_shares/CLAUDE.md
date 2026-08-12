@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase6_shares_plan.md         # voller Plan, Entscheidungen P6-A–P6-AC, Steps 0–10
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-2 verbatim, L3, kein Softcap
-updated: 2026-08-10 (Kopf unter Softcap rotiert -- Steps 0-2 nach SESSIONS_ARCHIVE.md; V42-Fenster startet 2026-08-10)
+updated: 2026-08-12 (Step 4 gestartet -- Gate-A-B per Nikinger-Entscheidung uebersteuert, Charakterisierung gruen)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -93,6 +93,7 @@ weiter ohne Build-Step (AC).
 | 2 | Werkzeug-Ergonomie: `storage/patch.py` (neu), `storage/store.py :: patch()`, `mcpserver/receipts.py` (neu), siebtes Tool `patch_item`, `return_body` an allen vier Schreib-Tools, `update_item` lehnt `visibility`/`share_read`/`share_write` ab | 1 | ✅ **vollständig** — `mcp_smoke.py` 13/13 grün | +17 (5 `phase6_shares/tests/test_patch.py`, neue Datei + 5 `phase1_storage/tests/test_store.py` + 7 `phase2_mcp/tests/test_tools.py`); 593 gesamt |
 | 3 | Betrieb: O2 (`authserver/store.py :: purge_expired()` räumt `token_families`/`clients` ab, zwei neue Retention-Konstanten), Client-Surface-Logging (`ua`-Feld auf `AccessLogASGI`, **V42 geschlossen, 2026-08-12** — Befund unten), `diagnose.sh` Prüfung 11 (Purge-Frische, INFO), `ui_budget.py :: _measure_latency()` (P6-I/P6-S, eigene `LatencyMetric`, kein Exit-Code-Einfluss) | 2 | ✅ **gebaut, ein Live-Teil beim Nikinger** — Gate-A→B-Punkt 3 (realer Purge-Lauf, `clients`-Zeilenzahl sinkt) bleibt live-Aufgabe, frühestens 2026-08-28 | +11 (8 `phase4_auth/tests/test_authserver_store.py` + 2 `phase2_mcp/tests/test_request_log.py` + 1 `phase2_mcp/tests/test_logging.py`); 604 gesamt |
 | 4 | Update-Log und Banner: `authserver/store.py` Schema 3 (`users.seen_update_id`), `webui/updates.py` (neu, Parser), `webui/api.py` (+`GET /api/v1/updates`, +`POST /api/v1/updates/seen`), `webui/static/js/updates.js` (neu, Banner + Konto-Dialog-Link), `app.html`/`app.css`, `deploy.sh`-Gate (P6-X), `docs/UPDATE_LOG.md` (neu, erster Eintrag) | 3 | ✅ **gebaut, Gate-A→B-Punkt 4 vollständig live bestanden** (Banner-Hälfte 2026-08-10, Fabian-Hälfte 2026-08-11, siehe Session-Block) | +16 (3 `phase4_auth/tests/test_authserver_store.py` [258→261] + 7 `phase6_shares/tests/test_updates.py` [neue Datei] + 2 `phase5_ui/tests/test_api.py` + 3 `phase5_ui/tests/test_deploy_scripts.py` + 1 `phase5_ui/tests/test_static_routes.py`); 620 gesamt |
+| 5 | Storage-Fundament (Block B): Charakterisierungstests + Goldens zuerst (P6-D), danach `storage/acl.py` (neu), `models.py`/`files.py`/`index.py`/`store.py`-Erweiterung (`folder`/`visibility`/`share_*`, `acl_of()`, `list_spaces()`) | 4 | 🔄 **gestartet, 2026-08-12** — Charakterisierung grün, Umbau folgt | +4 `phase6_shares/tests/test_characterization.py` (neue Datei, 3 Golden Files unter `tests/golden/`); 625 gesamt |
 
 ## Geerbte Contracts
 
@@ -282,6 +283,14 @@ Erst wenn alle vier Gate-Punkte stehen, beginnt Step 4 (Storage-Fundament, Block
 vorher, das Gate ist im Plan hart. V42 war ohnehin kein Gate-Blocker; jetzt zusätzlich
 geschlossen.
 
+**[2026-08-12 Korrektur, Nikinger-Entscheidung]:** Der Nikinger hat explizit angewiesen, Step 4
+jetzt zu beginnen und Punkt 3 als offenen, mitlaufenden Punkt zu tragen, statt bis 2026-08-28 zu
+warten — eine bewusste, benannte Übersteuerung des Gates, keine stille Abweichung. Punkt 3 bleibt
+unten als offen stehen (frühestens 2026-08-28), Step 2 bleibt „gebaut, ein Live-Teil beim
+Nikinger" und Abnahmezeile 4 bleibt unverändert **nicht** ✅ — §6s Statusregel („✅ heißt
+live-verifiziert, nicht gebaut") gilt unverändert fort. Diese Entscheidung überschreibt nur die
+Reihenfolge (Step 4 vor Gate-Abschluss), nicht die Abnahmekriterien selbst.
+
 **Nachtrag, 2026-08-09, siebter — Gate-A→B-Punkte 1–3 live geprüft** (Claude Code direkt auf der
 VM, Connector zuvor vom Nikinger neu verbunden — die alte Verbindung hatte noch den 6-Tool-Stand
 von vor P6). **Punkte 1+2 ✅:** an `itm_1b4fd59e` (Wegwerf-Testitem, danach archiviert) —
@@ -346,3 +355,49 @@ MCP-Surface-Diversität. **V42 damit geschlossen** — negativer, aber definitiv
 2s Client-Surface-Logging liefert kein brauchbares Unterscheidungsmerkmal auf `ev="http"`; eine
 Unterscheidung bräuchte eine andere Signalquelle, kein Scope dieser Phase). Kein Code-/Testlauf,
 reine Log-Auswertung.
+
+**Nachtrag, 2026-08-12, elfter — Step 4 (Storage-Fundament) begonnen, Charakterisierung zuerst
+(P6-D).** Vor dem Umbau: Advisor-Review des Ausführungsplans holte einen echten operativen Fund
+zutage, der weder im Plan noch beim ersten Lesen auffiel — `Store.__init__` ruft `rebuild_index()`
+nie auf, und `phase2_mcp/scripts/serve.py` (der reale Diensteinstieg) auch nicht; einziger
+Aufrufer heute ist der manuelle `space_cli.py`-Befehl (per `grep -rn "rebuild_index"` bestätigt).
+Ein `INDEX_SCHEMA_VERSION`-Sprung, der `index.connect()` beim nächsten echten Deploy zum
+Verwerfen+Leer-Neuanlegen zwingt (wie heute schon bei Korruption), würde den Produktivindex leer
+zurücklassen, bis jemand von Hand reindiziert — jeder `get()` würde bis dahin `ItemNotFound`
+werfen. Wird beim eigentlichen `index.py`-Umbau geschlossen: `connect()` liefert künftig
+`(conn, rebuilt: bool)`, `Store.__init__` ruft bei `rebuilt=True` sofort selbst
+`self.rebuild_index()` — dieselbe „Index ist billig, Dateien sind die Wahrheit"-Logik aus Hard
+Rule 2, nur diesmal auch tatsächlich verdrahtet.
+
+**Charakterisierung gebaut:** `phase6_shares/tests/test_characterization.py` (neu) + drei Golden
+Files unter `phase6_shares/tests/golden/` (`roundtrip_create.md`, `drift_repaired.md`,
+`archived.md`), byte-verglichen. Vier Fälle, wie im Plan gefordert — die beiden reinen
+Verhaltensfälle (`ConflictError.current`, die vier Commit-Messages `create|update|append|archive`)
+laufen als direkte Assertions statt eigener Golden-Dateien, gleiche Testkategorie wie
+`phase1_storage/tests/test_store.py` es für dieselben Fälle schon tut, kein eigener Dateiinhalt
+zu vergleichen. Goldens einmalig gegen den unveränderten HEAD-Code erzeugt (Scratchpad-Skript,
+nicht im Repo — gleiche Kategorie wie P5 Steps 10/11 und der jsdom-Durchlauf aus Step 3),
+`generate_id()` und `now_fn` deterministisch gemacht (`monkeypatch`), sonst wäre jeder Lauf ein
+anderes Golden. **Ein echter Stolperstein dabei:** die erste Capture-Runde benutzte einen
+gemeinsamen ID-Zähler über alle vier Fälle hinweg (`itm_00000001`…`itm_00000004`) — die echten
+pytest-Fixtures sind aber function-scoped, jeder Test bekommt seinen eigenen frischen Zähler bei
+1. Golden gegen den echten Testlauf verglichen schlug prompt fehl (`itm_00000001` erwartet,
+`itm_00000004` bekommen); zweite Capture-Runde mit einem frischen Zähler je Fall behoben. Zwei
+echte, jetzt eingefrorene Warzen dokumentiert, nicht korrigiert: CRLF im Body bleibt beim
+Schreiben roh erhalten (`atomic_write`s Textmodus übersetzt nur `\n`, unter POSIX ein No-Op),
+`store.get().body` normalisiert es beim Lesen trotzdem auf `\n` (`read_text()` vs. `read_bytes()`
+in `index.row_from_file`) — dieselbe Diskrepanz, die der Advisor vorab benannt hatte.
+`slugify("Ümlaut Café")` würde `é` unverändert (klein) im Dateinamen belassen (`isalnum()` ist
+Unicode-bewusst) — im Golden-Fall bewusst mit ASCII-Titel umgangen, um den Dateinamen
+vorhersagbar zu halten; kein Fund, nur eine Beobachtung am Rand.
+
+**Verifiziert:** `pytest -q` → **625 passed** (621 + 4 neue, exakt die vier
+`test_characterization.py`-Fälle). Kein `storage/`-Produktivcode in diesem Commit angefasst — nur
+Tests, Goldens, dieser Head. Das ist der P6-D-Ausgangspunkt: jeder künftige Diff in diesem Step
+muss diese vier Goldens byte-identisch lassen, außer dort, wo der Plan `visibility`/`share_read`/
+`share_write` ausdrücklich als Subjekt einer Änderung benennt (keiner der drei aktuellen Goldens
+berührt diese Felder).
+
+**Nächster Schritt (konkret):** `storage/acl.py` (neu) bauen, danach `models.py` → `files.py` →
+`index.py` → `store.py`, in dieser Reihenfolge (Ausführungsplan liegt vor, vom Nikinger
+freigegeben). Nach jedem Schritt: die drei Goldens hier laufen lassen, nicht erst am Ende.
