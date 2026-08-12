@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase6_shares_plan.md         # voller Plan, Entscheidungen P6-A–P6-AC, Steps 0–10
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-3 verbatim (zwei Eintraege), L3, kein Softcap
-updated: 2026-08-12 (Step 4 gebaut -- acl.py/folder/visibility/share_*, index-Rebuild-Fix, 669 Tests gruen)
+updated: 2026-08-12 (Step 4 gebaut -- acl.py/folder/visibility/share_*, index-Rebuild-Fix, 671 Tests gruen; Punkt 3 [visibility-Default] entschieden)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -244,6 +244,18 @@ Zeile 10 ergänzt.
    zusammen mit `migrate_visibility.py` in Step 6, nicht isoliert hier (würde sonst die drei
    Goldens aus diesem Step erneut anfassen). Kommentar sitzt zusätzlich direkt am betroffenen Test
    (`test_create_defaults_visibility_and_share_fields_and_omits_them_from_file`).
+
+**Nachtrag, 2026-08-12, dreizehnter — Punkt 3 entschieden, Nikinger-Bestätigung.** „Fehlend ==
+`private`" erfüllt Abnahmezeile 8 — **kein Sticky-Write**, keine Änderung an `_item_to_text`
+nötig. Begründung, vom Nikinger nach Abwägung bestätigt: der Wert ist zur Laufzeit nie
+mehrdeutig (`fields.get("visibility", DEFAULT_VISIBILITY)` ist derselbe Codepfad, ob das Feld
+in der Datei steht oder nicht — ACL-Auflösung, `visibility: human`-Agentensperre (P6-P) und
+API/UI-Anzeige unterscheiden „fehlt" nie von „explizit `private`"), und das Muster deckt sich mit
+der bereits gelockten Konvention für `share_read`/`share_write` (§2.1: „leer = nicht vorhanden") —
+`visibility` anders zu behandeln wäre die Inkonsistenz, nicht die Konsistenz. Einzige Konsequenz:
+Abnahmezeile 8 wird künftig über `get_item`/die API gelesen (löst zu `private` auf), nicht über
+ein rohes `grep visibility:` auf der `.md`-Datei — steht jetzt hier, damit es bei der Step-6-
+Abnahme nicht überrascht. Punkt damit **geschlossen**, keine offene Aufgabe mehr für Step 6.
 
 **Status:** Step 4 ist damit **gebaut**, DoD aus Plan §4 Step 4 erfüllt (Charakterisierung grün +
 Contract dokumentiert). Kein eigener Abnahmematrix-Punkt für diesen Step — die Live-Prüfung

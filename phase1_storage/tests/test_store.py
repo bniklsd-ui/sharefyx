@@ -560,12 +560,11 @@ def test_create_rejects_folder_deeper_than_max(store):
 
 
 def test_create_defaults_visibility_and_share_fields_and_omits_them_from_file(store, tmp_path):
-    # Offener Punkt (nicht diese Phase's Aufgabe, siehe phase6_shares/CLAUDE.md Session-Block):
-    # eine explizit gesetzte `visibility: private` verschwindet beim naechsten `update()` wieder
-    # aus der Datei (Default wird nie geschrieben) -- kollidiert potenziell mit Abnahmezeile 8
-    # ("jedes Item traegt visibility"), je nachdem wie der Nikinger die Zeile bei der Live-
-    # Abnahme liest. Funktional harmlos (fehlend == "private" beim naechsten Lesen), aber vor
-    # Step 6s Migrationsabnahme zu klaeren.
+    # Nikinger-Entscheidung 2026-08-12 (siehe phase6_shares/CLAUDE.md Session-Block, "Punkt 3"):
+    # "fehlend == private" erfuellt Abnahmezeile 8 -- kein Sticky-Write. Eine explizit gesetzte
+    # `visibility: private` verschwindet beim naechsten `update()` wieder aus der Datei (Default
+    # wird nie geschrieben), das ist gewolltes Verhalten, keine Luecke: Abnahmezeile 8 wird ueber
+    # `get_item`/die API gelesen (loest zu "private" auf), nicht ueber ein rohes Datei-`grep`.
     item = store.create("nikinger", type="note", title="Standard")
     assert item.visibility == "private"
     assert item.share_read == []
