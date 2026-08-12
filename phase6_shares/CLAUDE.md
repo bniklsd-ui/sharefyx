@@ -91,7 +91,7 @@ weiter ohne Build-Step (AC).
 |---|---|---|---|---|
 | 1 | Haushalt, Verifikationsdurchlauf (V39/V40/V41), Regeländerungen (§0.7 a/b/c), Phase-Head angelegt | 0 | ✅ **vollständig** | 0 (bewusst — reines Skelett, wie P1 Step 0; `phase6_shares/tests/conftest.py` leer angelegt) |
 | 2 | Werkzeug-Ergonomie: `storage/patch.py` (neu), `storage/store.py :: patch()`, `mcpserver/receipts.py` (neu), siebtes Tool `patch_item`, `return_body` an allen vier Schreib-Tools, `update_item` lehnt `visibility`/`share_read`/`share_write` ab | 1 | ✅ **vollständig** — `mcp_smoke.py` 13/13 grün | +17 (5 `phase6_shares/tests/test_patch.py`, neue Datei + 5 `phase1_storage/tests/test_store.py` + 7 `phase2_mcp/tests/test_tools.py`); 593 gesamt |
-| 3 | Betrieb: O2 (`authserver/store.py :: purge_expired()` räumt `token_families`/`clients` ab, zwei neue Retention-Konstanten), Client-Surface-Logging (`ua`-Feld auf `AccessLogASGI`, V42), `diagnose.sh` Prüfung 11 (Purge-Frische, INFO), `ui_budget.py :: _measure_latency()` (P6-I/P6-S, eigene `LatencyMetric`, kein Exit-Code-Einfluss) | 2 | ✅ **gebaut, Live-Teile beim Nikinger** — V42 (echtes journald, zwei Tage) und Gate-A→B-Punkt 3 (realer Purge-Lauf, `clients`-Zeilenzahl sinkt) sind live-Aufgaben, nicht in dieser Session baubar | +11 (8 `phase4_auth/tests/test_authserver_store.py` + 2 `phase2_mcp/tests/test_request_log.py` + 1 `phase2_mcp/tests/test_logging.py`); 604 gesamt |
+| 3 | Betrieb: O2 (`authserver/store.py :: purge_expired()` räumt `token_families`/`clients` ab, zwei neue Retention-Konstanten), Client-Surface-Logging (`ua`-Feld auf `AccessLogASGI`, **V42 geschlossen, 2026-08-12** — Befund unten), `diagnose.sh` Prüfung 11 (Purge-Frische, INFO), `ui_budget.py :: _measure_latency()` (P6-I/P6-S, eigene `LatencyMetric`, kein Exit-Code-Einfluss) | 2 | ✅ **gebaut, ein Live-Teil beim Nikinger** — Gate-A→B-Punkt 3 (realer Purge-Lauf, `clients`-Zeilenzahl sinkt) bleibt live-Aufgabe, frühestens 2026-08-28 | +11 (8 `phase4_auth/tests/test_authserver_store.py` + 2 `phase2_mcp/tests/test_request_log.py` + 1 `phase2_mcp/tests/test_logging.py`); 604 gesamt |
 | 4 | Update-Log und Banner: `authserver/store.py` Schema 3 (`users.seen_update_id`), `webui/updates.py` (neu, Parser), `webui/api.py` (+`GET /api/v1/updates`, +`POST /api/v1/updates/seen`), `webui/static/js/updates.js` (neu, Banner + Konto-Dialog-Link), `app.html`/`app.css`, `deploy.sh`-Gate (P6-X), `docs/UPDATE_LOG.md` (neu, erster Eintrag) | 3 | ✅ **gebaut, Gate-A→B-Punkt 4 vollständig live bestanden** (Banner-Hälfte 2026-08-10, Fabian-Hälfte 2026-08-11, siehe Session-Block) | +16 (3 `phase4_auth/tests/test_authserver_store.py` [258→261] + 7 `phase6_shares/tests/test_updates.py` [neue Datei] + 2 `phase5_ui/tests/test_api.py` + 3 `phase5_ui/tests/test_deploy_scripts.py` + 1 `phase5_ui/tests/test_static_routes.py`); 620 gesamt |
 
 ## Geerbte Contracts
@@ -271,22 +271,16 @@ Reihenfolge für den Nikinger, über Step 2 und Step 3 hinweg, nicht nur Step 3 
    `docs/UPDATE_LOG.md`, nicht im Parser — behoben + Regressionstest). Fabian-Hälfte seit
    2026-08-11: bei ihm technisch einwandfrei, Banner inklusive Ankündigung der
    Sichtbarkeitsumstellung gesehen und bestätigt (Nachtrag unten).
-5. **V42 (Step 2, weiterhin offen) — Fenster startet 2026-08-10, nicht erst „irgendwann in den
-   nächsten zwei Tagen".** Der Deploy/Restart vom 2026-08-09 hat `journald` faktisch geleert
-   (neuer Prozess, PID-Wechsel); der erste Tag mit durchgehend echtem Traffic unter dem neuen
-   `ua`-Feld ist heute. Frühestens **2026-08-12** prüfen (`grep '"ev":"http"'` in den Logs,
-   `ua`-Werte über beide Oberflächen — claude.ai/Desktop vs. Claude Code — vergleichen).
-   **Aktive Nutzung während des Fensters ist erwünscht, nicht zu vermeiden** — V42 fragt genau
-   danach, ob echte Clients zuverlässig einen `User-Agent` senden; ein künstlich ruhiger VM-
-   Zeitraum würde weniger Signal liefern, nicht mehr. Diese Session selbst hat bereits reale
-   `ua`-Werte erzeugt (Connector-Reconnect, `patch_item`-Tests) — die zählen mit.
+5. ~~V42~~ — **geschlossen, 2026-08-12** (Nachtrag unten): `ua` wird von echten MCP-Clients
+   zuverlässig gesetzt, unterscheidet aber **nicht** zwischen Claude-Oberflächen — alle senden
+   `"Claude-User"`. Negativer, aber definitiver Befund, kein offener Punkt mehr.
 6. **Gate-A→B-Punkt 3** — **versucht, 2026-08-09, korrekt noch nicht abgeschlossen** (Nachtrag
    unten): `clients`/`token_families` sind noch zu jung für die 30/90-Tage-Grenze. Frühestens
    ab 2026-08-28 erneut prüfen (`authctl.py purge-expired`, gegen den echten Zeilenrückgang).
 
 Erst wenn alle vier Gate-Punkte stehen, beginnt Step 4 (Storage-Fundament, Block B) — nicht
-vorher, das Gate ist im Plan hart. V42 blockiert das Gate nicht, sollte aber nicht vergessen
-werden.
+vorher, das Gate ist im Plan hart. V42 war ohnehin kein Gate-Blocker; jetzt zusätzlich
+geschlossen.
 
 **Nachtrag, 2026-08-09, siebter — Gate-A→B-Punkte 1–3 live geprüft** (Claude Code direkt auf der
 VM, Connector zuvor vom Nikinger neu verbunden — die alte Verbindung hatte noch den 6-Tool-Stand
@@ -337,7 +331,18 @@ hat jetzt nur noch einen offenen Punkt: Punkt 3** (Purge-Zeilenrückgang, frühe
 siehe oben). Kein Code-/Testlauf diese Session — reine Statuspflege auf Nikinger-Bitte
 („downtime" vor Arbeitsbeginn morgen genutzt).
 
-**Softcap-Warnung:** dieser Kopf ist nahe am 40KB-Softcap. Wenn Step 4 einen neuen `## Session
-stopped`-Block eröffnet, sind die Step-0/1/2-Nachträge die Kompressionskandidaten — verbatim
-nach `SESSIONS_ARCHIVE.md` (neue Datei), Muster wie `phase4_auth/CLAUDE.md`s Steps-0–6a-
-Verschiebung: `sed -n`, Byte-Identität vor dem Löschen geprüft.
+**Nachtrag, 2026-08-12 — V42 geschlossen, echtes journald-Fenster ausgewertet.** Fenster war
+2026-08-10 00:00 bis heute (~2 Tage echter Betrieb, Deploy vom 08-09 hatte `journald` faktisch
+geleert). `journalctl -u sharefyx-mcp --since "2026-08-10 00:00:00" | grep -o '"ua":"[^"]*"' |
+sort | uniq -c`: 285 `/mcp`-Requests insgesamt, davon **278 mit `"ua":"Claude-User"`** — jeder
+einzelne echte MCP-Tool-Aufruf in diesem Fenster (Rest: 4 eigene `python-httpx`-Testläufe, 2
+`CensysInspect`, 1 `curl`, alles kein echter Claude-Client). **Befund: `ua` wird von echten
+MCP-Clients zuverlässig gesetzt (nie leer/fehlend) — unterscheidet aber NICHT zwischen
+Claude-Oberflächen.** Claude Code und claude.ai (Web/Desktop) senden auf der `/mcp`-Ebene
+denselben generischen String, keine surface-spezifische Variante. Zusätzlich beobachtet auf
+`/ui/*` (Browser, nicht MCP): 3393 Firefox-, 748 Chrome-, 13 Android-, 1 Safari-Aufruf — echte,
+vielfältige menschliche Nutzung über die Testtage, bestätigt aber nur Browser-Diversität, nicht
+MCP-Surface-Diversität. **V42 damit geschlossen** — negativer, aber definitiver Befund (P6 Step
+2s Client-Surface-Logging liefert kein brauchbares Unterscheidungsmerkmal auf `ev="http"`; eine
+Unterscheidung bräuchte eine andere Signalquelle, kein Scope dieser Phase). Kein Code-/Testlauf,
+reine Log-Auswertung.

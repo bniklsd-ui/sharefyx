@@ -150,8 +150,9 @@ eigenes Python-Paket) — **🔄 gestartet, 2026-08-09.** Ausführungsreifer Pla
 Werkzeuge/Betrieb/Update-Banner, B = Dateisystem, C = Bilder, hartes Gate zwischen A und B).
 Herkunft/offene Entscheidungen: `docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` §4.1–§4.6. Phase-Head:
 `phase6_shares/CLAUDE.md`. Step 0 ✅, Step 1 ✅ (`patch_item`, Quittungen statt Volltext), Step 2
-✅ **gebaut, Live-Teile beim Nikinger** (O2 geschlossen, `ua`-Feld/V42, `diagnose.sh`/
-`ui_budget.py`-Ergänzungen), Step 3 ✅ **gebaut, Live-Teile beim Nikinger** (Update-Log und
+✅ **gebaut** (O2 geschlossen, `ua`-Feld, **V42 geschlossen 2026-08-12** — `ua` unterscheidet
+nicht zwischen Claude-Oberflächen, `diagnose.sh`/`ui_budget.py`-Ergänzungen), Step 3 ✅
+**gebaut, Live-Teile beim Nikinger** (Update-Log und
 Banner — Schema 3, `webui/updates.py`, `deploy.sh`-Gate). **Block A (Steps 0–3) damit
 vollständig gebaut.** **GATE A→B: 3 von 4 Punkten live bestanden** (patch_item, Banner + Fabians
 Bestätigung) — nur noch Punkt 3 offen (Purge-Zeilenrückgang, frühestens 2026-08-28). **Nächster
