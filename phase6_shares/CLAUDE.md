@@ -244,6 +244,30 @@ korrigiert: `can_write_item`/`Permissions`-Protokoll bekommen denselben `surface
 auszuschließen, nicht nur den einfachen Schreibversuch). **694 Tests gesamt** (691 + 3).
 Charakterisierungs-Goldens und alle drei Live-Skripte erneut grün, nach dem Fix.
 
+**Vier weitere Advisor-Funde, nicht blockierend, bewusst nicht hier gefixt — als Eingabe für
+spätere Steps festgehalten statt stillschweigend verloren:**
+1. **Diese Änderung kippt reales Verhalten schon vor Step 6.** Nichts im echten Betrieb trägt
+   heute eine `.share.yml`/`share_read` — sobald `deploy.sh` diesen Stand ausliefert, sieht
+   Fabian Niklas' Space in `/api/v1/spaces`/`/api/v1/items` nicht mehr (Abnahmezeile 8s
+   Zielzustand, nur **vor** `migrate_visibility.py`, nicht danach). Der Step-3-Banner hat das
+   angekündigt, ist also keine Überraschung — aber der Nikinger sollte den Deploy-Zeitpunkt
+   bewusst wählen, nicht nur das „ob".
+2. **Ein reiner Ordner-Share lässt den Space unauffindbar.** `can_read`/`visible_spaces` lesen
+   nur die Space-Wurzel-`.share.yml` (`grants_for_space`). Ein Space, der nur über
+   `space/ordner/.share.yml` geteilt ist, liefert über `search_items`/`GET /api/v1/items`
+   durchaus Treffer (item-weise gefiltert), taucht aber nie in `/api/v1/spaces` auf — Step 7s
+   Navigationsbaum baut genau darauf auf. Eingabe für Step 7, nicht hier zu lösen.
+3. **`get_item` auf ein ungeteiltes fremdes Item liefert `write_denied` statt eines
+   Existenz-neutralen Fehlers** — anders als Plan §1.7.3/Abnahmezeile 22 für Assets
+   ("404, nicht 403, kein Existenzleck"). IDs sind 8 Hex-Zeichen, Enumeration ist unpraktikabel,
+   aber die Asymmetrie ist jetzt ein erreichbarer Pfad (vorher totes `can_read`-Immer-True), kein
+   bloßer Seam mehr — eine bewusste Entscheidung wert, nicht automatisch nachziehen.
+4. **`acl_of()` liest `share_*` aus dem Index, nicht aus der Datei** (bewusst, index-only ist der
+   ganze Sinn) — ein Mensch, der eine Freigabe von Hand aus dem Frontmatter entfernt, sieht sie
+   im Index für ein Request-Fenster noch als aktiv, weil `acl_of()` bewusst vor jedem
+   drift-reparierenden `get()` läuft. Plan-gedeckt, aber das Fenster gehört benannt, damit Step 6s
+   `spacectl.py`/UI als der vorgesehene Weg verstanden wird, nicht nur als der bequeme.
+
 **Nächster Schritt (konkret):** Step 6 (Verwaltung und Migration) — `phase6_shares/scripts/
 spacectl.py` (neu, `create-space`/`list-spaces`/`add-member`/`remove-member`/`show`/
 `remove-space`), `phase6_shares/scripts/migrate_visibility.py` (neu, `--dry-run` Default,
