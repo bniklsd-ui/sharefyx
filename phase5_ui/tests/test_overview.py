@@ -13,7 +13,7 @@ from datetime import datetime, timedelta, timezone
 
 import httpx
 import pytest
-from mcpserver.permissions import OwnSpaceWritable
+from mcpserver.permissions import SharePolicy
 from starlette.applications import Starlette
 from storage.store import Store
 
@@ -61,14 +61,18 @@ def overview_app(ui_settings, store, confirmed_users, sessions, ticking_store) -
     routes = (
         ui_auth_routes(ui_settings, store, confirmed_users, sessions)
         + account_routes(ui_settings, store, confirmed_users, sessions)
-        + api_routes(ui_settings, ticking_store, sessions, OwnSpaceWritable(), store)
+        + api_routes(ui_settings, ticking_store, sessions, SharePolicy(ticking_store.acl_reader), store)
     )
     return Starlette(routes=routes)
 
 
 @pytest.fixture
-def seeded(ticking_store) -> Store:
-    """Ein Item je Ordner plus ein zweites im Archiv, dazu ein fremder Space."""
+def seeded(ticking_store, tmp_path) -> Store:
+    """Ein Item je Ordner plus ein zweites im Archiv, dazu ein fremder Space. P6 Step 5: ohne
+    `.share.yml` wäre `FOREIGN_SPACE` seit P6-U für `SPACE` unsichtbar — die `.share.yml`
+    macht ihn lesbar, damit `test_foreign_space_is_visible_but_marked_not_own` überhaupt
+    etwas zu prüfen hat; die drei anderen Tests, die `seeded` benutzen, sehen nur `SPACE` und
+    bleiben davon unberührt."""
     ticking_store.create(SPACE, type="task", title="offene Aufgabe")
     ticking_store.create(SPACE, type="task", title="erledigte Aufgabe", status="done")
     ticking_store.create(SPACE, type="note", title="aktive Notiz")
@@ -77,6 +81,9 @@ def seeded(ticking_store) -> Store:
     archived_task = ticking_store.create(SPACE, type="task", title="alte Aufgabe")
     ticking_store.archive(archived_task.id, version=archived_task.version)
     ticking_store.create(FOREIGN_SPACE, type="note", title="Fabians Notiz", body="fremder Text")
+    (tmp_path / "data" / FOREIGN_SPACE / ".share.yml").write_text(
+        f"read: [{SPACE}]\n", encoding="utf-8"
+    )
     return ticking_store
 
 

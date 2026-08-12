@@ -6,13 +6,20 @@ passiert ausschließlich im Browser, `app.js`). `format` wird aus `item.extra` g
 eigenes Feld ausgegeben; `extra` selbst wird vollständig mitgeliefert, damit ein Roundtrip durch
 die UI kein unbekanntes Frontmatter-Feld verliert (P5-Z, der ganze Format-Seam — keine Zeile in
 `storage/`).
-"""
+
+**P6 Step 5:** `folder`/`visibility`/`share_read`/`share_write`/`shared` sind neu auf jedem
+Item/jeder Summary. `readonly` bekommt hier weiterhin nur einen bool — die eigentliche
+`can_write_item()`-Auflösung (braucht `store.acl_reader`, also einen Store-Aufruf) bleibt
+`api.py`s Job, genau wie vorher; nur WAS `api.py` jetzt hineinreicht, hat sich geändert (ACL-
+basiert statt reiner Space-Identität). `shared` bleibt reine Space-Identität (`item.space !=
+own_space`) — das ist eine andere Frage als `readonly` (ein geteiltes Item mit `share_write`
+ist `shared=True` UND `readonly=False` zugleich)."""
 from __future__ import annotations
 
 from datetime import datetime, timezone
 from typing import Any
 
-from storage.models import Item, ItemSummary, SearchResult, SpaceInfo
+from storage.models import Item, ItemSummary, SpaceInfo
 
 
 def _iso(value: datetime) -> str:
@@ -21,7 +28,7 @@ def _iso(value: datetime) -> str:
     return value.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def item_to_json(item: Item, *, readonly: bool) -> dict[str, Any]:
+def item_to_json(item: Item, *, readonly: bool, own_space: str) -> dict[str, Any]:
     return {
         "id": item.id,
         "space": item.space,
@@ -37,13 +44,16 @@ def item_to_json(item: Item, *, readonly: bool) -> dict[str, Any]:
         "version": item.version,
         "format": item.extra.get("format", "markdown"),
         "extra": dict(item.extra),
+        "folder": item.folder,
+        "visibility": item.visibility,
+        "share_read": list(item.share_read),
+        "share_write": list(item.share_write),
+        "shared": item.space != own_space,
         "readonly": readonly,
     }
 
 
-def summary_to_json(s: ItemSummary) -> dict[str, Any]:
-    """Ohne `readonly` — das kennt erst der Aufrufer (`own_space` steht hier nicht zur
-    Verfügung). `search_to_json()` ergänzt es je Zeile."""
+def summary_to_json(s: ItemSummary, *, own_space: str, readonly: bool) -> dict[str, Any]:
     return {
         "id": s.id,
         "space": s.space,
@@ -57,6 +67,12 @@ def summary_to_json(s: ItemSummary) -> dict[str, Any]:
         "updated": _iso(s.updated),
         "version": s.version,
         "snippet": s.snippet,
+        "folder": s.folder,
+        "visibility": s.visibility,
+        "share_read": list(s.share_read),
+        "share_write": list(s.share_write),
+        "shared": s.space != own_space,
+        "readonly": readonly,
     }
 
 
@@ -68,24 +84,31 @@ def overview_row_to_json(s: ItemSummary, *, own_space: str) -> dict[str, Any]:
     nebeneinander zeigt, ohne dass man vorher bewusst „in einen fremden Space gewechselt" hat —
     dort gehört fremder Fließtext nicht hin. Titel und Metadaten reichen für den Zweck der Seite
     („was war zuletzt los"), und sie landen in `app.js` ausschließlich über `textContent`.
-    """
-    row = summary_to_json(s)
+
+    **P6 Step 5:** `readonly` bleibt hier bewusst bei der alten, günstigeren Space-Identitäts-
+    Näherung (`s.space != own_space`) statt einer echten `can_write_item()`-Auflösung — dieser
+    Endpunkt iteriert bereits mehrere `store.search()`-Aufrufe je sichtbarem Space (Plan-Kosten
+    schon bei 438-453 ms gemessen, `phase5_ui/CLAUDE.md` P6-Step-2-Ergänzung) und ist nicht Teil
+    von Step 5s Aufgabenliste. Eine ACL-genaue Übersicht ist ein späterer, eigener Schnitt."""
+    row = summary_to_json(s, own_space=own_space, readonly=s.space != own_space)
     row.pop("snippet")
-    row["readonly"] = s.space != own_space
     return row
 
 
-def search_to_json(r: SearchResult, *, own_space: str) -> dict[str, Any]:
-    return {
-        "items": [
-            {**summary_to_json(s), "readonly": s.space != own_space}
-            for s in r.items
-        ],
-        "total": r.total,
-        "limit": r.limit,
-        "offset": r.offset,
-    }
+def search_to_json(items: list[dict[str, Any]], *, total: int, limit: int, offset: int) -> dict[str, Any]:
+    """Dünne Hülle um bereits fertig serialisierte Zeilen (P6 Step 5) — `readonly` je Zeile
+    braucht jetzt eine `AclDecision` (`store.acl_reader`), die `serializers.py` bewusst nicht
+    selbst auflöst (kein Store-Aufruf hier, siehe Moduldocstring); `api.py` baut jede Zeile
+    deshalb selbst über `summary_to_json()`, während die ACL-Entscheidung ohnehin schon in der
+    Hand ist, und reicht nur noch die fertige Liste herein."""
+    return {"items": items, "total": total, "limit": limit, "offset": offset}
 
 
 def space_to_json(s: SpaceInfo, *, own_space: str) -> dict[str, Any]:
-    return {"name": s.name, "item_count": s.item_count, "own": s.name == own_space}
+    return {
+        "name": s.name,
+        "item_count": s.item_count,
+        "own": s.name == own_space,
+        "members": list(s.members),
+        "folders": list(s.folders),
+    }

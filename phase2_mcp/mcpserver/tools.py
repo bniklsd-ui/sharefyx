@@ -20,6 +20,23 @@ statt eine neue Store-Methode zu verlangen: der P1-Contract ist seit Step 2 "wie
 `phase1_storage/CLAUDE.md`), eine weitere einmalige Erweiterung wäre keine mehr. Der MCP-Adapter
 baut den Dateitext deshalb selbst aus `Item` + `storage.frontmatter.serialize` — dieselbe
 öffentliche Funktion, die `store.py` intern auch benutzt.
+
+**P6 Step 5:** jeder item-level Lese-/Schreibpfad (`get_item`/`update_item`/`append_to_item`/
+`patch_item`) löst seine Rechte jetzt über `store.acl_of(item_id)` +
+`permissions.can_read_item`/`can_write_item` auf, nicht mehr über `store.space_of(item_id)` +
+die alten space-level `can_read`/`can_write` — ein einzeln freigegebenes Item (`share_read`/
+`share_write`) wäre über die space-level Prüfung unsichtbar geblieben, obwohl die
+Space-Wurzel selbst keine `.share.yml` trägt. `Surface.AGENT` ist fest (dieser Adapter ist
+immer der Agent, nie der Mensch — Plan §1.2.4). `get_item`/`search_items` halten die
+"eigen"-Entscheidung bewusst in zwei getrennten Variablen: ob geschrieben werden darf
+(`can_write_item`, steuert `repair_drift`) ist eine andere Frage als ob gewrappt wird
+(`item.space != principal.space`, P6-O — ein Item, das ich per `share_write` ändern darf,
+bleibt trotzdem ein fremder Body und wird trotzdem gewrappt). **Fail-closed-Ergänzung, nicht
+im Plan-Text, Nikinger-Entscheidung 2026-08-12:** `update_item`s `folder`-Parameter ist nur
+vom Eigentümer-Space änderbar — ein `share_write`-Halter, der ein fremdes Item in einen
+Ordner mit breiterer `.share.yml` verschiebt, würde sonst dessen Sichtbarkeit erweitern, ohne
+dass es auf der Agentenfläche je ein Re-Auth-Gate dafür gibt (das gibt es nur für Menschen in
+der UI, Step 7). Details: `phase6_shares/CLAUDE.md`s Step-5-Session-Block.
 """
 from __future__ import annotations
 
@@ -33,6 +50,7 @@ from typing import Any
 from fastmcp import FastMCP
 from fastmcp.exceptions import ToolError
 
+from storage.acl import AclDecision
 from storage.errors import ConflictError, ItemNotFound, SpaceNotFound, ValidationError
 from storage.frontmatter import serialize as serialize_frontmatter
 from storage.models import Item, ItemSummary, SpaceInfo
@@ -41,7 +59,7 @@ from storage.store import Store
 
 from . import context
 from .auth import AuthError
-from .permissions import Permissions
+from .permissions import Permissions, Surface
 from .receipts import write_receipt
 
 logger = logging.getLogger(__name__)
@@ -146,7 +164,17 @@ def map_storage_error(exc: Exception) -> ToolError:
     if isinstance(exc, ItemNotFound):
         return ToolError(f"item_not_found: {exc.item_id} — prüfe die ID mit search_items")
     if isinstance(exc, PermissionDenied):
-        return ToolError(f"write_denied: {exc.space} ist nicht dein Space; du kannst dort nur lesen")
+        # P6 Step 5: dieselbe Meldung deckt jetzt drei Fälle ab, nicht nur "fremder Space, kein
+        # Schreibrecht" (P2s ursprüngliche Bedeutung) — auch ein ungeteiltes fremdes Item (kein
+        # Lesezugriff) und ein eigenes `visibility: human`-Item (für die Agentenfläche gesperrt,
+        # P6-P) laufen hier durch. Bewusst generisch statt drei eigener Meldungen: `map_storage_
+        # error()` kennt an dieser Stelle nicht, ob can_read_item oder can_write_item verweigert
+        # hat (beide werfen dasselbe PermissionDenied), und drei Texte für dieselbe Ursache
+        # (kein Zugriff) wären mehr Verwirrung als Hilfe.
+        return ToolError(
+            f"write_denied: kein Zugriff auf {exc.space} — kein Schreibrecht, das Item ist "
+            "nicht mit dir geteilt, oder es ist als 'nur für Menschen' markiert"
+        )
     if isinstance(exc, ConflictError):
         current = exc.current
         return ToolError(
@@ -206,8 +234,18 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
     gibt die unveränderte Python-Funktion zurück (nicht das interne `FunctionTool`-Objekt) —
     `register()` sammelt genau diese Funktionen und gibt sie zurück, damit Tests sie direkt
     aufrufen bzw. per `inspect.signature()` prüfen können (z. B.
-    `test_create_item_has_no_space_parameter`), ohne den vollen ASGI/HTTP-Stack aus Step 5
-    erneut hochzuziehen."""
+    `test_create_item_into_foreign_space_is_denied`), ohne den vollen ASGI/HTTP-Stack aus
+    Step 5 erneut hochzuziehen."""
+
+    def _acl_of_summary(item: ItemSummary) -> AclDecision:
+        """Baut die `AclDecision` einer bereits geladenen `ItemSummary`-Zeile (P6 Step 5) —
+        über `store.acl_reader.decision_for()`, nicht über `store.acl_of(item.id)`: die Zeile
+        kommt schon aus einem `store.search()`-Fetch, ein zweiter Index-Roundtrip pro Treffer
+        wäre reine Verschwendung (`_STORE_FETCH_LIMIT` ist bewusst großzügig)."""
+        return store.acl_reader.decision_for(
+            space=item.space, folder=item.folder, visibility=item.visibility,
+            share_read=item.share_read, share_write=item.share_write,
+        )
 
     @mcp.tool(
         title="Spaces auflisten",
@@ -242,11 +280,20 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         visible_names = set(
             permissions.visible_spaces(principal.space, [s.name for s in spaces])
         )
+        # P6-P: `visibility: human` existiert für die Agentenfläche "vollständig nicht" —
+        # das schließt die hier gezeigten Zähler ein, nicht nur search_items/total. Ein
+        # einziger gebündelter Fetch statt eines store.search() je sichtbarem Space.
+        human_counts: dict[str, int] = {}
+        for row in store.search(limit=_STORE_FETCH_LIMIT, offset=0).items:
+            if row.visibility == "human":
+                human_counts[row.space] = human_counts.get(row.space, 0) + 1
         payload = [
             {
                 "name": s.name,
-                "item_count": s.item_count,
+                "item_count": s.item_count - human_counts.get(s.name, 0),
                 "writable": permissions.can_write(principal.space, s.name),
+                "members": list(s.members),
+                "folders": list(s.folders),
             }
             for s in spaces
             if s.name in visible_names
@@ -269,6 +316,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
     def search_items(
         query: str | None = None,
         space: str | None = None,
+        folder: str | None = None,
         type: str | None = None,
         status: str | None = None,
         tag: str | None = None,
@@ -285,6 +333,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             result = store.search(
                 query,
                 space=space,
+                folder=folder,
                 type=type,
                 status=status,
                 tag=tag,
@@ -295,10 +344,16 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         except ValidationError as exc:
             raise map_storage_error(exc) from exc
 
-        visible_names = set(
-            permissions.visible_spaces(principal.space, [s.name for s in store.list_spaces()])
-        )
-        items = [i for i in result.items if i.space in visible_names]
+        # Item-weise, nicht space-weise gefiltert (P6 Step 5): ein einzeln freigegebenes Item
+        # (share_read) darf sichtbar sein, ohne dass sein ganzer Ordner es wird — ein
+        # space-level Vorfilter würde das Item entweder zu großzügig (ganzer Space sichtbar)
+        # oder zu eng (Space unsichtbar, Item verschwindet mit) behandeln. Dieselbe Prüfung
+        # entscheidet auch über visibility: human (P6-P) — inklusive `total` unten, nicht nur
+        # der Seite.
+        items = [
+            i for i in result.items
+            if permissions.can_read_item(principal.space, _acl_of_summary(i), surface=Surface.AGENT)
+        ]
         if status is None and not include_archived:
             items = [i for i in items if i.status != "archived"]
 
@@ -306,7 +361,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         page = items[offset : offset + clamped_limit]
         payload = {
             "items": [
-                summary_to_dict(i, own=permissions.can_write(principal.space, i.space))
+                summary_to_dict(i, own=(i.space == principal.space))
                 for i in page
             ],
             "total": total,
@@ -329,28 +384,30 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
     def get_item(item_id: str) -> str:
         principal = _authenticated_principal()
         try:
-            space = store.space_of(item_id)
+            acl = store.acl_of(item_id)
         except ItemNotFound as exc:
             raise map_storage_error(exc) from exc
 
-        if not permissions.can_read(principal.space, space):
-            # Heute unerreichbar (`OwnSpaceWritable.can_read` ist immer True) — der Seam ist
-            # trotzdem verdrahtet, damit eine spätere Policy hier nicht nachgerüstet werden muss
-            # (Plan §2.2 Erweiterungspfad).
-            raise map_storage_error(PermissionDenied(space)) from None
+        if not permissions.can_read_item(principal.space, acl, surface=Surface.AGENT):
+            raise map_storage_error(PermissionDenied(acl.space)) from None
 
-        own = permissions.can_write(principal.space, space)
-        item = store.get(item_id, repair_drift=own)  # fremd ⇒ kein Dateischreibzugriff (Rule 4)
-        if not own:
+        # Zwei getrennte Fragen, bewusst nicht dieselbe Variable (P6 Step 5): ob geschrieben
+        # werden darf (steuert repair_drift — ein fremdes, aber share_write-erlaubtes Item
+        # darf den Drift-Repair-Write bekommen) ist unabhängig davon, ob gewrappt wird (P6-O
+        # — ein fremdes Item bleibt fremder Body, auch wenn ich es ändern darf).
+        writable = permissions.can_write_item(principal.space, acl)
+        item = store.get(item_id, repair_drift=writable)
+        if acl.space != principal.space:
             item = replace(item, body=wrap_untrusted(item.body, space=item.space))
         return item_to_filetext(item)
 
     @mcp.tool(
         title="Item anlegen",
         description=(
-            "Legt ein neues Item im eigenen Space an — der Ziel-Space ist immer der Principal. "
-            "Liefert standardmäßig eine Quittung statt des vollen Texts — return_body=True holt "
-            "ihn zurück."
+            "Legt ein neues Item an — standardmäßig im eigenen Space. space=<name> legt es "
+            "stattdessen in einen anderen Space, wenn dessen .share.yml write: dafür gewährt; "
+            "folder=<pfad> legt es in einen Unterordner. Liefert standardmäßig eine Quittung "
+            "statt des vollen Texts — return_body=True holt ihn zurück."
         ),
         annotations={
             "readOnlyHint": False,
@@ -367,18 +424,26 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         links: list[str] | None = None,
         due: str | None = None,
         status: str | None = None,
+        space: str | None = None,
+        folder: str | None = None,
         return_body: bool = False,
     ) -> str:
         principal = _authenticated_principal()
-        # Keine Rechteprüfung nötig — es gibt keinen `space`-Parameter (P2-G, Rule 4
-        # architektonisch statt per `if`), der Ziel-Space ist immer `principal.space`.
+        # P6-U (root CLAUDE.md, Hard Rule 4 Neufassung): Ziel-Space ist per Default der eigene
+        # — ein anderer ist nur zulässig, wenn `.share.yml` dort `write:` gewährt. Space-level
+        # Prüfung, nicht item-level: es gibt noch kein Item, dessen ACL man auflösen könnte.
+        target_space = space if space is not None else principal.space
+        if target_space != principal.space and not permissions.can_write(principal.space, target_space):
+            raise map_storage_error(PermissionDenied(target_space)) from None
         kwargs: dict[str, Any] = {"tags": tags or [], "links": links or []}
         if due is not None:
             kwargs["due"] = due
         if status is not None:
             kwargs["status"] = status
+        if folder is not None:
+            kwargs["folder"] = folder
         try:
-            item = store.create(principal.space, type=type, title=title, body=body, **kwargs)
+            item = store.create(target_space, type=type, title=title, body=body, **kwargs)
         except ValidationError as exc:
             raise map_storage_error(exc) from exc
         if return_body:
@@ -388,10 +453,12 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
     @mcp.tool(
         title="Item aktualisieren",
         description=(
-            "Aktualisiert ein Item im eigenen Space, oder archiviert es über status=archived. "
-            "Braucht die zuletzt gelesene version. Liefert standardmäßig eine Quittung statt "
-            "des vollen Texts — return_body=True holt ihn zurück. Sichtbarkeit/Freigaben "
-            "(visibility/share_read/share_write) gehen über kein Tool, nur über die UI."
+            "Aktualisiert ein Item, oder archiviert es über status=archived. folder=<pfad> "
+            "verschiebt es — nur der Eigentümer-Space darf das, ein geteilter Schreibzugriff "
+            "reicht dafür nicht. Braucht die zuletzt gelesene version. Liefert standardmäßig "
+            "eine Quittung statt des vollen Texts — return_body=True holt ihn zurück. "
+            "Sichtbarkeit/Freigaben (visibility/share_read/share_write) gehen über kein Tool, "
+            "nur über die UI."
         ),
         annotations={
             "readOnlyHint": False,
@@ -410,6 +477,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         links: list[str] | None = None,
         due: str | None = None,
         type: str | None = None,
+        folder: str | None = None,
         visibility: str | None = None,
         share_read: list[str] | None = None,
         share_write: list[str] | None = None,
@@ -417,8 +485,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
     ) -> str:
         principal = _authenticated_principal()
         # P6-M: Freigaben/Sichtbarkeit sind über kein MCP-Tool änderbar — der Riegel entsteht
-        # hier, VOR dem eigentlichen Feld (das erst P6 Step 4/5 ins Modell bringt), damit ein
-        # späterer Step ihn nicht vergisst.
+        # hier, VOR dem eigentlichen Feld, damit ein späterer Step ihn nicht vergisst.
         if visibility is not None or share_read is not None or share_write is not None:
             raise map_storage_error(
                 ValidationError(
@@ -428,12 +495,27 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             ) from None
 
         try:
-            target_space = store.space_of(item_id)
+            acl = store.acl_of(item_id)
         except ItemNotFound as exc:
             raise map_storage_error(exc) from exc
 
-        if not permissions.can_write(principal.space, target_space):
-            raise map_storage_error(PermissionDenied(target_space)) from None
+        if not permissions.can_write_item(principal.space, acl):
+            raise map_storage_error(PermissionDenied(acl.space)) from None
+
+        # Fail-closed, Nikinger-Entscheidung 2026-08-12 (kein Plan-Text): `folder` ist zwar
+        # generell agenten-setzbar (`Store.update()` erlaubt es seit Step 4), aber nur für den
+        # Eigentümer-Space — ein fremder `share_write`-Halter, der ein Item in einen Ordner mit
+        # breiterer `.share.yml` verschiebt, würde dessen Sichtbarkeit erweitern, ohne dass es
+        # auf der Agentenfläche je ein Re-Auth-Gate dafür gäbe (das gibt es nur für Menschen in
+        # der UI, Step 7 — und selbst dort nur für den Eigentümer, der SEINE eigene Freigabe
+        # erweitert, nicht für einen Dritten, der fremden Besitz verschiebt).
+        if folder is not None and acl.space != principal.space:
+            raise map_storage_error(
+                ValidationError(
+                    "folder ist nur vom Eigentümer-Space änderbar — ein geteilter "
+                    "Schreibzugriff erlaubt keine Verschiebung in einen anderen Ordner"
+                )
+            ) from None
 
         changes = {
             key: value
@@ -444,6 +526,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
                 "links": links,
                 "due": due,
                 "type": type,
+                "folder": folder,
             }.items()
             if value is not None
         }
@@ -485,12 +568,12 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
     ) -> str:
         principal = _authenticated_principal()
         try:
-            target_space = store.space_of(item_id)
+            acl = store.acl_of(item_id)
         except ItemNotFound as exc:
             raise map_storage_error(exc) from exc
 
-        if not permissions.can_write(principal.space, target_space):
-            raise map_storage_error(PermissionDenied(target_space)) from None
+        if not permissions.can_write_item(principal.space, acl):
+            raise map_storage_error(PermissionDenied(acl.space)) from None
 
         try:
             item = store.append(item_id, version=version, text=text)
@@ -521,12 +604,12 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
     ) -> str:
         principal = _authenticated_principal()
         try:
-            target_space = store.space_of(item_id)
+            acl = store.acl_of(item_id)
         except ItemNotFound as exc:
             raise map_storage_error(exc) from exc
 
-        if not permissions.can_write(principal.space, target_space):
-            raise map_storage_error(PermissionDenied(target_space)) from None
+        if not permissions.can_write_item(principal.space, acl):
+            raise map_storage_error(PermissionDenied(acl.space)) from None
 
         try:
             result = store.patch(item_id, version=version, edits=edits)

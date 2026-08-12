@@ -125,6 +125,11 @@ async def _run(data_root: Path, checks: list[Check]) -> None:
     # Aufruf (Schritt 1, vor jedem `create_item`) unsichtbar, weil noch leer.
     store.create(SPACE_OWN, type="note", title="Ausgangspunkt", body="Anfangszustand.")
     store.create(SPACE_FOREIGN, type="note", title="Fremde Notiz", body="Fremder Inhalt.")
+    # P6 Step 5: ohne Freigabe wäre `SPACE_FOREIGN` für `SPACE_OWN` seit P6-U unsichtbar
+    # (`test_foreign_space_is_invisible_without_share`) — dieses Skript demonstriert
+    # ausdrücklich den Lese-Pfad in einen fremden, geteilten Space (Schritte 1 und 4 unten),
+    # deshalb hier bewusst geteilt, nicht ungeteilt gelassen.
+    (data_root / SPACE_FOREIGN / ".share.yml").write_text(f"read: [{SPACE_OWN}]\n", encoding="utf-8")
     # Auffüllen auf eine echte Default-Listing-Größe (§5 Kriterium 5: 20 Items < 12 KB) — ohne
     # das würde die Größenmessung für `search_items` nur 5 Treffer zeigen und die eigentliche
     # Frage ("hält das Token-Budget bei einem vollen Default-Listing") gar nicht beantworten

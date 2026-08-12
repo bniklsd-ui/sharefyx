@@ -146,6 +146,26 @@ gerendertem Markdown, „Verstanden" versteckt es und postet `/updates/seen`, �
 ansehen" öffnet den Dialog, ein bereits gesehener `latest_id` unterdrückt das Banner. Volle
 Herleitung: `phase6_shares/CLAUDE.md` Step-3-Session-Block.
 
+**[2026-08-12 Ergänzung, P6 Step 5]:** `webui/api.py`/`webui/serializers.py` auf die neue
+`SharePolicy`/`Surface.HUMAN`-Rechtepolitik umgestellt (ersetzt `OwnSpaceWritable`) — jeder
+Item-Lese-/Schreibpfad löst jetzt über `store.acl_of()`+`can_read_item`/`can_write_item` auf
+statt über `store.space_of()`+space-level `can_read`/`can_write`; `_items_get`/`search_items`
+filtern item-weise, nicht mehr space-weise. `SharePolicy.can_read_item_as_human()` kapselt
+`Surface.HUMAN` innerhalb von `mcpserver/permissions.py`, damit P5-B weiterhin nur ein
+`mcpserver`-Symbol erlaubt (`test_webui_imports_exactly_one_mcpserver_symbol` jetzt gegen
+`SharePolicy`, nicht mehr `OwnSpaceWritable`). Serializer bekommen `folder`/`visibility`/
+`share_read`/`share_write`/`shared`; `readonly` bleibt ein vom Aufrufer übergebener Wert, jetzt
+ACL- statt space-identitätsbasiert. Fail-closed-Ergänzung ohne Plan-Text (Nikinger-Entscheidung
+2026-08-12): `_items_patch` lehnt `folder`-Änderungen durch Nicht-Eigentümer ab. +2 Tests in
+`test_api.py` (27→29: `test_get_item_from_foreign_space_without_share_is_forbidden`/
+`test_get_shared_item_from_foreign_space_is_readonly_true` ersetzen das alte „jeder fremde
+Space ist immer lesbar"-Verhalten; `test_spaces_omits_foreign_space_without_a_share` neu) +2
+`test_serializers.py` (7→9, neue Felder). `test_overview.py`/`conftest.py`-Fixtures mussten auf
+`SharePolicy(item_store.acl_reader)` nachgezogen werden (kein neuer Test, reiner Signatur-Fix,
+gleiche Kategorie wie P6 Step 3s `ui_budget.py`-Fund oben). Volle Herleitung, inkl. des
+Advisor-Funds zum Folder-Move und der Nikinger-Entscheidung dazu:
+`phase6_shares/CLAUDE.md` Step-5-Session-Block.
+
 ---
 
 ## Abnahmestand (Plan §6) — Stand 2026-08-09

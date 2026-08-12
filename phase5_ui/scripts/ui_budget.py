@@ -70,7 +70,7 @@ from fastmcp import Client
 from fastmcp.client.transports import StreamableHttpTransport
 from mcpserver.app import OAuthConfig, create_app
 from mcpserver.config import Settings as McpSettings
-from mcpserver.permissions import OwnSpaceWritable
+from mcpserver.permissions import SharePolicy
 from starlette.applications import Starlette
 from storage.store import Store
 
@@ -171,7 +171,7 @@ async def _measure(data_root: Path) -> list[Metric]:
     routes = (
         ui_auth_routes(ui_settings, auth_store, users, sessions)
         + account_routes(ui_settings, auth_store, users, sessions)
-        + api_routes(ui_settings, item_store, sessions, OwnSpaceWritable(), auth_store)
+        + api_routes(ui_settings, item_store, sessions, SharePolicy(item_store.acl_reader), auth_store)
         + static_routes(ui_settings, sessions)
     )
     app = Starlette(routes=routes)
@@ -347,7 +347,9 @@ async def _measure_latency(data_root: Path) -> list[LatencyMetric]:
     )
     sessions = SessionManager(ui_auth_store, settings=ui_settings)
     rest_app = Starlette(
-        routes=api_routes(ui_settings, item_store, sessions, OwnSpaceWritable(), ui_auth_store)
+        routes=api_routes(
+            ui_settings, item_store, sessions, SharePolicy(item_store.acl_reader), ui_auth_store,
+        )
     )
 
     async with httpx.AsyncClient(

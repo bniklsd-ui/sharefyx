@@ -33,10 +33,16 @@ Rechteprüfung (also sicher, kein fremder Dateizugriff) den aktuellen Stand einm
 wiederholter Klick auf „Archivieren" bei jedem Aufruf stillschweigend die Version hochzählen,
 ohne dass sich am Zustand semantisch etwas ändert.
 
-**`webui` darf genau EIN Symbol aus `mcpserver` importieren** (P5-B): `OwnSpaceWritable`. Kein
-zweiter Import aus `mcpserver` — auch nicht das `Permissions`-Protokoll selbst, das läge im
-selben Modul und wäre ein zweites Symbol. Der Parameter unten ist deshalb konkret auf
-`OwnSpaceWritable` typisiert, nicht auf ein Protokoll. `AuthStore` (`authserver.store`) ist davon
+**`webui` darf genau EIN Symbol aus `mcpserver` importieren** (P5-B): `SharePolicy` seit P6
+Step 5 (vorher `OwnSpaceWritable` — `mcpserver.permissions.SharePolicy` ist jetzt der einzige
+erlaubte Name, `test_webui_imports_exactly_one_mcpserver_symbol` prüft ihn über den echten
+Quelltext, nicht über eine Behauptung). **`Surface` wird bewusst NICHT importiert** — ein
+zweiter Name aus demselben Modul wäre trotzdem ein zweites Symbol, der Test zählt tatsächlich
+importierte Namen, kein Sonderfall für "gleiches Modul". `SharePolicy.can_read_item_as_human()`
+(neu, P6 Step 5) kapselt `surface=Surface.HUMAN` innerhalb von `mcpserver/permissions.py` — eine
+`SharePolicy`-eigene Bequemlichkeitsmethode, nicht Teil des `Permissions`-Protokolls (das
+`tools.py` mit dem expliziten `surface=`-Parameter benutzt, weil es innerhalb desselben Pakets
+liegt und keiner Importbeschränkung unterliegt). `AuthStore` (`authserver.store`) ist von P5-B
 unberührt — dieselbe Bibliothek, die `account.py`/`sessions.py` bereits importieren, P5-B
 beschränkt nur `mcpserver`.
 
@@ -64,15 +70,17 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 from starlette.routing import Route
 
-from mcpserver.permissions import OwnSpaceWritable
+from mcpserver.permissions import SharePolicy
 from storage.errors import ConflictError, ItemNotFound, ValidationError
-from storage.models import STATUS_VALUES, SearchResult, SpaceInfo
+from storage.models import STATUS_VALUES, SpaceInfo
 from storage.store import Store
 
 from .config import UiSettings
 from .errors import ApiError, CsrfError
 from .security import require_csrf
-from .serializers import item_to_json, overview_row_to_json, search_to_json, space_to_json
+from .serializers import (
+    item_to_json, overview_row_to_json, search_to_json, space_to_json, summary_to_json,
+)
 from .sessions import SessionManager
 from .updates import load_update_log
 
@@ -114,7 +122,7 @@ _RECENT_LIMIT = 5
 _STORE_FETCH_LIMIT = 5000
 
 
-def _map_store_error(exc: Exception) -> ApiError:
+def _map_store_error(exc: Exception, *, own_space: str) -> ApiError:
     if isinstance(exc, ItemNotFound):
         return ApiError("not_found", f"Item nicht gefunden: {exc.item_id}")
     if isinstance(exc, ConflictError):
@@ -123,7 +131,7 @@ def _map_store_error(exc: Exception) -> ApiError:
             "conflict",
             f"Konflikt bei {exc.item_id}: erwartete Version {exc.expected_version}, "
             f"aktuell {current.version}.",
-            detail={"current": item_to_json(current, readonly=False)},
+            detail={"current": item_to_json(current, readonly=False, own_space=own_space)},
         )
     if isinstance(exc, (ValidationError, ValueError)):
         # `storage.store._coerce_due()` wirft bei einem falsch formatierten `due`-String ein
@@ -159,7 +167,7 @@ def api_routes(
     settings: UiSettings,
     store: Store,
     sessions: SessionManager,
-    permissions: OwnSpaceWritable,
+    permissions: SharePolicy,
     auth_store: AuthStore,
 ) -> list[Route]:
     async def _require_session(request: Request):
@@ -190,6 +198,16 @@ def api_routes(
 
     def _visible_spaces(actor: str, names: list[str]) -> set[str]:
         return set(permissions.visible_spaces(actor, names))
+
+    def _acl_for_summary(item):
+        """Baut die `AclDecision` einer bereits geladenen `ItemSummary`-Zeile (P6 Step 5) —
+        über `store.acl_reader.decision_for()`, kein zweiter Index-Roundtrip pro Treffer.
+        Dasselbe Muster wie `mcpserver.tools._acl_of_summary`, hier separat gehalten statt
+        importiert (P5-B: kein zweiter `mcpserver`-Import über `SharePolicy` hinaus)."""
+        return store.acl_reader.decision_for(
+            space=item.space, folder=item.folder, visibility=item.visibility,
+            share_read=item.share_read, share_write=item.share_write,
+        )
 
     async def _me(request: Request) -> Response:
         session = await _require_session(request)
@@ -268,6 +286,7 @@ def api_routes(
             result = store.search(
                 q.get("query"),
                 space=q.get("space"),
+                folder=q.get("folder"),
                 type=q.get("type"),
                 status=q.get("status"),
                 tag=q.get("tag"),
@@ -276,16 +295,26 @@ def api_routes(
                 offset=0,
             )
         except (ValidationError, ValueError) as exc:
-            raise _map_store_error(exc) from exc
+            raise _map_store_error(exc, own_space=session.space) from exc
 
-        visible = _visible_spaces(session.space, [s.name for s in store.list_spaces()])
-        items = [i for i in result.items if i.space in visible]
+        # Item-weise, nicht space-weise gefiltert (P6 Step 5, dieselbe Begründung wie
+        # `mcpserver.tools.search_items`): ein einzeln freigegebenes Item darf sichtbar sein,
+        # ohne dass sein ganzer Ordner es wird. `visibility: human` bleibt hier sichtbar
+        # (Surface.HUMAN) — anders als auf der Agentenfläche, P6-P.
+        items = [
+            i for i in result.items
+            if permissions.can_read_item_as_human(session.space, _acl_for_summary(i))
+        ]
         total = len(items)
         page = items[offset : offset + limit]
-        payload = search_to_json(
-            SearchResult(items=page, total=total, limit=limit, offset=offset),
-            own_space=session.space,
-        )
+        item_dicts = [
+            summary_to_json(
+                i, own_space=session.space,
+                readonly=not permissions.can_write_item(session.space, _acl_for_summary(i)),
+            )
+            for i in page
+        ]
+        payload = search_to_json(item_dicts, total=total, limit=limit, offset=offset)
         return JSONResponse(payload, headers={"Cache-Control": "no-store"})
 
     async def _items_post(request: Request) -> Response:
@@ -312,23 +341,27 @@ def api_routes(
         try:
             item = store.create(session.space, type=item_type, title=title, body=item_body, **kwargs)
         except (ValidationError, ValueError) as exc:
-            raise _map_store_error(exc) from exc
+            raise _map_store_error(exc, own_space=session.space) from exc
         return JSONResponse(
-            item_to_json(item, readonly=False), status_code=201, headers={"Cache-Control": "no-store"}
+            item_to_json(item, readonly=False, own_space=session.space),
+            status_code=201, headers={"Cache-Control": "no-store"},
         )
 
     async def _items_get_one(request: Request) -> Response:
         session = await _require_session(request)
         item_id = request.path_params["item_id"]
         try:
-            target_space = store.space_of(item_id)
+            acl = store.acl_of(item_id)
         except ItemNotFound as exc:
-            raise _map_store_error(exc) from exc
-        if not permissions.can_read(session.space, target_space):
-            raise ApiError("forbidden", "Kein Lesezugriff auf diesen Space.")
-        own = permissions.can_write(session.space, target_space)
-        item = store.get(item_id, repair_drift=own)  # fremd ⇒ kein Dateischreibzugriff (Rule 4)
-        return JSONResponse(item_to_json(item, readonly=not own), headers={"Cache-Control": "no-store"})
+            raise _map_store_error(exc, own_space=session.space) from exc
+        if not permissions.can_read_item_as_human(session.space, acl):
+            raise ApiError("forbidden", "Kein Lesezugriff auf dieses Item.")
+        writable = permissions.can_write_item(session.space, acl)
+        item = store.get(item_id, repair_drift=writable)  # fremd ⇒ kein Dateischreibzugriff (Rule 4)
+        return JSONResponse(
+            item_to_json(item, readonly=not writable, own_space=session.space),
+            headers={"Cache-Control": "no-store"},
+        )
 
     async def _items_patch(request: Request) -> Response:
         session = await _require_session(request)
@@ -341,18 +374,34 @@ def api_routes(
             raise ApiError("validation_failed", "'version' ist Pflichtfeld (int).")
 
         try:
-            target_space = store.space_of(item_id)
+            acl = store.acl_of(item_id)
         except ItemNotFound as exc:
-            raise _map_store_error(exc) from exc
-        if not permissions.can_write(session.space, target_space):
-            raise ApiError("forbidden", "Kein Schreibzugriff auf diesen Space.")
+            raise _map_store_error(exc, own_space=session.space) from exc
+        if not permissions.can_write_item(session.space, acl):
+            raise ApiError("forbidden", "Kein Schreibzugriff auf dieses Item.")
+
+        # Fail-closed, Nikinger-Entscheidung 2026-08-12 (kein Plan-Text, siehe
+        # `mcpserver/tools.py::update_item`s gleichnamige Begründung): `folder` ist nur vom
+        # Eigentümer-Space änderbar — ein `share_write`-Halter könnte sonst ein fremdes Item in
+        # einen Ordner mit breiterer `.share.yml` verschieben und dessen Sichtbarkeit
+        # erweitern, ohne dass `widens()`/Re-Auth (Step 7) das je sieht (das gilt nur für den
+        # Eigentümer, der seine eigene Freigabe erweitert, nicht für einen Dritten).
+        if "folder" in body and acl.space != session.space:
+            raise ApiError(
+                "forbidden",
+                "folder ist nur vom Eigentümer-Space änderbar — ein geteilter Schreibzugriff "
+                "erlaubt keine Verschiebung in einen anderen Ordner.",
+            )
 
         changes = {key: value for key, value in body.items() if key != "version"}
         try:
             item = store.update(item_id, version=version, **changes)
         except (ItemNotFound, ConflictError, ValidationError, ValueError) as exc:
-            raise _map_store_error(exc) from exc
-        return JSONResponse(item_to_json(item, readonly=False), headers={"Cache-Control": "no-store"})
+            raise _map_store_error(exc, own_space=session.space) from exc
+        return JSONResponse(
+            item_to_json(item, readonly=False, own_space=session.space),
+            headers={"Cache-Control": "no-store"},
+        )
 
     async def _items_append(request: Request) -> Response:
         session = await _require_session(request)
@@ -366,17 +415,20 @@ def api_routes(
             raise ApiError("validation_failed", "'version' (int) und 'text' (str) sind Pflichtfelder.")
 
         try:
-            target_space = store.space_of(item_id)
+            acl = store.acl_of(item_id)
         except ItemNotFound as exc:
-            raise _map_store_error(exc) from exc
-        if not permissions.can_write(session.space, target_space):
-            raise ApiError("forbidden", "Kein Schreibzugriff auf diesen Space.")
+            raise _map_store_error(exc, own_space=session.space) from exc
+        if not permissions.can_write_item(session.space, acl):
+            raise ApiError("forbidden", "Kein Schreibzugriff auf dieses Item.")
 
         try:
             item = store.append(item_id, version=version, text=text)
         except (ItemNotFound, ConflictError, ValidationError, ValueError) as exc:
-            raise _map_store_error(exc) from exc
-        return JSONResponse(item_to_json(item, readonly=False), headers={"Cache-Control": "no-store"})
+            raise _map_store_error(exc, own_space=session.space) from exc
+        return JSONResponse(
+            item_to_json(item, readonly=False, own_space=session.space),
+            headers={"Cache-Control": "no-store"},
+        )
 
     async def _items_archive(request: Request) -> Response:
         session = await _require_session(request)
@@ -389,27 +441,32 @@ def api_routes(
             raise ApiError("validation_failed", "'version' ist Pflichtfeld (int).")
 
         try:
-            target_space = store.space_of(item_id)
+            acl = store.acl_of(item_id)
         except ItemNotFound as exc:
-            raise _map_store_error(exc) from exc
-        if not permissions.can_write(session.space, target_space):
-            raise ApiError("forbidden", "Kein Schreibzugriff auf diesen Space.")
+            raise _map_store_error(exc, own_space=session.space) from exc
+        if not permissions.can_write_item(session.space, acl):
+            raise ApiError("forbidden", "Kein Schreibzugriff auf dieses Item.")
 
         # Siehe Moduldocstring: `store.archive()` hat keinen eigenen Schutz gegen ein bereits
-        # archiviertes Item — dieser Check läuft NACH der Rechteprüfung, also sicher (eigener
-        # Space, kein Rule-4-Risiko).
+        # archiviertes Item — dieser Check läuft NACH der Rechteprüfung, also sicher.
+        # `repair_drift=True` ist hier korrekt, nicht weil es "der eigene Space" ist (das gilt
+        # seit P6 Step 5 nicht mehr generell), sondern weil `can_write_item()` oben bereits
+        # bestätigt hat, dass dieser Actor schreiben darf.
         try:
             current = store.get(item_id, repair_drift=True)
         except ItemNotFound as exc:
-            raise _map_store_error(exc) from exc
+            raise _map_store_error(exc, own_space=session.space) from exc
         if current.status == "archived":
             raise ApiError("validation_failed", "Item ist bereits archiviert.")
 
         try:
             item = store.archive(item_id, version=version)
         except (ItemNotFound, ConflictError) as exc:
-            raise _map_store_error(exc) from exc
-        return JSONResponse(item_to_json(item, readonly=False), headers={"Cache-Control": "no-store"})
+            raise _map_store_error(exc, own_space=session.space) from exc
+        return JSONResponse(
+            item_to_json(item, readonly=False, own_space=session.space),
+            headers={"Cache-Control": "no-store"},
+        )
 
     async def _updates_get(request: Request) -> Response:
         session = await _require_session(request)

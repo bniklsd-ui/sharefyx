@@ -324,6 +324,15 @@ class Store:
                 ))
             return result
 
+    @property
+    def acl_reader(self) -> AclReader:
+        """Der eine `AclReader`, den dieser `Store` selbst benutzt (P6 Step 5) — Aufrufer, die
+        eine `AclDecision` außerhalb von `acl_of()` bauen müssen (z. B. `mcpserver.tools
+        .search_items` für eine ganze Seite `ItemSummary`-Zeilen), teilen sich damit denselben
+        `stat()`-invalidierten Cache statt einen zweiten, unabhängig veraltenden `AclReader`
+        zu instanziieren."""
+        return self._acl
+
     def acl_of(self, item_id: str) -> AclDecision:
         """Rechte eines Items, ausschließlich aus dem Index — liest die Item-DATEI NICHT
         (gleiche Eigenschaft wie `space_of()`, P2: sicher aufrufbar, BEVOR feststeht, ob der
@@ -338,16 +347,10 @@ class Store:
         # übernommen — reine Pfad-Arithmetik, kein Datei-Lesezugriff, verletzt also nicht den
         # "liest die Item-DATEI NICHT"-Vertrag oben.
         folder = files.folder_from_path(self._data_root, space, self._data_root / row["path"])
-        directory = self._data_root / space / folder if folder else self._data_root / space
-        grant = self._acl.grants_for_dir(directory)
-        item_read = frozenset(json.loads(row["share_read_json"]))
-        item_write = frozenset(json.loads(row["share_write_json"]))
-        return AclDecision(
+        return self._acl.decision_for(
             space=space, folder=folder, visibility=row["visibility"],
-            # `share_write` impliziert `share_read`, dieselbe Regel wie in `.share.yml`
-            # (Plan §1.2.2) -- sonst hätte ein Item mit `share_write: [x]` aber leerem
-            # `share_read` einen Schreiber, der nicht lesen darf, was keinen Sinn ergibt.
-            read=grant.read | item_read | item_write, write=grant.write | item_write,
+            share_read=json.loads(row["share_read_json"]),
+            share_write=json.loads(row["share_write_json"]),
         )
 
     def space_of(self, item_id: str) -> str:

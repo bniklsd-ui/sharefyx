@@ -10,7 +10,6 @@ hochzuziehen.
 """
 from __future__ import annotations
 
-import inspect
 import json
 import os
 from contextlib import contextmanager
@@ -21,13 +20,18 @@ from fastmcp.exceptions import ToolError
 
 from mcpserver import context, tools
 from mcpserver.auth import AuthError, Principal
-from mcpserver.permissions import OwnSpaceWritable, Permissions
+from mcpserver.permissions import Permissions, SharePolicy
 from mcpserver.tools import UNTRUSTED_CLOSE, UNTRUSTED_OPEN, wrap_untrusted
 from storage.store import Store
 
 # Bewusst keine Nikinger-typischen Spacenamen (Plan §2.2 Erweiterungspfad).
 SPACE_A = "alpha"
 SPACE_B = "beta"
+
+
+def _write_share_yml(directory, content: str) -> None:
+    directory.mkdir(parents=True, exist_ok=True)
+    (directory / ".share.yml").write_text(content, encoding="utf-8")
 
 
 @pytest.fixture(autouse=True)
@@ -50,8 +54,8 @@ def store(tmp_path) -> Store:
 
 
 @pytest.fixture
-def permissions() -> Permissions:
-    return OwnSpaceWritable()
+def permissions(store) -> Permissions:
+    return SharePolicy(store.acl_reader)
 
 
 @pytest.fixture
@@ -77,7 +81,11 @@ class _OwnSpaceOnlyVisible:
 # -- list_spaces --------------------------------------------------------------------
 
 
-def test_list_spaces_marks_own_space_writable(tools_map, store):
+def test_list_spaces_marks_own_space_writable(tools_map, store, tmp_path):
+    # P6 Step 5: ohne Freigabe wäre SPACE_B für SPACE_A unsichtbar (test_foreign_space_is_
+    # invisible_without_share) — ein `read:`-Grant hält es sichtbar, aber nicht schreibbar,
+    # genau der Kontrast, den dieser Test prüfen will.
+    _write_share_yml(tmp_path / SPACE_B, f"read: [{SPACE_A}]\n")
     store.create(SPACE_A, type="task", title="A")
     store.create(SPACE_B, type="task", title="B")
 
@@ -101,8 +109,12 @@ def test_list_spaces_includes_empty_own_space(tools_map, store):
         payload = json.loads(tools_map["list_spaces"]())
 
     by_name = {entry["name"]: entry for entry in payload}
-    assert by_name[SPACE_A] == {"name": SPACE_A, "item_count": 0, "writable": True}
-    assert SPACE_B in by_name
+    assert by_name[SPACE_A] == {
+        "name": SPACE_A, "item_count": 0, "writable": True, "members": [], "folders": [],
+    }
+    # SPACE_B ist ohne Freigabe unsichtbar (P6 Step 5) — anders als vor P6, wo jeder Space
+    # universell sichtbar war.
+    assert SPACE_B not in by_name
 
 
 def test_list_spaces_filters_by_can_read(store):
@@ -168,23 +180,24 @@ def test_search_limit_is_clamped_to_max(tools_map, store):
     assert len(payload["items"]) == tools.MAX_LIMIT
 
 
-def test_search_filters_by_can_read_and_reports_filtered_total(store):
-    """Plan §2.2 nennt `search_items` ausdrücklich als den Pfad, an dem `total`/Paginierung
-    falsch werden, sobald `can_read` nicht mehr konstant `True` ist — die „Bekannte Grenze"
-    handelt genau davon. `_OwnSpaceOnlyVisible` bewies den Seam bisher nur für `list_spaces`."""
+def test_foreign_space_is_invisible_without_share(tools_map, store):
+    """P6 Step 5 (Plan §4 Step 5, Pflichttest): `search_items` filtert jetzt item-weise über
+    `can_read_item`/`acl_of()`, nicht mehr space-weise über `visible_spaces` — ein Item in
+    einem Space ohne jede `.share.yml`/Item-Freigabe ist unsichtbar, `total` zählt es nicht
+    mit. Anders als unter `OwnSpaceWritable` (P2), wo jeder Space universell lesbar war."""
     store.create(SPACE_A, type="task", title="Eigenes Item A1")
     store.create(SPACE_A, type="task", title="Eigenes Item A2")
-    store.create(SPACE_B, type="task", title="Fremdes Item B1")
-    restricted = tools.register(FastMCP("restricted"), store=store, permissions=_OwnSpaceOnlyVisible())
+    store.create(SPACE_B, type="task", title="Fremdes Item B1, ungeteilt")
 
     with _as(SPACE_A):
-        payload = json.loads(restricted["search_items"]())
+        payload = json.loads(tools_map["search_items"]())
 
     assert {entry["space"] for entry in payload["items"]} == {SPACE_A}
     assert payload["total"] == 2  # nicht 3 — die Vorfilterung muss vor der Zählung passieren
 
 
-def test_search_snippet_of_foreign_space_is_wrapped(tools_map, store):
+def test_search_snippet_of_foreign_space_is_wrapped(tools_map, store, tmp_path):
+    _write_share_yml(tmp_path / SPACE_B, f"read: [{SPACE_A}]\n")
     beta_item = store.create(SPACE_B, type="note", title="Fremd", body="Beta-Inhalt")
 
     with _as(SPACE_A):
@@ -193,6 +206,103 @@ def test_search_snippet_of_foreign_space_is_wrapped(tools_map, store):
     entry = next(i for i in payload["items"] if i["id"] == beta_item.id)
     assert entry["snippet"].startswith(UNTRUSTED_OPEN.format(space=SPACE_B))
     assert entry["snippet"].endswith(UNTRUSTED_CLOSE)
+
+
+def test_share_read_makes_exactly_one_item_visible_not_the_folder(tools_map, store):
+    """Plan §4 Step 5, Pflichttest. Item-Freigabe (`share_read`) ist gezielt — anders als eine
+    `.share.yml`, die den ganzen Ordner öffnet, macht sie NUR das eine Item sichtbar."""
+    shared = store.create(SPACE_B, type="note", title="Freigegeben", folder="projekte")
+    store.update(shared.id, version=shared.version, share_read=[SPACE_A])
+    sibling = store.create(SPACE_B, type="note", title="Nicht freigegeben", folder="projekte")
+
+    with _as(SPACE_A):
+        payload = json.loads(tools_map["search_items"](space=SPACE_B))
+
+    ids = {entry["id"] for entry in payload["items"]}
+    assert shared.id in ids
+    assert sibling.id not in ids
+
+
+def test_folder_share_is_inherited_by_children(tools_map, store, tmp_path):
+    """Plan §4 Step 5, Pflichttest. Eine `.share.yml` in einem Ordner gilt für Items in
+    Unterordnern darunter (Vereinigung entlang des Pfads, Plan §1.2.3 Regel 1)."""
+    _write_share_yml(tmp_path / SPACE_B / "projekte", f"read: [{SPACE_A}]\n")
+    nested = store.create(SPACE_B, type="note", title="Tief verschachtelt", folder="projekte/alpha")
+
+    with _as(SPACE_A):
+        payload = json.loads(tools_map["search_items"](space=SPACE_B))
+
+    assert nested.id in {entry["id"] for entry in payload["items"]}
+
+
+def test_share_write_allows_update_and_append_but_not_in_other_folders(tools_map, store, tmp_path):
+    """Plan §4 Step 5, Pflichttest. `.share.yml`-Freigaben sind ordnerscharf — write in einem
+    Ordner erlaubt keinen Schreibzugriff auf ein Item in einem anderen, ungeteilten Ordner
+    desselben Space."""
+    _write_share_yml(tmp_path / SPACE_B / "geteilt", f"write: [{SPACE_A}]\n")
+    shared_item = store.create(SPACE_B, type="note", title="Geteilt", folder="geteilt")
+    other_item = store.create(SPACE_B, type="note", title="Ungeteilt", folder="privat")
+
+    with _as(SPACE_A):
+        update_receipt = json.loads(
+            tools_map["update_item"](shared_item.id, version=shared_item.version, title="Geändert")
+        )
+        assert update_receipt["title"] == "Geändert"
+        append_receipt = json.loads(
+            tools_map["append_to_item"](shared_item.id, version=update_receipt["version"], text="Mehr")
+        )
+        assert append_receipt["op"] == "append"
+
+        with pytest.raises(ToolError, match="write_denied"):
+            tools_map["update_item"](other_item.id, version=other_item.version, title="Hack")
+
+
+def test_human_only_item_is_invisible_to_agent_surface_including_total(tools_map, store):
+    """Plan §4 Step 5, Pflichttest (P6-P). `visibility: human` sperrt selbst dem Eigentümer-
+    Space die Agentenfläche — auch `get_item`, auch `total` in `search_items`. Das ist der
+    ganze Zweck des Felds: ein Mensch kann ein eigenes Item vor Claude verbergen."""
+    hidden = store.create(SPACE_A, type="note", title="Tagebuch", visibility="human")
+    store.create(SPACE_A, type="note", title="Normal")
+
+    with _as(SPACE_A):
+        payload = json.loads(tools_map["search_items"]())
+        assert hidden.id not in {entry["id"] for entry in payload["items"]}
+        assert payload["total"] == 1
+
+        with pytest.raises(ToolError, match="write_denied"):
+            tools_map["get_item"](hidden.id)
+
+
+def test_human_only_item_is_visible_on_the_human_surface(store):
+    """Kontrastprobe zu oben: `visibility: human` sperrt nur `Surface.AGENT`, nicht die
+    `SharePolicy` selbst — dieselbe `AclDecision` bleibt für `Surface.HUMAN` lesbar
+    (`webui/api.py` benutzt genau diesen Pfad, siehe `phase5_ui/tests/test_api.py`)."""
+    from mcpserver.permissions import Surface
+
+    hidden = store.create(SPACE_A, type="note", title="Tagebuch", visibility="human")
+    policy = SharePolicy(store.acl_reader)
+    acl = store.acl_of(hidden.id)
+    assert policy.can_read_item(SPACE_A, acl, surface=Surface.HUMAN) is True
+    assert policy.can_read_item(SPACE_A, acl, surface=Surface.AGENT) is False
+
+
+def test_unknown_space_in_share_yml_grants_nothing(tools_map, store, tmp_path):
+    """Plan §4 Step 5, Pflichttest — Wiring-Beweis auf Adapter-Ebene (die Mechanik selbst ist
+    in `phase6_shares/tests/test_acl.py` erschöpfend getestet)."""
+    _write_share_yml(tmp_path / SPACE_B, "read: [nichtexistent]\n")
+    item = store.create(SPACE_B, type="note", title="Fremd")
+
+    with _as(SPACE_A), pytest.raises(ToolError, match="write_denied"):
+        tools_map["get_item"](item.id)
+
+
+def test_broken_share_yml_grants_nothing_and_logs_critical(tools_map, store, tmp_path):
+    """Plan §4 Step 5, Pflichttest — Wiring-Beweis auf Adapter-Ebene."""
+    _write_share_yml(tmp_path / SPACE_B, "read: [unclosed\n")
+    item = store.create(SPACE_B, type="note", title="Fremd")
+
+    with _as(SPACE_A), pytest.raises(ToolError, match="write_denied"):
+        tools_map["get_item"](item.id)
 
 
 def test_search_result_size_budget(tools_map, store):
@@ -231,8 +341,12 @@ def test_get_item_own_space_returns_plain_filetext(tools_map, store):
     assert "<untrusted_content" not in text
 
 
-def test_get_item_foreign_space_body_is_wrapped(tools_map, store):
+def test_foreign_body_is_still_wrapped_in_shared_space(tools_map, store):
+    """Plan §4 Step 5, Pflichttest (P6-O). Ein Item, das ich per `share_write` ändern DARF,
+    bleibt trotzdem ein fremder Body und wird trotzdem gewrappt — die Wrap-Entscheidung folgt
+    der Space-Identität, nicht dem Schreibrecht (siehe `get_item`s Kommentar in `tools.py`)."""
     item = store.create(SPACE_B, type="note", title="Fremd", body="Beta-Body")
+    store.update(item.id, version=item.version, share_write=[SPACE_A])
 
     with _as(SPACE_A):
         text = tools_map["get_item"](item.id)
@@ -253,6 +367,7 @@ def test_wrap_untrusted_escapes_closing_tag():
 
 def test_get_item_foreign_space_does_not_write_file(tools_map, store, tmp_path):
     item = store.create(SPACE_B, type="note", title="Drift-Test", body="Original\n")
+    store.update(item.id, version=item.version, share_read=[SPACE_A])  # read, kein write
     path = next((tmp_path / SPACE_B).glob(f"{item.id}__*.md"))
 
     original_text = path.read_text()
@@ -282,9 +397,27 @@ def test_create_item_uses_principal_space(tools_map, store):
     assert counts[SPACE_A] == 1
 
 
-def test_create_item_has_no_space_parameter(tools_map):
-    sig = inspect.signature(tools_map["create_item"])
-    assert "space" not in sig.parameters
+def test_create_item_into_foreign_space_is_denied(tools_map):
+    """Plan §4 Step 5, Pflichttest. Ersetzt das alte `test_create_item_has_no_space_parameter`
+    (P2-G) — `create_item` hat seit P6 Step 5 einen `space`-Parameter (P6-U), aber ein anderer
+    Space als der eigene ist nur zulässig, wenn dessen `.share.yml` `write:` gewährt."""
+    with _as(SPACE_A), pytest.raises(ToolError, match="write_denied"):
+        tools_map["create_item"](type="task", title="Eindringling", space=SPACE_B)
+
+
+def test_create_item_into_shared_space_is_allowed_for_member(tools_map, store, tmp_path):
+    """Plan §4 Step 5, Pflichttest — Gegenprobe zu oben: mit `write:`-Mitgliedschaft gelingt
+    dasselbe `create_item(space=...)`."""
+    _write_share_yml(tmp_path / SPACE_B, f"write: [{SPACE_A}]\n")
+
+    with _as(SPACE_A):
+        receipt = json.loads(
+            tools_map["create_item"](type="task", title="Eingeladen", space=SPACE_B)
+        )
+
+    assert receipt["space"] == SPACE_B
+    counts = {s.name: s.item_count for s in store.list_spaces()}
+    assert counts[SPACE_B] == 1
 
 
 # -- update_item / append_to_item ------------------------------------------------------
@@ -477,6 +610,28 @@ def test_update_item_rejects_share_fields(tools_map, store):
         ):
             with pytest.raises(ToolError, match="invalid"):
                 tools_map["update_item"](item.id, version=item.version, **{field: value})
+
+
+def test_share_write_cannot_move_item_to_a_different_folder(tools_map, store, tmp_path):
+    """Nikinger-Entscheidung 2026-08-12 (kein Plan-Text, Advisor-Fund vor dem Build): ein
+    `share_write`-Halter darf ein fremdes Item inhaltlich ändern, aber nicht in einen anderen
+    Ordner verschieben — sonst könnte er dessen Sichtbarkeit über eine breitere `.share.yml`
+    dort erweitern, ohne dass die Agentenfläche je ein Re-Auth-Gate dafür hätte."""
+    _write_share_yml(tmp_path / SPACE_B / "eng", f"write: [{SPACE_A}]\n")
+    item = store.create(SPACE_B, type="note", title="Wird verschoben", folder="eng")
+
+    with _as(SPACE_A):
+        with pytest.raises(ToolError, match="invalid"):
+            tools_map["update_item"](item.id, version=item.version, folder="weit")
+
+        # Inhaltlich bleibt der Schreibzugriff intakt — nur `folder` ist gesperrt.
+        receipt = json.loads(
+            tools_map["update_item"](item.id, version=item.version, title="Geändert")
+        )
+        assert receipt["title"] == "Geändert"
+
+    unchanged = store.get(item.id)
+    assert unchanged.folder == "eng"
 
 
 def test_guard_auth_error_is_mapped_to_tool_error(tools_map, store, monkeypatch):

@@ -84,6 +84,15 @@ lebt in derselben `AuthStore`-Instanz, die `account_routes()`/`ui_auth_routes()`
 kein zweiter DB-Handle. **Dokumentierte Ein-Zeilen-Abweichung** von Step 3s Plan-Dateiliste (die
 nur `webui/api.py` nennt, nicht diese Datei) — Begründung im Moduldocstring von `webui/api.py`,
 gleiche Kategorie wie P6 Step 1/2s dokumentierte Abweichungen dort.
+
+**[2026-08-12, P6 Step 5]:** `OwnSpaceWritable()` ist entfernt. `SharePolicy(store.acl_reader)`
+tritt an ihre Stelle (Variable heißt jetzt `permissions`, nicht mehr `own_space_writable`) —
+die frühere Begründung oben ("ein Konstruktor-Austausch an dieser einen Stelle, kein Umbau von
+`tools.py`/`server.py`") war die Vorhersage für genau diesen Schnitt und hat gehalten:
+`build_mcp()`/`api_routes()` bekommen weiterhin nur ein `Permissions`-Objekt durchgereicht,
+keine Signaturänderung. `store.acl_reader` (neu, `storage/store.py`) gibt denselben
+`AclReader` zurück, den `Store.__init__` schon für `list_spaces()`/`acl_of()` baut — ein
+Handle, kein zweiter, siehe `permissions.py`s Moduldocstring.
 """
 from __future__ import annotations
 
@@ -113,7 +122,7 @@ from webui.static_routes import static_routes
 from . import __version__
 from .asgi import BearerAuthASGI
 from .config import Settings
-from .permissions import OwnSpaceWritable
+from .permissions import SharePolicy
 from .request_log import ToolCallLogMiddleware
 from .server import build_mcp
 
@@ -175,8 +184,11 @@ def create_app(
     `allowed_hosts` wie die FastMCP-App (P4-P) — sie trägt öffentliche Auth-Routen. Nur gesetzt,
     wenn `hosts` nicht `None` ist: sonst würde ein Betrieb ohne `SPACE_ALLOWED_HOSTS`
     (Discovery über den Tailscale-Funnel-Hostnamen) durch die Middleware selbst blockiert."""
-    own_space_writable = OwnSpaceWritable()
-    mcp = build_mcp(store, own_space_writable)
+    # P6 Step 5: `SharePolicy` statt `OwnSpaceWritable` — gebaut aus `store.acl_reader`, damit
+    # `Store` und die Rechteprüfung sich denselben `AclReader`-Cache teilen (ein Handle, kein
+    # zweiter, siehe `permissions.py`s Moduldocstring).
+    permissions = SharePolicy(store.acl_reader)
+    mcp = build_mcp(store, permissions)
     mcp.add_middleware(ToolCallLogMiddleware())
     hosts = list(allowed_hosts) if allowed_hosts else (list(settings.allowed_hosts) or None)
     mcp_app = mcp.http_app(path="/", stateless_http=True, allowed_hosts=hosts)
@@ -196,7 +208,7 @@ def create_app(
     routes += ui_auth_routes(ui_settings, oauth.store, oauth.users, ui_sessions)
     routes += static_routes(ui_settings, ui_sessions)
     routes += account_routes(ui_settings, oauth.store, oauth.users, ui_sessions)
-    routes += api_routes(ui_settings, store, ui_sessions, own_space_writable, oauth.store)
+    routes += api_routes(ui_settings, store, ui_sessions, permissions, oauth.store)
     middleware: list[Middleware] = []
     if hosts is not None:
         middleware.append(Middleware(TrustedHostMiddleware, allowed_hosts=hosts))

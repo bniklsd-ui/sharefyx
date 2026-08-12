@@ -408,11 +408,14 @@ async def test_principal_isolation_under_concurrency(app, token_alpha, token_bet
         own_space = "alpha" if i % 2 == 0 else "beta"
         foreign_space = "beta" if i % 2 == 0 else "alpha"
         assert by_name[own_space]["writable"] is True
-        assert by_name[foreign_space]["writable"] is False
+        # P6 Step 5: der fremde Space ist ohne Freigabe nicht mehr nur schreibgeschützt,
+        # sondern unsichtbar — eine stärkere Isolationsgarantie als vor P6 (test_foreign_
+        # space_is_invisible_without_share, phase2_mcp/tests/test_tools.py).
+        assert foreign_space not in by_name
 
 
 @pytest.mark.asyncio
-async def test_all_seven_tools_are_callable_over_http(app, token_alpha, token_beta):
+async def test_all_seven_tools_are_callable_over_http(app, token_alpha, token_beta, tmp_path):
     """Step 6 Done-when (P2), um `patch_item` erweitert (P6 Step 1): alle sieben Tools über den
     ASGI-Testclient aufrufbar — nicht nur als Python-Funktion (`test_tools.py`, Guard gemockt),
     sondern durch den echten Stack aus Step 5 (`BearerAuthASGI`, Guard, laufende FastMCP-App).
@@ -422,10 +425,17 @@ async def test_all_seven_tools_are_callable_over_http(app, token_alpha, token_be
     Inhaltsprüfungen unten (space/id/„Angehängt."/„status: archived") weiterhin gegen echten
     Dateitext laufen statt gegen die seit P6 Step 1 standardmäßige Quittung.
     """
+    # P6 Step 5: "beta" liest gleich ein Item aus "alpha" (Zeile "foreign_text" unten) — ohne
+    # Freigabe wäre das seit P6-U ein `write_denied`, nicht mehr universell erlaubt wie unter
+    # `OwnSpaceWritable`. Eine `.share.yml` an der Space-Wurzel macht "alpha" für "beta" lesbar.
+    (tmp_path / "alpha" / ".share.yml").write_text("read: [beta]\n", encoding="utf-8")
+
     async with app.router.lifespan_context(app):
         async with _mcp_client(app, token_alpha) as alpha, _mcp_client(app, token_beta) as beta:
             spaces = json.loads((await alpha.call_tool("list_spaces", {})).data)
-            assert {s["name"] for s in spaces} == {"alpha", "beta"}
+            # "beta" bleibt für "alpha" unsichtbar (kein Grant in dieser Richtung) — nur der
+            # eigene Space, plus der B1-Fallback, der ihn ohnehin immer mitliefert.
+            assert {s["name"] for s in spaces} == {"alpha"}
 
             created_text = (
                 await alpha.call_tool(

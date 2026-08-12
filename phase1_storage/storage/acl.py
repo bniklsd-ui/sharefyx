@@ -5,6 +5,7 @@ Angabe gibt nie mehr Rechte — sie loggt höchstens `critical` und liefert eine
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -99,7 +100,31 @@ class AclReader:
             write |= grant.write
         return Grant(read=frozenset(read), write=frozenset(write))
 
+    def grants_for_space(self, space: str) -> Grant:
+        """Grant der Space-Wurzel-`.share.yml` allein (kein Vereinigungs-Walk — die Space-Wurzel
+        IST der ganze Walk für sich selbst). Basis für `SharePolicy`s space-level `can_read`/
+        `can_write` (P6 Step 5) und für `members_of_space()`."""
+        return self._read_one(self._data_root / space / ACL_FILENAME)
+
     def members_of_space(self, space: str) -> frozenset[str]:
         """Write-Mitglieder der Space-Wurzel-`.share.yml` — nicht die Vereinigung über den
         ganzen Baum (das ist `grants_for_dir`s Job für ein konkretes Item)."""
-        return self._read_one(self._data_root / space / ACL_FILENAME).write
+        return self.grants_for_space(space).write
+
+    def decision_for(
+        self, *, space: str, folder: str, visibility: str,
+        share_read: Iterable[str], share_write: Iterable[str],
+    ) -> AclDecision:
+        """Baut eine `AclDecision` aus bereits bekannten Item-Feldern (P6 Step 5) — dieselbe
+        Vereinigungslogik, die `Store.acl_of()` sonst inline berechnet hätte, hier einmal
+        implementiert, damit `Store.acl_of()` sie aufrufen kann UND ein Aufrufer, der schon eine
+        `ItemSummary` aus `search()` in der Hand hat (z. B. `mcpserver.tools.search_items`),
+        keinen zweiten Index-Roundtrip pro Zeile braucht."""
+        directory = self._data_root / space / folder if folder else self._data_root / space
+        grant = self.grants_for_dir(directory)
+        item_read = frozenset(share_read)
+        item_write = frozenset(share_write)
+        return AclDecision(
+            space=space, folder=folder, visibility=visibility,
+            read=grant.read | item_read | item_write, write=grant.write | item_write,
+        )

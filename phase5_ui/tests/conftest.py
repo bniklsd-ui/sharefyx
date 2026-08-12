@@ -19,7 +19,7 @@ from authserver import passwords, totp
 from authserver.secretbox import KEY_LEN, seal
 from authserver.store import AuthStore
 from authserver.userdir import UserDirectory
-from mcpserver.permissions import OwnSpaceWritable
+from mcpserver.permissions import SharePolicy
 from starlette.applications import Starlette
 from storage.store import Store
 
@@ -120,8 +120,8 @@ def item_store(tmp_path) -> Store:
 
 
 @pytest.fixture
-def permissions() -> OwnSpaceWritable:
-    return OwnSpaceWritable()
+def permissions(item_store) -> SharePolicy:
+    return SharePolicy(item_store.acl_reader)
 
 
 @pytest.fixture

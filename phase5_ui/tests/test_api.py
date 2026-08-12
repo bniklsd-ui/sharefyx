@@ -3,11 +3,14 @@ die Sitzung, die die Items-API braucht, wie `test_account.py` es für `/api/v1/a
 tut).
 
 Zwei Tests laufen bewusst gegen einen `unittest.mock.MagicMock(spec=Store)`, nicht `item_store`:
-`test_space_of_is_called_before_permission_check` und
+`test_acl_of_is_called_before_permission_check` und
 `test_patch_foreign_item_is_403_and_never_reaches_store`. Ein echter `Store` würde beide
-Tests vacuous bestehen lassen — `OwnSpaceWritable.can_read` ist heute immer `True`, aber
-`can_write` ist es nicht; ohne den Spy sähe man nicht, dass `store.update()`/`get()` bei einer
-Rechteverweigerung wirklich nie aufgerufen werden, nur dass die Antwort 403 ist."""
+Tests vacuous bestehen lassen — `SharePolicy.can_write_item` gibt für ein fremdes, ungeteiltes
+Item `False` zurück, aber ohne den Spy sähe man nicht, dass `store.update()`/`get()` bei einer
+Rechteverweigerung wirklich nie aufgerufen werden, nur dass die Antwort 403 ist. **P6 Step 5:**
+beide Tests spionieren jetzt `store.acl_of()` statt `store.space_of()` — die Rechtereihenfolge
+selbst (Store-Aufruf vor Rechteprüfung, Rechteprüfung vor jedem weiteren Store-Aufruf) ist
+unverändert, nur die aufgelöste Größe (`AclDecision` statt ein roher Space-String)."""
 from __future__ import annotations
 
 import dataclasses
@@ -18,6 +21,7 @@ from unittest.mock import MagicMock
 import httpx
 import pytest
 from starlette.applications import Starlette
+from storage.acl import AclDecision
 from storage.models import Item
 from storage.store import Store
 
@@ -109,13 +113,31 @@ async def test_get_item_from_own_space_is_writable(full_app_items, item_store, t
 
 
 @pytest.mark.asyncio
-async def test_get_item_from_foreign_space_is_readonly_true(full_app_items, item_store, totp_code):
-    item = item_store.create(FOREIGN_SPACE, type="note", title="Fremde Notiz")
+async def test_get_item_from_foreign_space_without_share_is_forbidden(
+    full_app_items, item_store, totp_code
+):
+    """P6 Step 5: ohne jede Freigabe ist ein fremdes Item nicht mehr lesbar — anders als unter
+    `OwnSpaceWritable`, wo jeder Space universell lesbar war (`readonly=True`, aber `200`)."""
+    item = item_store.create(FOREIGN_SPACE, type="note", title="Fremde Notiz, ungeteilt")
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        response = await client.get(f"/api/v1/items/{item.id}")
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_get_shared_item_from_foreign_space_is_readonly_true(
+    full_app_items, item_store, totp_code
+):
+    item = item_store.create(FOREIGN_SPACE, type="note", title="Fremde Notiz, freigegeben")
+    item_store.update(item.id, version=item.version, share_read=[SPACE])
     async with _client(full_app_items) as client:
         await _login(client, totp_code)
         response = await client.get(f"/api/v1/items/{item.id}")
     assert response.status_code == 200
-    assert response.json()["readonly"] is True
+    body = response.json()
+    assert body["readonly"] is True
+    assert body["shared"] is True
 
 
 # -- Items: anlegen ---------------------------------------------------------------------------
@@ -157,7 +179,9 @@ async def test_patch_foreign_item_is_403_and_never_reaches_store(
     ui_settings, store, confirmed_users, sessions, permissions, totp_code
 ):
     mock_store = MagicMock(spec=Store)
-    mock_store.space_of.return_value = FOREIGN_SPACE
+    mock_store.acl_of.return_value = AclDecision(
+        space=FOREIGN_SPACE, folder="", visibility="private", read=frozenset(), write=frozenset(),
+    )
     app = Starlette(
         routes=ui_auth_routes(ui_settings, store, confirmed_users, sessions)
         + api_routes(ui_settings, mock_store, sessions, permissions, store)
@@ -168,26 +192,30 @@ async def test_patch_foreign_item_is_403_and_never_reaches_store(
             "/api/v1/items/itm_deadbeef", json={"version": 1, "title": "x"}, headers=_headers(csrf),
         )
     assert response.status_code == 403
-    mock_store.space_of.assert_called_once_with("itm_deadbeef")
+    mock_store.acl_of.assert_called_once_with("itm_deadbeef")
     mock_store.update.assert_not_called()
     mock_store.get.assert_not_called()
 
 
 @pytest.mark.asyncio
-async def test_space_of_is_called_before_permission_check(
+async def test_acl_of_is_called_before_permission_check(
     ui_settings, store, confirmed_users, sessions, permissions, totp_code
 ):
-    """Reihenfolge ist nicht verhandelbar (Plan §3.3): `space_of()` (index-only) MUSS laufen,
-    BEVOR `can_write()` entscheidet — sonst gäbe es keine Grundlage für die Rechteprüfung. Ein
-    Aufrufreihenfolge-Test braucht einen Spy, ein echter `Store` kann diese Reihenfolge nicht
-    unterscheidbar machen."""
+    """Reihenfolge ist nicht verhandelbar (Plan §3.3): `acl_of()` (index-only) MUSS laufen,
+    BEVOR `can_write_item()` entscheidet — sonst gäbe es keine Grundlage für die Rechteprüfung.
+    Ein Aufrufreihenfolge-Test braucht einen Spy, ein echter `Store` kann diese Reihenfolge
+    nicht unterscheidbar machen. **P6 Step 5:** ersetzt den vormaligen `space_of()`-Spion —
+    dieselbe Reihenfolgenfrage, jetzt mit der item-level ACL statt dem rohen Space-String."""
     fake_item = Item(
         id="itm_deadbeef", space=SPACE, type="note", title="x", status="active", body="",
         due=None, tags=[], links=[], created=NOW, updated=NOW, version=2, extra={},
     )
     mock_store = MagicMock(spec=Store)
     call_order: list[str] = []
-    mock_store.space_of.side_effect = lambda item_id: (call_order.append("space_of"), SPACE)[1]
+    own_acl = AclDecision(
+        space=SPACE, folder="", visibility="private", read=frozenset(), write=frozenset(),
+    )
+    mock_store.acl_of.side_effect = lambda item_id: (call_order.append("acl_of"), own_acl)[1]
     mock_store.update.side_effect = lambda *a, **kw: (call_order.append("update"), fake_item)[1]
     app = Starlette(
         routes=ui_auth_routes(ui_settings, store, confirmed_users, sessions)
@@ -198,7 +226,7 @@ async def test_space_of_is_called_before_permission_check(
         await client.patch(
             "/api/v1/items/itm_deadbeef", json={"version": 1, "title": "x"}, headers=_headers(csrf),
         )
-    assert call_order == ["space_of", "update"]
+    assert call_order == ["acl_of", "update"]
 
 
 @pytest.mark.asyncio
@@ -443,14 +471,32 @@ async def test_me_returns_session_space(full_app_items, totp_code):
 
 
 @pytest.mark.asyncio
-async def test_spaces_marks_own_space(full_app_items, item_store, totp_code):
+async def test_spaces_marks_own_space(full_app_items, item_store, tmp_path, totp_code):
+    """P6 Step 5: ein fremder Space ist nur noch sichtbar, wenn eine `.share.yml` das gewährt
+    (`test_foreign_space_is_invisible_without_share`) — vorher war jeder Space über
+    `OwnSpaceWritable.can_read` immer sichtbar. Diese `.share.yml` ist deshalb Teil des
+    Fixtures, nicht optional: ohne sie würde `FOREIGN_SPACE` in der Antwort schlicht fehlen."""
     item_store.create(FOREIGN_SPACE, type="note", title="Fremd")
+    (tmp_path / "data" / FOREIGN_SPACE / ".share.yml").write_text(
+        f"read: [{SPACE}]\n", encoding="utf-8"
+    )
     async with _client(full_app_items) as client:
         await _login(client, totp_code)
         response = await client.get("/api/v1/spaces")
     by_name = {s["name"]: s for s in response.json()}
     assert by_name[SPACE]["own"] is True
     assert by_name[FOREIGN_SPACE]["own"] is False
+
+
+@pytest.mark.asyncio
+async def test_spaces_omits_foreign_space_without_a_share(full_app_items, item_store, totp_code):
+    """Neues Verhalten (P6 Step 5, P6-U): ein Space ohne `.share.yml` und ohne Mitgliedschaft
+    ist für einen fremden Actor nicht mehr sichtbar — nicht nur nicht schreibbar."""
+    item_store.create(FOREIGN_SPACE, type="note", title="Fremd, ungeteilt")
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        response = await client.get("/api/v1/spaces")
+    assert FOREIGN_SPACE not in {s["name"] for s in response.json()}
 
 
 # -- /api/v1/updates (P6 Step 3) ----------------------------------------------------------------
@@ -503,8 +549,11 @@ async def test_updates_seen_sets_latest_id_and_is_separated_per_space(
 
 def test_webui_imports_exactly_one_mcpserver_symbol():
     """§1.2/P5-B: `webui` darf genau ein Symbol aus `mcpserver` importieren
-    (`permissions.OwnSpaceWritable`). Geprüft über den echten Quelltext, nicht über eine
-    Behauptung — jede `from mcpserver...`/`import mcpserver`-Zeile in `webui/*.py` wird gezählt."""
+    (`permissions.SharePolicy`, seit P6 Step 5 — vorher `OwnSpaceWritable`). Geprüft über den
+    echten Quelltext, nicht über eine Behauptung — jede `from mcpserver...`/`import
+    mcpserver`-Zeile in `webui/*.py` wird gezählt. `Surface` bleibt bewusst außen vor
+    (`SharePolicy.can_read_item_as_human()` kapselt es innerhalb von `mcpserver/permissions.py`
+    — ein zweiter Name aus demselben Modul wäre trotzdem ein zweites Symbol)."""
     import ast
     from pathlib import Path
 
@@ -520,4 +569,4 @@ def test_webui_imports_exactly_one_mcpserver_symbol():
                 for alias in node.names:
                     if alias.name.startswith("mcpserver"):
                         imported_symbols.add(alias.name)
-    assert imported_symbols == {"mcpserver.permissions.OwnSpaceWritable"}
+    assert imported_symbols == {"mcpserver.permissions.SharePolicy"}

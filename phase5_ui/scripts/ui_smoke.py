@@ -30,7 +30,7 @@ import httpx
 from authserver.config import AuthSettings
 from authserver.store import AuthStore
 from authserver.userdir import UserDirectory
-from mcpserver.permissions import OwnSpaceWritable
+from mcpserver.permissions import SharePolicy
 from starlette.applications import Starlette
 from storage.store import Store
 
@@ -80,11 +80,15 @@ async def _run(data_root: Path, checks: list[Check]) -> None:
     # `/api/v1/spaces`-Aufruf unsichtbar (`Store.list_spaces()` leitet Spaces ausschließlich aus
     # vorhandenen Items ab, keine separate Registry).
     item_store.create(SPACE_FOREIGN, type="note", title="Fremde Notiz", body="Fremder Inhalt.")
+    # P6 Step 5: ohne Freigabe wäre `SPACE_FOREIGN` seit P6-U auch nicht mehr LESBAR (nicht nur
+    # nicht schreibbar) — dieses Skript demonstriert ausdrücklich den Lese-Pfad in einen
+    # geteilten fremden Space (Prüfungen "spaces (eigen vs. fremd)" und "items?space=fremd").
+    (data_root / SPACE_FOREIGN / ".share.yml").write_text(f"read: [{SPACE_OWN}]\n", encoding="utf-8")
 
     routes = (
         ui_auth_routes(ui_settings, auth_store, users, sessions)
         + account_routes(ui_settings, auth_store, users, sessions)
-        + api_routes(ui_settings, item_store, sessions, OwnSpaceWritable(), auth_store)
+        + api_routes(ui_settings, item_store, sessions, SharePolicy(item_store.acl_reader), auth_store)
     )
     app = Starlette(routes=routes)
 

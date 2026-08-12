@@ -155,8 +155,13 @@ nicht zwischen Claude-Oberflächen, `diagnose.sh`/`ui_budget.py`-Ergänzungen), 
 **gebaut, Live-Teile beim Nikinger** (Update-Log und
 Banner — Schema 3, `webui/updates.py`, `deploy.sh`-Gate). **Block A (Steps 0–3) damit
 vollständig gebaut.** **GATE A→B: 3 von 4 Punkten live bestanden** (patch_item, Banner + Fabians
-Bestätigung) — nur noch Punkt 3 offen (Purge-Zeilenrückgang, frühestens 2026-08-28). **Nächster
-Schritt:** Punkt 3 abwarten, danach Step 4 (Storage-Fundament, Block B).
+Bestätigung) — nur noch Punkt 3 offen (Purge-Zeilenrückgang, frühestens 2026-08-28), per
+Nikinger-Entscheidung vor Gate-Abschluss mitgetragen, nicht blockierend für Block B. Block B:
+Step 4 (Storage-Fundament — `storage/acl.py`, `folder`/`visibility`/`share_*`) ✅ **gebaut**,
+Step 5 (Rechtepolitik — `SharePolicy`/`Surface` ersetzt `OwnSpaceWritable`, item-level ACL in
+`mcpserver/tools.py`/`webui/api.py`) ✅ **gebaut** (2026-08-12). **Nächster Schritt:** Step 6
+(Verwaltung/Migration — `spacectl.py`, `migrate_visibility.py`). Details:
+`phase6_shares/CLAUDE.md`.
 
 **Phase 5 — Web-UI, REST-API und Auth-Selbstverwaltung** (`phase5_ui/`, Paket `webui`) — **✅
 abgeschlossen, 2026-08-09 — 20/20 Abnahmezeilen live bestanden, 0 teilweise, 0 offen.** Zwei
