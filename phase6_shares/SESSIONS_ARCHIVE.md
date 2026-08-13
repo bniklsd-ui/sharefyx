@@ -1,10 +1,10 @@
 ---
 status: live
-purpose: L3-Archiv der Phase-6-Session-Bloecke -- Steps 0-5 (Haushalt, Werkzeug-Ergonomie, Betrieb, Update-Log/Banner, Storage-Fundament, Rechtepolitik), verbatim aus phase6_shares/CLAUDE.md verschoben
+purpose: L3-Archiv der Phase-6-Session-Bloecke -- Steps 0-6 (Haushalt, Werkzeug-Ergonomie, Betrieb, Update-Log/Banner, Storage-Fundament, Rechtepolitik, Verwaltung/Migration + Live-Cutover), verbatim aus phase6_shares/CLAUDE.md verschoben
 read-when: Historie einer bereits abgeschlossenen Phase-6-Teilarbeit nachvollziehen -- nicht beim normalen Sessionstart lesen
 detail: L3
 up: ../phase6_shares/CLAUDE.md
-updated: 2026-08-12
+updated: 2026-08-13
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 6 (`phase6_shares/`)
@@ -19,6 +19,302 @@ updated: 2026-08-12
 > überall in diesem Repo.
 > **Dritte Rotation (2026-08-12, derselbe Tag, Step-5-Commit):** Step 4 (Storage-Fundament)
 > wandert verbatim herein, wieder mechanisch über dasselbe Skript, Byte-Identität geprüft.
+> **Vierte Rotation (2026-08-13, Planungssession `ITEM_MOVE_PLAN.md`):** derselbe Auslöser wie
+> beim zweiten Mal — der Kopf riss mit dem neuen Block den Softcap (40,2 KB). Step 6 samt seinen
+> vier Nachträgen (Tool-Beschreibungen, Live-Cutover der Steps 4–6, Wortmarken-Version, UI-Fund
+> „nur lesen" trotz Schreibrecht) wandert verbatim herein, wieder über dasselbe Skript,
+> Byte-Identität geprüft. Enthält am Ende eine datierte Korrekturnotiz zum UI-Fund: dessen
+> zweiter Teil ist inzwischen deployed und live bestätigt — sie steht bewusst hier an der
+> Aussage, die sie korrigiert, der aktuelle Stand steht im Kopf.
+
+## Session stopped — 2026-08-12, dritter — (Step 6 — Verwaltung und Migration, Block B)
+
+**Auftrag:** Nikinger-Sonderauftrag zu Sessionbeginn — vor jedem Deploy des Sichtbarkeits-
+Cutovers mindestens Step 6 bauen (`spacectl.py`/`migrate_visibility.py`), damit die Umstellung
+mit richtigem Werkzeug statt einer von Hand editierten `.share.yml` landet. Plan §4 Step 6 war
+bereits ausführungsreif (Dateiliste, Unterbefehle, Report-Format, DoD) — per Root-Prompt-Regel
+("wenn der Plan detailliert genug ist, das feststellen und atomar entlang seiner Schritte
+vorgehen") direkt umgesetzt, kein eigener Planungsdurchlauf nötig. Vor dem ersten Code
+`advisor()` konsultiert (Auftrag: unaufgefordert vor substanzieller Arbeit).
+
+**Advisor-Runde vor dem Bau, vier Punkte übernommen:**
+1. **Kein `version`-Sprung in `migrate_visibility.py`.** Ursprüngliche Annahme dieser Session
+   ("ein Versionssprung wäre vertretbar") war falsch — ein fehlendes `visibility`-Feld hat schon
+   vor der Migration den Default `private` (`models.py :: DEFAULT_VISIBILITY`, Frontmatter-
+   Vertrag §2.1), nichts Beobachtbares ändert sich. Ein Versionssprung hätte jeder laufenden
+   Claude-Instanz mit einer gerade gelesenen `version` einen `ConflictError` untergeschoben, der
+   keiner ist — am Tag des Cutovers, an dem Abnahmezeile 8 getestet wird. Bestimmt die gesamte
+   Architektur des Skripts: es ruft deshalb nie `Store.update()` auf (das würde pro Item
+   committen), sondern schreibt über `storage.files.atomic_write` direkt.
+2. **Kein Index-Rebuild nach `--apply` nötig — geprüft, nicht angenommen.** `storage/index.py ::
+   row_from_file()` gibt einem fehlenden `visibility`-Feld bereits denselben Default (`"private"`,
+   `fields.get("visibility", "private")`) — Datei und Index sagen vor und nach dem Lauf für jedes
+   Item dasselbe. Kein `store.rebuild_index()`-Aufruf im Skript.
+3. **`STATE_DIRECTORY`-Konvention aus dem Plan ist wörtlich unpassend, sinngemäß richtig.**
+   Gegengeprüft: `phase4_auth/systemd/sharefyx-mcp.service` setzt `SPACE_DATA_ROOT` über eine
+   eigene, direkt gesetzte `Environment=`-Zeile — unabhängig von `StateDirectory=sharefyx` (das
+   trägt nur die Auth-DB). Gemeint war die **Haltung** von `authctl.py :: resolve_db_path()`
+   ("aus der Umgebung auflösen, kein stiller Fallback ins Arbeitsverzeichnis"), nicht die
+   wörtliche Variable. `mcpserver.config.load_settings()` wäre wiederverwendbar gewesen, aber
+   Advisor riet zu einer eigenen vierzeiligen `_resolve_data_root()` je Skript statt einer neuen
+   `phase6_shares → phase2_mcp`-Importabhängigkeit für ein einzelnes Feld — kein bestehender
+   Code-Pfad außerhalb von `phase2_mcp`/`phase4_auth` importiert `mcpserver.config` bisher
+   (gegengeprüft per `grep`), diese Abhängigkeit wäre neu und unbegründet gewesen. Umgesetzt:
+   `--data-root`-Flag hat Vorrang, sonst `SPACE_DATA_ROOT` (Pflicht), in beiden Skripten identisch.
+4. **Lock einmal für den gesamten `--apply`-Lauf, nicht je Datei.** Ein Flock auf
+   `<data_root>/.write.lock` (dieselbe Datei wie `Store._file_write_lock()`, hier eigenständig
+   reimplementiert statt als neue `Store`-Fläche exportiert — dieselbe Zurückhaltung wie P6
+   Step 5) wird für die komplette Migration bzw. jeden `spacectl.py`-Schreibbefehl gehalten. Ein
+   über mehrere Locks interleaved halbmigrierter Zustand mit einem parallel schreibenden Dienst
+   wäre schwerer zu erklären als ein kurzzeitig blockierter Dienst.
+
+**`phase6_shares/scripts/migrate_visibility.py` (neu):** `scan()` liest jedes `*.md` unter jedem
+Space (inkl. `_archive/` — archivierte Items brauchen `visibility` genauso), meldet nur Items
+ohne das Feld. `apply()` schreibt `visibility: private` je gemeldetem Item über
+`frontmatter.parse`/`serialize` + `files.atomic_write`, dann **ein** `history.commit()` je Space
+(`migrate visibility [<space>]`) — nicht je Item, wie Plan §2.3 verlangt (200 Commits wären
+Lärm). `history.ensure_repo()` wird defensiv selbst aufgerufen (nicht von einem vorherigen
+`Store()`-Aufruf vorausgesetzt) — sonst würde `history.commit()` gegen ein Verzeichnis ohne
+`.git` nur `logger.critical` loggen (nie fatal) und der geforderte Commit bliebe stillschweigend
+aus. `--dry-run` ist Default; Report als JSON-Zeilen (`{"id":…,"space":…,"path":…,"before":null,
+"after":"private"}`) plus eine Summenzeile (`items_migrated`, `spaces_touched`) auf stdout.
+
+**`phase6_shares/scripts/spacectl.py` (neu):** sieben Unterbefehle. `create-space` legt nur ein
+Verzeichnis an — **kein eigener Commit** (Git kennt keine leeren Verzeichnisse, der erste
+Item-Write erzeugt den ersten echten Commit), **aber jeder schreibende Unterbefehl inklusive
+`create-space` initialisiert über `_DataRootLock.__enter__()` beiläufig ein Git-Repo**
+(`history.ensure_repo()`, idempotent — derselbe Aufruf, den `Store.__init__` bei jedem
+Dienststart ohnehin macht), falls noch keins existiert. Bewusst genannt statt nur im Code
+sichtbar: `create-space` gegen ein brandneues `DATA_ROOT` initialisiert damit Git als
+Seiteneffekt, ohne selbst zu committen. `list-spaces`/`show` lesen über `Store`/`AclReader` (Wiederverwendung
+statt zweiter Lesepfad). `add-member`/`remove-member` schreiben `<space>/.share.yml` direkt
+(eigener, lauter YAML-Loader — anders als `AclReader`, der bei einem kaputten Bestand fail-closed
+still eine leere `Grant` zurückgibt, soll ein Operator, der gerade eine Freigabe bearbeitet, einen
+kaputten Bestand sofort sehen, nicht stillschweigend überschreiben); `write:` impliziert `read:`
+(Plan §1.2.2) — `add-member --write` trägt den Namen deshalb nur in `write:` ein, keine Dopplung
+in `read:`. `remove-member` entfernt aus beiden Listen (vollständiger Widerruf, kein Flag nötig)
+und löscht die Datei ganz, wenn danach nichts Nennenswertes übrig bleibt (`.share.yml`s eigene
+"leer = nicht vorhanden"-Disziplin, analog Frontmatter §2.1). `remove-space --force` löscht den
+Verzeichnisbaum (`shutil.rmtree` + ein Commit) — **nicht** ohne `--force` (Trockenlauf-Default,
+druckt nur eine Vorschau), warnt immer, dass Git-Historie/Backups den Inhalt trotzdem behalten
+(Hard Rule 4/F2), und scannt **vor** dem Löschen alle `.share.yml` im Bestand auf verbleibende
+Referenzen auf den zu löschenden Space (Advisor-Fund: sonst produziert `remove-space` selbst
+genau die verwaisten Namen, die `check`/Abnahmezeile 24 später melden). `check` (neu, nicht im
+Plan-Text benannt, aber von der Step-6-DoD verlangt — "`diagnose.sh` meldet keine verwaisten
+Namen" kann nur berichten, was ein YAML-Parser ausgewertet hat, kein zweiter Parser in Bash,
+§2.2/V51) meldet `orphan_count`/`broken_count` als JSON.
+
+**`phase3_edge/scripts/diagnose.sh`, Prüfung 12 (neu):** liest `DATA_ROOT`/`VENV` aus
+`local.env` (dasselbe Sourcing-Muster wie Prüfung 5), ruft `spacectl.py check --json` über den
+venv-Python auf, wertet `orphan_count + broken_count` aus (`python -c` auf dem JSON-Strom,
+dasselbe Muster wie `abnahme_run.sh` — kein `jq`, kein zweiter JSON-Parser im Repo). INFO/
+WARNUNG-Kategorie wie Prüfung 9/11, kein Abbruchkriterium — DATA_ROOT ist unter dem Dienst
+gesetzt, nicht unter der Bash-Session, ein fehlendes `local.env` ist kein Fehlerzustand für
+dieses Skript. **Manuell simuliert, nicht nur `bash -n`:** ein Wegwerf-`DATA_ROOT` mit zwei
+Spaces und einer Freigabe angelegt, den geteilten Space per `shutil.rmtree` entfernt, Block 12
+Zeile für Zeile gegen dieses Szenario gefahren — `orphan_count: 1`, korrekt den entfernten
+Namen benannt. Scratch-Verzeichnis danach entfernt.
+
+**Tests, beide Dateien neu (`importlib.util.spec_from_file_location`-Ladepfad wie
+`test_authctl.py`, Skripte liegen in keinem Python-Paket):** `test_spacectl.py` (20 Tests:
+DATA_ROOT-Auflösung, create/list/show, add/remove-member inkl. write-impliziert-read und
+Verwaisungswarnung, remove-space Dry-Run vs. `--force`, `check` sauber/verwaist/kaputt) +
+`test_migrate_visibility.py` (8 Tests: Dry-Run-Default schreibt nichts, Report-Inhalt, Version
+bleibt unverändert, bereits gesetztes `visibility` bleibt unangetastet, ein Commit je Space bei
+mehreren Items, zwei Commits bei zwei Spaces, DATA_ROOT-Auflösung). Beide Dateien injizieren
+`env` in `main()` (nie `os.environ` direkt) und filtern `SHAREFYX_*`/`SFX_*` vor dem Aufruf
+(P5-Lehre, memory `feedback_test_harness_never_inherits_env` — hier ohne reale Wirkung, da
+keines der Skripte `systemctl` aufruft, aber dieselbe Disziplin durchgehalten, nicht erst bei
+Bedarf nachgerüstet).
+
+**Zweite Advisor-Runde, nach dem ersten Entwurf, vor dem Commit — ein Fund übernommen:**
+`_cmd_remove_member` prüfte anders als `_cmd_add_member` nie, ob der Ziel-Space überhaupt
+existiert — bei einem Tippfehler im Space-Namen liefert `_load_share_file()` `{}` (Datei fehlt
+ja tatsächlich), `removed` bleibt leer, das Skript druckt „war in keiner Liste" und `EXIT_OK`.
+Harmlos im Ergebnis, aber aus dem falschen Grund: die „kein Schreibzugriff"-Eigenschaft hing an
+einer leeren Liste, nicht an einer Prüfung — ein Operator, der `remove-member niklsa fabian`
+tippt, bekommt eine fröhliche Erfolgsmeldung und glaubt, die Freigabe sei weg, obwohl nie ein
+echter Space namens `niklsa` existierte. Behoben: derselbe `ABBRUCH`-Guard wie in `add-member`,
+plus `test_remove_member_on_unknown_space_aborts_instead_of_false_success`. **20 statt 19 Tests
+in `test_spacectl.py`, 28 statt 27 insgesamt** — Zahlen unten schon korrigiert, nicht als
+spätere Drift stehen gelassen (die elf dokumentierten Instanzen dieser Drift-Kategorie in
+`phase2_mcp/CLAUDE.md` waren Warnung genug).
+
+**Verifiziert:** `pytest -q` (gesamtes Repo) → **722 passed** (694 + 20 + 8, keine Regression),
+Zahl der beiden neuen Dateien per `pytest --collect-only -q` nachgezählt, nicht aus dem
+Schreibprozess geschätzt. `git status --short` nach den Testläufen zeigt außerhalb der neuen
+Dateien nur `phase6_shares/CLAUDE.md`/`docs/INDEX.md` (Doc-Update) und `phase3_edge/scripts/
+diagnose.sh` — kein `storage/`/`mcpserver/`/`authserver/`-Touch, wie für einen reinen
+Tooling-Step erwartet.
+
+**Status:** Step 6 ist **gebaut und unit-verifiziert**, nicht live geprüft — insbesondere ist
+`migrate_visibility.py --apply` bisher ausschließlich gegen `tmp_path`-Wegwerfverzeichnisse
+gelaufen, nie gegen den echten `DATA_ROOT` (Hard Rule: kein Test gegen den echten `DATA_ROOT`
+durch Claude Code). DoD hat einen Live-Anteil, der laut Root-Prompt Sache des Nikingers ist
+(echter dritter Nutzer, echter `diagnose.sh`-Lauf gegen den realen `DATA_ROOT`) — dieselbe
+Aufteilung wie bei Steps 4/5 ("noch nicht live geprüft, kein eigener Abnahmematrix-Punkt"). Kein
+MCP-Tool/`storage`-Kern-Code geändert — reine neue Operator-Skripte plus eine
+`diagnose.sh`-Prüfung, wie geplant.
+
+**Nächster Schritt (konkret):** Sonderauftrag ("mindestens Step 6") ist erfüllt — Rückmeldung an
+den Nikinger vor Fortsetzung. **Empfehlung für den ersten echten Lauf, bevor der
+Sichtbarkeits-Cutover live geht:** `migrate_visibility.py --data-root <echter DATA_ROOT>`
+(Default `--dry-run`) einmal gegen den realen Bestand laufen lassen, den JSON-Report durchsehen
+(Anzahl migrierter Items plausibel? welche Spaces betroffen?), **erst danach** `--apply` — genau
+der Grund, warum dieses Skript existiert statt einer von Hand editierten `.share.yml`. Falls
+weiter im Plan: Step 7 (UI Dateisystem, `webui/shares.py`, `app.js`-Split, Freigabedialog +
+Re-Auth) ist der nächste Schritt, deutlich größerer Umfang (JS ohne Unit-Tests laut
+P5-Konvention, `[VERIFY]` V43/V50) — kein Selbstläufer aus dieser Session heraus.
+Gate-A→B-Punkt-3-Erinnerung bleibt unverändert gültig (frühestens 2026-08-28).
+
+**Nachtrag 2026-08-13, vor Step 7:** der Nikinger brachte zwei Betriebs-Reports einer
+arbeitenden Claude-Instanz mit — vermeintlich kein Weg, `status`/`links` ohne `patch_item`/
+`append_to_item` zu ändern. Geprüft statt übernommen: `update_item` konnte das schon seit P6
+Step 1 (alle Felder unabhängig optional, `body` weglassen rührt den Body nicht an) — die
+Instanz griff nur zu den zwei Tools, deren Namen „gezielt" suggerieren, weil deren
+Beschreibung das nicht ausschloss. Kein Code-/Schema-Fix nötig, nur die drei
+Tool-Descriptions in `mcpserver/tools.py` präzisiert (Details + Testlauf:
+`phase2_mcp/CLAUDE.md`s Korrekturnotiz vom selben Datum). Kein eigener Plan-Step, kein
+Einfluss auf Step 7.
+
+**Nachtrag 2026-08-13, dritter — Steps 4-6 live deployed, Cutover vollzogen, ein neuer
+Shared Space, ein UI-Fund und eine Planungsvormerkung:**
+
+**Auftrag:** Nikinger-Entscheidung, direkt aus dem laufenden Betrieb heraus: „power right
+through the deployment". Vorausgegangen war ein Nebenbefund beim Testen der Runbook-Kommandos
+für Step 6 (siehe vorheriger Nachtrag-Kontext) — `spacectl.py show` löste einen Index-Rebuild
+(Schema 0→2) auf dem echten Index gegen den ECHTEN `DATA_ROOT` aus, weil `Store.__init__` den
+laufenden Prozess ja nicht neu startet. Read-only anhand von `journalctl` (Fenster vor/nach dem
+Rebuild-Zeitstempel `13:18:34`) geprüft statt angenommen: der laufende Dienst (altes Release,
+kein Neustart) blieb durchgehend `200` auf `/mcp/` und `/api/v1/overview` — die neuen Spalten
+tragen `NOT NULL DEFAULT`, altes `index.py` referenziert sie nie. Kein Schaden, aber der Fund
+zeigt: der Index ist ein geteilter Zustand zwischen jedem lokalen Checkout und dem laufenden
+Prozess, nicht nur zwischen Releases.
+
+**Blockierender Befund vor dem eigentlichen Deploy:** die neue `SharePolicy` (Step 5) verlangt
+für fremden Lesezugriff einen expliziten `.share.yml`-Grant (`permissions.py:58-66`) — anders
+als das alte, noch live laufende Modell, das jeden fremden Space immer lesbar ließ. Weder
+`niklas/.share.yml` noch `fabian/.share.yml` existierten. Ein Deploy ohne Gegenmaßnahme hätte
+den beiden einzigen echten Nutzern dieses Systems gegenseitig die Notizen entzogen — dem
+Nikinger vor dem Deploy vorgelegt (nicht stillschweigend gelöst), er hat sich für „ja, gegenseitig
+lesbar halten" entschieden.
+
+**Deploy-Reihenfolge, als ein Skript statt zwei loser Befehlsblöcke gebaut** (Advisor-Fund vor
+dem Handover: getrennte Blöcke hätten in beliebiger Reihenfolge ausgeführt werden können —
+`deploy.sh`s eigenes Health-Gate prüft `/health`/`/ui/login`/`/api/v1/me`/`/mcp/`, nicht „kann
+niklas fabians Space noch lesen", ein Deploy vor den Grants wäre also grün durchgelaufen und
+hätte den Zugriffsverlust verdeckt): `spacectl.py add-member niklas fabian --read` +
+`add-member fabian niklas --read`, **hartes Grep-Gate** auf beide `.share.yml`-Dateien, erst
+danach `deploy.sh main`. Vom Nikinger ausgeführt (Sudo für den Neustart, außerhalb dessen, was
+Claude Code selbst kann). `docs/UPDATE_LOG.md` bekam einen echten, datierten Eintrag (Punkt „Doc
+✓" der eigenen Deploy-Konvention, P6-X) statt eines `SHAREFYX_ALLOW_STALE_UPDATELOG`-Overrides,
+weil dies — anders als die kosmetische Wortmarken-Änderung vorher am selben Tag — eine reale,
+nutzersichtbare Verhaltensänderung ist.
+
+**Ergebnis: `main`@`d068d1c` live, Release `20260813T113025.931306Z`, 722/722 Tests im Release
+grün, Health-Gate 3/3 grün.** Live-Verifikation **eine Richtung bestätigt, eine offen**: über
+den echten MCP-Connector (beide OAuth-Clients des Nikingers, `sharefyx` und
+`Phase_4_sharefyx_Niklas`, identische Ergebnisse) `list_spaces` → alle drei Spaces sichtbar,
+`IT-Sekus-Projekt` korrekt `writable:true` mit beiden Mitgliedern; `get_item`/`search_items`
+gegen `fabian` lieferten echten Inhalt, korrekt in `<untrusted_content space="fabian">`
+gewrappt — Rule 4 hält nach dem Cutover. **fabian→niklas ungetestet** — kein Zugriff auf
+Fabians Token/Connector in dieser Session, bleibt offen bis Fabian selbst prüft oder es
+weitergemeldet wird.
+
+**Neuer Shared Space `IT-Sekus-Projekt`** (kanonischer Firmen-Projektname, Nikinger-Wahl):
+beide Principals `--write` (impliziert read, `acl.py:76`), für Nutzung/Testing gedacht, bewusst
+getrennt von den beiden echten Notiz-Spaces angelegt, damit Konflikt-/Mehrbenutzer-Tests dort
+keine echten Daten berühren können.
+
+**UI-Fund, behoben (Nachtrag, selber Tag):** die Weboberfläche zeigte `IT-Sekus-Projekt` im
+Baum/in der Übersicht als „nur lesen", obwohl der Space laut MCP `writable:true` ist. **Root
+Cause:** `webui/api.py:271` / `serializers.py:111` berechneten für die Space-Liste
+ausschließlich `"own": space.name == session.space` — kein `writable`-Äquivalent zum
+MCP-`list_spaces`-Feld. `app.js:598`/`676` kannte deshalb nur `space.own` und badgte jeden
+nicht-eigenen Space hart als „nur lesen", ganz gleich ob ein `.share.yml`-Write-Grant existiert.
+Die **Item-Ebene** war davon nie betroffen — `api.py:359` (`_items_get`) berechnet `readonly`
+bereits korrekt über `can_write_item_as_human()`; der Fehler saß ausschließlich in der
+Space-Übersicht/im Baum. **Fix:** `space_to_json()` (`serializers.py:107`) bekommt einen
+neuen Pflicht-Parameter `writable: bool`; beide Aufrufer in `api.py` (`_spaces()`, `_overview()`)
+berechnen ihn über `permissions.can_write(session.space, ...)` — derselbe Aufruf, den
+`tools.py :: list_spaces()` für den MCP-Weg schon nutzt (`tools.py:294`), jetzt spiegelbildlich
+auf der REST-Seite. `app.js:598`/`676` lesen jetzt `space.writable` statt `space.own` für das
+Badge; die Baum-/Übersicht-**Gruppierung** (eigener vs. verbundener Space) bleibt bewusst bei
+`own` — das ist eine andere Frage als Schreibrecht. +2 Tests (`test_serializers.py`,
+`test_api.py`), +2 Assertions (`test_overview.py`); 722→724 gesamt. Deployed (Release
+`20260813T115528.897376Z`, `sha 17303f0`) — der Nikinger meldete danach live: Badge korrekt weg,
+aber **innerhalb** des Spaces weiterhin „nur lesen" und der Anlegen-Knopf weiterhin versteckt.
+
+**Zweiter Teil desselben Bugs, im selben Nachtrag behoben:** derselbe Fehler saß eine Ebene
+tiefer, unabhängig vom eben gefixten Badge. `app.js`s `ownSpaceActive()` (`state.activeSpace ===
+state.ownSpace`) steuerte acht Stellen — den Anlegen-Dialog, den „nur lesen"-Text in der
+Liste, den Leerzustand-Text, den Absende-Guard des Anlegen-Formulars — und fragte dabei
+ausschließlich „ist das mein Home-Space", nie das tatsächliche Schreibrecht. Der Badge-Fix
+allein änderte daran nichts, weil er nur die Space-Liste betraf, nicht diese acht Stellen.
+**Fix:** neue Funktion `activeSpaceWritable()` (`app.js`, sucht `state.activeSpace` in
+`state.spaces` — derselben Liste, die der Badge-Fix jetzt korrekt mit `writable` befüllt —
+und liest dessen `.writable`), alle acht `ownSpaceActive()`-Aufrufstellen umgestellt, die jetzt
+tote Funktion `ownSpaceActive()` selbst entfernt (nicht stehen gelassen). Kein Python geändert,
+keine neuen Backend-Tests nötig (`space.writable` selbst ist bereits über die Backend-Tests
+oben abgedeckt) — stattdessen `node --check` (Syntax) und eine Vier-Fall-Simulation
+(eigener/schreibbar-fremder/nur-lesbar-fremder/unbekannter Space) der reinen Funktionslogik
+gegen erwartete Werte, weil P5-T JS bewusst unit-ungetestet lässt und ein echter
+Browser-Durchlauf einen laufenden Server + eine echte Sitzung bräuchte (außerhalb dieser
+Session). **Nicht** interaktiv im Browser geprüft — der Nikinger sollte das nach dem nächsten
+Deploy live bestätigen, dieselbe Lücke wie beim ersten Teil des Fixes.
+
+> **[2026-08-13 Nachtrag zu diesem Absatz, fünfte Session] Lücke geschlossen.** Der Fix ist
+> deployed und vom Nikinger per **manuellem UI-Test im Browser** validiert — genau der Durchlauf,
+> den diese Session nicht selbst fahren konnte. Beleg read-only gegengeprüft statt die Meldung
+> übernommen: `/opt/sharefyx/current` zeigt auf Release `20260813T120925.743482Z`, dessen
+> Arbeitsstand `92b918b` trägt — derselbe Commit, der den `activeSpaceWritable()`-Fix enthält,
+> und identisch mit dem lokalen `main`-HEAD. `docs/UPDATE_LOG.md` trägt dafür einen echten,
+> heute datierten Eintrag („hotfixed Rechte für shared space"), das `deploy.sh`-Gate (P6-X) ist
+> also regulär gelaufen, nicht per Override. **Beide Teile des UI-Funds sind damit geschlossen
+> und live bestätigt.**
+
+**Planungsvormerkung für die nächste Session (Opus, Browser-Planung) — Item-Verschieben:**
+bereits vor dem Deploy geprüft und bestätigt fehlend auf allen drei Schichten
+(`storage/store.py :: update()` kennt kein `space`-Feld — ein unbekannter Schlüssel landet
+sogar stillschweigend als beliebiges Extra-Frontmatter-Feld statt eines Fehlers, `webui/api.py`s
+`_items_patch` kennt nur `folder` nicht `space`, `mcpserver/tools.py :: update_item` hat keinen
+`space`-Parameter). Der Nikinger-Wunsch: eine Planungssession soll klären, wie Item-Verschieben
+**zwischen** Ordnern UND Spaces zusammen mit dem bereits gebauten geschichteten Ordnermodell
+(`files.py :: MAX_FOLDER_DEPTH`/`validate_folder()`, Step 4) aussehen soll. Stichpunkte, die die
+Planung mitnehmen sollte, nicht mehr:
+- **Zwei Fälle, ein Werkzeug oder zwei?** Verschieben innerhalb des eigenen Space (nur
+  `folder` ändert sich, bereits gebaut) vs. Verschieben über Space-Grenzen (physische
+  Dateiverschiebung, echter Cross-Space-Write) — letzteres kollidiert mit Hard Rule 4/P6-U und
+  bräuchte einen Write-Grant im ZIEL-Space, nicht nur im Quell-Space.
+- **Git-Historie — geprüft, nicht mehr offen:** `history.ensure_repo(data_root)`/
+  `commit(data_root, message)` (`storage/history.py:30,60`) nehmen beide den gesamten
+  `DATA_ROOT`, nicht einen Space-Pfad — **ein** Repo für alle Spaces, kein Cross-Repo-Problem.
+  Ein Cross-Space-Move ist damit `git mv <alt> <neu>` + **ein** Commit, dieselbe Atomarität wie
+  jeder andere Write heute. Vereinfacht die Planung gegenüber der ursprünglichen Annahme.
+- **Index/ACL:** ein verschobenes Item braucht eine neue `AclDecision` (neuer Space, neuer
+  Ordner, ggf. andere `.share.yml`-Grants) — Version hochzählen oder nicht, dieselbe Abwägung
+  wie bei der Sichtbarkeits-Migration.
+- **Item-ID bleibt stabil** (Entscheidung F aus P1, `itm_<8hex>` unveränderlich) — ein Move darf
+  daran nichts ändern, nur Verzeichnis + Frontmatter-`space`/`folder`.
+- Ausgangspunkt für die Planung: dieser Abschnitt hier, nicht neu von vorne suchen.
+
+Diese vier Punkte (Cutover-Ergebnis, UI-Fund, neuer Space, Planungsvormerkung) sind reine
+Live-Betriebs-/Doku-Arbeit dieser Session — kein Code geändert außer `docs/UPDATE_LOG.md`
+(bereits im vorigen Nachtrag committet). `pytest` unverändert bei 722/722 (Release-interner Lauf
+von `deploy.sh` ist der Beleg, kein separater Lauf hier nötig).
+
+**Nachtrag 2026-08-13, zweiter — UI-Kleinigkeit „on the fly":** der Nikinger meldete direkt im
+Anschluss, die Wortmarke oben links zeige keine Versionsnummer, mit Vorschlag (dieselbe
+Schriftart, kleiner, Phase 6 = v2). Umgesetzt in `phase5_ui/webui/static/{app.html,app.css}`
+(`.rail__version`-Span neben `.rail__brand`, erbt `font-family`, 9px/60% Deckkraft) — Details,
+Begründung der Breakpoint-Interaktion und Testabdeckung stehen in `phase5_ui/CLAUDE.md`s
+Korrekturnotiz vom selben Datum, nicht doppelt hier. Visuell gegengeprüft: Playwright/Chromium
+headless gegen die echte `app.css` (Datei-URI, `link href` temporär auf einen absoluten Pfad
+umgeschrieben, damit `file://` die Stylesheet-Referenz auflöst — Serverstart wäre für eine reine
+CSS-Sichtprobe unverhältnismäßig gewesen), Screenshot zeigt „SHAREFYX ᵛ²" wie gewünscht, danach
+verworfen (kein Repo-Artefakt). Reine `webui/static/`-Änderung, kein Python-Code — `pytest`
+722/722 unverändert als Regressionsprobe, kein neuer Test (JS/CSS bleiben laut P5-T
+unit-ungetestet).
 
 ## Session stopped — 2026-08-12 (Step 5 — Rechtepolitik, Block B)
 

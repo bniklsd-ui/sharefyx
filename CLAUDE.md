@@ -172,8 +172,10 @@ trotz `writable:true`. Teil 1 (Space-Liste liefert kein `writable`-Feld) ist **d
 bestätigt weg** — Badge korrekt. Teil 2, vom Nikinger direkt danach gemeldet: **innerhalb** des
 Spaces stand weiterhin „nur lesen", der Anlegen-Knopf blieb versteckt — eine zweite, unabhängige
 Stelle in `app.js` (`ownSpaceActive()`, acht Aufrufstellen) fragte weiterhin „eigener Space?"
-statt „schreibbar?". Behoben (`activeSpaceWritable()` ersetzt alle acht Stellen), **noch nicht
-deployed**. Details: `phase6_shares/CLAUDE.md`s Session-Block vom selben Tag.
+statt „schreibbar?". Behoben (`activeSpaceWritable()` ersetzt alle acht Stellen). **[2026-08-13
+Nachtrag] deployed und live bestätigt** — Release `20260813T120925.743482Z` (`main`@`92b918b`),
+vom Nikinger per manuellem UI-Test im Browser validiert. **Damit sind beide Teile des UI-Funds
+geschlossen.** Details: `phase6_shares/CLAUDE.md`s Session-Block vom selben Tag.
 
 **Phase 5 — Web-UI, REST-API und Auth-Selbstverwaltung** (`phase5_ui/`, Paket `webui`) — **✅
 abgeschlossen, 2026-08-09 — 20/20 Abnahmezeilen live bestanden, 0 teilweise, 0 offen.** Zwei

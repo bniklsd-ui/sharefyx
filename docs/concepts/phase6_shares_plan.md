@@ -8,6 +8,7 @@ down:
   - ./PHASE5_CLOSEOUT_HANDOVER.md              # Herkunft: §4.1–§4.6, offene Entscheidungen, [VERIFY] V27–V38
   - ./phase5_ui_plan.md                        # P5-A–P5-AE, die diese Phase teilweise revidiert
   - ../../ROADMAP.md                           # P6-Zeile + die zwei korrigierten "Bewusst nicht"-Absätze
+  - ../../phase6_shares/ITEM_MOVE_PLAN.md      # [2026-08-13] Zusatzplan zu Step 7: Item-Verschieben (Ordner+Space) + Textfarben — P6-AD–P6-AJ, Abnahmezeilen 25–30, V52–V55
 updated: 2026-08-09
 ---
 # Phase 6 — Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -811,6 +812,18 @@ Item — 200 Commits wären Lärm).
 keine verwaisten Namen.
 
 #### Step 7 — UI Dateisystem
+
+> **[2026-08-13 Ergänzung, kein Umschreiben dieses Snapshots]** Zu diesem Step gehört seit dem
+> 2026-08-13 ein eigener, gegen den echten Code verifizierter Zusatzplan:
+> **`../../phase6_shares/ITEM_MOVE_PLAN.md`** — Item-Verschieben zwischen Ordnern **und Spaces**
+> (Cross-Space-Move fehlt auf allen Schichten), die UI-Bedienung dafür, sowie ein davon
+> unabhängiger Lesbarkeitsfix der Textfarben-Token. Er trägt die Entscheidungen **P6-AD–P6-AJ**,
+> die Abnahmezeilen **25–30**, `[VERIFY]` **V52–V55** und schneidet die Arbeit in **Step 7a**
+> (Farben, jederzeit lieferbar), diesen Step 7 (unverändert) und **Step 7b** (Cross-Space-Move,
+> setzt Step 7 voraus). Punkt 5 unten („Verschieben per Menü und Drag & Drop") bleibt Scope
+> dieses Steps; er meint ausdrücklich nur den Ordnerwechsel **innerhalb** eines Space.
+> Der Zusatzplan korrigiert außerdem vier Annahmen aus der Planungsvormerkung vom selben Tag
+> (§1.2 dort) — u. a. dass `Store.update(folder=…)` längst gebaut ist.
 
 **Dateien:** `webui/static/js/*` (Split, P6-AC), `app.html`, `app.css`, `webui/shares.py` (neu),
 `webui/api.py`, `webui/config.py`.
