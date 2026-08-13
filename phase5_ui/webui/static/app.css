@@ -450,9 +450,28 @@ select.input {
 }
 
 .list__row-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space);
+  flex-wrap: wrap;
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 2px;
+}
+
+/* Sichtbarkeits-Chip (Step 7 Commit 2) — "privat"/"nur ich" bleiben gedämpft (Default, niemand
+   sonst hat Zugriff), erst eine echte Freigabe hebt den Chip farblich hervor. */
+.visibility-chip {
+  font-size: 11px;
+  color: var(--text-faint);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 0 6px;
+  white-space: nowrap;
+}
+.visibility-chip--shared {
+  color: var(--ok);
+  border-color: rgba(71,184,129,.35);
 }
 
 .list__empty, .detail__empty {

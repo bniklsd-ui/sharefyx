@@ -117,6 +117,40 @@ export function itemMetaLine(item) {
   return parts.join(" · ");
 }
 
+// -- Sichtbarkeits-Chip (Step 7 Commit 2) -----------------------------------------------------
+// Alle Felder stehen bereits auf item_to_json()/summary_to_json() (P6 Step 5) — kein
+// Backend-Aufruf, reines Anzeigen. "private" und "human" ohne Freigaben sehen bewusst beide
+// gedämpft aus (niemand sonst hat Zugriff); erst eine echte Freigabe hebt den Chip farblich
+// hervor, dieselbe "nur Abweichung vom Default fällt auf"-Logik wie `.tree__badge`s "nur lesen".
+//
+// **Kleine, benannte Abweichung vom Plan-Wortlaut** (der Dispatch dort prüfte `visibility`
+// zuerst, "private" unbedingt zu "privat"): `acl.py :: decision_for()` verundet
+// `share_read`/`share_write` IMMER in `AclDecision.read`/`write`, unabhängig von `visibility` —
+// `permissions.py :: can_read_item_as_human()`/`can_write_item_as_human()` fragen `visibility`
+// nur für `Surface.AGENT` (P6-P), nie für Menschen. Ein Item mit `visibility=private` UND
+// nicht-leerem `share_read` ist für den freigegebenen Menschen also faktisch lesbar — erreichbar
+// schon heute über ein rohes `PATCH /api/v1/items/{id}` (`_items_patch` hat keine Feld-
+// Whitelist), nicht erst über Commit 5s künftigen Freigabe-Dialog. Ein Chip, der dort "privat"
+// zeigt, würde dem Eigentümer eine falsche Zusicherung machen. Deshalb: `share_read`/
+// `share_write` non-empty entscheidet zuerst, `visibility` nur als Fallback ohne Freigaben.
+export function visibilityLabel(item) {
+  var shared = item.share_read.length > 0 || item.share_write.length > 0;
+  if (shared) {
+    var names = item.share_read.concat(item.share_write).filter(function (name, i, all) {
+      return all.indexOf(name) === i;
+    });
+    return "geteilt mit " + names.join(", ");
+  }
+  return item.visibility === "private" ? "privat" : "nur ich";
+}
+
+export function visibilityChip(item) {
+  var shared = item.share_read.length > 0 || item.share_write.length > 0;
+  return el(
+    "span", "visibility-chip" + (shared ? " visibility-chip--shared" : ""), visibilityLabel(item)
+  );
+}
+
 export function renderCrumb() {
   listCrumbEl.textContent = "";
   var strong = el("strong", null, state.activeSpace || "");
@@ -184,7 +218,10 @@ export function renderList() {
     button.dataset.id = item.id;
     if (item.id === state.selectedId) button.setAttribute("aria-current", "true");
     button.appendChild(el("div", "list__row-title", item.title));
-    button.appendChild(el("div", "list__row-meta tnum", itemMetaLine(item)));
+    var metaEl = el("div", "list__row-meta tnum");
+    metaEl.appendChild(el("span", null, itemMetaLine(item)));
+    metaEl.appendChild(visibilityChip(item));
+    button.appendChild(metaEl);
     button.addEventListener("click", function () { selectItem(item.id).catch(reportUnexpectedError); });
     li.appendChild(button);
     listRowsEl.appendChild(li);
