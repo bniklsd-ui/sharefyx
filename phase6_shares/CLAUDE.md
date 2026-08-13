@@ -9,7 +9,7 @@ down:
   - ./ITEM_MOVE_PLAN.md                            # Zusatzplan zu Step 7: Item-Verschieben (Ordner+Space) + Textfarben, P6-AD–P6-AJ
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-6 verbatim (sechs Eintraege), L3, kein Softcap
-updated: 2026-08-13, sechster -- (Step 7a gebaut: Textfarben-Token app.css, Sichtprobe per Screenshot verifiziert, Deploy beim Nikinger; Rotations-Reihenfolge-Bug im eigenen Skript gefunden+von Hand korrigiert)
+updated: 2026-08-13, sechster -- (Step 7a gebaut+erweitert: Textfarben-Token app.css, Wortmarke/Versionen weiss + v2.1, Sichtprobe zweimal per Screenshot verifiziert, Deploy beim Nikinger; Rotations-Reihenfolge-Bug im eigenen Skript gefunden+von Hand korrigiert)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -97,7 +97,7 @@ weiter ohne Build-Step (AC).
 | 5 | Storage-Fundament (Block B): Charakterisierungstests + Goldens zuerst (P6-D), `storage/acl.py` (neu), `models.py`/`files.py`/`index.py`/`store.py`-Erweiterung (`folder`/`visibility`/`share_*`, `acl_of()`, `list_spaces()`), `index.py`-Rebuild-Fix (V46), zweiter Advisor-Durchlauf: `folder` jetzt pfadabgeleitet statt indexvertraut | 4 | ✅ **gebaut, 2026-08-12** — Charakterisierung vor+nach byte-identisch grün, DoD aus Plan §4 Step 4 erfüllt; noch nicht live geprüft (kein eigener Abnahmematrix-Punkt für diesen Step) | +36 `phase1_storage/` (1 `test_models.py` + 11 `test_files.py` + 4 `test_index.py` + 20 `test_store.py`) + 10 `phase6_shares/tests/test_acl.py`; 671 gesamt |
 | 6 | Rechtepolitik (Block B): `storage/acl.py` +`grants_for_space()`/`decision_for()`, `store.py` +`acl_reader`-Property (kleine, dokumentierte Erweiterung über Step 5s Dateiliste hinaus), `mcpserver/permissions.py` (`Surface`, `SharePolicy` ersetzt `OwnSpaceWritable`), `mcpserver/app.py` (Verdrahtung über `store.acl_reader`), `mcpserver/tools.py` (alle sieben Tools auf `acl_of()`+`can_read_item`/`can_write_item` umgestellt, `search_items`/`list_spaces` item-weise statt space-weise gefiltert, `create_item(space=, folder=)`, `update_item(folder=)`), `webui/api.py`+`serializers.py` (dieselbe Umstellung, `Surface.HUMAN` über `SharePolicy.can_read_item_as_human()`/`can_write_item_as_human()` gekapselt — P5-B erlaubt weiterhin nur ein `mcpserver`-Symbol) | 5 | ✅ **gebaut, 2026-08-12** — DoD aus Plan §4 Step 5 erfüllt, alle 12 Pflichttests + Fail-Closed-Folder-Fund + `can_write_item`-visibility-Fix (Advisor-Fund nach dem ersten Commit) abgedeckt; noch nicht live geprüft (kein eigener Abnahmematrix-Punkt) | +10 `phase2_mcp/tests/test_tools.py` (30→40) + 9 `test_permissions.py` (3→12, Datei vollständig neu geschrieben) + 2 `phase5_ui/tests/test_api.py` (27→29) + 2 `test_serializers.py` (7→9), Kollateralkorrekturen in `phase2_mcp/tests/test_app.py`/`phase5_ui/tests/test_overview.py`/conftest-Fixtures (keine neuen Tests, nur Assertions auf die neue ACL nachgezogen); 694 gesamt |
 | 7 | Verwaltung und Migration (Block B): `phase6_shares/scripts/spacectl.py` (neu — `create-space`/`list-spaces`/`show`/`add-member`/`remove-member`/`remove-space`/`check`), `phase6_shares/scripts/migrate_visibility.py` (neu — `--dry-run` Default, **kein** Versionssprung), `phase3_edge/scripts/diagnose.sh` Prüfung 12 (verwaiste/kaputte `.share.yml`-Referenzen über `spacectl.py check --json`, INFO/WARNUNG, kein Abbruchkriterium) | 6 | ✅ **gebaut, 2026-08-12** — Details, beide Plan-Abweichungen (DATA_ROOT-Auflösung, kein Index-Rebuild) und die Advisor-Runde davor: Session-Block unten. DoD-Live-Teil (realer dritter Nutzer, echter `diagnose.sh`-Lauf) bleibt Nikinger-Sache wie bei Steps 4/5 | +28 (20 `phase6_shares/tests/test_spacectl.py` [neu] + 8 `test_migrate_visibility.py` [neu]); 722 gesamt |
-| 8 | Lesbarkeit der Textfarben (`ITEM_MOVE_PLAN.md` §3, P6-AD/AE): `phase5_ui/webui/static/app.css` — `--text-muted`/`--text-faint` kalibriert angehoben, neues `--text-placeholder`, `.input::placeholder` darauf umgehängt | 7a | ✅ **gebaut, Deploy beim Nikinger** — Kontrastwerte bereits in `ITEM_MOVE_PLAN.md` §3.1 protokolliert (durchgerechnet vor dieser Session); Sichtprobe diese Session per In-Process-Server + Playwright-Screenshot gegen die echte `app.css` (Login-Seite, Liste mit Chips, Editor mit Meta-Panel — alle drei gesehen, nicht behauptet). Deploy braucht Sudo für den Neustart, außerhalb dessen, was Claude Code selbst kann (Präzedenz: Steps-4–6-Cutover, `SESSIONS_ARCHIVE.md`) | 0 (P5-T: JS/CSS bleiben unit-ungetestet; `pytest` unverändert als Regressionsprobe — 724 gesamt vor UND nach dieser Session, keiner davon neu) |
+| 8 | Lesbarkeit der Textfarben (`ITEM_MOVE_PLAN.md` §3, P6-AD/AE): `phase5_ui/webui/static/app.css` — `--text-muted`/`--text-faint` kalibriert angehoben, neues `--text-placeholder`, `.input::placeholder` darauf umgehängt. **Nachtrag, Nikinger-Feedback vor dem Deploy:** Wortmarke „sharefyx" + Versionsbadge (jetzt `v2.1`, `app.html`) sowie alle Versionsnummern aus den Dateien (`recent-row__meta`, `.editor__version`, `.version-band__number`, `ro-meta`) jetzt `var(--text)` statt `--text-faint`/`--text-muted` — neue Klasse `.version-num` trennt die Versionsnummer farblich vom gedämpften Begleittext im selben Element (`app.css`/`app.js`) | 7a | ✅ **gebaut, Deploy beim Nikinger** — Kontrastwerte bereits in `ITEM_MOVE_PLAN.md` §3.1 protokolliert (durchgerechnet vor dieser Session); Sichtprobe zweimal per In-Process-Server + Screenshot gegen die echte `app.css`/`app.js` (Login-Seite, Liste mit Chips, Editor mit Meta-Panel — alle drei beide Male gesehen, nicht behauptet). Deploy braucht Sudo für den Neustart, außerhalb dessen, was Claude Code selbst kann (Präzedenz: Steps-4–6-Cutover, `SESSIONS_ARCHIVE.md`) | 0 (P5-T: JS/CSS bleiben unit-ungetestet; `pytest` unverändert als Regressionsprobe — 724 gesamt vor UND nach beiden Teilen dieser Session, keiner davon neu) |
 
 ## Geerbte Contracts
 
@@ -184,9 +184,47 @@ Tabu-Diff nicht relevant (P5-B betrifft `storage/`/`mcpserver/{tools,permissions
 nicht `webui/static/`). Advisor vor diesem Commit konsultiert — beide Funde (Zeitform der
 Verifiziert-Zeile, `.venv`-Leck) in dieser Fassung des Blocks bereits behoben.
 
+**Nachtrag, noch vor dem ersten Deploy — Nikinger-Feedback:** Wortmarke „sharefyx" + Versionsbadge
+sollten weiß statt grau sein, Badge auf `v2.1`; zusätzlich **alle Versionsnummern aus den
+Dateien** (`item.version`, überall wo die UI sie zeigt) ebenfalls weiß statt grau. Das ist eine
+bewusste Umkehrung eines Teils der §3.2-Entscheidung von vorhin (dort ausdrücklich *gegen*
+„alles auf `--text`" — Platzhalter-Verwechslungsgefahr, leises Versionsband) — Nikinger hat hier
+gezielt nur die Versionsnummern selbst gemeint, nicht die Platzhalter/Begleittexte, und das ist
+sein Ruf, nicht meiner; keine Rücksprache nötig, nur sauber umgesetzt.
+
+Vier Fundstellen identifiziert (`grep` nach `item.version`/`.rail__version` in `app.js`/`app.css`,
+nicht geraten): `.rail__brand`+`.rail__version` (Wortmarke, Badge — Badge-`opacity:.6` dabei
+entfernt, sonst bliebe „weiß" nur ein gedämpftes Weiß und der Zweck der Änderung wäre verfehlt),
+`.editor__version` und `.version-band__number` (beide zeigen nur Versionstext, direkte
+Farbänderung reicht), `.recent-row__meta`/`ro-meta` (zeigen Version **und** Datum/Typ im selben
+Element — hier eine neue Klasse `.version-num` eingeführt statt die ganze Zeile weiß zu machen,
+damit nur die Zahl selbst hervortritt, Datum/Typ bleiben gedämpft; `recent-row__meta` dafür in
+`app.js` von einem Text-Span auf zwei verschachtelte Kindknoten umgebaut, `ro-meta`s Version-Span
+bekam nur eine zweite Klasse). `app.html`: `v2` → `v2.1`.
+
+**Eine Inferenz über den wörtlichen Auftrag hinaus, benannt statt still gemacht:** `ro-meta` ist
+die Nur-lesen-Ansicht eines **fremden** Items (geteilter Space) — „alle Versionsnummern aus den
+Dateien" wortwörtlich genommen schließt das ein, aber es ist die einzige der vier Fundstellen, zu
+der kein Grep-Treffer zwang, sondern eine Lesart. Mitgenommen, weil die Alternative (dieselbe
+Versionszahl in der eigenen Ansicht weiß, in der fremden grau) inkonsistent gewirkt hätte — bei
+Widerspruch ist das eine Korrektur wert, kein stiller Fakt.
+
+**Sichtprobe wiederholt**, diesmal mit der aus dem ersten Advisor-Fund gezogenen Konsequenz sauber
+umgesetzt statt nur nachträglich repariert: Server-Setup (`server_setup.py`, Projekt-`.venv`,
+Import von `authserver`/`webui`/`storage`) startet `uvicorn` und ruft danach `svg-venv`s Python
+als **separaten Subprozess** nur für `screenshot_client.py` (reines Playwright, kein
+Projekt-Import) — beide Umgebungen bleiben getrennt, kein erneutes Pip-Install im Projekt-`.venv`.
+Drei neue Screenshots gesehen: Wortmarke „SHAREFYX v2.1" weiß, „v1 · 2026-08-13" in der
+Übersicht mit weißer Zahl und gedämpftem Datum, Editor-Header „v1 gespeichert" und die
+Versionsband-Zahl „v1" beide weiß.
+
+**Verifiziert (zweiter Teil):** `pytest -q` erneut **724 passed**, unverändert. `.venv` erneut auf
+ein sauberes `pip show playwright` geprüft (leer) — diesmal von vornherein nie installiert, kein
+Nachräumen nötig. `git status --short` zeigt ausschließlich `app.css`/`app.html`/`app.js`.
+
 **Nächster Schritt (konkret):** Nikinger führt `deploy.sh main` aus (Sudo-Neustart), bestätigt
-danach live in allen drei Ansichten (Login, Liste, Editor) — das ist §3.3s letzter DoD-Punkt.
-Danach ist **Step 7a vollständig geschlossen** und der einzige noch offene UI-Rest aus
-`ITEM_MOVE_PLAN.md` erledigt. **Step 7** (UI Dateisystem, `app.js`-Split, Freigabedialog,
-Ordnerbaum) bleibt der nächste große Schnitt, **Step 7b** setzt ihn voraus. Gate-A→B-Punkt 3
-unverändert offen (realer Purge-Lauf, frühestens 2026-08-28).
+danach live in allen drei Ansichten (Login, Liste, Editor) — das ist §3.3s letzter DoD-Punkt,
+jetzt inklusive der weißen Wortmarke/Versionen. Danach ist **Step 7a vollständig geschlossen** und
+der einzige noch offene UI-Rest aus `ITEM_MOVE_PLAN.md` erledigt. **Step 7** (UI Dateisystem,
+`app.js`-Split, Freigabedialog, Ordnerbaum) bleibt der nächste große Schnitt, **Step 7b** setzt ihn
+voraus. Gate-A→B-Punkt 3 unverändert offen (realer Purge-Lauf, frühestens 2026-08-28).

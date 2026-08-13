@@ -666,7 +666,10 @@ function initShell() {
       // renderList(). Die Übersicht zeigt bewusst keine Textausschnitte (siehe
       // serializers.py :: overview_row_to_json()).
       row.appendChild(el("span", "recent-row__title", item.title));
-      row.appendChild(el("span", "recent-row__meta tnum", "v" + item.version + " · " + item.updated.slice(0, 10)));
+      var recentMetaEl = el("span", "recent-row__meta tnum");
+      recentMetaEl.appendChild(el("span", "version-num", "v" + item.version));
+      recentMetaEl.appendChild(document.createTextNode(" · " + item.updated.slice(0, 10)));
+      row.appendChild(recentMetaEl);
       row.addEventListener("click", function () { openFromOverview(own.name, item); });
       li.appendChild(row);
       overviewRecentEl.appendChild(li);
@@ -959,7 +962,7 @@ function initShell() {
     roTitleEl.textContent = item.title;
     roMetaEl.textContent = "";
     roMetaEl.appendChild(el("span", "detail__badge-readonly", "Nur lesen — fremder Space (" + item.space + ")"));
-    roMetaEl.appendChild(el("span", "tnum", "v" + item.version));
+    roMetaEl.appendChild(el("span", "tnum version-num", "v" + item.version));
     roMetaEl.appendChild(el("span", null, item.type + " · " + item.status));
     if (item.due) roMetaEl.appendChild(el("span", "tnum", "fällig " + item.due));
     roPreviewEl.innerHTML = markdownToHtml(item.body);

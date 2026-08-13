@@ -94,6 +94,11 @@ button, input, select, textarea {
 /* Zahlen/Metadaten (Plan §4.2): Versionen, Daten, Zähler — tabellarische Ziffern. */
 .tnum { font-variant-numeric: tabular-nums; }
 
+/* Nikinger-Entscheidung 2026-08-13, Step 7a Nachtrag: Versionsnummern aus den Dateien selbst
+   (`item.version`) sind kein leises Metadatum wie Datum/Typ/Status — sie werden weiß, wo sie
+   mit gedämpftem Begleittext im selben Element stehen (der Rest bleibt --text-muted/--text-faint). */
+.version-num { color: var(--text); }
+
 h1, h2, h3 { font-weight: 600; line-height: 1.25; margin: 0; }
 h1 { font-size: 22px; }
 h2 { font-size: 18px; }
@@ -236,7 +241,7 @@ select.input {
   font-weight: 600;
   letter-spacing: .08em;
   text-transform: uppercase;
-  color: var(--text-faint);
+  color: var(--text);
 }
 
 .rail__version {
@@ -245,7 +250,6 @@ select.input {
   font-weight: 400;
   letter-spacing: 0;
   text-transform: none;
-  opacity: .6;
   vertical-align: super;
 }
 
@@ -680,7 +684,7 @@ select.input {
   flex-shrink: 0;
 }
 
-.editor__version { font-size: 12px; color: var(--text-faint); }
+.editor__version { font-size: 12px; color: var(--text); }
 
 /* Zusätzlicher Abstand vor dem Editor-Schließen-Knopf: "Archivieren" ist auf die andere Seite der
    Leiste gewandert (app.html), dieser Rand hält das "×" trotzdem sichtbar abgesetzt von
@@ -816,7 +820,7 @@ select.input {
   left: 9px;
   bottom: var(--space);
   font-size: 12px;
-  color: var(--text-faint);
+  color: var(--text);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }

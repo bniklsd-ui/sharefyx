@@ -7,6 +7,7 @@
 
 ## 2026-08-13
 - Grauer Text (Platzhalter, Meta-Angaben, Versionsband) ist jetzt deutlich besser lesbar — Kontrast auf WCAG AA angehoben.
+- Der Schriftzug "sharefyx" oben links samt Versionsnummer (jetzt v2.1) und alle Versionsnummern deiner Dateien sind jetzt weiß statt grau.
 - Die angekündigte Umstellung ist jetzt live: fremde Spaces sind nicht mehr automatisch mitlesbar — nur noch, wo eine ausdrückliche Freigabe besteht.
 - Eure beiden Spaces bleiben füreinander lesbar wie bisher, per neu eingerichteter Freigabe.
 - Neu: gemeinsame Spaces sind jetzt möglich — als erstes Beispiel gibt es "IT-Sekus-Projekt" für gemeinsames Arbeiten.

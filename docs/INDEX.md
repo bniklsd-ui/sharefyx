@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-08-13 (P6 Step 7a gebaut -- app.css Textfarben-Token, Deploy beim Nikinger; Gate-A→B nur noch Punkt 3 offen)
+updated: 2026-08-13 (P6 Step 7a gebaut -- app.css Textfarben-Token + Wortmarke/Versionen weiss + v2.1, Deploy beim Nikinger; Gate-A→B nur noch Punkt 3 offen)
 ---
 # Doc Index (L0)
 
