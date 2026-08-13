@@ -32,6 +32,159 @@ updated: 2026-08-13
 > beim Einfügen vertauscht), von Hand auf die richtige Zuordnung korrigiert, keine Byte-Änderung
 > an den Blöcken selbst. Details: `phase6_shares/CLAUDE.md`, Session-Block „sechster".
 
+## Session stopped — 2026-08-13, sechster — (Step 7a gebaut: Textfarben-Token)
+
+**Auftrag:** Nikinger — Step 7a bauen (`ITEM_MOVE_PLAN.md` §3, vom vorigen Block als „sofort und
+unabhängig lieferbar" benannt): vier Token-Zeilen plus eine Regel in `app.css`, eigener kleiner
+Deploy samt `UPDATE_LOG.md`-Eintrag.
+
+**Ergebnis: gebaut, noch nicht deployt.** `phase5_ui/webui/static/app.css` — gegen den echten
+Code verifiziert (`--text-muted`/`--text-faint` standen exakt an der im Plan genannten Stelle,
+`.input::placeholder` exakt an Zeile 187 wie in §3.1 vermerkt):
+```
+--text-muted:       #C4CDD8;   /* war #9AA6B4 */
+--text-faint:       #A7B2BF;   /* war #64707E */
+--text-placeholder: #7E8A98;   /* neu, nur .input::placeholder */
+```
+Kontrastwerte waren bereits in `ITEM_MOVE_PLAN.md` §3.1 durchgerechnet (vorige Session) —
+diese Session hat sie nicht neu gemessen, nur die vier Zeilen umgesetzt.
+
+**Sichtprobe (Pflicht laut §3.3 DoD), diese Session neu gebaut, kein Repo-Artefakt:** Server
+(braucht Projekt-`.venv`) und Browser-Treiber (braucht nur `playwright`) sprechen über echtes
+HTTP miteinander, kein gemeinsamer Prozess nötig. `~/.claude-code-tools/svg-venv` hatte bereits
+einen gecachten Chromium (`~/.cache/ms-playwright`, für die SVG-Renderpipeline) — das
+`playwright`-Paket testweise trotzdem zusätzlich ins Projekt-`.venv` installiert, um Server und
+Treiber im selben Skript zu starten. **Advisor-Fund vor dem Commit:** das bricht die im Repo
+bereits etablierte Trennung — `svg-venv` existiert genau dafür, damit Browser-Automatisierung
+nicht in das `.venv` einsickert, aus dem `pytest`/`deploy.sh` laufen. Behoben: `playwright`/
+`greenlet`/`pyee` wieder aus dem Projekt-`.venv` deinstalliert; das Screenshot-Skript startet den
+Server weiterhin mit dem Projekt-`.venv` (echter `uvicorn`, echte `authserver`/`webui`-Module),
+treibt den Browser aber mit `svg-venv`s Python — zwei Prozesse, zwei Umgebungen, eine
+HTTP-Verbindung dazwischen.
+
+Skript (`/tmp/.../scratchpad/ui_screenshot.py`, nicht Teil des Repos): temporäres `DATA_ROOT` +
+temporäre `AuthStore`, alle vier Routengruppen inkl. `static_routes()` gemountet, echter
+`uvicorn` auf `localhost` (nicht `127.0.0.1` — Chrome behandelt nur `localhost` als potenziell
+vertrauenswürdig genug für das `Secure`-Cookie ohne TLS), Einladung+TOTP-Enrollment per `httpx`
+vorbereitet, echter Login-Roundtrip durch das Browser-Formular. Ein Stolperstein unterwegs:
+`http.cookiejar` (unter `httpx`) verweigert das Zurücksenden eines `Secure`-Cookies über eine
+reine `http://`-Verbindung strikter als ein echter Browser — Cookie deshalb zwischen den beiden
+`httpx`-Schritten manuell weitergereicht statt der Jar vertraut.
+
+Drei Screenshots gesehen (`Read`, nicht nur behauptet): Login-Seite (Platzhalter „TOTP- oder
+Recovery-Code" jetzt klar lesbar), Liste mit Ordner-Chips/Kennzahlen-Kacheln/„Zuletzt benutzt"
+(Space-Navigation, Zähler, Versionsstempel „v1 · 2026-08-13" alle im kalibrierten Grau lesbar),
+Editor mit Meta-Panel („Kopfdaten YAML-Frontmatter", Formatierleiste, Versionsband „v1",
+„Zeile anhängen..."-Platzhalter). Alle drei DoD-Sichten aus §3.3 abgedeckt.
+
+**`docs/UPDATE_LOG.md`:** eine neue `- `-Zeile unter dem bereits heute datierten
+`## 2026-08-13`-Abschnitt (kein neuer Heading nötig, das Datum stimmt bereits) — deploy.sh-Gate
+(P6-X) bleibt damit ohne Override erfüllbar.
+
+**Deploy bewusst nicht in dieser Session ausgeführt:** `deploy.sh` braucht Sudo für den
+Service-Neustart — außerhalb dessen, was Claude Code selbst kann (dieselbe Grenze wie beim
+Steps-4–6-Cutover, `SESSIONS_ARCHIVE.md`, dort ausdrücklich „vom Nikinger ausgeführt"). Dieser
+Prozess läuft auf der echten Produktions-VM (`systemctl status sharefyx-mcp` zeigt den echten,
+aktiven Dienst mit echtem Traffic während dieser Session) — ein Redeploy ist eine Aktion mit
+Wirkung auf ein geteiltes System (Fabian benutzt denselben Dienst), also Nikinger-Sache, nicht
+automatisch von Claude Code auszulösen.
+
+**Rotation in dieser Session ausgeführt, mit Korrektur:** `scripts/rotate_session_block.sh
+phase6_shares` archiviert den Block mit dem **höchsten Zeilenindex** im Head als „neuesten" —
+Konvention ist also: der aktuellste Block steht am **Ende** der Datei, nicht am Anfang. Der
+sechste Block wurde zunächst versehentlich **vor** dem fünften eingefügt; das Skript hat
+daraufhin den fünften (älteren) behalten und den sechsten ins Archiv verschoben — mechanisch
+korrekt nach seiner eigenen Regel, nur mit vertauschter Eingabe. Von Hand korrigiert: der fünfte
+Block liegt jetzt an seiner richtigen Archivposition (vor „Step 6, dritter", newest-first), der
+Head trägt nur noch diesen sechsten Block. Kein Byte-Identitätsverlust — beide Blöcke wurden
+unverändert verschoben, nur die Zuordnung war falsch.
+
+**Verifiziert:** `pytest -q` **724 passed** (unverändert — P5-T: JS/CSS bleiben
+unit-ungetestet, keine neuen Tests erwartet). `git status --short` zeigt ausschließlich
+`app.css`, `docs/UPDATE_LOG.md`, `phase6_shares/CLAUDE.md`, `phase6_shares/ITEM_MOVE_PLAN.md`,
+`phase6_shares/SESSIONS_ARCHIVE.md`, `docs/INDEX.md`. `.venv` selbst ist nicht versioniert —
+der Playwright-Fund war deshalb nur über den Advisor-Durchlauf sichtbar, nicht über `git status`.
+Tabu-Diff nicht relevant (P5-B betrifft `storage/`/`mcpserver/{tools,permissions,server}.py`,
+nicht `webui/static/`). Advisor vor diesem Commit konsultiert — beide Funde (Zeitform der
+Verifiziert-Zeile, `.venv`-Leck) in dieser Fassung des Blocks bereits behoben.
+
+**Nachtrag, noch vor dem ersten Deploy — Nikinger-Feedback:** Wortmarke „sharefyx" + Versionsbadge
+sollten weiß statt grau sein, Badge auf `v2.1`; zusätzlich **alle Versionsnummern aus den
+Dateien** (`item.version`, überall wo die UI sie zeigt) ebenfalls weiß statt grau. Das ist eine
+bewusste Umkehrung eines Teils der §3.2-Entscheidung von vorhin (dort ausdrücklich *gegen*
+„alles auf `--text`" — Platzhalter-Verwechslungsgefahr, leises Versionsband) — Nikinger hat hier
+gezielt nur die Versionsnummern selbst gemeint, nicht die Platzhalter/Begleittexte, und das ist
+sein Ruf, nicht meiner; keine Rücksprache nötig, nur sauber umgesetzt.
+
+Vier Fundstellen identifiziert (`grep` nach `item.version`/`.rail__version` in `app.js`/`app.css`,
+nicht geraten): `.rail__brand`+`.rail__version` (Wortmarke, Badge — Badge-`opacity:.6` dabei
+entfernt, sonst bliebe „weiß" nur ein gedämpftes Weiß und der Zweck der Änderung wäre verfehlt),
+`.editor__version` und `.version-band__number` (beide zeigen nur Versionstext, direkte
+Farbänderung reicht), `.recent-row__meta`/`ro-meta` (zeigen Version **und** Datum/Typ im selben
+Element — hier eine neue Klasse `.version-num` eingeführt statt die ganze Zeile weiß zu machen,
+damit nur die Zahl selbst hervortritt, Datum/Typ bleiben gedämpft; `recent-row__meta` dafür in
+`app.js` von einem Text-Span auf zwei verschachtelte Kindknoten umgebaut, `ro-meta`s Version-Span
+bekam nur eine zweite Klasse). `app.html`: `v2` → `v2.1`.
+
+**Eine Inferenz über den wörtlichen Auftrag hinaus, benannt statt still gemacht:** `ro-meta` ist
+die Nur-lesen-Ansicht eines **fremden** Items (geteilter Space) — „alle Versionsnummern aus den
+Dateien" wortwörtlich genommen schließt das ein, aber es ist die einzige der vier Fundstellen, zu
+der kein Grep-Treffer zwang, sondern eine Lesart. Mitgenommen, weil die Alternative (dieselbe
+Versionszahl in der eigenen Ansicht weiß, in der fremden grau) inkonsistent gewirkt hätte — bei
+Widerspruch ist das eine Korrektur wert, kein stiller Fakt.
+
+**Sichtprobe wiederholt**, diesmal mit der aus dem ersten Advisor-Fund gezogenen Konsequenz sauber
+umgesetzt statt nur nachträglich repariert: Server-Setup (`server_setup.py`, Projekt-`.venv`,
+Import von `authserver`/`webui`/`storage`) startet `uvicorn` und ruft danach `svg-venv`s Python
+als **separaten Subprozess** nur für `screenshot_client.py` (reines Playwright, kein
+Projekt-Import) — beide Umgebungen bleiben getrennt, kein erneutes Pip-Install im Projekt-`.venv`.
+Drei neue Screenshots gesehen: Wortmarke „SHAREFYX v2.1" weiß, „v1 · 2026-08-13" in der
+Übersicht mit weißer Zahl und gedämpftem Datum, Editor-Header „v1 gespeichert" und die
+Versionsband-Zahl „v1" beide weiß.
+
+**Verifiziert (zweiter Teil):** `pytest -q` erneut **724 passed**, unverändert. `.venv` erneut auf
+ein sauberes `pip show playwright` geprüft (leer) — diesmal von vornherein nie installiert, kein
+Nachräumen nötig. `git status --short` zeigt ausschließlich `app.css`/`app.html`/`app.js`.
+
+**Nachtrag, noch vor dem ersten Deploy — Nikinger-Weisung zum Update-Banner:** nur die
+v2.1-Zeilen dieser Deploy-Ära sollen im Banner erscheinen, nicht die v2-Rückschau (Umstellung
+live + beide Hotfixes) erneut. `docs/UPDATE_LOG.md :: parse_update_log()` zeigt im Banner **immer
+nur `entries[0]`** — ein Eintrag ist ein `##`-Block, nicht eine Zeile. Der bestehende
+`## 2026-08-13`-Block (7 Zeilen: 2 neue v2.1 + 5 alte v2) in **zwei** gleichdatierte Blöcke
+gesplittet — die eigene Docstring-Doku in `updates.py` sieht das ausdrücklich vor
+("disambiguiert zwei `## <selbes Datum>`-Blöcke"). Oben (neu, `id=2026-08-13#1`): nur die zwei
+v2.1-Zeilen. Darunter (`id=2026-08-13#2`): die fünf v2-Zeilen unverändert, bleiben im
+Vollständigen Log ("Update-Log ansehen") sichtbar, verschwinden nur aus dem Auto-Popup.
+Nachgeprüft, nicht nur behauptet: `parse_update_log()` gegen die echte Datei ausgeführt,
+`entries[0]` hat exakt die zwei neuen Zeilen.
+
+**Eine ehrlich benannte Unsicherheit, kein stiller Fund:** die ID-Vergabe ist rein positionell
+(erstes gleichdatiertes Heading in Dateireihenfolge = `#1`), nicht inhaltsbasiert. Falls der
+Nikinger das Banner für den `92b918b`-Deploy (die fünf v2-Zeilen, damals ebenfalls unter
+`2026-08-13#1`) bereits gesehen/weggeklickt hat, trägt `users.seen_update_id` bereits genau diese
+ID — und die neuen v2.1-Zeilen erben jetzt dieselbe ID, weil sie ebenfalls zum ersten
+gleichdatierten Block wurden. In diesem Fall poppt das Banner **nicht** automatisch neu auf,
+obwohl der Inhalt neu ist; „Update-Log ansehen" zeigt es trotzdem korrekt. Kein Zugriff auf die
+echte `auth.sqlite3` genommen, um das zu prüfen (Auto-Mode-Classifier blockierte den Pfadversuch,
+zu Recht — das wäre ein Griff in echte Nutzerdaten ohne zwingenden Grund). Für den Nikinger:
+falls das Banner nach dem Deploy nicht von selbst erscheint, ist das der Grund, kein neuer Bug.
+
+**Nikinger-Klarstellung zum Versionsschema, für spätere Bumps:** Versionsnummern spiegeln
+Deploy-Zyklen, nicht Phasen — jeder Deploy erhöht die Zahl, Schema `x.y.z` wie in klassischer
+Software-Versionierung, **nicht** neu bei 1 anfangend (diese Ära zählt als Fortsetzung von v2,
+daher `v2.1`, nächster Deploy `v2.2` usw.).
+
+**Nächster Schritt (konkret):** Nikinger führt `deploy.sh main` aus (Sudo-Neustart), bestätigt
+danach live in allen drei Ansichten (Login, Liste, Editor) — das ist §3.3s letzter DoD-Punkt,
+jetzt inklusive der weißen Wortmarke/Versionen — **und** dass das Banner nur die v2.1-Zeilen
+zeigt (mit der oben benannten Unsicherheit im Hinterkopf). Danach ist **Step 7a vollständig
+geschlossen** und der einzige noch offene UI-Rest aus `ITEM_MOVE_PLAN.md` erledigt. **Step 7**
+(UI Dateisystem) ist als eigener Plan freigegeben (`/home/savefyx/.claude/plans/
+serialized-seeking-aurora.md`, Nikinger-Entscheidung: Rename-Funktion bleibt draußen, Aufbau in
+Unterschritten mit Checkpoints) — Ausführung beginnt in derselben Session, sobald dieser Nachtrag
+committet ist. **Step 7b** setzt Step 7 voraus. Gate-A→B-Punkt 3 unverändert offen (realer
+Purge-Lauf, frühestens 2026-08-28).
+
 ## Session stopped — 2026-08-13, fünfter — (Planungssession: `ITEM_MOVE_PLAN.md`, keine Code-Änderung)
 
 **Auftrag:** Nikinger — die Planungsvormerkung des vorigen Blocks zu einem ausführungsreifen Plan

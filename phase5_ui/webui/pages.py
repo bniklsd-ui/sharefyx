@@ -42,7 +42,7 @@ _PAGE = """<!doctype html>
 <div class="auth__brand">sharefyx</div>
 {body}
 </div></div>
-<script src="/ui/static/app.js" defer></script>
+<script type="module" src="/ui/static/js/app.js"></script>
 </body></html>"""
 
 

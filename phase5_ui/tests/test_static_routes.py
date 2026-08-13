@@ -62,19 +62,24 @@ async def test_index_route_requires_session(static_app, totp_code):
 
 
 @pytest.mark.asyncio
-async def test_updates_js_loads_before_app_js(static_app, totp_code):
-    """P6 Step 3: `updates.js` ruft `app.js`s globale `markdownToHtml()`/`sanitizeHtml()` und
-    `app.js` ruft `window.SharefyxUpdates.init()` — beide `defer`-Skripte laufen in
-    Dokumentreihenfolge, also MUSS `js/updates.js` vor `app.js` im Markup stehen. Ein stiller
-    Regressionsfund hier wäre sonst ein Banner, das im Browser nie erscheint, während `pytest`
-    grün bleibt (JS bleibt laut Plan unit-ungetestet)."""
+async def test_app_loads_as_a_single_es_module(static_app, totp_code):
+    """Step 7: der frühere Zwei-Skript-Aufbau (`js/updates.js` als globales Skript VOR `app.js`,
+    Ladereihenfolge-Pflicht wegen `window.SharefyxUpdates`) ist mit dem Split in ES-Module
+    entfallen — `updates.js` ist jetzt selbst ein Modul, das `app.js` ganz normal per `import`
+    lädt, kein globaler Name, keine Reihenfolge-Regel mehr nötig. Genau EIN `<script
+    type="module">`-Tag, das den neuen Einstiegspunkt referenziert; kein altes Skript-Tag auf
+    den entfernten Top-Level-Pfad `/ui/static/app.js` (jetzt `/ui/static/js/app.js`)."""
     async with _client(static_app) as client:
         await _login(client, totp_code)
         response = await client.get("/ui/")
     html = response.text
-    assert '/ui/static/js/updates.js"' in html
-    assert '/ui/static/app.js"' in html
-    assert html.index("js/updates.js") < html.index('static/app.js"')
+    script_tags = re.findall(r"<script\b[^>]*>", html)
+    assert script_tags == ['<script type="module" src="/ui/static/js/app.js">']
+
+
+_JS_MODULES = (
+    "app", "api", "state", "tree", "list", "editor", "markdown", "dialogs", "toasts", "updates",
+)
 
 
 @pytest.mark.asyncio
@@ -83,10 +88,9 @@ async def test_static_files_are_served_with_correct_content_type(static_app):
     cases = {
         "app.html": "text/html",
         "app.css": "text/css",
-        "app.js": "text/javascript",
-        "js/updates.js": "text/javascript",
         f"fonts/{font_name}": "font/woff2",
     }
+    cases.update({f"js/{name}.js": "text/javascript" for name in _JS_MODULES})
     async with _client(static_app) as client:
         for path, expected in cases.items():
             response = await client.get(f"/ui/static/{path}")
@@ -101,7 +105,7 @@ async def test_static_hashed_assets_get_immutable_cache_header(static_app):
         hashed = await client.get(f"/ui/static/fonts/{font_name}")
         assert "immutable" in hashed.headers["cache-control"]
 
-        unhashed = await client.get("/ui/static/app.js")
+        unhashed = await client.get("/ui/static/js/app.js")
         assert unhashed.headers["cache-control"] == "no-store"
 
 
@@ -129,9 +133,10 @@ def test_app_html_contains_no_inline_style_attribute():
 
 
 def test_app_js_makes_no_external_requests():
-    js = (DEFAULT_STATIC_DIR / "app.js").read_text("utf-8")
-    for needle in ("http://", "https://", "//cdn"):
-        assert needle not in js, f"externe Referenz {needle!r} in app.js gefunden"
+    for name in _JS_MODULES:
+        js = (DEFAULT_STATIC_DIR / "js" / f"{name}.js").read_text("utf-8")
+        for needle in ("http://", "https://", "//cdn"):
+            assert needle not in js, f"externe Referenz {needle!r} in js/{name}.js gefunden"
 
 
 def test_write_controls_live_inside_detachable_containers():
@@ -143,10 +148,12 @@ def test_write_controls_live_inside_detachable_containers():
     Dieser Test kann das Laufzeitverhalten nicht prüfen (JavaScript bleibt laut Plan
     unit-ungetestet, dafür lief die jsdom-Simulation). Er hält die Voraussetzung fest, auf der
     das Aushängen beruht: jedes Schreib-Bedienelement sitzt in genau einem der drei Container,
-    die `app.js` aushängt. Ein neuer Speichern-Knopf, den jemand außerhalb davon platziert,
-    fällt hier auf statt erst live."""
+    die `state.js` aushängt (Step 7: aus `app.js` dorthin verschoben, `editorPart`/
+    `createTriggers`/`createDialogPart` müssen von mehreren Modulen dieselbe Instanz teilen).
+    Ein neuer Speichern-Knopf, den jemand außerhalb davon platziert, fällt hier auf statt erst
+    live."""
     html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
-    js = (DEFAULT_STATIC_DIR / "app.js").read_text("utf-8")
+    js = (DEFAULT_STATIC_DIR / "js" / "state.js").read_text("utf-8")
 
     for container in ("detailEditorEl", "newItemButtonEl", "createButtonEl", "createDialogEl"):
         assert f"detachable({container})" in js, f"{container} wird nicht mehr ausgehängt"

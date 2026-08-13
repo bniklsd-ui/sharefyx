@@ -227,13 +227,15 @@ async def _measure(data_root: Path) -> list[Metric]:
             "GET /api/v1/items/{id} (typisch)", len(single.content), 8 * KB, one_id,
         ))
 
-        # 3) Statische Nutzlast: app.js + app.css + Font, gzip.
-        #    Die Font-Datei wird NICHT noch einmal gzippt gezählt — woff2 ist bereits komprimiert,
-        #    ein zweiter Durchlauf macht sie minimal größer, nicht kleiner. Sie zählt roh, genau
-        #    wie ein Server sie ausliefert.
+        # 3) Statische Nutzlast: app.js (Step 7: zehn ES-Module unter js/, der Browser lädt beim
+        #    Erstaufruf den ganzen Modulgraphen, nicht nur die Einstiegsdatei) + app.css + Font,
+        #    gzip. Die Font-Datei wird NICHT noch einmal gzippt gezählt — woff2 ist bereits
+        #    komprimiert, ein zweiter Durchlauf macht sie minimal größer, nicht kleiner. Sie
+        #    zählt roh, genau wie ein Server sie ausliefert.
         static_total = 0
         static_parts = []
-        for name in ("app.js", "app.css"):
+        js_names = tuple(f"js/{p.name}" for p in sorted((DEFAULT_STATIC_DIR / "js").glob("*.js")))
+        for name in js_names + ("app.css",):
             payload = (DEFAULT_STATIC_DIR / name).read_bytes()
             size = _gz(payload)
             static_total += size
