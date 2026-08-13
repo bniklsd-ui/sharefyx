@@ -145,7 +145,9 @@ async def test_foreign_space_is_visible_but_marked_not_own(overview_app, seeded,
 
     foreign = _space(payload, FOREIGN_SPACE)
     assert foreign["own"] is False
+    assert foreign["writable"] is False  # only "read:" granted, not "write:"
     assert _space(payload, SPACE)["own"] is True
+    assert _space(payload, SPACE)["writable"] is True
     assert all(row["readonly"] is True for row in foreign["recent"])
 
 

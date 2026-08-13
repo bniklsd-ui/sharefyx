@@ -486,6 +486,29 @@ async def test_spaces_marks_own_space(full_app_items, item_store, tmp_path, totp
     by_name = {s["name"]: s for s in response.json()}
     assert by_name[SPACE]["own"] is True
     assert by_name[FOREIGN_SPACE]["own"] is False
+    assert by_name[SPACE]["writable"] is True
+    assert by_name[FOREIGN_SPACE]["writable"] is False  # only "read:" granted, not "write:"
+
+
+@pytest.mark.asyncio
+async def test_spaces_reports_writable_for_a_shared_non_own_space(
+    full_app_items, item_store, tmp_path, totp_code
+):
+    """Live-Fund 2026-08-13: `IT-Sekus-Projekt` war über MCP `writable:true`, aber die
+    Web-UI zeigte "nur lesen" -- `_spaces()`/`space_to_json()` lieferten nie ein `writable`-
+    Feld, nur `own`, und `app.js` badgte jeden nicht-eigenen Space hart als read-only. Ein
+    Space mit einem `write:`-Grant (statt nur `read:`) muss `own: false, writable: true`
+    liefern, nicht `own` und `writable` verwechseln."""
+    item_store.create(FOREIGN_SPACE, type="note", title="Geteilt")
+    (tmp_path / "data" / FOREIGN_SPACE / ".share.yml").write_text(
+        f"write: [{SPACE}]\n", encoding="utf-8"
+    )
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        response = await client.get("/api/v1/spaces")
+    by_name = {s["name"]: s for s in response.json()}
+    assert by_name[FOREIGN_SPACE]["own"] is False
+    assert by_name[FOREIGN_SPACE]["writable"] is True
 
 
 @pytest.mark.asyncio

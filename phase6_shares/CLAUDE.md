@@ -305,18 +305,24 @@ beide Principals `--write` (impliziert read, `acl.py:76`), für Nutzung/Testing 
 getrennt von den beiden echten Notiz-Spaces angelegt, damit Konflikt-/Mehrbenutzer-Tests dort
 keine echten Daten berühren können.
 
-**UI-Fund, nicht behoben, nur dokumentiert (Nikinger-Meldung nach dem Deploy):** die
-Weboberfläche zeigt `IT-Sekus-Projekt` im Baum/in der Übersicht als „nur lesen", obwohl der
-Space laut MCP `writable:true` ist. **Root Cause identifiziert:** `webui/api.py:271` /
-`serializers.py:111` berechnen für die Space-Liste ausschließlich `"own": space.name ==
-session.space` — kein `writable`-Äquivalent zum MCP-`list_spaces`-Feld. `app.js:598`/`676`
-kennt deshalb nur `space.own` und badgt jeden nicht-eigenen Space hart als „nur lesen", ganz
-gleich ob ein `.share.yml`-Write-Grant existiert. Die **Item-Ebene** ist davon nicht betroffen —
-`api.py:359` (`_items_get`) berechnet `readonly` bereits korrekt über
-`can_write_item_as_human()`; der Fehler sitzt ausschließlich in der Space-Übersicht/im Baum.
-Nicht Teil dieser Session (Doc-only-Auftrag) — nächster kleiner Fix, kein eigener Plan-Step
-nötig: `_visible_space_infos()` (`api.py:224`) müsste ein `writable`-Feld analog zu MCPs
-`list_spaces` mitliefern, `app.js` liest es statt `own` an den beiden genannten Stellen.
+**UI-Fund, behoben (Nachtrag, selber Tag):** die Weboberfläche zeigte `IT-Sekus-Projekt` im
+Baum/in der Übersicht als „nur lesen", obwohl der Space laut MCP `writable:true` ist. **Root
+Cause:** `webui/api.py:271` / `serializers.py:111` berechneten für die Space-Liste
+ausschließlich `"own": space.name == session.space` — kein `writable`-Äquivalent zum
+MCP-`list_spaces`-Feld. `app.js:598`/`676` kannte deshalb nur `space.own` und badgte jeden
+nicht-eigenen Space hart als „nur lesen", ganz gleich ob ein `.share.yml`-Write-Grant existiert.
+Die **Item-Ebene** war davon nie betroffen — `api.py:359` (`_items_get`) berechnet `readonly`
+bereits korrekt über `can_write_item_as_human()`; der Fehler saß ausschließlich in der
+Space-Übersicht/im Baum. **Fix:** `space_to_json()` (`serializers.py:107`) bekommt einen
+neuen Pflicht-Parameter `writable: bool`; beide Aufrufer in `api.py` (`_spaces()`, `_overview()`)
+berechnen ihn über `permissions.can_write(session.space, ...)` — derselbe Aufruf, den
+`tools.py :: list_spaces()` für den MCP-Weg schon nutzt (`tools.py:294`), jetzt spiegelbildlich
+auf der REST-Seite. `app.js:598`/`676` lesen jetzt `space.writable` statt `space.own` für das
+Badge; die Baum-/Übersicht-**Gruppierung** (eigener vs. verbundener Space) bleibt bewusst bei
+`own` — das ist eine andere Frage als Schreibrecht. +2 Tests (`test_serializers.py`,
+`test_api.py`), +2 Assertions (`test_overview.py`); 722→724 gesamt. **Braucht einen neuen
+Deploy** — die laufende Instanz bedient `/opt/sharefyx/current` (Release-Snapshot
+`20260813T113025.931306Z`), der Fix liegt bisher nur im Arbeitsverzeichnis.
 
 **Planungsvormerkung für die nächste Session (Opus, Browser-Planung) — Item-Verschieben:**
 bereits vor dem Deploy geprüft und bestätigt fehlend auf allen drei Schichten

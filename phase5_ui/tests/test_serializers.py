@@ -106,14 +106,30 @@ def test_search_to_json_wraps_pre_serialized_items():
 
 
 def test_space_to_json_marks_own_space():
-    assert space_to_json(SpaceInfo(name="niklas", item_count=3), own_space="niklas")["own"] is True
-    assert space_to_json(SpaceInfo(name="fabian", item_count=1), own_space="niklas")["own"] is False
+    assert space_to_json(
+        SpaceInfo(name="niklas", item_count=3), own_space="niklas", writable=True
+    )["own"] is True
+    assert space_to_json(
+        SpaceInfo(name="fabian", item_count=1), own_space="niklas", writable=False
+    )["own"] is False
+
+
+def test_space_to_json_reports_writable_independently_of_own():
+    # A shared (non-own) space can be writable via a .share.yml grant -- "own" and "writable"
+    # are different questions (found live, 2026-08-13: the UI badged every non-own space
+    # read-only regardless of an actual write grant).
+    payload = space_to_json(
+        SpaceInfo(name="shared", item_count=0), own_space="niklas", writable=True
+    )
+    assert payload["own"] is False
+    assert payload["writable"] is True
 
 
 def test_space_to_json_includes_members_and_folders():
     payload = space_to_json(
         SpaceInfo(name="fabian", item_count=1, members=("niklas",), folders=("projekte",)),
         own_space="niklas",
+        writable=False,
     )
     assert payload["members"] == ["niklas"]
     assert payload["folders"] == ["projekte"]

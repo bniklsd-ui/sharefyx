@@ -167,10 +167,12 @@ vorher `niklas`↔`fabian` gegenseitiges Lesen per `.share.yml` gesichert (sonst
 genau das stillschweigend entzogen). Live-Verifikation **eine Richtung bestätigt** (niklas liest
 fabian über den echten Connector, `<untrusted_content>`-Wrapping hält), **fabian→niklas offen**.
 Neuer Shared Space `IT-Sekus-Projekt` angelegt (beide Principals `--write`, für Nutzung/Testing).
-**Ein UI-Fund, nicht behoben:** `IT-Sekus-Projekt` zeigt sich in der Weboberfläche als „nur
-lesen" trotz `writable:true` — `webui/api.py`/`serializers.py` liefern für die Space-Liste kein
-`writable`-Feld, nur `own`. Details, Root-Cause-Fundstellen und die volle Live-Verifikation:
-`phase6_shares/CLAUDE.md`s Session-Block vom selben Tag.
+**Ein UI-Fund, im Code behoben, Deploy noch offen:** `IT-Sekus-Projekt` zeigte sich in der
+Weboberfläche als „nur lesen" trotz `writable:true` — `webui/api.py`/`serializers.py` lieferten
+für die Space-Liste kein `writable`-Feld, nur `own`. `space_to_json()` bekommt jetzt ein
+Pflichtfeld `writable`, `app.js` liest es statt `own` fürs Badge — **braucht einen neuen Deploy**,
+läuft auf der Live-Instanz noch nicht. Details, Root-Cause-Fundstellen und die volle
+Live-Verifikation von Steps 4–6: `phase6_shares/CLAUDE.md`s Session-Block vom selben Tag.
 
 **Phase 5 — Web-UI, REST-API und Auth-Selbstverwaltung** (`phase5_ui/`, Paket `webui`) — **✅
 abgeschlossen, 2026-08-09 — 20/20 Abnahmezeilen live bestanden, 0 teilweise, 0 offen.** Zwei

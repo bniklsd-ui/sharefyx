@@ -104,11 +104,12 @@ def search_to_json(items: list[dict[str, Any]], *, total: int, limit: int, offse
     return {"items": items, "total": total, "limit": limit, "offset": offset}
 
 
-def space_to_json(s: SpaceInfo, *, own_space: str) -> dict[str, Any]:
+def space_to_json(s: SpaceInfo, *, own_space: str, writable: bool) -> dict[str, Any]:
     return {
         "name": s.name,
         "item_count": s.item_count,
         "own": s.name == own_space,
+        "writable": writable,
         "members": list(s.members),
         "folders": list(s.folders),
     }

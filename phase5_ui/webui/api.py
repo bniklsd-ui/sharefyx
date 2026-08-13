@@ -240,7 +240,10 @@ def api_routes(
     async def _spaces(request: Request) -> Response:
         session = await _require_session(request)
         payload = [
-            space_to_json(s, own_space=session.space)
+            space_to_json(
+                s, own_space=session.space,
+                writable=permissions.can_write(session.space, s.name),
+            )
             for s in _visible_space_infos(session.space)
         ]
         return JSONResponse(payload, headers={"Cache-Control": "no-store"})
@@ -269,6 +272,7 @@ def api_routes(
             payload.append({
                 "name": space.name,
                 "own": space.name == session.space,
+                "writable": permissions.can_write(session.space, space.name),
                 "item_count": space.item_count,
                 "counts": counts,
                 "recent": [overview_row_to_json(i, own_space=session.space) for i in newest],

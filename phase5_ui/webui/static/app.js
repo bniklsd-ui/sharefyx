@@ -595,7 +595,7 @@ function initShell() {
     row.appendChild(el("span", "tree__twist", open ? "▾" : "▸"));
     row.appendChild(el("span", "rail__glyph", space.name.charAt(0).toUpperCase()));
     row.appendChild(el("span", "rail__label", space.name));
-    if (!space.own) row.appendChild(el("span", "tree__badge", "nur lesen"));
+    if (!space.writable) row.appendChild(el("span", "tree__badge", "nur lesen"));
     row.addEventListener("click", function () {
       state.expanded[space.name] = !open;
       renderRail();
@@ -673,7 +673,7 @@ function initShell() {
         card.type = "button";
         card.appendChild(el("span", "rail__glyph", space.name.charAt(0).toUpperCase()));
         card.appendChild(el("span", null, space.name));
-        card.appendChild(el("span", "space-card__meta", space.item_count + " Items · nur lesen"));
+        card.appendChild(el("span", "space-card__meta", space.item_count + " Items" + (space.writable ? "" : " · nur lesen")));
         card.addEventListener("click", function () {
           state.expanded[space.name] = true;
           navigate(space.name, "note").catch(reportUnexpectedError);
