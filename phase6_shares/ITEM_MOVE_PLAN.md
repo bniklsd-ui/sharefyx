@@ -36,7 +36,7 @@ Drei Schnitte, in dieser Reihenfolge unabhängig lieferbar:
 
 | Schnitt | Was | Hängt ab von | Umfang |
 |---|---|---|---|
-| **Step 7a** | Textfarben-Token anheben | nichts — jederzeit lieferbar | 4 Zeilen CSS |
+| **Step 7a** | Textfarben-Token anheben | nichts — jederzeit lieferbar | 4 Zeilen CSS — ✅ **gebaut 2026-08-13, Deploy beim Nikinger** (`phase6_shares/CLAUDE.md` Session-Block) |
 | **Step 7** | *(bestehend, Hauptplan)* echte Ordner in der UI, Verschieben per Menü/Drag & Drop | Steps 4–6 (live) | groß, unverändert |
 | **Step 7b** | Verschieben über Space-Grenzen, alle Schichten + UI | Step 7 | mittel |
 

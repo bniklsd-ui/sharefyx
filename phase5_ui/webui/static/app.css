@@ -25,9 +25,10 @@
   --line:          rgba(255,255,255,.08);   /* Haarlinie */
   --line-strong:   rgba(255,255,255,.16);
 
-  --text:          #E9EDF2;
-  --text-muted:    #9AA6B4;
-  --text-faint:    #64707E;
+  --text:             #E9EDF2;
+  --text-muted:       #C4CDD8;
+  --text-faint:       #A7B2BF;
+  --text-placeholder: #7E8A98;
 
   --accent:        #3E8DF3;   /* das einzige Blau */
   --accent-quiet:  rgba(62,141,243,.14);
@@ -184,7 +185,7 @@ h3 { font-size: 15px; }
   padding: 7px var(--space);
   box-shadow: var(--sunken-shadow);
 }
-.input::placeholder { color: var(--text-faint); }
+.input::placeholder { color: var(--text-placeholder); }
 .input:focus { border-color: var(--accent-line); }
 
 select.input {

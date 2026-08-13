@@ -26,6 +26,100 @@ updated: 2026-08-13
 > Byte-Identität geprüft. Enthält am Ende eine datierte Korrekturnotiz zum UI-Fund: dessen
 > zweiter Teil ist inzwischen deployed und live bestätigt — sie steht bewusst hier an der
 > Aussage, die sie korrigiert, der aktuelle Stand steht im Kopf.
+> **Fünfte Rotation (2026-08-13, Step-7a-Commit):** Planungssession `ITEM_MOVE_PLAN.md` (vierter
+> Block) wandert herein. Das Rotationsskript hatte den neuen sechsten Block zunächst fälschlich
+> archiviert (Konvention: der neueste Block steht am **Ende** der Head-Datei, nicht am Anfang —
+> beim Einfügen vertauscht), von Hand auf die richtige Zuordnung korrigiert, keine Byte-Änderung
+> an den Blöcken selbst. Details: `phase6_shares/CLAUDE.md`, Session-Block „sechster".
+
+## Session stopped — 2026-08-13, fünfter — (Planungssession: `ITEM_MOVE_PLAN.md`, keine Code-Änderung)
+
+**Auftrag:** Nikinger — die Planungsvormerkung des vorigen Blocks zu einem ausführungsreifen Plan
+ausbauen, **inklusive** der UI-Bedienung zum Verschieben (geteilte Spaces über die UI anlegen
+ausdrücklich **nicht**, P6-V bleibt), plus ein gemeldeter Lesbarkeitsdefekt („der graue Text ist
+nicht gut lesbar"). Ablage als persistente Notiz im Phasenverzeichnis mit semantischer Verknüpfung
+zum Hauptplan. Reine Doku-Session — kein Code angefasst, `git diff` außerhalb `.md` leer.
+
+**Ergebnis: `phase6_shares/ITEM_MOVE_PLAN.md` (neu, 27 KB).** Entscheidungen **P6-AD–P6-AJ**
+(Fortsetzung der Hauptplan-Nummerierung, die bei P6-AC endet), drei unabhängig lieferbare
+Schnitte — **Step 7a** (Textfarben, jederzeit lieferbar) · **Step 7** (unverändert, Hauptplan) ·
+**Step 7b** (Cross-Space-Move, setzt Step 7 voraus) —, Abnahmezeilen **25–30**, `[VERIFY]`
+**V52–V55**, Nebenbefunde **O6/O7**. Verknüpfung im Hauptplan an zwei Stellen (`down:`-Eintrag der
+Header-Card + datierter Hinweiskasten direkt über Step 7); der 📕-Snapshot bleibt inhaltlich
+unverändert — dieselbe Behandlung wie die Korrekturnotiz in `P2_ADAPTER_ABNAHME_2026-07-26.md`.
+
+**Vier Korrekturen an der Planungsvormerkung des vorigen Blocks** (dort steht „geprüft und
+bestätigt fehlend auf allen drei Schichten" — gegen den Code nachgeprüft ist das so nicht haltbar;
+der alte Text bleibt im Archiv verbatim stehen, dies ist die datierte Ersetzung):
+1. **`Store.update(folder=…)` verschiebt real** und ist seit Step 4 gebaut (`store.py:475-480`,
+   `_write_item_file():285-286`). Probelauf gegen ein Wegwerf-`DATA_ROOT`: die Datei landet unter
+   `niklas/projekte/alpha/…md`; Tiefe > 2 und reservierte Namen werfen `ValidationError`. Auch
+   `mcpserver/tools.py :: update_item(folder=)` und `webui/api.py :: _items_patch` können es,
+   beide mit dem Eigentümer-only-Riegel vom 2026-08-12.
+2. **`Store.update(space=…)` scheitert laut, nicht still** — `space` steht in
+   `_SYSTEM_MANAGED_FIELDS` (`store.py:43`), `ValidationError: Feld 'space' ist vom Store
+   verwaltet`. Der „still als Extra-Feld"-Effekt existiert, betrifft aber nur echte Tippfehler
+   (`spce=…`), nicht `space` — festgehalten als **O6**, und der Grund, warum `move()` eine
+   benannte Signatur statt `**changes` bekommt.
+3. **Die UI kennt keine echten Ordner.** `app.js :: renderFolders()` rendert die vier Buckets,
+   nicht Verzeichnisse; `GET /api/v1/overview` liefert gar kein `folders`-Feld (nur
+   `/api/v1/spaces` tut das, und den benutzt der Baum nicht). Der fehlende Verschieben-Knopf ist
+   ein Symptom, nicht die Ursache.
+4. **Menschen können nicht einmal in einen Ordner anlegen** — `_items_post`s Feld-Whitelist
+   (`api.py:343`) kennt `folder` nicht, `create_item(folder=)` über MCP schon. Die Agentenfläche
+   kann seit Step 5 etwas, das die Menschenfläche nicht kann; im Zusatzplan als K4 mitgeschnitten.
+
+**Der Fund, der Step 7b klein macht:** `_write_item_file()` berechnet den Zielpfad aus
+`item.space` **und** `item.folder` — es hat nur nie ein `Item` mit geändertem `space` gesehen.
+Simuliert (Wegwerf-`DATA_ROOT`, `replace(item, space="fabian")` + der bestehende Pfad): Datei
+liegt danach unter `fabian/`, Frontmatter-`space:` ist mitgezogen, `get()`/`acl_of()`/`search()`
+konsistent, **ein** Git-Commit (`move itm_… [fabian]`) mit von Git erkanntem Rename
+(`{niklas/alt => fabian}/…`). Der Storage-Anteil von Step 7b ist damit eine öffentliche Methode um
+bereits funktionierende Mechanik, kein neuer Schreibpfad. Zweiter Nebenbefund aus denselben
+Läufen: **O7** — leer gewordene Quellordner bleiben liegen und erscheinen weiter in
+`list_spaces().folders` (reiner Verzeichnis-Walk), was der Baum aus Step 7 als Geisterordner
+zeigen würde; Behandlung als P6-AF im Zusatzplan.
+
+**Nikinger-Entscheidung dieser Session (Grautext, per Frage gestellt statt geraten):** gemessen
+sind es zwei Token, nicht eines — `--text-muted` (#9AA6B4, 19 Stellen) besteht WCAG AA bereits
+(6.6–7.9:1), `--text-faint` (#64707E, 16 Stellen) fällt mit **3.2–3.9:1** durch. Gewählt:
+**kalibriert anheben** (`--text-muted` → `#C4CDD8`, `--text-faint` → `#A7B2BF`) **plus ein neues
+`--text-placeholder` (#7E8A98)** für `.input::placeholder`. Die wörtliche Fassung „alles auf
+`--text`" hätte leere Eingabefelder wie gefüllte aussehen lassen und das absichtlich leise
+Versionsband (Designsystem §4.4) so laut wie den Titel gemacht. Umsetzung ist Step 7a, **noch
+nicht gebaut**.
+
+**UI-Fund aus dem vorigen Block vollständig geschlossen:** der `activeSpaceWritable()`-Fix (Teil 2)
+ist deployed und vom Nikinger per **manuellem UI-Test im Browser** validiert. Read-only
+gegengeprüft statt die Meldung übernommen: `/opt/sharefyx/current` → Release
+`20260813T120925.743482Z`, Arbeitsstand `92b918b` — derselbe Commit, der den Fix enthält, und
+identisch mit dem lokalen `main`-HEAD; `docs/UPDATE_LOG.md` trägt dafür einen echten, heute
+datierten Eintrag („hotfixed Rechte für shared space"), das `deploy.sh`-Gate (P6-X) ist also
+regulär gelaufen, nicht per Override. **Beide Teile des UI-Funds sind live bestätigt.**
+
+**Rotation in dieser Session ausgeführt:** der Head hatte mit diesem Block 40,2 KB erreicht und
+damit den 40-KB-Softcap gerissen. Der vorige Block (2026-08-12, dritter, mit vier Nachträgen)
+ist über `scripts/rotate_session_block.sh phase6_shares` **verbatim** nach `SESSIONS_ARCHIVE.md`
+gewandert — nicht von Hand, nicht abgetippt. Die dort eingefügte Korrekturnotiz zum
+deployten UI-Fix ist mitgewandert und steht damit an der Aussage, die sie korrigiert.
+
+**Verifiziert:** kein Code geändert, `pytest -q` trotzdem zweimal als Regressionsprobe gefahren →
+**724 passed**, unverändert. `git status --short` zeigt ausschließlich `.md`-Dateien. Die Belege
+dieser Session sind drei Probeläufe gegen Wegwerf-`DATA_ROOT`s im Scratchpad (nie gegen den echten
+`DATA_ROOT`, Hard Rule) und ein selbst geschriebener WCAG-Kontrastrechner; alle Ergebnisse stehen
+im Zusatzplan §1.3/§3.1, keiner davon ist ein Repo-Artefakt geworden. **Der Advisor war in dieser
+Session nicht verfügbar** (nicht in der Tool-Liste) — statt eines Advisor-Durchlaufs wurde jede
+Behauptung des Plans einzeln gegen den Code oder einen Probelauf gestellt; das ist ein Ersatz,
+kein Gleichwertiger, und beim nächsten substanziellen Commit nachzuholen.
+
+**Nächster Schritt (konkret):** `ITEM_MOVE_PLAN.md` vom Nikinger freigeben lassen — damit sind
+P6-AD–P6-AJ gelockt. Danach ist **Step 7a** (vier CSS-Token-Zeilen + eine Regel in `app.css`)
+sofort und unabhängig lieferbar und derzeit der einzige noch nicht deployte UI-Rest; ein eigener
+kleiner Deploy dafür ist die realistische Form. **Step 7** (UI Dateisystem, `app.js`-Split,
+Freigabedialog, Ordnerbaum) bleibt der nächste große Schnitt, **Step 7b** setzt ihn voraus.
+Gate-A→B-Punkt 3 unverändert offen (realer Purge-Lauf, frühestens 2026-08-28).
+
+---
 
 ## Session stopped — 2026-08-12, dritter — (Step 6 — Verwaltung und Migration, Block B)
 
