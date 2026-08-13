@@ -337,6 +337,13 @@ select.input {
 /* Echte Ordner (Step 7 Commit 1) reusen .tree__folder unverändert; nur die zweite Ebene
    (`Projekte/Backend`) bekommt zusätzliche Einrückung, um sie sichtbar unter ihrem Elternordner
    einzuordnen — Tiefe bleibt serverseitig auf 2 begrenzt, keine dritte Stufe nötig. */
+/* Drag & Drop (Step 7 Commit 4) — gestrichelte statt durchgezogene Kontur, damit "Ziehziel"
+   optisch nicht mit [aria-current] (aktueller Ordner) verwechselt wird. */
+.tree__realfolder--dragover {
+  background: var(--surface);
+  border: 1px dashed var(--accent);
+  color: var(--text);
+}
 .tree__realfolder--child { padding-left: calc(var(--space) * 6); }
 
 /* "+ Ordner" (Step 7 Commit 3) -- gedämpft wie ein Platzhalter, damit es sich neben den echten
@@ -470,6 +477,11 @@ select.input {
   cursor: pointer;
 }
 .list__row-move:hover { color: var(--text); background: var(--line); }
+
+/* Drag & Drop (Step 7 Commit 4) — Pflicht-Alternative bleibt der Menü-Knopf oben (P6-AB),
+   dies ist nur der Ziehgriff-Cursor + eine gedimmte Zeile während des Ziehens selbst. */
+.list__rows > li.list__row-draggable { cursor: grab; }
+.list__rows > li.list__row-draggable--active { opacity: .5; }
 
 .list__row-title {
   font-size: 15px;

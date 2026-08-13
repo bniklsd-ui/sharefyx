@@ -152,6 +152,19 @@ export function visibilityChip(item) {
   );
 }
 
+// -- Verschieben: geteilter Schreibpfad für Menü (dialogs.js) und Drag & Drop (tree.js,
+// Commit 4) — derselbe `_items_patch`-Aufruf, den Commit 3 schon nutzte, nur aus `dialogs.js`
+// hierher gezogen, damit beide Auslöser ihn teilen statt ihn zu duplizieren. Erfolgsmeldung/
+// Fehlerbehandlung bleiben bei den Aufrufern (Menü hält dafür einen Dialog offen, Drag & Drop
+// nicht — zu wenig gemeinsam, um das auch noch zu teilen).
+export function moveItemToFolder(item, folder) {
+  return api("/items/" + encodeURIComponent(item.id), {
+    method: "PATCH", body: JSON.stringify({ version: item.version, folder: folder }),
+  }).then(function () {
+    return loadItems().then(loadOverview);
+  });
+}
+
 export function renderCrumb() {
   listCrumbEl.textContent = "";
   var strong = el("strong", null, state.activeSpace || "");
@@ -231,7 +244,10 @@ export function renderList() {
     // `.list__row` nimmt den Platz, dieser Knopf bleibt fest daneben. Nur fürs eigene,
     // schreibbare Item — der Server lehnt einen Ordnerwechsel an einem fremden Item ohnehin ab
     // (`_items_patch`s Eigentümer-Riegel), der Knopf zeigt also nur, was wirklich erlaubt ist.
-    if (!item.readonly && item.space === state.ownSpace) {
+    // Menü-Knopf bleibt die Pflicht-Alternative zu Drag & Drop (P6-AB) — dieselbe
+    // `movable`-Bedingung entscheidet über beide, nicht nur über den Knopf.
+    var movable = !item.readonly && item.space === state.ownSpace;
+    if (movable) {
       var moveButton = el("button", "list__row-move", "→");
       moveButton.type = "button";
       moveButton.title = "In Ordner verschieben";
@@ -241,6 +257,20 @@ export function renderList() {
         openMoveDialog(item);
       });
       li.appendChild(moveButton);
+
+      // Drag & Drop (Step 7 Commit 4) — die `<li>` ist der Ziehgriff, nicht `.list__row`,
+      // damit ein Klick auf den Button weiterhin normal öffnet/navigiert; nur `dragstart`
+      // trägt die Nutzlast (Item-ID), die Zielseite (tree.js) löst sie über `state.items` auf.
+      li.draggable = true;
+      li.classList.add("list__row-draggable");
+      li.addEventListener("dragstart", function (event) {
+        event.dataTransfer.setData("text/plain", item.id);
+        event.dataTransfer.effectAllowed = "move";
+        li.classList.add("list__row-draggable--active");
+      });
+      li.addEventListener("dragend", function () {
+        li.classList.remove("list__row-draggable--active");
+      });
     }
     listRowsEl.appendChild(li);
   });

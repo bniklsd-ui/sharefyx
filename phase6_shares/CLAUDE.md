@@ -9,7 +9,7 @@ down:
   - ./ITEM_MOVE_PLAN.md                            # Zusatzplan zu Step 7: Item-Verschieben (Ordner+Space) + Textfarben, P6-AD–P6-AJ
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-6 verbatim (sechs Eintraege), L3, kein Softcap
-updated: 2026-08-13, siebter -- (Step 7 Commits 0+1+2+3 gebaut+verifiziert+committet: app.js in zehn ES-Module gesplittet, echter Ordnerbaum, Sichtbarkeits-Chip, Ordner anlegen+Verschieben per Menue (K4-Fix, erste Backend-Beruehrung); Tabu-Diff-Regelfehler seit Commit 0 gefunden+korrigiert (P5-B statt P6-C geprueft, folgenlos); 733 gruen; atomarer Checkpoint nach jedem Commit, Nikinger-Weisung, ein Advisor-Aufruf pro Commit)
+updated: 2026-08-13, siebter -- (Step 7 Commits 0+1+2+3+4 gebaut+verifiziert+committet: app.js in zehn ES-Module gesplittet, echter Ordnerbaum, Sichtbarkeits-Chip, Ordner anlegen+Verschieben per Menue (K4-Fix, erste Backend-Beruehrung), Drag & Drop additiv auf Commit 3 (moveItemToFolder() geteilt zwischen Menue+Drag, Regression per Playwright bewiesen); Tabu-Diff-Regelfehler seit Commit 0 gefunden+korrigiert (P5-B statt P6-C geprueft, folgenlos); 733 gruen; atomarer Checkpoint nach jedem Commit, Nikinger-Weisung, ein Advisor-Aufruf pro Commit)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -102,6 +102,7 @@ weiter ohne Build-Step (AC).
 | 10 | UI Dateisystem (Block B), Commit 1/7 — echter Ordnerbaum, kein Backend-Fund nötig (`GET /api/v1/items?folder=` existierte bereits, `GET /api/v1/spaces` trug `folders`/`members` schon, nur `app.js` rief die Route nie ab). `list.js :: loadOverview()` holt jetzt `/overview`+`/spaces` per `Promise.all`, mischt `folders`/`members` nach Name in die Space-Objekte. `tree.js`: `buildFolderTree()` (flache Pfadliste → ≤2-stufiger Baum, reines Splitten auf „/", da `MAX_FOLDER_DEPTH` serverseitig gilt), `renderRealFolders()` reused `.tree__folder` (neue Modifier-Klasse `.tree__realfolder--child` nur für die Einrückung der zweiten Ebene), `navigate()`/`navigateFolder()` jetzt exklusiv (`state.folder`/`state.filter` nie beide gesetzt). `list.js`: `filterParams()`/`renderCrumb()`/Leerzustand-Text folder-bewusst gemacht | 7 | ✅ **gebaut, noch nicht deployt** — Sichtprobe mit zwei echten, verschachtelten Ordnern (`Projekte`/`Projekte/Backend`, serverseitig zu `projekte`/`projekte/backend` slugifiziert, P6-Q — Baumdarstellung ist davon unabhängig, reine String-Weiterreichung): Verschachtelung im Baum sichtbar, Klick navigiert **und** filtert exakt (nicht Präfix, V55) auf beiden Ebenen, per Playwright-Assertions auf die tatsächlich gerenderten Zeilentitel erzwungen, nicht nur der Screenshot. Advisor-Fund vor dem Commit, geprüft statt blind gefixt: `navigateFolder()` setzt `state.filter=null`, `dialogs.js :: openCreateDialog()` liest `state.meta.buckets[state.filter]` ungeschützt — JS stringifiziert einen `null`-Schlüssel zu `"null"`, kein `TypeError`, derselbe Fallback-Pfad wie beim typlosen Bucket „Archiv" heute schon; per Node-Check UND echtem Browserlauf (Konsolenfehler-Listener, „+" während `projekte/backend` aktiv) bestätigt, **kein Fix nötig**. Offen für Commit 3 (folder-bewusstes Anlegen): der aktuelle Fallback „leerer Ordner → Typ Notiz" ist ein stiller Default, keine bewusste Entscheidung für echte Ordner | 0 (P5-T: JS bleibt unit-ungetestet, kein jsdom-Zusatzlauf — die echte Browserprobe deckt strenger ab; 724 gesamt unverändert) |
 | 11 | UI Dateisystem (Block B), Commit 2/7 — Sichtbarkeits-Chip, kein Backend-Fund nötig (`visibility`/`share_read`/`share_write` stehen bereits auf `summary_to_json()`, P6 Step 5). `list.js`: neue `visibilityLabel()`/`visibilityChip()`, in `renderList()`s Zeilen verdrahtet (`.list__row-meta` von reinem Text auf Flex mit Meta-Text + Chip umgebaut). `app.css`: `.visibility-chip`/`.visibility-chip--shared` (gedämpft vs. `--ok`-grün), reused `.list__row-meta`s bestehende Fläche | 7 | ✅ **gebaut, noch nicht deployt** — Sichtprobe mit vier Items (privat/nur-ich/geteilt/Randfall), alle drei geplanten Chip-Zustände + der Randfall per Playwright-Assertion auf gerenderten Chip-Text erzwungen (nicht nur Screenshot), Konsolenfehler-Listener sauber. **Benannte Abweichung vom Plan-Wortlaut, gefunden beim Nachlesen von `acl.py`/`permissions.py` vor dem Commit:** der Plan prüft `visibility` zuerst („private" → unbedingt „privat"), aber `acl.py :: decision_for()` verundet `share_read`/`share_write` immer in `AclDecision.read`/`write`, unabhängig von `visibility` — nur `Surface.AGENT` fragt `visibility` (P6-P), nie ein Mensch. Ein Item mit `visibility=private` UND einer echten Freigabe ist für den Freigegebenen faktisch lesbar, erreichbar schon heute über ein rohes `PATCH /api/v1/items/{id}` (`_items_patch` hat keine Feld-Whitelist) — nicht erst über Commit 5s künftigen Dialog. Dispatch umgestellt: `share_read`/`share_write` non-empty entscheidet zuerst, `visibility` nur als Fallback ohne Freigaben — ein vierter Testfall (`visibility=private`+`share_read=[fabian]`) beweist den Unterschied, zeigt korrekt „geteilt mit fabian" statt „privat". **Zweiter, nicht blockierender Punkt:** der Chip erscheint identisch für Items aus fremden, geteilten Spaces (`renderList()` ist derselbe Codepfad für jeden Space) — das sind ACL-Metadaten, keine Fließtext-Bodies, Hard Rule 4s `<untrusted_content>`-Wrapping betrifft das nicht (derselbe Schnitt wie `overview_row_to_json()`s `snippet`-Auslassung, nur umgekehrt: hier ist die Metadaten-Anzeige bewusst, nicht der Fließtext) | 0 (P5-T: JS bleibt unit-ungetestet, kein jsdom-Zusatzlauf — die echte Browserprobe deckt strenger ab; 724 gesamt unverändert) |
 | 12 | UI Dateisystem (Block B), Commit 3/7 — Ordner anlegen + Verschieben per Menü, K4-Fix, erster echter Backend-Touch dieses Steps (P6-C erlaubt `storage/` explizit). `store.py :: ensure_folder(space, folder)` (neu, `mkdir(parents=True, exist_ok=True)` unter `self._lock`, kein Git-Commit, keine Content-Datei — reine Verzeichnisoperation). `api.py`: neue `POST /api/v1/spaces/{space}/folders` (Eigentümer-Riegel wie `_items_patch`s `folder`-Feld), `_items_post`-Whitelist um `"folder"` erweitert (K4). `tree.js`: „+ Ordner"-Zeile fürs eigene Space, öffnet `dialogs.js :: openNewFolderDialog()`. `list.js`: Verschieben-Knopf („→") pro Zeile — als GESCHWISTER von `.list__row`, nicht darin verschachtelt (zwei `<button>` ineinander ist ungültiges HTML), `<li>` deshalb neu Flex (`app.css`). `dialogs.js`: zwei neue Dialoge, `openNewFolderDialog()`/`openMoveDialog(item)`. `app.js`: kleine, dokumentierte Abweichung vom Plan-Dateiwortlaut — die beiden neuen Dialoge in `anyOverlayOpen()`/die Escape-Behandlung aufgenommen, dieselbe Konsistenz wie jeder andere Dialog hier | 7 | ✅ **gebaut, noch nicht deployt** — Details, beide Interpretationsentscheidungen und die zwei Advisor-Funde: Session-Block unten | +9 (4 `phase1_storage/tests/test_store.py`: `ensure_folder()` erstellt/idempotent/lehnt Tiefe>2 und leeren String ab + 5 `phase5_ui/tests/test_api.py`: `test_create_item_accepts_folder` [K4] + vier Endpunkt-Tests [erstellt sichtbaren leeren Ordner, lehnt fremden Space auch mit `write:`-Grant ab, lehnt Tiefe>2/reservierten Namen ab]); Charakterisierung erneut byte-identisch grün (P6-D); 733 gesamt |
+| 13 | UI Dateisystem (Block B), Commit 4/7 — Drag & Drop, additiv auf Commit 3, kein neuer Backend-Pfad (P6-AB: Menü-Knopf bleibt Pflicht-Alternative). `list.js :: moveItemToFolder(item, folder)` (neu, aus `dialogs.js`s bisher dort inline stehendem `PATCH`-Aufruf extrahiert — geteilter Schreibpfad für Menü UND Drag & Drop, Erfolgs-/Fehler-Rückmeldung bleibt bewusst bei den beiden Aufrufern statt mitextrahiert, weil der Menü-Pfad einen Dialog offen halten muss und der Drag-Pfad keinen hat). `list.js`: `<li>` (nicht der Button) trägt `draggable`/`dragstart`/`dragend`, dieselbe `movable`-Bedingung wie der Menü-Knopf. `tree.js`: neue `bindFolderDropTarget()`, `dragover`/`dragleave`/`drop` nur auf `folderButton()`-Knoten im **eigenen** Space (`space.own`) — der Server lehnt fremde `folder`-Änderungen ohnehin ab, das Gating hier ist reine UX. `app.css`: Ziehgriff-Cursor + gedimmte Zeile während des Ziehens, gestrichelte Kontur am Drop-Ziel (bewusst optisch von `[aria-current]` unterschieden) | 7 | ✅ **gebaut, noch nicht deployt** — Details, inkl. des Refactor-Regressionsbeweises: Session-Block unten | 0 (P5-T: JS bleibt unit-ungetestet; 733 gesamt unverändert — Playwright-`drag_to()`-Lauf statt jsdom, siehe Session-Block, ist Entwicklungshilfe dieser Session, kein Teil der Suite) |
 
 ## Geerbte Contracts
 
@@ -299,3 +300,65 @@ Commit 4 (Drag & Drop, additiv auf Commit 3, kein neuer Backend-Pfad) ist der n�
 falls der Nikinger weiterbauen lässt — Plan nennt ihn ausdrücklich „nur falls Kontextbudget
 reicht", nach drei Commits mit Frontend+jetzt-auch-Backend-Umfang ist das eine Sache, die der
 Nikinger einschätzen sollte, nicht diese Session allein.
+
+**Nachtrag, Commit 4/7 — Drag & Drop, auf Nikinger-Weisung gebaut** (AskUserQuestion zu
+Sessionbeginn: „Commit 4 bauen" gegen „direkt zu Commit 5 springen"/„hier pausieren" gewählt —
+neue Session nach `/clear`, kein Kontextbruch mitten in Commit 3, deshalb Nachtrag statt neuer
+Rotation, dieselbe Konvention wie Commits 1–3). Umfang, Code, Verifikation: Modul-Tabelle oben,
+Zeile 13.
+
+**Refactor als Nebeneffekt, nicht Beifang:** `dialogs.js`s Menü-Verschieben-Handler (Commit 3)
+rief den `PATCH`-Aufruf bisher inline auf; Drag & Drop braucht denselben Aufruf aus `tree.js`
+heraus. Statt ihn zu duplizieren, wurde er nach `list.js :: moveItemToFolder(item, folder)`
+gezogen (reiner `PATCH`+Neuladen, ohne Rückmeldung) — Erfolgs-/Fehler-Toast blieb bewusst bei
+den beiden Aufrufern, nicht mitextrahiert: der Menü-Pfad muss bei einem Fehler den Dialog offen
+halten, der Drag-Pfad hat keinen Dialog, der offenbleiben könnte. Zu wenig gemeinsam für eine
+gemeinsame Fehlerbehandlung (Root-`CLAUDE.md`: „drei ähnliche Zeilen sind besser als eine
+verfrühte Abstraktion").
+
+**Geprüft statt nur behauptet, dass der Refactor nichts kaputt gemacht hat:** dieselbe
+Zwei-venv-Playwright-Disziplin wie die vorigen Commits, diesmal mit zwei eigens dafür angelegten
+Fixture-Items (`server_setup4.py`/`screenshot_client4.py`, Scratchpad). Erster Teil des Laufs
+wiederholt exakt Commit 3s Menü-Pfad (Ordner „projekte" diesmal per `ensure_folder()` direkt
+gesetzt statt über die UI angelegt, kein Doppeltest von Commit 3s eigenem Anlegen-Pfad nötig) —
+Toast „Verschoben nach projekte" erscheint, Item taucht im Ordner auf. Kein Rückschritt durch
+den Refactor.
+
+**Drag & Drop selbst, entgegen der Plan-Erwartung tatsächlich per Playwright messbar:** der Plan
+(`serialized-seeking-aurora.md`, Commit-4-Abschnitt) warnt ausdrücklich, `drag_to()` sei für
+native HTML5-Drag-Events unzuverlässig, und nennt einen manuellen Livecheck durch den Nikinger
+als die eigentliche Abnahme für dieses Stück. Der Lauf dieser Session gelang trotzdem:
+`drag_row.drag_to(drop_target)` löste `dragstart`/`dragover`/`drop` sauber aus, das Item landete
+nach dem Ziehen real im Ordner — read-only gegen die Platte geprüft
+(`sichtprobe6/projekte/itm_...__drag-verschieben.md` existiert, `server_setup4.py`s eigener
+`rglob`-Ausdruck nach dem Lauf), nicht nur der Toast/Screenshot geglaubt. **Das ersetzt den
+Nikinger-Livecheck trotzdem nicht — konkret zu prüfen, nicht nur pauschal:** die `<li>` ist der
+Ziehgriff, aber ihre gesamte Fläche liegt unter zwei `<button>`s (`.list__row`, `.list__row-move`)
+— ob ein Mousedown-Drag auf einem `<button>` an sein `draggable`-Elternelement durchgereicht
+wird, ist enginespezifisch. Chromium tut es (genau das beweist der `drag_to()`-Lauf, dessen
+Mittelpunkt auf `.list__row` liegt), andere Engines sind darin unzuverlässiger. Bleibt
+`dragstart` dort aus, gibt es keinen sichtbaren Hinweis, warum — der „→"-Menü-Knopf funktioniert
+unbeeinflusst weiter. **Konkreter Check für den Nikinger:** eine Zeile im tatsächlich benutzten
+Browser ziehen und prüfen, ob überhaupt ein `dragstart` feuert (sichtbar am gedimmten
+`.list__row-draggable--active`-Zustand der Zeile), nicht nur ob der Drop funktioniert.
+Zweiter, kleiner Advisor-Fund vor diesem Commit, behoben statt nur benannt: Ablegen auf dem
+eigenen Ausgangsordner löste einen leeren `PATCH` mit Versionssprung + Git-Commit für keine
+tatsächliche Änderung aus (dieselbe Kategorie wie Fund V10, `toasts.js`s Kopfkommentar) — ein
+`if ((item.folder || "") === folderPath) return;` am Anfang von `tree.js`s `drop`-Handler
+verhindert das jetzt. Derselbe Leerlauf existiert im Menü-Pfad seit Commit 3 unverändert fort
+(dort schwerer aus Versehen auszulösen, deshalb hier behoben und dort nur benannt, kein
+Commit-3-Fix in diesem Commit-4-Schnitt).
+
+**Verifiziert:** `pytest -q` 733 passed (env-gestrippt), unverändert — kein neuer serverseitiger
+Test nötig (P5-T, kein neuer Backend-Pfad, Commit 4 rührt keine Datei außerhalb
+`phase5_ui/webui/static/` an). Tabu-Diff sauber gegen die korrekte P6-C-Liste (`mcpserver/
+asgi.py`, `authserver/{crypto,totp,passwords,resolver,flows}.py`) — nur `app.css`/`js/
+{dialogs,list,tree}.js` geändert. Kein Konsolenfehler während des gesamten Laufs (Playwright
+`pageerror`/`console`-Listener).
+
+**Nächster Schritt (konkret):** Checkpoint nach Nikinger-Weisung — Commit 4 ist fertig
+dokumentiert und wird jetzt committet, dann stoppt diese Session wieder für eine Rückmeldung.
+Commit 5 (`webui/shares.py` + Re-Auth-Gate, Freigabe-Dialog) ist der nächste Kandidat, deutlich
+größerer Umfang als die vorigen vier Commits (neue Datei, elfter Fehlercode `reauth_required`,
+Re-Auth-Mini-Formular) — eine Sache, die der Nikinger einschätzen sollte, nicht diese Session
+allein.

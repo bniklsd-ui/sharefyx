@@ -13,7 +13,7 @@ import {
   loadEditorFromItem, clearDraft, updateVersionBand, afterWrite, handleWriteError,
   currentFormValues,
 } from "./editor.js";
-import { loadOverview, loadItems, bucketFor } from "./list.js";
+import { loadOverview, bucketFor, moveItemToFolder } from "./list.js";
 
 var createDialogEl;
 var createTypeEl;
@@ -278,13 +278,9 @@ export function init() {
     var item = moveTargetItem;
     if (!item) return;
     var folder = moveFolderSelectEl.value;
-    api("/items/" + encodeURIComponent(item.id), {
-      method: "PATCH", body: JSON.stringify({ version: item.version, folder: folder }),
-    }).then(function () {
+    moveItemToFolder(item, folder).then(function () {
       closeMoveDialog();
-      return loadItems().then(loadOverview).then(function () {
-        toast(folder ? "Verschoben nach " + folder.split("/").join(" / ") : "In die oberste Ebene verschoben");
-      });
+      toast(folder ? "Verschoben nach " + folder.split("/").join(" / ") : "In die oberste Ebene verschoben");
     }).catch(function (err) {
       if (err.code === "conflict") {
         toast(

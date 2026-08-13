@@ -3,10 +3,10 @@
 // -- Navigationsbaum (Step 7b) --------------------------------------------------------------
 
 import { state, BUCKET_LABELS, activeSpaceWritable, setCreateControlsPresent } from "./state.js";
-import { el } from "./toasts.js";
+import { el, toast } from "./toasts.js";
 import { reportUnexpectedError } from "./api.js";
 import { closeEditor } from "./editor.js";
-import { loadItems, renderCrumb } from "./list.js";
+import { loadItems, renderCrumb, moveItemToFolder } from "./list.js";
 import { openNewFolderDialog } from "./dialogs.js";
 
 var railTreeEl;
@@ -89,6 +89,49 @@ export function buildFolderTree(folders) {
   return tops;
 }
 
+// Drag & Drop (Step 7 Commit 4) — Drop-Ziel nur für echte Ordner im EIGENEN Space, derselbe
+// Eigentümer-Riegel wie der Verschieben-Knopf in list.js (der Server lehnt einen
+// `folder`-Wechsel an einem fremden Item ohnehin ab; das Gating hier ist nur bessere UX, keine
+// eigene Sicherheitsgrenze). Teilt sich `moveItemToFolder()` mit dem Menü-Pfad (list.js),
+// duplizierte Erfolgs-/Fehlermeldung ist bewusst — zu wenig gemeinsam mit dem dialoggebundenen
+// Menü-Pfad, um das noch zu teilen (dort muss ein Dialog offen bleiben, hier gibt es keinen).
+function bindFolderDropTarget(button, folderPath) {
+  button.addEventListener("dragover", function (event) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    button.classList.add("tree__realfolder--dragover");
+  });
+  button.addEventListener("dragleave", function () {
+    button.classList.remove("tree__realfolder--dragover");
+  });
+  button.addEventListener("drop", function (event) {
+    event.preventDefault();
+    button.classList.remove("tree__realfolder--dragover");
+    var itemId = event.dataTransfer.getData("text/plain");
+    var item = itemId && state.items.filter(function (i) { return i.id === itemId; })[0];
+    if (!item) return;
+    // Ablegen auf dem eigenen Ausgangsordner ist mit Drag & Drop trivial auszulösen (kurz
+    // anheben, direkt wieder loslassen) — ohne diesen Guard verursacht das einen leeren
+    // `PATCH` mit Versionssprung + Git-Commit für keine tatsächliche Änderung (Advisor-Fund
+    // vor diesem Commit; derselbe Leerlauf existiert im Menü-Pfad seit Commit 3, dort aber
+    // schwerer aus Versehen auszulösen, deshalb hier behoben und dort nur benannt).
+    if ((item.folder || "") === folderPath) return;
+    moveItemToFolder(item, folderPath).then(function () {
+      toast("Verschoben nach " + folderPath.split("/").join(" / "));
+    }).catch(function (err) {
+      if (err.code === "conflict") {
+        toast(
+          "Ein anderer Client hat dieses Item zwischenzeitlich geändert — bitte neu laden und "
+          + "erneut versuchen.", "error",
+        );
+        return;
+      }
+      if (err.message === "unauthenticated") return;
+      toast(err.message || "Verschieben fehlgeschlagen.", "error");
+    });
+  });
+}
+
 function folderButton(space, node, isChild) {
   var button = el("button", "tree__folder tree__realfolder" + (isChild ? " tree__realfolder--child" : ""));
   button.type = "button";
@@ -106,6 +149,7 @@ function folderButton(space, node, isChild) {
       return navigateFolder(space.name, node.path);
     }).catch(reportUnexpectedError);
   });
+  if (space.own) bindFolderDropTarget(button, node.path);
   return button;
 }
 
