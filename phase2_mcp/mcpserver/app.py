@@ -208,7 +208,7 @@ def create_app(
     routes += ui_auth_routes(ui_settings, oauth.store, oauth.users, ui_sessions)
     routes += static_routes(ui_settings, ui_sessions)
     routes += account_routes(ui_settings, oauth.store, oauth.users, ui_sessions)
-    routes += api_routes(ui_settings, store, ui_sessions, permissions, oauth.store)
+    routes += api_routes(ui_settings, store, ui_sessions, permissions, oauth.store, oauth.users)
     middleware: list[Middleware] = []
     if hosts is not None:
         middleware.append(Middleware(TrustedHostMiddleware, allowed_hosts=hosts))

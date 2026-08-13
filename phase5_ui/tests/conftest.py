@@ -132,7 +132,7 @@ def full_app_items(ui_settings, store, confirmed_users, sessions, item_store, pe
     routes = (
         ui_auth_routes(ui_settings, store, confirmed_users, sessions)
         + account_routes(ui_settings, store, confirmed_users, sessions)
-        + api_routes(ui_settings, item_store, sessions, permissions, store)
+        + api_routes(ui_settings, item_store, sessions, permissions, store, confirmed_users)
     )
     return Starlette(routes=routes)
 

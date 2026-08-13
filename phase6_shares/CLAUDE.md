@@ -9,7 +9,7 @@ down:
   - ./ITEM_MOVE_PLAN.md                            # Zusatzplan zu Step 7: Item-Verschieben (Ordner+Space) + Textfarben, P6-AD–P6-AJ
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-6 verbatim (sechs Eintraege), L3, kein Softcap
-updated: 2026-08-13, siebter -- (Step 7 Commits 0+1+2+3+4 gebaut+verifiziert+committet: app.js in zehn ES-Module gesplittet, echter Ordnerbaum, Sichtbarkeits-Chip, Ordner anlegen+Verschieben per Menue (K4-Fix, erste Backend-Beruehrung), Drag & Drop additiv auf Commit 3 (moveItemToFolder() geteilt zwischen Menue+Drag, Regression per Playwright bewiesen); Tabu-Diff-Regelfehler seit Commit 0 gefunden+korrigiert (P5-B statt P6-C geprueft, folgenlos); 733 gruen; atomarer Checkpoint nach jedem Commit, Nikinger-Weisung, ein Advisor-Aufruf pro Commit)
+updated: 2026-08-13, siebter -- (Step 7 Commits 0+1+2+3+4+5a gebaut+verifiziert+committet: app.js in zehn ES-Module gesplittet, echter Ordnerbaum, Sichtbarkeits-Chip, Ordner anlegen+Verschieben per Menue (K4-Fix), Drag & Drop, Re-Auth-Gate Backend-Haelfte (5a, Freigabe-Dialog auf 5b verschoben -- Split-Begruendung im Session-Block, Advisor-Fund: password/totp duerfen nie in store.update() landen); Tabu-Diff-Regelfehler seit Commit 0 gefunden+korrigiert (P5-B statt P6-C geprueft, folgenlos); 746 gruen; atomarer Checkpoint nach jedem Commit, Nikinger-Weisung, ein Advisor-Aufruf pro Commit)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -103,6 +103,7 @@ weiter ohne Build-Step (AC).
 | 11 | UI Dateisystem (Block B), Commit 2/7 — Sichtbarkeits-Chip, kein Backend-Fund nötig (`visibility`/`share_read`/`share_write` stehen bereits auf `summary_to_json()`, P6 Step 5). `list.js`: neue `visibilityLabel()`/`visibilityChip()`, in `renderList()`s Zeilen verdrahtet (`.list__row-meta` von reinem Text auf Flex mit Meta-Text + Chip umgebaut). `app.css`: `.visibility-chip`/`.visibility-chip--shared` (gedämpft vs. `--ok`-grün), reused `.list__row-meta`s bestehende Fläche | 7 | ✅ **gebaut, noch nicht deployt** — Sichtprobe mit vier Items (privat/nur-ich/geteilt/Randfall), alle drei geplanten Chip-Zustände + der Randfall per Playwright-Assertion auf gerenderten Chip-Text erzwungen (nicht nur Screenshot), Konsolenfehler-Listener sauber. **Benannte Abweichung vom Plan-Wortlaut, gefunden beim Nachlesen von `acl.py`/`permissions.py` vor dem Commit:** der Plan prüft `visibility` zuerst („private" → unbedingt „privat"), aber `acl.py :: decision_for()` verundet `share_read`/`share_write` immer in `AclDecision.read`/`write`, unabhängig von `visibility` — nur `Surface.AGENT` fragt `visibility` (P6-P), nie ein Mensch. Ein Item mit `visibility=private` UND einer echten Freigabe ist für den Freigegebenen faktisch lesbar, erreichbar schon heute über ein rohes `PATCH /api/v1/items/{id}` (`_items_patch` hat keine Feld-Whitelist) — nicht erst über Commit 5s künftigen Dialog. Dispatch umgestellt: `share_read`/`share_write` non-empty entscheidet zuerst, `visibility` nur als Fallback ohne Freigaben — ein vierter Testfall (`visibility=private`+`share_read=[fabian]`) beweist den Unterschied, zeigt korrekt „geteilt mit fabian" statt „privat". **Zweiter, nicht blockierender Punkt:** der Chip erscheint identisch für Items aus fremden, geteilten Spaces (`renderList()` ist derselbe Codepfad für jeden Space) — das sind ACL-Metadaten, keine Fließtext-Bodies, Hard Rule 4s `<untrusted_content>`-Wrapping betrifft das nicht (derselbe Schnitt wie `overview_row_to_json()`s `snippet`-Auslassung, nur umgekehrt: hier ist die Metadaten-Anzeige bewusst, nicht der Fließtext) | 0 (P5-T: JS bleibt unit-ungetestet, kein jsdom-Zusatzlauf — die echte Browserprobe deckt strenger ab; 724 gesamt unverändert) |
 | 12 | UI Dateisystem (Block B), Commit 3/7 — Ordner anlegen + Verschieben per Menü, K4-Fix, erster echter Backend-Touch dieses Steps (P6-C erlaubt `storage/` explizit). `store.py :: ensure_folder(space, folder)` (neu, `mkdir(parents=True, exist_ok=True)` unter `self._lock`, kein Git-Commit, keine Content-Datei — reine Verzeichnisoperation). `api.py`: neue `POST /api/v1/spaces/{space}/folders` (Eigentümer-Riegel wie `_items_patch`s `folder`-Feld), `_items_post`-Whitelist um `"folder"` erweitert (K4). `tree.js`: „+ Ordner"-Zeile fürs eigene Space, öffnet `dialogs.js :: openNewFolderDialog()`. `list.js`: Verschieben-Knopf („→") pro Zeile — als GESCHWISTER von `.list__row`, nicht darin verschachtelt (zwei `<button>` ineinander ist ungültiges HTML), `<li>` deshalb neu Flex (`app.css`). `dialogs.js`: zwei neue Dialoge, `openNewFolderDialog()`/`openMoveDialog(item)`. `app.js`: kleine, dokumentierte Abweichung vom Plan-Dateiwortlaut — die beiden neuen Dialoge in `anyOverlayOpen()`/die Escape-Behandlung aufgenommen, dieselbe Konsistenz wie jeder andere Dialog hier | 7 | ✅ **gebaut, noch nicht deployt** — Details, beide Interpretationsentscheidungen und die zwei Advisor-Funde: Session-Block unten | +9 (4 `phase1_storage/tests/test_store.py`: `ensure_folder()` erstellt/idempotent/lehnt Tiefe>2 und leeren String ab + 5 `phase5_ui/tests/test_api.py`: `test_create_item_accepts_folder` [K4] + vier Endpunkt-Tests [erstellt sichtbaren leeren Ordner, lehnt fremden Space auch mit `write:`-Grant ab, lehnt Tiefe>2/reservierten Namen ab]); Charakterisierung erneut byte-identisch grün (P6-D); 733 gesamt |
 | 13 | UI Dateisystem (Block B), Commit 4/7 — Drag & Drop, additiv auf Commit 3, kein neuer Backend-Pfad (P6-AB: Menü-Knopf bleibt Pflicht-Alternative). `list.js :: moveItemToFolder(item, folder)` (neu, aus `dialogs.js`s bisher dort inline stehendem `PATCH`-Aufruf extrahiert — geteilter Schreibpfad für Menü UND Drag & Drop, Erfolgs-/Fehler-Rückmeldung bleibt bewusst bei den beiden Aufrufern statt mitextrahiert, weil der Menü-Pfad einen Dialog offen halten muss und der Drag-Pfad keinen hat). `list.js`: `<li>` (nicht der Button) trägt `draggable`/`dragstart`/`dragend`, dieselbe `movable`-Bedingung wie der Menü-Knopf. `tree.js`: neue `bindFolderDropTarget()`, `dragover`/`dragleave`/`drop` nur auf `folderButton()`-Knoten im **eigenen** Space (`space.own`) — der Server lehnt fremde `folder`-Änderungen ohnehin ab, das Gating hier ist reine UX. `app.css`: Ziehgriff-Cursor + gedimmte Zeile während des Ziehens, gestrichelte Kontur am Drop-Ziel (bewusst optisch von `[aria-current]` unterschieden) | 7 | ✅ **gebaut, noch nicht deployt** — Details, inkl. des Refactor-Regressionsbeweises: Session-Block unten | 0 (P5-T: JS bleibt unit-ungetestet; 733 gesamt unverändert — Playwright-`drag_to()`-Lauf statt jsdom, siehe Session-Block, ist Entwicklungshilfe dieser Session, kein Teil der Suite) |
+| 14 | UI Dateisystem (Block B), Commit 5a/7 — Re-Auth-Gate (Backend-Hälfte, P6-N), Freigabe-Dialog/Re-Auth-Mini-Formular auf Commit 5b verschoben (Session-Block begründet den Split). `storage/acl.py`: `AclDecision` bekommt rohe `share_read`/`share_write` (Defaults, bestehende Konstruktionsstellen unverändert). `webui/shares.py` (neu): `ShareState`, `widens()` (echte Obermenge auf `AclDecision.read`/`.write`, `visibility` fließt strukturell nie ein), `require_share_reauth()` (wirft `ApiError("reauth_required")`, Signatur um `body`/`userdir`/`throttle`/`auth_store` erweitert — die Plan-Skizze in §1.2.5 deckt die tatsächliche Credential-Prüfung nicht ab). `webui/errors.py`: elfter Code `reauth_required:403`. `webui/api.py :: _items_patch`: `before`/`after`-`ShareState` aus `acl`/Body gebaut, Gate läuft VOR `store.update()`; `password`/`totp` werden unabhängig vom Gate-Ausgang nie an `store.update()` weitergereicht (Advisor-Fund, sonst Frontmatter-Leck, Hard Rule 1); `api_routes()` bekommt sechsten Parameter `users: UserDirectory`. `mcpserver/app.py` zieht mit `oauth.users` nach | 7 | ✅ **gebaut, noch nicht deployt** — Details, Advisor-Fund und der Commit-5a/5b-Split: Session-Block unten | +13 (8 `phase6_shares/tests/test_shares.py` [neu, `widens()`-Wahrheitstabelle] + 5 `phase5_ui/tests/test_api.py` [Gate ausgelöst ohne/mit falschen Credentials, Gate erfüllt+Credential-Leck-Check, keine Auslösung bei Verkleinerung/reiner Inhaltsänderung]); Kollateralkorrekturen (kein neuer Test): `phase5_ui/tests/{conftest,test_overview}.py` + drei `test_api.py`-Fixtures um `confirmed_users` als sechstes `api_routes()`-Argument ergänzt, ein `mock_store.acl_reader.decision_for.return_value` gesetzt (unkonfigurierter `MagicMock` scheitert an `>` mit `TypeError`, nachgeprüft); `phase5_ui/scripts/{ui_budget,ui_smoke}.py` zogen ihre eigenen `api_routes()`-Aufrufe nach, beide real gegen ein Temp-`DATA_ROOT` gelaufen (12/12 bzw. `all_within_budget:true`); 746 gesamt |
 
 ## Geerbte Contracts
 
@@ -362,3 +363,78 @@ Commit 5 (`webui/shares.py` + Re-Auth-Gate, Freigabe-Dialog) ist der nächste Ka
 größerer Umfang als die vorigen vier Commits (neue Datei, elfter Fehlercode `reauth_required`,
 Re-Auth-Mini-Formular) — eine Sache, die der Nikinger einschätzen sollte, nicht diese Session
 allein.
+
+**Nachtrag, Commit 5a/7 — Re-Auth-Gate, nur die Backend-Hälfte, auf Nikinger-Weisung gebaut**
+("Let's go on with the next commit", ein Advisor-Aufruf freigegeben). Umfang, Code, Verifikation:
+Modul-Tabelle oben, Zeile 14.
+
+**Advisor-Aufruf vor dem Schreiben, ein Split und ein Sicherheitsfund:**
+1. **Split (angenommen, nicht selbst entschieden):** Commit 5 lief im Plan als eine Einheit
+   (Gate + Freigabe-Dialog + Re-Auth-Mini-Formular). Der Advisor riet, die Backend-Hälfte
+   (`shares.py`/`errors.py`/`api.py`/`acl.py`/`app.py`-Verdrahtung — vollständig `pytest`-
+   verifizierbar, deckt sich mit dem Plan-eigenen Verifikations-Split) von der Frontend-Hälfte
+   (Freigabe-Dialog, Re-Auth-Formular in `dialogs.js`/`app.html` — nur per Screenshot prüfbar,
+   UND eine im Plan noch offene UI-Designfrage: wie ein Mensch ein Freigabeziel benennt) zu
+   trennen — dieselbe Logik, die Commits 0–4 bereits atomar hielt. Umgesetzt: **dies ist Commit
+   5a**, der Freigabe-Dialog (5b) ist ein eigener, noch ungebauter Schritt.
+2. **Echter Fund, vor jeder Codezeile geprüft statt angenommen:** die Ausführungsplan-Skizze
+   sieht vor, dass ein Client bei `reauth_required` denselben `PATCH`-Body erneut sendet, jetzt
+   mit `password`/`totp` gemischt hinein. `store.update()`s `else: updated_extra[key] = value`
+   (Zeile ~507, keine Feld-Whitelist) hätte beide Felder unverändert in `extra` — also in die
+   Frontmatter-Datei UND in einen Git-Commit — geschrieben, wäre `_items_patch`s `changes`-Dict
+   nicht korrigiert worden. **Hard Rule 1, kein Schönheitsfehler.** Behoben: `changes` filtert
+   jetzt zusätzlich `password`/`totp` heraus, unabhängig davon, ob das Gate überhaupt auslöste.
+   Test `test_widening_share_write_with_correct_credentials_succeeds` beweist die Abwesenheit
+   sowohl in der API-Antwort als auch am tatsächlich auf der Platte liegenden Item.
+
+**Plumbing-Frage aufgelöst, nicht neu entworfen:** die Plan-Skizze §1.2.5 nennt
+`require_share_reauth(request, session, *, before, after, acl)` — das deckt nicht ab, WIE gegen
+ein echtes Credential geprüft wird. `request` fiel als ungenutzt ganz weg; `body`/`userdir`/
+`throttle`/`auth_store` kamen dazu, dieselben Bausteine wie `account.py :: _require_reauth()`.
+`api_routes()` bekommt dafür einen sechsten Parameter `users: UserDirectory` (`oauth.users` an
+der `mcpserver/app.py`-Aufrufstelle, bereits vorhanden für `account_routes()`), `LoginThrottle`
+wird lokal aus `auth_store` gebaut, exakt wie `account_routes()` es selbst tut.
+
+**AclDecision-Erweiterung statt zweitem Dateizugriff:** `before`-`ShareState` braucht Space,
+Ordner, `visibility`, `share_read`, `share_write` — `store.acl_of()` (index-only, liest die
+Item-Datei nicht) lieferte bisher nur die schon gemischte `read`/`write`-Menge. `AclDecision`
+bekam zwei neue Felder (`share_read`/`share_write`, roh, mit `default_factory=frozenset`, damit
+alle zwölf bestehenden `AclDecision(...)`-Testkonstruktionsstellen unverändert kompilieren) —
+`decision_for()` hatte beide Werte ohnehin schon als lokale Variablen, reiner Rückgabewert-
+Zusatz, kein neuer Lesezugriff. **`folder` wird vor der Verwendung normalisiert:** ein roher
+`folder`-String mit `..`-Segmenten hätte `AclReader.grants_for_dir()` sonst einen Pfad außerhalb
+des Space bauen lassen, bevor `store.update()` ihn je validiert — `files.validate_folder()`
+läuft deshalb hier ein zweites Mal (reine Funktion, kein Doppelschreiben), bevor der Wert in
+`ShareState` landet.
+
+**Ein zweiter, unabhängig gefundener Testfund (kein App-Fehler):** `test_acl_of_is_called_
+before_permission_check` benutzt einen unkonfigurierten `MagicMock(spec=Store)` — dessen
+`.acl_reader.decision_for(...)` liefert ohne Konfiguration einen frischen `MagicMock`, und ein
+bloßer `MagicMock() > MagicMock()` scheitert nachweislich mit `TypeError` (per Interpreter
+nachgeprüft, nicht angenommen). Behoben: `mock_store.acl_reader.decision_for.return_value =
+own_acl` gesetzt — der Body dieses Tests ändert keins der vier widen-relevanten Felder, `before`
+und `after` sind also ohnehin identisch.
+
+**Verifiziert:** `pytest -q` **746 passed** (env-gestrippt, +13 gegenüber 733 — 8
+`test_shares.py` [`widens()`-Wahrheitstabelle, acht Fälle aus der Plan-Testliste] + 5
+`test_api.py`). Tabu-Diff sauber gegen die korrekte P6-C-Liste. Beide von diesem Commit
+berührten Betriebsskripte real gelaufen (kein `pytest`-Äquivalent, `ui_budget.py`/`ui_smoke.py`
+haben nie eigene Unit-Tests gehabt): `ui_smoke.py --json` 12/12 grün, `ui_budget.py --json`
+`all_within_budget:true`, beide Läufe schließen `_measure_latency()`s zweiten, separaten
+`api_routes()`-Aufruf mit ein. **Ein echter Interaktionstest zwischen zwei Commits, per
+Zwei-venv-Playwright-Lauf statt nur gelesen:** Commit 3s bestehender Verschieben-Dialog gegen
+einen Ordner mit `.share.yml` (also einen echten Widen-Fall) — Server antwortet 403
+`reauth_required`, `dialogs.js`s bestehender Fallback-Zweig (kein `conflict`, kein
+`unauthenticated`) zeigt die echte Servermeldung als Toast, der Dialog bleibt offen, die reale
+Datei blieb nachweislich außerhalb `geteilt/` liegen (`rglob`-Gegenprobe). Kein JS-Absturz, kein
+`pageerror` — der einzige Playwright-„Konsolenfehler" war Chromiums eigenes Netzwerk-Log für die
+403-Antwort selbst, keine unbehandelte Exception, am fehlenden `pageerror`-Ereignis unterschieden
+statt geglaubt.
+
+**Nächster Schritt (konkret):** Checkpoint nach Nikinger-Weisung — Commit 5a ist fertig
+dokumentiert und wird jetzt committet, dann stoppt diese Session wieder für eine Rückmeldung.
+Commit 5b (Freigabe-Dialog + Re-Auth-Mini-Formular in `dialogs.js`/`app.html`, `#reauth-dialog`-
+Markup, `pw-field`/`pw-toggle`-Muster wiederverwendet) ist der nächste Kandidat — braucht vorher
+eine UI-Designentscheidung, die dieser Commit bewusst nicht selbst getroffen hat: wie ein Mensch
+ein Freigabeziel (eine andere Space) benennt (freies Textfeld vs. eine Auswahl aus bekannten
+Spaces). Danach bleiben laut Plan nur noch Commit 6 (`space_admin_enabled`-Stub, klein) übrig.

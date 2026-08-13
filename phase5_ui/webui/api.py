@@ -58,6 +58,18 @@ Argument) — dieselbe Kategorie wie P6 Step 1/2s dokumentierte Ein-Zeilen-Abwei
 .../seen` schreibt den vom Server aus dem Log berechneten `latest_id`, nie eine vom Client
 mitgeschickte ID — eine Client-ID wäre eine unnötige Validierungsfläche und ein Stale-Client-
 Rennen ohne Nutzen.
+
+**Re-Auth-Gate auf `PATCH /api/v1/items/{id}` (Step 7 Commit 5a, `shares.py`):** `api_routes()`
+bekommt einen sechsten Parameter, `users: UserDirectory` — `shares.py :: require_share_reauth()`
+braucht ihn für dieselbe `reauth.verify_reauth()`-Prüfung, die `account.py`s Passwortwechsel
+schon nutzt. `LoginThrottle` wird lokal aus `auth_store` gebaut (keine geteilte Instanz nötig,
+zustandslos gegenüber der DB-Tabelle). **Dokumentierte Abweichung vom Ausführungsplan**
+(`serialized-seeking-aurora.md`, Commit 5): die dort vorgeschlagene UI-Hälfte (Freigabe-Dialog,
+Re-Auth-Mini-Formular in `dialogs.js`/`app.html`) ist auf einen eigenen Commit 5b verschoben —
+Backend-Gate und Frontend-Dialog haben unterschiedliche Verifikationswege (`pytest` deterministisch
+hier, nur Screenshot dort) und würden als ein Commit den bisherigen Atomar-Rhythmus dieses Steps
+brechen. `mcpserver/app.py`s `api_routes(...)`-Aufruf zieht im selben Commit nach (`oauth.users`
+als sechstes Argument).
 """
 from __future__ import annotations
 
@@ -65,13 +77,16 @@ import json
 from datetime import date
 from typing import Any
 
+from authserver.ratelimit import LoginThrottle
 from authserver.store import AuthStore
+from authserver.userdir import UserDirectory
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 from starlette.routing import Route
 
 from mcpserver.permissions import SharePolicy
 from storage.errors import ConflictError, ItemNotFound, ValidationError
+from storage.files import validate_folder
 from storage.models import STATUS_VALUES, SpaceInfo
 from storage.store import Store
 
@@ -82,6 +97,7 @@ from .serializers import (
     item_to_json, overview_row_to_json, search_to_json, space_to_json, summary_to_json,
 )
 from .sessions import SessionManager
+from .shares import ShareState, require_share_reauth
 from .updates import load_update_log
 
 DEFAULT_LIMIT = 50
@@ -169,7 +185,14 @@ def api_routes(
     sessions: SessionManager,
     permissions: SharePolicy,
     auth_store: AuthStore,
+    users: UserDirectory,
 ) -> list[Route]:
+    # Re-Auth-Gate (Step 7 Commit 5a, `shares.py :: require_share_reauth()`) braucht dieselben
+    # drei Bausteine wie `account.py :: _require_reauth()` — `throttle` wird hier genauso lokal
+    # gebaut wie dort (`account_routes()`), kein geteilter Zustand nötig, `LoginThrottle` ist
+    # zustandslos gegenüber der `auth_store`-Tabelle, die die eigentliche Bremse trägt.
+    throttle = LoginThrottle(auth_store, now_fn=auth_store.now)
+
     async def _require_session(request: Request):
         session = sessions.load(request)
         if session is None:
@@ -420,7 +443,48 @@ def api_routes(
                 "erlaubt keine Verschiebung in einen anderen Ordner.",
             )
 
-        changes = {key: value for key, value in body.items() if key != "version"}
+        # Re-Auth-Gate (Step 7 Commit 5a, P6-N) — MUSS vor `store.update()` laufen, sonst wäre
+        # die Erweiterung schon geschehen, bevor irgendetwas sie sieht. `before` kommt
+        # vollständig aus `acl` (Index-only, kein zweiter Dateizugriff — `AclDecision` trägt seit
+        # diesem Commit die rohen `share_read`/`share_write` genau dafür). `after` übernimmt
+        # jedes im Body genannte Feld, sonst unverändert den `before`-Wert — derselbe "nur was da
+        # ist, ändert sich"-Vertrag wie `store.update()`s eigener `changes`-Mechanismus.
+        # `validate_folder()` läuft hier ein zweites Mal (auch `store.update()` ruft sie intern
+        # auf) — eine reine, günstige Funktion, kein Doppelschreiben; ohne diese Normalisierung
+        # könnte ein roher `folder`-String mit `..`-Segmenten `AclReader.grants_for_dir()` einen
+        # Pfad außerhalb des Space bauen lassen, bevor `store.update()` ihn je sieht.
+        try:
+            new_folder = validate_folder(body["folder"]) if "folder" in body else acl.folder
+        except ValidationError as exc:
+            raise _map_store_error(exc, own_space=session.space) from exc
+        before_state = ShareState(
+            visibility=acl.visibility, share_read=acl.share_read, share_write=acl.share_write,
+            space=acl.space, folder=acl.folder,
+        )
+        after_state = ShareState(
+            visibility=body.get("visibility", before_state.visibility),
+            share_read=(
+                frozenset(body["share_read"]) if "share_read" in body else before_state.share_read
+            ),
+            share_write=(
+                frozenset(body["share_write"]) if "share_write" in body else before_state.share_write
+            ),
+            space=before_state.space, folder=new_folder,
+        )
+        require_share_reauth(
+            session, body, before=before_state, after=after_state, acl=store.acl_reader,
+            userdir=users, throttle=throttle, auth_store=auth_store,
+        )
+
+        # `password`/`totp` dienen ausschließlich dem Re-Auth-Gate oben — landen sonst als
+        # Frontmatter-Feld in `extra` (Advisor-Fund vor diesem Commit: `store.update()`s
+        # `else: updated_extra[key] = value`-Zweig kennt keine Feld-Whitelist) und damit als
+        # Klartext auf der Platte UND in einem Git-Commit (Hard Rule 1). Deshalb NIE an
+        # `store.update()` weitergereicht, unabhängig davon, ob das Gate überhaupt auslöste.
+        changes = {
+            key: value for key, value in body.items()
+            if key not in {"version", "password", "totp"}
+        }
         try:
             item = store.update(item_id, version=version, **changes)
         except (ItemNotFound, ConflictError, ValidationError, ValueError) as exc:

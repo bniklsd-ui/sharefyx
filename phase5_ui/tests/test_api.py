@@ -69,7 +69,7 @@ async def test_items_search_maps_all_store_parameters(
     mock_store.list_spaces.return_value = []
     app = Starlette(
         routes=ui_auth_routes(ui_settings, store, confirmed_users, sessions)
-        + api_routes(ui_settings, mock_store, sessions, permissions, store)
+        + api_routes(ui_settings, mock_store, sessions, permissions, store, confirmed_users)
     )
     async with _client(app) as client:
         await _login(client, totp_code)
@@ -203,7 +203,7 @@ async def test_patch_foreign_item_is_403_and_never_reaches_store(
     )
     app = Starlette(
         routes=ui_auth_routes(ui_settings, store, confirmed_users, sessions)
-        + api_routes(ui_settings, mock_store, sessions, permissions, store)
+        + api_routes(ui_settings, mock_store, sessions, permissions, store, confirmed_users)
     )
     async with _client(app) as client:
         csrf = await _login(client, totp_code)
@@ -235,10 +235,17 @@ async def test_acl_of_is_called_before_permission_check(
         space=SPACE, folder="", visibility="private", read=frozenset(), write=frozenset(),
     )
     mock_store.acl_of.side_effect = lambda item_id: (call_order.append("acl_of"), own_acl)[1]
+    # Step 7 Commit 5a: `_items_patch` ruft jetzt zusätzlich `store.acl_reader.decision_for()`
+    # für das Re-Auth-Gate — ein unkonfigurierter `MagicMock(spec=Store)` liefert dafür einen
+    # generischen `MagicMock` zurück, dessen `>`-Vergleich mit TypeError scheitert (nachgeprüft,
+    # nicht angenommen). Body ändert hier weder `folder`/`visibility`/`share_read`/`share_write`,
+    # `before`==`after` ist also der korrekte, unveränderte Zustand — beide `decision_for()`-
+    # Aufrufe bekommen deshalb denselben `own_acl` zurück, `widens()` bleibt `False`.
+    mock_store.acl_reader.decision_for.return_value = own_acl
     mock_store.update.side_effect = lambda *a, **kw: (call_order.append("update"), fake_item)[1]
     app = Starlette(
         routes=ui_auth_routes(ui_settings, store, confirmed_users, sessions)
-        + api_routes(ui_settings, mock_store, sessions, permissions, store)
+        + api_routes(ui_settings, mock_store, sessions, permissions, store, confirmed_users)
     )
     async with _client(app) as client:
         csrf = await _login(client, totp_code)
@@ -330,6 +337,101 @@ async def test_archived_item_update_returns_422(full_app_items, item_store, totp
         )
     assert response.status_code == 422
     assert response.json()["error"] == "validation_failed"
+
+
+# -- Re-Auth-Gate bei rechte-erweiternden Freigabeänderungen (Step 7 Commit 5a, P6-N) ----------
+
+
+@pytest.mark.asyncio
+async def test_widening_share_write_without_credentials_returns_reauth_required(
+    full_app_items, item_store, totp_code,
+):
+    item = item_store.create(SPACE, type="note", title="Original")
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.patch(
+            f"/api/v1/items/{item.id}",
+            json={"version": item.version, "share_write": ["fabian"]},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 403
+    assert response.json()["error"] == "reauth_required"
+    # Kein stiller Teil-Schreibvorgang -- die Version im Index ist unverändert.
+    assert item_store.get(item.id).version == item.version
+
+
+@pytest.mark.asyncio
+async def test_widening_share_write_with_wrong_password_returns_reauth_required(
+    full_app_items, item_store, totp_code,
+):
+    item = item_store.create(SPACE, type="note", title="Original")
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.patch(
+            f"/api/v1/items/{item.id}",
+            json={
+                "version": item.version, "share_write": ["fabian"],
+                "password": "ganz falsches passwort", "totp": totp_code(),
+            },
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 403
+    assert response.json()["error"] == "reauth_required"
+    assert item_store.get(item.id).version == item.version
+
+
+@pytest.mark.asyncio
+async def test_widening_share_write_with_correct_credentials_succeeds(
+    full_app_items, item_store, totp_code, clock,
+):
+    item = item_store.create(SPACE, type="note", title="Original")
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        clock.advance(31)  # neues TOTP-Zeitfenster, sonst Replay-Ablehnung bei der Re-Auth
+        response = await client.patch(
+            f"/api/v1/items/{item.id}",
+            json={
+                "version": item.version, "share_write": ["fabian"],
+                "password": PASSWORD, "totp": totp_code(),
+            },
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["share_write"] == ["fabian"]
+    # `password`/`totp` dienten nur dem Gate -- landen nicht als Frontmatter-Feld auf der Platte
+    # (Advisor-Fund vor diesem Commit: `store.update()`s `extra`-Zweig hat keine Whitelist).
+    assert "password" not in body["extra"]
+    assert "totp" not in body["extra"]
+    on_disk = item_store.get(item.id)
+    assert "password" not in on_disk.extra
+    assert "totp" not in on_disk.extra
+
+
+@pytest.mark.asyncio
+async def test_narrowing_share_write_does_not_require_reauth(full_app_items, item_store, totp_code):
+    item = item_store.create(SPACE, type="note", title="Original", share_write=["fabian"])
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.patch(
+            f"/api/v1/items/{item.id}", json={"version": item.version, "share_write": []},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 200
+    assert response.json()["share_write"] == []
+
+
+@pytest.mark.asyncio
+async def test_pure_content_patch_does_not_require_reauth(full_app_items, item_store, totp_code):
+    item = item_store.create(SPACE, type="note", title="Original")
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.patch(
+            f"/api/v1/items/{item.id}", json={"version": item.version, "title": "Geändert"},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 200
+    assert response.json()["title"] == "Geändert"
 
 
 # -- Format-Seam / Roundtrip (P5-Z) -----------------------------------------------------------
@@ -615,7 +717,7 @@ async def test_updates_get_reports_latest_and_unset_seen_state(
     settings = dataclasses.replace(ui_settings, update_log_path=log_path)
     app = Starlette(
         routes=ui_auth_routes(settings, store, confirmed_users, sessions)
-        + api_routes(settings, item_store, sessions, permissions, store)
+        + api_routes(settings, item_store, sessions, permissions, store, confirmed_users)
     )
     async with _client(app) as client:
         await _login(client, totp_code)
@@ -638,7 +740,7 @@ async def test_updates_seen_sets_latest_id_and_is_separated_per_space(
     settings = dataclasses.replace(ui_settings, update_log_path=log_path)
     app = Starlette(
         routes=ui_auth_routes(settings, store, confirmed_users, sessions)
-        + api_routes(settings, item_store, sessions, permissions, store)
+        + api_routes(settings, item_store, sessions, permissions, store, confirmed_users)
     )
     async with _client(app) as client:
         csrf = await _login(client, totp_code)

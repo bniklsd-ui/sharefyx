@@ -171,7 +171,7 @@ async def _measure(data_root: Path) -> list[Metric]:
     routes = (
         ui_auth_routes(ui_settings, auth_store, users, sessions)
         + account_routes(ui_settings, auth_store, users, sessions)
-        + api_routes(ui_settings, item_store, sessions, SharePolicy(item_store.acl_reader), auth_store)
+        + api_routes(ui_settings, item_store, sessions, SharePolicy(item_store.acl_reader), auth_store, users)
         + static_routes(ui_settings, sessions)
     )
     app = Starlette(routes=routes)
@@ -348,9 +348,16 @@ async def _measure_latency(data_root: Path) -> list[LatencyMetric]:
         space=SPACE, idle_ttl_s=ui_settings.idle_ttl_s, absolute_ttl_s=ui_settings.absolute_ttl_s,
     )
     sessions = SessionManager(ui_auth_store, settings=ui_settings)
+    # `dek=None` ist sicher: `ui_auth_store` ist frisch, seine `users`-Tabelle bleibt in diesem
+    # Messlauf leer (`create_session()` mintet direkt, kein `upsert_user()`) — dieselbe
+    # Begründung wie `mcp_oauth`s `UserDirectory(mcp_auth_store, dek=None)` oben. Nur für
+    # `api_routes()`s Pflichtparameter gebraucht (Step 7 Commit 5a); `GET /overview` allein
+    # löst nie das Re-Auth-Gate aus, das ihn tatsächlich läse.
+    ui_users = UserDirectory(ui_auth_store, dek=None)
     rest_app = Starlette(
         routes=api_routes(
             ui_settings, item_store, sessions, SharePolicy(item_store.acl_reader), ui_auth_store,
+            ui_users,
         )
     )
 

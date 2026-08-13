@@ -61,7 +61,10 @@ def overview_app(ui_settings, store, confirmed_users, sessions, ticking_store) -
     routes = (
         ui_auth_routes(ui_settings, store, confirmed_users, sessions)
         + account_routes(ui_settings, store, confirmed_users, sessions)
-        + api_routes(ui_settings, ticking_store, sessions, SharePolicy(ticking_store.acl_reader), store)
+        + api_routes(
+            ui_settings, ticking_store, sessions, SharePolicy(ticking_store.acl_reader), store,
+            confirmed_users,
+        )
     )
     return Starlette(routes=routes)
 

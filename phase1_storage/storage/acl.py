@@ -29,6 +29,12 @@ class AclDecision:
     visibility: str
     read: frozenset[str]
     write: frozenset[str]
+    # Rohe Item-Freigaben, UNGEMISCHT mit der `.share.yml`-Vereinigung in `read`/`write` (Step 7
+    # Commit 5, `webui/shares.py :: ShareState`) — Defaults, damit bestehende
+    # `AclDecision(...)`-Konstruktionsstellen (Tests) ohne die zwei neuen Felder weiterlaufen,
+    # derselbe Kompatibilitäts-Trick wie `Grant`s Defaults oben in dieser Datei.
+    share_read: frozenset[str] = field(default_factory=frozenset)
+    share_write: frozenset[str] = field(default_factory=frozenset)
 
 
 class AclReader:
@@ -127,4 +133,5 @@ class AclReader:
         return AclDecision(
             space=space, folder=folder, visibility=visibility,
             read=grant.read | item_read | item_write, write=grant.write | item_write,
+            share_read=item_read, share_write=item_write,
         )

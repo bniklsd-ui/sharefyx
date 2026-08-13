@@ -33,12 +33,18 @@ class CsrfError(UiError):
         super().__init__(message, status_code=403)
 
 
-# Plan §3.1 — genau diese zehn Codes, kein weiterer ohne Plan-Änderung.
+# Plan §3.1 — genau diese elf Codes, kein weiterer ohne Plan-Änderung. **[2026-08-13 Ergänzung,
+# P6 Step 7 Commit 5a]:** `reauth_required` kam dazu (`webui/shares.py :: require_share_reauth()`
+# — eine rechte-erweiternde `PATCH /api/v1/items/{id}` ohne oder mit falschem `password`/`totp`).
+# Bewusst NICHT in der 📕-Plandatei nachgezogen (Doc-Layers: 📕 heißt niemals editieren) — die
+# Ergänzung steht stattdessen hier und im Phase-Head-Session-Block, benannte Abweichung von der
+# Ausführungsplan-Formulierung, die den Nachtrag dort verlangte.
 API_ERROR_STATUS: dict[str, int] = {
     "unauthenticated": 401,
     "csrf_failed": 403,
     "totp_required": 403,
     "forbidden": 403,
+    "reauth_required": 403,
     "not_found": 404,
     "conflict": 409,
     "validation_failed": 422,
@@ -49,7 +55,8 @@ API_ERROR_STATUS: dict[str, int] = {
 
 
 class ApiError(Exception):
-    """Trägt einen der zehn stabilen Codes aus Plan §3.1 — dieselbe Validierungsdisziplin wie
+    """Trägt einen der elf stabilen Codes aus Plan §3.1 (Step 7 Commit 5a: `reauth_required`
+    dazu, siehe Modulkopf) — dieselbe Validierungsdisziplin wie
     `authserver.errors.OAuthError`/`DCRError`: ein Aufrufer, der sich vertippt, bekommt sofort
     einen `ValueError`, nicht eine stumme falsche Antwort. `detail` trägt z. B. `{"current": …}`
     bei `409 conflict` (Plan §3.1) — leer per Default."""

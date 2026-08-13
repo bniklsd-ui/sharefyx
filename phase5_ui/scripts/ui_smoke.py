@@ -88,7 +88,7 @@ async def _run(data_root: Path, checks: list[Check]) -> None:
     routes = (
         ui_auth_routes(ui_settings, auth_store, users, sessions)
         + account_routes(ui_settings, auth_store, users, sessions)
-        + api_routes(ui_settings, item_store, sessions, SharePolicy(item_store.acl_reader), auth_store)
+        + api_routes(ui_settings, item_store, sessions, SharePolicy(item_store.acl_reader), auth_store, users)
     )
     app = Starlette(routes=routes)
 
