@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase6_shares_plan.md         # voller Plan, Entscheidungen P6-A–P6-AC, Steps 0–10
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-3 verbatim (zwei Eintraege), L3, kein Softcap
-updated: 2026-08-12 (Step 6 gebaut -- spacectl.py/migrate_visibility.py neu, diagnose.sh Pruefung 12, 721 Tests gruen)
+updated: 2026-08-13 (Nikinger-Feedback aus echtem Betrieb: update_item/append_to_item/patch_item-Beschreibungen praezisiert, kein Codeverhaltens-/Testzahlwechsel)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -245,3 +245,13 @@ weiter im Plan: Step 7 (UI Dateisystem, `webui/shares.py`, `app.js`-Split, Freig
 Re-Auth) ist der nächste Schritt, deutlich größerer Umfang (JS ohne Unit-Tests laut
 P5-Konvention, `[VERIFY]` V43/V50) — kein Selbstläufer aus dieser Session heraus.
 Gate-A→B-Punkt-3-Erinnerung bleibt unverändert gültig (frühestens 2026-08-28).
+
+**Nachtrag 2026-08-13, vor Step 7:** der Nikinger brachte zwei Betriebs-Reports einer
+arbeitenden Claude-Instanz mit — vermeintlich kein Weg, `status`/`links` ohne `patch_item`/
+`append_to_item` zu ändern. Geprüft statt übernommen: `update_item` konnte das schon seit P6
+Step 1 (alle Felder unabhängig optional, `body` weglassen rührt den Body nicht an) — die
+Instanz griff nur zu den zwei Tools, deren Namen „gezielt" suggerieren, weil deren
+Beschreibung das nicht ausschloss. Kein Code-/Schema-Fix nötig, nur die drei
+Tool-Descriptions in `mcpserver/tools.py` präzisiert (Details + Testlauf:
+`phase2_mcp/CLAUDE.md`s Korrekturnotiz vom selben Datum). Kein eigener Plan-Step, kein
+Einfluss auf Step 7.

@@ -453,12 +453,14 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
     @mcp.tool(
         title="Item aktualisieren",
         description=(
-            "Aktualisiert ein Item, oder archiviert es über status=archived. folder=<pfad> "
-            "verschiebt es — nur der Eigentümer-Space darf das, ein geteilter Schreibzugriff "
-            "reicht dafür nicht. Braucht die zuletzt gelesene version. Liefert standardmäßig "
-            "eine Quittung statt des vollen Texts — return_body=True holt ihn zurück. "
-            "Sichtbarkeit/Freigaben (visibility/share_read/share_write) gehen über kein Tool, "
-            "nur über die UI."
+            "Aktualisiert ein Item, oder archiviert es über status=archived. Alle Felder sind "
+            "einzeln optional — body weglassen ändert NUR das Frontmatter (z.B. status/tags/"
+            "links/due) und lässt den Body unangetastet, kein Komplett-Rewrite nötig. "
+            "folder=<pfad> verschiebt es — nur der Eigentümer-Space darf das, ein geteilter "
+            "Schreibzugriff reicht dafür nicht. Braucht die zuletzt gelesene version. Liefert "
+            "standardmäßig eine Quittung statt des vollen Texts — return_body=True holt ihn "
+            "zurück. Sichtbarkeit/Freigaben (visibility/share_read/share_write) gehen über kein "
+            "Tool, nur über die UI."
         ),
         annotations={
             "readOnlyHint": False,
@@ -552,9 +554,10 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
     @mcp.tool(
         title="Text an Item anhängen",
         description=(
-            "Hängt Text an den Body eines Items im eigenen Space an. Braucht die zuletzt "
-            "gelesene version. Liefert standardmäßig eine Quittung statt des vollen Texts — "
-            "return_body=True holt ihn zurück."
+            "Hängt Text an den Body eines Items im eigenen Space an. Nur der Body — für "
+            "Frontmatter-Felder (status/tags/links/due) update_item nutzen, body weglassen. "
+            "Braucht die zuletzt gelesene version. Liefert standardmäßig eine Quittung statt "
+            "des vollen Texts — return_body=True holt ihn zurück."
         ),
         annotations={
             "readOnlyHint": False,
@@ -587,10 +590,11 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         title="Item punktuell ändern",
         description=(
             "Ersetzt exakte Textstellen im Body eines Items, ohne den Rest neu zu schreiben. "
-            "Jedes old_text muss genau einmal vorkommen; sonst schlägt der ganze Aufruf fehl "
-            "und nichts wird geschrieben. Braucht die zuletzt gelesene version. Liefert "
-            "standardmäßig eine Quittung statt des vollen Texts — return_body=True holt ihn "
-            "zurück."
+            "Nur der Body — für Frontmatter-Felder (status/tags/links/due) update_item nutzen, "
+            "body weglassen. Jedes old_text muss genau einmal vorkommen; sonst schlägt der "
+            "ganze Aufruf fehl und nichts wird geschrieben. Braucht die zuletzt gelesene "
+            "version. Liefert standardmäßig eine Quittung statt des vollen Texts — "
+            "return_body=True holt ihn zurück."
         ),
         annotations={
             "readOnlyHint": False,

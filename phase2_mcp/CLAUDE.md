@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase2_mcp_plan.md          # voller Plan, Entscheidungen P2-A–P2-N, Steps 0–7
   - ../docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md # Herkunft der Entscheidungen D1–D6
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
-updated: 2026-08-03 (P5 Step 4 Nachtrag: create_app() mountet webui-Routen, Testzahl 80→83)
+updated: 2026-08-13 (Nikinger-Feedback: update_item/append_to_item/patch_item-Beschreibungen präzisiert, kein Verhaltens-/Testzahländerung)
 ---
 # CLAUDE.md — Phase 2: MCP-Server (`phase2_mcp/`)
 
@@ -259,6 +259,33 @@ Step-5-Session-Block), sofort im Folgecommit behoben. `test_permissions.py` 10�
 aus Step 2 liegen in
 `phase1_storage/tests/` (siehe
 Modul-Status Zeile 3 und `phase1_storage/CLAUDE.md`), werden dort mitgezählt, nicht hier.
+
+**[2026-08-13 Korrektur, Nikinger-Feedback aus echtem Betrieb]:** eine arbeitende Claude-
+Instanz meldete zwei vermeintliche Lücken — Status/`links` seien über `patch_item`/
+`append_to_item` nicht änderbar, weil beide nur den Body anfassen. Beides war schon vorher
+technisch möglich: `update_item(item_id, version, status=...)` bzw. `update_item(...,
+links=[...])` ändert nur die übergebenen Felder (`tools.py :: update_item()` baut `changes`
+ausschließlich aus Nicht-`None`-Argumenten, Zeile ~520) — `body` weglassen lässt den Body
+unangetastet, kein Komplett-Rewrite. Der reale Fehler war eine **Beschreibungslücke**, kein
+Codefehler: `update_item`s Tool-Description sagte nirgends, dass alle Felder unabhängig
+optional sind, und `patch_item`/`append_to_item` verwiesen nicht auf `update_item` als
+richtiges Werkzeug für Frontmatter-Felder. Behoben durch drei Beschreibungs-Ergänzungen in
+`mcpserver/tools.py` (`update_item`, `append_to_item`, `patch_item`) — keine Signatur-, Schema-
+oder Verhaltensänderung, daher keine neuen Tests nötig. **Gesamt weiterhin 114 Tests**,
+`pytest phase2_mcp/tests/test_tools.py` 40/40 grün nach der Änderung.
+
+**Advisor-Fund vor dem Commit, ein Punkt offen gehalten statt übernommen:** das Beispiel im
+Report lautete wörtlich „status: open → archiviert" — geprüft statt angenommen: `models.py ::
+STATUS_VALUES` (Zeile 95-98) ist rein englisch (`note`: `active`/`archived`; `task`: `open`/
+`done`/`archived`). Ein `update_item(..., status="archiviert")` schlägt weiterhin mit
+`ValidationError` fehl, das ist die vom Nikinger freigegebene Statusvalidierung aus P2 Step 2
+(`STATUS_VALUES`/`valid_statuses()`, `phase1_storage/CLAUDE.md` „Geerbte Contracts"), keine
+stille Aufweichung wert. Der reale Aufruf muss `status="archived"` (englisch) verwenden. Report
+1 ist damit nur **teilweise** durch diesen Commit gelöst: das Werkzeug existiert und ist jetzt
+auffindbar, aber die reportende Instanz griff möglicherweise zusätzlich zum falschen
+Statuswort — kein Tool-Fehler, sondern ein Vokabular-Missverständnis, das die präzisierte
+Beschreibung allein nicht behebt (die erlaubten Werte stehen dort nicht aufgezählt). Report 2
+(`links`) hat keine Vokabular-Falle — `links` ist eine freie Liste ohne `*_VALUES`-Whitelist.
 
 ## Geerbte Contracts
 
