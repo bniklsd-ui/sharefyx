@@ -509,11 +509,18 @@ function initShell() {
     createTriggers.forEach(function (part) { present ? part.attach() : part.detach(); });
     // Der Dialog hängt NUR am Space, nicht an der Trefferlage — sonst könnte ein Listen-Neuladen
     // einen gerade geöffneten Anlegen-Dialog aus dem Dokument reißen.
-    ownSpaceActive() ? createDialogPart.attach() : createDialogPart.detach();
+    activeSpaceWritable() ? createDialogPart.attach() : createDialogPart.detach();
   }
 
-  function ownSpaceActive() {
-    return state.activeSpace !== null && state.activeSpace === state.ownSpace;
+  // Live-Fund 2026-08-13, zweiter Teil desselben Bugs: der Sidebar-/Übersicht-Fix (writable
+  // statt own aus /api/v1/spaces) betraf nur das Badge dort -- jede Stelle, die tatsächlich
+  // Schreib-Bedienelemente ein-/ausblendet, fragte weiterhin nur nach dem eigenen Home-Space
+  // statt tatsächlichem Schreibrecht. Ein geteilter, fremder-aber-schreibbarer Space (z.B.
+  // IT-Sekus-Projekt) verlor damit trotz behobenem Badge weiterhin den Anlegen-Knopf.
+  function activeSpaceWritable() {
+    if (state.activeSpace === null) return false;
+    var space = spaceByName(state.activeSpace);
+    return !!(space && space.writable);
   }
 
   // -- Rückfragedialog (ersetzt window.confirm) ----------------------------------------------
@@ -553,7 +560,7 @@ function initShell() {
   function navigate(spaceName, bucket) {
     state.activeSpace = spaceName;
     state.filter = bucket;
-    setCreateControlsPresent(ownSpaceActive());
+    setCreateControlsPresent(activeSpaceWritable());
     renderRail();
     renderCrumb();
     return loadItems();
@@ -714,7 +721,7 @@ function initShell() {
     var strong = el("strong", null, state.activeSpace || "");
     listCrumbEl.appendChild(strong);
     listCrumbEl.appendChild(document.createTextNode(" › " + (BUCKET_LABELS[state.filter] || state.filter)));
-    listReadonlyEl.hidden = ownSpaceActive();
+    listReadonlyEl.hidden = activeSpaceWritable();
   }
 
   function renderChips() {
@@ -744,7 +751,7 @@ function initShell() {
       listEmptyEl.hidden = false;
       if (state.query) {
         listEmptyTextEl.textContent = "Keine Treffer für „" + state.query + "“.";
-      } else if (!ownSpaceActive()) {
+      } else if (!activeSpaceWritable()) {
         listEmptyTextEl.textContent = "In diesem Ordner liegt nichts.";
       } else {
         listEmptyTextEl.textContent =
@@ -758,12 +765,12 @@ function initShell() {
       createButtonEl.textContent = "Erste " + (TYPE_LABELS[emptyType] || emptyType) + " anlegen";
       // Der Anlegen-Knopf ist bei einer leeren Suche fehl am Platz (er legt kein Item mit dem
       // Suchbegriff an) und bei einem fremden Space gar nicht erst im DOM.
-      if (ownSpaceActive()) setCreateControlsPresent(!state.query);
+      if (activeSpaceWritable()) setCreateControlsPresent(!state.query);
       return;
     }
 
     listEmptyEl.hidden = true;
-    if (ownSpaceActive()) setCreateControlsPresent(true);
+    if (activeSpaceWritable()) setCreateControlsPresent(true);
     state.items.forEach(function (item) {
       var li = el("li");
       var button = el("button", "list__row");
@@ -1191,7 +1198,7 @@ function initShell() {
   // -- Anlegen (P5-U: Typ nach dem Anlegen nicht mehr änderbar) ------------------------------
 
   function openCreateDialog() {
-    if (!ownSpaceActive()) return;   // sollte nicht erreichbar sein, der Knopf ist dann ausgehängt
+    if (!activeSpaceWritable()) return;   // sollte nicht erreichbar sein, der Knopf ist dann ausgehängt
     if (state.meta) {
       createTypeEl.textContent = "";
       Object.keys(state.meta.status_values).forEach(function (t) {
@@ -1476,7 +1483,7 @@ function initShell() {
         return loadOverview();
       })
       .then(function () {
-        setCreateControlsPresent(ownSpaceActive());
+        setCreateControlsPresent(activeSpaceWritable());
         renderCrumb();
         return loadItems();
       })

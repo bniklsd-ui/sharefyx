@@ -10,6 +10,7 @@
 - Eure beiden Spaces bleiben füreinander lesbar wie bisher, per neu eingerichteter Freigabe.
 - Neu: gemeinsame Spaces sind jetzt möglich — als erstes Beispiel gibt es "IT-Sekus-Projekt" für gemeinsames Arbeiten.
 - hotfixed Rechte für shared space
+- hotfixed: Anlegen-Knopf und Bearbeiten fehlten in geteilten Spaces trotz Schreibrecht
 
 ## 2026-08-09
 - Deine Notizen werden bald **standardmäßig privat**: alles Bestehende und alles Neue ist nach der nächsten Umstellung nur noch für dich sichtbar.

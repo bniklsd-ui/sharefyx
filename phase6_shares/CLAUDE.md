@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase6_shares_plan.md         # voller Plan, Entscheidungen P6-A–P6-AC, Steps 0–10
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-3 verbatim (zwei Eintraege), L3, kein Softcap
-updated: 2026-08-13, dritter -- (Steps 4-6 live deployed, niklas->fabian read live-verified ueber echten Connector, IT-Sekus-Projekt Shared Space live, UI-Fund "nur lesen" trotz Schreibrecht, Planungsvormerkung Item-Verschieben fuer naechste Session)
+updated: 2026-08-13, vierter -- (UI-Fund "nur lesen" trotz Schreibrecht: Badge-Fix deployed, zweiter Teil (ownSpaceActive vs. echtes Schreibrecht an acht Stellen in app.js) gefunden und behoben, noch nicht deployed)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -320,9 +320,27 @@ berechnen ihn über `permissions.can_write(session.space, ...)` — derselbe Auf
 auf der REST-Seite. `app.js:598`/`676` lesen jetzt `space.writable` statt `space.own` für das
 Badge; die Baum-/Übersicht-**Gruppierung** (eigener vs. verbundener Space) bleibt bewusst bei
 `own` — das ist eine andere Frage als Schreibrecht. +2 Tests (`test_serializers.py`,
-`test_api.py`), +2 Assertions (`test_overview.py`); 722→724 gesamt. **Braucht einen neuen
-Deploy** — die laufende Instanz bedient `/opt/sharefyx/current` (Release-Snapshot
-`20260813T113025.931306Z`), der Fix liegt bisher nur im Arbeitsverzeichnis.
+`test_api.py`), +2 Assertions (`test_overview.py`); 722→724 gesamt. Deployed (Release
+`20260813T115528.897376Z`, `sha 17303f0`) — der Nikinger meldete danach live: Badge korrekt weg,
+aber **innerhalb** des Spaces weiterhin „nur lesen" und der Anlegen-Knopf weiterhin versteckt.
+
+**Zweiter Teil desselben Bugs, im selben Nachtrag behoben:** derselbe Fehler saß eine Ebene
+tiefer, unabhängig vom eben gefixten Badge. `app.js`s `ownSpaceActive()` (`state.activeSpace ===
+state.ownSpace`) steuerte acht Stellen — den Anlegen-Dialog, den „nur lesen"-Text in der
+Liste, den Leerzustand-Text, den Absende-Guard des Anlegen-Formulars — und fragte dabei
+ausschließlich „ist das mein Home-Space", nie das tatsächliche Schreibrecht. Der Badge-Fix
+allein änderte daran nichts, weil er nur die Space-Liste betraf, nicht diese acht Stellen.
+**Fix:** neue Funktion `activeSpaceWritable()` (`app.js`, sucht `state.activeSpace` in
+`state.spaces` — derselben Liste, die der Badge-Fix jetzt korrekt mit `writable` befüllt —
+und liest dessen `.writable`), alle acht `ownSpaceActive()`-Aufrufstellen umgestellt, die jetzt
+tote Funktion `ownSpaceActive()` selbst entfernt (nicht stehen gelassen). Kein Python geändert,
+keine neuen Backend-Tests nötig (`space.writable` selbst ist bereits über die Backend-Tests
+oben abgedeckt) — stattdessen `node --check` (Syntax) und eine Vier-Fall-Simulation
+(eigener/schreibbar-fremder/nur-lesbar-fremder/unbekannter Space) der reinen Funktionslogik
+gegen erwartete Werte, weil P5-T JS bewusst unit-ungetestet lässt und ein echter
+Browser-Durchlauf einen laufenden Server + eine echte Sitzung bräuchte (außerhalb dieser
+Session). **Nicht** interaktiv im Browser geprüft — der Nikinger sollte das nach dem nächsten
+Deploy live bestätigen, dieselbe Lücke wie beim ersten Teil des Fixes.
 
 **Planungsvormerkung für die nächste Session (Opus, Browser-Planung) — Item-Verschieben:**
 bereits vor dem Deploy geprüft und bestätigt fehlend auf allen drei Schichten
