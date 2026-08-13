@@ -3,11 +3,17 @@
      KEIN weiches Zeilenumbrechen einer einzelnen Aussage über mehrere physische Zeilen, der
      Parser ignoriert alles, was nicht mit "## " oder "- " beginnt (Live-Fund 2026-08-10: eine
      über vier Zeilen umgebrochene Aussage wurde nach der ersten Zeile abgeschnitten). Lieber
-     mehrere kurze "- "-Zeilen als eine lange, umgebrochene. -->
+     mehrere kurze "- "-Zeilen als eine lange, umgebrochene. Zwei "## "-Blöcke mit demselben
+     Datum sind erlaubt und bewusst genutzt (parse_update_log()s Docstring: "disambiguiert zwei
+     `## <selbes Datum>`-Blöcke") -- das Banner zeigt IMMER nur den obersten Eintrag
+     (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
+     statt stillschweigend an den ersten drangehängt zu werden. -->
 
 ## 2026-08-13
 - Grauer Text (Platzhalter, Meta-Angaben, Versionsband) ist jetzt deutlich besser lesbar — Kontrast auf WCAG AA angehoben.
 - Der Schriftzug "sharefyx" oben links samt Versionsnummer (jetzt v2.1) und alle Versionsnummern deiner Dateien sind jetzt weiß statt grau.
+
+## 2026-08-13
 - Die angekündigte Umstellung ist jetzt live: fremde Spaces sind nicht mehr automatisch mitlesbar — nur noch, wo eine ausdrückliche Freigabe besteht.
 - Eure beiden Spaces bleiben füreinander lesbar wie bisher, per neu eingerichteter Freigabe.
 - Neu: gemeinsame Spaces sind jetzt möglich — als erstes Beispiel gibt es "IT-Sekus-Projekt" für gemeinsames Arbeiten.

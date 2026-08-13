@@ -222,9 +222,41 @@ Versionsband-Zahl „v1" beide weiß.
 ein sauberes `pip show playwright` geprüft (leer) — diesmal von vornherein nie installiert, kein
 Nachräumen nötig. `git status --short` zeigt ausschließlich `app.css`/`app.html`/`app.js`.
 
+**Nachtrag, noch vor dem ersten Deploy — Nikinger-Weisung zum Update-Banner:** nur die
+v2.1-Zeilen dieser Deploy-Ära sollen im Banner erscheinen, nicht die v2-Rückschau (Umstellung
+live + beide Hotfixes) erneut. `docs/UPDATE_LOG.md :: parse_update_log()` zeigt im Banner **immer
+nur `entries[0]`** — ein Eintrag ist ein `##`-Block, nicht eine Zeile. Der bestehende
+`## 2026-08-13`-Block (7 Zeilen: 2 neue v2.1 + 5 alte v2) in **zwei** gleichdatierte Blöcke
+gesplittet — die eigene Docstring-Doku in `updates.py` sieht das ausdrücklich vor
+("disambiguiert zwei `## <selbes Datum>`-Blöcke"). Oben (neu, `id=2026-08-13#1`): nur die zwei
+v2.1-Zeilen. Darunter (`id=2026-08-13#2`): die fünf v2-Zeilen unverändert, bleiben im
+Vollständigen Log ("Update-Log ansehen") sichtbar, verschwinden nur aus dem Auto-Popup.
+Nachgeprüft, nicht nur behauptet: `parse_update_log()` gegen die echte Datei ausgeführt,
+`entries[0]` hat exakt die zwei neuen Zeilen.
+
+**Eine ehrlich benannte Unsicherheit, kein stiller Fund:** die ID-Vergabe ist rein positionell
+(erstes gleichdatiertes Heading in Dateireihenfolge = `#1`), nicht inhaltsbasiert. Falls der
+Nikinger das Banner für den `92b918b`-Deploy (die fünf v2-Zeilen, damals ebenfalls unter
+`2026-08-13#1`) bereits gesehen/weggeklickt hat, trägt `users.seen_update_id` bereits genau diese
+ID — und die neuen v2.1-Zeilen erben jetzt dieselbe ID, weil sie ebenfalls zum ersten
+gleichdatierten Block wurden. In diesem Fall poppt das Banner **nicht** automatisch neu auf,
+obwohl der Inhalt neu ist; „Update-Log ansehen" zeigt es trotzdem korrekt. Kein Zugriff auf die
+echte `auth.sqlite3` genommen, um das zu prüfen (Auto-Mode-Classifier blockierte den Pfadversuch,
+zu Recht — das wäre ein Griff in echte Nutzerdaten ohne zwingenden Grund). Für den Nikinger:
+falls das Banner nach dem Deploy nicht von selbst erscheint, ist das der Grund, kein neuer Bug.
+
+**Nikinger-Klarstellung zum Versionsschema, für spätere Bumps:** Versionsnummern spiegeln
+Deploy-Zyklen, nicht Phasen — jeder Deploy erhöht die Zahl, Schema `x.y.z` wie in klassischer
+Software-Versionierung, **nicht** neu bei 1 anfangend (diese Ära zählt als Fortsetzung von v2,
+daher `v2.1`, nächster Deploy `v2.2` usw.).
+
 **Nächster Schritt (konkret):** Nikinger führt `deploy.sh main` aus (Sudo-Neustart), bestätigt
 danach live in allen drei Ansichten (Login, Liste, Editor) — das ist §3.3s letzter DoD-Punkt,
-jetzt inklusive der weißen Wortmarke/Versionen. Danach ist **Step 7a vollständig geschlossen** und
-der einzige noch offene UI-Rest aus `ITEM_MOVE_PLAN.md` erledigt. **Step 7** (UI Dateisystem,
-`app.js`-Split, Freigabedialog, Ordnerbaum) bleibt der nächste große Schnitt, **Step 7b** setzt ihn
-voraus. Gate-A→B-Punkt 3 unverändert offen (realer Purge-Lauf, frühestens 2026-08-28).
+jetzt inklusive der weißen Wortmarke/Versionen — **und** dass das Banner nur die v2.1-Zeilen
+zeigt (mit der oben benannten Unsicherheit im Hinterkopf). Danach ist **Step 7a vollständig
+geschlossen** und der einzige noch offene UI-Rest aus `ITEM_MOVE_PLAN.md` erledigt. **Step 7**
+(UI Dateisystem) ist als eigener Plan freigegeben (`/home/savefyx/.claude/plans/
+serialized-seeking-aurora.md`, Nikinger-Entscheidung: Rename-Funktion bleibt draußen, Aufbau in
+Unterschritten mit Checkpoints) — Ausführung beginnt in derselben Session, sobald dieser Nachtrag
+committet ist. **Step 7b** setzt Step 7 voraus. Gate-A→B-Punkt 3 unverändert offen (realer
+Purge-Lauf, frühestens 2026-08-28).
