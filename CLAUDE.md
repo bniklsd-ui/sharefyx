@@ -159,9 +159,18 @@ Bestätigung) — nur noch Punkt 3 offen (Purge-Zeilenrückgang, frühestens 202
 Nikinger-Entscheidung vor Gate-Abschluss mitgetragen, nicht blockierend für Block B. Block B:
 Step 4 (Storage-Fundament — `storage/acl.py`, `folder`/`visibility`/`share_*`) ✅ **gebaut**,
 Step 5 (Rechtepolitik — `SharePolicy`/`Surface` ersetzt `OwnSpaceWritable`, item-level ACL in
-`mcpserver/tools.py`/`webui/api.py`) ✅ **gebaut** (2026-08-12). **Nächster Schritt:** Step 6
-(Verwaltung/Migration — `spacectl.py`, `migrate_visibility.py`). Details:
-`phase6_shares/CLAUDE.md`.
+`mcpserver/tools.py`/`webui/api.py`) ✅ **gebaut** (2026-08-12), Step 6 (Verwaltung/Migration —
+`spacectl.py`, `migrate_visibility.py`, `diagnose.sh` Prüfung 12) ✅ **gebaut** (2026-08-12).
+**[2026-08-13] Steps 4–6 live deployed** (`main`@`d068d1c`, Nikinger-Entscheidung „power right
+through the deployment", Sudo-Neustart durch ihn) — Cutover auf die neue `SharePolicy` vollzogen,
+vorher `niklas`↔`fabian` gegenseitiges Lesen per `.share.yml` gesichert (sonst hätte der Cutover
+genau das stillschweigend entzogen). Live-Verifikation **eine Richtung bestätigt** (niklas liest
+fabian über den echten Connector, `<untrusted_content>`-Wrapping hält), **fabian→niklas offen**.
+Neuer Shared Space `IT-Sekus-Projekt` angelegt (beide Principals `--write`, für Nutzung/Testing).
+**Ein UI-Fund, nicht behoben:** `IT-Sekus-Projekt` zeigt sich in der Weboberfläche als „nur
+lesen" trotz `writable:true` — `webui/api.py`/`serializers.py` liefern für die Space-Liste kein
+`writable`-Feld, nur `own`. Details, Root-Cause-Fundstellen und die volle Live-Verifikation:
+`phase6_shares/CLAUDE.md`s Session-Block vom selben Tag.
 
 **Phase 5 — Web-UI, REST-API und Auth-Selbstverwaltung** (`phase5_ui/`, Paket `webui`) — **✅
 abgeschlossen, 2026-08-09 — 20/20 Abnahmezeilen live bestanden, 0 teilweise, 0 offen.** Zwei
@@ -271,8 +280,12 @@ P2 Step 2 — siehe P2-Plan §0.4 Punkt L).
 | R6 | Zweck | **Lernprojekt**, später evtl. Arbeitswerkzeug. Bei Zielkonflikt gewinnt Lerneffekt über Bequemlichkeit — außer bei Safety/Secrets, dort gewinnt immer die sichere Variante. |
 
 **Noch nicht entschieden (bewusst offen, für spätere Planungssessions):**
-- *(aktuell keine offenen Punkte auf dieser Ebene — der einzige verbliebene, „Web-UI: Neubau vs.
-  Adaption", ist mit P5-V entschieden, siehe Korrekturnotiz direkt darunter.)*
+- **Item-Verschieben zwischen Ordnern und Spaces** (Nikinger-Meldung, 2026-08-13, nach dem
+  Steps-4-6-Live-Cutover) — geprüft und bestätigt fehlend auf allen drei Schichten (`storage`,
+  `webui/api.py`, `mcpserver/tools.py`); soll zusammen mit dem bereits gebauten geschichteten
+  Ordnermodell (P6 Step 4) geplant werden. Nächste Planungssession dafür ist mit Opus vorgesehen.
+  Scoping-Stichpunkte + der bereits geklärte Git-Historie-Punkt (ein Repo für den ganzen
+  `DATA_ROOT`, kein Cross-Repo-Problem): `phase6_shares/CLAUDE.md`s Session-Block vom selben Tag.
 
 **[2026-08-02 Korrektur, P5-Planungssession]:** der bis dahin offene Punkt „Web-UI: Neubau gegen
 die REST-API vs. Adaption des `Notizheft_example.html`" ist entschieden — **Neubau mit Ernte**

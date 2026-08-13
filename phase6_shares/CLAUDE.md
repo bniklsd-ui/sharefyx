@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase6_shares_plan.md         # voller Plan, Entscheidungen P6-A–P6-AC, Steps 0–10
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-3 verbatim (zwei Eintraege), L3, kein Softcap
-updated: 2026-08-13, zweiter -- (Nikinger-Feedback: Wortmarke bekommt eine Versionsnummer, phase5_ui/webui/static, kosmetisch)
+updated: 2026-08-13, dritter -- (Steps 4-6 live deployed, niklas->fabian read live-verified ueber echten Connector, IT-Sekus-Projekt Shared Space live, UI-Fund "nur lesen" trotz Schreibrecht, Planungsvormerkung Item-Verschieben fuer naechste Session)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -255,6 +255,98 @@ Beschreibung das nicht ausschloss. Kein Code-/Schema-Fix nötig, nur die drei
 Tool-Descriptions in `mcpserver/tools.py` präzisiert (Details + Testlauf:
 `phase2_mcp/CLAUDE.md`s Korrekturnotiz vom selben Datum). Kein eigener Plan-Step, kein
 Einfluss auf Step 7.
+
+**Nachtrag 2026-08-13, dritter — Steps 4-6 live deployed, Cutover vollzogen, ein neuer
+Shared Space, ein UI-Fund und eine Planungsvormerkung:**
+
+**Auftrag:** Nikinger-Entscheidung, direkt aus dem laufenden Betrieb heraus: „power right
+through the deployment". Vorausgegangen war ein Nebenbefund beim Testen der Runbook-Kommandos
+für Step 6 (siehe vorheriger Nachtrag-Kontext) — `spacectl.py show` löste einen Index-Rebuild
+(Schema 0→2) auf dem echten Index gegen den ECHTEN `DATA_ROOT` aus, weil `Store.__init__` den
+laufenden Prozess ja nicht neu startet. Read-only anhand von `journalctl` (Fenster vor/nach dem
+Rebuild-Zeitstempel `13:18:34`) geprüft statt angenommen: der laufende Dienst (altes Release,
+kein Neustart) blieb durchgehend `200` auf `/mcp/` und `/api/v1/overview` — die neuen Spalten
+tragen `NOT NULL DEFAULT`, altes `index.py` referenziert sie nie. Kein Schaden, aber der Fund
+zeigt: der Index ist ein geteilter Zustand zwischen jedem lokalen Checkout und dem laufenden
+Prozess, nicht nur zwischen Releases.
+
+**Blockierender Befund vor dem eigentlichen Deploy:** die neue `SharePolicy` (Step 5) verlangt
+für fremden Lesezugriff einen expliziten `.share.yml`-Grant (`permissions.py:58-66`) — anders
+als das alte, noch live laufende Modell, das jeden fremden Space immer lesbar ließ. Weder
+`niklas/.share.yml` noch `fabian/.share.yml` existierten. Ein Deploy ohne Gegenmaßnahme hätte
+den beiden einzigen echten Nutzern dieses Systems gegenseitig die Notizen entzogen — dem
+Nikinger vor dem Deploy vorgelegt (nicht stillschweigend gelöst), er hat sich für „ja, gegenseitig
+lesbar halten" entschieden.
+
+**Deploy-Reihenfolge, als ein Skript statt zwei loser Befehlsblöcke gebaut** (Advisor-Fund vor
+dem Handover: getrennte Blöcke hätten in beliebiger Reihenfolge ausgeführt werden können —
+`deploy.sh`s eigenes Health-Gate prüft `/health`/`/ui/login`/`/api/v1/me`/`/mcp/`, nicht „kann
+niklas fabians Space noch lesen", ein Deploy vor den Grants wäre also grün durchgelaufen und
+hätte den Zugriffsverlust verdeckt): `spacectl.py add-member niklas fabian --read` +
+`add-member fabian niklas --read`, **hartes Grep-Gate** auf beide `.share.yml`-Dateien, erst
+danach `deploy.sh main`. Vom Nikinger ausgeführt (Sudo für den Neustart, außerhalb dessen, was
+Claude Code selbst kann). `docs/UPDATE_LOG.md` bekam einen echten, datierten Eintrag (Punkt „Doc
+✓" der eigenen Deploy-Konvention, P6-X) statt eines `SHAREFYX_ALLOW_STALE_UPDATELOG`-Overrides,
+weil dies — anders als die kosmetische Wortmarken-Änderung vorher am selben Tag — eine reale,
+nutzersichtbare Verhaltensänderung ist.
+
+**Ergebnis: `main`@`d068d1c` live, Release `20260813T113025.931306Z`, 722/722 Tests im Release
+grün, Health-Gate 3/3 grün.** Live-Verifikation **eine Richtung bestätigt, eine offen**: über
+den echten MCP-Connector (beide OAuth-Clients des Nikingers, `sharefyx` und
+`Phase_4_sharefyx_Niklas`, identische Ergebnisse) `list_spaces` → alle drei Spaces sichtbar,
+`IT-Sekus-Projekt` korrekt `writable:true` mit beiden Mitgliedern; `get_item`/`search_items`
+gegen `fabian` lieferten echten Inhalt, korrekt in `<untrusted_content space="fabian">`
+gewrappt — Rule 4 hält nach dem Cutover. **fabian→niklas ungetestet** — kein Zugriff auf
+Fabians Token/Connector in dieser Session, bleibt offen bis Fabian selbst prüft oder es
+weitergemeldet wird.
+
+**Neuer Shared Space `IT-Sekus-Projekt`** (kanonischer Firmen-Projektname, Nikinger-Wahl):
+beide Principals `--write` (impliziert read, `acl.py:76`), für Nutzung/Testing gedacht, bewusst
+getrennt von den beiden echten Notiz-Spaces angelegt, damit Konflikt-/Mehrbenutzer-Tests dort
+keine echten Daten berühren können.
+
+**UI-Fund, nicht behoben, nur dokumentiert (Nikinger-Meldung nach dem Deploy):** die
+Weboberfläche zeigt `IT-Sekus-Projekt` im Baum/in der Übersicht als „nur lesen", obwohl der
+Space laut MCP `writable:true` ist. **Root Cause identifiziert:** `webui/api.py:271` /
+`serializers.py:111` berechnen für die Space-Liste ausschließlich `"own": space.name ==
+session.space` — kein `writable`-Äquivalent zum MCP-`list_spaces`-Feld. `app.js:598`/`676`
+kennt deshalb nur `space.own` und badgt jeden nicht-eigenen Space hart als „nur lesen", ganz
+gleich ob ein `.share.yml`-Write-Grant existiert. Die **Item-Ebene** ist davon nicht betroffen —
+`api.py:359` (`_items_get`) berechnet `readonly` bereits korrekt über
+`can_write_item_as_human()`; der Fehler sitzt ausschließlich in der Space-Übersicht/im Baum.
+Nicht Teil dieser Session (Doc-only-Auftrag) — nächster kleiner Fix, kein eigener Plan-Step
+nötig: `_visible_space_infos()` (`api.py:224`) müsste ein `writable`-Feld analog zu MCPs
+`list_spaces` mitliefern, `app.js` liest es statt `own` an den beiden genannten Stellen.
+
+**Planungsvormerkung für die nächste Session (Opus, Browser-Planung) — Item-Verschieben:**
+bereits vor dem Deploy geprüft und bestätigt fehlend auf allen drei Schichten
+(`storage/store.py :: update()` kennt kein `space`-Feld — ein unbekannter Schlüssel landet
+sogar stillschweigend als beliebiges Extra-Frontmatter-Feld statt eines Fehlers, `webui/api.py`s
+`_items_patch` kennt nur `folder` nicht `space`, `mcpserver/tools.py :: update_item` hat keinen
+`space`-Parameter). Der Nikinger-Wunsch: eine Planungssession soll klären, wie Item-Verschieben
+**zwischen** Ordnern UND Spaces zusammen mit dem bereits gebauten geschichteten Ordnermodell
+(`files.py :: MAX_FOLDER_DEPTH`/`validate_folder()`, Step 4) aussehen soll. Stichpunkte, die die
+Planung mitnehmen sollte, nicht mehr:
+- **Zwei Fälle, ein Werkzeug oder zwei?** Verschieben innerhalb des eigenen Space (nur
+  `folder` ändert sich, bereits gebaut) vs. Verschieben über Space-Grenzen (physische
+  Dateiverschiebung, echter Cross-Space-Write) — letzteres kollidiert mit Hard Rule 4/P6-U und
+  bräuchte einen Write-Grant im ZIEL-Space, nicht nur im Quell-Space.
+- **Git-Historie — geprüft, nicht mehr offen:** `history.ensure_repo(data_root)`/
+  `commit(data_root, message)` (`storage/history.py:30,60`) nehmen beide den gesamten
+  `DATA_ROOT`, nicht einen Space-Pfad — **ein** Repo für alle Spaces, kein Cross-Repo-Problem.
+  Ein Cross-Space-Move ist damit `git mv <alt> <neu>` + **ein** Commit, dieselbe Atomarität wie
+  jeder andere Write heute. Vereinfacht die Planung gegenüber der ursprünglichen Annahme.
+- **Index/ACL:** ein verschobenes Item braucht eine neue `AclDecision` (neuer Space, neuer
+  Ordner, ggf. andere `.share.yml`-Grants) — Version hochzählen oder nicht, dieselbe Abwägung
+  wie bei der Sichtbarkeits-Migration.
+- **Item-ID bleibt stabil** (Entscheidung F aus P1, `itm_<8hex>` unveränderlich) — ein Move darf
+  daran nichts ändern, nur Verzeichnis + Frontmatter-`space`/`folder`.
+- Ausgangspunkt für die Planung: dieser Abschnitt hier, nicht neu von vorne suchen.
+
+Diese vier Punkte (Cutover-Ergebnis, UI-Fund, neuer Space, Planungsvormerkung) sind reine
+Live-Betriebs-/Doku-Arbeit dieser Session — kein Code geändert außer `docs/UPDATE_LOG.md`
+(bereits im vorigen Nachtrag committet). `pytest` unverändert bei 722/722 (Release-interner Lauf
+von `deploy.sh` ist der Beleg, kein separater Lauf hier nötig).
 
 **Nachtrag 2026-08-13, zweiter — UI-Kleinigkeit „on the fly":** der Nikinger meldete direkt im
 Anschluss, die Wortmarke oben links zeige keine Versionsnummer, mit Vorschlag (dieselbe

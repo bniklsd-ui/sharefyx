@@ -11,7 +11,7 @@ down:
   - docs/concepts/phase4_auth_plan.md      # ausführungsreifer P4-Plan
   - docs/concepts/phase5_ui_plan.md        # ausführungsreifer P5-Plan
   - docs/concepts/phase6_shares_plan.md    # ausführungsreifer P6-Plan
-updated: 2026-08-09 (Phase 6 🔄 gestartet — neue Zeile + zwei korrigierte Absätze unter „Bewusst nicht auf der Roadmap")
+updated: 2026-08-13 (Phase 6 Steps 4-6 live deployed, Status-Absatz nachgezogen)
 ---
 # ROADMAP — Space-Server
 
@@ -204,10 +204,15 @@ schreiben, und das System verträgt einen dritten Nutzer ohne Codeänderung.
   Gate: A = Werkzeuge/Betrieb/Update-Banner, B = Dateisystem, C = Bilder — unter Druck fällt
   zuerst C weg, dann Bs geteilte Spaces, **nie Block A**.
 
-**Status 🔄 (2026-08-09, gestartet):** Plan ausführungsreif, Step 0 (Haushalt/Verifikation/
-Regeländerungen) läuft. Herkunft: `docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` §4.1–§4.6. Plan:
-`docs/concepts/phase6_shares_plan.md` (Entscheidungen P6-A–P6-AC, Steps 0–10). Phase-Head:
-`phase6_shares/CLAUDE.md`.
+**Status 🔄 (2026-08-13):** Block A (Steps 0–3) vollständig gebaut, Gate A→B 3/4 Punkte live
+bestanden. Block B Steps 4–6 (Storage-Fundament, Rechtepolitik, Verwaltung/Migration) ✅ gebaut
+**und seit 2026-08-13 live deployed** (`main`@`d068d1c`) — Cutover auf die neue `SharePolicy`
+vollzogen, eine Leserichtung (niklas→fabian) über den echten Connector live-verifiziert, die
+andere offen. Ein UI-Fund (geteilte Spaces zeigen „nur lesen" trotz Schreibrecht) und eine
+Planungsvormerkung für die nächste Session (Item-Verschieben zwischen Ordnern/Spaces) stehen
+offen. Herkunft: `docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` §4.1–§4.6. Plan:
+`docs/concepts/phase6_shares_plan.md` (Entscheidungen P6-A–P6-AC, Steps 0–10). Details:
+`phase6_shares/CLAUDE.md`s Session-Block vom 2026-08-13.
 
 ---
 
