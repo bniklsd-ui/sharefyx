@@ -238,6 +238,16 @@ select.input {
   color: var(--text-faint);
 }
 
+.rail__version {
+  margin-left: .5em;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  opacity: .6;
+  vertical-align: super;
+}
+
 .rail__home, .rail__action, .tree__space, .tree__folder {
   display: flex;
   align-items: center;

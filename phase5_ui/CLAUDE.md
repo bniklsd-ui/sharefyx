@@ -7,7 +7,7 @@ up: ../CLAUDE.md
 down:
   - ../docs/concepts/phase5_ui_plan.md             # voller Plan, Entscheidungen P5-A–P5-AE, Steps 0–9
   - ../docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.5, [VERIFY]-Bilanz V14–V26
-updated: 2026-08-09
+updated: 2026-08-13 (Nikinger-Feedback: Versionsnummer neben der Wortmarke, kosmetisch, keine Tests)
 ---
 
 # CLAUDE.md — Phase 5: Web-UI, REST-API, Auth-Selbstverwaltung (`phase5_ui/`)
@@ -210,6 +210,23 @@ vorgefunden (kein Kommando nötig, Session-Block). Alle Step-9-Abschlussarbeiten
 `phase5_ui_uebersicht.svg`, `PHASE5_CLOSEOUT_HANDOVER.md`, Rotationsprüfung (weiterhin genau ein
 Session-Block, kein Rotieren nötig) und Root-`CLAUDE.md`/`ROADMAP.md` auf ✅, alle im selben
 Commit (vierter Nachtrag unten). **Phase 5 formal abgeschlossen, 2026-08-09.**
+
+**[2026-08-13 Korrektur, Nikinger-Feedback aus echtem Betrieb, außerhalb eines Plan-Steps]:**
+die Wortmarke oben links (`.rail__brand`, `app.html`/`app.css`) trug keine Versionsnummer.
+Ergänzt: `<span class="rail__version">v2</span>` neben „sharefyx" — Phase 6 entspricht laut
+Nikinger v2 (kein eigenes Versionierungsschema im Code, reiner Hardcode wie die Wortmarke
+selbst). Bewusst **keine** eigene Schriftart — `.rail__version` erbt `font-family` von
+`.rail__brand` (nicht neu gesetzt), nur `font-size: 9px`/`opacity: .6`/`vertical-align: super`
+zur optischen Unterordnung. Sichtgeprüft per Playwright-Screenshot gegen die echte `app.css`
+(nicht nur behauptet) — bei ≤1280px Viewportbreite kollabiert `.rail__brand` ohnehin komplett
+(bestehende Breakpoint-Regel §4.3, `app.css` Zeile ~1088), die Version ist dort also
+plangemäß mit unsichtbar, kein neuer Sonderfall. Reine `webui/static/`-Änderung (P5-B tabu-Liste
+betrifft nur `storage/`/`mcpserver/{tools,permissions,server}.py`, nicht statische Assets), JS
+bleibt laut P5-T ohnehin unit-ungetestet — kein neuer Test, `pytest` (722/722) unverändert grün
+zur Regressionsprobe. Phase 5 ist geschlossen; dieser Head bekommt keinen neuen
+Session-Block dafür (kosmetischer Ein-Zeilen-Fix, kein Step) — Herleitung und Screenshot-Beleg
+stehen stattdessen in `phase6_shares/CLAUDE.md`s aktuellem Session-Block (die aktive Phase, aus
+der das Feedback kam).
 
 **Cutover auf Release-Verzeichnisse vollzogen (2026-08-05 20:37, Nikinger):** der Dienst läuft
 seither aus `/opt/sharefyx/current` statt aus dem Git-Arbeitsverzeichnis. „Datei ändern +

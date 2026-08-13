@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase6_shares_plan.md         # voller Plan, Entscheidungen P6-A–P6-AC, Steps 0–10
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-3 verbatim (zwei Eintraege), L3, kein Softcap
-updated: 2026-08-13 (Nikinger-Feedback aus echtem Betrieb: update_item/append_to_item/patch_item-Beschreibungen praezisiert, kein Codeverhaltens-/Testzahlwechsel)
+updated: 2026-08-13, zweiter -- (Nikinger-Feedback: Wortmarke bekommt eine Versionsnummer, phase5_ui/webui/static, kosmetisch)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -255,3 +255,16 @@ Beschreibung das nicht ausschloss. Kein Code-/Schema-Fix nötig, nur die drei
 Tool-Descriptions in `mcpserver/tools.py` präzisiert (Details + Testlauf:
 `phase2_mcp/CLAUDE.md`s Korrekturnotiz vom selben Datum). Kein eigener Plan-Step, kein
 Einfluss auf Step 7.
+
+**Nachtrag 2026-08-13, zweiter — UI-Kleinigkeit „on the fly":** der Nikinger meldete direkt im
+Anschluss, die Wortmarke oben links zeige keine Versionsnummer, mit Vorschlag (dieselbe
+Schriftart, kleiner, Phase 6 = v2). Umgesetzt in `phase5_ui/webui/static/{app.html,app.css}`
+(`.rail__version`-Span neben `.rail__brand`, erbt `font-family`, 9px/60% Deckkraft) — Details,
+Begründung der Breakpoint-Interaktion und Testabdeckung stehen in `phase5_ui/CLAUDE.md`s
+Korrekturnotiz vom selben Datum, nicht doppelt hier. Visuell gegengeprüft: Playwright/Chromium
+headless gegen die echte `app.css` (Datei-URI, `link href` temporär auf einen absoluten Pfad
+umgeschrieben, damit `file://` die Stylesheet-Referenz auflöst — Serverstart wäre für eine reine
+CSS-Sichtprobe unverhältnismäßig gewesen), Screenshot zeigt „SHAREFYX ᵛ²" wie gewünscht, danach
+verworfen (kein Repo-Artefakt). Reine `webui/static/`-Änderung, kein Python-Code — `pytest`
+722/722 unverändert als Regressionsprobe, kein neuer Test (JS/CSS bleiben laut P5-T
+unit-ungetestet).
