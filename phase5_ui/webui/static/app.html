@@ -176,6 +176,37 @@
   </div>
 </div>
 
+<!-- Step 7 Commit 3 (K4): Ordner nur bis Tiefe 2 -- ein Tiefe-2-Ordner taucht deshalb im
+     Elternordner-Dropdown gar nicht erst auf (siehe dialogs.js :: openNewFolderDialog()). -->
+<div class="overlay" id="new-folder-dialog" hidden>
+  <div class="overlay__panel">
+    <h2>Neuer Ordner</h2>
+    <label>Übergeordneter Ordner
+      <select class="input" id="new-folder-parent-select"></select>
+    </label>
+    <label>Name
+      <input type="text" class="input" id="new-folder-name-input">
+    </label>
+    <div class="overlay__actions">
+      <button type="button" class="btn-primary" id="new-folder-submit">Anlegen</button>
+      <button type="button" class="btn" id="new-folder-cancel">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="move-dialog" hidden>
+  <div class="overlay__panel">
+    <h2>Verschieben</h2>
+    <label>Ordner
+      <select class="input" id="move-folder-select"></select>
+    </label>
+    <div class="overlay__actions">
+      <button type="button" class="btn-primary" id="move-submit">Verschieben</button>
+      <button type="button" class="btn" id="move-cancel">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="conflict-dialog" hidden>
   <div class="overlay__panel">
     <h2>Konflikt</h2>

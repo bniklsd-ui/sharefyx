@@ -7,6 +7,7 @@ import { el } from "./toasts.js";
 import { api, reportUnexpectedError } from "./api.js";
 import { navigate, renderRail, bucketNames } from "./tree.js";
 import { selectItem } from "./editor.js";
+import { openMoveDialog } from "./dialogs.js";
 
 var listCrumbEl;
 var listReadonlyEl;
@@ -224,6 +225,23 @@ export function renderList() {
     button.appendChild(metaEl);
     button.addEventListener("click", function () { selectItem(item.id).catch(reportUnexpectedError); });
     li.appendChild(button);
+    // Verschieben-Knopf als GESCHWISTER von `.list__row`, nicht darin verschachtelt — zwei
+    // `<button>` ineinander ist ungültiges HTML und Browser hangeln das eine daraus hervor,
+    // was den Klick-Handler unvorhersehbar macht. `.list__rows > li` ist deshalb Flex (app.css),
+    // `.list__row` nimmt den Platz, dieser Knopf bleibt fest daneben. Nur fürs eigene,
+    // schreibbare Item — der Server lehnt einen Ordnerwechsel an einem fremden Item ohnehin ab
+    // (`_items_patch`s Eigentümer-Riegel), der Knopf zeigt also nur, was wirklich erlaubt ist.
+    if (!item.readonly && item.space === state.ownSpace) {
+      var moveButton = el("button", "list__row-move", "→");
+      moveButton.type = "button";
+      moveButton.title = "In Ordner verschieben";
+      moveButton.setAttribute("aria-label", "In Ordner verschieben");
+      moveButton.addEventListener("click", function (event) {
+        event.stopPropagation();
+        openMoveDialog(item);
+      });
+      li.appendChild(moveButton);
+    }
     listRowsEl.appendChild(li);
   });
 }

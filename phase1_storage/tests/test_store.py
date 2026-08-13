@@ -559,6 +559,32 @@ def test_create_rejects_folder_deeper_than_max(store):
         store.create("nikinger", type="note", title="Zu tief", folder="a/b/c")
 
 
+def test_ensure_folder_creates_empty_directory(store, tmp_path):
+    result = store.ensure_folder("nikinger", "Projekte/Backend")
+    assert result == "projekte/backend"  # slugifiziert wie jeder andere Ordnerpfad (P6-Q)
+    assert (tmp_path / "nikinger" / "projekte" / "backend").is_dir()
+    # Ein leeres Verzeichnis erzeugt kein Item -- list_spaces() sieht es trotzdem, ohne einen
+    # eigenen Index-Eintrag (derselbe rglob-Walk wie bei einem durch ein Item entstandenen Ordner).
+    nikinger = next(s for s in store.list_spaces() if s.name == "nikinger")
+    assert "projekte" in nikinger.folders
+    assert "projekte/backend" in nikinger.folders
+
+
+def test_ensure_folder_is_idempotent(store):
+    store.ensure_folder("nikinger", "projekte")
+    store.ensure_folder("nikinger", "projekte")  # zweiter Aufruf ist kein Fehler
+
+
+def test_ensure_folder_rejects_too_deep_via_validate_folder(store):
+    with pytest.raises(ValidationError):
+        store.ensure_folder("nikinger", "a/b/c")
+
+
+def test_ensure_folder_rejects_empty_string(store):
+    with pytest.raises(ValidationError):
+        store.ensure_folder("nikinger", "")
+
+
 def test_create_defaults_visibility_and_share_fields_and_omits_them_from_file(store, tmp_path):
     # Nikinger-Entscheidung 2026-08-12 (siehe phase6_shares/CLAUDE.md Session-Block, "Punkt 3"):
     # "fehlend == private" erfuellt Abnahmezeile 8 -- kein Sticky-Write. Eine explizit gesetzte

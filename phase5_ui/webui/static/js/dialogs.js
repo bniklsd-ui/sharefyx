@@ -5,7 +5,7 @@
 // — dieselbe Datei, weil alle vier denselben Charakter haben: modal, per `hidden`-Attribut
 // gesteuert, kein eigener Zustand außerhalb dessen, was sie gerade anzeigen).
 
-import { state, TYPE_LABELS, activeSpaceWritable } from "./state.js";
+import { state, TYPE_LABELS, activeSpaceWritable, spaceByName } from "./state.js";
 import { toast } from "./toasts.js";
 import { api, csrfToken } from "./api.js";
 import { navigate } from "./tree.js";
@@ -13,7 +13,7 @@ import {
   loadEditorFromItem, clearDraft, updateVersionBand, afterWrite, handleWriteError,
   currentFormValues,
 } from "./editor.js";
-import { loadOverview, bucketFor } from "./list.js";
+import { loadOverview, loadItems, bucketFor } from "./list.js";
 
 var createDialogEl;
 var createTypeEl;
@@ -46,6 +46,18 @@ var accountCancelEl;
 var accountButtonEl;
 
 var searchInputEl;
+
+var newFolderDialogEl;
+var newFolderParentSelectEl;
+var newFolderNameInputEl;
+var newFolderSubmitEl;
+var newFolderCancelEl;
+
+var moveDialogEl;
+var moveFolderSelectEl;
+var moveSubmitEl;
+var moveCancelEl;
+var moveTargetItem = null;
 
 // -- Rückfragedialog (ersetzt window.confirm) ----------------------------------------------
 
@@ -120,6 +132,69 @@ export function closeCreateDialog() {
   createDialogEl.hidden = true;
 }
 
+// -- Neuer Ordner (Step 7 Commit 3, K4) ------------------------------------------------------
+// Ein Elternordner-Dropdown statt eines Knopfs pro Baumzeile: funktional dieselbe Grenze wie
+// "Knopf bei Tiefe 2 deaktiviert" aus dem Plan — nur Tiefe-1-Ordner stehen als Elternoption zur
+// Wahl, ein Tiefe-2-Ordner würde als Elternteil eine unzulässige Tiefe 3 erzeugen und taucht
+// deshalb im Dropdown gar nicht erst auf, statt als deaktivierte Option daneben zu stehen.
+// Vermeidet außerdem, jede Baumzeile um einen zweiten, verschachtelten Button erweitern zu
+// müssen (dieselbe Falle wie bei den Listenzeilen, siehe list.js).
+
+export function openNewFolderDialog() {
+  if (!state.ownSpace) return;   // sollte nicht erreichbar sein, der Knopf existiert nur fürs eigene Space
+  newFolderParentSelectEl.textContent = "";
+  var rootOption = document.createElement("option");
+  rootOption.value = "";
+  rootOption.textContent = "(oberste Ebene)";
+  newFolderParentSelectEl.appendChild(rootOption);
+  var own = spaceByName(state.ownSpace);
+  ((own && own.folders) || [])
+    .filter(function (path) { return path.indexOf("/") === -1; })
+    .forEach(function (path) {
+      var opt = document.createElement("option");
+      opt.value = path;
+      opt.textContent = path;
+      newFolderParentSelectEl.appendChild(opt);
+    });
+  newFolderNameInputEl.value = "";
+  newFolderDialogEl.hidden = false;
+  newFolderNameInputEl.focus();
+}
+
+export function closeNewFolderDialog() {
+  newFolderDialogEl.hidden = true;
+}
+
+// -- Verschieben (Step 7 Commit 3) ------------------------------------------------------------
+// Bewusst KEIN Wiederverwenden von `handleWriteError()`/`showConflictDialog()`: die sind an
+// `state.editingSnapshot` gekoppelt (das aktuell IM EDITOR offene Item) — ein Verschieben aus
+// der Liste heraus betrifft aber typischerweise ein ANDERES Item als das gerade offene, teils
+// gar keines. `showConflictDialog()` bliebe dann auf einem `null`/falschen Snapshot sitzen. Ein
+// eigener, schlichter Fehlerpfad ist hier korrekt, keine Abkürzung.
+
+export function openMoveDialog(item) {
+  moveTargetItem = item;
+  moveFolderSelectEl.textContent = "";
+  var rootOption = document.createElement("option");
+  rootOption.value = "";
+  rootOption.textContent = "(kein Ordner)";
+  moveFolderSelectEl.appendChild(rootOption);
+  var space = spaceByName(item.space);
+  ((space && space.folders) || []).forEach(function (path) {
+    var opt = document.createElement("option");
+    opt.value = path;
+    opt.textContent = path.split("/").join(" / ");
+    moveFolderSelectEl.appendChild(opt);
+  });
+  moveFolderSelectEl.value = item.folder || "";
+  moveDialogEl.hidden = false;
+}
+
+export function closeMoveDialog() {
+  moveDialogEl.hidden = true;
+  moveTargetItem = null;
+}
+
 // -- Konto: Passwort ändern (Block-A-Abnahmezeilen 5/6) --------------------------------------
 
 function openAccountDialog() {
@@ -169,6 +244,59 @@ export function init() {
   accountButtonEl = document.getElementById("account-button");
 
   searchInputEl = document.getElementById("search-input");
+
+  newFolderDialogEl = document.getElementById("new-folder-dialog");
+  newFolderParentSelectEl = document.getElementById("new-folder-parent-select");
+  newFolderNameInputEl = document.getElementById("new-folder-name-input");
+  newFolderSubmitEl = document.getElementById("new-folder-submit");
+  newFolderCancelEl = document.getElementById("new-folder-cancel");
+
+  moveDialogEl = document.getElementById("move-dialog");
+  moveFolderSelectEl = document.getElementById("move-folder-select");
+  moveSubmitEl = document.getElementById("move-submit");
+  moveCancelEl = document.getElementById("move-cancel");
+
+  newFolderCancelEl.addEventListener("click", closeNewFolderDialog);
+  newFolderSubmitEl.addEventListener("click", function () {
+    var name = newFolderNameInputEl.value.trim();
+    if (!name) { newFolderNameInputEl.focus(); return; }
+    var parent = newFolderParentSelectEl.value;
+    var folder = parent ? parent + "/" + name : name;
+    api("/spaces/" + encodeURIComponent(state.ownSpace) + "/folders", {
+      method: "POST", body: JSON.stringify({ folder: folder }),
+    }).then(function (result) {
+      closeNewFolderDialog();
+      return loadOverview().then(function () { toast("Ordner angelegt · " + result.folder); });
+    }).catch(function (err) {
+      if (err.message === "unauthenticated") return;
+      toast(err.message || "Ordner anlegen fehlgeschlagen.", "error");
+    });
+  });
+
+  moveCancelEl.addEventListener("click", closeMoveDialog);
+  moveSubmitEl.addEventListener("click", function () {
+    var item = moveTargetItem;
+    if (!item) return;
+    var folder = moveFolderSelectEl.value;
+    api("/items/" + encodeURIComponent(item.id), {
+      method: "PATCH", body: JSON.stringify({ version: item.version, folder: folder }),
+    }).then(function () {
+      closeMoveDialog();
+      return loadItems().then(loadOverview).then(function () {
+        toast(folder ? "Verschoben nach " + folder.split("/").join(" / ") : "In die oberste Ebene verschoben");
+      });
+    }).catch(function (err) {
+      if (err.code === "conflict") {
+        toast(
+          "Ein anderer Client hat dieses Item zwischenzeitlich geändert — bitte neu laden und "
+          + "erneut versuchen.", "error",
+        );
+        return;
+      }
+      if (err.message === "unauthenticated") return;
+      toast(err.message || "Verschieben fehlgeschlagen.", "error");
+    });
+  });
 
   conflictLoadCurrentButtonEl.addEventListener("click", function () {
     var current = state.conflictCurrent;

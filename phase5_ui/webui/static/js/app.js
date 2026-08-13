@@ -8,7 +8,10 @@ import { api, csrfToken, reportUnexpectedError } from "./api.js";
 import { init as initTree } from "./tree.js";
 import * as List from "./list.js";
 import * as Editor from "./editor.js";
-import { init as initDialogs, pendingConfirmCancel, hideConflictDialog, closeCreateDialog } from "./dialogs.js";
+import {
+  init as initDialogs, pendingConfirmCancel, hideConflictDialog, closeCreateDialog,
+  closeNewFolderDialog, closeMoveDialog,
+} from "./dialogs.js";
 import { init as initUpdates } from "./updates.js";
 
 // -- Bootstrap: Übernahme des CSRF-Tokens von der Login-Erfolgsseite (Plan-Abweichung 2,
@@ -94,14 +97,21 @@ function initShell() {
   var updateLogDialogEl = document.getElementById("update-log-dialog");
   var conflictDialogEl = document.getElementById("conflict-dialog");
   var createDialogEl = document.getElementById("create-dialog");
+  // Step 7 Commit 3, kleine dokumentierte Abweichung vom Plan-Dateiwortlaut (der app.js für
+  // diesen Commit nicht nennt): die beiden neuen Dialoge brauchen dieselbe Escape-Behandlung
+  // wie jeder andere Overlay-Dialog hier — sie ihr eigenes Süppchen kochen zu lassen wäre eine
+  // stillschweigend inkonsistente Tastaturbedienung, kein kleinerer Eingriff.
+  var newFolderDialogEl = document.getElementById("new-folder-dialog");
+  var moveDialogEl = document.getElementById("move-dialog");
   var confirmDialogEl = document.getElementById("confirm-dialog");
   var accountDialogEl = document.getElementById("account-dialog");
   var detailEditorEl = document.getElementById("detail-editor");
   var searchInputEl = document.getElementById("search-input");
 
   function anyOverlayOpen() {
-    return !conflictDialogEl.hidden || !createDialogEl.hidden
-      || !confirmDialogEl.hidden || !accountDialogEl.hidden || !updateLogDialogEl.hidden;
+    return !conflictDialogEl.hidden || !createDialogEl.hidden || !newFolderDialogEl.hidden
+      || !moveDialogEl.hidden || !confirmDialogEl.hidden || !accountDialogEl.hidden
+      || !updateLogDialogEl.hidden;
   }
 
   document.addEventListener("keydown", function (event) {
@@ -117,6 +127,8 @@ function initShell() {
       if (!confirmDialogEl.hidden && pendingConfirmCancel) pendingConfirmCancel();
       else if (!conflictDialogEl.hidden) hideConflictDialog();
       else if (!createDialogEl.hidden) closeCreateDialog();
+      else if (!newFolderDialogEl.hidden) closeNewFolderDialog();
+      else if (!moveDialogEl.hidden) closeMoveDialog();
       else if (!updateLogDialogEl.hidden) updateLogDialogEl.hidden = true;
       else if (!accountDialogEl.hidden) accountDialogEl.hidden = true;
       else if (state.selectedId !== null) Editor.closeEditor();

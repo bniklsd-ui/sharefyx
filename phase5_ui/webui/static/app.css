@@ -338,6 +338,12 @@ select.input {
    (`Projekte/Backend`) bekommt zusätzliche Einrückung, um sie sichtbar unter ihrem Elternordner
    einzuordnen — Tiefe bleibt serverseitig auf 2 begrenzt, keine dritte Stufe nötig. */
 .tree__realfolder--child { padding-left: calc(var(--space) * 6); }
+
+/* "+ Ordner" (Step 7 Commit 3) -- gedämpft wie ein Platzhalter, damit es sich neben den echten
+   Ordnernamen als Aktion statt als weiterer Eintrag liest. */
+.tree__new-folder { color: var(--text-faint); }
+.tree__new-folder:hover { color: var(--text); }
+
 .tree__count {
   font-size: 12px;
   color: var(--text-faint);
@@ -421,12 +427,18 @@ select.input {
   padding: 0;
 }
 
+/* Verschieben-Knopf (Step 7 Commit 3) ist ein GESCHWISTER von `.list__row`, nicht darin
+   verschachtelt (zwei `<button>` ineinander ist ungültiges HTML, siehe list.js) — die `<li>`
+   trägt deshalb jetzt Flex + den Trennstrich, den vorher `.list__row` selbst trug, damit der
+   Strich über die volle Zeilenbreite läuft statt nur unter dem Textteil aufzuhören. */
+.list__rows > li { display: flex; align-items: stretch; border-bottom: 1px solid var(--line); }
+
 .list__row {
   display: block;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   background: none;
   border: none;
-  border-bottom: 1px solid var(--line);
   border-left: 2px solid transparent;
   padding: var(--space) calc(var(--space) * 2);
   text-align: left;
@@ -440,6 +452,24 @@ select.input {
   background: linear-gradient(90deg, var(--accent-quiet), transparent);
   border-left-color: var(--accent);
 }
+
+.list__row-move {
+  align-self: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  margin-right: var(--space);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-faint);
+  font-size: 15px;
+  cursor: pointer;
+}
+.list__row-move:hover { color: var(--text); background: var(--line); }
 
 .list__row-title {
   font-size: 15px;

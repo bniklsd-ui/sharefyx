@@ -9,7 +9,7 @@ down:
   - ./ITEM_MOVE_PLAN.md                            # Zusatzplan zu Step 7: Item-Verschieben (Ordner+Space) + Textfarben, P6-AD–P6-AJ
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-6 verbatim (sechs Eintraege), L3, kein Softcap
-updated: 2026-08-13, siebter -- (Step 7 Commits 0+1+2 gebaut+verifiziert+committet: app.js in zehn ES-Module gesplittet, echter Ordnerbaum mit exaktem Filtern, Sichtbarkeits-Chip inkl. eines vor dem Commit gefundenen+korrigierten Plan-Abweichungsfalls private+share; 724 gruen, Tabu-Diff sauber; atomarer Checkpoint nach jedem Commit, Nikinger-Weisung)
+updated: 2026-08-13, siebter -- (Step 7 Commits 0+1+2+3 gebaut+verifiziert+committet: app.js in zehn ES-Module gesplittet, echter Ordnerbaum, Sichtbarkeits-Chip, Ordner anlegen+Verschieben per Menue (K4-Fix, erste Backend-Beruehrung); Tabu-Diff-Regelfehler seit Commit 0 gefunden+korrigiert (P5-B statt P6-C geprueft, folgenlos); 733 gruen; atomarer Checkpoint nach jedem Commit, Nikinger-Weisung, ein Advisor-Aufruf pro Commit)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -101,6 +101,7 @@ weiter ohne Build-Step (AC).
 | 9 | UI Dateisystem (Block B), Commit 0/7 — `app.js` (1525 Zeilen, ein `initShell()`-Closure) entlang der bestehenden Kommentar-Nahtstellen in zehn ES-Module unter `phase5_ui/webui/static/js/` aufgeteilt (`app`/`api`/`state`/`tree`/`list`/`editor`/`markdown`/`dialogs`/`toasts`/`updates`), `state.js` als einzelnes mutierbares Objekt (von allen Importern geteilt, Ersatz für den Closure-`state`), jedes Modul ein `init(deps)`, das der neue schlanke `app.js` beim Bootstrap der Reihe nach aufruft. Bisheriges Zwei-Skript-Modell (`js/updates.js` als globales Skript vor `app.js`, `window.SharefyxUpdates`) entfällt — `updates.js` ist jetzt selbst ein Modul, `app.html`/`pages.py` laden nur noch `<script type="module" src=".../js/app.js">`. `ui_budget.py` zählt die Nutzlast jetzt über `js/*.js`-Glob statt fester Namen | 7 | ✅ **gebaut, noch nicht deployt** — CSP (`script-src 'self'`) erlaubt Same-Origin-`type="module"` ohne Header-Änderung (V50 geschlossen); Sichtprobe golden path (Login → Liste → bestehendes Item öffnen+bearbeiten+speichern v1→v2 → neu anlegen) per Zwei-venv-Playwright-Skript, fünf Screenshots gesehen, nicht nur behauptet | 0 (P5-T: JS bleibt unit-ungetestet; fünf bestehende Tests in `test_static_routes.py` auf die neue Modulstruktur umgeschrieben, keiner neu; 724 gesamt unverändert) |
 | 10 | UI Dateisystem (Block B), Commit 1/7 — echter Ordnerbaum, kein Backend-Fund nötig (`GET /api/v1/items?folder=` existierte bereits, `GET /api/v1/spaces` trug `folders`/`members` schon, nur `app.js` rief die Route nie ab). `list.js :: loadOverview()` holt jetzt `/overview`+`/spaces` per `Promise.all`, mischt `folders`/`members` nach Name in die Space-Objekte. `tree.js`: `buildFolderTree()` (flache Pfadliste → ≤2-stufiger Baum, reines Splitten auf „/", da `MAX_FOLDER_DEPTH` serverseitig gilt), `renderRealFolders()` reused `.tree__folder` (neue Modifier-Klasse `.tree__realfolder--child` nur für die Einrückung der zweiten Ebene), `navigate()`/`navigateFolder()` jetzt exklusiv (`state.folder`/`state.filter` nie beide gesetzt). `list.js`: `filterParams()`/`renderCrumb()`/Leerzustand-Text folder-bewusst gemacht | 7 | ✅ **gebaut, noch nicht deployt** — Sichtprobe mit zwei echten, verschachtelten Ordnern (`Projekte`/`Projekte/Backend`, serverseitig zu `projekte`/`projekte/backend` slugifiziert, P6-Q — Baumdarstellung ist davon unabhängig, reine String-Weiterreichung): Verschachtelung im Baum sichtbar, Klick navigiert **und** filtert exakt (nicht Präfix, V55) auf beiden Ebenen, per Playwright-Assertions auf die tatsächlich gerenderten Zeilentitel erzwungen, nicht nur der Screenshot. Advisor-Fund vor dem Commit, geprüft statt blind gefixt: `navigateFolder()` setzt `state.filter=null`, `dialogs.js :: openCreateDialog()` liest `state.meta.buckets[state.filter]` ungeschützt — JS stringifiziert einen `null`-Schlüssel zu `"null"`, kein `TypeError`, derselbe Fallback-Pfad wie beim typlosen Bucket „Archiv" heute schon; per Node-Check UND echtem Browserlauf (Konsolenfehler-Listener, „+" während `projekte/backend` aktiv) bestätigt, **kein Fix nötig**. Offen für Commit 3 (folder-bewusstes Anlegen): der aktuelle Fallback „leerer Ordner → Typ Notiz" ist ein stiller Default, keine bewusste Entscheidung für echte Ordner | 0 (P5-T: JS bleibt unit-ungetestet, kein jsdom-Zusatzlauf — die echte Browserprobe deckt strenger ab; 724 gesamt unverändert) |
 | 11 | UI Dateisystem (Block B), Commit 2/7 — Sichtbarkeits-Chip, kein Backend-Fund nötig (`visibility`/`share_read`/`share_write` stehen bereits auf `summary_to_json()`, P6 Step 5). `list.js`: neue `visibilityLabel()`/`visibilityChip()`, in `renderList()`s Zeilen verdrahtet (`.list__row-meta` von reinem Text auf Flex mit Meta-Text + Chip umgebaut). `app.css`: `.visibility-chip`/`.visibility-chip--shared` (gedämpft vs. `--ok`-grün), reused `.list__row-meta`s bestehende Fläche | 7 | ✅ **gebaut, noch nicht deployt** — Sichtprobe mit vier Items (privat/nur-ich/geteilt/Randfall), alle drei geplanten Chip-Zustände + der Randfall per Playwright-Assertion auf gerenderten Chip-Text erzwungen (nicht nur Screenshot), Konsolenfehler-Listener sauber. **Benannte Abweichung vom Plan-Wortlaut, gefunden beim Nachlesen von `acl.py`/`permissions.py` vor dem Commit:** der Plan prüft `visibility` zuerst („private" → unbedingt „privat"), aber `acl.py :: decision_for()` verundet `share_read`/`share_write` immer in `AclDecision.read`/`write`, unabhängig von `visibility` — nur `Surface.AGENT` fragt `visibility` (P6-P), nie ein Mensch. Ein Item mit `visibility=private` UND einer echten Freigabe ist für den Freigegebenen faktisch lesbar, erreichbar schon heute über ein rohes `PATCH /api/v1/items/{id}` (`_items_patch` hat keine Feld-Whitelist) — nicht erst über Commit 5s künftigen Dialog. Dispatch umgestellt: `share_read`/`share_write` non-empty entscheidet zuerst, `visibility` nur als Fallback ohne Freigaben — ein vierter Testfall (`visibility=private`+`share_read=[fabian]`) beweist den Unterschied, zeigt korrekt „geteilt mit fabian" statt „privat". **Zweiter, nicht blockierender Punkt:** der Chip erscheint identisch für Items aus fremden, geteilten Spaces (`renderList()` ist derselbe Codepfad für jeden Space) — das sind ACL-Metadaten, keine Fließtext-Bodies, Hard Rule 4s `<untrusted_content>`-Wrapping betrifft das nicht (derselbe Schnitt wie `overview_row_to_json()`s `snippet`-Auslassung, nur umgekehrt: hier ist die Metadaten-Anzeige bewusst, nicht der Fließtext) | 0 (P5-T: JS bleibt unit-ungetestet, kein jsdom-Zusatzlauf — die echte Browserprobe deckt strenger ab; 724 gesamt unverändert) |
+| 12 | UI Dateisystem (Block B), Commit 3/7 — Ordner anlegen + Verschieben per Menü, K4-Fix, erster echter Backend-Touch dieses Steps (P6-C erlaubt `storage/` explizit). `store.py :: ensure_folder(space, folder)` (neu, `mkdir(parents=True, exist_ok=True)` unter `self._lock`, kein Git-Commit, keine Content-Datei — reine Verzeichnisoperation). `api.py`: neue `POST /api/v1/spaces/{space}/folders` (Eigentümer-Riegel wie `_items_patch`s `folder`-Feld), `_items_post`-Whitelist um `"folder"` erweitert (K4). `tree.js`: „+ Ordner"-Zeile fürs eigene Space, öffnet `dialogs.js :: openNewFolderDialog()`. `list.js`: Verschieben-Knopf („→") pro Zeile — als GESCHWISTER von `.list__row`, nicht darin verschachtelt (zwei `<button>` ineinander ist ungültiges HTML), `<li>` deshalb neu Flex (`app.css`). `dialogs.js`: zwei neue Dialoge, `openNewFolderDialog()`/`openMoveDialog(item)`. `app.js`: kleine, dokumentierte Abweichung vom Plan-Dateiwortlaut — die beiden neuen Dialoge in `anyOverlayOpen()`/die Escape-Behandlung aufgenommen, dieselbe Konsistenz wie jeder andere Dialog hier | 7 | ✅ **gebaut, noch nicht deployt** — Details, beide Interpretationsentscheidungen und die zwei Advisor-Funde: Session-Block unten | +9 (4 `phase1_storage/tests/test_store.py`: `ensure_folder()` erstellt/idempotent/lehnt Tiefe>2 und leeren String ab + 5 `phase5_ui/tests/test_api.py`: `test_create_item_accepts_folder` [K4] + vier Endpunkt-Tests [erstellt sichtbaren leeren Ordner, lehnt fremden Space auch mit `write:`-Grant ab, lehnt Tiefe>2/reservierten Namen ab]); Charakterisierung erneut byte-identisch grün (P6-D); 733 gesamt |
 
 ## Geerbte Contracts
 
@@ -225,3 +226,76 @@ dokumentiert und wird jetzt committet, dann stoppt diese Session wieder für ein
 Commit 3 (Ordner-Anlegen+Verschieben über das Menü, K4-Fix — erste Backend-Berührung dieses
 Steps: `store.py :: ensure_folder()`, `POST /api/v1/spaces/{space}/folders`, `_items_post`-
 Whitelist um `folder`) ist der nächste Kandidat, falls der Nikinger weiterbauen lässt.
+
+**Nachtrag, Commit 3/7 — Ordner anlegen + Verschieben per Menü, K4-Fix, auf Nikinger-Weisung
+gebaut** ("go on with next step, atomar, stop before doing additional steps"; die vorige
+Formulierung „ein Advisor-Aufruf pro Arbeitszyklus" wurde vom Nikinger korrigiert auf **einen
+Advisor-Aufruf pro Commit**). Umfang, Code, Verifikation: Modul-Tabelle oben, Zeile 12.
+
+**Korrektur, eigener Fund vor dem Advisor-Aufruf:** der Tabu-Diff-Check dieser Session prüfte
+seit Commit 0 versehentlich die **P5-B**-Liste (`storage/`, `mcpserver/{tools,permissions,
+server}.py`) statt der für P6 tatsächlich geltenden P6-C-Liste (`mcpserver/asgi.py`,
+`authserver/{crypto,totp,passwords,resolver,flows}.py` — P6-C hebt P5-B für `storage/`/
+`tools.py`/`permissions.py` ausdrücklich auf). Die Behauptungen „Tabu-Diff sauber" in den
+Session-Blöcken zu Commit 0–2 bleiben **wahr**, waren aber gegen die falsche Regel geprüft —
+zufällig folgenlos, weil keiner der drei Commits `storage/` anfasste. Ab diesem Commit (der
+`storage/store.py` bewusst berührt, P6-C erlaubt das) läuft der Check gegen die korrekte Liste.
+
+**Zwei Advisor-Funde, beide geprüft statt blind übernommen oder ignoriert:**
+1. **Eigener Fund vor dem Advisor-Aufruf, vom Advisor nur bestätigt:** `dialogs.js` durfte
+   `handleWriteError()`/`showConflictDialog()` aus `editor.js` NICHT für den Verschieben-Fehlerpfad
+   wiederverwenden — beide sind an `state.editingSnapshot` gekoppelt (das im Editor offene Item).
+   Ein Verschieben aus der Liste betrifft aber meist ein ANDERES Item, teils gar keines im Editor
+   offen — `showConflictDialog()` hätte dort auf einem falschen oder `null`-Snapshot gesessen.
+   Eigener, schlichter Fehlerpfad für Verschieben-Konflikte gebaut (Toast statt Konfliktdialog),
+   keine Abkürzung.
+2. **Space-Namen-Traversal, geprüft, kein Fund in diesem Commit:** `ensure_folder()` baut
+   `data_root / space / folder` ohne eigene `space`-Validierung — dieselbe Vertrauensgrenze wie
+   `files.item_path()` (Phase 1, seit dem allerersten Commit unverändert: JEDER `store.create()`/
+   `update()`/`search()`-Aufruf vertraut `space` bereits so). Kein neues Risiko durch diesen
+   Commit. **Echter, unabhängiger Fund dabei, außerhalb des Commit-3-Scopes:**
+   `spacectl.py :: _cmd_create_space()` validiert Space-Namen (`"/" in name`, führender `.`,
+   `RESERVED_DIR_NAMES` → Abbruch), aber `phase4_auth/scripts/authctl.py :: _cmd_invite()` —
+   der tatsächliche Weg, wie ein neuer Mensch (z. B. Fabian) seinen Space bekommt — reicht
+   `args.space` ungeprüft an `store.create_invite()` durch, keine Validierung. Ein Space-Name wie
+   `".."` würde `spacectl.py` ablehnen, aber `authctl.py invite --space ".."` liefe durch und
+   böte danach jedem `ensure_folder()`/`store.create()`-Aufruf dieser Sitzung einen Pfad aus dem
+   `DATA_ROOT` heraus. **Kein Remote-Angriffsfläche** (Space-Namen sind Operator-Eingabe, nie
+   von einem Nutzer selbst wählbar) und **kein Commit-3-Blocker** (Fix läge in
+   `phase4_auth/scripts/authctl.py`, außerhalb dieses Steps/dieser Phase — `authctl.py` selbst
+   steht nicht auf der P6-C-Tabu-Liste, aber ein Fix dort wäre trotzdem eine Scope-Erweiterung
+   ohne Auftrag). Für den Nikinger vorgemerkt, nicht in `phase4_auth/CLAUDE.md`s S/O-Tabelle
+   eingetragen (das wäre ein eigener, bewusster Schritt, kein Nebenprodukt dieses Commits).
+
+**Zwei Interpretationsentscheidungen, benannt statt stillschweigend gewählt:**
+- **"Neuer-Ordner-Knopf bei Tiefe 2 deaktiviert"** wurde als Eltern-Dropdown-Ausschluss gebaut,
+  nicht als deaktivierter Knopf pro Baumzeile: EIN „+ Ordner"-Eintrag fürs eigene Space, dessen
+  Dialog nur Tiefe-1-Ordner als Elternoption anbietet (ein Tiefe-2-Ordner erzeugte als Elternteil
+  eine unzulässige Tiefe 3 und taucht deshalb gar nicht erst auf). Vermeidet, jede Baumzeile um
+  einen zweiten, verschachtelten Button erweitern zu müssen — dieselbe Nested-Button-Falle wie bei
+  den Listenzeilen. Per Browserlauf verifiziert: nach dem Anlegen von `projekte/backend` zeigt das
+  Dropdown weiterhin nur `["(oberste Ebene)", "projekte"]`.
+- **Verschieben lebt in `list.js`, nicht `editor.js`** (Plan-Dateiliste nennt `editor.js` nicht):
+  ein „→"-Knopf pro Zeile, Ziel per Dropdown aus den Ordnern des Items-eigenen Space — Verschieben
+  bleibt in diesem Step ausdrücklich space-intern (Cross-Space-Move ist Step 7b).
+
+**Verifiziert:** `pytest -q` **733 passed** (env-gestrippt, +9 gegenüber 724 — vier
+`ensure_folder()`-Tests + fünf API-Tests, deckungsgleich mit der Plan-Testliste). Tabu-Diff
+sauber gegen die korrekte P6-C-Liste (s. o.). Charakterisierungstests erneut byte-identisch grün
+(P6-D, `store.py` berührt). Zwei-venv-Playwright-Lauf gegen ein Wegwerf-`DATA_ROOT`: Ordner
+„projekte" über das Menü angelegt, Unterordner „projekte/backend" über dieselbe Aktion mit
+Elternauswahl, Tiefe-2-Ausschluss im Dropdown bestätigt, ein Item über den Verschieben-Knopf nach
+„projekte" verschoben — die reale Datei lag danach unter `sichtprobe5/projekte/itm_...md` auf der
+Platte (`server_setup3.py`s eigener `rglob`-Ausdruck nach dem Lauf gegengeprüft, nicht nur die
+UI geglaubt). Ein Testskript-Fund unterwegs, kein App-Fund: die erste Fassung nahm an, ein
+verschobenes Item verschwinde aus dem „Notizen"-Eimer — falsch, Eimer sind rein typ-/
+statusbasiert (`api.py :: _BUCKETS`), nicht ordnerbewusst, ein Item bleibt dort sichtbar,
+ordnerlos oder nicht. Korrigiert, keine App-Änderung nötig. Kein Konsolenfehler während des
+gesamten Laufs.
+
+**Nächster Schritt (konkret):** Checkpoint nach Nikinger-Weisung — Commit 3 ist fertig
+dokumentiert und wird jetzt committet, dann stoppt diese Session wieder für eine Rückmeldung.
+Commit 4 (Drag & Drop, additiv auf Commit 3, kein neuer Backend-Pfad) ist der nächste Kandidat,
+falls der Nikinger weiterbauen lässt — Plan nennt ihn ausdrücklich „nur falls Kontextbudget
+reicht", nach drei Commits mit Frontend+jetzt-auch-Backend-Umfang ist das eine Sache, die der
+Nikinger einschätzen sollte, nicht diese Session allein.

@@ -248,6 +248,27 @@ def api_routes(
         ]
         return JSONResponse(payload, headers={"Cache-Control": "no-store"})
 
+    async def _spaces_create_folder(request: Request) -> Response:
+        # Eigentümer-Space-Beschränkung wie `_items_patch`s `folder`-Riegel oben — ein geteilter
+        # Schreibzugriff auf EIN Item erlaubt keinen leeren, per Konstruktion einladenden neuen
+        # Ordner in einem fremden Space.
+        session = await _require_session(request)
+        await _require_csrf_json(request, session)
+        space = request.path_params["space"]
+        if space != session.space:
+            raise ApiError("forbidden", "Ordner können nur im eigenen Space angelegt werden.")
+        body = await _json_body(request)
+        folder = body.get("folder")
+        if not isinstance(folder, str) or not folder:
+            raise ApiError("validation_failed", "'folder' ist Pflichtfeld (nicht-leerer str).")
+        try:
+            created = store.ensure_folder(space, folder)
+        except (ValidationError, ValueError) as exc:
+            raise _map_store_error(exc, own_space=session.space) from exc
+        return JSONResponse(
+            {"folder": created}, status_code=201, headers={"Cache-Control": "no-store"},
+        )
+
     async def _overview(request: Request) -> Response:
         session = await _require_session(request)
         payload = []
@@ -337,10 +358,12 @@ def api_routes(
         # Kein `space`-Feld gelesen — Rule 4 architektonisch (P5-A): der Ziel-Space ist immer die
         # Sitzung, ein evtl. mitgeschicktes `space` im Body wird stillschweigend ignoriert,
         # niemals ausgewertet.
+        # "folder" seit Step 7 Commit 3 (K4-Fix) dabei — `store.create()` validiert/slugifiziert
+        # ihn selbst (`files.validate_folder()`), kein Zusatzcheck hier nötig.
         kwargs: dict[str, Any] = {
             key: value
             for key, value in body.items()
-            if key in {"status", "due", "tags", "links", "format"}
+            if key in {"status", "due", "tags", "links", "format", "folder"}
         }
         try:
             item = store.create(session.space, type=item_type, title=title, body=item_body, **kwargs)
@@ -506,6 +529,7 @@ def api_routes(
     return [
         Route("/api/v1/me", _catch(_me), methods=["GET"]),
         Route("/api/v1/spaces", _catch(_spaces), methods=["GET"]),
+        Route("/api/v1/spaces/{space}/folders", _catch(_spaces_create_folder), methods=["POST"]),
         Route("/api/v1/meta", _catch(_meta), methods=["GET"]),
         Route("/api/v1/overview", _catch(_overview), methods=["GET"]),
         Route("/api/v1/updates", _catch(_updates_get), methods=["GET"]),

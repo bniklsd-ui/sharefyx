@@ -324,6 +324,21 @@ class Store:
                 ))
             return result
 
+    def ensure_folder(self, space: str, folder: str) -> str:
+        """Legt einen leeren Ordner an (Step 7 Commit 3, K4) — reine Verzeichnisoperation, kein
+        Content-Write: kein Git-Commit, kein eigener Index-Eintrag nötig, `list_spaces()`s
+        `rglob`-Walk findet ein `mkdir`'tes Verzeichnis genauso wie eines, das durch ein Item
+        entstanden ist. Idempotent (`exist_ok=True`) — ein bereits vorhandener Ordner ist kein
+        Fehler, derselbe Nutzer könnte sonst durch einen Doppelklick eine Fehlermeldung sehen,
+        obwohl am Ergebnis nichts falsch ist.
+        """
+        with self._lock:
+            folder = files.validate_folder(folder)
+            if not folder:
+                raise ValidationError("Ordnername darf nicht leer sein")
+            (self._data_root / space / folder).mkdir(parents=True, exist_ok=True)
+            return folder
+
     @property
     def acl_reader(self) -> AclReader:
         """Der eine `AclReader`, den dieser `Store` selbst benutzt (P6 Step 5) — Aufrufer, die

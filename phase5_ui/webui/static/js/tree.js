@@ -7,6 +7,7 @@ import { el } from "./toasts.js";
 import { reportUnexpectedError } from "./api.js";
 import { closeEditor } from "./editor.js";
 import { loadItems, renderCrumb } from "./list.js";
+import { openNewFolderDialog } from "./dialogs.js";
 
 var railTreeEl;
 var homeButtonEl;
@@ -119,6 +120,18 @@ export function renderRealFolders(space) {
   return wrap;
 }
 
+// "+ Ordner" — nur der eigene Space (der Server lehnt `POST .../folders` für jeden anderen
+// Space ohnehin ab, `_spaces_create_folder`s Eigentümer-Riegel; derselbe Grund wie beim
+// Verschieben-Knopf in `list.js`, hier eine Ebene höher). Reused `.tree__folder` für dieselbe
+// Einrückung/Hover-Fläche wie jeder andere Baumeintrag, nur gedämpfter eingefärbt (`app.css`).
+function newFolderButton(space) {
+  var button = el("button", "tree__folder tree__new-folder");
+  button.type = "button";
+  button.appendChild(el("span", "rail__label", "+ Ordner"));
+  button.addEventListener("click", openNewFolderDialog);
+  return button;
+}
+
 export function renderSpaceNode(space) {
   var open = space.own || state.expanded[space.name] === true;
   var row = el("button", "tree__space");
@@ -135,6 +148,7 @@ export function renderSpaceNode(space) {
   if (open) {
     railTreeEl.appendChild(renderFolders(space));
     railTreeEl.appendChild(renderRealFolders(space));
+    if (space.own) railTreeEl.appendChild(newFolderButton(space));
   }
 }
 

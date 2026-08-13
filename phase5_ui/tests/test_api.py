@@ -171,6 +171,25 @@ async def test_create_item_uses_session_space(full_app_items, totp_code, item_st
     assert item_store.get(item_id).space == SPACE
 
 
+@pytest.mark.asyncio
+async def test_create_item_accepts_folder(full_app_items, totp_code, item_store):
+    """K4 (`ITEM_MOVE_PLAN.md`): `_items_post`s Whitelist ließ `folder` bisher stillschweigend
+    fallen, obwohl `create_item(folder=)` über MCP seit Step 6 funktioniert hat — Menschen konnten
+    über die UI/API nicht in einen Ordner anlegen. `store.create()` validiert/slugifiziert
+    `folder` selbst, kein zusätzlicher Check hier."""
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.post(
+            "/api/v1/items",
+            json={"type": "note", "title": "Im Ordner", "folder": "Projekte"},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 201
+    assert response.json()["folder"] == "projekte"
+    item_id = response.json()["id"]
+    assert item_store.get(item_id).folder == "projekte"
+
+
 # -- Items: PATCH, Rechte und Reihenfolge -----------------------------------------------------
 
 
@@ -520,6 +539,68 @@ async def test_spaces_omits_foreign_space_without_a_share(full_app_items, item_s
         await _login(client, totp_code)
         response = await client.get("/api/v1/spaces")
     assert FOREIGN_SPACE not in {s["name"] for s in response.json()}
+
+
+# -- POST /api/v1/spaces/{space}/folders (Step 7 Commit 3, K4) ------------------------------
+
+
+@pytest.mark.asyncio
+async def test_create_folder_makes_an_empty_directory_visible_in_spaces(
+    full_app_items, totp_code
+):
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        create = await client.post(
+            f"/api/v1/spaces/{SPACE}/folders", json={"folder": "Projekte"}, headers=_headers(csrf),
+        )
+        assert create.status_code == 201
+        assert create.json() == {"folder": "projekte"}
+
+        spaces = await client.get("/api/v1/spaces")
+    own = next(s for s in spaces.json() if s["name"] == SPACE)
+    assert "projekte" in own["folders"]
+
+
+@pytest.mark.asyncio
+async def test_create_folder_rejects_foreign_space_even_with_write_share(
+    full_app_items, item_store, tmp_path, totp_code
+):
+    """Derselbe Eigentümer-Riegel wie `_items_patch`s `folder`-Feld (2026-08-12): ein
+    `write:`-Grant erlaubt, einzelne Items zu ändern, aber keinen neuen, leeren Ordner in einem
+    fremden Space anzulegen."""
+    item_store.create(FOREIGN_SPACE, type="note", title="Fremd")
+    (tmp_path / "data" / FOREIGN_SPACE / ".share.yml").write_text(
+        f"write: [{SPACE}]\n", encoding="utf-8"
+    )
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.post(
+            f"/api/v1/spaces/{FOREIGN_SPACE}/folders",
+            json={"folder": "Projekte"}, headers=_headers(csrf),
+        )
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_create_folder_rejects_depth_over_max(full_app_items, totp_code):
+    """Dünner Wrapper über `files.validate_folder()` — dessen eigene Traversal-/Tiefenlogik ist
+    bereits in `phase1_storage/tests/test_files.py` getestet, hier nur die Fehlerweiterleitung."""
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.post(
+            f"/api/v1/spaces/{SPACE}/folders", json={"folder": "a/b/c"}, headers=_headers(csrf),
+        )
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_create_folder_rejects_reserved_name(full_app_items, totp_code):
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.post(
+            f"/api/v1/spaces/{SPACE}/folders", json={"folder": "_archive"}, headers=_headers(csrf),
+        )
+    assert response.status_code == 422
 
 
 # -- /api/v1/updates (P6 Step 3) ----------------------------------------------------------------
