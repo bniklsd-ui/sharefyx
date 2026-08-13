@@ -89,8 +89,20 @@ export function openFromOverview(spaceName, item) {
 }
 
 export function loadOverview() {
-  return api("/overview").then(function (spaces) {
-    state.spaces = spaces;
+  // `/overview` trägt die Zähler/„Zuletzt benutzt"; `/spaces` trägt `folders`/`members` (Step 7
+  // Commit 1) — kein neuer Endpunkt, nur ein zweiter, paralleler Aufruf und ein Merge nach Name.
+  // Beide Routen filtern über dieselbe `_visible_space_infos()`, jeder Eintrag aus `/overview`
+  // hat also eine passende `/spaces`-Zeile; der Fallback greift nur defensiv.
+  return Promise.all([api("/overview"), api("/spaces")]).then(function (results) {
+    var overview = results[0];
+    var byName = {};
+    results[1].forEach(function (s) { byName[s.name] = s; });
+    overview.forEach(function (s) {
+      var extra = byName[s.name];
+      s.folders = extra ? extra.folders : [];
+      s.members = extra ? extra.members : [];
+    });
+    state.spaces = overview;
     renderRail();
     renderOverview();
   });
@@ -109,7 +121,8 @@ export function renderCrumb() {
   listCrumbEl.textContent = "";
   var strong = el("strong", null, state.activeSpace || "");
   listCrumbEl.appendChild(strong);
-  listCrumbEl.appendChild(document.createTextNode(" › " + (BUCKET_LABELS[state.filter] || state.filter)));
+  var label = state.folder ? state.folder : (BUCKET_LABELS[state.filter] || state.filter);
+  listCrumbEl.appendChild(document.createTextNode(" › " + label));
   listReadonlyEl.hidden = activeSpaceWritable();
 }
 
@@ -142,14 +155,18 @@ export function renderList() {
       listEmptyTextEl.textContent = "Keine Treffer für „" + state.query + "“.";
     } else if (!activeSpaceWritable()) {
       listEmptyTextEl.textContent = "In diesem Ordner liegt nichts.";
+    } else if (state.folder) {
+      listEmptyTextEl.textContent = "Noch nichts in „" + state.folder + "“.";
     } else {
       listEmptyTextEl.textContent =
         "Noch nichts unter „" + (BUCKET_LABELS[state.filter] || state.filter) + "“.";
     }
     // Meldung des Nikingers, gleicher Fund wie der Anlegen-Dialog: der Knopf sagte immer
     // "Notiz", auch im "Offen"/"Erledigt"-Ordner (Typ "task"). Folgt jetzt demselben Typ, den
-    // ein Klick tatsächlich anlegen würde (siehe dialogs.js :: openCreateDialog()).
-    var emptyBucket = state.meta && state.meta.buckets[state.filter];
+    // ein Klick tatsächlich anlegen würde (siehe dialogs.js :: openCreateDialog()). In einem
+    // echten Ordner (state.filter === null) gibt es keinen Typ-Hinweis dafür — Default "note",
+    // Anlegen selbst bleibt ohnehin Commit-3-Scope (K4, Ordner-Whitelist am Server).
+    var emptyBucket = state.meta && state.filter && state.meta.buckets[state.filter];
     var emptyType = (emptyBucket && emptyBucket.type) || "note";
     createButtonEl.textContent = "Erste " + (TYPE_LABELS[emptyType] || emptyType) + " anlegen";
     // Der Anlegen-Knopf ist bei einer leeren Suche fehl am Platz (er legt kein Item mit dem
@@ -175,7 +192,11 @@ export function renderList() {
 }
 
 export function filterParams() {
-  // Die drei/vier Ordner kommen serverseitig aus `api.py :: _BUCKETS` und werden über
+  // Echter Ordner und Eimer-Filter sind exklusiv (Step 7 Commit 1) — ein Ordner sendet nur
+  // `folder=<Pfad>`, kein `type`/`status` mehr, `store.search(folder=…)` ist exakt, nicht
+  // Präfix (V55), zeigt also nur Items direkt in diesem Ordner (Finder-Stil).
+  if (state.folder) return { folder: state.folder };
+  // Die drei/vier Eimer kommen serverseitig aus `api.py :: _BUCKETS` und werden über
   // `GET /api/v1/meta` geliefert — hier steht bewusst keine zweite Definition mehr.
   var bucket = state.meta && state.meta.buckets[state.filter];
   return Object.assign({}, bucket || {});

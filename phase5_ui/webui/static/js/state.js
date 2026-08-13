@@ -25,11 +25,17 @@ export var TYPE_LABELS = {
 };
 
 export var state = {
-  spaces: [],          // aus /overview: {name, own, item_count, counts, recent}
+  // aus /overview gemischt mit folders/members aus /spaces (Step 7 Commit 1, list.js ::
+  // loadOverview()): {name, own, writable, item_count, counts, recent, folders, members}
+  spaces: [],
   ownSpace: null,
   activeSpace: null,
   expanded: {},        // fremder Space-Name -> aufgeklappt?
   filter: "open",
+  // echter Ordnerpfad (z.B. "Projekte/Backend") statt eines Eimer-Filters — exklusiv zu
+  // `filter`, nie beide gleichzeitig gesetzt (Step 7 Commit 1, tree.js :: navigate()/
+  // navigateFolder()).
+  folder: null,
   query: "",
   items: [],
   selectedId: null,

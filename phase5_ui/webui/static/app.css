@@ -334,6 +334,10 @@ select.input {
   padding-left: calc(var(--space) * 4);
   font-size: 14px;
 }
+/* Echte Ordner (Step 7 Commit 1) reusen .tree__folder unverändert; nur die zweite Ebene
+   (`Projekte/Backend`) bekommt zusätzliche Einrückung, um sie sichtbar unter ihrem Elternordner
+   einzuordnen — Tiefe bleibt serverseitig auf 2 begrenzt, keine dritte Stufe nötig. */
+.tree__realfolder--child { padding-left: calc(var(--space) * 6); }
 .tree__count {
   font-size: 12px;
   color: var(--text-faint);

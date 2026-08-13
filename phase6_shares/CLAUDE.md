@@ -9,7 +9,7 @@ down:
   - ./ITEM_MOVE_PLAN.md                            # Zusatzplan zu Step 7: Item-Verschieben (Ordner+Space) + Textfarben, P6-AD–P6-AJ
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-6 verbatim (sechs Eintraege), L3, kein Softcap
-updated: 2026-08-13, siebter -- (Step 7 Commit 0 verifiziert+dokumentiert+committet: app.js in zehn ES-Module gesplittet, 724 gruen, Tabu-Diff sauber, Golden-Path-Screenshots Oeffnen- vs. Anlegen-Pfad disambiguiert; Plan-Checkpoint nach Kontextbruch, kein Weiterbau in Commit 1 ohne Nikinger-Rueckmeldung)
+updated: 2026-08-13, siebter -- (Step 7 Commits 0+1 gebaut+verifiziert+committet: app.js in zehn ES-Module gesplittet, echter Ordnerbaum mit exaktem Filtern auf zwei Ebenen; 724 gruen, Tabu-Diff sauber; atomarer Checkpoint nach jedem Commit, Nikinger-Weisung)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -99,6 +99,7 @@ weiter ohne Build-Step (AC).
 | 7 | Verwaltung und Migration (Block B): `phase6_shares/scripts/spacectl.py` (neu — `create-space`/`list-spaces`/`show`/`add-member`/`remove-member`/`remove-space`/`check`), `phase6_shares/scripts/migrate_visibility.py` (neu — `--dry-run` Default, **kein** Versionssprung), `phase3_edge/scripts/diagnose.sh` Prüfung 12 (verwaiste/kaputte `.share.yml`-Referenzen über `spacectl.py check --json`, INFO/WARNUNG, kein Abbruchkriterium) | 6 | ✅ **gebaut, 2026-08-12** — Details, beide Plan-Abweichungen (DATA_ROOT-Auflösung, kein Index-Rebuild) und die Advisor-Runde davor: Session-Block unten. DoD-Live-Teil (realer dritter Nutzer, echter `diagnose.sh`-Lauf) bleibt Nikinger-Sache wie bei Steps 4/5 | +28 (20 `phase6_shares/tests/test_spacectl.py` [neu] + 8 `test_migrate_visibility.py` [neu]); 722 gesamt |
 | 8 | Lesbarkeit der Textfarben (`ITEM_MOVE_PLAN.md` §3, P6-AD/AE): `phase5_ui/webui/static/app.css` — `--text-muted`/`--text-faint` kalibriert angehoben, neues `--text-placeholder`, `.input::placeholder` darauf umgehängt. **Nachtrag, Nikinger-Feedback vor dem Deploy:** Wortmarke „sharefyx" + Versionsbadge (jetzt `v2.1`, `app.html`) sowie alle Versionsnummern aus den Dateien (`recent-row__meta`, `.editor__version`, `.version-band__number`, `ro-meta`) jetzt `var(--text)` statt `--text-faint`/`--text-muted` — neue Klasse `.version-num` trennt die Versionsnummer farblich vom gedämpften Begleittext im selben Element (`app.css`/`app.js`) | 7a | ✅ **gebaut, Deploy beim Nikinger** — Kontrastwerte bereits in `ITEM_MOVE_PLAN.md` §3.1 protokolliert (durchgerechnet vor dieser Session); Sichtprobe zweimal per In-Process-Server + Screenshot gegen die echte `app.css`/`app.js` (Login-Seite, Liste mit Chips, Editor mit Meta-Panel — alle drei beide Male gesehen, nicht behauptet). Deploy braucht Sudo für den Neustart, außerhalb dessen, was Claude Code selbst kann (Präzedenz: Steps-4–6-Cutover, `SESSIONS_ARCHIVE.md`) | 0 (P5-T: JS/CSS bleiben unit-ungetestet; `pytest` unverändert als Regressionsprobe — 724 gesamt vor UND nach beiden Teilen dieser Session, keiner davon neu) |
 | 9 | UI Dateisystem (Block B), Commit 0/7 — `app.js` (1525 Zeilen, ein `initShell()`-Closure) entlang der bestehenden Kommentar-Nahtstellen in zehn ES-Module unter `phase5_ui/webui/static/js/` aufgeteilt (`app`/`api`/`state`/`tree`/`list`/`editor`/`markdown`/`dialogs`/`toasts`/`updates`), `state.js` als einzelnes mutierbares Objekt (von allen Importern geteilt, Ersatz für den Closure-`state`), jedes Modul ein `init(deps)`, das der neue schlanke `app.js` beim Bootstrap der Reihe nach aufruft. Bisheriges Zwei-Skript-Modell (`js/updates.js` als globales Skript vor `app.js`, `window.SharefyxUpdates`) entfällt — `updates.js` ist jetzt selbst ein Modul, `app.html`/`pages.py` laden nur noch `<script type="module" src=".../js/app.js">`. `ui_budget.py` zählt die Nutzlast jetzt über `js/*.js`-Glob statt fester Namen | 7 | ✅ **gebaut, noch nicht deployt** — CSP (`script-src 'self'`) erlaubt Same-Origin-`type="module"` ohne Header-Änderung (V50 geschlossen); Sichtprobe golden path (Login → Liste → bestehendes Item öffnen+bearbeiten+speichern v1→v2 → neu anlegen) per Zwei-venv-Playwright-Skript, fünf Screenshots gesehen, nicht nur behauptet | 0 (P5-T: JS bleibt unit-ungetestet; fünf bestehende Tests in `test_static_routes.py` auf die neue Modulstruktur umgeschrieben, keiner neu; 724 gesamt unverändert) |
+| 10 | UI Dateisystem (Block B), Commit 1/7 — echter Ordnerbaum, kein Backend-Fund nötig (`GET /api/v1/items?folder=` existierte bereits, `GET /api/v1/spaces` trug `folders`/`members` schon, nur `app.js` rief die Route nie ab). `list.js :: loadOverview()` holt jetzt `/overview`+`/spaces` per `Promise.all`, mischt `folders`/`members` nach Name in die Space-Objekte. `tree.js`: `buildFolderTree()` (flache Pfadliste → ≤2-stufiger Baum, reines Splitten auf „/", da `MAX_FOLDER_DEPTH` serverseitig gilt), `renderRealFolders()` reused `.tree__folder` (neue Modifier-Klasse `.tree__realfolder--child` nur für die Einrückung der zweiten Ebene), `navigate()`/`navigateFolder()` jetzt exklusiv (`state.folder`/`state.filter` nie beide gesetzt). `list.js`: `filterParams()`/`renderCrumb()`/Leerzustand-Text folder-bewusst gemacht | 7 | ✅ **gebaut, noch nicht deployt** — Sichtprobe mit zwei echten, verschachtelten Ordnern (`Projekte`/`Projekte/Backend`, serverseitig zu `projekte`/`projekte/backend` slugifiziert, P6-Q — Baumdarstellung ist davon unabhängig, reine String-Weiterreichung): Verschachtelung im Baum sichtbar, Klick navigiert **und** filtert exakt (nicht Präfix, V55) auf beiden Ebenen, per Playwright-Assertions auf die tatsächlich gerenderten Zeilentitel erzwungen, nicht nur der Screenshot. Advisor-Fund vor dem Commit, geprüft statt blind gefixt: `navigateFolder()` setzt `state.filter=null`, `dialogs.js :: openCreateDialog()` liest `state.meta.buckets[state.filter]` ungeschützt — JS stringifiziert einen `null`-Schlüssel zu `"null"`, kein `TypeError`, derselbe Fallback-Pfad wie beim typlosen Bucket „Archiv" heute schon; per Node-Check UND echtem Browserlauf (Konsolenfehler-Listener, „+" während `projekte/backend` aktiv) bestätigt, **kein Fix nötig**. Offen für Commit 3 (folder-bewusstes Anlegen): der aktuelle Fallback „leerer Ordner → Typ Notiz" ist ein stiller Default, keine bewusste Entscheidung für echte Ordner | 0 (P5-T: JS bleibt unit-ungetestet, kein jsdom-Zusatzlauf — die echte Browserprobe deckt strenger ab; 724 gesamt unverändert) |
 
 ## Geerbte Contracts
 
@@ -157,3 +158,35 @@ Checkpoint nach einem Kontextbruch — nicht blind in Commit 1 weiterlaufen. Fü
 0 ist grün und deploybar (zusammen mit Step 7a, das weiterhin auf den Sudo-Neustart wartet); ob
 diese Session in Commit 1 (echter Ordnerbaum im Tree) weiterbaut oder hier für eine
 Nikinger-Rückmeldung pausiert, ist eine Scope-Entscheidung, keine technische.
+
+**Nachtrag, Commit 1/7 — echter Ordnerbaum, auf Nikinger-Weisung gebaut** ("Wenn alles grün ist,
+baut diese Session den nächsten Schritt, allerdings atomar nach jedem Schritt stoppen" — dieselbe
+Session, kein Kontextbruch, deshalb Nachtrag statt neuer Rotation). Umfang, Code, Verifikation:
+Modul-Tabelle oben, Zeile 10. Kein Backend-Fund, kein Backend-Commit — reiner Frontend-Schnitt wie
+geplant.
+
+**Advisor-Runde, zweimal, beide vor diesem Commit:** erste Runde bestätigte den Merge/die
+Baumlogik/die Exklusivität von `state.folder`/`state.filter`, benannte aber eine Lücke — die
+Sichtprobe deckte den Anlegen-Knopf **während ein echter Ordner aktiv ist** nicht ab, und
+`dialogs.js :: openCreateDialog()` (von diesem Commit nicht angefasst) liest
+`state.meta.buckets[state.filter]` ohne Guard. Nachgeprüft statt geglaubt: ein Node-Einzeiler
+zeigt, dass ein `null`-Objektschlüssel zu `"null"` stringifiziert wird (kein `TypeError`), und ein
+echter Browserlauf mit `pageerror`/`console`-Listener bestätigt das live — Dialog öffnet sauber,
+Typ fällt auf „Notiz" zurück, keine Konsolenfehler. **Zweite Runde bestand nur noch darauf, das
+korrekt zu benennen** (kein Fund, kein Fix — die erste Formulierung „TypeError" war die Vermutung
+des Advisors, nicht das tatsächliche Verhalten) und einen Satz für Commit 3 zu hinterlassen: der
+„Notiz"-Fallback für Ordner ohne Typbezug ist ein stiller Default, keine bewusste Wahl.
+
+**Verifiziert:** `pytest -q` 724 passed (env-gestrippt), unverändert. Tabu-Diff sauber (reiner
+`phase5_ui/webui/static/`-Diff: `app.css`, `js/{list,state,tree}.js`). Zwei-venv-Playwright-Lauf
+gegen ein Wegwerf-`DATA_ROOT` mit drei Items (kein Ordner, `projekte`, `projekte/backend`):
+Baum zeigt beide Ebenen korrekt eingerückt, Klick auf `projekte` filtert exakt auf
+„Projekt-Kickoff" (nicht auf das Backend-Item — bestätigt `search(folder=)`s Exaktheit statt
+Präfix, V55), Klick auf `projekte/backend` exakt auf „API-Design", „+" während `projekte/backend`
+aktiv öffnet den Dialog fehlerfrei. Alle Assertions am tatsächlich gerenderten DOM (Playwright-
+Locators auf `data-folder`/Zeilentitel), nicht nur Screenshots angesehen.
+
+**Nächster Schritt (konkret):** Checkpoint nach Nikinger-Weisung — Commit 1 ist fertig
+dokumentiert und wird jetzt committet, dann stoppt diese Session wieder für eine Rückmeldung
+(dieselbe atomare Taktung wie nach Commit 0). Commit 2 (Sichtbarkeits-Chip, reine Frontend-Anzeige,
+keine Backend-Änderung laut Plan) ist der nächste Kandidat, falls der Nikinger weiterbauen lässt.
