@@ -7,7 +7,7 @@ import { el } from "./toasts.js";
 import { api, reportUnexpectedError } from "./api.js";
 import { navigate, renderRail, bucketNames } from "./tree.js";
 import { selectItem } from "./editor.js";
-import { openMoveDialog } from "./dialogs.js";
+import { openMoveDialog, openShareDialog } from "./dialogs.js";
 
 var listCrumbEl;
 var listReadonlyEl;
@@ -257,6 +257,23 @@ export function renderList() {
         openMoveDialog(item);
       });
       li.appendChild(moveButton);
+
+      // Freigeben-Knopf (Step 7 Commit 5b) — dieselbe Geschwister-Regel wie der
+      // Verschieben-Knopf, aus demselben Grund (zwei `<button>` ineinander wäre ungültiges
+      // HTML). Dieselbe `movable`-Bedingung: nur ein eigenes, schreibbares Item lässt sich
+      // freigeben (eine UI-seitige Einschränkung, keine zusätzliche Serverregel — `_items_patch`
+      // selbst prüft `share_read`/`share_write`-Änderungen nicht auf Eigentümerschaft, siehe
+      // `api.py`s `folder`-Riegel-Kommentar; dieser Knopf zeigt bewusst nur den einfachsten,
+      // erwarteten Fall).
+      var shareButton = el("button", "list__row-share", "⇄");
+      shareButton.type = "button";
+      shareButton.title = "Freigeben";
+      shareButton.setAttribute("aria-label", "Freigeben");
+      shareButton.addEventListener("click", function (event) {
+        event.stopPropagation();
+        openShareDialog(item);
+      });
+      li.appendChild(shareButton);
 
       // Drag & Drop (Step 7 Commit 4) — die `<li>` ist der Ziehgriff, nicht `.list__row`,
       // damit ein Klick auf den Button weiterhin normal öffnet/navigiert; nur `dragstart`

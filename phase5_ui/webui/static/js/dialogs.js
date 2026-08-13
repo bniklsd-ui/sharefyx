@@ -6,14 +6,14 @@
 // gesteuert, kein eigener Zustand außerhalb dessen, was sie gerade anzeigen).
 
 import { state, TYPE_LABELS, activeSpaceWritable, spaceByName } from "./state.js";
-import { toast } from "./toasts.js";
+import { el, toast } from "./toasts.js";
 import { api, csrfToken } from "./api.js";
 import { navigate } from "./tree.js";
 import {
   loadEditorFromItem, clearDraft, updateVersionBand, afterWrite, handleWriteError,
   currentFormValues,
 } from "./editor.js";
-import { loadOverview, bucketFor, moveItemToFolder } from "./list.js";
+import { loadOverview, loadItems, bucketFor, moveItemToFolder } from "./list.js";
 
 var createDialogEl;
 var createTypeEl;
@@ -58,6 +58,18 @@ var moveFolderSelectEl;
 var moveSubmitEl;
 var moveCancelEl;
 var moveTargetItem = null;
+
+var shareDialogEl;
+var shareItemTitleEl;
+var shareErrorEl;
+var shareRowsEl;
+var shareReauthFieldsEl;
+var shareReauthPasswordEl;
+var shareReauthTotpEl;
+var shareSubmitEl;
+var shareCancelEl;
+var shareTargetItem = null;
+var pendingShareBody = null;
 
 // -- Rückfragedialog (ersetzt window.confirm) ----------------------------------------------
 
@@ -195,6 +207,84 @@ export function closeMoveDialog() {
   moveTargetItem = null;
 }
 
+// -- Freigeben (Step 7 Commit 5b) -------------------------------------------------------------
+// Ein PATCH mit `share_read`/`share_write` kann die effektive Lese-/Schreibmenge erweitern
+// (`webui.shares :: widens()`, Commit 5a) — der Server antwortet dann `403 reauth_required`
+// statt dem geänderten Item, statt es abzulehnen. `pendingShareBody` friert die Anfrage beim
+// ERSTEN Absenden ein (Advisor-Hinweis vor diesem Commit): eine Auswahländerung, während das
+// Re-Auth-Formular offen ist, darf nicht plötzlich eine andere Anfrage ausliefern als die, die
+// das Gate tatsächlich geprüft hat — nur `password`/`totp` werden bei jedem Versuch frisch aus
+// den Feldern gelesen, der Rest bleibt die eingefrorene erste Fassung.
+//
+// Nur Spaces, die dieser Actor bereits kennt (`state.spaces`, aus `/api/v1/spaces` — P6-V: eine
+// vollständige, ungefilterte Space-Liste gibt es für einen Menschen absichtlich nicht, Space-
+// Verwaltung bleibt CLI-only). Freigeben ist damit auf „mit einem bereits sichtbaren Space
+// teilen" begrenzt — ein bewusster, benannter Schnitt, kein Versehen.
+//
+// Kein `visibility`-Feld in diesem Dialog (Scope-Schnitt derselben Session, Advisor bestätigt):
+// der Chip zeigt `visibility` bereits an (Commit 2), niemand hat verlangt, sie aus der UI heraus
+// zu ändern — ein Freigabe-MATRIX-Dialog plus ein Re-Auth-Formular ist für einen Commit genug.
+
+function shareRowSelectValue(item, spaceName) {
+  if (item.share_write.indexOf(spaceName) !== -1) return "write";
+  if (item.share_read.indexOf(spaceName) !== -1) return "read";
+  return "";
+}
+
+export function openShareDialog(item) {
+  shareTargetItem = item;
+  pendingShareBody = null;
+  shareErrorEl.hidden = true;
+  shareReauthFieldsEl.hidden = true;
+  shareReauthPasswordEl.value = "";
+  shareReauthTotpEl.value = "";
+  shareItemTitleEl.textContent = item.title;
+  shareRowsEl.textContent = "";
+  state.spaces
+    .filter(function (space) { return space.name !== item.space; })
+    .forEach(function (space) {
+      var label = el("label", null, space.name);
+      var select = document.createElement("select");
+      select.className = "input";
+      select.dataset.space = space.name;
+      [["", "kein Zugriff"], ["read", "lesen"], ["write", "schreiben"]].forEach(function (pair) {
+        var opt = document.createElement("option");
+        opt.value = pair[0];
+        opt.textContent = pair[1];
+        select.appendChild(opt);
+      });
+      select.value = shareRowSelectValue(item, space.name);
+      label.appendChild(select);
+      shareRowsEl.appendChild(label);
+    });
+  shareDialogEl.hidden = false;
+}
+
+export function closeShareDialog() {
+  shareDialogEl.hidden = true;
+  shareTargetItem = null;
+  pendingShareBody = null;
+}
+
+function shareError(message) {
+  shareErrorEl.textContent = message;
+  shareErrorEl.hidden = false;
+}
+
+function collectShareBody(item) {
+  var shareRead = [];
+  var shareWrite = [];
+  // `write` reicht als alleiniger Eintrag in `share_write` — `acl.py :: decision_for()` bildet
+  // `read = grant.read | item_read | item_write`, ein Schreib-Grantee ist also automatisch auch
+  // lese-effektiv, ohne zusätzlich in `share_read` zu stehen (dieselbe Logik, die schon
+  // `visibilityChip()`s `share_read.concat(share_write)`-Dedupe in `list.js` voraussetzt).
+  Array.prototype.forEach.call(shareRowsEl.querySelectorAll("select"), function (select) {
+    if (select.value === "read") shareRead.push(select.dataset.space);
+    else if (select.value === "write") shareWrite.push(select.dataset.space);
+  });
+  return { version: item.version, share_read: shareRead, share_write: shareWrite };
+}
+
 // -- Konto: Passwort ändern (Block-A-Abnahmezeilen 5/6) --------------------------------------
 
 function openAccountDialog() {
@@ -256,6 +346,16 @@ export function init() {
   moveSubmitEl = document.getElementById("move-submit");
   moveCancelEl = document.getElementById("move-cancel");
 
+  shareDialogEl = document.getElementById("share-dialog");
+  shareItemTitleEl = document.getElementById("share-item-title");
+  shareErrorEl = document.getElementById("share-error");
+  shareRowsEl = document.getElementById("share-rows");
+  shareReauthFieldsEl = document.getElementById("share-reauth-fields");
+  shareReauthPasswordEl = document.getElementById("share-reauth-password");
+  shareReauthTotpEl = document.getElementById("share-reauth-totp");
+  shareSubmitEl = document.getElementById("share-submit");
+  shareCancelEl = document.getElementById("share-cancel");
+
   newFolderCancelEl.addEventListener("click", closeNewFolderDialog);
   newFolderSubmitEl.addEventListener("click", function () {
     var name = newFolderNameInputEl.value.trim();
@@ -291,6 +391,43 @@ export function init() {
       }
       if (err.message === "unauthenticated") return;
       toast(err.message || "Verschieben fehlgeschlagen.", "error");
+    });
+  });
+
+  shareCancelEl.addEventListener("click", closeShareDialog);
+  shareSubmitEl.addEventListener("click", function () {
+    var item = shareTargetItem;
+    if (!item) return;
+    shareErrorEl.hidden = true;
+    // Erste Fassung einfrieren, nicht bei jedem Versuch aus dem DOM neu bauen (Advisor-Hinweis)
+    // — nur `password`/`totp` kommen bei jedem Klick frisch aus den Feldern.
+    if (pendingShareBody === null) pendingShareBody = collectShareBody(item);
+    var body = Object.assign({}, pendingShareBody);
+    if (!shareReauthFieldsEl.hidden) {
+      body.password = shareReauthPasswordEl.value;
+      body.totp = shareReauthTotpEl.value;
+    }
+    api("/items/" + encodeURIComponent(item.id), {
+      method: "PATCH", body: JSON.stringify(body),
+    }).then(function () {
+      closeShareDialog();
+      return loadItems().then(loadOverview).then(function () { toast("Freigabe gespeichert."); });
+    }).catch(function (err) {
+      if (err.code === "reauth_required") {
+        shareReauthFieldsEl.hidden = false;
+        shareError(err.message);
+        shareReauthPasswordEl.focus();
+        return;
+      }
+      if (err.code === "conflict") {
+        shareError(
+          "Ein anderer Client hat dieses Item zwischenzeitlich geändert — bitte neu laden und "
+          + "erneut versuchen.",
+        );
+        return;
+      }
+      if (err.message === "unauthenticated") return;
+      shareError(err.message || "Freigeben fehlgeschlagen.");
     });
   });
 

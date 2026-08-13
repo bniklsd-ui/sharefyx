@@ -9,7 +9,7 @@ down:
   - ./ITEM_MOVE_PLAN.md                            # Zusatzplan zu Step 7: Item-Verschieben (Ordner+Space) + Textfarben, P6-AD–P6-AJ
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-6 verbatim (sechs Eintraege), L3, kein Softcap
-updated: 2026-08-13, siebter -- (Step 7 Commits 0+1+2+3+4+5a gebaut+verifiziert+committet: app.js in zehn ES-Module gesplittet, echter Ordnerbaum, Sichtbarkeits-Chip, Ordner anlegen+Verschieben per Menue (K4-Fix), Drag & Drop, Re-Auth-Gate Backend-Haelfte (5a, Freigabe-Dialog auf 5b verschoben -- Split-Begruendung im Session-Block, Advisor-Fund: password/totp duerfen nie in store.update() landen); Tabu-Diff-Regelfehler seit Commit 0 gefunden+korrigiert (P5-B statt P6-C geprueft, folgenlos); 746 gruen; atomarer Checkpoint nach jedem Commit, Nikinger-Weisung, ein Advisor-Aufruf pro Commit)
+updated: 2026-08-13, siebter -- (Step 7 Commits 0+1+2+3+4+5a+5b gebaut+verifiziert+committet: app.js in zehn ES-Module gesplittet, echter Ordnerbaum, Sichtbarkeits-Chip, Ordner anlegen+Verschieben per Menue (K4-Fix), Drag & Drop, Re-Auth-Gate Backend+Frontend (5a/5b, Split-Begruendung im Session-Block); Tabu-Diff-Regelfehler seit Commit 0 gefunden+korrigiert (P5-B statt P6-C geprueft, folgenlos); 746 gruen; atomarer Checkpoint nach jedem Commit, Nikinger-Weisung, ein Advisor-Aufruf pro Commit)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -104,6 +104,7 @@ weiter ohne Build-Step (AC).
 | 12 | UI Dateisystem (Block B), Commit 3/7 — Ordner anlegen + Verschieben per Menü, K4-Fix, erster echter Backend-Touch dieses Steps (P6-C erlaubt `storage/` explizit). `store.py :: ensure_folder(space, folder)` (neu, `mkdir(parents=True, exist_ok=True)` unter `self._lock`, kein Git-Commit, keine Content-Datei — reine Verzeichnisoperation). `api.py`: neue `POST /api/v1/spaces/{space}/folders` (Eigentümer-Riegel wie `_items_patch`s `folder`-Feld), `_items_post`-Whitelist um `"folder"` erweitert (K4). `tree.js`: „+ Ordner"-Zeile fürs eigene Space, öffnet `dialogs.js :: openNewFolderDialog()`. `list.js`: Verschieben-Knopf („→") pro Zeile — als GESCHWISTER von `.list__row`, nicht darin verschachtelt (zwei `<button>` ineinander ist ungültiges HTML), `<li>` deshalb neu Flex (`app.css`). `dialogs.js`: zwei neue Dialoge, `openNewFolderDialog()`/`openMoveDialog(item)`. `app.js`: kleine, dokumentierte Abweichung vom Plan-Dateiwortlaut — die beiden neuen Dialoge in `anyOverlayOpen()`/die Escape-Behandlung aufgenommen, dieselbe Konsistenz wie jeder andere Dialog hier | 7 | ✅ **gebaut, noch nicht deployt** — Details, beide Interpretationsentscheidungen und die zwei Advisor-Funde: Session-Block unten | +9 (4 `phase1_storage/tests/test_store.py`: `ensure_folder()` erstellt/idempotent/lehnt Tiefe>2 und leeren String ab + 5 `phase5_ui/tests/test_api.py`: `test_create_item_accepts_folder` [K4] + vier Endpunkt-Tests [erstellt sichtbaren leeren Ordner, lehnt fremden Space auch mit `write:`-Grant ab, lehnt Tiefe>2/reservierten Namen ab]); Charakterisierung erneut byte-identisch grün (P6-D); 733 gesamt |
 | 13 | UI Dateisystem (Block B), Commit 4/7 — Drag & Drop, additiv auf Commit 3, kein neuer Backend-Pfad (P6-AB: Menü-Knopf bleibt Pflicht-Alternative). `list.js :: moveItemToFolder(item, folder)` (neu, aus `dialogs.js`s bisher dort inline stehendem `PATCH`-Aufruf extrahiert — geteilter Schreibpfad für Menü UND Drag & Drop, Erfolgs-/Fehler-Rückmeldung bleibt bewusst bei den beiden Aufrufern statt mitextrahiert, weil der Menü-Pfad einen Dialog offen halten muss und der Drag-Pfad keinen hat). `list.js`: `<li>` (nicht der Button) trägt `draggable`/`dragstart`/`dragend`, dieselbe `movable`-Bedingung wie der Menü-Knopf. `tree.js`: neue `bindFolderDropTarget()`, `dragover`/`dragleave`/`drop` nur auf `folderButton()`-Knoten im **eigenen** Space (`space.own`) — der Server lehnt fremde `folder`-Änderungen ohnehin ab, das Gating hier ist reine UX. `app.css`: Ziehgriff-Cursor + gedimmte Zeile während des Ziehens, gestrichelte Kontur am Drop-Ziel (bewusst optisch von `[aria-current]` unterschieden) | 7 | ✅ **gebaut, noch nicht deployt** — Details, inkl. des Refactor-Regressionsbeweises: Session-Block unten | 0 (P5-T: JS bleibt unit-ungetestet; 733 gesamt unverändert — Playwright-`drag_to()`-Lauf statt jsdom, siehe Session-Block, ist Entwicklungshilfe dieser Session, kein Teil der Suite) |
 | 14 | UI Dateisystem (Block B), Commit 5a/7 — Re-Auth-Gate (Backend-Hälfte, P6-N), Freigabe-Dialog/Re-Auth-Mini-Formular auf Commit 5b verschoben (Session-Block begründet den Split). `storage/acl.py`: `AclDecision` bekommt rohe `share_read`/`share_write` (Defaults, bestehende Konstruktionsstellen unverändert). `webui/shares.py` (neu): `ShareState`, `widens()` (echte Obermenge auf `AclDecision.read`/`.write`, `visibility` fließt strukturell nie ein), `require_share_reauth()` (wirft `ApiError("reauth_required")`, Signatur um `body`/`userdir`/`throttle`/`auth_store` erweitert — die Plan-Skizze in §1.2.5 deckt die tatsächliche Credential-Prüfung nicht ab). `webui/errors.py`: elfter Code `reauth_required:403`. `webui/api.py :: _items_patch`: `before`/`after`-`ShareState` aus `acl`/Body gebaut, Gate läuft VOR `store.update()`; `password`/`totp` werden unabhängig vom Gate-Ausgang nie an `store.update()` weitergereicht (Advisor-Fund, sonst Frontmatter-Leck, Hard Rule 1); `api_routes()` bekommt sechsten Parameter `users: UserDirectory`. `mcpserver/app.py` zieht mit `oauth.users` nach | 7 | ✅ **gebaut, noch nicht deployt** — Details, Advisor-Fund und der Commit-5a/5b-Split: Session-Block unten | +13 (8 `phase6_shares/tests/test_shares.py` [neu, `widens()`-Wahrheitstabelle] + 5 `phase5_ui/tests/test_api.py` [Gate ausgelöst ohne/mit falschen Credentials, Gate erfüllt+Credential-Leck-Check, keine Auslösung bei Verkleinerung/reiner Inhaltsänderung]); Kollateralkorrekturen (kein neuer Test): `phase5_ui/tests/{conftest,test_overview}.py` + drei `test_api.py`-Fixtures um `confirmed_users` als sechstes `api_routes()`-Argument ergänzt, ein `mock_store.acl_reader.decision_for.return_value` gesetzt (unkonfigurierter `MagicMock` scheitert an `>` mit `TypeError`, nachgeprüft); `phase5_ui/scripts/{ui_budget,ui_smoke}.py` zogen ihre eigenen `api_routes()`-Aufrufe nach, beide real gegen ein Temp-`DATA_ROOT` gelaufen (12/12 bzw. `all_within_budget:true`); 746 gesamt |
+| 15 | UI Dateisystem (Block B), Commit 5b/7 — Freigabe-Dialog + Re-Auth-Mini-Formular, kein Backend-Fund nötig (Gate seit Commit 5a live). `list.js`: neuer „⇄"-Freigeben-Knopf, GESCHWISTER von `.list__row`/`.list__row-move` (dieselbe Nested-Button-Regel), dieselbe `movable`-Bedingung. `dialogs.js`: `openShareDialog()`/`closeShareDialog()` (Picker aus `state.spaces`, drei-stufiges `<select>` pro fremdem Space: kein Zugriff/lesen/schreiben — `schreiben` impliziert `lesen` bereits über `decision_for()`s Vereinigung, keine doppelte Eintragung), `collectShareBody()`, Submit-Handler mit eingefrorenem `pendingShareBody` (Advisor-Vorgabe: erste Fassung beim ersten Absenden fixiert, nur `password`/`totp` werden bei jedem Retry frisch gelesen). `app.html`: `#share-dialog` (statische Hülle, `pw-field`/`pw-toggle` von `initPasswordToggles()` automatisch erfasst, kein neuer JS-Code dafür). `app.js`: `#share-dialog` in `anyOverlayOpen()`/Escape aufgenommen (dieselbe dokumentierte Abweichung wie Commit 3). `app.css`: `.list__row-share` teilt sich die Regel mit `.list__row-move`. **Bewusster Scope-Schnitt (Advisor bestätigt):** kein `visibility`-Feld im Dialog — der Chip zeigt sie bereits, niemand hat eine UI-Änderung dafür verlangt | 7 | ✅ **gebaut, noch nicht deployt** — Details, Advisor-Bestätigung und die Zwei-venv-Playwright-Verifikation: Session-Block unten | 0 (P5-T: JS/HTML/CSS bleiben unit-ungetestet; 746 gesamt unverändert, reiner Frontend-Commit — Tabu-Diff bestätigt nur `phase5_ui/webui/static/`) |
 
 ## Geerbte Contracts
 
@@ -438,3 +439,63 @@ Markup, `pw-field`/`pw-toggle`-Muster wiederverwendet) ist der nächste Kandidat
 eine UI-Designentscheidung, die dieser Commit bewusst nicht selbst getroffen hat: wie ein Mensch
 ein Freigabeziel (eine andere Space) benennt (freies Textfeld vs. eine Auswahl aus bekannten
 Spaces). Danach bleiben laut Plan nur noch Commit 6 (`space_admin_enabled`-Stub, klein) übrig.
+
+**Nachtrag, Commit 5b/7 — Freigabe-Dialog + Re-Auth-Formular, auf Nikinger-Weisung gebaut** (die
+offene UI-Designfrage aus Commit 5a beantwortet: „ich würde sagen ein Picker (z.B. Dropdown Menü)
+ist intuitiv" — als drei-stufiges `<select>` pro Space umgesetzt, nicht als Dropdown-Multiselect,
+Begründung unten). Umfang, Code, Verifikation: Modul-Tabelle oben, Zeile 15.
+
+**Advisor-Aufruf vor dem Schreiben, drei Punkte bestätigt/präzisiert, keiner davon ein Fund:**
+1. **Picker-Quelle bestätigt:** `state.spaces` (aus `/api/v1/spaces`, nur sichtbare Spaces) ist
+   die einzig verfügbare Datenquelle — kein Endpunkt liefert einem Menschen die volle,
+   ungefilterte Space-Liste (P6-V, Space-Verwaltung bleibt CLI-only). Freigeben ist damit auf
+   „mit einem bereits sichtbaren Space teilen" begrenzt — benannter Scope, keine Lücke.
+2. **Drei-stufiges Select statt zwei Checkboxen bestätigt:** `acl.py :: decision_for()` bildet
+   `read = grant.read | item_read | item_write` — ein Schreib-Grantee ist automatisch auch
+   lese-effektiv. Zwei unabhängige Checkboxen hätten einen Zustand zulassen können ("schreiben"
+   an, "lesen" aus), den der Server so nicht unterscheiden kann. Ein Select mit genau drei
+   Werten (kein Zugriff/lesen/schreiben) macht diesen Zustand unrepräsentierbar.
+3. **Eingefrorener Body bestätigt und gebaut:** der Retry MUSS dieselbe Anfrage senden, die das
+   Gate tatsächlich geprüft hat — eine Auswahländerung während das Re-Auth-Formular offen ist,
+   darf keine andere Anfrage ausliefern. `pendingShareBody` wird beim ersten Absenden einmal aus
+   dem DOM gebaut und danach nur noch um frisch gelesene `password`/`totp` ergänzt, nie neu
+   aufgebaut.
+
+**TOTP-Replay-Frage vom Advisor gestellt, im Code beantwortet statt vermutet:** greift die
+Wiederverwendungssperre, wenn ein Mensch beim ersten Versuch ein falsches Passwort UND einen
+gültigen TOTP-Code eingibt, dann beim zweiten Versuch mit richtigem Passwort denselben (noch
+gültigen) Code erneut sendet? Nachgeprüft an `reauth.py :: verify_reauth()`:
+`store.set_totp_counter(...)` steht NACH dem `if not (password_ok and totp_ok): return False`
+—Rückgabe. Ein Code wird also nur dann als verbraucht markiert, wenn die GESAMTE Prüfung
+erfolgreich war, nie bei einem Teilfehlschlag. Ein falsches Passwort mit richtigem Code
+verbraucht den Code also NICHT — der zweite Versuch mit demselben Code UND dem jetzt richtigen
+Passwort validiert normal. Kein Fund, keine Änderung nötig; die eigene Testverifikation dieser
+Session (falsches Passwort, dann korrekte Zugangsdaten in einem frischen 30-Sekunden-Fenster)
+bestätigt das Verhalten, ohne die Grenzfrage selbst zu treffen.
+
+**Nested-Button-Risiko, geprüft statt nur befolgt:** der neue „⇄"-Knopf sitzt wie der
+Verschieben-Knopf auf einer seit Commit 4 `draggable`-`<li>` — drei interaktive Kinder auf
+derselben Ziehfläche. `event.stopPropagation()` auf dem Klick reicht aus (dieselbe Disziplin wie
+beim Verschieben-Knopf), per echtem Browserlauf bestätigt: ein Klick auf „Freigeben" öffnet den
+Dialog zuverlässig, kein versehentlich ausgelöster Drag.
+
+**Verifiziert:** `pytest -q` **746 passed** (env-gestrippt), unverändert — reiner
+`phase5_ui/webui/static/`-Diff (`app.css`, `app.html`, `js/{app,dialogs,list}.js`), kein
+Backend-Fund nötig. Tabu-Diff sauber. Zwei-venv-Playwright-Lauf gegen ein Wegwerf-`DATA_ROOT`
+(zwei Spaces, einer davon per `.share.yml` bereits sichtbar): Freigeben-Dialog öffnet, Picker
+zeigt den zweiten Space; „schreiben" gewählt (ein echter Widen) → `403 reauth_required` →
+Re-Auth-Formular erscheint, Dialog bleibt offen; falsches Passwort → weiterhin abgelehnt, Dialog
+bleibt offen, kein stiller Durchlass; korrekte Zugangsdaten (echtes TOTP-Fenster 31s nach dem
+Login-Code, derselbe Replay-Grund wie `test_api.py`s `clock.advance(31)`) → Dialog schließt,
+Chip zeigt „geteilt mit fabian". **Gegenprobe auf der echten Platte, nicht nur der UI geglaubt:**
+die reale Frontmatter-Datei trägt `share_write: [fabian]`, Version sprang 1→2 in EINEM Schritt —
+die beiden zurückgewiesenen Versuche schrieben nachweislich nichts. Kein `pageerror` während des
+gesamten Laufs; die beiden Playwright-„Konsolenfehler" waren Chromiums eigenes Netzwerk-Log für
+die erwarteten 403-Antworten (dieselbe, aus Commit 5a bekannte Unterscheidung, diesmal von
+Anfang an korrekt gefiltert statt erst hinterher erklärt).
+
+**Nächster Schritt (konkret):** Checkpoint nach Nikinger-Weisung — Commit 5b ist fertig
+dokumentiert und wird jetzt committet, dann stoppt diese Session wieder für eine Rückmeldung.
+Damit ist der Re-Auth-Gate-Umfang aus dem ursprünglichen Plan-Commit-5 vollständig (5a+5b). Nur
+noch Commit 6 (`space_admin_enabled`-Stub, `config.py`/`app.html`, klein, „falls Zeit reicht")
+steht laut Plan aus, danach ist Step 7 vollständig.

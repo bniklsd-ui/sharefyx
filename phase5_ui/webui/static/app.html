@@ -207,6 +207,30 @@
   </div>
 </div>
 
+<div class="overlay" id="share-dialog" hidden>
+  <div class="overlay__panel">
+    <h2>Freigeben</h2>
+    <p class="overlay__hint" id="share-item-title"></p>
+    <p class="form-error" id="share-error" hidden></p>
+    <div id="share-rows"></div>
+    <div id="share-reauth-fields" hidden>
+      <label>Passwort
+        <span class="pw-field">
+          <input type="password" class="input" id="share-reauth-password" autocomplete="current-password">
+          <button type="button" class="btn pw-toggle" data-target="share-reauth-password" aria-pressed="false">Anzeigen</button>
+        </span>
+      </label>
+      <label>Code aus der Authenticator-App
+        <input type="text" class="input" id="share-reauth-totp" autocomplete="one-time-code">
+      </label>
+    </div>
+    <div class="overlay__actions">
+      <button type="button" class="btn-primary" id="share-submit">Speichern</button>
+      <button type="button" class="btn" id="share-cancel">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="conflict-dialog" hidden>
   <div class="overlay__panel">
     <h2>Konflikt</h2>

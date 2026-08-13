@@ -460,7 +460,7 @@ select.input {
   border-left-color: var(--accent);
 }
 
-.list__row-move {
+.list__row-move, .list__row-share {
   align-self: center;
   flex-shrink: 0;
   width: 28px;
@@ -476,7 +476,7 @@ select.input {
   font-size: 15px;
   cursor: pointer;
 }
-.list__row-move:hover { color: var(--text); background: var(--line); }
+.list__row-move:hover, .list__row-share:hover { color: var(--text); background: var(--line); }
 
 /* Drag & Drop (Step 7 Commit 4) — Pflicht-Alternative bleibt der Menü-Knopf oben (P6-AB),
    dies ist nur der Ziehgriff-Cursor + eine gedimmte Zeile während des Ziehens selbst. */

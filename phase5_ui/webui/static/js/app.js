@@ -10,7 +10,7 @@ import * as List from "./list.js";
 import * as Editor from "./editor.js";
 import {
   init as initDialogs, pendingConfirmCancel, hideConflictDialog, closeCreateDialog,
-  closeNewFolderDialog, closeMoveDialog,
+  closeNewFolderDialog, closeMoveDialog, closeShareDialog,
 } from "./dialogs.js";
 import { init as initUpdates } from "./updates.js";
 
@@ -103,6 +103,10 @@ function initShell() {
   // stillschweigend inkonsistente Tastaturbedienung, kein kleinerer Eingriff.
   var newFolderDialogEl = document.getElementById("new-folder-dialog");
   var moveDialogEl = document.getElementById("move-dialog");
+  // Step 7 Commit 5b, dieselbe dokumentierte Abweichung wie Commit 3 oben (app.js steht nicht
+  // auf der Plan-Dateiliste dieses Commits) — derselbe Grund: konsistente Tastaturbedienung für
+  // jeden Overlay-Dialog, kein Sonderfall für den neuen.
+  var shareDialogEl = document.getElementById("share-dialog");
   var confirmDialogEl = document.getElementById("confirm-dialog");
   var accountDialogEl = document.getElementById("account-dialog");
   var detailEditorEl = document.getElementById("detail-editor");
@@ -110,8 +114,8 @@ function initShell() {
 
   function anyOverlayOpen() {
     return !conflictDialogEl.hidden || !createDialogEl.hidden || !newFolderDialogEl.hidden
-      || !moveDialogEl.hidden || !confirmDialogEl.hidden || !accountDialogEl.hidden
-      || !updateLogDialogEl.hidden;
+      || !moveDialogEl.hidden || !shareDialogEl.hidden || !confirmDialogEl.hidden
+      || !accountDialogEl.hidden || !updateLogDialogEl.hidden;
   }
 
   document.addEventListener("keydown", function (event) {
@@ -129,6 +133,7 @@ function initShell() {
       else if (!createDialogEl.hidden) closeCreateDialog();
       else if (!newFolderDialogEl.hidden) closeNewFolderDialog();
       else if (!moveDialogEl.hidden) closeMoveDialog();
+      else if (!shareDialogEl.hidden) closeShareDialog();
       else if (!updateLogDialogEl.hidden) updateLogDialogEl.hidden = true;
       else if (!accountDialogEl.hidden) accountDialogEl.hidden = true;
       else if (state.selectedId !== null) Editor.closeEditor();
