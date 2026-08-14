@@ -67,6 +67,24 @@ hier `tools.py` anfasst, ist in der falschen Phase.
 | 7 | Runbooks, `diagnose.sh`, Cloudflare-Rückbau | 6 | ✅ | 0 (Runbook/Skript, keine automatisierten Tests laut Plan) |
 | 8 | Live-Abnahme (Nikinger) | 7 | ✅ **13/13 live** — Zeile 6 (2026-07-29, unbeabsichtigter Reboot), Zeile 12 (P4 Step 0), Zeile 13 (2026-08-02, `restore_check.sh` vom Nikinger selbst gegen das frischeste Bundle bestätigt, `ok:true`), B3–B6 dokumentiert, V9 live geschlossen, Token-Rotation live bestätigt (2026-07-28) | — |
 
+**[2026-08-14 Live-Fund, Post-Deploy-Check nach dem v2.1-Release]:** `diagnose.sh`s Prüfung 9
+(Alter des letzten Auth-Backups) meldete beim Nikinger-Lauf fälschlich „keine Generation —
+`sudo systemctl start sharefyx-authbackup.service`", obwohl das Backup real gelaufen war
+(`journalctl -u sharefyx-authbackup` derselben Nacht: `"generations":7,"verified":true`).
+Ursache: `authbackup.sh` läuft bewusst als root (muss `auth.sqlite3` aus dem StateDirectory
+lesen + den root-only `systemd-creds`-Hostschlüssel benutzen), das Zielverzeichnis erbt daher
+`0700 root:root` — ein unprivilegierter `diagnose.sh`-Lauf (der dokumentierte Normalfall, „kein
+sudo nötig") bekam bei `find` lautlos „Permission denied" (`2>/dev/null` verschluckte es),
+`$newest` blieb leer, die WARNUNG war eine Verwechslung von „nicht geprüft" mit „geprüft, leer".
+Behoben nach demselben Muster wie Prüfung 8 direkt darüber (`[[ -r ... ]]`-Gate): eine dritte
+Fallunterscheidung (unlesbar → `INFO`, echte Handlungsaufforderung nur noch bei tatsächlich
+leerem, aber lesbarem Verzeichnis). Kein automatisierter Test (Skript hat laut Plan keine, siehe
+Modul-Status Zeile 7). Live gegengeprüft: unprivilegierter Lauf zeigt jetzt `INFO ... nicht
+lesbar (als root aufrufen ...)` statt der falschen `WARNUNG`, `sudo`-Lauf bliebe unverändert
+korrekt. `pytest -q` weiterhin 747/747 (reine Bash-Änderung, kein Python berührt). Gefunden
+während der Post-Deploy-Verifikation von Phase 6 Step 7/7a (`phase6_shares/CLAUDE.md`), hier
+statt dort dokumentiert, weil `diagnose.sh` P3-Eigentum ist.
+
 **[2026-07-29 Korrektur, P4 Step 7]:** Zeile 5 nennt „systemd-Units" — `sharefyx-mcp.service`
 ist davon inzwischen nicht mehr eine. Die MCP-Unit zog nach `phase4_auth/systemd/` um (Plan §5
 Step 7: „ERSETZT die P3-Fassung", inhaltlich jetzt eine P4-Unit — `StateDirectory`, zweites

@@ -103,8 +103,20 @@ fi
 
 # 9) Wann lief das letzte Auth-Backup? (P5 Step 8, P5-R. Ein Backup-Timer, der seit Wochen still
 #    ist, fällt sonst erst auf, wenn man das Backup braucht.)
+#
+# **[2026-08-14 Korrektur, Live-Fund beim Post-Deploy-Check]:** `authbackup.sh` läuft bewusst
+# OHNE `User=`/`Group=` (root) -- siehe dessen eigener Kommentar: es muss `auth.sqlite3` aus dem
+# StateDirectory lesen und `systemd-creds encrypt --with-key=host` (root-only Schlüssel)
+# aufrufen. Das Zielverzeichnis selbst erbt daher `0700 root:root`. Ein unprivilegierter
+# `diagnose.sh`-Lauf (der Normalfall -- ohne `sudo`) bekam bei `find` bisher lautlos "Permission
+# denied" (`2>/dev/null` verschluckt es), `$newest` blieb leer, und das Skript meldete
+# fälschlich "keine Generation" samt dem Vorschlag, den Dienst neu zu starten -- obwohl das
+# Backup real lief (`journalctl -u sharefyx-authbackup` zeigte zum Fundzeitpunkt
+# `"generations":7,"verified":true` von derselben Nacht). Derselbe Lesbarkeits-Check wie
+# Prüfung 8 oben (`[[ -r ... ]]`) unterscheidet jetzt "nicht geprüft, weil kein root" von
+# "geprüft, keine Generation gefunden" -- Letzteres bleibt eine echte WARNUNG.
 auth_backup_dir="/var/lib/sharefyx-backup/auth"
-if [[ -d "$auth_backup_dir" ]]; then
+if [[ -r "$auth_backup_dir" ]]; then
   newest="$(find "$auth_backup_dir" -maxdepth 1 -name 'auth-*.cred' 2>/dev/null | sort | tail -n1)"
   if [[ -n "$newest" ]]; then
     echo "INFO jüngstes Auth-Backup: $(basename "$newest") ($(date -u -r "$newest" +%Y-%m-%dT%H:%M:%SZ))" >&2
@@ -112,6 +124,9 @@ if [[ -d "$auth_backup_dir" ]]; then
     echo "WARNUNG: $auth_backup_dir existiert, enthält aber keine Generation —" \
          "sudo systemctl start sharefyx-authbackup.service" >&2
   fi
+elif [[ -d "$auth_backup_dir" ]]; then
+  echo "INFO Auth-Backup: $auth_backup_dir nicht lesbar (als root aufrufen für diese Prüfung," \
+       "z.B. 'sudo $0') — Verzeichnis existiert, Generationen sind 0700 root:root" >&2
 else
   echo "WARNUNG: kein Auth-Backup-Verzeichnis ($auth_backup_dir) —" \
        "sudo systemctl enable --now sharefyx-authbackup.timer" >&2

@@ -9,7 +9,7 @@ down:
   - ./ITEM_MOVE_PLAN.md                            # Zusatzplan zu Step 7: Item-Verschieben (Ordner+Space) + Textfarben, P6-AD–P6-AJ
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-7 verbatim (sieben Eintraege), L3, kein Softcap
-updated: 2026-08-14, achter + drei Nachtraege -- (Step 7 vollstaendig: Commits 0-6 inkl. 5a/5b-Split, siebter-Block rotiert; Pre-Deploy-Testschwelle vor v2.1 -- 747 pytest + 3 Smoke-Skripte + neu 30/30 echter Browser-E2E [Playwright, Scratchpad, nicht im Repo] gegen Step 7/7a, vier Harness-Fehler unterwegs gefunden+korrigiert, keine Produktbugs, UPDATE_LOG-Datumsluecke dem Nikinger vorgelegt+akzeptiert; Werkzeug-Ergonomie: die irrefuehrende patch_item-Fehlermeldung behoben (keine nummerierte Liste, Korrektur zum eigenen vorigen Nachtrag), fuenf Vormerkungspunkte bleiben offen; Gate B blockiert Step 8 architektonisch, noch nicht deployt)
+updated: 2026-08-14, achter + vier Nachtraege -- (Step 7 vollstaendig: Commits 0-6 inkl. 5a/5b-Split, siebter-Block rotiert; Pre-Deploy-Testschwelle vor v2.1 -- 747 pytest + 3 Smoke-Skripte + 30/30 echter Browser-E2E gegen Step 7/7a, vier Harness-Fehler gefunden+korrigiert; Werkzeug-Ergonomie: irrefuehrende patch_item-Fehlermeldung behoben, fuenf Punkte offen; **v2.1 deployt** (Release 20260814T201901.099704Z, SHA 70973a14), Post-Deploy: 30/30 Browser-E2E gegen die tatsaechlich deployten Bytes + Asset-Reachability-Checks gegen den echten Dienst, kein Live-Write; diagnose.sh-Live-Fund [falsche Auth-Backup-WARNUNG] behoben in phase3_edge/; Gate B braucht jetzt noch echte Nutzer/Fabian, nicht mehr den Deploy)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -312,3 +312,33 @@ ausdrücklich beauftragt (anders als beim Flag selbst, das bewusst nicht vorwegg
 lokalen Repo, nie von GitHub (`SHAREFYX_SOURCE_REPO`-Default), aber sinnvolles Backup, da diese
 VM sonst die einzige Kopie dieser Historie ist. Auf Nikinger-Wunsch, kein `--force`, reiner
 Fast-Forward.
+
+**Nachtrag, 2026-08-14 — v2.1 deployt, Post-Deploy-Verifikation.** Nikinger-Deploy erfolgreich:
+Release `/opt/sharefyx/releases/20260814T201901.099704Z`, SHA `70973a14` (=`HEAD`), Health-Gate
+bestanden, `diagnose.sh` „alle Prüfungen bestanden". **Kein Live-Write gegen den echten
+`DATA_ROOT`/die echte `auth.sqlite3`** (Advisor-Vorgabe, verworfen: ein `authctl.py invite`-
+Testspace hätte einen permanenten Commit in der echten Historie hinterlassen, kein Löschen im
+Kern-API — genau die Kostenkategorie, die P6-W für Step 10 bewusst als eigene Aufgabe vorsieht,
+kein Nebenprodukt eines Smoke-Tests). Stattdessen zwei read-only-sichere Schritte:
+1. **Der Browser-E2E-Lauf aus dem vorigen Nachtrag erneut, diesmal gegen die tatsächlich
+   deployten Bytes** (`UiSettings.static_dir` auf `.../releases/20260814T201901.099704Z/phase5_ui/
+   webui/static` gesetzt, sonst identischer Aufbau — temp `DATA_ROOT`, temp `AuthStore`, alpha/
+   beta-Fixtures). **30/30 grün**, dazu `diff -rq` zwischen `static/` im Release und im
+   Arbeitsverzeichnis leer, `git -C <release> rev-parse HEAD` == `70973a14` — der Release-Ordner
+   ist beweisbar identisch mit dem committeten Stand, nicht nur vermutlich.
+2. **Alle elf statischen Assets einzeln gegen den echten laufenden Dienst geprüft**
+   (`curl .../ui/static/{app.css,js/*.js}`) — 200 + korrekter MIME-Typ auf jede einzelne Datei,
+   `app.html` trägt `v2.1` und `<script type="module">`. `/ui/` ohne Sitzung → `303` (Redirect-
+   Gate greift wie erwartet).
+
+**Live-Fund, kein Produktbug — Doku-/Ops-Fix in `phase3_edge/scripts/diagnose.sh`:** Prüfung 9
+(Auth-Backup-Alter) log eine falsche `WARNUNG` beim Nikinger-eigenen, unprivilegierten Lauf
+(„keine Generation", obwohl real `"generations":7,"verified":true"` lief) — Ursache und Fix
+in `phase3_edge/CLAUDE.md`, dort dokumentiert (P3-Eigentum). `pytest -q` 747/747 unverändert.
+
+**Was das NICHT beweist, ausdrücklich benannt:** echte Nutzer, echte Spaces, ein echter Connector,
+Drag & Drop im tatsächlichen Browser des Nikingers oder Fabians. Das ist **Gate B**
+(Abnahmezeilen 8–18) — braucht beide Menschen live, kein Ergebnis, das eine Claude-Code-Session
+erzeugen kann. Der Nikinger hat angekündigt, die Werkzeuge selbst im Alltag zu testen — das ist
+der eigentliche nächste Beweis, dieser Nachtrag liefert nur „das deployte Artefakt verhält sich
+unter einem echten Browser gegen Fixture-Daten korrekt", keine Live-Abnahme.
