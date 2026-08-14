@@ -1,6 +1,6 @@
 ---
 status: live
-purpose: L3-Archiv der Phase-6-Session-Bloecke -- Steps 0-7 (Haushalt, Werkzeug-Ergonomie, Betrieb, Update-Log/Banner, Storage-Fundament, Rechtepolitik, Verwaltung/Migration + Live-Cutover, UI Dateisystem Commits 0-6), verbatim aus phase6_shares/CLAUDE.md verschoben
+purpose: L3-Archiv der Phase-6-Session-Bloecke -- Steps 0-7 (Haushalt, Werkzeug-Ergonomie, Betrieb, Update-Log/Banner, Storage-Fundament, Rechtepolitik, Verwaltung/Migration + Live-Cutover, UI Dateisystem Commits 0-6 + Pre-/Post-Deploy-Verifikation von v2.1), verbatim aus phase6_shares/CLAUDE.md verschoben
 read-when: Historie einer bereits abgeschlossenen Phase-6-Teilarbeit nachvollziehen -- nicht beim normalen Sessionstart lesen
 detail: L3
 up: ../phase6_shares/CLAUDE.md
@@ -37,6 +37,192 @@ updated: 2026-08-14
 > greift nur bei ≥2 Blöcken im Kopf; hier lag genau einer vor, also von Hand nach derselben
 > Byte-Identitäts-Disziplin durchgeführt: verbatim per `sed` extrahiert, hier eingefügt, danach
 > gegen das Original byte-für-byte geprüft (siehe Verifikationskommando im selben Commit).
+> **Siebte Rotation (2026-08-14, derselbe Tag, nach dem v2.1-Deploy):** derselbe Auslöser ein
+> drittes Mal — der "achter"-Block sammelte über den Tag vier Nachträge (Pre-Deploy-
+> Testschwelle, Werkzeug-Ergonomie-Fix, UPDATE_LOG-Eintrag, Post-Deploy-Verifikation) plus
+> UI-Feedback in den Vormerkungen, ~48 KB. Wieder genau ein Block im Kopf, wieder von Hand nach
+> derselben Disziplin: verbatim per `sed` extrahiert, hier eingefügt, byte-für-byte gegen das
+> Original geprüft.
+
+## Session stopped — 2026-08-14, achter — (Step 7 vollständig, Rotation, Werkzeug-Feedback vorgemerkt)
+
+**Step 7 (UI Dateisystem, Block B) ist mit Commit 6 vollständig** — alle sieben Sub-Commits
+(0–4, 5a, 5b, 6, der Plan zählt 5a+5b als den einen Commit 5) gebaut, verifiziert, committet.
+Voller Verlauf, jeder einzelne Commit mit Code/Verifikation/Advisor-Funden:
+`SESSIONS_ARCHIVE.md`, Block „siebter" (frisch rotiert, dieser Commit). Kurzfassung: `app.js` in
+zehn ES-Module gesplittet · echter Ordnerbaum · Sichtbarkeits-Chip · Ordner anlegen+Verschieben
+per Menü (K4-Fix) · Drag & Drop · Re-Auth-Gate (Backend `webui/shares.py`/`AclDecision`-
+Erweiterung, Frontend Freigabe-Dialog) · `space_admin_enabled`-Stub. 747 Tests grün, Tabu-Diff
+gegen die korrekte P6-C-Liste sauber bei jedem einzelnen Commit. **Noch nicht deployt** — Step 7a
+(Textfarben-Token) wartet ebenfalls weiter auf den Sudo-Neustart des Nikingers.
+
+**Rotation durchgeführt, diese Session:** der „siebter"-Block hatte acht Nachträge angesammelt,
+~61 KB, weit über dem 40KB-Softcap. Das Rotationsskript (`scripts/rotate_session_block.sh`)
+greift nur bei ≥2 Blöcken im Kopf; hier lag genau einer vor, deshalb von Hand nach derselben
+Byte-Identitäts-Disziplin: verbatim per `sed` extrahiert, in `SESSIONS_ARCHIVE.md` eingefügt,
+Körper (alles außer der bewusst präzisierten Titelzeile, gleiche Praxis wie die zweite Rotation)
+byte-für-byte gegen das Original verglichen, `diff` lief leer. Herleitung + Rotationsvermerk:
+`SESSIONS_ARCHIVE.md`s Kopf, „Sechste Rotation".
+
+**Werkzeug-Ergonomie-Feedback vorgemerkt, nicht gebaut:** eine arbeitende Claude-Instanz meldete
+nach einem sitzungsreichen Protokollierungstag sechs Punkte zu den MCP-Tools selbst (Bulk-Append,
+`list_spaces`-Auffindbarkeit, `patch_item`-vs-`update_item`-Abgrenzung, `get_item`s immer-voller
+Body, undokumentierte Status-Enum-Werte, `patch_item`s irreführende Fehlermeldung bei einem
+Frontmatter-Zugriffsversuch) — vollständig in „Vormerkungen" oben festgehalten, Kurzfassung in
+Root-`CLAUDE.md`s „Noch nicht entschieden". Betrifft `mcpserver/tools.py`, außerhalb des
+Step-7-Scopes, nichts davon in dieser Session verändert.
+
+**Verifiziert (Rotation selbst):** `diff` zwischen dem extrahierten Originalblock und seiner
+neuen Position in `SESSIONS_ARCHIVE.md` leer (Körper), die übrigen fünf archivierten Blöcke
+unverändert (`diff` gegen den alten Archivstand ebenfalls leer). `pytest` nicht erneut gelaufen
+(reine Doku-Operation, keine Code-Änderung seit Commit 6s eigener Verifikation — 747 gesamt).
+
+**Nächster Schritt (konkret):** Deploy von Step 7 ist die größte offene Live-Aufgabe der Phase —
+eine bewusste Nikinger-Entscheidung, wann, kein beiläufiger Nebeneffekt eines Commits. Danach:
+Step 8 (Bilder, Block C) oder das vorgemerkte Werkzeug-Ergonomie-Feedback, Priorisierung liegt
+beim Nikinger. Rotationsprüfung für die nächste Session: dieser Kopf trägt jetzt wieder genau
+einen, kompakten Session-Block — kein weiterer Rotationsbedarf, bis er selbst wieder wächst.
+
+**Nachtrag, 2026-08-14 — Pre-Deploy-Testschwelle vor v2.1 (Nikinger-Auftrag „test everything
+possible in throwaway instances"):** vor dem gebündelten Deploy von Step 7 + Step 7a einmal
+alles Erreichbare geprüft, nicht nur `pytest` behauptet. Vier Ebenen: `pytest` (747/747, keine
+Drift), die drei bestehenden Smoke-Skripte (`mcp_smoke.py` 13/13, `oauth_smoke.py` 11/11,
+`ui_smoke.py` 12/12 — alle gegen ein temporäres `DATA_ROOT`/`AuthStore`, nie das echte), und
+**neu:** ein echter Browser-E2E-Lauf gegen eine temporäre, TLS-terminierte `uvicorn`-Instanz
+(Playwright, headless Chromium), weil die ersten drei Ebenen die zehn seit Step 7 gesplitteten
+JS-Module (`app.js` → zehn Dateien) nie tatsächlich ausführen — `pytest` ist Python, `ui_smoke.py`
+läuft über `httpx.ASGITransport`, keins von beiden rendert eine Seite. Skripte
+(`throwaway_server.py`, `e2e_step7.py`) bewusst **nicht** ins Repo übernommen — dieselbe
+Disziplin wie die jsdom-/Playwright-Simulationen aus P5 Step 10/11/13 (Scratchpad, nicht
+versioniert), gedeckt durch P5-T (JS bleibt laut Plan unit-ungetestet, kein Build-Step).
+`playwright==1.62.0` lokal ins Projekt-`.venv` installiert (kein Download nötig, Chromium-Build
+war bereits unter `~/.cache/ms-playwright` gecacht, sichtbar an Commit 5bs eigener Erwähnung
+einer Playwright-Verifikation) — kein Repo-Code importiert es, berührt also auch den
+`pytest`-Lauf im Deploy-Release nicht.
+
+**Ergebnis, zwei stabile Läufe hintereinander: 30/30 Prüfungen grün**, viele davon gegen
+Server-Wahrheit gegengeprüft statt nur gegen "der Dialog hat sich geschlossen" — Ordner-
+Verschieben per Menü UND per Drag & Drop landet tatsächlich auf der Platte, der No-op-Drop-Guard
+(benannter Advisor-Fund aus Commit 4) bumpt wirklich keine Version, ein falsches Re-Auth am
+Freigeben-Dialog schreibt nachweislich nichts (Version unverändert), ein richtiges landet genau
+einen PATCH (`version_before + 1`, `share_write=['beta']`), der Sichtbarkeits-Chip springt
+sichtbar auf „geteilt mit beta", die Textfarben aus Step 7a bestehen 16,5:1 gegen ihren
+tatsächlich gemalten Hintergrund (WCAG-AA-Schwelle 4,5:1), und der fremde Space `beta` zeigt
+`+`/`+ Ordner` nachweislich **nicht im DOM**, nicht nur `hidden` (P5-Abnahmezeile 12, derselbe
+Code-Pfad `activeSpaceWritable()`, der am 2026-08-13 zweimal traf).
+
+**Nebenfund, korrigiert eine Aussage aus Commit 4s eigener Commit-Message:** die dortige Notiz
+nannte nur Commit 5b als real-browser-verifiziert. Mit diesem Lauf sind Drag & Drop UND der
+No-op-Drop-Guard aus Commit 4 jetzt ebenfalls über einen echten (headless) Chromium bestätigt —
+`page.mouse.down/move/up` reichte aus, Chromium synthetisiert daraus die nativen HTML5-
+Drag-Events selbst, kein `DragEvent`-Konstrukt nötig.
+
+**Vier Harness-Fehler unterwegs gefunden und korrigiert, festgehalten als wiederverwendbares
+Wissen für den nächsten, der diesen Aufbau erneut braucht:**
+1. Fehlender `static_routes()`-Mount → jede statische Datei `404` — `ui_smoke.py` navigiert nie
+   real, ein echter Browser schon.
+2. `wait_for_selector("...[hidden]")` wartet per Default auf „sichtbar" — ein Element mit
+   `hidden`-Attribut kann das nie erfüllen, braucht `state="attached"`.
+3. Der „Bucket"-Filter in der Liste filtert nach Typ, nicht nach Ordner — ein bereits
+   verschobenes Item bleibt im alten Bucket sichtbar und sortiert (nach `-updated`) sogar zuerst.
+   Ein blindes `.first` als Drag-Quelle traf deshalb zuerst das falsche (schon verschobene) Item
+   — `tree.js`s No-op-Drop-Guard (Commit-4-Advisor-Fund) griff korrekt und tat nichts, was wie
+   ein Bug aussah, aber keiner war. Quelle jetzt über Server-Wahrheit (`folder == ""`) gewählt,
+   nicht blind über Listenposition.
+4. Zwei Prüfungen waren anfangs Tautologien (`count() >= 0`; ein globaler Selektor, der auch
+   das eigene, immer gerenderte „+ Ordner" des eigenen Space traf, unabhängig vom aktiven
+   Space) — beide auf echte, falsifizierbare Aussagen umgestellt (Kontrast gegen den
+   tatsächlich gemalten Vorfahren statt gegen reines Schwarz; Zähl-Erwartung auf „genau 1, für
+   Alpha" statt „0").
+
+**Zwei Punkte dem Nikinger vorgelegt, einer akzeptiert:**
+- `docs/UPDATE_LOG.md`s oberster Eintrag stand auf `2026-08-13`, zum Zeitpunkt der Prüfung war
+  bereits `2026-08-14` — `deploy.sh`s P6-X-Gate bricht ohne einen auf den Deploy-Tag datierten
+  obersten Eintrag ab. **Vom Nikinger akzeptiert** (kein neuer Eintrag von Claude Code
+  geschrieben — welcher Änderungstext dort steht, ist eine Autorenentscheidung des Nikingers,
+  kein Rateversuch), Deploy-Tag entscheidet, welches Datum tatsächlich hinein muss.
+- Ein gebündeltes Deploy aus Step 7 + Step 7a bedeutet: `deploy.sh`s Auto-Rollback nimmt bei
+  einem Health-Gate-Fehlschlag beide zusammen zurück. Nikinger-Entscheidung, mitgetragen.
+
+**Verifiziert:** `pytest -q` 747/747 (Baseline, vor jeder Änderung dieser Session). Alle drei
+Smoke-Skripte grün (Zahlen oben). Browser-E2E 30/30, zwei Läufe hintereinander stabil. Kein
+Produktcode in dieser Teilsession geändert (`git status` vor dem folgenden Werkzeug-Ergonomie-
+Fix leer) — reine Verifikation, kein Fund, der einen Fix gebraucht hätte, bis auf den eigenen
+Harness (oben, nie Produktcode).
+
+**Nächster Schritt (aktualisiert):** Deploy bleibt beim Nikinger. Block C (Step 8, Bilder) ist
+architektonisch durch **Gate B** blockiert (`docs/concepts/phase6_shares_plan.md` §4, „🚦 GATE B" —
+Niklas allein, danach eine gemeinsame Sitzung mit Fabian, dritter Space live, Abnahmezeilen
+8–18) — dieses Gate braucht den echten Deploy und echte Live-Sitzungen, keine Claude-Code-Session
+kann es passieren. Der Deploy ist damit die entsperrende Aktion für Gate B, nicht etwas, das sich
+durch mehr Vorab-Arbeit umgehen lässt. Was **nicht** hinter Gate B liegt und heute noch bearbeitet
+werden kann: die vorgemerkte Werkzeug-Ergonomie-Feedback-Liste (`mcpserver/tools.py` ist laut
+P6-C offen) — siehe eigener Nachtrag unten für den einen Punkt, der in dieser Session bereits
+behoben wurde.
+
+**Nachtrag, 2026-08-14 — Werkzeug-Ergonomie: die irreführende `patch_item`-Fehlermeldung
+behoben.** **Korrekturnotiz zum vorigen Nachtrag:** dort stand „Punkt 6" — es gibt keine
+nummerierte Liste, der Bug ist die im Vormerkungen-Abschnitt gesondert hervorgehobene, schärfere
+Lesart von Punkt 3 (`patch_item` vs. `update_item` nirgends zusammengefasst), keine siebte,
+eigenständige Position. `mcpserver/tools.py :: map_storage_error()` gab bei `PatchError.found
+== 0` bisher „lies das Item neu mit get_item und prüfe den exakten Text" zurück — klingt nach
+einem Textmatching-Problem, obwohl `patch_item` Frontmatter-Felder kategorisch nie erreicht
+(operiert ausschließlich auf dem Body-String); ein erneutes Lesen hätte in diesem Fall nie
+geholfen. **Minimalster Fix, kein Feature:** die Meldung nennt jetzt den tatsächlichen Grund
+(„patch_item durchsucht nur den Body-Text, nie das Frontmatter") und die konkrete Alternative
+(„für title/status/tags/due/links/folder/visibility/share_read/share_write nutze update_item")
+— **keine** Frontmatter-Erkennungs-Logik ergänzt (Advisor-Vorgabe: `patch_item` kennt
+Frontmatter nicht, eine Heuristik über `old_text`s vermutete Herkunft wäre Raten, kein Wissen).
+Bestehender Test `test_patch_item_zero_match_error_maps_to_patch_failed_tool_error`
+(`phase2_mcp/tests/test_tools.py`) um zwei Assertions erweitert (`"Body-Text"`, `"update_item"`
+in der Meldung), kein neuer Test nötig — reine Textänderung an derselben Fehlerklasse.
+`pytest phase2_mcp/tests/test_tools.py` 40/40, volle Suite weiterhin 747/747 (keine neuen
+Tests, nur erweiterte Assertions). Die übrigen fünf Vormerkungspunkte (Bulk-Append,
+`list_spaces`-Auffindbarkeit, `get_item_meta`, Status-Enum-Dokumentation, Suchtreffer-
+Zuverlässigkeit) bleiben unverändert offen — größerer Zuschnitt, nicht in dieser Session
+angefasst.
+
+**Nachtrag, 2026-08-14 — UPDATE_LOG.md-Flag geschlossen, Deploy heute:** der Nikinger deployt
+v2.1 noch am selben Tag, damit ist die vorher offene Datumslücke gegenstandslos — neuer,
+oberster Eintrag `## 2026-08-14` in `docs/UPDATE_LOG.md` ergänzt (drei Zeilen: echte Ordner
++Verschieben, Sichtbarkeits-Anzeige pro Notiz, Freigeben-Knopf mit Re-Auth bei Erweiterung),
+Wortlaut diesmal von Claude Code formuliert statt offengelassen — der Nikinger hat das
+ausdrücklich beauftragt (anders als beim Flag selbst, das bewusst nicht vorweggenommen wurde).
+`deploy.sh`s P6-X-Gate ist damit ohne `SHAREFYX_ALLOW_STALE_UPDATELOG=1` passierbar. Zusätzlich
+`git push` (lokal 11 Commits vor `origin/main`) — technisch nicht nötig, `deploy.sh` klont vom
+lokalen Repo, nie von GitHub (`SHAREFYX_SOURCE_REPO`-Default), aber sinnvolles Backup, da diese
+VM sonst die einzige Kopie dieser Historie ist. Auf Nikinger-Wunsch, kein `--force`, reiner
+Fast-Forward.
+
+**Nachtrag, 2026-08-14 — v2.1 deployt, Post-Deploy-Verifikation.** Nikinger-Deploy erfolgreich:
+Release `/opt/sharefyx/releases/20260814T201901.099704Z`, SHA `70973a14` (=`HEAD`), Health-Gate
+bestanden, `diagnose.sh` „alle Prüfungen bestanden". **Kein Live-Write gegen den echten
+`DATA_ROOT`/die echte `auth.sqlite3`** (Advisor-Vorgabe, verworfen: ein `authctl.py invite`-
+Testspace hätte einen permanenten Commit in der echten Historie hinterlassen, kein Löschen im
+Kern-API — genau die Kostenkategorie, die P6-W für Step 10 bewusst als eigene Aufgabe vorsieht,
+kein Nebenprodukt eines Smoke-Tests). Stattdessen zwei read-only-sichere Schritte:
+1. **Der Browser-E2E-Lauf aus dem vorigen Nachtrag erneut, diesmal gegen die tatsächlich
+   deployten Bytes** (`UiSettings.static_dir` auf `.../releases/20260814T201901.099704Z/phase5_ui/
+   webui/static` gesetzt, sonst identischer Aufbau — temp `DATA_ROOT`, temp `AuthStore`, alpha/
+   beta-Fixtures). **30/30 grün**, dazu `diff -rq` zwischen `static/` im Release und im
+   Arbeitsverzeichnis leer, `git -C <release> rev-parse HEAD` == `70973a14` — der Release-Ordner
+   ist beweisbar identisch mit dem committeten Stand, nicht nur vermutlich.
+2. **Alle elf statischen Assets einzeln gegen den echten laufenden Dienst geprüft**
+   (`curl .../ui/static/{app.css,js/*.js}`) — 200 + korrekter MIME-Typ auf jede einzelne Datei,
+   `app.html` trägt `v2.1` und `<script type="module">`. `/ui/` ohne Sitzung → `303` (Redirect-
+   Gate greift wie erwartet).
+
+**Live-Fund, kein Produktbug — Doku-/Ops-Fix in `phase3_edge/scripts/diagnose.sh`:** Prüfung 9
+(Auth-Backup-Alter) log eine falsche `WARNUNG` beim Nikinger-eigenen, unprivilegierten Lauf
+(„keine Generation", obwohl real `"generations":7,"verified":true"` lief) — Ursache und Fix
+in `phase3_edge/CLAUDE.md`, dort dokumentiert (P3-Eigentum). `pytest -q` 747/747 unverändert.
+
+**Was das NICHT beweist, ausdrücklich benannt:** echte Nutzer, echte Spaces, ein echter Connector,
+Drag & Drop im tatsächlichen Browser des Nikingers oder Fabians. Das ist **Gate B**
+(Abnahmezeilen 8–18) — braucht beide Menschen live, kein Ergebnis, das eine Claude-Code-Session
+erzeugen kann. Der Nikinger hat angekündigt, die Werkzeuge selbst im Alltag zu testen — das ist
+der eigentliche nächste Beweis, dieser Nachtrag liefert nur „das deployte Artefakt verhält sich
+unter einem echten Browser gegen Fixture-Daten korrekt", keine Live-Abnahme.
 
 ## Session stopped — 2026-08-13, siebter — (Step 7 vollständig: Commits 0–6, JS-Split bis `space_admin_enabled`-Stub)
 
