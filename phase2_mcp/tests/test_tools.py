@@ -524,6 +524,12 @@ def test_patch_item_zero_match_error_maps_to_patch_failed_tool_error(tools_map, 
     assert "patch_failed" in message
     assert "edits[0]" in message
     assert "0 Treffer" in message
+    # Werkzeug-Ergonomie-Fund (2026-08-14): der alte Text ("lies das Item neu") suggerierte ein
+    # Textmatching-Problem, obwohl die häufigste reale Ursache ein Frontmatter-Feld ist, das
+    # patch_item kategorisch nie erreicht -- die Meldung muss das jetzt sagen, statt zu einem
+    # Re-Read zu raten, der nie hilft.
+    assert "Body-Text" in message
+    assert "update_item" in message
 
 
 def test_patch_item_multi_match_error_names_the_lines(tools_map, store):

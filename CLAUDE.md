@@ -302,9 +302,11 @@ P2 Step 2 — siehe P2-Plan §0.4 Punkt L).
   eine irreführende Fehlermeldung, kein reines Ergonomie-Wunsch:** `patch_item` auf einem
   Frontmatter-Feld liefert „0 Treffer — lies das Item neu" (klingt nach Textmatching-Problem),
   obwohl die Ursache kategorisch ist (`patch_item` erreicht Frontmatter grundsätzlich nicht) —
-  ein erneutes Lesen hätte nie geholfen. Betrifft ausschließlich `mcpserver/tools.py`
-  (P6-C erlaubt das, aber außerhalb des laufenden Step-7-Scopes), noch nicht geplant. Volltext:
-  `phase6_shares/CLAUDE.md`, Abschnitt „Vormerkungen".
+  ein erneutes Lesen hätte nie geholfen. **[2026-08-14 behoben]** dieser eine Befund (Text nennt
+  jetzt die Ursache + `update_item` als Alternative, keine Frontmatter-Erkennungslogik ergänzt);
+  die übrigen fünf Punkte bleiben offen, betreffen ausschließlich `mcpserver/tools.py` (P6-C
+  erlaubt das), noch nicht geplant. Volltext: `phase6_shares/CLAUDE.md`, Abschnitt
+  „Vormerkungen".
 
 **[2026-08-02 Korrektur, P5-Planungssession]:** der bis dahin offene Punkt „Web-UI: Neubau gegen
 die REST-API vs. Adaption des `Notizheft_example.html`" ist entschieden — **Neubau mit Ernte**

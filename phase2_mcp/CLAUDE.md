@@ -287,6 +287,15 @@ Statuswort — kein Tool-Fehler, sondern ein Vokabular-Missverständnis, das die
 Beschreibung allein nicht behebt (die erlaubten Werte stehen dort nicht aufgezählt). Report 2
 (`links`) hat keine Vokabular-Falle — `links` ist eine freie Liste ohne `*_VALUES`-Whitelist.
 
+**[2026-08-14 Korrektur, P6-Vormerkung]:** `tools.py :: map_storage_error()`s Text für
+`PatchError.found == 0` („lies das Item neu mit get_item und prüfe den exakten Text") war
+irreführend bei einem Frontmatter-Zugriffsversuch — `patch_item` erreicht Frontmatter
+kategorisch nie (operiert nur auf dem Body-String), ein erneutes Lesen hilft in diesem Fall nie.
+Text nennt jetzt die tatsächliche Ursache und verweist auf `update_item`, keine
+Frontmatter-Erkennungslogik ergänzt. Bestehender Test um zwei Assertions erweitert, kein neuer
+Test. **Gesamt weiterhin 114 Tests.** Volle Herleitung: `phase6_shares/CLAUDE.md`s
+Session-Block, Nachtrag „Werkzeug-Ergonomie".
+
 ## Geerbte Contracts
 
 Aus P1 (`phase1_storage/CLAUDE.md`, `docs/concepts/phase1_storage_plan.md` §1/§2): Frontmatter-

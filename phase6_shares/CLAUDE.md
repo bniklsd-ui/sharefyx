@@ -9,7 +9,7 @@ down:
   - ./ITEM_MOVE_PLAN.md                            # Zusatzplan zu Step 7: Item-Verschieben (Ordner+Space) + Textfarben, P6-AD–P6-AJ
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-7 verbatim (sieben Eintraege), L3, kein Softcap
-updated: 2026-08-14, achter + zwei Nachtraege -- (Step 7 vollstaendig: Commits 0-6 inkl. 5a/5b-Split, siebter-Block rotiert; Pre-Deploy-Testschwelle vor v2.1 -- 747 pytest + 3 Smoke-Skripte + neu 30/30 echter Browser-E2E [Playwright, Scratchpad, nicht im Repo] gegen Step 7/7a, vier Harness-Fehler unterwegs gefunden+korrigiert, keine Produktbugs, UPDATE_LOG-Datumsluecke dem Nikinger vorgelegt+akzeptiert; Werkzeug-Ergonomie Punkt 6 [irrefuehrende patch_item-Fehlermeldung] behoben, fuenf Punkte bleiben Vormerkung; Gate B blockiert Step 8 architektonisch, noch nicht deployt)
+updated: 2026-08-14, achter + drei Nachtraege -- (Step 7 vollstaendig: Commits 0-6 inkl. 5a/5b-Split, siebter-Block rotiert; Pre-Deploy-Testschwelle vor v2.1 -- 747 pytest + 3 Smoke-Skripte + neu 30/30 echter Browser-E2E [Playwright, Scratchpad, nicht im Repo] gegen Step 7/7a, vier Harness-Fehler unterwegs gefunden+korrigiert, keine Produktbugs, UPDATE_LOG-Datumsluecke dem Nikinger vorgelegt+akzeptiert; Werkzeug-Ergonomie: die irrefuehrende patch_item-Fehlermeldung behoben (keine nummerierte Liste, Korrektur zum eigenen vorigen Nachtrag), fuenf Vormerkungspunkte bleiben offen; Gate B blockiert Step 8 architektonisch, noch nicht deployt)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -278,3 +278,25 @@ durch mehr Vorab-Arbeit umgehen lässt. Was **nicht** hinter Gate B liegt und he
 werden kann: die vorgemerkte Werkzeug-Ergonomie-Feedback-Liste (`mcpserver/tools.py` ist laut
 P6-C offen) — siehe eigener Nachtrag unten für den einen Punkt, der in dieser Session bereits
 behoben wurde.
+
+**Nachtrag, 2026-08-14 — Werkzeug-Ergonomie: die irreführende `patch_item`-Fehlermeldung
+behoben.** **Korrekturnotiz zum vorigen Nachtrag:** dort stand „Punkt 6" — es gibt keine
+nummerierte Liste, der Bug ist die im Vormerkungen-Abschnitt gesondert hervorgehobene, schärfere
+Lesart von Punkt 3 (`patch_item` vs. `update_item` nirgends zusammengefasst), keine siebte,
+eigenständige Position. `mcpserver/tools.py :: map_storage_error()` gab bei `PatchError.found
+== 0` bisher „lies das Item neu mit get_item und prüfe den exakten Text" zurück — klingt nach
+einem Textmatching-Problem, obwohl `patch_item` Frontmatter-Felder kategorisch nie erreicht
+(operiert ausschließlich auf dem Body-String); ein erneutes Lesen hätte in diesem Fall nie
+geholfen. **Minimalster Fix, kein Feature:** die Meldung nennt jetzt den tatsächlichen Grund
+(„patch_item durchsucht nur den Body-Text, nie das Frontmatter") und die konkrete Alternative
+(„für title/status/tags/due/links/folder/visibility/share_read/share_write nutze update_item")
+— **keine** Frontmatter-Erkennungs-Logik ergänzt (Advisor-Vorgabe: `patch_item` kennt
+Frontmatter nicht, eine Heuristik über `old_text`s vermutete Herkunft wäre Raten, kein Wissen).
+Bestehender Test `test_patch_item_zero_match_error_maps_to_patch_failed_tool_error`
+(`phase2_mcp/tests/test_tools.py`) um zwei Assertions erweitert (`"Body-Text"`, `"update_item"`
+in der Meldung), kein neuer Test nötig — reine Textänderung an derselben Fehlerklasse.
+`pytest phase2_mcp/tests/test_tools.py` 40/40, volle Suite weiterhin 747/747 (keine neuen
+Tests, nur erweiterte Assertions). Die übrigen fünf Vormerkungspunkte (Bulk-Append,
+`list_spaces`-Auffindbarkeit, `get_item_meta`, Status-Enum-Dokumentation, Suchtreffer-
+Zuverlässigkeit) bleiben unverändert offen — größerer Zuschnitt, nicht in dieser Session
+angefasst.

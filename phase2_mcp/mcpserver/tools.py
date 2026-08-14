@@ -187,9 +187,19 @@ def map_storage_error(exc: Exception) -> ToolError:
         # ValidationError (P6-F), soll aber den spezifischeren "patch_failed"-Text bekommen,
         # nicht das generische "invalid: ...".
         if exc.found == 0:
+            # Werkzeug-Ergonomie-Feedback (2026-08-14, phase6_shares/CLAUDE.md "Vormerkungen"):
+            # der alte Text ("lies das Item neu") klingt nach einem Textmatching-Problem und
+            # verleitet zu genau der Aktion, die nie hilft, wenn old_text tatsächlich ein
+            # Frontmatter-Feld meinte — patch_item erreicht Frontmatter kategorisch nie, ein
+            # erneutes Lesen ändert daran nichts. Der neue Text nennt die tatsächliche Ursache
+            # (Bereich) statt eine falsche zu suggerieren (Texttreffer), ohne alt_text selbst
+            # gegen eine Frontmatter-Feldliste zu prüfen — patch_item kennt Frontmatter nicht,
+            # eine Heuristik hier würde nur eine Vermutung über alt_texts Herkunft raten.
             return ToolError(
-                f"patch_failed: edits[{exc.index}] fand 0 Treffer — lies das Item neu mit "
-                "get_item und prüfe den exakten Text"
+                f"patch_failed: edits[{exc.index}] fand 0 Treffer — patch_item durchsucht nur "
+                "den Body-Text, nie das Frontmatter. Prüfe mit get_item, ob old_text exakt so "
+                "im Body steht; für title/status/tags/due/links/folder/visibility/share_read/"
+                "share_write nutze stattdessen update_item"
             )
         shown = ", ".join(str(n) for n in exc.lines)
         if exc.found > len(exc.lines):
