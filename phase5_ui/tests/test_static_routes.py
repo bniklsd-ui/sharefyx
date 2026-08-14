@@ -132,6 +132,18 @@ def test_app_html_contains_no_inline_style_attribute():
     assert "style=" not in html
 
 
+def test_app_html_has_a_disabled_manage_spaces_stub():
+    """Step 7 Commit 6 (`space_admin_enabled`-Seam, P6-Plan) — der Menüpunkt existiert und ist
+    hart `disabled` (nicht bloß versteckt), `config.py`s gleichnamiges Feld hat noch keine
+    Laufzeitwirkung (app.html ist eine statische Datei, kein Templating) und wird erst in
+    Phase 7 verdrahtet, siehe der Feldkommentar dort."""
+    html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
+    match = re.search(r'<button[^>]*id="account-manage-spaces"[^>]*>([^<]*)</button>', html)
+    assert match is not None, "Menüpunkt 'Geteilte Spaces verwalten' fehlt"
+    assert "disabled" in match.group(0)
+    assert "kommt in Phase 7" in match.group(1)
+
+
 def test_app_js_makes_no_external_requests():
     for name in _JS_MODULES:
         js = (DEFAULT_STATIC_DIR / "js" / f"{name}.js").read_text("utf-8")

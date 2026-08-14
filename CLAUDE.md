@@ -291,6 +291,20 @@ P2 Step 2 — siehe P2-Plan §0.4 Punkt L).
   Ordnermodell (P6 Step 4) geplant werden. Nächste Planungssession dafür ist mit Opus vorgesehen.
   Scoping-Stichpunkte + der bereits geklärte Git-Historie-Punkt (ein Repo für den ganzen
   `DATA_ROOT`, kein Cross-Repo-Problem): `phase6_shares/CLAUDE.md`s Session-Block vom selben Tag.
+- **MCP-Werkzeug-Ergonomie, Live-Feedback einer arbeitenden Claude-Instanz** (Nikinger-Meldung,
+  2026-08-14, nach einem sitzungsreichen Protokollierungstag — 40+ `append_to_item`-Aufrufe für
+  ein einziges Log-Dokument) — sechs Punkte: kein Bulk-Append, `list_spaces` in der eigenen
+  Tool-Exploration nicht auffindbar genug (führte zur falschen Aussage „Claude kann nur im
+  eigenen Space schreiben"), `patch_item`-vs-`update_item`-Aufgabenteilung nirgends
+  zusammengefasst, `get_item` liefert immer den vollen Body (kein `get_item_meta` nur für
+  Frontmatter/Version), Status-Enum-Werte nicht in der Tool-Beschreibung dokumentiert (Ratefehler
+  „archiviert" statt „archived"), gelegentlich unzuverlässige Suchtreffer. **Ein Befund davon ist
+  eine irreführende Fehlermeldung, kein reines Ergonomie-Wunsch:** `patch_item` auf einem
+  Frontmatter-Feld liefert „0 Treffer — lies das Item neu" (klingt nach Textmatching-Problem),
+  obwohl die Ursache kategorisch ist (`patch_item` erreicht Frontmatter grundsätzlich nicht) —
+  ein erneutes Lesen hätte nie geholfen. Betrifft ausschließlich `mcpserver/tools.py`
+  (P6-C erlaubt das, aber außerhalb des laufenden Step-7-Scopes), noch nicht geplant. Volltext:
+  `phase6_shares/CLAUDE.md`, Abschnitt „Vormerkungen".
 
 **[2026-08-02 Korrektur, P5-Planungssession]:** der bis dahin offene Punkt „Web-UI: Neubau gegen
 die REST-API vs. Adaption des `Notizheft_example.html`" ist entschieden — **Neubau mit Ernte**

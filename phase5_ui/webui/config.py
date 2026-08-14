@@ -45,3 +45,8 @@ class UiSettings:
     hsts: bool = True
     static_dir: Path = field(default=DEFAULT_STATIC_DIR)
     update_log_path: Path = field(default=DEFAULT_UPDATE_LOG_PATH)
+    # Seam ohne Implementierung (Step 7 Commit 6, P6-Plan): kommt erst in Phase 7 zum Tragen.
+    # `app.html`s Menüpunkt ist unabhängig davon hart `disabled` (statische Datei, kein
+    # Templating) — dieses Feld existiert nur, damit eine künftige Phase nicht bei null anfängt,
+    # dieselbe Kategorie wie P5-Z (Format-Seam ohne Implementierung).
+    space_admin_enabled: bool = False
