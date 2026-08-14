@@ -9,6 +9,11 @@
      (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
+## 2026-08-14
+- Echte Ordner: anlegen und Notizen per Menü oder per Ziehen (Drag & Drop) hineinverschieben.
+- Jede Notiz zeigt jetzt an, ob sie privat ist oder mit welchem Space sie geteilt ist.
+- Neuer "Freigeben"-Knopf pro Notiz — wird eine Freigabe dabei erweitert, fragt sharefyx zur Sicherheit noch einmal Passwort und Code ab.
+
 ## 2026-08-13
 - Grauer Text (Platzhalter, Meta-Angaben, Versionsband) ist jetzt deutlich besser lesbar — Kontrast auf WCAG AA angehoben.
 - Der Schriftzug "sharefyx" oben links samt Versionsnummer (jetzt v2.1) und alle Versionsnummern deiner Dateien sind jetzt weiß statt grau.

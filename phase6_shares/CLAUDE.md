@@ -300,3 +300,15 @@ Tests, nur erweiterte Assertions). Die übrigen fünf Vormerkungspunkte (Bulk-Ap
 `list_spaces`-Auffindbarkeit, `get_item_meta`, Status-Enum-Dokumentation, Suchtreffer-
 Zuverlässigkeit) bleiben unverändert offen — größerer Zuschnitt, nicht in dieser Session
 angefasst.
+
+**Nachtrag, 2026-08-14 — UPDATE_LOG.md-Flag geschlossen, Deploy heute:** der Nikinger deployt
+v2.1 noch am selben Tag, damit ist die vorher offene Datumslücke gegenstandslos — neuer,
+oberster Eintrag `## 2026-08-14` in `docs/UPDATE_LOG.md` ergänzt (drei Zeilen: echte Ordner
++Verschieben, Sichtbarkeits-Anzeige pro Notiz, Freigeben-Knopf mit Re-Auth bei Erweiterung),
+Wortlaut diesmal von Claude Code formuliert statt offengelassen — der Nikinger hat das
+ausdrücklich beauftragt (anders als beim Flag selbst, das bewusst nicht vorweggenommen wurde).
+`deploy.sh`s P6-X-Gate ist damit ohne `SHAREFYX_ALLOW_STALE_UPDATELOG=1` passierbar. Zusätzlich
+`git push` (lokal 11 Commits vor `origin/main`) — technisch nicht nötig, `deploy.sh` klont vom
+lokalen Repo, nie von GitHub (`SHAREFYX_SOURCE_REPO`-Default), aber sinnvolles Backup, da diese
+VM sonst die einzige Kopie dieser Historie ist. Auf Nikinger-Wunsch, kein `--force`, reiner
+Fast-Forward.
