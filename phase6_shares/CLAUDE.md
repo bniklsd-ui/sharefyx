@@ -8,8 +8,8 @@ down:
   - ../docs/concepts/phase6_shares_plan.md         # voller Plan, Entscheidungen P6-A–P6-AC, Steps 0–10
   - ./ITEM_MOVE_PLAN.md                            # Zusatzplan zu Step 7: Item-Verschieben (Ordner+Space) + Textfarben, P6-AD–P6-AJ
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
-  - ./SESSIONS_ARCHIVE.md                          # Steps 0-7 verbatim (acht Eintraege), L3, kein Softcap
-updated: 2026-08-14, neunter -- (achter-Block siebte Rotation, verbatim ins Archiv; v2.1 deployt [Release 20260814T201901.099704Z, SHA 70973a14], Post-Deploy 30/30 Browser-E2E gegen die tatsaechlich deployten Bytes, kein Live-Write; diagnose.sh-Live-Fund [falsche Auth-Backup-WARNUNG] behoben in phase3_edge/; vier UI-Feedback-Punkte nach erster Live-Nutzung vorgemerkt [Dropdown-Lila, Space-Move fehlt noch/ist Step 7b, Mehrfachauswahl, Gruen->Blau] -- nur vorgemerkt, nichts umgesetzt; Gate B braucht jetzt echte Nutzer, nicht mehr den Deploy)
+  - ./SESSIONS_ARCHIVE.md                          # Steps 0-7 + v2.1-Deploy verbatim (neun Eintraege), L3, kein Softcap
+updated: 2026-08-16, zehnter -- (neunter-Block achte Rotation, verbatim ins Archiv, kein Softcap-Auslöser; zwei der vier UI-Feedback-Punkte umgesetzt -- select.input accent-color [Dropdown-Lila behoben], --ok-Token entfernt und durch --accent ersetzt in .toast/.visibility-chip--shared [Gruen->Blau], live per Playwright bestaetigt; Punkte 2/3 [Step 7b, Mehrfachauswahl] bleiben offen; 747 pytest unveraendert; kein Deploy diese Session)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -120,14 +120,11 @@ angekündigt — nach Phasenabschluss (Step 10) wieder geschlossen, siehe `phase
 Nutzung) — ausdrücklich nur vormerken, nichts davon diese Session umgesetzt, kein Code
 angefasst:**
 
-1. **Dropdown-Selects zeigen Lila statt des einheitlichen Blaus.** Geprüft, kein Rateversuch:
-   `app.css` definiert **keinen** Lila-Ton (`grep` über alle Hex-Werte in der Datei — keiner
-   passt); `--accent: #3E8DF3` ist laut eigenem Kommentar dort „das einzige Blau". Die Farbe
-   kommt aus der **nativen Browser-/OS-Darstellung** der `<option>`-Popup-Liste — `select.input`
-   (Zeile 196) setzt nur `appearance: none` + Padding, kein `background`/`accent-color` für die
-   Optionsliste selbst. Cross-Browser-Styling von `<option>`-Popups ist historisch schlecht über
-   reines CSS erreichbar; ein Fix bräuchte mindestens `accent-color: var(--accent)` als ersten
-   Versuch, im Zweifel einen selbstgebauten Dropdown statt eines nativen `<select>`.
+1. **✅ Behoben (2026-08-16).** Dropdown-Selects zeigten Lila statt des einheitlichen Blaus —
+   `app.css` definierte **keinen** Lila-Ton, die Farbe kam aus der nativen Browser-/OS-
+   Darstellung der `<option>`-Popup-Liste. Der vermutete erste Versuch hat gereicht:
+   `select.input { accent-color: var(--accent); }` — live per Playwright-Screenshot bestätigt
+   (die Popup-Liste rendert jetzt blau statt lila, kein selbstgebauter Dropdown nötig).
 2. **Space-zu-Space-Verschieben — Status geklärt, nicht „laut Plan nirgends vorgesehen".** Es
    ist bereits geplant, als **Step 7b** in `phase6_shares/ITEM_MOVE_PLAN.md` §4 (Entscheidungen
    P6-AD–P6-AJ, setzt den jetzt fertigen Step 7 voraus) — nur noch nicht gebaut (kein Eintrag in
@@ -143,18 +140,19 @@ angefasst:**
    `moveItemToFolder()` (`webui/api.py`) patcht ausschließlich `folder`, nie `share_read`/
    `share_write`; `webui/shares.py :: widens()` liest exakt diese beiden Felder und greift bei
    einem reinen Ordnerwechsel nie.
-4. **Farbuniformität, Grün raus.** `--ok` (`#47B881`, `app.css` Zeile 39) wird aktuell für zwei
-   Dinge benutzt: den Erfolgstoast (`.toast`, linker Rand, Zeile ~929) und den
-   Sichtbarkeits-Chip bei geteilten Items (`.visibility-chip--shared`, Zeile ~514–517).
-   Nikinger-Wunsch: beide auf Blau (`--accent`) statt Grün. „Privat"/„nur ich" bleibt wie es ist
-   (`.visibility-chip`-Default, `--text-faint`, unverändert — kein Feedback dazu). Das orangene
-   „nur lesen" (`--warn`, `.list__readonly`/`.detail__badge-readonly`) bleibt **bewusst
-   unangetastet** — Nikinger noch unentschieden, was damit passieren soll, ausdrücklich kein
-   Vormerkungspunkt zum Umsetzen, nur ein offen gelassener Zustand.
+4. **✅ Behoben (2026-08-16).** `--ok` (`#47B881`, Grün) wurde für den Erfolgstoast
+   (`.toast`, linker Rand) und den Sichtbarkeits-Chip bei geteilten Items
+   (`.visibility-chip--shared`) benutzt — beide jetzt `var(--accent)` (Blau), Token selbst
+   entfernt (nach dem Umbau ungenutzt, kein totes CSS-Property stehen gelassen). „Privat"/„nur
+   ich" unverändert (`--text-faint`, kein Feedback dazu). Live per Playwright bestätigt:
+   `visibility-chip--shared`-Farbe `rgb(62, 141, 243)` (= `#3E8DF3`) nach einer echten
+   Freigabe, Toast-Rand identisch. Das orangene „nur lesen" (`--warn`,
+   `.list__readonly`/`.detail__badge-readonly`) bleibt **bewusst unangetastet** — Nikinger noch
+   unentschieden, was damit passieren soll.
 
-**Noch nicht geplant, kein eigener Step.** Kandidat für einen kleinen UI-Politur-Schnitt
-(Punkte 1+4, reines CSS) plus Step 7b (Punkte 2+3, größerer Zuschnitt, eigener Plan liegt schon
-vor) — Priorisierung liegt beim Nikinger.
+**Punkte 1+4 umgesetzt (2026-08-16, reines CSS, `phase5_ui/webui/static/app.css`) — Punkte 2+3
+bleiben offen**, größerer Zuschnitt (Step 7b, eigener Plan liegt schon vor) — Priorisierung
+weiterhin beim Nikinger.
 
 **[2026-08-14] MCP-Werkzeug-Ergonomie, Live-Feedback einer arbeitenden Claude-Instanz** — nach
 einem sitzungsreichen Tag (Protokollierung eines OTOBO-Vorgangs, Item `itm_7cf94a2c`, 40+
@@ -203,44 +201,38 @@ das P6 selbst mit ausgelöst hat (`docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` §
 
 ---
 
-## Session stopped — 2026-08-14, neunter — (v2.1 deployt, Post-Deploy verifiziert, UI-Feedback vorgemerkt, Rotation)
+## Session stopped — 2026-08-16, zehnter — (zwei der vier UI-Feedback-Punkte umgesetzt, Rotation)
 
-**Für den nächsten, kalten Leser:** der vorige Block („achter") ist mit allen vier Nachträgen
-verbatim nach `SESSIONS_ARCHIVE.md` gewandert (siebte Rotation, von Hand, Byte-Identität
-geprüft) — voller Verlauf des Tages dort, dieser Block ist die Kurzfassung.
+**Auftrag:** Nikinger bat, die „kleinen" der vier vorgemerkten UI-Punkte (siehe „Vormerkungen"
+oben) umzusetzen und offene Arbeit zu committen — Punkte 1 (Dropdown-Lila) und 4 (Grün→Blau)
+sind reines CSS, klein genug für „implement the small fixes"; Punkte 2 (Space-Move, Step 7b) und
+3 (Mehrfachauswahl) bleiben der größere Zuschnitt, unangetastet.
 
-**Der Tag in einem Satz:** Step 7 (Commits 0–6) war schon fertig, diese Session hat ihn getestet
-(747 pytest + 3 Smoke-Skripte + 30/30 echter Browser-E2E, Playwright, Scratchpad, nicht im
-Repo), einen echten Bug behoben (`patch_item`s irreführende Fehlermeldung), den `UPDATE_LOG.md`-
-Eintrag geschrieben, **v2.1 live deployt** (Release `20260814T201901.099704Z`, SHA `70973a14`),
-und danach den Deploy selbst verifiziert — 30/30 Browser-Checks erneut, diesmal gegen die
-tatsächlich deployten Bytes statt gegen den Arbeitsbaum, `diff` auf `static/` leer, alle elf
-Assets einzeln per `curl` gegen den echten Dienst geprüft. Kein Live-Write gegen den echten
-`DATA_ROOT`/die echte `auth.sqlite3` — ein `authctl.py invite`-Testspace wurde erwogen und
-verworfen (Advisor-Rat: keine Löschfunktion im System, jeder Testwrite würde ein permanenter
-Commit in echter Historie, genau der Grund, warum P6-W dafür einen eigenen Step-10-Punkt hat).
+**Umgesetzt, `phase5_ui/webui/static/app.css`, drei Regeln:**
+- `select.input` bekommt `accent-color: var(--accent)` — behebt die native lila
+  Options-Popup-Darstellung, live per Playwright-Screenshot bestätigt (Popup rendert jetzt blau).
+- `.visibility-chip--shared` und `.toast` (Erfolgsfall) von `var(--ok)` auf `var(--accent)`
+  umgestellt; `--ok`-Token selbst entfernt (nach dem Umbau ungenutzt — `grep` bestätigt keine
+  verbliebene Referenz), kein totes CSS-Property stehen gelassen.
+- „Privat"/„nur ich" und das orangene „nur lesen" (`--warn`) bewusst unangetastet, wie
+  vorgemerkt.
 
-**Live-Fund, kein Produktbug:** `phase3_edge/scripts/diagnose.sh`s Auth-Backup-Prüfung meldete
-beim unprivilegierten Lauf fälschlich „keine Generation", obwohl das Backup real lief (root-only
-Zielverzeichnis, `find` scheiterte lautlos an fehlenden Rechten). Behoben nach demselben Muster
-wie die Prüfung direkt darüber — Details in `phase3_edge/CLAUDE.md`.
+**Verifiziert, nicht nur behauptet:** `pytest -q` 747/747 vor und nach der Änderung (reines CSS,
+keine Python-Testkopplung — geprüft, kein Test referenziert `--ok`/`accent-color`). Danach
+Playwright gegen eine frische throwaway-Instanz (Scratchpad, wie bei der Post-Deploy-Session):
+`getComputedStyle(select).accentColor` → `rgb(62, 141, 243)` (= `--accent`), Screenshot einer
+geöffneten Options-Liste zeigt sie blau statt lila; ein echter Erfolgstoast → `borderLeftColor`
+`rgb(62, 141, 243)`; eine echte Freigabe (mit Re-Auth-Runde) → `.visibility-chip--shared`-Farbe
+`rgb(62, 141, 243)`, Text „geteilt mit beta". Alle drei exakt `#3E8DF3`, kein Näherungswert.
 
-**Vier UI-Feedback-Punkte vom Nikinger nach der ersten Live-Nutzung, ausdrücklich nur vorgemerkt
-— siehe „Vormerkungen" oben, nichts davon in dieser Session umgesetzt:** Dropdown-Selects lila
-statt Blau (native Browser-Darstellung, kein App-Token) · Space-zu-Space-Verschieben ist bereits
-als Step 7b geplant (`ITEM_MOVE_PLAN.md`), nur noch nicht gebaut · Mehrfachauswahl fürs
-Verschieben fehlt, soll bei Space-Wechsel Code verlangen dürfen, innerhalb eines Space aber
-codefrei bleiben (schon heute der Fall, bestätigt) · Grün soll überall durch das eine
-Blau ersetzt werden (Erfolgstoast + geteilter Sichtbarkeits-Chip), Orange („nur lesen") bleibt
-bewusst unentschieden.
+**Vormerkung nachgezogen:** Punkte 1+4 in „Vormerkungen" oben auf ✅ gesetzt, Punkte 2+3 bleiben
+offen. Keine Deploy-Aktion diese Session — die Änderung liegt im Repo, geht mit dem nächsten
+Deploy raus, kein eigener Dringlichkeitsgrund.
 
-**Verifiziert:** `pytest -q` 747/747 (unverändert seit dem Deploy, keine Code-Änderung nach dem
-`diagnose.sh`-Fix mehr). Byte-Identität der Rotation geprüft (`diff` leer). Kein Code aus dieser
-Session unkommittiert (`git status` sauber nach jedem der vier Commits).
+**Rotation:** der vorige Block („neunter", 2026-08-14) ist abgeschlossene Historie (v2.1-Deploy
+liegt zwei Tage zurück) — verbatim nach `SESSIONS_ARCHIVE.md` (achte Rotation, kein
+Softcap-Auslöser diesmal, reine Ein-Block-pro-Session-Disziplin), byte-für-byte geprüft.
 
-**Nächster Schritt (konkret):** Gate B braucht jetzt noch echte Nutzer, nicht mehr den Deploy —
-Nikinger testet die Werkzeuge im Alltag, das ist der eigentliche nächste Beweis. Bei Bedarf
-danach: kleiner UI-Politur-Schnitt (Farben, reines CSS) oder Step 7b (Cross-Space-Move, eigener
-Plan liegt vor) — Priorisierung beim Nikinger. Rotationsprüfung für die nächste Session: dieser
-Kopf trägt wieder genau einen, kompakten Block.
-
+**Nächster Schritt:** kein offener Punkt aus dieser Session. Für die nächste: Punkte 2/3 (Step
+7b) brauchen eine eigene Planungsrunde vor dem Bauen (`ITEM_MOVE_PLAN.md` liegt schon vor),
+Gate B (Abnahmezeilen 8–18) braucht weiterhin echte Nutzer/Fabian im Alltag.

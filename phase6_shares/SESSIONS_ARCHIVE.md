@@ -1,10 +1,10 @@
 ---
 status: live
-purpose: L3-Archiv der Phase-6-Session-Bloecke -- Steps 0-7 (Haushalt, Werkzeug-Ergonomie, Betrieb, Update-Log/Banner, Storage-Fundament, Rechtepolitik, Verwaltung/Migration + Live-Cutover, UI Dateisystem Commits 0-6 + Pre-/Post-Deploy-Verifikation von v2.1), verbatim aus phase6_shares/CLAUDE.md verschoben
+purpose: L3-Archiv der Phase-6-Session-Bloecke -- Steps 0-7 (Haushalt, Werkzeug-Ergonomie, Betrieb, Update-Log/Banner, Storage-Fundament, Rechtepolitik, Verwaltung/Migration + Live-Cutover, UI Dateisystem Commits 0-6) + Pre-/Post-Deploy-Verifikation von v2.1, verbatim aus phase6_shares/CLAUDE.md verschoben
 read-when: Historie einer bereits abgeschlossenen Phase-6-Teilarbeit nachvollziehen -- nicht beim normalen Sessionstart lesen
 detail: L3
 up: ../phase6_shares/CLAUDE.md
-updated: 2026-08-14
+updated: 2026-08-16
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 6 (`phase6_shares/`)
@@ -43,6 +43,53 @@ updated: 2026-08-14
 > UI-Feedback in den Vormerkungen, ~48 KB. Wieder genau ein Block im Kopf, wieder von Hand nach
 > derselben Disziplin: verbatim per `sed` extrahiert, hier eingefügt, byte-für-byte gegen das
 > Original geprüft.
+> **Achte Rotation (2026-08-16, neue Session):** kein Softcap-Auslöser diesmal (Kopf lag bei
+> ~36 KB) — der "neunter"-Block war mit dem v2.1-Deploy vom 2026-08-14 abgeschlossen, diese
+> Session begann neu (zwei der vier UI-Feedback-Punkte umgesetzt). Dieselbe
+> Ein-Block-pro-Session-Disziplin wie sonst im Repo: der alte Block wandert verbatim herein,
+> der Kopf bekommt einen frischen, eigenen Block. Von Hand, byte-für-byte geprüft.
+
+## Session stopped — 2026-08-14, neunter — (v2.1 deployt, Post-Deploy verifiziert, UI-Feedback vorgemerkt, Rotation)
+
+**Für den nächsten, kalten Leser:** der vorige Block („achter") ist mit allen vier Nachträgen
+verbatim nach `SESSIONS_ARCHIVE.md` gewandert (siebte Rotation, von Hand, Byte-Identität
+geprüft) — voller Verlauf des Tages dort, dieser Block ist die Kurzfassung.
+
+**Der Tag in einem Satz:** Step 7 (Commits 0–6) war schon fertig, diese Session hat ihn getestet
+(747 pytest + 3 Smoke-Skripte + 30/30 echter Browser-E2E, Playwright, Scratchpad, nicht im
+Repo), einen echten Bug behoben (`patch_item`s irreführende Fehlermeldung), den `UPDATE_LOG.md`-
+Eintrag geschrieben, **v2.1 live deployt** (Release `20260814T201901.099704Z`, SHA `70973a14`),
+und danach den Deploy selbst verifiziert — 30/30 Browser-Checks erneut, diesmal gegen die
+tatsächlich deployten Bytes statt gegen den Arbeitsbaum, `diff` auf `static/` leer, alle elf
+Assets einzeln per `curl` gegen den echten Dienst geprüft. Kein Live-Write gegen den echten
+`DATA_ROOT`/die echte `auth.sqlite3` — ein `authctl.py invite`-Testspace wurde erwogen und
+verworfen (Advisor-Rat: keine Löschfunktion im System, jeder Testwrite würde ein permanenter
+Commit in echter Historie, genau der Grund, warum P6-W dafür einen eigenen Step-10-Punkt hat).
+
+**Live-Fund, kein Produktbug:** `phase3_edge/scripts/diagnose.sh`s Auth-Backup-Prüfung meldete
+beim unprivilegierten Lauf fälschlich „keine Generation", obwohl das Backup real lief (root-only
+Zielverzeichnis, `find` scheiterte lautlos an fehlenden Rechten). Behoben nach demselben Muster
+wie die Prüfung direkt darüber — Details in `phase3_edge/CLAUDE.md`.
+
+**Vier UI-Feedback-Punkte vom Nikinger nach der ersten Live-Nutzung, ausdrücklich nur vorgemerkt
+— siehe „Vormerkungen" oben, nichts davon in dieser Session umgesetzt:** Dropdown-Selects lila
+statt Blau (native Browser-Darstellung, kein App-Token) · Space-zu-Space-Verschieben ist bereits
+als Step 7b geplant (`ITEM_MOVE_PLAN.md`), nur noch nicht gebaut · Mehrfachauswahl fürs
+Verschieben fehlt, soll bei Space-Wechsel Code verlangen dürfen, innerhalb eines Space aber
+codefrei bleiben (schon heute der Fall, bestätigt) · Grün soll überall durch das eine
+Blau ersetzt werden (Erfolgstoast + geteilter Sichtbarkeits-Chip), Orange („nur lesen") bleibt
+bewusst unentschieden.
+
+**Verifiziert:** `pytest -q` 747/747 (unverändert seit dem Deploy, keine Code-Änderung nach dem
+`diagnose.sh`-Fix mehr). Byte-Identität der Rotation geprüft (`diff` leer). Kein Code aus dieser
+Session unkommittiert (`git status` sauber nach jedem der vier Commits).
+
+**Nächster Schritt (konkret):** Gate B braucht jetzt noch echte Nutzer, nicht mehr den Deploy —
+Nikinger testet die Werkzeuge im Alltag, das ist der eigentliche nächste Beweis. Bei Bedarf
+danach: kleiner UI-Politur-Schnitt (Farben, reines CSS) oder Step 7b (Cross-Space-Move, eigener
+Plan liegt vor) — Priorisierung beim Nikinger. Rotationsprüfung für die nächste Session: dieser
+Kopf trägt wieder genau einen, kompakten Block.
+
 
 ## Session stopped — 2026-08-14, achter — (Step 7 vollständig, Rotation, Werkzeug-Feedback vorgemerkt)
 

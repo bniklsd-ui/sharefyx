@@ -36,7 +36,6 @@
 
   --warn:          #E5A93C;   /* Konflikt, fremder Space */
   --danger:        #E5484D;   /* Widerruf, Archivieren */
-  --ok:            #47B881;
 
   --radius:        10px;
   --radius-sm:     6px;
@@ -196,6 +195,11 @@ h3 { font-size: 15px; }
 select.input {
   appearance: none;
   padding-right: 24px;
+  /* [2026-08-16, Nikinger-Feedback] Optionsliste zeigte den nativen Browser-/OS-Akzentton
+     (lila auf dieser Maschine) statt des einen App-Blaus -- app.css definiert selbst gar kein
+     Lila, `accent-color` ist die einzige CSS-Eigenschaft, die native Formular-Steuerelemente
+     (inkl. der Options-Popup-Hervorhebung in Chromium) auf einen bestimmten Ton zwingt. */
+  accent-color: var(--accent);
 }
 
 /* -- Layout (§4.3, 16:9 ab 1280px) ------------------------------------------------------ */
@@ -512,8 +516,10 @@ select.input {
   white-space: nowrap;
 }
 .visibility-chip--shared {
-  color: var(--ok);
-  border-color: rgba(71,184,129,.35);
+  /* [2026-08-16, Nikinger-Feedback] war --ok (Grün) -- Uniformitaets-Wunsch: geteilt zeigt
+     dasselbe Blau wie jede andere Hervorhebung in der App, kein zweiter Akzentton. */
+  color: var(--accent);
+  border-color: rgba(62,141,243,.35);
 }
 
 .list__empty, .detail__empty {
@@ -926,7 +932,9 @@ select.input {
   gap: var(--space);
   background: linear-gradient(180deg, #1F262F, #151A21);
   border: 1px solid var(--btn-edge);
-  border-left: 3px solid var(--ok);
+  /* [2026-08-16, Nikinger-Feedback] war --ok (Grün) -- Erfolg zeigt jetzt dasselbe Blau wie
+     jede andere Hervorhebung in der App, kein zweiter Akzentton. */
+  border-left: 3px solid var(--accent);
   border-radius: var(--radius-sm);
   box-shadow: inset 0 1px 0 var(--btn-glow), 0 8px 28px rgba(0,0,0,.55);
   padding: var(--space) calc(var(--space) * 2);
