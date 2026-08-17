@@ -185,6 +185,18 @@ durchgeschnitten — die vier Abschlusszeilen dieses bestehenden Tests landeten 
 der letzten neuen Testfunktion und lösten dort einen `NameError` aus. Vor dem Testlauf-Erfolg
 bemerkt und korrigiert (`git diff` gegenkontrolliert, nicht nur der grüne Lauf vertraut).
 
+**[2026-08-17 Ergänzung, P6 Step 7b Commit 3/3]:** `webui/static/{app.html,js/dialogs.js}` —
+Verschieben-Dialog (§4.4) bekommt Space-Auswahl (nur `writable: true`), Ordnerliste baut sich
+beim Space-Wechsel neu auf, Klartext-Konsequenz, `space` im `PATCH`-Body, Re-Auth im
+eingefrorene-erste-Fassung-Muster wie der Freigabedialog (`pendingMoveBody`). P5-T: kein
+Unit-Test, echte Playwright-Verifikation (Scratchpad) stattdessen — Login, Move `alpha`→`beta`,
+Re-Auth korrekt ausgelöst und mit Credentials abgeschlossen, Toast+PATCH-Antwort+Screenshot
+gegengeprüft. **Echter Fund der Verifikation:** `closeMoveDialog()` nullt `pendingMoveBody`,
+der ursprüngliche Handler las danach `pendingMoveBody.space` für die Toast-Meldung — ein
+`TypeError` verschluckte sie lautlos (Move gelang, aber ohne Rückmeldung). Werte jetzt vor dem Reset gesichert; ohne Browserlauf unentdeckt geblieben. Drag & Drop auf
+einen Space-Knoten (§4.4 Punkt 3) bewusst nicht gebaut — P6-AB verlangt nur die Menüvariante.
+Kein Live-Deploy, keine Nikinger-Bestätigung.
+
 ---
 
 ## Abnahmestand (Plan §6) — Stand 2026-08-09

@@ -13,7 +13,7 @@ import {
   loadEditorFromItem, clearDraft, updateVersionBand, afterWrite, handleWriteError,
   currentFormValues,
 } from "./editor.js";
-import { loadOverview, loadItems, bucketFor, moveItemToFolder } from "./list.js";
+import { loadOverview, loadItems, bucketFor } from "./list.js";
 
 var createDialogEl;
 var createTypeEl;
@@ -54,10 +54,17 @@ var newFolderSubmitEl;
 var newFolderCancelEl;
 
 var moveDialogEl;
+var moveSpaceSelectEl;
 var moveFolderSelectEl;
+var moveConsequenceEl;
+var moveErrorEl;
+var moveReauthFieldsEl;
+var moveReauthPasswordEl;
+var moveReauthTotpEl;
 var moveSubmitEl;
 var moveCancelEl;
 var moveTargetItem = null;
+var pendingMoveBody = null;
 
 var shareDialogEl;
 var shareItemTitleEl;
@@ -177,34 +184,71 @@ export function closeNewFolderDialog() {
   newFolderDialogEl.hidden = true;
 }
 
-// -- Verschieben (Step 7 Commit 3) ------------------------------------------------------------
+// -- Verschieben (Step 7 Commit 3, Step 7b: Space-Auswahl) --------------------------------------
 // Bewusst KEIN Wiederverwenden von `handleWriteError()`/`showConflictDialog()`: die sind an
 // `state.editingSnapshot` gekoppelt (das aktuell IM EDITOR offene Item) — ein Verschieben aus
 // der Liste heraus betrifft aber typischerweise ein ANDERES Item als das gerade offene, teils
 // gar keines. `showConflictDialog()` bliebe dann auf einem `null`/falschen Snapshot sitzen. Ein
 // eigener, schlichter Fehlerpfad ist hier korrekt, keine Abkürzung.
+//
+// Step 7b (ITEM_MOVE_PLAN.md §4.4): derselbe Dialog trägt jetzt zusätzlich eine Space-Auswahl
+// (nur `writable: true`-Spaces, Punkt 1) — ein Wechsel des Space baut die Ordnerliste für den
+// NEU gewählten Space neu auf und setzt sie auf "(Space-Wurzel)" zurück (§4.1 Punkt 3: ein
+// Space-Wechsel ohne eigene Ordnerwahl landet an der Ziel-Wurzel, nicht im gleichnamigen Ordner
+// im Zielspace). Re-Auth folgt demselben eingefrorenen-erste-Fassung-Muster wie der
+// Freigabedialog (`pendingShareBody`/Advisor-Vorgabe) — hier `pendingMoveBody`.
 
-export function openMoveDialog(item) {
-  moveTargetItem = item;
+function populateMoveFolderOptions(spaceName, selectedFolder) {
   moveFolderSelectEl.textContent = "";
   var rootOption = document.createElement("option");
   rootOption.value = "";
-  rootOption.textContent = "(kein Ordner)";
+  rootOption.textContent = "(Space-Wurzel)";
   moveFolderSelectEl.appendChild(rootOption);
-  var space = spaceByName(item.space);
+  var space = spaceByName(spaceName);
   ((space && space.folders) || []).forEach(function (path) {
     var opt = document.createElement("option");
     opt.value = path;
     opt.textContent = path.split("/").join(" / ");
     moveFolderSelectEl.appendChild(opt);
   });
-  moveFolderSelectEl.value = item.folder || "";
+  moveFolderSelectEl.value = selectedFolder || "";
+}
+
+function updateMoveConsequence(item) {
+  var target = moveSpaceSelectEl.value;
+  if (target === item.space) {
+    moveConsequenceEl.textContent = "";
+    return;
+  }
+  moveConsequenceEl.textContent =
+    "Verschiebt das Item aus " + item.space + " nach " + target + ". Alle Mitglieder dieses "
+    + "Space können es danach lesen und ändern.";
+}
+
+export function openMoveDialog(item) {
+  moveTargetItem = item;
+  pendingMoveBody = null;
+  moveErrorEl.hidden = true;
+  moveReauthFieldsEl.hidden = true;
+  moveReauthPasswordEl.value = "";
+  moveReauthTotpEl.value = "";
+  moveSpaceSelectEl.textContent = "";
+  state.spaces.filter(function (space) { return space.writable; }).forEach(function (space) {
+    var opt = document.createElement("option");
+    opt.value = space.name;
+    opt.textContent = space.name;
+    moveSpaceSelectEl.appendChild(opt);
+  });
+  moveSpaceSelectEl.value = item.space;
+  populateMoveFolderOptions(item.space, item.folder);
+  updateMoveConsequence(item);
   moveDialogEl.hidden = false;
 }
 
 export function closeMoveDialog() {
   moveDialogEl.hidden = true;
   moveTargetItem = null;
+  pendingMoveBody = null;
 }
 
 // -- Freigeben (Step 7 Commit 5b) -------------------------------------------------------------
@@ -342,7 +386,13 @@ export function init() {
   newFolderCancelEl = document.getElementById("new-folder-cancel");
 
   moveDialogEl = document.getElementById("move-dialog");
+  moveSpaceSelectEl = document.getElementById("move-space-select");
   moveFolderSelectEl = document.getElementById("move-folder-select");
+  moveConsequenceEl = document.getElementById("move-consequence");
+  moveErrorEl = document.getElementById("move-error");
+  moveReauthFieldsEl = document.getElementById("move-reauth-fields");
+  moveReauthPasswordEl = document.getElementById("move-reauth-password");
+  moveReauthTotpEl = document.getElementById("move-reauth-totp");
   moveSubmitEl = document.getElementById("move-submit");
   moveCancelEl = document.getElementById("move-cancel");
 
@@ -374,23 +424,66 @@ export function init() {
   });
 
   moveCancelEl.addEventListener("click", closeMoveDialog);
+  moveSpaceSelectEl.addEventListener("change", function () {
+    var item = moveTargetItem;
+    if (!item) return;
+    // Space-Wechsel setzt die Ordnerauswahl auf die Ziel-Wurzel zurück (§4.1 Punkt 3) --
+    // ein Ordnername im alten Space bedeutet im neuen etwas anderes.
+    populateMoveFolderOptions(moveSpaceSelectEl.value, "");
+    updateMoveConsequence(item);
+    pendingMoveBody = null;   // Ziel geändert -- eine evtl. eingefrorene Fassung ist ungültig
+    moveReauthFieldsEl.hidden = true;
+    moveErrorEl.hidden = true;
+  });
   moveSubmitEl.addEventListener("click", function () {
     var item = moveTargetItem;
     if (!item) return;
-    var folder = moveFolderSelectEl.value;
-    moveItemToFolder(item, folder).then(function () {
+    moveErrorEl.hidden = true;
+    if (pendingMoveBody === null) {
+      var targetSpace = moveSpaceSelectEl.value;
+      var folder = moveFolderSelectEl.value;
+      pendingMoveBody = { version: item.version, folder: folder };
+      if (targetSpace !== item.space) pendingMoveBody.space = targetSpace;
+    }
+    var body = Object.assign({}, pendingMoveBody);
+    if (!moveReauthFieldsEl.hidden) {
+      body.password = moveReauthPasswordEl.value;
+      body.totp = moveReauthTotpEl.value;
+    }
+    // Werte VOR `closeMoveDialog()` sichern -- die setzt `pendingMoveBody` auf `null` zurück
+    // (echter Fund der Playwright-Verifikation dieser Session: `pendingMoveBody` nach dem
+    // Schließen gelesen warf einen TypeError, der die Erfolgsmeldung stumm verschluckte).
+    var movedFolder = pendingMoveBody.folder;
+    var movedSpace = pendingMoveBody.space;
+    api("/items/" + encodeURIComponent(item.id), {
+      method: "PATCH", body: JSON.stringify(body),
+    }).then(function () {
       closeMoveDialog();
-      toast(folder ? "Verschoben nach " + folder.split("/").join(" / ") : "In die oberste Ebene verschoben");
-    }).catch(function (err) {
-      if (err.code === "conflict") {
+      return loadItems().then(loadOverview).then(function () {
         toast(
-          "Ein anderer Client hat dieses Item zwischenzeitlich geändert — bitte neu laden und "
-          + "erneut versuchen.", "error",
+          movedSpace
+            ? "Verschoben nach " + movedSpace
+            : (movedFolder ? "Verschoben nach " + movedFolder.split("/").join(" / ") : "In die oberste Ebene verschoben")
         );
+      });
+    }).catch(function (err) {
+      if (err.code === "reauth_required") {
+        moveReauthFieldsEl.hidden = false;
+        moveErrorEl.textContent = err.message;
+        moveErrorEl.hidden = false;
+        moveReauthPasswordEl.focus();
+        return;
+      }
+      if (err.code === "conflict") {
+        moveErrorEl.textContent =
+          "Ein anderer Client hat dieses Item zwischenzeitlich geändert — bitte neu laden und "
+          + "erneut versuchen.";
+        moveErrorEl.hidden = false;
         return;
       }
       if (err.message === "unauthenticated") return;
-      toast(err.message || "Verschieben fehlgeschlagen.", "error");
+      moveErrorEl.textContent = err.message || "Verschieben fehlgeschlagen.";
+      moveErrorEl.hidden = false;
     });
   });
 

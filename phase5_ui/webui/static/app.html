@@ -197,9 +197,25 @@
 <div class="overlay" id="move-dialog" hidden>
   <div class="overlay__panel">
     <h2>Verschieben</h2>
+    <label>Space
+      <select class="input" id="move-space-select"></select>
+    </label>
     <label>Ordner
       <select class="input" id="move-folder-select"></select>
     </label>
+    <p class="overlay__hint" id="move-consequence"></p>
+    <p class="form-error" id="move-error" hidden></p>
+    <div id="move-reauth-fields" hidden>
+      <label>Passwort
+        <span class="pw-field">
+          <input type="password" class="input" id="move-reauth-password" autocomplete="current-password">
+          <button type="button" class="btn pw-toggle" data-target="move-reauth-password" aria-pressed="false">Anzeigen</button>
+        </span>
+      </label>
+      <label>Code aus der Authenticator-App
+        <input type="text" class="input" id="move-reauth-totp" autocomplete="one-time-code">
+      </label>
+    </div>
     <div class="overlay__actions">
       <button type="button" class="btn-primary" id="move-submit">Verschieben</button>
       <button type="button" class="btn" id="move-cancel">Abbrechen</button>
