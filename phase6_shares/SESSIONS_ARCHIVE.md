@@ -4,7 +4,7 @@ purpose: L3-Archiv der Phase-6-Session-Bloecke -- Steps 0-7 (Haushalt, Werkzeug-
 read-when: Historie einer bereits abgeschlossenen Phase-6-Teilarbeit nachvollziehen -- nicht beim normalen Sessionstart lesen
 detail: L3
 up: ../phase6_shares/CLAUDE.md
-updated: 2026-08-16
+updated: 2026-08-17
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 6 (`phase6_shares/`)
@@ -48,6 +48,46 @@ updated: 2026-08-16
 > Session begann neu (zwei der vier UI-Feedback-Punkte umgesetzt). Dieselbe
 > Ein-Block-pro-Session-Disziplin wie sonst im Repo: der alte Block wandert verbatim herein,
 > der Kopf bekommt einen frischen, eigenen Block. Von Hand, byte-für-byte geprüft.
+> **Neunte Rotation (2026-08-17, Planungssession „light"):** über `scripts/rotate_session_block.sh
+> phase6_shares` (mechanisch, keine Handkorrektur diesmal nötig) — der "zehnter"-Block war mit
+> den beiden CSS-Fixes abgeschlossen, der Kopf bekam einen neuen "elfter"-Block für die
+> Step-7b-Freigabe + das neue §9 in `ITEM_MOVE_PLAN.md`.
+
+## Session stopped — 2026-08-16, zehnter — (zwei der vier UI-Feedback-Punkte umgesetzt, Rotation)
+
+**Auftrag:** Nikinger bat, die „kleinen" der vier vorgemerkten UI-Punkte (siehe „Vormerkungen"
+oben) umzusetzen und offene Arbeit zu committen — Punkte 1 (Dropdown-Lila) und 4 (Grün→Blau)
+sind reines CSS, klein genug für „implement the small fixes"; Punkte 2 (Space-Move, Step 7b) und
+3 (Mehrfachauswahl) bleiben der größere Zuschnitt, unangetastet.
+
+**Umgesetzt, `phase5_ui/webui/static/app.css`, drei Regeln:**
+- `select.input` bekommt `accent-color: var(--accent)` — behebt die native lila
+  Options-Popup-Darstellung, live per Playwright-Screenshot bestätigt (Popup rendert jetzt blau).
+- `.visibility-chip--shared` und `.toast` (Erfolgsfall) von `var(--ok)` auf `var(--accent)`
+  umgestellt; `--ok`-Token selbst entfernt (nach dem Umbau ungenutzt — `grep` bestätigt keine
+  verbliebene Referenz), kein totes CSS-Property stehen gelassen.
+- „Privat"/„nur ich" und das orangene „nur lesen" (`--warn`) bewusst unangetastet, wie
+  vorgemerkt.
+
+**Verifiziert, nicht nur behauptet:** `pytest -q` 747/747 vor und nach der Änderung (reines CSS,
+keine Python-Testkopplung — geprüft, kein Test referenziert `--ok`/`accent-color`). Danach
+Playwright gegen eine frische throwaway-Instanz (Scratchpad, wie bei der Post-Deploy-Session):
+`getComputedStyle(select).accentColor` → `rgb(62, 141, 243)` (= `--accent`), Screenshot einer
+geöffneten Options-Liste zeigt sie blau statt lila; ein echter Erfolgstoast → `borderLeftColor`
+`rgb(62, 141, 243)`; eine echte Freigabe (mit Re-Auth-Runde) → `.visibility-chip--shared`-Farbe
+`rgb(62, 141, 243)`, Text „geteilt mit beta". Alle drei exakt `#3E8DF3`, kein Näherungswert.
+
+**Vormerkung nachgezogen:** Punkte 1+4 in „Vormerkungen" oben auf ✅ gesetzt, Punkte 2+3 bleiben
+offen. Keine Deploy-Aktion diese Session — die Änderung liegt im Repo, geht mit dem nächsten
+Deploy raus, kein eigener Dringlichkeitsgrund.
+
+**Rotation:** der vorige Block („neunter", 2026-08-14) ist abgeschlossene Historie (v2.1-Deploy
+liegt zwei Tage zurück) — verbatim nach `SESSIONS_ARCHIVE.md` (achte Rotation, kein
+Softcap-Auslöser diesmal, reine Ein-Block-pro-Session-Disziplin), byte-für-byte geprüft.
+
+**Nächster Schritt:** kein offener Punkt aus dieser Session. Für die nächste: Punkte 2/3 (Step
+7b) brauchen eine eigene Planungsrunde vor dem Bauen (`ITEM_MOVE_PLAN.md` liegt schon vor),
+Gate B (Abnahmezeilen 8–18) braucht weiterhin echte Nutzer/Fabian im Alltag.
 
 ## Session stopped — 2026-08-14, neunter — (v2.1 deployt, Post-Deploy verifiziert, UI-Feedback vorgemerkt, Rotation)
 

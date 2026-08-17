@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase6_shares_plan.md    # Hauptplan der Phase, P6-A–P6-AC, Steps 0–10 — dieser Plan hängt an Step 7
   - ../phase1_storage/CLAUDE.md               # "Geerbte Contracts" — dritte, benannte Öffnung, hier fortgesetzt
   - ../phase5_ui/CLAUDE.md                    # Designsystem-Herkunft der Farbtoken (§4.1/§4.3, Step 7b revidiert)
-updated: 2026-08-13 — erstellt (Nikinger-Auftrag: Item-Verschieben fehlt, UI dafür fehlt, Grautext schlecht lesbar)
+updated: 2026-08-17 — P6-AD–AJ gelockt (Nikinger-Freigabe, „planning session light"), V52–V55 gegen den echten Step-7-Code geschlossen, Guard-Routing-Fund in §4.2/§4.3 präzisiert, neues §9 Mehrfachauswahl (P6-AK–AN) + Abnahmezeilen 31–34. Ursprung 2026-08-13: erstellt (Nikinger-Auftrag: Item-Verschieben fehlt, UI dafür fehlt, Grautext schlecht lesbar)
 ---
 
 # Zusatzplan P6 — Item verschieben, und die Textfarben
@@ -127,6 +127,18 @@ in der UI, nicht im Dateisystem.
 
 Fortsetzung der Nummerierung aus Hauptplan §0.5 (dort endet sie bei P6-AC). Diese sieben sind
 **Vorschläge dieses Plans** und werden mit der Nikinger-Freigabe dieses Dokuments gelockt.
+
+**[2026-08-17 gelockt.]** Der „Nächster Schritt" der Planungssession vom 2026-08-13 (Fünfter
+Session-Block, `SESSIONS_ARCHIVE.md`) stand seit Verfassung dieses Dokuments offen — die
+Session, die Step 7a baute, war explizit auf `ITEM_MOVE_PLAN.md` §3 verengt, keine Session
+dazwischen hat P6-AD–AJ freigegeben, und root-`CLAUDE.md`s „Noch nicht entschieden" trug den
+Punkt bis heute unverändert seit 2026-08-13. Vor dem Bauen ausdrücklich geprüft statt
+übernommen (dieselbe Kategorie wie die Doku-Status-Regel „✅ heißt live-verifiziert, nicht
+gebaut" — hier umgekehrt: eine Entscheidung ist erst gelockt, wenn eine Freigabe dokumentiert
+ist, nicht weil sie plausibel aussieht). **Nikinger-Freigabe dieser Session (2026-08-17,
+„planning session light"):** „I confirm we can work on all points." — gilt als Freigabe dieses
+gesamten Dokuments einschließlich §2. **P6-AD–P6-AJ sind ab hier gelockt.** Root-`CLAUDE.md`s
+„Noch nicht entschieden"-Eintrag wird im selben Commit entfernt/ersetzt.
 
 - **P6-AD — eigene Methode `Store.move()`, kein Feld an `update()`.** `space` bleibt in
   `_SYSTEM_MANAGED_FIELDS`. *Warum:* der Schutz dort ist tragend — er verhindert genau den
@@ -305,6 +317,25 @@ Und der bestehende Fail-Closed-Riegel gegen Nicht-Eigentümer-Ordnerwechsel (`to
 ersetzt die Regel aus P6-AE ihn, weil sie strenger in der relevanten Richtung ist: sie verlangt
 space-level Schreibrecht, das ein item-level `share_write`-Delegat per Konstruktion nie hat.
 
+**[2026-08-17, Präzisierung dieser Session — Advisor-Fund vor dem Bauen.]** „Ersetzt ihn" war im
+Text bisher nicht codeseitig verankert: der bestehende Riegel prüft `if folder is not None and
+acl.space != principal.space`, ohne auf `space` zu achten. Für einen Space-Move MIT gleichzeitig
+gesetztem Zielordner (der reale Fall in §4.4 Punkt 1 — der Dialog trägt beide Felder) wäre
+`acl.space != principal.space` für praktisch jeden Cross-Space-Move wahr (kein Principal heißt
+wie ein geteilter Space, P6-AE), der alte Riegel würde also fälschlich vor der neuen P6-AE-Prüfung
+greifen und einen legitimen Move mit space-level Schreibrecht auf beiden Seiten ablehnen. Der
+alte Riegel bekommt deshalb eine explizite Bedingung `space is None`:
+```python
+if folder is not None and space is None and acl.space != principal.space:
+    raise map_storage_error(ValidationError(...)) from None
+```
+Bei `space is not None` übernimmt ausschließlich der P6-AE-Block oben die Prüfung (Quelle UND
+Ziel). Neuer Pflichttest in §4.5: `test_update_item_with_space_and_folder_together_uses_space_
+level_check_not_owner_guard` — ein Move mit `space=` UND `folder=` durch einen Actor mit
+space-level Schreibrecht auf beiden Seiten, aber ohne Eigentümerschaft am Quell-Space, muss
+gelingen (nicht am alten Riegel scheitern). Dasselbe Muster gilt analog in `webui/api.py`s
+Pendant (§4.3) — dort ist der bestehende Eigentümer-Riegel derselbe Fund, derselbe Fix.
+
 Tool-Description ergänzen (dieselbe Kategorie wie die drei Präzisierungen vom 2026-08-13):
 `space=<name> verschiebt es in einen anderen Space — nur zwischen Spaces, in denen du schreiben
 darfst.`
@@ -329,7 +360,14 @@ Aufbauend auf Step 7 (Ordnerbaum vorhanden, Verschieben innerhalb des Space vorh
 1. **Ein Dialog, zwei Felder.** „Verschieben nach …" mit Space-Auswahl (nur Spaces mit
    `writable: true` — die Liste trägt das Feld seit dem Badge-Fix vom 2026-08-13) und darunter
    Ordner-Auswahl **des gewählten Ziel-Space**. Wechsel des Space setzt die Ordnerauswahl auf
-   „(Space-Wurzel)" zurück, siehe §4.1 Punkt 3.
+   „(Space-Wurzel)" zurück, siehe §4.1 Punkt 3. **[2026-08-17 V54 geklärt, kein Backend-Fund:]**
+   die Ordnerliste jedes sichtbaren Space liegt bereits heute in `state.spaces` — `list.js ::
+   loadOverview()` mischt `folders`/`members` aus `GET /api/v1/spaces` seit Step 7 Commit 1 in
+   jeden Space-Eintrag (`state.js:28`), nicht nur den aktiven. `dialogs.js :: openMoveDialog()`
+   liest `spaceByName(item.space).folders` schon heute für den bestehenden In-Space-Dialog
+   (Zeile 195) — die Erweiterung um eine Space-Auswahl liest exakt denselben Weg für den
+   GEWÄHLTEN Space, kein neuer Endpunkt, kein `GET /api/v1/overview`-Feld nötig (die alte Sorge
+   aus §1.2 K3 galt `/overview`, nicht `/spaces`).
 2. **Erreichbar von zwei Stellen**, dieselben zwei wie beim Archivieren heute: aus dem Editor-Kopf
    und aus dem Kontextmenü einer Listenzeile.
 3. **Drag & Drop auf einen Space-Knoten im Baum** — mit derselben Pflicht-Alternative wie P6-AB
@@ -389,12 +427,12 @@ Fortsetzung der Matrix in Hauptplan §6 (dort 1–24). **✅ heißt live-verifiz
 
 Fortsetzung von Hauptplan §7 (dort V39–V51).
 
-| # | Was | Wann |
-|---|---|---|
-| V52 | Exakte Antwortform von `reauth_required` aus Step 7 — dieser Plan setzt Wiederverwendung voraus, Step 7 existiert noch nicht | Step 7b |
-| V53 | Verhält sich `os.replace` über Space-Grenzen im echten `DATA_ROOT` weiterhin atomar? (Probelauf lief auf `/tmp`, ein Dateisystem; real ist es ext4 unter `/home` — **muss dasselbe Dateisystem sein**, sonst ist `move_file()` kein Rename mehr) | Step 7b |
-| V54 | Trägt `GET /api/v1/overview` nach Step 7 ein `folders`-Feld? Der Verschieben-Dialog braucht die Ordner des **Ziel**-Space, nicht nur des aktiven | Step 7b |
-| V55 | `search(folder=…)` ist heute **exakter** Gleichheitsvergleich (`store.py:391`), kein Präfix — reicht das für einen Baum mit zwei Ebenen, oder braucht Step 7 Präfix-Semantik? | Step 7 |
+| # | Was | Wann | Status |
+|---|---|---|---|
+| V52 | Exakte Antwortform von `reauth_required` aus Step 7 — dieser Plan setzt Wiederverwendung voraus, Step 7 existiert noch nicht | Step 7b | **[2026-08-17 geschlossen]** Step 7 ist gebaut: `webui/shares.py :: require_share_reauth()` wirft `ApiError("reauth_required", <text>)`, `ShareState` trägt bereits `space`/`folder`. Plan-Annahme in §4.3 hält, keine Änderung nötig |
+| V53 | Verhält sich `os.replace` über Space-Grenzen im echten `DATA_ROOT` weiterhin atomar? (Probelauf lief auf `/tmp`, ein Dateisystem; real ist es ext4 unter `/home` — **muss dasselbe Dateisystem sein**, sonst ist `move_file()` kein Rename mehr) | Step 7b | **[2026-08-17 geschlossen]** read-only gegen den echten `DATA_ROOT` geprüft: `stat -c %d` von `niklas`/`fabian`/`IT-Sekus-Projekt` liefert identisch `2050` (ext4, `/dev/sda2` auf `/`) — ein Dateisystem, `os.replace()` bleibt ein echtes Rename |
+| V54 | Trägt `GET /api/v1/overview` nach Step 7 ein `folders`-Feld? Der Verschieben-Dialog braucht die Ordner des **Ziel**-Space, nicht nur des aktiven | Step 7b | **[2026-08-17 geschlossen, anders als erwartet]** Nein, und braucht es auch nicht — `GET /api/v1/spaces` trägt `folders` bereits für jeden sichtbaren Space, und `list.js :: loadOverview()` mischt das seit Step 7 Commit 1 in `state.spaces`. Kein Backend-Fund für §4.4 Punkt 1 |
+| V55 | `search(folder=…)` ist heute **exakter** Gleichheitsvergleich (`store.py:391`), kein Präfix — reicht das für einen Baum mit zwei Ebenen, oder braucht Step 7 Präfix-Semantik? | Step 7 | geschlossen mit Step 7 (Baum ist zweistufig, exakter Vergleich je Ebene reicht — siehe Modul-Status Zeile 10, live per Playwright bestätigt) |
 
 ---
 
@@ -424,5 +462,122 @@ Fortsetzung von Hauptplan §7 (dort V39–V51).
 - **Ordner tiefer als zwei Ebenen** — `MAX_FOLDER_DEPTH = 2` (P6-Q) bleibt.
 - **Verschieben aus dem Archiv heraus** — Archivieren ist einseitig (P6-R). `move()` lehnt
   archivierte Items ab, gleichlaufend mit `update()`.
-- **Massen-/Mehrfachauswahl beim Verschieben** — ein Item pro Vorgang. Wenn sich das im Betrieb
-  als Schmerz zeigt, ist es ein eigener Befund mit eigener Entscheidung.
+- **Massen-/Mehrfachauswahl beim Verschieben** — §§1–8 dieses Dokuments behandeln ausschließlich
+  Step 7b (ein Item pro Vorgang). Der „eigene Befund mit eigener Entscheidung" ist eingetreten
+  (Nikinger-Meldung 2026-08-14, siehe Phase-Head „Vormerkungen") — Entscheidungen und Umfang
+  dafür stehen jetzt separat in **§9**, nicht rückwirkend hier eingemischt.
+
+---
+
+## §9 Mehrfachauswahl (Erweiterung, Nikinger-Auftrag 2026-08-17, „planning session light")
+
+**Setzt Step 7b (§4) voraus** — jeder Batch-Vorgang ist am Ende nur eine Schleife über den dort
+gebauten Einzel-Move-Pfad, kein eigener Schreibpfad. Kein eigener Charakterisierungs-Bedarf
+(P6-D): `storage/`/`mcpserver/`/`webui/api.py` werden für dieses §9 **nicht angefasst**, reiner
+Frontend-Schnitt.
+
+### 9.1 Herkunft und Rahmen
+
+Nikinger-Vorgabe vom 2026-08-14 (Phase-Head „Vormerkungen" Punkt 3), hier zum ersten Mal in
+Entscheidungen gegossen: *„ein einmaliger Code für die Mehrfachauswahl-Aktion selbst ist
+akzeptabel … Verschieben innerhalb eines Space muss dabei weiterhin codefrei bleiben."* Letzteres
+ist bereits grep-bestätigt wahr (Punkt 3, Zeile 140f. oben): `moveItemToFolder()` patcht
+ausschließlich `folder`, nie `share_read`/`share_write`, `widens()` greift bei einem reinen
+Ordnerwechsel nie — eine In-Space-Mehrfachauswahl braucht also **keine neue Rechteprüfung**, nur
+eine Schleife über einen bereits geprüften Aufruf.
+
+### 9.2 Neue Entscheidungen (P6-AK – P6-AN)
+
+Fortsetzung der Nummerierung aus §2 (dort endet sie bei P6-AJ).
+
+- **P6-AK — ein gemeinsames Ziel für die ganze Auswahl, kein Ziel pro Item.** Der Dialog aus §4.4
+  öffnet sich einmal für die gesamte Selektion. *Warum:* unabhängige Ziele pro Item wäre wieder
+  N Einzeldialoge mit einem gemeinsamen Startknopf — löst das gemeldete Problem (40+
+  Einzelaktionen an einem Tag) nicht. Ein Ziel für alle ist die kleinste Erweiterung, die den
+  echten Schmerz behebt.
+- **P6-AL — kein neuer Endpunkt, kein neues MCP-Tool.** Die Batch-Aktion ist eine clientseitige
+  sequenzielle Schleife über das bestehende `PATCH /api/v1/items/{id}` aus Step 7b — pro Item ein
+  eigener Request, keine Sammel-Payload. *Warum sequenziell, nicht parallel:* Re-Auth-Fehlversuche
+  laufen über `LoginThrottle` (`authserver/ratelimit.py`, dieselbe Bremse wie UI-Login/Consent) —
+  parallele Requests könnten das bei einem einzigen falschen Credential-Versuch unnötig
+  strapazieren, sequenziell bleibt die Fehlerzuordnung außerdem eindeutig einem Item zugeordnet.
+  *Warum kein neuer Endpunkt:* jeder einzelne Request durchläuft die volle, in §4 bereits gebaute
+  und geprüfte P6-AE-Rechtsprüfung unverändert — kein neuer Codepfad, keine neue Angriffsfläche
+  für Hard Rule 4. Das ist der „einmalige Code", den der Nikinger erlaubt hat: Auswahl sammeln,
+  Fortschritt anzeigen, Teilfehler einsammeln — keine neue Schreib- oder Rechteprüfung.
+  **Kein MCP-Tool:** Mehrfachauswahl ist laut Auslöser (Nikinger zieht mehrere Zeilen in der UI)
+  ein Menschen-/UI-Feature; ein Agent kann seit P6-AJ bereits einzelne Items per `update_item
+  (space=…)` verschieben, in einer eigenen Schleife, ohne dass dafür ein achtes Tool nötig wäre.
+- **P6-AM — Re-Auth wird bei Bedarf einmal für die ganze Auswahl eingeholt, nicht angenommen.**
+  Naiv „ein gemeinsames Ziel ⇒ ein gemeinsames `widens()`-Ergebnis" wäre **falsch** — `widens()`
+  hängt auch an der `visibility`/`share_read`/`share_write` des einzelnen Items (§2, P6-AH), zwei
+  Items mit demselben Ziel können unterschiedlich urteilen (eines bereits geteilt, eines noch
+  `private`). Der Batch nimmt deshalb den bereits vorhandenen Server-Zustand ernst statt ihn
+  vorherzusagen: **Runde 1** schickt alle N Requests ohne Credentials. Kommt mindestens ein
+  `403 reauth_required` zurück, zeigt die UI **ein** gemeinsames Re-Auth-Mini-Formular (dieselbe
+  Komponente wie der bestehende Freigabedialog, §4.3) — **Runde 2** wiederholt ausschließlich die
+  zurückgewiesenen Requests mit `password`/`totp` angehängt. Items, die in Runde 1 schon
+  durchgingen (kein Widen), werden nicht erneut angefasst. *Warum nicht konservativ IMMER
+  Re-Auth verlangen:* das würde jede In-Space-Mehrfachauswahl (P6-AN) unnötig hinter ein
+  Passwort-Formular stellen, obwohl der Server es nie verlangen würde — genau die Reibung, die
+  dieser Schnitt beheben soll.
+- **P6-AN — In-Space-Mehrfachauswahl bleibt ohne neues Rechte-Verhalten.** Direkte Folge aus 9.1:
+  für einen reinen Ordnerwechsel liefert Runde 1 nie ein `reauth_required`, der Batch braucht also
+  faktisch nie eine zweite Runde. Kein Sonderfall im Code — dieselbe Schleife wie P6-AL, nur dass
+  Runde 2 in der Praxis leer bleibt.
+
+### 9.3 UI (`phase5_ui/webui/static/js/`)
+
+1. **Auswahl.** Strg+Klick oder Long-Press auf eine Listenzeile (Nikinger-Vorgabe) togglet die
+   `<li>` in `state.selectedItemIds` (neues `Set`, `list.js`). Ausgewählte Zeilen bekommen eine
+   Modifier-Klasse (`.list__row--selected`), analog zu `[aria-current]` bei der Navigation.
+   **Navigation leert die Auswahl** (Ordnerwechsel, Bucket-Wechsel, Suche) — dieselbe
+   Exklusivitäts-Disziplin wie `state.folder`/`state.filter` seit Step 7 Commit 1 (dort bereits
+   ein Advisor-Fund zu ungeschütztem `state.filter`-Zugriff, siehe Modul-Status Zeile 10). Ohne
+   diese Regel könnte eine Auswahl Items enthalten, die in der aktuellen Listenansicht gar nicht
+   mehr sichtbar sind — die „8 von 10 verschoben"-Zusammenfassung (Punkt 4) würde dann auf Zeilen
+   verweisen, die der Mensch nicht mehr sieht.
+2. **Aktion.** Ein Auswahl-Werkzeugleiste erscheint nur, wenn `selectedItemIds` nicht leer ist:
+   „N ausgewählt · Verschieben · Abwählen". „Verschieben" öffnet `openMoveDialog()` (§4.4) mit
+   `moveTargetItems = [...ausgewählte Items]` statt eines einzelnen `moveTargetItem` — derselbe
+   Dialog, keine zweite Dialog-Definition.
+3. **Ausführung.** `moveSelectedItems(items, {space, folder})` (`list.js`, neu) — die in P6-AL/AM
+   beschriebene Zweirunden-Schleife, meldet Fortschritt (`x von N`) im Dialog selbst.
+4. **Ergebnis.** Sammel-Toast: „8 von 10 verschoben." Fehlgeschlagene Items namentlich in einer
+   zweiten Zeile („2 fehlgeschlagen: „Einkaufsliste" [Konflikt], „Q3-Plan" [keine Schreibrechte
+   am Ziel]") — kein stilles Verschlucken einzelner Fehler in einer Sammelmeldung ohne Namen.
+5. **Nach dem Batch:** Auswahl geleert, Liste neu geladen (anders als bei §4.4 Punkt 5 — bei
+   mehreren Items aus potenziell verschiedenen Ausgangsordnern ist „die Auswahl folgt in den
+   Zielordner" kein eindeutiger Zustand mehr, eine geleerte Auswahl ist der ehrlichere Default).
+
+### 9.4 Tests
+
+**Keine neue Backend-Testdatei** — P6-AL macht dieses §9 zu einem reinen Frontend-Schnitt, der
+bereits gebaute und getestete Step-7b-Endpunkt bleibt unverändert. Verifikation beim Bauen wie
+bei jedem anderen JS-Schnitt dieser Phase (P5-T): Playwright-Sichtprobe gegen einen echten,
+temporären Server — Mehrfachauswahl (3+ Items), Batch in einen Space ohne Widen (keine
+Re-Auth-Aufforderung erwartet), Batch mit einem Widen-Item (genau ein Re-Auth-Formular), ein
+absichtlich in Konflikt gebrachtes Item in der Mitte einer Auswahl (Batch läuft weiter, taucht
+namentlich im Fehlerbericht auf). `pytest` läuft unverändert als Regressionsprobe (kein neuer
+Test erwartet, keiner sollte kippen).
+
+### 9.5 Neue Abnahmezeilen
+
+Fortsetzung der Matrix aus §5 (dort 25–30).
+
+| # | Kriterium | Wer |
+|---|---|---|
+| 31 | N ausgewählte Items werden auf einmal in denselben Zielspace/-ordner verschoben; alle N Dateien liegen danach real dort, ein `move`-Commit je Item | Niklas |
+| 32 | Eine Auswahl mit genau einem rechteerweiternden Item verlangt **ein** Re-Auth-Formular pro Versuch, nicht eines je Item (ein Formular deckt Runde 2 für alle zurückgewiesenen Items gemeinsam ab — ein Tippfehler bei Passwort/TOTP zeigt es korrekt erneut) | Niklas |
+| 33 | Ein einzelnes fehlgeschlagenes Item in der Auswahl (z. B. veraltete Version) blockiert die anderen nicht — Sammelmeldung nennt es namentlich | Niklas |
+| 34 | Mehrfachauswahl innerhalb eines Space löst nie ein Re-Auth-Formular aus | Niklas |
+
+### 9.6 Was §9 nicht tut
+
+- **Unterschiedliche Ziele pro Item in einem Batch** — P6-AK, bewusst draußen.
+- **Ein Bulk-Endpunkt oder ein achtes MCP-Tool** — P6-AL, bewusst draußen; dieselbe
+  Zurückhaltung wie beim offenen „kein Bulk-Append"-Punkt der Werkzeug-Ergonomie-Vormerkung
+  (Phase-Head, 2026-08-14) — ein Bulk-Schreibpfad ist ein eigener, größerer Schnitt mit eigener
+  Rechteprüfung, kein Nebenprodukt dieses Plans.
+- **Mehrfachauswahl für andere Aktionen** (Archivieren, Freigeben) — nur Verschieben war
+  gemeldet, nur Verschieben ist hier geplant.

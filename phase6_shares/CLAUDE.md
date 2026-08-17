@@ -9,7 +9,7 @@ down:
   - ./ITEM_MOVE_PLAN.md                            # Zusatzplan zu Step 7: Item-Verschieben (Ordner+Space) + Textfarben, P6-AD–P6-AJ
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-7 + v2.1-Deploy verbatim (neun Eintraege), L3, kein Softcap
-updated: 2026-08-16, zehnter -- (neunter-Block achte Rotation, verbatim ins Archiv, kein Softcap-Auslöser; zwei der vier UI-Feedback-Punkte umgesetzt -- select.input accent-color [Dropdown-Lila behoben], --ok-Token entfernt und durch --accent ersetzt in .toast/.visibility-chip--shared [Gruen->Blau], live per Playwright bestaetigt; Punkte 2/3 [Step 7b, Mehrfachauswahl] bleiben offen; 747 pytest unveraendert; kein Deploy diese Session)
+updated: 2026-08-17, elfter -- (zehnter-Block neunte Rotation, verbatim ins Archiv; Planungssession "light" -- ITEM_MOVE_PLAN.md P6-AD-AJ gelockt (Nikinger-Freigabe), V52-V55 gegen echten Step-7-Code geschlossen, Guard-Routing-Fund in Sec4.2/4.3 praezisiert, neues Sec9 Mehrfachauswahl P6-AK-AN inkl. vier Abnahmezeilen; keine Code-Aenderung, 747 pytest unveraendert)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -97,7 +97,7 @@ weiter ohne Build-Step (AC).
 | 5 | Storage-Fundament (Block B): Charakterisierungstests + Goldens zuerst (P6-D), `storage/acl.py` (neu), `models.py`/`files.py`/`index.py`/`store.py`-Erweiterung (`folder`/`visibility`/`share_*`, `acl_of()`, `list_spaces()`), `index.py`-Rebuild-Fix (V46), zweiter Advisor-Durchlauf: `folder` jetzt pfadabgeleitet statt indexvertraut | 4 | ✅ **gebaut, 2026-08-12** — Charakterisierung vor+nach byte-identisch grün, DoD aus Plan §4 Step 4 erfüllt; noch nicht live geprüft (kein eigener Abnahmematrix-Punkt für diesen Step) | +36 `phase1_storage/` (1 `test_models.py` + 11 `test_files.py` + 4 `test_index.py` + 20 `test_store.py`) + 10 `phase6_shares/tests/test_acl.py`; 671 gesamt |
 | 6 | Rechtepolitik (Block B): `storage/acl.py` +`grants_for_space()`/`decision_for()`, `store.py` +`acl_reader`-Property (kleine, dokumentierte Erweiterung über Step 5s Dateiliste hinaus), `mcpserver/permissions.py` (`Surface`, `SharePolicy` ersetzt `OwnSpaceWritable`), `mcpserver/app.py` (Verdrahtung über `store.acl_reader`), `mcpserver/tools.py` (alle sieben Tools auf `acl_of()`+`can_read_item`/`can_write_item` umgestellt, `search_items`/`list_spaces` item-weise statt space-weise gefiltert, `create_item(space=, folder=)`, `update_item(folder=)`), `webui/api.py`+`serializers.py` (dieselbe Umstellung, `Surface.HUMAN` über `SharePolicy.can_read_item_as_human()`/`can_write_item_as_human()` gekapselt — P5-B erlaubt weiterhin nur ein `mcpserver`-Symbol) | 5 | ✅ **gebaut, 2026-08-12** — DoD aus Plan §4 Step 5 erfüllt, alle 12 Pflichttests + Fail-Closed-Folder-Fund + `can_write_item`-visibility-Fix (Advisor-Fund nach dem ersten Commit) abgedeckt; noch nicht live geprüft (kein eigener Abnahmematrix-Punkt) | +10 `phase2_mcp/tests/test_tools.py` (30→40) + 9 `test_permissions.py` (3→12, Datei vollständig neu geschrieben) + 2 `phase5_ui/tests/test_api.py` (27→29) + 2 `test_serializers.py` (7→9), Kollateralkorrekturen in `phase2_mcp/tests/test_app.py`/`phase5_ui/tests/test_overview.py`/conftest-Fixtures (keine neuen Tests, nur Assertions auf die neue ACL nachgezogen); 694 gesamt |
 | 7 | Verwaltung und Migration (Block B): `phase6_shares/scripts/spacectl.py` (neu — `create-space`/`list-spaces`/`show`/`add-member`/`remove-member`/`remove-space`/`check`), `phase6_shares/scripts/migrate_visibility.py` (neu — `--dry-run` Default, **kein** Versionssprung), `phase3_edge/scripts/diagnose.sh` Prüfung 12 (verwaiste/kaputte `.share.yml`-Referenzen über `spacectl.py check --json`, INFO/WARNUNG, kein Abbruchkriterium) | 6 | ✅ **gebaut, 2026-08-12** — Details, beide Plan-Abweichungen (DATA_ROOT-Auflösung, kein Index-Rebuild) und die Advisor-Runde davor: Session-Block unten. DoD-Live-Teil (realer dritter Nutzer, echter `diagnose.sh`-Lauf) bleibt Nikinger-Sache wie bei Steps 4/5 | +28 (20 `phase6_shares/tests/test_spacectl.py` [neu] + 8 `test_migrate_visibility.py` [neu]); 722 gesamt |
-| 8 | Lesbarkeit der Textfarben (`ITEM_MOVE_PLAN.md` §3, P6-AD/AE): `phase5_ui/webui/static/app.css` — `--text-muted`/`--text-faint` kalibriert angehoben, neues `--text-placeholder`, `.input::placeholder` darauf umgehängt. **Nachtrag, Nikinger-Feedback vor dem Deploy:** Wortmarke „sharefyx" + Versionsbadge (jetzt `v2.1`, `app.html`) sowie alle Versionsnummern aus den Dateien (`recent-row__meta`, `.editor__version`, `.version-band__number`, `ro-meta`) jetzt `var(--text)` statt `--text-faint`/`--text-muted` — neue Klasse `.version-num` trennt die Versionsnummer farblich vom gedämpften Begleittext im selben Element (`app.css`/`app.js`) | 7a | ✅ **gebaut, Deploy beim Nikinger** — Kontrastwerte bereits in `ITEM_MOVE_PLAN.md` §3.1 protokolliert (durchgerechnet vor dieser Session); Sichtprobe zweimal per In-Process-Server + Screenshot gegen die echte `app.css`/`app.js` (Login-Seite, Liste mit Chips, Editor mit Meta-Panel — alle drei beide Male gesehen, nicht behauptet). Deploy braucht Sudo für den Neustart, außerhalb dessen, was Claude Code selbst kann (Präzedenz: Steps-4–6-Cutover, `SESSIONS_ARCHIVE.md`) | 0 (P5-T: JS/CSS bleiben unit-ungetestet; `pytest` unverändert als Regressionsprobe — 724 gesamt vor UND nach beiden Teilen dieser Session, keiner davon neu) |
+| 8 | Lesbarkeit der Textfarben (`ITEM_MOVE_PLAN.md` §3 — **[2026-08-17 Korrektur]** dort ohne Entscheidungscode; „P6-AD/AE" war ein Kopierfehler aus §2, das sind tatsächlich Step-7b-Entscheidungen [`Store.move()`/Rechteregel], nicht Step 7as Textfarben): `phase5_ui/webui/static/app.css` — `--text-muted`/`--text-faint` kalibriert angehoben, neues `--text-placeholder`, `.input::placeholder` darauf umgehängt. **Nachtrag, Nikinger-Feedback vor dem Deploy:** Wortmarke „sharefyx" + Versionsbadge (jetzt `v2.1`, `app.html`) sowie alle Versionsnummern aus den Dateien (`recent-row__meta`, `.editor__version`, `.version-band__number`, `ro-meta`) jetzt `var(--text)` statt `--text-faint`/`--text-muted` — neue Klasse `.version-num` trennt die Versionsnummer farblich vom gedämpften Begleittext im selben Element (`app.css`/`app.js`) | 7a | ✅ **gebaut, Deploy beim Nikinger** — Kontrastwerte bereits in `ITEM_MOVE_PLAN.md` §3.1 protokolliert (durchgerechnet vor dieser Session); Sichtprobe zweimal per In-Process-Server + Screenshot gegen die echte `app.css`/`app.js` (Login-Seite, Liste mit Chips, Editor mit Meta-Panel — alle drei beide Male gesehen, nicht behauptet). Deploy braucht Sudo für den Neustart, außerhalb dessen, was Claude Code selbst kann (Präzedenz: Steps-4–6-Cutover, `SESSIONS_ARCHIVE.md`) | 0 (P5-T: JS/CSS bleiben unit-ungetestet; `pytest` unverändert als Regressionsprobe — 724 gesamt vor UND nach beiden Teilen dieser Session, keiner davon neu) |
 | 9 | UI Dateisystem (Block B), Commit 0/7 — `app.js` (1525 Zeilen, ein `initShell()`-Closure) entlang der bestehenden Kommentar-Nahtstellen in zehn ES-Module unter `phase5_ui/webui/static/js/` aufgeteilt (`app`/`api`/`state`/`tree`/`list`/`editor`/`markdown`/`dialogs`/`toasts`/`updates`), `state.js` als einzelnes mutierbares Objekt (von allen Importern geteilt, Ersatz für den Closure-`state`), jedes Modul ein `init(deps)`, das der neue schlanke `app.js` beim Bootstrap der Reihe nach aufruft. Bisheriges Zwei-Skript-Modell (`js/updates.js` als globales Skript vor `app.js`, `window.SharefyxUpdates`) entfällt — `updates.js` ist jetzt selbst ein Modul, `app.html`/`pages.py` laden nur noch `<script type="module" src=".../js/app.js">`. `ui_budget.py` zählt die Nutzlast jetzt über `js/*.js`-Glob statt fester Namen | 7 | ✅ **gebaut, noch nicht deployt** — CSP (`script-src 'self'`) erlaubt Same-Origin-`type="module"` ohne Header-Änderung (V50 geschlossen); Sichtprobe golden path (Login → Liste → bestehendes Item öffnen+bearbeiten+speichern v1→v2 → neu anlegen) per Zwei-venv-Playwright-Skript, fünf Screenshots gesehen, nicht nur behauptet | 0 (P5-T: JS bleibt unit-ungetestet; fünf bestehende Tests in `test_static_routes.py` auf die neue Modulstruktur umgeschrieben, keiner neu; 724 gesamt unverändert) |
 | 10 | UI Dateisystem (Block B), Commit 1/7 — echter Ordnerbaum, kein Backend-Fund nötig (`GET /api/v1/items?folder=` existierte bereits, `GET /api/v1/spaces` trug `folders`/`members` schon, nur `app.js` rief die Route nie ab). `list.js :: loadOverview()` holt jetzt `/overview`+`/spaces` per `Promise.all`, mischt `folders`/`members` nach Name in die Space-Objekte. `tree.js`: `buildFolderTree()` (flache Pfadliste → ≤2-stufiger Baum, reines Splitten auf „/", da `MAX_FOLDER_DEPTH` serverseitig gilt), `renderRealFolders()` reused `.tree__folder` (neue Modifier-Klasse `.tree__realfolder--child` nur für die Einrückung der zweiten Ebene), `navigate()`/`navigateFolder()` jetzt exklusiv (`state.folder`/`state.filter` nie beide gesetzt). `list.js`: `filterParams()`/`renderCrumb()`/Leerzustand-Text folder-bewusst gemacht | 7 | ✅ **gebaut, noch nicht deployt** — Sichtprobe mit zwei echten, verschachtelten Ordnern (`Projekte`/`Projekte/Backend`, serverseitig zu `projekte`/`projekte/backend` slugifiziert, P6-Q — Baumdarstellung ist davon unabhängig, reine String-Weiterreichung): Verschachtelung im Baum sichtbar, Klick navigiert **und** filtert exakt (nicht Präfix, V55) auf beiden Ebenen, per Playwright-Assertions auf die tatsächlich gerenderten Zeilentitel erzwungen, nicht nur der Screenshot. Advisor-Fund vor dem Commit, geprüft statt blind gefixt: `navigateFolder()` setzt `state.filter=null`, `dialogs.js :: openCreateDialog()` liest `state.meta.buckets[state.filter]` ungeschützt — JS stringifiziert einen `null`-Schlüssel zu `"null"`, kein `TypeError`, derselbe Fallback-Pfad wie beim typlosen Bucket „Archiv" heute schon; per Node-Check UND echtem Browserlauf (Konsolenfehler-Listener, „+" während `projekte/backend` aktiv) bestätigt, **kein Fix nötig**. Offen für Commit 3 (folder-bewusstes Anlegen): der aktuelle Fallback „leerer Ordner → Typ Notiz" ist ein stiller Default, keine bewusste Entscheidung für echte Ordner | 0 (P5-T: JS bleibt unit-ungetestet, kein jsdom-Zusatzlauf — die echte Browserprobe deckt strenger ab; 724 gesamt unverändert) |
 | 11 | UI Dateisystem (Block B), Commit 2/7 — Sichtbarkeits-Chip, kein Backend-Fund nötig (`visibility`/`share_read`/`share_write` stehen bereits auf `summary_to_json()`, P6 Step 5). `list.js`: neue `visibilityLabel()`/`visibilityChip()`, in `renderList()`s Zeilen verdrahtet (`.list__row-meta` von reinem Text auf Flex mit Meta-Text + Chip umgebaut). `app.css`: `.visibility-chip`/`.visibility-chip--shared` (gedämpft vs. `--ok`-grün), reused `.list__row-meta`s bestehende Fläche | 7 | ✅ **gebaut, noch nicht deployt** — Sichtprobe mit vier Items (privat/nur-ich/geteilt/Randfall), alle drei geplanten Chip-Zustände + der Randfall per Playwright-Assertion auf gerenderten Chip-Text erzwungen (nicht nur Screenshot), Konsolenfehler-Listener sauber. **Benannte Abweichung vom Plan-Wortlaut, gefunden beim Nachlesen von `acl.py`/`permissions.py` vor dem Commit:** der Plan prüft `visibility` zuerst („private" → unbedingt „privat"), aber `acl.py :: decision_for()` verundet `share_read`/`share_write` immer in `AclDecision.read`/`write`, unabhängig von `visibility` — nur `Surface.AGENT` fragt `visibility` (P6-P), nie ein Mensch. Ein Item mit `visibility=private` UND einer echten Freigabe ist für den Freigegebenen faktisch lesbar, erreichbar schon heute über ein rohes `PATCH /api/v1/items/{id}` (`_items_patch` hat keine Feld-Whitelist) — nicht erst über Commit 5s künftigen Dialog. Dispatch umgestellt: `share_read`/`share_write` non-empty entscheidet zuerst, `visibility` nur als Fallback ohne Freigaben — ein vierter Testfall (`visibility=private`+`share_read=[fabian]`) beweist den Unterschied, zeigt korrekt „geteilt mit fabian" statt „privat". **Zweiter, nicht blockierender Punkt:** der Chip erscheint identisch für Items aus fremden, geteilten Spaces (`renderList()` ist derselbe Codepfad für jeden Space) — das sind ACL-Metadaten, keine Fließtext-Bodies, Hard Rule 4s `<untrusted_content>`-Wrapping betrifft das nicht (derselbe Schnitt wie `overview_row_to_json()`s `snippet`-Auslassung, nur umgekehrt: hier ist die Metadaten-Anzeige bewusst, nicht der Fließtext) | 0 (P5-T: JS bleibt unit-ungetestet, kein jsdom-Zusatzlauf — die echte Browserprobe deckt strenger ab; 724 gesamt unverändert) |
@@ -114,6 +114,11 @@ bekommt `folder`/`visibility`/`share_read`/`share_write`, `store.py` bekommt `ac
 erweiterte `create()`/`update()`/`search()`/`list_spaces()`. Wird in Step 4 umgesetzt, hier nur
 angekündigt — nach Phasenabschluss (Step 10) wieder geschlossen, siehe `phase1_storage/CLAUDE.md`.
 
+**[2026-08-17, Planungssession] Vierte, benannte Öffnung angekündigt:** `store.py` bekommt
+`move(item_id, *, version, space=, folder=)` (`ITEM_MOVE_PLAN.md` §4.1, P6-AD). Additiv zur
+dritten Öffnung, kein bestehendes Signatur wird geändert. Wird mit Step 7b umgesetzt, hier nur
+angekündigt — schließt zusammen mit der dritten Öffnung nach Phasenabschluss.
+
 ## Vormerkungen (nicht Teil eines aktuellen Steps)
 
 **[2026-08-14] UI-Feedback nach dem Live-Deploy von v2.1 (Nikinger, direkt nach der ersten
@@ -125,21 +130,26 @@ angefasst:**
    Darstellung der `<option>`-Popup-Liste. Der vermutete erste Versuch hat gereicht:
    `select.input { accent-color: var(--accent); }` — live per Playwright-Screenshot bestätigt
    (die Popup-Liste rendert jetzt blau statt lila, kein selbstgebauter Dropdown nötig).
-2. **Space-zu-Space-Verschieben — Status geklärt, nicht „laut Plan nirgends vorgesehen".** Es
-   ist bereits geplant, als **Step 7b** in `phase6_shares/ITEM_MOVE_PLAN.md` §4 (Entscheidungen
-   P6-AD–P6-AJ, setzt den jetzt fertigen Step 7 voraus) — nur noch nicht gebaut (kein Eintrag in
-   der Modul-Status-Tabelle dieses Kopfs). Der Plan sieht dort bereits **Re-Auth bei einem
-   Cross-Space-Move** vor (P6-AI: „läuft durch `widens()`/Re-Auth") — deckt sich direkt mit
-   Punkt 3 unten, keine neue Entscheidung nötig, nur noch nicht umgesetzt.
-3. **Mehrfachauswahl (Long-Press oder Strg+Klick) fürs Verschieben mehrerer Items auf einmal** —
-   aktuell nicht gebaut, Step 7 verschiebt ausschließlich ein Item pro Aktion (Menü wie Drag &
-   Drop). Nikinger-Vorgabe für eine künftige Umsetzung: ein einmaliger Code für die
-   Mehrfachauswahl-Aktion selbst ist akzeptabel (deckt sich mit P6-AI, falls sie über
-   Space-Grenzen geht), **Verschieben innerhalb eines Space muss dabei weiterhin codefrei
-   bleiben** — bereits heute der Fall und in der Post-Deploy-E2E-Session read-only bestätigt:
-   `moveItemToFolder()` (`webui/api.py`) patcht ausschließlich `folder`, nie `share_read`/
-   `share_write`; `webui/shares.py :: widens()` liest exakt diese beiden Felder und greift bei
-   einem reinen Ordnerwechsel nie.
+2. **✅ Subplan gelockt (2026-08-17).** Space-zu-Space-Verschieben ist als **Step 7b** in
+   `phase6_shares/ITEM_MOVE_PLAN.md` §4 (Entscheidungen **P6-AD–P6-AJ**, setzt den fertigen
+   Step 7 voraus) ausführungsreif geplant — **diese Session hat die Freigabe eingeholt und
+   dokumentiert** (§2 des Plans, „[2026-08-17 gelockt]"), vorher offen seit der Planungssession
+   vom 2026-08-13 (kein Freigabe-Nachweis in keiner Session dazwischen, siehe Plan §2). Ein
+   Advisor-Fund vor dem Bauen führte zu einer Präzisierung des Guard-Routings in Plan §4.2/§4.3
+   (der alte Eigentümer-Riegel hätte sonst legitime Cross-Space-Moves mit `folder=` blockiert)
+   plus einem neuen Pflichttest dafür. **Noch nicht gebaut** — nächster Schritt ist die
+   Umsetzung entlang Plan §4.
+3. **✅ Subplan geschrieben (2026-08-17).** Mehrfachauswahl (Long-Press oder Strg+Klick) fürs
+   Verschieben mehrerer Items auf einmal — jetzt als eigenes **§9** in
+   `phase6_shares/ITEM_MOVE_PLAN.md` (Entscheidungen **P6-AK–P6-AN**) ausformuliert: ein
+   gemeinsames Ziel für die ganze Auswahl, kein neuer Endpunkt/kein neues MCP-Tool (die
+   Batch-Aktion ist eine clientseitige Schleife über den bestehenden Step-7b-Einzelpfad),
+   Re-Auth in maximal zwei Runden statt pro Item vorhergesagt. Bestätigt die bisherige
+   Nikinger-Vorgabe read-only: `moveItemToFolder()` (`list.js`, ruft serverseitig `_items_patch`
+   in `webui/api.py`) patcht ausschließlich `folder`, nie `share_read`/`share_write`;
+   `webui/shares.py :: widens()` liest exakt diese
+   beiden Felder und greift bei einem reinen Ordnerwechsel nie — In-Space-Mehrfachauswahl
+   braucht deshalb keine neue Rechteprüfung (P6-AN). **Noch nicht gebaut, setzt Step 7b voraus.**
 4. **✅ Behoben (2026-08-16).** `--ok` (`#47B881`, Grün) wurde für den Erfolgstoast
    (`.toast`, linker Rand) und den Sichtbarkeits-Chip bei geteilten Items
    (`.visibility-chip--shared`) benutzt — beide jetzt `var(--accent)` (Blau), Token selbst
@@ -150,9 +160,10 @@ angefasst:**
    `.list__readonly`/`.detail__badge-readonly`) bleibt **bewusst unangetastet** — Nikinger noch
    unentschieden, was damit passieren soll.
 
-**Punkte 1+4 umgesetzt (2026-08-16, reines CSS, `phase5_ui/webui/static/app.css`) — Punkte 2+3
-bleiben offen**, größerer Zuschnitt (Step 7b, eigener Plan liegt schon vor) — Priorisierung
-weiterhin beim Nikinger.
+**Punkte 1+4 umgesetzt (2026-08-16, reines CSS, `phase5_ui/webui/static/app.css`).** **Punkte
+2+3: Subplan geschrieben und gelockt (2026-08-17, `ITEM_MOVE_PLAN.md` §4/§9, P6-AD–AN) — noch
+nicht gebaut.** Reihenfolge unverändert Nikinger-Sache; Step 7b (Punkt 2) muss vor §9 (Punkt 3)
+gebaut werden, §9 setzt Step 7b architektonisch voraus (§9.1).
 
 **[2026-08-14] MCP-Werkzeug-Ergonomie, Live-Feedback einer arbeitenden Claude-Instanz** — nach
 einem sitzungsreichen Tag (Protokollierung eines OTOBO-Vorgangs, Item `itm_7cf94a2c`, 40+
@@ -201,38 +212,87 @@ das P6 selbst mit ausgelöst hat (`docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` §
 
 ---
 
-## Session stopped — 2026-08-16, zehnter — (zwei der vier UI-Feedback-Punkte umgesetzt, Rotation)
+## Session stopped — 2026-08-17, elfter — (Planungssession „light": Step 7b gelockt, §9 Mehrfachauswahl neu, keine Code-Änderung)
 
-**Auftrag:** Nikinger bat, die „kleinen" der vier vorgemerkten UI-Punkte (siehe „Vormerkungen"
-oben) umzusetzen und offene Arbeit zu committen — Punkte 1 (Dropdown-Lila) und 4 (Grün→Blau)
-sind reines CSS, klein genug für „implement the small fixes"; Punkte 2 (Space-Move, Step 7b) und
-3 (Mehrfachauswahl) bleiben der größere Zuschnitt, unangetastet.
+**Auftrag:** Nikinger — die beiden noch offenen UI-Feedback-Punkte (2: Space-zu-Space-Move/Step
+7b, 3: Mehrfachauswahl) bearbeiten. Nikinger-Rahmen für diese Session: „planning session light,
+da es kein echter Plan ist" — erster Schritt ein Subplan für beide Punkte, plus bei Bedarf die
+Tests, die für einen Abschluss von Phase 6 noch fehlen. Ausdrücklich bestätigt: „I confirm we
+can work on all points."
 
-**Umgesetzt, `phase5_ui/webui/static/app.css`, drei Regeln:**
-- `select.input` bekommt `accent-color: var(--accent)` — behebt die native lila
-  Options-Popup-Darstellung, live per Playwright-Screenshot bestätigt (Popup rendert jetzt blau).
-- `.visibility-chip--shared` und `.toast` (Erfolgsfall) von `var(--ok)` auf `var(--accent)`
-  umgestellt; `--ok`-Token selbst entfernt (nach dem Umbau ungenutzt — `grep` bestätigt keine
-  verbliebene Referenz), kein totes CSS-Property stehen gelassen.
-- „Privat"/„nur ich" und das orangene „nur lesen" (`--warn`) bewusst unangetastet, wie
-  vorgemerkt.
+**Vor dem Schreiben geklärt, nicht angenommen (Advisor-Konsultation vor jeder Substanzarbeit):**
+`ITEM_MOVE_PLAN.md` §2 hatte P6-AD–AJ nie als gelockt dokumentiert — die Planungssession vom
+2026-08-13 endete mit „ITEM_MOVE_PLAN.md vom Nikinger freigeben lassen" als offenem nächsten
+Schritt, die einzige Folge-Session (2026-08-13, Step 7a) war ausdrücklich auf §3 verengt, und
+root-`CLAUDE.md`s „Noch nicht entschieden" trug den Punkt bis zu dieser Session unverändert seit
+2026-08-13 (`git log`/Archiv-Grep über alle Sessions dazwischen bestätigen: keine Freigabe
+dokumentiert). Erst mit der Nikinger-Bestätigung dieser Session gilt §2 als gelockt — im
+Plan-Dokument selbst datiert festgehalten, keine stille Annahme.
 
-**Verifiziert, nicht nur behauptet:** `pytest -q` 747/747 vor und nach der Änderung (reines CSS,
-keine Python-Testkopplung — geprüft, kein Test referenziert `--ok`/`accent-color`). Danach
-Playwright gegen eine frische throwaway-Instanz (Scratchpad, wie bei der Post-Deploy-Session):
-`getComputedStyle(select).accentColor` → `rgb(62, 141, 243)` (= `--accent`), Screenshot einer
-geöffneten Options-Liste zeigt sie blau statt lila; ein echter Erfolgstoast → `borderLeftColor`
-`rgb(62, 141, 243)`; eine echte Freigabe (mit Re-Auth-Runde) → `.visibility-chip--shared`-Farbe
-`rgb(62, 141, 243)`, Text „geteilt mit beta". Alle drei exakt `#3E8DF3`, kein Näherungswert.
+**Ergebnis: zwei Subplan-Erweiterungen in `phase6_shares/ITEM_MOVE_PLAN.md`, keine
+Code-Änderung.**
 
-**Vormerkung nachgezogen:** Punkte 1+4 in „Vormerkungen" oben auf ✅ gesetzt, Punkte 2+3 bleiben
-offen. Keine Deploy-Aktion diese Session — die Änderung liegt im Repo, geht mit dem nächsten
-Deploy raus, kein eigener Dringlichkeitsgrund.
+1. **§2 (Step 7b) gelockt.** P6-AD–P6-AJ tragen jetzt einen datierten Freigabevermerk.
+2. **V52–V55 gegen den inzwischen echten Step-7-Code geschlossen** (bei Plan-Erstellung
+   2026-08-13 existierte Step 7 noch nicht, alle vier waren „wann: Step 7b/Step 7" offen):
+   `reauth_required` ist exakt `ApiError("reauth_required", …)` (`webui/shares.py`), `ShareState`
+   trägt bereits `space`/`folder` — Plan-Annahme in §4.3 hält unverändert. `os.replace()` bleibt
+   über Space-Grenzen atomar: read-only gegen den echten `DATA_ROOT` geprüft (`stat -c %d`),
+   `niklas`/`fabian`/`IT-Sekus-Projekt` liegen alle auf demselben ext4-Gerät (`2050`,
+   `/dev/sda2`). **V54 anders gelöst als geplant, einfacher:** kein `folders`-Feld an
+   `GET /api/v1/overview` nötig — `GET /api/v1/spaces` trägt `folders` bereits für jeden
+   sichtbaren Space, `list.js :: loadOverview()` mischt das seit Step 7 Commit 1 in
+   `state.spaces`, der bestehende `openMoveDialog()`-Code liest schon denselben Weg (§4.4 Punkt 1
+   entsprechend präzisiert, kein Backend-Fund für den Verschieben-Dialog).
+3. **Advisor-Fund vor dem Bauen, in §4.2/§4.3 nachgezogen:** der bestehende Eigentümer-Riegel
+   gegen Nicht-Eigentümer-Ordnerwechsel (`tools.py:514-520`, analog `api.py`) prüft `folder is
+   not None and acl.space != principal.space` — ohne Rücksicht auf `space`. Bei einem
+   Cross-Space-Move MIT gleichzeitig gesetztem Zielordner (der reale Fall aus §4.4 Punkt 1) wäre
+   diese Bedingung für praktisch jeden legitimen Move wahr (kein Principal heißt wie ein
+   geteilter Space, P6-AE) — der alte Riegel hätte einen von P6-AE bereits erlaubten Move
+   fälschlich blockiert. Plan-Text „ersetzt ihn" war codeseitig nicht verankert; jetzt eine
+   explizite Bedingung (`space is None`) plus ein neuer Pflichttest in §4.5. **Noch nicht
+   gebaut** — reine Plan-Präzisierung, kein Code in diesem Repo geändert außer den `.md`-Dateien.
+4. **Neues §9 „Mehrfachauswahl" (P6-AK–AN), vollständig neu entworfen** (dafür lag vorher kein
+   Plan vor, nur eine Nikinger-Vormerkung): ein gemeinsames Ziel für die ganze Auswahl (P6-AK),
+   kein neuer Endpunkt/kein neues MCP-Tool — die Batch-Aktion ist eine clientseitige,
+   sequenzielle Schleife über den bestehenden Step-7b-Einzelpfad, jeder Request durchläuft die
+   volle, bereits gebaute Rechteprüfung unverändert (P6-AL). Re-Auth in maximal zwei Runden
+   (erst alle Requests ohne Credentials, dann ein gemeinsames Formular nur für die
+   zurückgewiesenen) statt der falschen Annahme „ein Ziel ⇒ ein `widens()`-Ergebnis für alle"
+   (P6-AM — `widens()` hängt auch an der `visibility`/`share_*` des einzelnen Items, nicht nur
+   am Ziel). In-Space-Mehrfachauswahl bleibt bestätigt ohne neue Rechteprüfung (P6-AN, bestätigt
+   dieselbe grep-Prüfung, die schon die alte Vormerkung stützte). Vier neue Abnahmezeilen (31–34).
+   **Keine neue Backend-Testdatei geplant** (§9.4) — reiner Frontend-Schnitt, Playwright-Sichtprobe
+   beim Bauen wie bei jedem anderen JS-Schnitt dieser Phase.
+5. **Tests, die für den Abschluss von Phase 6 noch fehlen (Nikinger-Frage dieser Session,
+   beantwortet statt übergangen):** Block A+B sind vollständig gebaut, 747 Tests grün. Was fehlt,
+   ist kein Testcode, sondern **live-Verifikation durch Menschen** — Gate B (Abnahmezeilen 8–18
+   im Hauptplan) braucht weiterhin echten Alltag von Niklas **und** Fabian, nicht mehr
+   Claude-Code-Sessions. Für Step 7b/§9 selbst: genau ein neuer Pflichttest (Punkt 3 oben) plus
+   die bereits in `ITEM_MOVE_PLAN.md` §4.5 gelisteten 14 — beide noch ungeschrieben, weil noch
+   nicht gebaut. **Block C (Bilder, Abnahmezeilen 19–22) ist separat und laut P6-A explizit die
+   erste Stelle, die unter Druck wegfällt** — nicht Teil dieser beiden Feedback-Punkte, hier
+   bewusst nicht mitgeplant; ob Block C für einen Phasenabschluss noch gebaut wird, bleibt
+   Nikinger-Entscheidung.
 
-**Rotation:** der vorige Block („neunter", 2026-08-14) ist abgeschlossene Historie (v2.1-Deploy
-liegt zwei Tage zurück) — verbatim nach `SESSIONS_ARCHIVE.md` (achte Rotation, kein
-Softcap-Auslöser diesmal, reine Ein-Block-pro-Session-Disziplin), byte-für-byte geprüft.
+**Nebenfund, im selben Commit korrigiert:** Modul-Status Zeile 8 zitierte „P6-AD/AE" für Step 7a
+(Textfarben) — ein Kopierfehler, diese Codes gehören zu Step 7b (`Store.move()`/Rechteregel),
+§3 (Textfarben) hat gar keine eigenen Entscheidungscodes. Datierte Korrekturnotiz statt
+rückwirkendem Umschreiben.
 
-**Nächster Schritt:** kein offener Punkt aus dieser Session. Für die nächste: Punkte 2/3 (Step
-7b) brauchen eine eigene Planungsrunde vor dem Bauen (`ITEM_MOVE_PLAN.md` liegt schon vor),
-Gate B (Abnahmezeilen 8–18) braucht weiterhin echte Nutzer/Fabian im Alltag.
+**Contract-Ankündigung nachgezogen:** „Geerbte Contracts" bekommt eine vierte, benannte Öffnung
+(`store.py :: move()`, additiv) — angekündigt, noch nicht umgesetzt, gleiche Konvention wie die
+dritte Öffnung aus Step 0.
+
+**Verifiziert:** keine Testsuite gelaufen (reine `.md`-Änderungen, kein Code). Tabu-Diff nicht
+relevant. `git log`/`SESSIONS_ARCHIVE.md`-Grep für den Freigabe-Nachweis oben tatsächlich
+ausgeführt, nicht behauptet (Befehle und Treffer: siehe Advisor-Konsultation dieser Session).
+Dateigröße `ITEM_MOVE_PLAN.md` nach allen Ergänzungen: **~39,3 KB** — knapp unter dem 40-KB-
+Softcap für 📗-Dokumente, keine Rotation/Auslagerung nötig, aber der nächste Zuwachs (z. B. eine
+weitere Erweiterung) braucht eine Softcap-Prüfung vor dem Schreiben, nicht danach.
+
+**Nächster Schritt:** Step 7b bauen (`ITEM_MOVE_PLAN.md` §4, jetzt gelockt) — danach erst §9
+(Mehrfachauswahl setzt Step 7b architektonisch voraus, §9.1). Root-`CLAUDE.md`s „Noch nicht
+entschieden"-Eintrag zum Item-Verschieben wird im selben Commit wie dieser Session-Block entfernt
+(die Planungsfrage ist beantwortet, nur der Bau steht noch aus).

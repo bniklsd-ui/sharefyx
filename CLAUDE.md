@@ -285,12 +285,11 @@ P2 Step 2 — siehe P2-Plan §0.4 Punkt L).
 | R6 | Zweck | **Lernprojekt**, später evtl. Arbeitswerkzeug. Bei Zielkonflikt gewinnt Lerneffekt über Bequemlichkeit — außer bei Safety/Secrets, dort gewinnt immer die sichere Variante. |
 
 **Noch nicht entschieden (bewusst offen, für spätere Planungssessions):**
-- **Item-Verschieben zwischen Ordnern und Spaces** (Nikinger-Meldung, 2026-08-13, nach dem
-  Steps-4-6-Live-Cutover) — geprüft und bestätigt fehlend auf allen drei Schichten (`storage`,
-  `webui/api.py`, `mcpserver/tools.py`); soll zusammen mit dem bereits gebauten geschichteten
-  Ordnermodell (P6 Step 4) geplant werden. Nächste Planungssession dafür ist mit Opus vorgesehen.
-  Scoping-Stichpunkte + der bereits geklärte Git-Historie-Punkt (ein Repo für den ganzen
-  `DATA_ROOT`, kein Cross-Repo-Problem): `phase6_shares/CLAUDE.md`s Session-Block vom selben Tag.
+- ~~Item-Verschieben zwischen Ordnern und Spaces~~ **[2026-08-17 geplant und gelockt]** —
+  `phase6_shares/ITEM_MOVE_PLAN.md` §4 (Step 7b, Space-Move, Entscheidungen P6-AD–AJ) + §9
+  (Mehrfachauswahl, P6-AK–AN) sind ausführungsreif und per Nikinger-Freigabe gelockt. Kein
+  offener Planungsbedarf mehr — nur noch **nicht gebaut**. Details:
+  `phase6_shares/CLAUDE.md`s aktuellem Session-Block.
 - **MCP-Werkzeug-Ergonomie, Live-Feedback einer arbeitenden Claude-Instanz** (Nikinger-Meldung,
   2026-08-14, nach einem sitzungsreichen Protokollierungstag — 40+ `append_to_item`-Aufrufe für
   ein einziges Log-Dokument) — sechs Punkte: kein Bulk-Append, `list_spaces` in der eigenen
