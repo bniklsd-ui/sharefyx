@@ -760,3 +760,78 @@ def test_search_summary_carries_folder_and_visibility(store):
     result = store.search()
     assert result.items[0].folder == "projekte"
     assert result.items[0].visibility == "human"
+
+
+# -- Step 7b: move() -- P6-AD-AJ, phase6_shares/ITEM_MOVE_PLAN.md §4 --------------------------
+
+
+def test_move_between_spaces_rewrites_frontmatter_space(store, tmp_path):
+    (tmp_path / "fabian").mkdir()
+    item = store.create("nikinger", type="note", title="Umzug")
+
+    moved = store.move(item.id, version=item.version, space="fabian")
+
+    assert moved.space == "fabian"
+    new_path = tmp_path / "fabian" / f"{item.id}__umzug.md"
+    assert new_path.exists()
+    assert not (tmp_path / "nikinger" / f"{item.id}__umzug.md").exists()
+    # Fund B2 der P2-Adapter-Abnahme: Frontmatter muss mit dem Pfad mitziehen, nie divergieren.
+    assert "space: fabian" in new_path.read_text(encoding="utf-8")
+    fetched = store.get(item.id)
+    assert fetched.space == "fabian"
+
+
+def test_move_between_spaces_produces_exactly_one_commit(store_git, tmp_path):
+    (tmp_path / "fabian").mkdir()
+    item = store_git.create("nikinger", type="note", title="Umzug")
+
+    store_git.move(item.id, version=item.version, space="fabian")
+
+    messages = _git_log(tmp_path)
+    move_commits = [m for m in messages if m.startswith("move ")]
+    assert len(move_commits) == 1
+    assert move_commits[0] == f"move {item.id} [fabian]"
+
+
+def test_move_bumps_version_and_conflicts_on_stale_version(store, tmp_path):
+    (tmp_path / "fabian").mkdir()
+    item = store.create("nikinger", type="note", title="Umzug")
+
+    moved = store.move(item.id, version=item.version, space="fabian")
+    assert moved.version == item.version + 1
+
+    with pytest.raises(ConflictError):
+        store.move(item.id, version=item.version, space="nikinger")
+
+
+def test_move_to_nonexistent_space_raises_instead_of_creating_it(store, tmp_path):
+    item = store.create("nikinger", type="note", title="Umzug")
+
+    with pytest.raises(ValidationError):
+        store.move(item.id, version=item.version, space="nirgendwo")
+
+    assert not (tmp_path / "nirgendwo").exists()
+
+
+def test_move_removes_emptied_source_folder_but_keeps_one_with_share_yml(store, tmp_path):
+    (tmp_path / "fabian").mkdir()
+    without_share = store.create("nikinger", type="note", title="Leer wird", folder="alt")
+    with_share = store.create("nikinger", type="note", title="Bleibt", folder="geteilt")
+    (tmp_path / "nikinger" / "geteilt" / ".share.yml").write_text(
+        "write: [fabian]\n", encoding="utf-8"
+    )
+
+    store.move(without_share.id, version=without_share.version, space="fabian")
+    store.move(with_share.id, version=with_share.version, space="fabian")
+
+    assert not (tmp_path / "nikinger" / "alt").exists()
+    assert (tmp_path / "nikinger" / "geteilt").is_dir()
+    assert (tmp_path / "nikinger" / "geteilt" / ".share.yml").exists()
+
+
+def test_move_of_archived_item_is_rejected(store):
+    item = store.create("nikinger", type="note", title="Erledigt")
+    archived = store.archive(item.id, version=item.version)
+
+    with pytest.raises(ValidationError):
+        store.move(archived.id, version=archived.version, space="nikinger")

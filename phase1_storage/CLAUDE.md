@@ -7,7 +7,7 @@ up: ../CLAUDE.md
 down:
   - ../docs/concepts/phase1_storage_plan.md   # voller Plan, Entscheidungen A–H, Steps 0–7
   - SESSIONS_ARCHIVE.md                       # ältere Session-Blöcke
-updated: 2026-08-12 (P6 Step 4 -- dritte Contract-Oeffnung fortgesetzt: folder/visibility/share_*, acl.py, index-Rebuild-Fix)
+updated: 2026-08-17 (P6 Step 7b Commit 1/3 -- vierte Contract-Oeffnung: store.py :: move() + _cleanup_emptied_folders(), 123 Tests)
 ---
 # CLAUDE.md — Phase 1: Storage-Kern (`phase1_storage/`)
 
@@ -95,14 +95,17 @@ P1 nicht abgeschlossen, egal wie viel Code existiert.
 | 8 | `scripts/space_cli.py` | 7 | ✅ | 9 |
 | 9 | `patch.py` (neu) + `store.py :: patch()` | P6 Step 1 | ✅ | 5 (in `test_store.py`; die vier reinen `apply_edits()`-Funktionstests liegen in `phase6_shares/tests/test_patch.py`, außerhalb dieses Pakets) |
 | 10 | `acl.py` (neu) + `folder`/`visibility`/`share_read`/`share_write` in `models.py`/`store.py`/`index.py`/`files.py` — `Store.acl_of()`, `list_spaces()` verzeichnisbasiert, `index.connect()` liefert `(conn, rebuilt)` | P6 Step 4 | ✅ | 36 (1 `test_models.py` + 11 `test_files.py` + 4 `test_index.py` + 20 `test_store.py`) + 10 `phase6_shares/tests/test_acl.py` (außerhalb dieses Pakets) |
+| 11 | `store.py :: move()` (neu) + `_cleanup_emptied_folders()` (intern, P6-AF) — Space-/Ordner-Move additiv zu `update()`/`archive()`, `space` bleibt in `_SYSTEM_MANAGED_FIELDS` | P6 Step 7b, Commit 1/3 | ✅ | 6 (in `test_store.py`) |
 
-**Gesamt: 117 Tests** (`70 Tests` war der Stand bei Phasenabschluss; **[2026-07-25 Korrektur,
+**Gesamt: 123 Tests** (`70 Tests` war der Stand bei Phasenabschluss; **[2026-07-25 Korrektur,
 P2 Step 0]:** `rename_for_new_slug()` samt zweier Tests entfernt, 70→68; **[2026-07-25,
 P2 Step 2]:** acht neue Tests für die drei freigegebenen Contract-Erweiterungen, 68→76 — siehe
 „Geerbte Contracts" unten; **[2026-08-09, P6 Step 1]:** fünf neue Tests für `Store.patch()`
 (dritte, benannte Contract-Öffnung, siehe unten), 76→81; **[2026-08-12, P6 Step 4]:** 36 neue
 Tests für `folder`/`visibility`/`share_*`/`acl_of()`/`list_spaces()` (Fortsetzung derselben
-dritten Öffnung, siehe unten), 81→117). Zielgröße am Phasenende: grob 60–90,
+dritten Öffnung, siehe unten), 81→117; **[2026-08-17, P6 Step 7b Commit 1]:** sechs neue Tests
+für `Store.move()` (vierte, benannte Contract-Öffnung, siehe unten), 117→123). Zielgröße am
+Phasenende: grob 60–90,
 davon mindestens die vier Konflikt-Tests aus Step 4 — diese Zielgröße galt für den P1-Abschluss,
 P6 öffnet den Contract erneut benannt, siehe unten. Step 0 hat bewusst keine Tests (reines
 Skelett) — `pytest` lief dort grün mit `exit 5` („no tests ran", nicht `exit 0`); das ist die
@@ -188,6 +191,18 @@ Umbau, siehe `phase6_shares/CLAUDE.md`. 36 neue Tests in `phase1_storage/` (1 `t
 `phase6_shares/tests/test_acl.py` (außerhalb dieses Pakets, gleiche Kategorie wie
 `test_patch.py`/`test_updates.py`). `git diff` auf `mcpserver/`/`webui/`/`authserver/` blieb leer
 — Step 4 bleibt vollständig innerhalb `storage/`, wie geplant (P6-C).
+
+**[2026-08-17, P6 Step 7b Commit 1/3] Vierte, benannte Contract-Öffnung gebaut** (angekündigt in
+`phase6_shares/CLAUDE.md`s Session-Block vom selben Tag, `phase6_shares/ITEM_MOVE_PLAN.md` §4.1,
+P6-AD): `store.py :: move(item_id, *, version, space=, folder=) -> Item` (neu) + intern
+`_cleanup_emptied_folders()` (P6-AF). Additiv zu `update()`/`archive()` — `space` bleibt in
+`_SYSTEM_MANAGED_FIELDS`, ein Move ist eine eigene Methode, kein Feld an `update()` (P6-AD,
+verhindert dieselbe Divergenz-Klasse wie Fund B2 der P2-Adapter-Abnahme). Charakterisierung
+(`phase6_shares/tests/test_characterization.py`) lief vor und nach byte-identisch grün. Sechs
+neue Tests in `test_store.py`, `git diff` auf `mcpserver/`/`webui/`/`authserver/` leer — reiner
+`storage/`-Commit. Autorisierung (P6-AE, Schreibrecht auf Quelle **und** Ziel) passiert bewusst
+NICHT hier, wie überall im Store — Commit 2/3 (`mcpserver/tools.py`, `webui/api.py`) baut die
+Rechteprüfung eine Schicht höher.
 
 ---
 

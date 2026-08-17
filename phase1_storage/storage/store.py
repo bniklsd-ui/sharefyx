@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from . import files, history, index
-from .acl import AclDecision, AclReader
+from .acl import ACL_FILENAME, AclDecision, AclReader
 from .errors import ConflictError, ItemNotFound, ValidationError
 from .frontmatter import parse as parse_frontmatter
 from .frontmatter import serialize as serialize_frontmatter
@@ -591,6 +591,76 @@ class Store:
             index.upsert_item(self._conn, row2)
             self._commit("archive", new_item.id, new_item.space)
             return new_item
+
+    def move(
+        self, item_id: str, *, version: int, space: str | None = None, folder: str | None = None
+    ) -> Item:
+        """Verschiebt ein Item in einen anderen Space und/oder Ordner (P6-AD,
+        `phase6_shares/ITEM_MOVE_PLAN.md` §4.1). Eigene Methode statt eines `space=`-Feldes an
+        `update()` — `space` bleibt in `_SYSTEM_MANAGED_FIELDS`, derselbe Schutz, der den
+        Divergenz-Fund B2 der P2-Adapter-Abnahme (Verzeichnis sagt `niklas`, Frontmatter sagt
+        `nikinger`) verhindert. Genau ein Git-Commit (`move <id> [<ziel-space>]` über
+        `_write_item_file()`s bestehenden `_commit()`-Aufruf), genau ein Versionssprung.
+        Autorisierung passiert NICHT hier (wie überall im Store) — Aufrufer prüfen Rechte VOR
+        diesem Call (P6-AE: Schreibrecht auf Quelle UND Ziel).
+        """
+        with self._lock, self._file_write_lock():
+            row = self._reconcile_and_get_row(item_id)
+            current = self._row_to_item(row)
+            if current.version != version:
+                raise ConflictError(item_id, expected_version=version, current=current)
+            if current.status == "archived":
+                raise ValidationError(f"Item {item_id} ist archiviert — move verboten")
+
+            old_path = self._data_root / row["path"]
+            target_space = current.space
+            if space is not None:
+                # Explizite Prüfung statt `_write_item_file()`s `mkdir(parents=True)` beiläufig
+                # entscheiden zu lassen — sonst macht ein Tippfehler im Zielnamen aus Versehen
+                # einen neuen, rechtefreien Space (§4.1 Punkt 2).
+                if not (self._data_root / space).is_dir():
+                    raise ValidationError(
+                        f"Ziel-Space {space!r} existiert nicht — move legt keinen neuen Space an"
+                    )
+                target_space = space
+
+            if folder is not None:
+                target_folder = files.validate_folder(folder)
+            elif space is not None:
+                # Space-Wechsel ohne folder=: Ziel ist die Space-Wurzel, NICHT der gleichnamige
+                # Ordner im Zielspace — ein Ordnername bedeutet dort etwas anderes und trägt
+                # potenziell eine andere `.share.yml` (§4.1 Punkt 3).
+                target_folder = ""
+            else:
+                target_folder = current.folder
+
+            new_item = replace(
+                current, space=target_space, folder=target_folder,
+                version=current.version + 1, updated=self._now_fn(),
+            )
+            self._write_item_file(new_item, old_path=old_path, op="move")
+            self._cleanup_emptied_folders(old_path.parent, current.space)
+            return new_item
+
+    def _cleanup_emptied_folders(self, folder_dir: Path, space: str) -> None:
+        """P6-AF: nach einem Move leer gewordene Quellordner aufräumen, aufwärts bis maximal zur
+        Space-Wurzel. Abbruch bei einer `.share.yml` (eine bewusste Freigabe eines Menschen ist
+        kein Rest — sie wegzuräumen würde eine Rechteeinstellung als Nebenwirkung eines Moves
+        löschen) oder einem nicht-leeren Verzeichnis. Reine Aufräum-Nebenwirkung ohne eigenen
+        Git-Commit, dieselbe Kategorie wie `ensure_folder()`.
+        """
+        space_root = self._data_root / space
+        current = folder_dir
+        while space_root in current.parents:
+            if (current / ACL_FILENAME).exists():
+                break
+            try:
+                if any(current.iterdir()):
+                    break
+                current.rmdir()
+            except OSError:
+                break
+            current = current.parent
 
     def rebuild_index(self) -> IndexStats:
         with self._lock:
