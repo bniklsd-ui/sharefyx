@@ -408,6 +408,134 @@ async def test_widening_share_write_with_correct_credentials_succeeds(
     assert "totp" not in on_disk.extra
 
 
+# -- Step 7b: PATCH mit space= (Cross-Space-Move, ITEM_MOVE_PLAN.md Sec4.3) -------------------
+
+
+@pytest.mark.asyncio
+async def test_patch_with_space_requires_reauth_when_target_widens_access(
+    full_app_items, item_store, totp_code, tmp_path,
+):
+    (tmp_path / "data" / FOREIGN_SPACE).mkdir(parents=True)
+    (tmp_path / "data" / FOREIGN_SPACE / ".share.yml").write_text(
+        f"write: [{SPACE}]\n", encoding="utf-8"
+    )
+    item = item_store.create(SPACE, type="note", title="Umzug")
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.patch(
+            f"/api/v1/items/{item.id}",
+            json={"version": item.version, "space": FOREIGN_SPACE},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 403
+    assert response.json()["error"] == "reauth_required"
+    assert item_store.get(item.id).space == SPACE  # kein stiller Teil-Move
+
+
+@pytest.mark.asyncio
+async def test_patch_with_space_does_not_require_reauth_when_target_narrows(
+    full_app_items, item_store, totp_code, tmp_path,
+):
+    # fabian gewaehrt niklas space-level Schreibrecht (fuer P6-AE noetig) -- das Item selbst
+    # traegt kein eigenes share_write, effektives write/read kommt also nur aus diesem Grant.
+    (tmp_path / "data" / SPACE).mkdir(parents=True)  # Ziel muss als Space existieren
+    item = item_store.create(FOREIGN_SPACE, type="note", title="Zurueck")
+    (tmp_path / "data" / FOREIGN_SPACE / ".share.yml").write_text(
+        f"write: [{SPACE}]\n", encoding="utf-8"
+    )
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        # Ziel ist niklas' EIGENER Space -- keine .share.yml dort, das Item verliert also den
+        # fabian-Grant, effektives write/read schrumpft von {niklas} auf {} -- keine Erweiterung.
+        response = await client.patch(
+            f"/api/v1/items/{item.id}",
+            json={"version": item.version, "space": SPACE},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 200
+    assert response.json()["space"] == SPACE
+
+
+@pytest.mark.asyncio
+async def test_patch_with_space_without_folder_defaults_to_space_root(
+    full_app_items, item_store, totp_code, tmp_path, clock,
+):
+    """ITEM_MOVE_PLAN.md Sec4.1 Punkt 3: ein Space-Wechsel ohne folder= landet an der
+    Ziel-Space-Wurzel, NICHT im gleichnamigen Ordner im Zielspace."""
+    (tmp_path / "data" / FOREIGN_SPACE).mkdir(parents=True)
+    (tmp_path / "data" / FOREIGN_SPACE / ".share.yml").write_text(
+        f"write: [{SPACE}]\n", encoding="utf-8"
+    )
+    item = item_store.create(SPACE, type="note", title="Umzug", folder="projekte")
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        clock.advance(31)  # neues TOTP-Zeitfenster, sonst Replay-Ablehnung bei der Re-Auth
+        response = await client.patch(
+            f"/api/v1/items/{item.id}",
+            json={
+                "version": item.version, "space": FOREIGN_SPACE,
+                "password": PASSWORD, "totp": totp_code(),
+            },
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 200
+    assert response.json()["folder"] == ""
+    assert item_store.get(item.id).folder == ""
+
+
+@pytest.mark.asyncio
+async def test_patch_item_level_share_write_holder_cannot_move_item_between_spaces(
+    full_app_items, item_store, totp_code,
+):
+    """P6-AE, der Kern (Parity mit `mcpserver/tools.py`s gleichnamigem Test): item-level
+    `share_write` erlaubt inhaltliche Aenderungen, aber nie einen Space-Wechsel -- auch nicht in
+    den eigenen Space des Actors, der voll beschreibbar waere."""
+    item = item_store.create(FOREIGN_SPACE, type="note", title="Fremd", share_write=[SPACE])
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.patch(
+            f"/api/v1/items/{item.id}",
+            json={"version": item.version, "space": SPACE},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 403
+    assert response.json()["error"] == "forbidden"
+    assert item_store.get(item.id).space == FOREIGN_SPACE
+
+
+@pytest.mark.asyncio
+async def test_patch_with_space_and_folder_together_uses_space_level_check_not_owner_guard(
+    full_app_items, item_store, totp_code, tmp_path, clock,
+):
+    """Advisor-Fund vor dem Bauen (ITEM_MOVE_PLAN.md Sec4.2/4.3, 2026-08-17): derselbe
+    Eigentuemer-Riegel-Fund wie in `mcpserver/tools.py`, hier fuer `_items_patch`. Ein Actor mit
+    space-level Schreibrecht auf BEIDEN Seiten, aber ohne Eigentuemerschaft an der Quelle, muss
+    trotzdem mit gesetztem `folder` verschieben duerfen."""
+    third_space = "gamma"
+    (tmp_path / "data" / FOREIGN_SPACE).mkdir(parents=True)
+    (tmp_path / "data" / FOREIGN_SPACE / ".share.yml").write_text(
+        f"write: [{SPACE}]\n", encoding="utf-8"
+    )
+    item = item_store.create(third_space, type="note", title="Umzug mit Ordner")
+    (tmp_path / "data" / third_space / ".share.yml").write_text(
+        f"write: [{SPACE}]\n", encoding="utf-8"
+    )
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        clock.advance(31)  # neues TOTP-Zeitfenster, sonst Replay-Ablehnung bei der Re-Auth
+        response = await client.patch(
+            f"/api/v1/items/{item.id}",
+            json={
+                "version": item.version, "space": FOREIGN_SPACE, "folder": "projekte",
+                "password": PASSWORD, "totp": totp_code(),
+            },
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 200
+    assert response.json()["space"] == FOREIGN_SPACE
+    assert response.json()["folder"] == "projekte"
+
+
 @pytest.mark.asyncio
 async def test_narrowing_share_write_does_not_require_reauth(full_app_items, item_store, totp_code):
     item = item_store.create(SPACE, type="note", title="Original", share_write=["fabian"])

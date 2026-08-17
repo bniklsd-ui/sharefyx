@@ -430,31 +430,58 @@ def api_routes(
         if not permissions.can_write_item_as_human(session.space, acl):
             raise ApiError("forbidden", "Kein Schreibzugriff auf dieses Item.")
 
+        target_space = body.get("space")
+        if target_space is not None and not isinstance(target_space, str):
+            raise ApiError("validation_failed", "'space' muss ein String sein.")
+
+        # P6-AE (Step 7b, ITEM_MOVE_PLAN.md Sec2/Sec4.3): ein Space-Wechsel verlangt space-level
+        # Schreibrecht auf QUELLE UND ZIEL — strenger als der item-level Check oben, weil ein
+        # `share_write`-Halter, der genau ein fremdes Item bearbeiten darf, es sonst in einen
+        # geteilten Space wegtragen koennte (Exfiltration und Entzug in einem Zug).
+        if target_space is not None and target_space != acl.space:
+            if not permissions.can_write(session.space, acl.space):
+                raise ApiError("forbidden", "Kein Schreibzugriff auf den Quell-Space.")
+            if not permissions.can_write(session.space, target_space):
+                raise ApiError("forbidden", "Kein Schreibzugriff auf den Ziel-Space.")
+
         # Fail-closed, Nikinger-Entscheidung 2026-08-12 (kein Plan-Text, siehe
         # `mcpserver/tools.py::update_item`s gleichnamige Begründung): `folder` ist nur vom
         # Eigentümer-Space änderbar — ein `share_write`-Halter könnte sonst ein fremdes Item in
         # einen Ordner mit breiterer `.share.yml` verschieben und dessen Sichtbarkeit
         # erweitern, ohne dass `widens()`/Re-Auth (Step 7) das je sieht (das gilt nur für den
         # Eigentümer, der seine eigene Freigabe erweitert, nicht für einen Dritten).
-        if "folder" in body and acl.space != session.space:
+        # **[2026-08-17, Step 7b, Advisor-Fund vor dem Bauen]:** greift nur noch beim reinen
+        # Ordner-Move (`target_space is None`) — bei einem Space-Wechsel ersetzt ihn die
+        # strengere P6-AE-Prüfung oben, sonst hätte dieser Riegel praktisch jeden legitimen
+        # Cross-Space-Move mit gleichzeitig gesetztem `folder` blockiert.
+        if "folder" in body and target_space is None and acl.space != session.space:
             raise ApiError(
                 "forbidden",
                 "folder ist nur vom Eigentümer-Space änderbar — ein geteilter Schreibzugriff "
                 "erlaubt keine Verschiebung in einen anderen Ordner.",
             )
 
-        # Re-Auth-Gate (Step 7 Commit 5a, P6-N) — MUSS vor `store.update()` laufen, sonst wäre
-        # die Erweiterung schon geschehen, bevor irgendetwas sie sieht. `before` kommt
-        # vollständig aus `acl` (Index-only, kein zweiter Dateizugriff — `AclDecision` trägt seit
-        # diesem Commit die rohen `share_read`/`share_write` genau dafür). `after` übernimmt
-        # jedes im Body genannte Feld, sonst unverändert den `before`-Wert — derselbe "nur was da
-        # ist, ändert sich"-Vertrag wie `store.update()`s eigener `changes`-Mechanismus.
-        # `validate_folder()` läuft hier ein zweites Mal (auch `store.update()` ruft sie intern
-        # auf) — eine reine, günstige Funktion, kein Doppelschreiben; ohne diese Normalisierung
-        # könnte ein roher `folder`-String mit `..`-Segmenten `AclReader.grants_for_dir()` einen
-        # Pfad außerhalb des Space bauen lassen, bevor `store.update()` ihn je sieht.
+        # Re-Auth-Gate (Step 7 Commit 5a, P6-N) — MUSS vor `store.update()`/`store.move()`
+        # laufen, sonst wäre die Erweiterung schon geschehen, bevor irgendetwas sie sieht.
+        # `before` kommt vollständig aus `acl` (Index-only, kein zweiter Dateizugriff —
+        # `AclDecision` trägt seit diesem Commit die rohen `share_read`/`share_write` genau
+        # dafür). `after` übernimmt jedes im Body genannte Feld, sonst unverändert den
+        # `before`-Wert — derselbe "nur was da ist, ändert sich"-Vertrag wie `store.update()`s
+        # eigener `changes`-Mechanismus. `validate_folder()` läuft hier ein zweites Mal (auch
+        # `store.update()`/`store.move()` ruft sie intern auf) — eine reine, günstige Funktion,
+        # kein Doppelschreiben; ohne diese Normalisierung könnte ein roher `folder`-String mit
+        # `..`-Segmenten `AclReader.grants_for_dir()` einen Pfad außerhalb des Space bauen
+        # lassen, bevor der Store ihn je sieht.
         try:
-            new_folder = validate_folder(body["folder"]) if "folder" in body else acl.folder
+            if "folder" in body:
+                new_folder = validate_folder(body["folder"])
+            elif target_space is not None:
+                # Space-Wechsel ohne folder=: Ziel ist die Space-Wurzel, NICHT der gleichnamige
+                # Ordner im Zielspace — ein Ordnername bedeutet dort etwas anderes und trägt
+                # potenziell eine andere `.share.yml` (ITEM_MOVE_PLAN.md Sec4.1 Punkt 3).
+                new_folder = ""
+            else:
+                new_folder = acl.folder
         except ValidationError as exc:
             raise _map_store_error(exc, own_space=session.space) from exc
         before_state = ShareState(
@@ -469,7 +496,8 @@ def api_routes(
             share_write=(
                 frozenset(body["share_write"]) if "share_write" in body else before_state.share_write
             ),
-            space=before_state.space, folder=new_folder,
+            space=target_space if target_space is not None else before_state.space,
+            folder=new_folder,
         )
         require_share_reauth(
             session, body, before=before_state, after=after_state, acl=store.acl_reader,
@@ -480,13 +508,26 @@ def api_routes(
         # Frontmatter-Feld in `extra` (Advisor-Fund vor diesem Commit: `store.update()`s
         # `else: updated_extra[key] = value`-Zweig kennt keine Feld-Whitelist) und damit als
         # Klartext auf der Platte UND in einem Git-Commit (Hard Rule 1). Deshalb NIE an
-        # `store.update()` weitergereicht, unabhängig davon, ob das Gate überhaupt auslöste.
+        # `store.update()`/`store.move()` weitergereicht, unabhängig davon, ob das Gate
+        # überhaupt auslöste.
         changes = {
             key: value for key, value in body.items()
-            if key not in {"version", "password", "totp"}
+            if key not in {"version", "password", "totp", "space"}
         }
         try:
-            item = store.update(item_id, version=version, **changes)
+            if target_space is not None:
+                # Wie `mcpserver/tools.py::update_item` (Step 7b, Sec4.2): ein Move ist pur —
+                # nicht mit inhaltlichen Feldern in demselben Aufruf kombinierbar. `folder`
+                # gehört zum Move dazu (Zielordner im neuen Space), alles andere nicht.
+                if set(changes) - {"folder"}:
+                    raise ApiError(
+                        "validation_failed",
+                        "space verschiebt ein Item pur — kombiniere es nicht mit anderen "
+                        "Feldern im selben Aufruf.",
+                    )
+                item = store.move(item_id, version=version, space=target_space, folder=new_folder)
+            else:
+                item = store.update(item_id, version=version, **changes)
         except (ItemNotFound, ConflictError, ValidationError, ValueError) as exc:
             raise _map_store_error(exc, own_space=session.space) from exc
         return JSONResponse(

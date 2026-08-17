@@ -9,7 +9,7 @@ down:
   - ./ITEM_MOVE_PLAN.md                            # Zusatzplan zu Step 7: Item-Verschieben (Ordner+Space) + Textfarben, P6-AD–P6-AJ
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-7 + v2.1-Deploy verbatim (neun Eintraege), L3, kein Softcap
-updated: 2026-08-17, elfter -- (zehnter-Block neunte Rotation, verbatim ins Archiv; Planungssession "light" -- ITEM_MOVE_PLAN.md P6-AD-AJ gelockt (Nikinger-Freigabe), V52-V55 gegen echten Step-7-Code geschlossen, Guard-Routing-Fund in Sec4.2/4.3 praezisiert, neues Sec9 Mehrfachauswahl P6-AK-AN inkl. vier Abnahmezeilen; keine Code-Aenderung, 747 pytest unveraendert)
+updated: 2026-08-17, elfter -- (zehnter-Block neunte Rotation, verbatim ins Archiv; Planungssession "light" -- ITEM_MOVE_PLAN.md P6-AD-AJ gelockt, neues Sec9 Mehrfachauswahl P6-AK-AN; danach Bauauftrag -- Step 7b Commits 1-2/3 gebaut [store.py::move(), update_item(space=), _items_patch space=, P6-AE-Rechtspruefung, Guard-Routing-Fix in beiden Adaptern], 764 pytest gruen, Commit 3/3 UI-Dialog offen)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -125,45 +125,31 @@ angekündigt — schließt zusammen mit der dritten Öffnung nach Phasenabschlus
 Nutzung) — ausdrücklich nur vormerken, nichts davon diese Session umgesetzt, kein Code
 angefasst:**
 
-1. **✅ Behoben (2026-08-16).** Dropdown-Selects zeigten Lila statt des einheitlichen Blaus —
-   `app.css` definierte **keinen** Lila-Ton, die Farbe kam aus der nativen Browser-/OS-
-   Darstellung der `<option>`-Popup-Liste. Der vermutete erste Versuch hat gereicht:
-   `select.input { accent-color: var(--accent); }` — live per Playwright-Screenshot bestätigt
-   (die Popup-Liste rendert jetzt blau statt lila, kein selbstgebauter Dropdown nötig).
-2. **✅ Subplan gelockt (2026-08-17).** Space-zu-Space-Verschieben ist als **Step 7b** in
-   `phase6_shares/ITEM_MOVE_PLAN.md` §4 (Entscheidungen **P6-AD–P6-AJ**, setzt den fertigen
-   Step 7 voraus) ausführungsreif geplant — **diese Session hat die Freigabe eingeholt und
-   dokumentiert** (§2 des Plans, „[2026-08-17 gelockt]"), vorher offen seit der Planungssession
-   vom 2026-08-13 (kein Freigabe-Nachweis in keiner Session dazwischen, siehe Plan §2). Ein
-   Advisor-Fund vor dem Bauen führte zu einer Präzisierung des Guard-Routings in Plan §4.2/§4.3
-   (der alte Eigentümer-Riegel hätte sonst legitime Cross-Space-Moves mit `folder=` blockiert)
-   plus einem neuen Pflichttest dafür. **Noch nicht gebaut** — nächster Schritt ist die
-   Umsetzung entlang Plan §4.
-3. **✅ Subplan geschrieben (2026-08-17).** Mehrfachauswahl (Long-Press oder Strg+Klick) fürs
-   Verschieben mehrerer Items auf einmal — jetzt als eigenes **§9** in
-   `phase6_shares/ITEM_MOVE_PLAN.md` (Entscheidungen **P6-AK–P6-AN**) ausformuliert: ein
-   gemeinsames Ziel für die ganze Auswahl, kein neuer Endpunkt/kein neues MCP-Tool (die
-   Batch-Aktion ist eine clientseitige Schleife über den bestehenden Step-7b-Einzelpfad),
-   Re-Auth in maximal zwei Runden statt pro Item vorhergesagt. Bestätigt die bisherige
-   Nikinger-Vorgabe read-only: `moveItemToFolder()` (`list.js`, ruft serverseitig `_items_patch`
-   in `webui/api.py`) patcht ausschließlich `folder`, nie `share_read`/`share_write`;
-   `webui/shares.py :: widens()` liest exakt diese
-   beiden Felder und greift bei einem reinen Ordnerwechsel nie — In-Space-Mehrfachauswahl
+1. **✅ Behoben (2026-08-16).** Dropdown-Lila war natives Browser-Rendering der `<option>`-Liste,
+   kein `app.css`-Ton — `select.input { accent-color: var(--accent) }`, live per Playwright
+   bestätigt. Volle Herleitung: `SESSIONS_ARCHIVE.md`, zehnter Block.
+2. **🔄 Wird gebaut (Stand 2026-08-17).** Space-zu-Space-Verschieben, **Step 7b** in
+   `phase6_shares/ITEM_MOVE_PLAN.md` §4 (Entscheidungen **P6-AD–P6-AJ**, gelockt per
+   Nikinger-Freigabe dieser Session). **Commit 1/3** (`storage/store.py :: move()`) und
+   **Commit 2/3** (`mcpserver/tools.py`/`webui/api.py`, P6-AE-Rechtsprüfung, Guard-Routing-Fix)
+   ✅ **gebaut, 764 Tests grün** — Details `phase1_storage/CLAUDE.md`/`phase2_mcp/CLAUDE.md`/
+   `phase5_ui/CLAUDE.md`s jeweilige „[2026-08-17]"-Ergänzungen. **Commit 3/3 (UI-Dialog) noch
+   offen.** Noch nicht deployt, noch nicht live geprüft (Abnahmezeilen 25–30).
+3. **✅ Subplan geschrieben (2026-08-17).** Mehrfachauswahl — jetzt **§9** in
+   `phase6_shares/ITEM_MOVE_PLAN.md` (Entscheidungen **P6-AK–P6-AN**): gemeinsames Ziel für die
+   ganze Auswahl, kein neuer Endpunkt/MCP-Tool (clientseitige Schleife über den Step-7b-Pfad),
+   Re-Auth in max. zwei Runden. `moveItemToFolder()` (`list.js`→`_items_patch`) patcht weiterhin
+   nur `folder`, `widens()` greift bei reinem Ordnerwechsel nie — In-Space-Mehrfachauswahl
    braucht deshalb keine neue Rechteprüfung (P6-AN). **Noch nicht gebaut, setzt Step 7b voraus.**
-4. **✅ Behoben (2026-08-16).** `--ok` (`#47B881`, Grün) wurde für den Erfolgstoast
-   (`.toast`, linker Rand) und den Sichtbarkeits-Chip bei geteilten Items
-   (`.visibility-chip--shared`) benutzt — beide jetzt `var(--accent)` (Blau), Token selbst
-   entfernt (nach dem Umbau ungenutzt, kein totes CSS-Property stehen gelassen). „Privat"/„nur
-   ich" unverändert (`--text-faint`, kein Feedback dazu). Live per Playwright bestätigt:
-   `visibility-chip--shared`-Farbe `rgb(62, 141, 243)` (= `#3E8DF3`) nach einer echten
-   Freigabe, Toast-Rand identisch. Das orangene „nur lesen" (`--warn`,
-   `.list__readonly`/`.detail__badge-readonly`) bleibt **bewusst unangetastet** — Nikinger noch
-   unentschieden, was damit passieren soll.
+4. **✅ Behoben (2026-08-16).** `--ok` (Grün, Erfolgstoast + `.visibility-chip--shared`) auf
+   `var(--accent)` (Blau) umgestellt, Token entfernt (ungenutzt danach). Orange „nur lesen"
+   bewusst unangetastet — Nikinger noch unentschieden. Volle Herleitung: `SESSIONS_ARCHIVE.md`,
+   zehnter Block.
 
-**Punkte 1+4 umgesetzt (2026-08-16, reines CSS, `phase5_ui/webui/static/app.css`).** **Punkte
-2+3: Subplan geschrieben und gelockt (2026-08-17, `ITEM_MOVE_PLAN.md` §4/§9, P6-AD–AN) — noch
-nicht gebaut.** Reihenfolge unverändert Nikinger-Sache; Step 7b (Punkt 2) muss vor §9 (Punkt 3)
-gebaut werden, §9 setzt Step 7b architektonisch voraus (§9.1).
+**Punkte 1+4 umgesetzt (2026-08-16, reines CSS, `phase5_ui/webui/static/app.css`).** **Punkt 2
+(Step 7b): Backend fertig (Commits 1–2/3, 2026-08-17), UI-Dialog (Commit 3/3) offen.** **Punkt 3
+(§9 Mehrfachauswahl): Subplan gelockt, noch nicht angefangen** — setzt Step 7b architektonisch
+voraus (§9.1), bleibt also nach Commit 3/3 dran.
 
 **[2026-08-14] MCP-Werkzeug-Ergonomie, Live-Feedback einer arbeitenden Claude-Instanz** — nach
 einem sitzungsreichen Tag (Protokollierung eines OTOBO-Vorgangs, Item `itm_7cf94a2c`, 40+
@@ -296,3 +282,20 @@ weitere Erweiterung) braucht eine Softcap-Prüfung vor dem Schreiben, nicht dana
 (Mehrfachauswahl setzt Step 7b architektonisch voraus, §9.1). Root-`CLAUDE.md`s „Noch nicht
 entschieden"-Eintrag zum Item-Verschieben wird im selben Commit wie dieser Session-Block entfernt
 (die Planungsfrage ist beantwortet, nur der Bau steht noch aus).
+
+**Nachtrag, 2026-08-17, Bauauftrag „start atomically with the first step":** Step 7b in drei
+Commits, wie im Plan selbst vorgezeichnet (§4.1–§4.3 je eine Schicht). **Commit 1/3**
+(`storage/store.py :: move()`, vierte P1-Contract-Öffnung, `_cleanup_emptied_folders()`/P6-AF
+intern) und **Commit 2/3** (`update_item(space=)`/`_items_patch space=`, P6-AE-Rechtsprüfung
+in beiden Adaptern, der bereits in §4.2 vorhergesehene Guard-Routing-Fund bestätigte sich real
+und wurde per `space is None`-Bedingung geschlossen) — Details je Adapter in
+`phase1_storage/`/`phase2_mcp/`/`phase5_ui/CLAUDE.md`s „[2026-08-17]"-Einträgen, nicht doppelt
+hier. Ein eigener Fund dieser Session (kein Advisor-Fund): ein zu grobes `old_string` beim
+Test-Einfügen schnitt einen bestehenden `test_api.py`-Test versehentlich durch — per `git diff`
+bemerkt, nicht dem grünen Lauf vertraut, korrigiert.
+
+**Verifiziert nach beiden Commits:** `pytest -q` (voller Lauf) 753→764, alle grün.
+Charakterisierung separat grün. Tabu-Diff (`authserver/`, `mcpserver/asgi.py`) leer.
+
+**Noch offen:** Commit 3/3 (UI-Dialog + Space-Auswahl in `dialogs.js`/`app.html`, §4.4) — dann
+Step 7b DoD vollständig (bis auf den Live-Move über Connector/UI, Nikinger-Sache). Danach §9.

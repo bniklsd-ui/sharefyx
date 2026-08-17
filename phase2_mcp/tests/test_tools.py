@@ -663,6 +663,96 @@ def test_share_write_cannot_move_item_to_a_different_folder(tools_map, store, tm
     assert unchanged.folder == "eng"
 
 
+# -- update_item(space=...) -- Step 7b, P6-AD-AJ, ITEM_MOVE_PLAN.md Sec4.2 -------------------
+
+SPACE_C = "gamma"
+
+
+def test_update_item_with_space_moves_between_shared_spaces(tools_map, store, tmp_path):
+    _write_share_yml(tmp_path / SPACE_B, f"write: [{SPACE_A}]\n")
+    item = store.create(SPACE_A, type="note", title="Umzug")
+
+    with _as(SPACE_A):
+        receipt = json.loads(
+            tools_map["update_item"](item.id, version=item.version, space=SPACE_B)
+        )
+        assert receipt["version"] == item.version + 1
+
+    moved = store.get(item.id)
+    assert moved.space == SPACE_B
+    assert (tmp_path / SPACE_B / f"{item.id}__umzug.md").exists()
+    assert not (tmp_path / SPACE_A / f"{item.id}__umzug.md").exists()
+
+
+def test_item_level_share_write_holder_cannot_move_item_to_another_space(
+    tools_map, store, tmp_path
+):
+    """P6-AE, der Kern: item-level `share_write` erlaubt inhaltliche Änderungen, aber niemals
+    einen Space-Wechsel — selbst wenn das Ziel für den Actor voll beschreibbar ist. Sonst
+    könnte ein Delegat, der genau EIN fremdes Item bearbeiten darf, es in einen geteilten Space
+    wegtragen (Exfiltration und Entzug in einem Zug, kein Re-Auth-Gate auf der Agentenfläche)."""
+    item = store.create(SPACE_B, type="note", title="Fremdes Item", share_write=[SPACE_A])
+
+    with _as(SPACE_A), pytest.raises(ToolError, match="write_denied"):
+        # Ziel ist der EIGENE Space von alpha -- voll beschreibbar, rettet den Move trotzdem
+        # nicht: der Riegel ist die Quellseite (SPACE_B), nicht das Ziel.
+        tools_map["update_item"](item.id, version=item.version, space=SPACE_A)
+
+    unchanged = store.get(item.id)
+    assert unchanged.space == SPACE_B
+
+
+def test_move_into_space_without_write_grant_is_denied(tools_map, store):
+    item = store.create(SPACE_A, type="note", title="Umzug")
+
+    with _as(SPACE_A), pytest.raises(ToolError, match="write_denied"):
+        tools_map["update_item"](item.id, version=item.version, space=SPACE_B)
+
+
+def test_move_out_of_space_without_write_grant_is_denied(tools_map, store, tmp_path):
+    # Ziel (gamma) waere fuer alpha voll beschreibbar -- beweist, dass ausschliesslich die
+    # fehlende Quellberechtigung (SPACE_B) den Move blockiert, nicht ein Zielproblem.
+    _write_share_yml(tmp_path / SPACE_C, f"write: [{SPACE_A}]\n")
+    item = store.create(SPACE_B, type="note", title="Fremdes Item", share_write=[SPACE_A])
+
+    with _as(SPACE_A), pytest.raises(ToolError, match="write_denied"):
+        tools_map["update_item"](item.id, version=item.version, space=SPACE_C)
+
+
+def test_update_item_with_space_and_folder_together_uses_space_level_check_not_owner_guard(
+    tools_map, store, tmp_path
+):
+    """Advisor-Fund vor dem Bauen (ITEM_MOVE_PLAN.md Sec4.2, 2026-08-17): der alte
+    Eigentuemer-Riegel gegen Nicht-Eigentuemer-Ordnerwechsel haette einen legitimen
+    Cross-Space-Move mit gleichzeitig gesetztem folder= faelschlich blockiert, weil kein
+    Principal wie ein geteilter Space heisst. Ein Actor mit space-level Schreibrecht auf BEIDEN
+    Seiten, aber ohne Eigentuemerschaft an der Quelle, muss trotzdem verschieben duerfen."""
+    _write_share_yml(tmp_path / SPACE_A, f"write: [{SPACE_C}]\n")
+    _write_share_yml(tmp_path / SPACE_B, f"write: [{SPACE_C}]\n")
+    item = store.create(SPACE_A, type="note", title="Umzug mit Ordner")
+
+    with _as(SPACE_C):
+        receipt = json.loads(
+            tools_map["update_item"](
+                item.id, version=item.version, space=SPACE_B, folder="projekte"
+            )
+        )
+        assert receipt["version"] == item.version + 1
+
+    moved = store.get(item.id)
+    assert moved.space == SPACE_B
+    assert moved.folder == "projekte"
+
+
+def test_update_item_with_space_rejects_combined_content_changes(tools_map, store):
+    item = store.create(SPACE_A, type="note", title="Umzug")
+
+    with _as(SPACE_A), pytest.raises(ToolError, match="invalid"):
+        tools_map["update_item"](
+            item.id, version=item.version, space=SPACE_A, title="Gleichzeitig auch das"
+        )
+
+
 def test_guard_auth_error_is_mapped_to_tool_error(tools_map, store, monkeypatch):
     """Deckt genau die Lücke ab, die der Advisor in Step 4 vorausgesagt hat: ein `AuthError`
     aus dem Guard läuft INNERHALB eines Tool-Aufrufs (das 401-Fenster ist vorbei) und muss über

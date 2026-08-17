@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase2_mcp_plan.md          # voller Plan, Entscheidungen P2-A–P2-N, Steps 0–7
   - ../docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md # Herkunft der Entscheidungen D1–D6
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
-updated: 2026-08-13 (Nikinger-Feedback: update_item/append_to_item/patch_item-Beschreibungen präzisiert, kein Verhaltens-/Testzahländerung)
+updated: 2026-08-17 (P6 Step 7b Commit 2/3 -- update_item bekommt space=, P6-AE Rechtepruefung, Guard-Routing-Fix, 120 Tests)
 ---
 # CLAUDE.md — Phase 2: MCP-Server (`phase2_mcp/`)
 
@@ -250,7 +250,9 @@ Step-5-Commit (`can_write_item` prüfte `visibility` nicht, siehe `phase6_shares
 Step-5-Session-Block), sofort im Folgecommit behoben. `test_permissions.py` 10→12,
 `test_tools.py` 39→40. **Gesamt: 114 Tests.**
 
-**Gesamt: 114 Tests** in `phase2_mcp/tests/` (6 `test_config.py` + 1 `test_credentials.py` + 1
+**Gesamt: 114 Tests** war der Stand nach P6 Step 5 — **[2026-08-17, P6 Step 7b Commit 2/3]:
+120 Tests**, `test_tools.py` 40→46 (sechs neue, siehe Korrekturnotiz unten). Ursprüngliche
+Aufschlüsselung (6 `test_config.py` + 1 `test_credentials.py` + 1
 `test_auth.py` + 12 `test_permissions.py` + 9 `test_logging.py` + 2 `test_context.py` + 15
 `test_app.py` + 40 `test_tools.py` + 3 `test_mcp_smoke.py` + 13 `test_request_log.py` + 10
 `test_asgi_bearer.py` [seit dem Schnitt: nur noch `BearerAuthASGI`, kein `TokenPathASGI`/
@@ -273,6 +275,19 @@ richtiges Werkzeug für Frontmatter-Felder. Behoben durch drei Beschreibungs-Erg
 `mcpserver/tools.py` (`update_item`, `append_to_item`, `patch_item`) — keine Signatur-, Schema-
 oder Verhaltensänderung, daher keine neuen Tests nötig. **Gesamt weiterhin 114 Tests**,
 `pytest phase2_mcp/tests/test_tools.py` 40/40 grün nach der Änderung.
+
+**[2026-08-17, P6 Step 7b Commit 2/3]:** `update_item` bekommt `space: str | None = None`
+(`ITEM_MOVE_PLAN.md` §4.2, P6-AD–AJ) — routet auf `store.move()`, sobald `space` gesetzt ist,
+sonst unverändert `store.update()`. Rechteprüfung P6-AE (space-level Schreibrecht auf Quelle
+UND Ziel, strenger als der bestehende item-level `can_write_item`-Check) direkt nach diesem.
+**Advisor-Fund vor dem Bauen:** der bestehende Eigentümer-Riegel gegen Nicht-Eigentümer-
+Ordnerwechsel (Zeile ~514) hätte einen legitimen Cross-Space-Move mit gleichzeitig gesetztem
+`folder=` fälschlich blockiert — greift jetzt nur noch bei `space is None`. Ein Space-Wechsel
+ist pur: kombiniert mit inhaltlichen Feldern oder `status` im selben Aufruf wirft er
+`ValidationError` (`folder` ist die einzige Ausnahme, als Zielordner im neuen Space). Sechs neue
+Tests in `test_tools.py` (positiv, P6-AE-Kern via item-level `share_write`, Ziel-/Quellseite
+einzeln denied, Guard-Routing-Regression, kombinierte Felder abgelehnt). `test_tools.py` 40→46.
+**Gesamt: 120 Tests.**
 
 **Advisor-Fund vor dem Commit, ein Punkt offen gehalten statt übernommen:** das Beispiel im
 Report lautete wörtlich „status: open → archiviert" — geprüft statt angenommen: `models.py ::

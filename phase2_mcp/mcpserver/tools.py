@@ -467,10 +467,13 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             "einzeln optional — body weglassen ändert NUR das Frontmatter (z.B. status/tags/"
             "links/due) und lässt den Body unangetastet, kein Komplett-Rewrite nötig. "
             "folder=<pfad> verschiebt es — nur der Eigentümer-Space darf das, ein geteilter "
-            "Schreibzugriff reicht dafür nicht. Braucht die zuletzt gelesene version. Liefert "
-            "standardmäßig eine Quittung statt des vollen Texts — return_body=True holt ihn "
-            "zurück. Sichtbarkeit/Freigaben (visibility/share_read/share_write) gehen über kein "
-            "Tool, nur über die UI."
+            "Schreibzugriff reicht dafür nicht. space=<name> verschiebt es in einen anderen "
+            "Space — nur zwischen Spaces, in denen du schreiben darfst; kombiniere space= nicht "
+            "mit inhaltlichen Feldern oder status im selben Aufruf (folder= darf mitgegeben "
+            "werden, als Zielordner im neuen Space). Braucht die zuletzt gelesene version. "
+            "Liefert standardmäßig eine Quittung statt des vollen Texts — return_body=True holt "
+            "ihn zurück. Sichtbarkeit/Freigaben (visibility/share_read/share_write) gehen über "
+            "kein Tool, nur über die UI."
         ),
         annotations={
             "readOnlyHint": False,
@@ -490,6 +493,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         due: str | None = None,
         type: str | None = None,
         folder: str | None = None,
+        space: str | None = None,
         visibility: str | None = None,
         share_read: list[str] | None = None,
         share_write: list[str] | None = None,
@@ -514,6 +518,17 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         if not permissions.can_write_item(principal.space, acl, surface=Surface.AGENT):
             raise map_storage_error(PermissionDenied(acl.space)) from None
 
+        # P6-AE (Step 7b, ITEM_MOVE_PLAN.md §2/§4.2): ein Space-Wechsel verlangt space-level
+        # Schreibrecht auf QUELLE UND ZIEL — strenger als der obige item-level `can_write_item`,
+        # weil ein `share_write`-Delegat, der genau ein fremdes Item bearbeiten darf, es sonst in
+        # einen geteilten Space wegtragen könnte (Exfiltration und Entzug in einem Zug), ohne
+        # dass es dafür je ein Re-Auth-Gate gäbe (das existiert nur für Menschen in der UI).
+        if space is not None and space != acl.space:
+            if not permissions.can_write(principal.space, acl.space):      # Quelle
+                raise map_storage_error(PermissionDenied(acl.space)) from None
+            if not permissions.can_write(principal.space, space):          # Ziel
+                raise map_storage_error(PermissionDenied(space)) from None
+
         # Fail-closed, Nikinger-Entscheidung 2026-08-12 (kein Plan-Text): `folder` ist zwar
         # generell agenten-setzbar (`Store.update()` erlaubt es seit Step 4), aber nur für den
         # Eigentümer-Space — ein fremder `share_write`-Halter, der ein Item in einen Ordner mit
@@ -521,7 +536,13 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         # auf der Agentenfläche je ein Re-Auth-Gate dafür gäbe (das gibt es nur für Menschen in
         # der UI, Step 7 — und selbst dort nur für den Eigentümer, der SEINE eigene Freigabe
         # erweitert, nicht für einen Dritten, der fremden Besitz verschiebt).
-        if folder is not None and acl.space != principal.space:
+        # **[2026-08-17, Step 7b Commit 2/3, Advisor-Fund vor dem Bauen]:** dieser Riegel greift
+        # nur noch beim reinen Ordner-Move (`space is None`) — bei einem Space-Wechsel ersetzt
+        # ihn die strengere P6-AE-Prüfung oben, die space-level statt item-level prüft. Ohne
+        # dieses `space is None` hätte der Riegel praktisch jeden legitimen Cross-Space-Move mit
+        # gleichzeitig gesetztem `folder=` blockiert — kein Principal heißt wie ein geteilter
+        # Space, `acl.space != principal.space` wäre also fast immer wahr gewesen.
+        if folder is not None and space is None and acl.space != principal.space:
             raise map_storage_error(
                 ValidationError(
                     "folder ist nur vom Eigentümer-Space änderbar — ein geteilter "
@@ -544,7 +565,16 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         }
 
         try:
-            if status == "archived":
+            if space is not None:
+                content_changes = {k: v for k, v in changes.items() if k != "folder"}
+                if content_changes or status is not None:
+                    raise ValidationError(
+                        "space verschiebt ein Item pur — kombiniere es nicht mit inhaltlichen "
+                        "Feldern oder status im selben Aufruf (folder darf mitgegeben werden, "
+                        "als Zielordner im neuen Space)"
+                    )
+                item = store.move(item_id, version=version, space=space, folder=folder)
+            elif status == "archived":
                 if changes:
                     raise ValidationError(
                         "status=archived erlaubt keine weiteren Felder — erst inhaltlich "

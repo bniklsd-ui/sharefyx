@@ -166,6 +166,25 @@ gleiche Kategorie wie P6 Step 3s `ui_budget.py`-Fund oben). Volle Herleitung, in
 Advisor-Funds zum Folder-Move und der Nikinger-Entscheidung dazu:
 `phase6_shares/CLAUDE.md` Step-5-Session-Block.
 
+**[2026-08-17 Ergänzung, P6 Step 7b Commit 2/3]:** `webui/api.py :: _items_patch` bekommt
+`space` im PATCH-Body (`ITEM_MOVE_PLAN.md` §4.3, P6-AD–AJ) — routet auf `store.move()`, sobald
+`space` gesetzt ist. Rechteprüfung P6-AE (space-level `permissions.can_write()` auf Quelle UND
+Ziel) läuft vor dem bestehenden `folder`-Eigentümer-Riegel; dieser greift jetzt nur noch bei
+`space is None` (**Advisor-Fund vor dem Bauen**, derselbe wie im MCP-Adapter: der alte Riegel
+hätte sonst legitime Cross-Space-Moves mit gleichzeitig gesetztem `folder` blockiert). Der
+Re-Auth-Gate aus Step 7 Commit 5a (`require_share_reauth`) bekommt dafür keinen neuen Code —
+`after_state.space` trägt jetzt den Zielspace, `widens()` vergleicht wie gehabt. Space-Wechsel
+ohne `folder` im Body landet an der Ziel-Space-Wurzel (`""`), nicht im gleichnamigen Ordner im
+Ziel. K4 (`folder` in `_items_post`s Whitelist) war bereits seit Step 7 Commit 3 erledigt, kein
+neuer Fund. Fünf neue Tests in `test_api.py` (Widen verlangt Re-Auth, Narrow nicht, Space-ohne-
+Folder-Default, P6-AE-Kern via item-level `share_write`, Guard-Routing-Regression). **Advisor-
+Fund während des Bauens (nicht vor dem Commit, sondern ein eigener Fehler dieser Session):** ein
+zu grob gewähltes `old_string` beim Einfügen der neuen Tests hatte
+`test_widening_share_write_with_correct_credentials_succeeds` versehentlich mitten
+durchgeschnitten — die vier Abschlusszeilen dieses bestehenden Tests landeten dadurch am Ende
+der letzten neuen Testfunktion und lösten dort einen `NameError` aus. Vor dem Testlauf-Erfolg
+bemerkt und korrigiert (`git diff` gegenkontrolliert, nicht nur der grüne Lauf vertraut).
+
 ---
 
 ## Abnahmestand (Plan §6) — Stand 2026-08-09
