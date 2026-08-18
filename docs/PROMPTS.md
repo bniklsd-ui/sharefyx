@@ -62,7 +62,15 @@ Hard rules that override convenience (full list in CLAUDE.md):
 
 Tests:
 Unit tests are yours and are expected — mocked, no network, never against the real DATA_ROOT
-(use tmp_path). The Nikinger runs everything that touches reality: tunnel bring-up, the live
+(use tmp_path). Standing permission, reconfirmed 2026-08-18: you may also build/install and run
+sophisticated E2E passes (Playwright, load a second Wegwerf-Instanz on its own port/tmp
+DATA_ROOT/tmp auth.sqlite3, install whatever tooling that needs) without asking each time —
+established precedent already: P4's Wegwerf-Instanz on port 8799, P5's Step 6/7b "Wegwerf-
+Instanz mit tmp-DATA_ROOT" Done-when clauses. Keep test tooling in its own venv (e.g.
+~/.claude-code-tools/), not the project .venv or system Python. The one thing that stays off
+limits is the single systemd-managed `sharefyx-mcp.service` — never `systemctl restart/start`
+it, never point a throwaway run at the real DATA_ROOT/auth.sqlite3/keyring. The Nikinger runs
+everything that touches THAT reality: tunnel bring-up, the live
 Claude connector, and any end-to-end test against the real data directory.
 
 Skills:
@@ -232,3 +240,4 @@ xxx
 | **[2026-08-09]** „aktueller Stand auf Google Drive hochgeladen" (Ergebnis-Bullet) gestrichen, „Du darfst Google Drive … nutzen" (Hinweise) ersetzt durch eine konkrete Leseanweisung | Folgt aus derselben Entscheidung — das Repo ist jetzt die einzige Quelle, ein Upload-Schritt entfällt ersatzlos. |
 | **[2026-08-09]** Punkt 5 (Commit) neu in Prompt 3 | Der Browser-Chat konnte nicht committen, Claude Code muss es per Hard Rule 8 („Commit ⇒ Doc-Update, im selben Commit"). Bewusst als eigener Punkt, nicht implizit in Punkt 3/4 versteckt — sonst wird das Bündeln zum Zufall statt zur Regel. |
 | **[2026-08-09]** „Aktualisiere … deine direkten Erinnerungen" konkretisiert auf Claude Codes eigene Memory-Dateien | Der Originalsatz war für den Browser-Chat formuliert (Konversationskontext). Claude Code hat ein eigenes, dateibasiertes Memory-System — der Hinweis bleibt sinnvoll, aber nur, wenn er auf den tatsächlichen Mechanismus zeigt. |
+| **[2026-08-18]** „Tests"-Absatz in Prompt 1 um die Wegwerf-Instanz-Erlaubnis erweitert | Bisher nur implizit aus Session zu Session weitergetragen (P4-Sicherheitsreview/P5-Plan nannten Wegwerf-Instanzen, aber der Session-Start-Prompt selbst sagte nichts dazu) — eine Instanz musste sich per Memory oder Nachfrage daran erinnern. Der Nikinger hat die Erlaubnis am 2026-08-18 (P6 Step 7b Nachlese) ausdrücklich als Standing Permission reconfirmt, mit der klaren Grenze „nicht die echte, gerade von Fabian genutzte Instanz". Jetzt Teil des Prompts selbst statt nur der Memory-Datei `feedback_throwaway_test_instance_permission.md` — der Prompt ist, wie die Rotationsregel-Zeile darüber es schon vormacht, die Stelle, an der eine wiederkehrende Erlaubnis tatsächlich für jede neue Session greift, nicht nur für eine, die sich zufällig erinnert. |

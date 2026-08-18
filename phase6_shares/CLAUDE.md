@@ -9,7 +9,7 @@ down:
   - ./ITEM_MOVE_PLAN.md                            # Zusatzplan zu Step 7: Item-Verschieben (Ordner+Space) + Textfarben, P6-AD–P6-AJ
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-7 + v2.1-Deploy verbatim (neun Eintraege), L3, kein Softcap
-updated: 2026-08-18 -- (Nachtrag zum elften Block: Abschluss-Review vor der Nikinger-Live-Probe fand einen ungebauten Sec4.5-Pflichttest, test_acl.py :: test_acl_decision_follows_the_item_into_the_target_space nachgebaut; Step 7b DoD jetzt wirklich vollstaendig, 765 pytest gruen, noch nicht deployt)
+updated: 2026-08-18 -- (Nachtrag zum elften Block: Abschluss-Review fand einen ungebauten Sec4.5-Pflichttest, nachgebaut, 765 pytest gruen; danach sophistizierter E2E-Lauf gegen eine Wegwerf-Instanz (Port 8799, eigenes venv) -- 11/12 Playwright-Pruefungen gruen, Zeilen 26/27/30-Mechanik bestaetigt, zwei echte UI-Reichweiten-Funde dokumentiert (movable nur eigener Space, Zeile-28-Szenario nur ueber Connector erreichbar); Kopfzeile 48KB, ueber dem 40KB-Softcap, Rotation ist ein No-op (nur ein Block) -- Nikinger-Entscheidung noetig, siehe Session-Ende)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -318,3 +318,70 @@ nach dem Bau-Nachtrag). Kein neuer Advisor-Call für diesen Fix — Budget diese
 Abschluss-Konsultation aufgebraucht, Fund + Behebung folgen direkt der Plan-Tabelle, keine neue
 Designentscheidung. **Damit Step 7b DoD wirklich vollständig** (§4.5 jetzt 15/15 statt 14/15),
 weiterhin nur die Nikinger-Live-Probe offen.
+
+**Nachtrag, 2026-08-18, sophistizierter E2E-Lauf gegen eine echte Wegwerf-Instanz (Nikinger-
+Auftrag, Standing Permission reconfirmt — siehe `docs/PROMPTS.md`s „Tests"-Absatz und
+`[[feedback-throwaway-test-instance-permission]]`):** eigener Port 8799, eigenes `tmp`-
+`DATA_ROOT`/`auth.sqlite3` (Scratchpad, kein Repo-Artefakt, `create_app()` direkt verdrahtet wie
+`serve.py` es tut, aber mit einem selbst erzeugten DEK statt dem echten Keyring), zwei
+Testprincipale `alpha`/`beta` + ein dritter geteilter Space `geteilt` (`write: [alpha, beta]`,
+strukturell wie `IT-Sekus-Projekt`). Test-Tooling in einer neuen, eigenen venv
+(`~/.claude-code-tools/e2e-venv`, Playwright+httpx), getrennt von `svg-venv` und der Projekt-
+`.venv` — kein Vermischen von Testwerkzeugen mit Projekt- oder System-Python. Zwei echte
+Stolperfallen beim Aufsetzen, beide behoben, keine Codeänderung am Produkt: (1) der CSRF-
+Origin-Check (P5-H) verlangt eine `SPACE_PUBLIC_BASE_URL`, die exakt zum echten Browser-Origin
+passt — `http://127.0.0.1:8799` funktioniert, weil Chromium `127.0.0.1` als vertrauenswürdigen
+Ursprung behandelt und `__Host-`-Cookies dort trotz `http://` roundtripen; (2) TOTP-Replay-Schutz
+ist pro Space global (`counter <= last_counter`), nicht pro Vorgang — ein Skript, das denselben
+30-Sekunden-Code für Login UND einen Re-Auth-Dialog kurz danach wiederverwendet, bekommt den
+zweiten Versuch abgelehnt; `totp_now()` blockiert jetzt bis zu einem echten neuen Zeitfenster.
+
+**11 von 12 geskripteten Prüfungen grün, real im Chromium-Browser, gegen die echte laufende
+App:** Verschieben-Dialog inkl. Space-Auswahl (own→shared) triggert Re-Auth korrekt, Abschluss
+mit sichtbarem Erfolgs-Toast (der `pendingMoveBody`-Fund aus Commit 3/3 bleibt behoben), der
+geleerte Quellordner verschwindet aus dem Baum (**Abnahmezeile 30 mechanisch bestätigt**),
+`git log` im Wegwerf-`DATA_ROOT` zeigt exakt **einen** `move`-Commit (**Zeile 26s
+Kernmechanik bestätigt**), beta sieht das von alpha verschobene Item im geteilten Space und kann
+es speichern (**Zeile 27 mechanisch bestätigt**), In-Space-Drag-&-Drop funktioniert nach den
+Step-7b-Änderungen an `dialogs.js`/`app.html` weiterhin (Regressionsprobe, `tree.js`/`list.js`
+selbst unverändert), ein Drag auf einen fremden Space-Knoten löst nachweislich keine Anfrage aus
+(bestätigt P6-ABs „Menü ist der einzige Pflichtweg" empirisch, nicht nur aus dem Code gelesen).
+**Wichtig: dies ersetzt nicht die Nikinger-Live-Probe** (Abnahmezeilen 25–30 bleiben bei ihm/
+Fabian als die maßgebliche Abnahme) — es ist eine Vorab-Erhärtung auf einer Wegwerf-Instanz,
+kein Abhaken der Matrix.
+
+**Zwei echte Funde, keine Erfindungen — beide code- UND empirisch bestätigt, nicht nur
+vermutet:**
+
+1. **Der Verschieben-/Freigeben-Knopf ist client-seitig an `item.space === state.ownSpace`
+   gebunden** (`list.js`, `movable`-Variable, seit Step 7 unverändert, Step 7b hat sie nicht
+   angefasst). Folge: sobald ein Item in einen geteilten Space wandert, sieht **niemand** —
+   auch nicht, wer es verschoben hat — dort noch einen Verschieben-Knopf; ein Rückweg über die
+   UI existiert nicht. Kollidiert mit keiner Abnahmezeile (25–30 verlangen nur die eine
+   Richtung, nie den Rückweg über die UI), ist aber eine bewusste Einschränkung wert, dem
+   Nikinger genannt zu werden statt stillschweigend zu bleiben — der Server selbst (`api.py`s
+   `_items_patch`) verlangt diese Einschränkung nicht, nur `can_write` auf beiden Seiten.
+2. **Abnahmezeile 28s Szenario (item-level `share_write` ohne space-level Grant) ist über die
+   Web-UI nicht erreichbar, nicht nur nicht verschiebbar.** `GET /api/v1/spaces` filtert über
+   `permissions.visible_spaces()` — reines space-level `can_read` aus `.share.yml`, ohne
+   Rücksicht auf item-level `share_read`/`share_write`. Ein Space ohne space-level Grant taucht
+   im Baum nie auf, und die Suche (`list.js`: `params.set("space", state.activeSpace)`) filtert
+   serverseitig (`api.py :: _items_get` → `store.search(space=...)`) auf genau diesen einen
+   Space — es gibt in der UI keinen „über alle lesbaren Items hinweg suchen"-Modus. Live
+   bestätigt: `beta` fand das genau für dieses Szenario präparierte Item (`share_write:
+   [beta]`, kein space-level Grant von `alpha`) über die Suche **nicht** (0 Treffer). Über den
+   MCP-Connector funktioniert dasselbe Szenario nachweislich (`tools.py` filtert item-weise über
+   `acl_of()`/`can_read_item`, unabhängig von Space-Sichtbarkeit — genau das prüft der
+   bestehende Unit-Test `test_patch_item_level_share_write_holder_cannot_move_item_between_
+   spaces`). **Frage an den Nikinger, keine Selbstentscheidung:** ist Zeile 28 als „über den
+   Connector geprüft" gemeint (dann bereits erfüllt, nur nicht über die UI), oder ist ein
+   „über alle lesbaren Items suchen"-Modus ein echter, bisher unentdeckter UI-Lückenschluss für
+   eine spätere Phase? Keine Planänderung hier vorgenommen — reiner Befund.
+
+**Kein Code-Fund am Produkt selbst** (beide Punkte sind Verhalten, nicht Bugs — der Server tut
+in beiden Fällen genau das, was `permissions.py`/`api.py` vorsehen). Kein neuer Test im Repo
+(die Prüfungen liefen ausschließlich gegen die Wegwerf-Instanz, Scratchpad, dieselbe Kategorie
+wie die jsdom-/Playwright-Verifikationen aus P5 Steps 10/11 und P6 Step 3). `pytest` unverändert
+765/765 (keine Produktänderung in diesem Nachtrag). Wegwerf-Instanz nach dem Lauf beendet, Port
+8799 wieder frei, `~/.claude-code-tools/e2e-venv` bleibt als wiederverwendbares Werkzeug stehen
+(dieselbe Kategorie wie `svg-venv`, Werkzeug-Ebene, kein Repo-Artefakt).
