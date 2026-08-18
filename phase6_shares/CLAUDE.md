@@ -9,7 +9,7 @@ down:
   - ./ITEM_MOVE_PLAN.md                            # Zusatzplan zu Step 7: Item-Verschieben (Ordner+Space) + Textfarben, P6-AD–P6-AJ
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-7 + v2.1-Deploy verbatim (neun Eintraege), L3, kein Softcap
-updated: 2026-08-18 -- (Nachtrag zum elften Block: Abschluss-Review fand einen ungebauten Sec4.5-Pflichttest, nachgebaut, 765 pytest gruen; danach sophistizierter E2E-Lauf gegen eine Wegwerf-Instanz (Port 8799, eigenes venv) -- 11/12 Playwright-Pruefungen gruen, Zeilen 26/27/30-Mechanik bestaetigt, zwei echte UI-Reichweiten-Funde dokumentiert (movable nur eigener Space, Zeile-28-Szenario nur ueber Connector erreichbar); Kopfzeile 48KB, ueber dem 40KB-Softcap, Rotation ist ein No-op (nur ein Block) -- Nikinger-Entscheidung noetig, siehe Session-Ende)
+updated: 2026-08-18, zwoelfter (Abschluss-Review + Sec4.5-Testluecke nachgebaut, E2E-Lauf gegen eine Wegwerf-Instanz 11/12 gruen, Zeilen 26/27/30-Mechanik bestaetigt, ein Deploy-Blocker-Fund + ein akzeptierter Fund, Nikinger entschieden; danach rotiert, elfter Block verbatim ins Archiv)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -192,114 +192,22 @@ Nachrichten an den Nikinger erspart.
 Planungssession dafür ansteht — dieselbe Kategorie wie das ursprüngliche `patch_item`-Feedback,
 das P6 selbst mit ausgelöst hat (`docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` §4.6).
 
+**[2026-08-18] Zwei UI-Reichweiten-Funde aus dem Step-7b-E2E-Lauf gegen die Wegwerf-Instanz,
+beide Nikinger-Entscheidungen eingeholt** (volle Herleitung + Mechanismus: Session-Block unten,
+„Zwei echte Funde"):
+
+1. **🔴 Blockiert den nächsten Deploy.** Kein „über alle lesbaren Items suchen"-Modus in der
+   UI — ein item-level geteiltes Item ohne space-level Grant ist unauffindbar, nicht nur
+   unverschiebbar. Muss vor dem nächsten Deploy geplant und behoben werden, noch kein Plan/Code.
+2. **🟡 Kein Bug, nicht blockierend.** Verschieben-/Freigeben-Knopf nur für Items im eigenen
+   Space sichtbar (`list.js`, seit Step 7) — ein UI-Rückweg aus einem geteilten Space fehlt.
+   Reine Vormerkung, kein Handlungsbedarf.
+
 ---
 
-## Session stopped — 2026-08-17, elfter — (Planungssession „light": Step 7b gelockt, §9 Mehrfachauswahl neu — **[2026-08-17 Korrektur] Titel stimmte nur bis zum Nachtrag**: derselbe Block dokumentiert weiter unten den Bauauftrag, der Step 7b in drei Commits vollständig gebaut hat; Titel unverändert aus Historientreue, Klarstellung hier statt rückwirkendem Umschreiben)
+## Session stopped — 2026-08-18, zwölfter — (Abschluss-Review + Step-7b-E2E-Lauf gegen eine Wegwerf-Instanz, zwei Nikinger-Entscheidungen zu UI-Reichweiten-Funden)
 
-**Auftrag:** Nikinger — die beiden noch offenen UI-Feedback-Punkte (2: Space-zu-Space-Move/Step
-7b, 3: Mehrfachauswahl) bearbeiten. Nikinger-Rahmen für diese Session: „planning session light,
-da es kein echter Plan ist" — erster Schritt ein Subplan für beide Punkte, plus bei Bedarf die
-Tests, die für einen Abschluss von Phase 6 noch fehlen. Ausdrücklich bestätigt: „I confirm we
-can work on all points."
-
-**Vor dem Schreiben geklärt, nicht angenommen (Advisor-Konsultation vor jeder Substanzarbeit):**
-`ITEM_MOVE_PLAN.md` §2 hatte P6-AD–AJ nie als gelockt dokumentiert — die Planungssession vom
-2026-08-13 endete mit „ITEM_MOVE_PLAN.md vom Nikinger freigeben lassen" als offenem nächsten
-Schritt, die einzige Folge-Session (2026-08-13, Step 7a) war ausdrücklich auf §3 verengt, und
-root-`CLAUDE.md`s „Noch nicht entschieden" trug den Punkt bis zu dieser Session unverändert seit
-2026-08-13 (`git log`/Archiv-Grep über alle Sessions dazwischen bestätigen: keine Freigabe
-dokumentiert). Erst mit der Nikinger-Bestätigung dieser Session gilt §2 als gelockt — im
-Plan-Dokument selbst datiert festgehalten, keine stille Annahme.
-
-**Ergebnis: zwei Subplan-Erweiterungen in `phase6_shares/ITEM_MOVE_PLAN.md`, keine
-Code-Änderung.**
-
-1. **§2 (Step 7b) gelockt.** P6-AD–P6-AJ tragen jetzt einen datierten Freigabevermerk.
-2. **V52–V55 gegen den inzwischen echten Step-7-Code geschlossen** (bei Plan-Erstellung
-   2026-08-13 existierte Step 7 noch nicht, alle vier waren „wann: Step 7b/Step 7" offen):
-   `reauth_required` ist exakt `ApiError("reauth_required", …)` (`webui/shares.py`), `ShareState`
-   trägt bereits `space`/`folder` — Plan-Annahme in §4.3 hält unverändert. `os.replace()` bleibt
-   über Space-Grenzen atomar: read-only gegen den echten `DATA_ROOT` geprüft (`stat -c %d`),
-   `niklas`/`fabian`/`IT-Sekus-Projekt` liegen alle auf demselben ext4-Gerät (`2050`,
-   `/dev/sda2`). **V54 anders gelöst als geplant, einfacher:** kein `folders`-Feld an
-   `GET /api/v1/overview` nötig — `GET /api/v1/spaces` trägt `folders` bereits für jeden
-   sichtbaren Space, `list.js :: loadOverview()` mischt das seit Step 7 Commit 1 in
-   `state.spaces`, der bestehende `openMoveDialog()`-Code liest schon denselben Weg (§4.4 Punkt 1
-   entsprechend präzisiert, kein Backend-Fund für den Verschieben-Dialog).
-3. **Advisor-Fund vor dem Bauen, in §4.2/§4.3 nachgezogen:** der bestehende Eigentümer-Riegel
-   gegen Nicht-Eigentümer-Ordnerwechsel (`tools.py:514-520`, analog `api.py`) prüft `folder is
-   not None and acl.space != principal.space` — ohne Rücksicht auf `space`. Bei einem
-   Cross-Space-Move MIT gleichzeitig gesetztem Zielordner (der reale Fall aus §4.4 Punkt 1) wäre
-   diese Bedingung für praktisch jeden legitimen Move wahr (kein Principal heißt wie ein
-   geteilter Space, P6-AE) — der alte Riegel hätte einen von P6-AE bereits erlaubten Move
-   fälschlich blockiert. Plan-Text „ersetzt ihn" war codeseitig nicht verankert; jetzt eine
-   explizite Bedingung (`space is None`) plus ein neuer Pflichttest in §4.5. **Noch nicht
-   gebaut** — reine Plan-Präzisierung, kein Code in diesem Repo geändert außer den `.md`-Dateien.
-4. **Neues §9 „Mehrfachauswahl" (P6-AK–AN), vollständig neu entworfen** (dafür lag vorher kein
-   Plan vor, nur eine Nikinger-Vormerkung): ein gemeinsames Ziel für die ganze Auswahl (P6-AK),
-   kein neuer Endpunkt/kein neues MCP-Tool — die Batch-Aktion ist eine clientseitige,
-   sequenzielle Schleife über den bestehenden Step-7b-Einzelpfad, jeder Request durchläuft die
-   volle, bereits gebaute Rechteprüfung unverändert (P6-AL). Re-Auth in maximal zwei Runden
-   (erst alle Requests ohne Credentials, dann ein gemeinsames Formular nur für die
-   zurückgewiesenen) statt der falschen Annahme „ein Ziel ⇒ ein `widens()`-Ergebnis für alle"
-   (P6-AM — `widens()` hängt auch an der `visibility`/`share_*` des einzelnen Items, nicht nur
-   am Ziel). In-Space-Mehrfachauswahl bleibt bestätigt ohne neue Rechteprüfung (P6-AN, bestätigt
-   dieselbe grep-Prüfung, die schon die alte Vormerkung stützte). Vier neue Abnahmezeilen (31–34).
-   **Keine neue Backend-Testdatei geplant** (§9.4) — reiner Frontend-Schnitt, Playwright-Sichtprobe
-   beim Bauen wie bei jedem anderen JS-Schnitt dieser Phase.
-5. **Tests, die für den Abschluss von Phase 6 noch fehlen (Nikinger-Frage dieser Session,
-   beantwortet statt übergangen):** Block A+B sind vollständig gebaut, 747 Tests grün. Was fehlt,
-   ist kein Testcode, sondern **live-Verifikation durch Menschen** — Gate B (Abnahmezeilen 8–18
-   im Hauptplan) braucht weiterhin echten Alltag von Niklas **und** Fabian, nicht mehr
-   Claude-Code-Sessions. Für Step 7b/§9 selbst: genau ein neuer Pflichttest (Punkt 3 oben) plus
-   die bereits in `ITEM_MOVE_PLAN.md` §4.5 gelisteten 14 — beide noch ungeschrieben, weil noch
-   nicht gebaut. **Block C (Bilder, Abnahmezeilen 19–22) ist separat und laut P6-A explizit die
-   erste Stelle, die unter Druck wegfällt** — nicht Teil dieser beiden Feedback-Punkte, hier
-   bewusst nicht mitgeplant; ob Block C für einen Phasenabschluss noch gebaut wird, bleibt
-   Nikinger-Entscheidung.
-
-**Nebenfund, im selben Commit korrigiert:** Modul-Status Zeile 8 zitierte „P6-AD/AE" für Step 7a
-(Textfarben) — ein Kopierfehler, diese Codes gehören zu Step 7b (`Store.move()`/Rechteregel),
-§3 (Textfarben) hat gar keine eigenen Entscheidungscodes. Datierte Korrekturnotiz statt
-rückwirkendem Umschreiben.
-
-**Contract-Ankündigung nachgezogen:** „Geerbte Contracts" bekommt eine vierte, benannte Öffnung
-(`store.py :: move()`, additiv) — angekündigt, noch nicht umgesetzt, gleiche Konvention wie die
-dritte Öffnung aus Step 0.
-
-**Verifiziert:** keine Testsuite gelaufen (reine `.md`-Änderungen, kein Code). Tabu-Diff nicht
-relevant. `git log`/`SESSIONS_ARCHIVE.md`-Grep für den Freigabe-Nachweis oben tatsächlich
-ausgeführt, nicht behauptet (Befehle und Treffer: siehe Advisor-Konsultation dieser Session).
-Dateigröße `ITEM_MOVE_PLAN.md` nach allen Ergänzungen: **~39,3 KB** — knapp unter dem 40-KB-
-Softcap für 📗-Dokumente, keine Rotation/Auslagerung nötig, aber der nächste Zuwachs (z. B. eine
-weitere Erweiterung) braucht eine Softcap-Prüfung vor dem Schreiben, nicht danach.
-
-**Nächster Schritt:** Step 7b bauen (`ITEM_MOVE_PLAN.md` §4, jetzt gelockt) — danach erst §9
-(Mehrfachauswahl setzt Step 7b architektonisch voraus, §9.1). Root-`CLAUDE.md`s „Noch nicht
-entschieden"-Eintrag zum Item-Verschieben wird im selben Commit wie dieser Session-Block entfernt
-(die Planungsfrage ist beantwortet, nur der Bau steht noch aus).
-
-**Nachtrag, 2026-08-17, Bauauftrag „start atomically with the first step":** Step 7b **komplett
-gebaut, drei Commits** (§4.1–§4.3/§4.4 je eine Schicht, wie im Plan vorgezeichnet). **1/3**
-`storage/store.py :: move()` (vierte P1-Contract-Öffnung) · **2/3** `update_item(space=)`/
-`_items_patch space=`, P6-AE-Rechtsprüfung, der in §4.2 vorhergesehene Guard-Routing-Fund
-bestätigte sich real (`space is None`-Fix) · **3/3** Verschieben-Dialog + Space-Auswahl
-(`dialogs.js`/`app.html`), **echt per Playwright verifiziert** (Login → Move `alpha`→`beta` →
-Re-Auth-Formular → Erfolg, Screenshot gesehen) — dabei ein echter Fund: `closeMoveDialog()`
-nullte `pendingMoveBody` vor dessen letzter Lesung, verschluckte die Erfolgsmeldung lautlos,
-behoben. Details je Adapter: `phase1_storage/`/`phase2_mcp/`/`phase5_ui/CLAUDE.md`s
-„[2026-08-17]"-Einträge, nicht doppelt hier. Ein eigener Fund dieser Session (kein Advisor-Fund):
-ein zu grobes `old_string` beim Test-Einfügen schnitt einen bestehenden `test_api.py`-Test
-versehentlich durch — per `git diff` bemerkt, nicht dem grünen Lauf vertraut, korrigiert.
-
-**Verifiziert:** `pytest -q` 753→764 (Commits 1–2, Commit 3 ist reines JS/HTML, P5-T).
-Charakterisierung grün. Tabu-Diff leer. Drag & Drop auf Space-Knoten (§4.4 Punkt 3) bewusst
-nicht gebaut — P6-AB verlangt nur die Menüvariante als Pflichtweg.
-
-**Step 7b DoD vollständig außer der Nikinger-Live-Probe** (echter Move über Connector UND UI,
-Abnahmezeilen 25–30) — kein Deploy diese Session. **Nächster Schritt:** §9 (Mehrfachauswahl).
-
-**Nachtrag, 2026-08-18, Abschluss-Review (der letzte Advisor-Call der Session, wie vom Nikinger
+**Abschluss-Review (der letzte Advisor-Call der Session, wie vom Nikinger
 verlangt):** sechs Punkte geprüft, fünf grün ohne Codeänderung — Zielkollision beim Cross-Space-
 Move ausgeschlossen (Dateiname trägt die global eindeutige Item-ID, `item_filename()`, Entscheidung
 F aus P1; ein zweites Item mit derselben ID kann es per Index-`PRIMARY KEY` nicht geben), `version`/
@@ -319,22 +227,19 @@ Abschluss-Konsultation aufgebraucht, Fund + Behebung folgen direkt der Plan-Tabe
 Designentscheidung. **Damit Step 7b DoD wirklich vollständig** (§4.5 jetzt 15/15 statt 14/15),
 weiterhin nur die Nikinger-Live-Probe offen.
 
-**Nachtrag, 2026-08-18, sophistizierter E2E-Lauf gegen eine echte Wegwerf-Instanz (Nikinger-
-Auftrag, Standing Permission reconfirmt — siehe `docs/PROMPTS.md`s „Tests"-Absatz und
-`[[feedback-throwaway-test-instance-permission]]`):** eigener Port 8799, eigenes `tmp`-
-`DATA_ROOT`/`auth.sqlite3` (Scratchpad, kein Repo-Artefakt, `create_app()` direkt verdrahtet wie
-`serve.py` es tut, aber mit einem selbst erzeugten DEK statt dem echten Keyring), zwei
-Testprincipale `alpha`/`beta` + ein dritter geteilter Space `geteilt` (`write: [alpha, beta]`,
-strukturell wie `IT-Sekus-Projekt`). Test-Tooling in einer neuen, eigenen venv
-(`~/.claude-code-tools/e2e-venv`, Playwright+httpx), getrennt von `svg-venv` und der Projekt-
-`.venv` — kein Vermischen von Testwerkzeugen mit Projekt- oder System-Python. Zwei echte
-Stolperfallen beim Aufsetzen, beide behoben, keine Codeänderung am Produkt: (1) der CSRF-
-Origin-Check (P5-H) verlangt eine `SPACE_PUBLIC_BASE_URL`, die exakt zum echten Browser-Origin
-passt — `http://127.0.0.1:8799` funktioniert, weil Chromium `127.0.0.1` als vertrauenswürdigen
-Ursprung behandelt und `__Host-`-Cookies dort trotz `http://` roundtripen; (2) TOTP-Replay-Schutz
-ist pro Space global (`counter <= last_counter`), nicht pro Vorgang — ein Skript, das denselben
-30-Sekunden-Code für Login UND einen Re-Auth-Dialog kurz danach wiederverwendet, bekommt den
-zweiten Versuch abgelehnt; `totp_now()` blockiert jetzt bis zu einem echten neuen Zeitfenster.
+**Nachtrag, sophistizierter E2E-Lauf gegen eine echte Wegwerf-Instanz** (Standing Permission
+reconfirmt, jetzt in `docs/PROMPTS.md`s „Tests"-Absatz): eigener Port 8799, eigenes `tmp`-
+`DATA_ROOT`/`auth.sqlite3`, `create_app()` verdrahtet wie `serve.py`, aber mit selbst erzeugtem
+DEK statt dem echten Keyring. Zwei Testprincipale `alpha`/`beta` + geteilter Space `geteilt`
+(`write: [alpha, beta]`, strukturell wie `IT-Sekus-Projekt`). Test-Tooling in eigener venv
+(`~/.claude-code-tools/e2e-venv`, Playwright+httpx), getrennt von `svg-venv`/Projekt-`.venv`.
+Zwei Stolperfallen beim Aufsetzen, keine Codeänderung am Produkt: (1) CSRF-Origin-Check (P5-H)
+verlangt eine `SPACE_PUBLIC_BASE_URL`, die zum echten Browser-Origin passt —
+`http://127.0.0.1:8799` funktioniert, Chromium behandelt `127.0.0.1` als vertrauenswürdig,
+`__Host-`-Cookies roundtripen trotz `http://`; (2) TOTP-Replay-Schutz ist pro Space global
+(`counter <= last_counter`), nicht pro Vorgang — derselbe 30s-Code für Login und einen Re-Auth
+kurz danach wird beim zweiten Mal abgelehnt; `totp_now()` blockiert jetzt bis zu einem echten
+neuen Zeitfenster.
 
 **11 von 12 geskripteten Prüfungen grün, real im Chromium-Browser, gegen die echte laufende
 App:** Verschieben-Dialog inkl. Space-Auswahl (own→shared) triggert Re-Auth korrekt, Abschluss
@@ -378,10 +283,17 @@ vermutet:**
    „über alle lesbaren Items suchen"-Modus ein echter, bisher unentdeckter UI-Lückenschluss für
    eine spätere Phase? Keine Planänderung hier vorgenommen — reiner Befund.
 
-**Kein Code-Fund am Produkt selbst** (beide Punkte sind Verhalten, nicht Bugs — der Server tut
-in beiden Fällen genau das, was `permissions.py`/`api.py` vorsehen). Kein neuer Test im Repo
-(die Prüfungen liefen ausschließlich gegen die Wegwerf-Instanz, Scratchpad, dieselbe Kategorie
-wie die jsdom-/Playwright-Verifikationen aus P5 Steps 10/11 und P6 Step 3). `pytest` unverändert
-765/765 (keine Produktänderung in diesem Nachtrag). Wegwerf-Instanz nach dem Lauf beendet, Port
-8799 wieder frei, `~/.claude-code-tools/e2e-venv` bleibt als wiederverwendbares Werkzeug stehen
-(dieselbe Kategorie wie `svg-venv`, Werkzeug-Ebene, kein Repo-Artefakt).
+Beide Punkte: der Server tut genau das, was `permissions.py`/`api.py` vorsehen — Einstufung als
+Bug oder nicht ist eine Produktentscheidung, keine Codefrage (siehe Nikinger-Entscheidungen
+unten). Kein neuer Test im Repo, kein Code-Fund in diesem Nachtrag (Prüfungen liefen nur gegen
+die Wegwerf-Instanz, Scratchpad, Kategorie wie P5 Steps 10/11). `pytest` unverändert 765/765.
+Wegwerf-Instanz beendet, Port 8799 frei, `~/.claude-code-tools/e2e-venv` bleibt als
+wiederverwendbares Werkzeug (Kategorie `svg-venv`, kein Repo-Artefakt).
+
+**Nikinger-Entscheidungen zu den beiden Funden, direkt im Anschluss:** Blocker-Status für Fund 2,
+kein Bug für Fund 1 — beide mit Begründung in „Vormerkungen" oben, Fund 2 zusätzlich in
+Root-`CLAUDE.md`s „Current state". Push freigegeben. MD-Trim angeordnet: `scripts/rotate_
+session_block.sh` gegen eine neu gesetzte `##`-Überschrift gelaufen (genau der Fall, den das
+Skript selbst für „eine Sektion nach dem Block ist faktisch ein zweiter" vorsieht) — der
+komplette 2026-08-17-Block wanderte verbatim ins Archiv, dieser Block blieb als einziger
+aktueller stehen.

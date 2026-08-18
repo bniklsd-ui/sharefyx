@@ -177,6 +177,13 @@ Nachtrag] deployed und live bestätigt** — Release `20260813T120925.743482Z` (
 vom Nikinger per manuellem UI-Test im Browser validiert. **Damit sind beide Teile des UI-Funds
 geschlossen.** Details: `phase6_shares/CLAUDE.md`s Session-Block vom selben Tag.
 
+**[2026-08-18] Deploy-Blocker, Nikinger-Entscheidung, noch offen:** ein sophistizierter E2E-Lauf
+gegen eine Wegwerf-Instanz fand einen echten UI-Fund — es gibt keinen „über alle lesbaren Items
+hinweg suchen"-Modus, ein Item mit ausschließlich item-level `share_write`/`share_read` (kein
+space-level Grant) ist über die Web-UI unauffindbar, nur über den MCP-Connector erreichbar. Vom
+Nikinger als echter Bug eingestuft, **muss vor dem nächsten Deploy geplant und behoben werden**.
+Noch kein Plan, noch kein Code. Details: `phase6_shares/CLAUDE.md`s „Vormerkungen".
+
 **Phase 5 — Web-UI, REST-API und Auth-Selbstverwaltung** (`phase5_ui/`, Paket `webui`) — **✅
 abgeschlossen, 2026-08-09 — 20/20 Abnahmezeilen live bestanden, 0 teilweise, 0 offen.** Zwei
 Blöcke (A = Sicherheit + Auth-Selbstverwaltung, B = REST-API + UI) mit hartem Gate dazwischen,

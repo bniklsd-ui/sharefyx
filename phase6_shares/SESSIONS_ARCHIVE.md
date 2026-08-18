@@ -4,7 +4,7 @@ purpose: L3-Archiv der Phase-6-Session-Bloecke -- Steps 0-7 (Haushalt, Werkzeug-
 read-when: Historie einer bereits abgeschlossenen Phase-6-Teilarbeit nachvollziehen -- nicht beim normalen Sessionstart lesen
 detail: L3
 up: ../phase6_shares/CLAUDE.md
-updated: 2026-08-17
+updated: 2026-08-18
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 6 (`phase6_shares/`)
@@ -52,6 +52,118 @@ updated: 2026-08-17
 > phase6_shares` (mechanisch, keine Handkorrektur diesmal nötig) — der "zehnter"-Block war mit
 > den beiden CSS-Fixes abgeschlossen, der Kopf bekam einen neuen "elfter"-Block für die
 > Step-7b-Freigabe + das neue §9 in `ITEM_MOVE_PLAN.md`.
+> **Zehnte Rotation (2026-08-18, Nikinger-Auftrag „use the already probed logic to trim down md
+> files"):** der "elfter"-Block (Planungssession + Step-7b-Bau in drei Commits) war mit „Step 7b
+> DoD vollständig … Nächster Schritt: §9" abgeschlossen — die nachfolgenden 2026-08-18-Nachträge
+> (Abschluss-Review, Sec4.5-Testlücke, E2E-Lauf) bekamen eine eigene `## Session stopped`-
+> Überschrift ("zwölfter"), genau der vom Skript selbst vorgesehene Fall einer `##`-Sektion, die
+> faktisch ein zweiter Block ist. Danach `scripts/rotate_session_block.sh phase6_shares`
+> mechanisch gelaufen, Kopf 52→41 KB.
+
+## Session stopped — 2026-08-17, elfter — (Planungssession „light": Step 7b gelockt, §9 Mehrfachauswahl neu — **[2026-08-17 Korrektur] Titel stimmte nur bis zum Nachtrag**: derselbe Block dokumentiert weiter unten den Bauauftrag, der Step 7b in drei Commits vollständig gebaut hat; Titel unverändert aus Historientreue, Klarstellung hier statt rückwirkendem Umschreiben)
+
+**Auftrag:** Nikinger — die beiden noch offenen UI-Feedback-Punkte (2: Space-zu-Space-Move/Step
+7b, 3: Mehrfachauswahl) bearbeiten. Nikinger-Rahmen für diese Session: „planning session light,
+da es kein echter Plan ist" — erster Schritt ein Subplan für beide Punkte, plus bei Bedarf die
+Tests, die für einen Abschluss von Phase 6 noch fehlen. Ausdrücklich bestätigt: „I confirm we
+can work on all points."
+
+**Vor dem Schreiben geklärt, nicht angenommen (Advisor-Konsultation vor jeder Substanzarbeit):**
+`ITEM_MOVE_PLAN.md` §2 hatte P6-AD–AJ nie als gelockt dokumentiert — die Planungssession vom
+2026-08-13 endete mit „ITEM_MOVE_PLAN.md vom Nikinger freigeben lassen" als offenem nächsten
+Schritt, die einzige Folge-Session (2026-08-13, Step 7a) war ausdrücklich auf §3 verengt, und
+root-`CLAUDE.md`s „Noch nicht entschieden" trug den Punkt bis zu dieser Session unverändert seit
+2026-08-13 (`git log`/Archiv-Grep über alle Sessions dazwischen bestätigen: keine Freigabe
+dokumentiert). Erst mit der Nikinger-Bestätigung dieser Session gilt §2 als gelockt — im
+Plan-Dokument selbst datiert festgehalten, keine stille Annahme.
+
+**Ergebnis: zwei Subplan-Erweiterungen in `phase6_shares/ITEM_MOVE_PLAN.md`, keine
+Code-Änderung.**
+
+1. **§2 (Step 7b) gelockt.** P6-AD–P6-AJ tragen jetzt einen datierten Freigabevermerk.
+2. **V52–V55 gegen den inzwischen echten Step-7-Code geschlossen** (bei Plan-Erstellung
+   2026-08-13 existierte Step 7 noch nicht, alle vier waren „wann: Step 7b/Step 7" offen):
+   `reauth_required` ist exakt `ApiError("reauth_required", …)` (`webui/shares.py`), `ShareState`
+   trägt bereits `space`/`folder` — Plan-Annahme in §4.3 hält unverändert. `os.replace()` bleibt
+   über Space-Grenzen atomar: read-only gegen den echten `DATA_ROOT` geprüft (`stat -c %d`),
+   `niklas`/`fabian`/`IT-Sekus-Projekt` liegen alle auf demselben ext4-Gerät (`2050`,
+   `/dev/sda2`). **V54 anders gelöst als geplant, einfacher:** kein `folders`-Feld an
+   `GET /api/v1/overview` nötig — `GET /api/v1/spaces` trägt `folders` bereits für jeden
+   sichtbaren Space, `list.js :: loadOverview()` mischt das seit Step 7 Commit 1 in
+   `state.spaces`, der bestehende `openMoveDialog()`-Code liest schon denselben Weg (§4.4 Punkt 1
+   entsprechend präzisiert, kein Backend-Fund für den Verschieben-Dialog).
+3. **Advisor-Fund vor dem Bauen, in §4.2/§4.3 nachgezogen:** der bestehende Eigentümer-Riegel
+   gegen Nicht-Eigentümer-Ordnerwechsel (`tools.py:514-520`, analog `api.py`) prüft `folder is
+   not None and acl.space != principal.space` — ohne Rücksicht auf `space`. Bei einem
+   Cross-Space-Move MIT gleichzeitig gesetztem Zielordner (der reale Fall aus §4.4 Punkt 1) wäre
+   diese Bedingung für praktisch jeden legitimen Move wahr (kein Principal heißt wie ein
+   geteilter Space, P6-AE) — der alte Riegel hätte einen von P6-AE bereits erlaubten Move
+   fälschlich blockiert. Plan-Text „ersetzt ihn" war codeseitig nicht verankert; jetzt eine
+   explizite Bedingung (`space is None`) plus ein neuer Pflichttest in §4.5. **Noch nicht
+   gebaut** — reine Plan-Präzisierung, kein Code in diesem Repo geändert außer den `.md`-Dateien.
+4. **Neues §9 „Mehrfachauswahl" (P6-AK–AN), vollständig neu entworfen** (dafür lag vorher kein
+   Plan vor, nur eine Nikinger-Vormerkung): ein gemeinsames Ziel für die ganze Auswahl (P6-AK),
+   kein neuer Endpunkt/kein neues MCP-Tool — die Batch-Aktion ist eine clientseitige,
+   sequenzielle Schleife über den bestehenden Step-7b-Einzelpfad, jeder Request durchläuft die
+   volle, bereits gebaute Rechteprüfung unverändert (P6-AL). Re-Auth in maximal zwei Runden
+   (erst alle Requests ohne Credentials, dann ein gemeinsames Formular nur für die
+   zurückgewiesenen) statt der falschen Annahme „ein Ziel ⇒ ein `widens()`-Ergebnis für alle"
+   (P6-AM — `widens()` hängt auch an der `visibility`/`share_*` des einzelnen Items, nicht nur
+   am Ziel). In-Space-Mehrfachauswahl bleibt bestätigt ohne neue Rechteprüfung (P6-AN, bestätigt
+   dieselbe grep-Prüfung, die schon die alte Vormerkung stützte). Vier neue Abnahmezeilen (31–34).
+   **Keine neue Backend-Testdatei geplant** (§9.4) — reiner Frontend-Schnitt, Playwright-Sichtprobe
+   beim Bauen wie bei jedem anderen JS-Schnitt dieser Phase.
+5. **Tests, die für den Abschluss von Phase 6 noch fehlen (Nikinger-Frage dieser Session,
+   beantwortet statt übergangen):** Block A+B sind vollständig gebaut, 747 Tests grün. Was fehlt,
+   ist kein Testcode, sondern **live-Verifikation durch Menschen** — Gate B (Abnahmezeilen 8–18
+   im Hauptplan) braucht weiterhin echten Alltag von Niklas **und** Fabian, nicht mehr
+   Claude-Code-Sessions. Für Step 7b/§9 selbst: genau ein neuer Pflichttest (Punkt 3 oben) plus
+   die bereits in `ITEM_MOVE_PLAN.md` §4.5 gelisteten 14 — beide noch ungeschrieben, weil noch
+   nicht gebaut. **Block C (Bilder, Abnahmezeilen 19–22) ist separat und laut P6-A explizit die
+   erste Stelle, die unter Druck wegfällt** — nicht Teil dieser beiden Feedback-Punkte, hier
+   bewusst nicht mitgeplant; ob Block C für einen Phasenabschluss noch gebaut wird, bleibt
+   Nikinger-Entscheidung.
+
+**Nebenfund, im selben Commit korrigiert:** Modul-Status Zeile 8 zitierte „P6-AD/AE" für Step 7a
+(Textfarben) — ein Kopierfehler, diese Codes gehören zu Step 7b (`Store.move()`/Rechteregel),
+§3 (Textfarben) hat gar keine eigenen Entscheidungscodes. Datierte Korrekturnotiz statt
+rückwirkendem Umschreiben.
+
+**Contract-Ankündigung nachgezogen:** „Geerbte Contracts" bekommt eine vierte, benannte Öffnung
+(`store.py :: move()`, additiv) — angekündigt, noch nicht umgesetzt, gleiche Konvention wie die
+dritte Öffnung aus Step 0.
+
+**Verifiziert:** keine Testsuite gelaufen (reine `.md`-Änderungen, kein Code). Tabu-Diff nicht
+relevant. `git log`/`SESSIONS_ARCHIVE.md`-Grep für den Freigabe-Nachweis oben tatsächlich
+ausgeführt, nicht behauptet (Befehle und Treffer: siehe Advisor-Konsultation dieser Session).
+Dateigröße `ITEM_MOVE_PLAN.md` nach allen Ergänzungen: **~39,3 KB** — knapp unter dem 40-KB-
+Softcap für 📗-Dokumente, keine Rotation/Auslagerung nötig, aber der nächste Zuwachs (z. B. eine
+weitere Erweiterung) braucht eine Softcap-Prüfung vor dem Schreiben, nicht danach.
+
+**Nächster Schritt:** Step 7b bauen (`ITEM_MOVE_PLAN.md` §4, jetzt gelockt) — danach erst §9
+(Mehrfachauswahl setzt Step 7b architektonisch voraus, §9.1). Root-`CLAUDE.md`s „Noch nicht
+entschieden"-Eintrag zum Item-Verschieben wird im selben Commit wie dieser Session-Block entfernt
+(die Planungsfrage ist beantwortet, nur der Bau steht noch aus).
+
+**Nachtrag, 2026-08-17, Bauauftrag „start atomically with the first step":** Step 7b **komplett
+gebaut, drei Commits** (§4.1–§4.3/§4.4 je eine Schicht, wie im Plan vorgezeichnet). **1/3**
+`storage/store.py :: move()` (vierte P1-Contract-Öffnung) · **2/3** `update_item(space=)`/
+`_items_patch space=`, P6-AE-Rechtsprüfung, der in §4.2 vorhergesehene Guard-Routing-Fund
+bestätigte sich real (`space is None`-Fix) · **3/3** Verschieben-Dialog + Space-Auswahl
+(`dialogs.js`/`app.html`), **echt per Playwright verifiziert** (Login → Move `alpha`→`beta` →
+Re-Auth-Formular → Erfolg, Screenshot gesehen) — dabei ein echter Fund: `closeMoveDialog()`
+nullte `pendingMoveBody` vor dessen letzter Lesung, verschluckte die Erfolgsmeldung lautlos,
+behoben. Details je Adapter: `phase1_storage/`/`phase2_mcp/`/`phase5_ui/CLAUDE.md`s
+„[2026-08-17]"-Einträge, nicht doppelt hier. Ein eigener Fund dieser Session (kein Advisor-Fund):
+ein zu grobes `old_string` beim Test-Einfügen schnitt einen bestehenden `test_api.py`-Test
+versehentlich durch — per `git diff` bemerkt, nicht dem grünen Lauf vertraut, korrigiert.
+
+**Verifiziert:** `pytest -q` 753→764 (Commits 1–2, Commit 3 ist reines JS/HTML, P5-T).
+Charakterisierung grün. Tabu-Diff leer. Drag & Drop auf Space-Knoten (§4.4 Punkt 3) bewusst
+nicht gebaut — P6-AB verlangt nur die Menüvariante als Pflichtweg.
+
+**Step 7b DoD vollständig außer der Nikinger-Live-Probe** (echter Move über Connector UND UI,
+Abnahmezeilen 25–30) — kein Deploy diese Session. **Nächster Schritt:** §9 (Mehrfachauswahl).
 
 ## Session stopped — 2026-08-16, zehnter — (zwei der vier UI-Feedback-Punkte umgesetzt, Rotation)
 
