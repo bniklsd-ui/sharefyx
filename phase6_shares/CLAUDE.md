@@ -9,7 +9,7 @@ down:
   - ./ITEM_MOVE_PLAN.md                            # Zusatzplan zu Step 7: Item-Verschieben (Ordner+Space) + Textfarben, P6-AD–P6-AJ
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-7 + v2.1-Deploy verbatim (neun Eintraege), L3, kein Softcap
-updated: 2026-08-17, elfter -- (zehnter-Block neunte Rotation, verbatim ins Archiv; Planungssession "light" -- ITEM_MOVE_PLAN.md P6-AD-AJ gelockt, neues Sec9 Mehrfachauswahl P6-AK-AN; danach Bauauftrag -- Step 7b vollstaendig gebaut in drei Commits [store.py::move(), update_item(space=)/_items_patch space= mit P6-AE-Rechtspruefung, Verschieben-Dialog+Space-Auswahl per echtem Playwright-Lauf verifiziert], 764 pytest gruen, noch nicht deployt)
+updated: 2026-08-18 -- (Nachtrag zum elften Block: Abschluss-Review vor der Nikinger-Live-Probe fand einen ungebauten Sec4.5-Pflichttest, test_acl.py :: test_acl_decision_follows_the_item_into_the_target_space nachgebaut; Step 7b DoD jetzt wirklich vollstaendig, 765 pytest gruen, noch nicht deployt)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -194,7 +194,7 @@ das P6 selbst mit ausgelöst hat (`docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` §
 
 ---
 
-## Session stopped — 2026-08-17, elfter — (Planungssession „light": Step 7b gelockt, §9 Mehrfachauswahl neu, keine Code-Änderung)
+## Session stopped — 2026-08-17, elfter — (Planungssession „light": Step 7b gelockt, §9 Mehrfachauswahl neu — **[2026-08-17 Korrektur] Titel stimmte nur bis zum Nachtrag**: derselbe Block dokumentiert weiter unten den Bauauftrag, der Step 7b in drei Commits vollständig gebaut hat; Titel unverändert aus Historientreue, Klarstellung hier statt rückwirkendem Umschreiben)
 
 **Auftrag:** Nikinger — die beiden noch offenen UI-Feedback-Punkte (2: Space-zu-Space-Move/Step
 7b, 3: Mehrfachauswahl) bearbeiten. Nikinger-Rahmen für diese Session: „planning session light,
@@ -298,3 +298,23 @@ nicht gebaut — P6-AB verlangt nur die Menüvariante als Pflichtweg.
 
 **Step 7b DoD vollständig außer der Nikinger-Live-Probe** (echter Move über Connector UND UI,
 Abnahmezeilen 25–30) — kein Deploy diese Session. **Nächster Schritt:** §9 (Mehrfachauswahl).
+
+**Nachtrag, 2026-08-18, Abschluss-Review (der letzte Advisor-Call der Session, wie vom Nikinger
+verlangt):** sechs Punkte geprüft, fünf grün ohne Codeänderung — Zielkollision beim Cross-Space-
+Move ausgeschlossen (Dateiname trägt die global eindeutige Item-ID, `item_filename()`, Entscheidung
+F aus P1; ein zweites Item mit derselben ID kann es per Index-`PRIMARY KEY` nicht geben), `version`/
+`ConflictError` in `move()` vorhanden, kein verwaister Index-Eintrag im Quell-Space (`items.id
+PRIMARY KEY`, `ON CONFLICT(id) DO UPDATE`, eine Zeile pro Item), `move_file()` fsynct Quell- UND
+Zielverzeichnis, `visibility`/`share_read`/`share_write` bewusst unverändert mitziehend (P6-AH,
+dokumentierte Entscheidung, kein Übersehen). **Ein echter Fund:** der in `ITEM_MOVE_PLAN.md` §4.5
+gelistete Pflichttest `test_acl_decision_follows_the_item_into_the_target_space`
+(`phase6_shares/tests/test_acl.py`) wurde in keinem der drei Step-7b-Commits gebaut — anders als
+K4 (`test_create_item_accepts_folder`, Commit 2/3 dokumentiert explizit „bereits seit Step 7
+Commit 3 erledigt") war diese Lücke nirgends vermerkt. Nachgebaut (kombiniert `Store.move()` mit
+`Store.acl_of()`: Item wandert von `nikinger` — `write: [dritter]` — nach `fabian` — `read:
+[vierter]` —, `acl_of()` danach liefert `fabian`s Grant, nicht mehr `dritter`s). 764→765, grün.
+Zusätzlich der Titel des Session-Blocks oben datiert klargestellt (trug noch „keine Code-Änderung"
+nach dem Bau-Nachtrag). Kein neuer Advisor-Call für diesen Fix — Budget dieser Session war mit der
+Abschluss-Konsultation aufgebraucht, Fund + Behebung folgen direkt der Plan-Tabelle, keine neue
+Designentscheidung. **Damit Step 7b DoD wirklich vollständig** (§4.5 jetzt 15/15 statt 14/15),
+weiterhin nur die Nikinger-Live-Probe offen.

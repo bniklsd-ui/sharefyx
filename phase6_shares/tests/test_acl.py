@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 
 from storage.acl import ACL_FILENAME, AclReader, Grant
+from storage.store import Store
 
 
 def _write_share_yml(directory, content: str) -> None:
@@ -113,3 +114,26 @@ def test_members_of_space_reads_only_space_root_write(tmp_path):
     _write_share_yml(tmp_path / "nikinger" / "projekte", "write: [dritter]\n")
     reader = AclReader(tmp_path)
     assert reader.members_of_space("nikinger") == frozenset({"fabian"})
+
+
+def test_acl_decision_follows_the_item_into_the_target_space(tmp_path):
+    """§4.5: `Store.acl_of()` liest nie einen an das Item selbst gebundenen alten Wert — ein
+    `move()` über Space-Grenzen muss die Rechte des NEUEN Pfads liefern, nicht die des alten.
+    `AclReader` kennt ohnehin keine Items (nur Verzeichnisse), dieser Test beweist die
+    Vereinigung über den echten `Store.move()`-Aufweg, nicht nur `AclReader` isoliert."""
+    _write_share_yml(tmp_path / "nikinger", "write: [dritter]\n")
+    _write_share_yml(tmp_path / "fabian", "read: [vierter]\n")
+    store = Store(tmp_path, git=False)
+    item = store.create("nikinger", type="note", title="Umzug")
+
+    before = store.acl_of(item.id)
+    assert before.space == "nikinger"
+    assert before.write == frozenset({"dritter"})
+
+    store.move(item.id, version=item.version, space="fabian")
+
+    after = store.acl_of(item.id)
+    assert after.space == "fabian"
+    assert after.read == frozenset({"vierter"})
+    assert after.write == frozenset()
+    assert "dritter" not in after.read | after.write
