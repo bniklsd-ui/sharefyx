@@ -291,9 +291,20 @@ Nebenfund behoben: `docs/INDEX.md` nannte „VIER B1–B4" statt „FÜNF B1–B
 **plus `editor.js`** (Advisor-Fix, nicht im Ursprungsscope) plus die beiden neuen Plan-Dateien.
 Nichts gepusht, nichts committet.
 
+**[2026-08-19 Nachtrag, außerhalb P6-Scope, MUSS-VOR-DEM-NÄCHSTEN-DEPLOY] Funnel-Reboot-Fund —
+P3-Eigentum, hier nur verlinkt:** nach dem Reboot dieser Session war Sharefyx von außen
+unerreichbar trotz gesundem Dienst/lokalem `/health`/`funnel status` — `sudo systemctl restart
+tailscaled` behob es. Root Cause, `diagnose.sh`-Fix (Prüfung 5 prüfte den öffentlichen Pfad
+bisher unzuverlässig, MagicDNS verdeckte das) und die offene Selbstheilungsfrage: vollständig in
+`phase3_edge/CLAUDE.md`, Abschnitt „[2026-08-19 MUSS-VOR-DEM-NÄCHSTEN-DEPLOY]". `deploy.sh`
+selbst prüft nur lokal, kein technisches Gate — aber vor dem nächsten Deploy einmal bewusst
+`diagnose.sh` frisch fahren, nicht auf „Reboot war schonmal ok" vertrauen.
+
 **Offen für die nächste Session:**
 - Commit + Push (Nikinger-Freigabe ausstehend).
 - Nikinger-Live-Probe gegen Abnahmezeilen 35–39 (und weiterhin 25–30 für Step 7b, unverändert
   offen).
 - `IMAGES_PLAN.md`s fünf Entscheidungen B1–B5, wenn der Nikinger Block C priorisiert.
 - Body-Volltextsuche (Q1s Kehrseite) bleibt bewusst zurückgestellt, kein Auftrag.
+- **Vor dem nächsten Deploy:** `diagnose.sh` frisch fahren (neue Prüfung 5, echter externer
+  Pfad). Funnel-Watchdog bleibt offene Entscheidung (`phase3_edge/CLAUDE.md`).

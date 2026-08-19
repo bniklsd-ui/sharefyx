@@ -168,6 +168,38 @@ dieselbe Reihenfolge:
    Rauschen (Scanner, altes Bookmark) oder ein tatsächlich falsches/rotiertes Token, das ein
    `systemctl restart` vergessen hat (P3-M)?
 
+**[2026-08-19 MUSS-VOR-DEM-NÄCHSTEN-DEPLOY, echter Live-Fund nach einem VM-Reboot — zweiter
+Fallstrick, andere Ursache als der obige]:** nach einem regulären Reboot (nicht `kill -9`, kein
+Netzwechsel) war `sharefyx-mcp` gesund, `/health` lokal ok, `tailscale funnel status` zeigte
+„on" — und ein echtes Gerät ohne Tailscale/VPN bekam `NS_ERROR_CONNECTION_REFUSED` auf die
+Funnel-URL. **`sudo systemctl restart tailscaled` behob es sofort**, keine Policy-Änderung
+nötig — die `funnel`-Capability war laut `tailscale status --json` durchgehend gesetzt, `nodeAttrs`
+war also **nicht** die Ursache diesmal. Wahrscheinlichste Erklärung: die Backhaul-Verbindung des
+Nodes zum öffentlichen Funnel-Relay hat sich nach dem Reboot nicht sauber neu aufgebaut (ein
+`invalid-packet-filter`-Health-Warnung stand direkt beim Boot im Log, `error→ok` binnen derselben
+Sekunde — vermutlich ein Timing-Symptom desselben Vorgangs, nicht zweifelsfrei die Ursache).
+**Zweiter, unabhängiger Fund dabei: Prüfung 5 dieses Runbooks (und `diagnose.sh`) hätte das nicht
+zuverlässig erkannt**, wenn sie auf DIESER Maschine gelaufen wäre — `curl -sf https://<host>/health`
+löst `<host>` über MagicDNS (`100.100.100.100`) auf die **Tailnet-IP** auf, nicht über den
+öffentlichen Resolver auf die Funnel-Relay-IP; ein Node kann sich selbst über den Mesh erreichen,
+während sein Backhaul zum öffentlichen Relay tot ist. **Behoben:** `diagnose.sh` Prüfung 5 löst
+jetzt explizit über einen öffentlichen DNS-Server (1.1.1.1) auf und verbindet per `curl --resolve`
+gegen genau diese IP — derselbe Pfad, den ein echtes externes Gerät nimmt. Fehlschlag-Hinweis
+nennt jetzt zuerst `sudo systemctl restart tailscaled` (diesmal die tatsächliche Lösung), erst
+danach den `nodeAttrs`-Fallstrick von oben. **Noch offen, bewusst nicht in dieser Session
+gebaut — Selbstheilung/Alarmierung:** aktuell erkennt niemand automatisch, wenn Funnel nach einem
+Reboot in diesem Zustand hängen bleibt, außer ein Mensch prüft von außen nach. Zwei Optionen für
+eine spätere Entscheidung: (a) ein eigener, kleiner Watchdog-Timer (Muster wie
+`sharefyx-purge.timer`) der periodisch genau diese Prüfung fährt und bei Fehlschlag
+`tailscaled` neu startet — echte Selbstheilung, aber ein Dienst, der einen fremden (nicht
+projekteigenen) System-Dienst automatisch neu startet, ist ein Entscheidungsschritt, kein
+Ad-hoc-Bau; (b) dieselbe Prüfung nur als `diagnose.sh`-Ergänzung (jetzt geschehen) plus ein
+Eintrag in ein künftiges Monitoring (P3 Risiko 1 nennt „kein Monitoring" bereits als bekannte
+Lücke). **Deploy-Gate:** dieser Fund blockiert den nächsten `deploy.sh`-Lauf nicht technisch
+(das Deploy-Skript prüft nur den lokalen Health-Endpunkt, nicht den öffentlichen Funnel-Pfad),
+ist aber vom Nikinger als Muss-vor-dem-nächsten-Deploy eingestuft — Details/Kontext:
+`phase6_shares/CLAUDE.md`s aktuellem Session-Block.
+
 **[2026-07-29 Ergänzung, P4-Befund S1]:** Prüfung 2 (`curl -sf http://127.0.0.1:8765/health`)
 schlägt auch dann fehl, wenn der Dienst völlig gesund ist — nämlich wenn `SPACE_ALLOWED_HOSTS`
 kein `127.0.0.1` enthält (`400 Invalid host header` aus dem Wurzel-`TrustedHostMiddleware`, das

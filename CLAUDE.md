@@ -193,9 +193,18 @@ Schnitt — offene, dokumentierte Lücke, kein stilles Schließen. Steps G1–G2
 765→772 grün, Tabu-Diff leer. Zusätzlich Playwright-verifiziert gegen eine Wegwerf-Instanz
 (10/10 grün, Pflichtfall aus Zeile 28 nachgestellt) — ein Advisor-Fund dabei entdeckt und noch
 vor dem Commit behoben: `editor.js :: clearDetail()` (Home-Button) setzte `state.scope` nicht
-zurück, ließ den Anlegen-Knopf nach „Alle Items" → Home fälschlich ausgehängt. Wartet auf
-Commit-Freigabe und die Nikinger-Live-Probe. Details: `phase6_shares/CLAUDE.md`s aktuellem
-Session-Block.
+zurück, ließ den Anlegen-Knopf nach „Alle Items" → Home fälschlich ausgehängt. **[2026-08-19,
+committet]** `main`@`d348e2e`, noch nicht gepusht/deployt — wartet auf die Nikinger-Live-Probe.
+Details: `phase6_shares/CLAUDE.md`s aktuellem Session-Block.
+
+**[2026-08-19, MUSS-VOR-DEM-NÄCHSTEN-DEPLOY] Funnel überlebte den Reboot nicht sauber:** nach
+dem Reboot dieser Session war Sharefyx von einem echten Gerät ohne VPN/Tailscale aus
+unerreichbar (`NS_ERROR_CONNECTION_REFUSED`), obwohl Dienst, lokales `/health` und `tailscale
+funnel status` alle gesund aussahen — `sudo systemctl restart tailscaled` behob es sofort.
+`diagnose.sh` Prüfung 5 hätte das bisher **nicht** zuverlässig erkannt (MagicDNS verdeckte den
+echten öffentlichen Pfad) und ist jetzt entsprechend korrigiert. Selbstheilung/Watchdog für den
+Funnel-Backhaul ist eine bewusst offene Entscheidung, kein Auftrag. Volle Herleitung:
+`phase3_edge/CLAUDE.md`, Abschnitt „[2026-08-19 MUSS-VOR-DEM-NÄCHSTEN-DEPLOY]".
 
 **[2026-08-19] Block C (Bilder) ist geplant:** `phase6_shares/IMAGES_PLAN.md` (Entscheidungen
 **P6-AU–P6-BB**, Abnahmezeilen 40–47) — **fünf offene Nikinger-Entscheidungen B1–B5** (Binärblobs

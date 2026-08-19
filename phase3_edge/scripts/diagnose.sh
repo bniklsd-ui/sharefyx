@@ -58,6 +58,19 @@ fi
 echo "OK  Funnel für Port 8765 aktiv" >&2
 
 # 5) Antwortet er öffentlich? (Hostname aus local.env, falls vorhanden — sonst übersprungen.)
+#
+# **[2026-08-19 Korrektur, Live-Fund nach einem VM-Reboot]:** ein einfaches `curl -sf
+# "https://$host/health"` auf DIESER Maschine ist **kein** echter Test des öffentlichen
+# Funnel-Pfads — `100.100.100.100` (Tailscales eigener MagicDNS-Resolver) fängt jede
+# `*.ts.net`-Anfrage systemweit ab und löst `$host` auf die **Tailnet-IP** (`100.x.x.x`) auf,
+# nicht auf die öffentliche Funnel-Relay-IP. Ein Node, der sich selbst über den Tailnet-Mesh
+# erreicht, kann antworten, obwohl die Backhaul-Verbindung des Nodes zum öffentlichen
+# Funnel-Relay tot ist — genau der Zustand, der nach diesem Reboot vorlag (lokal + `funnel
+# status` sahen beide gesund aus, ein echtes Gerät ohne Tailscale bekam
+# `NS_ERROR_CONNECTION_REFUSED`). Behoben: DNS explizit gegen einen öffentlichen Resolver
+# auflösen und `curl --resolve` gegen genau diese IP fahren — derselbe Weg, den ein Browser
+# ohne Tailscale nimmt. `dig`/`getent` fehlen auf manchen Minimalsystemen; `python3` ist hier
+# ohnehin Pflicht (Prüfung 12 braucht es bereits).
 host=""
 if [[ -f "$LOCAL_ENV" ]]; then
   # shellcheck disable=SC1090
@@ -66,11 +79,42 @@ fi
 if [[ -z "$host" ]]; then
   echo "WARNUNG: kein Hostname aus $LOCAL_ENV ablesbar — Prüfung 5 übersprungen." >&2
 else
-  if ! curl -sf "https://$host/health" >/dev/null; then
-    diagnose "Lokal ok, öffentlich (https://$host/health) nicht erreichbar." \
-             "Siehe Fallstrick 'funnel status sagt on, TLS-Handshake hängt' im Runbook — meist fehlt nodeAttrs:funnel im Tailnet-Policy-File"
+  public_ip="$(python3 -c '
+import socket, sys
+try:
+    # 1.1.1.1 als DNS-Server erzwingen, kein Fallback auf den System-Resolver (der ist
+    # MagicDNS) -- reines UDP-DNS ohne Zusatzpaket, ~30 Zeilen waeren fuer eine Bibliothek zu
+    # viel fuer diesen einen Zweck.
+    import struct
+    host = sys.argv[1]
+    qname = b"".join(bytes([len(p)]) + p.encode() for p in host.split(".")) + b"\x00"
+    query = b"\xAA\xAA\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00" + qname + b"\x00\x01\x00\x01"
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.settimeout(5)
+    sock.sendto(query, ("1.1.1.1", 53))
+    resp, _ = sock.recvfrom(512)
+    ancount = struct.unpack(">H", resp[6:8])[0]
+    pos = 12 + len(qname) + 4
+    for _ in range(ancount):
+        if resp[pos] & 0xC0 == 0xC0:
+            pos += 2
+        rtype, _, _, rdlen = struct.unpack(">HHIH", resp[pos:pos+10])
+        pos += 10
+        if rtype == 1 and rdlen == 4:
+            print(".".join(str(b) for b in resp[pos:pos+4]))
+            break
+        pos += rdlen
+except Exception:
+    pass
+' "$host" 2>/dev/null)"
+  if [[ -z "$public_ip" ]]; then
+    echo "WARNUNG: öffentliche DNS-Auflösung von $host über 1.1.1.1 fehlgeschlagen —" \
+         "Prüfung 5 übersprungen (Netz down? DNS-über-UDP blockiert?)." >&2
+  elif ! curl -sf --resolve "$host:443:$public_ip" "https://$host/health" >/dev/null; then
+    diagnose "Lokal ok, aber über den ECHTEN öffentlichen Pfad ($public_ip, nicht MagicDNS) nicht erreichbar." \
+             "sudo systemctl restart tailscaled  # meist reicht das (stale Funnel-Backhaul nach Boot/Netzwechsel) -- danach erneut prüfen. Bleibt es rot: Fallstrick 'funnel status sagt on, TLS-Handshake hängt' im Runbook, meist fehlt nodeAttrs:funnel im Tailnet-Policy-File"
   fi
-  echo "OK  /health öffentlich über $host erreichbar" >&2
+  echo "OK  /health öffentlich über $host erreichbar (echter Pfad, $public_ip)" >&2
 fi
 
 # 6) Ist die Web-UI erreichbar? (P5 Step 8 — bis dahin prüfte dieses Skript nur /health und
