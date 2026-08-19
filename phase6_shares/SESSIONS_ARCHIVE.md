@@ -4,7 +4,7 @@ purpose: L3-Archiv der Phase-6-Session-Bloecke -- Steps 0-7 (Haushalt, Werkzeug-
 read-when: Historie einer bereits abgeschlossenen Phase-6-Teilarbeit nachvollziehen -- nicht beim normalen Sessionstart lesen
 detail: L3
 up: ../phase6_shares/CLAUDE.md
-updated: 2026-08-18
+updated: 2026-08-19
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 6 (`phase6_shares/`)
@@ -59,6 +59,99 @@ updated: 2026-08-18
 > Überschrift ("zwölfter"), genau der vom Skript selbst vorgesehene Fall einer `##`-Sektion, die
 > faktisch ein zweiter Block ist. Danach `scripts/rotate_session_block.sh phase6_shares`
 > mechanisch gelaufen, Kopf 52→41 KB.
+
+## Session stopped — 2026-08-18, zwölfter — (Abschluss-Review + Step-7b-E2E-Lauf gegen eine Wegwerf-Instanz, zwei Nikinger-Entscheidungen zu UI-Reichweiten-Funden)
+
+**Abschluss-Review (der letzte Advisor-Call der Session, wie vom Nikinger
+verlangt):** sechs Punkte geprüft, fünf grün ohne Codeänderung — Zielkollision beim Cross-Space-
+Move ausgeschlossen (Dateiname trägt die global eindeutige Item-ID, `item_filename()`, Entscheidung
+F aus P1; ein zweites Item mit derselben ID kann es per Index-`PRIMARY KEY` nicht geben), `version`/
+`ConflictError` in `move()` vorhanden, kein verwaister Index-Eintrag im Quell-Space (`items.id
+PRIMARY KEY`, `ON CONFLICT(id) DO UPDATE`, eine Zeile pro Item), `move_file()` fsynct Quell- UND
+Zielverzeichnis, `visibility`/`share_read`/`share_write` bewusst unverändert mitziehend (P6-AH,
+dokumentierte Entscheidung, kein Übersehen). **Ein echter Fund:** der in `ITEM_MOVE_PLAN.md` §4.5
+gelistete Pflichttest `test_acl_decision_follows_the_item_into_the_target_space`
+(`phase6_shares/tests/test_acl.py`) wurde in keinem der drei Step-7b-Commits gebaut — anders als
+K4 (`test_create_item_accepts_folder`, Commit 2/3 dokumentiert explizit „bereits seit Step 7
+Commit 3 erledigt") war diese Lücke nirgends vermerkt. Nachgebaut (kombiniert `Store.move()` mit
+`Store.acl_of()`: Item wandert von `nikinger` — `write: [dritter]` — nach `fabian` — `read:
+[vierter]` —, `acl_of()` danach liefert `fabian`s Grant, nicht mehr `dritter`s). 764→765, grün.
+Zusätzlich der Titel des Session-Blocks oben datiert klargestellt (trug noch „keine Code-Änderung"
+nach dem Bau-Nachtrag). Kein neuer Advisor-Call für diesen Fix — Budget dieser Session war mit der
+Abschluss-Konsultation aufgebraucht, Fund + Behebung folgen direkt der Plan-Tabelle, keine neue
+Designentscheidung. **Damit Step 7b DoD wirklich vollständig** (§4.5 jetzt 15/15 statt 14/15),
+weiterhin nur die Nikinger-Live-Probe offen.
+
+**Nachtrag, sophistizierter E2E-Lauf gegen eine echte Wegwerf-Instanz** (Standing Permission
+reconfirmt, jetzt in `docs/PROMPTS.md`s „Tests"-Absatz): eigener Port 8799, eigenes `tmp`-
+`DATA_ROOT`/`auth.sqlite3`, `create_app()` verdrahtet wie `serve.py`, aber mit selbst erzeugtem
+DEK statt dem echten Keyring. Zwei Testprincipale `alpha`/`beta` + geteilter Space `geteilt`
+(`write: [alpha, beta]`, strukturell wie `IT-Sekus-Projekt`). Test-Tooling in eigener venv
+(`~/.claude-code-tools/e2e-venv`, Playwright+httpx), getrennt von `svg-venv`/Projekt-`.venv`.
+Zwei Stolperfallen beim Aufsetzen, keine Codeänderung am Produkt: (1) CSRF-Origin-Check (P5-H)
+verlangt eine `SPACE_PUBLIC_BASE_URL`, die zum echten Browser-Origin passt —
+`http://127.0.0.1:8799` funktioniert, Chromium behandelt `127.0.0.1` als vertrauenswürdig,
+`__Host-`-Cookies roundtripen trotz `http://`; (2) TOTP-Replay-Schutz ist pro Space global
+(`counter <= last_counter`), nicht pro Vorgang — derselbe 30s-Code für Login und einen Re-Auth
+kurz danach wird beim zweiten Mal abgelehnt; `totp_now()` blockiert jetzt bis zu einem echten
+neuen Zeitfenster.
+
+**11 von 12 geskripteten Prüfungen grün, real im Chromium-Browser, gegen die echte laufende
+App:** Verschieben-Dialog inkl. Space-Auswahl (own→shared) triggert Re-Auth korrekt, Abschluss
+mit sichtbarem Erfolgs-Toast (der `pendingMoveBody`-Fund aus Commit 3/3 bleibt behoben), der
+geleerte Quellordner verschwindet aus dem Baum (**Abnahmezeile 30 mechanisch bestätigt**),
+`git log` im Wegwerf-`DATA_ROOT` zeigt exakt **einen** `move`-Commit (**Zeile 26s
+Kernmechanik bestätigt**), beta sieht das von alpha verschobene Item im geteilten Space und kann
+es speichern (**Zeile 27 mechanisch bestätigt**), In-Space-Drag-&-Drop funktioniert nach den
+Step-7b-Änderungen an `dialogs.js`/`app.html` weiterhin (Regressionsprobe, `tree.js`/`list.js`
+selbst unverändert), ein Drag auf einen fremden Space-Knoten löst nachweislich keine Anfrage aus
+(bestätigt P6-ABs „Menü ist der einzige Pflichtweg" empirisch, nicht nur aus dem Code gelesen).
+**Wichtig: dies ersetzt nicht die Nikinger-Live-Probe** (Abnahmezeilen 25–30 bleiben bei ihm/
+Fabian als die maßgebliche Abnahme) — es ist eine Vorab-Erhärtung auf einer Wegwerf-Instanz,
+kein Abhaken der Matrix.
+
+**Zwei echte Funde, keine Erfindungen — beide code- UND empirisch bestätigt, nicht nur
+vermutet:**
+
+1. **Der Verschieben-/Freigeben-Knopf ist client-seitig an `item.space === state.ownSpace`
+   gebunden** (`list.js`, `movable`-Variable, seit Step 7 unverändert, Step 7b hat sie nicht
+   angefasst). Folge: sobald ein Item in einen geteilten Space wandert, sieht **niemand** —
+   auch nicht, wer es verschoben hat — dort noch einen Verschieben-Knopf; ein Rückweg über die
+   UI existiert nicht. Kollidiert mit keiner Abnahmezeile (25–30 verlangen nur die eine
+   Richtung, nie den Rückweg über die UI), ist aber eine bewusste Einschränkung wert, dem
+   Nikinger genannt zu werden statt stillschweigend zu bleiben — der Server selbst (`api.py`s
+   `_items_patch`) verlangt diese Einschränkung nicht, nur `can_write` auf beiden Seiten.
+2. **Abnahmezeile 28s Szenario (item-level `share_write` ohne space-level Grant) ist über die
+   Web-UI nicht erreichbar, nicht nur nicht verschiebbar.** `GET /api/v1/spaces` filtert über
+   `permissions.visible_spaces()` — reines space-level `can_read` aus `.share.yml`, ohne
+   Rücksicht auf item-level `share_read`/`share_write`. Ein Space ohne space-level Grant taucht
+   im Baum nie auf, und die Suche (`list.js`: `params.set("space", state.activeSpace)`) filtert
+   serverseitig (`api.py :: _items_get` → `store.search(space=...)`) auf genau diesen einen
+   Space — es gibt in der UI keinen „über alle lesbaren Items hinweg suchen"-Modus. Live
+   bestätigt: `beta` fand das genau für dieses Szenario präparierte Item (`share_write:
+   [beta]`, kein space-level Grant von `alpha`) über die Suche **nicht** (0 Treffer). Über den
+   MCP-Connector funktioniert dasselbe Szenario nachweislich (`tools.py` filtert item-weise über
+   `acl_of()`/`can_read_item`, unabhängig von Space-Sichtbarkeit — genau das prüft der
+   bestehende Unit-Test `test_patch_item_level_share_write_holder_cannot_move_item_between_
+   spaces`). **Frage an den Nikinger, keine Selbstentscheidung:** ist Zeile 28 als „über den
+   Connector geprüft" gemeint (dann bereits erfüllt, nur nicht über die UI), oder ist ein
+   „über alle lesbaren Items suchen"-Modus ein echter, bisher unentdeckter UI-Lückenschluss für
+   eine spätere Phase? Keine Planänderung hier vorgenommen — reiner Befund.
+
+Beide Punkte: der Server tut genau das, was `permissions.py`/`api.py` vorsehen — Einstufung als
+Bug oder nicht ist eine Produktentscheidung, keine Codefrage (siehe Nikinger-Entscheidungen
+unten). Kein neuer Test im Repo, kein Code-Fund in diesem Nachtrag (Prüfungen liefen nur gegen
+die Wegwerf-Instanz, Scratchpad, Kategorie wie P5 Steps 10/11). `pytest` unverändert 765/765.
+Wegwerf-Instanz beendet, Port 8799 frei, `~/.claude-code-tools/e2e-venv` bleibt als
+wiederverwendbares Werkzeug (Kategorie `svg-venv`, kein Repo-Artefakt).
+
+**Nikinger-Entscheidungen zu den beiden Funden, direkt im Anschluss:** Blocker-Status für Fund 2,
+kein Bug für Fund 1 — beide mit Begründung in „Vormerkungen" oben, Fund 2 zusätzlich in
+Root-`CLAUDE.md`s „Current state". Push freigegeben. MD-Trim angeordnet: `scripts/rotate_
+session_block.sh` gegen eine neu gesetzte `##`-Überschrift gelaufen (genau der Fall, den das
+Skript selbst für „eine Sektion nach dem Block ist faktisch ein zweiter" vorsieht) — der
+komplette 2026-08-17-Block wanderte verbatim ins Archiv, dieser Block blieb als einziger
+aktueller stehen.
 
 ## Session stopped — 2026-08-17, elfter — (Planungssession „light": Step 7b gelockt, §9 Mehrfachauswahl neu — **[2026-08-17 Korrektur] Titel stimmte nur bis zum Nachtrag**: derselbe Block dokumentiert weiter unten den Bauauftrag, der Step 7b in drei Commits vollständig gebaut hat; Titel unverändert aus Historientreue, Klarstellung hier statt rückwirkendem Umschreiben)
 

@@ -53,8 +53,10 @@ def item_to_json(item: Item, *, readonly: bool, own_space: str) -> dict[str, Any
     }
 
 
-def summary_to_json(s: ItemSummary, *, own_space: str, readonly: bool) -> dict[str, Any]:
-    return {
+def summary_to_json(
+    s: ItemSummary, *, own_space: str, readonly: bool, include_snippet: bool = True
+) -> dict[str, Any]:
+    row = {
         "id": s.id,
         "space": s.space,
         "type": s.type,
@@ -74,6 +76,9 @@ def summary_to_json(s: ItemSummary, *, own_space: str, readonly: bool) -> dict[s
         "shared": s.space != own_space,
         "readonly": readonly,
     }
+    if not include_snippet:
+        row.pop("snippet")
+    return row
 
 
 def overview_row_to_json(s: ItemSummary, *, own_space: str) -> dict[str, Any]:

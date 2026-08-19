@@ -329,6 +329,7 @@ def api_routes(
         limit = max(1, min(_parse_int(q.get("limit"), default=DEFAULT_LIMIT), MAX_LIMIT))
         offset = max(0, _parse_int(q.get("offset"), default=0))
         due_before = _parse_due(q.get("due_before"))
+        global_scope = q.get("space") is None
 
         try:
             result = store.search(
@@ -359,6 +360,7 @@ def api_routes(
             summary_to_json(
                 i, own_space=session.space,
                 readonly=not permissions.can_write_item_as_human(session.space, _acl_for_summary(i)),
+                include_snippet=not (global_scope and i.space != session.space),
             )
             for i in page
         ]

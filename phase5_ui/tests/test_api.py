@@ -140,6 +140,90 @@ async def test_get_shared_item_from_foreign_space_is_readonly_true(
     assert body["shared"] is True
 
 
+# -- Items: globaler Modus (GLOBAL_SEARCH_PLAN.md, P6-AO/AS) ----------------------------------
+
+
+@pytest.mark.asyncio
+async def test_items_without_space_param_returns_items_from_all_readable_spaces(
+    full_app_items, item_store, totp_code,
+):
+    """P6-AO: `GET /api/v1/items` ohne `space`-Parameter ist bereits die globale, item-weise
+    ACL-gefilterte Suche -- ein Item mit ausschliesslich item-level `share_read` (kein
+    space-level Grant) muss darin erscheinen, obwohl der Space selbst unter `/spaces` nicht
+    auftaucht (siehe `test_spaces_omits_foreign_space_without_a_share` direkt oberhalb)."""
+    item = item_store.create(FOREIGN_SPACE, type="note", title="Nur item-level geteilt")
+    item_store.update(item.id, version=item.version, share_read=[SPACE])
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        response = await client.get("/api/v1/items")
+    assert response.status_code == 200
+    ids = {row["id"] for row in response.json()["items"]}
+    assert item.id in ids
+
+
+@pytest.mark.asyncio
+async def test_items_without_space_param_still_hides_unreadable_items(
+    full_app_items, item_store, totp_code,
+):
+    """Fail-closed-Gegenprobe zum Test oberhalb: ein Item ganz ohne Freigabe bleibt im globalen
+    Modus unsichtbar, genau wie beim bewussten Space-Wechsel."""
+    item = item_store.create(FOREIGN_SPACE, type="note", title="Fremd, ungeteilt")
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        response = await client.get("/api/v1/items")
+    ids = {row["id"] for row in response.json()["items"]}
+    assert item.id not in ids
+
+
+@pytest.mark.asyncio
+async def test_global_items_omit_snippet_for_foreign_rows_but_keep_own(
+    full_app_items, item_store, totp_code,
+):
+    """P6-AS, dem Geiste von Rule 4 nach: eine fremde Zeile im globalen Modus traegt keinen
+    `snippet`-Schluessel, die eigene Zeile in derselben Antwort schon."""
+    own = item_store.create(SPACE, type="note", title="Eigen")
+    foreign = item_store.create(FOREIGN_SPACE, type="note", title="Fremd, geteilt")
+    item_store.update(foreign.id, version=foreign.version, share_read=[SPACE])
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        response = await client.get("/api/v1/items")
+    rows = {row["id"]: row for row in response.json()["items"]}
+    assert "snippet" in rows[own.id]
+    assert "snippet" not in rows[foreign.id]
+
+
+@pytest.mark.asyncio
+async def test_items_with_space_param_keeps_snippet_for_foreign_space(
+    full_app_items, item_store, totp_code, tmp_path,
+):
+    """Der bewusste Space-Wechsel (`space`-Parameter gesetzt) bleibt unveraendert -- P6-AS
+    schraenkt nur den neuen globalen Modus ein, nicht das bestehende Verhalten."""
+    foreign = item_store.create(FOREIGN_SPACE, type="note", title="Fremder Space, sichtbar")
+    (tmp_path / "data" / FOREIGN_SPACE / ".share.yml").write_text(
+        f"read: [{SPACE}]\n", encoding="utf-8"
+    )
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        response = await client.get(f"/api/v1/items?space={FOREIGN_SPACE}")
+    rows = {row["id"]: row for row in response.json()["items"]}
+    assert "snippet" in rows[foreign.id]
+
+
+@pytest.mark.asyncio
+async def test_get_single_item_shared_item_level_only_is_readable(
+    full_app_items, item_store, totp_code,
+):
+    """Ein Treffer aus dem globalen Modus muss auch oeffenbar sein (heutiges Verhalten von
+    `_items_get_one`, hier gegen kuenftige Regression gepinnt -- kein neuer Code in diesem
+    Schnitt, siehe GLOBAL_SEARCH_PLAN.md Sec0.1)."""
+    item = item_store.create(FOREIGN_SPACE, type="note", title="Item-level frei")
+    item_store.update(item.id, version=item.version, share_read=[SPACE])
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        response = await client.get(f"/api/v1/items/{item.id}")
+    assert response.status_code == 200
+
+
 # -- Items: anlegen ---------------------------------------------------------------------------
 
 

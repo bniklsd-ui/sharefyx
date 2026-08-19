@@ -2,7 +2,7 @@
 
 // -- Navigationsbaum (Step 7b) --------------------------------------------------------------
 
-import { state, BUCKET_LABELS, activeSpaceWritable, setCreateControlsPresent } from "./state.js";
+import { state, BUCKET_LABELS, activeSpaceWritable, setCreateControlsPresent, isGlobalScope } from "./state.js";
 import { el, toast } from "./toasts.js";
 import { reportUnexpectedError } from "./api.js";
 import { closeEditor } from "./editor.js";
@@ -17,7 +17,22 @@ export function bucketNames() {
 }
 
 function activateView(spaceName) {
+  // Jeder Klick auf einen Space/Eimer/Ordner führt aus dem globalen Modus zurück (P6-AP), ohne
+  // dass jede Aufrufstelle das selbst erinnern muss.
+  state.scope = "space";
   state.activeSpace = spaceName;
+  setCreateControlsPresent(activeSpaceWritable());
+  renderRail();
+  renderCrumb();
+  return loadItems();
+}
+
+// "Alle Items" (P6-AP/AQ) — `state.activeSpace` bleibt bewusst unangetastet, das ist der
+// Rückweg in den zuletzt aktiven Space.
+export function navigateAll() {
+  state.scope = "all";
+  state.filter = null;
+  state.folder = null;
   setCreateControlsPresent(activeSpaceWritable());
   renderRail();
   renderCrumb();
@@ -196,8 +211,26 @@ export function renderSpaceNode(space) {
   }
 }
 
+// Kein Zähler an dieser Zeile: `state.spaces` trägt keine Zahl für "alle lesbaren Items", und
+// eine aus den sichtbaren Spaces aufaddierte Zahl wäre falsch — sie ließe genau die item-level
+// geteilten Items weg, um die es hier geht. Lieber keine Zahl als eine unwahre.
+function renderScopeRow() {
+  var button = el("button", "tree__scope");
+  button.type = "button";
+  button.appendChild(el("span", "rail__label", "Alle Items"));
+  if (isGlobalScope()) button.setAttribute("aria-current", "true");
+  button.addEventListener("click", function () {
+    closeEditor().then(function (proceed) {
+      if (proceed === false) return;
+      return navigateAll();
+    }).catch(reportUnexpectedError);
+  });
+  railTreeEl.appendChild(button);
+}
+
 export function renderRail() {
   railTreeEl.textContent = "";
+  renderScopeRow();
   var own = state.spaces.filter(function (s) { return s.own; });
   var foreign = state.spaces.filter(function (s) { return !s.own; });
 

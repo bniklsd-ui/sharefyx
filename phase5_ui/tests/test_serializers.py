@@ -81,6 +81,24 @@ def test_summary_to_json_has_no_snippet_pop_but_has_readonly():
     assert payload["shared"] is False
 
 
+def test_summary_to_json_keeps_snippet_by_default():
+    s = ItemSummary(
+        id="itm_deadbeef", space="niklas", type="note", title="Test", status="active",
+        due=None, tags=[], links=[], created=NOW, updated=NOW, version=1, snippet="...",
+    )
+    payload = summary_to_json(s, own_space="niklas", readonly=False)
+    assert payload["snippet"] == "..."
+
+
+def test_summary_to_json_omits_snippet_key_when_disabled():
+    s = ItemSummary(
+        id="itm_deadbeef", space="fabian", type="note", title="Test", status="active",
+        due=None, tags=[], links=[], created=NOW, updated=NOW, version=1, snippet="...",
+    )
+    payload = summary_to_json(s, own_space="niklas", readonly=True, include_snippet=False)
+    assert "snippet" not in payload
+
+
 def test_search_to_json_wraps_pre_serialized_items():
     own = summary_to_json(
         ItemSummary(

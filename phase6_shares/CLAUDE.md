@@ -7,9 +7,11 @@ up: ../CLAUDE.md
 down:
   - ../docs/concepts/phase6_shares_plan.md         # voller Plan, Entscheidungen P6-A–P6-AC, Steps 0–10
   - ./ITEM_MOVE_PLAN.md                            # Zusatzplan zu Step 7: Item-Verschieben (Ordner+Space) + Textfarben, P6-AD–P6-AJ
+  - ./GLOBAL_SEARCH_PLAN.md                        # Zusatzplan: "Alle Items"-Modus (Deploy-Blocker vom 2026-08-18), P6-AO–P6-AT
+  - ./IMAGES_PLAN.md                                # Zusatzplan Block C: Bilder, P6-AU–P6-BB, fünf offene Nikinger-Entscheidungen B1–B5
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
-  - ./SESSIONS_ARCHIVE.md                          # Steps 0-7 + v2.1-Deploy verbatim (neun Eintraege), L3, kein Softcap
-updated: 2026-08-18, zwoelfter (Abschluss-Review + Sec4.5-Testluecke nachgebaut, E2E-Lauf gegen eine Wegwerf-Instanz 11/12 gruen, Zeilen 26/27/30-Mechanik bestaetigt, ein Deploy-Blocker-Fund + ein akzeptierter Fund, Nikinger entschieden; danach rotiert, elfter Block verbatim ins Archiv)
+  - ./SESSIONS_ARCHIVE.md                          # Steps 0-7 + v2.1-Deploy verbatim (zehn Eintraege), L3, kein Softcap
+updated: 2026-08-19, dreizehnter (GLOBAL_SEARCH_PLAN.md + IMAGES_PLAN.md geplant per Opus-Subagent, Nikinger-Entscheidungen zu Q1/Bilder-Priorität, Deploy-Blocker Steps G1–G2 gebaut, 772 pytest gruen, ungecommittet; danach rotiert, zwoelfter Block verbatim ins Archiv)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -125,34 +127,21 @@ angekündigt — schließt zusammen mit der dritten Öffnung nach Phasenabschlus
 Nutzung) — ausdrücklich nur vormerken, nichts davon diese Session umgesetzt, kein Code
 angefasst:**
 
-1. **✅ Behoben (2026-08-16).** Dropdown-Lila war natives Browser-Rendering der `<option>`-Liste,
-   kein `app.css`-Ton — `select.input { accent-color: var(--accent) }`, live per Playwright
-   bestätigt. Volle Herleitung: `SESSIONS_ARCHIVE.md`, zehnter Block.
+1. **✅ Behoben (2026-08-16).** Dropdown-Lila (`select.input { accent-color }`). Herleitung:
+   `SESSIONS_ARCHIVE.md`, zehnter Block.
 2. **✅ Gebaut (2026-08-17), Step 7b vollständig.** Space-zu-Space-Verschieben,
-   `phase6_shares/ITEM_MOVE_PLAN.md` §4 (P6-AD–AJ). Drei Commits (Storage/Rechte/UI-Dialog) —
-   Details `phase1_storage/`/`phase2_mcp/`/`phase5_ui/CLAUDE.md`s „[2026-08-17]"-Einträge.
-   UI-Move per echtem Playwright-Lauf verifiziert. **Noch nicht deployt, keine
-   Nikinger-Live-Probe** (Abnahmezeilen 25–30 bleiben offen bis dahin).
-3. **✅ Subplan geschrieben (2026-08-17).** Mehrfachauswahl — jetzt **§9** in
-   `phase6_shares/ITEM_MOVE_PLAN.md` (Entscheidungen **P6-AK–P6-AN**): gemeinsames Ziel für die
-   ganze Auswahl, kein neuer Endpunkt/MCP-Tool (clientseitige Schleife über den Step-7b-Pfad),
-   Re-Auth in max. zwei Runden. `moveItemToFolder()` (`list.js`→`_items_patch`) patcht weiterhin
-   nur `folder`, `widens()` greift bei reinem Ordnerwechsel nie — In-Space-Mehrfachauswahl
-   braucht deshalb keine neue Rechteprüfung (P6-AN). **Noch nicht gebaut, setzt Step 7b voraus.**
-4. **✅ Behoben (2026-08-16).** `--ok` (Grün, Erfolgstoast + `.visibility-chip--shared`) auf
-   `var(--accent)` (Blau) umgestellt, Token entfernt (ungenutzt danach). Orange „nur lesen"
-   bewusst unangetastet — Nikinger noch unentschieden. Volle Herleitung: `SESSIONS_ARCHIVE.md`,
-   zehnter Block.
-
-**Punkte 1+4 umgesetzt (2026-08-16). Punkt 2 (Step 7b) vollständig gebaut (2026-08-17), noch
-nicht deployt.** **Punkt 3 (§9 Mehrfachauswahl): Subplan gelockt, noch nicht angefangen.**
+   `ITEM_MOVE_PLAN.md` §4 (P6-AD–AJ), drei Commits — Details in den „[2026-08-17]"-Einträgen der
+   Phase-Heads P1/P2/P5. **Noch nicht deployt** (Abnahmezeilen 25–30 offen).
+3. **✅ Subplan geschrieben (2026-08-17), noch nicht gebaut, setzt Step 7b voraus.**
+   Mehrfachauswahl = **§9** in `phase6_shares/ITEM_MOVE_PLAN.md` (**P6-AK–P6-AN**): kein neuer
+   Endpunkt/MCP-Tool, In-Space-Mehrfachauswahl braucht keine neue Rechteprüfung (P6-AN).
+4. **✅ Behoben (2026-08-16).** `--ok` (Grün) auf `var(--accent)` (Blau), Token entfernt; Orange
+   „nur lesen" bewusst unangetastet. Herleitung: `SESSIONS_ARCHIVE.md`, zehnter Block.
 
 **[2026-08-14] MCP-Werkzeug-Ergonomie, Live-Feedback einer arbeitenden Claude-Instanz** — nach
-einem sitzungsreichen Tag (Protokollierung eines OTOBO-Vorgangs, Item `itm_7cf94a2c`, 40+
-`append_to_item`-Aufrufe für ein einziges, sequenziell wachsendes Log-Dokument). Vom Nikinger
-verbatim weitergegeben, hier strukturiert, nichts davon in dieser Session geplant oder gebaut —
-betrifft ausschließlich `mcpserver/tools.py` (P6-C erlaubt das, aber außerhalb des laufenden
-Step-7-Scopes „UI Dateisystem").
+einem sitzungsreichen Tag (OTOBO-Protokollierung, `itm_7cf94a2c`, 40+ `append_to_item`-Aufrufe für
+ein einziges Log-Dokument). Vom Nikinger verbatim weitergegeben; betrifft
+ausschließlich `mcpserver/tools.py` (P6-C erlaubt das, aber außerhalb des Step-7-Scopes).
 
 **Technisch fehlend:**
 - **Kein Bulk-Append.** Ein sequenziell wachsendes Log-Dokument lässt sich nicht komplett ohne
@@ -196,104 +185,115 @@ das P6 selbst mit ausgelöst hat (`docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` §
 beide Nikinger-Entscheidungen eingeholt** (volle Herleitung + Mechanismus: Session-Block unten,
 „Zwei echte Funde"):
 
-1. **🔴 Blockiert den nächsten Deploy.** Kein „über alle lesbaren Items suchen"-Modus in der
-   UI — ein item-level geteiltes Item ohne space-level Grant ist unauffindbar, nicht nur
-   unverschiebbar. Muss vor dem nächsten Deploy geplant und behoben werden, noch kein Plan/Code.
+1. **🟢 Geplant und gebaut (2026-08-19), noch nicht deployt.** Kein „über alle lesbaren Items
+   suchen"-Modus in der UI — ein item-level geteiltes Item ohne space-level Grant war
+   unauffindbar, nicht nur unverschiebbar. `GLOBAL_SEARCH_PLAN.md` + Code, siehe unten. Bleibt
+   Deploy-Voraussetzung, bis die Nikinger-Live-Probe (Zeilen 35–39) bestanden ist.
 2. **🟡 Kein Bug, nicht blockierend.** Verschieben-/Freigeben-Knopf nur für Items im eigenen
    Space sichtbar (`list.js`, seit Step 7) — ein UI-Rückweg aus einem geteilten Space fehlt.
    Reine Vormerkung, kein Handlungsbedarf.
 
+**[2026-08-19, Planungssession] Fund 1 ist geplant:** `GLOBAL_SEARCH_PLAN.md` (P6-AO–AT, Zeilen
+35–39). Kernbefund: `GET /api/v1/items` **ohne** `space`-Parameter ist bereits die globale,
+item-weise ACL-gefilterte Suche — es fehlt nur die UI-Fläche. Block C ebenfalls geplant:
+`IMAGES_PLAN.md` (P6-AU–BB, Zeilen 40–47, **fünf offene Nikinger-Entscheidungen B1–B5**).
+
+**[2026-08-19, direkt danach] ✅ Gebaut UND Playwright-verifiziert, Steps G1–G3 vollständig,
+noch nicht deployt/committet.** Q1/Bilder-Priorität vom Nikinger entschieden, ein Advisor-Fund
+vor dem Commit gefunden und behoben (`editor.js`). 772 pytest grün, 10/10 Playwright grün,
+Tabu-Diff leer. Details: aktueller Session-Block.
+
+**[2026-08-19] Kurzprüfung „trägt die Architektur >2 Nutzer?" — Befund, kein Plan nötig.**
+Architektur ist offen: `.share.yml`s `read:`/`write:` sind beliebig lange Namenslisten
+(`acl.py :: _names()`), `SharePolicy` prüft nur Mengenzugehörigkeit, `spacectl.py add-member`
+nimmt jeden Namen, Principals sind `auth.sqlite3`-Zeilen ohne Obergrenze. **Keine Stelle im
+Laufzeitcode ist auf zwei Principals hartkodiert** (`grep niklas|fabian` trifft nur
+`abnahme_run.sh`-Defaults). Einzige Skalierungsnotiz, kein Blocker: `Store.search()` liest je
+Aufruf **jede** indizierte Item-Datei (`_row_to_item()`) — bekannter P6-S-Kostenpunkt, wächst mit
+der Item-, nicht der Nutzerzahl. Der globale Suchmodus kostet dabei **nichts zusätzlich** (der
+`space`-Filter wirkt erst nach dem Lesen aller Zeilen).
+
 ---
 
-## Session stopped — 2026-08-18, zwölfter — (Abschluss-Review + Step-7b-E2E-Lauf gegen eine Wegwerf-Instanz, zwei Nikinger-Entscheidungen zu UI-Reichweiten-Funden)
+## Session stopped — 2026-08-19 (Deploy-Blocker geplant und gebaut: GLOBAL_SEARCH_PLAN.md, Q1/Bilder-Priorität per Nikinger-Entscheidung)
 
-**Abschluss-Review (der letzte Advisor-Call der Session, wie vom Nikinger
-verlangt):** sechs Punkte geprüft, fünf grün ohne Codeänderung — Zielkollision beim Cross-Space-
-Move ausgeschlossen (Dateiname trägt die global eindeutige Item-ID, `item_filename()`, Entscheidung
-F aus P1; ein zweites Item mit derselben ID kann es per Index-`PRIMARY KEY` nicht geben), `version`/
-`ConflictError` in `move()` vorhanden, kein verwaister Index-Eintrag im Quell-Space (`items.id
-PRIMARY KEY`, `ON CONFLICT(id) DO UPDATE`, eine Zeile pro Item), `move_file()` fsynct Quell- UND
-Zielverzeichnis, `visibility`/`share_read`/`share_write` bewusst unverändert mitziehend (P6-AH,
-dokumentierte Entscheidung, kein Übersehen). **Ein echter Fund:** der in `ITEM_MOVE_PLAN.md` §4.5
-gelistete Pflichttest `test_acl_decision_follows_the_item_into_the_target_space`
-(`phase6_shares/tests/test_acl.py`) wurde in keinem der drei Step-7b-Commits gebaut — anders als
-K4 (`test_create_item_accepts_folder`, Commit 2/3 dokumentiert explizit „bereits seit Step 7
-Commit 3 erledigt") war diese Lücke nirgends vermerkt. Nachgebaut (kombiniert `Store.move()` mit
-`Store.acl_of()`: Item wandert von `nikinger` — `write: [dritter]` — nach `fabian` — `read:
-[vierter]` —, `acl_of()` danach liefert `fabian`s Grant, nicht mehr `dritter`s). 764→765, grün.
-Zusätzlich der Titel des Session-Blocks oben datiert klargestellt (trug noch „keine Code-Änderung"
-nach dem Bau-Nachtrag). Kein neuer Advisor-Call für diesen Fix — Budget dieser Session war mit der
-Abschluss-Konsultation aufgebraucht, Fund + Behebung folgen direkt der Plan-Tabelle, keine neue
-Designentscheidung. **Damit Step 7b DoD wirklich vollständig** (§4.5 jetzt 15/15 statt 14/15),
-weiterhin nur die Nikinger-Live-Probe offen.
+**Auftrag:** Nikinger wollte die verbleibenden offenen P6-Punkte per Opus-Subagent
+ausführungsreif planen lassen (Token-/Effizienzgrund: Planung ist Opus-Klasse, Ausführung
+Sonnet). Ursprünglicher Prompt beschrieb Freigaben/Dateisystem/Update-Banner als „noch zu
+bauen" — das ist stale, alles davon ist längst live (Block A+B). Vor dem Start korrigiert:
+Scope auf die drei tatsächlich offenen Punkte (Such-Blocker, Block C Bilder, >2-Nutzer-Check)
+präzisiert, dem Subagenten mitgegeben.
 
-**Nachtrag, sophistizierter E2E-Lauf gegen eine echte Wegwerf-Instanz** (Standing Permission
-reconfirmt, jetzt in `docs/PROMPTS.md`s „Tests"-Absatz): eigener Port 8799, eigenes `tmp`-
-`DATA_ROOT`/`auth.sqlite3`, `create_app()` verdrahtet wie `serve.py`, aber mit selbst erzeugtem
-DEK statt dem echten Keyring. Zwei Testprincipale `alpha`/`beta` + geteilter Space `geteilt`
-(`write: [alpha, beta]`, strukturell wie `IT-Sekus-Projekt`). Test-Tooling in eigener venv
-(`~/.claude-code-tools/e2e-venv`, Playwright+httpx), getrennt von `svg-venv`/Projekt-`.venv`.
-Zwei Stolperfallen beim Aufsetzen, keine Codeänderung am Produkt: (1) CSRF-Origin-Check (P5-H)
-verlangt eine `SPACE_PUBLIC_BASE_URL`, die zum echten Browser-Origin passt —
-`http://127.0.0.1:8799` funktioniert, Chromium behandelt `127.0.0.1` als vertrauenswürdig,
-`__Host-`-Cookies roundtripen trotz `http://`; (2) TOTP-Replay-Schutz ist pro Space global
-(`counter <= last_counter`), nicht pro Vorgang — derselbe 30s-Code für Login und einen Re-Auth
-kurz danach wird beim zweiten Mal abgelehnt; `totp_now()` blockiert jetzt bis zu einem echten
-neuen Zeitfenster.
+**Ergebnis des Subagenten (Opus, Hintergrund, ~949s, 50 Tool-Aufrufe):** zwei neue Zusatzpläne,
+`phase6_shares/GLOBAL_SEARCH_PLAN.md` (P6-AO–AT, Abnahmezeilen 35–39) und
+`phase6_shares/IMAGES_PLAN.md` (P6-AU–BB, Abnahmezeilen 40–47), plus Doku-Nachträge in
+Root-`CLAUDE.md`/`docs/INDEX.md`/diesem Head. **Kernbefund, im Code verifiziert statt nur aus
+dem 18.8.-Session-Block übernommen:** der Deploy-Blocker war kleiner als die E2E-Session
+vermutet hatte — `GET /api/v1/items` ohne `space`-Parameter ist bereits die globale, item-weise
+ACL-gefilterte Suche (`store.search()` filtert bei `space=None` nicht, `_items_get` filtert
+danach ohnehin item-weise über `can_read_item_as_human`). Kein neuer Endpunkt, keine
+`storage/`/`tools.py`/`permissions.py`-Änderung nötig — nur eine fehlende UI-Fläche plus ein
+Rule-4-Snippet-Riegel (P6-AS). Positiver Nebenfund: `_assets` liegt seit P6 Step 4 ungenutzt in
+`RESERVED_DIR_NAMES`, ein fertiger Seam für Block C; `img-src 'self' data:` steht bereits in
+der CSP.
 
-**11 von 12 geskripteten Prüfungen grün, real im Chromium-Browser, gegen die echte laufende
-App:** Verschieben-Dialog inkl. Space-Auswahl (own→shared) triggert Re-Auth korrekt, Abschluss
-mit sichtbarem Erfolgs-Toast (der `pendingMoveBody`-Fund aus Commit 3/3 bleibt behoben), der
-geleerte Quellordner verschwindet aus dem Baum (**Abnahmezeile 30 mechanisch bestätigt**),
-`git log` im Wegwerf-`DATA_ROOT` zeigt exakt **einen** `move`-Commit (**Zeile 26s
-Kernmechanik bestätigt**), beta sieht das von alpha verschobene Item im geteilten Space und kann
-es speichern (**Zeile 27 mechanisch bestätigt**), In-Space-Drag-&-Drop funktioniert nach den
-Step-7b-Änderungen an `dialogs.js`/`app.html` weiterhin (Regressionsprobe, `tree.js`/`list.js`
-selbst unverändert), ein Drag auf einen fremden Space-Knoten löst nachweislich keine Anfrage aus
-(bestätigt P6-ABs „Menü ist der einzige Pflichtweg" empirisch, nicht nur aus dem Code gelesen).
-**Wichtig: dies ersetzt nicht die Nikinger-Live-Probe** (Abnahmezeilen 25–30 bleiben bei ihm/
-Fabian als die maßgebliche Abnahme) — es ist eine Vorab-Erhärtung auf einer Wegwerf-Instanz,
-kein Abhaken der Matrix.
+**Zwei Nikinger-Entscheidungen eingeholt (`AskUserQuestion`, der Subagent hatte dieses Tool
+nicht):**
+- **Q1 (Suchreichweite):** nur Titel/Tags, keine Body-Volltextsuche in diesem Schnitt — als
+  offene, dokumentierte Lücke vermerkt (teilt die Wurzel mit dem Werkzeug-Ergonomie-Punkt
+  „Suchtreffer unzuverlässig" und mit D6), kein stilles Schließen. In
+  `GLOBAL_SEARCH_PLAN.md` §1.1 nachgetragen.
+- **Priorität:** erst der Such-Fix (klein, der einzige echte Deploy-Blocker), Bilder (B1–B5,
+  fünf offene Nikinger-Entscheidungen) bleiben zurückgestellt für eine eigene Session.
 
-**Zwei echte Funde, keine Erfindungen — beide code- UND empirisch bestätigt, nicht nur
-vermutet:**
+**Gebaut, GLOBAL_SEARCH_PLAN.md Steps G1–G2 vollständig:**
+- `webui/serializers.py :: summary_to_json()` — neuer Keyword-Parameter `include_snippet: bool
+  = True`, Default hält alle bestehenden Aufrufer byte-identisch.
+- `webui/api.py :: _items_get()` — `global_scope = q.get("space") is None`,
+  `include_snippet=not (global_scope and i.space != session.space)` je Zeile. Der
+  `store.search(...)`-Aufruf selbst bewusst NICHT geändert (`space=None` ist bereits global).
+- `static/js/state.js` — neues Feld `state.scope` ("space"|"all", exklusiv zu
+  `filter`/`folder` im Modus "all"), `isGlobalScope()`, `activeSpaceWritable()` gibt im
+  globalen Modus `false` zurück.
+- `static/js/tree.js` — `navigateAll()` (setzt `scope`/`filter`/`folder`, lässt
+  `activeSpace` als Rückweg unangetastet), `activateView()` setzt `scope` zurück auf "space",
+  neue Baumzeile „Alle Items" (`renderScopeRow()`, ohne Zähler — eine aufaddierte Zahl wäre
+  falsch, siehe P6-AT-Begründung im Plan).
+- `static/js/list.js` — `filterParams()` gibt im globalen Modus `{}` zurück (P6-AQ, die
+  kritischste Zeile: ohne sie würde `state.filter`s Default „open" eine fremde Notiz weiterhin
+  unauffindbar lassen), `loadItems()` setzt keinen `space`-Parameter mehr im globalen Modus,
+  `renderCrumb()`/`renderList()`-Leerzustand/`itemMetaLine()` (Space-Präfix, P6-AT) angepasst.
+- `static/app.css` — `.tree__scope` teilt sich die Basis mit `.tree__space`/`.tree__folder`,
+  eigene Trennlinie nach unten (`--line`, nicht `--border` — Letzteres existiert in diesem
+  Repo nicht, beim Schreiben gegen die echten Custom Properties geprüft statt angenommen).
 
-1. **Der Verschieben-/Freigeben-Knopf ist client-seitig an `item.space === state.ownSpace`
-   gebunden** (`list.js`, `movable`-Variable, seit Step 7 unverändert, Step 7b hat sie nicht
-   angefasst). Folge: sobald ein Item in einen geteilten Space wandert, sieht **niemand** —
-   auch nicht, wer es verschoben hat — dort noch einen Verschieben-Knopf; ein Rückweg über die
-   UI existiert nicht. Kollidiert mit keiner Abnahmezeile (25–30 verlangen nur die eine
-   Richtung, nie den Rückweg über die UI), ist aber eine bewusste Einschränkung wert, dem
-   Nikinger genannt zu werden statt stillschweigend zu bleiben — der Server selbst (`api.py`s
-   `_items_patch`) verlangt diese Einschränkung nicht, nur `can_write` auf beiden Seiten.
-2. **Abnahmezeile 28s Szenario (item-level `share_write` ohne space-level Grant) ist über die
-   Web-UI nicht erreichbar, nicht nur nicht verschiebbar.** `GET /api/v1/spaces` filtert über
-   `permissions.visible_spaces()` — reines space-level `can_read` aus `.share.yml`, ohne
-   Rücksicht auf item-level `share_read`/`share_write`. Ein Space ohne space-level Grant taucht
-   im Baum nie auf, und die Suche (`list.js`: `params.set("space", state.activeSpace)`) filtert
-   serverseitig (`api.py :: _items_get` → `store.search(space=...)`) auf genau diesen einen
-   Space — es gibt in der UI keinen „über alle lesbaren Items hinweg suchen"-Modus. Live
-   bestätigt: `beta` fand das genau für dieses Szenario präparierte Item (`share_write:
-   [beta]`, kein space-level Grant von `alpha`) über die Suche **nicht** (0 Treffer). Über den
-   MCP-Connector funktioniert dasselbe Szenario nachweislich (`tools.py` filtert item-weise über
-   `acl_of()`/`can_read_item`, unabhängig von Space-Sichtbarkeit — genau das prüft der
-   bestehende Unit-Test `test_patch_item_level_share_write_holder_cannot_move_item_between_
-   spaces`). **Frage an den Nikinger, keine Selbstentscheidung:** ist Zeile 28 als „über den
-   Connector geprüft" gemeint (dann bereits erfüllt, nur nicht über die UI), oder ist ein
-   „über alle lesbaren Items suchen"-Modus ein echter, bisher unentdeckter UI-Lückenschluss für
-   eine spätere Phase? Keine Planänderung hier vorgenommen — reiner Befund.
+**Tests:** 7 neu (2 `test_serializers.py`, 5 `test_api.py` — der Pflichtfall aus Plan §3, Step
+G3, ist als `type="note"` in `test_items_without_space_param_returns_items_from_all_readable_
+spaces` abgedeckt, nicht als `task`, genau die Falle, die P6-AQ stopft). `pytest` 765→**772**,
+komplett grün. Tabu-Diff (`storage/**`, `mcpserver/{tools,permissions,server}.py`,
+`phase4_auth/**`) geprüft: leer.
 
-Beide Punkte: der Server tut genau das, was `permissions.py`/`api.py` vorsehen — Einstufung als
-Bug oder nicht ist eine Produktentscheidung, keine Codefrage (siehe Nikinger-Entscheidungen
-unten). Kein neuer Test im Repo, kein Code-Fund in diesem Nachtrag (Prüfungen liefen nur gegen
-die Wegwerf-Instanz, Scratchpad, Kategorie wie P5 Steps 10/11). `pytest` unverändert 765/765.
-Wegwerf-Instanz beendet, Port 8799 frei, `~/.claude-code-tools/e2e-venv` bleibt als
-wiederverwendbares Werkzeug (Kategorie `svg-venv`, kein Repo-Artefakt).
+**Advisor-Fund vor dem Commit, korrigiert eine zu optimistische Zwischennotiz:** Step G3
+(Playwright) war zunächst mit „Pflichtfall schon im Unit-Test abgedeckt" übersprungen worden —
+falsch, P6-AQ ist ein reiner Frontend-Fund (`filterParams()`), den kein Unit-Test erreicht
+(P5-T). Doch gegen eine Wegwerf-Instanz gefahren (Port 8799, `tmp`-`DATA_ROOT`, eigener DEK).
 
-**Nikinger-Entscheidungen zu den beiden Funden, direkt im Anschluss:** Blocker-Status für Fund 2,
-kein Bug für Fund 1 — beide mit Begründung in „Vormerkungen" oben, Fund 2 zusätzlich in
-Root-`CLAUDE.md`s „Current state". Push freigegeben. MD-Trim angeordnet: `scripts/rotate_
-session_block.sh` gegen eine neu gesetzte `##`-Überschrift gelaufen (genau der Fall, den das
-Skript selbst für „eine Sektion nach dem Block ist faktisch ein zweiter" vorsieht) — der
-komplette 2026-08-17-Block wanderte verbatim ins Archiv, dieser Block blieb als einziger
-aktueller stehen.
+**Echter Fund dabei, noch vor dem Commit behoben:** `state.scope` wurde nur in `tree.js ::
+activateView()` zurückgesetzt — der Home-Button läuft über `editor.js :: clearDetail()`, einen
+zweiten, unabhängigen Pfad. Nach „Alle Items" → Home blieb `scope==="all"` stehen, der
+„+"-Knopf auf der eigenen Übersicht fälschlich ausgehängt — dieselbe Fundklasse wie
+`ownSpaceActive()` 2026-08-13. Fix: `clearDetail()` bekommt dieselben zwei Zeilen wie
+`activateView()` (`state.scope = "space"` + `setCreateControlsPresent(...)`). Playwright:
+10/10 grün (Pflichtfall + die Regression selbst), keine Konsolenfehler. Schließt V57/V58.
+Nebenfund behoben: `docs/INDEX.md` nannte „VIER B1–B4" statt „FÜNF B1–B5" für `IMAGES_PLAN.md`.
+
+**Verifiziert:** `pytest` 772/772, Tabu-Diff leer, `git status` = `GLOBAL_SEARCH_PLAN.md` §2
+**plus `editor.js`** (Advisor-Fix, nicht im Ursprungsscope) plus die beiden neuen Plan-Dateien.
+Nichts gepusht, nichts committet.
+
+**Offen für die nächste Session:**
+- Commit + Push (Nikinger-Freigabe ausstehend).
+- Nikinger-Live-Probe gegen Abnahmezeilen 35–39 (und weiterhin 25–30 für Step 7b, unverändert
+  offen).
+- `IMAGES_PLAN.md`s fünf Entscheidungen B1–B5, wenn der Nikinger Block C priorisiert.
+- Body-Volltextsuche (Q1s Kehrseite) bleibt bewusst zurückgestellt, kein Auftrag.

@@ -2,7 +2,7 @@
 
 // -- Übersichtsseite + Liste ------------------------------------------------------------------
 
-import { state, BUCKET_LABELS, TYPE_LABELS, activeSpaceWritable, spaceByName, setCreateControlsPresent } from "./state.js";
+import { state, BUCKET_LABELS, TYPE_LABELS, activeSpaceWritable, spaceByName, setCreateControlsPresent, isGlobalScope } from "./state.js";
 import { el } from "./toasts.js";
 import { api, reportUnexpectedError } from "./api.js";
 import { navigate, renderRail, bucketNames } from "./tree.js";
@@ -115,6 +115,8 @@ export function itemMetaLine(item) {
   var parts = [item.type, item.status];
   if (item.due) parts.push(item.due);
   if (item.tags && item.tags.length) parts.push(item.tags.join(", "));
+  // P6-AT: ohne Space-Angabe ist eine Trefferliste über mehrere Spaces nicht interpretierbar.
+  if (isGlobalScope()) parts.unshift(item.space);
   return parts.join(" · ");
 }
 
@@ -167,11 +169,17 @@ export function moveItemToFolder(item, folder) {
 
 export function renderCrumb() {
   listCrumbEl.textContent = "";
-  var strong = el("strong", null, state.activeSpace || "");
-  listCrumbEl.appendChild(strong);
-  var label = state.folder ? state.folder : (BUCKET_LABELS[state.filter] || state.filter);
-  listCrumbEl.appendChild(document.createTextNode(" › " + label));
-  listReadonlyEl.hidden = activeSpaceWritable();
+  if (isGlobalScope()) {
+    listCrumbEl.appendChild(el("strong", null, "Alle Items"));
+  } else {
+    var strong = el("strong", null, state.activeSpace || "");
+    listCrumbEl.appendChild(strong);
+    var label = state.folder ? state.folder : (BUCKET_LABELS[state.filter] || state.filter);
+    listCrumbEl.appendChild(document.createTextNode(" › " + label));
+  }
+  // Im globalen Modus ist "nur lesen" kein sinnvoller Hinweis (es gibt keinen einen Space, auf
+  // den er sich bezöge) — Banner bleibt dort ausgeblendet statt fälschlich sichtbar.
+  listReadonlyEl.hidden = isGlobalScope() || activeSpaceWritable();
 }
 
 export function renderChips() {
@@ -199,7 +207,11 @@ export function renderList() {
 
   if (state.items.length === 0) {
     listEmptyEl.hidden = false;
-    if (state.query) {
+    if (isGlobalScope()) {
+      listEmptyTextEl.textContent = state.query
+        ? "Keine Treffer für „" + state.query + "“."
+        : "Keine lesbaren Items.";
+    } else if (state.query) {
       listEmptyTextEl.textContent = "Keine Treffer für „" + state.query + "“.";
     } else if (!activeSpaceWritable()) {
       listEmptyTextEl.textContent = "In diesem Ordner liegt nichts.";
@@ -294,6 +306,10 @@ export function renderList() {
 }
 
 export function filterParams() {
+  // P6-AQ, die kritischste Zeile dieses Plans: ohne diesen Riegel würde `state.filter`s Default
+  // ("open") den globalen Modus auf `type=task&status=open` einschränken — eine fremde Notiz
+  // bliebe dann weiterhin unauffindbar, ein fix-förmiges No-Op.
+  if (isGlobalScope()) return {};
   // Echter Ordner und Eimer-Filter sind exklusiv (Step 7 Commit 1) — ein Ordner sendet nur
   // `folder=<Pfad>`, kein `type`/`status` mehr, `store.search(folder=…)` ist exakt, nicht
   // Präfix (V55), zeigt also nur Items direkt in diesem Ordner (Finder-Stil).
@@ -317,7 +333,7 @@ export function bucketFor(item) {
 
 export function loadItems() {
   var params = new URLSearchParams(filterParams());
-  if (state.activeSpace) params.set("space", state.activeSpace);
+  if (state.activeSpace && !isGlobalScope()) params.set("space", state.activeSpace);
   if (state.query) params.set("query", state.query);
   return api("/items?" + params.toString()).then(function (result) {
     state.items = result.items;

@@ -182,7 +182,27 @@ gegen eine Wegwerf-Instanz fand einen echten UI-Fund — es gibt keinen „über
 hinweg suchen"-Modus, ein Item mit ausschließlich item-level `share_write`/`share_read` (kein
 space-level Grant) ist über die Web-UI unauffindbar, nur über den MCP-Connector erreichbar. Vom
 Nikinger als echter Bug eingestuft, **muss vor dem nächsten Deploy geplant und behoben werden**.
-Noch kein Plan, noch kein Code. Details: `phase6_shares/CLAUDE.md`s „Vormerkungen".
+**[2026-08-19 Nachtrag] Geplant UND gebaut, noch nicht deployt/committet:**
+`phase6_shares/GLOBAL_SEARCH_PLAN.md` (Entscheidungen **P6-AO–P6-AT**, Abnahmezeilen 35–39).
+Kernbefund der Planung, im Code verifiziert: `GET /api/v1/items` **ohne** `space`-Parameter ist
+bereits die globale, item-weise ACL-gefilterte Suche (`webui/api.py :: _items_get` →
+`can_read_item_as_human`) — es fehlt ausschließlich die UI-Fläche, kein neuer Endpunkt. **Q1
+(Suchreichweite) vom Nikinger entschieden:** nur Titel/Tags, keine Body-Volltextsuche in diesem
+Schnitt — offene, dokumentierte Lücke, kein stilles Schließen. Steps G1–G2 gebaut
+(`serializers.py`/`api.py`/`state.js`/`tree.js`/`list.js`/`app.css`), 7 neue Tests, `pytest`
+765→772 grün, Tabu-Diff leer. Zusätzlich Playwright-verifiziert gegen eine Wegwerf-Instanz
+(10/10 grün, Pflichtfall aus Zeile 28 nachgestellt) — ein Advisor-Fund dabei entdeckt und noch
+vor dem Commit behoben: `editor.js :: clearDetail()` (Home-Button) setzte `state.scope` nicht
+zurück, ließ den Anlegen-Knopf nach „Alle Items" → Home fälschlich ausgehängt. Wartet auf
+Commit-Freigabe und die Nikinger-Live-Probe. Details: `phase6_shares/CLAUDE.md`s aktuellem
+Session-Block.
+
+**[2026-08-19] Block C (Bilder) ist geplant:** `phase6_shares/IMAGES_PLAN.md` (Entscheidungen
+**P6-AU–P6-BB**, Abnahmezeilen 40–47) — **fünf offene Nikinger-Entscheidungen B1–B5** (Binärblobs
+in der Git-Historie des `DATA_ROOT` vs. Hard Rule 5, Größenriegel, Bildbytes fremder Items vor
+einem sehenden Modell als Injektionskanal, den `<untrusted_content>` strukturell nicht erreicht,
+MCP-Upload, Löschen eines Bildes vs. Entscheidung H/„kein Delete im Kern-API"). Vor dem Bau
+einzuholen, nicht von Claude zu entscheiden.
 
 **Phase 5 — Web-UI, REST-API und Auth-Selbstverwaltung** (`phase5_ui/`, Paket `webui`) — **✅
 abgeschlossen, 2026-08-09 — 20/20 Abnahmezeilen live bestanden, 0 teilweise, 0 offen.** Zwei

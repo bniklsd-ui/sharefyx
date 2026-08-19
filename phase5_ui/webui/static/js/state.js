@@ -36,6 +36,11 @@ export var state = {
   // `filter`, nie beide gleichzeitig gesetzt (Step 7 Commit 1, tree.js :: navigate()/
   // navigateFolder()).
   folder: null,
+  // "space" | "all" — globaler Modus (P6-AP): eigenes Feld statt `activeSpace === null`, weil
+  // dieses Repo von genau der Verwechslung schon zweimal getroffen wurde (`ownSpaceActive()`-
+  // Fund 2026-08-13, `state.filter=null`-Fund Step 7 Commit 1). Im Modus "all" bleiben `filter`
+  // UND `folder` auf `null` (P6-AQ), `activeSpace` bleibt unangetastet (Rückweg).
+  scope: "space",
   query: "",
   items: [],
   selectedId: null,
@@ -59,9 +64,14 @@ export function spaceByName(name) {
 // statt tatsächlichem Schreibrecht. Ein geteilter, fremder-aber-schreibbarer Space (z.B.
 // IT-Sekus-Projekt) verlor damit trotz behobenem Badge weiterhin den Anlegen-Knopf.
 export function activeSpaceWritable() {
+  if (state.scope === "all") return false;
   if (state.activeSpace === null) return false;
   var space = spaceByName(state.activeSpace);
   return !!(space && space.writable);
+}
+
+export function isGlobalScope() {
+  return state.scope === "all";
 }
 
 // -- Bedienelemente aus dem DOM lösen (Akzeptanzkriterium 12) -------------------------------

@@ -257,7 +257,7 @@ select.input {
   vertical-align: super;
 }
 
-.rail__home, .rail__action, .tree__space, .tree__folder {
+.rail__home, .rail__action, .tree__space, .tree__folder, .tree__scope {
   display: flex;
   align-items: center;
   gap: var(--space);
@@ -274,12 +274,12 @@ select.input {
 .rail__home { margin: 0 var(--space) var(--space); width: auto; }
 .rail__action { width: auto; flex: 1; }
 
-.rail__home:hover, .rail__action:hover, .tree__space:hover, .tree__folder:hover {
+.rail__home:hover, .rail__action:hover, .tree__space:hover, .tree__folder:hover, .tree__scope:hover {
   background: var(--surface);
   color: var(--text);
 }
 
-.rail__home[aria-current="true"], .tree__folder[aria-current="true"] {
+.rail__home[aria-current="true"], .tree__folder[aria-current="true"], .tree__scope[aria-current="true"] {
   background: linear-gradient(180deg, rgba(62,141,243,.20), rgba(62,141,243,.08));
   border-color: var(--accent-line);
   color: var(--text);
@@ -320,6 +320,13 @@ select.input {
 }
 
 .tree__space { font-weight: 500; color: var(--text); }
+.tree__scope {
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: calc(var(--space) * 1.5);
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+}
 .tree__twist {
   width: 12px;
   flex-shrink: 0;

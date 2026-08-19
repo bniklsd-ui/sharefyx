@@ -2,7 +2,7 @@
 
 // -- Detail: Nur-lesen (fremdes Item) vs. Editor (eigenes Item) -----------------------------
 
-import { state, editorPart } from "./state.js";
+import { state, editorPart, activeSpaceWritable, setCreateControlsPresent } from "./state.js";
 import { el, toast } from "./toasts.js";
 import { api } from "./api.js";
 import { markdownToHtml } from "./markdown.js";
@@ -53,6 +53,12 @@ export function clearDetail() {
   state.selectedReadonly = false;
   state.editingSnapshot = null;
   state.conflictCurrent = null;
+  // Advisor-Fund vor dem Commit (GLOBAL_SEARCH_PLAN.md): ohne diesen Reset blieb
+  // `state.scope === "all"` nach "Alle Items" -> Home stehen, `activeSpaceWritable()` gab dort
+  // faelschlich `false` zurueck und liess den Anlegen-Knopf auf der eigenen, schreibbaren
+  // Uebersicht ausgehaengt. Playwright-bestaetigt (Wegwerf-Instanz, kein Repo-Artefakt).
+  state.scope = "space";
+  setCreateControlsPresent(activeSpaceWritable());
   showOverviewPane();
   renderRail();
   renderList();
