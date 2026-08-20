@@ -9,7 +9,7 @@
      (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
-## 2026-08-20
+## 2026-08-21
 - Bilder in Notizen: hochladen, ansehen, im Text einfügen — direkt im Editor.
 - Claude beschreibt seine Werkzeuge jetzt klarer: weniger Rateversuche, weniger Fehlversuche.
 
