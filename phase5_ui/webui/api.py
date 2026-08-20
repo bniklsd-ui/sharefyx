@@ -94,7 +94,8 @@ from .config import UiSettings
 from .errors import ApiError, CsrfError
 from .security import require_csrf
 from .serializers import (
-    item_to_json, overview_row_to_json, search_to_json, space_to_json, summary_to_json,
+    asset_to_json, item_to_json, overview_row_to_json, search_to_json, space_to_json,
+    summary_to_json,
 )
 from .sessions import SessionManager
 from .shares import ShareState, require_share_reauth
@@ -103,6 +104,11 @@ from .updates import load_update_log
 DEFAULT_LIMIT = 50
 MAX_LIMIT = 200
 MAX_BODY_BYTES = 1 * 1024 * 1024  # Plan §3.1
+# Eigene Konstante statt MAX_BODY_BYTES (P6.5-L): ein Bild-Upload ist rohe Bildbytes, kein
+# JSON — 1 MiB wäre für ein reales Foto/Screenshot zu eng, während MAX_BODY_BYTES bewusst eng
+# gehalten ist, weil ein JSON-Body sonst ohnehin nie so groß werden sollte (Plan §3.1). Zwei
+# unterschiedliche Grenzen für zwei unterschiedliche Datenarten, keine gemeinsame Zahl.
+MAX_ASSET_BYTES = 5 * 1024 * 1024
 
 # Die drei Ordner des Navigationsbaums, einmal definiert (Step 7b). Vorher standen dieselben drei
 # Filterkombinationen ausschließlich in `app.js :: filterParams()` — die Übersichtszähler hätten
@@ -218,6 +224,16 @@ def api_routes(
         if not isinstance(body, dict):
             raise ApiError("validation_failed", "Body muss ein JSON-Objekt sein.")
         return body
+
+    async def _raw_body(request: Request) -> bytes:
+        """Gegenstück zu `_json_body()` für den Bild-Upload — rohe Bytes, kein JSON-Parsing,
+        eigene (großzügigere) Grenze `MAX_ASSET_BYTES`. Der `Content-Type` des Clients wird
+        nirgends gelesen (P6-AZ) — was ein Bild ist, entscheidet ausschließlich
+        `sniff_image_mime()` auf den tatsächlichen Bytes."""
+        raw = await request.body()
+        if len(raw) > MAX_ASSET_BYTES:
+            raise ApiError("payload_too_large", "Bild überschreitet 5 MiB.")
+        return raw
 
     def _visible_spaces(actor: str, names: list[str]) -> set[str]:
         return set(permissions.visible_spaces(actor, names))
@@ -410,8 +426,9 @@ def api_routes(
             raise ApiError("forbidden", "Kein Lesezugriff auf dieses Item.")
         writable = permissions.can_write_item_as_human(session.space, acl)
         item = store.get(item_id, repair_drift=writable)  # fremd ⇒ kein Dateischreibzugriff (Rule 4)
+        assets = store.list_assets(item_id)
         return JSONResponse(
-            item_to_json(item, readonly=not writable, own_space=session.space),
+            item_to_json(item, readonly=not writable, own_space=session.space, assets=assets),
             headers={"Cache-Control": "no-store"},
         )
 
@@ -602,6 +619,92 @@ def api_routes(
             headers={"Cache-Control": "no-store"},
         )
 
+    async def _assets_post(request: Request) -> Response:
+        session = await _require_session(request)
+        await _require_csrf_json(request, session)  # keine JSON-Content-Type-Abhängigkeit (V66)
+        item_id = request.path_params["item_id"]
+        try:
+            acl = store.acl_of(item_id)
+        except ItemNotFound as exc:
+            raise _map_store_error(exc, own_space=session.space) from exc
+        if not permissions.can_write_item_as_human(session.space, acl):
+            raise ApiError("forbidden", "Kein Schreibzugriff auf dieses Item.")
+
+        # Kein `filename` an `put_asset()` -- der Plan spezifiziert rohe Bytes, kein Multipart-
+        # Formularfeld (Z. 401f.), es gibt hier also nichts zu lesen. `asset_to_json()` liefert
+        # deshalb `filename=""` für jedes über diese Route hochgeladene Bild (B1s Advisor-Punkt
+        # 4, ausdrücklich für B2/B4 vorgemerkt) -- weiterhin unbehoben, jetzt zum zweiten Mal
+        # bewusst re-vertagt statt still verschluckt: B3 (Editor-Upload) kennt den echten
+        # Dateinamen aus der `<input type="file">`-Auswahl und ist der frühestmögliche Ort, an
+        # dem eine Entscheidung (Persistenz vs. Parameter streichen) etwas zu tragen hätte.
+        data = await _raw_body(request)
+        try:
+            asset = store.put_asset(item_id, data=data)
+        except (ItemNotFound, ValidationError) as exc:
+            raise _map_store_error(exc, own_space=session.space) from exc
+        return JSONResponse(
+            asset_to_json(asset), status_code=201, headers={"Cache-Control": "no-store"},
+        )
+
+    async def _assets_get_list(request: Request) -> Response:
+        session = await _require_session(request)
+        item_id = request.path_params["item_id"]
+        try:
+            acl = store.acl_of(item_id)
+        except ItemNotFound as exc:
+            raise _map_store_error(exc, own_space=session.space) from exc
+        if not permissions.can_read_item_as_human(session.space, acl):
+            raise ApiError("forbidden", "Kein Lesezugriff auf dieses Item.")
+        assets = store.list_assets(item_id)
+        return JSONResponse(
+            [asset_to_json(a) for a in assets], headers={"Cache-Control": "no-store"},
+        )
+
+    async def _assets_get_one(request: Request) -> Response:
+        session = await _require_session(request)
+        item_id = request.path_params["item_id"]
+        asset_id = request.path_params["asset_id"]
+        try:
+            acl = store.acl_of(item_id)
+        except ItemNotFound as exc:
+            raise _map_store_error(exc, own_space=session.space) from exc
+        if not permissions.can_read_item_as_human(session.space, acl):
+            raise ApiError("forbidden", "Kein Lesezugriff auf dieses Item.")
+        try:
+            data, mime = store.get_asset(item_id, asset_id)
+        except ItemNotFound as exc:
+            raise _map_store_error(exc, own_space=session.space) from exc
+        return Response(
+            data,
+            media_type=mime,
+            headers={
+                "Content-Disposition": "inline",
+                "Cache-Control": "no-store",
+                # V67 geschlossen: `ui_security_headers()` läuft nur auf `/ui/*`-HTML-Seiten
+                # (`routes_auth.py`/`static_routes.py`), nicht auf `/api/v1/**` — für eine
+                # rohe Bild-Antwort deshalb hier explizit, statt sich auf eine Annahme zu
+                # verlassen, die der Plan als bereits gegeben unterstellte.
+                "X-Content-Type-Options": "nosniff",
+            },
+        )
+
+    async def _assets_delete(request: Request) -> Response:
+        session = await _require_session(request)
+        await _require_csrf_json(request, session)
+        item_id = request.path_params["item_id"]
+        asset_id = request.path_params["asset_id"]
+        try:
+            acl = store.acl_of(item_id)
+        except ItemNotFound as exc:
+            raise _map_store_error(exc, own_space=session.space) from exc
+        if not permissions.can_write_item_as_human(session.space, acl):
+            raise ApiError("forbidden", "Kein Schreibzugriff auf dieses Item.")
+        try:
+            store.delete_asset(item_id, asset_id)
+        except ItemNotFound as exc:
+            raise _map_store_error(exc, own_space=session.space) from exc
+        return JSONResponse({"ok": True}, headers={"Cache-Control": "no-store"})
+
     async def _updates_get(request: Request) -> Response:
         session = await _require_session(request)
         entries = load_update_log(settings.update_log_path)
@@ -647,4 +750,13 @@ def api_routes(
         Route("/api/v1/items/{item_id}", _catch(_items_patch), methods=["PATCH"]),
         Route("/api/v1/items/{item_id}/append", _catch(_items_append), methods=["POST"]),
         Route("/api/v1/items/{item_id}/archive", _catch(_items_archive), methods=["POST"]),
+        Route("/api/v1/items/{item_id}/assets", _catch(_assets_post), methods=["POST"]),
+        Route("/api/v1/items/{item_id}/assets", _catch(_assets_get_list), methods=["GET"]),
+        Route(
+            "/api/v1/items/{item_id}/assets/{asset_id}", _catch(_assets_get_one), methods=["GET"],
+        ),
+        Route(
+            "/api/v1/items/{item_id}/assets/{asset_id}", _catch(_assets_delete),
+            methods=["DELETE"],
+        ),
     ]

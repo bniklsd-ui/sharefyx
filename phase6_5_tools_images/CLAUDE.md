@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase6_5_tools_images_plan.md   # voller Plan, Entscheidungen P6.5-A–P6.5-V, §0.0 gelockte N1–N6, Steps 0/A/B
   - ../phase6_shares/IMAGES_PLAN.md                  # Vorgänger-Zusatzplan, nachrangig seit 2026-08-20
   - SESSIONS_ARCHIVE.md                              # ältere Session-Blöcke, newest-first
-updated: 2026-08-20 (Block B Step B1 gebaut: Bild-Assets in storage/, 807 pytest gruen nach drei Advisor-Fixes (Lock-Disziplin/created-Konsistenz/Sniff-Kosten), Zaehlkorrektur phase1_storage 126->130, Tabu-Diff leer)
+updated: 2026-08-20 (Block B Step B2 gebaut: REST-Flaeche Bilder in phase5_ui/webui, 818 pytest gruen, Charakterisierung gruen, Tabu-Diff leer, zweite Rotation gelaufen)
 ---
 # CLAUDE.md — Phase 6.5: Werkzeug-Ergonomie und Bilder (`phase6_5_tools_images/`)
 
@@ -43,7 +43,8 @@ Testliste, Abnahmezeilen: `docs/concepts/phase6_5_tools_images_plan.md`.
 | Step 0 | Haushalt/Ankündigungen | ✅ |
 | Block A (Steps A1/A2/A4; A3 bewusst nicht gebaut, N3) | Werkzeug-Ergonomie (`mcpserver/tools.py`, `storage/store.py :: search(in_body=)`) | ✅ **gebaut**, noch nicht deployt — Gate A→B (echte Connector-Probe) steht aus |
 | Block B Step B1 | Storage-Fundament Bilder (`storage/{files,store,models}.py`) | ✅ **gebaut** |
-| Block B Steps B2–B5 | `webui`-Routen, MCP-Asset-Tools, Markdown-Bildzweig | ⏳ nicht begonnen |
+| Block B Step B2 | REST-Fläche Bilder (`phase5_ui/webui/{api,serializers}.py`) | ✅ **gebaut**, noch nicht deployt |
+| Block B Steps B3–B5 | Markdown-Bildzweig/Editor-Upload, MCP-Asset-Tools | ⏳ nicht begonnen |
 
 ## Geerbte Contracts
 
@@ -53,95 +54,82 @@ Details dort, nicht hier dupliziert.
 
 ---
 
-## Session stopped — 2026-08-20 (Block B Step B1 gebaut: Bild-Assets in storage/)
+## Session stopped — 2026-08-20 (Block B Step B2 gebaut: REST-Fläche Bilder in `phase5_ui/webui`)
 
-**Auftrag:** Nikinger bestätigte Block B, weiterhin ein Schritt nach dem anderen für
-`/context`-Checks dazwischen. Step B1 ist Storage-Fundament — kein Adapter, keine `webui`-Route,
-kein MCP-Tool, reine `storage/`-Arbeit, P6.5-T (fünfte Contract-Öffnung) war bereits in Step 0
-angekündigt.
+**Auftrag:** Vorsitzung endete am Kontextlimit mitten in Step B2 — Route-Code lag bereits
+geschrieben und ungetestet im Arbeitsverzeichnis vor (`webui/api.py`/`serializers.py`, Tests in
+`phase5_ui/tests/test_api.py` + neuem `phase6_5_tools_images/tests/test_assets_acl.py`,
+`pytest.ini` um den neuen Testpfad erweitert). Diese Session: Zustand rekonstruiert (`docs/
+INDEX.md` → Phase-Head → `git status`/`git diff`), Code gegen Plan §3 Step B2 Zeile für Zeile
+geprüft, volle Suite + Charakterisierung + Tabu-Diff gefahren, Advisor-Runde, drei Funde
+behoben, Doku nachgezogen.
 
-**Gebaut, exakt wie im Plan §3 Step B1 vorgezeichnet, keine Abweichung:**
-- `storage/models.py` — `AssetInfo` (neuer Dataclass: `id`/`mime`/`bytes`/`filename`/`created`).
-- `storage/files.py` — `ASSET_ID_PREFIX`, `ITEM_ID_RE`/`ASSET_ID_RE` (V65 empirisch bestätigt:
-  `generate_id()` liefert exakt `itm_[0-9a-f]{8}`), `new_asset_id()` (Zwilling zu
-  `generate_id()`), `ASSET_MIME_TYPES` + `sniff_image_mime()` (PNG/JPEG/GIF-Präfix, WebP als
-  Zweiteilprüfung RIFF+Offset-8-„WEBP" — kein reiner RIFF-Präfix-Check, sonst ließe er andere
-  RIFF-Container wie WAV durch), `asset_dir()`/`asset_path()` (validieren IDs gegen die Regexe,
-  `ValidationError` sonst), `move_asset_dir()` (No-op ohne Quellverzeichnis **und** bei
-  `src==dst`, sonst `os.replace` + `fsync` auf beiden Elternverzeichnissen, propagiert
-  `OSError(ENOTEMPTY)` unverändert bei einem nicht-leeren Ziel — P6.5-S), `atomic_write_bytes()`
-  (binäres Gegenstück zu `atomic_write()`, eigene Funktion statt `bytes|str`-Zweig, damit die
-  Textvariante ihre `encoding`-Semantik unangetastet behält, wie vom Plan empfohlen).
-- `storage/store.py` — `put_asset()` (kein `version`-Parameter: Assets sind nicht Teil der
-  Item-Versionierung, konkurrieren nie mit einem Text-Write um dieselbe `version`; genau ein
-  Commit `"asset"`), `list_assets()` (kein Index, reines Verzeichnis-Listing, `_trash/`
-  übersprungen, MIME erneut aus den Magic Bytes statt aus der Dateiendung), `get_asset()` (Bytes
-  + MIME, dieselbe Nie-der-Endung-vertrauen-Regel), `delete_asset()` (N5: Verschieben nach
-  `_trash/`, Entscheidung H bleibt formal unangetastet — kein Rewrite der Body-Referenz hier,
-  das ist Sache der aufrufenden Schicht). `move()` ruft `files.move_asset_dir(...)`
-  **innerhalb** der bestehenden Lock-Sektion, **vor** `_write_item_file()` (dem einzigen Ort,
-  der committet) — ein Move mit Bildern erzeugt weiterhin genau einen Git-Commit, per Test
-  bewiesen (`test_move_carries_the_asset_directory_and_still_produces_one_commit`). `archive()`
-  unangetastet — `_assets/<item_id>/` bleibt liegen, wie geplant.
+**Vorgefunden, exakt wie im Plan §3 Step B2 vorgezeichnet, keine Abweichung:**
+- `webui/api.py` — `MAX_ASSET_BYTES = 5 * 1024 * 1024` (P6.5-L, eigene Konstante neben
+  `MAX_BODY_BYTES`), `_raw_body()` (Gegenstück zu `_json_body()`, kein JSON-Parsing, ignoriert
+  `Content-Type`, P6-AZ), vier Routen (`POST`/`GET`-Liste/`GET`-eins/`DELETE` auf
+  `/api/v1/items/{item_id}/assets[/{asset_id}]`), jede mit `store.acl_of()` +
+  `can_read_item_as_human()`/`can_write_item_as_human()` vor dem Store-Aufruf (P6-AW: ein Bild
+  trägt keine eigene ACL, erbt die des Items). `X-Content-Type-Options: nosniff` explizit
+  gesetzt (V67 unten).
+- `webui/serializers.py` — `asset_to_json()` (neu), `item_to_json()` bekommt `assets=` (Default
+  `None` → `[]`, bestehende Aufrufer bleiben byte-identisch — dieselbe Konvention wie
+  `include_snippet` in Schritt G1).
+- `phase6_5_tools_images/tests/test_assets_acl.py` (neu, Testheimat im neuen Phasenverzeichnis,
+  nicht `phase6_shares/tests/` — P6.5-A) — vier Tests, `Store`+`SharePolicy` direkt, kein
+  HTTP-Layer: Bild eines fremden, per `share_read` freigegebenen Items lesbar · ohne Grant
+  verweigert · `share_read` allein erlaubt kein `POST` · Asset folgt dem Item über `store.move()`
+  in den Zielspace und ist dort lesbar (Zwilling zu
+  `test_acl_decision_follows_the_item_into_the_target_space`).
 
-**Fund während der Umsetzung, kein Plan-Text:** `ItemNotFound` wird für einen fehlenden
-`asset_id` wiederverwendet (`get_asset()`/`delete_asset()`), obwohl seine feste Fehlermeldung
-„Item nicht gefunden" für ein Asset sachlich ungenau ist und `tools.py :: map_storage_error()`s
-bestehender `ItemNotFound`-Zweig „prüfe die ID mit search_items" empfiehlt — für eine Asset-ID
-unpassend. Bewusst nicht behoben: Step B1 ist reine Storage-Arbeit ohne MCP-Fehlerabbildung: die
-eigentliche Fehlertextpflege gehört Step B4 (MCP-Asset-Tools), wo `map_storage_error()` ohnehin
-angefasst wird. Vermerkt hier, damit es dort nicht übersehen wird.
+**`[VERIFY]` empirisch geschlossen, nicht nur aus dem Plan-Kommentar übernommen:**
+- **V66** — `require_csrf()` (`webui/security.py` Z. 61-98) liest `Content-Type` nirgends, reine
+  Origin-/Token-Prüfung über Header. `_require_csrf_json()` funktioniert für den rohen
+  Bild-Body deshalb unverändert, kein Sonderfall nötig.
+- **V67** — `ui_security_headers()` wird ausschließlich in `routes_auth.py`/`static_routes.py`
+  aufgerufen (`grep` bestätigt), nie in `api.py` — erreicht `/api/v1/**` also grundsätzlich
+  nicht. Der explizite `X-Content-Type-Options: nosniff` in `_assets_get_one()` ist deshalb
+  nötig, nicht redundant, wie im Code-Kommentar behauptet.
 
-**Drei Advisor-Funde vor dem Commit, alle behoben:**
-1. **Lock-Disziplin:** `list_assets()`/`get_asset()` nahmen ursprünglich nur `self._lock`, nicht
-   auch `self._file_write_lock()` — obwohl `_reconcile_and_get_row()`s eigener Docstring beide
-   verlangt (sie kann auch bei `repair_drift=False` reindizieren, ein Index-Write außerhalb der
-   Prozess-`flock`). `get()` (Z. 441) macht es richtig vor; die drei Asset-Lesemethoden jetzt auch.
-2. **`created`-Divergenz:** `put_asset()` nahm `self._now_fn()` (injizierte Uhr), `list_assets()`
-   die Datei-mtime — dasselbe Asset zeigte zwei verschiedene Werte, unbemerkt, weil kein Test sie
-   gegeneinander prüfte. `put_asset()` liest jetzt ebenfalls die mtime nach dem Write; neuer
-   Pflichttest `test_put_asset_created_matches_list_assets_created` pinnt das.
-3. **Sniff-Kosten:** `list_assets()` las für die MIME-Erkennung jedes Bild vollständig ein,
-   obwohl `sniff_image_mime()` maximal 12 Bytes braucht — bei mehreren/großen Bildern hätte das
-   `get_item_meta`s eigenes Kostenversprechen („um Größenordnungen billiger" als `get_item`)
-   unterlaufen, sobald Step B4 `assets` dort einblendet. Jetzt `path.open("rb").read(12)`.
+**Zwei Advisor-Funde vor dem Commit, beide behoben:**
+1. **`filename` ein zweites Mal still übersprungen.** B1s Session-Block hatte den Punkt
+   ausdrücklich für B2/B4 vorgemerkt (`put_asset()`s `filename`-Parameter wird nirgends
+   persistiert, `list_assets()` liefert `filename=""`); der vorgefundene B2-Code rief
+   `store.put_asset(item_id, data=data)` ohne Übernahme dieser Vormerkung auf, ohne Kommentar.
+   Jetzt ein Kommentar an der Aufrufstelle: der Plan spezifiziert rohe Bytes ohne
+   Multipart-Feld, es gibt hier nichts zu lesen — B3 (Editor-Upload, kennt den echten
+   Dateinamen aus `<input type="file">`) ist der frühestmögliche Ort für eine echte
+   Entscheidung (persistieren vs. Parameter streichen). Bewusst zum zweiten Mal vertagt, jetzt
+   mit Papierspur statt stillem Verschwinden.
+2. **Testname überversprach.** `test_asset_of_foreign_nonexistent_item_gives_no_existence_
+   signal` behauptete „kein Existenzunterschied", prüfte aber nur den nichtexistenten Fall
+   (404) — ein fremdes, existierendes Item ohne Freigabe liefert tatsächlich `403`
+   (`_items_get_one`s eigenes, kopiertes Verhalten, siehe `test_get_item_from_foreign_space_
+   without_share_is_forbidden`). Der Plantext (Step-B2-Tabelle) behauptet „denselben
+   Statuscode für beide Fälle" — das trifft auf `_items_get_one` selbst nicht zu, ist also eine
+   Plan-Ungenauigkeit, kein Code-Fund. Aufgeteilt in zwei Tests mit korrekten Namen/Codes
+   (`test_asset_of_nonexistent_item_is_404`, `test_asset_of_foreign_ungranted_item_is_403_not_
+   404`), Docstring benennt die Plan-Abweichung.
 
-**Tests:** 20 neu (12 `test_files.py`: 5 parametrisierte MIME-Erkennungsfälle + WebP-Offset-Fall
-+ unbekannte Bytes + SVG-Ablehnung + ungültige IDs + `move_asset_dir` No-op + `move_asset_dir`
-echter Move + `new_asset_id`-Format/Eindeutigkeit; 8 `test_store.py`: `put_asset` schreibt
-atomar + genau ein Commit, `put_asset` lehnt unbekannte Bytes ab, `list_assets` leer ohne Bilder,
-`get_asset` liefert Bytes+MIME, `delete_asset` verschiebt statt löscht, `move()` zieht Assets mit
-+ weiterhin ein Commit, `move()` ohne Assets unverändert, `put_asset`/`list_assets`-`created`-
-Konsistenz). `pytest` 787→**807**, alle grün, mehrere volle Läufe. Charakterisierung
-(P6-D/P6.5-U) vor/nach byte-identisch. Tabu-Diff (`mcpserver/`/`phase4_auth/`/
-`webui/security.py`/`webui/static/**`) leer — reiner `storage/`-Commit, wie Step B1 es verlangt.
+**Tests:** 11 neu (7 `phase5_ui/tests/test_api.py`, davon 6 aus dem Plan + der zusätzliche
+403-Test aus Advisor-Fund 2, 50→57; 4 `phase6_5_tools_images/tests/test_assets_acl.py`, neue
+Datei — DoD-Zahl aus dem Plan war „+10", real +11 wegen des zusätzlichen 403-Tests, keine
+Abweichung von Substanz). `pytest` 807→**818**, mehrere volle Läufe grün. Charakterisierung
+(`phase6_shares/tests/test_characterization.py`) unverändert grün — Step B2 fasst `storage/`
+nicht an. Tabu-Diff (`storage/**`, `mcpserver/**`, `phase4_auth/**`,
+`phase5_ui/webui/security.py`, `phase5_ui/webui/static/**`): leer — `git status` zeigt
+ausschließlich `phase5_ui/webui/{api,serializers}.py`, `phase5_ui/tests/test_api.py`,
+`pytest.ini` und die neue `phase6_5_tools_images/tests/`.
 
-**Vierter Advisor-Punkt, bewusst nicht behoben, für B2/B4 vorgemerkt:** `put_asset()`s
-`filename`-Parameter wird in der Antwort zurückgegeben, aber nirgends persistiert —
-`list_assets()` liefert für jedes Asset danach `filename=""`. P6-AZ sagt, der Pfad kommt aus der
-Asset-ID, nie aus dem Namen — ob/wie der Originaldateiname trotzdem irgendwo überleben soll
-(oder der Parameter ganz entfällt), ist eine Plan-Frage für Step B2/B4, keine Storage-Frage.
-
-**Zählkorrektur, noch am selben Tag gefunden:** der vorherige Session-Block (Block A) hatte
-`phase1_storage`s Testtotal per Delta-Rechnung auf **126** fortgeschrieben (123 + 3 `in_body`-
-Tests), ohne einen vollen `pytest --collect-only -q` über alle `phase1_storage/tests/*.py` als
-Gegenprobe zu fahren. Vor Step B1 lag die reale Summe bei **130**, nicht 126 — dieselbe
-Drift-Kategorie, die `phase2_mcp/CLAUDE.md` bereits mehrfach dokumentiert (dort fremdverursacht
-durch nicht nachgezogene Commits; hier selbstverursacht durch eine Delta-Rechnung ohne
-Vollzähler). In `phase1_storage/CLAUDE.md`s Testzahl-Historie korrigiert, nicht stillschweigend
-überschrieben. Lehre für den Rest dieser Phase: Testtotals per `pytest --collect-only -q` **über
-das ganze Testverzeichnis** verifizieren, nicht nur die eigene Delta-Behauptung fortschreiben.
-
-**Verifiziert:** `pytest` 807/807 (mehrere Läufe), Charakterisierung byte-identisch, Tabu-Diff
-leer, `git status` zeigt ausschließlich die erwarteten `storage/`- und Test-Dateien plus Doku.
+**Verifiziert:** `pytest` 818/818, Charakterisierung grün, Tabu-Diff leer, `git status` passt
+zur erwarteten Step-B2-Berührungsfläche.
 
 **Offen für die nächste Session:**
 - Commit + Push (Nikinger-Freigabe ausstehend zum Zeitpunkt des Schreibens).
-- Block B Step B2 (`webui`-Routen: Upload/Download/Delete-Endpunkte) ist der nächste Schritt,
-  atomar wie bisher.
-- Für Step B4 (MCP-Asset-Tools) vorgemerkt, nicht jetzt zu beheben: der `ItemNotFound`-
-  Fehlertext-Fund (Asset-Fehlermeldung sagt „prüfe die ID mit search_items", unpassend für eine
-  Asset-ID) und die `filename`-Persistenzfrage (Advisor-Punkt 4 oben).
+- Block B Step B3 (Web-UI: Anzeigen und Einfügen, `markdown.js`/`editor.js`) ist der nächste
+  Schritt, atomar wie bisher — Playwright gegen eine Wegwerf-Instanz (P5-T), kein Unit-Test.
+- Für Step B4 (MCP-Asset-Tools) weiterhin vorgemerkt: der `ItemNotFound`-Fehlertext-Fund aus
+  B1 und die `filename`-Persistenzfrage (jetzt zweimal vertagt, siehe oben).
 - Gate A→B (echte Connector-Probe für Block A) steht weiterhin aus, unverändert — Block B darf
   weitergebaut, aber nicht vor diesem Gate deployt werden.
 - Bekannte Doku-Schuld (`phase6_shares/CLAUDE.md` Block-C-Text stale) und der

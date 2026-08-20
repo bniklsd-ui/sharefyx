@@ -19,7 +19,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any
 
-from storage.models import Item, ItemSummary, SpaceInfo
+from storage.models import AssetInfo, Item, ItemSummary, SpaceInfo
 
 
 def _iso(value: datetime) -> str:
@@ -28,7 +28,16 @@ def _iso(value: datetime) -> str:
     return value.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def item_to_json(item: Item, *, readonly: bool, own_space: str) -> dict[str, Any]:
+def asset_to_json(asset: AssetInfo) -> dict[str, Any]:
+    return {
+        "id": asset.id, "mime": asset.mime, "bytes": asset.bytes,
+        "filename": asset.filename, "created": _iso(asset.created),
+    }
+
+
+def item_to_json(
+    item: Item, *, readonly: bool, own_space: str, assets: list[AssetInfo] | None = None,
+) -> dict[str, Any]:
     return {
         "id": item.id,
         "space": item.space,
@@ -50,6 +59,7 @@ def item_to_json(item: Item, *, readonly: bool, own_space: str) -> dict[str, Any
         "share_write": list(item.share_write),
         "shared": item.space != own_space,
         "readonly": readonly,
+        "assets": [asset_to_json(a) for a in assets] if assets is not None else [],
     }
 
 

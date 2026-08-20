@@ -965,6 +965,110 @@ async def test_updates_seen_sets_latest_id_and_is_separated_per_space(
     assert store.get_seen_update_id(FOREIGN_SPACE) is None
 
 
+# -- Assets (Phase 6.5 Step B2) --------------------------------------------------------------
+
+_PNG = b"\x89PNG\r\n\x1a\n" + b"restliche-bytes-egal"
+
+
+@pytest.mark.asyncio
+async def test_asset_upload_download_roundtrip(full_app_items, item_store, totp_code):
+    item = item_store.create(SPACE, type="note", title="Mit Bild")
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        upload = await client.post(
+            f"/api/v1/items/{item.id}/assets", content=_PNG, headers=_headers(csrf),
+        )
+        assert upload.status_code == 201
+        asset_id = upload.json()["id"]
+
+        download = await client.get(f"/api/v1/items/{item.id}/assets/{asset_id}")
+    assert download.status_code == 200
+    assert download.content == _PNG
+    assert download.headers["content-type"] == "image/png"
+    assert download.headers["x-content-type-options"] == "nosniff"
+
+
+@pytest.mark.asyncio
+async def test_asset_upload_too_large_is_413(full_app_items, item_store, totp_code):
+    item = item_store.create(SPACE, type="note", title="Mit Bild")
+    too_big = _PNG + b"\x00" * (5 * 1024 * 1024)
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.post(
+            f"/api/v1/items/{item.id}/assets", content=too_big, headers=_headers(csrf),
+        )
+    assert response.status_code == 413
+
+
+@pytest.mark.asyncio
+async def test_asset_upload_wrong_type_is_422(full_app_items, item_store, totp_code):
+    item = item_store.create(SPACE, type="note", title="Mit Bild")
+    svg = b"<svg xmlns='http://www.w3.org/2000/svg'></svg>"
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.post(
+            f"/api/v1/items/{item.id}/assets", content=svg, headers=_headers(csrf),
+        )
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_asset_delete_moves_to_trash(full_app_items, item_store, totp_code):
+    item = item_store.create(SPACE, type="note", title="Mit Bild")
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        upload = await client.post(
+            f"/api/v1/items/{item.id}/assets", content=_PNG, headers=_headers(csrf),
+        )
+        asset_id = upload.json()["id"]
+        delete = await client.delete(
+            f"/api/v1/items/{item.id}/assets/{asset_id}", headers=_headers(csrf),
+        )
+        listing = await client.get(f"/api/v1/items/{item.id}/assets")
+    assert delete.status_code == 200
+    assert listing.json() == []
+
+
+@pytest.mark.asyncio
+async def test_asset_of_nonexistent_item_is_404(full_app_items, totp_code):
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        response = await client.get("/api/v1/items/itm_00000000/assets/ast_00000000")
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_asset_of_foreign_ungranted_item_is_403_not_404(
+    full_app_items, item_store, totp_code,
+):
+    """Existiert wie `_items_get_one` (Z. 418-426): fehlende ID -> 404, fremdes Item ohne
+    Freigabe -> 403 -- zwei unterscheidbare Codes, kein „gibt es nicht"-Versteck. Der Plantext
+    (Step B2-Tabelle) behauptet denselben Code für beide Fälle; das trifft auf den kopierten
+    `_items_get_one`-Pfad selbst nicht zu (siehe `test_get_item_from_foreign_space_without_
+    share_is_forbidden` oben) -- diese Route übernimmt das bestehende Verhalten unverändert,
+    keine neue Abweichung."""
+    item = item_store.create(FOREIGN_SPACE, type="note", title="Fremd, ungeteilt")
+    asset_id = item_store.put_asset(item.id, data=_PNG).id
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        response = await client.get(f"/api/v1/items/{item.id}/assets/{asset_id}")
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_assets_appear_in_item_to_json(full_app_items, item_store, totp_code):
+    item = item_store.create(SPACE, type="note", title="Mit Bild")
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        await client.post(
+            f"/api/v1/items/{item.id}/assets", content=_PNG, headers=_headers(csrf),
+        )
+        response = await client.get(f"/api/v1/items/{item.id}")
+    assets = response.json()["assets"]
+    assert len(assets) == 1
+    assert assets[0]["mime"] == "image/png"
+
+
 def test_webui_imports_exactly_one_mcpserver_symbol():
     """§1.2/P5-B: `webui` darf genau ein Symbol aus `mcpserver` importieren
     (`permissions.SharePolicy`, seit P6 Step 5 — vorher `OwnSpaceWritable`). Geprüft über den
