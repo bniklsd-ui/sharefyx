@@ -7,12 +7,17 @@ from storage.errors import ValidationError
 from storage.files import (
     MAX_FOLDER_DEPTH,
     RESERVED_DIR_NAMES,
+    asset_dir,
+    asset_path,
     atomic_write,
     folder_from_path,
     generate_id,
     item_filename,
     item_path,
+    move_asset_dir,
+    new_asset_id,
     slugify,
+    sniff_image_mime,
     validate_folder,
 )
 
@@ -181,3 +186,72 @@ def test_slug_collision_does_not_overwrite(tmp_path):
     assert path_a.read_text() == "Liste A\n"
     assert path_b.read_text() == "Liste B\n"
     assert len(list(space.glob("*.md"))) == 2
+
+
+# -- Bild-Assets (Phase 6.5 Step B1) ----------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "data, expected_mime",
+    [
+        (b"\x89PNG\r\n\x1a\n" + b"rest", "image/png"),
+        (b"\xff\xd8\xff" + b"rest", "image/jpeg"),
+        (b"GIF87a" + b"rest", "image/gif"),
+        (b"GIF89a" + b"rest", "image/gif"),
+        (b"RIFF\x00\x00\x00\x00WEBPrest", "image/webp"),
+    ],
+)
+def test_sniff_image_mime_recognizes_each_format(data, expected_mime):
+    result = sniff_image_mime(data)
+    assert result is not None
+    assert result[0] == expected_mime
+
+
+def test_sniff_image_mime_webp_needs_correct_offset_8_marker():
+    # RIFF-Header, aber kein "WEBP" bei Offset 8 -- ein anderes RIFF-Format (z.B. WAV) darf
+    # nicht fälschlich als Bild durchgehen.
+    assert sniff_image_mime(b"RIFF\x00\x00\x00\x00WAVErest") is None
+
+
+def test_sniff_image_mime_unknown_bytes_returns_none():
+    assert sniff_image_mime(b"not an image") is None
+
+
+def test_sniff_image_mime_rejects_svg():
+    svg = b"<svg xmlns='http://www.w3.org/2000/svg'></svg>"
+    assert sniff_image_mime(svg) is None
+
+
+def test_asset_path_rejects_invalid_ids(tmp_path):
+    with pytest.raises(ValidationError):
+        asset_dir(tmp_path, "nikinger", "not-an-item-id")
+    with pytest.raises(ValidationError):
+        asset_path(tmp_path, "nikinger", generate_id(), "not-an-asset-id", "png")
+
+
+def test_move_asset_dir_is_a_no_op_without_a_source_directory(tmp_path):
+    src = asset_dir(tmp_path, "nikinger", generate_id())
+    dst = asset_dir(tmp_path, "beta", generate_id())
+
+    move_asset_dir(src, dst)  # darf nicht werfen
+
+    assert not dst.exists()
+
+
+def test_move_asset_dir_moves_existing_directory(tmp_path):
+    item_id = generate_id()
+    src = asset_dir(tmp_path, "nikinger", item_id)
+    src.mkdir(parents=True)
+    (src / "ast_00000000.png").write_bytes(b"x")
+    dst = asset_dir(tmp_path, "beta", item_id)
+
+    move_asset_dir(src, dst)
+
+    assert not src.exists()
+    assert (dst / "ast_00000000.png").read_bytes() == b"x"
+
+
+def test_new_asset_id_format_and_uniqueness():
+    ids = [new_asset_id() for _ in range(200)]
+    assert all(re.match(r"\Aast_[0-9a-f]{8}\Z", i) for i in ids)
+    assert len(set(ids)) == 200

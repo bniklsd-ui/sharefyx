@@ -7,7 +7,7 @@ up: ../CLAUDE.md
 down:
   - ../docs/concepts/phase1_storage_plan.md   # voller Plan, Entscheidungen A–H, Steps 0–7
   - SESSIONS_ARCHIVE.md                       # ältere Session-Blöcke
-updated: 2026-08-20 (Phase 6.5 Block A: store.py :: search() bekommt in_body=, 126 Tests; fuenfte Contract-Oeffnung fuer Block B weiterhin nur angekuendigt, noch kein Code)
+updated: 2026-08-20 (Phase 6.5 Step B1: fuenfte Contract-Oeffnung gebaut -- Bild-Assets in models/files/store.py, 150 Tests nach drei Advisor-Fixes (Lock-Disziplin, created-Konsistenz, Sniff-Kosten), Zaehlkorrektur 126->130 vor Step B1)
 ---
 # CLAUDE.md — Phase 1: Storage-Kern (`phase1_storage/`)
 
@@ -97,8 +97,9 @@ P1 nicht abgeschlossen, egal wie viel Code existiert.
 | 10 | `acl.py` (neu) + `folder`/`visibility`/`share_read`/`share_write` in `models.py`/`store.py`/`index.py`/`files.py` — `Store.acl_of()`, `list_spaces()` verzeichnisbasiert, `index.connect()` liefert `(conn, rebuilt)` | P6 Step 4 | ✅ | 36 (1 `test_models.py` + 11 `test_files.py` + 4 `test_index.py` + 20 `test_store.py`) + 10 `phase6_shares/tests/test_acl.py` (außerhalb dieses Pakets) |
 | 11 | `store.py :: move()` (neu) + `_cleanup_emptied_folders()` (intern, P6-AF) — Space-/Ordner-Move additiv zu `update()`/`archive()`, `space` bleibt in `_SYSTEM_MANAGED_FIELDS` | P6 Step 7b, Commit 1/3 | ✅ | 6 (in `test_store.py`) |
 | 12 | `store.py :: search()` bekommt `in_body: bool = False` (P6.5-N4) — additiv zum bestehenden Contract, keine benannte Öffnung wie #9/#10/#11 (kein neues Modul, kein neuer Store-Aufruf, nur ein optionales Keyword an einer bereits kontraktierten Signatur) | Phase 6.5 Step A4 | ✅ | 3 (in `test_store.py`) |
+| 13 | Fünfte, benannte Contract-Öffnung (angekündigt Step 0, siehe „Geerbte Contracts"): `AssetInfo` (neu, `models.py`), `files.py` (`new_asset_id()`, `ITEM_ID_RE`/`ASSET_ID_RE`, `ASSET_MIME_TYPES`/`sniff_image_mime()`, `asset_dir()`/`asset_path()`, `move_asset_dir()`, `atomic_write_bytes()`), `store.py` (`put_asset()`/`list_assets()`/`get_asset()`/`delete_asset()`, `move()` zieht das Asset-Verzeichnis mit — ein Move bleibt ein Commit) | Phase 6.5 Step B1 | ✅ | 20 (12 `test_files.py` + 8 `test_store.py`) |
 
-**Gesamt: 126 Tests** (`70 Tests` war der Stand bei Phasenabschluss; **[2026-07-25 Korrektur,
+**Gesamt: 150 Tests** (`70 Tests` war der Stand bei Phasenabschluss; **[2026-07-25 Korrektur,
 P2 Step 0]:** `rename_for_new_slug()` samt zweier Tests entfernt, 70→68; **[2026-07-25,
 P2 Step 2]:** acht neue Tests für die drei freigegebenen Contract-Erweiterungen, 68→76 — siehe
 „Geerbte Contracts" unten; **[2026-08-09, P6 Step 1]:** fünf neue Tests für `Store.patch()`
@@ -106,7 +107,15 @@ P2 Step 2]:** acht neue Tests für die drei freigegebenen Contract-Erweiterungen
 Tests für `folder`/`visibility`/`share_*`/`acl_of()`/`list_spaces()` (Fortsetzung derselben
 dritten Öffnung, siehe unten), 81→117; **[2026-08-17, P6 Step 7b Commit 1]:** sechs neue Tests
 für `Store.move()` (vierte, benannte Contract-Öffnung, siehe unten), 117→123);
-**[2026-08-20, Phase 6.5 Step A4]:** drei neue Tests für `search(in_body=)`, 123→126). Zielgröße
+**[2026-08-20, Phase 6.5 Step A4]:** drei neue Tests für `search(in_body=)`, 123→126 — **Korrektur
+im selben Tag, Step B1:** 126 war falsch, aus einer Delta-Rechnung ohne vollen Gegenzähler
+übernommen; ein `pytest --collect-only -q` über **alle** `phase1_storage/tests/*.py` ergab **130**
+vor Step B1, nicht 126 — vierzehnte Instanz derselben Drift-Kategorie wie die drei Korrekturen in
+`phase2_mcp/CLAUDE.md`, diesmal von Claude Code selbst verursacht und noch am selben Tag beim
+nächsten vollen Recount aufgefallen, nicht erst später gefunden; **[2026-08-20, Phase 6.5 Step
+B1]:** 20 neue Tests für die fünfte Contract-Öffnung (Bild-Assets, siehe Zeile 13; 19 im ersten
+Durchgang + 1 nach einem Advisor-Fund, siehe unten), 130→150).
+Zielgröße
 am Phasenende: grob 60–90,
 davon mindestens die vier Konflikt-Tests aus Step 4 — diese Zielgröße galt für den P1-Abschluss,
 P6 öffnet den Contract erneut benannt, siehe unten. Step 0 hat bewusst keine Tests (reines
@@ -193,6 +202,25 @@ Umbau, siehe `phase6_shares/CLAUDE.md`. 36 neue Tests in `phase1_storage/` (1 `t
 `phase6_shares/tests/test_acl.py` (außerhalb dieses Pakets, gleiche Kategorie wie
 `test_patch.py`/`test_updates.py`). `git diff` auf `mcpserver/`/`webui/`/`authserver/` blieb leer
 — Step 4 bleibt vollständig innerhalb `storage/`, wie geplant (P6-C).
+
+**[2026-08-20, Phase 6.5 Step B1] Fünfte, benannte Contract-Öffnung gebaut** — wie unten
+angekündigt, ohne Abweichung. `put_asset()` löst `sniff_image_mime()` selbst auf (kein
+`filename`-Vertrauen), `_commit("asset", ...)` erzeugt genau einen Commit je Upload, unabhängig
+von der Item-`version` (Assets konkurrieren nie mit einem Text-Write um dieselbe Version).
+`list_assets()`/`get_asset()`/`delete_asset()` nehmen wie `get()` **beide** Sperren
+(`self._lock` UND `self._file_write_lock()`) — `_reconcile_and_get_row()` kann auch bei
+`repair_drift=False` reindizieren, das ist ein Index-Write außerhalb der Prozess-`flock`, wenn
+nur `self._lock` gehalten wird. **Drei Advisor-Funde vor dem Commit behoben:** (1) genau diese
+Lock-Lücke in `list_assets()`/`get_asset()` (ursprünglich nur `self._lock`); (2) `created` kam in
+`put_asset()` aus `self._now_fn()`, in `list_assets()` aus der Datei-mtime — dasselbe Asset zeigte
+zwei verschiedene Werte, weil nichts den Upload-Zeitpunkt separat persistiert; behoben, indem
+`put_asset()` jetzt ebenfalls die mtime liest, plus ein Pflichttest, der beide Werte gegeneinander
+pinnt; (3) `list_assets()` las für die MIME-Erkennung jedes Bild vollständig ein (`sniff_image_
+mime()` braucht maximal 12 Bytes) — bei mehreren Bildern hätte das genau das Kostenversprechen von
+`get_item_meta` („um Größenordnungen billiger") unterlaufen, jetzt `path.open("rb").read(12)`. 20
+neue Tests (12 `test_files.py` + 8 `test_store.py`), Charakterisierung (P6-D) vor/nach
+byte-identisch grün. Volle Herleitung, inkl. der `126`-vs-`130`-Zählkorrektur desselben Tages:
+`phase6_5_tools_images/CLAUDE.md`s Session-Block.
 
 **[2026-08-20, Phase 6.5 Step 0] Fünfte, benannte Contract-Öffnung angekündigt** (noch kein Code —
 Ankündigung **vor** Step B1, `docs/concepts/phase6_5_tools_images_plan.md` §3 Step B1, P6.5-T),

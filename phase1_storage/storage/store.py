@@ -23,6 +23,7 @@ from .frontmatter import serialize as serialize_frontmatter
 from .models import (
     DEFAULT_VISIBILITY,
     VISIBILITY_VALUES,
+    AssetInfo,
     IndexStats,
     Item,
     ItemSummary,
@@ -643,6 +644,12 @@ class Store:
                 current, space=target_space, folder=target_folder,
                 version=current.version + 1, updated=self._now_fn(),
             )
+            # P6.5-T: das Asset-Verzeichnis zieht mit, BEVOR `_write_item_file()` committet —
+            # ein Move erzeugt weiterhin genau einen Git-Commit (P6-Abnahmezeile 26s Mechanik).
+            files.move_asset_dir(
+                files.asset_dir(self._data_root, current.space, current.id),
+                files.asset_dir(self._data_root, target_space, current.id),
+            )
             self._write_item_file(new_item, old_path=old_path, op="move")
             self._cleanup_emptied_folders(old_path.parent, current.space)
             return new_item
@@ -666,6 +673,98 @@ class Store:
             except OSError:
                 break
             current = current.parent
+
+    def put_asset(
+        self, item_id: str, *, data: bytes, filename: str | None = None
+    ) -> AssetInfo:
+        """Legt ein Bild unter `<space>/_assets/<item_id>/` ab (P6.5-T, fünfte Contract-
+        Öffnung). Kein `version`-Parameter — Assets sind nicht Teil der Item-Versionierung,
+        ein Upload konkurriert nie mit einem Text-Write um dieselbe `version`."""
+        with self._lock, self._file_write_lock():
+            row = self._reconcile_and_get_row(item_id, repair_drift=False)
+            space = row["space"]
+            sniffed = files.sniff_image_mime(data)
+            if sniffed is None:
+                raise ValidationError(
+                    "Unbekanntes oder nicht unterstütztes Bildformat — erlaubt: "
+                    "PNG/JPEG/GIF/WebP"
+                )
+            mime, ext = sniffed
+            asset_id = files.new_asset_id()
+            target_dir = files.asset_dir(self._data_root, space, item_id)
+            target_dir.mkdir(parents=True, exist_ok=True)
+            path = files.asset_path(self._data_root, space, item_id, asset_id, ext)
+            files.atomic_write_bytes(path, data)
+            self._commit("asset", item_id, space)
+            # `created` kommt aus der Datei-mtime, nicht aus `self._now_fn()` — nichts
+            # persistiert den Upload-Zeitpunkt separat, also muss put_asset() dieselbe Quelle
+            # liefern, die list_assets() beim nächsten Listing sieht (Advisor-Fund, sonst
+            # zeigen dieselbe Asset zwei verschiedene `created`-Werte).
+            created = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
+            return AssetInfo(
+                id=asset_id, mime=mime, bytes=len(data),
+                filename=filename or "", created=created,
+            )
+
+    def list_assets(self, item_id: str) -> list[AssetInfo]:
+        """Kein Index-Eintrag für Assets (P6-AY) — direktes Verzeichnis-Listing.
+        `_trash/` wird übersprungen (verschobene, „entfernte" Assets, N5)."""
+        with self._lock, self._file_write_lock():
+            row = self._reconcile_and_get_row(item_id, repair_drift=False)
+            target_dir = files.asset_dir(self._data_root, row["space"], item_id)
+            if not target_dir.is_dir():
+                return []
+            result = []
+            for path in sorted(target_dir.iterdir()):
+                if path.name == "_trash" or not path.is_file():
+                    continue
+                asset_id = path.stem
+                if not files.ASSET_ID_RE.match(asset_id):
+                    continue
+                # Nur die für sniff_image_mime() nötigen ersten 12 Bytes lesen (WebPs
+                # Offset-8-Prüfung ist der längste Fall) — ein Listing darf nicht jedes Bild
+                # vollständig einlesen, das widerspräche get_item_metas eigenem Versprechen
+                # "um Größenordnungen billiger" (Advisor-Fund).
+                with path.open("rb") as f:
+                    sniffed = files.sniff_image_mime(f.read(12))
+                mime = sniffed[0] if sniffed is not None else ""
+                stat = path.stat()
+                result.append(AssetInfo(
+                    id=asset_id, mime=mime, bytes=stat.st_size, filename="",
+                    created=datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc),
+                ))
+            return result
+
+    def get_asset(self, item_id: str, asset_id: str) -> tuple[bytes, str]:
+        """Bytes + MIME — die MIME kommt erneut aus den Magic Bytes, nicht aus der
+        Dateiendung (dieselbe Nie-der-Endung-vertrauen-Regel wie beim Upload)."""
+        with self._lock, self._file_write_lock():
+            row = self._reconcile_and_get_row(item_id, repair_drift=False)
+            target_dir = files.asset_dir(self._data_root, row["space"], item_id)
+            matches = list(target_dir.glob(f"{asset_id}.*")) if target_dir.is_dir() else []
+            if not matches:
+                raise ItemNotFound(asset_id)
+            data = matches[0].read_bytes()
+            sniffed = files.sniff_image_mime(data)
+            mime = sniffed[0] if sniffed is not None else "application/octet-stream"
+            return data, mime
+
+    def delete_asset(self, item_id: str, asset_id: str) -> None:
+        """„Verschieben statt Entfernen" (N5, gelockt): das Bild landet in `_trash/`,
+        Entscheidung H (kein Hard-Delete im Kern-API) bleibt formal unangetastet. Die
+        Body-Referenz läuft danach ins Leere und rendert als Alt-Text — kein Rewrite des
+        Bodys hier, das ist Aufgabe der aufrufenden Schicht, falls gewünscht."""
+        with self._lock, self._file_write_lock():
+            row = self._reconcile_and_get_row(item_id, repair_drift=False)
+            space = row["space"]
+            target_dir = files.asset_dir(self._data_root, space, item_id)
+            matches = list(target_dir.glob(f"{asset_id}.*")) if target_dir.is_dir() else []
+            if not matches:
+                raise ItemNotFound(asset_id)
+            trash_dir = target_dir / "_trash"
+            trash_dir.mkdir(parents=True, exist_ok=True)
+            files.move_file(matches[0], trash_dir / matches[0].name)
+            self._commit("asset_trash", item_id, space)
 
     def rebuild_index(self) -> IndexStats:
         with self._lock:

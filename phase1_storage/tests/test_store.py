@@ -865,3 +865,92 @@ def test_move_of_archived_item_is_rejected(store):
 
     with pytest.raises(ValidationError):
         store.move(archived.id, version=archived.version, space="nikinger")
+
+
+# -- Bild-Assets (Phase 6.5 Step B1, fünfte Contract-Öffnung) ---------------------------
+
+_PNG = b"\x89PNG\r\n\x1a\n" + b"restliche-bytes-egal"
+
+
+def test_put_asset_writes_atomically_and_commits_exactly_once(store_git, tmp_path):
+    item = store_git.create("nikinger", type="note", title="Mit Bild")
+
+    asset = store_git.put_asset(item.id, data=_PNG, filename="schnappschuss.png")
+
+    assert asset.mime == "image/png"
+    assert asset.bytes == len(_PNG)
+    path = tmp_path / "nikinger" / "_assets" / item.id / f"{asset.id}.png"
+    assert path.read_bytes() == _PNG
+    messages = _git_log(tmp_path)
+    asset_commits = [m for m in messages if m.startswith("asset ")]
+    assert len(asset_commits) == 1
+
+
+def test_put_asset_rejects_unrecognized_bytes(store):
+    item = store.create("nikinger", type="note", title="Ohne Bild")
+
+    with pytest.raises(ValidationError):
+        store.put_asset(item.id, data=b"nicht ein bild")
+
+
+def test_list_assets_is_empty_for_an_item_without_images(store):
+    item = store.create("nikinger", type="note", title="Textlich")
+
+    assert store.list_assets(item.id) == []
+
+
+def test_put_asset_created_matches_list_assets_created(store):
+    # Advisor-Fund: put_asset() darf nicht self._now_fn() für `created` nehmen, wenn
+    # list_assets() die Datei-mtime liest -- sonst zeigt dasselbe Asset zwei Werte.
+    item = store.create("nikinger", type="note", title="Mit Bild")
+
+    put = store.put_asset(item.id, data=_PNG)
+    [listed] = store.list_assets(item.id)
+
+    assert put.created == listed.created
+
+
+def test_get_asset_returns_bytes_and_mime(store):
+    item = store.create("nikinger", type="note", title="Mit Bild")
+    asset = store.put_asset(item.id, data=_PNG)
+
+    data, mime = store.get_asset(item.id, asset.id)
+
+    assert data == _PNG
+    assert mime == "image/png"
+
+
+def test_delete_asset_moves_to_trash_not_gone(store, tmp_path):
+    item = store.create("nikinger", type="note", title="Mit Bild")
+    asset = store.put_asset(item.id, data=_PNG)
+
+    store.delete_asset(item.id, asset.id)
+
+    assert store.list_assets(item.id) == []  # _trash/ wird beim Listing übersprungen
+    trashed = tmp_path / "nikinger" / "_assets" / item.id / "_trash" / f"{asset.id}.png"
+    assert trashed.read_bytes() == _PNG  # Entscheidung H: verschoben, nicht gelöscht
+
+
+def test_move_carries_the_asset_directory_and_still_produces_one_commit(store_git, tmp_path):
+    (tmp_path / "fabian").mkdir()
+    item = store_git.create("nikinger", type="note", title="Umzug mit Bild")
+    asset = store_git.put_asset(item.id, data=_PNG)
+
+    store_git.move(item.id, version=item.version, space="fabian")
+
+    old_dir = tmp_path / "nikinger" / "_assets" / item.id
+    new_dir = tmp_path / "fabian" / "_assets" / item.id
+    assert not old_dir.exists()
+    assert (new_dir / f"{asset.id}.png").read_bytes() == _PNG
+    messages = _git_log(tmp_path)
+    move_commits = [m for m in messages if m.startswith("move ")]
+    assert len(move_commits) == 1  # der Asset-Move erzeugt KEINEN eigenen Commit
+
+
+def test_move_without_assets_is_unchanged(store, tmp_path):
+    (tmp_path / "fabian").mkdir()
+    item = store.create("nikinger", type="note", title="Ohne Bild")
+
+    moved = store.move(item.id, version=item.version, space="fabian")
+
+    assert moved.space == "fabian"

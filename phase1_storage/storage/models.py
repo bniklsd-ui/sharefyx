@@ -89,6 +89,19 @@ class IndexStats:
     duration_seconds: float
 
 
+@dataclass(kw_only=True)
+class AssetInfo:
+    """Ein Bild unter `<space>/_assets/<item_id>/` (Phase 6.5 Block B, fünfte, benannte
+    P1-Contract-Öffnung, P6.5-T). Kein Index-Eintrag (P6-AY) — `Store.list_assets()` liest
+    das Verzeichnis direkt."""
+
+    id: str  # ast_<8hex>
+    mime: str  # image/png|image/jpeg|image/gif|image/webp
+    bytes: int
+    filename: str  # bereinigt, rein kosmetisch — NIE für die Pfadbildung
+    created: datetime
+
+
 # Statusvokabular je `type` (P2 Step 2, Entscheidung D2). Die CLI hielt ungültige Werte bisher
 # nur über `argparse choices` ab — ein zweiter Adapter (MCP) wäre daran vorbeigelaufen. Deshalb
 # einmal im Kern statt in jedem Adapter neu.
