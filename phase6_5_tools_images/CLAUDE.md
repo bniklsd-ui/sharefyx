@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase6_5_tools_images_plan.md   # voller Plan, Entscheidungen P6.5-A–P6.5-V, §0.0 gelockte N1–N6, Steps 0/A/B
   - ../phase6_shares/IMAGES_PLAN.md                  # Vorgänger-Zusatzplan, nachrangig seit 2026-08-20
   - SESSIONS_ARCHIVE.md                              # ältere Session-Blöcke, newest-first
-updated: 2026-08-20 (Block B Step B2 gebaut: REST-Flaeche Bilder in phase5_ui/webui, 818 pytest gruen, Charakterisierung gruen, Tabu-Diff leer, zweite Rotation gelaufen)
+updated: 2026-08-20 (Block B Step B3 gebaut: Markdown-Bildzweig + Editor-Upload, 818 pytest unveraendert [P5-T], Playwright 13/13 gruen und gesehen, dritte Rotation gelaufen)
 ---
 # CLAUDE.md — Phase 6.5: Werkzeug-Ergonomie und Bilder (`phase6_5_tools_images/`)
 
@@ -44,7 +44,8 @@ Testliste, Abnahmezeilen: `docs/concepts/phase6_5_tools_images_plan.md`.
 | Block A (Steps A1/A2/A4; A3 bewusst nicht gebaut, N3) | Werkzeug-Ergonomie (`mcpserver/tools.py`, `storage/store.py :: search(in_body=)`) | ✅ **gebaut**, noch nicht deployt — Gate A→B (echte Connector-Probe) steht aus |
 | Block B Step B1 | Storage-Fundament Bilder (`storage/{files,store,models}.py`) | ✅ **gebaut** |
 | Block B Step B2 | REST-Fläche Bilder (`phase5_ui/webui/{api,serializers}.py`) | ✅ **gebaut**, noch nicht deployt |
-| Block B Steps B3–B5 | Markdown-Bildzweig/Editor-Upload, MCP-Asset-Tools | ⏳ nicht begonnen |
+| Block B Step B3 | Web-UI Anzeigen/Einfügen (`phase5_ui/webui/static/{app.html,app.css,js/{markdown,editor}.js}`) | ✅ **gebaut**, Playwright grün+gesehen, noch nicht deployt |
+| Block B Steps B4–B5 | MCP-Asset-Tools, offene Advisor-Vormerkungen | ⏳ nicht begonnen |
 
 ## Geerbte Contracts
 
@@ -54,82 +55,105 @@ Details dort, nicht hier dupliziert.
 
 ---
 
-## Session stopped — 2026-08-20 (Block B Step B2 gebaut: REST-Fläche Bilder in `phase5_ui/webui`)
+## Session stopped — 2026-08-20 (Block B Step B3 gebaut: Markdown-Bildzweig + Editor-Upload)
 
-**Auftrag:** Vorsitzung endete am Kontextlimit mitten in Step B2 — Route-Code lag bereits
-geschrieben und ungetestet im Arbeitsverzeichnis vor (`webui/api.py`/`serializers.py`, Tests in
-`phase5_ui/tests/test_api.py` + neuem `phase6_5_tools_images/tests/test_assets_acl.py`,
-`pytest.ini` um den neuen Testpfad erweitert). Diese Session: Zustand rekonstruiert (`docs/
-INDEX.md` → Phase-Head → `git status`/`git diff`), Code gegen Plan §3 Step B2 Zeile für Zeile
-geprüft, volle Suite + Charakterisierung + Tabu-Diff gefahren, Advisor-Runde, drei Funde
-behoben, Doku nachgezogen.
+**Auftrag:** direkter Anschluss an Step B2, Nikinger-Wunsch „nächster Schritt, atomar" für
+Context-Checks dazwischen. Step B3 aus Plan §3: `markdown.js`s Bildzweig, Sanitizer-Erweiterung
+um `IMG`, „Bild einfügen"-Knopf im Editor, `.md-body img`-CSS-Regel, Playwright-Pflichtfälle.
 
-**Vorgefunden, exakt wie im Plan §3 Step B2 vorgezeichnet, keine Abweichung:**
-- `webui/api.py` — `MAX_ASSET_BYTES = 5 * 1024 * 1024` (P6.5-L, eigene Konstante neben
-  `MAX_BODY_BYTES`), `_raw_body()` (Gegenstück zu `_json_body()`, kein JSON-Parsing, ignoriert
-  `Content-Type`, P6-AZ), vier Routen (`POST`/`GET`-Liste/`GET`-eins/`DELETE` auf
-  `/api/v1/items/{item_id}/assets[/{asset_id}]`), jede mit `store.acl_of()` +
-  `can_read_item_as_human()`/`can_write_item_as_human()` vor dem Store-Aufruf (P6-AW: ein Bild
-  trägt keine eigene ACL, erbt die des Items). `X-Content-Type-Options: nosniff` explizit
-  gesetzt (V67 unten).
-- `webui/serializers.py` — `asset_to_json()` (neu), `item_to_json()` bekommt `assets=` (Default
-  `None` → `[]`, bestehende Aufrufer bleiben byte-identisch — dieselbe Konvention wie
-  `include_snippet` in Schritt G1).
-- `phase6_5_tools_images/tests/test_assets_acl.py` (neu, Testheimat im neuen Phasenverzeichnis,
-  nicht `phase6_shares/tests/` — P6.5-A) — vier Tests, `Store`+`SharePolicy` direkt, kein
-  HTTP-Layer: Bild eines fremden, per `share_read` freigegebenen Items lesbar · ohne Grant
-  verweigert · `share_read` allein erlaubt kein `POST` · Asset folgt dem Item über `store.move()`
-  in den Zielspace und ist dort lesbar (Zwilling zu
-  `test_acl_decision_follows_the_item_into_the_target_space`).
+**Gebaut, exakt wie im Plan §3 Step B3 vorgezeichnet, zwei dokumentierte Namensabweichungen
+(siehe unten):**
+- `webui/static/js/markdown.js` — Bildzweig in `inlineMarkdown()` **vor** dem Link-Replace
+  (P6.5-J), `resolveAssetSrc()` löst `asset:<id>` nur bei gesetztem `itemId` auf; `itemId` wird
+  durch `markdownToHtml(src, options)` an alle sieben `inlineMarkdown()`-Aufrufstellen
+  durchgereicht (Paragraph/Tabellenzellen/Überschrift/Zitat/beide Listenarten). `ALLOWED_TAGS`
+  +`IMG`, `ALLOWED_ATTRS.IMG = {src, alt}`. `safeSrc()` (neu, neben `safeHref()`) akzeptiert
+  ausschließlich `/^\/api\/v1\/items\/itm_[0-9a-f]{8}\/assets\/ast_[0-9a-f]{8}$/` — kein
+  `data:`, keine fremde Domain (P6.5-V). `sanitizeHtml()`s `walk()` ersetzt ein `<img>` ohne
+  gültiges `src` durch seinen Alt-Text-Knoten (nicht nur das Attribut entfernen — toter Knoten
+  sonst), exakt derselbe Mechanismus deckt `javascript:`, fremde Domains, `data:`-URIs UND
+  unaufgelöste `asset:`-Marker ab (`updates.js`s „fallende Kante", kein Sonderfall nötig). Kopf-
+  kommentar korrigiert (P6.5-K — IMG/`asset:` sind nicht mehr „bewusst nicht übernommen").
+- `webui/static/js/editor.js` — `insertAtCursor()` (neuer Helfer neben `wrapSelection()`/
+  `insertLinePrefix()`), Upload-Handler auf `#insert-image-input` (`change`): rohe Bytes per
+  `api()` an `POST .../assets`, Erfolg fügt `![<Dateiname>](asset:<id>)` an der Cursorposition
+  ein, Preview wird nachgezogen, falls gerade sichtbar. Beide `markdownToHtml()`-Aufrufstellen
+  (Vorschau-Umschalter, Entwurf-Wiederherstellung) bekommen jetzt `{ itemId:
+  state.editingSnapshot.id }`; `showReadonlyItem()` bekommt `{ itemId: item.id }`.
+- `webui/static/app.html` — neuer Knopf `#insert-image-button` (`data-md="image"` — bewusst,
+  damit er automatisch an der bestehenden Preview-Disable-Schleife und am generischen
+  No-Op-Klick-Listener teilnimmt, ohne beides zu duplizieren) + verstecktes `#insert-image-input`
+  (`accept="image/png,image/jpeg,image/gif,image/webp"`), zwischen „Trennlinie" und dem
+  Vorschau-Umschalter.
+- `webui/static/app.css` — `.preview img { max-width: 100%; height: auto; }`.
 
-**`[VERIFY]` empirisch geschlossen, nicht nur aus dem Plan-Kommentar übernommen:**
-- **V66** — `require_csrf()` (`webui/security.py` Z. 61-98) liest `Content-Type` nirgends, reine
-  Origin-/Token-Prüfung über Header. `_require_csrf_json()` funktioniert für den rohen
-  Bild-Body deshalb unverändert, kein Sonderfall nötig.
-- **V67** — `ui_security_headers()` wird ausschließlich in `routes_auth.py`/`static_routes.py`
-  aufgerufen (`grep` bestätigt), nie in `api.py` — erreicht `/api/v1/**` also grundsätzlich
-  nicht. Der explizite `X-Content-Type-Options: nosniff` in `_assets_get_one()` ist deshalb
-  nötig, nicht redundant, wie im Code-Kommentar behauptet.
+**Zwei dokumentierte Abweichungen vom Plan-Wortlaut, keine Abweichung von der Absicht:**
+1. Plan nennt die Zielklasse `.md-body` — diese Klasse existiert im Repo nicht, die echte
+   Vorschau-Klasse heißt `.preview` (dieselbe Drift-Kategorie wie der frühere `--border`-Fund in
+   P6 Step G1). Regel an `.preview` gehängt, Kommentar verweist auf die Abweichung.
+2. Kein `<input type="file">` mit sichtbarem Dateiauswahl-Button im Sinne des Plantexts, sondern
+   ein `hidden`-Input, den der Werkzeugleisten-Knopf per `.click()` auslöst — gleiche
+   Nutzerinteraktion (ein Klick, ein Dateidialog), aber der sichtbare Knopf bleibt optisch
+   konsistent mit den übrigen `toolbar-btn`-Elementen statt eines rohen Browser-Datei-Inputs.
 
-**Zwei Advisor-Funde vor dem Commit, beide behoben:**
-1. **`filename` ein zweites Mal still übersprungen.** B1s Session-Block hatte den Punkt
-   ausdrücklich für B2/B4 vorgemerkt (`put_asset()`s `filename`-Parameter wird nirgends
-   persistiert, `list_assets()` liefert `filename=""`); der vorgefundene B2-Code rief
-   `store.put_asset(item_id, data=data)` ohne Übernahme dieser Vormerkung auf, ohne Kommentar.
-   Jetzt ein Kommentar an der Aufrufstelle: der Plan spezifiziert rohe Bytes ohne
-   Multipart-Feld, es gibt hier nichts zu lesen — B3 (Editor-Upload, kennt den echten
-   Dateinamen aus `<input type="file">`) ist der frühestmögliche Ort für eine echte
-   Entscheidung (persistieren vs. Parameter streichen). Bewusst zum zweiten Mal vertagt, jetzt
-   mit Papierspur statt stillem Verschwinden.
-2. **Testname überversprach.** `test_asset_of_foreign_nonexistent_item_gives_no_existence_
-   signal` behauptete „kein Existenzunterschied", prüfte aber nur den nichtexistenten Fall
-   (404) — ein fremdes, existierendes Item ohne Freigabe liefert tatsächlich `403`
-   (`_items_get_one`s eigenes, kopiertes Verhalten, siehe `test_get_item_from_foreign_space_
-   without_share_is_forbidden`). Der Plantext (Step-B2-Tabelle) behauptet „denselben
-   Statuscode für beide Fälle" — das trifft auf `_items_get_one` selbst nicht zu, ist also eine
-   Plan-Ungenauigkeit, kein Code-Fund. Aufgeteilt in zwei Tests mit korrekten Namen/Codes
-   (`test_asset_of_nonexistent_item_is_404`, `test_asset_of_foreign_ungranted_item_is_403_not_
-   404`), Docstring benennt die Plan-Abweichung.
+**Advisor-Runde vor dem Commit, drei Funde, alle behoben, ein vierter dokumentiert statt
+gefixt:**
+1. **Update-Banner-DoD lief nur auf Argumentation, nicht auf einem echten Lauf.** Plan §3 Step
+   B3 verlangt explizit „ein `asset:`-Link im Update-Banner crasht nicht" als eigene Zeile —
+   ursprünglich mit dem (korrekten, aber unzureichenden) Argument übersprungen, derselbe
+   `safeSrc()`/`walk()`-Pfad decke das schon ab. Dieselbe Fundklasse wie der G3-Skip im
+   Deploy-Blocker (2026-08-19, „schon im Unit-Test abgedeckt" war dort auch falsch). Behoben:
+   Wegwerf-Instanz bekommt jetzt ein eigenes, temporäres `UPDATE_LOG.md` (`UiSettings.
+   update_log_path` überschrieben — Default hätte sonst das ECHTE `docs/UPDATE_LOG.md` des Repos
+   geladen, dessen Banner-Text nichts mit diesem Test zu tun hat, wie der erste Lauf zeigte) mit
+   einem Eintrag, der einen `asset:`-Marker enthält. Drei neue Prüfungen: kein `<img>` im
+   Banner, Alt-/Fließtext sichtbar, keine Konsolenfehler.
+2. **1×1-Testbild machte zwei Prüfungen wirkungslos.** `naturalWidth=1` bewies den echten
+   Byte-Roundtrip, aber weder griff `.preview img { max-width: 100% }` bei einem 1px-Bild, noch
+   war der Screenshot auswertbar (ein Farbfleck von 1×1px ist im Bild unsichtbar). Behoben:
+   echtes 900×200-PNG (eigener kleiner PNG-Encoder im Skript, `zlib`/`struct`, keine neue
+   Abhängigkeit), zwei neue Prüfungen (`naturalWidth == 900`, gerenderte Breite ≤ Panelbreite).
+   Screenshot danach tatsächlich ausgewertet, nicht nur „geschrieben" behauptet — zeigt ein
+   korrekt auf die Panelbreite begrenztes blaues Rechteck unter dem Absatztext.
+3. **Tabu-Diff-Kommando war zu eng.** Lief bisher nur gegen `storage mcpserver phase4_auth`;
+   `phase5_ui/webui/security.py` gehört ebenfalls zur Tabu-Liste dieser Phase (nur
+   `static/**`/`api.py`/`serializers.py` sind für Bilder geöffnet) und fehlte im Kommando. Leer,
+   aber jetzt mit dem vollständigen Satz geprüft.
+4. **Dokumentiert, bewusst nicht behoben — kein Sicherheitsfund, aber ein falsches Plan-Modell:**
+   `resolveAssetSrc()` schreibt ausschließlich `asset:<id>`-Marker um; ein händisch eingetragener
+   Pfad wie `![x](/api/v1/items/itm_ANDERES/assets/ast_XYZ)` läuft an dieser Auflösung vorbei und
+   besteht `safeSrc()`s Regex trotzdem, weil die Regex nur die **Form** prüft, nicht die
+   Herkunft aus einem `asset:`-Marker. Das widerspricht dem Plan-Mentalmodell „`src` stammt immer
+   aus einer Marker-Auflösung". **Kein Eskalationspfad:** `_assets_get_one` (Step B2) löst die
+   ACL ausschließlich über die `item_id` **im Pfad** auf, nicht über das Item, in dessen Body der
+   Link steht — ein Leser kann so nur Assets laden, für die er ohnehin schon `can_read_item_
+   as_human()` besteht, und es gibt keinen Rückkanal, über den ein Autor das Ergebnis beobachten
+   könnte (kein Exfil-Kanal). Vorgemerkt für B4/B5, falls dort eine Markdown-Erzeugung durch
+   Claude selbst hinzukommt — dann würde die Form-statt-Herkunft-Lücke relevanter.
 
-**Tests:** 11 neu (7 `phase5_ui/tests/test_api.py`, davon 6 aus dem Plan + der zusätzliche
-403-Test aus Advisor-Fund 2, 50→57; 4 `phase6_5_tools_images/tests/test_assets_acl.py`, neue
-Datei — DoD-Zahl aus dem Plan war „+10", real +11 wegen des zusätzlichen 403-Tests, keine
-Abweichung von Substanz). `pytest` 807→**818**, mehrere volle Läufe grün. Charakterisierung
-(`phase6_shares/tests/test_characterization.py`) unverändert grün — Step B2 fasst `storage/`
-nicht an. Tabu-Diff (`storage/**`, `mcpserver/**`, `phase4_auth/**`,
-`phase5_ui/webui/security.py`, `phase5_ui/webui/static/**`): leer — `git status` zeigt
-ausschließlich `phase5_ui/webui/{api,serializers}.py`, `phase5_ui/tests/test_api.py`,
-`pytest.ini` und die neue `phase6_5_tools_images/tests/`.
+**Playwright gegen eine Wegwerf-Instanz (Standing Permission, Port 8799, `tmp`-`DATA_ROOT`,
+eigene `AuthStore`/`DEK`, eigenes `UPDATE_LOG.md`, echter `uvicorn`-Prozess + echter Chromium,
+kein Repo-Artefakt):** 13/13 grün — Einladung/TOTP/Login-Roundtrip, Update-Banner mit
+`asset:`-Marker (drei Prüfungen, Fund 1 oben), Bild-Upload-Roundtrip (`201`, Marker in der
+Textarea), Vorschau zeigt das Bild mit den echten Abmessungen, `max-width`-Begrenzung wirkt,
+Screenshot geschrieben UND angesehen, `javascript:`/fremde Domain werden weder als `<img src>`
+übernommen noch lösen sie einen Netzabruf aus, keine Konsolenfehler über den gesamten Lauf.
+Skript liegt im Scratchpad (`/tmp/.../e2e_asset_upload.py`), kein Repo-Artefakt, P5-T gilt
+unverändert (kein Unit-Test für JS).
 
-**Verifiziert:** `pytest` 818/818, Charakterisierung grün, Tabu-Diff leer, `git status` passt
-zur erwarteten Step-B2-Berührungsfläche.
+**Tests:** `pytest` 818 unverändert (P5-T: JS bleibt unit-ungetestet, keine neue Python-Datei
+in diesem Step). Tabu-Diff (`storage/**`, `mcpserver/**`, `phase4_auth/**`,
+`phase5_ui/webui/security.py`) — jetzt mit dem vollständigen Satz geprüft (Advisor-Fund 3): leer.
+
+**Verifiziert:** `pytest` 818/818 (Regressionsprobe, unverändert), Playwright 13/13 grün und
+per Screenshot gesehen, Tabu-Diff (vollständiger Satz) leer, `git status` passt zur erwarteten
+Step-B3-Berührungsfläche (`webui/static/{app.html,app.css,js/{markdown,editor}.js}`).
 
 **Offen für die nächste Session:**
 - Commit + Push (Nikinger-Freigabe ausstehend zum Zeitpunkt des Schreibens).
-- Block B Step B3 (Web-UI: Anzeigen und Einfügen, `markdown.js`/`editor.js`) ist der nächste
-  Schritt, atomar wie bisher — Playwright gegen eine Wegwerf-Instanz (P5-T), kein Unit-Test.
-- Für Step B4 (MCP-Asset-Tools) weiterhin vorgemerkt: der `ItemNotFound`-Fehlertext-Fund aus
-  B1 und die `filename`-Persistenzfrage (jetzt zweimal vertagt, siehe oben).
+- Block B Step B4 (MCP-Asset-Tools, `mcpserver/tools.py`) ist der nächste Schritt — dort auch
+  der `ItemNotFound`-Fehlertext-Fund aus B1, die `filename`-Persistenzfrage (zweimal vertagt)
+  und Advisor-Fund 4 oben (Form-statt-Herkunft-Lücke in `safeSrc()`) mitdenken.
 - Gate A→B (echte Connector-Probe für Block A) steht weiterhin aus, unverändert — Block B darf
   weitergebaut, aber nicht vor diesem Gate deployt werden.
 - Bekannte Doku-Schuld (`phase6_shares/CLAUDE.md` Block-C-Text stale) und der

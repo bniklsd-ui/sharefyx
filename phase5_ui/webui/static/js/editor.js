@@ -39,6 +39,8 @@ var closeButtonEl;
 var appendInputEl;
 var appendButtonEl;
 var conflictDialogEl;
+var insertImageButtonEl;
+var insertImageInputEl;
 
 export function showOverviewPane() {
   overviewEl.hidden = false;
@@ -173,7 +175,9 @@ function setEditorMode(mode) {
     b.disabled = mode !== "edit";
   });
   if (mode === "preview") {
-    editorPreviewEl.innerHTML = markdownToHtml(editorTextareaEl.value);
+    editorPreviewEl.innerHTML = markdownToHtml(
+      editorTextareaEl.value, { itemId: state.editingSnapshot && state.editingSnapshot.id },
+    );
   }
 }
 
@@ -193,7 +197,7 @@ function showReadonlyItem(item) {
   roMetaEl.appendChild(el("span", "tnum version-num", "v" + item.version));
   roMetaEl.appendChild(el("span", null, item.type + " · " + item.status));
   if (item.due) roMetaEl.appendChild(el("span", "tnum", "fällig " + item.due));
-  roPreviewEl.innerHTML = markdownToHtml(item.body);
+  roPreviewEl.innerHTML = markdownToHtml(item.body, { itemId: item.id });
 }
 
 function showEditableItem(item, opts) {
@@ -240,7 +244,9 @@ function showEditableItem(item, opts) {
       // stehen wir (Vorgabe seit diesem Fund) schon dort, während der Entwurf asynchron
       // ankommt, zeigte die Vorschau bis hierhin weiter den ALTEN, gespeicherten Text.
       if (state.mode === "preview") {
-        editorPreviewEl.innerHTML = markdownToHtml(editorTextareaEl.value);
+        editorPreviewEl.innerHTML = markdownToHtml(
+      editorTextareaEl.value, { itemId: state.editingSnapshot && state.editingSnapshot.id },
+    );
       }
     });
   }
@@ -368,6 +374,8 @@ export function init() {
   appendInputEl = document.getElementById("append-input");
   appendButtonEl = document.getElementById("append-button");
   conflictDialogEl = document.getElementById("conflict-dialog");
+  insertImageButtonEl = document.getElementById("insert-image-button");
+  insertImageInputEl = document.getElementById("insert-image-input");
 
   closeButtonEl.addEventListener("click", function () { closeEditor(); });
 
@@ -434,6 +442,17 @@ export function init() {
     textarea.dispatchEvent(new Event("input", { bubbles: true }));
   }
 
+  function insertAtCursor(textarea, text) {
+    var start = textarea.selectionStart;
+    var end = textarea.selectionEnd;
+    var value = textarea.value;
+    textarea.value = value.slice(0, start) + text + value.slice(end);
+    var pos = start + text.length;
+    textarea.selectionStart = textarea.selectionEnd = pos;
+    textarea.focus();
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
   function insertLinePrefix(textarea, prefix) {
     var start = textarea.selectionStart;
     var value = textarea.value;
@@ -487,6 +506,31 @@ export function init() {
 
   togglePreviewButtonEl.addEventListener("click", function () {
     setEditorMode(state.mode === "edit" ? "preview" : "edit");
+  });
+
+  // -- Bild einfügen (Block B Step B3, P6.5-J) — der Pflichtweg ist dieser Knopf, kein
+  // Zwischenablage-/Drag&Drop-Einfügen (P6-AB gilt sinngemäß fort, dieselbe Regel wie bei
+  // Ordner-Verschieben). Roh-Upload wie `webui/api.py`s Route ihn erwartet, kein Multipart.
+  insertImageButtonEl.addEventListener("click", function () {
+    if (!state.editingSnapshot) return;
+    insertImageInputEl.value = "";
+    insertImageInputEl.click();
+  });
+
+  insertImageInputEl.addEventListener("change", function () {
+    var file = insertImageInputEl.files[0];
+    if (!file || !state.editingSnapshot) return;
+    var itemId = state.editingSnapshot.id;
+    api("/items/" + encodeURIComponent(itemId) + "/assets", {
+      method: "POST", body: file, headers: { "Content-Type": "application/octet-stream" },
+    }).then(function (asset) {
+      insertAtCursor(editorTextareaEl, "![" + (file.name || "Bild") + "](asset:" + asset.id + ")");
+      if (state.mode === "preview") {
+        editorPreviewEl.innerHTML = markdownToHtml(editorTextareaEl.value, { itemId: itemId });
+      }
+    }).catch(function (err) {
+      toast(err.message || "Bild-Upload fehlgeschlagen.", "error");
+    });
   });
 
   [fieldTitleEl, fieldStatusEl, fieldDueEl, fieldTagsEl, fieldLinksEl, editorTextareaEl].forEach(

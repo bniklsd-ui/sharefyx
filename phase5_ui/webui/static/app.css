@@ -715,6 +715,8 @@ select.input {
 .preview .ta-c { text-align: center; }
 .preview .ta-r { text-align: right; }
 .preview ul, .preview ol { padding-left: 1.4em; margin: 0 0 1em; }
+/* P6-BA -- Plan-Klasse `.md-body` existiert in diesem Repo nicht, echte Klasse ist `.preview`. */
+.preview img { max-width: 100%; height: auto; }
 
 .detail__back {
   display: none;
