@@ -2,10 +2,13 @@
 """mcp_smoke.py — Gegenstück zu `space_cli.py` aus P1 (Plan §4 Step 7). Baut ein **temporäres**
 `DATA_ROOT` (nie das echte), zwei Fixture-Spaces, startet `create_app()` in-process (kein
 echter Port, kein Netz — `httpx.ASGITransport`, dasselbe Muster wie `test_app.py`) und fährt
-die sieben Tools einmal vollständig durch: `list_spaces`, `create_item` ×3, `search_items`,
-`get_item` eigen/fremd, ein `update_item`-Konflikt, `append_to_item`, `patch_item`,
-`update_item(status=archived)`, ein `update_item` auf einen fremden Space. Am Ende eine
-Größenmessung (Bytes je Antwort) als Tabelle.
+die acht Tools einmal vollständig durch: `list_spaces`, `create_item` ×3, `search_items`,
+`get_item` eigen/fremd, `get_item_meta`, ein `update_item`-Konflikt, `append_to_item`,
+`patch_item`, `update_item(status=archived)`, ein `update_item` auf einen fremden Space. Am
+Ende eine Größenmessung (Bytes je Antwort) als Tabelle.
+
+**Phase 6.5 Step A2:** `get_item_meta` dazugekommen — reine Metadaten-Prüfung nach `get_item`
+(eigen), 13→14 Checks.
 
 **P6 Step 1:** `create_item`/`append_to_item`/`update_item`/`patch_item` liefern seither per
 Default eine Quittung statt Dateitext (P6-H) — die betroffenen Prüfungen unten lesen die
@@ -235,6 +238,19 @@ async def _run(data_root: Path, checks: list[Check]) -> None:
                     "<untrusted_content" not in own_text,
                     "Klartext ohne Wrap",
                     len(own_text.encode("utf-8")),
+                )
+            )
+
+            # 4b. get_item_meta -- Frontmatter + version, ohne Body (Phase 6.5 Step A2).
+            meta = json.loads(
+                (await own.call_tool("get_item_meta", {"item_id": created_ids[0]})).data
+            )
+            checks.append(
+                Check(
+                    "get_item_meta (eigen)",
+                    "version" in meta and "body" not in meta,
+                    "Metadaten ohne Body",
+                    len(json.dumps(meta).encode("utf-8")),
                 )
             )
 

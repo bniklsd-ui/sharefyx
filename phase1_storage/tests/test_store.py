@@ -247,6 +247,36 @@ def test_search_filters_by_space_type_status_tag(store):
     assert [i.title for i in result.items] == ["A"]
 
 
+def test_search_default_does_not_match_body_only_text(store):
+    store.create("nikinger", type="note", title="Titel", body="EinBodyMarkerXYZ")
+
+    result = store.search("EinBodyMarkerXYZ")
+
+    assert result.total == 0
+
+
+def test_search_in_body_true_matches_body_only_text(store):
+    item = store.create("nikinger", type="note", title="Titel", body="EinBodyMarkerXYZ")
+
+    result = store.search("EinBodyMarkerXYZ", in_body=True)
+
+    assert [i.id for i in result.items] == [item.id]
+
+
+def test_search_in_body_true_does_not_change_sort_or_total_for_title_matches(store, clock):
+    # P6.5-U-Nebenbedingung: in_body=True darf ein bestehendes Titel-Match-Verhalten nicht
+    # verändern -- derselbe Sortier-/Total-Pfad läuft in beiden Fällen.
+    a = store.create("nikinger", type="task", title="Treffer A")
+    clock.advance(1)
+    b = store.create("nikinger", type="task", title="Treffer B")
+
+    without = store.search("Treffer")
+    with_body = store.search("Treffer", in_body=True)
+
+    assert without.total == with_body.total == 2
+    assert [i.id for i in without.items] == [i.id for i in with_body.items] == [b.id, a.id]
+
+
 def test_search_listing_of_30_items_stays_within_calibrated_json_bound(store, clock):
     """Plan §4 Step 6 Done-when: 'Listing über 30 Items serialisiert zu <3 KB JSON'. Der
     3-KB-Schätzwert war `[VERIFY]` und ist gegen echte Beispieldaten empirisch widerlegt --

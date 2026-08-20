@@ -350,7 +350,7 @@ async def test_mcp_bare_mount_redirects_without_leaking(app):
 
 
 @pytest.mark.asyncio
-async def test_tools_list_returns_seven_tools(app, token_alpha):
+async def test_tools_list_returns_eight_tools(app, token_alpha):
     async with app.router.lifespan_context(app):
         async with _mcp_client(app, token_alpha) as client:
             tools = await client.list_tools()
@@ -360,6 +360,7 @@ async def test_tools_list_returns_seven_tools(app, token_alpha):
         "list_spaces",
         "search_items",
         "get_item",
+        "get_item_meta",
         "create_item",
         "update_item",
         "append_to_item",
@@ -415,8 +416,9 @@ async def test_principal_isolation_under_concurrency(app, token_alpha, token_bet
 
 
 @pytest.mark.asyncio
-async def test_all_seven_tools_are_callable_over_http(app, token_alpha, token_beta, tmp_path):
-    """Step 6 Done-when (P2), um `patch_item` erweitert (P6 Step 1): alle sieben Tools über den
+async def test_all_eight_tools_are_callable_over_http(app, token_alpha, token_beta, tmp_path):
+    """Step 6 Done-when (P2), um `patch_item` (P6 Step 1) und `get_item_meta` (Phase 6.5 Step
+    A2) erweitert: alle acht Tools über den
     ASGI-Testclient aufrufbar — nicht nur als Python-Funktion (`test_tools.py`, Guard gemockt),
     sondern durch den echten Stack aus Step 5 (`BearerAuthASGI`, Guard, laufende FastMCP-App).
     Ein Rundlauf pro Tool reicht hier; die granulare Semantik (Wrapping, Klemmung, Fehlertexte,
@@ -456,6 +458,12 @@ async def test_all_seven_tools_are_callable_over_http(app, token_alpha, token_be
 
             foreign_text = (await beta.call_tool("get_item", {"item_id": new_id})).data
             assert "<untrusted_content" in foreign_text
+
+            meta = json.loads(
+                (await alpha.call_tool("get_item_meta", {"item_id": new_id})).data
+            )
+            assert meta["version"] == 1
+            assert "body" not in meta
 
             appended_text = (
                 await alpha.call_tool(

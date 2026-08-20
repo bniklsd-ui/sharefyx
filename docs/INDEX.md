@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-08-20 (Phase 6.5 gestartet: phase6_5_tools_images/CLAUDE.md neu, Step 0 laeuft, phase6_shares/IMAGES_PLAN.md nachrangig, ROADMAP.md-Sektion ergaenzt) | 2026-08-19 (Deploy-Blocker gebaut+committet, main@d348e2e, 772 pytest+10/10 Playwright gruen; IMAGES_PLAN.md geplant, zurueckgestellt; Funnel-Reboot-Fund -- diagnose.sh Pruefung 5 korrigiert, MUSS-VOR-DEM-NAECHSTEN-DEPLOY in phase3_edge/root CLAUDE.md)
+updated: 2026-08-20 (Phase 6.5 Block A gebaut: achtes Tool get_item_meta, Beschreibungskorrekturen, search in_body=, 787 pytest gruen, erste Rotation gelaufen) | 2026-08-19 (Deploy-Blocker gebaut+committet, main@d348e2e, 772 pytest+10/10 Playwright gruen; IMAGES_PLAN.md geplant, zurueckgestellt; Funnel-Reboot-Fund -- diagnose.sh Pruefung 5 korrigiert, MUSS-VOR-DEM-NAECHSTEN-DEPLOY in phase3_edge/root CLAUDE.md)
 ---
 # Doc Index (L0)
 
@@ -41,7 +41,8 @@ updated: 2026-08-20 (Phase 6.5 gestartet: phase6_5_tools_images/CLAUDE.md neu, S
 
 ## Active phase (6.5 — Werkzeug-Ergonomie und Bilder)
 
-- [phase6_5_tools_images/CLAUDE.md](../phase6_5_tools_images/CLAUDE.md) — 🔄 ~8KB · **[2026-08-20 neu]** phase head, Step 0 gestartet: pytest-Baseline 772/772 real bestätigt (ein reihenfolgeabhängiger Flake auf dem ersten Lauf, isoliert und im Re-Run grün), fünfte Contract-Öffnung in `phase1_storage/CLAUDE.md` angekündigt, `IMAGES_PLAN.md` nachrangig markiert, `ROADMAP.md` + diese Zeile ergänzt. Block A/B noch nicht begonnen; read + newest Session-stopped block first
+- [phase6_5_tools_images/CLAUDE.md](../phase6_5_tools_images/CLAUDE.md) — 🔄 ~7.5KB · **[2026-08-20]** phase head, erste Rotation gelaufen (Step-0-Block ins Archiv). **Block A gebaut**: achtes Tool `get_item_meta`, `list_spaces`-Falschaussage behoben, `search_items(in_body=)` als MCP-Opt-in, alle vier Schreib-Tools zeigen Statuswerte + Aufgabenteilung. 787 pytest grün, `mcp_smoke.py` 14/14, Tabu-Diff leer — **noch nicht deployt**, Gate A→B (echte Connector-Probe) steht aus. Block B noch nicht begonnen; read + newest Session-stopped block first
+- [phase6_5_tools_images/SESSIONS_ARCHIVE.md](../phase6_5_tools_images/SESSIONS_ARCHIVE.md) — 📦 ~5.5KB · ein Eintrag (Step 0, erste Rotation 2026-08-20), verbatim
 - [docs/concepts/phase6_5_tools_images_plan.md](./concepts/phase6_5_tools_images_plan.md) — 📕 ~62KB · **[2026-08-20 neu, gleicher Tag von Claude Code auf Phase 6.5 finalisiert]** ausführungsreifer Plan, zwei Blöcke: **A = MCP-Werkzeug-Ergonomie** (die fünf offenen Punkte des 2026-08-14-Live-Feedbacks; darunter ein echter Bug — `list_spaces`' Beschreibung behauptet seit P6 Step 5 fälschlich „writable nur im eigenen Space"), **B = Abschluss Block C Bilder** (löst `phase6_shares/IMAGES_PLAN.md` als maßgebliche Quelle ab, siehe dort die Nachrangig-Notiz). Gelockt **P6.5-A–P6.5-V**; **B1–B4 und alle SECHS N1–N6 sind jetzt Nikinger-Vorgabe, in §0.0 gelockt**: Phase heißt **6.5** (keine Kollision mit `app.html`s „kommt in Phase 7" — die bleibt unangetastet, Space-Admin-UI ist weiterhin Phase 7), Verzeichnis `phase6_5_tools_images/`, kein Bulk-Append, Body-Suche als MCP-Opt-in (`in_body=`), Bild-Entfernen per Verschieben nach `_trash/` (offene Vormerkung: `_trash/` wird nie automatisch geräumt, mittelfristig eigene Lösung nötig), `MAX_MCP_ASSET_BYTES=1 MiB`. Abnahmezeilen **1–14** (phaseneigene Zählung), `[VERIFY]` V59–V70 — **V59 und V61 in der Planungssession empirisch geschlossen**; über 40KB, aber als 📕-Snapshot vom Softcap ausgenommen
 
 ## Completed phases

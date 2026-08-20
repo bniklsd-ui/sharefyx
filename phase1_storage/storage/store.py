@@ -392,6 +392,7 @@ class Store:
         due_before: date | None = None,
         limit: int = 50,
         offset: int = 0,
+        in_body: bool = False,
     ) -> SearchResult:
         with self._lock:
             rows = index.all_rows(self._conn)
@@ -414,8 +415,12 @@ class Store:
             if due_before is not None and (item.due is None or item.due >= due_before):
                 return False
             if query:
-                haystack = f"{item.title} {' '.join(item.tags)}".lower()
-                if query.lower() not in haystack:
+                # P6.5-N4: Body nur bei explizitem in_body=True — item.body ist über
+                # _row_to_item() ohnehin schon geladen, kein zusätzlicher Datei-Zugriff.
+                haystack = f"{item.title} {' '.join(item.tags)}"
+                if in_body:
+                    haystack += " " + item.body
+                if query.lower() not in haystack.lower():
                     return False
             return True
 

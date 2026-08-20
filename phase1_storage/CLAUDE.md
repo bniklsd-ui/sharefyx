@@ -7,7 +7,7 @@ up: ../CLAUDE.md
 down:
   - ../docs/concepts/phase1_storage_plan.md   # voller Plan, Entscheidungen A–H, Steps 0–7
   - SESSIONS_ARCHIVE.md                       # ältere Session-Blöcke
-updated: 2026-08-20 (Phase 6.5 Step 0 -- fuenfte Contract-Oeffnung angekuendigt, noch kein Code: Asset-Support in models.py/files.py/store.py, siehe "Geerbte Contracts")
+updated: 2026-08-20 (Phase 6.5 Block A: store.py :: search() bekommt in_body=, 126 Tests; fuenfte Contract-Oeffnung fuer Block B weiterhin nur angekuendigt, noch kein Code)
 ---
 # CLAUDE.md — Phase 1: Storage-Kern (`phase1_storage/`)
 
@@ -96,16 +96,18 @@ P1 nicht abgeschlossen, egal wie viel Code existiert.
 | 9 | `patch.py` (neu) + `store.py :: patch()` | P6 Step 1 | ✅ | 5 (in `test_store.py`; die vier reinen `apply_edits()`-Funktionstests liegen in `phase6_shares/tests/test_patch.py`, außerhalb dieses Pakets) |
 | 10 | `acl.py` (neu) + `folder`/`visibility`/`share_read`/`share_write` in `models.py`/`store.py`/`index.py`/`files.py` — `Store.acl_of()`, `list_spaces()` verzeichnisbasiert, `index.connect()` liefert `(conn, rebuilt)` | P6 Step 4 | ✅ | 36 (1 `test_models.py` + 11 `test_files.py` + 4 `test_index.py` + 20 `test_store.py`) + 10 `phase6_shares/tests/test_acl.py` (außerhalb dieses Pakets) |
 | 11 | `store.py :: move()` (neu) + `_cleanup_emptied_folders()` (intern, P6-AF) — Space-/Ordner-Move additiv zu `update()`/`archive()`, `space` bleibt in `_SYSTEM_MANAGED_FIELDS` | P6 Step 7b, Commit 1/3 | ✅ | 6 (in `test_store.py`) |
+| 12 | `store.py :: search()` bekommt `in_body: bool = False` (P6.5-N4) — additiv zum bestehenden Contract, keine benannte Öffnung wie #9/#10/#11 (kein neues Modul, kein neuer Store-Aufruf, nur ein optionales Keyword an einer bereits kontraktierten Signatur) | Phase 6.5 Step A4 | ✅ | 3 (in `test_store.py`) |
 
-**Gesamt: 123 Tests** (`70 Tests` war der Stand bei Phasenabschluss; **[2026-07-25 Korrektur,
+**Gesamt: 126 Tests** (`70 Tests` war der Stand bei Phasenabschluss; **[2026-07-25 Korrektur,
 P2 Step 0]:** `rename_for_new_slug()` samt zweier Tests entfernt, 70→68; **[2026-07-25,
 P2 Step 2]:** acht neue Tests für die drei freigegebenen Contract-Erweiterungen, 68→76 — siehe
 „Geerbte Contracts" unten; **[2026-08-09, P6 Step 1]:** fünf neue Tests für `Store.patch()`
 (dritte, benannte Contract-Öffnung, siehe unten), 76→81; **[2026-08-12, P6 Step 4]:** 36 neue
 Tests für `folder`/`visibility`/`share_*`/`acl_of()`/`list_spaces()` (Fortsetzung derselben
 dritten Öffnung, siehe unten), 81→117; **[2026-08-17, P6 Step 7b Commit 1]:** sechs neue Tests
-für `Store.move()` (vierte, benannte Contract-Öffnung, siehe unten), 117→123). Zielgröße am
-Phasenende: grob 60–90,
+für `Store.move()` (vierte, benannte Contract-Öffnung, siehe unten), 117→123);
+**[2026-08-20, Phase 6.5 Step A4]:** drei neue Tests für `search(in_body=)`, 123→126). Zielgröße
+am Phasenende: grob 60–90,
 davon mindestens die vier Konflikt-Tests aus Step 4 — diese Zielgröße galt für den P1-Abschluss,
 P6 öffnet den Contract erneut benannt, siehe unten. Step 0 hat bewusst keine Tests (reines
 Skelett) — `pytest` lief dort grün mit `exit 5` („no tests ran", nicht `exit 0`); das ist die

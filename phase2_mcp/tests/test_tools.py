@@ -10,6 +10,7 @@ hochzuziehen.
 """
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 from contextlib import contextmanager
@@ -76,6 +77,60 @@ class _OwnSpaceOnlyVisible:
 
     def visible_spaces(self, actor, all_spaces):
         return [s for s in all_spaces if self.can_read(actor, s)]
+
+
+# -- tool descriptions (Phase 6.5 Step A1) ---------------------------------------------
+
+
+def _description_of(mcp: FastMCP, name: str) -> str:
+    # [VERIFY] V63, gegen fastmcp==3.4.4 geklärt: die Beschreibung hängt am `FunctionTool`,
+    # das nur über das (async) `get_tool()` erreichbar ist, nicht über `inspect.signature()`
+    # wie der Rest dieser Suite die Funktionen selbst prüft.
+    tool = asyncio.run(mcp.get_tool(name))
+    return tool.description
+
+
+@pytest.fixture
+def described_mcp(store, permissions):
+    mcp = FastMCP("test-tools-descriptions")
+    tools.register(mcp, store=store, permissions=permissions)
+    return mcp
+
+
+def test_list_spaces_description_does_not_claim_own_space_only(described_mcp):
+    desc = _description_of(described_mcp, "list_spaces")
+    assert "nur für den" not in desc
+    assert "geteilte Spaces" in desc
+
+
+def test_write_tool_descriptions_document_status_values(described_mcp):
+    from storage.models import STATUS_VALUES
+
+    for name in ("create_item", "update_item"):
+        desc = _description_of(described_mcp, name)
+        for item_type, values in STATUS_VALUES.items():
+            for value in values:
+                assert value in desc, f"{name} nennt {value!r} für {item_type!r} nicht"
+
+
+def test_all_write_tools_carry_the_division_of_labour(described_mcp):
+    for name in ("create_item", "update_item", "append_to_item", "patch_item"):
+        assert tools.WRITE_TOOL_DIVISION in _description_of(described_mcp, name)
+
+
+def test_search_description_states_title_and_tag_scope(described_mcp):
+    desc = _description_of(described_mcp, "search_items")
+    assert "Titel und" in desc
+    assert "NICHT im Body" in desc
+
+
+def test_write_tool_descriptions_point_to_list_spaces(described_mcp):
+    for name in ("create_item", "update_item"):
+        assert "list_spaces" in _description_of(described_mcp, name)
+
+
+def test_get_item_description_points_to_get_item_meta(described_mcp):
+    assert "get_item_meta" in _description_of(described_mcp, "get_item")
 
 
 # -- list_spaces --------------------------------------------------------------------
@@ -178,6 +233,24 @@ def test_search_limit_is_clamped_to_max(tools_map, store):
     # trotzdem (Finding aus dem Advisor-Review).
     assert payload["limit"] == tools.MAX_LIMIT
     assert len(payload["items"]) == tools.MAX_LIMIT
+
+
+def test_search_in_body_default_does_not_find_body_only_match(tools_map, store):
+    store.create(SPACE_A, type="note", title="Titel ohne Treffer", body="EinBodyMarkerXYZ")
+
+    with _as(SPACE_A):
+        payload = json.loads(tools_map["search_items"](query="EinBodyMarkerXYZ"))
+
+    assert payload["total"] == 0
+
+
+def test_search_in_body_true_finds_body_only_match(tools_map, store):
+    item = store.create(SPACE_A, type="note", title="Titel ohne Treffer", body="EinBodyMarkerXYZ")
+
+    with _as(SPACE_A):
+        payload = json.loads(tools_map["search_items"](query="EinBodyMarkerXYZ", in_body=True))
+
+    assert item.id in {entry["id"] for entry in payload["items"]}
 
 
 def test_foreign_space_is_invisible_without_share(tools_map, store):
@@ -406,6 +479,46 @@ def test_get_item_foreign_space_does_not_write_file(tools_map, store, tmp_path):
     assert "Verändert von außen" in text  # der echte, aktuelle Inhalt wird gelesen …
     assert path.stat().st_mtime == mtime_before  # … aber Rule 4: keine Datei in fremden Spaces
     assert path.read_bytes() == bytes_before  # angefasst — kein `_rewrite_version_in_file`
+
+
+# -- get_item_meta (Phase 6.5 Step A2) -------------------------------------------------
+
+
+def test_get_item_meta_returns_version_without_body(tools_map, store):
+    item = store.create(SPACE_A, type="note", title="Meta", body="X" * 500)
+
+    with _as(SPACE_A):
+        payload = json.loads(tools_map["get_item_meta"](item.id))
+
+    assert payload["version"] == item.version
+    assert payload["body_bytes"] == 500
+
+
+def test_get_item_meta_never_contains_body_text(tools_map, store):
+    item = store.create(SPACE_A, type="note", title="Meta", body="EinAusgefallenerMarkerXYZ")
+
+    with _as(SPACE_A):
+        raw = tools_map["get_item_meta"](item.id)
+
+    assert "EinAusgefallenerMarkerXYZ" not in raw
+
+
+def test_get_item_meta_foreign_shared_item_is_readable_and_not_own(tools_map, store):
+    item = store.create(SPACE_B, type="note", title="Fremd", body="Beta")
+    store.update(item.id, version=item.version, share_read=[SPACE_A])
+
+    with _as(SPACE_A):
+        payload = json.loads(tools_map["get_item_meta"](item.id))
+
+    assert payload["own"] is False
+    assert payload["space"] == SPACE_B
+
+
+def test_get_item_meta_foreign_item_without_grant_is_denied(tools_map, store):
+    item = store.create(SPACE_B, type="note", title="Fremd")
+
+    with _as(SPACE_A), pytest.raises(ToolError, match="write_denied"):
+        tools_map["get_item_meta"](item.id)
 
 
 # -- create_item ----------------------------------------------------------------------

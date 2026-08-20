@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase2_mcp_plan.md          # voller Plan, Entscheidungen P2-A–P2-N, Steps 0–7
   - ../docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md # Herkunft der Entscheidungen D1–D6
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
-updated: 2026-08-17 (P6 Step 7b Commit 2/3 -- update_item bekommt space=, P6-AE Rechtepruefung, Guard-Routing-Fix, 120 Tests)
+updated: 2026-08-20 (Phase 6.5 Block A: achtes Tool get_item_meta, Beschreibungskorrekturen, search_items in_body=, 132 Tests)
 ---
 # CLAUDE.md — Phase 2: MCP-Server (`phase2_mcp/`)
 
@@ -41,7 +41,9 @@ einbauen will → **stop**.
   `/health`. **[2026-08-09 Korrektur, P6 Step 1]:** ein siebtes Tool ist dazugekommen —
   `patch_item` (P6-E, `storage/patch.py`) — siehe Modul-Status unten und
   `phase6_shares/CLAUDE.md`. Die P2-eigene Entscheidungsliste K unten bleibt als historischer
-  Beschluss stehen, ist aber überholt (Korrekturnotiz dort).
+  Beschluss stehen, ist aber überholt (Korrekturnotiz dort). **[2026-08-20 Korrektur, Phase 6.5
+  Step A2]:** ein achtes Tool ist dazugekommen — `get_item_meta` (P6.5-E/F, reine
+  Metadaten-Antwort ohne Body) — siehe Modul-Status Zeile 12.
 - **DRAUSSEN:** Löschen (`status: archived` reicht), MCP Resources, MCP Prompts, OAuth,
   öffentliche Erreichbarkeit/Tunnel (P3), SQL-Filterung in `Store.search()` (D6, zurückgestellt).
 
@@ -103,6 +105,7 @@ Streichung.
 | 9 | Siebtes Tool `patch_item` (P6-E/F/G) + `mcpserver/receipts.py` (neu, Quittungen statt Volltext, P6-H) + `return_body` an allen vier Schreib-Tools + `update_item` lehnt `visibility`/`share_read`/`share_write` ab (P6-M) | P6 Step 1 | ✅ | +7 (`test_tools.py` 23→30), Kollateralkorrekturen in `test_app.py`/`test_request_log.py`/`mcp_smoke.py` (keine neuen Tests, nur Assertions auf JSON statt Frontmatter-Text umgestellt) |
 | 10 | Client-Surface-Logging (V42): `ua`-Feld auf der `ev="http"`-Zeile (`AccessLogASGI`), gekürzt auf 120 Zeichen, läuft durch `TokenScrubbingFilter` wie jedes andere Feld. Bewusst **nicht** auf `ev="tool"` — `context.py` ist nicht auf P6 Step 2s Berührungsliste | P6 Step 2 | ✅ **gebaut, V42 geschlossen (2026-08-12, `phase6_shares/CLAUDE.md` Step-2/-3-Session-Block)** — zwei Tage echtes journald ausgewertet: `ua` wird von echten MCP-Clients zuverlässig gesetzt, unterscheidet aber NICHT zwischen Claude-Oberflächen (278/278 echte `/mcp`-Aufrufe trugen `"Claude-User"`, egal ob Claude Code oder claude.ai) — negativer, aber definitiver Befund | +3 (`test_request_log.py` 11→13, `test_logging.py` 8→9) |
 | 11 | Rechtepolitik (P6 Step 5): `permissions.py` (`Surface`, `SharePolicy` ersetzt `OwnSpaceWritable`, `can_read_item`/`can_write_item` beide surface-scharf inkl. `visibility` — Advisor-Fund am `can_write_item`, siehe Nachtrag im Phase-Head), `tools.py` (alle sieben Tools auf `acl_of()`+`can_read_item`/`can_write_item`, `search_items`/`list_spaces` item-weise gefiltert, `create_item(space=,folder=)`, `update_item(folder=)` mit Fail-Closed-Riegel gegen Nicht-Eigentümer-Verschiebung — Nikinger-Entscheidung, kein Plan-Text), `app.py` (Verdrahtung über `store.acl_reader`) | P6 Step 5 | ✅ **gebaut** — Details, alle zwölf Pflichttests, die Fail-Closed-Ergänzung und der `can_write_item`-Fix: `phase6_shares/CLAUDE.md` Step-5-Session-Block | +10 (`test_tools.py` 30→40), `test_permissions.py` vollständig neu (3→12 Tests, `OwnSpaceWritable`-Klasse entfernt), Kollateralkorrekturen in `test_app.py`/`mcp_smoke.py` (keine neuen Tests, Assertions auf die neue Fail-Closed-Sichtbarkeit umgestellt) |
+| 12 | Phase-6.5-Block-A (Werkzeug-Ergonomie): achtes Tool `get_item_meta` (P6.5-E/F), Beschreibungskorrekturen (`list_spaces`-Falschaussage raus P6.5-B, `_status_hint()`/`WRITE_TOOL_DIVISION`-Helfer P6.5-C/D, Suchreichweite ehrlich benannt P6.5-H), `search_items` bekommt `in_body: bool = False` durchgereicht (P6.5-N4) | Phase 6.5 Step A1/A2/A4 | ✅ **gebaut** | +12 `test_tools.py` (46→58: 6 Beschreibungstests, 4 `get_item_meta`, 2 `in_body`-Durchreichung), `test_app.py` umbenannt/erweitert (`test_all_eight_tools_are_callable_over_http`, keine neue Testfunktion), `mcp_smoke.py` 13→14 Prüfungen (kein neuer Test) |
 
 **Zeile 7, Step 6 abgeschlossen:** `search_items`, `get_item`, `create_item`, `update_item`,
 `append_to_item` lösen ihre seit Step 5 bestehenden `NotImplementedError`-Platzhalter ein
@@ -310,6 +313,15 @@ Text nennt jetzt die tatsächliche Ursache und verweist auf `update_item`, keine
 Frontmatter-Erkennungslogik ergänzt. Bestehender Test um zwei Assertions erweitert, kein neuer
 Test. **Gesamt weiterhin 114 Tests.** Volle Herleitung: `phase6_shares/CLAUDE.md`s
 Session-Block, Nachtrag „Werkzeug-Ergonomie".
+
+**[2026-08-20, Phase 6.5 Step A1/A2/A4]:** achtes Tool `get_item_meta`, Beschreibungskorrekturen
+(`list_spaces` P6.5-B, Statuswerte + Aufgabenteilung an allen vier Schreib-Tools P6.5-C/D/G,
+Suchreichweite P6.5-H), `search_items(in_body=)` (P6.5-N4). Zwölf neue Tests in `test_tools.py`
+(46→58), `test_app.py`s Achttool-Test umbenannt/erweitert (keine neue Testfunktion),
+`mcp_smoke.py` 13→14 Prüfungen (kein neuer Test). Reale Zahl per `pytest --collect-only -q` je
+Datei neu gezählt (dieselbe Disziplin wie bei den neun vorherigen Instanzen dieser
+Drift-Kategorie oben): **Gesamt: 132 Tests.** Volle Herleitung, Advisor-Runden, Details:
+`phase6_5_tools_images/CLAUDE.md`s Session-Block.
 
 ## Geerbte Contracts
 

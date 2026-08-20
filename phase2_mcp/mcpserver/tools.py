@@ -1,4 +1,5 @@
-"""Die MCP-Tools (P2 Plan §3, seit P6 Step 1 sieben statt sechs). Registrierung über
+"""Die MCP-Tools (P2 Plan §3, seit P6 Step 1 sieben statt sechs, seit Phase 6.5 Step A2 acht).
+Registrierung über
 `register(mcp, store=..., permissions=...)`, damit `server.py :: build_mcp()` `tools.py` kennt,
 aber `tools.py` selbst weder HTTP noch Token kennt — nur einen Principal (`context.py`) und eine
 Policy (`permissions.py`), siehe Plan §1.2.
@@ -53,7 +54,7 @@ from fastmcp.exceptions import ToolError
 from storage.acl import AclDecision
 from storage.errors import ConflictError, ItemNotFound, SpaceNotFound, ValidationError
 from storage.frontmatter import serialize as serialize_frontmatter
-from storage.models import Item, ItemSummary, SpaceInfo
+from storage.models import STATUS_VALUES, Item, ItemSummary, SpaceInfo, valid_statuses
 from storage.patch import PatchError, TextEdit
 from storage.store import Store
 
@@ -103,6 +104,30 @@ def wrap_untrusted(text: str, *, space: str) -> str:
 def compact_json(payload: Any) -> str:
     """Entscheidung I: kompaktes JSON als Text-Content, keine ASCII-Escapes."""
     return json.dumps(payload, separators=(",", ":"), ensure_ascii=False)
+
+
+def _status_hint() -> str:
+    """Statusvokabular aus storage.models.STATUS_VALUES generiert (P6.5-C) — nie abtippen,
+    das ist genau die Drift, die Report 1 aus der 2026-08-13-Korrektur verursacht hat."""
+    parts = [
+        f"{t}: {'|'.join(sorted(valid_statuses(t)))}"
+        for t in sorted(STATUS_VALUES)
+    ]
+    return "Erlaubte status-Werte je type — " + " · ".join(parts) + "."
+
+
+WRITE_TOOL_DIVISION = (
+    "Aufgabenteilung der Schreib-Werkzeuge: create_item legt neu an · "
+    "update_item ändert Frontmatter (status/tags/links/due/title) und optional den ganzen Body · "
+    "append_to_item hängt Text ans Body-Ende · "
+    "patch_item ersetzt exakte Textstellen IM BODY. "
+    "patch_item und append_to_item erreichen Frontmatter grundsätzlich nicht."
+)
+
+_LIST_SPACES_POINTER = (
+    "Unklar, in welche Spaces du schreiben darfst? Ruf zuerst list_spaces — writable:true ist "
+    "die Antwort."
+)
 
 
 def _format_dt(value: datetime) -> str:
@@ -239,7 +264,7 @@ def _authenticated_principal():
 
 
 def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[str, Callable[..., str]]:
-    """Registriert alle sieben Tools auf `mcp`. Reihenfolge in jedem Tool-Body wie Plan §3.3:
+    """Registriert alle acht Tools auf `mcp`. Reihenfolge in jedem Tool-Body wie Plan §3.3:
     `current_principal()` → Guard → Zielraum → Rechte → Store → Formatieren. `@mcp.tool(...)`
     gibt die unveränderte Python-Funktion zurück (nicht das interne `FunctionTool`-Objekt) —
     `register()` sammelt genau diese Funktionen und gibt sie zurück, damit Tests sie direkt
@@ -260,8 +285,10 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
     @mcp.tool(
         title="Spaces auflisten",
         description=(
-            "Listet alle sichtbaren Spaces mit Item-Anzahl. `writable` ist nur für den "
-            "eigenen Space true."
+            "Listet alle sichtbaren Spaces mit Item-Anzahl, Mitgliedern und Ordnern. "
+            "writable:true heißt: du darfst dort schreiben — das gilt für deinen eigenen "
+            "Space UND für geteilte Spaces, in denen dir write: gewährt wurde. Ruf dies "
+            "zuerst auf, wenn unklar ist, wo geschrieben werden darf; rate es nicht."
         ),
         annotations={
             "readOnlyHint": True,
@@ -314,7 +341,11 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         title="Items durchsuchen",
         description=(
             "Sucht Items über alle sichtbaren Spaces (Frontmatter + Snippet, nie der volle "
-            "Body). Fremde Snippets sind gewrappt."
+            "Body). Fremde Snippets sind gewrappt. Gesucht wird als Teilstring in Titel und "
+            "Tags (Groß/Kleinschreibung egal) — NICHT im Body, außer du setzt in_body=True. "
+            "Wenn ein Begriff nichts findet, liegt er vermutlich nur im Fließtext: dann "
+            "in_body=True setzen oder über tags/type/status/folder filtern statt den "
+            "Suchbegriff zu variieren."
         ),
         annotations={
             "readOnlyHint": True,
@@ -334,6 +365,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         limit: int = DEFAULT_LIMIT,
         offset: int = 0,
         include_archived: bool = DEFAULT_INCLUDE_ARCHIVED,
+        in_body: bool = False,
     ) -> str:
         principal = _authenticated_principal()
         clamped_limit = max(1, min(limit, MAX_LIMIT))
@@ -350,6 +382,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
                 due_before=due_before_date,
                 limit=_STORE_FETCH_LIMIT,
                 offset=0,
+                in_body=in_body,
             )
         except ValidationError as exc:
             raise map_storage_error(exc) from exc
@@ -383,7 +416,11 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
 
     @mcp.tool(
         title="Item lesen",
-        description="Liest ein Item als Dateitext (Frontmatter + Body). Fremde Bodies sind gewrappt.",
+        description=(
+            "Liest ein Item als Dateitext (Frontmatter + Body). Fremde Bodies sind gewrappt. "
+            "Liefert immer den vollen Body. Wenn du nur die aktuelle version oder Frontmatter "
+            "brauchst, nimm get_item_meta — das ist um Größenordnungen billiger."
+        ),
         annotations={
             "readOnlyHint": True,
             "destructiveHint": False,
@@ -412,12 +449,64 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         return item_to_filetext(item)
 
     @mcp.tool(
+        title="Item-Metadaten lesen",
+        description=(
+            "Liest NUR Frontmatter und Version eines Items — ohne Body. Billig. Nimm dies "
+            "statt get_item, wenn du die aktuelle version für einen Schreibaufruf brauchst "
+            "oder nur Status/Tags/Ordner prüfen willst. body_bytes sagt dir, wie teuer ein "
+            "get_item wäre."
+        ),
+        annotations={
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+    )
+    def get_item_meta(item_id: str) -> str:
+        principal = _authenticated_principal()
+        try:
+            acl = store.acl_of(item_id)
+        except ItemNotFound as exc:
+            raise map_storage_error(exc) from exc
+
+        if not permissions.can_read_item(principal.space, acl, surface=Surface.AGENT):
+            raise map_storage_error(PermissionDenied(acl.space)) from None
+
+        # Reiner Metadaten-Lesevorgang löst nie einen Drift-Repair-Write aus (anders als
+        # get_item, wo `writable` das steuert) — wer nur Metadaten will, soll nie einen Write
+        # auslösen, den die Antwort selbst gar nicht zeigt.
+        item = store.get(item_id, repair_drift=False)
+        payload = {
+            "id": item.id,
+            "space": item.space,
+            "folder": item.folder,
+            "type": item.type,
+            "title": item.title,
+            "status": item.status,
+            "due": item.due.isoformat() if item.due is not None else None,
+            "tags": list(item.tags),
+            "links": list(item.links),
+            "visibility": item.visibility,
+            "share_read": list(item.share_read),
+            "share_write": list(item.share_write),
+            "version": item.version,
+            "created": _format_dt(item.created),
+            "updated": _format_dt(item.updated),
+            "body_bytes": len(item.body.encode("utf-8")),
+            "own": acl.space == principal.space,
+            "writable": permissions.can_write_item(principal.space, acl, surface=Surface.AGENT),
+        }
+        return compact_json(payload)
+
+    @mcp.tool(
         title="Item anlegen",
         description=(
             "Legt ein neues Item an — standardmäßig im eigenen Space. space=<name> legt es "
             "stattdessen in einen anderen Space, wenn dessen .share.yml write: dafür gewährt; "
             "folder=<pfad> legt es in einen Unterordner. Liefert standardmäßig eine Quittung "
-            "statt des vollen Texts — return_body=True holt ihn zurück."
+            "statt des vollen Texts — return_body=True holt ihn zurück. "
+            + _status_hint() + " " + WRITE_TOOL_DIVISION + " " + _LIST_SPACES_POINTER
         ),
         annotations={
             "readOnlyHint": False,
@@ -473,7 +562,8 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             "werden, als Zielordner im neuen Space). Braucht die zuletzt gelesene version. "
             "Liefert standardmäßig eine Quittung statt des vollen Texts — return_body=True holt "
             "ihn zurück. Sichtbarkeit/Freigaben (visibility/share_read/share_write) gehen über "
-            "kein Tool, nur über die UI."
+            "kein Tool, nur über die UI. "
+            + _status_hint() + " " + WRITE_TOOL_DIVISION + " " + _LIST_SPACES_POINTER
         ),
         annotations={
             "readOnlyHint": False,
@@ -597,7 +687,11 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             "Hängt Text an den Body eines Items im eigenen Space an. Nur der Body — für "
             "Frontmatter-Felder (status/tags/links/due) update_item nutzen, body weglassen. "
             "Braucht die zuletzt gelesene version. Liefert standardmäßig eine Quittung statt "
-            "des vollen Texts — return_body=True holt ihn zurück."
+            "des vollen Texts — return_body=True holt ihn zurück. Mehrere Einträge in einem "
+            "Aufruf: übergib einen Text mit Zeilenumbrüchen — ein Aufruf, ein Commit, eine "
+            "Versionserhöhung. Die Quittung enthält die neue version; du brauchst zwischen "
+            "aufeinanderfolgenden Appends kein erneutes get_item. "
+            + WRITE_TOOL_DIVISION
         ),
         annotations={
             "readOnlyHint": False,
@@ -634,7 +728,8 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             "body weglassen. Jedes old_text muss genau einmal vorkommen; sonst schlägt der "
             "ganze Aufruf fehl und nichts wird geschrieben. Braucht die zuletzt gelesene "
             "version. Liefert standardmäßig eine Quittung statt des vollen Texts — "
-            "return_body=True holt ihn zurück."
+            "return_body=True holt ihn zurück. "
+            + WRITE_TOOL_DIVISION
         ),
         annotations={
             "readOnlyHint": False,
@@ -671,6 +766,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         "list_spaces": list_spaces,
         "search_items": search_items,
         "get_item": get_item,
+        "get_item_meta": get_item_meta,
         "create_item": create_item,
         "update_item": update_item,
         "append_to_item": append_to_item,
