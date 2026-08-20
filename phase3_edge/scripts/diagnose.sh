@@ -244,5 +244,32 @@ except Exception:
   fi
 fi
 
+# 13) Gesamtgröße aller `_assets/`-Verzeichnisse und der `.git`-Verzeichnisgröße im DATA_ROOT
+#     (Phase 6.5 Step B5, §4 Punkt 7 im Plan: B1 = ja, Bilder werden mitcommittet, ein
+#     entferntes Bild gibt keine Bytes frei -- Git-Historie wächst monoton. B2 = 5 MiB je Bild
+#     OHNE Space-Gesamtbudget heißt "messen statt deckeln", diese Prüfung ist das Messgerät.
+#     INFO, kein Abbruchkriterium -- dieselbe Kategorie wie Prüfung 9/11/12. `$data_root`
+#     stammt aus Prüfung 12 oben, dieselbe `local.env`-Auflösung, kein zweiter Read nötig.)
+if [[ -z "$data_root" ]]; then
+  echo "WARNUNG: kein DATA_ROOT aus $LOCAL_ENV ablesbar — Prüfung 13 übersprungen." >&2
+elif [[ ! -d "$data_root" ]]; then
+  echo "WARNUNG: DATA_ROOT $data_root existiert nicht — Prüfung 13 übersprungen." >&2
+else
+  assets_bytes=0
+  while IFS= read -r -d '' dir; do
+    dir_bytes="$(du -sb "$dir" 2>/dev/null | cut -f1)"
+    assets_bytes=$(( assets_bytes + ${dir_bytes:-0} ))
+  done < <(find "$data_root" -mindepth 2 -maxdepth 2 -type d -name '_assets' -print0 2>/dev/null)
+  git_dir="$data_root/.git"
+  if [[ -d "$git_dir" ]]; then
+    git_bytes="$(du -sb "$git_dir" 2>/dev/null | cut -f1)"
+  else
+    git_bytes=0
+  fi
+  assets_human="$(numfmt --to=iec --suffix=B "${assets_bytes:-0}" 2>/dev/null || echo "${assets_bytes:-0}B")"
+  git_human="$(numfmt --to=iec --suffix=B "${git_bytes:-0}" 2>/dev/null || echo "${git_bytes:-0}B")"
+  echo "INFO Bild-Assets gesamt: $assets_human (_assets/ über alle Spaces) · Git-Historie: $git_human ($git_dir)" >&2
+fi
+
 echo "DIAGNOSE: alle Prüfungen bestanden." >&2
 exit 0

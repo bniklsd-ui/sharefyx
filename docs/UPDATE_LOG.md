@@ -9,6 +9,10 @@
      (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
+## 2026-08-20
+- Bilder in Notizen: hochladen, ansehen, im Text einfügen — direkt im Editor.
+- Claude beschreibt seine Werkzeuge jetzt klarer: weniger Rateversuche, weniger Fehlversuche.
+
 ## 2026-08-14
 - Echte Ordner: anlegen und Notizen per Menü oder per Ziehen (Drag & Drop) hineinverschieben.
 - Jede Notiz zeigt jetzt an, ob sie privat ist oder mit welchem Space sie geteilt ist.
