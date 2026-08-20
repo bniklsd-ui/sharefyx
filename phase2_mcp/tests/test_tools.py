@@ -11,6 +11,7 @@ hochzuziehen.
 from __future__ import annotations
 
 import asyncio
+import base64
 import json
 import os
 from contextlib import contextmanager
@@ -880,3 +881,151 @@ def test_guard_auth_error_is_mapped_to_tool_error(tools_map, store, monkeypatch)
 
     with _as(SPACE_A), pytest.raises(ToolError, match="auth_error"):
         tools_map["list_spaces"]()
+
+
+# -- get_item_asset / put_item_asset (Phase 6.5 Step B4) -------------------------------------
+
+_PNG = b"\x89PNG\r\n\x1a\n" + b"restliche-bytes-egal"
+
+
+def test_get_item_meta_lists_assets_without_bytes(tools_map, store):
+    item = store.create(SPACE_A, type="note", title="Mit Bild")
+    asset = store.put_asset(item.id, data=_PNG)
+
+    with _as(SPACE_A):
+        payload = json.loads(tools_map["get_item_meta"](item.id))
+
+    assert payload["assets"] == [
+        {"id": asset.id, "mime": "image/png", "bytes": len(_PNG), "filename": ""}
+    ]
+
+
+def test_get_item_asset_returns_image_content_for_own_item(tools_map, store):
+    item = store.create(SPACE_A, type="note", title="Mit Bild")
+    asset = store.put_asset(item.id, data=_PNG)
+
+    with _as(SPACE_A):
+        image = tools_map["get_item_asset"](item.id, asset.id)
+
+    content = image.to_image_content()
+    assert content.mimeType == "image/png"
+    assert base64.b64decode(content.data) == _PNG
+
+
+def test_get_item_asset_foreign_item_with_share_read_only_returns_metadata_not_bytes(
+    tools_map, store,
+):
+    """Der B3-Kerntest (P6.5-M): Leserecht allein reicht nicht für Bildbytes -- ein fremdes
+    Bild vor einem sehenden Modell ist ein Injektionskanal, den <untrusted_content> strukturell
+    nicht erreicht. Schreibrecht ist der gewählte Vertrauensmarker, nicht Leserecht."""
+    item = store.create(SPACE_B, type="note", title="Fremd, nur lesbar", share_read=[SPACE_A])
+    asset = store.put_asset(item.id, data=_PNG)
+
+    with _as(SPACE_A):
+        result = tools_map["get_item_asset"](item.id, asset.id)
+
+    assert isinstance(result, str)
+    payload = json.loads(result)
+    assert payload["bytes_available"] is False
+    assert payload["mime"] == "image/png"
+    assert "hint" in payload
+
+
+def test_get_item_asset_with_read_only_grant_and_unknown_asset_id_is_asset_not_found(
+    tools_map, store,
+):
+    """Advisor-Fund vor dem Commit: der may_see_bytes=False-Zweig prüfte urspruenglich NIE, ob
+    die asset_id ueberhaupt existiert -- jede erfundene ID waere hier "erfolgreich" gewesen
+    (bytes_available: false), waehrend derselbe Aufruf mit Schreibrecht fuer dieselbe ID
+    korrekt asset_not_found geworfen haette. Jetzt symmetrisch: Existenz zuerst, unabhaengig
+    vom Rechtelevel."""
+    item = store.create(SPACE_B, type="note", title="Fremd, nur lesbar", share_read=[SPACE_A])
+
+    with _as(SPACE_A), pytest.raises(ToolError, match="asset_not_found"):
+        tools_map["get_item_asset"](item.id, "ast_00000000")
+
+
+def test_get_item_asset_foreign_item_with_share_write_returns_bytes(tools_map, store):
+    item = store.create(SPACE_B, type="note", title="Fremd, beschreibbar", share_write=[SPACE_A])
+    asset = store.put_asset(item.id, data=_PNG)
+
+    with _as(SPACE_A):
+        image = tools_map["get_item_asset"](item.id, asset.id)
+
+    assert base64.b64decode(image.to_image_content().data) == _PNG
+
+
+def test_get_item_asset_foreign_item_without_grant_denied(tools_map, store):
+    item = store.create(SPACE_B, type="note", title="Fremd, ungeteilt")
+    asset = store.put_asset(item.id, data=_PNG)
+
+    with _as(SPACE_A), pytest.raises(ToolError, match="write_denied"):
+        tools_map["get_item_asset"](item.id, asset.id)
+
+
+def test_get_item_asset_unknown_asset_id_gives_asset_not_found_not_item_not_found(
+    tools_map, store,
+):
+    """B1s Advisor-Fund, hier geschlossen: `ItemNotFound`s Standardtext ('prüfe die ID mit
+    search_items') ist für eine Asset-ID irreführend -- `AssetNotFound` liefert stattdessen
+    einen zur Asset-ID passenden Hinweis (`get_item_meta`)."""
+    item = store.create(SPACE_A, type="note", title="Ohne Bild")
+
+    with _as(SPACE_A), pytest.raises(ToolError, match="asset_not_found.*get_item_meta"):
+        tools_map["get_item_asset"](item.id, "ast_00000000")
+
+
+def test_put_item_asset_writes_and_returns_receipt_without_bytes(tools_map, store):
+    item = store.create(SPACE_A, type="note", title="Ziel")
+    data_b64 = base64.b64encode(_PNG).decode()
+
+    with _as(SPACE_A):
+        receipt = json.loads(
+            tools_map["put_item_asset"](item.id, data_b64, filename="foto.png")
+        )
+
+    assert receipt["op"] == "asset"
+    assert receipt["mime"] == "image/png"
+    assert receipt["bytes"] == len(_PNG)
+    assert receipt["item_version"] == item.version
+    assert "asset:" + receipt["asset_id"] in receipt["hint"]
+    assert data_b64 not in json.dumps(receipt)
+
+    [stored] = store.list_assets(item.id)
+    assert stored.id == receipt["asset_id"]
+
+
+def test_put_item_asset_foreign_space_without_grant_denied(tools_map, store):
+    item = store.create(SPACE_B, type="note", title="Fremd")
+    data_b64 = base64.b64encode(_PNG).decode()
+
+    with _as(SPACE_A), pytest.raises(ToolError, match="write_denied"):
+        tools_map["put_item_asset"](item.id, data_b64)
+
+    assert store.list_assets(item.id) == []
+
+
+def test_no_tool_response_ever_carries_a_base64_image_payload(tools_map, store):
+    """P6.5-N, die erzwingbare Hälfte: Bildbytes verlassen den Server über GENAU EIN Tool
+    (`get_item_asset`) -- `get_item`, `get_item_meta`, `search_items` und jede Quittung
+    (inkl. `put_item_asset`s eigener) enthalten NIE die Base64-Nutzlast, auch nicht für ein
+    eigenes Item mit Bild. Assertion gegen einen eigenen, unverwechselbaren Bytes-Marker
+    (Advisor-Vorgabe) statt gegen `_PNG` oben: eine kurze Fixture beweist per Zufall dasselbe
+    wie ein Marker, ein Marker beweist es absichtlich -- und die zusätzliche Klartext-Prüfung
+    (nicht nur Base64) fängt auch den Fehlerfall "jemand gibt rohe Bytes statt Base64 zurück",
+    den die reine Base64-Suche nicht abdecken würde."""
+    item = store.create(SPACE_A, type="note", title="Mit Bild", body="Text.")
+    marker = b"MARKER-NIE-IN-EINER-ANTWORT"
+    png = b"\x89PNG\r\n\x1a\n" + marker
+    data_b64 = base64.b64encode(png).decode()
+
+    with _as(SPACE_A):
+        put_receipt = tools_map["put_item_asset"](item.id, data_b64)
+        get_meta = tools_map["get_item_meta"](item.id)
+        get_full = tools_map["get_item"](item.id)
+        search = tools_map["search_items"](query="Mit Bild")
+
+    marker_text = marker.decode("ascii")
+    for response in (put_receipt, get_meta, get_full, search):
+        assert data_b64 not in response
+        assert marker_text not in response

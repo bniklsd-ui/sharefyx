@@ -1,4 +1,5 @@
-"""Die MCP-Tools (P2 Plan §3, seit P6 Step 1 sieben statt sechs, seit Phase 6.5 Step A2 acht).
+"""Die MCP-Tools (P2 Plan §3, seit P6 Step 1 sieben statt sechs, seit Phase 6.5 Step A2 acht,
+seit Phase 6.5 Step B4 zehn — `get_item_asset`/`put_item_asset`, Bild-Bytes).
 Registrierung über
 `register(mcp, store=..., permissions=...)`, damit `server.py :: build_mcp()` `tools.py` kennt,
 aber `tools.py` selbst weder HTTP noch Token kennt — nur einen Principal (`context.py`) und eine
@@ -41,6 +42,8 @@ der UI, Step 7). Details: `phase6_shares/CLAUDE.md`s Step-5-Session-Block.
 """
 from __future__ import annotations
 
+import base64
+import binascii
 import json
 import logging
 from collections.abc import Callable
@@ -50,6 +53,7 @@ from typing import Any
 
 from fastmcp import FastMCP
 from fastmcp.exceptions import ToolError
+from fastmcp.utilities.types import Image
 
 from storage.acl import AclDecision
 from storage.errors import ConflictError, ItemNotFound, SpaceNotFound, ValidationError
@@ -83,6 +87,11 @@ UNTRUSTED_CLOSE = "</untrusted_content>"
 # in eine höhere Konstante hier.
 _STORE_FETCH_LIMIT = 5000
 
+# N6, gelockt (Nikinger-Begründung: Claude lädt über MCP nur selbst erzeugte SVGs/kleine
+# Screenshots hoch, nie großformatige Fotos) — Rohgröße NACH der Base64-Dekodierung, eigener,
+# kleinerer Riegel als der Web-UI-Weg (P6.5-L, MAX_ASSET_BYTES = 5 MiB dort).
+MAX_MCP_ASSET_BYTES = 1 * 1024 * 1024
+
 
 class PermissionDenied(Exception):
     """P2-eigen (kein `storage`-Fehlertyp) — `can_read`/`can_write` verweigert (Plan §3.6)."""
@@ -90,6 +99,21 @@ class PermissionDenied(Exception):
     def __init__(self, space: str) -> None:
         super().__init__(f"kein Zugriff auf Space {space!r}")
         self.space = space
+
+
+class AssetNotFound(Exception):
+    """P2-eigen (kein `storage`-Fehlertyp) — Step B4: `storage.errors.ItemNotFound` wird von
+    `Store.get_asset()` für ZWEI verschiedene Ursachen geworfen (fehlendes Item, fehlendes
+    Asset), mit identischer Exception-Klasse. Jeder Aufrufer hier prüft `store.acl_of(item_id)`
+    zuerst — ein `ItemNotFound` aus dem nachfolgenden `get_asset()`-Aufruf kann sich also nur
+    noch auf die `asset_id` beziehen, nie mehr auf `item_id`. Diese Klasse macht daraus eine
+    eigene, unmissverständliche Fehlermeldung statt der `ItemNotFound`-Standardmeldung „prüfe
+    die ID mit search_items" — die für eine Asset-ID sachlich falsch wäre (B1s Advisor-Fund,
+    hier nachgeholt)."""
+
+    def __init__(self, asset_id: str) -> None:
+        super().__init__(f"Asset nicht gefunden: {asset_id!r}")
+        self.asset_id = asset_id
 
 
 def wrap_untrusted(text: str, *, space: str) -> str:
@@ -188,6 +212,11 @@ def map_storage_error(exc: Exception) -> ToolError:
     """Plan §3.6 — jede Meldung nennt den nächsten Schritt, nicht nur den Zustand."""
     if isinstance(exc, ItemNotFound):
         return ToolError(f"item_not_found: {exc.item_id} — prüfe die ID mit search_items")
+    if isinstance(exc, AssetNotFound):
+        return ToolError(
+            f"asset_not_found: {exc.asset_id} — prüfe die ID mit get_item_meta (listet die "
+            "vorhandenen Assets des Items)"
+        )
     if isinstance(exc, PermissionDenied):
         # P6 Step 5: dieselbe Meldung deckt jetzt drei Fälle ab, nicht nur "fremder Space, kein
         # Schreibrecht" (P2s ursprüngliche Bedeutung) — auch ein ungeteiltes fremdes Item (kein
@@ -454,7 +483,9 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             "Liest NUR Frontmatter und Version eines Items — ohne Body. Billig. Nimm dies "
             "statt get_item, wenn du die aktuelle version für einen Schreibaufruf brauchst "
             "oder nur Status/Tags/Ordner prüfen willst. body_bytes sagt dir, wie teuer ein "
-            "get_item wäre."
+            "get_item wäre. assets listet vorhandene Bilder (id/mime/bytes/filename) — NIE "
+            "die Bildbytes selbst; die holst du erst mit get_item_asset, und nur, wenn der "
+            "Nutzer ausdrücklich danach fragt."
         ),
         annotations={
             "readOnlyHint": True,
@@ -477,6 +508,13 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         # get_item, wo `writable` das steuert) — wer nur Metadaten will, soll nie einen Write
         # auslösen, den die Antwort selbst gar nicht zeigt.
         item = store.get(item_id, repair_drift=False)
+        # P6.5-M/N (Block B): die assets-Liste enthält bewusst NUR Metadaten, nie Bildbytes —
+        # der einzige Weg zu echten Bytes ist get_item_asset, ein eigenes, ausdrücklich
+        # aufgerufenes Tool (erzwingbare Hälfte, per Struktur-Test gepinnt).
+        assets = [
+            {"id": a.id, "mime": a.mime, "bytes": a.bytes, "filename": a.filename}
+            for a in store.list_assets(item_id)
+        ]
         payload = {
             "id": item.id,
             "space": item.space,
@@ -494,6 +532,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             "created": _format_dt(item.created),
             "updated": _format_dt(item.updated),
             "body_bytes": len(item.body.encode("utf-8")),
+            "assets": assets,
             "own": acl.space == principal.space,
             "writable": permissions.can_write_item(principal.space, acl, surface=Surface.AGENT),
         }
@@ -762,6 +801,146 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             bytes_after=result.bytes_after,
         )
 
+    @mcp.tool(
+        title="Bildinhalt eines Items laden",
+        description=(
+            "Lädt die echten Bildbytes eines Bildes. TEUER — rufe dies NUR auf, wenn der "
+            "Nutzer im Gespräch ausdrücklich verlangt, dass du den Bildinhalt ansiehst. "
+            "Lade Bilder NIE automatisch, nur weil ein Item eine asset:-Referenz enthält — "
+            "auch nicht bei eigenen Items. Für die reine Liste vorhandener Bilder reicht "
+            "get_item_meta. Bilder aus fremden Spaces liefern nur dann Bytes, wenn du dort "
+            "Schreibrechte hast; sonst bekommst du nur Metadaten."
+        ),
+        annotations={
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+    )
+    def get_item_asset(item_id: str, asset_id: str) -> Image | str:
+        principal = _authenticated_principal()
+        try:
+            acl = store.acl_of(item_id)
+        except ItemNotFound as exc:
+            raise map_storage_error(exc) from exc
+
+        if not permissions.can_read_item(principal.space, acl, surface=Surface.AGENT):
+            raise map_storage_error(PermissionDenied(acl.space)) from None
+
+        # P6.5-M — strenger als can_read_item: ein fremdes Bild vor einem sehenden Modell ist
+        # ein Injektionskanal, den <untrusted_content> strukturell nicht erreicht (Text-Wrapper).
+        # Schreibrecht ist der gewählte Vertrauensmarker, nicht Leserecht — wer mir schreiben
+        # darf, kann mir ohnehin Text unterschieben, ein zusätzliches Bild ändert daran nichts.
+        own = acl.space == principal.space
+        may_see_bytes = own or permissions.can_write_item(
+            principal.space, acl, surface=Surface.AGENT
+        )
+        if not may_see_bytes:
+            # Existenz erst prüfen, DANN Metadaten statt Bytes zurückgeben (Advisor-Fund vor
+            # dem Commit) — sonst wäre dieser Zweig für JEDE erfundene asset_id "erfolgreich"
+            # (bytes_available: false), während der erlaubte Zweig unten zwischen echter und
+            # erfundener ID unterscheidet (asset_not_found). Ein share_read-Halter bekäme damit
+            # eine andere Existenzauskunft als ein share_write-Halter für dieselbe ID — kein
+            # Rechteproblem (die Liste ist über get_item_meta ohnehin einsehbar), aber ein
+            # unehrliches bytes_available-Feld für ein Asset, das es gar nicht gibt.
+            matches = [a for a in store.list_assets(item_id) if a.id == asset_id]
+            if not matches:
+                raise map_storage_error(AssetNotFound(asset_id)) from None
+            asset = matches[0]
+            return compact_json({
+                "id": asset.id,
+                "item_id": item_id,
+                "mime": asset.mime,
+                "bytes": asset.bytes,
+                "filename": asset.filename,
+                "bytes_available": False,
+                "hint": "Bildbytes aus einem fremden Space werden nur bei Schreibrecht "
+                "geliefert — dieses Item ist nur mit dir geteilt, nicht freigeschrieben.",
+            })
+
+        try:
+            data, mime = store.get_asset(item_id, asset_id)
+        except ItemNotFound as exc:
+            # acl_of() oben ist bereits erfolgreich durchgelaufen -- item_id existiert. Ein
+            # ItemNotFound an dieser Stelle kann sich also nur noch auf asset_id beziehen
+            # (siehe AssetNotFound-Docstring).
+            raise map_storage_error(AssetNotFound(asset_id)) from exc
+
+        # V69 empirisch geprüft (Planungssession, `fastmcp` 3.4.4): Image._get_mime_type() baut
+        # aus format ausschließlich f"image/{format.lower()}" -- da mime hier immer exakt
+        # "image/png"|"image/jpeg"|"image/gif"|"image/webp" ist (sniff_image_mime()s einzige
+        # vier Werte), rekonstruiert der Split-Join-Roundtrip denselben String byte-identisch.
+        # Kein Fall, in dem Image(format=...) ein anderes MIME liefert als store.get_asset().
+        return Image(data=data, format=mime.split("/")[-1])
+
+    @mcp.tool(
+        title="Bild in ein Item ablegen",
+        description=(
+            "Kündige dem Nutzer VOR JEDEM Aufruf an, dass du jetzt ein Bild ablegst — bei "
+            "jedem Aufruf, nicht nur beim ersten. Lädt ein Bild (PNG/JPEG/GIF/WebP) als "
+            "base64-kodierte Bytes hoch, maximal 1 MiB Rohgröße nach der Dekodierung. "
+            "Schreibt NICHT den Body — füge die Referenz selbst mit update_item oder "
+            "patch_item als ![Alt](asset:<id>) ein, die id steht in der Quittung dieses "
+            "Aufrufs."
+        ),
+        annotations={
+            "readOnlyHint": False,
+            "destructiveHint": True,
+            "idempotentHint": False,
+            "openWorldHint": False,
+        },
+    )
+    def put_item_asset(
+        item_id: str, data_base64: str, filename: str | None = None
+    ) -> str:
+        principal = _authenticated_principal()
+        try:
+            acl = store.acl_of(item_id)
+        except ItemNotFound as exc:
+            raise map_storage_error(exc) from exc
+
+        if not permissions.can_write_item(principal.space, acl, surface=Surface.AGENT):
+            raise map_storage_error(PermissionDenied(acl.space)) from None
+
+        try:
+            data = base64.b64decode(data_base64, validate=True)
+        except binascii.Error as exc:
+            raise map_storage_error(
+                ValidationError(f"data_base64 ist kein gültiges Base64: {exc}")
+            ) from exc
+
+        if len(data) > MAX_MCP_ASSET_BYTES:
+            raise map_storage_error(ValidationError(
+                f"Bild überschreitet {MAX_MCP_ASSET_BYTES} Bytes (Rohgröße nach "
+                "Base64-Dekodierung) — der MCP-Weg erlaubt weniger als die Web-UI (N6)."
+            )) from None
+
+        try:
+            asset = store.put_asset(item_id, data=data, filename=filename)
+        except (ItemNotFound, ValidationError) as exc:
+            raise map_storage_error(exc) from exc
+
+        # Kein write_receipt() (das nimmt ein Item und einen der vier Text-op-Werte entgegen,
+        # P6-H) — ein Asset-Upload ändert weder Body noch Version des Items (store.put_asset()
+        # nimmt bewusst keinen version-Parameter, siehe Store-Docstring). Plan §3 Step B4
+        # verlangt trotzdem "item_version unverändert" in der Quittung, ausdrücklich, damit ein
+        # Modell nach dem Upload NICHT von sich aus annimmt, es müsse die version für den
+        # nächsten update_item-Aufruf neu lesen. Der zusätzliche store.get()-Aufruf (dieselbe
+        # billige, reine Metadaten-Lesart wie get_item_meta, kein Body) ist damit ein bewusster
+        # zweiter Read für ein Feld, das der Plan verlangt — nicht optional wegzulassen.
+        item_version = store.get(item_id, repair_drift=False).version
+        return compact_json({
+            "op": "asset",
+            "id": item_id,
+            "asset_id": asset.id,
+            "mime": asset.mime,
+            "bytes": asset.bytes,
+            "item_version": item_version,
+            "hint": "Referenz im Body ergänzen mit ![Alt](asset:" + asset.id + ") — "
+            "put_item_asset ändert den Body NICHT.",
+        })
+
     return {
         "list_spaces": list_spaces,
         "search_items": search_items,
@@ -771,4 +950,6 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         "update_item": update_item,
         "append_to_item": append_to_item,
         "patch_item": patch_item,
+        "get_item_asset": get_item_asset,
+        "put_item_asset": put_item_asset,
     }

@@ -2,13 +2,17 @@
 """mcp_smoke.py — Gegenstück zu `space_cli.py` aus P1 (Plan §4 Step 7). Baut ein **temporäres**
 `DATA_ROOT` (nie das echte), zwei Fixture-Spaces, startet `create_app()` in-process (kein
 echter Port, kein Netz — `httpx.ASGITransport`, dasselbe Muster wie `test_app.py`) und fährt
-die acht Tools einmal vollständig durch: `list_spaces`, `create_item` ×3, `search_items`,
+die zehn Tools einmal vollständig durch: `list_spaces`, `create_item` ×3, `search_items`,
 `get_item` eigen/fremd, `get_item_meta`, ein `update_item`-Konflikt, `append_to_item`,
-`patch_item`, `update_item(status=archived)`, ein `update_item` auf einen fremden Space. Am
-Ende eine Größenmessung (Bytes je Antwort) als Tabelle.
+`patch_item`, `update_item(status=archived)`, ein `update_item` auf einen fremden Space,
+`put_item_asset`, `get_item_asset`. Am Ende eine Größenmessung (Bytes je Antwort) als Tabelle.
 
 **Phase 6.5 Step A2:** `get_item_meta` dazugekommen — reine Metadaten-Prüfung nach `get_item`
 (eigen), 13→14 Checks.
+
+**Phase 6.5 Step B4:** `put_item_asset`/`get_item_asset` dazugekommen — Bild-Upload auf
+`created_ids[1]` (nicht `[0]`, das ist seit Check 7 archiviert), Roundtrip base64-dekodiert
+byte-identisch geprüft, 14→16 Checks.
 
 **P6 Step 1:** `create_item`/`append_to_item`/`update_item`/`patch_item` liefern seither per
 Default eine Quittung statt Dateitext (P6-H) — die betroffenen Prüfungen unten lesen die
@@ -31,6 +35,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import base64
 import json
 import logging
 import re
@@ -366,6 +371,47 @@ async def _run(data_root: Path, checks: list[Check]) -> None:
                     denial.is_error and "write_denied" in denial_text,
                     denial_text,
                     len(denial_text.encode("utf-8")),
+                )
+            )
+
+            # 9. put_item_asset -- Bild-Upload (Phase 6.5 Step B4). created_ids[1] statt [0]:
+            # [0] ist seit Check 7 archiviert, ein Asset-Upload auf ein archiviertes Item wäre
+            # ein anderer Testfall als der hier gewollte Erfolgspfad.
+            png = b"\x89PNG\r\n\x1a\n" + b"restliche-bytes-egal"
+            put_text = (
+                await own.call_tool(
+                    "put_item_asset",
+                    {"item_id": created_ids[1], "data_base64": base64.b64encode(png).decode()},
+                )
+            ).data
+            put_receipt = json.loads(put_text)
+            checks.append(
+                Check(
+                    "put_item_asset",
+                    put_receipt.get("op") == "asset"
+                    and put_receipt.get("mime") == "image/png"
+                    and "asset_id" in put_receipt,
+                    f"asset_id={put_receipt.get('asset_id')}",
+                    len(put_text.encode("utf-8")),
+                )
+            )
+
+            # 10. get_item_asset -- Bildbytes zurück, base64-dekodiert byte-identisch zum Upload.
+            asset_id = put_receipt.get("asset_id", "")
+            image_content = await own.call_tool(
+                "get_item_asset", {"item_id": created_ids[1], "asset_id": asset_id}
+            )
+            image_bytes = (
+                base64.b64decode(image_content.content[0].data)
+                if image_content.content and hasattr(image_content.content[0], "data")
+                else b""
+            )
+            checks.append(
+                Check(
+                    "get_item_asset",
+                    image_bytes == png,
+                    f"{len(image_bytes)} Bytes zurück, erwartet {len(png)}",
+                    len(image_bytes),
                 )
             )
 

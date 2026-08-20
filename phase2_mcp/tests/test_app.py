@@ -15,6 +15,7 @@ gegen eine temporäre `AuthStore` (`token_alpha`/`token_beta`-Fixtures) und reis
 from __future__ import annotations
 
 import asyncio
+import base64
 import json
 from collections.abc import Callable
 from contextlib import asynccontextmanager
@@ -350,7 +351,7 @@ async def test_mcp_bare_mount_redirects_without_leaking(app):
 
 
 @pytest.mark.asyncio
-async def test_tools_list_returns_eight_tools(app, token_alpha):
+async def test_tools_list_returns_ten_tools(app, token_alpha):
     async with app.router.lifespan_context(app):
         async with _mcp_client(app, token_alpha) as client:
             tools = await client.list_tools()
@@ -365,6 +366,8 @@ async def test_tools_list_returns_eight_tools(app, token_alpha):
         "update_item",
         "append_to_item",
         "patch_item",
+        "get_item_asset",
+        "put_item_asset",
     }
 
 
@@ -416,9 +419,9 @@ async def test_principal_isolation_under_concurrency(app, token_alpha, token_bet
 
 
 @pytest.mark.asyncio
-async def test_all_eight_tools_are_callable_over_http(app, token_alpha, token_beta, tmp_path):
-    """Step 6 Done-when (P2), um `patch_item` (P6 Step 1) und `get_item_meta` (Phase 6.5 Step
-    A2) erweitert: alle acht Tools über den
+async def test_all_ten_tools_are_callable_over_http(app, token_alpha, token_beta, tmp_path):
+    """Step 6 Done-when (P2), um `patch_item` (P6 Step 1), `get_item_meta` (Phase 6.5 Step A2)
+    und `get_item_asset`/`put_item_asset` (Phase 6.5 Step B4) erweitert: alle zehn Tools über den
     ASGI-Testclient aufrufbar — nicht nur als Python-Funktion (`test_tools.py`, Guard gemockt),
     sondern durch den echten Stack aus Step 5 (`BearerAuthASGI`, Guard, laufende FastMCP-App).
     Ein Rundlauf pro Tool reicht hier; die granulare Semantik (Wrapping, Klemmung, Fehlertexte,
@@ -464,6 +467,27 @@ async def test_all_eight_tools_are_callable_over_http(app, token_alpha, token_be
             )
             assert meta["version"] == 1
             assert "body" not in meta
+
+            put_asset_receipt = json.loads(
+                (
+                    await alpha.call_tool(
+                        "put_item_asset",
+                        {
+                            "item_id": new_id,
+                            "data_base64": base64.b64encode(
+                                b"\x89PNG\r\n\x1a\n" + b"http-roundtrip"
+                            ).decode(),
+                        },
+                    )
+                ).data
+            )
+            assert put_asset_receipt["op"] == "asset"
+            asset_image = await alpha.call_tool(
+                "get_item_asset",
+                {"item_id": new_id, "asset_id": put_asset_receipt["asset_id"]},
+            )
+            asset_bytes = base64.b64decode(asset_image.content[0].data)
+            assert asset_bytes == b"\x89PNG\r\n\x1a\n" + b"http-roundtrip"
 
             appended_text = (
                 await alpha.call_tool(
