@@ -7,7 +7,7 @@ up: ../CLAUDE.md
 down:
   - ../docs/concepts/phase1_storage_plan.md   # voller Plan, Entscheidungen A–H, Steps 0–7
   - SESSIONS_ARCHIVE.md                       # ältere Session-Blöcke
-updated: 2026-08-17 (P6 Step 7b Commit 1/3 -- vierte Contract-Oeffnung: store.py :: move() + _cleanup_emptied_folders(), 123 Tests)
+updated: 2026-08-20 (Phase 6.5 Step 0 -- fuenfte Contract-Oeffnung angekuendigt, noch kein Code: Asset-Support in models.py/files.py/store.py, siehe "Geerbte Contracts")
 ---
 # CLAUDE.md — Phase 1: Storage-Kern (`phase1_storage/`)
 
@@ -191,6 +191,21 @@ Umbau, siehe `phase6_shares/CLAUDE.md`. 36 neue Tests in `phase1_storage/` (1 `t
 `phase6_shares/tests/test_acl.py` (außerhalb dieses Pakets, gleiche Kategorie wie
 `test_patch.py`/`test_updates.py`). `git diff` auf `mcpserver/`/`webui/`/`authserver/` blieb leer
 — Step 4 bleibt vollständig innerhalb `storage/`, wie geplant (P6-C).
+
+**[2026-08-20, Phase 6.5 Step 0] Fünfte, benannte Contract-Öffnung angekündigt** (noch kein Code —
+Ankündigung **vor** Step B1, `docs/concepts/phase6_5_tools_images_plan.md` §3 Step B1, P6.5-T),
+Block C (Bilder): `models.py` bekommt `AssetInfo` (neuer Dataclass: `id`/`mime`/`bytes`/
+`filename`/`created`); `files.py` bekommt `new_asset_id()`, `sniff_image_mime()` (Magic-Byte-
+Erkennung PNG/JPEG/GIF/WebP, **kein** SVG/HEIC/PDF — P6-AZ), `asset_dir()`/`asset_path()`,
+`move_asset_dir()` (No-op ohne Quellverzeichnis, sonst `os.replace` + `fsync` wie überall);
+`store.py` bekommt `put_asset()`/`list_assets()`/`get_asset()`/`delete_asset()` (letzteres nur bei
+Phase-6.5-Entscheidung N5 ≠ „gar nicht") sowie eine Erweiterung von `move()` um
+`files.move_asset_dir(...)` **innerhalb** derselben Lock-Sektion, damit ein Move weiterhin genau
+**einen** Git-Commit erzeugt. **Datierte Notiz zu Entscheidung H** (kein Delete im Kern-API):
+Phase 6.5 löst N5 als „Verschieben statt Entfernen" (`_assets/<item_id>/_trash/`, dieselbe Bauart
+wie `_archive/`) — Entscheidung H bleibt damit formal unangetastet, `delete_asset()` löscht nie,
+es verschiebt. Charakterisierungstests (P6-D) laufen vor **und** nach dieser Öffnung
+byte-identisch grün, dieselbe Disziplin wie bei den vier Vorgängern.
 
 **[2026-08-17, P6 Step 7b Commit 1/3] Vierte, benannte Contract-Öffnung gebaut** (angekündigt in
 `phase6_shares/CLAUDE.md`s Session-Block vom selben Tag, `phase6_shares/ITEM_MOVE_PLAN.md` §4.1,

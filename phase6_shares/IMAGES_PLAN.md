@@ -5,7 +5,7 @@ read-when: bevor Block C gebaut wird, oder wenn geklärt werden muss, wie ein Bi
 detail: L2
 up: ./CLAUDE.md
 down: ../docs/concepts/phase6_shares_plan.md (Block C, nur stichwortartig) · ./GLOBAL_SEARCH_PLAN.md
-updated: 2026-08-19 (neu geschrieben, Planungssession; gelockt P6-AU–P6-BB, FÜNF offene Nikinger-Entscheidungen B1–B5, Abnahmezeilen 40–47)
+updated: 2026-08-20 (nachrangig -- abgeloest durch docs/concepts/phase6_5_tools_images_plan.md, alle B1-B5 dort gelockt, V59-V62 dorthin uebernommen); 2026-08-19 (neu geschrieben, Planungssession; gelockt P6-AU–P6-BB, FÜNF offene Nikinger-Entscheidungen B1–B5, Abnahmezeilen 40–47)
 ---
 
 # IMAGES_PLAN.md — Block C: Bilder (P6, Zusatzplan)
@@ -21,6 +21,16 @@ updated: 2026-08-19 (neu geschrieben, Planungssession; gelockt P6-AU–P6-BB, F�
 > editiert.
 
 ---
+
+> **[2026-08-20 Nachrangig-Notiz, Phase 6.5]** Dieses Dokument ist **nicht mehr die maßgebliche
+> Quelle für Block C** — `docs/concepts/phase6_5_tools_images_plan.md` (📕, gelockt) hat es
+> abgelöst: alle FÜNF Entscheidungen unten (B1–B5) sind dort in §0.0/§0.1 beantwortet und gelockt,
+> zusammen mit den zusätzlichen N1–N6-Fragen der Folgeplanung. **`[VERIFY]` V59–V62 hier sind
+> dieselben Nummern wie V59–V70 im neuen Plan — kein Duplikat, sondern eine Übernahme**: der neue
+> Plan hat V59/V61 bereits empirisch geschlossen und V60/V62 unverändert übernommen, bevor er auf
+> V70 weiterzählte. Dieses Dokument bleibt als Herkunftsnachweis stehen (P6-AU–P6-BB, die
+> ursprüngliche Bauart-Vorgabe `_assets/<item_id>/`), wird aber nicht mehr weitergepflegt — Bau
+> und Doku-Updates laufen ab jetzt gegen den Phase-6.5-Plan.
 
 ## ⚠️ §0 FÜNF offene Entscheidungen — vor dem Bau vom Nikinger einzuholen
 

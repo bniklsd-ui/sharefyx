@@ -11,7 +11,8 @@ down:
   - docs/concepts/phase4_auth_plan.md      # ausführungsreifer P4-Plan
   - docs/concepts/phase5_ui_plan.md        # ausführungsreifer P5-Plan
   - docs/concepts/phase6_shares_plan.md    # ausführungsreifer P6-Plan
-updated: 2026-08-13 (Phase 6 Steps 4-6 live deployed, Status-Absatz nachgezogen)
+  - docs/concepts/phase6_5_tools_images_plan.md   # ausführungsreifer P6.5-Plan
+updated: 2026-08-20 (neue Phase 6.5 -- Werkzeug-Ergonomie + Bilder -- ergaenzt, Step 0 gestartet)
 ---
 # ROADMAP — Space-Server
 
@@ -215,6 +216,35 @@ nicht deployed. Eine Planungsvormerkung für die nächste Session (Item-Verschie
 Ordnern/Spaces) steht offen. Herkunft: `docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` §4.1–§4.6. Plan:
 `docs/concepts/phase6_shares_plan.md` (Entscheidungen P6-A–P6-AC, Steps 0–10). Details:
 `phase6_shares/CLAUDE.md`s Session-Block vom 2026-08-13.
+
+---
+
+## Phase 6.5 — Werkzeug-Ergonomie und Bilder
+
+**Mission, zwei Blöcke:** (A) Eine arbeitende Claude-Instanz findet ihre Werkzeuge, versteht deren
+Aufgabenteilung aus der Beschreibung und zahlt keine Tausende Token für eine Versionsnummer.
+(B) Ein Bild liegt im Space, ist im Dokument sichtbar, technisch nur ein Link — und Claude sieht
+seine Bytes nur, wenn ein Mensch ausdrücklich danach fragt.
+
+- **DRIN:** fünf offene MCP-Werkzeug-Ergonomie-Punkte (`list_spaces`-Beschreibungsfehler,
+  `patch_item`/`update_item`-Aufgabenteilung, `get_item_meta`, Status-Enum in Tool-Beschreibungen,
+  Body-Suche als MCP-Opt-in), Abschluss Block C Bilder (Speicherung als Asset-Datei, Referenz im
+  Body, MCP-Lesen nur bei Schreibrecht und nie automatisch, MCP-Upload mit Ankündigungspflicht,
+  Entfernen per Verschieben nach `_trash/`).
+- **DRAUSSEN:** Bulk-Append-Tool (Befund: heute schon über mehrzeiligen Text möglich), Body-
+  Volltextsuche in der Web-UI (Q1 bleibt gelockt), automatische `_trash/`-Räumung (Vormerkung,
+  kein Auftrag), Space-Admin-UI (bleibt Phase 7), Rechteverwaltung über MCP-Tools, HEIC/SVG/PDF
+  als Bildformat, serverseitiges Bild-Rendering.
+- Sitzt bewusst zwischen Phase 6 und Phase 7 — kein Space-Admin-UI-Scope, `app.html`s „kommt in
+  Phase 7"-Zeichenkette bleibt unangetastet und korrekt. Zwei Blöcke, kein hartes Gate zwischen
+  ihnen (Block B bei Zeitdruck komplett verschiebbar, Block A nicht).
+
+**Status 🔄 (2026-08-20, Step 0 läuft):** Plan `docs/concepts/phase6_5_tools_images_plan.md`
+ausführungsreif, gelockte Entscheidungen P6.5-A–P6.5-V, sechs Nikinger-Fragen N1–N6 beantwortet
+und in §0.0 gelockt (Phasenname 6.5, kein `app.html`-Fix, kein Bulk-Append, Body-Suche als
+MCP-Opt-in, Bild-Entfernen per `_trash/`, `MAX_MCP_ASSET_BYTES=1 MiB`). Herkunft: Live-Feedback
+2026-08-14 (Werkzeug-Ergonomie) + `phase6_shares/IMAGES_PLAN.md` (jetzt nachrangig). Details:
+`phase6_5_tools_images/CLAUDE.md`s Session-Block.
 
 ---
 

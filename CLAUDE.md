@@ -144,6 +144,15 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 
 ## Current state
 
+**[2026-08-20] Zweite aktive Phase gestartet: Phase 6.5 — Werkzeug-Ergonomie und Bilder**
+(`phase6_5_tools_images/`, kein eigenes Python-Paket) — **🔄 Step 0.** Sitzt bewusst zwischen der
+noch laufenden Phase 6 und der reservierten Phase 7 (Space-Admin-UI, `app.html` unverändert).
+Deckt die fünf noch offenen MCP-Werkzeug-Ergonomie-Punkte (siehe „Noch nicht entschieden" unten —
+**jetzt geplant, nicht mehr offen**) und den Abschluss von Block C Bilder ab (löst
+`phase6_shares/IMAGES_PLAN.md` als maßgebliche Quelle ab). Plan: `docs/concepts/
+phase6_5_tools_images_plan.md` (Entscheidungen P6.5-A–P6.5-V, alle sechs Nikinger-Fragen N1–N6
+gelockt in §0.0). Phase-Head: `phase6_5_tools_images/CLAUDE.md`.
+
 **Aktive Phase:** Phase 6 — Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`, kein
 eigenes Python-Paket) — **🔄 gestartet, 2026-08-09.** Ausführungsreifer Plan lag bereits vor
 (`docs/concepts/phase6_shares_plan.md`, Entscheidungen P6-A–P6-AC, Steps 0–10, drei Blöcke: A =
@@ -321,6 +330,10 @@ P2 Step 2 — siehe P2-Plan §0.4 Punkt L).
 | R6 | Zweck | **Lernprojekt**, später evtl. Arbeitswerkzeug. Bei Zielkonflikt gewinnt Lerneffekt über Bequemlichkeit — außer bei Safety/Secrets, dort gewinnt immer die sichere Variante. |
 
 **Noch nicht entschieden (bewusst offen, für spätere Planungssessions):**
+- ~~MCP-Werkzeug-Ergonomie, fünf offene Punkte~~ **[2026-08-20 geplant und gelockt]** — jetzt
+  Block A von Phase 6.5 (`docs/concepts/phase6_5_tools_images_plan.md` §3, Entscheidungen
+  P6.5-A–P6.5-H u. a.). Kein offener Planungsbedarf mehr — nur noch **nicht gebaut**. Der
+  Absatz unten bleibt als Herkunftsnachweis stehen.
 - ~~Item-Verschieben zwischen Ordnern und Spaces~~ **[2026-08-17 geplant und gelockt]** —
   `phase6_shares/ITEM_MOVE_PLAN.md` §4 (Step 7b, Space-Move, Entscheidungen P6-AD–AJ) + §9
   (Mehrfachauswahl, P6-AK–AN) sind ausführungsreif und per Nikinger-Freigabe gelockt. Kein
@@ -339,9 +352,9 @@ P2 Step 2 — siehe P2-Plan §0.4 Punkt L).
   obwohl die Ursache kategorisch ist (`patch_item` erreicht Frontmatter grundsätzlich nicht) —
   ein erneutes Lesen hätte nie geholfen. **[2026-08-14 behoben]** dieser eine Befund (Text nennt
   jetzt die Ursache + `update_item` als Alternative, keine Frontmatter-Erkennungslogik ergänzt);
-  die übrigen fünf Punkte bleiben offen, betreffen ausschließlich `mcpserver/tools.py` (P6-C
-  erlaubt das), noch nicht geplant. Volltext: `phase6_shares/CLAUDE.md`, Abschnitt
-  „Vormerkungen".
+  die übrigen fünf Punkte betreffen ausschließlich `mcpserver/tools.py` (P6-C erlaubt das) und
+  sind **[2026-08-20]** als Block A von Phase 6.5 geplant, siehe oben. Volltext:
+  `phase6_shares/CLAUDE.md`, Abschnitt „Vormerkungen".
 
 **[2026-08-02 Korrektur, P5-Planungssession]:** der bis dahin offene Punkt „Web-UI: Neubau gegen
 die REST-API vs. Adaption des `Notizheft_example.html`" ist entschieden — **Neubau mit Ernte**

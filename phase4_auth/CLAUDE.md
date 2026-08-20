@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase4_auth_plan.md          # voller Plan, Entscheidungen P4-A–P4-R, Steps 0–7
   - ../docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md  # Herkunft der offenen Entscheidungen, Doku-Drift, [VERIFY]-Bilanz
   - SESSIONS_ARCHIVE.md                            # ältere Session-Blöcke, newest-first
-updated: 2026-08-06
+updated: 2026-08-20 (Vormerkung: bekannter reihenfolgeabhaengiger pytest-Flake in test_authctl.py, ausserhalb P4-Scope entdeckt)
 ---
 
 # CLAUDE.md — Phase 4: OAuth 2.1 + DCR (`phase4_auth/`)
@@ -209,6 +209,14 @@ Tabellen anlegte). `SCHEMA_VERSION` jetzt `"3"`, zwei neue Methoden
 darunter ein Migrationstest v2→v3 nach dem Muster des bestehenden v1→v2-Tests). Speist das
 Update-Log-Banner in `phase5_ui/webui/api.py`. Volle Herleitung: `phase6_shares/CLAUDE.md`
 Step-3-Session-Block — lebt dort, gleiche Begründung wie beim O2-Absatz oben.
+
+**[2026-08-20, außerhalb P4-Scope, nur vermerkt] Bekannter Flake:**
+`phase4_auth/tests/test_authctl.py::test_revoke_kills_the_family` schlug im ersten vollen
+`pytest`-Lauf einer Phase-6.5-Kickoff-Session fehl (`argparse: --family-id: expected one
+argument`), lief isoliert grün und im vollständigen Re-Run ebenfalls grün — reihenfolgeabhängig,
+vermutlich ein `family_id`-Kollisionsfall mit einem vorangehenden Test statt ein echter Bug.
+Nicht untersucht (kein P4-Code angefasst, außerhalb des aktuellen Auftrags). Vermerkt hier, damit
+ein künftiges „`pytest` nicht grün" nicht neu diagnostiziert werden muss, bevor jemand es fixt.
 
 ---
 
