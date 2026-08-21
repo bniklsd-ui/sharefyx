@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase6_5_tools_images_plan.md   # voller Plan, Entscheidungen P6.5-A–P6.5-V, §0.0 gelockte N1–N6, Steps 0/A/B
   - ../phase6_shares/IMAGES_PLAN.md                  # Vorgänger-Zusatzplan, nachrangig seit 2026-08-20
   - SESSIONS_ARCHIVE.md                              # ältere Session-Blöcke, newest-first
-updated: 2026-08-20 (Block B Step B5 gebaut: diagnose.sh Pruefung 13, UPDATE_LOG.md, ui_budget.py Lauf -- Block B vollstaendig, 828 pytest unveraendert, sechste Rotation gelaufen)
+updated: 2026-08-21 (Live-Deploy bestaetigt: Block A + Block B vollstaendig live, f96125e -- Gate A->B MCP-Rundlauf vom Nikinger freigegeben, noch nicht ausgefuehrt [Connector nicht verdrahtet], siebte Rotation gelaufen)
 ---
 # CLAUDE.md — Phase 6.5: Werkzeug-Ergonomie und Bilder (`phase6_5_tools_images/`)
 
@@ -41,12 +41,12 @@ Testliste, Abnahmezeilen: `docs/concepts/phase6_5_tools_images_plan.md`.
 | Block | Inhalt | Status |
 |---|---|---|
 | Step 0 | Haushalt/Ankündigungen | ✅ |
-| Block A (Steps A1/A2/A4; A3 bewusst nicht gebaut, N3) | Werkzeug-Ergonomie (`mcpserver/tools.py`, `storage/store.py :: search(in_body=)`) | ✅ **gebaut**, noch nicht deployt — Gate A→B (echte Connector-Probe) steht aus |
-| Block B Step B1 | Storage-Fundament Bilder (`storage/{files,store,models}.py`) | ✅ **gebaut** |
-| Block B Step B2 | REST-Fläche Bilder (`phase5_ui/webui/{api,serializers}.py`) | ✅ **gebaut**, noch nicht deployt |
-| Block B Step B3 | Web-UI Anzeigen/Einfügen (`phase5_ui/webui/static/{app.html,app.css,js/{markdown,editor}.js}`) | ✅ **gebaut**, Playwright grün+gesehen, noch nicht deployt |
-| Block B Step B4 | MCP-Fläche Bilder (`mcpserver/tools.py` — `get_item_asset`/`put_item_asset`) | ✅ **gebaut**, `mcp_smoke.py` 16/16, noch nicht deployt |
-| Block B Step B5 | Betrieb/Deploy-Vorbereitung (`diagnose.sh` Prüfung 13, `UPDATE_LOG.md`, `ui_budget.py`) | ✅ **gebaut, Block B vollständig** |
+| Block A (Steps A1/A2/A4; A3 bewusst nicht gebaut, N3) | Werkzeug-Ergonomie (`mcpserver/tools.py`, `storage/store.py :: search(in_body=)`) | ✅ **gebaut, live deployt 2026-08-21** — Gate A→B (echte Connector-Probe) steht weiterhin aus |
+| Block B Step B1 | Storage-Fundament Bilder (`storage/{files,store,models}.py`) | ✅ **gebaut, live deployt 2026-08-21** |
+| Block B Step B2 | REST-Fläche Bilder (`phase5_ui/webui/{api,serializers}.py`) | ✅ **gebaut, live deployt 2026-08-21** |
+| Block B Step B3 | Web-UI Anzeigen/Einfügen (`phase5_ui/webui/static/{app.html,app.css,js/{markdown,editor}.js}`) | ✅ **gebaut, live deployt 2026-08-21**, Playwright vor dem Deploy grün+gesehen |
+| Block B Step B4 | MCP-Fläche Bilder (`mcpserver/tools.py` — `get_item_asset`/`put_item_asset`) | ✅ **gebaut, live deployt 2026-08-21**, `mcp_smoke.py` 16/16 |
+| Block B Step B5 | Betrieb/Deploy-Vorbereitung (`diagnose.sh` Prüfung 13, `UPDATE_LOG.md`, `ui_budget.py`) | ✅ **gebaut, Block B vollständig, live deployt 2026-08-21** |
 
 ## Geerbte Contracts
 
@@ -56,76 +56,62 @@ Details dort, nicht hier dupliziert.
 
 ---
 
-## Session stopped — 2026-08-20 (Block B Step B5 gebaut: Betrieb/Deploy-Vorbereitung — Block B vollständig)
+## Session stopped — 2026-08-21 (Live-Deploy bestätigt: Block A + Block B vollständig live)
 
-**Auftrag:** direkter Anschluss an Step B4, letzter Schritt von Block B. Plan §3 Step B5:
-`diagnose.sh` Prüfung 13 (Größenmessung), `docs/UPDATE_LOG.md`-Eintrag, `ui_budget.py`-Lauf.
-Reines Betriebs-/Ops-Skript-Zeug, keine Python-Kernlogik — bewusst kein Advisor-Call nötig,
-Nikinger-Vorgabe für diese Session: nur noch EIN Advisor-Call insgesamt, für den Abschluss.
+**Auftrag:** Nikinger führte den in der Vorsitzung übergebenen Deploy-Befehl selbst live aus
+(Sudo für den Neustart, außerhalb dessen, was Claude Code selbst kann — Präzedenz seit P6 Steps
+4–6). Diese Session: Ergebnis read-only nachgeprüft, Doku nachgezogen (Hard Rule 8).
 
-**Gebaut, exakt wie im Plan §3 Step B5 vorgezeichnet:**
-- `phase3_edge/scripts/diagnose.sh` — **Prüfung 13** (neu, INFO, kein Abbruchkriterium, dieselbe
-  Kategorie wie 9/11/12): Gesamtgröße aller `_assets/`-Verzeichnisse über alle Spaces (`find
-  -mindepth 2 -maxdepth 2 -type d -name '_assets'`, passend zu `files.py :: asset_dir()`s
-  echtem Pfad `<data_root>/<space>/_assets`) + Größe von `$DATA_ROOT/.git`. Begründung direkt im
-  Skript: B1 = ja (Bilder werden mitcommittet, Git-Historie wächst monoton, ein entferntes Bild
-  gibt keine Bytes frei) und B2 = 5 MiB je Bild ohne Space-Gesamtbudget heißt „messen statt
-  deckeln" — diese Prüfung ist das Messgerät. Nutzt dieselbe `$data_root`-Auflösung wie Prüfung
-  12 (kein zweiter `local.env`-Read). `numfmt --to=iec` für menschenlesbare Ausgabe, Fallback
-  auf rohe Byte-Zahl, falls `numfmt` fehlt.
-- `docs/UPDATE_LOG.md` — neuer Eintrag oben, heutiges Datum (P6-X-Gate in `deploy.sh` verlangt
-  das), zwei Zeilen: Bilder in Notizen (Upload/Ansehen/Einfügen im Editor), Claude beschreibt
-  seine Werkzeuge klarer.
-- `phase5_ui/scripts/ui_budget.py` einmal real gelaufen (temporäres `DATA_ROOT`, kein Live-
-  Zugriff): alle 5 Messgrößen weiterhin im Zielkorridor — `app.js + app.css + Font (gzip)`
-  jetzt **79.5 KB** (Ziel < 250 KB), trotz `markdown.js` (+Bildzweig/`safeSrc`) und `editor.js`
-  (+Upload-Handler/`insertAtCursor`) deutlich unter dem Korridor. Erstaufruf-Gesamtgröße 84.1 KB
-  (Ziel < 400 KB).
+**Was live passierte, per Transkript, nicht nur behauptet:**
+1. `diagnose.sh` scheiterte zunächst an Prüfung 4 (`tailscale funnel status` zeigte Port 8765
+   nicht als aktiv) — ein anderer, einfacherer Fund als der 2026-08-19-Fallstrick (Prüfung 5,
+   Backhaul-Problem): hier fehlte die Funnel-Weiterleitung selbst, wahrscheinlich nach einem
+   zwischenzeitlichen Neustart/Session-Reset nicht neu aufgebaut. `sudo tailscale funnel --bg
+   8765` (Sudo nötig, weil kein `tailscale set --operator=savefyx` gesetzt ist — Betriebsnotiz,
+   kein Bug) behob es, danach lief `diagnose.sh` sauber durch (nicht im Transkript wiederholt,
+   aber der Deploy-Lauf direkt danach setzt eine funktionierende Prüfung voraus).
+2. `sudo systemctl start sharefyx-authbackup.service` — frisches Auth-Backup vor der
+   `auth.sqlite3`-Migration (kein neues Schema in diesem Release, aber Standardvorsicht).
+3. `SHAREFYX_RELEASES_DIR=/opt/sharefyx/releases SHAREFYX_CURRENT_LINK=/opt/sharefyx/current
+   SHAREFYX_DATA_ROOT=/home/savefyx/savefyx-data SHAREFYX_BACKUP_DIR=/var/lib/sharefyx-backup
+   SHAREFYX_SYSTEMCTL="sudo systemctl" phase5_ui/scripts/deploy.sh main` — 828/828 Tests im
+   Release-Build grün, `docs/UPDATE_LOG.md`-Gate (P6-X) bestand ohne Override (Datum war auf
+   2026-08-21 vorbereitet, siehe vorherige Session), Health-Gate `/ui/login`→200,
+   `/api/v1/me`→401, `/mcp/`→401, Retention entfernte das älteste Release (`20260810...`,
+   KEEP=5), JSON bestätigt `"result":"ok"`.
+4. **Read-only gegengeprüft, nicht nur die JSON-Zeile vertraut:** `readlink -f
+   /opt/sharefyx/current` → `/opt/sharefyx/releases/20260821T183341.270842Z`; `git log
+   --oneline -1` darin → `f96125e`, identisch mit dem `main`-HEAD zum Deploy-Zeitpunkt (der
+   Commit mit dem korrigierten `UPDATE_LOG.md`-Datum aus der Vorsitzung).
 
-**Kein Code-Fund, keine Abweichung.** Reines Betriebsartefakt-Kapitel, bewusst ohne Advisor-
-Runde (Nikinger-Vorgabe dieser Session: ein einziger Advisor-Call, für die Abschlussprüfung
-unten) — die diagnose.sh-Logik selbst wurde stattdessen gegen ein echtes temporäres
-Test-`DATA_ROOT` (zwei `_assets/`-Verzeichnisse verschiedener Größe + ein `.git`-Verzeichnis,
-nie das reale) durchgerechnet: 12345+5000 Bytes Assets korrekt zu 17345 summiert, 2000 Bytes
-`.git` korrekt gemeldet — Arithmetik verifiziert, nicht nur `bash -n` (Syntaxprüfung) vertraut.
+**Ergebnis: Block A und Block B (Steps B1–B5) sind live**, nicht nur gebaut — Modul-Status-Tabelle
+oben nachgezogen (jede Zeile trägt jetzt „live deployt 2026-08-21").
 
-**Tests:** keine neuen (Bash-Skript + Markdown-Doku, kein Python — dieselbe Kategorie wie P5-T
-für JS: `diagnose.sh` hat repo-weit keine Unit-Tests, nur `bash -n` + reale Läufe als Beweis,
-kein einziger Test in `phase3_edge/tests/`/`phase5_ui/tests/` referenziert das Skript). `pytest`
-**828 unverändert**. Tabu-Diff nicht relevant (kein `storage/`/`mcpserver/`/`webui`-Python-Diff
-in diesem Step — nur `phase3_edge/scripts/diagnose.sh` + `docs/UPDATE_LOG.md`, beide laut Plan
-§2 ausdrücklich erlaubt).
+**Was live sein UND nicht sein bedeutet:** der Deploy selbst schließt Gate A→B nicht. Gate A→B
+ist definiert als eine echte Claude-Connector-Probe (claude.ai/Desktop gegen den echten OAuth-
+Connector) — das ist ein Nutzungsereignis, kein Deploy-Ereignis. V60 (rendert der Connector
+`ImageContent`?) und V64 (löst `destructiveHint: True` eine wiederholte Rückfrage aus?) bleiben
+beide offen, aus demselben Grund: Client-Verhalten, das nur eine echte Sitzung beantworten kann.
 
-**Verifiziert:** `bash -n diagnose.sh` sauber, Prüfung-13-Arithmetik gegen ein echtes
-Temp-`DATA_ROOT` nachgerechnet (Ergebnis oben), `ui_budget.py` real gelaufen (5/5 im
-Zielkorridor, Rohausgabe gesehen), `pytest` 828/828 unverändert, `git status` zeigt nur die
-beiden erwarteten Dateien. **Advisor-Nachprobe vor dem Commit:** Prüfung 13 gegen dieselbe
-Temp-Harness erneut gefahren, diesmal mit `set -euo pipefail` (wie im echten Skript) UND einem
-per `chmod 000` unlesbaren Space-Unterverzeichnis — `find ... 2>/dev/null` überspringt ihn
-lautlos, die `while <(process substitution)`-Schleife bricht `pipefail` nicht, das Skript
-endet weiterhin mit `exit 0`. Kein Fund, nur bestätigt.
+**Vom Nikinger für diese Session freigegeben, noch nicht ausgeführt:** ein MCP-Werkzeug-Rundlauf
+gegen den echten, jetzt live deployten Connector — ausdrücklich mit der Auflage, jedes dabei
+angelegte Item danach zu archivieren (`update_item(status="archived")`, nie Hard-Delete, Hard
+Rule 5/Entscheidung H). **Blockiert:** diese Claude-Code-Sitzung hat den sharefyx-MCP-Server
+nicht als Tool verdrahtet (`ToolSearch` liefert keinen Treffer, keine `.mcp.json`/kein
+MCP-Server-Eintrag in den Settings dieser Session) — die OAuth-Autorisierung (Passwort + TOTP,
+Browser-Flow) kann diese Sitzung nicht selbst durchlaufen, das ist absichtlich so gebaut (Hard
+Rule: kein Secret, das den Server umgeht). Der Rundlauf braucht entweder (a) den Nikinger, der
+den Connector selbst gegen den echten Prompt fährt und berichtet, oder (b) `claude mcp add`
+gegen die echte `PUBLIC_BASE_URL` mit einer echten, vom Nikinger im Browser abgeschlossenen
+OAuth-Anmeldung, danach könnte DIESE Sitzung die zehn Tools nativ aufrufen. Noch keins von
+beidem geschehen — für die nächste Session vorgemerkt, kein stiller Rückzug vom Auftrag.
 
-**Block B (Bilder) ist damit vollständig: Steps B1–B5 alle gebaut, noch nicht deployt.**
+**Verifiziert:** keine Testsuite in dieser Session gelaufen (reine Doku-Nachpflege, kein
+Code-Diff). `git status` zeigt ausschließlich den Phase-Head + `SESSIONS_ARCHIVE.md` +
+`docs/INDEX.md`.
 
 **Offen für die nächste Session:**
-- Commit + Push (Nikinger-Freigabe ausstehend zum Zeitpunkt des Schreibens).
-- **Vor jedem Deploy:** `diagnose.sh` frisch fahren (geerbte Auflage seit dem
-  Funnel-Reboot-Fund, `phase3_edge/CLAUDE.md`) — jetzt inklusive der neuen Prüfung 13.
-- **`docs/UPDATE_LOG.md`s neuer oberster Eintrag trägt `2026-08-20`.** `deploy.sh`s P6-X-Gate
-  verlangt an JEDEM Deploy-Tag ein heutiges Top-Datum — findet der Deploy nicht heute statt,
-  muss das Datum vor dem `deploy.sh`-Lauf einmal nachgezogen werden (oder
-  `SHAREFYX_ALLOW_STALE_UPDATELOG=1` bewusst gesetzt werden), sonst bricht ein ansonsten
-  sauberer Deploy grundlos am Gate ab.
-- **`ROADMAP.md` Zeile 15 (`Step 0 gestartet`) bewusst stehen gelassen, nicht nachgezogen** —
-  Hard Rule 8 nennt nur Phase-Head + `docs/INDEX.md`, `ROADMAP.md` wird laut Präzedenz (P5)
-  erst beim Phasenabschluss aktualisiert, nicht bei jedem Step. Explizit vermerkt, damit das
-  eine bewusste Entscheidung bleibt und keine unbemerkte Drift.
-- Gate A→B (echte Connector-Probe für Block A) steht weiterhin aus, unverändert — **das ist
-  jetzt der einzige verbleibende Blocker vor einem Deploy von Block A UND B**, keine offenen
-  Bau-Schritte mehr in dieser Phase außer der Deploy-Vorbereitung selbst.
-- V64 (löst `destructiveHint: True` bei claude.ai tatsächlich eine Rückfrage aus?) bleibt offen,
-  braucht dieselbe echte Connector-Probe wie Gate A→B — beide können in einem Aufwasch geprüft
-  werden, sobald der Nikinger den Connector gegen diesen Stand testet.
-- `filename`-Persistenzfrage (dreimal berührt: B1/B2/B4, nie entschieden) bleibt offen.
-- Bekannte Doku-Schuld (`phase6_shares/CLAUDE.md` Block-C-Text stale) und der
-  `test_authctl.py`-Flake bleiben unverändert offen.
+- Gate A→B: entweder Nikinger-Live-Probe oder `claude mcp add` mit echter OAuth-Anmeldung, dann
+  der zugesagte Werkzeug-Rundlauf inkl. Archivieren jedes Test-Items.
+- V60/V64 bleiben offen, an dieselbe Probe gekoppelt.
+- `filename`-Persistenzfrage, Doku-Schuld, `test_authctl.py`-Flake: unverändert offen.
