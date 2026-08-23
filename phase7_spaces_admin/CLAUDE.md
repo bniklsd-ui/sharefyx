@@ -105,7 +105,7 @@ keinen Code bekommen, nur Step 0 (Haushalt) lief.
 | P7-6 | `PATCH` mit Tippfehler-Feld abgewiesen (O6) | Claude Code, Test | ✅ `test_items_patch_rejects_an_unknown_field` |
 | P7-7 | Speichern/Verschieben/Freigeben nach Whitelist unverändert | Niklas | 🟡 Whitelist per Test gegen die real gesendeten Felder gepinnt, keine Browserprobe |
 | P7-8 | Migration: 0 `.md` ohne `visibility:` | Nikinger + Claude Code | ✅ `--apply` 2026-08-23, `items_migrated:73` (deckungsgleich Dry-Run), `grep -L '^visibility:'`→0, 3 Commits (niklas/fabian/IT-Sekus-Projekt) |
-| P7-9 | `clients`/`token_families` sinken nach realem Purge (ab 2026-08-28) | Niklas | ⬜ |
+| P7-9 | `clients`/`token_families` sinken nach realem Purge | Niklas | ⬜ — `token_families` ab 2026-08-28, `clients` erst ab 2026-10-27 (siehe Session-Block, Retention 30d/90d) |
 | P7-10 | `testnutzer-p7` existiert, schreibt einmal | Nikinger + Claude Code | ✅ `p7_10_write_probe.py`, `itm_ee1e0323` |
 | P7-11 | `testnutzer-p7` sieht nur sein item-level Item | Claude Code | ✅ Web-UI (P6-Zeilen 36/37, echter Login) **und** MCP (`p7_11_visibility_probe.py`) |
 | P7-12 | `testnutzer-p7` entfernt, Keyring-Eintrag weg | Claude Code | ⬜ |
@@ -126,381 +126,61 @@ keinen Code bekommen, nur Step 0 (Haushalt) lief.
 **Geerbt und in dieser Phase nicht adressiert:** P6-Zeilen 7, 9, 14–17, 23, 25, 29, 30 sowie
 P6.5-14 — bleiben im Handover offen, kein stilles Abhaken (Plan §6, Fußnote).
 
-## Session stopped — 2026-08-23 (Step 0 gestartet: Verifikationsdurchlauf + Doku-Audit)
+## Session stopped — 2026-08-24 (Manueller Purge gefahren, P6.5-12-Browserprobe: Deploy-Blocker gefunden, Versionsbump)
 
-**Auftrag:** Erste Claude-Code-Sitzung von Phase 7. Einstieg ist Step 0, erster Handgriff das
-Doku-Audit aus Handover §4.1 (Plan §4 Step 0.2).
+**Auftrag:** Fortsetzung derselben Sitzung, Datumswechsel während der Sitzung. Nikinger bot an,
+den Purge (A6) manuell vorzuziehen und half beim P6.5-12-Browsernachweis mit eigenem Login.
 
-**0.1 — `pytest`-Ausgangsstand:** `828 passed`, deckungsgleich mit der Erwartung aus dem P6.5-
-Handover-Nachtrag. **V71 geschlossen.**
+**A6 — Purge manuell gefahren (Nikinger, `sudo systemctl start sharefyx-purge.service`).**
+Baseline vorher (read-only): `clients: 54`, `token_families: 35`. Lauf `status=0/SUCCESS`, echte
+Löschungen (`auth_requests: 8, auth_codes: 7, access_tokens: 15, invites: 1` — 31 Zeilen), aber
+`clients`/`token_families` beide **unverändert bei 54/35**. Kein Fehlschlag — geprüft:
+`TOKEN_FAMILY_RETENTION_S = 30*86400`, `CLIENT_RETENTION_S = 90*86400`
+(`authserver/store.py:54,63`), ältester `clients`/`token_families`-Eintrag ist
+`2026-07-29T15:02:27Z`. **Präzisierung gegenüber dem Plan-Text:** `token_families` wird ab
+**2026-08-28** sichtbar sinken (deckt sich mit der Plan-Erwartung), `clients` aber erst ab
+**2026-10-27** — fast zwei Monate später als angenommen. P7-9 bleibt ⬜, jetzt mit korrekter
+Zeitangabe für beide Tabellen statt einer gemeinsamen.
 
-**0.2 — Doku-Audit, mit SHA-Beweis je Zeile.** `LIVE = f96125e` (`/opt/sharefyx/current`).
-Geprüft per `git merge-base --is-ancestor <sha> $LIVE` gegen die Commits, die den jeweiligen
-Modul-Status-Zeilen 8–16 in `phase6_shares/CLAUDE.md` entsprechen:
+**P6.5-12-Browserprobe: echter Fund, kein Bug.** Zweiter Login-Anlauf nötig — der erste
+Nikinger-Login lief in einem Tab außerhalb meiner MCP-Tab-Gruppe, `sessionStorage`s
+`sfx:csrf` wird ausschließlich von der `/ui/login`-POST-Antwort gesetzt
+(`app.js:34-36`, `location.pathname !== "/ui/"`), ein reines Neuladen von `/ui/` liefert ihn
+nicht nach — korrektes P5-H-Verhalten, kein Leck (erster Upload-Versuch schlug entsprechend mit
+`403 csrf_failed` fehl). Nikinger loggte sich ein zweites Mal ein, diesmal im von mir
+gesteuerten Tab (`testcred.py password`/`totp` in seinem eigenen Terminal, nie durch mich
+gelesen). Upload gelang (`ast_2cf1ce2f`, `itm_ee1e0323`, PIL-PNG), Bild rendert sichtbar, `.md`
++ Asset-Datei korrekt im echten `DATA_ROOT`. **Aber:** `document.getElementById('asset-strip')`
+→ `null` auf der Live-Seite. Ursache gefunden: **die Live-Instanz läuft weiterhin Release
+`f96125e` (2026-08-21) — fünf Commits dahinter**, darunter A3 (`d974836`, baut genau dieses
+`<div id="asset-strip">`). `docs/UPDATE_LOG.md`s oberster Eintrag ist auf `2026-08-23` datiert,
+mit dem Datumswechsel auf `2026-08-24` würde `deploy.sh`s Gate (P6-X) jetzt ohnehin abbrechen.
+**Kein Code-Fehler — der Knopf existiert im Repo, ist nur nie ausgeliefert worden.** P6.5-12
+bleibt deshalb 🟡 ungeprüft, aus einem neuen, treffenderen Grund als zuvor.
 
-| Zeile | Modul | Commit(s) | Ergebnis |
-|---|---|---|---|
-| 8 | Step 7a Textfarben + Wortmarke-Nachtrag | `562d279`, `15cf054` | IST live |
-| 9 | Step 7 Commit 0 (app.js-Split) | `1959de8` | IST live |
-| 10 | Step 7 Commit 1 (echter Ordnerbaum) | `fbcdb9f` | IST live |
-| 11 | Step 7 Commit 2 (Sichtbarkeits-Chip) | `e48c039` | IST live |
-| 12 | Step 7 Commit 3 (Ordner anlegen+Verschieben, K4) | `5db817e` | IST live |
-| 13 | Step 7 Commit 4 (Drag & Drop) | `0c504a4` | IST live |
-| 14 | Step 7 Commit 5a (Re-Auth-Gate Backend) | `928908c` | IST live |
-| 15 | Step 7 Commit 5b (Freigabe-Dialog+Re-Auth-Formular) | `cd94061` | IST live |
-| 16 | Step 7 Commit 6 (`space_admin_enabled`-Stub) | `0378c41` | IST live |
+**Deploy bewusst nicht selbst ausgeführt:** `deploy.sh` braucht `SHAREFYX_SYSTEMCTL="sudo
+systemctl"` für den Restart-Schritt; `sudo -n true` bestätigte fehlende passwortlose Rechte
+(`exit:1`). Genau die Art Aktion („live Dienst neu starten, beeinflusst laufende Sitzungen"),
+die dieses Projekt konsequent dem Nikinger überlässt — kein Umgehungsversuch unternommen, dem
+Nikinger die Optionen vorgelegt (selbst deployen / mir `sudo` geben / verschieben). **Nikinger-
+Entscheidung: verschieben, Sitzung hier beenden, Test in der nächsten Sitzung.**
 
-Zusätzlich geprüft, weil dieselbe Fehlbehauptung an zwei weiteren Stellen stand: **Vormerkungen
-Punkt 2** (Space-zu-Space-Verschieben, Step 7b, drei Commits `9274346`/`3f476c7`/`abeaba6`) — alle
-drei ebenfalls Vorfahren von `f96125e`.
+**Versionsbump, Nikinger-Auftrag:** `.rail__version` in `app.html` `v2.1` → `v2.2` (reiner
+Hardcode wie die Wortmarke selbst, kein Test pinnt den String, kein Schema). Reitet mit dem
+nächsten Deploy mit.
 
-**Befund: die Doku war stale, nicht der Code.** Alle neun geprüften Zeilen (8–16) trugen „gebaut,
-noch nicht deployt" bzw. „Deploy beim Nikinger" — tatsächlich sind sie seit dem Phase-6.5-Deploy
-(`f96125e`, 2026-08-21) live. **Wichtig, per Advisor-Hinweis eingehalten: „deployt" ≠
-„abgenommen".** Diese Korrektur ändert ausschließlich den Deploy-Status der Zeilen, **nicht**
-ihren Abnahmestatus — Zeile 8 z. B. bleibt ohne eigenen Abnahmematrix-Punkt, die Space-Move-
-Zeilen 25–30 bleiben „offen", nur das „noch nicht deployt" darin ist jetzt falsch und wurde
-entfernt. Korrigiert in `phase6_shares/CLAUDE.md` (Zeilen 8–16 + Vormerkungspunkt 2), in
-Root-`CLAUDE.md`s Current-State-Absatz (trug denselben veralteten Satz zu `d348e2e`, obwohl
-`phase6_shares/CLAUDE.md` die Korrektur vom 2026-08-23 schon hatte — Root hatte sie nie
-bekommen) und in `docs/INDEX.md`s `phase6_shares/CLAUDE.md`-Zeile (trug „Step 7b vollständig
-gebaut … noch nicht deployt").
+**Teardown:** Test-Asset `ast_2cf1ce2f` auf `itm_ee1e0323` per `p7_13_teardown.py` in `_trash/`
+verschoben. Die Markdown-Referenz `![p65-browser-test.png](asset:ast_2cf1ce2f)` bleibt im Body
+stehen (rendert nach dem nächsten Deploy als Alt-Text, V73-Konsequenz — bewusst nicht vorab per
+Skript entfernt, da genau dieser Übergang Teil des nächsten P6.5-12-Nachweises ist).
 
-**0.3 — Link-Auflösung.** Ein echter Fund: `docs/PROMPTS.md`s `up: CLAUDE.md` löste relativ zu
-`docs/` auf `docs/CLAUDE.md` auf (existiert nicht) statt `../CLAUDE.md`. Behoben. Sonst leer.
+**`pytest -q` weiterhin 843 passed.** Kein Quellcode dieser Sitzung geändert außer dem
+Ein-Zeilen-Versionsbump; Tabu-Diff unverändert leer.
 
-**0.4 — Indexzeile je `.md`.** Leer, nach Ausschluss von `.pytest_cache/` (generiert, wie in
-0.5s Find-Kommando bereits vorgesehen, hier nur im Plan-Kommando vergessen) und `docs/INDEX.md`
-selbst (Selbstverweis erwartungsgemäß nicht vorhanden).
-
-**0.5 — Softcap.** 12 Treffer (Plan-Erwartung aus der Planungssession: 11 — Delta ist
-`phase7_spaces_admin_plan.md` selbst, nach der Zählung angelegt). Alle 12 sind 📕/📦-konform.
-`phase6_shares/CLAUDE.md` (39.080 B) und `ITEM_MOVE_PLAN.md` (40.261 B) bleiben grenzwertig unter
-dem Cap (40.960 B) — die Zeilen-8–16-Korrektur oben blieb bewusst minimal (Zellen-Edits + eine
-datierte Korrekturzeile, keine neue Erzählung), um den Cap nicht zu reißen. Größe nach der
-Korrektur nicht erneut über 40 KB.
-
-**0.6 — Skelett angelegt.** `phase7_spaces_admin/CLAUDE.md` (diese Datei), `SESSIONS_ARCHIVE.md`
-(leer), `tests/conftest.py` (leer). `ROADMAP.md`: fehlende P6.5-Tabellenzeile ergänzt (echte
-Vorphasen-Lücke, beim Bearbeiten derselben Tabelle mitgefunden, datiert korrigiert) + neue
-P7-Zeile + eigener Abschnitt. `docs/INDEX.md`: „Active phase" auf Phase 7 umgestellt, neue Zeilen
-für Plan/Head/Archiv.
-
-**0.7 — Sechste Contract-Öffnung angekündigt.** `phase1_storage/CLAUDE.md`, datierter Absatz mit
-der Funktionsliste aus Plan §4 C1.
-
-**DoD Step 0:** alle sechs Punkte gefahren, Ergebnis protokolliert (0.1/0.3/0.4 „nichts zu tun"
-außer dem PROMPTS.md-Link-Fund; 0.2/0.5/0.6/0.7 mit Ergebnis); Audit-Tabelle mit SHA je Zeile
-oben; Skelett steht; `pytest` unverändert bei 828.
-
-**Nächster Schritt:** Block A (Fixes + Phase-6.5-Abschluss) — beginnt mit einem live
-`migrate_visibility.py --apply` gegen den echten `DATA_ROOT` und dem Anlegen von
-`testnutzer-p7`. Beides ist Nikinger-Sache zu autorisieren, nicht Claude Codes eigene
-Entscheidung — Session hier bewusst gestoppt, um das einzuholen.
-
-**Nachtrag, selber Tag — Nikinger-Freigabe „per Plan, mit Step A" erhalten, A1+A2 gebaut.**
-
-**V73/V74 vorab geklärt, wie vom Advisor verlangt:**
-- **V73 (A3-Vorbereitung):** `markdown.js` löst `asset:<id>` unabhängig davon auf, ob die
-  Asset-Datei noch existiert — die Regex prüft nur die URL-**Form**, nicht die Existenz. Ein
-  entferntes (nach `_trash/` verschobenes) Bild rendert deshalb heute ein **kaputtes `<img>`**,
-  keinen Alt-Text. A3 braucht also tatsächlich den geplanten dritten Kontextschlüssel
-  `assetIds` — noch nicht gebaut, folgt mit A3 selbst.
-- **V74 (A4-Vorbereitung):** `grep 'method: "PATCH"' -B15` über `editor.js`/`list.js`/
-  `dialogs.js` enumeriert. **Der Plan-Entwurf für `_PATCH_FIELDS` fehlte `format`** —
-  `editor.js :: saveItem()` sendet `format: "markdown"` bei **jedem** Speichern
-  (`editor.js:335`); ohne dieses Feld in der Whitelist hätte A4 jedes UI-Speichern mit `400`
-  gebrochen. Korrigierte Feldliste notiert, wird mit A4 geschrieben.
-
-**A1 — ID sichtbar + auffindbar (`api.py :: _items_get`, `editor.js`, `app.html`, `app.css`):**
-ID-Zweig vor dem bestehenden Store-Aufruf (`ITEM_ID_RE.fullmatch`), space-/ordnerübergreifend
-(P7-D/E), Rechteprüfung unverändert davor — eine ID ohne Leserecht liefert `total: 0`, nie
-403/404 (kein Existenz-Orakel). `idChip(itemId)` (neu, `editor.js`) in beiden Detailansichten
-(readonly `roMetaEl`, editierbar `#meta-item-id`), Klick kopiert über
-`navigator.clipboard.writeText`, kein `execCommand`-Fallback. Such-Placeholder nennt jetzt
-`itm_…`. **Tabu-Probe:** `git diff phase1_storage/storage/` leer (P7-D eingehalten).
-
-**A2 — Tool-Beschreibungen nennen Titel, nicht ID (`mcpserver/tools.py`):** neue Konstante
-`_TITLE_NOT_ID_HINT`, wörtlich identisch an `search_items`/`get_item`/`get_item_meta`/
-`create_item` angehängt, gleiche Bauart wie `WRITE_TOOL_DIVISION`/`_LIST_SPACES_POINTER`.
-
-**Tests:** +5 (`test_items_get_finds_an_item_by_its_id`,
-`test_id_lookup_ignores_space_and_folder_filter`, `test_id_lookup_respects_read_permission`,
-`test_id_lookup_with_unknown_id_returns_empty_list` in `phase5_ui/tests/test_api.py`;
-`test_tool_descriptions_tell_the_agent_to_name_titles_not_ids` in
-`phase2_mcp/tests/test_tools.py`). `pytest -q` **833 passed** (828 + 5).
-
-**Ehrlich offen:** DoD verlangt eine echte Browserprobe für den Chip (sichtbar, kopierbar) und
-einen echten Connector-Beweis für A2 (P7-4) — **beides diese Session nicht gefahren**, nur
-Backend/Tool-Ebene per `pytest`. Abnahmezeilen P7-1/P7-4 bleiben deshalb ⬜, P7-2 🟡 (Backend
-bewiesen, keine Browserprobe), P7-3 ✅ (reiner Test-Fall, kein Mensch nötig).
-
-**Nächster Schritt:** A3 (Bild-Entfernen-Knopf, V73-Konsequenz eingeplant) und A4 (Feld-
-Whitelist, korrigierte Liste aus V74 oben) folgen als eigene Commits, wie mit dem Advisor
-abgestimmt.
-
-**Nachtrag, selber Tag — A3 gebaut (V73-Konsequenz umgesetzt).** `markdown.js :: inlineMarkdown()`
-prüft jetzt vor jedem `asset:<id>`-Auflösen, ob die ID in einem mitgegebenen `assetIds` steht —
-fehlt sie, rendert der Alt-Text statt eines `<img>` (ohne `assetIds` bleibt das alte Verhalten,
-`updates.js`s Aufrufe sind unberührt). `editor.js`: `renderAssetStrip(item)` (neu) zeigt jedes
-Asset mit Dateiname + „×"; Klick fragt per `confirmDialog()` nach, Wortlaut „entfernen"/„Papier-
-korb" (nie „löschen", der Server verschiebt nur nach `_trash/`), ruft `DELETE .../assets/{id}`
-(bereits vorhanden, kein neuer Serverpfad), aktualisiert `item.assets` lokal und rendert Leiste +
-Vorschau neu. `snapshotFromItem()` trägt jetzt `assets` mit, ein neu hochgeladenes Bild wird
-sofort in `state.editingSnapshot.assets` gepusht (sonst zeigte die Leiste es erst nach dem
-nächsten Neuladen).
-
-**Echter Nebenfund beim Bauen, nicht Teil des Plans:** `_items_patch`/`_items_append`/
-`_items_archive` (`webui/api.py`) reichten `item_to_json()` bisher **ohne** `assets=` durch —
-jede Antwort trug `assets: []`, unabhängig vom tatsächlichen Bestand. `editor.js :: afterWrite()`
-lädt den Editor direkt aus genau dieser Antwort neu (`loadEditorFromItem(item, …)`) — ohne den
-Fix hätte jedes Speichern nach einem Bild-Einfügen die Asset-Leiste geleert und `assetIds` beim
-nächsten Render-Zyklus leer gemacht, was ein soeben eingefügtes Bild fälschlich als Alt-Text
-gezeigt hätte. Behoben: alle drei Endpunkte reichen jetzt `assets=store.list_assets(item.id)`
-durch, wie `_items_get_one` es schon tat. Bewusst **nicht** mitbehoben: `_map_store_error()`s
-Konfliktantwort (`detail.current`) trägt weiterhin keine `assets` — das ist eine reine
-Modulfunktion ohne `store`-Zugriff, eine Signaturänderung hätte jeden Aufrufer in der Datei
-berührt; der Konfliktdialog zeigt ohnehin keine Bildvorschau, also kein beobachtbarer Fehler,
-nur vorsorglich notiert.
-
-**Test:** +1 `phase5_ui/tests/test_api.py :: test_assets_survive_a_patch_response` (Bild
-hochladen, PATCH + append, beide Antworten tragen das Asset). `pytest -q` **834 passed**
-(833 + 1). Tabu-Probe (`storage/`) weiterhin leer — der Fix blieb vollständig in `webui/api.py`.
-
-**Ehrlich offen, wie bei A1/A2:** keine Browserprobe für den Entfernen-Knopf/Alt-Text-Übergang
-diese Session — P7-5 bleibt ⬜ „gebaut, ungeprüft" in der Abnahmematrix.
-
-**Nachtrag, selber Tag — A4 gebaut (schließt O6).** `_PATCH_FIELDS`-Konstante in `webui/api.py`,
-Prüfung `unknown = sorted(set(body) - _PATCH_FIELDS)` direkt nach `body = await
-_json_body(request)`, vor jeder Rechteprüfung (unbekannte Felder werden abgewiesen, bevor
-irgendetwas anderes über den Request nachdenkt). Liste ist die durch V74 korrigierte Fassung
-(inkl. `format`, siehe Nachtrag oben) — `version`/`title`/`body`/`status`/`due`/`tags`/`links`/
-`type`/`format`/`folder`/`space`/`visibility`/`share_read`/`share_write`/`password`/`totp`.
-**Zwei Tests:** `test_items_patch_rejects_an_unknown_field` (`spce`-Tippfehler-Fall aus
-`ITEM_MOVE_PLAN.md` §112, Datei bleibt byte-identisch unverändert) und
-`test_items_patch_accepts_every_field_the_ui_sends` (pinnt `_PATCH_FIELDS` als Obermenge der
-real von `editor.js`/`list.js`/`dialogs.js` gesendeten Schlüssel). **Ein Plan-Detail korrigiert
-beim Testen, nicht angenommen:** der Plan-Text nennt „400 validation_failed" für den
-Zurückweisungsfall — `webui/errors.py` bildet `validation_failed` durchgehend auf `422`
-ab (Unprocessable Entity), nicht 400; der Test pinnt den tatsächlichen Code.
-
-**Tests:** `pytest -q` **836 passed** (834 + 2). Tabu-Probe (`storage/`) weiterhin leer.
-
-**Block A damit vollständig: A1, A2, A3, A4 gebaut, alle vier nur backend-/tool-seitig
-verifiziert (`pytest`), keine der vier Browser-/Connector-Proben diese Session gefahren.**
-Verbleibend in Block A: A5 (Sichtbarkeits-Migration, braucht den Nikinger für `--apply`), A6
-(Purge-Gate, kalendarisch erst ab 2026-08-28), A7/A7b (dritter Principal `testnutzer-p7`, braucht
-den Nikinger für die Einladung), A8 (formaler Abschluss Phase 6.5, setzt A3/A7 voraus). Session
-hier bewusst gestoppt — die nächsten Schritte brauchen entweder den Nikinger direkt oder bauen
-auf etwas auf, das er noch anstoßen muss.
-
-**Nachtrag, selber Tag — zwei Vorarbeiten erledigt, die Claude Code selbst darf (Advisor-
-Hinweis), damit der Nikinger-Handgriff kein blinder Griff wird:**
-
-**A5 Schritt 2 (Claude-Code-Sache laut Plan): `migrate_visibility.py --dry-run` gegen den
-echten `DATA_ROOT` gelaufen** (`--data-root /home/savefyx/savefyx-data`, Default ist bereits
-`--dry-run`, kein `--apply`). Ergebnis: **`items_migrated: 73`, `dry_run: true`, `spaces_touched:
-["IT-Sekus-Projekt", "fabian", "niklas"]`** — exakte Deckung mit der Plan-Erwartung (Handover §1
-Punkt 4). Alle 73 Zeilen zeigen `"before": null, "after": "private"`. Kein Schreibzugriff (Skript
-selbst berichtet `dry_run: true`, kein `git log`-Nachtrag im `DATA_ROOT` geprüft nötig, da das
-Skript bei `--dry-run` laut eigenem Code keinen Store-Write auslöst). **A5 Schritt 3 (`--apply`)
-bleibt Nikinger-Sache (P7-H) — nicht ausgeführt.**
-
-**V75 geschlossen, gegen eine Wegwerf-Instanz, nicht den echten `DATA_ROOT`:** `spacectl.py
-create-space testnutzer-p7` gegen ein Temp-Verzeichnis — Space-Name mit Bindestrich angenommen,
-kein Sonderzeichen-Fehler (`_cmd_create_space` prüft nur `/`, führenden `.`, `RESERVED_DIR_NAMES`
-— ein Bindestrich fällt in keine der drei Kategorien). `Store.create("testnutzer-p7", ...)`
-direkt danach: Item angelegt, Datei liegt unter `testnutzer-p7/itm_…__v75-testprobe.md`,
-`store.search(space="testnutzer-p7")` findet es wieder. **Der Bindestrich übersteht Anlegen,
-Schreiben und Suchen — keine Sonderbehandlung nötig, `authctl.py invite --space
-testnutzer-p7` kann unverändert kommen.**
-
-**Zwei offene Fragen für den Nikinger, bevor A5/A7 weitergehen können (nicht von Claude Code
-entscheidbar):**
-1. **A5 Schritt 1** (`docs/UPDATE_LOG.md`-Eintrag, muss auf den `--apply`-Tag datiert sein,
-   `deploy.sh` bricht sonst ab, P6-X) — läuft `--apply` heute (2026-08-23, Eintrag jetzt
-   schreibbar) oder an einem späteren Tag (Eintrag dann)?
-2. **A7 Schritt 1** — wann kann `authctl.py invite --space testnutzer-p7 --purpose enroll`
-   laufen? Danach übernimmt Claude Code das Enrollment im Browser (`claude-in-chrome`) und den
-   Rest von A7/A7b ohne weiteren Nikinger-Handgriff.
-
-**Beide Fragen beantwortet (Nikinger, per AskUserQuestion, selber Tag): heute, auf beide.**
-`docs/UPDATE_LOG.md` bekam den A5-Eintrag (2026-08-23, bewusst zurückhaltend formuliert — die
-Migration macht laut Skript-Docstring nur explizit, was implizit längst galt, „sichtbar ändert
-sich für dich nichts"), gegen `test_updates.py`/`test_deploy_scripts.py` grün geprüft (28/28).
-**`authctl.py invite`/`spacectl.py create-space testnutzer-p7` bleiben laut Plan-Text
-ausdrücklich „Nikinger, einmalig" — Claude Code führt sie nicht selbst aus**, auch nach der
-Freigabe nicht (Live-Schreibzugriff auf `auth.sqlite3`, dieselbe Vorsicht wie bei jedem
-`--apply`). **Warte auf: (a) den Nikinger führt `--apply` aus, (b) den Nikinger führt `authctl.py
-invite` aus und gibt den Link weiter** — beides außerhalb dessen, was Claude Code aus dieser
-Session heraus selbst anstößt.
-
-**Nachtrag, selber Tag — nach A5 `--apply`/A7 Anlegen/A7b: P7-10/P7-11/P7-12b geschlossen, zwei
-echte Funde unterwegs.**
-
-**Fund 1 — claude.ai dedupliziert Custom Connectors organisationsweit nach Server-URL.** Ein
-zweiter, eigener Connector `sharefyx-testnutzer-p7` (dieselbe MCP-URL wie der bestehende
-`sharefyx`-Connector) ließ sich in claude.ai nicht anlegen: „In deiner Organisation existiert
-bereits ein Connector mit dieser URL." Der OAuth-Login selbst funktionierte (Passwort+TOTP
-akzeptiert, Redirect korrekt) — der Server ist gesund, die Blockade sitzt eine Ebene höher, in
-claude.ai selbst. **Konsequenz:** P7-10/P7-12b laufen seither über
-`phase7_spaces_admin/scripts/p7_10_write_probe.py` — einen echten Netz-OAuth-Client (DCR+PKCE,
-`testcred.py`-gestützt), der denselben Authorization Server direkt anspricht, ohne einen
-claude.ai-Connector zu brauchen. Ergebnis: `own_space_visible: true`, `itm_ee1e0323` geschrieben.
-**Nebeneffekt, kein separater Nachweis nötig:** derselbe Lauf beweist P7-12b (Login allein über
-`testcred.py`, kein Nikinger-Handgriff).
-
-**Nebenfund, real reproduziert (nicht Teil des Plans):** das `computer`-Type-Tool des
-Browser-Automations-Kanals ließ bei einem langen, schnell getippten String zuverlässig das
-letzte Zeichen fallen (`…/mcp` → `…/mc`) — zweimal reproduziert, per Zoom-Screenshot UND
-Accessibility-Tree bestätigt, nicht nur per Screenshot vermutet. Fund kam vom Nikinger selbst
-(„du hast da einen Tippfehler"), nicht von Claude Code entdeckt. Kein sharefyx-Bug — Werkzeug-
-Eigenheit, hier nur vermerkt, falls sie bei künftiger Browser-Automation wieder auftritt: ans
-Feldende springen und das fehlende Zeichen einzeln nachtippen, dann per Zoom verifizieren.
-
-**Fund 2 — die `Freigeben`-Dialogbox kann kein item-level Share an einen brandneuen Principal
-setzen.** `dialogs.js :: openShareDialog()` listet ausdrücklich nur `state.spaces` (Spaces, die
-der Actor schon über ein bestehendes `.share.yml` kennt) — dokumentierter, bewusster Scope-
-Schnitt aus Step 7 Commit 5b (`phase6_shares/CLAUDE.md`, Modul-Zeile 15). `testnutzer-p7` hat
-laut P7-11s eigenem Zweck **keinerlei** vorherige Beziehung zu `niklas` — genau der Fall, den
-die Dialogbox nicht abdeckt. Kein Bug: `webui/api.py :: _items_patch` UND
-`mcpserver/tools.py :: update_item()` erlauben `share_read`/`share_write` beide bereits
-serverseitig für Menschen (P6-M sperrt nur MCP-Tools), die Lücke ist rein die Dialogbox-Fläche.
-**Ein Versuch, das über einen rohen `fetch()`-`PATCH` aus der Browser-Konsole zu umgehen,
-scheiterte korrekt** (`403 csrf_failed`) — der Double-Submit-CSRF-Token wird ausschließlich
-einmalig auf der echten Login-Erfolgsseite ausgeliefert (P5-H), eine frisch navigierte
-Tab-Session hat ihn nicht, und ihn zu bekommen hätte Niklas' echtes Passwort/TOTP gebraucht.
-**Bestätigt: die Sicherheitsgrenze hält, kein Leck.** Stattdessen:
-`phase7_spaces_admin/scripts/p7_11_setup_fixture.py` (neu) — ruft `storage.store.Store.update()`
-direkt auf (Details/Einschränkung siehe Korrektur unten). Ergebnis: `itm_3d0ac2b3` trägt jetzt
-`share_read: ["testnutzer-p7"]`, echter Git-Commit, `version` 1→2.
-
-**P7-11-Ergebnis, zweifach belegt (Advisor-Hinweis: die MCP-Probe allein testet die falsche
-Fläche — P6-Zeilen 36/37 sind ausdrücklich Web-UI-Kriterien, nicht der bereits vorher
-funktionierende Agenten-Pfad):**
-1. **MCP:** `p7_11_visibility_probe.py itm_3d0ac2b3` → `expected_item_visible: true`,
-   `foreign_ids: ["itm_3d0ac2b3"]`, `foreign_ids_are_exactly_expected: true`.
-2. **Web-UI, echter Login als `testnutzer-p7`** (`/ui/login`, dieselben drei Felder wie
-   `/oauth/authorize`, `testcred.py`-gestützt): **P6-Zeile 36** — „Alle Items" zeigt genau zwei
-   Einträge, `P7-10 Schreibprobe` (eigen) und `P7-11 Sichtbarkeitsprobe` (fremd, Chip „geteilt
-   mit testnutzer-p7"), Klick öffnet es. **P6-Zeile 37** — Detailansicht zeigt „Nur lesen —
-   fremder Space (niklas)", kein Editor (nur `share_read`, kein `share_write`). **Damit
-   erstmals ein Empfänger ohne jede Space-Mitgliedschaft real durchgespielt** — mit `niklas`
-   strukturell nie möglich (steht in `fabian/.share.yml` unter `read:`), das war der eigentliche
-   Grund für den dritten Principal (P7-J).
-
-**Nebenwirkung, bewusst in Kauf genommen:** der `/ui/login`-Lauf als `testnutzer-p7` hat Niklas'
-eigene aktive UI-Sitzung im selben Browser beendet (ein Session-Cookie pro Domain) — Niklas
-muss sich in der Web-UI neu anmelden, sein Passwort/TOTP war davon nie betroffen.
-
-**Korrektur nach Advisor-Review, vor dem Commit:** der ursprüngliche Versuch, das CSRF-geschützte
-`PATCH /api/v1/items/{id}` per rohem `fetch()` aus der Browserkonsole in einer frisch navigierten
-(nicht über den echten Login-Fluss bootstrapten) Tab-Sitzung zu setzen, schlug korrekt mit `403
-csrf_failed` fehl — das ist die Sicherheitsgrenze aus P5-H, die hält, kein Leck. Der
-Double-Submit-CSRF-Token wird ausschließlich einmalig auf der echten Login-Erfolgsseite
-ausgeliefert; ihn zu bekommen hätte Niklas' echtes Passwort/TOTP gebraucht. Deshalb stattdessen
-`p7_11_setup_fixture.py` über `Store.update()` direkt — **ohne** das Re-Auth-Gate aus P6-N
-(`require_share_reauth()`), das `_items_patch` einer Freigabe-Erweiterung davorschaltet
-(Docstring korrigiert, Advisor-Fund).
-
-**Teardown-Hinweis für P7-12, jetzt vermerkt statt erst beim Abbau entdeckt (Advisor-Fund):**
-`spacectl.py check` prüft ausschließlich `.share.yml` (space-level), nie item-level
-`share_read`/`share_write` in Frontmatter. Nach `spacectl.py remove-space testnutzer-p7` bliebe
-`share_read: [testnutzer-p7]` auf `itm_3d0ac2b3` sonst eine verwaiste Freigabe, die kein
-Werkzeug meldet — P7-12s Kriterium „keine verwaisten Freigaben" wäre dann ein falsches ✅. Vor
-dem Abbau: diese Freigabe zurücknehmen oder das Fixture-Item archivieren.
-
-**`pytest -q` 843 passed** (unverändert — die drei neuen Skripte sind Live-Probe-Skripte ohne
-eigene Unit-Tests, gleiche Kategorie wie `oauth_smoke.py`/`migrate_visibility.py`). Tabu-Diff
-(`mcpserver/asgi.py`, `authserver/{crypto,totp,passwords,resolver,flows}.py`) weiterhin leer.
-
-**Vormerkung für den Fabian-Freigeben-Schnitt/§0.4:** die `Freigeben`-Dialogbox „nur bereits
-bekannte Spaces" ist derselbe Scope-Schnitt, der P7-14/P7-16 (geteilte Spaces im Browser
-anlegen/freigeben) betreffen könnte — dort wird der Zielraum aber immer VORHER angelegt/bekannt
-sein (Block C), betrifft also vermutlich nicht dasselbe Muster. Nicht weiter verfolgt, außerhalb
-dieses Fundes.
-
-**Nächster Schritt:** P7-12 (Abbau — `testcred.py purge`, `spacectl.py remove-space
-testnutzer-p7 --force`, `authctl.py disable-user`/`revoke-sessions`) erst am Ende von Block A,
-nicht jetzt — `testnutzer-p7` wird für A8/weitere Abnahmezeilen noch gebraucht.
-
-**Nachtrag, selber Tag — A8 (Phase 6.5 formal abschließen, P7-I) durchgeführt.**
-
-**Advisor-Runde vor dem Bauen:** A8.1s Plan-Text („A3 schließt P6.5-12; A7 schließt P6.5-8 und
-P6.5-13") war zum Zeitpunkt seines Entwurfs eine Absicht, keine gemessene Tatsache — vor dem
-Schreiben des Handovers geprüft statt übernommen. **Diskriminierender Befund:** weder
-`itm_3d0ac2b3` noch `itm_ee1e0323` trugen ein `_assets/`-Verzeichnis im echten `DATA_ROOT` — A3
-baute den Knopf, testete ihn aber nicht am Bild; A7s Proben (`p7_10`/`p7_11`) berührten nie ein
-Asset. A8.1s Satz war damit Plan-Drift, kein erledigter Punkt.
-
-**P6.5-12/P7-5 — Browser-Nachweis dieser Sitzung bewusst nicht gefahren.** Ein Login als
-`testnutzer-p7` im echten Chrome-Tab hätte Passwort/TOTP aus `testcred.py` in eine
-`computer`-Type-Aktion getippt — anders als bei `p7_10`/`p7_11` (dort las das Skript die
-Credentials intern, nie sichtbar für Claude Code) wäre das Geheimnis hier im sichtbaren
-Werkzeugverlauf dieser Sitzung gelandet. Ein direkter `python -c`-Ausdruck, der `testcred.py
-password`/`totp` roh ausgibt, wurde vom Auto-Mode-Classifier korrekt blockiert — als Bestätigung
-behandelt, nicht umgangen. P6.5-12/P7-5 bleiben deshalb 🟡/⬜ (gebaut, ungeprüft), keine Regression.
-
-**P6.5-13 — MCP-Fläche, per echtem OAuth-Client geschlossen.** `p7_13_asset_fixture.py itm_id`
-(neu, Store-direkt) legte ein PIL-erzeugtes PNG auf `itm_3d0ac2b3` ab (`ast_e7f27214`, 77 Bytes)
-— derselbe Store-Kürzungsweg wie `p7_11_setup_fixture.py`, kein neuer Serverpfad.
-`p7_13_asset_share_gate_probe.py` (neu, gleiche OAuth-Bauart wie `p7_10_write_probe.py`) rief
-`get_item_asset` als `testnutzer-p7` auf: mit reinem `share_read` (aus P7-11) →
-`bytes_available:false`, nur Metadaten. `p7_13_share_write_fixture.py itm_id --version 2` (neu)
-erweiterte auf `share_write` — derselbe Aufruf lieferte danach echte `image/png`-Bytes. **Exakt
-das kommentierte P6.5-M-Verhalten (`tools.py :: get_item_asset()`), empirisch bestätigt, kein
-neuer Sicherheitsbefund.**
-
-**P6.5-8 — Web-UI-Fläche, per Cookie-Session-Skript statt Browser-Klick geschlossen.**
-`p7_13_ui_asset_probe.py` (neu) postet gegen `/ui/login` (Cookie-Session, P5-D) und holt danach
-`GET /api/v1/items/{id}/assets/{id}` — dieselbe Bauart wie die MCP-Probe, nur gegen die
-Cookie-Fläche.
-
-**Advisor-Fund, VOR dem Commit korrigiert (nicht danach entdeckt):** der erste Testlauf setzte
-„ohne Session" (kein Cookie überhaupt, `401`, reine Authentifizierung — dieselbe Fläche wie P5
-Zeile 19, nicht neu geprüft) mit „ohne Freigabe" (P6.5-8s tatsächliches Kriterium — angemeldet,
-aber kein `share_read`/`share_write`) gleich und schloss daraus fälschlich auf einen
-„Plan-Text-Drift" (Plan nennt `403`). **Drei saubere Zustände desselben Items nachgeholt, ein
-Variable je Schritt geändert** (`p7_13_share_write_fixture.py --clear`/`--clear-read`, Item-
-Version 3→4→5): `share_write` geleert, `share_read` behalten → UI `200` (HUMAN-Fläche braucht
-nur Leserecht, P6-AW — bestätigt zugleich P6.5-13s Asymmetrie, MCP-Seite bleibt
-`bytes_available:false` unter derselben Bedingung, sauber reproduziert); danach auch
-`share_read` geleert → UI-`authenticated_status`: **`403`, deckungsgleich mit dem Plan-Text.**
-**Der Plan-Text war richtig, der ursprüngliche „401 statt 403"-Befund war der eigentliche
-Fehler.** Korrigiert in `phase6_5_tools_images/CLAUDE.md`s P6.5-8-Zeile (dortige, datierte
-Korrekturnotiz, kein stilles Überschreiben).
-
-**Teardown, gleich mitgezogen statt erst bei P7-12:** `p7_13_teardown.py` (neu,
-`store.delete_asset()`) entfernt `ast_e7f27214` — landet wie jedes gelöschte Asset in
-`_assets/itm_3d0ac2b3/_trash/` (N5, kein echtes Löschen, Entscheidung H bleibt unangetastet),
-`list_assets()` zeigt danach `[]`. `share_read`/`share_write` sind bereits durch den dritten
-Testzustand oben auf `[]` (Version 5). **Alle vier Teardown-Ledger-Punkte damit vorzeitig
-geschlossen** — P7-12 selbst hat für `itm_3d0ac2b3` nichts mehr zu tun.
-
-**Abnahmestand 6.5 neu gezählt (A8.2): 12 von 14**, nicht 14/14 — Glyph bleibt 🟡, aus der
-Zahl abgeleitet, kein Grenzfall (P6.5-12 UND P6.5-14 offen, nicht nur P6.5-14 wie im
-13/14-Beispiel des Plans). Details, Kriterienliste, `[VERIFY]`-Bilanz:
-`docs/concepts/PHASE6_5_CLOSEOUT_HANDOVER.md` (neu). `phase6_5_tools_images/CLAUDE.md`s Matrix
-+ `updated:`-Zeile korrigiert (kein neuer Session-Block dort — Rotationsregel, die Erzählung
-lebt hier). `phase1_storage/CLAUDE.md`: Öffnungen 3/4/5 datiert geschlossen, Öffnung 6 (P7,
-`acl.py`-Schreibseite) im selben Absatz als weiterhin offen benannt (A8.5, vermeidet die
-Falschaussage, die P6-Handover §5.6 bereits umging). `docs/concepts/
-phase6_5_tools_images_uebersicht.svg` (neu, 1080×1080) — zweimal gerendert und per `Read`
-visuell geprüft, kein Textüberlauf. `ROADMAP.md`/Root-`CLAUDE.md`/`docs/INDEX.md` im selben
-Umfang auf den neuen 6.5-Status gezogen — Root-`CLAUDE.md`s „Current state" hatte Phase 7 bisher
-gar nicht erwähnt (eigener kleiner Fund, kein A8-Punkt, aber dieselbe Kategorie Doku-Drift wie
-Step 0s Audit).
-
-**Teardown-Ledger — alle vier Punkte bereits diese Sitzung geschlossen, nicht erst bei P7-12
-(siehe „Advisor-Fund" oben: die dritte Nachprobe brauchte den geleerten Zustand ohnehin):**
-`itm_3d0ac2b3` trägt jetzt `share_read: []`, `share_write: []` (Version 5) und `ast_e7f27214`
-liegt in `_trash/` (`p7_13_teardown.py`, `list_assets()` → `[]`). Nichts bleibt für P7-12 an
-diesem Item übrig.
-
-**`pytest -q` weiterhin 843 passed** (fünf neue Skripte — vier aus der ersten A8-Runde plus
-`p7_13_teardown.py` — alle Live-Probe-Kategorie ohne eigenen Unit-Test). Tabu-Diff unverändert
-leer.
-
-**Nächster Schritt:** A6 (Purge-Gate, `clients`/`token_families`-Rückgang, frühestens
-2026-08-28) ist der letzte offene Block-A-Punkt außer P7-12 selbst. Bis dahin: Session hier
-gestoppt — A6 ist kalendarisch blockiert, kein Claude-Code-Handgriff verkürzt das.
+**Nächster Schritt, konkret:** vor der nächsten P6.5-12-Probe braucht es (1) einen neuen
+`docs/UPDATE_LOG.md`-Eintrag datiert auf den Deploy-Tag (P6-X-Gate) und (2) einen echten
+`deploy.sh`-Lauf durch den Nikinger (`sudo systemctl`-Rechte nötig). Danach: derselbe
+Browser-Test wiederholen (Upload → Entfernen-Knopf → Alt-Text-Rendering →
+`_trash/`-Dateiprüfung) — diesmal sollte `asset-strip` im DOM erscheinen. A6 bleibt bis
+2026-08-28 (`token_families`) bzw. 2026-10-27 (`clients`) beobachtend offen, kein weiterer
+Handgriff nötig.
