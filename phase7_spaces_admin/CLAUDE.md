@@ -9,7 +9,7 @@ down:
   - ../docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md   # Herkunft: P6-Status, §4.1/§4.2, offene Entscheidungen §5.1–§5.7
   - ../phase6_shares/ITEM_MOVE_PLAN.md              # §9 Mehrfachauswahl (P6-AK–AN) — Block B baut das, unverändert
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-08-23 (Step 0 gestartet, Doku-Audit gefahren, Skelett angelegt)
+updated: 2026-08-23 (A8: Phase 6.5 formal abgeschlossen als 🟡, 12/14, P6.5-8/13 via testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, P1-Contract-Absatz aktualisiert) | 2026-08-23 (Step 0 gestartet, Doku-Audit gefahren, Skelett angelegt)
 ---
 # CLAUDE.md — Phase 7: Space-Verwaltung, Mehrfachauswahl, Konsolidierung (`phase7_spaces_admin/`)
 
@@ -74,6 +74,8 @@ Abnahmezeilen: `docs/concepts/phase7_spaces_admin_plan.md`.
 
 | 7 | A7-Rest: `phase7_spaces_admin/scripts/p7_10_write_probe.py` (neu, echter Netz-OAuth-Fluss gegen den laufenden Server, `testcred.py`-gestützt, schreibt ein Item), `p7_11_visibility_probe.py` (neu, globale `search_items`-Probe), `p7_11_setup_fixture.py` (neu, Einmal-Setup über `storage.store.Store.update()` — Begründung siehe Modul-Docstring/Session-Block) | A | ✅ **P7-10/P7-11/P7-12b live bestanden** | 0 (Live-Probe-Skripte, gleiche Kategorie wie `oauth_smoke.py`/`migrate_visibility.py` — kein Unit-Test für einen echten Netzlauf) |
 
+| 8 | A8 (Phase 6.5 formal abschließen, P7-I): P6.5-8/13 per gebilligter `testnutzer-p7`-Substitution geschlossen — `p7_13_asset_fixture.py`/`p7_13_share_write_fixture.py` (neu, Store-direkte Fixtures) + `p7_13_asset_share_gate_probe.py`/`p7_13_ui_asset_probe.py` (neu, MCP- bzw. `/ui/login`-Cookie-Probe). `docs/concepts/PHASE6_5_CLOSEOUT_HANDOVER.md` (neu) + `phase6_5_tools_images_uebersicht.svg` (neu, zweimal gerendert/gegengeprüft). P1-Contract-Absatz (Öffnungen 3/4/5 datiert geschlossen, 6 als offen benannt) in `phase1_storage/CLAUDE.md`. `ROADMAP.md`/Root-`CLAUDE.md`/`docs/INDEX.md` auf den neuen 6.5-Status | A | ✅ **vollständig** — Abnahmestand 6.5: 12/14, P6.5-12/14 bleiben offen (siehe unten) | 0 (nur neue Live-Probe-Skripte, kein Unit-Test-Delta; `pytest` unverändert 843) |
+
 *(Weitere Zeilen entstehen mit dem Rest von Block A/C/B — siehe Plan §4 für die vollständige Schritt-Sequenz.)*
 
 ## Geerbte Contracts
@@ -108,7 +110,7 @@ keinen Code bekommen, nur Step 0 (Haushalt) lief.
 | P7-11 | `testnutzer-p7` sieht nur sein item-level Item | Claude Code | ✅ Web-UI (P6-Zeilen 36/37, echter Login) **und** MCP (`p7_11_visibility_probe.py`) |
 | P7-12 | `testnutzer-p7` entfernt, Keyring-Eintrag weg | Claude Code | ⬜ |
 | P7-12b | Claude Code loggt sich ohne Nikinger als `testnutzer-p7` ein | Claude Code | ✅ derselbe Lauf wie P7-10 — Login/TOTP/Consent allein über `testcred.py` |
-| P7-13 | Phase 6.5 formal abgeschlossen | Claude Code | ⬜ |
+| P7-13 | Phase 6.5 formal abgeschlossen | Claude Code | ✅ 🟡 (12/14, `PHASE6_5_CLOSEOUT_HANDOVER.md`) |
 | P7-14 | Eigener Space im Browser freigegeben, Empfänger sieht ihn | Niklas + `testnutzer-p7` | ⬜ |
 | P7-15 | Zurücknehmen kein Re-Auth, Erweitern eines | Niklas | ⬜ |
 | P7-16 | Neuer geteilter Space im Browser angelegt | Niklas | ⬜ |
@@ -421,3 +423,71 @@ dieses Fundes.
 **Nächster Schritt:** P7-12 (Abbau — `testcred.py purge`, `spacectl.py remove-space
 testnutzer-p7 --force`, `authctl.py disable-user`/`revoke-sessions`) erst am Ende von Block A,
 nicht jetzt — `testnutzer-p7` wird für A8/weitere Abnahmezeilen noch gebraucht.
+
+**Nachtrag, selber Tag — A8 (Phase 6.5 formal abschließen, P7-I) durchgeführt.**
+
+**Advisor-Runde vor dem Bauen:** A8.1s Plan-Text („A3 schließt P6.5-12; A7 schließt P6.5-8 und
+P6.5-13") war zum Zeitpunkt seines Entwurfs eine Absicht, keine gemessene Tatsache — vor dem
+Schreiben des Handovers geprüft statt übernommen. **Diskriminierender Befund:** weder
+`itm_3d0ac2b3` noch `itm_ee1e0323` trugen ein `_assets/`-Verzeichnis im echten `DATA_ROOT` — A3
+baute den Knopf, testete ihn aber nicht am Bild; A7s Proben (`p7_10`/`p7_11`) berührten nie ein
+Asset. A8.1s Satz war damit Plan-Drift, kein erledigter Punkt.
+
+**P6.5-12/P7-5 — Browser-Nachweis dieser Sitzung bewusst nicht gefahren.** Ein Login als
+`testnutzer-p7` im echten Chrome-Tab hätte Passwort/TOTP aus `testcred.py` in eine
+`computer`-Type-Aktion getippt — anders als bei `p7_10`/`p7_11` (dort las das Skript die
+Credentials intern, nie sichtbar für Claude Code) wäre das Geheimnis hier im sichtbaren
+Werkzeugverlauf dieser Sitzung gelandet. Ein direkter `python -c`-Ausdruck, der `testcred.py
+password`/`totp` roh ausgibt, wurde vom Auto-Mode-Classifier korrekt blockiert — als Bestätigung
+behandelt, nicht umgangen. P6.5-12/P7-5 bleiben deshalb 🟡/⬜ (gebaut, ungeprüft), keine Regression.
+
+**P6.5-13 — MCP-Fläche, per echtem OAuth-Client geschlossen.** `p7_13_asset_fixture.py itm_id`
+(neu, Store-direkt) legte ein PIL-erzeugtes PNG auf `itm_3d0ac2b3` ab (`ast_e7f27214`, 77 Bytes)
+— derselbe Store-Kürzungsweg wie `p7_11_setup_fixture.py`, kein neuer Serverpfad.
+`p7_13_asset_share_gate_probe.py` (neu, gleiche OAuth-Bauart wie `p7_10_write_probe.py`) rief
+`get_item_asset` als `testnutzer-p7` auf: mit reinem `share_read` (aus P7-11) →
+`bytes_available:false`, nur Metadaten. `p7_13_share_write_fixture.py itm_id --version 2` (neu)
+erweiterte auf `share_write` — derselbe Aufruf lieferte danach echte `image/png`-Bytes. **Exakt
+das kommentierte P6.5-M-Verhalten (`tools.py :: get_item_asset()`), empirisch bestätigt, kein
+neuer Sicherheitsbefund.**
+
+**P6.5-8 — Web-UI-Fläche, per Cookie-Session-Skript statt Browser-Klick geschlossen.**
+`p7_13_ui_asset_probe.py` (neu) postet gegen `/ui/login` (Cookie-Session, P5-D) und holt danach
+`GET /api/v1/items/{id}/assets/{id}` — dieselbe Bauart wie die MCP-Probe, nur gegen die
+Cookie-Fläche: authentifiziert + `share_write` → `200`/`image/png`/77 Bytes; ganz ohne Session
+→ `401`. **Plan-Text-Drift, kein Bug:** `phase6_5_tools_images_plan.md` Zeile P6.5-8 nennt
+„403" — der reale Endpunkt liefert bei fehlender Authentifizierung `401` (P5-typisch: kein
+Unterschied zwischen „nicht angemeldet" und „falsche Anmeldedaten"), beides fail-closed.
+
+**Abnahmestand 6.5 neu gezählt (A8.2): 12 von 14**, nicht 14/14 — Glyph bleibt 🟡, aus der
+Zahl abgeleitet, kein Grenzfall (P6.5-12 UND P6.5-14 offen, nicht nur P6.5-14 wie im
+13/14-Beispiel des Plans). Details, Kriterienliste, `[VERIFY]`-Bilanz:
+`docs/concepts/PHASE6_5_CLOSEOUT_HANDOVER.md` (neu). `phase6_5_tools_images/CLAUDE.md`s Matrix
++ `updated:`-Zeile korrigiert (kein neuer Session-Block dort — Rotationsregel, die Erzählung
+lebt hier). `phase1_storage/CLAUDE.md`: Öffnungen 3/4/5 datiert geschlossen, Öffnung 6 (P7,
+`acl.py`-Schreibseite) im selben Absatz als weiterhin offen benannt (A8.5, vermeidet die
+Falschaussage, die P6-Handover §5.6 bereits umging). `docs/concepts/
+phase6_5_tools_images_uebersicht.svg` (neu, 1080×1080) — zweimal gerendert und per `Read`
+visuell geprüft, kein Textüberlauf. `ROADMAP.md`/Root-`CLAUDE.md`/`docs/INDEX.md` im selben
+Umfang auf den neuen 6.5-Status gezogen — Root-`CLAUDE.md`s „Current state" hatte Phase 7 bisher
+gar nicht erwähnt (eigener kleiner Fund, kein A8-Punkt, aber dieselbe Kategorie Doku-Drift wie
+Step 0s Audit).
+
+**Teardown-Ledger erweitert (P7-12, jetzt vier statt zwei Punkte):**
+1. `itm_3d0ac2b3` trägt `share_read: [testnutzer-p7]` (aus P7-11) — bereits vermerkt.
+2. `itm_3d0ac2b3` trägt jetzt zusätzlich **`share_write: [testnutzer-p7]`** (aus P7-13) —
+   `spacectl.py check` sieht das ebenso wenig wie `share_read`, gleiche Lücke, jetzt zwei Felder.
+3. `itm_3d0ac2b3` trägt ein echtes **Asset** (`ast_e7f27214`, `niklas/_assets/itm_3d0ac2b3/`) —
+   gehört `niklas`, nicht `testnutzer-p7`; `spacectl.py remove-space testnutzer-p7` räumt es
+   nicht auf (fremdes Item), aber es bleibt als Testartefakt in niklas' Space stehen, wenn es
+   niemand vorher entfernt.
+4. **Empfehlung vor P7-12:** `share_read`/`share_write` auf `itm_3d0ac2b3` zurücknehmen (oder
+   das Item archivieren) UND das Test-Asset per `store.delete_asset()` entfernen — alle drei in
+   einem Zug, nicht einzeln vergessen.
+
+**`pytest -q` weiterhin 843 passed** (vier neue Skripte, alle Live-Probe-Kategorie ohne eigenen
+Unit-Test). Tabu-Diff unverändert leer.
+
+**Nächster Schritt:** A6 (Purge-Gate, `clients`/`token_families`-Rückgang, frühestens
+2026-08-28) ist der letzte offene Block-A-Punkt außer P7-12 selbst. Bis dahin: Session hier
+gestoppt — A6 ist kalendarisch blockiert, kein Claude-Code-Handgriff verkürzt das.

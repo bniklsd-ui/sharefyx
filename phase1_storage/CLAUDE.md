@@ -254,6 +254,15 @@ führenden `.` und `files.RESERVED_DIR_NAMES` ab. Jede schreibende Funktion nimm
 tests (P6-D) laufen vor **und** nach dieser Öffnung byte-identisch grün, dieselbe Disziplin wie
 bei den fünf Vorgängern.
 
+**[2026-08-23, P7 Step A8.5] Öffnungen 3, 4 und 5 geschlossen — Öffnung 6 bleibt offen, in
+demselben Absatz genannt.** Dritte (`patch()`, P6 Step 1), vierte (`move()`, P6 Step 7b Commit 1)
+und fünfte (Bild-Assets, Phase 6.5 Step B1) Öffnung sind mit ihren jeweiligen Phasenabschlüssen
+datiert geschlossen (Phase 6 formal 🟡, Phase 6.5 formal 🟡, beide code-complete und live deployt
+— siehe `docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md`/`PHASE6_5_CLOSEOUT_HANDOVER.md`). **Die sechste
+Öffnung (P7, `storage/acl.py`-Schreibseite, oben angekündigt) ist zum Zeitpunkt dieses Satzes
+NICHT geschlossen** — Block C dieser Phase baut sie erst noch. Ein Schließen ohne diesen Satz
+wäre dieselbe Falschaussage, die `PHASE6_CLOSEOUT_HANDOVER.md` §5.6 bereits vermieden hat.
+
 **[2026-08-17, P6 Step 7b Commit 1/3] Vierte, benannte Contract-Öffnung gebaut** (angekündigt in
 `phase6_shares/CLAUDE.md`s Session-Block vom selben Tag, `phase6_shares/ITEM_MOVE_PLAN.md` §4.1,
 P6-AD): `store.py :: move(item_id, *, version, space=, folder=) -> Item` (neu) + intern

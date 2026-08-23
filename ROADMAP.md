@@ -13,7 +13,7 @@ down:
   - docs/concepts/phase6_shares_plan.md    # ausführungsreifer P6-Plan
   - docs/concepts/phase6_5_tools_images_plan.md   # ausführungsreifer P6.5-Plan
   - docs/concepts/phase7_spaces_admin_plan.md     # ausführungsreifer P7-Plan
-updated: 2026-08-23 (neue Phase 7 -- Space-Verwaltung, Mehrfachauswahl, Konsolidierung -- ergaenzt, Step 0 gestartet; fehlende P6.5-Tabellenzeile nachgetragen) | 2026-08-23 (Phase 6 auf 🟡 code-complete -- 12 von 39 Abnahmezeilen live, Sprung auf ✅ ist offene Nikinger-Entscheidung) | 2026-08-20 (neue Phase 6.5 -- Werkzeug-Ergonomie + Bilder -- ergaenzt, Step 0 gestartet)
+updated: 2026-08-23 (Phase 6.5 formal abgeschlossen als P7 Step A8 -- 🟡 code-complete, 12 von 14 Abnahmezeilen live, zwei per testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md neu) | 2026-08-23 (neue Phase 7 -- Space-Verwaltung, Mehrfachauswahl, Konsolidierung -- ergaenzt, Step 0 gestartet; fehlende P6.5-Tabellenzeile nachgetragen) | 2026-08-23 (Phase 6 auf 🟡 code-complete -- 12 von 39 Abnahmezeilen live, Sprung auf ✅ ist offene Nikinger-Entscheidung) | 2026-08-20 (neue Phase 6.5 -- Werkzeug-Ergonomie + Bilder -- ergaenzt, Step 0 gestartet)
 ---
 # ROADMAP — Space-Server
 
@@ -255,12 +255,15 @@ seine Bytes nur, wenn ein Mensch ausdrücklich danach fragt.
   Phase 7"-Zeichenkette bleibt unangetastet und korrekt. Zwei Blöcke, kein hartes Gate zwischen
   ihnen (Block B bei Zeitdruck komplett verschiebbar, Block A nicht).
 
-**Status 🔄 (2026-08-20, Step 0 läuft):** Plan `docs/concepts/phase6_5_tools_images_plan.md`
-ausführungsreif, gelockte Entscheidungen P6.5-A–P6.5-V, sechs Nikinger-Fragen N1–N6 beantwortet
-und in §0.0 gelockt (Phasenname 6.5, kein `app.html`-Fix, kein Bulk-Append, Body-Suche als
-MCP-Opt-in, Bild-Entfernen per `_trash/`, `MAX_MCP_ASSET_BYTES=1 MiB`). Herkunft: Live-Feedback
-2026-08-14 (Werkzeug-Ergonomie) + `phase6_shares/IMAGES_PLAN.md` (jetzt nachrangig). Details:
-`phase6_5_tools_images/CLAUDE.md`s Session-Block.
+**Status-Korrektur (2026-08-23, formaler Abschluss als P7 Step A8): 🔄 → 🟡, bewusst nicht ✅.**
+Sämtlicher P6.5-Code ist gebaut und live deployt (`main`@`f96125e`), **12 von 14 Abnahmezeilen**
+sind live-verifiziert (zwei davon über eine im P7-Plan §A8.1 gebilligte Substitution —
+`testnutzer-p7` statt Fabian). Verbleibend offen: P6.5-12 (Entfernen-Knopf inzwischen von P7
+Step A3 gebaut, kein Browser-Klick-Nachweis) und P6.5-14 (Nikingers eigene Bewertung, kein
+Selbstzertifizierungs-Kriterium). **Der Sprung auf ✅ ist eine offene Nikinger-Entscheidung.**
+Vollständiger Zeilenstatus, offene Entscheidungen und `[VERIFY]`-Bilanz:
+`docs/concepts/PHASE6_5_CLOSEOUT_HANDOVER.md`. Übersichtsgrafik:
+`docs/concepts/phase6_5_tools_images_uebersicht.svg`.
 
 ---
 

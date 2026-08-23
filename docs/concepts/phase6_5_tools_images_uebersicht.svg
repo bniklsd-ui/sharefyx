@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080" font-family="'DejaVu Sans','Segoe UI',Helvetica,Arial,sans-serif">
+
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a6b7d"/>
+    </marker>
+    <marker id="arG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2f7a4d"/>
+    </marker>
+    <marker id="arR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b03030"/>
+    </marker>
+  </defs>
+
+  <rect width="1080" height="1080" fill="#f7f8fa"/>
+
+  <!-- ================= Kopf ================= -->
+  <rect x="0" y="0" width="1080" height="86" fill="#1d2b3a"/>
+  <text x="36" y="38" font-size="25" font-weight="700" fill="#ffffff">Phase 6.5 — Werkzeug-Ergonomie und Bilder</text>
+  <text x="36" y="66" font-size="14" fill="#9db2c6">Sharefyx · phase6_5_tools_images/ · kein eigenes Paket · Code live seit main@f96125e · Stand 2026-08-23</text>
+  <rect x="808" y="20" width="236" height="46" rx="10" fill="#b8860b"/>
+  <text x="926" y="39" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">code-complete</text>
+  <text x="926" y="57" font-size="12.5" fill="#f5e6c0" text-anchor="middle">12 von 14 Zeilen live bestanden</text>
+
+  <!-- ================= Mission ================= -->
+  <rect x="36" y="102" width="1008" height="60" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="127" font-size="15" font-weight="700" fill="#1d2b3a">Mission: Claude findet seine Werkzeuge selbst — und ein Bild bleibt ein Link, kein Byte, das ungefragt fließt.</text>
+  <text x="56" y="149" font-size="12.5" fill="#4a5a6b">Zwei Blöcke, unter Druck fällt <tspan font-weight="700" fill="#1d2b3a">B</tspan> weg, nie <tspan font-weight="700" fill="#1d2b3a">A</tspan> — reine Beschreibungsarbeit ohne Datenformatänderung schlägt Bild-Fläche.</text>
+
+  <!-- ================= Flussdiagramm: zwei Bloecke ================= -->
+  <rect x="36" y="180" width="1008" height="440" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="206" font-size="15" font-weight="700" fill="#1d2b3a">Block A: Werkzeuge finden sich selbst — Block B: ein Bild sieht nur, wer schreiben darf</text>
+
+  <!-- Block A -->
+  <rect x="76" y="226" width="440" height="150" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="296" y="250" font-size="13.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">Block A — Werkzeug-Ergonomie</text>
+  <text x="296" y="270" font-size="11" fill="#4a5a6b" text-anchor="middle" font-family="monospace">mcpserver/tools.py</text>
+  <text x="96" y="294" font-size="11" fill="#4a5a6b">get_item_meta — reine Metadaten, kein Body</text>
+  <text x="96" y="314" font-size="11" fill="#4a5a6b">list_spaces — Falschaussage „nur eigener Space" entfernt</text>
+  <text x="96" y="334" font-size="11" fill="#4a5a6b">Statuswerte + Aufgabenteilung in vier Beschreibungen benannt</text>
+  <text x="96" y="354" font-size="11" fill="#4a5a6b" font-family="monospace">search_items(in_body=) — Körpersuche als Opt-in</text>
+  <text x="296" y="372" font-size="10.5" fill="#2f7a4d" text-anchor="middle" font-weight="700">4 von 4 Zeilen live — vollständig</text>
+
+  <!-- Block B -->
+  <rect x="564" y="226" width="440" height="150" rx="8" fill="#e8eef5" stroke="#7f9ab5" stroke-width="1.6"/>
+  <text x="784" y="250" font-size="13.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">Block B — Bilder</text>
+  <text x="784" y="270" font-size="11" fill="#4a5a6b" text-anchor="middle" font-family="monospace">storage/{files,store} · webui/api.py</text>
+  <text x="584" y="294" font-size="11" fill="#4a5a6b">put_asset()/get_asset() — nie base64 im .md</text>
+  <text x="584" y="314" font-size="11" fill="#4a5a6b" font-family="monospace">&lt;space&gt;/_assets/&lt;item_id&gt;/ — ein Commit je Upload</text>
+  <text x="584" y="334" font-size="11" fill="#4a5a6b">get_item_asset — Bytes nur bei Schreibrecht (P6.5-M)</text>
+  <text x="584" y="354" font-size="11" fill="#4a5a6b">Entfernen = Verschieben nach _trash/ (N5, Entscheidung H bleibt)</text>
+  <text x="784" y="372" font-size="10.5" fill="#b8860b" text-anchor="middle" font-weight="700">8 von 10 Zeilen live — 2 offen</text>
+
+  <!-- Pfeil Block A -> Block B (gemeinsamer Server) -->
+  <line x1="516" y1="301" x2="564" y2="301" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <text x="540" y="292" font-size="9.5" fill="#6b7b8c" text-anchor="middle">selbe zehn Tools</text>
+
+  <!-- Rechtegrenze -->
+  <line x1="784" y1="376" x2="784" y2="402" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <rect x="614" y="404" width="340" height="72" rx="8" fill="#fff8e8" stroke="#d4ab5a" stroke-width="1.6"/>
+  <text x="784" y="428" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle" font-family="monospace">get_item_asset() — die Rechtegrenze</text>
+  <text x="784" y="448" font-size="10.5" fill="#4a5a6b" text-anchor="middle">share_read allein → nur Metadaten, bytes_available:false</text>
+  <text x="784" y="465" font-size="10.5" fill="#4a5a6b" text-anchor="middle">share_write ODER eigener Space → echte Bytes</text>
+
+  <line x1="700" y1="476" x2="700" y2="498" stroke="#b03030" stroke-width="1.6" marker-end="url(#arR)"/>
+  <line x1="868" y1="476" x2="868" y2="498" stroke="#2f7a4d" stroke-width="1.6" marker-end="url(#arG)"/>
+
+  <rect x="580" y="500" width="240" height="50" rx="25" fill="#fdecec" stroke="#d99b9b"/>
+  <text x="700" y="522" font-size="11.5" font-weight="700" fill="#b03030" text-anchor="middle">share_read → Metadaten</text>
+  <text x="700" y="540" font-size="10" fill="#4a5a6b" text-anchor="middle">P6.5-13, per testnutzer-p7 bestätigt</text>
+
+  <rect x="828" y="500" width="240" height="50" rx="25" fill="#eaf4ee" stroke="#8fb59a"/>
+  <text x="948" y="522" font-size="11.5" font-weight="700" fill="#2f7a4d" text-anchor="middle">share_write → Bild-Bytes</text>
+  <text x="948" y="540" font-size="10" fill="#4a5a6b" text-anchor="middle">P6.5-8, per testnutzer-p7 bestätigt</text>
+
+  <!-- Substitution note -->
+  <rect x="76" y="404" width="500" height="72" rx="8" fill="#f2f5f8" stroke="#a8b8c8"/>
+  <text x="326" y="428" font-size="12" font-weight="700" fill="#1d2b3a" text-anchor="middle">Dritter Principal statt Fabian</text>
+  <text x="326" y="448" font-size="10.5" fill="#4a5a6b" text-anchor="middle">testnutzer-p7 (Phase 7, P7-J) — gleicher Code-Pfad,</text>
+  <text x="326" y="465" font-size="10.5" fill="#4a5a6b" text-anchor="middle">gebilligte Substitution laut P7-Plan §A8.1</text>
+
+  <!-- Entfernen-Knopf -->
+  <rect x="76" y="500" width="500" height="102" rx="8" fill="#fdf6ea" stroke="#d4ab5a"/>
+  <text x="326" y="524" font-size="12" font-weight="700" fill="#1d2b3a" text-anchor="middle">P6.5-12 — Entfernen-Knopf</text>
+  <text x="96" y="546" font-size="10.5" fill="#4a5a6b">Ursprünglicher Fund dieser Phase: editor.js hatte keinen Knopf,</text>
+  <text x="96" y="564" font-size="10.5" fill="#4a5a6b">obwohl DELETE .../assets/{id} längst existierte.</text>
+  <text x="96" y="588" font-size="11" font-weight="700" fill="#b8860b">Geschlossen von P7 Step A3 — gebaut, kein Browser-Klick-Nachweis</text>
+
+  <!-- ================= Abnahme-Zusammenfassung ================= -->
+  <rect x="36" y="640" width="1008" height="106" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="664" font-size="14.5" font-weight="700" fill="#1d2b3a">Abnahme — 12 von 14, zwei strukturell unterschiedliche Lücken</text>
+  <rect x="56" y="676" width="472" height="52" rx="6" fill="#eaf4ee" stroke="#8fb59a"/>
+  <text x="72" y="696" font-size="11.5" font-weight="700" fill="#1d2b3a">P6.5-12 — kein Blocker mehr</text>
+  <text x="72" y="714" font-size="10.5" fill="#4a5a6b">Knopf gebaut (P7 A3), nur der Browser-Beweis fehlt</text>
+  <rect x="552" y="676" width="472" height="52" rx="6" fill="#f2f5f8" stroke="#a8b8c8"/>
+  <text x="568" y="696" font-size="11.5" font-weight="700" fill="#1d2b3a">P6.5-14 — strukturell offen</text>
+  <text x="568" y="714" font-size="10.5" fill="#4a5a6b">Verhaltenskriterium über Claude — kein Skript kann das je schließen</text>
+
+  <!-- ================= Was offen ist ================= -->
+  <rect x="36" y="762" width="1008" height="130" rx="8" fill="#ffffff" stroke="#d99b9b"/>
+  <text x="56" y="788" font-size="14.5" font-weight="700" fill="#b03030">Was offen ist — ehrlich, nicht beschönigt</text>
+  <text x="56" y="814" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">P6.5-12</tspan> — kein echter claude-in-chrome-Klick diese Sitzung: Login-Credentials in eine Type-Aktion zu tippen hätte sie im Werkzeugverlauf exponiert (Hard Rule 1).</text>
+  <text x="56" y="836" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">P6.5-14</tspan> — zwei Datenpunkte liegen vor (beide Male korrekt angekündigt), die Kriterienbewertung selbst bleibt Sache des Nikingers.</text>
+  <text x="56" y="858" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">V64</tspan> — ob claude.ai aus destructiveHint:True eine wiederholte Rückfrage macht, ist Client-Verhalten, nicht spezifizierbar.</text>
+  <text x="56" y="880" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#b03030">_trash/-Räumung</tspan> bleibt bewusst unautomatisiert — eigene Lösung mittelfristig nötig, kein Teil dieser Phase.</text>
+
+  <!-- ================= Fuss ================= -->
+  <text x="36" y="944" font-size="11" fill="#6b7b8c">P6.5-8/13 über testnutzer-p7 statt Fabian geschlossen (P7-Plan §A8.1 gebilligte Substitution) — derselbe Server-Code-Pfad, ein anderer Principal-Name.</text>
+  <text x="36" y="966" font-size="11" fill="#6b7b8c">843 pytest grün · Plan: docs/concepts/phase6_5_tools_images_plan.md · Handover: docs/concepts/PHASE6_5_CLOSEOUT_HANDOVER.md</text>
+  <text x="36" y="994" font-size="10.5" fill="#8a97a5">Statusregel des Projekts: „grün" heißt live-verifiziert, nicht gebaut. Deshalb steht diese Phase auf gelb — der Sprung auf grün ist eine Nikinger-Entscheidung.</text>
+
+</svg>
