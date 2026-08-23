@@ -110,7 +110,7 @@ keinen Code bekommen, nur Step 0 (Haushalt) lief.
 | P7-11 | `testnutzer-p7` sieht nur sein item-level Item | Claude Code | ✅ Web-UI (P6-Zeilen 36/37, echter Login) **und** MCP (`p7_11_visibility_probe.py`) |
 | P7-12 | `testnutzer-p7` entfernt, Keyring-Eintrag weg | Claude Code | ⬜ |
 | P7-12b | Claude Code loggt sich ohne Nikinger als `testnutzer-p7` ein | Claude Code | ✅ derselbe Lauf wie P7-10 — Login/TOTP/Consent allein über `testcred.py` |
-| P7-13 | Phase 6.5 formal abgeschlossen | Claude Code | ✅ 🟡 (12/14, `PHASE6_5_CLOSEOUT_HANDOVER.md`) |
+| P7-13 | Phase 6.5 formal abgeschlossen | Claude Code | ✅ Abschluss vollzogen (Phase 6.5 selbst steht 🟡, 12/14 — siehe `PHASE6_5_CLOSEOUT_HANDOVER.md`) |
 | P7-14 | Eigener Space im Browser freigegeben, Empfänger sieht ihn | Niklas + `testnutzer-p7` | ⬜ |
 | P7-15 | Zurücknehmen kein Re-Auth, Erweitern eines | Niklas | ⬜ |
 | P7-16 | Neuer geteilter Space im Browser angelegt | Niklas | ⬜ |
@@ -454,10 +454,28 @@ neuer Sicherheitsbefund.**
 **P6.5-8 — Web-UI-Fläche, per Cookie-Session-Skript statt Browser-Klick geschlossen.**
 `p7_13_ui_asset_probe.py` (neu) postet gegen `/ui/login` (Cookie-Session, P5-D) und holt danach
 `GET /api/v1/items/{id}/assets/{id}` — dieselbe Bauart wie die MCP-Probe, nur gegen die
-Cookie-Fläche: authentifiziert + `share_write` → `200`/`image/png`/77 Bytes; ganz ohne Session
-→ `401`. **Plan-Text-Drift, kein Bug:** `phase6_5_tools_images_plan.md` Zeile P6.5-8 nennt
-„403" — der reale Endpunkt liefert bei fehlender Authentifizierung `401` (P5-typisch: kein
-Unterschied zwischen „nicht angemeldet" und „falsche Anmeldedaten"), beides fail-closed.
+Cookie-Fläche.
+
+**Advisor-Fund, VOR dem Commit korrigiert (nicht danach entdeckt):** der erste Testlauf setzte
+„ohne Session" (kein Cookie überhaupt, `401`, reine Authentifizierung — dieselbe Fläche wie P5
+Zeile 19, nicht neu geprüft) mit „ohne Freigabe" (P6.5-8s tatsächliches Kriterium — angemeldet,
+aber kein `share_read`/`share_write`) gleich und schloss daraus fälschlich auf einen
+„Plan-Text-Drift" (Plan nennt `403`). **Drei saubere Zustände desselben Items nachgeholt, ein
+Variable je Schritt geändert** (`p7_13_share_write_fixture.py --clear`/`--clear-read`, Item-
+Version 3→4→5): `share_write` geleert, `share_read` behalten → UI `200` (HUMAN-Fläche braucht
+nur Leserecht, P6-AW — bestätigt zugleich P6.5-13s Asymmetrie, MCP-Seite bleibt
+`bytes_available:false` unter derselben Bedingung, sauber reproduziert); danach auch
+`share_read` geleert → UI-`authenticated_status`: **`403`, deckungsgleich mit dem Plan-Text.**
+**Der Plan-Text war richtig, der ursprüngliche „401 statt 403"-Befund war der eigentliche
+Fehler.** Korrigiert in `phase6_5_tools_images/CLAUDE.md`s P6.5-8-Zeile (dortige, datierte
+Korrekturnotiz, kein stilles Überschreiben).
+
+**Teardown, gleich mitgezogen statt erst bei P7-12:** `p7_13_teardown.py` (neu,
+`store.delete_asset()`) entfernt `ast_e7f27214` — landet wie jedes gelöschte Asset in
+`_assets/itm_3d0ac2b3/_trash/` (N5, kein echtes Löschen, Entscheidung H bleibt unangetastet),
+`list_assets()` zeigt danach `[]`. `share_read`/`share_write` sind bereits durch den dritten
+Testzustand oben auf `[]` (Version 5). **Alle vier Teardown-Ledger-Punkte damit vorzeitig
+geschlossen** — P7-12 selbst hat für `itm_3d0ac2b3` nichts mehr zu tun.
 
 **Abnahmestand 6.5 neu gezählt (A8.2): 12 von 14**, nicht 14/14 — Glyph bleibt 🟡, aus der
 Zahl abgeleitet, kein Grenzfall (P6.5-12 UND P6.5-14 offen, nicht nur P6.5-14 wie im
@@ -473,20 +491,15 @@ Umfang auf den neuen 6.5-Status gezogen — Root-`CLAUDE.md`s „Current state" 
 gar nicht erwähnt (eigener kleiner Fund, kein A8-Punkt, aber dieselbe Kategorie Doku-Drift wie
 Step 0s Audit).
 
-**Teardown-Ledger erweitert (P7-12, jetzt vier statt zwei Punkte):**
-1. `itm_3d0ac2b3` trägt `share_read: [testnutzer-p7]` (aus P7-11) — bereits vermerkt.
-2. `itm_3d0ac2b3` trägt jetzt zusätzlich **`share_write: [testnutzer-p7]`** (aus P7-13) —
-   `spacectl.py check` sieht das ebenso wenig wie `share_read`, gleiche Lücke, jetzt zwei Felder.
-3. `itm_3d0ac2b3` trägt ein echtes **Asset** (`ast_e7f27214`, `niklas/_assets/itm_3d0ac2b3/`) —
-   gehört `niklas`, nicht `testnutzer-p7`; `spacectl.py remove-space testnutzer-p7` räumt es
-   nicht auf (fremdes Item), aber es bleibt als Testartefakt in niklas' Space stehen, wenn es
-   niemand vorher entfernt.
-4. **Empfehlung vor P7-12:** `share_read`/`share_write` auf `itm_3d0ac2b3` zurücknehmen (oder
-   das Item archivieren) UND das Test-Asset per `store.delete_asset()` entfernen — alle drei in
-   einem Zug, nicht einzeln vergessen.
+**Teardown-Ledger — alle vier Punkte bereits diese Sitzung geschlossen, nicht erst bei P7-12
+(siehe „Advisor-Fund" oben: die dritte Nachprobe brauchte den geleerten Zustand ohnehin):**
+`itm_3d0ac2b3` trägt jetzt `share_read: []`, `share_write: []` (Version 5) und `ast_e7f27214`
+liegt in `_trash/` (`p7_13_teardown.py`, `list_assets()` → `[]`). Nichts bleibt für P7-12 an
+diesem Item übrig.
 
-**`pytest -q` weiterhin 843 passed** (vier neue Skripte, alle Live-Probe-Kategorie ohne eigenen
-Unit-Test). Tabu-Diff unverändert leer.
+**`pytest -q` weiterhin 843 passed** (fünf neue Skripte — vier aus der ersten A8-Runde plus
+`p7_13_teardown.py` — alle Live-Probe-Kategorie ohne eigenen Unit-Test). Tabu-Diff unverändert
+leer.
 
 **Nächster Schritt:** A6 (Purge-Gate, `clients`/`token_families`-Rückgang, frühestens
 2026-08-28) ist der letzte offene Block-A-Punkt außer P7-12 selbst. Bis dahin: Session hier

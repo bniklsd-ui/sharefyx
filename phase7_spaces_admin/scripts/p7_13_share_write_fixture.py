@@ -25,10 +25,21 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("item_id")
     parser.add_argument("--version", type=int, required=True)
     parser.add_argument("--principal", default="testnutzer-p7")
+    parser.add_argument(
+        "--clear", action="store_true",
+        help="share_write leeren statt setzen (Rueckbau-Halbschritt, kein neuer Serverpfad)",
+    )
+    parser.add_argument(
+        "--clear-read", action="store_true",
+        help="zusaetzlich share_read leeren (vollstaendiger Rueckbau in einem Aufruf)",
+    )
     args = parser.parse_args(argv)
 
     store = Store(DATA_ROOT)
-    item = store.update(args.item_id, version=args.version, share_write=[args.principal])
+    kwargs = {"share_write": [] if args.clear else [args.principal]}
+    if args.clear_read:
+        kwargs["share_read"] = []
+    item = store.update(args.item_id, version=args.version, **kwargs)
     print(json.dumps({
         "id": item.id, "version": item.version,
         "share_read": item.share_read, "share_write": item.share_write,

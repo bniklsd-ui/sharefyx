@@ -24,7 +24,7 @@ updated: 2026-08-23 (Phase 6.5 formal abgeschlossen als P7 Step A8 -- 12/14, tes
 
 ## Root & governance
 
-- [CLAUDE.md](../CLAUDE.md) — 📗 ~17KB · rules, core principle, hard rules, working style, current state; auto-loaded every session — 2026-08-08 komprimiert (war ~41KB), P4/P5-Detailhistorie lebt jetzt nur noch in den jeweiligen Phase-Heads
+- [CLAUDE.md](../CLAUDE.md) — 📗 ~31KB (Größe hier stand seit 2026-08-08 stale bei „~17KB" — beim A8-Edit dieser Sitzung nachgezählt, keine eigene Aufräumaktion, nur die Zahl korrigiert) · rules, core principle, hard rules, working style, current state; auto-loaded every session — 2026-08-08 komprimiert (war ~41KB), P4/P5-Detailhistorie lebt jetzt nur noch in den jeweiligen Phase-Heads
 - [AGENTS.md](../AGENTS.md) — 📗 ~1KB · harness-neutral entry point for non-Claude-Code agents; points to `CLAUDE.md` + doc-layers navigation
 - [README.md](../README.md) — 📗 ~5KB · human overview + machine setup (venv, keyring, run, smoke test)
 - [ROADMAP.md](../ROADMAP.md) — 📗 ~16KB · Phases 1–6.5, scope in/out per phase, status (P1–P5 ✅, P6 🔄 gestartet, P6.5 🔄 Step 0)
