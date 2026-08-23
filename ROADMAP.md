@@ -12,7 +12,7 @@ down:
   - docs/concepts/phase5_ui_plan.md        # ausführungsreifer P5-Plan
   - docs/concepts/phase6_shares_plan.md    # ausführungsreifer P6-Plan
   - docs/concepts/phase6_5_tools_images_plan.md   # ausführungsreifer P6.5-Plan
-updated: 2026-08-20 (neue Phase 6.5 -- Werkzeug-Ergonomie + Bilder -- ergaenzt, Step 0 gestartet)
+updated: 2026-08-23 (Phase 6 auf 🟡 code-complete -- 12 von 39 Abnahmezeilen live, Sprung auf ✅ ist offene Nikinger-Entscheidung) | 2026-08-20 (neue Phase 6.5 -- Werkzeug-Ergonomie + Bilder -- ergaenzt, Step 0 gestartet)
 ---
 # ROADMAP — Space-Server
 
@@ -28,7 +28,7 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 | **P3** | `phase3_edge/` | Tunnel, systemd, Health, Logging, Ops-Skripte. Öffentlich erreichbar. | ✅ |
 | **P4** | `phase4_auth/` · `authserver` | OAuth 2.1 + DCR; ersetzt den Pfad-Token. | ✅ |
 | **P5** | `phase5_ui/` · `webui` | REST-API + Web-UI für Menschen. | ✅ |
-| **P6** | `phase6_shares/` (kein eigenes Paket) | Freigaben, Ordner, `patch_item`, Update-Log, Bilder. | 🔄 |
+| **P6** | `phase6_shares/` (kein eigenes Paket) | Freigaben, Ordner, `patch_item`, Update-Log, Bilder. | 🟡 |
 
 **Korrektur (2026-07-25, P2-Planungssession):** OAuth rückt von „ganz am Ende" auf „direkt nach
 P3" — der Pfad-Token soll kurz leben, und die UI ist die Phase, die laut Build-Reihenfolge unter
@@ -216,6 +216,16 @@ nicht deployed. Eine Planungsvormerkung für die nächste Session (Item-Verschie
 Ordnern/Spaces) steht offen. Herkunft: `docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` §4.1–§4.6. Plan:
 `docs/concepts/phase6_shares_plan.md` (Entscheidungen P6-A–P6-AC, Steps 0–10). Details:
 `phase6_shares/CLAUDE.md`s Session-Block vom 2026-08-13.
+
+**Status-Korrektur (2026-08-23, Phasenabschluss): 🔄 → 🟡, bewusst nicht ✅.** Sämtlicher P6-Code
+ist gebaut und live deployt (`main`@`f96125e`), aber nur **12 von 39 Abnahmezeilen** sind
+live-verifiziert — und die Statusregel dieses Projekts sagt „✅ heißt live-verifiziert, nicht
+gebaut". Vier Zeilen (31–34, §9 Mehrfachauswahl) wurden nie gebaut; Block C (Zeilen 19–22/40–47,
+Bilder) ist nach Phase 6.5 ausgewandert; sieben weitere Zeilen hängen an einer Sitzung mit
+Fabians eigenem Login. **Der Sprung auf ✅ ist eine offene Nikinger-Entscheidung.** Vollständiger
+Zeilenstatus, offene Entscheidungen und `[VERIFY]`-Bilanz:
+`docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md`. Übersichtsgrafik:
+`docs/concepts/phase6_shares_uebersicht.svg`.
 
 ---
 

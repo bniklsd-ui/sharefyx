@@ -153,7 +153,22 @@ Deckt die fünf noch offenen MCP-Werkzeug-Ergonomie-Punkte (siehe „Noch nicht 
 phase6_5_tools_images_plan.md` (Entscheidungen P6.5-A–P6.5-V, alle sechs Nikinger-Fragen N1–N6
 gelockt in §0.0). Phase-Head: `phase6_5_tools_images/CLAUDE.md`.
 
-**Aktive Phase:** Phase 6 — Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`, kein
+**[2026-08-23] Phase 6 abgeschlossen als 🟡 — code-complete und live deployt, aber NICHT
+vollständig live-verifiziert.** Bewusst **nicht** ✅: nur **12 von 39 Abnahmezeilen** sind
+live-verifiziert, vier (31–34, §9 Mehrfachauswahl) wurden nie gebaut, Block C ist nach Phase 6.5
+ausgewandert, sieben Zeilen hängen an einer Sitzung mit Fabians eigenem Login. Es gibt bewusst
+**kein** `P6_ABNAHME_<datum>.md` — der Zeilenstatus steht in
+`docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md` §3. **Der Sprung auf ✅ ist eine offene
+Nikinger-Entscheidung.** Zwei Aufgaben sind vom Nikinger ausdrücklich für die nächste Phase
+benannt: (1) **Doku-Audit** der Modul-Status-Zeilen 8–16 in `phase6_shares/CLAUDE.md`, die noch
+„gebaut, noch nicht deployt" tragen — vermutlich stale, wie sich am 2026-08-23 schon für die
+globale Suche zeigte, aber **zu prüfen, nicht zu raten**; (2) **kein Entfernen-Knopf für Bilder**
+in `phase5_ui/webui/static/js/editor.js`, obwohl N5 gelockt ist und der `DELETE`-Endpunkt
+existiert (blockiert P6.5-12). Übersichtsgrafik: `docs/concepts/phase6_shares_uebersicht.svg`.
+**Phase 6.5 ist davon unberührt und läuft weiter.** Der folgende Absatz bleibt als
+Verlaufsdokumentation stehen.
+
+**Phase 6 — Freigaben, Ordner, Werkzeug-Ergonomie** (`phase6_shares/`, kein
 eigenes Python-Paket) — **🔄 gestartet, 2026-08-09.** Ausführungsreifer Plan lag bereits vor
 (`docs/concepts/phase6_shares_plan.md`, Entscheidungen P6-A–P6-AC, Steps 0–10, drei Blöcke: A =
 Werkzeuge/Betrieb/Update-Banner, B = Dateisystem, C = Bilder, hartes Gate zwischen A und B).

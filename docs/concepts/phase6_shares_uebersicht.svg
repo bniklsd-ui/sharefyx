@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080" font-family="'DejaVu Sans','Segoe UI',Helvetica,Arial,sans-serif">
+
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a6b7d"/>
+    </marker>
+    <marker id="arG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2f7a4d"/>
+    </marker>
+    <marker id="arR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b03030"/>
+    </marker>
+  </defs>
+
+  <rect width="1080" height="1080" fill="#f7f8fa"/>
+
+  <!-- ================= Kopf ================= -->
+  <rect x="0" y="0" width="1080" height="86" fill="#1d2b3a"/>
+  <text x="36" y="38" font-size="25" font-weight="700" fill="#ffffff">Phase 6 — Freigaben, Ordner, Werkzeug-Ergonomie</text>
+  <text x="36" y="66" font-size="14" fill="#9db2c6">Sharefyx · phase6_shares/ · kein eigenes Paket · Code live seit main@f96125e · Stand 2026-08-23</text>
+  <rect x="828" y="20" width="216" height="46" rx="10" fill="#b8860b"/>
+  <text x="936" y="39" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">code-complete</text>
+  <text x="936" y="57" font-size="12.5" fill="#f5e6c0" text-anchor="middle">12 von 39 Zeilen live bestanden</text>
+
+  <!-- ================= Mission ================= -->
+  <rect x="36" y="102" width="1008" height="60" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="127" font-size="15" font-weight="700" fill="#1d2b3a">Mission: Ein Mensch entscheidet pro Item, wer es sieht — Claude korrigiert drei Zeilen statt alles.</text>
+  <text x="56" y="149" font-size="12.5" fill="#4a5a6b">Der Bruch dieser Phase: <tspan font-weight="700" fill="#1d2b3a">Hard Rule 4 wurde neu gefasst</tspan> — Schreibrechte folgen der Mitgliedschaft, nicht dem Token. Als Datei, nie als if-Zweig.</text>
+
+  <!-- ================= Flussdiagramm ================= -->
+  <rect x="36" y="180" width="1008" height="470" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="206" font-size="15" font-weight="700" fill="#1d2b3a">Eine Rechtepolitik, zwei Oberflächen — und die Antwort steht in einer Datei, nicht im Code</text>
+
+  <!-- Row A: Akteure -->
+  <rect x="76" y="222" width="250" height="64" rx="6" fill="#e8eef5" stroke="#7f9ab5"/>
+  <text x="201" y="246" font-size="14" font-weight="700" fill="#1d2b3a" text-anchor="middle">Mensch</text>
+  <text x="201" y="265" font-size="11.5" fill="#4a5a6b" text-anchor="middle">Browser, Cookie-Sitzung</text>
+  <text x="201" y="279" font-size="10" fill="#6b7b8c" text-anchor="middle">Surface.HUMAN</text>
+
+  <rect x="754" y="222" width="250" height="64" rx="6" fill="#e8eef5" stroke="#7f9ab5"/>
+  <text x="879" y="246" font-size="14" font-weight="700" fill="#1d2b3a" text-anchor="middle">Claude</text>
+  <text x="879" y="265" font-size="11.5" fill="#4a5a6b" text-anchor="middle">Connector, Bearer-Token</text>
+  <text x="879" y="279" font-size="10" fill="#6b7b8c" text-anchor="middle">Surface.AGENT</text>
+
+  <line x1="201" y1="286" x2="201" y2="310" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <line x1="879" y1="286" x2="879" y2="310" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <!-- Row B: Flaechen -->
+  <rect x="76" y="312" width="250" height="64" rx="6" fill="#eef4ee" stroke="#8fb59a"/>
+  <text x="201" y="335" font-size="12.5" font-weight="700" fill="#1d2b3a" text-anchor="middle" font-family="monospace">webui/api.py</text>
+  <text x="201" y="353" font-size="10.5" fill="#4a5a6b" text-anchor="middle">Ordner, Chips, Freigabe-Dialog</text>
+  <text x="201" y="367" font-size="10" fill="#6b7b8c" text-anchor="middle">Re-Auth beim Erweitern (P6-N)</text>
+
+  <rect x="754" y="312" width="250" height="64" rx="6" fill="#eef4ee" stroke="#8fb59a"/>
+  <text x="879" y="335" font-size="12.5" font-weight="700" fill="#1d2b3a" text-anchor="middle" font-family="monospace">mcpserver/tools.py</text>
+  <text x="879" y="353" font-size="10.5" fill="#4a5a6b" text-anchor="middle">7 Werkzeuge, Quittung statt Volltext</text>
+  <text x="879" y="367" font-size="10" fill="#6b7b8c" text-anchor="middle">patch_item ist neu (P6-E/F/G)</text>
+
+  <!-- Row B -> Policy -->
+  <line x1="326" y1="344" x2="384" y2="344" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <line x1="754" y1="344" x2="696" y2="344" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <!-- Policy -->
+  <rect x="386" y="310" width="308" height="68" rx="8" fill="#fff8e8" stroke="#d4ab5a" stroke-width="1.6"/>
+  <text x="540" y="334" font-size="13.5" font-weight="700" fill="#1d2b3a" text-anchor="middle" font-family="monospace">SharePolicy</text>
+  <text x="540" y="352" font-size="11" fill="#4a5a6b" text-anchor="middle">ersetzt OwnSpaceWritable aus P2</text>
+  <text x="540" y="368" font-size="10" fill="#6b7b8c" text-anchor="middle">ein Regelwerk, zwei Surfaces — keine Kopie</text>
+
+  <line x1="540" y1="378" x2="540" y2="404" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <!-- ACL -->
+  <rect x="316" y="406" width="448" height="58" rx="6" fill="#e8eef5" stroke="#7f9ab5"/>
+  <text x="540" y="429" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle" font-family="monospace">storage/acl.py :: decision_for()</text>
+  <text x="540" y="450" font-size="10.5" fill="#4a5a6b" text-anchor="middle">fail-closed: was nicht ausdrücklich erlaubt ist, ist verboten</text>
+
+  <!-- ACL liest -->
+  <line x1="540" y1="464" x2="540" y2="478" stroke="#5a6b7d" stroke-width="1.4"/>
+  <line x1="216" y1="478" x2="864" y2="478" stroke="#5a6b7d" stroke-width="1.4"/>
+  <line x1="216" y1="478" x2="216" y2="496" stroke="#5a6b7d" stroke-width="1.4" marker-end="url(#ar)"/>
+  <line x1="540" y1="478" x2="540" y2="496" stroke="#5a6b7d" stroke-width="1.4" marker-end="url(#ar)"/>
+  <line x1="864" y1="478" x2="864" y2="496" stroke="#5a6b7d" stroke-width="1.4" marker-end="url(#ar)"/>
+  <text x="600" y="473" font-size="10" fill="#6b7b8c">liest — Daten auf der Platte</text>
+
+  <rect x="76" y="498" width="280" height="62" rx="6" fill="#f2f5f8" stroke="#a8b8c8"/>
+  <text x="216" y="520" font-size="12" font-weight="700" fill="#1d2b3a" text-anchor="middle" font-family="monospace">&lt;space&gt;/.share.yml</text>
+  <text x="216" y="537" font-size="10.5" fill="#4a5a6b" text-anchor="middle">read: / write: — Mitgliedschaft</text>
+  <text x="216" y="552" font-size="10" fill="#6b7b8c" text-anchor="middle">nur per spacectl.py, nie per MCP</text>
+
+  <rect x="400" y="498" width="280" height="62" rx="6" fill="#f2f5f8" stroke="#a8b8c8"/>
+  <text x="540" y="520" font-size="12" font-weight="700" fill="#1d2b3a" text-anchor="middle" font-family="monospace">share_read / share_write</text>
+  <text x="540" y="537" font-size="10.5" fill="#4a5a6b" text-anchor="middle">Frontmatter, pro Item</text>
+  <text x="540" y="552" font-size="10" fill="#6b7b8c" text-anchor="middle">setzt nur ein Mensch (P6-M)</text>
+
+  <rect x="724" y="498" width="280" height="62" rx="6" fill="#f2f5f8" stroke="#a8b8c8"/>
+  <text x="864" y="520" font-size="12" font-weight="700" fill="#1d2b3a" text-anchor="middle" font-family="monospace">visibility: private | human</text>
+  <text x="864" y="537" font-size="10.5" fill="#4a5a6b" text-anchor="middle">zwei Stufen, mehr nicht (P6-J)</text>
+  <text x="864" y="552" font-size="10" fill="#6b7b8c" text-anchor="middle">Migration real nie gelaufen</text>
+
+  <!-- Ergebnisse -->
+  <line x1="216" y1="560" x2="216" y2="580" stroke="#2f7a4d" stroke-width="1.6" marker-end="url(#arG)"/>
+  <line x1="540" y1="560" x2="540" y2="580" stroke="#b03030" stroke-width="1.6" marker-end="url(#arR)"/>
+  <line x1="864" y1="560" x2="864" y2="580" stroke="#b03030" stroke-width="1.6" marker-end="url(#arR)"/>
+
+  <rect x="76" y="582" width="280" height="48" rx="24" fill="#eaf4ee" stroke="#8fb59a"/>
+  <text x="216" y="602" font-size="12" font-weight="700" fill="#2f7a4d" text-anchor="middle">erlaubt — lesen / schreiben</text>
+  <text x="216" y="620" font-size="10" fill="#4a5a6b" text-anchor="middle">fremder Body bleibt untrusted_content</text>
+
+  <rect x="400" y="582" width="280" height="48" rx="24" fill="#fdecec" stroke="#d99b9b"/>
+  <text x="540" y="602" font-size="12" font-weight="700" fill="#b03030" text-anchor="middle">verweigert — fail-closed</text>
+  <text x="540" y="620" font-size="10" fill="#4a5a6b" text-anchor="middle">404 statt 403: kein Existenzleck</text>
+
+  <rect x="724" y="582" width="280" height="48" rx="24" fill="#fdecec" stroke="#d99b9b"/>
+  <text x="864" y="602" font-size="12" font-weight="700" fill="#b03030" text-anchor="middle">visibility: human</text>
+  <text x="864" y="620" font-size="10" fill="#4a5a6b" text-anchor="middle">für Claude nicht existent, auch nicht in total</text>
+
+  <!-- ================= Bloecke ================= -->
+  <rect x="36" y="666" width="1008" height="98" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="690" font-size="14.5" font-weight="700" fill="#1d2b3a">Drei Blöcke, ein hartes Gate — unter Druck fällt zuerst C, nie A (P6-A)</text>
+
+  <rect x="56" y="700" width="300" height="50" rx="6" fill="#eaf4ee" stroke="#8fb59a"/>
+  <text x="72" y="720" font-size="12.5" font-weight="700" fill="#1d2b3a">A — Werkzeuge, Betrieb, Update-Banner</text>
+  <text x="72" y="738" font-size="10.5" fill="#4a5a6b">Steps 0–3 · gebaut, live · Gate A→B 3 von 4</text>
+
+  <rect x="376" y="700" width="300" height="50" rx="6" fill="#eaf4ee" stroke="#8fb59a"/>
+  <text x="392" y="720" font-size="12.5" font-weight="700" fill="#1d2b3a">B — Dateisystem, Rechte, Ordner</text>
+  <text x="392" y="738" font-size="10.5" fill="#4a5a6b">Steps 4–7b · gebaut, live · §9 nie gebaut</text>
+
+  <rect x="696" y="700" width="330" height="50" rx="6" fill="#f2f5f8" stroke="#a8b8c8"/>
+  <text x="712" y="720" font-size="12.5" font-weight="700" fill="#1d2b3a">C — Bilder</text>
+  <text x="712" y="738" font-size="10.5" fill="#4a5a6b">ausgewandert nach Phase 6.5 — läuft dort weiter</text>
+
+  <!-- ================= Was offen ist ================= -->
+  <rect x="36" y="780" width="1008" height="184" rx="8" fill="#ffffff" stroke="#d99b9b"/>
+  <text x="56" y="806" font-size="14.5" font-weight="700" fill="#b03030">Was offen ist — ehrlich, nicht beschönigt</text>
+
+  <text x="56" y="830" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">Zeilen 31–34</tspan> — Mehrfachauswahl (ITEM_MOVE_PLAN §9, P6-AK–AN): geplant, gelockt, <tspan font-weight="700">nie gebaut</tspan>. Größter offener Bauposten.</text>
+  <text x="56" y="852" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">Zeilen 10–13, 27, 28, 36, 37</tspan> — eine einzige Ursache: es fehlt eine Sitzung mit Fabians eigenem Login.</text>
+  <text x="56" y="874" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">Zeile 8</tspan> — migrate_visibility.py --apply lief nie live: 0 von 73 .md-Dateien tragen ein visibility-Feld (heute nachgeprüft).</text>
+  <text x="56" y="896" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">Zeile 18 / 24</tspan> — der dritte Testnutzer (P6-W) wurde nie angelegt. <tspan font-weight="700" fill="#1d2b3a">Zeile 4</tspan> — Purge-Nachweis, frühestens 2026-08-28.</text>
+  <text x="56" y="918" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">Zeile 23</tspan> — live widerlegt: der Funnel überlebte den Reboot vom 2026-08-19 nicht sauber. Watchdog bleibt offene Entscheidung.</text>
+  <text x="56" y="942" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#b03030">Für die nächste Phase benannt:</tspan> Doku-Audit der Modul-Zeilen 8–16 („noch nicht deployt" ist vermutlich stale) · kein Entfernen-Knopf für Bilder in editor.js.</text>
+
+  <!-- ================= Fuss ================= -->
+  <text x="36" y="994" font-size="11" fill="#6b7b8c">Der Seam-Beweis der Phasen 4/5 (leerer git diff auf storage/) ist hier bewusst aufgelöst — Ersatz sind byte-verglichene Charakterisierungstests (P6-D).</text>
+  <text x="36" y="1014" font-size="11" fill="#6b7b8c">828 pytest grün (772 am Ende von P6) · Plan: docs/concepts/phase6_shares_plan.md · Handover: docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md</text>
+  <text x="36" y="1040" font-size="10.5" fill="#8a97a5">Statusregel des Projekts: „grün" heißt live-verifiziert, nicht gebaut. Deshalb steht diese Phase auf gelb — der Sprung auf grün ist eine Nikinger-Entscheidung.</text>
+
+</svg>

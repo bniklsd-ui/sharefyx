@@ -4,7 +4,7 @@ purpose: L3-Archiv der Phase-6-Session-Bloecke -- Steps 0-7 (Haushalt, Werkzeug-
 read-when: Historie einer bereits abgeschlossenen Phase-6-Teilarbeit nachvollziehen -- nicht beim normalen Sessionstart lesen
 detail: L3
 up: ../phase6_shares/CLAUDE.md
-updated: 2026-08-19
+updated: 2026-08-23 (zwoelfte Rotation, Phasenabschluss -- der Deploy-Blocker-Block vom 2026-08-19 wandert herein, der Kopf traegt den Abschluss-Block)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 6 (`phase6_shares/`)
@@ -59,6 +59,107 @@ updated: 2026-08-19
 > Überschrift ("zwölfter"), genau der vom Skript selbst vorgesehene Fall einer `##`-Sektion, die
 > faktisch ein zweiter Block ist. Danach `scripts/rotate_session_block.sh phase6_shares`
 > mechanisch gelaufen, Kopf 52→41 KB.
+> **Elfte Rotation (2026-08-19, Planungs-/Bausession zum Deploy-Blocker):** der "zwölfter"-Block
+> (Abschluss-Review + Step-7b-E2E-Lauf) wandert herein, mechanisch über dasselbe Skript.
+> **Zwölfte Rotation (2026-08-23, Phasenabschluss):** der "dreizehnter"-Block (GLOBAL_SEARCH_PLAN
+> geplant und gebaut) wandert herein, mechanisch über dasselbe Skript, Byte-Identität vom Skript
+> geprüft (Kopf 45,7 → 38,7 KB) — der Kopf trägt seither den Abschluss-Block vom 2026-08-23.
+
+## Session stopped — 2026-08-19 (Deploy-Blocker geplant und gebaut: GLOBAL_SEARCH_PLAN.md, Q1/Bilder-Priorität per Nikinger-Entscheidung)
+
+**Auftrag:** Nikinger wollte die verbleibenden offenen P6-Punkte per Opus-Subagent
+ausführungsreif planen lassen (Token-/Effizienzgrund: Planung ist Opus-Klasse, Ausführung
+Sonnet). Ursprünglicher Prompt beschrieb Freigaben/Dateisystem/Update-Banner als „noch zu
+bauen" — das ist stale, alles davon ist längst live (Block A+B). Vor dem Start korrigiert:
+Scope auf die drei tatsächlich offenen Punkte (Such-Blocker, Block C Bilder, >2-Nutzer-Check)
+präzisiert, dem Subagenten mitgegeben.
+
+**Ergebnis des Subagenten (Opus, Hintergrund, ~949s, 50 Tool-Aufrufe):** zwei neue Zusatzpläne,
+`phase6_shares/GLOBAL_SEARCH_PLAN.md` (P6-AO–AT, Abnahmezeilen 35–39) und
+`phase6_shares/IMAGES_PLAN.md` (P6-AU–BB, Abnahmezeilen 40–47), plus Doku-Nachträge in
+Root-`CLAUDE.md`/`docs/INDEX.md`/diesem Head. **Kernbefund, im Code verifiziert statt nur aus
+dem 18.8.-Session-Block übernommen:** der Deploy-Blocker war kleiner als die E2E-Session
+vermutet hatte — `GET /api/v1/items` ohne `space`-Parameter ist bereits die globale, item-weise
+ACL-gefilterte Suche (`store.search()` filtert bei `space=None` nicht, `_items_get` filtert
+danach ohnehin item-weise über `can_read_item_as_human`). Kein neuer Endpunkt, keine
+`storage/`/`tools.py`/`permissions.py`-Änderung nötig — nur eine fehlende UI-Fläche plus ein
+Rule-4-Snippet-Riegel (P6-AS). Positiver Nebenfund: `_assets` liegt seit P6 Step 4 ungenutzt in
+`RESERVED_DIR_NAMES`, ein fertiger Seam für Block C; `img-src 'self' data:` steht bereits in
+der CSP.
+
+**Zwei Nikinger-Entscheidungen eingeholt (`AskUserQuestion`, der Subagent hatte dieses Tool
+nicht):**
+- **Q1 (Suchreichweite):** nur Titel/Tags, keine Body-Volltextsuche in diesem Schnitt — als
+  offene, dokumentierte Lücke vermerkt (teilt die Wurzel mit dem Werkzeug-Ergonomie-Punkt
+  „Suchtreffer unzuverlässig" und mit D6), kein stilles Schließen. In
+  `GLOBAL_SEARCH_PLAN.md` §1.1 nachgetragen.
+- **Priorität:** erst der Such-Fix (klein, der einzige echte Deploy-Blocker), Bilder (B1–B5,
+  fünf offene Nikinger-Entscheidungen) bleiben zurückgestellt für eine eigene Session.
+
+**Gebaut, GLOBAL_SEARCH_PLAN.md Steps G1–G2 vollständig:**
+- `webui/serializers.py :: summary_to_json()` — neuer Keyword-Parameter `include_snippet: bool
+  = True`, Default hält alle bestehenden Aufrufer byte-identisch.
+- `webui/api.py :: _items_get()` — `global_scope = q.get("space") is None`,
+  `include_snippet=not (global_scope and i.space != session.space)` je Zeile. Der
+  `store.search(...)`-Aufruf selbst bewusst NICHT geändert (`space=None` ist bereits global).
+- `static/js/state.js` — neues Feld `state.scope` ("space"|"all", exklusiv zu
+  `filter`/`folder` im Modus "all"), `isGlobalScope()`, `activeSpaceWritable()` gibt im
+  globalen Modus `false` zurück.
+- `static/js/tree.js` — `navigateAll()` (setzt `scope`/`filter`/`folder`, lässt
+  `activeSpace` als Rückweg unangetastet), `activateView()` setzt `scope` zurück auf "space",
+  neue Baumzeile „Alle Items" (`renderScopeRow()`, ohne Zähler — eine aufaddierte Zahl wäre
+  falsch, siehe P6-AT-Begründung im Plan).
+- `static/js/list.js` — `filterParams()` gibt im globalen Modus `{}` zurück (P6-AQ, die
+  kritischste Zeile: ohne sie würde `state.filter`s Default „open" eine fremde Notiz weiterhin
+  unauffindbar lassen), `loadItems()` setzt keinen `space`-Parameter mehr im globalen Modus,
+  `renderCrumb()`/`renderList()`-Leerzustand/`itemMetaLine()` (Space-Präfix, P6-AT) angepasst.
+- `static/app.css` — `.tree__scope` teilt sich die Basis mit `.tree__space`/`.tree__folder`,
+  eigene Trennlinie nach unten (`--line`, nicht `--border` — Letzteres existiert in diesem
+  Repo nicht, beim Schreiben gegen die echten Custom Properties geprüft statt angenommen).
+
+**Tests:** 7 neu (2 `test_serializers.py`, 5 `test_api.py` — der Pflichtfall aus Plan §3, Step
+G3, ist als `type="note"` in `test_items_without_space_param_returns_items_from_all_readable_
+spaces` abgedeckt, nicht als `task`, genau die Falle, die P6-AQ stopft). `pytest` 765→**772**,
+komplett grün. Tabu-Diff (`storage/**`, `mcpserver/{tools,permissions,server}.py`,
+`phase4_auth/**`) geprüft: leer.
+
+**Advisor-Fund vor dem Commit, korrigiert eine zu optimistische Zwischennotiz:** Step G3
+(Playwright) war zunächst mit „Pflichtfall schon im Unit-Test abgedeckt" übersprungen worden —
+falsch, P6-AQ ist ein reiner Frontend-Fund (`filterParams()`), den kein Unit-Test erreicht
+(P5-T). Doch gegen eine Wegwerf-Instanz gefahren (Port 8799, `tmp`-`DATA_ROOT`, eigener DEK).
+
+**Echter Fund dabei, noch vor dem Commit behoben:** `state.scope` wurde nur in `tree.js ::
+activateView()` zurückgesetzt — der Home-Button läuft über `editor.js :: clearDetail()`, einen
+zweiten, unabhängigen Pfad. Nach „Alle Items" → Home blieb `scope==="all"` stehen, der
+„+"-Knopf auf der eigenen Übersicht fälschlich ausgehängt — dieselbe Fundklasse wie
+`ownSpaceActive()` 2026-08-13. Fix: `clearDetail()` bekommt dieselben zwei Zeilen wie
+`activateView()` (`state.scope = "space"` + `setCreateControlsPresent(...)`). Playwright:
+10/10 grün (Pflichtfall + die Regression selbst), keine Konsolenfehler. Schließt V57/V58.
+Nebenfund behoben: `docs/INDEX.md` nannte „VIER B1–B4" statt „FÜNF B1–B5" für `IMAGES_PLAN.md`.
+
+**Verifiziert:** `pytest` 772/772, Tabu-Diff leer, `git status` = `GLOBAL_SEARCH_PLAN.md` §2
+**plus `editor.js`** (Advisor-Fix, nicht im Ursprungsscope) plus die beiden neuen Plan-Dateien.
+Nichts gepusht, nichts committet.
+
+**[2026-08-19 Nachtrag, außerhalb P6-Scope, MUSS-VOR-DEM-NÄCHSTEN-DEPLOY] Funnel-Reboot-Fund —
+P3-Eigentum, hier nur verlinkt:** nach dem Reboot dieser Session war Sharefyx von außen
+unerreichbar trotz gesundem Dienst/lokalem `/health`/`funnel status` — `sudo systemctl restart
+tailscaled` behob es. Root Cause, `diagnose.sh`-Fix (Prüfung 5 prüfte den öffentlichen Pfad
+bisher unzuverlässig, MagicDNS verdeckte das) und die offene Selbstheilungsfrage: vollständig in
+`phase3_edge/CLAUDE.md`, Abschnitt „[2026-08-19 MUSS-VOR-DEM-NÄCHSTEN-DEPLOY]". `deploy.sh`
+selbst prüft nur lokal, kein technisches Gate — aber vor dem nächsten Deploy einmal bewusst
+`diagnose.sh` frisch fahren, nicht auf „Reboot war schonmal ok" vertrauen.
+
+**Offen für die nächste Session:**
+- Commit + Push (Nikinger-Freigabe ausstehend).
+- Nikinger-Live-Probe gegen Abnahmezeilen 35–39 (und weiterhin 25–30 für Step 7b, unverändert
+  offen).
+- `IMAGES_PLAN.md`s fünf Entscheidungen B1–B5, wenn der Nikinger Block C priorisiert.
+- Body-Volltextsuche (Q1s Kehrseite) bleibt bewusst zurückgestellt, kein Auftrag.
+- **Vor dem nächsten Deploy:** `diagnose.sh` frisch fahren (neue Prüfung 5, echter externer
+  Pfad). Funnel-Watchdog bleibt offene Entscheidung (`phase3_edge/CLAUDE.md`).
+
+---
 
 ## Session stopped — 2026-08-18, zwölfter — (Abschluss-Review + Step-7b-E2E-Lauf gegen eine Wegwerf-Instanz, zwei Nikinger-Entscheidungen zu UI-Reichweiten-Funden)
 
