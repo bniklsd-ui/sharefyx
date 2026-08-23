@@ -5,12 +5,54 @@ read-when: Auditieren der vollen Phase-6.5-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-08-23 (neunte Rotation -- Gate-A->B-Session-Block verschoben, Head traegt seither den Abnahmematrix-Session-Block)
+updated: 2026-08-23 (zehnte Rotation -- Abnahmematrix-Session-Block verschoben, Head traegt seither den P6.5-3-Session-Block)
 ---
 # SESSIONS_ARCHIVE.md — Phase 6.5: Werkzeug-Ergonomie und Bilder
 
-Neun Einträge, newest-first, verbatim aus `phase6_5_tools_images/CLAUDE.md` per
+Zehn Einträge, newest-first, verbatim aus `phase6_5_tools_images/CLAUDE.md` per
 `scripts/rotate_session_block.sh phase6_5_tools_images`.
+
+## Session stopped — 2026-08-23 (Abnahmematrix eröffnet: P6.5-1/2/4 live bestanden)
+
+**Korrektur zur Vorsitzung:** deren Schlusssatz „Phase 6.5 hat keine offenen Bau- oder
+Verifikationsschritte mehr" war zu stark — Gate A→B (Code/Connector-Rundlauf funktioniert) und
+die vollständige Abnahmematrix (Plan §6, P6.5-1–14, „✅ heißt live-verifiziert durch den
+Nikinger") sind zwei verschiedene Dinge. Diese Session baut die bis dahin fehlende
+Abnahmematrix-Sektion in diesem Head nach (existierte vorher gar nicht — anders als bei P5/P6)
+und trägt die ersten drei Zeilen ein.
+
+**Auftrag:** Nikinger fragte, ob eine spontane, nicht-abgesprochene Nutzungssitzung (Ordner +
+Datei über den Connector anlegen, NVIDIA-Notizen) bereits Testwert für die Abnahmematrix hat.
+Antwort: nur zufällig, nicht gezielt — P6.5-1–4 verlangen laut Plan **gepunktete Fragen** an eine
+Instanz, kein Nebenprodukt einer anderen Aufgabe (Details siehe Antwort im Chat). Auf Vorschlag
+drei konkrete Fragen im selben Gespräch gestellt, echte Antworten erhalten und geprüft.
+
+**Geprüft, Wortlaut gegen den Plan-Wortlaut abgeglichen, keine Interpretation nötig:**
+- **P6.5-1 ✅** — Instanz nannte `niklas` (eigen) UND `IT-Sekus-Projekt` (geteilt, `write: true`)
+  als beschreibbar, `fabian` korrekt als reinen Lesezugriff. Sagte an keiner Stelle „nur eigener
+  Space" — genau der Fehler, den P6.5-B beheben sollte.
+- **P6.5-2 ✅** — `note: active|archived`, `task: archived|done|open`, exakter Treffer, kein
+  Fehlversuch. Deckt sich byte-genau mit `storage.models.STATUS_VALUES`.
+- **P6.5-4 ✅** — Aufgabenteilung korrekt aus der Beschreibung abgeleitet: nur `update_item`
+  erreicht Frontmatter, `patch_item`/`append_to_item` brauchen `version` (Optimistic Locking),
+  `patch_item` verlangt exakt einen Treffer sonst kompletter Fehlschlag ohne Teil-Schreiben.
+- **P6.5-3 — weiterhin offen.** Diese Sitzung enthielt keinen Lesen-vor-Folge-Append-Fall, kann
+  also weder bestätigen noch widerlegen, ob eine Instanz von sich aus `get_item_meta` statt
+  `get_item` für die Versionsnummer wählt.
+
+**Neu gebaut, nicht nur editiert:** die Sektion „Abnahmestand" existierte in diesem Head bisher
+nicht (anders als `phase5_ui/CLAUDE.md`/`phase6_shares/CLAUDE.md`, die beide eine laufend
+gepflegte Matrix führen). Jetzt angelegt, alle 14 Zeilen aus Plan §6 übernommen, drei auf ✅,
+Rest „offen" mit Beleg-Spalte (wer/wie prüft). Statusregel identisch zu P5/P6: ✅ = live-
+verifiziert, nicht „Code existiert".
+
+**Verifiziert:** kein Code-Diff (reine Doku-Session). `git status` zeigt ausschließlich den
+Phase-Head + `SESSIONS_ARCHIVE.md` + `docs/INDEX.md`.
+
+**Offen für die nächste Session:**
+- 11 von 14 Abnahmezeilen offen — P6.5-3 (weitere Connector-Frage), P6.5-5–12 (Browser/
+  `DATA_ROOT`, Block B), P6.5-13/14 (Connector + Fabian, zwei Gespräche).
+- V64, `filename`-Persistenzfrage, Doku-Schuld, `test_authctl.py`-Flake: unverändert offen.
 
 ## Session stopped — 2026-08-21 (Gate A→B bestanden: echter Connector-Rundlauf, V60 geschlossen)
 
