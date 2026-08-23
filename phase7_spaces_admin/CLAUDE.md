@@ -66,6 +66,8 @@ Abnahmezeilen: `docs/concepts/phase7_spaces_admin_plan.md`.
 
 | 3 | A3 (Bild-Entfernen-Knopf, schließt P6.5-12): `markdownToHtml()` bekommt dritten Kontextschlüssel `assetIds` (V73 — sonst rendert ein entferntes Bild ein kaputtes `<img>`, nicht Alt-Text), `renderAssetStrip()`/`idChip`-Muster in `editor.js`, `DELETE .../assets/{id}` (bereits vorhanden). **Nebenfund beim Bauen, mitbehoben:** `_items_patch`/`_items_append`/`_items_archive` gaben `item_to_json()` bisher ohne `assets=` zurück — jede Antwort log `assets: []`, auch mit vorhandenen Bildern; `afterWrite()` lädt den Editor direkt aus genau dieser Antwort neu, ohne den Fix wäre die Asset-Leiste nach jedem Speichern leer gewesen | A | 🟡 **gebaut, JS nicht browserverifiziert** — Backend-Nebenfund per Test bewiesen, Entfernen-Knopf/Alt-Text-Verhalten noch nicht in einem echten Browser gesehen | +1 `phase5_ui/tests/test_api.py`; 834 gesamt |
 
+| 4 | A4 (Feld-Whitelist an `_items_patch`, schließt O6): `_PATCH_FIELDS`-Konstante (korrigierte Liste aus V74 — `format` ergänzt), Prüfung direkt nach `body = await _json_body(request)`, vor jeder Rechteprüfung | A | ✅ **vollständig** | +2 `phase5_ui/tests/test_api.py`; 836 gesamt |
+
 *(Weitere Zeilen entstehen mit dem Rest von Block A/C/B — siehe Plan §4 für die vollständige Schritt-Sequenz.)*
 
 ## Geerbte Contracts
@@ -92,8 +94,8 @@ keinen Code bekommen, nur Step 0 (Haushalt) lief.
 | P7-3 | ID-Suche auf nicht lesbares Item → leere Liste | Claude Code, Test | ✅ `test_id_lookup_respects_read_permission` |
 | P7-4 | Claude nennt Items beim Titel, nicht der ID | Niklas, echter Connector | ⬜ Text steht in vier Tool-Beschreibungen, kein Connector-Beweis |
 | P7-5 | Bild im Editor entfernbar, landet in `_trash/` | Niklas | ⬜ gebaut, ungeprüft |
-| P7-6 | `PATCH` mit Tippfehler-Feld abgewiesen (O6) | Claude Code, Test | ⬜ |
-| P7-7 | Speichern/Verschieben/Freigeben nach Whitelist unverändert | Niklas | ⬜ |
+| P7-6 | `PATCH` mit Tippfehler-Feld abgewiesen (O6) | Claude Code, Test | ✅ `test_items_patch_rejects_an_unknown_field` |
+| P7-7 | Speichern/Verschieben/Freigeben nach Whitelist unverändert | Niklas | 🟡 Whitelist per Test gegen die real gesendeten Felder gepinnt, keine Browserprobe |
 | P7-8 | Migration: 0 `.md` ohne `visibility:` | Nikinger + Claude Code | ⬜ |
 | P7-9 | `clients`/`token_families` sinken nach realem Purge (ab 2026-08-28) | Niklas | ⬜ |
 | P7-10 | `testnutzer-p7` existiert, schreibt einmal | Nikinger + Claude Code | ⬜ |
@@ -259,3 +261,27 @@ hochladen, PATCH + append, beide Antworten tragen das Asset). `pytest -q` **834 
 
 **Ehrlich offen, wie bei A1/A2:** keine Browserprobe für den Entfernen-Knopf/Alt-Text-Übergang
 diese Session — P7-5 bleibt ⬜ „gebaut, ungeprüft" in der Abnahmematrix.
+
+**Nachtrag, selber Tag — A4 gebaut (schließt O6).** `_PATCH_FIELDS`-Konstante in `webui/api.py`,
+Prüfung `unknown = sorted(set(body) - _PATCH_FIELDS)` direkt nach `body = await
+_json_body(request)`, vor jeder Rechteprüfung (unbekannte Felder werden abgewiesen, bevor
+irgendetwas anderes über den Request nachdenkt). Liste ist die durch V74 korrigierte Fassung
+(inkl. `format`, siehe Nachtrag oben) — `version`/`title`/`body`/`status`/`due`/`tags`/`links`/
+`type`/`format`/`folder`/`space`/`visibility`/`share_read`/`share_write`/`password`/`totp`.
+**Zwei Tests:** `test_items_patch_rejects_an_unknown_field` (`spce`-Tippfehler-Fall aus
+`ITEM_MOVE_PLAN.md` §112, Datei bleibt byte-identisch unverändert) und
+`test_items_patch_accepts_every_field_the_ui_sends` (pinnt `_PATCH_FIELDS` als Obermenge der
+real von `editor.js`/`list.js`/`dialogs.js` gesendeten Schlüssel). **Ein Plan-Detail korrigiert
+beim Testen, nicht angenommen:** der Plan-Text nennt „400 validation_failed" für den
+Zurückweisungsfall — `webui/errors.py` bildet `validation_failed` durchgehend auf `422`
+ab (Unprocessable Entity), nicht 400; der Test pinnt den tatsächlichen Code.
+
+**Tests:** `pytest -q` **836 passed** (834 + 2). Tabu-Probe (`storage/`) weiterhin leer.
+
+**Block A damit vollständig: A1, A2, A3, A4 gebaut, alle vier nur backend-/tool-seitig
+verifiziert (`pytest`), keine der vier Browser-/Connector-Proben diese Session gefahren.**
+Verbleibend in Block A: A5 (Sichtbarkeits-Migration, braucht den Nikinger für `--apply`), A6
+(Purge-Gate, kalendarisch erst ab 2026-08-28), A7/A7b (dritter Principal `testnutzer-p7`, braucht
+den Nikinger für die Einladung), A8 (formaler Abschluss Phase 6.5, setzt A3/A7 voraus). Session
+hier bewusst gestoppt — die nächsten Schritte brauchen entweder den Nikinger direkt oder bauen
+auf etwas auf, das er noch anstoßen muss.

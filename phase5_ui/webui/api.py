@@ -143,6 +143,21 @@ _RECENT_LIMIT = 5
 # den heutigen Datenumfang (Zwei-Personen-Space-Server) um Größenordnungen ab.
 _STORE_FETCH_LIMIT = 5000
 
+# P7-G/O6: Whitelist an der API-Fläche, nicht in `store.update()` — dort **ist** ein
+# unbekanntes Feld die Round-Trip-Treue selbst (Abnahmezeile 13 aus Phase 5, ein von Hand
+# eingefügtes Frontmatter-Feld überlebt eine UI-Bearbeitung unverändert über den
+# `else: updated_extra[key] = value`-Zweig). Abgewiesen wird nur, was neu über HTTP
+# hereinkommt — ein bereits auf der Platte stehendes Feld bleibt unberührt. Muss eine
+# Obermenge dessen sein, was `webui/static/js/*.js` tatsächlich sendet (V74, geprüft per
+# `grep 'method: "PATCH"' -B15` über `editor.js`/`list.js`/`dialogs.js`) — `format` gehört
+# dazu, `editor.js :: saveItem()` sendet es bei jedem Speichern, der Plan-Entwurf hatte es
+# nicht.
+_PATCH_FIELDS = frozenset({
+    "version", "title", "body", "status", "due", "tags", "links", "type", "format",
+    "folder", "space", "visibility", "share_read", "share_write",
+    "password", "totp",
+})
+
 
 def _map_store_error(exc: Exception, *, own_space: str) -> ApiError:
     if isinstance(exc, ItemNotFound):
@@ -449,6 +464,10 @@ def api_routes(
         await _require_csrf_json(request, session)
         body = await _json_body(request)
         item_id = request.path_params["item_id"]
+
+        unknown = sorted(set(body) - _PATCH_FIELDS)
+        if unknown:
+            raise ApiError("validation_failed", f"Unbekannte Felder: {unknown}")
 
         version = body.get("version")
         if not isinstance(version, int):

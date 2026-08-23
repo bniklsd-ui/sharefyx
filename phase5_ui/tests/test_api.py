@@ -405,6 +405,39 @@ async def test_version_mismatch_returns_409_with_current_item(full_app_items, it
 
 
 @pytest.mark.asyncio
+async def test_items_patch_rejects_an_unknown_field(full_app_items, item_store, totp_code, tmp_path):
+    """O6: der exakte Fall aus `ITEM_MOVE_PLAN.md` Sec112 -- ein Tippfehler-Feld (`spce` statt
+    `space`) wird an der API-Flaeche abgewiesen, die Datei bleibt unveraendert."""
+    item = item_store.create(SPACE, type="note", title="Original")
+    path = tmp_path / "data" / SPACE
+    path = next(path.glob(f"{item.id}*.md"))
+    before = path.read_text(encoding="utf-8")
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.patch(
+            f"/api/v1/items/{item.id}", json={"version": item.version, "spce": FOREIGN_SPACE},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 422
+    assert response.json()["error"] == "validation_failed"
+    assert path.read_text(encoding="utf-8") == before
+
+
+@pytest.mark.asyncio
+async def test_items_patch_accepts_every_field_the_ui_sends(full_app_items, item_store, totp_code):
+    """V74: pinnt die Whitelist gegen die real von editor.js/list.js/dialogs.js gesendeten
+    Schluessel -- eine Obermenge ist Pflicht, sonst bricht das Speichern (siehe api.py ::
+    _PATCH_FIELDS-Kommentar)."""
+    from webui.api import _PATCH_FIELDS
+
+    sent_by_ui = {
+        "version", "title", "body", "status", "due", "tags", "links", "format",
+        "folder", "space", "share_read", "share_write", "password", "totp",
+    }
+    assert sent_by_ui <= _PATCH_FIELDS
+
+
+@pytest.mark.asyncio
 async def test_conflict_response_current_item_matches_item_to_json_exactly(
     full_app_items, item_store, totp_code,
 ):
