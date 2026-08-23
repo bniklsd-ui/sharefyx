@@ -3,7 +3,7 @@ status: live
 purpose: Die drei wiederverwendeten Workflow-Prompts (Claude Code Session-Start, Phasen-Kickoff im Browser, Phasen-Abschluss) — angepasst an dieses Projekt
 read-when: Start einer Claude-Code-Session, Start eines neuen Phasen-Chats, Abschluss einer Phase
 detail: L2
-up: CLAUDE.md
+up: ../CLAUDE.md
 down:
   - DOC_LAYERS_CONVENTION.md   # Navigationsregeln, auf die Prompt 1 verweist
   - ../ROADMAP.md              # Phasenübersicht

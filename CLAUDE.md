@@ -7,8 +7,8 @@ up: docs/INDEX.md
 down:
   - ROADMAP.md                          # Phasenplan + Status je Phase
   - docs/INDEX.md                       # L0-Karte aller .md
-  - phase6_shares/CLAUDE.md             # aktive Phase
-updated: 2026-08-09 (Phase 6 🔄 gestartet — Hard Rule 4 neu gefasst (P6-U), Current state umgestellt)
+  - phase7_spaces_admin/CLAUDE.md       # aktive Phase
+updated: 2026-08-23 (Phase 7 Step 0: down: auf phase7_spaces_admin/CLAUDE.md umgestellt, stale d348e2e-Deploy-Behauptung im Current-state-Absatz korrigiert) | 2026-08-09 (Phase 6 🔄 gestartet — Hard Rule 4 neu gefasst (P6-U), Current state umgestellt)
 ---
 # CLAUDE.md — Project Instructions
 
@@ -218,7 +218,9 @@ Schnitt — offene, dokumentierte Lücke, kein stilles Schließen. Steps G1–G2
 (10/10 grün, Pflichtfall aus Zeile 28 nachgestellt) — ein Advisor-Fund dabei entdeckt und noch
 vor dem Commit behoben: `editor.js :: clearDetail()` (Home-Button) setzte `state.scope` nicht
 zurück, ließ den Anlegen-Knopf nach „Alle Items" → Home fälschlich ausgehängt. **[2026-08-19,
-committet]** `main`@`d348e2e`, noch nicht gepusht/deployt — wartet auf die Nikinger-Live-Probe.
+committet]** `main`@`d348e2e`. **[2026-08-23 Korrektur, P7 Step-0-Audit]** live deployt seit
+`main`@`f96125e` (`git merge-base --is-ancestor d348e2e f96125e`) — diese Zeile hatte die
+Korrektur, die `phase6_shares/CLAUDE.md` bereits am 2026-08-23 bekam, selbst nie erhalten.
 Details: `phase6_shares/CLAUDE.md`s aktuellem Session-Block.
 
 **[2026-08-19, MUSS-VOR-DEM-NÄCHSTEN-DEPLOY] Funnel überlebte den Reboot nicht sauber:** nach

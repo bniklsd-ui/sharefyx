@@ -12,7 +12,8 @@ down:
   - docs/concepts/phase5_ui_plan.md        # ausführungsreifer P5-Plan
   - docs/concepts/phase6_shares_plan.md    # ausführungsreifer P6-Plan
   - docs/concepts/phase6_5_tools_images_plan.md   # ausführungsreifer P6.5-Plan
-updated: 2026-08-23 (Phase 6 auf 🟡 code-complete -- 12 von 39 Abnahmezeilen live, Sprung auf ✅ ist offene Nikinger-Entscheidung) | 2026-08-20 (neue Phase 6.5 -- Werkzeug-Ergonomie + Bilder -- ergaenzt, Step 0 gestartet)
+  - docs/concepts/phase7_spaces_admin_plan.md     # ausführungsreifer P7-Plan
+updated: 2026-08-23 (neue Phase 7 -- Space-Verwaltung, Mehrfachauswahl, Konsolidierung -- ergaenzt, Step 0 gestartet; fehlende P6.5-Tabellenzeile nachgetragen) | 2026-08-23 (Phase 6 auf 🟡 code-complete -- 12 von 39 Abnahmezeilen live, Sprung auf ✅ ist offene Nikinger-Entscheidung) | 2026-08-20 (neue Phase 6.5 -- Werkzeug-Ergonomie + Bilder -- ergaenzt, Step 0 gestartet)
 ---
 # ROADMAP — Space-Server
 
@@ -29,6 +30,11 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 | **P4** | `phase4_auth/` · `authserver` | OAuth 2.1 + DCR; ersetzt den Pfad-Token. | ✅ |
 | **P5** | `phase5_ui/` · `webui` | REST-API + Web-UI für Menschen. | ✅ |
 | **P6** | `phase6_shares/` (kein eigenes Paket) | Freigaben, Ordner, `patch_item`, Update-Log, Bilder. | 🟡 |
+| **P6.5** | `phase6_5_tools_images/` (kein eigenes Paket) | Werkzeug-Ergonomie, Abschluss Bilder. | 🟡 |
+| **P7** | `phase7_spaces_admin/` (kein eigenes Paket) | Space-Verwaltung, Mehrfachauswahl, Konsolidierung. | 🔄 |
+
+**[2026-08-23 Korrektur, P7 Step 0]:** P6.5 fehlte als eigene Tabellenzeile — beim Ergänzen der
+P7-Zeile mitgefunden und nachgetragen, keine inhaltliche Änderung.
 
 **Korrektur (2026-07-25, P2-Planungssession):** OAuth rückt von „ganz am Ende" auf „direkt nach
 P3" — der Pfad-Token soll kurz leben, und die UI ist die Phase, die laut Build-Reihenfolge unter
@@ -255,6 +261,36 @@ und in §0.0 gelockt (Phasenname 6.5, kein `app.html`-Fix, kein Bulk-Append, Bod
 MCP-Opt-in, Bild-Entfernen per `_trash/`, `MAX_MCP_ASSET_BYTES=1 MiB`). Herkunft: Live-Feedback
 2026-08-14 (Werkzeug-Ergonomie) + `phase6_shares/IMAGES_PLAN.md` (jetzt nachrangig). Details:
 `phase6_5_tools_images/CLAUDE.md`s Session-Block.
+
+---
+
+## Phase 7 — Space-Verwaltung, Mehrfachauswahl, Konsolidierung
+
+**Mission, drei Blöcke:** (A) ein Mensch findet ein Item wieder, das eine Claude-Instanz ihm
+gegenüber `itm_807df219` genannt hat, und kann ein eingefügtes Bild wieder loswerden. (C) ein
+Mensch entscheidet im Browser, wer seinen Space lesen darf, legt einen geteilten Space an und
+wird einen wieder los, ohne dass dabei ein Item verloren geht. (B) zehn Items wandern in einem
+Vorgang in denselben Zielordner, mit einem Re-Auth-Formular statt zehn.
+
+- **DRIN:** Item-ID sichtbar + auffindbar, Bild-Entfernen-Knopf (schließt P6.5-12), Feld-
+  Whitelist an `_items_patch` (schließt O6), Doku-Audit der P6-Modul-Zeilen 8–16, Sichtbarkeits-
+  Migration live, dritter Principal `testnutzer-p7`, formaler Abschluss Phase 6.5, volle
+  Space-Verwaltung in der Weboberfläche (anlegen/Mitglieder/entfernen, Home-Spaces ausgenommen
+  vom Anlegen/Entfernen), Mehrfachauswahl (`ITEM_MOVE_PLAN.md` §9).
+- **DRAUSSEN:** FastMCP-4-Umstieg, `owner:`-Feld in `.share.yml`, Löschen von Items,
+  Rechteverwaltung über MCP-Tools, automatische `_trash/`-Räumung, Funnel-Watchdog, Body-
+  Volltextsuche in der Web-UI, Mehrfachauswahl für andere Aktionen als Verschieben.
+- **Reihenfolge 0 → A → Gate → C → B** (bewusst nicht die Buchstabenfolge) — Block C trägt den
+  Namen dieser Phase (seit P6 Step 7 Commit 6 in `app.html` als „kommt in Phase 7" reserviert)
+  und fällt unter Druck nie vor Block B.
+
+**Status 🔄 (2026-08-23, Step 0 läuft):** Plan `docs/concepts/phase7_spaces_admin_plan.md`
+ausführungsreif, alle zehn Nikinger-Fragen N1–N10 in §0.1 gelockt. Step 0.1–0.6 gefahren: `pytest`
+828 grün, Doku-Audit der P6-Modul-Zeilen 8–16 + Vormerkungspunkt 2 mit SHA-Beweis abgeschlossen
+(alle live deployt, Stale-Doku in `phase6_shares/CLAUDE.md`/Root-`CLAUDE.md`/`docs/INDEX.md`
+korrigiert), ein Link-Fund behoben (`docs/PROMPTS.md`), Softcap-Prüfung 12/12 konform, Skelett
+angelegt. Herkunft: `docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md`. Details:
+`phase7_spaces_admin/CLAUDE.md`s Session-Block.
 
 ---
 

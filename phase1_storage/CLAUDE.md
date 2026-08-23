@@ -7,7 +7,7 @@ up: ../CLAUDE.md
 down:
   - ../docs/concepts/phase1_storage_plan.md   # voller Plan, Entscheidungen A–H, Steps 0–7
   - SESSIONS_ARCHIVE.md                       # ältere Session-Blöcke
-updated: 2026-08-20 (Phase 6.5 Step B1: fuenfte Contract-Oeffnung gebaut -- Bild-Assets in models/files/store.py, 150 Tests nach drei Advisor-Fixes (Lock-Disziplin, created-Konsistenz, Sniff-Kosten), Zaehlkorrektur 126->130 vor Step B1)
+updated: 2026-08-23 (Phase 7 Step 0: sechste Contract-Oeffnung angekuendigt -- acl.py-Schreibseite, Extraktion aus spacectl.py, P7-M-Lock-Regel) | 2026-08-20 (Phase 6.5 Step B1: fuenfte Contract-Oeffnung gebaut -- Bild-Assets in models/files/store.py, 150 Tests nach drei Advisor-Fixes (Lock-Disziplin, created-Konsistenz, Sniff-Kosten), Zaehlkorrektur 126->130 vor Step B1)
 ---
 # CLAUDE.md — Phase 1: Storage-Kern (`phase1_storage/`)
 
@@ -236,6 +236,23 @@ Phase 6.5 löst N5 als „Verschieben statt Entfernen" (`_assets/<item_id>/_tras
 wie `_archive/`) — Entscheidung H bleibt damit formal unangetastet, `delete_asset()` löscht nie,
 es verschiebt. Charakterisierungstests (P6-D) laufen vor **und** nach dieser Öffnung
 byte-identisch grün, dieselbe Disziplin wie bei den vier Vorgängern.
+
+**[2026-08-23, Phase 7 Step 0] Sechste, benannte Contract-Öffnung angekündigt** (noch kein Code —
+Ankündigung **vor** Block C Step C1, `docs/concepts/phase7_spaces_admin_plan.md` §4 C1, P7-P):
+`storage/acl.py` bekommt eine Schreibseite — `read_share_file(data_root, space) -> dict[str,
+list[str]]`, `write_share_file(data_root, space, data) -> None`, `add_member(data_root, space,
+name, *, write) -> bool`, `remove_member(data_root, space, name) -> list[str]`,
+`create_space(data_root, name) -> Path`, `remove_space_dir(data_root, name) -> None`,
+`spaces_referencing(data_root, name, *, exclude=None) -> list[str]`, `class AclWriteError
+(ValueError)`. **Extraktion aus `phase6_shares/scripts/spacectl.py`, keine Neuentwicklung**
+(Referenz: `spacectl.py:90–107, 113–127, 133–148, 185–242`) — Ausgabetexte und Exit-Codes von
+`spacectl.py` müssen byte-identisch bleiben, das ist die Bedingung, unter der die 20 bestehenden
+`test_spacectl.py`-Tests der Regressionsbeweis für den Umbau sind. `create_space()` lehnt `/`,
+führenden `.` und `files.RESERVED_DIR_NAMES` ab. Jede schreibende Funktion nimmt `flock` auf
+`.write.lock` selbst, gibt ihn vor der Rückkehr frei, und ruft **keine** `Store`-Methode auf
+(P7-M: zwei `open()` auf denselben Lock im selben Prozess blockieren einander). Charakterisierungs-
+tests (P6-D) laufen vor **und** nach dieser Öffnung byte-identisch grün, dieselbe Disziplin wie
+bei den fünf Vorgängern.
 
 **[2026-08-17, P6 Step 7b Commit 1/3] Vierte, benannte Contract-Öffnung gebaut** (angekündigt in
 `phase6_shares/CLAUDE.md`s Session-Block vom selben Tag, `phase6_shares/ITEM_MOVE_PLAN.md` §4.1,
