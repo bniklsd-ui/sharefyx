@@ -819,6 +819,19 @@ select.input {
 }
 .panel--meta[open] .panel__digest { display: none; }
 
+.id-chip {
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.85em;
+  color: var(--text-faint);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 0.5em;
+}
+.id-chip:hover { color: var(--text); }
+
 .panel--body {
   background: var(--panel-body);
   flex: 1;

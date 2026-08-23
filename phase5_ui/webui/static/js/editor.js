@@ -24,6 +24,7 @@ var versionBandEl;
 var versionBandNumberEl;
 var metaPanelEl;
 var metaDigestEl;
+var metaItemIdEl;
 var fieldTitleEl;
 var fieldStatusEl;
 var fieldDueEl;
@@ -181,6 +182,23 @@ function setEditorMode(mode) {
   }
 }
 
+// P7-A1: die ID ist eine interne Adresse, kein Anzeigename — deshalb nur als Kopierfeld, nie
+// als Suchbegriff/Titelersatz beworben. Kein `execCommand`-Fallback: fehlt die Clipboard-API,
+// bleibt der Text markierbar, das genügt (kein sicherheitsrelevanter Pfad).
+function idChip(itemId) {
+  var chip = el("button", "id-chip", itemId);
+  chip.type = "button";
+  chip.title = "ID kopieren";
+  chip.addEventListener("click", function () {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(itemId).then(function () {
+        toast("ID kopiert.");
+      });
+    }
+  });
+  return chip;
+}
+
 function showReadonlyItem(item) {
   editorPart.detach();          // Akzeptanzkriterium 12
   // Beides zwingend, nicht kosmetisch (Advisor-Fund, siehe F7 im Session-Block): `hidden`
@@ -195,6 +213,7 @@ function showReadonlyItem(item) {
   roMetaEl.textContent = "";
   roMetaEl.appendChild(el("span", "detail__badge-readonly", "Nur lesen — fremder Space (" + item.space + ")"));
   roMetaEl.appendChild(el("span", "tnum version-num", "v" + item.version));
+  roMetaEl.appendChild(idChip(item.id));
   roMetaEl.appendChild(el("span", null, item.type + " · " + item.status));
   if (item.due) roMetaEl.appendChild(el("span", "tnum", "fällig " + item.due));
   roPreviewEl.innerHTML = markdownToHtml(item.body, { itemId: item.id });
@@ -208,6 +227,8 @@ function showEditableItem(item, opts) {
   detailEditorEl.hidden = false;
 
   state.editingSnapshot = snapshotFromItem(item);
+  metaItemIdEl.textContent = "";
+  metaItemIdEl.appendChild(idChip(item.id));
   fieldTitleEl.value = item.title;
   populateStatusSelect(item.type);
   fieldStatusEl.value = item.status;
@@ -359,6 +380,7 @@ export function init() {
   versionBandNumberEl = document.getElementById("version-band-number");
   metaPanelEl = document.getElementById("meta-panel");
   metaDigestEl = document.getElementById("meta-digest");
+  metaItemIdEl = document.getElementById("meta-item-id");
   fieldTitleEl = document.getElementById("field-title");
   fieldStatusEl = document.getElementById("field-status");
   fieldDueEl = document.getElementById("field-due");

@@ -61,9 +61,10 @@ Abnahmezeilen: `docs/concepts/phase7_spaces_admin_plan.md`.
 
 | # | Modul | Step | Status | Tests |
 |---|---|---|---|---|
-| 1 | Haushalt, Verifikationsdurchlauf (0.1–0.5), Skelett (0.6), sechste Contract-Öffnung angekündigt (0.7) | 0 | 🔄 **läuft** — 0.1–0.6 diese Session, siehe Session-Block | 0 (Skelett, wie P1/P6/6.5 Step 0) |
+| 1 | Haushalt, Verifikationsdurchlauf (0.1–0.5), Skelett (0.6), sechste Contract-Öffnung angekündigt (0.7) | 0 | ✅ **vollständig** — siehe Session-Block 2026-08-23 | 0 (Skelett, wie P1/P6/6.5 Step 0) |
+| 2 | A1 (ID sichtbar+auffindbar: `api.py :: _items_get` ID-Zweig, `idChip()` in Editor + Nur-lesen, Such-Placeholder) + A2 (Tool-Beschreibungen: `_TITLE_NOT_ID_HINT` an vier Lese-Tools) | A | 🟡 **gebaut, JS nicht browserverifiziert** — Backend+Tools per `pytest` grün, Editor-Chip/Copy-Verhalten noch nicht in einem echten Browser gesehen | +5 (4 `phase5_ui/tests/test_api.py` + 1 `phase2_mcp/tests/test_tools.py`); 833 gesamt |
 
-*(Weitere Zeilen entstehen mit Block A/C/B — siehe Plan §4 für die vollständige Schritt-Sequenz.)*
+*(Weitere Zeilen entstehen mit dem Rest von Block A/C/B — siehe Plan §4 für die vollständige Schritt-Sequenz.)*
 
 ## Geerbte Contracts
 
@@ -84,10 +85,10 @@ keinen Code bekommen, nur Step 0 (Haushalt) lief.
 
 | # | Kriterium | Wer | Status |
 |---|---|---|---|
-| P7-1 | Item-ID sichtbar + Klick kopiert | Niklas | ⬜ |
-| P7-2 | ID-Suche findet Item spaceübergreifend | Niklas | ⬜ |
-| P7-3 | ID-Suche auf nicht lesbares Item → leere Liste | Claude Code, Test | ⬜ |
-| P7-4 | Claude nennt Items beim Titel, nicht der ID | Niklas, echter Connector | ⬜ |
+| P7-1 | Item-ID sichtbar + Klick kopiert | Niklas | ⬜ gebaut, ungeprüft |
+| P7-2 | ID-Suche findet Item spaceübergreifend | Niklas | 🟡 Backend per Test bewiesen, keine Browserprobe |
+| P7-3 | ID-Suche auf nicht lesbares Item → leere Liste | Claude Code, Test | ✅ `test_id_lookup_respects_read_permission` |
+| P7-4 | Claude nennt Items beim Titel, nicht der ID | Niklas, echter Connector | ⬜ Text steht in vier Tool-Beschreibungen, kein Connector-Beweis |
 | P7-5 | Bild im Editor entfernbar, landet in `_trash/` | Niklas | ⬜ |
 | P7-6 | `PATCH` mit Tippfehler-Feld abgewiesen (O6) | Claude Code, Test | ⬜ |
 | P7-7 | Speichern/Verschieben/Freigeben nach Whitelist unverändert | Niklas | ⬜ |
@@ -184,3 +185,44 @@ oben; Skelett steht; `pytest` unverändert bei 828.
 `migrate_visibility.py --apply` gegen den echten `DATA_ROOT` und dem Anlegen von
 `testnutzer-p7`. Beides ist Nikinger-Sache zu autorisieren, nicht Claude Codes eigene
 Entscheidung — Session hier bewusst gestoppt, um das einzuholen.
+
+**Nachtrag, selber Tag — Nikinger-Freigabe „per Plan, mit Step A" erhalten, A1+A2 gebaut.**
+
+**V73/V74 vorab geklärt, wie vom Advisor verlangt:**
+- **V73 (A3-Vorbereitung):** `markdown.js` löst `asset:<id>` unabhängig davon auf, ob die
+  Asset-Datei noch existiert — die Regex prüft nur die URL-**Form**, nicht die Existenz. Ein
+  entferntes (nach `_trash/` verschobenes) Bild rendert deshalb heute ein **kaputtes `<img>`**,
+  keinen Alt-Text. A3 braucht also tatsächlich den geplanten dritten Kontextschlüssel
+  `assetIds` — noch nicht gebaut, folgt mit A3 selbst.
+- **V74 (A4-Vorbereitung):** `grep 'method: "PATCH"' -B15` über `editor.js`/`list.js`/
+  `dialogs.js` enumeriert. **Der Plan-Entwurf für `_PATCH_FIELDS` fehlte `format`** —
+  `editor.js :: saveItem()` sendet `format: "markdown"` bei **jedem** Speichern
+  (`editor.js:335`); ohne dieses Feld in der Whitelist hätte A4 jedes UI-Speichern mit `400`
+  gebrochen. Korrigierte Feldliste notiert, wird mit A4 geschrieben.
+
+**A1 — ID sichtbar + auffindbar (`api.py :: _items_get`, `editor.js`, `app.html`, `app.css`):**
+ID-Zweig vor dem bestehenden Store-Aufruf (`ITEM_ID_RE.fullmatch`), space-/ordnerübergreifend
+(P7-D/E), Rechteprüfung unverändert davor — eine ID ohne Leserecht liefert `total: 0`, nie
+403/404 (kein Existenz-Orakel). `idChip(itemId)` (neu, `editor.js`) in beiden Detailansichten
+(readonly `roMetaEl`, editierbar `#meta-item-id`), Klick kopiert über
+`navigator.clipboard.writeText`, kein `execCommand`-Fallback. Such-Placeholder nennt jetzt
+`itm_…`. **Tabu-Probe:** `git diff phase1_storage/storage/` leer (P7-D eingehalten).
+
+**A2 — Tool-Beschreibungen nennen Titel, nicht ID (`mcpserver/tools.py`):** neue Konstante
+`_TITLE_NOT_ID_HINT`, wörtlich identisch an `search_items`/`get_item`/`get_item_meta`/
+`create_item` angehängt, gleiche Bauart wie `WRITE_TOOL_DIVISION`/`_LIST_SPACES_POINTER`.
+
+**Tests:** +5 (`test_items_get_finds_an_item_by_its_id`,
+`test_id_lookup_ignores_space_and_folder_filter`, `test_id_lookup_respects_read_permission`,
+`test_id_lookup_with_unknown_id_returns_empty_list` in `phase5_ui/tests/test_api.py`;
+`test_tool_descriptions_tell_the_agent_to_name_titles_not_ids` in
+`phase2_mcp/tests/test_tools.py`). `pytest -q` **833 passed** (828 + 5).
+
+**Ehrlich offen:** DoD verlangt eine echte Browserprobe für den Chip (sichtbar, kopierbar) und
+einen echten Connector-Beweis für A2 (P7-4) — **beides diese Session nicht gefahren**, nur
+Backend/Tool-Ebene per `pytest`. Abnahmezeilen P7-1/P7-4 bleiben deshalb ⬜, P7-2 🟡 (Backend
+bewiesen, keine Browserprobe), P7-3 ✅ (reiner Test-Fall, kein Mensch nötig).
+
+**Nächster Schritt:** A3 (Bild-Entfernen-Knopf, V73-Konsequenz eingeplant) und A4 (Feld-
+Whitelist, korrigierte Liste aus V74 oben) folgen als eigene Commits, wie mit dem Advisor
+abgestimmt.

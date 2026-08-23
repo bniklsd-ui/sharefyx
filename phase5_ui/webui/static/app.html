@@ -46,7 +46,7 @@
       <div class="list__crumb" id="list-crumb"></div>
       <p class="list__readonly" id="list-readonly" hidden>Nur lesen &mdash; fremder Space</p>
       <div class="list__search">
-        <input type="search" class="input list__search-input" id="search-input" placeholder="Suche&hellip;" aria-label="Suche">
+        <input type="search" class="input list__search-input" id="search-input" placeholder="Titel, Tag oder itm_&hellip;" aria-label="Suche">
         <button class="btn btn--icon" type="button" id="new-item-button" title="Neu anlegen" aria-label="Neu anlegen">&#43;</button>
       </div>
       <div class="list__chips" id="list-chips"></div>
@@ -103,6 +103,7 @@
         <summary class="panel__head">
           <span class="panel__title">Kopfdaten <span class="panel__sub">YAML-Frontmatter</span></span>
           <span class="panel__digest" id="meta-digest"></span>
+          <span id="meta-item-id"></span>
         </summary>
         <div class="panel__inner">
           <p class="panel__hint">Diese Felder pflegt in der Regel ein verbundenes Claude &mdash; du musst hier nichts eintragen.</p>

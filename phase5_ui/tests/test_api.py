@@ -224,6 +224,53 @@ async def test_get_single_item_shared_item_level_only_is_readable(
     assert response.status_code == 200
 
 
+# -- Items: ID-Suche (P7-A1, P7-D/E) ------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_items_get_finds_an_item_by_its_id(full_app_items, item_store, totp_code):
+    item = item_store.create(SPACE, type="note", title="Findbar per ID")
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        response = await client.get("/api/v1/items", params={"query": item.id})
+    assert response.status_code == 200
+    ids = {row["id"] for row in response.json()["items"]}
+    assert ids == {item.id}
+
+
+@pytest.mark.asyncio
+async def test_id_lookup_ignores_space_and_folder_filter(full_app_items, item_store, totp_code):
+    item = item_store.create(SPACE, type="note", title="In einem Ordner")
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        response = await client.get(
+            "/api/v1/items",
+            params={"query": item.id, "space": FOREIGN_SPACE, "folder": "irgendwo"},
+        )
+    ids = {row["id"] for row in response.json()["items"]}
+    assert item.id in ids
+
+
+@pytest.mark.asyncio
+async def test_id_lookup_respects_read_permission(full_app_items, item_store, totp_code):
+    item = item_store.create(FOREIGN_SPACE, type="note", title="Fremd, ungeteilt")
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        response = await client.get("/api/v1/items", params={"query": item.id})
+    assert response.status_code == 200
+    assert response.json()["items"] == []
+    assert response.json()["total"] == 0
+
+
+@pytest.mark.asyncio
+async def test_id_lookup_with_unknown_id_returns_empty_list(full_app_items, totp_code):
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        response = await client.get("/api/v1/items", params={"query": "itm_deadbeef"})
+    assert response.status_code == 200
+    assert response.json()["total"] == 0
+
+
 # -- Items: anlegen ---------------------------------------------------------------------------
 
 

@@ -153,6 +153,14 @@ _LIST_SPACES_POINTER = (
     "die Antwort."
 )
 
+# P7-F: Item-IDs sind eine interne Adresse, kein Anzeigename — in der Weboberfläche nur als
+# Kopierfeld sichtbar (P7-A1). Wörtlich identisch an allen vier Tools, die ein Item gegenüber
+# einem Menschen benennen könnten.
+_TITLE_NOT_ID_HINT = (
+    "Nenne einem Menschen gegenüber immer den Titel eines Items, nicht seine itm_…-ID — die "
+    "ID ist eine interne Adresse und in der Weboberfläche nur als Kopierfeld sichtbar."
+)
+
 
 def _format_dt(value: datetime) -> str:
     """Gleiche Formatierung wie `storage.store._format_dt` — Dateitext und JSON-Ausgabe zeigen
@@ -374,7 +382,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             "Tags (Groß/Kleinschreibung egal) — NICHT im Body, außer du setzt in_body=True. "
             "Wenn ein Begriff nichts findet, liegt er vermutlich nur im Fließtext: dann "
             "in_body=True setzen oder über tags/type/status/folder filtern statt den "
-            "Suchbegriff zu variieren."
+            "Suchbegriff zu variieren. " + _TITLE_NOT_ID_HINT
         ),
         annotations={
             "readOnlyHint": True,
@@ -448,7 +456,8 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         description=(
             "Liest ein Item als Dateitext (Frontmatter + Body). Fremde Bodies sind gewrappt. "
             "Liefert immer den vollen Body. Wenn du nur die aktuelle version oder Frontmatter "
-            "brauchst, nimm get_item_meta — das ist um Größenordnungen billiger."
+            "brauchst, nimm get_item_meta — das ist um Größenordnungen billiger. "
+            + _TITLE_NOT_ID_HINT
         ),
         annotations={
             "readOnlyHint": True,
@@ -485,7 +494,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             "oder nur Status/Tags/Ordner prüfen willst. body_bytes sagt dir, wie teuer ein "
             "get_item wäre. assets listet vorhandene Bilder (id/mime/bytes/filename) — NIE "
             "die Bildbytes selbst; die holst du erst mit get_item_asset, und nur, wenn der "
-            "Nutzer ausdrücklich danach fragt."
+            "Nutzer ausdrücklich danach fragt. " + _TITLE_NOT_ID_HINT
         ),
         annotations={
             "readOnlyHint": True,
@@ -546,6 +555,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             "folder=<pfad> legt es in einen Unterordner. Liefert standardmäßig eine Quittung "
             "statt des vollen Texts — return_body=True holt ihn zurück. "
             + _status_hint() + " " + WRITE_TOOL_DIVISION + " " + _LIST_SPACES_POINTER
+            + " " + _TITLE_NOT_ID_HINT
         ),
         annotations={
             "readOnlyHint": False,

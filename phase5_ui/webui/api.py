@@ -86,7 +86,7 @@ from starlette.routing import Route
 
 from mcpserver.permissions import SharePolicy
 from storage.errors import ConflictError, ItemNotFound, ValidationError
-from storage.files import validate_folder
+from storage.files import ITEM_ID_RE, validate_folder
 from storage.models import STATUS_VALUES, SpaceInfo
 from storage.store import Store
 
@@ -345,13 +345,21 @@ def api_routes(
         limit = max(1, min(_parse_int(q.get("limit"), default=DEFAULT_LIMIT), MAX_LIMIT))
         offset = max(0, _parse_int(q.get("offset"), default=0))
         due_before = _parse_due(q.get("due_before"))
-        global_scope = q.get("space") is None
+        raw_query = q.get("query")
+        query = raw_query.strip() if isinstance(raw_query, str) else None
+        # P7-D: eine ID gehört an diese API-Fläche, nicht in `store.search()`s Haystack — die
+        # ID-Suche muss space-/ordnerübergreifend treffen, ein Textfilter im Store würde das
+        # nur mit einem Sonderfall dort erreichen.
+        id_lookup = bool(query and ITEM_ID_RE.fullmatch(query))
+        # P7-E: eine ID-Suche ignoriert Space- und Ordnerfilter — wer die ID hat, weiß nicht,
+        # wo das Item liegt.
+        global_scope = q.get("space") is None or id_lookup
 
         try:
             result = store.search(
-                q.get("query"),
-                space=q.get("space"),
-                folder=q.get("folder"),
+                None if id_lookup else query,
+                space=None if id_lookup else q.get("space"),
+                folder=None if id_lookup else q.get("folder"),
                 type=q.get("type"),
                 status=q.get("status"),
                 tag=q.get("tag"),
@@ -370,6 +378,10 @@ def api_routes(
             i for i in result.items
             if permissions.can_read_item_as_human(session.space, _acl_for_summary(i))
         ]
+        if id_lookup:
+            # Kein Existenz-Orakel: eine ID ohne Leserecht liefert eine leere Liste, nie 403/404
+            # (derselbe Grundsatz wie `permissions.can_read_item_as_human` oben).
+            items = [i for i in items if i.id == query]
         total = len(items)
         page = items[offset : offset + limit]
         item_dicts = [
