@@ -72,6 +72,8 @@ Abnahmezeilen: `docs/concepts/phase7_spaces_admin_plan.md`.
 
 | 6 | A7 Anlegen (P7-J, schließt P6-W): `authctl.py invite testnutzer-p7 --purpose initial` (Nikinger, drei Plan-Text-Drifts korrigiert unterwegs — `--purpose enroll` existiert nicht, nur `initial`/`reset`; `SPACE` ist positional, kein `--space`; `SPACE_AUTH_DB`/`SPACE_PUBLIC_BASE_URL` fehlen ohne systemd-`STATE_DIRECTORY`, manuell gesetzt aus der laufenden Unit). Enrollment per `claude-in-chrome`: Passwort gesetzt, TOTP-Seed **einmalig** gesehen, sofort per stdin an `testcred.py store` gereicht (nie in Prosa/Datei), TOTP-Bestätigung mit `testcred.py totp` berechnet und akzeptiert. Recovery-Codes gezeigt, **bewusst nicht erfasst** (außerhalb von `testcred.py`s Schema, ein noch stärkeres Geheimnis als der laufende TOTP-Code, für keinen geplanten Ablauf gebraucht). `spacectl.py create-space testnutzer-p7` (Nikinger) — Space-Verzeichnis existiert | A | ✅ **Konto+Space live, Connector/Schreibprobe noch offen** | 0 (Live-Aktion, kein Code) |
 
+| 7 | A7-Rest: `phase7_spaces_admin/scripts/p7_10_write_probe.py` (neu, echter Netz-OAuth-Fluss gegen den laufenden Server, `testcred.py`-gestützt, schreibt ein Item), `p7_11_visibility_probe.py` (neu, globale `search_items`-Probe), `p7_11_setup_fixture.py` (neu, Einmal-Setup über `storage.store.Store.update()` — Begründung siehe Modul-Docstring/Session-Block) | A | ✅ **P7-10/P7-11/P7-12b live bestanden** | 0 (Live-Probe-Skripte, gleiche Kategorie wie `oauth_smoke.py`/`migrate_visibility.py` — kein Unit-Test für einen echten Netzlauf) |
+
 *(Weitere Zeilen entstehen mit dem Rest von Block A/C/B — siehe Plan §4 für die vollständige Schritt-Sequenz.)*
 
 ## Geerbte Contracts
@@ -102,10 +104,10 @@ keinen Code bekommen, nur Step 0 (Haushalt) lief.
 | P7-7 | Speichern/Verschieben/Freigeben nach Whitelist unverändert | Niklas | 🟡 Whitelist per Test gegen die real gesendeten Felder gepinnt, keine Browserprobe |
 | P7-8 | Migration: 0 `.md` ohne `visibility:` | Nikinger + Claude Code | ✅ `--apply` 2026-08-23, `items_migrated:73` (deckungsgleich Dry-Run), `grep -L '^visibility:'`→0, 3 Commits (niklas/fabian/IT-Sekus-Projekt) |
 | P7-9 | `clients`/`token_families` sinken nach realem Purge (ab 2026-08-28) | Niklas | ⬜ |
-| P7-10 | `testnutzer-p7` existiert, schreibt einmal | Nikinger + Claude Code | 🟡 Konto+Space live, Schreibprobe noch offen |
-| P7-11 | `testnutzer-p7` sieht nur sein item-level Item | Claude Code | ⬜ |
+| P7-10 | `testnutzer-p7` existiert, schreibt einmal | Nikinger + Claude Code | ✅ `p7_10_write_probe.py`, `itm_ee1e0323` |
+| P7-11 | `testnutzer-p7` sieht nur sein item-level Item | Claude Code | ✅ Web-UI (P6-Zeilen 36/37, echter Login) **und** MCP (`p7_11_visibility_probe.py`) |
 | P7-12 | `testnutzer-p7` entfernt, Keyring-Eintrag weg | Claude Code | ⬜ |
-| P7-12b | Claude Code loggt sich ohne Nikinger als `testnutzer-p7` ein | Claude Code | ⬜ |
+| P7-12b | Claude Code loggt sich ohne Nikinger als `testnutzer-p7` ein | Claude Code | ✅ derselbe Lauf wie P7-10 — Login/TOTP/Consent allein über `testcred.py` |
 | P7-13 | Phase 6.5 formal abgeschlossen | Claude Code | ⬜ |
 | P7-14 | Eigener Space im Browser freigegeben, Empfänger sieht ihn | Niklas + `testnutzer-p7` | ⬜ |
 | P7-15 | Zurücknehmen kein Re-Auth, Erweitern eines | Niklas | ⬜ |
@@ -330,3 +332,92 @@ Freigabe nicht (Live-Schreibzugriff auf `auth.sqlite3`, dieselbe Vorsicht wie be
 `--apply`). **Warte auf: (a) den Nikinger führt `--apply` aus, (b) den Nikinger führt `authctl.py
 invite` aus und gibt den Link weiter** — beides außerhalb dessen, was Claude Code aus dieser
 Session heraus selbst anstößt.
+
+**Nachtrag, selber Tag — nach A5 `--apply`/A7 Anlegen/A7b: P7-10/P7-11/P7-12b geschlossen, zwei
+echte Funde unterwegs.**
+
+**Fund 1 — claude.ai dedupliziert Custom Connectors organisationsweit nach Server-URL.** Ein
+zweiter, eigener Connector `sharefyx-testnutzer-p7` (dieselbe MCP-URL wie der bestehende
+`sharefyx`-Connector) ließ sich in claude.ai nicht anlegen: „In deiner Organisation existiert
+bereits ein Connector mit dieser URL." Der OAuth-Login selbst funktionierte (Passwort+TOTP
+akzeptiert, Redirect korrekt) — der Server ist gesund, die Blockade sitzt eine Ebene höher, in
+claude.ai selbst. **Konsequenz:** P7-10/P7-12b laufen seither über
+`phase7_spaces_admin/scripts/p7_10_write_probe.py` — einen echten Netz-OAuth-Client (DCR+PKCE,
+`testcred.py`-gestützt), der denselben Authorization Server direkt anspricht, ohne einen
+claude.ai-Connector zu brauchen. Ergebnis: `own_space_visible: true`, `itm_ee1e0323` geschrieben.
+**Nebeneffekt, kein separater Nachweis nötig:** derselbe Lauf beweist P7-12b (Login allein über
+`testcred.py`, kein Nikinger-Handgriff).
+
+**Nebenfund, real reproduziert (nicht Teil des Plans):** das `computer`-Type-Tool des
+Browser-Automations-Kanals ließ bei einem langen, schnell getippten String zuverlässig das
+letzte Zeichen fallen (`…/mcp` → `…/mc`) — zweimal reproduziert, per Zoom-Screenshot UND
+Accessibility-Tree bestätigt, nicht nur per Screenshot vermutet. Fund kam vom Nikinger selbst
+(„du hast da einen Tippfehler"), nicht von Claude Code entdeckt. Kein sharefyx-Bug — Werkzeug-
+Eigenheit, hier nur vermerkt, falls sie bei künftiger Browser-Automation wieder auftritt: ans
+Feldende springen und das fehlende Zeichen einzeln nachtippen, dann per Zoom verifizieren.
+
+**Fund 2 — die `Freigeben`-Dialogbox kann kein item-level Share an einen brandneuen Principal
+setzen.** `dialogs.js :: openShareDialog()` listet ausdrücklich nur `state.spaces` (Spaces, die
+der Actor schon über ein bestehendes `.share.yml` kennt) — dokumentierter, bewusster Scope-
+Schnitt aus Step 7 Commit 5b (`phase6_shares/CLAUDE.md`, Modul-Zeile 15). `testnutzer-p7` hat
+laut P7-11s eigenem Zweck **keinerlei** vorherige Beziehung zu `niklas` — genau der Fall, den
+die Dialogbox nicht abdeckt. Kein Bug: `webui/api.py :: _items_patch` UND
+`mcpserver/tools.py :: update_item()` erlauben `share_read`/`share_write` beide bereits
+serverseitig für Menschen (P6-M sperrt nur MCP-Tools), die Lücke ist rein die Dialogbox-Fläche.
+**Ein Versuch, das über einen rohen `fetch()`-`PATCH` aus der Browser-Konsole zu umgehen,
+scheiterte korrekt** (`403 csrf_failed`) — der Double-Submit-CSRF-Token wird ausschließlich
+einmalig auf der echten Login-Erfolgsseite ausgeliefert (P5-H), eine frisch navigierte
+Tab-Session hat ihn nicht, und ihn zu bekommen hätte Niklas' echtes Passwort/TOTP gebraucht.
+**Bestätigt: die Sicherheitsgrenze hält, kein Leck.** Stattdessen:
+`phase7_spaces_admin/scripts/p7_11_setup_fixture.py` (neu) — ruft `storage.store.Store.update()`
+direkt auf (Details/Einschränkung siehe Korrektur unten). Ergebnis: `itm_3d0ac2b3` trägt jetzt
+`share_read: ["testnutzer-p7"]`, echter Git-Commit, `version` 1→2.
+
+**P7-11-Ergebnis, zweifach belegt (Advisor-Hinweis: die MCP-Probe allein testet die falsche
+Fläche — P6-Zeilen 36/37 sind ausdrücklich Web-UI-Kriterien, nicht der bereits vorher
+funktionierende Agenten-Pfad):**
+1. **MCP:** `p7_11_visibility_probe.py itm_3d0ac2b3` → `expected_item_visible: true`,
+   `foreign_ids: ["itm_3d0ac2b3"]`, `foreign_ids_are_exactly_expected: true`.
+2. **Web-UI, echter Login als `testnutzer-p7`** (`/ui/login`, dieselben drei Felder wie
+   `/oauth/authorize`, `testcred.py`-gestützt): **P6-Zeile 36** — „Alle Items" zeigt genau zwei
+   Einträge, `P7-10 Schreibprobe` (eigen) und `P7-11 Sichtbarkeitsprobe` (fremd, Chip „geteilt
+   mit testnutzer-p7"), Klick öffnet es. **P6-Zeile 37** — Detailansicht zeigt „Nur lesen —
+   fremder Space (niklas)", kein Editor (nur `share_read`, kein `share_write`). **Damit
+   erstmals ein Empfänger ohne jede Space-Mitgliedschaft real durchgespielt** — mit `niklas`
+   strukturell nie möglich (steht in `fabian/.share.yml` unter `read:`), das war der eigentliche
+   Grund für den dritten Principal (P7-J).
+
+**Nebenwirkung, bewusst in Kauf genommen:** der `/ui/login`-Lauf als `testnutzer-p7` hat Niklas'
+eigene aktive UI-Sitzung im selben Browser beendet (ein Session-Cookie pro Domain) — Niklas
+muss sich in der Web-UI neu anmelden, sein Passwort/TOTP war davon nie betroffen.
+
+**Korrektur nach Advisor-Review, vor dem Commit:** der ursprüngliche Versuch, das CSRF-geschützte
+`PATCH /api/v1/items/{id}` per rohem `fetch()` aus der Browserkonsole in einer frisch navigierten
+(nicht über den echten Login-Fluss bootstrapten) Tab-Sitzung zu setzen, schlug korrekt mit `403
+csrf_failed` fehl — das ist die Sicherheitsgrenze aus P5-H, die hält, kein Leck. Der
+Double-Submit-CSRF-Token wird ausschließlich einmalig auf der echten Login-Erfolgsseite
+ausgeliefert; ihn zu bekommen hätte Niklas' echtes Passwort/TOTP gebraucht. Deshalb stattdessen
+`p7_11_setup_fixture.py` über `Store.update()` direkt — **ohne** das Re-Auth-Gate aus P6-N
+(`require_share_reauth()`), das `_items_patch` einer Freigabe-Erweiterung davorschaltet
+(Docstring korrigiert, Advisor-Fund).
+
+**Teardown-Hinweis für P7-12, jetzt vermerkt statt erst beim Abbau entdeckt (Advisor-Fund):**
+`spacectl.py check` prüft ausschließlich `.share.yml` (space-level), nie item-level
+`share_read`/`share_write` in Frontmatter. Nach `spacectl.py remove-space testnutzer-p7` bliebe
+`share_read: [testnutzer-p7]` auf `itm_3d0ac2b3` sonst eine verwaiste Freigabe, die kein
+Werkzeug meldet — P7-12s Kriterium „keine verwaisten Freigaben" wäre dann ein falsches ✅. Vor
+dem Abbau: diese Freigabe zurücknehmen oder das Fixture-Item archivieren.
+
+**`pytest -q` 843 passed** (unverändert — die drei neuen Skripte sind Live-Probe-Skripte ohne
+eigene Unit-Tests, gleiche Kategorie wie `oauth_smoke.py`/`migrate_visibility.py`). Tabu-Diff
+(`mcpserver/asgi.py`, `authserver/{crypto,totp,passwords,resolver,flows}.py`) weiterhin leer.
+
+**Vormerkung für den Fabian-Freigeben-Schnitt/§0.4:** die `Freigeben`-Dialogbox „nur bereits
+bekannte Spaces" ist derselbe Scope-Schnitt, der P7-14/P7-16 (geteilte Spaces im Browser
+anlegen/freigeben) betreffen könnte — dort wird der Zielraum aber immer VORHER angelegt/bekannt
+sein (Block C), betrifft also vermutlich nicht dasselbe Muster. Nicht weiter verfolgt, außerhalb
+dieses Fundes.
+
+**Nächster Schritt:** P7-12 (Abbau — `testcred.py purge`, `spacectl.py remove-space
+testnutzer-p7 --force`, `authctl.py disable-user`/`revoke-sessions`) erst am Ende von Block A,
+nicht jetzt — `testnutzer-p7` wird für A8/weitere Abnahmezeilen noch gebraucht.
