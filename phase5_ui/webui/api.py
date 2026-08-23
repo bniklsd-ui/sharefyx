@@ -562,7 +562,10 @@ def api_routes(
         except (ItemNotFound, ConflictError, ValidationError, ValueError) as exc:
             raise _map_store_error(exc, own_space=session.space) from exc
         return JSONResponse(
-            item_to_json(item, readonly=False, own_space=session.space),
+            item_to_json(
+                item, readonly=False, own_space=session.space,
+                assets=store.list_assets(item.id),
+            ),
             headers={"Cache-Control": "no-store"},
         )
 
@@ -589,7 +592,10 @@ def api_routes(
         except (ItemNotFound, ConflictError, ValidationError, ValueError) as exc:
             raise _map_store_error(exc, own_space=session.space) from exc
         return JSONResponse(
-            item_to_json(item, readonly=False, own_space=session.space),
+            item_to_json(
+                item, readonly=False, own_space=session.space,
+                assets=store.list_assets(item.id),
+            ),
             headers={"Cache-Control": "no-store"},
         )
 
@@ -627,7 +633,10 @@ def api_routes(
         except (ItemNotFound, ConflictError) as exc:
             raise _map_store_error(exc, own_space=session.space) from exc
         return JSONResponse(
-            item_to_json(item, readonly=False, own_space=session.space),
+            item_to_json(
+                item, readonly=False, own_space=session.space,
+                assets=store.list_assets(item.id),
+            ),
             headers={"Cache-Control": "no-store"},
         )
 

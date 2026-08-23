@@ -42,6 +42,7 @@ var appendButtonEl;
 var conflictDialogEl;
 var insertImageButtonEl;
 var insertImageInputEl;
+var assetStripEl;
 
 export function showOverviewPane() {
   overviewEl.hidden = false;
@@ -72,7 +73,14 @@ function snapshotFromItem(item) {
     id: item.id, type: item.type, version: item.version,
     title: item.title, body: item.body, status: item.status,
     due: item.due, tags: item.tags.slice(), links: item.links.slice(),
+    assets: (item.assets || []).slice(),
   };
+}
+
+// P7-A3 (V73): `assets` liefert `markdownToHtml()`s dritten Kontextschlüssel, damit ein
+// entferntes Asset als Alt-Text statt als kaputtes `<img>` rendert.
+function assetIdsOf(assets) {
+  return (assets || []).map(function (a) { return a.id; });
 }
 
 export function currentFormValues() {
@@ -176,9 +184,10 @@ function setEditorMode(mode) {
     b.disabled = mode !== "edit";
   });
   if (mode === "preview") {
-    editorPreviewEl.innerHTML = markdownToHtml(
-      editorTextareaEl.value, { itemId: state.editingSnapshot && state.editingSnapshot.id },
-    );
+    editorPreviewEl.innerHTML = markdownToHtml(editorTextareaEl.value, {
+      itemId: state.editingSnapshot && state.editingSnapshot.id,
+      assetIds: assetIdsOf(state.editingSnapshot && state.editingSnapshot.assets),
+    });
   }
 }
 
@@ -199,6 +208,47 @@ function idChip(itemId) {
   return chip;
 }
 
+// P7-A3: kein neuer Serverpfad — `storage/store.py :: delete_asset()` verschiebt nach
+// `_assets/<item_id>/_trash/`, löscht nie (N5 aus 6.5, Entscheidung H aus P1 bleibt
+// unangetastet). Wortwahl deshalb "entfernen", nie "löschen".
+function renderAssetStrip(item) {
+  assetStripEl.textContent = "";
+  var assets = item.assets || [];
+  if (!assets.length) return;
+  assets.forEach(function (asset) {
+    var row = el("span", "asset-strip__item");
+    row.appendChild(el("span", null, asset.filename || asset.id));
+    var removeButton = el("button", "asset-strip__remove", "×");
+    removeButton.type = "button";
+    removeButton.title = "Bild entfernen";
+    removeButton.addEventListener("click", function () {
+      confirmDialog({
+        title: "Bild entfernen",
+        message: "Das Bild wird aus dem Dokument entfernt und in den Papierkorb des Items verschoben.",
+        ok: "Entfernen",
+      }).then(function (confirmed) {
+        if (!confirmed) return;
+        api("/items/" + encodeURIComponent(item.id) + "/assets/" + encodeURIComponent(asset.id), {
+          method: "DELETE",
+        }).then(function () {
+          item.assets = item.assets.filter(function (a) { return a.id !== asset.id; });
+          renderAssetStrip(item);
+          if (state.mode === "preview") {
+            editorPreviewEl.innerHTML = markdownToHtml(editorTextareaEl.value, {
+              itemId: item.id, assetIds: assetIdsOf(item.assets),
+            });
+          }
+          toast("Bild entfernt.");
+        }).catch(function (err) {
+          toast(err.message || "Entfernen fehlgeschlagen.", "error");
+        });
+      });
+    });
+    row.appendChild(removeButton);
+    assetStripEl.appendChild(row);
+  });
+}
+
 function showReadonlyItem(item) {
   editorPart.detach();          // Akzeptanzkriterium 12
   // Beides zwingend, nicht kosmetisch (Advisor-Fund, siehe F7 im Session-Block): `hidden`
@@ -216,7 +266,9 @@ function showReadonlyItem(item) {
   roMetaEl.appendChild(idChip(item.id));
   roMetaEl.appendChild(el("span", null, item.type + " · " + item.status));
   if (item.due) roMetaEl.appendChild(el("span", "tnum", "fällig " + item.due));
-  roPreviewEl.innerHTML = markdownToHtml(item.body, { itemId: item.id });
+  roPreviewEl.innerHTML = markdownToHtml(item.body, {
+    itemId: item.id, assetIds: assetIdsOf(item.assets),
+  });
 }
 
 function showEditableItem(item, opts) {
@@ -229,6 +281,7 @@ function showEditableItem(item, opts) {
   state.editingSnapshot = snapshotFromItem(item);
   metaItemIdEl.textContent = "";
   metaItemIdEl.appendChild(idChip(item.id));
+  renderAssetStrip(state.editingSnapshot);
   fieldTitleEl.value = item.title;
   populateStatusSelect(item.type);
   fieldStatusEl.value = item.status;
@@ -265,9 +318,10 @@ function showEditableItem(item, opts) {
       // stehen wir (Vorgabe seit diesem Fund) schon dort, während der Entwurf asynchron
       // ankommt, zeigte die Vorschau bis hierhin weiter den ALTEN, gespeicherten Text.
       if (state.mode === "preview") {
-        editorPreviewEl.innerHTML = markdownToHtml(
-      editorTextareaEl.value, { itemId: state.editingSnapshot && state.editingSnapshot.id },
-    );
+        editorPreviewEl.innerHTML = markdownToHtml(editorTextareaEl.value, {
+          itemId: state.editingSnapshot && state.editingSnapshot.id,
+          assetIds: assetIdsOf(state.editingSnapshot && state.editingSnapshot.assets),
+        });
       }
     });
   }
@@ -398,6 +452,7 @@ export function init() {
   conflictDialogEl = document.getElementById("conflict-dialog");
   insertImageButtonEl = document.getElementById("insert-image-button");
   insertImageInputEl = document.getElementById("insert-image-input");
+  assetStripEl = document.getElementById("asset-strip");
 
   closeButtonEl.addEventListener("click", function () { closeEditor(); });
 
@@ -546,9 +601,13 @@ export function init() {
     api("/items/" + encodeURIComponent(itemId) + "/assets", {
       method: "POST", body: file, headers: { "Content-Type": "application/octet-stream" },
     }).then(function (asset) {
+      state.editingSnapshot.assets.push(asset);
+      renderAssetStrip(state.editingSnapshot);
       insertAtCursor(editorTextareaEl, "![" + (file.name || "Bild") + "](asset:" + asset.id + ")");
       if (state.mode === "preview") {
-        editorPreviewEl.innerHTML = markdownToHtml(editorTextareaEl.value, { itemId: itemId });
+        editorPreviewEl.innerHTML = markdownToHtml(editorTextareaEl.value, {
+          itemId: itemId, assetIds: assetIdsOf(state.editingSnapshot.assets),
+        });
       }
     }).catch(function (err) {
       toast(err.message || "Bild-Upload fehlgeschlagen.", "error");

@@ -1116,6 +1116,31 @@ async def test_assets_appear_in_item_to_json(full_app_items, item_store, totp_co
     assert assets[0]["mime"] == "image/png"
 
 
+@pytest.mark.asyncio
+async def test_assets_survive_a_patch_response(full_app_items, item_store, totp_code):
+    """P7-A3-Nebenfund: `_items_patch`/`_items_append`/`_items_archive` gaben `item_to_json()`
+    bisher ohne `assets=` zurueck -- jede Antwort truegete `assets: []`, auch wenn das Item
+    laengst ein Bild hatte. `editor.js :: afterWrite()` laedt den Editor direkt aus genau dieser
+    Antwort neu -- ohne diesen Fix waere die Asset-Leiste nach jedem Speichern leer gewesen."""
+    item = item_store.create(SPACE, type="note", title="Mit Bild")
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        await client.post(f"/api/v1/items/{item.id}/assets", content=_PNG, headers=_headers(csrf))
+        current = (await client.get(f"/api/v1/items/{item.id}")).json()
+        patch = await client.patch(
+            f"/api/v1/items/{item.id}",
+            json={"version": current["version"], "title": "Umbenannt"},
+            headers=_headers(csrf),
+        )
+        append = await client.post(
+            f"/api/v1/items/{item.id}/append",
+            json={"version": patch.json()["version"], "text": "mehr Text"},
+            headers=_headers(csrf),
+        )
+    assert len(patch.json()["assets"]) == 1
+    assert len(append.json()["assets"]) == 1
+
+
 def test_webui_imports_exactly_one_mcpserver_symbol():
     """§1.2/P5-B: `webui` darf genau ein Symbol aus `mcpserver` importieren
     (`permissions.SharePolicy`, seit P6 Step 5 — vorher `OwnSpaceWritable`). Geprüft über den

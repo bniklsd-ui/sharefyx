@@ -64,6 +64,8 @@ Abnahmezeilen: `docs/concepts/phase7_spaces_admin_plan.md`.
 | 1 | Haushalt, Verifikationsdurchlauf (0.1–0.5), Skelett (0.6), sechste Contract-Öffnung angekündigt (0.7) | 0 | ✅ **vollständig** — siehe Session-Block 2026-08-23 | 0 (Skelett, wie P1/P6/6.5 Step 0) |
 | 2 | A1 (ID sichtbar+auffindbar: `api.py :: _items_get` ID-Zweig, `idChip()` in Editor + Nur-lesen, Such-Placeholder) + A2 (Tool-Beschreibungen: `_TITLE_NOT_ID_HINT` an vier Lese-Tools) | A | 🟡 **gebaut, JS nicht browserverifiziert** — Backend+Tools per `pytest` grün, Editor-Chip/Copy-Verhalten noch nicht in einem echten Browser gesehen | +5 (4 `phase5_ui/tests/test_api.py` + 1 `phase2_mcp/tests/test_tools.py`); 833 gesamt |
 
+| 3 | A3 (Bild-Entfernen-Knopf, schließt P6.5-12): `markdownToHtml()` bekommt dritten Kontextschlüssel `assetIds` (V73 — sonst rendert ein entferntes Bild ein kaputtes `<img>`, nicht Alt-Text), `renderAssetStrip()`/`idChip`-Muster in `editor.js`, `DELETE .../assets/{id}` (bereits vorhanden). **Nebenfund beim Bauen, mitbehoben:** `_items_patch`/`_items_append`/`_items_archive` gaben `item_to_json()` bisher ohne `assets=` zurück — jede Antwort log `assets: []`, auch mit vorhandenen Bildern; `afterWrite()` lädt den Editor direkt aus genau dieser Antwort neu, ohne den Fix wäre die Asset-Leiste nach jedem Speichern leer gewesen | A | 🟡 **gebaut, JS nicht browserverifiziert** — Backend-Nebenfund per Test bewiesen, Entfernen-Knopf/Alt-Text-Verhalten noch nicht in einem echten Browser gesehen | +1 `phase5_ui/tests/test_api.py`; 834 gesamt |
+
 *(Weitere Zeilen entstehen mit dem Rest von Block A/C/B — siehe Plan §4 für die vollständige Schritt-Sequenz.)*
 
 ## Geerbte Contracts
@@ -89,7 +91,7 @@ keinen Code bekommen, nur Step 0 (Haushalt) lief.
 | P7-2 | ID-Suche findet Item spaceübergreifend | Niklas | 🟡 Backend per Test bewiesen, keine Browserprobe |
 | P7-3 | ID-Suche auf nicht lesbares Item → leere Liste | Claude Code, Test | ✅ `test_id_lookup_respects_read_permission` |
 | P7-4 | Claude nennt Items beim Titel, nicht der ID | Niklas, echter Connector | ⬜ Text steht in vier Tool-Beschreibungen, kein Connector-Beweis |
-| P7-5 | Bild im Editor entfernbar, landet in `_trash/` | Niklas | ⬜ |
+| P7-5 | Bild im Editor entfernbar, landet in `_trash/` | Niklas | ⬜ gebaut, ungeprüft |
 | P7-6 | `PATCH` mit Tippfehler-Feld abgewiesen (O6) | Claude Code, Test | ⬜ |
 | P7-7 | Speichern/Verschieben/Freigeben nach Whitelist unverändert | Niklas | ⬜ |
 | P7-8 | Migration: 0 `.md` ohne `visibility:` | Nikinger + Claude Code | ⬜ |
@@ -226,3 +228,34 @@ bewiesen, keine Browserprobe), P7-3 ✅ (reiner Test-Fall, kein Mensch nötig).
 **Nächster Schritt:** A3 (Bild-Entfernen-Knopf, V73-Konsequenz eingeplant) und A4 (Feld-
 Whitelist, korrigierte Liste aus V74 oben) folgen als eigene Commits, wie mit dem Advisor
 abgestimmt.
+
+**Nachtrag, selber Tag — A3 gebaut (V73-Konsequenz umgesetzt).** `markdown.js :: inlineMarkdown()`
+prüft jetzt vor jedem `asset:<id>`-Auflösen, ob die ID in einem mitgegebenen `assetIds` steht —
+fehlt sie, rendert der Alt-Text statt eines `<img>` (ohne `assetIds` bleibt das alte Verhalten,
+`updates.js`s Aufrufe sind unberührt). `editor.js`: `renderAssetStrip(item)` (neu) zeigt jedes
+Asset mit Dateiname + „×"; Klick fragt per `confirmDialog()` nach, Wortlaut „entfernen"/„Papier-
+korb" (nie „löschen", der Server verschiebt nur nach `_trash/`), ruft `DELETE .../assets/{id}`
+(bereits vorhanden, kein neuer Serverpfad), aktualisiert `item.assets` lokal und rendert Leiste +
+Vorschau neu. `snapshotFromItem()` trägt jetzt `assets` mit, ein neu hochgeladenes Bild wird
+sofort in `state.editingSnapshot.assets` gepusht (sonst zeigte die Leiste es erst nach dem
+nächsten Neuladen).
+
+**Echter Nebenfund beim Bauen, nicht Teil des Plans:** `_items_patch`/`_items_append`/
+`_items_archive` (`webui/api.py`) reichten `item_to_json()` bisher **ohne** `assets=` durch —
+jede Antwort trug `assets: []`, unabhängig vom tatsächlichen Bestand. `editor.js :: afterWrite()`
+lädt den Editor direkt aus genau dieser Antwort neu (`loadEditorFromItem(item, …)`) — ohne den
+Fix hätte jedes Speichern nach einem Bild-Einfügen die Asset-Leiste geleert und `assetIds` beim
+nächsten Render-Zyklus leer gemacht, was ein soeben eingefügtes Bild fälschlich als Alt-Text
+gezeigt hätte. Behoben: alle drei Endpunkte reichen jetzt `assets=store.list_assets(item.id)`
+durch, wie `_items_get_one` es schon tat. Bewusst **nicht** mitbehoben: `_map_store_error()`s
+Konfliktantwort (`detail.current`) trägt weiterhin keine `assets` — das ist eine reine
+Modulfunktion ohne `store`-Zugriff, eine Signaturänderung hätte jeden Aufrufer in der Datei
+berührt; der Konfliktdialog zeigt ohnehin keine Bildvorschau, also kein beobachtbarer Fehler,
+nur vorsorglich notiert.
+
+**Test:** +1 `phase5_ui/tests/test_api.py :: test_assets_survive_a_patch_response` (Bild
+hochladen, PATCH + append, beide Antworten tragen das Asset). `pytest -q` **834 passed**
+(833 + 1). Tabu-Probe (`storage/`) weiterhin leer — der Fix blieb vollständig in `webui/api.py`.
+
+**Ehrlich offen, wie bei A1/A2:** keine Browserprobe für den Entfernen-Knopf/Alt-Text-Übergang
+diese Session — P7-5 bleibt ⬜ „gebaut, ungeprüft" in der Abnahmematrix.

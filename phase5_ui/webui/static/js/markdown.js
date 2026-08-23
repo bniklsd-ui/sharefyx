@@ -33,7 +33,12 @@ function resolveAssetSrc(src, itemId) {
   return itemId ? "/api/v1/items/" + itemId + "/assets/" + m[1] : src;
 }
 
-function inlineMarkdown(escaped, itemId) {
+// P7-A3 (V73): `resolveAssetSrc()` prüft nur die URL-**Form**, nicht ob das Asset noch
+// existiert — nach einem Entfernen (Verschieben nach `_trash/`) matcht die Route weiterhin,
+// der Browser bekäme einen `404` statt eines sauberen Alt-Texts. `assetIds` (aus `item.assets`,
+// wenn mitgegeben) macht die Existenzprüfung hier explizit, bevor überhaupt ein `<img>`
+// entsteht — ohne `assetIds` bleibt das alte Verhalten (jede `ast_…`-Form wird aufgelöst).
+function inlineMarkdown(escaped, itemId, assetIds) {
   return escaped
     .replace(/`([^`]+)`/g, "<code>$1</code>")
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
@@ -41,6 +46,8 @@ function inlineMarkdown(escaped, itemId) {
     // Bildzweig MUSS vor dem Link-Replace laufen (P6.5-J) — sonst frisst die Link-Regex das
     // `[alt](src)` eines `![alt](src)` und das führende `!` bleibt als Text übrig.
     .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, function (whole, alt, src) {
+      var m = /^asset:(ast_[0-9a-f]{8})$/.exec(src);
+      if (m && assetIds && assetIds.indexOf(m[1]) === -1) return alt;
       return '<img src="' + resolveAssetSrc(src, itemId) + '" alt="' + alt + '">';
     })
     .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2">$1</a>');
@@ -67,6 +74,7 @@ var TABLE_SEPARATOR_RE = /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/;
 
 export function markdownToHtml(src, options) {
   var itemId = options && options.itemId;
+  var assetIds = (options && options.assetIds) || null;
   var lines = escapeHtml(src).replace(/\r\n/g, "\n").split("\n");
   var out = "";
   var i = 0;
@@ -75,7 +83,7 @@ export function markdownToHtml(src, options) {
 
   function flushParagraph() {
     if (paragraph.length) {
-      out += "<p>" + inlineMarkdown(paragraph.join(" "), itemId) + "</p>";
+      out += "<p>" + inlineMarkdown(paragraph.join(" "), itemId, assetIds) + "</p>";
       paragraph = [];
     }
   }
@@ -112,7 +120,7 @@ export function markdownToHtml(src, options) {
       out += "<table><thead><tr>";
       headerCells.forEach(function (cell, idx) {
         var cls = aligns[idx] ? ' class="' + aligns[idx] + '"' : "";
-        out += "<th" + cls + ">" + inlineMarkdown(cell.trim(), itemId) + "</th>";
+        out += "<th" + cls + ">" + inlineMarkdown(cell.trim(), itemId, assetIds) + "</th>";
       });
       out += "</tr></thead><tbody>";
       i += 2;
@@ -121,7 +129,7 @@ export function markdownToHtml(src, options) {
         out += "<tr>";
         cells.forEach(function (cell, idx) {
           var cls = aligns[idx] ? ' class="' + aligns[idx] + '"' : "";
-          out += "<td" + cls + ">" + inlineMarkdown(cell.trim(), itemId) + "</td>";
+          out += "<td" + cls + ">" + inlineMarkdown(cell.trim(), itemId, assetIds) + "</td>";
         });
         out += "</tr>";
         i++;
@@ -134,7 +142,7 @@ export function markdownToHtml(src, options) {
       flushParagraph();
       closeList();
       var level = m[1].length;
-      out += "<h" + level + ">" + inlineMarkdown(m[2], itemId) + "</h" + level + ">";
+      out += "<h" + level + ">" + inlineMarkdown(m[2], itemId, assetIds) + "</h" + level + ">";
       i++;
       continue;
     }
@@ -148,7 +156,7 @@ export function markdownToHtml(src, options) {
         quoteLines.push(m[1]);
         i++;
       }
-      out += "<blockquote>" + quoteLines.map(function (l) { return "<p>" + inlineMarkdown(l, itemId) + "</p>"; }).join("") + "</blockquote>";
+      out += "<blockquote>" + quoteLines.map(function (l) { return "<p>" + inlineMarkdown(l, itemId, assetIds) + "</p>"; }).join("") + "</blockquote>";
       continue;
     }
 
@@ -159,7 +167,7 @@ export function markdownToHtml(src, options) {
         out += "<ul>";
         listType = "ul";
       }
-      out += "<li>" + inlineMarkdown(m[1], itemId) + "</li>";
+      out += "<li>" + inlineMarkdown(m[1], itemId, assetIds) + "</li>";
       i++;
       continue;
     }
@@ -171,7 +179,7 @@ export function markdownToHtml(src, options) {
         out += "<ol>";
         listType = "ol";
       }
-      out += "<li>" + inlineMarkdown(m[1], itemId) + "</li>";
+      out += "<li>" + inlineMarkdown(m[1], itemId, assetIds) + "</li>";
       i++;
       continue;
     }
