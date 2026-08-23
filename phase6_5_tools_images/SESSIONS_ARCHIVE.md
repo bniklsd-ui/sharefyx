@@ -5,12 +5,46 @@ read-when: Auditieren der vollen Phase-6.5-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-08-23 (zehnte Rotation -- Abnahmematrix-Session-Block verschoben, Head traegt seither den P6.5-3-Session-Block)
+updated: 2026-08-23 (elfte Rotation -- P6.5-3-Session-Block verschoben, Head traegt seither den P6.5-6/7/9-Session-Block)
 ---
 # SESSIONS_ARCHIVE.md — Phase 6.5: Werkzeug-Ergonomie und Bilder
 
-Zehn Einträge, newest-first, verbatim aus `phase6_5_tools_images/CLAUDE.md` per
+Elf Einträge, newest-first, verbatim aus `phase6_5_tools_images/CLAUDE.md` per
 `scripts/rotate_session_block.sh phase6_5_tools_images`.
+
+## Session stopped — 2026-08-23 (P6.5-3 bestanden, Block A der Abnahmematrix vollständig)
+
+**Auftrag:** direkter Anschluss an die Vorsitzung. Nikinger stellte P6.5-3 einer frischen
+Instanz in einem separaten, thematisch anderen Gespräch (Aufgabe: NVIDIA-Item um einen
+OpenCode-Vergleich + eine Integrationsempfehlung ergänzen) — kein gezielter Test-Prompt, echte
+Arbeitsaufgabe, dabei fielen die Tool-Aufrufe an.
+
+**Reihenfolge aus den Versionsnummern rekonstruiert (die UI zeigt die fünf Aufrufe nicht in
+chronologischer Reihenfolge, nur als Einzelscreenshots):**
+1. `search_items(query="NVIDIA")` → `itm_9b22ef03`, v1.
+2. `get_item(item_id)` → voller Body, v1 im Frontmatter — korrekt `get_item`, nicht `get_item_
+   meta`: der Body wurde tatsächlich gebraucht (Vergleichsbasis für den neuen Abschnitt).
+3. `append_to_item(version=1, text="Vergleich zu OpenCode...")` → v2, `appended_bytes: 3027`.
+4. **`get_item_meta(item_id)`** → v2 bestätigt — **nicht** `get_item`.
+5. `append_to_item(version=2, text="Integrationsempfehlung...")` → v3, `appended_bytes: 2210`.
+
+**P6.5-3 ✅.** Schritt 4 ist der eigentliche Test: zwischen den beiden Appends brauchte die
+Instanz nur die aktuelle Version, keinen Body — und wählte unaufgefordert das billige Tool
+(`get_item_meta`) statt das teure erneut aufzurufen (`get_item`). Genau die in P6.5-E/F
+begründete Unterscheidung wirkte in echter, unangeleiteter Nutzung, nicht nur auf gezielte
+Nachfrage wie P6.5-1/2/4.
+
+**Block A der Abnahmematrix ist damit vollständig (4/4).** Modul-Status-Zeile und
+Abnahmestand-Tabelle oben nachgezogen.
+
+**Verifiziert:** kein Code-Diff (reine Doku-Session, Beleg aus Screenshots einer echten
+Connector-Sitzung). `git status` zeigt ausschließlich den Phase-Head + `SESSIONS_ARCHIVE.md` +
+`docs/INDEX.md`.
+
+**Offen für die nächste Session:**
+- 10 von 14 Abnahmezeilen offen — ausschließlich noch Block B: P6.5-5–12 (Browser/`DATA_ROOT`),
+  P6.5-13/14 (Connector + Fabian, zwei Gespräche).
+- V64, `filename`-Persistenzfrage, Doku-Schuld, `test_authctl.py`-Flake: unverändert offen.
 
 ## Session stopped — 2026-08-23 (Abnahmematrix eröffnet: P6.5-1/2/4 live bestanden)
 
