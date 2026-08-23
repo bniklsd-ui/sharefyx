@@ -285,3 +285,33 @@ Verbleibend in Block A: A5 (Sichtbarkeits-Migration, braucht den Nikinger für `
 den Nikinger für die Einladung), A8 (formaler Abschluss Phase 6.5, setzt A3/A7 voraus). Session
 hier bewusst gestoppt — die nächsten Schritte brauchen entweder den Nikinger direkt oder bauen
 auf etwas auf, das er noch anstoßen muss.
+
+**Nachtrag, selber Tag — zwei Vorarbeiten erledigt, die Claude Code selbst darf (Advisor-
+Hinweis), damit der Nikinger-Handgriff kein blinder Griff wird:**
+
+**A5 Schritt 2 (Claude-Code-Sache laut Plan): `migrate_visibility.py --dry-run` gegen den
+echten `DATA_ROOT` gelaufen** (`--data-root /home/savefyx/savefyx-data`, Default ist bereits
+`--dry-run`, kein `--apply`). Ergebnis: **`items_migrated: 73`, `dry_run: true`, `spaces_touched:
+["IT-Sekus-Projekt", "fabian", "niklas"]`** — exakte Deckung mit der Plan-Erwartung (Handover §1
+Punkt 4). Alle 73 Zeilen zeigen `"before": null, "after": "private"`. Kein Schreibzugriff (Skript
+selbst berichtet `dry_run: true`, kein `git log`-Nachtrag im `DATA_ROOT` geprüft nötig, da das
+Skript bei `--dry-run` laut eigenem Code keinen Store-Write auslöst). **A5 Schritt 3 (`--apply`)
+bleibt Nikinger-Sache (P7-H) — nicht ausgeführt.**
+
+**V75 geschlossen, gegen eine Wegwerf-Instanz, nicht den echten `DATA_ROOT`:** `spacectl.py
+create-space testnutzer-p7` gegen ein Temp-Verzeichnis — Space-Name mit Bindestrich angenommen,
+kein Sonderzeichen-Fehler (`_cmd_create_space` prüft nur `/`, führenden `.`, `RESERVED_DIR_NAMES`
+— ein Bindestrich fällt in keine der drei Kategorien). `Store.create("testnutzer-p7", ...)`
+direkt danach: Item angelegt, Datei liegt unter `testnutzer-p7/itm_…__v75-testprobe.md`,
+`store.search(space="testnutzer-p7")` findet es wieder. **Der Bindestrich übersteht Anlegen,
+Schreiben und Suchen — keine Sonderbehandlung nötig, `authctl.py invite --space
+testnutzer-p7` kann unverändert kommen.**
+
+**Zwei offene Fragen für den Nikinger, bevor A5/A7 weitergehen können (nicht von Claude Code
+entscheidbar):**
+1. **A5 Schritt 1** (`docs/UPDATE_LOG.md`-Eintrag, muss auf den `--apply`-Tag datiert sein,
+   `deploy.sh` bricht sonst ab, P6-X) — läuft `--apply` heute (2026-08-23, Eintrag jetzt
+   schreibbar) oder an einem späteren Tag (Eintrag dann)?
+2. **A7 Schritt 1** — wann kann `authctl.py invite --space testnutzer-p7 --purpose enroll`
+   laufen? Danach übernimmt Claude Code das Enrollment im Browser (`claude-in-chrome`) und den
+   Rest von A7/A7b ohne weiteren Nikinger-Handgriff.
