@@ -5,12 +5,77 @@ read-when: Auditieren der vollen Phase-6.5-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-08-21 (achte Rotation -- Live-Deploy-Session-Block verschoben, Head traegt seither den Gate-A->B-Session-Block)
+updated: 2026-08-23 (neunte Rotation -- Gate-A->B-Session-Block verschoben, Head traegt seither den Abnahmematrix-Session-Block)
 ---
 # SESSIONS_ARCHIVE.md — Phase 6.5: Werkzeug-Ergonomie und Bilder
 
-Acht Einträge, newest-first, verbatim aus `phase6_5_tools_images/CLAUDE.md` per
+Neun Einträge, newest-first, verbatim aus `phase6_5_tools_images/CLAUDE.md` per
 `scripts/rotate_session_block.sh phase6_5_tools_images`.
+
+## Session stopped — 2026-08-21 (Gate A→B bestanden: echter Connector-Rundlauf, V60 geschlossen)
+
+**Auftrag:** direkter Anschluss an die Vorsitzung — der Nikinger verband den sharefyx-Connector
+neu (`/mcp`, „Reconnected to claude.ai sharefyx"; Standardschritt nach jedem Deploy, kein Fund)
+und gab den in der Vorsitzung blockierten MCP-Werkzeug-Rundlauf frei, mit der Auflage, jedes
+angelegte Item danach zu archivieren.
+
+**Rundlauf, alle Aufrufe über den echten, live deployten Connector, kein In-Process-Test:**
+1. `list_spaces` — `writable:true` korrekt für den eigenen Space (`niklas`) UND den geteilten
+   Space `IT-Sekus-Projekt` (item-level `write:`), `writable:false` korrekt für `fabian`. Beweist
+   live, was P6.5-B beschreibungsseitig korrigiert hatte.
+2. `create_item(type=note, ...)` in `niklas` — Quittung statt Volltext, `itm_676b26b8`.
+3. `get_item_meta` — Frontmatter+Version ohne Body, `assets: []` vor dem ersten Upload.
+4. `put_item_asset` — **erster Versuch mit einem verbreiteten „1×1-PNG"-Copy-Paste-Fixture
+   scheiterte**, Client zeigte „[Image removed — rejected by API]". **Root Cause gefunden, kein
+   Server-/Connector-Fund:** dieses spezifische Fixture (aus dem Gedächtnis zitiert, nicht aus
+   dem Repo) hat einen falschen CRC im `IDAT`-Chunk — per Byte-Parser bestätigt. `sniff_image_
+   mime()` prüft bewusst nur Magic Bytes (P6-AZ, kein serverseitiges Bildverarbeiten), speicherte
+   die kaputten Bytes also unverändert; der Client-Decoder lehnte sie beim Rendern korrekt ab.
+   Kein Fix nötig — das ist exakt das entworfene Verhalten (garbage in, garbage out, keine
+   serverseitige Validierung über Magic Bytes hinaus). Mit einem korrekt CRC'd 4×4-PNG (eigener
+   Encoder, derselbe wie in der Step-B3-Playwright-Probe) wiederholt: **Bild wurde korrekt
+   gerendert** (sichtbares blaues Quadrat).
+5. `patch_item` — alter Text exakt einmal getroffen, Ersetzung korrekt, Quittung ohne Volltext.
+6. `update_item(status="archived")` — Item archiviert, `get_item_meta` bestätigt
+   `status:"archived"`, `version:3`, beide Assets weiterhin gelistet.
+
+**`[VERIFY]` empirisch geschlossen:**
+- **V60 — geschlossen.** Der claude.ai/Claude-Code-Connector rendert `ImageContent` für ein
+  gültiges Bild korrekt (gesehen, nicht nur behauptet — das Quadrat war sichtbar). Für ein
+  Bild mit ungültiger interner Struktur (falscher Chunk-CRC) lehnt der Client-Decoder korrekt
+  ab, statt es als kaputtes Bild anzuzeigen — kein serverseitiger Fund, siehe oben.
+- **V64 — Teildatenpunkt, nicht abschließend geschlossen.** Zwei `put_item_asset`-Aufrufe
+  (`destructiveHint: True`) liefen ohne sichtbare wiederholte Rückfrage zwischen den Aufrufen.
+  Das ist ein Hinweis, keine vollständige Antwort — eine einzelne Sitzung mit zwei Aufrufen
+  beweist nicht das UI-Verhalten über mehrere Sitzungen/Tage hinweg; bleibt „beobachtet, nicht
+  abschließend verifiziert" im Register.
+
+**Live bestätigter, bereits dreimal dokumentierter Fund, jetzt auch außerhalb der Testsuite
+gesehen:** `filename` wird weiterhin nicht persistiert — `put_item_asset(..., filename=
+"gate-probe-valid.png")` gefolgt von `get_item_meta` zeigt `filename:""` für exakt dieses
+Asset. Keine neue Information, aber die erste Live-Bestätigung außerhalb von `pytest`/
+`mcp_smoke.py` — verstärkt den Fall für eine Entscheidung, ändert aber nichts an der offenen
+Frage selbst.
+
+**Aufräumen:** `itm_676b26b8` ist `status:"archived"` (nicht hart gelöscht, Entscheidung H/Hard
+Rule 5 unverändert) — bleibt im Archiv-Ordner des Space `niklas` liegen, wie jedes andere
+archivierte Item auch. Kein weiterer Aufräumschritt nötig oder vorgesehen.
+
+**Ergebnis: Gate A→B ist bestanden.** Block A ist damit nicht nur gebaut und deployt, sondern
+auch die einzige noch fehlende Abnahmebedingung (echte Connector-Probe) ist erfüllt. Modul-
+Status-Tabelle oben nachgezogen.
+
+**Verifiziert:** kein Code-Diff in dieser Session (reiner Live-Rundlauf über den Connector +
+Doku-Nachpflege) — `pytest` nicht erneut gelaufen, war seit dem letzten Lauf unverändert.
+`git status` zeigt ausschließlich den Phase-Head + `SESSIONS_ARCHIVE.md` + `docs/INDEX.md`.
+
+**Offen für die nächste Session:**
+- V64 bleibt ein offener Registereintrag — braucht mehrere echte Sitzungen über Zeit, kein
+  Ein-Aufwasch-Test.
+- `filename`-Persistenzfrage (jetzt viermal berührt: B1/B2/B4/live) bleibt offen, weiterhin
+  keine Entscheidung getroffen.
+- Phase 6.5 hat damit keine offenen Bau- oder Verifikationsschritte mehr — nur noch die beiden
+  bekannten Vormerkungen oben (Doku-Schuld `phase6_shares/CLAUDE.md`, `test_authctl.py`-Flake).
 
 ## Session stopped — 2026-08-21 (Live-Deploy bestätigt: Block A + Block B vollständig live)
 

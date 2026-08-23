@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase6_5_tools_images_plan.md   # voller Plan, Entscheidungen P6.5-A–P6.5-V, §0.0 gelockte N1–N6, Steps 0/A/B
   - ../phase6_shares/IMAGES_PLAN.md                  # Vorgänger-Zusatzplan, nachrangig seit 2026-08-20
   - SESSIONS_ARCHIVE.md                              # ältere Session-Blöcke, newest-first
-updated: 2026-08-21 (Gate A->B bestanden: echter Connector-Rundlauf ueber den live deployten sharefyx-MCP-Server, V60 geschlossen, achte Rotation gelaufen -- Phase 6.5 hat keine offenen Bau-/Verifikationsschritte mehr)
+updated: 2026-08-23 (Abnahmematrix eroeffnet, P6.5-1/2/4 live bestanden -- 3 von 14 Zeilen, neunte Rotation gelaufen)
 ---
 # CLAUDE.md — Phase 6.5: Werkzeug-Ergonomie und Bilder (`phase6_5_tools_images/`)
 
@@ -54,69 +54,73 @@ Fünfte, benannte Öffnung des P1-Contracts (`storage/{files,store,models}.py`) 
 2026-08-20 (Step B1), siehe `phase1_storage/CLAUDE.md` unter „Geerbte Contracts" (P6.5-T).
 Details dort, nicht hier dupliziert.
 
+## Abnahmestand (Plan §6, P6.5-1–P6.5-14)
+
+**Statusregel wie in P5/P6: ✅ heißt live-verifiziert durch den Nikinger, nicht „gebaut".** Der
+Plan selbst (`docs/concepts/phase6_5_tools_images_plan.md`) ist ein 📕-Snapshot und wird nicht
+mehr editiert — der laufende Abnahmestand lebt hier, wie bei jeder Vorgängerphase.
+
+| # | Kriterium (Kurzform) | Block | Stand | Beleg |
+|---|---|---|---|---|
+| P6.5-1 | Frische Instanz sagt NICHT „nur eigener Space" | A | ✅ | Nikinger, echter Connector, 2026-08-23 — Instanz nannte `niklas` UND `IT-Sekus-Projekt` (`write: true`) korrekt, `fabian` korrekt read-only |
+| P6.5-2 | Nennt erlaubte `status`-Werte ohne Fehlversuch | A | ✅ | Nikinger, echter Connector, 2026-08-23 — `note: active\|archived`, `task: archived\|done\|open`, exakter Treffer im ersten Versuch |
+| P6.5-3 | Nutzt `get_item_meta` vor einem Folge-Append | A | offen | noch nicht beobachtet — die 2026-08-23-Sitzung enthielt keinen Append-Fall |
+| P6.5-4 | Erklärt `patch_item`/`update_item`/`append_to_item`-Aufgabenteilung aus den Beschreibungen | A | ✅ | Nikinger, echter Connector, 2026-08-23 — korrekt: nur `update_item` erreicht Frontmatter, `patch_item`/`append_to_item` brauchen `version`, `patch_item` verlangt exakt einen Treffer |
+| P6.5-5 | Bild-Upload sichtbar im UI-Dokument | B | offen | Browser |
+| P6.5-6 | `.md`-Datei enthält nur `asset:`-Referenz, kein Binär/base64 | B | offen | `cat` im `DATA_ROOT` |
+| P6.5-7 | Bilddatei unter `_assets/<item_id>/`, kein UI-Ordner | B | offen | `ls` + Browser |
+| P6.5-8 | Fabian sieht freigegebenes Bild, `403` ohne Freigabe | B | offen | Nikinger + Fabian, Browser + `curl` |
+| P6.5-9 | Ein Upload = genau ein Git-Commit | B | offen | `git log --oneline` |
+| P6.5-10 | Cross-Space-Move nimmt Bild mit, ein Commit | B | offen | Browser + `git log` |
+| P6.5-11 | Fremde `<img>`-URLs/`javascript:` kein Netzabruf, kein `<img>` | B | offen | DevTools Network-Tab |
+| P6.5-12 | Bild entfernbar, Referenz rendert danach als Alt-Text | B | offen | Browser — entfällt bei N5=„gar nicht" |
+| P6.5-13 | Claude sieht fremdes Bild nur bei `share_write`, nicht bei reinem `share_read` | B | offen | Nikinger + Fabian, echter Connector |
+| P6.5-14 | Kündigt jeden Upload an, lädt nie unaufgefordert | B | offen | Nikinger, echter Connector, zwei Gespräche |
+
+**3 von 14 live bestanden** (Block A: 3 von 4, Block B: 0 von 10). Geerbte, in dieser Phase
+nicht gelöste Live-Proben aus P6 (Abnahmezeilen 25–30/35–39, Gate A→B Punkt 3, `diagnose.sh`
+vor jedem Deploy): unverändert offen, siehe Plan §6 Fußnote.
+
 ---
 
-## Session stopped — 2026-08-21 (Gate A→B bestanden: echter Connector-Rundlauf, V60 geschlossen)
+## Session stopped — 2026-08-23 (Abnahmematrix eröffnet: P6.5-1/2/4 live bestanden)
 
-**Auftrag:** direkter Anschluss an die Vorsitzung — der Nikinger verband den sharefyx-Connector
-neu (`/mcp`, „Reconnected to claude.ai sharefyx"; Standardschritt nach jedem Deploy, kein Fund)
-und gab den in der Vorsitzung blockierten MCP-Werkzeug-Rundlauf frei, mit der Auflage, jedes
-angelegte Item danach zu archivieren.
+**Korrektur zur Vorsitzung:** deren Schlusssatz „Phase 6.5 hat keine offenen Bau- oder
+Verifikationsschritte mehr" war zu stark — Gate A→B (Code/Connector-Rundlauf funktioniert) und
+die vollständige Abnahmematrix (Plan §6, P6.5-1–14, „✅ heißt live-verifiziert durch den
+Nikinger") sind zwei verschiedene Dinge. Diese Session baut die bis dahin fehlende
+Abnahmematrix-Sektion in diesem Head nach (existierte vorher gar nicht — anders als bei P5/P6)
+und trägt die ersten drei Zeilen ein.
 
-**Rundlauf, alle Aufrufe über den echten, live deployten Connector, kein In-Process-Test:**
-1. `list_spaces` — `writable:true` korrekt für den eigenen Space (`niklas`) UND den geteilten
-   Space `IT-Sekus-Projekt` (item-level `write:`), `writable:false` korrekt für `fabian`. Beweist
-   live, was P6.5-B beschreibungsseitig korrigiert hatte.
-2. `create_item(type=note, ...)` in `niklas` — Quittung statt Volltext, `itm_676b26b8`.
-3. `get_item_meta` — Frontmatter+Version ohne Body, `assets: []` vor dem ersten Upload.
-4. `put_item_asset` — **erster Versuch mit einem verbreiteten „1×1-PNG"-Copy-Paste-Fixture
-   scheiterte**, Client zeigte „[Image removed — rejected by API]". **Root Cause gefunden, kein
-   Server-/Connector-Fund:** dieses spezifische Fixture (aus dem Gedächtnis zitiert, nicht aus
-   dem Repo) hat einen falschen CRC im `IDAT`-Chunk — per Byte-Parser bestätigt. `sniff_image_
-   mime()` prüft bewusst nur Magic Bytes (P6-AZ, kein serverseitiges Bildverarbeiten), speicherte
-   die kaputten Bytes also unverändert; der Client-Decoder lehnte sie beim Rendern korrekt ab.
-   Kein Fix nötig — das ist exakt das entworfene Verhalten (garbage in, garbage out, keine
-   serverseitige Validierung über Magic Bytes hinaus). Mit einem korrekt CRC'd 4×4-PNG (eigener
-   Encoder, derselbe wie in der Step-B3-Playwright-Probe) wiederholt: **Bild wurde korrekt
-   gerendert** (sichtbares blaues Quadrat).
-5. `patch_item` — alter Text exakt einmal getroffen, Ersetzung korrekt, Quittung ohne Volltext.
-6. `update_item(status="archived")` — Item archiviert, `get_item_meta` bestätigt
-   `status:"archived"`, `version:3`, beide Assets weiterhin gelistet.
+**Auftrag:** Nikinger fragte, ob eine spontane, nicht-abgesprochene Nutzungssitzung (Ordner +
+Datei über den Connector anlegen, NVIDIA-Notizen) bereits Testwert für die Abnahmematrix hat.
+Antwort: nur zufällig, nicht gezielt — P6.5-1–4 verlangen laut Plan **gepunktete Fragen** an eine
+Instanz, kein Nebenprodukt einer anderen Aufgabe (Details siehe Antwort im Chat). Auf Vorschlag
+drei konkrete Fragen im selben Gespräch gestellt, echte Antworten erhalten und geprüft.
 
-**`[VERIFY]` empirisch geschlossen:**
-- **V60 — geschlossen.** Der claude.ai/Claude-Code-Connector rendert `ImageContent` für ein
-  gültiges Bild korrekt (gesehen, nicht nur behauptet — das Quadrat war sichtbar). Für ein
-  Bild mit ungültiger interner Struktur (falscher Chunk-CRC) lehnt der Client-Decoder korrekt
-  ab, statt es als kaputtes Bild anzuzeigen — kein serverseitiger Fund, siehe oben.
-- **V64 — Teildatenpunkt, nicht abschließend geschlossen.** Zwei `put_item_asset`-Aufrufe
-  (`destructiveHint: True`) liefen ohne sichtbare wiederholte Rückfrage zwischen den Aufrufen.
-  Das ist ein Hinweis, keine vollständige Antwort — eine einzelne Sitzung mit zwei Aufrufen
-  beweist nicht das UI-Verhalten über mehrere Sitzungen/Tage hinweg; bleibt „beobachtet, nicht
-  abschließend verifiziert" im Register.
+**Geprüft, Wortlaut gegen den Plan-Wortlaut abgeglichen, keine Interpretation nötig:**
+- **P6.5-1 ✅** — Instanz nannte `niklas` (eigen) UND `IT-Sekus-Projekt` (geteilt, `write: true`)
+  als beschreibbar, `fabian` korrekt als reinen Lesezugriff. Sagte an keiner Stelle „nur eigener
+  Space" — genau der Fehler, den P6.5-B beheben sollte.
+- **P6.5-2 ✅** — `note: active|archived`, `task: archived|done|open`, exakter Treffer, kein
+  Fehlversuch. Deckt sich byte-genau mit `storage.models.STATUS_VALUES`.
+- **P6.5-4 ✅** — Aufgabenteilung korrekt aus der Beschreibung abgeleitet: nur `update_item`
+  erreicht Frontmatter, `patch_item`/`append_to_item` brauchen `version` (Optimistic Locking),
+  `patch_item` verlangt exakt einen Treffer sonst kompletter Fehlschlag ohne Teil-Schreiben.
+- **P6.5-3 — weiterhin offen.** Diese Sitzung enthielt keinen Lesen-vor-Folge-Append-Fall, kann
+  also weder bestätigen noch widerlegen, ob eine Instanz von sich aus `get_item_meta` statt
+  `get_item` für die Versionsnummer wählt.
 
-**Live bestätigter, bereits dreimal dokumentierter Fund, jetzt auch außerhalb der Testsuite
-gesehen:** `filename` wird weiterhin nicht persistiert — `put_item_asset(..., filename=
-"gate-probe-valid.png")` gefolgt von `get_item_meta` zeigt `filename:""` für exakt dieses
-Asset. Keine neue Information, aber die erste Live-Bestätigung außerhalb von `pytest`/
-`mcp_smoke.py` — verstärkt den Fall für eine Entscheidung, ändert aber nichts an der offenen
-Frage selbst.
+**Neu gebaut, nicht nur editiert:** die Sektion „Abnahmestand" existierte in diesem Head bisher
+nicht (anders als `phase5_ui/CLAUDE.md`/`phase6_shares/CLAUDE.md`, die beide eine laufend
+gepflegte Matrix führen). Jetzt angelegt, alle 14 Zeilen aus Plan §6 übernommen, drei auf ✅,
+Rest „offen" mit Beleg-Spalte (wer/wie prüft). Statusregel identisch zu P5/P6: ✅ = live-
+verifiziert, nicht „Code existiert".
 
-**Aufräumen:** `itm_676b26b8` ist `status:"archived"` (nicht hart gelöscht, Entscheidung H/Hard
-Rule 5 unverändert) — bleibt im Archiv-Ordner des Space `niklas` liegen, wie jedes andere
-archivierte Item auch. Kein weiterer Aufräumschritt nötig oder vorgesehen.
-
-**Ergebnis: Gate A→B ist bestanden.** Block A ist damit nicht nur gebaut und deployt, sondern
-auch die einzige noch fehlende Abnahmebedingung (echte Connector-Probe) ist erfüllt. Modul-
-Status-Tabelle oben nachgezogen.
-
-**Verifiziert:** kein Code-Diff in dieser Session (reiner Live-Rundlauf über den Connector +
-Doku-Nachpflege) — `pytest` nicht erneut gelaufen, war seit dem letzten Lauf unverändert.
-`git status` zeigt ausschließlich den Phase-Head + `SESSIONS_ARCHIVE.md` + `docs/INDEX.md`.
+**Verifiziert:** kein Code-Diff (reine Doku-Session). `git status` zeigt ausschließlich den
+Phase-Head + `SESSIONS_ARCHIVE.md` + `docs/INDEX.md`.
 
 **Offen für die nächste Session:**
-- V64 bleibt ein offener Registereintrag — braucht mehrere echte Sitzungen über Zeit, kein
-  Ein-Aufwasch-Test.
-- `filename`-Persistenzfrage (jetzt viermal berührt: B1/B2/B4/live) bleibt offen, weiterhin
-  keine Entscheidung getroffen.
-- Phase 6.5 hat damit keine offenen Bau- oder Verifikationsschritte mehr — nur noch die beiden
-  bekannten Vormerkungen oben (Doku-Schuld `phase6_shares/CLAUDE.md`, `test_authctl.py`-Flake).
+- 11 von 14 Abnahmezeilen offen — P6.5-3 (weitere Connector-Frage), P6.5-5–12 (Browser/
+  `DATA_ROOT`, Block B), P6.5-13/14 (Connector + Fabian, zwei Gespräche).
+- V64, `filename`-Persistenzfrage, Doku-Schuld, `test_authctl.py`-Flake: unverändert offen.
