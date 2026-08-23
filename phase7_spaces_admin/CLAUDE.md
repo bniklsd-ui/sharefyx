@@ -315,3 +315,14 @@ entscheidbar):**
 2. **A7 Schritt 1** — wann kann `authctl.py invite --space testnutzer-p7 --purpose enroll`
    laufen? Danach übernimmt Claude Code das Enrollment im Browser (`claude-in-chrome`) und den
    Rest von A7/A7b ohne weiteren Nikinger-Handgriff.
+
+**Beide Fragen beantwortet (Nikinger, per AskUserQuestion, selber Tag): heute, auf beide.**
+`docs/UPDATE_LOG.md` bekam den A5-Eintrag (2026-08-23, bewusst zurückhaltend formuliert — die
+Migration macht laut Skript-Docstring nur explizit, was implizit längst galt, „sichtbar ändert
+sich für dich nichts"), gegen `test_updates.py`/`test_deploy_scripts.py` grün geprüft (28/28).
+**`authctl.py invite`/`spacectl.py create-space testnutzer-p7` bleiben laut Plan-Text
+ausdrücklich „Nikinger, einmalig" — Claude Code führt sie nicht selbst aus**, auch nach der
+Freigabe nicht (Live-Schreibzugriff auf `auth.sqlite3`, dieselbe Vorsicht wie bei jedem
+`--apply`). **Warte auf: (a) den Nikinger führt `--apply` aus, (b) den Nikinger führt `authctl.py
+invite` aus und gibt den Link weiter** — beides außerhalb dessen, was Claude Code aus dieser
+Session heraus selbst anstößt.
