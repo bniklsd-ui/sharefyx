@@ -68,6 +68,8 @@ Abnahmezeilen: `docs/concepts/phase7_spaces_admin_plan.md`.
 
 | 4 | A4 (Feld-Whitelist an `_items_patch`, schließt O6): `_PATCH_FIELDS`-Konstante (korrigierte Liste aus V74 — `format` ergänzt), Prüfung direkt nach `body = await _json_body(request)`, vor jeder Rechteprüfung | A | ✅ **vollständig** | +2 `phase5_ui/tests/test_api.py`; 836 gesamt |
 
+| 5 | A7b: `phase7_spaces_admin/scripts/testcred.py` (neu — `store`/`password`/`totp`/`purge`, hart auf `testnutzer-p7`/`nikinger-space`/`p7-testcred` verdrahtet, kein `--space`/`--key`/`--service`, `authserver/totp.py` nur importiert). **Nebenfund beim Bauen:** `pytest.ini`s `testpaths` hatte `phase7_spaces_admin/tests` nie aufgenommen (Step-0.6-Lücke) — der volle Lauf zeigte trotz neuer Tests weiterhin 836, erst `--collect-only` deckte es auf. Nachgetragen | A | ✅ **vollständig** | +7 `phase7_spaces_admin/tests/test_testcred.py`; 843 gesamt |
+
 *(Weitere Zeilen entstehen mit dem Rest von Block A/C/B — siehe Plan §4 für die vollständige Schritt-Sequenz.)*
 
 ## Geerbte Contracts
