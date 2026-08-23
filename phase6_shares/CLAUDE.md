@@ -185,10 +185,19 @@ das P6 selbst mit ausgelöst hat (`docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` §
 beide Nikinger-Entscheidungen eingeholt** (volle Herleitung + Mechanismus: Session-Block unten,
 „Zwei echte Funde"):
 
-1. **🟢 Geplant und gebaut (2026-08-19), noch nicht deployt.** Kein „über alle lesbaren Items
+1. **🟢 Geplant und gebaut (2026-08-19). [2026-08-23 Korrektur] Live deployt** — `d348e2e` ist
+   Vorfahre von `main`@`f96125e` (Phase-6.5-Deploy, 2026-08-21), per `git merge-base
+   --is-ancestor` bestätigt; die Doku hier hinkte hinterher. Kein „über alle lesbaren Items
    suchen"-Modus in der UI — ein item-level geteiltes Item ohne space-level Grant war
-   unauffindbar, nicht nur unverschiebbar. `GLOBAL_SEARCH_PLAN.md` + Code, siehe unten. Bleibt
-   Deploy-Voraussetzung, bis die Nikinger-Live-Probe (Zeilen 35–39) bestanden ist.
+   unauffindbar, nicht nur unverschiebbar. `GLOBAL_SEARCH_PLAN.md` + Code, siehe unten.
+   **Nikinger-Live-Probe (Zeilen 35–39): 35/38/39 ✅ per echtem `claude-in-chrome`-Connector,
+   2026-08-23** — „Alle Items" im Baum sichtbar+aktivierbar, Klick auf `niklas` führt zurück
+   (Breadcrumb wechselt, Nav-Highlight verschwindet); Notizen und Aufgaben gemeinsam gelistet
+   (`EPP-Zeitabgleich...`, `task·open`, neben Notizen); kein Anlegen-Knopf/-Dialog im DOM (die
+   beiden einzigen `Anlegen`-Buttons sitzen nachweislich hinter `[hidden]`-Vorfahren). **36/37
+   unverändert offen** — beide prüfen, was ein Empfänger sieht, der ausschließlich einen
+   item-level Grant ohne Space-Mitgliedschaft hat; als `niklas` mit voller Space-Mitgliedschaft
+   in `fabian` nicht erzeugbar, braucht Fabians eigenen Login.
 2. **🟡 Kein Bug, nicht blockierend.** Verschieben-/Freigeben-Knopf nur für Items im eigenen
    Space sichtbar (`list.js`, seit Step 7) — ein UI-Rückweg aus einem geteilten Space fehlt.
    Reine Vormerkung, kein Handlungsbedarf.
@@ -198,10 +207,11 @@ beide Nikinger-Entscheidungen eingeholt** (volle Herleitung + Mechanismus: Sessi
 item-weise ACL-gefilterte Suche — es fehlt nur die UI-Fläche. Block C ebenfalls geplant:
 `IMAGES_PLAN.md` (P6-AU–BB, Zeilen 40–47, **fünf offene Nikinger-Entscheidungen B1–B5**).
 
-**[2026-08-19, direkt danach] ✅ Gebaut UND Playwright-verifiziert, Steps G1–G3 vollständig,
-noch nicht deployt/committet.** Q1/Bilder-Priorität vom Nikinger entschieden, ein Advisor-Fund
-vor dem Commit gefunden und behoben (`editor.js`). 772 pytest grün, 10/10 Playwright grün,
-Tabu-Diff leer. Details: aktueller Session-Block.
+**[2026-08-19, direkt danach] ✅ Gebaut UND Playwright-verifiziert, Steps G1–G3 vollständig.
+[2026-08-23 Korrektur] Live deployt, siehe oben — Nikinger-Live-Probe teilweise bestanden
+(35/38/39 ✅, 36/37 brauchen Fabian).** Q1/Bilder-Priorität vom Nikinger entschieden, ein
+Advisor-Fund vor dem Commit gefunden und behoben (`editor.js`). 772 pytest grün, 10/10
+Playwright grün, Tabu-Diff leer. Details: aktueller Session-Block.
 
 **[2026-08-19] Kurzprüfung „trägt die Architektur >2 Nutzer?" — Befund, kein Plan nötig.**
 Architektur ist offen: `.share.yml`s `read:`/`write:` sind beliebig lange Namenslisten

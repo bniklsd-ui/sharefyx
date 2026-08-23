@@ -5,12 +5,56 @@ read-when: Auditieren der vollen Phase-6.5-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-08-23 (elfte Rotation -- P6.5-3-Session-Block verschoben, Head traegt seither den P6.5-6/7/9-Session-Block)
+updated: 2026-08-23 (zwoelfte Rotation -- P6.5-6/7/9-Session-Block verschoben, Head traegt seither den P6.5-5/7/10/11-Session-Block)
 ---
 # SESSIONS_ARCHIVE.md — Phase 6.5: Werkzeug-Ergonomie und Bilder
 
-Elf Einträge, newest-first, verbatim aus `phase6_5_tools_images/CLAUDE.md` per
+Zwölf Einträge, newest-first, verbatim aus `phase6_5_tools_images/CLAUDE.md` per
 `scripts/rotate_session_block.sh phase6_5_tools_images`.
+
+## Session stopped — 2026-08-23 (P6.5-6/9 bestanden, P6.5-7 teilweise — Grenzen ohne Browser-Tool sichtbar)
+
+**Auftrag:** Nikinger bat, die restlichen Abnahmezeilen anzugehen, „besonders die UI-Tests
+nochmal". Vor dem Start geprüft: diese Sitzung hat weder `claude-in-chrome` noch ein anderes
+Browser-Automatisierungswerkzeug geladen (`ToolSearch` liefert nichts) — nur den sharefyx-MCP-
+Connector und Bash auf der echten VM. Das setzt eine harte Grenze: alles, was echtes Rendern im
+Browser braucht (P6.5-5/8/10/11/12/13), kann diese Sitzung nicht selbst erledigen.
+
+**Was diese Grenze trotzdem zulässt, genutzt:** ein Test-Item über den echten Connector angelegt
+(`itm_e33d2906`, Space `niklas`), ein echtes Bild hochgeladen (`put_item_asset`, angekündigt vor
+dem Aufruf), die `asset:`-Referenz per `patch_item` in den Body eingefügt — danach den echten
+`DATA_ROOT` read-only per Bash geprüft (kein Schreibzugriff auf den Live-Dienst, nur Lesen).
+
+**Geprüft, exakt mit der im Plan §6 vorgeschriebenen Methode:**
+- **P6.5-6 ✅** — `cat` auf die reale `.md`-Datei zeigt exakt `![Testbild](asset:ast_c28583e6)`
+  im Body, keine Binärdaten, kein base64.
+- **P6.5-9 ✅** — `git log --oneline -- niklas/_assets/itm_e33d2906/ast_c28583e6.png` zeigt genau
+  einen Commit (`320a737 asset itm_e33d2906 [niklas]`), getrennt von `create`/`patch`.
+- **P6.5-7 teilweise** — Pfad bestätigt (`niklas/_assets/itm_e33d2906/ast_c28583e6.png`, `file`
+  bestätigt ein echtes 4×4-PNG), `list_spaces`s `folders`-Feld listet `_assets` strukturell
+  nicht mit. **Nicht dasselbe wie die im Plan verlangte Browser-Probe** — ehrlich als „teilweise"
+  markiert statt aufgerundet, weil niemand tatsächlich in die UI geschaut hat.
+
+**Aufräumen:** `itm_e33d2906` ist `status:"archived"` (v3, `get_item_meta` bestätigt), bleibt
+liegen wie jedes andere archivierte Item.
+
+**Ergebnis, ehrlich benannt:** 6 von 14 statt vorher 4 von 14 — aber die verbleibenden 8 Zeilen
+(P6.5-5/8/10/11/12/13 voll, P6.5-7 der Browser-Teil) sind strukturell nicht ohne echten Browser
+zu schließen. Kein Weg, das über MCP/Bash zu umgehen, ohne die Abnahmezeile selbst zu verwässern
+— genau die Art von „aufgerundetem" Fund, den Ponytail/Military-Brief-Disziplin verbietet.
+
+**Verifiziert:** kein Code-Diff (reine Doku- + Live-Datensession über den Connector). `git
+status` zeigt ausschließlich den Phase-Head + `SESSIONS_ARCHIVE.md` + `docs/INDEX.md`.
+
+**Offen für die nächste Session:**
+- P6.5-5/8/10/11/12/13 (Browser/`curl`, teils + Fabian) und der Browser-Teil von P6.5-7 —
+  brauchen entweder den Nikinger selbst am echten Browser, oder ein Browser-Tool in einer
+  künftigen Sitzung (`claude-in-chrome` o. Ä., falls verfügbar gemacht).
+- P6.5-14 hat jetzt zwei Datenpunkte (Gate-A→B-Sitzung + diese Sitzung, beide Male vor jedem
+  `put_item_asset` angekündigt) — Bewertung bleibt beim Nikinger, keine Selbstzertifizierung.
+- V64, `filename`-Persistenzfrage, Doku-Schuld, `test_authctl.py`-Flake: unverändert offen.
+
+---
 
 ## Session stopped — 2026-08-23 (P6.5-3 bestanden, Block A der Abnahmematrix vollständig)
 

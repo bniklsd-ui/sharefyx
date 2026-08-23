@@ -5,7 +5,7 @@ read-when: bevor der Deploy-Blocker gebaut wird, oder wenn geklärt werden muss,
 detail: L2
 up: ./CLAUDE.md
 down: ../docs/concepts/phase6_shares_plan.md §1.2 (Rechtemodell) · ./ITEM_MOVE_PLAN.md (Muster)
-updated: 2026-08-19 (gebaut + Playwright-verifiziert gegen Wegwerf-Instanz, 10/10 gruen; Q1 vom Nikinger entschieden -- nur Titel/Tags; V57/V58 geschlossen; ein Advisor-Fund vor dem Commit behoben, editor.js clearDetail() setzt state.scope jetzt zurueck)
+updated: 2026-08-23 (live deployt bestaetigt -- d348e2e Vorfahre von main@f96125e; Zeilen 35/38/39 live bestanden per echtem claude-in-chrome-Connector, 36/37 offen, brauchen Fabian) | 2026-08-19 (gebaut + Playwright-verifiziert gegen Wegwerf-Instanz, 10/10 gruen; Q1 vom Nikinger entschieden -- nur Titel/Tags; V57/V58 geschlossen; ein Advisor-Fund vor dem Commit behoben, editor.js clearDetail() setzt state.scope jetzt zurueck)
 ---
 
 # GLOBAL_SEARCH_PLAN.md — „Alle Items" als eigener Suchbereich (P6, Zusatzplan)

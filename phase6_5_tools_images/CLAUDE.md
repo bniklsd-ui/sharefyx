@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase6_5_tools_images_plan.md   # voller Plan, Entscheidungen P6.5-A–P6.5-V, §0.0 gelockte N1–N6, Steps 0/A/B
   - ../phase6_shares/IMAGES_PLAN.md                  # Vorgänger-Zusatzplan, nachrangig seit 2026-08-20
   - SESSIONS_ARCHIVE.md                              # ältere Session-Blöcke, newest-first
-updated: 2026-08-23 (P6.5-6/9 bestanden per DATA_ROOT-Check, P6.5-7 teilweise -- 6 von 14 Zeilen, Rest braucht ein Browser-Tool oder den Nikinger selbst, elfte Rotation gelaufen)
+updated: 2026-08-23 (P6.5-5/7/10/11 per echtem Chrome-Connector bestanden -- 10 von 14 Zeilen, ein echter Lueckenfund: kein Entfernen-Knopf in editor.js trotz gebautem DELETE-Endpoint, P6.5-12 dadurch blockiert, zwoelfte Rotation gelaufen)
 ---
 # CLAUDE.md — Phase 6.5: Werkzeug-Ergonomie und Bilder (`phase6_5_tools_images/`)
 
@@ -66,62 +66,87 @@ mehr editiert — der laufende Abnahmestand lebt hier, wie bei jeder Vorgängerp
 | P6.5-2 | Nennt erlaubte `status`-Werte ohne Fehlversuch | A | ✅ | Nikinger, echter Connector, 2026-08-23 — `note: active\|archived`, `task: archived\|done\|open`, exakter Treffer im ersten Versuch |
 | P6.5-3 | Nutzt `get_item_meta` vor einem Folge-Append | A | ✅ | Nikinger, echter Connector, separates Gespräch, 2026-08-23 — Reihenfolge aus den Versionsnummern rekonstruiert: `search_items`→`get_item`(v1, echter Body-Bedarf)→`append`(v1→v2)→**`get_item_meta`**(bestätigt v2)→`append`(v2→v3) — für den reinen Versions-Check vor dem zweiten Append wurde das billige Tool gewählt, nicht `get_item` erneut |
 | P6.5-4 | Erklärt `patch_item`/`update_item`/`append_to_item`-Aufgabenteilung aus den Beschreibungen | A | ✅ | Nikinger, echter Connector, 2026-08-23 — korrekt: nur `update_item` erreicht Frontmatter, `patch_item`/`append_to_item` brauchen `version`, `patch_item` verlangt exakt einen Treffer |
-| P6.5-5 | Bild-Upload sichtbar im UI-Dokument | B | offen | Browser — kein Browser-Tool in dieser Session, braucht den Nikinger |
+| P6.5-5 | Bild-Upload sichtbar im UI-Dokument | B | ✅ | Claude Code, echter `claude-in-chrome`-Connector, 2026-08-23 — `itm_de2e4fd8`, 4×4-PNG rendert sichtbar (per `naturalWidth`/`naturalHeight` + Zoom-Screenshot bestätigt); erster Upload-Versuch war ein selbst erzeugtes korruptes PNG (PIL bestätigte `cannot identify image file`) — kein Server-Bug, eigener Fixture-Fehler, mit PIL-erzeugtem echten PNG wiederholt |
 | P6.5-6 | `.md`-Datei enthält nur `asset:`-Referenz, kein Binär/base64 | B | ✅ | Claude Code, `cat` im echten `DATA_ROOT`, 2026-08-23 — `itm_e33d2906`s `.md` enthält exakt `![Testbild](asset:ast_c28583e6)`, keine Binärdaten |
-| P6.5-7 | Bilddatei unter `_assets/<item_id>/`, kein UI-Ordner | B | teilweise | Pfad bestätigt (`niklas/_assets/itm_e33d2906/ast_c28583e6.png`, `file` bestätigt echtes PNG), `list_spaces`s `folders`-Feld listet `_assets` strukturell nicht — **„kein UI-Ordner" selbst noch nicht mit echten Augen im Browser gesehen** |
-| P6.5-8 | Fabian sieht freigegebenes Bild, `403` ohne Freigabe | B | offen | Nikinger + Fabian, Browser + `curl` |
+| P6.5-7 | Bilddatei unter `_assets/<item_id>/`, kein UI-Ordner | B | ✅ | Pfad+Datei per Bash bestätigt (Vorsitzung); **[2026-08-23]** Browser-Teil geschlossen — echte DOM-/Accessibility-Tree-Probe des `niklas`-Baums UND das Space-Auswahl-`<select>` im Verschieben-Dialog listen beide identisch nur `nvidia-avo-harness`, `otobo`, `+ Ordner` — kein `_assets`-Eintrag an keiner Stelle der echten UI |
+| P6.5-8 | Fabian sieht freigegebenes Bild, `403` ohne Freigabe | B | offen | Nikinger + Fabian, Browser + `curl` — braucht Fabians eigenes Login, nicht diese Session leistbar, vom Nikinger als nicht-blockierend bestätigt |
 | P6.5-9 | Ein Upload = genau ein Git-Commit | B | ✅ | Claude Code, `git log --oneline`, 2026-08-23 — `320a737 asset itm_e33d2906 [niklas]`, ein einziger Commit für den Asset-Pfad, getrennt von `create`/`patch` |
-| P6.5-10 | Cross-Space-Move nimmt Bild mit, ein Commit | B | offen | Browser + `git log` |
-| P6.5-11 | Fremde `<img>`-URLs/`javascript:` kein Netzabruf, kein `<img>` | B | offen | DevTools Network-Tab — Client-Logik bereits gegen eine Wegwerf-Instanz Playwright-geprüft (Step B3), aber nicht dasselbe wie eine Live-Probe |
-| P6.5-12 | Bild entfernbar, Referenz rendert danach als Alt-Text | B | offen | Browser — entfällt bei N5=„gar nicht" |
+| P6.5-10 | Cross-Space-Move nimmt Bild mit, ein Commit | B | ✅ | Nikinger (echter Login, TOTP), Claude Code verifiziert per `git log` + Browser, 2026-08-23 — `5d06187 move itm_de2e4fd8 [IT-Sekus-Projekt]` trägt `.md` UND `_assets/itm_de2e4fd8/` in einem Commit, Bild rendert nach dem Move im neuen Space sichtbar |
+| P6.5-11 | Fremde `<img>`-URLs/`javascript:` kein Netzabruf, kein `<img>` | B | ✅ | Claude Code, echter `claude-in-chrome`-Connector + `read_network_requests`, 2026-08-23 — Body testweise um eine `example.com`-URL und eine `javascript:`-URL erweitert (danach zurückgesetzt): DOM zeigt exakt ein `<img>` (die echte `asset:`-Referenz), kein Request an `example.com`, kein zweites `<img>`-Element |
+| P6.5-12 | Bild entfernbar, Referenz rendert danach als Alt-Text | B | **Lücke** | **[2026-08-23]** Nicht testbar — `editor.js` hat keinen Entfernen-Knopf, obwohl N5 = „Verschieben statt Entfernen" (nicht „gar nicht") und der Server-Endpunkt bereits existiert (`store.delete_asset()`, `DELETE /api/v1/items/{id}/assets/{id}`, `api.py:703,756-760`). Nikinger-Entscheidung: fürs Erste nur vermerken, nicht in dieser Sitzung bauen |
 | P6.5-13 | Claude sieht fremdes Bild nur bei `share_write`, nicht bei reinem `share_read` | B | offen | Nikinger + Fabian, echter Connector |
 | P6.5-14 | Kündigt jeden Upload an, lädt nie unaufgefordert | B | offen | Nikinger, echter Connector, zwei Gespräche — zwei Datenpunkte liegen vor (Gate-A→B-Sitzung + diese Sitzung, beide Male vor jedem `put_item_asset` angekündigt), aber die Kriterienbewertung selbst ist Sache des Nikingers |
 
-**6 von 14 live bestanden, Block A vollständig, Block B angefangen** (Block A: 4 von 4, Block B:
-2 von 10 voll + 1 teilweise). Geerbte, in dieser Phase
+**10 von 14 live bestanden, Block A vollständig, Block B größtenteils** (Block A: 4 von 4, Block
+B: 6 von 10). Verbleibend offen: P6.5-8/13 (brauchen Fabians eigenes Login, nicht blockierend
+laut Nikinger), P6.5-14 (Nikingers eigene Bewertung, kein Selbstzertifizierungs-Kriterium),
+P6.5-12 (echte Werkzeug-Lücke — fehlender Entfernen-Knopf, siehe oben). Geerbte, in dieser Phase
 nicht gelöste Live-Proben aus P6 (Abnahmezeilen 25–30/35–39, Gate A→B Punkt 3, `diagnose.sh`
 vor jedem Deploy): unverändert offen, siehe Plan §6 Fußnote.
 
 ---
 
-## Session stopped — 2026-08-23 (P6.5-6/9 bestanden, P6.5-7 teilweise — Grenzen ohne Browser-Tool sichtbar)
+## Session stopped — 2026-08-23 (P6.5-5/7/10/11 per echtem Chrome-Connector bestanden, echte Werkzeug-Lücke bei P6.5-12 gefunden)
 
-**Auftrag:** Nikinger bat, die restlichen Abnahmezeilen anzugehen, „besonders die UI-Tests
-nochmal". Vor dem Start geprüft: diese Sitzung hat weder `claude-in-chrome` noch ein anderes
-Browser-Automatisierungswerkzeug geladen (`ToolSearch` liefert nichts) — nur den sharefyx-MCP-
-Connector und Bash auf der echten VM. Das setzt eine harte Grenze: alles, was echtes Rendern im
-Browser braucht (P6.5-5/8/10/11/12/13), kann diese Sitzung nicht selbst erledigen.
+**Auftrag:** Nikinger bestätigte, der Chrome-Connector (`claude-in-chrome`) sei jetzt nutzbar,
+und bat, die in der Vorsitzung liegen gebliebenen Browser-Abnahmezeilen anzugehen. Session lief
+als generischer Standard-Kickoff-Prompt an, der sich als versehentlich falsch eingefügtes
+Trading-Bot-Template herausstellte — vor dem Start geklärt und korrigiert, kein Zeitverlust.
 
-**Was diese Grenze trotzdem zulässt, genutzt:** ein Test-Item über den echten Connector angelegt
-(`itm_e33d2906`, Space `niklas`), ein echtes Bild hochgeladen (`put_item_asset`, angekündigt vor
-dem Aufruf), die `asset:`-Referenz per `patch_item` in den Body eingefügt — danach den echten
-`DATA_ROOT` read-only per Bash geprüft (kein Schreibzugriff auf den Live-Dienst, nur Lesen).
+**Setup:** `niklas` war bereits in einer manuell vom Nikinger geöffneten Chrome-Session
+eingeloggt. Eine neue, per `claude-in-chrome` erzeugte Tab wiederverwendete dasselbe
+Cookie-authentifizierte Profil erfolgreich für Lesezugriffe (`/ui/` zeigte sofort den
+`niklas`-Space, kein Login nötig).
 
-**Geprüft, exakt mit der im Plan §6 vorgeschriebenen Methode:**
-- **P6.5-6 ✅** — `cat` auf die reale `.md`-Datei zeigt exakt `![Testbild](asset:ast_c28583e6)`
-  im Body, keine Binärdaten, kein base64.
-- **P6.5-9 ✅** — `git log --oneline -- niklas/_assets/itm_e33d2906/ast_c28583e6.png` zeigt genau
-  einen Commit (`320a737 asset itm_e33d2906 [niklas]`), getrennt von `create`/`patch`.
-- **P6.5-7 teilweise** — Pfad bestätigt (`niklas/_assets/itm_e33d2906/ast_c28583e6.png`, `file`
-  bestätigt ein echtes 4×4-PNG), `list_spaces`s `folders`-Feld listet `_assets` strukturell
-  nicht mit. **Nicht dasselbe wie die im Plan verlangte Browser-Probe** — ehrlich als „teilweise"
-  markiert statt aufgerundet, weil niemand tatsächlich in die UI geschaut hat.
+**Test-Fixture:** ein Item angelegt (`itm_de2e4fd8`, Space `niklas`), Bild hochgeladen
+(`put_item_asset`, jedes Mal vor dem Aufruf angekündigt), `asset:`-Referenz per `patch_item`
+eingefügt.
 
-**Aufräumen:** `itm_e33d2906` ist `status:"archived"` (v3, `get_item_meta` bestätigt), bleibt
-liegen wie jedes andere archivierte Item.
+**Geprüft, mit echtem Browser:**
+- **P6.5-5 ✅** — erster Upload-Versuch war ein von Hand aus Hex getipptes PNG, das der Browser
+  als kaputtes Bild zeigte (`naturalWidth`/`naturalHeight` = 0 trotz `200`/korrektem
+  `Content-Type` vom Server — **kein Server-Bug**, `PIL.Image.open()` bestätigte das Bild selbst
+  als ungültig). Mit einem echten, PIL-erzeugten 4×4-PNG erneut hochgeladen — rendert sichtbar,
+  per Zoom-Screenshot bestätigt.
+- **P6.5-7 (Browser-Teil) ✅** — Ordnerbaum in der echten Accessibility-Tree-Probe UND das
+  Space-Auswahl-`<select>` im Verschieben-Dialog zeigen beide identisch nur
+  `nvidia-avo-harness`/`otobo`/`+ Ordner` — kein `_assets`-Eintrag.
+- **P6.5-11 ✅** — Body testweise um eine `example.com`-Bild-URL und eine `javascript:`-URL
+  erweitert, per `read_network_requests` + DOM-Query geprüft: kein Request an `example.com`,
+  genau ein `<img>`-Element im DOM (die echte `asset:`-Referenz). Danach zurückgesetzt.
+- **P6.5-10 ✅** — eigener Move-Versuch scheiterte zunächst dreifach an `403 CSRF-Token fehlt`
+  (`PATCH .../items/{id}`, auch ein einfacher `append` schlug fehl) — Ursache gefunden, kein
+  sharefyx-Bug: `sfx:csrf` wird nur EIN einziges Mal auf der Login-Bootstrap-Seite in
+  `sessionStorage` abgelegt (`webui/pages.py :: render_logged_in_page()`,
+  `static/js/app.js:33-39`) — `sessionStorage` ist pro Tab, eine frisch erzeugte Tab, die nur das
+  Auth-Cookie erbt, hat nie einen Token. Der Nikinger fragte zu Recht zurück, dass der Move
+  ohnehin TOTP+Passwort braucht — hat ihn selbst in seiner eigenen Tab ausgeführt. Verifiziert:
+  `git log --oneline -- .../itm_de2e4fd8*` zeigt genau `5d06187 move itm_de2e4fd8
+  [IT-Sekus-Projekt]`, `.md` UND `_assets/itm_de2e4fd8/` im selben Commit; Bild rendert nach dem
+  Move im neuen Space sichtbar (Browser-Screenshot nach dem Move).
 
-**Ergebnis, ehrlich benannt:** 6 von 14 statt vorher 4 von 14 — aber die verbleibenden 8 Zeilen
-(P6.5-5/8/10/11/12/13 voll, P6.5-7 der Browser-Teil) sind strukturell nicht ohne echten Browser
-zu schließen. Kein Weg, das über MCP/Bash zu umgehen, ohne die Abnahmezeile selbst zu verwässern
-— genau die Art von „aufgerundetem" Fund, den Ponytail/Military-Brief-Disziplin verbietet.
+**Echter Fund, kein Test-Artefakt: P6.5-12 nicht baubar in dieser Form.** `editor.js` hat keinen
+Entfernen-Knopf für Bilder — grep auf `trash|entfern|delete.*asset` liefert null Treffer im
+gesamten Skript, obwohl N5 = „Verschieben statt Entfernen" (nicht „gar nicht") gelockt ist und
+der Server-Endpunkt bereits existiert (`store.delete_asset()`,
+`DELETE /api/v1/items/{item_id}/assets/{asset_id}`, `webui/api.py:703,756-760`). Dem Nikinger
+gemeldet, bevor er in seiner Tab danach gesucht hätte. **Nikinger-Entscheidung: nur vermerken,
+nicht in dieser Sitzung bauen.**
 
-**Verifiziert:** kein Code-Diff (reine Doku- + Live-Datensession über den Connector). `git
+**Aufräumen:** `itm_de2e4fd8` ist `status:"archived"` (v7, per `update_item`), liegt jetzt in
+`IT-Sekus-Projekt` (Move war Teil des Tests). Beide MCP-Chrome-Tabs geschlossen.
+
+**Ergebnis, ehrlich benannt:** 10 von 14 statt vorher 6 von 14. Verbleibend offen: P6.5-8/13
+(brauchen Fabians eigenes Login, vom Nikinger als nicht-blockierend bestätigt — „werden von ihm
+getestet, wenn er Zeit hat"), P6.5-14 (Nikingers eigene Bewertung), P6.5-12 (echte Werkzeug-Lücke,
+siehe oben — kein Testproblem, ein Baufund).
+
+**Verifiziert:** kein Code-Diff (reine Doku- + Live-Datensession über Connector + Browser). `git
 status` zeigt ausschließlich den Phase-Head + `SESSIONS_ARCHIVE.md` + `docs/INDEX.md`.
 
 **Offen für die nächste Session:**
-- P6.5-5/8/10/11/12/13 (Browser/`curl`, teils + Fabian) und der Browser-Teil von P6.5-7 —
-  brauchen entweder den Nikinger selbst am echten Browser, oder ein Browser-Tool in einer
-  künftigen Sitzung (`claude-in-chrome` o. Ä., falls verfügbar gemacht).
-- P6.5-14 hat jetzt zwei Datenpunkte (Gate-A→B-Sitzung + diese Sitzung, beide Male vor jedem
-  `put_item_asset` angekündigt) — Bewertung bleibt beim Nikinger, keine Selbstzertifizierung.
+- P6.5-12: Entfernen-Knopf in `editor.js` bauen (kleine, phaseneigene Änderung — DELETE-Endpoint
+  existiert bereits) — Nikinger-Entscheidung noch ausständig, ob/wann.
+- P6.5-8/13: Fabians eigenes Login, sobald er Zeit hat.
+- P6.5-14: Nikingers eigene Bewertung, zwei Datenpunkte liegen vor (Vorsitzung + diese Sitzung).
 - V64, `filename`-Persistenzfrage, Doku-Schuld, `test_authctl.py`-Flake: unverändert offen.
