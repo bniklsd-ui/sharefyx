@@ -96,7 +96,7 @@ keinen Code bekommen, nur Step 0 (Haushalt) lief.
 | P7-5 | Bild im Editor entfernbar, landet in `_trash/` | Niklas | ⬜ gebaut, ungeprüft |
 | P7-6 | `PATCH` mit Tippfehler-Feld abgewiesen (O6) | Claude Code, Test | ✅ `test_items_patch_rejects_an_unknown_field` |
 | P7-7 | Speichern/Verschieben/Freigeben nach Whitelist unverändert | Niklas | 🟡 Whitelist per Test gegen die real gesendeten Felder gepinnt, keine Browserprobe |
-| P7-8 | Migration: 0 `.md` ohne `visibility:` | Nikinger + Claude Code | ⬜ |
+| P7-8 | Migration: 0 `.md` ohne `visibility:` | Nikinger + Claude Code | ✅ `--apply` 2026-08-23, `items_migrated:73` (deckungsgleich Dry-Run), `grep -L '^visibility:'`→0, 3 Commits (niklas/fabian/IT-Sekus-Projekt) |
 | P7-9 | `clients`/`token_families` sinken nach realem Purge (ab 2026-08-28) | Niklas | ⬜ |
 | P7-10 | `testnutzer-p7` existiert, schreibt einmal | Nikinger + Claude Code | ⬜ |
 | P7-11 | `testnutzer-p7` sieht nur sein item-level Item | Claude Code | ⬜ |
