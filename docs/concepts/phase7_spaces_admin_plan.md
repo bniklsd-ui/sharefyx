@@ -541,7 +541,7 @@ Wegwerf-Instanz probieren, nicht am echten `DATA_ROOT` herausfinden.
 | 10–13, 27, 28 | brauchten einen zweiten Menschen | mechanisch prüfbar (Fabian-Sitzung bleibt der schönere, aber optionale Weg — N10) |
 | P6.5-8, P6.5-13 | dito | dito |
 
-**Abbauen, am Ende von Block A:**
+~~**Abbauen, am Ende von Block A:**~~
 ```
 phase7_spaces_admin/scripts/testcred.py purge     # Keyring-Eintrag zuerst (A7b)
 spacectl.py remove-space testnutzer-p7 --force
@@ -552,6 +552,16 @@ diagnose.sh                       # Prüfung 12 sauber
 ```
 Das erfüllt P6-Abnahmezeile 24 („dritter Space entfernt, keine verwaisten Freigaben") **als echten
 Lauf**, nicht als Konstruktion.
+
+**[2026-08-25 Korrektur, Claude-Code-Session]:** Der Satz „am Ende von Block A" oben ist stehen
+gelassen als Beleg, wie der Plan ursprünglich geschrieben war — er widerspricht sich selbst mit
+Block C: **P7-14** verlangt `testnutzer-p7` ausdrücklich als Empfänger-Principal für den
+Freigabe-Test im Browser („Niklas + `testnutzer-p7`"), und Block C war beim Schreiben dieses
+Abschnitts offenbar noch nicht gegen die eigene Testnutzer-Abhängigkeit gegengelesen worden. Der
+Befehlsblock selbst (Abbau-Kommandos) bleibt technisch korrekt und unverändert — nur der
+Zeitpunkt ist falsch. **Richtig: Abbauen erst nach Block C** (P7-14 durchlaufen oder Block C
+formal descoped), nicht am Ende von Block A. Details/Herleitung:
+`phase7_spaces_admin/CLAUDE.md`, Session-Block 2026-08-25.
 
 > **Reihenfolge-Hinweis:** A7 kommt **nach** A5. Ein frisch angelegter Space soll die
 > Sichtbarkeitswelt sehen, die nach der Migration gilt, nicht die davor.
@@ -990,7 +1000,7 @@ Der laufende Stand lebt im Phase-Head, nicht in diesem Snapshot.
 | **P7-9** | `clients`/`token_families` sinken nach einem realen Purge-Lauf (**P6-Zeile 4**, ab 2026-08-28) | Niklas |
 | **P7-10** | `testnutzer-p7` existiert, hat Konto, Space und eigenen Connector und schreibt einmal (**P6-Zeile 18**) | Nikinger + Claude Code |
 | **P7-11** | `testnutzer-p7` sieht ein **nur item-level** freigegebenes Item — und **nur** dieses (**P6-Zeilen 36/37**) | Claude Code |
-| **P7-12** | `testnutzer-p7` wieder entfernt, **Keyring-Eintrag `p7-testcred` ist weg** (`testcred.py purge`), `spacectl.py check` und `diagnose.sh` melden keine verwaisten Freigaben (**P6-Zeile 24**) | Claude Code |
+| **P7-12** | `testnutzer-p7` wieder entfernt, **Keyring-Eintrag `p7-testcred` ist weg** (`testcred.py purge`), `spacectl.py check` und `diagnose.sh` melden keine verwaisten Freigaben (**P6-Zeile 24**) — **[2026-08-25 Korrektur: erst nach Block C/P7-14, nicht am Ende von Block A, siehe A7-Abschnitt]** | Claude Code |
 | **P7-12b** | Claude Code meldet sich **ohne Nikinger** als `testnutzer-p7` an — Login, TOTP und ein Re-Auth-Gate — allein über `testcred.py`; das Skript verweigert nachweislich jeden anderen Principal | Claude Code |
 | **P7-13** | Phase 6.5 formal abgeschlossen: Handover, Übersichtsgrafik, Status, P1-Contract geschlossen und sechste Öffnung benannt | Claude Code |
 
