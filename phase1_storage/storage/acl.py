@@ -1,6 +1,10 @@
-"""Auflösung von `.share.yml`-Freigaben (Plan §1.2). Kennt keine Items, keine Frontmatter — nur
-Verzeichnisse und die Textdateien darin. Fail-closed: eine fehlende, kaputte oder unbekannte
-Angabe gibt nie mehr Rechte — sie loggt höchstens `critical` und liefert eine leere `Grant`.
+"""Auflösung UND Schreiben von `.share.yml`-Freigaben (Plan §1.2, Schreibseite seit P7 Step C1).
+Kennt keine Items, keine Frontmatter — nur Verzeichnisse und die Textdateien darin. Zwei bewusst
+getrennte Pfade (P7-P): der Lesepfad (`AclReader`) ist fail-closed — eine fehlende, kaputte oder
+unbekannte Angabe gibt nie mehr Rechte, sie loggt höchstens `critical` und liefert eine leere
+`Grant`. Der Schreibpfad (`read_share_file`/`add_member`/`remove_member`/…) ist dagegen laut —
+wer eine `.share.yml` gerade bearbeitet, soll einen kaputten Bestand sofort als Exception sehen,
+nicht stillschweigend überschreiben.
 """
 from __future__ import annotations
 
@@ -204,18 +208,28 @@ def read_share_file(data_root: Path, space: str) -> dict[str, list[str]]:
     return data
 
 
+def _write_share_file_unlocked(path: Path, data: dict) -> None:
+    """Die eine Stelle, die eine `.share.yml` tatsächlich auf die Platte bringt — leer = nicht
+    vorhanden, dieselbe Disziplin wie im Frontmatter (Plan §2.1). Nimmt **keinen** Lock (Aufrufer
+    hält ihn bereits); `write_share_file()` unten ist der öffentliche, lockende Wrapper darum,
+    `add_member`/`remove_member` rufen diese Funktion direkt innerhalb ihres eigenen Locks —
+    sonst zwei `open()`+`flock` auf `.write.lock` im selben Aufruf, der Selbst-Deadlock aus P7-M."""
+    if data:
+        files.atomic_write(path, yaml.safe_dump(
+            data, sort_keys=False, allow_unicode=True, default_flow_style=False,
+        ))
+    elif path.exists():
+        path.unlink()
+
+
 def write_share_file(data_root: Path, space: str, data: dict) -> None:
-    """Schreibt oder entfernt die `.share.yml` eines Space — leer = nicht vorhanden, dieselbe
-    Disziplin wie im Frontmatter (Plan §2.1). Nimmt den Lock selbst, erzeugt **keinen** Commit
-    (das bleibt Aufgabe der aufrufenden `add_member`/`remove_member`, die den Betreff kennen)."""
+    """Öffentlicher, lockender Wrapper um `_write_share_file_unlocked()` — für einen Aufrufer,
+    der eine bereits fertig gebaute `.share.yml`-Struktur schreiben will, ohne über
+    `add_member`/`remove_member` zu gehen. Erzeugt **keinen** Commit (das bleibt Aufgabe der
+    Aufrufer, die den Betreff kennen)."""
     path = data_root / space / ACL_FILENAME
     with _WriteLock(data_root):
-        if data:
-            files.atomic_write(path, yaml.safe_dump(
-                data, sort_keys=False, allow_unicode=True, default_flow_style=False,
-            ))
-        elif path.exists():
-            path.unlink()
+        _write_share_file_unlocked(path, data)
 
 
 def add_member(data_root: Path, space: str, name: str, *, write: bool) -> bool:
@@ -231,9 +245,7 @@ def add_member(data_root: Path, space: str, name: str, *, write: bool) -> bool:
             return False
         names.add(name)
         data[key] = sorted(names)
-        files.atomic_write(path, yaml.safe_dump(
-            data, sort_keys=False, allow_unicode=True, default_flow_style=False,
-        ))
+        _write_share_file_unlocked(path, data)
         history.commit(data_root, f"share {space} {key}+={name}")
     return True
 
@@ -257,12 +269,7 @@ def remove_member(data_root: Path, space: str, name: str) -> list[str]:
         for key in ("read", "write"):
             if key in data and not data[key]:
                 del data[key]
-        if data:
-            files.atomic_write(path, yaml.safe_dump(
-                data, sort_keys=False, allow_unicode=True, default_flow_style=False,
-            ))
-        elif path.exists():
-            path.unlink()
+        _write_share_file_unlocked(path, data)
         history.commit(data_root, f"unshare {space} {name}")
     return removed
 

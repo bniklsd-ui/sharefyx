@@ -76,10 +76,6 @@ def _load_share_file(path: Path) -> dict:
     return data
 
 
-def _dump_share_file(data: dict) -> str:
-    return yaml.safe_dump(data, sort_keys=False, allow_unicode=True, default_flow_style=False)
-
-
 def _find_share_files(data_root: Path):
     yield from sorted(data_root.rglob(ACL_FILENAME))
 

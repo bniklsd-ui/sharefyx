@@ -76,7 +76,7 @@ Abnahmezeilen: `docs/concepts/phase7_spaces_admin_plan.md`.
 
 | 8 | A8 (Phase 6.5 formal abschließen, P7-I): P6.5-8/13 per gebilligter `testnutzer-p7`-Substitution geschlossen — `p7_13_asset_fixture.py`/`p7_13_share_write_fixture.py` (neu, Store-direkte Fixtures) + `p7_13_asset_share_gate_probe.py`/`p7_13_ui_asset_probe.py` (neu, MCP- bzw. `/ui/login`-Cookie-Probe). `docs/concepts/PHASE6_5_CLOSEOUT_HANDOVER.md` (neu) + `phase6_5_tools_images_uebersicht.svg` (neu, zweimal gerendert/gegengeprüft). P1-Contract-Absatz (Öffnungen 3/4/5 datiert geschlossen, 6 als offen benannt) in `phase1_storage/CLAUDE.md`. `ROADMAP.md`/Root-`CLAUDE.md`/`docs/INDEX.md` auf den neuen 6.5-Status | A | ✅ **vollständig** — Abnahmestand 6.5: 12/14, P6.5-12/14 bleiben offen (siehe unten) | 0 (nur neue Live-Probe-Skripte, kein Unit-Test-Delta; `pytest` unverändert 843) |
 
-| 9 | C1 (Schreibseite von `.share.yml`, sechste Contract-Öffnung, P7-P): `storage/acl.py` bekommt `read_share_file`/`write_share_file`/`add_member`/`remove_member`/`create_space`/`remove_space_dir`/`spaces_referencing`/`AclWriteError` — Extraktion aus `spacectl.py`, kein neues Verhalten. `spacectl.py`s vier schreibende Unterbefehle rufen jetzt `acl.*` auf, `_DataRootLock`/`_load_share_file`/`_dump_share_file`/`_spaces_referencing` entfallen dort (nur `_load_share_file`/`_find_share_files` bleiben, weiterhin für `check`, rein lesend). Jede `acl`-Schreibfunktion nimmt den `.write.lock`-Flock selbst (P7-M) | C | ✅ **vollständig** | +19 `phase7_spaces_admin/tests/test_acl_write.py`; 862 gesamt |
+| 9 | C1 (Schreibseite von `.share.yml`, sechste Contract-Öffnung, P7-P): `storage/acl.py` bekommt `read_share_file`/`write_share_file`/`add_member`/`remove_member`/`create_space`/`remove_space_dir`/`spaces_referencing`/`AclWriteError` (Dump-Logik intern einmal in `_write_share_file_unlocked()`, Advisor-Fund nach dem ersten Commit). `spacectl.py`s vier schreibende Unterbefehle rufen jetzt `acl.*` auf; entfallen dort: `_DataRootLock`/`_dump_share_file`/`_spaces_referencing`. `_load_share_file`/`_find_share_files` bleiben — nur noch für `check`, rein lesend. Jede `acl`-Schreibfunktion nimmt den `.write.lock`-Flock selbst (P7-M) | C | ✅ **vollständig** | +24 `phase7_spaces_admin/tests/test_acl_write.py`; 867 gesamt |
 
 *(Weitere Zeilen entstehen mit dem Rest von Block C/B — siehe Plan §4 für die vollständige Schritt-Sequenz.)*
 
@@ -351,7 +351,64 @@ volle Suite: **843 → 862** (Baseline vor dieser Sitzung read gegengezählt, ni
 Tabu-Diff (`asgi.py`/`server.py`/`permissions.py`/`authserver/{crypto,totp,passwords,resolver,
 flows}.py`) leer.
 
+**Nachtrag, 2026-08-25 — Advisor-Runde nach dem C1-Commit, vier Funde, alle vier behoben in
+einem Folgecommit.** Versäumnis vorweg: der Advisor-Call vor dem Commit (Standing-Feedback
+dieses Projekts) wurde übersprungen, erst danach nachgeholt. `409fe18` wurde bewusst **nicht**
+amended (Projektregel) — die vier Funde landen als eigener Commit mit eigenem Doku-Update.
+
+1. **Dead Code + versteckte Divergenzquelle:** `write_share_file()` inlinete `yaml.safe_dump`+
+   `atomic_write`+leer-löschen ein drittes Mal, `add_member`/`remove_member` je ein zweites Mal —
+   und `write_share_file()` konnte von den beiden nie aufgerufen werden (P7-M-Deadlock, es nimmt
+   den Lock selbst, sie halten ihn schon). Genau die Divergenzquelle, die P7-P verhindern sollte,
+   nur ins Modul verlagert statt entfernt. **Behoben:** neues privates
+   `_write_share_file_unlocked(path, data)` hält die Dump-Logik einmal; `add_member`/
+   `remove_member` rufen es innerhalb ihres Locks auf, `write_share_file()` bleibt der
+   öffentliche, lockende Wrapper darum. Der Deadlock ist jetzt durch Bauart unerreichbar, nicht
+   nur per Kommentar vermieden.
+2. **Commit-Betreffs waren nie gepinnt.** Der Plan verlangt die drei exakten Formate (`share
+   <space> <key>+=<name>` / `unshare <space> <name>` / `remove-space <name>`) — genau das Stück,
+   das die `DATA_ROOT`-Historie (Hard Rule 5, Undo-Pfad) leise brechen könnte, war ungeprüft.
+   **Behoben:** die drei Commit-Tests in `test_acl_write.py` assertieren jetzt zusätzlich `git
+   log -1 --format=%s` gegen den exakten Wortlaut.
+3. **`phase1_storage/CLAUDE.md`s Modul-Tabelle fehlte Zeile 14** für die sechste Öffnung — der
+   „Geerbte Contracts"-Absatz war da, die Tabellenzeile (Präzedenzfall: Zeile 13 bei der fünften
+   Öffnung) fehlte. Nachgetragen, `Gesamt: 150` unverändert (Tests liegen außerhalb des Pakets,
+   dieselbe Konvention wie Zeile 10).
+4. **`acl.py`s Kopf-Docstring war nach dem Umbau falsch** — beschrieb das Modul weiterhin als
+   rein lesend/fail-closed. Nachgezogen: zwei Sätze, die den bewussten Zwei-Pfade-Schnitt nennen
+   (lesend fail-closed via `AclReader`, schreibend laut via `read_share_file`/`add_member`/…).
+
+**Verifiziert:** 43/43 (`test_acl_write.py` + `test_spacectl.py` + Charakterisierung), volle
+Suite **862/862** unverändert (Umbau, keine neuen Tests — drei bestehende umbenannt/erweitert).
+Tabu-Diff weiterhin leer.
+
+**Zweite Advisor-Runde, diesmal vor dem Commit (wie es sein soll), vier weitere Funde, alle
+behoben:**
+
+1. **`_dump_share_file` in `spacectl.py` war tot** — meine erste Edit-Runde ersetzte beide
+   Aufrufer (`_cmd_add_member`/`_cmd_remove_member`), ließ die Funktionsdefinition selbst aber
+   stehen (sie lag außerhalb des ersetzten `old_string`-Bereichs). Entfernt. Die Modul-Tabellen-
+   zeile oben widersprach sich zusätzlich selbst („`_load_share_file` entfällt … bleibt") —
+   richtiggestellt: entfallen sind `_DataRootLock`/`_dump_share_file`/`_spaces_referencing`,
+   geblieben sind `_load_share_file`/`_find_share_files` (nur noch für `check`).
+2. **`read_share_file()`s `AclWriteError`-Zweig (nicht-Mapping-YAML) war ungetestet** — die
+   bestehende Malformed-YAML-Probe pinnt nur den `yaml.YAMLError`-Zweig. Zwei neue Tests: einer
+   direkt gegen `read_share_file()`, einer gegen `add_member()` mit demselben kaputten Bestand
+   (weder `add_member` noch `remove_member` fangen die Exception ab — bewusst, dieselbe „laut
+   statt fail-closed"-Haltung wie beim direkten Lesen, kein Verhaltensunterschied zur alten
+   `spacectl.py`-Fassung, die genauso unabgefangen `ValueError` warf).
+3. **Plan-Testfall „leere Liste verschwindet" fehlte** — bisher nur „leere Datei wird entfernt"
+   abgedeckt. Neuer Test: `read:`+`write:` beide besetzt, ein Name aus `read:` entfernt macht
+   `read:` leer → der Schlüssel fehlt danach ganz (nicht `read: []`), die Datei bleibt (wegen
+   `write:`) bestehen.
+4. **`write_share_file()` hatte keine eigene Testabdeckung** — zwei neue Tests: Round-Trip durch
+   `read_share_file()`, und leeres `data` entfernt eine bestehende Datei.
+
+**Verifiziert (zweite Runde):** `test_acl_write.py` jetzt **24** Tests (`--collect-only`
+gegengezählt, nicht addiert), zusammen mit `test_spacectl.py`+Charakterisierung **48/48** grün.
+Volle Suite **862 → 867** (real gezählt). Tabu-Diff weiterhin leer.
+
 **Nächster Schritt, konkret:** Step C2 (REST-Fläche, fünf neue Routen unter `/api/v1/spaces*`,
 `webui/shares.py`-Erweiterung um `require_space_reauth()`) — Anker (`api.py:743-755`,
 `api_routes()`-Signatur, `UserDirectory`-Principal-Check V76) vor dem Bau gegen den echten Code
-prüfen, wie bei C1.
+prüfen, wie bei C1. Advisor-Call **vor** dem C2-Commit, nicht danach.
