@@ -77,6 +77,7 @@ Abnahmezeilen: `docs/concepts/phase7_spaces_admin_plan.md`.
 | 8 | A8 (Phase 6.5 formal abschließen, P7-I): P6.5-8/13 per gebilligter `testnutzer-p7`-Substitution geschlossen — `p7_13_asset_fixture.py`/`p7_13_share_write_fixture.py` (neu, Store-direkte Fixtures) + `p7_13_asset_share_gate_probe.py`/`p7_13_ui_asset_probe.py` (neu, MCP- bzw. `/ui/login`-Cookie-Probe). `docs/concepts/PHASE6_5_CLOSEOUT_HANDOVER.md` (neu) + `phase6_5_tools_images_uebersicht.svg` (neu, zweimal gerendert/gegengeprüft). P1-Contract-Absatz (Öffnungen 3/4/5 datiert geschlossen, 6 als offen benannt) in `phase1_storage/CLAUDE.md`. `ROADMAP.md`/Root-`CLAUDE.md`/`docs/INDEX.md` auf den neuen 6.5-Status | A | ✅ **vollständig** — Abnahmestand 6.5: 12/14, P6.5-12/14 bleiben offen (siehe unten) | 0 (nur neue Live-Probe-Skripte, kein Unit-Test-Delta; `pytest` unverändert 843) |
 
 | 9 | C1 (Schreibseite von `.share.yml`, sechste Contract-Öffnung, P7-P): `storage/acl.py` bekommt `read_share_file`/`write_share_file`/`add_member`/`remove_member`/`create_space`/`remove_space_dir`/`spaces_referencing`/`AclWriteError` (Dump-Logik intern einmal in `_write_share_file_unlocked()`, Advisor-Fund nach dem ersten Commit). `spacectl.py`s vier schreibende Unterbefehle rufen jetzt `acl.*` auf; entfallen dort: `_DataRootLock`/`_dump_share_file`/`_spaces_referencing`. `_load_share_file`/`_find_share_files` bleiben — nur noch für `check`, rein lesend. Jede `acl`-Schreibfunktion nimmt den `.write.lock`-Flock selbst (P7-M) | C | ✅ **vollständig** | +24 `phase7_spaces_admin/tests/test_acl_write.py`; 867 gesamt |
+| 10 | C2 (REST-Fläche für Space-Verwaltung): vier der fünf in Plan §4.C2 genannten Routen — `POST /api/v1/spaces`, `GET/POST .../{space}/members`, `DELETE .../{space}/members/{name}` (`DELETE /api/v1/spaces/{space}` bleibt C4, sein Vorlauf/Durchlauf-Algorithmus gehört dorthin, ein Stub-Handler wäre eine zweite unvollständige Fassung derselben Regel). `webui/shares.py :: require_space_reauth()` (neu, Re-Auth bei Mitglied-Hinzufügen, keins bei -Entfernen, P7-N) — ruft `verify_reauth()` direkt auf, keine neue Extraktion nötig: die im Plan beschriebene `_verify_reauth_credentials()`-Extraktion existiert bereits als `webui/reauth.py :: verify_reauth()` (gebaut vor dieser Phase, von `account.py` UND `shares.py` geteilt) — Plan-Text war insofern stale, keine neue Arbeit. `storage/store.py :: Store.data_root` (neue Read-Property, kein neues Verhalten, keine siebte Öffnung). `_meta` bekommt `space_admin` | C | ✅ **vollständig, zwei Advisor-Runden vor dem Commit** | +23 (21 `phase7_spaces_admin/tests/test_space_admin_api.py` neu + 1 `phase5_ui/tests/test_meta.py` + 1 `phase1_storage/tests/test_store.py`); 890 gesamt |
 
 *(Weitere Zeilen entstehen mit dem Rest von Block C/B — siehe Plan §4 für die vollständige Schritt-Sequenz.)*
 
@@ -412,3 +413,72 @@ Volle Suite **862 → 867** (real gezählt). Tabu-Diff weiterhin leer.
 `webui/shares.py`-Erweiterung um `require_space_reauth()`) — Anker (`api.py:743-755`,
 `api_routes()`-Signatur, `UserDirectory`-Principal-Check V76) vor dem Bau gegen den echten Code
 prüfen, wie bei C1. Advisor-Call **vor** dem C2-Commit, nicht danach.
+
+**Nachtrag, 2026-08-25 — Step C2 gebaut (Nikinger-Auftrag „Lets go on with C2"), zwei
+Advisor-Runden vor dem Commit.**
+
+**Vier von fünf Routen aus Plan §4.C2** (`POST /api/v1/spaces`, `GET/POST .../members`,
+`DELETE .../members/{name}`) — `DELETE /api/v1/spaces/{space}` bleibt bewusst C4, siehe
+Modul-Tabelle oben. Anker vor dem Bau geprüft: `api_routes()`-Signatur trägt bereits alles
+Nötige (keine neue Parameter), Route-Tabelle liegt bei `api.py:779-802` (Plan nennt 743-755,
+kosmetische Zeilendrift wie bei C1). **Ein Plan-Textfund:** §4.C2 beschreibt eine Extraktion
+von `require_share_reauth()`s Credential-Hälfte in `_verify_reauth_credentials()` — diese
+Extraktion existiert bereits, als `webui/reauth.py :: verify_reauth()`, gebaut vor dieser Phase
+und von `account.py` UND `shares.py` bereits geteilt. `require_space_reauth()` ruft sie direkt
+auf, keine Restrukturierung von `shares.py` nötig — der Plan-Text war insofern stale, spart
+aber Arbeit, kostet keine.
+
+**Erste Advisor-Runde (vor dem ersten Commitversuch), zwei Blocker + zwei Doku-Lücken:**
+
+1. **Frisch angelegter Space war für niemanden sichtbar oder verwaltbar.**
+   `acl.create_space()` legt bewusst nur ein leeres Verzeichnis an (dieselbe Zurückhaltung wie
+   `spacectl.py create-space`, ein CLI-Operator ruft danach selbst `add-member` auf) — über die
+   Weboberfläche gibt es diesen zweiten Handgriff aber nicht. **Fix:** `_spaces_post` seedet den
+   Anlegenden direkt danach als `write`-Mitglied (`acl.add_member(..., write=True)`) — zwei
+   Commits (`create-space` selbst committet nichts, der Seed-`add_member` einen), korrekt: die
+   Mitgliedschaft ist eine echte Rechteänderung und gehört in die Historie. Ohne den Fix hätte
+   P7-16 („neuer geteilter Space erscheint im Baum") strukturell nie bestehen können.
+2. **`GET .../members` hatte gar keine Autorisierung.** Die Plan-Begründung dafür („spiegelt
+   `GET /api/v1/spaces`, das zeigt Mitgliedschaft auch") war sachlich falsch — `_spaces` filtert
+   über `_visible_space_infos()`/`permissions.visible_spaces()`, der neue Handler nahm `space`
+   ungeprüft aus dem Pfad. Das öffnete ein Existenz-Orakel über beliebige Space-Namen,
+   Mitglieder-Enumeration für nicht-lesbare Spaces, und (über `orphans`) einen Leak-Kanal quer
+   über den ganzen `DATA_ROOT`. **Fix:** `permissions.can_read(session.space, space)`-Gate,
+   `403` sonst; `manageable` bleibt der Render-Hinweis fürs Frontend.
+3. `space_admin`-Feld in `_meta` war ungetestet — nachgetragen (`test_meta.py`).
+4. Kill-Switch-Abdeckung nur 2 von 4 Routen — auf einen parametrisierten Test über alle vier
+   ausgeweitet.
+
+**Zweite Advisor-Runde (nach den ersten vier Fixes, vor dem tatsächlichen Commit), ein
+weiterer Blocker:** `orphans` implementierte den falschen Namen — der Plan-Satz nennt
+`acl.spaces_referencing()`, beschreibt aber „Namen ohne zugehörigen Space" — das ist
+`spacectl.py check`s Semantik (Tippfehler in `read:`/`write:` gegen bekannte Space-Verzeichnisse
+prüfen), nicht „wer verweist auf mich" (das ist tatsächlich `spaces_referencing()`s Job, und
+C4s eigene Sache). **Fix:** `_space_members_get` vergleicht `grant.read | grant.write` jetzt
+gegen die real existierenden Space-Verzeichnisse (`store.data_root.iterdir()`), dieselbe
+Prüfung wie `_cmd_check`. Die `not is_home`-Ausnahme ist mit dem Fix ebenfalls gefallen — ein
+Tippfehler im eigenen Home-Space ist genauso meldenswert. **Datierte Plan-Korrektur, wie bei
+C1s P7-12-Zeitpunkt:** §4.C2s `orphans`-Beschreibung war intern widersprüchlich (Funktionsname
+vs. beschriebenes Verhalten); der 📕-Snapshot bleibt unverändert, diese Zeile ist die
+maßgebliche Korrektur.
+
+**`atomic_write()`-Randfrage aus der ersten Runde geklärt, kein Fund:** `tempfile.mkstemp(dir=…)`
+wirft `FileNotFoundError` auf einem fehlenden Space-Verzeichnis, legt keine Elternverzeichnisse
+an — `acl.add_member()` auf einen nicht existierenden Space kann `create_space()`s
+Namens-Riegel also nicht umgehen. Nichts zu tun, für C4 vermerkt.
+
+**Verifiziert:** 21 neue Tests in `test_space_admin_api.py` (eigene Fixtures — `phase5_ui/tests/
+conftest.py` ist kein Vorfahre von `phase7_spaces_admin/tests/`, dieselbe Isolation wie
+`test_acl_write.py`), +1 `test_meta.py`, +1 `test_store.py` (`Store.data_root`-Property). Alle
+gegen `--collect-only` gezählt, nicht addiert. Volle Suite **867 → 890**. Tabu-Diff leer.
+
+**P7-22 bleibt ⬜, explizit benannt statt stillschweigend:** „`space_admin_enabled=False` lässt
+alle fünf Routen `404` antworten" — vier von fünf sind jetzt getestet (parametrisierter
+Kill-Switch-Test), die fünfte (`DELETE /api/v1/spaces/{space}`) existiert erst mit C4. „C2
+fertig" heißt hier ausdrücklich nicht „P7-22 erfüllbar".
+
+**Nächster Schritt, konkret:** Step C4 (Space entfernen, zweiphasig, P7-O/N8/N9) vor C3 (UI) —
+C3s Entfernen-Dialog bräuchte sonst eine Route, die noch nicht existiert; C4 zuerst gibt C3 ein
+vollständiges Backend in einem Rutsch. Anker vor dem Bau prüfen: `_STORE_FETCH_LIMIT`
+(V78), `store.move()`/`store.archive()`-Reihenfolge, Lock-Disziplin (P7-M) für die
+Vorlauf/Durchlauf-Schleife. Advisor-Call **vor** dem Commit.

@@ -341,6 +341,14 @@ class Store:
             return folder
 
     @property
+    def data_root(self) -> Path:
+        """Roher `DATA_ROOT`-Pfad (P7 Step C2) — für Aufrufer, die `storage.acl`s Schreibseite
+        (C1) direkt benutzen wollen, statt eine neue `Store`-Methode je Space-Verwaltungs-
+        operation zu bekommen (dieselbe Zurückhaltung wie `spacectl.py`s eigener Docstring zur
+        `Store`-Fläche)."""
+        return self._data_root
+
+    @property
     def acl_reader(self) -> AclReader:
         """Der eine `AclReader`, den dieser `Store` selbst benutzt (P6 Step 5) — Aufrufer, die
         eine `AclDecision` außerhalb von `acl_of()` bauen müssen (z. B. `mcpserver.tools

@@ -91,3 +91,35 @@ def require_share_reauth(
     )
     if not ok:
         raise ApiError("reauth_required", "Re-Authentisierung fehlgeschlagen.")
+
+
+def require_space_reauth(
+    session,
+    body: dict,
+    *,
+    widening: bool,
+    userdir: UserDirectory,
+    throttle: LoginThrottle,
+    auth_store: AuthStore,
+) -> None:
+    """Wie `require_share_reauth()`, aber für Space-Mitgliedschaft (P7 Step C2) statt Item-
+    Freigaben — hier gibt es keine `AclDecision` zum Vergleichen, also kein `widens()`-Äquivalent:
+    P7-N benennt die Regel bereits flach („Mitglied hinzufügen ⇒ Re-Auth, Mitglied entfernen ⇒
+    nicht"), der Aufrufer übergibt sie direkt statt sie hier neu zu berechnen. Teilt sich
+    `verify_reauth()` mit `require_share_reauth()`/`account.py :: _require_reauth()` — dieselbe
+    Credential-Prüfung, drei Aufrufer."""
+    if not widening:
+        return
+    password = body.get("password")
+    code = body.get("totp")
+    if not isinstance(password, str) or not isinstance(code, str):
+        raise ApiError(
+            "reauth_required",
+            "Diese Änderung erweitert Zugriffsrechte — Passwort und TOTP-Code nötig.",
+        )
+    ok = verify_reauth(
+        userdir, throttle, auth_store, space=session.space, password=password,
+        second_factor=code, now=auth_store.now().timestamp(),
+    )
+    if not ok:
+        raise ApiError("reauth_required", "Re-Authentisierung fehlgeschlagen.")

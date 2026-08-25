@@ -273,6 +273,13 @@ unverändert grün, Charakterisierung P6-D/P7-C vor+nach byte-identisch). 19 neu
 mit C1 begonnen (C2–C5 folgen), dieselbe Disziplin wie oben: geschlossen wird erst mit dem
 formalen Phase-7-Abschluss, nicht mit dem ersten Teilschritt.
 
+**[2026-08-25, P7 Step C2] Kleine additive Erweiterung, keine siebte Öffnung.** `store.py`
+bekommt `Store.data_root -> Path` (neue, reine Read-Property neben `acl_reader`) — kein neues
+Verhalten, nur ein Zugriffspfad für `webui/api.py`s neue Space-Verwaltungsrouten, die `acl.py`s
+Schreibseite (C1) direkt aufrufen und dafür den rohen `DATA_ROOT`-Pfad brauchen, den `Store`
+bisher nur privat hielt. Kein eigener Absatz nötig gewesen, wird hier trotzdem benannt, damit
+kein Leser eine unbelegte öffentliche Property vorfindet.
+
 **[2026-08-17, P6 Step 7b Commit 1/3] Vierte, benannte Contract-Öffnung gebaut** (angekündigt in
 `phase6_shares/CLAUDE.md`s Session-Block vom selben Tag, `phase6_shares/ITEM_MOVE_PLAN.md` §4.1,
 P6-AD): `store.py :: move(item_id, *, version, space=, folder=) -> Item` (neu) + intern

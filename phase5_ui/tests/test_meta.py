@@ -61,6 +61,18 @@ async def test_meta_publishes_the_bucket_definitions_verbatim(full_app_items, to
 
 
 @pytest.mark.asyncio
+async def test_meta_reports_the_space_admin_kill_switch(full_app_items, ui_settings, totp_code):
+    """P7 Step C2 — `space_admin` im Meta-Payload spiegelt `UiSettings.space_admin_enabled`
+    (P7-R), damit C3s UI den Menüpunkt danach ein-/ausblenden kann. `full_app_items` baut
+    `ui_settings` mit dem Feld-Default `False` (Step 7 Commit 6) — dieser Test pinnt genau das."""
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        body = (await client.get("/api/v1/meta")).json()
+
+    assert body["space_admin"] == ui_settings.space_admin_enabled
+
+
+@pytest.mark.asyncio
 async def test_meta_requires_session(full_app_items):
     async with _client(full_app_items) as client:
         response = await client.get("/api/v1/meta")

@@ -37,6 +37,11 @@ def store_git(tmp_path, clock):
     return Store(tmp_path, now_fn=clock, git=True)
 
 
+def test_data_root_property_returns_the_configured_root(tmp_path, clock):
+    store = Store(tmp_path, now_fn=clock, git=False)
+    assert store.data_root == tmp_path
+
+
 def _git_log(tmp_path) -> list[str]:
     """Commit-Messages newest-first, wie `git log` sie liefert."""
     result = subprocess.run(

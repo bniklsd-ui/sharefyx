@@ -85,6 +85,7 @@ from starlette.responses import JSONResponse, Response
 from starlette.routing import Route
 
 from mcpserver.permissions import SharePolicy
+from storage import acl
 from storage.errors import ConflictError, ItemNotFound, ValidationError
 from storage.files import ITEM_ID_RE, validate_folder
 from storage.models import STATUS_VALUES, SpaceInfo
@@ -98,7 +99,7 @@ from .serializers import (
     summary_to_json,
 )
 from .sessions import SessionManager
-from .shares import ShareState, require_share_reauth
+from .shares import ShareState, require_share_reauth, require_space_reauth
 from .updates import load_update_log
 
 DEFAULT_LIMIT = 50
@@ -271,7 +272,10 @@ def api_routes(
         await _require_session(request)
         status_values = {kind: sorted(values) for kind, values in STATUS_VALUES.items()}
         return JSONResponse(
-            {"status_values": status_values, "buckets": _BUCKETS},
+            {
+                "status_values": status_values, "buckets": _BUCKETS,
+                "space_admin": settings.space_admin_enabled,
+            },
             headers={"Cache-Control": "no-store"},
         )
 
@@ -321,6 +325,113 @@ def api_routes(
             raise _map_store_error(exc, own_space=session.space) from exc
         return JSONResponse(
             {"folder": created}, status_code=201, headers={"Cache-Control": "no-store"},
+        )
+
+    # -- Space-Verwaltung (P7 Step C2) ----------------------------------------------------
+    #
+    # Vier der fünf in `docs/concepts/phase7_spaces_admin_plan.md` §4.C2 genannten Routen.
+    # `DELETE /api/v1/spaces/{space}` (Entfernen) fehlt hier bewusst — sein Vorlauf/Durchlauf-
+    # Algorithmus gehört zu Step C4, ein Stub-Handler, der bis dahin nur 400 liefert, wäre eine
+    # zweite, unvollständige Fassung derselben Regel. Der Kill-Switch (P7-R) läuft in jedem
+    # Handler zuerst, obwohl `settings.space_admin_enabled` bis C3 `False` bleibt — die Routen
+    # sind damit von Anfang an inert-per-default, nicht erst nachträglich abgesichert.
+
+    async def _spaces_post(request: Request) -> Response:
+        session = await _require_session(request)
+        if not settings.space_admin_enabled:
+            raise ApiError("not_found", "Nicht gefunden.")
+        await _require_csrf_json(request, session)
+        body = await _json_body(request)
+        name = body.get("name")
+        if not isinstance(name, str) or not name:
+            raise ApiError("validation_failed", "'name' ist Pflichtfeld (nicht-leerer str).")
+        if users.get(name) is not None:
+            raise ApiError(
+                "validation_failed", f"'{name}' ist ein bestehender Principal-Name.",
+            )
+        try:
+            acl.create_space(store.data_root, name)
+            # Ohne diesen Schritt wäre der frisch angelegte Space für niemanden lesbar oder
+            # schreibbar (`create_space()` legt bewusst nur ein Verzeichnis an, keine
+            # `.share.yml` — dieselbe Zurückhaltung wie `spacectl.py create-space`, das den
+            # Anlegenden ebenfalls nicht automatisch einträgt, weil ein CLI-Operator meist der
+            # spätere `add-member`-Aufruf selbst ist). Über die Weboberfläche gibt es diesen
+            # zweiten Schritt nicht — ohne Seed-Mitgliedschaft verschwindet der Space sofort
+            # nach dem Anlegen aus dem Baum (Advisor-Fund: P7-16 scheiterte genau daran).
+            acl.add_member(store.data_root, name, session.space, write=True)
+        except acl.AclWriteError as exc:
+            raise ApiError("validation_failed", str(exc)) from exc
+        return JSONResponse(
+            {"name": name}, status_code=201, headers={"Cache-Control": "no-store"},
+        )
+
+    async def _space_members_get(request: Request) -> Response:
+        session = await _require_session(request)
+        if not settings.space_admin_enabled:
+            raise ApiError("not_found", "Nicht gefunden.")
+        space = request.path_params["space"]
+        if not permissions.can_read(session.space, space):
+            raise ApiError("forbidden", "Keine Leserechte für diesen Space.")
+        grant = store.acl_reader.grants_for_space(space)
+        manageable = permissions.can_write(session.space, space)
+        # Tippfehler-Fänger, nicht "wer referenziert MICH" (das ist `spacectl.py check`s/C4s
+        # Job, `acl.spaces_referencing()`) — Advisor-Fund: der Plan-Satz nannte die falsche
+        # Funktion für die beschriebene Semantik ("Namen ohne zugehörigen Space" ==
+        # `_cmd_check`s Vergleich gegen bekannte Space-Verzeichnisse, nicht gegen andere
+        # `.share.yml`-Dateien). Nur sichtbar für `manageable`, sonst ein Leak-Kanal für die
+        # Mitgliederliste selbst (dieselbe Vorsicht wie beim ursprünglichen Fund).
+        known_spaces = {
+            p.name for p in store.data_root.iterdir()
+            if p.is_dir() and not p.name.startswith(".")
+        }
+        return JSONResponse(
+            {
+                "space": space,
+                "read": sorted(grant.read - grant.write),
+                "write": sorted(grant.write),
+                "home": users.get(space) is not None,
+                "manageable": manageable,
+                "orphans": (
+                    sorted((grant.read | grant.write) - known_spaces) if manageable else []
+                ),
+            },
+            headers={"Cache-Control": "no-store"},
+        )
+
+    async def _space_members_post(request: Request) -> Response:
+        session = await _require_session(request)
+        if not settings.space_admin_enabled:
+            raise ApiError("not_found", "Nicht gefunden.")
+        await _require_csrf_json(request, session)
+        space = request.path_params["space"]
+        if not permissions.can_write(session.space, space):
+            raise ApiError("forbidden", "Keine Schreibrechte für diesen Space.")
+        body = await _json_body(request)
+        name = body.get("name")
+        if not isinstance(name, str) or not name:
+            raise ApiError("validation_failed", "'name' ist Pflichtfeld (nicht-leerer str).")
+        require_space_reauth(
+            session, body, widening=True,
+            userdir=users, throttle=throttle, auth_store=auth_store,
+        )
+        acl.add_member(store.data_root, space, name, write=bool(body.get("write", False)))
+        return JSONResponse(
+            {"space": space, "name": name}, headers={"Cache-Control": "no-store"},
+        )
+
+    async def _space_members_delete(request: Request) -> Response:
+        session = await _require_session(request)
+        if not settings.space_admin_enabled:
+            raise ApiError("not_found", "Nicht gefunden.")
+        await _require_csrf_json(request, session)
+        space = request.path_params["space"]
+        if not permissions.can_write(session.space, space):
+            raise ApiError("forbidden", "Keine Schreibrechte für diesen Space.")
+        name = request.path_params["name"]
+        # Kein `require_space_reauth()`-Aufruf hier — Rücknahme braucht kein Re-Auth (P7-N).
+        acl.remove_member(store.data_root, space, name)
+        return JSONResponse(
+            {"space": space, "name": name}, headers={"Cache-Control": "no-store"},
         )
 
     async def _overview(request: Request) -> Response:
@@ -779,7 +890,14 @@ def api_routes(
     return [
         Route("/api/v1/me", _catch(_me), methods=["GET"]),
         Route("/api/v1/spaces", _catch(_spaces), methods=["GET"]),
+        Route("/api/v1/spaces", _catch(_spaces_post), methods=["POST"]),
         Route("/api/v1/spaces/{space}/folders", _catch(_spaces_create_folder), methods=["POST"]),
+        Route("/api/v1/spaces/{space}/members", _catch(_space_members_get), methods=["GET"]),
+        Route("/api/v1/spaces/{space}/members", _catch(_space_members_post), methods=["POST"]),
+        Route(
+            "/api/v1/spaces/{space}/members/{name}", _catch(_space_members_delete),
+            methods=["DELETE"],
+        ),
         Route("/api/v1/meta", _catch(_meta), methods=["GET"]),
         Route("/api/v1/overview", _catch(_overview), methods=["GET"]),
         Route("/api/v1/updates", _catch(_updates_get), methods=["GET"]),
