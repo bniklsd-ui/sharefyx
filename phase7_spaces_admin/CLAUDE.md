@@ -9,7 +9,7 @@ down:
   - ../docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md   # Herkunft: P6-Status, §4.1/§4.2, offene Entscheidungen §5.1–§5.7
   - ../phase6_shares/ITEM_MOVE_PLAN.md              # §9 Mehrfachauswahl (P6-AK–AN) — Block B baut das, unverändert
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-08-25 (Gate A->C geprueft, alle vier Punkte live -- Block C gestartet, Step C1: Schreibseite von .share.yml in storage/acl.py, sechste Contract-Oeffnung gebaut) | 2026-08-25 (P7-4 erster echter Befund: FAIL, ID statt Titel genannt; P7-12-Abbau geprueft und bewusst NICHT gefahren -- Block C/P7-14 braucht testnutzer-p7 noch) | 2026-08-25 (P7-1/P7-2/P7-7 per echtem Browser-Klick bestanden, git-Reparatur nach Nikinger-Freigabe, nur noch P7-4/P7-9/P7-12 offen) | 2026-08-25 (P6.5-12/P7-5 per echtem Browser-Klick bestanden, testnutzer-p7-Substitution, 13/14 in Phase 6.5) | 2026-08-25 (echter deploy.sh-Lauf durch den Nikinger, Live-Release jetzt 53bad20 statt f96125e, A3s asset-strip live, P6.5-12 wieder testbar) | 2026-08-23 (A8: Phase 6.5 formal abgeschlossen als 🟡, 12/14, P6.5-8/13 via testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, P1-Contract-Absatz aktualisiert) | 2026-08-23 (Step 0 gestartet, Doku-Audit gefahren, Skelett angelegt)
+updated: 2026-08-25 (Step C4 gebaut -- zweiphasiger Space-Entfernen-Algorithmus, Advisor-Fund: bereits archivierte Items brauchen einen eigenen Vorlauf-Riegel, P7-20/P7-21/Testanteil-P7-22 geschlossen) | 2026-08-25 (Gate A->C geprueft, alle vier Punkte live -- Block C gestartet, Step C1: Schreibseite von .share.yml in storage/acl.py, sechste Contract-Oeffnung gebaut) | 2026-08-25 (P7-4 erster echter Befund: FAIL, ID statt Titel genannt; P7-12-Abbau geprueft und bewusst NICHT gefahren -- Block C/P7-14 braucht testnutzer-p7 noch) | 2026-08-25 (P7-1/P7-2/P7-7 per echtem Browser-Klick bestanden, git-Reparatur nach Nikinger-Freigabe, nur noch P7-4/P7-9/P7-12 offen) | 2026-08-25 (P6.5-12/P7-5 per echtem Browser-Klick bestanden, testnutzer-p7-Substitution, 13/14 in Phase 6.5) | 2026-08-25 (echter deploy.sh-Lauf durch den Nikinger, Live-Release jetzt 53bad20 statt f96125e, A3s asset-strip live, P6.5-12 wieder testbar) | 2026-08-23 (A8: Phase 6.5 formal abgeschlossen als 🟡, 12/14, P6.5-8/13 via testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, P1-Contract-Absatz aktualisiert) | 2026-08-23 (Step 0 gestartet, Doku-Audit gefahren, Skelett angelegt)
 ---
 # CLAUDE.md — Phase 7: Space-Verwaltung, Mehrfachauswahl, Konsolidierung (`phase7_spaces_admin/`)
 
@@ -78,6 +78,7 @@ Abnahmezeilen: `docs/concepts/phase7_spaces_admin_plan.md`.
 
 | 9 | C1 (Schreibseite von `.share.yml`, sechste Contract-Öffnung, P7-P): `storage/acl.py` bekommt `read_share_file`/`write_share_file`/`add_member`/`remove_member`/`create_space`/`remove_space_dir`/`spaces_referencing`/`AclWriteError` (Dump-Logik intern einmal in `_write_share_file_unlocked()`, Advisor-Fund nach dem ersten Commit). `spacectl.py`s vier schreibende Unterbefehle rufen jetzt `acl.*` auf; entfallen dort: `_DataRootLock`/`_dump_share_file`/`_spaces_referencing`. `_load_share_file`/`_find_share_files` bleiben — nur noch für `check`, rein lesend. Jede `acl`-Schreibfunktion nimmt den `.write.lock`-Flock selbst (P7-M) | C | ✅ **vollständig** | +24 `phase7_spaces_admin/tests/test_acl_write.py`; 867 gesamt |
 | 10 | C2 (REST-Fläche für Space-Verwaltung): vier der fünf in Plan §4.C2 genannten Routen — `POST /api/v1/spaces`, `GET/POST .../{space}/members`, `DELETE .../{space}/members/{name}` (`DELETE /api/v1/spaces/{space}` bleibt C4, sein Vorlauf/Durchlauf-Algorithmus gehört dorthin, ein Stub-Handler wäre eine zweite unvollständige Fassung derselben Regel). `webui/shares.py :: require_space_reauth()` (neu, Re-Auth bei Mitglied-Hinzufügen, keins bei -Entfernen, P7-N) — ruft `verify_reauth()` direkt auf, keine neue Extraktion nötig: die im Plan beschriebene `_verify_reauth_credentials()`-Extraktion existiert bereits als `webui/reauth.py :: verify_reauth()` (gebaut vor dieser Phase, von `account.py` UND `shares.py` geteilt) — Plan-Text war insofern stale, keine neue Arbeit. `storage/store.py :: Store.data_root` (neue Read-Property, kein neues Verhalten, keine siebte Öffnung). `_meta` bekommt `space_admin` | C | ✅ **vollständig, zwei Advisor-Runden vor dem Commit** | +23 (21 `phase7_spaces_admin/tests/test_space_admin_api.py` neu + 1 `phase5_ui/tests/test_meta.py` + 1 `phase1_storage/tests/test_store.py`); 890 gesamt |
+| 11 | C4 (Space entfernen, zweiphasig, P7-O/N8/N9): fünfte Route `DELETE /api/v1/spaces/{space}` in `webui/api.py :: _spaces_delete`. Vorlauf (kein Schreibvorgang) über `store.search()`-Paging mit `_STORE_FETCH_LIMIT`, Blocker-Scan via `permissions.can_write_item_as_human(home, store.acl_of(...))`; `require_space_reauth(widening=True)` + `confirm == space`; Durchlauf `store.move()` → `store.archive()` je Item (Reihenfolge durch `archive()`s `folder=""`/`_archive/`-Ablage erzwungen, nicht gewählt); harte `len(moved) == total`-Sperre vor `acl.remove_space_dir()`. **Advisor-Fund (empirisch, vor dem Commit):** `store.search()` zählt bereits archivierte Items mit (`total` schließt sie ein), `store.move()` verbietet sie aber explizit — ohne eigenen Riegel hätte das einen unbehandelten `ValidationError`/500 mitten im Durchlauf ausgelöst, nach bereits verschobenen Items, ohne den von N9 verlangten Bericht. Neuer, eigener Vorlauf-Riegel `archived_blockers` schließt das fail-closed — **eine Space mit archivierten Items ist damit vorerst unentfernbar, das ist eine bewusst offene Nikinger-Frage** (siehe Session-Block), keine stille Lücke. Zweiter Advisor-Fund: `acl.spaces_referencing()` fehlte das `exclude=`, das `spacectl.py remove-space` für dieselbe Prüfung setzt (Parität-Drift, behoben). `phase7_spaces_admin/tests/test_space_admin_api.py`s Kill-Switch-Parametrize um die fünfte Route ergänzt (schließt den Testanteil von P7-22) | C | ✅ **vollständig, ein Advisor-Fund vor dem Commit behoben** | +9 (8 `phase7_spaces_admin/tests/test_space_removal.py`, neu + 1 Zeile im bestehenden Kill-Switch-Parametrize von `test_space_admin_api.py`); 900 gesamt |
 
 *(Weitere Zeilen entstehen mit dem Rest von Block C/B — siehe Plan §4 für die vollständige Schritt-Sequenz.)*
 
@@ -120,9 +121,9 @@ keinen Code bekommen, nur Step 0 (Haushalt) lief.
 | P7-17 | Name-Kollision mit Principal abgewiesen | Claude Code, Test | ⬜ |
 | P7-18 | Home-Space nicht entfernbar (Knopf fehlt, Route 403) | Claude Code, Test+Browser | ⬜ |
 | P7-19 | Space mit N Items entfernt → alle N im `_archive/` | Niklas | ⬜ |
-| P7-20 | Space mit nicht-schreibbarem Item nicht entfernbar, kein Teil-Move | Claude Code, Test | ⬜ |
-| P7-21 | Entfernen ohne Namensbestätigung abgewiesen | Claude Code, Test | ⬜ |
-| P7-22 | `space_admin_enabled=False` → Menüpunkt weg, Routen 404 | Claude Code, Test | ⬜ |
+| P7-20 | Space mit nicht-schreibbarem Item nicht entfernbar, kein Teil-Move | Claude Code, Test | ✅ **mit Vorbehalt** — `test_removal_blocked_by_one_unwritable_item_moves_nothing` besteht nur über eine simulierte `can_write_item_as_human`-Divergenz: unter der echten Union-ACL-Semantik (`AclReader.grants_for_dir()` unioniert immer den Space-Root-Grant) macht ein P7-L-autorisierter Ausführender jedes Item automatisch schreibbar — ein realer Blocker ist mit echten `.share.yml`-Daten unerreichbar, der Pre-Flight-Check bleibt trotzdem die zweite, unabhängige Absicherung, die N9 verlangt. **Zusätzlich, nicht im ursprünglichen Kriterium benannt:** `test_removal_blocked_by_an_already_archived_item_moves_nothing` — ein bereits archiviertes Item blockiert die Entfernung ebenfalls (`store.move()` verbietet das, `store.search()` zählt es aber mit `total`), fail-closed statt eines unbehandelten 500 |
+| P7-21 | Entfernen ohne Namensbestätigung abgewiesen | Claude Code, Test | ✅ `test_removal_requires_reauth_and_typed_confirmation` (422 bei falschem `confirm`) |
+| P7-22 | `space_admin_enabled=False` → Menüpunkt weg, Routen 404 | Claude Code, Test | ⬜ **Testanteil geschlossen** (`test_all_five_routes_404_when_space_admin_disabled` deckt jetzt alle fünf Space-Verwaltungsrouten inkl. `DELETE /api/v1/spaces/{space}`) — „Menüpunkt weg" bleibt Browser-Sache, offen bis C3 den Kill-Switch tatsächlich verdrahtet |
 | P7-23 | N-Auswahl wandert in einem Vorgang, ein Commit je Item | Niklas | ⬜ |
 | P7-24 | Ein rechteerweiterndes Item in Auswahl → ein Formular, nicht N | Niklas | ⬜ |
 
@@ -482,3 +483,81 @@ C3s Entfernen-Dialog bräuchte sonst eine Route, die noch nicht existiert; C4 zu
 vollständiges Backend in einem Rutsch. Anker vor dem Bau prüfen: `_STORE_FETCH_LIMIT`
 (V78), `store.move()`/`store.archive()`-Reihenfolge, Lock-Disziplin (P7-M) für die
 Vorlauf/Durchlauf-Schleife. Advisor-Call **vor** dem Commit.
+
+**Nachtrag, 2026-08-25 — Step C4 gebaut (Nikinger-Auftrag „lets go on with C4"), ein
+Advisor-Fund vor dem Commit behoben.**
+
+Anker gegen den echten Code geprüft, nicht nur den Plan-Snapshot übernommen:
+`_STORE_FETCH_LIMIT` (`api.py:145`, Plan nennt `144` — dieselbe Ein-Zeilen-Drift wie bei C1/C2),
+`store.archive()`/`store.move()` (`store.py:586–663`, Reihenfolge durch `archive()`s
+`folder=""`/`_archive/`-Ablage erzwungen — ein vorheriger `move()` würde die Datei sonst an die
+Zielspace-Wurzel setzen, nicht ins Zielarchiv), `acl.remove_space_dir()` (`acl.py:291–301`,
+kein eigener Vorlauf — das ist ausdrücklich C4s Job), `require_space_reauth()`
+(`shares.py:96–121`, flacher `widening`-Flag statt `widens()`-Vergleich, exakt wie geplant).
+
+`webui/api.py :: _spaces_delete` — fünfte Route `DELETE /api/v1/spaces/{space}`. Reihenfolge wie
+im Plan: P7-K (bekannter Principal → 403) → P7-L (`can_write(home, space)` → 403) → Vorlauf
+(`store.search()`-Paging über `_STORE_FETCH_LIMIT`, Blocker-Scan) → `require_space_reauth
+(widening=True)` + `confirm == space` → Durchlauf (`move()`→`archive()` je Item, `ConflictError`
+→ Abbruch mit beiden Listen) → harte `len(moved) == total`-Sperre → `acl.remove_space_dir()`.
+Antwort trägt zusätzlich `orphan_refs` (`acl.spaces_referencing()`, vor dem `rmtree` berechnet,
+da danach die eigene `.share.yml` des entfernten Space nicht mehr existiert).
+
+**Advisor-Fund vor dem Commit (empirisch verifiziert, nicht nur behauptet):** ein Testfall mit
+einem bereits archivierten Item im Zielspace fehlte. Direkt geprüft (`store.create()` +
+`store.archive()` + `store.search()` gegen ein Wegwerf-`tmp_path`): `search()`s `total` zählt
+archivierte Items mit, `store.move()` verbietet sie aber ausdrücklich
+(`ValidationError("... ist archiviert — move verboten")`, `store.py:626–627`). Ohne einen
+eigenen Riegel hätte das einen unbehandelten `ValidationError` mitten im Durchlauf ausgelöst —
+ein `500` nach bereits verschobenen Items, ohne den von N9 verlangten Bericht mit beiden Listen.
+**Behoben:** ein zweiter, eigener Vorlauf-Riegel (`archived_blockers`) lehnt die Entfernung
+fail-closed ab, wenn der Space bereits archivierte Items enthält — genau wie beim
+Schreib-Blocker wird dabei **nichts** bewegt. **Das ist eine bewusst offene Frage, keine stille
+Lücke:** N8 sagt, Items sterben nie — aber der Store hat keine API, ein bereits archiviertes
+Item in einen anderen Space zu verschieben. Eine Space mit Historie ist damit vorerst
+unentfernbar. Ob das dauerhaft tragbar ist oder eine siebte, benannte Contract-Öffnung braucht
+(`storage/store.py` bekäme eine Move-Variante für archivierte Items), ist eine Nikinger-
+Entscheidung — dieser Commit trifft sie nicht, sondern hält die Grenze fail-closed.
+
+**Zweiter, kleinerer Advisor-Fund:** `acl.spaces_referencing()` fehlte das `exclude=`, das
+`spacectl.py remove-space` für dieselbe Prüfung setzt (die eigene `.share.yml` des entfernten
+Space zählt dort nicht als Fremdreferenz auf sich selbst) — Parität-Drift gegen P7-Ks „volle
+`spacectl.py`-Parität", behoben (`exclude=store.data_root / space / acl.ACL_FILENAME`).
+
+**Ein weiterer, unabhängig entdeckter Fund beim Testen (kein Advisor-Fund, sondern ein eigener
+Testflakiness-Fehler dieser Session):** der erste Entwurf des Konflikt-Abbruch-Tests nahm an,
+`store.search()` liefere Items in Erstellungsreihenfolge — im vollen `pytest`-Lauf (echte
+Wanduhr statt eines injizierten `now_fn`, `item_store`-Fixture hier bewusst ohne `now_fn` wegen
+der Git-Commit-Reihenfolgeprüfungen) zeigte sich, dass die tatsächliche Suchreihenfolge davon
+abweicht. Test korrigiert: er fragt `store.search()` selbst nach der Verarbeitungsreihenfolge,
+statt eine Reihenfolge anzunehmen, die `_spaces_delete` nirgends verspricht.
+
+**Kill-Switch-Testlücke aus dem C2-Commit geschlossen:** `test_space_admin_api.py`s
+parametrisierter Kill-Switch-Test deckte bis jetzt nur vier von fünf Routen ab (die fünfte
+existierte zum Zeitpunkt von C2 noch nicht). Um die neue `DELETE /api/v1/spaces/{space}`-Zeile
+ergänzt — schließt den Testanteil von P7-22, der sonst als offener Rest hätte weitergetragen
+werden müssen.
+
+**Abnahmestand:** P7-20 ✅ *mit Vorbehalt* (der Schreib-Blocker ist unter der echten Union-ACL-
+Semantik — `AclReader.grants_for_dir()` unioniert immer den Space-Root-Grant — mit echten
+`.share.yml`-Daten unerreichbar, siehe Kommentar in `_spaces_delete`; der Test simuliert die
+Divergenz direkt. Der archivierte-Item-Blocker aus demselben Kriterium ist dagegen real
+erreichbar und eigenständig getestet). P7-21 ✅. P7-22 Testanteil geschlossen, Browser-Anteil
+bleibt C3. Modul-Status-Tabelle (Zeile 11) und Abnahmestand-Tabelle oben nachgezogen.
+
+**Verifiziert:** 8 neue Tests in `phase7_spaces_admin/tests/test_space_removal.py` (Vorlauf-
+Blocker × 2 — Schreibrecht + bereits archiviert —, sauberer Durchlauf, Assets wandern mit, zwei
+Commits je Item + ein `remove-space`-Commit, Verzeichnis weg, `ConflictError`-Abbruch mit beiden
+Listen, Home-Space-Riegel, Re-Auth+Bestätigung), +1 in `test_space_admin_api.py` (Kill-Switch-
+Zeile). Volle Suite **890 → 900**, real gezählt (`pytest -q`, nicht addiert). Tabu-Diff
+(`asgi.py`/`server.py`/`permissions.py`/`authserver/{crypto,totp,passwords,resolver,flows}.py`)
+leer. Kein neuer Contract-Absatz nötig — C4 fügt `storage/` nichts hinzu, es ruft nur bereits
+bestehende Funktionen (`store.search/move/archive`, `acl.remove_space_dir/spaces_referencing`)
+aus `webui/api.py` heraus auf.
+
+**Nächster Schritt, konkret:** C3 (UI) — Entfernen-Dialog gegen die jetzt vollständige C2/C4-
+REST-Fläche, Kill-Switch tatsächlich verdrahten (schließt P7-22s Browser-Anteil und macht
+`space_admin_enabled` erstmals produktiv scharf), Home-Space-Ausnahme im Menü (P7-18s
+Browser-Anteil). Danach Step C5 (Betrieb/Doku) und die Nikinger-Entscheidung zu archivierten
+Items in einem zu entfernenden Space (siehe oben) — beide unabhängig von C3, können parallel
+vorgemerkt werden.

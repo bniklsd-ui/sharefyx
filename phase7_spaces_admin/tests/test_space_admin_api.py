@@ -1,7 +1,8 @@
-"""Tests für die vier Space-Verwaltungs-Routen aus P7 Step C2 (`docs/concepts/
+"""Tests für die Space-Verwaltungs-Routen aus P7 Step C2 (`docs/concepts/
 phase7_spaces_admin_plan.md` §4.C2) — `POST /api/v1/spaces`, `GET/POST .../members`,
-`DELETE .../members/{name}`. `DELETE /api/v1/spaces/{space}` (Entfernen) ist bewusst NICHT
-hier — sein Vorlauf/Durchlauf-Algorithmus ist Step C4.
+`DELETE .../members/{name}`. `DELETE /api/v1/spaces/{space}` (Entfernen) selbst — sein
+Vorlauf/Durchlauf-Algorithmus — ist Step C4, siehe `test_space_removal.py`; der Kill-Switch-Test
+unten deckt trotzdem alle fünf Routen ab, damit P7-22 nicht halb offen bleibt.
 
 Eigene Fixtures statt `phase5_ui/tests/conftest.py`s `full_app_items` & Co.: `conftest.py`-
 Dateien werden nur entlang des Verzeichnisbaums des Testfiles selbst eingesammelt,
@@ -162,9 +163,13 @@ def _share_yml(data_root, space) -> dict:
         ("GET", f"/api/v1/spaces/{SPACE}/members", None),
         ("POST", f"/api/v1/spaces/{SPACE}/members", {"name": "fabian"}),
         ("DELETE", f"/api/v1/spaces/{SPACE}/members/fabian", None),
+        ("DELETE", f"/api/v1/spaces/{SPACE}", {"confirm": SPACE}),
     ],
 )
-async def test_all_four_routes_404_when_space_admin_disabled(disabled_app, totp_code, method, path, body):
+async def test_all_five_routes_404_when_space_admin_disabled(disabled_app, totp_code, method, path, body):
+    # Der Kill-Switch (P7-R) läuft vor jedem anderen Gate, auch vor P7-Ks Home-Space-Riegel —
+    # `SPACE` als Ziel der DELETE-Zeile ist deshalb hier unproblematisch, obwohl dieselbe Zeile
+    # gegen den echten `app` (space_admin_enabled=True) immer `forbidden` liefern würde.
     async with _client(disabled_app) as client:
         csrf = await _login(client, totp_code)
         response = await client.request(method, path, json=body, headers=_headers(csrf))

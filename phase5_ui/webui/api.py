@@ -327,14 +327,14 @@ def api_routes(
             {"folder": created}, status_code=201, headers={"Cache-Control": "no-store"},
         )
 
-    # -- Space-Verwaltung (P7 Step C2) ----------------------------------------------------
+    # -- Space-Verwaltung (P7 Step C2/C4) -------------------------------------------------
     #
-    # Vier der fünf in `docs/concepts/phase7_spaces_admin_plan.md` §4.C2 genannten Routen.
-    # `DELETE /api/v1/spaces/{space}` (Entfernen) fehlt hier bewusst — sein Vorlauf/Durchlauf-
-    # Algorithmus gehört zu Step C4, ein Stub-Handler, der bis dahin nur 400 liefert, wäre eine
-    # zweite, unvollständige Fassung derselben Regel. Der Kill-Switch (P7-R) läuft in jedem
-    # Handler zuerst, obwohl `settings.space_admin_enabled` bis C3 `False` bleibt — die Routen
-    # sind damit von Anfang an inert-per-default, nicht erst nachträglich abgesichert.
+    # Fünf der fünf in `docs/concepts/phase7_spaces_admin_plan.md` §4.C2 genannten Routen
+    # (`DELETE /api/v1/spaces/{space}` kam mit C4 dazu — sein Vorlauf/Durchlauf-Algorithmus
+    # braucht `store.search()`/`store.move()`/`store.archive()`, die die übrigen vier Routen
+    # nicht anfassen). Der Kill-Switch (P7-R) läuft in jedem Handler zuerst, obwohl
+    # `settings.space_admin_enabled` bis C3 `False` bleibt — die Routen sind damit von Anfang
+    # an inert-per-default, nicht erst nachträglich abgesichert.
 
     async def _spaces_post(request: Request) -> Response:
         session = await _require_session(request)
@@ -432,6 +432,121 @@ def api_routes(
         acl.remove_member(store.data_root, space, name)
         return JSONResponse(
             {"space": space, "name": name}, headers={"Cache-Control": "no-store"},
+        )
+
+    async def _spaces_delete(request: Request) -> Response:
+        """Zweiphasiger Space-Entfernen-Algorithmus (Plan §4.C4, P7-O/N8/N9). Die Orchestrierung
+        hält zu keinem Zeitpunkt selbst den `.write.lock` (P7-M) — jeder `store`-/`acl`-Aufruf
+        sperrt für sich, in seiner eigenen Sektion.
+        """
+        session = await _require_session(request)
+        if not settings.space_admin_enabled:
+            raise ApiError("not_found", "Nicht gefunden.")
+        await _require_csrf_json(request, session)
+        space = request.path_params["space"]
+        home = session.space
+
+        if users.get(space) is not None:
+            raise ApiError(
+                "forbidden", "Ein Home-Space kann nicht entfernt werden (nur der Zugehörige)."
+            )
+        if not permissions.can_write(home, space):
+            raise ApiError("forbidden", "Keine Schreibrechte für diesen Space.")
+
+        # VORLAUF — kein Schreibvorgang, kein Commit. `_STORE_FETCH_LIMIT` ist eine echte
+        # Obergrenze, kein Seitenmaß (`_items_get` schneidet danach in Python) — ein einzelner
+        # Aufruf über einem großen Space prüfte sonst nur eine Teilmenge, meldete "sauber", der
+        # Durchlauf verschöbe nur diese Teilmenge, und Schritt 4 rmtree'te den Rest. Genau der
+        # Datenverlust, den N8/N9 verhindern sollen.
+        items = []
+        offset = 0
+        while True:
+            page = store.search(space=space, limit=_STORE_FETCH_LIMIT, offset=offset)
+            items.extend(page.items)
+            offset += len(page.items)
+            if len(items) >= page.total or not page.items:
+                break
+        total = len(items)
+
+        blockers = [
+            item.id for item in items
+            if not permissions.can_write_item_as_human(home, store.acl_of(item.id))
+        ]
+        if blockers:
+            raise ApiError(
+                "forbidden",
+                f"{len(blockers)} Item(s) in diesem Space sind für dich nicht schreibbar — "
+                "nichts wurde bewegt.",
+                detail={"blockers": blockers},
+            )
+        # Ein bereits archiviertes Item lässt sich nicht `move()`n (`store.py`: „ist archiviert
+        # — move verboten"). N8 sagt: Items sterben nie, aber der Store hat keine API, ein
+        # archiviertes Item in einen anderen Space zu verschieben — genau der Fall, den `store.
+        # search()`s Empirie hier zeigte (`total` zählt archivierte Items mit). Fail-closed statt
+        # eines unbehandelten `ValidationError` mitten im Durchlauf (das wäre ein 500 nach K
+        # bereits verschobenen Items, ohne Bericht — ein Bruch von N9). Eine Space mit Historie
+        # wird damit vorerst unentfernbar; ob das dauerhaft tragbar ist oder eine siebte
+        # Contract-Öffnung braucht (Store bekommt eine Move-Variante für archivierte Items), ist
+        # eine Nikinger-Entscheidung, keine, die dieser Commit trifft.
+        archived_blockers = [item.id for item in items if item.status == "archived"]
+        if archived_blockers:
+            raise ApiError(
+                "forbidden",
+                f"{len(archived_blockers)} bereits archivierte Item(s) in diesem Space können "
+                "nicht automatisch verschoben werden — nichts wurde bewegt.",
+                detail={"archived_blockers": archived_blockers},
+            )
+
+        body = await _json_body(request)
+        require_space_reauth(
+            session, body, widening=True,
+            userdir=users, throttle=throttle, auth_store=auth_store,
+        )
+        if body.get("confirm") != space:
+            raise ApiError(
+                "validation_failed", "'confirm' muss exakt dem Space-Namen entsprechen."
+            )
+
+        # DURCHLAUF, Item für Item. Bei einem `ConflictError` mitten im Lauf: ABBRUCH, Bericht,
+        # Space bleibt stehen — bereits verschobene Items bleiben verschoben, ein Rollback
+        # existiert nicht, weil Git-Commits sich nicht zurücknehmen lassen (N9).
+        moved: list[str] = []
+        try:
+            for item in items:
+                it = store.move(item.id, version=item.version, space=home, folder="")
+                store.archive(it.id, version=it.version)
+                moved.append(item.id)
+        except ConflictError as exc:
+            remaining = [item.id for item in items if item.id not in moved]
+            raise ApiError(
+                "conflict",
+                f"Abbruch beim Entfernen von '{space}': {len(moved)} von {total} Item(s) "
+                "bereits verschoben, Rest steht noch. Space bleibt bestehen.",
+                detail={"moved": moved, "remaining": remaining},
+            ) from exc
+
+        # HARTE SPERRE VOR DEM rmtree — der letzte Schutz gegen jeden Zählfehler weiter oben,
+        # wird nicht wegoptimiert, auch wenn sie hier redundant aussieht.
+        if len(moved) != total:
+            raise ApiError(  # pragma: no cover - durch den Vorlauf/Durchlauf-Aufbau unerreichbar
+                "conflict",
+                f"Abbruch beim Entfernen von '{space}': nur {len(moved)} von {total} Item(s) "
+                "archiviert. Verzeichnis bleibt bestehen.",
+                detail={"moved": moved},
+            )
+        # Vor dem `rmtree`: welche fremden `.share.yml`-Dateien den entfernten Space noch nennen
+        # (`acl.spaces_referencing()`, dieselbe Prüfung wie `spacectl.py remove-space`) — reine
+        # Information für den Menschen, nichts davon wird hier bereinigt. `exclude` spiegelt
+        # `spacectl.py`s Aufruf: die eigene `.share.yml` des entfernten Space zählt nicht als
+        # Fremdreferenz auf sich selbst.
+        orphan_refs = acl.spaces_referencing(
+            store.data_root, space, exclude=store.data_root / space / acl.ACL_FILENAME,
+        )
+        acl.remove_space_dir(store.data_root, space)
+
+        return JSONResponse(
+            {"removed": space, "archived": len(moved), "orphan_refs": orphan_refs},
+            headers={"Cache-Control": "no-store"},
         )
 
     async def _overview(request: Request) -> Response:
@@ -898,6 +1013,7 @@ def api_routes(
             "/api/v1/spaces/{space}/members/{name}", _catch(_space_members_delete),
             methods=["DELETE"],
         ),
+        Route("/api/v1/spaces/{space}", _catch(_spaces_delete), methods=["DELETE"]),
         Route("/api/v1/meta", _catch(_meta), methods=["GET"]),
         Route("/api/v1/overview", _catch(_overview), methods=["GET"]),
         Route("/api/v1/updates", _catch(_updates_get), methods=["GET"]),
