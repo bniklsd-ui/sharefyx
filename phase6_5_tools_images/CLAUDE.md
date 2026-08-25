@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase6_5_tools_images_plan.md   # voller Plan, Entscheidungen P6.5-A–P6.5-V, §0.0 gelockte N1–N6, Steps 0/A/B
   - ../phase6_shares/IMAGES_PLAN.md                  # Vorgänger-Zusatzplan, nachrangig seit 2026-08-20
   - SESSIONS_ARCHIVE.md                              # ältere Session-Blöcke, newest-first
-updated: 2026-08-23 (P7 Step A8.1 -- P6.5-8/13 per testnutzer-p7-Substitution geschlossen, 12 von 14 Zeilen, P6.5-12-Status auf "gebaut, ungeprueft" korrigiert nach P7 Step A3, Details in phase7_spaces_admin/CLAUDE.md) | 2026-08-23 (P6.5-5/7/10/11 per echtem Chrome-Connector bestanden -- 10 von 14 Zeilen, ein echter Lueckenfund: kein Entfernen-Knopf in editor.js trotz gebautem DELETE-Endpoint, P6.5-12 dadurch blockiert, zwoelfte Rotation gelaufen)
+updated: 2026-08-25 (P6.5-12 per echtem Browser-Klick gegen die reparierte Live-Instanz geschlossen -- 13 von 14 Zeilen, nur noch P6.5-14 offen, Details in phase7_spaces_admin/CLAUDE.md) | 2026-08-23 (P7 Step A8.1 -- P6.5-8/13 per testnutzer-p7-Substitution geschlossen, 12 von 14 Zeilen, P6.5-12-Status auf "gebaut, ungeprueft" korrigiert nach P7 Step A3, Details in phase7_spaces_admin/CLAUDE.md) | 2026-08-23 (P6.5-5/7/10/11 per echtem Chrome-Connector bestanden -- 10 von 14 Zeilen, ein echter Lueckenfund: kein Entfernen-Knopf in editor.js trotz gebautem DELETE-Endpoint, P6.5-12 dadurch blockiert, zwoelfte Rotation gelaufen)
 ---
 # CLAUDE.md — Phase 6.5: Werkzeug-Ergonomie und Bilder (`phase6_5_tools_images/`)
 
@@ -73,20 +73,18 @@ mehr editiert — der laufende Abnahmestand lebt hier, wie bei jeder Vorgängerp
 | P6.5-9 | Ein Upload = genau ein Git-Commit | B | ✅ | Claude Code, `git log --oneline`, 2026-08-23 — `320a737 asset itm_e33d2906 [niklas]`, ein einziger Commit für den Asset-Pfad, getrennt von `create`/`patch` |
 | P6.5-10 | Cross-Space-Move nimmt Bild mit, ein Commit | B | ✅ | Nikinger (echter Login, TOTP), Claude Code verifiziert per `git log` + Browser, 2026-08-23 — `5d06187 move itm_de2e4fd8 [IT-Sekus-Projekt]` trägt `.md` UND `_assets/itm_de2e4fd8/` in einem Commit, Bild rendert nach dem Move im neuen Space sichtbar |
 | P6.5-11 | Fremde `<img>`-URLs/`javascript:` kein Netzabruf, kein `<img>` | B | ✅ | Claude Code, echter `claude-in-chrome`-Connector + `read_network_requests`, 2026-08-23 — Body testweise um eine `example.com`-URL und eine `javascript:`-URL erweitert (danach zurückgesetzt): DOM zeigt exakt ein `<img>` (die echte `asset:`-Referenz), kein Request an `example.com`, kein zweites `<img>`-Element |
-| P6.5-12 | Bild entfernbar, Referenz rendert danach als Alt-Text | B | 🟡 gebaut, ungeprüft | **[2026-08-23 Korrektur, P7 Step A3]** die „nicht testbar/keine Lücke mehr"-Aussage unten war stale — P7s Step A3 hat den Entfernen-Knopf gebaut (`renderAssetStrip()`/`assetIds`-Kontextschlüssel, `editor.js`/`markdown.js`), siehe `phase7_spaces_admin/CLAUDE.md`. **Backend-/Store-Verhalten nur per `pytest` bewiesen, kein echter Browser-Klick diese Session** — bleibt deckungsgleich mit P7-5 (⬜ dort, 🟡 hier: der Knopf existiert, ist aber unverifiziert, kein reiner Blocker mehr) |
+| P6.5-12 | Bild entfernbar, Referenz rendert danach als Alt-Text | B | ✅ | **[2026-08-25, echter Browser-Klick]** `testnutzer-p7`, `claude-in-chrome`-Connector gegen die jetzt aktuelle Live-Instanz (`53bad20`, Deploy behoben den A8-Blocker vom Vortag): Testitem `itm_26f8d0b7` angelegt, `p65-retest.png` per `put_item_asset` hochgeladen (`naturalWidth/Height:4`, sichtbar), „Bild entfernen"-Knopf (`ref` auf den ×-Chip im Asset-Strip) geklickt, Bestätigungsdialog „wird in den Papierkorb des Items verschoben" bestätigt. **Read-only gegengeprüft, nicht nur den Toast vertraut:** `.md`-Referenz `![p65-retest.png](asset:ast_e60e8d8a)` unverändert, rendert in der Vorschau als reiner Text (kein `<img>`, kein Broken-Icon); Datei liegt real unter `_assets/itm_26f8d0b7/_trash/ast_e60e8d8a.png`; `git log` zeigt einen eigenen `asset_trash itm_26f8d0b7`-Commit, getrennt vom vorherigen `update`. Testitem danach archiviert |
 | P6.5-13 | Claude sieht fremdes Bild nur bei `share_write`, nicht bei reinem `share_read` | B | ✅ (via `testnutzer-p7`) | **[2026-08-23, P7-Plan §A8.1 gebilligte Substitution]** `phase7_spaces_admin/scripts/p7_13_asset_share_gate_probe.py`, echter OAuth-Fluss: `share_read` allein → `get_item_asset` liefert `bytes_available:false` (nur Metadaten); nach Erweiterung auf `share_write` → echte Bild-Bytes (`image/png`). Genau das in `tools.py :: get_item_asset()` kommentierte P6.5-M-Verhalten, empirisch bestätigt, kein neuer Sicherheitsbefund |
 | P6.5-14 | Kündigt jeden Upload an, lädt nie unaufgefordert | B | offen | Nikinger, echter Connector, zwei Gespräche — zwei Datenpunkte liegen vor (Gate-A→B-Sitzung + diese Sitzung, beide Male vor jedem `put_item_asset` angekündigt), aber die Kriterienbewertung selbst ist Sache des Nikingers |
 
-**[2026-08-23 Korrektur, P7 Step A8.1] 12 von 14 live bestanden, Block A vollständig, Block B
-größtenteils** (Block A: 4 von 4, Block B: 8 von 10) — P6.5-8/13 per gebilligter
-`testnutzer-p7`-Substitution geschlossen (siehe Zeilen oben), **nicht** wie zuvor hier
-festgehalten „brauchen Fabians eigenes Login" — das war der Stand vor P7s dritten Principal.
-Verbleibend offen: **P6.5-12** (Knopf jetzt gebaut, aber ungeprüft — kein Blocker mehr, siehe
-oben) und **P6.5-14** (Nikingers eigene Bewertung, kein Selbstzertifizierungs-Kriterium — bleibt
-grundsätzlich außerhalb dessen, was ein Skript oder ein zweiter Testprincipal je schließen kann).
-Volle Herleitung der beiden neuen Proben: `phase7_spaces_admin/CLAUDE.md`s Session-Block
-2026-08-23 (A8). Geerbte, in dieser Phase nicht gelöste Live-Proben aus P6 (Abnahmezeilen
-25–30/35–39, Gate A→B Punkt 3, `diagnose.sh` vor jedem Deploy): unverändert offen, siehe Plan §6
+**[2026-08-25] 13 von 14 live bestanden, Block A vollständig, Block B fast vollständig**
+(Block A: 4 von 4, Block B: 9 von 10) — P6.5-12 per echtem Browser-Klick gegen die reparierte
+Live-Instanz geschlossen (siehe Zeile oben). Verbleibend offen: **P6.5-14** (Nikingers eigene
+Bewertung, kein Selbstzertifizierungs-Kriterium — bleibt grundsätzlich außerhalb dessen, was ein
+Skript oder ein zweiter Testprincipal je schließen kann). Volle Herleitung P6.5-12:
+`phase7_spaces_admin/CLAUDE.md`s Session-Block 2026-08-25. Geerbte, in dieser Phase nicht
+gelöste Live-Proben aus P6 (Abnahmezeilen 25–30/35–39, Gate A→B Punkt 3, `diagnose.sh` vor jedem
+Deploy): unverändert offen, siehe Plan §6
 Fußnote.
 
 ---

@@ -9,7 +9,7 @@ down:
   - ../docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md   # Herkunft: P6-Status, §4.1/§4.2, offene Entscheidungen §5.1–§5.7
   - ../phase6_shares/ITEM_MOVE_PLAN.md              # §9 Mehrfachauswahl (P6-AK–AN) — Block B baut das, unverändert
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-08-25 (echter deploy.sh-Lauf durch den Nikinger, Live-Release jetzt 53bad20 statt f96125e, A3s asset-strip live, P6.5-12 wieder testbar) | 2026-08-23 (A8: Phase 6.5 formal abgeschlossen als 🟡, 12/14, P6.5-8/13 via testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, P1-Contract-Absatz aktualisiert) | 2026-08-23 (Step 0 gestartet, Doku-Audit gefahren, Skelett angelegt)
+updated: 2026-08-25 (P6.5-12/P7-5 per echtem Browser-Klick bestanden, testnutzer-p7-Substitution, 13/14 in Phase 6.5) | 2026-08-25 (echter deploy.sh-Lauf durch den Nikinger, Live-Release jetzt 53bad20 statt f96125e, A3s asset-strip live, P6.5-12 wieder testbar) | 2026-08-23 (A8: Phase 6.5 formal abgeschlossen als 🟡, 12/14, P6.5-8/13 via testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, P1-Contract-Absatz aktualisiert) | 2026-08-23 (Step 0 gestartet, Doku-Audit gefahren, Skelett angelegt)
 ---
 # CLAUDE.md — Phase 7: Space-Verwaltung, Mehrfachauswahl, Konsolidierung (`phase7_spaces_admin/`)
 
@@ -101,7 +101,7 @@ keinen Code bekommen, nur Step 0 (Haushalt) lief.
 | P7-2 | ID-Suche findet Item spaceübergreifend | Niklas | 🟡 Backend per Test bewiesen, keine Browserprobe |
 | P7-3 | ID-Suche auf nicht lesbares Item → leere Liste | Claude Code, Test | ✅ `test_id_lookup_respects_read_permission` |
 | P7-4 | Claude nennt Items beim Titel, nicht der ID | Niklas, echter Connector | ⬜ Text steht in vier Tool-Beschreibungen, kein Connector-Beweis |
-| P7-5 | Bild im Editor entfernbar, landet in `_trash/` | Niklas | ⬜ gebaut, ungeprüft |
+| P7-5 | Bild im Editor entfernbar, landet in `_trash/` | Niklas | ✅ (via `testnutzer-p7`) — **[2026-08-25]** echter Browser-Klick, `itm_26f8d0b7`/`ast_e60e8d8a`, siehe Session-Block |
 | P7-6 | `PATCH` mit Tippfehler-Feld abgewiesen (O6) | Claude Code, Test | ✅ `test_items_patch_rejects_an_unknown_field` |
 | P7-7 | Speichern/Verschieben/Freigeben nach Whitelist unverändert | Niklas | 🟡 Whitelist per Test gegen die real gesendeten Felder gepinnt, keine Browserprobe |
 | P7-8 | Migration: 0 `.md` ohne `visibility:` | Nikinger + Claude Code | ✅ `--apply` 2026-08-23, `items_migrated:73` (deckungsgleich Dry-Run), `grep -L '^visibility:'`→0, 3 Commits (niklas/fabian/IT-Sekus-Projekt) |
@@ -197,3 +197,39 @@ Doku-Commit von oben — die Live-Instanz läuft damit fünf Commits weiter als 
 und enthält jetzt A3s `<div id="asset-strip">`. **P6.5-12 ist damit wieder testbar, noch nicht
 erneut geprobt** — nächster Schritt bleibt derselbe Browser-Test wie oben beschrieben, nur ohne
 den Deploy-Blocker davor.
+
+**Nachtrag, 2026-08-25 — P6.5-12/P7-5 per echtem Browser-Klick bestanden.** `testnutzer-p7` war
+bereits über eine vom Nikinger geöffnete Tab eingeloggt (Cookie), meine eigene MCP-Tab teilt das
+Cookie, aber `sessionStorage`s `sfx:csrf` ist tab-lokal und wird nur von der
+`/ui/login`-Bootstrap-Antwort gesetzt (derselbe Mechanismus wie am 2026-08-23) — ein erster
+Schreibversuch (Item anlegen) schlug entsprechend mit `CSRF-Token fehlt oder stimmt nicht` fehl.
+Der Nikinger loggte sich erneut in der von mir gesteuerten Tab ein (eigenes Terminal, Zugangsdaten
+nie durch mich gelesen); `sessionStorage.getItem('sfx:csrf')` bestätigte danach einen Token.
+
+**Testablauf, per Transkript:** Item `itm_26f8d0b7` angelegt, `p65-retest.png` (4×4-PNG, per
+PIL erzeugt) über `file_upload` + den echten Datei-Input hochgeladen, Asset-Chip
+`ast_e60e8d8a` samt „×"-Knopf erschien im Asset-Strip (`ref_251`, ARIA-Label bereits „Bild
+entfernen" — die vorher fehlende Fläche existiert jetzt wirklich im DOM). Vorschau bestätigte
+das Bild vor dem Entfernen (`naturalWidth/Height:4`, korrekter `src`). „Bild entfernen" geklickt
+→ Bestätigungsdialog „wird aus dem Dokument entfernt und in den Papierkorb des Items
+verschoben" → bestätigt → Toast „Bild entfernt.". Vorschau danach: `p65-retest.png` als reiner
+Text, kein `<img>`, kein Broken-Icon.
+
+**Read-only gegengeprüft, nicht nur den Toast vertraut:** `.md`-Datei enthält weiterhin exakt
+`![p65-retest.png](asset:ast_e60e8d8a)` — der Server schreibt die Referenz beim Entfernen nicht
+um, nur die fehlende Asset-Datei macht sie zum Alt-Text (N5-Design, wie geplant). Datei liegt
+real unter `_assets/itm_26f8d0b7/_trash/ast_e60e8d8a.png`. `git log` zeigt vier saubere,
+getrennte Commits: `create` → `asset` → `update` (die `asset:`-Referenz im Body) →
+`asset_trash` — kein Commit vermischt zwei Aktionen. Testitem danach archiviert
+(`_archive/itm_26f8d0b7__...`), Trash-Asset bewusst nicht angerührt (ist der Beweis).
+
+**Ergebnis: P6.5-12 ✅, P7-5 ✅ (via `testnutzer-p7`, gleicher Substitutionsgrund wie
+P6.5-8/13 — dieselbe serverseitige Fläche, kein Bug-Risiko durch den Principal).**
+`phase6_5_tools_images/CLAUDE.md` Abnahmestand jetzt **13 von 14** (nur noch P6.5-14 offen,
+strukturell Nikinger-Sache). Modul-Status-Tabelle oben (P7-5) nachgezogen.
+
+**Verifiziert:** keine Testsuite gelaufen (reine Live-Browser-/Doku-Session, kein Python-Diff).
+Tabu-Diff nicht relevant.
+
+**Offen für die nächste Session:** P7-9 (A6-Purge-Rückgang, `token_families` ab 2026-08-28,
+`clients` ab 2026-10-27, rein beobachtend) — sonst nichts Neues aus dieser Sitzung.
