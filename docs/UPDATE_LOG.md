@@ -9,6 +9,9 @@
      (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
+## 2026-08-25
+- Neuer Knopf zum Entfernen von Bildern aus einer Notiz — das Bild wandert in den Papierkorb, die Textstelle bleibt als reiner Bildname stehen.
+
 ## 2026-08-23
 - Interner Aufräumschritt: jede bestehende Notiz trägt jetzt explizit "privat" in ihren Metadaten — das war schon vorher der geltende Standardwert, sichtbar ändert sich für dich nichts.
 
