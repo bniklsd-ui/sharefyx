@@ -251,6 +251,77 @@
   </div>
 </div>
 
+<!-- Space-Verwaltung (P7 Step C3, P7-Q) -- Liste aller schreibbaren Spaces, je Space
+     Mitgliederverwaltung, Anlegen. Home-Spaces erscheinen in der Liste, aber ohne
+     Entfernen-Knopf (P7-K) -- das Entfernen selbst laeuft ueber #space-remove-dialog. -->
+<div class="overlay" id="space-admin-dialog" hidden>
+  <div class="overlay__panel">
+    <h2>Spaces verwalten</h2>
+    <p class="form-error" id="space-admin-error" hidden></p>
+    <div id="space-admin-list"></div>
+    <div class="overlay__actions">
+      <input type="text" class="input" id="space-create-name-input" placeholder="Name des neuen Space">
+      <button type="button" class="btn" id="space-create-submit">Space anlegen</button>
+    </div>
+    <hr>
+    <div id="space-detail" hidden>
+      <h3 id="space-detail-name"></h3>
+      <p class="overlay__hint" id="space-detail-home-hint" hidden>Dies ist ein Home-Space -- er
+        kann nicht entfernt werden, nur seine Mitgliederliste.</p>
+      <ul id="space-member-list"></ul>
+      <div class="overlay__actions">
+        <input type="text" class="input" id="space-member-name-input" placeholder="Name">
+        <select class="input" id="space-member-write-select">
+          <option value="">lesen</option>
+          <option value="write">schreiben</option>
+        </select>
+        <button type="button" class="btn" id="space-member-add-submit">Hinzufügen</button>
+      </div>
+      <div id="space-member-reauth-fields" hidden>
+        <label>Passwort
+          <span class="pw-field">
+            <input type="password" class="input" id="space-member-reauth-password" autocomplete="current-password">
+            <button type="button" class="btn pw-toggle" data-target="space-member-reauth-password" aria-pressed="false">Anzeigen</button>
+          </span>
+        </label>
+        <label>Code aus der Authenticator-App
+          <input type="text" class="input" id="space-member-reauth-totp" autocomplete="one-time-code">
+        </label>
+      </div>
+      <button type="button" class="btn" id="space-remove-open">Space entfernen</button>
+    </div>
+    <div class="overlay__actions">
+      <button type="button" class="btn" id="space-admin-close">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="space-remove-dialog" hidden>
+  <div class="overlay__panel">
+    <h2>Space entfernen</h2>
+    <p class="overlay__hint" id="space-remove-consequence"></p>
+    <p class="form-error" id="space-remove-error" hidden></p>
+    <label>Namen zur Bestätigung eintippen
+      <input type="text" class="input" id="space-remove-confirm-input">
+    </label>
+    <div id="space-remove-reauth-fields" hidden>
+      <label>Passwort
+        <span class="pw-field">
+          <input type="password" class="input" id="space-remove-reauth-password" autocomplete="current-password">
+          <button type="button" class="btn pw-toggle" data-target="space-remove-reauth-password" aria-pressed="false">Anzeigen</button>
+        </span>
+      </label>
+      <label>Code aus der Authenticator-App
+        <input type="text" class="input" id="space-remove-reauth-totp" autocomplete="one-time-code">
+      </label>
+    </div>
+    <div class="overlay__actions">
+      <button type="button" class="btn-primary" id="space-remove-submit">Entfernen</button>
+      <button type="button" class="btn" id="space-remove-cancel">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="conflict-dialog" hidden>
   <div class="overlay__panel">
     <h2>Konflikt</h2>
@@ -282,7 +353,7 @@
     <p class="overlay__hint">Danach musst du jeden Connector neu autorisieren, und andere
       angemeldete Browser werden abgemeldet. Diese Sitzung bleibt bestehen.</p>
     <button type="button" class="btn account-updates-link" id="account-show-updates">Update-Log ansehen</button>
-    <button type="button" class="btn" id="account-manage-spaces" disabled title="Kommt in Phase 7">Geteilte Spaces verwalten — kommt in Phase 7</button>
+    <button type="button" class="btn" id="account-manage-spaces">Spaces verwalten</button>
     <p class="form-error" id="account-error" hidden></p>
     <label>Aktuelles Passwort
       <span class="pw-field">

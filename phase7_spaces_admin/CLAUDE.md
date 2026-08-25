@@ -9,7 +9,7 @@ down:
   - ../docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md   # Herkunft: P6-Status, §4.1/§4.2, offene Entscheidungen §5.1–§5.7
   - ../phase6_shares/ITEM_MOVE_PLAN.md              # §9 Mehrfachauswahl (P6-AK–AN) — Block B baut das, unverändert
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-08-25 (Step C4 Nachtrag -- Nikinger-Entscheidung: siebte Contract-Oeffnung statt archived_blockers-Riegel, storage/store.py :: move() erlaubt Space-Wechsel fuer archivierte Items, create(status=archived) faengt jetzt denselben Fall ab, 903 Tests gruen) | 2026-08-25 (Step C4 gebaut -- zweiphasiger Space-Entfernen-Algorithmus, Advisor-Fund: bereits archivierte Items brauchen einen eigenen Vorlauf-Riegel, P7-20/P7-21/Testanteil-P7-22 geschlossen) | 2026-08-25 (Gate A->C geprueft, alle vier Punkte live -- Block C gestartet, Step C1: Schreibseite von .share.yml in storage/acl.py, sechste Contract-Oeffnung gebaut) | 2026-08-25 (P7-4 erster echter Befund: FAIL, ID statt Titel genannt; P7-12-Abbau geprueft und bewusst NICHT gefahren -- Block C/P7-14 braucht testnutzer-p7 noch) | 2026-08-25 (P7-1/P7-2/P7-7 per echtem Browser-Klick bestanden, git-Reparatur nach Nikinger-Freigabe, nur noch P7-4/P7-9/P7-12 offen) | 2026-08-25 (P6.5-12/P7-5 per echtem Browser-Klick bestanden, testnutzer-p7-Substitution, 13/14 in Phase 6.5) | 2026-08-25 (echter deploy.sh-Lauf durch den Nikinger, Live-Release jetzt 53bad20 statt f96125e, A3s asset-strip live, P6.5-12 wieder testbar) | 2026-08-23 (A8: Phase 6.5 formal abgeschlossen als 🟡, 12/14, P6.5-8/13 via testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, P1-Contract-Absatz aktualisiert) | 2026-08-23 (Step 0 gestartet, Doku-Audit gefahren, Skelett angelegt)
+updated: 2026-08-25 (Step C3 gebaut -- Space-Verwaltung UI, spaces.js neu, echter Browser-Lauf gegen eine Wegwerf-Instanz Ende-zu-Ende bestanden, zwei Advisor-Funde vor dem Commit behoben, 904 Tests gruen) | 2026-08-25 (Step C4 Nachtrag -- Nikinger-Entscheidung: siebte Contract-Oeffnung statt archived_blockers-Riegel, storage/store.py :: move() erlaubt Space-Wechsel fuer archivierte Items, create(status=archived) faengt jetzt denselben Fall ab, 903 Tests gruen) | 2026-08-25 (Step C4 gebaut -- zweiphasiger Space-Entfernen-Algorithmus, Advisor-Fund: bereits archivierte Items brauchen einen eigenen Vorlauf-Riegel, P7-20/P7-21/Testanteil-P7-22 geschlossen) | 2026-08-25 (Gate A->C geprueft, alle vier Punkte live -- Block C gestartet, Step C1: Schreibseite von .share.yml in storage/acl.py, sechste Contract-Oeffnung gebaut) | 2026-08-25 (P7-4 erster echter Befund: FAIL, ID statt Titel genannt; P7-12-Abbau geprueft und bewusst NICHT gefahren -- Block C/P7-14 braucht testnutzer-p7 noch) | 2026-08-25 (P7-1/P7-2/P7-7 per echtem Browser-Klick bestanden, git-Reparatur nach Nikinger-Freigabe, nur noch P7-4/P7-9/P7-12 offen) | 2026-08-25 (P6.5-12/P7-5 per echtem Browser-Klick bestanden, testnutzer-p7-Substitution, 13/14 in Phase 6.5) | 2026-08-25 (echter deploy.sh-Lauf durch den Nikinger, Live-Release jetzt 53bad20 statt f96125e, A3s asset-strip live, P6.5-12 wieder testbar) | 2026-08-23 (A8: Phase 6.5 formal abgeschlossen als 🟡, 12/14, P6.5-8/13 via testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, P1-Contract-Absatz aktualisiert) | 2026-08-23 (Step 0 gestartet, Doku-Audit gefahren, Skelett angelegt)
 ---
 # CLAUDE.md — Phase 7: Space-Verwaltung, Mehrfachauswahl, Konsolidierung (`phase7_spaces_admin/`)
 
@@ -80,6 +80,7 @@ Abnahmezeilen: `docs/concepts/phase7_spaces_admin_plan.md`.
 | 10 | C2 (REST-Fläche für Space-Verwaltung): vier der fünf in Plan §4.C2 genannten Routen — `POST /api/v1/spaces`, `GET/POST .../{space}/members`, `DELETE .../{space}/members/{name}` (`DELETE /api/v1/spaces/{space}` bleibt C4, sein Vorlauf/Durchlauf-Algorithmus gehört dorthin, ein Stub-Handler wäre eine zweite unvollständige Fassung derselben Regel). `webui/shares.py :: require_space_reauth()` (neu, Re-Auth bei Mitglied-Hinzufügen, keins bei -Entfernen, P7-N) — ruft `verify_reauth()` direkt auf, keine neue Extraktion nötig: die im Plan beschriebene `_verify_reauth_credentials()`-Extraktion existiert bereits als `webui/reauth.py :: verify_reauth()` (gebaut vor dieser Phase, von `account.py` UND `shares.py` geteilt) — Plan-Text war insofern stale, keine neue Arbeit. `storage/store.py :: Store.data_root` (neue Read-Property, kein neues Verhalten, keine siebte Öffnung). `_meta` bekommt `space_admin` | C | ✅ **vollständig, zwei Advisor-Runden vor dem Commit** | +23 (21 `phase7_spaces_admin/tests/test_space_admin_api.py` neu + 1 `phase5_ui/tests/test_meta.py` + 1 `phase1_storage/tests/test_store.py`); 890 gesamt |
 | 11 | C4 (Space entfernen, zweiphasig, P7-O/N8/N9): fünfte Route `DELETE /api/v1/spaces/{space}` in `webui/api.py :: _spaces_delete`. Vorlauf (kein Schreibvorgang) über `store.search()`-Paging mit `_STORE_FETCH_LIMIT`, Blocker-Scan via `permissions.can_write_item_as_human(home, store.acl_of(...))`; `require_space_reauth(widening=True)` + `confirm == space`; Durchlauf `store.move()` → `store.archive()` je Item; harte `len(moved) == total`-Sperre vor `acl.remove_space_dir()`. **Advisor-Fund (empirisch, vor dem ersten Commit):** `store.search()` zählt bereits archivierte Items mit (`total` schließt sie ein), `store.move()` verbot sie zu diesem Zeitpunkt aber noch explizit — ohne einen Riegel hätte das einen unbehandelten `ValidationError`/500 mitten im Durchlauf ausgelöst, ohne den von N9 verlangten Bericht. **Erster Fix in diesem Commit: ein Vorlauf-Riegel `archived_blockers`, fail-closed** — eine Space mit archivierten Items wäre damit vorerst unentfernbar gewesen. **Überholt durch Zeile 12 in derselben Sitzung** (Nikinger-Entscheidung, siehe unten) — der Riegel existiert im finalen Code nicht mehr. Zweiter, weiterhin gültiger Advisor-Fund: `acl.spaces_referencing()` fehlte das `exclude=`, das `spacectl.py remove-space` für dieselbe Prüfung setzt (Parität-Drift, behoben). `phase7_spaces_admin/tests/test_space_admin_api.py`s Kill-Switch-Parametrize um die fünfte Route ergänzt (schließt den Testanteil von P7-22) | C | ✅ **vollständig** | siehe Zeile 12 für die finale Testzahl |
 | 12 | Nikinger-Entscheidung auf Nachfrage (dieselbe Sitzung): siebte, benannte Contract-Öffnung statt des `archived_blockers`-Riegels aus Zeile 11 — `storage/store.py :: move()` erlaubt jetzt einen reinen Space-Wechsel für archivierte Items (echter Ordner-Wechsel bleibt verboten), `_write_item_file()` legt sie dabei ins Ziel-`_archive/`. Zweiter Advisor-Fund vor diesem Commit: `create(status="archived")` (über MCP/REST erreichbar) lief am ursprünglichen Riegel vorbei und hätte sonst eine Divergenz erzeugt — `create()` setzt jetzt selbst `folder=""` bei `status="archived"`. `_spaces_delete` ruft `archive()` nur noch für Items auf, die `move()` nicht schon als archiviert zurückgibt (kein doppelter Commit). Volle Herleitung, inkl. der Anker-Prüfung gegen `phase1_storage/storage/store.py`, in `phase1_storage/CLAUDE.md`s „Geerbte Contracts" (siebte Öffnung) | C | ✅ **vollständig** | +4 `phase1_storage/tests/test_store.py` (3 ersetzen `test_move_of_archived_item_is_rejected`, 1 neu) + 1 `phase7_spaces_admin/tests/test_space_removal.py` (ersetzt den 403-Test aus Zeile 11 durch einen 200-Test); 903 gesamt |
+| 13 | C3 (Oberfläche): Menüpunkt scharf geschaltet (`app.html` verliert `disabled`/„kommt in Phase 7"), `webui/config.py :: UiSettings.space_admin_enabled` Default `False`→`True` (P7-R, schließt den in `phase6_shares/CLAUDE.md` Zeile 16 gebauten Seam). Neues Modul `webui/static/js/spaces.js` (P7-Q): `openSpaceAdminDialog()`/Liste aller `writable`-Spaces, `selectSpace()` lädt `GET .../members`, Mitglieder-Hinzufügen (immer Re-Auth, eingefroren wie `dialogs.js`s `pendingMoveBody`)/-Entfernen (kein Re-Auth), `openRemoveSpaceDialog()` (Klartext-Konsequenz + getippte Bestätigung + Re-Auth). `app.html`: `#space-admin-dialog`/`#space-remove-dialog`, Geschwister von `#share-dialog`. `app.js`: `initSpaces()` in den Bootstrap, beide neuen Dialoge in `anyOverlayOpen()`/Escape, `account-manage-spaces`-Klick öffnet den Dialog, **`meta.space_admin` blendet den Menüpunkt aus** (P7-R — statisches HTML kennt den Kill-Switch sonst nicht, P5-T). **Zwei Advisor-Funde vor dem Commit:** (1) `selectSpace()` setzte `pendingMemberBody`/die Re-Auth-Felder beim Space-Wechsel nicht zurück — ein eingefrorener Hinzufügen-Versuch für Space A wäre nach einem Klick auf Space B gegen B abgeschickt worden, derselbe Fund, den `dialogs.js :: pendingMoveBody = null` beim Space-Wechsel bereits kommentiert; behoben, plus dieselbe Rücksetzung in `openSpaceAdminDialog()`. (2) `orphans` aus `GET .../members` wurde gelesen und verworfen, obwohl C2 es explizit als „Render-Hinweis fürs Frontend" gebaut hatte — jetzt in der Mitgliederliste als eigene Zeile gerendert. **Echter Browser-Lauf gegen eine Wegwerf-Instanz** (siehe Session-Block: Anlegen, Hinzufügen mit Re-Auth, Entfernen ohne Re-Auth, Entfernen-Dialog mit Konsequenztext+Bestätigung+Re-Auth, Home-Space-Ausnahme — alles Ende-zu-Ende bestanden) | C | ✅ **vollständig, zwei Advisor-Funde vor dem Commit behoben** | +2 (`test_app_html_has_a_live_manage_spaces_entry` ersetzt den Stub-Test, `_JS_MODULES` um `"spaces"` ergänzt) + 1 `test_api.py` (`UiSettings().space_admin_enabled is True`); JS bleibt laut P5-T unit-ungetestet, echter Browser-Lauf statt jsdom; 904 gesamt |
 
 *(Weitere Zeilen entstehen mit dem Rest von Block C/B — siehe Plan §4 für die vollständige Schritt-Sequenz.)*
 
@@ -120,11 +121,11 @@ keinen Code bekommen, nur Step 0 (Haushalt) lief.
 | P7-15 | Zurücknehmen kein Re-Auth, Erweitern eines | Niklas | ⬜ |
 | P7-16 | Neuer geteilter Space im Browser angelegt | Niklas | ⬜ |
 | P7-17 | Name-Kollision mit Principal abgewiesen | Claude Code, Test | ⬜ |
-| P7-18 | Home-Space nicht entfernbar (Knopf fehlt, Route 403) | Claude Code, Test+Browser | ⬜ |
+| P7-18 | Home-Space nicht entfernbar (Knopf fehlt, Route 403) | Claude Code, Test+Browser | ✅ Route: `test_home_space_cannot_be_removed` (403). Knopf fehlt: bestätigt gegen eine Wegwerf-Instanz (`spaceRemoveOpenEl.hidden = info.home` — Home-Space zeigte keinen „Space entfernen"-Knopf, ein anderer, nicht-Home-Space direkt danach zeigte ihn) |
 | P7-19 | Space mit N Items entfernt → alle N im `_archive/` | Niklas | ⬜ |
 | P7-20 | Space mit nicht-schreibbarem Item nicht entfernbar, kein Teil-Move | Claude Code, Test | ✅ **mit Vorbehalt** — `test_removal_blocked_by_one_unwritable_item_moves_nothing` besteht nur über eine simulierte `can_write_item_as_human`-Divergenz: unter der echten Union-ACL-Semantik (`AclReader.grants_for_dir()` unioniert immer den Space-Root-Grant) macht ein P7-L-autorisierter Ausführender jedes Item automatisch schreibbar — ein realer Blocker ist mit echten `.share.yml`-Daten unerreichbar, der Pre-Flight-Check bleibt trotzdem die zweite, unabhängige Absicherung, die N9 verlangt. **Ein bereits archiviertes Item ist dagegen seit der siebten Contract-Öffnung (Zeile 12 der Modul-Tabelle) KEIN Blocker mehr** — `store.move()` verschiebt es korrekt ins Ziel-`_archive/`, `test_removal_moves_an_already_archived_item_to_the_home_archive` deckt genau das ab (ersetzt den vorherigen 403-Test aus dem ersten C4-Commit) |
 | P7-21 | Entfernen ohne Namensbestätigung abgewiesen | Claude Code, Test | ✅ `test_removal_requires_reauth_and_typed_confirmation` (422 bei falschem `confirm`) |
-| P7-22 | `space_admin_enabled=False` → Menüpunkt weg, Routen 404 | Claude Code, Test | ⬜ **Testanteil geschlossen** (`test_all_five_routes_404_when_space_admin_disabled` deckt jetzt alle fünf Space-Verwaltungsrouten inkl. `DELETE /api/v1/spaces/{space}`) — „Menüpunkt weg" bleibt Browser-Sache, offen bis C3 den Kill-Switch tatsächlich verdrahtet |
+| P7-22 | `space_admin_enabled=False` → Menüpunkt weg, Routen 404 | Claude Code, Test | ⬜ **Routenanteil geschlossen, mit Vorbehalt** — `test_all_five_routes_404_when_space_admin_disabled` (alle fünf Routen) **und** ein zweiter, echter Server-Lauf (`space_admin_enabled=False`, Wegwerf-Instanz, echter Login-Roundtrip über curl): `GET /api/v1/meta` → `"space_admin":false`, alle vier `/api/v1/spaces*`-Aufrufe → `404`. **„Menüpunkt weg" bleibt unverifiziert und zieht die Zeile deshalb nicht auf ✅** — die Zeile `document.getElementById("account-manage-spaces").hidden = !meta.space_admin` (`app.js`) ist eine einzeilige, unbedingte DOM-Zuweisung, aber der Browser-Lauf gegen genau diese Instanz scheiterte wiederholt an einem Login-Formular-Klick, der serverseitig nie ankam (siehe Session-Block) — kein Code-Fund, ein Harness-Problem dieser Sitzung, das die nächste Session direkt angehen sollte, statt es zu wiederholen |
 | P7-23 | N-Auswahl wandert in einem Vorgang, ein Commit je Item | Niklas | ⬜ |
 | P7-24 | Ein rechteerweiterndes Item in Auswahl → ein Formular, nicht N | Niklas | ⬜ |
 
@@ -620,3 +621,99 @@ Baseline aus einer übersehenen Zeile-10-Ergänzung in C2, +3 netto aus dieser �
 
 **Nächster Schritt, konkret:** unverändert C3 (UI) — die archivierte-Items-Frage ist jetzt
 geschlossen, kein offener Posten mehr dafür.
+
+**Nachtrag, 2026-08-25 — Step C3 gebaut (Nikinger-Auftrag „lets go on with C4" führte zu C4,
+danach Rotationsversuch + Fortsetzung mit C3), ein Advisor-Fund mit zwei Teilen vor dem Commit
+behoben, echter Browser-Lauf gegen eine Wegwerf-Instanz.**
+
+**Rotationsversuch zuerst:** `scripts/rotate_session_block.sh phase7_spaces_admin` auf
+Nikinger-Vorschlag gefahren — Ergebnis „Bereits konform: genau ein Session-Block im Head.
+Nichts zu tun." (`exit 2`). Die ~58KB dieses Heads sind kein Rotationsrückstand (die Regel
+rotiert beim Start eines NEUEN `## Session stopped`-Blocks, nicht nach Größe) — dieser Kopf
+trägt seit Sitzungsbeginn genau einen Block, gewachsen über viele Nachträge derselben
+fortlaufenden Sitzung. Kein Handgriff möglich, bis eine wirklich neue Session beginnt.
+
+**C3 gebaut, drei gekoppelte Stellen in einem Commit (Plan §4.C3):** `app.html:283`s
+Menüpunkt verliert `disabled`/„kommt in Phase 7" → „Spaces verwalten"; `config.py`s
+`space_admin_enabled` Default `False`→`True`; `test_static_routes.py`s Stub-Test ersetzt.
+**Zwei Plan-Positionen erwiesen sich als bereits erledigt, keine neue Arbeit:** `_meta`
+trug `space_admin` bereits aus Step C2, `.rail__version` stand bereits auf `v2.2` aus der
+A6-Session vom 2026-08-24 (P7-U) — beide Plan-Zeilen beim Nachlesen bestätigt, nicht blind
+übernommen.
+
+**Neues Modul `webui/static/js/spaces.js`** (P7-Q), Bauart wie `dialogs.js`: `initSpaces()`
+im selben Muster wie die zehn bestehenden Module, `openSpaceAdminDialog()` (Liste aller
+`writable`-Spaces aus `state.spaces`), `selectSpace()` (`GET .../members`, Home-Hinweis,
+Mitgliederliste), Hinzufügen (immer Re-Auth wie serverseitig erzwungen, eingefroren-erste-
+Fassung-Muster wie `pendingMoveBody`/`pendingShareBody`), Entfernen (kein Re-Auth),
+`openRemoveSpaceDialog()` (Klartext-Konsequenz + getippte Bestätigung + Re-Auth, immer). Neue
+Dialoge `#space-admin-dialog`/`#space-remove-dialog` als Geschwister von `#share-dialog`;
+`app.js` bekommt `initSpaces()` im Bootstrap, beide Dialoge in `anyOverlayOpen()`/Escape,
+einen Klick-Handler auf den Menüpunkt und **eine neue Zeile in `init()`**:
+`document.getElementById("account-manage-spaces").hidden = !meta.space_admin` — ohne die
+wäre der Kill-Switch (P7-R) nur serverseitig scharf gewesen, der Knopf bliebe sichtbar und
+jeder Klick liefe in einen `404`.
+
+**Advisor-Fund vor dem Commit, zwei Teile, beide in `spaces.js`:**
+1. **Eingefrorener Hinzufügen-Request überlebt einen Space-Wechsel.** `selectSpace()` setzte
+   `pendingMemberBody`/die Re-Auth-Felder nicht zurück — ein Re-Auth-Retry nach einem Wechsel
+   von Space A zu Space B hätte den für A eingefrorenen Namen gegen B abgeschickt. Exakt der
+   Fund, den `dialogs.js :: pendingMoveBody = null` beim Space-Wechsel im Verschieben-Dialog
+   bereits kommentiert (`// Ziel geändert -- eine evtl. eingefrorene Fassung ist ungültig`) —
+   hier übernommen, plus dieselbe Rücksetzung (inkl. Feldwerte) in `openSpaceAdminDialog()`,
+   damit ein getipptes Passwort auch ein Schließen+Wiederöffnen des Dialogs nicht überlebt.
+2. **`orphans` gelesen und verworfen.** C2s eigener Commit-Kommentar begründet `orphans`
+   explizit als „der Render-Hinweis fürs Frontend" (Tippfehler-Fänger gegen bekannte
+   Space-Verzeichnisse) — `selectSpace()` las das Feld nie. Jetzt als eigene Zeile in der
+   Mitgliederliste gerendert („verwaist -- kein solcher Space mehr").
+
+**Echter Browser-Lauf, Ende-zu-Ende, gegen eine Wegwerf-Instanz** (eigener Uvicorn-Prozess,
+temporäres `DATA_ROOT`+`AuthStore`, `git=False`, Skript im Scratchpad, kein Repo-Teil):
+Einladung→Enrollment→Login, Menüpunkt trägt kein `disabled` mehr (bestätigt per DOM-Lesung),
+Dialog öffnet, `niklas`-Space zeigt den Home-Hinweis und **keinen** „Space entfernen"-Knopf,
+Mitglied `fabian` (schreiben) hinzugefügt — erster Versuch ohne Credentials → `403
+reauth_required`, Re-Auth-Formular erscheint, zweiter Versuch mit Passwort+TOTP → `200`,
+Mitgliederliste aktualisiert. `fabian` ohne Re-Auth wieder entfernt (Toast bestätigt). Neuer
+Space `team-c3-probe` angelegt (erscheint sofort im Baum, `niklas` automatisch als
+Schreib-Mitglied gesät — C2s eigener Fund, hier bestätigt). `team-c3-probe` zeigt korrekt
+einen „Space entfernen"-Knopf (kein Home-Space); Entfernen-Dialog zeigt den vorgeschriebenen
+Konsequenztext, erster Versuch nur mit getipptem Namen → `403 reauth_required` +
+„Re-Authentisierung fehlgeschlagen.", zweiter Versuch mit Credentials → `200`, Toast „Space
+entfernt · 0 Item(s) archiviert", Space verschwindet aus dem Baum.
+
+**Zwei Harness-Eigenheiten dieser Sitzung, für die nächste Session festgehalten (kein
+Code-Fund):**
+1. **CSRF bootstrapt sich ausschließlich über die `/ui/login`-POST-Antwort**, nicht über ein
+   bloßes Neuladen von `/ui/` — dieselbe P5-H-Eigenheit, die schon für `testnutzer-p7` mehrfach
+   dokumentiert wurde (`docs/INDEX.md`, P6.5-12-Fund). Direktes Navigieren zu `/ui/` nach einer
+   Einladungs-/Enrollment-Sitzung lässt `sessionStorage['sfx:csrf']` leer — jeder erste
+   Schreibversuch scheitert mit „CSRF-Token fehlt oder stimmt nicht", bis ein echter
+   `/ui/login`-Roundtrip in DERSELBEN Tab durchlaufen wird.
+2. **`get_page_text` kann eine Vor-Navigations-DOM liefern**, wenn es zu schnell nach einem
+   Klick aufgerufen wird — dreimal fälschlich als „Login/Hinzufügen ist fehlgeschlagen"
+   gelesen, obwohl der Server-Log denselben Request bereits mit `200` beantwortet hatte. Ein
+   erneutes `get_page_text` (ggf. nach `wait`) zeigte danach den korrekten, bereits
+   erfolgreichen Zustand. Für die zweite Wegwerf-Instanz (Kill-Switch-Probe,
+   `space_admin_enabled=False`) führte dieselbe Klick-Unzuverlässigkeit dazu, dass der
+   Login-POST dort nie beim Server ankam (kein einziges Mal in mehreren Versuchen) — die
+   REST-Ebene wurde stattdessen per `curl` bestätigt (siehe P7-22-Zeile oben), der
+   Menü-Ausblendung fehlt deshalb noch der Pixel-Beweis.
+
+**Verifiziert:** +3 neue/geänderte Tests (`test_app_html_has_a_live_manage_spaces_entry` ersetzt
+den Stub, `_JS_MODULES` um `"spaces"`, `test_ui_settings_space_admin_enabled_defaults_to_true`
+in `test_api.py`). Volle Suite **903 → 904**, real gezählt. Tabu-Diff leer. `node --check` auf
+`spaces.js`/`app.js` sauber (kein Ersatz für einen Test, nur eine Syntaxprobe — P5-T lässt JS
+weiterhin unit-ungetestet).
+
+**Abnahmestand:** P7-18 ✅ (Route + Knopf-fehlt, beide bestätigt). P7-22 bleibt ⬜, jetzt mit
+präzisiertem Grund (Routenanteil doppelt bestätigt, Menü-Ausblendung nur code-geprüft, nicht
+pixel-verifiziert — siehe oben). Modul-Status-Tabelle (Zeile 13) und Abnahmestand-Tabelle oben
+nachgezogen. `phase6_shares/CLAUDE.md`s Zeile 16 (der ursprüngliche `space_admin_enabled`-Seam)
+bekam eine datierte Schließungsnotiz, der Snapshot selbst bleibt unangetastet.
+
+**Nächster Schritt, konkret:** Step C5 (Betrieb/Doku — `diagnose.sh` Prüfung 12 Textergänzung,
+`docs/UPDATE_LOG.md`-Eintrag vor dem nächsten Deploy, P6-X-Gate beachten) und Block B
+(Mehrfachauswahl, `phase6_shares/ITEM_MOVE_PLAN.md` §9). Vor dem nächsten Deploy zusätzlich:
+`space_admin_enabled`s Default-Wechsel auf `True` bedeutet, dass Fabian den neuen Menüpunkt
+ab dem nächsten Release sieht — im Update-Log-Eintrag erwähnen, nicht erst beim Deploy
+entdecken lassen (Advisor-Hinweis).

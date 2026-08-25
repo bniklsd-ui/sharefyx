@@ -79,6 +79,7 @@ async def test_app_loads_as_a_single_es_module(static_app, totp_code):
 
 _JS_MODULES = (
     "app", "api", "state", "tree", "list", "editor", "markdown", "dialogs", "toasts", "updates",
+    "spaces",
 )
 
 
@@ -132,16 +133,15 @@ def test_app_html_contains_no_inline_style_attribute():
     assert "style=" not in html
 
 
-def test_app_html_has_a_disabled_manage_spaces_stub():
-    """Step 7 Commit 6 (`space_admin_enabled`-Seam, P6-Plan) — der Menüpunkt existiert und ist
-    hart `disabled` (nicht bloß versteckt), `config.py`s gleichnamiges Feld hat noch keine
-    Laufzeitwirkung (app.html ist eine statische Datei, kein Templating) und wird erst in
-    Phase 7 verdrahtet, siehe der Feldkommentar dort."""
+def test_app_html_has_a_live_manage_spaces_entry():
+    """P7 Step C3 — der Menüpunkt ist jetzt scharf: kein `disabled` mehr, kein Verweis auf
+    „Phase 7" (die Fläche ist diese Phase). Sichtbarkeit zur Laufzeit folgt `state.meta.
+    space_admin` (`app.js`), nicht diesem statischen Markup (P5-T, kein Templating)."""
     html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
     match = re.search(r'<button[^>]*id="account-manage-spaces"[^>]*>([^<]*)</button>', html)
-    assert match is not None, "Menüpunkt 'Geteilte Spaces verwalten' fehlt"
-    assert "disabled" in match.group(0)
-    assert "kommt in Phase 7" in match.group(1)
+    assert match is not None, "Menüpunkt 'Spaces verwalten' fehlt"
+    assert "disabled" not in match.group(0)
+    assert "Phase 7" not in html
 
 
 def test_app_js_makes_no_external_requests():

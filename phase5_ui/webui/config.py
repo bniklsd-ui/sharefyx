@@ -45,8 +45,9 @@ class UiSettings:
     hsts: bool = True
     static_dir: Path = field(default=DEFAULT_STATIC_DIR)
     update_log_path: Path = field(default=DEFAULT_UPDATE_LOG_PATH)
-    # Seam ohne Implementierung (Step 7 Commit 6, P6-Plan): kommt erst in Phase 7 zum Tragen.
-    # `app.html`s Menüpunkt ist unabhängig davon hart `disabled` (statische Datei, kein
-    # Templating) — dieses Feld existiert nur, damit eine künftige Phase nicht bei null anfängt,
-    # dieselbe Kategorie wie P5-Z (Format-Seam ohne Implementierung).
-    space_admin_enabled: bool = False
+    # Kill-Switch für die Space-Verwaltung (P7 Step C3, P7-R) — war bis Phase 7 ein Seam ohne
+    # Implementierung (Step 7 Commit 6, P6-Plan). Jetzt scharf: `False` lässt alle fünf
+    # `/api/v1/spaces*`-Routen `404` antworten und blendet den Menüpunkt in `app.html` aus.
+    # Default `True`, weil die Fläche jetzt live gebaut ist — kein Grund mehr, sie ausgeliefert
+    # aber abgeschaltet zu lassen.
+    space_admin_enabled: bool = True

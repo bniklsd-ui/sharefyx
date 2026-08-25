@@ -26,6 +26,7 @@ from storage.models import Item
 from storage.store import Store
 
 from webui.api import api_routes
+from webui.config import UiSettings
 from webui.routes_auth import ui_auth_routes
 
 BASE_URL = "https://space.example.ts.net"
@@ -1197,3 +1198,10 @@ def test_webui_imports_exactly_one_mcpserver_symbol():
                     if alias.name.startswith("mcpserver"):
                         imported_symbols.add(alias.name)
     assert imported_symbols == {"mcpserver.permissions.SharePolicy"}
+
+
+def test_ui_settings_space_admin_enabled_defaults_to_true():
+    # P7 Step C3: der Default, der tatsächlich ausgeliefert wird -- ohne diese Zeile könnte
+    # Block C komplett hinter einem `False` versenden, ohne dass eine Testsuite es merkt (die
+    # `_env()`-Helfer-Erfahrung aus P6-X zeigte genau diese Art still überschriebener Defaults).
+    assert UiSettings(base_url=BASE_URL).space_admin_enabled is True

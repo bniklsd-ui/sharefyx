@@ -13,6 +13,9 @@ import {
   closeNewFolderDialog, closeMoveDialog, closeShareDialog,
 } from "./dialogs.js";
 import { init as initUpdates } from "./updates.js";
+import {
+  init as initSpaces, openSpaceAdminDialog, closeSpaceAdminDialog, closeRemoveSpaceDialog,
+} from "./spaces.js";
 
 // -- Bootstrap: Übernahme des CSRF-Tokens von der Login-Erfolgsseite (Plan-Abweichung 2,
 // phase5_ui/CLAUDE.md Session-Block 2026-08-05) --------------------------------------------
@@ -73,7 +76,13 @@ function initShell() {
   initTree();
   List.init();
   initDialogs();
+  initSpaces();
   Editor.init();
+
+  document.getElementById("account-manage-spaces").addEventListener("click", function () {
+    document.getElementById("account-dialog").hidden = true;
+    openSpaceAdminDialog();
+  });
 
   // -- Übersicht / Logout / Zurück ---------------------------------------------------------
 
@@ -111,11 +120,17 @@ function initShell() {
   var accountDialogEl = document.getElementById("account-dialog");
   var detailEditorEl = document.getElementById("detail-editor");
   var searchInputEl = document.getElementById("search-input");
+  // Step C3, dieselbe dokumentierte Abweichung wie bei jedem Dialog seit Step 7 Commit 3
+  // (app.js steht nicht auf der Plan-Dateiliste dieses Commits) -- konsistente Tastaturbedienung
+  // für jeden Overlay-Dialog, kein Sonderfall für den neuen.
+  var spaceAdminDialogEl = document.getElementById("space-admin-dialog");
+  var spaceRemoveDialogEl = document.getElementById("space-remove-dialog");
 
   function anyOverlayOpen() {
     return !conflictDialogEl.hidden || !createDialogEl.hidden || !newFolderDialogEl.hidden
       || !moveDialogEl.hidden || !shareDialogEl.hidden || !confirmDialogEl.hidden
-      || !accountDialogEl.hidden || !updateLogDialogEl.hidden;
+      || !accountDialogEl.hidden || !updateLogDialogEl.hidden || !spaceAdminDialogEl.hidden
+      || !spaceRemoveDialogEl.hidden;
   }
 
   document.addEventListener("keydown", function (event) {
@@ -136,6 +151,8 @@ function initShell() {
       else if (!shareDialogEl.hidden) closeShareDialog();
       else if (!updateLogDialogEl.hidden) updateLogDialogEl.hidden = true;
       else if (!accountDialogEl.hidden) accountDialogEl.hidden = true;
+      else if (!spaceRemoveDialogEl.hidden) closeRemoveSpaceDialog();
+      else if (!spaceAdminDialogEl.hidden) closeSpaceAdminDialog();
       else if (state.selectedId !== null) Editor.closeEditor();
       return;
     }
@@ -166,6 +183,10 @@ function initShell() {
       })
       .then(function (meta) {
         state.meta = meta;
+        // P7-R: der Kill-Switch blendet den Menüpunkt aus, statisches HTML kennt ihn nicht
+        // (kein Templating, P5-T) -- ohne diese Zeile führte ein `False` nur serverseitig zu
+        // `404`, der Knopf bliebe sichtbar und würde bei jedem Klick nur einen Fehler zeigen.
+        document.getElementById("account-manage-spaces").hidden = !meta.space_admin;
         var names = Object.keys(meta.buckets);
         if (names.indexOf(state.filter) === -1) state.filter = names[0];
         return List.loadOverview();
