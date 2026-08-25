@@ -279,7 +279,15 @@ class Store:
         Muss unter `self._lock` **und** `self._file_write_lock()` aufgerufen werden.
         """
         slug = files.slugify(item.title)
-        target_path = files.item_path(self._data_root, item.space, item.id, slug, folder=item.folder)
+        if item.status == "archived":
+            # `move()`s siebte Contract-Öffnung (P7 Step C4): ein archiviertes Item lebt
+            # physisch immer unter `_archive/`, unabhängig vom (stets leeren) `folder`-Feld —
+            # `files.item_path()` kennt diesen Sonderfall nicht, nur `archive()` selbst kannte
+            # ihn bisher (eigene, separate Pfad-Berechnung dort). Hierher gezogen, damit `move()`
+            # ein archiviertes Item korrekt im Ziel-`_archive/` ablegt statt an der Space-Wurzel.
+            target_path = self._data_root / item.space / "_archive" / files.item_filename(item.id, slug)
+        else:
+            target_path = files.item_path(self._data_root, item.space, item.id, slug, folder=item.folder)
         write_path = old_path if old_path is not None else target_path
         write_path.parent.mkdir(parents=True, exist_ok=True)
         files.atomic_write(write_path, _item_to_text(item))
@@ -463,6 +471,15 @@ class Store:
             now = self._now_fn()
             status = fields.pop("status", _DEFAULT_STATUS.get(type, "active"))
             _check_type_and_status(type, status)
+            if status == "archived":
+                # Siebte Contract-Öffnung (P7 Step C4): `_write_item_file()` legt ein
+                # archiviertes Item jetzt immer unter `_archive/` ab, unabhängig davon, ob es
+                # `archive()` oder direkt `create(status="archived")` (z. B. `POST /api/v1/items`)
+                # dorthin geschickt hat — dieselbe Zurücksetzung, die `archive()` selbst seit je
+                # her vornimmt (`folder=""`), hier vorgezogen, damit das zurückgegebene `Item`
+                # nie einen `folder`-Wert trägt, den der nächste `get()` ohnehin verwirft
+                # (`folder` wird immer aus dem realen Pfad abgeleitet, nie aus dem Frontmatter).
+                folder = ""
             due = _coerce_due(fields.pop("due", None))
             tags = fields.pop("tags", [])
             links = fields.pop("links", [])
@@ -617,14 +634,29 @@ class Store:
         `_write_item_file()`s bestehenden `_commit()`-Aufruf), genau ein Versionssprung.
         Autorisierung passiert NICHT hier (wie überall im Store) — Aufrufer prüfen Rechte VOR
         diesem Call (P6-AE: Schreibrecht auf Quelle UND Ziel).
+
+        **P7 Step C4, siebte Contract-Öffnung:** ein archiviertes Item darf per Space-Wechsel
+        bewegt werden (kein `folder=` außer `""`) — `_write_item_file()` legt es dabei ins
+        Ziel-`_archive/`, nicht an die Space-Wurzel. Ein echter Ordner-Wechsel bleibt für
+        archivierte Items verboten (ihr `folder` ist immer `""`).
         """
         with self._lock, self._file_write_lock():
             row = self._reconcile_and_get_row(item_id)
             current = self._row_to_item(row)
             if current.version != version:
                 raise ConflictError(item_id, expected_version=version, current=current)
-            if current.status == "archived":
-                raise ValidationError(f"Item {item_id} ist archiviert — move verboten")
+            if current.status == "archived" and folder not in (None, ""):
+                # Siebte Contract-Öffnung (P7 Step C4, N8): ein archiviertes Item bleibt ein
+                # reiner Space-Wechsel-Kandidat — sein `folder` ist immer "" (archive() erzwingt
+                # das), ein ECHTER Ordner-Wechsel ergibt für ein Item ohne Ordnerposition keinen
+                # Sinn und bleibt verboten. Ein reiner Space-Move (kein `folder=`, oder explizit
+                # `folder=""`) ist dagegen ab jetzt erlaubt — vorher unterschiedslos verboten,
+                # was einen Space mit Historie (`_archive/`-Inhalt) strukturell unentfernbar
+                # machte (P7-20-Fund, `docs/concepts/phase7_spaces_admin_plan.md` §4.C4).
+                raise ValidationError(
+                    f"Item {item_id} ist archiviert — Ordner-Wechsel verboten (Space-Wechsel "
+                    "erlaubt)"
+                )
 
             old_path = self._data_root / row["path"]
             target_space = current.space

@@ -9,7 +9,7 @@ down:
   - ../docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md   # Herkunft: P6-Status, §4.1/§4.2, offene Entscheidungen §5.1–§5.7
   - ../phase6_shares/ITEM_MOVE_PLAN.md              # §9 Mehrfachauswahl (P6-AK–AN) — Block B baut das, unverändert
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-08-25 (Step C4 gebaut -- zweiphasiger Space-Entfernen-Algorithmus, Advisor-Fund: bereits archivierte Items brauchen einen eigenen Vorlauf-Riegel, P7-20/P7-21/Testanteil-P7-22 geschlossen) | 2026-08-25 (Gate A->C geprueft, alle vier Punkte live -- Block C gestartet, Step C1: Schreibseite von .share.yml in storage/acl.py, sechste Contract-Oeffnung gebaut) | 2026-08-25 (P7-4 erster echter Befund: FAIL, ID statt Titel genannt; P7-12-Abbau geprueft und bewusst NICHT gefahren -- Block C/P7-14 braucht testnutzer-p7 noch) | 2026-08-25 (P7-1/P7-2/P7-7 per echtem Browser-Klick bestanden, git-Reparatur nach Nikinger-Freigabe, nur noch P7-4/P7-9/P7-12 offen) | 2026-08-25 (P6.5-12/P7-5 per echtem Browser-Klick bestanden, testnutzer-p7-Substitution, 13/14 in Phase 6.5) | 2026-08-25 (echter deploy.sh-Lauf durch den Nikinger, Live-Release jetzt 53bad20 statt f96125e, A3s asset-strip live, P6.5-12 wieder testbar) | 2026-08-23 (A8: Phase 6.5 formal abgeschlossen als 🟡, 12/14, P6.5-8/13 via testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, P1-Contract-Absatz aktualisiert) | 2026-08-23 (Step 0 gestartet, Doku-Audit gefahren, Skelett angelegt)
+updated: 2026-08-25 (Step C4 Nachtrag -- Nikinger-Entscheidung: siebte Contract-Oeffnung statt archived_blockers-Riegel, storage/store.py :: move() erlaubt Space-Wechsel fuer archivierte Items, create(status=archived) faengt jetzt denselben Fall ab, 903 Tests gruen) | 2026-08-25 (Step C4 gebaut -- zweiphasiger Space-Entfernen-Algorithmus, Advisor-Fund: bereits archivierte Items brauchen einen eigenen Vorlauf-Riegel, P7-20/P7-21/Testanteil-P7-22 geschlossen) | 2026-08-25 (Gate A->C geprueft, alle vier Punkte live -- Block C gestartet, Step C1: Schreibseite von .share.yml in storage/acl.py, sechste Contract-Oeffnung gebaut) | 2026-08-25 (P7-4 erster echter Befund: FAIL, ID statt Titel genannt; P7-12-Abbau geprueft und bewusst NICHT gefahren -- Block C/P7-14 braucht testnutzer-p7 noch) | 2026-08-25 (P7-1/P7-2/P7-7 per echtem Browser-Klick bestanden, git-Reparatur nach Nikinger-Freigabe, nur noch P7-4/P7-9/P7-12 offen) | 2026-08-25 (P6.5-12/P7-5 per echtem Browser-Klick bestanden, testnutzer-p7-Substitution, 13/14 in Phase 6.5) | 2026-08-25 (echter deploy.sh-Lauf durch den Nikinger, Live-Release jetzt 53bad20 statt f96125e, A3s asset-strip live, P6.5-12 wieder testbar) | 2026-08-23 (A8: Phase 6.5 formal abgeschlossen als 🟡, 12/14, P6.5-8/13 via testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, P1-Contract-Absatz aktualisiert) | 2026-08-23 (Step 0 gestartet, Doku-Audit gefahren, Skelett angelegt)
 ---
 # CLAUDE.md — Phase 7: Space-Verwaltung, Mehrfachauswahl, Konsolidierung (`phase7_spaces_admin/`)
 
@@ -78,7 +78,8 @@ Abnahmezeilen: `docs/concepts/phase7_spaces_admin_plan.md`.
 
 | 9 | C1 (Schreibseite von `.share.yml`, sechste Contract-Öffnung, P7-P): `storage/acl.py` bekommt `read_share_file`/`write_share_file`/`add_member`/`remove_member`/`create_space`/`remove_space_dir`/`spaces_referencing`/`AclWriteError` (Dump-Logik intern einmal in `_write_share_file_unlocked()`, Advisor-Fund nach dem ersten Commit). `spacectl.py`s vier schreibende Unterbefehle rufen jetzt `acl.*` auf; entfallen dort: `_DataRootLock`/`_dump_share_file`/`_spaces_referencing`. `_load_share_file`/`_find_share_files` bleiben — nur noch für `check`, rein lesend. Jede `acl`-Schreibfunktion nimmt den `.write.lock`-Flock selbst (P7-M) | C | ✅ **vollständig** | +24 `phase7_spaces_admin/tests/test_acl_write.py`; 867 gesamt |
 | 10 | C2 (REST-Fläche für Space-Verwaltung): vier der fünf in Plan §4.C2 genannten Routen — `POST /api/v1/spaces`, `GET/POST .../{space}/members`, `DELETE .../{space}/members/{name}` (`DELETE /api/v1/spaces/{space}` bleibt C4, sein Vorlauf/Durchlauf-Algorithmus gehört dorthin, ein Stub-Handler wäre eine zweite unvollständige Fassung derselben Regel). `webui/shares.py :: require_space_reauth()` (neu, Re-Auth bei Mitglied-Hinzufügen, keins bei -Entfernen, P7-N) — ruft `verify_reauth()` direkt auf, keine neue Extraktion nötig: die im Plan beschriebene `_verify_reauth_credentials()`-Extraktion existiert bereits als `webui/reauth.py :: verify_reauth()` (gebaut vor dieser Phase, von `account.py` UND `shares.py` geteilt) — Plan-Text war insofern stale, keine neue Arbeit. `storage/store.py :: Store.data_root` (neue Read-Property, kein neues Verhalten, keine siebte Öffnung). `_meta` bekommt `space_admin` | C | ✅ **vollständig, zwei Advisor-Runden vor dem Commit** | +23 (21 `phase7_spaces_admin/tests/test_space_admin_api.py` neu + 1 `phase5_ui/tests/test_meta.py` + 1 `phase1_storage/tests/test_store.py`); 890 gesamt |
-| 11 | C4 (Space entfernen, zweiphasig, P7-O/N8/N9): fünfte Route `DELETE /api/v1/spaces/{space}` in `webui/api.py :: _spaces_delete`. Vorlauf (kein Schreibvorgang) über `store.search()`-Paging mit `_STORE_FETCH_LIMIT`, Blocker-Scan via `permissions.can_write_item_as_human(home, store.acl_of(...))`; `require_space_reauth(widening=True)` + `confirm == space`; Durchlauf `store.move()` → `store.archive()` je Item (Reihenfolge durch `archive()`s `folder=""`/`_archive/`-Ablage erzwungen, nicht gewählt); harte `len(moved) == total`-Sperre vor `acl.remove_space_dir()`. **Advisor-Fund (empirisch, vor dem Commit):** `store.search()` zählt bereits archivierte Items mit (`total` schließt sie ein), `store.move()` verbietet sie aber explizit — ohne eigenen Riegel hätte das einen unbehandelten `ValidationError`/500 mitten im Durchlauf ausgelöst, nach bereits verschobenen Items, ohne den von N9 verlangten Bericht. Neuer, eigener Vorlauf-Riegel `archived_blockers` schließt das fail-closed — **eine Space mit archivierten Items ist damit vorerst unentfernbar, das ist eine bewusst offene Nikinger-Frage** (siehe Session-Block), keine stille Lücke. Zweiter Advisor-Fund: `acl.spaces_referencing()` fehlte das `exclude=`, das `spacectl.py remove-space` für dieselbe Prüfung setzt (Parität-Drift, behoben). `phase7_spaces_admin/tests/test_space_admin_api.py`s Kill-Switch-Parametrize um die fünfte Route ergänzt (schließt den Testanteil von P7-22) | C | ✅ **vollständig, ein Advisor-Fund vor dem Commit behoben** | +9 (8 `phase7_spaces_admin/tests/test_space_removal.py`, neu + 1 Zeile im bestehenden Kill-Switch-Parametrize von `test_space_admin_api.py`); 900 gesamt |
+| 11 | C4 (Space entfernen, zweiphasig, P7-O/N8/N9): fünfte Route `DELETE /api/v1/spaces/{space}` in `webui/api.py :: _spaces_delete`. Vorlauf (kein Schreibvorgang) über `store.search()`-Paging mit `_STORE_FETCH_LIMIT`, Blocker-Scan via `permissions.can_write_item_as_human(home, store.acl_of(...))`; `require_space_reauth(widening=True)` + `confirm == space`; Durchlauf `store.move()` → `store.archive()` je Item; harte `len(moved) == total`-Sperre vor `acl.remove_space_dir()`. **Advisor-Fund (empirisch, vor dem ersten Commit):** `store.search()` zählt bereits archivierte Items mit (`total` schließt sie ein), `store.move()` verbot sie zu diesem Zeitpunkt aber noch explizit — ohne einen Riegel hätte das einen unbehandelten `ValidationError`/500 mitten im Durchlauf ausgelöst, ohne den von N9 verlangten Bericht. **Erster Fix in diesem Commit: ein Vorlauf-Riegel `archived_blockers`, fail-closed** — eine Space mit archivierten Items wäre damit vorerst unentfernbar gewesen. **Überholt durch Zeile 12 in derselben Sitzung** (Nikinger-Entscheidung, siehe unten) — der Riegel existiert im finalen Code nicht mehr. Zweiter, weiterhin gültiger Advisor-Fund: `acl.spaces_referencing()` fehlte das `exclude=`, das `spacectl.py remove-space` für dieselbe Prüfung setzt (Parität-Drift, behoben). `phase7_spaces_admin/tests/test_space_admin_api.py`s Kill-Switch-Parametrize um die fünfte Route ergänzt (schließt den Testanteil von P7-22) | C | ✅ **vollständig** | siehe Zeile 12 für die finale Testzahl |
+| 12 | Nikinger-Entscheidung auf Nachfrage (dieselbe Sitzung): siebte, benannte Contract-Öffnung statt des `archived_blockers`-Riegels aus Zeile 11 — `storage/store.py :: move()` erlaubt jetzt einen reinen Space-Wechsel für archivierte Items (echter Ordner-Wechsel bleibt verboten), `_write_item_file()` legt sie dabei ins Ziel-`_archive/`. Zweiter Advisor-Fund vor diesem Commit: `create(status="archived")` (über MCP/REST erreichbar) lief am ursprünglichen Riegel vorbei und hätte sonst eine Divergenz erzeugt — `create()` setzt jetzt selbst `folder=""` bei `status="archived"`. `_spaces_delete` ruft `archive()` nur noch für Items auf, die `move()` nicht schon als archiviert zurückgibt (kein doppelter Commit). Volle Herleitung, inkl. der Anker-Prüfung gegen `phase1_storage/storage/store.py`, in `phase1_storage/CLAUDE.md`s „Geerbte Contracts" (siebte Öffnung) | C | ✅ **vollständig** | +4 `phase1_storage/tests/test_store.py` (3 ersetzen `test_move_of_archived_item_is_rejected`, 1 neu) + 1 `phase7_spaces_admin/tests/test_space_removal.py` (ersetzt den 403-Test aus Zeile 11 durch einen 200-Test); 903 gesamt |
 
 *(Weitere Zeilen entstehen mit dem Rest von Block C/B — siehe Plan §4 für die vollständige Schritt-Sequenz.)*
 
@@ -121,7 +122,7 @@ keinen Code bekommen, nur Step 0 (Haushalt) lief.
 | P7-17 | Name-Kollision mit Principal abgewiesen | Claude Code, Test | ⬜ |
 | P7-18 | Home-Space nicht entfernbar (Knopf fehlt, Route 403) | Claude Code, Test+Browser | ⬜ |
 | P7-19 | Space mit N Items entfernt → alle N im `_archive/` | Niklas | ⬜ |
-| P7-20 | Space mit nicht-schreibbarem Item nicht entfernbar, kein Teil-Move | Claude Code, Test | ✅ **mit Vorbehalt** — `test_removal_blocked_by_one_unwritable_item_moves_nothing` besteht nur über eine simulierte `can_write_item_as_human`-Divergenz: unter der echten Union-ACL-Semantik (`AclReader.grants_for_dir()` unioniert immer den Space-Root-Grant) macht ein P7-L-autorisierter Ausführender jedes Item automatisch schreibbar — ein realer Blocker ist mit echten `.share.yml`-Daten unerreichbar, der Pre-Flight-Check bleibt trotzdem die zweite, unabhängige Absicherung, die N9 verlangt. **Zusätzlich, nicht im ursprünglichen Kriterium benannt:** `test_removal_blocked_by_an_already_archived_item_moves_nothing` — ein bereits archiviertes Item blockiert die Entfernung ebenfalls (`store.move()` verbietet das, `store.search()` zählt es aber mit `total`), fail-closed statt eines unbehandelten 500 |
+| P7-20 | Space mit nicht-schreibbarem Item nicht entfernbar, kein Teil-Move | Claude Code, Test | ✅ **mit Vorbehalt** — `test_removal_blocked_by_one_unwritable_item_moves_nothing` besteht nur über eine simulierte `can_write_item_as_human`-Divergenz: unter der echten Union-ACL-Semantik (`AclReader.grants_for_dir()` unioniert immer den Space-Root-Grant) macht ein P7-L-autorisierter Ausführender jedes Item automatisch schreibbar — ein realer Blocker ist mit echten `.share.yml`-Daten unerreichbar, der Pre-Flight-Check bleibt trotzdem die zweite, unabhängige Absicherung, die N9 verlangt. **Ein bereits archiviertes Item ist dagegen seit der siebten Contract-Öffnung (Zeile 12 der Modul-Tabelle) KEIN Blocker mehr** — `store.move()` verschiebt es korrekt ins Ziel-`_archive/`, `test_removal_moves_an_already_archived_item_to_the_home_archive` deckt genau das ab (ersetzt den vorherigen 403-Test aus dem ersten C4-Commit) |
 | P7-21 | Entfernen ohne Namensbestätigung abgewiesen | Claude Code, Test | ✅ `test_removal_requires_reauth_and_typed_confirmation` (422 bei falschem `confirm`) |
 | P7-22 | `space_admin_enabled=False` → Menüpunkt weg, Routen 404 | Claude Code, Test | ⬜ **Testanteil geschlossen** (`test_all_five_routes_404_when_space_admin_disabled` deckt jetzt alle fünf Space-Verwaltungsrouten inkl. `DELETE /api/v1/spaces/{space}`) — „Menüpunkt weg" bleibt Browser-Sache, offen bis C3 den Kill-Switch tatsächlich verdrahtet |
 | P7-23 | N-Auswahl wandert in einem Vorgang, ein Commit je Item | Niklas | ⬜ |
@@ -558,6 +559,64 @@ aus `webui/api.py` heraus auf.
 **Nächster Schritt, konkret:** C3 (UI) — Entfernen-Dialog gegen die jetzt vollständige C2/C4-
 REST-Fläche, Kill-Switch tatsächlich verdrahten (schließt P7-22s Browser-Anteil und macht
 `space_admin_enabled` erstmals produktiv scharf), Home-Space-Ausnahme im Menü (P7-18s
-Browser-Anteil). Danach Step C5 (Betrieb/Doku) und die Nikinger-Entscheidung zu archivierten
-Items in einem zu entfernenden Space (siehe oben) — beide unabhängig von C3, können parallel
-vorgemerkt werden.
+Browser-Anteil). Danach Step C5 (Betrieb/Doku).
+
+**Nachtrag, 2026-08-25 — Nikinger-Entscheidung zur oben offen gelassenen Frage: siebte
+Contract-Öffnung statt dauerhaftem `archived_blockers`-Riegel.**
+
+Auf Nachfrage empfohlen (Begründung: eine Space mit `_archive/`-Inhalt ist der Normalfall, nicht
+der Ausnahmefall — jede Space mit echter Nutzungshistorie hätte sonst permanent unentfernbar
+bleiben müssen, das widerspricht N8 direkter als eine kleine Erweiterung des Contracts es tut),
+vom Nikinger bestätigt („do that then").
+
+**Umgesetzt in `phase1_storage/storage/store.py`** (Anker vor dem Bau geprüft: `move()` bei
+`store.py:617–663`, `_write_item_file()` bei `276–291`, `create()` bei `463–489`, alle drei
+Guard-Vorkommen `"ist archiviert"` bei Zeilen 493/544/570/627 gegengezählt — nur `move()`s
+Guard bei 627 wird relaxiert, die drei anderen (`update`/`append`/`patch`) bleiben unverändert):
+
+- `move()`: der Guard `if current.status == "archived": raise ...` wird zu
+  `if current.status == "archived" and folder not in (None, ""): raise ...` — ein reiner
+  Space-Wechsel ist jetzt erlaubt, ein echter Ordner-Wechsel bleibt verboten (archivierte Items
+  tragen nie eine Ordnerposition).
+- `_write_item_file()` bekommt einen Sonderfall: `item.status == "archived"` routet den
+  Zielpfad auf `<space>/_archive/<file>` statt über `files.item_path()` (das `_archive/` nicht
+  kennt) — dieselbe Pfad-Sonderbehandlung, die vorher exklusiv `archive()`s eigener,
+  separater Code hatte, jetzt am gemeinsamen Schreibpfad. Vor diesem Fix hätte ein `move()`
+  auf ein archiviertes Item die Datei an die Ziel-Space-Wurzel gesetzt — physisch „entarchiviert“,
+  während das Frontmatter weiter `status: archived` behauptet hätte.
+- **Zweiter Advisor-Fund, vor demselben Commit:** `create(status="archived")` ist über
+  `POST /api/v1/items` erreichbar (`_items_post`s Feld-Whitelist enthält `status`,
+  `STATUS_VALUES` erlaubt `archived` für `note` **und** `task` seit der P2-Öffnung) und lief am
+  ursprünglichen `move()`-Guard naturgemäß nie vorbei — der `_write_item_file()`-Fix hätte hier
+  aber eine neue Divergenz erzeugt (Datei landet in `_archive/`, das zurückgegebene `Item`-Objekt
+  im Speicher trägt trotzdem noch das angeforderte `folder`, bis der nächste `get()` es aus dem
+  echten Pfad neu ableitet und verwirft). **Fix:** `create()` setzt `folder=""` selbst, sobald
+  `status="archived"` — dieselbe Zurücksetzung, die `archive()` seit je her vornimmt, hier nur
+  vorgezogen. Ein direkt als `archived` angelegtes Item verhält sich damit identisch zu einem,
+  das später archiviert wurde.
+- `_spaces_delete` (`webui/api.py`) verliert den `archived_blockers`-Riegel aus dem vorherigen
+  Commit ersatzlos; der Durchlauf ruft `archive()` nur noch für Items auf, die `move()` nicht
+  bereits als `status == "archived"` zurückgibt (kein doppelter Commit auf einem schon
+  archivierten Item).
+
+**Verifiziert:** `phase1_storage/tests/test_store.py`s `test_move_of_archived_item_is_rejected`
+durch drei Tests ersetzt (Ordner-Wechsel weiterhin verboten, Space-Wechsel relokiert korrekt ins
+Ziel-`_archive/`, genau ein `move`-Commit) + ein neuer Test für `create(status="archived")`.
+`phase7_spaces_admin/tests/test_space_removal.py`s bisheriger 403-Test (`archived_blockers`)
+durch einen 200-Test ersetzt, der zusätzlich gegenprüft, dass das bereits archivierte Item
+KEINEN zweiten `archive`-Commit bekommt. Charakterisierung (P6-D/P7-C,
+`phase6_shares/tests/test_characterization.py`) vor und nach byte-identisch grün. Volle Suite
+**900 → 903**, real gezählt. Tabu-Diff weiterhin leer.
+
+**Dated Plan-Korrektur** (wie bei C1s P7-12-Zeitpunkt und C2s `orphans`-Fund): Plan §4.C4s
+Pseudocode ruft `store.archive()` unterschiedslos nach jedem `move()` auf — der tatsächliche
+Code ruft es nur noch für Items auf, die nicht schon archiviert waren. Der 📕-Plan-Snapshot
+bleibt unverändert, diese Zeile ist die maßgebliche Korrektur.
+
+**Dokumentation der siebten Öffnung** (Ankündigung + Bau in derselben Sitzung, kein separater
+Ankündigungs-Absatz vorher) steht vollständig in `phase1_storage/CLAUDE.md`s „Geerbte
+Contracts" — Modul-Status-Zeile 15 dort, Gesamtzahl-Korrektur 150→154 (davon 151 korrigierte
+Baseline aus einer übersehenen Zeile-10-Ergänzung in C2, +3 netto aus dieser Öffnung).
+
+**Nächster Schritt, konkret:** unverändert C3 (UI) — die archivierte-Items-Frage ist jetzt
+geschlossen, kein offener Posten mehr dafür.

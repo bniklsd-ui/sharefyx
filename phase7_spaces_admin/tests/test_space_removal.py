@@ -197,14 +197,12 @@ async def test_removal_blocked_by_one_unwritable_item_moves_nothing(
 
 
 @pytest.mark.asyncio
-async def test_removal_blocked_by_an_already_archived_item_moves_nothing(app, item_store, totp_code, clock):
-    # Empirischer Advisor-Fund: `store.search()` zählt archivierte Items mit (`total` schließt sie
-    # ein), aber `store.move()` verbietet sie explizit ("ist archiviert — move verboten").
-    # Ohne diesen Riegel hätte ein `ValidationError` mitten im Durchlauf einen unbehandelten
-    # 500 ausgelöst -- nach bereits verschobenen Items, ohne den von N9 verlangten Bericht.
-    # Fail-closed VOR jedem Schreibvorgang ist die einzige Option, solange der Store keine
-    # Move-Variante für archivierte Items kennt (Nikinger-Entscheidung offen, siehe Kommentar
-    # in `_spaces_delete`).
+async def test_removal_moves_an_already_archived_item_to_the_home_archive(app, item_store, totp_code, clock):
+    # `storage.store.Store.move()`s siebte Contract-Öffnung (P7 Step C4): ein bereits
+    # archiviertes Item lässt sich seit dieser Öffnung per Space-Wechsel bewegen -- `total`
+    # aus `store.search()` zählt archivierte Items mit, und ohne die Öffnung wäre ein Space mit
+    # Historie (`_archive/`-Inhalt) strukturell unentfernbar geblieben (empirischer Fund vor
+    # dieser Öffnung, siehe `phase1_storage/storage/store.py :: move()`s Docstring).
     _team_space(item_store)
     active = item_store.create("team", type="note", title="Aktiv")
     old = item_store.create("team", type="note", title="Alt")
@@ -216,11 +214,22 @@ async def test_removal_blocked_by_an_already_archived_item_moves_nothing(app, it
         response = await _remove_space(
             client, csrf, "team", totp_code=totp_code, confirm="team",
         )
-    assert response.status_code == 403
-    assert response.json()["detail"]["archived_blockers"] == [old.id]
-    assert (item_store.data_root / "team").is_dir()
-    assert item_store.get(active.id).space == "team"
-    assert item_store.get(old.id).space == "team"
+    assert response.status_code == 200
+    assert response.json()["archived"] == 2
+    assert not (item_store.data_root / "team").exists()
+    for item_id in (active.id, old.id):
+        moved = item_store.get(item_id)
+        assert moved.space == SPACE
+        assert moved.status == "archived"
+    # Kein zweiter Commit auf dem bereits archivierten Item -- `_spaces_delete` ruft `archive()`
+    # nur für Items auf, die `move()` nicht schon als archiviert zurückgibt. Genau EIN
+    # `archive`-Commit für `old` (aus dem Test-Setup, vor der Entfernung) und genau einer für
+    # `active` (während der Entfernung selbst) -- keine zweite Archivierung von `old`.
+    subjects = _commit_subjects(item_store.data_root)
+    old_archive_commits = [s for s in subjects if s == f"archive {old.id} [team]"]
+    active_archive_commits = [s for s in subjects if s.startswith(f"archive {active.id} ")]
+    assert len(old_archive_commits) == 1
+    assert len(active_archive_commits) == 1
 
 
 @pytest.mark.asyncio

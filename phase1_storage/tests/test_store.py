@@ -589,6 +589,22 @@ def test_create_with_folder_places_file_under_it(store, tmp_path):
     assert store.get(item.id).folder == "projekte/alpha"
 
 
+def test_create_with_status_archived_lands_directly_in_archive_and_drops_folder(store, tmp_path):
+    # Siebte Contract-Öffnung (P7 Step C4): ein direkt als `archived` angelegtes Item (z. B.
+    # über `POST /api/v1/items` mit `status="archived"`, `_items_post` erlaubt beide Felder)
+    # landet sofort unter `_archive/`, ein mitgeschicktes `folder` wird verworfen -- dieselbe
+    # Zurücksetzung, die `archive()` seit je her vornimmt, hier nur vorgezogen auf `create()`.
+    item = store.create(
+        "nikinger", type="note", title="Direkt Erledigt", status="archived", folder="projekte",
+    )
+    assert item.folder == ""
+    assert item.status == "archived"
+    path = tmp_path / "nikinger" / "_archive" / f"{item.id}__direkt-erledigt.md"
+    assert path.exists()
+    assert not (tmp_path / "nikinger" / "projekte").exists()
+    assert store.get(item.id).folder == ""
+
+
 def test_create_rejects_folder_deeper_than_max(store):
     with pytest.raises(ValidationError):
         store.create("nikinger", type="note", title="Zu tief", folder="a/b/c")
@@ -864,12 +880,49 @@ def test_move_removes_emptied_source_folder_but_keeps_one_with_share_yml(store, 
     assert (tmp_path / "nikinger" / "geteilt" / ".share.yml").exists()
 
 
-def test_move_of_archived_item_is_rejected(store):
+def test_move_of_archived_item_rejects_a_real_folder_change(store):
+    # Siebte Contract-Öffnung (P7 Step C4): ein reiner Space-Wechsel ist seit dieser Öffnung
+    # erlaubt (siehe die beiden Tests unten) -- ein echter Ordner-Wechsel bleibt verboten, weil
+    # ein archiviertes Item nie eine Ordnerposition trägt (`archive()` erzwingt `folder=""`).
     item = store.create("nikinger", type="note", title="Erledigt")
     archived = store.archive(item.id, version=item.version)
 
     with pytest.raises(ValidationError):
-        store.move(archived.id, version=archived.version, space="nikinger")
+        store.move(archived.id, version=archived.version, folder="irgendwo")
+
+
+def test_move_of_archived_item_between_spaces_relocates_to_target_archive(store, tmp_path):
+    # Siebte Contract-Öffnung (P7 Step C4, N8/P7-20-Fund): vorher unterschiedslos verboten, was
+    # einen Space mit Historie (`_archive/`-Inhalt) strukturell unentfernbar machte. Ein reiner
+    # Space-Wechsel ist jetzt erlaubt -- `_write_item_file()` legt das Item dabei ins
+    # Ziel-`_archive/`, nicht an die Space-Wurzel (`files.item_path()` kennt `_archive/` nicht).
+    (tmp_path / "fabian").mkdir()
+    item = store.create("nikinger", type="note", title="Erledigt")
+    archived = store.archive(item.id, version=item.version)
+
+    moved = store.move(archived.id, version=archived.version, space="fabian")
+
+    assert moved.space == "fabian"
+    assert moved.status == "archived"
+    assert moved.folder == ""
+    target_path = tmp_path / "fabian" / "_archive" / f"{item.id}__erledigt.md"
+    assert target_path.exists()
+    assert not (tmp_path / "nikinger" / "_archive" / f"{item.id}__erledigt.md").exists()
+    fetched = store.get(item.id)
+    assert fetched.space == "fabian"
+    assert fetched.status == "archived"
+
+
+def test_move_of_archived_item_produces_exactly_one_commit(store_git, tmp_path):
+    (tmp_path / "fabian").mkdir()
+    item = store_git.create("nikinger", type="note", title="Erledigt")
+    archived = store_git.archive(item.id, version=item.version)
+
+    store_git.move(archived.id, version=archived.version, space="fabian")
+
+    messages = _git_log(tmp_path)
+    move_commits = [m for m in messages if m.startswith("move ")]
+    assert len(move_commits) == 1
 
 
 # -- Bild-Assets (Phase 6.5 Step B1, fünfte Contract-Öffnung) ---------------------------

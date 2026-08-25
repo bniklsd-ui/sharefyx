@@ -479,24 +479,6 @@ def api_routes(
                 "nichts wurde bewegt.",
                 detail={"blockers": blockers},
             )
-        # Ein bereits archiviertes Item lässt sich nicht `move()`n (`store.py`: „ist archiviert
-        # — move verboten"). N8 sagt: Items sterben nie, aber der Store hat keine API, ein
-        # archiviertes Item in einen anderen Space zu verschieben — genau der Fall, den `store.
-        # search()`s Empirie hier zeigte (`total` zählt archivierte Items mit). Fail-closed statt
-        # eines unbehandelten `ValidationError` mitten im Durchlauf (das wäre ein 500 nach K
-        # bereits verschobenen Items, ohne Bericht — ein Bruch von N9). Eine Space mit Historie
-        # wird damit vorerst unentfernbar; ob das dauerhaft tragbar ist oder eine siebte
-        # Contract-Öffnung braucht (Store bekommt eine Move-Variante für archivierte Items), ist
-        # eine Nikinger-Entscheidung, keine, die dieser Commit trifft.
-        archived_blockers = [item.id for item in items if item.status == "archived"]
-        if archived_blockers:
-            raise ApiError(
-                "forbidden",
-                f"{len(archived_blockers)} bereits archivierte Item(s) in diesem Space können "
-                "nicht automatisch verschoben werden — nichts wurde bewegt.",
-                detail={"archived_blockers": archived_blockers},
-            )
-
         body = await _json_body(request)
         require_space_reauth(
             session, body, widening=True,
@@ -509,12 +491,17 @@ def api_routes(
 
         # DURCHLAUF, Item für Item. Bei einem `ConflictError` mitten im Lauf: ABBRUCH, Bericht,
         # Space bleibt stehen — bereits verschobene Items bleiben verschoben, ein Rollback
-        # existiert nicht, weil Git-Commits sich nicht zurücknehmen lassen (N9).
+        # existiert nicht, weil Git-Commits sich nicht zurücknehmen lassen (N9). Ein bereits
+        # archiviertes Item braucht nur noch `move()` (siebte Contract-Öffnung, P7 Step C4 —
+        # `_write_item_file()` legt es dabei selbst ins Ziel-`_archive/`) — ein zweiter
+        # `archive()`-Aufruf wäre ein überflüssiger, doppelter Commit auf einem bereits
+        # archivierten Item.
         moved: list[str] = []
         try:
             for item in items:
                 it = store.move(item.id, version=item.version, space=home, folder="")
-                store.archive(it.id, version=it.version)
+                if it.status != "archived":
+                    store.archive(it.id, version=it.version)
                 moved.append(item.id)
         except ConflictError as exc:
             remaining = [item.id for item in items if item.id not in moved]

@@ -99,8 +99,9 @@ P1 nicht abgeschlossen, egal wie viel Code existiert.
 | 12 | `store.py :: search()` bekommt `in_body: bool = False` (P6.5-N4) — additiv zum bestehenden Contract, keine benannte Öffnung wie #9/#10/#11 (kein neues Modul, kein neuer Store-Aufruf, nur ein optionales Keyword an einer bereits kontraktierten Signatur) | Phase 6.5 Step A4 | ✅ | 3 (in `test_store.py`) |
 | 13 | Fünfte, benannte Contract-Öffnung (angekündigt Step 0, siehe „Geerbte Contracts"): `AssetInfo` (neu, `models.py`), `files.py` (`new_asset_id()`, `ITEM_ID_RE`/`ASSET_ID_RE`, `ASSET_MIME_TYPES`/`sniff_image_mime()`, `asset_dir()`/`asset_path()`, `move_asset_dir()`, `atomic_write_bytes()`), `store.py` (`put_asset()`/`list_assets()`/`get_asset()`/`delete_asset()`, `move()` zieht das Asset-Verzeichnis mit — ein Move bleibt ein Commit) | Phase 6.5 Step B1 | ✅ | 20 (12 `test_files.py` + 8 `test_store.py`) |
 | 14 | Sechste, benannte Contract-Öffnung (angekündigt P7 Step 0, siehe „Geerbte Contracts"): `acl.py` bekommt eine Schreibseite — `read_share_file()`/`write_share_file()`/`add_member()`/`remove_member()`/`create_space()`/`remove_space_dir()`/`spaces_referencing()`/`AclWriteError` — byte-identische Extraktion aus `spacectl.py` (P7-P), kein neues Verhalten | P7 Step C1 | ✅ **gebaut, Phase noch nicht abgeschlossen** (siehe „Geerbte Contracts" unten) | 24 (außerhalb dieses Pakets, `phase7_spaces_admin/tests/test_acl_write.py` — gleiche Kategorie wie Zeile 10s `phase6_shares/tests/test_acl.py`) |
+| 15 | Siebte, benannte Contract-Öffnung, angekündigt **und** gebaut in derselben Sitzung (P7 Step C4, Advisor-Fund): `store.py :: move()` erlaubt jetzt einen reinen Space-Wechsel für bereits archivierte Items (ein echter Ordner-Wechsel bleibt verboten); `_write_item_file()` legt ein archiviertes Item dabei ins Ziel-`_archive/`, nicht an die Space-Wurzel (`files.item_path()` kennt `_archive/` nicht — dieselbe Sonderbehandlung, die `archive()` bisher exklusiv hatte). Zweiter Advisor-Fund: `create(status="archived")` (über MCP/REST erreichbar, `STATUS_VALUES` erlaubt `archived` für beide Typen seit P2 Step 2) lief bis dahin am selben Riegel vorbei — jetzt landet auch ein direkt als `archived` angelegtes Item sofort unter `_archive/`, ein mitgeschicktes `folder` wird verworfen, dieselbe Zurücksetzung wie in `archive()` | P7 Step C4 | ✅ **gebaut, Phase noch nicht abgeschlossen** — schließt eine strukturelle Lücke, die C4s Space-Entfernen sonst bei jedem Space mit `_archive/`-Inhalt (also jedem Space mit echter Historie) permanent blockiert hätte | 4 (in `test_store.py`: `test_move_of_archived_item_between_spaces_relocates_to_target_archive`, `test_move_of_archived_item_produces_exactly_one_commit`, `test_move_of_archived_item_rejects_a_real_folder_change` — ersetzt den bisherigen `test_move_of_archived_item_is_rejected` —, `test_create_with_status_archived_lands_directly_in_archive_and_drops_folder`) |
 
-**Gesamt: 150 Tests** (`70 Tests` war der Stand bei Phasenabschluss; **[2026-07-25 Korrektur,
+**Gesamt: 154 Tests** (`70 Tests` war der Stand bei Phasenabschluss; **[2026-07-25 Korrektur,
 P2 Step 0]:** `rename_for_new_slug()` samt zweier Tests entfernt, 70→68; **[2026-07-25,
 P2 Step 2]:** acht neue Tests für die drei freigegebenen Contract-Erweiterungen, 68→76 — siehe
 „Geerbte Contracts" unten; **[2026-08-09, P6 Step 1]:** fünf neue Tests für `Store.patch()`
@@ -115,7 +116,13 @@ vor Step B1, nicht 126 — vierzehnte Instanz derselben Drift-Kategorie wie die 
 `phase2_mcp/CLAUDE.md`, diesmal von Claude Code selbst verursacht und noch am selben Tag beim
 nächsten vollen Recount aufgefallen, nicht erst später gefunden; **[2026-08-20, Phase 6.5 Step
 B1]:** 20 neue Tests für die fünfte Contract-Öffnung (Bild-Assets, siehe Zeile 13; 19 im ersten
-Durchgang + 1 nach einem Advisor-Fund, siehe unten), 130→150).
+Durchgang + 1 nach einem Advisor-Fund, siehe unten), 130→150. **[2026-08-25 Korrektur, P7 Step
+C4]:** 150 war bereits leicht stale — P7 Step C2 (`Store.data_root`-Property, Modul-Status-Zeile
+10 der Phase-7-Tabelle) hatte einen Test in `test_store.py` ergänzt, ohne dass diese Gesamtzahl
+hier nachgezogen wurde (kein neuer Contract-Absatz, deshalb übersehen). Ein
+`pytest --collect-only -q` über **alle** `phase1_storage/tests/*.py` ergab **154** — real
+gezählt, nicht addiert: 151 (korrigierte Baseline) + 3 netto aus der siebten Öffnung (ein
+bestehender Test ersetzt durch drei + ein neuer, siehe Zeile 15), 151→154.**
 Zielgröße
 am Phasenende: grob 60–90,
 davon mindestens die vier Konflikt-Tests aus Step 4 — diese Zielgröße galt für den P1-Abschluss,
@@ -279,6 +286,29 @@ Verhalten, nur ein Zugriffspfad für `webui/api.py`s neue Space-Verwaltungsroute
 Schreibseite (C1) direkt aufrufen und dafür den rohen `DATA_ROOT`-Pfad brauchen, den `Store`
 bisher nur privat hielt. Kein eigener Absatz nötig gewesen, wird hier trotzdem benannt, damit
 kein Leser eine unbelegte öffentliche Property vorfindet.
+
+**[2026-08-25, P7 Step C4] Siebte, benannte Contract-Öffnung — angekündigt und gebaut in
+derselben Sitzung, kein separater Ankündigungs-Absatz (Nikinger-Entscheidung im laufenden
+Gespräch, nicht als eigener Plan-Step vorgeplant).** Ausgangspunkt war der P7-20-Fund im
+Advisor-Review von Step C4 (`webui/api.py :: _spaces_delete`): `store.move()` verbot jeden Move
+eines bereits archivierten Items pauschal, was einen Space mit `_archive/`-Inhalt — also jeden
+Space mit echter Historie — strukturell unentfernbar gemacht hätte. **`store.py :: move()`**
+erlaubt jetzt einen reinen Space-Wechsel für archivierte Items (kein `folder=` außer `""`); ein
+echter Ordner-Wechsel bleibt verboten, weil ein archiviertes Item nie eine Ordnerposition trägt.
+**`_write_item_file()`** legt ein archiviertes Item dabei ins Ziel-`_archive/`, nicht an die
+Space-Wurzel — `files.item_path()` kennt diesen Sonderfall nicht, vorher war das exklusiv
+`archive()`s eigene, separate Pfad-Berechnung. **Zweiter Advisor-Fund, vor demselben Commit:**
+`create(status="archived")` — erreichbar über `POST /api/v1/items` (`webui/api.py`, `status`
+steht in dessen Feld-Whitelist) und über MCP, `STATUS_VALUES` erlaubt `archived` für beide Typen
+seit der P2-Öffnung — lief bisher am ursprünglichen Riegel vorbei und hätte mit dem `_write_
+item_file()`-Fix eine Divergenz erzeugt (Datei landet in `_archive/`, `folder` im Frontmatter
+bliebe der angeforderte Wert, den der nächste `get()` ohnehin verwirft, weil `folder` immer aus
+dem realen Pfad abgeleitet wird — nie aus dem Frontmatter). **Entschieden:** `create()` setzt
+`folder=""` jetzt selbst, sobald `status="archived"`, dieselbe Zurücksetzung wie in `archive()`
+— ein Space mit direkt archiviert angelegten Items verhält sich damit identisch zu einem, dessen
+Items später archiviert wurden, kein Sonderfall. Charakterisierung (P6-D/P7-C) lief vor und nach
+byte-identisch grün. Vier neue/ersetzte Tests in `test_store.py` (siehe Modul-Status-Zeile 15).
+**Bleibt formal offen bis zum Phase-7-Abschluss**, dieselbe Disziplin wie Öffnung 6.
 
 **[2026-08-17, P6 Step 7b Commit 1/3] Vierte, benannte Contract-Öffnung gebaut** (angekündigt in
 `phase6_shares/CLAUDE.md`s Session-Block vom selben Tag, `phase6_shares/ITEM_MOVE_PLAN.md` §4.1,
