@@ -9,7 +9,7 @@ down:
   - ../docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md   # Herkunft: P6-Status, §4.1/§4.2, offene Entscheidungen §5.1–§5.7
   - ../phase6_shares/ITEM_MOVE_PLAN.md              # §9 Mehrfachauswahl (P6-AK–AN) — Block B baut das, unverändert
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-08-25 (P6.5-12/P7-5 per echtem Browser-Klick bestanden, testnutzer-p7-Substitution, 13/14 in Phase 6.5) | 2026-08-25 (echter deploy.sh-Lauf durch den Nikinger, Live-Release jetzt 53bad20 statt f96125e, A3s asset-strip live, P6.5-12 wieder testbar) | 2026-08-23 (A8: Phase 6.5 formal abgeschlossen als 🟡, 12/14, P6.5-8/13 via testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, P1-Contract-Absatz aktualisiert) | 2026-08-23 (Step 0 gestartet, Doku-Audit gefahren, Skelett angelegt)
+updated: 2026-08-25 (P7-1/P7-2/P7-7 per echtem Browser-Klick bestanden, git-Reparatur nach Nikinger-Freigabe, nur noch P7-4/P7-9/P7-12 offen) | 2026-08-25 (P6.5-12/P7-5 per echtem Browser-Klick bestanden, testnutzer-p7-Substitution, 13/14 in Phase 6.5) | 2026-08-25 (echter deploy.sh-Lauf durch den Nikinger, Live-Release jetzt 53bad20 statt f96125e, A3s asset-strip live, P6.5-12 wieder testbar) | 2026-08-23 (A8: Phase 6.5 formal abgeschlossen als 🟡, 12/14, P6.5-8/13 via testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, P1-Contract-Absatz aktualisiert) | 2026-08-23 (Step 0 gestartet, Doku-Audit gefahren, Skelett angelegt)
 ---
 # CLAUDE.md — Phase 7: Space-Verwaltung, Mehrfachauswahl, Konsolidierung (`phase7_spaces_admin/`)
 
@@ -97,13 +97,13 @@ keinen Code bekommen, nur Step 0 (Haushalt) lief.
 
 | # | Kriterium | Wer | Status |
 |---|---|---|---|
-| P7-1 | Item-ID sichtbar + Klick kopiert | Niklas | ⬜ gebaut, ungeprüft |
-| P7-2 | ID-Suche findet Item spaceübergreifend | Niklas | 🟡 Backend per Test bewiesen, keine Browserprobe |
+| P7-1 | Item-ID sichtbar + Klick kopiert | Niklas | ✅ (via `testnutzer-p7`) — **[2026-08-25]** `itm_ee1e0323` sichtbar im Kopfdaten-Header, „ID kopieren" geklickt, „ID kopiert."-Toast bestätigt (`editor.js:202-204`: Toast läuft nur im `.then()` von `navigator.clipboard.writeText(itemId)` — kein Fake-Erfolg möglich) |
+| P7-2 | ID-Suche findet Item spaceübergreifend | Niklas | ✅ (via `testnutzer-p7`) — **[2026-08-25]** `p7_11_setup_fixture.py` erneut gefahren (`share_read:[testnutzer-p7]` auf `itm_3d0ac2b3`, niklas-Space), Suche nach `itm_3d0ac2b3` in „Alle Items" fand das fremde Item, Chip „geteilt mit testnutzer-p7" |
 | P7-3 | ID-Suche auf nicht lesbares Item → leere Liste | Claude Code, Test | ✅ `test_id_lookup_respects_read_permission` |
 | P7-4 | Claude nennt Items beim Titel, nicht der ID | Niklas, echter Connector | ⬜ Text steht in vier Tool-Beschreibungen, kein Connector-Beweis |
 | P7-5 | Bild im Editor entfernbar, landet in `_trash/` | Niklas | ✅ (via `testnutzer-p7`) — **[2026-08-25]** echter Browser-Klick, `itm_26f8d0b7`/`ast_e60e8d8a`, siehe Session-Block |
 | P7-6 | `PATCH` mit Tippfehler-Feld abgewiesen (O6) | Claude Code, Test | ✅ `test_items_patch_rejects_an_unknown_field` |
-| P7-7 | Speichern/Verschieben/Freigeben nach Whitelist unverändert | Niklas | 🟡 Whitelist per Test gegen die real gesendeten Felder gepinnt, keine Browserprobe |
+| P7-7 | Speichern/Verschieben/Freigeben nach Whitelist unverändert | Niklas | ✅ (via `testnutzer-p7`) — **[2026-08-25]** `itm_68f0251d`: Save (Body-Edit, v1→v2), Move (`p7-7-test`-Ordner angelegt + verschoben, Datei real dort, v2→v3), Share (leerer Dialog — `testnutzer-p7` kennt laut P6-V keine fremden Spaces, `Speichern` als No-op-PATCH echt abgeschickt, v3→v4). Frontmatter nach allen vier Commits (`create`/`update`×3) weiterhin exakt die erlaubten Felder, keine Fremdfelder |
 | P7-8 | Migration: 0 `.md` ohne `visibility:` | Nikinger + Claude Code | ✅ `--apply` 2026-08-23, `items_migrated:73` (deckungsgleich Dry-Run), `grep -L '^visibility:'`→0, 3 Commits (niklas/fabian/IT-Sekus-Projekt) |
 | P7-9 | `clients`/`token_families` sinken nach realem Purge | Niklas | ⬜ — `token_families` ab 2026-08-28, `clients` erst ab 2026-10-27 (siehe Session-Block, Retention 30d/90d) |
 | P7-10 | `testnutzer-p7` existiert, schreibt einmal | Nikinger + Claude Code | ✅ `p7_10_write_probe.py`, `itm_ee1e0323` |
@@ -233,3 +233,47 @@ Tabu-Diff nicht relevant.
 
 **Offen für die nächste Session:** P7-9 (A6-Purge-Rückgang, `token_families` ab 2026-08-28,
 `clients` ab 2026-10-27, rein beobachtend) — sonst nichts Neues aus dieser Sitzung.
+
+**Nachtrag, 2026-08-25 — P7-1/P7-2/P7-7 per echtem Browser-Klick bestanden, git-Reparatur
+zwischendurch.**
+
+**Git-Zwischenfall (vor den Proben, beim Recherchieren von `p7_11_setup_fixture.py`):** `git
+log` scheiterte mit `fatal: bad object HEAD` — der Commit `ef2e6be` (vorheriger Nachtrag dieser
+Sitzung) war als acht 0-Byte-Objekte auf der Platte gelandet, alle mit demselben Zeitstempel
+(13:28) — ein unterbrochener `git commit`-Schreibvorgang, isoliert auf genau dieses eine
+Ereignis (`git reflog`/frühere Commits intakt, Arbeitskopie-Inhalt per `grep` gegengeprüft und
+vollständig). **Reparatur nach expliziter Nikinger-Freigabe** (`git update-ref
+refs/heads/main 6fb3eda...`, dann die acht verwaisten 0-Byte-Objekte gelöscht, `git read-tree
+HEAD` gegen den stale Cache-Tree im Index, `touch` + `git add` + `git commit` neu) — Ergebnis
+`6e60dbd`, `git fsck --full` danach sauber (nur harmlose dangling Objekte + eine veraltete
+Reflog-Zeile, keine echte Beschädigung mehr). Kein Datenverlust: derselbe Inhalt, neuer,
+gültiger Commit.
+
+**P7-1 ✅, P7-2 ✅, P7-7 ✅** — Details in der Modul-Status-Tabelle oben. Zwei Nebenfunde beim
+Bauen:
+- **Freigeben-Dialog für `testnutzer-p7` ist strukturell leer**, nicht kaputt — `dialogs.js:262-
+  266` (P6-V) listet nur `state.spaces`, und `testnutzer-p7` kennt (space-level) keinen anderen
+  Space. Exakt der Fall, für den `p7_11_setup_fixture.py` existiert; hier zusätzlich bestätigt,
+  dass ein leerer `Speichern`-Klick ein echtes, harmloses No-op-PATCH auslöst (Version bumpt, kein
+  Fremdfeld erscheint) statt gar nichts zu tun.
+- **`navigator.clipboard.readText()` per `javascript_tool` hängt den Tab auf** (45s-Timeout,
+  „renderer möglicherweise eingefroren") — vermutlich ein Chrome-Berechtigungsprompt außerhalb
+  des DOM, den Screenshots nicht zeigen. Nicht weiter verfolgt, seitdem gemieden: DOM-sichtbare
+  Bestätigungen (Toast-Text, Quellcode-Verifikation der `.then()`-Kette) reichen als Beweis und
+  sind ohnehin die robustere Prüfung.
+
+**Aufräumen:** `p7_11`-Fixture-Freigabe (`share_read:[testnutzer-p7]` auf `itm_3d0ac2b3`) bewusst
+**nicht** zurückgenommen — falls P7-2 später erneut vorgezeigt werden soll, ist die Fixture
+sofort wieder nutzbar; Rücknahme ist Teil des ohnehin fälligen P7-12-Abbaus. Testitem `itm_
+68f0251d` archiviert (`_archive/`), Test-Ordner `p7-7-test` bleibt (kein Lösch-Mechanismus für
+leere Ordner in der UI, kein Schaden).
+
+**Verifiziert:** kein Python-Code geändert (nur `.md`), Tabu-Diff nicht relevant. Kein `pytest`-
+Lauf nötig — reine Live-Browser-/Git-Reparatursession.
+
+**Damit bleiben aus dem P7-A-Rest nur noch: P7-4 (braucht Niklas selbst mit einem echten
+Connector-Gespräch — nicht durch Claude Code allein herstellbar), P7-9 (kalendergebunden,
+2026-08-28/2026-10-27) und P7-12 (Testnutzer-Abbau — laut eigenem Docstring „am Ende von Block
+A"; mit P7-1/2/5/6/7/8/10/11/12b jetzt erledigt ist nur noch P7-9 offen, das `testnutzer-p7`
+nicht braucht — der Abbau ist damit möglich, aber eine Nikinger-Entscheidung, kein automatischer
+nächster Schritt).**
