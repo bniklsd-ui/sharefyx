@@ -16,12 +16,13 @@ gesetzte `Environment=SPACE_DATA_ROOT=...`-Zeile, ganz unabhängig von `StateDir
 war die Haltung („aus der Umgebung auflösen, kein stiller Fallback"), nicht die wörtliche
 Variable — hier entsprechend mit `SPACE_DATA_ROOT` umgesetzt.
 
-Schreibende Unterbefehle (`create-space`/`add-member`/`remove-member`/`remove-space`) halten
-für ihre gesamte Operation denselben `.write.lock`-Flock wie `Store._file_write_lock()`
-(`storage/store.py`) — hier bewusst neu implementiert statt dort als öffentliche Methode
-exportiert (dieselbe Zurückhaltung wie P6 Step 5: keine neue `Store`-Fläche für einen einzigen
-Aufrufer öffnen). Das serialisiert diese Schreibvorgänge gegen einen parallel laufenden Dienst
-über Prozessgrenzen hinweg, exakt wie `history.commit()`s Docstring es verlangt.
+Schreibende Unterbefehle (`create-space`/`add-member`/`remove-member`/`remove-space`) rufen seit
+P7 Step C1 `storage.acl`s Schreibfunktionen auf (`read_share_file`/`add_member`/`remove_member`/
+`create_space`/`remove_space_dir`/`spaces_referencing`) — dieses Skript hält den `.write.lock`
+selbst nicht mehr, `acl.py` nimmt ihn je Aufruf selbst und gibt ihn vor der Rückkehr wieder frei
+(P7-M: zwei `open()` auf dieselbe Lock-Datei im selben Prozess blockieren einander). Das
+serialisiert diese Schreibvorgänge weiterhin gegen einen parallel laufenden Dienst über
+Prozessgrenzen hinweg, exakt wie `history.commit()`s Docstring es verlangt.
 
 Ausgabe: Text auf stdout (Unterbefehle mit `--json` liefern zusätzlich maschinenlesbares JSON),
 Logs/Fehler auf stderr (Hard Rule 7).
@@ -29,16 +30,14 @@ Logs/Fehler auf stderr (Hard Rule 7).
 from __future__ import annotations
 
 import argparse
-import fcntl
 import json
 import os
-import shutil
 import sys
 from pathlib import Path
 
 import yaml
 
-from storage import files, history
+from storage import acl
 from storage.acl import ACL_FILENAME
 from storage.store import Store
 
@@ -56,31 +55,6 @@ def _resolve_data_root(args_value: str | None, env: dict[str, str]) -> Path:
             "(kein stiller Fallback ins Arbeitsverzeichnis)"
         )
     return Path(raw)
-
-
-class _DataRootLock:
-    """Flock auf `<data_root>/.write.lock` — dieselbe Datei wie `Store._file_write_lock()`,
-    hier eigenständig gehalten, weil dieses Skript keinen `Store` für seine Schreibvorgänge
-    benutzt (die schreiben `.share.yml`/Space-Verzeichnisse, keine Items)."""
-
-    def __init__(self, data_root: Path) -> None:
-        self._lock_path = data_root / ".write.lock"
-        self._fh = None
-
-    def __enter__(self) -> "_DataRootLock":
-        self._lock_path.touch(exist_ok=True)
-        self._fh = open(self._lock_path, "r+")
-        fcntl.flock(self._fh, fcntl.LOCK_EX)
-        # Idempotent wie in `Store.__init__` -- dieses Skript darf nicht davon abhängen, dass
-        # vorher schon ein `Store` instanziiert wurde (z. B. gegen ein frisches `tmp_path` in
-        # Tests); ohne Repo würde `history.commit()` weiter unten nur `logger.critical` loggen
-        # (nie fatal) und der geforderte Commit bliebe stillschweigend aus.
-        history.ensure_repo(self._lock_path.parent)
-        return self
-
-    def __exit__(self, *exc_info: object) -> None:
-        fcntl.flock(self._fh, fcntl.LOCK_UN)
-        self._fh.close()
 
 
 def _is_known_space(data_root: Path, name: str) -> bool:
@@ -110,40 +84,21 @@ def _find_share_files(data_root: Path):
     yield from sorted(data_root.rglob(ACL_FILENAME))
 
 
-def _spaces_referencing(data_root: Path, name: str, *, exclude: Path) -> list[str]:
-    """Alle `.share.yml`-Dateien (außer `exclude`), die `name` in `read:`/`write:` nennen —
-    Basis für `remove-space`s Verwaisungswarnung und `check`s Diagnose."""
-    hits = []
-    for share_path in _find_share_files(data_root):
-        if share_path == exclude:
-            continue
-        try:
-            data = _load_share_file(share_path)
-        except (ValueError, yaml.YAMLError):
-            continue  # kaputte Datei ist `check`s Befund, nicht dieser Warnung Aufgabe
-        names = set(data.get("read") or []) | set(data.get("write") or [])
-        if name in names:
-            hits.append(str(share_path.relative_to(data_root)))
-    return sorted(hits)
-
-
 # -- Unterbefehle -------------------------------------------------------------------------
+#
+# create-space/add-member/remove-member/remove-space rufen ab hier `storage.acl`s
+# Schreibfunktionen auf (P7 Step C1, sechste Contract-Öffnung) statt eigener Kopien — reine
+# Extraktion, Ausgabetexte und Exit-Codes bleiben byte-identisch (Bedingung für die 20
+# bestehenden Tests dieser Datei als Regressionsbeweis).
 
 
 def _cmd_create_space(data_root: Path, args: argparse.Namespace) -> int:
     name = args.name
-    if "/" in name or name.startswith(".") or name in files.RESERVED_DIR_NAMES:
-        print(f"ABBRUCH: '{name}' ist kein gültiger Space-Name.", file=sys.stderr)
+    try:
+        space_dir = acl.create_space(data_root, name)
+    except acl.AclWriteError as exc:
+        print(f"ABBRUCH: {exc}", file=sys.stderr)
         return EXIT_ERROR
-    space_dir = data_root / name
-    with _DataRootLock(data_root):
-        if space_dir.exists():
-            print(f"ABBRUCH: Space '{name}' existiert bereits.", file=sys.stderr)
-            return EXIT_ERROR
-        space_dir.mkdir(parents=True)
-    # Ein leeres Verzeichnis hat für Git nichts zu committen (Git kennt keine leeren
-    # Verzeichnisse) — kein `history.commit()`-Aufruf hier, der erste Item-Write erzeugt den
-    # ersten realen Commit für diesen Space.
     print(f"Space '{name}' angelegt: {space_dir}")
     return EXIT_OK
 
@@ -195,17 +150,10 @@ def _cmd_add_member(data_root: Path, args: argparse.Namespace) -> int:
             file=sys.stderr,
         )
     key = "write" if args.write else "read"
-    share_path = data_root / space / ACL_FILENAME
-    with _DataRootLock(data_root):
-        data = _load_share_file(share_path)
-        names = set(data.get(key) or [])
-        if user in names:
-            print(f"'{user}' ist bereits in '{key}' für Space '{space}'.")
-            return EXIT_OK
-        names.add(user)
-        data[key] = sorted(names)
-        files.atomic_write(share_path, _dump_share_file(data))
-        history.commit(data_root, f"share {space} {key}+={user}")
+    added = acl.add_member(data_root, space, user, write=args.write)
+    if not added:
+        print(f"'{user}' ist bereits in '{key}' für Space '{space}'.")
+        return EXIT_OK
     print(f"Space '{space}': '{user}' zu '{key}' hinzugefügt.")
     return EXIT_OK
 
@@ -215,29 +163,10 @@ def _cmd_remove_member(data_root: Path, args: argparse.Namespace) -> int:
     if not _is_known_space(data_root, space):
         print(f"ABBRUCH: Space '{space}' existiert nicht unter {data_root}.", file=sys.stderr)
         return EXIT_ERROR
-    share_path = data_root / space / ACL_FILENAME
-    with _DataRootLock(data_root):
-        data = _load_share_file(share_path)
-        removed = []
-        for key in ("read", "write"):
-            names = set(data.get(key) or [])
-            if user in names:
-                names.discard(user)
-                data[key] = sorted(names)
-                removed.append(key)
-        if not removed:
-            print(f"'{user}' war in keiner Liste von Space '{space}'.")
-            return EXIT_OK
-        # leere Listen nicht mitschreiben — dieselbe "leer = nicht vorhanden"-Disziplin wie im
-        # Frontmatter (Plan §2.1), hier auf `.share.yml` übertragen.
-        for key in ("read", "write"):
-            if key in data and not data[key]:
-                del data[key]
-        if data:
-            files.atomic_write(share_path, _dump_share_file(data))
-        elif share_path.exists():
-            share_path.unlink()
-        history.commit(data_root, f"unshare {space} {user}")
+    removed = acl.remove_member(data_root, space, user)
+    if not removed:
+        print(f"'{user}' war in keiner Liste von Space '{space}'.")
+        return EXIT_OK
     print(f"Space '{space}': '{user}' entfernt aus {removed}.")
     return EXIT_OK
 
@@ -255,7 +184,7 @@ def _cmd_remove_space(data_root: Path, args: argparse.Namespace) -> int:
         "F2).",
         file=sys.stderr,
     )
-    orphans = _spaces_referencing(data_root, name, exclude=space_dir / ACL_FILENAME)
+    orphans = acl.spaces_referencing(data_root, name, exclude=space_dir / ACL_FILENAME)
     if orphans:
         print(
             f"WARNUNG: '{name}' wird nach dieser Aktion noch referenziert in: {orphans} — "
@@ -266,9 +195,7 @@ def _cmd_remove_space(data_root: Path, args: argparse.Namespace) -> int:
     if not args.force:
         print("Trockenlauf — kein --force übergeben, nichts gelöscht.")
         return EXIT_OK
-    with _DataRootLock(data_root):
-        shutil.rmtree(space_dir)
-        history.commit(data_root, f"remove-space {name}")
+    acl.remove_space_dir(data_root, name)
     print(f"Space '{name}' entfernt.")
     return EXIT_OK
 

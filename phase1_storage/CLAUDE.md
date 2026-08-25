@@ -263,6 +263,15 @@ datiert geschlossen (Phase 6 formal 🟡, Phase 6.5 formal 🟡, beide code-comp
 NICHT geschlossen** — Block C dieser Phase baut sie erst noch. Ein Schließen ohne diesen Satz
 wäre dieselbe Falschaussage, die `PHASE6_CLOSEOUT_HANDOVER.md` §5.6 bereits vermieden hat.
 
+**[2026-08-25, P7 Step C1] Sechste Öffnung: Code gebaut, bleibt formal offen bis Phasenabschluss.**
+`acl.py` trägt jetzt `read_share_file`/`write_share_file`/`add_member`/`remove_member`/
+`create_space`/`remove_space_dir`/`spaces_referencing`/`AclWriteError` — exakt wie oben
+angekündigt, byte-identische Extraktion aus `spacectl.py` (20 bestehende `test_spacectl.py`-Tests
+unverändert grün, Charakterisierung P6-D/P7-C vor+nach byte-identisch). 19 neue Tests in
+`phase7_spaces_admin/tests/test_acl_write.py`. **Weiterhin nicht geschlossen** — Block C ist erst
+mit C1 begonnen (C2–C5 folgen), dieselbe Disziplin wie oben: geschlossen wird erst mit dem
+formalen Phase-7-Abschluss, nicht mit dem ersten Teilschritt.
+
 **[2026-08-17, P6 Step 7b Commit 1/3] Vierte, benannte Contract-Öffnung gebaut** (angekündigt in
 `phase6_shares/CLAUDE.md`s Session-Block vom selben Tag, `phase6_shares/ITEM_MOVE_PLAN.md` §4.1,
 P6-AD): `store.py :: move(item_id, *, version, space=, folder=) -> Item` (neu) + intern

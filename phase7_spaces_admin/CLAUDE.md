@@ -9,7 +9,7 @@ down:
   - ../docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md   # Herkunft: P6-Status, §4.1/§4.2, offene Entscheidungen §5.1–§5.7
   - ../phase6_shares/ITEM_MOVE_PLAN.md              # §9 Mehrfachauswahl (P6-AK–AN) — Block B baut das, unverändert
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-08-25 (P7-4 erster echter Befund: FAIL, ID statt Titel genannt; P7-12-Abbau geprueft und bewusst NICHT gefahren -- Block C/P7-14 braucht testnutzer-p7 noch) | 2026-08-25 (P7-1/P7-2/P7-7 per echtem Browser-Klick bestanden, git-Reparatur nach Nikinger-Freigabe, nur noch P7-4/P7-9/P7-12 offen) | 2026-08-25 (P6.5-12/P7-5 per echtem Browser-Klick bestanden, testnutzer-p7-Substitution, 13/14 in Phase 6.5) | 2026-08-25 (echter deploy.sh-Lauf durch den Nikinger, Live-Release jetzt 53bad20 statt f96125e, A3s asset-strip live, P6.5-12 wieder testbar) | 2026-08-23 (A8: Phase 6.5 formal abgeschlossen als 🟡, 12/14, P6.5-8/13 via testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, P1-Contract-Absatz aktualisiert) | 2026-08-23 (Step 0 gestartet, Doku-Audit gefahren, Skelett angelegt)
+updated: 2026-08-25 (Gate A->C geprueft, alle vier Punkte live -- Block C gestartet, Step C1: Schreibseite von .share.yml in storage/acl.py, sechste Contract-Oeffnung gebaut) | 2026-08-25 (P7-4 erster echter Befund: FAIL, ID statt Titel genannt; P7-12-Abbau geprueft und bewusst NICHT gefahren -- Block C/P7-14 braucht testnutzer-p7 noch) | 2026-08-25 (P7-1/P7-2/P7-7 per echtem Browser-Klick bestanden, git-Reparatur nach Nikinger-Freigabe, nur noch P7-4/P7-9/P7-12 offen) | 2026-08-25 (P6.5-12/P7-5 per echtem Browser-Klick bestanden, testnutzer-p7-Substitution, 13/14 in Phase 6.5) | 2026-08-25 (echter deploy.sh-Lauf durch den Nikinger, Live-Release jetzt 53bad20 statt f96125e, A3s asset-strip live, P6.5-12 wieder testbar) | 2026-08-23 (A8: Phase 6.5 formal abgeschlossen als 🟡, 12/14, P6.5-8/13 via testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, P1-Contract-Absatz aktualisiert) | 2026-08-23 (Step 0 gestartet, Doku-Audit gefahren, Skelett angelegt)
 ---
 # CLAUDE.md — Phase 7: Space-Verwaltung, Mehrfachauswahl, Konsolidierung (`phase7_spaces_admin/`)
 
@@ -76,7 +76,9 @@ Abnahmezeilen: `docs/concepts/phase7_spaces_admin_plan.md`.
 
 | 8 | A8 (Phase 6.5 formal abschließen, P7-I): P6.5-8/13 per gebilligter `testnutzer-p7`-Substitution geschlossen — `p7_13_asset_fixture.py`/`p7_13_share_write_fixture.py` (neu, Store-direkte Fixtures) + `p7_13_asset_share_gate_probe.py`/`p7_13_ui_asset_probe.py` (neu, MCP- bzw. `/ui/login`-Cookie-Probe). `docs/concepts/PHASE6_5_CLOSEOUT_HANDOVER.md` (neu) + `phase6_5_tools_images_uebersicht.svg` (neu, zweimal gerendert/gegengeprüft). P1-Contract-Absatz (Öffnungen 3/4/5 datiert geschlossen, 6 als offen benannt) in `phase1_storage/CLAUDE.md`. `ROADMAP.md`/Root-`CLAUDE.md`/`docs/INDEX.md` auf den neuen 6.5-Status | A | ✅ **vollständig** — Abnahmestand 6.5: 12/14, P6.5-12/14 bleiben offen (siehe unten) | 0 (nur neue Live-Probe-Skripte, kein Unit-Test-Delta; `pytest` unverändert 843) |
 
-*(Weitere Zeilen entstehen mit dem Rest von Block A/C/B — siehe Plan §4 für die vollständige Schritt-Sequenz.)*
+| 9 | C1 (Schreibseite von `.share.yml`, sechste Contract-Öffnung, P7-P): `storage/acl.py` bekommt `read_share_file`/`write_share_file`/`add_member`/`remove_member`/`create_space`/`remove_space_dir`/`spaces_referencing`/`AclWriteError` — Extraktion aus `spacectl.py`, kein neues Verhalten. `spacectl.py`s vier schreibende Unterbefehle rufen jetzt `acl.*` auf, `_DataRootLock`/`_load_share_file`/`_dump_share_file`/`_spaces_referencing` entfallen dort (nur `_load_share_file`/`_find_share_files` bleiben, weiterhin für `check`, rein lesend). Jede `acl`-Schreibfunktion nimmt den `.write.lock`-Flock selbst (P7-M) | C | ✅ **vollständig** | +19 `phase7_spaces_admin/tests/test_acl_write.py`; 862 gesamt |
+
+*(Weitere Zeilen entstehen mit dem Rest von Block C/B — siehe Plan §4 für die vollständige Schritt-Sequenz.)*
 
 ## Geerbte Contracts
 
@@ -303,3 +305,53 @@ diesen Widerspruch bereits (A7s „Abbauen, am Ende von Block A" wurde offenbar 
 Block C den Principal als Testpartner brauchte). **Datierte Korrektur:** P7-12 bleibt bis nach
 Block C offen, nicht „am Ende von Block A" — der Plan-Snapshot selbst bleibt unverändert (📕),
 diese Zeile hier ist die maßgebliche Korrektur. Kein Handgriff ausgeführt, keine Löschung.
+
+**Nachtrag, 2026-08-25 — Gate A→C geprüft: alle vier Punkte live, Block C gestartet (Nikinger-
+Auftrag „next block should be unblocked").**
+
+**Gate-Prüfung** (Plan `docs/concepts/phase7_spaces_admin_plan.md` §0/Block-C-Vorspann, vier
+Punkte, alle vier live vor der ersten Zeile Block-C-Code):
+
+| # | Kriterium | Beleg |
+|---|---|---|
+| 1 | Item per `itm_…`-ID im Browser gefunden | P7-1 ✅ (siehe oben) |
+| 2 | Bild entfernbar, Alt-Text-Rendering, Datei in `_trash/` | P7-5 ✅ (siehe oben) |
+| 3 | Migration gelaufen, 0 Dateien ohne `visibility:` | P7-8 ✅ (73/73) |
+| 4 | `testnutzer-p7` echter Cross-Principal-Lesetest | P7-11 ✅ (Web-UI **und** MCP) |
+
+Alle vier bereits vor dieser Sitzung geschlossen, hier nur formal gegen den Plan-Wortlaut
+nachgeprüft — **Gate offen, Block C gestartet.**
+
+**Step C1 gebaut — Schreibseite von `.share.yml` in `storage/acl.py` (sechste Contract-
+Öffnung, P7-P).** Reine Extraktion aus `phase6_shares/scripts/spacectl.py`
+(`_load_share_file`/`_dump_share_file`/`_spaces_referencing`, Schreibbodies von
+`_cmd_create_space`/`_cmd_add_member`/`_cmd_remove_member`/`_cmd_remove_space`), kein neues
+Verhalten. Anker vor dem Bau gegen den echten Code geprüft (nicht nur den Plan-Snapshot
+übernommen) — Zeilennummern im Plan wichen leicht ab (Funktionen um wenige Zeilen gewachsen seit
+`f5691e0`), Funktionsnamen stimmten exakt, wie vom Plan selbst vorgeschrieben.
+
+Neu in `acl.py`: `read_share_file`/`write_share_file`/`add_member`/`remove_member`/
+`create_space`/`remove_space_dir`/`spaces_referencing`/`AclWriteError`, plus `_WriteLock`
+(dieselbe Bauart wie `spacectl.py`s bisherige `_DataRootLock`, jetzt die einzige verbleibende
+Kopie). Jede Schreibfunktion nimmt den `.write.lock`-Flock selbst und gibt ihn vor der Rückkehr
+frei — kein Aufruf einer `Store`-Methode darin (P7-M, Selbst-Deadlock-Vermeidung). `spacectl.py`
+ruft jetzt `acl.*` auf; `_DataRootLock` ist komplett entfallen, `_load_share_file`/
+`_find_share_files` bleiben (nur noch für `check`, rein lesend). Modulkopf-Docstring von
+`spacectl.py` entsprechend nachgezogen (die Lock-Beschreibung war sonst stale gewesen).
+
+**Verifiziert:** `phase6_shares/tests/test_spacectl.py` (20 Tests) **unverändert**, weiterhin
+grün — der Regressionsbeweis der Extraktion. `phase6_shares/tests/test_characterization.py` (3
+Golden Files) vor und nach byte-identisch grün (P7-C/P6-D). 19 neue Tests in
+`phase7_spaces_admin/tests/test_acl_write.py`. Ein eigener Testfehlschlag korrigiert vor dem
+Commit, kein Code-Fund: `test_remove_member_removes_from_both_lists` nahm fälschlich an, ein
+`write=True`-Add trage den Namen auch in die Roh-Liste `read:` ein — `write:` impliziert `read:`
+nur beim Lesen (`AclReader._parse`), nicht in der Datei selbst; Test korrigiert, schreibt den
+Doppel-Eintrag jetzt direkt, um den echten Zwei-Listen-Entfernen-Pfad zu prüfen. `pytest -q`
+volle Suite: **843 → 862** (Baseline vor dieser Sitzung read gegengezählt, nicht angenommen).
+Tabu-Diff (`asgi.py`/`server.py`/`permissions.py`/`authserver/{crypto,totp,passwords,resolver,
+flows}.py`) leer.
+
+**Nächster Schritt, konkret:** Step C2 (REST-Fläche, fünf neue Routen unter `/api/v1/spaces*`,
+`webui/shares.py`-Erweiterung um `require_space_reauth()`) — Anker (`api.py:743-755`,
+`api_routes()`-Signatur, `UserDirectory`-Principal-Check V76) vor dem Bau gegen den echten Code
+prüfen, wie bei C1.
