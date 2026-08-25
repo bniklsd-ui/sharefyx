@@ -125,7 +125,7 @@ keinen Code bekommen, nur Step 0 (Haushalt) lief.
 | P7-19 | Space mit N Items entfernt → alle N im `_archive/` | Niklas | ⬜ |
 | P7-20 | Space mit nicht-schreibbarem Item nicht entfernbar, kein Teil-Move | Claude Code, Test | ✅ **mit Vorbehalt** — `test_removal_blocked_by_one_unwritable_item_moves_nothing` besteht nur über eine simulierte `can_write_item_as_human`-Divergenz: unter der echten Union-ACL-Semantik (`AclReader.grants_for_dir()` unioniert immer den Space-Root-Grant) macht ein P7-L-autorisierter Ausführender jedes Item automatisch schreibbar — ein realer Blocker ist mit echten `.share.yml`-Daten unerreichbar, der Pre-Flight-Check bleibt trotzdem die zweite, unabhängige Absicherung, die N9 verlangt. **Ein bereits archiviertes Item ist dagegen seit der siebten Contract-Öffnung (Zeile 12 der Modul-Tabelle) KEIN Blocker mehr** — `store.move()` verschiebt es korrekt ins Ziel-`_archive/`, `test_removal_moves_an_already_archived_item_to_the_home_archive` deckt genau das ab (ersetzt den vorherigen 403-Test aus dem ersten C4-Commit) |
 | P7-21 | Entfernen ohne Namensbestätigung abgewiesen | Claude Code, Test | ✅ `test_removal_requires_reauth_and_typed_confirmation` (422 bei falschem `confirm`) |
-| P7-22 | `space_admin_enabled=False` → Menüpunkt weg, Routen 404 | Claude Code, Test | ⬜ **Routenanteil geschlossen, mit Vorbehalt** — `test_all_five_routes_404_when_space_admin_disabled` (alle fünf Routen) **und** ein zweiter, echter Server-Lauf (`space_admin_enabled=False`, Wegwerf-Instanz, echter Login-Roundtrip über curl): `GET /api/v1/meta` → `"space_admin":false`, alle vier `/api/v1/spaces*`-Aufrufe → `404`. **„Menüpunkt weg" bleibt unverifiziert und zieht die Zeile deshalb nicht auf ✅** — die Zeile `document.getElementById("account-manage-spaces").hidden = !meta.space_admin` (`app.js`) ist eine einzeilige, unbedingte DOM-Zuweisung, aber der Browser-Lauf gegen genau diese Instanz scheiterte wiederholt an einem Login-Formular-Klick, der serverseitig nie ankam (siehe Session-Block) — kein Code-Fund, ein Harness-Problem dieser Sitzung, das die nächste Session direkt angehen sollte, statt es zu wiederholen |
+| P7-22 | `space_admin_enabled=False` → Menüpunkt weg, Routen 404 | Claude Code, Test | ✅ Routenanteil: `test_all_five_routes_404_when_space_admin_disabled` **und** ein echter Server-Lauf (curl, `space_admin_enabled=False`) — `GET /api/v1/meta` → `"space_admin":false`, alle vier `/api/v1/spaces*`-Aufrufe → `404`. Menüpunkt-Anteil: Nikinger loggte sich selbst per Hand in die von Claude Code gesteuerte Tab ein (`niklas`/Passwort/TOTP, Zugangsdaten von Claude Code berechnet, nie gelesen — siehe Session-Block für den vollen Verlauf inkl. des ersten, gescheiterten Automatisierungs-Anlaufs), Konto-Dialog zeigt danach ausschließlich „Update-Log ansehen" — „Spaces verwalten" fehlt vollständig, `account-manage-spaces` bleibt via `meta.space_admin` ausgehängt |
 | P7-23 | N-Auswahl wandert in einem Vorgang, ein Commit je Item | Niklas | ⬜ |
 | P7-24 | Ein rechteerweiterndes Item in Auswahl → ein Formular, nicht N | Niklas | ⬜ |
 
@@ -705,11 +705,11 @@ in `test_api.py`). Volle Suite **903 → 904**, real gezählt. Tabu-Diff leer. `
 `spaces.js`/`app.js` sauber (kein Ersatz für einen Test, nur eine Syntaxprobe — P5-T lässt JS
 weiterhin unit-ungetestet).
 
-**Abnahmestand:** P7-18 ✅ (Route + Knopf-fehlt, beide bestätigt). P7-22 bleibt ⬜, jetzt mit
-präzisiertem Grund (Routenanteil doppelt bestätigt, Menü-Ausblendung nur code-geprüft, nicht
-pixel-verifiziert — siehe oben). Modul-Status-Tabelle (Zeile 13) und Abnahmestand-Tabelle oben
-nachgezogen. `phase6_shares/CLAUDE.md`s Zeile 16 (der ursprüngliche `space_admin_enabled`-Seam)
-bekam eine datierte Schließungsnotiz, der Snapshot selbst bleibt unangetastet.
+**Abnahmestand:** P7-18 ✅ (Route + Knopf-fehlt, beide bestätigt). P7-22 ✅ (Route doppelt
+bestätigt, Menü-Ausblendung jetzt pixel-verifiziert — siehe Nachtrag unten). Modul-Status-
+Tabelle (Zeile 13) und Abnahmestand-Tabelle oben nachgezogen. `phase6_shares/CLAUDE.md`s
+Zeile 16 (der ursprüngliche `space_admin_enabled`-Seam) bekam eine datierte Schließungsnotiz,
+der Snapshot selbst bleibt unangetastet.
 
 **Nächster Schritt, konkret:** Step C5 (Betrieb/Doku — `diagnose.sh` Prüfung 12 Textergänzung,
 `docs/UPDATE_LOG.md`-Eintrag vor dem nächsten Deploy, P6-X-Gate beachten) und Block B
@@ -717,3 +717,38 @@ bekam eine datierte Schließungsnotiz, der Snapshot selbst bleibt unangetastet.
 `space_admin_enabled`s Default-Wechsel auf `True` bedeutet, dass Fabian den neuen Menüpunkt
 ab dem nächsten Release sieht — im Update-Log-Eintrag erwähnen, nicht erst beim Deploy
 entdecken lassen (Advisor-Hinweis).
+
+**Nachtrag, 2026-08-25 — P7-22s Menü-Anteil geschlossen (Nikinger-Vorschlag „use my real
+chrome browser"), root cause des Browser-Harness-Problems gefunden.**
+
+**Root Cause, nicht nur Symptom:** das ursprüngliche Problem war nie „Login klappt in diesem
+Browser nicht" — der allererste automatisierte Klick auf „Weiter" beim Einladungs-Formular
+**gelang tatsächlich** (Server-Log: `POST /ui/invite/... 200 OK`). Ein `get_page_text`-Aufruf
+direkt danach zeigte aber noch die alte, prä-Navigations-DOM (dieselbe Race-Bedingung, die
+bereits im vorigen C3-Nachtrag notiert war) — das las ich fälschlich als Fehlschlag und klickte
+ein zweites Mal. Der zweite Klick traf denselben, jetzt schon verbrauchten Einmal-Token
+(`POST .../invite/... 404`) und riss die Enrollment mitten in der TOTP-Bestätigung ab, bevor
+das Secret gesichert war — die Instanz landete in einem nicht mehr sauber fortsetzbaren
+Zwischenzustand. **Kein Bug in `spaces.js`/`app.js`/der Login-Seite — ein Fehler in der
+Auswertungsreihenfolge dieser Sitzung**, nicht im getesteten Code.
+
+**Vorgehen mit dem Nikinger, dritte Wegwerf-Instanz (frisches `DATA_ROOT`, neuer
+Einladungslink):** Claude Code füllte Formularfelder per Automation, der Nikinger klickte
+selbst („Weiter", „Bestätigen", Login-Submit — dieselbe Arbeitsteilung wie bei
+`testnutzer-p7`s Enrollment in P7 Step A7: TOTP-Sekret einmalig vom Nikinger vorgelesen, sofort
+zur Code-Berechnung verwendet, nie in einer Datei oder einem Commit gelandet). **Danach lief
+auch die automatisierte Login-Route** (`niklas`/Passwort/frischer TOTP-Code, Server-Log direkt
+geprüft statt `get_page_text` zu vertrauen) — Login, Übersicht, `GET /api/v1/{me,meta,
+overview,spaces,items}` alle `200`. Konto-Dialog geöffnet: zeigt ausschließlich „Update-Log
+ansehen", **„Spaces verwalten" fehlt vollständig** — `meta.space_admin === false` blendet den
+Menüpunkt tatsächlich aus, wie `app.js`s einzeilige Zuweisung es verspricht.
+
+**Ergebnis: P7-22 ✅, beide Hälften.** Kein Code geändert (reine Verifikationssitzung),
+Verifiziert-Absatz oben bleibt unverändert gültig (903/904-Zählung betrifft nur den C3-Commit,
+nicht diesen Nachtrag). Tabu-Diff nicht relevant (keine Code-Änderung). Beide Wegwerf-Server
+sauber beendet (`pkill`, Port frei bestätigt).
+
+**Für die nächste Sitzung, falls dieselbe Klasse Fund nochmal auftritt:** nach einem Klick
+IMMER zuerst den Server-Log (oder ein `wait` vor `get_page_text`) prüfen, bevor ein zweiter
+Klick riskiert wird — ein zu früh gelesenes `get_page_text` ist nicht dasselbe wie ein
+fehlgeschlagener Request.
