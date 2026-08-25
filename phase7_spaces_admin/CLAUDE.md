@@ -9,7 +9,7 @@ down:
   - ../docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md   # Herkunft: P6-Status, §4.1/§4.2, offene Entscheidungen §5.1–§5.7
   - ../phase6_shares/ITEM_MOVE_PLAN.md              # §9 Mehrfachauswahl (P6-AK–AN) — Block B baut das, unverändert
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-08-25 (P7-1/P7-2/P7-7 per echtem Browser-Klick bestanden, git-Reparatur nach Nikinger-Freigabe, nur noch P7-4/P7-9/P7-12 offen) | 2026-08-25 (P6.5-12/P7-5 per echtem Browser-Klick bestanden, testnutzer-p7-Substitution, 13/14 in Phase 6.5) | 2026-08-25 (echter deploy.sh-Lauf durch den Nikinger, Live-Release jetzt 53bad20 statt f96125e, A3s asset-strip live, P6.5-12 wieder testbar) | 2026-08-23 (A8: Phase 6.5 formal abgeschlossen als 🟡, 12/14, P6.5-8/13 via testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, P1-Contract-Absatz aktualisiert) | 2026-08-23 (Step 0 gestartet, Doku-Audit gefahren, Skelett angelegt)
+updated: 2026-08-25 (P7-4 erster echter Befund: FAIL, ID statt Titel genannt; P7-12-Abbau geprueft und bewusst NICHT gefahren -- Block C/P7-14 braucht testnutzer-p7 noch) | 2026-08-25 (P7-1/P7-2/P7-7 per echtem Browser-Klick bestanden, git-Reparatur nach Nikinger-Freigabe, nur noch P7-4/P7-9/P7-12 offen) | 2026-08-25 (P6.5-12/P7-5 per echtem Browser-Klick bestanden, testnutzer-p7-Substitution, 13/14 in Phase 6.5) | 2026-08-25 (echter deploy.sh-Lauf durch den Nikinger, Live-Release jetzt 53bad20 statt f96125e, A3s asset-strip live, P6.5-12 wieder testbar) | 2026-08-23 (A8: Phase 6.5 formal abgeschlossen als 🟡, 12/14, P6.5-8/13 via testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, P1-Contract-Absatz aktualisiert) | 2026-08-23 (Step 0 gestartet, Doku-Audit gefahren, Skelett angelegt)
 ---
 # CLAUDE.md — Phase 7: Space-Verwaltung, Mehrfachauswahl, Konsolidierung (`phase7_spaces_admin/`)
 
@@ -100,7 +100,7 @@ keinen Code bekommen, nur Step 0 (Haushalt) lief.
 | P7-1 | Item-ID sichtbar + Klick kopiert | Niklas | ✅ (via `testnutzer-p7`) — **[2026-08-25]** `itm_ee1e0323` sichtbar im Kopfdaten-Header, „ID kopieren" geklickt, „ID kopiert."-Toast bestätigt (`editor.js:202-204`: Toast läuft nur im `.then()` von `navigator.clipboard.writeText(itemId)` — kein Fake-Erfolg möglich) |
 | P7-2 | ID-Suche findet Item spaceübergreifend | Niklas | ✅ (via `testnutzer-p7`) — **[2026-08-25]** `p7_11_setup_fixture.py` erneut gefahren (`share_read:[testnutzer-p7]` auf `itm_3d0ac2b3`, niklas-Space), Suche nach `itm_3d0ac2b3` in „Alle Items" fand das fremde Item, Chip „geteilt mit testnutzer-p7" |
 | P7-3 | ID-Suche auf nicht lesbares Item → leere Liste | Claude Code, Test | ✅ `test_id_lookup_respects_read_permission` |
-| P7-4 | Claude nennt Items beim Titel, nicht der ID | Niklas, echter Connector | ⬜ Text steht in vier Tool-Beschreibungen, kein Connector-Beweis |
+| P7-4 | Claude nennt Items beim Titel, nicht der ID | Niklas, echter Connector | ❌ **[2026-08-25]** erste echte Probe, organisch (kein gestellter Testfall) — Nikinger fragte im Webchat „welche 3 Items sind die aktuellsten", Claude antwortete mit einer Tabelle, deren Item-Spalte jede Zeile mit der rohen `itm_…`-ID einleitete (`itm_3d0ac2b3 — P7-11 Sichtbarkeitsprobe...`), Titel nur angehängt. Widerspricht dem Wortlaut aller vier Tool-Beschreibungen (`create_item`/`patch_item`/`search_items`/`get_item_meta`, `mcpserver/tools.py`) direkt. Kein Code-Fehler — die Prosa-Anweisung reicht offenbar nicht, sobald eine tabellarische Antwort naheliegt (`search_items` liefert `id` als Feldname, das Modell übernimmt es vermutlich als Zeilen-Anker). Bleibt ⬜/❌ bis weitere Datenpunkte vorliegen |
 | P7-5 | Bild im Editor entfernbar, landet in `_trash/` | Niklas | ✅ (via `testnutzer-p7`) — **[2026-08-25]** echter Browser-Klick, `itm_26f8d0b7`/`ast_e60e8d8a`, siehe Session-Block |
 | P7-6 | `PATCH` mit Tippfehler-Feld abgewiesen (O6) | Claude Code, Test | ✅ `test_items_patch_rejects_an_unknown_field` |
 | P7-7 | Speichern/Verschieben/Freigeben nach Whitelist unverändert | Niklas | ✅ (via `testnutzer-p7`) — **[2026-08-25]** `itm_68f0251d`: Save (Body-Edit, v1→v2), Move (`p7-7-test`-Ordner angelegt + verschoben, Datei real dort, v2→v3), Share (leerer Dialog — `testnutzer-p7` kennt laut P6-V keine fremden Spaces, `Speichern` als No-op-PATCH echt abgeschickt, v3→v4). Frontmatter nach allen vier Commits (`create`/`update`×3) weiterhin exakt die erlaubten Felder, keine Fremdfelder |
@@ -277,3 +277,29 @@ Connector-Gespräch — nicht durch Claude Code allein herstellbar), P7-9 (kalen
 A"; mit P7-1/2/5/6/7/8/10/11/12b jetzt erledigt ist nur noch P7-9 offen, das `testnutzer-p7`
 nicht braucht — der Abbau ist damit möglich, aber eine Nikinger-Entscheidung, kein automatischer
 nächster Schritt).**
+
+**Nachtrag, 2026-08-25 — P7-4 erster echter Befund (❌), P7-12 bewusst NICHT geschlossen.**
+
+**P7-4:** Nikinger fragte im Webchat (Doku-Stand dort veraltet, unerheblich für diesen Befund)
+„welche 3 Items sind die aktuellsten" — eine organische, ungestellte Probe genau des P7-4-
+Kriteriums. Antwort kam als Tabelle mit jeder Zeile eingeleitet durch die rohe `itm_…`-ID, Titel
+nur angehängt (`itm_3d0ac2b3 — P7-11 Sichtbarkeitsprobe...`). Das widerspricht dem Satz, der
+wortgleich in vier Tool-Beschreibungen steht (`mcpserver/tools.py`: „Nenne einem Menschen
+gegenüber immer den Titel eines Items, nicht seine itm_...-ID"). Kein Code-Fehler — die
+Prosa-Anweisung reicht offenbar nicht gegen den Sog einer tabellarischen Antwort, wo `id` als
+Feldname aus `search_items`s eigenem Rückgabeschema naheliegt. Modul-Status-Tabelle oben
+(P7-4 ❌) nachgezogen. Bleibt ein UX-/Formulierungs-Befund, keine neue Aufgabe ohne
+Nikinger-Entscheidung, ob/wie die Tool-Beschreibung geschärft werden soll.
+
+**P7-12 — Nikinger-Auftrag „schließen, falls für spätere Blöcke nicht gebraucht" geprüft, Ergebnis:
+gebraucht.** Gegen den Plan geprüft, nicht gegen den eigenen Docstring von `p7_11_setup_fixture.py`
+(der nur „am Ende von Block A" sagt, ohne Block C zu kennen): `docs/concepts/
+phase7_spaces_admin_plan.md` §Block C, **P7-14** — „Ein Mensch gibt seinen eigenen Space im
+Browser für einen anderen zum Lesen frei; der andere sieht ihn danach", Wer: **Niklas +
+`testnutzer-p7`**. Block C ist komplett ungebaut (P7-14–P7-22 alle ⬜) und braucht `testnutzer-p7`
+ausdrücklich als Empfänger-Principal. **Ein Abbau jetzt („Block A ist fertig") würde P7-14 später
+zwingen, den Principal neu anzulegen** — Mehrarbeit statt Ersparnis, und der Plan selbst enthält
+diesen Widerspruch bereits (A7s „Abbauen, am Ende von Block A" wurde offenbar geschrieben, bevor
+Block C den Principal als Testpartner brauchte). **Datierte Korrektur:** P7-12 bleibt bis nach
+Block C offen, nicht „am Ende von Block A" — der Plan-Snapshot selbst bleibt unverändert (📕),
+diese Zeile hier ist die maßgebliche Korrektur. Kein Handgriff ausgeführt, keine Löschung.
