@@ -9,7 +9,7 @@ down:
   - ../docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md   # Herkunft: P6-Status, §4.1/§4.2, offene Entscheidungen §5.1–§5.7
   - ../phase6_shares/ITEM_MOVE_PLAN.md              # §9 Mehrfachauswahl (P6-AK–AN) — Block B baut das, unverändert
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-08-23 (A8: Phase 6.5 formal abgeschlossen als 🟡, 12/14, P6.5-8/13 via testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, P1-Contract-Absatz aktualisiert) | 2026-08-23 (Step 0 gestartet, Doku-Audit gefahren, Skelett angelegt)
+updated: 2026-08-25 (echter deploy.sh-Lauf durch den Nikinger, Live-Release jetzt 53bad20 statt f96125e, A3s asset-strip live, P6.5-12 wieder testbar) | 2026-08-23 (A8: Phase 6.5 formal abgeschlossen als 🟡, 12/14, P6.5-8/13 via testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, P1-Contract-Absatz aktualisiert) | 2026-08-23 (Step 0 gestartet, Doku-Audit gefahren, Skelett angelegt)
 ---
 # CLAUDE.md — Phase 7: Space-Verwaltung, Mehrfachauswahl, Konsolidierung (`phase7_spaces_admin/`)
 
@@ -184,3 +184,16 @@ Browser-Test wiederholen (Upload → Entfernen-Knopf → Alt-Text-Rendering →
 `_trash/`-Dateiprüfung) — diesmal sollte `asset-strip` im DOM erscheinen. A6 bleibt bis
 2026-08-28 (`token_families`) bzw. 2026-10-27 (`clients`) beobachtend offen, kein weiterer
 Handgriff nötig.
+
+**Nachtrag, 2026-08-25 — beide offenen Punkte erledigt, echter Deploy gefahren.** `docs/
+UPDATE_LOG.md` bekam den neuen `## 2026-08-25`-Eintrag (Bild-Entfernen-Knopf angekündigt),
+committet als `53bad20`. Danach fuhr der Nikinger `deploy.sh main` selbst (`sudo systemctl`-Recht
+nötig, Claude Code hat das nicht). **Ergebnis, per Transkript:** Update-Log-Gate bestand ohne
+Override, Health-Gate `/ui/login`→200/`/api/v1/me`→401/`/mcp/`→401 alle grün, Retention räumte
+das älteste Release (`20260813...`) ab, JSON bestätigt `"result":"ok"`. **Read-only
+gegengeprüft:** `readlink -f /opt/sharefyx/current` → `/opt/sharefyx/releases/
+20260825T110849.160586Z`, `git -C /opt/sharefyx/current log --oneline -1` → `53bad20`, exakt der
+Doku-Commit von oben — die Live-Instanz läuft damit fünf Commits weiter als vorher (`f96125e`)
+und enthält jetzt A3s `<div id="asset-strip">`. **P6.5-12 ist damit wieder testbar, noch nicht
+erneut geprobt** — nächster Schritt bleibt derselbe Browser-Test wie oben beschrieben, nur ohne
+den Deploy-Blocker davor.
