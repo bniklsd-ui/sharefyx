@@ -81,6 +81,7 @@ Abnahmezeilen: `docs/concepts/phase7_spaces_admin_plan.md`.
 | 11 | C4 (Space entfernen, zweiphasig, P7-O/N8/N9): fünfte Route `DELETE /api/v1/spaces/{space}` in `webui/api.py :: _spaces_delete`. Vorlauf (kein Schreibvorgang) über `store.search()`-Paging mit `_STORE_FETCH_LIMIT`, Blocker-Scan via `permissions.can_write_item_as_human(home, store.acl_of(...))`; `require_space_reauth(widening=True)` + `confirm == space`; Durchlauf `store.move()` → `store.archive()` je Item; harte `len(moved) == total`-Sperre vor `acl.remove_space_dir()`. **Advisor-Fund (empirisch, vor dem ersten Commit):** `store.search()` zählt bereits archivierte Items mit (`total` schließt sie ein), `store.move()` verbot sie zu diesem Zeitpunkt aber noch explizit — ohne einen Riegel hätte das einen unbehandelten `ValidationError`/500 mitten im Durchlauf ausgelöst, ohne den von N9 verlangten Bericht. **Erster Fix in diesem Commit: ein Vorlauf-Riegel `archived_blockers`, fail-closed** — eine Space mit archivierten Items wäre damit vorerst unentfernbar gewesen. **Überholt durch Zeile 12 in derselben Sitzung** (Nikinger-Entscheidung, siehe unten) — der Riegel existiert im finalen Code nicht mehr. Zweiter, weiterhin gültiger Advisor-Fund: `acl.spaces_referencing()` fehlte das `exclude=`, das `spacectl.py remove-space` für dieselbe Prüfung setzt (Parität-Drift, behoben). `phase7_spaces_admin/tests/test_space_admin_api.py`s Kill-Switch-Parametrize um die fünfte Route ergänzt (schließt den Testanteil von P7-22) | C | ✅ **vollständig** | siehe Zeile 12 für die finale Testzahl |
 | 12 | Nikinger-Entscheidung auf Nachfrage (dieselbe Sitzung): siebte, benannte Contract-Öffnung statt des `archived_blockers`-Riegels aus Zeile 11 — `storage/store.py :: move()` erlaubt jetzt einen reinen Space-Wechsel für archivierte Items (echter Ordner-Wechsel bleibt verboten), `_write_item_file()` legt sie dabei ins Ziel-`_archive/`. Zweiter Advisor-Fund vor diesem Commit: `create(status="archived")` (über MCP/REST erreichbar) lief am ursprünglichen Riegel vorbei und hätte sonst eine Divergenz erzeugt — `create()` setzt jetzt selbst `folder=""` bei `status="archived"`. `_spaces_delete` ruft `archive()` nur noch für Items auf, die `move()` nicht schon als archiviert zurückgibt (kein doppelter Commit). Volle Herleitung, inkl. der Anker-Prüfung gegen `phase1_storage/storage/store.py`, in `phase1_storage/CLAUDE.md`s „Geerbte Contracts" (siebte Öffnung) | C | ✅ **vollständig** | +4 `phase1_storage/tests/test_store.py` (3 ersetzen `test_move_of_archived_item_is_rejected`, 1 neu) + 1 `phase7_spaces_admin/tests/test_space_removal.py` (ersetzt den 403-Test aus Zeile 11 durch einen 200-Test); 903 gesamt |
 | 13 | C3 (Oberfläche): Menüpunkt scharf geschaltet (`app.html` verliert `disabled`/„kommt in Phase 7"), `webui/config.py :: UiSettings.space_admin_enabled` Default `False`→`True` (P7-R, schließt den in `phase6_shares/CLAUDE.md` Zeile 16 gebauten Seam). Neues Modul `webui/static/js/spaces.js` (P7-Q): `openSpaceAdminDialog()`/Liste aller `writable`-Spaces, `selectSpace()` lädt `GET .../members`, Mitglieder-Hinzufügen (immer Re-Auth, eingefroren wie `dialogs.js`s `pendingMoveBody`)/-Entfernen (kein Re-Auth), `openRemoveSpaceDialog()` (Klartext-Konsequenz + getippte Bestätigung + Re-Auth). `app.html`: `#space-admin-dialog`/`#space-remove-dialog`, Geschwister von `#share-dialog`. `app.js`: `initSpaces()` in den Bootstrap, beide neuen Dialoge in `anyOverlayOpen()`/Escape, `account-manage-spaces`-Klick öffnet den Dialog, **`meta.space_admin` blendet den Menüpunkt aus** (P7-R — statisches HTML kennt den Kill-Switch sonst nicht, P5-T). **Zwei Advisor-Funde vor dem Commit:** (1) `selectSpace()` setzte `pendingMemberBody`/die Re-Auth-Felder beim Space-Wechsel nicht zurück — ein eingefrorener Hinzufügen-Versuch für Space A wäre nach einem Klick auf Space B gegen B abgeschickt worden, derselbe Fund, den `dialogs.js :: pendingMoveBody = null` beim Space-Wechsel bereits kommentiert; behoben, plus dieselbe Rücksetzung in `openSpaceAdminDialog()`. (2) `orphans` aus `GET .../members` wurde gelesen und verworfen, obwohl C2 es explizit als „Render-Hinweis fürs Frontend" gebaut hatte — jetzt in der Mitgliederliste als eigene Zeile gerendert. **Echter Browser-Lauf gegen eine Wegwerf-Instanz** (siehe Session-Block: Anlegen, Hinzufügen mit Re-Auth, Entfernen ohne Re-Auth, Entfernen-Dialog mit Konsequenztext+Bestätigung+Re-Auth, Home-Space-Ausnahme — alles Ende-zu-Ende bestanden) | C | ✅ **vollständig, zwei Advisor-Funde vor dem Commit behoben** | +2 (`test_app_html_has_a_live_manage_spaces_entry` ersetzt den Stub-Test, `_JS_MODULES` um `"spaces"` ergänzt) + 1 `test_api.py` (`UiSettings().space_admin_enabled is True`); JS bleibt laut P5-T unit-ungetestet, echter Browser-Lauf statt jsdom; 904 gesamt |
+| 14 | C5 (Betrieb/Doku, kein Code): `phase3_edge/scripts/diagnose.sh` Prüfung 12 bekommt einen Satz im Prüfungstext (deckt jetzt ausdrücklich auch die menschliche Space-Verwaltungsfläche ab, nicht nur `spacectl.py`). `docs/UPDATE_LOG.md`-Eintrag `## 2026-08-26` (P6-X-Gate: oberster Eintrag muss den Deploy-Tag tragen — vor dem tatsächlichen Deploy-Tag nachzuprüfen, falls der Tag abweicht) | C | ✅ **vollständig** | 0 (Doku-/Skript-Text, kein Python-Verhalten geändert); 904 gesamt unverändert |
 
 *(Weitere Zeilen entstehen mit dem Rest von Block C/B — siehe Plan §4 für die vollständige Schritt-Sequenz.)*
 
@@ -752,3 +753,39 @@ sauber beendet (`pkill`, Port frei bestätigt).
 IMMER zuerst den Server-Log (oder ein `wait` vor `get_page_text`) prüfen, bevor ein zweiter
 Klick riskiert wird — ein zu früh gelesenes `get_page_text` ist nicht dasselbe wie ein
 fehlgeschlagener Request.
+
+**Nachtrag, 2026-08-26 — Step C5 (Betrieb/Doku) gebaut, Block C damit vollständig.**
+
+Reiner Doku-/Skript-Text, kein Python-Verhalten geändert (Plan §C5 verlangt genau das: „ein
+Satz im Prüfungstext, mehr nicht").
+
+- `phase3_edge/scripts/diagnose.sh` Prüfung 12 (`spacectl.py check --json` gegen `.share.yml`-
+  Referenzen): Kommentarblock um einen Satz ergänzt — dieselbe Prüfung deckt jetzt ausdrücklich
+  auch die neue menschliche Space-Verwaltungsfläche (C2–C4) ab, ein per „Spaces verwalten"
+  angelegter oder entfernter Space hinterlässt dieselben Spuren wie einer über `spacectl.py`.
+  Die eigentliche Prüf-Logik/Ausgabetexte (Zeilen 226–244) bleiben unverändert — der Plan
+  verlangt nur den einen erklärenden Satz, keine neue Fallunterscheidung.
+- `docs/UPDATE_LOG.md`: neuer oberster Eintrag `## 2026-08-26`, zwei Zeilen (neuer Menüpunkt
+  „Spaces verwalten"; Re-Auth-Hinweis bei Entfernen/größeren Mitgliederänderungen) — Format
+  gegen den Datei-Kopf-Kommentar geprüft (kurze `- `-Zeilen, kein weiches Umbrechen). **Achtung
+  für den tatsächlichen Deploy-Tag:** P6-X-Gate verlangt, dass der oberste Eintrag auf den
+  Deploy-Tag datiert ist — falls `deploy.sh` nicht noch am 2026-08-26 läuft, muss das Datum
+  vor dem Lauf auf den echten Tag nachgezogen werden, sonst bricht das Skript ab.
+- Modul-Status-Tabelle (Zeile 14, neu) nachgezogen.
+
+**Verifiziert:** `pytest -q` **904 → 904**, unverändert (keine neue Testdatei, keine geänderte
+Assertion — Plan sieht für C5 keinen Test vor). Tabu-Diff leer (nur `diagnose.sh`-Kommentar +
+`docs/UPDATE_LOG.md` + dieser Head berührt).
+
+C5 trägt keine eigene Abnahmezeile (P7-1–P7-24 sind alle Zeilen 1–13 zugeordnet) — geprüft per
+Grep, kein `P7-N`-Eintrag nennt `diagnose.sh`/`UPDATE_LOG`/„Betrieb". Kein offener Posten dieser
+Art zurückgelassen.
+
+**Damit ist Block C (C1–C5) vollständig.** Einzig verbleibender Scope-Punkt dieser Phase:
+Block B (Mehrfachauswahl, `phase6_shares/ITEM_MOVE_PLAN.md` §9, Entscheidungen P6-AK–AN) —
+kein neuer Endpunkt, kein neues MCP-Tool, Zweirunden-Re-Auth-Logik (P6-AM) wie im Plan-Auszug
+oben. Danach Step Z (Abnahme/Deploy/Abschluss).
+
+**Nächster Schritt, konkret:** Block B, `webui/static/js/state.js`/`list.js`/`tree.js`/
+`dialogs.js`/`toasts.js`/`app.html` gemäß der Anker-Tabelle oben in `docs/concepts/
+phase7_spaces_admin_plan.md` §"Block B".

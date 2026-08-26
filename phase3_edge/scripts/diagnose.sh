@@ -210,7 +210,10 @@ fi
 # 12) Verwaiste oder kaputte `.share.yml`-Referenzen? (P6 Step 6, DoD: "diagnose.sh meldet
 #     keine verwaisten Namen". `spacectl.py check` kennt jede `.share.yml` unter DATA_ROOT und
 #     benutzt denselben YAML-Parser wie `AclReader` -- kein zweiter Parser hier in Bash (§2.2,
-#     V51). Braucht DATA_ROOT/VENV aus local.env wie Prüfung 5.)
+#     V51). Braucht DATA_ROOT/VENV aus local.env wie Prüfung 5. Seit P7 Block C deckt dieselbe
+#     Prüfung zusätzlich die menschliche Space-Verwaltungsfläche ab -- ein per "Spaces
+#     verwalten" angelegter oder entfernter Space hinterlässt hier dieselben Spuren wie einer
+#     über `spacectl.py`.)
 data_root=""
 venv_python=""
 if [[ -f "$LOCAL_ENV" ]]; then
