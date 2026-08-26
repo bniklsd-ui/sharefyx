@@ -416,6 +416,17 @@ select.input {
 }
 .list__chips:empty { display: none; }
 
+/* Mehrfachauswahl-Werkzeugleiste (§9, P6-AK) — dieselbe visuelle Sprache wie `.list__chips`
+   daneben (gedämpfter Begleittext + kleine Knöpfe), nur ohne die Pill-Form der Such-Chips. */
+.list__selection {
+  display: flex;
+  align-items: center;
+  gap: var(--space);
+  padding: 0 calc(var(--space) * 2) var(--space);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
 .chip {
   display: inline-flex;
   align-items: center;
@@ -493,6 +504,13 @@ select.input {
    dies ist nur der Ziehgriff-Cursor + eine gedimmte Zeile während des Ziehens selbst. */
 .list__rows > li.list__row-draggable { cursor: grab; }
 .list__rows > li.list__row-draggable--active { opacity: .5; }
+
+/* Mehrfachauswahl (§9) — `box-shadow` statt `border-left`, damit die Zeile beim Auswählen nicht
+   um 2px springt (jede `<li>` hat sonst keinen linken Rahmen, siehe `.list__rows > li` oben). */
+.list__rows > li.list__row--selected {
+  background: var(--surface);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
 
 .list__row-title {
   font-size: 15px;
@@ -992,6 +1010,10 @@ select.input {
   padding: var(--space) calc(var(--space) * 2);
   font-size: 13px;
   max-width: 70vw;
+  /* §9.3 Punkt 4: die Sammelmeldung nach einem Mehrfachauswahl-Verschieben kann eine zweite
+     Zeile tragen ("8 von 10 verschoben." + "2 fehlgeschlagen: ..."), joint per "\n" (toasts.js).
+     `white-space: pre-line` rendert den Umbruch statt ihn im Flex-Layout zu verschlucken. */
+  white-space: pre-line;
 }
 .toast--error { border-left-color: var(--danger); }
 .toast--warn { border-left-color: var(--warn); }

@@ -6,7 +6,7 @@ import { state, BUCKET_LABELS, activeSpaceWritable, setCreateControlsPresent, is
 import { el, toast } from "./toasts.js";
 import { reportUnexpectedError } from "./api.js";
 import { closeEditor } from "./editor.js";
-import { loadItems, renderCrumb, moveItemToFolder } from "./list.js";
+import { loadItems, renderCrumb, moveItemToFolder, clearSelection } from "./list.js";
 import { openNewFolderDialog } from "./dialogs.js";
 
 var railTreeEl;
@@ -21,6 +21,10 @@ function activateView(spaceName) {
   // dass jede Aufrufstelle das selbst erinnern muss.
   state.scope = "space";
   state.activeSpace = spaceName;
+  // §9.3 Punkt 1: Navigation leert die Auswahl, dieselbe Exklusivitäts-Disziplin wie
+  // `folder`/`filter` — sonst könnte eine Auswahl Items enthalten, die hier gar nicht mehr
+  // sichtbar sind.
+  clearSelection();
   setCreateControlsPresent(activeSpaceWritable());
   renderRail();
   renderCrumb();
@@ -33,6 +37,7 @@ export function navigateAll() {
   state.scope = "all";
   state.filter = null;
   state.folder = null;
+  clearSelection();
   setCreateControlsPresent(activeSpaceWritable());
   renderRail();
   renderCrumb();

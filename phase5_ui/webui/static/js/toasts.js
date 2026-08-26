@@ -25,8 +25,12 @@ export function showSessionExpiredCard() {
   sessionExpiredCardEl.hidden = false;
 }
 
+// `message` ist meist ein String, für die Mehrfachauswahl-Sammelmeldung (§9.3 Punkt 4) auch ein
+// Array aus Zeilen ("8 von 10 verschoben." + "2 fehlgeschlagen: ..." als zweite Zeile) — kein
+// stilles Verschlucken einzelner Fehler in einer Sammelmeldung ohne Namen. `.toast` bekommt dafür
+// `white-space: pre-line` (app.css), sonst würde der Zeilenumbruch im Flex-Layout verschluckt.
 export function toast(message, kind) {
-  toastEl.textContent = message;
+  toastEl.textContent = Array.isArray(message) ? message.join("\n") : message;
   toastEl.className = "toast" + (kind ? " toast--" + kind : "");
   toastEl.hidden = false;
   clearTimeout(toastTimer);

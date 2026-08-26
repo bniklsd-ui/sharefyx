@@ -45,6 +45,9 @@ export var state = {
   items: [],
   selectedId: null,
   selectedReadonly: false,
+  // Mehrfachauswahl (§9, P6-AK) — ein `Set` von Item-IDs, geleert bei jeder Navigation
+  // (dieselbe Exklusivitäts-Disziplin wie `folder`/`filter`, siehe tree.js :: activateView()).
+  selectedItemIds: new Set(),
   meta: null,
   mode: "edit",
   editingSnapshot: null,

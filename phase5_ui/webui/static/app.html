@@ -50,6 +50,12 @@
         <button class="btn btn--icon" type="button" id="new-item-button" title="Neu anlegen" aria-label="Neu anlegen">&#43;</button>
       </div>
       <div class="list__chips" id="list-chips"></div>
+      <!-- Mehrfachauswahl (§9, P6-AK) -- nur sichtbar, wenn state.selectedItemIds nicht leer ist -->
+      <div class="list__selection" id="list-selection" hidden>
+        <span id="list-selection-count"></span>
+        <button class="btn" type="button" id="list-selection-move">Verschieben</button>
+        <button class="btn" type="button" id="list-selection-clear">Abwählen</button>
+      </div>
     </header>
     <ol class="list__rows" id="list-rows"></ol>
     <div class="list__empty" id="list-empty" hidden>
@@ -200,7 +206,7 @@
 
 <div class="overlay" id="move-dialog" hidden>
   <div class="overlay__panel">
-    <h2>Verschieben</h2>
+    <h2 id="move-dialog-title">Verschieben</h2>
     <label>Space
       <select class="input" id="move-space-select"></select>
     </label>
@@ -208,6 +214,7 @@
       <select class="input" id="move-folder-select"></select>
     </label>
     <p class="overlay__hint" id="move-consequence"></p>
+    <p class="overlay__hint" id="move-progress" hidden></p>
     <p class="form-error" id="move-error" hidden></p>
     <div id="move-reauth-fields" hidden>
       <label>Passwort

@@ -7,13 +7,13 @@
 
 import { state, TYPE_LABELS, activeSpaceWritable, spaceByName } from "./state.js";
 import { el, toast } from "./toasts.js";
-import { api, csrfToken } from "./api.js";
+import { api, csrfToken, reportUnexpectedError } from "./api.js";
 import { navigate } from "./tree.js";
 import {
   loadEditorFromItem, clearDraft, updateVersionBand, afterWrite, handleWriteError,
   currentFormValues,
 } from "./editor.js";
-import { loadOverview, loadItems, bucketFor } from "./list.js";
+import { loadOverview, loadItems, bucketFor, moveSelectedItems } from "./list.js";
 
 var createDialogEl;
 var createTypeEl;
@@ -54,17 +54,33 @@ var newFolderSubmitEl;
 var newFolderCancelEl;
 
 var moveDialogEl;
+var moveDialogTitleEl;
 var moveSpaceSelectEl;
 var moveFolderSelectEl;
 var moveConsequenceEl;
 var moveErrorEl;
+var moveProgressEl;
 var moveReauthFieldsEl;
 var moveReauthPasswordEl;
 var moveReauthTotpEl;
 var moveSubmitEl;
 var moveCancelEl;
-var moveTargetItem = null;
+// §9 (Mehrfachauswahl, P6-AK): `moveTargetItems` ist IMMER ein Array — ein Einzel-Move (list.js
+// „→"-Knopf/Drag & Drop) ruft `openMoveDialog(item)` weiterhin mit einem einzelnen Item auf,
+// das wird hier zu `[item]` normalisiert. Derselbe Dialog, keine zweite Definition (P6-AK).
+var moveTargetItems = [];
 var pendingMoveBody = null;
+// Batch-Zustand (P6-AL/AM) — nur relevant, wenn `moveTargetItems.length > 1`.
+// `moveBatchReauthItems !== null` heißt: Runde 1 ist gelaufen, mindestens ein Item braucht
+// Runde 2 mit Credentials; ein erneuter Klick auf „Verschieben" liest dann NUR noch diese Liste.
+var moveBatchReauthItems = null;
+var moveBatchSucceeded = [];
+var moveBatchFailed = [];
+// Eingefrorenes Ziel, gesetzt beim ERSTEN Batch-Submit (dasselbe Muster wie `pendingMoveBody`
+// beim Einzel-Move) -- ohne das könnte ein Dropdown-Wechsel zwischen Runde 1 und Runde 2 die
+// zurückgewiesenen Items an ein anderes Ziel schicken als die bereits erfolgreichen (Advisor-
+// Fund vor dem Commit, dieselbe Klasse wie der C3-Fund zu `pendingMemberBody`).
+var pendingBatchTarget = null;
 
 var shareDialogEl;
 var shareItemTitleEl;
@@ -214,24 +230,46 @@ function populateMoveFolderOptions(spaceName, selectedFolder) {
   moveFolderSelectEl.value = selectedFolder || "";
 }
 
-function updateMoveConsequence(item) {
+function updateMoveConsequence() {
   var target = moveSpaceSelectEl.value;
-  if (target === item.space) {
-    moveConsequenceEl.textContent = "";
+  if (moveTargetItems.length === 1) {
+    var item = moveTargetItems[0];
+    if (target === item.space) { moveConsequenceEl.textContent = ""; return; }
+    moveConsequenceEl.textContent =
+      "Verschiebt das Item aus " + item.space + " nach " + target + ". Alle Mitglieder dieses "
+      + "Space können es danach lesen und ändern.";
     return;
   }
+  // §9.3 Punkt 2: EIN gemeinsames Ziel für die ganze Auswahl (P6-AK) — die Konsequenz gilt damit
+  // für alle N Items gleich, unabhängig von ihrem jeweiligen Ausgangsspace.
+  var allAlreadyThere = moveTargetItems.every(function (i) { return i.space === target; });
+  if (allAlreadyThere) { moveConsequenceEl.textContent = ""; return; }
   moveConsequenceEl.textContent =
-    "Verschiebt das Item aus " + item.space + " nach " + target + ". Alle Mitglieder dieses "
-    + "Space können es danach lesen und ändern.";
+    "Verschiebt " + moveTargetItems.length + " Items nach " + target + ". Alle Mitglieder "
+    + "dieses Space können sie danach lesen und ändern.";
 }
 
-export function openMoveDialog(item) {
-  moveTargetItem = item;
+// `itemOrItems` ist ein einzelnes Item (list.js „→"-Knopf, tree.js Drag & Drop) ODER ein Array
+// aus der Mehrfachauswahl-Werkzeugleiste (§9.3 Punkt 2) — normalisiert auf `moveTargetItems`.
+export function openMoveDialog(itemOrItems) {
+  moveTargetItems = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
+  if (!moveTargetItems.length) return;
   pendingMoveBody = null;
+  moveBatchReauthItems = null;
+  moveBatchSucceeded = [];
+  moveBatchFailed = [];
+  pendingBatchTarget = null;
+  moveSpaceSelectEl.disabled = false;
+  moveFolderSelectEl.disabled = false;
   moveErrorEl.hidden = true;
+  moveProgressEl.hidden = true;
   moveReauthFieldsEl.hidden = true;
   moveReauthPasswordEl.value = "";
   moveReauthTotpEl.value = "";
+  moveSubmitEl.disabled = false;
+  moveDialogTitleEl.textContent =
+    moveTargetItems.length > 1 ? moveTargetItems.length + " Items verschieben" : "Verschieben";
+  var first = moveTargetItems[0];
   moveSpaceSelectEl.textContent = "";
   state.spaces.filter(function (space) { return space.writable; }).forEach(function (space) {
     var opt = document.createElement("option");
@@ -239,16 +277,18 @@ export function openMoveDialog(item) {
     opt.textContent = space.name;
     moveSpaceSelectEl.appendChild(opt);
   });
-  moveSpaceSelectEl.value = item.space;
-  populateMoveFolderOptions(item.space, item.folder);
-  updateMoveConsequence(item);
+  moveSpaceSelectEl.value = first.space;
+  populateMoveFolderOptions(first.space, moveTargetItems.length === 1 ? first.folder : "");
+  updateMoveConsequence();
   moveDialogEl.hidden = false;
 }
 
 export function closeMoveDialog() {
   moveDialogEl.hidden = true;
-  moveTargetItem = null;
+  moveTargetItems = [];
   pendingMoveBody = null;
+  moveBatchReauthItems = null;
+  pendingBatchTarget = null;
 }
 
 // -- Freigeben (Step 7 Commit 5b) -------------------------------------------------------------
@@ -386,10 +426,12 @@ export function init() {
   newFolderCancelEl = document.getElementById("new-folder-cancel");
 
   moveDialogEl = document.getElementById("move-dialog");
+  moveDialogTitleEl = document.getElementById("move-dialog-title");
   moveSpaceSelectEl = document.getElementById("move-space-select");
   moveFolderSelectEl = document.getElementById("move-folder-select");
   moveConsequenceEl = document.getElementById("move-consequence");
   moveErrorEl = document.getElementById("move-error");
+  moveProgressEl = document.getElementById("move-progress");
   moveReauthFieldsEl = document.getElementById("move-reauth-fields");
   moveReauthPasswordEl = document.getElementById("move-reauth-password");
   moveReauthTotpEl = document.getElementById("move-reauth-totp");
@@ -425,19 +467,25 @@ export function init() {
 
   moveCancelEl.addEventListener("click", closeMoveDialog);
   moveSpaceSelectEl.addEventListener("change", function () {
-    var item = moveTargetItem;
-    if (!item) return;
+    if (!moveTargetItems.length) return;
     // Space-Wechsel setzt die Ordnerauswahl auf die Ziel-Wurzel zurück (§4.1 Punkt 3) --
     // ein Ordnername im alten Space bedeutet im neuen etwas anderes.
     populateMoveFolderOptions(moveSpaceSelectEl.value, "");
-    updateMoveConsequence(item);
+    updateMoveConsequence();
     pendingMoveBody = null;   // Ziel geändert -- eine evtl. eingefrorene Fassung ist ungültig
+    moveBatchReauthItems = null;
+    // Defense in depth (Advisor-Fund): in der Praxis unerreichbar, solange `runBatchMove()` die
+    // Auswahlfelder für die Laufzeit des Batches sperrt -- läuft dieser Handler trotzdem, darf
+    // Runde 2 weder das eingefrorene Ziel noch die bisherige Runde-1-Bilanz weiterschleppen.
+    pendingBatchTarget = null;
+    moveBatchSucceeded = [];
+    moveBatchFailed = [];
     moveReauthFieldsEl.hidden = true;
     moveErrorEl.hidden = true;
   });
-  moveSubmitEl.addEventListener("click", function () {
-    var item = moveTargetItem;
-    if (!item) return;
+
+  function runSingleMove() {
+    var item = moveTargetItems[0];
     moveErrorEl.hidden = true;
     if (pendingMoveBody === null) {
       var targetSpace = moveSpaceSelectEl.value;
@@ -485,6 +533,83 @@ export function init() {
       moveErrorEl.textContent = err.message || "Verschieben fehlgeschlagen.";
       moveErrorEl.hidden = false;
     });
+  }
+
+  // §9.3 Punkt 3/P6-AM: Runde 1 ohne Credentials über ALLE Items; kommt mindestens ein
+  // `reauth_required` zurück, zeigt sich EIN gemeinsames Re-Auth-Formular, Runde 2 wiederholt
+  // NUR die zurückgewiesenen Items mit `password`/`totp`. Ein Item, das in Runde 1 schon
+  // durchging, wird nie erneut angefasst (P6-AN: In-Space-Batches lösen Runde 2 faktisch nie
+  // aus, weil `widens()` dort nie zuschlägt).
+  function runBatchMove() {
+    // Ziel beim ERSTEN Submit einfrieren (siehe `pendingBatchTarget`-Kommentar oben) — Runde 2
+    // schickt die zurückgewiesenen Items an GENAU dasselbe Ziel wie Runde 1, ein Dropdown bleibt
+    // während der Wartezeit ohnehin gesperrt (siehe unten), das ist nur die zweite Absicherung.
+    if (pendingBatchTarget === null) {
+      pendingBatchTarget = { space: moveSpaceSelectEl.value, folder: moveFolderSelectEl.value };
+    }
+    var target = pendingBatchTarget;
+    var items;
+    var credentials = null;
+    if (moveBatchReauthItems !== null) {
+      items = moveBatchReauthItems;
+      credentials = { password: moveReauthPasswordEl.value, totp: moveReauthTotpEl.value };
+    } else {
+      items = moveTargetItems;
+    }
+    moveErrorEl.hidden = true;
+    moveSubmitEl.disabled = true;
+    moveSpaceSelectEl.disabled = true;
+    moveFolderSelectEl.disabled = true;
+    moveProgressEl.hidden = false;
+    moveSelectedItems(items, target, credentials, function (done, total) {
+      moveProgressEl.textContent = done + " von " + total;
+    }).then(function (results) {
+      moveSubmitEl.disabled = false;
+      moveProgressEl.hidden = true;
+
+      var okItems = results.filter(function (r) { return r.ok; }).map(function (r) { return r.item; });
+      var reauthItems = results
+        .filter(function (r) { return !r.ok && r.code === "reauth_required"; })
+        .map(function (r) { return r.item; });
+      var hardFailed = results.filter(function (r) { return !r.ok && r.code !== "reauth_required"; });
+
+      moveBatchSucceeded = moveBatchSucceeded.concat(okItems);
+      moveBatchFailed = moveBatchFailed.concat(hardFailed);
+
+      if (reauthItems.length > 0) {
+        moveBatchReauthItems = reauthItems;
+        moveReauthFieldsEl.hidden = false;
+        moveErrorEl.textContent = reauthItems.length + " von " + items.length
+          + " benötigen Passwort und Code — bitte eingeben und erneut auf „Verschieben“ klicken.";
+        moveErrorEl.hidden = false;
+        moveReauthPasswordEl.focus();
+        return;
+      }
+
+      var succeeded = moveBatchSucceeded;
+      var failed = moveBatchFailed;
+      var total = moveTargetItems.length;
+      closeMoveDialog();
+      state.selectedItemIds.clear();
+      loadItems().then(loadOverview).then(function () {
+        // §9.3 Punkt 4: keine leise Sammelmeldung -- fehlgeschlagene Items namentlich in einer
+        // zweiten Zeile, kein Verschlucken einzelner Fehler.
+        var lines = [succeeded.length + " von " + total + " verschoben."];
+        if (failed.length) {
+          lines.push(
+            failed.length + " fehlgeschlagen: "
+            + failed.map(function (f) { return "„" + f.item.title + "“ [" + f.message + "]"; }).join(", ")
+          );
+        }
+        toast(lines, failed.length ? "warn" : undefined);
+      }).catch(reportUnexpectedError);
+    });
+  }
+
+  moveSubmitEl.addEventListener("click", function () {
+    if (!moveTargetItems.length) return;
+    if (moveTargetItems.length === 1) runSingleMove();
+    else runBatchMove();
   });
 
   shareCancelEl.addEventListener("click", closeShareDialog);

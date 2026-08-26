@@ -82,6 +82,7 @@ Abnahmezeilen: `docs/concepts/phase7_spaces_admin_plan.md`.
 | 12 | Nikinger-Entscheidung auf Nachfrage (dieselbe Sitzung): siebte, benannte Contract-Öffnung statt des `archived_blockers`-Riegels aus Zeile 11 — `storage/store.py :: move()` erlaubt jetzt einen reinen Space-Wechsel für archivierte Items (echter Ordner-Wechsel bleibt verboten), `_write_item_file()` legt sie dabei ins Ziel-`_archive/`. Zweiter Advisor-Fund vor diesem Commit: `create(status="archived")` (über MCP/REST erreichbar) lief am ursprünglichen Riegel vorbei und hätte sonst eine Divergenz erzeugt — `create()` setzt jetzt selbst `folder=""` bei `status="archived"`. `_spaces_delete` ruft `archive()` nur noch für Items auf, die `move()` nicht schon als archiviert zurückgibt (kein doppelter Commit). Volle Herleitung, inkl. der Anker-Prüfung gegen `phase1_storage/storage/store.py`, in `phase1_storage/CLAUDE.md`s „Geerbte Contracts" (siebte Öffnung) | C | ✅ **vollständig** | +4 `phase1_storage/tests/test_store.py` (3 ersetzen `test_move_of_archived_item_is_rejected`, 1 neu) + 1 `phase7_spaces_admin/tests/test_space_removal.py` (ersetzt den 403-Test aus Zeile 11 durch einen 200-Test); 903 gesamt |
 | 13 | C3 (Oberfläche): Menüpunkt scharf geschaltet (`app.html` verliert `disabled`/„kommt in Phase 7"), `webui/config.py :: UiSettings.space_admin_enabled` Default `False`→`True` (P7-R, schließt den in `phase6_shares/CLAUDE.md` Zeile 16 gebauten Seam). Neues Modul `webui/static/js/spaces.js` (P7-Q): `openSpaceAdminDialog()`/Liste aller `writable`-Spaces, `selectSpace()` lädt `GET .../members`, Mitglieder-Hinzufügen (immer Re-Auth, eingefroren wie `dialogs.js`s `pendingMoveBody`)/-Entfernen (kein Re-Auth), `openRemoveSpaceDialog()` (Klartext-Konsequenz + getippte Bestätigung + Re-Auth). `app.html`: `#space-admin-dialog`/`#space-remove-dialog`, Geschwister von `#share-dialog`. `app.js`: `initSpaces()` in den Bootstrap, beide neuen Dialoge in `anyOverlayOpen()`/Escape, `account-manage-spaces`-Klick öffnet den Dialog, **`meta.space_admin` blendet den Menüpunkt aus** (P7-R — statisches HTML kennt den Kill-Switch sonst nicht, P5-T). **Zwei Advisor-Funde vor dem Commit:** (1) `selectSpace()` setzte `pendingMemberBody`/die Re-Auth-Felder beim Space-Wechsel nicht zurück — ein eingefrorener Hinzufügen-Versuch für Space A wäre nach einem Klick auf Space B gegen B abgeschickt worden, derselbe Fund, den `dialogs.js :: pendingMoveBody = null` beim Space-Wechsel bereits kommentiert; behoben, plus dieselbe Rücksetzung in `openSpaceAdminDialog()`. (2) `orphans` aus `GET .../members` wurde gelesen und verworfen, obwohl C2 es explizit als „Render-Hinweis fürs Frontend" gebaut hatte — jetzt in der Mitgliederliste als eigene Zeile gerendert. **Echter Browser-Lauf gegen eine Wegwerf-Instanz** (siehe Session-Block: Anlegen, Hinzufügen mit Re-Auth, Entfernen ohne Re-Auth, Entfernen-Dialog mit Konsequenztext+Bestätigung+Re-Auth, Home-Space-Ausnahme — alles Ende-zu-Ende bestanden) | C | ✅ **vollständig, zwei Advisor-Funde vor dem Commit behoben** | +2 (`test_app_html_has_a_live_manage_spaces_entry` ersetzt den Stub-Test, `_JS_MODULES` um `"spaces"` ergänzt) + 1 `test_api.py` (`UiSettings().space_admin_enabled is True`); JS bleibt laut P5-T unit-ungetestet, echter Browser-Lauf statt jsdom; 904 gesamt |
 | 14 | C5 (Betrieb/Doku, kein Code): `phase3_edge/scripts/diagnose.sh` Prüfung 12 bekommt einen Satz im Prüfungstext (deckt jetzt ausdrücklich auch die menschliche Space-Verwaltungsfläche ab, nicht nur `spacectl.py`). `docs/UPDATE_LOG.md`-Eintrag `## 2026-08-26` (P6-X-Gate: oberster Eintrag muss den Deploy-Tag tragen — vor dem tatsächlichen Deploy-Tag nachzuprüfen, falls der Tag abweicht) | C | ✅ **vollständig** | 0 (Doku-/Skript-Text, kein Python-Verhalten geändert); 904 gesamt unverändert |
+| 15 | Block B (Mehrfachauswahl, `phase6_shares/ITEM_MOVE_PLAN.md` §9, P6-AK–AN): `state.js` (`selectedItemIds`-Set), `list.js` (Strg+Klick/Long-Press-Toggle, Auswahl-Werkzeugleiste, `moveSelectedItems()`-Zweirunden-Schleife), `dialogs.js` (`openMoveDialog()` nimmt jetzt Item ODER Array, Batch-Zweig in `runBatchMove()` mit eingefrorenem `pendingBatchTarget`), `tree.js` (Auswahl leert sich bei Navigation), `toasts.js`/`app.css` (mehrzeilige Sammelmeldung), `app.html` (`#list-selection`, `#move-dialog-title`, `#move-progress`) | B | ✅ **vollständig, Advisor-Runde vor UND nach dem Browser-Lauf** | 0 (reiner Frontend-Schnitt, P6-AL — kein neuer Endpunkt, `webui/api.py` unangetastet, Tabu-Diff bestätigt nur `webui/static/`); 904 gesamt unverändert, JS bleibt laut P5-T unit-ungetestet |
 
 *(Weitere Zeilen entstehen mit dem Rest von Block C/B — siehe Plan §4 für die vollständige Schritt-Sequenz.)*
 
@@ -789,3 +790,104 @@ oben. Danach Step Z (Abnahme/Deploy/Abschluss).
 **Nächster Schritt, konkret:** Block B, `webui/static/js/state.js`/`list.js`/`tree.js`/
 `dialogs.js`/`toasts.js`/`app.html` gemäß der Anker-Tabelle oben in `docs/concepts/
 phase7_spaces_admin_plan.md` §"Block B".
+
+**Nachtrag, 2026-08-26 — Block B gebaut (Mehrfachauswahl, §9), Phase-7-Scope damit vollständig
+außer Step Z.**
+
+**Umsetzung entlang der Plan-Anker (§9.3), sechs Dateien, reiner Frontend-Schnitt (P6-AL):**
+`state.js` bekommt `selectedItemIds` (ein `Set`, geteilt wie der Rest von `state`). `list.js`:
+`toggleSelected()`/`clearSelection()`/`renderSelectionToolbar()`, Strg+Klick UND Long-Press
+(Pointer-Events, nur `pointerType !== "mouse"`, P5-W bleibt Desktop-first — kein eigener
+Touch-Testlauf für diesen Zweig) auf jeder `movable`-Zeile, neue `moveSelectedItems(items,
+target, credentials, onProgress)` als geteilte Zweirunden-Schleife. `tree.js`: `clearSelection()`
+in `activateView()`/`navigateAll()` — dieselbe Exklusivitäts-Disziplin wie `folder`/`filter`
+seit Step 7 Commit 1, zusätzlich beim Such-Debounce und beim Chip-„×“ in `list.js` (Suche zählt
+laut §9.3 Punkt 1 ausdrücklich als Navigation). `dialogs.js`: `openMoveDialog(itemOrItems)`
+normalisiert auf `moveTargetItems` (Array, IMMER — ein Einzel-Move wird zu `[item]`) — **derselbe
+Dialog, keine zweite Definition** (P6-AK), Titel/Konsequenztext branchen auf `.length`.
+`toasts.js`/`app.css`: `toast()` nimmt jetzt auch ein Array (mit `\n` verbunden), `.toast`
+bekommt `white-space: pre-line` für die zweite Zeile der Sammelmeldung. `app.html`: neue
+`#list-selection`-Werkzeugleiste unter `#list-chips`, `#move-dialog-title`/`#move-progress`.
+
+**Zwei Advisor-Runden, insgesamt fünf Funde vor dem Commit behoben (keiner davon durch den
+Browser-Lauf allein gefunden — beide Runden liefen VOR dem jeweils nächsten Schritt):**
+1. **Batch-Ziel war nicht eingefroren** — `runBatchMove()` las `moveSpaceSelectEl.value`/
+   `moveFolderSelectEl.value` bei JEDEM Klick neu, auch beim Re-Auth-Retry. Ein Dropdown-Wechsel
+   zwischen Runde 1 und Runde 2 hätte die zurückgewiesenen Items an ein ANDERES Ziel geschickt
+   als die bereits erfolgreichen — derselbe Fundtyp wie C3s `pendingMemberBody`. Behoben: neues
+   `pendingBatchTarget`, eingefroren beim ersten Batch-Submit (dasselbe Muster wie
+   `pendingMoveBody` beim Einzel-Move), PLUS `moveSpaceSelectEl.disabled`/`moveFolderSelectEl.
+   disabled = true` für die Dauer eines laufenden Batches (zwei unabhängige Riegel für denselben
+   Fund, nicht nur einer).
+2. **Space-Wechsel-Handler räumte die Batch-Bilanz nicht auf** — nullte `moveBatchReauthItems`,
+   ließ `moveBatchSucceeded`/`moveBatchFailed`/`pendingBatchTarget` stehen. In der Praxis durch
+   Fix 1 unerreichbar (die Auswahlfelder sind währenddessen gesperrt), trotzdem als
+   Defense-in-Depth nachgezogen — kein Verlass allein auf einen HTML-`disabled`, den die
+   Accessibility-Probe dieser Sitzung nicht zweifelsfrei bestätigen konnte.
+3. **Fehlender `.catch()`** auf der Erfolgs-Kette nach einem Batch (`loadItems().then(loadOverview)
+   .then(...)`) — ein `401` mitten im Batch hätte eine unbehandelte Promise-Ablehnung hinterlassen
+   (dieselbe Fundklasse wie P5 Step 10, `reportUnexpectedError()`). Behoben, `reportUnexpectedError`
+   neu aus `api.js` importiert.
+4. **Abgelaufene Sitzung mitten im Batch wäre als benannter Fehlschlag pro Item erschienen** —
+   `api.js`s 401-Zweig zeigt die "Sitzung abgelaufen"-Karte bereits synchron; ohne Sonderfall
+   hätte `moveSelectedItems()` trotzdem jedes verbleibende Item als `[unauthenticated]`
+   gemeldet UND weiter erfolglose Requests abgeschickt. Behoben: `err.message ===
+   "unauthenticated"` bricht die Schleife sofort ab, dieselbe Unterdrückung wie im Einzel-Move.
+5. *(Kein Fund, gegengeprüft:)* die Konflikt-Fehlermeldung (`api.py :: _map_store_error()` —
+   „Konflikt bei {id}: erwartete Version X, aktuell Y.“) liest sich sinnvoll eingebettet in der
+   Batch-Sammelmeldung (`„Titel“ [Konflikt bei …]`) — keine Änderung nötig.
+
+**Echter Browser-Lauf, Ende-zu-Ende, gegen eine Wegwerf-Instanz** (eigener Uvicorn-Prozess,
+temporäres `DATA_ROOT`+`AuthStore`, `git=False`, Skript im Scratchpad, kein Repo-Teil — Nutzer
+per `store.upsert_user()`+`confirm_totp()` direkt bestätigt angelegt, kein Einladungsumweg
+nötig, Login selbst lief normal über die UI mit Passwort+echtem TOTP-Code):
+- **Zeile 31** (N Items auf einmal): drei Notizen per Strg+Klick ausgewählt (Toolbar zeigte
+  korrekt „3 ausgewählt“), Dialogtitel „3 Items verschieben“, Konsequenztext „Verschiebt 3 Items
+  nach beta. …“ — alle drei korrekt gerendert.
+- **Zeile 33** (ein fehlgeschlagenes Item blockiert die anderen nicht): eines der drei Items
+  wurde VOR dem Klick über einen zweiten `Store`-Handle auf eine neue Version gebracht (echter
+  Konflikt, nicht simuliert). Ergebnis: die anderen zwei landeten korrekt im Zielspace (Space-
+  Zähler beta 1→3), das Konfliktitem blieb unverändert in alpha. **Die tatsächliche
+  Sammelmeldung mit dem benannten Fehler wurde dabei NICHT gesehen** — der Dialog schloss sich
+  vor dem Screenshot, der Toast war bereits abgelaufen. Nur die Nichtbewegung des Konfliktitems
+  ist damit live bewiesen, nicht der Text der zweiten Toast-Zeile selbst.
+- **Zeile 32** (ein gemeinsames Re-Auth-Formular für die ganze Auswahl): mit einer frischen
+  `.share.yml`-Konstellation (alpha teilt NICHTS mit beta, beta teilt `write` mit alpha — echtes
+  Widen, kein durch beidseitige Shares verdecktes No-Op, wie es der erste Durchlauf zeigte) zwei
+  Items batch-verschoben: Runde 1 → „2 von 2 benötigen Passwort und Code“, EIN Formular. Ein
+  wiederverwendeter TOTP-Code wurde vom Server korrekt als Replay abgelehnt (echtes
+  Anti-Replay-Verhalten, kein Fund) — nach einem frischen Code liefen beide Items durch, Toast
+  bestätigte, Dialog schloss, beta-Zähler stieg auf 5.
+- **Zeile 34** (In-Space-Batch löst nie Re-Auth aus): zwei Items innerhalb von alpha in einen
+  neuen Ordner verschoben — Dialog schloss sofort ohne jedes Re-Auth-Formular, beide Items auf
+  v2, Ordner im Baum korrekt.
+- **Konsole** ohne Fehler während des gesamten Laufs (Muster `error|Error|Uncaught|Unhandled`).
+
+**Ehrlich benannt, nicht verschwiegen:** die zweizeilige Sammelmeldung mit namentlich genannten
+Fehlern (§9.3 Punkt 4, Zeile 33s zweite Hälfte) ist NICHT im Browser gesehen — nur ihre
+Voraussetzung (das Konfliktitem bleibt unbewegt, taucht nicht fälschlich als erfolgreich auf).
+Der fünfte Advisor-Fund oben (Konflikt-Meldungstext) ist eine Code-Prüfung, kein Sichtbeweis.
+Der von der Beraterin vorgeschlagene fünfte E2E-Fall (Dropdown-Wechsel zwischen Runde 1 und 2)
+wurde NICHT nachgestellt — durch Fund 1 oben ist er strukturell unerreichbar geworden (die
+Auswahlfelder sind während eines laufenden Batches gesperrt), nicht übersprungen.
+
+**Abnahmezeilen 31–34 (`ITEM_MOVE_PLAN.md` §9.5, „Wer: Niklas“) bleiben formal offen** —
+derselbe Umgang wie P6.5-12 vor dem echten Klick: ein Claude-Code-Browserlauf ist ein
+Kandidatenbeleg, keine Abnahme durch den Nikinger selbst. **Gebaut, Claude-Code-Browserlauf
+bestanden, Nikinger-Bestätigung steht aus.**
+
+**Verifiziert:** `pytest -q` **904 → 904**, unverändert (P6-AL: reiner Frontend-Schnitt, keine
+neue Backend-Testdatei laut Plan §9.4). `node --check` auf `list.js`/`dialogs.js` sauber. Tabu-
+Diff: ausschließlich `phase5_ui/webui/static/{app.css,app.html,js/{state,list,dialogs,tree,
+toasts}.js}` — `webui/api.py` bewusst NICHT angefasst (P6-AL, kein neuer Endpunkt), stärker als
+§9 verlangt. Wegwerf-Server sauber beendet (`pkill`, `DATA_ROOT` gelöscht, Port frei bestätigt).
+
+**Damit ist Block B fertig — Phase 7 ist inhaltlich vollständig (Block A, Gate, Block C, Block
+B).** Einzig verbleibend: **Step Z** (Abnahme/Deploy/Abschluss, siehe Plan-Auszug oben) — frischer
+`diagnose.sh`-Lauf, `docs/UPDATE_LOG.md`-Datum auf den echten Deploy-Tag geprüft, `pytest -q`/
+`mcp_smoke.py`/`ui_smoke.py`/`ui_budget.py --json`, Tabu-Diff, dann `deploy.sh` durch den
+Nikinger (braucht Sudo). Danach die Abnahmematrix real durchgehen (inkl. der jetzt offenen
+Zeilen 31–34) und die Phase-7-Closeout-Dokumente schreiben.
+
+**Nächster Schritt, konkret:** Step Z — mit dem Nikinger abstimmen, wann `deploy.sh` läuft und
+ob das UPDATE_LOG-Datum vom 2026-08-26 noch zum tatsächlichen Deploy-Tag passt.

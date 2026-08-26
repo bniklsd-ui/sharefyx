@@ -18,6 +18,11 @@ var listChipsEl;
 var searchInputEl;
 var createButtonEl;
 
+var listSelectionEl;
+var listSelectionCountEl;
+var listSelectionMoveEl;
+var listSelectionClearEl;
+
 var overviewTitleEl;
 var overviewTilesEl;
 var overviewRecentEl;
@@ -195,15 +200,75 @@ export function renderChips() {
   remove.addEventListener("click", function () {
     state.query = "";
     searchInputEl.value = "";
+    clearSelection();   // §9.3 Punkt 1: Suche zurücksetzen zählt als Navigation
     loadItems().catch(reportUnexpectedError);
   });
   chip.appendChild(remove);
   listChipsEl.appendChild(chip);
 }
 
+// -- Mehrfachauswahl (§9, P6-AK–AN) ----------------------------------------------------------
+// Auswahl leert sich bei jeder Navigation (tree.js :: activateView()/navigateAll()) — ohne diese
+// Regel könnte eine Auswahl Items enthalten, die in der aktuellen Listenansicht gar nicht mehr
+// sichtbar sind (§9.3 Punkt 1).
+
+export function clearSelection() {
+  if (state.selectedItemIds.size === 0) return;
+  state.selectedItemIds.clear();
+}
+
+function toggleSelected(id) {
+  if (state.selectedItemIds.has(id)) state.selectedItemIds.delete(id);
+  else state.selectedItemIds.add(id);
+  renderList();
+}
+
+function renderSelectionToolbar() {
+  var count = state.selectedItemIds.size;
+  listSelectionEl.hidden = count === 0;
+  if (count === 0) return;
+  listSelectionCountEl.textContent = count + " ausgewählt";
+}
+
+// Zweirunden-Batch-Move (P6-AL/AM), kein neuer Endpunkt — eine sequenzielle Schleife über den
+// bereits gebauten Einzel-Move-Pfad (`PATCH /api/v1/items/{id}`, Step 7b). Sequenziell statt
+// parallel: `LoginThrottle` ist dieselbe Bremse wie beim UI-Login, parallele Requests könnten sie
+// bei einem einzigen falschen Credential-Versuch unnötig strapazieren. `credentials` ist `null`
+// für Runde 1 (kein Widen angenommen, P6-AM) oder `{password, totp}` für die Wiederholung der in
+// Runde 1 zurückgewiesenen Items. Löst nie selbst auf/ab — der Aufrufer (dialogs.js) entscheidet
+// anhand von `results[i].code === "reauth_required"`, ob eine zweite Runde nötig ist.
+export function moveSelectedItems(items, target, credentials, onProgress) {
+  var results = [];
+  var i = 0;
+  function next() {
+    if (i >= items.length) return Promise.resolve(results);
+    var item = items[i];
+    var body = Object.assign({ version: item.version, folder: target.folder }, credentials || {});
+    if (target.space && target.space !== item.space) body.space = target.space;
+    if (onProgress) onProgress(i + 1, items.length);
+    return api("/items/" + encodeURIComponent(item.id), {
+      method: "PATCH", body: JSON.stringify(body),
+    }).then(function () {
+      results.push({ item: item, ok: true });
+    }).catch(function (err) {
+      // Abgelaufene Sitzung mitten im Batch: `api.js` hat die "Sitzung abgelaufen"-Karte bereits
+      // synchron gezeigt (dieselbe Unterdrückung wie im Einzel-Move, `err.message ===
+      // "unauthenticated"` dort) -- jeder weitere Request würde ohnehin nur wieder 401 liefern.
+      // Batch hier abbrechen statt jedes verbleibende Item als "fehlgeschlagen" zu melden.
+      if (err && err.message === "unauthenticated") {
+        i = items.length;
+        return;
+      }
+      results.push({ item: item, ok: false, code: err.code, message: err.message });
+    }).then(function () { i++; return next(); });
+  }
+  return next();
+}
+
 export function renderList() {
   listRowsEl.textContent = "";
   renderChips();
+  renderSelectionToolbar();
 
   if (state.items.length === 0) {
     listEmptyEl.hidden = false;
@@ -239,6 +304,7 @@ export function renderList() {
   if (activeSpaceWritable()) setCreateControlsPresent(true);
   state.items.forEach(function (item) {
     var li = el("li");
+    if (state.selectedItemIds.has(item.id)) li.classList.add("list__row--selected");
     var button = el("button", "list__row");
     button.type = "button";
     button.dataset.id = item.id;
@@ -248,8 +314,30 @@ export function renderList() {
     metaEl.appendChild(el("span", null, itemMetaLine(item)));
     metaEl.appendChild(visibilityChip(item));
     button.appendChild(metaEl);
-    button.addEventListener("click", function () { selectItem(item.id).catch(reportUnexpectedError); });
+    var movable = !item.readonly && item.space === state.ownSpace;
+    button.addEventListener("click", function (event) {
+      // Strg+Klick (Nikinger-Vorgabe, §9.3 Punkt 1) togglet statt zu öffnen — nur für Items, die
+      // sich überhaupt in einem Batch verschieben ließen (dieselbe `movable`-Bedingung wie der
+      // Verschieben-Knopf unten).
+      if (movable && (event.ctrlKey || event.metaKey)) {
+        toggleSelected(item.id);
+        return;
+      }
+      selectItem(item.id).catch(reportUnexpectedError);
+    });
     li.appendChild(button);
+    if (movable) {
+      // Long-Press (Nikinger-Vorgabe, zweiter Auslöser neben Strg+Klick) — nur für Touch/Pen,
+      // eine Maus deckt bereits Strg+Klick ab. Best-effort: P5-W lässt diese App bewusst
+      // Desktop-first, kein dedizierter Touch-Testlauf für diesen Pfad.
+      var longPressTimer = null;
+      li.addEventListener("pointerdown", function (event) {
+        if (event.pointerType === "mouse") return;
+        longPressTimer = setTimeout(function () { toggleSelected(item.id); }, 500);
+      });
+      li.addEventListener("pointerup", function () { clearTimeout(longPressTimer); });
+      li.addEventListener("pointerleave", function () { clearTimeout(longPressTimer); });
+    }
     // Verschieben-Knopf als GESCHWISTER von `.list__row`, nicht darin verschachtelt — zwei
     // `<button>` ineinander ist ungültiges HTML und Browser hangeln das eine daraus hervor,
     // was den Klick-Handler unvorhersehbar macht. `.list__rows > li` ist deshalb Flex (app.css),
@@ -257,8 +345,8 @@ export function renderList() {
     // schreibbare Item — der Server lehnt einen Ordnerwechsel an einem fremden Item ohnehin ab
     // (`_items_patch`s Eigentümer-Riegel), der Knopf zeigt also nur, was wirklich erlaubt ist.
     // Menü-Knopf bleibt die Pflicht-Alternative zu Drag & Drop (P6-AB) — dieselbe
-    // `movable`-Bedingung entscheidet über beide, nicht nur über den Knopf.
-    var movable = !item.readonly && item.space === state.ownSpace;
+    // `movable`-Bedingung entscheidet über beide, nicht nur über den Knopf (jetzt oben einmal
+    // berechnet, §9 braucht sie zusätzlich für Strg+Klick/Long-Press).
     if (movable) {
       var moveButton = el("button", "list__row-move", "→");
       moveButton.type = "button";
@@ -351,6 +439,20 @@ export function init() {
   searchInputEl = document.getElementById("search-input");
   createButtonEl = document.getElementById("create-button");
 
+  listSelectionEl = document.getElementById("list-selection");
+  listSelectionCountEl = document.getElementById("list-selection-count");
+  listSelectionMoveEl = document.getElementById("list-selection-move");
+  listSelectionClearEl = document.getElementById("list-selection-clear");
+
+  listSelectionMoveEl.addEventListener("click", function () {
+    var items = state.items.filter(function (item) { return state.selectedItemIds.has(item.id); });
+    if (items.length) openMoveDialog(items);
+  });
+  listSelectionClearEl.addEventListener("click", function () {
+    state.selectedItemIds.clear();
+    renderList();
+  });
+
   overviewTitleEl = document.getElementById("overview-title");
   overviewTilesEl = document.getElementById("overview-tiles");
   overviewRecentEl = document.getElementById("overview-recent");
@@ -360,6 +462,7 @@ export function init() {
   var searchTimer = null;
   searchInputEl.addEventListener("input", function () {
     state.query = searchInputEl.value;
+    clearSelection();   // §9.3 Punkt 1: Suche zählt als Navigation
     clearTimeout(searchTimer);
     searchTimer = setTimeout(function () { loadItems().catch(reportUnexpectedError); }, 200);
   });
