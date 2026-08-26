@@ -9,9 +9,10 @@
      (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
-## 2026-08-26
+## 2026-08-28
 - Neuer Menüpunkt "Spaces verwalten": eigene Spaces anlegen oder entfernen, Mitglieder mit Schreibrecht hinzufügen oder entfernen — direkt im Konto-Menü, ohne Kommandozeile.
 - Entfernen eines Space und größere Mitgliederänderungen fragen zur Sicherheit noch einmal Passwort und Code ab.
+- Mehrere Notizen auf einmal verschieben: mit Strg+Klick (oder lange gedrückt halten) mehrere Zeilen auswählen, dann in einem Rutsch in einen anderen Ordner oder Space verschieben.
 
 ## 2026-08-25
 - Neuer Knopf zum Entfernen von Bildern aus einer Notiz — das Bild wandert in den Papierkorb, die Textstelle bleibt als reiner Bildname stehen.
