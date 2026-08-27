@@ -13,7 +13,7 @@ down:
   - docs/concepts/phase6_shares_plan.md    # ausführungsreifer P6-Plan
   - docs/concepts/phase6_5_tools_images_plan.md   # ausführungsreifer P6.5-Plan
   - docs/concepts/phase7_spaces_admin_plan.md     # ausführungsreifer P7-Plan
-updated: 2026-08-23 (Phase 6.5 formal abgeschlossen als P7 Step A8 -- 🟡 code-complete, 12 von 14 Abnahmezeilen live, zwei per testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md neu) | 2026-08-23 (neue Phase 7 -- Space-Verwaltung, Mehrfachauswahl, Konsolidierung -- ergaenzt, Step 0 gestartet; fehlende P6.5-Tabellenzeile nachgetragen) | 2026-08-23 (Phase 6 auf 🟡 code-complete -- 12 von 39 Abnahmezeilen live, Sprung auf ✅ ist offene Nikinger-Entscheidung) | 2026-08-20 (neue Phase 6.5 -- Werkzeug-Ergonomie + Bilder -- ergaenzt, Step 0 gestartet)
+updated: 2026-08-27 (Phase 7 inhaltlich vollstaendig, live deployt e88a624, Step Z laeuft) | 2026-08-23 (Phase 6.5 formal abgeschlossen als P7 Step A8 -- 🟡 code-complete, 12 von 14 Abnahmezeilen live, zwei per testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md neu) | 2026-08-23 (neue Phase 7 -- Space-Verwaltung, Mehrfachauswahl, Konsolidierung -- ergaenzt, Step 0 gestartet; fehlende P6.5-Tabellenzeile nachgetragen) | 2026-08-23 (Phase 6 auf 🟡 code-complete -- 12 von 39 Abnahmezeilen live, Sprung auf ✅ ist offene Nikinger-Entscheidung) | 2026-08-20 (neue Phase 6.5 -- Werkzeug-Ergonomie + Bilder -- ergaenzt, Step 0 gestartet)
 ---
 # ROADMAP — Space-Server
 
@@ -287,7 +287,15 @@ Vorgang in denselben Zielordner, mit einem Re-Auth-Formular statt zehn.
   Namen dieser Phase (seit P6 Step 7 Commit 6 in `app.html` als „kommt in Phase 7" reserviert)
   und fällt unter Druck nie vor Block B.
 
-**Status 🔄 (2026-08-23, Step 0 läuft):** Plan `docs/concepts/phase7_spaces_admin_plan.md`
+**Status 🔄 (2026-08-27, inhaltlich vollständig, live deployt `e88a624`, Step Z läuft):** Block A
+(inkl. A8, Phase 6.5 formal abgeschlossen), Gate A→C, Block C (C1–C5, Space-Verwaltung in der
+Weboberfläche) und Block B (Mehrfachauswahl) sind alle gebaut. `deploy.sh main` durch den
+Nikinger gefahren, `/opt/sharefyx/current` → `e88a6244…`, Health-Gate 3/3 grün. Verbleibend: A6
+(Purge-Gate, frühestens 2026-08-28) und die volle Abnahmematrix real mit dem Nikinger durchgehen
+(Zeilen 31–34 bislang nur Claude-Code-Browserlauf, keine Nikinger-Abnahme). Details, alte
+Session-Historie: `phase7_spaces_admin/CLAUDE.md`.
+
+**Status-Herkunft (2026-08-23, Step 0 gestartet):** Plan `docs/concepts/phase7_spaces_admin_plan.md`
 ausführungsreif, alle zehn Nikinger-Fragen N1–N10 in §0.1 gelockt. Step 0.1–0.6 gefahren: `pytest`
 828 grün, Doku-Audit der P6-Modul-Zeilen 8–16 + Vormerkungspunkt 2 mit SHA-Beweis abgeschlossen
 (alle live deployt, Stale-Doku in `phase6_shares/CLAUDE.md`/Root-`CLAUDE.md`/`docs/INDEX.md`

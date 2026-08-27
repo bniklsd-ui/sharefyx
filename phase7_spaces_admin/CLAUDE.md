@@ -927,3 +927,24 @@ Leiche zurückgeblieben, kein Handgriff nötig. `docs/UPDATE_LOG.md`s oberster B
 
 **Nächster Schritt, konkret:** `deploy.sh main` erneut versuchen, mit demselben Env-Var-Satz wie
 zuvor — das UPDATE_LOG-Gate sollte jetzt durchlaufen.
+
+**Nachtrag, 2026-08-27 — echter `deploy.sh main`-Lauf durch den Nikinger, erfolgreich.**
+**Live-Ergebnis:** `{"action":"deploy","result":"ok","release":"/opt/sharefyx/releases/
+20260827T165737.663410Z","sha":"e88a6244d8eebb5d08d1d93c4a2725f84a2f5971","ref":"main",
+"previous":"/opt/sharefyx/releases/20260825T110849.160586Z"}`. `pytest -q` im Release **904/904**
+(zweiter, unabhängiger Lauf — im gebauten Release-Verzeichnis, nicht nur im Arbeitsbaum),
+`/opt/sharefyx/current` zeigt jetzt auf `e88a624`, `sharefyx-mcp` neu gestartet, Health-Gate 3/3
+grün (`/ui/login`→200, `/api/v1/me`→401, `/mcp/`→401 — alle drei die per `deploy.sh`-Kommentar
+erwarteten Antworten: Stack vollständig gemountet UND Auth-Gate scharf, kein Fehlschlag),
+Retention griff (`KEEP=5`, ältestes Release `20260813T115528` entfernt).
+
+**Damit ist Phase 7 live deployt.** Block A/Gate/C/B stehen jetzt real auf der Maschine, nicht
+nur im Repo. **Weiterhin offen, unverändert:** A6 (Purge-Gate, frühestens 2026-08-28) und die
+volle Abnahmematrix real mit dem Nikinger durchgehen — insbesondere die neuen Zeilen 31–34
+(bislang nur Claude-Code-Browserlauf gegen eine Wegwerf-Instanz, keine Nikinger-Abnahme auf der
+echten Instanz) und alle Zeilen, die noch Fabians eigenen Login brauchen. **Root-`CLAUDE.md`,
+`ROADMAP.md`, `docs/INDEX.md`** im selben Commit nachgezogen (Phase 7 jetzt „inhaltlich
+vollständig, live deployt, Step Z läuft" statt „Block A weit fortgeschritten").
+
+**Nächster Schritt, konkret:** mit dem Nikinger die volle Abnahmematrix (Plan §6/§9.5) real
+durchgehen, danach `PHASE7_CLOSEOUT_HANDOVER.md` + Übersichtsgrafik + Rotationsprüfung.
