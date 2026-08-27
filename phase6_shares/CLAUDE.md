@@ -222,6 +222,12 @@ item-weise ACL-gefilterte Suche — es fehlt nur die UI-Fläche. Block C ebenfal
 (35/38/39 ✅, 36/37 brauchen Fabian).** Q1/Bilder-Priorität vom Nikinger entschieden, ein
 Advisor-Fund vor dem Commit gefunden und behoben (`editor.js`). 772 pytest grün, 10/10
 Playwright grün, Tabu-Diff leer. Details: aktueller Session-Block.
+**[2026-08-27 Korrektur, P7-Sitzung]:** „36/37 brauchen Fabian" war zu eng gedacht — der Plan
+selbst erkannte später (`phase7_spaces_admin_plan.md` P7-J/§540), dass Fabian den Fall „nur
+item-level Share, kein Space-Grant" strukturell nie zeigen konnte (`niklas` steht in
+`fabian/.share.yml` unter `read:`, Fabian sieht ohnehin alles). `testnutzer-p7` wurde genau
+dafür gebaut; P7-11 (Web-UI **und** MCP) schließt 36/37 damit tatsächlich, nicht Fabians Login.
+Siehe `phase7_spaces_admin/CLAUDE.md`, Session-Block vom selben Tag.
 
 **[2026-08-19] Kurzprüfung „trägt die Architektur >2 Nutzer?" — Befund, kein Plan nötig.**
 Architektur ist offen: `.share.yml`s `read:`/`write:` sind beliebig lange Namenslisten

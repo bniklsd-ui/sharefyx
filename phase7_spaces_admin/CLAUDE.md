@@ -116,20 +116,20 @@ keinen Code bekommen, nur Step 0 (Haushalt) lief.
 | P7-9 | `clients`/`token_families` sinken nach realem Purge | Niklas | ⬜ — `token_families` ab 2026-08-28, `clients` erst ab 2026-10-27 (siehe Session-Block, Retention 30d/90d) |
 | P7-10 | `testnutzer-p7` existiert, schreibt einmal | Nikinger + Claude Code | ✅ `p7_10_write_probe.py`, `itm_ee1e0323` |
 | P7-11 | `testnutzer-p7` sieht nur sein item-level Item | Claude Code | ✅ Web-UI (P6-Zeilen 36/37, echter Login) **und** MCP (`p7_11_visibility_probe.py`) |
-| P7-12 | `testnutzer-p7` entfernt, Keyring-Eintrag weg | Claude Code | ⬜ |
+| P7-12 | `testnutzer-p7` entfernt, Keyring-Eintrag weg | Claude Code | ✅ **[2026-08-27]** genau nach Plan-Rezept (§ Zeile 544-552): `testcred.py purge` (Claude Code, Keyring lokal) → `spacectl.py remove-space testnutzer-p7 --force` + `authctl.py disable-user`/`revoke-sessions --space testnutzer-p7` (Nikinger, `SPACE_DATA_ROOT`/`SPACE_AUTH_DB` gegen die echte Instanz gesetzt) → `spacectl.py check --json` → `{"orphan_count":0,"orphans":[],"broken_count":0,"broken":[]}`, keine verwaisten `.share.yml`-Referenzen |
 | P7-12b | Claude Code loggt sich ohne Nikinger als `testnutzer-p7` ein | Claude Code | ✅ derselbe Lauf wie P7-10 — Login/TOTP/Consent allein über `testcred.py` |
 | P7-13 | Phase 6.5 formal abgeschlossen | Claude Code | ✅ Abschluss vollzogen (Phase 6.5 selbst steht 🟡, 12/14 — siehe `PHASE6_5_CLOSEOUT_HANDOVER.md`) |
-| P7-14 | Eigener Space im Browser freigegeben, Empfänger sieht ihn | Niklas + `testnutzer-p7` | ⬜ |
-| P7-15 | Zurücknehmen kein Re-Auth, Erweitern eines | Niklas | ⬜ |
-| P7-16 | Neuer geteilter Space im Browser angelegt | Niklas | ⬜ |
-| P7-17 | Name-Kollision mit Principal abgewiesen | Claude Code, Test | ⬜ |
+| P7-14 | Eigener Space im Browser freigegeben, Empfänger sieht ihn | Niklas + `testnutzer-p7` | ✅ **[2026-08-27]** `niklas` teilte seinen Home-Space mit `testnutzer-p7` (lesen) über Konto → Spaces verwalten; zweiter Login als `testnutzer-p7` (`testcred.py`, ohne Nikinger) zeigte `niklas` sofort unter „Verbundene Spaces" (59 Items · nur lesen). Grant danach wieder entfernt (Aufräumen dieser Sitzung) |
+| P7-15 | Zurücknehmen kein Re-Auth, Erweitern eines | Niklas | ✅ **[2026-08-27]**, beide Hälften live: Hinzufügen von `testnutzer-p7 (lesen)` verlangte „Diese Änderung erweitert Zugriffsrechte — Passwort und TOTP-Code nötig" (Nikinger gab beides ein); Entfernen desselben Mitglieds direkt danach lief ohne jede Re-Auth-Aufforderung durch (Toast „Mitglied entfernt · testnutzer-p7") |
+| P7-16 | Neuer geteilter Space im Browser angelegt | Niklas | ✅ **[2026-08-27]** `p7-abnahme-space` über Konto → Spaces verwalten angelegt, Toast „Space angelegt", sofort in Sidebar/Space-Liste sichtbar (später im selben Lauf wieder entfernt, siehe P7-19) |
+| P7-17 | Name-Kollision mit Principal abgewiesen | Claude Code, Test | ✅ **[2026-08-27]**, jetzt zusätzlich live: Anlegeversuch `fabian` (bestehender Principal-Name) im echten Browser → „'fabian' ist ein bestehender Principal-Name.", vom Nikinger live gesehen |
 | P7-18 | Home-Space nicht entfernbar (Knopf fehlt, Route 403) | Claude Code, Test+Browser | ✅ Route: `test_home_space_cannot_be_removed` (403). Knopf fehlt: bestätigt gegen eine Wegwerf-Instanz (`spaceRemoveOpenEl.hidden = info.home` — Home-Space zeigte keinen „Space entfernen"-Knopf, ein anderer, nicht-Home-Space direkt danach zeigte ihn) |
-| P7-19 | Space mit N Items entfernt → alle N im `_archive/` | Niklas | ⬜ |
+| P7-19 | Space mit N Items entfernt → alle N im `_archive/` | Niklas | ✅ **[2026-08-27]** `p7-abnahme-space` mit 1 Item entfernt (Klartext-Konsequenz + getippte Bestätigung + Passwort/TOTP durch den Nikinger), niklas' Archiv 22→23, Item verifiziert unter `niklas > Archiv`, Status `archived` |
 | P7-20 | Space mit nicht-schreibbarem Item nicht entfernbar, kein Teil-Move | Claude Code, Test | ✅ **mit Vorbehalt** — `test_removal_blocked_by_one_unwritable_item_moves_nothing` besteht nur über eine simulierte `can_write_item_as_human`-Divergenz: unter der echten Union-ACL-Semantik (`AclReader.grants_for_dir()` unioniert immer den Space-Root-Grant) macht ein P7-L-autorisierter Ausführender jedes Item automatisch schreibbar — ein realer Blocker ist mit echten `.share.yml`-Daten unerreichbar, der Pre-Flight-Check bleibt trotzdem die zweite, unabhängige Absicherung, die N9 verlangt. **Ein bereits archiviertes Item ist dagegen seit der siebten Contract-Öffnung (Zeile 12 der Modul-Tabelle) KEIN Blocker mehr** — `store.move()` verschiebt es korrekt ins Ziel-`_archive/`, `test_removal_moves_an_already_archived_item_to_the_home_archive` deckt genau das ab (ersetzt den vorherigen 403-Test aus dem ersten C4-Commit) |
 | P7-21 | Entfernen ohne Namensbestätigung abgewiesen | Claude Code, Test | ✅ `test_removal_requires_reauth_and_typed_confirmation` (422 bei falschem `confirm`) |
 | P7-22 | `space_admin_enabled=False` → Menüpunkt weg, Routen 404 | Claude Code, Test | ✅ Routenanteil: `test_all_five_routes_404_when_space_admin_disabled` **und** ein echter Server-Lauf (curl, `space_admin_enabled=False`) — `GET /api/v1/meta` → `"space_admin":false`, alle vier `/api/v1/spaces*`-Aufrufe → `404`. Menüpunkt-Anteil: Nikinger loggte sich selbst per Hand in die von Claude Code gesteuerte Tab ein (`niklas`/Passwort/TOTP, Zugangsdaten von Claude Code berechnet, nie gelesen — siehe Session-Block für den vollen Verlauf inkl. des ersten, gescheiterten Automatisierungs-Anlaufs), Konto-Dialog zeigt danach ausschließlich „Update-Log ansehen" — „Spaces verwalten" fehlt vollständig, `account-manage-spaces` bleibt via `meta.space_admin` ausgehängt |
-| P7-23 | N-Auswahl wandert in einem Vorgang, ein Commit je Item | Niklas | ⬜ |
-| P7-24 | Ein rechteerweiterndes Item in Auswahl → ein Formular, nicht N | Niklas | ⬜ |
+| P7-23 | N-Auswahl wandert in einem Vorgang, ein Commit je Item | Niklas | ✅ **[2026-08-27]** Nikinger live gegen `e88a624`: zwei Items per Strg+Klick ausgewählt ("2 ausgewählt"), `Verschieben` → "2 Items verschieben", beide landeten in `IT-Sekus-Projekt` (Zähler 2→4) |
+| P7-24 | Ein rechteerweiterndes Item in Auswahl → ein Formular, nicht N | Niklas | ❌ **[2026-08-27]** Formular selbst korrekt ("2 von 2 benötigen Passwort und Code" — EIN Dialog), aber der Nikinger musste ZWEI unterschiedliche TOTP-Codes eintippen, um beide Items durchzubekommen. Root Cause in `phase5_ui/webui/static/js/list.js:240` `moveSelectedItems()`: die Batch-Schleife ruft `PATCH /api/v1/items/{id}` sequenziell für jedes Item auf, reicht dabei aber dasselbe `credentials`-Objekt (ein Passwort+EIN TOTP-Code) unverändert an jeden Request durch. Der Server lehnt einen wiederverwendeten TOTP-Code als Replay ab (korrektes Sicherheitsverhalten) — das zweite (und jedes weitere) sequenzielle PATCH in derselben Batch-Runde scheitert deshalb strukturell, nicht zufällig. Für N>1 Items degeneriert das Zweirunden-Design (P6-AM) real Richtung "bis zu N Runden", nicht "höchstens 2" — genau das Gegenteil von P7-24s Anspruch. **Kein reiner UI-Fund wie P7-4, sondern ein Mechanismus-Fehler**: das gezeigte Formular ist korrekt, aber es kann pro Runde strukturell nur EIN Item wirklich durchbringen, wenn mehrere Items in derselben Runde re-auth brauchen. Fix-Optionen (nicht von Claude Code entschieden): (a) TOTP-Fenster serverseitig für Requests innerhalb desselben Batches tolerant machen (schwächt Anti-Replay, riskant), (b) Client wartet zwischen sequenziellen Requests auf einen neuen 30s-Fenster-Tick und fragt den Nutzer pro Fenster einmal (langsam, UX fragwürdig), (c) ehrlich dokumentieren: "ein Formular pro Runde" bedeutet bei TOTP-Widen-Batches in der Praxis oft mehrere Runden, P7-24s Kriterium selbst nachschärfen. Bleibt ⬜/❌ bis der Nikinger entscheidet |
 
 **Geerbt und in dieser Phase nicht adressiert:** P6-Zeilen 7, 9, 14–17, 23, 25, 29, 30 sowie
 P6.5-14 — bleiben im Handover offen, kein stilles Abhaken (Plan §6, Fußnote).
@@ -948,3 +948,87 @@ vollständig, live deployt, Step Z läuft" statt „Block A weit fortgeschritten
 
 **Nächster Schritt, konkret:** mit dem Nikinger die volle Abnahmematrix (Plan §6/§9.5) real
 durchgehen, danach `PHASE7_CLOSEOUT_HANDOVER.md` + Übersichtsgrafik + Rotationsprüfung.
+
+**Nachtrag, 2026-08-27 — Abnahmematrix-Walkthrough gegen die echte Live-Instanz
+(`e88a624`), Browser-Tool-Modus (Claude Code steuert, Nikinger klickt/tippt Zugangsdaten):**
+
+Sieben Zeilen live geschlossen: **P7-14, P7-15 (beide Hälften), P7-16, P7-17, P7-19, P7-23 ✅.**
+Eine neu gefunden, **P7-24 ❌** (echter Mechanismus-Fehler, kein reiner UI-Fund) — siehe
+Abnahmestand-Tabelle oben für den vollen Befund und die Fix-Optionen, hier nur der Kern:
+`list.js :: moveSelectedItems()` reicht dasselbe `credentials`-Objekt (ein TOTP-Code) an jedes
+sequenzielle PATCH im Batch durch; der Server lehnt den wiederverwendeten Code korrekt als
+Replay ab, wodurch ein re-auth-pflichtiger Batch mit N>1 Items strukturell mehr als zwei Runden
+braucht statt der von P7-24 verlangten „ein Formular, nicht N". Bleibt offen bis der Nikinger
+entscheidet, wie behoben wird. **P7-9 weiterhin blockiert** — `token_families`-Purge-Fenster
+öffnet erst 2026-08-28, Systemdatum heute ist 2026-08-27, keine Umgehung versucht.
+
+**Zwei operative Pannen dieser Sitzung, für zukünftige Läufe festgehalten:**
+1. **Cookie-Kollision zwischen Tabs derselben Session.** `testnutzer-p7`s Login in einem zweiten
+   Tab überschrieb das Session-Cookie für den ERSTEN Tab (gleicher Browser-Origin, gemeinsamer
+   Cookie-Jar) — `niklas`s Tab zeigte danach `testnutzer-p7` als Home-Space, obwohl die
+   rechte Seite noch die alte `niklas`-Übersicht cachte. Merke: ein zweiter Login in einem
+   zweiten Tab **derselben** `claude-in-chrome`-Session ist kein isolierter Kontext, er
+   invalidiert die erste Sitzung. Für zwei gleichzeitige Logins bräuchte es zwei getrennte
+   Chrome-Profile/Inkognito-Fenster, nicht zwei Tabs — hier stattdessen sequenziell gearbeitet
+   (Tab 2 nach Gebrauch geschlossen, Tab 1 neu eingeloggt).
+2. **Koordinaten-Klicks nach einer Layout-Änderung sind unzuverlässig.** Mehrere `computer
+   left_click`-Aufrufe auf feste Pixel-Koordinaten trafen nach einem Viewport-Wechsel
+   (1214×545 → 1517×681 zwischen Screenshots) das falsche Feld — Text landete wiederholt im
+   Passwortfeld statt im Space-Feld. Behoben durch Umstieg auf `find`+`form_input`/`ref`-Klicks
+   (element-basiert statt pixel-basiert) für sicherheitsrelevante Formulare. Für künftige
+   Läufe: bei jedem Login-/Formular-Schritt `find` statt gecachter Koordinaten verwenden,
+   besonders nach einem Screenshot mit anderer Auflösung als der vorherige.
+
+**Verifiziert:** keine Code-Änderung in diesem Nachtrag (reine Live-Abnahme + Doku). Kein
+`pytest`-Lauf nötig. Abnahmestand-Tabelle und dieser Block sind der einzige Diff.
+
+**Nachtrag, 2026-08-27 — P7-12 durchgeführt, `testnutzer-p7` vollständig zurückgebaut.** Exakt
+nach dem Plan-Rezept (`docs/concepts/phase7_spaces_admin_plan.md:544-552`): `testcred.py purge`
+(Claude Code, reiner Keyring-Vorgang, kein `DATA_ROOT`-Zugriff) zuerst, danach die drei
+`DATA_ROOT`/Auth-DB-Schreibvorgänge durch den Nikinger selbst (`spacectl.py remove-space
+testnutzer-p7 --force`, `authctl.py disable-user`/`revoke-sessions --space testnutzer-p7`) —
+bewusst nicht von Claude Code ausgeführt, dieselbe Kategorie destruktiver Direktzugriff ohne
+interaktives Re-Auth-Gate wie `deploy.sh`. `SPACE_AUTH_DB` war die nächste bekannte Lücke aus
+A7 (systemd setzt `STATE_DIRECTORY`, eine interaktive Shell nicht) — diesmal mit dem echten
+Pfad (`/var/lib/sharefyx/auth.sqlite3`, per `ls`-Zeitstempel als aktiv bestätigt) sofort gelöst,
+keine neue Verzögerung. `spacectl.py check --json` bestätigt `orphan_count:0`/`broken_count:0` —
+keine verwaisten `.share.yml`-Referenzen zurückgeblieben. Damit ist der dritte Test-Principal
+dieser Phase vollständig entsorgt; jede künftige Phase, die einen dritten Nutzer braucht, legt
+sich einen neuen an (Nikinger-Entscheidung dieser Sitzung, kein Wiederverwenden von
+`testnutzer-p7`).
+
+**Ehrliche Antwort auf die Nikinger-Frage „sind alle Tests fertig, ist Phase 7 damit vorbei?":
+Nein, noch nicht — aber nur noch zwei Punkte, nicht drei (Korrektur unten).**
+1. **P7-24 ❌** — der TOTP-Batch-Mechanismus-Fund oben. **Nikinger-Entscheidung, 2026-08-27:
+   wird als echter Defekt anerkannt, Fix erst in der nächsten Phase.** Bleibt ❌ in der
+   Abnahmestand-Tabelle stehen (kein stilles Weglassen, kein Umdeuten in ein akzeptiertes
+   Restrisiko) — nur der Zeitpunkt der Behebung ist geklärt, nicht der Befund selbst.
+2. **P7-9 ⬜** — `token_families`-Purge-Fenster öffnet erst 2026-08-28 (morgen), `clients` erst
+   2026-10-27. **Nikinger-Entscheidung: bis morgen warten**, kein Umgehungsversuch.
+
+**Korrektur, noch in dieser Sitzung: P6-Zeilen 36/37 fälschlich als offen geführt.** Der
+Nikinger fragte direkt nach, ob `testnutzer-p7`s Test gleichwertig zu einem Fabian-Test ist —
+Antwort: **mehr als gleichwertig, es ist der einzig mögliche Weg.** Der Plan selbst
+(`docs/concepts/phase7_spaces_admin_plan.md:540`) begründet genau das: mit Fabian ist der Fall
+„nur item-level Share, kein Space-Grant" **strukturell unerreichbar** — `niklas` steht bereits
+in `fabian/.share.yml` unter `read:`, Fabian sieht als Empfänger also ohnehin alles über den
+Space-Grant, ein item-level-only-Szenario lässt sich mit ihm gar nicht bauen. `testnutzer-p7`
+hat **keinen** space-level Grant — deshalb wurde er für genau diesen Fall angelegt (P7-J). Die
+Zeile P7-11 in der Abnahmestand-Tabelle oben (bereits ✅, Web-UI **und** MCP) trägt das als
+Beleg schon direkt in ihrem eigenen Text: „Web-UI (**P6-Zeilen 36/37**, echter Login)". **P6-36/37
+sind damit bereits geschlossen, nicht offen** — mein eigener Nachtrag oben (Punkt 3, „brauchen
+Fabians eigenen Login") war falsch, hier korrigiert. `phase6_shares/CLAUDE.md` trägt an dieser
+Stelle noch den alten Stand („36/37 brauchen Fabian") — das ist der zugehörige Doku-Fund für die
+nächste Sitzung, nicht mehr Teil des Abnahme-Fortschritts dieser hier.
+
+Alles andere in der Abnahmestand-Tabelle steht jetzt ✅. **Phase 7 ist damit sehr nah, aber
+nicht formal abschließbar** — der Root-`CLAUDE.md`/`ROADMAP.md`/`docs/INDEX.md`-Sprung auf
+„Phase 7 ✅" und `PHASE7_CLOSEOUT_HANDOVER.md`/Übersichtsgrafik/Rotationsprüfung bleiben
+bewusst der nächsten Sitzung, sobald P7-9 (frühestens morgen) geprüft ist. P7-24 bleibt als
+bekannter, akzeptierter Defekt in der nächsten Phase offen — das blockiert den Phase-7-Abschluss
+selbst nicht mehr, muss aber im Closeout-Handover als offene Entscheidung an die nächste Phase
+weitergereicht werden, nicht stillschweigend verschwinden.
+
+**Nächster Schritt, konkret:** neue Sitzung ab 2026-08-28 — zuerst P7-9 (`clients`/
+`token_families`-Rückgang nachprüfen), P7-24-Entscheidung einholen, dann erst der formale
+Phase-7-Abschluss samt Closeout-Dokumenten.
