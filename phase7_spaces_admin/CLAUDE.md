@@ -1032,3 +1032,46 @@ weitergereicht werden, nicht stillschweigend verschwinden.
 **Nächster Schritt, konkret:** neue Sitzung ab 2026-08-28 — zuerst P7-9 (`clients`/
 `token_families`-Rückgang nachprüfen), P7-24-Entscheidung einholen, dann erst der formale
 Phase-7-Abschluss samt Closeout-Dokumenten.
+
+**Nachtrag, 2026-08-27 (spät) — Live-Incident: `GET /api/v1/overview` → 500 auf jedem Gerät,
+Ursache und Sofort-Fix.** Nikinger meldete den Fehler von einem neuen Gerät aus (DevTools-
+Screenshot, `500` auf `/api/v1/overview`). `journalctl -u sharefyx-mcp` zeigte den echten
+Traceback: `FileNotFoundError` in `storage/store.py :: _row_to_item()` für
+`/home/savefyx/savefyx-data/testnutzer-p7/_archive/itm_26f8d0b7__p6-5-12-retest-2026-08-25.md`.
+
+**Root Cause, kein Geräte-/Browser-Problem:** `spacectl.py :: _cmd_remove_space()`
+(`phase6_shares/scripts/spacectl.py:170-195`) löscht mit `acl.remove_space_dir()` nur das
+Verzeichnis auf der Platte — der SQLite-Index wird dabei **nie** angefasst. Der frühere P7-12-
+Lauf dieser Sitzung (`spacectl.py remove-space testnutzer-p7 --force`, vom Nikinger ausgeführt)
+hat damit einen index-only-Karteileichen-Zustand hinterlassen: Zeilen für `testnutzer-p7`s
+Items standen weiter in der SQLite-Datenbank, obwohl die Dateien weg waren. Jede Anfrage, die
+diese Zeilen berührt (`/api/v1/overview` iteriert `store.search()` über alle Buckets), krachte
+mit dem `FileNotFoundError` — reproduzierbar für **jeden** eingeloggten Nutzer, nicht
+gerätespezifisch (Screenshot zeigte Firefox/Windows, ein bislang ungenutztes Gerät — reiner
+Zufall, dass es dort zuerst auffiel).
+
+**Sofort-Fix, noch in dieser Sitzung, durch Hard Rule 2 vorab autorisiert** („SQLite darf
+jederzeit gelöscht und aus den `.md`-Dateien vollständig rekonstruiert werden"): `space_cli.py
+--data-root /home/savefyx/savefyx-data reindex --json` → `{"items_indexed": 78,
+"duration_seconds": 0.044}`. `Store.rebuild_index()` nimmt denselben `.write.lock`-Flock wie der
+laufende Dienst (P7-M) — sicher gegen die Live-Instanz gefahren, kein Neustart nötig. Danach
+`journalctl --since "2 minutes ago"` grep nach `error|traceback` → leer, `curl .../api/v1/me` →
+weiterhin `401` (Dienst gesund). **Vom Nikinger noch nicht gegengeprüft** (kein erneuter
+Login-Versuch im selben Gespräch) — bitte auf dem betroffenen Gerät erneut `/ui/` laden und
+bestätigen.
+
+**Echter Fund, nicht nur ein einmaliger Vorfall — `spacectl.py remove-space` braucht einen
+Nachlauf-Reindex oder zumindest einen Warnhinweis.** Jeder künftige `remove-space --force`-Lauf
+reproduziert dieselbe Karteileiche für die entfernten Items, bis jemand von Hand reindiziert.
+**Nikinger-Entscheidung noch offen:** `_cmd_remove_space()` um einen automatischen
+`store.rebuild_index()`-Aufruf erweitern (ein Zweizeiler, gleiche Datei) oder nur die
+Warnmeldung ergänzen („führe danach `reindex` aus")? Bleibt für die nächste Sitzung — nicht
+mehr Teil des heutigen P7-12-Laufs, aber eine direkte Konsequenz davon, hier festgehalten statt
+verloren zu gehen.
+
+**Verifiziert:** keine Testsuite gelaufen (reine Betriebs-Wiederherstellung, kein Code-Diff in
+diesem Nachtrag — der `spacectl.py`-Fix selbst ist noch nicht gebaut). Tabu-Diff nicht relevant.
+
+**Nächster Schritt, konkret, VOR allem anderen in der nächsten Sitzung:** Nikinger bestätigt,
+dass `/ui/` wieder lädt. Danach `spacectl.py remove-space`s fehlenden Reindex beheben (kleiner,
+in-scope Fix, keine neue Planungsrunde nötig) — erst danach weiter mit P7-9/P7-24/Closeout.
