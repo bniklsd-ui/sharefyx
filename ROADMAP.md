@@ -287,13 +287,15 @@ Vorgang in denselben Zielordner, mit einem Re-Auth-Formular statt zehn.
   Namen dieser Phase (seit P6 Step 7 Commit 6 in `app.html` als „kommt in Phase 7" reserviert)
   und fällt unter Druck nie vor Block B.
 
-**Status 🔄 (2026-08-28, inhaltlich vollständig, live deployt `e88a624`, Step Z läuft):** Block A
-(inkl. A8, Phase 6.5 formal abgeschlossen), Gate A→C, Block C (C1–C5, Space-Verwaltung in der
-Weboberfläche) und Block B (Mehrfachauswahl) sind alle gebaut. `deploy.sh main` durch den
-Nikinger gefahren, `/opt/sharefyx/current` → `e88a6244…`, Health-Gate 3/3 grün. **Abnahmezeilen
-31–34 vom Nikinger selbst live bestätigt** (32/33/34 ohne Vorbehalt, 31 mit dem bereits bekannten
-P7-24-TOTP-Vorbehalt, kein neuer Fund, Fix in der nächsten Phase). Verbleibend: A6 (Purge-Gate,
-ab heute möglich) und die Phase-7-Closeout-Dokumente. Details, alte Session-Historie:
+**Status 🔄 (2026-08-28, vollständig abgenommen, live deployt `e88a624`, nur noch Step-Z-Closeout
+offen):** Block A (inkl. A8, Phase 6.5 formal abgeschlossen), Gate A→C, Block C (C1–C5,
+Space-Verwaltung in der Weboberfläche) und Block B (Mehrfachauswahl) sind alle gebaut.
+`deploy.sh main` durch den Nikinger gefahren, `/opt/sharefyx/current` → `e88a6244…`, Health-Gate
+3/3 grün. **Abnahmezeilen 31–34 vom Nikinger selbst live bestätigt** (32/33/34 ohne Vorbehalt, 31
+mit dem bereits bekannten P7-24-TOTP-Vorbehalt, kein neuer Fund, Fix in der nächsten Phase). **A6
+(Purge-Gate/P7-9) gefahren** — `token_families` 35→31, `clients` unverändert 54 wie erwartet.
+**Kein offener Test/Gate mehr.** Verbleibend: Step Z Rest (`PHASE7_CLOSEOUT_HANDOVER.md`,
+Übersichtsgrafik, Rotationsprüfung, danach Sprung auf ✅). Details, alte Session-Historie:
 `phase7_spaces_admin/CLAUDE.md`.
 
 **Status-Herkunft (2026-08-23, Step 0 gestartet):** Plan `docs/concepts/phase7_spaces_admin_plan.md`

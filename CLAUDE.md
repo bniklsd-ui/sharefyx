@@ -162,9 +162,11 @@ Gate A→C, Block C (C1–C5, Space-Verwaltung in der Weboberfläche) und Block 
 (`/ui/login`→200, `/api/v1/me`→401, `/mcp/`→401 — alle drei die erwarteten Antworten, kein
 Fehlschlag). **[2026-08-28 Korrektur]** Abnahmezeilen 31–34 (`ITEM_MOVE_PLAN.md` §9.5) sind seither
 vom Nikinger selbst live gegen die echte Instanz bestätigt — 32/33/34 ohne Vorbehalt, 31 mit dem
-bereits bekannten P7-24-TOTP-Vorbehalt (kein neuer Fund, Fix in der nächsten Phase). Verbleibend:
-A6 (Purge-Gate, ab heute möglich) und die Phase-7-Closeout-Dokumente. **Noch nicht ✅** — „✅ heißt
-live-verifiziert, nicht gebaut", und A6/Closeout stehen weiterhin aus. Details:
+bereits bekannten P7-24-TOTP-Vorbehalt (kein neuer Fund, Fix in der nächsten Phase). **A6
+(Purge-Gate/P7-9) ebenfalls gefahren** — `token_families` 35→31, `clients` unverändert 54 wie
+erwartet (90-Tage-Fenster erst 2026-10-27). **Kein offener Test/Gate mehr.** Verbleibend: Step Z
+Rest (Phase-7-Closeout-Dokumente, Übersichtsgrafik, Rotationsprüfung). **Noch nicht ✅** — „✅
+heißt live-verifiziert, nicht gebaut", der formale Sprung folgt erst mit dem Closeout. Details:
 `phase7_spaces_admin/CLAUDE.md`, aktueller Session-Block.
 
 **[2026-08-23, P7 Step A8] Phase 6.5 formal abgeschlossen als 🟡 — code-complete und live
