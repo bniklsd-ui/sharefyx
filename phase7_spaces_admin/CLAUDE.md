@@ -202,3 +202,20 @@ angefasst (Diff ausschließlich `.md` und die neue `.svg`). Tabu-Diff nicht rele
 `docs/concepts/PHASE7_CLOSEOUT_HANDOVER.md`, nicht dieser Head. Die drei Punkte, die dort als
 erstes eine Entscheidung brauchen, stehen in §4.1–§4.3; die geänderte Arbeitsweise (Ausführung in
 opencode) in §7.
+
+**Nachtrag, selber Tag — Harness-Inventur für den opencode-Umstieg, ein echter Fund.** Gegen die
+opencode-Dokumentation geprüft, nicht erinnert: **Skills** tragen (`~/.claude/skills`,
+`.claude/skills` werden nativ gelesen), **Plugins/Output-Style/MCP-Registrierungen tragen nicht**
+(eigenes Plugin-Format, kein Style-Äquivalent, eigener `mcp`-Konfigblock — die hier genutzten
+Server sind claude.ai-Konto-Connectoren und stehen in **gar keiner** lokalen Datei). Hooks sind
+gegenstandslos: es gibt keine, weder global noch im Repo.
+
+**Der Fund:** opencode lädt `CLAUDE.md` **nur dann**, wenn **kein** `AGENTS.md` existiert. Dieses
+Repo hat beides — die ~1 KB große `AGENTS.md` verdeckt damit genau die Hard Rules, auf die sie
+verweist. **Nikinger-Entscheidung: entfernen, es sei denn sie wird zwingend gebraucht.**
+Bedarfsprüfung gefahren, Ergebnis negativ — kein Skript/Test/Deploy-Pfad liest sie (`grep` über
+`*.py`/`*.sh`/`*.json` leer), einziger lebender Verweis ist die Indexzeile, seit dem
+Initial-Commit `3cef165` nie geändert. **Vermerkt, nicht ausgeführt:** eine Datei im
+Wurzelverzeichnis zu löschen ist ein eigener Schritt, nicht Teil eines Closeout-Commits. Handgriff
+und Alternative stehen in `PHASE7_CLOSEOUT_HANDOVER.md` §7.2, der Hinweis zusätzlich an der
+`AGENTS.md`-Zeile in `docs/INDEX.md`.

@@ -252,6 +252,47 @@ nötig — die sind in den anderen Projekten über ganze Meta-Phasen entstanden.
   Batch-Ziel, `ValidationError` mitten im Space-Entfernen-Durchlauf). Wie diese Stufe im
   opencode-Ablauf abgebildet wird, ist eine **offene Frage an die P8-Planung**, keine erledigte.
 
+### 7.1 Was der Harnesswechsel mitnimmt und was nicht
+
+Gegen die opencode-Dokumentation geprüft (2026-08-28), nicht aus dem Gedächtnis. `opencode` ist
+auf der Maschine noch nicht installiert; die Inventur ist die Claude-Code-Seite.
+
+| Trägt | Trägt nicht |
+|---|---|
+| **Skills** — `~/.claude/skills/*/SKILL.md` und `.claude/skills/*/SKILL.md` werden nativ gelesen | **Plugins** (`frontend-design`, `skill-creator`, `github`) — opencode hat ein eigenes JS/TS-Plugin-Format, keine Claude-Code-Kompatibilität |
+| **Projektregeln** — `AGENTS.md`, mit `CLAUDE.md` als Rückfallebene (siehe §7.2) | **Output Style** („Military Brief") — kein Äquivalent; der Inhalt müsste in die Regeldatei oder einen opencode-Agent-Prompt |
+| | **MCP-Server** — opencode konfiguriert sie im eigenen `mcp`-Block. Die hier genutzten Server (sharefyx, Gmail, Drive, Chrome) sind **claude.ai-Konto-Connectoren**, stehen also in gar keiner lokalen Datei und müssen neu eingetragen werden (`type: remote`, OAuth mit DCR wird unterstützt) |
+| | **Hooks** — hier ohnehin gegenstandslos: es sind **keine** konfiguriert, weder global noch im Repo |
+
+### 7.2 `AGENTS.md` kann weg — und sollte es wahrscheinlich
+
+**Der Befund:** opencode lädt `CLAUDE.md` **nur dann**, wenn **kein** `AGENTS.md` existiert. Dieses
+Repository hat beides. opencode liest damit ausschließlich die ~1 KB große `AGENTS.md` — ein
+reines Verweisdokument, das auf `CLAUDE.md` *zeigt*, statt dessen Inhalt zu tragen. Ob ein
+ausführendes Modell diesem Verweis zuverlässig folgt, ist eine Wette; **im Fehlerfall stehen die
+Hard Rules nicht im Kontext des Agenten, der schreibt.** Genau die Datei, die harness-Neutralität
+herstellen sollte, verhindert sie.
+
+**Nikinger-Entscheidung, 2026-08-28: `AGENTS.md` darf entfernt werden, es sei denn, sie wird
+zwingend gebraucht.** Die Bedarfsprüfung ist gelaufen und fällt eindeutig aus:
+
+- **Kein Skript, kein Test, kein Deploy-Pfad liest sie.** `grep` über `*.py`/`*.sh`/`*.json`
+  findet keinen einzigen Treffer.
+- **Genau ein lebender Verweis:** die Indexzeile in `docs/INDEX.md`. Zwei weitere Treffer stehen
+  in `SESSIONS_ARCHIVE.md`-Dateien und sind historische Aufzählungen, keine Abhängigkeiten.
+- **Sie wurde seit `3cef165` („docs: initial project documentation") nie geändert** — der
+  Inhalt, auf den sie verweist, ist seither sieben Phasen weitergezogen.
+
+**Konsequenz des Entfernens:** opencode fällt auf `CLAUDE.md` zurück und lädt damit die echten
+Hard Rules statt eines Wegweisers dorthin. Das ist die gewünschte Wirkung, kein Nebeneffekt.
+
+**Nicht in diesem Commit ausgeführt** — eine Datei im Repository-Wurzelverzeichnis zu löschen ist
+keine Doku-Korrektur, sondern ein eigener Schritt mit eigener Indexzeilen-Pflege. **Der Handgriff,
+wenn er kommt:** `git rm AGENTS.md` **plus** die Indexzeile aus `docs/INDEX.md` im selben Commit
+(Hard Rule 8). **Die Alternative, falls die Datei doch bleiben soll:** sie zu einem echten Auszug
+der Hard Rules ausbauen, statt sie als Wegweiser stehen zu lassen — ein Wegweiser, der die
+Zieldatei verdeckt, ist der schlechteste der drei möglichen Zustände.
+
 ---
 
 ## 8 Was dieser Handover nicht enthält

@@ -25,7 +25,7 @@ updated: 2026-08-28 (Phase 7 formal abgeschlossen ✅ -- PHASE7_CLOSEOUT_HANDOVE
 ## Root & governance
 
 - [CLAUDE.md](../CLAUDE.md) — 📗 ~36KB (Größe hier stand seit 2026-08-08 stale bei „~17KB" — beim A8-Edit dieser Sitzung nachgezählt, keine eigene Aufräumaktion, nur die Zahl korrigiert) · rules, core principle, hard rules, working style, current state; auto-loaded every session — 2026-08-08 komprimiert (war ~41KB), P4/P5-Detailhistorie lebt jetzt nur noch in den jeweiligen Phase-Heads
-- [AGENTS.md](../AGENTS.md) — 📗 ~1KB · harness-neutral entry point for non-Claude-Code agents; points to `CLAUDE.md` + doc-layers navigation
+- [AGENTS.md](../AGENTS.md) — 📗 ~1KB · harness-neutral entry point for non-Claude-Code agents; points to `CLAUDE.md` + doc-layers navigation. **[2026-08-28] Entfernung freigegeben, noch nicht ausgeführt:** opencode lädt `CLAUDE.md` nur, wenn **kein** `AGENTS.md` existiert — diese Datei verdeckt also genau die Regeln, auf die sie verweist. Bedarfsprüfung negativ (kein Skript/Test liest sie, einziger lebender Verweis ist diese Zeile, seit dem Initial-Commit nie geändert). Herleitung + Handgriff: `docs/concepts/PHASE7_CLOSEOUT_HANDOVER.md` §7.2
 - [README.md](../README.md) — 📗 ~5KB · human overview + machine setup (venv, keyring, run, smoke test)
 - [ROADMAP.md](../ROADMAP.md) — 📗 ~24KB · Phasen 1–7, Scope in/out je Phase, Status — **[2026-08-28 korrigiert]** P1–P5 ✅, P6 🟡, P6.5 🟡, **P7 ✅**; die Statusangabe hier stand seit dem P6-Start stale auf „P6 🔄 gestartet, P6.5 🔄 Step 0"
 - [docs/DOC_LAYERS_CONVENTION.md](./DOC_LAYERS_CONVENTION.md) — 📗 ~5KB · Doc-Layers-Spec (v1, 2026-07-06) · **byte-identische Kopie aus dem Trading-Bot-Repo — nicht projektspezifisch anpassen, sonst divergieren zwei Kopien derselben Regel**
