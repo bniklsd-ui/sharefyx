@@ -160,11 +160,12 @@ Gate A→C, Block C (C1–C5, Space-Verwaltung in der Weboberfläche) und Block 
 `ITEM_MOVE_PLAN.md` §9) sind alle gebaut. **Live deployt, 2026-08-27, Nikinger-Lauf:**
 `/opt/sharefyx/current` → `e88a6244d8eebb5d08d1d93c4a2725f84a2f5971`, Health-Gate 3/3 grün
 (`/ui/login`→200, `/api/v1/me`→401, `/mcp/`→401 — alle drei die erwarteten Antworten, kein
-Fehlschlag). Verbleibend: A6 (Purge-Gate, kalendarisch frühestens 2026-08-28, unverändert offen)
-und Step Z (die volle Abnahmematrix inkl. der neuen Zeilen 31–34 real mit dem Nikinger
-durchgehen, danach Phase-7-Closeout-Dokumente). **Noch nicht ✅** — „✅ heißt live-verifiziert,
-nicht gebaut", und die Abnahmematrix ist bislang nur ein Claude-Code-Browserlauf, keine
-Nikinger-Abnahme. Details: `phase7_spaces_admin/CLAUDE.md`, aktueller Session-Block.
+Fehlschlag). **[2026-08-28 Korrektur]** Abnahmezeilen 31–34 (`ITEM_MOVE_PLAN.md` §9.5) sind seither
+vom Nikinger selbst live gegen die echte Instanz bestätigt — 32/33/34 ohne Vorbehalt, 31 mit dem
+bereits bekannten P7-24-TOTP-Vorbehalt (kein neuer Fund, Fix in der nächsten Phase). Verbleibend:
+A6 (Purge-Gate, ab heute möglich) und die Phase-7-Closeout-Dokumente. **Noch nicht ✅** — „✅ heißt
+live-verifiziert, nicht gebaut", und A6/Closeout stehen weiterhin aus. Details:
+`phase7_spaces_admin/CLAUDE.md`, aktueller Session-Block.
 
 **[2026-08-23, P7 Step A8] Phase 6.5 formal abgeschlossen als 🟡 — code-complete und live
 deployt, aber NICHT vollständig live-verifiziert.** Bewusst **nicht** ✅: **12 von 14

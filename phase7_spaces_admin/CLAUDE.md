@@ -9,7 +9,7 @@ down:
   - ../docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md   # Herkunft: P6-Status, §4.1/§4.2, offene Entscheidungen §5.1–§5.7
   - ../phase6_shares/ITEM_MOVE_PLAN.md              # §9 Mehrfachauswahl (P6-AK–AN) — Block B baut das, unverändert
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-08-25 (Step C3 gebaut -- Space-Verwaltung UI, spaces.js neu, echter Browser-Lauf gegen eine Wegwerf-Instanz Ende-zu-Ende bestanden, zwei Advisor-Funde vor dem Commit behoben, 904 Tests gruen) | 2026-08-25 (Step C4 Nachtrag -- Nikinger-Entscheidung: siebte Contract-Oeffnung statt archived_blockers-Riegel, storage/store.py :: move() erlaubt Space-Wechsel fuer archivierte Items, create(status=archived) faengt jetzt denselben Fall ab, 903 Tests gruen) | 2026-08-25 (Step C4 gebaut -- zweiphasiger Space-Entfernen-Algorithmus, Advisor-Fund: bereits archivierte Items brauchen einen eigenen Vorlauf-Riegel, P7-20/P7-21/Testanteil-P7-22 geschlossen) | 2026-08-25 (Gate A->C geprueft, alle vier Punkte live -- Block C gestartet, Step C1: Schreibseite von .share.yml in storage/acl.py, sechste Contract-Oeffnung gebaut) | 2026-08-25 (P7-4 erster echter Befund: FAIL, ID statt Titel genannt; P7-12-Abbau geprueft und bewusst NICHT gefahren -- Block C/P7-14 braucht testnutzer-p7 noch) | 2026-08-25 (P7-1/P7-2/P7-7 per echtem Browser-Klick bestanden, git-Reparatur nach Nikinger-Freigabe, nur noch P7-4/P7-9/P7-12 offen) | 2026-08-25 (P6.5-12/P7-5 per echtem Browser-Klick bestanden, testnutzer-p7-Substitution, 13/14 in Phase 6.5) | 2026-08-25 (echter deploy.sh-Lauf durch den Nikinger, Live-Release jetzt 53bad20 statt f96125e, A3s asset-strip live, P6.5-12 wieder testbar) | 2026-08-23 (A8: Phase 6.5 formal abgeschlossen als 🟡, 12/14, P6.5-8/13 via testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, P1-Contract-Absatz aktualisiert) | 2026-08-23 (Step 0 gestartet, Doku-Audit gefahren, Skelett angelegt)
+updated: 2026-08-28 (Abnahmezeilen 31-34 vom Nikinger live gegen die echte Instanz bestaetigt -- 32/33/34 ohne Vorbehalt, 31 mit demselben bereits bekannten P7-24-TOTP-Vorbehalt, kein neuer Fund) | 2026-08-25 (Step C3 gebaut -- Space-Verwaltung UI, spaces.js neu, echter Browser-Lauf gegen eine Wegwerf-Instanz Ende-zu-Ende bestanden, zwei Advisor-Funde vor dem Commit behoben, 904 Tests gruen) | 2026-08-25 (Step C4 Nachtrag -- Nikinger-Entscheidung: siebte Contract-Oeffnung statt archived_blockers-Riegel, storage/store.py :: move() erlaubt Space-Wechsel fuer archivierte Items, create(status=archived) faengt jetzt denselben Fall ab, 903 Tests gruen) | 2026-08-25 (Step C4 gebaut -- zweiphasiger Space-Entfernen-Algorithmus, Advisor-Fund: bereits archivierte Items brauchen einen eigenen Vorlauf-Riegel, P7-20/P7-21/Testanteil-P7-22 geschlossen) | 2026-08-25 (Gate A->C geprueft, alle vier Punkte live -- Block C gestartet, Step C1: Schreibseite von .share.yml in storage/acl.py, sechste Contract-Oeffnung gebaut) | 2026-08-25 (P7-4 erster echter Befund: FAIL, ID statt Titel genannt; P7-12-Abbau geprueft und bewusst NICHT gefahren -- Block C/P7-14 braucht testnutzer-p7 noch) | 2026-08-25 (P7-1/P7-2/P7-7 per echtem Browser-Klick bestanden, git-Reparatur nach Nikinger-Freigabe, nur noch P7-4/P7-9/P7-12 offen) | 2026-08-25 (P6.5-12/P7-5 per echtem Browser-Klick bestanden, testnutzer-p7-Substitution, 13/14 in Phase 6.5) | 2026-08-25 (echter deploy.sh-Lauf durch den Nikinger, Live-Release jetzt 53bad20 statt f96125e, A3s asset-strip live, P6.5-12 wieder testbar) | 2026-08-23 (A8: Phase 6.5 formal abgeschlossen als 🟡, 12/14, P6.5-8/13 via testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, P1-Contract-Absatz aktualisiert) | 2026-08-23 (Step 0 gestartet, Doku-Audit gefahren, Skelett angelegt)
 ---
 # CLAUDE.md — Phase 7: Space-Verwaltung, Mehrfachauswahl, Konsolidierung (`phase7_spaces_admin/`)
 
@@ -1075,3 +1075,31 @@ diesem Nachtrag — der `spacectl.py`-Fix selbst ist noch nicht gebaut). Tabu-Di
 **Nächster Schritt, konkret, VOR allem anderen in der nächsten Sitzung:** Nikinger bestätigt,
 dass `/ui/` wieder lädt. Danach `spacectl.py remove-space`s fehlenden Reindex beheben (kleiner,
 in-scope Fix, keine neue Planungsrunde nötig) — erst danach weiter mit P7-9/P7-24/Closeout.
+
+**Nachtrag, 2026-08-28 — Abnahmezeilen 31–34 (`ITEM_MOVE_PLAN.md` §9.5) vom Nikinger selbst live
+gegen die echte Instanz bestätigt.** Damit ist die in Zeile 874 oben und im Session-Block vom
+2026-08-25 genannte Lücke „Gebaut, Claude-Code-Browserlauf bestanden, Nikinger-Bestätigung steht
+aus" geschlossen — dies ist die Nikinger-Abnahme selbst, kein weiterer Kandidatenbeleg. Ergebnis,
+Zeile für Zeile:
+
+- **Zeile 31** (N Items in einem Vorgang, ein `move`-Commit je Item) — ✅ **mit demselben bereits
+  bekannten Vorbehalt wie P7-24**: die Items landeten korrekt im Ziel, aber die Auswahl enthielt
+  rechteerweiternde Items, und der Nikinger musste dafür N verschiedene TOTP-Codes eintippen
+  statt einem. **Kein neuer Fund** — deckungsgleich mit dem bereits im Abnahmestand oben
+  protokollierten P7-24-Mechanismus-Fehler (`list.js :: moveSelectedItems()` reicht denselben
+  TOTP-Code an jedes sequenzielle PATCH durch, Server lehnt den Replay korrekt ab). Bereits als
+  echter, in die nächste Phase verschobener Defekt anerkannt (Nikinger-Entscheidung 2026-08-27,
+  siehe oben) — diese Probe bestätigt nur, dass Zeile 31 denselben Mechanismus trifft, öffnet
+  keine neue Entscheidung.
+- **Zeile 32** (genau ein rechteerweiterndes Item → ein Formular) — ✅ live bestanden.
+- **Zeile 33** (ein fehlgeschlagenes Item blockiert die anderen nicht) — ✅ live bestanden.
+- **Zeile 34** (reine In-Space-Auswahl löst nie Re-Auth aus) — ✅ live bestanden.
+
+**Damit ist die Nikinger-Abnahme für Block B (Mehrfachauswahl) vollständig**, mit demselben
+einen offenen Punkt, der bereits vor dieser Probe bekannt und entschieden war (P7-24, Fix in der
+nächsten Phase). Kein neuer Code-Diff, keine neue Testsuite nötig — reine Abnahme-Dokumentation.
+`docs/INDEX.md`, `ROADMAP.md`, Root-`CLAUDE.md` im selben Commit nachgezogen.
+
+**Verbleibend für Step Z / Phase-7-Abschluss:** A6 (Purge-Gate, ab heute 2026-08-28 kalendarisch
+möglich, `token_families`), danach `PHASE7_CLOSEOUT_HANDOVER.md` + Übersichtsgrafik +
+Rotationsprüfung.
