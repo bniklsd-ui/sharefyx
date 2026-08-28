@@ -25,5 +25,8 @@ dist/
 package-lock.json
 skills-lock.json
 
+# opencode/M3 (P8 executor, ab Block A) — Playwright-MCP-Laufzeitartefakte
+.playwright-mcp/
+
 # machine-local deployment config (P3) — Pfade + Hostname, kein Secret, aber maschinenspezifisch
 phase3_edge/local.env

@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase8_ui_graph_plan.md       # voller Plan, Entscheidungen P8-A–P8-Q, §0.1 gelockte N1–N12, Steps 0/A/B/C/D/Z
   - ../docs/concepts/PHASE7_CLOSEOUT_HANDOVER.md   # Herkunft der drei Erbposten (P7-24/remove-space/P7-4)
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
+updated: 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
 ---
 
 # CLAUDE.md — Phase 8: UI-Neuanstrich v3, Verknüpfungs-Graph, QoL (`phase8_ui_graph/`)
@@ -51,7 +51,7 @@ Abnahmezeilen: `docs/concepts/phase8_ui_graph_plan.md`.
 
 | Block | Inhalt | Status |
 |---|---|---|
-| Step 0 | Fundament-Session (Haushalt, AGENTS.md weg, Skelett, opencode-Setup, Smoke-Test) | 🔄 |
+| Step 0 | Fundament-Session (Haushalt, AGENTS.md weg, Skelett, opencode-Setup, Smoke-Test) | ✅ |
 | Block A | Erbposten (Reauth-Grant, remove-space-Reindex, P7-4-Zweitprobe) | ⬜ |
 | Block B | Link-Fundament (`linkscan.py`, `item_links`, `GET /api/v1/graph`) | ⬜ |
 | Block C | Design-Fundament v3 (Typografie, Icons, Farben, Glas) | ⬜ |
@@ -70,7 +70,7 @@ Achte P1-Contract-Öffnung (P8-M) wird in Block B benannt und gebaut — Eintrag
 
 ---
 
-## Session stopped — 2026-08-28 (Step 0 gestartet: Verifikationsdurchlauf + Skelett)
+## Session stopped — 2026-08-28 (Step 0 abgeschlossen: Fundament-Session + opencode-Setup + Smoke-Test)
 
 **Stand:** Fundament-Session läuft, Claude Code + Nikinger, interaktiv.
 
@@ -97,14 +97,54 @@ Achte P1-Contract-Öffnung (P8-M) wird in Block B benannt und gebaut — Eintrag
   der INDEX-Zeile selbst (P7-Handover §7.2).
 - 0.5 Dieses Skelett + `SESSIONS_ARCHIVE.md` angelegt.
 
-**Noch offen in dieser Fundament-Session (0.6–0.8):** opencode installieren + Regeldatei-Verhalten
-verifizieren, Browser-Steuerung + Web-Recherche prüfen (V93/V94), Smoke-Test (P8-26). Diese drei
-Schritte brauchen den Nikinger (Installation ist sein Handgriff) — laufen im Anschluss in
-derselben Sitzung, sobald er verfügbar ist.
+- 0.6 **opencode installiert und Regeldatei-Verhalten verifiziert.** `npm install -g
+  opencode-ai` (Nikinger-Handgriff), Ergebnis `opencode-ai@1.18.25`. Ein `postinstall`-Warnhinweis
+  (`allow-scripts` blockierte `postinstall.mjs`) erwies sich als folgenlos — das Plattform-Binary
+  kommt über ein separates optionales npm-Paket, nicht über das Skript; `opencode --version` /
+  `--help` funktionieren sofort. Provider-Auth vom Nikinger selbst gesetzt (Minimax-Token-Plan,
+  `opencode auth list` zeigt `MiniMax (minimax.io)`, Modell `minimax/MiniMax-M3` verfügbar).
+  **Kontrollfrage statt Annahme** (Plan-Vorgabe): `opencode run --model minimax/MiniMax-M3` mit
+  der Frage nach dem Nikinger-Codenamen + Hard Rule 6 — Antwort korrekt **„Nikinger"** + Hard
+  Rule 6 wortgetreu zitiert. `CLAUDE.md` wird gelesen, keine Verdeckung mehr durch `AGENTS.md`
+  (0.4 hat es entfernt).
+- 0.7 **Fähigkeits-Parität hergestellt, V93/V94 beantwortet:**
+  - **V93 (Browser-Steuerung):** `opencode mcp add playwright -- npx @playwright/mcp@latest`
+    (Syntax: Kommando nach `--`, nicht per Prompt-Dialog) — steht in
+    `~/.config/opencode/opencode.jsonc` (**global**, nicht projektlokal — für dieses
+    Ein-Projekt-Setup ohne praktischen Unterschied, aber notiert für den Fall eines zweiten
+    opencode-Projekts). `opencode mcp list` zeigt `playwright — connected`. 30 `playwright_*`-
+    Tools stehen der laufenden Instanz zur Verfügung (per Tool-Auflistung bestätigt) — Pendant zu
+    `claude-in-chrome` gefunden.
+  - **V94 (Web-Recherche):** **nein, nur `webfetch`** (Einzel-URL-Abruf), keine Web-Suche. Für
+    C0 (Anti-AI-Pattern-Research) bedeutet das: **Teil 1 (Recherche/Katalog) läuft als
+    Claude-Code-Zuarbeit**, opencode/M3 bekommt nur den fertigen Fund-Katalog — genau der in
+    V94 vorgesehene Ausweichpfad, keine neue Entscheidung nötig.
+- 0.8 **Smoke-Test bestanden (P8-26).** Wegwerf-Branch `phase8-step0-smoke-test`, drei Proben
+  in einem opencode-Lauf: (1) Testdatei angelegt — bestanden; (2) `pytest -q
+  phase1_storage/tests/test_models.py` — **4 passed**, kein `SHAREFYX_*`/`SFX_*`-Env gesetzt
+  (Session-`env` vor und nach dem Lauf geprüft, sauber); (3) Playwright-Navigation gegen eine
+  echte Wegwerf-Instanz (eigener Port `18765`, eigenes `tmp`-`SPACE_DATA_ROOT`, eigene
+  `SPACE_AUTH_DB`) — `GET /ui/login` korrekt mit Titel/Überschrift „Anmelden" gelesen.
+  **Ein Betriebsfehler dabei, sofort korrigiert:** der erste Versuch ließ `SPACE_PORT`
+  unspezifiziert, band an den Default-Port `8765` — dort läuft der **echte** `sharefyx-mcp.service`
+  (Live-Instanz, pid 999) — Bindeversuch scheiterte mit `EADDRINUSE`, der Prozess beendete sich
+  selbst, kein Schreibzugriff erfolgte. Der folgende `curl /health` traf dadurch tatsächlich den
+  Live-Dienst — rein lesend, keine andere Wirkung als ein manueller Health-Check. Wiederholt mit
+  `SPACE_PORT=18765`, danach sauber gegen die eigene Instanz verifiziert (`uptime_s:1`).
+  Wegwerf-Instanz per PID beendet, Live-Dienst per zweitem `/health`-Aufruf als unverändert
+  bestätigt (`uptime_s` durchgehend steigend, kein Neustart). Branch + Testdatei +
+  `.playwright-mcp/`-Laufzeitordner nach dem Test verworfen (`git branch -D`, `rm`);
+  `.playwright-mcp/` zusätzlich in `.gitignore` aufgenommen (künftige opencode-Läufe in diesem
+  Projektverzeichnis legen ihn sonst wieder an).
 
-**Verifiziert:** `git status` zeigt `AGENTS.md` (gelöscht), `docs/INDEX.md`, `ROADMAP.md`,
-`phase8_ui_graph/CLAUDE.md` + `SESSIONS_ARCHIVE.md` (neu) — kein anderer Diff.
+**Verifiziert:** `git status` nach Cleanup zeigt nur den beabsichtigten Diff (`.gitignore`,
+Phase-Head, Skelett, INDEX/ROADMAP) — Wegwerf-Branch weg, Wegwerf-Instanz-Prozess weg, Live-Dienst
+lief während der gesamten Sitzung ohne Unterbrechung (`systemctl is-active` durchgehend `active`).
 
-**Offen für den Rest der Sitzung:** 0.6 opencode-Installation, 0.7 Fähigkeits-Parität
-(Browser/Recherche), 0.8 Smoke-Test auf Wegwerf-Branch. Danach wechselt der Harness zu
-opencode/M3 für Block A.
+**Harnesswechsel freigegeben:** ab Block A führt opencode/M3 aus, kein Advisor-Call
+(P8-L/N12) — Ersatzmechanismen sind die Selbstprüf-Checkliste (Plan §0.6) und die zwei
+Nikinger-Sichtprüfpunkte (Plan §8).
+
+**Offen für die nächste Sitzung:** Block A starten (A1 Reauth-Grant zuerst, P8-A) — unter
+opencode/M3, gegen `docs/concepts/phase8_ui_graph_plan.md` §2. Vor jedem Edit die zitierten
+Datei:Zeile-Anker neu prüfen (V82, driftet erfahrungsgemäß um wenige Zeilen).
