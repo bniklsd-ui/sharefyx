@@ -13,7 +13,8 @@ down:
   - docs/concepts/phase6_shares_plan.md    # ausführungsreifer P6-Plan
   - docs/concepts/phase6_5_tools_images_plan.md   # ausführungsreifer P6.5-Plan
   - docs/concepts/phase7_spaces_admin_plan.md     # ausführungsreifer P7-Plan
-updated: 2026-08-28 (Phase 7 formal abgeschlossen ✅ -- 22 von 24 Abnahmezeilen live bestanden, zwei benannte Defekte an P8 vererbt, PHASE7_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, zweite Rotation des Phase-Heads) | 2026-08-27 (Phase 7 inhaltlich vollstaendig, live deployt e88a624, Step Z laeuft) | 2026-08-23 (Phase 6.5 formal abgeschlossen als P7 Step A8 -- 🟡 code-complete, 12 von 14 Abnahmezeilen live, zwei per testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md neu) | 2026-08-23 (neue Phase 7 -- Space-Verwaltung, Mehrfachauswahl, Konsolidierung -- ergaenzt, Step 0 gestartet; fehlende P6.5-Tabellenzeile nachgetragen) | 2026-08-23 (Phase 6 auf 🟡 code-complete -- 12 von 39 Abnahmezeilen live, Sprung auf ✅ ist offene Nikinger-Entscheidung) | 2026-08-20 (neue Phase 6.5 -- Werkzeug-Ergonomie + Bilder -- ergaenzt, Step 0 gestartet)
+  - docs/concepts/phase8_ui_graph_plan.md         # ausführungsreifer P8-Plan
+updated: 2026-08-28 (Phase 8 geplant -- Zeile + Abschnitt neu, phase8_ui_graph_plan.md in down: aufgenommen) | 2026-08-28 (Phase 7 formal abgeschlossen ✅ -- 22 von 24 Abnahmezeilen live bestanden, zwei benannte Defekte an P8 vererbt, PHASE7_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, zweite Rotation des Phase-Heads) | 2026-08-27 (Phase 7 inhaltlich vollstaendig, live deployt e88a624, Step Z laeuft) | 2026-08-23 (Phase 6.5 formal abgeschlossen als P7 Step A8 -- 🟡 code-complete, 12 von 14 Abnahmezeilen live, zwei per testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md neu) | 2026-08-23 (neue Phase 7 -- Space-Verwaltung, Mehrfachauswahl, Konsolidierung -- ergaenzt, Step 0 gestartet; fehlende P6.5-Tabellenzeile nachgetragen) | 2026-08-23 (Phase 6 auf 🟡 code-complete -- 12 von 39 Abnahmezeilen live, Sprung auf ✅ ist offene Nikinger-Entscheidung) | 2026-08-20 (neue Phase 6.5 -- Werkzeug-Ergonomie + Bilder -- ergaenzt, Step 0 gestartet)
 ---
 # ROADMAP — Space-Server
 
@@ -32,6 +33,7 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 | **P6** | `phase6_shares/` (kein eigenes Paket) | Freigaben, Ordner, `patch_item`, Update-Log, Bilder. | 🟡 |
 | **P6.5** | `phase6_5_tools_images/` (kein eigenes Paket) | Werkzeug-Ergonomie, Abschluss Bilder. | 🟡 |
 | **P7** | `phase7_spaces_admin/` (kein eigenes Paket) | Space-Verwaltung, Mehrfachauswahl, Konsolidierung. | ✅ |
+| **P8** | `phase8_ui_graph/` (kein eigenes Paket) | UI-Neuanstrich v3, Verknüpfungs-Graph, P7-Erbposten. | ⬜ |
 
 **[2026-08-23 Korrektur, P7 Step 0]:** P6.5 fehlte als eigene Tabellenzeile — beim Ergänzen der
 P7-Zeile mitgefunden und nachgetragen, keine inhaltliche Änderung.
@@ -309,6 +311,34 @@ ausführungsreif, alle zehn Nikinger-Fragen N1–N10 in §0.1 gelockt. Step 0.1�
 korrigiert), ein Link-Fund behoben (`docs/PROMPTS.md`), Softcap-Prüfung 12/12 konform, Skelett
 angelegt. Herkunft: `docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md`. Details:
 `phase7_spaces_admin/CLAUDE.md`s Session-Block.
+
+---
+
+## Phase 8 — UI-Neuanstrich, Verknüpfungs-Graph, QoL
+
+**Mission, drei Stränge:** (A) die drei benannten P7-Erbposten sind behoben bzw. entschieden —
+ein Batch-Verschieben braucht eine einzige Passwort+TOTP-Eingabe (Reauth-Grant statt
+TOTP-Replay), `remove-space` hinterlässt nie wieder einen stalen Index, P7-4 bekommt seine
+Zweitprobe. (B/D) ein Mensch sieht in einem Graphen, welche Items wie verknüpft sind
+(`links:`-Feld + `itm_`-Body-Referenzen + zuschaltbare Tag-/Ordner-Kanten), und die Übersicht
+zeigt tablos, was tatsächlich gebraucht wird. (C) die UI verliert ihren AI-Template-Look:
+Lucide-Icons statt HTML-Entities, IBM Plex 16px statt Inter 15px, Farblegende
+own/shared/foreign, Liquid-Glass-Akzente mit Pflicht-Fallback — Version v3.0.
+
+- **DRIN:** Reauth-Grant (`POST /api/v1/reauth`), `remove-space`-Auto-Reindex, P7-4-Zweitprobe
+  + Textschärfung, achte P1-Contract-Öffnung (`linkscan.py`, `item_links`, `GET /api/v1/graph`),
+  `#item/`-Navigation, Link-Picker, Icon-Sprite, Plex-Fonts, Farbsemantik, Glass-Akzente,
+  tablose Übersicht, handgerollter Canvas-Graph, v3.0.
+- **DRAUSSEN:** FastMCP-4/V79, Body-Volltextsuche UI, Rechteverwaltung über MCP, neues
+  MCP-Graph-Tool, Löschen von Items, `_trash/`-Räumung, Funnel-Watchdog, Light-Mode,
+  Glyph-Entscheidungen P6/P6.5.
+- **Erstmals: Claude Code plant, opencode/M3 führt aus — ohne Advisor-Stufe in der Ausführung**
+  (Nikinger-Entscheidung N12; Ersatzmechanismen im Plan §0.6).
+
+**Status ⬜ (2026-08-28, geplant):** Plan `docs/concepts/phase8_ui_graph_plan.md`
+ausführungsreif, alle zwölf Nikinger-Fragen N1–N12 in §0.1 gelockt, Entscheidungen P8-A–P8-Q,
+Abnahmezeilen P8-1–P8-24, `[VERIFY]` V81–V92. Closeout wird §9 des Plans (P8-N: ein Dokument
+pro Phase, kein separates Handover).
 
 ---
 
