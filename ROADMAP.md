@@ -13,7 +13,7 @@ down:
   - docs/concepts/phase6_shares_plan.md    # ausführungsreifer P6-Plan
   - docs/concepts/phase6_5_tools_images_plan.md   # ausführungsreifer P6.5-Plan
   - docs/concepts/phase7_spaces_admin_plan.md     # ausführungsreifer P7-Plan
-updated: 2026-08-27 (Phase 7 inhaltlich vollstaendig, live deployt e88a624, Step Z laeuft) | 2026-08-23 (Phase 6.5 formal abgeschlossen als P7 Step A8 -- 🟡 code-complete, 12 von 14 Abnahmezeilen live, zwei per testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md neu) | 2026-08-23 (neue Phase 7 -- Space-Verwaltung, Mehrfachauswahl, Konsolidierung -- ergaenzt, Step 0 gestartet; fehlende P6.5-Tabellenzeile nachgetragen) | 2026-08-23 (Phase 6 auf 🟡 code-complete -- 12 von 39 Abnahmezeilen live, Sprung auf ✅ ist offene Nikinger-Entscheidung) | 2026-08-20 (neue Phase 6.5 -- Werkzeug-Ergonomie + Bilder -- ergaenzt, Step 0 gestartet)
+updated: 2026-08-28 (Phase 7 formal abgeschlossen ✅ -- 22 von 24 Abnahmezeilen live bestanden, zwei benannte Defekte an P8 vererbt, PHASE7_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, zweite Rotation des Phase-Heads) | 2026-08-27 (Phase 7 inhaltlich vollstaendig, live deployt e88a624, Step Z laeuft) | 2026-08-23 (Phase 6.5 formal abgeschlossen als P7 Step A8 -- 🟡 code-complete, 12 von 14 Abnahmezeilen live, zwei per testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md neu) | 2026-08-23 (neue Phase 7 -- Space-Verwaltung, Mehrfachauswahl, Konsolidierung -- ergaenzt, Step 0 gestartet; fehlende P6.5-Tabellenzeile nachgetragen) | 2026-08-23 (Phase 6 auf 🟡 code-complete -- 12 von 39 Abnahmezeilen live, Sprung auf ✅ ist offene Nikinger-Entscheidung) | 2026-08-20 (neue Phase 6.5 -- Werkzeug-Ergonomie + Bilder -- ergaenzt, Step 0 gestartet)
 ---
 # ROADMAP — Space-Server
 
@@ -31,7 +31,7 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 | **P5** | `phase5_ui/` · `webui` | REST-API + Web-UI für Menschen. | ✅ |
 | **P6** | `phase6_shares/` (kein eigenes Paket) | Freigaben, Ordner, `patch_item`, Update-Log, Bilder. | 🟡 |
 | **P6.5** | `phase6_5_tools_images/` (kein eigenes Paket) | Werkzeug-Ergonomie, Abschluss Bilder. | 🟡 |
-| **P7** | `phase7_spaces_admin/` (kein eigenes Paket) | Space-Verwaltung, Mehrfachauswahl, Konsolidierung. | 🔄 |
+| **P7** | `phase7_spaces_admin/` (kein eigenes Paket) | Space-Verwaltung, Mehrfachauswahl, Konsolidierung. | ✅ |
 
 **[2026-08-23 Korrektur, P7 Step 0]:** P6.5 fehlte als eigene Tabellenzeile — beim Ergänzen der
 P7-Zeile mitgefunden und nachgetragen, keine inhaltliche Änderung.
@@ -287,16 +287,20 @@ Vorgang in denselben Zielordner, mit einem Re-Auth-Formular statt zehn.
   Namen dieser Phase (seit P6 Step 7 Commit 6 in `app.html` als „kommt in Phase 7" reserviert)
   und fällt unter Druck nie vor Block B.
 
-**Status 🔄 (2026-08-28, vollständig abgenommen, live deployt `e88a624`, nur noch Step-Z-Closeout
-offen):** Block A (inkl. A8, Phase 6.5 formal abgeschlossen), Gate A→C, Block C (C1–C5,
-Space-Verwaltung in der Weboberfläche) und Block B (Mehrfachauswahl) sind alle gebaut.
-`deploy.sh main` durch den Nikinger gefahren, `/opt/sharefyx/current` → `e88a6244…`, Health-Gate
-3/3 grün. **Abnahmezeilen 31–34 vom Nikinger selbst live bestätigt** (32/33/34 ohne Vorbehalt, 31
-mit dem bereits bekannten P7-24-TOTP-Vorbehalt, kein neuer Fund, Fix in der nächsten Phase). **A6
-(Purge-Gate/P7-9) gefahren** — `token_families` 35→31, `clients` unverändert 54 wie erwartet.
-**Kein offener Test/Gate mehr.** Verbleibend: Step Z Rest (`PHASE7_CLOSEOUT_HANDOVER.md`,
-Übersichtsgrafik, Rotationsprüfung, danach Sprung auf ✅). Details, alte Session-Historie:
-`phase7_spaces_admin/CLAUDE.md`.
+**Status ✅ (2026-08-28, formal abgeschlossen, live deployt `e88a624`):** Block A (inkl. A8, Phase
+6.5 formal abgeschlossen), Gate A→C, Block C (C1–C5, Space-Verwaltung in der Weboberfläche) und
+Block B (Mehrfachauswahl) sind alle gebaut, deployt und abgenommen. `deploy.sh main` durch den
+Nikinger gefahren, `/opt/sharefyx/current` → `e88a6244…`, Health-Gate 3/3 grün. **Abnahmestand:
+22 von 24 Zeilen ✅ live, 2 ❌, 0 ungeprüft** — die Matrix ist vollständig durchgelaufen, und genau
+das unterscheidet diese Phase von P6 (27 Zeilen nie geprüft). **Der Sprung auf ✅ ist eine
+Nikinger-Entscheidung vom 2026-08-28** unter der Bedingung, dass die beiden ❌ als **benannte
+Defekte an Phase 8 vererbt** werden, nicht verschwinden: **P7-24** (TOTP-Replay im
+Batch-Verschieben, echter Mechanismus-Defekt) und **P7-4** (Claude nennt IDs statt Titeln,
+UX-Befund). Dazu ein dritter Erbposten aus dem Live-Betrieb: **`spacectl.py remove-space`
+reindiziert nicht** (Incident 2026-08-27, `overview` → 500 für jeden Nutzer; Zustand behoben,
+Ursache nicht). Handover: `docs/concepts/PHASE7_CLOSEOUT_HANDOVER.md`. Übersichtsgrafik:
+`docs/concepts/phase7_spaces_admin_uebersicht.svg`. Details, volle Session-Historie:
+`phase7_spaces_admin/CLAUDE.md` + `SESSIONS_ARCHIVE.md`.
 
 **Status-Herkunft (2026-08-23, Step 0 gestartet):** Plan `docs/concepts/phase7_spaces_admin_plan.md`
 ausführungsreif, alle zehn Nikinger-Fragen N1–N10 in §0.1 gelockt. Step 0.1–0.6 gefahren: `pytest`

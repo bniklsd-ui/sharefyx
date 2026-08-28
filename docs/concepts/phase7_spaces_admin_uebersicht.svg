@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080" font-family="'DejaVu Sans','Segoe UI',Helvetica,Arial,sans-serif">
+
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a6b7d"/>
+    </marker>
+    <marker id="arG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2f7a4d"/>
+    </marker>
+    <marker id="arR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b03030"/>
+    </marker>
+  </defs>
+
+  <rect width="1080" height="1080" fill="#f7f8fa"/>
+
+  <!-- ================= Kopf ================= -->
+  <rect x="0" y="0" width="1080" height="86" fill="#1d2b3a"/>
+  <text x="36" y="36" font-size="21" font-weight="700" fill="#ffffff">Phase 7 — Space-Verwaltung, Mehrfachauswahl, Konsolidierung</text>
+  <text x="36" y="62" font-size="12.5" fill="#9db2c6">Sharefyx · phase7_spaces_admin/ · kein eigenes Paket · live seit main@e88a624 (2026-08-27) · Stand 2026-08-28</text>
+  <rect x="808" y="20" width="236" height="46" rx="10" fill="#2f7a4d"/>
+  <text x="926" y="39" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">22 / 24 ✅ live-verifiziert</text>
+  <text x="926" y="57" font-size="12" fill="#cfe6d8" text-anchor="middle">2 benannte Defekte an Phase 8 vererbt</text>
+
+  <!-- ================= Mission ================= -->
+  <rect x="36" y="102" width="1008" height="66" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="126" font-size="14.5" font-weight="700" fill="#1d2b3a">Mission: Ein Mensch verwaltet seine Spaces selbst — im Browser, ohne Terminal, ohne dass ein Item verlorengeht.</text>
+  <text x="56" y="148" font-size="12" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">A</tspan> — ein Mensch findet ein Item wieder, das Claude ihm gegenüber „itm_807df219" genannt hat.  <tspan font-weight="700" fill="#1d2b3a">C</tspan> — er entscheidet im Browser, wer seinen Space liest.</text>
+  <text x="56" y="164" font-size="12" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">B</tspan> — zehn Items wandern in einem Vorgang, mit einem Re-Auth-Formular statt zehn.  Fall-Reihenfolge <tspan font-weight="700" fill="#1d2b3a">A &gt; C &gt; B</tspan>: unter Druck fällt B, nie A.</text>
+
+  <!-- ================= Flussdiagramm ================= -->
+  <rect x="36" y="184" width="1008" height="378" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="209" font-size="15" font-weight="700" fill="#1d2b3a">Reihenfolge 0 → A → Gate → C → B (bewusst nicht die Buchstabenfolge)</text>
+
+  <!-- Vier Bloecke -->
+  <rect x="60" y="222" width="222" height="146" rx="8" fill="#f2f5f8" stroke="#a8b8c8" stroke-width="1.6"/>
+  <text x="171" y="245" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">Step 0 — Haushalt</text>
+  <text x="76" y="268" font-size="10.5" fill="#4a5a6b">Doku-Audit P6-Zeilen 8–16,</text>
+  <text x="76" y="285" font-size="10.5" fill="#4a5a6b">SHA-Beweis je Zeile</text>
+  <text x="76" y="306" font-size="10.5" fill="#4a5a6b">Befund: die Doku war stale,</text>
+  <text x="76" y="323" font-size="10.5" fill="#4a5a6b">nicht der Code</text>
+  <text x="171" y="352" font-size="10.5" fill="#2f7a4d" text-anchor="middle" font-weight="700">6/6 Punkte gefahren</text>
+
+  <rect x="310" y="222" width="222" height="146" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="421" y="245" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">Block A — Fixes</text>
+  <text x="326" y="268" font-size="10.5" fill="#4a5a6b">ID sichtbar + per ID suchbar</text>
+  <text x="326" y="285" font-size="10.5" fill="#4a5a6b">Bild-Entfernen-Knopf (P6.5-12)</text>
+  <text x="326" y="302" font-size="10.5" fill="#4a5a6b">Feld-Whitelist an PATCH (O6)</text>
+  <text x="326" y="319" font-size="10.5" fill="#4a5a6b">Sichtbarkeits-Migration: 73/73</text>
+  <text x="326" y="336" font-size="10.5" fill="#4a5a6b">Phase 6.5 formal abgeschlossen</text>
+  <text x="421" y="358" font-size="10.5" fill="#2f7a4d" text-anchor="middle" font-weight="700">A1–A8 vollständig</text>
+
+  <rect x="560" y="222" width="222" height="146" rx="8" fill="#e8eef5" stroke="#7f9ab5" stroke-width="1.6"/>
+  <text x="671" y="245" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">Block C — Space-Verwaltung</text>
+  <text x="576" y="268" font-size="10.5" fill="#4a5a6b">C1 acl.py bekommt Schreibseite</text>
+  <text x="576" y="285" font-size="10.5" fill="#4a5a6b">C2/C4 fünf REST-Routen</text>
+  <text x="576" y="302" font-size="10.5" fill="#4a5a6b">C3 spaces.js — elftes Modul</text>
+  <text x="576" y="319" font-size="10.5" fill="#4a5a6b">C5 diagnose.sh + Update-Log</text>
+  <text x="576" y="336" font-size="10.5" fill="#4a5a6b">volle spacectl.py-Parität (N5)</text>
+  <text x="671" y="358" font-size="10.5" fill="#2f7a4d" text-anchor="middle" font-weight="700">C1–C5 vollständig</text>
+
+  <rect x="810" y="222" width="210" height="146" rx="8" fill="#e8eef5" stroke="#7f9ab5" stroke-width="1.6"/>
+  <text x="915" y="245" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">Block B — Mehrfachauswahl</text>
+  <text x="826" y="268" font-size="10.5" fill="#4a5a6b">Strg+Klick / Long-Press</text>
+  <text x="826" y="285" font-size="10.5" fill="#4a5a6b">Zweirunden-Re-Auth (P6-AM)</text>
+  <text x="826" y="302" font-size="10.5" fill="#4a5a6b">reiner Frontend-Schnitt:</text>
+  <text x="826" y="319" font-size="10.5" fill="#4a5a6b">kein neuer Endpunkt</text>
+  <text x="826" y="336" font-size="10.5" fill="#4a5a6b">ein move-Commit je Item</text>
+  <text x="915" y="358" font-size="10.5" fill="#b03030" text-anchor="middle" font-weight="700">gebaut — P7-24 defekt</text>
+
+  <line x1="282" y1="295" x2="310" y2="295" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <line x1="532" y1="295" x2="560" y2="295" stroke="#2f7a4d" stroke-width="2" marker-end="url(#arG)"/>
+  <text x="546" y="286" font-size="9" fill="#2f7a4d" text-anchor="middle" font-weight="700">Gate 4/4</text>
+  <line x1="782" y1="295" x2="810" y2="295" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <!-- Mechanismus: Space entfernen -->
+  <rect x="60" y="388" width="600" height="158" rx="8" fill="#fdf6ea" stroke="#d4ab5a" stroke-width="1.6"/>
+  <text x="360" y="411" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">Space entfernen — zweiphasig, es gibt keinen Rollback (P7-O / N8 / N9)</text>
+
+  <rect x="80" y="424" width="170" height="52" rx="6" fill="#ffffff" stroke="#a8b8c8"/>
+  <text x="165" y="445" font-size="11" font-weight="700" fill="#1d2b3a" text-anchor="middle">Vorlauf</text>
+  <text x="165" y="463" font-size="10" fill="#4a5a6b" text-anchor="middle">kein einziger Schreibvorgang</text>
+
+  <line x1="250" y1="450" x2="292" y2="450" stroke="#b03030" stroke-width="1.6" marker-end="url(#arR)"/>
+  <rect x="292" y="424" width="176" height="52" rx="6" fill="#fdecec" stroke="#d99b9b"/>
+  <text x="380" y="445" font-size="11" font-weight="700" fill="#b03030" text-anchor="middle">ein Hindernis</text>
+  <text x="380" y="463" font-size="10" fill="#4a5a6b" text-anchor="middle">→ es wird nichts bewegt</text>
+
+  <line x1="165" y1="476" x2="165" y2="500" stroke="#2f7a4d" stroke-width="1.6" marker-end="url(#arG)"/>
+  <rect x="80" y="502" width="388" height="34" rx="6" fill="#eaf4ee" stroke="#8fb59a"/>
+  <text x="274" y="524" font-size="10.5" fill="#2f7a4d" text-anchor="middle" font-weight="700">Durchlauf: jedes Item → _archive/ des Ausführenden, dann rmtree</text>
+
+  <rect x="486" y="424" width="156" height="112" rx="6" fill="#ffffff" stroke="#a8b8c8"/>
+  <text x="564" y="445" font-size="10.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">Was stirbt</text>
+  <text x="564" y="463" font-size="10" fill="#4a5a6b" text-anchor="middle">nur die Space-Zuordnung</text>
+  <text x="564" y="480" font-size="10" fill="#4a5a6b" text-anchor="middle">und der Müll (_trash/,</text>
+  <text x="564" y="497" font-size="10" fill="#4a5a6b" text-anchor="middle">verwaiste _assets/)</text>
+  <text x="564" y="522" font-size="10" fill="#2f7a4d" text-anchor="middle" font-weight="700">Kein Item stirbt je</text>
+
+  <!-- testnutzer-p7 -->
+  <rect x="684" y="388" width="336" height="158" rx="8" fill="#f2f5f8" stroke="#a8b8c8" stroke-width="1.6"/>
+  <text x="852" y="411" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">Dritter Principal: testnutzer-p7 (P7-J / N10)</text>
+  <text x="700" y="435" font-size="10.5" fill="#4a5a6b">Angelegt, benutzt, am Ende vollständig entsorgt.</text>
+  <text x="700" y="455" font-size="10.5" fill="#4a5a6b">Zugang über testcred.py aus dem Keyring —</text>
+  <text x="700" y="472" font-size="10.5" fill="#4a5a6b">hart auf diesen einen Principal verdrahtet (P7-W).</text>
+  <text x="700" y="494" font-size="10.5" fill="#4a5a6b">Er löst, was mit Fabian strukturell unmöglich war:</text>
+  <text x="700" y="511" font-size="10.5" fill="#4a5a6b">ein Empfänger mit item-level Share und ohne</text>
+  <text x="700" y="528" font-size="10.5" fill="#4a5a6b">jede Space-Mitgliedschaft (schließt P6-36/37).</text>
+
+  <!-- ================= Abnahme ================= -->
+  <rect x="36" y="578" width="1008" height="118" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="602" font-size="14.5" font-weight="700" fill="#1d2b3a">Abnahme — 22 von 24 Zeilen live, die Matrix ist vollständig durchgelaufen</text>
+  <rect x="56" y="614" width="310" height="66" rx="6" fill="#eaf4ee" stroke="#8fb59a"/>
+  <text x="72" y="634" font-size="11.5" font-weight="700" fill="#1d2b3a">22 Zeilen ✅ live</text>
+  <text x="72" y="652" font-size="10.5" fill="#4a5a6b">mehrere davon vom Nikinger selbst am Browser,</text>
+  <text x="72" y="669" font-size="10.5" fill="#4a5a6b">Rest per Test oder testnutzer-p7-Substitution</text>
+  <rect x="384" y="614" width="310" height="66" rx="6" fill="#fdecec" stroke="#d99b9b"/>
+  <text x="400" y="634" font-size="11.5" font-weight="700" fill="#b03030">2 Zeilen ❌ — gefunden, nicht übersehen</text>
+  <text x="400" y="652" font-size="10.5" fill="#4a5a6b">P7-24 Mechanismus-Defekt (TOTP-Replay),</text>
+  <text x="400" y="669" font-size="10.5" fill="#4a5a6b">P7-4 Claude nennt IDs statt Titeln</text>
+  <rect x="712" y="614" width="312" height="66" rx="6" fill="#fdf6ea" stroke="#d4ab5a"/>
+  <text x="728" y="634" font-size="11.5" font-weight="700" fill="#1d2b3a">P7-20 ✅ mit Vorbehalt</text>
+  <text x="728" y="652" font-size="10.5" fill="#4a5a6b">der Schreib-Blocker ist unter der echten</text>
+  <text x="728" y="669" font-size="10.5" fill="#4a5a6b">Union-ACL-Semantik real unerreichbar</text>
+
+  <!-- ================= Was offen ist ================= -->
+  <rect x="36" y="712" width="1008" height="172" rx="8" fill="#ffffff" stroke="#d99b9b"/>
+  <text x="56" y="738" font-size="14.5" font-weight="700" fill="#b03030">Was Phase 8 erbt — ehrlich, nicht beschönigt</text>
+  <text x="56" y="764" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">P7-24</tspan> — list.js reicht denselben TOTP-Code an jedes sequenzielle PATCH einer Batch-Runde; der Server lehnt den Replay korrekt ab.</text>
+  <text x="56" y="783" font-size="11.5" fill="#4a5a6b">Ein Batch mit N rechteerweiternden Items braucht real N Codes statt einem. Als echter Defekt anerkannt, Fix bewusst in Phase 8.</text>
+  <text x="56" y="807" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">spacectl.py remove-space</tspan> reindiziert nicht — der Live-Incident vom 2026-08-27 (overview → 500) kam genau daher. Fix ist klein, Entscheidung offen.</text>
+  <text x="56" y="831" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">P7-4</tspan> — die Prosa-Anweisung in vier Tool-Beschreibungen hält nicht gegen den Sog einer tabellarischen Antwort. Kein Code-Fehler.</text>
+  <text x="56" y="855" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">Selbstaussperrung</tspan> bleibt bewusst ungeschützt (N7): das letzte write-Mitglied darf sich selbst entfernen. Rückweg nur im Terminal.</text>
+  <text x="56" y="875" font-size="11" fill="#8a97a5">Weiter geerbt und nicht adressiert: O4/O5/O7, V64, V79 (fastmcp 4), P6.5-14, die P6-Zeilen 7/9/14–17/23/25/29/30, _trash/-Räumung.</text>
+
+  <!-- ================= Fuss ================= -->
+  <text x="36" y="928" font-size="11" fill="#6b7b8c">Sechste und siebte P1-Contract-Öffnung: acl.py bekam eine Schreibseite, store.move() erlaubt den Space-Wechsel eines archivierten Items — beide mit dieser Phase geschlossen.</text>
+  <text x="36" y="950" font-size="11" fill="#6b7b8c">904 pytest grün · Tabu-Diff über die ganze Phase leer · Plan: docs/concepts/phase7_spaces_admin_plan.md · Handover: docs/concepts/PHASE7_CLOSEOUT_HANDOVER.md</text>
+  <text x="36" y="978" font-size="10.5" fill="#8a97a5">Statusregel des Projekts: „grün" heißt live-verifiziert, nicht gebaut. Diese Phase steht auf grün, weil die Matrix ganz gelaufen ist — die zwei ❌ sind benannt, nicht offen gelassen.</text>
+
+</svg>
