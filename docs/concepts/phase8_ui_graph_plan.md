@@ -7,7 +7,7 @@ up: ../../ROADMAP.md
 down:
   - ./PHASE7_CLOSEOUT_HANDOVER.md            # Herkunft der Erbposten P7-24 / remove-space / P7-4
   - ../../phase8_ui_graph/CLAUDE.md          # Phase-Head (entsteht in Step 0.5)
-updated: 2026-08-28 (initial, Planungssession Claude Code Opus, N1–N12 vom Nikinger gelockt)
+updated: 2026-08-28 (Nachtrag noch in der Planungssession: Step 0 als Fundament-Session Claude Code + Nikinger, C0 Anti-AI-Pattern-Research neu, P8-P gelockt, P8-25/26 + V93/V94) | 2026-08-28 (initial, Planungssession Claude Code Opus, N1–N12 vom Nikinger gelockt)
 ---
 # Phase 8 — UI-Neuanstrich, Verknüpfungs-Graph, QoL (`phase8_ui_graph/`)
 
@@ -26,7 +26,9 @@ updated: 2026-08-28 (initial, Planungssession Claude Code Opus, N1–N12 vom Nik
 ### §0.0 Arbeitsweise (erstmals opencode/M3 als Ausführender)
 
 - **Claude Code (Opus, high effort) hat geplant; opencode (Minimax M3 Thinking) führt aus.**
-  Nikinger-Vorgabe aus dem P7-Handover §7, hier erstmals scharf.
+  Nikinger-Vorgabe aus dem P7-Handover §7, hier erstmals scharf. **Ausnahme: Step 0 ist die
+  Fundament-Session** — sie läuft in Claude Code, gemeinsam und interaktiv mit dem Nikinger,
+  und stellt erst die opencode-Fähigkeits-Parität her (§1). Ab Block A übernimmt opencode/M3.
 - **Kein Advisor-Call während der Ausführung (P8-L, N12).** Die Qualitätsstufe, die in P7 elf
   Funde lieferte, wird ersetzt durch: (1) diese Planungstiefe, (2) die Pflicht-Testliste je
   Step, (3) die Selbstprüf-Checkliste am Step-Ende (§0.6), (4) Nikingers Sichtprüfung an den
@@ -79,7 +81,7 @@ updated: 2026-08-28 (initial, Planungssession Claude Code Opus, N1–N12 vom Nik
 | P8-M | **Achte P1-Contract-Öffnung, benannt** | Neu: `storage/linkscan.py`; `index.py`: Tabelle `item_links` + `replace_item_links()` + Befüllung in `rebuild_index()`; `store.py`: Aufrufe an den Schreibpfaden + Lesemethode `links_all()`. **`models.py` und alle Dateiformate bleiben unangetastet; `test_characterization.py` (drei Golden Files) muss byte-identisch grün bleiben.** Datierte Notiz in `phase1_storage/CLAUDE.md` §„Geerbte Contracts" im Öffnungs-Commit. |
 | P8-N | Ein Phasendokument | Closeout wird §9 dieses Dokuments; kein separates Handover-Dokument. |
 | P8-O | `AGENTS.md` wird entfernt (Step 0.4) | Freigabe Nikinger 2026-08-28 (P7-Handover §7.2); `git rm` + INDEX-Zeile im selben Commit. |
-| P8-P | Softcap-Ausnahme für zwei geschlossene Phase-Heads | `phase6_shares/CLAUDE.md` (~41 KB) und `phase5_ui/CLAUDE.md` (~41 KB): benannte Ausnahme in der jeweiligen INDEX-Zeile statt künstlicher Rotation (geschlossene Phase, genau ein Abschluss-Block, `rotate_session_block.sh` bräche mit `exit 2`). **Vorschlag der Planung — Nikinger bestätigt beim Plan-Review; bis dahin nicht ausführen.** |
+| P8-P | Softcap-Ausnahme für zwei geschlossene Phase-Heads | `phase6_shares/CLAUDE.md` (~41 KB) und `phase5_ui/CLAUDE.md` (~41 KB): benannte Ausnahme in der jeweiligen INDEX-Zeile statt künstlicher Rotation (geschlossene Phase, genau ein Abschluss-Block, `rotate_session_block.sh` bräche mit `exit 2`). **Gelockt (Nikinger, 2026-08-28)** — Step 0.3 führt aus. |
 | P8-Q | CSP bleibt byte-identisch | Alles ist self-hosted; `webui/security.py :: ui_security_headers()` wird in dieser Phase nicht angefasst. Abnahmekriterium: leerer Diff auf `security.py`. |
 
 ### §0.3 Verbotsliste (Anti-AI-Look, verbindlich für jeden UI-Commit)
@@ -137,10 +139,15 @@ P6/P6.5 (offene Nikinger-Entscheidungen, kein P8-Auftrag) · Mobile/Realtime · 
 | V90 | Ob `_measure_latency()` in `ui_budget.py` um `GET /api/v1/graph` ergänzt wird (informativ, kein Budget) — Entscheidung des Ausführenden | B3 |
 | V91 | `tags`/`folder`/`space`/`type`/`status` stehen in den Summary-Daten, die `_graph_get` je Knoten braucht (`serializers.py`) | B3 |
 | V92 | Existieren die §4.2-Lucide-Icon-Namen in der gepinnten Lucide-Version? (Namen driften zwischen Releases) | C2 |
+| V93 | Welcher opencode-Weg liefert Browser-Steuerung über den Harness (Playwright-MCP? opencode-eigene Tools?) — Stand bei Ausführung prüfen, nicht aus dieser Planung übernehmen | Step 0.7 |
+| V94 | Hat opencode/M3 brauchbare Web-Recherche für C0? Sonst läuft C0-Teil 1 als Claude-Code-Zuarbeit | Step 0.7 / C0 |
 
 ---
 
-## §1 Step 0 — Haushalt + Verifikations-Durchlauf
+## §1 Step 0 — Fundament-Session (Claude Code + Nikinger) + Haushalt
+
+> **Step 0 läuft in Claude Code, gemeinsam mit dem Nikinger** — er legt das Fundament, auf dem
+> opencode/M3 ab Block A ausführt. Erst wenn 0.6–0.8 stehen, wechselt der Harness.
 
 0.1 `pytest -q` → Ausgangsstand notieren (Erwartung 904, V81).
 0.2 **Verifikations-Durchlauf** (der Step-0-Platzhalter dieses Projekts): (a) Stichprobe
@@ -149,17 +156,29 @@ P6/P6.5 (offene Nikinger-Entscheidungen, kein P8-Auftrag) · Mobile/Realtime · 
     (c) jede `.md` außerhalb `.git`/`.claude`/`.agents` hat eine INDEX-Zeile;
     (d) Softcap-Scan (`du -b` über alle lebenden Heads). „Nichts zu tun" ist ein zulässiges
     Ergebnis und wird gemeldet. Bekannt aus der Planung: die zwei Übergrößen aus P8-P.
-0.3 P8-P ausführen **nur falls vom Nikinger bestätigt** — sonst als offen dokumentieren.
+0.3 P8-P ausführen (gelockt): benannte Ausnahme-Notiz in den INDEX-Zeilen der beiden Heads.
 0.4 `git rm AGENTS.md` + zugehörige INDEX-Zeile raus, **ein** Commit (P8-O).
 0.5 Skelett: `phase8_ui_graph/CLAUDE.md` (L1-Card, Modul-Status-Tabelle, leerer
     `## Session stopped`-Block) + `phase8_ui_graph/SESSIONS_ARCHIVE.md`; zwei INDEX-Zeilen +
     ROADMAP-Statuswechsel ⬜→🔄 im selben Commit.
-0.6 opencode-Vorbedingung protokollieren: opencode installiert (Nikinger-Handgriff), lädt
-    `CLAUDE.md` (nach 0.4 gibt es kein `AGENTS.md` mehr, das sie verdeckt). Kein MCP-Block
-    nötig — der Ausführende arbeitet nur auf dem lokalen Repo.
+0.6 **opencode installieren und konfigurieren (gemeinsam mit dem Nikinger):** Installation ist
+    sein Handgriff, Claude Code assistiert. Prüfen, dass opencode `CLAUDE.md` lädt (nach 0.4
+    gibt es kein `AGENTS.md` mehr, das sie verdeckt). Regeldatei-Verhalten mit einer
+    Kontrollfrage an den opencode-Agenten verifizieren, nicht annehmen.
+0.7 **Fähigkeits-Parität herstellen** — Ziel: opencode kann möglichst dasselbe wie Claude Code
+    in diesem Projekt braucht. Mindestens: (a) **Browser-Steuerung über den Harness** (Pendant
+    zu claude-in-chrome; Kandidat: Playwright-MCP als `mcp`-Block-Eintrag, V93) — ohne sie sind
+    die (W)-Zeilen der Abnahmematrix und der Playwright-Lauf D nicht fahrbar; (b)
+    **Web-Recherche-Fähigkeit** prüfen (V94) — braucht C0; fehlt sie, läuft C0-Teil 1 als
+    Claude-Code-Zuarbeit und opencode bekommt nur den Katalog. opencode-Plugins sind JS/TS,
+    Claude-Code-Plugins tragen nicht (P7-Handover §7.1) — Äquivalente suchen, nicht portieren.
+0.8 **Smoke-Test des Executors:** opencode führt auf einem Wegwerf-Branch eine Kleinsttask aus
+    (Testdatei anlegen, `pytest -q` eines Einzelmoduls, Browser-Probe gegen eine
+    Wegwerf-Instanz-Seite) — beweist Regeln, Tools und Browser-Pfad; Branch wird verworfen.
+    Ergebnis + exakte Konfiguration (Plugins/MCP-Einträge, Versionen) in den Phase-Head.
 
 **DoD Step 0:** pytest-Stand notiert, Verifikationsbericht im Session-Block, AGENTS.md weg,
-Skelett steht.
+Skelett steht, opencode konfiguriert + Smoke-Test bestanden (P8-26), Konfig dokumentiert.
 
 ---
 
@@ -331,6 +350,29 @@ geprüft. Erst dann Designarbeit.
 ---
 
 ## §4 Block C — Design-Fundament v3 (De-AI-isierung)
+
+### C0 — Anti-AI-Pattern-Research + UI-Audit
+
+**Teil 1 — Research (Web, V94):** frische Recherche „woran erkennt man AI-generierte UIs und
+wie behebt man es" — Designer-Blogs, offizielle Styleguides (Apple HIG, Material), Stand zum
+Ausführungszeitpunkt. Startpunkt ist der Katalog unten (Planungsrecherche 2026-08-28); die
+Recherche **ergänzt** ihn, sie beginnt nicht bei null.
+
+**Starter-Katalog (Muster → Fix):**
+1. Emoji/HTML-Entities als Icons → echtes Icon-System (C2)
+2. Indigo/Violett-Gradients, Gradient-Branding → Farbsemantik-Tokens, Verbotsliste §0.3 (C3)
+3. Inter als unreflektierter Default → bewusste Schriftentscheidung Plex (C1)
+4. Austauschbare Card-Grids mit 1px-Grau-Rand → Struktur über Dichte/Whitespace (C5, D1)
+5. Uniformes border-radius + Schatten auf allem → gezielte Erhebungsebenen (bestehende Plastik-Tokens aus Step 7b weiternutzen, nicht ersetzen)
+6. Dekorative Farben ohne Bedeutung → eine Farbe = eine Bedeutung (C3)
+7. Generische Marketing-Microcopy → nüchterne deutsche UI-Texte im Bestandston
+8. Marketing-Seiten-Großzügigkeit (zentrierte Heros, riesige Abstände) in einer Daten-UI → dichte Arbeitsfläche (C5)
+
+**Teil 2 — Audit:** systematischer Durchgang durch `app.html`, `app.css` und alle
+JS-Render-Stellen gegen den (ergänzten) Katalog. Ergebnis: **Findings-Tabelle
+Muster → Fundstelle (Datei:Zeile) → Fix → Ziel-Step (C1–C5/D1)** im Phase-Head. Ein Fund ohne
+Heimat-Step wird eine **benannte Nikinger-Entscheidung**, kein stiller Scope-Zuwachs (P8-25).
+C1–C5 arbeiten danach die Tabelle ab, nicht nur die Plan-Aufzählung.
 
 ### C1 — Typografie (P8-G)
 
@@ -504,7 +546,7 @@ Knoten öffnet Item → Legende sichtbar.
 
 ---
 
-## §7 Abnahmematrix P8-1 – P8-24
+## §7 Abnahmematrix P8-1 – P8-26
 
 **Statusregel unverändert: ✅ heißt live-verifiziert durch einen Menschen, nicht „gebaut".**
 (W) = Wegwerf-Instanz zulässig, (L) = nur live, (C) = Code/Test-Nachweis genügt.
@@ -535,14 +577,16 @@ Knoten öffnet Item → Legende sichtbar.
 | P8-22 (W) | 200-Knoten-Wegwerf-Datensatz: Simulation kommt < 3 s zur Ruhe, Interaktion ohne spürbares Haken; `prefers-reduced-motion` rendert statisch |
 | P8-23 (L) | `v3.0`-Badge live, UPDATE_LOG-Eintrag vorhanden, Health-Gate 3/3 nach Deploy |
 | P8-24 (W) | Playwright-Durchlauf gegen die Wegwerf-Instanz grün (Übersicht→Scope→Graph→Knotenklick→Item) |
+| P8-25 (C) | C0-Findings-Tabelle existiert im Phase-Head; jeder Fund auf einen Step gemappt oder als benannte Nikinger-Entscheidung eskaliert |
+| P8-26 (W) | Fundament: opencode steuert nachweislich einen Browser gegen eine Wegwerf-Instanz (Smoke-Test 0.8) — Voraussetzung aller (W)-Zeilen |
 
 ---
 
 ## §8 Reihenfolge und Fallregel
 
-**0 → A → B → GATE → C → D → Z.** Zwei Nikinger-Sichtprüfpunkte: nach C (Typo/Farben/Glass)
+**0 (Fundament, Claude Code) → A → B → GATE → C (C0→C5) → D → Z.** Zwei Nikinger-Sichtprüfpunkte: nach C (Typo/Farben/Glass)
 und in D (Übersicht/Graph). Unter Druck fällt zuerst D2-Feinschliff (Labels, Zoom-Komfort),
-dann C4 (Glass), dann C5 — **nie Block A, nie die B-Integrität (ACL-Filter, Hard Rule 2,
+dann C4 (Glass), dann C5 — C0-Teil 2 (Audit) fällt nie, er ist billig und trägt die Verbotsliste — **nie Block A, nie die B-Integrität (ACL-Filter, Hard Rule 2,
 Characterization)**. Ein UI-Schnitt ohne Glass ist auslieferbar; einer mit ACL-Leck nicht.
 
 ---
