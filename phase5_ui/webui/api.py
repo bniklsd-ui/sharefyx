@@ -98,6 +98,7 @@ from .serializers import (
     asset_to_json, item_to_json, overview_row_to_json, search_to_json, space_to_json,
     summary_to_json,
 )
+from .reauth import REAUTH_GRANT_TTL_S, ReauthGrantStore, verify_reauth
 from .sessions import SessionManager
 from .shares import ShareState, require_share_reauth, require_space_reauth
 from .updates import load_update_log
@@ -157,6 +158,10 @@ _PATCH_FIELDS = frozenset({
     "version", "title", "body", "status", "due", "tags", "links", "type", "format",
     "folder", "space", "visibility", "share_read", "share_write",
     "password", "totp",
+    # P8-A: Reauth-Grant, ausgestellt von POST /api/v1/reauth; session-gebunden, in-memory,
+    # TTL 90 s. Wird in `webui/shares.py` ZUERST geprüft (vor `password`/`totp`), damit ein
+    # Batch mit N rechteerweiternden Items nur EINEN Credentials-Block braucht (P7-24).
+    "reauth_grant",
 })
 
 
@@ -215,6 +220,12 @@ def api_routes(
     # zustandslos gegenüber der `auth_store`-Tabelle, die die eigentliche Bremse trägt.
     throttle = LoginThrottle(auth_store, now_fn=auth_store.now)
 
+    # P8-A: Reauth-Grant-Store — in-memory, pro App-Instanz, stirbt mit dem Prozess. Genau wie
+    # `throttle` lokal in `api_routes()` gebaut, kein `create_app()`-Parameter nötig (Hard Rule
+    # 8: minimaler API-Footprint). Wird vom neuen `POST /api/v1/reauth` befüllt und von
+    # `require_share_reauth()`/`require_space_reauth()` gelesen.
+    grant_store = ReauthGrantStore()
+
     async def _require_session(request: Request):
         session = sessions.load(request)
         if session is None:
@@ -267,6 +278,50 @@ def api_routes(
     async def _me(request: Request) -> Response:
         session = await _require_session(request)
         return JSONResponse({"space": session.space}, headers={"Cache-Control": "no-store"})
+
+    async def _reauth_post(request: Request) -> Response:
+        """P8-A: löst mit Passwort+TOTP ein kurzlebiges Reauth-Grant aus (TTL 90 s), das
+        nachfolgende PATCH-Batches (P7-24) ohne erneute Credentials absichert. Sitzungspflicht +
+        CSRF + Throttle teilen sich mit den anderen state-ändernden Routen (`_require_session`/
+        `_require_csrf_json`/`LoginThrottle`-getriebenes `verify_reauth()`). Erfolg geht durch
+        dieselbe `verify_reauth()`-Credential-Prüfung wie `account.py`/`shares.py` — keine
+        zweite Passwort-/TOTP-Verifikation, der TOTP-Code wird genau einmal verbraucht, das
+        Grant ist nur ein session-gebundenes Ticket. Fehlschlag → 403 (`reauth_required`),
+        gedrosselt → 429 (bestehende `LoginThrottle`-Konvention).
+
+        **Throttle-Prüfung explizit vorgezogen** — `verify_reauth()` schluckt die Sperre in
+        ein `False` und der Client könnte nicht zwischen „falsche Credentials" und „Space
+        gesperrt" unterscheiden. Spiegelung des Musters aus `routes_auth.py :: _login_post()`
+        (Zeile 59-67): bei `remaining is not None` → 429, bevor Argon2id+TOTP überhaupt laufen."""
+        session = await _require_session(request)
+        await _require_csrf_json(request, session)
+        remaining = throttle.check(session.space)
+        if remaining is not None:
+            raise ApiError(
+                "rate_limited",
+                f"Konto gesperrt. Nächster Versuch in {remaining} Sekunden möglich.",
+            )
+        body = await _json_body(request)
+        password = body.get("password")
+        code = body.get("totp")
+        if not isinstance(password, str) or not isinstance(code, str):
+            raise ApiError(
+                "reauth_required",
+                "Re-Authentisierung fehlgeschlagen.",
+            )
+        ok = verify_reauth(
+            users, throttle, auth_store, space=session.space, password=password,
+            second_factor=code, now=auth_store.now().timestamp(),
+        )
+        if not ok:
+            raise ApiError("reauth_required", "Re-Authentisierung fehlgeschlagen.")
+        grant = grant_store.issue(
+            session.session_hash, now=auth_store.now().timestamp(),
+        )
+        return JSONResponse(
+            {"grant": grant, "expires_in": int(REAUTH_GRANT_TTL_S)},
+            headers={"Cache-Control": "no-store"},
+        )
 
     async def _meta(request: Request) -> Response:
         await _require_session(request)
@@ -412,7 +467,7 @@ def api_routes(
             raise ApiError("validation_failed", "'name' ist Pflichtfeld (nicht-leerer str).")
         require_space_reauth(
             session, body, widening=True,
-            userdir=users, throttle=throttle, auth_store=auth_store,
+            userdir=users, throttle=throttle, auth_store=auth_store, grant_store=grant_store,
         )
         acl.add_member(store.data_root, space, name, write=bool(body.get("write", False)))
         return JSONResponse(
@@ -482,7 +537,7 @@ def api_routes(
         body = await _json_body(request)
         require_space_reauth(
             session, body, widening=True,
-            userdir=users, throttle=throttle, auth_store=auth_store,
+            userdir=users, throttle=throttle, auth_store=auth_store, grant_store=grant_store,
         )
         if body.get("confirm") != space:
             raise ApiError(
@@ -764,7 +819,7 @@ def api_routes(
         )
         require_share_reauth(
             session, body, before=before_state, after=after_state, acl=store.acl_reader,
-            userdir=users, throttle=throttle, auth_store=auth_store,
+            userdir=users, throttle=throttle, auth_store=auth_store, grant_store=grant_store,
         )
 
         # `password`/`totp` dienen ausschließlich dem Re-Auth-Gate oben — landen sonst als
@@ -772,10 +827,11 @@ def api_routes(
         # `else: updated_extra[key] = value`-Zweig kennt keine Feld-Whitelist) und damit als
         # Klartext auf der Platte UND in einem Git-Commit (Hard Rule 1). Deshalb NIE an
         # `store.update()`/`store.move()` weitergereicht, unabhängig davon, ob das Gate
-        # überhaupt auslöste.
+        # überhaupt auslöste. `reauth_grant` (P8-A) gehört in dieselbe Kategorie — ein
+        # langlebiges Token, das NIE in einem Frontmatter-Feld landen darf.
         changes = {
             key: value for key, value in body.items()
-            if key not in {"version", "password", "totp", "space"}
+            if key not in {"version", "password", "totp", "reauth_grant", "space"}
         }
         try:
             if target_space is not None:
@@ -991,6 +1047,10 @@ def api_routes(
 
     return [
         Route("/api/v1/me", _catch(_me), methods=["GET"]),
+        # P8-A: Reauth-Grant-Ausgabe (POST) — Passwort+TOTP → session-gebundenes Grant.
+        # Sitzungs-/CSRF-Pflicht sitzt im Handler (`_reauth_post`), nicht in der Middleware,
+        # damit GET-Routen ohne CSRF-Token funktionieren.
+        Route("/api/v1/reauth", _catch(_reauth_post), methods=["POST"]),
         Route("/api/v1/spaces", _catch(_spaces), methods=["GET"]),
         Route("/api/v1/spaces", _catch(_spaces_post), methods=["POST"]),
         Route("/api/v1/spaces/{space}/folders", _catch(_spaces_create_folder), methods=["POST"]),

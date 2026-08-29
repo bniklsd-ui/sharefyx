@@ -13,6 +13,14 @@ breiter geteilten Ordner), `decision_for()` kennt beides bereits. `visibility` f
 Vergleich strukturell nicht ein (`decision_for()` nutzt es nur für `AclDecision.visibility`,
 nie für die `read`/`write`-Vereinigung — das ist Schritt 5s eigener Fund, hier wiederverwendet,
 nicht neu erfunden) — `private → human` ist deshalb korrekt NIE ein Widen.
+
+**[Phase 8 / P8-A]** beide Gates akzeptieren jetzt optional ein `reauth_grant` aus dem Request-
+Body — ein von `POST /api/v1/reauth` ausgestelltes, session-gebundenes Ticket, das den
+Passwort+TOTP-Pfad für die nächsten 90 Sekunden ersetzt. Ein einziger Credentials-Block pro
+Batch reicht damit für N rechteerweiternde PATCHes (P7-24). Anti-Replay bleibt unverändert:
+der TOTP-Code wird weiterhin genau einmal verbraucht (durch `verify_reauth()`), das Grant ist
+kein zweiter Faktor, nur ein session-gebundenes Ticket. Weder `widens()` noch die Rechteprüfung
+je Item ändern sich — das Grant überspringt ausschließlich die Credential-Eingabe.
 """
 from __future__ import annotations
 
@@ -25,7 +33,7 @@ from authserver.userdir import UserDirectory
 from storage.acl import AclReader
 
 from .errors import ApiError
-from .reauth import verify_reauth
+from .reauth import ReauthGrantStore, verify_reauth
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -62,21 +70,36 @@ def require_share_reauth(
     userdir: UserDirectory,
     throttle: LoginThrottle,
     auth_store: AuthStore,
+    grant_store: ReauthGrantStore,
 ) -> None:
-    """Wirft `ApiError("reauth_required")`, wenn `widens()` wahr ist UND `password`/`totp` im
-    Body fehlen oder nicht verifizieren — beide Fälle liefern denselben Code (Plan-Entscheidung,
-    `serialized-seeking-aurora.md` Commit 5: der Client kann und muss „fehlt" nicht von „falsch"
-    unterscheiden, er zeigt in beiden Fällen dasselbe Mini-Formular und schickt denselben PATCH-
-    Body erneut, jetzt mit `password`/`totp`). Kein eigener `ReauthRequired`-Exception-Typ (P6-
-    Plan §1.2.5 skizziert einen, `request`/`session`/`before`/`after`/`acl` als Signatur — diese
-    Skizze deckt nicht ab, WIE gegen ein echtes Credential geprüft wird; die Prüfung selbst
-    braucht `body`/`userdir`/`throttle`/`auth_store` zusätzlich, dieselben Bausteine wie
-    `account.py :: _require_reauth()`, hier als Parameter statt als Closure, weil `shares.py`
-    kein eigenes `throttle`/`userdir` besitzt. `request` fiel ganz weg — ungenutzt, `body` kommt
-    bereits geparst herein, kein zweiter Lesezugriff auf den Request-Stream) — eine
-    Exception-Klasse mehr für denselben Übersetzungsschritt wäre eine Indirektion ohne Nutzen.
+    """Wirft `ApiError("reauth_required")`, wenn `widens()` wahr ist UND weder ein gültiges
+    `reauth_grant` noch `password`/`totp` im Body verifizieren — alle drei Fälle liefern
+    denselben Code (Plan-Entscheidung, `serialized-seeking-aurora.md` Commit 5: der Client kann
+    und muss „fehlt" nicht von „falsch" unterscheiden, er zeigt in beiden Fällen dasselbe
+    Mini-Formular und schickt denselben PATCH-Body erneut, jetzt mit `password`/`totp`). Kein
+    eigener `ReauthRequired`-Exception-Typ (P6-Plan §1.2.5 skizziert einen, `request`/`session`/
+    `before`/`after`/`acl` als Signatur — diese Skizze deckt nicht ab, WIE gegen ein echtes
+    Credential geprüft wird; die Prüfung selbst braucht `body`/`userdir`/`throttle`/
+    `auth_store` zusätzlich, dieselben Bausteine wie `account.py :: _require_reauth()`, hier als
+    Parameter statt als Closure, weil `shares.py` kein eigenes `throttle`/`userdir` besitzt.
+    `request` fiel ganz weg — ungenutzt, `body` kommt bereits geparst herein, kein zweiter
+    Lesezugriff auf den Request-Stream) — eine Exception-Klasse mehr für denselben
+    Übersetzungsschritt wäre eine Indirektion ohne Nutzen.
+
+    **Grant-Reihenfolge (P8-A):** Grant wird ZUERST geprüft, weil ein gültiges Grant den
+    Passwort+TOTP-Pfad komplett überspringt — sonst müsste der Client für jeden Item-PATCH im
+    Batch erneut Credentials mitschicken (genau P7-24). Bei einem abgelaufenen oder fremden
+    Grant fällt der Code auf den Passwort+TOTP-Pfad zurück (kein zweiter `reauth_required`,
+    derselbe Fehlerpfad). Bindung an `session.session_hash` (nicht an den Klartext-Cookie — der
+    existiert nur im Browser, P5-K) ist die einzige serverseitig mögliche Session-Identität;
+    ein neues Login mintet einen neuen Hash, ein altes Grant wird damit automatisch wertlos.
     """
     if not widens(before, after, acl=acl):
+        return
+    grant_token = body.get("reauth_grant")
+    if isinstance(grant_token, str) and grant_store.check(
+        grant_token, session.session_hash, now=auth_store.now().timestamp(),
+    ):
         return
     password = body.get("password")
     code = body.get("totp")
@@ -101,14 +124,21 @@ def require_space_reauth(
     userdir: UserDirectory,
     throttle: LoginThrottle,
     auth_store: AuthStore,
+    grant_store: ReauthGrantStore,
 ) -> None:
     """Wie `require_share_reauth()`, aber für Space-Mitgliedschaft (P7 Step C2) statt Item-
     Freigaben — hier gibt es keine `AclDecision` zum Vergleichen, also kein `widens()`-Äquivalent:
     P7-N benennt die Regel bereits flach („Mitglied hinzufügen ⇒ Re-Auth, Mitglied entfernen ⇒
     nicht"), der Aufrufer übergibt sie direkt statt sie hier neu zu berechnen. Teilt sich
     `verify_reauth()` mit `require_share_reauth()`/`account.py :: _require_reauth()` — dieselbe
-    Credential-Prüfung, drei Aufrufer."""
+    Credential-Prüfung, drei Aufrufer. Akzeptiert ebenfalls ein `reauth_grant` (P8-A) — gleiche
+    Reihenfolge und Bindung an `session.session_hash` wie `require_share_reauth()`."""
     if not widening:
+        return
+    grant_token = body.get("reauth_grant")
+    if isinstance(grant_token, str) and grant_store.check(
+        grant_token, session.session_hash, now=auth_store.now().timestamp(),
+    ):
         return
     password = body.get("password")
     code = body.get("totp")
