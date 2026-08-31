@@ -4,13 +4,83 @@ purpose: Archiv älterer Session-Blöcke aus phase8_ui_graph/CLAUDE.md — newes
 read-when: nur wenn der aktuelle Session-Block im Phase-Head nicht reicht und Verlauf gebraucht wird
 detail: L3
 up: CLAUDE.md
-updated: 2026-08-31 (zweiter Eintrag: 2026-08-31 A1-Client+Smoke+N=14-Block nach SESSIONS_ARCHIVE rotiert, da die zweite Session mit A2-remove-space-Auto-Reindex den aktuellen Head-Block bildet)
+updated: 2026-08-31 (dritte Rotation: drei Blöcke im Archiv -- 2026-08-28 A1-Backend, 2026-08-31 A1-Client+Smoke+N=14, 2026-08-31 A2-Reindex; Head-Block jetzt Deploy-Vorbereitungs-Session für die drei A1+A2-Commits)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8
 
 Noch leer — der Phase-Head trägt bisher genau einen (aktuellen) Session-Block. Der erste Eintrag
 hier entsteht bei der ersten Rotation (`scripts/rotate_session_block.sh phase8_ui_graph`).
+
+## Session stopped — 2026-08-31 (A2 `remove-space`-Auto-Reindex gebaut, 913 grün, Live-Verifikation ausstehend)
+
+**Auftrag:** A2-Commit 3 (Block A letzter Erbpost, P8-B) — atomar in derselben Sitzung wie
+A1, danach Session zuende. V82-Anker gegen die aktuelle Code-Basis verifiziert:
+`spacectl.py:194` (`acl.remove_space_dir(data_root, name)`), `storage/store.py:809`
+(`Store.rebuild_index() -> IndexStats`), `storage/index.py:187` (`rebuild_index(data_root,
+conn)`).
+
+**Was gebaut wurde (Zweizeiler + Test, exakt Plan §A2):**
+- `phase6_shares/scripts/spacectl.py :: _cmd_remove_space()`: nach `acl.remove_space_dir(...)`
+  ein `stats = Store(data_root).rebuild_index()` und eine Statuszeile
+  (`Index neu aufgebaut: N Items in 0.044s.`) — die `Store`-Klasse war bereits importiert
+  (`_cmd_list_spaces` und `_cmd_show` benutzen sie seit P6 Step 6, gleiches Muster,
+  keine neue Import-Zeile nötig).
+- `phase6_shares/tests/test_spacectl.py :: test_remove_space_with_force_rebuilds_the_index_
+  so_no_stale_rows_remain`: legt zwei Spaces mit je einem Item an, baut den Index auf
+  (`Store(data_root, git=False).rebuild_index()`), beweist dass BEIDE Items im Suchlauf
+  auftauchen, ruft `remove-space --force` auf, beweist dass nur das Opfer-Item verschwunden
+  ist UND das Zeuge-Item erhalten bleibt (Reindex ist `data_root`-weit, kein Kollateralschaden),
+  UND dass das Opfer-Item auch im **globalen** `search()` ohne `space=`-Filter nicht mehr
+  auftaucht (Hard Rule 2: keine Karteileichen, jemals). Die Test-Datei wird direkt geschrieben
+  (kein `Store.create()`), weil das die schnellste Variante ist, einen indexierten Eintrag zu
+  erzeugen — der Test beweist den Mechanismus, nicht die Schreibpfade.
+
+**Begründung der Entscheidung „Reindex erzwingen statt nur warnen" gegen den Plan:** Plan
+§A2 sagt „Zweizeiler + Test, Warnhinweis-Variante verworfen (wird übersehen, reproduziert den
+500er-Incident vom 2026-08-27)". Beweis im Code-Kommentar dieselbe Begründung mit explizitem
+Hard-Rule-2-Bezug (Datei ist die Wahrheit, der Index muss jederzeit entsprechen — diese
+Operation entfernt eine Verzeichnisebene, „danach reindexen" ist keine optionale Optimierung,
+sondern Pflicht).
+
+**Verifiziert:** `pytest -q` → **913 passed** (912 alt + 1 neu). Tabu-Diff leer
+(`phase4_auth/`, `phase2_mcp/`, `webui/security.py`, benannte `storage/`-Dateien — `acl.py`
+**nicht** in der Tabu-Liste, der Reindex-Aufruf geht durch `store.rebuild_index()`, nicht durch
+einen direkten `acl`-Eingriff, kein Plan-Drift auf P7-Cs sechster Öffnung). Erster Lauf
+zeigte den **bekannten** `test_authctl.py :: test_revoke_kills_the_family`-Flake
+(`phase4_auth/CLAUDE.md` Zeile „Vormerkungen", seit 2026-08-20 vermerkt — `argparse:
+--family-id: expected one argument`, reihenfolgeabhängig, nicht von dieser Session
+verursacht); zweiter vollständiger Lauf 913/913 grün, kein Code-Touch in `phase4_auth/`.
+`ui_budget.py` nicht erneut gelaufen — keine UI-Änderung in diesem Commit, der vorige A1-Lauf
+(dialogs.js 9.5 KB) deckt das schon ab.
+
+**Was der Test bewiesen hat (vs. was der Live-Vorfall bewies):**
+- ✅ `rebuild_index()` entfernt Zeilen gelöschter Spaces — keine Karteileichen im Index.
+- ✅ `rebuild_index()` fasst **nicht** andere Spaces an — keine Kollateralschäden.
+- ✅ Der Status-Print zeigt `items_indexed > 0` für die verbliebenen Spaces (Beweis im
+  Test-Output, nicht nur behauptet).
+- ❌ Live-Verifikation durch den Nikinger: ausstehend. Der echte
+  `testnutzer-p7`-Vorfall vom 2026-08-27 (Commit `e2c908a`) entstand genau durch das
+  Fehlen dieses Reindex — der Live-Lauf wird denselben `remove-space` durchspielen und
+  danach `GET /api/v1/overview` (das `search()`/`list_spaces()` aggregiert) gegen den
+  realen Dienst aufrufen, um die 200 statt 500 zu sehen. Nikinger-Aktion.
+
+**Hard-Rule-1-Compliance:** keine Geheimnisse berührt (CLI-Operator-Werkzeug, schreibt nur
+`.share.yml`-Konfigurationen und Verzeichnisse, niemals Tokens oder TOTP-Seeds). Tabu-Diff
+leer. `git diff` auf `mcpserver/`, `webui/`, `authserver/` ebenfalls leer.
+
+**Nächster Schritt, konkret:** A3 P7-4-Zweitprobe (P8-C) — der UX-Befund aus Phase 7
+(Claude nennt Menschen IDs statt Titeln), eine organische Probe **vor** der
+`_TITLE_NOT_ID_HINT`-Beschreibungsschärfung, dann falls die Prosa-Anweisung allein nicht
+reicht der Text-Edit in `mcpserver/tools.py` (Tabu-Linie §0.4 erlaubt reine
+Beschreibungstext-Strings in `tools.py`, Präzedenz P7-T). Block A damit vollständig — drei
+Commits (`a381a96` A1-Client + Smoke + N=14, dieser Commit A2, A3 folgt). Danach Block B
+(Link-Fundament, achte P1-Contract-Öffnung — neuer Absatz in
+`phase1_storage/CLAUDE.md` §„Geerbte Contracts" beim Öffnungs-Commit, hier nur als Vormerkung
+genannt).
+
+---
+
 ## Session stopped — 2026-08-31 (A1 Reauth-Grant Client gebaut, N=14 Batch-Test, Smoke gegen Wegwerf bestanden — Live-Verifikation ausstehend)
 
 **Auftrag:** A1-Commit 2 — die JS-Seite von P8-A. Code lag seit der vorherigen Session bereits

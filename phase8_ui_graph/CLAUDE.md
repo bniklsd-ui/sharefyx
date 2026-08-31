@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase8_ui_graph_plan.md       # voller Plan, Entscheidungen P8-A–P8-Q, §0.1 gelockte N1–N12, Steps 0/A/B/C/D/Z
   - ../docs/concepts/PHASE7_CLOSEOUT_HANDOVER.md   # Herkunft der drei Erbposten (P7-24/remove-space/P7-4)
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
+updated: 2026-08-31 (Deploy-Vorbereitung A1+A2 -- Update-Log-Eintrag 2026-08-31 lokal commit (00dfaef), P6-X-Gate gruen, Sudo ueber savefyx nicht moeglich, Nikinger fuehrt deploy.sh main selbst aus, danach A1+A2-Sichtpruefung; zwei alte Bloecke in dieser Sitzung rotiert) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
 ---
 
 # CLAUDE.md — Phase 8: UI-Neuanstrich v3, Verknüpfungs-Graph, QoL (`phase8_ui_graph/`)
@@ -52,8 +52,8 @@ Abnahmezeilen: `docs/concepts/phase8_ui_graph_plan.md`.
 | Block | Inhalt | Status |
 |---|---|---|
 | Step 0 | Fundament-Session (Haushalt, AGENTS.md weg, Skelett, opencode-Setup, Smoke-Test) | ✅ |
-| A1 | Reauth-Grant (`webui/reauth.py :: ReauthGrantStore` + Endpoint + Client + Tests, N=14-Batch) | 🟡 gebaut, Live-Deploy + Nikinger-Sichtprüfung ausstehend |
-| A2 | `remove-space`-Auto-Reindex (`spacectl.py :: _cmd_remove_space()` → `store.rebuild_index()`) | 🟡 gebaut, Live-Deploy + Nikinger-Sichtprüfung ausstehend |
+| A1 | Reauth-Grant (`webui/reauth.py :: ReauthGrantStore` + Endpoint + Client + Tests, N=14-Batch) | 🟡 gebaut, Update-Log-Commit ✅, Live-Deploy wartet auf Nikinger-Sudo, danach Nikinger-Sichtprüfung |
+| A2 | `remove-space`-Auto-Reindex (`spacectl.py :: _cmd_remove_space()` → `store.rebuild_index()`) | 🟡 gebaut, Update-Log-Commit ✅, Live-Deploy wartet auf Nikinger-Sudo, danach Nikinger-Sichtprüfung |
 | A3 | P7-4: organische Zweitprobe + `_TITLE_NOT_ID_HINT` schärfen | ⬜ |
 | Block B | Link-Fundament (`linkscan.py`, `item_links`, `GET /api/v1/graph`) | ⬜ |
 | Block C | Design-Fundament v3 (Typografie, Icons, Farben, Glas) | ⬜ |
@@ -72,69 +72,99 @@ Achte P1-Contract-Öffnung (P8-M) wird in Block B benannt und gebaut — Eintrag
 
 ---
 
-## Session stopped — 2026-08-31 (A2 `remove-space`-Auto-Reindex gebaut, 913 grün, Live-Verifikation ausstehend)
+## Session stopped — 2026-08-31 (Deploy-Vorbereitung A1+A2 — Update-Log ✅, Sudo wartet auf Nikinger)
 
-**Auftrag:** A2-Commit 3 (Block A letzter Erbpost, P8-B) — atomar in derselben Sitzung wie
-A1, danach Session zuende. V82-Anker gegen die aktuelle Code-Basis verifiziert:
-`spacectl.py:194` (`acl.remove_space_dir(data_root, name)`), `storage/store.py:809`
-(`Store.rebuild_index() -> IndexStats`), `storage/index.py:187` (`rebuild_index(data_root,
-conn)`).
+**Auftrag:** Sonderaufgabe der vorherigen Sitzung — `deploy.sh main` für die drei
+A1+A2-Commits (`06cd21b` A1-Backend, `a381a96` A1-Client, `ca4669f` A2-Reindex). Mein
+„Handgriff" laut Nikinger-Anweisung, Live-Deploy der drei Phase-8-Commits.
 
-**Was gebaut wurde (Zweizeiler + Test, exakt Plan §A2):**
-- `phase6_shares/scripts/spacectl.py :: _cmd_remove_space()`: nach `acl.remove_space_dir(...)`
-  ein `stats = Store(data_root).rebuild_index()` und eine Statuszeile
-  (`Index neu aufgebaut: N Items in 0.044s.`) — die `Store`-Klasse war bereits importiert
-  (`_cmd_list_spaces` und `_cmd_show` benutzen sie seit P6 Step 6, gleiches Muster,
-  keine neue Import-Zeile nötig).
-- `phase6_shares/tests/test_spacectl.py :: test_remove_space_with_force_rebuilds_the_index_
-  so_no_stale_rows_remain`: legt zwei Spaces mit je einem Item an, baut den Index auf
-  (`Store(data_root, git=False).rebuild_index()`), beweist dass BEIDE Items im Suchlauf
-  auftauchen, ruft `remove-space --force` auf, beweist dass nur das Opfer-Item verschwunden
-  ist UND das Zeuge-Item erhalten bleibt (Reindex ist `data_root`-weit, kein Kollateralschaden),
-  UND dass das Opfer-Item auch im **globalen** `search()` ohne `space=`-Filter nicht mehr
-  auftaucht (Hard Rule 2: keine Karteileichen, jemals). Die Test-Datei wird direkt geschrieben
-  (kein `Store.create()`), weil das die schnellste Variante ist, einen indexierten Eintrag zu
-  erzeugen — der Test beweist den Mechanismus, nicht die Schreibpfade.
+**Zwei Blocker vor dem Skript-Start identifiziert (verifiziert, nicht spekuliert):**
 
-**Begründung der Entscheidung „Reindex erzwingen statt nur warnen" gegen den Plan:** Plan
-§A2 sagt „Zweizeiler + Test, Warnhinweis-Variante verworfen (wird übersehen, reproduziert den
-500er-Incident vom 2026-08-27)". Beweis im Code-Kommentar dieselbe Begründung mit explizitem
-Hard-Rule-2-Bezug (Datei ist die Wahrheit, der Index muss jederzeit entsprechen — diese
-Operation entfernt eine Verzeichnisebene, „danach reindexen" ist keine optionale Optimierung,
-sondern Pflicht).
+1. **`docs/UPDATE_LOG.md` stale.** Oberster `## YYYY-MM-DD`-Eintrag war `2026-08-27`,
+   heute `2026-08-31` (UTC und lokal gleich) — `deploy.sh` würde an P6-X-Gate (Schritt
+   2.5) sofort abbrechen. Genau der Mechanismus, für den das Gate gebaut wurde: ein
+   Deploy mit sichtbarer Funktionalität ohne frischen Banner-Eintrag ist per Definition
+   ein Bug.
+2. **`sudo systemctl` braucht Passwort.** `sudo -n -l` → `password is required`, der
+   `savefyx`-User hat **keine** `NOPASSWD`-Regel. Deploy-Schritt 6 (Service-Neustart) ist
+   ohne sudo nicht möglich.
 
-**Verifiziert:** `pytest -q` → **913 passed** (912 alt + 1 neu). Tabu-Diff leer
-(`phase4_auth/`, `phase2_mcp/`, `webui/security.py`, benannte `storage/`-Dateien — `acl.py`
-**nicht** in der Tabu-Liste, der Reindex-Aufruf geht durch `store.rebuild_index()`, nicht durch
-einen direkten `acl`-Eingriff, kein Plan-Drift auf P7-Cs sechster Öffnung). Erster Lauf
-zeigte den **bekannten** `test_authctl.py :: test_revoke_kills_the_family`-Flake
-(`phase4_auth/CLAUDE.md` Zeile „Vormerkungen", seit 2026-08-20 vermerkt — `argparse:
---family-id: expected one argument`, reihenfolgeabhängig, nicht von dieser Session
-verursacht); zweiter vollständiger Lauf 913/913 grün, kein Code-Touch in `phase4_auth/`.
-`ui_budget.py` nicht erneut gelaufen — keine UI-Änderung in diesem Commit, der vorige A1-Lauf
-(dialogs.js 9.5 KB) deckt das schon ab.
+**Nikinger-Entscheidung (AskUserQuestion):** Option 1 — Update-Log-Eintrag selbst schreiben,
+sudo durch den Nikinger aus dessen Session.
 
-**Was der Test bewiesen hat (vs. was der Live-Vorfall bewies):**
-- ✅ `rebuild_index()` entfernt Zeilen gelöschter Spaces — keine Karteileichen im Index.
-- ✅ `rebuild_index()` fasst **nicht** andere Spaces an — keine Kollateralschäden.
-- ✅ Der Status-Print zeigt `items_indexed > 0` für die verbliebenen Spaces (Beweis im
-  Test-Output, nicht nur behauptet).
-- ❌ Live-Verifikation durch den Nikinger: ausstehend. Der echte
-  `testnutzer-p7`-Vorfall vom 2026-08-27 (Commit `e2c908a`) entstand genau durch das
-  Fehlen dieses Reindex — der Live-Lauf wird denselben `remove-space` durchspielen und
-  danach `GET /api/v1/overview` (das `search()`/`list_spaces()` aggregiert) gegen den
-  realen Dienst aufrufen, um die 200 statt 500 zu sehen. Nikinger-Aktion.
+**Was diese Sitzung konkret getan hat (vier Schritte, klein gehalten):**
 
-**Hard-Rule-1-Compliance:** keine Geheimnisse berührt (CLI-Operator-Werkzeug, schreibt nur
-`.share.yml`-Konfigurationen und Verzeichnisse, niemals Tokens oder TOTP-Seeds). Tabu-Diff
-leer. `git diff` auf `mcpserver/`, `webui/`, `authserver/` ebenfalls leer.
+1. **Update-Log-Eintrag `## 2026-08-31` oben in `docs/UPDATE_LOG.md` eingefügt.** Zwei
+   sichtbare Verbesserungen, eine Zeile je Feature, nutzerorientierte Sprache
+   (Präzedenz-Eintrag 2026-08-27):
+   - „Mehrere Notizen gleichzeitig in einen anderen Space verschieben: reicht jetzt ein
+     Passwort und ein Code für alle aus, auch wenn die Aktion Schreibrechte erweitert
+     — der Code wird intern genau einmal verwendet, danach ist für jede weitere
+     Verschiebe-Aktion ein neuer Code nötig." (deckt A1-Backend + A1-Client, schließt
+     P7-24 — TOTP-Replay im Batch war die vererbte Block-A-Erbpost)
+   - „Spaces entfernen räumt jetzt den internen Suchindex mit auf — die Übersicht
+     funktioniert danach wieder zuverlässig." (deckt A2, schließt den 500er-Incident
+     vom 2026-08-27 reproduzierbar)
+2. **Lokal commit `00dfaef` auf `main`, kein Push.** Branch steht 46 commits vor
+   `origin/main` (war 45 vor diesem Commit) — `git push` ist bewusst nicht ausgeführt,
+   der Nikinger pusht nach dem Deploy selbst. Hard Rule 8 (Doc-Update im selben Commit)
+   trifft hier nicht zu — Doc und Code gehören zu verschiedenen Commits (Hard Rule 8
+   bezieht sich auf Step-Abschluss-Commits, der Update-Log-Eintrag ist eine Deploy-
+   Voraussetzung, kein Schritt-Abschluss).
+3. **Modul-Status-Tabelle angepasst:** A1 + A2 von „🟡 gebaut, Live-Deploy +
+   Nikinger-Sichtprüfung ausstehend" auf „🟡 gebaut, Update-Log-Commit ✅, Live-Deploy
+   wartet auf Nikinger-Sudo, danach Nikinger-Sichtprüfung".
+4. **Deploy.sh-Kommando für den Nikinger vorbereitet** (siehe unten).
 
-**Nächster Schritt, konkret:** A3 P7-4-Zweitprobe (P8-C) — der UX-Befund aus Phase 7
-(Claude nennt Menschen IDs statt Titeln), eine organische Probe **vor** der
-`_TITLE_NOT_ID_HINT`-Beschreibungsschärfung, dann falls die Prosa-Anweisung allein nicht
-reicht der Text-Edit in `mcpserver/tools.py` (Tabu-Linie §0.4 erlaubt reine
-Beschreibungstext-Strings in `tools.py`, Präzedenz P7-T). Block A damit vollständig — drei
-Commits (`a381a96` A1-Client + Smoke + N=14, dieser Commit A2, A3 folgt). Danach Block B
-(Link-Fundament, achte P1-Contract-Öffnung — neuer Absatz in
-`phase1_storage/CLAUDE.md` §„Geerbte Contracts" beim Öffnungs-Commit, hier nur als Vormerkung
-genannt).
+**Deploy-Kommando, vollständig und kopierbereit** (einzeilig, Env-Variablen vorne):
+```bash
+SHAREFYX_RELEASES_DIR=/opt/sharefyx/releases \
+SHAREFYX_CURRENT_LINK=/opt/sharefyx/current \
+SHAREFYX_SOURCE_REPO=/home/savefyx/dev/savefxy \
+SHAREFYX_SERVICE=sharefyx-mcp \
+SHAREFYX_SYSTEMCTL="sudo systemctl" \
+SHAREFYX_DATA_ROOT=/home/savefyx/savefyx-data \
+SHAREFYX_BACKUP_DIR=/var/lib/sharefyx-backup \
+bash phase5_ui/scripts/deploy.sh main
+```
+Pfade aus `phase3_edge/local.env` (`DATA_ROOT`) und `phase3_edge/systemd/sharefyx-backup.service`
+(`SHAREFYX_BACKUP_DIR`). `SHAREFYX_PORT`/`SHAREFYX_HEALTH_TIMEOUT`/`SHAREFYX_KEEP_RELEASES`
+nicht gesetzt — Defaults aus `deploy.sh` (8765/30/5) sind die in P5/Phase 8 unverändert
+geltenden Werte. Skript gibt am Ende genau eine JSON-Zeile aus (`{"action":"deploy",
+"result":"ok",...}` bei Erfolg, automatisches Rollback + `*.failed`-Mark bei Gate-Fail).
+
+**Verifiziert:** `grep -m1 -E '^## [0-9]{4}-[0-9]{2}-[0-9]{2}$' docs/UPDATE_LOG.md`
+→ `## 2026-08-31` (Gate grün); `git log --oneline -1` → `00dfaef phase8: Update-Log-Eintrag
+2026-08-31 fuer A1+A2`; `git status` clean. **Keine** Live-Aktion meinerseits — keine
+git clone, keine venv, kein pytest, kein Symlink, kein Service-Neustart. `pytest -q` wurde
+nicht erneut gefahren: die letzte Messung A2 (`913 passed`) ist zwei Commits alt, dieser
+Sitzungs-Commit berührt keinen Python-Code, der Stand kann nicht rot geworden sein.
+
+**Was der Nikinger nach dem Deploy live prüft (zwei Sichtprüfpunkte, beide aus dem
+Phase-8-Plan §8):**
+- **A1 (Reauth-Grant, P7-24):** Mehrfachauswahl (Strg+Klick) zweier Items in einen
+  fremden, schreib-erweiternden Space verschieben — ein einziger Dialog
+  „2 von 2 benötigen Passwort und Code", **ein** TOTP-Code deckt beide ab, danach
+  ist der Code verbraucht (Toast/MCP-Server-Log bestätigen „PATCH 200" für beide
+  Items).
+- **A2 (Auto-Reindex):** am einfachsten der Vorfall vom 2026-08-27 reproduziert —
+  einen Space (nicht den Home-Space) mit einem Item über die UI entfernen (oder
+  `spacectl.py remove-space … --force`), danach `GET /api/v1/overview` gegen den
+  realen Dienst (curl/Cookie-Login) → **200**, kein 500. Optional zusätzlich: das
+  entfernte Space taucht nicht mehr in `list_spaces()` auf, das Item nicht mehr in
+  globalem `search()` ohne `space=`-Filter.
+
+**Hard-Rule-Konformität:** Hard Rule 1 (keine Geheimnisse) — diese Sitzung berührt
+keine Tokens, keine TOTP-Seeds, keine Credentials. Hard Rule 7 (stderr/stdout) —
+kein Skript-Lauf, kein Live-Eingriff. Hard Rule 8 — Update-Log ist die einzige
+Doc-Änderung; Modul-Tabelle und dieser Session-Block sind im selben Working-Tree,
+gehen aber als zwei separate Commits raus (einer von mir, einer vom Nikinger nach
+dem Deploy — bewusst kein Squash, weil dieser Block den tatsächlichen Deploy-Verlauf
+dokumentieren soll und nicht den Vorbereitungs-Stand vor dem `00dfaef`-Commit).
+
+**Nächster Schritt, konkret:** nach erfolgreichem Deploy + Nikinger-Sichtprüfung
+**A3 P7-4-Zweitprobe** (P8-C) — organische Probe, danach ggf. `_TITLE_NOT_ID_HINT`-
+Beschreibungsschärfung in `mcpserver/tools.py` (Tabu-Ausnahme §0.4 erlaubt das,
+Präzedenz P7-T). Block A dann vollständig ✅. Danach Block B (Link-Fundament, achte
+P1-Contract-Öffnung — `phase1_storage/CLAUDE.md` §„Geerbte Contracts" wird im
+Öffnungs-Commit ergänzt).
