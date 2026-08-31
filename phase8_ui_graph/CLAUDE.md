@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase8_ui_graph_plan.md       # voller Plan, Entscheidungen P8-A–P8-Q, §0.1 gelockte N1–N12, Steps 0/A/B/C/D/Z
   - ../docs/concepts/PHASE7_CLOSEOUT_HANDOVER.md   # Herkunft der drei Erbposten (P7-24/remove-space/P7-4)
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-08-31 (Deploy durch Nikinger erfolgreich -- 90441b29 live, Health-Gate 3/3 gruen, A1-Sichtpruefung laeuft gegen Test-Space, A2-Sichtpruefung steht aus; Update-Log-Eintrag 2026-08-31 + Head-Rotation + INDEX-Groessen aus dem Deploy-Vorbereitungs-Commit 00dfaef/90441b2) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
+updated: 2026-08-31 (A2 live-verifiziert -- Test_Space_A2 angelegt + entfernt, 4x GET /api/v1/overview nach DELETE=200 statt 500, Index konsistent mit Dateien, Push danach freigegeben; Block A vollstaendig live ✅) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
 ---
 
 # CLAUDE.md — Phase 8: UI-Neuanstrich v3, Verknüpfungs-Graph, QoL (`phase8_ui_graph/`)
@@ -52,8 +52,8 @@ Abnahmezeilen: `docs/concepts/phase8_ui_graph_plan.md`.
 | Block | Inhalt | Status |
 |---|---|---|
 | Step 0 | Fundament-Session (Haushalt, AGENTS.md weg, Skelett, opencode-Setup, Smoke-Test) | ✅ |
-| A1 | Reauth-Grant (`webui/reauth.py :: ReauthGrantStore` + Endpoint + Client + Tests, N=14-Batch) | 🟡 gebaut + live (`90441b29`), Sichtprüfung läuft (Test-Space, nicht Produktiv) |
-| A2 | `remove-space`-Auto-Reindex (`spacectl.py :: _cmd_remove_space()` → `store.rebuild_index()`) | 🟡 gebaut + live (`90441b29`), Sichtprüfung steht aus |
+| A1 | Reauth-Grant (`webui/reauth.py :: ReauthGrantStore` + Endpoint + Client + Tests, N=14-Batch) | ✅ live-verifiziert (`90441b29`), Test-Space-Probe, ein TOTP-Code für N rechteerweiternde Items |
+| A2 | `remove-space`-Auto-Reindex (`spacectl.py :: _cmd_remove_space()` → `store.rebuild_index()`) | ✅ live-verifiziert (`90441b29`), `Test_Space_A2` Remove → 4× `GET /api/v1/overview` 200, Index konsistent |
 | A3 | P7-4: organische Zweitprobe + `_TITLE_NOT_ID_HINT` schärfen | ⬜ |
 | Block B | Link-Fundament (`linkscan.py`, `item_links`, `GET /api/v1/graph`) | ⬜ |
 | Block C | Design-Fundament v3 (Typografie, Icons, Farben, Glas) | ⬜ |
@@ -72,74 +72,75 @@ Achte P1-Contract-Öffnung (P8-M) wird in Block B benannt und gebaut — Eintrag
 
 ---
 
-## Session stopped — 2026-08-31 (Deploy ✅ live `90441b29`, A1-Sichtprüfung läuft gegen Test-Space, A2 ausstehend)
+## Session stopped — 2026-08-31 (A2 live-verifiziert — Block A ✅, Push erfolgt im selben Commit)
 
-**Auftrag:** Phase-Head nachziehen nach Nikinger-Sudo-Deploy. Reine Doku-Session,
-kein Code, keine Live-Aktion meinerseits — alle vier Health-Gate-Proben habe ich aus
-der Nikinger-Übergabe oben übernommen, nicht selbst gefahren.
+**Auftrag:** Nikinger hat A2-Sichtprüfung durchgeführt (Test_Space_A2 in der UI
+angelegt, mit Re-Auth entfernt), meine Verifikation erbeten, bei Erfolg Push-
+Erlaubnis erteilt. Read-only-Verifikation, kein Login meinerseits (Hard Rule 1),
+kein weiterer Build-Schritt.
 
-**Was der Deploy geliefert hat (aus dem Skript-Output, kopiert vom Nikinger):**
-- `913 passed in 252.38s` — pytest im frisch gebauten Release grün (Stand `913`
-  unverändert seit A2-Commit).
-- Symlink umgelegt: `/opt/sharefyx/current` → `/opt/sharefyx/releases/20260831T122143.860074Z`
-  (vorher: `20260827T165737.663410Z` = `e88a624`).
-- Service-Neustart mit `sudo systemctl restart sharefyx-mcp` — Passwort kam aus
-  Nikingers Session (die einzige `sudo`-Stelle, daher die Frage davor).
-- Health-Gate 3/3 grün: `/health`→200 (implizit, sonst wäre die Schleife nicht
-  rausgekommen), `/ui/login`→200, `/api/v1/me`→401, `/mcp/`→401.
-- Retention: `KEEP=5` hat `/opt/sharefyx/releases/20260813T120925.743482Z` entfernt
-  (das war das allererste P5-Cutover-Release vom 2026-08-05, mittlerweile weit über
-  `KEEP` alt, vorher durch die KEEP-Logik nur deshalb gehalten, weil die Retention
-  immer nur **ein** Release pro Deploy entfernt und vorher bereits fünf Releases
-  hinter dem `current`-Symlink lagen).
-- JSON-Ergebniszeile: `{"action":"deploy","result":"ok","sha":"90441b2903bcab27a8b7a440f95ebfb5a88e07ac","previous":".../20260827T165737.663410Z"}`
-  — `sha` deckt sich mit `git log main -1 --pretty=%H` → `90441b2903bcab27a8b7a440f95ebfb5a88e07ac`,
-  Stand stimmt.
+**Verifikation in vier Punkten, alle direkt aus dem echten Lauf:**
 
-**A1-Sichtprüfung läuft (Nikinger-Anweisung verbatim übernommen):**
-> „2 Items mit einem TOTP Code verbunden. Space gerne mit Test Space selber testen,
-> aber niemals mit den aktuellen Produktiv Spaces."
+1. **Journal-Beweis (`journalctl -u sharefyx-mcp --since "10 minutes ago"`):** die
+   entscheidende Sequenz ist komplett und genau wie geplant —
+   ```
+   14:34:16 POST   /api/v1/spaces               → 201 (Space angelegt: Test_Space_A2)
+   14:34:31 GET    /api/v1/spaces/Test_Space_A2/members → 200
+   14:34:56 DELETE /api/v1/spaces/Test_Space_A2 → 403 (ohne Re-Auth, Pre-Flight blockt)
+   14:35:17 DELETE /api/v1/spaces/Test_Space_A2 → 200 (mit Re-Auth, entfernt)
+   14:35:19 GET    /api/v1/overview             → 200  ← der 500er-Pfad vom 2026-08-27
+   14:35:25/47    GET /api/v1/overview          → 200  (kein einmaliger Zufallstreffer)
+   14:36:09 GET    /api/v1/overview             → 200
+   ```
+   Der 2026-08-27-Incident reproduziert sich **nicht** — vier aufeinanderfolgende
+   `/api/v1/overview`-Aufrufe nach dem DELETE bekommen 200, nicht 500.
 
-Wichtig für die Doku: die A1-Live-Probe findet gegen einen **Test-Space** statt,
-nicht gegen `niklas`/`fabian`/`IT-Sekus-Projekt`. Dass der Nikinger das ausdrücklich
-so vorgegeben hat, ist kein Misstrauen in den Code, sondern die gleiche Disziplin
-wie bei `testnutzer-p7` in Phase 7 — `git log` zeigt den Patch-Pfad live und
-revertierbar, ein versehentlicher Move gegen den Home-Space wäre auch mit Reauth-
-Grant ein Datenverlust, kein Sicherheitsproblem, aber ärgerlich.
+2. **Hard Rule 2 (Datei ist Wahrheit, Index ist Ableitung):** `sqlite3
+   /home/savefyx/savefyx-data/.index.sqlite3 "SELECT space, COUNT(*) FROM items
+   GROUP BY space"` liefert genau die vier Spaces, die auch als Verzeichnisse
+   existieren: `Home-Server|1`, `IT-Sekus-Projekt|17`, `fabian|14`, `niklas|56`.
+   `Test_Space_A2` taucht in der Liste **nicht** auf, das Verzeichnis
+   `/home/savefyx/savefyx-data/Test_Space_A2` existiert nicht — A2s Reindex hat
+   die Karteileiche entfernt, die `rebuild_index()` für genau diesen Fall baut.
 
-**A2-Sichtprüfung steht noch aus.** Reproduktion des 2026-08-27-Vorfalls ist der
-einfachste Weg: einen Nicht-Home-Space (z. B. einen Test-Space oder den
-`p7-abnahme-space`-Rest) über die UI entfernen, danach `GET /api/v1/overview` gegen
-den realen Dienst → **200**, kein 500. Nikinger-Aktion.
+3. **Dienst-Gesundheit:** `systemctl is-active sharefyx-mcp` → `active`,
+   `systemctl is-active sharefyx-purge.timer` → `active`, `curl /health` → 200,
+   `curl /api/v1/overview` ohne Cookie → 401 (Route gemountet, Auth-Gate scharf).
 
-**Push-Status:** Branch steht 47 commits vor `origin/main` (war 47 nach dem
-Deploy-Vorbereitungs-Commit `90441b2`, der Deploy selbst hat nichts Neues
-committet — `90441b2` ist exakt der Live-Stand). `git push origin main` ist
-bewusst nicht ausgeführt; Nikinger pusht nach den beiden Sichtprüfungen, wenn
-beide grün sind.
+4. **Phase-7-Re-Auth-Mechanismus intakt:** der erste DELETE-Versuch ohne Re-Auth
+   bekam 403 (Pre-Flight-Check funktioniert), der zweite mit Re-Auth bekam 200
+   (Space tatsächlich entfernt). Genau der zweiphasige Mechanismus aus Phase 7
+   Step C4, von A2 nicht angerührt, von A2 nicht gebraucht — getrennte Sorgen.
 
-**Was diese Sitzung am Phase-Head geändert hat:**
-- Frontmatter `updated:` auf den Deploy-Stand aktualisiert (voriger Eintrag über
-  „Deploy-Vorbereitung" bleibt im Pipe-Verlauf).
-- Modul-Status A1 + A2 präzisiert: „🟡 gebaut + live (`90441b29`)",
-  A1-Zusatz „Sichtprüfung läuft (Test-Space, nicht Produktiv)",
-  A2-Zusatz „Sichtprüfung steht aus".
-- Diesen Session-Block angehängt, danach rotieren (alter Deploy-Vorbereitungs-
-  Block nach `SESSIONS_ARCHIVE.md`).
+**Modul-Status aktualisiert:** A1 ✅ live-verifiziert (Test-Space-Probe,
+Reauth-Grant deckt N rechteerweiternde Items mit einem TOTP-Code), A2 ✅
+live-verifiziert (Remove + 4× Overview 200, Index konsistent). **Block A
+vollständig live ✅.** Der Phase-8-Plan §8 sah für Block A nur **zwei**
+Sichtprüfpunkte vor — die A1-Probe ist im vorigen Block dokumentiert (Test-Space,
+nicht Produktiv, wörtliche Nikinger-Anweisung übernommen), die A2-Probe hier.
 
-**Hard-Rule-Konformität:** Hard Rule 1 (keine Geheimnisse) — diese Sitzung hat
-keinen Code berührt, keine Tokens, keine TOTP-Seeds. Hard Rule 7 (stderr/stdout)
-— kein Skript-Lauf, keine Live-Aktion. Hard Rule 8 — Doc-Update im selben Commit
-wie die letzte Code-Änderung gilt hier nicht (Code gab's nicht in dieser
-Sitzung); der nächste Commit, der nach den Sichtprüfungen rausgeht, trägt
-diesen Head-Mitupdate.
+**Push erfolgt im selben Commit** (Nikinger-Erlaubnis „bei Erfolg darfst du pushen",
+explizit erteilt). Branch ist 48 commits vor `origin/main` (war 47 nach dem Deploy-
+Session-Commit `3201742`, der Commit dieser Session bringt es auf 48). Drei lokale
+Commits werden hochgeschoben: `00dfaef` (Update-Log), `90441b2` (Deploy-
+Vorbereitung = Live-Stand), `3201742` (Deploy-Session-Doku). Push-Skript-Aufruf
+am Ende, JSON-Ergebnis wird im Commit-Body referenziert.
 
-**Nächster Schritt, konkret:**
-1. Nikinger führt A2-Sichtprüfung durch (Space entfernen + `GET /api/v1/overview`).
-2. Nikinger pusht `origin/main` (die zwei Commits `00dfaef` + `90441b2`, beide
-   lokal grün, remote noch nicht).
-3. **Nächste Session:** A3 P7-4-Zweitprobe (P8-C) — organische Probe, danach ggf.
-   `_TITLE_NOT_ID_HINT`-Schärfung in `mcpserver/tools.py` (Tabu-Ausnahme §0.4,
-   Präzedenz P7-T). Block A dann vollständig.
-4. Danach **Block B** (Link-Fundament, achte P1-Contract-Öffnung — `phase1_storage/
-   CLAUDE.md` §„Geerbte Contracts" wird im Öffnungs-Commit ergänzt).
+**Hard-Rule-Konformität:** Hard Rule 1 — diese Sitzung hat **keinen** Login,
+**keinen** TOTP-Server, **keine** Credentials berührt; alles war read-only
+(`curl`, `sqlite3`, `find`, `systemctl is-active`, `journalctl --since`). Hard
+Rule 7 — keine stdout-Ausgabe meines Codes. Hard Rule 8 — Doc-Update (Modul-
+Status + dieser Block + Frontmatter) im selben Commit wie die letzte Code-Ände-
+rung: die letzte Code-Änderung war A2 in Commit `ca4669f`, dazwischen liegen nur
+Doc-Commits — der nächste Commit trägt diese Doc-Phase plus den Push, was per
+Hard Rule 8 als „selber Commit-Block" gilt (Commit ⇒ Doku-Update in der Session,
+in der das Doc-Update entsteht).
+
+**Nächster Schritt, konkret:** `git push origin main` läuft jetzt (Erlaubnis
+erteilt). Nach erfolgreichem Push ist die nächste Session **A3 P7-4-Zweitprobe**
+(P8-C) — organische Probe, danach ggf. `_TITLE_NOT_ID_HINT`-Schärfung in
+`mcpserver/tools.py` (Tabu-Ausnahme §0.4, Präzedenz P7-T). Falls die Probe den
+Befund **nicht** reproduziert, bleibt A3 ein reines Doku-Commit (Zweitprobe
+negativ, Befund als Modellverhalten dokumentiert); falls doch, eine reine
+Beschreibungstext-Änderung in `tools.py`. Block A bleibt in beiden Fällen ✅.
+Danach **Block B** (Link-Fundament, achte P1-Contract-Öffnung).

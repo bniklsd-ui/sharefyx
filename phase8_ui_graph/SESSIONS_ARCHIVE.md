@@ -4,13 +4,87 @@ purpose: Archiv älterer Session-Blöcke aus phase8_ui_graph/CLAUDE.md — newes
 read-when: nur wenn der aktuelle Session-Block im Phase-Head nicht reicht und Verlauf gebraucht wird
 detail: L3
 up: CLAUDE.md
-updated: 2026-08-31 (vierte Rotation: vier Blöcke im Archiv -- 2026-08-28 A1-Backend, 2026-08-31 A1-Client+Smoke+N=14, 2026-08-31 A2-Reindex, 2026-08-31 Deploy-Vorbereitung; Head-Block jetzt Deploy-✅-live-90441b29 mit A1-Sichtprüfung-gegen-Test-Space, A2 ausstehend)
+updated: 2026-08-31 (fünfte Rotation: fünf Blöcke im Archiv -- 2026-08-28 A1-Backend, 2026-08-31 A1-Client+Smoke+N=14, 2026-08-31 A2-Reindex, 2026-08-31 Deploy-Vorbereitung, 2026-08-31 Deploy-Session; Head-Block jetzt A2-live-verifiziert-Block-A-✅ mit Push-Erlaubnis)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8
 
 Noch leer — der Phase-Head trägt bisher genau einen (aktuellen) Session-Block. Der erste Eintrag
 hier entsteht bei der ersten Rotation (`scripts/rotate_session_block.sh phase8_ui_graph`).
+
+## Session stopped — 2026-08-31 (Deploy ✅ live `90441b29`, A1-Sichtprüfung läuft gegen Test-Space, A2 ausstehend)
+
+**Auftrag:** Phase-Head nachziehen nach Nikinger-Sudo-Deploy. Reine Doku-Session,
+kein Code, keine Live-Aktion meinerseits — alle vier Health-Gate-Proben habe ich aus
+der Nikinger-Übergabe oben übernommen, nicht selbst gefahren.
+
+**Was der Deploy geliefert hat (aus dem Skript-Output, kopiert vom Nikinger):**
+- `913 passed in 252.38s` — pytest im frisch gebauten Release grün (Stand `913`
+  unverändert seit A2-Commit).
+- Symlink umgelegt: `/opt/sharefyx/current` → `/opt/sharefyx/releases/20260831T122143.860074Z`
+  (vorher: `20260827T165737.663410Z` = `e88a624`).
+- Service-Neustart mit `sudo systemctl restart sharefyx-mcp` — Passwort kam aus
+  Nikingers Session (die einzige `sudo`-Stelle, daher die Frage davor).
+- Health-Gate 3/3 grün: `/health`→200 (implizit, sonst wäre die Schleife nicht
+  rausgekommen), `/ui/login`→200, `/api/v1/me`→401, `/mcp/`→401.
+- Retention: `KEEP=5` hat `/opt/sharefyx/releases/20260813T120925.743482Z` entfernt
+  (das war das allererste P5-Cutover-Release vom 2026-08-05, mittlerweile weit über
+  `KEEP` alt, vorher durch die KEEP-Logik nur deshalb gehalten, weil die Retention
+  immer nur **ein** Release pro Deploy entfernt und vorher bereits fünf Releases
+  hinter dem `current`-Symlink lagen).
+- JSON-Ergebniszeile: `{"action":"deploy","result":"ok","sha":"90441b2903bcab27a8b7a440f95ebfb5a88e07ac","previous":".../20260827T165737.663410Z"}`
+  — `sha` deckt sich mit `git log main -1 --pretty=%H` → `90441b2903bcab27a8b7a440f95ebfb5a88e07ac`,
+  Stand stimmt.
+
+**A1-Sichtprüfung läuft (Nikinger-Anweisung verbatim übernommen):**
+> „2 Items mit einem TOTP Code verbunden. Space gerne mit Test Space selber testen,
+> aber niemals mit den aktuellen Produktiv Spaces."
+
+Wichtig für die Doku: die A1-Live-Probe findet gegen einen **Test-Space** statt,
+nicht gegen `niklas`/`fabian`/`IT-Sekus-Projekt`. Dass der Nikinger das ausdrücklich
+so vorgegeben hat, ist kein Misstrauen in den Code, sondern die gleiche Disziplin
+wie bei `testnutzer-p7` in Phase 7 — `git log` zeigt den Patch-Pfad live und
+revertierbar, ein versehentlicher Move gegen den Home-Space wäre auch mit Reauth-
+Grant ein Datenverlust, kein Sicherheitsproblem, aber ärgerlich.
+
+**A2-Sichtprüfung steht noch aus.** Reproduktion des 2026-08-27-Vorfalls ist der
+einfachste Weg: einen Nicht-Home-Space (z. B. einen Test-Space oder den
+`p7-abnahme-space`-Rest) über die UI entfernen, danach `GET /api/v1/overview` gegen
+den realen Dienst → **200**, kein 500. Nikinger-Aktion.
+
+**Push-Status:** Branch steht 47 commits vor `origin/main` (war 47 nach dem
+Deploy-Vorbereitungs-Commit `90441b2`, der Deploy selbst hat nichts Neues
+committet — `90441b2` ist exakt der Live-Stand). `git push origin main` ist
+bewusst nicht ausgeführt; Nikinger pusht nach den beiden Sichtprüfungen, wenn
+beide grün sind.
+
+**Was diese Sitzung am Phase-Head geändert hat:**
+- Frontmatter `updated:` auf den Deploy-Stand aktualisiert (voriger Eintrag über
+  „Deploy-Vorbereitung" bleibt im Pipe-Verlauf).
+- Modul-Status A1 + A2 präzisiert: „🟡 gebaut + live (`90441b29`)",
+  A1-Zusatz „Sichtprüfung läuft (Test-Space, nicht Produktiv)",
+  A2-Zusatz „Sichtprüfung steht aus".
+- Diesen Session-Block angehängt, danach rotieren (alter Deploy-Vorbereitungs-
+  Block nach `SESSIONS_ARCHIVE.md`).
+
+**Hard-Rule-Konformität:** Hard Rule 1 (keine Geheimnisse) — diese Sitzung hat
+keinen Code berührt, keine Tokens, keine TOTP-Seeds. Hard Rule 7 (stderr/stdout)
+— kein Skript-Lauf, keine Live-Aktion. Hard Rule 8 — Doc-Update im selben Commit
+wie die letzte Code-Änderung gilt hier nicht (Code gab's nicht in dieser
+Sitzung); der nächste Commit, der nach den Sichtprüfungen rausgeht, trägt
+diesen Head-Mitupdate.
+
+**Nächster Schritt, konkret:**
+1. Nikinger führt A2-Sichtprüfung durch (Space entfernen + `GET /api/v1/overview`).
+2. Nikinger pusht `origin/main` (die zwei Commits `00dfaef` + `90441b2`, beide
+   lokal grün, remote noch nicht).
+3. **Nächste Session:** A3 P7-4-Zweitprobe (P8-C) — organische Probe, danach ggf.
+   `_TITLE_NOT_ID_HINT`-Schärfung in `mcpserver/tools.py` (Tabu-Ausnahme §0.4,
+   Präzedenz P7-T). Block A dann vollständig.
+4. Danach **Block B** (Link-Fundament, achte P1-Contract-Öffnung — `phase1_storage/
+   CLAUDE.md` §„Geerbte Contracts" wird im Öffnungs-Commit ergänzt).
+
+---
 
 ## Session stopped — 2026-08-31 (Deploy-Vorbereitung A1+A2 — Update-Log ✅, Sudo wartet auf Nikinger)
 
