@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase8_ui_graph_plan.md       # voller Plan, Entscheidungen P8-A–P8-Q, §0.1 gelockte N1–N12, Steps 0/A/B/C/D/Z
   - ../docs/concepts/PHASE7_CLOSEOUT_HANDOVER.md   # Herkunft der drei Erbposten (P7-24/remove-space/P7-4)
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-08-31 (A2 live-verifiziert -- Test_Space_A2 angelegt + entfernt, 4x GET /api/v1/overview nach DELETE=200 statt 500, Index konsistent mit Dateien, Push danach freigegeben; Block A vollstaendig live ✅) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
+updated: 2026-08-31 (A2 live-verifiziert -- Test_Space_A2 angelegt + entfernt, 4x GET /api/v1/overview nach DELETE=200 statt 500, Index konsistent mit Dateien, Push danach freigegeben; Block A vollstaendig live ✅) | 2026-08-31 (Nachtrag: Janick live angemeldet -- dritter biologischer Nutzer, Phase-4-Auth-Architektur erstmals mit externem Dritt-Anwender durchgespielt; Connector-UI-Befund: 'Anmeldung fehlgeschlagen' trotz erfolgreicher OAuth-Verbindung, kein Handlungsbedarf, Vormerkung fuer spaeter) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
 ---
 
 # CLAUDE.md — Phase 8: UI-Neuanstrich v3, Verknüpfungs-Graph, QoL (`phase8_ui_graph/`)
@@ -144,3 +144,41 @@ Befund **nicht** reproduziert, bleibt A3 ein reines Doku-Commit (Zweitprobe
 negativ, Befund als Modellverhalten dokumentiert); falls doch, eine reine
 Beschreibungstext-Änderung in `tools.py`. Block A bleibt in beiden Fällen ✅.
 Danach **Block B** (Link-Fundament, achte P1-Contract-Öffnung).
+
+---
+
+**Nachtrag, selbe Session — zwei Live-Beobachtungen, kein Handlungsbedarf, nur
+festgehalten (Nikinger-Auftrag „notieren und committen"):**
+
+1. **Dritter biologischer Nutzer „Janick" hat sich live angemeldet.** Die
+   Phase-4-Auth-Architektur (OAuth 2.1 + DCR + PKCE + Argon2id + TOTP, gebaut
+   2026-07-30, 16/16 live verifiziert) ist damit erstmals mit einem **externen
+   dritten realen Anwender** durchgespielt — `testnutzer-p7` zählt nicht, das
+   war ein internes Testkonto mit bekanntem Seed (`phase7_spaces_admin/scripts/
+   testcred.py`). Bestätigung als Meilenstein: die Auth-Kette funktioniert ohne
+   SSH, ohne Editor, ohne dass der Nikinger dem Anwender über die Schulter
+   schauen muss — genau der Härtetest, für den Phase 4 die Pfad-Token abgelöst
+   hat (`docs/concepts/phase4_auth_plan.md` §0.1 „der eigentliche Härtetest
+   ist nicht der erste erfolgreiche Login, sondern der erste erfolgreiche
+   Fehlschlag"). Drei reale Konten parallel ist auch betrieblich ein
+   Sprung — vorher liefen zwei (niklas, fabian), jetzt drei.
+
+2. **Connector-Erfolgsanzeige zeigt „Anmeldung fehlgeschlagen" trotz
+   erfolgreicher OAuth-Verbindung.** Vermutliche Ursache: der Anmelde-Dialog
+   wertet eine Bedingung als Fehler, die technisch kein Fehler ist (z. B. ein
+   4xx-Response, der zu einem Redirect gehört, oder ein
+   `state`-Mismatch-Check, der nach erfolgreichem Consent einen erwarteten
+   Schritt als „missing" wertet). Die OAuth-Verbindung selbst kommt sauber
+   zustande, der Connector funktioniert — der Fehlertext ist eine reine UI-
+   Falschmeldung. **Kein Handlungsbedarf**, Nikinger hat das ausdrücklich so
+   vermerkt. Vormerkung für eine spätere Phase (nicht Phase 8 — Block B/C/D
+   sind nicht betroffen; eher ein zukünftiger UI-Pass nach Abschluss von
+   Phase 8). Genauer Aufschlag: die Connector-UI liegt in `phase5_ui/webui/
+   pages.py` (OAuth-Consent-Seite) bzw. der Folge-Handler in
+   `phase5_ui/webui/routes_auth.py` — bei nächster Gelegenheit gegen den
+   Code lesen, welcher Pfad den Text tatsächlich erzeugt, und ob er an einer
+   Bedingung hängt, die im Erfolgsfall fälschlich als Fehler gewertet wird.
+
+Beide Notizen sind reine Doku, kein Code, keine Live-Aktion meinerseits.
+Commit lokal, kein Push — die zwei Vormerkungen reisen mit dem nächsten
+Push mit, der ohnehin ansteht (Nikinger entscheidet, wann).
