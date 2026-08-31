@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase8_ui_graph_plan.md       # voller Plan, Entscheidungen P8-A–P8-Q, §0.1 gelockte N1–N12, Steps 0/A/B/C/D/Z
   - ../docs/concepts/PHASE7_CLOSEOUT_HANDOVER.md   # Herkunft der drei Erbposten (P7-24/remove-space/P7-4)
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
+updated: 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
 ---
 
 # CLAUDE.md — Phase 8: UI-Neuanstrich v3, Verknüpfungs-Graph, QoL (`phase8_ui_graph/`)
@@ -53,7 +53,7 @@ Abnahmezeilen: `docs/concepts/phase8_ui_graph_plan.md`.
 |---|---|---|
 | Step 0 | Fundament-Session (Haushalt, AGENTS.md weg, Skelett, opencode-Setup, Smoke-Test) | ✅ |
 | A1 | Reauth-Grant (`webui/reauth.py :: ReauthGrantStore` + Endpoint + Client + Tests, N=14-Batch) | 🟡 gebaut, Live-Deploy + Nikinger-Sichtprüfung ausstehend |
-| A2 | `remove-space`-Auto-Reindex (`spacectl.py :: _cmd_remove_space()` → `store.rebuild_index()`) | ⬜ |
+| A2 | `remove-space`-Auto-Reindex (`spacectl.py :: _cmd_remove_space()` → `store.rebuild_index()`) | 🟡 gebaut, Live-Deploy + Nikinger-Sichtprüfung ausstehend |
 | A3 | P7-4: organische Zweitprobe + `_TITLE_NOT_ID_HINT` schärfen | ⬜ |
 | Block B | Link-Fundament (`linkscan.py`, `item_links`, `GET /api/v1/graph`) | ⬜ |
 | Block C | Design-Fundament v3 (Typografie, Icons, Farben, Glas) | ⬜ |
@@ -72,113 +72,69 @@ Achte P1-Contract-Öffnung (P8-M) wird in Block B benannt und gebaut — Eintrag
 
 ---
 
-## Session stopped — 2026-08-31 (A1 Reauth-Grant Client gebaut, N=14 Batch-Test, Smoke gegen Wegwerf bestanden — Live-Verifikation ausstehend)
+## Session stopped — 2026-08-31 (A2 `remove-space`-Auto-Reindex gebaut, 913 grün, Live-Verifikation ausstehend)
 
-**Auftrag:** A1-Commit 2 — die JS-Seite von P8-A. Code lag seit der vorherigen Session bereits
-in der Working Tree (uncommitted, vermutlich Claude-Code-Wechsel ohne `git commit` dazwischen);
-diese Session hat den Commit vollendet: Test #3 von N=3 auf N=14 gezogen, Browser-Smoke gegen
-eine Wegwerf-Instanz gefahren, Phase-Head nachgezogen.
+**Auftrag:** A2-Commit 3 (Block A letzter Erbpost, P8-B) — atomar in derselben Sitzung wie
+A1, danach Session zuende. V82-Anker gegen die aktuelle Code-Basis verifiziert:
+`spacectl.py:194` (`acl.remove_space_dir(data_root, name)`), `storage/store.py:809`
+(`Store.rebuild_index() -> IndexStats`), `storage/index.py:187` (`rebuild_index(data_root,
+conn)`).
 
-**Anker vor jedem Edit neu verifiziert (V82 gegen die aktuelle Code-Basis):** `dialogs.js:550`
-(`runBatchMove` → `async`), `dialogs.js:540-549` (P8-A-Kommentarblock), `dialogs.js:561-581`
-(Grant-Round-2-Block), `list.js:240-246` (`Object.assign({version, folder}, credentials || {})`,
-bleibt unverändert — das Grant-Feld setzt sich automatisch korrekt).
+**Was gebaut wurde (Zweizeiler + Test, exakt Plan §A2):**
+- `phase6_shares/scripts/spacectl.py :: _cmd_remove_space()`: nach `acl.remove_space_dir(...)`
+  ein `stats = Store(data_root).rebuild_index()` und eine Statuszeile
+  (`Index neu aufgebaut: N Items in 0.044s.`) — die `Store`-Klasse war bereits importiert
+  (`_cmd_list_spaces` und `_cmd_show` benutzen sie seit P6 Step 6, gleiches Muster,
+  keine neue Import-Zeile nötig).
+- `phase6_shares/tests/test_spacectl.py :: test_remove_space_with_force_rebuilds_the_index_
+  so_no_stale_rows_remain`: legt zwei Spaces mit je einem Item an, baut den Index auf
+  (`Store(data_root, git=False).rebuild_index()`), beweist dass BEIDE Items im Suchlauf
+  auftauchen, ruft `remove-space --force` auf, beweist dass nur das Opfer-Item verschwunden
+  ist UND das Zeuge-Item erhalten bleibt (Reindex ist `data_root`-weit, kein Kollateralschaden),
+  UND dass das Opfer-Item auch im **globalen** `search()` ohne `space=`-Filter nicht mehr
+  auftaucht (Hard Rule 2: keine Karteileichen, jemals). Die Test-Datei wird direkt geschrieben
+  (kein `Store.create()`), weil das die schnellste Variante ist, einen indexierten Eintrag zu
+  erzeugen — der Test beweist den Mechanismus, nicht die Schreibpfade.
 
-**Was gebaut wurde:**
-- **`test_reauth_grant.py` #3 — N=14 statt N=3.** Funktion umbenannt
-  `test_three_widening_patches_with_one_grant_all_succeed` →
-  `test_fourteen_widening_patches_with_one_grant_all_succeed`, Docstring+Modul-Docstring
-  nachgezogen, expliziter Verweis auf den 2026-08-31-Live-Fall (N=14 entspricht dem
-  Rapid-Fire-Szenario, das die `LoginThrottle`-Sperre ausgelöst hat). Throttle-Counter-Invarianz
-  wird implizit mitbewiesen — der Throttle wird in `_reauth_post()` EINMAL pro Grant-Ausstellung
-  geprüft, die 14 PATCHes laufen über `require_share_reauth()`, das den Throttle gar nicht
-  anfasst.
-- **Plan-`§A1`-Edit (diese Session, vor dem Bau).** Per Nikinger-Auftrag („bitte die
-  bestätigte Beobachtung aus dem Live-Betrieb mitanhängen"): Datierter
-  „Live urgency, 2026-08-31"-Absatz nach der bestehenden Beschreibung, vor der Test-Liste;
-  Test #3 von 3 auf 14 rechteerweiternde PATCHes gehoben, plus Throttle-Counter-Aussage
-  (bleibt unverändert, weil der Grant-Pfad den Throttle gar nicht anfasst).
+**Begründung der Entscheidung „Reindex erzwingen statt nur warnen" gegen den Plan:** Plan
+§A2 sagt „Zweizeiler + Test, Warnhinweis-Variante verworfen (wird übersehen, reproduziert den
+500er-Incident vom 2026-08-27)". Beweis im Code-Kommentar dieselbe Begründung mit explizitem
+Hard-Rule-2-Bezug (Datei ist die Wahrheit, der Index muss jederzeit entsprechen — diese
+Operation entfernt eine Verzeichnisebene, „danach reindexen" ist keine optionale Optimierung,
+sondern Pflicht).
 
-**Smoke gegen Wegwerf-Instanz, eigenes `tmp`-`DATA_ROOT` + eigenes `auth.sqlite3` +
-`CREDENTIALS_DIRECTORY` (P8-26-Pattern):**
-1. **Provisionierung** (`/tmp/opencode/p8-smoke/provision_user.py`): `AuthStore.upsert_user` +
-   `confirm_totp` direkt in die Wegwerf-DB — derselbe Pfad wie
-   `phase5_ui/tests/conftest.py :: confirmed_users`. Spiegelbildlich zur Vermeidung der
-   Keyring-Verschmutzung (Hard Rule 1 — kein Test-Geheimnis in `nikinger-space`).
-   TOTP-Seed: `ZUUMAH5A37MRZZ3V3O45EEUFQKUNR5Z5`. Passwort Argon2id-gehasht.
-2. **DEK-Setup:** `SPACE_AUTH_DEK` existiert nicht als Env-Var (nur `CREDENTIALS_DIRECTORY` +
-   Keyring); das hat den ersten Smoke-Versuch gekillt — der Server fiel auf den realen
-   Keyring-DEK zurück, mein Test-User war mit dem Wegwerf-DEK `WlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlo`
-   versiegelt, TOTP-Unseal schlug fehl. Korrektur: `CREDENTIALS_DIRECTORY=/tmp/opencode/p8-smoke/creds`
-   mit `auth-dek`-Datei (base64-urlsafe, 600). Zweite Lektion dieser Session: `load_data_encryption_key()`
-   liest NUR aus diesen beiden Quellen — keine `SPACE_AUTH_DEK`-Env-Var (gleicher Befund, der
-   für eine künftige Konfigurationserweiterung vorgemerkt werden müsste, kein P8-Auftrag).
-3. **Server-Start:** Port `28765` (Step 0 hatte `18765` benutzt, frischer Port zur Kollisions-
-   Vermeidung), `SPACE_DATA_ROOT=/tmp/opencode/p8-smoke/data`, `SPACE_AUTH_DB` dorthin,
-   `SPACE_PUBLIC_BASE_URL=https://p8smoke.local`, `SPACE_ALLOWED_HOSTS=127.0.0.1,p8smoke.local`,
-   `SPACE_LOG_LEVEL=INFO` (anfangs `WARNING` — falsche Casing-Erwartung, `logging._checkLevel`
-   lehnt `warning` ab, korrigiert), `CREDENTIALS_DIRECTORY` wie oben. `uptime_s:0` nach 3
-   Half-Sekunden.
-4. **Login via Playwright MCP (Chromium):** Space + Passwort + TOTP eingegeben. **Zwei echte
-   Fehlschläge dokumentiert, nicht stillschweigend übergangen:**
-   - (a) **TOTP-Counter vs. Timestamp.** Erster `totp_at(secret, now)`-Aufruf lieferte 401
-     (kein Fehler im Server-Log außer HTTP-Status, weil `WARNING`/`INFO` zu wenig
-     Auth-Debugging zeigen). Direktanalyse: `totp_at(secret, now // 30)` — der zweite Parameter
-     ist der **Zähler**, nicht der Timestamp; das `verify()` rechnet intern `int(now // step_s)`,
-     ich hatte `now` direkt durchgereicht. `totp_at(secret, 1788175872)` vs. `verify(..., now=1788175872)`
-     (intern `current = 59605862`) — Counter-Drift von 59605862 zu 1788175872 = Faktor 30
-     Unterschied, also komplett andere HOTP-Stelle. Korrigiert: `totp_at(secret, int(time.time()) // 30)`.
-     Selbsterkenntnis, vor dem nächsten Versuch.
-   - (b) **Rate-Limit-Sperre** nach den fünf 401-Versuchen aus (a) — `authctl.py unlock --space
-     p8smoke` (Hard-Rule-1-konform, kein Secret im Aufruf) hat sie aufgehoben, danach
-     erfolgreicher Login mit `168439` als TOTP-Code. Seite landete auf `/ui/`, Update-Banner
-     sichtbar (`P7 Spaces verwalten`-Hinweis), Navigation+Rail gerendert, keine JS-Konsole-
-     Fehler außer dem üblichen 401 vom Vorversuch.
-5. **Tear-down:** Server-PID beendet, `rm -rf /tmp/opencode/p8-smoke`, **Live-Dienst
-   unverändert** (`pid 997`, `uptime_s:73001` — beide Proben vor und nach dem Wegwerf-Lauf
-   identisch, kein Server-Neustart durch den Smoke ausgelöst).
+**Verifiziert:** `pytest -q` → **913 passed** (912 alt + 1 neu). Tabu-Diff leer
+(`phase4_auth/`, `phase2_mcp/`, `webui/security.py`, benannte `storage/`-Dateien — `acl.py`
+**nicht** in der Tabu-Liste, der Reindex-Aufruf geht durch `store.rebuild_index()`, nicht durch
+einen direkten `acl`-Eingriff, kein Plan-Drift auf P7-Cs sechster Öffnung). Erster Lauf
+zeigte den **bekannten** `test_authctl.py :: test_revoke_kills_the_family`-Flake
+(`phase4_auth/CLAUDE.md` Zeile „Vormerkungen", seit 2026-08-20 vermerkt — `argparse:
+--family-id: expected one argument`, reihenfolgeabhängig, nicht von dieser Session
+verursacht); zweiter vollständiger Lauf 913/913 grün, kein Code-Touch in `phase4_auth/`.
+`ui_budget.py` nicht erneut gelaufen — keine UI-Änderung in diesem Commit, der vorige A1-Lauf
+(dialogs.js 9.5 KB) deckt das schon ab.
 
-**Was der Smoke bewiesen hat (vs. was er bewiesen hätte, wenn der Round-2-Pfad mit
-`widens()`-Auslöser leicht reproduzierbar wäre):**
-- ✅ Throwaway-Instanz startet, Login funktioniert end-to-end (Browser, TOTP, Cookie, Rail,
-  App-Layout).
-- ✅ `phase5_ui/webui/static/js/dialogs.js` (mit dem neuen `async runBatchMove`) wird vom
-  Server ausgeliefert (HTTP 200 im Access-Log, letzte Zeile der JS-Lade-Liste).
-- ✅ `/api/v1/reauth` ist im Server vorhanden (HTTP 401 mit Secure-Cookie-Quirk über
-  HTTP-Base-URL, NICHT 404 — der Endpunkt existiert; per `grep` auf den Code und über
-  `test_reauth_grant.py` ohnehin bewiesen).
+**Was der Test bewiesen hat (vs. was der Live-Vorfall bewies):**
+- ✅ `rebuild_index()` entfernt Zeilen gelöschter Spaces — keine Karteileichen im Index.
+- ✅ `rebuild_index()` fasst **nicht** andere Spaces an — keine Kollateralschäden.
+- ✅ Der Status-Print zeigt `items_indexed > 0` für die verbliebenen Spaces (Beweis im
+  Test-Output, nicht nur behauptet).
+- ❌ Live-Verifikation durch den Nikinger: ausstehend. Der echte
+  `testnutzer-p7`-Vorfall vom 2026-08-27 (Commit `e2c908a`) entstand genau durch das
+  Fehlen dieses Reindex — der Live-Lauf wird denselben `remove-space` durchspielen und
+  danach `GET /api/v1/overview` (das `search()`/`list_spaces()` aggregiert) gegen den
+  realen Dienst aufrufen, um die 200 statt 500 zu sehen. Nikinger-Aktion.
 
-**Was der Smoke NICHT bewiesen hat, bewusst:**
-- Eine echte Round-2-Auslösung im UI (seltene `widens()`-Pfade via Cross-Space-Move mit
-  gleichzeitiger `share_*`-Erweiterung — ein Konstrukt, das der Dialog selbst gar nicht
-  anbietet; `runBatchMove()` reagiert nur auf `reauth_required`-Antworten aus Round 1, die
-  im Standard-Move-Pfad nie feuern). Der Round-2-Pfad ist durch `test_fourteen_widening_
-  patches_with_one_grant_all_succeed` (8/8 in `test_reauth_grant.py` grün, einschließlich
-  Test 6 „derselbe rohe TOTP zweimal wird vom Anti-Replay abgelehnt") vollständig
-  bewiesen.
-- Eine tatsächliche 14-Item-Bewegung im UI — erfordert entweder einen geteilten Space mit
-  passendem `share_write`-Setup (in einer frischen Wegwerf-Instanz nicht trivial
-  aufzubauen) oder einen UI-Dialog-Roundtrip mit Multi-Select, der in Playwright manuell
-  getrieben werden müsste. Beides über die Nützlichkeit dieses Smokes hinaus; der
-  UI-Roundtrip wird beim Live-Deploy ohnehin gefahren.
+**Hard-Rule-1-Compliance:** keine Geheimnisse berührt (CLI-Operator-Werkzeug, schreibt nur
+`.share.yml`-Konfigurationen und Verzeichnisse, niemals Tokens oder TOTP-Seeds). Tabu-Diff
+leer. `git diff` auf `mcpserver/`, `webui/`, `authserver/` ebenfalls leer.
 
-**Verifiziert:** `pytest -q` → **912 passed** (904 alt + 8 aus `test_reauth_grant.py`,
-darunter der umbenannte `test_fourteen_widening_patches_with_one_grant_all_succeed` mit
-N=14). Tabu-Diff leer (`phase4_auth/`, `phase2_mcp/`, `phase5_ui/webui/security.py`,
-benannte `storage/`-Dateien — keine Zeile berührt). `ui_budget.py` 5/5 grün
-(`dialogs.js` 9.5 KB, +0.6 KB seit dem Backend-Commit — der `async`-Block ist klein).
-
-**Hard-Rule-1-Compliance des Smokes:** alle Geheimnisse (Passwort, TOTP-Seed, TOTP-Codes)
-lebten ausschließlich in Prozess-Speicher und `auth.sqlite3` der Wegwerf-Instanz. Der
-TOTP-Seed wurde einmalig in `/tmp/opencode/p8-smoke/provision.out` geschrieben (Hard Rule 7
-verlangt stdout-Lesbarkeit, der Seed kommt nun mal aus `provision_user.py`); die Datei ist
-mit dem gesamten Smoke-Verzeichnis nach dem Lauf gelöscht (`rm -rf`), kein Eintrag im
-Keyring, keine Zeile in einem Repo-File.
-
-**Nächster Schritt, konkret:** A2 `remove-space`-Auto-Reindex (P8-B, zweiter Erbpost aus
-PHASE7_CLOSEOUT_H_H.md §4.2) — der Live-Incident vom 2026-08-27 (`GET /api/v1/overview` →
-500 nach `testnutzer-p7`-Entfernung) rangiert bewusst vor dem UX-Befund P7-4 als
-zweites A-Thema. Plan: `phase8_ui_graph_plan.md` §A2 (Zweizeiler + Test, Warn
--Variante
-bewusst verworfen). Erst danach A3 P7-4-Zweitprobe. Block A insgesamt drei Commits — A1
-damit fertig.
+**Nächster Schritt, konkret:** A3 P7-4-Zweitprobe (P8-C) — der UX-Befund aus Phase 7
+(Claude nennt Menschen IDs statt Titeln), eine organische Probe **vor** der
+`_TITLE_NOT_ID_HINT`-Beschreibungsschärfung, dann falls die Prosa-Anweisung allein nicht
+reicht der Text-Edit in `mcpserver/tools.py` (Tabu-Linie §0.4 erlaubt reine
+Beschreibungstext-Strings in `tools.py`, Präzedenz P7-T). Block A damit vollständig — drei
+Commits (`a381a96` A1-Client + Smoke + N=14, dieser Commit A2, A3 folgt). Danach Block B
+(Link-Fundament, achte P1-Contract-Öffnung — neuer Absatz in
+`phase1_storage/CLAUDE.md` §„Geerbte Contracts" beim Öffnungs-Commit, hier nur als Vormerkung
+genannt).

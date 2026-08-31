@@ -221,6 +221,55 @@ def test_remove_space_warns_about_orphaning_references(data_root, env, capsys):
     assert "niklas" in err and "verwaisen" in err
 
 
+def test_remove_space_with_force_rebuilds_the_index_so_no_stale_rows_remain(
+    data_root, env, capsys,
+):
+    """P8-B: ohne Reindex verwaist jede `search`-/`GET /api/v1/items`-Antwort mit Zeilen aus
+    dem gerade entfernten Space — derselbe Live-Incident vom 2026-08-27 nach
+    `testnutzer-p7 remove-space` (`phase7_spaces_admin/CLAUDE.md`, e2c908a). Hier wird das
+    Verhalten BEWIESEN, nicht nur die Warnung dokumentiert — `Store.search(space=name)` vor
+    dem Lauf darf das Item noch finden, nach dem `--force`-Lauf darf sie es nicht mehr."""
+    from storage.store import Store
+
+    data_root.mkdir()
+    spacectl.main(["create-space", "opfer"], env=env)
+    spacectl.main(["create-space", "zeuge"], env=env)
+    # Ein Item direkt ins Opfer-Verzeichnis schreiben — der schnellste Weg, einen
+    # indexierten Eintrag zu erzeugen, ohne die volle `Store`-API durchzuspielen.
+    (data_root / "opfer" / "itm_aaaaaaaa__demo.md").write_text(
+        "---\nid: itm_aaaaaaaa\nspace: opfer\ntype: note\ntitle: Demo\nstatus: active\n"
+        "version: 1\ncreated: 2026-08-31T00:00:00Z\nupdated: 2026-08-31T00:00:00Z\n"
+        "tags: []\nlinks: []\n---\n\nBody.\n",
+        encoding="utf-8",
+    )
+    # Zeuge-Space bleibt unverändert (sicherheitshalber — der Test darf nicht den falschen
+    # Space treffen).
+    (data_root / "zeuge" / "itm_bbbbbbbb__andere.md").write_text(
+        "---\nid: itm_bbbbbbbb\nspace: zeuge\ntype: note\ntitle: Andere\nstatus: active\n"
+        "version: 1\ncreated: 2026-08-31T00:00:00Z\nupdated: 2026-08-31T00:00:00Z\n"
+        "tags: []\nlinks: []\n---\n\nAnderer Body.\n",
+        encoding="utf-8",
+    )
+    pre = Store(data_root, git=False)
+    pre.rebuild_index()  # die Welt in den definierten Ausgangszustand bringen
+    assert any(i.id == "itm_aaaaaaaa" for i in pre.search(space="opfer").items)
+    assert any(i.id == "itm_bbbbbbbb" for i in pre.search(space="zeuge").items)
+
+    capsys.readouterr()
+    code = spacectl.main(["remove-space", "opfer", "--force"], env=env)
+    out = capsys.readouterr().out
+    assert code == spacectl.EXIT_OK
+    assert "Index neu" in out  # die neue Statuszeile, der eigentliche Mechanismus-Beweis
+
+    post = Store(data_root, git=False)
+    # Opfer-Item darf nirgends mehr auftauchen — weder im space-gefilterten noch im globalen
+    # Suchlauf (Hard Rule 2: keine Karteileichen im Index, jemals).
+    assert not any(i.id == "itm_aaaaaaaa" for i in post.search(space="opfer").items)
+    assert not any(i.id == "itm_aaaaaaaa" for i in post.search().items)
+    # Zeuge-Item bleibt sichtbar — der Reindex ist `data_root`-weit, kein Kollateralschaden.
+    assert any(i.id == "itm_bbbbbbbb" for i in post.search(space="zeuge").items)
+
+
 # -- check ------------------------------------------------------------------------------
 
 

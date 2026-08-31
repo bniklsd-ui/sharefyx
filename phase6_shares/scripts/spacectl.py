@@ -192,7 +192,15 @@ def _cmd_remove_space(data_root: Path, args: argparse.Namespace) -> int:
         print("Trockenlauf — kein --force übergeben, nichts gelöscht.")
         return EXIT_OK
     acl.remove_space_dir(data_root, name)
-    print(f"Space '{name}' entfernt.")
+    # P8-B (schließt P7-§4.2): ohne Reindex verwaist jeder `search_items`/`GET /api/v1/items`
+    # mit `reiterierten` Zeilen aus dem gerade gelöschten Space — derselbe 500er-Incident vom
+    # 2026-08-27 nach `testnutzer-p7 remove-space` ohne Reindex. Zweizeiler statt einer Warnung
+    # („führe danach `reindex` aus"), weil ein Operator nach `--force` typischerweise direkt
+    # weiterarbeitet und die Warnung im Produktiv-Runbook untergeht (Hard Rule 2: Datei ist
+    # die Wahrheit, der Index muss ihr jederzeit entsprechen — diese Operation entfernt eine
+    # ganze Verzeichnisebene, „danach reindexen" ist keine optionale Optimierung).
+    stats = Store(data_root).rebuild_index()
+    print(f"Space '{name}' entfernt (Index neu: {stats.items_indexed} Items).")
     return EXIT_OK
 
 
