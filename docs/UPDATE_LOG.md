@@ -9,6 +9,10 @@
      (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
+## 2026-08-31
+- Mehrere Notizen gleichzeitig in einen anderen Space verschieben: reicht jetzt ein Passwort und ein Code für alle aus, auch wenn die Aktion Schreibrechte erweitert — der Code wird intern genau einmal verwendet, danach ist für jede weitere Verschiebe-Aktion ein neuer Code nötig.
+- Spaces entfernen räumt jetzt den internen Suchindex mit auf — die Übersicht funktioniert danach wieder zuverlässig.
+
 ## 2026-08-27
 - Neuer Menüpunkt "Spaces verwalten": eigene Spaces anlegen oder entfernen, Mitglieder mit Schreibrecht hinzufügen oder entfernen — direkt im Konto-Menü, ohne Kommandozeile.
 - Entfernen eines Space und größere Mitgliederänderungen fragen zur Sicherheit noch einmal Passwort und Code ab.
