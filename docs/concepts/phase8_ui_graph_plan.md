@@ -207,6 +207,14 @@ Credentials des angemeldeten Principals, nicht eines Ziel-Space — das Grant be
 Session hat sich vor < 90 s mit Passwort+TOTP ausgewiesen". Die Rechteprüfung je Item läuft
 unverändert danach.
 
+**[2026-08-31 Live urgency, Nikinger]** Erste echte N>2-Beobachtung aus dem Betrieb
+(14-Item-Batch, alle rechteerweiternd): nicht nur der Mechanismus-Defekt aus dem Abnahme-Lauf
+(Replay-Schleife ab Item 2), sondern die heute sichtbare Folge — bei N rasch aufeinander
+folgenden, **verschiedenen** TOTP-Codes greift `LoginThrottle` (`authserver/ratelimit.py`)
+und sperrt das Konto vorübergehend. Mit dem Grant-Fix entfällt der wiederholte TOTP pro Item
+und damit jeder weitere Throttle-Eintrag; Beleg, dass P7-24 nicht-theoretisch ist und in der
+P8-Priorität ganz oben steht.
+
 **Neuer Endpunkt `POST /api/v1/reauth`** — Handler `_reauth_post()` in `webui/api.py`
 (Registrierung neben den bestehenden Routen ~Zeile 1005, V82):
 - Session-Pflicht (Plumbing wie `_items_patch`; `session_id` via `SessionManager`, V89).
@@ -235,7 +243,8 @@ Passwort+TOTP-Pfad — kein Umbau ohne Not.
 **Tests** (`phase5_ui/tests/test_reauth_grant.py`, neu):
 1. Grant-Ausgabe mit korrekten Credentials → 200 + Token.
 2. Falscher TOTP → 403, Throttle zählt.
-3. Batch: 3 rechteerweiternde PATCHes mit demselben Grant → alle 200 (der P7-24-Kernfall).
+3. Batch: 14 rechteerweiternde PATCHes mit demselben Grant → alle 200; Throttle-Counter
+   unverändert vor und nach (Rate-Limit-Regression, N=14 entspricht dem Live-Fall).
 4. Abgelaufenes Grant (Zeit vorgespult) → Re-Auth-Fehler wie bisher.
 5. Grant einer fremden Session → abgelehnt.
 6. Regression: derselbe **rohe** TOTP-Code zweimal → zweiter Request scheitert (Anti-Replay unverändert).

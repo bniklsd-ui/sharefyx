@@ -3,7 +3,9 @@
 Acht Testfälle aus Plan §A1:
 1. Grant-Ausgabe mit korrekten Credentials → 200 + Token.
 2. Falscher TOTP → 403, Throttle zählt.
-3. Batch: 3 rechteerweiternde PATCHes mit demselben Grant → alle 200 (P7-24-Kernfall).
+3. Batch: 14 rechteerweiternde PATCHes mit demselben Grant → alle 200 (P7-24-Kernfall,
+   N=14 entspricht dem Live-Fall, mit dem der Nikinger am 2026-08-31 die
+   `LoginThrottle`-Sperre ausgelöst hat).
 4. Abgelaufenes Grant (Zeit vorgespult) → Re-Auth-Fehler wie bisher.
 5. Grant einer fremden Session → abgelehnt.
 6. Regression: derselbe rohe TOTP-Code zweimal → zweiter Request scheitert
@@ -14,7 +16,11 @@ Acht Testfälle aus Plan §A1:
 
 Bewusst KEIN Test „dasselbe Grant zweimal benutzen ist OK" — das ist der Zweck des Grants
 und wird im Batch-Test (3) implizit mitbewiesen. Tests (3)/(5) zusammen decken die Session-
-Bindung ab.
+Bindung ab. Throttle-Counter-Invarianz (Plan §A1, nach 2026-08-31-Nachtrag): der Throttle
+wird in `_reauth_post()` EINMAL pro Grant-Ausstellung geprüft — die 14 PATCHes laufen über
+`require_share_reauth()`, das den Throttle gar nicht anfasst; Test (3) deckt die
+Rate-Limit-Regression implizit mit, weil ein 14-fach-403/429 in einem einzigen Testlauf
+unmöglich zu übersehen wäre.
 """
 from __future__ import annotations
 
@@ -106,19 +112,27 @@ async def test_reauth_with_wrong_totp_fails_and_counts_against_the_throttle(
 
 
 # ---------------------------------------------------------------------------------------------
-# 3) Batch: 3 rechteerweiternde PATCHes mit demselben Grant → alle 200 (P7-24-Kernfall).
+# 3) Batch: 14 rechteerweiternde PATCHes mit demselben Grant → alle 200 (P7-24-Kernfall,
+#    N=14 entspricht dem Live-Fall).
 # ---------------------------------------------------------------------------------------------
 
 
 @pytest.mark.asyncio
-async def test_three_widening_patches_with_one_grant_all_succeed(
+async def test_fourteen_widening_patches_with_one_grant_all_succeed(
     full_app_items, item_store, totp_code, clock,
 ):
-    """Genau P7-24: vor dem Fix brauchte der User drei verschiedene TOTP-Codes für drei
-    Items; mit dem Grant reicht EIN Code für alle drei, derselbe TOTP wird durch das Grant
-    nicht erneut verbraucht (Anti-Replay bleibt intakt — siehe Test 6)."""
+    """Genau P7-24: vor dem Fix brauchte der User N verschiedene TOTP-Codes für N Items;
+    mit dem Grant reicht EIN Code für alle N, derselbe TOTP wird durch das Grant nicht
+    erneut verbraucht (Anti-Replay bleibt intakt — siehe Test 6).
+
+    N=14 ist nicht willkürlich: am 2026-08-31 hat der Nikinger genau diesen Versuch live
+    ausgelöst und dabei die `LoginThrottle`-Sperre getriggert (Rapid-Fire-Folge
+    unterschiedlicher TOTP-Codes). Der Test mit N=14 ist die direkte Regressionsprobe —
+    die hier nicht durch 14 verschiedene TOTP-Codes läuft, sondern durch EIN Grant für
+    14 PATCHes, also genau das Verhalten, das der Fix herstellt. Ein 14-fach-Fehler in
+    diesem einen Test wäre sofort sichtbar."""
     items = [
-        item_store.create(SPACE, type="note", title=f"Original {i}") for i in range(3)
+        item_store.create(SPACE, type="note", title=f"Original {i}") for i in range(14)
     ]
     async with _client(full_app_items) as client:
         csrf = await _login(client, totp_code)

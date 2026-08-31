@@ -540,7 +540,14 @@ export function init() {
   // NUR die zurückgewiesenen Items mit `password`/`totp`. Ein Item, das in Runde 1 schon
   // durchging, wird nie erneut angefasst (P6-AN: In-Space-Batches lösen Runde 2 faktisch nie
   // aus, weil `widens()` dort nie zuschlägt).
-  function runBatchMove() {
+  //
+  // P8-A (schließt P7-24): vor Runde 2 wird EIN `POST /api/v1/reauth` aus den eingegebenen
+  // Rohcredentials ausgelöst; das zurückgegebene Grant ersetzt `{password, totp}` als
+  // `credentials`-Objekt für ALLE sequenziellen PATCHes. Anti-Replay bleibt unverändert —
+  // der TOTP-Code wird genau einmal verbraucht (durch `verify_reauth()` selbst), das Grant
+  // ist nur ein session-gebundenes Ticket. Bei einem Re-Auth-Fehler bleibt das Formular
+  // stehen, KEIN Item wird verbraucht (Runde 2 beginnt erst wieder nach erneuter Eingabe).
+  async function runBatchMove() {
     // Ziel beim ERSTEN Submit einfrieren (siehe `pendingBatchTarget`-Kommentar oben) — Runde 2
     // schickt die zurückgewiesenen Items an GENAU dasselbe Ziel wie Runde 1, ein Dropdown bleibt
     // während der Wartezeit ohnehin gesperrt (siehe unten), das ist nur die zweite Absicherung.
@@ -551,8 +558,27 @@ export function init() {
     var items;
     var credentials = null;
     if (moveBatchReauthItems !== null) {
+      // Runde 2: vor dem ersten PATCH ein Reauth-Grant holen — ein einziger
+      // Passwort+TOTP-Block pro Batch statt N (= P7-24). Fehlerpfad: Formular bleibt offen,
+      // KEIN Item wird verbraucht (kein `moveSelectedItems`-Aufruf im Catch-Zweig).
+      moveErrorEl.hidden = true;
+      var password = moveReauthPasswordEl.value;
+      var code = moveReauthTotpEl.value;
+      var grantResp;
+      try {
+        grantResp = await api("/reauth", {
+          method: "POST", body: JSON.stringify({ password: password, totp: code }),
+        });
+      } catch (err) {
+        if (err && err.message === "unauthenticated") return;  // Karte ist schon da
+        moveErrorEl.textContent =
+          (err && err.message) || "Re-Authentisierung fehlgeschlagen.";
+        moveErrorEl.hidden = false;
+        moveReauthPasswordEl.focus();
+        return;
+      }
       items = moveBatchReauthItems;
-      credentials = { password: moveReauthPasswordEl.value, totp: moveReauthTotpEl.value };
+      credentials = { reauth_grant: grantResp.grant };
     } else {
       items = moveTargetItems;
     }
@@ -577,6 +603,9 @@ export function init() {
       moveBatchFailed = moveBatchFailed.concat(hardFailed);
 
       if (reauthItems.length > 0) {
+        // Theoretisch unerreichbar mit Grant (TTL 90 s, wiederverwendbar) — wenn doch: nochmal
+        // Credentials verlangen. Belassen, weil es die Verteidigungslinie für „Grant zwischen
+        // Runde 1 und 2 abgelaufen + User hat sehr lange gebraucht" ist.
         moveBatchReauthItems = reauthItems;
         moveReauthFieldsEl.hidden = false;
         moveErrorEl.textContent = reauthItems.length + " von " + items.length
