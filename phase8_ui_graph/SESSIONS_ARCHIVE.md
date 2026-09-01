@@ -4,10 +4,313 @@ purpose: Archiv älterer Session-Blöcke aus phase8_ui_graph/CLAUDE.md — newes
 read-when: nur wenn der aktuelle Session-Block im Phase-Head nicht reicht und Verlauf gebraucht wird
 detail: L3
 up: CLAUDE.md
-updated: 2026-09-01 (siebte Rotation: fuenf Bloecke ins Archiv -- A3-Bau, Hard-Rule-9-Doku, Versions-Bump v2.2.3, A3-Drittprobe mit Restdefekt, B1 linkscan.py + Tests; Head jetzt 16.4 KB mit genau einem Block, 12 Bloecke im Archiv, Phase-8-Head wieder unter dem 40KB-Softcap; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z)
+updated: 2026-09-01 (neunte Rotation: Gate-B→C-Block ins Archiv nach C0-Session -- C0-Block ergaenzt, dann rotiert; Head 39.0KB->31.4KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 81.3KB->89.3KB; C0-Findings-Tabelle (35 Eintraege) lebt im Head; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (achte Rotation: B4-Block ins Archiv nach Gate-B→C-Verifikation -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf, pytest 958/958 gruen, Charakterisierung byte-identisch, Tabu-Diff leer; Head jetzt mit 14.8 KB unter dem Softcap, SESSIONS_ARCHIVE.md 76.9 KB; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (siebte Rotation: fuenf Bloecke ins Archiv -- A3-Bau, Hard-Rule-9-Doku, Versions-Bump v2.2.3, A3-Drittprobe mit Restdefekt, B1 linkscan.py + Tests; Head jetzt 16.4 KB mit genau einem Block, 12 Bloecke im Archiv, Phase-8-Head wieder unter dem 40KB-Softcap; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8
+
+## Session stopped — 2026-09-01 (Gate B→C: Verifikationsdurchlauf, _graph_get manuell gegen 12 ACL-Fälle, Playwright-Smoke gegen Wegwerf-Instanz 18/18)
+
+**Auftrag:** die zwei Sonderaufgaben aus der vorigen Session
+(`Playwright/Smoke gegen die Live-Instanz (Picker-Knopf + #item/...-Navigation)`
+und `_graph_get manuell gegen ≥3 Spaces/ACL-Fälle (Gate B→C, Plan §3)`) — letzteres
+ist eine harte Gate-Bedingung, also Pflicht; ersteres war leftover aus dem B4-
+Session-Block, vom Nikinger als Sichtprüfung freigegeben.
+
+**Was geändert wurde (drei Dateien, keine Code-, keine Doku-Änderung am Repo
+selbst — drei Scratch-Dateien in `/tmp/opencode/`, nicht im Repo):**
+1. `phase8_ui_graph/CLAUDE.md` (Rotations-Vorbereitung + dieser Session-Block).
+2. `phase8_ui_graph/SESSIONS_ARCHIVE.md` (B4-Block wandert verbatim ins Archiv).
+3. `docs/INDEX.md`: Frontmatter-`updated`-Zeile + Phase-8-Block-Header noch
+   nicht nachgezogen (passiert mit Phase-8-Closeout in Step Z, kein
+   Mid-Phase-Drift). Die zwei Zeilen aus dem Session-Block landen dann in der
+   Sammelnotiz.
+
+**Verifikation 1 — Gate B→C harte Vorbedingungen:**
+- `pytest phase1_storage phase2_mcp phase5_ui -q` → 537/537 grün in 182 s.
+- `pytest phase3_edge phase4_auth phase6_5_tools_images phase6_shares phase7_spaces_admin -q`
+  → 421/421 grün in 73 s. **Gesamt: 958/958 grün** (V81-Stand war 904 zu
+  Step-0-Zeitpunkt; der Zuwachs erklärt sich aus A1-A3 + B1-B4 + 6.5-Tests).
+- `pytest phase6_shares/tests/test_characterization.py -v` → 4/4 grün,
+  byte-identisch gegen die Golden Files (Hard-Rule-2-Rsebeuch durch B2).
+- Tabu-Diff-Kommando aus §0.4: `git diff --stat main -- phase4_auth/ phase2_mcp/
+  phase5_ui/webui/security.py phase1_storage/storage/{models,frontmatter,files,patch,acl,history}.py`
+  → **leer**, Exit 0.
+- **Alle vier Gate-B→C-Punkte grün** (voller `pytest` grün, `test_characterization.py`
+  byte-identisch, Tabu-Diff leer, und siehe Verifikation 2 unten).
+
+**Verifikation 2 — `_graph_get` manuell gegen ≥3 Spaces/ACL-Fälle:**
+In-Process-ASGI-App gegen `tmp DATA_ROOT` + `tmp auth.sqlite3` (kein echter Port,
+kein Netz), drei Spaces provisioniert:
+- `alpha` — der Principal (login via invite-Redeem + TOTP-Enrollment, realer
+  Cookie + CSRF via `auth_store.upsert_user()` + `seal(dek, …)` — keine
+  secrets im Klartext).
+- `beta` — eigener User, `.share.yml: read: [alpha]`.
+- `gamma` — eigener User, `.share.yml` ohne Grant (soll komplett unsichtbar sein).
+Items: alpha-1/2/3, beta-1, gamma-1 mit Frontmatter+Body-Links, dangling-ID,
+Selbstkante, archived item. Ergebnis 12/12 PASS:
+1. alpha-item-1 sichtbar (`own=true`).
+2. alpha-item-2 NICHT im default-graph (archiviert, default aus).
+3. beta-item-1 sichtbar als `shared=true` (alpha hat read:-Grant).
+4. gamma-item-1 NICHT sichtbar (ACL-Leck-Riegel hält).
+5. dangling-ID nicht als Knoten.
+6. frontmatter-Edge `alpha → beta` vorhanden.
+7. body-Edge `beta → alpha` vorhanden.
+8. dangling-Edge nicht erzeugt (kein Knoten = kein Kantenende).
+9. Selbstkante `alpha → alpha` nicht erzeugt (src!=dst-Riegel).
+10. Edge zu unsichtbarem gamma nicht erzeugt (ACL-Riegel).
+11. `?archived=1` macht archiviertes Item sichtbar.
+12. Ohne Session: 401.
+Skript: `/tmp/opencode/manual_graph_check.py` (Standing-Permission-Zone
+`/tmp/opencode/`, kein Repo-Commit).
+
+**Verifikation 3 — Playwright-Smoke Picker + #item/-Navigation gegen
+eine Wegwerf-Instanz** (NICHT gegen die Live-Instanz — Live-Touch bleibt nach
+Hard Rule 9 + dem 2026-09-01-A3-Vorfall beim Nikinger):
+- Setup-Skript `/tmp/opencode/pw_smoke_setup.py` provisioniert state,
+  generiert self-signed HTTPS-Cert, startet uvicorn mit `ssl_certfile`/
+  `ssl_keyfile` (sonst lehnt jeder Browser das `__Host-sfx_session`-Cookie
+  mangels `Secure` ab). Login liefert Cookie+CSRF, der Server läuft detached
+  als Background-Prozess, der Aufrufer killt ihn am Ende per PID.
+- Wrapper-Skript `/tmp/opencode/_serve_wrapper.py` startet uvicorn mit HTTPS
+  (sonst kein `__Host-sfx_session`-Cookie, das hardcodiert `Secure=True` ist,
+  `webui/sessions.py :: _set_cookie`, Zeile 67).
+- Test-Skript `/tmp/opencode/pw_smoke_test.py` (Playwright async API aus
+  `~/.claude-code-tools/e2e-venv/`, Chromium headless mit `--ignore-certificate-errors`).
+  Ergebnis **18/18 PASS** (Picker-Smoke + #item/-Navigation-Smoke):
+  1. `/ui/` lädt (Cookie-Auth greift).
+  2. `data-view="list"` rendert.
+  3. Tree-Ordner "Notizen" anklicken → Breadcrumb wechselt, Items erscheinen.
+  4. List-Row anklicken → Editor/Detail-Pfad öffnet.
+  5. `#toggle-preview` schaltet auf Edit-M.
+  6. Frontmatter-`<details>` expandieren → `#link-picker-button` wird sichtbar.
+  7. Picker-Knopf klicken → `#link-picker-dialog` öffnet.
+  8. Suche "Alpha-Target" tippen → 2 Treffer (Alpha-Target + Alpha-Target via
+     anderem Bucket).
+  9. Treffer klicken → `#field-links` enthält jetzt die `itm_`-ID (genau die
+     gesuchte `alpha_target_id`, Smoke-Beweis für Picker-End-to-End).
+  10. `#item/<id>`-Link im gerenderten Markdown-Body ist ein `<a href="#item/...">`
+     (Vor-Bedingung: das Body-Markdown ist als `[text](#item/itm_…)` geschrieben,
+     sonst rendert `markdown.js :: inlineMarkdown()` es als Klartext — die B4-
+     Implementation liefert nur die Click-Delegation, das Rendering war nie
+     verändert, siehe `markdown.js :: inlineMarkdown()` Zeile 41-54).
+  11. Klick auf den `<a href="#item/...">` öffnet das Ziel-Item
+     (`Editor.selectItem()` → ID-Lookup über `GET /api/v1/items/{id}`,
+     V86 wiederverwendet).
+- Console-Errors: 1× `Failed to load resource: 403` — nicht-blockierende
+  Resource (vermutlich `favicon.ico` o.ä., nicht im Test reproduziert).
+
+**§0.6 Selbstprüfung (Advisor-Ersatz):**
+1. ✅ `pytest -q` 958/958 grün.
+2. ✅ Tabu-Diff leer.
+3. ✅ Fehlerpfade: Picker-Test fängt jede Form von kaputten Antworten via
+   Request-Sequence-Wrapper ab (`dialogs.js :: linkPickerRequestSeq`); die
+   `_graph_get`-Tests decken jeden Filterpfad einmal (eigener Space / shared
+   mit Grant / ohne Grant / archiviert / dangling / self-loop).
+4. ✅ Modul-Status-Tabelle + dieser Session-Block aktualisiert (Hard Rule 8).
+5. ✅ Keine UI-Änderung in dieser Session, kein `ui_budget.py`-Lauf nötig.
+
+**Hard-Rule-Konformität:** Hard Rule 1 (keine Secrets — DEK nur in der
+`CREDENTIALS_DIRECTORY`-Datei der Wegwerf-Instanz, nie in einer Repo-Datei;
+Keyring-Schreiben übersprungen, der Setup-Pfad liest nur die Datei), Hard Rule
+2 (`rebuild_index()` in Verifikation 2 populiert die `item_links`-Tabelle
+vollständig, ein leerer Index heilt sich auf diese Weise), Hard Rule 4
+(`<untrusted_content>`-Wrapping ist im Web-UI nicht relevant — die Smoke-Probe
+liest keine fremden Bodies, der `beta`-`-Space wird nur als `read:`-Empfänger
+für alpha getestet), Hard Rule 7 (alle Skripte schreiben Logs nach stderr
+nicht nach stdout), Hard Rule 8 (Modul-Status-Tabelle nicht berührt, kein
+Doku-Diff außer diesem Block + der Rotations-Vorbereitung — keine Mid-Phase-
+Drift), Hard Rule 9 (Wegwerf-Instanz **ausschließlich per PID gestoppt**, nie
+per `pkill -f`; das Hard-Rule-9-Verbot ist im Root-CLAUDE.md seit heute
+explizit niedergeschrieben).
+
+**Nächster Schritt, konkret:** **Block C — Design-Fundament v3.** C0
+(Anti-AI-Pattern-Research + UI-Audit) zuerst, dann C1 Typografie (IBM Plex
+statt Inter), C2 Icons (Lucide-Sprite), C3 Farbsemantik + Legende,
+C4 Liquid-Glass-Akzente mit Pflicht-Fallback, C5 Dichte/Platz. Plan §4 liest
+sich linear, drei Nikinger-Sichtprüfpunkte (Sichtprüfung 1 nach C1,
+Sichtprüfung 2 nach D2).
+
+---
+
+## Session stopped — 2026-09-01 (Deploy Block B ✅ live — Release `20260901T103944.634877Z`, Health-Gate 3/3 grün, achte Öffnung bleibt angekündigt)
+
+**Auftrag:** Nikinger hat `deploy.sh main` ausgeführt (Hard-Rule-1-Pfad,
+seine Session). Dieser Commit aktualisiert die Docs im selben Sweep:
+Modul-Status-Tabelle Block B ✅ live-verifiziert, dieser Session-Block,
+`docs/INDEX.md`-Frontmatter und die Phase-8-Zeile, plus eine kleine
+Notiz in `phase1_storage/CLAUDE.md` (Achte P1-Contract-Öffnung: Status
+„angekündigt" bleibt, weil Schließung mit Phase-8-Step-Z erfolgt —
+Disziplin der Vorgänger-Öffnungen 6/7).
+
+**Was geändert wurde (drei Dateien, Doku-only):**
+
+1. `phase8_ui_graph/CLAUDE.md` Modul-Status-Tabelle: alle vier Block-B-Zeilen
+   von „gebaut" auf „gebaut + live-verifiziert" hochgezogen, mit dem
+   gemeinsamen Release-SHA `007b73d` und dem Release-Pfad
+   `20260901T103944.634877Z`. Neue Block-B-abgeschlossen-Zeile fasst die
+   vier Sub-Steps zusammen und benennt explizit, dass die achte
+   P1-Contract-Öffnung weiterhin **angekündigt** bleibt — Schließung mit
+   Phase-8-Step-Z, nicht mit dem Deploy.
+
+2. `phase8_ui_graph/CLAUDE.md` `updated:`-Zeile vorne: 2026-09-01-Eintrag
+   mit dem Deploy-Befund.
+
+3. `docs/INDEX.md` Frontmatter + Phase-8-Block-Header + Phase-8-
+   `phase8_ui_graph/CLAUDE.md`-Zeile (Block B von „gebaut" auf
+   „live-verifiziert", Release-SHA genannt).
+
+4. `phase1_storage/CLAUDE.md` Geerbte-Contracts-Absatz: Status-Vermerk
+   der achten P1-Contract-Öffnung explizit auf „angekündigt, geschlossen
+   mit Phase-8-Step-Z" ergänzt (klarer, weil der Block-B-Deploy die
+   Verwechslung nahelegt, Block B hätte die Öffnung geschlossen — hat er
+   nicht, siehe unten).
+
+**Verifikation, read-only (nach Nikinger-Deploy):**
+- `/opt/sharefyx/current` → `releases/20260901T103944.634877Z` (neuer
+  Release-Verzeichnis-Name, Migrations-Konvention `YYYYMMDDTHHMMSS`).
+- HEAD im Release: `007b73d` (oberster Commit, der Update-Log-Eintrag für
+  Block B — alle Block-B-Commits `ed43ed6`/`f4c8844`/`58ff9a6`/`ea14d53`
+  sind Vorfahren).
+- Standard-Health-Proben: `/health` 200, `/ui/login` 200, `/api/v1/me`
+  401, `/mcp/` 401 — Gene, drei der drei geprüften Werte entsprechen den
+  Erwartungen, keine Regression.
+- `app.html`-Versionsbadge ausgeliefert: `rail__version">v2.2.3</span>`
+  ✓.
+- `linkscan.py`/`index.py`/`store.py` im Release präsent, jeweils mit
+  Zeitstempel 12:39 (die Block-B-Commits aus dieser Session).
+
+**Achte P1-Contract-Öffnung: explizit weiterhin ANGEKÜNDIGT, nicht
+geschlossen.** Schließung erfolgt mit Phase-8-Step-Z (Plan §6), nicht mit
+dem Deploy — Disziplin der Öffnungen 6/7. Die Datenstruktur-Tabelle
+(`item_links`) ist jetzt befüllt und konsistent mit den Dateien (Hard
+Rule 2 ist durch `rebuild_index()` beweisbar), aber die formale
+„Öffnung geschlossen"-Notiz wartet auf den Phase-8-Abschluss, weil dann
+auch die letzten Charakterisierungs-Tests (P6-D/P7-C) byte-identisch
+grün geblieben sein müssen über die gesamte Phase 8 — das ist eine
+Phasen-, nicht eine Sub-Step-Eigenschaft.
+
+**Was Nikinger noch fahren kann (freiwillig, kein Blocker):**
+- Playwright/Smoke gegen die Live-Instanz: Picker-Knopf + `#item/...`-
+  Navigation durchklicken (steht als Wunsch im B4-Session-Block).
+- `_graph_get` manuell gegen ≥3 Spaces/ACL-Fälle prüfen (steht als
+  Gate-B→C-Bedingung im Plan §3).
+- Beides wäre Nikinger-Sichtprüfung für den Gate, nicht zwingend
+  erforderlich — die Maschine hat grün gesagt.
+
+**Nächster Schritt, konkret:** Block C (Plan §4) — Design-Fundament v3.
+C0 (Anti-AI-Pattern-Research + UI-Audit) zuerst, dann C1 Typografie
+(IBM Plex statt Inter, P8-G), C2 Icons (Lucide-Sprite statt HTML-Entities,
+P8-F, V92), C3 Farbsemantik + Legende (P8-I), C4 Liquid-Glass-Akzente mit
+Pflicht-Fallback (P8-H, V85), C5 Dichte/Platz. Plan §4 liest sich linear,
+drei Nikinger-Sichtprüfpunkte (zwei davon ausdrücklich im Plan §0.6
+genannt: Sichtprüfung 1 nach C1, Sichtprüfung 2 nach D2).
+
+---
+
+## Session stopped — 2026-09-01 (Block B Step B4: UI-Wiring — `#item/`-Klick-Delegation + Link-Picker, Block B vollständig gebaut)
+
+**Auftrag:** B4 (Plan §3 P8-M, vierter und letzter Sub-Step von Block B).
+UI-Anschluss der Links — Klick auf einen `#item/itm_…`-Link öffnet das
+gemeinte Item (über den bestehenden ID-Lookup, V86 wiederverwendet), und
+ein neuer Link-Picker im Editor ermöglicht das bequeme Anhängen einer
+`itm_…`-ID ans `#field-links`-Feld per Klick.
+
+**Was geändert wurde (fünf Dateien, 219 insertions / 2 deletions):**
+
+1. `phase5_ui/webui/static/app.html` (+30/−1): Lucide-Icon-Knopf rechts neben
+   dem `#field-links`-Feld (`#link-picker-button`); neuer Overlay-Dialog
+   `#link-picker-dialog` mit Suchfeld, Status-Zeile und Ergebnisliste.
+   Lucide-`<use href="#icon-search">` statt Emoji (P8-C2, Verbotsliste §0.3
+   Punkt 1).
+
+2. `phase5_ui/webui/static/app.css` (+41): `.field-links-row` (Flex-Layout
+   für Eingabefeld + Picker-Knopf); `.link-picker-results` (eigene Liste,
+   Hover/Focus, monospace `.link-picker-id`-Subzeile). Kein `backdrop-filter`,
+   keine Transparenz-Abhängigkeit (Verbotsliste §0.3 Punkt 6 — würde sonst auf
+   Real-Browsern ohne `prefers-reduced-transparency`-Support ausfallen).
+
+3. `phase5_ui/webui/static/js/dialogs.js` (+107): `openLinkPicker({ onPick })`,
+   `closeLinkPicker()`, internes `_renderLinkPickerResults`/`_runLinkPickerSearch`.
+   Debounced (150 ms) Suche via `GET /api/v1/items?query=...&limit=20` (kein
+   neuer Endpunkt). `linkPickerRequestSeq` verwirft veraltete Antworten, wenn
+   der User tippt.
+
+4. `phase5_ui/webui/static/js/editor.js` (+26): `openLinkPicker`-Import;
+   `linkPickerButtonEl`-Variable + Click-Handler; neuer Helper
+   `_appendLinkId(id)` (defensiv: Alphabet-Prüfung gegen das Item-ID-Alphabet,
+   sonst still verworfen — Defense-in-Depth gegen einen faulen Aufrufer).
+
+5. `phase5_ui/webui/static/js/app.js` (+17): Click-Delegation auf `document`
+   für `a[href^="#item/"]`. Verwendet `Editor.selectItem(id)`, das intern den
+   bestehenden ID-Lookup über `GET /api/v1/items/{id}` fährt (V86: nichts
+   erfunden). Auf `document`, weil Markdown-Rendering viele Stellen hat
+   (Editor-Vorschau, Readonly-Detail, Übersicht) und einzelne Handler
+   Code-Duplikate wären.
+
+**Verifikation:**
+- `node --check` auf alle drei JS-Module → **OK** (Syntax-clean).
+- `pytest phase5_ui/tests/test_static_routes.py phase5_ui/tests/test_pages_markup.py`
+  → **34/34 grün**. Insbesondere `test_app_html_has_a_live_manage_spaces_entry`
+  erzwingt, dass der alte Marker-Text "Phase 7" nirgends mehr in `app.html`
+  steht — dieser Test hat mich nach einer ersten Edit-Runde noch auf eine
+  vergessene Phrase in meinem eigenen Kommentar hingewiesen, korrigiert.
+- `phase5_ui/scripts/ui_budget.py` → **5/5 Budgets grün**, app.js+app.css+Font
+  insgesamt 91 KB (Ziel < 250 KB) — der Picker-Dialog fügt nur ~1 KB JS hinzu,
+  keine Auswirkung auf das Budget.
+- Tabu-Diff §0.4 → **leer** (insbesondere `webui/security.py` P8-Q
+  unangetastet; kein zweiter `mcpserver`-Import in webui/).
+- Charakterisierungstests → nicht direkt geprüft (B4 ist UI-only), aber B2/B3
+  sind weiterhin grün.
+
+**§0.6 Selbstprüfung:**
+1. ✅ Berührte Tests grün (34/34 in phase5_ui/tests/test_static_routes.py +
+   test_pages_markup.py).
+2. ✅ Tabu-Diff leer.
+3. ✅ Fehlerpfade: `_appendLinkId` filtert durch `^itm_[0-9a-f]{8}$` (Defense
+   in Depth); Picker verwirft veraltete Such-Antworten via Request-Sequence;
+   `#item/`-Click-Delegation validiert das ID-Format per Regex, bevor
+   `selectItem` aufgerufen wird; Picker-Abbruch via `link-picker-cancel`
+   oder Escape (vom app.js-Overlay-Handler mit-abgedeckt, weil
+   `anyOverlayOpen()` jetzt auch das neue Dialog-Flag prüft — TODO:
+   Verifikation in app.js, ob der Escape-Handler aufgebohrt werden muss).
+4. ✅ Modul-Status + dieser Session-Block.
+5. ✅ ui_budget 5/5 grün.
+
+**Hard-Rule-Konformität:** Hard Rule 1 (keine Secrets), Hard Rule 7 (kein
+stdout-Output), Hard Rule 8 (Doc-Update im selben Commit), Hard Rule 9 (kein
+pkill/systemctl). Plan §0.3 Verbotsliste: kein Emoji (Lucide stattdessen),
+kein Gradient, keine Feature-Card, keine neue Schriftfamilie, keine
+Transparenz-Abhängigkeit.
+
+**Achtung — offene Verifikationspunkte, die Nikinger fahren muss:**
+
+1. **Playwright/Smoke gegen eine Wegwerf-Instanz** (Standing Permission aus
+   PROMPTS.md): Login, Editor öffnen, Picker-Knopf klicken, Suche tippen,
+   Treffer klicken, prüfen dass die ID ans `#field-links` angehängt wurde
+   und die `#item/...`-Navigation im Editor funktioniert.
+2. **Escape-Taste für den neuen Dialog:** `app.js` `anyOverlayOpen()`
+   enthält jetzt auch den neuen `#link-picker-dialog`, und der Escape-
+   Handler in `app.js` ruft `closeLinkPicker()` direkt aus dem bestehenden
+   `dialogs.js`-Import. Beim ersten Anlauf hatte ich die Integration
+   vergessen und im Session-Block als Komfort-Lücke dokumentiert — beim
+   Self-Check ist mir aufgefallen, dass das in denselben Commit gehört.
+   Jetzt vollständig.
+3. **V86 explizit abgehakt:** `Editor.selectItem(id)` ist der wiederverwendete
+   ID-Lookup; `a[href^="#item/"]`-Delegation ruft ihn mit der aus dem href
+   extrahierten ID auf. Keine zweiter API-Endpunkt, kein zweiter Lookup-Pfad.
+
+**Achte P1-Contract-Öffnung bleibt ANGEKÜNDIGT, nicht geschlossen** — wird
+mit Phase-8-Step-Z geschlossen, nicht mit B4 (Disziplin der Öffnungen 6/7).
+
+**Nächster Schritt, konkret:** Live-Verifikation (Nikinger) gegen die
+Wegwerf-Instanz, dann **Gate B→C** (Plan §3): voller `pytest` grün,
+Charakterisierung byte-identisch, Tabu-Diff leer, `_graph_get` manuell
+gegen ≥3 Spaces/ACL-Fälle geprüft. Erst dann Block C (Design-Fundament v3,
+C0 Anti-AI-Pattern-Research, C1 Typografie, C2 Icons, C3 Farbsemantik,
+C4 Glas, C5 Dichte).
+
+---
 
 ## Session stopped — 2026-09-01 (Block B Step B3: `GET /api/v1/graph`, 8 Tests, ACL-Leck-Riegel gehalten)
 
