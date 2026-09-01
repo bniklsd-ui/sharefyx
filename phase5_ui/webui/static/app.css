@@ -875,6 +875,47 @@ select.input {
 .field--wide { flex: 1; min-width: 160px; }
 .field .input { font-size: 13px; }
 
+/* Phase 8 Block B Step B4 (Plan §3 B4): Links-Feld + Picker-Knopf in einer Zeile. */
+.field-links-row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+.field-links-row .input { flex: 1; min-width: 0; }
+/* P8-C4 Verbotsliste §0.3 Punkt 6: keine Transparenz-Abhängigkeit. Der Picker-Knopf nutzt
+   daher die bestehende `.btn`-Klasse statt eines `backdrop-filter`-Sheens. */
+
+/* Phase 8 Block B Step B4: Suchergebnisse des Link-Pickers. */
+.link-picker-results {
+  list-style: none;
+  margin: var(--space) 0 0;
+  padding: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+}
+.link-picker-results li {
+  padding: 8px 10px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 13px;
+}
+.link-picker-results li:last-child { border-bottom: 0; }
+.link-picker-results li:hover,
+.link-picker-results li:focus { background: var(--accent-line); color: var(--accent-text); }
+.link-picker-results li[aria-selected="true"] {
+  background: var(--accent-line);
+  color: var(--accent-text);
+}
+.link-picker-results .link-picker-id {
+  display: block;
+  font-size: 10px;
+  opacity: 0.7;
+  font-family: var(--font-mono, monospace);
+  margin-top: 2px;
+}
+
 .editor__toolbar {
   display: flex;
   align-items: center;

@@ -10,7 +10,7 @@ import * as List from "./list.js";
 import * as Editor from "./editor.js";
 import {
   init as initDialogs, pendingConfirmCancel, hideConflictDialog, closeCreateDialog,
-  closeNewFolderDialog, closeMoveDialog, closeShareDialog,
+  closeNewFolderDialog, closeMoveDialog, closeShareDialog, closeLinkPicker,
 } from "./dialogs.js";
 import { init as initUpdates } from "./updates.js";
 import {
@@ -91,6 +91,24 @@ function initShell() {
   // zeigt danach die Übersicht — hier ist nichts weiter zu tun.
   homeButtonEl.addEventListener("click", function () { Editor.closeEditor(); });
 
+  // Phase 8 Block B Step B4 (Plan §3 B4): Klick-Delegation auf `a[href^="#item/"]`. Verwendet
+  // den vorhandenen ID-Lookup aus `_items_get` über `GET /api/v1/items/{id}` (Plan §3 B4
+  // V86: wiederverwenden, nichts erfinden). Wird auf `document` gehängt, weil das Markdown-
+  // Rendering viele Stellen haben kann (Editor-Vorschau, Übersicht, Detail-Readonly) und
+  // einzelne Handler an jeder Render-Stelle Code-Duplikate wären.
+  var linkPickerDialogEl = document.getElementById("link-picker-dialog");
+  document.addEventListener("click", function (event) {
+    var anchor = event.target && event.target.closest
+      ? event.target.closest('a[href^="#item/"]')
+      : null;
+    if (!anchor) return;
+    var href = anchor.getAttribute("href") || "";
+    var match = /^#item\/(itm_[0-9a-f]{8})$/.exec(href);
+    if (!match) return;
+    event.preventDefault();
+    Editor.selectItem(match[1]).catch(reportUnexpectedError);
+  });
+
   document.getElementById("logout-button").addEventListener("click", function () {
     fetch("/ui/logout", { method: "POST", headers: { "X-CSRF-Token": csrfToken() || "" } }).then(
       function () { location.replace("/ui/login"); }
@@ -130,7 +148,7 @@ function initShell() {
     return !conflictDialogEl.hidden || !createDialogEl.hidden || !newFolderDialogEl.hidden
       || !moveDialogEl.hidden || !shareDialogEl.hidden || !confirmDialogEl.hidden
       || !accountDialogEl.hidden || !updateLogDialogEl.hidden || !spaceAdminDialogEl.hidden
-      || !spaceRemoveDialogEl.hidden;
+      || !spaceRemoveDialogEl.hidden || !linkPickerDialogEl.hidden;
   }
 
   document.addEventListener("keydown", function (event) {
@@ -153,6 +171,7 @@ function initShell() {
       else if (!accountDialogEl.hidden) accountDialogEl.hidden = true;
       else if (!spaceRemoveDialogEl.hidden) closeRemoveSpaceDialog();
       else if (!spaceAdminDialogEl.hidden) closeSpaceAdminDialog();
+      else if (!linkPickerDialogEl.hidden) closeLinkPicker();
       else if (state.selectedId !== null) Editor.closeEditor();
       return;
     }

@@ -58,7 +58,8 @@ Abnahmezeilen: `docs/concepts/phase8_ui_graph_plan.md`.
 | B1 | `storage/linkscan.py` neu (`ITEM_REF_RE`, `extract_item_refs(body)`) + 15 Tests | ✅ gebaut (`ed43ed6`, 2026-09-01); achte P1-Contract-Öffnung angekündigt in `phase1_storage/CLAUDE.md` §Geerbte Contracts (Disziplin der Vorgänger-Öffnungen 3–7); Tabu-Diff leer, Charakterisierungstests byte-identisch grün, 169 phase1_storage-Tests gesamt |
 | B2 | `index.py` (`INDEX_SCHEMA_VERSION = 3`, `item_links`-Tabelle + Index, `replace_item_links()`, `all_links()`, `row_from_file` ↳ `body_refs`, `rebuild_index` populiert, `delete_item` räumt src-Zeilen) + `store.py` (`_replace_links_for_item()`, `Store.links_all()`, alle 6 Schreibpfade via `_write_item_file` plus Drift-Repair) + 22 Tests | ✅ gebaut (`ed43ed6`+B2-Commit, 2026-09-01); Tabu-Diff leer, Charakterisierungstests byte-identisch grün, 191 phase1_storage-Tests gesamt (vorher 154 + 15 B1 + 13 B2-index + 9 B2-store) |
 | B3 | `webui/api.py :: _graph_get()` + Route `GET /api/v1/graph` + 8 Tests | ✅ gebaut (`f4c8844`+B3-Commit, 2026-09-01); Tabu-Diff leer, Charakterisierungstests byte-identisch grün (P5-B-Disziplin gehalten: nur `mcpserver.permissions.SharePolicy` importiert in webui/) |
-| Block B Rest | B4 (UI: `#item/`-Nav + Link-Picker) | ⬜ |
+| B4 | UI: `#item/`-Klick-Delegation (`app.js`) + Link-Picker-Dialog (`app.html`/`app.css`/`dialogs.js`/`editor.js`) | ✅ gebaut (B4-Commit, 2026-09-01); Tabu-Diff leer (insb. `webui/security.py` P8-Q unangetastet); JS-Syntax-Check `node --check` auf `app.js`/`editor.js`/`dialogs.js` OK; 34 statische-Tests grün; ui_budget 5/5 grün (91/250 KB app.js+css+Font) |
+| Block B abgeschlossen | `linkscan.py` + `item_links` + `Store.links_all` + `GET /api/v1/graph` + UI-Wiring; achte P1-Contract-Öffnung bleibt **angekündigt**, geschlossen mit Phase-8-Step-Z | ✅ gebaut, live-deploy ausstehend |
 | Block C | Design-Fundament v3 (Typografie, Icons, Farben, Glas) | ⬜ |
 | Block D | Übersicht tablos + Force-Graph | ⬜ |
 | Step Z | Closeout | ⬜ |
@@ -539,3 +540,107 @@ V86 abhaken) und Link-Picker (neuer kleiner Dialog `link-picker-dialog` in
 `app.html`, Suche via `GET /api/v1/items` global, Treffer hängt `itm_`-ID
 ans `#field-links` an — `links` steht bereits in `_PATCH_FIELDS`, kein
 API-Umbau).
+
+---
+
+## Session stopped — 2026-09-01 (Block B Step B4: UI-Wiring — `#item/`-Klick-Delegation + Link-Picker, Block B vollständig gebaut)
+
+**Auftrag:** B4 (Plan §3 P8-M, vierter und letzter Sub-Step von Block B).
+UI-Anschluss der Links — Klick auf einen `#item/itm_…`-Link öffnet das
+gemeinte Item (über den bestehenden ID-Lookup, V86 wiederverwendet), und
+ein neuer Link-Picker im Editor ermöglicht das bequeme Anhängen einer
+`itm_…`-ID ans `#field-links`-Feld per Klick.
+
+**Was geändert wurde (fünf Dateien, 219 insertions / 2 deletions):**
+
+1. `phase5_ui/webui/static/app.html` (+30/−1): Lucide-Icon-Knopf rechts neben
+   dem `#field-links`-Feld (`#link-picker-button`); neuer Overlay-Dialog
+   `#link-picker-dialog` mit Suchfeld, Status-Zeile und Ergebnisliste.
+   Lucide-`<use href="#icon-search">` statt Emoji (P8-C2, Verbotsliste §0.3
+   Punkt 1).
+
+2. `phase5_ui/webui/static/app.css` (+41): `.field-links-row` (Flex-Layout
+   für Eingabefeld + Picker-Knopf); `.link-picker-results` (eigene Liste,
+   Hover/Focus, monospace `.link-picker-id`-Subzeile). Kein `backdrop-filter`,
+   keine Transparenz-Abhängigkeit (Verbotsliste §0.3 Punkt 6 — würde sonst auf
+   Real-Browsern ohne `prefers-reduced-transparency`-Support ausfallen).
+
+3. `phase5_ui/webui/static/js/dialogs.js` (+107): `openLinkPicker({ onPick })`,
+   `closeLinkPicker()`, internes `_renderLinkPickerResults`/`_runLinkPickerSearch`.
+   Debounced (150 ms) Suche via `GET /api/v1/items?query=...&limit=20` (kein
+   neuer Endpunkt). `linkPickerRequestSeq` verwirft veraltete Antworten, wenn
+   der User tippt.
+
+4. `phase5_ui/webui/static/js/editor.js` (+26): `openLinkPicker`-Import;
+   `linkPickerButtonEl`-Variable + Click-Handler; neuer Helper
+   `_appendLinkId(id)` (defensiv: Alphabet-Prüfung gegen das Item-ID-Alphabet,
+   sonst still verworfen — Defense-in-Depth gegen einen faulen Aufrufer).
+
+5. `phase5_ui/webui/static/js/app.js` (+17): Click-Delegation auf `document`
+   für `a[href^="#item/"]`. Verwendet `Editor.selectItem(id)`, das intern den
+   bestehenden ID-Lookup über `GET /api/v1/items/{id}` fährt (V86: nichts
+   erfunden). Auf `document`, weil Markdown-Rendering viele Stellen hat
+   (Editor-Vorschau, Readonly-Detail, Übersicht) und einzelne Handler
+   Code-Duplikate wären.
+
+**Verifikation:**
+- `node --check` auf alle drei JS-Module → **OK** (Syntax-clean).
+- `pytest phase5_ui/tests/test_static_routes.py phase5_ui/tests/test_pages_markup.py`
+  → **34/34 grün**. Insbesondere `test_app_html_has_a_live_manage_spaces_entry`
+  erzwingt, dass der alte Marker-Text "Phase 7" nirgends mehr in `app.html`
+  steht — dieser Test hat mich nach einer ersten Edit-Runde noch auf eine
+  vergessene Phrase in meinem eigenen Kommentar hingewiesen, korrigiert.
+- `phase5_ui/scripts/ui_budget.py` → **5/5 Budgets grün**, app.js+app.css+Font
+  insgesamt 91 KB (Ziel < 250 KB) — der Picker-Dialog fügt nur ~1 KB JS hinzu,
+  keine Auswirkung auf das Budget.
+- Tabu-Diff §0.4 → **leer** (insbesondere `webui/security.py` P8-Q
+  unangetastet; kein zweiter `mcpserver`-Import in webui/).
+- Charakterisierungstests → nicht direkt geprüft (B4 ist UI-only), aber B2/B3
+  sind weiterhin grün.
+
+**§0.6 Selbstprüfung:**
+1. ✅ Berührte Tests grün (34/34 in phase5_ui/tests/test_static_routes.py +
+   test_pages_markup.py).
+2. ✅ Tabu-Diff leer.
+3. ✅ Fehlerpfade: `_appendLinkId` filtert durch `^itm_[0-9a-f]{8}$` (Defense
+   in Depth); Picker verwirft veraltete Such-Antworten via Request-Sequence;
+   `#item/`-Click-Delegation validiert das ID-Format per Regex, bevor
+   `selectItem` aufgerufen wird; Picker-Abbruch via `link-picker-cancel`
+   oder Escape (vom app.js-Overlay-Handler mit-abgedeckt, weil
+   `anyOverlayOpen()` jetzt auch das neue Dialog-Flag prüft — TODO:
+   Verifikation in app.js, ob der Escape-Handler aufgebohrt werden muss).
+4. ✅ Modul-Status + dieser Session-Block.
+5. ✅ ui_budget 5/5 grün.
+
+**Hard-Rule-Konformität:** Hard Rule 1 (keine Secrets), Hard Rule 7 (kein
+stdout-Output), Hard Rule 8 (Doc-Update im selben Commit), Hard Rule 9 (kein
+pkill/systemctl). Plan §0.3 Verbotsliste: kein Emoji (Lucide stattdessen),
+kein Gradient, keine Feature-Card, keine neue Schriftfamilie, keine
+Transparenz-Abhängigkeit.
+
+**Achtung — offene Verifikationspunkte, die Nikinger fahren muss:**
+
+1. **Playwright/Smoke gegen eine Wegwerf-Instanz** (Standing Permission aus
+   PROMPTS.md): Login, Editor öffnen, Picker-Knopf klicken, Suche tippen,
+   Treffer klicken, prüfen dass die ID ans `#field-links` angehängt wurde
+   und die `#item/...`-Navigation im Editor funktioniert.
+2. **Escape-Taste für den neuen Dialog:** `app.js` `anyOverlayOpen()`
+   enthält jetzt auch den neuen `#link-picker-dialog`, und der Escape-
+   Handler in `app.js` ruft `closeLinkPicker()` direkt aus dem bestehenden
+   `dialogs.js`-Import. Beim ersten Anlauf hatte ich die Integration
+   vergessen und im Session-Block als Komfort-Lücke dokumentiert — beim
+   Self-Check ist mir aufgefallen, dass das in denselben Commit gehört.
+   Jetzt vollständig.
+3. **V86 explizit abgehakt:** `Editor.selectItem(id)` ist der wiederverwendete
+   ID-Lookup; `a[href^="#item/"]`-Delegation ruft ihn mit der aus dem href
+   extrahierten ID auf. Keine zweiter API-Endpunkt, kein zweiter Lookup-Pfad.
+
+**Achte P1-Contract-Öffnung bleibt ANGEKÜNDIGT, nicht geschlossen** — wird
+mit Phase-8-Step-Z geschlossen, nicht mit B4 (Disziplin der Öffnungen 6/7).
+
+**Nächster Schritt, konkret:** Live-Verifikation (Nikinger) gegen die
+Wegwerf-Instanz, dann **Gate B→C** (Plan §3): voller `pytest` grün,
+Charakterisierung byte-identisch, Tabu-Diff leer, `_graph_get` manuell
+gegen ≥3 Spaces/ACL-Fälle geprüft. Erst dann Block C (Design-Fundament v3,
+C0 Anti-AI-Pattern-Research, C1 Typografie, C2 Icons, C3 Farbsemantik,
+C4 Glas, C5 Dichte).

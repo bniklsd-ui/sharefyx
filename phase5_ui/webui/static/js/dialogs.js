@@ -94,6 +94,96 @@ var shareCancelEl;
 var shareTargetItem = null;
 var pendingShareBody = null;
 
+// -- Phase 8 Block B Step B4 (Plan §3 B4): Link-Picker --------------------------------------
+// Sucht via `GET /api/v1/items?query=...` (existierender globaler Such-Modus aus Phase 7
+// Block B), Trefferklick ruft `onPick(id)`. Reines Overlay-Modal, kein API-Umbau, kein
+// neues MCP-Tool (Plan §0.5: Graph ist Mensch-UI, Claude erreicht Links ueber `links:`/
+// `get_item`).
+var linkPickerDialogEl;
+var linkPickerSearchEl;
+var linkPickerStatusEl;
+var linkPickerResultsEl;
+var linkPickerCancelEl;
+var linkPickerButtonEl;
+var linkPickerOnPick = null;
+var linkPickerRequestSeq = 0;
+
+export function openLinkPicker(opts) {
+  // `opts.onPick(id)` wird gerufen, wenn der User einen Treffer anklickt; der Callback haengt
+  // die ID typischerweise ans `#field-links` an. Pflicht-Parameter, weil das Picker-Dialog
+  // keine Meinung hat, wohin die ID gehoert (Editor kann das, DetailView wuerde was
+  // anderes wollen).
+  if (typeof opts !== "object" || typeof opts.onPick !== "function") {
+    throw new Error("openLinkPicker braucht { onPick(id) }");
+  }
+  linkPickerOnPick = opts.onPick;
+  linkPickerSearchEl.value = "";
+  linkPickerStatusEl.textContent = "";
+  linkPickerResultsEl.replaceChildren();
+  linkPickerDialogEl.hidden = false;
+  linkPickerSearchEl.focus();
+}
+
+export function closeLinkPicker() {
+  linkPickerDialogEl.hidden = true;
+  linkPickerSearchEl.value = "";
+  linkPickerStatusEl.textContent = "";
+  linkPickerResultsEl.replaceChildren();
+  linkPickerOnPick = null;
+  linkPickerRequestSeq += 1;  // laufende Suchen verwerfen
+}
+
+function _renderLinkPickerResults(items) {
+  linkPickerResultsEl.replaceChildren();
+  if (items.length === 0) {
+    var empty = document.createElement("li");
+    empty.textContent = "Keine Treffer.";
+    empty.setAttribute("aria-disabled", "true");
+    linkPickerResultsEl.appendChild(empty);
+    return;
+  }
+  items.forEach(function (item) {
+    var li = document.createElement("li");
+    li.setAttribute("role", "option");
+    li.dataset.itemId = item.id;
+    var title = document.createElement("span");
+    title.textContent = item.title;
+    var idLine = document.createElement("span");
+    idLine.className = "link-picker-id";
+    idLine.textContent = item.id + " \u00b7 " + item.space + " \u00b7 " + item.type;
+    li.appendChild(title);
+    li.appendChild(idLine);
+    li.addEventListener("click", function () {
+      var onPick = linkPickerOnPick;
+      var picked = item.id;
+      closeLinkPicker();
+      if (onPick) onPick(picked);
+    });
+    linkPickerResultsEl.appendChild(li);
+  });
+}
+
+function _runLinkPickerSearch(query) {
+  var seq = ++linkPickerRequestSeq;
+  if (!query) {
+    linkPickerStatusEl.textContent = "";
+    linkPickerResultsEl.replaceChildren();
+    return;
+  }
+  linkPickerStatusEl.textContent = "Suche…";
+  api("/items?query=" + encodeURIComponent(query) + "&limit=20&offset=0")
+    .then(function (data) {
+      if (seq !== linkPickerRequestSeq) return;  // spaetere Suche hat gewonnen
+      linkPickerStatusEl.textContent = data.total + " Treffer";
+      _renderLinkPickerResults(data.items || []);
+    })
+    .catch(function (err) {
+      if (seq !== linkPickerRequestSeq) return;
+      linkPickerStatusEl.textContent = "Fehler: " + (err.message || "unbekannt");
+      linkPickerResultsEl.replaceChildren();
+    });
+}
+
 // -- Rückfragedialog (ersetzt window.confirm) ----------------------------------------------
 
 export var pendingConfirmCancel = null;
@@ -408,6 +498,23 @@ export function init() {
   confirmCancelEl = document.getElementById("confirm-cancel");
 
   accountDialogEl = document.getElementById("account-dialog");
+
+  // Phase 8 Block B Step B4 (Plan §3 B4): Link-Picker-Verkabelung. Der Picker-Knopf selbst
+  // wird in editor.js verkabelt (er weiss, an welches Feld die ID angehaengt werden soll);
+  // hier nur Such-Input, Status, Ergebnisliste, Abbrechen-Knopf und Initial-Suche.
+  linkPickerDialogEl = document.getElementById("link-picker-dialog");
+  linkPickerSearchEl = document.getElementById("link-picker-search");
+  linkPickerStatusEl = document.getElementById("link-picker-status");
+  linkPickerResultsEl = document.getElementById("link-picker-results");
+  linkPickerCancelEl = document.getElementById("link-picker-cancel");
+  linkPickerButtonEl = document.getElementById("link-picker-button");
+  linkPickerCancelEl.addEventListener("click", function () { closeLinkPicker(); });
+  var _pickerDebounce = null;
+  linkPickerSearchEl.addEventListener("input", function () {
+    if (_pickerDebounce) clearTimeout(_pickerDebounce);
+    var q = linkPickerSearchEl.value.trim();
+    _pickerDebounce = setTimeout(function () { _runLinkPickerSearch(q); }, 150);
+  });
   accountErrorEl = document.getElementById("account-error");
   accountCurrentEl = document.getElementById("account-current");
   accountTotpEl = document.getElementById("account-totp");

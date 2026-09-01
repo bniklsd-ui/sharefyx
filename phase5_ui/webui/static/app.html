@@ -124,7 +124,17 @@
               <input type="text" class="input" id="field-tags" placeholder="kommagetrennt">
             </label>
             <label class="field field--wide">Links
-              <input type="text" class="input" id="field-links" placeholder="kommagetrennt">
+              <span class="field-links-row">
+                <input type="text" class="input" id="field-links" placeholder="kommagetrennt">
+                <!-- Phase 8 Block B Step B4 (Plan §3 P4): Link-Picker -- Icon-Knopf rechts neben
+                     dem Eingabefeld, öffnet den `link-picker-dialog`. Das Lucide-Sprite wird
+                     via <use href="#icon-..."> eingebunden (P8-C2, Verbotsliste §0.3 Punkt 1:
+                     keine Emoji / HTML-Entity-Icons). -->
+                <button type="button" class="btn" id="link-picker-button"
+                        aria-label="Item-Verknüpfung suchen" title="Item suchen">
+                  <svg class="icon" aria-hidden="true"><use href="#icon-search"></use></svg>
+                </button>
+              </span>
             </label>
           </div>
         </div>
@@ -200,6 +210,24 @@
     <div class="overlay__actions">
       <button type="button" class="btn-primary" id="new-folder-submit">Anlegen</button>
       <button type="button" class="btn" id="new-folder-cancel">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Phase 8 Block B Step B4 (Plan §3 P4): Link-Picker-Dialog. Reine UI-Komponente,
+     kein eigenes MCP-Tool (Plan §0.5: Graph ist Mensch-UI, Claude erreicht Links ueber
+     `links:`/`get_item`). Sucht via `GET /api/v1/items?query=...` (existierender globaler
+     Such-Modus), Trefferklick haengt die `itm_…`-ID ans `#field-links` an
+     (Komma-Konvention des Feldes, kein API-Umbau). -->
+<div class="overlay" id="link-picker-dialog" hidden>
+  <div class="overlay__panel">
+    <h2>Item verknüpfen</h2>
+    <p class="overlay__hint">Sucht nach Titel oder Tag. Klick auf einen Treffer hängt die <code>itm_…</code>-ID an die Links dieses Items.</p>
+    <input type="search" class="input" id="link-picker-search" placeholder="Titel oder Tag…" autocomplete="off">
+    <p class="overlay__hint" id="link-picker-status" aria-live="polite"></p>
+    <ul class="link-picker-results" id="link-picker-results" role="listbox"></ul>
+    <div class="overlay__actions">
+      <button type="button" class="btn" id="link-picker-cancel">Schließen</button>
     </div>
   </div>
 </div>

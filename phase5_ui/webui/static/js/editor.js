@@ -8,7 +8,7 @@ import { api } from "./api.js";
 import { markdownToHtml } from "./markdown.js";
 import { loadItems, loadOverview, renderList } from "./list.js";
 import { renderRail } from "./tree.js";
-import { confirmDialog, showConflictDialog } from "./dialogs.js";
+import { confirmDialog, showConflictDialog, openLinkPicker } from "./dialogs.js";
 
 var shellEl;
 var overviewEl;
@@ -43,6 +43,7 @@ var conflictDialogEl;
 var insertImageButtonEl;
 var insertImageInputEl;
 var assetStripEl;
+var linkPickerButtonEl;  // Phase 8 Block B Step B4 (Plan §3 B4)
 
 export function showOverviewPane() {
   overviewEl.hidden = false;
@@ -81,6 +82,20 @@ function snapshotFromItem(item) {
 // entferntes Asset als Alt-Text statt als kaputtes `<img>` rendert.
 function assetIdsOf(assets) {
   return (assets || []).map(function (a) { return a.id; });
+}
+
+// Phase 8 Block B Step B4 (Plan §3 B4): Link-Picker-Callback. Hängt eine `itm_…`-ID an
+// `#field-links` an (Komma-Konvention). Dedupliziert nicht — wer dieselbe ID zweimal
+// verlinken will, kann das bewusst tun, und der Server akzeptiert es ohnehin (Phase-6-
+// Spezifikation: `links` ist `list[str]`). Die Alphabet-Prüfung ist eine harte Garantie,
+// dass der Picker-Callback nichts in das Feld schreibt, was nicht durch `links: ITEM_REF_RE`
+// als Frontmatter-Kante akzeptiert würde — Defense-in-Depth gegen einen faulen Aufrufer.
+function _appendLinkId(id) {
+  if (!/^itm_[0-9a-f]{8}$/.test(id)) return;
+  var current = fieldLinksEl.value
+    .split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+  current.push(id);
+  fieldLinksEl.value = current.join(", ");
 }
 
 export function currentFormValues() {
@@ -289,6 +304,7 @@ function showEditableItem(item, opts) {
   fieldTagsEl.value = item.tags.join(", ");
   fieldLinksEl.value = item.links.join(", ");
   editorTextareaEl.value = item.body;
+
   // Meldung des Nikingers: der Editor öffnete immer in der Bearbeiten-Ansicht, auch beim
   // bloßen Betrachten. Vorgabe jetzt "Vorschau" — außer `opts.mode` sagt etwas anderes:
   // ein frisch angelegtes Item (dialogs.js :: createSubmitButtonEl) will sofort tippen können
@@ -453,8 +469,16 @@ export function init() {
   insertImageButtonEl = document.getElementById("insert-image-button");
   insertImageInputEl = document.getElementById("insert-image-input");
   assetStripEl = document.getElementById("asset-strip");
+  linkPickerButtonEl = document.getElementById("link-picker-button");
 
   closeButtonEl.addEventListener("click", function () { closeEditor(); });
+
+  // Phase 8 Block B Step B4 (Plan §3 B4): Link-Picker-Knopf öffnet den Dialog, der Callback
+  // hängt die gewählte `itm_…`-ID an das `#field-links`-Feld an (Komma-Konvention, kein
+  // API-Umbau). Idempotent: derselbe Picker lässt sich auch mehrfach öffnen.
+  linkPickerButtonEl.addEventListener("click", function () {
+    openLinkPicker({ onPick: _appendLinkId });
+  });
 
   // Nur-lesen-Ansicht (fremdes Item): kein `editingSnapshot`, also nichts Ungespeichertes —
   // schließt ohne Rückfrage, anders als `closeEditor()`.
