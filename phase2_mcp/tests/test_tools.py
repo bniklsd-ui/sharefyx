@@ -137,6 +137,9 @@ def test_get_item_description_points_to_get_item_meta(described_mcp):
 def test_tool_descriptions_tell_the_agent_to_name_titles_not_ids(described_mcp):
     for name in ("search_items", "get_item", "get_item_meta", "create_item"):
         assert tools._TITLE_NOT_ID_HINT in _description_of(described_mcp, name)
+    assert "Einkaufsliste Winter" in tools._TITLE_NOT_ID_HINT
+    assert "itm_a1b2c3d4" in tools._TITLE_NOT_ID_HINT
+    assert "Tabellen-Spalte" in tools._TITLE_NOT_ID_HINT
 
 
 # -- list_spaces --------------------------------------------------------------------

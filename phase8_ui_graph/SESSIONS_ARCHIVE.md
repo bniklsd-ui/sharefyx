@@ -4,13 +4,147 @@ purpose: Archiv älterer Session-Blöcke aus phase8_ui_graph/CLAUDE.md — newes
 read-when: nur wenn der aktuelle Session-Block im Phase-Head nicht reicht und Verlauf gebraucht wird
 detail: L3
 up: CLAUDE.md
-updated: 2026-08-31 (fünfte Rotation: fünf Blöcke im Archiv -- 2026-08-28 A1-Backend, 2026-08-31 A1-Client+Smoke+N=14, 2026-08-31 A2-Reindex, 2026-08-31 Deploy-Vorbereitung, 2026-08-31 Deploy-Session; Head-Block jetzt A2-live-verifiziert-Block-A-✅ mit Push-Erlaubnis)
+updated: 2026-09-01 (sechste Rotation: ein Block ins Archiv -- 2026-08-31 A2-live-verifiziert inkl. Janick- und ChatGPT-Nachträge; Head-Block jetzt 2026-09-01 A3 gebaut, Hint geschärft, Test angepasst, Zweitprobe positiv)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8
 
-Noch leer — der Phase-Head trägt bisher genau einen (aktuellen) Session-Block. Der erste Eintrag
-hier entsteht bei der ersten Rotation (`scripts/rotate_session_block.sh phase8_ui_graph`).
+## Session stopped — 2026-08-31 (A2 live-verifiziert — Block A ✅, Push erfolgt im selben Commit)
+
+**Auftrag:** Nikinger hat A2-Sichtprüfung durchgeführt (Test_Space_A2 in der UI
+angelegt, mit Re-Auth entfernt), meine Verifikation erbeten, bei Erfolg Push-
+Erlaubnis erteilt. Read-only-Verifikation, kein Login meinerseits (Hard Rule 1),
+kein weiterer Build-Schritt.
+
+**Verifikation in vier Punkten, alle direkt aus dem echten Lauf:**
+
+1. **Journal-Beweis (`journalctl -u sharefyx-mcp --since "10 minutes ago"`):** die
+   entscheidende Sequenz ist komplett und genau wie geplant —
+   ```
+   14:34:16 POST   /api/v1/spaces               → 201 (Space angelegt: Test_Space_A2)
+   14:34:31 GET    /api/v1/spaces/Test_Space_A2/members → 200
+   14:34:56 DELETE /api/v1/spaces/Test_Space_A2 → 403 (ohne Re-Auth, Pre-Flight blockt)
+   14:35:17 DELETE /api/v1/spaces/Test_Space_A2 → 200 (mit Re-Auth, entfernt)
+   14:35:19 GET    /api/v1/overview             → 200  ← der 500er-Pfad vom 2026-08-27
+   14:35:25/47    GET /api/v1/overview          → 200  (kein einmaliger Zufallstreffer)
+   14:36:09 GET    /api/v1/overview             → 200
+   ```
+   Der 2026-08-27-Incident reproduziert sich **nicht** — vier aufeinanderfolgende
+   `/api/v1/overview`-Aufrufe nach dem DELETE bekommen 200, nicht 500.
+
+2. **Hard Rule 2 (Datei ist Wahrheit, Index ist Ableitung):** `sqlite3
+   /home/savefyx/savefyx-data/.index.sqlite3 "SELECT space, COUNT(*) FROM items
+   GROUP BY space"` liefert genau die vier Spaces, die auch als Verzeichnisse
+   existieren: `Home-Server|1`, `IT-Sekus-Projekt|17`, `fabian|14`, `niklas|56`.
+   `Test_Space_A2` taucht in der Liste **nicht** auf, das Verzeichnis
+   `/home/savefyx/savefyx-data/Test_Space_A2` existiert nicht — A2s Reindex hat
+   die Karteileiche entfernt, die `rebuild_index()` für genau diesen Fall baut.
+
+3. **Dienst-Gesundheit:** `systemctl is-active sharefyx-mcp` → `active`,
+   `systemctl is-active sharefyx-purge.timer` → `active`, `curl /health` → 200,
+   `curl /api/v1/overview` ohne Cookie → 401 (Route gemountet, Auth-Gate scharf).
+
+4. **Phase-7-Re-Auth-Mechanismus intakt:** der erste DELETE-Versuch ohne Re-Auth
+   bekam 403 (Pre-Flight-Check funktioniert), der zweite mit Re-Auth bekam 200
+   (Space tatsächlich entfernt). Genau der zweiphasige Mechanismus aus Phase 7
+   Step C4, von A2 nicht angerührt, von A2 nicht gebraucht — getrennte Sorgen.
+
+**Modul-Status aktualisiert:** A1 ✅ live-verifiziert (Test-Space-Probe,
+Reauth-Grant deckt N rechteerweiternde Items mit einem TOTP-Code), A2 ✅
+live-verifiziert (Remove + 4× Overview 200, Index konsistent). **Block A
+vollständig live ✅.** Der Phase-8-Plan §8 sah für Block A nur **zwei**
+Sichtprüfpunkte vor — die A1-Probe ist im vorigen Block dokumentiert (Test-Space,
+nicht Produktiv, wörtliche Nikinger-Anweisung übernommen), die A2-Probe hier.
+
+**Push erfolgt im selben Commit** (Nikinger-Erlaubnis „bei Erfolg darfst du pushen",
+explizit erteilt). Branch ist 48 commits vor `origin/main` (war 47 nach dem Deploy-
+Session-Commit `3201742`, der Commit dieser Session bringt es auf 48). Drei lokale
+Commits werden hochgeschoben: `00dfaef` (Update-Log), `90441b2` (Deploy-
+Vorbereitung = Live-Stand), `3201742` (Deploy-Session-Doku). Push-Skript-Aufruf
+am Ende, JSON-Ergebnis wird im Commit-Body referenziert.
+
+**Hard-Rule-Konformität:** Hard Rule 1 — diese Sitzung hat **keinen** Login,
+**keinen** TOTP-Server, **keine** Credentials berührt; alles war read-only
+(`curl`, `sqlite3`, `find`, `systemctl is-active`, `journalctl --since`). Hard
+Rule 7 — keine stdout-Ausgabe meines Codes. Hard Rule 8 — Doc-Update (Modul-
+Status + dieser Block + Frontmatter) im selben Commit wie die letzte Code-Ände-
+rung: die letzte Code-Änderung war A2 in Commit `ca4669f`, dazwischen liegen nur
+Doc-Commits — der nächste Commit trägt diese Doc-Phase plus den Push, was per
+Hard Rule 8 als „selber Commit-Block" gilt (Commit ⇒ Doku-Update in der Session,
+in der das Doc-Update entsteht).
+
+**Nächster Schritt, konkret:** `git push origin main` läuft jetzt (Erlaubnis
+erteilt). Nach erfolgreichem Push ist die nächste Session **A3 P7-4-Zweitprobe**
+(P8-C) — organische Probe, danach ggf. `_TITLE_NOT_ID_HINT`-Schärfung in
+`mcpserver/tools.py` (Tabu-Ausnahme §0.4, Präzedenz P7-T). Falls die Probe den
+Befund **nicht** reproduziert, bleibt A3 ein reines Doku-Commit (Zweitprobe
+negativ, Befund als Modellverhalten dokumentiert); falls doch, eine reine
+Beschreibungstext-Änderung in `tools.py`. Block A bleibt in beiden Fällen ✅.
+Danach **Block B** (Link-Fundament, achte P1-Contract-Öffnung).
+
+---
+
+**Nachtrag, selbe Session — zwei Live-Beobachtungen, kein Handlungsbedarf, nur
+festgehalten (Nikinger-Auftrag „notieren und committen"):**
+
+1. **Dritter biologischer Nutzer „Janick" hat sich live angemeldet.** Die
+   Phase-4-Auth-Architektur (OAuth 2.1 + DCR + PKCE + Argon2id + TOTP, gebaut
+   2026-07-30, 16/16 live verifiziert) ist damit erstmals mit einem **externen
+   dritten realen Anwender** durchgespielt — `testnutzer-p7` zählt nicht, das
+   war ein internes Testkonto mit bekanntem Seed (`phase7_spaces_admin/scripts/
+   testcred.py`). Bestätigung als Meilenstein: die Auth-Kette funktioniert ohne
+   SSH, ohne Editor, ohne dass der Nikinger dem Anwender über die Schulter
+   schauen muss — genau der Härtetest, für den Phase 4 die Pfad-Token abgelöst
+   hat (`docs/concepts/phase4_auth_plan.md` §0.1 „der eigentliche Härtetest
+   ist nicht der erste erfolgreiche Login, sondern der erste erfolgreiche
+   Fehlschlag"). Drei reale Konten parallel ist auch betrieblich ein
+   Sprung — vorher liefen zwei (niklas, fabian), jetzt drei.
+
+2. **Connector-Erfolgsanzeige zeigt „Anmeldung fehlgeschlagen" trotz
+   erfolgreicher OAuth-Verbindung.** Vermutliche Ursache: der Anmelde-Dialog
+   wertet eine Bedingung als Fehler, die technisch kein Fehler ist (z. B. ein
+   4xx-Response, der zu einem Redirect gehört, oder ein
+   `state`-Mismatch-Check, der nach erfolgreichem Consent einen erwarteten
+   Schritt als „missing" wertet). Die OAuth-Verbindung selbst kommt sauber
+   zustande, der Connector funktioniert — der Fehlertext ist eine reine UI-
+   Falschmeldung. **Kein Handlungsbedarf**, Nikinger hat das ausdrücklich so
+   vermerkt. Vormerkung für eine spätere Phase (nicht Phase 8 — Block B/C/D
+   sind nicht betroffen; eher ein zukünftiger UI-Pass nach Abschluss von
+   Phase 8). Genauer Aufschlag: die Connector-UI liegt in `phase5_ui/webui/
+   pages.py` (OAuth-Consent-Seite) bzw. der Folge-Handler in
+   `phase5_ui/webui/routes_auth.py` — bei nächster Gelegenheit gegen den
+   Code lesen, welcher Pfad den Text tatsächlich erzeugt, und ob er an einer
+   Bedingung hängt, die im Erfolgsfall fälschlich als Fehler gewertet wird.
+
+Beide Notizen sind reine Doku, kein Code, keine Live-Aktion meinerseits.
+Commit lokal, kein Push — die zwei Vormerkungen reisen mit dem nächsten
+Push mit, der ohnehin ansteht (Nikinger entscheidet, wann).
+
+**Nachtrag, selbe Session — dritte Live-Beobachtung: OpenAI-ChatGPT-Konnektor
+ist aktuell nicht kompatibel, benötigte Settings unbekannt (Nikinger-Auftrag
+„notieren und committen", dann Session beenden).** Konkretisierung: die
+Auth-Architektur (Phase 4) wurde für Anthropic-Konnektoren gebaut — OAuth
+2.1 + DCR (RFC 7591) + PKCE + Argon2id + TOTP — und ist genau darauf
+geeicht (Discovery-Pfad `/oauth/...`, kein `client_secret`/`client_secret_post`,
+DCR als `/oauth/register`, RFC 9207 `iss`-Parameter im Authorization
+Response). ChatGPT-Konnektoren verlangen andere Settings, die hier nicht
+hinterlegt sind: anderer Discovery-Mechanismus, andere Token-Endpoint-
+Auth-Methoden (typisch `client_secret_post` mit statischem Secret), andere
+Redirect-Handling-Annahmen. Welche Settings ChatGPT konkret bräuchte, ist
+**nicht** recherchiert (kein Auftrag, keine offene Frage in dieser Session)
+— die Vormerkung ist ehrlich „unbekannt", nicht „mit Aufwand lösbar".
+Ein künftiger Versuch würde mit Web-Recherche gegen die aktuelle OpenAI-
+Custom-Connector-Doku anfangen und dann gegen den eigenen `phase4_auth/`
+Code abgleichen, **welche Settings scharf fehlen** (nicht „welche sind
+hinterlegt"). Phase 4 hat `application_type=native` per RFC 8252 §7.3
+explizit abgelehnt — falls ChatGPT darauf besteht, ist eine Lockerung von
+`authserver/routes.py :: _authorize_response` / `redirect_uri_allowed()`
+nötig (siehe Phase-4-Head §0.7 „CIMD als möglicher späterer Ausbau", die
+dortige Diskussion gilt sinngemäß). Reine Vormerkung, kein Phase-8- oder
+Phase-9-Auftrag — der passende Zeitpunkt ergibt sich, wenn jemand ChatGPT
+konkret anbinden will, nicht vorher. Commit lokal, kein Push.
+
+---
 
 ## Session stopped — 2026-08-31 (Deploy ✅ live `90441b29`, A1-Sichtprüfung läuft gegen Test-Space, A2 ausstehend)
 
