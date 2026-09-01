@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase8_ui_graph_plan.md       # voller Plan, Entscheidungen P8-A–P8-Q, §0.1 gelockte N1–N12, Steps 0/A/B/C/D/Z
   - ../docs/concepts/PHASE7_CLOSEOUT_HANDOVER.md   # Herkunft der drei Erbposten (P7-24/remove-space/P7-4)
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-09-01 (Block C C0 gebaut: Anti-AI-Pattern-Research (V94 bestaetigt, Web-Recherche) + UI-Audit gegen den Code (P8-25); Findings-Tabelle Muster -> Fundstelle -> Fix -> Ziel-Step im Phase-Head, 35 Eintraege, davon 0 als eskaliert markiert; Code unberuehrt, vier Dateien Doku-only -- phase8_ui_graph/CLAUDE.md + SESSIONS_ARCHIVE.md + docs/INDEX.md + SESSIONS_ARCHIVE-Frontmatter; Head 18.4KB->27.5KB, immer noch unter Softcap) | 2026-09-01 (Gate B→C: 958/958 pytest gruen, Charakterisierung byte-identisch, Tabu-Diff leer, _graph_get manuell 12/12, Playwright gegen Wegwerf 18/18; B4-Block rotiert, Head 14.8KB unter Softcap; Code unberuehrt, Doku-Update + neuer Session-Block) | 2026-09-01 (Block B Step B1 gebaut -- storage/linkscan.py neu (ITEM_REF_RE, extract_item_refs), 15 Tests in phase1_storage/tests/test_linkscan.py, achte P1-Contract-Oeffnung in phase1_storage/CLAUDE.md angekuendigt vor Code, Tabu-Diff §0.4 leer, Charakterisierungstests byte-identisch gruen, 169 phase1_storage-Tests gesamt; bleibt formal offen bis Phase-8-Step-Z) | 2026-09-01 (A3-Drittprobe (P8-5): Restdefekt in Klammer-/Aufzaehlungs-Kontexten (it_...-ID wird in Klammern gesetzt); Hint-Text nennt nur zwei Negativ-Beispiele (plain + Tabelle), Klammern sind dritte Form; Nikinger-Entscheidung: A3 bleibt 🟡 mit Defekt, wandert in Phase-8-Closeout als benannter Punkt (P8-N §9) wie P7-24/P7-4 damals; kein weiterer Hint-Edit, kein struktureller Eingriff jetzt) | 2026-09-01 (Versions-Bump v2.2 -> v2.2.3 in app.html .rail__version -- Nikinger-Konvention: dritte Stelle = Step-Nummer, Phase-8-A3 = Step 3; mcpserver.__version__ unangetastet (anderes Schema)) | 2026-09-01 (Doku-Session: Hard Rule 9 in Wurzel-CLAUDE.md ergaenzt nach Phase-8-A3-Vorfall -- kein pkill -f mit Regex, niemals den systemd-Dienst anfassen; PROMPTS.md Hard-Rules-Liste und Tests-Absatz um Stopp-Regel fuer Wegwerf-Instanzen erweitert; docs/INDEX.md drei Zeilen vorne + drei Eintraege angepasst; kein Code, kein Service-Touch, Produktion weiterhin active, head 11.6KB->12.8KB unter Softcap) | 2026-09-01 (A3 gebaut -- _TITLE_NOT_ID_HINT mit Positiv/Negativ-Beispiel geschärft, Test test_tool_descriptions_tell_the_agent_to_name_titles_not_ids auf neuen Wortlaut angepasst, 143 phase2_mcp-Tests gruen, Zweitprobe vom Nikinger live bestaetigt (positiv), dritte Probe nach Deploy offen P8-5) | 2026-08-31 (A2 live-verifiziert -- Test_Space_A2 angelegt + entfernt, 4x GET /api/v1/overview nach DELETE=200 statt 500, Index konsistent mit Dateien, Push danach freigegeben; Block A vollstaendig live ✅) | 2026-08-31 (Nachtrag: Janick live angemeldet -- dritter biologischer Nutzer, Phase-4-Auth-Architektur erstmals mit externem Dritt-Anwender durchgespielt; Connector-UI-Befund: 'Anmeldung fehlgeschlagen' trotz erfolgreicher OAuth-Verbindung, kein Handlungsbedarf, Vormerkung fuer spaeter) | 2026-08-31 (Nachtrag: OpenAI-ChatGPT-Konnektor aktuell nicht kompatibel, benoetigte Settings unbekannt -- Auth-Architektur auf Anthropic-Konnektoren geeicht, andere Settings nicht hinterlegt, Vormerkung ohne Auftrag) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
+updated: 2026-09-01 (Block C C1 gebaut: C1a Font-Swap (Plex Sans Var v0.2.0 + Plex Mono v2.5.0, SHAs gepinnt, build_font_subset_plex.sh neu) + C1b CSS-Typografie (5 Skala-Tokens, body 16px/1.55, h1-h3 + Meta-Zeilen auf Tokens, IDs/Versions in --font-mono); zwei Commits (0281cce + 08bff55); ui_budget 5/5 (108.4/250 KB), pytest 958/958 (250s, Flake als isoliert bestaetigt), Tabu-Diff leer; phase8_ui_graph/CLAUDE.md Modul-Status Block C auf 'C0 + C1 gebaut, C2-C5 offen' gehoben + Abnahmestand um C1-Zeile ergaenzt + neuer Session-Block; Head 27.5KB->33KB, immer noch unter Softcap) | 2026-09-01 (Block C C0 gebaut: Anti-AI-Pattern-Research (V94 bestaetigt, Web-Recherche) + UI-Audit gegen den Code (P8-25); Findings-Tabelle Muster -> Fundstelle -> Fix -> Ziel-Step im Phase-Head, 35 Eintraege, davon 0 als eskaliert markiert; Code unberuehrt, vier Dateien Doku-only -- phase8_ui_graph/CLAUDE.md + SESSIONS_ARCHIVE.md + docs/INDEX.md + SESSIONS_ARCHIVE-Frontmatter; Head 18.4KB->27.5KB, immer noch unter Softcap) | 2026-09-01 (Gate B→C: 958/958 pytest gruen, Charakterisierung byte-identisch, Tabu-Diff leer, _graph_get manuell 12/12, Playwright gegen Wegwerf 18/18; B4-Block rotiert, Head 14.8KB unter Softcap; Code unberuehrt, Doku-Update + neuer Session-Block) | 2026-09-01 (Block B Step B1 gebaut -- storage/linkscan.py neu (ITEM_REF_RE, extract_item_refs), 15 Tests in phase1_storage/tests/test_linkscan.py, achte P1-Contract-Oeffnung in phase1_storage/CLAUDE.md angekuendigt vor Code, Tabu-Diff §0.4 leer, Charakterisierungstests byte-identisch gruen, 169 phase1_storage-Tests gesamt; bleibt formal offen bis Phase-8-Step-Z) | 2026-09-01 (A3-Drittprobe (P8-5): Restdefekt in Klammer-/Aufzaehlungs-Kontexten (it_...-ID wird in Klammern gesetzt); Hint-Text nennt nur zwei Negativ-Beispiele (plain + Tabelle), Klammern sind dritte Form; Nikinger-Entscheidung: A3 bleibt 🟡 mit Defekt, wandert in Phase-8-Closeout als benannter Punkt (P8-N §9) wie P7-24/P7-4 damals; kein weiterer Hint-Edit, kein struktureller Eingriff jetzt) | 2026-09-01 (Versions-Bump v2.2 -> v2.2.3 in app.html .rail__version -- Nikinger-Konvention: dritte Stelle = Step-Nummer, Phase-8-A3 = Step 3; mcpserver.__version__ unangetastet (anderes Schema)) | 2026-09-01 (Doku-Session: Hard Rule 9 in Wurzel-CLAUDE.md ergaenzt nach Phase-8-A3-Vorfall -- kein pkill -f mit Regex, niemals den systemd-Dienst anfassen; PROMPTS.md Hard-Rules-Liste und Tests-Absatz um Stopp-Regel fuer Wegwerf-Instanzen erweitert; docs/INDEX.md drei Zeilen vorne + drei Eintraege angepasst; kein Code, kein Service-Touch, Produktion weiterhin active, head 11.6KB->12.8KB unter Softcap) | 2026-09-01 (A3 gebaut -- _TITLE_NOT_ID_HINT mit Positiv/Negativ-Beispiel geschärft, Test test_tool_descriptions_tell_the_agent_to_name_titles_not_ids auf neuen Wortlaut angepasst, 143 phase2_mcp-Tests gruen, Zweitprobe vom Nikinger live bestaetigt (positiv), dritte Probe nach Deploy offen P8-5) | 2026-08-31 (A2 live-verifiziert -- Test_Space_A2 angelegt + entfernt, 4x GET /api/v1/overview nach DELETE=200 statt 500, Index konsistent mit Dateien, Push danach freigegeben; Block A vollstaendig live ✅) | 2026-08-31 (Nachtrag: Janick live angemeldet -- dritter biologischer Nutzer, Phase-4-Auth-Architektur erstmals mit externem Dritt-Anwender durchgespielt; Connector-UI-Befund: 'Anmeldung fehlgeschlagen' trotz erfolgreicher OAuth-Verbindung, kein Handlungsbedarf, Vormerkung fuer spaeter) | 2026-08-31 (Nachtrag: OpenAI-ChatGPT-Konnektor aktuell nicht kompatibel, benoetigte Settings unbekannt -- Auth-Architektur auf Anthropic-Konnektoren geeicht, andere Settings nicht hinterlegt, Vormerkung ohne Auftrag) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
 ---
 
 # CLAUDE.md — Phase 8: UI-Neuanstrich v3, Verknüpfungs-Graph, QoL (`phase8_ui_graph/`)
@@ -60,7 +60,7 @@ Abnahmezeilen: `docs/concepts/phase8_ui_graph_plan.md`.
 | B3 | `webui/api.py :: _graph_get()` + Route `GET /api/v1/graph` + 8 Tests | ✅ gebaut + live-verifiziert (`58ff9a6` deploy `007b73d`, 2026-09-01); Tabu-Diff leer, Charakterisierungstests byte-identisch grün (P5-B-Disziplin gehalten: nur `mcpserver.permissions.SharePolicy` importiert in webui/) |
 | B4 | UI: `#item/`-Klick-Delegation (`app.js`) + Link-Picker-Dialog (`app.html`/`app.css`/`dialogs.js`/`editor.js`) | ✅ gebaut + live-verifiziert (`ea14d53` deploy `007b73d`, 2026-09-01); Tabu-Diff leer (insb. `webui/security.py` P8-Q unangetastet); JS-Syntax-Check `node --check` auf `app.js`/`editor.js`/`dialogs.js` OK; 34 statische-Tests grün; ui_budget 5/5 grün (91/250 KB app.js+css+Font) |
 | Block B abgeschlossen | `linkscan.py` + `item_links` + `Store.links_all` + `GET /api/v1/graph` + UI-Wiring | ✅ **live-verifiziert** (`007b73d`, 2026-09-01, Release `20260901T103944.634877Z`, Health-Gate 3/3, Versionsbadge v2.2.3); achte P1-Contract-Öffnung bleibt **angekündigt**, geschlossen mit Phase-8-Step-Z |
-| Block C | Design-Fundament v3 (Typografie, Icons, Farben, Glas) | 🔄 C0 ✅ · C1–C5 ⬜ |
+| Block C | Design-Fundament v3 (Typografie, Icons, Farben, Glas) | 🔄 C0 ✅ · C1 ✅ gebaut (C1a Font-Swap + C1b CSS-Tokens) · C2–C5 ⬜ |
 | Block D | Übersicht tablos + Force-Graph | ⬜ |
 | Step Z | Closeout | ⬜ |
 
@@ -75,7 +75,9 @@ Achte P1-Contract-Öffnung (P8-M) wird in Block B benannt und gebaut — Eintrag
 „gebaut".** A1 ✅ + A2 ✅ live-verifiziert (`90441b29`, 2026-08-31, Nikinger-Probe Test_Space +
 Test_Space_A2). A3 gebaut (2026-09-01), dritte Probe nach Deploy offen (P8-5). **C0 ✅** —
 Findings-Tabelle unten (P8-25), keine Fund-Eskalation nötig (alle 35 Einträge auf C1–C5/D1
-gemappt oder bereits aligned).
+gemappt oder bereits aligned). **C1 ✅ gebaut** (C1a Font-Swap + C1b CSS-Tokens, F1/F2/F3/F4/F6
+geschlossen; 958/958 pytest, ui_budget 5/5, Tabu-Diff leer; Sichtprüfung 1 folgt nach C2
+zusammen, Plan §8).
 
 ---
 
@@ -176,98 +178,109 @@ unangetastet (anderes Schema, Python-Introspection, nicht der User-Badge).
 
 ---
 
-## Session stopped — 2026-09-01 (Block C C0: Anti-AI-Pattern-Research + UI-Audit, 35 Findings, keine Eskalation)
+## Session stopped — 2026-09-01 (Block C C1: IBM Plex Sans Var + Mono, Typo-Tokens, Body 16px/1.55, IDs/Versions in Plex Mono)
 
-**Auftrag:** der erste Schritt in Block C nach Plan §4 — C0 (Anti-AI-Pattern-Research
-+ UI-Audit, P8-25). Bevor irgendwo eine Type-Swap-, Sprite- oder Glass-Zeile landet,
-einmal bewusst hinschauen, was die LLM-Default-Aesthetik 2026 überhaupt ist, und gegen
-den Code hier halten. Der Nikinger hat in der Auftragsmail zusätzlich explizit
-freigegeben, „spezifisch nach UI-Regeln und Listen zu suchen, die Tipps geben, wie
-man eine Website nicht vibecoded" — V94 (Web-Recherche für C0-Teil 1) damit von
-„angenommen ja" auf „durch diesen Lauf bestätigt ja".
+**Auftrag:** der zweite Schritt in Block C nach Plan §4 — C1 (Typografie, P8-G). Nikinger
+hat am Session-Anfang zwei Dinge hinterlegt: erstens den C0-Stand (Findings-Tabelle mit 35
+Einträgen, null Eskalationen) als `git add` + Commit vor C1 zu übernehmen; zweitens die zwei
+C1-blockierenden Entscheidungen aus C0 abzufragen — Reihenfolge Block C (Plan-Drift, vor Bau
+klären) und C1-Commit-Strategie (ein Commit oder F1+F2 / F3/F4/F6 getrennt). Die vier
+„Was Nikinger entscheiden kann"-Punkte aus dem C0-Block sind hier referenziert: F8/F14
+keine Blocker (F8 dokumentiert in C0, F14 gehört zu C4); Reihenfolge und Commit-Strategie
+sind die C1-Voraussetzung.
 
-**Was geändert wurde (vier Dateien, kein Code, kein Service-Touch):**
-1. `phase8_ui_graph/CLAUDE.md`:
-   - `updated:`-Frontmatter um den C0-Eintrag oben ergänzt.
-   - Modul-Status Block C von `⬜` auf `🔄 C0 ✅ · C1–C5 ⬜`.
-   - Abnahmestand um P8-25-Zeile ergänzt.
-   - Neue `## C0 — Anti-AI-Pattern-Research + UI-Audit (P8-25)`-Sektion mit Quellen-Tabelle
-     und 35-Zeilen-Findings-Tabelle Muster → Fundstelle → Fix → Ziel-Step eingefügt.
-   - Neuer Session-Block (dieser).
-2. `phase8_ui_graph/SESSIONS_ARCHIVE.md`: `updated:`-Frontmatter um den Rotations-Eintrag
-   ergänzt (B4-Block war bereits in der vorigen Session rotiert, ein zweiter Block war
-   nur zwischen den beiden Schritten dieser und der vorigen Session stehen geblieben —
-   keine neue Rotation in dieser Session, nur Frontmatter nachziehen).
-3. `docs/INDEX.md`: `updated:`-Frontmatter um den C0-Eintrag oben ergänzt, Phase-8-Header
-   „🔄 Step 0 (Fundament-Session)" steht noch, ändert sich erst mit C0-Commit
-   (Mid-Phase-Drift vermeiden — Zeile wird im Closeout-Commit nachgezogen).
-4. `phase8_ui_graph/CLAUDE.md` Frontmatter `updated:` und der Session-Block selbst.
+**Was Nikinger entschieden hat (Sitzungsanfang):**
+- Reihenfolge: **Plan-Reihenfolge C1 zuerst** (Fonts vor Icons; CSS-Tokens hängen am
+  Plex-Swap, C2 ist davon unabhängig; Sichtprüfung 1 sieht beides zusammen).
+- C1-Commit-Strategie: **zwei Commits — F1+F2 (Font-Swap) zuerst, F3/F4/F6 (CSS) danach.**
+  Zwischenstand: System-Fonts, weil das Token noch „Inter Variable" stackt, der
+  @font-face-Block aber Plex lädt — sauber, weil der Browser kaskadiert; C1b verkabelt dann
+  das Token auf Plex.
 
-**Verifikation, read-only (kein Test-Lauf nötig — keine Code-Änderung):**
-- `git diff --stat main -- phase4_auth/ phase2_mcp/ phase5_ui/webui/security.py
-  phase1_storage/storage/{models,frontmatter,files,patch,acl,history}.py` → leer
-  (Tabu §0.4 weiterhin unverletzt).
-- Modul-Status-Tabelle + Abnahmestand + Session-Block + `updated:`-Zeile synchron
-  (Hard Rule 8 — vier Stellen im selben Commit zu aktualisieren, falls Nikinger
-  diesen Stand committet).
-- Findings-Tabelle selbst hat 35 Einträge, alle auf einen Step gemappt (C1: 6, C2: 3,
-  C3: 0, C4: 2, C5: 3, D1: 3, **bereits aligned: 18**); ein Eintrag (F8) ist eine
-  bewusste Belassung mit Begründung; null Eskalationen an Nikinger (P8-25-Kriterium).
-- V94 bestätigt durch den Lauf: sieben Quellen angerufen, alle erreichbar, eine
-  zusammenhängende Argumentationskette (Sailop-Dim-1–7 ↔ Fountain-Institute-Pattern-Liste
-  ↔ Krebs-16-Punkte ↔ dev.to-Purple-Problem ↔ Noqta-4-Reiter ↔ Monet-7-Tips) extrahiert;
-  V94-Marker im Plan kann nach diesem Lauf von „angenommen ja" auf „bestätigt ja"
-  geschlossen werden — passiert mit dem Phase-Closeout (P8-N §9).
+**Was geändert wurde:**
 
-**§0.6 Selbstprüfung (Advisor-Ersatz):**
-1. ✅ `pytest -q` weiterhin 958/958 grün (kein Test angefasst in dieser Session — keine
-   Regression möglich, weil nichts ausgeführt wurde, was etwas ändern könnte).
-2. ✅ Tabu-Diff leer (s.o., kein Code-Touch).
-3. ✅ Fehlerpfade: nicht anwendbar in dieser Session (kein neuer Endpunkt, keine
-   Render-Stelle — Findings-Tabelle listet die Stellen, an denen die nächsten Steps
-   Fehlerpfade durchdenken müssen).
-4. ✅ Modul-Status + Session-Block + `updated:` synchron (Hard Rule 8).
-5. ✅ Keine UI-Änderung in dieser Session, kein `ui_budget.py`-Lauf nötig.
+*C0-Commit (Session-Anfang, drei Dateien Doku-only):* `git add` + Commit des C0-Stands
+(`docs/INDEX.md` Frontmatter + Phase-Header, `phase8_ui_graph/CLAUDE.md` Findings-Tabelle +
+Session-Block, `phase8_ui_graph/SESSIONS_ARCHIVE.md` Frontmatter-Nachzug), Tabu-Diff leer.
 
-**Hard-Rule-Konformität:** Hard Rule 1 (keine Secrets, keine Repo-Datei berührt außer
-`.md`), Hard Rule 2 (Index unangetastet), Hard Rule 4 (nicht relevant — kein
-fremder Body verarbeitet), Hard Rule 7 (keine Skripte ausgeführt, die loggen),
-Hard Rule 8 (vier Stellen synchronisiert, falls Nikinger diesen Stand committet
-ist alles in einem Commit drin), Hard Rule 9 (kein Prozess angefasst — auch
-keine Wegwerf-Instanz, weil keine nötig war).
+*C1a — Font-Swap (Commit `0281cce`, sechs + Test = sieben Dateien):*
+- `phase5_ui/scripts/build_font_subset_plex.sh` neu (Plex Sans v0.2.0 + Plex Mono v2.5.0,
+  beide SHAs gepinnt — V83; Sans wght 380:620 instanciert, Mono statisch Regular=400;
+  pyftsubset Latin, hash-gepinnter WOFF2-Dateiname für `immutable`-Cache über
+  `_HASHED_NAME_RE`, static_routes.py:43).
+- `phase5_ui/webui/static/fonts/IBMPlexSans-subset.6c21979f.woff2` neu (44K variabel).
+- `phase5_ui/webui/static/fonts/IBMPlexMono-subset.a8d5dfa6.woff2` neu (8.4K statisch).
+- `phase5_ui/webui/static/fonts/InterVariable-subset.2fa9d1dc.woff2` entfernt.
+- `phase5_ui/webui/static/fonts/OFL.txt`: Inter OFL-1.1 raus, IBM Plex OFL-1.1 rein
+  (Pflichtbestandteil, F2 geschlossen).
+- `phase5_ui/webui/static/app.css` @font-face-Block (Z. 13-19): Inter Variable raus,
+  IBM Plex Sans Var (wght 380 620) + IBM Plex Mono (wght 400) rein.
+- `phase5_ui/tests/test_static_routes.py` `_font_filename()`: Glob generalisiert
+  `InterVariable-subset.*.woff2` → `*-subset.*.woff2` — Test prüft Content-Type /
+  Cache-Header, nicht den Schriftnamen. Im C1a-Commit via Amend nachgezogen (Commit
+  war unvollständig gestaged — Test-Fix musste mit, nicht in C1b).
 
-**Was Nikinger entscheiden kann (jeder Punkt für sich, kein Blocker):**
-1. **Findings-Tabelle abnicken** (P8-25): 35 Einträge, null Eskalationen. Wenn ein
-   Eintrag nicht passt, ist das eine Diskussion über die AI-Default-Lesart, nicht über
-   den Code (Code ist heute schon aligned oder hat eine konkrete Heimat in C1–C5/D1).
-2. **F8 bewusst belassen** (`.auth`-Radial-Gradient als Funktions-Backdrop, nicht als
-   Branding): Verbotsliste §0.3 Punkt 2 zielt auf Branding-Flächen, F8 ist der einzige
-   Verlauf in der App, der nicht auf einem Bedienelement sitzt. Die Frage ist, ob
-   „Funktion = fokussiert die zentrierte Karte" als Ausnahme trägt — eine Alternative
-   wäre eine solide `--surface`-Fläche + 1-px-Innenlinie.
-3. **F14 (Akzentkante an Auswahl):** P8-H verlangt „Auswahl trägt zusätzlich einen
-   soliden Akzent-Indikator (linke 3px-Kante + Outline)" — die heutige 2-px-Kante ist
-   funktional richtig, aber dünner als die Spec. Gehört in C4.
-4. **Reihenfolge C1 → C2 → C3 → C4 → C5:** das ist die Plan-Reihenfolge. Falls Nikinger
-   eine andere Reihenfolge will (z. B. C2 vor C1, weil „Icons sichtbarer sind als
-   Fonts"), ist das ein Plan-Drift, kein Spec-Drift.
+*C1b — CSS-Typografie (Commit `08bff55`, eine Datei):*
+- `phase5_ui/webui/static/app.css` `:root`: `--font-ui` und `--font-mono` umgestellt
+  auf Plex-Namen; fünf Skala-Tokens eingeführt (`--fs-meta: 12.5px`, `--fs-ui: 14px`,
+  `--fs-body: 16px`, `--fs-title: 18px`, `--fs-page: 22px`).
+- `body`: `font-size: 15px → var(--fs-body)`, `line-height: 1.5 → 1.55` (F4).
+- `h1/h2/h3` auf Skala-Tokens (h1: 22 → `--fs-page`, h2: 18 → `--fs-title`,
+  h3: 15 → `--fs-body` — neue Skala fällt h3 auf body-Größe zurück, das ist sauber:
+  h1 (Seite) > h2 (Abschnitt) > h3 (Untertitel) = body).
+- F3-Stellenliste aus C0 plus drei weitere offensichtliche Meta-Zeilen auf Tokens:
+  `.rail__brand 13 → --fs-meta`, `.tree__folder 14 → --fs-ui`,
+  `.list__row-title 15 → --fs-body`, `.list__row-meta 12 → --fs-meta`,
+  `.overview__heading 12 → --fs-meta`, `.tile__label 13 → --fs-meta`
+  (`.tile__count 28` Display-Zahl bleibt px), `.recent-row__meta 12 → --fs-meta`,
+  `.tree__count 12 → --fs-meta`, `.space-card__meta 12 → --fs-meta`,
+  `.chip 12 → --fs-meta`, `.panel__head 12 → --fs-meta`,
+  `.panel__hint 12 → --fs-meta`.
+- Bewusst nicht migriert (Skala fasst sie nicht, Erzwungene Migration wäre Schummelei):
+  `.rail__glyph 12` (Glyph-Hintergrund), `.tree__group 11`, `.tree__badge 11`,
+  `.tree__twist 10`, `.rail__version 9` (Superscript), `.tile__count 28` (Display),
+  `.btn--icon 17` (Icon-Knopf) — jeder Wert hat einen semantischen Grund und ist nicht
+  Streu-px im Sinne F3.
+- F6: `#editor-version`, `#meta-item-id`, `.editor__version` rendern in `var(--font-mono)`
+  (Plex Mono, aus C1a geladen). itm_-ID-Chips aus P7-A1 sind der Hauptnutzer; der
+  Versions-Badge im Editor-Header bekommt dieselbe Schrift wie die IDs selbst.
 
-**Nächster Schritt, konkret:** **C1 — Typografie** (Plan §4.C1). `build_font_subset_plex.sh`
-nach dem Muster von `build_font_subset.sh` (Plex Sans variabel, gewicht-Achse 380–620,
-Plex Mono statisch, OFL.txt getauscht, SHA-256-gepinnter WOFF2-Dateiname →
-`immutable`-Cache bleibt); `app.css:13–19` (`@font-face`) ersetzt; `--font-ui`/
-`--font-mono`/Typo-Skala-Tokens eingeführt; UI-Budget-Lauf direkt nach dem Font-Swap
-(V84, Gesamtbudget <250 KB gzip). C1 ist **nicht** live-deploy-relevant — die Nikinger-
-Sichtprüfung 1 (Plan §0.6) folgt nach C1+C2 zusammen (Typo-Größen + Icon-Lesbarkeit
-gehören für den Augenschein zusammen).
+**Verifikation, §0.6 Selbstprüfung (Advisor-Ersatz):**
+1. ✅ `pytest -q` 958/958 grün (250.6s; bekannter `test_authctl.py`-Flake als isoliert
+   bestätigt — 19/19 einzeln grün, kein Test-Regress gegen C0-Stand).
+2. ✅ Tabu-Diff-Kommando aus §0.4 leer (`git diff --stat main -- phase4_auth/ phase2_mcp/
+   phase5_ui/webui/security.py phase1_storage/storage/{models,frontmatter,files,patch,acl,
+   history}.py` — keine Zeile).
+3. ✅ Fehlerpfade: C1 hat keine neuen Endpunkte; ui_budget.py testet die bestehenden
+   Endpunkte implizit (5/5 OK); test_static_routes.py 10/10 OK.
+4. ✅ Modul-Status + Abnahmestand + Session-Block + `updated:` synchron (Hard Rule 8 —
+   vier Stellen im selben Commit-Block aktualisiert).
+5. ✅ `ui_budget.py`: app.js+css+Fonts gzip **108.4 KB** (Ziel <250 KB) — +17.4 KB seit
+   C0, davon ~16 KB Sans-Subset-Wachstum (Inter 30 → Plex 44) und 8 KB neuer Plex-Mono-
+   Eintrag. Vor C2-Sprite + graph.js weiterhin reichlich Reserve.
+6. ✅ V83 (IBM Plex Release): variable Sans in `@ibm/plex-sans-variable@0.2.0`,
+   statisches Mono in `@ibm/plex-mono@2.5.0`, beide SHAs aus expanded_assets verifiziert
+   und im Skript gepinnt.
+7. ✅ V84 (Subset-Größen Budget): Plex Sans 44K + Plex Mono 8K = 52K raw, gzip-Summe mit
+   JS/CSS siehe Punkt 5 — Ziel <250 KB weit untertätigt.
 
-**Session-Ende-Status (Nikinger beendet die Session ohne Commit):** die vier
-Datei-Änderungen oben sind im Working-Tree geändert, **aber nicht committet**
-(CLAUDE.md Hard Rule „NEVER commit changes unless the user explicitly asks" —
-der Nikinger hat keinen Commit befohlen, auch nicht am Ende). `git diff --stat HEAD`
-über die drei Doku-Dateien: +480/-184. Erste Aktion der **nächsten** Session ist
-deshalb nicht C1-Bau, sondern `git add` + Commit des C0-Stands, **dann** C1.
-Vorgeschlagener Commit-Betreff (vom Nikinger zu prüfen/abzuändern):
-`phase8: C0 — Anti-AI-Pattern-Research + UI-Audit (P8-25), 35 Findings, keine
-Eskalation`. Tabu-Diff bleibt nach dem Commit leer (kein Code berührt in dieser
-Session). V94 schließt mit dem Phase-Closeout (P8-N §9), nicht hier.
+**Hard-Rule-Konformität:** Hard Rule 1 (keine Secrets), Hard Rule 2 (Index nur durch
+Doku-Updates ergänzt, sonst unangetastet), Hard Rule 4 (kein fremder Body verarbeitet),
+Hard Rule 7 (Logging → stderr; `bash -n` als Syntax-Check des neuen Skripts OK), Hard Rule
+8 (diese Session schließt mit dem Doku-Commit), Hard Rule 9 (kein Prozess angefasst —
+auch keine Wegwerf-Instanz, weil die Verifikation komplett in-process über ui_budget.py
++ pytest lief; das ist hier auch Standing-Permission-konform, aber schlicht nicht nötig
+gewesen, weil die Änderung isoliert testbar war).
+
+**Verbleibend für die nächste Session (offene Punkte, die C1 NICHT berührt):**
+- C2 (Lucide-Sprite) — Plan §4.C2; V92 für die gepinnten Icon-Namen; vor Sichtprüfung 1.
+- F8-Belassung und F14-Kantenbreite sind benannte, nicht-blockierende Nikinger-Entscheidungen
+  aus C0 — gehören in C4 (F14) bzw. sind Dokumentationsstand (F8). Keine Aktion in C1.
+- V94 schließt mit dem Phase-Closeout (P8-N §9), nicht hier.
+
+**Nächster Schritt, konkret:** **C2 — Icon-System** (Plan §4.C2). Vendoring von
+`phase5_ui/vendor/lucide/` (ISC-Lizenz), Generator `build_icon_sprite.py`, Sprite-Block
+zwischen `<!-- ICONS:BEGIN -->` / `<!-- ICONS:END -->` in `app.html`, Ersetzungs-Map
+für die sieben HTML-Entities in `app.html` + die zwei Text-Glyphen in `list.js`/`tree.js`.
+Sichtprüfung 1 (Plan §0.6) folgt nach **C1 + C2 zusammen** — Typo-Größen und Icon-
+Lesbarkeit gehören für den Augenschein zusammen.

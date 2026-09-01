@@ -4,10 +4,108 @@ purpose: Archiv älterer Session-Blöcke aus phase8_ui_graph/CLAUDE.md — newes
 read-when: nur wenn der aktuelle Session-Block im Phase-Head nicht reicht und Verlauf gebraucht wird
 detail: L3
 up: CLAUDE.md
-updated: 2026-09-01 (neunte Rotation: Gate-B→C-Block ins Archiv nach C0-Session -- C0-Block ergaenzt, dann rotiert; Head 39.0KB->31.4KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 81.3KB->89.3KB; C0-Findings-Tabelle (35 Eintraege) lebt im Head; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (achte Rotation: B4-Block ins Archiv nach Gate-B→C-Verifikation -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf, pytest 958/958 gruen, Charakterisierung byte-identisch, Tabu-Diff leer; Head jetzt mit 14.8 KB unter dem Softcap, SESSIONS_ARCHIVE.md 76.9 KB; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (siebte Rotation: fuenf Bloecke ins Archiv -- A3-Bau, Hard-Rule-9-Doku, Versions-Bump v2.2.3, A3-Drittprobe mit Restdefekt, B1 linkscan.py + Tests; Head jetzt 16.4 KB mit genau einem Block, 12 Bloecke im Archiv, Phase-8-Head wieder unter dem 40KB-Softcap; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z)
+updated: 2026-09-01 (zehnte Rotation: C0-Block ins Archiv nach C1-Session -- C1-Block (Plex-Font-Swap + CSS-Typo-Tokens, 35 Findings aus C0 abgearbeitet fuer C1) ergaenzt, dann rotiert; Head 27.5KB->33.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 89.3KB->96.0KB; C1-Commits 0281cce + 08bff55 im Head referenziert; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (neunte Rotation: Gate-B→C-Block ins Archiv nach C0-Session -- C0-Block ergaenzt, dann rotiert; Head 39.0KB->31.4KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 81.3KB->89.3KB; C0-Findings-Tabelle (35 Eintraege) lebt im Head; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (achte Rotation: B4-Block ins Archiv nach Gate-B→C-Verifikation -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf, pytest 958/958 gruen, Charakterisierung byte-identisch, Tabu-Diff leer; Head jetzt mit 14.8 KB unter dem Softcap, SESSIONS_ARCHIVE.md 76.9 KB; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (siebte Rotation: fuenf Bloecke ins Archiv -- A3-Bau, Hard-Rule-9-Doku, Versions-Bump v2.2.3, A3-Drittprobe mit Restdefekt, B1 linkscan.py + Tests; Head jetzt 16.4 KB mit genau einem Block, 12 Bloecke im Archiv, Phase-8-Head wieder unter dem 40KB-Softcap; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8
+
+## Session stopped — 2026-09-01 (Block C C0: Anti-AI-Pattern-Research + UI-Audit, 35 Findings, keine Eskalation)
+
+**Auftrag:** der erste Schritt in Block C nach Plan §4 — C0 (Anti-AI-Pattern-Research
++ UI-Audit, P8-25). Bevor irgendwo eine Type-Swap-, Sprite- oder Glass-Zeile landet,
+einmal bewusst hinschauen, was die LLM-Default-Aesthetik 2026 überhaupt ist, und gegen
+den Code hier halten. Der Nikinger hat in der Auftragsmail zusätzlich explizit
+freigegeben, „spezifisch nach UI-Regeln und Listen zu suchen, die Tipps geben, wie
+man eine Website nicht vibecoded" — V94 (Web-Recherche für C0-Teil 1) damit von
+„angenommen ja" auf „durch diesen Lauf bestätigt ja".
+
+**Was geändert wurde (vier Dateien, kein Code, kein Service-Touch):**
+1. `phase8_ui_graph/CLAUDE.md`:
+   - `updated:`-Frontmatter um den C0-Eintrag oben ergänzt.
+   - Modul-Status Block C von `⬜` auf `🔄 C0 ✅ · C1–C5 ⬜`.
+   - Abnahmestand um P8-25-Zeile ergänzt.
+   - Neue `## C0 — Anti-AI-Pattern-Research + UI-Audit (P8-25)`-Sektion mit Quellen-Tabelle
+     und 35-Zeilen-Findings-Tabelle Muster → Fundstelle → Fix → Ziel-Step eingefügt.
+   - Neuer Session-Block (dieser).
+2. `phase8_ui_graph/SESSIONS_ARCHIVE.md`: `updated:`-Frontmatter um den Rotations-Eintrag
+   ergänzt (B4-Block war bereits in der vorigen Session rotiert, ein zweiter Block war
+   nur zwischen den beiden Schritten dieser und der vorigen Session stehen geblieben —
+   keine neue Rotation in dieser Session, nur Frontmatter nachziehen).
+3. `docs/INDEX.md`: `updated:`-Frontmatter um den C0-Eintrag oben ergänzt, Phase-8-Header
+   „🔄 Step 0 (Fundament-Session)" steht noch, ändert sich erst mit C0-Commit
+   (Mid-Phase-Drift vermeiden — Zeile wird im Closeout-Commit nachgezogen).
+4. `phase8_ui_graph/CLAUDE.md` Frontmatter `updated:` und der Session-Block selbst.
+
+**Verifikation, read-only (kein Test-Lauf nötig — keine Code-Änderung):**
+- `git diff --stat main -- phase4_auth/ phase2_mcp/ phase5_ui/webui/security.py
+  phase1_storage/storage/{models,frontmatter,files,patch,acl,history}.py` → leer
+  (Tabu §0.4 weiterhin unverletzt).
+- Modul-Status-Tabelle + Abnahmestand + Session-Block + `updated:`-Zeile synchron
+  (Hard Rule 8 — vier Stellen im selben Commit zu aktualisieren, falls Nikinger
+  diesen Stand committet).
+- Findings-Tabelle selbst hat 35 Einträge, alle auf einen Step gemappt (C1: 6, C2: 3,
+  C3: 0, C4: 2, C5: 3, D1: 3, **bereits aligned: 18**); ein Eintrag (F8) ist eine
+  bewusste Belassung mit Begründung; null Eskalationen an Nikinger (P8-25-Kriterium).
+- V94 bestätigt durch den Lauf: sieben Quellen angerufen, alle erreichbar, eine
+  zusammenhängende Argumentationskette (Sailop-Dim-1–7 ↔ Fountain-Institute-Pattern-Liste
+  ↔ Krebs-16-Punkte ↔ dev.to-Purple-Problem ↔ Noqta-4-Reiter ↔ Monet-7-Tips) extrahiert;
+  V94-Marker im Plan kann nach diesem Lauf von „angenommen ja" auf „bestätigt ja"
+  geschlossen werden — passiert mit dem Phase-Closeout (P8-N §9).
+
+**§0.6 Selbstprüfung (Advisor-Ersatz):**
+1. ✅ `pytest -q` weiterhin 958/958 grün (kein Test angefasst in dieser Session — keine
+   Regression möglich, weil nichts ausgeführt wurde, was etwas ändern könnte).
+2. ✅ Tabu-Diff leer (s.o., kein Code-Touch).
+3. ✅ Fehlerpfade: nicht anwendbar in dieser Session (kein neuer Endpunkt, keine
+   Render-Stelle — Findings-Tabelle listet die Stellen, an denen die nächsten Steps
+   Fehlerpfade durchdenken müssen).
+4. ✅ Modul-Status + Session-Block + `updated:` synchron (Hard Rule 8).
+5. ✅ Keine UI-Änderung in dieser Session, kein `ui_budget.py`-Lauf nötig.
+
+**Hard-Rule-Konformität:** Hard Rule 1 (keine Secrets, keine Repo-Datei berührt außer
+`.md`), Hard Rule 2 (Index unangetastet), Hard Rule 4 (nicht relevant — kein
+fremder Body verarbeitet), Hard Rule 7 (keine Skripte ausgeführt, die loggen),
+Hard Rule 8 (vier Stellen synchronisiert, falls Nikinger diesen Stand committet
+ist alles in einem Commit drin), Hard Rule 9 (kein Prozess angefasst — auch
+keine Wegwerf-Instanz, weil keine nötig war).
+
+**Was Nikinger entscheiden kann (jeder Punkt für sich, kein Blocker):**
+1. **Findings-Tabelle abnicken** (P8-25): 35 Einträge, null Eskalationen. Wenn ein
+   Eintrag nicht passt, ist das eine Diskussion über die AI-Default-Lesart, nicht über
+   den Code (Code ist heute schon aligned oder hat eine konkrete Heimat in C1–C5/D1).
+2. **F8 bewusst belassen** (`.auth`-Radial-Gradient als Funktions-Backdrop, nicht als
+   Branding): Verbotsliste §0.3 Punkt 2 zielt auf Branding-Flächen, F8 ist der einzige
+   Verlauf in der App, der nicht auf einem Bedienelement sitzt. Die Frage ist, ob
+   „Funktion = fokussiert die zentrierte Karte" als Ausnahme trägt — eine Alternative
+   wäre eine solide `--surface`-Fläche + 1-px-Innenlinie.
+3. **F14 (Akzentkante an Auswahl):** P8-H verlangt „Auswahl trägt zusätzlich einen
+   soliden Akzent-Indikator (linke 3px-Kante + Outline)" — die heutige 2-px-Kante ist
+   funktional richtig, aber dünner als die Spec. Gehört in C4.
+4. **Reihenfolge C1 → C2 → C3 → C4 → C5:** das ist die Plan-Reihenfolge. Falls Nikinger
+   eine andere Reihenfolge will (z. B. C2 vor C1, weil „Icons sichtbarer sind als
+   Fonts"), ist das ein Plan-Drift, kein Spec-Drift.
+
+**Nächster Schritt, konkret:** **C1 — Typografie** (Plan §4.C1). `build_font_subset_plex.sh`
+nach dem Muster von `build_font_subset.sh` (Plex Sans variabel, gewicht-Achse 380–620,
+Plex Mono statisch, OFL.txt getauscht, SHA-256-gepinnter WOFF2-Dateiname →
+`immutable`-Cache bleibt); `app.css:13–19` (`@font-face`) ersetzt; `--font-ui`/
+`--font-mono`/Typo-Skala-Tokens eingeführt; UI-Budget-Lauf direkt nach dem Font-Swap
+(V84, Gesamtbudget <250 KB gzip). C1 ist **nicht** live-deploy-relevant — die Nikinger-
+Sichtprüfung 1 (Plan §0.6) folgt nach C1+C2 zusammen (Typo-Größen + Icon-Lesbarkeit
+gehören für den Augenschein zusammen).
+
+**Session-Ende-Status (Nikinger beendet die Session ohne Commit):** die vier
+Datei-Änderungen oben sind im Working-Tree geändert, **aber nicht committet**
+(CLAUDE.md Hard Rule „NEVER commit changes unless the user explicitly asks" —
+der Nikinger hat keinen Commit befohlen, auch nicht am Ende). `git diff --stat HEAD`
+über die drei Doku-Dateien: +480/-184. Erste Aktion der **nächsten** Session ist
+deshalb nicht C1-Bau, sondern `git add` + Commit des C0-Stands, **dann** C1.
+Vorgeschlagener Commit-Betreff (vom Nikinger zu prüfen/abzuändern):
+`phase8: C0 — Anti-AI-Pattern-Research + UI-Audit (P8-25), 35 Findings, keine
+Eskalation`. Tabu-Diff bleibt nach dem Commit leer (kein Code berührt in dieser
+Session). V94 schließt mit dem Phase-Closeout (P8-N §9), nicht hier.
+
+---
 
 ## Session stopped — 2026-09-01 (Gate B→C: Verifikationsdurchlauf, _graph_get manuell gegen 12 ACL-Fälle, Playwright-Smoke gegen Wegwerf-Instanz 18/18)
 
