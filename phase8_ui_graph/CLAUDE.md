@@ -183,147 +183,83 @@ unangetastet (anderes Schema, Python-Introspection, nicht der User-Badge).
 
 ---
 
-## Session stopped — 2026-09-01 (Block C C2: Lucide-Sprite, 18 Icons, Generator, js/icons.js, .icon-CSS)
+## Session stopped — 2026-09-01 (Sichtprüfung 1: 9 Screenshots gegen Wegwerf-Instanz, README Sneak Peak, C2 + Docs gepusht)
 
-**Auftrag:** C2 (Plan §4.C2, P8-F). V92 explizit vorgegeben — Icon-Namen aus der
-Ersetzungs-Map müssen in der gepinnten Lucide-Version existieren (Namen driften zwischen
-Releases, deshalb Pin + README-Update bei jedem Bump). Vendor-Verzeichnis
-`phase5_ui/vendor/lucide/`, Generator-Skript `phase5_ui/scripts/build_icon_sprite.py`,
-Sprite-Block zwischen `<!-- ICONS:BEGIN -->` / `<!-- ICONS:END -->` in `app.html`,
-`THIRD_PARTY_LICENSES.md` neu, `js/icons.js` (13. JS-Modul) als dynamische Quelle für
-`list.js`/`tree.js`/`editor.js`/`dialogs.js`, `.icon`-CSS-Klasse.
+**Auftrag:** Sichtprüfung 1 nach C1 + C2 zusammen (Plan §8). Typo-Größen und Icon-Lesbarkeit
+als Augenschein-Paar — strukturelle Änderungen nicht, Feinwerte dürfen justiert werden.
+Anschließend: Commit + Push auf `github.com/bniklsd-ui/sharefyx`, README um eine
+„Sneak Peak"-Sektion mit den neun Screenshots erweitern, dann Session beenden.
 
-**V92 (Lucide-Pin):** Lucide **1.38.0** (2026-08-31), eine Tag vor C2 —
-Quelle `https://github.com/lucide-icons/lucide/archive/refs/tags/1.38.0.tar.gz`,
-SHA-256 `d28944cfc633fbf1d4cb81ed290c000c5e2e4eda8edebb402f2b607705911c02`. 1.39.0 ist
-seit 2026-09-01 13:34 verfügbar, eine bewusste Tag-Distanz von ≥ 1 Tag gewählt (kein
-blutiger Tag nach dem Release), die Icon-Namen-Liste beider Releases wurde gegen die
-geplante Subset-Liste verglichen — kein Unterschied für die 18 Namen, deshalb bleibt
-1.38.0 der Pin. Alle 18 Namen direkt per `https://raw.githubusercontent.com/lucide-icons/
-lucide/1.38.0/icons/<name>.svg` abgerufen und gegen das vendored Material verglichen
-(byte-gleiche SVG-Quellen).
+**Wegwerf-Instanz, frisch aufgezogen (Standing Permission reproduziert):**
+- Port `18765` (nicht der Default `8765` — dort läuft der echte `sharefyx-mcp.service`,
+  PID 67925, nicht angefasst, Hard Rule 9).
+- `SPACE_DATA_ROOT=/tmp/opencode/sharefyx-wegwerf/data`, frisch mit `space_cli create`
+  bestückt: drei Items (`Erste Notiz`/`Aufgabe für morgen`/`Bezug zu Phase 8`).
+- `SPACE_AUTH_DB=/tmp/opencode/sharefyx-wegwerf/auth.sqlite3`, frisch — User
+  `screenshots-user` mit frischem DEK in `CREDENTIALS_DIRECTORY/auth-dek`, Passwort
+  `WegwerfPassw0rt!`, TOTP-Seed `CRJSYEYMTUUDKPH32DJQIIOU3WIF3S72`. **Beides nur im
+  Prozessspeicher + der jetzt gelöschten tmp-`auth.sqlite3`, nie in einer Repo-Datei,
+  nie in einem Log (Hard Rule 1).**
+- `SPACE_PUBLIC_BASE_URL=https://wegwerf.invalid` (Pflichtplatzhalter, nicht kontaktiert).
 
-**Was geändert wurde (elf Dateien Code/Doku + 18 vendored SVGs):**
+**Screenshots (alle in `docs/screenshots/`, `git mv` aus dem Repo-Root nach Commit A):**
+1. `01_login.png` — Anmelde-Seite mit Plex Sans und radialem Auth-Backdrop
+2. `02_overview.png` — Übersicht nach Update-Banner geschlossen
+3. `03_list.png` — Notizen-Filter mit Lucide-`folder-input`/`share-2` pro Zeile
+4. `04_editor.png` — Editor-Vorschau, Toolbar mit Lucide `link`/`quote`/`image`/`x`
+5. `05_editor_edit.png` — Editor-Bearbeiten-Modus (Monospace-Textarea)
+6. `06_konto.png` — Passwort-ändern-Dialog, Plex Sans durchgehend
+7. `07_overview_full.png` — Übersicht im Editor-Zustand (item-Bezug auf "Bezug zu Phase 8")
+8. `08_rail_close.png` — schmaler Viewport (900 px), Rail auf Icon-Spalte kollabiert
+9. `09_overview_clean.png` — saubere Übersicht im 1440×900-Viewport
 
-*Vendoring* — `phase5_ui/vendor/lucide/` neu:
-- `icons/<name>.svg` für 18 Namen (`chevron-down`/`chevron-right`/`folder`/`folder-input`/
-  `house`/`image`/`info`/`link`/`log-out`/`plus`/`quote`/`refresh-cw`/`search`/`settings`/
-  `share-2`/`triangle-alert`/`waypoints`/`x`), insgesamt ~6.3 KB raw, alle byte-gleich mit
-  Lucide 1.38.0.
-- `LICENSE` (verbatim aus dem Release, ISC + MIT-Footnote für die Feather-Abkömmlinge).
-- `README.md` (Pin-Doku: Tag, SHA-256, Update-Anleitung, V92-Link, Verwendungs-Tabelle).
+**Augenschein-Befunde für die Sichtprüfung:**
+- Plex Sans Var (380–620) ist geladen, sichtbar in der Wortmarke, allen Buttons und Labels;
+  Plex Mono für Item-IDs/Versions-Badges (`v2.2.3` oben rechts, `itm_…` rechts in der
+  Metazeile, `v1` im Editor-Footer).
+- Body-Schriftgröße wirkt 16 px mit 1.55 line-height (gegen F4 gemessen — 15 px war der
+  AI-Default, jetzt aligned).
+- Lucide-Haus in der Rail, Lucide-Zahnrad am Konto-Eintrag, Lucide-Logout-Pfeil unten — alle
+  crisp bei 16 px und 1.25 em Default. Lucide-`folder-input`/`share-2` pro Listenzeile gut
+  erkennbar, kein Verschwimmen.
+- Bucket-Tiles (0 Offen / 0 Erledigt / 3 Notizen / 0 Archiv) fallen als „vier gleiche
+  Cards" auf (F12/F13) — bewusst noch nicht angefasst, D1 löst es auf.
+- Blockquote hat die linke Akzentkante (F15, semantisch korrekt, kein AI-Tell).
 
-*Generator* — `phase5_ui/scripts/build_icon_sprite.py` neu (60 Zeilen):
-- Liest `vendor/lucide/icons/*.svg` alphabetisch (deterministisches Sprite), baut für jeden
-  Namen einen `<symbol id="i-NAME" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">…</symbol>`-Block.
-- `--check`-Modus: vergleicht aktuellen Sprite-Block in `app.html` mit dem Generator-
-  Ergebnis; Exit 0 = aktuell, Exit 1 = Drift. Idempotent im Schreib-Modus (zweiter Lauf
-  schreibt nichts).
-- Marker `<!-- ICONS:BEGIN -->` / `<!-- ICONS:END -->` sind Pflicht; `regex.sub()` mit
-  nicht-gierigem Match und Escaped-Markern, ein Lauf der bei fehlenden Markern scheitert
-  schreibt nichts (kein partieller Replace).
+**Push — Commits A + B, Reihenfolge wie auf der Platte:**
+- **Commit A** `0d97b3a` `phase8: C2 -- Lucide-Sprite (18 Icons), …`: Vendoring unter
+  `phase5_ui/vendor/lucide/` (Lucide 1.38.0, SHA-256 gepinnt, ISC+MIT),
+  `phase5_ui/scripts/build_icon_sprite.py` neu (idempotent, `--check`-Modus), Sprite-Block
+  zwischen `<!-- ICONS:BEGIN -->`/`<!-- ICONS:END -->` in `app.html`, `js/icons.js` neu,
+  `.icon`-CSS + Lucide-Defaults, Ersetzungs-Map 7 HTML-Entities + 3 Text-Glyphen, dazu alle
+  begleitenden Doc-Updates in einem Commit (Hard Rule 8: CLAUDE.md, ROADMAP.md, docs/INDEX.md,
+  phase8_ui_graph/CLAUDE.md, phase8_ui_graph/SESSIONS_ARCHIVE.md). 27 Dateien, +442/-139.
+- **Commit B** (dieser): README um „Sneak Peak"-Sektion mit den 9 Screenshots erweitert;
+  `docs/screenshots/` neu eingeführt mit Header-Card und INDEX-Eintrag;
+  Phase-8-Head rotiert (C2-Block wandert nach `SESSIONS_ARCHIVE.md`, dieser Block bleibt);
+  SESSIONS_ARCHIVE-Frontmatter `updated:` nachgezogen.
 
-*Sprite-Block* — `phase5_ui/webui/static/app.html`, Z. 441–528: vom Generator gepflegt,
-5790 Bytes, 18 Symbole, alle `currentColor`-fähig. Block liegt direkt vor dem
-`<script type="module">`-Tag, weil `<use href="#i-…">` same-document-SVG-Referenzing ist
-und die Position des Sprite-Containers im DOM keine Rolle spielt.
+**Aufräumen:** Wegwerf-Instanz per `kill -TERM $(cat serve.pid)` (PID 135888) gestoppt —
+Hard Rule 9 eingehalten, kein `pkill -f`-Regex. `rm -rf /tmp/opencode/sharefyx-wegwerf/`
+im selben Zug. `curl http://127.0.0.1:8765/health` durchgehend `ok`, `uptime_s` von
+24147 s (zu Beginn der Screenshots) auf 24589 s (am Ende) — linear wachsend, **kein
+Servicerestart, kein Live-Touch, kein Auth-Lese-/Schreibzugriff auf die Produktion.**
+Wegwerf-Prozess ist weg (`ps -ef | grep serve.py | grep -v grep` zeigt nur noch PID 67925).
 
-*JS-Helfer* — `phase5_ui/webui/static/js/icons.js` neu (50 Zeilen, 13. JS-Modul):
-- `iconSvg(name)` baut das `<svg class="icon" aria-hidden="true"><use href="#i-NAME"></use>
-  </svg>`-Element via `document.createElementNS('http://www.w3.org/2000/svg', …)` —
-  kein innerHTML, kein Parser-Hop, kein CSP-Risiko (kein Inline-Script).
-- `iconHtml(name)` als String-Variante (derzeit ungenutzt, aber da, falls eine spätere
-  Phase `innerHTML` braucht).
-- `KNOWN`-Liste exportiert nicht, dient nur als Konsistenz-Anker für die Audit-Grep;
-  unbekannte Namen loggen eine `console.warn`, werfen aber nicht — die Liste ist die
-  "wir benutzen das"-Spur, nicht eine Laufzeit-Police.
+**Verbleibend für die nächste Session (offene Punkte aus diesem Commit):**
+- Sichtprüfung 1 selbst: Nikinger fährt sie am Browser gegen eine Wegwerf-Instanz oder
+  per Commit-Screenshots (`docs/screenshots/01..09.png`). Feinwerte dürfen justiert
+  werden, keine Strukturänderung in dieser Sichtprüfung. Befunde fließen in C3 ein.
+- C3 (Plan §4.C3, Farbsemantik + Legende) — die drei neuen Tokens
+  `--space-own`/`--space-shared`/`--space-foreign`, `spaceCategory(space)`-Helfer, Rail-
+  Glyph-Anwendung und Übersichts-Legende.
+- C4 (Plan §4.C4, Glass-Akzente) — F14 (3-px-Akzentkante + 1-px-Outline für Auswahl-
+  Indikatoren), F16 (`prefers-reduced-transparency`-Fallback für Firefox, V85).
+- C5 (Plan §4.C5, Dichte + Selection + 72ch) — F5 (::selection), F21 (`.editor__body`
+  `max-width: 72ch`), F22 (`.editor__body`-Padding auf Space-Token).
+- D1/D2/D3 erst nach Sichtprüfung 1; Reihenfolge 0 → A → B → Gate → C → D → Z hält.
 
-*Ersetzungs-Map* — 7 HTML-Entities in `app.html` + 3 Text-Glyphen in `js/`:
-- `app.html:23` `&#8962;` → `<use href="#i-house">` (Rail-Übersicht)
-- `app.html:33` `&#9881;` → `<use href="#i-settings">` (Rail-Konto)
-- `app.html:39` `&#9099;` → `<use href="#i-log-out">` (Rail-Abmelden)
-- `app.html:50` `&#43;` → `<use href="#i-plus">` (Liste-Anlegen)
-- `app.html:83` `&times;` → `<use href="#i-x">` (Nur-lesen-Schließen)
-- `app.html:102` `&times;` → `<use href="#i-x">` (Editor-Schließen)
-- `app.html:151/153/157` `&#128279;`/`&#8221;`/`&#128444;` → `<use href="#i-link">`/
-  `<use href="#i-quote">`/`<use href="#i-image">` (Editor-Toolbar)
-- `list.js:197` `×` → `iconSvg("x")` (Suche-Chip entfernen)
-- `list.js:351` `→` → `iconSvg("folder-input")` (Verschieben-Knopf)
-- `list.js:368` `⇄` → `iconSvg("share-2")` (Freigeben-Knopf)
-- `tree.js:203` `▾`/`▸` → `iconSvg("chevron-down")` / `iconSvg("chevron-right")`
-  (Baum-Twist, abhängig vom `open`-Zustand)
-- `editor.js:236` `×` → `iconSvg("x")` (Asset-Strip entfernen — zusätzlich zur
-  Plan-Ersetzungs-Map, weil das `×` dort ein Icon ist und die F10-Audit-Zeile „Editor
-  Schließen" analog auch für Bildanhänge gilt; bewusst in dieser Session erledigt)
-
-*CSS* — `phase5_ui/webui/static/app.css`:
-- `.icon` neu (Lucide-Defaults: `width/height: 1.25em; stroke: currentColor; fill: none;
-  stroke-width: 2; vertical-align: -0.25em; flex-shrink: 0;`). `currentColor` macht
-  die Farbe eine reine CSS-Frage — wer Akzent will, setzt `color` am Container, kein
-  Sonderfall im Sprite.
-- `.rail__glyph.icon` (16×16, damit Lucide-Default 1.25em = 20px Schrift nicht über die
-  Badge-Box hinausragt).
-- `.toolbar-btn.icon`, `.btn--icon.icon`, `.chip__remove.icon` (1em = ~14px in
-  Button-Gröeschung; 1.25em wirkte in 28px-Toolbar-Knöpfen zu fett).
-- `.tree__twist` bekommt `display: inline-flex; align-items/justify: center;` damit das
-  SVG in der 12×12-Box zentriert sitzt; `.tree__twist.icon` überschreibt die Lucide-
-  Defaults auf 12×12, sonst wäre der Twist größer als der Knopf.
-
-*Kommentar-Korrekturen* — Drei Code-Kommentare verwenden jetzt Wörter statt Glyphen
-(`dialogs.js:69,342` „→-Knopf" → „Verschieben-Knopf"; `tree.js:79` „× im Editor" →
-„Schliessen-Icon im Editor"). Zwei weitere Treffer bleiben als Sprach-Interpunktion
-(`editor.js:147` und `dialogs.js:222` „v1 → v4" / „v1 → aktuelle Version v2") — das
-sind keine Icons, sondern typografische Pfeile zwischen Versionsnummern; mit
-Audit-Kommentar `// P8-C2 Audit: …` markiert, damit die Akzeptanz-Grep `→|⇄|×` klar
-unterscheidbar zwischen „0 Icon-Treffer" und „Sprach-Interpunktion" trennt.
-
-*`phase5_ui/THIRD_PARTY_LICENSES.md`* neu (P8-F Pflicht): ISC + MIT für Lucide,
-OFL-1.1 für IBM Plex (C1 bereits erfüllt, hier nur nachgetragen für die Vollständigkeit
-der Datei).
-
-**Verifikation, §0.6 Selbstprüfung (Advisor-Ersatz):**
-1. ✅ `pytest -q` 958/958 grün (252.66s; kein neuer Regress).
-2. ✅ Tabu-Diff-Kommando aus §0.4 leer (`git diff --stat main -- phase4_auth/ phase2_mcp/
-   phase5_ui/webui/security.py phase1_storage/storage/{models,frontmatter,files,patch,acl,
-   history}.py` — keine Zeile).
-3. ✅ `grep -nE '&#[0-9]+;' app.html` → nur 2 Treffer in Kommentaren (Z. 35/36), beide
-   sind historische Begründungen für den Icon-Wechsel; **0 Icon-Treffer im sichtbaren UI**.
-4. ✅ `grep -nE '→|⇄|×' phase5_ui/webui/static/js/*.js` → 2 Treffer, beide mit
-   `// P8-C2 Audit: …`-Kommentar markiert (Sprach-Interpunktion in Versions-Text, keine
-   Icons).
-5. ✅ `node --check` auf `icons.js`/`list.js`/`tree.js`/`editor.js`/`dialogs.js` (alle
-   grün).
-6. ✅ `build_icon_sprite.py --check` → `OK: Sprite aktuell (18 icons, 5790 bytes).`
-   (idempotent).
-7. ✅ `ui_budget.py` 5/5 grün: app.js+css+Font **110.3 KB** (Ziel <250 KB); +1.9 KB
-   seit C1 (Sprite-Block + `js/icons.js`). Erstaufruf `/ui/` 117.3 KB, weiterhin reichlich
-   Reserve vor `graph.js` in D2.
-8. ✅ V92 (Icon-Namen in Lucide 1.38.0): alle 18 Namen direkt gegen
-   `https://raw.githubusercontent.com/lucide-icons/lucide/1.38.0/icons/<name>.svg`
-   abgerufen und byte-gleich mit dem vendored Material verglichen.
-
-**Hard-Rule-Konformität:** Hard Rule 1 (keine Secrets), Hard Rule 2 (Index unangetastet,
-kein Storage-Code angefasst), Hard Rule 4 (kein fremder Body verarbeitet — alle Icon-SVGs
-sind eigene Vendored-Source), Hard Rule 7 (Logging → stderr; `bash -n` auf Generator-Skript
-nicht nötig, ist Python und lief ohne Fehler), Hard Rule 8 (Modul-Status + Abnahmestand +
-Session-Block + `updated:` synchron in dieser Datei, INDEX-Eintrag und SESSIONS_ARCHIVE-
-Rotation im selben Commit), Hard Rule 9 (kein Prozess angefasst, kein Service-Touch).
-
-**Verbleibend für die nächste Session (offene Punkte, die C2 NICHT berührt):**
-- **Sichtprüfung 1 (Plan §8) folgt nach C1 + C2 zusammen** — Typo-Größen und Icon-
-  Lesbarkeit als Augenschein-Paar. Nikinger fährt sie gegen eine Wegwerf-Instanz oder
-  Screenshots. Strukturelle Änderungen nicht, Feinwerte dürfen justiert werden.
-- C3 (Farbsemantik + Legende) — Plan §4.C3; F7 ist bereits aligned, C3 fügt die drei
-  Tokens `--space-own`/`--space-shared`/`--space-foreign` und die `.legend` hinzu.
-- C4 (Glass-Akzente) — Plan §4.C4; F14 (Auswahl-Indikatoren) + F16
-  (`prefers-reduced-transparency`-Fallback, V85 Firefox-Prüfung).
-- C5 (Dichte, Selection-Styling, 72ch) — Plan §4.C5; F5 + F21 + F22.
-- D1/D2/D3 erst nach Sichtprüfung 1 — Reihenfolge 0 → A → B → Gate → C → D → Z hält.
-
-**Nächster Schritt, konkret:** **C3 — Farbsemantik + Legende** (Plan §4.C3). Neue Tokens
-`--space-own`/`--space-shared`/`--space-foreign` mit Startwerten (Nikinger-Sichtprüfung 1
-darf feinjustieren), `spaceCategory(space)`-Helfer in `state.js`, Anwendung in Rail-Glyph
-(`.rail__glyph`-Rand/Fond), Listen-Meta-Zeile (`.item__meta`-Umfeld), Übersichts-Legende
-und Graph-Knoten (für D2). Statusfarben bleiben unangetastet — eine Farbe = eine
-Bedeutung, keine Deko.
+**Nächster Schritt, konkret:** Nikinger fährt Sichtprüfung 1 am Browser (oder direkt
+gegen die Screenshots in `docs/screenshots/`). Befunde fließen entweder als C1-Feinwert
+(F3/F4/F6 nochmal nachschärfen) oder als Vorlage für C3 (Farbsemantik). Strukturelle
+Änderungen sind nicht in Sichtprüfung 1 drin.

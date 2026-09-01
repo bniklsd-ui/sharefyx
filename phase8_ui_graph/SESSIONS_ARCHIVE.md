@@ -4,10 +4,157 @@ purpose: Archiv älterer Session-Blöcke aus phase8_ui_graph/CLAUDE.md — newes
 read-when: nur wenn der aktuelle Session-Block im Phase-Head nicht reicht und Verlauf gebraucht wird
 detail: L3
 up: CLAUDE.md
-updated: 2026-09-01 (elfte Rotation: C1-Block ins Archiv nach C2-Session -- C2-Block (Lucide-Sprite, 18 Icons, build_icon_sprite.py, js/icons.js, .icon-CSS) ergaenzt, dann rotiert; Head 33.7KB->37.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 96.0KB->103.8KB; F9/F10/F11 aus C0 geschlossen; keine neue P1-Contract-Oeffnung; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (zehnte Rotation: C0-Block ins Archiv nach C1-Session -- C1-Block (Plex-Font-Swap + CSS-Typo-Tokens, 35 Findings aus C0 abgearbeitet fuer C1) ergaenzt, dann rotiert; Head 27.5KB->33.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 89.3KB->96.0KB; C1-Commits 0281cce + 08bff55 im Head referenziert; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (neunte Rotation: Gate-B→C-Block ins Archiv nach C0-Session -- C0-Block ergaenzt, dann rotiert; Head 39.0KB->31.4KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 81.3KB->89.3KB; C0-Findings-Tabelle (35 Eintraege) lebt im Head; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (achte Rotation: B4-Block ins Archiv nach Gate-B→C-Verifikation -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf, pytest 958/958 gruen, Charakterisierung byte-identisch, Tabu-Diff leer; Head jetzt mit 14.8 KB unter dem Softcap, SESSIONS_ARCHIVE.md 76.9 KB; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (siebte Rotation: fuenf Bloecke ins Archiv -- A3-Bau, Hard-Rule-9-Doku, Versions-Bump v2.2.3, A3-Drittprobe mit Restdefekt, B1 linkscan.py + Tests; Head jetzt 16.4 KB mit genau einem Block, 12 Bloecke im Archiv, Phase-8-Head wieder unter dem 40KB-Softcap; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z)
+updated: 2026-09-01 (zwoelfte Rotation: C2-Block ins Archiv nach Screenshots+README-Session -- Sichtpruefung 1 mit 9 Screenshots gegen Wegwerf-Instanz, README "Sneak Peak"-Sektion neu, docs/screenshots/ neu im INDEX, C2+Docs-Commit 0d97b3a gepusht; Head 37.7KB->33.6KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 103.8KB->114.0KB; keine Code-Aenderung ausserhalb webui/static + build_icon_sprite.py + vendor/, keine Service-Touch in dieser Sitzung) | 2026-09-01 (elfte Rotation: C1-Block ins Archiv nach C2-Session -- C2-Block (Lucide-Sprite, 18 Icons, build_icon_sprite.py, js/icons.js, .icon-CSS) ergaenzt, dann rotiert; Head 33.7KB->37.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 96.0KB->103.8KB; F9/F10/F11 aus C0 geschlossen; keine neue P1-Contract-Oeffnung; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (zehnte Rotation: C0-Block ins Archiv nach C1-Session -- C1-Block (Plex-Font-Swap + CSS-Typo-Tokens, 35 Findings aus C0 abgearbeitet fuer C1) ergaenzt, dann rotiert; Head 27.5KB->33.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 89.3KB->96.0KB; C1-Commits 0281cce + 08bff55 im Head referenziert; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (neunte Rotation: Gate-B→C-Block ins Archiv nach C0-Session -- C0-Block ergaenzt, dann rotiert; Head 39.0KB->31.4KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 81.3KB->89.3KB; C0-Findings-Tabelle (35 Eintraege) lebt im Head; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (achte Rotation: B4-Block ins Archiv nach Gate-B→C-Verifikation -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf, pytest 958/958 gruen, Charakterisierung byte-identisch, Tabu-Diff leer; Head jetzt mit 14.8 KB unter dem Softcap, SESSIONS_ARCHIVE.md 76.9 KB; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (siebte Rotation: fuenf Bloecke ins Archiv -- A3-Bau, Hard-Rule-9-Doku, Versions-Bump v2.2.3, A3-Drittprobe mit Restdefekt, B1 linkscan.py + Tests; Head jetzt 16.4 KB mit genau einem Block, 12 Bloecke im Archiv, Phase-8-Head wieder unter dem 40KB-Softcap; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8
+
+## Session stopped — 2026-09-01 (Block C C2: Lucide-Sprite, 18 Icons, Generator, js/icons.js, .icon-CSS)
+
+**Auftrag:** C2 (Plan §4.C2, P8-F). V92 explizit vorgegeben — Icon-Namen aus der
+Ersetzungs-Map müssen in der gepinnten Lucide-Version existieren (Namen driften zwischen
+Releases, deshalb Pin + README-Update bei jedem Bump). Vendor-Verzeichnis
+`phase5_ui/vendor/lucide/`, Generator-Skript `phase5_ui/scripts/build_icon_sprite.py`,
+Sprite-Block zwischen `<!-- ICONS:BEGIN -->` / `<!-- ICONS:END -->` in `app.html`,
+`THIRD_PARTY_LICENSES.md` neu, `js/icons.js` (13. JS-Modul) als dynamische Quelle für
+`list.js`/`tree.js`/`editor.js`/`dialogs.js`, `.icon`-CSS-Klasse.
+
+**V92 (Lucide-Pin):** Lucide **1.38.0** (2026-08-31), eine Tag vor C2 —
+Quelle `https://github.com/lucide-icons/lucide/archive/refs/tags/1.38.0.tar.gz`,
+SHA-256 `d28944cfc633fbf1d4cb81ed290c000c5e2e4eda8edebb402f2b607705911c02`. 1.39.0 ist
+seit 2026-09-01 13:34 verfügbar, eine bewusste Tag-Distanz von ≥ 1 Tag gewählt (kein
+blutiger Tag nach dem Release), die Icon-Namen-Liste beider Releases wurde gegen die
+geplante Subset-Liste verglichen — kein Unterschied für die 18 Namen, deshalb bleibt
+1.38.0 der Pin. Alle 18 Namen direkt per `https://raw.githubusercontent.com/lucide-icons/
+lucide/1.38.0/icons/<name>.svg` abgerufen und gegen das vendored Material verglichen
+(byte-gleiche SVG-Quellen).
+
+**Was geändert wurde (elf Dateien Code/Doku + 18 vendored SVGs):**
+
+*Vendoring* — `phase5_ui/vendor/lucide/` neu:
+- `icons/<name>.svg` für 18 Namen (`chevron-down`/`chevron-right`/`folder`/`folder-input`/
+  `house`/`image`/`info`/`link`/`log-out`/`plus`/`quote`/`refresh-cw`/`search`/`settings`/
+  `share-2`/`triangle-alert`/`waypoints`/`x`), insgesamt ~6.3 KB raw, alle byte-gleich mit
+  Lucide 1.38.0.
+- `LICENSE` (verbatim aus dem Release, ISC + MIT-Footnote für die Feather-Abkömmlinge).
+- `README.md` (Pin-Doku: Tag, SHA-256, Update-Anleitung, V92-Link, Verwendungs-Tabelle).
+
+*Generator* — `phase5_ui/scripts/build_icon_sprite.py` neu (60 Zeilen):
+- Liest `vendor/lucide/icons/*.svg` alphabetisch (deterministisches Sprite), baut für jeden
+  Namen einen `<symbol id="i-NAME" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">…</symbol>`-Block.
+- `--check`-Modus: vergleicht aktuellen Sprite-Block in `app.html` mit dem Generator-
+  Ergebnis; Exit 0 = aktuell, Exit 1 = Drift. Idempotent im Schreib-Modus (zweiter Lauf
+  schreibt nichts).
+- Marker `<!-- ICONS:BEGIN -->` / `<!-- ICONS:END -->` sind Pflicht; `regex.sub()` mit
+  nicht-gierigem Match und Escaped-Markern, ein Lauf der bei fehlenden Markern scheitert
+  schreibt nichts (kein partieller Replace).
+
+*Sprite-Block* — `phase5_ui/webui/static/app.html`, Z. 441–528: vom Generator gepflegt,
+5790 Bytes, 18 Symbole, alle `currentColor`-fähig. Block liegt direkt vor dem
+`<script type="module">`-Tag, weil `<use href="#i-…">` same-document-SVG-Referenzing ist
+und die Position des Sprite-Containers im DOM keine Rolle spielt.
+
+*JS-Helfer* — `phase5_ui/webui/static/js/icons.js` neu (50 Zeilen, 13. JS-Modul):
+- `iconSvg(name)` baut das `<svg class="icon" aria-hidden="true"><use href="#i-NAME"></use>
+  </svg>`-Element via `document.createElementNS('http://www.w3.org/2000/svg', …)` —
+  kein innerHTML, kein Parser-Hop, kein CSP-Risiko (kein Inline-Script).
+- `iconHtml(name)` als String-Variante (derzeit ungenutzt, aber da, falls eine spätere
+  Phase `innerHTML` braucht).
+- `KNOWN`-Liste exportiert nicht, dient nur als Konsistenz-Anker für die Audit-Grep;
+  unbekannte Namen loggen eine `console.warn`, werfen aber nicht — die Liste ist die
+  "wir benutzen das"-Spur, nicht eine Laufzeit-Police.
+
+*Ersetzungs-Map* — 7 HTML-Entities in `app.html` + 3 Text-Glyphen in `js/`:
+- `app.html:23` `&#8962;` → `<use href="#i-house">` (Rail-Übersicht)
+- `app.html:33` `&#9881;` → `<use href="#i-settings">` (Rail-Konto)
+- `app.html:39` `&#9099;` → `<use href="#i-log-out">` (Rail-Abmelden)
+- `app.html:50` `&#43;` → `<use href="#i-plus">` (Liste-Anlegen)
+- `app.html:83` `&times;` → `<use href="#i-x">` (Nur-lesen-Schließen)
+- `app.html:102` `&times;` → `<use href="#i-x">` (Editor-Schließen)
+- `app.html:151/153/157` `&#128279;`/`&#8221;`/`&#128444;` → `<use href="#i-link">`/
+  `<use href="#i-quote">`/`<use href="#i-image">` (Editor-Toolbar)
+- `list.js:197` `×` → `iconSvg("x")` (Suche-Chip entfernen)
+- `list.js:351` `→` → `iconSvg("folder-input")` (Verschieben-Knopf)
+- `list.js:368` `⇄` → `iconSvg("share-2")` (Freigeben-Knopf)
+- `tree.js:203` `▾`/`▸` → `iconSvg("chevron-down")` / `iconSvg("chevron-right")`
+  (Baum-Twist, abhängig vom `open`-Zustand)
+- `editor.js:236` `×` → `iconSvg("x")` (Asset-Strip entfernen — zusätzlich zur
+  Plan-Ersetzungs-Map, weil das `×` dort ein Icon ist und die F10-Audit-Zeile „Editor
+  Schließen" analog auch für Bildanhänge gilt; bewusst in dieser Session erledigt)
+
+*CSS* — `phase5_ui/webui/static/app.css`:
+- `.icon` neu (Lucide-Defaults: `width/height: 1.25em; stroke: currentColor; fill: none;
+  stroke-width: 2; vertical-align: -0.25em; flex-shrink: 0;`). `currentColor` macht
+  die Farbe eine reine CSS-Frage — wer Akzent will, setzt `color` am Container, kein
+  Sonderfall im Sprite.
+- `.rail__glyph.icon` (16×16, damit Lucide-Default 1.25em = 20px Schrift nicht über die
+  Badge-Box hinausragt).
+- `.toolbar-btn.icon`, `.btn--icon.icon`, `.chip__remove.icon` (1em = ~14px in
+  Button-Gröeschung; 1.25em wirkte in 28px-Toolbar-Knöpfen zu fett).
+- `.tree__twist` bekommt `display: inline-flex; align-items/justify: center;` damit das
+  SVG in der 12×12-Box zentriert sitzt; `.tree__twist.icon` überschreibt die Lucide-
+  Defaults auf 12×12, sonst wäre der Twist größer als der Knopf.
+
+*Kommentar-Korrekturen* — Drei Code-Kommentare verwenden jetzt Wörter statt Glyphen
+(`dialogs.js:69,342` „→-Knopf" → „Verschieben-Knopf"; `tree.js:79` „× im Editor" →
+„Schliessen-Icon im Editor"). Zwei weitere Treffer bleiben als Sprach-Interpunktion
+(`editor.js:147` und `dialogs.js:222` „v1 → v4" / „v1 → aktuelle Version v2") — das
+sind keine Icons, sondern typografische Pfeile zwischen Versionsnummern; mit
+Audit-Kommentar `// P8-C2 Audit: …` markiert, damit die Akzeptanz-Grep `→|⇄|×` klar
+unterscheidbar zwischen „0 Icon-Treffer" und „Sprach-Interpunktion" trennt.
+
+*`phase5_ui/THIRD_PARTY_LICENSES.md`* neu (P8-F Pflicht): ISC + MIT für Lucide,
+OFL-1.1 für IBM Plex (C1 bereits erfüllt, hier nur nachgetragen für die Vollständigkeit
+der Datei).
+
+**Verifikation, §0.6 Selbstprüfung (Advisor-Ersatz):**
+1. ✅ `pytest -q` 958/958 grün (252.66s; kein neuer Regress).
+2. ✅ Tabu-Diff-Kommando aus §0.4 leer (`git diff --stat main -- phase4_auth/ phase2_mcp/
+   phase5_ui/webui/security.py phase1_storage/storage/{models,frontmatter,files,patch,acl,
+   history}.py` — keine Zeile).
+3. ✅ `grep -nE '&#[0-9]+;' app.html` → nur 2 Treffer in Kommentaren (Z. 35/36), beide
+   sind historische Begründungen für den Icon-Wechsel; **0 Icon-Treffer im sichtbaren UI**.
+4. ✅ `grep -nE '→|⇄|×' phase5_ui/webui/static/js/*.js` → 2 Treffer, beide mit
+   `// P8-C2 Audit: …`-Kommentar markiert (Sprach-Interpunktion in Versions-Text, keine
+   Icons).
+5. ✅ `node --check` auf `icons.js`/`list.js`/`tree.js`/`editor.js`/`dialogs.js` (alle
+   grün).
+6. ✅ `build_icon_sprite.py --check` → `OK: Sprite aktuell (18 icons, 5790 bytes).`
+   (idempotent).
+7. ✅ `ui_budget.py` 5/5 grün: app.js+css+Font **110.3 KB** (Ziel <250 KB); +1.9 KB
+   seit C1 (Sprite-Block + `js/icons.js`). Erstaufruf `/ui/` 117.3 KB, weiterhin reichlich
+   Reserve vor `graph.js` in D2.
+8. ✅ V92 (Icon-Namen in Lucide 1.38.0): alle 18 Namen direkt gegen
+   `https://raw.githubusercontent.com/lucide-icons/lucide/1.38.0/icons/<name>.svg`
+   abgerufen und byte-gleich mit dem vendored Material verglichen.
+
+**Hard-Rule-Konformität:** Hard Rule 1 (keine Secrets), Hard Rule 2 (Index unangetastet,
+kein Storage-Code angefasst), Hard Rule 4 (kein fremder Body verarbeitet — alle Icon-SVGs
+sind eigene Vendored-Source), Hard Rule 7 (Logging → stderr; `bash -n` auf Generator-Skript
+nicht nötig, ist Python und lief ohne Fehler), Hard Rule 8 (Modul-Status + Abnahmestand +
+Session-Block + `updated:` synchron in dieser Datei, INDEX-Eintrag und SESSIONS_ARCHIVE-
+Rotation im selben Commit), Hard Rule 9 (kein Prozess angefasst, kein Service-Touch).
+
+**Verbleibend für die nächste Session (offene Punkte, die C2 NICHT berührt):**
+- **Sichtprüfung 1 (Plan §8) folgt nach C1 + C2 zusammen** — Typo-Größen und Icon-
+  Lesbarkeit als Augenschein-Paar. Nikinger fährt sie gegen eine Wegwerf-Instanz oder
+  Screenshots. Strukturelle Änderungen nicht, Feinwerte dürfen justiert werden.
+- C3 (Farbsemantik + Legende) — Plan §4.C3; F7 ist bereits aligned, C3 fügt die drei
+  Tokens `--space-own`/`--space-shared`/`--space-foreign` und die `.legend` hinzu.
+- C4 (Glass-Akzente) — Plan §4.C4; F14 (Auswahl-Indikatoren) + F16
+  (`prefers-reduced-transparency`-Fallback, V85 Firefox-Prüfung).
+- C5 (Dichte, Selection-Styling, 72ch) — Plan §4.C5; F5 + F21 + F22.
+- D1/D2/D3 erst nach Sichtprüfung 1 — Reihenfolge 0 → A → B → Gate → C → D → Z hält.
+
+**Nächster Schritt, konkret:** **C3 — Farbsemantik + Legende** (Plan §4.C3). Neue Tokens
+`--space-own`/`--space-shared`/`--space-foreign` mit Startwerten (Nikinger-Sichtprüfung 1
+darf feinjustieren), `spaceCategory(space)`-Helfer in `state.js`, Anwendung in Rail-Glyph
+(`.rail__glyph`-Rand/Fond), Listen-Meta-Zeile (`.item__meta`-Umfeld), Übersichts-Legende
+und Graph-Knoten (für D2). Statusfarben bleiben unangetastet — eine Farbe = eine
+Bedeutung, keine Deko.
+
+---
 
 ## Session stopped — 2026-09-01 (Block C C1: IBM Plex Sans Var + Mono, Typo-Tokens, Body 16px/1.55, IDs/Versions in Plex Mono)
 

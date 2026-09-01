@@ -7,8 +7,8 @@ up: docs/INDEX.md
 down:
   - ROADMAP.md                          # Phasenplan + Status je Phase
   - docs/INDEX.md                       # L0-Karte aller .md
-  - phase7_spaces_admin/CLAUDE.md       # aktive Phase
-updated: 2026-09-01 (Phase 8 Gate B→C bestanden -- Current-state-Absatz erweitert, Phase-8-Head rotiert, Block C als nächster Schritt markiert; kein Code, kein Service-Touch in dieser Sitzung) | 2026-09-01 (Hard Rule 9 ergänzt — kein pkill -f mit Regex, niemals den systemd-Dienst anfassen; Lehre aus dem Prod-Vorfall 2026-09-01, Phase 8 Step A3 Nachbereitung) | 2026-08-23 (Phase 7 Step 0: down: auf phase7_spaces_admin/CLAUDE.md umgestellt, stale d348e2e-Deploy-Behauptung im Current-state-Absatz korrigiert) | 2026-08-09 (Phase 6 🔄 gestartet — Hard Rule 4 neu gefasst (P6-U), Current state umgestellt)
+  - phase8_ui_graph/CLAUDE.md           # aktive Phase
+updated: 2026-09-01 (Phase 8 Sichtprüfung 1: 9 Screenshots gegen Wegwerf-Instanz + README Sneak-Peak-Sektion + C2+Docs-Commit `0d97b3a` gepusht; phase8_ui_graph/CLAUDE.md Head 37.7KB->33.6KB wieder unter Softcap, SESSIONS_ARCHIVE.md 103.8KB->114.0KB; docs/screenshots/ neu im INDEX; kein Code ausserhalb webui/static + build_icon_sprite.py + vendor/, kein Service-Touch, Produktion weiterhin active) | 2026-09-01 (Phase 8 Gate B→C bestanden -- Current-state-Absatz erweitert, Phase-8-Head rotiert, Block C als nächster Schritt markiert; kein Code, kein Service-Touch in dieser Sitzung) | 2026-09-01 (Hard Rule 9 ergänzt — kein pkill -f mit Regex, niemals den systemd-Dienst anfassen; Lehre aus dem Prod-Vorfall 2026-09-01, Phase 8 Step A3 Nachbereitung) | 2026-08-23 (Phase 7 Step 0: down: auf phase7_spaces_admin/CLAUDE.md umgestellt, stale d348e2e-Deploy-Behauptung im Current-state-Absatz korrigiert) | 2026-08-09 (Phase 6 🔄 gestartet — Hard Rule 4 neu gefasst (P6-U), Current state umgestellt)
 ---
 # CLAUDE.md — Project Instructions
 

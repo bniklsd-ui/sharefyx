@@ -4,7 +4,7 @@ purpose: Menschliche Übersicht + Maschinen-Setup (venv, Keyring, Datenverzeichn
 read-when: erstes Setup auf einer neuen Maschine, oder wenn jemand wissen will, was das Ding überhaupt ist
 detail: L2
 up: docs/INDEX.md
-updated: 2026-07-28
+updated: 2026-09-01
 ---
 # Space-Server
 
@@ -55,6 +55,31 @@ noch keine eigene Zeile, siehe `phase3_edge/CLAUDE.md`.
 
 Der Storage-Kern ist die einzige Komponente, die Daten anfasst. MCP und REST sind zwei dünne
 Adapter darüber — deshalb wird der Kern zuerst gebaut und offline bewiesen.
+
+## Sneak Peak
+
+Neun Screenshots aus Phase 8 Block C (UI-Neuanstrich v3: IBM Plex Sans Var + Plex Mono,
+Lucide-Icons statt HTML-Entities), gefahren gegen eine Wegwerf-Instanz mit frischem
+`DATA_ROOT` und eigener `auth.sqlite3`. Akzentfarbe ist `#3E8DF3`; Hintergrund dunkel;
+deutsche UI-Texte.
+
+| | |
+|:---:|:---|
+| ![Anmelden](docs/screenshots/01_login.png) | ![Übersicht](docs/screenshots/02_overview.png) |
+| Anmelden | Übersicht nach Update-Banner |
+| ![Notizen-Filter](docs/screenshots/03_list.png) | ![Editor Vorschau](docs/screenshots/04_editor.png) |
+| Notizen mit Verschieben-/Freigeben-Icons | Editor-Vorschau mit Toolbar-Icons |
+| ![Editor Bearbeiten](docs/screenshots/05_editor_edit.png) | ![Konto](docs/screenshots/06_konto.png) |
+| Editor-Bearbeiten-Modus | Passwort-ändern-Dialog |
+| ![Übersicht im Edit-Kontext](docs/screenshots/07_overview_full.png) | ![Schmaler Viewport](docs/screenshots/08_rail_close.png) |
+| Übersicht mit selektiertem Item | Schmaler Viewport — Rail kollabiert auf Icons |
+| ![Saubere Übersicht](docs/screenshots/09_overview_clean.png) | |
+| Saubere Übersicht im 1440×900-Viewport | |
+
+Hinweis: die Screenshots wurden **vor** dem Phase-8-Live-Deploy gemacht und zeigen den
+Stand des lokalen Working-Trees. Bucket-Tiles (`0 Offen / 0 Erledigt / 3 Notizen / 0
+Archiv`) werden in Block D (`P8-J`, tabellose Space-Zeilen) durch eine nicht-Card-Darstellung
+ersetzt — die vier Cards sind ein bewusst noch nicht angefasster AI-Tell (C0-F12/F13).
 
 ## Setup
 
