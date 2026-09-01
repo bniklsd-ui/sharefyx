@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase8_ui_graph_plan.md       # voller Plan, Entscheidungen P8-A–P8-Q, §0.1 gelockte N1–N12, Steps 0/A/B/C/D/Z
   - ../docs/concepts/PHASE7_CLOSEOUT_HANDOVER.md   # Herkunft der drei Erbposten (P7-24/remove-space/P7-4)
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-09-01 (Versions-Bump v2.2 -> v2.2.3 in app.html .rail__version -- Nikinger-Konvention: dritte Stelle = Step-Nummer, Phase-8-A3 = Step 3; mcpserver.__version__ unangetastet (anderes Schema)) | 2026-09-01 (Doku-Session: Hard Rule 9 in Wurzel-CLAUDE.md ergaenzt nach Phase-8-A3-Vorfall -- kein pkill -f mit Regex, niemals den systemd-Dienst anfassen; PROMPTS.md Hard-Rules-Liste und Tests-Absatz um Stopp-Regel fuer Wegwerf-Instanzen erweitert; docs/INDEX.md drei Zeilen vorne + drei Eintraege angepasst; kein Code, kein Service-Touch, Produktion weiterhin active, head 11.6KB->12.8KB unter Softcap) | 2026-09-01 (A3 gebaut -- _TITLE_NOT_ID_HINT mit Positiv/Negativ-Beispiel geschärft, Test test_tool_descriptions_tell_the_agent_to_name_titles_not_ids auf neuen Wortlaut angepasst, 143 phase2_mcp-Tests gruen, Zweitprobe vom Nikinger live bestaetigt (positiv), dritte Probe nach Deploy offen P8-5) | 2026-08-31 (A2 live-verifiziert -- Test_Space_A2 angelegt + entfernt, 4x GET /api/v1/overview nach DELETE=200 statt 500, Index konsistent mit Dateien, Push danach freigegeben; Block A vollstaendig live ✅) | 2026-08-31 (Nachtrag: Janick live angemeldet -- dritter biologischer Nutzer, Phase-4-Auth-Architektur erstmals mit externem Dritt-Anwender durchgespielt; Connector-UI-Befund: 'Anmeldung fehlgeschlagen' trotz erfolgreicher OAuth-Verbindung, kein Handlungsbedarf, Vormerkung fuer spaeter) | 2026-08-31 (Nachtrag: OpenAI-ChatGPT-Konnektor aktuell nicht kompatibel, benoetigte Settings unbekannt -- Auth-Architektur auf Anthropic-Konnektoren geeicht, andere Settings nicht hinterlegt, Vormerkung ohne Auftrag) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
+updated: 2026-09-01 (A3-Drittprobe (P8-5): Restdefekt in Klammer-/Aufzaehlungs-Kontexten (it_...-ID wird in Klammern gesetzt); Hint-Text nennt nur zwei Negativ-Beispiele (plain + Tabelle), Klammern sind dritte Form; Nikinger-Entscheidung: A3 bleibt 🟡 mit Defekt, wandert in Phase-8-Closeout als benannter Punkt (P8-N §9) wie P7-24/P7-4 damals; kein weiterer Hint-Edit, kein struktureller Eingriff jetzt) | 2026-09-01 (Versions-Bump v2.2 -> v2.2.3 in app.html .rail__version -- Nikinger-Konvention: dritte Stelle = Step-Nummer, Phase-8-A3 = Step 3; mcpserver.__version__ unangetastet (anderes Schema)) | 2026-09-01 (Doku-Session: Hard Rule 9 in Wurzel-CLAUDE.md ergaenzt nach Phase-8-A3-Vorfall -- kein pkill -f mit Regex, niemals den systemd-Dienst anfassen; PROMPTS.md Hard-Rules-Liste und Tests-Absatz um Stopp-Regel fuer Wegwerf-Instanzen erweitert; docs/INDEX.md drei Zeilen vorne + drei Eintraege angepasst; kein Code, kein Service-Touch, Produktion weiterhin active, head 11.6KB->12.8KB unter Softcap) | 2026-09-01 (A3 gebaut -- _TITLE_NOT_ID_HINT mit Positiv/Negativ-Beispiel geschärft, Test test_tool_descriptions_tell_the_agent_to_name_titles_not_ids auf neuen Wortlaut angepasst, 143 phase2_mcp-Tests gruen, Zweitprobe vom Nikinger live bestaetigt (positiv), dritte Probe nach Deploy offen P8-5) | 2026-08-31 (A2 live-verifiziert -- Test_Space_A2 angelegt + entfernt, 4x GET /api/v1/overview nach DELETE=200 statt 500, Index konsistent mit Dateien, Push danach freigegeben; Block A vollstaendig live ✅) | 2026-08-31 (Nachtrag: Janick live angemeldet -- dritter biologischer Nutzer, Phase-4-Auth-Architektur erstmals mit externem Dritt-Anwender durchgespielt; Connector-UI-Befund: 'Anmeldung fehlgeschlagen' trotz erfolgreicher OAuth-Verbindung, kein Handlungsbedarf, Vormerkung fuer spaeter) | 2026-08-31 (Nachtrag: OpenAI-ChatGPT-Konnektor aktuell nicht kompatibel, benoetigte Settings unbekannt -- Auth-Architektur auf Anthropic-Konnektoren geeicht, andere Settings nicht hinterlegt, Vormerkung ohne Auftrag) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
 ---
 
 # CLAUDE.md — Phase 8: UI-Neuanstrich v3, Verknüpfungs-Graph, QoL (`phase8_ui_graph/`)
@@ -54,7 +54,7 @@ Abnahmezeilen: `docs/concepts/phase8_ui_graph_plan.md`.
 | Step 0 | Fundament-Session (Haushalt, AGENTS.md weg, Skelett, opencode-Setup, Smoke-Test) | ✅ |
 | A1 | Reauth-Grant (`webui/reauth.py :: ReauthGrantStore` + Endpoint + Client + Tests, N=14-Batch) | ✅ live-verifiziert (`90441b29`), Test-Space-Probe, ein TOTP-Code für N rechteerweiternde Items |
 | A2 | `remove-space`-Auto-Reindex (`spacectl.py :: _cmd_remove_space()` → `store.rebuild_index()`) | ✅ live-verifiziert (`90441b29`), `Test_Space_A2` Remove → 4× `GET /api/v1/overview` 200, Index konsistent |
-| A3 | P7-4: organische Zweitprobe + `_TITLE_NOT_ID_HINT` schärfen | 🟡 gebaut, Zweitprobe positiv (Nikinger live bestätigt 2026-09-01), dritte Probe nach Deploy offen (P8-5) |
+| A3 | P7-4: organische Zweitprobe + `_TITLE_NOT_ID_HINT` schärfen | 🟡 gebaut + deployt (`7254aa9`, 2026-09-01); Drittprobe (P8-5) **Restdefekt**: Plain-Text sauber, **Klammer-/Aufzählungs-Kontext** nennt weiterhin die `itm_…`-ID — Hint deckt zwei Negativ-Beispiele (plain + Tabelle), Klammern sind eine dritte, nicht genannte Form. **Bleibt 🟡 mit Defekt** (Nikinger-Entscheidung 2026-09-01); der Restdefekt wandert als benannter Defekt in den Phase-8-Closeout (`docs/concepts/phase8_ui_graph_plan.md` §9), wie P7-24/P7-4 damals |
 | Block B | Link-Fundament (`linkscan.py`, `item_links`, `GET /api/v1/graph`) | ⬜ |
 | Block C | Design-Fundament v3 (Typografie, Icons, Farben, Glas) | ⬜ |
 | Block D | Übersicht tablos + Force-Graph | ⬜ |
@@ -239,3 +239,56 @@ fort, nicht ersetzt sie — Major (`v2`) bleibt, Minor (`v2.2`) bleibt bis zur
 nächsten Phasen-Bumpscheidung, Patch (`v2.2.3`) ist der Step-Counter innerhalb
 der Phase. Nur `app.html`-Änderung; `mcpserver.__version__` (`0.1.0`) bleibt
 unangetastet (anderes Schema, Python-Introspection, nicht der User-Badge).
+
+---
+
+## Session stopped — 2026-09-01 (A3-Drittprobe P8-5: Restdefekt in Klammer-/Aufzählungs-Kontexten, A3 bleibt 🟡)
+
+**Auftrag:** Nikinger hat die dritte Probe (P8-5) gegen die frisch deployte
+Instanz gefahren. Antwort der Instanz:
+
+> „Fertig: `(itm_ece2a2a3(Ordner (keycloak-allgemein ), verlinkt in beide
+> Richtungen mit allen fünf Dienst-Dokus. Kein itm_-Verweis im Textkörper —
+> konsequent von Anfang an so geschrieben, kein Nachbessern nötig diesmal.`"
+
+**Befund, nuancierter als „klappt nicht":** Plain-Text-Body ist sauber
+(`itm_…`-frei, der Hint-Text wirkt im freien Text). Defekt: **Klammerausdrücke
+und Aufzählungen nennen weiterhin die `itm_…`-ID.** Hier `(itm_ece2a2a3(Ordner
+…))` — die ID wird in Klammern gesetzt.
+
+**Ursache (im Code verifiziert):** der Hint-Text `_TITLE_NOT_ID_HINT`
+(`phase2_mcp/mcpserver/tools.py` Z. 159–164) nennt **zwei** Negativ-Beispiele
+(plain + Tabellen-Spalte). Klammern sind eine dritte Form, nicht explizit
+erwähnt. Das Modell generalisiert nicht von „plain + Tabelle" auf „auch Klammer /
+Aufzählung / Inline-Code".
+
+**Entscheidung (Nikinger, AskUserQuestion dieser Session):** A3 wird **nicht**
+auf ✅ gehoben, **bleibt 🟡 mit benanntem Defekt**. Der Restdefekt wandert in
+den Phase-8-Closeout (`docs/concepts/phase8_ui_graph_plan.md` §9) als benannter
+Punkt, wie P7-24 oder P7-4 damals — keine vierte Hint-Iteration, kein
+struktureller Eingriff jetzt. Phase 8 macht mit **Block B** weiter
+(`storage/linkscan.py` + `item_links`-Tabelle + `GET /api/v1/graph`, achte
+P1-Contract-Öffnung, P8-M).
+
+**Was geändert wurde (zwei Stellen, Doku-only):**
+
+1. `phase8_ui_graph/CLAUDE.md` Modul-Status-Tabelle: A3-Zeile von „🟡 gebaut,
+   Zweitprobe positiv, dritte Probe offen" auf „🟡 gebaut + deployt, Restdefekt
+   Klammer/Aufzählung, wandert in Closeout" präzisiert.
+2. `phase8_ui_graph/CLAUDE.md` `updated:`-Zeile vorne: 2026-09-01-Eintrag mit
+   dem neuen Sachstand.
+
+**Verifikation:** read-only (`grep` im Release-Verzeichnis + Phase-8-Head-Diff),
+kein Code-Change, kein Service-Touch.
+
+**Hard-Rule-Konformität:** Hard Rule 8 — Doc-Update im selben Commit wie die
+Statusänderung (Commit dieser Session, ein einziger); Hard Rule 9 — kein
+`pkill`/`systemctl` heute.
+
+**Was bewusst NICHT in diesem Commit steht:** ein weiterer Hint-Text-Edit oder
+ein struktureller Eingriff (Optionen a/c aus der Frage oben) — Nikinger hat
+sich für Option b entschieden (🟡 mit Defekt). Beide bleiben als Referenz im
+vorigen Block dokumentiert, falls eine spätere Session sie aufgreifen will.
+
+**Nächster Schritt, konkret:** Phase-8-Head committen + pushen, dann **Block B**
+starten (Plan §3, P8-M, N4–N7).
