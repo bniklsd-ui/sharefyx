@@ -57,7 +57,8 @@ Abnahmezeilen: `docs/concepts/phase8_ui_graph_plan.md`.
 | A3 | P7-4: organische Zweitprobe + `_TITLE_NOT_ID_HINT` schärfen | 🟡 gebaut + deployt (`7254aa9`, 2026-09-01); Drittprobe (P8-5) **Restdefekt**: Plain-Text sauber, **Klammer-/Aufzählungs-Kontext** nennt weiterhin die `itm_…`-ID — Hint deckt zwei Negativ-Beispiele (plain + Tabelle), Klammern sind eine dritte, nicht genannte Form. **Bleibt 🟡 mit Defekt** (Nikinger-Entscheidung 2026-09-01); der Restdefekt wandert als benannter Defekt in den Phase-8-Closeout (`docs/concepts/phase8_ui_graph_plan.md` §9), wie P7-24/P7-4 damals |
 | B1 | `storage/linkscan.py` neu (`ITEM_REF_RE`, `extract_item_refs(body)`) + 15 Tests | ✅ gebaut (`ed43ed6`, 2026-09-01); achte P1-Contract-Öffnung angekündigt in `phase1_storage/CLAUDE.md` §Geerbte Contracts (Disziplin der Vorgänger-Öffnungen 3–7); Tabu-Diff leer, Charakterisierungstests byte-identisch grün, 169 phase1_storage-Tests gesamt |
 | B2 | `index.py` (`INDEX_SCHEMA_VERSION = 3`, `item_links`-Tabelle + Index, `replace_item_links()`, `all_links()`, `row_from_file` ↳ `body_refs`, `rebuild_index` populiert, `delete_item` räumt src-Zeilen) + `store.py` (`_replace_links_for_item()`, `Store.links_all()`, alle 6 Schreibpfade via `_write_item_file` plus Drift-Repair) + 22 Tests | ✅ gebaut (`ed43ed6`+B2-Commit, 2026-09-01); Tabu-Diff leer, Charakterisierungstests byte-identisch grün, 191 phase1_storage-Tests gesamt (vorher 154 + 15 B1 + 13 B2-index + 9 B2-store) |
-| Block B Rest | B3 (`GET /api/v1/graph`), B4 (UI: `#item/`-Nav + Link-Picker) | ⬜ |
+| B3 | `webui/api.py :: _graph_get()` + Route `GET /api/v1/graph` + 8 Tests | ✅ gebaut (`f4c8844`+B3-Commit, 2026-09-01); Tabu-Diff leer, Charakterisierungstests byte-identisch grün (P5-B-Disziplin gehalten: nur `mcpserver.permissions.SharePolicy` importiert in webui/) |
+| Block B Rest | B4 (UI: `#item/`-Nav + Link-Picker) | ⬜ |
 | Block C | Design-Fundament v3 (Typografie, Icons, Farben, Glas) | ⬜ |
 | Block D | Übersicht tablos + Force-Graph | ⬜ |
 | Step Z | Closeout | ⬜ |
@@ -466,3 +467,75 @@ draußen, `?archived=1` nimmt sie rein; Kanten aus `Store.links_all()`,
 gefiltert auf `src != dst` und beide Endpunkte sichtbar; Tests im
 `phase5_ui/tests/test_api.py`. Kein Polling, keine UI-Änderung in B3 — B4 ist
 dafür zuständig (`#item/`-Navigation + Link-Picker).
+
+---
+
+## Session stopped — 2026-09-01 (Block B Step B3: `GET /api/v1/graph`, 8 Tests, ACL-Leck-Riegel gehalten)
+
+**Auftrag:** B3 (Plan §3 P8-M, dritter Sub-Step von Block B). API-Endpoint
+für die Graph-Ansicht: Knotenmenge + Kantenmenge in einer Antwort, mit der
+ACL-Pipeline aus `_items_get` spiegelbildlich.
+
+**Was geändert wurde (zwei Dateien, 87 insertions / 0 deletions):**
+
+1. `phase5_ui/webui/api.py` (79 +): neue Handler-Funktion `_graph_get()` +
+   Route `Route("/api/v1/graph", _catch(_graph_get), methods=["GET"])`.
+   Knotenmenge spiegelt exakt die Filterlogik aus `_items_get` im globalen
+   Scope (P7-D/P7-E), zusätzlich `status != "archived"` per Default mit
+   `?archived=1`-Opt-In. Kanten aus `store.links_all()`, gefiltert auf
+   `src != dst` UND beide Endpunkte sichtbar (ACL-Leck-Riegel — sonst
+   verrät eine Kante einen unsichtbaren Knoten), exakt dedupliziert pro
+   `(src, dst, kind)`. Antwort-Payload minimal: `nodes` mit den acht
+   Feldern aus Plan §3 B3 (`id`/`title`/`space`/`own`/`shared`/`type`/
+   `status`/`folder`/`tags`), `edges` mit `{src, dst, kind}`. Kein
+   `body`/`snippet` — Graph-Ansicht braucht keine Inhalte, fremde Snippets
+   wären Rule 4 dem Geiste nach fragwürdig (analog `overview_row_to_json`).
+
+2. `phase5_ui/tests/test_graph.py` (neu, 8 Tests): Frontmatter+Body-Kanten
+   sichtbar mit korrektem Knoten-Payload (exakte 8-Felder-Prüfung), ACL-
+   Leck-Riegel (fremdes `private`-Item weder als Knoten noch als Kanten-
+   ende), `share_read`-geteiltes fremdes Item inkl. Kanten, dangling
+   Reference (`itm_deadbeef`) erzeugt stillschweigend keine Kante,
+   `?archived=1`-Opt-In funktioniert, Self-Loop-Filter (`src != dst`),
+   401 ohne Session.
+
+**Verifikation:** `pytest phase1_storage/ phase5_ui/tests/test_graph.py
+phase6_shares/tests/test_characterization.py` → **203/203 grün**. Tabu-Diff
+§0.4 → **leer**. `webui`-Modul darf weiterhin genau ein `mcpserver`-Symbol
+importieren — `test_webui_imports_exactly_one_mcpserver_symbol` (aus der
+bestehenden Suite) prüft das automatisch: nur `mcpserver.permissions.SharePolicy`
+(P5-B-Disziplin gehalten). Charakterisierungstests 4/4 byte-identisch.
+
+**§0.6 Selbstprüfung:**
+1. ✅ Berührte Tests grün.
+2. ✅ Tabu-Diff leer.
+3. ✅ Fehlerpfade: ACL filtriert vor Knoten- UND Kantenbau, Self-Loops
+   gedroppt, dangling `dst_id` stumm, archivierte Items per Default raus.
+   `?archived=1` opt-in, ohne Session 401 (Test bestätigt).
+4. ✅ Modul-Status + dieser Session-Block.
+5. ⏭️ `ui_budget.py` — V90 nennt es als Entscheidung des Ausführenden;
+   für B3 nicht erforderlich, weil der Endpoint nur bei explizitem
+   Graph-Aufruf läuft (kein Default-Traffic). Falls Block D ein
+   Graph-Default-Tab öffnet, ist eine Latency-Messung sinnvoll.
+
+**Hard-Rule-Konformität:** Hard Rule 1 (keine Secrets), Hard Rule 4 (fremde
+Spaces nur über die existierende `can_read_item_as_human`-Pipeline, kein
+zweiter Rechtepfad erfunden — das war der ausdrückliche Plan §3 B3-Auftrag),
+Hard Rule 7 (stderr-only, kein stdout-Output von Produktivcode), Hard Rule 8
+(Doc-Update im selben Commit).
+
+**Tabu-Grenze gehalten:** außer `linkscan.py`/`index.py`/`store.py` (B1, B2)
+fasst Block B nur `webui/api.py` an — `webui/security.py` (P8-Q) bleibt
+unangetastet, kein zweiter `mcpserver`-Import, `models.py`/Frontmatter-Schema
+unverändert.
+
+**Öffnung bleibt angekündigt, nicht geschlossen** — achte P1-Contract-Öffnung
+wird mit Phase-8-Step-Z geschlossen, nicht mit B3.
+
+**Nächster Schritt, konkret:** B4 — UI-Anschluss der Links. Konkret:
+`#item/`-Navigation (Klick-Delegation in `app.js`/`editor.js` auf
+`a[href^="#item/"]`, wiederverwendet den P7-ID-Lookup aus `_items_get`,
+V86 abhaken) und Link-Picker (neuer kleiner Dialog `link-picker-dialog` in
+`app.html`, Suche via `GET /api/v1/items` global, Treffer hängt `itm_`-ID
+ans `#field-links` an — `links` steht bereits in `_PATCH_FIELDS`, kein
+API-Umbau).

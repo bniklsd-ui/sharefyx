@@ -622,6 +622,83 @@ def api_routes(
             })
         return JSONResponse(payload, headers={"Cache-Control": "no-store"})
 
+    async def _graph_get(request: Request) -> Response:
+        """Phase 8 Block B Step B3 (Plan §3 P8-M, P8-7/P8-8): liefert die Knoten + Kanten
+        für die Verknüpfungs-Graph-Ansicht.
+
+        Knotenmenge spiegelt EXAKT die Filterlogik aus `_items_get` im globalen Scope
+        (`P7-D`/`P7-E`): derselbe `permissions.can_read_item_as_human`-Riegel, kein zweiter
+        Rechtepfad erfunden. `status=archived` ist DEFAULT ausgeschlossen, `?archived=1`
+        nimmt archivierte Items herein -- sonst wäre die Graph-Ansicht von verwaisten Knoten
+        übersät, sobald ein Space aufgeräumt wird.
+
+        Kanten aus `store.links_all()`, gefiltert auf
+        - `src != dst` (Plan §3 P8-M: eine Selbstkante ist nie sinnvoll),
+        - **beide** Endpunkte in der sichtbaren Knotenmenge (ACL-Leck-Riegel: ein unsichtbares
+          Item existiert weder als Knoten noch als Kantenende -- ein dangling `dst_id` oder ein
+          archiviertes Item ohne `?archived=1` produziert schlicht keine Kante),
+        - exakt dedupliziert pro `(src, dst, kind)`.
+
+        Knoten-Payload: exakt die acht Felder aus Plan §3 B3 (`id`/`title`/`space`/`own`/
+        `shared`/`type`/`status`/`folder`/`tags`). Kein `snippet`, kein `body` -- die Graph-
+        Ansicht braucht keine Inhalte, und fremde Snippets/Bodies wären Rule 4 dem Geiste nach
+        fragwürdig (analog zu `overview_row_to_json`'s `snippet`-Strip).
+        """
+        session = await _require_session(request)
+        include_archived = request.query_params.get("archived") == "1"
+
+        try:
+            # Kein Status-Filter im Store: der Graph will ALLES sehen und filtert
+            # `status != "archived"` selbst in Python (analog zu `_items_get`s Architektur,
+            # die ebenfalls keine eigene Status-Semantik erfunden hat, sondern den Store-
+            # Filter exposed). Eine einzige `store.search`-Iteration reicht.
+            result = store.search(
+                None, space=None, folder=None, type=None, status=None, tag=None,
+                due_before=None, limit=_STORE_FETCH_LIMIT, offset=0,
+            )
+        except (ValidationError, ValueError) as exc:
+            raise _map_store_error(exc, own_space=session.space) from exc
+
+        # ACL + Archiv-Filter in Python -- exakt dieselbe ACL-Pipeline wie `_items_get`,
+        # nur dass hier zusätzlich archivierte Items per Default rausfallen.
+        visible_items = [
+            i for i in result.items
+            if permissions.can_read_item_as_human(session.space, _acl_for_summary(i))
+            and (include_archived or i.status != "archived")
+        ]
+        visible_ids = {i.id for i in visible_items}
+
+        nodes = [
+            {
+                "id": i.id,
+                "title": i.title,
+                "space": i.space,
+                "own": i.space == session.space,
+                "shared": i.space != session.space,
+                "type": i.type,
+                "status": i.status,
+                "folder": i.folder,
+                "tags": list(i.tags),
+            }
+            for i in visible_items
+        ]
+
+        seen: set[tuple[str, str, str]] = set()
+        edges: list[dict[str, str]] = []
+        for src, dst, kind in store.links_all():
+            if src == dst or src not in visible_ids or dst not in visible_ids:
+                continue
+            key = (src, dst, kind)
+            if key in seen:
+                continue
+            seen.add(key)
+            edges.append({"src": src, "dst": dst, "kind": kind})
+
+        return JSONResponse(
+            {"nodes": nodes, "edges": edges},
+            headers={"Cache-Control": "no-store"},
+        )
+
     async def _items_get(request: Request) -> Response:
         session = await _require_session(request)
         q = request.query_params
@@ -1063,6 +1140,8 @@ def api_routes(
         Route("/api/v1/spaces/{space}", _catch(_spaces_delete), methods=["DELETE"]),
         Route("/api/v1/meta", _catch(_meta), methods=["GET"]),
         Route("/api/v1/overview", _catch(_overview), methods=["GET"]),
+        # Phase 8 Block B Step B3 (Plan §3 P8-M): Knoten + Kanten für die Graph-Ansicht.
+        Route("/api/v1/graph", _catch(_graph_get), methods=["GET"]),
         Route("/api/v1/updates", _catch(_updates_get), methods=["GET"]),
         Route("/api/v1/updates/seen", _catch(_updates_seen), methods=["POST"]),
         Route("/api/v1/items", _catch(_items_get), methods=["GET"]),
