@@ -9,6 +9,9 @@
      (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
+## 2026-09-01
+- Claude nennt dir gegenüber jetzt den Titel einer Notiz statt einer internen ID — die Kennung bleibt im Hintergrund, der Titel ist, was du im Browser siehst.
+
 ## 2026-08-31
 - Mehrere Notizen gleichzeitig in einen anderen Space verschieben: reicht jetzt ein Passwort und ein Code für alle aus, auch wenn die Aktion Schreibrechte erweitert — der Code wird intern genau einmal verwendet, danach ist für jede weitere Verschiebe-Aktion ein neuer Code nötig.
 - Spaces entfernen räumt jetzt den internen Suchindex mit auf — die Übersicht funktioniert danach wieder zuverlässig.
