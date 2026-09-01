@@ -20,6 +20,7 @@ from .acl import ACL_FILENAME, AclDecision, AclReader
 from .errors import ConflictError, ItemNotFound, ValidationError
 from .frontmatter import parse as parse_frontmatter
 from .frontmatter import serialize as serialize_frontmatter
+from .linkscan import ITEM_REF_RE, extract_item_refs
 from .models import (
     DEFAULT_VISIBILITY,
     VISIBILITY_VALUES,
@@ -261,6 +262,18 @@ class Store:
             else:
                 fresh["version"] = row["version"]
             index.upsert_item(self._conn, fresh)
+            # Phase 8 Block B Step B2 (P8-M): auch `item_links` an die neue Body-Realitaet
+            # anpassen -- ein Drift-Repair (Body vom Menschen editiert) kann itm_...-Refs
+            # hinzugefuegt oder entfernt haben. Frontmatter-Refs sind `row_from_file()`s
+            # `links_json`-Spalte entnommen, die schon in `fresh` steht.
+            frontmatter_refs = [
+                ref for ref in json.loads(fresh["links_json"]) if ITEM_REF_RE.fullmatch(ref)
+            ]
+            rows = (
+                [(ref, "frontmatter") for ref in frontmatter_refs]
+                + [(ref, "body") for ref in fresh["body_refs"]]
+            )
+            index.replace_item_links(self._conn, item_id, rows)
             row = index.get_item_row(self._conn, item_id)
         return row
 
@@ -273,10 +286,37 @@ class Store:
         fields["version"] = new_version
         files.atomic_write(path, serialize_frontmatter(fields, body))
 
+    def _replace_links_for_item(self, item: Item) -> None:
+        """Phase 8 Block B Step B2 (P8-M): schreibt die Kantenmenge eines Items neu.
+
+        `frontmatter_refs` = `item.links`-Eintraege, die `ITEM_REF_RE.fullmatch` passieren
+        (beliebige Strings im `links:`-Feld bleiben erlaubt und werden keine Kante, Plan §3
+        B2). `body_refs` = `extract_item_refs(item.body)`. Beide werden zu einer Liste
+        `[(dst_id, kind), ...]` zusammengefuehrt; `replace_item_links(conn, src_id, rows)`
+        loescht alles Vorhandene und fuegt neu ein -- idempotent, darf mehrfach in einer
+        Schreiboperation aufgerufen werden. Setzt KEINEN eigenen Git-Commit, weil der Aufrufer
+        (`_write_item_file`) bereits committet.
+
+        Voraussetzung: `self._lock` UND `self._file_write_lock()` werden vom Aufrufer gehalten,
+        genau wie bei `index.upsert_item`.
+        """
+        frontmatter_refs = [ref for ref in item.links if ITEM_REF_RE.fullmatch(ref)]
+        body_refs = extract_item_refs(item.body)
+        rows = (
+            [(ref, "frontmatter") for ref in frontmatter_refs]
+            + [(ref, "body") for ref in body_refs]
+        )
+        index.replace_item_links(self._conn, item.id, rows)
+
     def _write_item_file(self, item: Item, *, old_path: Path | None, op: str) -> Path:
         """Schreibt `item` an den (ggf. neuen) Pfad, benennt bei Titeländerung um, aktualisiert
         den Index und committet (`op` benennt den Git-Commit, z.B. "create"/"update"/"append").
         Muss unter `self._lock` **und** `self._file_write_lock()` aufgerufen werden.
+
+        Phase 8 Block B Step B2 (P8-M): nach `index.upsert_item` ruft diese Methode auch
+        `_replace_links_for_item` -- damit JEDER Schreibpfad (`create`/`update`/`patch`/
+        `append`/`move`/`archive`) genau einmal pro Operation die `item_links`-Tabelle
+        aktualisiert, ohne dass jede Store-Methode das selbst tun muss.
         """
         slug = files.slugify(item.title)
         if item.status == "archived":
@@ -295,6 +335,7 @@ class Store:
             files.move_file(write_path, target_path)
         row = index.row_from_file(self._data_root, target_path)
         index.upsert_item(self._conn, row)
+        self._replace_links_for_item(item)
         self._commit(op, item.id, item.space)
         return target_path
 
@@ -395,6 +436,21 @@ class Store:
         if row is None:
             raise ItemNotFound(item_id)
         return row["space"]
+
+    def links_all(self) -> list[tuple[str, str, str]]:
+        """Phase 8 Block B Step B2 (P8-M): alle Item-Kanten aus dem Index.
+
+        Liefert `[(src_id, dst_id, kind), ...]` für ALLE Items, ohne ACL-Filterung --
+        der Aufrufer (`webui/api.py :: _graph_get`, Phase 8 Step B3) filtert die
+        sichtbare Knotenmenge gegen `can_read_item_as_human` und blendet Kanten aus,
+        deren Endpunkte unsichtbar sind (Plan §3 B3 ACL-Leck-Riegel). Sortierung:
+        (src_id, kind, dst_id), deterministisch.
+
+        Dangling `dst_id`-Eintraege (Notiz nennt eine ID, die nicht existiert) bleiben
+        enthalten; dieselbe Filterung oben schneidet sie mit raus.
+        """
+        with self._lock:
+            return [(r["src_id"], r["dst_id"], r["kind"]) for r in index.all_links(self._conn)]
 
     def search(
         self,

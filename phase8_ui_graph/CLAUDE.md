@@ -55,8 +55,9 @@ Abnahmezeilen: `docs/concepts/phase8_ui_graph_plan.md`.
 | A1 | Reauth-Grant (`webui/reauth.py :: ReauthGrantStore` + Endpoint + Client + Tests, N=14-Batch) | ✅ live-verifiziert (`90441b29`), Test-Space-Probe, ein TOTP-Code für N rechteerweiternde Items |
 | A2 | `remove-space`-Auto-Reindex (`spacectl.py :: _cmd_remove_space()` → `store.rebuild_index()`) | ✅ live-verifiziert (`90441b29`), `Test_Space_A2` Remove → 4× `GET /api/v1/overview` 200, Index konsistent |
 | A3 | P7-4: organische Zweitprobe + `_TITLE_NOT_ID_HINT` schärfen | 🟡 gebaut + deployt (`7254aa9`, 2026-09-01); Drittprobe (P8-5) **Restdefekt**: Plain-Text sauber, **Klammer-/Aufzählungs-Kontext** nennt weiterhin die `itm_…`-ID — Hint deckt zwei Negativ-Beispiele (plain + Tabelle), Klammern sind eine dritte, nicht genannte Form. **Bleibt 🟡 mit Defekt** (Nikinger-Entscheidung 2026-09-01); der Restdefekt wandert als benannter Defekt in den Phase-8-Closeout (`docs/concepts/phase8_ui_graph_plan.md` §9), wie P7-24/P7-4 damals |
-| B1 | P7-4 organische Zweitprobe + `_TITLE_NOT_ID_HINT` schärfen (PLATZHALTER); achte P1-Contract-Öffnung angekündigt in `phase1_storage/CLAUDE.md` §Geerbte Contracts (Disziplin der Vorgänger-Öffnungen 3–7); Tabu-Diff leer, Charakterisierungstests byte-identisch grün, 169 phase1_storage-Tests gesamt |
-| Block B Rest | B2 (`item_links`-Tabelle + Schreibpfade), B3 (`GET /api/v1/graph`), B4 (UI: `#item/`-Nav + Link-Picker) | ⬜ |
+| B1 | `storage/linkscan.py` neu (`ITEM_REF_RE`, `extract_item_refs(body)`) + 15 Tests | ✅ gebaut (`ed43ed6`, 2026-09-01); achte P1-Contract-Öffnung angekündigt in `phase1_storage/CLAUDE.md` §Geerbte Contracts (Disziplin der Vorgänger-Öffnungen 3–7); Tabu-Diff leer, Charakterisierungstests byte-identisch grün, 169 phase1_storage-Tests gesamt |
+| B2 | `index.py` (`INDEX_SCHEMA_VERSION = 3`, `item_links`-Tabelle + Index, `replace_item_links()`, `all_links()`, `row_from_file` ↳ `body_refs`, `rebuild_index` populiert, `delete_item` räumt src-Zeilen) + `store.py` (`_replace_links_for_item()`, `Store.links_all()`, alle 6 Schreibpfade via `_write_item_file` plus Drift-Repair) + 22 Tests | ✅ gebaut (`ed43ed6`+B2-Commit, 2026-09-01); Tabu-Diff leer, Charakterisierungstests byte-identisch grün, 191 phase1_storage-Tests gesamt (vorher 154 + 15 B1 + 13 B2-index + 9 B2-store) |
+| Block B Rest | B3 (`GET /api/v1/graph`), B4 (UI: `#item/`-Nav + Link-Picker) | ⬜ |
 | Block C | Design-Fundament v3 (Typografie, Icons, Farben, Glas) | ⬜ |
 | Block D | Übersicht tablos + Force-Graph | ⬜ |
 | Step Z | Closeout | ⬜ |
@@ -372,3 +373,96 @@ archive), `Store.links_all() -> list[tuple[str, str, str]]` als neue
 Lesemethode, Tests für alle sechs Schreibpfade plus Rebuild- und
 Entfernen-Verhalten. Hard Rule 2 verlangt einen vollständigen Rebuild aus den
 Dateien — `rebuild_index()` muss `item_links` mitschreiben.
+
+---
+
+## Session stopped — 2026-09-01 (Block B Step B2: `item_links`-Tabelle, alle 6 Schreibpfade, 22 Tests, Öffnung bleibt angekündigt)
+
+**Auftrag:** B2 (Plan §3 P8-M, Fortsetzung der achten P1-Contract-Öffnung).
+Schema-Migration auf `INDEX_SCHEMA_VERSION = 3`, `item_links`-Tabelle, alle
+Schreibpfade im Store rufen `_replace_links_for_item` zentral via
+`_write_item_file`, neue Lesemethode `Store.links_all()`.
+
+**Was geändert wurde (fünf Dateien, 543 insertions / 6 deletions):**
+
+1. `phase1_storage/storage/index.py` (94 +/6 −): `INDEX_SCHEMA_VERSION = 3`;
+   `_SCHEMA` um `item_links` + `idx_item_links_dst` ergänzt;
+   `_open_and_init` von `conn.execute(_SCHEMA)` auf `conn.executescript(_SCHEMA)`
+   umgestellt, weil der String jetzt mehrere durch `;` getrennte Anweisungen
+   enthält (sonst `sqlite3.ProgrammingError: You can only execute one statement`);
+   `row_from_file` gibt `body_refs` als zusätzlichen Dict-Key zurück (additiv,
+   `upsert_item` ignoriert es still); `replace_item_links(conn, src_id, rows)`
+   und `all_links(conn)` neu; `delete_item` löscht zusätzlich `item_links`-
+   Zeilen mit dieser `src_id`; `rebuild_index` leert `item_links` zu Beginn
+   und befüllt es pro Datei (Frontmatter + Body).
+
+2. `phase1_storage/storage/store.py` (56 +): `_replace_links_for_item(item)`-
+   Helper, der `frontmatter_refs` (aus `item.links` gefiltert durch
+   `ITEM_REF_RE.fullmatch`) und `body_refs` (aus `extract_item_refs(item.body)`)
+   zusammenführt und `index.replace_item_links(self._conn, item.id, rows)` ruft;
+   `_write_item_file` ruft den Helper nach `index.upsert_item(...)` — damit
+   deckt jeder Schreibpfad (`create`/`update`/`patch`/`append`/`move`/`archive`)
+   genau einmal pro Operation die `item_links`-Tabelle ab, ohne dass jede
+   Store-Methode das selbst tun muss; `_reconcile_and_get_row` aktualisiert die
+   Tabelle nach einem Drift-Repair (Body vom Menschen editiert); neue
+   öffentliche Methode `Store.links_all() -> list[tuple[str, str, str]]`.
+
+3. `phase1_storage/tests/test_item_links.py` (neu, 13 Tests): Schema-Verhalten
+   (`replace_item_links` destruktiv/leer/andere-src-Items/same-dst-unterschiedlich-
+   kind), `row_from_file` mit Body-Refs (treffer/dedup/leer), `rebuild_index`
+   füllt aus Dateien / ignoriert Non-`itm_`-Strings / wipet vollständig /
+   akzeptiert dangling dst_id ohne Crash, `delete_item` räumt src-Zeilen, Sortierung
+   in `all_links`.
+
+4. `phase1_storage/tests/test_item_links_store.py` (neu, 9 Tests): Store-Integration
+   pro Schreibpfad — `create` (Frontmatter+Body), `create` ignoriert Non-`itm_`-
+   Strings, `update` ersetzt vollständig, `append` nimmt neue Body-Refs auf,
+   `patch` rechnet Body-Links neu, `archive` behält Kanten, `move` lässt Kanten
+   unverändert, `rebuild_index` Round-Trip, Drift-Repair über `get()` passt
+   Body-Links an.
+
+5. `phase8_ui_graph/CLAUDE.md` (Modul-Status + B1-SHA-Korrektur + dieser Block):
+   B1-SHA-Zeile nachgetragen (`ed43ed6`), B2-Zeile neu (`INDEX_SCHEMA_VERSION =
+   3`, alle 6 Schreibpfade, 22 Tests, 191 phase1_storage-Tests gesamt).
+
+**Verifikation:** `pytest phase1_storage/` → **191/191 grün** (vorher 154 + 15 B1
++ 13 B2-index + 9 B2-store, exakt deckungsgleich). Tabu-Diff §0.4 → **leer**.
+`pytest phase6_shares/tests/test_characterization.py` → **4/4 grün**, byte-identisch.
+
+**§0.6 Selbstprüfung:**
+1. ✅ Voller `pytest -q` über alle berührten Module grün (191/191).
+2. ✅ Tabu-Diff leer.
+3. ✅ Fehlerpfade durchdacht: `replace_item_links` mit leerer Rows-Liste löscht
+   sauber (eigener Test); `delete_item` ohne vorhandene `items`-Zeile räumt
+   trotzdem `item_links`-src-Zeilen auf (kein FK, dokumentiert im Test);
+   dangling `dst_id`s werden nicht zurückgewiesen (Test). Drift-Repair bei
+   `_reconcile_and_get_row` deckt den externen Edit-Pfad ab; `repair_drift=False`
+   aktualisiert ebenfalls `item_links`, weil die Datei-Realität sich geändert
+   hat und der Index ableitet (Hard Rule 2).
+4. ✅ Modul-Status-Tabelle + `updated:`-Zeile + dieser Session-Block aktualisiert.
+5. ⏭️ `ui_budget.py` entfällt — kein UI-Step.
+
+**Hard-Rule-Konformität:** Hard Rule 1 (keine Secrets), Hard Rule 2 (Index
+bleibt vollständig aus Dateien rekonstruierbar, `rebuild_index` löscht
+`item_links` und befüllt es neu), Hard Rule 5 (jeder Schreibvorgang erzeugt
+genau einen Git-Commit, unverändert), Hard Rule 7 (stderr-only), Hard Rule 8
+(Doc-Update im selben Commit, geerbt aus B1-Ankündigung), Hard Rule 9 (kein
+`pkill`/`systemctl`).
+
+**Tabu-Grenze gehalten:** außer `linkscan.py` (B1), `index.py` und `store.py`
+fasst dieser Commit nichts an. `models.py`, `frontmatter.py`, `files.py`,
+`patch.py`, `acl.py`, `history.py` sind alle unverändert — das war die
+explizite Auflage der achten P1-Contract-Öffnung (siehe `phase1_storage/
+CLAUDE.md` §Geerbte Contracts).
+
+**Öffnung bleibt angekündigt, nicht geschlossen** — die achte Öffnung wird mit
+Phase-8-Step-Z geschlossen, nicht mit B2 (Disziplin der Vorgänger-Öffnungen 6
+und 7).
+
+**Nächster Schritt, konkret:** B3 — `GET /api/v1/graph` in `webui/api.py`.
+Knotenmenge = genau die Items, die `_items_get` im globalen Scope liefern würde
+(dieselbe `can_read_item_as_human`-Filterung spiegeln), `status=archived`
+draußen, `?archived=1` nimmt sie rein; Kanten aus `Store.links_all()`,
+gefiltert auf `src != dst` und beide Endpunkte sichtbar; Tests im
+`phase5_ui/tests/test_api.py`. Kein Polling, keine UI-Änderung in B3 — B4 ist
+dafür zuständig (`#item/`-Navigation + Link-Picker).

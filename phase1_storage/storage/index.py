@@ -14,6 +14,7 @@ from pathlib import Path
 
 from .files import folder_from_path
 from .frontmatter import parse as parse_frontmatter
+from .linkscan import ITEM_REF_RE, extract_item_refs
 from .models import IndexStats
 
 logger = logging.getLogger(__name__)
@@ -23,7 +24,11 @@ SAFE_FILESYSTEMS = {"ext4", "xfs", "btrfs"}
 # P6 Step 4 (Plan §1.4, V46): der Index kannte bis hierher keinen Versionsbegriff. Ein Sprung
 # hier heißt "Schema verworfen und leer neu angelegt" (Hard Rule 2 — der Index ist Ableitung,
 # billiger als jede Migration), nie ein `ALTER TABLE`.
-INDEX_SCHEMA_VERSION = 2
+#
+# Phase 8 Block B (P8-M, achte P1-Contract-Oeffnung): Version 3 fuegt `item_links` hinzu --
+# Kantenmenge zwischen Items, getrennt nach `kind` (`frontmatter`/`body`). Rebuild heilt
+# alte Indices ueber `CREATE IF NOT EXISTS` + `rebuild_index()` (Hard Rule 2, keine Migration).
+INDEX_SCHEMA_VERSION = 3
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS items (
@@ -47,6 +52,21 @@ CREATE TABLE IF NOT EXISTS items (
     share_read_json TEXT NOT NULL DEFAULT '[]',
     share_write_json TEXT NOT NULL DEFAULT '[]'
 );
+
+-- Phase 8 Block B Step B2 (P8-M): Item-zu-Item-Kanten. `src_id` ist immer ein existierendes
+-- Item, `dst_id` MUSS nicht existieren (eine Notiz darf eine ID nennen, die (noch) nicht
+-- existiert -- der API-Endpoint filtert das beim Lesen). `kind` unterscheidet Herkunft:
+-- `frontmatter` = Eintrag im `links:`-Feld (menschengewollt), `body` = `itm_...`-Erwähnung im
+-- Markdown-Body (mechanisch extrahiert, Plan §3 P8-M). PK ueber alle drei Spalten verhindert
+-- Doppelkanten derselben Art; ein und dieselbe ID darf als Frontmatter- UND Body-Kante
+-- existieren (zwei Zeilen, getrennte Kinds).
+CREATE TABLE IF NOT EXISTS item_links (
+    src_id TEXT NOT NULL,
+    dst_id TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    PRIMARY KEY (src_id, dst_id, kind)
+);
+CREATE INDEX IF NOT EXISTS idx_item_links_dst ON item_links(dst_id);
 """
 
 
@@ -98,7 +118,11 @@ def _open_and_init(db_path: Path) -> sqlite3.Connection:
     conn = sqlite3.connect(db_path, check_same_thread=False)
     try:
         conn.execute("PRAGMA journal_mode=WAL")
-        conn.execute(_SCHEMA)
+        # `executescript` fuer mehrstellige SQL: Phase 8 Block B Step B2 ergaenzt die Tabelle
+        # `item_links` + Index, der String enthaelt damit mehrere durch `;` getrennte
+        # Anweisungen -- `conn.execute` kann nur eine. `executescript` fuehrt sie alle in einer
+        # impliziten Transaktion aus.
+        conn.executescript(_SCHEMA)
         conn.commit()
     except sqlite3.DatabaseError:
         conn.close()
@@ -140,7 +164,11 @@ def _upsert_no_commit(conn: sqlite3.Connection, row: dict) -> None:
 
 
 def delete_item(conn: sqlite3.Connection, item_id: str) -> None:
+    """Entfernt ein Item aus dem Index. Räumt auch die `item_links`-Zeilen mit dieser `src_id`
+    auf (Phase 8 Block B Step B2, P8-M) -- ein verwaistes `dst_id` (das Item zeigte auf ein
+    inzwischen geloeschtes anderes Item) bleibt stehen, die API filtert das beim Lesen."""
     conn.execute("DELETE FROM items WHERE id = ?", (item_id,))
+    conn.execute("DELETE FROM item_links WHERE src_id = ?", (item_id,))
     conn.commit()
 
 
@@ -152,10 +180,48 @@ def all_rows(conn: sqlite3.Connection) -> list[sqlite3.Row]:
     return conn.execute("SELECT * FROM items ORDER BY id").fetchall()
 
 
+def replace_item_links(
+    conn: sqlite3.Connection, src_id: str, rows: list[tuple[str, str]]
+) -> None:
+    """Phase 8 Block B Step B2 (P8-M): ersetzt die Kantenmenge eines Items vollständig.
+
+    `rows` ist `[(dst_id, kind), ...]`. Semantik: ALLE bisherigen Zeilen mit dieser `src_id`
+    verschwinden, die übergebenen werden genau so eingefügt. `kind` ∈ {"frontmatter", "body"}.
+    Eine leere Liste löscht alle Kanten dieses Items.
+
+    Implementierung in EINEM `BEGIN`-Block, damit `rebuild_index()` und Store-Schreibpfade
+    nicht zwischen DELETE und INSERT von einem Leser in einem halb-leeren Zustand gesehen
+    werden. sqlite3's autocommit + `commit()` am Ende ist hier ausreichend (single-threaded
+    durch `Store._lock`).
+    """
+    conn.execute("DELETE FROM item_links WHERE src_id = ?", (src_id,))
+    if rows:
+        conn.executemany(
+            "INSERT INTO item_links (src_id, dst_id, kind) VALUES (?, ?, ?)",
+            [(src_id, dst_id, kind) for (dst_id, kind) in rows],
+        )
+    conn.commit()
+
+
+def all_links(conn: sqlite3.Connection) -> list[sqlite3.Row]:
+    """Liest alle `item_links`-Zeilen. Sortierung: (src_id, kind, dst_id) -- deterministisch
+    für Tests."""
+    return conn.execute(
+        "SELECT src_id, dst_id, kind FROM item_links ORDER BY src_id, kind, dst_id"
+    ).fetchall()
+
+
 def row_from_file(data_root: Path, path: Path) -> dict:
-    """Liest eine Item-Datei und baut die dazugehörige Index-Zeile. Kein Schreibzugriff."""
+    """Liest eine Item-Datei und baut die dazugehörige Index-Zeile. Kein Schreibzugriff.
+
+    Phase 8 Block B Step B2 (P8-M): gibt zusaetzlich `body_refs` (reine `itm_…`-Referenzen im
+    Markdown-Body, Auftrittsreihenfolge, dedupliziert) im Dict zurueck. Konsumenten, die das
+    Key nicht kennen (namentlich `upsert_item` via `_upsert_no_commit`), ignorieren es still --
+    der INSERT-Statement nennt die Spalte nicht. `body_refs` wird ausschliesslich von
+    `rebuild_index()` und `_reconcile_and_get_row()` gelesen, um `item_links` zu befuellen."""
     raw_bytes = path.read_bytes()
-    fields, _body = parse_frontmatter(raw_bytes.decode("utf-8"))
+    text = raw_bytes.decode("utf-8")
+    fields, body = parse_frontmatter(text)
     stat = path.stat()
     space = path.relative_to(data_root).parts[0]
     return {
@@ -181,21 +247,39 @@ def row_from_file(data_root: Path, path: Path) -> dict:
         "visibility": fields.get("visibility", "private"),
         "share_read_json": json.dumps(fields.get("share_read", []) or []),
         "share_write_json": json.dumps(fields.get("share_write", []) or []),
+        # Body-Referenzen, NICHT in `items` gespeichert, nur fuer `item_links`-Befuellung.
+        "body_refs": extract_item_refs(body),
     }
 
 
 def rebuild_index(data_root: Path, conn: sqlite3.Connection) -> IndexStats:
     """Verwirft den Indexinhalt und baut ihn komplett aus den Dateien unter `data_root` neu auf.
     Ein Index-Fehler darf nie eine Datei anfassen — diese Funktion liest ausschließlich.
-    """
+
+    Phase 8 Block B Step B2 (P8-M): befuellt zusaetzlich `item_links`. Pro Datei: erst
+    `upsert_item` (die `items`-Zeile), dann `replace_item_links` mit den Frontmatter-Referenzen
+    (alle `links:`-Eintraege, die `ITEM_REF_RE.fullmatch` passieren -- beliebige Strings im
+    `links:`-Feld bleiben erlaubt und werden keine Kante) plus den Body-Referenzen aus
+    `row_from_file()["body_refs"]`. `DELETE FROM items` oben wird durch `DELETE FROM
+    item_links` ergaenzt -- sonst bleiben stale Kanten aus dem Vorab-Stand stehen."""
     start = time.monotonic()
     conn.execute("DELETE FROM items")
+    conn.execute("DELETE FROM item_links")
     count = 0
+    edge_count = 0
     for space_dir in sorted(p for p in data_root.iterdir() if p.is_dir() and not p.name.startswith(".")):
         for md_path in sorted(space_dir.rglob("*.md")):
             row = row_from_file(data_root, md_path)
             _upsert_no_commit(conn, row)
+            frontmatter_refs = [
+                ref for ref in json.loads(row["links_json"]) if ITEM_REF_RE.fullmatch(ref)
+            ]
+            rows = [(ref, "frontmatter") for ref in frontmatter_refs] + [
+                (ref, "body") for ref in row["body_refs"]
+            ]
+            replace_item_links(conn, row["id"], rows)
             count += 1
+            edge_count += len(rows)
     conn.commit()
     return IndexStats(items_indexed=count, duration_seconds=time.monotonic() - start)
 
