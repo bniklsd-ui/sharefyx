@@ -323,6 +323,23 @@ Charakterisierungstests (P6-D/P7-C, `phase6_shares/tests/test_characterization.p
 Files) blieben über beide Öffnungen byte-identisch grün und bleiben die Bedingung jedes künftigen
 `storage/`-Umbaus.
 
+**[2026-09-01, Phase 8 Block B Step B1] Achte P1-Contract-Öffnung angekündigt** (vor Code,
+Disziplin der Vorgänger-Öffnungen 3–7): `storage/linkscan.py` (neu) trägt `ITEM_REF_RE` und
+`extract_item_refs(body) -> list[str]` (rein, kein I/O, deterministisch); `storage/index.py`
+bekommt im Schema-Block die Tabelle `item_links` (`src_id`, `dst_id`, `kind` ∈ `frontmatter`/
+`body`, PRIMARY KEY `(src_id, dst_id, kind)`) + Index `idx_item_links_dst` + neue Funktion
+`replace_item_links(conn, src_id, rows)`; `storage/store.py` ruft `replace_item_links()` an
+jedem Schreibpfad, der heute `upsert_item()` ruft (create/update/patch/append/move/archive,
+V82), und stellt `Store.links_all() -> list[tuple[str, str, str]]` (src, dst, kind) als neue
+Lesemethode bereit. **Außerhalb des Scopes dieser Öffnung:** `models.py`, `frontmatter.py`,
+`files.py`, `patch.py`, `acl.py`, `history.py` bleiben unangetastet — das Dateiformat ändert
+sich nicht, das Frontmatter-Schema nicht, kein neues Feld, keine neue `Item`-Property;
+Charakterisierung (P6-D/P7-C, `phase6_shares/tests/test_characterization.py`, drei Golden
+Files) muss vor und nach dieser Öffnung byte-identisch grün bleiben, das ist die
+Bedingung — Plan §3 P8-M, dokumentiert in `docs/concepts/phase8_ui_graph_plan.md` §3 + §0.4
+Tabu-Liste. Die Schließung dieser Öffnung folgt mit dem Phase-8-Abschluss (Step Z, Plan §6),
+nicht mit dem ersten Teilschritt — dieselbe Disziplin wie bei 6 und 7.
+
 **[2026-08-17, P6 Step 7b Commit 1/3] Vierte, benannte Contract-Öffnung gebaut** (angekündigt in
 `phase6_shares/CLAUDE.md`s Session-Block vom selben Tag, `phase6_shares/ITEM_MOVE_PLAN.md` §4.1,
 P6-AD): `store.py :: move(item_id, *, version, space=, folder=) -> Item` (neu) + intern

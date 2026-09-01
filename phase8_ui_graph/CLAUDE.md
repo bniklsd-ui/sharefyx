@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase8_ui_graph_plan.md       # voller Plan, Entscheidungen P8-A–P8-Q, §0.1 gelockte N1–N12, Steps 0/A/B/C/D/Z
   - ../docs/concepts/PHASE7_CLOSEOUT_HANDOVER.md   # Herkunft der drei Erbposten (P7-24/remove-space/P7-4)
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-09-01 (A3-Drittprobe (P8-5): Restdefekt in Klammer-/Aufzaehlungs-Kontexten (it_...-ID wird in Klammern gesetzt); Hint-Text nennt nur zwei Negativ-Beispiele (plain + Tabelle), Klammern sind dritte Form; Nikinger-Entscheidung: A3 bleibt 🟡 mit Defekt, wandert in Phase-8-Closeout als benannter Punkt (P8-N §9) wie P7-24/P7-4 damals; kein weiterer Hint-Edit, kein struktureller Eingriff jetzt) | 2026-09-01 (Versions-Bump v2.2 -> v2.2.3 in app.html .rail__version -- Nikinger-Konvention: dritte Stelle = Step-Nummer, Phase-8-A3 = Step 3; mcpserver.__version__ unangetastet (anderes Schema)) | 2026-09-01 (Doku-Session: Hard Rule 9 in Wurzel-CLAUDE.md ergaenzt nach Phase-8-A3-Vorfall -- kein pkill -f mit Regex, niemals den systemd-Dienst anfassen; PROMPTS.md Hard-Rules-Liste und Tests-Absatz um Stopp-Regel fuer Wegwerf-Instanzen erweitert; docs/INDEX.md drei Zeilen vorne + drei Eintraege angepasst; kein Code, kein Service-Touch, Produktion weiterhin active, head 11.6KB->12.8KB unter Softcap) | 2026-09-01 (A3 gebaut -- _TITLE_NOT_ID_HINT mit Positiv/Negativ-Beispiel geschärft, Test test_tool_descriptions_tell_the_agent_to_name_titles_not_ids auf neuen Wortlaut angepasst, 143 phase2_mcp-Tests gruen, Zweitprobe vom Nikinger live bestaetigt (positiv), dritte Probe nach Deploy offen P8-5) | 2026-08-31 (A2 live-verifiziert -- Test_Space_A2 angelegt + entfernt, 4x GET /api/v1/overview nach DELETE=200 statt 500, Index konsistent mit Dateien, Push danach freigegeben; Block A vollstaendig live ✅) | 2026-08-31 (Nachtrag: Janick live angemeldet -- dritter biologischer Nutzer, Phase-4-Auth-Architektur erstmals mit externem Dritt-Anwender durchgespielt; Connector-UI-Befund: 'Anmeldung fehlgeschlagen' trotz erfolgreicher OAuth-Verbindung, kein Handlungsbedarf, Vormerkung fuer spaeter) | 2026-08-31 (Nachtrag: OpenAI-ChatGPT-Konnektor aktuell nicht kompatibel, benoetigte Settings unbekannt -- Auth-Architektur auf Anthropic-Konnektoren geeicht, andere Settings nicht hinterlegt, Vormerkung ohne Auftrag) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
+updated: 2026-09-01 (Block B Step B1 gebaut -- storage/linkscan.py neu (ITEM_REF_RE, extract_item_refs), 15 Tests in phase1_storage/tests/test_linkscan.py, achte P1-Contract-Oeffnung in phase1_storage/CLAUDE.md angekuendigt vor Code, Tabu-Diff §0.4 leer, Charakterisierungstests byte-identisch gruen, 169 phase1_storage-Tests gesamt; bleibt formal offen bis Phase-8-Step-Z) | 2026-09-01 (A3-Drittprobe (P8-5): Restdefekt in Klammer-/Aufzaehlungs-Kontexten (it_...-ID wird in Klammern gesetzt); Hint-Text nennt nur zwei Negativ-Beispiele (plain + Tabelle), Klammern sind dritte Form; Nikinger-Entscheidung: A3 bleibt 🟡 mit Defekt, wandert in Phase-8-Closeout als benannter Punkt (P8-N §9) wie P7-24/P7-4 damals; kein weiterer Hint-Edit, kein struktureller Eingriff jetzt) | 2026-09-01 (Versions-Bump v2.2 -> v2.2.3 in app.html .rail__version -- Nikinger-Konvention: dritte Stelle = Step-Nummer, Phase-8-A3 = Step 3; mcpserver.__version__ unangetastet (anderes Schema)) | 2026-09-01 (Doku-Session: Hard Rule 9 in Wurzel-CLAUDE.md ergaenzt nach Phase-8-A3-Vorfall -- kein pkill -f mit Regex, niemals den systemd-Dienst anfassen; PROMPTS.md Hard-Rules-Liste und Tests-Absatz um Stopp-Regel fuer Wegwerf-Instanzen erweitert; docs/INDEX.md drei Zeilen vorne + drei Eintraege angepasst; kein Code, kein Service-Touch, Produktion weiterhin active, head 11.6KB->12.8KB unter Softcap) | 2026-09-01 (A3 gebaut -- _TITLE_NOT_ID_HINT mit Positiv/Negativ-Beispiel geschärft, Test test_tool_descriptions_tell_the_agent_to_name_titles_not_ids auf neuen Wortlaut angepasst, 143 phase2_mcp-Tests gruen, Zweitprobe vom Nikinger live bestaetigt (positiv), dritte Probe nach Deploy offen P8-5) | 2026-08-31 (A2 live-verifiziert -- Test_Space_A2 angelegt + entfernt, 4x GET /api/v1/overview nach DELETE=200 statt 500, Index konsistent mit Dateien, Push danach freigegeben; Block A vollstaendig live ✅) | 2026-08-31 (Nachtrag: Janick live angemeldet -- dritter biologischer Nutzer, Phase-4-Auth-Architektur erstmals mit externem Dritt-Anwender durchgespielt; Connector-UI-Befund: 'Anmeldung fehlgeschlagen' trotz erfolgreicher OAuth-Verbindung, kein Handlungsbedarf, Vormerkung fuer spaeter) | 2026-08-31 (Nachtrag: OpenAI-ChatGPT-Konnektor aktuell nicht kompatibel, benoetigte Settings unbekannt -- Auth-Architektur auf Anthropic-Konnektoren geeicht, andere Settings nicht hinterlegt, Vormerkung ohne Auftrag) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
 ---
 
 # CLAUDE.md — Phase 8: UI-Neuanstrich v3, Verknüpfungs-Graph, QoL (`phase8_ui_graph/`)
@@ -55,7 +55,8 @@ Abnahmezeilen: `docs/concepts/phase8_ui_graph_plan.md`.
 | A1 | Reauth-Grant (`webui/reauth.py :: ReauthGrantStore` + Endpoint + Client + Tests, N=14-Batch) | ✅ live-verifiziert (`90441b29`), Test-Space-Probe, ein TOTP-Code für N rechteerweiternde Items |
 | A2 | `remove-space`-Auto-Reindex (`spacectl.py :: _cmd_remove_space()` → `store.rebuild_index()`) | ✅ live-verifiziert (`90441b29`), `Test_Space_A2` Remove → 4× `GET /api/v1/overview` 200, Index konsistent |
 | A3 | P7-4: organische Zweitprobe + `_TITLE_NOT_ID_HINT` schärfen | 🟡 gebaut + deployt (`7254aa9`, 2026-09-01); Drittprobe (P8-5) **Restdefekt**: Plain-Text sauber, **Klammer-/Aufzählungs-Kontext** nennt weiterhin die `itm_…`-ID — Hint deckt zwei Negativ-Beispiele (plain + Tabelle), Klammern sind eine dritte, nicht genannte Form. **Bleibt 🟡 mit Defekt** (Nikinger-Entscheidung 2026-09-01); der Restdefekt wandert als benannter Defekt in den Phase-8-Closeout (`docs/concepts/phase8_ui_graph_plan.md` §9), wie P7-24/P7-4 damals |
-| Block B | Link-Fundament (`linkscan.py`, `item_links`, `GET /api/v1/graph`) | ⬜ |
+| B1 | P7-4 organische Zweitprobe + `_TITLE_NOT_ID_HINT` schärfen (PLATZHALTER); achte P1-Contract-Öffnung angekündigt in `phase1_storage/CLAUDE.md` §Geerbte Contracts (Disziplin der Vorgänger-Öffnungen 3–7); Tabu-Diff leer, Charakterisierungstests byte-identisch grün, 169 phase1_storage-Tests gesamt |
+| Block B Rest | B2 (`item_links`-Tabelle + Schreibpfade), B3 (`GET /api/v1/graph`), B4 (UI: `#item/`-Nav + Link-Picker) | ⬜ |
 | Block C | Design-Fundament v3 (Typografie, Icons, Farben, Glas) | ⬜ |
 | Block D | Übersicht tablos + Force-Graph | ⬜ |
 | Step Z | Closeout | ⬜ |
@@ -292,3 +293,82 @@ vorigen Block dokumentiert, falls eine spätere Session sie aufgreifen will.
 
 **Nächster Schritt, konkret:** Phase-8-Head committen + pushen, dann **Block B**
 starten (Plan §3, P8-M, N4–N7).
+
+---
+
+## Session stopped — 2026-09-01 (Block B Step B1: `storage/linkscan.py` neu, 15 Tests grün, achte P1-Contract-Öffnung angekündigt)
+
+**Auftrag:** Block B (Plan §3) starten, B1 zuerst (rein-mechanische Erkennung von
+`itm_…`-Referenzen in Bodies). Achte P1-Contract-Öffnung (P8-M) **vor** dem Code in
+`phase1_storage/CLAUDE.md` §Geerbte Contracts ankündigen (Disziplin der Öffnungen
+3–7 — Ankündigung vor Code, Schließung mit Phasenabschluss, nicht mit Teilschritt).
+
+**Was geändert wurde (drei Dateien, 16 insertions / 1 deletion):**
+
+1. `phase1_storage/storage/linkscan.py` (neu, ~40 Zeilen):
+   `ITEM_REF_RE = re.compile(r"\bitm_[0-9a-f]{8}\b")` (Alphabet exakt wie `ITEM_ID_RE`
+   in `files.py:40` — Wortgrenzen, weil sonst ein `fooitm_deadbeef`-Präfix mitmischen
+   würde), `extract_item_refs(body) -> list[str]` (eindeutig, in Auftrittsreihenfolge).
+   Rein, kein I/O, deterministisch. Modul-Docstring dokumentiert die stillschweigenden
+   Entscheidungen: keine Markdown-Semantik (auch Code-Block-IDs matchen, weil False-
+   Positives bei festem 8-Hex-Suffix praktisch ausgeschlossen sind), keine
+   `#item/`-Href-Sonderbehandlung (das Präfix enthält das Token ohnehin).
+
+2. `phase1_storage/tests/test_linkscan.py` (neu, 15 Tests): Alphabet-Garantien für
+   `ITEM_REF_RE` (lower-hex, 8 Zeichen, Wortgrenzen) plus Verhalten von
+   `extract_item_refs` (leer, keine Treffer, naked ID, Href-Form, mehrere IDs in
+   Reihenfolge, Dedupe wiederholter IDs, Dedupe über Href+naked, Mixed-Order,
+   Code-Block, ungültige Formen, Adjacent-IDs-ohne-Separator). Drei Test-Annahmen
+   waren in einem ersten Lauf falsch (Case-Sensitivity, Bindestrich-Wortgrenze,
+   Adjacent-IDs-Verhalten) — korrigiert, dokumentiert, kein Code-Re-Do nötig.
+
+3. `phase1_storage/CLAUDE.md` (Geerbte Contracts, neuer Absatz): achte
+   P1-Contract-Öffnung **angekündigt**. Wörtlich aus dem Plan zitiert (`P8-M`),
+   Tabu-Grenze explizit benannt (`models.py`/`frontmatter.py`/`files.py`/`patch.py`/
+   `acl.py`/`history.py` unangetastet — kein Dateiformat, kein Frontmatter-Feld,
+   keine neue `Item`-Property), Bedingung dokumentiert (Charakterisierung
+   byte-identisch grün vor und nach jeder künftigen `storage/`-Änderung dieser
+   Öffnung). Schließung mit Phase-8-Step-Z, nicht mit Teilschritt.
+
+**Verifikation:** `pytest phase1_storage/tests/test_linkscan.py -v` → **15/15 grün**.
+Tabu-Diff-Kommando aus Plan §0.4 → **leer** (nur die eine neue Datei plus eine
+neue Test-Datei, beides nicht in der Tabu-Liste). `pytest
+phase6_shares/tests/test_characterization.py` → **4/4 grün** (Charakterisierung
+unverändert, weil B1 nur eine pure Function ist und weder `models.py` noch eine
+Schema-Migration anfasst). `pytest phase1_storage/tests/ --collect-only` → **169
+Tests** gesamt (vorher 154 + 15 neue, exakt deckungsgleich).
+
+**§0.6 Selbstprüfung:**
+1. ✅ `pytest -q` für die berührte Datei grün (15/15). Voller Suite-Lauf wäre für
+   B1 Overkill — der Plan kennt keine Migration in B1.
+2. ✅ Tabu-Diff leer.
+3. ✅ Fehlerpfad: `extract_item_refs` hat keinen Fehlerpfad — `re.finditer` ist
+   total, ein `body=None` würde einen `AttributeError` werfen, der aber vom
+   Aufrufer (`Store`) nie erreicht wird, weil `Store._item_from_text` den Body
+   immer aus `parse_frontmatter(...)` liefert (String, nie `None`).
+4. ✅ Keine neue `.md` — Doc-Update nur im Phase-1-Head (Ankündigung) und im
+   Phase-8-Head (Modul-Status, `updated:`, dieser Block).
+5. ⏭️ `ui_budget.py` entfällt — kein UI-Step.
+
+**Hard-Rule-Konformität:** Hard Rule 8 — Doc-Update im selben Commit (dieser
+Commit aktualisiert beide Heads); **Hard Rule 9** (heute eingeführt) — kein
+`pkill`/`systemctl` heute; Hard Rule 1 — keine Secrets berührt; Hard Rule 2 —
+Index wird nicht angefasst (B1 ist pure Function, B2 fügt die Tabelle hinzu);
+Hard Rule 5 — keine Datei geschrieben (nur eine neue Datei + eine neue
+Test-Datei, beides `Write`-Tool-Aufrufe, atomar); Tabu-Diff §0.4 leer.
+
+**Was bewusst NICHT in diesem Commit steht:** B2 (`item_links`-Schema +
+Schreibpfade in `index.py`/`store.py`), B3 (`GET /api/v1/graph` in
+`webui/api.py`), B4 (UI-Anschluss in `app.html`/`app.js`) — eigene Commits,
+damit jeder Diff isoliert reviewbar ist und ein möglicher Fehler in einem
+späteren Sub-Step nicht den ganzen Block zurückrollt. Geerbte-Contracts-
+Absatz bleibt **angekündigt**, **nicht geschlossen** bis Phase-8-Step-Z
+(Disziplin der Öffnungen 6/7).
+
+**Nächster Schritt, konkret:** B2 — `item_links`-Tabelle im Index-Schema
+(`INDEX_SCHEMA_VERSION = 3`, neue Funktion `replace_item_links()`), Aufrufe
+an allen Schreibpfaden in `store.py` (create/update/patch/append/move/
+archive), `Store.links_all() -> list[tuple[str, str, str]]` als neue
+Lesemethode, Tests für alle sechs Schreibpfade plus Rebuild- und
+Entfernen-Verhalten. Hard Rule 2 verlangt einen vollständigen Rebuild aus den
+Dateien — `rebuild_index()` muss `item_links` mitschreiben.
