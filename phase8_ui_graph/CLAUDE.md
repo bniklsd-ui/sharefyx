@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase8_ui_graph_plan.md       # voller Plan, Entscheidungen P8-A–P8-Q, §0.1 gelockte N1–N12, Steps 0/A/B/C/D/Z
   - ../docs/concepts/PHASE7_CLOSEOUT_HANDOVER.md   # Herkunft der drei Erbposten (P7-24/remove-space/P7-4)
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-08-31 (A2 live-verifiziert -- Test_Space_A2 angelegt + entfernt, 4x GET /api/v1/overview nach DELETE=200 statt 500, Index konsistent mit Dateien, Push danach freigegeben; Block A vollstaendig live ✅) | 2026-08-31 (Nachtrag: Janick live angemeldet -- dritter biologischer Nutzer, Phase-4-Auth-Architektur erstmals mit externem Dritt-Anwender durchgespielt; Connector-UI-Befund: 'Anmeldung fehlgeschlagen' trotz erfolgreicher OAuth-Verbindung, kein Handlungsbedarf, Vormerkung fuer spaeter) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
+updated: 2026-08-31 (A2 live-verifiziert -- Test_Space_A2 angelegt + entfernt, 4x GET /api/v1/overview nach DELETE=200 statt 500, Index konsistent mit Dateien, Push danach freigegeben; Block A vollstaendig live ✅) | 2026-08-31 (Nachtrag: Janick live angemeldet -- dritter biologischer Nutzer, Phase-4-Auth-Architektur erstmals mit externem Dritt-Anwender durchgespielt; Connector-UI-Befund: 'Anmeldung fehlgeschlagen' trotz erfolgreicher OAuth-Verbindung, kein Handlungsbedarf, Vormerkung fuer spaeter) | 2026-08-31 (Nachtrag: OpenAI-ChatGPT-Konnektor aktuell nicht kompatibel, benoetigte Settings unbekannt -- Auth-Architektur auf Anthropic-Konnektoren geeicht, andere Settings nicht hinterlegt, Vormerkung ohne Auftrag) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
 ---
 
 # CLAUDE.md — Phase 8: UI-Neuanstrich v3, Verknüpfungs-Graph, QoL (`phase8_ui_graph/`)
@@ -182,3 +182,27 @@ festgehalten (Nikinger-Auftrag „notieren und committen"):**
 Beide Notizen sind reine Doku, kein Code, keine Live-Aktion meinerseits.
 Commit lokal, kein Push — die zwei Vormerkungen reisen mit dem nächsten
 Push mit, der ohnehin ansteht (Nikinger entscheidet, wann).
+
+**Nachtrag, selbe Session — dritte Live-Beobachtung: OpenAI-ChatGPT-Konnektor
+ist aktuell nicht kompatibel, benötigte Settings unbekannt (Nikinger-Auftrag
+„notieren und committen", dann Session beenden).** Konkretisierung: die
+Auth-Architektur (Phase 4) wurde für Anthropic-Konnektoren gebaut — OAuth
+2.1 + DCR (RFC 7591) + PKCE + Argon2id + TOTP — und ist genau darauf
+geeicht (Discovery-Pfad `/oauth/...`, kein `client_secret`/`client_secret_post`,
+DCR als `/oauth/register`, RFC 9207 `iss`-Parameter im Authorization
+Response). ChatGPT-Konnektoren verlangen andere Settings, die hier nicht
+hinterlegt sind: anderer Discovery-Mechanismus, andere Token-Endpoint-
+Auth-Methoden (typisch `client_secret_post` mit statischem Secret), andere
+Redirect-Handling-Annahmen. Welche Settings ChatGPT konkret bräuchte, ist
+**nicht** recherchiert (kein Auftrag, keine offene Frage in dieser Session)
+— die Vormerkung ist ehrlich „unbekannt", nicht „mit Aufwand lösbar".
+Ein künftiger Versuch würde mit Web-Recherche gegen die aktuelle OpenAI-
+Custom-Connector-Doku anfangen und dann gegen den eigenen `phase4_auth/`
+Code abgleichen, **welche Settings scharf fehlen** (nicht „welche sind
+hinterlegt"). Phase 4 hat `application_type=native` per RFC 8252 §7.3
+explizit abgelehnt — falls ChatGPT darauf besteht, ist eine Lockerung von
+`authserver/routes.py :: _authorize_response` / `redirect_uri_allowed()`
+nötig (siehe Phase-4-Head §0.7 „CIMD als möglicher späterer Ausbau", die
+dortige Diskussion gilt sinngemäß). Reine Vormerkung, kein Phase-8- oder
+Phase-9-Auftrag — der passende Zeitpunkt ergibt sich, wenn jemand ChatGPT
+konkret anbinden will, nicht vorher. Commit lokal, kein Push.
