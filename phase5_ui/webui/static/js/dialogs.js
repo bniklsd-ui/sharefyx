@@ -66,7 +66,7 @@ var moveReauthTotpEl;
 var moveSubmitEl;
 var moveCancelEl;
 // §9 (Mehrfachauswahl, P6-AK): `moveTargetItems` ist IMMER ein Array — ein Einzel-Move (list.js
-// „→"-Knopf/Drag & Drop) ruft `openMoveDialog(item)` weiterhin mit einem einzelnen Item auf,
+// Verschieben-Knopf/Drag & Drop) ruft `openMoveDialog(item)` weiterhin mit einem einzelnen Item auf,
 // das wird hier zu `[item]` normalisiert. Derselbe Dialog, keine zweite Definition (P6-AK).
 var moveTargetItems = [];
 var pendingMoveBody = null;
@@ -219,7 +219,7 @@ export function showConflictDialog(current) {
   updateVersionBand();
   conflictMessageEl.textContent =
     "Ein anderer Client hat dieses Item zwischenzeitlich geändert (deine Version v"
-    + state.editingSnapshot.version + " → aktuelle Version v" + current.version + ").";
+    + state.editingSnapshot.version + " → aktuelle Version v" + current.version + ").";  // P8-C2 Audit: "→" hier ist Sprach-Interpunktion ("Version X fuehrt zu Y"), kein Icon
   conflictDialogEl.hidden = false;
 }
 
@@ -339,7 +339,7 @@ function updateMoveConsequence() {
     + "dieses Space können sie danach lesen und ändern.";
 }
 
-// `itemOrItems` ist ein einzelnes Item (list.js „→"-Knopf, tree.js Drag & Drop) ODER ein Array
+// `itemOrItems` ist ein einzelnes Item (list.js Verschieben-Knopf, tree.js Drag & Drop) ODER ein Array
 // aus der Mehrfachauswahl-Werkzeugleiste (§9.3 Punkt 2) — normalisiert auf `moveTargetItems`.
 export function openMoveDialog(itemOrItems) {
   moveTargetItems = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];

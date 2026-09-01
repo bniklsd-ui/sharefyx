@@ -4,10 +4,117 @@ purpose: Archiv älterer Session-Blöcke aus phase8_ui_graph/CLAUDE.md — newes
 read-when: nur wenn der aktuelle Session-Block im Phase-Head nicht reicht und Verlauf gebraucht wird
 detail: L3
 up: CLAUDE.md
-updated: 2026-09-01 (zehnte Rotation: C0-Block ins Archiv nach C1-Session -- C1-Block (Plex-Font-Swap + CSS-Typo-Tokens, 35 Findings aus C0 abgearbeitet fuer C1) ergaenzt, dann rotiert; Head 27.5KB->33.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 89.3KB->96.0KB; C1-Commits 0281cce + 08bff55 im Head referenziert; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (neunte Rotation: Gate-B→C-Block ins Archiv nach C0-Session -- C0-Block ergaenzt, dann rotiert; Head 39.0KB->31.4KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 81.3KB->89.3KB; C0-Findings-Tabelle (35 Eintraege) lebt im Head; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (achte Rotation: B4-Block ins Archiv nach Gate-B→C-Verifikation -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf, pytest 958/958 gruen, Charakterisierung byte-identisch, Tabu-Diff leer; Head jetzt mit 14.8 KB unter dem Softcap, SESSIONS_ARCHIVE.md 76.9 KB; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (siebte Rotation: fuenf Bloecke ins Archiv -- A3-Bau, Hard-Rule-9-Doku, Versions-Bump v2.2.3, A3-Drittprobe mit Restdefekt, B1 linkscan.py + Tests; Head jetzt 16.4 KB mit genau einem Block, 12 Bloecke im Archiv, Phase-8-Head wieder unter dem 40KB-Softcap; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z)
+updated: 2026-09-01 (elfte Rotation: C1-Block ins Archiv nach C2-Session -- C2-Block (Lucide-Sprite, 18 Icons, build_icon_sprite.py, js/icons.js, .icon-CSS) ergaenzt, dann rotiert; Head 33.7KB->37.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 96.0KB->103.8KB; F9/F10/F11 aus C0 geschlossen; keine neue P1-Contract-Oeffnung; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (zehnte Rotation: C0-Block ins Archiv nach C1-Session -- C1-Block (Plex-Font-Swap + CSS-Typo-Tokens, 35 Findings aus C0 abgearbeitet fuer C1) ergaenzt, dann rotiert; Head 27.5KB->33.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 89.3KB->96.0KB; C1-Commits 0281cce + 08bff55 im Head referenziert; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (neunte Rotation: Gate-B→C-Block ins Archiv nach C0-Session -- C0-Block ergaenzt, dann rotiert; Head 39.0KB->31.4KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 81.3KB->89.3KB; C0-Findings-Tabelle (35 Eintraege) lebt im Head; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (achte Rotation: B4-Block ins Archiv nach Gate-B→C-Verifikation -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf, pytest 958/958 gruen, Charakterisierung byte-identisch, Tabu-Diff leer; Head jetzt mit 14.8 KB unter dem Softcap, SESSIONS_ARCHIVE.md 76.9 KB; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (siebte Rotation: fuenf Bloecke ins Archiv -- A3-Bau, Hard-Rule-9-Doku, Versions-Bump v2.2.3, A3-Drittprobe mit Restdefekt, B1 linkscan.py + Tests; Head jetzt 16.4 KB mit genau einem Block, 12 Bloecke im Archiv, Phase-8-Head wieder unter dem 40KB-Softcap; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8
+
+## Session stopped — 2026-09-01 (Block C C1: IBM Plex Sans Var + Mono, Typo-Tokens, Body 16px/1.55, IDs/Versions in Plex Mono)
+
+**Auftrag:** der zweite Schritt in Block C nach Plan §4 — C1 (Typografie, P8-G). Nikinger
+hat am Session-Anfang zwei Dinge hinterlegt: erstens den C0-Stand (Findings-Tabelle mit 35
+Einträgen, null Eskalationen) als `git add` + Commit vor C1 zu übernehmen; zweitens die zwei
+C1-blockierenden Entscheidungen aus C0 abzufragen — Reihenfolge Block C (Plan-Drift, vor Bau
+klären) und C1-Commit-Strategie (ein Commit oder F1+F2 / F3/F4/F6 getrennt). Die vier
+„Was Nikinger entscheiden kann"-Punkte aus dem C0-Block sind hier referenziert: F8/F14
+keine Blocker (F8 dokumentiert in C0, F14 gehört zu C4); Reihenfolge und Commit-Strategie
+sind die C1-Voraussetzung.
+
+**Was Nikinger entschieden hat (Sitzungsanfang):**
+- Reihenfolge: **Plan-Reihenfolge C1 zuerst** (Fonts vor Icons; CSS-Tokens hängen am
+  Plex-Swap, C2 ist davon unabhängig; Sichtprüfung 1 sieht beides zusammen).
+- C1-Commit-Strategie: **zwei Commits — F1+F2 (Font-Swap) zuerst, F3/F4/F6 (CSS) danach.**
+  Zwischenstand: System-Fonts, weil das Token noch „Inter Variable" stackt, der
+  @font-face-Block aber Plex lädt — sauber, weil der Browser kaskadiert; C1b verkabelt dann
+  das Token auf Plex.
+
+**Was geändert wurde:**
+
+*C0-Commit (Session-Anfang, drei Dateien Doku-only):* `git add` + Commit des C0-Stands
+(`docs/INDEX.md` Frontmatter + Phase-Header, `phase8_ui_graph/CLAUDE.md` Findings-Tabelle +
+Session-Block, `phase8_ui_graph/SESSIONS_ARCHIVE.md` Frontmatter-Nachzug), Tabu-Diff leer.
+
+*C1a — Font-Swap (Commit `0281cce`, sechs + Test = sieben Dateien):*
+- `phase5_ui/scripts/build_font_subset_plex.sh` neu (Plex Sans v0.2.0 + Plex Mono v2.5.0,
+  beide SHAs gepinnt — V83; Sans wght 380:620 instanciert, Mono statisch Regular=400;
+  pyftsubset Latin, hash-gepinnter WOFF2-Dateiname für `immutable`-Cache über
+  `_HASHED_NAME_RE`, static_routes.py:43).
+- `phase5_ui/webui/static/fonts/IBMPlexSans-subset.6c21979f.woff2` neu (44K variabel).
+- `phase5_ui/webui/static/fonts/IBMPlexMono-subset.a8d5dfa6.woff2` neu (8.4K statisch).
+- `phase5_ui/webui/static/fonts/InterVariable-subset.2fa9d1dc.woff2` entfernt.
+- `phase5_ui/webui/static/fonts/OFL.txt`: Inter OFL-1.1 raus, IBM Plex OFL-1.1 rein
+  (Pflichtbestandteil, F2 geschlossen).
+- `phase5_ui/webui/static/app.css` @font-face-Block (Z. 13-19): Inter Variable raus,
+  IBM Plex Sans Var (wght 380 620) + IBM Plex Mono (wght 400) rein.
+- `phase5_ui/tests/test_static_routes.py` `_font_filename()`: Glob generalisiert
+  `InterVariable-subset.*.woff2` → `*-subset.*.woff2` — Test prüft Content-Type /
+  Cache-Header, nicht den Schriftnamen. Im C1a-Commit via Amend nachgezogen (Commit
+  war unvollständig gestaged — Test-Fix musste mit, nicht in C1b).
+
+*C1b — CSS-Typografie (Commit `08bff55`, eine Datei):*
+- `phase5_ui/webui/static/app.css` `:root`: `--font-ui` und `--font-mono` umgestellt
+  auf Plex-Namen; fünf Skala-Tokens eingeführt (`--fs-meta: 12.5px`, `--fs-ui: 14px`,
+  `--fs-body: 16px`, `--fs-title: 18px`, `--fs-page: 22px`).
+- `body`: `font-size: 15px → var(--fs-body)`, `line-height: 1.5 → 1.55` (F4).
+- `h1/h2/h3` auf Skala-Tokens (h1: 22 → `--fs-page`, h2: 18 → `--fs-title`,
+  h3: 15 → `--fs-body` — neue Skala fällt h3 auf body-Größe zurück, das ist sauber:
+  h1 (Seite) > h2 (Abschnitt) > h3 (Untertitel) = body).
+- F3-Stellenliste aus C0 plus drei weitere offensichtliche Meta-Zeilen auf Tokens:
+  `.rail__brand 13 → --fs-meta`, `.tree__folder 14 → --fs-ui`,
+  `.list__row-title 15 → --fs-body`, `.list__row-meta 12 → --fs-meta`,
+  `.overview__heading 12 → --fs-meta`, `.tile__label 13 → --fs-meta`
+  (`.tile__count 28` Display-Zahl bleibt px), `.recent-row__meta 12 → --fs-meta`,
+  `.tree__count 12 → --fs-meta`, `.space-card__meta 12 → --fs-meta`,
+  `.chip 12 → --fs-meta`, `.panel__head 12 → --fs-meta`,
+  `.panel__hint 12 → --fs-meta`.
+- Bewusst nicht migriert (Skala fasst sie nicht, Erzwungene Migration wäre Schummelei):
+  `.rail__glyph 12` (Glyph-Hintergrund), `.tree__group 11`, `.tree__badge 11`,
+  `.tree__twist 10`, `.rail__version 9` (Superscript), `.tile__count 28` (Display),
+  `.btn--icon 17` (Icon-Knopf) — jeder Wert hat einen semantischen Grund und ist nicht
+  Streu-px im Sinne F3.
+- F6: `#editor-version`, `#meta-item-id`, `.editor__version` rendern in `var(--font-mono)`
+  (Plex Mono, aus C1a geladen). itm_-ID-Chips aus P7-A1 sind der Hauptnutzer; der
+  Versions-Badge im Editor-Header bekommt dieselbe Schrift wie die IDs selbst.
+
+**Verifikation, §0.6 Selbstprüfung (Advisor-Ersatz):**
+1. ✅ `pytest -q` 958/958 grün (250.6s; bekannter `test_authctl.py`-Flake als isoliert
+   bestätigt — 19/19 einzeln grün, kein Test-Regress gegen C0-Stand).
+2. ✅ Tabu-Diff-Kommando aus §0.4 leer (`git diff --stat main -- phase4_auth/ phase2_mcp/
+   phase5_ui/webui/security.py phase1_storage/storage/{models,frontmatter,files,patch,acl,
+   history}.py` — keine Zeile).
+3. ✅ Fehlerpfade: C1 hat keine neuen Endpunkte; ui_budget.py testet die bestehenden
+   Endpunkte implizit (5/5 OK); test_static_routes.py 10/10 OK.
+4. ✅ Modul-Status + Abnahmestand + Session-Block + `updated:` synchron (Hard Rule 8 —
+   vier Stellen im selben Commit-Block aktualisiert).
+5. ✅ `ui_budget.py`: app.js+css+Fonts gzip **108.4 KB** (Ziel <250 KB) — +17.4 KB seit
+   C0, davon ~16 KB Sans-Subset-Wachstum (Inter 30 → Plex 44) und 8 KB neuer Plex-Mono-
+   Eintrag. Vor C2-Sprite + graph.js weiterhin reichlich Reserve.
+6. ✅ V83 (IBM Plex Release): variable Sans in `@ibm/plex-sans-variable@0.2.0`,
+   statisches Mono in `@ibm/plex-mono@2.5.0`, beide SHAs aus expanded_assets verifiziert
+   und im Skript gepinnt.
+7. ✅ V84 (Subset-Größen Budget): Plex Sans 44K + Plex Mono 8K = 52K raw, gzip-Summe mit
+   JS/CSS siehe Punkt 5 — Ziel <250 KB weit untertätigt.
+
+**Hard-Rule-Konformität:** Hard Rule 1 (keine Secrets), Hard Rule 2 (Index nur durch
+Doku-Updates ergänzt, sonst unangetastet), Hard Rule 4 (kein fremder Body verarbeitet),
+Hard Rule 7 (Logging → stderr; `bash -n` als Syntax-Check des neuen Skripts OK), Hard Rule
+8 (diese Session schließt mit dem Doku-Commit), Hard Rule 9 (kein Prozess angefasst —
+auch keine Wegwerf-Instanz, weil die Verifikation komplett in-process über ui_budget.py
++ pytest lief; das ist hier auch Standing-Permission-konform, aber schlicht nicht nötig
+gewesen, weil die Änderung isoliert testbar war).
+
+**Verbleibend für die nächste Session (offene Punkte, die C1 NICHT berührt):**
+- C2 (Lucide-Sprite) — Plan §4.C2; V92 für die gepinnten Icon-Namen; vor Sichtprüfung 1.
+- F8-Belassung und F14-Kantenbreite sind benannte, nicht-blockierende Nikinger-Entscheidungen
+  aus C0 — gehören in C4 (F14) bzw. sind Dokumentationsstand (F8). Keine Aktion in C1.
+- V94 schließt mit dem Phase-Closeout (P8-N §9), nicht hier.
+
+**Nächster Schritt, konkret:** **C2 — Icon-System** (Plan §4.C2). Vendoring von
+`phase5_ui/vendor/lucide/` (ISC-Lizenz), Generator `build_icon_sprite.py`, Sprite-Block
+zwischen `<!-- ICONS:BEGIN -->` / `<!-- ICONS:END -->` in `app.html`, Ersetzungs-Map
+für die sieben HTML-Entities in `app.html` + die zwei Text-Glyphen in `list.js`/`tree.js`.
+Sichtprüfung 1 (Plan §0.6) folgt nach **C1 + C2 zusammen** — Typo-Größen und Icon-
+Lesbarkeit gehören für den Augenschein zusammen.
 
 ## Session stopped — 2026-09-01 (Block C C0: Anti-AI-Pattern-Research + UI-Audit, 35 Findings, keine Eskalation)
 

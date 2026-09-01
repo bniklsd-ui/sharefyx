@@ -9,6 +9,7 @@ import { markdownToHtml } from "./markdown.js";
 import { loadItems, loadOverview, renderList } from "./list.js";
 import { renderRail } from "./tree.js";
 import { confirmDialog, showConflictDialog, openLinkPicker } from "./dialogs.js";
+import { iconSvg } from "./icons.js";
 
 var shellEl;
 var overviewEl;
@@ -143,7 +144,7 @@ export function updateVersionBand() {
   saveButtonEl.disabled = !dirty;
   if (state.conflictCurrent) {
     versionBandEl.classList.add("is-conflict");
-    versionBandNumberEl.textContent = "v" + state.editingSnapshot.version + " → v" + state.conflictCurrent.version;
+    versionBandNumberEl.textContent = "v" + state.editingSnapshot.version + " → v" + state.conflictCurrent.version;  // P8-C2 Audit: "→" hier ist Sprach-Interpunktion ("Version X wird zu Y"), kein Icon
     editorVersionEl.textContent = "Konflikt";
   } else if (dirty) {
     versionBandEl.classList.add("is-dirty");
@@ -233,7 +234,8 @@ function renderAssetStrip(item) {
   assets.forEach(function (asset) {
     var row = el("span", "asset-strip__item");
     row.appendChild(el("span", null, asset.filename || asset.id));
-    var removeButton = el("button", "asset-strip__remove", "×");
+    var removeButton = el("button", "asset-strip__remove");
+    removeButton.appendChild(iconSvg("x"));
     removeButton.type = "button";
     removeButton.title = "Bild entfernen";
     removeButton.addEventListener("click", function () {

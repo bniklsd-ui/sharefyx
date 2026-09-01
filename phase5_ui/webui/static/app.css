@@ -319,6 +319,30 @@ select.input {
   font-weight: 600;
   flex-shrink: 0;
 }
+/* Lucide-SVG-Icons (Phase 8 C2, Plan §4.C2). Tragerklasse `.icon` fuer jedes Icon -- Farbe folgt
+   dem Text (currentColor auf dem <symbol>), keine Sonderfarben. Optionale Groessenregelung
+   durch umschliessende Klasse (rail__glyph 20px, tree__twist 12px, sonst 1em = Schriftgroesse). */
+.icon {
+  width: 1.25em;
+  height: 1.25em;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  vertical-align: -0.25em;
+  flex-shrink: 0;
+}
+.rail__glyph.icon {
+  /* Badge traegt das Icon, Lucide-Defaults sollen das Badge nicht ueberschreiben: 1.25em =
+     Schriftgroesse 16px waere groesser als das 20x20-Badge. Auf Badge-Box beschneiden. */
+  width: 16px;
+  height: 16px;
+}
+.toolbar-btn.icon, .btn--icon.icon, .chip__remove.icon {
+  /* Knopf-Icons: etwas kleiner als Default-1.25em, weil der Knopf selbst schon Schrifthoehe
+     als Mindestmasse hat und das Icon bei 1.25em optisch zu dick wirkt. */
+  width: 1em;
+  height: 1em;
+}
 
 .rail__label {
   flex: 1;
@@ -348,9 +372,17 @@ select.input {
 }
 .tree__twist {
   width: 12px;
+  height: 12px;
   flex-shrink: 0;
   color: var(--text-faint);
-  font-size: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.tree__twist.icon {
+  /* Lucide-Default 1.25em ist groesser als die 12px-Twist-Box; ueberschreiben. */
+  width: 12px;
+  height: 12px;
 }
 .tree__badge {
   font-size: 11px;

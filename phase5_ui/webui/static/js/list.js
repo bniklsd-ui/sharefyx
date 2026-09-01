@@ -8,6 +8,7 @@ import { api, reportUnexpectedError } from "./api.js";
 import { navigate, renderRail, bucketNames } from "./tree.js";
 import { selectItem } from "./editor.js";
 import { openMoveDialog, openShareDialog } from "./dialogs.js";
+import { iconSvg } from "./icons.js";
 
 var listCrumbEl;
 var listReadonlyEl;
@@ -194,7 +195,8 @@ export function renderChips() {
   if (!state.query) return;
   var chip = el("span", "chip");
   chip.appendChild(el("span", null, "Suche: " + state.query));
-  var remove = el("button", "chip__remove", "×");
+  var remove = el("button", "chip__remove");
+  remove.appendChild(iconSvg("x"));
   remove.type = "button";
   remove.title = "Suche zurücksetzen";
   remove.addEventListener("click", function () {
@@ -348,10 +350,11 @@ export function renderList() {
     // `movable`-Bedingung entscheidet über beide, nicht nur über den Knopf (jetzt oben einmal
     // berechnet, §9 braucht sie zusätzlich für Strg+Klick/Long-Press).
     if (movable) {
-      var moveButton = el("button", "list__row-move", "→");
+      var moveButton = el("button", "list__row-move");
       moveButton.type = "button";
       moveButton.title = "In Ordner verschieben";
       moveButton.setAttribute("aria-label", "In Ordner verschieben");
+      moveButton.appendChild(iconSvg("folder-input"));
       moveButton.addEventListener("click", function (event) {
         event.stopPropagation();
         openMoveDialog(item);
@@ -365,10 +368,11 @@ export function renderList() {
       // selbst prüft `share_read`/`share_write`-Änderungen nicht auf Eigentümerschaft, siehe
       // `api.py`s `folder`-Riegel-Kommentar; dieser Knopf zeigt bewusst nur den einfachsten,
       // erwarteten Fall).
-      var shareButton = el("button", "list__row-share", "⇄");
+      var shareButton = el("button", "list__row-share");
       shareButton.type = "button";
       shareButton.title = "Freigeben";
       shareButton.setAttribute("aria-label", "Freigeben");
+      shareButton.appendChild(iconSvg("share-2"));
       shareButton.addEventListener("click", function (event) {
         event.stopPropagation();
         openShareDialog(item);

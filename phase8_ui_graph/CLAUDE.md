@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase8_ui_graph_plan.md       # voller Plan, Entscheidungen P8-A–P8-Q, §0.1 gelockte N1–N12, Steps 0/A/B/C/D/Z
   - ../docs/concepts/PHASE7_CLOSEOUT_HANDOVER.md   # Herkunft der drei Erbposten (P7-24/remove-space/P7-4)
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-09-01 (Block C C1 gebaut: C1a Font-Swap (Plex Sans Var v0.2.0 + Plex Mono v2.5.0, SHAs gepinnt, build_font_subset_plex.sh neu) + C1b CSS-Typografie (5 Skala-Tokens, body 16px/1.55, h1-h3 + Meta-Zeilen auf Tokens, IDs/Versions in --font-mono); zwei Commits (0281cce + 08bff55); ui_budget 5/5 (108.4/250 KB), pytest 958/958 (250s, Flake als isoliert bestaetigt), Tabu-Diff leer; phase8_ui_graph/CLAUDE.md Modul-Status Block C auf 'C0 + C1 gebaut, C2-C5 offen' gehoben + Abnahmestand um C1-Zeile ergaenzt + neuer Session-Block; Head 27.5KB->33KB, immer noch unter Softcap) | 2026-09-01 (Block C C0 gebaut: Anti-AI-Pattern-Research (V94 bestaetigt, Web-Recherche) + UI-Audit gegen den Code (P8-25); Findings-Tabelle Muster -> Fundstelle -> Fix -> Ziel-Step im Phase-Head, 35 Eintraege, davon 0 als eskaliert markiert; Code unberuehrt, vier Dateien Doku-only -- phase8_ui_graph/CLAUDE.md + SESSIONS_ARCHIVE.md + docs/INDEX.md + SESSIONS_ARCHIVE-Frontmatter; Head 18.4KB->27.5KB, immer noch unter Softcap) | 2026-09-01 (Gate B→C: 958/958 pytest gruen, Charakterisierung byte-identisch, Tabu-Diff leer, _graph_get manuell 12/12, Playwright gegen Wegwerf 18/18; B4-Block rotiert, Head 14.8KB unter Softcap; Code unberuehrt, Doku-Update + neuer Session-Block) | 2026-09-01 (Block B Step B1 gebaut -- storage/linkscan.py neu (ITEM_REF_RE, extract_item_refs), 15 Tests in phase1_storage/tests/test_linkscan.py, achte P1-Contract-Oeffnung in phase1_storage/CLAUDE.md angekuendigt vor Code, Tabu-Diff §0.4 leer, Charakterisierungstests byte-identisch gruen, 169 phase1_storage-Tests gesamt; bleibt formal offen bis Phase-8-Step-Z) | 2026-09-01 (A3-Drittprobe (P8-5): Restdefekt in Klammer-/Aufzaehlungs-Kontexten (it_...-ID wird in Klammern gesetzt); Hint-Text nennt nur zwei Negativ-Beispiele (plain + Tabelle), Klammern sind dritte Form; Nikinger-Entscheidung: A3 bleibt 🟡 mit Defekt, wandert in Phase-8-Closeout als benannter Punkt (P8-N §9) wie P7-24/P7-4 damals; kein weiterer Hint-Edit, kein struktureller Eingriff jetzt) | 2026-09-01 (Versions-Bump v2.2 -> v2.2.3 in app.html .rail__version -- Nikinger-Konvention: dritte Stelle = Step-Nummer, Phase-8-A3 = Step 3; mcpserver.__version__ unangetastet (anderes Schema)) | 2026-09-01 (Doku-Session: Hard Rule 9 in Wurzel-CLAUDE.md ergaenzt nach Phase-8-A3-Vorfall -- kein pkill -f mit Regex, niemals den systemd-Dienst anfassen; PROMPTS.md Hard-Rules-Liste und Tests-Absatz um Stopp-Regel fuer Wegwerf-Instanzen erweitert; docs/INDEX.md drei Zeilen vorne + drei Eintraege angepasst; kein Code, kein Service-Touch, Produktion weiterhin active, head 11.6KB->12.8KB unter Softcap) | 2026-09-01 (A3 gebaut -- _TITLE_NOT_ID_HINT mit Positiv/Negativ-Beispiel geschärft, Test test_tool_descriptions_tell_the_agent_to_name_titles_not_ids auf neuen Wortlaut angepasst, 143 phase2_mcp-Tests gruen, Zweitprobe vom Nikinger live bestaetigt (positiv), dritte Probe nach Deploy offen P8-5) | 2026-08-31 (A2 live-verifiziert -- Test_Space_A2 angelegt + entfernt, 4x GET /api/v1/overview nach DELETE=200 statt 500, Index konsistent mit Dateien, Push danach freigegeben; Block A vollstaendig live ✅) | 2026-08-31 (Nachtrag: Janick live angemeldet -- dritter biologischer Nutzer, Phase-4-Auth-Architektur erstmals mit externem Dritt-Anwender durchgespielt; Connector-UI-Befund: 'Anmeldung fehlgeschlagen' trotz erfolgreicher OAuth-Verbindung, kein Handlungsbedarf, Vormerkung fuer spaeter) | 2026-08-31 (Nachtrag: OpenAI-ChatGPT-Konnektor aktuell nicht kompatibel, benoetigte Settings unbekannt -- Auth-Architektur auf Anthropic-Konnektoren geeicht, andere Settings nicht hinterlegt, Vormerkung ohne Auftrag) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
+updated: 2026-09-01 (Block C C2 gebaut: Lucide-Sprite-Vendoring (18 Icons, ISC+MIT-Lizenzen, phase5_ui/vendor/lucide/); Generator build_icon_sprite.py (idempotent, --check); Sprite-Block zwischen ICONS:BEGIN/ICONS:END in app.html (vom Generator gepflegt); js/icons.js (iconSvg()/iconHtml(), 13. JS-Modul); app.css .icon (Lucide-Defaults: 1.25em/currentColor/stroke-width 2) + .rail__glyph.icon (16px Badge-Box) + .toolbar-btn.icon (1em) + .tree__twist (12px SVG-Box); Ersetzungs-Map 7 HTML-Entities + 3 Text-Glyphen geschlossen (F9/F10/F11 aus C0); V92 gepinnt (Lucide 1.38.0, SHA-256 d28944cf…); ui_budget 5/5 (110.3/250 KB), pytest 958/958, Tabu-Diff leer, grep &#[0-9]+; in app.html → 0 Icon-Treffer, grep '→|⇄|×' in js/ → 0 Icon-Treffer (2 Treffer bleiben = Sprach-Interpunktion 'v3 → v4' mit Audit-Kommentar); Modul-Status Block C auf 'C0+C1+C2 gebaut, C3-C5 offen' + Abnahmestand um C2-Zeile ergaenzt + neuer Session-Block + C1-Block rotiert; Head 33KB->38KB, immer noch unter Softcap; kein Code ausserhalb webui/static + build_icon_sprite.py beruehrt) | 2026-09-01 (Block C C1 gebaut: C1a Font-Swap (Plex Sans Var v0.2.0 + Plex Mono v2.5.0, SHAs gepinnt, build_font_subset_plex.sh neu) + C1b CSS-Typografie (5 Skala-Tokens, body 16px/1.55, h1-h3 + Meta-Zeilen auf Tokens, IDs/Versions in --font-mono); zwei Commits (0281cce + 08bff55); ui_budget 5/5 (108.4/250 KB), pytest 958/958 (250s, Flake als isoliert bestaetigt), Tabu-Diff leer; phase8_ui_graph/CLAUDE.md Modul-Status Block C auf 'C0 + C1 gebaut, C2-C5 offen' gehoben + Abnahmestand um C1-Zeile ergaenzt + neuer Session-Block; Head 27.5KB->33KB, immer noch unter Softcap) | 2026-09-01 (Block C C0 gebaut: Anti-AI-Pattern-Research (V94 bestaetigt, Web-Recherche) + UI-Audit gegen den Code (P8-25); Findings-Tabelle Muster -> Fundstelle -> Fix -> Ziel-Step im Phase-Head, 35 Eintraege, davon 0 als eskaliert markiert; Code unberuehrt, vier Dateien Doku-only -- phase8_ui_graph/CLAUDE.md + SESSIONS_ARCHIVE.md + docs/INDEX.md + SESSIONS_ARCHIVE-Frontmatter; Head 18.4KB->27.5KB, immer noch unter Softcap) | 2026-09-01 (Gate B→C: 958/958 pytest gruen, Charakterisierung byte-identisch, Tabu-Diff leer, _graph_get manuell 12/12, Playwright gegen Wegwerf 18/18; B4-Block rotiert, Head 14.8KB unter Softcap; Code unberuehrt, Doku-Update + neuer Session-Block) | 2026-09-01 (Block B Step B1 gebaut -- storage/linkscan.py neu (ITEM_REF_RE, extract_item_refs), 15 Tests in phase1_storage/tests/test_linkscan.py, achte P1-Contract-Oeffnung in phase1_storage/CLAUDE.md angekuendigt vor Code, Tabu-Diff §0.4 leer, Charakterisierungstests byte-identisch gruen, 169 phase1_storage-Tests gesamt; bleibt formal offen bis Phase-8-Step-Z) | 2026-09-01 (A3-Drittprobe (P8-5): Restdefekt in Klammer-/Aufzaehlungs-Kontexten (it_...-ID wird in Klammern gesetzt); Hint-Text nennt nur zwei Negativ-Beispiele (plain + Tabelle), Klammern sind dritte Form; Nikinger-Entscheidung: A3 bleibt 🟡 mit Defekt, wandert in Phase-8-Closeout als benannter Punkt (P8-N §9) wie P7-24/P7-4 damals; kein weiterer Hint-Edit, kein struktureller Eingriff jetzt) | 2026-09-01 (Versions-Bump v2.2 -> v2.2.3 in app.html .rail__version -- Nikinger-Konvention: dritte Stelle = Step-Nummer, Phase-8-A3 = Step 3; mcpserver.__version__ unangetastet (anderes Schema)) | 2026-09-01 (Doku-Session: Hard Rule 9 in Wurzel-CLAUDE.md ergaenzt nach Phase-8-A3-Vorfall -- kein pkill -f mit Regex, niemals den systemd-Dienst anfassen; PROMPTS.md Hard-Rules-Liste und Tests-Absatz um Stopp-Regel fuer Wegwerf-Instanzen erweitert; docs/INDEX.md drei Zeilen vorne + drei Eintraege angepasst; kein Code, kein Service-Touch, Produktion weiterhin active, head 11.6KB->12.8KB unter Softcap) | 2026-09-01 (A3 gebaut -- _TITLE_NOT_ID_HINT mit Positiv/Negativ-Beispiel geschärft, Test test_tool_descriptions_tell_the_agent_to_name_titles_not_ids auf neuen Wortlaut angepasst, 143 phase2_mcp-Tests gruen, Zweitprobe vom Nikinger live bestaetigt (positiv), dritte Probe nach Deploy offen P8-5) | 2026-08-31 (A2 live-verifiziert -- Test_Space_A2 angelegt + entfernt, 4x GET /api/v1/overview nach DELETE=200 statt 500, Index konsistent mit Dateien, Push danach freigegeben; Block A vollstaendig live ✅) | 2026-08-31 (Nachtrag: Janick live angemeldet -- dritter biologischer Nutzer, Phase-4-Auth-Architektur erstmals mit externem Dritt-Anwender durchgespielt; Connector-UI-Befund: 'Anmeldung fehlgeschlagen' trotz erfolgreicher OAuth-Verbindung, kein Handlungsbedarf, Vormerkung fuer spaeter) | 2026-08-31 (Nachtrag: OpenAI-ChatGPT-Konnektor aktuell nicht kompatibel, benoetigte Settings unbekannt -- Auth-Architektur auf Anthropic-Konnektoren geeicht, andere Settings nicht hinterlegt, Vormerkung ohne Auftrag) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
 ---
 
 # CLAUDE.md — Phase 8: UI-Neuanstrich v3, Verknüpfungs-Graph, QoL (`phase8_ui_graph/`)
@@ -60,7 +60,7 @@ Abnahmezeilen: `docs/concepts/phase8_ui_graph_plan.md`.
 | B3 | `webui/api.py :: _graph_get()` + Route `GET /api/v1/graph` + 8 Tests | ✅ gebaut + live-verifiziert (`58ff9a6` deploy `007b73d`, 2026-09-01); Tabu-Diff leer, Charakterisierungstests byte-identisch grün (P5-B-Disziplin gehalten: nur `mcpserver.permissions.SharePolicy` importiert in webui/) |
 | B4 | UI: `#item/`-Klick-Delegation (`app.js`) + Link-Picker-Dialog (`app.html`/`app.css`/`dialogs.js`/`editor.js`) | ✅ gebaut + live-verifiziert (`ea14d53` deploy `007b73d`, 2026-09-01); Tabu-Diff leer (insb. `webui/security.py` P8-Q unangetastet); JS-Syntax-Check `node --check` auf `app.js`/`editor.js`/`dialogs.js` OK; 34 statische-Tests grün; ui_budget 5/5 grün (91/250 KB app.js+css+Font) |
 | Block B abgeschlossen | `linkscan.py` + `item_links` + `Store.links_all` + `GET /api/v1/graph` + UI-Wiring | ✅ **live-verifiziert** (`007b73d`, 2026-09-01, Release `20260901T103944.634877Z`, Health-Gate 3/3, Versionsbadge v2.2.3); achte P1-Contract-Öffnung bleibt **angekündigt**, geschlossen mit Phase-8-Step-Z |
-| Block C | Design-Fundament v3 (Typografie, Icons, Farben, Glas) | 🔄 C0 ✅ · C1 ✅ gebaut (C1a Font-Swap + C1b CSS-Tokens) · C2–C5 ⬜ |
+| Block C | Design-Fundament v3 (Typografie, Icons, Farben, Glas) | 🔄 C0 ✅ · C1 ✅ gebaut (C1a Font-Swap + C1b CSS-Tokens) · C2 ✅ gebaut (Lucide-Sprite, 18 Icons, build_icon_sprite.py, js/icons.js, .icon CSS) · C3–C5 ⬜ |
 | Block D | Übersicht tablos + Force-Graph | ⬜ |
 | Step Z | Closeout | ⬜ |
 
@@ -76,8 +76,13 @@ Achte P1-Contract-Öffnung (P8-M) wird in Block B benannt und gebaut — Eintrag
 Test_Space_A2). A3 gebaut (2026-09-01), dritte Probe nach Deploy offen (P8-5). **C0 ✅** —
 Findings-Tabelle unten (P8-25), keine Fund-Eskalation nötig (alle 35 Einträge auf C1–C5/D1
 gemappt oder bereits aligned). **C1 ✅ gebaut** (C1a Font-Swap + C1b CSS-Tokens, F1/F2/F3/F4/F6
-geschlossen; 958/958 pytest, ui_budget 5/5, Tabu-Diff leer; Sichtprüfung 1 folgt nach C2
-zusammen, Plan §8).
+geschlossen; 958/958 pytest, ui_budget 5/5, Tabu-Diff leer). **C2 ✅ gebaut** (Lucide-Sprite mit
+18 Icons, F9/F10/F11 geschlossen — 7 HTML-Entities in app.html + 3 Text-Glyphen in js/
+ersetzt, V92 mit Lucide 1.38.0 + SHA-256 d28944cf… gepinnt; Generator idempotent + --
+check-Modus, js/icons.js (13. JS-Modul), .icon-CSS-Klasse + Lucide-Defaults; 958/958 pytest,
+ui_budget 5/5 (110.3/250 KB), Tabu-Diff leer, kein Live-Touch (P8-L bleibt); **Sichtprüfung 1
+(Plan §8) folgt nach C1 + C2 zusammen** — Typo-Größen und Icon-Lesbarkeit gehören für den
+Augenschein zusammen.
 
 ---
 
@@ -178,109 +183,147 @@ unangetastet (anderes Schema, Python-Introspection, nicht der User-Badge).
 
 ---
 
-## Session stopped — 2026-09-01 (Block C C1: IBM Plex Sans Var + Mono, Typo-Tokens, Body 16px/1.55, IDs/Versions in Plex Mono)
+## Session stopped — 2026-09-01 (Block C C2: Lucide-Sprite, 18 Icons, Generator, js/icons.js, .icon-CSS)
 
-**Auftrag:** der zweite Schritt in Block C nach Plan §4 — C1 (Typografie, P8-G). Nikinger
-hat am Session-Anfang zwei Dinge hinterlegt: erstens den C0-Stand (Findings-Tabelle mit 35
-Einträgen, null Eskalationen) als `git add` + Commit vor C1 zu übernehmen; zweitens die zwei
-C1-blockierenden Entscheidungen aus C0 abzufragen — Reihenfolge Block C (Plan-Drift, vor Bau
-klären) und C1-Commit-Strategie (ein Commit oder F1+F2 / F3/F4/F6 getrennt). Die vier
-„Was Nikinger entscheiden kann"-Punkte aus dem C0-Block sind hier referenziert: F8/F14
-keine Blocker (F8 dokumentiert in C0, F14 gehört zu C4); Reihenfolge und Commit-Strategie
-sind die C1-Voraussetzung.
+**Auftrag:** C2 (Plan §4.C2, P8-F). V92 explizit vorgegeben — Icon-Namen aus der
+Ersetzungs-Map müssen in der gepinnten Lucide-Version existieren (Namen driften zwischen
+Releases, deshalb Pin + README-Update bei jedem Bump). Vendor-Verzeichnis
+`phase5_ui/vendor/lucide/`, Generator-Skript `phase5_ui/scripts/build_icon_sprite.py`,
+Sprite-Block zwischen `<!-- ICONS:BEGIN -->` / `<!-- ICONS:END -->` in `app.html`,
+`THIRD_PARTY_LICENSES.md` neu, `js/icons.js` (13. JS-Modul) als dynamische Quelle für
+`list.js`/`tree.js`/`editor.js`/`dialogs.js`, `.icon`-CSS-Klasse.
 
-**Was Nikinger entschieden hat (Sitzungsanfang):**
-- Reihenfolge: **Plan-Reihenfolge C1 zuerst** (Fonts vor Icons; CSS-Tokens hängen am
-  Plex-Swap, C2 ist davon unabhängig; Sichtprüfung 1 sieht beides zusammen).
-- C1-Commit-Strategie: **zwei Commits — F1+F2 (Font-Swap) zuerst, F3/F4/F6 (CSS) danach.**
-  Zwischenstand: System-Fonts, weil das Token noch „Inter Variable" stackt, der
-  @font-face-Block aber Plex lädt — sauber, weil der Browser kaskadiert; C1b verkabelt dann
-  das Token auf Plex.
+**V92 (Lucide-Pin):** Lucide **1.38.0** (2026-08-31), eine Tag vor C2 —
+Quelle `https://github.com/lucide-icons/lucide/archive/refs/tags/1.38.0.tar.gz`,
+SHA-256 `d28944cfc633fbf1d4cb81ed290c000c5e2e4eda8edebb402f2b607705911c02`. 1.39.0 ist
+seit 2026-09-01 13:34 verfügbar, eine bewusste Tag-Distanz von ≥ 1 Tag gewählt (kein
+blutiger Tag nach dem Release), die Icon-Namen-Liste beider Releases wurde gegen die
+geplante Subset-Liste verglichen — kein Unterschied für die 18 Namen, deshalb bleibt
+1.38.0 der Pin. Alle 18 Namen direkt per `https://raw.githubusercontent.com/lucide-icons/
+lucide/1.38.0/icons/<name>.svg` abgerufen und gegen das vendored Material verglichen
+(byte-gleiche SVG-Quellen).
 
-**Was geändert wurde:**
+**Was geändert wurde (elf Dateien Code/Doku + 18 vendored SVGs):**
 
-*C0-Commit (Session-Anfang, drei Dateien Doku-only):* `git add` + Commit des C0-Stands
-(`docs/INDEX.md` Frontmatter + Phase-Header, `phase8_ui_graph/CLAUDE.md` Findings-Tabelle +
-Session-Block, `phase8_ui_graph/SESSIONS_ARCHIVE.md` Frontmatter-Nachzug), Tabu-Diff leer.
+*Vendoring* — `phase5_ui/vendor/lucide/` neu:
+- `icons/<name>.svg` für 18 Namen (`chevron-down`/`chevron-right`/`folder`/`folder-input`/
+  `house`/`image`/`info`/`link`/`log-out`/`plus`/`quote`/`refresh-cw`/`search`/`settings`/
+  `share-2`/`triangle-alert`/`waypoints`/`x`), insgesamt ~6.3 KB raw, alle byte-gleich mit
+  Lucide 1.38.0.
+- `LICENSE` (verbatim aus dem Release, ISC + MIT-Footnote für die Feather-Abkömmlinge).
+- `README.md` (Pin-Doku: Tag, SHA-256, Update-Anleitung, V92-Link, Verwendungs-Tabelle).
 
-*C1a — Font-Swap (Commit `0281cce`, sechs + Test = sieben Dateien):*
-- `phase5_ui/scripts/build_font_subset_plex.sh` neu (Plex Sans v0.2.0 + Plex Mono v2.5.0,
-  beide SHAs gepinnt — V83; Sans wght 380:620 instanciert, Mono statisch Regular=400;
-  pyftsubset Latin, hash-gepinnter WOFF2-Dateiname für `immutable`-Cache über
-  `_HASHED_NAME_RE`, static_routes.py:43).
-- `phase5_ui/webui/static/fonts/IBMPlexSans-subset.6c21979f.woff2` neu (44K variabel).
-- `phase5_ui/webui/static/fonts/IBMPlexMono-subset.a8d5dfa6.woff2` neu (8.4K statisch).
-- `phase5_ui/webui/static/fonts/InterVariable-subset.2fa9d1dc.woff2` entfernt.
-- `phase5_ui/webui/static/fonts/OFL.txt`: Inter OFL-1.1 raus, IBM Plex OFL-1.1 rein
-  (Pflichtbestandteil, F2 geschlossen).
-- `phase5_ui/webui/static/app.css` @font-face-Block (Z. 13-19): Inter Variable raus,
-  IBM Plex Sans Var (wght 380 620) + IBM Plex Mono (wght 400) rein.
-- `phase5_ui/tests/test_static_routes.py` `_font_filename()`: Glob generalisiert
-  `InterVariable-subset.*.woff2` → `*-subset.*.woff2` — Test prüft Content-Type /
-  Cache-Header, nicht den Schriftnamen. Im C1a-Commit via Amend nachgezogen (Commit
-  war unvollständig gestaged — Test-Fix musste mit, nicht in C1b).
+*Generator* — `phase5_ui/scripts/build_icon_sprite.py` neu (60 Zeilen):
+- Liest `vendor/lucide/icons/*.svg` alphabetisch (deterministisches Sprite), baut für jeden
+  Namen einen `<symbol id="i-NAME" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">…</symbol>`-Block.
+- `--check`-Modus: vergleicht aktuellen Sprite-Block in `app.html` mit dem Generator-
+  Ergebnis; Exit 0 = aktuell, Exit 1 = Drift. Idempotent im Schreib-Modus (zweiter Lauf
+  schreibt nichts).
+- Marker `<!-- ICONS:BEGIN -->` / `<!-- ICONS:END -->` sind Pflicht; `regex.sub()` mit
+  nicht-gierigem Match und Escaped-Markern, ein Lauf der bei fehlenden Markern scheitert
+  schreibt nichts (kein partieller Replace).
 
-*C1b — CSS-Typografie (Commit `08bff55`, eine Datei):*
-- `phase5_ui/webui/static/app.css` `:root`: `--font-ui` und `--font-mono` umgestellt
-  auf Plex-Namen; fünf Skala-Tokens eingeführt (`--fs-meta: 12.5px`, `--fs-ui: 14px`,
-  `--fs-body: 16px`, `--fs-title: 18px`, `--fs-page: 22px`).
-- `body`: `font-size: 15px → var(--fs-body)`, `line-height: 1.5 → 1.55` (F4).
-- `h1/h2/h3` auf Skala-Tokens (h1: 22 → `--fs-page`, h2: 18 → `--fs-title`,
-  h3: 15 → `--fs-body` — neue Skala fällt h3 auf body-Größe zurück, das ist sauber:
-  h1 (Seite) > h2 (Abschnitt) > h3 (Untertitel) = body).
-- F3-Stellenliste aus C0 plus drei weitere offensichtliche Meta-Zeilen auf Tokens:
-  `.rail__brand 13 → --fs-meta`, `.tree__folder 14 → --fs-ui`,
-  `.list__row-title 15 → --fs-body`, `.list__row-meta 12 → --fs-meta`,
-  `.overview__heading 12 → --fs-meta`, `.tile__label 13 → --fs-meta`
-  (`.tile__count 28` Display-Zahl bleibt px), `.recent-row__meta 12 → --fs-meta`,
-  `.tree__count 12 → --fs-meta`, `.space-card__meta 12 → --fs-meta`,
-  `.chip 12 → --fs-meta`, `.panel__head 12 → --fs-meta`,
-  `.panel__hint 12 → --fs-meta`.
-- Bewusst nicht migriert (Skala fasst sie nicht, Erzwungene Migration wäre Schummelei):
-  `.rail__glyph 12` (Glyph-Hintergrund), `.tree__group 11`, `.tree__badge 11`,
-  `.tree__twist 10`, `.rail__version 9` (Superscript), `.tile__count 28` (Display),
-  `.btn--icon 17` (Icon-Knopf) — jeder Wert hat einen semantischen Grund und ist nicht
-  Streu-px im Sinne F3.
-- F6: `#editor-version`, `#meta-item-id`, `.editor__version` rendern in `var(--font-mono)`
-  (Plex Mono, aus C1a geladen). itm_-ID-Chips aus P7-A1 sind der Hauptnutzer; der
-  Versions-Badge im Editor-Header bekommt dieselbe Schrift wie die IDs selbst.
+*Sprite-Block* — `phase5_ui/webui/static/app.html`, Z. 441–528: vom Generator gepflegt,
+5790 Bytes, 18 Symbole, alle `currentColor`-fähig. Block liegt direkt vor dem
+`<script type="module">`-Tag, weil `<use href="#i-…">` same-document-SVG-Referenzing ist
+und die Position des Sprite-Containers im DOM keine Rolle spielt.
+
+*JS-Helfer* — `phase5_ui/webui/static/js/icons.js` neu (50 Zeilen, 13. JS-Modul):
+- `iconSvg(name)` baut das `<svg class="icon" aria-hidden="true"><use href="#i-NAME"></use>
+  </svg>`-Element via `document.createElementNS('http://www.w3.org/2000/svg', …)` —
+  kein innerHTML, kein Parser-Hop, kein CSP-Risiko (kein Inline-Script).
+- `iconHtml(name)` als String-Variante (derzeit ungenutzt, aber da, falls eine spätere
+  Phase `innerHTML` braucht).
+- `KNOWN`-Liste exportiert nicht, dient nur als Konsistenz-Anker für die Audit-Grep;
+  unbekannte Namen loggen eine `console.warn`, werfen aber nicht — die Liste ist die
+  "wir benutzen das"-Spur, nicht eine Laufzeit-Police.
+
+*Ersetzungs-Map* — 7 HTML-Entities in `app.html` + 3 Text-Glyphen in `js/`:
+- `app.html:23` `&#8962;` → `<use href="#i-house">` (Rail-Übersicht)
+- `app.html:33` `&#9881;` → `<use href="#i-settings">` (Rail-Konto)
+- `app.html:39` `&#9099;` → `<use href="#i-log-out">` (Rail-Abmelden)
+- `app.html:50` `&#43;` → `<use href="#i-plus">` (Liste-Anlegen)
+- `app.html:83` `&times;` → `<use href="#i-x">` (Nur-lesen-Schließen)
+- `app.html:102` `&times;` → `<use href="#i-x">` (Editor-Schließen)
+- `app.html:151/153/157` `&#128279;`/`&#8221;`/`&#128444;` → `<use href="#i-link">`/
+  `<use href="#i-quote">`/`<use href="#i-image">` (Editor-Toolbar)
+- `list.js:197` `×` → `iconSvg("x")` (Suche-Chip entfernen)
+- `list.js:351` `→` → `iconSvg("folder-input")` (Verschieben-Knopf)
+- `list.js:368` `⇄` → `iconSvg("share-2")` (Freigeben-Knopf)
+- `tree.js:203` `▾`/`▸` → `iconSvg("chevron-down")` / `iconSvg("chevron-right")`
+  (Baum-Twist, abhängig vom `open`-Zustand)
+- `editor.js:236` `×` → `iconSvg("x")` (Asset-Strip entfernen — zusätzlich zur
+  Plan-Ersetzungs-Map, weil das `×` dort ein Icon ist und die F10-Audit-Zeile „Editor
+  Schließen" analog auch für Bildanhänge gilt; bewusst in dieser Session erledigt)
+
+*CSS* — `phase5_ui/webui/static/app.css`:
+- `.icon` neu (Lucide-Defaults: `width/height: 1.25em; stroke: currentColor; fill: none;
+  stroke-width: 2; vertical-align: -0.25em; flex-shrink: 0;`). `currentColor` macht
+  die Farbe eine reine CSS-Frage — wer Akzent will, setzt `color` am Container, kein
+  Sonderfall im Sprite.
+- `.rail__glyph.icon` (16×16, damit Lucide-Default 1.25em = 20px Schrift nicht über die
+  Badge-Box hinausragt).
+- `.toolbar-btn.icon`, `.btn--icon.icon`, `.chip__remove.icon` (1em = ~14px in
+  Button-Gröeschung; 1.25em wirkte in 28px-Toolbar-Knöpfen zu fett).
+- `.tree__twist` bekommt `display: inline-flex; align-items/justify: center;` damit das
+  SVG in der 12×12-Box zentriert sitzt; `.tree__twist.icon` überschreibt die Lucide-
+  Defaults auf 12×12, sonst wäre der Twist größer als der Knopf.
+
+*Kommentar-Korrekturen* — Drei Code-Kommentare verwenden jetzt Wörter statt Glyphen
+(`dialogs.js:69,342` „→-Knopf" → „Verschieben-Knopf"; `tree.js:79` „× im Editor" →
+„Schliessen-Icon im Editor"). Zwei weitere Treffer bleiben als Sprach-Interpunktion
+(`editor.js:147` und `dialogs.js:222` „v1 → v4" / „v1 → aktuelle Version v2") — das
+sind keine Icons, sondern typografische Pfeile zwischen Versionsnummern; mit
+Audit-Kommentar `// P8-C2 Audit: …` markiert, damit die Akzeptanz-Grep `→|⇄|×` klar
+unterscheidbar zwischen „0 Icon-Treffer" und „Sprach-Interpunktion" trennt.
+
+*`phase5_ui/THIRD_PARTY_LICENSES.md`* neu (P8-F Pflicht): ISC + MIT für Lucide,
+OFL-1.1 für IBM Plex (C1 bereits erfüllt, hier nur nachgetragen für die Vollständigkeit
+der Datei).
 
 **Verifikation, §0.6 Selbstprüfung (Advisor-Ersatz):**
-1. ✅ `pytest -q` 958/958 grün (250.6s; bekannter `test_authctl.py`-Flake als isoliert
-   bestätigt — 19/19 einzeln grün, kein Test-Regress gegen C0-Stand).
+1. ✅ `pytest -q` 958/958 grün (252.66s; kein neuer Regress).
 2. ✅ Tabu-Diff-Kommando aus §0.4 leer (`git diff --stat main -- phase4_auth/ phase2_mcp/
    phase5_ui/webui/security.py phase1_storage/storage/{models,frontmatter,files,patch,acl,
    history}.py` — keine Zeile).
-3. ✅ Fehlerpfade: C1 hat keine neuen Endpunkte; ui_budget.py testet die bestehenden
-   Endpunkte implizit (5/5 OK); test_static_routes.py 10/10 OK.
-4. ✅ Modul-Status + Abnahmestand + Session-Block + `updated:` synchron (Hard Rule 8 —
-   vier Stellen im selben Commit-Block aktualisiert).
-5. ✅ `ui_budget.py`: app.js+css+Fonts gzip **108.4 KB** (Ziel <250 KB) — +17.4 KB seit
-   C0, davon ~16 KB Sans-Subset-Wachstum (Inter 30 → Plex 44) und 8 KB neuer Plex-Mono-
-   Eintrag. Vor C2-Sprite + graph.js weiterhin reichlich Reserve.
-6. ✅ V83 (IBM Plex Release): variable Sans in `@ibm/plex-sans-variable@0.2.0`,
-   statisches Mono in `@ibm/plex-mono@2.5.0`, beide SHAs aus expanded_assets verifiziert
-   und im Skript gepinnt.
-7. ✅ V84 (Subset-Größen Budget): Plex Sans 44K + Plex Mono 8K = 52K raw, gzip-Summe mit
-   JS/CSS siehe Punkt 5 — Ziel <250 KB weit untertätigt.
+3. ✅ `grep -nE '&#[0-9]+;' app.html` → nur 2 Treffer in Kommentaren (Z. 35/36), beide
+   sind historische Begründungen für den Icon-Wechsel; **0 Icon-Treffer im sichtbaren UI**.
+4. ✅ `grep -nE '→|⇄|×' phase5_ui/webui/static/js/*.js` → 2 Treffer, beide mit
+   `// P8-C2 Audit: …`-Kommentar markiert (Sprach-Interpunktion in Versions-Text, keine
+   Icons).
+5. ✅ `node --check` auf `icons.js`/`list.js`/`tree.js`/`editor.js`/`dialogs.js` (alle
+   grün).
+6. ✅ `build_icon_sprite.py --check` → `OK: Sprite aktuell (18 icons, 5790 bytes).`
+   (idempotent).
+7. ✅ `ui_budget.py` 5/5 grün: app.js+css+Font **110.3 KB** (Ziel <250 KB); +1.9 KB
+   seit C1 (Sprite-Block + `js/icons.js`). Erstaufruf `/ui/` 117.3 KB, weiterhin reichlich
+   Reserve vor `graph.js` in D2.
+8. ✅ V92 (Icon-Namen in Lucide 1.38.0): alle 18 Namen direkt gegen
+   `https://raw.githubusercontent.com/lucide-icons/lucide/1.38.0/icons/<name>.svg`
+   abgerufen und byte-gleich mit dem vendored Material verglichen.
 
-**Hard-Rule-Konformität:** Hard Rule 1 (keine Secrets), Hard Rule 2 (Index nur durch
-Doku-Updates ergänzt, sonst unangetastet), Hard Rule 4 (kein fremder Body verarbeitet),
-Hard Rule 7 (Logging → stderr; `bash -n` als Syntax-Check des neuen Skripts OK), Hard Rule
-8 (diese Session schließt mit dem Doku-Commit), Hard Rule 9 (kein Prozess angefasst —
-auch keine Wegwerf-Instanz, weil die Verifikation komplett in-process über ui_budget.py
-+ pytest lief; das ist hier auch Standing-Permission-konform, aber schlicht nicht nötig
-gewesen, weil die Änderung isoliert testbar war).
+**Hard-Rule-Konformität:** Hard Rule 1 (keine Secrets), Hard Rule 2 (Index unangetastet,
+kein Storage-Code angefasst), Hard Rule 4 (kein fremder Body verarbeitet — alle Icon-SVGs
+sind eigene Vendored-Source), Hard Rule 7 (Logging → stderr; `bash -n` auf Generator-Skript
+nicht nötig, ist Python und lief ohne Fehler), Hard Rule 8 (Modul-Status + Abnahmestand +
+Session-Block + `updated:` synchron in dieser Datei, INDEX-Eintrag und SESSIONS_ARCHIVE-
+Rotation im selben Commit), Hard Rule 9 (kein Prozess angefasst, kein Service-Touch).
 
-**Verbleibend für die nächste Session (offene Punkte, die C1 NICHT berührt):**
-- C2 (Lucide-Sprite) — Plan §4.C2; V92 für die gepinnten Icon-Namen; vor Sichtprüfung 1.
-- F8-Belassung und F14-Kantenbreite sind benannte, nicht-blockierende Nikinger-Entscheidungen
-  aus C0 — gehören in C4 (F14) bzw. sind Dokumentationsstand (F8). Keine Aktion in C1.
-- V94 schließt mit dem Phase-Closeout (P8-N §9), nicht hier.
+**Verbleibend für die nächste Session (offene Punkte, die C2 NICHT berührt):**
+- **Sichtprüfung 1 (Plan §8) folgt nach C1 + C2 zusammen** — Typo-Größen und Icon-
+  Lesbarkeit als Augenschein-Paar. Nikinger fährt sie gegen eine Wegwerf-Instanz oder
+  Screenshots. Strukturelle Änderungen nicht, Feinwerte dürfen justiert werden.
+- C3 (Farbsemantik + Legende) — Plan §4.C3; F7 ist bereits aligned, C3 fügt die drei
+  Tokens `--space-own`/`--space-shared`/`--space-foreign` und die `.legend` hinzu.
+- C4 (Glass-Akzente) — Plan §4.C4; F14 (Auswahl-Indikatoren) + F16
+  (`prefers-reduced-transparency`-Fallback, V85 Firefox-Prüfung).
+- C5 (Dichte, Selection-Styling, 72ch) — Plan §4.C5; F5 + F21 + F22.
+- D1/D2/D3 erst nach Sichtprüfung 1 — Reihenfolge 0 → A → B → Gate → C → D → Z hält.
 
-**Nächster Schritt, konkret:** **C2 — Icon-System** (Plan §4.C2). Vendoring von
-`phase5_ui/vendor/lucide/` (ISC-Lizenz), Generator `build_icon_sprite.py`, Sprite-Block
-zwischen `<!-- ICONS:BEGIN -->` / `<!-- ICONS:END -->` in `app.html`, Ersetzungs-Map
-für die sieben HTML-Entities in `app.html` + die zwei Text-Glyphen in `list.js`/`tree.js`.
-Sichtprüfung 1 (Plan §0.6) folgt nach **C1 + C2 zusammen** — Typo-Größen und Icon-
-Lesbarkeit gehören für den Augenschein zusammen.
+**Nächster Schritt, konkret:** **C3 — Farbsemantik + Legende** (Plan §4.C3). Neue Tokens
+`--space-own`/`--space-shared`/`--space-foreign` mit Startwerten (Nikinger-Sichtprüfung 1
+darf feinjustieren), `spaceCategory(space)`-Helfer in `state.js`, Anwendung in Rail-Glyph
+(`.rail__glyph`-Rand/Fond), Listen-Meta-Zeile (`.item__meta`-Umfeld), Übersichts-Legende
+und Graph-Knoten (für D2). Statusfarben bleiben unangetastet — eine Farbe = eine
+Bedeutung, keine Deko.

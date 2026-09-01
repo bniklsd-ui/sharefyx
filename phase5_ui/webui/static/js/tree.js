@@ -8,6 +8,7 @@ import { reportUnexpectedError } from "./api.js";
 import { closeEditor } from "./editor.js";
 import { loadItems, renderCrumb, moveItemToFolder, clearSelection } from "./list.js";
 import { openNewFolderDialog } from "./dialogs.js";
+import { iconSvg } from "./icons.js";
 
 var railTreeEl;
 var homeButtonEl;
@@ -75,7 +76,7 @@ export function renderFolders(space) {
       // gebliebenen Editor unangetastet stehen — Liste und Baum sprangen auf den neuen Space,
       // während rechts weiter der alte (u.U. ungespeicherte) Editor stand, ohne dass man ihn
       // von dort noch schließen konnte. `closeEditor()` fragt bei ungespeicherten Änderungen
-      // nach (derselbe Dialog wie das "×" im Editor) und bricht bei "Abbrechen" die Navigation
+      // nach (derselbe Dialog wie das Schliessen-Icon im Editor) und bricht bei "Abbrechen" die Navigation
       // ab, statt sie durchzuführen und den Editor stumm zu verwerfen.
       closeEditor().then(function (proceed) {
         if (proceed === false) return;
@@ -200,7 +201,9 @@ export function renderSpaceNode(space) {
   var open = space.own || state.expanded[space.name] === true;
   var row = el("button", "tree__space");
   row.type = "button";
-  row.appendChild(el("span", "tree__twist", open ? "▾" : "▸"));
+  var twist = el("span", "tree__twist");
+  twist.appendChild(iconSvg(open ? "chevron-down" : "chevron-right"));
+  row.appendChild(twist);
   row.appendChild(el("span", "rail__glyph", space.name.charAt(0).toUpperCase()));
   row.appendChild(el("span", "rail__label", space.name));
   if (!space.writable) row.appendChild(el("span", "tree__badge", "nur lesen"));
