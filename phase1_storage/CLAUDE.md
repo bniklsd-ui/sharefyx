@@ -340,6 +340,20 @@ Bedingung — Plan §3 P8-M, dokumentiert in `docs/concepts/phase8_ui_graph_plan
 Tabu-Liste. Die Schließung dieser Öffnung folgt mit dem Phase-8-Abschluss (Step Z, Plan §6),
 nicht mit dem ersten Teilschritt — dieselbe Disziplin wie bei 6 und 7.
 
+**[2026-09-01, Phase 8 Block B Deploy] Achte Öffnung bleibt ANGEKÜNDIGT nach
+Deploy.** Block B (B1 `linkscan.py` + 15 Tests, B2 `item_links`-Tabelle +
+alle 6 Schreibpfade + 22 Tests, B3 `GET /api/v1/graph` + 8 Tests, B4
+UI-Wiring `#item/`-Nav + Link-Picker) ist seit `main@007b73d` live
+verifiziert (`releases/20260901T103944.634877Z`, Health-Gate 3/3 grün,
+Versionsbadge v2.2.3, Tabu-Diff §0.4 leer, Charakterisierungstests
+bleiben byte-identisch grün). Die formale „Öffnung geschlossen"-Notiz
+kommt weiterhin mit Phase-8-Step-Z — die achte Öffnung umfasst die
+gesamte Phase 8, und die Schließungsbedingung ist nicht der Block-B-
+Deploy, sondern die byte-identische Charakterisierung über ALLE
+`storage/`-Änderungen der Phase. Aktueller Stand: B1/B2 fertig +
+live, keine weiteren `storage/`-Änderungen in Block C/D geplant —
+Schließung wird mit dem Phase-8-Abschluss erfolgen, nicht früher.
+
 **[2026-08-17, P6 Step 7b Commit 1/3] Vierte, benannte Contract-Öffnung gebaut** (angekündigt in
 `phase6_shares/CLAUDE.md`s Session-Block vom selben Tag, `phase6_shares/ITEM_MOVE_PLAN.md` §4.1,
 P6-AD): `store.py :: move(item_id, *, version, space=, folder=) -> Item` (neu) + intern

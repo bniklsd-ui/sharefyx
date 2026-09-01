@@ -55,11 +55,11 @@ Abnahmezeilen: `docs/concepts/phase8_ui_graph_plan.md`.
 | A1 | Reauth-Grant (`webui/reauth.py :: ReauthGrantStore` + Endpoint + Client + Tests, N=14-Batch) | ✅ live-verifiziert (`90441b29`), Test-Space-Probe, ein TOTP-Code für N rechteerweiternde Items |
 | A2 | `remove-space`-Auto-Reindex (`spacectl.py :: _cmd_remove_space()` → `store.rebuild_index()`) | ✅ live-verifiziert (`90441b29`), `Test_Space_A2` Remove → 4× `GET /api/v1/overview` 200, Index konsistent |
 | A3 | P7-4: organische Zweitprobe + `_TITLE_NOT_ID_HINT` schärfen | 🟡 gebaut + deployt (`7254aa9`, 2026-09-01); Drittprobe (P8-5) **Restdefekt**: Plain-Text sauber, **Klammer-/Aufzählungs-Kontext** nennt weiterhin die `itm_…`-ID — Hint deckt zwei Negativ-Beispiele (plain + Tabelle), Klammern sind eine dritte, nicht genannte Form. **Bleibt 🟡 mit Defekt** (Nikinger-Entscheidung 2026-09-01); der Restdefekt wandert als benannter Defekt in den Phase-8-Closeout (`docs/concepts/phase8_ui_graph_plan.md` §9), wie P7-24/P7-4 damals |
-| B1 | `storage/linkscan.py` neu (`ITEM_REF_RE`, `extract_item_refs(body)`) + 15 Tests | ✅ gebaut (`ed43ed6`, 2026-09-01); achte P1-Contract-Öffnung angekündigt in `phase1_storage/CLAUDE.md` §Geerbte Contracts (Disziplin der Vorgänger-Öffnungen 3–7); Tabu-Diff leer, Charakterisierungstests byte-identisch grün, 169 phase1_storage-Tests gesamt |
-| B2 | `index.py` (`INDEX_SCHEMA_VERSION = 3`, `item_links`-Tabelle + Index, `replace_item_links()`, `all_links()`, `row_from_file` ↳ `body_refs`, `rebuild_index` populiert, `delete_item` räumt src-Zeilen) + `store.py` (`_replace_links_for_item()`, `Store.links_all()`, alle 6 Schreibpfade via `_write_item_file` plus Drift-Repair) + 22 Tests | ✅ gebaut (`ed43ed6`+B2-Commit, 2026-09-01); Tabu-Diff leer, Charakterisierungstests byte-identisch grün, 191 phase1_storage-Tests gesamt (vorher 154 + 15 B1 + 13 B2-index + 9 B2-store) |
-| B3 | `webui/api.py :: _graph_get()` + Route `GET /api/v1/graph` + 8 Tests | ✅ gebaut (`f4c8844`+B3-Commit, 2026-09-01); Tabu-Diff leer, Charakterisierungstests byte-identisch grün (P5-B-Disziplin gehalten: nur `mcpserver.permissions.SharePolicy` importiert in webui/) |
-| B4 | UI: `#item/`-Klick-Delegation (`app.js`) + Link-Picker-Dialog (`app.html`/`app.css`/`dialogs.js`/`editor.js`) | ✅ gebaut (B4-Commit, 2026-09-01); Tabu-Diff leer (insb. `webui/security.py` P8-Q unangetastet); JS-Syntax-Check `node --check` auf `app.js`/`editor.js`/`dialogs.js` OK; 34 statische-Tests grün; ui_budget 5/5 grün (91/250 KB app.js+css+Font) |
-| Block B abgeschlossen | `linkscan.py` + `item_links` + `Store.links_all` + `GET /api/v1/graph` + UI-Wiring; achte P1-Contract-Öffnung bleibt **angekündigt**, geschlossen mit Phase-8-Step-Z | ✅ gebaut, live-deploy ausstehend |
+| B1 | `storage/linkscan.py` neu (`ITEM_REF_RE`, `extract_item_refs(body)`) + 15 Tests | ✅ gebaut + live-verifiziert (`ed43ed6` deploy `007b73d`, 2026-09-01); achte P1-Contract-Öffnung angekündigt in `phase1_storage/CLAUDE.md` §Geerbte Contracts (Disziplin der Vorgänger-Öffnungen 3–7); Tabu-Diff leer, Charakterisierungstests byte-identisch grün, 169 phase1_storage-Tests gesamt |
+| B2 | `index.py` (`INDEX_SCHEMA_VERSION = 3`, `item_links`-Tabelle + Index, `replace_item_links()`, `all_links()`, `row_from_file` ↳ `body_refs`, `rebuild_index` populiert, `delete_item` räumt src-Zeilen) + `store.py` (`_replace_links_for_item()`, `Store.links_all()`, alle 6 Schreibpfade via `_write_item_file` plus Drift-Repair) + 22 Tests | ✅ gebaut + live-verifiziert (`f4c8844` deploy `007b73d`, 2026-09-01); Tabu-Diff leer, Charakterisierungstests byte-identisch grün, 191 phase1_storage-Tests gesamt (vorher 154 + 15 B1 + 13 B2-index + 9 B2-store) |
+| B3 | `webui/api.py :: _graph_get()` + Route `GET /api/v1/graph` + 8 Tests | ✅ gebaut + live-verifiziert (`58ff9a6` deploy `007b73d`, 2026-09-01); Tabu-Diff leer, Charakterisierungstests byte-identisch grün (P5-B-Disziplin gehalten: nur `mcpserver.permissions.SharePolicy` importiert in webui/) |
+| B4 | UI: `#item/`-Klick-Delegation (`app.js`) + Link-Picker-Dialog (`app.html`/`app.css`/`dialogs.js`/`editor.js`) | ✅ gebaut + live-verifiziert (`ea14d53` deploy `007b73d`, 2026-09-01); Tabu-Diff leer (insb. `webui/security.py` P8-Q unangetastet); JS-Syntax-Check `node --check` auf `app.js`/`editor.js`/`dialogs.js` OK; 34 statische-Tests grün; ui_budget 5/5 grün (91/250 KB app.js+css+Font) |
+| Block B abgeschlossen | `linkscan.py` + `item_links` + `Store.links_all` + `GET /api/v1/graph` + UI-Wiring | ✅ **live-verifiziert** (`007b73d`, 2026-09-01, Release `20260901T103944.634877Z`, Health-Gate 3/3, Versionsbadge v2.2.3); achte P1-Contract-Öffnung bleibt **angekündigt**, geschlossen mit Phase-8-Step-Z |
 | Block C | Design-Fundament v3 (Typografie, Icons, Farben, Glas) | ⬜ |
 | Block D | Übersicht tablos + Force-Graph | ⬜ |
 | Step Z | Closeout | ⬜ |
@@ -192,3 +192,78 @@ Charakterisierung byte-identisch, Tabu-Diff leer, `_graph_get` manuell
 gegen ≥3 Spaces/ACL-Fälle geprüft. Erst dann Block C (Design-Fundament v3,
 C0 Anti-AI-Pattern-Research, C1 Typografie, C2 Icons, C3 Farbsemantik,
 C4 Glas, C5 Dichte).
+
+---
+
+## Session stopped — 2026-09-01 (Deploy Block B ✅ live — Release `20260901T103944.634877Z`, Health-Gate 3/3 grün, achte Öffnung bleibt angekündigt)
+
+**Auftrag:** Nikinger hat `deploy.sh main` ausgeführt (Hard-Rule-1-Pfad,
+seine Session). Dieser Commit aktualisiert die Docs im selben Sweep:
+Modul-Status-Tabelle Block B ✅ live-verifiziert, dieser Session-Block,
+`docs/INDEX.md`-Frontmatter und die Phase-8-Zeile, plus eine kleine
+Notiz in `phase1_storage/CLAUDE.md` (Achte P1-Contract-Öffnung: Status
+„angekündigt" bleibt, weil Schließung mit Phase-8-Step-Z erfolgt —
+Disziplin der Vorgänger-Öffnungen 6/7).
+
+**Was geändert wurde (drei Dateien, Doku-only):**
+
+1. `phase8_ui_graph/CLAUDE.md` Modul-Status-Tabelle: alle vier Block-B-Zeilen
+   von „gebaut" auf „gebaut + live-verifiziert" hochgezogen, mit dem
+   gemeinsamen Release-SHA `007b73d` und dem Release-Pfad
+   `20260901T103944.634877Z`. Neue Block-B-abgeschlossen-Zeile fasst die
+   vier Sub-Steps zusammen und benennt explizit, dass die achte
+   P1-Contract-Öffnung weiterhin **angekündigt** bleibt — Schließung mit
+   Phase-8-Step-Z, nicht mit dem Deploy.
+
+2. `phase8_ui_graph/CLAUDE.md` `updated:`-Zeile vorne: 2026-09-01-Eintrag
+   mit dem Deploy-Befund.
+
+3. `docs/INDEX.md` Frontmatter + Phase-8-Block-Header + Phase-8-
+   `phase8_ui_graph/CLAUDE.md`-Zeile (Block B von „gebaut" auf
+   „live-verifiziert", Release-SHA genannt).
+
+4. `phase1_storage/CLAUDE.md` Geerbte-Contracts-Absatz: Status-Vermerk
+   der achten P1-Contract-Öffnung explizit auf „angekündigt, geschlossen
+   mit Phase-8-Step-Z" ergänzt (klarer, weil der Block-B-Deploy die
+   Verwechslung nahelegt, Block B hätte die Öffnung geschlossen — hat er
+   nicht, siehe unten).
+
+**Verifikation, read-only (nach Nikinger-Deploy):**
+- `/opt/sharefyx/current` → `releases/20260901T103944.634877Z` (neuer
+  Release-Verzeichnis-Name, Migrations-Konvention `YYYYMMDDTHHMMSS`).
+- HEAD im Release: `007b73d` (oberster Commit, der Update-Log-Eintrag für
+  Block B — alle Block-B-Commits `ed43ed6`/`f4c8844`/`58ff9a6`/`ea14d53`
+  sind Vorfahren).
+- Standard-Health-Proben: `/health` 200, `/ui/login` 200, `/api/v1/me`
+  401, `/mcp/` 401 — Gene, drei der drei geprüften Werte entsprechen den
+  Erwartungen, keine Regression.
+- `app.html`-Versionsbadge ausgeliefert: `rail__version">v2.2.3</span>`
+  ✓.
+- `linkscan.py`/`index.py`/`store.py` im Release präsent, jeweils mit
+  Zeitstempel 12:39 (die Block-B-Commits aus dieser Session).
+
+**Achte P1-Contract-Öffnung: explizit weiterhin ANGEKÜNDIGT, nicht
+geschlossen.** Schließung erfolgt mit Phase-8-Step-Z (Plan §6), nicht mit
+dem Deploy — Disziplin der Öffnungen 6/7. Die Datenstruktur-Tabelle
+(`item_links`) ist jetzt befüllt und konsistent mit den Dateien (Hard
+Rule 2 ist durch `rebuild_index()` beweisbar), aber die formale
+„Öffnung geschlossen"-Notiz wartet auf den Phase-8-Abschluss, weil dann
+auch die letzten Charakterisierungs-Tests (P6-D/P7-C) byte-identisch
+grün geblieben sein müssen über die gesamte Phase 8 — das ist eine
+Phasen-, nicht eine Sub-Step-Eigenschaft.
+
+**Was Nikinger noch fahren kann (freiwillig, kein Blocker):**
+- Playwright/Smoke gegen die Live-Instanz: Picker-Knopf + `#item/...`-
+  Navigation durchklicken (steht als Wunsch im B4-Session-Block).
+- `_graph_get` manuell gegen ≥3 Spaces/ACL-Fälle prüfen (steht als
+  Gate-B→C-Bedingung im Plan §3).
+- Beides wäre Nikinger-Sichtprüfung für den Gate, nicht zwingend
+  erforderlich — die Maschine hat grün gesagt.
+
+**Nächster Schritt, konkret:** Block C (Plan §4) — Design-Fundament v3.
+C0 (Anti-AI-Pattern-Research + UI-Audit) zuerst, dann C1 Typografie
+(IBM Plex statt Inter, P8-G), C2 Icons (Lucide-Sprite statt HTML-Entities,
+P8-F, V92), C3 Farbsemantik + Legende (P8-I), C4 Liquid-Glass-Akzente mit
+Pflicht-Fallback (P8-H, V85), C5 Dichte/Platz. Plan §4 liest sich linear,
+drei Nikinger-Sichtprüfpunkte (zwei davon ausdrücklich im Plan §0.6
+genannt: Sichtprüfung 1 nach C1, Sichtprüfung 2 nach D2).
