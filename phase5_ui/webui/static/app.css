@@ -48,8 +48,18 @@
   --radius-sm:     6px;
   --space:         8px;       /* alles ist ein Vielfaches davon */
 
-  --font-ui: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-ui: "IBM Plex Sans Var", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Typo-Skala (Plan §4.C1) -- statt Streu-px. Die fünf Werte decken die Hierarchie-Ebenen
+     der App ab (Meta-Annotationen / UI-Steuerelemente / Body / Titel / Seite); nicht jede
+     font-size nutzt einen Token -- Chips (11px), Superscripts (9px), Display-Zahlen (28px)
+     bleiben als raw px, weil das Schema sie nicht abbildet und Erzwingen Schummelei wäre. */
+  --fs-meta:  12.5px;
+  --fs-ui:    14px;
+  --fs-body:  16px;
+  --fs-title: 18px;
+  --fs-page:  22px;
 
   /* -- Plastische Schicht (Step 7b) ------------------------------------------------------
      Zwei Panelfarben, damit „wo kommt der Text hin" und „wo kommen die Kopfdaten hin" ohne
@@ -87,9 +97,9 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-ui);
-  font-size: 15px;
+  font-size: var(--fs-body);   /* 16px -- vor C1: 15px (AI-Default, Sailop Dim 2) */
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 1.55;            /* vor C1: 1.5 */
 }
 
 button, input, select, textarea {
@@ -106,9 +116,11 @@ button, input, select, textarea {
 .version-num { color: var(--text); }
 
 h1, h2, h3 { font-weight: 600; line-height: 1.25; margin: 0; }
-h1 { font-size: 22px; }
-h2 { font-size: 18px; }
-h3 { font-size: 15px; }
+h1 { font-size: var(--fs-page); }   /* 22px -- Seitentitel */
+h2 { font-size: var(--fs-title); }  /* 18px -- Abschnittstitel */
+h3 { font-size: var(--fs-body); }   /* 16px -- Untertitel (vor C1: 15px, kleiner als body -- mit
+                                       der neuen Skala fällt h3 auf body-Groesse zurück, was die
+                                       Hierarchie h1>h2>h3>h4 sauber abbildet: Titel>Titel>Body) */
 
 /* -- Fokus/Bewegung (§4.6, unverändert) -------------------------------------------------- */
 
@@ -248,7 +260,7 @@ select.input {
 
 .rail__brand {
   padding: var(--space) calc(var(--space) * 2) calc(var(--space) * 2);
-  font-size: 13px;
+  font-size: var(--fs-meta);   /* 12.5px -- vor C1: 13px */
   font-weight: 600;
   letter-spacing: .08em;
   text-transform: uppercase;
@@ -350,7 +362,7 @@ select.input {
 
 .tree__folder {
   padding-left: calc(var(--space) * 4);
-  font-size: 14px;
+  font-size: var(--fs-ui);   /* 14px */
 }
 /* Echte Ordner (Step 7 Commit 1) reusen .tree__folder unverändert; nur die zweite Ebene
    (`Projekte/Backend`) bekommt zusätzliche Einrückung, um sie sichtbar unter ihrem Elternordner
@@ -370,7 +382,7 @@ select.input {
 .tree__new-folder:hover { color: var(--text); }
 
 .tree__count {
-  font-size: 12px;
+  font-size: var(--fs-meta);
   color: var(--text-faint);
   font-variant-numeric: tabular-nums;
 }
@@ -442,7 +454,7 @@ select.input {
   border: 1px solid var(--line-strong);
   border-radius: 999px;
   padding: 2px 4px 2px 10px;
-  font-size: 12px;
+  font-size: var(--fs-meta);
   color: var(--text-muted);
 }
 
@@ -520,7 +532,7 @@ select.input {
 }
 
 .list__row-title {
-  font-size: 15px;
+  font-size: var(--fs-body);   /* 16px -- vor C1: 15px */
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -532,7 +544,7 @@ select.input {
   align-items: center;
   gap: var(--space);
   flex-wrap: wrap;
-  font-size: 12px;
+  font-size: var(--fs-meta);   /* 12.5px -- vor C1: 12px */
   color: var(--text-muted);
   margin-top: 2px;
 }
@@ -575,7 +587,7 @@ select.input {
 }
 .overview__title { margin-bottom: calc(var(--space) * 2); }
 .overview__heading {
-  font-size: 12px;
+  font-size: var(--fs-meta);   /* 12.5px -- vor C1: 12px */
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: .05em;
@@ -607,7 +619,7 @@ select.input {
 .tile:hover { border-color: var(--accent-line); }
 .tile:active { transform: translateY(1px); box-shadow: var(--btn-press); }
 .tile__count { font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.tile__label { font-size: 13px; color: var(--text-muted); }
+.tile__label { font-size: var(--fs-meta); color: var(--text-muted); }   /* vor C1: 13px */
 
 .overview__recent { list-style: none; margin: 0; padding: 0; max-width: 720px; }
 
@@ -626,7 +638,7 @@ select.input {
 }
 .recent-row:hover { color: var(--accent); }
 .recent-row__title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.recent-row__meta { font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
+.recent-row__meta { font-size: var(--fs-meta); color: var(--text-muted); flex-shrink: 0; }   /* vor C1: 12px */
 
 .space-card {
   display: flex;
@@ -645,7 +657,7 @@ select.input {
   max-width: 720px;
 }
 .space-card:hover { border-color: var(--line-strong); border-left-color: var(--warn); }
-.space-card__meta { margin-left: auto; font-size: 12px; color: var(--text-muted); }
+.space-card__meta { margin-left: auto; font-size: var(--fs-meta); color: var(--text-muted); }
 
 /* -- Detailkopf / Nur-lesen -------------------------------------------------------------- */
 
@@ -789,7 +801,11 @@ select.input {
   flex-shrink: 0;
 }
 
-.editor__version { font-size: 12px; color: var(--text); }
+/* F6 (Plan §4.C1): IDs, Versions-Badge und Metazeilen in Plex Mono -- die Schrift macht die
+   Information "das ist eine technische Referenz" sichtbar. itm_-ID-Chips aus P7-A1 sind der
+   Hauptnutzer; #meta-item-id im Kopfdaten-Panel und der Editor-Versions-Badge daneben. */
+#editor-version, #meta-item-id { font-family: var(--font-mono); }
+.editor__version { font-family: var(--font-mono); font-size: var(--fs-meta); color: var(--text); }
 
 /* Zusätzlicher Abstand vor dem Editor-Schließen-Knopf: "Archivieren" ist auf die andere Seite der
    Leiste gewandert (app.html), dieser Rand hält das "×" trotzdem sichtbar abgesetzt von
@@ -805,14 +821,14 @@ select.input {
   align-items: center;
   gap: var(--space);
   padding: 6px calc(var(--space) * 3);
-  font-size: 12px;
+  font-size: var(--fs-meta);   /* 12.5px -- vor C1: 12px */
   color: var(--text-muted);
 }
 .panel__title { font-weight: 600; color: var(--text); flex-shrink: 0; }
 .panel__sub { font-weight: 400; color: var(--text-faint); }
 .panel__hint {
   margin: 0 0 var(--space);
-  font-size: 12px;
+  font-size: var(--fs-meta);   /* 12.5px -- vor C1: 12px */
   color: var(--text-faint);
 }
 .panel__inner { padding: 0 calc(var(--space) * 3) calc(var(--space) * 2); }
