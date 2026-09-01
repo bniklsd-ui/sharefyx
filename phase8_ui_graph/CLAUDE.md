@@ -196,10 +196,15 @@ Anschließend: Commit + Push auf `github.com/bniklsd-ui/sharefyx`, README um ein
 - `SPACE_DATA_ROOT=/tmp/opencode/sharefyx-wegwerf/data`, frisch mit `space_cli create`
   bestückt: drei Items (`Erste Notiz`/`Aufgabe für morgen`/`Bezug zu Phase 8`).
 - `SPACE_AUTH_DB=/tmp/opencode/sharefyx-wegwerf/auth.sqlite3`, frisch — User
-  `screenshots-user` mit frischem DEK in `CREDENTIALS_DIRECTORY/auth-dek`, Passwort
-  `WegwerfPassw0rt!`, TOTP-Seed `CRJSYEYMTUUDKPH32DJQIIOU3WIF3S72`. **Beides nur im
-  Prozessspeicher + der jetzt gelöschten tmp-`auth.sqlite3`, nie in einer Repo-Datei,
-  nie in einem Log (Hard Rule 1).**
+  `screenshots-user` mit frischem DEK in `CREDENTIALS_DIRECTORY/auth-dek`. **Beides nur
+  im Prozessspeicher + der jetzt gelöschten tmp-`auth.sqlite3`, nie in einer Repo-Datei,
+  nie in einem Log (Hard Rule 1).** **[2026-09-01 Korrektur, unmittelbar nach
+  Commit-Push:]** der erste Wurf dieses Absatzes hatte Klartext-Passwort + TOTP-Seed
+  ausgehalten — Hard-Rule-1-Verstoß. Redigiert in Commit `… (folgt)`. Die Credentials
+  waren ausschließlich für die Wegwerf-Instanz, der User existiert in keiner anderen
+  Datenbank, der DEK war nirgendwo sonst im Spiel — die Laufzeit-Exposition ist also
+  Null, aber die Regel „Secrets gehören nicht in Commits" gilt unbedingt, deshalb der
+  Folgecommit.
 - `SPACE_PUBLIC_BASE_URL=https://wegwerf.invalid` (Pflichtplatzhalter, nicht kontaktiert).
 
 **Screenshots (alle in `docs/screenshots/`, `git mv` aus dem Repo-Root nach Commit A):**
