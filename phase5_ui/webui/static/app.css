@@ -11,9 +11,16 @@
    die Revision steht datiert im Phase-Head. */
 
 @font-face {
-  font-family: "Inter Variable";
-  src: url("/ui/static/fonts/InterVariable-subset.2fa9d1dc.woff2") format("woff2");
+  font-family: "IBM Plex Sans Var";
+  src: url("/ui/static/fonts/IBMPlexSans-subset.6c21979f.woff2") format("woff2");
   font-weight: 380 620;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/ui/static/fonts/IBMPlexMono-subset.a8d5dfa6.woff2") format("woff2");
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }

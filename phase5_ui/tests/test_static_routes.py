@@ -42,7 +42,12 @@ async def _login(client: httpx.AsyncClient, totp_code) -> None:
 
 
 def _font_filename() -> str:
-    matches = list(DEFAULT_STATIC_DIR.glob("fonts/InterVariable-subset.*.woff2"))
+    # Generischer Glob seit Phase 8 C1: das Webfont-Subset heißt je nach Schrift "InterVariable-subset.*.woff2"
+    # (P5) oder "IBMPlex{Sans,Mono}-subset.*.woff2" (P8). Was hier gelesen wird, ist dem Test egal —
+    # er prüft nur, dass die Static-Routes (Content-Type, Cache-Header) für das Muster stimmen, nicht
+    # welcher konkrete Schnitt gebaut wurde. Wer einen Schriftnamen einführt, der nicht auf "-subset"
+    # endet, bricht diesen Test, weil er dann auch das Routing/Caching bricht.
+    matches = list(DEFAULT_STATIC_DIR.glob("fonts/*-subset.*.woff2"))
     assert matches, "kein gebautes Font-Subset unter webui/static/fonts/ gefunden"
     return matches[0].name
 
