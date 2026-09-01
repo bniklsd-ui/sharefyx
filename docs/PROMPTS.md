@@ -59,6 +59,7 @@ Hard rules that override convenience (full list in CLAUDE.md):
 - Never propose port forwarding or DynDNS. The VM sits behind CGNAT; egress tunnel only.
 - Never introduce an LLM call into the server. The server is dumb by design.
 - No last-write-wins, anywhere, not even "temporarily for the test".
+- Never `pkill -f` with regex (kills the prod by accident) — see Hard Rule 9, root CLAUDE.md.
 
 Tests:
 Unit tests are yours and are expected — mocked, no network, never against the real DATA_ROOT
@@ -72,6 +73,15 @@ limits is the single systemd-managed `sharefyx-mcp.service` — never `systemctl
 it, never point a throwaway run at the real DATA_ROOT/auth.sqlite3/keyring. The Nikinger runs
 everything that touches THAT reality: tunnel bring-up, the live
 Claude connector, and any end-to-end test against the real data directory.
+
+Eigene Wegwerf-Instanzen dürfen gestoppt werden — **aber nicht per `pkill -f` mit Regex**. Hard
+Rule 9 (Wurzel-`CLAUDE.md`) verbietet `pkill -f <modul>` und alle Regex-Substring-Muster im
+Cmdline, weil sie die echte Instanz mitkillen (Phase-8-Step-A3-Vorfall 2026-09-01,
+Journal-beweisener SIGTERM auf PID 38101). Erlaubte Wege zum Stoppen der **eigenen**
+Wegwerf-Instanz: PID-Datei (Wegwerf-Prozess legt sie selbst an), `pgrep -f "python -m
+phase2_mcp"` mit nachgestelltem `$`-Anker im Filter oder `pgrep` über den eindeutigen
+Wegwerf-Port (typisch 8799, nie 8765 = Produktion). Den **einen** `sharefyx-mcp.service`
+fasst ausschließlich der Nikinger an.
 
 Skills:
 You have skills installed and may use them freely, including the browser skill for quick checks.
@@ -237,6 +247,7 @@ xxx
 | Rotationsregel in Prompt 1 und als Punkt 4 in Prompt 3 | Im Trading-Bot-Repo wurde die Regel eingeführt, *nachdem* ein Head auf 211 KB gewachsen war. Der Prompt ist die Stelle, an der sie tatsächlich greift. |
 | „Phase X+15" → „Phase X+1" | Vermutlich ein Tippfehler im Original. Falls nicht: sag Bescheid, dann drehe ich es zurück. |
 | **[2026-08-09]** Prompt 3 von „Browser-Chat + Google Drive" auf „Claude Code" umgestellt | Nikinger-Entscheidung: Google Drive ist für den Abschluss ineffizient, Sharefyx trägt noch keine ganzen Projekte. Geprüft statt angenommen: eine SVG wie die drei bestehenden `phase*_uebersicht.svg` ist reines von Hand geschriebenes SVG-Markup (kein Renderer, kein Bild-Tool) — Claude Code kann das genauso schreiben wie der Browser-Chat, **kein neues Skill/Plugin nötig**. Die reale Lücke lag woanders: Claude Code hatte keine automatische Vorschau wie die Artifact-Ansicht im Browser (auf dieser VM waren weder `rsvg-convert`/`cairosvg`/`inkscape` noch ein Browser für Screenshots installiert, Stand 2026-08-09 morgens) — **noch am selben Tag geschlossen:** headless Chromium über Playwright, isoliert unter `~/.claude-code-tools/` installiert (kein `sudo`, keine Projektabhängigkeit, Nikinger-Auftrag „optimale Kontrolle, keine Abstriche"), Testrender gegen `phase4_auth_uebersicht.svg` per `Read` visuell bestätigt. Konkretes Kommando jetzt direkt in Punkt 2 des Prompts. |
+| **[2026-09-01]** Prompt 1 „Hard rules"-Liste um `pkill -f`-Verbot ergänzt; Tests-Absatz um explizite Stopp-Regel für Wegwerf-Instanzen erweitert (PID-Datei / `pgrep`-Anker / Port, nie Regex im Cmdline) | Lehre aus Phase-8-Step-A3-Vorfall 2026-09-01: `pkill -f "phase2_mcp.scripts.serve"` killte die Produktion (PID 38101, SIGTERM, Journal bestätigt) statt der Wegwerf-Instanz. Hard Rule 9 in `CLAUDE.md` trägt das Verbot, der Tests-Absatz macht es operativ (eigene Wegwerf darf gestoppt werden, **wie** ist hier dokumentiert). Vorfall-Detail im Session-Block der Phase-8-Head-Datei. |
 | **[2026-08-09]** „aktueller Stand auf Google Drive hochgeladen" (Ergebnis-Bullet) gestrichen, „Du darfst Google Drive … nutzen" (Hinweise) ersetzt durch eine konkrete Leseanweisung | Folgt aus derselben Entscheidung — das Repo ist jetzt die einzige Quelle, ein Upload-Schritt entfällt ersatzlos. |
 | **[2026-08-09]** Punkt 5 (Commit) neu in Prompt 3 | Der Browser-Chat konnte nicht committen, Claude Code muss es per Hard Rule 8 („Commit ⇒ Doc-Update, im selben Commit"). Bewusst als eigener Punkt, nicht implizit in Punkt 3/4 versteckt — sonst wird das Bündeln zum Zufall statt zur Regel. |
 | **[2026-08-09]** „Aktualisiere … deine direkten Erinnerungen" konkretisiert auf Claude Codes eigene Memory-Dateien | Der Originalsatz war für den Browser-Chat formuliert (Konversationskontext). Claude Code hat ein eigenes, dateibasiertes Memory-System — der Hinweis bleibt sinnvoll, aber nur, wenn er auf den tatsächlichen Mechanismus zeigt. |

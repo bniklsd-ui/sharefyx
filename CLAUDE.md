@@ -8,7 +8,7 @@ down:
   - ROADMAP.md                          # Phasenplan + Status je Phase
   - docs/INDEX.md                       # L0-Karte aller .md
   - phase7_spaces_admin/CLAUDE.md       # aktive Phase
-updated: 2026-08-23 (Phase 7 Step 0: down: auf phase7_spaces_admin/CLAUDE.md umgestellt, stale d348e2e-Deploy-Behauptung im Current-state-Absatz korrigiert) | 2026-08-09 (Phase 6 🔄 gestartet — Hard Rule 4 neu gefasst (P6-U), Current state umgestellt)
+updated: 2026-09-01 (Hard Rule 9 ergänzt — kein pkill -f mit Regex, niemals den systemd-Dienst anfassen; Lehre aus dem Prod-Vorfall 2026-09-01, Phase 8 Step A3 Nachbereitung) | 2026-08-23 (Phase 7 Step 0: down: auf phase7_spaces_admin/CLAUDE.md umgestellt, stale d348e2e-Deploy-Behauptung im Current-state-Absatz korrigiert) | 2026-08-09 (Phase 6 🔄 gestartet — Hard Rule 4 neu gefasst (P6-U), Current state umgestellt)
 ---
 # CLAUDE.md — Project Instructions
 
@@ -107,6 +107,20 @@ und er importiert Prompt-Injection direkt in den Speicherpfad.
 8. **Commit ⇒ Doc-Update (zwingend, auch auf direkte Anweisung).** Jeder Step-Abschluss-Commit
    aktualisiert im **selben** Commit die Modul-/Status-Tabelle der Phase **und** den
    `## Session stopped`-Block. Neue `.md` ⇒ Zeile in `docs/INDEX.md` im selben Commit.
+
+9. **Niemals per Regex-Substring Prozesse killen, niemals den systemd-Dienst anfassen.**
+   `pkill -f <muster>` matcht mit Extended Regex — ein einzelner `.` matcht `/`, ein Modulname
+   im eigenen und im Production-Args reicht, um die falsche PID zu treffen. Konkret
+   (2026-09-01, Phase 8 Step A3 Nachbereitung): `pkill -f "phase2_mcp.scripts.serve"` killte
+   sowohl die Wegwerf-Instanz als auch die Produktion (`sharefyx-mcp.service`, PID 38101,
+   SIGTERM, Journal bestätigt). Stopp-Reihenfolge: **eigene** Wegwerf-Instanzen sind erlaubt
+   zu stoppen, aber ausschließlich über PID-Datei, `pgrep -f` mit Anker (`$`) oder über den
+   eindeutigen Port — nie über Regex im Cmdline. Den **einen** systemd-verwalteten
+   `sharefyx-mcp.service` startet/stoppt/restartet **ausschließlich der Nikinger**
+   (`sudo systemctl ...` läuft nicht aus dem `savefyx`-User, und auch wenn es liefe:
+   Handlungsgrenze). Vor jedem `kill`/`pkill`/`systemctl` zuerst fragen: *ist das die echte
+   Instanz, oder meine Wegwerf-Instanz, oder gar nicht meine?* Im Zweifel: fragen, nicht
+   schießen.
 
 ---
 

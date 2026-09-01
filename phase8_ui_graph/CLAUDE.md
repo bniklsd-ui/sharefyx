@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase8_ui_graph_plan.md       # voller Plan, Entscheidungen P8-A–P8-Q, §0.1 gelockte N1–N12, Steps 0/A/B/C/D/Z
   - ../docs/concepts/PHASE7_CLOSEOUT_HANDOVER.md   # Herkunft der drei Erbposten (P7-24/remove-space/P7-4)
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-09-01 (A3 gebaut -- _TITLE_NOT_ID_HINT mit Positiv/Negativ-Beispiel geschärft, Test test_tool_descriptions_tell_the_agent_to_name_titles_not_ids auf neuen Wortlaut angepasst, 143 phase2_mcp-Tests gruen, Zweitprobe vom Nikinger live bestaetigt (positiv), dritte Probe nach Deploy offen P8-5) | 2026-08-31 (A2 live-verifiziert -- Test_Space_A2 angelegt + entfernt, 4x GET /api/v1/overview nach DELETE=200 statt 500, Index konsistent mit Dateien, Push danach freigegeben; Block A vollstaendig live ✅) | 2026-08-31 (Nachtrag: Janick live angemeldet -- dritter biologischer Nutzer, Phase-4-Auth-Architektur erstmals mit externem Dritt-Anwender durchgespielt; Connector-UI-Befund: 'Anmeldung fehlgeschlagen' trotz erfolgreicher OAuth-Verbindung, kein Handlungsbedarf, Vormerkung fuer spaeter) | 2026-08-31 (Nachtrag: OpenAI-ChatGPT-Konnektor aktuell nicht kompatibel, benoetigte Settings unbekannt -- Auth-Architektur auf Anthropic-Konnektoren geeicht, andere Settings nicht hinterlegt, Vormerkung ohne Auftrag) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
+updated: 2026-09-01 (Doku-Session: Hard Rule 9 in Wurzel-CLAUDE.md ergaenzt nach Phase-8-A3-Vorfall -- kein pkill -f mit Regex, niemals den systemd-Dienst anfassen; PROMPTS.md Hard-Rules-Liste und Tests-Absatz um Stopp-Regel fuer Wegwerf-Instanzen erweitert; docs/INDEX.md drei Zeilen vorne + drei Eintraege angepasst; kein Code, kein Service-Touch, Produktion weiterhin active, head 11.6KB->12.8KB unter Softcap) | 2026-09-01 (A3 gebaut -- _TITLE_NOT_ID_HINT mit Positiv/Negativ-Beispiel geschärft, Test test_tool_descriptions_tell_the_agent_to_name_titles_not_ids auf neuen Wortlaut angepasst, 143 phase2_mcp-Tests gruen, Zweitprobe vom Nikinger live bestaetigt (positiv), dritte Probe nach Deploy offen P8-5) | 2026-08-31 (A2 live-verifiziert -- Test_Space_A2 angelegt + entfernt, 4x GET /api/v1/overview nach DELETE=200 statt 500, Index konsistent mit Dateien, Push danach freigegeben; Block A vollstaendig live ✅) | 2026-08-31 (Nachtrag: Janick live angemeldet -- dritter biologischer Nutzer, Phase-4-Auth-Architektur erstmals mit externem Dritt-Anwender durchgespielt; Connector-UI-Befund: 'Anmeldung fehlgeschlagen' trotz erfolgreicher OAuth-Verbindung, kein Handlungsbedarf, Vormerkung fuer spaeter) | 2026-08-31 (Nachtrag: OpenAI-ChatGPT-Konnektor aktuell nicht kompatibel, benoetigte Settings unbekannt -- Auth-Architektur auf Anthropic-Konnektoren geeicht, andere Settings nicht hinterlegt, Vormerkung ohne Auftrag) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
 ---
 
 # CLAUDE.md — Phase 8: UI-Neuanstrich v3, Verknüpfungs-Graph, QoL (`phase8_ui_graph/`)
@@ -162,3 +162,66 @@ gebaut + gepusht, dritte Probe wartet auf den nächsten Deploy. Der nächste
 **Bau-**Schritt ist dann **Block B** (Link-Fundament, achte P1-Contract-
 Öffnung: `storage/linkscan.py`, `item_links`-Tabelle, `GET /api/v1/graph`) —
 Plan §3, decisions P8-M und N4–N7.
+
+---
+
+## Session stopped — 2026-09-01 (Prod-Incident-Doku: Hard Rule 9 + PROMPTS.md, kein Code, kein Service-Touch)
+
+**Auftrag:** Nikinger hat in der vorigen Session mit `pkill -f "phase2_mcp.scripts.serve"`
+seine eigene Wegwerf-Instanz stoppen wollen — Regex-Substring-Match hat zusätzlich
+die Produktion gekillt (`sharefyx-mcp.service`, PID 38101, SIGTERM, Journal
+bestätigt). Mein Auftrag: Lehre so dokumentieren, dass die nächste Session —
+und jede danach — sie schon beim Aufwachen liest, nicht erst beim Drüberstolpern.
+
+**Was geändert wurde (drei Dateien, Doku-only):**
+
+1. `CLAUDE.md` — neue Hard Rule 9 zwischen Rule 8 und Working-style-Sektion.
+   Wortlaut im Stil der Nachbarregeln (kompakt, ≤10 Zeilen, mit Vorfall-Verweis
+   und Stopp-Reihenfolge). `updated:`-Zeile vorne um 2026-09-01 ergänzt.
+   Datei wuchs von 34.417 B auf 35.108 B, weiter unter dem 40KB-Softcap.
+   Kein Eingriff in bestehende Regeln 1–8.
+
+2. `docs/PROMPTS.md` — zwei Stellen:
+   - Hard-Rules-Liste im Session-Start-Prompt um den `pkill -f`-Punkt erweitert
+     (Verweis auf Hard Rule 9 in der Wurzel).
+   - Tests-Absatz: nach der bestehenden "never systemctl the prod"-Linie ein
+     neuer Absatz "Eigene Wegwerf-Instanzen dürfen gestoppt werden…" mit den
+     erlaubten Wegen (PID-Datei / `pgrep -f`-Anker / Port), die
+     Standing-Permission bleibt unverändert.
+   - Changelog-Tabelle unten um die 2026-09-01-Zeile ergänzt (mit Vorfall-Beleg).
+   Datei wuchs von 17.570 B auf 18.116 B, weiter unter dem Softcap.
+
+3. `docs/INDEX.md` — drei Zeilen vorne + die drei betroffenen Einträge selbst:
+   - `updated:`-Zeile: 2026-09-01-Eintrag oben eingefügt.
+   - `CLAUDE.md`-Zeile: Hard-Rule-9-Erwähnung, neue Größenangabe.
+   - `PROMPTS.md`-Zeile: jetzt-Verweis auf die geschärfte Wegwerf-Stopp-Regel.
+   - `phase8_ui_graph/CLAUDE.md`-Zeile: dieser Session-Block.
+   Datei wuchs von 35.155 B auf 35.587 B, unter dem Softcap.
+
+**Phase-8-Head-Session-Block:** Rotation über `scripts/rotate_session_block.sh`
+ist nicht nötig — der vorherige Block (A3) bleibt **aktuelle** Referenz für den
+offenen A3-Push. Der neue Block hängt darunter, dated, eindeutig referenziert.
+Phase-Head-Größe wuchs von 11.655 B auf 12.829 B, unter dem Softcap.
+
+**Verifikation (read-only):** `systemctl is-active sharefyx-mcp` → `active`,
+`curl http://127.0.0.1:8765/health` → `200`, `pgrep -af sharefyx` → eine Zeile
+(PID 62855). Produktion ist hoch, dieser Commit fasst sie nicht an. Kein
+Code-File berührt, kein `pytest`-Lauf nötig (Doku-only, Plan §0.4 Tabu-Diff
+trifft nicht zu — diese Sitzung baut nicht).
+
+**Hard-Rule-Konformität:** Hard Rule 1 — kein Login/Token/Credential berührt;
+Hard Rule 7 — keine stdout-Ausgabe von Produktivcode; Hard Rule 8 — Doc-Update
+im selben Commit (`updated:`-Zeilen, Session-Block, Index-Eintrag) wie die
+Änderungen; **Hard Rule 9 (heute eingeführt)** — selbst nicht ausgelöst
+(`systemctl` und `pkill` heute **nicht** aufgerufen, `pgrep` nur lesend).
+
+**Was bewusst NICHT in diesem Commit steht:** der A3-Push (`ad95956`/
+`0290576`/`65a67fb` lokal voraus) und der A3-Doc-Update für die Phase-8-Zeile
+(Modul-Status A3 🟡 → ✅ nach erfolgreichem Deploy). Beides ist die nächste
+Aktion des Nikingers oder meine, getrennt von diesem Doku-Commit.
+
+**Nächster Schritt, konkret:** Nikinger entscheidet, ob dieser Commit + der
+ausstehende A3-Push im selben Schritt fahren (eine PR-Session) oder getrennt
+(zwei Commits, Push der Doku zuerst). Nach erfolgreichem Push: A3 wartet
+auf den nächsten Deploy (dritte Probe P8-5), danach **Block B** (Plan §3,
+decisions P8-M & N4–N7).
