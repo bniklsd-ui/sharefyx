@@ -2,7 +2,7 @@
 
 // -- Übersichtsseite + Liste ------------------------------------------------------------------
 
-import { state, BUCKET_LABELS, TYPE_LABELS, activeSpaceWritable, spaceByName, setCreateControlsPresent, isGlobalScope } from "./state.js";
+import { state, BUCKET_LABELS, TYPE_LABELS, activeSpaceWritable, spaceByName, setCreateControlsPresent, isGlobalScope, spaceCategory } from "./state.js";
 import { el } from "./toasts.js";
 import { api, reportUnexpectedError } from "./api.js";
 import { navigate, renderRail, bucketNames } from "./tree.js";
@@ -118,11 +118,13 @@ export function loadOverview() {
 // -- Liste ----------------------------------------------------------------------------------
 
 export function itemMetaLine(item) {
+  // Phase 8 C3 (P8-I): der Space-Name wird im globalen Listen-Scope getrennt mit farbigem
+  // Punkt gerendert (`renderList()`); itemMetaLine liefert nur die Tail-Informationen.
+  // Im nicht-globalen Modus bleibt die Zeile wie vorher -- ein Space ist dort ohnehin
+  // implizit (activeSpace), eine Wiederholung wäre redundant.
   var parts = [item.type, item.status];
   if (item.due) parts.push(item.due);
   if (item.tags && item.tags.length) parts.push(item.tags.join(", "));
-  // P6-AT: ohne Space-Angabe ist eine Trefferliste über mehrere Spaces nicht interpretierbar.
-  if (isGlobalScope()) parts.unshift(item.space);
   return parts.join(" · ");
 }
 
@@ -313,6 +315,14 @@ export function renderList() {
     if (item.id === state.selectedId) button.setAttribute("aria-current", "true");
     button.appendChild(el("div", "list__row-title", item.title));
     var metaEl = el("div", "list__row-meta tnum");
+    // P6-AT + Phase 8 C3 (P8-I): im globalen Listen-Scope ("Alle Items") steht der
+    // Space-Name vor der Metazeile, mit einem farbigen Punkt nach spaceCategory().
+    // Im nicht-globalen Modus ist der Space implizit (state.activeSpace), keine Wiederholung.
+    if (isGlobalScope()) {
+      var sp = spaceByName(item.space);
+      metaEl.appendChild(el("span", "space-dot space-dot--" + spaceCategory(sp)));
+      metaEl.appendChild(document.createTextNode(item.space + " · "));
+    }
     metaEl.appendChild(el("span", null, itemMetaLine(item)));
     metaEl.appendChild(visibilityChip(item));
     button.appendChild(metaEl);

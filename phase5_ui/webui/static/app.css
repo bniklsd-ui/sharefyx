@@ -41,8 +41,17 @@
   --accent-quiet:  rgba(62,141,243,.14);
   --accent-line:   rgba(62,141,243,.40);
 
-  --warn:          #E5A93C;   /* Konflikt, fremder Space */
+  --warn:          #E5A93C;   /* Konflikt */
   --danger:        #E5484D;   /* Widerruf, Archivieren */
+
+  /* Farbsemantik Space-Kategorien (Phase 8 Block C C3, Plan §4.C3 P8-I) -- drei Kategorien,
+     eine Farbe pro Kategorie. Statusfarben oben bleiben unveraendert (Akzent=interaktiv,
+     Amber=warn, Rot=danger); die drei neuen Tokens ermoeglichen eine konsistente Kennzeichnung
+     der Space-Kategorie in Rail-Glyph, Metazeilen-Punkt und Legende. Feinjustierung der
+     Startwerte nur in Nikingers Sichtpruefung. */
+  --space-own:     #4A93F0;   /* Markenblau-Familie, etwas matter als --accent */
+  --space-shared:  #2EB8A6;   /* Teal */
+  --space-foreign: #8B93A1;   /* neutrales Slate -- "nicht deins" darf leise sein */
 
   --radius:        10px;
   --radius-sm:     6px;
@@ -319,6 +328,27 @@ select.input {
   font-weight: 600;
   flex-shrink: 0;
 }
+/* Space-Kategoriefarbe (Phase 8 C3, P8-I) -- Variante des rail__glyph, die nach
+   spaceCategory(space) gewaehlt wird (state.js). Bleibt ein 20x20-Badge mit dem ersten
+   Buchstaben des Space-Namens; nur die Akzentfarbe wechselt. Drei feste Gradient/Edge-Paare
+   statt weiterer Tokens, weil die Kategorie genau drei Werte hat und keine Zwischenstufen
+   braucht (Plex-Tokens --space-* sind die "Schluesselfarbe", hier entsteht die
+   plastische Variante). */
+.rail__glyph--own {
+  background: linear-gradient(180deg, #5DA8F7, #3A7DCB);
+  border-color: #1F4F8F;
+  color: var(--text);
+}
+.rail__glyph--shared {
+  background: linear-gradient(180deg, #48C9B6, #259C8C);
+  border-color: #156959;
+  color: var(--text);
+}
+.rail__glyph--foreign {
+  background: linear-gradient(180deg, #9CA3B0, #6F7686);
+  border-color: #3F4452;
+  color: var(--text);
+}
 /* Lucide-SVG-Icons (Phase 8 C2, Plan §4.C2). Tragerklasse `.icon` fuer jedes Icon -- Farbe folgt
    dem Text (currentColor auf dem <symbol>), keine Sonderfarben. Optionale Groessenregelung
    durch umschliessende Klasse (rail__glyph 20px, tree__twist 12px, sonst 1em = Schriftgroesse). */
@@ -581,6 +611,23 @@ select.input {
   margin-top: 2px;
 }
 
+/* Farbiger Punkt vor dem Space-Namen in der globalen Listen-Metazeile (Phase 8 C3, P8-I) --
+   zeigt auf einen Blick, in welche Space-Kategorie das Item faellt. 8px-Kreis, vertikal
+   mittig zur Textzeile der Metazeile (12.5px Font-Hoehe), etwas mehr Innenabstand rechts
+   damit das Wort nicht am Punkt klebt. */
+.space-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  align-self: center;
+}
+.space-dot + .space-dot-text { margin-left: 6px; }
+.space-dot--own { background: var(--space-own); }
+.space-dot--shared { background: var(--space-shared); }
+.space-dot--foreign { background: var(--space-foreign); }
+
 /* Sichtbarkeits-Chip (Step 7 Commit 2) — "privat"/"nur ich" bleiben gedämpft (Default, niemand
    sonst hat Zugriff), erst eine echte Freigabe hebt den Chip farblich hervor. */
 .visibility-chip {
@@ -618,6 +665,31 @@ select.input {
   padding: calc(var(--space) * 4);
 }
 .overview__title { margin-bottom: calc(var(--space) * 2); }
+
+/* Mini-Legende (Phase 8 C3, P8-I) -- kleines statisches Element im Uebersichts-Kopf, das die
+   drei Space-Kategoriefarben erklaert. Eine "Alle Items"-Liste ohne Legende waere nicht
+   selbsterklaerend: der Leser sieht farbige Punkte und weiss nicht, was sie bedeuten. */
+.legend {
+  display: flex;
+  gap: calc(var(--space) * 2);
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: var(--fs-meta);
+  color: var(--text-muted);
+  margin-bottom: calc(var(--space) * 2);
+}
+.legend__item { display: inline-flex; align-items: center; gap: 6px; }
+.legend__dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.legend__dot--own { background: var(--space-own); }
+.legend__dot--shared { background: var(--space-shared); }
+.legend__dot--foreign { background: var(--space-foreign); }
+
 .overview__heading {
   font-size: var(--fs-meta);   /* 12.5px -- vor C1: 12px */
   font-weight: 500;

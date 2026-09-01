@@ -3,11 +3,100 @@ status: live
 purpose: Archiv älterer Session-Blöcke aus phase8_ui_graph/CLAUDE.md — newest-first, verbatim per Rotationsregel
 read-when: nur wenn der aktuelle Session-Block im Phase-Head nicht reicht und Verlauf gebraucht wird
 detail: L3
+updated: 2026-09-01 (Sichtpruefung-1-Block (vom Vortag) nach C3-Rotation ins Archiv gewandert -- jetzt 18 Bloecke newest-first; Phase-8-Head wieder unter dem 40KB-Softcap) | 2026-09-01 (zwölfte Rotation, 17 Blöcke)
 up: CLAUDE.md
 updated: 2026-09-01 (zwoelfte Rotation: C2-Block ins Archiv nach Screenshots+README-Session -- Sichtpruefung 1 mit 9 Screenshots gegen Wegwerf-Instanz, README "Sneak Peak"-Sektion neu, docs/screenshots/ neu im INDEX, C2+Docs-Commit 0d97b3a gepusht; Head 37.7KB->33.6KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 103.8KB->114.0KB; keine Code-Aenderung ausserhalb webui/static + build_icon_sprite.py + vendor/, keine Service-Touch in dieser Sitzung) | 2026-09-01 (elfte Rotation: C1-Block ins Archiv nach C2-Session -- C2-Block (Lucide-Sprite, 18 Icons, build_icon_sprite.py, js/icons.js, .icon-CSS) ergaenzt, dann rotiert; Head 33.7KB->37.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 96.0KB->103.8KB; F9/F10/F11 aus C0 geschlossen; keine neue P1-Contract-Oeffnung; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (zehnte Rotation: C0-Block ins Archiv nach C1-Session -- C1-Block (Plex-Font-Swap + CSS-Typo-Tokens, 35 Findings aus C0 abgearbeitet fuer C1) ergaenzt, dann rotiert; Head 27.5KB->33.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 89.3KB->96.0KB; C1-Commits 0281cce + 08bff55 im Head referenziert; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (neunte Rotation: Gate-B→C-Block ins Archiv nach C0-Session -- C0-Block ergaenzt, dann rotiert; Head 39.0KB->31.4KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 81.3KB->89.3KB; C0-Findings-Tabelle (35 Eintraege) lebt im Head; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (achte Rotation: B4-Block ins Archiv nach Gate-B→C-Verifikation -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf, pytest 958/958 gruen, Charakterisierung byte-identisch, Tabu-Diff leer; Head jetzt mit 14.8 KB unter dem Softcap, SESSIONS_ARCHIVE.md 76.9 KB; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (siebte Rotation: fuenf Bloecke ins Archiv -- A3-Bau, Hard-Rule-9-Doku, Versions-Bump v2.2.3, A3-Drittprobe mit Restdefekt, B1 linkscan.py + Tests; Head jetzt 16.4 KB mit genau einem Block, 12 Bloecke im Archiv, Phase-8-Head wieder unter dem 40KB-Softcap; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8
+
+## Session stopped — 2026-09-01 (Sichtprüfung 1: 9 Screenshots gegen Wegwerf-Instanz, README Sneak Peak, C2 + Docs gepusht)
+
+**Auftrag:** Sichtprüfung 1 nach C1 + C2 zusammen (Plan §8). Typo-Größen und Icon-Lesbarkeit
+als Augenschein-Paar — strukturelle Änderungen nicht, Feinwerte dürfen justiert werden.
+Anschließend: Commit + Push auf `github.com/bniklsd-ui/sharefyx`, README um eine
+„Sneak Peak"-Sektion mit den neun Screenshots erweitern, dann Session beenden.
+
+**Wegwerf-Instanz, frisch aufgezogen (Standing Permission reproduziert):**
+- Port `18765` (nicht der Default `8765` — dort läuft der echte `sharefyx-mcp.service`,
+  PID 67925, nicht angefasst, Hard Rule 9).
+- `SPACE_DATA_ROOT=/tmp/opencode/sharefyx-wegwerf/data`, frisch mit `space_cli create`
+  bestückt: drei Items (`Erste Notiz`/`Aufgabe für morgen`/`Bezug zu Phase 8`).
+- `SPACE_AUTH_DB=/tmp/opencode/sharefyx-wegwerf/auth.sqlite3`, frisch — User
+  `screenshots-user` mit frischem DEK in `CREDENTIALS_DIRECTORY/auth-dek`. **Beides nur
+  im Prozessspeicher + der jetzt gelöschten tmp-`auth.sqlite3`, nie in einer Repo-Datei,
+  nie in einem Log (Hard Rule 1).** **[2026-09-01 Korrektur, unmittelbar nach
+  Commit-Push:]** der erste Wurf dieses Absatzes hatte Klartext-Passwort + TOTP-Seed
+  ausgehalten — Hard-Rule-1-Verstoß. Redigiert in Commit `… (folgt)`. Die Credentials
+  waren ausschließlich für die Wegwerf-Instanz, der User existiert in keiner anderen
+  Datenbank, der DEK war nirgendwo sonst im Spiel — die Laufzeit-Exposition ist also
+  Null, aber die Regel „Secrets gehören nicht in Commits" gilt unbedingt, deshalb der
+  Folgecommit.
+- `SPACE_PUBLIC_BASE_URL=https://wegwerf.invalid` (Pflichtplatzhalter, nicht kontaktiert).
+
+**Screenshots (alle in `docs/screenshots/`, `git mv` aus dem Repo-Root nach Commit A):**
+1. `01_login.png` — Anmelde-Seite mit Plex Sans und radialem Auth-Backdrop
+2. `02_overview.png` — Übersicht nach Update-Banner geschlossen
+3. `03_list.png` — Notizen-Filter mit Lucide-`folder-input`/`share-2` pro Zeile
+4. `04_editor.png` — Editor-Vorschau, Toolbar mit Lucide `link`/`quote`/`image`/`x`
+5. `05_editor_edit.png` — Editor-Bearbeiten-Modus (Monospace-Textarea)
+6. `06_konto.png` — Passwort-ändern-Dialog, Plex Sans durchgehend
+7. `07_overview_full.png` — Übersicht im Editor-Zustand (item-Bezug auf "Bezug zu Phase 8")
+8. `08_rail_close.png` — schmaler Viewport (900 px), Rail auf Icon-Spalte kollabiert
+9. `09_overview_clean.png` — saubere Übersicht im 1440×900-Viewport
+
+**Augenschein-Befunde für die Sichtprüfung:**
+- Plex Sans Var (380–620) ist geladen, sichtbar in der Wortmarke, allen Buttons und Labels;
+  Plex Mono für Item-IDs/Versions-Badges (`v2.2.3` oben rechts, `itm_…` rechts in der
+  Metazeile, `v1` im Editor-Footer).
+- Body-Schriftgröße wirkt 16 px mit 1.55 line-height (gegen F4 gemessen — 15 px war der
+  AI-Default, jetzt aligned).
+- Lucide-Haus in der Rail, Lucide-Zahnrad am Konto-Eintrag, Lucide-Logout-Pfeil unten — alle
+  crisp bei 16 px und 1.25 em Default. Lucide-`folder-input`/`share-2` pro Listenzeile gut
+  erkennbar, kein Verschwimmen.
+- Bucket-Tiles (0 Offen / 0 Erledigt / 3 Notizen / 0 Archiv) fallen als „vier gleiche
+  Cards" auf (F12/F13) — bewusst noch nicht angefasst, D1 löst es auf.
+- Blockquote hat die linke Akzentkante (F15, semantisch korrekt, kein AI-Tell).
+
+**Push — Commits A + B, Reihenfolge wie auf der Platte:**
+- **Commit A** `0d97b3a` `phase8: C2 -- Lucide-Sprite (18 Icons), …`: Vendoring unter
+  `phase5_ui/vendor/lucide/` (Lucide 1.38.0, SHA-256 gepinnt, ISC+MIT),
+  `phase5_ui/scripts/build_icon_sprite.py` neu (idempotent, `--check`-Modus), Sprite-Block
+  zwischen `<!-- ICONS:BEGIN -->`/`<!-- ICONS:END -->` in `app.html`, `js/icons.js` neu,
+  `.icon`-CSS + Lucide-Defaults, Ersetzungs-Map 7 HTML-Entities + 3 Text-Glyphen, dazu alle
+  begleitenden Doc-Updates in einem Commit (Hard Rule 8: CLAUDE.md, ROADMAP.md, docs/INDEX.md,
+  phase8_ui_graph/CLAUDE.md, phase8_ui_graph/SESSIONS_ARCHIVE.md). 27 Dateien, +442/-139.
+- **Commit B** (dieser): README um „Sneak Peak"-Sektion mit den 9 Screenshots erweitert;
+  `docs/screenshots/` neu eingeführt mit Header-Card und INDEX-Eintrag;
+  Phase-8-Head rotiert (C2-Block wandert nach `SESSIONS_ARCHIVE.md`, dieser Block bleibt);
+  SESSIONS_ARCHIVE-Frontmatter `updated:` nachgezogen.
+
+**Aufräumen:** Wegwerf-Instanz per `kill -TERM $(cat serve.pid)` (PID 135888) gestoppt —
+Hard Rule 9 eingehalten, kein `pkill -f`-Regex. `rm -rf /tmp/opencode/sharefyx-wegwerf/`
+im selben Zug. `curl http://127.0.0.1:8765/health` durchgehend `ok`, `uptime_s` von
+24147 s (zu Beginn der Screenshots) auf 24589 s (am Ende) — linear wachsend, **kein
+Servicerestart, kein Live-Touch, kein Auth-Lese-/Schreibzugriff auf die Produktion.**
+Wegwerf-Prozess ist weg (`ps -ef | grep serve.py | grep -v grep` zeigt nur noch PID 67925).
+
+**Verbleibend für die nächste Session (offene Punkte aus diesem Commit):**
+- Sichtprüfung 1 selbst: Nikinger fährt sie am Browser gegen eine Wegwerf-Instanz oder
+  per Commit-Screenshots (`docs/screenshots/01..09.png`). Feinwerte dürfen justiert
+  werden, keine Strukturänderung in dieser Sichtprüfung. Befunde fließen in C3 ein.
+- C3 (Plan §4.C3, Farbsemantik + Legende) — die drei neuen Tokens
+  `--space-own`/`--space-shared`/`--space-foreign`, `spaceCategory(space)`-Helfer, Rail-
+  Glyph-Anwendung und Übersichts-Legende.
+- C4 (Plan §4.C4, Glass-Akzente) — F14 (3-px-Akzentkante + 1-px-Outline für Auswahl-
+  Indikatoren), F16 (`prefers-reduced-transparency`-Fallback für Firefox, V85).
+- C5 (Plan §4.C5, Dichte + Selection + 72ch) — F5 (::selection), F21 (`.editor__body`
+  `max-width: 72ch`), F22 (`.editor__body`-Padding auf Space-Token).
+- D1/D2/D3 erst nach Sichtprüfung 1; Reihenfolge 0 → A → B → Gate → C → D → Z hält.
+
+**Nächster Schritt, konkret:** Nikinger fährt Sichtprüfung 1 am Browser (oder direkt
+gegen die Screenshots in `docs/screenshots/`). Befunde fließen entweder als C1-Feinwert
+(F3/F4/F6 nochmal nachschärfen) oder als Vorlage für C3 (Farbsemantik). Strukturelle
+Änderungen sind nicht in Sichtprüfung 1 drin.
+
+---
 
 ## Session stopped — 2026-09-01 (Block C C2: Lucide-Sprite, 18 Icons, Generator, js/icons.js, .icon-CSS)
 

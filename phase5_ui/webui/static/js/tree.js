@@ -2,7 +2,7 @@
 
 // -- Navigationsbaum (Step 7b) --------------------------------------------------------------
 
-import { state, BUCKET_LABELS, activeSpaceWritable, setCreateControlsPresent, isGlobalScope } from "./state.js";
+import { state, BUCKET_LABELS, activeSpaceWritable, setCreateControlsPresent, isGlobalScope, spaceCategory } from "./state.js";
 import { el, toast } from "./toasts.js";
 import { reportUnexpectedError } from "./api.js";
 import { closeEditor } from "./editor.js";
@@ -204,7 +204,10 @@ export function renderSpaceNode(space) {
   var twist = el("span", "tree__twist");
   twist.appendChild(iconSvg(open ? "chevron-down" : "chevron-right"));
   row.appendChild(twist);
-  row.appendChild(el("span", "rail__glyph", space.name.charAt(0).toUpperCase()));
+  // Phase 8 C3 (P8-I): rail__glyph nimmt die Space-Kategoriefarbe an (Plex-Tokens
+  // app.css :: --space-own/--space-shared/--space-foreign). Der Glyph bleibt ein
+  // Buchstabe, keine Icon -- Identitaet, nicht Symbol.
+  row.appendChild(el("span", "rail__glyph rail__glyph--" + spaceCategory(space), space.name.charAt(0).toUpperCase()));
   row.appendChild(el("span", "rail__label", space.name));
   if (!space.writable) row.appendChild(el("span", "tree__badge", "nur lesen"));
   row.addEventListener("click", function () {

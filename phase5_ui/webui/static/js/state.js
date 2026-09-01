@@ -73,6 +73,21 @@ export function activeSpaceWritable() {
   return !!(space && space.writable);
 }
 
+// Phase 8 Block C C3 (Plan §4.C3 P8-I) -- Ableitung der Space-Kategorie aus den von
+// `GET /spaces` gelieferten Feldern (`own`/`writable`). Drei Werte, eine Farbe pro Wert
+// (`app.css :: --space-own/--space-shared/--space-foreign`). Aufrufer: Rail-Glyph
+// (`tree.js :: renderSpaceNode()`), Metazeilen-Punkt (`list.js :: renderList()`), Legende
+// (`app.html`, statisch). `foreign` als Fallback für `null`/`undefined` (z.B. wenn das
+// Item zu einem Space gehoert, der in `state.spaces` noch nicht geladen ist -- der
+// Aufrufer hat den Space-Namen, aber `spaceByName()` liefert null; konservativ "fremd"
+// ist sicherer als "eigener").
+export function spaceCategory(space) {
+  if (!space) return "foreign";
+  if (space.own) return "own";
+  if (space.writable) return "shared";
+  return "foreign";
+}
+
 export function isGlobalScope() {
   return state.scope === "all";
 }

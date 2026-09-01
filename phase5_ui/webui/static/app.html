@@ -70,6 +70,15 @@
     <!-- Startansicht (Step 7b) -->
     <div class="overview" id="detail-overview">
       <h1 class="overview__title" id="overview-title"></h1>
+      <!-- Phase 8 C3 (P8-I): Mini-Legende fuer die drei Space-Kategoriefarben. Statisch --
+           wird vom Renderer nicht angefasst, steht ab App-Start dort. Position direkt unter
+           dem Titel, vor den Bucket-Tiles, damit der Leser die Farben dort findet, wo sie
+           zum ersten Mal auftauchen (in den "Verbundene Spaces"-Cards weiter unten). -->
+      <div class="legend" aria-label="Space-Kategorien">
+        <span class="legend__item"><span class="legend__dot legend__dot--own"></span>Eigener Space</span>
+        <span class="legend__item"><span class="legend__dot legend__dot--shared"></span>Geteilter Space (schreibbar)</span>
+        <span class="legend__item"><span class="legend__dot legend__dot--foreign"></span>Fremder Space</span>
+      </div>
       <div class="overview__tiles" id="overview-tiles"></div>
       <h2 class="overview__heading">Zuletzt benutzt</h2>
       <ol class="overview__recent" id="overview-recent"></ol>

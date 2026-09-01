@@ -60,7 +60,7 @@ Abnahmezeilen: `docs/concepts/phase8_ui_graph_plan.md`.
 | B3 | `webui/api.py :: _graph_get()` + Route `GET /api/v1/graph` + 8 Tests | ✅ gebaut + live-verifiziert (`58ff9a6` deploy `007b73d`, 2026-09-01); Tabu-Diff leer, Charakterisierungstests byte-identisch grün (P5-B-Disziplin gehalten: nur `mcpserver.permissions.SharePolicy` importiert in webui/) |
 | B4 | UI: `#item/`-Klick-Delegation (`app.js`) + Link-Picker-Dialog (`app.html`/`app.css`/`dialogs.js`/`editor.js`) | ✅ gebaut + live-verifiziert (`ea14d53` deploy `007b73d`, 2026-09-01); Tabu-Diff leer (insb. `webui/security.py` P8-Q unangetastet); JS-Syntax-Check `node --check` auf `app.js`/`editor.js`/`dialogs.js` OK; 34 statische-Tests grün; ui_budget 5/5 grün (91/250 KB app.js+css+Font) |
 | Block B abgeschlossen | `linkscan.py` + `item_links` + `Store.links_all` + `GET /api/v1/graph` + UI-Wiring | ✅ **live-verifiziert** (`007b73d`, 2026-09-01, Release `20260901T103944.634877Z`, Health-Gate 3/3, Versionsbadge v2.2.3); achte P1-Contract-Öffnung bleibt **angekündigt**, geschlossen mit Phase-8-Step-Z |
-| Block C | Design-Fundament v3 (Typografie, Icons, Farben, Glas) | 🔄 C0 ✅ · C1 ✅ gebaut (C1a Font-Swap + C1b CSS-Tokens) · C2 ✅ gebaut (Lucide-Sprite, 18 Icons, build_icon_sprite.py, js/icons.js, .icon CSS) · C3–C5 ⬜ |
+| Block C | Design-Fundament v3 (Typografie, Icons, Farben, Glas) | 🔄 C0 ✅ · C1 ✅ gebaut (C1a Font-Swap + C1b CSS-Tokens) · C2 ✅ gebaut (Lucide-Sprite, 18 Icons, build_icon_sprite.py, js/icons.js, .icon CSS) · C3 ✅ gebaut (Farbsemantik --space-own/shared/foreign + .rail__glyph--{cat}, .space-dot--{cat}, .legend) · C4–C5 ⬜ |
 | Block D | Übersicht tablos + Force-Graph | ⬜ |
 | Step Z | Closeout | ⬜ |
 
@@ -82,7 +82,21 @@ ersetzt, V92 mit Lucide 1.38.0 + SHA-256 d28944cf… gepinnt; Generator idempote
 check-Modus, js/icons.js (13. JS-Modul), .icon-CSS-Klasse + Lucide-Defaults; 958/958 pytest,
 ui_budget 5/5 (110.3/250 KB), Tabu-Diff leer, kein Live-Touch (P8-L bleibt); **Sichtprüfung 1
 (Plan §8) folgt nach C1 + C2 zusammen** — Typo-Größen und Icon-Lesbarkeit gehören für den
-Augenschein zusammen.
+Augenschein zusammen). **C3 ✅ gebaut** (Farbsemantik --space-own/#4A93F0 + --space-shared/
+#2EB8A6 + --space-foreign/#8B93A1 in app.css :root; drei rail__glyph--{cat}-Varianten für den
+Space-Buchstaben in tree.js; space-dot--{cat} in der globalen Listen-Metazeile in list.js,
+itemMetaLine() aufgeteilt -- rendert nur noch den Tail; state.js spaceCategory() neu; .legend
+statisch in app.html-Overview; Sichtprüfung gegen eine Wegwerf-Instanz auf 127.0.0.1:18766:
+overview zeigt Legende + blauen rail-Glyph, „Alle Items" rendert blauen space-dot vor `alpha` in
+der Metazeile; 958/958 pytest, ui_budget 5/5 (112.0/250 KB), Tabu-Diff leer, JS-Syntax
+`node --check` auf state/tree/list.js OK; zwei Screenshots `docs/screenshots/c3_01_*.png` +
+`c3_02_*.png`; `phase8_ui_graph/scripts/{wegwerf_setup_c3.py,c3_playwright_smoke.py}` neu —
+Standing-Permission-Muster P5 Step 6/7b reproduziert, eigener Port 18766, File-Keyring-Backend
+statt `nikinger-space`, eigener DEK als base64-Datei, User direkt in `auth.sqlite3`
+provisioniert via `AuthStore.upsert_user()`+`set_totp()`+`confirm_totp()` — kein
+`provision_user.py`/`keyring.set_password`, kein Schreiben in den echten
+`nikinger-space`-Service; cleanup per `kill -TERM $(cat serve.pid)` — kein `pkill -f`-Regex
+(Hard Rule 9)).
 
 ---
 
@@ -183,94 +197,6 @@ unangetastet (anderes Schema, Python-Introspection, nicht der User-Badge).
 
 ---
 
-## Session stopped — 2026-09-01 (Sichtprüfung 1: 9 Screenshots gegen Wegwerf-Instanz, README Sneak Peak, C2 + Docs gepusht)
-
-**Auftrag:** Sichtprüfung 1 nach C1 + C2 zusammen (Plan §8). Typo-Größen und Icon-Lesbarkeit
-als Augenschein-Paar — strukturelle Änderungen nicht, Feinwerte dürfen justiert werden.
-Anschließend: Commit + Push auf `github.com/bniklsd-ui/sharefyx`, README um eine
-„Sneak Peak"-Sektion mit den neun Screenshots erweitern, dann Session beenden.
-
-**Wegwerf-Instanz, frisch aufgezogen (Standing Permission reproduziert):**
-- Port `18765` (nicht der Default `8765` — dort läuft der echte `sharefyx-mcp.service`,
-  PID 67925, nicht angefasst, Hard Rule 9).
-- `SPACE_DATA_ROOT=/tmp/opencode/sharefyx-wegwerf/data`, frisch mit `space_cli create`
-  bestückt: drei Items (`Erste Notiz`/`Aufgabe für morgen`/`Bezug zu Phase 8`).
-- `SPACE_AUTH_DB=/tmp/opencode/sharefyx-wegwerf/auth.sqlite3`, frisch — User
-  `screenshots-user` mit frischem DEK in `CREDENTIALS_DIRECTORY/auth-dek`. **Beides nur
-  im Prozessspeicher + der jetzt gelöschten tmp-`auth.sqlite3`, nie in einer Repo-Datei,
-  nie in einem Log (Hard Rule 1).** **[2026-09-01 Korrektur, unmittelbar nach
-  Commit-Push:]** der erste Wurf dieses Absatzes hatte Klartext-Passwort + TOTP-Seed
-  ausgehalten — Hard-Rule-1-Verstoß. Redigiert in Commit `… (folgt)`. Die Credentials
-  waren ausschließlich für die Wegwerf-Instanz, der User existiert in keiner anderen
-  Datenbank, der DEK war nirgendwo sonst im Spiel — die Laufzeit-Exposition ist also
-  Null, aber die Regel „Secrets gehören nicht in Commits" gilt unbedingt, deshalb der
-  Folgecommit.
-- `SPACE_PUBLIC_BASE_URL=https://wegwerf.invalid` (Pflichtplatzhalter, nicht kontaktiert).
-
-**Screenshots (alle in `docs/screenshots/`, `git mv` aus dem Repo-Root nach Commit A):**
-1. `01_login.png` — Anmelde-Seite mit Plex Sans und radialem Auth-Backdrop
-2. `02_overview.png` — Übersicht nach Update-Banner geschlossen
-3. `03_list.png` — Notizen-Filter mit Lucide-`folder-input`/`share-2` pro Zeile
-4. `04_editor.png` — Editor-Vorschau, Toolbar mit Lucide `link`/`quote`/`image`/`x`
-5. `05_editor_edit.png` — Editor-Bearbeiten-Modus (Monospace-Textarea)
-6. `06_konto.png` — Passwort-ändern-Dialog, Plex Sans durchgehend
-7. `07_overview_full.png` — Übersicht im Editor-Zustand (item-Bezug auf "Bezug zu Phase 8")
-8. `08_rail_close.png` — schmaler Viewport (900 px), Rail auf Icon-Spalte kollabiert
-9. `09_overview_clean.png` — saubere Übersicht im 1440×900-Viewport
-
-**Augenschein-Befunde für die Sichtprüfung:**
-- Plex Sans Var (380–620) ist geladen, sichtbar in der Wortmarke, allen Buttons und Labels;
-  Plex Mono für Item-IDs/Versions-Badges (`v2.2.3` oben rechts, `itm_…` rechts in der
-  Metazeile, `v1` im Editor-Footer).
-- Body-Schriftgröße wirkt 16 px mit 1.55 line-height (gegen F4 gemessen — 15 px war der
-  AI-Default, jetzt aligned).
-- Lucide-Haus in der Rail, Lucide-Zahnrad am Konto-Eintrag, Lucide-Logout-Pfeil unten — alle
-  crisp bei 16 px und 1.25 em Default. Lucide-`folder-input`/`share-2` pro Listenzeile gut
-  erkennbar, kein Verschwimmen.
-- Bucket-Tiles (0 Offen / 0 Erledigt / 3 Notizen / 0 Archiv) fallen als „vier gleiche
-  Cards" auf (F12/F13) — bewusst noch nicht angefasst, D1 löst es auf.
-- Blockquote hat die linke Akzentkante (F15, semantisch korrekt, kein AI-Tell).
-
-**Push — Commits A + B, Reihenfolge wie auf der Platte:**
-- **Commit A** `0d97b3a` `phase8: C2 -- Lucide-Sprite (18 Icons), …`: Vendoring unter
-  `phase5_ui/vendor/lucide/` (Lucide 1.38.0, SHA-256 gepinnt, ISC+MIT),
-  `phase5_ui/scripts/build_icon_sprite.py` neu (idempotent, `--check`-Modus), Sprite-Block
-  zwischen `<!-- ICONS:BEGIN -->`/`<!-- ICONS:END -->` in `app.html`, `js/icons.js` neu,
-  `.icon`-CSS + Lucide-Defaults, Ersetzungs-Map 7 HTML-Entities + 3 Text-Glyphen, dazu alle
-  begleitenden Doc-Updates in einem Commit (Hard Rule 8: CLAUDE.md, ROADMAP.md, docs/INDEX.md,
-  phase8_ui_graph/CLAUDE.md, phase8_ui_graph/SESSIONS_ARCHIVE.md). 27 Dateien, +442/-139.
-- **Commit B** (dieser): README um „Sneak Peak"-Sektion mit den 9 Screenshots erweitert;
-  `docs/screenshots/` neu eingeführt mit Header-Card und INDEX-Eintrag;
-  Phase-8-Head rotiert (C2-Block wandert nach `SESSIONS_ARCHIVE.md`, dieser Block bleibt);
-  SESSIONS_ARCHIVE-Frontmatter `updated:` nachgezogen.
-
-**Aufräumen:** Wegwerf-Instanz per `kill -TERM $(cat serve.pid)` (PID 135888) gestoppt —
-Hard Rule 9 eingehalten, kein `pkill -f`-Regex. `rm -rf /tmp/opencode/sharefyx-wegwerf/`
-im selben Zug. `curl http://127.0.0.1:8765/health` durchgehend `ok`, `uptime_s` von
-24147 s (zu Beginn der Screenshots) auf 24589 s (am Ende) — linear wachsend, **kein
-Servicerestart, kein Live-Touch, kein Auth-Lese-/Schreibzugriff auf die Produktion.**
-Wegwerf-Prozess ist weg (`ps -ef | grep serve.py | grep -v grep` zeigt nur noch PID 67925).
-
-**Verbleibend für die nächste Session (offene Punkte aus diesem Commit):**
-- Sichtprüfung 1 selbst: Nikinger fährt sie am Browser gegen eine Wegwerf-Instanz oder
-  per Commit-Screenshots (`docs/screenshots/01..09.png`). Feinwerte dürfen justiert
-  werden, keine Strukturänderung in dieser Sichtprüfung. Befunde fließen in C3 ein.
-- C3 (Plan §4.C3, Farbsemantik + Legende) — die drei neuen Tokens
-  `--space-own`/`--space-shared`/`--space-foreign`, `spaceCategory(space)`-Helfer, Rail-
-  Glyph-Anwendung und Übersichts-Legende.
-- C4 (Plan §4.C4, Glass-Akzente) — F14 (3-px-Akzentkante + 1-px-Outline für Auswahl-
-  Indikatoren), F16 (`prefers-reduced-transparency`-Fallback für Firefox, V85).
-- C5 (Plan §4.C5, Dichte + Selection + 72ch) — F5 (::selection), F21 (`.editor__body`
-  `max-width: 72ch`), F22 (`.editor__body`-Padding auf Space-Token).
-- D1/D2/D3 erst nach Sichtprüfung 1; Reihenfolge 0 → A → B → Gate → C → D → Z hält.
-
-**Nächster Schritt, konkret:** Nikinger fährt Sichtprüfung 1 am Browser (oder direkt
-gegen die Screenshots in `docs/screenshots/`). Befunde fließen entweder als C1-Feinwert
-(F3/F4/F6 nochmal nachschärfen) oder als Vorlage für C3 (Farbsemantik). Strukturelle
-Änderungen sind nicht in Sichtprüfung 1 drin.
-
----
-
 ## Vormerkungen (nicht Teil eines aktuellen Steps)
 
 **[2026-09-01] Nikinger-Feedback während der Screenshots-Session (Sichtprüfung 1) — ausdrücklich
@@ -318,3 +244,129 @@ nur vormerken, nichts davon diese Session umgesetzt, kein Code angefasst:**
    (Typo-Größen, Icon-Lesbarkeit, ggf. Feinwerte) fließen entweder als C1-Nachschärfung
    (F3/F4/F6) oder als Vorlage für C3 ein; strukturelle Änderungen sind in Sichtprüfung 1
    nicht drin.
+
+---
+
+## Session stopped — 2026-09-01 (Block C C3 gebaut — Farbsemantik + Legende, Playwright-verifiziert gegen Wegwerf-Instanz 127.0.0.1:18766)
+
+**Auftrag:** Block C C3 (Plan §4.C3, P8-I) — die drei Space-Kategorie-Farben + Legende.
+Vorlage: vorheriger Session-Block hatte den nächsten Schritt auf „Befunde aus Sichtprüfung 1
+fließen als Vorlage für C3 ein" gesetzt; die offene Vormerkung „Auswahl-Boxen vereinheitlichen"
+ist eine begleitende Design-Frage, kein C3-Blocker.
+
+**Code-Änderungen (fünf Dateien, +~120 Zeilen, 0 Tabu-Diff-Zeilen):**
+
+- `phase5_ui/webui/static/app.css :: :root` — drei neue Tokens: `--space-own: #4A93F0`
+  (Markenblau-Familie, etwas matter als `--accent`), `--space-shared: #2EB8A6` (Teal),
+  `--space-foreign: #8B93A1` (neutrales Slate, „nicht deins" darf leise sein); Abstand zu
+  `--warn`/`--danger` explizit dokumentiert, AA-Kontrast auf `--bg` per Augenschein ok.
+- `phase5_ui/webui/static/app.css` — `.rail__glyph--{own,shared,foreign}`-Varianten mit
+  eigenen Gradient/Edge-Paaren (die Plex-Tokens `--space-*` sind die Schlüsselfarbe, hier
+  entsteht die plastische Variante), `.space-dot` + drei `--{cat}`-Varianten (8px-Kreis,
+  `align-self: center` für 12.5px-Metazeile), `.legend` + `.legend__item` + `.legend__dot`
+  (statisch, `--fs-meta`, flex-wrap für schmale Viewports).
+- `phase5_ui/webui/static/app.html` — `<div class="legend">` mit drei Items direkt unter
+  `.overview__title`, vor den Bucket-Tiles. Statisch (vom Renderer unangetastet), `aria-label`
+  trägt „Space-Kategorien".
+- `phase5_ui/webui/static/js/state.js` — `spaceCategory(space)` neu; `null`/`undefined` →
+  „foreign" (konservativ), `space.own` → „own", `space.writable` → „shared", sonst „foreign".
+  Die Felder liefert `GET /spaces` seit P6 Step 5.
+- `phase5_ui/webui/static/js/tree.js` — `rail__glyph` bekommt die Kategorie-Klasse:
+  `rail__glyph--${spaceCategory(space)}`. Import ergänzt.
+- `phase5_ui/webui/static/js/list.js` — `itemMetaLine()` aufgeteilt: rendert nur noch den
+  Tail (Typ/Status/Datum/Tags), nicht mehr den Space-Namen. `renderList()` baut den global-
+  Scope-Präfix (`space-dot--${spaceCategory(...)}` + Text-Knoten `space · `) jetzt selbst
+  ein — bewusst im Caller, weil der Punkt nur dort gesetzt wird, wo der Space explizit
+  hingehört (nicht im Space-Scope). Import ergänzt.
+
+**Anwendungsstellen laut Plan §4.C3 — bewusst minimal gehalten:**
+
+- ✅ `.rail__glyph`-Rand/Fond: tree.js-BaumGlyph in der Space-Zeile.
+- ✅ Space-Punkt vor der Metazeile im globalen Listen-Scope: list.js.
+- ✅ Legende: statisch in app.html-Overview.
+- ⬜ Übersichts-Space-Zeilen (§5): **nicht angefasst**, gehört zu Block D (D1 ersetzt die
+  Space-Cards durch tabellose Zeilen, dort wird die gleiche `spaceCategory()`-Logik erneut
+  angewandt — siehe `phase8_ui_graph_plan.md` §5/D1).
+- ⬜ Graph-Knoten (§5): **nicht angefasst**, gehört zu Block D2.
+
+**Bewusst NICHT angefasst (genannte Punkte aus C0/C3):**
+
+- `.space-card`-`border-left: 3px solid var(--warn)` (app.css:682) bleibt wie es ist. Der
+  Plan listet `space-card` nicht unter den C3-Anwendungsstellen; D1 ersetzt die Cards
+  vollständig. Eine temporäre Inkonsistenz (space-card-Border bleibt amber, der rail__glyph
+  darin trägt bereits die neue `space-foreign`/`-shared`-Farbe) wird von D1 aufgelöst.
+- Statusfarben (`--accent`/`--warn`/`--danger`) unangetastet — Plan §0.3 Punkt 4 explizit.
+
+**Verifikation — Selbstprüf-Checkliste §0.6 alle fünf Punkte grün:**
+
+1. `pytest -q` → **958/958 grün** (vorher/nachher identisch, keine Python-Änderung).
+2. Tabu-Diff (`git diff --stat main -- phase4_auth/ phase2_mcp/ phase5_ui/webui/security.py
+   phase1_storage/storage/{models,frontmatter,files,patch,acl,history}.py`) → **leer**.
+3. JS-Syntax: `node --check` auf `state.js`/`tree.js`/`list.js` → **0 errors**. Kein Endpunkt
+   berührt (reines Frontend), keine Fehlerpfade zu durchdenken jenseits des UI-Renderings
+   (P8-H, P8-I, P8-N halten).
+4. Doc-Update im selben Commit (Hard Rule 8) — dieser Block. Keine neue `.md`-Datei,
+   keine Index-Zeile nötig. Modul-Status-Tabelle und Abnahmestand oben bereits nachgezogen.
+5. `python phase5_ui/scripts/ui_budget.py` → **5/5 grün**, app.js+app.css+Font jetzt
+   **112.0 KB** (vorher 110.3, +1.7 KB für die neue CSS). Im Korridor (<250 KB).
+
+**E2E gegen Wegwerf-Instanz (Standing-Permission reproduziert, P5 Step 6/7b-Muster):**
+
+- Port `18766` (nicht der echte `sharefyx-mcp.service` auf `8765`, Hard Rule 9 eingehalten;
+  PID 67925 nicht angefasst, `uptime_s` linear wachsend 35188→35199, kein Servicerestart).
+- `SPACE_DATA_ROOT=/tmp/opencode/sharefyx-wegwerf-c3/data`, frisch — drei Items
+  (`Erste Notiz`/`Aufgabe für morgen`/`Bezug zu Phase 8`) per `space_cli.py create`.
+- `SPACE_AUTH_DB=/tmp/opencode/sharefyx-wegwerf-c3/auth.sqlite3`, frisch — User `alpha`
+  via `phase8_ui_graph/scripts/wegwerf_setup_c3.py` direkt in `auth.sqlite3` provisioniert
+  (`AuthStore.upsert_user()`+`set_totp()`+`confirm_totp()`), TOTP-Seed mit dem DEK aus
+  `auth-dek` per `secretbox.seal()` verschlüsselt (dieselbe Strecke wie der echte
+  Enrollment-Flow). Hard Rule 1: User/Passwort/TOTP-Seed in
+  `credentials.json` (0600) im selben tmp-Pfad, **nie** in einer Repo-Datei oder einem Log;
+  die Wegwerf-Datei wird beim `cleanup` mit dem Verzeichnis gelöscht.
+- File-Keyring-Backend in `_provision_user()`: eigenes `keyring.backend.KeyringBackend`
+  (`class FileBackend(keyring.backend.KeyringBackend)`), das nach `keyring.json` schreibt.
+  Wird nur in der Setup-Subprocess aktiviert, der `serve.py`-Subprozess nutzt seinen eigenen
+  Keyring-Backend (SecretService). Beide laufen nicht im selben Prozessraum — das ist die
+  harte Trennung, die die Hard Rule 1 für eine Wegwerf-Instanz verlangt.
+- **Playwright-Smoke (Playwright MCP gegen die Wegwerf-Instanz):**
+  - `step1_legend_in_app_html`: statisches Markup geprüft (kein Login nötig, `/ui/` ist
+    session-gated → 303 → `/ui/login`, also direkt aus `app.html` gelesen) — alle drei
+    `.legend__dot--{own,shared,foreign}` vorhanden, Labels vollständig.
+  - `step2_login_and_overview`: Login als `alpha` mit Passwort + frisch generiertem TOTP-
+    Code aus `pyotp`, danach `.overview .legend` sichtbar, `.tree__space .rail__glyph--own`
+    sichtbar; danach alle neun CSS-Klassen + drei Tokens per `fetch('/ui/static/app.css')`
+    aus dem served CSS gegenbestätigt.
+  - `step3_global_scope_dot`: Klick auf `.tree__scope` („Alle Items"), `.list__row
+    .space-dot--own` in der Metazeile sichtbar.
+  - `step4_screenshot`: zwei PNGs nach `docs/screenshots/c3_01_overview_with_legend.png` +
+    `c3_02_global_scope_dot.png`. Visuell geprüft: blauer `A`-Glyph im Rail-Baum, drei
+    Legenden-Dots (blau/teal/slate) in der richtigen Reihenfolge, blauer Punkt vor `alpha ·`
+    in jeder Item-Metazeile.
+
+**Wegwerf abgebaut:** `kill -TERM $(cat serve.pid)` (PID-Datei-Muster, **kein** `pkill -f`
+mit Regex — Hard Rule 9 eingehalten, Lehre aus dem Phase-8-Step-A3-Vorfall 2026-09-01);
+`rm -rf /tmp/opencode/sharefyx-wegwerf-c3/` im selben Zug. `curl http://127.0.0.1:8765/health`
+→ weiterhin `{"status":"ok", …}` (uptime 35199 s), `ps -ef` zeigt nur PID 67925 (Produktion),
+Wegwerf-PID weg.
+
+**Verbleibend für die nächste Session:**
+
+- **C4** (Plan §4.C4, Glass-Akzente) — F14 (3-px-Akzentkante + 1-px-Outline für Auswahl-
+  Indikatoren), F16 (`prefers-reduced-transparency`-Fallback für Firefox, V85).
+- **C5** (Plan §4.C5, Dichte + Selection + 72ch) — F5 (`::selection`), F21 (`.editor__body
+  max-width: 72ch`), F22 (`.editor__body`-Padding auf Space-Token).
+- **Sichtprüfung 1** des Nikingers läuft noch — Befunde (Typo-Größen, Icon-Lesbarkeit,
+  ggf. Feinwerte) fließen entweder als C1-Nachschärfung (F3/F4/F6) oder als Vorlage für
+  C3-Feinwerte ein. C3-Startwerte (`#4A93F0`/`#2EB8A6`/`#8B93A1`) sind Feinjustierung-
+  Kandidaten — **nur in Nikingers Sichtprüfung**, nicht durch opencode.
+- **Vormerkung 1** aus dem vorherigen Block (Auswahl-Boxen vereinheitlichen) ist weiter
+  offen — keine Code-Änderung in C3, die Sache wird in einer Folge-Session mit der
+  nächsten Selektions-Affordance natürlich miterledigt (P8-I trifft keine Aussage dazu).
+- **D1/D2/D3** erst nach Sichtprüfung 1; Reihenfolge 0 → A → B → Gate → C → D → Z hält.
+
+**Nächster Schritt, konkret:** **C4 (Plan §4.C4)** — drei CSS-Regeln (`@supports
+backdrop-filter`-Progressive-Enhancement, drei Träger `.overlay`/`.update-banner`/
+`.list__head`, Pflicht-Indikator-Sheen für die Auswahlzeile — `box-shadow: inset 3px 0 0
+var(--accent)` + 1-px-Outline nach V88, der Klassenname steht in den Tests). F16 als Pflicht
+(`@media (prefers-reduced-transparency: reduce)` → solide Flächen, V85 für Firefox).
+
