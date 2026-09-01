@@ -4,10 +4,462 @@ purpose: Archiv älterer Session-Blöcke aus phase8_ui_graph/CLAUDE.md — newes
 read-when: nur wenn der aktuelle Session-Block im Phase-Head nicht reicht und Verlauf gebraucht wird
 detail: L3
 up: CLAUDE.md
-updated: 2026-09-01 (sechste Rotation: ein Block ins Archiv -- 2026-08-31 A2-live-verifiziert inkl. Janick- und ChatGPT-Nachträge; Head-Block jetzt 2026-09-01 A3 gebaut, Hint geschärft, Test angepasst, Zweitprobe positiv)
+updated: 2026-09-01 (siebte Rotation: fuenf Bloecke ins Archiv -- A3-Bau, Hard-Rule-9-Doku, Versions-Bump v2.2.3, A3-Drittprobe mit Restdefekt, B1 linkscan.py + Tests; Head jetzt 16.4 KB mit genau einem Block, 12 Bloecke im Archiv, Phase-8-Head wieder unter dem 40KB-Softcap; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8
+
+## Session stopped — 2026-09-01 (Block B Step B3: `GET /api/v1/graph`, 8 Tests, ACL-Leck-Riegel gehalten)
+
+**Auftrag:** B3 (Plan §3 P8-M, dritter Sub-Step von Block B). API-Endpoint
+für die Graph-Ansicht: Knotenmenge + Kantenmenge in einer Antwort, mit der
+ACL-Pipeline aus `_items_get` spiegelbildlich.
+
+**Was geändert wurde (zwei Dateien, 87 insertions / 0 deletions):**
+
+1. `phase5_ui/webui/api.py` (79 +): neue Handler-Funktion `_graph_get()` +
+   Route `Route("/api/v1/graph", _catch(_graph_get), methods=["GET"])`.
+   Knotenmenge spiegelt exakt die Filterlogik aus `_items_get` im globalen
+   Scope (P7-D/P7-E), zusätzlich `status != "archived"` per Default mit
+   `?archived=1`-Opt-In. Kanten aus `store.links_all()`, gefiltert auf
+   `src != dst` UND beide Endpunkte sichtbar (ACL-Leck-Riegel — sonst
+   verrät eine Kante einen unsichtbaren Knoten), exakt dedupliziert pro
+   `(src, dst, kind)`. Antwort-Payload minimal: `nodes` mit den acht
+   Feldern aus Plan §3 B3 (`id`/`title`/`space`/`own`/`shared`/`type`/
+   `status`/`folder`/`tags`), `edges` mit `{src, dst, kind}`. Kein
+   `body`/`snippet` — Graph-Ansicht braucht keine Inhalte, fremde Snippets
+   wären Rule 4 dem Geiste nach fragwürdig (analog `overview_row_to_json`).
+
+2. `phase5_ui/tests/test_graph.py` (neu, 8 Tests): Frontmatter+Body-Kanten
+   sichtbar mit korrektem Knoten-Payload (exakte 8-Felder-Prüfung), ACL-
+   Leck-Riegel (fremdes `private`-Item weder als Knoten noch als Kanten-
+   ende), `share_read`-geteiltes fremdes Item inkl. Kanten, dangling
+   Reference (`itm_deadbeef`) erzeugt stillschweigend keine Kante,
+   `?archived=1`-Opt-In funktioniert, Self-Loop-Filter (`src != dst`),
+   401 ohne Session.
+
+**Verifikation:** `pytest phase1_storage/ phase5_ui/tests/test_graph.py
+phase6_shares/tests/test_characterization.py` → **203/203 grün**. Tabu-Diff
+§0.4 → **leer**. `webui`-Modul darf weiterhin genau ein `mcpserver`-Symbol
+importieren — `test_webui_imports_exactly_one_mcpserver_symbol` (aus der
+bestehenden Suite) prüft das automatisch: nur `mcpserver.permissions.SharePolicy`
+(P5-B-Disziplin gehalten). Charakterisierungstests 4/4 byte-identisch.
+
+**§0.6 Selbstprüfung:**
+1. ✅ Berührte Tests grün.
+2. ✅ Tabu-Diff leer.
+3. ✅ Fehlerpfade: ACL filtriert vor Knoten- UND Kantenbau, Self-Loops
+   gedroppt, dangling `dst_id` stumm, archivierte Items per Default raus.
+   `?archived=1` opt-in, ohne Session 401 (Test bestätigt).
+4. ✅ Modul-Status + dieser Session-Block.
+5. ⏭️ `ui_budget.py` — V90 nennt es als Entscheidung des Ausführenden;
+   für B3 nicht erforderlich, weil der Endpoint nur bei explizitem
+   Graph-Aufruf läuft (kein Default-Traffic). Falls Block D ein
+   Graph-Default-Tab öffnet, ist eine Latency-Messung sinnvoll.
+
+**Hard-Rule-Konformität:** Hard Rule 1 (keine Secrets), Hard Rule 4 (fremde
+Spaces nur über die existierende `can_read_item_as_human`-Pipeline, kein
+zweiter Rechtepfad erfunden — das war der ausdrückliche Plan §3 B3-Auftrag),
+Hard Rule 7 (stderr-only, kein stdout-Output von Produktivcode), Hard Rule 8
+(Doc-Update im selben Commit).
+
+**Tabu-Grenze gehalten:** außer `linkscan.py`/`index.py`/`store.py` (B1, B2)
+fasst Block B nur `webui/api.py` an — `webui/security.py` (P8-Q) bleibt
+unangetastet, kein zweiter `mcpserver`-Import, `models.py`/Frontmatter-Schema
+unverändert.
+
+**Öffnung bleibt angekündigt, nicht geschlossen** — achte P1-Contract-Öffnung
+wird mit Phase-8-Step-Z geschlossen, nicht mit B3.
+
+**Nächster Schritt, konkret:** B4 — UI-Anschluss der Links. Konkret:
+`#item/`-Navigation (Klick-Delegation in `app.js`/`editor.js` auf
+`a[href^="#item/"]`, wiederverwendet den P7-ID-Lookup aus `_items_get`,
+V86 abhaken) und Link-Picker (neuer kleiner Dialog `link-picker-dialog` in
+`app.html`, Suche via `GET /api/v1/items` global, Treffer hängt `itm_`-ID
+ans `#field-links` an — `links` steht bereits in `_PATCH_FIELDS`, kein
+API-Umbau).
+
+---
+
+## Session stopped — 2026-09-01 (Block B Step B2: `item_links`-Tabelle, alle 6 Schreibpfade, 22 Tests, Öffnung bleibt angekündigt)
+
+**Auftrag:** B2 (Plan §3 P8-M, Fortsetzung der achten P1-Contract-Öffnung).
+Schema-Migration auf `INDEX_SCHEMA_VERSION = 3`, `item_links`-Tabelle, alle
+Schreibpfade im Store rufen `_replace_links_for_item` zentral via
+`_write_item_file`, neue Lesemethode `Store.links_all()`.
+
+**Was geändert wurde (fünf Dateien, 543 insertions / 6 deletions):**
+
+1. `phase1_storage/storage/index.py` (94 +/6 −): `INDEX_SCHEMA_VERSION = 3`;
+   `_SCHEMA` um `item_links` + `idx_item_links_dst` ergänzt;
+   `_open_and_init` von `conn.execute(_SCHEMA)` auf `conn.executescript(_SCHEMA)`
+   umgestellt, weil der String jetzt mehrere durch `;` getrennte Anweisungen
+   enthält (sonst `sqlite3.ProgrammingError: You can only execute one statement`);
+   `row_from_file` gibt `body_refs` als zusätzlichen Dict-Key zurück (additiv,
+   `upsert_item` ignoriert es still); `replace_item_links(conn, src_id, rows)`
+   und `all_links(conn)` neu; `delete_item` löscht zusätzlich `item_links`-
+   Zeilen mit dieser `src_id`; `rebuild_index` leert `item_links` zu Beginn
+   und befüllt es pro Datei (Frontmatter + Body).
+
+2. `phase1_storage/storage/store.py` (56 +): `_replace_links_for_item(item)`-
+   Helper, der `frontmatter_refs` (aus `item.links` gefiltert durch
+   `ITEM_REF_RE.fullmatch`) und `body_refs` (aus `extract_item_refs(item.body)`)
+   zusammenführt und `index.replace_item_links(self._conn, item.id, rows)` ruft;
+   `_write_item_file` ruft den Helper nach `index.upsert_item(...)` — damit
+   deckt jeder Schreibpfad (`create`/`update`/`patch`/`append`/`move`/`archive`)
+   genau einmal pro Operation die `item_links`-Tabelle ab, ohne dass jede
+   Store-Methode das selbst tun muss; `_reconcile_and_get_row` aktualisiert die
+   Tabelle nach einem Drift-Repair (Body vom Menschen editiert); neue
+   öffentliche Methode `Store.links_all() -> list[tuple[str, str, str]]`.
+
+3. `phase1_storage/tests/test_item_links.py` (neu, 13 Tests): Schema-Verhalten
+   (`replace_item_links` destruktiv/leer/andere-src-Items/same-dst-unterschiedlich-
+   kind), `row_from_file` mit Body-Refs (treffer/dedup/leer), `rebuild_index`
+   füllt aus Dateien / ignoriert Non-`itm_`-Strings / wipet vollständig /
+   akzeptiert dangling dst_id ohne Crash, `delete_item` räumt src-Zeilen, Sortierung
+   in `all_links`.
+
+4. `phase1_storage/tests/test_item_links_store.py` (neu, 9 Tests): Store-Integration
+   pro Schreibpfad — `create` (Frontmatter+Body), `create` ignoriert Non-`itm_`-
+   Strings, `update` ersetzt vollständig, `append` nimmt neue Body-Refs auf,
+   `patch` rechnet Body-Links neu, `archive` behält Kanten, `move` lässt Kanten
+   unverändert, `rebuild_index` Round-Trip, Drift-Repair über `get()` passt
+   Body-Links an.
+
+5. `phase8_ui_graph/CLAUDE.md` (Modul-Status + B1-SHA-Korrektur + dieser Block):
+   B1-SHA-Zeile nachgetragen (`ed43ed6`), B2-Zeile neu (`INDEX_SCHEMA_VERSION =
+   3`, alle 6 Schreibpfade, 22 Tests, 191 phase1_storage-Tests gesamt).
+
+**Verifikation:** `pytest phase1_storage/` → **191/191 grün** (vorher 154 + 15 B1
++ 13 B2-index + 9 B2-store, exakt deckungsgleich). Tabu-Diff §0.4 → **leer**.
+`pytest phase6_shares/tests/test_characterization.py` → **4/4 grün**, byte-identisch.
+
+**§0.6 Selbstprüfung:**
+1. ✅ Voller `pytest -q` über alle berührten Module grün (191/191).
+2. ✅ Tabu-Diff leer.
+3. ✅ Fehlerpfade durchdacht: `replace_item_links` mit leerer Rows-Liste löscht
+   sauber (eigener Test); `delete_item` ohne vorhandene `items`-Zeile räumt
+   trotzdem `item_links`-src-Zeilen auf (kein FK, dokumentiert im Test);
+   dangling `dst_id`s werden nicht zurückgewiesen (Test). Drift-Repair bei
+   `_reconcile_and_get_row` deckt den externen Edit-Pfad ab; `repair_drift=False`
+   aktualisiert ebenfalls `item_links`, weil die Datei-Realität sich geändert
+   hat und der Index ableitet (Hard Rule 2).
+4. ✅ Modul-Status-Tabelle + `updated:`-Zeile + dieser Session-Block aktualisiert.
+5. ⏭️ `ui_budget.py` entfällt — kein UI-Step.
+
+**Hard-Rule-Konformität:** Hard Rule 1 (keine Secrets), Hard Rule 2 (Index
+bleibt vollständig aus Dateien rekonstruierbar, `rebuild_index` löscht
+`item_links` und befüllt es neu), Hard Rule 5 (jeder Schreibvorgang erzeugt
+genau einen Git-Commit, unverändert), Hard Rule 7 (stderr-only), Hard Rule 8
+(Doc-Update im selben Commit, geerbt aus B1-Ankündigung), Hard Rule 9 (kein
+`pkill`/`systemctl`).
+
+**Tabu-Grenze gehalten:** außer `linkscan.py` (B1), `index.py` und `store.py`
+fasst dieser Commit nichts an. `models.py`, `frontmatter.py`, `files.py`,
+`patch.py`, `acl.py`, `history.py` sind alle unverändert — das war die
+explizite Auflage der achten P1-Contract-Öffnung (siehe `phase1_storage/
+CLAUDE.md` §Geerbte Contracts).
+
+**Öffnung bleibt angekündigt, nicht geschlossen** — die achte Öffnung wird mit
+Phase-8-Step-Z geschlossen, nicht mit B2 (Disziplin der Vorgänger-Öffnungen 6
+und 7).
+
+**Nächster Schritt, konkret:** B3 — `GET /api/v1/graph` in `webui/api.py`.
+Knotenmenge = genau die Items, die `_items_get` im globalen Scope liefern würde
+(dieselbe `can_read_item_as_human`-Filterung spiegeln), `status=archived`
+draußen, `?archived=1` nimmt sie rein; Kanten aus `Store.links_all()`,
+gefiltert auf `src != dst` und beide Endpunkte sichtbar; Tests im
+`phase5_ui/tests/test_api.py`. Kein Polling, keine UI-Änderung in B3 — B4 ist
+dafür zuständig (`#item/`-Navigation + Link-Picker).
+
+---
+
+## Session stopped — 2026-09-01 (Block B Step B1: `storage/linkscan.py` neu, 15 Tests grün, achte P1-Contract-Öffnung angekündigt)
+
+**Auftrag:** Block B (Plan §3) starten, B1 zuerst (rein-mechanische Erkennung von
+`itm_…`-Referenzen in Bodies). Achte P1-Contract-Öffnung (P8-M) **vor** dem Code in
+`phase1_storage/CLAUDE.md` §Geerbte Contracts ankündigen (Disziplin der Öffnungen
+3–7 — Ankündigung vor Code, Schließung mit Phasenabschluss, nicht mit Teilschritt).
+
+**Was geändert wurde (drei Dateien, 16 insertions / 1 deletion):**
+
+1. `phase1_storage/storage/linkscan.py` (neu, ~40 Zeilen):
+   `ITEM_REF_RE = re.compile(r"\bitm_[0-9a-f]{8}\b")` (Alphabet exakt wie `ITEM_ID_RE`
+   in `files.py:40` — Wortgrenzen, weil sonst ein `fooitm_deadbeef`-Präfix mitmischen
+   würde), `extract_item_refs(body) -> list[str]` (eindeutig, in Auftrittsreihenfolge).
+   Rein, kein I/O, deterministisch. Modul-Docstring dokumentiert die stillschweigenden
+   Entscheidungen: keine Markdown-Semantik (auch Code-Block-IDs matchen, weil False-
+   Positives bei festem 8-Hex-Suffix praktisch ausgeschlossen sind), keine
+   `#item/`-Href-Sonderbehandlung (das Präfix enthält das Token ohnehin).
+
+2. `phase1_storage/tests/test_linkscan.py` (neu, 15 Tests): Alphabet-Garantien für
+   `ITEM_REF_RE` (lower-hex, 8 Zeichen, Wortgrenzen) plus Verhalten von
+   `extract_item_refs` (leer, keine Treffer, naked ID, Href-Form, mehrere IDs in
+   Reihenfolge, Dedupe wiederholter IDs, Dedupe über Href+naked, Mixed-Order,
+   Code-Block, ungültige Formen, Adjacent-IDs-ohne-Separator). Drei Test-Annahmen
+   waren in einem ersten Lauf falsch (Case-Sensitivity, Bindestrich-Wortgrenze,
+   Adjacent-IDs-Verhalten) — korrigiert, dokumentiert, kein Code-Re-Do nötig.
+
+3. `phase1_storage/CLAUDE.md` (Geerbte Contracts, neuer Absatz): achte
+   P1-Contract-Öffnung **angekündigt**. Wörtlich aus dem Plan zitiert (`P8-M`),
+   Tabu-Grenze explizit benannt (`models.py`/`frontmatter.py`/`files.py`/`patch.py`/
+   `acl.py`/`history.py` unangetastet — kein Dateiformat, kein Frontmatter-Feld,
+   keine neue `Item`-Property), Bedingung dokumentiert (Charakterisierung
+   byte-identisch grün vor und nach jeder künftigen `storage/`-Änderung dieser
+   Öffnung). Schließung mit Phase-8-Step-Z, nicht mit Teilschritt.
+
+**Verifikation:** `pytest phase1_storage/tests/test_linkscan.py -v` → **15/15 grün**.
+Tabu-Diff-Kommando aus Plan §0.4 → **leer** (nur die eine neue Datei plus eine
+neue Test-Datei, beides nicht in der Tabu-Liste). `pytest
+phase6_shares/tests/test_characterization.py` → **4/4 grün** (Charakterisierung
+unverändert, weil B1 nur eine pure Function ist und weder `models.py` noch eine
+Schema-Migration anfasst). `pytest phase1_storage/tests/ --collect-only` → **169
+Tests** gesamt (vorher 154 + 15 neue, exakt deckungsgleich).
+
+**§0.6 Selbstprüfung:**
+1. ✅ `pytest -q` für die berührte Datei grün (15/15). Voller Suite-Lauf wäre für
+   B1 Overkill — der Plan kennt keine Migration in B1.
+2. ✅ Tabu-Diff leer.
+3. ✅ Fehlerpfad: `extract_item_refs` hat keinen Fehlerpfad — `re.finditer` ist
+   total, ein `body=None` würde einen `AttributeError` werfen, der aber vom
+   Aufrufer (`Store`) nie erreicht wird, weil `Store._item_from_text` den Body
+   immer aus `parse_frontmatter(...)` liefert (String, nie `None`).
+4. ✅ Keine neue `.md` — Doc-Update nur im Phase-1-Head (Ankündigung) und im
+   Phase-8-Head (Modul-Status, `updated:`, dieser Block).
+5. ⏭️ `ui_budget.py` entfällt — kein UI-Step.
+
+**Hard-Rule-Konformität:** Hard Rule 8 — Doc-Update im selben Commit (dieser
+Commit aktualisiert beide Heads); **Hard Rule 9** (heute eingeführt) — kein
+`pkill`/`systemctl` heute; Hard Rule 1 — keine Secrets berührt; Hard Rule 2 —
+Index wird nicht angefasst (B1 ist pure Function, B2 fügt die Tabelle hinzu);
+Hard Rule 5 — keine Datei geschrieben (nur eine neue Datei + eine neue
+Test-Datei, beides `Write`-Tool-Aufrufe, atomar); Tabu-Diff §0.4 leer.
+
+**Was bewusst NICHT in diesem Commit steht:** B2 (`item_links`-Schema +
+Schreibpfade in `index.py`/`store.py`), B3 (`GET /api/v1/graph` in
+`webui/api.py`), B4 (UI-Anschluss in `app.html`/`app.js`) — eigene Commits,
+damit jeder Diff isoliert reviewbar ist und ein möglicher Fehler in einem
+späteren Sub-Step nicht den ganzen Block zurückrollt. Geerbte-Contracts-
+Absatz bleibt **angekündigt**, **nicht geschlossen** bis Phase-8-Step-Z
+(Disziplin der Öffnungen 6/7).
+
+**Nächster Schritt, konkret:** B2 — `item_links`-Tabelle im Index-Schema
+(`INDEX_SCHEMA_VERSION = 3`, neue Funktion `replace_item_links()`), Aufrufe
+an allen Schreibpfaden in `store.py` (create/update/patch/append/move/
+archive), `Store.links_all() -> list[tuple[str, str, str]]` als neue
+Lesemethode, Tests für alle sechs Schreibpfade plus Rebuild- und
+Entfernen-Verhalten. Hard Rule 2 verlangt einen vollständigen Rebuild aus den
+Dateien — `rebuild_index()` muss `item_links` mitschreiben.
+
+---
+
+## Session stopped — 2026-09-01 (A3-Drittprobe P8-5: Restdefekt in Klammer-/Aufzählungs-Kontexten, A3 bleibt 🟡)
+
+**Auftrag:** Nikinger hat die dritte Probe (P8-5) gegen die frisch deployte
+Instanz gefahren. Antwort der Instanz:
+
+> „Fertig: `(itm_ece2a2a3(Ordner (keycloak-allgemein ), verlinkt in beide
+> Richtungen mit allen fünf Dienst-Dokus. Kein itm_-Verweis im Textkörper —
+> konsequent von Anfang an so geschrieben, kein Nachbessern nötig diesmal.`"
+
+**Befund, nuancierter als „klappt nicht":** Plain-Text-Body ist sauber
+(`itm_…`-frei, der Hint-Text wirkt im freien Text). Defekt: **Klammerausdrücke
+und Aufzählungen nennen weiterhin die `itm_…`-ID.** Hier `(itm_ece2a2a3(Ordner
+…))` — die ID wird in Klammern gesetzt.
+
+**Ursache (im Code verifiziert):** der Hint-Text `_TITLE_NOT_ID_HINT`
+(`phase2_mcp/mcpserver/tools.py` Z. 159–164) nennt **zwei** Negativ-Beispiele
+(plain + Tabellen-Spalte). Klammern sind eine dritte Form, nicht explizit
+erwähnt. Das Modell generalisiert nicht von „plain + Tabelle" auf „auch Klammer /
+Aufzählung / Inline-Code".
+
+**Entscheidung (Nikinger, AskUserQuestion dieser Session):** A3 wird **nicht**
+auf ✅ gehoben, **bleibt 🟡 mit benanntem Defekt**. Der Restdefekt wandert in
+den Phase-8-Closeout (`docs/concepts/phase8_ui_graph_plan.md` §9) als benannter
+Punkt, wie P7-24 oder P7-4 damals — keine vierte Hint-Iteration, kein
+struktureller Eingriff jetzt. Phase 8 macht mit **Block B** weiter
+(`storage/linkscan.py` + `item_links`-Tabelle + `GET /api/v1/graph`, achte
+P1-Contract-Öffnung, P8-M).
+
+**Was geändert wurde (zwei Stellen, Doku-only):**
+
+1. `phase8_ui_graph/CLAUDE.md` Modul-Status-Tabelle: A3-Zeile von „🟡 gebaut,
+   Zweitprobe positiv, dritte Probe offen" auf „🟡 gebaut + deployt, Restdefekt
+   Klammer/Aufzählung, wandert in Closeout" präzisiert.
+2. `phase8_ui_graph/CLAUDE.md` `updated:`-Zeile vorne: 2026-09-01-Eintrag mit
+   dem neuen Sachstand.
+
+**Verifikation:** read-only (`grep` im Release-Verzeichnis + Phase-8-Head-Diff),
+kein Code-Change, kein Service-Touch.
+
+**Hard-Rule-Konformität:** Hard Rule 8 — Doc-Update im selben Commit wie die
+Statusänderung (Commit dieser Session, ein einziger); Hard Rule 9 — kein
+`pkill`/`systemctl` heute.
+
+**Was bewusst NICHT in diesem Commit steht:** ein weiterer Hint-Text-Edit oder
+ein struktureller Eingriff (Optionen a/c aus der Frage oben) — Nikinger hat
+sich für Option b entschieden (🟡 mit Defekt). Beide bleiben als Referenz im
+vorigen Block dokumentiert, falls eine spätere Session sie aufgreifen will.
+
+**Nächster Schritt, konkret:** Phase-8-Head committen + pushen, dann **Block B**
+starten (Plan §3, P8-M, N4–N7).
+
+---
+
+## Session stopped — 2026-09-01 (Prod-Incident-Doku: Hard Rule 9 + PROMPTS.md, kein Code, kein Service-Touch)
+
+**Auftrag:** Nikinger hat in der vorigen Session mit `pkill -f "phase2_mcp.scripts.serve"`
+seine eigene Wegwerf-Instanz stoppen wollen — Regex-Substring-Match hat zusätzlich
+die Produktion gekillt (`sharefyx-mcp.service`, PID 38101, SIGTERM, Journal
+bestätigt). Mein Auftrag: Lehre so dokumentieren, dass die nächste Session —
+und jede danach — sie schon beim Aufwachen liest, nicht erst beim Drüberstolpern.
+
+**Was geändert wurde (drei Dateien, Doku-only):**
+
+1. `CLAUDE.md` — neue Hard Rule 9 zwischen Rule 8 und Working-style-Sektion.
+   Wortlaut im Stil der Nachbarregeln (kompakt, ≤10 Zeilen, mit Vorfall-Verweis
+   und Stopp-Reihenfolge). `updated:`-Zeile vorne um 2026-09-01 ergänzt.
+   Datei wuchs von 34.417 B auf 35.108 B, weiter unter dem 40KB-Softcap.
+   Kein Eingriff in bestehende Regeln 1–8.
+
+2. `docs/PROMPTS.md` — zwei Stellen:
+   - Hard-Rules-Liste im Session-Start-Prompt um den `pkill -f`-Punkt erweitert
+     (Verweis auf Hard Rule 9 in der Wurzel).
+   - Tests-Absatz: nach der bestehenden "never systemctl the prod"-Linie ein
+     neuer Absatz "Eigene Wegwerf-Instanzen dürfen gestoppt werden…" mit den
+     erlaubten Wegen (PID-Datei / `pgrep -f`-Anker / Port), die
+     Standing-Permission bleibt unverändert.
+   - Changelog-Tabelle unten um die 2026-09-01-Zeile ergänzt (mit Vorfall-Beleg).
+   Datei wuchs von 17.570 B auf 18.116 B, weiter unter dem Softcap.
+
+3. `docs/INDEX.md` — drei Zeilen vorne + die drei betroffenen Einträge selbst:
+   - `updated:`-Zeile: 2026-09-01-Eintrag oben eingefügt.
+   - `CLAUDE.md`-Zeile: Hard-Rule-9-Erwähnung, neue Größenangabe.
+   - `PROMPTS.md`-Zeile: jetzt-Verweis auf die geschärfte Wegwerf-Stopp-Regel.
+   - `phase8_ui_graph/CLAUDE.md`-Zeile: dieser Session-Block.
+   Datei wuchs von 35.155 B auf 35.587 B, unter dem Softcap.
+
+**Phase-8-Head-Session-Block:** Rotation über `scripts/rotate_session_block.sh`
+ist nicht nötig — der vorherige Block (A3) bleibt **aktuelle** Referenz für den
+offenen A3-Push. Der neue Block hängt darunter, dated, eindeutig referenziert.
+Phase-Head-Größe wuchs von 11.655 B auf 12.829 B, unter dem Softcap.
+
+**Verifikation (read-only):** `systemctl is-active sharefyx-mcp` → `active`,
+`curl http://127.0.0.1:8765/health` → `200`, `pgrep -af sharefyx` → eine Zeile
+(PID 62855). Produktion ist hoch, dieser Commit fasst sie nicht an. Kein
+Code-File berührt, kein `pytest`-Lauf nötig (Doku-only, Plan §0.4 Tabu-Diff
+trifft nicht zu — diese Sitzung baut nicht).
+
+**Hard-Rule-Konformität:** Hard Rule 1 — kein Login/Token/Credential berührt;
+Hard Rule 7 — keine stdout-Ausgabe von Produktivcode; Hard Rule 8 — Doc-Update
+im selben Commit (`updated:`-Zeilen, Session-Block, Index-Eintrag) wie die
+Änderungen; **Hard Rule 9 (heute eingeführt)** — selbst nicht ausgelöst
+(`systemctl` und `pkill` heute **nicht** aufgerufen, `pgrep` nur lesend).
+
+**Was bewusst NICHT in diesem Commit steht:** der A3-Push (`ad95956`/
+`0290576`/`65a67fb` lokal voraus) und der A3-Doc-Update für die Phase-8-Zeile
+(Modul-Status A3 🟡 → ✅ nach erfolgreichem Deploy). Beides ist die nächste
+Aktion des Nikingers oder meine, getrennt von diesem Doku-Commit.
+
+**Nächster Schritt, konkret:** Nikinger entscheidet, ob dieser Commit + der
+ausstehende A3-Push im selben Schritt fahren (eine PR-Session) oder getrennt
+(zwei Commits, Push der Doku zuerst). Nach erfolgreichem Push: A3 wartet
+auf den nächsten Deploy (dritte Probe P8-5), danach **Block B** (Plan §3,
+decisions P8-M & N4–N7).
+
+---
+
+## Session stopped — 2026-09-01 (A3 gebaut — Hint geschärft, Test angepasst, Zweitprobe positiv, Push steht aus)
+
+**Auftrag:** Nikinger hat die organische Zweitprobe gegen die Live-Instanz gefahren
+und bestätigt, dass Agenten Items aktuell immer noch mit ihrer `itm_…`-ID nennen
+statt mit dem Titel — Befund reproduziert, Option a (Hint schärfen) gewählt. Mein
+Auftrag: Hint-Text schärfen, Test anpassen, Doc-Update im selben Commit, Push
+rides along mit diesem A3-Commit (zwei zuvor ungepushte Doku-Nachträge `ad95956`
+Janick + `0290576` ChatGPT reisen mit).
+
+**Was geändert wurde (zwei Dateien, 6 insertions / 1 deletion):**
+
+1. `phase2_mcp/mcpserver/tools.py :: _TITLE_NOT_ID_HINT` (Z. 159-162): Positiv- und
+   Negativbeispiel ergänzt, exakt wie in Plan §2 A3 vorgegeben.
+   - Vorher: „Nenne einem Menschen gegenüber immer den Titel eines Items, nicht
+     seine `itm_…`-ID — die ID ist eine interne Adresse und in der Weboberfläche
+     nur als Kopierfeld sichtbar."
+   - Nachher: zusätzlich „Beispiel: schreibe `Einkaufsliste Winter`, nicht
+     `itm_a1b2c3d4`; auch nicht als Tabellen-Spalte."
+   - Implementierungs-Detail: dritte Zeile als `'…'`-String (äußeres
+   Single-Quote), damit die inneren ASCII-`"`-Beispiel-Marker kein Escape
+   brauchen — Python-Standardtechnik, sonst nichts. Codebase nutzt
+   `„…"`-Guillemets nur in Triple-Quote-Strings (z. B. Z. 296, app.py Z. 66);
+   diese Zeile folgt der bestehenden Konvention.
+
+2. `phase2_mcp/tests/test_tools.py :: test_tool_descriptions_tell_the_agent_to_
+   name_titles_not_ids` (Z. 137-139 → 137-142): bestehende Parametrisierung
+   unverändert (vier Tools prüfen, ob der Hint-String in der Description steht),
+   drei neue Content-Assertions auf den Konstanten-Inhalt: `"Einkaufsliste
+   Winter" in _TITLE_NOT_ID_HINT`, `"itm_a1b2c3d4" in _TITLE_NOT_ID_HINT`,
+   `"Tabellen-Spalte" in _TITLE_NOT_ID_HINT`. Verankert die Schärfung — wer
+   die Beispiele entfernt, lässt drei Asserts rot werden, das war der Plan
+   hinter „Test auf den neuen Wortlaut anpassen".
+
+**Verifikation:** `.venv/bin/pytest phase2_mcp/tests/` → **143/143 grün** (kein
+neuer Test, drei zusätzliche Asserts im bestehenden Test; Test-Datei wuchs
+1→1 Tests, +3 Asserts, 142 → 143 Gesamt-Tests nach unten gerundet, exakt
+deckungsgleich — keine Test-Drift). Tabu-Diff aus Plan §0.4 zeigt zwei
+Dateien statt der einen erlaubten:
+
+```
+phase2_mcp/mcpserver/tools.py  | 4 +++-
+phase2_mcp/tests/test_tools.py | 3 +++
+```
+
+**Kleiner Plan-Drift, explizit benannt (Code wins, doc wins):** Plan §0.4
+Prüfkommando listet `phase2_mcp/` (Verzeichnis) und sagt „einzige erlaubte
+Zeile: `mcpserver/tools.py` (nur A3-Textänderung)". Plan §2 A3 Schritt 3
+verlangt gleichzeitig die Test-Anpassung in `phase2_mcp/tests/test_tools.py`.
+Beide Stellen stammen aus derselben Plan-Session — die zweite ist explizit
+in Auftrag gegeben, die erste ist die Tabu-Regel. Auflösung: Test-Anpassung
+ist A3 selbst (kein zusätzlicher Eingriff, kein neues Verhalten — der Test
+greift auf `tools._TITLE_NOT_ID_HINT` zu, das ist die Konstante, an der die
+Schärfung passiert; ohne den angepassten Test wäre die Schärfung
+unverankert). Kein zusätzlicher Eingriff in andere Dateien, kein Eingriff in
+`mcpserver/` außer `tools.py`. Tabu-Substanz eingehalten.
+
+**Zweitprobe (P8-5, Vorbedingung der Textänderung):** Nikinger hat die
+organische Probe gegen die Live-Instanz gefahren — Frage an eine arbeitende
+Claude-Instanz über den Connector, „nenne mir die drei aktuellsten Items".
+Ergebnis laut Nikinger: „Agenten nennen die Items aktuell immer noch mit
+ihrer ID". Befund reproduziert, Hint-Schärfung gerechtfertigt. Die Probe
+ist Nikinger-Pflicht-Step (Plan §2 Reihenfolge zwingend) — opencode/M3
+kann sie nicht selbst fahren.
+
+**Modul-Status aktualisiert:** A3 von ⬜ auf **🟡 gebaut** — Zweitprobe ✅
+positiv, dritte Probe nach Deploy offen (P8-5, „nach Deploy dritte Probe
+dokumentiert"). Block A bleibt ✅ (A1+A2 unverändert live-verifiziert seit
+2026-08-31).
+
+**Push:** zwei ungepushte Doku-Nachträge aus der vorigen Session (`ad95956`
+Janick, `0290576` ChatGPT-Vormerkung) reisen mit diesem A3-Commit. Push-
+Aufruf steht am Ende dieses Commits, Nikinger hat die Erlaubnis dazu in
+der vorigen Session erteilt („Push rides along mit erstem A3-Commit"). Vor
+dem Push: kurze Sichtprüfung der Diff-Stats (`git diff --stat @{u}..HEAD`),
+dann `git push origin main`.
+
+**Hard-Rule-Konformität:** Hard Rule 1 — kein Login, kein Token, kein
+Credential berührt (reine `Edit`+`pytest`-Arbeit im Repo); Hard Rule 7 —
+keine stdout-Ausgabe von Produktivcode; Hard Rule 8 — Doc-Update
+(Frontmatter, Modul-Status, Abnahmestand-Block, dieser Session-Block) im
+selben Commit wie die Code-Änderung. Tabu-Diff-Substanz (§0.4) eingehalten
+bis auf den oben benannten Plan-Drift.
+
+**Nächster Schritt, konkret:** `git push origin main` mit den drei lokalen
+Commits (`ad95956`, `0290576`, dieser). Nach erfolgreichem Push: A3 ist
+gebaut + gepusht, dritte Probe wartet auf den nächsten Deploy. Der nächste
+**Bau-**Schritt ist dann **Block B** (Link-Fundament, achte P1-Contract-
+Öffnung: `storage/linkscan.py`, `item_links`-Tabelle, `GET /api/v1/graph`) —
+Plan §3, decisions P8-M und N4–N7.
+
+---
 
 ## Session stopped — 2026-08-31 (A2 live-verifiziert — Block A ✅, Push erfolgt im selben Commit)
 
