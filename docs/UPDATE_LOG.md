@@ -10,6 +10,10 @@
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
 ## 2026-09-01
+- Links zwischen Notizen werden anklickbar: ein `#item/...`-Link im Text einer Notiz öffnet direkt das verlinkte Gegenstück — vorher waren die Links sichtbar, aber ohne Funktion.
+- Im Editor erscheint neben dem Links-Feld eine kleine Lupe zum Suchen und bequemen Anhängen einer Notiz per Klick.
+
+## 2026-09-01
 - Claude nennt dir gegenüber jetzt den Titel einer Notiz statt einer internen ID — die Kennung bleibt im Hintergrund, der Titel ist, was du im Browser siehst.
 
 ## 2026-08-31
