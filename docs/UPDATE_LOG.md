@@ -9,6 +9,12 @@
      (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
+## 2026-09-02
+- Die Übersicht ist jetzt tabellos: jede deiner Spaces bekommt eine eigene Zeile mit Zähler-Chips für „Offen", „Erledigt", „Notizen" und „Archiv" — ein Klick auf einen Chip öffnet die zugehörige Liste. Vier gleiche Kacheln gibt es nicht mehr.
+- Die Übersicht bekommt einen neuen Abschnitt „Verknüpfungen": ein Graph zeigt, welche Notizen aufeinander verweisen (über das Links-Feld oder eine `itm_…`-Referenz im Text) — gemeinsame Tags oder Ordner kannst du bei Bedarf zuschalten, Standard sind nur die echten Verweise.
+- Klick auf „Übersicht" zeigt jetzt alle lesbaren Items als Liste (eigene und geteilte Spaces zusammen) — vorher blättertest du in den zuletzt geöffneten Space zurück.
+- Eine kleine Legende über der Space-Liste zeigt die drei Kategoriefarben: eigener Space, geteilter Space, fremder Space.
+
 ## 2026-09-01
 - Links zwischen Notizen werden anklickbar: ein `#item/...`-Link im Text einer Notiz öffnet direkt das verlinkte Gegenstück — vorher waren die Links sichtbar, aber ohne Funktion.
 - Im Editor erscheint neben dem Links-Feld eine kleine Lupe zum Suchen und bequemen Anhängen einer Notiz per Klick.

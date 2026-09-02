@@ -4,7 +4,7 @@ purpose: Menschliche Übersicht + Maschinen-Setup (venv, Keyring, Datenverzeichn
 read-when: erstes Setup auf einer neuen Maschine, oder wenn jemand wissen will, was das Ding überhaupt ist
 detail: L2
 up: docs/INDEX.md
-updated: 2026-09-01
+updated: 2026-09-02
 ---
 # Space-Server
 
@@ -56,30 +56,28 @@ noch keine eigene Zeile, siehe `phase3_edge/CLAUDE.md`.
 Der Storage-Kern ist die einzige Komponente, die Daten anfasst. MCP und REST sind zwei dünne
 Adapter darüber — deshalb wird der Kern zuerst gebaut und offline bewiesen.
 
-## Sneak Peak
+## Sneak Peak — Phase 8 (v3)
 
-Neun Screenshots aus Phase 8 Block C (UI-Neuanstrich v3: IBM Plex Sans Var + Plex Mono,
-Lucide-Icons statt HTML-Entities), gefahren gegen eine Wegwerf-Instanz mit frischem
-`DATA_ROOT` und eigener `auth.sqlite3`. Akzentfarbe ist `#3E8DF3`; Hintergrund dunkel;
-deutsche UI-Texte.
+Sechs Screenshots aus Phase 8 Block D (v3.0): tabellose Übersicht mit Space-Zeilen,
+Verknüpfungs-Graph als Force-Directed-Layout, Knoten-Klick öffnet das Item. Gegen
+eine Wegwerf-Instanz mit 26 Items über drei Spaces (eigener + zwei fremde-readable),
+Frontmatter-Links, Body-Referenzen, gemeinsame Tags und Ordner — die Toggles
+zeigen, wie das Bild mit jeder zugeschalteten Kantenart dichter wird.
 
 | | |
 |:---:|:---|
-| ![Anmelden](docs/screenshots/01_login.png) | ![Übersicht](docs/screenshots/02_overview.png) |
-| Anmelden | Übersicht nach Update-Banner |
-| ![Notizen-Filter](docs/screenshots/03_list.png) | ![Editor Vorschau](docs/screenshots/04_editor.png) |
-| Notizen mit Verschieben-/Freigeben-Icons | Editor-Vorschau mit Toolbar-Icons |
-| ![Editor Bearbeiten](docs/screenshots/05_editor_edit.png) | ![Konto](docs/screenshots/06_konto.png) |
-| Editor-Bearbeiten-Modus | Passwort-ändern-Dialog |
-| ![Übersicht im Edit-Kontext](docs/screenshots/07_overview_full.png) | ![Schmaler Viewport](docs/screenshots/08_rail_close.png) |
-| Übersicht mit selektiertem Item | Schmaler Viewport — Rail kollabiert auf Icons |
-| ![Saubere Übersicht](docs/screenshots/09_overview_clean.png) | |
-| Saubere Übersicht im 1440×900-Viewport | |
+| ![Übersicht tabellos](docs/screenshots/sp2_01_overview_spaces_rows.png) | ![Globaler Scope](docs/screenshots/sp2_02_overview_global_scope.png) |
+| Übersicht mit drei Space-Zeilen (eigene + fremde, Counter-Chips), Legende, Graph im Default | „Alle Items" nach Home-Klick — die Liste zeigt jetzt eigene und fremde Items zusammen |
+| ![Graph mit Default](docs/screenshots/sp2_03_graph_default.png) | ![Graph mit Tag-Toggle](docs/screenshots/sp2_04_graph_with_tags.png) |
+| Verknüpfungs-Graph mit nur expliziten Kanten (Frontmatter + Body) | zusätzlich gestrichelte Linien für gemeinsame Tags |
+| ![Graph mit Tag + Ordner](docs/screenshots/sp2_05_graph_with_folders.png) | ![Knoten-Klick öffnet Item](docs/screenshots/sp2_06_node_click.png) |
+| zusätzlich gepunktete Linien für gemeinsame Ordner — der Graph wird erwartbar dichter | Klick auf einen Knoten öffnet das Item im Editor-Bereich, mit Versionsband und Metadaten |
 
-Hinweis: die Screenshots wurden **vor** dem Phase-8-Live-Deploy gemacht und zeigen den
-Stand des lokalen Working-Trees. Bucket-Tiles (`0 Offen / 0 Erledigt / 3 Notizen / 0
-Archiv`) werden in Block D (`P8-J`, tabellose Space-Zeilen) durch eine nicht-Card-Darstellung
-ersetzt — die vier Cards sind ein bewusst noch nicht angefasster AI-Tell (C0-F12/F13).
+Hinweis: die Screenshots wurden **vor** dem Phase-8-Block-D-Live-Deploy gemacht und
+zeigen den Stand des lokalen Working-Trees. Die älteren Screenshots aus Block C
+(`docs/screenshots/01_login.png` … `09_overview_clean.png`, mit Kachel-Grid) bleiben
+als historische Referenz im Verzeichnis, sind aber **nicht** mehr aktuell — wer
+die aktuelle Oberfläche sehen will, schaut auf die obigen sechs Bilder.
 
 ## Setup
 

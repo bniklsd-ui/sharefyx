@@ -3,12 +3,155 @@ status: live
 purpose: Archiv älterer Session-Blöcke aus phase8_ui_graph/CLAUDE.md — newest-first, verbatim per Rotationsregel
 read-when: nur wenn der aktuelle Session-Block im Phase-Head nicht reicht und Verlauf gebraucht wird
 detail: L3
-updated: 2026-09-02 (D1-Block nach D2-Session ins Archiv -- 20 Bloecke newest-first, Phase-8-Head jetzt mit D2-Block allein) | 2026-09-02 (C3-Block nach D1-Session ins Archiv -- 19 Bloecke newest-first, Phase-8-Head jetzt mit D1-Block allein; Head 41.8KB->45.1KB ueber Softcap benannt) | 2026-09-01 (Sichtpruefung-1-Block (vom Vortag) nach C3-Rotation ins Archiv gewandert -- jetzt 18 Bloecke newest-first; Phase-8-Head wieder unter dem 40KB-Softcap) | 2026-09-01 (zwölfte Rotation, 17 Blöcke)
+updated: 2026-09-02 (D2-Block nach D3-Session ins Archiv -- 21 Bloecke newest-first, Phase-8-Head jetzt mit D3-Block allein) | 2026-09-02 (D1-Block nach D2-Session ins Archiv -- 20 Bloecke newest-first, Phase-8-Head jetzt mit D2-Block allein) | 2026-09-02 (C3-Block nach D1-Session ins Archiv -- 19 Bloecke newest-first, Phase-8-Head jetzt mit D1-Block allein; Head 41.8KB->45.1KB ueber Softcap benannt) | 2026-09-01 (Sichtpruefung-1-Block (vom Vortag) nach C3-Rotation ins Archiv gewandert -- jetzt 18 Bloecke newest-first; Phase-8-Head wieder unter dem 40KB-Softcap) | 2026-09-01 (zwölfte Rotation, 17 Blöcke)
 up: CLAUDE.md
 updated: 2026-09-01 (zwoelfte Rotation: C2-Block ins Archiv nach Screenshots+README-Session -- Sichtpruefung 1 mit 9 Screenshots gegen Wegwerf-Instanz, README "Sneak Peak"-Sektion neu, docs/screenshots/ neu im INDEX, C2+Docs-Commit 0d97b3a gepusht; Head 37.7KB->33.6KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 103.8KB->114.0KB; keine Code-Aenderung ausserhalb webui/static + build_icon_sprite.py + vendor/, keine Service-Touch in dieser Sitzung) | 2026-09-01 (elfte Rotation: C1-Block ins Archiv nach C2-Session -- C2-Block (Lucide-Sprite, 18 Icons, build_icon_sprite.py, js/icons.js, .icon-CSS) ergaenzt, dann rotiert; Head 33.7KB->37.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 96.0KB->103.8KB; F9/F10/F11 aus C0 geschlossen; keine neue P1-Contract-Oeffnung; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (zehnte Rotation: C0-Block ins Archiv nach C1-Session -- C1-Block (Plex-Font-Swap + CSS-Typo-Tokens, 35 Findings aus C0 abgearbeitet fuer C1) ergaenzt, dann rotiert; Head 27.5KB->33.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 89.3KB->96.0KB; C1-Commits 0281cce + 08bff55 im Head referenziert; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (neunte Rotation: Gate-B→C-Block ins Archiv nach C0-Session -- C0-Block ergaenzt, dann rotiert; Head 39.0KB->31.4KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 81.3KB->89.3KB; C0-Findings-Tabelle (35 Eintraege) lebt im Head; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (achte Rotation: B4-Block ins Archiv nach Gate-B→C-Verifikation -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf, pytest 958/958 gruen, Charakterisierung byte-identisch, Tabu-Diff leer; Head jetzt mit 14.8 KB unter dem Softcap, SESSIONS_ARCHIVE.md 76.9 KB; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (siebte Rotation: fuenf Bloecke ins Archiv -- A3-Bau, Hard-Rule-9-Doku, Versions-Bump v2.2.3, A3-Drittprobe mit Restdefekt, B1 linkscan.py + Tests; Head jetzt 16.4 KB mit genau einem Block, 12 Bloecke im Archiv, Phase-8-Head wieder unter dem 40KB-Softcap; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8
+
+## Session stopped — 2026-09-02 (Block D D2 gebaut — handgerollter Canvas-Force-Graph in js/graph.js, Playwright-verifiziert gegen Wegwerf-Instanz 127.0.0.1:18768, 7/7 Checks grün)
+
+**Auftrag:** Block D D2 (Plan §5 D2, P8-D/P8-E) — Verknüpfungs-Graph: `GET /api/v1/graph`
+(B3, ACL-gefiltert) als Datenquelle, handgerollter Canvas-Force-Graph (kein D3/PixiJS,
+Plan verbietet Bibliotheken), implizite Kanten clientseitig (gemeinsame Tags /
+gemeinsamer Ordner), zwei Toggles (Tags/Ordner, Default aus), Interaktion (Hover-Dim,
+Klick → `Editor.selectItem`, Drag, Wheel-Zoom, Pan, Doppelklick-Reset), `prefers-
+reduced-motion` synchron. Vorlage: vorheriger Session-Block hatte D2 als nächsten
+Schritt benannt.
+
+**Code-Änderungen (fünf Dateien, +~640 Zeilen, 0 Tabu-Diff-Zeilen §0.4):**
+
+- `phase5_ui/webui/static/js/graph.js` (neu, 542 Zeilen, davon ~120 Kommentare) —
+  selbstgeschlossenes Modul ohne externe Library-Abhängigkeiten. Daten-Layer:
+  `loadGraph()` ruft `GET /api/v1/graph`, speichert `nodes`/`explicitEdges`,
+  baut `nodeById`-Lookup; `rebuildImplicitEdges()` läuft bei Toggle-Wechsel
+  und baut `implicitEdges` aus `buildTagEdges()` (gleiche-Tag-Paare, >15-Knoten-
+  Skip-Riegel P8-21) und `buildFolderEdges()` (gleicher space+folder, folder != "").
+  Simulation: flache Arrays, `applyForces()` mit paarweiser `O(n²)`-Repulsion +
+  Federkraft je Kante (Ruhelänge 60px, einheitlich für explizit und implizit —
+  eine stärkere Frontmatter-Feder wäre eine stillschweigend eingeführte
+  Semantik) + Zentrums-Gravitation; `integrate()` mit Dämpfung 0.85; Alpha-Decay
+  0.985, Stopp bei α < 0.005; `prefers-reduced-motion` → synchron 300 Ticks ohne
+  `requestAnimationFrame`-Loop (kein Dauerbrenner). Render: Canvas 2D mit
+  `devicePixelRatio`-Korrektur (max 2×, headless-getrieben bei 1), Knotenfüllung
+  = Kategoriefarbe via `spaceCategory()` aus C3, Knotenradius `min(12, 4 +
+  2·log2(1+deg))`, Kantenstile (explizit solide, Tag gestrichelt [4,4], Ordner
+  gepunktet [1.5,3]), Labels nur bei Zoom > 1.2 oder Hover-Nachbarschaft
+  (Plan §5 D2). Interaktion: `mousedown`/Move/Up mit Hit-Test (Hover-Toleranz
+  14px über den sichtbaren Radius hinaus), Pan-Geste wenn kein Knoten getroffen,
+  Wheel-Zoom 0.5–2.5× um den Mauspunkt herum (Bildausschnitt stabil), Doppelklick
+  setzt Zoom/Pan zurück. Empty-State: `#overview-graph-empty` zeigt den
+  Hinweistext, sobald keine Kante existiert; Toggle auf der `.hidden`-Property,
+  in `updateEmptyState()` aktualisiert. Zoom-Readout (`#overview-graph-zoom`) zeigt
+  die aktuelle Zoom-Stufe in Prozent.
+- `phase5_ui/webui/static/app.html` — Graph-Gerüst aus D1 erweitert: Toolbar
+  (`.overview__graph-toolbar`) mit zwei `<label>`-Toggles (Tags, Ordner) und
+  Zoom-Readout, `<canvas>`-Element bleibt; `<p class="overview__graph-empty"
+  id="overview-graph-empty">` als statischer Hinweistext. `aria-label` am Canvas,
+  `role="img"` für Screenreader.
+- `phase5_ui/webui/static/app.css` — Toolbar als absolute Position oben links im
+  Panel (`z-index: 1`, `pointer-events: auto`, damit sie nicht vom Canvas-Pan
+  abgefangen wird), Toggles als Inline-Flex mit `accent-color: var(--accent)`;
+  Empty-Hint zentriert im Panel (`position: absolute; inset: 0;`), `pointer-events:
+  none` damit Knoten-Klicks durchkommen, `code` darin in Plex Mono (Plex-Tokens
+  aus C1).
+- `phase5_ui/webui/static/js/app.js` — Graph-Modul in der Init-Kette
+  (`initGraph()`), `loadGraphPanel()` zusätzlich an drei Stellen gerufen: in
+  `init()` als letzter Schritt der Initialisierung, im Home-Knopf-Handler
+  (`closeEditor() → navigateAll() → loadGraphPanel()`), und im Refresh-Knopf-
+  Handler (parallel zu `List.loadOverview()`). Damit ist der Graph überall
+  frisch, wo der Plan §5 D2 ihn vorsieht: App-Start, Home-Klick, Refresh-Klick.
+  Polling bleibt auf die Zähler beschränkt (Plan §5 D1: „Graph lädt nur bei
+  Öffnen/Refresh, P8-J").
+- `phase5_ui/webui/static/js/icons.js` — unangetastet.
+
+**Wegwerf-Instanz D2 neu (zwei Skripte, 0 Repo-Geheimnisse berührt):**
+
+- `phase8_ui_graph/scripts/wegwerf_setup_d2.py` — Standing-Permission-Muster
+  C3/D1 reproduziert, eigener Port **18768**, File-Keyring-Backend, User `alpha`
+  direkt in `auth.sqlite3` provisioniert (Hard Rule 1). Datenlage: 10 Items in
+  alpha + 4 Items in beta = 14 Knoten, explizite Frontmatter-Kanten
+  (`Bezug zu Phase 8 → Erste Notiz`, `Geteilte Notiz eins → Beta Notiz eins`,
+  `Geteilte Notiz zwei → Beta Notiz zwei`, `Beta Notiz eins → Geteilte Notiz zwei`)
+  plus zwei Body-Kanten (`Zweite Notiz → Erste Notiz`, `Beta Notiz zwei →
+  Geteilte Notiz eins`) — sechs explizite Kanten ohne Toggles. Tags: `phase`/
+  `intro`/`wichtig`/`extern`/`log`/`meeting` — Tag-Toggle verbindet gleichgetaggte
+  Knoten, fünfzehn-Knoten-Cutoff-Riegel hält (Plan §5 D2). Folder-Edges bewusst
+  ausgespart (`space_cli create` kennt kein `--folder`), bleibt Sichtprüfung-2
+  überlassen. `_run_cli_json()` setzt `--json` ans CLI-Ende (nach dem
+  Subcommand-Positional — der Fehler aus dem ersten Versuch war eine Lehre für
+  die nächste Wegwerf-Variante).
+- `phase8_ui_graph/scripts/d2_playwright_smoke.py` — sieben Schritte:
+  `step1_static_markup` (kein Login, liest `app.html` direkt, prüft Toolbar/
+  Canvas/Empty-Hint/Zoom-IDs), `step2_login_and_overview` (Login +
+  `wait_for_function(...)` bis Empty-Hint verschwindet ODER Zoom-Readout
+  gefüllt ist + 800ms Pause, damit die Force-Simulation sichtbare Knoten
+  ausgestreut hat — Lehre aus dem ersten Screenshot-Versuch, der die
+  Initial-Lage mit leerem Canvas einfing), `step3_graph_endpoint_payload`
+  (`page.evaluate("async () => (await fetch('/api/v1/graph')).json()")` +
+  Schema-Prüfung gegen den B3-Contract), `step4_default_then_tag_toggle`
+  (Empty-Hint bei Default versteckt, Tag-Toggle einschalten + Zoom-Readout-
+  Aktivität), `step5_canvas_not_blank` (Pixel-Vergleich via
+  `getImageData(0, 0, w, h).data`, mindestens 500 nicht-transparente Pixel —
+  sehr großzügig, ein einzelner 12px-Knoten allein wäre schon > 400), zwei
+  PNG-Screenshots nach `docs/screenshots/d2_{01_overview_with_graph,
+  02_graph_with_tag_toggle}.png` mit Sichtprüfung: 14 Knoten, 6 explizite
+  Kanten (4 Frontmatter + 2 Body, davon 4 als zusammenhängender Cluster im
+  rechten Drittel), Tag-Toggle on erweitert um gestrichelte Linien zwischen
+  gleichgetaggten Knoten (das `extern`-Cluster bildet eine deutliche Sechs-
+  Knoten-Gruppe mit allen 15 Paaren als gestrichelte Linien).
+
+**Verifikation — Selbstprüf-Checkliste §0.6 alle fünf Punkte grün:**
+
+1. `pytest -q` → **958/958 grün** (vorher/nachher identisch, keine Python-Änderung,
+   D2 ist reines Frontend).
+2. Tabu-Diff (`git diff --stat main -- phase4_auth/ phase2_mcp/ phase5_ui/webui/security.py
+   phase1_storage/storage/{models,frontmatter,files,patch,acl,history}.py`) →
+   **leer** (Storage nicht angefasst, Phase 8 Block B bleibt „achte Öffnung bleibt
+   ANGEKÜNDIGT").
+3. JS-Syntax: `node --check` auf `graph.js`/`app.js`/`list.js`/`tree.js`/`state.js`/
+   `icons.js` → **0 errors**. Kein Endpunkt berührt (reines Frontend), P5-B +
+   P8-§0.4 halten.
+4. Doc-Update im selben Commit (Hard Rule 8) — dieser Block. Keine neue `.md`-Datei,
+   keine Index-Zeile nötig.
+5. `python phase5_ui/scripts/ui_budget.py` → **5/5 grün**, app.js+app.css+Font jetzt
+   **119.8 KB** (vorher 113.0, +6.8 KB für `graph.js` 6.2 KB gzipped; Plan §5 D2
+   schätzt 300–400 Zeilen, real ~540 mit Kommentaren — innerhalb der Größenordnung,
+   `graph.js` belegt 6.2 KB von 250 KB Budget). Im Korridor.
+
+**Wegwerf abgebaut:** `kill -TERM $(cat serve.pid)` (PID-Datei-Muster, **kein** `pkill -f`
+mit Regex — Hard Rule 9 eingehalten); `rm -rf /tmp/opencode/sharefyx-wegwerf-d2/` im
+selben Zug. `curl http://127.0.0.1:8765/health` → `{"status":"ok", …}` (uptime 66363 s,
++1206 s gegenüber Sessionbeginn — kein Service-Touch durch diese Session). `ps -ef` zeigt
+nur die `sharefyx-mcp.service` (PID 67925, Produktion); Wegwerf-PID weg.
+
+**Verbleibend für die nächste Session (D3, atomar):**
+
+- **D3** (Plan §5 D3, P8-K) — `.rail__version` `v2.2.3` → `v3.0`, neuer oberster
+  `docs/UPDATE_LOG.md`-Eintrag am Deploy-Tag (P6-X-Gate), `ui_budget.py` nach
+  graph.js weiterhin alle vier Budgets grün (V84), `_measure_latency()`-
+  Erweiterung um `/graph` nach Ermessen (V90, informativ — entscheidet der
+  Ausführende).
+- **Sichtprüfung 2** (Plan §8) im selben D3-Commit — Übersicht + Graph gegen
+  realistischere Daten (~30 Items, gemischte Kategorien, mit Folder-Edges),
+  per Playwright. Fünf bis sechs Screenshots statt der bisherigen 9–12,
+  weil Layout dichter wird.
+- **README Sneak Peak** — Phase-8-Block am Anfang der Tabelle um die D1/D2-
+  Screenshots erweitern (`d1_01`, `d2_01`, `d2_02`), bestehende C1/C2-Bilder
+  bleiben — dienen weiterhin als Schriftbild- und Icon-Beleg.
+- **`phase1_storage/CLAUDE.md`** — achte P1-Contract-Öffnung am Ende des
+  Phase-8-Abschlusses (Step Z) als „geschlossen" markieren, nicht hier schon.
+
+**Nächster Schritt, konkret:** **D3 (Plan §5 D3)** in dieser Session — Versions-Bump
+`.rail__version` `v2.2.3` → `v3.0` (eine Stelle, app.html), neuer oberster
+`docs/UPDATE_LOG.md`-Eintrag mit heutigem Datum (P6-X-Gate verlangt das — `deploy.sh`
+bricht ohne diesen Eintrag ab), `ui_budget.py` finaler Lauf als Sichtprüfung, dann
+Sichtprüfung 2 + README-Sneak-Peak + INDEX-Größen nachziehen + Phase-8-Closeout-
+Eintrag im `phase1_storage/CLAUDE.md` für die achte Öffnung. Ein einziger Commit am
+Ende von D3 fasst alles zusammen.
+
+---
 
 ## Session stopped — 2026-09-02 (Block D D1 gebaut — Übersicht tabellos + globaler Home-Scope, Playwright-verifiziert gegen Wegwerf-Instanz 127.0.0.1:18767, 5/5 Checks grün)
 
