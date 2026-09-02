@@ -3,12 +3,157 @@ status: live
 purpose: Archiv älterer Session-Blöcke aus phase8_ui_graph/CLAUDE.md — newest-first, verbatim per Rotationsregel
 read-when: nur wenn der aktuelle Session-Block im Phase-Head nicht reicht und Verlauf gebraucht wird
 detail: L3
-updated: 2026-09-02 (D2-Block nach D3-Session ins Archiv -- 21 Bloecke newest-first, Phase-8-Head jetzt mit D3-Block allein) | 2026-09-02 (D1-Block nach D2-Session ins Archiv -- 20 Bloecke newest-first, Phase-8-Head jetzt mit D2-Block allein) | 2026-09-02 (C3-Block nach D1-Session ins Archiv -- 19 Bloecke newest-first, Phase-8-Head jetzt mit D1-Block allein; Head 41.8KB->45.1KB ueber Softcap benannt) | 2026-09-01 (Sichtpruefung-1-Block (vom Vortag) nach C3-Rotation ins Archiv gewandert -- jetzt 18 Bloecke newest-first; Phase-8-Head wieder unter dem 40KB-Softcap) | 2026-09-01 (zwölfte Rotation, 17 Blöcke)
+updated: 2026-09-02 (D3-Block nach C4+C5-Session ins Archiv -- 22 Bloecke newest-first, Phase-8-Head jetzt mit C4+C5-Block allein; Head 50.8KB ueber 40KB-Softcap benannt -- Glas-Träger-Regeln + gruppierte Selektor-Liste am Dateiende plus ausführlicher Session-Block mit allen Verifikations-Belegen) | 2026-09-02 (D2-Block nach D3-Session ins Archiv -- 21 Bloecke newest-first, Phase-8-Head jetzt mit D3-Block allein) | 2026-09-02 (D1-Block nach D2-Session ins Archiv -- 20 Bloecke newest-first, Phase-8-Head jetzt mit D2-Block allein) | 2026-09-02 (C3-Block nach D1-Session ins Archiv -- 19 Bloecke newest-first, Phase-8-Head jetzt mit D1-Block allein; Head 41.8KB->45.1KB ueber Softcap benannt) | 2026-09-01 (Sichtpruefung-1-Block (vom Vortag) nach C3-Rotation ins Archiv gewandert -- jetzt 18 Bloecke newest-first; Phase-8-Head wieder unter dem 40KB-Softcap) | 2026-09-01 (zwölfte Rotation, 17 Blöcke)
 up: CLAUDE.md
 updated: 2026-09-01 (zwoelfte Rotation: C2-Block ins Archiv nach Screenshots+README-Session -- Sichtpruefung 1 mit 9 Screenshots gegen Wegwerf-Instanz, README "Sneak Peak"-Sektion neu, docs/screenshots/ neu im INDEX, C2+Docs-Commit 0d97b3a gepusht; Head 37.7KB->33.6KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 103.8KB->114.0KB; keine Code-Aenderung ausserhalb webui/static + build_icon_sprite.py + vendor/, keine Service-Touch in dieser Sitzung) | 2026-09-01 (elfte Rotation: C1-Block ins Archiv nach C2-Session -- C2-Block (Lucide-Sprite, 18 Icons, build_icon_sprite.py, js/icons.js, .icon-CSS) ergaenzt, dann rotiert; Head 33.7KB->37.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 96.0KB->103.8KB; F9/F10/F11 aus C0 geschlossen; keine neue P1-Contract-Oeffnung; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (zehnte Rotation: C0-Block ins Archiv nach C1-Session -- C1-Block (Plex-Font-Swap + CSS-Typo-Tokens, 35 Findings aus C0 abgearbeitet fuer C1) ergaenzt, dann rotiert; Head 27.5KB->33.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 89.3KB->96.0KB; C1-Commits 0281cce + 08bff55 im Head referenziert; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (neunte Rotation: Gate-B→C-Block ins Archiv nach C0-Session -- C0-Block ergaenzt, dann rotiert; Head 39.0KB->31.4KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 81.3KB->89.3KB; C0-Findings-Tabelle (35 Eintraege) lebt im Head; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (achte Rotation: B4-Block ins Archiv nach Gate-B→C-Verifikation -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf, pytest 958/958 gruen, Charakterisierung byte-identisch, Tabu-Diff leer; Head jetzt mit 14.8 KB unter dem Softcap, SESSIONS_ARCHIVE.md 76.9 KB; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (siebte Rotation: fuenf Bloecke ins Archiv -- A3-Bau, Hard-Rule-9-Doku, Versions-Bump v2.2.3, A3-Drittprobe mit Restdefekt, B1 linkscan.py + Tests; Head jetzt 16.4 KB mit genau einem Block, 12 Bloecke im Archiv, Phase-8-Head wieder unter dem 40KB-Softcap; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8
+
+## Session stopped — 2026-09-02 (Block D D3 gebaut — Versionierung v3.0, UPDATE_LOG-Eintrag, Sichtprüfung 2 mit 26 Items, README Sneak Peak neu)
+
+**Auftrag:** Block D D3 (Plan §5 D3, P8-K) — Versions-Bump `.rail__version` v2.2.3 → v3.0,
+neuer oberster `docs/UPDATE_LOG.md`-Eintrag am Deploy-Tag (P6-X-Gate), finaler
+`ui_budget.py`-Lauf, Sichtprüfung 2 mit realistischen Daten (~30 Items über mehrere
+Spaces, gemischte Kategorien, mit Folder-Edges), sechs Block-D-End-Screenshots und
+README-Sneak-Peak-Sektion umstellen.
+
+**Code-Änderungen (sechs Dateien, +~480 Zeilen, 0 Tabu-Diff-Zeilen §0.4):**
+
+- `phase5_ui/webui/static/app.html` — `.rail__version` `v2.2.3` → `v3.0`. Eine
+  Stelle, App-Shell-Logo, Plan §5 D3 explizit. Major (`v2`) bleibt, Minor
+  (`v2.2`) bleibt — die Sprung-Konvention für Phase 8 Block D ist „Major UI-
+  Overhaul" → neue Minor-Stelle, hier direkt v3.0 (keine `v2.3`-Zwischenstation,
+  weil das hier der letzte Block der Phase ist und der Versions-Bump zusammen
+  mit Step Z ausgeliefert wird).
+- `docs/UPDATE_LOG.md` — neuer oberster `## 2026-09-02`-Block mit vier `- `-Zeilen
+  (eine Aussage pro Zeile, Parser-Konvention `webui/updates.py :: parse_update_log()`):
+  Übersicht tabellos + Counter-Chips, Verknüpfungs-Graph mit Tag-/Ordner-Toggle,
+  Home-Klick → globaler Scope, Mini-Legende für Space-Kategorien. Bewusst nüchtern
+  Deutsch (P5-U), keine Marketing-Sprache.
+- `README.md` — Sneak-Peak-Sektion komplett ausgetauscht: die neun Phase-8-Block-C-
+  Screenshots werden durch sechs neue `sp2_*`-Screenshots ersetzt, die den
+  Endstand von Block D zeigen (tabellose Übersicht, globaler Scope, Graph mit drei
+  Toggle-Varianten, Knoten-Klick öffnet Item). Format 3×2-Tabelle statt der alten
+  4-5-Reihen-Tabelle — dichter, gleicher visueller Takt. Hinweis-Text unter der
+  Tabelle benennt die alten Screenshots explizit als „historische Referenz, nicht
+  mehr aktuell" und verweist auf die neuen. Frontmatter `updated:` 2026-09-01 →
+  2026-09-02.
+- `phase8_ui_graph/scripts/wegwerf_setup_sichtpruefung2.py` (neu, ~410 Zeilen) —
+  Standing-Permission-Muster reproduziert, eigener Port **18769**, File-Keyring-
+  Backend, User `alpha` direkt in `auth.sqlite3`. Datenlage: 12 alpha + 6 beta +
+  8 gamma = **26 Items** verteilt auf sieben Ordner
+  (`Projekte/Backend`/`Projekte/Frontend`/`Projekte`/`Notizen`/`Logbuch` quer durch
+  alle drei Spaces), gemischte Typen (note + task), Tags überlappend (backend,
+  frontend, infra, planung, retro, lesen, log, meeting, design, wissen,
+  wichtig, qa) — Folder-Edges und Tag-Edges werden gleichzeitig sichtbar, sobald
+  die Toggles an sind. Items werden **nicht** über `space_cli create` angelegt
+  (das kennt kein `--folder`), sondern direkt über `Store.create(..., folder=...)`
+  aus `phase1_storage/storage/store.py` — derselbe Pfad wie die UI selbst.
+  Frontmatter-Links per `Store.update(..., links=[...])`, Body-Referenzen per
+  `Store.update(..., body="...")`. Cleanup per `kill -TERM $(cat serve.pid)`
+  (Hard Rule 9).
+- `phase8_ui_graph/scripts/sichtpruefung2_smoke.py` (neu, ~140 Zeilen) — Playwright
+  gegen `127.0.0.1:18769`. Sechs Screenshots: `sp2_01_overview_spaces_rows.png`
+  (drei Space-Zeilen, Graph-Panel mit Toolbar), `sp2_02_overview_global_scope.png`
+  (Home-Klick → „Alle Items" mit gemischten Spaces), `sp2_03_graph_default.png`
+  (nur explizite Kanten, drei sichtbare Cluster), `sp2_04_graph_with_tags.png`
+  (Tag-Toggle an, gestrichelte Linien), `sp2_05_graph_with_folders.png` (Ordner-
+  Toggle zusätzlich an, gepunktete Linien, Graph wird erwartbar dichter),
+  `sp2_06_node_click.png` (Knoten-Klick öffnet das Item im Editor mit Versionsband
+  und Metadaten). Wartet nach Login explizit auf Graph-Ready-Zustand
+  (`wait_for_function` bis Empty-Hint weg ODER Zoom-Readout gefüllt + 1500ms
+  Pause für die Force-Simulation — Lehre aus dem D2-Smoke-Versuch, wo die
+  Initial-Lage mit leerem Canvas eingefangen wurde).
+- `phase1_storage/CLAUDE.md` — wird in Step Z nachgezogen, nicht hier (D3 ist
+  Vorarbeit für Z, die achte Öffnung bleibt formal offen bis zum Phasen-
+  Abschluss, genau wie ihre Vorgänger-Öffnungen 6 und 7).
+
+**Screenshots (sechs PNG, ~940 KB, unter `docs/screenshots/`):**
+
+- `sp2_01_overview_spaces_rows.png` (137 KB) — Übersicht nach Login: drei Space-
+  Zeilen (alpha mit 5 Offen + 7 Notizen, beta mit 6 Notizen, gamma mit 4 Offen +
+  4 Notizen), Legende oben, Graph-Panel rechts mit Toolbar und zwei Clustern
+  aus Frontmatter-/Body-Kanten. Update-Banner oben zeigt den neuen
+  `## 2026-09-02`-Eintrag.
+- `sp2_02_overview_global_scope.png` (151 KB) — nach Home-Klick: Liste „Alle
+  Items" mit 11+ sichtbaren Items aus drei Spaces (eigene blau, fremde slate),
+  Move/Share-Buttons nur bei eigenen Items, space-dot in der Metazeile
+  korrekt nach Kategorie eingefärbt (C3).
+- `sp2_03_graph_default.png` (151 KB) — Graph mit Default-Toggles (nur
+  explizite Kanten), drei sichtbare Cluster: Alpha-Backend-Gruppe links
+  (Sprint-Planning ↔ Logging standardisieren via Body, Auth ↔ DB-Migration ↔
+  Smoke-Tests via Frontmatter), Alpha-Frontend-Gruppe mittig (Komponenten ↔
+  Storybook), Beta-Gruppe rechts (Design-Reviews ↔ Externe Bibliothek).
+- `sp2_04_graph_with_tags.png` (168 KB) — Tags-Toggle an: gestrichelte Linien
+  zwischen gleichgetaggten Knoten. Sichtbar: backend-Cluster (Alpha-Backend
+  + Gamma-Backend), frontend-Cluster (Alpha-Frontend + Gamma-Frontend +
+  Beta-Projekte), log-Cluster (Alpha-Logbuch + Beta-Logbuch + Gamma-Logbuch).
+- `sp2_05_graph_with_folders.png` (169 KB) — Ordner-Toggle zusätzlich an:
+  gepunktete Linien zwischen Knoten im selben Ordner. Sichtbar:
+  Alpha-Projekte-Backend, Alpha-Projekte-Frontend, Beta-Projekte, Gamma-Projekte-
+  Backend. Kombiniert mit Tag-Kanten → der erwartbar dichter werdende Graph
+  ist im Bild sichtbar.
+- `sp2_06_node_click.png` (153 KB) — nach Klick auf das Alpha-Item „Tagesnotizen"
+  in der globalen Liste: Editor-Bereich öffnet das Item mit Titel, „v1
+  gespeichert"-Badge, Kopfdaten-Panel („active · log · itm_b6518d41"),
+  Markdown-Text-Bereich, Anhängen-Eingabe. Item in der Liste links als aktiv
+  markiert (Akzentkante).
+
+**Verifikation — Selbstprüf-Checkliste §0.6 alle fünf Punkte grün:**
+
+1. `pytest -q` → **958/958 grün** (D3 ist Doku-/Markup-Änderung, keine Python-
+   Änderung seit D2).
+2. Tabu-Diff (`git diff --stat main -- phase4_auth/ phase2_mcp/ phase5_ui/webui/
+   security.py phase1_storage/storage/{models,frontmatter,files,patch,acl,history}
+   .py`) → **leer** (kein Storage-Touch in D3).
+3. JS-Syntax: `node --check` auf `graph.js`/`app.js`/`list.js` → **0 errors**
+   (D3 ist Markup/HTML/CSS/JS-Konstanten, keine neuen JS-Module).
+4. Doc-Update im selben Commit (Hard Rule 8) — dieser Block. Keine neue
+   `.md`-Datei (Phase-Head existiert, Screenshots sind im vorhandenen
+   `docs/screenshots/`).
+5. `python phase5_ui/scripts/ui_budget.py` → **5/5 grün**, app.js+app.css+Font
+   unverändert bei **119.8 KB**. Im Korridor (<250 KB). V84 erfüllt.
+
+**Wegwerf abgebaut:** `kill -TERM $(cat serve.pid)` (PID-Datei-Muster, **kein** `pkill -f`
+mit Regex — Hard Rule 9 eingehalten); `rm -rf /tmp/opencode/sharefyx-wegwerf-sichtpruefung2/`
+im selben Zug. `curl http://127.0.0.1:8765/health` → `{"status":"ok", …}` (uptime 66891 s,
++528 s gegenüber Sessionbeginn — kein Service-Touch durch diese Session). `ps -ef` zeigt nur
+die `sharefyx-mcp.service` (PID 67925, Produktion); Wegwerf-PID weg.
+
+**Verbleibend für die nächste Session (Step Z, Phase-Closeout):**
+
+- **Nikinger-Sichtprüfung 2** am echten Gerät — Übersicht + Graph gegen die echten
+  Spaces (`niklas`/`IT-Sekus-Projekt`/`fabian`) statt gegen die Wegwerf-Daten.
+  Betrifft Layout-Wahl (Clustering-Dichte der realen Spaces), Schriftbild und
+  Icon-Lesbarkeit — kann Feinjustierungen an Farben, Token-Größen oder
+  Interaktions-Distanzen auslösen.
+- **`phase1_storage/CLAUDE.md`** — achte P1-Contract-Öffnung als „geschlossen"
+  markieren, mit Verweis auf Block B Deploy und Charakterisierungs-Disziplin
+  (drei Golden Files byte-identisch).
+- **`docs/concepts/phase8_ui_graph_plan.md` §9** (Closeout, P8-N) — füllen mit
+  Phase-8-Status, Abnahmebilanz P8-1…P8-26, den drei vererbten Defekten
+  aus P7 (P7-24 abgeschlossen in A1, `remove-space`-Auto-Reindex in A2,
+  P7-4 in A3 mit benanntem Restdefekt), den beiden benannten C-Restenfalls
+  (Sichtprüfung-1-Farbfeinwerte, Sichtprüfung-2-Layout nach echten Daten),
+  und der Achten-Öffnung-Schließung.
+- **`ROADMAP.md`** Phase-8-Status auf ✅ oder 🟡 — Nikinger-Entscheidung, wie
+  bei P5/P6/P6.5/P7 nach der Sichtprüfung.
+- **`docs/UPDATE_LOG.md` und `docs/screenshots/`** — Größenangaben in
+  `docs/INDEX.md` nachziehen (Head von 42KB → ~47KB, Archiv von ~139KB, Screenshots
+  ~1.1MB).
+- **`ROOT `CLAUDE.md`** — „Current state" umstellen auf „Phase 8 abgeschlossen" oder
+  „Phase 8 wartet auf Sichtprüfung 2".
+- **Deploy** — `deploy.sh main` durch den Nikinger (UPDATE_LOG-Gate ist
+  erfüllt — der heutige Eintrag steht oben). Health-Gate 3/3, danach die
+  Live-Zeilen der Abnahmematrix.
+
+**Nächster Schritt, konkret:** Nikinger-Sichtprüfung 2 am echten Gerät. Wenn die
+Feinwerte passen, Step Z (Closeout) im selben Sitzungsblock — eine einzige Commit-
+Kette von hier bis zum Phase-8-Abschluss. Wenn nicht, eine kurze Nachschärfung
+als D3.5 (z. B. ein Icon-Tausch, eine Farbfeinjustierung, eine Zoom-Default-
+Änderung) und dann Step Z.
+
 
 ## Session stopped — 2026-09-02 (Block D D2 gebaut — handgerollter Canvas-Force-Graph in js/graph.js, Playwright-verifiziert gegen Wegwerf-Instanz 127.0.0.1:18768, 7/7 Checks grün)
 

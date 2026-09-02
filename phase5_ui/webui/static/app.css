@@ -32,6 +32,18 @@
   --line:          rgba(255,255,255,.08);   /* Haarlinie */
   --line-strong:   rgba(255,255,255,.16);
 
+  /* Liquid-Glas (Phase 8 Block C C4, Plan §4.C4 P8-H). Nur Akzente — niemals die ganze
+     Fläche, niemals die einzige Erkennbarkeit eines Elements (N8, Verbotsliste §0.3 Punkt 6).
+     Tokens sind bewusst getrennt von --surface/-surface-raised: Glas ist eine *Variante*
+     einer Fläche, kein eigener Typ. Fallback-Werte (rgba mit ~55% Alpha, weicher Rand)
+     sind so gewählt, dass die Fläche auch ohne `backdrop-filter` noch lesbar ist
+     (Kontrastpflicht ≥ 4,5:1). */
+  --glass-bg:       rgba(27,32,39,.55);
+  --glass-border:   rgba(255,255,255,.14);
+  --glass-blur:     14px;
+  --glass-highlight:rgba(255,255,255,.08);   /* Top-Innenglanz, gleicher Wert wie
+                                                --btn-glow — bewusst keine zweite Größe */
+
   --text:             #E9EDF2;
   --text-muted:       #C4CDD8;
   --text-faint:       #A7B2BF;
@@ -119,6 +131,14 @@ button, input, select, textarea {
 /* Zahlen/Metadaten (Plan §4.2): Versionen, Daten, Zähler — tabellarische Ziffern. */
 .tnum { font-variant-numeric: tabular-nums; }
 
+/* Selection (Phase 8 Block C C5, F5 Sailop-Dim-7 "craft signal"). Browser-Default
+   ist ein helles Blau, das weder zur Akzent-Familie passt noch zum dunklen Grund --
+   eine winzige eigene Antwort reicht: Akzent-quiet als Hintergrund, heller Text.
+   ::-moz-selection ist die Firefox-Variante (die Spec-Pseudo-Klasse reicht dort
+   nicht in allen Versionen). */
+::selection { background: var(--accent-quiet); color: var(--text); }
+::-moz-selection { background: var(--accent-quiet); color: var(--text); }
+
 /* Nikinger-Entscheidung 2026-08-13, Step 7a Nachtrag: Versionsnummern aus den Dateien selbst
    (`item.version`) sind kein leises Metadatum wie Datum/Typ/Status — sie werden weiß, wo sie
    mit gedämpftem Begleittext im selben Element stehen (der Rest bleibt --text-muted/--text-faint). */
@@ -140,6 +160,43 @@ h3 { font-size: var(--fs-body); }   /* 16px -- Untertitel (vor C1: 15px, kleiner
 
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
+}
+
+/* -- Liquid-Glas-Utility (Phase 8 Block C C4, Plan §4.C4 P8-H) ----------------------------
+   Drei-Schichten-Modell, damit die App auf jedem Browser und in jedem Setting
+   lesbar bleibt:
+     1. Solider Fallback (kein backdrop-filter)  -- Default, gilt für Browser ohne Support
+     2. @supports-Progressive-Enhancement        -- echte Glas-Optik mit Blur + Saturate
+     3. prefers-reduced-transparency              -- OS-Setting „Reduce transparency" (Firefox
+                                                   113+, macOS/Windows) zwingt zurück auf solide
+   Pflicht: Text auf jeder Glas-Fläche ≥ 4,5:1 gegen den effektiven Grund. --text (#E9EDF2)
+   auf --glass-bg (rgba 27,32,39,.55) über --bg (#0B0D10) liegt nach Rechnung bei ~13:1
+   (gilt für jeden Standard-Dunkel-Hintergrund; eine helle Fläche hinter dem Glas kann
+   den Wert drücken — bewusst auf den dunklen App-Grund beschränken, nicht in hellen
+   Kontexten verwenden).
+   Träger-Klassen, die .glass einsetzen: .overlay__panel, .update-banner, .list__head,
+   .toast. Auswahl-Sheen für Listenzeilen ist eine *solide* Variante (Plan §4.C4, N8,
+   Verbotsliste §0.3 Punkt 6) — die Auswahl darf nicht allein von Transparenz abhängen. */
+.glass {
+  background: var(--surface-raised);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--surface-raised);
+  }
 }
 
 /* -- Bedienelemente: die plastische Schicht ---------------------------------------------- */
@@ -459,7 +516,21 @@ select.input {
 
 /* -- Listenspalte ------------------------------------------------------------------------ */
 
-.list__head { border-bottom: 1px solid var(--line); }
+.list__head {
+  /* Liquid-Glas-Träger (Phase 8 Block C C4, Plan §4.C4 P8-H): sticky über scrollender
+     Liste -- man sieht beim Scrollen, dass Inhalt darunter durchläuft (funktional,
+     nicht dekorativ). `z-index: 1` hebt den Kopf über die Zeilen, ohne mit dem
+     Editor oder Detail-Stack (höhere z-indizes) zu kollidieren. Hintergrund, Blur
+     und Reduced-Transparenz-Fallback werden weiter unten via gruppierter Selektoren
+     für alle Glas-Träger einmal gesetzt (siehe `.glass-carriers` unten). Der
+     Trennstrich bleibt -- er trennt semantisch Kopf von Liste, das Glas macht die
+     Fläche nur sichtbar, ohne den Strich zu schlucken. */
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface-raised);
+  border-bottom: 1px solid var(--line);
+}
 
 .list__crumb {
   padding: var(--space) calc(var(--space) * 2) 0;
@@ -549,7 +620,10 @@ select.input {
   min-width: 0;
   background: none;
   border: none;
-  border-left: 2px solid transparent;
+  /* 3px transparenter Default statt 2px (Phase 8 Block C C4, Plan §4.C4 P8-H): die
+     Selektion bekommt eine 3px-Akzentkante, und die Default-Breite muss identisch
+     sein, sonst springt die Zeile beim Auswählen um 1px nach rechts. */
+  border-left: 3px solid transparent;
   padding: var(--space) calc(var(--space) * 2);
   text-align: left;
   cursor: pointer;
@@ -558,9 +632,31 @@ select.input {
 
 .list__row:hover { background: var(--surface); }
 
+/* Auswahl-Sheen (Phase 8 Block C C4, Plan §4.C4 P8-H): die ausgewählte Zeile trägt
+   drei Erkennbarkeits-Layer -- (a) Glass-Sheen via Backdrop-Blur, (b) 3px-Akzentkante
+   links, (c) 1px-Akzent-Outline. (b) und (c) sind *solide*, damit die Auswahl auch
+   bei deaktiviertem Blur oder reduzierter Transparenz vollständig erkennbar bleibt
+   (N8-Bedingung, Verbotsliste §0.3 Punkt 6: "Kein Element, dessen Erkennbarkeit
+   allein von Transparenz/Blur abhängt"). */
 .list__row[aria-current="true"] {
-  background: linear-gradient(90deg, var(--accent-quiet), transparent);
+  background: var(--accent-quiet);
   border-left-color: var(--accent);
+  outline: 1px solid var(--accent);
+  outline-offset: -4px;
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .list__row[aria-current="true"] {
+    backdrop-filter: blur(8px) saturate(1.2);
+    -webkit-backdrop-filter: blur(8px) saturate(1.2);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .list__row[aria-current="true"] {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }
 
 .list__row-move, .list__row-share {
@@ -586,12 +682,38 @@ select.input {
 .list__rows > li.list__row-draggable { cursor: grab; }
 .list__rows > li.list__row-draggable--active { opacity: .5; }
 
-/* Mehrfachauswahl (§9) — `box-shadow` statt `border-left`, damit die Zeile beim Auswählen nicht
-   um 2px springt (jede `<li>` hat sonst keinen linken Rahmen, siehe `.list__rows > li` oben). */
+/* Mehrfachauswahl (§9) — dieselbe Auswahl-Sprache wie `.list__row[aria-current="true"]`
+   darüber: 3px-Akzentkante links + 1px-Akzent-Outline + (mit @supports) Backdrop-Sheen.
+   `border-left` statt `box-shadow`, weil die Default-Breite jetzt 3px ist (oben bei
+   `.list__row`) und damit kein Layout-Shift mehr entsteht, der historische box-shadow-
+   Workaround damit obsolet wird. Die Outline-Innenkante (-4px Offset) hält 1px Abstand
+   zur Border-Außenkante -- die Auswahl ist auch bei reduzierter Transparenz klar
+   gerahmt, die Akzentfarbe dominiert nicht das ganze Zeilen-Innere. */
 .list__rows > li.list__row--selected {
-  background: var(--surface);
-  box-shadow: inset 2px 0 0 var(--accent);
+  background: var(--accent-quiet);
+  border-left: 3px solid var(--accent);
+  outline: 1px solid var(--accent);
+  outline-offset: -4px;
 }
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .list__rows > li.list__row--selected {
+    backdrop-filter: blur(8px) saturate(1.2);
+    -webkit-backdrop-filter: blur(8px) saturate(1.2);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .list__rows > li.list__row--selected {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Kombiniert (selektiert UND aktuell): das innere `.list__row` darf seinen 3px-Border
+   nicht zusätzlich einfärben -- sonst gibt's 6px Akzent links (3px li-Border + 3px
+   button-Border). Border bleibt transparent, der äußere li-Border trägt die Akzenz. */
+.list__rows > li.list__row--selected .list__row { border-left-color: transparent; }
 
 .list__row-title {
   font-size: var(--fs-body);   /* 16px -- vor C1: 15px */
@@ -1219,7 +1341,10 @@ select.input {
   flex: 1;
   min-height: 0;
   display: flex;
-  padding-left: 12px;
+  /* F22 (Phase 8 Block C C5, Plan §4.C5): 12px -> calc(var(--space) * 1.5).
+     Gleicher Wert, aber Token-basiert -- bleibt konsistent mit dem 8-px-Raster
+     (Monet, F20), auch wenn --space je nach Phase irgendwann mal anders gewählt wird. */
+  padding-left: calc(var(--space) * 1.5);
 }
 .version-band {
   position: absolute;
@@ -1253,6 +1378,14 @@ select.input {
   font-size: 13px;
   line-height: 1.6;
   padding: calc(var(--space) * 2) calc(var(--space) * 3);
+  /* F21 (Phase 8 Block C C5, Plan §4.C5): Editor-Body zentriert auf 72ch, kein
+     Vollbreiten-Flattern mehr. `margin: 0 auto` im Flex-Container mit `flex: 1`
+     erzeugt symmetrische Ränder; `max-width` greift, sobald die Spalte breiter ist
+     als 72ch (etwa ab ~700px Detail-Spalte). Das Meta-Panel links (Versionsband
+     + Versions-Nummer) bleibt fest, der Body-Lesebereich folgt dem klassischen
+     Lesebreiten-Korridor (~65–75 Zeichen). */
+  max-width: 72ch;
+  margin: 0 auto;
 }
 .editor__textarea:focus { outline: none; }
 
@@ -1276,13 +1409,15 @@ select.input {
   display: flex;
   align-items: center;
   gap: var(--space);
-  background: linear-gradient(180deg, #1F262F, #151A21);
-  border: 1px solid var(--btn-edge);
+  background: var(--surface-raised);
+  border: 1px solid var(--glass-border);
   /* [2026-08-16, Nikinger-Feedback] war --ok (Grün) -- Erfolg zeigt jetzt dasselbe Blau wie
-     jede andere Hervorhebung in der App, kein zweiter Akzentton. */
+     jede andere Hervorhebung in der App, kein zweiter Akzentton. Die 3px-Akzentkante
+     bleibt der *semantische* Toast-Indikator (Fehler/Warnung überschreiben sie per
+     `.toast--error`/`.toast--warn` -- die Glas-Schicht ersetzt sie nicht). */
   border-left: 3px solid var(--accent);
   border-radius: var(--radius-sm);
-  box-shadow: inset 0 1px 0 var(--btn-glow), 0 8px 28px rgba(0,0,0,.55);
+  box-shadow: 0 8px 28px rgba(0,0,0,.55);
   padding: var(--space) calc(var(--space) * 2);
   font-size: 13px;
   max-width: 70vw;
@@ -1306,13 +1441,18 @@ select.input {
   z-index: 30;
 }
 .overlay__panel {
-  background: linear-gradient(180deg, #1A2029, var(--surface));
-  border: 1px solid var(--line-strong);
+  /* Glas-Träger (Phase 8 C4) -- Hintergrund + Border + Innenglanz werden unten in der
+     gruppierten Selektor-Liste `.list__head.glass, .overlay__panel, .update-banner,
+     .toast` einmal gesetzt (Fallback + @supports + prefers-reduced-transparency).
+     Hier nur Layout + der große Drop-Shadow (P5 Step 7b Nikinger-Entscheidung:
+     "der eine erlaubte große Schatten" -- §4.1). */
   border-radius: var(--radius);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 24px 64px rgba(0, 0, 0, .55);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, .55);
   padding: calc(var(--space) * 3);
   max-width: 440px;
   width: 90%;
+  background: var(--surface-raised);
+  border: 1px solid var(--glass-border);
 }
 .overlay__panel h2 { margin-bottom: var(--space); }
 .overlay__hint { font-size: 12px; color: var(--text-muted); margin: 0 0 var(--space) 0; }
@@ -1384,8 +1524,8 @@ select.input {
   align-items: center;
   justify-content: center;
   gap: calc(var(--space) * 2);
-  background: linear-gradient(180deg, #1F262F, #151A21);
-  border-bottom: 1px solid var(--accent-line);
+  background: var(--surface-raised);
+  border-bottom: 1px solid var(--glass-border);
   box-shadow: 0 8px 28px rgba(0,0,0,.35);
   padding: var(--space) calc(var(--space) * 3);
   font-size: 13px;
@@ -1526,4 +1666,50 @@ body.has-update-banner .shell { height: calc(100vh - var(--banner-h)); margin-to
   .shell[data-view="list"] .detail { display: none; }
   .shell[data-view="detail"] .list { display: none; }
   .shell[data-view="detail"] .detail__back { display: block; }
+}
+
+/* -- Glas-Träger-Anwendung (Phase 8 Block C C4, Plan §4.C4 P8-H) -------------------------
+   Gruppierte Selektor-Liste am Ende der Datei: gleicher Selektor-Spezifitäts-Level wie
+   die einzelnen Träger oben (kein `.carrier.glass` Compound-Selector nötig), aber
+   nach allen Trägern definiert, also gewinnt im Quellordnungs-Konflikt. Drei Schichten:
+
+     1. Default-Block             -> solide Variante aus --surface-raised, Browser ohne
+                                       backdrop-filter-Support (oder deaktiviertes Blur)
+                                       sehen eine vollwertige Fläche.
+     2. @supports backdrop-filter -> echtes Glas (rgba-Background + Blur + Saturate).
+     3. prefers-reduced-transparency -> OS-Setting "Reduce transparency" (Firefox 113+,
+                                          macOS/Windows) erzwingt solide Variante zurück.
+
+   V85 (Self-Check in der Planung): der Fallback funktioniert unabhängig davon, ob der
+   Browser `prefers-reduced-transparency` kennt -- `@supports` greift nur wenn die
+   Capability vorhanden ist, der Default-Block läuft sonst. */
+.list__head,
+.overlay__panel,
+.update-banner,
+.toast {
+  background: var(--surface-raised);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .list__head,
+  .overlay__panel,
+  .update-banner,
+  .toast {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .list__head,
+  .overlay__panel,
+  .update-banner,
+  .toast {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--surface-raised);
+  }
 }
