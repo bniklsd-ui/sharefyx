@@ -7,7 +7,7 @@ up: ../CLAUDE.md
 down:
   - ../docs/concepts/phase1_storage_plan.md   # voller Plan, Entscheidungen A–H, Steps 0–7
   - SESSIONS_ARCHIVE.md                       # ältere Session-Blöcke
-updated: 2026-08-28 (P7 Step Z: sechste und siebte Contract-Oeffnung geschlossen, keine achte angekuendigt -- jede P8-Arbeit an storage/ braucht eine neue benannte Oeffnung) | 2026-08-23 (Phase 7 Step 0: sechste Contract-Oeffnung angekuendigt -- acl.py-Schreibseite, Extraktion aus spacectl.py, P7-M-Lock-Regel) | 2026-08-20 (Phase 6.5 Step B1: fuenfte Contract-Oeffnung gebaut -- Bild-Assets in models/files/store.py, 150 Tests nach drei Advisor-Fixes (Lock-Disziplin, created-Konsistenz, Sniff-Kosten), Zaehlkorrektur 126->130 vor Step B1)
+updated: 2026-09-02 (achte Contract-Oeffnung geschlossen mit Phase-8-Step-Z -- P8-7 bestaetigt: 13 B2-index-Tests gruen, rebuild_index rekonstruiert item_links vollstaendig; Charakterisierung byte-identisch gruen; keine neunte angekuendigt; drei P8-Befunde aus der 200-Knoten/P8-24-Smoke-Sitzung (graph.js-ALPHA_DECAY / api.py-_graph_get-writable-Feld / graph.js-Knotenklick-SelectItem-Pfad) wurden NICHT in storage/ gebaut -- sie liegen in webui/ und sind dort Phase-9-Kandidaten, keine neue storage/-Oeffnung noetig) | 2026-08-28 (P7 Step Z: sechste und siebte Contract-Oeffnung geschlossen, keine achte angekuendigt -- jede P8-Arbeit an storage/ braucht eine neue benannte Oeffnung) | 2026-08-23 (Phase 7 Step 0: sechste Contract-Oeffnung angekuendigt -- acl.py-Schreibseite, Extraktion aus spacectl.py, P7-M-Lock-Regel) | 2026-08-20 (Phase 6.5 Step B1: fuenfte Contract-Oeffnung gebaut -- Bild-Assets in models/files/store.py, 150 Tests nach drei Advisor-Fixes (Lock-Disziplin, created-Konsistenz, Sniff-Kosten), Zaehlkorrektur 126->130 vor Step B1)
 ---
 # CLAUDE.md — Phase 1: Storage-Kern (`phase1_storage/`)
 
@@ -353,6 +353,24 @@ Deploy, sondern die byte-identische Charakterisierung über ALLE
 `storage/`-Änderungen der Phase. Aktueller Stand: B1/B2 fertig +
 live, keine weiteren `storage/`-Änderungen in Block C/D geplant —
 Schließung wird mit dem Phase-8-Abschluss erfolgen, nicht früher.
+
+**[2026-09-02, Phase 8 Step Z] Achte P1-Contract-Öffnung geschlossen** (gemäß der
+Anweisung in `docs/concepts/phase8_ui_graph_plan.md` §9.6: "Schließung folgt im selben
+Commit wie §9: datierte Notiz hier mit dem Eintrag ‚Achte Öffnung geschlossen mit
+Phase-8-Step-Z'"). **Schließungsbeleg:** `rebuild_index()` rekonstruiert `item_links`
+vollständig aus den `.md`-Dateien — 13 `phase1_storage/tests/test_index.py`-Tests
+(B2-Indexblock) sind grün, `test_characterization.py` (P6-D/P7-C) bleibt über die
+gesamte Phase 8 byte-identisch grün. Hard Rule 2 gehalten: der Index ist jederzeit aus
+den Dateien rekonstruierbar. **Schließungsbedingung über ALLE Phase-8-`storage/`-
+Änderungen erfüllt:** es gab in Block C/D keine weiteren `storage/`-Edits — Phase 8 hat
+ausschließlich in `mcpserver/`/`webui/`/`scripts/` und in `phase5_ui/webui/static/js/`
+gearbeitet. Damit ist die achte Öffnung mit B1 + B2 vollständig abgedeckt. **Drei
+Phase-8-Befunde aus der 200-Knoten- und E2E-Smoke-Sitzung** (`graph.js` ALPHA_DECAY /
+`api.py :: _graph_get` `writable`-Feld / `graph.js` Klick-nach-Item-Pfad) liegen in
+`phase5_ui/webui/`, nicht in `storage/`. **Keine neunte Öffnung nötig** — die Befunde
+gehören in eine P9-Planung, nicht in einen `storage/`-Umbau. Die P1-Contract-Disziplin
+der Vorgänger-Öffnungen 3–7 gilt weiter: jede künftige P9-Arbeit an `storage/` braucht
+eine neue, benannte Öffnung mit eigenem Absatz hier, kein stiller Anbau.
 
 **[2026-08-17, P6 Step 7b Commit 1/3] Vierte, benannte Contract-Öffnung gebaut** (angekündigt in
 `phase6_shares/CLAUDE.md`s Session-Block vom selben Tag, `phase6_shares/ITEM_MOVE_PLAN.md` §4.1,
