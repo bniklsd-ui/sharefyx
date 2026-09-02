@@ -4,7 +4,7 @@ purpose: Menschliche Übersicht + Maschinen-Setup (venv, Keyring, Datenverzeichn
 read-when: erstes Setup auf einer neuen Maschine, oder wenn jemand wissen will, was das Ding überhaupt ist
 detail: L2
 up: docs/INDEX.md
-updated: 2026-09-02 (Sneak-Peak-Sektion auf die vier c4c5_*-Screenshots aus Block C4+C5 umgestellt -- Liquid-Glas-Akzente, Auswahl-Sheen 3px + Outline, Editor-72ch, Anlege-Dialog-Glas; ersetzt die sechs sp2_*-Screenshots aus Block D, die jetzt nur noch als historische Referenz unter docs/screenshots/ liegen)
+updated: 2026-09-02 (Sneak-Peak um die zwei Auswahl-Chevron-Screenshots ergaenzt (Vormerkung-3-Fixes, fuer Nikinger-Sichtpruefung 3 via GitHub) | 2026-09-02 (Sneak-Peak-Sektion auf die vier c4c5_*-Screenshots aus Block C4+C5 umgestellt -- Liquid-Glas-Akzente, Auswahl-Sheen 3px + Outline, Editor-72ch, Anlege-Dialog-Glas; ersetzt die sechs sp2_*-Screenshots aus Block D, die jetzt nur noch als historische Referenz unter docs/screenshots/ liegen)
 ---
 # Space-Server
 
@@ -70,6 +70,17 @@ Nikinger-Sichtprüfung 3 am echten Gerät.
 | Übersicht nach Login: Sticky List-Head mit Crumb, C3-Legende, D2-Graph-Panel im Hintergrund | selektierte Listenzeile mit 3-px-Akzentkante + 1-px-Outline + Backdrop-Sheen (sichtbar bei aktivem Blur) |
 | ![Editor mit 72ch](docs/screenshots/c4c5_03_editor_72ch.png) | ![Anlege-Dialog in Glas](docs/screenshots/c4c5_04_create_dialog_glass.png) |
 | Editor-Spalte zentriert auf 72ch Lesebreite (576px in der 836px-Spalte, kein Vollbreiten-Flattern) | Anlege-Dialog als Liquid-Glas-Träger (`--glass-bg` semi-transparent + Backdrop-Blur, Fallback solide bei `prefers-reduced-transparency`) |
+
+**Nachtrag, Auswahl-Chevron-Vorbild (für Nikinger-Sichtprüfung 3, zusammen mit den vier
+Bildern oben zu bewerten):** zwei weitere Screenshots, gegen dieselbe Wegwerf-Kategorie
+(Port 18771) aufgenommen, **inklusive** der zwei Vormerkung-3-Fixes dieser Session
+(Chevron-Größe/-Position jetzt `em`-skaliert statt fest 12px, `<select>`-Fokus-Rand nur
+noch rechts/unten in Akzentfarbe).
+
+| | |
+|:---:|:---|
+| ![Verschieben-Dialog mit Chevron](docs/screenshots/auswahl_chevron_01_move_dialog.png) | ![Freigabe-Dialog mit Chevron](docs/screenshots/auswahl_chevron_02_share_dialog.png) |
+| Verschieben-Dialog: Space- und Ordner-Auswahl, beide mit sichtbarem Chevron rechts | Freigabe-Dialog: Per-Item-Share-Row mit demselben `<select class="input">`-Vorbild |
 
 Hinweis: die Screenshots wurden **vor** dem Phase-8-Block-C4+C5-Live-Deploy gemacht
 und zeigen den Stand des lokalen Working-Trees. Die Block-D-Screenshots
