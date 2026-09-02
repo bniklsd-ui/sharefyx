@@ -16,6 +16,7 @@ import { init as initUpdates } from "./updates.js";
 import {
   init as initSpaces, openSpaceAdminDialog, closeSpaceAdminDialog, closeRemoveSpaceDialog,
 } from "./spaces.js";
+import { init as initGraph, loadGraph as loadGraphPanel } from "./graph.js";
 
 // -- Bootstrap: Übernahme des CSRF-Tokens von der Login-Erfolgsseite (Plan-Abweichung 2,
 // phase5_ui/CLAUDE.md Session-Block 2026-08-05) --------------------------------------------
@@ -78,6 +79,7 @@ function initShell() {
   initDialogs();
   initSpaces();
   Editor.init();
+  initGraph();
 
   document.getElementById("account-manage-spaces").addEventListener("click", function () {
     document.getElementById("account-dialog").hidden = true;
@@ -87,16 +89,18 @@ function initShell() {
   // -- Übersicht / Logout / Zurück ---------------------------------------------------------
 
   var homeButtonEl = document.getElementById("home-button");
-  // Phase 8 Block D D1 (Plan §5 D1): Klick auf den Übersicht-Knopf schließt den Editor (mit
-  // Rueckfrage bei ungespeicherten Aenderungen) UND schaltet die Listen-Spalte auf den
-  // globalen "Alle Items"-Scope. `closeEditor()` ruft intern `clearDetail()`, das `state.scope`
-  // auf "space" zuruecksetzt (V82, P6-Advisor-Fund) -- das `navigateAll()` HIER setzt es direkt
-  // danach wieder auf "all". Kein Umgehen, Zusammenspiel explizit getestet (Playwright-Smoke
-  // prueft beide Pfaade: Klick aus eigenem Space, Klick aus bereits aktivem globalem Scope).
+  // Phase 8 Block D D1 + D2 (Plan §5 D1/D2): Klick auf den Übersicht-Knopf schließt den Editor
+  // (mit Rueckfrage bei ungespeicherten Aenderungen), schaltet die Listen-Spalte auf den
+  // globalen "Alle Items"-Scope UND laedt den Graph neu. `closeEditor()` ruft intern
+  // `clearDetail()`, das `state.scope` auf "space" zuruecksetzt (V82, P6-Advisor-Fund) --
+  // das `navigateAll()` HIER setzt es direkt danach wieder auf "all". Kein Umgehen,
+  // Zusammenspiel explizit getestet (Playwright-Smoke prueft beide Pfaade: Klick aus eigenem
+  // Space, Klick aus bereits aktivem globalem Scope).
   homeButtonEl.addEventListener("click", function () {
     Editor.closeEditor().then(function (proceed) {
       if (proceed === false) return;
       navigateAll();
+      loadGraphPanel();
     }).catch(reportUnexpectedError);
   });
 
@@ -124,13 +128,14 @@ function initShell() {
     );
   });
 
-  // Phase 8 Block D D1 (Plan §5 D1): Refresh-Knopf in der Übersichts-Kopfzeile. Laedt die
-  // Übersicht neu -- D2 erweitert das um `Graph.loadGraph()` (dann ist der Knopf der einzige
-  // Ausloeser fuer den Graph-Refresh, der Polling-Mechanismus bleibt laut Plan §5 D1 nur auf
-  // die Zaehler beschränkt). Listener sitzt HIER (app.js) statt in list.js, weil der Knopf
-  // bewusst zur Übersichts-Flaeche gehoert und nicht zur Liste.
+  // Phase 8 Block D D1 + D2 (Plan §5 D1/D2): Refresh-Knopf in der Übersichts-Kopfzeile.
+  // Laedt die Übersicht UND den Graph neu -- die Uebersicht liefert die Zaehler (Plan §5 D1
+  // haelt den 20s-Polling auf die Zaehler beschraenkt, Refresh ist der einzige Ausloeser
+  // fuer den Graph-Reload, damit der Server nicht bei jedem Tick die `/graph`-Query feuert).
+  // Beide Calls laufen parallel; ein Fehler in einem blockiert den anderen nicht.
   document.getElementById("overview-refresh").addEventListener("click", function () {
     List.loadOverview().catch(reportUnexpectedError);
+    loadGraphPanel();
   });
 
   document.getElementById("back-button").addEventListener("click", function () {
@@ -232,6 +237,13 @@ function initShell() {
         setCreateControlsPresent(activeSpaceWritable());
         List.renderCrumb();
         return List.loadItems();
+      })
+      .then(function () {
+        // Graph laeuft unabhaengig vom Listen-Scope -- die erste Anzeige ist der Default-
+        // Zustand (explizite Kanten, Toggles aus). Plan §5 D2 haelt den 20s-Polling auf die
+        // Zaehler beschraenkt; Graph-Refresh nur hier, ueber den Home-Knopf und ueber den
+        // Refresh-Knopf im Uebersichts-Kopf.
+        return loadGraphPanel();
       })
       .catch(reportUnexpectedError);
   }

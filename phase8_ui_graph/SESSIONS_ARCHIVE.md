@@ -3,12 +3,140 @@ status: live
 purpose: Archiv älterer Session-Blöcke aus phase8_ui_graph/CLAUDE.md — newest-first, verbatim per Rotationsregel
 read-when: nur wenn der aktuelle Session-Block im Phase-Head nicht reicht und Verlauf gebraucht wird
 detail: L3
-updated: 2026-09-02 (C3-Block nach D1-Session ins Archiv -- 19 Bloecke newest-first, Phase-8-Head jetzt mit D1-Block allein; Head 41.8KB->45.1KB ueber Softcap benannt) | 2026-09-01 (Sichtpruefung-1-Block (vom Vortag) nach C3-Rotation ins Archiv gewandert -- jetzt 18 Bloecke newest-first; Phase-8-Head wieder unter dem 40KB-Softcap) | 2026-09-01 (zwölfte Rotation, 17 Blöcke)
+updated: 2026-09-02 (D1-Block nach D2-Session ins Archiv -- 20 Bloecke newest-first, Phase-8-Head jetzt mit D2-Block allein) | 2026-09-02 (C3-Block nach D1-Session ins Archiv -- 19 Bloecke newest-first, Phase-8-Head jetzt mit D1-Block allein; Head 41.8KB->45.1KB ueber Softcap benannt) | 2026-09-01 (Sichtpruefung-1-Block (vom Vortag) nach C3-Rotation ins Archiv gewandert -- jetzt 18 Bloecke newest-first; Phase-8-Head wieder unter dem 40KB-Softcap) | 2026-09-01 (zwölfte Rotation, 17 Blöcke)
 up: CLAUDE.md
 updated: 2026-09-01 (zwoelfte Rotation: C2-Block ins Archiv nach Screenshots+README-Session -- Sichtpruefung 1 mit 9 Screenshots gegen Wegwerf-Instanz, README "Sneak Peak"-Sektion neu, docs/screenshots/ neu im INDEX, C2+Docs-Commit 0d97b3a gepusht; Head 37.7KB->33.6KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 103.8KB->114.0KB; keine Code-Aenderung ausserhalb webui/static + build_icon_sprite.py + vendor/, keine Service-Touch in dieser Sitzung) | 2026-09-01 (elfte Rotation: C1-Block ins Archiv nach C2-Session -- C2-Block (Lucide-Sprite, 18 Icons, build_icon_sprite.py, js/icons.js, .icon-CSS) ergaenzt, dann rotiert; Head 33.7KB->37.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 96.0KB->103.8KB; F9/F10/F11 aus C0 geschlossen; keine neue P1-Contract-Oeffnung; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (zehnte Rotation: C0-Block ins Archiv nach C1-Session -- C1-Block (Plex-Font-Swap + CSS-Typo-Tokens, 35 Findings aus C0 abgearbeitet fuer C1) ergaenzt, dann rotiert; Head 27.5KB->33.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 89.3KB->96.0KB; C1-Commits 0281cce + 08bff55 im Head referenziert; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (neunte Rotation: Gate-B→C-Block ins Archiv nach C0-Session -- C0-Block ergaenzt, dann rotiert; Head 39.0KB->31.4KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 81.3KB->89.3KB; C0-Findings-Tabelle (35 Eintraege) lebt im Head; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (achte Rotation: B4-Block ins Archiv nach Gate-B→C-Verifikation -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf, pytest 958/958 gruen, Charakterisierung byte-identisch, Tabu-Diff leer; Head jetzt mit 14.8 KB unter dem Softcap, SESSIONS_ARCHIVE.md 76.9 KB; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (siebte Rotation: fuenf Bloecke ins Archiv -- A3-Bau, Hard-Rule-9-Doku, Versions-Bump v2.2.3, A3-Drittprobe mit Restdefekt, B1 linkscan.py + Tests; Head jetzt 16.4 KB mit genau einem Block, 12 Bloecke im Archiv, Phase-8-Head wieder unter dem 40KB-Softcap; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8
+
+## Session stopped — 2026-09-02 (Block D D1 gebaut — Übersicht tabellos + globaler Home-Scope, Playwright-verifiziert gegen Wegwerf-Instanz 127.0.0.1:18767, 5/5 Checks grün)
+
+**Auftrag:** Block D D1 (Plan §5 D1, P8-J) — tabellose Übersicht statt Kachel-Grid, eigener
+und fremder Space in einer gemeinsamen Zeilen-Liste (F12/F13/F23 aufgelöst), Home-Knopf
+schaltet die Listen-Spalte auf den globalen Scope (P8-19, V82 explizit getestet),
+Refresh-Knopf in der Kopfzeile (D2 erweitert um den Graph-Refresh), Graph-Gerüst als
+`<canvas>`-Platzhalter für D2. Nikinger-Vorgabe dieser Session: atomar pro Schritt
+arbeiten — D2/D3 folgen in eigenen Commits, das Block-D-Endbild + README-Sneak-Peak
+kommen erst nach D3.
+
+**Code-Änderungen (fünf Dateien, +~110 Zeilen, 0 Tabu-Diff-Zeilen):**
+
+- `phase5_ui/webui/static/app.html` — `#detail-overview`-Struktur ersetzt: `<header
+  class="overview__header">` mit Titel + Refresh-Knopf (Lucide `i-refresh-cw` aus C2),
+  bestehende `.legend` aus C3 darunter, dann `<ol id="overview-spaces">` für die
+  tabellosen Space-Zeilen, dann `<h2>Verknüpfungen</h2>` + `<div id="overview-graph"><canvas
+  id="overview-graph-canvas"></canvas></div>` als D2-Gerüst, dann bestehende
+  „Zuletzt benutzt"-Liste. Alte IDs `#overview-tiles` und `#overview-foreign` ersatzlos
+  entfernt (F12/F13).
+- `phase5_ui/webui/static/app.css` — `.overview__tiles`/`.tile`/`.space-card` ersatzlos
+  entfernt (Sailop Dim 5/6, „3 identical cards", F12/F13/F23). Neu:
+  `.overview__header` (Flex-Reihe, Refresh-Knopf rechts mit `flex-shrink: 0`),
+  `.overview__spaces` + `.overview__space-row` (Haarlinie unten wie `.recent-row`,
+  720px-Maximalbreite zur visuellen Achse mit „Zuletzt benutzt"),
+  `.overview__space-name` + `.overview__space-name-label` (Kategoriepunkt + Space-Name,
+  ellipsis bei langen Namen, gedämpfter Slate für read-only),
+  `.overview__space-counts` + `.overview__space-count` (8px-Padding-Chip, `--surface`-
+  Fond, `--line`-Rand, Hover-Akzentkante, `:focus-visible`-Outline 2px),
+  `.overview__graph` (`min-height: 55vh`, `max-width: 960px`, Linie + Radius wie andere
+  Panels, Canvas füllt die Box, `overflow: hidden`).
+- `phase5_ui/webui/static/js/list.js :: renderOverview()` neu — eine Zeile je Space
+  (eigene zuerst, dann fremde, `localeCompare` als Tiebreaker, analog zu
+  `tree.js :: renderRail()`); Kategoriepunkt via `spaceCategory(space)` aus C3
+  (`rail__glyph--{own|shared|foreign}`); Counter-Chips iterieren über
+  `bucketNames()` und überspringen Buckets mit `count === 0` (Plan §5 D1, „keine
+  leeren Buckets"); Chip-Klick ruft `navigate(space.name, bucket)` — derselbe Pfad wie
+  die alten Tiles, kein neuer Endpunkt, keine neue Server-Logik. Variablen
+  `overviewTilesEl` und `overviewForeignEl` ersatzlos entfernt, `overviewSpacesEl` neu.
+- `phase5_ui/webui/static/js/app.js` — Home-Knopf-Handler erweitert: `Editor.closeEditor()
+  .then(proceed => proceed === false ? null : navigateAll())`. `closeEditor()` ruft
+  intern `clearDetail()`, das `state.scope` auf "space" zurücksetzt (V82, P6-Advisor-
+  Fund); das `navigateAll()` HIER setzt direkt danach wieder "all". Zusammenspiel
+  explizit getestet (Smoke Step 5 = idempotenter zweiter Home-Klick). Refresh-Knopf-
+  Handler neu: `List.loadOverview()`; D2 erweitert um `Graph.loadGraph()` — kein
+  vorzeitiger Aufruf hier, der Graph-Code lebt noch nicht.
+
+**Wegwerf-Instanz D1 neu (zwei Skripte, 0 Repo-Geheimnisse berührt):**
+
+- `phase8_ui_graph/scripts/wegwerf_setup_d1.py` — Standing-Permission-Muster aus C3
+  reproduziert, eigener Port **18767**, `WEGWERF_ROOT=/tmp/opencode/sharefyx-wegwerf-d1`,
+  File-Keyring-Backend schreibt nach `keyring.json` (nicht in echten `nikinger-space`-
+  Service), eigener DEK als base64-Datei. User `alpha` direkt in `auth.sqlite3`
+  provisioniert (`AuthStore.upsert_user()`+`set_totp()`+`confirm_totp()`), TOTP-Seed
+  mit dem DEK aus `auth-dek` per `secretbox.seal()` verschlüsselt (derselbe Pfad wie
+  der echte Enrollment-Flow, Hard Rule 1: kein Schreiben in den echten Keyring,
+  Credentials in `credentials.json` 0600 nur im Wegwerf-Root, mit dem `cleanup`
+  gelöscht). Zweiter Space `beta` über `spacectl.py create-space` + `add-member --read
+  beta alpha` — `spacectl` schreibt die `share.yml` mit `read: [alpha]` (P6-M-Rechte-
+  politik), drei Items in alpha (gemischt Typen, damit Counter-Chips greifen: 1
+  task=open, 2 notes) und zwei in beta (zwei notes). Cleanup per
+  `kill -TERM $(cat serve.pid)` (Hard Rule 9).
+- `phase8_ui_graph/scripts/d1_playwright_smoke.py` — fünf Schritte:
+  `step1_static_markup` (kein Login, liest `app.html` direkt und prüft die neuen
+  IDs/Klassen + das Fehlen der alten), `step2_login_and_overview` (Login + Overview
+  rendert zwei `.overview__space-row`s mit den richtigen `rail__glyph--{own,foreign}`
+  und Counter-Chips: alpha 2, beta 1 — exakt die nicht-leeren Buckets),
+  `step3_click_counter_chip` (Klick auf den ersten alpha-Chip → Liste rendert, Crumb
+  enthält `alpha` + Bucket-Name, hier `alpha › Offen`),
+  `step4_home_button_switches_to_global` (Klick auf `#home-button` → `.tree__scope`
+  wird `aria-current="true"`, Crumb „Alle Items", 5 Items sichtbar — 3 aus alpha +
+  2 aus beta),
+  `step5_home_click_is_idempotent_when_global` (zweiter Home-Klick aus dem globalen
+  Scope heraus lässt den Scope global, kein Zurückfallen auf "space" — V82). Drei
+  PNG-Screenshots nach `docs/screenshots/d1_{01_overview_space_rows,02_counter_chip_navigates,
+  03_home_to_global_scope}.png`, danach visuelle Sichtprüfung: alpha-Zeile mit blauem
+  „A"-Glyph + „1 Offen"/„2 Notizen"-Chips, beta-Zeile mit Slate-„B"-Glyph +
+  „2 Notizen"-Chip, „Verknüpfungen"-Panel als leere Slate-Box (~55vh), „Zuletzt
+  benutzt"-Liste mit den drei alpha-Items, Update-Banner von der realen
+  `UPDATE_LOG.md` korrekt oben (siehe Sichtprüfung 1, Banner nicht weggedrückt —
+  gehört zur Realität der App).
+
+**Verifikation — Selbstprüf-Checkliste §0.6 alle fünf Punkte grün:**
+
+1. `pytest -q` → **958/958 grün** (vorher/nachher identisch, keine Python-Änderung).
+2. Tabu-Diff (`git diff --stat main -- phase4_auth/ phase2_mcp/ phase5_ui/webui/security.py
+   phase1_storage/storage/{models,frontmatter,files,patch,acl,history}.py`) → **leer**.
+3. JS-Syntax: `node --check` auf `list.js`/`app.js` → **0 errors**. Kein Endpunkt berührt
+   (reines Frontend, P5-B + P8-§0.4 halten), keine Fehlerpfade zu durchdenken jenseits
+   des UI-Renderings. Home-Knopf-Regression V82 explizit geprüft.
+4. Doc-Update im selben Commit (Hard Rule 8) — dieser Block. Keine neue `.md`-Datei,
+   keine Index-Zeile nötig (Phase-Head und SESSIONS_ARCHIVE sind bereits im INDEX
+   verlinkt, Phase-8-Block steht dort seit 2026-08-28).
+5. `python phase5_ui/scripts/ui_budget.py` → **5/5 grün**, app.js+app.css+Font jetzt
+   **113.0 KB** (vorher 112.0, +1.0 KB für die neue CSS). Im Korridor (<250 KB).
+
+**Wegwerf abgebaut:** `kill -TERM $(cat serve.pid)` (PID-Datei-Muster, **kein** `pkill -f`
+mit Regex — Hard Rule 9 eingehalten); `rm -rf /tmp/opencode/sharefyx-wegwerf-d1/` im selben
+Zug. `curl http://127.0.0.1:8765/health` → `{"status":"ok", …}` (uptime 65157 s, +0 s
+gegenüber Sessionbeginn — kein Service-Touch durch diese Session). `ps -ef` zeigt nur die
+`sharefyx-mcp.service` (PID 67925, Produktion); Wegwerf-PID weg.
+
+**Verbleibend für die nächste Session (innerhalb Block D, atomar pro Schritt):**
+
+- **D2** (Plan §5 D2, P8-D/P8-E) — `js/graph.js` neu: `loadGraph()` →
+  `GET /api/v1/graph`, Knoten bekommen `cat` über `spaceCategory()` und `deg` über
+  explizite Kanten, implizite Kanten clientseitig (`tagEdges()` mit
+  > 15-Knoten-Cutoff-Riegel, `folderEdges()` für gleicher-Space+Ordner), flache
+  Arrays mit `O(n²)`-Repulsion + Federkraft + Zentrums-Gravitation + Dämpfung,
+  Canvas 2D mit `devicePixelRatio`, Knotenfüllung = Kategoriefarbe, Kantenstile
+  (explizit solide / Tag gestrichelt / Ordner gepunktet), Hover-Dim,
+  Klick → `Editor.selectItem(id)`, Drag/Zoom/Pan, `prefers-reduced-motion`
+  → synchron zu Ende rechnen, Leerzustand-Hinweistext. Refresh-Knopf erweitern um
+  `Graph.loadGraph()`. P8-20/21/22.
+- **D3** (Plan §5 D3, P8-K) — `.rail__version` `v2.2.3` → `v3.0`, neuer oberster
+  `docs/UPDATE_LOG.md`-Eintrag am Deploy-Tag (P6-X-Gate), `ui_budget.py` alle
+  vier Budgets grün nach Fonts+Sprite+`graph.js` (V84), `_measure_latency()`-
+  Erweiterung um `/graph` nach Ermessen (V90). P8-17/23.
+
+**Nächster Schritt, konkret:** **D3 (Plan §5 D3)** — `.rail__version` `v2.2.3` → `v3.0`,
+neuer oberster `docs/UPDATE_LOG.md`-Eintrag am Deploy-Tag (P6-X-Gate), `ui_budget.py`
+alle vier Budgets grün nach Fonts+Sprite+`graph.js` (V84), `_measure_latency()`-
+Erweiterung um `/graph` nach Ermessen (V90). Sichtprüfung 2 (Plan §8) im selben
+Commit — Übersicht + Graph mit den frischen Daten, Sichtprüfung-2-Screenshots,
+README-Sneak-Peak-Sektion aktualisieren, `phase1_storage/CLAUDE.md` „Achte Öffnung
+geschlossen"-Notiz.
+
+---
 
 ## Session stopped — 2026-09-01 (Block C C3 gebaut — Farbsemantik + Legende, Playwright-verifiziert gegen Wegwerf-Instanz 127.0.0.1:18766)
 

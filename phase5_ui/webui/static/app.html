@@ -95,12 +95,29 @@
            eigene Spaces zuerst, dann fremde. Aus dem DOM gerendert, nicht statisch -- die Liste
            selbst wird per loadOverview() befuellt. -->
       <ol class="overview__spaces" id="overview-spaces"></ol>
-      <!-- Phase 8 Block D D2 (Plan §5 D2): Graph-Panel mit <canvas>. D1 legt nur das Geruest
-           an (Container + Canvas), D2 befuellt es mit der Force-Simulation. ~55vh aus dem Plan,
-           umgesetzt mit min-height (kann bei vielen Knoten auch groesser werden). -->
+      <!-- Phase 8 Block D D2 (Plan §5 D2): Graph-Panel mit <canvas>, Toggle-Toolbar und
+           Leerzustand-Hinweis. Container ist 55vh (Plan §5 D2), D1 hat das Geruest gebaut,
+           D2 befuellt es mit Force-Simulation, Toggles (Tags/Ordner, Default aus) und
+           dem Hinweistext fuer den leeren Fall. -->
       <h2 class="overview__heading">Verkn&uuml;pfungen</h2>
       <div class="overview__graph" id="overview-graph">
-        <canvas id="overview-graph-canvas" aria-label="Verkn&uuml;pfungsgraph"></canvas>
+        <div class="overview__graph-toolbar" id="overview-graph-toolbar">
+          <label class="overview__graph-toggle">
+            <input type="checkbox" id="overview-graph-toggle-tags">
+            <span>Tags</span>
+          </label>
+          <label class="overview__graph-toggle">
+            <input type="checkbox" id="overview-graph-toggle-folders">
+            <span>Ordner</span>
+          </label>
+          <span class="overview__graph-zoom tnum" id="overview-graph-zoom"></span>
+        </div>
+        <canvas id="overview-graph-canvas" aria-label="Verkn&uuml;pfungsgraph"
+                role="img"></canvas>
+        <p class="overview__graph-empty" id="overview-graph-empty">
+          Verkn&uuml;pfe Items &uuml;ber das Links-Feld oder eine
+          <code>itm_&hellip;</code>-Referenz im Text &mdash; dann erscheinen sie hier als Kanten.
+        </p>
       </div>
       <h2 class="overview__heading">Zuletzt benutzt</h2>
       <ol class="overview__recent" id="overview-recent"></ol>

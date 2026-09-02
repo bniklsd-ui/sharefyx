@@ -788,6 +788,70 @@ select.input {
   height: 100%;
 }
 
+/* Toolbar oben links ueber dem Canvas (Plan §5 D2: zwei Checkbox-Toggles, Default aus).
+   Floating, damit das Canvas seine volle Hoehe behalten kann und die Toggles nicht den
+   Knoten-Layer ueberlagern. */
+.overview__graph-toolbar {
+  position: absolute;
+  top: calc(var(--space) * 1.5);
+  left: calc(var(--space) * 1.5);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space) * 2);
+  padding: calc(var(--space) * 0.75) calc(var(--space) * 1.25);
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-meta);
+  color: var(--text-muted);
+  z-index: 1;
+  pointer-events: auto;
+}
+.overview__graph-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--space) * 0.75);
+  cursor: pointer;
+  user-select: none;
+}
+.overview__graph-toggle input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+.overview__graph-zoom {
+  color: var(--text-faint);
+  font-size: var(--fs-meta);
+  min-width: 3ch;
+  text-align: right;
+}
+
+/* Leerzustand-Hinweis (Plan §5 D2: kein Knoten mit Kante). Statisch in HTML, Sichtbarkeit
+   wird vom Graph-Modul umgeschaltet -- ohne CSS-Animation, sonst wirkt es wie eine
+   Marketing-Bubble (F8 bleibt der einzige radiale Gradient). */
+.overview__graph-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: calc(var(--space) * 4);
+  color: var(--text-muted);
+  font-size: var(--fs-meta);
+  text-align: center;
+  pointer-events: none;
+}
+.overview__graph-empty[hidden] { display: none; }
+.overview__graph-empty code {
+  font-family: var(--font-mono);
+  font-size: 0.95em;
+  color: var(--text);
+  background: var(--surface);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+}
+
 .overview__recent { list-style: none; margin: 0; padding: 0; max-width: 720px; }
 
 .recent-row {
