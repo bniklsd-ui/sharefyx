@@ -328,6 +328,13 @@ Handler `_graph_get()` in `webui/api.py`, Route neben `_overview` (~Zeile 1005):
   `status=archived` draußen, `?archived=1` nimmt sie rein.
 - Knoten-Payload minimal: `{id, title, space, own, shared, type, status, folder, tags}`
   (`own`/`shared` für die §4.3-Kategorie; Quelle `serializers.py`, V91).
+  **[2026-09-02 Korrektur, Fix B, Plan §9.4.6 Befund B]:** das Feld heißt inzwischen
+  `writable`, nicht mehr `shared` — space-level über `permissions.can_write(session.space,
+  i.space)` berechnet (analog zu `/api/v1/spaces`, NICHT zu `serializers.py ::
+  overview_row_to_json`, siehe die Korrektur in §9.4.6). Der ursprüngliche `shared`-Wert
+  (`i.space != session.space`) machte jeden fremden Knoten „shared", die dritte Legendenfarbe
+  `--space-foreign` war strukturell unerreichbar. Details: `phase8_ui_graph/CLAUDE.md`s
+  Session-Block 2026-09-02.
 - Kanten: `store.links_all()`, gefiltert auf `src != dst` und **beide** Endpunkte in der
   sichtbaren Knotenmenge (ACL-Leck-Riegel: ein unsichtbares Item existiert weder als Knoten
   noch als Kantenende), exakt dedupliziert.
@@ -528,6 +535,24 @@ Umfang realistisch 300–400 Zeilen. Struktur:
   rendern — kein animiertes Einschwingen.
 - **Leerzustand:** kein Knoten mit Kante → Hinweistext („Verknüpfe Items über das Links-Feld
   oder eine itm_-Referenz im Text") statt leerer Fläche.
+
+**[2026-09-02 Korrektur, Fixes A + C, Plan §9.4.6]:**
+
+- **Alpha-Konstanten (Befund A):** „Stopp bei α < 0.005" mit `ALPHA_DECAY 0.985` maß sich am
+  200-Knoten-Datensatz auf **5.95 s** (P8-22-Smoke) — über dem 3s-Budget. Konstanten danach auf
+  `ALPHA_DECAY 0.97` / `ALPHA_MIN 0.01` gesetzt (`phase5_ui/webui/static/js/graph.js:71-72`):
+  ln(0.01)/ln(0.97) ≈ 151 Ticks ≈ 2.52 s, erneut gegen den 200-Knoten-Wegwerf gemessen (nicht
+  nur gerechnet) — siehe Phase-Head-Session-Block für die genaue Zahl. `MAX_TICKS_REDUCED = 300`
+  ist seither **nicht mehr die bindende Grenze** für `prefers-reduced-motion` — die Schleife
+  endet jetzt schon bei ~151 Ticks am `ALPHA_MIN`-Abbruch, 300 wird nie erreicht. Konstante
+  unverändert gelassen (nur `ALPHA_DECAY`/`ALPHA_MIN` waren Teil der Entscheidung).
+- **„Klick → Item öffnen" (Befund C):** dieser Satz war **dokumentiert, bevor er gebaut war** —
+  der P8-24-Smoke fand am 2026-09-02 keinen Klick-nach-Item-Pfad im Code (`onMouseDown`/
+  `onMouseUp` setzten ausschließlich Drag/Pan zurück, `selectItem` war nicht importiert). Jetzt
+  tatsächlich gebaut: `onMouseUp` vergleicht die Pointer-Position gegen `pressStart` (neue
+  Konstante `CLICK_SLOP = 4`), ruft bei einer Bewegung < 4 px `selectItem(id)` — derselbe
+  ID-Lookup wie B4. Ein eigener `onMouseLeave`-Handler (statt weiterhin denselben Handler für
+  „mouseup" UND „mouseleave") verhindert, dass ein Drag-off-canvas als Klick zählt.
 
 ### D3 — Versionierung + Budget (P8-K)
 
@@ -796,7 +821,7 @@ Smokes in die Vererbung.
 | Kein UI-Rückweg aus geteiltem Space | P6 | „kein Bug, nicht blockierend", bleibt so |
 | V79 FastMCP-4 / `2026-07-28`-Revision | P5-C | eigene Mini-Phase, kein Phase-8-Auftrag |
 | **Neu in P8:** A3 Klammer/Aufzählung · Item-Link-Picker-Body · Picker-A11y | P8 | siehe §9.4.1–§9.4.3 |
-| **Neu in P8 (2026-09-02, aus den 200-Knoten-/E2E-Smokes):** Settle-Zeit (graph.js ALPHA_DECAY) · Foreign-Farbe unerreichbar (`_graph_get` setzt `shared` statt `writable`) · Knotenklick öffnet das Item nicht (graph.js hat keinen `selectItem`-Pfad) | P8 | siehe §9.4.6 (drei Nikinger-Entscheidungen, drei Optionen je Befund) |
+| **Neu in P8 (2026-09-02, aus den 200-Knoten-/E2E-Smokes):** Settle-Zeit (graph.js ALPHA_DECAY) · Foreign-Farbe unerreichbar (`_graph_get` setzt `shared` statt `writable`) · Knotenklick öffnet das Item nicht (graph.js hat keinen `selectItem`-Pfad) | P8 | **geschlossen in diesem Commit (2026-09-02)** — Nikinger-Entscheidung Option (a) für alle drei (A mit beiden Konstanten). Settle-Zeit: `ALPHA_DECAY 0.97`/`ALPHA_MIN 0.01`, ~151 Ticks, throwaway-gemessen unter 3 s. Foreign-Farbe: `_graph_get` liefert jetzt `writable` (space-level `permissions.can_write`, memoisiert). Knotenklick: `onMouseUp` erkennt Klick vs. Drag (`CLICK_SLOP`), ruft `selectItem`. Throwaway-verifiziert (P8-22 5/5, P8-24 6/6 auf dem D2-Datensatz), **nicht live** — Bilanz bleibt 15 ✅ · 10 🟡 · 0 ⬜, kein Glyphen-Sprung. Details: §9.4.6, `phase8_ui_graph/CLAUDE.md`s Session-Block 2026-09-02. |
 
 **Was P8 ausdrücklich draußen ließ und was dadurch nicht Phase 9 verpflichtet:** FastMCP-4-
 Umstieg, `_trash/`-Räumung, Funnel-Watchdog, Body-Volltextsuche in der Web-UI (Q1),
@@ -855,6 +880,53 @@ Entscheidung, keine Claude-Ableitung.
 **Das sind drei Nikinger-Entscheidungen, keine Claude-Ableitung.** Nikinger kann pro
 Befund eine der drei Optionen wählen, die Befunde in eine P9-Planung verschieben, oder
 den Code-Fix jeweils selbst anordnen (mit oder ohne opencode-Advisor).
+
+**[2026-09-02 Nikinger-Entscheidung, nach Vorlage der drei Optionen je Befund durch Claude
+Code]:** Option **(a)** für alle drei Befunde — bei A mit einer Verschärfung. Umgesetzt im
+selben Commit wie diese Notiz; Details, Messwerte, Screenshots:
+`phase8_ui_graph/CLAUDE.md`s Session-Block 2026-09-02.
+
+- **A — beide Konstanten, nicht nur eine.** `ALPHA_DECAY` 0.985→0.97 **und** `ALPHA_MIN`
+  0.005→0.01 (Option (a) allein hätte nur `ALPHA_DECAY` geändert). Grund: mit `ALPHA_DECAY`
+  0.97 und `ALPHA_MIN` unverändert bei 0.005 wären es 174 Ticks ≈ 2.90 s gewesen — eine Marge
+  von ~40 ms auf einem Kriterium, das gerade erst mit 5.95 s gerissen war. Mit beiden
+  Konstanten: ln(0.01)/ln(0.97) ≈ 151 Ticks ≈ 2.52 s, throwaway-gemessen 2.65–2.74 s über
+  mehrere Läufe (Browser-Overhead oben drauf).
+  **Korrektur, Option A(b) war arithmetisch nie tragfähig, nicht nur schlechter als (a):** die
+  dort vorgeschlagene Alternative „`ALPHA_MIN` 0.005→0.02" ergibt bei unverändertem
+  `ALPHA_DECAY` 0.985 `ln(0.02)/ln(0.985)` ≈ 259 Ticks ≈ 4.31 s bei 60 fps — weiterhin über dem
+  3s-Budget. A(b) war nie ein gangbarer Weg.
+- **B — Option (a) wie vorgeschlagen, mit einer falschen Begründung im Options-Text
+  korrigiert.** `_graph_get` rechnet `writable` jetzt space-level über
+  `permissions.can_write(session.space, i.space)`, memoisiert pro Space-Name.
+  **Korrektur:** die ursprüngliche Begründung oben — „analog zu `webui/serializers.py ::
+  overview_row_to_json`'s `shared`-Feld, das bereits `space`/`own`/`writable` differenziert"
+  — ist FALSCH. `overview_row_to_json` benutzt exakt dieselbe billige Näherung
+  (`readonly=s.space != own_space`), die hier gerade behoben wird, dokumentiert als solche
+  in `phase5_ui/webui/serializers.py:103-107`. Der Endpunkt, der Schreibbarkeit korrekt
+  auflöst, ist `/api/v1/spaces` (`phase5_ui/webui/api.py:358` und `:618`, beide
+  `permissions.can_write(session.space, <space>)`) — genau das, was die Rail einfärbt, und
+  genau deshalb reproduziert der Fix die Rail-Kategorisierung per Konstruktion (P8-15 verlangt
+  „own/shared/foreign konsistent in Rail, Liste, Übersicht und Graph").
+- **C — Option (a) wie vorgeschlagen.** `onMouseUp` um Klick-Erkennung erweitert
+  (`CLICK_SLOP = 4`, `pressStart`-Zustand), `selectItem` aus `editor.js` importiert. Der in der
+  Options-Liste genannte Fallstrick (derselbe Handler an „mouseup" UND „mouseleave") wurde
+  vermieden, indem „mouseleave" einen eigenen Handler (`onMouseLeave`) bekam, der nur
+  zurücksetzt, nie selektiert — ein Drag, der den Canvas verlässt, ist nie ein Klick.
+
+Verifikation: `p8_22_smoke.py` 5/5 (200-Knoten-Wegwerf, Settle throwaway-gemessen unter 3 s,
+own/shared/foreign-Assertion ersetzt den früheren `[FUND]`-Print), `phase8_e2e_smoke.py` 6/6
+(D2-Wegwerf — der 200-Knoten-Datensatz brach Station 3 aus einem unrelated Grund, siehe
+Phase-Head-Session-Block). Zwei Bugs in den Smoke-Skripten selbst dabei gefunden und behoben
+(nicht Teil der drei Befunde, aber notwendig, um sie zu verifizieren): `p8_22_smoke.py`s
+Drag-Simulation feuerte `mouseup` an der ursprünglichen statt der zuletzt gedraggten Position
+(sah nach Fix C wie ein Klick aus); `phase8_e2e_smoke.py`s Station 6 prüfte nicht-existente
+DOM-IDs (`#editor`/`#readonly-view` statt `#detail-editor`/`#detail-readonly`) und hätte daher
+selbst einen funktionierenden Klick nie als Erfolg erkannt.
+
+**Throwaway-verifiziert, nicht live.** Die Bilanz bleibt 15 ✅ · 10 🟡 · 0 ⬜ — kein Zeile springt
+auf ✅, „✅ heißt live-verifiziert durch einen Menschen, nicht gebaut" (Projektregel,
+unverändert).
 
 #### §9.4.7 Phase-Status Glyphe ✅ vs. 🟡
 

@@ -13,12 +13,24 @@
 // Kein LLM, keine Semantik -- reine Geometrie auf den schon ACL-gefilterten Knoten.
 //
 // **Bewusst NICHT gemacht:** persistent layout (kein Save der Positionen zwischen Reloads),
-// WebWorker-Simulation (Datenmenge ist klein genug fuer requestAnimationFrame, 200 Knoten
-// erreichen Ruhe in <3s auf einem normalen Browser, Plan P8-22), Mobile-Pinch-Zoom
-// (Step 7b-W Desktop-first).
+// WebWorker-Simulation (Datenmenge ist klein genug fuer requestAnimationFrame), Mobile-Pinch-
+// Zoom (Step 7b-W Desktop-first).
+//
+// **Settle-Zeit bei 200 Knoten (Fix A, Plan §9.4.6 Befund A, 2026-09-02):** mit den
+// urspruenglichen Konstanten (ALPHA_DECAY 0.985 / ALPHA_MIN 0.005) kam die Simulation
+// **gemessen 5.95 s** zur Ruhe (351 Ticks, p8_22_smoke.py gegen den 200-Knoten-Wegwerf) --
+// der damalige Kommentar hier "200 Knoten erreichen Ruhe in <3s" war damit widerlegt, nicht nur
+// ungenau. Konstanten danach auf ALPHA_DECAY 0.97 / ALPHA_MIN 0.01 gesetzt: ticks =
+// ln(ALPHA_MIN)/ln(ALPHA_DECAY) = ln(0.01)/ln(0.97) ≈ 151 Ticks ≈ 2.52 s bei 60 fps -- mit
+// Marge unter dem 3s-Budget (der Plan-Vorschlag ALPHA_DECAY 0.97 allein, ALPHA_MIN bei 0.005
+// belassen, waere 174 Ticks ≈ 2.90 s gewesen: ~40 ms Marge auf einem Kriterium, das gerade erst
+// gerissen war -- deshalb beide Konstanten, Nikinger-Entscheidung 2026-09-02, Option (a) mit
+// Marge). Erneut mit `p8_22_smoke.py` gegen den 200-Knoten-Wegwerf gemessen, nicht nur
+// gerechnet -- Zahl steht im Phase-Head-Session-Block und in Plan §9.4.6.
 
 import { api, reportUnexpectedError } from "./api.js";
 import { spaceCategory } from "./state.js";
+import { selectItem } from "./editor.js";
 
 var nodes = [];
 var explicitEdges = [];   // {src, dst, kind} -- vom Server (frontmatter|body)
@@ -39,6 +51,10 @@ var dragNode = null;       // Knoten, der gerade gezogen wird
 var panStart = null;        // Pan-Geste: {startX, startY, origPanX, origPanY}
 var hoverId = null;
 var reducedMotion = false;
+// Fix C (Plan §9.4.6 Befund C, 2026-09-02): {x, y, node} vom mousedown -- node ist null bei
+// einem Hintergrund-Press. onMouseUp vergleicht die Pointer-Position dagegen (CLICK_SLOP) und
+// oeffnet das Item nur, wenn sich der Pointer kaum bewegt hat -- ein Drag ist kein Klick.
+var pressStart = null;
 
 var tagsEnabled = false;    // Default aus (Plan §5 D2: "Default zeigt nur explizite Kanten")
 var foldersEnabled = false;
@@ -49,9 +65,17 @@ const SPRING_STRENGTH = 0.05;
 const CENTER_GRAVITY = 0.012;
 const DAMPING = 0.85;
 const ALPHA_START = 1;
-const ALPHA_MIN = 0.005;
-const ALPHA_DECAY = 0.985;
+// Fix A (Plan §9.4.6 Befund A, 2026-09-02): 0.005/0.985 brauchten 351 Ticks (gemessen 5.95 s
+// bei 200 Knoten, siehe Modul-Header oben) -- 0.01/0.97 brauchen ln(0.01)/ln(0.97) ≈ 151 Ticks
+// ≈ 2.52 s, mit Marge unter dem 3s-Budget.
+const ALPHA_MIN = 0.01;
+const ALPHA_DECAY = 0.97;
 const ALPHA_REHEAT = 0.3;          // Drag-Eingriff
+// MAX_TICKS_REDUCED bleibt 300 (Plan §5 D2), ist aber seit Fix A nicht mehr die bindende
+// Grenze fuer prefers-reduced-motion -- die Schleife endet jetzt schon nach ~151 Ticks am
+// ALPHA_MIN-Abbruch (siehe runSimulation()), 300 wird nie erreicht. Konstante unveraendert
+// gelassen (Plan §9.4.6 Befund A nennt nur ALPHA_DECAY/ALPHA_MIN, nicht diese), der
+// Seiteneffekt ist in Plan §5 D2 vermerkt, nicht stillschweigend.
 const MAX_TICKS_REDUCED = 300;     // Plan §5 D2: ~300 Ticks synchron fuer reduced-motion
 const NODE_RADIUS_BASE = 4;
 const NODE_RADIUS_PER_LOG = 2;
@@ -62,6 +86,9 @@ const ZOOM_LABEL_THRESHOLD = 1.2;  // Plan §5 D2: Labels nur bei Zoom > 1.2 ode
 const DIM_ALPHA = 0.15;            // Nicht-Nachbarn auf 15% Alpha (Plan §5 D2)
 const HOVER_HIT_RADIUS = 14;       // Klick-Toleranz ueber den sichtbaren Radius hinaus
 const TAG_CLIQUE_LIMIT = 15;       // Plan §5 D2: Tags auf >15 Knoten erzeugen keine Clique
+// Fix C (Plan §9.4.6 Befund C, 2026-09-02): maximale Pointer-Bewegung zwischen mousedown und
+// mouseup, die noch als Klick (nicht Drag) zaehlt -- Klick oeffnet das Item.
+const CLICK_SLOP = 4;
 
 const COLORS = Object.freeze({
   bg: "#0B0D10",          // wird nicht gezeichnet -- Canvas ist transparent, darunter die .surface
@@ -99,7 +126,12 @@ export function init() {
   canvasEl.addEventListener("mousedown", onMouseDown);
   canvasEl.addEventListener("mousemove", onMouseMove);
   canvasEl.addEventListener("mouseup", onMouseUp);
-  canvasEl.addEventListener("mouseleave", onMouseUp);
+  // Fix C (Plan §9.4.6 Befund C, 2026-09-02): eigener Handler statt weiterhin `onMouseUp` --
+  // ein Pointer, der das Canvas waehrend eines Press verlaesst, ist nie ein Klick. Vorher
+  // teilten sich "mouseup" und "mouseleave" denselben Handler; das war unproblematisch, solange
+  // der Handler nur Drag/Pan zuruecksetzte, waere aber mit der neuen Klick-Erkennung in
+  // `onMouseUp` zur Falle geworden (Drag-off-canvas haette sonst eine Selektion ausgeloest).
+  canvasEl.addEventListener("mouseleave", onMouseLeave);
   canvasEl.addEventListener("wheel", onWheel, { passive: false });
   canvasEl.addEventListener("dblclick", onDoubleClick);
 
@@ -410,10 +442,14 @@ function drawLabels(neighbors) {
 }
 
 function nodeColor(n) {
-  // spaceCategory() wuerde hier funktionieren, aber das ist dieselbe Logik wie in tree.js
-  // und list.js -- direkt auf den Knoten-Feldern arbeitet es einen Tick schneller und macht
-  // die Abhaengigkeit von state.js ueberfluessig (graph.js laedt sich auch ohne State-Init).
-  var cat = spaceCategory({ own: n.own, writable: n.shared });
+  // Fix B (Plan §9.4.6 Befund B, 2026-09-02): der Knoten traegt jetzt own/writable in exakt
+  // derselben Form wie eine /api/v1/spaces-Zeile (webui/api.py :: _graph_get -> _writable()),
+  // deshalb dieselbe spaceCategory()-Funktion wie tree.js/list.js -- der Graph faerbt sich
+  // dadurch per Konstruktion identisch zur Rail (P8-15), keine zweite Kategorie-Logik hier.
+  // Vorher stand hier `writable: n.shared`, das Feld hiess `shared` und war tatsaechlich
+  // `space != own_space` -- jeder fremde Knoten kam als "shared" (tuerkis) heraus, die dritte
+  // Farbe --space-foreign war strukturell unerreichbar (P8-22-Smoke-Nebenfund, 2026-09-02).
+  var cat = spaceCategory({ own: n.own, writable: n.writable });
   if (cat === "own") return COLORS.spaceOwn;
   if (cat === "shared") return COLORS.spaceShared;
   return COLORS.spaceForeign;
@@ -486,6 +522,10 @@ function onMouseDown(e) {
   if (e.button !== 0) return;
   var world = graphCoordsFromEvent(e);
   var hit = hitTest(world);
+  // Fix C (Plan §9.4.6 Befund C, 2026-09-02): merkt sich Press-Position + getroffenen Knoten
+  // (null bei einem Hintergrund-Press) -- onMouseUp entscheidet anhand der Pointer-Bewegung,
+  // ob daraus ein Klick (Item oeffnen) oder nur ein abgeschlossenes Drag/Pan wird.
+  pressStart = { x: e.clientX, y: e.clientY, node: hit };
   if (hit) {
     dragNode = hit;
     dragNode.fixed = true;
@@ -518,12 +558,37 @@ function onMouseMove(e) {
   }
 }
 
-function onMouseUp() {
+function onMouseUp(e) {
+  // Fix C (Plan §9.4.6 Befund C, 2026-09-02): ein Press, der auf einem Knoten begann und sich
+  // seither um weniger als CLICK_SLOP Pixel bewegt hat, zaehlt als Klick -- Item oeffnen, kein
+  // neuer ID-Lookup noetig, `selectItem` uebernimmt das (derselbe Pfad wie `#item/`-Klicks aus
+  // B4). Traegt `pressStart.node` nicht (Hintergrund-Press) oder war die Bewegung groesser,
+  // war es ein Drag/Pan -- das Zuruecksetzen unten laeuft in jedem Fall.
+  if (pressStart && pressStart.node) {
+    var dx = e.clientX - pressStart.x;
+    var dy = e.clientY - pressStart.y;
+    if (Math.sqrt(dx * dx + dy * dy) < CLICK_SLOP) {
+      selectItem(pressStart.node.id).catch(reportUnexpectedError);
+    }
+  }
   if (dragNode) {
     dragNode.fixed = false;
     dragNode = null;
   }
   panStart = null;
+  pressStart = null;
+}
+
+function onMouseLeave() {
+  // Fix C (Plan §9.4.6 Befund C, 2026-09-02): eigener Handler statt weiterhin `onMouseUp` --
+  // der Pointer hat das Canvas verlassen, das ist nie ein Klick, egal wie klein die Bewegung
+  // seit dem Press war. Reset ist identisch zum bisherigen `onMouseUp`-Verhalten.
+  if (dragNode) {
+    dragNode.fixed = false;
+    dragNode = null;
+  }
+  panStart = null;
+  pressStart = null;
 }
 
 function onWheel(e) {

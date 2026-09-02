@@ -190,14 +190,26 @@ async def station5_hover_dim(page, probe: dict) -> dict:
 
 
 async def station6_node_click(page, payload: dict, aim: dict) -> None:
-    """Klick auf den Knoten muss das Item oeffnen (P8-20/P8-24, Plan §5 D2)."""
+    """Klick auf den Knoten muss das Item oeffnen (P8-20/P8-24, Plan §5 D2, Fix C ab
+    2026-09-02 -- `graph.js :: onMouseUp()` erkennt jetzt einen Klick (< CLICK_SLOP Bewegung
+    seit dem mousedown auf einem Knoten) und ruft `selectItem(id)`.
+
+    **[2026-09-02 Korrektur]** die Locators hier zielten auf `#editor`/`#readonly-view`/
+    `.readonly`/`#readonly-title` -- keine dieser IDs/Klassen existiert in `app.html`
+    (echte IDs: `#detail-editor`/`#detail-readonly`/`#ro-title`, siehe
+    `phase5_ui/webui/static/app.html:126-138`). Die Kriteriumspruefung war dadurch VOR Fix C
+    strukturell blind (Editor/Nur-lesen wurden nie als sichtbar erkannt, egal ob der Klick
+    funktionierte) -- der urspruengliche P8-24-Lauf (5/6, Station 6 FAIL) haette mit den alten
+    Selektoren selbst nach einem funktionierenden Klick weiterhin FAIL gezeigt. Erst beim
+    Nachpruefen von Fix C aufgefallen: `#field-title` (korrekt) hatte einen echten Knotentitel
+    geliefert, aber `editor_open`/`readonly_open` blieben beide 0."""
     titles = {n["title"] for n in payload.get("nodes") or []}
     await page.mouse.click(aim["left"] + aim["target"]["x"], aim["top"] + aim["target"]["y"])
     await page.wait_for_timeout(1200)
-    editor_open = await page.locator("#editor:visible").count()
-    readonly_open = await page.locator("#readonly-view:visible, .readonly:visible").count()
+    editor_open = await page.locator("#detail-editor:visible").count()
+    readonly_open = await page.locator("#detail-readonly:visible").count()
     shown = ""
-    for selector in ("#field-title", "#readonly-title", ".editor__title"):
+    for selector in ("#field-title", "#ro-title"):
         loc = page.locator(selector)
         if await loc.count():
             try:
@@ -214,12 +226,9 @@ async def station6_node_click(page, payload: dict, aim: dict) -> None:
         f"angezeigter Titel {shown.strip()!r} ist ein Knotentitel={hit}",
     )
     if not (editor_open or readonly_open):
-        print("[FUND] `js/graph.js` hat ueberhaupt keinen Klick-nach-Item-Pfad: die Datei "
-              "importiert nur `api`/`reportUnexpectedError`/`spaceCategory`, `selectItem` "
-              "kommt darin nicht vor (`grep -n selectItem js/*.js` findet app.js:122/213 und "
-              "list.js:111/355, nie graph.js). `onMouseDown`/`onMouseUp` setzen ausschliesslich "
-              "Drag/Pan zurueck. Die Behauptung 'Klick -> Editor.selectItem' im Phase-Head "
-              "(D2-Session-Block) und Plan §5 D2 hat im Code keine Entsprechung.")
+        print("[FUND] Klick hat das Item NICHT geoeffnet -- `graph.js :: onMouseUp()`/"
+              "`selectItem`-Pfad (Fix C) pruefen, oder `#detail-editor`/`#detail-readonly` "
+              "sind aus einem anderen Grund nicht sichtbar geworden.")
 
 
 async def _shot(page, name: str) -> None:

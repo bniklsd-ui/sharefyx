@@ -639,10 +639,23 @@ def api_routes(
           archiviertes Item ohne `?archived=1` produziert schlicht keine Kante),
         - exakt dedupliziert pro `(src, dst, kind)`.
 
-        Knoten-Payload: exakt die acht Felder aus Plan §3 B3 (`id`/`title`/`space`/`own`/
-        `shared`/`type`/`status`/`folder`/`tags`). Kein `snippet`, kein `body` -- die Graph-
-        Ansicht braucht keine Inhalte, und fremde Snippets/Bodies wären Rule 4 dem Geiste nach
-        fragwürdig (analog zu `overview_row_to_json`'s `snippet`-Strip).
+        Knoten-Payload: exakt die neun Felder aus Plan §3 B3 (`id`/`title`/`space`/`own`/
+        `writable`/`type`/`status`/`folder`/`tags` -- **[2026-09-02 Korrektur, Fix B, Plan
+        §9.4.6 Befund B]** war zuvor als "acht Felder .../`shared`/..." dokumentiert; das war
+        schon vor dem `shared`→`writable`-Fix ein Zähl-Fehler, die Liste hatte immer neun
+        Einträge). Kein `snippet`, kein `body` -- die Graph-Ansicht braucht keine Inhalte, und
+        fremde Snippets/Bodies wären Rule 4 dem Geiste nach fragwürdig (analog zu
+        `overview_row_to_json`'s `snippet`-Strip).
+
+        `writable` ist **space-level** über `permissions.can_write(session.space, i.space)`
+        berechnet, memoisiert pro Space-Name (Plan §9.4.6 Befund B, Fix (a), 2026-09-02) --
+        dieselbe Quelle wie `/api/v1/spaces` (Zeile ~358/~618 in dieser Datei), NICHT
+        `webui/serializers.py :: overview_row_to_json`'s `shared`-Feld (das benutzt dieselbe
+        `space != own_space`-Näherung, die hier gerade behoben wird -- kein Vorbild). Vorher
+        stand hier `"shared": i.space != session.space`, was JEDEN fremden Knoten als "shared"
+        (türkis) einfärbte und die dritte Legendenfarbe `--space-foreign` (grau) strukturell
+        unerreichbar machte, obwohl die Legende sie zeigt (P8-15, im 200-Knoten-Smoke vom
+        2026-09-02 gefunden, siehe `docs/concepts/phase8_ui_graph_plan.md` §9.4.6).
         """
         session = await _require_session(request)
         include_archived = request.query_params.get("archived") == "1"
@@ -668,13 +681,24 @@ def api_routes(
         ]
         visible_ids = {i.id for i in visible_items}
 
+        # `writable` je Space memoisiert -- ein 200-Knoten-Graph hat ~drei distinkte Spaces,
+        # nicht 200 `can_write`-Aufrufe (Fix B, Plan §9.4.6 Befund B, 2026-09-02).
+        writable_by_space: dict[str, bool] = {}
+
+        def _writable(space: str) -> bool:
+            cached = writable_by_space.get(space)
+            if cached is None:
+                cached = permissions.can_write(session.space, space)
+                writable_by_space[space] = cached
+            return cached
+
         nodes = [
             {
                 "id": i.id,
                 "title": i.title,
                 "space": i.space,
                 "own": i.space == session.space,
-                "shared": i.space != session.space,
+                "writable": _writable(i.space),
                 "type": i.type,
                 "status": i.status,
                 "folder": i.folder,

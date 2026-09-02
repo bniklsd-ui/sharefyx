@@ -51,10 +51,13 @@ async def test_graph_returns_visible_nodes_and_edges(full_app_items, item_store,
     assert target.id in by_id
     assert by_id[source.id]["title"] == "Quelle"
     assert by_id[source.id]["own"] is True
-    assert by_id[source.id]["shared"] is False
-    # Exakt die acht Felder aus Plan §3 B3 -- nicht mehr.
+    # Fix B (Plan §9.4.6 Befund B, 2026-09-02): `shared` -> `writable`, space-level ueber
+    # `permissions.can_write`. Ein eigener Knoten ist immer writable (actor == target).
+    assert by_id[source.id]["writable"] is True
+    # Exakt die neun Felder aus Plan §3 B3 -- nicht mehr (war zuvor faelschlich als "acht"
+    # dokumentiert, siehe die datierte Korrektur im `_graph_get`-Docstring).
     assert set(by_id[source.id].keys()) == {
-        "id", "title", "space", "own", "shared", "type", "status", "folder", "tags",
+        "id", "title", "space", "own", "writable", "type", "status", "folder", "tags",
     }
 
     edges = sorted(data["edges"], key=lambda e: (e["src"], e["kind"], e["dst"]))
@@ -115,6 +118,38 @@ async def test_graph_includes_foreign_shared_item_as_node(full_app_items, item_s
     assert own.id in node_ids
     assert foreign.id in node_ids
     assert any(e["src"] == own.id and e["dst"] == foreign.id for e in data["edges"])
+
+
+@pytest.mark.asyncio
+async def test_graph_node_writable_reflects_space_level_write_grant(
+    full_app_items, item_store, totp_code, tmp_path,
+):
+    """Fix B (Plan §9.4.6 Befund B, 2026-09-02): `_graph_get` rechnete bis zu diesem Fix
+    `"shared": i.space != session.space` -- JEDER fremde Knoten kam damit als "shared" (tuerkis)
+    heraus, egal ob der Space nur lesbar oder tatsaechlich schreibgeteilt war; die dritte
+    Legendenfarbe (`--space-foreign`, grau) war strukturell unerreichbar (P8-15-Nebenfund im
+    200-Knoten-Smoke, 2026-09-02). Jetzt rechnet `writable` ueber `permissions.can_write`
+    (space-level, dieselbe Quelle wie `/api/v1/spaces`). Zwei fremde Spaces, zwei Ergebnisse --
+    ohne diesen Test kaeme der Bug lautlos zurueck."""
+    readonly_space = "gamma"
+    readonly_item = item_store.create(readonly_space, type="note", title="Nur lesbar")
+    (tmp_path / "data" / readonly_space / ".share.yml").write_text(
+        f"read: [{SPACE}]\n", encoding="utf-8"
+    )
+
+    writeshare_item = item_store.create(FOREIGN_SPACE, type="note", title="Schreibgeteilt")
+    (tmp_path / "data" / FOREIGN_SPACE / ".share.yml").write_text(
+        f"write: [{SPACE}]\n", encoding="utf-8"
+    )
+
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        response = await client.get("/api/v1/graph")
+
+    data = response.json()
+    by_id = {n["id"]: n for n in data["nodes"]}
+    assert by_id[readonly_item.id]["writable"] is False
+    assert by_id[writeshare_item.id]["writable"] is True
 
 
 # --- Dangling references ----------------------------------------------------------------

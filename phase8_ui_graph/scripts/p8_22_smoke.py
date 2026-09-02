@@ -192,25 +192,25 @@ async def step1_payload(page) -> dict:
     kinds = sorted({e.get("kind") for e in edges})
     spaces = sorted({n["space"] for n in nodes})
     own = sum(1 for n in nodes if n.get("own"))
-    shared = sum(1 for n in nodes if not n.get("own") and n.get("shared"))
-    foreign = len(nodes) - own - shared
-    assert own and (shared or foreign), (
-        f"Datensatz enthaelt nicht mindestens einen eigenen und einen fremden Knoten: "
-        f"own={own} shared={shared} foreign={foreign}"
-    )
+    shared = sum(1 for n in nodes if not n.get("own") and n.get("writable"))
+    foreign = sum(1 for n in nodes if not n.get("own") and not n.get("writable"))
     print(f"[OK ] /api/v1/graph: {len(nodes)} Knoten ({own} own / {shared} shared / "
           f"{foreign} foreign, Spaces {spaces}), {len(edges)} explizite Kanten, kinds={kinds}")
-    if foreign == 0 and len(spaces) >= 3:
-        # Der Datensatz hat bewusst einen `--write`- UND einen `--read`-Mitgliedsspace, also
-        # zwei unterschiedliche C3-Kategorien fuer fremde Spaces. Der Payload macht daraus
-        # eine: `webui/api.py :: _graph_get` setzt `"shared": i.space != session.space`, und
-        # `js/graph.js :: nodeColor()` reicht dieses Feld als `writable` an
-        # `state.js :: spaceCategory()` weiter. Damit ist jeder fremde Knoten "shared"
-        # (tuerkis); `--space-foreign` (grau) ist im Graphen strukturell unerreichbar.
-        print("[FUND] `shared` im Graph-Payload heisst 'nicht mein Space', nicht 'schreibbar' "
-              "(`api.py :: _graph_get`) -- `nodeColor()` faerbt deshalb JEDEN fremden Knoten "
-              "tuerkis, die dritte C3-Farbe (grau/foreign) kann im Graphen nicht auftreten. "
-              f"Datensatz haette {spaces} in own/shared/foreign getrennt erwartet (P8-15).")
+    # Fix B (Plan §9.4.6 Befund B, behoben 2026-09-02): der Datensatz hat bewusst einen
+    # `--write`- UND einen `--read`-Mitgliedsspace, also zwei unterschiedliche C3-Kategorien
+    # fuer fremde Spaces (alpha own / beta shared-write / gamma foreign-read). Vor dem Fix
+    # setzte `webui/api.py :: _graph_get` `"shared": i.space != session.space`, und
+    # `js/graph.js :: nodeColor()` reichte dieses Feld als `writable` an `state.js ::
+    # spaceCategory()` weiter -- jeder fremde Knoten kam damit als "shared" (tuerkis) heraus,
+    # `foreign` blieb strukturell immer 0, egal wie der Datensatz aussah (P8-15-Nebenfund,
+    # urspruenglicher Lauf dieses Smokes, 2026-09-02). `_graph_get` liefert seither ein echtes
+    # `writable`-Feld (space-level `permissions.can_write`, memoisiert pro Space) -- diese
+    # Assertion ist der Regressionswaechter dafuer, nicht nur ein Diagnose-Print mehr.
+    assert own > 0 and shared > 0 and foreign > 0, (
+        f"own/shared/foreign nicht alle drei besetzt (own={own} shared={shared} "
+        f"foreign={foreign}, Spaces {spaces}) -- P8-15-Regression, `_graph_get`s "
+        f"`writable`-Feld pruefen"
+    )
     return payload
 
 
@@ -318,11 +318,23 @@ async def step3_interaction(page, label: str = "Interaktion ohne Hakeln") -> dic
         hover.push(timed(() => c.dispatchEvent(new MouseEvent('mousemove', ev('mousemove', x, y)))));
       }
       c.dispatchEvent(new MouseEvent('mousedown', ev('mousedown', target.x, target.y, { button: 0 })));
+      let dragEndX = target.x, dragEndY = target.y;
       for (let i = 0; i < 30; i++) {
-        const x = target.x + i * 3, y = target.y + i * 2;
-        drag.push(timed(() => c.dispatchEvent(new MouseEvent('mousemove', ev('mousemove', x, y)))));
+        dragEndX = target.x + i * 3; dragEndY = target.y + i * 2;
+        drag.push(timed(() => c.dispatchEvent(new MouseEvent('mousemove', ev('mousemove', dragEndX, dragEndY)))));
       }
-      c.dispatchEvent(new MouseEvent('mouseup', ev('mouseup', target.x, target.y, { button: 0 })));
+      // Fix C (Plan §9.4.6 Befund C, 2026-09-02): mouseup MUSS an der zuletzt gedraggten
+      // Position feuern, nicht an der urspruenglichen mousedown-Position -- `graph.js ::
+      // onMouseUp()` vergleicht seit Fix C `e.clientX/clientY` gegen `pressStart` (CLICK_SLOP),
+      // um einen Klick von einem Drag zu unterscheiden. Ein mouseup an der Startposition sieht
+      // nach einem Klick auf `target` aus (Distanz 0 < CLICK_SLOP) und hätte `selectItem()`
+      // ausgeloest -- die Uebersicht wechselt dann zur Detailansicht, und
+      // `#overview-graph-toggle-tags` (nur im Uebersicht-Panel) verschwindet aus dem DOM,
+      // wodurch Schritt 4 (Tag-Toggle) mit "element is not visible" fehlschlaegt. Vorher
+      // (vor Fix C) ignorierte `onMouseUp()` die Position vollstaendig, der Fehler war also
+      // nicht sichtbar. Ein echter Drag laesst die Maus dort los, wo sie zuletzt war --
+      // dieser Test tut das jetzt auch.
+      c.dispatchEvent(new MouseEvent('mouseup', ev('mouseup', dragEndX, dragEndY, { button: 0 })));
       for (let i = 0; i < 10; i++) {
         wheel.push(timed(() => c.dispatchEvent(new WheelEvent('wheel', Object.assign(
           ev('wheel', r.width / 2, r.height / 2), { deltaY: i % 2 ? 100 : -100, cancelable: true })))));
