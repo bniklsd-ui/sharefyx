@@ -4,7 +4,7 @@ purpose: Menschliche Übersicht + Maschinen-Setup (venv, Keyring, Datenverzeichn
 read-when: erstes Setup auf einer neuen Maschine, oder wenn jemand wissen will, was das Ding überhaupt ist
 detail: L2
 up: docs/INDEX.md
-updated: 2026-09-02
+updated: 2026-09-02 (Sneak-Peak-Sektion auf die vier c4c5_*-Screenshots aus Block C4+C5 umgestellt -- Liquid-Glas-Akzente, Auswahl-Sheen 3px + Outline, Editor-72ch, Anlege-Dialog-Glas; ersetzt die sechs sp2_*-Screenshots aus Block D, die jetzt nur noch als historische Referenz unter docs/screenshots/ liegen)
 ---
 # Space-Server
 
@@ -58,26 +58,27 @@ Adapter darüber — deshalb wird der Kern zuerst gebaut und offline bewiesen.
 
 ## Sneak Peak — Phase 8 (v3)
 
-Sechs Screenshots aus Phase 8 Block D (v3.0): tabellose Übersicht mit Space-Zeilen,
-Verknüpfungs-Graph als Force-Directed-Layout, Knoten-Klick öffnet das Item. Gegen
-eine Wegwerf-Instanz mit 26 Items über drei Spaces (eigener + zwei fremde-readable),
-Frontmatter-Links, Body-Referenzen, gemeinsame Tags und Ordner — die Toggles
-zeigen, wie das Bild mit jeder zugeschalteten Kantenart dichter wird.
+Vier Screenshots aus Phase 8 Block C4+C5: Liquid-Glas-Akzente auf Sticky-Head und
+Overlays, 3-px-Akzentkante + 1-px-Outline als Auswahl-Sheen, Editor zentriert auf
+72ch Lesebreite, `::selection` im eigenen Akzent-Quiet. Gegen eine Wegwerf-Instanz
+auf Port 18770 mit sieben Items über zwei Spaces, aufgenommen für die
+Nikinger-Sichtprüfung 3 am echten Gerät.
 
 | | |
 |:---:|:---|
-| ![Übersicht tabellos](docs/screenshots/sp2_01_overview_spaces_rows.png) | ![Globaler Scope](docs/screenshots/sp2_02_overview_global_scope.png) |
-| Übersicht mit drei Space-Zeilen (eigene + fremde, Counter-Chips), Legende, Graph im Default | „Alle Items" nach Home-Klick — die Liste zeigt jetzt eigene und fremde Items zusammen |
-| ![Graph mit Default](docs/screenshots/sp2_03_graph_default.png) | ![Graph mit Tag-Toggle](docs/screenshots/sp2_04_graph_with_tags.png) |
-| Verknüpfungs-Graph mit nur expliziten Kanten (Frontmatter + Body) | zusätzlich gestrichelte Linien für gemeinsame Tags |
-| ![Graph mit Tag + Ordner](docs/screenshots/sp2_05_graph_with_folders.png) | ![Knoten-Klick öffnet Item](docs/screenshots/sp2_06_node_click.png) |
-| zusätzlich gepunktete Linien für gemeinsame Ordner — der Graph wird erwartbar dichter | Klick auf einen Knoten öffnet das Item im Editor-Bereich, mit Versionsband und Metadaten |
+| ![Übersicht mit sticky head](docs/screenshots/c4c5_01_overview_sticky_head.png) | ![Selected row mit Akzentkante](docs/screenshots/c4c5_02_selected_row_3px_outline.png) |
+| Übersicht nach Login: Sticky List-Head mit Crumb, C3-Legende, D2-Graph-Panel im Hintergrund | selektierte Listenzeile mit 3-px-Akzentkante + 1-px-Outline + Backdrop-Sheen (sichtbar bei aktivem Blur) |
+| ![Editor mit 72ch](docs/screenshots/c4c5_03_editor_72ch.png) | ![Anlege-Dialog in Glas](docs/screenshots/c4c5_04_create_dialog_glass.png) |
+| Editor-Spalte zentriert auf 72ch Lesebreite (576px in der 836px-Spalte, kein Vollbreiten-Flattern) | Anlege-Dialog als Liquid-Glas-Träger (`--glass-bg` semi-transparent + Backdrop-Blur, Fallback solide bei `prefers-reduced-transparency`) |
 
-Hinweis: die Screenshots wurden **vor** dem Phase-8-Block-D-Live-Deploy gemacht und
-zeigen den Stand des lokalen Working-Trees. Die älteren Screenshots aus Block C
+Hinweis: die Screenshots wurden **vor** dem Phase-8-Block-C4+C5-Live-Deploy gemacht
+und zeigen den Stand des lokalen Working-Trees. Die Block-D-Screenshots
+(`docs/screenshots/sp2_*`, tabellose Übersicht im Detail + Force-Graph mit
+Tag-Toggle/Ordner-Toggle/Knoten-Klick) und die Block-C-Screenshots
 (`docs/screenshots/01_login.png` … `09_overview_clean.png`, mit Kachel-Grid) bleiben
-als historische Referenz im Verzeichnis, sind aber **nicht** mehr aktuell — wer
-die aktuelle Oberfläche sehen will, schaut auf die obigen sechs Bilder.
+als historische Referenz im Verzeichnis, sind aber **nicht** mehr der aktuellste
+Stand — wer die volle Übersicht sehen will, schaut oben für C4+C5, dann auf die
+`sp2_*`-Bilder für den Verknüpfungs-Graph im Detail.
 
 ## Setup
 
