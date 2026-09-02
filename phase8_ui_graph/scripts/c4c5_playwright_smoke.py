@@ -4,16 +4,19 @@
 Pruefungen:
   1. CSS-Content (statisch via fetch): --glass-* Tokens, .glass-Utility,
      @supports backdrop-filter, @media prefers-reduced-transparency,
-     ::selection, max-width:72ch auf .editor__textarea, 3px-Akzentkante +
-     Rail-Button-Gradient-Fill auf .list__row[aria-current="true"] und
-     .list__rows > li.list__row--selected (Vormerkung 3 Punkt 1, Richtung (a)
-     -- loest den fruehreren Outline+Blur-Sheen ab, 2026-09-02).
+     ::selection, max-width:72ch auf .editor__textarea, Rail-Button-Gradient-Fill
+     + umlaufender 1px-Outline (var(--accent-line)) auf .list__row[aria-current="true"]
+     und .list__rows > li.list__row--selected, KEIN linker Akzentrand mehr
+     (Vormerkung 3 Punkt 1, Richtung (a), nachgeschaerft 2026-09-02 nach
+     Nikinger-Sichtung des ersten Wurfs: "remove the left solid line and add the
+     outline I can see around the Notizen Auswahl").
   2. Login + Overview: .list__head ist sticky positioniert (CSS computed style),
      .list__head.traegt die Glass-Träger-Regeln (CSS-Variable --glass-bg ist
      gesetzt), rail__glyph--own sichtbar.
-  3. Klick auf ein Item: ausgewaehlte Zeile hat aria-current="true", berechnete
-     border-left-color ist var(--accent), background-image ist derselbe Gradient
-     wie .rail__home[aria-current="true"] (Unified-Nachweis fuer Richtung (a)).
+  3. Klick auf ein Item: ausgewaehlte Zeile hat aria-current="true", border-left-color
+     ist NICHT eingefaerbt, computed outlineColor/outlineWidth entspricht
+     var(--accent-line)/1px, background-image ist derselbe Gradient wie
+     .rail__home[aria-current="true"] (Unified-Nachweis fuer Richtung (a)).
   4. Editor offen: .editor__textarea hat computed max-width: 72ch und ist
      horizontal zentriert (margin: 0 auto wirksam -- boundingClientRect.centerX
      im Bereich der Listen-Spalten-Mitte).
@@ -70,27 +73,32 @@ async def step1_css_static_checks() -> str:
     # 72ch-Editor
     assert re.search(r"\.editor__textarea\s*{[^}]*max-width:\s*72ch", body), \
         ".editor__textarea ohne max-width: 72ch"
-    # Selektion: 3px Akzentkante + Rail-Button-Gradient-Fill, KEIN outline mehr
-    # (Regex mit DOTALL, weil die Properties in der naechsten Zeile nach der
-    # Selector-Klammer stehen). Vormerkung 3 Punkt 1, Richtung (a), 2026-09-02.
+    # Selektion: Rail-Button-Gradient-Fill + umlaufender Outline, KEIN linker
+    # Akzentrand mehr (Regex mit DOTALL, weil die Properties in der naechsten Zeile
+    # nach der Selector-Klammer stehen). Vormerkung 3 Punkt 1, Richtung (a),
+    # nachgeschaerft 2026-09-02 (linke Linie raus, Outline rein).
     RAIL_GRADIENT = "linear-gradient(180deg, rgba(62,141,243,.20), rgba(62,141,243,.08))"
-    assert re.search(
-        r"\.list__row\[aria-current=\"true\"\]\s*\{[^}]*border-left-color:\s*var\(--accent\)",
-        body, re.DOTALL), ".list__row[aria-current=true] ohne 3px Akzentkante"
     assert re.search(
         re.escape(f'.list__row[aria-current="true"] {{\n  background: {RAIL_GRADIENT};'),
         body), ".list__row[aria-current=true] ohne Rail-Button-Gradient-Fill"
     assert re.search(
-        r"\.list__row\[aria-current=\"true\"\]\s*\{[^}]*outline",
-        body, re.DOTALL) is None, \
-        ".list__row[aria-current=true] traegt noch eine outline-Regel (Vormerkung 3 " \
-        "Punkt 1 hat sie durch den Fill abgeloest)"
+        r"\.list__row\[aria-current=\"true\"\]\s*\{[^}]*outline:\s*1px solid var\(--accent-line\)",
+        body, re.DOTALL), ".list__row[aria-current=true] ohne umlaufenden Outline"
     assert re.search(
-        r"\.list__rows\s*>\s*li\.list__row--selected\s*\{[^}]*border-left:\s*3px solid var\(--accent\)",
-        body, re.DOTALL), "Mehrfachauswahl ohne 3px Akzentkante"
+        r"\.list__row\[aria-current=\"true\"\]\s*\{[^}]*border-left-color",
+        body, re.DOTALL) is None, \
+        ".list__row[aria-current=true] faerbt noch den linken Rand ein (sollte per " \
+        "Nikinger-Feedback entfernt sein)"
     assert re.search(
         re.escape(f'.list__rows > li.list__row--selected {{\n  background: {RAIL_GRADIENT};'),
         body), "Mehrfachauswahl ohne Rail-Button-Gradient-Fill"
+    assert re.search(
+        r"\.list__rows\s*>\s*li\.list__row--selected\s*\{[^}]*outline:\s*1px solid var\(--accent-line\)",
+        body, re.DOTALL), "Mehrfachauswahl ohne umlaufenden Outline"
+    assert re.search(
+        r"\.list__rows\s*>\s*li\.list__row--selected\s*\{[^}]*border-left:",
+        body, re.DOTALL) is None, \
+        "Mehrfachauswahl faerbt noch einen linken Rand ein (sollte entfernt sein)"
     # Unified-Nachweis: derselbe Gradient wie .rail__home[aria-current="true"] (Zeile ~402)
     assert body.count(RAIL_GRADIENT) >= 3, \
         f"Rail-Button-Gradient nur {body.count(RAIL_GRADIENT)}x gefunden, erwartet " \
@@ -100,7 +108,7 @@ async def step1_css_static_checks() -> str:
         "Glas-Traeger-Liste am Dateiende fehlt"
     print("[OK ] app.css: --glass-* Tokens, .glass-Utility, @supports, "
           "prefers-reduced-transparency, ::selection, max-width:72ch, "
-          "3px Akzentkante + Rail-Button-Gradient-Fill (kein outline mehr), "
+          "Rail-Button-Gradient-Fill + umlaufender Outline (kein linker Rand mehr), "
           "gruppierte Glas-Traeger")
     return body
 
@@ -142,21 +150,28 @@ async def step3_selected_row_styles(page) -> None:
       const railCs = rail ? getComputedStyle(rail) : null;
       return {
         borderLeftColor: rowCs.borderLeftColor,
-        borderLeftWidth: rowCs.borderLeftWidth,
         rowBackgroundImage: rowCs.backgroundImage,
         rowBoxShadow: rowCs.boxShadow,
         outlineStyle: rowCs.outlineStyle,
+        outlineWidth: rowCs.outlineWidth,
+        outlineColor: rowCs.outlineColor,
         railBackgroundImage: railCs ? railCs.backgroundImage : null,
       };
     }""")
-    # 3px Akzentkante links (var(--accent) = #3E8DF3 = rgb(62,141,243))
-    assert styles["borderLeftWidth"] == "3px", \
-        f"border-left-width ist {styles['borderLeftWidth']}, erwartet 3px"
-    assert "62, 141, 243" in styles["borderLeftColor"] or "3e8df3" in styles["borderLeftColor"].lower(), \
-        f"border-left-color ist {styles['borderLeftColor']}, erwartet var(--accent)"
-    # Kein Outline mehr (Vormerkung 3 Punkt 1 hat die schwimmende -4px-Outline abgeloest)
-    assert styles["outlineStyle"] in ("none", ""), \
-        f"outline-style ist {styles['outlineStyle']}, erwartet 'none' (Outline wurde abgeloest)"
+    # Kein linker Akzentrand mehr (Nikinger-Feedback nach der ersten Fassung: "remove
+    # the left solid line"). border-left bleibt im Boxmodell (Layout-Reservierung),
+    # nur die Farbe darf sich nicht mehr aendern -- transparent, nicht var(--accent).
+    assert "62, 141, 243" not in styles["borderLeftColor"], \
+        f"border-left-color ist {styles['borderLeftColor']}, sollte transparent sein " \
+        f"(linker Akzentrand wurde per Nikinger-Feedback entfernt)"
+    # Umlaufender Outline statt linkem Rand ("add the outline I can see around the
+    # Notizen Auswahl" -- derselbe --accent-line-Ton wie der Rail-Button-Rand)
+    assert styles["outlineStyle"] == "solid", \
+        f"outline-style ist {styles['outlineStyle']}, erwartet 'solid'"
+    assert styles["outlineWidth"] == "1px", \
+        f"outline-width ist {styles['outlineWidth']}, erwartet 1px"
+    assert "62, 141, 243" in styles["outlineColor"], \
+        f"outline-color ist {styles['outlineColor']}, erwartet var(--accent-line)"
     # Solider Gradient-Fill statt --accent-quiet
     assert "gradient" in styles["rowBackgroundImage"], \
         f"background-image ist {styles['rowBackgroundImage']}, erwartet einen Gradienten"
@@ -168,11 +183,13 @@ async def step3_selected_row_styles(page) -> None:
             f"Listenzeile ({styles['rowBackgroundImage']}) und Rail-Button " \
             f"({styles['railBackgroundImage']}) haben unterschiedliche Gradienten -- " \
             f"Richtung (a) verlangt denselben Fill"
-        print(f"[OK ] Ausgewaehlte Zeile (own): border-left 3px + Rail-Button-Gradient-Fill, "
-              f"identisch mit Rail-Button computed background-image")
+        print(f"[OK ] Ausgewaehlte Zeile (own): Rail-Button-Gradient-Fill + umlaufender "
+              f"Outline, kein linker Rand, Fill identisch mit Rail-Button computed "
+              f"background-image")
     else:
-        print(f"[OK ] Ausgewaehlte Zeile (own): border-left 3px + Rail-Button-Gradient-Fill "
-              f"(kein aktiver Rail-Button in dieser Ansicht zum Direktvergleich)")
+        print(f"[OK ] Ausgewaehlte Zeile (own): Rail-Button-Gradient-Fill + umlaufender "
+              f"Outline, kein linker Rand (kein aktiver Rail-Button in dieser Ansicht zum "
+              f"Direktvergleich)")
 
 
 async def step4_editor_textarea_72ch(page) -> None:

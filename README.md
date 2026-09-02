@@ -59,17 +59,17 @@ Adapter darüber — deshalb wird der Kern zuerst gebaut und offline bewiesen.
 ## Sneak Peak — Phase 8 (v3)
 
 Vier Screenshots aus Phase 8 Block C4+C5: Liquid-Glas-Akzente auf Sticky-Head und
-Overlays, 3-px-Akzentkante + solider Rail-Button-Gradient-Fill als Auswahl-Sheen
-(Vormerkung 3 Punkt 1, Nikinger-Entscheidung 2026-09-02 Richtung (a) — löst die
-frühere, kaum wahrnehmbare Outline-Variante ab), Editor zentriert auf 72ch
-Lesebreite, `::selection` im eigenen Akzent-Quiet. Gegen eine Wegwerf-Instanz auf
-Port 18770 mit sieben Items über zwei Spaces, aufgenommen für die
-Nikinger-Sichtprüfung 3 am echten Gerät.
+Overlays, solider Rail-Button-Gradient-Fill + umlaufender Outline als Auswahl-Sheen
+(Vormerkung 3 Punkt 1, Nikinger-Entscheidung 2026-09-02 Richtung (a), zweifach
+nachgeschärft nach Sichtung — kein linker Akzentrand mehr, dafür der Outline-Rahmen
+vom Rail-Button-Vorbild), Editor zentriert auf 72ch Lesebreite, `::selection` im
+eigenen Akzent-Quiet. Gegen eine Wegwerf-Instanz auf Port 18770 mit sieben Items
+über zwei Spaces, aufgenommen für die Nikinger-Sichtprüfung 3 am echten Gerät.
 
 | | |
 |:---:|:---|
 | ![Übersicht mit sticky head](docs/screenshots/c4c5_01_overview_sticky_head.png) | ![Selected row mit Akzent-Fill](docs/screenshots/c4c5_02_selected_row_accent_fill.png) |
-| Übersicht nach Login: Sticky List-Head mit Crumb, C3-Legende, D2-Graph-Panel im Hintergrund | selektierte Listenzeile mit 3-px-Akzentkante + soliden Rail-Button-Gradient-Fill (identisch mit dem Rail-Button-Akzent aus der Navigation) |
+| Übersicht nach Login: Sticky List-Head mit Crumb, C3-Legende, D2-Graph-Panel im Hintergrund | selektierte Listenzeile mit soliden Rail-Button-Gradient-Fill + umlaufendem 1-px-Outline (identisch mit dem Rail-Button-Akzent aus der Navigation, kein linker Rand mehr) |
 | ![Editor mit 72ch](docs/screenshots/c4c5_03_editor_72ch.png) | ![Anlege-Dialog in Glas](docs/screenshots/c4c5_04_create_dialog_glass.png) |
 | Editor-Spalte zentriert auf 72ch Lesebreite (576px in der 836px-Spalte, kein Vollbreiten-Flattern) | Anlege-Dialog als Liquid-Glas-Träger (`--glass-bg` semi-transparent + Backdrop-Blur, Fallback solide bei `prefers-reduced-transparency`) |
 

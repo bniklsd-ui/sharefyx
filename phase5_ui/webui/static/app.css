@@ -667,20 +667,23 @@ select.input:focus {
 
 .list__row:hover { background: var(--surface); }
 
-/* Auswahl-Fill (Vormerkung 3 Punkt 1, Nikinger-Entscheidung 2026-09-02 Richtung (a)):
-   loest den fruehreren Glass-Sheen (Blur + schwimmende -4px-Outline) ab -- per
-   Handyscreenshot-Vergleich war die Outline "kaum wahrnehmbar" gegen den soliden
-   Rail-Button-Akzent-Fill (.rail__home[aria-current="true"] o.ae., Zeile ~402).
-   Uebernimmt denselben Gradient + Gloss-Highlight woertlich. Die 3px-Akzentkante
-   links bleibt unveraendert (kein Layout-Shift, `.list__row`-Default-Border bleibt
-   3px transparent). N8 (Verbotsliste §0.3 Punkt 6: Erkennbarkeit darf nicht allein
-   von Transparenz/Blur abhaengen) ist damit EINFACHER erfuellt als vorher -- kein
-   backdrop-filter mehr im Spiel, die Erkennbarkeit haengt an einem opaken Gradient
-   plus dem soliden linken Akzentrand. */
+/* Auswahl-Fill (Vormerkung 3 Punkt 1, Nikinger-Entscheidung 2026-09-02 Richtung (a),
+   nachgeschaerft nach Sichtpruefung der ersten Fassung): loest den fruehreren Glass-Sheen
+   (Blur + schwimmende -4px-Outline + 3px-Akzentrand links) vollstaendig ab -- Nikinger-
+   Feedback auf den ersten Wurf ("remove the left solid line and add the outline I can see
+   around the Notizen Auswahl"): der linke Rand sollte weg, stattdessen ein umlaufender
+   Rahmen wie beim Rail-Button. `outline` statt `border`, weil Outline layoutneutral ist
+   (nimmt keinen Platz im Boxmodell weg, kein Risiko einer Breitenaenderung wie bei einem
+   echten `border` auf allen vier Seiten). `.list__row`s 3px-transparenter Default-Rand
+   bleibt unveraendert stehen (harmlos, faerbt sich nirgends mehr ein) statt ihn zu
+   entfernen -- Entfernen wuerde die Zeilenbreite fuer ALLE Zeilen um 3px aendern, nicht nur
+   fuer die ausgewaehlte. N8 (Verbotsliste §0.3 Punkt 6): weiterhin einfacher erfuellt als
+   die urspruengliche Fassung, kein Blur im Spiel. */
 .list__row[aria-current="true"] {
   background: linear-gradient(180deg, rgba(62,141,243,.20), rgba(62,141,243,.08));
-  border-left-color: var(--accent);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+  outline: 1px solid var(--accent-line);
+  outline-offset: -1px;
 }
 
 .list__row-move, .list__row-share {
@@ -707,25 +710,23 @@ select.input:focus {
 .list__rows > li.list__row-draggable--active { opacity: .5; }
 
 /* Mehrfachauswahl (§9) -- dieselbe Auswahl-Sprache wie `.list__row[aria-current="true"]`
-   darüber, jetzt mit demselben Rail-Button-Fill (Vormerkung 3 Punkt 1, Richtung (a)):
-   solider Gradient + Gloss-Highlight statt Glass-Blur + schwimmender Outline.
-   `border-left` bleibt 3px (Default-Breite bei `.list__row` unveraendert, kein
-   Layout-Shift). */
+   darüber: solider Gradient-Fill + Gloss-Highlight + umlaufender Outline (kein linker
+   Akzentrand mehr, siehe Kommentar dort für die Begründung). */
 .list__rows > li.list__row--selected {
   background: linear-gradient(180deg, rgba(62,141,243,.20), rgba(62,141,243,.08));
-  border-left: 3px solid var(--accent);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+  outline: 1px solid var(--accent-line);
+  outline-offset: -1px;
 }
 
-/* Kombiniert (selektiert UND aktuell): das innere `.list__row` darf seinen 3px-Border
-   nicht zusätzlich einfärben -- sonst gibt's 6px Akzent links (3px li-Border + 3px
-   button-Border). Border bleibt transparent, der äußere li-Border trägt die Akzenz.
-   Denselben Grund hat der Fill-Override darunter -- zwei gestapelte Gradienten (li +
-   inneres .list__row) würden sich sichtbar aufaddieren, der äußere li-Fill reicht. */
-.list__rows > li.list__row--selected .list__row { border-left-color: transparent; }
+/* Kombiniert (selektiert UND aktuell): das innere `.list__row` darf seinen Fill/Outline
+   nicht zusätzlich aufbauen -- sonst gibt's einen doppelten, sichtbar dickeren Rahmen
+   (li-Outline + button-Outline uebereinander) und einen aufaddierten Gradient. Der
+   äußere li-Fill/-Outline reicht. */
 .list__rows > li.list__row--selected .list__row[aria-current="true"] {
   background: none;
   box-shadow: none;
+  outline: none;
 }
 
 .list__row-title {
