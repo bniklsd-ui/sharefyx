@@ -279,12 +279,30 @@ h3 { font-size: var(--fs-body); }   /* 16px -- Untertitel (vor C1: 15px, kleiner
 
 select.input {
   appearance: none;
-  padding-right: 24px;
+  /* rechts 28px freihalten fuer den Lucide-Chevron (12x12, 8px vom Rand), damit der Wert-Text
+     nicht unter den Chevron laeuft. */
+  padding-right: 28px;
+  /* Chevron-down: Lucide-Pfad m6 9 6 6 6-6 als Data-URL, Farbe = --text-faint (#A7B2BF, weniger
+     prominent als der Wert-Text selbst -- "ich bin ein Auswahl", nicht "ich bin Inhalt").
+     12x12 px = 0.5em in der aktuellen Schrift -- bewusst klein, der Wert zaehlt, nicht der
+     Indikator. `background-repeat: no-repeat` + `right 8px center` positioniert ihn bündig rechts.
+     Stroke-Width 2.5 (statt Lucide-Default 2) gibt ihm auf dem dunklen App-Grund mehr Gewicht,
+     ohne fett zu wirken. */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A7B2BF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 12px 12px;
   /* [2026-08-16, Nikinger-Feedback] Optionsliste zeigte den nativen Browser-/OS-Akzentton
      (lila auf dieser Maschine) statt des einen App-Blaus -- app.css definiert selbst gar kein
      Lila, `accent-color` ist die einzige CSS-Eigenschaft, die native Formular-Steuerelemente
      (inkl. der Options-Popup-Hervorhebung in Chromium) auf einen bestimmten Ton zwingt. */
   accent-color: var(--accent);
+}
+select.input:disabled {
+  /* deaktivierter Auswahl: Chevron in --text-placeholder-Farbe, damit "nicht bedienbar" auch
+     ohne Wert-Aenderung sichtbar ist. */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237E8A98' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
+  opacity: .6;
 }
 
 /* -- Layout (§4.3, 16:9 ab 1280px) ------------------------------------------------------ */

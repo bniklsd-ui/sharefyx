@@ -3,12 +3,153 @@ status: live
 purpose: Archiv älterer Session-Blöcke aus phase8_ui_graph/CLAUDE.md — newest-first, verbatim per Rotationsregel
 read-when: nur wenn der aktuelle Session-Block im Phase-Head nicht reicht und Verlauf gebraucht wird
 detail: L3
-updated: 2026-09-02 (D3-Block nach C4+C5-Session ins Archiv -- 22 Bloecke newest-first, Phase-8-Head jetzt mit C4+C5-Block allein; Head 50.8KB ueber 40KB-Softcap benannt -- Glas-Träger-Regeln + gruppierte Selektor-Liste am Dateiende plus ausführlicher Session-Block mit allen Verifikations-Belegen) | 2026-09-02 (D2-Block nach D3-Session ins Archiv -- 21 Bloecke newest-first, Phase-8-Head jetzt mit D3-Block allein) | 2026-09-02 (D1-Block nach D2-Session ins Archiv -- 20 Bloecke newest-first, Phase-8-Head jetzt mit D2-Block allein) | 2026-09-02 (C3-Block nach D1-Session ins Archiv -- 19 Bloecke newest-first, Phase-8-Head jetzt mit D1-Block allein; Head 41.8KB->45.1KB ueber Softcap benannt) | 2026-09-01 (Sichtpruefung-1-Block (vom Vortag) nach C3-Rotation ins Archiv gewandert -- jetzt 18 Bloecke newest-first; Phase-8-Head wieder unter dem 40KB-Softcap) | 2026-09-01 (zwölfte Rotation, 17 Blöcke)
+updated: 2026-09-02 (C4+C5-Block nach Chevron-Vorbild-Session ins Archiv -- 23 Bloecke newest-first, Phase-8-Head jetzt mit Chevron-Vorbild-Block allein; Head 70.3KB->60.2KB, immer noch ueber 40KB-Softcap benannt -- Selection/Choice-Konvention-v3-Block + neuer Session-Block plus umfangreiche Vormerkung-1-ERLEDIGT-Erlaeuterung) | 2026-09-02 (D3-Block nach C4+C5-Session ins Archiv -- 22 Bloecke newest-first, Phase-8-Head jetzt mit C4+C5-Block allein; Head 50.8KB ueber 40KB-Softcap benannt -- Glas-Träger-Regeln + gruppierte Selektor-Liste am Dateiende plus ausführlicher Session-Block mit allen Verifikations-Belegen) | 2026-09-02 (D2-Block nach D3-Session ins Archiv -- 21 Bloecke newest-first, Phase-8-Head jetzt mit D3-Block allein) | 2026-09-02 (D1-Block nach D2-Session ins Archiv -- 20 Bloecke newest-first, Phase-8-Head jetzt mit D2-Block allein) | 2026-09-02 (C3-Block nach D1-Session ins Archiv -- 19 Bloecke newest-first, Phase-8-Head jetzt mit D1-Block allein; Head 41.8KB->45.1KB ueber Softcap benannt) | 2026-09-01 (Sichtpruefung-1-Block (vom Vortag) nach C3-Rotation ins Archiv gewandert -- jetzt 18 Bloecke newest-first; Phase-8-Head wieder unter dem 40KB-Softcap) | 2026-09-01 (zwölfte Rotation, 17 Blöcke)
 up: CLAUDE.md
 updated: 2026-09-01 (zwoelfte Rotation: C2-Block ins Archiv nach Screenshots+README-Session -- Sichtpruefung 1 mit 9 Screenshots gegen Wegwerf-Instanz, README "Sneak Peak"-Sektion neu, docs/screenshots/ neu im INDEX, C2+Docs-Commit 0d97b3a gepusht; Head 37.7KB->33.6KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 103.8KB->114.0KB; keine Code-Aenderung ausserhalb webui/static + build_icon_sprite.py + vendor/, keine Service-Touch in dieser Sitzung) | 2026-09-01 (elfte Rotation: C1-Block ins Archiv nach C2-Session -- C2-Block (Lucide-Sprite, 18 Icons, build_icon_sprite.py, js/icons.js, .icon-CSS) ergaenzt, dann rotiert; Head 33.7KB->37.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 96.0KB->103.8KB; F9/F10/F11 aus C0 geschlossen; keine neue P1-Contract-Oeffnung; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (zehnte Rotation: C0-Block ins Archiv nach C1-Session -- C1-Block (Plex-Font-Swap + CSS-Typo-Tokens, 35 Findings aus C0 abgearbeitet fuer C1) ergaenzt, dann rotiert; Head 27.5KB->33.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 89.3KB->96.0KB; C1-Commits 0281cce + 08bff55 im Head referenziert; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (neunte Rotation: Gate-B→C-Block ins Archiv nach C0-Session -- C0-Block ergaenzt, dann rotiert; Head 39.0KB->31.4KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 81.3KB->89.3KB; C0-Findings-Tabelle (35 Eintraege) lebt im Head; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (achte Rotation: B4-Block ins Archiv nach Gate-B→C-Verifikation -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf, pytest 958/958 gruen, Charakterisierung byte-identisch, Tabu-Diff leer; Head jetzt mit 14.8 KB unter dem Softcap, SESSIONS_ARCHIVE.md 76.9 KB; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (siebte Rotation: fuenf Bloecke ins Archiv -- A3-Bau, Hard-Rule-9-Doku, Versions-Bump v2.2.3, A3-Drittprobe mit Restdefekt, B1 linkscan.py + Tests; Head jetzt 16.4 KB mit genau einem Block, 12 Bloecke im Archiv, Phase-8-Head wieder unter dem 40KB-Softcap; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8
+
+## Session stopped — 2026-09-02 (Block C C4 + C5 gebaut — Liquid-Glas-Akzente, Auswahl-Sheen, Editor 72ch, Selection)
+
+**Auftrag:** Block C C4 (Plan §4.C4, P8-H Liquid Glass) + C5 (Plan §4.C5, Dichte) — nachgeholt
+in dieser Session, weil die vorherige Session auf „D" statt „C" weitergelaufen ist (User-
+Hinweis zu Beginn: Tippfehler im Auftrag). Plan-Reihenfolge ist 0 → A → B → Gate → C → D → Z;
+die D1/D2/D3-Arbeit der vorherigen Session bleibt inhaltlich stehen, ich fülle C → Z plangemäß.
+
+**Code-Änderungen (zwei Dateien, +~140 Zeilen, 0 Tabu-Diff-Zeilen §0.4):**
+
+- `phase5_ui/webui/static/app.css` — **C4 Liquid-Glas-Akzente (P8-H):**
+  - `:root` bekommt vier Glas-Tokens: `--glass-bg: rgba(27,32,39,.55)` (semi-transparenter
+    Träger), `--glass-border: rgba(255,255,255,.14)` (helle Kante), `--glass-blur: 14px`
+    (Blur-Stärke), `--glass-highlight: rgba(255,255,255,.08)` (Top-Innenglanz, gleicher Wert
+    wie `--btn-glow` aus P5 Step 7b — bewusst keine zweite Größe). Kommentar erklärt N8
+    (Auswahl muss bei deaktiviertem Blur erkennbar bleiben) und Kontrastpflicht ≥ 4,5:1
+    (Text auf Glas gegen --bg).
+  - `.glass`-Utility-Klasse (Drei-Schichten-Modell): Default-Block mit solidem Fallback
+    (`var(--surface-raised)` + `--glass-border` + Innenglanz), `@supports (backdrop-filter:
+    blur(1px))`-Block mit echter Glas-Optik (`var(--glass-bg)` + `blur(14px) saturate(1.5)` +
+    Webkit-Präfix), `@media (prefers-reduced-transparency: reduce)`-Block zwingt zurück auf
+    solide Variante (Firefox 113+ macOS/Windows-Setting „Reduce transparency", V85).
+  - **Vier Glas-Träger** via gruppierter Selektor-Liste am Dateiende (gleicher Spezifitäts-
+    Level wie die Einzeldefinitionen, aber nach allen Trägern — gewinnt im Quellordnungs-
+    Konflikt): `.list__head, .overlay__panel, .update-banner, .toast` bekommen alle drei
+    Schichten (Fallback + @supports + @media). `.list__head` zusätzlich `position: sticky;
+    top: 0; z-index: 1;` — funktional, nicht dekorativ (scrollende Liste, man sieht was
+    durchläuft).
+  - Bestehende Träger-Styles chirurgisch angepasst: Original-Gradient-Backgrounds + 1-px-
+    Line-Borders + Box-Shadows raus, dafür `var(--surface-raised)` + `var(--glass-border)`
+    + (am Träger selbst) der Drop-Shadow bleibt (`.overlay__panel`: 0 24px 64px,
+    `.update-banner`: 0 8px 28px, `.toast`: 0 8px 28px). `.toast` behält die 3px-Akzent-
+    links-Kante semantisch (Fehler/Warnung überschreiben sie).
+  - **Auswahl-Sheen** für selektierte Listenzeilen (P8-H, V88):
+    `.list__row[aria-current="true"]` (Einzelselektion) und
+    `.list__rows > li.list__row--selected` (Mehrfachauswahl, §9) bekommen drei Layer:
+    (a) 3px solide Akzentkante links (`border-left: 3px solid var(--accent)`), (b) 1px
+    Akzent-Outline rundum (`outline: 1px solid var(--accent); outline-offset: -4px`),
+    (c) Backdrop-Sheen via `@supports` (`blur(8px) saturate(1.2)`). Default-Border des
+    `.list__row` von 2px auf 3px transparent gehoben, damit kein Layout-Shift beim
+    Auswählen (Lehre aus P7-§9 + Advisor-Fund damals). Kombiniert (Mehrfachauswahl UND
+    aktuell): innerer `.list__row` bekommt `border-left-color: transparent` damit das
+    äußere li-Border nicht doppelt mit dem button-Border übereinanderliegt (6px statt 3px).
+  - **C5 Dichte + Kleinigkeiten:**
+    - F5: `::selection`-Regel + `::-moz-selection` (Firefox-Variante, Spec-Pseudo reicht
+      dort nicht in allen Versionen) mit `background: var(--accent-quiet); color: var(--text);`
+      — Sailop Dim 7 „craft signal", Browser-Default-Blau wird durch eigene Akzent-quiet-
+      Variante ersetzt.
+    - F21: `.editor__textarea` bekommt `max-width: 72ch; margin: 0 auto;` — Body-Spalte
+      zentriert auf 72 Zeichen Lesebreite (im Flex-Container mit `flex: 1` greift
+      `margin: 0 auto` für symmetrische Ränder), kein Vollbreiten-Flattern mehr auf
+      breiten Monitoren. Computed werden 576px (Plex Mono 13px ≈ 8px/ch).
+    - F22: `.editor__body padding-left: 12px` → `calc(var(--space) * 1.5)` — gleicher Wert
+      (12px), aber Token-basiert (Monet „konsistentes 8-px-Raster", F20 bleibt gewahrt).
+- `phase5_ui/webui/static/js/app.js` — **keine Änderung.** Der Tastatur-Shortcut `/`
+  fokussiert die Listensuche (Plan §4.C5 Punkt 3 „Tastatur-QoL") existierte schon seit
+  Step 7b (Z. 201–205): `if (event.key === "/" && !inField) { ... searchInputEl.focus(); }`.
+  C5 ist hier ein No-Op — bestehender Code erfüllt die Anforderung bereits.
+
+**Wegwerf + Smoke (Standing-Permission reproduziert):**
+
+- `phase8_ui_graph/scripts/wegwerf_setup_c4c5.py` neu (Port **18770**, File-Keyring,
+  User `alpha` direkt in `auth.sqlite3` provisioniert via `AuthStore.upsert_user()` +
+  `set_totp()` + `confirm_totp()` — kein `provision_user.py`, kein Schreiben in
+  `nikinger-space`). Datenlage: 5 eigene Items + 2 fremde = 7 Items über zwei Spaces
+  (`alpha`/`beta`, zweiter via `spacectl.py create-space` + `add-member --read`).
+- `phase8_ui_graph/scripts/c4c5_playwright_smoke.py` neu (7/7 grün):
+  - Step 1 — CSS-Static: `--glass-*`-Tokens, `.glass`-Utility, `@supports backdrop-filter`,
+    `@media prefers-reduced-transparency`, `::selection` mit `--accent-quiet`/`--text`,
+    `.editor__textarea max-width:72ch`, 3px-Akzentkante + 1px-Outline für `[aria-current=true]`
+    + `--selected`, gruppierte Glas-Träger-Liste am Dateiende.
+  - Step 2 — Login + Overview: `.list__head` computed `position: sticky`.
+  - Step 3 — Eigene Item-Zeile ausgewählt (foreign-Items sind read-only, Editor-Step 4
+    braucht editierbares Item): border-left `3px` solid accent + outline `1px solid accent`.
+  - Step 4 — Editor offen (Toggle-Klick auf `#toggle-preview`, default preview): textarea
+    computed `max-width: 576px` (72ch in Plex Mono), `margin-left == margin-right` (auto
+    symmetrisch wirksam), textarea schmaler als Parent.
+  - Step 5 — `::selection`-Regel via `document.styleSheets[0].cssRules` aktiv, cssText
+    enthält `var(--accent-quiet)` und `var(--text)`.
+  - Step 6 — Anlegen-Dialog geöffnet (`#new-item-button` → `#create-dialog`): `.overlay__panel`
+    computed `background-color: rgba(27, 32, 39, 0.55)` (Chromium-Headless rendert echte
+    Glas-Optik via `@supports`-Block).
+
+**Screenshots (vier PNG, ~390 KB, unter `docs/screenshots/`):**
+
+- `c4c5_01_overview_sticky_head.png` — Übersicht nach Login, Liste auf „Alle Items",
+  Legend (C3-Farblegende), Graph-Panel (D2) sichtbar; List-Head sticky mit Crumb.
+- `c4c5_02_selected_row_3px_outline.png` — Item „Aufgabe fuer morgen" ausgewählt: 3px
+  Akzentkante links + 1px Akzent-Outline rundum, space-dot--own in Metazeile blau.
+- `c4c5_03_editor_72ch.png` — Editor offen (Bearbeiten-Modus, „Vorschau"-Button sichtbar):
+  textarea computed 576px breit, mittig in der 836px-Spalte (margin auto symmetrisch),
+  rechte 260px bleiben leer (kein Vollbreiten-Flattern).
+- `c4c5_04_create_dialog_glass.png` — Anlegen-Dialog geöffnet: `.overlay__panel` als Glas-
+  Träger sichtbar, Hintergrund semi-transparent, Listen-Inhalt scheint leicht durch
+  (Blur-Effekt im Headless-Renderer weniger intensiv als in Echt-Browsern, aber das
+  Material ist erkennbar). Plus: die `Verknüpfungen`-Graph-Knoten aus D2 zeigen sich
+  hinter dem Dialog als cluster-Form — der gewünschte „Inhalt durchläuft"-Effekt greift.
+
+**Verifikation — Selbstprüf-Checkliste §0.6 alle fünf Punkte grün:**
+
+1. `pytest -q` → **958/958 grün** (keine Python-Änderung, vorher/nachher identisch).
+2. Tabu-Diff (`git diff --stat main -- phase4_auth/ phase2_mcp/ phase5_ui/webui/
+   security.py phase1_storage/storage/{models,frontmatter,files,patch,acl,history}.py`)
+   → **leer** (C4/C5 berührt nur `app.css` + Smoke/Setup-Skripte, keine Tabu-Dateien).
+3. JS-Syntax: `node --check` auf `app.js`/`list.js`/`state.js`/`tree.js` → **0 errors**
+   (C5-QoL-Shortcut existierte schon, kein neuer JS-Code).
+4. Doc-Update im selben Commit (Hard Rule 8) — dieser Block + Modul-Status-Tabelle +
+   `updated:`-Frontmatter.
+5. `python phase5_ui/scripts/ui_budget.py` → **5/5 grün**, app.js+css+Font jetzt
+   **122.7 KB** (vorher 119.8 KB, +2.9 KB für die C4-Glas-Träger-Regeln + die
+   gruppierte Selektor-Liste am Dateiende). Im Korridor (<250 KB). V84 erfüllt.
+
+**Wegwerf abgebaut:** `kill -TERM $(cat serve.pid)` (PID-Datei-Muster, **kein** `pkill -f`
+mit Regex — Hard Rule 9 eingehalten); `rm -rf /tmp/opencode/sharefyx-wegwerf-c4c5/` im
+selben Zug. `curl http://127.0.0.1:8765/health` → `{"status":"ok", …}` (uptime 78113s,
++1122s gegenüber Sessionbeginn — **kein Service-Touch durch diese Session**, der einzige
+PID-Restart war vorgestern). `ps -ef` zeigt nur die `sharefyx-mcp.service`; Wegwerf-PID weg.
+
+**Verbleibend für die nächste Session:**
+
+- **Nikinger-Sichtprüfung 3 am echten Gerät** — Glas-Intensität und 72ch-Editor-Breite
+  gegen die echten Spaces prüfen (Background-Gradient im echten Browser stärker als im
+  Headless, kann eine Nachjustierung von `--glass-bg` Alpha auslösen). Sichtprüfung 2
+  (D3) wartet ebenfalls noch am echten Gerät.
+- **Step Z** (Phase-Closeout) — wenn beide Sichtprüfungen passen:
+  - `phase1_storage/CLAUDE.md` — achte P1-Contract-Öffnung als „geschlossen" markieren.
+  - `docs/concepts/phase8_ui_graph_plan.md` §9 — Closeout, Abnahmebilanz P8-1…P8-26,
+    die drei P7-Erbposten (P7-24 ✅ A1, remove-space ✅ A2, P7-4 🟡 A3 Restdefekt).
+  - `ROADMAP.md` Phase-8-Status auf ✅ oder 🟡 (Nikinger-Entscheidung).
+  - `docs/INDEX.md` Größenangaben nachziehen.
+  - `docs/UPDATE_LOG.md` neuer Eintrag am Deploy-Tag (P6-X-Gate).
+  - `deploy.sh main` durch den Nikinger.
+- **Block D D1/D2/D3 ist inhaltlich fertig** (alle drei Commits vorhanden,
+  `ui_budget.py` 5/5, Tabu-Diff leer, Playwright-Smoke aller drei Sub-Steps grün) —
+  wartet nur auf Sichtprüfung 2 am echten Gerät wie oben.
+
+**Nächster Schritt, konkret:** Nikinger-Sichtprüfung 3 (echtes Gerät) für die
+C4-Glas-Akzente + die C5-Editor-Lesebreite. Wenn die Feinwerte passen, Step Z im
+selben Sitzungsblock.
+
+---
 
 ## Session stopped — 2026-09-02 (Block D D3 gebaut — Versionierung v3.0, UPDATE_LOG-Eintrag, Sichtprüfung 2 mit 26 Items, README Sneak Peak neu)
 
