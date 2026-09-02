@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase8_ui_graph_plan.md       # voller Plan, Entscheidungen P8-A–P8-Q, §0.1 gelockte N1–N12, Steps 0/A/B/C/D/Z
   - ../docs/concepts/PHASE7_CLOSEOUT_HANDOVER.md   # Herkunft der drei Erbposten (P7-24/remove-space/P7-4)
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-09-01 (Vormerkung in phase8_ui_graph/CLAUDE.md ergaenzt: Auswahl-Boxen vereinheitlichen -- Space-Auswahlbox (Move-Dialog, <select class=input id=move-space-select>) als Standard; Nikinger-Sichtpruefung-1-Design-Frage mit 'nein, C3-C5 + D-Block noch offen' beantwortet; kein Code, kein Service-Touch; Head 33.6KB->37.5KB noch unter Softcap) | 2026-09-01 (Block C C2 gebaut: Lucide-Sprite-Vendoring (18 Icons, ISC+MIT-Lizenzen, phase5_ui/vendor/lucide/); Generator build_icon_sprite.py (idempotent, --check); Sprite-Block zwischen ICONS:BEGIN/ICONS:END in app.html (vom Generator gepflegt); js/icons.js (iconSvg()/iconHtml(), 13. JS-Modul); app.css .icon (Lucide-Defaults: 1.25em/currentColor/stroke-width 2) + .rail__glyph.icon (16px Badge-Box) + .toolbar-btn.icon (1em) + .tree__twist (12px SVG-Box); Ersetzungs-Map 7 HTML-Entities + 3 Text-Glyphen geschlossen (F9/F10/F11 aus C0); V92 gepinnt (Lucide 1.38.0, SHA-256 d28944cf…); ui_budget 5/5 (110.3/250 KB), pytest 958/958, Tabu-Diff leer, grep &#[0-9]+; in app.html → 0 Icon-Treffer, grep '→|⇄|×' in js/ → 0 Icon-Treffer (2 Treffer bleiben = Sprach-Interpunktion 'v3 → v4' mit Audit-Kommentar); Modul-Status Block C auf 'C0+C1+C2 gebaut, C3-C5 offen' + Abnahmestand um C2-Zeile ergaenzt + neuer Session-Block + C1-Block rotiert; Head 33KB->38KB, immer noch unter Softcap; kein Code ausserhalb webui/static + build_icon_sprite.py beruehrt) | 2026-09-01 (Block C C1 gebaut: C1a Font-Swap (Plex Sans Var v0.2.0 + Plex Mono v2.5.0, SHAs gepinnt, build_font_subset_plex.sh neu) + C1b CSS-Typografie (5 Skala-Tokens, body 16px/1.55, h1-h3 + Meta-Zeilen auf Tokens, IDs/Versions in --font-mono); zwei Commits (0281cce + 08bff55); ui_budget 5/5 (108.4/250 KB), pytest 958/958 (250s, Flake als isoliert bestaetigt), Tabu-Diff leer; phase8_ui_graph/CLAUDE.md Modul-Status Block C auf 'C0 + C1 gebaut, C2-C5 offen' gehoben + Abnahmestand um C1-Zeile ergaenzt + neuer Session-Block; Head 27.5KB->33KB, immer noch unter Softcap) | 2026-09-01 (Block C C0 gebaut: Anti-AI-Pattern-Research (V94 bestaetigt, Web-Recherche) + UI-Audit gegen den Code (P8-25); Findings-Tabelle Muster -> Fundstelle -> Fix -> Ziel-Step im Phase-Head, 35 Eintraege, davon 0 als eskaliert markiert; Code unberuehrt, vier Dateien Doku-only -- phase8_ui_graph/CLAUDE.md + SESSIONS_ARCHIVE.md + docs/INDEX.md + SESSIONS_ARCHIVE-Frontmatter; Head 18.4KB->27.5KB, immer noch unter Softcap) | 2026-09-01 (Gate B→C: 958/958 pytest gruen, Charakterisierung byte-identisch, Tabu-Diff leer, _graph_get manuell 12/12, Playwright gegen Wegwerf 18/18; B4-Block rotiert, Head 14.8KB unter Softcap; Code unberuehrt, Doku-Update + neuer Session-Block) | 2026-09-01 (Block B Step B1 gebaut -- storage/linkscan.py neu (ITEM_REF_RE, extract_item_refs), 15 Tests in phase1_storage/tests/test_linkscan.py, achte P1-Contract-Oeffnung in phase1_storage/CLAUDE.md angekuendigt vor Code, Tabu-Diff §0.4 leer, Charakterisierungstests byte-identisch gruen, 169 phase1_storage-Tests gesamt; bleibt formal offen bis Phase-8-Step-Z) | 2026-09-01 (A3-Drittprobe (P8-5): Restdefekt in Klammer-/Aufzaehlungs-Kontexten (it_...-ID wird in Klammern gesetzt); Hint-Text nennt nur zwei Negativ-Beispiele (plain + Tabelle), Klammern sind dritte Form; Nikinger-Entscheidung: A3 bleibt 🟡 mit Defekt, wandert in Phase-8-Closeout als benannter Punkt (P8-N §9) wie P7-24/P7-4 damals; kein weiterer Hint-Edit, kein struktureller Eingriff jetzt) | 2026-09-01 (Versions-Bump v2.2 -> v2.2.3 in app.html .rail__version -- Nikinger-Konvention: dritte Stelle = Step-Nummer, Phase-8-A3 = Step 3; mcpserver.__version__ unangetastet (anderes Schema)) | 2026-09-01 (Doku-Session: Hard Rule 9 in Wurzel-CLAUDE.md ergaenzt nach Phase-8-A3-Vorfall -- kein pkill -f mit Regex, niemals den systemd-Dienst anfassen; PROMPTS.md Hard-Rules-Liste und Tests-Absatz um Stopp-Regel fuer Wegwerf-Instanzen erweitert; docs/INDEX.md drei Zeilen vorne + drei Eintraege angepasst; kein Code, kein Service-Touch, Produktion weiterhin active, head 11.6KB->12.8KB unter Softcap) | 2026-09-01 (A3 gebaut -- _TITLE_NOT_ID_HINT mit Positiv/Negativ-Beispiel geschärft, Test test_tool_descriptions_tell_the_agent_to_name_titles_not_ids auf neuen Wortlaut angepasst, 143 phase2_mcp-Tests gruen, Zweitprobe vom Nikinger live bestaetigt (positiv), dritte Probe nach Deploy offen P8-5) | 2026-08-31 (A2 live-verifiziert -- Test_Space_A2 angelegt + entfernt, 4x GET /api/v1/overview nach DELETE=200 statt 500, Index konsistent mit Dateien, Push danach freigegeben; Block A vollstaendig live ✅) | 2026-08-31 (Nachtrag: Janick live angemeldet -- dritter biologischer Nutzer, Phase-4-Auth-Architektur erstmals mit externem Dritt-Anwender durchgespielt; Connector-UI-Befund: 'Anmeldung fehlgeschlagen' trotz erfolgreicher OAuth-Verbindung, kein Handlingsbedarf, Vormerkung fuer spaeter) | 2026-08-31 (Nachtrag: OpenAI-ChatGPT-Konnektor aktuell nicht kompatibel, benoetigte Settings unbekannt -- Auth-Architektur auf Anthropic-Konnektoren geeicht, andere Settings nicht hinterlegt, Vormerkung ohne Auftrag) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
+updated: 2026-09-02 (Block D D1 gebaut: Uebersicht tabellos, app.html/app.css/list.js/app.js aktualisiert, Playwright-verifiziert gegen Wegwerf 18767, 5/5 gruen, drei Screenshots d1_{01..03}, 958/958 pytest, ui_budget 5/5 (113.0/250 KB), Tabu-Diff §0.4 leer, Head 41.8KB->44.4KB ueber Softcap benannt, C3-Block rotiert, kein Service-Touch, PID 67925 uptime 65157s linear wachsend) | 2026-09-01 (Vormerkung in phase8_ui_graph/CLAUDE.md ergaenzt: Auswahl-Boxen vereinheitlichen -- Space-Auswahlbox (Move-Dialog, <select class=input id=move-space-select>) als Standard; Nikinger-Sichtpruefung-1-Design-Frage mit 'nein, C3-C5 + D-Block noch offen' beantwortet; kein Code, kein Service-Touch; Head 33.6KB->37.5KB noch unter Softcap) | 2026-09-01 (Block C C2 gebaut: Lucide-Sprite-Vendoring (18 Icons, ISC+MIT-Lizenzen, phase5_ui/vendor/lucide/); Generator build_icon_sprite.py (idempotent, --check); Sprite-Block zwischen ICONS:BEGIN/ICONS:END in app.html (vom Generator gepflegt); js/icons.js (iconSvg()/iconHtml(), 13. JS-Modul); app.css .icon (Lucide-Defaults: 1.25em/currentColor/stroke-width 2) + .rail__glyph.icon (16px Badge-Box) + .toolbar-btn.icon (1em) + .tree__twist (12px SVG-Box); Ersetzungs-Map 7 HTML-Entities + 3 Text-Glyphen geschlossen (F9/F10/F11 aus C0); V92 gepinnt (Lucide 1.38.0, SHA-256 d28944cf…); ui_budget 5/5 (110.3/250 KB), pytest 958/958, Tabu-Diff leer, grep &#[0-9]+; in app.html → 0 Icon-Treffer, grep '→|⇄|×' in js/ → 0 Icon-Treffer (2 Treffer bleiben = Sprach-Interpunktion 'v3 → v4' mit Audit-Kommentar); Modul-Status Block C auf 'C0+C1+C2 gebaut, C3-C5 offen' + Abnahmestand um C2-Zeile ergaenzt + neuer Session-Block + C1-Block rotiert; Head 33KB->38KB, immer noch unter Softcap; kein Code ausserhalb webui/static + build_icon_sprite.py beruehrt) | 2026-09-01 (Block C C1 gebaut: C1a Font-Swap (Plex Sans Var v0.2.0 + Plex Mono v2.5.0, SHAs gepinnt, build_font_subset_plex.sh neu) + C1b CSS-Typografie (5 Skala-Tokens, body 16px/1.55, h1-h3 + Meta-Zeilen auf Tokens, IDs/Versions in --font-mono); zwei Commits (0281cce + 08bff55); ui_budget 5/5 (108.4/250 KB), pytest 958/958 (250s, Flake als isoliert bestaetigt), Tabu-Diff leer; phase8_ui_graph/CLAUDE.md Modul-Status Block C auf 'C0 + C1 gebaut, C2-C5 offen' gehoben + Abnahmestand um C1-Zeile ergaenzt + neuer Session-Block; Head 27.5KB->33KB, immer noch unter Softcap) | 2026-09-01 (Block C C0 gebaut: Anti-AI-Pattern-Research (V94 bestaetigt, Web-Recherche) + UI-Audit gegen den Code (P8-25); Findings-Tabelle Muster -> Fundstelle -> Fix -> Ziel-Step im Phase-Head, 35 Eintraege, davon 0 als eskaliert markiert; Code unberuehrt, vier Dateien Doku-only -- phase8_ui_graph/CLAUDE.md + SESSIONS_ARCHIVE.md + docs/INDEX.md + SESSIONS_ARCHIVE-Frontmatter; Head 18.4KB->27.5KB, immer noch unter Softcap) | 2026-09-01 (Gate B→C: 958/958 pytest gruen, Charakterisierung byte-identisch, Tabu-Diff leer, _graph_get manuell 12/12, Playwright gegen Wegwerf 18/18; B4-Block rotiert, Head 14.8KB unter Softcap; Code unberuehrt, Doku-Update + neuer Session-Block) | 2026-09-01 (Block B Step B1 gebaut -- storage/linkscan.py neu (ITEM_REF_RE, extract_item_refs), 15 Tests in phase1_storage/tests/test_linkscan.py, achte P1-Contract-Oeffnung in phase1_storage/CLAUDE.md angekuendigt vor Code, Tabu-Diff §0.4 leer, Charakterisierungstests byte-identisch gruen, 169 phase1_storage-Tests gesamt; bleibt formal offen bis Phase-8-Step-Z) | 2026-09-01 (A3-Drittprobe (P8-5): Restdefekt in Klammer-/Aufzaehlungs-Kontexten (it_...-ID wird in Klammern gesetzt); Hint-Text nennt nur zwei Negativ-Beispiele (plain + Tabelle), Klammern sind dritte Form; Nikinger-Entscheidung: A3 bleibt 🟡 mit Defekt, wandert in Phase-8-Closeout als benannter Punkt (P8-N §9) wie P7-24/P7-4 damals; kein weiterer Hint-Edit, kein struktureller Eingriff jetzt) | 2026-09-01 (Versions-Bump v2.2 -> v2.2.3 in app.html .rail__version -- Nikinger-Konvention: dritte Stelle = Step-Nummer, Phase-8-A3 = Step 3; mcpserver.__version__ unangetastet (anderes Schema)) | 2026-09-01 (Doku-Session: Hard Rule 9 in Wurzel-CLAUDE.md ergaenzt nach Phase-8-A3-Vorfall -- kein pkill -f mit Regex, niemals den systemd-Dienst anfassen; PROMPTS.md Hard-Rules-Liste und Tests-Absatz um Stopp-Regel fuer Wegwerf-Instanzen erweitert; docs/INDEX.md drei Zeilen vorne + drei Eintraege angepasst; kein Code, kein Service-Touch, Produktion weiterhin active, head 11.6KB->12.8KB unter Softcap) | 2026-09-01 (A3 gebaut -- _TITLE_NOT_ID_HINT mit Positiv/Negativ-Beispiel geschärft, Test test_tool_descriptions_tell_the_agent_to_name_titles_not_ids auf neuen Wortlaut angepasst, 143 phase2_mcp-Tests gruen, Zweitprobe vom Nikinger live bestaetigt (positiv), dritte Probe nach Deploy offen P8-5) | 2026-08-31 (A2 live-verifiziert -- Test_Space_A2 angelegt + entfernt, 4x GET /api/v1/overview nach DELETE=200 statt 500, Index konsistent mit Dateien, Push danach freigegeben; Block A vollstaendig live ✅) | 2026-08-31 (Nachtrag: Janick live angemeldet -- dritter biologischer Nutzer, Phase-4-Auth-Architektur erstmals mit externem Dritt-Anwender durchgespielt; Connector-UI-Befund: 'Anmeldung fehlgeschlagen' trotz erfolgreicher OAuth-Verbindung, kein Handlingsbedarf, Vormerkung fuer spaeter) | 2026-08-31 (Nachtrag: OpenAI-ChatGPT-Konnektor aktuell nicht kompatibel, benoetigte Settings unbekannt -- Auth-Architektur auf Anthropic-Konnektoren geeicht, andere Settings nicht hinterlegt, Vormerkung ohne Auftrag) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
 ---
 
 # CLAUDE.md — Phase 8: UI-Neuanstrich v3, Verknüpfungs-Graph, QoL (`phase8_ui_graph/`)
@@ -61,7 +61,7 @@ Abnahmezeilen: `docs/concepts/phase8_ui_graph_plan.md`.
 | B4 | UI: `#item/`-Klick-Delegation (`app.js`) + Link-Picker-Dialog (`app.html`/`app.css`/`dialogs.js`/`editor.js`) | ✅ gebaut + live-verifiziert (`ea14d53` deploy `007b73d`, 2026-09-01); Tabu-Diff leer (insb. `webui/security.py` P8-Q unangetastet); JS-Syntax-Check `node --check` auf `app.js`/`editor.js`/`dialogs.js` OK; 34 statische-Tests grün; ui_budget 5/5 grün (91/250 KB app.js+css+Font) |
 | Block B abgeschlossen | `linkscan.py` + `item_links` + `Store.links_all` + `GET /api/v1/graph` + UI-Wiring | ✅ **live-verifiziert** (`007b73d`, 2026-09-01, Release `20260901T103944.634877Z`, Health-Gate 3/3, Versionsbadge v2.2.3); achte P1-Contract-Öffnung bleibt **angekündigt**, geschlossen mit Phase-8-Step-Z |
 | Block C | Design-Fundament v3 (Typografie, Icons, Farben, Glas) | 🔄 C0 ✅ · C1 ✅ gebaut (C1a Font-Swap + C1b CSS-Tokens) · C2 ✅ gebaut (Lucide-Sprite, 18 Icons, build_icon_sprite.py, js/icons.js, .icon CSS) · C3 ✅ gebaut (Farbsemantik --space-own/shared/foreign + .rail__glyph--{cat}, .space-dot--{cat}, .legend) · C4–C5 ⬜ |
-| Block D | Übersicht tablos + Force-Graph | ⬜ |
+| Block D | Übersicht tablos + Force-Graph | 🔄 D1 ✅ gebaut (Übersicht tablos + globaler Home-Scope, Playwright-verifiziert Wegwerf 127.0.0.1:18767, 5/5 Checks grün) · D2 ⬜ · D3 ⬜ |
 | Step Z | Closeout | ⬜ |
 
 ## Geerbte Contracts
@@ -96,7 +96,39 @@ statt `nikinger-space`, eigener DEK als base64-Datei, User direkt in `auth.sqlit
 provisioniert via `AuthStore.upsert_user()`+`set_totp()`+`confirm_totp()` — kein
 `provision_user.py`/`keyring.set_password`, kein Schreiben in den echten
 `nikinger-space`-Service; cleanup per `kill -TERM $(cat serve.pid)` — kein `pkill -f`-Regex
-(Hard Rule 9)).
+(Hard Rule 9)). **D1 ✅ gebaut** (Übersicht tabellos — `app.html` `#detail-overview`-Struktur
+ersetzt: `<header class=overview__header>` mit Refresh-Knopf + bestehende `.legend`, dann
+`<ol id=overview-spaces>` für die tabellosen Space-Zeilen, dann `<h2>Verknüpfungen</h2>`
++ `<div id=overview-graph><canvas id=overview-graph-canvas></canvas></div>`-Gerüst für D2,
+dann bestehende „Zuletzt benutzt"-Liste; `app.css` `.overview__tiles/.tile/.space-card`
+entfernt (F12/F13/F23 aufgelöst), `.overview__header/.overview__spaces/.overview__space-row/
+.overview__space-name/.overview__space-counts/.overview__space-count/.overview__graph`
+neu mit Space-Token-gerechter Typografie und 720px-Maximalbreite (recent-Analogie);
+`list.js :: renderOverview()` neu — eine Zeile je Space (eigene zuerst, dann fremde,
+localeCompare), Kategoriepunkt via `spaceCategory(space)` aus C3, Counter-Chips nur für
+Buckets mit `count > 0` (Plan §5 D1, „keine leeren Buckets"), Chip-Klick navigiert wie die
+alten Tiles via `navigate(space.name, bucket)`; `app.js` Home-Knopf-Handler erweitert —
+`Editor.closeEditor().then(proceed => proceed === false ? null : navigateAll())`,
+V82-Regression explizit getestet (Smoke Step 5), Refresh-Knopf ruft `List.loadOverview()`
+(D2 erweitert um `Graph.loadGraph()`); `phase8_ui_graph/scripts/{wegwerf_setup_d1.py,
+d1_playwright_smoke.py}` neu — Standing-Permission-Muster C3 reproduziert, eigener Port
+**18767**, File-Keyring-Backend, User `alpha` direkt in `auth.sqlite3`, zweiter Space
+`beta` über `spacectl.py create-space` + `add-member --read beta alpha` (P6-M-Rechtepolitik,
+`.share.yml` entsteht), 3 Items in alpha + 2 in beta (gemischt Typen, so dass Counter-
+Chips greifen); Playwright-Smoke 5/5 grün — statisches Markup (header/spaces/graph-canvas
+vorhanden, `.overview__tiles`/`#overview-foreign` weg), Login + zwei Space-Zeilen mit
+korrekten `rail__glyph--{own,foreign}` und Counter-Chips (alpha 2 Chips, beta 1),
+Chip-Klick navigiert zur richtigen Bucket-Liste (Crumb `alpha › Offen`), Home-Klick
+schaltet Liste auf globalen Scope (Crumb „Alle Items", 5 Items sichtbar), Home-Klick im
+bereits-globalen Scope idempotent (V82); drei Screenshots
+`docs/screenshots/d1_{01_overview_space_rows,02_counter_chip_navigates,
+03_home_to_global_scope}.png`; `phase8_ui_graph/CLAUDE.md` Modul-Status Block D auf
+„D1 ✅ gebaut, D2/D3 offen" gehoben + Abnahmestand um D1-Zeile ergänzt + dieser
+Session-Block; **958/958 pytest** (vorher/nachher identisch, keine Python-Änderung),
+`ui_budget` 5/5 grün (113.0/250 KB, +1.0 KB), Tabu-Diff §0.4 leer, JS-Syntax
+`node --check` auf list.js/app.js OK; kein Code ausserhalb `webui/static/` +
+`phase8_ui_graph/scripts/` berührt; Produktion **unangetastet** (kein Deploy, kein
+Service-Touch).
 
 ---
 
@@ -247,126 +279,130 @@ nur vormerken, nichts davon diese Session umgesetzt, kein Code angefasst:**
 
 ---
 
-## Session stopped — 2026-09-01 (Block C C3 gebaut — Farbsemantik + Legende, Playwright-verifiziert gegen Wegwerf-Instanz 127.0.0.1:18766)
+## Session stopped — 2026-09-02 (Block D D1 gebaut — Übersicht tabellos + globaler Home-Scope, Playwright-verifiziert gegen Wegwerf-Instanz 127.0.0.1:18767, 5/5 Checks grün)
 
-**Auftrag:** Block C C3 (Plan §4.C3, P8-I) — die drei Space-Kategorie-Farben + Legende.
-Vorlage: vorheriger Session-Block hatte den nächsten Schritt auf „Befunde aus Sichtprüfung 1
-fließen als Vorlage für C3 ein" gesetzt; die offene Vormerkung „Auswahl-Boxen vereinheitlichen"
-ist eine begleitende Design-Frage, kein C3-Blocker.
+**Auftrag:** Block D D1 (Plan §5 D1, P8-J) — tabellose Übersicht statt Kachel-Grid, eigener
+und fremder Space in einer gemeinsamen Zeilen-Liste (F12/F13/F23 aufgelöst), Home-Knopf
+schaltet die Listen-Spalte auf den globalen Scope (P8-19, V82 explizit getestet),
+Refresh-Knopf in der Kopfzeile (D2 erweitert um den Graph-Refresh), Graph-Gerüst als
+`<canvas>`-Platzhalter für D2. Nikinger-Vorgabe dieser Session: atomar pro Schritt
+arbeiten — D2/D3 folgen in eigenen Commits, das Block-D-Endbild + README-Sneak-Peak
+kommen erst nach D3.
 
-**Code-Änderungen (fünf Dateien, +~120 Zeilen, 0 Tabu-Diff-Zeilen):**
+**Code-Änderungen (fünf Dateien, +~110 Zeilen, 0 Tabu-Diff-Zeilen):**
 
-- `phase5_ui/webui/static/app.css :: :root` — drei neue Tokens: `--space-own: #4A93F0`
-  (Markenblau-Familie, etwas matter als `--accent`), `--space-shared: #2EB8A6` (Teal),
-  `--space-foreign: #8B93A1` (neutrales Slate, „nicht deins" darf leise sein); Abstand zu
-  `--warn`/`--danger` explizit dokumentiert, AA-Kontrast auf `--bg` per Augenschein ok.
-- `phase5_ui/webui/static/app.css` — `.rail__glyph--{own,shared,foreign}`-Varianten mit
-  eigenen Gradient/Edge-Paaren (die Plex-Tokens `--space-*` sind die Schlüsselfarbe, hier
-  entsteht die plastische Variante), `.space-dot` + drei `--{cat}`-Varianten (8px-Kreis,
-  `align-self: center` für 12.5px-Metazeile), `.legend` + `.legend__item` + `.legend__dot`
-  (statisch, `--fs-meta`, flex-wrap für schmale Viewports).
-- `phase5_ui/webui/static/app.html` — `<div class="legend">` mit drei Items direkt unter
-  `.overview__title`, vor den Bucket-Tiles. Statisch (vom Renderer unangetastet), `aria-label`
-  trägt „Space-Kategorien".
-- `phase5_ui/webui/static/js/state.js` — `spaceCategory(space)` neu; `null`/`undefined` →
-  „foreign" (konservativ), `space.own` → „own", `space.writable` → „shared", sonst „foreign".
-  Die Felder liefert `GET /spaces` seit P6 Step 5.
-- `phase5_ui/webui/static/js/tree.js` — `rail__glyph` bekommt die Kategorie-Klasse:
-  `rail__glyph--${spaceCategory(space)}`. Import ergänzt.
-- `phase5_ui/webui/static/js/list.js` — `itemMetaLine()` aufgeteilt: rendert nur noch den
-  Tail (Typ/Status/Datum/Tags), nicht mehr den Space-Namen. `renderList()` baut den global-
-  Scope-Präfix (`space-dot--${spaceCategory(...)}` + Text-Knoten `space · `) jetzt selbst
-  ein — bewusst im Caller, weil der Punkt nur dort gesetzt wird, wo der Space explizit
-  hingehört (nicht im Space-Scope). Import ergänzt.
+- `phase5_ui/webui/static/app.html` — `#detail-overview`-Struktur ersetzt: `<header
+  class="overview__header">` mit Titel + Refresh-Knopf (Lucide `i-refresh-cw` aus C2),
+  bestehende `.legend` aus C3 darunter, dann `<ol id="overview-spaces">` für die
+  tabellosen Space-Zeilen, dann `<h2>Verknüpfungen</h2>` + `<div id="overview-graph"><canvas
+  id="overview-graph-canvas"></canvas></div>` als D2-Gerüst, dann bestehende
+  „Zuletzt benutzt"-Liste. Alte IDs `#overview-tiles` und `#overview-foreign` ersatzlos
+  entfernt (F12/F13).
+- `phase5_ui/webui/static/app.css` — `.overview__tiles`/`.tile`/`.space-card` ersatzlos
+  entfernt (Sailop Dim 5/6, „3 identical cards", F12/F13/F23). Neu:
+  `.overview__header` (Flex-Reihe, Refresh-Knopf rechts mit `flex-shrink: 0`),
+  `.overview__spaces` + `.overview__space-row` (Haarlinie unten wie `.recent-row`,
+  720px-Maximalbreite zur visuellen Achse mit „Zuletzt benutzt"),
+  `.overview__space-name` + `.overview__space-name-label` (Kategoriepunkt + Space-Name,
+  ellipsis bei langen Namen, gedämpfter Slate für read-only),
+  `.overview__space-counts` + `.overview__space-count` (8px-Padding-Chip, `--surface`-
+  Fond, `--line`-Rand, Hover-Akzentkante, `:focus-visible`-Outline 2px),
+  `.overview__graph` (`min-height: 55vh`, `max-width: 960px`, Linie + Radius wie andere
+  Panels, Canvas füllt die Box, `overflow: hidden`).
+- `phase5_ui/webui/static/js/list.js :: renderOverview()` neu — eine Zeile je Space
+  (eigene zuerst, dann fremde, `localeCompare` als Tiebreaker, analog zu
+  `tree.js :: renderRail()`); Kategoriepunkt via `spaceCategory(space)` aus C3
+  (`rail__glyph--{own|shared|foreign}`); Counter-Chips iterieren über
+  `bucketNames()` und überspringen Buckets mit `count === 0` (Plan §5 D1, „keine
+  leeren Buckets"); Chip-Klick ruft `navigate(space.name, bucket)` — derselbe Pfad wie
+  die alten Tiles, kein neuer Endpunkt, keine neue Server-Logik. Variablen
+  `overviewTilesEl` und `overviewForeignEl` ersatzlos entfernt, `overviewSpacesEl` neu.
+- `phase5_ui/webui/static/js/app.js` — Home-Knopf-Handler erweitert: `Editor.closeEditor()
+  .then(proceed => proceed === false ? null : navigateAll())`. `closeEditor()` ruft
+  intern `clearDetail()`, das `state.scope` auf "space" zurücksetzt (V82, P6-Advisor-
+  Fund); das `navigateAll()` HIER setzt direkt danach wieder "all". Zusammenspiel
+  explizit getestet (Smoke Step 5 = idempotenter zweiter Home-Klick). Refresh-Knopf-
+  Handler neu: `List.loadOverview()`; D2 erweitert um `Graph.loadGraph()` — kein
+  vorzeitiger Aufruf hier, der Graph-Code lebt noch nicht.
 
-**Anwendungsstellen laut Plan §4.C3 — bewusst minimal gehalten:**
+**Wegwerf-Instanz D1 neu (zwei Skripte, 0 Repo-Geheimnisse berührt):**
 
-- ✅ `.rail__glyph`-Rand/Fond: tree.js-BaumGlyph in der Space-Zeile.
-- ✅ Space-Punkt vor der Metazeile im globalen Listen-Scope: list.js.
-- ✅ Legende: statisch in app.html-Overview.
-- ⬜ Übersichts-Space-Zeilen (§5): **nicht angefasst**, gehört zu Block D (D1 ersetzt die
-  Space-Cards durch tabellose Zeilen, dort wird die gleiche `spaceCategory()`-Logik erneut
-  angewandt — siehe `phase8_ui_graph_plan.md` §5/D1).
-- ⬜ Graph-Knoten (§5): **nicht angefasst**, gehört zu Block D2.
-
-**Bewusst NICHT angefasst (genannte Punkte aus C0/C3):**
-
-- `.space-card`-`border-left: 3px solid var(--warn)` (app.css:682) bleibt wie es ist. Der
-  Plan listet `space-card` nicht unter den C3-Anwendungsstellen; D1 ersetzt die Cards
-  vollständig. Eine temporäre Inkonsistenz (space-card-Border bleibt amber, der rail__glyph
-  darin trägt bereits die neue `space-foreign`/`-shared`-Farbe) wird von D1 aufgelöst.
-- Statusfarben (`--accent`/`--warn`/`--danger`) unangetastet — Plan §0.3 Punkt 4 explizit.
+- `phase8_ui_graph/scripts/wegwerf_setup_d1.py` — Standing-Permission-Muster aus C3
+  reproduziert, eigener Port **18767**, `WEGWERF_ROOT=/tmp/opencode/sharefyx-wegwerf-d1`,
+  File-Keyring-Backend schreibt nach `keyring.json` (nicht in echten `nikinger-space`-
+  Service), eigener DEK als base64-Datei. User `alpha` direkt in `auth.sqlite3`
+  provisioniert (`AuthStore.upsert_user()`+`set_totp()`+`confirm_totp()`), TOTP-Seed
+  mit dem DEK aus `auth-dek` per `secretbox.seal()` verschlüsselt (derselbe Pfad wie
+  der echte Enrollment-Flow, Hard Rule 1: kein Schreiben in den echten Keyring,
+  Credentials in `credentials.json` 0600 nur im Wegwerf-Root, mit dem `cleanup`
+  gelöscht). Zweiter Space `beta` über `spacectl.py create-space` + `add-member --read
+  beta alpha` — `spacectl` schreibt die `share.yml` mit `read: [alpha]` (P6-M-Rechte-
+  politik), drei Items in alpha (gemischt Typen, damit Counter-Chips greifen: 1
+  task=open, 2 notes) und zwei in beta (zwei notes). Cleanup per
+  `kill -TERM $(cat serve.pid)` (Hard Rule 9).
+- `phase8_ui_graph/scripts/d1_playwright_smoke.py` — fünf Schritte:
+  `step1_static_markup` (kein Login, liest `app.html` direkt und prüft die neuen
+  IDs/Klassen + das Fehlen der alten), `step2_login_and_overview` (Login + Overview
+  rendert zwei `.overview__space-row`s mit den richtigen `rail__glyph--{own,foreign}`
+  und Counter-Chips: alpha 2, beta 1 — exakt die nicht-leeren Buckets),
+  `step3_click_counter_chip` (Klick auf den ersten alpha-Chip → Liste rendert, Crumb
+  enthält `alpha` + Bucket-Name, hier `alpha › Offen`),
+  `step4_home_button_switches_to_global` (Klick auf `#home-button` → `.tree__scope`
+  wird `aria-current="true"`, Crumb „Alle Items", 5 Items sichtbar — 3 aus alpha +
+  2 aus beta),
+  `step5_home_click_is_idempotent_when_global` (zweiter Home-Klick aus dem globalen
+  Scope heraus lässt den Scope global, kein Zurückfallen auf "space" — V82). Drei
+  PNG-Screenshots nach `docs/screenshots/d1_{01_overview_space_rows,02_counter_chip_navigates,
+  03_home_to_global_scope}.png`, danach visuelle Sichtprüfung: alpha-Zeile mit blauem
+  „A"-Glyph + „1 Offen"/„2 Notizen"-Chips, beta-Zeile mit Slate-„B"-Glyph +
+  „2 Notizen"-Chip, „Verknüpfungen"-Panel als leere Slate-Box (~55vh), „Zuletzt
+  benutzt"-Liste mit den drei alpha-Items, Update-Banner von der realen
+  `UPDATE_LOG.md` korrekt oben (siehe Sichtprüfung 1, Banner nicht weggedrückt —
+  gehört zur Realität der App).
 
 **Verifikation — Selbstprüf-Checkliste §0.6 alle fünf Punkte grün:**
 
 1. `pytest -q` → **958/958 grün** (vorher/nachher identisch, keine Python-Änderung).
 2. Tabu-Diff (`git diff --stat main -- phase4_auth/ phase2_mcp/ phase5_ui/webui/security.py
    phase1_storage/storage/{models,frontmatter,files,patch,acl,history}.py`) → **leer**.
-3. JS-Syntax: `node --check` auf `state.js`/`tree.js`/`list.js` → **0 errors**. Kein Endpunkt
-   berührt (reines Frontend), keine Fehlerpfade zu durchdenken jenseits des UI-Renderings
-   (P8-H, P8-I, P8-N halten).
+3. JS-Syntax: `node --check` auf `list.js`/`app.js` → **0 errors**. Kein Endpunkt berührt
+   (reines Frontend, P5-B + P8-§0.4 halten), keine Fehlerpfade zu durchdenken jenseits
+   des UI-Renderings. Home-Knopf-Regression V82 explizit geprüft.
 4. Doc-Update im selben Commit (Hard Rule 8) — dieser Block. Keine neue `.md`-Datei,
-   keine Index-Zeile nötig. Modul-Status-Tabelle und Abnahmestand oben bereits nachgezogen.
+   keine Index-Zeile nötig (Phase-Head und SESSIONS_ARCHIVE sind bereits im INDEX
+   verlinkt, Phase-8-Block steht dort seit 2026-08-28).
 5. `python phase5_ui/scripts/ui_budget.py` → **5/5 grün**, app.js+app.css+Font jetzt
-   **112.0 KB** (vorher 110.3, +1.7 KB für die neue CSS). Im Korridor (<250 KB).
-
-**E2E gegen Wegwerf-Instanz (Standing-Permission reproduziert, P5 Step 6/7b-Muster):**
-
-- Port `18766` (nicht der echte `sharefyx-mcp.service` auf `8765`, Hard Rule 9 eingehalten;
-  PID 67925 nicht angefasst, `uptime_s` linear wachsend 35188→35199, kein Servicerestart).
-- `SPACE_DATA_ROOT=/tmp/opencode/sharefyx-wegwerf-c3/data`, frisch — drei Items
-  (`Erste Notiz`/`Aufgabe für morgen`/`Bezug zu Phase 8`) per `space_cli.py create`.
-- `SPACE_AUTH_DB=/tmp/opencode/sharefyx-wegwerf-c3/auth.sqlite3`, frisch — User `alpha`
-  via `phase8_ui_graph/scripts/wegwerf_setup_c3.py` direkt in `auth.sqlite3` provisioniert
-  (`AuthStore.upsert_user()`+`set_totp()`+`confirm_totp()`), TOTP-Seed mit dem DEK aus
-  `auth-dek` per `secretbox.seal()` verschlüsselt (dieselbe Strecke wie der echte
-  Enrollment-Flow). Hard Rule 1: User/Passwort/TOTP-Seed in
-  `credentials.json` (0600) im selben tmp-Pfad, **nie** in einer Repo-Datei oder einem Log;
-  die Wegwerf-Datei wird beim `cleanup` mit dem Verzeichnis gelöscht.
-- File-Keyring-Backend in `_provision_user()`: eigenes `keyring.backend.KeyringBackend`
-  (`class FileBackend(keyring.backend.KeyringBackend)`), das nach `keyring.json` schreibt.
-  Wird nur in der Setup-Subprocess aktiviert, der `serve.py`-Subprozess nutzt seinen eigenen
-  Keyring-Backend (SecretService). Beide laufen nicht im selben Prozessraum — das ist die
-  harte Trennung, die die Hard Rule 1 für eine Wegwerf-Instanz verlangt.
-- **Playwright-Smoke (Playwright MCP gegen die Wegwerf-Instanz):**
-  - `step1_legend_in_app_html`: statisches Markup geprüft (kein Login nötig, `/ui/` ist
-    session-gated → 303 → `/ui/login`, also direkt aus `app.html` gelesen) — alle drei
-    `.legend__dot--{own,shared,foreign}` vorhanden, Labels vollständig.
-  - `step2_login_and_overview`: Login als `alpha` mit Passwort + frisch generiertem TOTP-
-    Code aus `pyotp`, danach `.overview .legend` sichtbar, `.tree__space .rail__glyph--own`
-    sichtbar; danach alle neun CSS-Klassen + drei Tokens per `fetch('/ui/static/app.css')`
-    aus dem served CSS gegenbestätigt.
-  - `step3_global_scope_dot`: Klick auf `.tree__scope` („Alle Items"), `.list__row
-    .space-dot--own` in der Metazeile sichtbar.
-  - `step4_screenshot`: zwei PNGs nach `docs/screenshots/c3_01_overview_with_legend.png` +
-    `c3_02_global_scope_dot.png`. Visuell geprüft: blauer `A`-Glyph im Rail-Baum, drei
-    Legenden-Dots (blau/teal/slate) in der richtigen Reihenfolge, blauer Punkt vor `alpha ·`
-    in jeder Item-Metazeile.
+   **113.0 KB** (vorher 112.0, +1.0 KB für die neue CSS). Im Korridor (<250 KB).
 
 **Wegwerf abgebaut:** `kill -TERM $(cat serve.pid)` (PID-Datei-Muster, **kein** `pkill -f`
-mit Regex — Hard Rule 9 eingehalten, Lehre aus dem Phase-8-Step-A3-Vorfall 2026-09-01);
-`rm -rf /tmp/opencode/sharefyx-wegwerf-c3/` im selben Zug. `curl http://127.0.0.1:8765/health`
-→ weiterhin `{"status":"ok", …}` (uptime 35199 s), `ps -ef` zeigt nur PID 67925 (Produktion),
-Wegwerf-PID weg.
+mit Regex — Hard Rule 9 eingehalten); `rm -rf /tmp/opencode/sharefyx-wegwerf-d1/` im selben
+Zug. `curl http://127.0.0.1:8765/health` → `{"status":"ok", …}` (uptime 65157 s, +0 s
+gegenüber Sessionbeginn — kein Service-Touch durch diese Session). `ps -ef` zeigt nur die
+`sharefyx-mcp.service` (PID 67925, Produktion); Wegwerf-PID weg.
 
-**Verbleibend für die nächste Session:**
+**Verbleibend für die nächste Session (innerhalb Block D, atomar pro Schritt):**
 
-- **C4** (Plan §4.C4, Glass-Akzente) — F14 (3-px-Akzentkante + 1-px-Outline für Auswahl-
-  Indikatoren), F16 (`prefers-reduced-transparency`-Fallback für Firefox, V85).
-- **C5** (Plan §4.C5, Dichte + Selection + 72ch) — F5 (`::selection`), F21 (`.editor__body
-  max-width: 72ch`), F22 (`.editor__body`-Padding auf Space-Token).
-- **Sichtprüfung 1** des Nikingers läuft noch — Befunde (Typo-Größen, Icon-Lesbarkeit,
-  ggf. Feinwerte) fließen entweder als C1-Nachschärfung (F3/F4/F6) oder als Vorlage für
-  C3-Feinwerte ein. C3-Startwerte (`#4A93F0`/`#2EB8A6`/`#8B93A1`) sind Feinjustierung-
-  Kandidaten — **nur in Nikingers Sichtprüfung**, nicht durch opencode.
-- **Vormerkung 1** aus dem vorherigen Block (Auswahl-Boxen vereinheitlichen) ist weiter
-  offen — keine Code-Änderung in C3, die Sache wird in einer Folge-Session mit der
-  nächsten Selektions-Affordance natürlich miterledigt (P8-I trifft keine Aussage dazu).
-- **D1/D2/D3** erst nach Sichtprüfung 1; Reihenfolge 0 → A → B → Gate → C → D → Z hält.
+- **D2** (Plan §5 D2, P8-D/P8-E) — `js/graph.js` neu: `loadGraph()` →
+  `GET /api/v1/graph`, Knoten bekommen `cat` über `spaceCategory()` und `deg` über
+  explizite Kanten, implizite Kanten clientseitig (`tagEdges()` mit
+  > 15-Knoten-Cutoff-Riegel, `folderEdges()` für gleicher-Space+Ordner), flache
+  Arrays mit `O(n²)`-Repulsion + Federkraft + Zentrums-Gravitation + Dämpfung,
+  Canvas 2D mit `devicePixelRatio`, Knotenfüllung = Kategoriefarbe, Kantenstile
+  (explizit solide / Tag gestrichelt / Ordner gepunktet), Hover-Dim,
+  Klick → `Editor.selectItem(id)`, Drag/Zoom/Pan, `prefers-reduced-motion`
+  → synchron zu Ende rechnen, Leerzustand-Hinweistext. Refresh-Knopf erweitern um
+  `Graph.loadGraph()`. P8-20/21/22.
+- **D3** (Plan §5 D3, P8-K) — `.rail__version` `v2.2.3` → `v3.0`, neuer oberster
+  `docs/UPDATE_LOG.md`-Eintrag am Deploy-Tag (P6-X-Gate), `ui_budget.py` alle
+  vier Budgets grün nach Fonts+Sprite+`graph.js` (V84), `_measure_latency()`-
+  Erweiterung um `/graph` nach Ermessen (V90). P8-17/23.
 
-**Nächster Schritt, konkret:** **C4 (Plan §4.C4)** — drei CSS-Regeln (`@supports
-backdrop-filter`-Progressive-Enhancement, drei Träger `.overlay`/`.update-banner`/
-`.list__head`, Pflicht-Indikator-Sheen für die Auswahlzeile — `box-shadow: inset 3px 0 0
-var(--accent)` + 1-px-Outline nach V88, der Klassenname steht in den Tests). F16 als Pflicht
-(`@media (prefers-reduced-transparency: reduce)` → solide Flächen, V85 für Firefox).
+**Nächster Schritt, konkret:** **D2 (Plan §5 D2)** — `js/graph.js` mit Force-Simulation
+(`requestAnimationFrame`-Loop endet mit der Simulation, kein Dauerbrenner),
+Render-Layer mit `devicePixelRatio`-Korrektur, Interaktions-Layer mit Hover-Dim
+und Knoten-Klick → `Editor.selectItem(id)` (derselbe ID-Lookup wie B4, nichts
+erfinden), Toggles für Tag-/Ordner-Kanten mit Default aus, Leerzustand-Hinweis.
+Anschließend Refresh-Knopf-Handler in `app.js` um `Graph.loadGraph()` erweitern.
+Sichtprüfung 2 (Plan §8) nach D3 abgeschlossen — Übersicht + Graph mit realistischen
+Daten (~30 Items, gemischte Kategorien) per Playwright.
 

@@ -5,7 +5,7 @@ import {
 } from "./state.js";
 import { init as initToasts } from "./toasts.js";
 import { api, csrfToken, reportUnexpectedError } from "./api.js";
-import { init as initTree } from "./tree.js";
+import { init as initTree, navigateAll } from "./tree.js";
 import * as List from "./list.js";
 import * as Editor from "./editor.js";
 import {
@@ -87,9 +87,18 @@ function initShell() {
   // -- Übersicht / Logout / Zurück ---------------------------------------------------------
 
   var homeButtonEl = document.getElementById("home-button");
-  // `closeEditor()` räumt bereits auf (inklusive Rückfrage bei ungespeicherten Änderungen) und
-  // zeigt danach die Übersicht — hier ist nichts weiter zu tun.
-  homeButtonEl.addEventListener("click", function () { Editor.closeEditor(); });
+  // Phase 8 Block D D1 (Plan §5 D1): Klick auf den Übersicht-Knopf schließt den Editor (mit
+  // Rueckfrage bei ungespeicherten Aenderungen) UND schaltet die Listen-Spalte auf den
+  // globalen "Alle Items"-Scope. `closeEditor()` ruft intern `clearDetail()`, das `state.scope`
+  // auf "space" zuruecksetzt (V82, P6-Advisor-Fund) -- das `navigateAll()` HIER setzt es direkt
+  // danach wieder auf "all". Kein Umgehen, Zusammenspiel explizit getestet (Playwright-Smoke
+  // prueft beide Pfaade: Klick aus eigenem Space, Klick aus bereits aktivem globalem Scope).
+  homeButtonEl.addEventListener("click", function () {
+    Editor.closeEditor().then(function (proceed) {
+      if (proceed === false) return;
+      navigateAll();
+    }).catch(reportUnexpectedError);
+  });
 
   // Phase 8 Block B Step B4 (Plan §3 B4): Klick-Delegation auf `a[href^="#item/"]`. Verwendet
   // den vorhandenen ID-Lookup aus `_items_get` über `GET /api/v1/items/{id}` (Plan §3 B4
@@ -113,6 +122,15 @@ function initShell() {
     fetch("/ui/logout", { method: "POST", headers: { "X-CSRF-Token": csrfToken() || "" } }).then(
       function () { location.replace("/ui/login"); }
     );
+  });
+
+  // Phase 8 Block D D1 (Plan §5 D1): Refresh-Knopf in der Übersichts-Kopfzeile. Laedt die
+  // Übersicht neu -- D2 erweitert das um `Graph.loadGraph()` (dann ist der Knopf der einzige
+  // Ausloeser fuer den Graph-Refresh, der Polling-Mechanismus bleibt laut Plan §5 D1 nur auf
+  // die Zaehler beschränkt). Listener sitzt HIER (app.js) statt in list.js, weil der Knopf
+  // bewusst zur Übersichts-Flaeche gehoert und nicht zur Liste.
+  document.getElementById("overview-refresh").addEventListener("click", function () {
+    List.loadOverview().catch(reportUnexpectedError);
   });
 
   document.getElementById("back-button").addEventListener("click", function () {

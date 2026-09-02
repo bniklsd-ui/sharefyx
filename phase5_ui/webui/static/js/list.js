@@ -25,27 +25,61 @@ var listSelectionMoveEl;
 var listSelectionClearEl;
 
 var overviewTitleEl;
-var overviewTilesEl;
+var overviewSpacesEl;
 var overviewRecentEl;
-var overviewForeignEl;
 
 export function renderOverview() {
   var own = spaceByName(state.ownSpace);
   overviewTitleEl.textContent = state.ownSpace || "";
-  overviewTilesEl.textContent = "";
+  overviewSpacesEl.textContent = "";
   overviewRecentEl.textContent = "";
-  overviewForeignEl.textContent = "";
   if (!own) return;
 
-  bucketNames().forEach(function (bucket) {
-    var tile = el("button", "tile");
-    tile.type = "button";
-    tile.appendChild(el("span", "tile__count tnum", String(own.counts[bucket])));
-    tile.appendChild(el("span", "tile__label", BUCKET_LABELS[bucket] || bucket));
-    tile.addEventListener("click", function () {
-      navigate(own.name, bucket).catch(reportUnexpectedError);
+  // Phase 8 Block D D1 (Plan §5 D1): tabellose Space-Zeilen statt Kachel-Grid -- eine Zeile je
+  // Space (eigene + fremde, Kategoriepunkt C3 + Name links, Counter-Chips rechts). Reihenfolge
+  // ist dieselbe wie im Navigationsbaum: eigene Spaces zuerst, dann fremde (analog
+  // tree.js :: renderRail()).
+  var orderedSpaces = state.spaces.slice().sort(function (a, b) {
+    if (a.own !== b.own) return a.own ? -1 : 1;
+    return a.name.localeCompare(b.name);
+  });
+  var buckets = bucketNames();
+  orderedSpaces.forEach(function (space) {
+    var row = el("li", "overview__space-row");
+    var nameEl = el("div", "overview__space-name");
+    nameEl.appendChild(el(
+      "span", "rail__glyph rail__glyph--" + spaceCategory(space),
+      space.name.charAt(0).toUpperCase(),
+    ));
+    nameEl.appendChild(el(
+      "span",
+      "overview__space-name-label" + (space.writable ? "" : " overview__space-name-label--readonly"),
+      space.name,
+    ));
+    row.appendChild(nameEl);
+
+    var countsEl = el("div", "overview__space-counts");
+    buckets.forEach(function (bucket) {
+      var count = (space.counts && space.counts[bucket]) || 0;
+      // Plan §5 D1: "keine leeren Buckets" -- ein 0-Chip wäre Deko und würde Klick auf
+      // leere Ordner provozieren.
+      if (!count) return;
+      var chip = el("button", "overview__space-count");
+      chip.type = "button";
+      chip.dataset.space = space.name;
+      chip.dataset.bucket = bucket;
+      chip.title = space.name + " › " + (BUCKET_LABELS[bucket] || bucket);
+      chip.appendChild(document.createTextNode(
+        String(count) + " " + (BUCKET_LABELS[bucket] || bucket),
+      ));
+      chip.addEventListener("click", function (event) {
+        event.stopPropagation();
+        navigate(space.name, bucket).catch(reportUnexpectedError);
+      });
+      countsEl.appendChild(chip);
     });
-    overviewTilesEl.appendChild(tile);
+    row.appendChild(countsEl);
+    overviewSpacesEl.appendChild(row);
   });
 
   if (own.recent.length === 0) {
@@ -67,23 +101,6 @@ export function renderOverview() {
     li.appendChild(row);
     overviewRecentEl.appendChild(li);
   });
-
-  var foreign = state.spaces.filter(function (s) { return !s.own; });
-  if (foreign.length) {
-    overviewForeignEl.appendChild(el("h2", "overview__heading", "Verbundene Spaces"));
-    foreign.forEach(function (space) {
-      var card = el("button", "space-card");
-      card.type = "button";
-      card.appendChild(el("span", "rail__glyph", space.name.charAt(0).toUpperCase()));
-      card.appendChild(el("span", null, space.name));
-      card.appendChild(el("span", "space-card__meta", space.item_count + " Items" + (space.writable ? "" : " · nur lesen")));
-      card.addEventListener("click", function () {
-        state.expanded[space.name] = true;
-        navigate(space.name, "note").catch(reportUnexpectedError);
-      });
-      overviewForeignEl.appendChild(card);
-    });
-  }
 }
 
 export function openFromOverview(spaceName, item) {
@@ -468,9 +485,8 @@ export function init() {
   });
 
   overviewTitleEl = document.getElementById("overview-title");
-  overviewTilesEl = document.getElementById("overview-tiles");
+  overviewSpacesEl = document.getElementById("overview-spaces");
   overviewRecentEl = document.getElementById("overview-recent");
-  overviewForeignEl = document.getElementById("overview-foreign");
 
   // -- Suche (200ms Debounce) -----------------------------------------------------------
   var searchTimer = null;

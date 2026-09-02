@@ -699,31 +699,94 @@ select.input {
   margin: calc(var(--space) * 4) 0 var(--space);
 }
 
-.overview__tiles {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: calc(var(--space) * 2);
+/* Phase 8 Block D D1 (Plan §5 D1): Übersichts-Kopf mit Refresh-Knopf rechts. Flex-Reihe,
+   damit Titel und Knopf auf gemeinsamer Grundlinie stehen. Knopf nutzt die existierende
+   btn--icon-Klasse (Plex-Tokens, Lucide-Icon i-refresh-cw aus C2). */
+.overview__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space);
+  margin-bottom: calc(var(--space) * 2);
+}
+.overview__header .overview__title { margin-bottom: 0; flex: 1; min-width: 0; }
+.overview__refresh { flex-shrink: 0; }
+
+/* Phase 8 Block D D1 (Plan §5 D1): tabellose Space-Zeilen -- ersetzt das ehemalige
+   .overview__tiles-Kachel-Grid (F12/F23) UND die .space-card-Liste der fremden Spaces
+   (F13). Eine Zeile je Space, Kategoriepunkt + Name links, Counter-Chips rechts.
+   Maximale Breite wie .recent-row (720px), damit Uebersicht und Graph-Panel visuell
+   aufeinander aufbauen. */
+.overview__spaces {
+  list-style: none;
+  margin: 0 0 calc(var(--space) * 3);
+  padding: 0;
   max-width: 720px;
 }
-
-.tile {
+.overview__space-row {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  align-items: flex-start;
-  background: linear-gradient(180deg, #1D242D, #151A21);
-  border: 1px solid var(--btn-edge);
-  border-radius: var(--radius);
-  box-shadow: inset 0 1px 0 var(--btn-glow), var(--btn-lift);
-  padding: calc(var(--space) * 2);
-  cursor: pointer;
-  text-align: left;
-  color: var(--text);
+  align-items: center;
+  gap: calc(var(--space) * 2);
+  padding: calc(var(--space) * 1.25) 0;
+  border-bottom: 1px solid var(--line);
 }
-.tile:hover { border-color: var(--accent-line); }
-.tile:active { transform: translateY(1px); box-shadow: var(--btn-press); }
-.tile__count { font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.tile__label { font-size: var(--fs-meta); color: var(--text-muted); }   /* vor C1: 13px */
+.overview__space-row:first-child { padding-top: 0; }
+.overview__space-row:last-child { border-bottom: 0; padding-bottom: 0; }
+
+.overview__space-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space);
+  flex: 1;
+  min-width: 0;
+}
+.overview__space-name-label {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.overview__space-name-label--readonly { color: var(--text-muted); }
+
+.overview__space-counts {
+  display: flex;
+  gap: calc(var(--space) * 0.5);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.overview__space-count {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 2px calc(var(--space) * 1.25);
+  font-size: var(--fs-meta);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  font-family: inherit;
+}
+.overview__space-count:hover { color: var(--accent); border-color: var(--accent-line); }
+.overview__space-count:focus-visible {
+  outline: 2px solid var(--accent-line);
+  outline-offset: 1px;
+}
+
+/* Phase 8 Block D D2 (Plan §5 D2): Graph-Panel-Geruest, ~55vh (min-height, kann bei
+   vielen Knoten wachsen). Canvas fuellt das Panel, Ueberlauf wird abgeschnitten. */
+.overview__graph {
+  position: relative;
+  min-height: 55vh;
+  max-width: 960px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  margin-bottom: calc(var(--space) * 2);
+  overflow: hidden;
+}
+.overview__graph canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 
 .overview__recent { list-style: none; margin: 0; padding: 0; max-width: 720px; }
 
@@ -743,25 +806,6 @@ select.input {
 .recent-row:hover { color: var(--accent); }
 .recent-row__title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .recent-row__meta { font-size: var(--fs-meta); color: var(--text-muted); flex-shrink: 0; }   /* vor C1: 12px */
-
-.space-card {
-  display: flex;
-  align-items: center;
-  gap: var(--space);
-  width: 100%;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--warn);
-  border-radius: var(--radius-sm);
-  padding: var(--space) calc(var(--space) * 2);
-  margin-bottom: var(--space);
-  cursor: pointer;
-  text-align: left;
-  color: var(--text);
-  max-width: 720px;
-}
-.space-card:hover { border-color: var(--line-strong); border-left-color: var(--warn); }
-.space-card__meta { margin-left: auto; font-size: var(--fs-meta); color: var(--text-muted); }
 
 /* -- Detailkopf / Nur-lesen -------------------------------------------------------------- */
 

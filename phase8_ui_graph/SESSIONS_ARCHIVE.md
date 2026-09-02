@@ -3,12 +3,137 @@ status: live
 purpose: Archiv älterer Session-Blöcke aus phase8_ui_graph/CLAUDE.md — newest-first, verbatim per Rotationsregel
 read-when: nur wenn der aktuelle Session-Block im Phase-Head nicht reicht und Verlauf gebraucht wird
 detail: L3
-updated: 2026-09-01 (Sichtpruefung-1-Block (vom Vortag) nach C3-Rotation ins Archiv gewandert -- jetzt 18 Bloecke newest-first; Phase-8-Head wieder unter dem 40KB-Softcap) | 2026-09-01 (zwölfte Rotation, 17 Blöcke)
+updated: 2026-09-02 (C3-Block nach D1-Session ins Archiv -- 19 Bloecke newest-first, Phase-8-Head jetzt mit D1-Block allein; Head 41.8KB->45.1KB ueber Softcap benannt) | 2026-09-01 (Sichtpruefung-1-Block (vom Vortag) nach C3-Rotation ins Archiv gewandert -- jetzt 18 Bloecke newest-first; Phase-8-Head wieder unter dem 40KB-Softcap) | 2026-09-01 (zwölfte Rotation, 17 Blöcke)
 up: CLAUDE.md
 updated: 2026-09-01 (zwoelfte Rotation: C2-Block ins Archiv nach Screenshots+README-Session -- Sichtpruefung 1 mit 9 Screenshots gegen Wegwerf-Instanz, README "Sneak Peak"-Sektion neu, docs/screenshots/ neu im INDEX, C2+Docs-Commit 0d97b3a gepusht; Head 37.7KB->33.6KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 103.8KB->114.0KB; keine Code-Aenderung ausserhalb webui/static + build_icon_sprite.py + vendor/, keine Service-Touch in dieser Sitzung) | 2026-09-01 (elfte Rotation: C1-Block ins Archiv nach C2-Session -- C2-Block (Lucide-Sprite, 18 Icons, build_icon_sprite.py, js/icons.js, .icon-CSS) ergaenzt, dann rotiert; Head 33.7KB->37.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 96.0KB->103.8KB; F9/F10/F11 aus C0 geschlossen; keine neue P1-Contract-Oeffnung; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (zehnte Rotation: C0-Block ins Archiv nach C1-Session -- C1-Block (Plex-Font-Swap + CSS-Typo-Tokens, 35 Findings aus C0 abgearbeitet fuer C1) ergaenzt, dann rotiert; Head 27.5KB->33.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 89.3KB->96.0KB; C1-Commits 0281cce + 08bff55 im Head referenziert; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (neunte Rotation: Gate-B→C-Block ins Archiv nach C0-Session -- C0-Block ergaenzt, dann rotiert; Head 39.0KB->31.4KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 81.3KB->89.3KB; C0-Findings-Tabelle (35 Eintraege) lebt im Head; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (achte Rotation: B4-Block ins Archiv nach Gate-B→C-Verifikation -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf, pytest 958/958 gruen, Charakterisierung byte-identisch, Tabu-Diff leer; Head jetzt mit 14.8 KB unter dem Softcap, SESSIONS_ARCHIVE.md 76.9 KB; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (siebte Rotation: fuenf Bloecke ins Archiv -- A3-Bau, Hard-Rule-9-Doku, Versions-Bump v2.2.3, A3-Drittprobe mit Restdefekt, B1 linkscan.py + Tests; Head jetzt 16.4 KB mit genau einem Block, 12 Bloecke im Archiv, Phase-8-Head wieder unter dem 40KB-Softcap; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8
+
+## Session stopped — 2026-09-01 (Block C C3 gebaut — Farbsemantik + Legende, Playwright-verifiziert gegen Wegwerf-Instanz 127.0.0.1:18766)
+
+**Auftrag:** Block C C3 (Plan §4.C3, P8-I) — die drei Space-Kategorie-Farben + Legende.
+Vorlage: vorheriger Session-Block hatte den nächsten Schritt auf „Befunde aus Sichtprüfung 1
+fließen als Vorlage für C3 ein" gesetzt; die offene Vormerkung „Auswahl-Boxen vereinheitlichen"
+ist eine begleitende Design-Frage, kein C3-Blocker.
+
+**Code-Änderungen (fünf Dateien, +~120 Zeilen, 0 Tabu-Diff-Zeilen):**
+
+- `phase5_ui/webui/static/app.css :: :root` — drei neue Tokens: `--space-own: #4A93F0`
+  (Markenblau-Familie, etwas matter als `--accent`), `--space-shared: #2EB8A6` (Teal),
+  `--space-foreign: #8B93A1` (neutrales Slate, „nicht deins" darf leise sein); Abstand zu
+  `--warn`/`--danger` explizit dokumentiert, AA-Kontrast auf `--bg` per Augenschein ok.
+- `phase5_ui/webui/static/app.css` — `.rail__glyph--{own,shared,foreign}`-Varianten mit
+  eigenen Gradient/Edge-Paaren (die Plex-Tokens `--space-*` sind die Schlüsselfarbe, hier
+  entsteht die plastische Variante), `.space-dot` + drei `--{cat}`-Varianten (8px-Kreis,
+  `align-self: center` für 12.5px-Metazeile), `.legend` + `.legend__item` + `.legend__dot`
+  (statisch, `--fs-meta`, flex-wrap für schmale Viewports).
+- `phase5_ui/webui/static/app.html` — `<div class="legend">` mit drei Items direkt unter
+  `.overview__title`, vor den Bucket-Tiles. Statisch (vom Renderer unangetastet), `aria-label`
+  trägt „Space-Kategorien".
+- `phase5_ui/webui/static/js/state.js` — `spaceCategory(space)` neu; `null`/`undefined` →
+  „foreign" (konservativ), `space.own` → „own", `space.writable` → „shared", sonst „foreign".
+  Die Felder liefert `GET /spaces` seit P6 Step 5.
+- `phase5_ui/webui/static/js/tree.js` — `rail__glyph` bekommt die Kategorie-Klasse:
+  `rail__glyph--${spaceCategory(space)}`. Import ergänzt.
+- `phase5_ui/webui/static/js/list.js` — `itemMetaLine()` aufgeteilt: rendert nur noch den
+  Tail (Typ/Status/Datum/Tags), nicht mehr den Space-Namen. `renderList()` baut den global-
+  Scope-Präfix (`space-dot--${spaceCategory(...)}` + Text-Knoten `space · `) jetzt selbst
+  ein — bewusst im Caller, weil der Punkt nur dort gesetzt wird, wo der Space explizit
+  hingehört (nicht im Space-Scope). Import ergänzt.
+
+**Anwendungsstellen laut Plan §4.C3 — bewusst minimal gehalten:**
+
+- ✅ `.rail__glyph`-Rand/Fond: tree.js-BaumGlyph in der Space-Zeile.
+- ✅ Space-Punkt vor der Metazeile im globalen Listen-Scope: list.js.
+- ✅ Legende: statisch in app.html-Overview.
+- ⬜ Übersichts-Space-Zeilen (§5): **nicht angefasst**, gehört zu Block D (D1 ersetzt die
+  Space-Cards durch tabellose Zeilen, dort wird die gleiche `spaceCategory()`-Logik erneut
+  angewandt — siehe `phase8_ui_graph_plan.md` §5/D1).
+- ⬜ Graph-Knoten (§5): **nicht angefasst**, gehört zu Block D2.
+
+**Bewusst NICHT angefasst (genannte Punkte aus C0/C3):**
+
+- `.space-card`-`border-left: 3px solid var(--warn)` (app.css:682) bleibt wie es ist. Der
+  Plan listet `space-card` nicht unter den C3-Anwendungsstellen; D1 ersetzt die Cards
+  vollständig. Eine temporäre Inkonsistenz (space-card-Border bleibt amber, der rail__glyph
+  darin trägt bereits die neue `space-foreign`/`-shared`-Farbe) wird von D1 aufgelöst.
+- Statusfarben (`--accent`/`--warn`/`--danger`) unangetastet — Plan §0.3 Punkt 4 explizit.
+
+**Verifikation — Selbstprüf-Checkliste §0.6 alle fünf Punkte grün:**
+
+1. `pytest -q` → **958/958 grün** (vorher/nachher identisch, keine Python-Änderung).
+2. Tabu-Diff (`git diff --stat main -- phase4_auth/ phase2_mcp/ phase5_ui/webui/security.py
+   phase1_storage/storage/{models,frontmatter,files,patch,acl,history}.py`) → **leer**.
+3. JS-Syntax: `node --check` auf `state.js`/`tree.js`/`list.js` → **0 errors**. Kein Endpunkt
+   berührt (reines Frontend), keine Fehlerpfade zu durchdenken jenseits des UI-Renderings
+   (P8-H, P8-I, P8-N halten).
+4. Doc-Update im selben Commit (Hard Rule 8) — dieser Block. Keine neue `.md`-Datei,
+   keine Index-Zeile nötig. Modul-Status-Tabelle und Abnahmestand oben bereits nachgezogen.
+5. `python phase5_ui/scripts/ui_budget.py` → **5/5 grün**, app.js+app.css+Font jetzt
+   **112.0 KB** (vorher 110.3, +1.7 KB für die neue CSS). Im Korridor (<250 KB).
+
+**E2E gegen Wegwerf-Instanz (Standing-Permission reproduziert, P5 Step 6/7b-Muster):**
+
+- Port `18766` (nicht der echte `sharefyx-mcp.service` auf `8765`, Hard Rule 9 eingehalten;
+  PID 67925 nicht angefasst, `uptime_s` linear wachsend 35188→35199, kein Servicerestart).
+- `SPACE_DATA_ROOT=/tmp/opencode/sharefyx-wegwerf-c3/data`, frisch — drei Items
+  (`Erste Notiz`/`Aufgabe für morgen`/`Bezug zu Phase 8`) per `space_cli.py create`.
+- `SPACE_AUTH_DB=/tmp/opencode/sharefyx-wegwerf-c3/auth.sqlite3`, frisch — User `alpha`
+  via `phase8_ui_graph/scripts/wegwerf_setup_c3.py` direkt in `auth.sqlite3` provisioniert
+  (`AuthStore.upsert_user()`+`set_totp()`+`confirm_totp()`), TOTP-Seed mit dem DEK aus
+  `auth-dek` per `secretbox.seal()` verschlüsselt (dieselbe Strecke wie der echte
+  Enrollment-Flow). Hard Rule 1: User/Passwort/TOTP-Seed in
+  `credentials.json` (0600) im selben tmp-Pfad, **nie** in einer Repo-Datei oder einem Log;
+  die Wegwerf-Datei wird beim `cleanup` mit dem Verzeichnis gelöscht.
+- File-Keyring-Backend in `_provision_user()`: eigenes `keyring.backend.KeyringBackend`
+  (`class FileBackend(keyring.backend.KeyringBackend)`), das nach `keyring.json` schreibt.
+  Wird nur in der Setup-Subprocess aktiviert, der `serve.py`-Subprozess nutzt seinen eigenen
+  Keyring-Backend (SecretService). Beide laufen nicht im selben Prozessraum — das ist die
+  harte Trennung, die die Hard Rule 1 für eine Wegwerf-Instanz verlangt.
+- **Playwright-Smoke (Playwright MCP gegen die Wegwerf-Instanz):**
+  - `step1_legend_in_app_html`: statisches Markup geprüft (kein Login nötig, `/ui/` ist
+    session-gated → 303 → `/ui/login`, also direkt aus `app.html` gelesen) — alle drei
+    `.legend__dot--{own,shared,foreign}` vorhanden, Labels vollständig.
+  - `step2_login_and_overview`: Login als `alpha` mit Passwort + frisch generiertem TOTP-
+    Code aus `pyotp`, danach `.overview .legend` sichtbar, `.tree__space .rail__glyph--own`
+    sichtbar; danach alle neun CSS-Klassen + drei Tokens per `fetch('/ui/static/app.css')`
+    aus dem served CSS gegenbestätigt.
+  - `step3_global_scope_dot`: Klick auf `.tree__scope` („Alle Items"), `.list__row
+    .space-dot--own` in der Metazeile sichtbar.
+  - `step4_screenshot`: zwei PNGs nach `docs/screenshots/c3_01_overview_with_legend.png` +
+    `c3_02_global_scope_dot.png`. Visuell geprüft: blauer `A`-Glyph im Rail-Baum, drei
+    Legenden-Dots (blau/teal/slate) in der richtigen Reihenfolge, blauer Punkt vor `alpha ·`
+    in jeder Item-Metazeile.
+
+**Wegwerf abgebaut:** `kill -TERM $(cat serve.pid)` (PID-Datei-Muster, **kein** `pkill -f`
+mit Regex — Hard Rule 9 eingehalten, Lehre aus dem Phase-8-Step-A3-Vorfall 2026-09-01);
+`rm -rf /tmp/opencode/sharefyx-wegwerf-c3/` im selben Zug. `curl http://127.0.0.1:8765/health`
+→ weiterhin `{"status":"ok", …}` (uptime 35199 s), `ps -ef` zeigt nur PID 67925 (Produktion),
+Wegwerf-PID weg.
+
+**Verbleibend für die nächste Session:**
+
+- **C4** (Plan §4.C4, Glass-Akzente) — F14 (3-px-Akzentkante + 1-px-Outline für Auswahl-
+  Indikatoren), F16 (`prefers-reduced-transparency`-Fallback für Firefox, V85).
+- **C5** (Plan §4.C5, Dichte + Selection + 72ch) — F5 (`::selection`), F21 (`.editor__body
+  max-width: 72ch`), F22 (`.editor__body`-Padding auf Space-Token).
+- **Sichtprüfung 1** des Nikingers läuft noch — Befunde (Typo-Größen, Icon-Lesbarkeit,
+  ggf. Feinwerte) fließen entweder als C1-Nachschärfung (F3/F4/F6) oder als Vorlage für
+  C3-Feinwerte ein. C3-Startwerte (`#4A93F0`/`#2EB8A6`/`#8B93A1`) sind Feinjustierung-
+  Kandidaten — **nur in Nikingers Sichtprüfung**, nicht durch opencode.
+- **Vormerkung 1** aus dem vorherigen Block (Auswahl-Boxen vereinheitlichen) ist weiter
+  offen — keine Code-Änderung in C3, die Sache wird in einer Folge-Session mit der
+  nächsten Selektions-Affordance natürlich miterledigt (P8-I trifft keine Aussage dazu).
+- **D1/D2/D3** erst nach Sichtprüfung 1; Reihenfolge 0 → A → B → Gate → C → D → Z hält.
+
+**Nächster Schritt, konkret:** **C4 (Plan §4.C4)** — drei CSS-Regeln (`@supports
+backdrop-filter`-Progressive-Enhancement, drei Träger `.overlay`/`.update-banner`/
+`.list__head`, Pflicht-Indikator-Sheen für die Auswahlzeile — `box-shadow: inset 3px 0 0
+var(--accent)` + 1-px-Outline nach V88, der Klassenname steht in den Tests). F16 als Pflicht
+(`@media (prefers-reduced-transparency: reduce)` → solide Flächen, V85 für Firefox).
+
+---
 
 ## Session stopped — 2026-09-01 (Sichtprüfung 1: 9 Screenshots gegen Wegwerf-Instanz, README Sneak Peak, C2 + Docs gepusht)
 

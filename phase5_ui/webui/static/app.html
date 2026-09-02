@@ -67,22 +67,43 @@
   <section class="detail" id="detail">
     <button class="detail__back" type="button" id="back-button">&larr; Zur&uuml;ck</button>
 
-    <!-- Startansicht (Step 7b) -->
+    <!-- Startansicht (Step 7b, Phase 8 Block D D1 tabellos) -->
     <div class="overview" id="detail-overview">
-      <h1 class="overview__title" id="overview-title"></h1>
+      <!-- Phase 8 Block D D1 (Plan §5 D1): Kopfzeile mit Titel + Refresh-Knopf. Der Refresh-
+           Knopf laedt Overview (und in D2 auch den Graph) neu -- geteilte Header-Zeile mit
+           Flex, damit Titel und Knopf auf einer gemeinsamen Grundlinie stehen, ohne dass
+           der Knopf bei langen Namen umbricht. -->
+      <header class="overview__header">
+        <h1 class="overview__title" id="overview-title"></h1>
+        <button class="btn btn--icon overview__refresh" id="overview-refresh" type="button"
+                title="Aktualisieren" aria-label="Aktualisieren">
+          <svg class="icon" aria-hidden="true"><use href="#i-refresh-cw"></use></svg>
+        </button>
+      </header>
       <!-- Phase 8 C3 (P8-I): Mini-Legende fuer die drei Space-Kategoriefarben. Statisch --
            wird vom Renderer nicht angefasst, steht ab App-Start dort. Position direkt unter
-           dem Titel, vor den Bucket-Tiles, damit der Leser die Farben dort findet, wo sie
-           zum ersten Mal auftauchen (in den "Verbundene Spaces"-Cards weiter unten). -->
+           dem Titel, vor den Space-Zeilen, damit der Leser die Farben dort findet, wo sie
+           zum ersten Mal auftauchen. -->
       <div class="legend" aria-label="Space-Kategorien">
         <span class="legend__item"><span class="legend__dot legend__dot--own"></span>Eigener Space</span>
         <span class="legend__item"><span class="legend__dot legend__dot--shared"></span>Geteilter Space (schreibbar)</span>
         <span class="legend__item"><span class="legend__dot legend__dot--foreign"></span>Fremder Space</span>
       </div>
-      <div class="overview__tiles" id="overview-tiles"></div>
+      <!-- Phase 8 Block D D1 (Plan §5 D1): tabellose Space-Zeilen statt Kachel-Grid. Eine Zeile
+           je Space -- Kategoriepunkt + Name + klickbare Counter-Chips (open/done/note/archived,
+           nur die mit count > 0, keine leeren Buckets, F12/F13/F23 aufgeloest). Reihenfolge:
+           eigene Spaces zuerst, dann fremde. Aus dem DOM gerendert, nicht statisch -- die Liste
+           selbst wird per loadOverview() befuellt. -->
+      <ol class="overview__spaces" id="overview-spaces"></ol>
+      <!-- Phase 8 Block D D2 (Plan §5 D2): Graph-Panel mit <canvas>. D1 legt nur das Geruest
+           an (Container + Canvas), D2 befuellt es mit der Force-Simulation. ~55vh aus dem Plan,
+           umgesetzt mit min-height (kann bei vielen Knoten auch groesser werden). -->
+      <h2 class="overview__heading">Verkn&uuml;pfungen</h2>
+      <div class="overview__graph" id="overview-graph">
+        <canvas id="overview-graph-canvas" aria-label="Verkn&uuml;pfungsgraph"></canvas>
+      </div>
       <h2 class="overview__heading">Zuletzt benutzt</h2>
       <ol class="overview__recent" id="overview-recent"></ol>
-      <div id="overview-foreign"></div>
     </div>
 
     <div id="detail-readonly" hidden>
