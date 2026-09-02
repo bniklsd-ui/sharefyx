@@ -5,13 +5,15 @@ Pruefungen:
   1. CSS-Content (statisch via fetch): --glass-* Tokens, .glass-Utility,
      @supports backdrop-filter, @media prefers-reduced-transparency,
      ::selection, max-width:72ch auf .editor__textarea, 3px-Akzentkante +
-     1px-Outline auf .list__row[aria-current="true"] und
-     .list__rows > li.list__row--selected.
+     Rail-Button-Gradient-Fill auf .list__row[aria-current="true"] und
+     .list__rows > li.list__row--selected (Vormerkung 3 Punkt 1, Richtung (a)
+     -- loest den fruehreren Outline+Blur-Sheen ab, 2026-09-02).
   2. Login + Overview: .list__head ist sticky positioniert (CSS computed style),
      .list__head.traegt die Glass-Träger-Regeln (CSS-Variable --glass-bg ist
      gesetzt), rail__glyph--own sichtbar.
   3. Klick auf ein Item: ausgewaehlte Zeile hat aria-current="true", berechnete
-     border-left-color ist var(--accent), Outline ist 1px solid accent.
+     border-left-color ist var(--accent), background-image ist derselbe Gradient
+     wie .rail__home[aria-current="true"] (Unified-Nachweis fuer Richtung (a)).
   4. Editor offen: .editor__textarea hat computed max-width: 72ch und ist
      horizontal zentriert (margin: 0 auto wirksam -- boundingClientRect.centerX
      im Bereich der Listen-Spalten-Mitte).
@@ -68,23 +70,38 @@ async def step1_css_static_checks() -> str:
     # 72ch-Editor
     assert re.search(r"\.editor__textarea\s*{[^}]*max-width:\s*72ch", body), \
         ".editor__textarea ohne max-width: 72ch"
-    # Selektion: 3px Akzentkante + 1px Outline (Regex mit DOTALL, weil die Properties
-    # in der naechsten Zeile nach der Selector-Klammer stehen)
+    # Selektion: 3px Akzentkante + Rail-Button-Gradient-Fill, KEIN outline mehr
+    # (Regex mit DOTALL, weil die Properties in der naechsten Zeile nach der
+    # Selector-Klammer stehen). Vormerkung 3 Punkt 1, Richtung (a), 2026-09-02.
+    RAIL_GRADIENT = "linear-gradient(180deg, rgba(62,141,243,.20), rgba(62,141,243,.08))"
     assert re.search(
         r"\.list__row\[aria-current=\"true\"\]\s*\{[^}]*border-left-color:\s*var\(--accent\)",
         body, re.DOTALL), ".list__row[aria-current=true] ohne 3px Akzentkante"
     assert re.search(
-        r"\.list__row\[aria-current=\"true\"\]\s*\{[^}]*outline:\s*1px solid var\(--accent\)",
-        body, re.DOTALL), ".list__row[aria-current=true] ohne 1px Akzent-Outline"
+        re.escape(f'.list__row[aria-current="true"] {{\n  background: {RAIL_GRADIENT};'),
+        body), ".list__row[aria-current=true] ohne Rail-Button-Gradient-Fill"
+    assert re.search(
+        r"\.list__row\[aria-current=\"true\"\]\s*\{[^}]*outline",
+        body, re.DOTALL) is None, \
+        ".list__row[aria-current=true] traegt noch eine outline-Regel (Vormerkung 3 " \
+        "Punkt 1 hat sie durch den Fill abgeloest)"
     assert re.search(
         r"\.list__rows\s*>\s*li\.list__row--selected\s*\{[^}]*border-left:\s*3px solid var\(--accent\)",
         body, re.DOTALL), "Mehrfachauswahl ohne 3px Akzentkante"
+    assert re.search(
+        re.escape(f'.list__rows > li.list__row--selected {{\n  background: {RAIL_GRADIENT};'),
+        body), "Mehrfachauswahl ohne Rail-Button-Gradient-Fill"
+    # Unified-Nachweis: derselbe Gradient wie .rail__home[aria-current="true"] (Zeile ~402)
+    assert body.count(RAIL_GRADIENT) >= 3, \
+        f"Rail-Button-Gradient nur {body.count(RAIL_GRADIENT)}x gefunden, erwartet " \
+        "mindestens 3 (rail__home + list__row + list__row--selected)"
     # Gruppierte Glas-Traeger am Ende der Datei
     assert ".list__head,\n.overlay__panel,\n.update-banner,\n.toast" in body, \
         "Glas-Traeger-Liste am Dateiende fehlt"
     print("[OK ] app.css: --glass-* Tokens, .glass-Utility, @supports, "
           "prefers-reduced-transparency, ::selection, max-width:72ch, "
-          "3px Akzentkante, gruppierte Glas-Traeger")
+          "3px Akzentkante + Rail-Button-Gradient-Fill (kein outline mehr), "
+          "gruppierte Glas-Traeger")
     return body
 
 
@@ -114,14 +131,22 @@ async def step3_selected_row_styles(page) -> None:
     await page.click('.list__row:has(.space-dot--own)')
     await page.wait_for_selector('.list__row[aria-current="true"]', timeout=5000)
     styles = await page.evaluate("""() => {
-      const el = document.querySelector('.list__row[aria-current=\"true\"]');
-      const cs = getComputedStyle(el);
+      const row = document.querySelector('.list__row[aria-current=\"true\"]');
+      const rowCs = getComputedStyle(row);
+      // Unified-Nachweis (Vormerkung 3 Punkt 1, Richtung (a)): derselbe Fill wie der
+      // Rail-Home-Button im aktiven Zustand -- Home ist immer aria-current wenn kein
+      // Scope aktiv ist, sonst faellt dies auf null zurueck (dann nur die Zeile geprueft).
+      const rail = document.querySelector('.rail__home[aria-current=\"true\"]')
+                || document.querySelector('.tree__scope[aria-current=\"true\"]')
+                || document.querySelector('.tree__folder[aria-current=\"true\"]');
+      const railCs = rail ? getComputedStyle(rail) : null;
       return {
-        borderLeftColor: cs.borderLeftColor,
-        borderLeftWidth: cs.borderLeftWidth,
-        outlineColor: cs.outlineColor,
-        outlineWidth: cs.outlineWidth,
-        outlineStyle: cs.outlineStyle,
+        borderLeftColor: rowCs.borderLeftColor,
+        borderLeftWidth: rowCs.borderLeftWidth,
+        rowBackgroundImage: rowCs.backgroundImage,
+        rowBoxShadow: rowCs.boxShadow,
+        outlineStyle: rowCs.outlineStyle,
+        railBackgroundImage: railCs ? railCs.backgroundImage : null,
       };
     }""")
     # 3px Akzentkante links (var(--accent) = #3E8DF3 = rgb(62,141,243))
@@ -129,14 +154,25 @@ async def step3_selected_row_styles(page) -> None:
         f"border-left-width ist {styles['borderLeftWidth']}, erwartet 3px"
     assert "62, 141, 243" in styles["borderLeftColor"] or "3e8df3" in styles["borderLeftColor"].lower(), \
         f"border-left-color ist {styles['borderLeftColor']}, erwartet var(--accent)"
-    # Outline: 1px solid var(--accent)
-    assert styles["outlineWidth"] == "1px", \
-        f"outline-width ist {styles['outlineWidth']}, erwartet 1px"
-    assert styles["outlineStyle"] == "solid", \
-        f"outline-style ist {styles['outlineStyle']}, erwartet solid"
-    assert "62, 141, 243" in styles["outlineColor"], \
-        f"outline-color ist {styles['outlineColor']}, erwartet var(--accent)"
-    print(f"[OK ] Ausgewaehlte Zeile (own): border-left 3px + outline 1px solid accent")
+    # Kein Outline mehr (Vormerkung 3 Punkt 1 hat die schwimmende -4px-Outline abgeloest)
+    assert styles["outlineStyle"] in ("none", ""), \
+        f"outline-style ist {styles['outlineStyle']}, erwartet 'none' (Outline wurde abgeloest)"
+    # Solider Gradient-Fill statt --accent-quiet
+    assert "gradient" in styles["rowBackgroundImage"], \
+        f"background-image ist {styles['rowBackgroundImage']}, erwartet einen Gradienten"
+    assert "62, 141, 243" in styles["rowBoxShadow"] or "255, 255, 255" in styles["rowBoxShadow"], \
+        f"box-shadow (Gloss-Highlight) fehlt oder unerwartet: {styles['rowBoxShadow']}"
+    # Unified-Nachweis: identischer computed background-image wie der Rail-Button
+    if styles["railBackgroundImage"]:
+        assert styles["rowBackgroundImage"] == styles["railBackgroundImage"], \
+            f"Listenzeile ({styles['rowBackgroundImage']}) und Rail-Button " \
+            f"({styles['railBackgroundImage']}) haben unterschiedliche Gradienten -- " \
+            f"Richtung (a) verlangt denselben Fill"
+        print(f"[OK ] Ausgewaehlte Zeile (own): border-left 3px + Rail-Button-Gradient-Fill, "
+              f"identisch mit Rail-Button computed background-image")
+    else:
+        print(f"[OK ] Ausgewaehlte Zeile (own): border-left 3px + Rail-Button-Gradient-Fill "
+              f"(kein aktiver Rail-Button in dieser Ansicht zum Direktvergleich)")
 
 
 async def step4_editor_textarea_72ch(page) -> None:
@@ -260,7 +296,7 @@ async def main() -> int:
             await step2_login_and_overview(page, password, secret_b32)
             await step7_screenshot(page, "c4c5_01_overview_sticky_head.png")
             await step3_selected_row_styles(page)
-            await step7_screenshot(page, "c4c5_02_selected_row_3px_outline.png")
+            await step7_screenshot(page, "c4c5_02_selected_row_accent_fill.png")
             await step4_editor_textarea_72ch(page)
             await step7_screenshot(page, "c4c5_03_editor_72ch.png")
             await step5_selection_styling(page)

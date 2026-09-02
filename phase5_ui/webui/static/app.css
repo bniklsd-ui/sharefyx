@@ -667,31 +667,20 @@ select.input:focus {
 
 .list__row:hover { background: var(--surface); }
 
-/* Auswahl-Sheen (Phase 8 Block C C4, Plan §4.C4 P8-H): die ausgewählte Zeile trägt
-   drei Erkennbarkeits-Layer -- (a) Glass-Sheen via Backdrop-Blur, (b) 3px-Akzentkante
-   links, (c) 1px-Akzent-Outline. (b) und (c) sind *solide*, damit die Auswahl auch
-   bei deaktiviertem Blur oder reduzierter Transparenz vollständig erkennbar bleibt
-   (N8-Bedingung, Verbotsliste §0.3 Punkt 6: "Kein Element, dessen Erkennbarkeit
-   allein von Transparenz/Blur abhängt"). */
+/* Auswahl-Fill (Vormerkung 3 Punkt 1, Nikinger-Entscheidung 2026-09-02 Richtung (a)):
+   loest den fruehreren Glass-Sheen (Blur + schwimmende -4px-Outline) ab -- per
+   Handyscreenshot-Vergleich war die Outline "kaum wahrnehmbar" gegen den soliden
+   Rail-Button-Akzent-Fill (.rail__home[aria-current="true"] o.ae., Zeile ~402).
+   Uebernimmt denselben Gradient + Gloss-Highlight woertlich. Die 3px-Akzentkante
+   links bleibt unveraendert (kein Layout-Shift, `.list__row`-Default-Border bleibt
+   3px transparent). N8 (Verbotsliste §0.3 Punkt 6: Erkennbarkeit darf nicht allein
+   von Transparenz/Blur abhaengen) ist damit EINFACHER erfuellt als vorher -- kein
+   backdrop-filter mehr im Spiel, die Erkennbarkeit haengt an einem opaken Gradient
+   plus dem soliden linken Akzentrand. */
 .list__row[aria-current="true"] {
-  background: var(--accent-quiet);
+  background: linear-gradient(180deg, rgba(62,141,243,.20), rgba(62,141,243,.08));
   border-left-color: var(--accent);
-  outline: 1px solid var(--accent);
-  outline-offset: -4px;
-}
-
-@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
-  .list__row[aria-current="true"] {
-    backdrop-filter: blur(8px) saturate(1.2);
-    -webkit-backdrop-filter: blur(8px) saturate(1.2);
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .list__row[aria-current="true"] {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
 }
 
 .list__row-move, .list__row-share {
@@ -717,38 +706,27 @@ select.input:focus {
 .list__rows > li.list__row-draggable { cursor: grab; }
 .list__rows > li.list__row-draggable--active { opacity: .5; }
 
-/* Mehrfachauswahl (§9) — dieselbe Auswahl-Sprache wie `.list__row[aria-current="true"]`
-   darüber: 3px-Akzentkante links + 1px-Akzent-Outline + (mit @supports) Backdrop-Sheen.
-   `border-left` statt `box-shadow`, weil die Default-Breite jetzt 3px ist (oben bei
-   `.list__row`) und damit kein Layout-Shift mehr entsteht, der historische box-shadow-
-   Workaround damit obsolet wird. Die Outline-Innenkante (-4px Offset) hält 1px Abstand
-   zur Border-Außenkante -- die Auswahl ist auch bei reduzierter Transparenz klar
-   gerahmt, die Akzentfarbe dominiert nicht das ganze Zeilen-Innere. */
+/* Mehrfachauswahl (§9) -- dieselbe Auswahl-Sprache wie `.list__row[aria-current="true"]`
+   darüber, jetzt mit demselben Rail-Button-Fill (Vormerkung 3 Punkt 1, Richtung (a)):
+   solider Gradient + Gloss-Highlight statt Glass-Blur + schwimmender Outline.
+   `border-left` bleibt 3px (Default-Breite bei `.list__row` unveraendert, kein
+   Layout-Shift). */
 .list__rows > li.list__row--selected {
-  background: var(--accent-quiet);
+  background: linear-gradient(180deg, rgba(62,141,243,.20), rgba(62,141,243,.08));
   border-left: 3px solid var(--accent);
-  outline: 1px solid var(--accent);
-  outline-offset: -4px;
-}
-
-@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
-  .list__rows > li.list__row--selected {
-    backdrop-filter: blur(8px) saturate(1.2);
-    -webkit-backdrop-filter: blur(8px) saturate(1.2);
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .list__rows > li.list__row--selected {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
 }
 
 /* Kombiniert (selektiert UND aktuell): das innere `.list__row` darf seinen 3px-Border
    nicht zusätzlich einfärben -- sonst gibt's 6px Akzent links (3px li-Border + 3px
-   button-Border). Border bleibt transparent, der äußere li-Border trägt die Akzenz. */
+   button-Border). Border bleibt transparent, der äußere li-Border trägt die Akzenz.
+   Denselben Grund hat der Fill-Override darunter -- zwei gestapelte Gradienten (li +
+   inneres .list__row) würden sich sichtbar aufaddieren, der äußere li-Fill reicht. */
 .list__rows > li.list__row--selected .list__row { border-left-color: transparent; }
+.list__rows > li.list__row--selected .list__row[aria-current="true"] {
+  background: none;
+  box-shadow: none;
+}
 
 .list__row-title {
   font-size: var(--fs-body);   /* 16px -- vor C1: 15px */

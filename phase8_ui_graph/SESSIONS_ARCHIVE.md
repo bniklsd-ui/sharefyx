@@ -3,12 +3,165 @@ status: live
 purpose: Archiv älterer Session-Blöcke aus phase8_ui_graph/CLAUDE.md — newest-first, verbatim per Rotationsregel
 read-when: nur wenn der aktuelle Session-Block im Phase-Head nicht reicht und Verlauf gebraucht wird
 detail: L3
-updated: 2026-09-02 (Chevron-Vorbild-Block nach Escalation-Session (Vormerkung-3-Fixes + Deploy-Fund) ins Archiv -- 24 Bloecke newest-first, Phase-8-Head jetzt mit Escalation-Block allein; Head 75.0KB->65.8KB, immer noch ueber 40KB-Softcap benannt) | 2026-09-02 (C4+C5-Block nach Chevron-Vorbild-Session ins Archiv -- 23 Bloecke newest-first, Phase-8-Head jetzt mit Chevron-Vorbild-Block allein; Head 70.3KB->60.2KB, immer noch ueber 40KB-Softcap benannt -- Selection/Choice-Konvention-v3-Block + neuer Session-Block plus umfangreiche Vormerkung-1-ERLEDIGT-Erlaeuterung) | 2026-09-02 (D3-Block nach C4+C5-Session ins Archiv -- 22 Bloecke newest-first, Phase-8-Head jetzt mit C4+C5-Block allein; Head 50.8KB ueber 40KB-Softcap benannt -- Glas-Träger-Regeln + gruppierte Selektor-Liste am Dateiende plus ausführlicher Session-Block mit allen Verifikations-Belegen) | 2026-09-02 (D2-Block nach D3-Session ins Archiv -- 21 Bloecke newest-first, Phase-8-Head jetzt mit D3-Block allein) | 2026-09-02 (D1-Block nach D2-Session ins Archiv -- 20 Bloecke newest-first, Phase-8-Head jetzt mit D2-Block allein) | 2026-09-02 (C3-Block nach D1-Session ins Archiv -- 19 Bloecke newest-first, Phase-8-Head jetzt mit D1-Block allein; Head 41.8KB->45.1KB ueber Softcap benannt) | 2026-09-01 (Sichtpruefung-1-Block (vom Vortag) nach C3-Rotation ins Archiv gewandert -- jetzt 18 Bloecke newest-first; Phase-8-Head wieder unter dem 40KB-Softcap) | 2026-09-01 (zwölfte Rotation, 17 Blöcke)
+updated: 2026-09-02 (Escalation-Block nach Vormerkung-3-Punkt-1-Session (Listenzeilen-Fill vereinheitlicht) ins Archiv -- 25 Bloecke newest-first, Phase-8-Head jetzt mit dem neuen Session-Block allein; Head 81.2KB->70.1KB, weiterhin ueber 40KB-Softcap benannt) | 2026-09-02 (Chevron-Vorbild-Block nach Escalation-Session (Vormerkung-3-Fixes + Deploy-Fund) ins Archiv -- 24 Bloecke newest-first, Phase-8-Head jetzt mit Escalation-Block allein; Head 75.0KB->65.8KB, immer noch ueber 40KB-Softcap benannt) | 2026-09-02 (C4+C5-Block nach Chevron-Vorbild-Session ins Archiv -- 23 Bloecke newest-first, Phase-8-Head jetzt mit Chevron-Vorbild-Block allein; Head 70.3KB->60.2KB, immer noch ueber 40KB-Softcap benannt -- Selection/Choice-Konvention-v3-Block + neuer Session-Block plus umfangreiche Vormerkung-1-ERLEDIGT-Erlaeuterung) | 2026-09-02 (D3-Block nach C4+C5-Session ins Archiv -- 22 Bloecke newest-first, Phase-8-Head jetzt mit C4+C5-Block allein; Head 50.8KB ueber 40KB-Softcap benannt -- Glas-Träger-Regeln + gruppierte Selektor-Liste am Dateiende plus ausführlicher Session-Block mit allen Verifikations-Belegen) | 2026-09-02 (D2-Block nach D3-Session ins Archiv -- 21 Bloecke newest-first, Phase-8-Head jetzt mit D3-Block allein) | 2026-09-02 (D1-Block nach D2-Session ins Archiv -- 20 Bloecke newest-first, Phase-8-Head jetzt mit D2-Block allein) | 2026-09-02 (C3-Block nach D1-Session ins Archiv -- 19 Bloecke newest-first, Phase-8-Head jetzt mit D1-Block allein; Head 41.8KB->45.1KB ueber Softcap benannt) | 2026-09-01 (Sichtpruefung-1-Block (vom Vortag) nach C3-Rotation ins Archiv gewandert -- jetzt 18 Bloecke newest-first; Phase-8-Head wieder unter dem 40KB-Softcap) | 2026-09-01 (zwölfte Rotation, 17 Blöcke)
 up: CLAUDE.md
 updated: 2026-09-01 (zwoelfte Rotation: C2-Block ins Archiv nach Screenshots+README-Session -- Sichtpruefung 1 mit 9 Screenshots gegen Wegwerf-Instanz, README "Sneak Peak"-Sektion neu, docs/screenshots/ neu im INDEX, C2+Docs-Commit 0d97b3a gepusht; Head 37.7KB->33.6KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 103.8KB->114.0KB; keine Code-Aenderung ausserhalb webui/static + build_icon_sprite.py + vendor/, keine Service-Touch in dieser Sitzung) | 2026-09-01 (elfte Rotation: C1-Block ins Archiv nach C2-Session -- C2-Block (Lucide-Sprite, 18 Icons, build_icon_sprite.py, js/icons.js, .icon-CSS) ergaenzt, dann rotiert; Head 33.7KB->37.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 96.0KB->103.8KB; F9/F10/F11 aus C0 geschlossen; keine neue P1-Contract-Oeffnung; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (zehnte Rotation: C0-Block ins Archiv nach C1-Session -- C1-Block (Plex-Font-Swap + CSS-Typo-Tokens, 35 Findings aus C0 abgearbeitet fuer C1) ergaenzt, dann rotiert; Head 27.5KB->33.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 89.3KB->96.0KB; C1-Commits 0281cce + 08bff55 im Head referenziert; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (neunte Rotation: Gate-B→C-Block ins Archiv nach C0-Session -- C0-Block ergaenzt, dann rotiert; Head 39.0KB->31.4KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 81.3KB->89.3KB; C0-Findings-Tabelle (35 Eintraege) lebt im Head; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (achte Rotation: B4-Block ins Archiv nach Gate-B→C-Verifikation -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf, pytest 958/958 gruen, Charakterisierung byte-identisch, Tabu-Diff leer; Head jetzt mit 14.8 KB unter dem Softcap, SESSIONS_ARCHIVE.md 76.9 KB; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (siebte Rotation: fuenf Bloecke ins Archiv -- A3-Bau, Hard-Rule-9-Doku, Versions-Bump v2.2.3, A3-Drittprobe mit Restdefekt, B1 linkscan.py + Tests; Head jetzt 16.4 KB mit genau einem Block, 12 Bloecke im Archiv, Phase-8-Head wieder unter dem 40KB-Softcap; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8
+
+## Session stopped — 2026-09-02 (Escalation-Session: Vormerkung-3-Fixes gebaut + Deploy-Fund)
+
+**Auftrag:** Claude-Code-Escalation, ausdrücklich als erster Fall dieser Art benannt — nach
+zwei opencode/M3-Sessions, die die zwei Chevron-/Border-Funde aus Vormerkung 3 nur vormerken
+konnten (drei Lösungsrichtungen je Fund benannt, keine gebaut), sollte Claude Code (a) kurz auf
+das aktuelle Block-Ergebnis schauen und bei einem tieferliegenden Problem sofort melden und
+warten, (b) sonst die zwei gemeldeten UI-Funde selbst fixen, (c) den seit 2026-09-01 an `sudo`
+hängenden `deploy.sh main` auf Sicherheit prüfen.
+
+**(a) Blick auf den aktuellen Block:** keine strukturelle Blockade in der Chevron-CSS selbst
+gefunden — beide Vormerkung-3-Funde hatten eine konkrete, im Code auffindbare Root Cause (siehe
+unten), kein Anzeichen für eine tiefere Architekturfrage, die eine Nikinger-Entscheidung vor dem
+Fix gebraucht hätte. **Der eigentliche Fund dieser Kategorie liegt beim Deploy, nicht beim
+CSS — siehe (c).**
+
+**(c) Deploy-Sicherheitscheck (zuerst, weil höheres Risiko):**
+
+- `ps -ef` zeigt `deploy.sh main` (PID 76357) seit **2026-09-01** hängend an
+  `sudo systemctl restart sharefyx-mcp` (PID 79380, `root`) — wartet auf das Nikinger-Passwort.
+  **Nicht angefasst** (Hard Rule 9 — `systemctl`/`sudo` auf dem echten Dienst ausschließlich
+  Nikinger).
+- Der Build-Teil ist bereits durch: `current` zeigt auf `20260901T103944.634877Z` =
+  Commit `007b73d` (Block B, "Update-Log-Eintrag ... fuer Block B"). Der **laufende** Prozess
+  (PID 67925, `uptime` seit Di 2026-09-01 11:47 CEST, **vor** dem Release-Build um 12:44)
+  serviert aber noch `20260901T094146.796734Z` = Commit `7254aa9` (Phase-8-A3-Versions-Bump) —
+  **eine Version älter**. Der Restart, der den Sprung auf Block B vollziehen würde, ist genau
+  der Schritt, der am Passwort hängt.
+- **Befund, mit Korrekturbedarf:** dieser Head (voriger Abschnitt, "Block B live deployt")
+  und `docs/INDEX.md` behaupten "Release `20260901T103944.634877Z`, Health-Gate 3/3 grün" als
+  abgeschlossen — das Health-Gate lief gegen den **gebauten Release**, nicht gegen den
+  tatsächlich neu gestarteten Dienst. Live serviert wird bis zum abgeschlossenen Restart
+  weiterhin die A3-Version, nicht Block B. **Keine eigene Korrektur an der Doku-Behauptung
+  vorgenommen** — der Zustand ändert sich mit dem nächsten Nikinger-Handgriff (Passwort
+  eingeben, oder Prozess abbrechen), eine jetzt geschriebene Korrektur wäre in beide Richtungen
+  sofort wieder stale.
+- **Sicherheitsurteil: Ja, sicher fortzusetzen.** Das Release, auf das der hängende Restart
+  zielt, ist Block B — vollständig Gate-B→C-geprüft (958/958 pytest, Charakterisierung
+  byte-identisch, Tabu-Diff leer, `_graph_get` manuell 12/12, Playwright 18/18) und bereits
+  einmal exakt in diesem Zustand für "live" erklärt worden. Das neue `item_links`-Schema
+  (achte P1-Contract-Öffnung) legt sich selbst per `CREATE TABLE IF NOT EXISTS` an
+  (`phase1_storage/storage/index.py:63`) — kein separates Migrationskommando nötig, der
+  Restart allein genügt.
+- **Was der Restart NICHT bringt:** die 18 Commits seit `007b73d` (Block C C0–C5, Block D
+  D1–D3, die zwei Fixes dieser Session) sind nie in einen Release-Build eingeflossen — nach
+  dem Restart läuft weiterhin nur Block B live, nicht Block C/D. Ein zweiter `deploy.sh main`
+  wäre danach ein eigener, weiterer Schritt (durch den Nikinger).
+
+**(b) Vormerkung-3-Fixes gebaut, eine Datei (`phase5_ui/webui/static/app.css`, +37/-8 Zeilen,
+0 Tabu-Diff):**
+
+- **Fund 1 (Chevrons nicht identisch) — Root Cause gefunden, nicht nur vermutet:**
+  `.field .input { font-size: 13px; }` (Zeile 1251, Item-Editor-Frontmatter-Panel, z. B.
+  `#field-status`) verkürzt dort die Select-Box gegenüber den 16px-Dialog-Kontexten
+  (Move-/Anlege-/Freigabe-Dialog), während der Chevron in Vormerkung-1-Fassung fest 12×12 px
+  mit `right 8px`/`padding-right 28px` verdrahtet war — derselbe absolute Chevron in einer
+  kürzeren Box wirkt dort größer. Vormerkung-3-Hypothese (a) bestätigt. **Fix: alle drei
+  Werte auf `em`** (`background-size: 0.75em 0.75em`, `background-position: right 0.5em
+  center`, `padding-right: 1.75em`) — skaliert jetzt mit der Schriftgröße des jeweiligen
+  Kontexts mit, das Verhältnis Chevron:Select-Höhe bleibt konstant. `select.input:disabled`
+  erbt `background-size`/`-position` unverändert von der Basisregel (nur `background-image`
+  wird dort überschrieben), kein zweiter Fix nötig.
+- **Fund 2 (linker Border-Strich konkurriert mit Chevron) — Fix ohne `.input:focus`
+  anzufassen:** neue, spezifischere Regel `select.input:focus { border-color:
+  var(--line-strong); border-right-color: var(--accent-line); border-bottom-color:
+  var(--accent-line); }`. `<input type="text"/"date">` behält den vollen Fokus-Rahmen (Caret-
+  Sichtbarkeit, Nikinger-Vorgabe aus der Vormerkung selbst) — nur `<select class="input">`
+  bekommt die asymmetrische Variante, links bleibt `--line-strong`, rechts+unten (näher am
+  Chevron) auf `--accent-line`. Damit reicht keine linke Akzentkante mehr in Konkurrenz zur
+  C4-Auswahl-Sheen-Konvention (ausgewählte Listenzeile = 3px-Akzentkante links).
+
+**Wegwerf + Regressions-Smoke (Standing-Permission, dieselbe Instanz wie die Vorgänger-Session
+reproduziert):**
+
+- `phase8_ui_graph/scripts/wegwerf_setup_auswahl_chevron.py` wiederverwendet (Port 18771,
+  unverändert).
+- `phase8_ui_graph/scripts/auswahl_chevron_playwright_smoke.py` erweitert (9/9 → **11/11**):
+  Step 1 auf die neue `padding-right: 1.75em`-Assertion nachgezogen (die alte `28px`-Prüfung
+  wäre am geänderten Code fälschlich rot gelaufen); **neu Step 10** — computed
+  `background-size`/Element-Höhe-Verhältnis von `#field-status` (0.2698) gegen
+  `#move-space-select` (0.2602) verglichen, Differenz 0.0096 < 0.02-Toleranz (vorher wäre die
+  Differenz bei fixen 12 px deutlich größer gewesen); **neu Step 11** — `#move-space-select`
+  fokussiert, `border-left-color` (`rgba(255,255,255,.16)` = `--line-strong`) unterscheidet
+  sich von `border-right-color`/`border-bottom-color` (`rgba(62,141,243,.4)` = `--accent-line`).
+  **11/11 grün**, beide Fixes empirisch bestätigt, nicht nur behauptet.
+- Zwei Screenshots (`auswahl_chevron_01_move_dialog.png`, `auswahl_chevron_02_share_dialog.png`)
+  in derselben Session neu erzeugt (überschreiben die Vorgänger-Screenshots gleichen Namens).
+
+**Verifikation — Selbstprüf-Checkliste §0.6:**
+
+1. `pytest -q` → **958/958 grün** (keine Python-Änderung, 270 s).
+2. Tabu-Diff → **leer** (nur `app.css` + der eine Smoke-Skript-Edit + zwei Screenshots).
+3. JS-Syntax: kein neuer/geänderter JS-Code, `node --check app.js` zur Sicherheit trotzdem
+   grün.
+4. Doc-Update im selben Commit (dieser Block + Vormerkungen-ERLEDIGT-Marker + Frontmatter).
+5. `ui_budget.py` → **5/5 grün**, app.js+css+Font **123.7 KB** (vorher 123.3 KB, +0.4 KB für
+   die zwei neuen/geänderten Regeln). Im Korridor (<250 KB).
+
+**Wegwerf abgebaut:** `wegwerf_setup_auswahl_chevron.py cleanup` (PID-Datei-Muster, kein
+`pkill -f`). `curl http://127.0.0.1:8765/health` → `{"status":"ok",...}` **kein Service-Touch**
+an der echten Instanz; `ps -ef` zeigt weiterhin nur `sharefyx-mcp.service` (PID 67925) +
+den unveränderten hängenden Deploy-Prozess (PID 76357/79380).
+
+**Was diese Session bewusst NICHT gemacht hat:**
+
+- **Nichts am hängenden Deploy/`sudo`-Prozess.** Kein Passwort, kein `kill`, kein
+  `systemctl`-Aufruf — reines Auslesen (`ps`, `readlink`, `git rev-parse` in den
+  Release-Verzeichnissen, `systemctl status`, `curl /health`).
+- **Vormerkung-3-Punkt 1 vom 2026-09-02 (Listenzeilen-Sheen vs. Rail-Button-Vorbild)
+  unangetastet.** Anders als die zwei Chevron-Funde hat dieser keine im Code auffindbare Root
+  Cause — es ist eine Geschmacksentscheidung zwischen drei gleichwertigen Richtungen, die laut
+  eigener Vormerkung explizit der Nikinger-Sichtprüfung am echten Gerät vorbehalten bleibt.
+- **Obsidian-Übersicht (D2) unverändert** — weiterhin WIP wie zuletzt bestätigt.
+- **Kein Push.** Lokale Commits, keine Weiterleitung an `origin/main` ohne Nikinger-Freigabe.
+
+**Minimax-/opencode-M3-Beobachtung (Nikinger-Auftrag, zur Kenntnisnahme, kein Code-Fix):**
+dies ist die erste Session, in der eine Eskalation von opencode/M3 zurück zu Claude Code nötig
+wurde — zwei vorangegangene opencode-Sessions konnten die zwei Chevron-/Border-Funde nur
+vormerken (je drei benannte Lösungsrichtungen, keine gebaut), obwohl beide eine im Code
+auffindbare, eindeutige Root Cause hatten (`.field .input`-Font-Override; generische
+`.input:focus`-Regel). Als Muster festgehalten (Memory + hier): opencode/M3 formuliert
+UI-Divergenz-Befunde zuverlässig in Optionen, geht aber nicht bis zur CSS-Spezifitäts-/
+Kaskaden-Root-Cause durch, wenn die Ursache nicht in der zuletzt geänderten Regel selbst,
+sondern in einer an anderer Stelle vorbestehenden Regel liegt (`font-size`-Override neun
+Blöcke entfernt, `:focus`-Shorthand-Regel aus einer früheren Phase). Vorschlag für eine
+spätere Phase (kein Auftrag): ein Skill/Plugin, das bei einem gemeldeten CSS-Visualdefekt
+automatisch `getComputedStyle`-Diffs zwischen den betroffenen Selektoren zieht, bevor
+Lösungsrichtungen formuliert werden — hätte hier vermutlich beide Root Causes in einem
+einzigen automatisierten Schritt offengelegt.
+
+**Verbleibend für die nächste Session:**
+
+- **Nikinger-Sichtprüfung 3** (echtes Gerät) — jetzt inklusive der zwei Fixes dieser Session,
+  plus die Restfrage aus Vormerkung 3 Punkt 1 (Listenzeilen-Sheen vs. Rail-Button).
+- ~~**Deploy-Entscheidung beim Nikinger:** Passwort eingeben (Block B geht live, Block C/D
+  bleibt es weiterhin schuldig) oder den hängenden Prozess selbst abbrechen und später neu
+  fahren.~~ **[2026-09-02 ERLEDIGT]** Nikinger hat das Passwort eingegeben, Restart durch.
+  Neuer Dienst-PID (uptime bestätigt frisch), Health-Gate 3/3 grün (`/ui/login`→200,
+  `/api/v1/me`→401, `/mcp/`→401), `current` weiterhin auf `007b73d`. **Damit ist die
+  Diskrepanz aus dieser Session (Doku behauptet "live", Dienst lief noch auf A3) geschlossen
+  — Block B ist jetzt tatsächlich live**, nicht mehr nur gebaut+geplant. Retention hat dabei
+  `20260821T183341.270842Z` abgeräumt (KEEP=5, planmäßig). Block C/D (20 Commits seit
+  `007b73d`, inkl. der beiden Fixes + der Entscheidungsnotiz dieser Session) sind weiterhin
+  **nicht** live — ein zweiter `deploy.sh main` bleibt ein eigener, späterer Schritt.
+- **Sichtprüfung 2** (D3) weiterhin am echten Gerät ausstehend.
+- **Step Z** (Phase-Closeout) unverändert wie im vorigen Block beschrieben — hängt weiterhin
+  an beiden Sichtprüfungen; der Block-B-Restart ist jetzt erledigt, kein offener Punkt mehr.
+
+**Nächster Schritt, konkret:** Sichtprüfung 3 (inkl. der zwei Fixes dieser Session + der
+Rail-Button-Entscheidung) und Sichtprüfung 2 am echten Gerät. Ein zweiter Deploy für Block C/D
+ist erst nach Step Z fällig, nicht vorher.
+
+---
 
 ## Session stopped — 2026-09-02 (Auswahl-Chevron-Vorbild + Selection/Choice Konvention v3 — Vormerkung 1 vom 2026-09-01 erledigt)
 

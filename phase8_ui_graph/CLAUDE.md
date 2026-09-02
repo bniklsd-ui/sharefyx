@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase8_ui_graph_plan.md       # voller Plan, Entscheidungen P8-A–P8-Q, §0.1 gelockte N1–N12, Steps 0/A/B/C/D/Z
   - ../docs/concepts/PHASE7_CLOSEOUT_HANDOVER.md   # Herkunft der drei Erbposten (P7-24/remove-space/P7-4)
   - SESSIONS_ARCHIVE.md                             # ältere Session-Blöcke, newest-first
-updated: 2026-09-02 (Zwei Vormerkungen ergaenzt, nur dokumentiert, kein Code: (1) Item-Link-Picker fuellt nur das Frontmatter-links-Feld fuer den Graphen, kein Pfad zu einem klickbaren #item/-Link im Body -- Fix-Vorschlag notiert; (2) Nikinger-Handyscreenshot-Vergleich Rail-Bucket vs. Listenzeilen-Auswahl bestaetigt die Richtung-(a)-Entscheidung mit Bildbeleg, keine neue Entscheidung) | 2026-09-02 (Deploy-Diskrepanz geschlossen -- Nikinger hat den haengenden Restart durchgefuehrt, Block B jetzt tatsaechlich live, Health-Gate 3/3 gruen, Retention hat 20260821T183341.270842Z abgeraeumt; Block C/D weiterhin nicht deployt) | 2026-09-02 (Nikinger-Entscheidung Vormerkung 3 Punkt 1: Richtung (a) vereinheitlichen zugunsten Rail-Button-Stil -- "looks cleaner", dokumentiert vor dem Push, Umsetzung offen fuer naechste Session; README Sneak-Peak um die zwei Chevron-Screenshots ergaenzt) | 2026-09-02 (Vormerkung-3-Fixes: Chevron em-skaliert (Root Cause .field .input font-size:13px) + select.input:focus links/rechts entkoppelt, 11/11 Playwright-Regression gruen, 958/958 pytest, ui_budget 5/5 (123.7/250 KB); Escalation-Deploy-Fund dokumentiert (deploy.sh main haengt seit 2026-09-01 an sudo, Live-PID 67925 noch auf 7254aa9/A3, NICHT auf 007b73d/Block B trotz gegenteiliger Doku-Behauptung) | 2026-09-02 (Vormerkung 3 vom 2026-09-02 ergaenzt: Nikinger-Feedback nach Chevron-Sichtpruefung -- Chevrons nicht visuell identisch ueber alle 7+1 Stellen (Hypothese: 12px vs Container-Hoehe, --text-faint-Kontrast auf Glas vs Solid), +linker input-Border-Strich konkurriert mit dem neuen Chevron-Affordance rechts; drei Loesungsrichtungen jeweils benannt, ausdruecklich NUR vormerken, kein Edit in dieser Session) | 2026-09-02 (Selection/Choice Konvention v3 im Phase-Head dokumentiert + Auswahl-Chevron-Vorbild in app.css ::select.input gebaut -- Lucide m6 9 6 6 6-6 als data-URL, --text-faint-Stroke, 12x12 rechtsbuendig, padding-right 28px, :disabled-Variante in --text-placeholder; alle 7+1 <select class="input">-Stellen gerendert (field-status, create-type, new-folder-parent-select, move-space-select, move-folder-select, space-member-write-select, Per-Item-Share-Row dynamisch); Playwright-Smoke 9/9 gruen gegen Wegwerf 18771; ui_budget 5/5 (123.3/250 KB, +0.6 KB), 958/958 pytest, Tabu-Diff §0.4 leer, JS-Syntax OK; phase8_ui_graph/scripts/{wegwerf_setup_auswahl_chevron.py,auswahl_chevron_playwright_smoke.py} neu; docs/screenshots/auswahl_chevron_{01_move,02_share}_dialog.png neu; kein Service-Touch, kein Deploy, kein Push; Vormerkung 1 vom 2026-09-01 (Auswahl-Boxen vereinheitlichen) damit erledigt -- die Selection/Choice-Konvention ersetzt die offene Frage, das Chevron-Vorbild schliesst die sichtbare Luecke im Vorbild; Vormerkung 2 vom 2026-09-02 (Listenzeilen-Sheen vs Rail-Button-Stil) bewusst NICHT aufgeloest -- der C4-Sheen bleibt unvera (ge 3px-Akzentkante + Outline + Backdrop-Blur) wegen N8 (Auswahl darf nicht allein von Transparenz abhaengen); Obsidian-Uebersicht (D2) bleibt WIP wie vom Nikinger bestaetigt -- keine Code-Aenderung an js/graph.js, app.css/app.html fuer das Graph-Panel) | 2026-09-02 (Vormerkung-Block ergaenzt: Nikinger-Feedback nach Sichtpruefung 3 -- Listenzeilen-Auswahl (c4c5_03) sieht anders aus als Rail-Button-Vorbild (03_list.png), drei Loesungsrichtungen fuer die naechste kontrollierte UI-Session vereinheitlichen / vereinfachen / bewusst unterschiedlich lassen; Obsidian-Uebersicht weiterhin WIP, explizit bestaetigt; kein Code angefasst, kein Push noetig) | 2026-09-02 (Block C C4+C5 gebaut: Liquid-Glas-Akzente (P8-H/N8, --glass-{bg,border,blur,highlight}-Tokens + .glass-Utility mit Fallback+@supports+prefers-reduced-transparency), .list__head sticky (position:sticky;top:0;z-index:1) + .overlay__panel/.update-banner/.toast ueber gruppierte Selektor-Liste am Dateiende auf Glas, Auswahl-Sheen fuer .list__row[aria-current=true] und .list__row--selected (3px solide Akzentkante + 1px Outline + backdrop-blur Sheen); C5: ::selection (Akzent-quiet/Text), .editor__textarea max-width:72ch + margin:0 auto (576px computed in Plex Mono, symmetrische Margins), .editor__body padding-left auf calc(var(--space)*1.5) Token; phase8_ui_graph/scripts/{wegwerf_setup_c4c5.py,c4c5_playwright_smoke.py} neu (Port 18770, Standing-Permission-Muster D1/D2 reproduziert, File-Keyring, 7 Items ueber zwei Spaces); Playwright-Smoke 7/7 gruen (CSS-Static + sticky head + 3px border + outline + 72ch centered + ::selection rule + overlay glass rgba(27,32,39,0.55)); vier Screenshots docs/screenshots/c4c5_{01..04}_*.png; 958/958 pytest, ui_budget 5/5 gruen (122.7/250 KB, +2.9 KB), Tabu-Diff §0.4 leer, JS-Syntax node --check auf app/list/state/tree.js OK; kein Code ausserhalb webui/static + phase8_ui_graph/scripts beruehrt; Produktion unangetastet, kein Deploy, kein Service-Touch) | 2026-09-02 (Block D D3 gebaut: Versions-Bump .rail__version v2.2.3 -> v3.0, neuer docs/UPDATE_LOG.md-Eintrag 2026-09-02 mit vier Bullet-Points (Uebersicht tabellos, Verknuepfungs-Graph, globaler Home-Scope, Mini-Legende); Sichtpruefung 2 mit 26 Items ueber drei Spaces via phase8_ui_graph/scripts/{wegwerf_setup_sichtpruefung2.py,sichtpruefung2_smoke.py} (Standing-Permission-Muster reproduziert, Port 18769, File-Keyring, User alpha + drei Spaces alpha/beta/gamma via Store.create mit folder-Support statt space_cli); sechs Screenshots docs/screenshots/sp2_{01..06}_*.png; README.md Sneak-Peak-Sektion komplett ersetzt (neun Block-C-Screenshots raus, sechs Block-D-Screenshots rein, 3x2-Tabelle, Hinweis-Text ueber die historische Referenz); D2-Block rotiert; Head jetzt mit D3-Block allein ueber 40KB-Softcap benannt; 958/958 pytest, ui_budget 5/5 gruen (119.8/250 KB unveraendert), Tabu-Diff §0.4 leer; kein Service-Touch, PID 67925 uptime 66891s linear wachsend) | 2026-09-02 (Block D D2 gebaut: handgerollter Canvas-Force-Graph in js/graph.js (542 Zeilen, 6.2 KB gzipped), Force-Simulation mit O(n^2)-Repulsion + Federkraft + Alpha-Decay, Canvas 2D mit devicePixelRatio-Korrektur, Knotenfaerbung via spaceCategory() aus C3, Kantenstile explizit solide / Tag gestrichelt / Ordner gepunktet, Hover-Dim, Klick -> Editor.selectItem, Drag/Zoom/Pan, prefers-reduced-motion synchron 300 Ticks; Toggles Tags/Ordner mit Default aus, >15-Knoten-Cutoff-Riegel fuer Tag-Cliquen; app.html-Graph-Panel erweitert (Toolbar + Empty-Hint), app.css fuer Toolbar + Empty-Hint, app.js initGraph() in Init-Kette + loadGraphPanel() an drei Stellen (Init/Home/Refresh); phase8_ui_graph/scripts/{wegwerf_setup_d2.py,d2_playwright_smoke.py} neu -- Standing-Permission-Muster C3/D1 reproduziert, eigener Port 18768, File-Keyring-Backend, 14 Items (10 alpha + 4 beta) mit 6 expliziten Kanten (4 Frontmatter + 2 Body); Playwright-Smoke 7/7 gruen -- statisches Markup korrekt, Login + Overview rendert Graph-Panel, /api/v1/graph liefert 14 Knoten/6 Kanten, Empty-Hint versteckt wenn Kanten existieren, Tag-Toggle erweitert sichtbar, Zoom-Readout aktiv, Canvas mit >=500 nicht-transparenten Pixeln; zwei Screenshots docs/screenshots/d2_{01_overview_with_graph,02_graph_with_tag_toggle}.png; D1-Block rotiert; Head jetzt mit D2-Block allein ueber Softcap benannt (Rotation wuerde nichts bewegen); 958/958 pytest (vorher/nachher identisch, keine Python-Aenderung), ui_budget 5/5 gruen (119.8/250 KB, +6.8 KB), Tabu-Diff §0.4 leer (Storage nicht beruehrt, achte Oeffnung bleibt ANGEKUENDIGT), JS-Syntax node --check auf graph.js/app.js OK; kein Code ausserhalb webui/static + phase8_ui_graph/scripts beruehrt; Produktion unangetastet, PID 67925 uptime 66363s linear wachsend) | 2026-09-02 (Block D D1 gebaut: Uebersicht tabellos, app.html/app.css/list.js/app.js aktualisiert, Playwright-verifiziert gegen Wegwerf 18767, 5/5 gruen, drei Screenshots d1_{01..03}, 958/958 pytest, ui_budget 5/5 (113.0/250 KB), Tabu-Diff §0.4 leer, Head 41.8KB->44.4KB ueber Softcap benannt, C3-Block rotiert, kein Service-Touch, PID 67925 uptime 65157s linear wachsend) | 2026-09-01 (Vormerkung in phase8_ui_graph/CLAUDE.md ergaenzt: Auswahl-Boxen vereinheitlichen -- Space-Auswahlbox (Move-Dialog, <select class=input id=move-space-select>) als Standard; Nikinger-Sichtpruefung-1-Design-Frage mit 'nein, C3-C5 + D-Block noch offen' beantwortet; kein Code, kein Service-Touch; Head 33.6KB->37.5KB noch unter Softcap) | 2026-09-01 (Block C C2 gebaut: Lucide-Sprite-Vendoring (18 Icons, ISC+MIT-Lizenzen, phase5_ui/vendor/lucide/); Generator build_icon_sprite.py (idempotent, --check); Sprite-Block zwischen ICONS:BEGIN/ICONS:END in app.html (vom Generator gepflegt); js/icons.js (iconSvg()/iconHtml(), 13. JS-Modul); app.css .icon (Lucide-Defaults: 1.25em/currentColor/stroke-width 2) + .rail__glyph.icon (16px Badge-Box) + .toolbar-btn.icon (1em) + .tree__twist (12px SVG-Box); Ersetzungs-Map 7 HTML-Entities + 3 Text-Glyphen geschlossen (F9/F10/F11 aus C0); V92 gepinnt (Lucide 1.38.0, SHA-256 d28944cf…); ui_budget 5/5 (110.3/250 KB), pytest 958/958, Tabu-Diff leer, grep &#[0-9]+; in app.html → 0 Icon-Treffer, grep '→|⇄|×' in js/ → 0 Icon-Treffer (2 Treffer bleiben = Sprach-Interpunktion 'v3 → v4' mit Audit-Kommentar); Modul-Status Block C auf 'C0+C1+C2 gebaut, C3-C5 offen' + Abnahmestand um C2-Zeile ergaenzt + neuer Session-Block + C1-Block rotiert; Head 33KB->38KB, immer noch unter Softcap; kein Code ausserhalb webui/static + build_icon_sprite.py beruehrt) | 2026-09-01 (Block C C1 gebaut: C1a Font-Swap (Plex Sans Var v0.2.0 + Plex Mono v2.5.0, SHAs gepinnt, build_font_subset_plex.sh neu) + C1b CSS-Typografie (5 Skala-Tokens, body 16px/1.55, h1-h3 + Meta-Zeilen auf Tokens, IDs/Versions in --font-mono); zwei Commits (0281cce + 08bff55); ui_budget 5/5 (108.4/250 KB), pytest 958/958 (250s, Flake als isoliert bestaetigt), Tabu-Diff leer; phase8_ui_graph/CLAUDE.md Modul-Status Block C auf 'C0 + C1 gebaut, C2-C5 offen' gehoben + Abnahmestand um C1-Zeile ergaenzt + neuer Session-Block; Head 27.5KB->33KB, immer noch unter Softcap) | 2026-09-01 (Block C C0 gebaut: Anti-AI-Pattern-Research (V94 bestaetigt, Web-Recherche) + UI-Audit gegen den Code (P8-25); Findings-Tabelle Muster -> Fundstelle -> Fix -> Ziel-Step im Phase-Head, 35 Eintraege, davon 0 als eskaliert markiert; Code unberuehrt, vier Dateien Doku-only -- phase8_ui_graph/CLAUDE.md + SESSIONS_ARCHIVE.md + docs/INDEX.md + SESSIONS_ARCHIVE-Frontmatter; Head 18.4KB->27.5KB, immer noch unter Softcap) | 2026-09-01 (Gate B→C: 958/958 pytest gruen, Charakterisierung byte-identisch, Tabu-Diff leer, _graph_get manuell 12/12, Playwright gegen Wegwerf 18/18; B4-Block rotiert, Head 14.8KB unter Softcap; Code unberuehrt, Doku-Update + neuer Session-Block) | 2026-09-01 (Block B Step B1 gebaut -- storage/linkscan.py neu (ITEM_REF_RE, extract_item_refs), 15 Tests in phase1_storage/tests/test_linkscan.py, achte P1-Contract-Oeffnung in phase1_storage/CLAUDE.md angekuendigt vor Code, Tabu-Diff §0.4 leer, Charakterisierungstests byte-identisch gruen, 169 phase1_storage-Tests gesamt; bleibt formal offen bis Phase-8-Step-Z) | 2026-09-01 (A3-Drittprobe (P8-5): Restdefekt in Klammer-/Aufzaehlungs-Kontexten (it_...-ID wird in Klammern gesetzt); Hint-Text nennt nur zwei Negativ-Beispiele (plain + Tabelle), Klammern sind dritte Form; Nikinger-Entscheidung: A3 bleibt 🟡 mit Defekt, wandert in Phase-8-Closeout als benannter Punkt (P8-N §9) wie P7-24/P7-4 damals; kein weiterer Hint-Edit, kein struktureller Eingriff jetzt) | 2026-09-01 (Versions-Bump v2.2 -> v2.2.3 in app.html .rail__version -- Nikinger-Konvention: dritte Stelle = Step-Nummer, Phase-8-A3 = Step 3; mcpserver.__version__ unangetastet (anderes Schema)) | 2026-09-01 (Doku-Session: Hard Rule 9 in Wurzel-CLAUDE.md ergaenzt nach Phase-8-A3-Vorfall -- kein pkill -f mit Regex, niemals den systemd-Dienst anfassen; PROMPTS.md Hard-Rules-Liste und Tests-Absatz um Stopp-Regel fuer Wegwerf-Instanzen erweitert; docs/INDEX.md drei Zeilen vorne + drei Eintraege angepasst; kein Code, kein Service-Touch, Produktion weiterhin active, head 11.6KB->12.8KB unter Softcap) | 2026-09-01 (A3 gebaut -- _TITLE_NOT_ID_HINT mit Positiv/Negativ-Beispiel geschärft, Test test_tool_descriptions_tell_the_agent_to_name_titles_not_ids auf neuen Wortlaut angepasst, 143 phase2_mcp-Tests gruen, Zweitprobe vom Nikinger live bestaetigt (positiv), dritte Probe nach Deploy offen P8-5) | 2026-08-31 (A2 live-verifiziert -- Test_Space_A2 angelegt + entfernt, 4x GET /api/v1/overview nach DELETE=200 statt 500, Index konsistent mit Dateien, Push danach freigegeben; Block A vollstaendig live ✅) | 2026-08-31 (Nachtrag: Janick live angemeldet -- dritter biologischer Nutzer, Phase-4-Auth-Architektur erstmals mit externem Dritt-Anwender durchgespielt; Connector-UI-Befund: 'Anmeldung fehlgeschlagen' trotz erfolgreicher OAuth-Verbindung, kein Handlingsbedarf, Vormerkung fuer spaeter) | 2026-08-31 (Nachtrag: OpenAI-ChatGPT-Konnektor aktuell nicht kompatibel, benoetigte Settings unbekannt -- Auth-Architektur auf Anthropic-Konnektoren geeicht, andere Settings nicht hinterlegt, Vormerkung ohne Auftrag) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
+updated: 2026-09-02 (Vormerkung 3 Punkt 1 gebaut -- Listenzeilen-Auswahl-Fill vereinheitlicht auf denselben Rail-Button-Gradient wie .rail__home[aria-current=true] (loest --accent-quiet-Flaeche + schwimmende -4px-Outline + Backdrop-Blur ab, alles ersatzlos entfernt), 3px-Akzentrand links unveraendert, Kombi-Override neu (aria-current + selected gleichzeitig); Playwright-Smoke umgeschrieben -- Unified-Nachweis jetzt per computed background-image-Gleichheit gegen den Rail-Button, nicht nur Vorhandensein; Screenshot c4c5_02_selected_row_3px_outline.png -> c4c5_02_selected_row_accent_fill.png (alter Name behauptete abgeloestes CSS-Merkmal); 7/7 Playwright, 958/958 pytest, ui_budget 5/5 (123.8 KB, -0.1 KB), Tabu-Diff leer; Selection/Choice-Konvention-v3-Abschnitt korrigiert (der dort dokumentierte Kategorien-Einwand ist per Nikinger-Weisung ueberstimmt, nicht widerlegt); README Sneak-Peak-Zeile + Bild nachgezogen; kein Service-Touch, kein Push) | 2026-09-02 (Zwei Vormerkungen ergaenzt, nur dokumentiert, kein Code: (1) Item-Link-Picker fuellt nur das Frontmatter-links-Feld fuer den Graphen, kein Pfad zu einem klickbaren #item/-Link im Body -- Fix-Vorschlag notiert; (2) Nikinger-Handyscreenshot-Vergleich Rail-Bucket vs. Listenzeilen-Auswahl bestaetigt die Richtung-(a)-Entscheidung mit Bildbeleg, keine neue Entscheidung) | 2026-09-02 (Deploy-Diskrepanz geschlossen -- Nikinger hat den haengenden Restart durchgefuehrt, Block B jetzt tatsaechlich live, Health-Gate 3/3 gruen, Retention hat 20260821T183341.270842Z abgeraeumt; Block C/D weiterhin nicht deployt) | 2026-09-02 (Nikinger-Entscheidung Vormerkung 3 Punkt 1: Richtung (a) vereinheitlichen zugunsten Rail-Button-Stil -- "looks cleaner", dokumentiert vor dem Push, Umsetzung offen fuer naechste Session; README Sneak-Peak um die zwei Chevron-Screenshots ergaenzt) | 2026-09-02 (Vormerkung-3-Fixes: Chevron em-skaliert (Root Cause .field .input font-size:13px) + select.input:focus links/rechts entkoppelt, 11/11 Playwright-Regression gruen, 958/958 pytest, ui_budget 5/5 (123.7/250 KB); Escalation-Deploy-Fund dokumentiert (deploy.sh main haengt seit 2026-09-01 an sudo, Live-PID 67925 noch auf 7254aa9/A3, NICHT auf 007b73d/Block B trotz gegenteiliger Doku-Behauptung) | 2026-09-02 (Vormerkung 3 vom 2026-09-02 ergaenzt: Nikinger-Feedback nach Chevron-Sichtpruefung -- Chevrons nicht visuell identisch ueber alle 7+1 Stellen (Hypothese: 12px vs Container-Hoehe, --text-faint-Kontrast auf Glas vs Solid), +linker input-Border-Strich konkurriert mit dem neuen Chevron-Affordance rechts; drei Loesungsrichtungen jeweils benannt, ausdruecklich NUR vormerken, kein Edit in dieser Session) | 2026-09-02 (Selection/Choice Konvention v3 im Phase-Head dokumentiert + Auswahl-Chevron-Vorbild in app.css ::select.input gebaut -- Lucide m6 9 6 6 6-6 als data-URL, --text-faint-Stroke, 12x12 rechtsbuendig, padding-right 28px, :disabled-Variante in --text-placeholder; alle 7+1 <select class="input">-Stellen gerendert (field-status, create-type, new-folder-parent-select, move-space-select, move-folder-select, space-member-write-select, Per-Item-Share-Row dynamisch); Playwright-Smoke 9/9 gruen gegen Wegwerf 18771; ui_budget 5/5 (123.3/250 KB, +0.6 KB), 958/958 pytest, Tabu-Diff §0.4 leer, JS-Syntax OK; phase8_ui_graph/scripts/{wegwerf_setup_auswahl_chevron.py,auswahl_chevron_playwright_smoke.py} neu; docs/screenshots/auswahl_chevron_{01_move,02_share}_dialog.png neu; kein Service-Touch, kein Deploy, kein Push; Vormerkung 1 vom 2026-09-01 (Auswahl-Boxen vereinheitlichen) damit erledigt -- die Selection/Choice-Konvention ersetzt die offene Frage, das Chevron-Vorbild schliesst die sichtbare Luecke im Vorbild; Vormerkung 2 vom 2026-09-02 (Listenzeilen-Sheen vs Rail-Button-Stil) bewusst NICHT aufgeloest -- der C4-Sheen bleibt unvera (ge 3px-Akzentkante + Outline + Backdrop-Blur) wegen N8 (Auswahl darf nicht allein von Transparenz abhaengen); Obsidian-Uebersicht (D2) bleibt WIP wie vom Nikinger bestaetigt -- keine Code-Aenderung an js/graph.js, app.css/app.html fuer das Graph-Panel) | 2026-09-02 (Vormerkung-Block ergaenzt: Nikinger-Feedback nach Sichtpruefung 3 -- Listenzeilen-Auswahl (c4c5_03) sieht anders aus als Rail-Button-Vorbild (03_list.png), drei Loesungsrichtungen fuer die naechste kontrollierte UI-Session vereinheitlichen / vereinfachen / bewusst unterschiedlich lassen; Obsidian-Uebersicht weiterhin WIP, explizit bestaetigt; kein Code angefasst, kein Push noetig) | 2026-09-02 (Block C C4+C5 gebaut: Liquid-Glas-Akzente (P8-H/N8, --glass-{bg,border,blur,highlight}-Tokens + .glass-Utility mit Fallback+@supports+prefers-reduced-transparency), .list__head sticky (position:sticky;top:0;z-index:1) + .overlay__panel/.update-banner/.toast ueber gruppierte Selektor-Liste am Dateiende auf Glas, Auswahl-Sheen fuer .list__row[aria-current=true] und .list__row--selected (3px solide Akzentkante + 1px Outline + backdrop-blur Sheen); C5: ::selection (Akzent-quiet/Text), .editor__textarea max-width:72ch + margin:0 auto (576px computed in Plex Mono, symmetrische Margins), .editor__body padding-left auf calc(var(--space)*1.5) Token; phase8_ui_graph/scripts/{wegwerf_setup_c4c5.py,c4c5_playwright_smoke.py} neu (Port 18770, Standing-Permission-Muster D1/D2 reproduziert, File-Keyring, 7 Items ueber zwei Spaces); Playwright-Smoke 7/7 gruen (CSS-Static + sticky head + 3px border + outline + 72ch centered + ::selection rule + overlay glass rgba(27,32,39,0.55)); vier Screenshots docs/screenshots/c4c5_{01..04}_*.png; 958/958 pytest, ui_budget 5/5 gruen (122.7/250 KB, +2.9 KB), Tabu-Diff §0.4 leer, JS-Syntax node --check auf app/list/state/tree.js OK; kein Code ausserhalb webui/static + phase8_ui_graph/scripts beruehrt; Produktion unangetastet, kein Deploy, kein Service-Touch) | 2026-09-02 (Block D D3 gebaut: Versions-Bump .rail__version v2.2.3 -> v3.0, neuer docs/UPDATE_LOG.md-Eintrag 2026-09-02 mit vier Bullet-Points (Uebersicht tabellos, Verknuepfungs-Graph, globaler Home-Scope, Mini-Legende); Sichtpruefung 2 mit 26 Items ueber drei Spaces via phase8_ui_graph/scripts/{wegwerf_setup_sichtpruefung2.py,sichtpruefung2_smoke.py} (Standing-Permission-Muster reproduziert, Port 18769, File-Keyring, User alpha + drei Spaces alpha/beta/gamma via Store.create mit folder-Support statt space_cli); sechs Screenshots docs/screenshots/sp2_{01..06}_*.png; README.md Sneak-Peak-Sektion komplett ersetzt (neun Block-C-Screenshots raus, sechs Block-D-Screenshots rein, 3x2-Tabelle, Hinweis-Text ueber die historische Referenz); D2-Block rotiert; Head jetzt mit D3-Block allein ueber 40KB-Softcap benannt; 958/958 pytest, ui_budget 5/5 gruen (119.8/250 KB unveraendert), Tabu-Diff §0.4 leer; kein Service-Touch, PID 67925 uptime 66891s linear wachsend) | 2026-09-02 (Block D D2 gebaut: handgerollter Canvas-Force-Graph in js/graph.js (542 Zeilen, 6.2 KB gzipped), Force-Simulation mit O(n^2)-Repulsion + Federkraft + Alpha-Decay, Canvas 2D mit devicePixelRatio-Korrektur, Knotenfaerbung via spaceCategory() aus C3, Kantenstile explizit solide / Tag gestrichelt / Ordner gepunktet, Hover-Dim, Klick -> Editor.selectItem, Drag/Zoom/Pan, prefers-reduced-motion synchron 300 Ticks; Toggles Tags/Ordner mit Default aus, >15-Knoten-Cutoff-Riegel fuer Tag-Cliquen; app.html-Graph-Panel erweitert (Toolbar + Empty-Hint), app.css fuer Toolbar + Empty-Hint, app.js initGraph() in Init-Kette + loadGraphPanel() an drei Stellen (Init/Home/Refresh); phase8_ui_graph/scripts/{wegwerf_setup_d2.py,d2_playwright_smoke.py} neu -- Standing-Permission-Muster C3/D1 reproduziert, eigener Port 18768, File-Keyring-Backend, 14 Items (10 alpha + 4 beta) mit 6 expliziten Kanten (4 Frontmatter + 2 Body); Playwright-Smoke 7/7 gruen -- statisches Markup korrekt, Login + Overview rendert Graph-Panel, /api/v1/graph liefert 14 Knoten/6 Kanten, Empty-Hint versteckt wenn Kanten existieren, Tag-Toggle erweitert sichtbar, Zoom-Readout aktiv, Canvas mit >=500 nicht-transparenten Pixeln; zwei Screenshots docs/screenshots/d2_{01_overview_with_graph,02_graph_with_tag_toggle}.png; D1-Block rotiert; Head jetzt mit D2-Block allein ueber Softcap benannt (Rotation wuerde nichts bewegen); 958/958 pytest (vorher/nachher identisch, keine Python-Aenderung), ui_budget 5/5 gruen (119.8/250 KB, +6.8 KB), Tabu-Diff §0.4 leer (Storage nicht beruehrt, achte Oeffnung bleibt ANGEKUENDIGT), JS-Syntax node --check auf graph.js/app.js OK; kein Code ausserhalb webui/static + phase8_ui_graph/scripts beruehrt; Produktion unangetastet, PID 67925 uptime 66363s linear wachsend) | 2026-09-02 (Block D D1 gebaut: Uebersicht tabellos, app.html/app.css/list.js/app.js aktualisiert, Playwright-verifiziert gegen Wegwerf 18767, 5/5 gruen, drei Screenshots d1_{01..03}, 958/958 pytest, ui_budget 5/5 (113.0/250 KB), Tabu-Diff §0.4 leer, Head 41.8KB->44.4KB ueber Softcap benannt, C3-Block rotiert, kein Service-Touch, PID 67925 uptime 65157s linear wachsend) | 2026-09-01 (Vormerkung in phase8_ui_graph/CLAUDE.md ergaenzt: Auswahl-Boxen vereinheitlichen -- Space-Auswahlbox (Move-Dialog, <select class=input id=move-space-select>) als Standard; Nikinger-Sichtpruefung-1-Design-Frage mit 'nein, C3-C5 + D-Block noch offen' beantwortet; kein Code, kein Service-Touch; Head 33.6KB->37.5KB noch unter Softcap) | 2026-09-01 (Block C C2 gebaut: Lucide-Sprite-Vendoring (18 Icons, ISC+MIT-Lizenzen, phase5_ui/vendor/lucide/); Generator build_icon_sprite.py (idempotent, --check); Sprite-Block zwischen ICONS:BEGIN/ICONS:END in app.html (vom Generator gepflegt); js/icons.js (iconSvg()/iconHtml(), 13. JS-Modul); app.css .icon (Lucide-Defaults: 1.25em/currentColor/stroke-width 2) + .rail__glyph.icon (16px Badge-Box) + .toolbar-btn.icon (1em) + .tree__twist (12px SVG-Box); Ersetzungs-Map 7 HTML-Entities + 3 Text-Glyphen geschlossen (F9/F10/F11 aus C0); V92 gepinnt (Lucide 1.38.0, SHA-256 d28944cf…); ui_budget 5/5 (110.3/250 KB), pytest 958/958, Tabu-Diff leer, grep &#[0-9]+; in app.html → 0 Icon-Treffer, grep '→|⇄|×' in js/ → 0 Icon-Treffer (2 Treffer bleiben = Sprach-Interpunktion 'v3 → v4' mit Audit-Kommentar); Modul-Status Block C auf 'C0+C1+C2 gebaut, C3-C5 offen' + Abnahmestand um C2-Zeile ergaenzt + neuer Session-Block + C1-Block rotiert; Head 33KB->38KB, immer noch unter Softcap; kein Code ausserhalb webui/static + build_icon_sprite.py beruehrt) | 2026-09-01 (Block C C1 gebaut: C1a Font-Swap (Plex Sans Var v0.2.0 + Plex Mono v2.5.0, SHAs gepinnt, build_font_subset_plex.sh neu) + C1b CSS-Typografie (5 Skala-Tokens, body 16px/1.55, h1-h3 + Meta-Zeilen auf Tokens, IDs/Versions in --font-mono); zwei Commits (0281cce + 08bff55); ui_budget 5/5 (108.4/250 KB), pytest 958/958 (250s, Flake als isoliert bestaetigt), Tabu-Diff leer; phase8_ui_graph/CLAUDE.md Modul-Status Block C auf 'C0 + C1 gebaut, C2-C5 offen' gehoben + Abnahmestand um C1-Zeile ergaenzt + neuer Session-Block; Head 27.5KB->33KB, immer noch unter Softcap) | 2026-09-01 (Block C C0 gebaut: Anti-AI-Pattern-Research (V94 bestaetigt, Web-Recherche) + UI-Audit gegen den Code (P8-25); Findings-Tabelle Muster -> Fundstelle -> Fix -> Ziel-Step im Phase-Head, 35 Eintraege, davon 0 als eskaliert markiert; Code unberuehrt, vier Dateien Doku-only -- phase8_ui_graph/CLAUDE.md + SESSIONS_ARCHIVE.md + docs/INDEX.md + SESSIONS_ARCHIVE-Frontmatter; Head 18.4KB->27.5KB, immer noch unter Softcap) | 2026-09-01 (Gate B→C: 958/958 pytest gruen, Charakterisierung byte-identisch, Tabu-Diff leer, _graph_get manuell 12/12, Playwright gegen Wegwerf 18/18; B4-Block rotiert, Head 14.8KB unter Softcap; Code unberuehrt, Doku-Update + neuer Session-Block) | 2026-09-01 (Block B Step B1 gebaut -- storage/linkscan.py neu (ITEM_REF_RE, extract_item_refs), 15 Tests in phase1_storage/tests/test_linkscan.py, achte P1-Contract-Oeffnung in phase1_storage/CLAUDE.md angekuendigt vor Code, Tabu-Diff §0.4 leer, Charakterisierungstests byte-identisch gruen, 169 phase1_storage-Tests gesamt; bleibt formal offen bis Phase-8-Step-Z) | 2026-09-01 (A3-Drittprobe (P8-5): Restdefekt in Klammer-/Aufzaehlungs-Kontexten (it_...-ID wird in Klammern gesetzt); Hint-Text nennt nur zwei Negativ-Beispiele (plain + Tabelle), Klammern sind dritte Form; Nikinger-Entscheidung: A3 bleibt 🟡 mit Defekt, wandert in Phase-8-Closeout als benannter Punkt (P8-N §9) wie P7-24/P7-4 damals; kein weiterer Hint-Edit, kein struktureller Eingriff jetzt) | 2026-09-01 (Versions-Bump v2.2 -> v2.2.3 in app.html .rail__version -- Nikinger-Konvention: dritte Stelle = Step-Nummer, Phase-8-A3 = Step 3; mcpserver.__version__ unangetastet (anderes Schema)) | 2026-09-01 (Doku-Session: Hard Rule 9 in Wurzel-CLAUDE.md ergaenzt nach Phase-8-A3-Vorfall -- kein pkill -f mit Regex, niemals den systemd-Dienst anfassen; PROMPTS.md Hard-Rules-Liste und Tests-Absatz um Stopp-Regel fuer Wegwerf-Instanzen erweitert; docs/INDEX.md drei Zeilen vorne + drei Eintraege angepasst; kein Code, kein Service-Touch, Produktion weiterhin active, head 11.6KB->12.8KB unter Softcap) | 2026-09-01 (A3 gebaut -- _TITLE_NOT_ID_HINT mit Positiv/Negativ-Beispiel geschärft, Test test_tool_descriptions_tell_the_agent_to_name_titles_not_ids auf neuen Wortlaut angepasst, 143 phase2_mcp-Tests gruen, Zweitprobe vom Nikinger live bestaetigt (positiv), dritte Probe nach Deploy offen P8-5) | 2026-08-31 (A2 live-verifiziert -- Test_Space_A2 angelegt + entfernt, 4x GET /api/v1/overview nach DELETE=200 statt 500, Index konsistent mit Dateien, Push danach freigegeben; Block A vollstaendig live ✅) | 2026-08-31 (Nachtrag: Janick live angemeldet -- dritter biologischer Nutzer, Phase-4-Auth-Architektur erstmals mit externem Dritt-Anwender durchgespielt; Connector-UI-Befund: 'Anmeldung fehlgeschlagen' trotz erfolgreicher OAuth-Verbindung, kein Handlingsbedarf, Vormerkung fuer spaeter) | 2026-08-31 (Nachtrag: OpenAI-ChatGPT-Konnektor aktuell nicht kompatibel, benoetigte Settings unbekannt -- Auth-Architektur auf Anthropic-Konnektoren geeicht, andere Settings nicht hinterlegt, Vormerkung ohne Auftrag) | 2026-08-31 (Block A: A2 remove-space-Auto-Reindex gebaut -- spacectl._cmd_remove_space nach remove_space_dir mit store.rebuild_index(), Test beweist keine Karteileichen + keine Kollateralschäden, 913 gruen, Live-Verifikation ausstehend) | 2026-08-31 (Block A: A1 Reauth-Grant Client gebaut -- async runBatchMove + Grant-Round-2, test #3 auf N=14, Browser-Smoke gegen Wegwerf bestanden, Head rotiert, Live-Verifikation ausstehend) | 2026-08-28 (Block A gestartet -- A1 Reauth-Grant Backend gebaut, 912 Tests gruen, Plan-Drift session_id->session_hash + Throttle-Vorzug dokumentiert, JS-Client ausstehend) | 2026-08-28 (Nachtrag: websearch-MCP nachgerüstet -- @zhafron/mcp-web-search, kein API-Key, Live-Probe bestanden, V94 von nein auf ja) | 2026-08-28 (Step 0 abgeschlossen -- opencode-ai 1.18.25 global installiert, Minimax-Provider-Auth vom Nikinger gesetzt, Playwright-MCP verbunden (V93), CLAUDE.md-Regeldatei-Kontrollfrage bestanden, Smoke-Test P8-26 auf Wegwerf-Branch bestanden, Harnesswechsel zu opencode/M3 ab Block A freigegeben) | 2026-08-28 (Skelett angelegt, Step 0 Fundament-Session gestartet)
 ---
 
 # CLAUDE.md — Phase 8: UI-Neuanstrich v3, Verknüpfungs-Graph, QoL (`phase8_ui_graph/`)
@@ -320,6 +320,24 @@ vormerken, nichts davon diese Session umgesetzt, kein Code angefasst, kein Push:
    Damit ist Vormerkung 3 Punkt 1 vollständig entschieden — Umsetzung offen für die nächste
    Session.
 
+   **[2026-09-02 ERLEDIGT]:** `.list__row[aria-current="true"]` und
+   `.list__rows > li.list__row--selected` (`phase5_ui/webui/static/app.css`) tragen jetzt
+   denselben Gradient + Gloss-Highlight wie `.rail__home[aria-current="true"]`
+   (`linear-gradient(180deg, rgba(62,141,243,.20), rgba(62,141,243,.08))` +
+   `box-shadow: inset 0 1px 0 rgba(255,255,255,.06)`) — Playwright-Smoke vergleicht
+   computed `background-image` beider Elemente auf Gleichheit, nicht nur auf Vorhandensein
+   (`c4c5_playwright_smoke.py :: step3_selected_row_styles`). `outline`/`outline-offset` und
+   beide `backdrop-filter`-Blöcke (Blur-Sheen, `prefers-reduced-transparency`-Fallback) sind
+   komplett entfernt. Der 3px-Akzentrand links bleibt unverändert (kein Layout-Shift, `.list__row`s
+   Default-Border bleibt 3px transparent). N8 geprüft: einfacher erfüllt als vorher, weil die
+   Erkennbarkeit jetzt an einem opaken Gradient + dem soliden Rand hängt, kein Blur mehr im
+   Spiel — der `@media prefers-reduced-transparency`-Sonderfall entfällt strukturell. Bewusst
+   minimaler Diff (Advisor-Fund vor dem Bauen): `.list__row` blieb bei `border-left`, bekam
+   **keinen** vollen `border: 1px solid transparent` wie `.rail__home` — ein Listenrow ist
+   randlos volle Breite, ein voller Rand hätte jede Zeile 2px schmaler/höher gemacht (globale
+   Dichte-Änderung) für einen Fund, der nur den *Fill* betraf. 7/7 Playwright-Smoke grün gegen
+   Wegwerf 18770, 958/958 pytest, ui_budget 5/5 (123.8 KB, −0.1 KB). Details im Session-Block.
+
    **[2026-09-02 Nachtrag, zwei eigene Handy-Screenshots als Vergleichsbeleg]:** Nikinger
    liefert ein direktes Vorher-Nachher-Paar aus der laufenden App (kein Playwright-Shot):
    Rail-Bucket „Notizen" aktiv (voller Akzent-Fill, klar als „ausgewählt" lesbar) gegen die
@@ -456,13 +474,25 @@ neuen UI-Commit in `webui/static/`.
 
 ### Was diese Konvention NICHT macht
 
-- Sie ändert **nichts** am Listenzeilen-Sheen aus C4 (3-px-Akzentkante + 1-px-Outline +
+- **[2026-09-02 Korrektur]** Der Absatz unten stand hier als Momentaufnahme der Sitzung vom
+  2026-09-01/-02 und ist überholt: der Nikinger hat die dort verworfene Vereinheitlichung am
+  2026-09-02 explizit angeordnet (Vormerkung 3 Punkt 1, Richtung (a), „i like the rail Button
+  Style more, Looks cleaner") und sie ist seither gebaut (`app.css`, Session-Block unten). Der
+  ursprüngliche Kategorien-Einwand (Listenzeilen-Auswahl = eigene Kategorie, keine Vermischung
+  mit Navigation) ist damit per direkter Nikinger-Weisung überstimmt, nicht als falsch
+  widerlegt — bewusst als Ausnahme dokumentiert, keine neue Kategorisierungsregel. Die
+  **Farbsprache** (Rail-Button-Gradient) ist jetzt identisch, die **Markup-Kategorien** selbst
+  (Choice/Toggle/Status/Navigation, Tabelle oben) bleiben unverändert — eine Listenzeile ist
+  weiterhin keine Navigation, sie sieht nur jetzt optisch genauso aus wie eine. Ursprünglicher
+  Text, unverändert stehen gelassen als Herkunftsnachweis der verworfenen Position:
+  *„Sie ändert nichts am Listenzeilen-Sheen aus C4 (3-px-Akzentkante + 1-px-Outline +
   Backdrop-Blur-Sheen) — Vormerkung 2 vom 2026-09-02 (Sichtprüfung 3) hatte drei mögliche
   Richtungen benannt; diese Sitzung hat keine davon umgesetzt, weil der Sheen durch N8
   begründet ist (Auswahl darf nicht allein von Transparenz abhängen, sonst bei
-  `prefers-reduced-transparency: reduce` unsichtbar). Eine Vereinheitlichung mit dem
+  prefers-reduced-transparency: reduce unsichtbar). Eine Vereinheitlichung mit dem
   Rail-Button-Akzent-Gradient-Fill (Navigation-Kategorie) wäre aus Sicht des Servers eine
-  *Vermischung zweier Kategorien* — semantisch falsch.
+  Vermischung zweier Kategorien — semantisch falsch."* N8 selbst ist weiterhin erfüllt, siehe
+  die Vormerkung-3-Punkt-1-ERLEDIGT-Notiz oben — der neue Fill ist opak, hängt an keinem Blur.
 - Sie passt **nicht** den Counter-Chip-Stil auf der Übersichtsseite an den `<select>`-
   Chevron-Stil an — Counter-Chips sind Navigation, kein Choice, andere Kategorie.
 
@@ -489,153 +519,98 @@ P9-Arbeitsanweisung weitergeführt, falls die Nikinger-Entscheidung anders ausf�
 
 ---
 
-## Session stopped — 2026-09-02 (Escalation-Session: Vormerkung-3-Fixes gebaut + Deploy-Fund)
+## Session stopped — 2026-09-02 (Vormerkung 3 Punkt 1 gebaut: Listenzeilen-Fill vereinheitlicht)
 
-**Auftrag:** Claude-Code-Escalation, ausdrücklich als erster Fall dieser Art benannt — nach
-zwei opencode/M3-Sessions, die die zwei Chevron-/Border-Funde aus Vormerkung 3 nur vormerken
-konnten (drei Lösungsrichtungen je Fund benannt, keine gebaut), sollte Claude Code (a) kurz auf
-das aktuelle Block-Ergebnis schauen und bei einem tieferliegenden Problem sofort melden und
-warten, (b) sonst die zwei gemeldeten UI-Funde selbst fixen, (c) den seit 2026-09-01 an `sudo`
-hängenden `deploy.sh main` auf Sicherheit prüfen.
+**Auftrag:** Nikinger-Anweisung „Go on with the UI fix". Die gelockte Entscheidung aus der
+vorigen Session (Vormerkung 3 Punkt 1, Richtung (a): Listenzeilen-Auswahl auf den
+Rail-Button-Akzent-Fill umstellen, „Umsetzung offen für die nächste Session") ist die einzige
+Vormerkung mit Bauauftrag — der zweite offene Punkt aus der letzten Doku-Sitzung
+(Item-Link-Picker-Lücke) trägt explizit „nur vormerken, nicht bauen" und blieb unangetastet.
 
-**(a) Blick auf den aktuellen Block:** keine strukturelle Blockade in der Chevron-CSS selbst
-gefunden — beide Vormerkung-3-Funde hatten eine konkrete, im Code auffindbare Root Cause (siehe
-unten), kein Anzeichen für eine tiefere Architekturfrage, die eine Nikinger-Entscheidung vor dem
-Fix gebraucht hätte. **Der eigentliche Fund dieser Kategorie liegt beim Deploy, nicht beim
-CSS — siehe (c).**
+**Umgesetzt (eine Datei, `phase5_ui/webui/static/app.css`, minimaler Diff — Advisor-Fund vor
+dem Bauen: keine `.list__row`-Basis-Border-Umstellung auf volle 4-Seiten-Border wie beim
+Rail-Button, das hätte jede Zeile global 2px schmaler/höher gemacht für einen Fund, der nur
+den *Fill* betraf):**
 
-**(c) Deploy-Sicherheitscheck (zuerst, weil höheres Risiko):**
+- `.list__row[aria-current="true"]` und `.list__rows > li.list__row--selected`: `background`
+  von `var(--accent-quiet)` (flach, 14% Deckkraft) auf denselben Gradient wie
+  `.rail__home[aria-current="true"]` (`linear-gradient(180deg, rgba(62,141,243,.20),
+  rgba(62,141,243,.08))`), plus `box-shadow: inset 0 1px 0 rgba(255,255,255,.06)` (Gloss-
+  Highlight, ebenfalls vom Rail-Button übernommen).
+- `outline: 1px solid var(--accent)` + `outline-offset: -4px` ersatzlos entfernt — das war laut
+  Nikingers Handyscreenshot-Vergleich die „kaum wahrnehmbare" schwimmende Innenkante.
+- Beide `@supports (backdrop-filter)`- und `@media (prefers-reduced-transparency)`-Blöcke für
+  beide Selektoren ersatzlos entfernt — der neue Fill ist opak, hängt an keinem Blur mehr.
+- 3px-Akzentrand links (`border-left`) unverändert stehen gelassen (kein Layout-Shift, war
+  nicht Teil des gemeldeten Befunds).
+- Kombi-Zustand (Zeile gleichzeitig `aria-current` UND mehrfach-`selected`) bekommt eine neue
+  Override-Regel (`.list__rows > li.list__row--selected .list__row[aria-current="true"] {
+  background: none; box-shadow: none; }`), analog zur bestehenden `border-left-color:
+  transparent`-Regel eine Zeile darüber — verhindert, dass sich zwei identische Gradienten
+  sichtbar aufaddieren.
+- Netto-Diff: −20/+9 Zeilen App-CSS.
 
-- `ps -ef` zeigt `deploy.sh main` (PID 76357) seit **2026-09-01** hängend an
-  `sudo systemctl restart sharefyx-mcp` (PID 79380, `root`) — wartet auf das Nikinger-Passwort.
-  **Nicht angefasst** (Hard Rule 9 — `systemctl`/`sudo` auf dem echten Dienst ausschließlich
-  Nikinger).
-- Der Build-Teil ist bereits durch: `current` zeigt auf `20260901T103944.634877Z` =
-  Commit `007b73d` (Block B, "Update-Log-Eintrag ... fuer Block B"). Der **laufende** Prozess
-  (PID 67925, `uptime` seit Di 2026-09-01 11:47 CEST, **vor** dem Release-Build um 12:44)
-  serviert aber noch `20260901T094146.796734Z` = Commit `7254aa9` (Phase-8-A3-Versions-Bump) —
-  **eine Version älter**. Der Restart, der den Sprung auf Block B vollziehen würde, ist genau
-  der Schritt, der am Passwort hängt.
-- **Befund, mit Korrekturbedarf:** dieser Head (voriger Abschnitt, "Block B live deployt")
-  und `docs/INDEX.md` behaupten "Release `20260901T103944.634877Z`, Health-Gate 3/3 grün" als
-  abgeschlossen — das Health-Gate lief gegen den **gebauten Release**, nicht gegen den
-  tatsächlich neu gestarteten Dienst. Live serviert wird bis zum abgeschlossenen Restart
-  weiterhin die A3-Version, nicht Block B. **Keine eigene Korrektur an der Doku-Behauptung
-  vorgenommen** — der Zustand ändert sich mit dem nächsten Nikinger-Handgriff (Passwort
-  eingeben, oder Prozess abbrechen), eine jetzt geschriebene Korrektur wäre in beide Richtungen
-  sofort wieder stale.
-- **Sicherheitsurteil: Ja, sicher fortzusetzen.** Das Release, auf das der hängende Restart
-  zielt, ist Block B — vollständig Gate-B→C-geprüft (958/958 pytest, Charakterisierung
-  byte-identisch, Tabu-Diff leer, `_graph_get` manuell 12/12, Playwright 18/18) und bereits
-  einmal exakt in diesem Zustand für "live" erklärt worden. Das neue `item_links`-Schema
-  (achte P1-Contract-Öffnung) legt sich selbst per `CREATE TABLE IF NOT EXISTS` an
-  (`phase1_storage/storage/index.py:63`) — kein separates Migrationskommando nötig, der
-  Restart allein genügt.
-- **Was der Restart NICHT bringt:** die 18 Commits seit `007b73d` (Block C C0–C5, Block D
-  D1–D3, die zwei Fixes dieser Session) sind nie in einen Release-Build eingeflossen — nach
-  dem Restart läuft weiterhin nur Block B live, nicht Block C/D. Ein zweiter `deploy.sh main`
-  wäre danach ein eigener, weiterer Schritt (durch den Nikinger).
+**N8-Prüfung (Verbotsliste §0.3 Punkt 6, „Auswahl darf nicht allein von Transparenz
+abhängen") — wie von der Nikinger-Entscheidung selbst verlangt, vor dem Bauen geprüft, nicht
+nur behauptet:** einfacher erfüllt als vorher. Der alte Sheen hatte drei Layer, von denen einer
+(Backdrop-Blur) tatsächlich transparenzabhängig war und deshalb einen eigenen
+`prefers-reduced-transparency`-Fallback brauchte; der neue Fill ist ein einziger opaker
+Gradient plus der ohnehin schon soliden Akzentkante — kein Fallback-Fall mehr, weil kein
+Blur mehr existiert, der ausfallen könnte.
 
-**(b) Vormerkung-3-Fixes gebaut, eine Datei (`phase5_ui/webui/static/app.css`, +37/-8 Zeilen,
-0 Tabu-Diff):**
+**Playwright-Regression (`c4c5_playwright_smoke.py`, gegen dieselbe Wegwerf-Kategorie 18770,
+die den beanstandeten Screenshot erzeugt hatte — Standing Permission, `wegwerf_setup_c4c5.py`
+neu provisioniert, vorheriger `/tmp`-Stand war bereits aufgeräumt):**
 
-- **Fund 1 (Chevrons nicht identisch) — Root Cause gefunden, nicht nur vermutet:**
-  `.field .input { font-size: 13px; }` (Zeile 1251, Item-Editor-Frontmatter-Panel, z. B.
-  `#field-status`) verkürzt dort die Select-Box gegenüber den 16px-Dialog-Kontexten
-  (Move-/Anlege-/Freigabe-Dialog), während der Chevron in Vormerkung-1-Fassung fest 12×12 px
-  mit `right 8px`/`padding-right 28px` verdrahtet war — derselbe absolute Chevron in einer
-  kürzeren Box wirkt dort größer. Vormerkung-3-Hypothese (a) bestätigt. **Fix: alle drei
-  Werte auf `em`** (`background-size: 0.75em 0.75em`, `background-position: right 0.5em
-  center`, `padding-right: 1.75em`) — skaliert jetzt mit der Schriftgröße des jeweiligen
-  Kontexts mit, das Verhältnis Chevron:Select-Höhe bleibt konstant. `select.input:disabled`
-  erbt `background-size`/`-position` unverändert von der Basisregel (nur `background-image`
-  wird dort überschrieben), kein zweiter Fix nötig.
-- **Fund 2 (linker Border-Strich konkurriert mit Chevron) — Fix ohne `.input:focus`
-  anzufassen:** neue, spezifischere Regel `select.input:focus { border-color:
-  var(--line-strong); border-right-color: var(--accent-line); border-bottom-color:
-  var(--accent-line); }`. `<input type="text"/"date">` behält den vollen Fokus-Rahmen (Caret-
-  Sichtbarkeit, Nikinger-Vorgabe aus der Vormerkung selbst) — nur `<select class="input">`
-  bekommt die asymmetrische Variante, links bleibt `--line-strong`, rechts+unten (näher am
-  Chevron) auf `--accent-line`. Damit reicht keine linke Akzentkante mehr in Konkurrenz zur
-  C4-Auswahl-Sheen-Konvention (ausgewählte Listenzeile = 3px-Akzentkante links).
-
-**Wegwerf + Regressions-Smoke (Standing-Permission, dieselbe Instanz wie die Vorgänger-Session
-reproduziert):**
-
-- `phase8_ui_graph/scripts/wegwerf_setup_auswahl_chevron.py` wiederverwendet (Port 18771,
-  unverändert).
-- `phase8_ui_graph/scripts/auswahl_chevron_playwright_smoke.py` erweitert (9/9 → **11/11**):
-  Step 1 auf die neue `padding-right: 1.75em`-Assertion nachgezogen (die alte `28px`-Prüfung
-  wäre am geänderten Code fälschlich rot gelaufen); **neu Step 10** — computed
-  `background-size`/Element-Höhe-Verhältnis von `#field-status` (0.2698) gegen
-  `#move-space-select` (0.2602) verglichen, Differenz 0.0096 < 0.02-Toleranz (vorher wäre die
-  Differenz bei fixen 12 px deutlich größer gewesen); **neu Step 11** — `#move-space-select`
-  fokussiert, `border-left-color` (`rgba(255,255,255,.16)` = `--line-strong`) unterscheidet
-  sich von `border-right-color`/`border-bottom-color` (`rgba(62,141,243,.4)` = `--accent-line`).
-  **11/11 grün**, beide Fixes empirisch bestätigt, nicht nur behauptet.
-- Zwei Screenshots (`auswahl_chevron_01_move_dialog.png`, `auswahl_chevron_02_share_dialog.png`)
-  in derselben Session neu erzeugt (überschreiben die Vorgänger-Screenshots gleichen Namens).
+- Step 1 (CSS-statisch) umgeschrieben: prüft jetzt Gradient-Fill-Präsenz auf beiden Selektoren
+  UND die **Abwesenheit** jeder `outline`-Deklaration in beiden Regelblöcken UND zählt den
+  exakten Gradient-String ≥3× im Dateikörper (Rail-Home + beide Listenzeilen-Selektoren) als
+  Unified-Nachweis.
+- Step 3 (computed Styles im Browser) umgeschrieben: liest jetzt `background-image` +
+  `box-shadow` der ausgewählten Zeile UND von `.rail__home`/`.tree__scope`/`.tree__folder` (je
+  nachdem, was gerade `aria-current="true"` trägt) und **vergleicht beide computed
+  `background-image`-Werte auf exakte Gleichheit** — das ist der eigentliche Beweis für
+  „vereinheitlicht", nicht nur „ein Gradient ist da".
+- Screenshot umbenannt: `c4c5_02_selected_row_3px_outline.png` (Git-getrackt, per `git rm
+  --cached` entfernt) → `c4c5_02_selected_row_accent_fill.png` (neu aufgenommen) — der alte
+  Name behauptete ein CSS-Merkmal, das es nicht mehr gibt.
+- **7/7 grün**, inklusive der neuen Gleichheits-Assertion (nicht nur „Gradient vorhanden",
+  sondern „identisch mit dem Rail-Button-Vorbild").
 
 **Verifikation — Selbstprüf-Checkliste §0.6:**
 
-1. `pytest -q` → **958/958 grün** (keine Python-Änderung, 270 s).
-2. Tabu-Diff → **leer** (nur `app.css` + der eine Smoke-Skript-Edit + zwei Screenshots).
-3. JS-Syntax: kein neuer/geänderter JS-Code, `node --check app.js` zur Sicherheit trotzdem
-   grün.
-4. Doc-Update im selben Commit (dieser Block + Vormerkungen-ERLEDIGT-Marker + Frontmatter).
-5. `ui_budget.py` → **5/5 grün**, app.js+css+Font **123.7 KB** (vorher 123.3 KB, +0.4 KB für
-   die zwei neuen/geänderten Regeln). Im Korridor (<250 KB).
+1. `pytest -q` → **958/958 grün** (270 s, reiner CSS-Diff, keine Python-Änderung).
+2. Tabu-Diff (`storage/`, `mcpserver/{tools,permissions,server}.py`) → **leer**.
+3. JS-Syntax: kein JS geändert, `node --check app.js`/`list.js` zur Sicherheit trotzdem grün.
+4. Doc-Update im selben Commit: dieser Block + Vormerkung-3-Punkt-1-ERLEDIGT-Nachtrag +
+   Korrektur der jetzt widersprüchlichen „Was diese Konvention NICHT macht"-Aussage (Selection/
+   Choice Konvention v3, siehe oben — Advisor-Fund: die Konvention hatte den jetzt überstimmten
+   Kategorien-Einwand noch als geltende Position stehen) + `README.md` Sneak-Peak-Zeile +
+   Frontmatter.
+5. `ui_budget.py` → **5/5 grün**, app.js+css+Font **123.8 KB** (vorher 123.9 KB — netto **−0.1
+   KB**, weniger CSS als vorher trotz der neuen Kombi-Override-Regel).
 
-**Wegwerf abgebaut:** `wegwerf_setup_auswahl_chevron.py cleanup` (PID-Datei-Muster, kein
-`pkill -f`). `curl http://127.0.0.1:8765/health` → `{"status":"ok",...}` **kein Service-Touch**
-an der echten Instanz; `ps -ef` zeigt weiterhin nur `sharefyx-mcp.service` (PID 67925) +
-den unveränderten hängenden Deploy-Prozess (PID 76357/79380).
+**Wegwerf abgebaut:** `wegwerf_setup_c4c5.py cleanup` (PID-Datei-Muster, kein `pkill -f`).
+`curl http://127.0.0.1:8765/health` → `{"status":"ok",...}`, `ps -ef` zeigt danach nur noch
+`sharefyx-mcp.service` — kein Service-Touch an der echten Instanz.
 
 **Was diese Session bewusst NICHT gemacht hat:**
 
-- **Nichts am hängenden Deploy/`sudo`-Prozess.** Kein Passwort, kein `kill`, kein
-  `systemctl`-Aufruf — reines Auslesen (`ps`, `readlink`, `git rev-parse` in den
-  Release-Verzeichnissen, `systemctl status`, `curl /health`).
-- **Vormerkung-3-Punkt 1 vom 2026-09-02 (Listenzeilen-Sheen vs. Rail-Button-Vorbild)
-  unangetastet.** Anders als die zwei Chevron-Funde hat dieser keine im Code auffindbare Root
-  Cause — es ist eine Geschmacksentscheidung zwischen drei gleichwertigen Richtungen, die laut
-  eigener Vormerkung explizit der Nikinger-Sichtprüfung am echten Gerät vorbehalten bleibt.
-- **Obsidian-Übersicht (D2) unverändert** — weiterhin WIP wie zuletzt bestätigt.
-- **Kein Push.** Lokale Commits, keine Weiterleitung an `origin/main` ohne Nikinger-Freigabe.
-
-**Minimax-/opencode-M3-Beobachtung (Nikinger-Auftrag, zur Kenntnisnahme, kein Code-Fix):**
-dies ist die erste Session, in der eine Eskalation von opencode/M3 zurück zu Claude Code nötig
-wurde — zwei vorangegangene opencode-Sessions konnten die zwei Chevron-/Border-Funde nur
-vormerken (je drei benannte Lösungsrichtungen, keine gebaut), obwohl beide eine im Code
-auffindbare, eindeutige Root Cause hatten (`.field .input`-Font-Override; generische
-`.input:focus`-Regel). Als Muster festgehalten (Memory + hier): opencode/M3 formuliert
-UI-Divergenz-Befunde zuverlässig in Optionen, geht aber nicht bis zur CSS-Spezifitäts-/
-Kaskaden-Root-Cause durch, wenn die Ursache nicht in der zuletzt geänderten Regel selbst,
-sondern in einer an anderer Stelle vorbestehenden Regel liegt (`font-size`-Override neun
-Blöcke entfernt, `:focus`-Shorthand-Regel aus einer früheren Phase). Vorschlag für eine
-spätere Phase (kein Auftrag): ein Skill/Plugin, das bei einem gemeldeten CSS-Visualdefekt
-automatisch `getComputedStyle`-Diffs zwischen den betroffenen Selektoren zieht, bevor
-Lösungsrichtungen formuliert werden — hätte hier vermutlich beide Root Causes in einem
-einzigen automatisierten Schritt offengelegt.
+- **Item-Link-Picker-Lücke unangetastet.** Trägt „Nikinger-Auftrag: nur vormerken, nicht
+  bauen" — kein Code, kein `editor.js`-Edit.
+- **Kein `deploy.sh`/`sudo`/`systemctl`-Kontakt.** Der Live-Dienst läuft weiterhin auf Block B
+  (`007b73d`); dieser Fix ist einer von jetzt 21 Commits seit dem letzten Release-Build, geht
+  erst mit dem nächsten, vom Nikinger ausgelösten `deploy.sh main` live.
+- **Kein Push.** Lokaler Commit, keine Weiterleitung an `origin/main`.
+- **Keine `.list__row`-Basis-Border-Umstellung** (siehe Begründung oben, Advisor-Fund vor dem
+  Bauen) — bewusst kein 1:1-Literalport des Rail-Button-Markups, nur der Fill wurde
+  übernommen.
 
 **Verbleibend für die nächste Session:**
 
-- **Nikinger-Sichtprüfung 3** (echtes Gerät) — jetzt inklusive der zwei Fixes dieser Session,
-  plus die Restfrage aus Vormerkung 3 Punkt 1 (Listenzeilen-Sheen vs. Rail-Button).
-- ~~**Deploy-Entscheidung beim Nikinger:** Passwort eingeben (Block B geht live, Block C/D
-  bleibt es weiterhin schuldig) oder den hängenden Prozess selbst abbrechen und später neu
-  fahren.~~ **[2026-09-02 ERLEDIGT]** Nikinger hat das Passwort eingegeben, Restart durch.
-  Neuer Dienst-PID (uptime bestätigt frisch), Health-Gate 3/3 grün (`/ui/login`→200,
-  `/api/v1/me`→401, `/mcp/`→401), `current` weiterhin auf `007b73d`. **Damit ist die
-  Diskrepanz aus dieser Session (Doku behauptet "live", Dienst lief noch auf A3) geschlossen
-  — Block B ist jetzt tatsächlich live**, nicht mehr nur gebaut+geplant. Retention hat dabei
-  `20260821T183341.270842Z` abgeräumt (KEEP=5, planmäßig). Block C/D (20 Commits seit
-  `007b73d`, inkl. der beiden Fixes + der Entscheidungsnotiz dieser Session) sind weiterhin
-  **nicht** live — ein zweiter `deploy.sh main` bleibt ein eigener, späterer Schritt.
+- **Nikinger-Sichtprüfung 3** (echtes Gerät) — Chevron-Fixes + Border-Fix (vorige Session) UND
+  jetzt der Listenzeilen-Fill (diese Session) sind alle bereit zur Begutachtung.
 - **Sichtprüfung 2** (D3) weiterhin am echten Gerät ausstehend.
-- **Step Z** (Phase-Closeout) unverändert wie im vorigen Block beschrieben — hängt weiterhin
-  an beiden Sichtprüfungen; der Block-B-Restart ist jetzt erledigt, kein offener Punkt mehr.
-
-**Nächster Schritt, konkret:** Sichtprüfung 3 (inkl. der zwei Fixes dieser Session + der
-Rail-Button-Entscheidung) und Sichtprüfung 2 am echten Gerät. Ein zweiter Deploy für Block C/D
-ist erst nach Step Z fällig, nicht vorher.
+- **Zweiter Deploy** für Block C/D (21 Commits seit `007b73d`) bleibt ein eigener, späterer,
+  vom Nikinger ausgelöster Schritt — nicht vor Step Z fällig.
+- **Item-Link-Picker-Fix** bleibt Vormerkung ohne Bauauftrag, siehe oben.
