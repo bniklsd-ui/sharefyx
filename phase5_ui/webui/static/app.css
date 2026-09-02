@@ -279,19 +279,24 @@ h3 { font-size: var(--fs-body); }   /* 16px -- Untertitel (vor C1: 15px, kleiner
 
 select.input {
   appearance: none;
-  /* rechts 28px freihalten fuer den Lucide-Chevron (12x12, 8px vom Rand), damit der Wert-Text
-     nicht unter den Chevron laeuft. */
-  padding-right: 28px;
+  /* rechts Platz fuer den Lucide-Chevron freihalten, damit der Wert-Text nicht unter den
+     Chevron laeuft. */
+  padding-right: 1.75em;
   /* Chevron-down: Lucide-Pfad m6 9 6 6 6-6 als Data-URL, Farbe = --text-faint (#A7B2BF, weniger
      prominent als der Wert-Text selbst -- "ich bin ein Auswahl", nicht "ich bin Inhalt").
-     12x12 px = 0.5em in der aktuellen Schrift -- bewusst klein, der Wert zaehlt, nicht der
-     Indikator. `background-repeat: no-repeat` + `right 8px center` positioniert ihn bündig rechts.
+     [2026-09-02, Vormerkung-3-Fund] Groesse/Position waren zuerst in px (12x12, 8px vom Rand)
+     fest verdrahtet -- an `#field-status` (`.field .input`, 13px Schrift) sass der Chevron
+     dadurch relativ zur (durch die kleinere Schrift kuerzeren) Select-Box groesser als am
+     Move-Dialog-Select (16px Schrift), das war der "Chevron nicht identisch"-Befund aus der
+     Sichtpruefung. Jetzt in `em`: 0.75em/0.75em Groesse, 0.5em vom Rand -- skaliert mit der
+     Schriftgroesse des jeweiligen Kontexts mit, das Verhaeltnis Chevron:Select-Hoehe bleibt
+     ueberall gleich. `background-repeat: no-repeat` positioniert ihn bündig rechts.
      Stroke-Width 2.5 (statt Lucide-Default 2) gibt ihm auf dem dunklen App-Grund mehr Gewicht,
      ohne fett zu wirken. */
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A7B2BF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
   background-repeat: no-repeat;
-  background-position: right 8px center;
-  background-size: 12px 12px;
+  background-position: right 0.5em center;
+  background-size: 0.75em 0.75em;
   /* [2026-08-16, Nikinger-Feedback] Optionsliste zeigte den nativen Browser-/OS-Akzentton
      (lila auf dieser Maschine) statt des einen App-Blaus -- app.css definiert selbst gar kein
      Lila, `accent-color` ist die einzige CSS-Eigenschaft, die native Formular-Steuerelemente
@@ -303,6 +308,18 @@ select.input:disabled {
      ohne Wert-Aenderung sichtbar ist. */
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237E8A98' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
   opacity: .6;
+}
+/* [2026-09-02, Vormerkung-3-Fund 2] `.input:focus` faerbt alle vier Raender auf --accent-line --
+   am <select> tritt der linke Rand dadurch in Konkurrenz zur C4-Auswahl-Sheen-Konvention
+   (ausgewaehlte Listenzeile = 3px-Akzentkante LINKS), der User liest den linken Fokus-Rand am
+   Move-Dialog-Select faelschlich als dieselbe "ausgewaehlt"-Semantik. Bewusst <select>-spezifisch
+   und nicht an `.input:focus` selbst geaendert -- `<input type="text/date">` braucht den vollen
+   Fokus-Rahmen fuer die Caret-Sichtbarkeit (Nikinger-Vorgabe). Nur rechts/unten auf Akzent, naeher
+   am Chevron-Affordance als am linken Rand. */
+select.input:focus {
+  border-color: var(--line-strong);
+  border-right-color: var(--accent-line);
+  border-bottom-color: var(--accent-line);
 }
 
 /* -- Layout (§4.3, 16:9 ab 1280px) ------------------------------------------------------ */

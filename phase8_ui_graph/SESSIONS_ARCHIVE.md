@@ -3,12 +3,151 @@ status: live
 purpose: Archiv älterer Session-Blöcke aus phase8_ui_graph/CLAUDE.md — newest-first, verbatim per Rotationsregel
 read-when: nur wenn der aktuelle Session-Block im Phase-Head nicht reicht und Verlauf gebraucht wird
 detail: L3
-updated: 2026-09-02 (C4+C5-Block nach Chevron-Vorbild-Session ins Archiv -- 23 Bloecke newest-first, Phase-8-Head jetzt mit Chevron-Vorbild-Block allein; Head 70.3KB->60.2KB, immer noch ueber 40KB-Softcap benannt -- Selection/Choice-Konvention-v3-Block + neuer Session-Block plus umfangreiche Vormerkung-1-ERLEDIGT-Erlaeuterung) | 2026-09-02 (D3-Block nach C4+C5-Session ins Archiv -- 22 Bloecke newest-first, Phase-8-Head jetzt mit C4+C5-Block allein; Head 50.8KB ueber 40KB-Softcap benannt -- Glas-Träger-Regeln + gruppierte Selektor-Liste am Dateiende plus ausführlicher Session-Block mit allen Verifikations-Belegen) | 2026-09-02 (D2-Block nach D3-Session ins Archiv -- 21 Bloecke newest-first, Phase-8-Head jetzt mit D3-Block allein) | 2026-09-02 (D1-Block nach D2-Session ins Archiv -- 20 Bloecke newest-first, Phase-8-Head jetzt mit D2-Block allein) | 2026-09-02 (C3-Block nach D1-Session ins Archiv -- 19 Bloecke newest-first, Phase-8-Head jetzt mit D1-Block allein; Head 41.8KB->45.1KB ueber Softcap benannt) | 2026-09-01 (Sichtpruefung-1-Block (vom Vortag) nach C3-Rotation ins Archiv gewandert -- jetzt 18 Bloecke newest-first; Phase-8-Head wieder unter dem 40KB-Softcap) | 2026-09-01 (zwölfte Rotation, 17 Blöcke)
+updated: 2026-09-02 (Chevron-Vorbild-Block nach Escalation-Session (Vormerkung-3-Fixes + Deploy-Fund) ins Archiv -- 24 Bloecke newest-first, Phase-8-Head jetzt mit Escalation-Block allein; Head 75.0KB->65.8KB, immer noch ueber 40KB-Softcap benannt) | 2026-09-02 (C4+C5-Block nach Chevron-Vorbild-Session ins Archiv -- 23 Bloecke newest-first, Phase-8-Head jetzt mit Chevron-Vorbild-Block allein; Head 70.3KB->60.2KB, immer noch ueber 40KB-Softcap benannt -- Selection/Choice-Konvention-v3-Block + neuer Session-Block plus umfangreiche Vormerkung-1-ERLEDIGT-Erlaeuterung) | 2026-09-02 (D3-Block nach C4+C5-Session ins Archiv -- 22 Bloecke newest-first, Phase-8-Head jetzt mit C4+C5-Block allein; Head 50.8KB ueber 40KB-Softcap benannt -- Glas-Träger-Regeln + gruppierte Selektor-Liste am Dateiende plus ausführlicher Session-Block mit allen Verifikations-Belegen) | 2026-09-02 (D2-Block nach D3-Session ins Archiv -- 21 Bloecke newest-first, Phase-8-Head jetzt mit D3-Block allein) | 2026-09-02 (D1-Block nach D2-Session ins Archiv -- 20 Bloecke newest-first, Phase-8-Head jetzt mit D2-Block allein) | 2026-09-02 (C3-Block nach D1-Session ins Archiv -- 19 Bloecke newest-first, Phase-8-Head jetzt mit D1-Block allein; Head 41.8KB->45.1KB ueber Softcap benannt) | 2026-09-01 (Sichtpruefung-1-Block (vom Vortag) nach C3-Rotation ins Archiv gewandert -- jetzt 18 Bloecke newest-first; Phase-8-Head wieder unter dem 40KB-Softcap) | 2026-09-01 (zwölfte Rotation, 17 Blöcke)
 up: CLAUDE.md
 updated: 2026-09-01 (zwoelfte Rotation: C2-Block ins Archiv nach Screenshots+README-Session -- Sichtpruefung 1 mit 9 Screenshots gegen Wegwerf-Instanz, README "Sneak Peak"-Sektion neu, docs/screenshots/ neu im INDEX, C2+Docs-Commit 0d97b3a gepusht; Head 37.7KB->33.6KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 103.8KB->114.0KB; keine Code-Aenderung ausserhalb webui/static + build_icon_sprite.py + vendor/, keine Service-Touch in dieser Sitzung) | 2026-09-01 (elfte Rotation: C1-Block ins Archiv nach C2-Session -- C2-Block (Lucide-Sprite, 18 Icons, build_icon_sprite.py, js/icons.js, .icon-CSS) ergaenzt, dann rotiert; Head 33.7KB->37.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 96.0KB->103.8KB; F9/F10/F11 aus C0 geschlossen; keine neue P1-Contract-Oeffnung; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (zehnte Rotation: C0-Block ins Archiv nach C1-Session -- C1-Block (Plex-Font-Swap + CSS-Typo-Tokens, 35 Findings aus C0 abgearbeitet fuer C1) ergaenzt, dann rotiert; Head 27.5KB->33.7KB immer noch unter Softcap, SESSIONS_ARCHIVE.md 89.3KB->96.0KB; C1-Commits 0281cce + 08bff55 im Head referenziert; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (neunte Rotation: Gate-B→C-Block ins Archiv nach C0-Session -- C0-Block ergaenzt, dann rotiert; Head 39.0KB->31.4KB wieder unter dem Softcap, SESSIONS_ARCHIVE.md 81.3KB->89.3KB; C0-Findings-Tabelle (35 Eintraege) lebt im Head; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (achte Rotation: B4-Block ins Archiv nach Gate-B→C-Verifikation -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf, pytest 958/958 gruen, Charakterisierung byte-identisch, Tabu-Diff leer; Head jetzt mit 14.8 KB unter dem Softcap, SESSIONS_ARCHIVE.md 76.9 KB; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z) | 2026-09-01 (siebte Rotation: fuenf Bloecke ins Archiv -- A3-Bau, Hard-Rule-9-Doku, Versions-Bump v2.2.3, A3-Drittprobe mit Restdefekt, B1 linkscan.py + Tests; Head jetzt 16.4 KB mit genau einem Block, 12 Bloecke im Archiv, Phase-8-Head wieder unter dem 40KB-Softcap; achte P1-Contract-Oeffnung bleibt ANGEKUENDIGT, geschlossen mit Phase-8-Step-Z)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8
+
+## Session stopped — 2026-09-02 (Auswahl-Chevron-Vorbild + Selection/Choice Konvention v3 — Vormerkung 1 vom 2026-09-01 erledigt)
+
+**Auftrag:** Nikinger-Auftrag zu Beginn: „Auswahl Button überarbeiten, Option vereinheitlichen,
+Vorbild initiales Design; Obsidian Übersicht ist WIP, aber nicht mehr in dieser Phase."
+Mapping auf den Stand: (a) Auswahl-Vorbild = `<select class="input">` mit Chevron aus dem
+Lucide-Sprite (Vormerkung 1 vom 2026-09-01); (b) Obsidian-Übersicht (D2) bleibt WIP
+wie vom Nikinger ausdrücklich bestätigt (Vormerkung 2 vom 2026-09-02), keine Änderung
+am `js/graph.js` oder am Graph-Panel in `app.css`/`app.html`. Plan-Reihenfolge ist
+0 → A → B → Gate → C → D → Z; der C4+C5-Block der vorherigen Session steht, Block C ist
+damit optisch-konsistent, Block D bleibt inhaltlich wie er ist.
+
+**Code-Änderung (eine Datei, +19/-1 Zeilen, 0 Tabu-Diff-Zeilen §0.4):**
+
+- `phase5_ui/webui/static/app.css` — **Auswahl-Chevron-Vorbild in `select.input`:**
+  - `appearance: none` war bereits gesetzt (aus dem Phase-7-Lila-Fund, `accent-color` auf
+    `var(--accent)` zwingt native Optionsliste auf App-Blau), aber **kein Chevron-Ersatz**.
+    Folge: alle sieben `<select class="input">`-Stellen renderten als Textboxen ohne
+    Auswahl-Indikator — ein „ich bin eine Auswahl"-Affordance fehlte im Vorbild.
+  - Neuer Lucide-Chevron-down als `background-image`-Data-URL: SVG-Pfad
+    `m6 9 6 6 6-6` (derselbe Pfad, den das Lucide-Sprite unter `#i-chevron-down` führt,
+    app.html:491), Stroke `var(--text-faint)` = `#A7B2BF` (leiser als der Wert-Text,
+    „ich bin ein Indikator", nicht „ich bin Inhalt"), 12×12 px (0,5em in 16-Pixel-Schrift,
+    bewusst klein), Stroke-Wwidth 2.5 (statt Lucide-Default 2 — etwas mehr Gewicht auf
+    dem dunklen App-Grund), Position `right 8px center`, `background-repeat: no-repeat`.
+  - `padding-right: 28px` (vorher 24 px) — Platz für den Chevron, damit der Wert-Text
+    nicht unter den Chevron läuft.
+  - `:disabled`-Variante: Chevron-Stroke in `--text-placeholder` = `#7E8A98`, plus
+    `opacity: .6` — eine deaktivierte Auswahl sieht aus wie eine deaktivierte Auswahl,
+    nicht wie ein Möchtegern-Auswahl mit versteckter Funktion.
+
+**Warum Data-URL statt `<svg><use>`:** die Data-URL kostet 0,5 KB in `app.css` und
+funktioniert auch dann, wenn das Lucide-Sprite noch nicht geladen ist (Race-Condition
+in einem `<details>`-Panel, das per Klick aufgeklappt wird); ein `<use href="#i-…">`
+im Markup würde genau dort verschwinden, wo man es braucht. Der Chevron ist visuell
+„eingerichtet" — er muss sich identisch verhalten, ob das Sprite schon da ist oder
+nicht.
+
+**Wegwerf + Smoke (Standing-Permission reproduziert):**
+
+- `phase8_ui_graph/scripts/wegwerf_setup_auswahl_chevron.py` neu (Port **18771**, File-
+  Keyring, User `alpha` direkt in `auth.sqlite3` provisioniert via `AuthStore.upsert_user` +
+  `set_totp` + `confirm_totp` — Standing-Permission-Muster aus C3/C4+C5 reproduziert).
+  Datenlage identisch zum C4+C5-Smoke: 5 eigene Items + 2 fremde = 7 Items über zwei
+  Spaces (`alpha`/`beta`), keine Folder.
+- `phase8_ui_graph/scripts/auswahl_chevron_playwright_smoke.py` neu (**9/9 grün**):
+  - **Step 1** — `select.input`-Regel enthält Lucide-Chevron-Pfad `m6 9 6 6 6-6` als
+    `data:image/svg+xml`-URL, `padding-right: 28px`, plus `select.input:disabled`-Regel
+    in `--text-placeholder`.
+  - **Step 2** — Login + Overview rendert (Sanity-Check für die Folge-Steps).
+  - **Step 3** — Item-Editor, `#field-status`: `computed background-image` =
+    `url("data:image/svg+xml…")` (Kopfdaten-Panel musste per Klick auf `<summary>`
+    aufgeklappt werden, weil `#field-status` in einem `<details>` mit Default `closed`
+    sitzt).
+  - **Step 4** — Anlegen-Dialog, `#create-type`: Chevron rendert (Anlege-Knopf nur in
+    eigenem Space sichtbar — Navigation auf `.tree__space:has-text('alpha')` vor dem
+    Klick nötig).
+  - **Step 5** — Anlegen-Dialog, `#new-folder-parent-select`: Chevron rendert.
+  - **Step 6** — Verschieben-Dialog, `#move-space-select`: Chevron rendert (Mehrfach-
+    auswahl via Strg+Klick auf erste Listenzeile, `dialogs.js` öffnet den Dialog mit
+    `writable: true`-Spaces).
+  - **Step 7** — Verschieben-Dialog, `#move-folder-select`: Chevron rendert.
+  - **Step 8** — Freigabe-Dialog, Per-Item-Share-Row: dynamisch erzeugte
+    `<select class="input">` rendert Chevron (Lucide-Sprite-Loader unabhängig — die
+    Data-URL hat den Vorteil bewiesen).
+  - **Step 9** — Space-Verwaltung, `#space-member-write-select`: statische Regel greift
+    auch ohne geöffneten Dialog (Selector im DOM von `app.html`).
+
+**Screenshots (zwei PNG, ~150 KB, unter `docs/screenshots/`):**
+
+- `auswahl_chevron_01_move_dialog.png` — Verschieben-Dialog geöffnet, beide Selects
+  (`#move-space-select` + `#move-folder-select`) mit sichtbarem Chevron-Down rechts, Wert-
+  Text links (`alpha` bzw. `(Space-Wurzel)`).
+- `auswahl_chevron_02_share_dialog.png` — Freigabe-Dialog geöffnet, Per-Item-Share-Row
+  mit `<select class="input">` für `beta` (lesen), Chevron rendert.
+
+**Verifikation — Selbstprüf-Checkliste §0.6 alle fünf Punkte grün:**
+
+1. `pytest -q` → **958/958 grün** (keine Python-Änderung, vorher/nachher identisch,
+   255 s).
+2. Tabu-Diff (`git diff --stat main -- phase4_auth/ phase2_mcp/ phase5_ui/webui/
+   security.py phase1_storage/storage/{models,frontmatter,files,patch,acl,history}.py`)
+   → **leer** (nur `app.css` + Smoke/Setup-Skripte + zwei Screenshots berührt).
+3. JS-Syntax: `node --check` auf `app.js`/`list.js`/`state.js`/`tree.js`/`dialogs.js`/
+   `editor.js`/`spaces.js` → **0 errors** (kein neuer JS-Code in dieser Session, nur
+   reines CSS).
+4. Doc-Update im selben Commit (Hard Rule 8) — `updated:`-Frontmatter +
+   Selection/Choice-Konvention v3 + Vormerkung-1-ERLEDIGT-Marker + dieser Session-
+   Block.
+5. `python phase5_ui/scripts/ui_budget.py` → **5/5 grün**, app.js+css+Font jetzt
+   **123.3 KB** (vorher 122.7 KB, +0.6 KB für die zwei `select.input`-Regeln + die
+   `:disabled`-Variante). Im Korridor (<250 KB). V84 weiterhin erfüllt.
+
+**Wegwerf abgebaut:** `kill -TERM $(cat serve.pid)` (PID-Datei-Muster, **kein** `pkill
+-f` mit Regex — Hard Rule 9 eingehalten); `rm -rf /tmp/opencode/sharefyx-wegwerf-
+auswahl-chevron/` im selben Zug. `curl http://127.0.0.1:8765/health` → `{"status":"ok",…}`
+(uptime linear wachsend, **kein Service-Touch durch diese Session**); `ps -ef` zeigt nur
+die `sharefyx-mcp.service`, Wegwerf-PID weg.
+
+**Was diese Session bewusst NICHT gemacht hat** (gegen Vormerkung 2 vom 2026-09-02):
+
+- **Listenzeilen-Sheen (C4) unverändert.** Die drei möglichen Richtungen aus
+  Vormerkung 2 (vereinheitlichen mit Rail-Button / vereinfachen / bewusst unterschiedlich
+  lassen) wurden nicht umgesetzt. Begründung: der C4-Sheen (3-px-Akzentkante +
+  1-px-Outline + Backdrop-Blur-Sheen) erfüllt N8 (Auswahl darf nicht allein von
+  Transparenz abhängen — sonst bei `prefers-reduced-transparency: reduce` unsichtbar);
+  eine Vereinheitlichung mit dem Rail-Button-Akzent-Gradient wäre außerdem eine
+  *Vermischung zweier Selection-Kategorien* (Choice vs. Navigation) — semantisch falsch.
+  Diese Entscheidung steht jetzt in der Selection/Choice Konvention v3 dokumentiert.
+- **Counter-Chip-Stil unverändert.** `.overview__space-count` ist Navigation (Klick
+  navigiert zur Bucket-Ansicht), kein Choice. Chevron-Vorbild passt hier nicht.
+- **Obsidian-Übersicht (D2) unverändert.** `js/graph.js` (542 Zeilen) und das Graph-
+  Panel in `app.css`/`app.html` bleiben wie sie sind — der Nikinger hat den WIP-Stand
+  am 2026-09-02 ausdrücklich bestätigt (Vormerkung 2 Punkt 2), keine Änderung gewünscht.
+
+**Verbleibend für die nächste Session:**
+
+- **Nikinger-Sichtprüfung 3 (echtes Gerät):** die C4-Glas-Akzente + C5-Editor-72ch +
+  **neu diese Session** das Chevron-Vorbild (Größe 12 vs. 14 px, Stroke-Wwidth 2.5
+  vs. Lucide-Default 2, `--text-faint` vs. `--text`) — die Feinwerte sind
+  Smoke-verifiziert, aber das Auge am Bildschirm entscheidet. `--glass-bg` Alpha
+  kann ebenfalls nachjustiert werden müssen (Background-Gradient im echten Browser
+  stärker als im Headless).
+- **Sichtprüfung 2 (D3 wartet ebenfalls noch am echten Gerät).**
+- **Step Z** (Phase-Closeout) — wenn beide Sichtprüfungen passen:
+  - `phase1_storage/CLAUDE.md` — achte P1-Contract-Öffnung als „geschlossen" markieren.
+  - `docs/concepts/phase8_ui_graph_plan.md` §9 — Closeout, Abnahmebilanz P8-1…P8-26,
+    die drei P7-Erbposten (P7-24 ✅ A1, remove-space ✅ A2, P7-4 🟡 A3 Restdefekt).
+  - Selection/Choice-Konvention v3 in die allgemeine Doku-Layer-Konvention überführen
+    oder als P9-Arbeitsanweisung weiterführen — **eine Nikinger-Entscheidung**, nicht
+    von opencode.
+  - `ROADMAP.md` Phase-8-Status auf ✅ oder 🟡 (Nikinger-Entscheidung).
+  - `docs/INDEX.md` Größenangaben nachziehen.
+  - `docs/UPDATE_LOG.md` neuer Eintrag am Deploy-Tag (P6-X-Gate).
+  - `deploy.sh main` durch den Nikinger.
+
+**Nächster Schritt, konkret:** Nikinger-Sichtprüfung 3 (echtes Gerät) für die
+C4/C5-Verbauungen + die Chevron-Akzente dieser Session. Wenn die Feinwerte passen,
+Step Z im selben Sitzungsblock.
 
 ## Session stopped — 2026-09-02 (Block C C4 + C5 gebaut — Liquid-Glas-Akzente, Auswahl-Sheen, Editor 72ch, Selection)
 

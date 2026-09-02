@@ -7,7 +7,7 @@ smoket gegen die Wegwerf-Instanz aus wegwerf_setup_auswahl_chevron.py
 
 Pruefungen:
   Step 1 -- CSS-Static: select.input-Regel hat background-image-Data-URL mit
-            Lucide-Chevron-down (Pfad "m6 9 6 6 6-6"), padding-right 28px,
+            Lucide-Chevron-down (Pfad "m6 9 6 6 6-6"), padding-right 1.75em,
             accent-color --accent, :disabled-Variante mit --text-placeholder.
   Step 2 -- Login + Overview rendert (Sanity).
   Step 3 -- Editor: #field-status hat computed background-image (nicht "none").
@@ -18,6 +18,17 @@ Pruefungen:
   Step 8 -- Freigabe-Dialog (geteiltes Item): Per-Item-Share-Row mit
             `<select class="input">` rendert background-image.
   Step 9 -- Space-Verwaltung: #space-member-write-select hat computed background-image.
+  Step 10 -- [2026-09-02, Vormerkung-3-Fix] Regressionscheck: computed
+             background-size (px) skaliert jetzt mit der Schriftgroesse --
+             das Verhaeltnis Chevron-Hoehe:Select-Hoehe ist zwischen
+             #field-status (13px-Kontext) und #move-space-select (16px-
+             Kontext) gleich (vorher: fixe 12px, dadurch am 13px-Feld
+             relativ groesser -- das war der "Chevron nicht identisch"-Fund).
+  Step 11 -- [2026-09-02, Vormerkung-3-Fix] #move-space-select:focus hat
+             einen ANDEREN border-left-color als border-right-color (nur
+             rechts/unten auf --accent-line, links bleibt --line-strong --
+             der linke Rand konkurriert nicht mehr mit der C4-Auswahl-
+             Sheen-Konvention, die "ausgewaehlt" links markiert).
 
   Plus Screenshot des Move-Dialogs mit sichtbarem Chevron (move_chevron.png).
 """
@@ -97,10 +108,10 @@ def main(argv: list[str] | None = None) -> int:
     for r in select_input_rules:
         print(f"    - {r[:200]}{'...' if len(r) > 200 else ''}")
     has_chevron = any("m6 9 6 6 6-6" in r and "data:image/svg+xml" in r for r in select_input_rules)
-    has_padding = any("padding-right: 28px" in r or "padding-right:28px" in r for r in select_input_rules)
+    has_padding = any("padding-right: 1.75em" in r or "padding-right:1.75em" in r for r in select_input_rules)
     has_disabled = any("select.input:disabled" in r for r in select_input_rules)
     _assert(has_chevron, "select.input-Regel enthaelt Lucide-Chevron-Pfad 'm6 9 6 6 6-6' als data-URL")
-    _assert(has_padding, "select.input-Regel setzt padding-right: 28px (Platz fuer Chevron)")
+    _assert(has_padding, "select.input-Regel setzt padding-right: 1.75em (skaliert mit Schriftgroesse)")
     _assert(has_disabled, "select.input:disabled-Regel vorhanden (Chevron-Muted-Variante)")
 
     # -- Login -------------------------------------------------------------------
@@ -229,9 +240,63 @@ def main(argv: list[str] | None = None) -> int:
     _assert(bg.startswith("url(") and "data:image/svg+xml" in bg,
             "#space-member-write-select rendert Chevron-Data-URL (statische Regel)")
 
+    # -- Step 10: Regressionscheck -- Chevron:Select-Hoehe-Verhaeltnis gleich -----
+    print("\nStep 10: Chevron-Groessenverhaeltnis #field-status vs. #move-space-select")
+    page.click("#close-button") if page.is_visible("#close-button") else None
+    page.goto(f"{BASE_URL}/ui/", wait_until="domcontentloaded")
+    page.click(".tree__space:has-text('alpha')")
+    page.wait_for_selector(".list__row", timeout=10000)
+    page.click(".list__row")
+    page.wait_for_selector("#detail-editor:not([hidden])", timeout=5000)
+    page.click("#meta-panel summary")
+    page.wait_for_selector("#field-status", state="visible", timeout=4000)
+    ratio_field = page.evaluate(
+        """() => {
+            const el = document.getElementById('field-status');
+            const cs = getComputedStyle(el);
+            const chevronPx = parseFloat(cs.backgroundSize.split(' ')[0]);
+            return chevronPx / el.getBoundingClientRect().height;
+        }"""
+    )
+    rows2 = page.locator(".list__row")
+    rows2.nth(0).click(modifiers=["Control"])
+    page.wait_for_selector("#list-selection:not([hidden])", timeout=4000)
+    page.click("#list-selection-move")
+    page.wait_for_selector("#move-dialog", state="visible", timeout=4000)
+    ratio_move = page.evaluate(
+        """() => {
+            const el = document.getElementById('move-space-select');
+            const cs = getComputedStyle(el);
+            const chevronPx = parseFloat(cs.backgroundSize.split(' ')[0]);
+            return chevronPx / el.getBoundingClientRect().height;
+        }"""
+    )
+    print(f"  chevron/select-height ratio: #field-status={ratio_field:.4f}  #move-space-select={ratio_move:.4f}")
+    _assert(
+        abs(ratio_field - ratio_move) < 0.02,
+        f"Chevron:Select-Hoehe-Verhaeltnis stimmt ueberein (Differenz {abs(ratio_field - ratio_move):.4f} < 0.02)",
+    )
+
+    # -- Step 11: Focus-Border nur rechts/unten auf Akzent -----------------------
+    print("\nStep 11: #move-space-select:focus -- linker Rand bleibt --line-strong")
+    page.focus("#move-space-select")
+    borders = page.evaluate(
+        """() => {
+            const el = document.getElementById('move-space-select');
+            const cs = getComputedStyle(el);
+            return {left: cs.borderLeftColor, right: cs.borderRightColor, bottom: cs.borderBottomColor};
+        }"""
+    )
+    print(f"  border colors while focused: {borders}")
+    _assert(borders["left"] != borders["right"], "border-left-color unterscheidet sich von border-right-color im Fokus")
+    _assert(borders["right"] == borders["bottom"], "border-right-color == border-bottom-color (beide auf --accent-line)")
+
+    page.click("#move-cancel")
+    page.wait_for_selector("#move-dialog", state="hidden", timeout=4000)
+
     browser.close()
     pw.stop()
-    print("\n9/9 ok -- Chevron-Vorbild gilt fuer alle `<select class=\"input\">`-Stellen.")
+    print("\n11/11 ok -- Chevron-Vorbild + Vormerkung-3-Fixes verifiziert.")
     return 0
 
 
