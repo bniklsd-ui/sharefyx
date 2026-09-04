@@ -338,14 +338,44 @@ own/shared/foreign, Liquid-Glass-Akzente mit Pflicht-Fallback — Version v3.0.
 **Status 🔄 (2026-09-01, Block A + B ✅ live-verifiziert, Gate B→C bestanden):**
 Plan `docs/concepts/phase8_ui_graph_plan.md` ausführungsreif, alle zwölf Nikinger-Fragen
 N1–N12 in §0.1 gelockt, Entscheidungen P8-A–P8-Q, Abnahmezeilen P8-1–P8-24, `[VERIFY]`
-V81–V92. Closeout wird §9 des Plans (P8-N: ein Dokument pro Phase, kein separates
-Handover). **Block A (A1 Reauth-Grant, A2 `remove-space`-Auto-Reindex, A3
-P7-4-Zweitprobe 🟡 mit benanntem Restdefekt Klammer/Aufzählung) + Block B
-(`storage/linkscan.py`, `item_links`-Tabelle, `GET /api/v1/graph`, `#item/`-
-Navigation, Link-Picker-Dialog) sind seit `main@007b73d` live, Release
-`20260901T103944.634877Z`. Gate B→C (2026-09-01) grün: 958/958 pytest, Charakterisierung
-byte-identisch, Tabu-Diff leer, `_graph_get` manuell 12/12, Playwright gegen
-Wegwerf 18/18. Nächster Schritt: Block C — Design-Fundament v3 (Plan §4).**
+  V81–V92. Closeout wird §9 des Plans (P8-N: ein Dokument pro Phase, kein separates
+  Handover). **Block A (A1 Reauth-Grant, A2 `remove-space`-Auto-Reindex, A3
+  P7-4-Zweitprobe 🟡 mit benanntem Restdefekt Klammer/Aufzählung) + Block B
+  (`storage/linkscan.py`, `item_links`-Tabelle, `GET /api/v1/graph`, `#item/`-
+  Navigation, Link-Picker-Dialog) sind seit `main@007b73d` live, Release
+  `20260901T103944.634877Z`. Gate B→C (2026-09-01) grün: 958/958 pytest, Charakterisierung
+  byte-identisch, Tabu-Diff leer, `_graph_get` manuell 12/12, Playwright gegen
+  Wegwerf 18/18. Nächster Schritt: Block C — Design-Fundament v3 (Plan §4).**
+
+---
+
+## Phase 8.5 — Link-Picker-Politur und v3-Release
+
+**Mission:** drei 🟡-Restdefekte aus Phase-8-Closeout §9.4.1–§9.4.3 schließen, einen vollständigen
+v3-Vorabritt über den nie ausgelieferten v3-Build fahren und ihn live deployen — diese Phase
+**schließt Phase 8 formal mit ab** (N6, Präzedenz P7 Step A8 für Phase 6.5). **Wichtige
+Korrektur zum Live-Stand:** v3.0 ist **nicht** ausgeliefert — `/opt/sharefyx/current` zeigt auf
+`007b73d` (Block B), Badge `v2.2.3`; Block C (Design v3) und Block D (Graph, tabellose Übersicht)
+liegen nur im Repo. Deshalb ist ein voller 13-Stationen-Vorabritt gegen eine Wegwerf-Instanz vor
+dem Deploy Teil dieser Phase (N5), nicht nur die drei Fixes.
+
+- **DRIN:** Picker-Modus-Umschalter „Text-Link / Kante" mit `localStorage`-Persistenz
+  (P8.5-§2 A1); Tastaturnavigation über `aria-activedescendant`-Muster (P8.5-§2 A2); Hint
+  `_TITLE_NOT_ID_HINT` generalisierend geschärft mit verbindlicher Abbruchregel (P8.5-§3 B1);
+  v3-Vorabritt gegen Wegwerf-Instanz mit 13 Stationen (P8.5-§4 C); Deploy `v3.0` → `v3.0.1`
+  als **Nikinger-Aktion** (P8.5-§5 D2, Hard Rule 9); Phase-8-Closeout-Nachtrag
+  (`phase8_ui_graph_plan.md` §9).
+- **DRAUSSEN:** Phase-8-§9.4.6-Funde (Settle-Zeit / Foreign-Farbe / Knotenklick — bereits am
+  2026-09-02 geschlossen), Phase-8-§9.4.7 Glyph-Entscheidung ✅/🟡 (Nikinger-Sache nach
+  Live-Deploy + Sichtprüfung), geerbtes Phase-6/6.5/7-Ledger (`phase8_ui_graph_plan.md` §9.4.5),
+  FastMCP-4/V79 (eigene Mini-Phase, P5-C), `_trash/`-Räumung, Funnel-Watchdog, Mobile/Realtime,
+  Light-Mode, Phase-8.5-Übersichtsgrafik (P8.5-S).
+
+**Plan:** `docs/concepts/phase8_5_picker_release_plan.md` (744 Zeilen, geschrieben 2026-09-03
+gegen `main@6272cad`). N1–N7 in §0.1 gelockt, Entscheidungen P8.5-A–P8.5-T, Steps 0/A/B/C/D/Z,
+Abnahmezeilen P8.5-1–P8.5-20, `[VERIFY]` V95–V105. Closeout wird §9 des Plans. **Step 0
+abgeschlossen** (Haushalt-Funde, Skelett, Größenkorrekturen); **nächster Schritt:** A1
+(Picker-Modus-Umschalter).
 
 ---
 

@@ -119,15 +119,25 @@ Frontmatter (Vormerkung), A11y `aria-selected` im Link-Picker nie per JS gesetzt
 
 ### Bilanz (Stand 2026-09-02, vor Step-Z-Deploy)
 
-**15 ✅ · 10 🟡 · 0 ⬜** von 26 Zeilen. **[2026-09-02 Korrektur]** stand hier noch auf
-„9 🟡 · 2 ⬜" — widersprach der eigenen Aufzählung zwei Zeilen darunter (die schon zehn 🟡-Posten
-nennt und „keine mehr" bei ⬜ sagt); Drift aus der Step-Z-Vorstufen-Session, hier korrigiert,
-kein Glyphen-Sprung dieser Session (siehe unten, Fixes A/B/C ändern 🟡-Belege, keine Status).
+**14 ✅ · 12 🟡 · 0 ⬜** von 26 Zeilen — maschinell gezählt, siehe Prüfkommando am Ende dieser
+Sektion. **[2026-09-03 Korrektur, P8.5 Step 0.4]:** die Zeile trug seit dem 2026-09-02-Block
+„15 ✅ · 10 🟡 · 0 ⬜", real sind es **14 ✅ · 12 🟡** — der Zähler ist zum dritten Mal
+gedriftet (zwei Mal am 2026-09-02 korrigiert). Statt ihn weiter mit der Hand zu pflegen,
+wird er ab jetzt **abgeleitet**:
 
-- **15 ✅:** P8-1, P8-2, P8-3, P8-4 (Block A); P8-6, P8-7 (Block B Indexseite); P8-9,
+```
+awk '/^\| P8-[0-9]+ /{ if (/\| ✅ \|/) g++; else if (/\| 🟡 \|/) y++; else if (/\| ⬜ \|/) o++; n++ } \
+  END {printf "Zeilen=%d ✅=%d 🟡=%d ⬜=%d\n", n, g, y, o}' phase8_ui_graph/CLAUDE.md
+```
+
+Ausgaben dieses Kommandos (zuletzt 2026-09-03): `Zeilen=26 ✅=14 🟡=12 ⬜=0`. Die Aufzählung
+unten bleibt **als Beleg** stehen, was wo zählt — beim nächsten Schreibvorgang ist sie gegen
+das Kommando abzugleichen.
+
+- **14 ✅:** P8-1, P8-2, P8-3, P8-4 (Block A); P8-6, P8-7 (Block B Indexseite); P8-9,
   P8-10 (Block B UI); P8-11, P8-12, P8-13 (Block B/C Constraints); P8-17 (Budget-Test);
   P8-25 (C0-Audit); P8-26 (Smoke-Fundament).
-- **10 🟡:** P8-5 (A3 Restdefekt), P8-8 (B3 Zweitnutzer-Pass-Through fehlt),
+- **12 🟡:** P8-5 (A3 Restdefekt), P8-8 (B3 Zweitnutzer-Pass-Through fehlt),
   P8-14/15/16 (C1–C5 Sichtprüfungen am echten Gerät, P8-15 Fix B throwaway-verifiziert),
   P8-18/19 (D1 Sichtprüfung 2), P8-20/21 (D2 Fix C throwaway-verifiziert, Drag/Zoom/Pan weiter
   ohne Browser-Assertion), P8-22 (Fix A throwaway-verifiziert, 5/5, ~2.7 s statt 5.95 s),
@@ -437,11 +447,14 @@ Drei Mechanismen existieren nebeneinander und werden leicht verwechselt:
 
 1. **🔗-Symbol in der Formatierleiste** (`editor.js` `TOOLBAR_ACTIONS.link`) — blinder
    Markdown-Schnipsel `[Linktext](Ziel-URL)` an der Cursor-Position, kennt keine Items.
-2. **Link-Picker-Knopf** (Büroklammer-Symbol im Kopfdaten-Panel, `editor.js:88-100
+2. **Link-Picker-Knopf** (Lupen-Symbol im Kopfdaten-Panel, `editor.js:88-100
    _appendLinkId`, Phase 8 Block B Step B4) — öffnet eine Item-Suche, hängt die gewählte
    `itm_…`-ID an das **Frontmatter-Feld `links:`** an (Komma-Konvention). Dient
    ausschließlich dem Verknüpfungs-Graphen (`linkscan.py` liest dieses Feld für
    Graph-Kanten) — wird **nirgends als Text oder Link gerendert**.
+   **[2026-09-03 Korrektur, P8.5 Step 0.3]:** Stand vorher „Büroklammer-Symbol", `app.html:183`
+   rendert aber `<use href="#i-search">` (`#i-search` aus dem Lucide-Sprite, eingeführt in
+   Phase 8 Block C2). `docs/UPDATE_LOG.md` (2026-09-01) sagt bereits korrekt „Lupe".
 3. **Echter klickbarer Link im Body:** `[Text](#item/itm_xxxxxxxx)`, von Hand getippt.
    Erst `markdownToHtml`/`safeHref` (`markdown.js`) rendert das in der Vorschau zu einem
    echten `<a href="#item/itm_...">`; `app.js:107-115` hat die Klick-Delegation, die dann

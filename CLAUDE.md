@@ -7,8 +7,8 @@ up: docs/INDEX.md
 down:
   - ROADMAP.md                          # Phasenplan + Status je Phase
   - docs/INDEX.md                       # L0-Karte aller .md
-  - phase8_ui_graph/CLAUDE.md           # aktive Phase
-updated: 2026-09-01 (Phase 8 Sichtprüfung 1: 9 Screenshots gegen Wegwerf-Instanz + README Sneak-Peak-Sektion + C2+Docs-Commit `0d97b3a` gepusht; phase8_ui_graph/CLAUDE.md Head 37.7KB->33.6KB wieder unter Softcap, SESSIONS_ARCHIVE.md 103.8KB->114.0KB; docs/screenshots/ neu im INDEX; kein Code ausserhalb webui/static + build_icon_sprite.py + vendor/, kein Service-Touch, Produktion weiterhin active) | 2026-09-01 (Phase 8 Gate B→C bestanden -- Current-state-Absatz erweitert, Phase-8-Head rotiert, Block C als nächster Schritt markiert; kein Code, kein Service-Touch in dieser Sitzung) | 2026-09-01 (Hard Rule 9 ergänzt — kein pkill -f mit Regex, niemals den systemd-Dienst anfassen; Lehre aus dem Prod-Vorfall 2026-09-01, Phase 8 Step A3 Nachbereitung) | 2026-08-23 (Phase 7 Step 0: down: auf phase7_spaces_admin/CLAUDE.md umgestellt, stale d348e2e-Deploy-Behauptung im Current-state-Absatz korrigiert) | 2026-08-09 (Phase 6 🔄 gestartet — Hard Rule 4 neu gefasst (P6-U), Current state umgestellt)
+  - phase8_5_picker_release/CLAUDE.md   # aktive Phase (Phase 8.5, schließt Phase 8 mit ab)
+updated: 2026-09-03 (Phase 8.5 Step 0 abgeschlossen -- Skelett phase8_5_picker_release/{CLAUDE.md, SESSIONS_ARCHIVE.md, scripts/} angelegt, vier §1-Funde abgearbeitet: docs/INDEX.md 52.911 B -> 40.917 B (-23%, 43 B unter 40 KB-Softcap) durch Kürzung updated: auf 5 neueste Eintraege + Schlusszeile + kompakte Ausnahmenliste (Fund 2) im Wartungsblock, Doku/Code-Drift "Bueroklammer" -> "Lupe" in phase8_ui_graph/CLAUDE.md:440 mit Korrekturnotiz, Phase-8-Abnahmebilanz 15/10/0 -> 14/12/0 maschinell korrigiert + awk-Kommando im Phase-8-Head verankert; ROADMAP-Abschnitt "Phase 8.5" neu, Wurzel-CLAUDE.md down: phase8_ui_graph -> phase8_5_picker_release, drei INDEX-Zeilen unter "Phase 8.5 --"; 959/959 pytest unveraendert (kein Python-Touch), Tabu-Diff §0.3 leer, kein Service-Touch, PID 195922 uptime linear wachsend -- nur gelesen) | 2026-09-03 (Phase 8.5 geplant -- docs/concepts/phase8_5_picker_release_plan.md neu, Current-state-Absatz oben ergänzt; Live-Stand-Korrektur festgehalten: v3.0 ist NICHT ausgeliefert, /opt/sharefyx/current -> 007b73d/v2.2.3; down: bleibt vorerst auf phase8_ui_graph, die Umstellung auf phase8_5_picker_release/CLAUDE.md macht Step 0 beim Anlegen des Skeletts; kein Code, kein Service-Touch) | 2026-09-01 (Phase 8 Sichtprüfung 1: 9 Screenshots gegen Wegwerf-Instanz + README Sneak-Peak-Sektion + C2+Docs-Commit `0d97b3a` gepusht; phase8_ui_graph/CLAUDE.md Head 37.7KB->33.6KB wieder unter Softcap, SESSIONS_ARCHIVE.md 103.8KB->114.0KB; docs/screenshots/ neu im INDEX; kein Code ausserhalb webui/static + build_icon_sprite.py + vendor/, kein Service-Touch, Produktion weiterhin active) | 2026-09-01 (Phase 8 Gate B→C bestanden -- Current-state-Absatz erweitert, Phase-8-Head rotiert, Block C als nächster Schritt markiert; kein Code, kein Service-Touch in dieser Sitzung) | 2026-09-01 (Hard Rule 9 ergänzt — kein pkill -f mit Regex, niemals den systemd-Dienst anfassen; Lehre aus dem Prod-Vorfall 2026-09-01, Phase 8 Step A3 Nachbereitung) | 2026-08-23 (Phase 7 Step 0: down: auf phase7_spaces_admin/CLAUDE.md umgestellt, stale d348e2e-Deploy-Behauptung im Current-state-Absatz korrigiert) | 2026-08-09 (Phase 6 🔄 gestartet — Hard Rule 4 neu gefasst (P6-U), Current state umgestellt)
 ---
 # CLAUDE.md — Project Instructions
 
@@ -157,6 +157,39 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 ---
 
 ## Current state
+
+**[2026-09-03] Phase 8.5 geplant — ⬜ nicht gestartet.** Link-Picker-Politur, Titel-statt-ID-Hint,
+v3-Vorabritt und Deploy (`phase8_5_picker_release/`, kein eigenes Python-Paket). Plan:
+`docs/concepts/phase8_5_picker_release_plan.md` (N1–N7 gelockt, P8.5-A–P8.5-T, Abnahme
+P8.5-1–P8.5-20, `[VERIFY]` V95–V105). Schließt die drei Restdefekte aus
+`phase8_ui_graph_plan.md` §9.4.1–§9.4.3 und **beendet Phase 8 formal mit** (N6, Präzedenz
+P7 Step A8 für Phase 6.5) — deshalb 8.5 und nicht 9. **Wichtige Korrektur zum Live-Stand:**
+v3.0 ist **nicht** ausgeliefert — `/opt/sharefyx/current` zeigt auf `007b73d` (Block B),
+Badge `v2.2.3`; Block C (Design v3) und Block D (Graph, tabellose Übersicht) liegen nur im
+Repo. Deshalb ist ein **voller 13-Stationen-Vorabritt gegen eine Wegwerf-Instanz vor dem
+Deploy** Teil dieser Phase (N5), nicht nur die drei Fixes. Kernbefund der Planung, im Code
+verifiziert: ein Body-Link `[Titel](#item/itm_…)` ist bereits eine Graph-Kante
+(`storage/linkscan.py`) — der Picker bekommt deshalb einen **Modus-Umschalter** statt eines
+Kombi-Klicks. **Ausführung wieder opencode/M3 ohne Advisor** (N4), mit neuer
+Eskalationsregel: Kaskaden-Ursachen gehen an Claude Code (Lehre vom 2026-09-02).
+
+**[2026-09-03] Phase 8.5 — 🔄 Step 0 abgeschlossen, ⬜ A1 noch nicht angefangen.** Skelett
+angelegt (`phase8_5_picker_release/{CLAUDE.md, SESSIONS_ARCHIVE.md, scripts/}` mit L1-Cards,
+Modul-Status-Tabelle für Step 0/A/B/C/D/Z, Abnahmematrix nach §7-Muster, leerer
+`## Session stopped`-Block), die vier vom Plan §1 benannten Funde abgearbeitet:
+`docs/INDEX.md` 52.911 B → 40.917 B (Kürzung `updated:` auf die 5 neuesten Einträge +
+Schlusszeile „ältere Einträge: phase*/SESSIONS_ARCHIVE.md", jetzt 43 B unter dem eigenen
+40 KB-Softcap, Ausnahmenliste kompakt gehalten wegen der Mehrbelastung), vier card-lose
+`.md` als korrekte Ausnahmen dokumentiert (Harness, Test-Fixtures, maschinell geparst,
+Vendor/Lizenz), Doku/Code-Drift „Büroklammer" → „Lupe" in
+`phase8_ui_graph/CLAUDE.md:440` mit datierter Korrekturnotiz, Phase-8-Abnahmebilanz
+**15/10/0 → 14/12/0** maschinell korrigiert und awk-Kommando im Phase-8-Head Bilanz-Abschnitt
+verankert (zählmaschinell nachprüfbar, statt weiterer Drift). ROADMAP-Abschnitt „Phase 8.5",
+Wurzel-CLAUDE.md-`down:` auf `phase8_5_picker_release/CLAUDE.md` umgestellt, drei INDEX-Zeilen
+unter „Phase 8.5 — 🔄 …" — alles im selben Commit (Hard Rule 8). **`pytest` unverändert
+959/959 grün** (kein Python-Touch in dieser Session), Tabu-Diff §0.3 leer, kein Service-Touch
+(PID 195922, ActiveEnterTimestamp 2026-09-02 11:51:57 CEST — nur gelesen). Nächster Schritt:
+Block A / A1 (Picker-Modus-Umschalter).
 
 **[2026-09-01] Phase 8 — 🔄 Block A + B ✅ live-verifiziert, Gate B→C bestanden.** UI-Neuanstrich v3,
 Verknüpfungs-Graph (`GET /api/v1/graph` + `item_links`-Tabelle + `linkscan.py` + UI-Wiring), drei
