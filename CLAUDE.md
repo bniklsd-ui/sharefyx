@@ -8,7 +8,7 @@ down:
   - ROADMAP.md                          # Phasenplan + Status je Phase
   - docs/INDEX.md                       # L0-Karte aller .md
   - phase8_5_picker_release/CLAUDE.md   # aktive Phase (Phase 8.5, schließt Phase 8 mit ab)
-updated: 2026-09-03 (Phase 8.5 Step 0 abgeschlossen -- Skelett phase8_5_picker_release/{CLAUDE.md, SESSIONS_ARCHIVE.md, scripts/} angelegt, vier §1-Funde abgearbeitet: docs/INDEX.md 52.911 B -> 40.917 B (-23%, 43 B unter 40 KB-Softcap) durch Kürzung updated: auf 5 neueste Eintraege + Schlusszeile + kompakte Ausnahmenliste (Fund 2) im Wartungsblock, Doku/Code-Drift "Bueroklammer" -> "Lupe" in phase8_ui_graph/CLAUDE.md:440 mit Korrekturnotiz, Phase-8-Abnahmebilanz 15/10/0 -> 14/12/0 maschinell korrigiert + awk-Kommando im Phase-8-Head verankert; ROADMAP-Abschnitt "Phase 8.5" neu, Wurzel-CLAUDE.md down: phase8_ui_graph -> phase8_5_picker_release, drei INDEX-Zeilen unter "Phase 8.5 --"; 959/959 pytest unveraendert (kein Python-Touch), Tabu-Diff §0.3 leer, kein Service-Touch, PID 195922 uptime linear wachsend -- nur gelesen) | 2026-09-03 (Phase 8.5 geplant -- docs/concepts/phase8_5_picker_release_plan.md neu, Current-state-Absatz oben ergänzt; Live-Stand-Korrektur festgehalten: v3.0 ist NICHT ausgeliefert, /opt/sharefyx/current -> 007b73d/v2.2.3; down: bleibt vorerst auf phase8_ui_graph, die Umstellung auf phase8_5_picker_release/CLAUDE.md macht Step 0 beim Anlegen des Skeletts; kein Code, kein Service-Touch) | 2026-09-01 (Phase 8 Sichtprüfung 1: 9 Screenshots gegen Wegwerf-Instanz + README Sneak-Peak-Sektion + C2+Docs-Commit `0d97b3a` gepusht; phase8_ui_graph/CLAUDE.md Head 37.7KB->33.6KB wieder unter Softcap, SESSIONS_ARCHIVE.md 103.8KB->114.0KB; docs/screenshots/ neu im INDEX; kein Code ausserhalb webui/static + build_icon_sprite.py + vendor/, kein Service-Touch, Produktion weiterhin active) | 2026-09-01 (Phase 8 Gate B→C bestanden -- Current-state-Absatz erweitert, Phase-8-Head rotiert, Block C als nächster Schritt markiert; kein Code, kein Service-Touch in dieser Sitzung) | 2026-09-01 (Hard Rule 9 ergänzt — kein pkill -f mit Regex, niemals den systemd-Dienst anfassen; Lehre aus dem Prod-Vorfall 2026-09-01, Phase 8 Step A3 Nachbereitung) | 2026-08-23 (Phase 7 Step 0: down: auf phase7_spaces_admin/CLAUDE.md umgestellt, stale d348e2e-Deploy-Behauptung im Current-state-Absatz korrigiert) | 2026-08-09 (Phase 6 🔄 gestartet — Hard Rule 4 neu gefasst (P6-U), Current state umgestellt)
+updated: 2026-09-04 (Wurzel-CLAUDE.md komprimiert -- Phase-6-Verlaufsdokumentation + Phase-6/6.5-Vormerkungen + Funnel-Reboot + MCP-Werkzeug-Ergonomie + End-Korrekturen P5/P4 auf Pointer-Form gestaucht; ~5 KB freigemacht, aktueller Stand ~39.7 KB unter Cap; Phase-8.5-Work-Abschnitt aktualisiert auf A1+A2, A1-Block rotiert nach Archiv) | 2026-09-04 (Phase 8.5 A2 committet `7ce0be0` -- Tastaturnavigation `aria-activedescendant` + `_pickLinkPickerAt` + CSS-Block-Entdopplung am Picker; +3 statische Tests in `test_static_routes.py`; A1-Block nach `SESSIONS_ARCHIVE.md` rotiert) | 2026-09-04 (Phase 8.5 Drift nachgezogen `4424310` + A1 committet `499d9be` -- Picker-Modus-Umschalter + `localStorage` `sfx:linkpicker:mode`; V99 `session` zu `local` als Eskalation wegen P8.5-G; erste `localStorage`-Nutzung des Projekts) | 2026-09-03 (Phase 8.5 Step 0 -- Skelett phase8_5_picker_release/{CLAUDE.md, SESSIONS_ARCHIVE.md, scripts/} angelegt; vier Paragraph-1-Funde: INDEX 52.911 zu 40.917 B unter Cap, Bueroklammer-zu-Lupe-Drift in phase8_ui_graph/CLAUDE.md:440, Phase-8-Bilanz korrigiert; ROADMAP-Abschnitt neu; Wurzel-`down:` umgestellt) | 2026-09-01 (Phase 8 Sichtpruefung 1 + Gate B zu C bestanden; **Hard Rule 9 ergaenzt** -- kein `pkill -f` mit Regex, niemals den systemd-Dienst anfassen, Lehre aus dem Prod-Vorfall 2026-09-01 Phase 8 Step A3 Nachbereitung) | aeltere Eintraegge: die jeweilige phase*/SESSIONS_ARCHIVE.md
 ---
 # CLAUDE.md — Project Instructions
 
@@ -333,68 +333,29 @@ existiert (blockiert P6.5-12). Übersichtsgrafik: `docs/concepts/phase6_shares_u
 Verlaufsdokumentation stehen.
 
 **Phase 6 — Freigaben, Ordner, Werkzeug-Ergonomie** (`phase6_shares/`, kein
-eigenes Python-Paket) — **🔄 gestartet, 2026-08-09.** Ausführungsreifer Plan lag bereits vor
-(`docs/concepts/phase6_shares_plan.md`, Entscheidungen P6-A–P6-AC, Steps 0–10, drei Blöcke: A =
-Werkzeuge/Betrieb/Update-Banner, B = Dateisystem, C = Bilder, hartes Gate zwischen A und B).
-Herkunft/offene Entscheidungen: `docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` §4.1–§4.6. Phase-Head:
-`phase6_shares/CLAUDE.md`. Step 0 ✅, Step 1 ✅ (`patch_item`, Quittungen statt Volltext), Step 2
-✅ **gebaut** (O2 geschlossen, `ua`-Feld, **V42 geschlossen 2026-08-12** — `ua` unterscheidet
-nicht zwischen Claude-Oberflächen, `diagnose.sh`/`ui_budget.py`-Ergänzungen), Step 3 ✅
-**gebaut, Live-Teile beim Nikinger** (Update-Log und
-Banner — Schema 3, `webui/updates.py`, `deploy.sh`-Gate). **Block A (Steps 0–3) damit
-vollständig gebaut.** **GATE A→B: 3 von 4 Punkten live bestanden** (patch_item, Banner + Fabians
-Bestätigung) — nur noch Punkt 3 offen (Purge-Zeilenrückgang, frühestens 2026-08-28), per
-Nikinger-Entscheidung vor Gate-Abschluss mitgetragen, nicht blockierend für Block B. Block B:
-Step 4 (Storage-Fundament — `storage/acl.py`, `folder`/`visibility`/`share_*`) ✅ **gebaut**,
-Step 5 (Rechtepolitik — `SharePolicy`/`Surface` ersetzt `OwnSpaceWritable`, item-level ACL in
-`mcpserver/tools.py`/`webui/api.py`) ✅ **gebaut** (2026-08-12), Step 6 (Verwaltung/Migration —
-`spacectl.py`, `migrate_visibility.py`, `diagnose.sh` Prüfung 12) ✅ **gebaut** (2026-08-12).
-**[2026-08-13] Steps 4–6 live deployed** (`main`@`d068d1c`, Nikinger-Entscheidung „power right
-through the deployment", Sudo-Neustart durch ihn) — Cutover auf die neue `SharePolicy` vollzogen,
-vorher `niklas`↔`fabian` gegenseitiges Lesen per `.share.yml` gesichert (sonst hätte der Cutover
-genau das stillschweigend entzogen). Live-Verifikation **eine Richtung bestätigt** (niklas liest
-fabian über den echten Connector, `<untrusted_content>`-Wrapping hält), **fabian→niklas offen**.
-Neuer Shared Space `IT-Sekus-Projekt` angelegt (beide Principals `--write`, für Nutzung/Testing).
-**Ein UI-Fund, zwei Teile:** `IT-Sekus-Projekt` zeigte sich in der Weboberfläche als „nur lesen"
-trotz `writable:true`. Teil 1 (Space-Liste liefert kein `writable`-Feld) ist **deployed und live
-bestätigt weg** — Badge korrekt. Teil 2, vom Nikinger direkt danach gemeldet: **innerhalb** des
-Spaces stand weiterhin „nur lesen", der Anlegen-Knopf blieb versteckt — eine zweite, unabhängige
-Stelle in `app.js` (`ownSpaceActive()`, acht Aufrufstellen) fragte weiterhin „eigener Space?"
-statt „schreibbar?". Behoben (`activeSpaceWritable()` ersetzt alle acht Stellen). **[2026-08-13
-Nachtrag] deployed und live bestätigt** — Release `20260813T120925.743482Z` (`main`@`92b918b`),
-vom Nikinger per manuellem UI-Test im Browser validiert. **Damit sind beide Teile des UI-Funds
-geschlossen.** Details: `phase6_shares/CLAUDE.md`s Session-Block vom selben Tag.
+eigenes Python-Paket) — **offen/Kompakt:** Phase 6 abgeschlossen als `phase6_shares/CLAUDE.md`.
+Verlaufsdokumentation zweier Blöcke (Block A Werkzeuge/Betrieb/Update-Banner, Block B
+Dateisystem mit SharePolicy-Cutover; Block C Bilder nach 6.5 ausgewandert) ist dort —
+Steps 0–3 (patch_item, ua-Feld, Update-Log-Banner) gebaut, Steps 4–6 (Storage-Fundament +
+Rechtepolitik + Verwaltung) 2026-08-13 live deployed (`main`@`d068d1c`), IT-Sekus-UI-Fund
+(writable-Badge + acht `ownSpaceActive()` zu `activeSpaceWritable()`) geschlossen,
+Closeout-Handover `docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md` mit 12-von-39-Live-Bilanz.
+**Hard Rule 8:** Phase-6-/6.5-/7-Block-Detailnarrative werden hier nicht mehr dupliziert —
+maßgebliche Quelle: die jeweilige `phase*/CLAUDE.md`.
 
-**[2026-08-18] Deploy-Blocker, Nikinger-Entscheidung, noch offen:** ein sophistizierter E2E-Lauf
-gegen eine Wegwerf-Instanz fand einen echten UI-Fund — es gibt keinen „über alle lesbaren Items
-hinweg suchen"-Modus, ein Item mit ausschließlich item-level `share_write`/`share_read` (kein
-space-level Grant) ist über die Web-UI unauffindbar, nur über den MCP-Connector erreichbar. Vom
-Nikinger als echter Bug eingestuft, **muss vor dem nächsten Deploy geplant und behoben werden**.
-**[2026-08-19 Nachtrag] Geplant UND gebaut, noch nicht deployt/committet:**
-`phase6_shares/GLOBAL_SEARCH_PLAN.md` (Entscheidungen **P6-AO–P6-AT**, Abnahmezeilen 35–39).
-Kernbefund der Planung, im Code verifiziert: `GET /api/v1/items` **ohne** `space`-Parameter ist
-bereits die globale, item-weise ACL-gefilterte Suche (`webui/api.py :: _items_get` →
-`can_read_item_as_human`) — es fehlt ausschließlich die UI-Fläche, kein neuer Endpunkt. **Q1
-(Suchreichweite) vom Nikinger entschieden:** nur Titel/Tags, keine Body-Volltextsuche in diesem
-Schnitt — offene, dokumentierte Lücke, kein stilles Schließen. Steps G1–G2 gebaut
-(`serializers.py`/`api.py`/`state.js`/`tree.js`/`list.js`/`app.css`), 7 neue Tests, `pytest`
-765→772 grün, Tabu-Diff leer. Zusätzlich Playwright-verifiziert gegen eine Wegwerf-Instanz
-(10/10 grün, Pflichtfall aus Zeile 28 nachgestellt) — ein Advisor-Fund dabei entdeckt und noch
-vor dem Commit behoben: `editor.js :: clearDetail()` (Home-Button) setzte `state.scope` nicht
-zurück, ließ den Anlegen-Knopf nach „Alle Items" → Home fälschlich ausgehängt. **[2026-08-19,
-committet]** `main`@`d348e2e`. **[2026-08-23 Korrektur, P7 Step-0-Audit]** live deployt seit
-`main`@`f96125e` (`git merge-base --is-ancestor d348e2e f96125e`) — diese Zeile hatte die
-Korrektur, die `phase6_shares/CLAUDE.md` bereits am 2026-08-23 bekam, selbst nie erhalten.
-Details: `phase6_shares/CLAUDE.md`s aktuellem Session-Block.
-
-**[2026-08-19, MUSS-VOR-DEM-NÄCHSTEN-DEPLOY] Funnel überlebte den Reboot nicht sauber:** nach
-dem Reboot dieser Session war Sharefyx von einem echten Gerät ohne VPN/Tailscale aus
-unerreichbar (`NS_ERROR_CONNECTION_REFUSED`), obwohl Dienst, lokales `/health` und `tailscale
-funnel status` alle gesund aussahen — `sudo systemctl restart tailscaled` behob es sofort.
-`diagnose.sh` Prüfung 5 hätte das bisher **nicht** zuverlässig erkannt (MagicDNS verdeckte den
-echten öffentlichen Pfad) und ist jetzt entsprechend korrigiert. Selbstheilung/Watchdog für den
-Funnel-Backhaul ist eine bewusst offene Entscheidung, kein Auftrag. Volle Herleitung:
-`phase3_edge/CLAUDE.md`, Abschnitt „[2026-08-19 MUSS-VOR-DEM-NÄCHSTEN-DEPLOY]".
+**Deploy-Blocker (2026-08-18) + Funnel-Recovery (2026-08-19) — kompakt:**
+Der 2026-08-18 entdeckte UI-Fund („kein über-alle-lesbaren-Items-Suchmodus", item-level-only
+`share_*` über Web-UI unauffindbar, nur Connector-Zugriff) wurde 2026-08-19 geplant
+(`phase6_shares/GLOBAL_SEARCH_PLAN.md`, P6-AO–AT; Q1: Titel/Tags-only, kein Body-Fulltext) —
+Kernbefund im Code verifiziert: `GET /api/v1/items` *ohne* `space`-Parameter ist bereits die
+globale, item-weise ACL-gefilterte Suche, es fehlte nur die UI-Fläche (kein neuer
+Endpunkt). Steps G1–G2 gebaut (Playwright 10/10 gegen Wegwerf, Advisor-Fund
+`editor.js :: clearDetail()` Scope-Reset mitgefixt), `d348e2e` 2026-08-23 zu `f96125e`
+korrigiert (Closeout-Sweep) und live deployt. Der 2026-08-19-Funnel-Reboot-Fund (`tailscaled`-
+Restart nach VM-Reboot, MagicDNS hatte den öffentlichen Pfad verdeckt) hat
+`diagnose.sh`-Prüfung 5 korrigiert; Watchdog/Selbstheilung bewusst offen. Volle
+Herleitung beider Punkte: `phase6_shares/CLAUDE.md` Session-Block 2026-08-23 bzw.
+`phase3_edge/CLAUDE.md` Abschnitt 2026-08-19.
 
 **[2026-08-19] Block C (Bilder) ist geplant:** `phase6_shares/IMAGES_PLAN.md` (Entscheidungen
 **P6-AU–P6-BB**, Abnahmezeilen 40–47) — **fünf offene Nikinger-Entscheidungen B1–B5** (Binärblobs
@@ -423,27 +384,7 @@ Entscheidungen: `docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md`. Abnahmeprotokoll:
 `docs/concepts/P5_ABNAHME_2026-08-09.md`. Formaler Abschluss-Handover an P6:
 `docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md`.
 
-**Phase-6-Vormerkungen — [2026-08-09 erledigt] alle vier Punkte sind jetzt Scope von Phase 6**
-(`docs/concepts/phase6_shares_plan.md`: F1 → P6-J/K/Q/T, F2 → §0.6 weiterhin bewusst draußen,
-Client-Surface-Logging → P6-A5/Step 2, `patch_item` → P6-E/F/G/Step 1). Absatz bleibt stehen als
-Herkunftsnachweis, nicht mehr als offene Sammlung:
-- **F1** — Subspaces/eigene Ordner + „shared Spaces" (Nikinger-Meldung, Step 8b): F1a
-  (Default-Leserechte auf eigene Connectoren verengen) ist ein kleiner eigener Schnitt; F1b (ein
-  Space, in dem alle unabhängig volle Rechte haben) kollidiert frontal mit Hard Rule 4, kein
-  Ad-hoc.
-- **F2** — vollständiges Löschen bleibt draußen (Plan §0.5 nennt es explizit), nur Archivieren.
-- **Client-Surface-Logging** (2026-08-07) — welche Claude-Oberfläche (claude.ai/Desktop vs.
-  Claude Code) einen Request stellte, ins Request-Log, nicht in die UI. Kein Blocker —
-  Nikinger-Entscheidung 2026-08-07: Claude Code darf den produktiven Connector wie jede andere
-  Oberfläche nutzen, das ist architektonisch identisch (Token → Space, nicht Token → Client).
-- **`patch_item`** (2026-08-08, Live-Feedback einer arbeitenden Claude-Instanz über den echten
-  Connector) — `update_item` ersetzt immer den kompletten Body; eine Drei-Zeilen-Korrektur an
-  einem großen Dokument erzwingt einen Komplett-Rewrite, teuer und riskant, weil dabei mehr
-  verloren gehen kann als bei einem gezielten Patch. Vorschlag aus der Rückmeldung:
-  `patch_item(item_id, version, old_text, new_text)`, schlägt hart fehl, wenn `old_text` nicht
-  genau einmal vorkommt (kein stilles Teil-Überschreiben). Betrifft `mcpserver/tools.py`
-  (P5-B tabu für diese Phase), also kein Ad-hoc-Fix — Kandidat für denselben späteren Zuschnitt
-  wie F1/F2.
+**[2026-08-09 erledigt]** Vor-Phase-6-Vormerkungen F1 (Subspaces/Shared Spaces), F2 (kein Löschen, nur Archivieren), Client-Surface-Logging (ua-Feld), `patch_item` (gezielter Patch statt Volltext-Rewrite) sind alle in Phase 6 gelandet (`phase6_shares_plan.md`: F1 zu P6-J/K/Q/T, F2 zu §0.5 weiterhin draußen, Logging zu P6-A5/Step 2, `patch_item` zu P6-E/F/G/Step 1, gebaut als siebtes MCP-Tool 2026-08-09). F1b (Space, in dem alle unabhängig volle Rechte haben) bleibt wegen Hard Rule 4 bewusst draußen. Volltext: `phase6_shares/CLAUDE.md` Vormerkungen-Abschnitt.
 
 **Phase 4 — OAuth 2.1 + DCR** (`phase4_auth/`, Paket `authserver`) — **✅ abgeschlossen,
 2026-07-30 — 16/16 Abnahmezeilen live bestanden, Schnitt vollzogen.** Der Pfad-Token ist
@@ -520,30 +461,6 @@ P2 Step 2 — siehe P2-Plan §0.4 Punkt L).
   (Mehrfachauswahl, P6-AK–AN) sind ausführungsreif und per Nikinger-Freigabe gelockt. Kein
   offener Planungsbedarf mehr — nur noch **nicht gebaut**. Details:
   `phase6_shares/CLAUDE.md`s aktuellem Session-Block.
-- **MCP-Werkzeug-Ergonomie, Live-Feedback einer arbeitenden Claude-Instanz** (Nikinger-Meldung,
-  2026-08-14, nach einem sitzungsreichen Protokollierungstag — 40+ `append_to_item`-Aufrufe für
-  ein einziges Log-Dokument) — sechs Punkte: kein Bulk-Append, `list_spaces` in der eigenen
-  Tool-Exploration nicht auffindbar genug (führte zur falschen Aussage „Claude kann nur im
-  eigenen Space schreiben"), `patch_item`-vs-`update_item`-Aufgabenteilung nirgends
-  zusammengefasst, `get_item` liefert immer den vollen Body (kein `get_item_meta` nur für
-  Frontmatter/Version), Status-Enum-Werte nicht in der Tool-Beschreibung dokumentiert (Ratefehler
-  „archiviert" statt „archived"), gelegentlich unzuverlässige Suchtreffer. **Ein Befund davon ist
-  eine irreführende Fehlermeldung, kein reines Ergonomie-Wunsch:** `patch_item` auf einem
-  Frontmatter-Feld liefert „0 Treffer — lies das Item neu" (klingt nach Textmatching-Problem),
-  obwohl die Ursache kategorisch ist (`patch_item` erreicht Frontmatter grundsätzlich nicht) —
-  ein erneutes Lesen hätte nie geholfen. **[2026-08-14 behoben]** dieser eine Befund (Text nennt
-  jetzt die Ursache + `update_item` als Alternative, keine Frontmatter-Erkennungslogik ergänzt);
-  die übrigen fünf Punkte betreffen ausschließlich `mcpserver/tools.py` (P6-C erlaubt das) und
-  sind **[2026-08-20]** als Block A von Phase 6.5 geplant, siehe oben. Volltext:
-  `phase6_shares/CLAUDE.md`, Abschnitt „Vormerkungen".
+- **MCP-Werkzeug-Ergonomie, Live-Feedback (2026-08-14, sechs Punkte):** Bulk-Append, `list_spaces` auffindbarer, `patch_item`-vs-`update_item`-Aufgabenteilung, `get_item_meta`-Trennung vom vollen Body, Status-Enum-Doku in der Tool-Beschreibung, Suchtreffer-Robustheit. Der eine Bug (irreführende `patch_item`-Fehlermeldung „0 Treffer — lies das Item neu“ auf Frontmatter-Feldern; `patch_item` erreicht Frontmatter grundsätzlich nicht) ist am 2026-08-14 behoben (Text nennt jetzt die Ursache + `update_item` als Alternative, keine Frontmatter-Erkennungslogik). Übrige fünf Punkte: Phase 6.5 Block A, gelockt in `phase6_5_tools_images_plan.md` Abschnitt 3. Volltext: `phase6_shares/CLAUDE.md` Vormerkungen.
 
-**[2026-08-02 Korrektur, P5-Planungssession]:** der bis dahin offene Punkt „Web-UI: Neubau gegen
-die REST-API vs. Adaption des `Notizheft_example.html`" ist entschieden — **Neubau mit Ernte**
-(Entscheidung P5-V, `docs/concepts/phase5_ui_plan.md` §0.5): Layout-Ideen sowie
-`sanitizeHtml`/`markdownToHtml` werden übernommen, die clientseitige Vault-Verschlüsselung
-(unvereinbar mit R4), `localStorage`/IndexedDB und `connect-src 'none'` werden verworfen.
-
-**[2026-07-28 Korrektur, P4 Step 0]:** Der Punkt „Ob der Kollege einen eigenen Server-Prozess
-oder nur einen eigenen Space bekommt" stand hier fälschlich noch als offen. Das ist seit P3-G
-entschieden und live bewiesen: **ein Prozess, ein Space je Person.** Zwei Spaces existieren real
-(`niklas`, `fabian`), beide über denselben `sharefyx-mcp.service`.
+**[2026-08-02 Korrektur]** Web-UI-Planungs-Entscheidung **P5-V** (Neubau mit Ernte aus `notiz_heft_example.html`): Layout + `sanitizeHtml`/`markdownToHtml` übernommen; Vault-Encryption (R4-inkompatibel), `localStorage` und `connect-src 'none'` verworfen. **[2026-07-28 Korrektur]** Kollege-Frage (eigener Prozess vs. eigener Space) ist seit P3-G entschieden und live bewiesen: **ein Prozess, ein Space je Person** — zwei Spaces real (`niklas`, `fabian`) über denselben `sharefyx-mcp.service`.
