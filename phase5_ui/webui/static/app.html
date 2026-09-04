@@ -265,13 +265,21 @@
 <!-- Phase 8 Block B Step B4 (Plan §3 P4): Link-Picker-Dialog. Reine UI-Komponente,
      kein eigenes MCP-Tool (Plan §0.5: Graph ist Mensch-UI, Claude erreicht Links ueber
      `links:`/`get_item`). Sucht via `GET /api/v1/items?query=...` (existierender globaler
-     Such-Modus), Trefferklick haengt die `itm_…`-ID ans `#field-links` an
-     (Komma-Konvention des Feldes, kein API-Umbau). -->
+     Such-Modus), Trefferklick fuegt je nach Modus eine Kante an `#field-links` an oder einen
+     Markdown-Link `[Titel](#item/itm_…)` an der Cursorposition in den Body (P8.5-H/P8.5-J:
+     ein Body-Link erzeugt bereits eine Graph-Kante via `linkscan.py`; Moduswahl persistent
+     in `localStorage` unter `sfx:linkpicker:mode`, `body` ist Default). -->
 <div class="overlay" id="link-picker-dialog" hidden>
   <div class="overlay__panel">
     <h2>Item verknüpfen</h2>
-    <p class="overlay__hint">Sucht nach Titel oder Tag. Klick auf einen Treffer hängt die <code>itm_…</code>-ID an die Links dieses Items.</p>
-    <input type="search" class="input" id="link-picker-search" placeholder="Titel oder Tag…" autocomplete="off">
+    <p class="overlay__hint">Sucht nach Titel oder Tag. Was der Klick einfügt, hängt vom Modus darunter ab.</p>
+    <label>Einfügen
+      <select class="input" id="link-picker-mode">
+        <option value="body">als Text-Link im Text</option>
+        <option value="frontmatter">als Kante (Feld „Links")</option>
+      </select>
+    </label>
+    <input type="search" class="input" id="link-picker-search" placeholder="Titel oder Tag…" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="link-picker-results">
     <p class="overlay__hint" id="link-picker-status" aria-live="polite"></p>
     <ul class="link-picker-results" id="link-picker-results" role="listbox"></ul>
     <div class="overlay__actions">

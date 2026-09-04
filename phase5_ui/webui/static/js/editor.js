@@ -99,6 +99,52 @@ function _appendLinkId(id) {
   fieldLinksEl.value = current.join(", ");
 }
 
+// Phase 8.5 A1 (P8.5-I): `insertAtCursor` aus `init()` auf Modulebene gehoben, damit der
+// Picker-Callback (`_onLinkPicked`) ihn auch ausserhalb von `init()` erreichen kann.
+// Koerper unveraendert -- schliesst ueber nichts aus `init()`, `textarea` ist Parameter.
+// Alle Alt-Aufrufstellen innerhalb von `init()` (Bild-Knopf, Zeile ~632) sehen die
+// Modulebene ebenfalls, function-Deklarationen sind gehoistet.
+function insertAtCursor(textarea, text) {
+  var start = textarea.selectionStart;
+  var end = textarea.selectionEnd;
+  var value = textarea.value;
+  textarea.value = value.slice(0, start) + text + value.slice(end);
+  var pos = start + text.length;
+  textarea.selectionStart = textarea.selectionEnd = pos;
+  textarea.focus();
+  textarea.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+// Phase 8.5 A1 (P8.5-H): Body-Variante des Link-Pickers. Erzeugt einen klickbaren Markdown-
+// Link `[<Titel>](#item/<id>)` an der Cursorposition. Die `itm_`-ID darin ist gleichzeitig
+// eine Graph-Kante (`storage/linkscan.py` matcht sie im Body, `#item/`-Praefix eingeschlossen
+// -- Plan §0.3-Verweis). Deshalb ist im sichtbaren Fall ein zusaetzlicher Eintrag in `links:`
+// redundant.
+function _linkTextFor(title) {
+  var t = (title || "").replace(/\s+/g, " ").trim();
+  if (!t) return "";
+  // Eckige Klammern im Titel maskiert -- ein Titel wie `Notiz [Entwurf]` wuerde den
+  // Markdown-Link sonst zerreissen. Rueckgabe leerer String signalisiert "kein Titel".
+  return t.replace(/([\[\]])/g, "\\$1");
+}
+
+function _appendLinkMarkdown(title, id) {
+  if (!/^itm_[0-9a-f]{8}$/.test(id)) return;
+  var label = _linkTextFor(title);
+  if (!label) label = id;  // kein Titel verfuegbar -> ID als sichtbarer Text (selten, aber
+                            // moeglich: API liefert irgendwann ein Item ohne Titel)
+  insertAtCursor(editorTextareaEl, "[" + label + "](#item/" + id + ")");
+}
+
+// Phase 8.5 A1: Modus-Router des Picker-Callbacks. `dialogs.js` ruft diesen mit dem vom
+// Nutzer gewaehlten Modus; die ID landet entweder im Frontmatter (`links:`) oder als
+// Markdown-Link im Body. `picked` ist `{id, title, mode}` aus `dialogs.js`.
+function _onLinkPicked(picked) {
+  if (!picked || typeof picked.id !== "string") return;
+  if (picked.mode === "frontmatter") _appendLinkId(picked.id);
+  else _appendLinkMarkdown(picked.title, picked.id);
+}
+
 export function currentFormValues() {
   return {
     title: fieldTitleEl.value,
@@ -475,11 +521,13 @@ export function init() {
 
   closeButtonEl.addEventListener("click", function () { closeEditor(); });
 
-  // Phase 8 Block B Step B4 (Plan §3 B4): Link-Picker-Knopf öffnet den Dialog, der Callback
-  // hängt die gewählte `itm_…`-ID an das `#field-links`-Feld an (Komma-Konvention, kein
-  // API-Umbau). Idempotent: derselbe Picker lässt sich auch mehrfach öffnen.
+  // Phase 8 Block B Step B4 (Plan §3 B4) + Phase 8.5 A1: Link-Picker-Knopf öffnet den Dialog;
+  // der Callback routet je nach gewaehltem Modus (`body` / `frontmatter`) den Treffer entweder
+  // als `[Titel](#item/itm_…)` an die Cursorposition oder als `itm_…`-ID in `#field-links`
+  // (Komma-Konvention, kein API-Umbau). Idempotent: derselbe Picker laesst sich mehrfach
+  // oeffnen; die Moduswahl ueberlebt das in `localStorage`.
   linkPickerButtonEl.addEventListener("click", function () {
-    openLinkPicker({ onPick: _appendLinkId });
+    openLinkPicker({ onPick: _onLinkPicked });
   });
 
   // Nur-lesen-Ansicht (fremdes Item): kein `editingSnapshot`, also nichts Ungespeichertes —
@@ -541,17 +589,6 @@ export function init() {
     textarea.value = value.slice(0, start) + marker + selected + marker + value.slice(end);
     textarea.selectionStart = start + marker.length;
     textarea.selectionEnd = start + marker.length + selected.length;
-    textarea.focus();
-    textarea.dispatchEvent(new Event("input", { bubbles: true }));
-  }
-
-  function insertAtCursor(textarea, text) {
-    var start = textarea.selectionStart;
-    var end = textarea.selectionEnd;
-    var value = textarea.value;
-    textarea.value = value.slice(0, start) + text + value.slice(end);
-    var pos = start + text.length;
-    textarea.selectionStart = textarea.selectionEnd = pos;
     textarea.focus();
     textarea.dispatchEvent(new Event("input", { bubbles: true }));
   }

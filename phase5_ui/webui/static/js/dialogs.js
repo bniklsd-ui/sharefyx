@@ -96,31 +96,39 @@ var pendingShareBody = null;
 
 // -- Phase 8 Block B Step B4 (Plan §3 B4): Link-Picker --------------------------------------
 // Sucht via `GET /api/v1/items?query=...` (existierender globaler Such-Modus aus Phase 7
-// Block B), Trefferklick ruft `onPick(id)`. Reines Overlay-Modal, kein API-Umbau, kein
-// neues MCP-Tool (Plan §0.5: Graph ist Mensch-UI, Claude erreicht Links ueber `links:`/
-// `get_item`).
+// Block B). Reines Overlay-Modal, kein API-Umbau, kein neues MCP-Tool (Plan §0.5: Graph
+// ist Mensch-UI, Claude erreicht Links ueber `links:`/`get_item`).
+//
+// Phase 8.5 A1 ergaenzt einen Modus-Umschalter (`#link-picker-mode`, zwei Werte: `body` /
+// `frontmatter`); der Trefferklick ruft `onPick({id, title, mode})`, `editor.js :: _onLinkPicked`
+// routet entsprechend. Default-Modus `body`, letzte Wahl persistent in `localStorage` unter
+// `sfx:linkpicker:mode` (P8.5-G/H). `body` ist der strikt maechtigere Modus -- der Body-Link
+// erzeugt bereits eine Graph-Kante via `storage/linkscan.py` (Plan §0.3-Verweis).
+var LINK_PICKER_MODE_KEY = "sfx:linkpicker:mode";
+
 var linkPickerDialogEl;
 var linkPickerSearchEl;
 var linkPickerStatusEl;
 var linkPickerResultsEl;
 var linkPickerCancelEl;
-var linkPickerButtonEl;
+var linkPickerModeEl;
 var linkPickerOnPick = null;
 var linkPickerRequestSeq = 0;
 
 export function openLinkPicker(opts) {
-  // `opts.onPick(id)` wird gerufen, wenn der User einen Treffer anklickt; der Callback haengt
-  // die ID typischerweise ans `#field-links` an. Pflicht-Parameter, weil das Picker-Dialog
-  // keine Meinung hat, wohin die ID gehoert (Editor kann das, DetailView wuerde was
-  // anderes wollen).
+  // `opts.onPick({id, title, mode})` wird gerufen, wenn der User einen Treffer anklickt;
+  // der Callback entscheidet, was mit `id`/`title` geschieht (Editor fuegt je nach `mode`
+  // eine Kante in `links:` ein oder einen Markdown-Link an der Cursorposition). Pflicht-
+  // Parameter, weil das Picker-Dialog keine Meinung hat, wohin die ID gehoert.
   if (typeof opts !== "object" || typeof opts.onPick !== "function") {
-    throw new Error("openLinkPicker braucht { onPick(id) }");
+    throw new Error("openLinkPicker braucht { onPick({id, title, mode}) }");
   }
   linkPickerOnPick = opts.onPick;
   linkPickerSearchEl.value = "";
   linkPickerStatusEl.textContent = "";
   linkPickerResultsEl.replaceChildren();
   linkPickerDialogEl.hidden = false;
+  _restoreLinkPickerMode();
   linkPickerSearchEl.focus();
 }
 
@@ -154,13 +162,32 @@ function _renderLinkPickerResults(items) {
     li.appendChild(title);
     li.appendChild(idLine);
     li.addEventListener("click", function () {
+      // Phase 8.5 A1: Modus VOR closeLinkPicker lesen -- das Select wird mit dem Dialog
+      // versteckt, sein `.value` ist danach zwar noch da, aber die Reihenfolge haelt die
+      // Lesung unabhaengig von UI-Mutationen und ist robust gegen spaetere Refactors.
       var onPick = linkPickerOnPick;
-      var picked = item.id;
+      var mode = _linkPickerMode();
       closeLinkPicker();
-      if (onPick) onPick(picked);
+      if (onPick) onPick({ id: item.id, title: item.title, mode: mode });
     });
     linkPickerResultsEl.appendChild(li);
   });
+}
+
+// Phase 8.5 A1 (P8.5-G): liefert den aktuell gewaehlten Modus. Faellt auf `body` zurueck,
+// wenn `linkPickerModeEl.value` ein unerwarteter Wert ist (z. B. bei Hand-Edit der HTML-
+// Datei oder einem fehlgeschlagenen `localStorage`-Restore).
+function _linkPickerMode() {
+  return linkPickerModeEl.value === "frontmatter" ? "frontmatter" : "body";
+}
+
+// Phase 8.5 A1 (P8.5-G): liest die gespeicherte Wahl aus `localStorage`, faellt auf
+// `body` zurueck. `try`/`catch`, weil `localStorage` im privaten Fenster mit SecurityError
+// wirft (sonst bekommt der Nutzer statt eines Pickers eine Konsolen-Exception).
+function _restoreLinkPickerMode() {
+  var saved = null;
+  try { saved = window.localStorage.getItem(LINK_PICKER_MODE_KEY); } catch (e) { saved = null; }
+  linkPickerModeEl.value = (saved === "frontmatter") ? "frontmatter" : "body";
 }
 
 function _runLinkPickerSearch(query) {
@@ -501,14 +528,23 @@ export function init() {
 
   // Phase 8 Block B Step B4 (Plan §3 B4): Link-Picker-Verkabelung. Der Picker-Knopf selbst
   // wird in editor.js verkabelt (er weiss, an welches Feld die ID angehaengt werden soll);
-  // hier nur Such-Input, Status, Ergebnisliste, Abbrechen-Knopf und Initial-Suche.
+  // hier nur Such-Input, Status, Ergebnisliste, Abbrechen-Knopf, Modus-Select und Such-Debounce.
+  // Phase 8.5 A1 (P8.5-G): Modus-Select -- der Trefferklick liest den Wert hier, die Wahl
+  // wird beim Wechsel in `localStorage` unter `sfx:linkpicker:mode` gemerkt.
   linkPickerDialogEl = document.getElementById("link-picker-dialog");
   linkPickerSearchEl = document.getElementById("link-picker-search");
   linkPickerStatusEl = document.getElementById("link-picker-status");
   linkPickerResultsEl = document.getElementById("link-picker-results");
   linkPickerCancelEl = document.getElementById("link-picker-cancel");
-  linkPickerButtonEl = document.getElementById("link-picker-button");
+  linkPickerModeEl = document.getElementById("link-picker-mode");
   linkPickerCancelEl.addEventListener("click", function () { closeLinkPicker(); });
+  linkPickerModeEl.addEventListener("change", function () {
+    // Beim Wechsel schreiben, nicht beim Picken -- so ueberlebt die Wahl auch einen
+    // Abbruch via Escape oder Klick neben das Overlay. `try`/`catch` deckt den privaten
+    // Modus ab (`localStorage` wirft dort SecurityError).
+    var mode = _linkPickerMode();
+    try { window.localStorage.setItem(LINK_PICKER_MODE_KEY, mode); } catch (e) { /* private */ }
+  });
   var _pickerDebounce = null;
   linkPickerSearchEl.addEventListener("input", function () {
     if (_pickerDebounce) clearTimeout(_pickerDebounce);
