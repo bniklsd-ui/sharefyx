@@ -1282,14 +1282,11 @@ select.input:focus {
    everywhere in the UI where its used"). Vorher: solides var(--accent-line) als Flaechenfarbe +
    color: var(--accent-text) -- letzteres Token war nirgends definiert (kein Treffer in :root),
    fiel also lautlos auf die geerbte Textfarbe zurueck; beim Angleichen mit entfernt statt
-   fortgeschleppt. */
+   fortgeschleppt.
+   Phase 8.5 A2: zwei identische Regelbloecke (li:hover+li:focus und li[aria-selected=true])
+   zu einem zusammengezogen; das tote `:focus` entfaellt (kein `tabindex` auf den li, kann
+   nie feuern). Deklarationen byte-identisch zum 2026-09-02-Standard, hier nur entdoppelt. */
 .link-picker-results li:hover,
-.link-picker-results li:focus {
-  background: linear-gradient(180deg, rgba(62,141,243,.20), rgba(62,141,243,.08));
-  outline: 1px solid var(--accent-line);
-  outline-offset: -1px;
-  border-radius: var(--radius-sm);
-}
 .link-picker-results li[aria-selected="true"] {
   background: linear-gradient(180deg, rgba(62,141,243,.20), rgba(62,141,243,.08));
   outline: 1px solid var(--accent-line);

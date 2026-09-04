@@ -183,3 +183,73 @@ def test_write_controls_live_inside_detachable_containers():
     for control in ('id="save-button"', 'id="archive-button"', 'id="append-button"',
                     'id="editor-textarea"'):
         assert control in editor_markup, f"{control} liegt außerhalb von #detail-editor"
+
+
+def test_link_picker_css_has_one_selection_block():
+    """P8.5-14: app.css hat genau einen Auswahl-Block für den Link-Picker, kein totes `:focus`.
+
+    Vor A2 gab es zwei identische Regelblöcke -- einen für `li:hover`/`li:focus` und einen
+    für `li[aria-selected="true"]` -- beide mit denselben vier Deklarationen. Die `:focus`-
+    Hälfte war toter Code (kein `tabindex` auf den `li`, kann nie feuern). A2 hat sie auf
+    genau einen Block zusammengezogen: `li:hover` + `li[aria-selected="true"]`. Wer einen
+    dritten Auswahl-Standard daneben stellt, fällt hier auf statt erst im Browser.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+    assert css.count('li[aria-selected="true"]') == 1, (
+        "app.css muss genau einen Auswahl-Block für den Link-Picker tragen "
+        "(Phase 8.5 A2-Entdopplung)."
+    )
+    assert ".link-picker-results li:focus" not in css, (
+        "Totes `.link-picker-results li:focus` darf nicht mehr vorkommen "
+        "(kein tabindex auf den li, kann nie feuern)."
+    )
+
+
+def test_link_picker_picks_run_through_a_single_helper():
+    """P8.5-12: Tastatur- und Maus-Pfad laufen beide durch `_pickLinkPickerAt`.
+
+    Statt zweier separater Code-Pfade -- einer für den Klick-Listener in
+    `_renderLinkPickerResults`, einer für den Enter-Handler im keydown des Suchfelds --
+    rufen beide genau dieselbe Funktion. `app.js` bleibt außen vor (P8.5-L, dort darf
+    kein Link-Picker-Handler sein, der den Helper umgeht).
+    """
+    dialogs = (DEFAULT_STATIC_DIR / "js" / "dialogs.js").read_text("utf-8")
+    app_js = (DEFAULT_STATIC_DIR / "js" / "app.js").read_text("utf-8")
+    # Genau eine Definition des Helpers in dialogs.js (Definition + 2 Aufrufe = 3 Vorkommen).
+    assert dialogs.count("function _pickLinkPickerAt(") == 1, (
+        "_pickLinkPickerAt muss genau einmal in dialogs.js definiert sein."
+    )
+    assert dialogs.count("_pickLinkPickerAt(") >= 3, (
+        "Mindestens drei Vorkommen erwartet (1 Definition + Maus-Klick + Enter-Taste)."
+    )
+    # app.js bleibt tabu -- keine Picker-Handler, die am Helper vorbeilaufen würden.
+    assert "openLinkPicker" not in app_js, (
+        "app.js darf den Link-Picker nicht öffnen (P8.5-L)."
+    )
+    assert "_pickLinkPickerAt" not in app_js, (
+        "app.js darf den Pick-Helper nicht umgehen -- Picker-Logik gehört nach dialogs.js."
+    )
+
+
+def test_insertAtCursor_defined_exactly_once_at_module_level():
+    """P8.5-9: `insertAtCursor` existiert genau einmal, auf Modulebene; alle Alt-Aufrufe
+    in `init()` funktionieren unverändert.
+
+    Die Phase-8.5-A1-Anforderung (P8.5-I: `insertAtCursor` aus `init()` auf Modulebene
+    gehoben, damit der Link-Picker-Pfad darauf zugreifen kann) war bislang nur per
+    `grep -n` belegt. Jetzt mit pytest festgehalten: die function-Deklaration darf
+    genau einmal vorkommen -- bei mehreren wäre unklar, welcher die Quelle der Wahrheit
+    ist; bei null würde der Bild-Knopf-Aufruf (jetzt Z. 669) eine Referenz auf eine
+    undefinierte Funktion tragen.
+
+    Implizit über die Modul-Ebene: der Bild-Knopf-Listener liegt außerhalb von `init()`
+    und kann den Helper nur sehen, wenn er auf Modul-Ebene deklariert ist -- eine
+    function-Deklaration innerhalb von `init()` wäre über Function-Scoping außerhalb
+    nicht sichtbar. Der Test prüft "genau einmal definiert" als Stellvertreter für die
+    strukturelle Eigenschaft.
+    """
+    editor = (DEFAULT_STATIC_DIR / "js" / "editor.js").read_text("utf-8")
+    assert editor.count("function insertAtCursor(") == 1, (
+        "insertAtCursor muss genau einmal in editor.js definiert sein "
+        "(Phase 8.5 A1, P8.5-I: auf Modulebene gehoben)."
+    )

@@ -115,6 +115,12 @@ var linkPickerModeEl;
 var linkPickerOnPick = null;
 var linkPickerRequestSeq = 0;
 
+// Phase 8.5 A2: aktuell gerenderte Treffer (Index = Cursor-Index) und der Cursor selbst.
+// `-1` = keine Auswahl; beim Re-Rendern zurueckgesetzt, sonst zeigte ein alter Cursor nach
+// dem Filtern auf einen anderen Treffer (benannte Falle aus dem Plan §2.A2).
+var linkPickerItems = [];
+var linkPickerCursor = -1;
+
 export function openLinkPicker(opts) {
   // `opts.onPick({id, title, mode})` wird gerufen, wenn der User einen Treffer anklickt;
   // der Callback entscheidet, was mit `id`/`title` geschieht (Editor fuegt je nach `mode`
@@ -139,19 +145,34 @@ export function closeLinkPicker() {
   linkPickerResultsEl.replaceChildren();
   linkPickerOnPick = null;
   linkPickerRequestSeq += 1;  // laufende Suchen verwerfen
+  // Phase 8.5 A2: State zuruecksetzen -- Reihenfolge wichtig: erst leeren, dann Cursor
+  // raeumen. Sonst wuerde `_setLinkPickerCursor(-1)` zwar korrekt "out of range" sehen,
+  // aber `linkPickerItems` waere noch der alte Stand (kein heutiger Bug, nur Robustheit
+  // fuer spaetere Refactors).
+  linkPickerItems = [];
+  _setLinkPickerCursor(-1);
 }
 
 function _renderLinkPickerResults(items) {
+  // Phase 8.5 A2: vor jedem Re-Rendern State und ARIA zuruecksetzen -- sonst ueberlebt
+  // ein Cursor aus der vorigen Suche und zeigt nach dem Filtern auf einen anderen Treffer
+  // (benannte Falle aus dem Plan §2.A2).
+  linkPickerItems = [];
+  linkPickerCursor = -1;
+  linkPickerSearchEl.removeAttribute("aria-activedescendant");
   linkPickerResultsEl.replaceChildren();
   if (items.length === 0) {
     var empty = document.createElement("li");
     empty.textContent = "Keine Treffer.";
     empty.setAttribute("aria-disabled", "true");
+    // Bewusst NICHT in linkPickerItems -- der "Keine Treffer."-Eintrag ist nie auswaehlbar
+    // (Abnahmezeile P8.5-11).
     linkPickerResultsEl.appendChild(empty);
     return;
   }
-  items.forEach(function (item) {
+  items.forEach(function (item, i) {
     var li = document.createElement("li");
+    li.id = "link-picker-opt-" + i;
     li.setAttribute("role", "option");
     li.dataset.itemId = item.id;
     var title = document.createElement("span");
@@ -161,17 +182,41 @@ function _renderLinkPickerResults(items) {
     idLine.textContent = item.id + " \u00b7 " + item.space + " \u00b7 " + item.type;
     li.appendChild(title);
     li.appendChild(idLine);
-    li.addEventListener("click", function () {
-      // Phase 8.5 A1: Modus VOR closeLinkPicker lesen -- das Select wird mit dem Dialog
-      // versteckt, sein `.value` ist danach zwar noch da, aber die Reihenfolge haelt die
-      // Lesung unabhaengig von UI-Mutationen und ist robust gegen spaetere Refactors.
-      var onPick = linkPickerOnPick;
-      var mode = _linkPickerMode();
-      closeLinkPicker();
-      if (onPick) onPick({ id: item.id, title: item.title, mode: mode });
-    });
+    li.addEventListener("click", function () { _pickLinkPickerAt(i); });
+    linkPickerItems.push(item);
     linkPickerResultsEl.appendChild(li);
   });
+}
+
+// Phase 8.5 A2: sichtbare Auswahl durch die Trefferliste. Setzt `aria-selected` auf genau
+// einer `li` und `aria-activedescendant` auf dem Suchfeld (combobox-Rolle, ARIA 1.2
+// Pflicht-Beziehung); raeumt beides bei `index < 0` oder ausserhalb der Liste.
+// `scrollIntoView` haelt den Cursor im sichtbaren Bereich bei langen Trefferlisten.
+function _setLinkPickerCursor(index) {
+  var lis = linkPickerResultsEl.children;
+  for (var k = 0; k < lis.length; k++) lis[k].removeAttribute("aria-selected");
+  if (index < 0 || index >= linkPickerItems.length) {
+    linkPickerCursor = -1;
+    linkPickerSearchEl.removeAttribute("aria-activedescendant");
+    return;
+  }
+  linkPickerCursor = index;
+  var li = lis[index];
+  li.setAttribute("aria-selected", "true");
+  linkPickerSearchEl.setAttribute("aria-activedescendant", li.id);
+  li.scrollIntoView({ block: "nearest" });
+}
+
+// Phase 8.5 A2: gemeinsamer Pick-Pfad fuer Maus-Klick und Enter-Taste. Modus wird VOR
+// `closeLinkPicker()` gelesen (Select wird mit dem Dialog versteckt; Reihenfolge wie beim
+// bestehenden Klick-Handler, abnahmegemaess dokumentiert).
+function _pickLinkPickerAt(index) {
+  var item = linkPickerItems[index];
+  if (!item) return;
+  var onPick = linkPickerOnPick;
+  var mode = _linkPickerMode();
+  closeLinkPicker();
+  if (onPick) onPick({ id: item.id, title: item.title, mode: mode });
 }
 
 // Phase 8.5 A1 (P8.5-G): liefert den aktuell gewaehlten Modus. Faellt auf `body` zurueck,
@@ -550,6 +595,24 @@ export function init() {
     if (_pickerDebounce) clearTimeout(_pickerDebounce);
     var q = linkPickerSearchEl.value.trim();
     _pickerDebounce = setTimeout(function () { _runLinkPickerSearch(q); }, 150);
+  });
+  // Phase 8.5 A2: Tastaturnavigation im Suchfeld. Fokus bleibt im Input (kein tabindex auf
+  // den li), sichtbare Auswahl ueber `aria-activedescendant` -- ARIA-1.2-Pflicht-Beziehung,
+  // genau dafuer steht `aria-controls="link-picker-results"` am Input (A1-Vorbereitung).
+  // Bewusst kein Wrap-around (die Listen-Navigation in app.js:212 klemmt ebenfalls), kein
+  // Home/End, kein Enter-waehlt-den-einzigen-Treffer (Raten). Escape bleibt beim globalen
+  // Handler (P8.5-L).
+  linkPickerSearchEl.addEventListener("keydown", function (event) {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      _setLinkPickerCursor(Math.min(linkPickerItems.length - 1, linkPickerCursor + 1));
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      _setLinkPickerCursor(Math.max(0, linkPickerCursor - 1));
+    } else if (event.key === "Enter") {
+      event.preventDefault();
+      if (linkPickerCursor >= 0) _pickLinkPickerAt(linkPickerCursor);
+    }
   });
   accountErrorEl = document.getElementById("account-error");
   accountCurrentEl = document.getElementById("account-current");

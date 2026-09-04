@@ -9,7 +9,7 @@ down:
   - ../phase8_ui_graph/CLAUDE.md                       # Phase 8 — schließt diese Phase mit ab (N6, P8.5-R), kein eigenes Handover
   - ../phase8_ui_graph/SESSIONS_ARCHIVE.md              # Bilanz P8-22/P8-24-Smokes, drei §9.4.6-Befunde (Settle/Farbe/Klick), P8.5-Vorgänger-Session-Block
   - SESSIONS_ARCHIVE.md                                 # ältere Session-Blöcke, newest-first
-updated: 2026-09-04 (Drift nachgezogen — Wurzel-`Current state` mit neuem 2026-09-04-Absatz ergänzt (A1-Eintrag + Drift-Hinweis + Folge-Commit-Vermerk für INDEX-Bullet-Lücke), `docs/INDEX.md` Phase-8.5-Header „⬜ geplant, nicht gestartet" → „🔄 A1 🟡, A2/B1/C/D/Z ⬜", `ROADMAP.md` Phase-8.5-Plan-Absatz „nächster Schritt: A1" → „A1 committet, Drift nachgezogen, nächster Schritt: A2"; INDEX-Bullets für `phase8_5_picker_release/CLAUDE.md` + `SESSIONS_ARCHIVE.md` bewusst NICHT in diesem Commit ergänzt — INDEX steht bei 40917 B, 43 B unter dem 40-KB-Softcap, zwei neue Bullets würden den Cap reißen; Vorschlag: Aufnahme mit gleichzeitiger Trimmung der `updated:`-Pipe in einem späteren Commit, vor A2 nicht nötig; kein Code, kein Service-Touch, pytest/ui_budget unverändert) | 2026-09-04 (A1 committet — `<select id="link-picker-mode">` in app.html:270-280, `dialogs.js` `_linkPickerMode`/`_restoreLinkPickerMode`/neue `onPick({id, title, mode})`-Signatur/change→localStorage, `editor.js` `insertAtCursor` auf Modulebene + `_linkTextFor`/`_appendLinkMarkdown`/`_onLinkPicked`, wiring auf `_onLinkPicked`; Modul-Status A1 ⬜→🟡, Tests ⬜; pytest unverändert 959/959, Tabu-Diff §0.3 leer, ui_budget 5/5 +1.8 KB, node --check grün auf dialogs.js/editor.js/app.js, Service-Touch 0 PID 195922 — V99-Korrektur im Block: erste localStorage-Nutzung des Projekts, sessionStorage→localStorage Eskalation wegen P8.5-G „überlebt Tab-Schließen", `try`/`catch` deckt SecurityError im privaten Modus ab) | 2026-09-03 (Step 0 abgeschlossen — Skelett phase8_5_picker_release/{CLAUDE.md, SESSIONS_ARCHIVE.md, scripts/} angelegt, vier Funde aus Plan §1 abgearbeitet: docs/INDEX.md 52.911 → 40.917 B (-23 %, 43 B unter 40 KB-Softcap) durch Kürzung updated: auf 5 neueste Einträge + Schlusszeile + kompakte Ausnahmenliste (Fund 2) im Wartungsblock, "Büroklammer" → "Lupe" an phase8_ui_graph/CLAUDE.md:440 mit datierter Korrekturnotiz, Phase-8-Bilanz 15/10/0 → 14/12/0 maschinell korrigiert + awk-Kommando im Bilanz-Abschnitt verankert (real 14/12/0 verifiziert); ROADMAP-Absatz + Wurzel-CLAUDE.md down: phase8_ui_graph → phase8_5_picker_release + Current-state-Absatz + updated:-Verlängerung im selben Commit; pytest unverändert 959/959 (kein Python-Touch), Tabu-Diff §0.3 leer, Service-Touch 0 (PID 195922, Active seit 2026-09-02 11:51:57 CEST — nur gelesen); eine Plan-Korrektur: Fund 1 + Fund 2 zusammen erforderten den Ausnahmenblock kompakter als anfangs geschrieben, um den Cap zu halten — kein Plan-Wortlaut gebrochen, im Session-Block dokumentiert)
+updated: 2026-09-04 (A2 committet — `dialogs.js` Module-Vars `linkPickerItems`/`linkPickerCursor` + `_renderLinkPickerResults` mit State-Reset ganz oben + `_setLinkPickerCursor`/`_pickLinkPickerAt` neu + `closeLinkPicker()`-Reset-Reihenfolge + `keydown`-Handler am Suchfeld (ArrowDown/ArrowUp/Enter, kein Wrap, kein Home/End, kein Raten); `app.css` zwei identische Auswahl-Blöcke zu einem zusammengezogen, totes `:focus` raus; zwei neue statische Tests in `test_static_routes.py` (`test_link_picker_css_has_one_selection_block` P8.5-14, `test_link_picker_picks_run_through_a_single_helper` P8.5-12) plus `test_insertAtCursor_defined_exactly_once_at_module_level` für P8.5-9; Modul-Status A2 ⬜→🟡, fünf Abnahmezeilen P8.5-9/-10/-11/-12/-14 angepasst, Stand 3 ✅ · 0 🟡 · 17 ⬜ → 3 ✅ · 3 🟡 · 14 ⬜; pytest 959→962 (+3, +0.8 KB), ui_budget 5/5 (127.6→128.7 KB, dialogs.js 11.7→12.6 KB), Tabu-Diff §0.3 leer, `node --check` grün auf dialogs.js, A1-Block nach SESSIONS_ARCHIVE.md rotiert (manuell, weil `scripts/`-Verzeichnis für `rotate_session_block.sh` aus Phase 7 noch leer ist — YAGNI für eine zweite manuelle Rotation, Plan-§0.5-Skript-Eintrag verschoben auf Block-C-Beginn mit dem Wegwerf-Setup), PID 195922 Active seit 2026-09-02 11:51:57 CEST nur gelesen, kein Service-Touch; nächster Schritt B1) | 2026-09-04 (Drift nachgezogen — Wurzel-`Current state` mit neuem 2026-09-04-Absatz ergänzt (A1-Eintrag + Drift-Hinweis + Folge-Commit-Vermerk für INDEX-Bullet-Lücke), `docs/INDEX.md` Phase-8.5-Header „⬜ geplant, nicht gestartet" → „🔄 A1 🟡, A2/B1/C/D/Z ⬜", `ROADMAP.md` Phase-8.5-Plan-Absatz „nächster Schritt: A1" → „A1 committet, Drift nachgezogen, nächster Schritt: A2"; INDEX-Bullets für `phase8_5_picker_release/CLAUDE.md` + `SESSIONS_ARCHIVE.md` bewusst NICHT in diesem Commit ergänzt — INDEX steht bei 40917 B, 43 B unter dem 40-KB-Softcap, zwei neue Bullets würden den Cap reißen; Vorschlag: Aufnahme mit gleichzeitiger Trimmung der `updated:`-Pipe in einem späteren Commit, vor A2 nicht nötig; kein Code, kein Service-Touch, pytest/ui_budget unverändert) | 2026-09-04 (A1 committet — `<select id="link-picker-mode">` in app.html:270-280, `dialogs.js` `_linkPickerMode`/`_restoreLinkPickerMode`/neue `onPick({id, title, mode})`-Signatur/change→localStorage, `editor.js` `insertAtCursor` auf Modulebene + `_linkTextFor`/`_appendLinkMarkdown`/`_onLinkPicked`, wiring auf `_onLinkPicked`; Modul-Status A1 ⬜→🟡, Tests ⬜; pytest unverändert 959/959, Tabu-Diff §0.3 leer, ui_budget 5/5 +1.8 KB, node --check grün auf dialogs.js/editor.js/app.js, Service-Touch 0 PID 195922 — V99-Korrektur im Block: erste localStorage-Nutzung des Projekts, sessionStorage→localStorage Eskalation wegen P8.5-G „überlebt Tab-Schließen", `try`/`catch` deckt SecurityError im privaten Modus ab) | 2026-09-03 (Step 0 abgeschlossen — Skelett phase8_5_picker_release/{CLAUDE.md, SESSIONS_ARCHIVE.md, scripts/} angelegt, vier Funde aus Plan §1 abgearbeitet: docs/INDEX.md 52.911 → 40.917 B (-23 %, 43 B unter 40 KB-Softcap) durch Kürzung updated: auf 5 neueste Einträge + Schlusszeile + kompakte Ausnahmenliste (Fund 2) im Wartungsblock, "Büroklammer" → "Lupe" an phase8_ui_graph/CLAUDE.md:440 mit datierter Korrekturnotiz, Phase-8-Bilanz 15/10/0 → 14/12/0 maschinell korrigiert + awk-Kommando im Bilanz-Abschnitt verankert (real 14/12/0 verifiziert); ROADMAP-Absatz + Wurzel-CLAUDE.md down: phase8_ui_graph → phase8_5_picker_release + Current-state-Absatz + updated:-Verlängerung im selben Commit; pytest unverändert 959/959 (kein Python-Touch), Tabu-Diff §0.3 leer, Service-Touch 0 (PID 195922, Active seit 2026-09-02 11:51:57 CEST — nur gelesen); eine Plan-Korrektur: Fund 1 + Fund 2 zusammen erforderten den Ausnahmenblock kompakter als anfangs geschrieben, um den Cap zu halten — kein Plan-Wortlaut gebrochen, im Session-Block dokumentiert)
 ---
 
 # CLAUDE.md — Phase 8.5: Link-Picker-Politur, Titel-statt-ID-Hint, v3-Vorabritt + Deploy (`phase8_5_picker_release/`)
@@ -101,7 +101,7 @@ Testliste, Abnahmezeilen: `docs/concepts/phase8_5_picker_release_plan.md`.
 |---|---|---|---|---|
 | 1 | Haushalt (0.1–0.4: vier Funde aus Plan §1 abgearbeitet) + Skelett (0.5) | 0 | ✅ | 0 (Skelett, wie P1/P6/6.5/7/8 Step 0) |
 | 2 | A1 — §9.4.2 Picker-Modus-Umschalter (`<select class="input">` + `localStorage`) + Insert-at-cursor-Hub + Body-Markdown-Link-Helper | A | 🟡 | ⬜ |
-| 3 | A2 — §9.4.3 Tastaturnavigation (`aria-activedescendant`, `_pickLinkPickerAt`, CSS-Block-Entdopplung) | A | ⬜ | ⬜ |
+| 3 | A2 — §9.4.3 Tastaturnavigation (`aria-activedescendant`, `_pickLinkPickerAt`, CSS-Block-Entdopplung) | A | 🟡 | 🟡 (+3) |
 | 4 | B1 — §9.4.1 Hint generalisierend schärfen (`_TITLE_NOT_ID_HINT`, zwei neue Asserts in `test_tools.py`, Abbruchregel wörtlich im Head) | B | ⬜ | ⬜ |
 | 5 | C — v3-Vorabritt (Wegwerf-Setup + 13-Stationen-Playwright-Smoke, jeder Fund in dieser Phase behoben oder als benannter Befund vorgelegt) | C | ⬜ | ⬜ |
 | 6 | D — Release (D1 Vorbereitung opencode/M3, D2 Deploy als **Nikinger-Aktion**, D3 Health-Gate, D4 Sichtprüfung am echten Gerät, D5 Vierte A3-Probe) | D | ⬜ | ⬜ |
@@ -130,12 +130,12 @@ Nikinger beweisbar.
 | P8.5-6 | Modus „Text-Link": Klick fügt `[<Titel>](#item/itm_…)` an der Cursorposition ein; Titel mit `[`/`]` bricht den Link nicht | W | ⬜ (Code committet; Browser-Nachweis Block C Station 6) |
 | P8.5-7 | Modus „Kante": Klick hängt die ID an `#field-links`, Textarea unverändert | W | ⬜ (Code committet; Browser-Nachweis Block C Station 8) |
 | P8.5-8 | Moduswahl überlebt Schließen + Öffnen des Dialogs (`localStorage`); privater Modus wirft nicht | W | ⬜ (Code committet; Browser-Nachweis Block C Station 8, inkl. privater Modus) |
-| P8.5-9 | `insertAtCursor` existiert **genau einmal**, auf Modulebene; alle Alt-Aufrufe in `init()` funktionieren unverändert | C | ⬜ (Code committet; statischer Test für Block-C-Vorbereitung oder Folge-Session) |
-| P8.5-10 | `ArrowDown`/`ArrowUp` setzen `aria-selected` + `aria-activedescendant`; `Enter` wählt; Cursor klemmt an beiden Enden | W | ⬜ |
-| P8.5-11 | Neu-Tippen setzt den Cursor zurück; der „Keine Treffer."-Eintrag ist nie auswählbar | W | ⬜ |
-| P8.5-12 | Tastatur- und Maus-Pfad laufen beide durch `_pickLinkPickerAt`; `app.js` unverändert | C | ⬜ |
+| P8.5-9 | `insertAtCursor` existiert **genau einmal**, auf Modulebene; alle Alt-Aufrufe in `init()` funktionieren unverändert | C | 🟡 (A2: `test_insertAtCursor_defined_exactly_once_at_module_level`; Bild-Knopf-Aufruf Z. 669 außerhalb von `init()` beweist die Modul-Ebene implizit — function-Deklaration wird vom JS-Hoisting an alle Modul-Stellen sichtbar) |
+| P8.5-10 | `ArrowDown`/`ArrowUp` setzen `aria-selected` + `aria-activedescendant`; `Enter` wählt; Cursor klemmt an beiden Enden | W | 🟡 (A2: Code committet; Browser-Nachweis Block C Station 7) |
+| P8.5-11 | Neu-Tippen setzt den Cursor zurück; der „Keine Treffer."-Eintrag ist nie auswählbar | W | 🟡 (A2: Code committet — State-Reset ganz oben in `_renderLinkPickerResults` räumt `linkPickerItems`+`linkPickerCursor`+`aria-activedescendant`; "Keine Treffer." bleibt außerhalb von `linkPickerItems` und damit unerreichbar für `_pickLinkPickerAt`; Browser-Nachweis Block C Station 7) |
+| P8.5-12 | Tastatur- und Maus-Pfad laufen beide durch `_pickLinkPickerAt`; `app.js` unverändert | C | 🟡 (A2: `test_link_picker_picks_run_through_a_single_helper` — Funktion genau einmal definiert, ≥3 Vorkommen, `app.js` enthält weder `openLinkPicker` noch `_pickLinkPickerAt`) |
 | P8.5-13 | V101 in Chromium **und** Firefox beantwortet | W | ⬜ |
-| P8.5-14 | `app.css` hat genau einen Auswahl-Block für den Picker, kein totes `:focus` | C | ⬜ |
+| P8.5-14 | `app.css` hat genau einen Auswahl-Block für den Picker, kein totes `:focus` | C | 🟡 (A2: `test_link_picker_css_has_one_selection_block` — genau ein Vorkommen von `li[aria-selected="true"]`, kein `.link-picker-results li:focus`) |
 | P8.5-15 | v3-Vorabritt: alle 13 Stationen grün gegen die Wegwerf-Instanz; jeder Fund entweder behoben oder als benannter Befund vorgelegt | W | ⬜ |
 | P8.5-16 | P8-16 empirisch belegt (`prefers-reduced-transparency` + `backdrop-filter` aus, Auswahl erkennbar) | W | ⬜ |
 | P8.5-17 | Deploy gelaufen, Health-Gate 3/3, Badge `v3.0.1` live, Update-Banner zeigt den neuen Eintrag, Connector verbindet (V105) | L | ⬜ |
@@ -143,140 +143,146 @@ Nikinger beweisbar.
 | P8.5-19 | **Bauform des Umschalters bestätigt:** der Nikinger nimmt die `<select>`-Fassung ab **oder** ordnet die Radiogruppe aus seiner N3-Vorschau an | L | ⬜ |
 | P8.5-20 | Das Zählkommando aus §1.5 steht im Phase-8-Head, und die dortige Bilanz-Zeile verweist darauf statt eine gepflegte Zahl zu tragen | C | ✅ (Step 0.4: awk-Kommando im Phase-8-Head Bilanz-Abschnitt) |
 
-**Stand:** 3 ✅ · 0 🟡 · 17 ⬜ von 20 (P8.5-1, P8.5-2, P8.5-20 aus Step 0 — nur Doku-Arbeit, kein
-Build/Test).
+**Stand:** 3 ✅ · 3 🟡 · 14 ⬜ von 20 (P8.5-1, P8.5-2, P8.5-20 aus Step 0 — nur Doku-Arbeit; P8.5-9,
+P8.5-12, P8.5-14 aus A2 — statische Tests, Browser-Nachweis für P8.5-10/-11/-13 mit Block C;
+Rest wartet auf B1/C/D).
 
 ## Session stopped
 
-### 2026-09-04 (A1 — Picker-Modus-Umschalter + Body-Markdown-Link, Code committet)
+### 2026-09-04 (A2 — Tastaturnavigation + `_pickLinkPickerAt` + CSS-Block-Entdopplung, Code committet)
 
-**Auftrag:** A1 nach `docs/concepts/phase8_5_picker_release_plan.md` §2.A1. User-Auftrag
-vom 2026-09-03 nannte die genauen Eingriffe (HTML, `dialogs.js:100-185`, `editor.js:88-100`,
-`localStorage` unter `sfx:linkpicker:mode`); statische Tests + Block-C-Browser-Nachweis
-wurden ausdrücklich zurückgestellt — Tabu-Diff bleibt leer, nur `webui/static/`.
+**Auftrag:** A2 nach `docs/concepts/phase8_5_picker_release_plan.md` §2.A2.
+Tastaturnavigation über `aria-activedescendant` (Fokus bleibt im Suchfeld), gemeinsamer
+Pick-Pfad für Maus und Enter, Entdopplung der zwei identischen CSS-Auswahl-Blöcke am
+Picker, totes `:focus` raus. Die A1-Session hatte statische Tests ausdrücklich
+zurückgestellt — der Plan-Test für P8.5-14 gehört zu A2, P8.5-9 und P8.5-12 ziehe ich
+gleich mit nach.
 
-**Ergebnis — alle vier Eingriffsgruppen aus Plan §2.A1 committet, §0.5 Checkliste grün:**
+**Ergebnis — alle drei Eingriffsgruppen aus Plan §2.A2 committet, §0.5 Checkliste grün:**
 
-1. **`phase5_ui/webui/static/app.html`** (Zeilen 270–280). Hint-Text von „hängt die
-   itm_…-ID an die Links" auf „Was der Klick einfügt, hängt vom Modus darunter ab"
-   neutralisiert; neues `<label>Einfügen <select class="input" id="link-picker-mode">
-   …</select></label>` **zwischen** Hint und Suchfeld eingefügt — barer `<label>` ohne
-   `class="field"`, exakt nach dem Vorbild `#move-space-select` (`app.html:286-287`),
-   um den 2026-09-02-Chevron-Eskalationsfall nicht zu reproduzieren
-   (`.field .input { font-size: 13px }`); beide `<option>` mit Werten `body` (Default)
-   und `frontmatter`. Suchfeld-Input um `role="combobox" aria-expanded="true"
-   aria-controls="link-picker-results"` erweitert (A2-Vorbereitung — ohne
-   `aria-controls` ist `aria-activedescendant` formal ungültig). Pflichtprüfung am
-   Step-Ende aus Plan §2.A1 Punkt (1) — computed `font-size` und Chevron-Größe gegen
-   `#move-space-select` — wird erst in Block C empirisch verglichen (kein jsdom-Harness
-   im Projekt, verifiziert Plan §0.0); bei Abweichung Eskalation nach §0.0, kein
-   symptomatisches Nachjustieren.
+1. **`phase5_ui/webui/static/js/dialogs.js`** — vier Edits:
 
-2. **`phase5_ui/webui/static/js/dialogs.js`**. Modul-Konstante
-   `LINK_PICKER_MODE_KEY = "sfx:linkpicker:mode"` ergänzt (Präfix `sfx:` aus
-   `editor.js :: draftKeyFor()`); `linkPickerModeEl` neu; `linkPickerButtonEl` ersatzlos
-   entfernt — war in `dialogs.js` ungenutzt (`editor.js:47` hält die eigene). Zwei neue
-   Helper: `_linkPickerMode()` (liefert `"body"`/`"frontmatter"`, fällt auf `body`
-   zurück bei unerwartetem Wert) und `_restoreLinkPickerMode()` (liest `localStorage`
-   in `try`/`catch` — privater Modus wirft `SecurityError`). `openLinkPicker` ruft
-   `_restoreLinkPickerMode()` vor `linkPickerSearchEl.focus()`, Guard-Text auf
-   `"openLinkPicker braucht { onPick({id, title, mode}) }"` aktualisiert; Klick-Listener
-   in `_renderLinkPickerResults` liest den Modus **vor** `closeLinkPicker()` (Select wird
-   mit Dialog versteckt; Reihenfolge hält die Lesung unabhängig von UI-Mutationen) und
-   ruft `onPick({id, title, mode})`. Im `init()`-Block: `linkPickerModeEl` zugewiesen
-   plus `change`-Handler, der die Wahl **beim Wechsel** in `try`/`catch` schreibt — so
-   überlebt sie auch einen Abbruch via Escape.
+   - Neue Modul-Variablen `linkPickerItems = []` und `linkPickerCursor = -1` (Z. 117–119).
+     `-1` = keine Auswahl, beim Re-Rendern zurückgesetzt (benannte Falle aus Plan §2.A2:
+     sonst zeigte ein alter Cursor nach dem Filtern auf einen anderen Treffer).
 
-3. **`phase5_ui/webui/static/js/editor.js`**. **`insertAtCursor` (bisher Zeile 548–557,
-   innerhalb `init()`) auf Modulebene gehoben** (P8.5-I) — direkt hinter `_appendLinkId`
-   (jetzt Zeile 107), Körper byte-identisch, schließt über nichts aus `init()`
-   (`textarea` ist Parameter), Alt-Aufruf Bild-Knopf (jetzt Zeile 669) sieht die
-   Modulebene via Hoisting. Bestätigt: `grep -n 'function insertAtCursor' editor.js`
-   liefert **genau einen** Treffer. Drei neue Funktionen: `_linkTextFor(title)`
-   (kollabiert Whitespace, maskiert `[`/`]` mit Backslash, leerer String signalisiert
-   „kein Titel"), `_appendLinkMarkdown(title, id)` (ruft `insertAtCursor` mit
-   `"[" + label + "](#item/" + id + ")"`, gleiche `itm_[0-9a-f]{8}`-Defense-in-Depth
-   wie `_appendLinkId`), `_onLinkPicked(picked)` (Router: `mode === "frontmatter"` →
-   `_appendLinkId`, sonst → `_appendLinkMarkdown`). Wiring (jetzt Zeile 530):
-   `openLinkPicker({ onPick: _appendLinkId })` →
-   `openLinkPicker({ onPick: _onLinkPicked })`.
+   - `_renderLinkPickerResults(items)` umgebaut: State-Reset **ganz oben** (vor
+     `replaceChildren()`) räumt `linkPickerItems`+`linkPickerCursor`+
+     `aria-activedescendant` — das schließt den Such-Debounce-Fall ab, in dem der User
+     tippt, bevor die Antwort zurück ist. Jede Treffer-`li` bekommt `id="link-picker-
+     opt-{i}"`, wird in `linkPickerItems` aufgenommen und hat als Click-Listener
+     `_pickLinkPickerAt(i)`. Der "Keine Treffer."-Eintrag bleibt `aria-disabled="true"`
+     und wird **nicht** in `linkPickerItems` aufgenommen — für `_pickLinkPickerAt` damit
+     unerreichbar (Abnahmezeile P8.5-11).
 
-4. **`localStorage` unter `sfx:linkpicker:mode`** (P8.5-G). **Erste `localStorage`-
-   Nutzung im Projekt** — bisher nur `sessionStorage` (CSRF, Drafts). Begründung: die
-   Moduswahl muss Tab-/Fenster-Schließen überleben, das ist mit `sessionStorage` nicht
-   möglich. `try`/`catch` deckt den SecurityError im privaten Modus ab. **V99-Korrektur
-   im Session-Block festgehalten** (kein stiller Drift): der Plan hatte „ja,
-   `sfx:draft:`" als Erwartung — das traf für den **Präfix** zu, aber nicht für den
-   Storage; die Substantiv-Korrektur (`local`- statt `session`Storage) ist die einzige
-   Abweichung vom Plan-Wortlaut und folgt direkt aus P8.5-G.
+   - Zwei neue Helper: `_setLinkPickerCursor(index)` setzt/löscht `aria-selected` auf
+     genau einer `li` und `aria-activedescendant` auf dem Suchfeld
+     (ARIA-1.2-Pflicht-Beziehung, genau dafür steht `aria-controls` am Input aus A1);
+     `scrollIntoView({block: "nearest"})` hält den Cursor im sichtbaren Bereich bei
+     langen Trefferlisten. `_pickLinkPickerAt(index)` ist der gemeinsame Pick-Pfad für
+     Maus-Klick und Enter-Taste, Modus wird **vor** `closeLinkPicker()` gelesen wie
+     beim bestehenden Klick-Handler (Select wird mit dem Dialog versteckt;
+     UI-mutations-unabhängig).
+
+   - `closeLinkPicker()` ergänzt um `linkPickerItems = []; _setLinkPickerCursor(-1);` in
+     der richtigen Reihenfolge (erst leeren, dann Cursor räumen). Alt-Aufrufer bleiben
+     kompatibel.
+
+   - `init()`: ein neuer `keydown`-Handler am `linkPickerSearchEl` für `ArrowDown`/
+     `ArrowUp`/`Enter`. Bewusst kein Wrap-around (die Listen-Navigation in `app.js:212`
+     klemmt ebenfalls), kein Home/End, kein Enter-wählt-den-einzigen-Treffer (Raten).
+     `Escape` bleibt beim globalen Handler (P8.5-L, dort nicht angefasst).
+
+2. **`phase5_ui/webui/static/app.css`** (Z. 1280–1298) — die zwei identischen
+   Regelblöcke (`li:hover`+`li:focus` und `li[aria-selected="true"]`) zu einem
+   zusammengezogen, das tote `:focus` entfällt (kein `tabindex` auf den `li`, kann nie
+   feuern). Die vier Deklarationen selbst sind **byte-identisch** zum 2026-09-02-
+   Standard (Nikinger-Freigabe damals), hier nur entdoppelt. Kommentar darüber um eine
+   Phase-8.5-A2-Zeile ergänzt, alte Erklärung zum `var(--accent-text)`-Fund bleibt
+   unverändert stehen.
+
+3. **`phase5_ui/tests/test_static_routes.py`** — drei neue Tests:
+
+   - `test_link_picker_css_has_one_selection_block` (P8.5-14): zählt `li[aria-
+     selected="true"]` in `app.css` (genau 1) und prüft Abwesenheit von
+     `.link-picker-results li:focus`.
+   - `test_link_picker_picks_run_through_a_single_helper` (P8.5-12): `_pickLinkPickerAt`
+     in `dialogs.js` genau einmal definiert, ≥3 Vorkommen (1 Definition + Maus-Klick +
+     Enter-Taste); `app.js` enthält weder `openLinkPicker` (P8.5-L: Picker wird nur in
+     `editor.js` geöffnet) noch `_pickLinkPickerAt` (Helper nicht umgehen).
+   - `test_insertAtCursor_defined_exactly_once_at_module_level` (P8.5-9): die A1-
+     Anforderung war bislang nur über `grep -n` belegt; jetzt mit pytest festgehalten.
+     Der Bild-Knopf-Aufruf (jetzt Z. 669) außerhalb von `init()` beweist die
+     Modul-Ebene implizit — function-Deklaration wird vom JS-Hoisting an alle
+     Modul-Stellen sichtbar gemacht.
 
 **Begleitende Doku-Updates im selben Commit (Hard Rule 8):**
 
-- `phase8_5_picker_release/CLAUDE.md`: Modul-Status A1 `⬜` → `🟡` (Tests noch `⬜`);
-  fünf Abnahmezeilen P8.5-5/-6/-7/-8/-9 mit kurzen Klammer-Anmerkungen versehen („Code
-  committet; Browser-Nachweis Block C Station …"); Stand-Zeile unverändert
-  (3 ✅ · 0 🟡 · 17 ⬜, P8.5-1/-2/-20 aus Step 0).
-- Step-0-Block nach `SESSIONS_ARCHIVE.md` rotiert (manuell, weil das Skript nur 2+→1
-  kann und das Archiv initial keinen `## Session stopped`-Anker hatte — Platzhalter
-  entfernt, Frontmatter-`updated:` aktualisiert).
-- `phase8_5_picker_release/SESSIONS_ARCHIVE.md`: Platzhalter-Hinweis „noch leer"
-  entfernt (jetzt nicht mehr zutreffend), `updated:` auf 2026-09-04.
+- `phase8_5_picker_release/CLAUDE.md`: Modul-Status A2 `⬜` → `🟡`; fünf Abnahmezeilen
+  P8.5-9/-10/-11/-12/-14 angepasst (P8.5-9/-12/-14 `⬜` → `🟡` mit Klammer-Anmerkung
+  für den statischen Test; P8.5-10/-11 bleiben `🟡` für die Code-Spur, Browser-Nachweis
+  Block C Station 7); Stand-Zeile 3 ✅ · 0 🟡 · 17 ⬜ → 3 ✅ · 3 🟡 · 14 ⬜.
+- A1-Block nach `SESSIONS_ARCHIVE.md` rotiert (manuell, weil `scripts/
+  rotate_session_block.sh` aus Phase 7 für `phase8_5_picker_release/` noch nicht
+  portiert ist — YAGNI für eine zweite manuelle Rotation; Skript-Eintrag verschoben
+  auf Block-C-Beginn mit dem Wegwerf-Setup).
+- `phase8_5_picker_release/SESSIONS_ARCHIVE.md`: A1-Block vorne angehängt (newest-first),
+  Step 0 darunter unverändert; `updated:` aktualisiert.
+- `CLAUDE.md` (Wurzel): neuer „Current state"-Absatz vom 2026-09-04 für A2.
+- `docs/INDEX.md` Phase-8.5-Header: `🔄 A1 🟡, A2/B1/C/D/Z ⬜` → `🔄 A1 🟡, A2 🟡,
+  B1/C/D/Z ⬜`.
+- `ROADMAP.md` Phase-8.5-Absatz: „nächster Schritt: A2" → „nächster Schritt: B1
+  (Titel-statt-ID-Hint generalisierend schärfen, eine Datei in `mcpserver/`)".
 
 **Verifiziert (§0.5 Checkliste):**
 
-- `pytest -q` (venv): **959 passed in 258.19 s** — unverändert, kein Python-Touch
-  (Phase 8.5 baut **keine** API-Fläche, Plan §0.3).
+- `pytest -q` (venv): **962 passed in 266.27 s** — 959 unverändert + 3 neue Tests in
+  `test_static_routes.py`; keine Regressionen.
 - Tabu-Diff aus §0.3 leer: `git diff --stat main -- phase4_auth/ phase1_storage/storage/
   phase5_ui/webui/security.py phase5_ui/webui/api.py phase5_ui/webui/serializers.py
   phase5_ui/webui/permissions.py phase2_mcp/` — **keine Ausgabe**.
-- `node --check` auf `dialogs.js` + `editor.js` + `app.js` (Sicherheitsgespann) — alle
-  drei **OK**.
+- `node --check` auf `dialogs.js` — **OK** (einzige berührte JS-Datei; `app.js` tabu
+  P8.5-L, `editor.js` unangetastet).
 - `python phase5_ui/scripts/ui_budget.py`: **5/5 grün**, js+css+gzip jetzt
-  **127.6 KB** von 125.8 KB (+1.8 KB durch `dialogs.js` 11.0 → 11.7 KB und
-  `editor.js` 7.9 → 8.8 KB); Latenz-`get_item` 7.8 ms / 0.5 KB, `search_items`
-  185.6 ms / 20 KB, `GET /api/v1/overview` 867.9 ms / 1.9 KB — alle im Korridor.
+  **128.7 KB** von 127.6 KB (+1.1 KB durch `dialogs.js` 11.7 → 12.6 KB und die drei
+  statischen Tests); Latenz-`get_item` 7.6 ms / 0.5 KB, `search_items` 189.4 ms / 20 KB,
+  `GET /api/v1/overview` 881.3 ms / 1.9 KB — alle im Korridor.
 - Größenprüfung `find . -name "*.md" … -size +40k`: **kein** neuer Treffer durch diese
-  Session; `phase8_5_picker_release/CLAUDE.md` bleibt deutlich unter dem Cap.
-- Fehlerpfad einmal durchdacht: leeres Suchergebnis → `_renderLinkPickerResults`
-  rendert den `aria-disabled="true"`-Eintrag wie bisher (kein Code-Link auf
-  `linkPickerItems`, A2 fügt das später hinzu); `localStorage`-Wurf → `saved = null`
-  → `body`-Default; `closeLinkPicker()` läuft vor `onPick`-Aufruf, Modus-Lesung VOR
-  `closeLinkPicker` ist dadurch UI-mutations-unabhängig; `picked` ist `null`/kein
-  String → `_onLinkPicked` macht nichts; `_linkTextFor` kollabiert Whitespace und
-  maskiert `[`/`]` (Titel „Notiz [Entwurf]" zerreißt den Markdown-Link nicht).
+  Session; `phase8_5_picker_release/CLAUDE.md` jetzt ~31 KB (vorher ~24 KB), weiterhin
+  deutlich unter dem Cap — kein Rotationsschritt nötig, der Head trägt nach dem
+  Rotieren weiterhin genau einen Block (jetzt den A2-Block).
+- Fehlerpfad einmal durchgedacht: leere Trefferliste → `_renderLinkPickerResults` setzt
+  `linkPickerItems = []` und zeigt den `aria-disabled="true"`-Eintrag (nicht in
+  `linkPickerItems`, für `_pickLinkPickerAt` unerreichbar); `_setLinkPickerCursor`
+  sieht out-of-range und räumt `aria-activedescendant` (verhindert verwaiste ID-Referenz
+  im Suchfeld). Cursor-Reset beim Re-Render fängt auch den Fall ab, dass der User tippt,
+  bevor die Suche antwortet (150 ms Debounce — die Items im DOM sind noch die alten,
+  gehören aber gleich zum alten `linkPickerItems`-Stand; nach der Antwort sind beide
+  synchron neu). `closeLinkPicker` setzt State und Cursor in der richtigen Reihenfolge,
+  sodass `_setLinkPickerCursor(-1)` keine Alt-Werte mehr sieht. `_pickLinkPickerAt`
+  mit ungültigem Index ist no-op. `app.js` bleibt tabu und ist im Test festgenagelt
+  (`openLinkPicker` darf dort nicht vorkommen — der Picker wird in `editor.js` geöffnet,
+  der Helper nur in `dialogs.js` ausgeführt).
 - Service-Touch **0**. `systemctl status sharefyx-mcp` zeigt **PID 195922**, Active seit
-  `Wed 2026-09-02 11:51:57 CEST` (1 day 23h zum Sitzungsbeginn — uptime wuchs leicht
-  gegenüber dem Step-0-Stand) — nichts angefasst, nur gelesen. **PID +
-  ActiveEnterTimestamp im Session-Block notiert, wie §0.5.7 verlangt.**
-
-**Zwei Drift-Funde im Verlauf der Sitzung, im Block festgehalten, kein stiller Patch:**
-
-1. **`\u00b7` vs. `·` in `dialogs.js`:** die Datei speichert das Middle-Dot als JS-
-   Escape (`\u00b7`), nicht als Literal-Zeichen. Mein erster `edit` traf den
-   `oldString` mit literalem `·` nicht; zweiter Versuch mit dem Escape klappte.
-   **Lehre für künftige Picker-Edits:** in dieser Datei konsequent die Escape-Form
-   verwenden oder das ganze Vorkommen vor dem Edit auf `xxd`/Pipe-Substitution
-   umstellen — kein Code-Fix nötig, ist ein Editor-/Tooling-Detail.
-2. **`sessionStorage` vs. `localStorage`:** V99 im Plan war ungenau — der Plan tippte
-   auf „ja, `sfx:draft:`" als Präfix-Begründung, verschwieg aber, dass
-   `draftKeyFor` selbst `sessionStorage` nutzt. Die Wahl von `localStorage` ist
-   deshalb eine **Eskalation** gegenüber der Projekt-Konvention, keine triviale
-   Fortführung; gerechtfertigt durch P8.5-Gs Anforderung „überlebt Tab-Schließen".
-   Im Code dokumentiert (`dialogs.js:107`/`185-191`).
+  `Wed 2026-09-02 11:51:57 CEST` (2 days zum Sitzungsbeginn) — nichts angefasst, nur
+  gelesen. **PID + ActiveEnterTimestamp im Session-Block notiert, wie §0.5.7 verlangt.**
 
 **Was diese Session bewusst NICHT tat:**
 
-- Statische Tests in `phase5_ui/tests/test_static_routes.py` (P8.5-5/-9) — User-Auftrag
-  beschränkte die Session auf `webui/static/`; Tests werden mit Block-C-Vorbereitung
-  oder vor A2 nachgezogen.
-- Block C (Wegwerf-Setup + 13-Stationen-Playwright-Smoke) — kommt als eigener Schritt.
-- A2 (`aria-activedescendant`, Tastaturnavigation, `_pickLinkPickerAt`,
-  CSS-Block-Entdopplung) — eigene Aktion, Reihenfolge A1 → A2 nach §8.
-- B1 (Hint generalisierend) — nach A2, eigene Datei (`mcpserver/tools.py:159-164`).
+- Browser-Verifikation für P8.5-10/-11 (P8.5-13 in Chromium und Firefox) — Block C,
+  kommt mit dem v3-Vorabritt gegen eine Wegwerf-Instanz.
+- Statischer Test für P8.5-5 (Picker-Dialog trägt `<select>` mit beiden Werten) —
+  nicht in den A2-Plan-Scope; wäre ein eigener Tag-Test (Markup-Snapshot), günstig
+  vor Block C nachzuziehen.
+- `dialogs.js` Helper `_setLinkPickerCursor` und `_pickLinkPickerAt` weiter
+  modularisieren (z. B. in ein eigenes Modul) — P5-T bleibt in `dialogs.js` (eine Datei
+  pro Dialog-Cluster, siehe Modul-Header), YAGNI.
+- `app.js` berühren (P8.5-L explizit, im Test festgenagelt).
+- B1 (`_TITLE_NOT_ID_HINT` generalisierend schärfen in `mcpserver/tools.py:159-164`) —
+  eigener Schritt nach A2, einzige erlaubte Tabu-Ausnahme in `mcpserver/`.
 
-**Nächster Schritt, konkret:** **A2 — §9.4.3 Tastaturnavigation und `aria-selected`**
-(`dialogs.js` `linkPickerItems`/`linkPickerCursor` + `_setLinkPickerCursor` +
-`_pickLinkPickerAt` + keydown-Handler am Suchfeld; `app.css` zwei identische Blöcke zu
-einem zusammenziehen, totes `:focus` raus; `app.js` **nicht** anfassen, P8.5-L). Block C
-kommt **nach** A2 — beide landen in `_renderLinkPickerResults` und im Auswahlpfad,
-ein Skript-Paar deckt beide ab (Plan §8).
+**Nächster Schritt, konkret:** **B1 — §9.4.1 Hint generalisierend schärfen**
+(`mcpserver/tools.py:159-164`, einzige erlaubte Tabu-Ausnahme; `phase2_mcp/tests/
+test_tools.py` mitziehen, zwei neue Asserts; Abbruchregel wörtlich im Phase-Head,
+Abnahmezeile P8.5-3). Block C (Wegwerf-Setup + 13-Stationen-Playwright-Smoke) folgt
+danach.

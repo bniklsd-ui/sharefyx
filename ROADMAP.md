@@ -378,8 +378,11 @@ abgeschlossen** (Haushalt-Funde, Skelett, Größenkorrekturen); **A1 committet**
 2026-09-04, Picker-Modus-Umschalter + Body-Markdown-Link-Helper + `localStorage`,
 Modul-Status 🟡, Tests ⬜, vollständiger Session-Block im Phase-Head); **Drift nachgezogen**
 in einem separaten Folge-Commit (Wurzel-Current-state, dieser Absatz, INDEX-Header);
-**nächster Schritt:** A2 (Tastaturnavigation + CSS-Block-Entdopplung am Picker, `app.js`
-tabu).
+**A2 committet** (Tastaturnavigation + gemeinsamer Pick-Pfad `_pickLinkPickerAt` +
+CSS-Block-Entdopplung am Picker; drei neue statische Tests; Modul-Status 🟡; A1-Block
+nach `SESSIONS_ARCHIVE.md` rotiert); Abnahmestand **3 ✅ · 3 🟡 · 14 ⬜ von 20**.
+**nächster Schritt:** B1 (Titel-statt-ID-Hint generalisierend schärfen, eine Datei in
+`mcpserver/`, einzige erlaubte Tabu-Ausnahme).
 
 ---
 

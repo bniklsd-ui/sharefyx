@@ -208,6 +208,26 @@ Tabu-Diff §0.3 leer (kein Code-Touch in beiden Commits), ui_budget 5/5 (127.6 K
 ActiveEnterTimestamp 2026-09-02 11:51:57 CEST — nur gelesen). Nächster Schritt: A2
 (Tastaturnavigation + CSS-Block-Entdopplung am Picker, `app.js` tabu).
 
+**[2026-09-04] Phase 8.5 — 🔄 A2 committet, 🟡, ⬜ B1 als Nächstes.** A2 (`aria-activedescendant`-
+Tastaturnavigation + gemeinsamer Pick-Pfad `_pickLinkPickerAt` + CSS-Block-Entdopplung am
+Picker) gebaut und committet (vollständiger Session-Block im Phase-Head, A1-Block nach
+`SESSIONS_ARCHIVE.md` rotiert); `dialogs.js` neue Modul-Variablen `linkPickerItems`/
+`linkPickerCursor`, neuer `_renderLinkPickerResults`-Aufbau mit State-Reset ganz oben,
+neue Helper `_setLinkPickerCursor`/`_pickLinkPickerAt`, neuer keydown-Handler am
+Suchfeld (ArrowDown/ArrowUp/Enter, kein Wrap, kein Home/End, kein Raten; Escape bleibt
+beim globalen Handler); `app.css` zwei identische Auswahl-Blöcke zusammengezogen, totes
+`:focus` raus; drei neue statische Tests in `test_static_routes.py`
+(`test_link_picker_css_has_one_selection_block` P8.5-14, `test_link_picker_picks_run_
+through_a_single_helper` P8.5-12, `test_insertAtCursor_defined_exactly_once_at_module_level`
+P8.5-9 nachgezogen — A1 hatte diese drei statisch zu belegen zurückgestellt); Modul-Status
+A2 `⬜` → `🟡`, Abnahmestand **3 ✅ · 3 🟡 · 14 ⬜ von 20**. **`pytest` 962/962** (959 + 3 neu,
+keine Regressionen), Tabu-Diff §0.3 leer (kein `storage/`/`mcpserver/`/`security.py`/`api.py`/
+`serializers.py`/`permissions.py`-Touch), ui_budget 5/5 (128.7 KB, +1.1 KB durch `dialogs.js`
+11.7 → 12.6 KB), `node --check` grün auf `dialogs.js`, Service-Touch 0 (PID 195922,
+ActiveEnterTimestamp 2026-09-02 11:51:57 CEST — nur gelesen). Nächster Schritt: B1
+(`_TITLE_NOT_ID_HINT` generalisierend schärfen in `mcpserver/tools.py:159-164`, einzige
+erlaubte Tabu-Ausnahme).
+
 **[2026-09-01] Phase 8 — 🔄 Block A + B ✅ live-verifiziert, Gate B→C bestanden.** UI-Neuanstrich v3,
 Verknüpfungs-Graph (`GET /api/v1/graph` + `item_links`-Tabelle + `linkscan.py` + UI-Wiring), drei
 P7-Erbposten (P7-24 Reauth-Grant ✅, `remove-space`-Auto-Reindex ✅, P7-4 Zweitprobe 🟡 mit
