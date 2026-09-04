@@ -374,8 +374,12 @@ dem Deploy Teil dieser Phase (N5), nicht nur die drei Fixes.
 **Plan:** `docs/concepts/phase8_5_picker_release_plan.md` (744 Zeilen, geschrieben 2026-09-03
 gegen `main@6272cad`). N1–N7 in §0.1 gelockt, Entscheidungen P8.5-A–P8.5-T, Steps 0/A/B/C/D/Z,
 Abnahmezeilen P8.5-1–P8.5-20, `[VERIFY]` V95–V105. Closeout wird §9 des Plans. **Step 0
-abgeschlossen** (Haushalt-Funde, Skelett, Größenkorrekturen); **nächster Schritt:** A1
-(Picker-Modus-Umschalter).
+abgeschlossen** (Haushalt-Funde, Skelett, Größenkorrekturen); **A1 committet** (`499d9be`,
+2026-09-04, Picker-Modus-Umschalter + Body-Markdown-Link-Helper + `localStorage`,
+Modul-Status 🟡, Tests ⬜, vollständiger Session-Block im Phase-Head); **Drift nachgezogen**
+in einem separaten Folge-Commit (Wurzel-Current-state, dieser Absatz, INDEX-Header);
+**nächster Schritt:** A2 (Tastaturnavigation + CSS-Block-Entdopplung am Picker, `app.js`
+tabu).
 
 ---
 

@@ -191,6 +191,23 @@ unter „Phase 8.5 — 🔄 …" — alles im selben Commit (Hard Rule 8). **`py
 (PID 195922, ActiveEnterTimestamp 2026-09-02 11:51:57 CEST — nur gelesen). Nächster Schritt:
 Block A / A1 (Picker-Modus-Umschalter).
 
+**[2026-09-04] Phase 8.5 — 🔄 A1 committet, Drift nachgezogen, ⬜ A2 als Nächstes.** A1
+(Picker-Modus-Umschalter + Body-Markdown-Link-Helper + `localStorage` unter
+`sfx:linkpicker:mode`) gebaut und committet (`499d9be`, vollständiger Session-Block in
+`phase8_5_picker_release/CLAUDE.md`); Modul-Status A1 `⬜` → `🟡` (Tests ⬜, Browser-Nachweis
+folgt in Block C Station 6/8). **Drift-Korrektur in diesem Commit:** Wurzel-Current-state
++ `docs/INDEX.md` Phase-8.5-Eintrag + `ROADMAP.md` Phase-8.5-Absatz waren seit dem A1-Commit
+versehentlich nicht nachgezogen — Phase-eigene Hard-Rule-8-Erweiterung (INDEX-Zeile +
+ROADMAP + Wurzel-Current-state im selben Commit) verlangt das eigentlich; INDEX-Bullet-
+Lücke (`phase8_5_picker_release/CLAUDE.md` + `SESSIONS_ARCHIVE.md` fehlen komplett unter
+„Phase 8.5 — 🔄 …") geht auf die Planungs-Commit-Widmung im Step-0-Block zurück („drei
+INDEX-Zeilen … bereits durch den Nikinger angelegt" — die dritte Zeile fehlte real).
+Auflösung in einem Folge-Commit mit INDEX-Trimmung. **`pytest` 959/959 unverändert**,
+Tabu-Diff §0.3 leer (kein Code-Touch in beiden Commits), ui_budget 5/5 (127.6 KB nach A1
++1.8 KB), `node --check` grün auf dialogs.js/editor.js/app.js, Service-Touch 0 (PID 195922,
+ActiveEnterTimestamp 2026-09-02 11:51:57 CEST — nur gelesen). Nächster Schritt: A2
+(Tastaturnavigation + CSS-Block-Entdopplung am Picker, `app.js` tabu).
+
 **[2026-09-01] Phase 8 — 🔄 Block A + B ✅ live-verifiziert, Gate B→C bestanden.** UI-Neuanstrich v3,
 Verknüpfungs-Graph (`GET /api/v1/graph` + `item_links`-Tabelle + `linkscan.py` + UI-Wiring), drei
 P7-Erbposten (P7-24 Reauth-Grant ✅, `remove-space`-Auto-Reindex ✅, P7-4 Zweitprobe 🟡 mit
