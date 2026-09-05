@@ -283,3 +283,37 @@ sichtbar sein, das `<select class="input" id="link-picker-mode">` im Picker muss
 da sein (P8.5-19-Abnahme: Radiogruppe oder `<select>`-Bestätigung), die drei Fixes
 (A1 Body-Modus, A2 Tastatur, B1 generalisierter Hint) müssen optisch wie in Block C
 verifiziert sein. Danach D5 (Vierte A3-Probe), Z (Closeout).
+
+**Aus dem echten Betrieb mitgekommen (Nikinger, 2026-09-05, Sichtprüfung 2/3?) —
+Beobachtungen geparkt für Plan §9 / Z:** zwei Punkte zur Map-Ansicht
+(`phase5_ui/webui/static/js/graph.js`, Phase-8-Block-D, **P8.5 §0.3 tabu — kein
+stiller Fix in D3-Prep**):
+
+1. **Map-Field schneidet unten ab, zeigt nur solid color.** Layout- oder
+   Canvas-Resize-Problem (vermutlich `.rail__main`/`.graph-canvas`-Höhe oder
+   `position:absolute` ohne Bodem-Anker). Keine Code-Probe in dieser Session.
+2. **Map „fliegt" bei jedem Neuladen durcheinander.** Force-Graph hat keinen
+   stabilen/persistenten Layout-Seed; jeder Mount startet mit frischen Random-
+   Kräften. Der Phase-8-§9.4.6-Settle-Zeit-Fix hat die Konvergenz auf < 3 s
+   gebracht, aber **keine Persistenz** — eine Folge-Sitzung sieht jedes Mal ein
+   anderes Layout. Wurde am 2026-09-02 throwaway-verifiziert (Phase 8 `p8_22_smoke.py`
+   zeigt 5/5 grün), im Live-Betrieb aber sichtbar als „verwirrende Form".
+
+Bezug zu P8.5: nicht Bestandteil dieser Phase (P8.5 §0.4 DRAUSSEN — Phase-8-§9.4.6-
+Funde sind bereits am 2026-09-02 geschlossen). Aber als **offene Beobachtungen für
+Phase 8 / §9 dieses Plans** festgehalten, weil Z genau diese Art von „echter-Betrieb-
+Befund" in den Closeout-Nachtrag einordnen können soll.
+
+**Empfehlung für nächste Session (Übergabe an Nikinger + Z):** zwischen D3 und Z
+**nichts Offenes mehr für opencode/M3** — D4 (Sichtprüfung am echten Gerät), D5
+(Vierte A3-Probe, entscheidet §9.4.1 Abbruchregel) und V105 (echter Anthropic-
+Connector) sind **alles Nikinger-Aktionen**. Sobald die drei abgehakt sind, kann Z
+(Phase-8.5-Closeout, opencode/M3) starten mit: (a) §9 dieses Plans füllen
+(P8.5-T — Status/Delta/Abnahmestand/Restdefekte mit den zwei Map-Beobachtungen
+oben/`[VERIFY]` V95–V105-Bilanz); (b) Nachtrag in `phase8_ui_graph_plan.md` §9 +
+§9.4.7 (P8.5-R/N6 — Phase 8 formal abschließen, Glyph-Entscheidung); (c)
+`phase8_ui_graph/CLAUDE.md` §7-Matrix + Session-Block nachziehen; (d)
+`phase8_5_picker_release/CLAUDE.md` Modul-Status + Abnahmematrix final; (e)
+Größenprüfung mit den zwei benannten Softcap-Überschreitungen (Wurzel-CLAUDE.md
+47.999 B, docs/INDEX.md 44.784 B) als P8-Entscheidung dokumentieren, nicht still
+trimmen.
