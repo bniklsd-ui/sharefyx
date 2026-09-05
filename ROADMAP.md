@@ -14,7 +14,7 @@ down:
   - docs/concepts/phase6_5_tools_images_plan.md   # ausführungsreifer P6.5-Plan
   - docs/concepts/phase7_spaces_admin_plan.md     # ausführungsreifer P7-Plan
   - docs/concepts/phase8_ui_graph_plan.md         # ausführungsreifer P8-Plan
-updated: 2026-09-01 (Phase 8 Block A+B ✅ live-verifiziert, Gate B→C bestanden -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf; Block C naechster Schritt) | 2026-08-28 (Phase 8 Step 0 gestartet -- Status ⬜→🔄, phase8_ui_graph/CLAUDE.md als phase head angelegt) | 2026-08-28 (Phase 8 geplant -- Zeile + Abschnitt neu, phase8_ui_graph_plan.md in down: aufgenommen) | 2026-08-28 (Phase 7 formal abgeschlossen ✅ -- 22 von 24 Abnahmezeilen live bestanden, zwei benannte Defekte an P8 vererbt, PHASE7_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, zweite Rotation des Phase-Heads) | 2026-08-27 (Phase 7 inhaltlich vollstaendig, live deployt e88a624, Step Z laeuft) | 2026-08-23 (Phase 6.5 formal abgeschlossen als P7 Step A8 -- 🟡 code-complete, 12 von 14 Abnahmezeilen live, zwei per testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md neu) | 2026-08-23 (neue Phase 7 -- Space-Verwaltung, Mehrfachauswahl, Konsolidierung -- ergaenzt, Step 0 gestartet; fehlende P6.5-Tabellenzeile nachgetragen) | 2026-08-23 (Phase 6 auf 🟡 code-complete -- 12 von 39 Abnahmezeilen live, Sprung auf ✅ ist offene Nikinger-Entscheidung) | 2026-08-20 (neue Phase 6.5 -- Werkzeug-Ergonomie + Bilder -- ergaenzt, Step 0 gestartet)
+updated: 2026-09-05 (Phase 8.5 D1 committet — Badge `v3.0`→`v3.0.1` in `app.html:20` (P8.5-N7), neuer `## 2026-09-05`-Block in `docs/UPDATE_LOG.md` mit drei Zeilen Picker-Modi/Tastatur/Generalisierter-Hint — **Datums-Drift zu Block-C-Spec dokumentiert**: Block-C-Absatz schlug `## 2026-09-04` vor, `date +%F`/`date -u +%F` ist heute 2026-09-05, `deploy.sh` Z. 117–131 verlangt strikt `today_utc`/`today_local`, sonst Gate-Abbruch; Block-C-Block per Hand nach `SESSIONS_ARCHIVE.md` rotiert (Skript passt nicht auf Phase-8.5-Muster), Modul-Status D `⬜`→`🟡` mit D2–D5 als Nikinger-Aktionen vermerkt, pytest nicht gelaufen, Tabu-Diff §0.3 leer, Service-Touch 0 PID 195922 nur gelesen; nächster Schritt D2 Nikinger-Aktion) | 2026-09-01 (Phase 8 Block A+B ✅ live-verifiziert, Gate B→C bestanden -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf; Block C naechster Schritt) | 2026-08-28 (Phase 8 Step 0 gestartet -- Status ⬜→🔄, phase8_ui_graph/CLAUDE.md als phase head angelegt) | 2026-08-28 (Phase 8 geplant -- Zeile + Abschnitt neu, phase8_ui_graph_plan.md in down: aufgenommen) | 2026-08-28 (Phase 7 formal abgeschlossen ✅ -- 22 von 24 Abnahmezeilen live bestanden, zwei benannte Defekte an P8 vererbt, PHASE7_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, zweite Rotation des Phase-Heads) | 2026-08-27 (Phase 7 inhaltlich vollstaendig, live deployt e88a624, Step Z laeuft) | 2026-08-23 (Phase 6.5 formal abgeschlossen als P7 Step A8 -- 🟡 code-complete, 12 von 14 Abnahmezeilen live, zwei per testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md neu) | 2026-08-23 (neue Phase 7 -- Space-Verwaltung, Mehrfachauswahl, Konsolidierung -- ergaenzt, Step 0 gestartet; fehlende P6.5-Tabellenzeile nachgetragen) | 2026-08-23 (Phase 6 auf 🟡 code-complete -- 12 von 39 Abnahmezeilen live, Sprung auf ✅ ist offene Nikinger-Entscheidung) | 2026-08-20 (neue Phase 6.5 -- Werkzeug-Ergonomie + Bilder -- ergaenzt, Step 0 gestartet)
 ---
 # ROADMAP — Space-Server
 
@@ -420,6 +420,27 @@ menschenlesbaren Zeilen), D2 Deploy als **Nikinger-Aktion** (Hard Rule 9 + P8.5-
 niemals `sudo systemctl restart sharefyx-mcp` durch opencode/M3), D3 Health-Gate,
 D4 Sichtprüfung am echten Gerät, D5 Vierte A3-Probe (an der die Abbruchregel §9.4.1
 (N2) fällt oder hält).
+
+**[2026-09-05, D1 committet]** Release-Vorbereitung opencode/M3: Badge `v3.0` →
+`v3.0.1` in `phase5_ui/webui/static/app.html:20` (P8.5-N7); neuer `## 2026-09-05`-
+Block in `docs/UPDATE_LOG.md` mit drei Zeilen (Picker-Modi / Tastatur / Generalisierter
+Hint). **Datums-Drift zur Block-C-Spec ausdrücklich dokumentiert:** Block-C-Absatz oben
+hatte noch `## 2026-09-04` vorgeschlagen (geschrieben am 2026-09-04, dem Tag von Block C);
+heute ist `date +%F`/`date -u +%F` = 2026-09-05, und `deploy.sh` Z. 117–131 verlangt strikt
+`today_utc`/`today_local` als oberstes Datum, sonst Gate-Abbruch — Eintrag deshalb auf
+2026-09-05 datiert. Block-C-Block per Hand nach `SESSIONS_ARCHIVE.md` rotiert
+(newest-first, vor B1); Skript `scripts/rotate_session_block.sh` passt nicht auf das
+Phase-8.5-Muster mit einem `## Session stopped`-Header + mehreren `### date`-Subblöcken
+(Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits
+konform"). Modul-Status D `⬜` → `🟡` mit D2–D5 als Nikinger-Aktionen vermerkt. `pytest`
+nicht gelaufen (kein Python-Touch), Tabu-Diff §0.3 leer (`app.html` und `docs/UPDATE_LOG.md`
+nicht tabu), Service-Touch 0 (PID 195922 / ActiveEnterTimestamp 2026-09-02 11:51:57 CEST nur
+gelesen). **nächster Schritt:** D2 — Deploy als Nikinger-Aktion
+(`SHAREFYX_SYSTEMCTL="sudo systemctl" phase5_ui/scripts/deploy.sh main` in interaktiver
+Vordergrund-Shell, V103 prüft den `sudo`-Prompt; Hard Rule 9 — niemals `sudo systemctl`
+durch opencode/M3), D3 Health-Gate 3/3 + V105, D4 Sichtprüfung am echten Gerät +
+P8.5-19-Abnahme des `<select>`-Modus-Selektors, D5 Vierte A3-Probe (entscheidet §9.4.1
+Abbruchregel aus N2).
 
 ---
 

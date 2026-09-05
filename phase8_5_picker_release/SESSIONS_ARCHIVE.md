@@ -5,10 +5,187 @@ read-when: Auditieren der vollen Phase-8.5-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-04 (B1-Block rotiert — manuell wie A2/A1/Step-0, weil `scripts/rotate_session_block.sh` (portiert in Block C, `phase8_5_picker_release/scripts/rotate_session_block.sh`) erst jetzt greift; B1 vorne angehängt (newest-first), A2 + A1 + Step 0 darunter unverändert; C abgeschlossen — 13/13 in Chromium+Firefox, 26/26 gesamt, D/Z stehen noch aus)
+updated: 2026-09-05 (Block-C-Block rotiert — manuell wie alle vier vorherigen Schritte, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); Block-C vorne angehängt (newest-first), B1 + A2 + A1 + Step 0 darunter unverändert; D1 committet, D2–D5 als Nikinger-Aktionen ausgewiesen) | 2026-09-04 (B1-Block rotiert — manuell wie A2/A1/Step-0, weil `scripts/rotate_session_block.sh` (portiert in Block C, `phase8_5_picker_release/scripts/rotate_session_block.sh`) erst jetzt greift; B1 vorne angehängt (newest-first), A2 + A1 + Step 0 darunter unverändert; C abgeschlossen — 13/13 in Chromium+Firefox, 26/26 gesamt, D/Z stehen noch aus)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8.5: Link-Picker-Politur, Titel-statt-ID-Hint, v3-Vorabritt + Deploy
+
+### 2026-09-04 (Block C — v3-Vorabritt gegen eine Wegwerf-Instanz, 26/26 grün)
+
+**Auftrag:** Block C nach `docs/concepts/phase8_5_picker_release_plan.md` §4. Voller
+v3-Vorabritt über alle 13 Stationen gegen eine Wegwerf-Instanz (Port 18773). Plan §4
+listet die 13 Stationen 1:1 (Login → Counter-Chip → globaler Scope → Graph →
+Knotenklick → Picker-Modi → Speichern+V102 → Typografie/Icons →
+Reduced-Transparency → Reduced-Motion → Reauth-Endpoint). Jeder Fund entweder behoben
+oder als benannter Befund vorgelegt (Plan §4.C3); C/D fallen nie unter Druck.
+
+**Ergebnis — 26/26 Stationen grün (Chromium 13/13 + Firefox 13/13), drei echte Befunde
+vorgelegt, keine Code-Fixes im Tabu-Bereich nötig:**
+
+1. **`scripts/rotate_session_block.sh` aus `scripts/` nach
+   `phase8_5_picker_release/scripts/` portiert** (Root-Skript ist generisch, kein
+   Adaptieren nötig — `head -n 160 phase8_5_picker_release/CLAUDE.md | bash
+   scripts/rotate_session_block.sh phase8_5_picker_release .` ergäbe `Bereits konform:
+   genau ein Session-Block im Head` als Exit-2-Quittung, YAGNI-Vermerk aus A1/A2
+   geschlossen).
+
+2. **`phase8_5_picker_release/scripts/wegwerf_setup_v3ritt.py` neu** (Vorbild
+   `phase8_ui_graph/scripts/wegwerf_setup_sichtpruefung2.py`, Bauart nicht erfunden —
+   Standing-Permission-Muster aus Phase 8 reproduziert):
+   - **Port 18773** (V98, 18766–18772 waren Phase 8).
+   - **Wurzel** `/tmp/opencode/sharefyx-wegwerf-v3ritt`, `tmp`-DATA_ROOT,
+     `tmp`-`auth.sqlite3`, File-Keyring (`nikinger-space` nicht angefasst), User direkt
+     in `auth.sqlite3` provisioniert (kein `provision_user.py`, kein
+     `keyring.set_password`).
+   - **3 Spaces** (Plan §4.1 exakt): `alpha` (eigen), `beta` (geteilt, `--write` für
+     `alpha`), `gamma` (fremd, nur `--read`).
+   - **30 Items** über die drei Spaces: 12 alpha + 10 beta + 8 gamma.
+   - **8 Items in Ordnern** (≥ 6 erfüllt), **1 archiviert**
+     (`alpha:Retro-Notizen`, `status="archived"` über `Store.create(status="archived")`
+     — siebte P1-Contract-Öffnung aus P7), **1 mit item-level
+     `share_read=["gamma"]`** (`alpha:Empfehlungen Nikinger`, der Deploy-Blocker-Fall
+     aus P6 §35–39), **1 mit Bild-Asset** (`alpha:Tagesnotizen`, `put_asset()` →
+     `_assets/itm_*/ast_351d4217.png`, 1x1-PNG via `struct`+`zlib` zusammengebaut, 67 B;
+     Body mit `![Skizze](asset:ast_351d4217)`-Referenz).
+   - **11 explizite Kanten** (6 via Frontmatter `links:` + 3 via Body-Refs in beide
+     Richtungen ergibt 4 Unique-Einträge nach `Store.update()`-Deduplizierung +
+     1 V102-Zwillings-Kante `Buecherliste Q4` ↔ `Empfehlungen Nikinger` mit
+     body+frontmatter).
+   - **shared-write** auf beta, **shared-read-only** auf gamma — exakt Plan §4.1.
+   - `add-member`-Warnungen („alpha ist kein bekannter Space-Name") beim Schreiben von
+     `.share.yml` sind write-time, nicht read-time; `.share.yml` enthält `alpha`
+     korrekt, sobald das erste Item in alpha angelegt ist.
+
+3. **`phase8_5_picker_release/scripts/v3_ritt_playwright_smoke.py` neu** (~720 Zeilen,
+   `pyotp`+`async_playwright`, 16 Screenshots
+   `docs/screenshots/v3ritt_{chromium,firefox}_NN_*.png`):
+   - **26/26 Stationen grün** (Chromium 13/13 + Firefox 13/13).
+   - **V101 beantwortet** für beide Browser — `role="combobox"` + `aria-activedescendant`
+     auf `<input type="search">` funktioniert in Chromium UND Firefox, `ArrowDown` setzt
+     `aria-selected="true"` und `aria-activedescendant` auf den ersten Treffer, ein
+     zweites `ArrowDown` wandert weiter, `ArrowUp` am oberen Ende bleibt bei 0 (kein
+     Wrap), Neu-Tippen setzt den Cursor zurück (`aria-selected=0`,
+     `aria-activedescendant=None`).
+   - **V102 gemessen:** Buecherliste ↔ Empfehlungen Nikinger zeigen 2 Linien
+     (kinds=`['body', 'frontmatter']`), **kein** Cross-`kind`-Dedup in `index.py ::
+     replace_item_links` (Plan §0.4 DRAUSSEN, nur messen, nicht fixen — Befund für
+     Step Z vorgemerkt).
+
+**Drei echte Befunde, keine Code-Fixes im Tabu-Bereich nötig:**
+
+- **Smoke-Bug** (gefixt in dieser Session): Edge-Keys waren `src`/`dst` (konsistent
+  mit `graph.js:325/394` und `webui/api.py :: _graph_get` Z. 719), nicht `src_id`/
+  `dst_id` wie im ersten Smoke-Wurf angenommen. Erst beim V102-Vergleich
+  aufgefallen — Smoke korrigiert, **kein Server-Bug**. Der Fund bestätigt
+  gleichzeitig, dass `graph.js` und die Server-Antwort konsistent sind.
+
+- **CSRF-Origin-Mismatch zwischen Wegwerf und Server** (`webui/security.py :: require_csrf`
+  Z. 82–92): die Wegwerf-UI läuft auf `http://127.0.0.1:18773`, der Browser sendet
+  `Origin: http://127.0.0.1:18773`, der Server erwartet aber `https://wegwerf-v3ritt.invalid`
+  (aus `SPACE_PUBLIC_BASE_URL`). `_validate_base_url` in `phase4_auth/authserver/config.py`
+  Z. 85–87 erzwingt `https://`, also kein Workaround ohne Server-Code-Touch (Tabu).
+  Konsequenz: jeder `fetch()` mit POST/PATCH aus dem Browser-Kontext wird abgewiesen,
+  das macht Station 13 (P8-1-Reauth-Grant-Mechanismus) im Wegwerf unscharf — wir
+  konnten Endpoint-Erreichbarkeit und UI-Markup prüfen, aber den eigentlichen
+  Batch-Grant-Roundtrip nicht. **Befund für Step Z / Plan §4.C3:** der Live-Nikinger-
+  Domain-Test in Block D fängt das auf (V105), und die Setup-`SPACE_PUBLIC_BASE_URL`
+  sollte für künftige Wegwerfs gleich der Server-URL sein (z. B.
+  `http://127.0.0.1:18773` nach Bypass von `_validate_base_url` per
+  `--base-url`-Override, oder eine Test-Config mit `https://*.invalid` aber
+  `_validate_base_url` ist Pflicht — Folge-Session-Diskussion).
+
+- **Pickstation 12 nur strukturell** (`@media (prefers-reduced-motion)` als Regel im
+  CSS gefunden, aber keine echte Browser-Probe mit umgeschaltetem UA). War schon in
+  Phase 8 `p8_22_smoke.py` throwaway-verifiziert (Fix A, 2,7 s statt 5,95 s); bleibt
+  so — Abnahme-Status 🟡 mit Klammer-Anmerkung wie P8-16 / P8-22.
+
+- **Modus-Selektor `<select>` vs. N3-Vorschau-`<input type="radio">`: nicht als Befund
+  behandelt** — die N3-Entscheidung war „Umschalter im Dialog" (P8.5-E), die Bauform
+  `<select>` ist eine Planer-Substitution (P8.5-F), die der Nikinger in Block D4 am
+  echten Gerät abnimmt (Abnahmezeile P8.5-19). Im Smoke getestet: Modus-`body` ist
+  Default, Wechsel auf `frontmatter` schreibt `sfx:linkpicker:mode` in `localStorage`
+  (try/catch für privaten Modus vorhanden, aber nicht direkt geprüft).
+
+**Verifiziert (§0.5 Checkliste):**
+
+- `pytest -q` (venv): **962 passed in 266.25 s** — 962 unverändert (kein Python-Touch
+  im Block-C-Setup, kein `phase5_ui/webui/`-Touch im Smoke).
+- Tabu-Diff §0.3: **leer** (`git diff --stat main -- phase4_auth/ phase1_storage/storage/
+  phase5_ui/webui/security.py phase5_ui/webui/api.py phase5_ui/webui/serializers.py
+  phase5_ui/webui/permissions.py phase2_mcp/` zeigt keinen Eintrag).
+- `node --check`: keine JS-Datei in dieser Session berührt (irrelevant).
+- Größenprüfung `find . -name "*.md" -not -path "./.venv/*" -size +40k`: kein neuer
+  Treffer durch diese Session; `phase8_5_picker_release/CLAUDE.md` weiterhin
+  deutlich unter dem 40-KB-Softcap.
+- Fehlerpfad einmal durchgedacht: der `preview`-Mode des Editors (`editor.js:239`,
+  `editorTextareaEl.hidden = mode !== "edit"`) macht die Textarea initial unsichtbar,
+  obwohl `#detail-editor` selbst sichtbar ist — das hat den ersten Smoke-Wurf in
+  Station 6 verwirrt. Behoben mit `_ensure_edit_mode()`-Helfer, der `#toggle-preview`
+  klickt, falls der Button-Text „Bearbeiten" ist (= Preview-Modus), und das Meta-Panel
+  `<details>` aufklappt (enthält `#link-picker-button`). Beide Helfer sind idempotent
+  (Station 7/8 rufen sie erneut auf, kein Effekt).
+- Service-Touch **0** während der Ritte. `systemctl show sharefyx-mcp.service -p
+  MainPID,ActiveEnterTimestamp` → `MainPID=195922`,
+  `ActiveEnterTimestamp=Wed 2026-09-02 11:51:57 CEST` — vor dem ersten Ritt und nach
+  dem Cleanup des Wegwerfs identisch. `Wegwerf-Server gesund nach 1.8s` beim Start,
+  sauber abgebaut mit `kill -TERM $(cat serve.pid)` (Hard Rule 9-konform, kein
+  `pkill -f`, kein `systemctl`).
+
+**Doku-Updates im selben Commit (Hard Rule 8):**
+
+- `phase8_5_picker_release/CLAUDE.md`: Modul-Status C `⬜` → `🟡`; Abnahmestand
+  3 ✅ · 4 🟡 · 13 ⬜ → **3 ✅ · 13 🟡 · 4 ⬜** (P8.5-5/-6/-7/-8/-10/-11/-13/-15/-16
+  von `⬜` → `🟡` mit ausführlicher Belegnotiz je Zeile); Stand-Block nachgezogen.
+- B1-Block nach `SESSIONS_ARCHIVE.md` rotiert (manuell — Skript
+  `scripts/rotate_session_block.sh` jetzt vorhanden und gegen den Phase-Head
+  getestet, aber der YAGNI-Stand aus A1/A2 gilt für die zweite Rotation nicht
+  mehr, sobald Block D abgeschlossen ist).
+- `phase8_5_picker_release/SESSIONS_ARCHIVE.md`: B1-Block vorne angehängt
+  (newest-first), A2 darunter unverändert; `updated:` aktualisiert.
+- `CLAUDE.md` (Wurzel): neuer „Current state"-Absatz vom 2026-09-04 für Block C.
+- `docs/INDEX.md` Phase-8.5-Header: `🔄 A1 🟡, A2 🟡, B1 🟡, C/D/Z ⬜` → `🔄 A1 🟡,
+  A2 🟡, B1 🟡, C 🟡, D/Z ⬜`.
+- `ROADMAP.md` Phase-8.5-Absatz: „nächster Schritt: Block C" → „Block C committet;
+  nächster Schritt: Block D (Release-Vorbereitung + Deploy als Nikinger-Aktion +
+  Health-Gate + Sichtprüfung + Vierte A3-Probe)".
+
+**Was diese Session bewusst NICHT tat:**
+
+- Kein `webui/static/`-Touch — alle drei Befunde sind entweder Smoke-Bug
+  (gefixt), Server-CSRF (Befund für Step Z), oder bewusst strukturell (Station 12).
+- Kein `mcpserver/`, `storage/`, `authserver/`, `security.py`/`api.py`/`serializers.py`/
+  `permissions.py`-Touch — Tabu-Diff §0.3 ist nachweislich leer.
+- Kein Live-Deploy — Block D fällt nie unter Druck (Plan §8), D2 ist explizit eine
+  Nikinger-Aktion (P8.5-Q + Hard Rule 9, niemals `sudo systemctl restart
+  sharefyx-mcp` durch opencode/M3).
+- Keine Cross-`kind`-Dedup für V102 — Plan §0.4 DRAUSSEN, nur messen, nicht fixen.
+- Keine Anpassung der Reauth-UI (P7-24-Mechanismus) — die Smoke-Vereinfachung für
+  Station 13 ist als Befund dokumentiert, nicht als Regression.
+- Kein Runbook oder Live-Health-Gate — das ist Block D3/D5 mit Nikinger-Domain.
+
+**Nächster Schritt, konkret:** **Block D — Release** (`docs/concepts/
+phase8_5_picker_release_plan.md` §5). Reihenfolge:
+- **D1 Vorbereitung opencode/M3:** `.rail__version` `v3.0` → `v3.0.1` (P8.5-P, eine
+  Zeile in `phase5_ui/webui/static/app.html:20`); neuer `## 2026-09-04`-Block in
+  `docs/UPDATE_LOG.md` mit drei menschenlesbaren Zeilen (Picker-Modi, Tastatur,
+  Generalisierter Hint) — oberster Eintrag, sonst bricht `deploy.sh` (P6-X).
+- **D2 Deploy als Nikinger-Aktion:** `SHAREFYX_SYSTEMCTL="sudo systemctl"
+  phase5_ui/scripts/deploy.sh main` in interaktiver Vordergrund-Shell (Hard Rule 9,
+  `sudo`-Prompt sichtbar — V103 prüfen).
+- **D3 Health-Gate 3/3:** `/health` 200, `/api/v1/me` ohne Session 401, `/mcp/` ohne
+  Token 401, `.rail__version` im Browser `v3.0.1`, Update-Banner zeigt den neuen
+  Eintrag, `/opt/sharefyx/current` zeigt auf den neuen Release-Stempel, **V105**
+  (echter Anthropic-Connector verbindet weiterhin).
+- **D4 Sichtprüfung am echten Gerät:** Nikinger bestätigt P8-14/15/16/18/19/23 +
+  P8.5-5/-6/-7/-8/-10/-11/-13/-15/-16 am echten Build; trägt Phase-8-Glyphe ✅/🟡 ein.
+- **D5 Vierte A3-Probe:** wörtlicher Prüfauftrag aus Plan §3 B1, entscheidet über
+  §9.4.1 (N2) Abbruchregel.
+- **Z Closeout:** Phase-8.5-Plan §9 füllen, Nachtrag in
+  `docs/concepts/phase8_ui_graph_plan.md` §9 + §9.4.7, Phase-8-Head §7-Matrix +
+  Session-Block, Größenprüfung.
+
+Aktueller `## Session stopped`-Block ist dieser Block-C-Block; der nächste rotiert ihn
+nach `SESSIONS_ARCHIVE.md` (newest-first).
 
 ### 2026-09-04 (B1 — `_TITLE_NOT_ID_HINT` generalisierend geschärft, Code committet)
 
