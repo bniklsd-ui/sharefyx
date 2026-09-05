@@ -380,9 +380,14 @@ Modul-Status 🟡, Tests ⬜, vollständiger Session-Block im Phase-Head); **Dri
 in einem separaten Folge-Commit (Wurzel-Current-state, dieser Absatz, INDEX-Header);
 **A2 committet** (Tastaturnavigation + gemeinsamer Pick-Pfad `_pickLinkPickerAt` +
 CSS-Block-Entdopplung am Picker; drei neue statische Tests; Modul-Status 🟡; A1-Block
-nach `SESSIONS_ARCHIVE.md` rotiert); Abnahmestand **3 ✅ · 3 🟡 · 14 ⬜ von 20**.
-**nächster Schritt:** B1 (Titel-statt-ID-Hint generalisierend schärfen, eine Datei in
-`mcpserver/`, einzige erlaubte Tabu-Ausnahme).
+nach `SESSIONS_ARCHIVE.md` rotiert); **B1 committet** (`_TITLE_NOT_ID_HINT` generalisiert
+in `mcpserver/tools.py:159-164` — Schlußsatz „Das gilt in jeder Textform" wörtlich aus
+Plan §3 B1; zwei Asserts in `test_tools.py`; Abbruchregel-Abschnitt im Phase-Head;
+Modul-Status 🟡; A2-Block nach `SESSIONS_ARCHIVE.md` rotiert); Abnahmestand
+**3 ✅ · 4 🟡 · 13 ⬜ von 20**. **nächster Schritt:** **Block C** — v3-Vorabritt gegen
+eine Wegwerf-Instanz (Plan §4, 13 Stationen Playwright-Smoke gegen den nie ausgelieferten
+v3-Build; Wegwerf-Setup mit tmp `DATA_ROOT`/`auth.sqlite3`/eigenem Port, inkl. Portierung
+von `scripts/rotate_session_block.sh` aus Phase 7 für `phase8_5_picker_release/`).
 
 ---
 

@@ -8,7 +8,7 @@ down:
   - ROADMAP.md                          # Phasenplan + Status je Phase
   - docs/INDEX.md                       # L0-Karte aller .md
   - phase8_5_picker_release/CLAUDE.md   # aktive Phase (Phase 8.5, schließt Phase 8 mit ab)
-updated: 2026-09-04 (Wurzel-CLAUDE.md komprimiert -- Phase-6-Verlaufsdokumentation + Phase-6/6.5-Vormerkungen + Funnel-Reboot + MCP-Werkzeug-Ergonomie + End-Korrekturen P5/P4 auf Pointer-Form gestaucht; ~5 KB freigemacht, aktueller Stand ~39.7 KB unter Cap; Phase-8.5-Work-Abschnitt aktualisiert auf A1+A2, A1-Block rotiert nach Archiv) | 2026-09-04 (Phase 8.5 A2 committet `7ce0be0` -- Tastaturnavigation `aria-activedescendant` + `_pickLinkPickerAt` + CSS-Block-Entdopplung am Picker; +3 statische Tests in `test_static_routes.py`; A1-Block nach `SESSIONS_ARCHIVE.md` rotiert) | 2026-09-04 (Phase 8.5 Drift nachgezogen `4424310` + A1 committet `499d9be` -- Picker-Modus-Umschalter + `localStorage` `sfx:linkpicker:mode`; V99 `session` zu `local` als Eskalation wegen P8.5-G; erste `localStorage`-Nutzung des Projekts) | 2026-09-03 (Phase 8.5 Step 0 -- Skelett phase8_5_picker_release/{CLAUDE.md, SESSIONS_ARCHIVE.md, scripts/} angelegt; vier Paragraph-1-Funde: INDEX 52.911 zu 40.917 B unter Cap, Bueroklammer-zu-Lupe-Drift in phase8_ui_graph/CLAUDE.md:440, Phase-8-Bilanz korrigiert; ROADMAP-Abschnitt neu; Wurzel-`down:` umgestellt) | 2026-09-01 (Phase 8 Sichtpruefung 1 + Gate B zu C bestanden; **Hard Rule 9 ergaenzt** -- kein `pkill -f` mit Regex, niemals den systemd-Dienst anfassen, Lehre aus dem Prod-Vorfall 2026-09-01 Phase 8 Step A3 Nachbereitung) | aeltere Eintraegge: die jeweilige phase*/SESSIONS_ARCHIVE.md
+updated: 2026-09-04 (Wurzel-CLAUDE.md komprimiert -- Phase-6-Verlaufsdokumentation + Phase-6/6.5-Vormerkungen + Funnel-Reboot + MCP-Werkzeug-Ergonomie + End-Korrekturen P5/P4 auf Pointer-Form gestaucht; ~5 KB freigemacht, aktueller Stand ~39.7 KB unter Cap; Phase-8.5-Work-Abschnitt aktualisiert auf A1+A2, A1-Block rotiert nach Archiv) | 2026-09-04 (Phase 8.5 B1 committet -- `_TITLE_NOT_ID_HINT` in `phase2_mcp/mcpserver/tools.py:159-164` generalisiert, „Das gilt in jeder Textform -- auch nicht als Tabellen-Spalte, nicht in Klammern hinter dem Titel und nicht in Aufzählungs-Zeilen" wörtlich aus Plan §3 B1; `test_tools.py` zwei Asserts (`in jeder Textform`/`Klammern`); neuer Phase-Head-Abschnitt `## Abbruchregel §9.4.1 (N2, verbindlich)`; Modul-Status B1 + P8.5-3, A2-Block nach `SESSIONS_ARCHIVE.md` rotiert; pytest 962/962 unverändert, Tabu-Diff zeigt **genau** `tools.py +5/-2` und `test_tools.py +2`, kein Service-Touch) | 2026-09-04 (Phase 8.5 A2 committet `7ce0be0` -- Tastaturnavigation `aria-activedescendant` + `_pickLinkPickerAt` + CSS-Block-Entdopplung am Picker; +3 statische Tests in `test_static_routes.py`; A1-Block nach `SESSIONS_ARCHIVE.md` rotiert) | 2026-09-04 (Phase 8.5 Drift nachgezogen `4424310` + A1 committet `499d9be` -- Picker-Modus-Umschalter + `localStorage` `sfx:linkpicker:mode`; V99 `session` zu `local` als Eskalation wegen P8.5-G; erste `localStorage`-Nutzung des Projekts) | 2026-09-03 (Phase 8.5 Step 0 -- Skelett phase8_5_picker_release/{CLAUDE.md, SESSIONS_ARCHIVE.md, scripts/} angelegt; vier Paragraph-1-Funde: INDEX 52.911 zu 40.917 B unter Cap, Bueroklammer-zu-Lupe-Drift in phase8_ui_graph/CLAUDE.md:440, Phase-8-Bilanz korrigiert; ROADMAP-Abschnitt neu; Wurzel-`down:` umgestellt) | 2026-09-01 (Phase 8 Sichtpruefung 1 + Gate B zu C bestanden; **Hard Rule 9 ergaenzt** -- kein `pkill -f` mit Regex, niemals den systemd-Dienst anfassen, Lehre aus dem Prod-Vorfall 2026-09-01 Phase 8 Step A3 Nachbereitung) | aeltere Eintraegge: die jeweilige phase*/SESSIONS_ARCHIVE.md
 ---
 # CLAUDE.md — Project Instructions
 
@@ -227,6 +227,25 @@ keine Regressionen), Tabu-Diff §0.3 leer (kein `storage/`/`mcpserver/`/`securit
 ActiveEnterTimestamp 2026-09-02 11:51:57 CEST — nur gelesen). Nächster Schritt: B1
 (`_TITLE_NOT_ID_HINT` generalisierend schärfen in `mcpserver/tools.py:159-164`, einzige
 erlaubte Tabu-Ausnahme).
+
+**[2026-09-04] Phase 8.5 — 🔄 B1 committet, 🟡, ⬜ Block C als Nächstes.** B1 (Hint generalisierend
+geschärft — Plan §3 B1, Option a, N2) gebaut und committet (vollständiger Session-Block im
+Phase-Head, A2-Block nach `SESSIONS_ARCHIVE.md` rotiert); `_TITLE_NOT_ID_HINT` in
+`mcpserver/tools.py:159-164` um den Vier-Zeilen-Schlusssatz *„Das gilt in jeder Textform —
+auch nicht als Tabellen-Spalte, nicht in Klammern hinter dem Titel und nicht in
+Aufzählungs-Zeilen"* wörtlich aus dem Plan ergänzt; `test_tools.py` um zwei Asserts
+(`in jeder Textform`/`Klammern`) im bestehenden
+`test_tool_descriptions_tell_the_agent_to_name_titles_not_ids` erweitert; neuer Phase-Head-
+Abschnitt `## Abbruchregel §9.4.1 (N2, verbindlich)` zwischen Modul-Status und Geerbte
+Contracts, ebenfalls wörtlich aus Plan §3 B1 — Abbruchregel ist damit prüfbar an
+Abnahmezeile P8.5-3 hängen; Modul-Status B1 `⬜` → `🟡`, Abnahmestand **3 ✅ · 4 🟡 · 13 ⬜
+von 20** (P8.5-3 von `⬜` → `🟡` mit Klammer-Anmerkung). **`pytest` 962/962** unverändert
+(keine neue Testfunktion, nur zwei Asserts im bestehenden Test), Tabu-Diff §0.3 zeigt
+**genau** die erlaubten zwei Dateien (`phase2_mcp/mcpserver/tools.py +5/-2`,
+`phase2_mcp/tests/test_tools.py +2`), kein `authserver/`/`storage/`/`security.py`/`api.py`/
+`serializers.py`/`permissions.py`-Touch, Service-Touch 0 (PID 195922, ActiveEnterTimestamp
+2026-09-02 11:51:57 CEST — nur gelesen). Nächster Schritt: **Block C** (Wegwerf-Setup +
+13-Stationen-Playwright-Smoke gegen den nie ausgelieferten v3-Build, Plan §4).
 
 **[2026-09-01] Phase 8 — 🔄 Block A + B ✅ live-verifiziert, Gate B→C bestanden.** UI-Neuanstrich v3,
 Verknüpfungs-Graph (`GET /api/v1/graph` + `item_links`-Tabelle + `linkscan.py` + UI-Wiring), drei

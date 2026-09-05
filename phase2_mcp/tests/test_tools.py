@@ -140,6 +140,8 @@ def test_tool_descriptions_tell_the_agent_to_name_titles_not_ids(described_mcp):
     assert "Einkaufsliste Winter" in tools._TITLE_NOT_ID_HINT
     assert "itm_a1b2c3d4" in tools._TITLE_NOT_ID_HINT
     assert "Tabellen-Spalte" in tools._TITLE_NOT_ID_HINT
+    assert "in jeder Textform" in tools._TITLE_NOT_ID_HINT
+    assert "Klammern" in tools._TITLE_NOT_ID_HINT
 
 
 # -- list_spaces --------------------------------------------------------------------

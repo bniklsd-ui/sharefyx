@@ -5,10 +5,148 @@ read-when: Auditieren der vollen Phase-8.5-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-04 (A1-Block rotiert — manuell wie Step-0, weil `scripts/rotate_session_block.sh` aus Phase 7 für `phase8_5_picker_release/` noch nicht portiert ist und YAGNI für eine zweite manuelle Rotation; A1 vorne angehängt (newest-first), Step 0 darunter unverändert; B1/C/D/Z stehen noch aus)
+updated: 2026-09-04 (A2-Block rotiert — manuell wie A1/Step-0, weil `scripts/rotate_session_block.sh` aus Phase 7 für `phase8_5_picker_release/` noch nicht portiert ist und YAGNI für eine dritte manuelle Rotation; A2 vorne angehängt (newest-first), A1 + Step 0 darunter unverändert; B1 abgeschlossen, C/D/Z stehen noch aus)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8.5: Link-Picker-Politur, Titel-statt-ID-Hint, v3-Vorabritt + Deploy
+
+### 2026-09-04 (A2 — Tastaturnavigation + `_pickLinkPickerAt` + CSS-Block-Entdopplung, Code committet)
+
+**Auftrag:** A2 nach `docs/concepts/phase8_5_picker_release_plan.md` §2.A2.
+Tastaturnavigation über `aria-activedescendant` (Fokus bleibt im Suchfeld), gemeinsamer
+Pick-Pfad für Maus und Enter, Entdopplung der zwei identischen CSS-Auswahl-Blöcke am
+Picker, totes `:focus` raus. Die A1-Session hatte statische Tests ausdrücklich
+zurückgestellt — der Plan-Test für P8.5-14 gehört zu A2, P8.5-9 und P8.5-12 ziehe ich
+gleich mit nach.
+
+**Ergebnis — alle drei Eingriffsgruppen aus Plan §2.A2 committet, §0.5 Checkliste grün:**
+
+1. **`phase5_ui/webui/static/js/dialogs.js`** — vier Edits:
+
+   - Neue Modul-Variablen `linkPickerItems = []` und `linkPickerCursor = -1` (Z. 117–119).
+     `-1` = keine Auswahl, beim Re-Rendern zurückgesetzt (benannte Falle aus Plan §2.A2:
+     sonst zeigte ein alter Cursor nach dem Filtern auf einen anderen Treffer).
+
+   - `_renderLinkPickerResults(items)` umgebaut: State-Reset **ganz oben** (vor
+     `replaceChildren()`) räumt `linkPickerItems`+`linkPickerCursor`+
+     `aria-activedescendant` — das schließt den Such-Debounce-Fall ab, in dem der User
+     tippt, bevor die Antwort zurück ist. Jede Treffer-`li` bekommt `id="link-picker-
+     opt-{i}"`, wird in `linkPickerItems` aufgenommen und hat als Click-Listener
+     `_pickLinkPickerAt(i)`. Der "Keine Treffer."-Eintrag bleibt `aria-disabled="true"`
+     und wird **nicht** in `linkPickerItems` aufgenommen — für `_pickLinkPickerAt` damit
+     unerreichbar (Abnahmezeile P8.5-11).
+
+   - Zwei neue Helper: `_setLinkPickerCursor(index)` setzt/löscht `aria-selected` auf
+     genau einer `li` und `aria-activedescendant` auf dem Suchfeld
+     (ARIA-1.2-Pflicht-Beziehung, genau dafür steht `aria-controls` am Input aus A1);
+     `scrollIntoView({block: "nearest"})` hält den Cursor im sichtbaren Bereich bei
+     langen Trefferlisten. `_pickLinkPickerAt(index)` ist der gemeinsame Pick-Pfad für
+     Maus-Klick und Enter-Taste, Modus wird **vor** `closeLinkPicker()` gelesen wie
+     beim bestehenden Klick-Handler (Select wird mit dem Dialog versteckt;
+     UI-mutations-unabhängig).
+
+   - `closeLinkPicker()` ergänzt um `linkPickerItems = []; _setLinkPickerCursor(-1);` in
+     der richtigen Reihenfolge (erst leeren, dann Cursor räumen). Alt-Aufrufer bleiben
+     kompatibel.
+
+   - `init()`: ein neuer `keydown`-Handler am `linkPickerSearchEl` für `ArrowDown`/
+     `ArrowUp`/`Enter`. Bewusst kein Wrap-around (die Listen-Navigation in `app.js:212`
+     klemmt ebenfalls), kein Home/End, kein Enter-wählt-den-einzigen-Treffer (Raten).
+     `Escape` bleibt beim globalen Handler (P8.5-L, dort nicht angefasst).
+
+2. **`phase5_ui/webui/static/app.css`** (Z. 1280–1298) — die zwei identischen
+   Regelblöcke (`li:hover`+`li:focus` und `li[aria-selected="true"]`) zu einem
+   zusammengezogen, das tote `:focus` entfällt (kein `tabindex` auf den `li`, kann nie
+   feuern). Die vier Deklarationen selbst sind **byte-identisch** zum 2026-09-02-
+   Standard (Nikinger-Freigabe damals), hier nur entdoppelt. Kommentar darüber um eine
+   Phase-8.5-A2-Zeile ergänzt, alte Erklärung zum `var(--accent-text)`-Fund bleibt
+   unverändert stehen.
+
+3. **`phase5_ui/tests/test_static_routes.py`** — drei neue Tests:
+
+   - `test_link_picker_css_has_one_selection_block` (P8.5-14): zählt `li[aria-
+     selected="true"]` in `app.css` (genau 1) und prüft Abwesenheit von
+     `.link-picker-results li:focus`.
+   - `test_link_picker_picks_run_through_a_single_helper` (P8.5-12): `_pickLinkPickerAt`
+     in `dialogs.js` genau einmal definiert, ≥3 Vorkommen (1 Definition + Maus-Klick +
+     Enter-Taste); `app.js` enthält weder `openLinkPicker` (P8.5-L: Picker wird nur in
+     `editor.js` geöffnet) noch `_pickLinkPickerAt` (Helper nicht umgehen).
+   - `test_insertAtCursor_defined_exactly_once_at_module_level` (P8.5-9): die A1-
+     Anforderung war bislang nur über `grep -n` belegt; jetzt mit pytest festgehalten.
+     Der Bild-Knopf-Aufruf (jetzt Z. 669) außerhalb von `init()` beweist die
+     Modul-Ebene implizit — function-Deklaration wird vom JS-Hoisting an alle
+     Modul-Stellen sichtbar gemacht.
+
+**Begleitende Doku-Updates im selben Commit (Hard Rule 8):**
+
+- `phase8_5_picker_release/CLAUDE.md`: Modul-Status A2 `⬜` → `🟡`; fünf Abnahmezeilen
+  P8.5-9/-10/-11/-12/-14 angepasst (P8.5-9/-12/-14 `⬜` → `🟡` mit Klammer-Anmerkung
+  für den statischen Test; P8.5-10/-11 bleiben `🟡` für die Code-Spur, Browser-Nachweis
+  Block C Station 7); Stand-Zeile 3 ✅ · 0 🟡 · 17 ⬜ → 3 ✅ · 3 🟡 · 14 ⬜.
+- A1-Block nach `SESSIONS_ARCHIVE.md` rotiert (manuell, weil `scripts/
+  rotate_session_block.sh` aus Phase 7 für `phase8_5_picker_release/` noch nicht
+  portiert ist — YAGNI für eine zweite manuelle Rotation; Skript-Eintrag verschoben
+  auf Block-C-Beginn mit dem Wegwerf-Setup).
+- `phase8_5_picker_release/SESSIONS_ARCHIVE.md`: A1-Block vorne angehängt (newest-first),
+  Step 0 darunter unverändert; `updated:` aktualisiert.
+- `CLAUDE.md` (Wurzel): neuer „Current state"-Absatz vom 2026-09-04 für A2.
+- `docs/INDEX.md` Phase-8.5-Header: `🔄 A1 🟡, A2/B1/C/D/Z ⬜` → `🔄 A1 🟡, A2 🟡,
+  B1/C/D/Z ⬜`.
+- `ROADMAP.md` Phase-8.5-Absatz: „nächster Schritt: A2" → „nächster Schritt: B1
+  (Titel-statt-ID-Hint generalisierend schärfen, eine Datei in `mcpserver/`)".
+
+**Verifiziert (§0.5 Checkliste):**
+
+- `pytest -q` (venv): **962 passed in 266.27 s** — 959 unverändert + 3 neue Tests in
+  `test_static_routes.py`; keine Regressionen.
+- Tabu-Diff aus §0.3 leer: `git diff --stat main -- phase4_auth/ phase1_storage/storage/
+  phase5_ui/webui/security.py phase5_ui/webui/api.py phase5_ui/webui/serializers.py
+  phase5_ui/webui/permissions.py phase2_mcp/` — **keine Ausgabe**.
+- `node --check` auf `dialogs.js` — **OK** (einzige berührte JS-Datei; `app.js` tabu
+  P8.5-L, `editor.js` unangetastet).
+- `python phase5_ui/scripts/ui_budget.py`: **5/5 grün**, js+css+gzip jetzt
+  **128.7 KB** von 127.6 KB (+1.1 KB durch `dialogs.js` 11.7 → 12.6 KB und die drei
+  statischen Tests); Latenz-`get_item` 7.6 ms / 0.5 KB, `search_items` 189.4 ms / 20 KB,
+  `GET /api/v1/overview` 881.3 ms / 1.9 KB — alle im Korridor.
+- Größenprüfung `find . -name "*.md" … -size +40k`: **kein** neuer Treffer durch diese
+  Session; `phase8_5_picker_release/CLAUDE.md` jetzt ~31 KB (vorher ~24 KB), weiterhin
+  deutlich unter dem Cap — kein Rotationsschritt nötig, der Head trägt nach dem
+  Rotieren weiterhin genau einen Block (jetzt den A2-Block).
+- Fehlerpfad einmal durchgedacht: leere Trefferliste → `_renderLinkPickerResults` setzt
+  `linkPickerItems = []` und zeigt den `aria-disabled="true"`-Eintrag (nicht in
+  `linkPickerItems`, für `_pickLinkPickerAt` unerreichbar); `_setLinkPickerCursor`
+  sieht out-of-range und räumt `aria-activedescendant` (verhindert verwaiste ID-Referenz
+  im Suchfeld). Cursor-Reset beim Re-Render fängt auch den Fall ab, dass der User tippt,
+  bevor die Suche antwortet (150 ms Debounce — die Items im DOM sind noch die alten,
+  gehören aber gleich zum alten `linkPickerItems`-Stand; nach der Antwort sind beide
+  synchron neu). `closeLinkPicker` setzt State und Cursor in der richtigen Reihenfolge,
+  sodass `_setLinkPickerCursor(-1)` keine Alt-Werte mehr sieht. `_pickLinkPickerAt`
+  mit ungültigem Index ist no-op. `app.js` bleibt tabu und ist im Test festgenagelt
+  (`openLinkPicker` darf dort nicht vorkommen — der Picker wird in `editor.js` geöffnet,
+  der Helper nur in `dialogs.js` ausgeführt).
+- Service-Touch **0**. `systemctl status sharefyx-mcp` zeigt **PID 195922**, Active seit
+  `Wed 2026-09-02 11:51:57 CEST` (2 days zum Sitzungsbeginn) — nichts angefasst, nur
+  gelesen. **PID + ActiveEnterTimestamp im Session-Block notiert, wie §0.5.7 verlangt.**
+
+**Was diese Session bewusst NICHT tat:**
+
+- Browser-Verifikation für P8.5-10/-11 (P8.5-13 in Chromium und Firefox) — Block C,
+  kommt mit dem v3-Vorabritt gegen eine Wegwerf-Instanz.
+- Statischer Test für P8.5-5 (Picker-Dialog trägt `<select>` mit beiden Werten) —
+  nicht in den A2-Plan-Scope; wäre ein eigener Tag-Test (Markup-Snapshot), günstig
+  vor Block C nachzuziehen.
+- `dialogs.js` Helper `_setLinkPickerCursor` und `_pickLinkPickerAt` weiter
+  modularisieren (z. B. in ein eigenes Modul) — P5-T bleibt in `dialogs.js` (eine Datei
+  pro Dialog-Cluster, siehe Modul-Header), YAGNI.
+- `app.js` berühren (P8.5-L explizit, im Test festgenagelt).
+- B1 (`_TITLE_NOT_ID_HINT` generalisierend schärfen in `mcpserver/tools.py:159-164`) —
+  eigener Schritt nach A2, einzige erlaubte Tabu-Ausnahme in `mcpserver/`.
+
+**Nächster Schritt, konkret:** **B1 — §9.4.1 Hint generalisierend schärfen**
+(`mcpserver/tools.py:159-164`, einzige erlaubte Tabu-Ausnahme; `phase2_mcp/tests/
+test_tools.py` mitziehen, zwei neue Asserts; Abbruchregel wörtlich im Phase-Head,
+Abnahmezeile P8.5-3). Block C (Wegwerf-Setup + 13-Stationen-Playwright-Smoke) folgt
+danach.
 
 ### 2026-09-04 (A1 — Picker-Modus-Umschalter + Body-Markdown-Link, Code committet)
 

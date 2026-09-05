@@ -159,8 +159,9 @@ _LIST_SPACES_POINTER = (
 _TITLE_NOT_ID_HINT = (
     "Nenne einem Menschen gegenüber immer den Titel eines Items, nicht seine itm_…-ID — die "
     "ID ist eine interne Adresse und in der Weboberfläche nur als Kopierfeld sichtbar. "
-    'Beispiel: schreibe „Einkaufsliste Winter", nicht „itm_a1b2c3d4"; auch nicht als '
-    "Tabellen-Spalte."
+    'Beispiel: schreibe „Einkaufsliste Winter", nicht „itm_a1b2c3d4". Das gilt in jeder '
+    "Textform — auch nicht als Tabellen-Spalte, nicht in Klammern hinter dem Titel und "
+    "nicht in Aufzählungs-Zeilen."
 )
 
 
