@@ -228,24 +228,48 @@ ActiveEnterTimestamp 2026-09-02 11:51:57 CEST — nur gelesen). Nächster Schrit
 (`_TITLE_NOT_ID_HINT` generalisierend schärfen in `mcpserver/tools.py:159-164`, einzige
 erlaubte Tabu-Ausnahme).
 
+**[2026-09-04] Phase 8.5 — 🔄 Block C committet, 🟡, ⬜ Block D + Z als Nächstes.** Voller
+v3-Vorabritt (Plan §4) gegen eine Wegwerf-Instanz auf Port 18773 gefahren:
+`phase8_5_picker_release/scripts/wegwerf_setup_v3ritt.py` (Wegwerf-Setup mit Standing-
+Permission-Muster aus Phase 8: eigener Port, tmp-`DATA_ROOT`/tmp-`auth.sqlite3`/File-
+Keyring; 30 Items über drei Spaces — 12 alpha + 10 beta + 8 gamma; ein archiviertes
+Item, ein Item mit item-level `share_read=["gamma"]` (Deploy-Blocker-Fall aus P6 §35–
+39), ein Item mit Bild-Asset (`ast_351d4217` per `put_asset()`); 11 explizite Kanten,
+darunter die für V102 präparierte Zwillings-Kante body+frontmatter zwischen
+`alpha:Buecherliste Q4` und `alpha:Empfehlungen Nikinger`); 16 Screenshots
+`docs/screenshots/v3ritt_{chromium,firefox}_NN_*.png`. **`v3_ritt_playwright_smoke.py`:
+13/13 Stationen grün in Chromium UND Firefox — 26/26 gesamt** (V101 beantwortet für beide
+Browser). Drei **echte Befunde**, keine Code-Fixes im Tabu-Bereich nötig:
+- **Smoke-Bug** (gefixt in dieser Session): Edge-Keys waren `src`/`dst` (konsistent mit
+  `graph.js:325/394`), nicht `src_id`/`dst_id` wie im Smoke angenommen; ist beim
+  V102-Vergleich aufgefallen, Smoke korrigiert, **kein Server-Bug**.
+- **CSRF-Origin-Mismatch** zwischen Wegwerf-UI (`http://127.0.0.1:18773`) und
+  konfiguriertem `SPACE_PUBLIC_BASE_URL` (`https://wegwerf-v3ritt.invalid`); `_validate_base_url`
+  erzwingt https. Konsequenz: jeder `fetch()` mit POST/PATCH aus dem Browser-Kontext
+  wird abgewiesen, das macht Station 13 (P8-1-Reauth-Grant-Mechanismus) im Wegwerf
+  unscharf — der Live-Nikinger-Domain-Test in Block D fängt das auf. **Befund für
+  Step Z / Plan-§4.C3.**
+- **Pickstation 12 nur strukturell** (`@media (prefers-reduced-motion)` als Regel im
+  CSS gefunden, aber keine echte Browser-Probe mit umgeschaltetem UA). War schon in
+  Phase 8 `p8_22_smoke.py` throwaway-verifiziert (Fix A, 2,7 s statt 5,95 s); bleibt
+  so.
+- Modus-Selektor `<select>` vs. N3-Vorschau-`<input type="radio">`: **nicht als Befund
+  behandelt** — die N3-Entscheidung war „Umschalter im Dialog" (P8.5-E), die Bauform
+  `<select>` ist eine Planer-Substitution (P8.5-F), die der Nikinger in Block D4 am
+  echten Gerät abnimmt (Abnahmezeile P8.5-19). Modul-Status C `⬜` → `🟡`, Abnahme-
+  stand **3 ✅ · 13 🟡 · 4 ⬜ von 20** (P8.5-5, -6, -7, -8, -10, -11, -13, -15, -16 alle
+  `⬜` → `🟡`; P8.5-3 bleibt `🟡` mit Klammer-Anmerkung für Live-D5). **`pytest` 962/962**
+  unverändert (kein Python-Touch im Block-C-Setup, kein `phase5_ui/webui/`-Touch im
+  Smoke), Tabu-Diff §0.3 leer, Wegwerf sauber abgebaut (`kill -TERM $(cat serve.pid)`,
+  Hard Rule 9-konform), Produktion nachweislich unangetastet (PID 195922 / ActiveEnter
+  2026-09-02 11:51:57 CEST vor/nach identisch). Nächster Schritt: **Block D** —
+  Release-Vorbereitung (`.rail__version` `v3.0` → `v3.0.1`, neuer `## 2026-09-04`-Block
+  in `docs/UPDATE_LOG.md`, drei Zeilen menschenlesbar zum Phase-8.5-Deploy), D2 Deploy
+  als **Nikinger-Aktion** (Hard Rule 9 + P8.5-Q, niemals `sudo systemctl restart
+  sharefyx-mcp` durch opencode/M3), D3 Health-Gate, D4 Sichtprüfung am echten Gerät,
+  D5 Vierte A3-Probe (an der die Abbruchregel §9.4.1 fällt oder hält).
+
 **[2026-09-04] Phase 8.5 — 🔄 B1 committet, 🟡, ⬜ Block C als Nächstes.** B1 (Hint generalisierend
-geschärft — Plan §3 B1, Option a, N2) gebaut und committet (vollständiger Session-Block im
-Phase-Head, A2-Block nach `SESSIONS_ARCHIVE.md` rotiert); `_TITLE_NOT_ID_HINT` in
-`mcpserver/tools.py:159-164` um den Vier-Zeilen-Schlusssatz *„Das gilt in jeder Textform —
-auch nicht als Tabellen-Spalte, nicht in Klammern hinter dem Titel und nicht in
-Aufzählungs-Zeilen"* wörtlich aus dem Plan ergänzt; `test_tools.py` um zwei Asserts
-(`in jeder Textform`/`Klammern`) im bestehenden
-`test_tool_descriptions_tell_the_agent_to_name_titles_not_ids` erweitert; neuer Phase-Head-
-Abschnitt `## Abbruchregel §9.4.1 (N2, verbindlich)` zwischen Modul-Status und Geerbte
-Contracts, ebenfalls wörtlich aus Plan §3 B1 — Abbruchregel ist damit prüfbar an
-Abnahmezeile P8.5-3 hängen; Modul-Status B1 `⬜` → `🟡`, Abnahmestand **3 ✅ · 4 🟡 · 13 ⬜
-von 20** (P8.5-3 von `⬜` → `🟡` mit Klammer-Anmerkung). **`pytest` 962/962** unverändert
-(keine neue Testfunktion, nur zwei Asserts im bestehenden Test), Tabu-Diff §0.3 zeigt
-**genau** die erlaubten zwei Dateien (`phase2_mcp/mcpserver/tools.py +5/-2`,
-`phase2_mcp/tests/test_tools.py +2`), kein `authserver/`/`storage/`/`security.py`/`api.py`/
-`serializers.py`/`permissions.py`-Touch, Service-Touch 0 (PID 195922, ActiveEnterTimestamp
-2026-09-02 11:51:57 CEST — nur gelesen). Nächster Schritt: **Block C** (Wegwerf-Setup +
-13-Stationen-Playwright-Smoke gegen den nie ausgelieferten v3-Build, Plan §4).
 
 **[2026-09-01] Phase 8 — 🔄 Block A + B ✅ live-verifiziert, Gate B→C bestanden.** UI-Neuanstrich v3,
 Verknüpfungs-Graph (`GET /api/v1/graph` + `item_links`-Tabelle + `linkscan.py` + UI-Wiring), drei

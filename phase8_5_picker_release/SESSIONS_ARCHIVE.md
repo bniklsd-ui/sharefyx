@@ -5,10 +5,124 @@ read-when: Auditieren der vollen Phase-8.5-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-04 (A2-Block rotiert — manuell wie A1/Step-0, weil `scripts/rotate_session_block.sh` aus Phase 7 für `phase8_5_picker_release/` noch nicht portiert ist und YAGNI für eine dritte manuelle Rotation; A2 vorne angehängt (newest-first), A1 + Step 0 darunter unverändert; B1 abgeschlossen, C/D/Z stehen noch aus)
+updated: 2026-09-04 (B1-Block rotiert — manuell wie A2/A1/Step-0, weil `scripts/rotate_session_block.sh` (portiert in Block C, `phase8_5_picker_release/scripts/rotate_session_block.sh`) erst jetzt greift; B1 vorne angehängt (newest-first), A2 + A1 + Step 0 darunter unverändert; C abgeschlossen — 13/13 in Chromium+Firefox, 26/26 gesamt, D/Z stehen noch aus)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8.5: Link-Picker-Politur, Titel-statt-ID-Hint, v3-Vorabritt + Deploy
+
+### 2026-09-04 (B1 — `_TITLE_NOT_ID_HINT` generalisierend geschärft, Code committet)
+
+**Auftrag:** B1 nach `docs/concepts/phase8_5_picker_release_plan.md` §3 B1. Einzige
+erlaubte Tabu-Ausnahme in `mcpserver/` (P8.5-D, Präzedenz P7-T und P8-§0.4). Hint
+generalisierend schärfen (Option a, N2), zwei neue Asserts in `test_tools.py`,
+Abbruchregel wörtlich im Phase-Head.
+
+**Ergebnis — alle drei Eingriffsgruppen aus Plan §3 B1 committet, §0.5 Checkliste grün:**
+
+1. **`phase2_mcp/mcpserver/tools.py` Z. 159–164.** `_TITLE_NOT_ID_HINT` generalisiert.
+   Der alte Schwanz `; auch nicht als Tabellen-Spalte.` ist durch einen Vier-Zeilen-
+   Schlusssatz ersetzt: *„Das gilt in jeder Textform — auch nicht als Tabellen-Spalte,
+   nicht in Klammern hinter dem Titel und nicht in Aufzählungs-Zeilen."* — wörtlich aus
+   Plan §3 B1. Die drei Negativ-Beispiele stehen jetzt als **Illustration der Regel**,
+   nicht als abschließende Liste; der Satz „Das gilt in jeder Textform" ist die
+   eigentliche Änderung, der Rest ist Konkretisierung. Wörtlich identisch an den vier
+   Verwendungsstellen (`search_items`/`get_item`/`get_item_meta`/`create_item`) — die
+   `update_item`/`append_to_item`/`patch_item`-Beschreibungen tragen den Hint bewusst
+   nicht (reine Schreibwerkzeuge, Vorlage aus Phase 7; siehe auch „Fehlerpfad" unten).
+
+2. **`phase2_mcp/tests/test_tools.py` Z. 137–143.** `test_tool_descriptions_tell_the_
+   agent_to_name_titles_not_ids` um zwei Asserts erweitert:
+   - `assert "in jeder Textform" in tools._TITLE_NOT_ID_HINT`
+   - `assert "Klammern" in tools._TITLE_NOT_ID_HINT`
+   Bestehende Asserts (`"Einkaufsliste Winter"`, `"itm_a1b2c3d4"`, `"Tabellen-Spalte"`,
+   plus Hint-in-Beschreibung für `search_items`/`get_item`/`get_item_meta`/
+   `create_item`) bleiben unverändert gültig — keine Anpassung am Testaufbau, nur zwei
+   zusätzliche Zeilen.
+
+3. **`phase8_5_picker_release/CLAUDE.md`.** Neuer Abschnitt `## Abbruchregel §9.4.1
+   (N2, verbindlich)` zwischen Modul-Status und Geerbte Contracts, wörtlich aus Plan
+   §3 B1: *„Taucht die `itm_…`-ID in einer **vierten** Oberflächenform auf (Fließtext +
+   Tabelle waren die ersten zwei, der Klammer-/Aufzählungs-Kontext aus Phase 8 §9.4.1
+   die dritte), wird §9.4.1 als **Modellverhalten dokumentiert und geschlossen**
+   (Option c). Kein fünfter Hint-Edit, keine Schema-Änderung an `search_items`. Der
+   Punkt verschwindet dann aus dem Ledger, statt weiter vererbt zu werden. — Geprüft
+   wird das in Block D5 (vierte A3-Probe nach dem Deploy, wörtlicher Prüfauftrag im
+   Plan §3 B1)."* — Pflichtbestandteil der Abnahmezeile P8.5-3.
+
+**Begleitende Doku-Updates im selben Commit (Hard Rule 8):**
+
+- `phase8_5_picker_release/CLAUDE.md`: Modul-Status B1 `⬜` → `🟡`; P8.5-3 `⬜` → `🟡`
+  mit Klammer-Anmerkung für den Code-Beleg; Stand-Zeile 3 ✅ · 3 🟡 · 14 ⬜ →
+  3 ✅ · 4 🟡 · 13 ⬜.
+- A2-Block nach `SESSIONS_ARCHIVE.md` rotiert (manuell, wie in A1/A2 — Skript
+  `scripts/rotate_session_block.sh` aus Phase 7 noch nicht für `phase8_5_picker_release/`
+  portiert; YAGNI bis Block-C-Beginn).
+- `phase8_5_picker_release/SESSIONS_ARCHIVE.md`: A2-Block vorne angehängt
+  (newest-first), A1 darunter unverändert; `updated:` aktualisiert.
+- `CLAUDE.md` (Wurzel): neuer „Current state"-Absatz vom 2026-09-04 für B1.
+- `docs/INDEX.md` Phase-8.5-Header: `🔄 A1 🟡, A2 🟡, B1/C/D/Z ⬜` → `🔄 A1 🟡, A2
+  🟡, B1 🟡, C/D/Z ⬜`.
+- `ROADMAP.md` Phase-8.5-Absatz: „nächster Schritt: B1" → „B1 committet; nächster
+  Schritt: Block C (Wegwerf-Setup + 13-Stationen-Playwright-Smoke)".
+
+**Verifiziert (§0.5 Checkliste):**
+
+- `pytest -q` (venv): **962 passed in 256.65 s** — 962 unverändert (keine neue
+  Testfunktion, nur zwei Asserts im bestehenden
+  `test_tool_descriptions_tell_the_agent_to_name_titles_not_ids`); keine Regressionen.
+- Tabu-Diff aus §0.3 zeigt **genau** die erlaubten zwei Dateien:
+  `git diff --stat main -- phase4_auth/ phase1_storage/storage/ phase5_ui/webui/security.py
+  phase5_ui/webui/api.py phase5_ui/webui/serializers.py phase5_ui/webui/permissions.py
+  phase2_mcp/` →
+  ```
+  phase2_mcp/mcpserver/tools.py  | 5 +++--
+  phase2_mcp/tests/test_tools.py | 2 ++
+  ```
+  Plan §3 B1 „Tabu: … Der Diff auf `phase2_mcp/` darf **genau** diese eine Datei plus
+  die Testdatei zeigen." — exakt erfüllt.
+- `node --check`: keine JS-Datei berührt (irrelevant für diese Session).
+- Größenprüfung `find . -name "*.md" -not -path "./.venv/*" -size +40k`: **kein**
+  neuer Treffer durch diese Session; `phase8_5_picker_release/CLAUDE.md` jetzt ~27 KB
+  (vorher ~27 KB), weiterhin deutlich unter dem Cap — kein Rotationsschritt nötig.
+- Fehlerpfad einmal durchgedacht: bestehender Test prüft den Hint an den vier
+  Verwendungsstellen, an denen er tatsächlich eingebettet ist. Die Generalisierung
+  ist **additiv** (kein bestehender Fall wird gebrochen, nur neue Fälle werden
+  abgedeckt) — wer vorher schon „Tabellen-Spalte" las, sieht jetzt zusätzlich
+  „Klammern" und „Aufzählungs-Zeilen". Wenn der Generalisierungs-Satz später einmal
+  entfernt werden müsste (Pflege, niemand weiß), würde der bestehende Assert
+  `"Tabellen-Spalte" in tools._TITLE_NOT_ID_HINT` zuerst feuern — das ist das
+  gewollte Sicherheitsnetz. Ein viertes `_TITLE_NOT_ID_HINT`-Vorkommen (etwa in einem
+  fünften Tool) fällt durch den `assert tools._TITLE_NOT_ID_HINT in
+  _description_of(described_mcp, name)`-Loop nicht auf — der Test ist absichtlich
+  nicht „viermal vorkommend", sondern „in diesen vier Beschreibungen vorhanden".
+- Service-Touch **0**. `systemctl status sharefyx-mcp` zeigt **PID 195922**, Active seit
+  `Wed 2026-09-02 11:51:57 CEST` (3 days zum Sitzungsbeginn) — nichts angefasst, nur
+  gelesen. **PID + ActiveEnterTimestamp im Session-Block notiert, wie §0.5.7 verlangt.**
+
+**Was diese Session bewusst NICHT tat:**
+
+- Browser-/Live-Verifikation für P8.5-4 (vierte A3-Probe) — kommt mit Block D5 nach
+  dem Deploy.
+- `test_mcp_smoke.py`-Anpassung an den neuen Hint-Text — der Smoke ist eine Live-
+  Probe, die keinen Description-Text liest (nur Tool-Aufrufe gegen den Server); keine
+  Anpassung nötig, keine Lücke im Smoke.
+- Block C (Wegwerf-Setup + 13-Stationen-Playwright-Smoke) — nächster Schritt nach
+  diesem Commit; Plan §4.
+- `mcpserver/tools.py` sonst anfassen — die Tabu-Ausnahme gilt **ausschließlich** für
+  den Hint-Text. `WRITE_TOOL_DIVISION`, `_LIST_SPACES_POINTER`, alle
+  Beschreibungs-Strings anderer Tools bleiben unangetastet (gegengeprüft mit
+  `git diff` auf der Datei).
+- `mcp_smoke.py`-Beschreibungen — der Hint erscheint nur in Tool-Beschreibungen, der
+  Smoke spricht die Tools über Funktionsaufrufe an.
+
+**Nächster Schritt, konkret:** **Block C — v3-Vorabritt gegen eine Wegwerf-Instanz**
+(`docs/concepts/phase8_5_picker_release_plan.md` §4). Erst Wegwerf-Setup
+(`scripts/serve.py` mit tmp `DATA_ROOT`/tmp `auth.sqlite3`/eigenem Port, inkl. der seit
+Step 0 angekündigten Portierung von `scripts/rotate_session_block.sh` aus Phase 7 für
+`phase8_5_picker_release/`), dann 13 Stationen Playwright-Smoke; jeder Fund entweder
+behoben oder als benannter Befund vorgelegt. Plan §4 listet die 13 Stationen.
+
+---
 
 ### 2026-09-04 (A2 — Tastaturnavigation + `_pickLinkPickerAt` + CSS-Block-Entdopplung, Code committet)
 
