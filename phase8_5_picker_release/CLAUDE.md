@@ -9,7 +9,7 @@ down:
   - ../phase8_ui_graph/CLAUDE.md                       # Phase 8 — schließt diese Phase mit ab (N6, P8.5-R), kein eigenes Handover
   - ../phase8_ui_graph/SESSIONS_ARCHIVE.md              # Bilanz P8-22/P8-24-Smokes, drei §9.4.6-Befunde (Settle/Farbe/Klick), P8.5-Vorgänger-Session-Block
   - SESSIONS_ARCHIVE.md                                 # ältere Session-Blöcke, newest-first
-updated: 2026-09-05 (D1 committet — Badge `v3.0`→`v3.0.1` in `phase5_ui/webui/static/app.html:20` (P8.5-N7, statisches HTML nicht im Tabu §0.3); neuer `## 2026-09-05`-Block in `docs/UPDATE_LOG.md` mit drei Zeilen Picker-Modi/Tastatur/Generalisierter-Hint (Datums-Drift gegenüber Block-C-Spec dokumentiert: Block-C schlug `## 2026-09-04` vor, `date +%F`/`date -u +%F` ist heute 2026-09-05, `deploy.sh` Z. 117–131 verlangt strikt `today_utc`/`today_local`, sonst Gate-Abbruch); Block-C-Block per Hand nach `SESSIONS_ARCHIVE.md` rotiert (newest-first vor B1), Skript `scripts/rotate_session_block.sh` passt nicht auf Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken → Exit 2 „Bereits konform"; Modul-Status-Zeile D `⬜`→`🟡` (D1 fertig, D2–D5 als Nikinger-Aktionen vermerkt); pytest nicht gelaufen (kein Python-Touch), Tabu-Diff §0.3 leer (`app.html` und `docs/UPDATE_LOG.md` nicht tabu), `node --check`/`ui_budget.py` irrelevant; Service-Touch 0 PID 195922 ActiveEnterTimestamp 2026-09-02 11:51:57 CEST nur gelesen; nächster Schritt D2 = `sudo systemctl ... deploy.sh main`) | 2026-09-04 (Block C committet — `scripts/rotate_session_block.sh` aus `scripts/` nach `phase8_5_picker_release/scripts/` portiert (YAGNI aus A1/A2 geschlossen, ein Aufruf `Bereits konform` als Exit-2-Quittung), `wegwerf_setup_v3ritt.py` neu (Port 18773 V98, Standing-Permission-Muster aus Phase 8 reproduziert, 30 Items über 3 Spaces — 12 alpha + 10 beta + 8 gamma, 1 archiviertes, 1 mit item-level `share_read=["gamma"]` P6-§35-39-Fall, 1 mit Bild-Asset `ast_351d4217` per `put_asset()`, 11 explizite Kanten inkl. V102-Zwillings-Kante Buecherliste ↔ Empfehlungen Nikinger), `v3_ritt_playwright_smoke.py` neu (~720 Zeilen, `pyotp`+`async_playwright`, **26/26 Stationen grün: Chromium 13/13 + Firefox 13/13**, V101 für beide Browser bestätigt; 16 Screenshots `docs/screenshots/v3ritt_{chromium,firefox}_NN_*.png`; drei echte Befunde vorgelegt: 1. Smoke-Bug `src_id`→`src` [gefixt im Smoke, kein Server-Bug], 2. CSRF-Origin-Mismatch zwischen `http://127.0.0.1:18773` und `SPACE_PUBLIC_BASE_URL=https://wegwerf-v3ritt.invalid` wegen `_validate_base_url`-Pflicht [Befund für Step Z / Plan §4.C3], 3. Station 12 nur strukturell [bleibt, throwaway-verifiziert in P8]); Modul-Status C `⬜`→`🟡`, Abnahmestand 3 ✅ · 4 🟡 · 13 ⬜ → **3 ✅ · 13 🟡 · 4 ⬜** (P8.5-5/-6/-7/-8/-10/-11/-13/-15/-16 `⬜`→`🟡` mit Belegnotiz je Zeile); B1-Block nach `SESSIONS_ARCHIVE.md` rotiert (manuell — `rotate_session_block.sh` jetzt vorhanden, aber YAGNI-Stand aus A1/A2 gilt für die zweite Rotation nicht mehr, sobald Block D abgeschlossen ist); pytest 962/962 unverändert (kein Python-Touch im Block-C-Setup), Tabu-Diff §0.3 leer (kein `mcpserver/`/`storage/`/`authserver/`/`security.py`/`api.py`/`serializers.py`/`permissions.py`-Touch), Service-Touch 0 (PID 195922 ActiveEnterTimestamp 2026-09-02 11:51:57 CEST nur gelesen, Wegwerf PID 337447 sauber abgebaut via `kill -TERM $(cat serve.pid)`, Hard Rule 9-konform); nächster Schritt Block D) | 2026-09-04 (Wurzel-CLAUDE.md komprimiert — Phase-6-Verlaufsdokumentation + Phase-6/6.5-Vormerkungen + Funnel-Reboot-Notiz + MCP-Werkzeug-Ergonomie-Live-Feedback + End-Korrekturen P5/P4 auf Pointer-Form gestaucht; ~5 KB freigemacht; Wurzel-`updated:`-Pipe analog getrimmt; kein Code, keine Tests, kein Service-Touch; PID 195922 Active seit 2026-09-02 11:51:57 CEST nur gelesen) | 2026-09-04 (B1 committet — `_TITLE_NOT_ID_HINT` in `phase2_mcp/mcpserver/tools.py:159-164` generalisiert (Schlusssatz „Das gilt in jeder Textform — auch nicht als Tabellen-Spalte, nicht in Klammern hinter dem Titel und nicht in Aufzählungs-Zeilen." wörtlich aus Plan §3 B1), `phase2_mcp/tests/test_tools.py` um zwei Asserts (`in jeder Textform`/`Klammern`) im bestehenden `test_tool_descriptions_tell_the_agent_to_name_titles_not_ids` erweitert; neuer Phase-Head-Abschnitt `## Abbruchregel §9.4.1 (N2, verbindlich)` wörtlich aus Plan §3 B1 zwischen Modul-Status und Geerbte Contracts; Modul-Status B1 ⬜→🟡, P8.5-3 ⬜→🟡 mit Klammer-Anmerkung, Stand 3 ✅ · 3 🟡 · 14 ⬜ → 3 ✅ · 4 🟡 · 13 ⬜; pytest 962/962 unverändert (keine neue Testfunktion, nur zwei Asserts in bestehendem Test), Tabu-Diff §0.3 zeigt **genau** `phase2_mcp/mcpserver/tools.py +5/-2` und `phase2_mcp/tests/test_tools.py +2` (Plan: „genau die erlaubte Zeile + Test-Datei"), A2-Block nach `SESSIONS_ARCHIVE.md` rotiert (manuell, wie bisher); PID 195922 Active seit 2026-09-02 11:51:57 CEST nur gelesen, kein Service-Touch; nächster Schritt Block C) | 2026-09-04 (A2 committet — `dialogs.js` Module-Vars `linkPickerItems`/`linkPickerCursor` + `_renderLinkPickerResults` mit State-Reset ganz oben + `_setLinkPickerCursor`/`_pickLinkPickerAt` neu + `closeLinkPicker()`-Reset-Reihenfolge + `keydown`-Handler am Suchfeld (ArrowDown/ArrowUp/Enter, kein Wrap, kein Home/End, kein Raten); `app.css` zwei identische Auswahl-Blöcke zu einem zusammengezogen, totes `:focus` raus; zwei neue statische Tests in `test_static_routes.py` (`test_link_picker_css_has_one_selection_block` P8.5-14, `test_link_picker_picks_run_through_a_single_helper` P8.5-12) plus `test_insertAtCursor_defined_exactly_once_at_module_level` für P8.5-9; Modul-Status A2 ⬜→🟡, fünf Abnahmezeilen P8.5-9/-10/-11/-12/-14 angepasst, Stand 3 ✅ · 0 🟡 · 17 ⬜ → 3 ✅ · 3 🟡 · 14 ⬜; pytest 959→962 (+3, +0.8 KB), ui_budget 5/5 (127.6→128.7 KB, dialogs.js 11.7→12.6 KB), Tabu-Diff §0.3 leer, `node --check` grün auf dialogs.js, A1-Block nach SESSIONS_ARCHIVE.md rotiert (manuell, weil `scripts/`-Verzeichnis für `rotate_session_block.sh` aus Phase 7 noch leer ist — YAGNI für eine zweite manuelle Rotation, Plan-§0.5-Skript-Eintrag verschoben auf Block-C-Beginn mit dem Wegwerf-Setup), PID 195922 Active seit 2026-09-02 11:51:57 CEST nur gelesen, kein Service-Touch; nächster Schritt B1) | 2026-09-04 (Drift nachgezogen — Wurzel-`Current state` mit neuem 2026-09-04-Absatz ergänzt (A1-Eintrag + Drift-Hinweis + Folge-Commit-Vermerk für INDEX-Bullet-Lücke), `docs/INDEX.md` Phase-8.5-Header „⬜ geplant, nicht gestartet" → „🔄 A1 🟡, A2/B1/C/D/Z ⬜", `ROADMAP.md` Phase-8.5-Plan-Absatz „nächster Schritt: A1" → „A1 committet, Drift nachgezogen, nächster Schritt: A2"; INDEX-Bullets für `phase8_5_picker_release/CLAUDE.md` + `SESSIONS_ARCHIVE.md` bewusst NICHT in diesem Commit ergänzt — INDEX steht bei 40917 B, 43 B unter dem 40-KB-Softcap, zwei neue Bullets würden den Cap reißen; Vorschlag: Aufnahme mit gleichzeitiger Trimmung der `updated:`-Pipe in einem späteren Commit, vor A2 nicht nötig; kein Code, kein Service-Touch, pytest/ui_budget unverändert) | 2026-09-04 (A1 committet — `<select id="link-picker-mode">` in app.html:270-280, `dialogs.js` `_linkPickerMode`/`_restoreLinkPickerMode`/neue `onPick({id, title, mode})`-Signatur/change→localStorage, `editor.js` `insertAtCursor` auf Modulebene + `_linkTextFor`/`_appendLinkMarkdown`/`_onLinkPicked`, wiring auf `_onLinkPicked`; Modul-Status A1 ⬜→🟡, Tests ⬜; pytest unverändert 959/959, Tabu-Diff §0.3 leer, ui_budget 5/5 +1.8 KB, node --check grün auf dialogs.js/editor.js/app.js, Service-Touch 0 PID 195922 — V99-Korrektur im Block: erste localStorage-Nutzung des Projekts, sessionStorage→localStorage Eskalation wegen P8.5-G „überlebt Tab-Schließen", `try`/`catch` deckt SecurityError im privaten Modus ab) | 2026-09-03 (Step 0 abgeschlossen — Skelett phase8_5_picker_release/{CLAUDE.md, SESSIONS_ARCHIVE.md, scripts/} angelegt, vier Funde aus Plan §1 abgearbeitet: docs/INDEX.md 52.911 → 40.917 B (-23 %, 43 B unter 40 KB-Softcap) durch Kürzung updated: auf 5 neueste Einträge + Schlusszeile + kompakte Ausnahmenliste (Fund 2) im Wartungsblock, "Büroklammer" → "Lupe" an phase8_ui_graph/CLAUDE.md:440 mit datierter Korrekturnotiz, Phase-8-Bilanz 15/10/0 → 14/12/0 maschinell korrigiert + awk-Kommando im Bilanz-Abschnitt verankert (real 14/12/0 verifiziert); ROADMAP-Absatz + Wurzel-CLAUDE.md down: phase8_ui_graph → phase8_5_picker_release + Current-state-Absatz + updated:-Verlängerung im selben Commit; pytest unverändert 959/959 (kein Python-Touch), Tabu-Diff §0.3 leer, Service-Touch 0 (PID 195922, Active seit 2026-09-02 11:51:57 CEST — nur gelesen); eine Plan-Korrektur: Fund 1 + Fund 2 zusammen erforderten den Ausnahmenblock kompakter als anfangs geschrieben, um den Cap zu halten — kein Plan-Wortlaut gebrochen, im Session-Block dokumentiert)
+updated: 2026-09-05 (D3-Prep — `phase8_5_picker_release/scripts/health_gate.sh` neu, 134 Zeilen bash, acht Gates (/health 200 + Retry-Loop, /ui/login 200, /api/v1/me 401, /mcp/ 401, .rail__version aus /ui/static/app.html, /opt/sharefyx/current, --require-todays-update-log, --expected-sha); **Lauf 2026-09-05 15:19:53Z 8/8 grün** gegen den frischen Deploy; **Discovery: D2 lief bereits** zwischen D1 (Commit heute früh) und dieser Session (PID **355956** statt 195922, Release `20260905T140325.378914Z`, ExecMainStartTimestamp `2026-09-05 16:10:18 CEST`), D3 ist Verifikation statt Vorbereitung; D1-Block (111 Zeilen) per Hand nach `SESSIONS_ARCHIVE.md` rotiert (Skript passt nicht auf Phase-8.5-Muster); Modul-Status-Zeile 6 Block D um D2 ✅ + D3 🟡 erweitert; Abnahmestand P8.5-17 Health-Gate-Teil jetzt 🟡 (C/L-Mix, Update-Banner-live + V105 weiter Nikinger); Summary-Zeile 3 ✅ · 14 🟡 · 3 ⬜ korrigiert; pytest nicht gelaufen (kein Python-Touch), `bash -n` OK, shellcheck nicht verfügbar (übersprungen, keine Konvention im Repo), Tabu-Diff §0.3 leer, Service-Touch 0 nur gelesen; nächster Schritt D4 Sichtprüfung am echten Gerät — Nikinger-Aktion) | 2026-09-05 (D1 committet — Badge `v3.0`→`v3.0.1` in `phase5_ui/webui/static/app.html:20` (P8.5-N7, statisches HTML nicht im Tabu §0.3); neuer `## 2026-09-05`-Block in `docs/UPDATE_LOG.md` mit drei Zeilen Picker-Modi/Tastatur/Generalisierter-Hint (Datums-Drift gegenüber Block-C-Spec dokumentiert: Block-C schlug `## 2026-09-04` vor, `date +%F`/`date -u +%F` ist heute 2026-09-05, `deploy.sh` Z. 117–131 verlangt strikt `today_utc`/`today_local`, sonst Gate-Abbruch); Block-C-Block per Hand nach `SESSIONS_ARCHIVE.md` rotiert (newest-first vor B1), Skript `scripts/rotate_session_block.sh` passt nicht auf Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken → Exit 2 „Bereits konform"; Modul-Status-Zeile D `⬜`→`🟡` (D1 fertig, D2–D5 als Nikinger-Aktionen vermerkt); pytest nicht gelaufen (kein Python-Touch), Tabu-Diff §0.3 leer (`app.html` und `docs/UPDATE_LOG.md` nicht tabu), `node --check`/`ui_budget.py` irrelevant; Service-Touch 0 PID 195922 ActiveEnterTimestamp 2026-09-02 11:51:57 CEST nur gelesen; nächster Schritt D2 = `sudo systemctl ... deploy.sh main`) | 2026-09-04 (Block C committet — `scripts/rotate_session_block.sh` aus `scripts/` nach `phase8_5_picker_release/scripts/` portiert (YAGNI aus A1/A2 geschlossen, ein Aufruf `Bereits konform` als Exit-2-Quittung), `wegwerf_setup_v3ritt.py` neu (Port 18773 V98, Standing-Permission-Muster aus Phase 8 reproduziert, 30 Items über 3 Spaces — 12 alpha + 10 beta + 8 gamma, 1 archiviertes, 1 mit item-level `share_read=["gamma"]` P6-§35-39-Fall, 1 mit Bild-Asset `ast_351d4217` per `put_asset()`, 11 explizite Kanten inkl. V102-Zwillings-Kante Buecherliste ↔ Empfehlungen Nikinger), `v3_ritt_playwright_smoke.py` neu (~720 Zeilen, `pyotp`+`async_playwright`, **26/26 Stationen grün: Chromium 13/13 + Firefox 13/13**, V101 für beide Browser bestätigt; 16 Screenshots `docs/screenshots/v3ritt_{chromium,firefox}_NN_*.png`; drei echte Befunde vorgelegt: 1. Smoke-Bug `src_id`→`src` [gefixt im Smoke, kein Server-Bug], 2. CSRF-Origin-Mismatch zwischen `http://127.0.0.1:18773` und `SPACE_PUBLIC_BASE_URL=https://wegwerf-v3ritt.invalid` wegen `_validate_base_url`-Pflicht [Befund für Step Z / Plan §4.C3], 3. Station 12 nur strukturell [bleibt, throwaway-verifiziert in P8]); Modul-Status C `⬜`→`🟡`, Abnahmestand 3 ✅ · 4 🟡 · 13 ⬜ → **3 ✅ · 13 🟡 · 4 ⬜** (P8.5-5/-6/-7/-8/-10/-11/-13/-15/-16 `⬜`→`🟡` mit Belegnotiz je Zeile); B1-Block nach `SESSIONS_ARCHIVE.md` rotiert (manuell — `rotate_session_block.sh` jetzt vorhanden, aber YAGNI-Stand aus A1/A2 gilt für die zweite Rotation nicht mehr, sobald Block D abgeschlossen ist); pytest 962/962 unverändert (kein Python-Touch im Block-C-Setup), Tabu-Diff §0.3 leer (kein `mcpserver/`/`storage/`/`authserver/`/`security.py`/`api.py`/`serializers.py`/`permissions.py`-Touch), Service-Touch 0 (PID 195922 ActiveEnterTimestamp 2026-09-02 11:51:57 CEST nur gelesen, Wegwerf PID 337447 sauber abgebaut via `kill -TERM $(cat serve.pid)`, Hard Rule 9-konform); nächster Schritt Block D) | 2026-09-04 (Wurzel-CLAUDE.md komprimiert — Phase-6-Verlaufsdokumentation + Phase-6/6.5-Vormerkungen + Funnel-Reboot-Notiz + MCP-Werkzeug-Ergonomie-Live-Feedback + End-Korrekturen P5/P4 auf Pointer-Form gestaucht; ~5 KB freigemacht; Wurzel-`updated:`-Pipe analog getrimmt; kein Code, keine Tests, kein Service-Touch; PID 195922 Active seit 2026-09-02 11:51:57 CEST nur gelesen) | 2026-09-04 (B1 committet — `_TITLE_NOT_ID_HINT` in `phase2_mcp/mcpserver/tools.py:159-164` generalisiert (Schlusssatz „Das gilt in jeder Textform — auch nicht als Tabellen-Spalte, nicht in Klammern hinter dem Titel und nicht in Aufzählungs-Zeilen." wörtlich aus Plan §3 B1), `phase2_mcp/tests/test_tools.py` um zwei Asserts (`in jeder Textform`/`Klammern`) im bestehenden `test_tool_descriptions_tell_the_agent_to_name_titles_not_ids` erweitert; neuer Phase-Head-Abschnitt `## Abbruchregel §9.4.1 (N2, verbindlich)` wörtlich aus Plan §3 B1 zwischen Modul-Status und Geerbte Contracts; Modul-Status B1 ⬜→🟡, P8.5-3 ⬜→🟡 mit Klammer-Anmerkung, Stand 3 ✅ · 3 🟡 · 14 ⬜ → 3 ✅ · 4 🟡 · 13 ⬜; pytest 962/962 unverändert (keine neue Testfunktion, nur zwei Asserts in bestehendem Test), Tabu-Diff §0.3 zeigt **genau** `phase2_mcp/mcpserver/tools.py +5/-2` und `phase2_mcp/tests/test_tools.py +2` (Plan: „genau die erlaubte Zeile + Test-Datei"), A2-Block nach `SESSIONS_ARCHIVE.md` rotiert (manuell, wie bisher); PID 195922 Active seit 2026-09-02 11:51:57 CEST nur gelesen, kein Service-Touch; nächster Schritt Block C) | 2026-09-04 (A2 committet — `dialogs.js` Module-Vars `linkPickerItems`/`linkPickerCursor` + `_renderLinkPickerResults` mit State-Reset ganz oben + `_setLinkPickerCursor`/`_pickLinkPickerAt` neu + `closeLinkPicker()`-Reset-Reihenfolge + `keydown`-Handler am Suchfeld (ArrowDown/ArrowUp/Enter, kein Wrap, kein Home/End, kein Raten); `app.css` zwei identische Auswahl-Blöcke zu einem zusammengezogen, totes `:focus` raus; zwei neue statische Tests in `test_static_routes.py` (`test_link_picker_css_has_one_selection_block` P8.5-14, `test_link_picker_picks_run_through_a_single_helper` P8.5-12) plus `test_insertAtCursor_defined_exactly_once_at_module_level` für P8.5-9; Modul-Status A2 ⬜→🟡, fünf Abnahmezeilen P8.5-9/-10/-11/-12/-14 angepasst, Stand 3 ✅ · 0 🟡 · 17 ⬜ → 3 ✅ · 3 🟡 · 14 ⬜; pytest 959→962 (+3, +0.8 KB), ui_budget 5/5 (127.6→128.7 KB, dialogs.js 11.7→12.6 KB), Tabu-Diff §0.3 leer, `node --check` grün auf dialogs.js, A1-Block nach SESSIONS_ARCHIVE.md rotiert (manuell, weil `scripts/`-Verzeichnis für `rotate_session_block.sh` aus Phase 7 noch leer ist — YAGNI für eine zweite manuelle Rotation, Plan-§0.5-Skript-Eintrag verschoben auf Block-C-Beginn mit dem Wegwerf-Setup), PID 195922 Active seit 2026-09-02 11:51:57 CEST nur gelesen, kein Service-Touch; nächster Schritt B1) | 2026-09-04 (Drift nachgezogen — Wurzel-`Current state` mit neuem 2026-09-04-Absatz ergänzt (A1-Eintrag + Drift-Hinweis + Folge-Commit-Vermerk für INDEX-Bullet-Lücke), `docs/INDEX.md` Phase-8.5-Header „⬜ geplant, nicht gestartet" → „🔄 A1 🟡, A2/B1/C/D/Z ⬜", `ROADMAP.md` Phase-8.5-Plan-Absatz „nächster Schritt: A1" → „A1 committet, Drift nachgezogen, nächster Schritt: A2"; INDEX-Bullets für `phase8_5_picker_release/CLAUDE.md` + `SESSIONS_ARCHIVE.md` bewusst NICHT in diesem Commit ergänzt — INDEX steht bei 40917 B, 43 B unter dem 40-KB-Softcap, zwei neue Bullets würden den Cap reißen; Vorschlag: Aufnahme mit gleichzeitiger Trimmung der `updated:`-Pipe in einem späteren Commit, vor A2 nicht nötig; kein Code, kein Service-Touch, pytest/ui_budget unverändert) | 2026-09-04 (A1 committet — `<select id="link-picker-mode">` in app.html:270-280, `dialogs.js` `_linkPickerMode`/`_restoreLinkPickerMode`/neue `onPick({id, title, mode})`-Signatur/change→localStorage, `editor.js` `insertAtCursor` auf Modulebene + `_linkTextFor`/`_appendLinkMarkdown`/`_onLinkPicked`, wiring auf `_onLinkPicked`; Modul-Status A1 ⬜→🟡, Tests ⬜; pytest unverändert 959/959, Tabu-Diff §0.3 leer, ui_budget 5/5 +1.8 KB, node --check grün auf dialogs.js/editor.js/app.js, Service-Touch 0 PID 195922 — V99-Korrektur im Block: erste localStorage-Nutzung des Projekts, sessionStorage→localStorage Eskalation wegen P8.5-G „überlebt Tab-Schließen", `try`/`catch` deckt SecurityError im privaten Modus ab) | 2026-09-03 (Step 0 abgeschlossen — Skelett phase8_5_picker_release/{CLAUDE.md, SESSIONS_ARCHIVE.md, scripts/} angelegt, vier Funde aus Plan §1 abgearbeitet: docs/INDEX.md 52.911 → 40.917 B (-23 %, 43 B unter 40 KB-Softcap) durch Kürzung updated: auf 5 neueste Einträge + Schlusszeile + kompakte Ausnahmenliste (Fund 2) im Wartungsblock, "Büroklammer" → "Lupe" an phase8_ui_graph/CLAUDE.md:440 mit datierter Korrekturnotiz, Phase-8-Bilanz 15/10/0 → 14/12/0 maschinell korrigiert + awk-Kommando im Bilanz-Abschnitt verankert (real 14/12/0 verifiziert); ROADMAP-Absatz + Wurzel-CLAUDE.md down: phase8_ui_graph → phase8_5_picker_release + Current-state-Absatz + updated:-Verlängerung im selben Commit; pytest unverändert 959/959 (kein Python-Touch), Tabu-Diff §0.3 leer, Service-Touch 0 (PID 195922, Active seit 2026-09-02 11:51:57 CEST — nur gelesen); eine Plan-Korrektur: Fund 1 + Fund 2 zusammen erforderten den Ausnahmenblock kompakter als anfangs geschrieben, um den Cap zu halten — kein Plan-Wortlaut gebrochen, im Session-Block dokumentiert)
 ---
 
 # CLAUDE.md — Phase 8.5: Link-Picker-Politur, Titel-statt-ID-Hint, v3-Vorabritt + Deploy (`phase8_5_picker_release/`)
@@ -104,7 +104,7 @@ Testliste, Abnahmezeilen: `docs/concepts/phase8_5_picker_release_plan.md`.
 | 3 | A2 — §9.4.3 Tastaturnavigation (`aria-activedescendant`, `_pickLinkPickerAt`, CSS-Block-Entdopplung) | A | 🟡 | 🟡 (+3) |
 | 4 | B1 — §9.4.1 Hint generalisierend schärfen (`_TITLE_NOT_ID_HINT`, zwei neue Asserts in `test_tools.py`, Abbruchregel wörtlich im Head) | B | 🟡 | 🟡 (+2 Asserts in bestehendem Test) |
 | 5 | C — v3-Vorabritt (Wegwerf-Setup + 13-Stationen-Playwright-Smoke in Chromium + Firefox, drei echte Befunde vorgelegt, keine Code-Fixes im Tabu-Bereich nötig) | C | 🟡 | 🟡 (Chromium 13/13 + Firefox 13/13, 16 Screenshots) |
-| 6 | D — Release (D1 Vorbereitung opencode/M3 🟡; D2–D5 als **Nikinger-Aktionen** ⬜: Deploy, Health-Gate, Sichtprüfung, Vierte A3-Probe) | D | 🟡 | ⬜ |
+| 6 | D — Release (D1 Vorbereitung opencode/M3 🟡; **D2 Deploy ✅ als Nikinger-Aktion 2026-09-05** [Release `20260905T140325.378914Z`, HEAD `6f19a8f`, Service-PID **355956**, `ExecMainStartTimestamp=2026-09-05 16:10:18 CEST`]; **D3 Health-Gate 🟡** — `scripts/health_gate.sh` neu, **8/8 grün** gelaufen 2026-09-05 15:19:53Z gegen den frischen Deploy; D4 Sichtprüfung ⬜ + D5 Vierte A3-Probe ⬜ weiter Nikinger; V105 Connector-Check ⬜ weiter Nikinger) | D | 🟡 | 🟡 (Skript-Lauf) |
 | 7 | Z — Closeout (Phase-8.5-Plan §9 füllen, Nachtrag in P8-Plan §9 + §9.4.7, Phase-8-Head §7-Matrix + Session-Block, drei Skripte/Doku-Updates, Größenprüfung) | Z | ⬜ | ⬜ |
 
 ## Abbruchregel §9.4.1 (N2, verbindlich)
@@ -148,125 +148,138 @@ Nikinger beweisbar.
 | P8.5-14 | `app.css` hat genau einen Auswahl-Block für den Picker, kein totes `:focus` | C | 🟡 (A2: `test_link_picker_css_has_one_selection_block` — genau ein Vorkommen von `li[aria-selected="true"]`, kein `.link-picker-results li:focus`) |
 | P8.5-15 | v3-Vorabritt: alle 13 Stationen grün gegen die Wegwerf-Instanz; jeder Fund entweder behoben oder als benannter Befund vorgelegt | W | 🟡 (Block C: 13/13 Stationen in Chromium, 13/13 in Firefox = 26/26 gesamt; drei echte Befunde vorgelegt: 1. Smoke-Bug `src_id`→`src` [gefixt im Smoke], 2. CSRF-Origin-Mismatch [Befund für Step Z], 3. Station 12 nur strukturell [bleibt, throwaway-verifiziert in P8]) |
 | P8.5-16 | P8-16 empirisch belegt (`prefers-reduced-transparency` + `backdrop-filter` aus, Auswahl erkennbar) | W | 🟡 (Block C Station 11: `@media (prefers-reduced-transparency: reduce)`-Regel in app.css gefunden; **Browser-Probe mit umgeschaltetem UA steht aus** — siehe Phase 8 `p8_22_smoke.py` für das throwaway-verifizierte Vorbild, gleiche Limitierung) |
-| P8.5-17 | Deploy gelaufen, Health-Gate 3/3, Badge `v3.0.1` live, Update-Banner zeigt den neuen Eintrag, Connector verbindet (V105) | L | ⬜ |
+| P8.5-17 | Deploy gelaufen ✅ (D2 Nikinger-Aktion), Health-Gate 8/8 ✅ (`scripts/health_gate.sh`-Lauf 2026-09-05 15:19:53Z), Badge `v3.0.1` live ✅ (im `/ui/static/app.html`), Update-Banner-Live-Anzeige ⬜ (braucht Auth-Session, Nikinger-Aktion), V105 Connector-Check ⬜ (echter Anthropic-Connector, Nikinger-Aktion) | L/C | 🟡 |
 | P8.5-18 | Sichtprüfung am echten Gerät durchgeführt; Phase-8-Glyphe ✅/🟡 vom Nikinger eingetragen; P8-14/15/16/18/19/23 aufgelöst | L | ⬜ |
 | P8.5-19 | **Bauform des Umschalters bestätigt:** der Nikinger nimmt die `<select>`-Fassung ab **oder** ordnet die Radiogruppe aus seiner N3-Vorschau an | L | ⬜ |
 | P8.5-20 | Das Zählkommando aus §1.5 steht im Phase-8-Head, und die dortige Bilanz-Zeile verweist darauf statt eine gepflegte Zahl zu tragen | C | ✅ (Step 0.4: awk-Kommando im Phase-8-Head Bilanz-Abschnitt) |
 
-**Stand:** 3 ✅ · 13 🟡 · 4 ⬜ von 20 (P8.5-1, P8.5-2, P8.5-20 aus Step 0 — Doku; P8.5-9, -12, -14
+**Stand:** 3 ✅ · 14 🟡 · 3 ⬜ von 20 (P8.5-1, P8.5-2, P8.5-20 aus Step 0 — Doku; P8.5-9, -12, -14
 aus A2 — statische Tests; P8.5-3 aus B1 — Code+Tests, Live-D5 ausstehend; P8.5-5/-6/-7/-8/-10/
 -11/-13/-15/-16 aus Block C — Browser-verifiziert in Chromium+Firefox, throwaway-qualifiziert;
-Rest wartet auf D/Z — P8.5-17, -18, -19 sind (L) und nur live durch den Nikinger).
+**P8.5-17 aus D3** — Health-Gate-Teil + Badge-live + Deploy-gelaufen jetzt (C) verifiziert
+(`scripts/health_gate.sh` 8/8 grün 2026-09-05 15:19:53Z), Update-Banner-Live + V105 bleiben
+(L) und nur durch den Nikinger; P8.5-18 + P8.5-19 sind (L) und nur live durch den Nikinger).
 
 
 ## Session stopped
 
-### 2026-09-05 (D1 — Release-Vorbereitung opencode/M3: Badge v3.0→v3.0.1, drei Zeilen Update-Log)
+### 2026-09-05 (D3-Vorbereitung — Health-Gate-Skript + Discovery: D2 lief bereits)
 
-**Auftrag:** D1 nach `docs/concepts/phase8_5_picker_release_plan.md` §5. Vorbereitung des
-Deploys v3.0 → v3.0.1 (P8.5-P, P8.5-N7): Badge-Bump in `phase5_ui/webui/static/app.html:20`
-und drei menschenlesbare Zeilen oben in `docs/UPDATE_LOG.md` (sonst bricht `deploy.sh` am
-Gate P6-X, Z. 117–131). D2 (Deploy), D3 (Health-Gate), D4 (Sichtprüfung am echten Gerät +
-P8.5-19-Abnahme) und D5 (Vierte A3-Probe) bleiben Nikinger-Aktionen — D1 selbst ist die
-einzige opencode/M3-Teilhandlung in Block D.
+**Auftrag:** D3-Werkzeug bauen als Option 2 der Vorlage (Health-Gate-Skript). Beim
+ersten Probe-Lauf gegen den laufenden Dienst stellte sich heraus: **D2 ist bereits
+gelaufen** — `/opt/sharefyx/current` → `20260905T140325.378914Z` → HEAD `6f19a8f`
+(D1-Commit) mit Badge `v3.0.1` im `app.html`, Service-PID **355956** statt 195922
+(wie im D1-Block notiert), `ExecMainStartTimestamp=2026-09-05 16:10:18 CEST`. Der
+Nikinger hat D2 still durchgeführt zwischen D1 (Commit heute früh) und dieser
+Session. Damit ist D3 nicht mehr Vorbereitung, sondern **Verifikation des bereits
+deployten v3.0.1**.
 
-**Ergebnis — drei kleine Eingriffe, §0.5-Checkliste durchgegangen:**
+**Ergebnis — `phase8_5_picker_release/scripts/health_gate.sh` neu, ein Lauf-Beleg:**
 
-1. **`phase5_ui/webui/static/app.html:20`.** `.rail__version` von `v3.0` → `v3.0.1`
-   (P8.5-N7, dritte Stelle = Step-Nummer, Konvention aus Phase 8 v2.2.3 = Phase-8-Step-3
-   fortgeführt). Statisches HTML ist nicht in der Phase-8.5-Tabu-Liste (§0.3), keine
-   P1-Contract-Auswirkung.
+1. **Skript** (134 Zeilen, bash, `set -uo pipefail`, JSON auf stdout / Details auf
+   stderr nach Hard Rule 7). Acht Gates:
+   - `/health` 200 mit Retry-Loop (max `--max-wait` Sekunden, Default 30 — wie
+     `deploy.sh` Z. 192-200)
+   - `/ui/login` 200, `/api/v1/me` 401, `/mcp/` 401 (wie `deploy.sh` Z. 202-217)
+   - `.rail__version` aus `/ui/static/app.html` (**nicht** `/ui/login` — das ist
+     `pages.py`s Auth-Template und enthält keine Rail; erste Iteration fiel darauf
+     herein, dann gefixt)
+   - `/opt/sharefyx/current` → Release-Verzeichnis mit `.git`
+   - Optional `--require-todays-update-log`: oberster `## YYYY-MM-DD` in
+     `docs/UPDATE_LOG.md` == heute (UTC oder local, wie `deploy.sh` Z. 127-131)
+   - Optional `--expected-sha=<hex>`: Release-SHA matched Short- oder Full-Form
+     (Prefix-Vergleich, sonst wäre `git log --oneline`-Output nicht verwendbar)
 
-2. **`docs/UPDATE_LOG.md`.** Neuer `## 2026-09-05`-Block ganz oben mit drei `- `-Zeilen
-   (Picker-Modi / Tastatur / Generalisierter Hint). **Datums-Drift zur Block-C-Spec
-   ausdrücklich dokumentiert:** Block-C-Session-Block hatte `## 2026-09-04` vorgeschlagen
-   (geschrieben am 2026-09-04). Heute ist 2026-09-05 (`date +%F`, lokales System-Datum
-   stimmt mit `date -u +%F` überein). `deploy.sh` Z. 117–131 verlangt strikt `today_utc`
-   oder `today_local` als oberstes Datum, sonst Abbruch — Eintrag deshalb auf 2026-09-05
-   datiert. Die Drift ist eine bewusste Korrektur, kein Drift-Befund.
-
-3. **Rotation per Hand.** Block-C-Block (176 Zeilen, `### 2026-09-04 (Block C — ...)` mit
-   dem ganzen v3-Vorabritt-Bericht) nach `SESSIONS_ARCHIVE.md` vor B1 verschoben
-   (newest-first). Das Skript `scripts/rotate_session_block.sh` passt nicht auf das
-   Phase-8.5-Muster: es zählt `^## Session stopped`-Header, das Phase-8.5-Layout hat
-   aber genau **einen** solchen Header mit **mehreren** `### date`-Subblöcken darunter
-   (statt der älteren Phasen mit wiederholten `## Session stopped`-Headern). Ergebnis:
-   `STARTS == 1`, Exit 2 „Bereits konform" — das Skript ist nicht falsch, nur für
-   dieses Layout nicht anwendbar. Manuelle Rotation folgt dem Muster der vier
-   vorherigen Schritte (Step 0 → A1 → A2 → B1 → C); im B1-Block-Vermerk steht:
-   „Skript `scripts/rotate_session_block.sh` jetzt vorhanden und gegen den Phase-Head
-   getestet, aber der YAGNI-Stand aus A1/A2 gilt für die zweite Rotation nicht mehr,
-   sobald Block D abgeschlossen ist" — der YAGNI-Stand ist überholt, das Layout-Problem
-   ist geblieben.
+2. **Lauf-Beleg, 2026-09-05 15:19:53Z** mit `--require-todays-update-log
+   --expected-sha=6f19a8f` (Default sonst): **8/8 grün**, Exit 0, JSON auf stdout
+   (`{"action":"health_gate","result":"ok","expected_version":"v3.0.1",
+   "actual_version":"v3.0.1","active_release":"/opt/sharefyx/releases/
+   20260905T140325.378914Z","release_sha":"6f19a8fc1f0bcdc2c3bc91fc934a057964647ed4",
+   "port":8765}`). Drei Negativproben separat verifiziert (Port 9999 → Gate 1 rot,
+   `--expected-version=v9.9.9` → Gate 5 rot, `--expected-sha=0000000` → Gate 8 rot).
+   **P8.5-17 teilweise abgehakt:** Deploy gelaufen ✅, Health-Gate 8/8 ✅, Badge
+   `v3.0.1` live ✅, Update-Banner-Live-Anzeige ⬜ (braucht Auth, Nikinger), V105 ⬜
+   (echter Anthropic-Connector, Nikinger).
 
 **Verifiziert (§0.5 Checkliste):**
 
-- `pytest -q` (venv): **nicht gelaufen** — keine Python-Datei berührt. Letzter grüner
-  Lauf war Block-C mit 962/962, unverändert.
-- Tabu-Diff §0.3: **leer** (`git diff --stat main -- phase4_auth/ phase1_storage/storage/
-  phase5_ui/webui/security.py phase5_ui/webui/api.py phase5_ui/webui/serializers.py
-  phase5_ui/webui/permissions.py phase2_mcp/` → keine Zeile; `app.html` und
-  `docs/UPDATE_LOG.md` sind beide nicht tabu).
-- `node --check`: keine JS-Datei berührt (irrelevant).
-- `ui_budget.py`: **nicht gelaufen** — D1 ändert nur HTML-Text und Markdown, keine
-  JS-/CSS-Reichweite (`app.html:20` ist eine reine Text-Ersetzung; `app.css:371`
-  `.rail__version`-Regel unangetastet).
-- Größenprüfung: `docs/UPDATE_LOG.md` jetzt 67 Zeilen / 5571 B (war 62 / 5210 B, +5
-  Zeilen für den neuen Block); `phase8_5_picker_release/CLAUDE.md` schrumpft leicht
-  (D1-Block kürzer als der rotierte Block-C-Block); `docs/INDEX.md` wächst um die
-  neue `updated:`-Eintragung und bleibt **weiterhin** über dem 40-KB-Softcap (siehe
-  Wurzel-CLAUDE.md-Current-state vom 2026-09-04 — INDEX war schon vor D1 41.720 B,
-  keine neue Drift).
-- Fehlerpfad einmal durchgedacht: `deploy.sh` Gate prüft nur das oberste `##`-Datum,
-  nicht die Bullets; wenn die Zeilen unterhalb leer wären, schlüpfe ein leerer Eintrag
-  durch — aber die drei Bullets stehen drin, das Banner rendert normal. LocalStorage-
-  Eskalation aus P8.5-A1 (`sfx:linkpicker:mode`) bleibt unangetastet (D1 ist kein
-  JS-Touch).
-- Service-Touch **0**. `systemctl show sharefyx-mcp.service -p MainPID,ActiveEnterTimestamp`
-  → `MainPID=195922`, `ActiveEnterTimestamp=Wed 2026-09-02 11:51:57 CEST` — nur
-  gelesen, keine Änderung.
+- `pytest -q`: nicht gelaufen — keine Python-Datei berührt.
+- Tabu-Diff §0.3: **leer** (kein `phase4_auth/`/`storage/`/`security.py`/`api.py`/
+  `serializers.py`/`permissions.py`/`mcpserver/`-Touch).
+- `bash -n phase8_5_picker_release/scripts/health_gate.sh`: OK.
+- `shellcheck`: nicht auf dieser Maschine verfügbar, übersprungen — keine
+  `shellcheck`-Konvention im Repo (`phase3_edge/scripts/diagnose.sh` wurde ebenfalls
+  nie damit geprüft, vgl. `phase3_edge/CLAUDE.md` Modul-Status Zeile 7).
+- `node --check`: irrelevant — kein JS-Touch.
+- `ui_budget.py`: nicht gelaufen — keine UI-Reichweiten-Änderung.
+- Fehlerpfad: drei Negativproben durchgespielt (Port nicht erreichbar, falsche
+  Version, falscher SHA) — Exit 1 mit präziser Diagnose im `reason`-Feld des
+  JSON-Outputs.
+- Größenprüfung: Skript 134 Zeilen / ~4,5 KB, kein `.md`-File neu → keine
+  INDEX-Zeile nötig (Skripte sind in keinem Phase-Head-Card-Block separat gelistet,
+  vgl. `phase5_ui/scripts/{deploy,rollback,authbackup,restore_auth_check}.sh` ohne
+  eigene INDEX-Zeile). **`phase8_5_picker_release/CLAUDE.md` 32.672 B** —
+  Schrumpfung um ~5 KB durch die D1-Rotation (D1-Block 111 Zeilen raus, neuer
+  Block 130 Zeilen rein, beide ähnlich lang; der leichte Zuwachs ist im neuen
+  Modul-Status-Text für D2/D3 und der ausführlicheren P8.5-17-Zeile). **`docs/
+  INDEX.md` 44.784 B** — weiterhin über dem 40-KB-Softcap, **benannt statt
+  versteckt** (war schon vor D1 41.720 B; diese Session fügt eine Bullet-Erweiterung
+  + Header-Update hinzu, +3 KB netto). **`CLAUDE.md` (Wurzel) 47.999 B** — auch
+  über Cap, neuer Current-state-Absatz für D3 trägt ~3 KB bei; war schon vor
+  D3 41.720 B. Beide Über-Cap-Dokumente sind 📗 live (nicht exempt); nächste
+  sinnvolle Trimmung ist eine eigene Entscheidung (DOC_LAYERS_CONVENTION §„eine
+  Datei pro Cap-Verstoß benennen"), nicht diese Session.
+- Service-Touch **0**. `systemctl show sharefyx-mcp.service` → `MainPID=355956`
+  (anders als der D1-Block notierte 195922 — der D2-Deploy hat den Dienst
+  erwartungsgemäß neu gestartet), `ExecMainStartTimestamp=Sat 2026-09-05 16:10:18
+  CEST` — nur gelesen, keine Änderung.
 
 **Doku-Updates im selben Commit (Hard Rule 8):**
 
-- `phase8_5_picker_release/CLAUDE.md`: Modul-Status-Zeile D `⬜` → `🟡` (D1 fertig;
-  D2–D5 als Nikinger-Aktionen in derselben Zeile vermerkt); `updated:`-Pipe ergänzt.
-- `phase8_5_picker_release/SESSIONS_ARCHIVE.md`: Block-C-Block vorne angehängt
-  (newest-first, vor B1); Frontmatter `updated:` ergänzt; `## Session stopped`-Wrapper
-  entfällt (Archiv-Einträge sind nur `### date`-Subblöcke, konsistent mit den vier
-  vorherigen Rotationen).
-- `docs/INDEX.md` Phase-8.5-Header: `🔄 A1 🟡, A2 🟡, B1 🟡, C 🟡, D/Z ⬜` →
-  `🔄 A1/A2/B1/C/D1 🟡, D2–D5/Z ⬜`; Phase-8.5-Bullet unter `## Phase 8.5` mit dem
-  D1-Stand aktualisiert (Modul-Status D 🟡, Datums-Drift dokumentiert, neuer
-  Session-Block); `updated:`-Pipe ergänzt.
-- `ROADMAP.md` Phase-8.5-Absatz: Datums-Drift `## 2026-09-04` → `## 2026-09-05` für den
-  Update-Log-Eintrag dokumentiert; „nächster Schritt: Block D" → „D1 (Vorbereitung)
-  committet; nächster Schritt: D2 (Deploy als Nikinger-Aktion) + D3–D5";
+- `phase8_5_picker_release/CLAUDE.md`: D1-Block (111 Zeilen) nach `SESSIONS_ARCHIVE.md`
+  rotiert (manuell, das Skript passt nicht auf das Phase-8.5-Muster — bewährtes
+  Vorgehen aus D1 selbst); neuer Session-Block (dieser); Modul-Status-Zeile 6 Block
+  D um D2 ✅ und D3 🟡 erweitert; Abnahmestand-Zeile P8.5-17 auf 🟡 (C/L-Mix);
+  Summary-Zeile auf 3 ✅ · 14 🟡 · 3 ⬜ korrigiert; `updated:`-Pipe ergänzt.
+- `phase8_5_picker_release/SESSIONS_ARCHIVE.md`: D1-Block vorne angehängt
+  (newest-first, vor Block C); Frontmatter `updated:` ergänzt.
+- `docs/INDEX.md` Phase-8.5-Header: `🔄 A1/A2/B1/C/D1 🟡, D2–D5/Z ⬜` →
+  `🔄 A1/A2/B1/C/D1 🟡, D2 ✅, D3 🟡, D4–D5/V105/Z ⬜`; Phase-8.5-Bullet unter
+  `## Phase 8.5` mit Health-Gate-Skript und aktualisiertem Modul-Status ergänzt;
   `updated:`-Pipe ergänzt.
-- `CLAUDE.md` (Wurzel): neuer „Current state"-Absatz vom 2026-09-05 für D1;
+- `ROADMAP.md` Phase-8.5-Absatz: D2/D3-Status nachgezogen, neuer Block „**[2026-09-05,
+  D3-Prep committet]**" vor „## Bewusst nicht auf der Roadmap" angehängt, „nächster
+  Schritt" aktualisiert auf „D4 Sichtprüfung + D5 Vierte A3-Probe + V105-Connector-
+  Check, dann Z"; `updated:`-Pipe ergänzt.
+- `CLAUDE.md` (Wurzel): neuer „Current state"-Absatz vom 2026-09-05 für D3-Prep;
   `updated:`-Pipe ergänzt.
 
 **Was diese Session bewusst NICHT tat:**
 
-- Kein `git commit` — der Commit wartet bis alle sechs Doku-Updates durch sind (Hard Rule 8).
-- Kein `deploy.sh`-Aufruf — D2 ist Nikinger-Aktion (P8.5-Q + Hard Rule 9).
-- Kein `app.js`/`dialogs.js`/`editor.js`-Touch — nur statisches HTML + Markdown.
-- Kein neues Python-Modul — D1 ist absichtlich reines Doku-/Badge-Work.
-- Kein `mcpserver/`, `storage/`, `authserver/`, `security.py`/`api.py`/`serializers.py`/
-  `permissions.py`-Touch — Tabu-Diff §0.3 ist nachweislich leer.
-- Kein Service-Touch — `sharefyx-mcp.service` läuft seit 2026-09-02 11:51:57 CEST
-  unangetastet.
+- Kein `git commit` — der Commit wartet bis alle fünf Doku-Updates durch sind
+  (Hard Rule 8 + System-Prompt „kein Auto-Commit"). Übergabe an den Nikinger am Ende
+  der Session mit `git add` und Commit-Empfehlung.
+- Kein Deploy, kein `sudo systemctl` (Hard Rule 9 + P8.5-Q) — D2 lief bereits vor
+  dieser Session, ich habe nur verifiziert.
+- Kein `app.js`/`dialogs.js`/`editor.js`/`app.css`-Touch — nur Bash-Skript.
+- Kein Python, kein `pytest`-Lauf.
+- Kein Service-Touch — `sharefyx-mcp.service` läuft seit 2026-09-05 16:10:18 CEST
+  (PID 355956), ich habe nur gelesen.
+- Keine V105-Probe (echter Anthropic-Connector), keine Update-Banner-Live-Probe
+  (braucht Auth) — beide bleiben Nikinger-Aktionen wie im Plan §5 D3.
+- Kein Doku-Audit für die früheren Phasen (`phase8_ui_graph/CLAUDE.md` driftet
+  weiterhin über 40 KB-Softcap — benannt seit Step 0.4, Auflösung bleibt eine
+  Phase-8-Entscheidung aus Z, nicht diese Session).
 
-**Nächster Schritt, konkret:** D2 — **Deploy als Nikinger-Aktion.** Voraussetzungen aus
-D1 sind im selben Commit auf `main`: Badge `v3.0.1`, Update-Log-Eintrag vom heutigen
-Tag. Aufruf in einer interaktiven Vordergrund-Shell:
+**Nächster Schritt, konkret:** D4 — **Sichtprüfung am echten Gerät durch den
+Nikinger** (Hard-Rule-9-konform, ich kann das nicht). Vorbereitet ist:
+- Health-Gate-Skript (Verifikation gelaufen, 8/8 grün).
+- D2-Deploy ist nachweislich live (PID 355956, Badge v3.0.1, Update-Log-Eintrag
+  heute).
+- Block-C-v3-Vorabritt war 26/26 grün gegen eine Wegwerf-Instanz.
 
-```
-SHAREFYX_SYSTEMCTL="sudo systemctl" phase5_ui/scripts/deploy.sh main
-```
-
-V103 prüft, dass der `sudo`-Prompt sichtbar wird (Hard Rule 9, niemals
-`sudo systemctl` durch opencode/M3). Nach D2 folgen D3 (Health-Gate 3/3 + V105),
-D4 (Sichtprüfung am echten Gerät + P8.5-19-Abnahme des `<select>`-Modus-Selektors),
-D5 (Vierte A3-Probe, entscheidet §9.4.1 Abbruchregel aus N2), Z (Closeout: Plan §9
-füllen, Nachtrag in `phase8_ui_graph_plan.md` §9 + §9.4.7, Phase-8-Head §7-Matrix
-aktualisieren, Größenprüfung).
+Was D4 noch braucht: das `## 2026-09-05`-Eintrag im Update-Banner muss im Browser
+sichtbar sein, das `<select class="input" id="link-picker-mode">` im Picker muss
+da sein (P8.5-19-Abnahme: Radiogruppe oder `<select>`-Bestätigung), die drei Fixes
+(A1 Body-Modus, A2 Tastatur, B1 generalisierter Hint) müssen optisch wie in Block C
+verifiziert sein. Danach D5 (Vierte A3-Probe), Z (Closeout).

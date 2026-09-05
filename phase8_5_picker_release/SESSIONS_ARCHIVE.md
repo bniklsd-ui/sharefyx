@@ -5,10 +5,119 @@ read-when: Auditieren der vollen Phase-8.5-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-05 (Block-C-Block rotiert — manuell wie alle vier vorherigen Schritte, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); Block-C vorne angehängt (newest-first), B1 + A2 + A1 + Step 0 darunter unverändert; D1 committet, D2–D5 als Nikinger-Aktionen ausgewiesen) | 2026-09-04 (B1-Block rotiert — manuell wie A2/A1/Step-0, weil `scripts/rotate_session_block.sh` (portiert in Block C, `phase8_5_picker_release/scripts/rotate_session_block.sh`) erst jetzt greift; B1 vorne angehängt (newest-first), A2 + A1 + Step 0 darunter unverändert; C abgeschlossen — 13/13 in Chromium+Firefox, 26/26 gesamt, D/Z stehen noch aus)
+updated: 2026-09-05 (D1-Block rotiert — manuell wie Block-C davor, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt; D1 vorne angehängt (newest-first), Block-C + B1 + A2 + A1 + Step 0 darunter unverändert; D3-Prep-Session (Health-Gate-Skript + D2-Discovery) hat den D1-Block aus dem Head ersetzt, D2 lief zwischen D1 und D3 still durch den Nikinger) | 2026-09-05 (Block-C-Block rotiert — manuell wie alle vier vorherigen Schritte, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); Block-C vorne angehängt (newest-first), B1 + A2 + A1 + Step 0 darunter unverändert; D1 committet, D2–D5 als Nikinger-Aktionen ausgewiesen) | 2026-09-04 (B1-Block rotiert — manuell wie A2/A1/Step-0, weil `scripts/rotate_session_block.sh` (portiert in Block C, `phase8_5_picker_release/scripts/rotate_session_block.sh`) erst jetzt greift; B1 vorne angehängt (newest-first), A2 + A1 + Step 0 darunter unverändert; C abgeschlossen — 13/13 in Chromium+Firefox, 26/26 gesamt, D/Z stehen noch aus)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8.5: Link-Picker-Politur, Titel-statt-ID-Hint, v3-Vorabritt + Deploy
+### 2026-09-05 (D1 — Release-Vorbereitung opencode/M3: Badge v3.0→v3.0.1, drei Zeilen Update-Log)
+
+**Auftrag:** D1 nach `docs/concepts/phase8_5_picker_release_plan.md` §5. Vorbereitung des
+Deploys v3.0 → v3.0.1 (P8.5-P, P8.5-N7): Badge-Bump in `phase5_ui/webui/static/app.html:20`
+und drei menschenlesbare Zeilen oben in `docs/UPDATE_LOG.md` (sonst bricht `deploy.sh` am
+Gate P6-X, Z. 117–131). D2 (Deploy), D3 (Health-Gate), D4 (Sichtprüfung am echten Gerät +
+P8.5-19-Abnahme) und D5 (Vierte A3-Probe) bleiben Nikinger-Aktionen — D1 selbst ist die
+einzige opencode/M3-Teilhandlung in Block D.
+
+**Ergebnis — drei kleine Eingriffe, §0.5-Checkliste durchgegangen:**
+
+1. **`phase5_ui/webui/static/app.html:20`.** `.rail__version` von `v3.0` → `v3.0.1`
+   (P8.5-N7, dritte Stelle = Step-Nummer, Konvention aus Phase 8 v2.2.3 = Phase-8-Step-3
+   fortgeführt). Statisches HTML ist nicht in der Phase-8.5-Tabu-Liste (§0.3), keine
+   P1-Contract-Auswirkung.
+
+2. **`docs/UPDATE_LOG.md`.** Neuer `## 2026-09-05`-Block ganz oben mit drei `- `-Zeilen
+   (Picker-Modi / Tastatur / Generalisierter Hint). **Datums-Drift zur Block-C-Spec
+   ausdrücklich dokumentiert:** Block-C-Session-Block hatte `## 2026-09-04` vorgeschlagen
+   (geschrieben am 2026-09-04). Heute ist 2026-09-05 (`date +%F`, lokales System-Datum
+   stimmt mit `date -u +%F` überein). `deploy.sh` Z. 117–131 verlangt strikt `today_utc`
+   oder `today_local` als oberstes Datum, sonst Abbruch — Eintrag deshalb auf 2026-09-05
+   datiert. Die Drift ist eine bewusste Korrektur, kein Drift-Befund.
+
+3. **Rotation per Hand.** Block-C-Block (176 Zeilen, `### 2026-09-04 (Block C — ...)` mit
+   dem ganzen v3-Vorabritt-Bericht) nach `SESSIONS_ARCHIVE.md` vor B1 verschoben
+   (newest-first). Das Skript `scripts/rotate_session_block.sh` passt nicht auf das
+   Phase-8.5-Muster: es zählt `^## Session stopped`-Header, das Phase-8.5-Layout hat
+   aber genau **einen** solchen Header mit **mehreren** `### date`-Subblöcken darunter
+   (statt der älteren Phasen mit wiederholten `## Session stopped`-Headern). Ergebnis:
+   `STARTS == 1`, Exit 2 „Bereits konform" — das Skript ist nicht falsch, nur für
+   dieses Layout nicht anwendbar. Manuelle Rotation folgt dem Muster der vier
+   vorherigen Schritte (Step 0 → A1 → A2 → B1 → C); im B1-Block-Vermerk steht:
+   „Skript `scripts/rotate_session_block.sh` jetzt vorhanden und gegen den Phase-Head
+   getestet, aber der YAGNI-Stand aus A1/A2 gilt für die zweite Rotation nicht mehr,
+   sobald Block D abgeschlossen ist" — der YAGNI-Stand ist überholt, das Layout-Problem
+   ist geblieben.
+
+**Verifiziert (§0.5 Checkliste):**
+
+- `pytest -q` (venv): **nicht gelaufen** — keine Python-Datei berührt. Letzter grüner
+  Lauf war Block-C mit 962/962, unverändert.
+- Tabu-Diff §0.3: **leer** (`git diff --stat main -- phase4_auth/ phase1_storage/storage/
+  phase5_ui/webui/security.py phase5_ui/webui/api.py phase5_ui/webui/serializers.py
+  phase5_ui/webui/permissions.py phase2_mcp/` → keine Zeile; `app.html` und
+  `docs/UPDATE_LOG.md` sind beide nicht tabu).
+- `node --check`: keine JS-Datei berührt (irrelevant).
+- `ui_budget.py`: **nicht gelaufen** — D1 ändert nur HTML-Text und Markdown, keine
+  JS-/CSS-Reichweite (`app.html:20` ist eine reine Text-Ersetzung; `app.css:371`
+  `.rail__version`-Regel unangetastet).
+- Größenprüfung: `docs/UPDATE_LOG.md` jetzt 67 Zeilen / 5571 B (war 62 / 5210 B, +5
+  Zeilen für den neuen Block); `phase8_5_picker_release/CLAUDE.md` schrumpft leicht
+  (D1-Block kürzer als der rotierte Block-C-Block); `docs/INDEX.md` wächst um die
+  neue `updated:`-Eintragung und bleibt **weiterhin** über dem 40-KB-Softcap (siehe
+  Wurzel-CLAUDE.md-Current-state vom 2026-09-04 — INDEX war schon vor D1 41.720 B,
+  keine neue Drift).
+- Fehlerpfad einmal durchgedacht: `deploy.sh` Gate prüft nur das oberste `##`-Datum,
+  nicht die Bullets; wenn die Zeilen unterhalb leer wären, schlüpfe ein leerer Eintrag
+  durch — aber die drei Bullets stehen drin, das Banner rendert normal. LocalStorage-
+  Eskalation aus P8.5-A1 (`sfx:linkpicker:mode`) bleibt unangetastet (D1 ist kein
+  JS-Touch).
+- Service-Touch **0**. `systemctl show sharefyx-mcp.service -p MainPID,ActiveEnterTimestamp`
+  → `MainPID=195922`, `ActiveEnterTimestamp=Wed 2026-09-02 11:51:57 CEST` — nur
+  gelesen, keine Änderung.
+
+**Doku-Updates im selben Commit (Hard Rule 8):**
+
+- `phase8_5_picker_release/CLAUDE.md`: Modul-Status-Zeile D `⬜` → `🟡` (D1 fertig;
+  D2–D5 als Nikinger-Aktionen in derselben Zeile vermerkt); `updated:`-Pipe ergänzt.
+- `phase8_5_picker_release/SESSIONS_ARCHIVE.md`: Block-C-Block vorne angehängt
+  (newest-first, vor B1); Frontmatter `updated:` ergänzt; `## Session stopped`-Wrapper
+  entfällt (Archiv-Einträge sind nur `### date`-Subblöcke, konsistent mit den vier
+  vorherigen Rotationen).
+- `docs/INDEX.md` Phase-8.5-Header: `🔄 A1 🟡, A2 🟡, B1 🟡, C 🟡, D/Z ⬜` →
+  `🔄 A1/A2/B1/C/D1 🟡, D2–D5/Z ⬜`; Phase-8.5-Bullet unter `## Phase 8.5` mit dem
+  D1-Stand aktualisiert (Modul-Status D 🟡, Datums-Drift dokumentiert, neuer
+  Session-Block); `updated:`-Pipe ergänzt.
+- `ROADMAP.md` Phase-8.5-Absatz: Datums-Drift `## 2026-09-04` → `## 2026-09-05` für den
+  Update-Log-Eintrag dokumentiert; „nächster Schritt: Block D" → „D1 (Vorbereitung)
+  committet; nächster Schritt: D2 (Deploy als Nikinger-Aktion) + D3–D5";
+  `updated:`-Pipe ergänzt.
+- `CLAUDE.md` (Wurzel): neuer „Current state"-Absatz vom 2026-09-05 für D1;
+  `updated:`-Pipe ergänzt.
+
+**Was diese Session bewusst NICHT tat:**
+
+- Kein `git commit` — der Commit wartet bis alle sechs Doku-Updates durch sind (Hard Rule 8).
+- Kein `deploy.sh`-Aufruf — D2 ist Nikinger-Aktion (P8.5-Q + Hard Rule 9).
+- Kein `app.js`/`dialogs.js`/`editor.js`-Touch — nur statisches HTML + Markdown.
+- Kein neues Python-Modul — D1 ist absichtlich reines Doku-/Badge-Work.
+- Kein `mcpserver/`, `storage/`, `authserver/`, `security.py`/`api.py`/`serializers.py`/
+  `permissions.py`-Touch — Tabu-Diff §0.3 ist nachweislich leer.
+- Kein Service-Touch — `sharefyx-mcp.service` läuft seit 2026-09-02 11:51:57 CEST
+  unangetastet.
+
+**Nächster Schritt, konkret:** D2 — **Deploy als Nikinger-Aktion.** Voraussetzungen aus
+D1 sind im selben Commit auf `main`: Badge `v3.0.1`, Update-Log-Eintrag vom heutigen
+Tag. Aufruf in einer interaktiven Vordergrund-Shell:
+
+```
+SHAREFYX_SYSTEMCTL="sudo systemctl" phase5_ui/scripts/deploy.sh main
+```
+
+V103 prüft, dass der `sudo`-Prompt sichtbar wird (Hard Rule 9, niemals
+`sudo systemctl` durch opencode/M3). Nach D2 folgen D3 (Health-Gate 3/3 + V105),
+D4 (Sichtprüfung am echten Gerät + P8.5-19-Abnahme des `<select>`-Modus-Selektors),
+D5 (Vierte A3-Probe, entscheidet §9.4.1 Abbruchregel aus N2), Z (Closeout: Plan §9
+füllen, Nachtrag in `phase8_ui_graph_plan.md` §9 + §9.4.7, Phase-8-Head §7-Matrix
+aktualisieren, Größenprüfung).
 
 ### 2026-09-04 (Block C — v3-Vorabritt gegen eine Wegwerf-Instanz, 26/26 grün)
 
