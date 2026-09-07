@@ -7,7 +7,7 @@ up: ../../ROADMAP.md
 down:
   - ./PHASE7_CLOSEOUT_HANDOVER.md            # Herkunft der Erbposten P7-24 / remove-space / P7-4
   - ../../phase8_ui_graph/CLAUDE.md          # Phase-Head (entsteht in Step 0.5)
-updated: 2026-09-02 (P8-22+P8-24-Smokes gebaut, drei Phase-8-Funde als benannte Defekte in §9.4.6 -- graph.js ALPHA_DECAY / api.py _graph_get `writable` / graph.js Knotenklick-nach-Item -- mit je drei Optionen, §9.4.4 gegenstandslos (beide Substanz-Setups gebaut), Status 15-10-0; achte P1-Contract-Öffnung GESCHLOSSEN mit demselben Commit, Schliessungsbeleg in phase1_storage/CLAUDE.md §Geerbte Contracts; keine Python- oder JS-Datei in storage/mcpserver/webui/static angefasst, 958/958 pytest unveraendert, ui_budget 5/5 unveraendert) | 2026-09-02 (§9 Closeout gefüllt — Phase-8-Closeout in diesem Plan-Abschnitt per P8-N, Status 15 ✅ · 9 🟡 · 2 ⬜ vor Step-Z-Deploy; drei benannte Restdefekte + Glyph-Entscheidung dokumentiert, achte P1-Contract-Öffnung formal geschlossen; keine Python-/JS-Datei angefasst, keine Tests geändert, Sichtprüfung am echten Gerät + Sprung auf ✅ bleibt Nikinger-Aktion nach `deploy.sh main`) | 2026-08-28 (Nachtrag noch in der Planungssession: Step 0 als Fundament-Session Claude Code + Nikinger, C0 Anti-AI-Pattern-Research neu, P8-P gelockt, P8-25/26 + V93/V94) | 2026-08-28 (initial, Planungssession Claude Code Opus, N1–N12 vom Nikinger gelockt)
+updated: 2026-09-06 (Phase 8.5 D4-Sichtprobe-Folgesession — **nur dokumentiert, kein Code-Touch in dieser opencode/M3-Session**; §9.4.7 mit Phase-8-✅-Sprung + p8.X-Ankündigung + Verweis auf `docs/concepts/p8x_ui_polish_notes.md` als Schreib-Stelle ergänzt; sieben Sichtprobe-Folgesession-Themen [Spaces-Layout-Reorg, Obsidian-Map 5 Sub-Punkte, Anzahl-Anzeige Ordner, Edit-in-Place-Vision, Layering-Design-System, „Konto"→„Einstellungen", De-AI-ierung-Lauf 2] + fünf D4-Punkte [UX-2-Step-Knotenklick, Map-Field schneidet ab, Map fliegt, Save-Button-YAML-Header, Fabi-Sammelliste] sind in der p8.X-Notizen-Datei gesammelt; `phase8_5_picker_release/CLAUDE.md` aktiver Block auf D4-Sichtprobe-Folgesession umgestellt, D4-Block rotiert nach `SESSIONS_ARCHIVE.md`; Phase-8.5-Head Frontmatter `updated:` Pipe vorne ergänzt; keine Code-Tests, kein Service-Touch; Plan-Kern unverändert [P8-A–P8-Q, N1–N12]) | 2026-09-02 (P8-22+P8-24-Smokes gebaut, drei Phase-8-Funde als benannte Defekte in §9.4.6 -- graph.js ALPHA_DECAY / api.py _graph_get `writable` / graph.js Knotenklick-nach-Item -- mit je drei Optionen, §9.4.4 gegenstandslos (beide Substanz-Setups gebaut), Status 15-10-0; achte P1-Contract-Öffnung GESCHLOSSEN mit demselben Commit, Schliessungsbeleg in phase1_storage/CLAUDE.md §Geerbte Contracts; keine Python- oder JS-Datei in storage/mcpserver/webui/static angefasst, 958/958 pytest unveraendert, ui_budget 5/5 unveraendert) | 2026-09-02 (§9 Closeout gefüllt — Phase-8-Closeout in diesem Plan-Abschnitt per P8-N, Status 15 ✅ · 9 🟡 · 2 ⬜ vor Step-Z-Deploy; drei benannte Restdefekte + Glyph-Entscheidung dokumentiert, achte P1-Contract-Öffnung formal geschlossen; keine Python-/JS-Datei angefasst, keine Tests geändert, Sichtprüfung am echten Gerät + Sprung auf ✅ bleibt Nikinger-Aktion nach `deploy.sh main`) | 2026-08-28 (Nachtrag noch in der Planungssession: Step 0 als Fundament-Session Claude Code + Nikinger, C0 Anti-AI-Pattern-Research neu, P8-P gelockt, P8-25/26 + V93/V94) | 2026-08-28 (initial, Planungssession Claude Code Opus, N1–N12 vom Nikinger gelockt)
 ---
 # Phase 8 — UI-Neuanstrich, Verknüpfungs-Graph, QoL (`phase8_ui_graph/`)
 
@@ -943,6 +943,20 @@ neuen aus §9.4.6 **vor** dem Sprung noch schließen will, kann die Bilanz vor d
 Achtung: die sechs optionalen Schließungen liegen in zwei verschiedenen Phasen — die drei
 aus §9.4.6 sind Phase-8-Restdefekte, die drei aus §9.4.1–§9.4.3 sind teils Phase-7-
 Restdefekte (A3, Item-Picker) und teils Phase-8-Nebenfunde (A11y).
+
+**Phase 8 ✅ + p8.X als Folge-Phase** — Nikinger-Entscheidung in Phase 8.5 D4
+(2026-09-06), vorgemerkt für den Phase-8.5-Z-Closeout. Die Folge-Phase **p8.X**
+(„UI-Polish-Folge-Phase") sammelt die gerade von Fabian kommenden fixbaren Issues
+plus die zwei Map-Beobachtungen (Field schneidet ab, Reload-Drift) plus den
+**UX-2-Step-Knotenklick** plus den **Save-Button-YAML-Header** (Verifikation ob
+außerhalb Header-Kontext steht aus) plus die sieben Sichtprobe-Folgesession-
+Themen vom 2026-09-06 (Spaces-Layout-Reorg, Obsidian-Map [5 Sub-Punkte],
+Anzahl-Anzeige Ordner, Edit-in-Place-Vision, Layering-Design-System,
+„Konto"→„Einstellungen"-Rename, De-AI-ierung-Lauf 2). **Einzige Schreib-Stelle**
+für die Ideen bis zur Planungs-Session: **`docs/concepts/p8x_ui_polish_notes.md`**
+(L2, 25 KB, 2026-09-06 neu) — Sammlung, kein Plan, kein Locking, keine
+Tabu-Aufhebung. Phase-8.5-Z referenziert diese Datei als Quelle der
+p8.X-Ankündigung.
 
 ### §9.5 `[VERIFY]`-Bilanz (V81–V92 + V93, V94)
 

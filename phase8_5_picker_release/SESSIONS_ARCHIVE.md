@@ -5,10 +5,463 @@ read-when: Auditieren der vollen Phase-8.5-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-05 (D1-Block rotiert — manuell wie Block-C davor, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt; D1 vorne angehängt (newest-first), Block-C + B1 + A2 + A1 + Step 0 darunter unverändert; D3-Prep-Session (Health-Gate-Skript + D2-Discovery) hat den D1-Block aus dem Head ersetzt, D2 lief zwischen D1 und D3 still durch den Nikinger) | 2026-09-05 (Block-C-Block rotiert — manuell wie alle vier vorherigen Schritte, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); Block-C vorne angehängt (newest-first), B1 + A2 + A1 + Step 0 darunter unverändert; D1 committet, D2–D5 als Nikinger-Aktionen ausgewiesen) | 2026-09-04 (B1-Block rotiert — manuell wie A2/A1/Step-0, weil `scripts/rotate_session_block.sh` (portiert in Block C, `phase8_5_picker_release/scripts/rotate_session_block.sh`) erst jetzt greift; B1 vorne angehängt (newest-first), A2 + A1 + Step 0 darunter unverändert; C abgeschlossen — 13/13 in Chromium+Firefox, 26/26 gesamt, D/Z stehen noch aus)
+updated: 2026-09-07 (D4-Sichtprobe-Folgesession-Block rotiert — manuell wie alle vier vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt; Cluster-1-P8-16-Block ersetzt ihn im Head, **erste echte Code-Touch-Session seit D1** — `phase8_ui_graph/scripts/p8_16_glass_fallback_probe.py` + `wegwerf_setup_p8_16.py` neu (Port 18775, Standing-Permission-Muster reproduziert), vier Screenshots `docs/screenshots/p8_16_{01..04}_*.png`; **P8.5-16 ✅** (Wegwerf-Chromium-Probe mit CDP-`Emulation.setEmulatedMedia` für `prefers-reduced-transparency: reduce` — beide Glass-Träger `.list__head`+`.overlay__panel` wechseln sauber `blur(14px) saturate(1.5)`+`rgba(27,32,39,0.55)` → `backdrop-filter: none`+`rgb(27,32,39)`, Selektion mit Akzent-Fill+Outline im Solid-Modus voll erkennbar, Restore identisch zur Baseline; Phase 8 P8-16 bleibt 🟡 — throwaway-Eidenz jetzt drin, Nikinger-Sichtprüfung am echten v3.0.1 offen); Phase-8.5-Summary 3 ✅ · 14 🟡 · 3 ⬜ → **4 ✅ · 13 🟡 · 3 ⬜**; pytest nicht gelaufen (kein `.venv`-Python-Touch in `phase8_ui_graph/scripts/`), Tabu-Diff §0.3 leer (Phase-8.5-Tabu greift nicht für `phase8_ui_graph/scripts/`), `node --check`/`bash -n`/`ui_budget.py` irrelevant, Service-Touch 0 nur gelesen (PID 355956 unverändert seit 2026-09-05); Cluster 2-5 (Sichtprüfung 2+3 / Connector / Fabian) als nächste Schritte für Cluster-Sequenz offen, Nikinger-Aktionen) | 2026-09-06 (D4-Block rotiert — manuell wie alle vier vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); D4-Block vorne angehängt (newest-first, vor D3), D3 + D1 + Block-C + B1 + A2 + Step 0 darunter unverändert; **D4-Sichtprobe-Folgesession** (Notiz-Session, kein Code-Touch) hat den D4-Block aus dem Head ersetzt — sieben neue Themen-Cluster aus der Sichtprobe mit Fabian dokumentiert: Spaces-Layout-Reorg, Obsidian-Map (Reload-Overload + Landkarten-Stil + Collapsible mit Abhängigkeiten + zwei D4-bestätigte Beobachtungen), Anzahl-Anzeige Ordner, Edit-in-Place-Vision, Layering-Design-System (3 Layer + Selektion blau), „Konto"→„Einstellungen" + Positions-Tausch mit Logout, De-AI-isierung-Lauf 2 nach neuen Kriterien; **neue Datei `docs/concepts/p8x_ui_polish_notes.md` angelegt** (25 KB, L2, alle 16 Themen — fünf bereits in D4 dokumentierte p8.X-Punkte + sieben Sichtprobe-Folgesession-Cluster + vier Sub-Punkte aus §2 Obsidian-Map; Vorsegmentierter Anhang für die Planungs-Session) | 2026-09-06 (D3-Block rotiert — manuell wie alle vier vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); D3-Block vorne angehängt (newest-first, vor D1), D1 + Block-C + B1 + A2 + Step 0 darunter unverändert; D4-Session (Notiz-Session, kein Code-Touch) hat den D3-Block aus dem Head ersetzt — drei Findings dokumentiert: P8.5-19 Radiogruppe statt `<select>` (Tausch ausstehend), P8.5-6 Bracket-Renderer-Bug (Fix in `markdown.js` ausstehend), UX-2-Step-Knotenklick (p8.X); Phase 8 ✅ + p8.X als Nikinger-Entscheidung für Z vorgemerkt) | 2026-09-05 (D1-Block rotiert — manuell wie Block-C davor, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt; D1 vorne angehängt (newest-first), Block-C + B1 + A2 + A1 + Step 0 darunter unverändert; D3-Prep-Session (Health-Gate-Skript + D2-Discovery) hat den D1-Block aus dem Head ersetzt, D2 lief zwischen D1 und D3 still durch den Nikinger) | 2026-09-05 (Block-C-Block rotiert — manuell wie alle vier vorherigen Schritte, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); Block-C vorne angehängt (newest-first), B1 + A2 + A1 + Step 0 darunter unverändert; D1 committet, D2–D5 als Nikinger-Aktionen ausgewiesen) | 2026-09-04 (B1-Block rotiert — manuell wie A2/A1/Step-0, weil `scripts/rotate_session_block.sh` (portiert in Block C, `phase8_5_picker_release/scripts/rotate_session_block.sh`) erst jetzt greift; B1 vorne angehängt (newest-first), A2 + A1 + Step 0 darunter unverändert; C abgeschlossen — 13/13 in Chromium+Firefox, 26/26 gesamt, D/Z stehen noch aus)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8.5: Link-Picker-Politur, Titel-statt-ID-Hint, v3-Vorabritt + Deploy
+### 2026-09-06 (D4-Sichtprobe-Folgesession — p8.X-Notizen-Datei angelegt, kein Code-Touch)
+
+**Auftrag:** Notiz-Session. Im Anschluss an die D4-Sichtprüfung hat der Nikinger mit
+Fabian weitere Themen-Cluster notiert, die über den D4-Sichtprüfungs-Scope
+hinausgehen und in p8.X gehören. Alles in dieser Session **nur dokumentiert**
+— kein Code-Touch (Hard Rule 9 + §0.3-Tabu unverändert), keine Tests, kein
+Service-Touch, kein `git commit`. **Wichtig:** D4-Block wurde vor diesem Block
+**rotiert** nach `SESSIONS_ARCHIVE.md` (manuell wie alle vier vorherigen
+Schritte in dieser Phase — Skript `scripts/rotate_session_block.sh` greift hier
+nicht, weil das Phase-8.5-Muster mit einem `## Session stopped` + mehreren
+`### date`-Subblöcken vom Skript nicht erkannt wird; siehe Archiv-Header).
+
+**Ergebnis — neue Datei `docs/concepts/p8x_ui_polish_notes.md` angelegt
+(25 KB, L2).** Sie sammelt alle 16 Themen aus D4 (5) und der
+Sichtprobe-Folgesession (7 Cluster mit 4 Sub-Punkten im Obsidian-Map-§2):
+
+| Cluster | Inhalt (Kurzform) | Herkunft |
+|---|---|---|
+| §1 Spaces-Layout-Reorg | „Alle Items"-Leiste unter Spaces + Kippschalter; Map 40 % Breite, volle Höhe, keine Duplikate | Sichtprobe-Folgesession |
+| §2.1 Map-Performance | Jeder Klick auf Übersicht lädt Map neu → überlastet | Sichtprobe-Folgesession |
+| §2.2 Map-Stil „Landkarte" | Aktuelle Farben übernehmen (außer Hintergrund), stilisierter, im Gesamt-Style | Sichtprobe-Folgesession |
+| §2.3 Map-Field schneidet ab | Layout-Issue | D4 bestätigt + Sichtprobe-Folgesession |
+| §2.4 Map-Reload-Drift | Kein persistenter Layout-Seed | D4 bestätigt + Sichtprobe-Folgesession |
+| §2.5 Map einklappen mit Abhängigkeiten | Collapsible Map, Abhängigkeiten sichtbar im eingeklappten Zustand | Sichtprobe-Folgesession |
+| §3 Anzahl-Anzeige Ordner | Count-Anzeige pro Ordner (Aufgaben + Notizen) | Sichtprobe-Folgesession |
+| §4 Edit-in-Place | „Bearbeiten"-Knopf überflüssig; Word-ähnlich im Read-View editieren | Sichtprobe-Folgesession |
+| §5 Layering-Design-System | 3 Layer (echtes Schwarz / aktueller Standard / Liquid Glass) + Selektion explizit blau auf Hover, Note-Select, Checkbox | Sichtprobe-Folgesession |
+| §6 Settings/Navigation | „Konto" → „Einstellungen"-Rename + Positions-Tausch mit Logout | Sichtprobe-Folgesession |
+| §7 De-AI-ierung Lauf 2 | Nach **neuen** Kriterien suchen; dann echte Erstellungs-Regeln | Sichtprobe-Folgesession |
+| D4-1 UX-2-Step-Knotenklick | 1. Klick Readonly-Vorschau, 2. Klick vollständig | D4 (verbatim übernommen + Duplikatverweis) |
+| D4-4 Save-Button-YAML-Header | Workaround „Leerzeichen einfügen"; Verifikation ob außerhalb Header auftretend steht aus | D4 (verbatim übernommen + Duplikatverweis) |
+| D4-5 Fabis Sammelliste | Laufend, was Fabi sammelt | D4 (Duplikatverweis) |
+
+**Zusätzlich in der Notizen-Datei dokumentiert (für die Planungs-Session in
+Claude Code, vermutlich nach Phase 8.5 Z):**
+
+- **§A** — vollständige Tabelle der bereits in D4 dokumentierten p8.X-Punkte mit
+  Verweisen zurück in den D4-Block.
+- **§B** — klare Außenkanten: was **nicht** in p8.X gehört (Body-Volltextsuche Q1,
+  FastMCP-4/V79, Funnel-Watchdog, Mobile/Realtime, Light-Mode, Glyph-Entscheidungen,
+  Phase-8/8.5-Tabus gelten vorerst weiter).
+- **§C** — sechs offene Fragen für die Planungs-Session (Reichweite, Reihenfolge,
+  Aufwand-Schätzung, Fabian-Koordination, Layering-Audit-Sweep, Phase-9-Tabu-Frage).
+- **§D** — Namens- und Datei-Konvention für den späteren Plan (`phase9_…` oder
+  `phase8_x_…`).
+- **§E** — chronologische Tabelle der 16 Themen mit Herkunft (alle 2026-09-06).
+
+**Bewusst NICHT in den p8.X-Notizen dokumentiert** (um Doppelung zu vermeiden):
+
+- Phase 8 §9.4.6 drei Restdefekte (Settle-Zeit / Foreign-Farbe / Knotenklick) —
+  bereits am 2026-09-02 in Phase 8 D2-Session geschlossen, **nicht** p8.X.
+- Phase 8 §9.4.1 A3 Klammer-/Aufzählungs-Kontext — Phase-8.5-Scope, D5
+  Vierte A3-Probe entscheidet, **nicht** p8.X.
+- Phase 8.5-eigene Funde (P8.5-19 Radiogruppe, P8.5-6 Bracket-Renderer-Bug) —
+  Phase-8.5-Scope, Fix vor Z, **nicht** p8.X.
+
+**Verifiziert (§0.5 Checkliste):**
+
+- `pytest -q`: nicht gelaufen — keine Python-Datei berührt.
+- Tabu-Diff §0.3: **leer** — kein `phase4_auth/`/`storage/`/`security.py`/`api.py`/
+  `serializers.py`/`permissions.py`/`mcpserver/`-Touch. Auch kein anderer Code-Touch
+  (`markdown.js`/`dialogs.js`/`editor.js`/`graph.js`/`app.html`/`app.css`
+  unangetastet).
+- `bash -n`/`node --check`/`ui_budget.py`: irrelevant — keine Code-Änderung.
+- Service-Touch **0**. `systemctl show sharefyx-mcp.service` vom 2026-09-05 16:10:18
+  CEST / PID 355956 ist weiterhin der letzte gelesene Stand (Hard Rule 9 + §0.5.7).
+- Größenprüfung am Ende dieser Session (Ist-Werte, gekürzt): `p8x_ui_polish_notes.md`
+  neu, 25.489 B (L2, unter Cap); `phase8_5_picker_release/CLAUDE.md` 39.679 B
+  (war 38.038 B, **+1.641 B** netto, **knapp unter Cap**); `SESSIONS_ARCHIVE.md`
+  75.330 B (L3, exempt); `docs/INDEX.md` 49.556 B (war 44.784 B, **+4.772 B** durch
+  neue Phase-8.X-Sektion + L0-Zeile, weiterhin über Cap); `ROADMAP.md` 43.819 B
+  (war 42.413 B, **+1.406 B** durch neue Phase-8.X-Sektion + Tabellenzeilen, neu über
+  Cap); **`CLAUDE.md` (Wurzel) 55.014 B** (war 47.999 B, **+7.015 B**, **deutlich
+  über Cap**); `phase8_ui_graph_plan.md` 80.039 B (+1.865 B durch §9.4.7-Erweiterung,
+  bereits exempt als Plan-Snapshot). `phase8_ui_graph/CLAUDE.md` 93.562 B unverändert
+  (diese Session hat nicht hineingeschrieben, Z-Sache).
+
+**Plan-Konsistenz — Drei Festlegungen explizit gemacht, damit die
+Planungs-Session sie vorfindet (keine Erfindung, alles aus dem Bericht des
+Nikingers):**
+
+1. **p8.X ist eine Nikinger-Entscheidung** (festgelegt in D4, 2026-09-06, in der
+   Phase-8.5-Z vorgemerkt). Diese Session hat das weder bestätigt noch aufgehoben —
+   die p8.X-Notizen-Datei ist Vorbereitung der späteren Planung, nicht Startschuss.
+2. **Reichweite unklar.** §C in der Notizen-Datei listet sechs Fragen, die die
+   Planungs-Session beantworten muss, bevor ein Plan-Doc entsteht. Die Datei ist
+   **kein** Plan — sie ist Sammlung + Strukturierung, kein Locking.
+3. **Keine neuen Tabu-Aufhebungen** für p8.X. Phase-8/8.5-Tabus
+   (`storage/`, `authserver/`, `mcpserver/` außer dem Hint, `webui/{security,api,
+   serializers,permissions}.py`) gelten vorerst weiter. Die Phase-8.5-D4-Präzedenz
+   „`webui/static/js/` ist erlaubt" (Bracket-Renderer-Fix-Pfad) gilt weiter, ist
+   aber p8.X nicht vorgeschrieben.
+
+**Doku-Updates im selben Commit (Hard Rule 8):**
+
+- `phase8_5_picker_release/CLAUDE.md`: D4-Block nach `SESSIONS_ARCHIVE.md` rotiert;
+  dieser neue Block hier; Modul-Status unverändert (Block D weiter 🟡 bis Z);
+  P8.5-Abnahmezeilen unverändert; `updated:`-Pipe vorne ergänzt.
+- `phase8_5_picker_release/SESSIONS_ARCHIVE.md`: D4-Block vorne angehängt (verbatim);
+  `updated:`-Pipe vorne ergänzt (neuer 2026-09-06-Eintrag über der bisherigen
+  D3-Rotation).
+- `docs/concepts/p8x_ui_polish_notes.md`: **neu**, L2, 25.489 B.
+- `docs/INDEX.md`: eine neue Zeile unter „Phase 8.5"-Header für die p8.X-Notizen-
+  Datei; `updated:`-Pipe vorne ergänzt.
+- `ROADMAP.md`: Phase-8.5-„nächster Schritt" Verweis auf die Notizen-Datei;
+  `updated:`-Pipe vorne ergänzt.
+- `CLAUDE.md` (Wurzel): neuer Current-state-Absatz vom 2026-09-06 für die
+  Sichtprobe-Folgesession; `updated:`-Pipe vorne ergänzt.
+- `docs/concepts/phase8_ui_graph_plan.md` §9.4.7: kurzer Anker auf die neue
+  p8.X-Notizen-Datei (Phase-8-Closeout-Verweis).
+
+**Was diese Session bewusst NICHT tat:**
+
+- Kein Code-Touch, kein Deploy, kein `sudo systemctl`, keine `systemctl show`
+  (Hard Rule 9 + P8.5-Q; PID 355956 reicht für die Übergabe).
+- Kein `pytest`/`node --check`/`bash -n`/`ui_budget.py` — irrelevant ohne Code-Touch.
+- Kein Browser-/Funnel-/Connector-Test — alles lief am echten Gerät durch den Nikinger.
+- Kein `git commit` — siehe Session-Ende-Notiz unten.
+- **Keine Planung von p8.X.** Findings strukturiert, nicht gelockt; Planungs-Session
+  (vermutlich Claude Code) klärt Reichweite/Reihenfolge/Aufwand (§C der Notizen-Datei).
+- Keine Aufhebung von Phase-8/8.5-Tabus.
+- Keine Schließung von P8.5-6 / P8.5-19 — die Fixe gehören in den
+  Phase-8.5-Tausch-Pfad vor Z, **nicht** in die p8.X-Notizen.
+- Kein Schreibvorgang in `phase8_ui_graph/CLAUDE.md` (Phase 8 ✅, gehört Z).
+
+**Größe-Hinweis:** Phase-Head 39.962 B (unter 40-KB-Cap).
+
+**Nächster Schritt, konkret (unverändert gegenüber D4):**
+
+- **D5** — Vierte A3-Probe (Nikinger, wörtlicher Prüfauftrag aus Plan §3 B1 —
+  entscheidet §9.4.1 Abbruchregel aus N2).
+- **V105** — Connector-Check (Nikinger, echter Anthropic-Connector).
+- **Optional vor Z** durch opencode/M3: Radiogruppe-Tausch (P8.5-19, 5 Z. in
+  `dialogs.js`+`app.html`) + Bracket-Renderer-Fix (P8.5-6, in `markdown.js`) —
+  damit Z die Endabnahme-Zeilen P8.5-6 und P8.5-19 auf ✅ heben kann.
+- **Z** (Phase-8.5-Closeout, opencode/M3): wie D4-Block beschrieben — neu ist
+  **zusätzlich**: Verweis auf `docs/concepts/p8x_ui_polish_notes.md` als Quelle
+  für die p8.X-Ankündigung in `phase8_ui_graph_plan.md §9.4.7` + Eintrag in
+  `phase8_ui_graph/CLAUDE.md §7`-Matrix „Phase 8 ✅, p8.X angekündigt, Notizen
+  in `docs/concepts/p8x_ui_polish_notes.md`".
+
+---
+
+**Session beendet 2026-09-06 auf Wunsch des Nikingers.** Session-Ende-Notiz,
+steht für nächste Sitzung (oder den Nikinger direkt) an:
+
+- **D5** — Vierte A3-Probe (Nikinger, entscheidet §9.4.1 Abbruchregel).
+- **V105** — Connector-Check (Nikinger, echter Anthropic-Connector).
+- **Optional vor Z** durch opencode/M3 — Radiogruppe-Tausch (P8.5-19, 5 Z.) +
+  Bracket-Renderer-Fix (P8.5-6).
+- **`git commit`** — Nikinger commitet die uncommitted Working-Tree-Änderungen
+  (D4 + D4-Folgesession gemeinsam; +1 neue Datei `docs/concepts/p8x_ui_polish_notes.md`).
+
+Reine Doku-Session — kein Code, keine Tests, kein Service-Touch, kein
+`sudo systemctl`; Commit liegt beim Nikinger.
+### 2026-09-06 (D4 Sichtprüfung am echten Gerät durch den Nikinger — nur dokumentiert, kein Code-Touch)
+
+**Auftrag:** Notiz-Session für D4. Der Nikinger hat heute die Sichtprüfung am echten Gerät
+gegen den D2-Deploy durchgeführt (Hard-Rule-9-konform, opencode/M3 kann das nicht).
+Alles in dieser Session **nur dokumentiert** — kein Code-Touch (Hard Rule 9 + §0.3-Tabu
+unverändert), keine Tests, kein Service-Touch, kein `git commit`.
+
+**Ergebnis — Vorbereitung + Block 1–7 komplett durchgelaufen, drei echte Funde zum
+Festhalten:**
+
+Vorbereitung (Login beide Accounts ✅), Block 1 (Update-Banner `## 2026-09-05` mit den drei
+Zeilen sichtbar ✅; Picker-Umschalter vorhanden, beide Modi „als Text-Link" und „als Kante"
+funktional ✅; **eckige Klammern im Titel brechen den Link im Preview** — Bug),
+Block 2 (Persistenz via `localStorage["sfx:linkpicker:mode"]` ✅, privater Modus wirft nicht),
+Block 3 (Tastaturnavigation `aria-activedescendant` in **Firefox + Chrome + Safari** auf
+beiden Accounts ✅, geht über die Mindestanforderung Chromium+Firefox hinaus),
+Block 4 (Insert-at-cursor Hub Bild-Knopf ✅, Bild erscheint in Vorschau),
+Block 5-Kern (Settle-Zeit 2 s unter dem 3-s-Ziel; alle drei Graph-Farben korrekt gerendert;
+Knotenklick öffnet das Item im Detail — Phase-8-§9.4.6 Fixes A/B/C regressionsfrei),
+Block 6 (zwei Map-Beobachtungen wie geparkt bestätigt: Map-Field schneidet unten ab; Map
+„fliegt" bei jedem Reload),
+Block 7 (**Nikinger-Entscheidung Phase 8 ✅ + p8.X als Folge-Phase**, weil weitere fixbare
+Issues gerade von Fabi gesammelt werden, die über den Sichtprüfungs-Scope hinausgehen).
+
+**Drei echte Findings — jede mit Scope-Entscheidung:**
+
+1. **P8.5-19 — Radiogruppe statt `<select>`.** Wörtlich aus dem Bericht: „Radiogruppe mit
+   evtl eindeutigen Icons aber deutlich angenehmer". P8.5-F-Planer-Substitution (Konvention
+   v3 hatte `<select>` nahegelegt) wird zurückgedreht. **Tausch 5 Zeilen** in `dialogs.js:584`
+   + `app.html:277` — opencode/M3 in einer Folge-Session, vor Z. Icon-Vorschlag:
+   Lucide-`link-2` für „als Kante", `pilcrow` (oder `text-cursor-input`) für „als Text-Link" —
+   Bestätigung durch Nikinger offen. P8.5-19 bleibt ⬜ bis zum Tausch.
+
+2. **P8.5-6 — Bracket-Renderer-Bug.** Body-Source-Escape `[vgpu \[Vercel\] – Relevanz für
+   Sharefyx-UI (Obsidian-ähnliche Notiz-Map)](#item/itm_67bb0565)` ist **korrekt**
+   (Backslash-Escape steht im Body), aber der Markdown-Renderer bricht den Link in der
+   Vorschau — eckige Klammern zerlegen die URL-Zuordnung, **runde Klammern funktionieren**.
+   Evidenz im Live-Datensatz gelassen (Item `itm_67bb0565`).
+   **Diagnose:** `phase5_ui/webui/static/js/markdown.js` ist Source-of-Truth des
+   Preview-Renderers, der Parser folgt CommonMark für `\[`/`\]` in Link-Text nicht
+   (Heuristik „erste `]` schließt den Link" o. ä.). **Echter Bug, Phase-8.5-Scope:**
+   §0.3-Tabu verbietet `webui/static/js/` **nicht** — nur `webui/{security,api,
+   serializers,permissions}.py` + `storage/` + `authserver/` + `mcpserver/` (mit der
+   Hint-Ausnahme). **Hard-Rule-9-Eskalation greift nicht** — Ursache liegt genau dort,
+   wo der Fix hinkommt (kein Kaskaden-Problem). Fix-Pfad: lokalisieren, Fix vorschlagen,
+   gegen Wegwerf-Instanz throwaway-verifizieren, committen, Health-Gate-Re-Run. Zeile
+   bleibt 🟡 bis zum Fix.
+
+3. **UX-2-Step-Knotenklick — neues Feature für p8.X.** Knotenklick öffnet das Item, aber
+   „umständlich, da über Browser-Tools zurück navigiert werden muss". Nikinger-Vorschlag:
+   **erster Klick öffnet Readonly-Scroll-Vorschau (ESC/Outside-Click schließt), zweiter
+   Klick auf die Notiz öffnet sie vollständig**. Ist **kein** Phase-8-Restdefekt,
+   **kein** Phase-8.5-Scope — neues UX-Feature für die p8.X-Folge-Phase, in der Fabi
+   gerade fixbare Issues sammelt.
+
+**Vier kleinere Punkte — parkiert, kein Phase-8.5-Fix:**
+
+- **Map-Field schneidet unten ab** (`phase5_ui/webui/static/js/graph.js`-Layout, Phase-8-
+  Block-D). Parken für p8.X — vom Nikinger in D4 explizit bestätigt, vom D3-Handover
+  übernommen.
+- **Map „fliegt" bei jedem Reload durcheinander** — kein persistenter Layout-Seed,
+  jeder Mount startet mit frischen Random-Kräften. Parken für p8.X — gleiche
+  Herkunft wie oben.
+- **Save-Button-YAML-Header-Issue**: Picker → `#field-links` modifiziert, aber
+  Save-Button unlockt nicht, wenn der Cursor im YAML-Header-Feld sitzt; Workaround
+  „einfach Leerzeichen einfügen". Vermutung: `editor.js`-Dirty-Detection ist
+  Phase-5-Code, nicht Phase-8.5. **Verifikation steht aus:** wenn der gleiche Bug
+  auch außerhalb des Header-Kontexts auftritt (nur Frontmatter-Edit ohne Picker), ist
+  es ein Phase-8.5-Fix. Bis dahin parken, wahrscheinlich p8.X.
+- **Conflict-Dialog-Verhalten** (im Bericht implizit über „Speicherbutton spam →
+  Konflikt-Dialog getestet"): Hard Rule 3 „kein Last-Write-Wins" bewährt sich, der
+  Server lehnt den Replay korrekt ab. Kein Befund, nur Notiz.
+
+**Phase-8-Closeout-Entscheidung (für Z vorgemerkt):** Nikinger bestätigt Phase 8 ✅ mit
+p8.X als Folge-Phase. „p8.X" sammelt die gerade von Fabi kommenden fixbaren Issues plus
+die zwei Map-Beobachtungen plus den UX-2-Step-Knotenklick plus (wahrscheinlich) den
+Save-Button-Bug. **Eintrag in `phase8_ui_graph_plan.md §9.4.7` + `phase8_ui_graph/
+CLAUDE.md §7`-Matrix** ist Z-Arbeit, kein Phase-8.5-Eingriff.
+
+**Verifiziert (§0.5 Checkliste):**
+
+- `pytest -q`: nicht gelaufen — keine Python-Datei berührt.
+- Tabu-Diff §0.3: **leer** — kein `phase4_auth/`/`storage/`/`security.py`/`api.py`/
+  `serializers.py`/`permissions.py`/`mcpserver/`-Touch. Auch kein anderer Code-Touch
+  (`markdown.js`/`dialogs.js`/`editor.js`/`graph.js`/`app.html`/`app.css` unangetastet).
+- `bash -n`/`node --check`/`ui_budget.py`: irrelevant — keine Code-Änderung.
+- Service-Touch **0**. `systemctl show sharefyx-mcp.service` vom 2026-09-05 16:10:18
+  CEST / PID 355956 ist weiterhin der letzte gelesene Stand (Hard Rule 9 + §0.5.7).
+- Größenprüfung: kein neues `.md`-File → keine INDEX-Zeile nötig. **`phase8_5_picker_
+  release/CLAUDE.md` 37.831 B** (D3-Block 154 Z. raus, neuer Block ~140 Z. rein —
+  leicht kürzer als D3 trotz dreier Findings-Dokumentation; mit Modul-Status-Erweiterung
+  netto +2 KB auf ~37.8 KB, **bleibt unter dem 40-KB-Softcap**).
+- **`docs/INDEX.md` 44.784 B + `CLAUDE.md` (Wurzel) 47.999 B** — weiterhin über dem
+  40-KB-Softcap, **benannt seit D3, Auflösung bleibt eine P8-Entscheidung aus Z**,
+  nicht diese Session.
+
+**Doku-Updates im selben Commit (Hard Rule 8):**
+
+- `phase8_5_picker_release/CLAUDE.md`: dieser Block (alter D3-Block 154 Zeilen ins
+  Archiv); Modul-Status-Zeile 6 Block D um D4 ✅ erweitert (mit Findings-Anhang);
+  P8.5-6-Zeile um Bracket-Bug-Caveat; P8.5-17-Zeile Update-Banner-live jetzt ✅;
+  Summary-Zeile 3 ✅ · 14 🟡 · 3 ⬜ unverändert (P8.5-6 bleibt 🟡 weil Fix ausstehend,
+  P8.5-17 bleibt 🟡 weil V105 noch offen); `updated:`-Pipe vorne ergänzt.
+- `phase8_5_picker_release/SESSIONS_ARCHIVE.md`: D3-Block vorne angehängt (verbatim);
+  `updated:`-Pipe vorne ergänzt.
+- `docs/INDEX.md`: Phase-8.5-Header um D4 ✅ erweitert; Phase-8.5-Bullet um die drei
+  Findings verkürzt; `updated:`-Pipe vorne ergänzt.
+- `ROADMAP.md`: Phase-8.5-„nächster Schritt" von „D4 — Sichtprüfung" auf
+  „D5 + V105 (Nikinger), optional vor Z Radiogruppe-Tausch + Bracket-Fix durch
+  opencode/M3, dann Z (mit Phase-8 ✅ + p8.X)" umgestellt; `updated:`-Pipe vorne
+  ergänzt.
+- `CLAUDE.md` (Wurzel): neuer Current-state-Absatz vom 2026-09-06 für D4;
+  `updated:`-Pipe vorne ergänzt.
+
+**Was diese Session bewusst NICHT tat:**
+
+- Kein Code-Touch (kein `dialogs.js`/`app.html`/`markdown.js`/`editor.js`/`graph.js`).
+- Kein Deploy, kein `sudo systemctl`, keine `systemctl show` (Hard Rule 9 + P8.5-Q;
+  letzte Werte vom 2026-09-05 16:10:18 CEST / PID 355956 reichen für die Übergabe).
+- Kein `pytest`/`node --check`/`bash -n`/`ui_budget.py` — irrelevant ohne Code-Touch.
+- Kein Browser-/Funnel-/Connector-Test — der Nikinger hat alles gemacht.
+- Kein `git commit` — alle Edits bleiben offen, nächste Session oder Nikinger committet.
+- Kein neuer Funnel-Test, keine Anthropic-Connector-Probe — bleibt V105 (Nikinger).
+- Kein Doku-Audit für die früheren Phasen (`phase8_ui_graph/CLAUDE.md` weiterhin über
+  40-KB-Softcap — benannt seit Step 0.4, Auflösung bleibt eine Phase-8-Entscheidung
+  aus Z).
+
+**Nächster Schritt, konkret (offene Nikinger-Aktionen, dann opencode/M3-Z):**
+
+- **D5** — Vierte A3-Probe (Nikinger, wörtlicher Prüfauftrag aus Plan §3 B1 — entscheidet
+  §9.4.1 Abbruchregel aus N2).
+- **V105** — Connector-Check (Nikinger, echter Anthropic-Connector).
+- **Optional vor Z** durch opencode/M3: Radiogruppe-Tausch (P8.5-19, 5 Z. in
+  `dialogs.js`+`app.html`) + Bracket-Renderer-Fix (P8.5-6, in `markdown.js`) — damit Z
+  die Endabnahme-Zeilen P8.5-6 und P8.5-19 auf ✅ heben kann.
+- **Z** (Phase-8.5-Closeout, opencode/M3): `docs/concepts/phase8_5_picker_release_plan.md
+  §9` füllen (P8.5-T); Nachtrag in `phase8_ui_graph_plan.md §9` + `§9.4.7` (Phase 8 ✅,
+  Glyph-Entscheidung, p8.X-Ankündigung); `phase8_ui_graph/CLAUDE.md §7`-Matrix +
+  Session-Block; dieser Head final; INDEX/ROADMAP/Wurzel-`CLAUDE.md` nachziehen (Hard
+  Rule 8); Größenprüfung mit den zwei benannten Softcap-Überschreitungen (Wurzel-
+  CLAUDE.md 47.999 B, INDEX 44.784 B) als P8-Entscheidung dokumentieren, nicht still
+  trimmen.
+
+### 2026-09-05 (D3-Vorbereitung — Health-Gate-Skript + Discovery: D2 lief bereits)
+
+**Auftrag:** D3-Werkzeug bauen als Option 2 der Vorlage (Health-Gate-Skript). Beim
+ersten Probe-Lauf gegen den laufenden Dienst stellte sich heraus: **D2 ist bereits
+gelaufen** — `/opt/sharefyx/current` → `20260905T140325.378914Z` → HEAD `6f19a8f`
+(D1-Commit) mit Badge `v3.0.1` im `app.html`, Service-PID **355956** statt 195922
+(wie im D1-Block notiert), `ExecMainStartTimestamp=2026-09-05 16:10:18 CEST`. Der
+Nikinger hat D2 still durchgeführt zwischen D1 (Commit heute früh) und dieser
+Session. Damit ist D3 nicht mehr Vorbereitung, sondern **Verifikation des bereits
+deployten v3.0.1**.
+
+**Ergebnis — `phase8_5_picker_release/scripts/health_gate.sh` neu, ein Lauf-Beleg:**
+
+1. **Skript** (134 Zeilen, bash, `set -uo pipefail`, JSON auf stdout / Details auf
+   stderr nach Hard Rule 7). Acht Gates:
+   - `/health` 200 mit Retry-Loop (max `--max-wait` Sekunden, Default 30 — wie
+     `deploy.sh` Z. 192-200)
+   - `/ui/login` 200, `/api/v1/me` 401, `/mcp/` 401 (wie `deploy.sh` Z. 202-217)
+   - `.rail__version` aus `/ui/static/app.html` (**nicht** `/ui/login` — das ist
+     `pages.py`s Auth-Template und enthält keine Rail; erste Iteration fiel darauf
+     herein, dann gefixt)
+   - `/opt/sharefyx/current` → Release-Verzeichnis mit `.git`
+   - Optional `--require-todays-update-log`: oberster `## YYYY-MM-DD` in
+     `docs/UPDATE_LOG.md` == heute (UTC oder local, wie `deploy.sh` Z. 127-131)
+   - Optional `--expected-sha=<hex>`: Release-SHA matched Short- oder Full-Form
+     (Prefix-Vergleich, sonst wäre `git log --oneline`-Output nicht verwendbar)
+
+2. **Lauf-Beleg, 2026-09-05 15:19:53Z** mit `--require-todays-update-log
+   --expected-sha=6f19a8f` (Default sonst): **8/8 grün**, Exit 0, JSON auf stdout
+   (`{"action":"health_gate","result":"ok","expected_version":"v3.0.1",
+   "actual_version":"v3.0.1","active_release":"/opt/sharefyx/releases/
+   20260905T140325.378914Z","release_sha":"6f19a8fc1f0bcdc2c3bc91fc934a057964647ed4",
+   "port":8765}`). Drei Negativproben separat verifiziert (Port 9999 → Gate 1 rot,
+   `--expected-version=v9.9.9` → Gate 5 rot, `--expected-sha=0000000` → Gate 8 rot).
+   **P8.5-17 teilweise abgehakt:** Deploy gelaufen ✅, Health-Gate 8/8 ✅, Badge
+   `v3.0.1` live ✅, Update-Banner-Live-Anzeige ⬜ (braucht Auth, Nikinger), V105 ⬜
+   (echter Anthropic-Connector, Nikinger).
+
+**Verifiziert (§0.5 Checkliste):**
+
+- `pytest -q`: nicht gelaufen — keine Python-Datei berührt.
+- Tabu-Diff §0.3: **leer** (kein `phase4_auth/`/`storage/`/`security.py`/`api.py`/
+  `serializers.py`/`permissions.py`/`mcpserver/`-Touch).
+- `bash -n phase8_5_picker_release/scripts/health_gate.sh`: OK.
+- `shellcheck`: nicht auf dieser Maschine verfügbar, übersprungen — keine
+  `shellcheck`-Konvention im Repo (`phase3_edge/scripts/diagnose.sh` wurde ebenfalls
+  nie damit geprüft, vgl. `phase3_edge/CLAUDE.md` Modul-Status Zeile 7).
+- `node --check`: irrelevant — kein JS-Touch.
+- `ui_budget.py`: nicht gelaufen — keine UI-Reichweiten-Änderung.
+- Fehlerpfad: drei Negativproben durchgespielt (Port nicht erreichbar, falsche
+  Version, falscher SHA) — Exit 1 mit präziser Diagnose im `reason`-Feld des
+  JSON-Outputs.
+- Größenprüfung: Skript 134 Zeilen / ~4,5 KB, kein `.md`-File neu → keine
+  INDEX-Zeile nötig (Skripte sind in keinem Phase-Head-Card-Block separat gelistet,
+  vgl. `phase5_ui/scripts/{deploy,rollback,authbackup,restore_auth_check}.sh` ohne
+  eigene INDEX-Zeile). **`phase8_5_picker_release/CLAUDE.md` 32.672 B** —
+  Schrumpfung um ~5 KB durch die D1-Rotation (D1-Block 111 Zeilen raus, neuer
+  Block 130 Zeilen rein, beide ähnlich lang; der leichte Zuwachs ist im neuen
+  Modul-Status-Text für D2/D3 und der ausführlicheren P8.5-17-Zeile). **`docs/
+  INDEX.md` 44.784 B** — weiterhin über dem 40-KB-Softcap, **benannt statt
+  versteckt** (war schon vor D1 41.720 B; diese Session fügt eine Bullet-Erweiterung
+  + Header-Update hinzu, +3 KB netto). **`CLAUDE.md` (Wurzel) 47.999 B** — auch
+  über Cap, neuer Current-state-Absatz für D3 trägt ~3 KB bei; war schon vor
+  D3 41.720 B. Beide Über-Cap-Dokumente sind 📗 live (nicht exempt); nächste
+  sinnvolle Trimmung ist eine eigene Entscheidung (DOC_LAYERS_CONVENTION §„eine
+  Datei pro Cap-Verstoß benennen"), nicht diese Session.
+- Service-Touch **0**. `systemctl show sharefyx-mcp.service` → `MainPID=355956`
+  (anders als der D1-Block notierte 195922 — der D2-Deploy hat den Dienst
+  erwartungsgemäß neu gestartet), `ExecMainStartTimestamp=Sat 2026-09-05 16:10:18
+  CEST` — nur gelesen, keine Änderung.
+
+**Doku-Updates im selben Commit (Hard Rule 8):**
+
+- `phase8_5_picker_release/CLAUDE.md`: D1-Block (111 Zeilen) nach `SESSIONS_ARCHIVE.md`
+  rotiert (manuell, das Skript passt nicht auf das Phase-8.5-Muster — bewährtes
+  Vorgehen aus D1 selbst); neuer Session-Block (dieser); Modul-Status-Zeile 6 Block
+  D um D2 ✅ und D3 🟡 erweitert; Abnahmestand-Zeile P8.5-17 auf 🟡 (C/L-Mix);
+  Summary-Zeile auf 3 ✅ · 14 🟡 · 3 ⬜ korrigiert; `updated:`-Pipe ergänzt.
+- `phase8_5_picker_release/SESSIONS_ARCHIVE.md`: D1-Block vorne angehängt
+  (newest-first, vor Block C); Frontmatter `updated:` ergänzt.
+- `docs/INDEX.md` Phase-8.5-Header: `🔄 A1/A2/B1/C/D1 🟡, D2–D5/Z ⬜` →
+  `🔄 A1/A2/B1/C/D1 🟡, D2 ✅, D3 🟡, D4–D5/V105/Z ⬜`; Phase-8.5-Bullet unter
+  `## Phase 8.5` mit Health-Gate-Skript und aktualisiertem Modul-Status ergänzt;
+  `updated:`-Pipe ergänzt.
+- `ROADMAP.md` Phase-8.5-Absatz: D2/D3-Status nachgezogen, neuer Block „**[2026-09-05,
+  D3-Prep committet]**" vor „## Bewusst nicht auf der Roadmap" angehängt, „nächster
+  Schritt" aktualisiert auf „D4 Sichtprüfung + D5 Vierte A3-Probe + V105-Connector-
+  Check, dann Z"; `updated:`-Pipe ergänzt.
+- `CLAUDE.md` (Wurzel): neuer „Current state"-Absatz vom 2026-09-05 für D3-Prep;
+  `updated:`-Pipe ergänzt.
+
+**Was diese Session bewusst NICHT tat:**
+
+- Kein `git commit` — der Commit wartet bis alle fünf Doku-Updates durch sind
+  (Hard Rule 8 + System-Prompt „kein Auto-Commit"). Übergabe an den Nikinger am Ende
+  der Session mit `git add` und Commit-Empfehlung.
+- Kein Deploy, kein `sudo systemctl` (Hard Rule 9 + P8.5-Q) — D2 lief bereits vor
+  dieser Session, ich habe nur verifiziert.
+- Kein `app.js`/`dialogs.js`/`editor.js`/`app.css`-Touch — nur Bash-Skript.
+- Kein Python, kein `pytest`-Lauf.
+- Kein Service-Touch — `sharefyx-mcp.service` läuft seit 2026-09-05 16:10:18 CEST
+  (PID 355956), ich habe nur gelesen.
+- Keine V105-Probe (echter Anthropic-Connector), keine Update-Banner-Live-Probe
+  (braucht Auth) — beide bleiben Nikinger-Aktionen wie im Plan §5 D3.
+- Kein Doku-Audit für die früheren Phasen (`phase8_ui_graph/CLAUDE.md` driftet
+  weiterhin über 40 KB-Softcap — benannt seit Step 0.4, Auflösung bleibt eine
+  Phase-8-Entscheidung aus Z, nicht diese Session).
+
+**Nächster Schritt, konkret:** D4 — **Sichtprüfung am echten Gerät durch den
+Nikinger** (Hard-Rule-9-konform, ich kann das nicht). Vorbereitet ist:
+- Health-Gate-Skript (Verifikation gelaufen, 8/8 grün).
+- D2-Deploy ist nachweislich live (PID 355956, Badge v3.0.1, Update-Log-Eintrag
+  heute).
+- Block-C-v3-Vorabritt war 26/26 grün gegen eine Wegwerf-Instanz.
+
+Was D4 noch braucht: das `## 2026-09-05`-Eintrag im Update-Banner muss im Browser
+sichtbar sein, das `<select class="input" id="link-picker-mode">` im Picker muss
+da sein (P8.5-19-Abnahme: Radiogruppe oder `<select>`-Bestätigung), die drei Fixes
+(A1 Body-Modus, A2 Tastatur, B1 generalisierter Hint) müssen optisch wie in Block C
+verifiziert sein. Danach D5 (Vierte A3-Probe), Z (Closeout).
+
+**Aus dem echten Betrieb mitgekommen (Nikinger, 2026-09-05, Sichtprüfung 2/3?) —
+Beobachtungen geparkt für Plan §9 / Z:** zwei Punkte zur Map-Ansicht
+(`phase5_ui/webui/static/js/graph.js`, Phase-8-Block-D, **P8.5 §0.3 tabu — kein
+stiller Fix in D3-Prep**):
+
+1. **Map-Field schneidet unten ab, zeigt nur solid color.** Layout- oder
+   Canvas-Resize-Problem (vermutlich `.rail__main`/`.graph-canvas`-Höhe oder
+   `position:absolute` ohne Bodem-Anker). Keine Code-Probe in dieser Session.
+2. **Map „fliegt" bei jedem Neuladen durcheinander.** Force-Graph hat keinen
+   stabilen/persistenten Layout-Seed; jeder Mount startet mit frischen Random-
+   Kräften. Der Phase-8-§9.4.6-Settle-Zeit-Fix hat die Konvergenz auf < 3 s
+   gebracht, aber **keine Persistenz** — eine Folge-Sitzung sieht jedes Mal ein
+   anderes Layout. Wurde am 2026-09-02 throwaway-verifiziert (Phase 8 `p8_22_smoke.py`
+   zeigt 5/5 grün), im Live-Betrieb aber sichtbar als „verwirrende Form".
+
+Bezug zu P8.5: nicht Bestandteil dieser Phase (P8.5 §0.4 DRAUSSEN — Phase-8-§9.4.6-
+Funde sind bereits am 2026-09-02 geschlossen). Aber als **offene Beobachtungen für
+Phase 8 / §9 dieses Plans** festgehalten, weil Z genau diese Art von „echter-Betrieb-
+Befund" in den Closeout-Nachtrag einordnen können soll.
+
+**Empfehlung für nächste Session (Übergabe an Nikinger + Z):** zwischen D3 und Z
+**nichts Offenes mehr für opencode/M3** — D4 (Sichtprüfung am echten Gerät), D5
+(Vierte A3-Probe, entscheidet §9.4.1 Abbruchregel) und V105 (echter Anthropic-
+Connector) sind **alles Nikinger-Aktionen**. Sobald die drei abgehakt sind, kann Z
+(Phase-8.5-Closeout, opencode/M3) starten mit: (a) §9 dieses Plans füllen
+(P8.5-T — Status/Delta/Abnahmestand/Restdefekte mit den zwei Map-Beobachtungen
+oben/`[VERIFY]` V95–V105-Bilanz); (b) Nachtrag in `phase8_ui_graph_plan.md` §9 +
+§9.4.7 (P8.5-R/N6 — Phase 8 formal abschließen, Glyph-Entscheidung); (c)
+`phase8_ui_graph/CLAUDE.md` §7-Matrix + Session-Block nachziehen; (d)
+`phase8_5_picker_release/CLAUDE.md` Modul-Status + Abnahmematrix final; (e)
+Größenprüfung mit den zwei benannten Softcap-Überschreitungen (Wurzel-CLAUDE.md
+47.999 B, docs/INDEX.md 44.784 B) als P8-Entscheidung dokumentieren, nicht still
+trimmen.
+
 ### 2026-09-05 (D1 — Release-Vorbereitung opencode/M3: Badge v3.0→v3.0.1, drei Zeilen Update-Log)
 
 **Auftrag:** D1 nach `docs/concepts/phase8_5_picker_release_plan.md` §5. Vorbereitung des

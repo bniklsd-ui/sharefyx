@@ -14,7 +14,7 @@ down:
   - docs/concepts/phase6_5_tools_images_plan.md   # ausführungsreifer P6.5-Plan
   - docs/concepts/phase7_spaces_admin_plan.md     # ausführungsreifer P7-Plan
   - docs/concepts/phase8_ui_graph_plan.md         # ausführungsreifer P8-Plan
-updated: 2026-09-05 (Phase 8.5 D3-Prep — `scripts/health_gate.sh` neu, **Lauf 2026-09-05 15:19:53Z 8/8 grün** gegen den frischen Deploy; **D2 lief zwischen D1 und D3 still durch den Nikinger** (PID 355956, Release `20260905T140325.378914Z`, ExecMainStartTimestamp `2026-09-05 16:10:18 CEST`); D3 ist Verifikation statt Vorbereitung; D1-Block per Hand nach SESSIONS_ARCHIVE.md rotiert; Modul-Status D um D2 ✅ + D3 🟡 erweitert; Abnahmestand P8.5-17 Health-Gate-Teil 🟡, Summary 3 ✅ · 14 🟡 · 3 ⬜; pytest nicht gelaufen (kein Python-Touch), bash -n OK, Tabu-Diff §0.3 leer, Service-Touch 0; nächster Schritt D4 Sichtprüfung am echten Gerät — Nikinger-Aktion) | 2026-09-05 (Phase 8.5 D1 committet — Badge `v3.0`→`v3.0.1` in `app.html:20` (P8.5-N7), neuer `## 2026-09-05`-Block in `docs/UPDATE_LOG.md` mit drei Zeilen Picker-Modi/Tastatur/Generalisierter-Hint — **Datums-Drift zu Block-C-Spec dokumentiert**: Block-C-Absatz schlug `## 2026-09-04` vor, `date +%F`/`date -u +%F` ist heute 2026-09-05, `deploy.sh` Z. 117–131 verlangt strikt `today_utc`/`today_local`, sonst Gate-Abbruch; Block-C-Block per Hand nach `SESSIONS_ARCHIVE.md` rotiert (Skript passt nicht auf Phase-8.5-Muster), Modul-Status D `⬜`→`🟡` mit D2–D5 als Nikinger-Aktionen vermerkt, pytest nicht gelaufen, Tabu-Diff §0.3 leer, Service-Touch 0 PID 195922 nur gelesen; nächster Schritt D2 Nikinger-Aktion) | 2026-09-01 (Phase 8 Block A+B ✅ live-verifiziert, Gate B→C bestanden -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf; Block C naechster Schritt) | 2026-08-28 (Phase 8 Step 0 gestartet -- Status ⬜→🔄, phase8_ui_graph/CLAUDE.md als phase head angelegt) | 2026-08-28 (Phase 8 geplant -- Zeile + Abschnitt neu, phase8_ui_graph_plan.md in down: aufgenommen) | 2026-08-28 (Phase 7 formal abgeschlossen ✅ -- 22 von 24 Abnahmezeilen live bestanden, zwei benannte Defekte an P8 vererbt, PHASE7_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, zweite Rotation des Phase-Heads) | 2026-08-27 (Phase 7 inhaltlich vollstaendig, live deployt e88a624, Step Z laeuft) | 2026-08-23 (Phase 6.5 formal abgeschlossen als P7 Step A8 -- 🟡 code-complete, 12 von 14 Abnahmezeilen live, zwei per testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md neu) | 2026-08-23 (neue Phase 7 -- Space-Verwaltung, Mehrfachauswahl, Konsolidierung -- ergaenzt, Step 0 gestartet; fehlende P6.5-Tabellenzeile nachgetragen) | 2026-08-23 (Phase 6 auf 🟡 code-complete -- 12 von 39 Abnahmezeilen live, Sprung auf ✅ ist offene Nikinger-Entscheidung) | 2026-08-20 (neue Phase 6.5 -- Werkzeug-Ergonomie + Bilder -- ergaenzt, Step 0 gestartet)
+updated: 2026-09-06 (Phase 8.5 D4-Sichtprobe-Folgesession — **nur dokumentiert, kein Code-Touch in dieser opencode/M3-Session**; sieben neue Themen-Cluster aus der Sichtprobe mit Fabian dokumentiert: Spaces-Layout-Reorg, Obsidian-Map [5 Sub-Punkte], Anzahl-Anzeige Ordner, Edit-in-Place-Vision, Layering-Design-System [3 Layer + Selektion blau], „Konto"→„Einstellungen"-Rename, De-AI-ierung-Lauf 2; neue Datei `docs/concepts/p8x_ui_polish_notes.md` 25 KB L2 mit allen 16 Themen — fünf D4-Punkte + sieben Sichtprobe-Folgesession-Cluster + vier Sub-Punkte aus §2 Obsidian-Map; Anhang §A–§E für die Planungs-Session; **kein Plan, kein Locking, keine Tabu-Aufhebung** — Sammlung; neue ROADMAP-Sektion „## Phase 8.X — UI-Polish-Folge-Phase (nur Notizen, kein Plan)" zwischen Phase 8.5 und „Bewusst nicht auf der Roadmap" angelegt; Phase-Tabelle um P8.5 + P8.X ergänzt (P8.5 war seit Phase 8.5-Start in der Tabelle nicht eingetragen — bei P8.X-Anlegen mitgefunden und nachgetragen, **keine inhaltliche Änderung**); `phase8_5_picker_release/CLAUDE.md` aktiver Block auf D4-Sichtprobe-Folgesession umgestellt, D4-Block per Hand nach `SESSIONS_ARCHIVE.md` rotiert (Skript passt nicht auf Phase-8.5-Muster); keine Code-Tests, kein Service-Touch; nächster Schritt D5 Vierte A3-Probe + V105 Connector-Check — beides Nikinger; optional vor Z Radiogruppe-Tausch + Bracket-Fix durch opencode/M3) | 2026-09-06 (Phase 8.5 D4 Sichtprüfung durch den Nikinger — **nur dokumentiert, kein Code-Touch**; Block 1–7 + Vorbereitung komplett durchgelaufen, drei echte Findings: **P8.5-19 Radiogruppe statt `<select>`** [Tausch 5 Z. ausstehend], **P8.5-6 Bracket-Renderer-Bug in `markdown.js`** [Fix ausstehend, §0.3 erlaubt `webui/static/js/`], **UX-2-Step-Knotenklick als neues Feature für p8.X** [parkiert]; Phase 8 ✅ + p8.X als Nikinger-Entscheidung für Z vorgemerkt; Modul-Status Zeile 6 Block D um D4 ✅ erweitert; P8.5-6 um Bracket-Caveat, P8.5-17 Update-Banner-Teil jetzt ✅; Summary 3 ✅ · 14 🟡 · 3 ⬜; D3-Block per Hand nach SESSIONS_ARCHIVE.md rotiert; keine Code-Tests, kein Service-Touch; nächster Schritt D5 Vierte A3-Probe + V105 Connector-Check — beides Nikinger; optional vor Z Radiogruppe-Tausch + Bracket-Fix durch opencode/M3) | 2026-09-05 (Phase 8.5 D3-Prep — `scripts/health_gate.sh` neu, **Lauf 2026-09-05 15:19:53Z 8/8 grün** gegen den frischen Deploy; **D2 lief zwischen D1 und D3 still durch den Nikinger** (PID 355956, Release `20260905T140325.378914Z`, ExecMainStartTimestamp `2026-09-05 16:10:18 CEST`); D3 ist Verifikation statt Vorbereitung; D1-Block per Hand nach SESSIONS_ARCHIVE.md rotiert; Modul-Status D um D2 ✅ + D3 🟡 erweitert; Abnahmestand P8.5-17 Health-Gate-Teil 🟡, Summary 3 ✅ · 14 🟡 · 3 ⬜; pytest nicht gelaufen (kein Python-Touch), bash -n OK, Tabu-Diff §0.3 leer, Service-Touch 0; nächster Schritt D4 Sichtprüfung am echten Gerät — Nikinger-Aktion) | 2026-09-05 (Phase 8.5 D1 committet — Badge `v3.0`→`v3.0.1` in `app.html:20` (P8.5-N7), neuer `## 2026-09-05`-Block in `docs/UPDATE_LOG.md` mit drei Zeilen Picker-Modi/Tastatur/Generalisierter-Hint — **Datums-Drift zu Block-C-Spec dokumentiert**: Block-C-Absatz schlug `## 2026-09-04` vor, `date +%F`/`date -u +%F` ist heute 2026-09-05, `deploy.sh` Z. 117–131 verlangt strikt `today_utc`/`today_local`, sonst Gate-Abbruch; Block-C-Block per Hand nach `SESSIONS_ARCHIVE.md` rotiert (Skript passt nicht auf Phase-8.5-Muster), Modul-Status D `⬜`→`🟡` mit D2–D5 als Nikinger-Aktionen vermerkt, pytest nicht gelaufen, Tabu-Diff §0.3 leer, Service-Touch 0 PID 195922 nur gelesen; nächster Schritt D2 Nikinger-Aktion) | 2026-09-01 (Phase 8 Block A+B ✅ live-verifiziert, Gate B→C bestanden -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf; Block C naechster Schritt) | 2026-08-28 (Phase 8 Step 0 gestartet -- Status ⬜→🔄, phase8_ui_graph/CLAUDE.md als phase head angelegt) | 2026-08-28 (Phase 8 geplant -- Zeile + Abschnitt neu, phase8_ui_graph_plan.md in down: aufgenommen) | 2026-08-28 (Phase 7 formal abgeschlossen ✅ -- 22 von 24 Abnahmezeilen live bestanden, zwei benannte Defekte an P8 vererbt, PHASE7_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, zweite Rotation des Phase-Heads) | 2026-08-27 (Phase 7 inhaltlich vollstaendig, live deployt e88a624, Step Z laeuft) | 2026-08-23 (Phase 6.5 formal abgeschlossen als P7 Step A8 -- 🟡 code-complete, 12 von 14 Abnahmezeilen live, zwei per testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md neu) | 2026-08-23 (neue Phase 7 -- Space-Verwaltung, Mehrfachauswahl, Konsolidierung -- ergaenzt, Step 0 gestartet; fehlende P6.5-Tabellenzeile nachgetragen) | 2026-08-23 (Phase 6 auf 🟡 code-complete -- 12 von 39 Abnahmezeilen live, Sprung auf ✅ ist offene Nikinger-Entscheidung) | 2026-08-20 (neue Phase 6.5 -- Werkzeug-Ergonomie + Bilder -- ergaenzt, Step 0 gestartet)
 ---
 # ROADMAP — Space-Server
 
@@ -34,6 +34,13 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 | **P6.5** | `phase6_5_tools_images/` (kein eigenes Paket) | Werkzeug-Ergonomie, Abschluss Bilder. | 🟡 |
 | **P7** | `phase7_spaces_admin/` (kein eigenes Paket) | Space-Verwaltung, Mehrfachauswahl, Konsolidierung. | ✅ |
 | **P8** | `phase8_ui_graph/` (kein eigenes Paket) | UI-Neuanstrich v3, Verknüpfungs-Graph, P7-Erbposten. | 🔄 |
+| **P8.5** | `phase8_5_picker_release/` (kein eigenes Paket) | Link-Picker-Politur, v3-Vorabritt + Deploy; schließt Phase 8 ab. | 🔄 |
+| **P8.X** | (nicht angelegt) | UI-Polish-Folge-Phase; **nur Notizen** in `docs/concepts/p8x_ui_polish_notes.md`. | ⬜ |
+
+**[2026-09-06 Korrektur, Phase 8.5 D4-Sichtprobe-Folgesession]:** P8.5 fehlte als eigene
+Tabellenzeile — beim Anlegen der P8.X-Zeile mitgefunden und nachgetragen, **keine**
+inhaltliche Änderung. P8.X ist die in Phase 8.5 D4 vorgemerkte Folge-Phase; das
+Verzeichnis wird in der Planungs-Session festgelegt (siehe Notizen §D).
 
 **[2026-08-23 Korrektur, P7 Step 0]:** P6.5 fehlte als eigene Tabellenzeile — beim Ergänzen der
 P7-Zeile mitgefunden und nachgetragen, keine inhaltliche Änderung.
@@ -472,11 +479,50 @@ D2 ✅ + D3 🟡 erweitert; Abnahmestand-Zeile P8.5-17 Health-Gate-Teil 🟡; Su
 rotiert (Skript passt nicht auf das Phase-8.5-Muster — bewährtes Vorgehen aus D1 selbst).
 `pytest` nicht gelaufen (kein Python-Touch), `bash -n` OK, shellcheck nicht verfügbar
 (übersprungen, keine Konvention im Repo), Tabu-Diff §0.3 leer, Service-Touch 0 (PID 355956
-nur gelesen). **nächster Schritt:** D4 — Sichtprüfung am echten Gerät durch den Nikinger
-(`## 2026-09-05`-Eintrag im Update-Banner sichtbar, `<select class="input"
-id="link-picker-mode">` im Picker vorhanden — P8.5-19-Abnahme: Radiogruppe oder `<select>`-
-Bestätigung, drei Fixes A1/A2/B1 optisch verifiziert), D5 Vierte A3-Probe (entscheidet
-§9.4.1 Abbruchregel aus N2), V105-Connector-Check, dann Z (Closeout).
+nur gelesen). **nächster Schritt:** **D4 ✅ erledigt 2026-09-06** (Sichtprüfung am echten Gerät durch den Nikinger,
+Update-Banner sichtbar, beide Picker-Modi funktional, drei echte Findings dokumentiert: **P8.5-19
+Radiogruppe** statt `<select>` — Tausch 5 Z. ausstehend; **P8.5-6 Bracket-Renderer-Bug** in
+`markdown.js` — Fix ausstehend; **UX-2-Step-Knotenklick** als neues Feature für p8.X parkiert;
+**Phase 8 ✅ + p8.X** als Nikinger-Entscheidung für Z vorgemerkt); **D5 Vierte A3-Probe**
+(entscheidet §9.4.1 Abbruchregel aus N2 — Nikinger-Aktion); **V105-Connector-Check** (echter
+Anthropic-Connector — Nikinger-Aktion); **optional vor Z** durch opencode/M3: Radiogruppe-Tausch
+(P8.5-19) + Bracket-Renderer-Fix (P8.5-6); dann **Z (Closeout)** mit Phase-8-✅-Eintrag +
+p8.X-Ankündigung in `phase8_ui_graph_plan.md §9.4.7`.
+
+---
+
+## Phase 8.X — UI-Polish-Folge-Phase (nur Notizen, kein Plan)
+
+**Mission, ein Satz:** Nach dem v3.0.1-Deploy und dem Phase-8.5-Closeout sammelt diese
+Folge-Phase die offenen UI-Polish-Wünsche aus der Sichtprobe-Folgesession 2026-09-06
+(Nikinger + Fabian) plus die bereits in Phase 8.5 D4 parkierten p8.X-Punkte.
+
+**Status:** ⬜ nicht gestartet, **kein** Plan-Doc, **kein** Locking. Nikinger-Entscheidung
+in Phase 8.5 D4 vorgemerkt (`phase8_5_picker_release/CLAUDE.md` und
+`phase8_ui_graph_plan.md §9.4.7`).
+
+**Notiz-Sammlung:** `docs/concepts/p8x_ui_polish_notes.md` (L2, 25 KB, 2026-09-06
+angelegt) — 16 Themen in sieben Clustern: §1 Spaces-Layout-Reorg, §2 Obsidian-Map
+(fünf Sub-Punkte: Performance / Stil / Field schneidet ab / Reload-Drift /
+Collapsible mit Abhängigkeiten), §3 Anzahl-Anzeige Ordner, §4 Edit-in-Place-Vision,
+§5 Layering-Design-System, §6 „Konto"→„Einstellungen"-Rename, §7 De-AI-ierung-Lauf 2.
+Anhang §A–§E mit D4-Duplikat-Verweisen, klaren Außenkanten, sechs offenen Fragen für
+die Planungs-Session, Namens-Konvention und chronologischer Tabelle.
+
+**Reihenfolge der nächsten Schritte (heute, post-Phase-8.5-D4):**
+
+1. **Phase 8.5 Z** (opencode/M3, Closeout) — schließt Phase 8 formal ab, referenziert
+   `p8x_ui_polish_notes.md` als Quelle für die p8.X-Ankündigung.
+2. **Planungs-Session für p8.X** (vermutlich Claude Code, weil die Fragen §5
+   Layering + §4 Edit-in-Place Layout-/Design-System-weit sind und Researchlast
+   tragen) — beantwortet §C-Fragen, schätzt Reichweite, spaltet ggf. in Sub-Phasen.
+3. **Plan-Doc + Phase-Verzeichnis** (`phase9_…plan.md` o. ä., siehe Notizen §D) —
+   sobald die Planungs-Session sich auf Reichweite + Reihenfolge geeinigt hat.
+
+**Was NICHT in p8.X gehört** (klare Außenkanten, Notizen-Datei §B): Body-Volltextsuche
+in der Web-UI (Q1 gelockt), Rechteverwaltung über MCP-Tools (P6-M), Löschen von Items
+(F2), FastMCP-4/V79 (eigene Mini-Phase per P5-C), Funnel-Watchdog, Mobile/Realtime,
+Light-Mode (P5-X), Glyph-Entscheidungen P6/P6.5.
 
 ---
 
