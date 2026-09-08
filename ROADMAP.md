@@ -14,7 +14,7 @@ down:
   - docs/concepts/phase6_5_tools_images_plan.md   # ausführungsreifer P6.5-Plan
   - docs/concepts/phase7_spaces_admin_plan.md     # ausführungsreifer P7-Plan
   - docs/concepts/phase8_ui_graph_plan.md         # ausführungsreifer P8-Plan
-updated: 2026-09-06 (Phase 8.5 D4-Sichtprobe-Folgesession — **nur dokumentiert, kein Code-Touch in dieser opencode/M3-Session**; sieben neue Themen-Cluster aus der Sichtprobe mit Fabian dokumentiert: Spaces-Layout-Reorg, Obsidian-Map [5 Sub-Punkte], Anzahl-Anzeige Ordner, Edit-in-Place-Vision, Layering-Design-System [3 Layer + Selektion blau], „Konto"→„Einstellungen"-Rename, De-AI-ierung-Lauf 2; neue Datei `docs/concepts/p8x_ui_polish_notes.md` 25 KB L2 mit allen 16 Themen — fünf D4-Punkte + sieben Sichtprobe-Folgesession-Cluster + vier Sub-Punkte aus §2 Obsidian-Map; Anhang §A–§E für die Planungs-Session; **kein Plan, kein Locking, keine Tabu-Aufhebung** — Sammlung; neue ROADMAP-Sektion „## Phase 8.X — UI-Polish-Folge-Phase (nur Notizen, kein Plan)" zwischen Phase 8.5 und „Bewusst nicht auf der Roadmap" angelegt; Phase-Tabelle um P8.5 + P8.X ergänzt (P8.5 war seit Phase 8.5-Start in der Tabelle nicht eingetragen — bei P8.X-Anlegen mitgefunden und nachgetragen, **keine inhaltliche Änderung**); `phase8_5_picker_release/CLAUDE.md` aktiver Block auf D4-Sichtprobe-Folgesession umgestellt, D4-Block per Hand nach `SESSIONS_ARCHIVE.md` rotiert (Skript passt nicht auf Phase-8.5-Muster); keine Code-Tests, kein Service-Touch; nächster Schritt D5 Vierte A3-Probe + V105 Connector-Check — beides Nikinger; optional vor Z Radiogruppe-Tausch + Bracket-Fix durch opencode/M3) | 2026-09-06 (Phase 8.5 D4 Sichtprüfung durch den Nikinger — **nur dokumentiert, kein Code-Touch**; Block 1–7 + Vorbereitung komplett durchgelaufen, drei echte Findings: **P8.5-19 Radiogruppe statt `<select>`** [Tausch 5 Z. ausstehend], **P8.5-6 Bracket-Renderer-Bug in `markdown.js`** [Fix ausstehend, §0.3 erlaubt `webui/static/js/`], **UX-2-Step-Knotenklick als neues Feature für p8.X** [parkiert]; Phase 8 ✅ + p8.X als Nikinger-Entscheidung für Z vorgemerkt; Modul-Status Zeile 6 Block D um D4 ✅ erweitert; P8.5-6 um Bracket-Caveat, P8.5-17 Update-Banner-Teil jetzt ✅; Summary 3 ✅ · 14 🟡 · 3 ⬜; D3-Block per Hand nach SESSIONS_ARCHIVE.md rotiert; keine Code-Tests, kein Service-Touch; nächster Schritt D5 Vierte A3-Probe + V105 Connector-Check — beides Nikinger; optional vor Z Radiogruppe-Tausch + Bracket-Fix durch opencode/M3) | 2026-09-05 (Phase 8.5 D3-Prep — `scripts/health_gate.sh` neu, **Lauf 2026-09-05 15:19:53Z 8/8 grün** gegen den frischen Deploy; **D2 lief zwischen D1 und D3 still durch den Nikinger** (PID 355956, Release `20260905T140325.378914Z`, ExecMainStartTimestamp `2026-09-05 16:10:18 CEST`); D3 ist Verifikation statt Vorbereitung; D1-Block per Hand nach SESSIONS_ARCHIVE.md rotiert; Modul-Status D um D2 ✅ + D3 🟡 erweitert; Abnahmestand P8.5-17 Health-Gate-Teil 🟡, Summary 3 ✅ · 14 🟡 · 3 ⬜; pytest nicht gelaufen (kein Python-Touch), bash -n OK, Tabu-Diff §0.3 leer, Service-Touch 0; nächster Schritt D4 Sichtprüfung am echten Gerät — Nikinger-Aktion) | 2026-09-05 (Phase 8.5 D1 committet — Badge `v3.0`→`v3.0.1` in `app.html:20` (P8.5-N7), neuer `## 2026-09-05`-Block in `docs/UPDATE_LOG.md` mit drei Zeilen Picker-Modi/Tastatur/Generalisierter-Hint — **Datums-Drift zu Block-C-Spec dokumentiert**: Block-C-Absatz schlug `## 2026-09-04` vor, `date +%F`/`date -u +%F` ist heute 2026-09-05, `deploy.sh` Z. 117–131 verlangt strikt `today_utc`/`today_local`, sonst Gate-Abbruch; Block-C-Block per Hand nach `SESSIONS_ARCHIVE.md` rotiert (Skript passt nicht auf Phase-8.5-Muster), Modul-Status D `⬜`→`🟡` mit D2–D5 als Nikinger-Aktionen vermerkt, pytest nicht gelaufen, Tabu-Diff §0.3 leer, Service-Touch 0 PID 195922 nur gelesen; nächster Schritt D2 Nikinger-Aktion) | 2026-09-01 (Phase 8 Block A+B ✅ live-verifiziert, Gate B→C bestanden -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf; Block C naechster Schritt) | 2026-08-28 (Phase 8 Step 0 gestartet -- Status ⬜→🔄, phase8_ui_graph/CLAUDE.md als phase head angelegt) | 2026-08-28 (Phase 8 geplant -- Zeile + Abschnitt neu, phase8_ui_graph_plan.md in down: aufgenommen) | 2026-08-28 (Phase 7 formal abgeschlossen ✅ -- 22 von 24 Abnahmezeilen live bestanden, zwei benannte Defekte an P8 vererbt, PHASE7_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, zweite Rotation des Phase-Heads) | 2026-08-27 (Phase 7 inhaltlich vollstaendig, live deployt e88a624, Step Z laeuft) | 2026-08-23 (Phase 6.5 formal abgeschlossen als P7 Step A8 -- 🟡 code-complete, 12 von 14 Abnahmezeilen live, zwei per testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md neu) | 2026-08-23 (neue Phase 7 -- Space-Verwaltung, Mehrfachauswahl, Konsolidierung -- ergaenzt, Step 0 gestartet; fehlende P6.5-Tabellenzeile nachgetragen) | 2026-08-23 (Phase 6 auf 🟡 code-complete -- 12 von 39 Abnahmezeilen live, Sprung auf ✅ ist offene Nikinger-Entscheidung) | 2026-08-20 (neue Phase 6.5 -- Werkzeug-Ergonomie + Bilder -- ergaenzt, Step 0 gestartet)
+updated: 2026-09-08 (Z-Final: Phase-1-bis-7-Rollups komprimiert — jeweils ein Status-Satz + Pointer auf Phase-Head/Plan/Handover statt der vollen Verlaufsdokumentation [P1 23→3, P2 41→4, P3 30→4, P4 30→3, P5 29→3, P6 40→4, P6.5 32→4, P7 45→4 Zeilen]; Phase 8 + 8.5 + 8.X + „Bewusst nicht" bleiben ausführlich; 44.6 KB → 28.4 KB, jetzt **unter dem 40-KB-Softcap**; Frontmatter vorne ergänzt; Phase 8 ✅, Phase 8.5 ✅, Phase 8.6 + P9 weiter als Arbeitsnamen vorgemerkt) | 2026-09-06 (Phase 8.5 D4 Sichtprüfung durch den Nikinger — **nur dokumentiert, kein Code-Touch**; Block 1–7 + Vorbereitung komplett durchgelaufen, drei echte Findings: **P8.5-19 Radiogruppe statt `<select>`** [Tausch 5 Z. ausstehend], **P8.5-6 Bracket-Renderer-Bug in `markdown.js`** [Fix ausstehend, §0.3 erlaubt `webui/static/js/`], **UX-2-Step-Knotenklick als neues Feature für p8.X** [parkiert]; Phase 8 ✅ + p8.X als Nikinger-Entscheidung für Z vorgemerkt; Modul-Status Zeile 6 Block D um D4 ✅ erweitert; P8.5-6 um Bracket-Caveat, P8.5-17 Update-Banner-Teil jetzt ✅; Summary 3 ✅ · 14 🟡 · 3 ⬜; D3-Block per Hand nach SESSIONS_ARCHIVE.md rotiert; keine Code-Tests, kein Service-Touch; nächster Schritt D5 Vierte A3-Probe + V105 Connector-Check — beides Nikinger; optional vor Z Radiogruppe-Tausch + Bracket-Fix durch opencode/M3) | 2026-09-05 (Phase 8.5 D3-Prep — `scripts/health_gate.sh` neu, **Lauf 2026-09-05 15:19:53Z 8/8 grün** gegen den frischen Deploy; **D2 lief zwischen D1 und D3 still durch den Nikinger** (PID 355956, Release `20260905T140325.378914Z`, ExecMainStartTimestamp `2026-09-05 16:10:18 CEST`); D3 ist Verifikation statt Vorbereitung; D1-Block per Hand nach SESSIONS_ARCHIVE.md rotiert; Modul-Status D um D2 ✅ + D3 🟡 erweitert; Abnahmestand P8.5-17 Health-Gate-Teil 🟡, Summary 3 ✅ · 14 🟡 · 3 ⬜; pytest nicht gelaufen (kein Python-Touch), bash -n OK, Tabu-Diff §0.3 leer, Service-Touch 0; nächster Schritt D4 Sichtprüfung am echten Gerät — Nikinger-Aktion) | 2026-09-05 (Phase 8.5 D1 committet — Badge `v3.0`→`v3.0.1` in `app.html:20` (P8.5-N7), neuer `## 2026-09-05`-Block in `docs/UPDATE_LOG.md` mit drei Zeilen Picker-Modi/Tastatur/Generalisierter-Hint — **Datums-Drift zu Block-C-Spec dokumentiert**: Block-C-Absatz schlug `## 2026-09-04` vor, `date +%F`/`date -u +%F` ist heute 2026-09-05, `deploy.sh` Z. 117–131 verlangt strikt `today_utc`/`today_local`, sonst Gate-Abbruch; Block-C-Block per Hand nach `SESSIONS_ARCHIVE.md` rotiert (Skript passt nicht auf Phase-8.5-Muster), Modul-Status D `⬜`→`🟡` mit D2–D5 als Nikinger-Aktionen vermerkt, pytest nicht gelaufen, Tabu-Diff §0.3 leer, Service-Touch 0 PID 195922 nur gelesen; nächster Schritt D2 Nikinger-Aktion) | 2026-09-01 (Phase 8 Block A+B ✅ live-verifiziert, Gate B→C bestanden -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf; Block C naechster Schritt) | 2026-08-28 (Phase 8 Step 0 gestartet -- Status ⬜→🔄, phase8_ui_graph/CLAUDE.md als phase head angelegt) | 2026-08-28 (Phase 8 geplant -- Zeile + Abschnitt neu, phase8_ui_graph_plan.md in down: aufgenommen) | 2026-08-28 (Phase 7 formal abgeschlossen ✅ -- 22 von 24 Abnahmezeilen live bestanden, zwei benannte Defekte an P8 vererbt, PHASE7_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, zweite Rotation des Phase-Heads) | 2026-08-27 (Phase 7 inhaltlich vollstaendig, live deployt e88a624, Step Z laeuft) | 2026-08-23 (Phase 6.5 formal abgeschlossen als P7 Step A8 -- 🟡 code-complete, 12 von 14 Abnahmezeilen live, zwei per testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md neu) | 2026-08-23 (neue Phase 7 -- Space-Verwaltung, Mehrfachauswahl, Konsolidierung -- ergaenzt, Step 0 gestartet; fehlende P6.5-Tabellenzeile nachgetragen) | 2026-08-23 (Phase 6 auf 🟡 code-complete -- 12 von 39 Abnahmezeilen live, Sprung auf ✅ ist offene Nikinger-Entscheidung) | 2026-08-20 (neue Phase 6.5 -- Werkzeug-Ergonomie + Bilder -- ergaenzt, Step 0 gestartet)
 ---
 # ROADMAP — Space-Server
 
@@ -60,274 +60,28 @@ Druck wegfallen darf, OAuth nicht. Begründung: `docs/concepts/phase2_mcp_plan.m
 ---
 
 ## Phase 1 — Storage-Kern
-
-**Mission:** Ein Datenmodell, das Menschen im Editor und Claude über Tools *gleichzeitig*
-benutzen können, ohne sich gegenseitig zu überschreiben. Das ist der harte Teil, nicht MCP.
-
-- **DRIN:** Frontmatter-Modelle, atomarer Datei-Store, SQLite-Index + Rebuild, optimistic
-  Locking, Git-Commit je Write, Query-Layer (nur Frontmatter im Listing), CLI als Beweis.
-- **DRAUSSEN:** MCP, HTTP, Auth, Tunnel, UI, Volltextsuche über Bodies, Anhänge.
-- **Warum zuerst:** ohne Konfliktbehandlung produziert jede spätere Phase stillen Datenverlust,
-  und stiller Datenverlust wird erst bemerkt, wenn er nicht mehr reparabel ist.
-
-Plan: `docs/concepts/phase1_storage_plan.md`. Phase-Head: `phase1_storage/CLAUDE.md`.
-
-**Korrektur (2026-07-25):** Alle acht Module (Steps 0–7) fertig, 68 Tests grün (70 bei
-Phasenabschluss, minus zwei bei Entfernung toten Codes — `rename_for_new_slug()` — in P2 Step 0),
-`space_cli.py` als Beweis. Status **✅ live-verifiziert**: der Nikinger hat den Lauf gegen den
-echten `DATA_ROOT` (`/home/savefyx/savefyx-data`) selbst ausgeführt (Hard Rule: kein Test gegen
-den echten DATA_ROOT durch Claude Code) — `create`/`list`/`search` funktionieren, der Git-Commit
-im Datenverzeichnis landet real, `.gitignore` hält `.index.sqlite3`/`.write.lock` draußen (die
-reale Probe auf den Advisor-Fund aus Step 5). Details + Transkript:
-`phase1_storage/CLAUDE.md`, Session-Block. Handover an P2:
-`docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md`.
+Status **✅** (2026-07-25): 8 Module + 68 Tests, `space_cli.py` als Beweis. Nikinger-Lauf gegen echten `DATA_ROOT` (`/home/savefyx/savefyx-data`) selbst ausgeführt. Details: `phase1_storage/CLAUDE.md` · Plan: `docs/concepts/phase1_storage_plan.md` · Handover: `docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md`.
 
 ## Phase 2 — MCP-Server
-
-**Mission:** Claude kann lesen und schreiben — lokal, ohne Tunnel.
-
-- **DRIN:** `fastmcp` über Streamable HTTP, Token→Space-Auflösung, sechs Tools
-  (`list_spaces`, `search_items`, `get_item`, `create_item`, `update_item`, `append_to_item`),
-  `<untrusted_content>`-Wrapping fremder Bodies, Token-Budget-Disziplin im Listing.
-- **DRAUSSEN:** Löschen (`status: archived` reicht), MCP Resources, MCP Prompts, OAuth,
-  öffentliche Erreichbarkeit.
-- **Explizit gegen MCP Resources entschieden:** Tools sind der verlässliche Pfad in Claude.ai.
-  Wer Resources ergänzen will, muss es vorher messen, nicht annehmen.
-
-Plan: `docs/concepts/phase2_mcp_plan.md`. Phase-Head: `phase2_mcp/CLAUDE.md`.
-
-**Stand 2026-07-26:** alle acht Module (Steps 0–7) fertig, 133 Tests grün (76 P1 + 57 P2),
-`mcp_smoke.py` als Beweis (Gegenstück zu `space_cli.py` aus P1). Status **✅ live-verifiziert**:
-der Nikinger hat die Quick-Tunnel-Probe **und** eine vollständige Adapter-Abnahme über den
-echten Custom Connector gefahren — 21 von 21 Prüfungen gegen den echten `DATA_ROOT`, mit
-Rohantworten als Beweis. Protokoll: `docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md`. Ein Fund
-(fehlende Sichtbarkeit des eigenen, noch leeren Space in `list_spaces`) wurde noch am selben Tag
-behoben; ein zweiter (Space-Namen `nikinger`/`niklas` gemischt) wurde vom Nikinger direkt am
-echten `DATA_ROOT` behoben (`nikinger/` → `niklas/`, siehe `phase2_mcp/CLAUDE.md`). Keine
-offenen Findings mehr. Handover an P3: `docs/concepts/PHASE2_CLOSEOUT_HANDOVER.md`.
-
-### Zurückgestellt aus P2 (bewusst, nicht vergessen)
-
-- **D6 — `Store.search()` liest jede indizierte Datei von der Platte.** Gefiltert/sortiert wird
-  in Python, nicht in SQL. Bei zwei Nutzern und einigen hundert Items unkritisch, aber P2 hängt
-  das an einen Mobilfunk-Uplink. Kostenfrage, kein Bug — SQL-Filterung ist eine
-  contract-neutrale Optimierung im `storage`-Paket, kein Adapter-Thema.
-- **MCP-Revision 2026-07-28** (Sessions entfallen, `Mcp-Method`/`Mcp-Name`-Header werden Pflicht)
-  — nicht in P2 adressiert. **Korrektur (2026-07-27, P3 Step 0):** Migration hängt an einem
-  **Trigger, nicht an einem Datum** — erstes `fastmcp`-Release mit Support für die neue Revision.
-  P3-E (`docs/concepts/phase3_edge_plan.md`) begründet das: `fastmcp` 3.4.4 hat noch keinen
-  Support, bestehende 2025-11-25-Server brechen laut MCP-Blog nicht, neue Clients handeln
-  herunter. Watch-Item, keine Terminfrage.
-- **Lese-Rechte zwischen Spaces.** Der Seam existiert ab P2 (`Permissions.can_read`, heute immer
-  `True`, aber schon von jedem Lesepfad aufgerufen), die Policy fehlt bewusst. Siehe „Bewusst
-  nicht auf der Roadmap" unten — der Satz dort bleibt richtig, der Seam macht ihn nur nicht mehr
-  unumkehrbar.
+Status **✅** (2026-07-26): 8 Module + 133 Tests (76 P1 + 57 P2), `mcp_smoke.py` als Beweis, **Adapter-Abnahme 21/21 gegen den echten Custom Connector** durch den Nikinger (`docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md`). Details: `phase2_mcp/CLAUDE.md` · Plan: `docs/concepts/phase2_mcp_plan.md` · Handover: `docs/concepts/PHASE2_CLOSEOUT_HANDOVER.md`.
 
 ## Phase 3 — Exposure & Betrieb
-
-**Mission:** Der Connector steht in beiden Claude-Accounts und bleibt stehen.
-
-- **DRIN:** Tailscale Funnel (Korrektur 2026-07-28: ersetzt die ursprünglich geplante
-  Cloudflare-Tunnel-Zeile, siehe P3-A), systemd-Unit (`Restart=on-failure`,
-  `LoadCredentialEncrypted`), `/health`, strukturiertes Request-Log mit Tool-Name und Dauer,
-  Backup des Datenverzeichnisses, Runbook „Connector zeigt Disconnected".
-- **DRAUSSEN:** VPS-Migration (dokumentierte Option, eigener Track), Monitoring/Alerting.
-- **Bekanntes Risiko:** Mobilfunk-Uplink. Claude zeigt bei Nichterreichbarkeit nur
-  „Disconnected" mit minimaler Diagnose — deshalb ist das Log kein Nice-to-have, sondern
-  Teil des Scope.
-
-**Status ✅ (2026-07-27, Live-Abnahme zweite Session; 2026-07-29/2026-08-02 fortgeschrieben):**
-10 von 13 Abnahmezeilen live bestanden am 2026-07-27 (Details: `docs/concepts/
-P3_ABNAHME_2026-07-27.md`). Nikinger-Entscheidung: Reboot-Test (Zeile 6), Backup-Timer-Lauf
-(Zeile 12) und Restore-Nachweis (Zeile 13) werden nicht mehr aktiv nachgeholt, sondern auf die
-nächste Phase verschoben — ein unbeabsichtigter Reboot ist ohnehin der reale Prüffall, 12/13
-lösen sich mit dem nächsten Backup-Zyklus. **[2026-07-29:]** Zeile 12 löste sich mit dem
-P4-Step-0-Backup-Zyklus, Zeile 6 mit einem unbeabsichtigten Reboot der VM
-(Windows-Host-Neustart des Nikingers) — beide jetzt ✅, Belege in `phase3_edge/CLAUDE.md`.
-Damit stehen **12 von 13**. **[2026-08-02, P5 Step 0:]** Claude Code fuhr `restore_check.sh`
-(Zeile 13, Restore-Nachweis) zunächst selbst read-only gegen das frischeste Backup-Bundle
-(`sharefyx-data-20260801T220156.234086Z.bundle`, `ok:true`) — bewusst nur als Kandidatenbeleg
-gewertet, da dieser Prompt „jeden End-to-End-Test gegen das echte Datenverzeichnis" dem
-Nikinger vorbehält. **Der Nikinger hat denselben Lauf danach selbst ausgeführt** (identischer
-HEAD `3756c26a…`, `ok:true`) und im selben Zug Step-0-A.7 live nachgezogen
-(`install_units.sh`, Restart, `/health`, `spaces.cred` gelöscht). **13 von 13 Abnahmezeilen
-live bestanden — Status ✅.** Details: `phase3_edge/CLAUDE.md` Session-Block 2026-08-02.
+Status **✅** (2026-07-27–2026-08-02): 13/13 live bestanden, **Tailscale Funnel** (ersetzt den ursprünglich geplanten Cloudflare-Tunnel, Korrektur 2026-07-28; **CGNAT-konform**, Hard Rule 6 eingehalten). Runbooks (`diagnose.sh` etc.) in `phase3_edge/CLAUDE.md`. Details: `phase3_edge/CLAUDE.md` · Plan: `docs/concepts/phase3_edge_plan.md` · Handover: `docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md`.
 
 ## Phase 4 — OAuth 2.1
-
-**Mission:** Der Pfad-Token verschwindet.
-
-**Status ✅ (2026-07-30, Schnitt vollzogen):** 16 von 16 Prüfungen live bestanden — Discovery,
-DCR, Consent, Token-Ausgabe, beide RFC-9700-Replay-Abwehren, Rule 4 unter echtem OAuth **und**
-einem zweiten, unabhängigen Nutzer (Fabian), Fehlversuchsbremse, Token-Ablauf/Auto-Refresh
-(belegt on-demand, kein Hintergrund-Timer), Pfad-Token tot (Runbook-Schritt 8, live
-gegenverifiziert: `SPACE_AUTH_MODE=oauth`, `export_space_map.py` → 0 Einträge, alte
-Pfad-Token-URL → 401). `TokenPathASGI`/`AuthModeASGI` sind im selben Commit wie die Abnahme aus
-dem Code entfernt, `SPACE_AUTH_MODE` auf einen Wert reduziert (`oauth`) — Plan-Wortlaut „auf
-zwei Werte reduzieren" war ohne frischen Repo-Zugriff geschrieben und ungenau, siehe
-`authserver/config.py`. Protokoll: `docs/concepts/P4_ABNAHME_2026-07-29.md` (drei Nachträge,
-2026-07-30). Sicherheits-Review (kein Auth-Bypass, kein Cross-Space-Leck) in
-`docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md` — Befunde S2–S8/O1 bleiben offen, bewusst nicht
-Teil dieses Schnitts.
-
-- **DRIN:** Protected Resource Metadata, Authorization Server, Dynamic Client Registration,
-  PKCE, Token-Rotation. `[VERIFY]` Callback-URLs und unterstützte Auth-Spec-Version gegen die
-  aktuelle Anthropic-Doku — das ändert sich schneller als dieses Dokument.
-- **Warum direkt nach P3 statt ganz am Ende (Korrektur 2026-07-25):** der Pfad-Token soll kurz
-  leben; P2 baut den Seam dafür bereits (`SpaceResolver` liefert einen `Principal`, egal ob aus
-  Pfad-Token oder OAuth-Access-Token — der Umbau berührt keine Zeile Tool-Code). Nicht
-  optional-für-immer: P4 ist der lehrreichste Teil des gesamten Projekts. Wer ihn dauerhaft
-  überspringt, hat ein Ablagesystem gebaut und nichts gelernt.
-- **Korrektur (2026-07-28, P4-Planungssession):** Paketname ist `authserver`, nicht `auth` wie
-  oben in der Tabelle ursprünglich vorgesehen — `mcpserver/auth.py` existiert seit P2, ein
-  zweites Top-Level-Paket `auth` daneben wäre für Menschen und `grep` eine Falle
-  (`docs/concepts/phase4_auth_plan.md`, Entscheidung P4-B). Tabelle oben bereits korrigiert.
+Status **✅** (2026-07-30): 16/16 live bestanden — Schnitt vollzogen, **Pfad-Token tot**, Argon2id + TOTP + DCR + PKCE, opake rotierende Token, zwei unabhängige Nutzer. Sicherheits-Review in `docs/concepts/P4_SECURITY_REVIEW_2026-07-29.md`. Details: `phase4_auth/CLAUDE.md` · Plan: `docs/concepts/phase4_auth_plan.md` · Handover: `docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md`.
 
 ## Phase 5 — Web-UI
-
-**Mission:** Menschen legen Aufgaben und Notizen ohne Editor an.
-
-- **DRIN:** REST-API über demselben Storage-Kern, UI gegen diese API.
-- **DRAUSSEN:** Realtime/Collaboration, Anhänge, Mobile-App.
-- ~~**Offene Entscheidung:** Neubau vs. Adaption des `Notizheft_example.html`.~~ **[2026-08-02
-  Korrektur, P5-Planungssession, Entscheidung P5-V]:** entschieden — **Neubau mit Ernte**.
-  Übernommen werden Layout-Ideen sowie `sanitizeHtml`/`markdownToHtml`; verworfen wird die
-  clientseitige Vault-Verschlüsselung (unvereinbar mit R4), `localStorage`/IndexedDB als
-  Speicher und `connect-src 'none'`. Details: `docs/concepts/phase5_ui_plan.md` §0.5.
-- **Rückt hinter OAuth (Korrektur 2026-07-25):** die UI ist die Phase, die unter Zeit-/Token-
-  Druck wegfallen darf; OAuth nicht. Innerhalb der Phase gilt dieselbe Regel eine Ebene tiefer:
-  unter Druck fällt Block B (REST-API/UI) weg, nicht Block A (Sicherheit/Auth-Selbstverwaltung).
-- **Erweiterung (2026-08-02 Planungssession):** Scope wächst gegenüber der ursprünglichen
-  Roadmap-Zeile um **Auth-Selbstverwaltung** (Einladung, Passwort/TOTP/Recovery-Code selbst
-  setzen, ohne SSH/Neustart) — kommt aus `docs/concepts/PHASE4_CLOSEOUT_HANDOVER.md` §4.1 und
-  ist ausdrücklich Block A der Phase, nicht optional. Ohne sie ist die UI eine Oberfläche auf
-  einem Konto, das nur per SSH existiert.
-
-**Status ✅ (2026-08-09):** Abnahmematrix vollständig — 20/20 Zeilen live bestanden, 0 teilweise,
-0 offen (`docs/concepts/P5_ABNAHME_2026-08-09.md`). Beide Blöcke (A Sicherheit/
-Auth-Selbstverwaltung, B REST-API/UI) durch das harte Gate. `git diff` auf `storage/`,
-`mcpserver/{tools,permissions,server}.py` blieb über die gesamte Phase leer (Kriterium 18).
-Formaler Abschluss-Handover an P6: `docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md`. Phase-Head:
-`phase5_ui/CLAUDE.md`.
-
----
+Status **✅** (2026-08-09): 20/20 live bestanden. Zwei Blöcke (A Sicherheit/Auth-Selbstverwaltung, B REST-API/UI) mit hartem Gate. **`git diff` auf `storage/`, `mcpserver/{tools,permissions,server}.py` blieb über die gesamte Phase leer** (Kriterium 18 — derselbe Seam-Beweis wie in P4, eine API-Fläche höher). Details: `phase5_ui/CLAUDE.md` · Handover: `docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md`.
 
 ## Phase 6 — Freigaben, Ordner, Werkzeug-Ergonomie
-
-**Mission:** Drei Dinge beweisbar — punktuelle Textkorrektur statt Komplett-Rewrite
-(`patch_item`), Menschen entscheiden pro Item wer es sieht plus Orte, an denen mehrere gemeinsam
-schreiben, und das System verträgt einen dritten Nutzer ohne Codeänderung.
-
-- **DRIN:** `patch_item` + Quittungen statt Volltext, Sichtbarkeitsstufen (`private`/`human`),
-  Item- und Ordner-/Space-Freigaben, echte Ordner, Update-Log/Banner, Bild-Assets als verlinkte
-  Dateien.
-- **DRAUSSEN:** Löschen von Items, FastMCP-4/CIMD/DPoP, Volltext-/semantische Suche, Realtime,
-  Mobilversion, Rechteverwaltung über MCP-Tools, HEIC, serverseitiges Bild-Rendering.
-- Steht in **keiner** ursprünglichen Roadmap-Zeile — ein QoS-Schnitt aus echtem Betrieb (siehe
-  „Phase-6-Vormerkungen" in Root-`CLAUDE.md`, jetzt hier eingepflegt). Drei Blöcke, ein hartes
-  Gate: A = Werkzeuge/Betrieb/Update-Banner, B = Dateisystem, C = Bilder — unter Druck fällt
-  zuerst C weg, dann Bs geteilte Spaces, **nie Block A**.
-
-**Status 🔄 (2026-08-13):** Block A (Steps 0–3) vollständig gebaut, Gate A→B 3/4 Punkte live
-bestanden. Block B Steps 4–6 (Storage-Fundament, Rechtepolitik, Verwaltung/Migration) ✅ gebaut
-**und seit 2026-08-13 live deployed** (`main`@`d068d1c`) — Cutover auf die neue `SharePolicy`
-vollzogen, eine Leserichtung (niklas→fabian) über den echten Connector live-verifiziert, die
-andere offen. Ein UI-Fund (geteilte Spaces zeigten „nur lesen" trotz Schreibrecht) hatte zwei
-Teile — Space-Listen-Badge ist deployed und live bestätigt, ein zweiter Teil (Anlegen-Knopf/
-Text innerhalb des Spaces, dieselbe Ursachenkategorie an anderer Stelle) ist behoben, aber noch
-nicht deployed. Eine Planungsvormerkung für die nächste Session (Item-Verschieben zwischen
-Ordnern/Spaces) steht offen. Herkunft: `docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` §4.1–§4.6. Plan:
-`docs/concepts/phase6_shares_plan.md` (Entscheidungen P6-A–P6-AC, Steps 0–10). Details:
-`phase6_shares/CLAUDE.md`s Session-Block vom 2026-08-13.
-
-**Status-Korrektur (2026-08-23, Phasenabschluss): 🔄 → 🟡, bewusst nicht ✅.** Sämtlicher P6-Code
-ist gebaut und live deployt (`main`@`f96125e`), aber nur **12 von 39 Abnahmezeilen** sind
-live-verifiziert — und die Statusregel dieses Projekts sagt „✅ heißt live-verifiziert, nicht
-gebaut". Vier Zeilen (31–34, §9 Mehrfachauswahl) wurden nie gebaut; Block C (Zeilen 19–22/40–47,
-Bilder) ist nach Phase 6.5 ausgewandert; sieben weitere Zeilen hängen an einer Sitzung mit
-Fabians eigenem Login. **Der Sprung auf ✅ ist eine offene Nikinger-Entscheidung.** Vollständiger
-Zeilenstatus, offene Entscheidungen und `[VERIFY]`-Bilanz:
-`docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md`. Übersichtsgrafik:
-`docs/concepts/phase6_shares_uebersicht.svg`.
-
----
+Status **🟡** (2026-08-23, bewusst nicht ✅): Code-complete und live deployt, aber nur 12/39 Abnahmezeilen live-verifiziert (drei benannte Tasks für nächste Phase in `PHASE6_CLOSEOUT_HANDOVER.md` §4). Drei Blöcke (A Werkzeuge/Betrieb/Update-Banner, B Dateisystem mit SharePolicy, C Bilder nach 6.5 ausgewandert). Details: `phase6_shares/CLAUDE.md` · Handover: `docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md`.
 
 ## Phase 6.5 — Werkzeug-Ergonomie und Bilder
-
-**Mission, zwei Blöcke:** (A) Eine arbeitende Claude-Instanz findet ihre Werkzeuge, versteht deren
-Aufgabenteilung aus der Beschreibung und zahlt keine Tausende Token für eine Versionsnummer.
-(B) Ein Bild liegt im Space, ist im Dokument sichtbar, technisch nur ein Link — und Claude sieht
-seine Bytes nur, wenn ein Mensch ausdrücklich danach fragt.
-
-- **DRIN:** fünf offene MCP-Werkzeug-Ergonomie-Punkte (`list_spaces`-Beschreibungsfehler,
-  `patch_item`/`update_item`-Aufgabenteilung, `get_item_meta`, Status-Enum in Tool-Beschreibungen,
-  Body-Suche als MCP-Opt-in), Abschluss Block C Bilder (Speicherung als Asset-Datei, Referenz im
-  Body, MCP-Lesen nur bei Schreibrecht und nie automatisch, MCP-Upload mit Ankündigungspflicht,
-  Entfernen per Verschieben nach `_trash/`).
-- **DRAUSSEN:** Bulk-Append-Tool (Befund: heute schon über mehrzeiligen Text möglich), Body-
-  Volltextsuche in der Web-UI (Q1 bleibt gelockt), automatische `_trash/`-Räumung (Vormerkung,
-  kein Auftrag), Space-Admin-UI (bleibt Phase 7), Rechteverwaltung über MCP-Tools, HEIC/SVG/PDF
-  als Bildformat, serverseitiges Bild-Rendering.
-- Sitzt bewusst zwischen Phase 6 und Phase 7 — kein Space-Admin-UI-Scope, `app.html`s „kommt in
-  Phase 7"-Zeichenkette bleibt unangetastet und korrekt. Zwei Blöcke, kein hartes Gate zwischen
-  ihnen (Block B bei Zeitdruck komplett verschiebbar, Block A nicht).
-
-**Status-Korrektur (2026-08-23, formaler Abschluss als P7 Step A8): 🔄 → 🟡, bewusst nicht ✅.**
-Sämtlicher P6.5-Code ist gebaut und live deployt (`main`@`f96125e`), **12 von 14 Abnahmezeilen**
-sind live-verifiziert (zwei davon über eine im P7-Plan §A8.1 gebilligte Substitution —
-`testnutzer-p7` statt Fabian). Verbleibend offen: P6.5-12 (Entfernen-Knopf inzwischen von P7
-Step A3 gebaut, kein Browser-Klick-Nachweis) und P6.5-14 (Nikingers eigene Bewertung, kein
-Selbstzertifizierungs-Kriterium). **Der Sprung auf ✅ ist eine offene Nikinger-Entscheidung.**
-Vollständiger Zeilenstatus, offene Entscheidungen und `[VERIFY]`-Bilanz:
-`docs/concepts/PHASE6_5_CLOSEOUT_HANDOVER.md`. Übersichtsgrafik:
-`docs/concepts/phase6_5_tools_images_uebersicht.svg`.
-
----
+Status **🟡** code-complete (13/14 live, P6.5-14 strukturell offen — Nikinger-Bewertung): fünf offene MCP-Werkzeug-Ergonomie-Punkte geschlossen + Abschluss Block C Bilder (`put_asset`/`get_item_asset`/`<untrusted_content>`). Drei neue Punkte nach Phase 6.5 in `PHASE6_5_CLOSEOUT_HANDOVER.md` benannt. Details: `phase6_5_tools_images/CLAUDE.md` · Handover: `docs/concepts/PHASE6_5_CLOSEOUT_HANDOVER.md`.
 
 ## Phase 7 — Space-Verwaltung, Mehrfachauswahl, Konsolidierung
-
-**Mission, drei Blöcke:** (A) ein Mensch findet ein Item wieder, das eine Claude-Instanz ihm
-gegenüber `itm_807df219` genannt hat, und kann ein eingefügtes Bild wieder loswerden. (C) ein
-Mensch entscheidet im Browser, wer seinen Space lesen darf, legt einen geteilten Space an und
-wird einen wieder los, ohne dass dabei ein Item verloren geht. (B) zehn Items wandern in einem
-Vorgang in denselben Zielordner, mit einem Re-Auth-Formular statt zehn.
-
-- **DRIN:** Item-ID sichtbar + auffindbar, Bild-Entfernen-Knopf (schließt P6.5-12), Feld-
-  Whitelist an `_items_patch` (schließt O6), Doku-Audit der P6-Modul-Zeilen 8–16, Sichtbarkeits-
-  Migration live, dritter Principal `testnutzer-p7`, formaler Abschluss Phase 6.5, volle
-  Space-Verwaltung in der Weboberfläche (anlegen/Mitglieder/entfernen, Home-Spaces ausgenommen
-  vom Anlegen/Entfernen), Mehrfachauswahl (`ITEM_MOVE_PLAN.md` §9).
-- **DRAUSSEN:** FastMCP-4-Umstieg, `owner:`-Feld in `.share.yml`, Löschen von Items,
-  Rechteverwaltung über MCP-Tools, automatische `_trash/`-Räumung, Funnel-Watchdog, Body-
-  Volltextsuche in der Web-UI, Mehrfachauswahl für andere Aktionen als Verschieben.
-- **Reihenfolge 0 → A → Gate → C → B** (bewusst nicht die Buchstabenfolge) — Block C trägt den
-  Namen dieser Phase (seit P6 Step 7 Commit 6 in `app.html` als „kommt in Phase 7" reserviert)
-  und fällt unter Druck nie vor Block B.
-
-**Status ✅ (2026-08-28, formal abgeschlossen, live deployt `e88a624`):** Block A (inkl. A8, Phase
-6.5 formal abgeschlossen), Gate A→C, Block C (C1–C5, Space-Verwaltung in der Weboberfläche) und
-Block B (Mehrfachauswahl) sind alle gebaut, deployt und abgenommen. `deploy.sh main` durch den
-Nikinger gefahren, `/opt/sharefyx/current` → `e88a6244…`, Health-Gate 3/3 grün. **Abnahmestand:
-22 von 24 Zeilen ✅ live, 2 ❌, 0 ungeprüft** — die Matrix ist vollständig durchgelaufen, und genau
-das unterscheidet diese Phase von P6 (27 Zeilen nie geprüft). **Der Sprung auf ✅ ist eine
-Nikinger-Entscheidung vom 2026-08-28** unter der Bedingung, dass die beiden ❌ als **benannte
-Defekte an Phase 8 vererbt** werden, nicht verschwinden: **P7-24** (TOTP-Replay im
-Batch-Verschieben, echter Mechanismus-Defekt) und **P7-4** (Claude nennt IDs statt Titeln,
-UX-Befund). Dazu ein dritter Erbposten aus dem Live-Betrieb: **`spacectl.py remove-space`
-reindiziert nicht** (Incident 2026-08-27, `overview` → 500 für jeden Nutzer; Zustand behoben,
-Ursache nicht). Handover: `docs/concepts/PHASE7_CLOSEOUT_HANDOVER.md`. Übersichtsgrafik:
-`docs/concepts/phase7_spaces_admin_uebersicht.svg`. Details, volle Session-Historie:
-`phase7_spaces_admin/CLAUDE.md` + `SESSIONS_ARCHIVE.md`.
-
-**Status-Herkunft (2026-08-23, Step 0 gestartet):** Plan `docs/concepts/phase7_spaces_admin_plan.md`
-ausführungsreif, alle zehn Nikinger-Fragen N1–N10 in §0.1 gelockt. Step 0.1–0.6 gefahren: `pytest`
-828 grün, Doku-Audit der P6-Modul-Zeilen 8–16 + Vormerkungspunkt 2 mit SHA-Beweis abgeschlossen
-(alle live deployt, Stale-Doku in `phase6_shares/CLAUDE.md`/Root-`CLAUDE.md`/`docs/INDEX.md`
-korrigiert), ein Link-Fund behoben (`docs/PROMPTS.md`), Softcap-Prüfung 12/12 konform, Skelett
-angelegt. Herkunft: `docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md`. Details:
-`phase7_spaces_admin/CLAUDE.md`s Session-Block.
-
----
+Status **✅** (2026-08-28): 22/24 Abnahmezeilen live, 2 ❌ als benannte Defekte an Phase 8 vererbt (P7-24 TOTP-Replay im Batch, P7-4 Claude-nennt-IDs-statt-Titeln) — die Matrix ist **vollständig durchgelaufen**, das unterscheidet P7 von P6/P6.5. Live: `e88a624`, Health-Gate 3/3 grün. Drei Erbposten aus dem Live-Betrieb (P7-24, P7-4, `remove-space`-Auto-Reindex) in Phase 8 gebaut. Details: `phase7_spaces_admin/CLAUDE.md` · Handover: `docs/concepts/PHASE7_CLOSEOUT_HANDOVER.md`.
 
 ## Phase 8 — UI-Neuanstrich, Verknüpfungs-Graph, QoL
 

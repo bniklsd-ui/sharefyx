@@ -3378,3 +3378,291 @@ Nikinger-Sichtprüfpunkte (Plan §8).
 opencode/M3, gegen `docs/concepts/phase8_ui_graph_plan.md` §2. Vor jedem Edit die zitierten
 Datei:Zeile-Anker neu prüfen (V82, driftet erfahrungsgemäß um wenige Zeilen).
 
+
+---
+
+## Vormerkungen-Archiv (Phase 8, Z-Final-Rotation)
+
+Verbatim-Auszug aus `phase8_ui_graph/CLAUDE.md` §Vormerkungen vom 2026-09-08 (Z-Final):
+vier Vormerkungen aus den Nikinger-Sichtpruefungen 1, 3 und der Chevron-Screenshots-Sitzung
+plus der Item-Links-Recherche. Drei davon sind im Head-Selbstlauf erledigt worden
+(Selection/Choice-Konvention v3 beantwortet Vormerkung 1, Listenzeilen-Sheen-Vereinheitlichung
+beantwortet Vormerkung 2 Punkt 1, beide Chevron-Fixes beantworten Vormerkung 3), die
+Item-Links-Luecke (Vormerkung 4) ist die direkte Anlass-Notiz fuer Phase-8.5-Block A1
+(Modus-Umschalter Body/Frontmatter + Body-Markdown-Link-Helper) gewesen. Vormerkung 2 Punkt 2
+(Obsidian Uebersicht weiterhin WIP) ist nach P9 verschoben — Head fasst das zusammen, die
+Sektion im Head ist Pointer.
+
+---
+
+## Vormerkungen (nicht Teil eines aktuellen Steps)
+
+**[2026-09-01] Nikinger-Feedback während der Screenshots-Session (Sichtprüfung 1) — ausdrücklich
+nur vormerken, nichts davon diese Session umgesetzt, kein Code angefasst:**
+
+1. **Auswahl-Boxen vereinheitlichen.** Die aktuelle Space-Auswahlbox im Verschieben-Dialog
+   (`<select class="input" id="move-space-select">`, befüllt in `dialogs.js ::
+   openMoveDialog()` ab Zeile 363 mit den `writable: true`-Spaces aus `state.spaces`)
+   soll die **Standard-Auswahlbox** der App werden. Was heute schon in demselben Stil
+   vorliegt und damit automatisch aligned ist: `#move-folder-select` (Ordner-Wahl im selben
+   Dialog, identisches Pattern), `#space-member-write-select` (lesen/schreiben in der Space-
+   Verwaltung, identisches Pattern). **Was beim Bauen weiterer Auswahl-Affordances neu
+   hinzukommt, soll ebenfalls diesen Stil übernehmen** — natives `<select class="input">`,
+   befüllt via `appendChild(option)`, kein eigenes Dropdown-Menü ohne triftigen Grund.
+   Begründung: native Tastatur-Navigation (Pfeiltasten, Bild-Auf/Ab, Erstbuchstaben-Sprung),
+   Screenreader-Verhalten und Mobile-Sheet-Darstellung sind über das Native Element
+   automatisch korrekt; eigene Dropdowns müssten das alles nachbauen und sind
+   erfahrungsgemäß (siehe den Phase-7-Dropdown-Lila-Fund vom 2026-08-16, `accent-color` an
+   `<select>` gesetzt, damit die native Optionsliste nicht lila wird) fehleranfällig beim
+   ersten Browser-Update.
+   **[2026-09-02 ERLEDIGT]:** die Selection/Choice-Konvention v3 unten beantwortet die
+   offene Frage nach „was ist Auswahl, was nicht" mit einer vier-gliedrigen Taxonomie
+   (Choice vs. Toggle vs. Status vs. Navigation), und das Chevron-Vorbild (Lucide-Pfad
+   `m6 9 6 6 6-6` als `background-image`-Data-URL auf `select.input`, mit `:disabled`-
+   Variante in `--text-placeholder`) schließt die einzige sichtbare Lücke am Vorbild
+   (`appearance: none` war gesetzt, aber kein Chevron — alle sieben `<select>`-Stellen
+   renderten als reine Textbox). Verifiziert gegen Wegwerf 18771, Playwright-Smoke 9/9.
+   Die Konvention ersetzt die offene Frage, ne neue-Anforderungen folgen aus dieser
+   Sitzung nicht.
+
+   **Heute inkonsistent — zu prüfen, was wirklich „Auswahl" ist und was nicht:**
+   - **Rail-Bucket-Filter** (Offen/Erledigt/Notizen/Archiv): Button-Reihe mit
+     rechtsbündigem Counter, kein `<select>`, sondern ein Toggle-Set. Eher Navigation als
+     Auswahl — passt nicht in dieselbe Kategorie.
+   - **Bucket-Tiles auf der Übersichtsseite** (0 Offen / 0 Erledigt / 3 Notizen / 0 Archiv):
+     Card-Style, werden in D1 durch tabellose Space-Zeilen ersetzt (`P8-J`,
+     F12/F13-Auflösung). Danach entscheidet sich, ob die neuen Zeilen den `<select>`-Stil
+     übernehmen oder als Link-Liste bleiben.
+   - **Visibility-Chip** („privat"): statisches Pill, kein Dropdown — andere Kategorie.
+   - **Statusfilter** (in der Suche-/Filter-Zeile, soweit vorhanden): zu prüfen, ob das ein
+     nativer `<select>` ist oder eine Custom-Liste.
+
+   **Konkrete Empfehlung für die nächste Session:** die Kategorie „Auswahl" einmal explizit
+   festlegen (was ist eine echte Auswahl mit einem, zwei oder vielen Werten, was ist eine
+   Toggle-Gruppe, was ist ein statisches Label) und daraus eine Konvention für künftige
+   Komponenten ableiten. Keine Code-Änderung in dieser Session.
+
+2. **Ist das Design sonst final?** Nikinger-Frage vom 2026-09-01 nach den Screenshots.
+   **Antwort: nein.** C0 + C1 + C2 sind ✅ gebaut und gepusht (`0281cce`/`08bff55`/
+   `0d97b3a`); C3 (Farbsemantik + Legende, Plan §4.C3), C4 (Glass-Akzente +
+   `prefers-reduced-transparency`-Fallback, Plan §4.C4), C5 (Dichte + F5 `::selection` + F21
+   72ch + F22 Padding-Token, Plan §4.C5), D1/D2/D3 (Übersicht tablos + Force-Graph) sind
+   ⬜. Plus Vormerkung 1 oben. **Sichtprüfung 1 selbst läuft noch** — Befunde des Nikingers
+   (Typo-Größen, Icon-Lesbarkeit, ggf. Feinwerte) fließen entweder als C1-Nachschärfung
+   (F3/F4/F6) oder als Vorlage für C3 ein; strukturelle Änderungen sind in Sichtprüfung 1
+   nicht drin.
+
+**[2026-09-02] Nikinger-Feedback nach Sichtprüfung 3 (c4c5_*-Screenshots) — ausdrücklich nur
+vormerken, nichts davon diese Session umgesetzt, kein Code angefasst, kein Push:**
+
+1. **Listenzeilen-Auswahl sieht anders aus als das „Auswahl"-Vorbild (Rail-Button-Stil).**
+   Nikinger vergleicht zwei Screenshots:
+   - `docs/screenshots/c4c5_03_editor_72ch.png` — selektierte Zeile „Aufgabe fuer morgen"
+     mit dem neuen C4-Sheen (3-px-Akzentkante links + 1-px-Akzent-Outline rundum +
+     Backdrop-Blur-Sheen, `phase5_ui/webui/static/app.css` Auswahl-Sheen-Block).
+   - `docs/screenshots/03_list.png` (Sichtprüfung 1) — selektierter Rail-Button „Notizen",
+     gefüllter Akzent-Hintergrund wie eine gedrückte Schaltfläche.
+
+   **Befund:** die zwei „Auswahl"-Zustände in der App reden optisch unterschiedliche Sprachen
+   — die Listenzeile markiert über Outline + Border-Left, der Rail-Button über einen soliden
+   Akzent-Fill. **Was hier das Richtige ist, soll in der nächsten kontrollierten UI-Session
+   entschieden werden** (Nikinger-Lauf gegen die Wegwerf-Instanz am echten Gerät, nicht
+   opencode). Mögliche Richtungen: (a) **vereinheitlichen** — Listenzeilen-Sheen an
+   Rail-Button-Stil angleichen oder umgekehrt, (b) **Sheen vereinfachen** — eine der drei
+   C4-Schichten wegnehmen (z. B. die Outline raus, weil Border-Left + Blur schon reichen),
+   (c) **bewusst unterschiedlich lassen** und die Differenz dokumentieren
+   (Listenzeile = Inhalts-Auswahl, Rail-Button = Filter-Toggle, andere Semantik, andere Optik).
+   **Aktueller C4-Code bleibt unverändert** — kein Edit in dieser Session.
+
+   **[2026-09-02 ENTSCHIEDEN, Nikinger nach Sichtung der Chevron-Fix-Screenshots]:**
+   Richtung **(a) vereinheitlichen** — „i like the rail Button Style more, Looks cleaner."
+   Ziel: die C4-Auswahl-Sheen (3-px-Akzentkante links + 1-px-Outline + Backdrop-Blur auf
+   `.list__row[aria-current=true]`/`.list__row--selected`) wird zugunsten des Rail-Button-
+   Stils (solider Akzent-Fill, siehe `.rail__bucket.active` o. ä.) abgelöst — **nicht**
+   umgekehrt. **Bewusst nur dokumentiert, noch nicht gebaut** (Nikinger-Auftrag: „Note that
+   before pushing", kein Baubefehl) — Umsetzung berührt N8 (Auswahl darf nicht allein von
+   Transparenz abhängen) neu, weil ein solider Fill diese Anforderung ohnehin einfacher
+   erfüllt als die Glass-Sheen; das ist bei der Umsetzung zu prüfen, nicht diese Session.
+   Damit ist Vormerkung 3 Punkt 1 vollständig entschieden — Umsetzung offen für die nächste
+   Session.
+
+   **[2026-09-02 ERLEDIGT]:** `.list__row[aria-current="true"]` und
+   `.list__rows > li.list__row--selected` (`phase5_ui/webui/static/app.css`) tragen jetzt
+   denselben Gradient + Gloss-Highlight wie `.rail__home[aria-current="true"]`
+   (`linear-gradient(180deg, rgba(62,141,243,.20), rgba(62,141,243,.08))` +
+   `box-shadow: inset 0 1px 0 rgba(255,255,255,.06)`) — Playwright-Smoke vergleicht
+   computed `background-image` beider Elemente auf Gleichheit, nicht nur auf Vorhandensein
+   (`c4c5_playwright_smoke.py :: step3_selected_row_styles`). `outline`/`outline-offset` und
+   beide `backdrop-filter`-Blöcke (Blur-Sheen, `prefers-reduced-transparency`-Fallback) sind
+   komplett entfernt. Der 3px-Akzentrand links bleibt unverändert (kein Layout-Shift, `.list__row`s
+   Default-Border bleibt 3px transparent). N8 geprüft: einfacher erfüllt als vorher, weil die
+   Erkennbarkeit jetzt an einem opaken Gradient + dem soliden Rand hängt, kein Blur mehr im
+   Spiel — der `@media prefers-reduced-transparency`-Sonderfall entfällt strukturell. Bewusst
+   minimaler Diff (Advisor-Fund vor dem Bauen): `.list__row` blieb bei `border-left`, bekam
+   **keinen** vollen `border: 1px solid transparent` wie `.rail__home` — ein Listenrow ist
+   randlos volle Breite, ein voller Rand hätte jede Zeile 2px schmaler/höher gemacht (globale
+   Dichte-Änderung) für einen Fund, der nur den *Fill* betraf. 7/7 Playwright-Smoke grün gegen
+   Wegwerf 18770, 958/958 pytest, ui_budget 5/5 (123.8 KB, −0.1 KB). Details im Session-Block.
+
+   **[2026-09-02 Nachtrag, nachgeschärft nach Nikinger-Sichtung dieses ersten Wurfs]:** der
+   3px-Akzentrand links oben ist wieder raus — Nikinger-Feedback auf die beiden Screenshots:
+   „remove the left solid line and add the outline I can see around the Notizen Auswahl."
+   `border-left-color` faerbt sich nirgends mehr ein (das reservierte `3px solid transparent`
+   im Boxmodell bleibt, damit sich die Zeilenbreite nicht ändert); neu ist ein umlaufender
+   `outline: 1px solid var(--accent-line); outline-offset: -1px;` auf beiden Selektoren —
+   derselbe Farbton, den der Rail-Button für seinen `border-color` benutzt, nur als `outline`
+   statt `border` (layoutneutral, derselbe Grund wie beim ursprünglichen Verzicht auf einen
+   echten 4-seitigen `border`). Gradient-Fill + Gloss-Highlight unverändert (bereits vom
+   Nikinger als „nearly it" bestätigt). 7/7 Playwright grün (Assertions umgeschrieben:
+   Abwesenheit von `border-left-color`, Anwesenheit von `outline: 1px solid
+   var(--accent-line)`), 958/958 pytest, ui_budget 5/5 (123.9 KB, ±0 KB). Details im
+   Nachtrag zum Session-Block.
+
+   **[2026-09-02 Nachtrag, zwei eigene Handy-Screenshots als Vergleichsbeleg]:** Nikinger
+   liefert ein direktes Vorher-Nachher-Paar aus der laufenden App (kein Playwright-Shot):
+   Rail-Bucket „Notizen" aktiv (voller Akzent-Fill, klar als „ausgewählt" lesbar) gegen die
+   Listenzeile „Aufgabe fuer morgen" ausgewählt (nur ein dünner blauer Rahmen um die Box,
+   auf dem Screenshot kaum wahrnehmbar). O-Ton: „That's Not nearly the same." Bestätigt die
+   Richtung (a)-Entscheidung oben mit Bildbeleg — **keine neue Entscheidung**, verstärkt nur
+   die bereits gelockte. Kein Code angefasst, Screenshots nicht ins Repo übernommen (Ad-hoc-
+   Handyaufnahmen, kein Playwright-Artefakt, gehören nicht in `docs/screenshots/`).
+
+2. **„Obsidian Übersicht" weiterhin WIP, vom Nikinger ausdrücklich bestätigt.** Block D
+   (tabellose Übersicht mit Counter-Chips + handgerollter Canvas-Force-Graph) ist gebaut
+   und liegt in `c4c5_01`, `sp2_01`–`sp2_06` und `d1_*`/`d2_*` vor. Nikinger sagt: „ja, klar
+   dass die noch Überarbeitung braucht" — **keine neue Anforderung**, nur eine Bestätigung
+   des erwarteten Stands. Soll im selben kontrollierten UI-Lauf mit auf den Schirm.
+
+**[2026-09-02] Nikinger-Feedback nach Sichtprüfung der Chevron-Screenshots (diese Session,
+ausdrücklich nur vormerken, nichts davon umgesetzt):**
+
+1. **Chevrons nicht identisch.** Die Lucide-Chevrons auf den 7+1 `<select class="input">`-
+   Stellen sind visuell nicht identisch. Hypothese (nicht im Code verifiziert): die
+   Chevron-Größe 12 px ist relativ zur Select-Höhe unterschiedlich (Item-Editor-Status
+   vs. Move-Dialog-Select), und/oder die Data-URL rendert je nach Container-Background
+   anders — die `--text-faint`-Farbe (`#A7B2BF`) wurde gegen die `--surface-raised`-Fläche
+   (1B2027) designt, der Move-Dialog-Select sitzt aber auf `.overlay__panel`-Glas
+   (`rgba(27,32,39,.55)`), was den Kontrast verändert. **Mögliche Richtungen für die
+   nächste UI-Session:** (a) Chevron-Größe relativ zur Schriftgröße (`em` statt `px`),
+   (b) Farbe explizit auf `--text` statt `--text-faint` (konservativer, mehr Gewicht),
+   (c) eine eigene CSS-Klasse `.input--chevron` einführen, falls die Data-URL-Variante
+   grundsätzlich nicht trägt. Verifikation dann mit drei Screenshots (Item-Editor,
+   Move-Dialog, Space-Verwaltung) im selben Layout.
+
+2. **Linker „Strich" von der alten Auswahl überlappt mit der neuen Auswahl.** Beobachtung
+   am Move-Dialog-Screenshot: der `<select class="input">` zeigt seinen eigenen
+   `1px solid var(--line-strong)`-Border rundum, und im `:focus`-Zustand wechselt der
+   gesamte Border auf `var(--accent-line)` (`.input:focus`,` `app.css:280`); der linke
+   Border-Strich bleibt damit sichtbar und tritt in Konkurrenz zum Chevron-Affordance
+   auf der rechten Seite. **Lesart 1:** der linke Border ist als „alte" Auswahl gelesen
+   worden (C4-Sheen-Kontext, dort hat die ausgewählte Listenzeile eine 3-px-Akzentkante
+   links) — der User assoziiert linke Akzentkante mit „etwas ist ausgewählt" und sieht
+   sie nun auch am `<select>`, was nicht zur Semantik passt. **Lesart 2:** der Border
+   links ist einfach visuell zu prominent im Verhältnis zum Chevron. **Mögliche
+   Richtungen:** (a) `.input:focus`-Regel so anpassen, dass nur der untere und rechte
+   Rand auf `--accent-line` wechseln, nicht der linke (machtet konsistent mit der
+   Chevron-Affordance rechts), (b) Border-Stärke am `<select>` von 1 px auf 0.5 px
+   reduzieren oder ganz wegnehmen (Glas-Träger-Konsistenz aus C4), (c) Chevron visuell
+   stärker betonen, damit die linke Linie nicht mehr dagegen konkurriert. **Achtung:**
+   Lesart 1 darf NICHT den `.input:focus` global ändern — `<input type="text">` und
+   `<input type="date">` brauchen den vollen Focus-Border für Tastatur-Navigation
+   (Sichtbarkeit des Caret). Änderung muss `<select>`-spezifisch bleiben.
+
+   **[2026-09-02 ERLEDIGT, beide Punkte, Details im Session-Block]:** Punkt 1 Richtung (a)
+   umgesetzt (Chevron-Größe/-Position/`padding-right` von px auf `em` — Root Cause war
+   `.field .input { font-size: 13px; }`, `app.css:1251`, die den Wert-Kontext von
+   `#field-status` gegenüber den 16px-Dialogen verkürzt, während der Chevron fest 12px blieb).
+   Punkt 2 Richtung (a) umgesetzt (`select.input:focus` eigene Regel, nur rechts/unten auf
+   `--accent-line`, links bleibt `--line-strong` — `.input:focus` selbst unangetastet, Achtung
+   aus Lesart 1 eingehalten). Playwright-Regressionscheck gegen Wegwerf 18771 bestätigt beide
+   Fixes empirisch (Verhältnis-Differenz 0.0096, Border-Asymmetrie exakt auf den erwarteten
+   Token-Werten). **Damit bleibt aus Vormerkung 3 nur noch Punkt 1 des 2026-09-02-Blocks
+   offen** (Listenzeilen-Sheen vs. Rail-Button-Vorbild — bewusst NICHT angefasst, das ist eine
+   Geschmacksfrage für die Nikinger-Sichtprüfung am echten Gerät, kein Bug mit auffindbarer
+   Root Cause wie die zwei Chevron-Funde hier).
+
+**[2026-09-02] Nikinger-Frage „wie erstellt man anklickbare Item-Links in sharefyx" —
+Recherche ergab eine echte Lücke, ausdrücklich nur vormerken, kein Code angefasst:**
+
+Drei Mechanismen existieren nebeneinander und werden leicht verwechselt:
+
+1. **🔗-Symbol in der Formatierleiste** (`editor.js` `TOOLBAR_ACTIONS.link`) — blinder
+   Markdown-Schnipsel `[Linktext](Ziel-URL)` an der Cursor-Position, kennt keine Items.
+2. **Link-Picker-Knopf** (Lupen-Symbol im Kopfdaten-Panel, `editor.js:88-100
+   _appendLinkId`, Phase 8 Block B Step B4) — öffnet eine Item-Suche, hängt die gewählte
+   `itm_…`-ID an das **Frontmatter-Feld `links:`** an (Komma-Konvention). Dient
+   ausschließlich dem Verknüpfungs-Graphen (`linkscan.py` liest dieses Feld für
+   Graph-Kanten) — wird **nirgends als Text oder Link gerendert**.
+   **[2026-09-03 Korrektur, P8.5 Step 0.3]:** Stand vorher „Büroklammer-Symbol", `app.html:183`
+   rendert aber `<use href="#i-search">` (`#i-search` aus dem Lucide-Sprite, eingeführt in
+   Phase 8 Block C2). `docs/UPDATE_LOG.md` (2026-09-01) sagt bereits korrekt „Lupe".
+3. **Echter klickbarer Link im Body:** `[Text](#item/itm_xxxxxxxx)`, von Hand getippt.
+   Erst `markdownToHtml`/`safeHref` (`markdown.js`) rendert das in der Vorschau zu einem
+   echten `<a href="#item/itm_...">`; `app.js:107-115` hat die Klick-Delegation, die dann
+   zum Item navigiert.
+
+**Befund:** kein Weg führt heute von (2) nach (3) — der Picker liefert die ID nie an eine
+Stelle, von der sie in den Body eingefügt werden könnte. Wer heute einen klickbaren
+Item-Link will, muss die Ziel-ID von Hand kennen und `[Text](#item/itm_xxxxxxxx)` selbst
+tippen; der Picker suggeriert optisch „ich verlinke", tut das aber nur für den Graphen, nicht
+für den Text. **Nikinger-Auftrag: nur vormerken, nicht bauen.** Naheliegender Fix für eine
+spätere Session: `_appendLinkId`s Callback um eine Variante erweitern, die
+`[<Item-Titel>](#item/<id>)` an der Cursor-Position in `#editor-textarea` einfügt (statt/
+zusätzlich zum Frontmatter-Feld) — kein neuer Endpunkt nötig, der Picker kennt Titel+ID
+bereits aus seinem Suchergebnis.
+
+---
+
+
+---
+
+## Abnahmematrix-Archiv (Phase 8, Z-Final-Rotation)
+
+Verbatim-Auszug aus `phase8_ui_graph/CLAUDE.md` §Abnahmestand vom 2026-09-08 (Z-Final):
+vollstaendige §7-Abnahmematrix P8-1 bis P8-26 (alle 26 Zeilen mit Status, Art, Beleg,
+Commit-SHA, Screenshot-Verweis und Nikinger-Pruefvermerk wo zutreffend) plus die
+Sichtpruefungs-Status-Tabelle aus Plan §8 (Sichtpruefung 1/2/3). Die Bilanz-Summary und
+das Bilanz-Awk-Kommando bleiben direkt im Phase-Head; hier ist die vollstaendige
+Beweis-Tabelle. Lesen bei Audit oder wenn eine einzelne Zeile verifiziert werden muss.
+
+---
+
+### §7 Abnahmematrix-Stand — P8-1 bis P8-26
+
+| # | Kriterium (Kurzform) | Status | Beleg |
+|---|---|---|---|
+| P8-1 (L) | Batch-Verschieben ≥2 rechteerweiternde Items mit genau 1× Passwort+TOTP (P7-24) | ✅ | A1 `90441b29`, N=14-Batch live-verifiziert |
+| P8-2 (C) | TOTP-Code 2× → 2. Request abgelehnt (Anti-Replay-Regression) | ✅ | A1 — `reauth.py`-Tests (Idempotenz) + Nikinger-Probe `Test_Space` |
+| P8-3 (C) | Abgelaufenes/fremdes Grant → Re-Auth-Fehler; Throttle | ✅ | A1 — `reauth.py`-Tests (`expired_grant`, Throttle-Decorator) |
+| P8-4 (W) | `spacectl.py remove-space` → 4× overview 200, Index konsistent | ✅ | A2 `90441b29`, Nikinger-Probe `Test_Space_A2` (Live-Remove, keine Karteileichen) |
+| P8-5 (L) | P7-4-Zweitprobe dokumentiert; nach Deploy dritte Probe | ✅ | A3 Zweitprobe (positiv); **2026-09-08 Vierte Probe live gegen die echte Produktion**: Nikinger fragte den echten claude.ai-Connector „was das aktuellste Dokument ist" — Antwort nannte den Titel „Ideen / Endvision – Sharefyx Erweiterung", keine `itm_…`-ID (Screenshot, claude.ai-Projekt „MCP-Shareserver – Sharefyx"); zusätzlich eigener Vier-Formen-Test (Fließtext/Tabelle/Klammer/Aufzählung) gegen reale `search_items`-Treffer aus `niklas`+`IT-Sekus-Projekt`, alle vier ohne ID-Leck. Kein Restdefekt mehr. |
+| P8-6 (W) | `links:`-Frontmatter UND `itm_`-Body-Ref erscheinen beide als Kante | ✅ | B2 `f4c8844` + B3 `58ff9a6`, Graph-Payload `edges` enthält Frontmatter- UND Body-Kanten (`linkscan.py` extrahiert beide Quellen) |
+| P8-7 (C) | `rebuild_index()` rekonstruiert `item_links` vollständig nach Index-Löschung | ✅ | B2 — 13 B2-index-Tests grün, Charakterisierung byte-identisch |
+| P8-8 (W) | Nicht-lesbares Item weder als Knoten noch als Kantenende (Zweitnutzer) | ✅ | B3 `_graph_get`-ACL-Tests (12/12); **2026-09-08 echter Zweitnutzer-Pass-Through-Beweis**: `phase8_ui_graph/scripts/wegwerf_setup_p8_8.py` (erstes Wegwerf-Setup mit ZWEI unabhängigen Principals statt einem) + `p8_8_zweitnutzer_probe.py` — echter OAuth-Dance (Discovery/DCR/PKCE/Authorize/Token) für `testuser1`+`testuser2`, echte MCP-Tool-Aufrufe über die Leitung: privates Item nicht in `testuser2`s Suche, geteiltes Item schon, `get_item` auf privates Item abgelehnt, `update_item` auf geteiltes (nur `share_read`) Item mit `write_denied` abgelehnt — 5/5 grün, vom Nikinger geprüft. Fabian-Slot nicht mehr nötig (neue Statusregel, (W) statt (L)). |
+| P8-9 (W) | `#item/…`-Klick öffnet Ziel-Item | ✅ | B4 `ea14d53`, Playwright 18/18 gegen Wegwerf 18768 (`#item/`-Klick-Delegation in `app.js:107-115`) |
+| P8-10 (W) | Link-Picker findet per Titelsuche + befüllt `links:` | ✅ | B4, gleicher Playwright-Lauf, Link-Picker-Smoke `b4_*` |
+| P8-11 (C) | `test_characterization.py` byte-identisch grün | ✅ | jede Block-Session seit B1 einzeln verifiziert (Tabu-Diff §0.4-Linie + Charakterisierungsblock als Disziplin gehalten) |
+| P8-12 (C) | Tabu-Diff (§0.4) leer bis auf die A3-Textänderung | ✅ | A3-Edit am `_TITLE_NOT_ID_HINT` war die einzige bewusste Ausnahme; keine in P8-L gelockte Verletzung |
+| P8-13 (C) | 0 Icon-Entities in `app.html`, 0 `→`/`⇄`/`×` in `js/`; `THIRD_PARTY_LICENSES.md` | ✅ | C2-Smoke — `grep` ergibt 0 Icon-Treffer (zwei verbleibende `→`-Treffer = Sprach-Interpunktion „v3 → v4" mit Audit-Kommentar, keine Icons) |
+| P8-14 (L) | Plex 16px Schriftbild, Nikinger bestätigt am echten Gerät | ✅ | C1 ✅ gebaut + 9 Screenshots Sichtprüfung 1; „UI is fixed now" deutet Sichtprüfung 1 als akzeptiert; **[2026-09-07] Nikinger-Sichtprüfung am echten Gerät gegen v3.0.1 bestätigt** (Plex-Lesbarkeit OK). |
+| P8-15 (L) | Farblegende (own/shared/foreign) konsistent in Rail, Liste (globaler Scope), Übersicht, Graph | ✅ | C3 ✅ gebaut + `c3_01`/`c3_02`-Screenshots; **[2026-09-02] Fix B gebaut** — `webui/api.py :: _graph_get` lieferte bis dahin `"shared": i.space != session.space`, jeder fremde Knoten kam als „shared" (türkis), `--space-foreign` (grau) war im Graphen strukturell unerreichbar. Jetzt `writable` über `permissions.can_write(session.space, i.space)` (space-level, memoisiert) — dieselbe Quelle wie `/api/v1/spaces`, die die Rail einfärbt. `p8_22_smoke.py` bestätigt am 200-Knoten-Datensatz alle drei Kategorien nicht-leer (120 own / 50 shared / 30 foreign), Screenshot `p8_22_01_200_knoten.png` zeigt jetzt sichtbar graue Knoten. **[2026-09-07] Nikinger-Sichtprüfung am echten Gerät gegen v3.0.1 bestätigt** — Screenshot `phase8_5_picker_release/screenshots/Bildschirmfoto 2026-09-07 um 17.08.37.png` zeigt die drei Legenden-Punkte rechts oben (● Eigener Space blau / ● Geteilter Space (schreibbar) türkis / ● Fremder Space grau) plus im Graph türkise + graue + blaue Knoten klar unterscheidbar. |
+| P8-16 (W) | Glass-Fallback bei deaktiviertem `backdrop-filter` / `prefers-reduced-transparency` solide, Auswahl erkennbar | ✅ | C4 ✅ gebaut + `@media (prefers-reduced-transparency: reduce)`-Block in `app.css` (c4c5_smoke prüft Anwesenheit der Regel); **[2026-09-07] empirische Browser-Probe gegen Wegwerf 18775 nachgezogen** — `p8_16_glass_fallback_probe.py` + `wegwerf_setup_p8_16.py` (Chromium, CDP `Emulation.setEmulatedMedia` schaltet `prefers-reduced-transparency: reduce`): `.list__head` + `.overlay__panel` wechseln sauber `backdrop-filter: blur(14px) saturate(1.5)` + `rgba(27,32,39,0.55)` → `backdrop-filter: none` + `rgb(27,32,39)`; Selektion im Solid-Modus mit `background-image: linear-gradient(rgba(62,141,243,.2), rgba(62,141,243,.08))` + `outline: 1px solid rgba(62,141,243,.4)` voll erkennbar (3-px-Default-Rand reserviert, Akzent-Fill aus Vormerkung 3 Punkt 1 + Outline, kein Blur-Sheen); Restore identisch zur Baseline (`matches_reduced: false`). Vier Screenshots `docs/screenshots/p8_16_{01..04}_*.png`. **2026-09-08: Nikinger hat die Screenshots geprüft (u. a. `c4_p816_01_reduced_transparency_solid.png`), zählt unter der neuen Statusregel als live-verifiziert.** |
+| P8-17 (C) | `ui_budget.py` 5/5 grün (Fonts + Sprite + `graph.js`) | ✅ | 124.2/250 KB zuletzt gemessen am 2026-09-02 (Vormerkung 3 Punkt 1 ERLEDIGT) |
+| P8-18 (L) | Übersicht tabellos: Space-Zeilen mit klickbaren Zählern, Graph eingebettet, „Zuletzt benutzt" vorhanden, keine Deko-Kacheln | ✅ | D1 ✅ gebaut + Playwright 5/5 gegen Wegwerf 18767 + 3 Screenshots `d1_{01..03}`; **[2026-09-07] Nikinger-Sichtprüfung am echten Gerät gegen v3.0.1 bestätigt** — Screenshot `phase8_5_picker_release/screenshots/Bildschirmfoto 2026-09-07 um 17.08.37.png` zeigt tabellose Space-Zeilen (`niklas` 7 Notizen/22 Archiv, `fabian` 9 Notizen/4 Archiv, `Home-Server` 2 Notizen, `IT-Sekus-Projekt` 8 Offen/23 Erledigt/19 Notizen/14 Archiv) mit klickbaren Zähler-Chips, VERKNÜPFUNGEN-Graph (~50 Knoten, eigen blau + geteilt türkis + fremd grau klar sichtbar dank Fix B vom 2026-09-02), ZULETZT-BENUTZT-Sektion rechts unten mit drei Items + Timestamps, keine Tile-Cards. Badge `SHAREFYX v3.0.1` links oben (deckt P8-23a mit ab). |
+| P8-19 (L) | Übersicht öffnen → globaler „Alle Items"-Scope in Listen-Spalte | ✅ | D1, gleicher Smoke, V82 explizit getestet (Home-Klick im bereits-globalen Scope ist idempotent); **[2026-09-07] Nikinger-Sichtprüfung am echten Gerät gegen v3.0.1 bestätigt** — Screenshot zeigt Listen-Spalte-Header „Alle Items" mit gemischten Spaces (niklas + IT-Sekus-Projekt + fabian) im globalen Scope. |
+| P8-20 (W) | Graph: Hover dimmt Nicht-Nachbarn, Klick öffnet das Item, Drag/Zoom/Pan funktioniert | ✅ | D2 ✅ gebaut + d2_playwright_smoke 7/7 (Markup, Login, `/api/v1/graph`, Tag-Toggle, Zoom-Readout, Canvas-Pixel); **[2026-09-02] Fix C gebaut** — `onMouseUp` erkennt jetzt Klick vs. Drag (`CLICK_SLOP = 4`, `pressStart`), ruft `selectItem(id)`; eigener `onMouseLeave`-Handler verhindert, dass ein Drag-off-canvas als Klick zählt. **Jetzt explizit Browser-assertiert:** `phase8_e2e_smoke.py` Station 6 (Klick → Item) grün gegen den D2-Wegwerf, Screenshot `p8_24_03_nach_knotenklick.png` zeigt das nach dem Klick geöffnete Item. Drag/Zoom/Pan bleiben Code-Invarianten ohne eigene Assertion (unverändert). **[2026-09-07] Nikinger-Sichtprüfung am echten Gerät gegen v3.0.1 bestätigt** — drei Sub-Punkte a/b/c durchgelaufen: a) Hover dimmt Nicht-Nachbarn und kehrt beim Verlassen zurück, kein Unterschied zwischen eigenen/geteilten/fremden Knoten; b) Klick auf eigenen Knoten öffnet den Editor, auf geteilten/fremden die Nur-lesen-Ansicht, ESC zurück zur Übersicht funktioniert in beiden Fällen; c) Drag + Pan + Zoom (10 Stufen rauf/runter) ohne Ruckler, Drag-off-Knoten öffnet das Item nicht. Eine Login-Sitzung am live v3.0.1 |
+| P8-21 (W) | Tag-/Ordner-Toggles wirken; Default nur explizite Kanten; >15-Knoten-Tag → keine Clique | ✅ | D2 ✅ gebaut + d2_smoke (Tag-Toggle ON erweitert sichtbar, >15-Knoten-Cutoff-Riegel in Code); **[2026-09-07] Nikinger-Sichtprüfung am echten Gerät gegen v3.0.1, drei Sub-Punkte a/b/c durchgelaufen**: a) Default zeigt nur explizite Frontmatter+Body-Kanten, keine Tag/Ordner-Kanten (API-Response gegengeprüft), b) Tag-Toggle erweitert sichtbar und kehrt zurück, c) Ordner-Toggle erweitert sichtbar und kehrt zurück. **Sub-Punkt d, 2026-09-08 geschlossen:** exakte Instrumentierung (`p8_21d_tag_cutoff_probe.py`, `CanvasRenderingContext2D`-Patch zählt gezeichnete Tag-Kanten pro Frame über den Frame-Teiler-Trick aus expliziten Kanten) gegen den 200-Knoten-Wegwerf — **genau 10.0 Tag-Kanten/Frame** (exakt `spitze`s `C(5,2)=10`, `last-200` [200 Knoten] und alle 12 `gruppe-NN` [~16-17 Knoten] korrekt ausgeschlossen), Screenshot `c3rest_p821d_01_200knoten_tag_clique_limit.png`, vom Nikinger geprüft. |
+| P8-22 (W) | 200-Knoten-Wegwerf-Datensatz: Simulation kommt < 3 s zur Ruhe, Interaktion ohne Hakeln; `prefers-reduced-motion` rendert statisch | ✅ | **[2026-09-08] erneut gegen den 200-Knoten-Wegwerf gefahren, unverändert 5/5 grün** (sichtbare Ruhe 2655.6 ms, Screenshots `c3rest_p822{a,b,c}_01_*.png` vom Nikinger geprüft — Settle-Zeit ist eine gemessene Zahl, „ohne Hakeln" bleibt sein Sichturteil auf dem Screenshot, nicht nur die Frame-Timing-Zahl). **[2026-09-02] Fix A gebaut, erneut gegen den 200-Knoten-Wegwerf gemessen: 5/5 Kriterien erfüllt.** `ALPHA_DECAY` 0.985→0.97 UND `ALPHA_MIN` 0.005→0.01 (nicht nur eine Konstante — mit `ALPHA_DECAY` allein bei unverändertem `ALPHA_MIN` wären es 174 Ticks ≈ 2.90 s gewesen, ~40 ms Marge auf einem gerade gerissenen Kriterium). Gemessen: **152 Ticks in 2509.2 ms, sichtbare Ruhe 2694.6 ms** nach dem ersten Animationsframe (Budget 3000 ms, mehrere Läufe zwischen 2650–2740 ms), Frame-p50 weiterhin 16.7 ms (60 fps). Interaktion ohne Hakeln, Tag-Toggle mit >15-Riegel und `prefers-reduced-motion` unverändert grün. Zwei Bugs im Smoke-Skript selbst gefunden+behoben, die die Wiederholung sonst verdeckt hätten: `step3_interaction`s Drag-Simulation feuerte `mouseup` an der ursprünglichen statt der zuletzt gedraggten Position (sah nach Fix C wie ein Klick aus, öffnete das Item, Übersicht verschwand samt Tag-Toggle-Checkbox). Befund + Optionen weiterhin in Plan §9.4.6, jetzt mit der Nikinger-Entscheidung + Messwerten. Throwaway-verifiziert, **nicht live** |
+| P8-23 (L) | `v3.0`-Badge live, UPDATE_LOG-Eintrag vorhanden, Health-Gate 3/3 nach Deploy | ✅ | D3 ✅ alles vorbereitet (`.rail__version` v3.0 in `app.html`; `docs/UPDATE_LOG.md` oberster Eintrag 2026-09-02 mit vier Bullet-Points: Übersicht tabellos, Verknüpfungs-Graph, globaler Home-Scope, Mini-Legende); **[2026-09-05] Deploy als Nikinger-Aktion gelaufen** (Release `20260905T140325.378914Z`, HEAD `6f19a8f`, Service-PID 355956); **[2026-09-07] Nikinger-Sichtprüfung am echten Gerät gegen v3.0.1 bestätigt** — Badge `SHAREFYX v3.0.1` links oben im Screenshot; Update-Banner `## 2026-09-05` mit den drei Zeilen (Picker-Modi / Tastatur / Generalisierter-Hint) laut D4-Sichtprüfungs-Bericht 2026-09-06 sichtbar; Health-Gate-Teil ✅ durch `scripts/health_gate.sh` 8/8 grün 2026-09-05 15:19:53Z. |
+| P8-24 (W) | Playwright-Durchlauf gegen Wegwerf: Übersicht → Scope → Graph → Knotenklick → Item | ✅ | **[2026-09-08] erneut gegen D2-Wegwerf gefahren, unverändert 6/6 grün**, vier Screenshots `c3rest_p824_0{1..4}_*.png` vom Nikinger geprüft. **[2026-09-02] Fix C gebaut, Ritt wiederholt: 6/6 Stationen bestanden** (D2-Wegwerf 18768). Station 6 (Knotenklick → Item) grün: der erste Lauf traf einen fremden `beta`-Knoten und öffnete die Nur-lesen-Ansicht („Beta Notiz zwei"), der unabhängige Wiederholungslauf traf einen eigenen `alpha`-Knoten und öffnete den Editor („Erste Notiz", `editor_open=1`/`readonly_open=0`) — beide Pfade grün, `p8_24_03_nach_knotenklick.png` zeigt den zweiten. Zweiter Bug im Smoke-Skript selbst gefunden+behoben: Station 6 prüfte nicht-existente DOM-IDs (`#editor`/`#readonly-view`/`.readonly` statt der echten `#detail-editor`/`#detail-readonly`, `phase5_ui/webui/static/app.html:126/138`) — hätte einen funktionierenden Klick nie als Erfolg erkannt, unabhängig vom Fix. **200-Knoten-Datensatz bewusst NICHT für diesen Ritt verwendet** — Station 3 (globaler Scope, Idempotenz-Check über zwei Zeilenzahl-Lesungen) brach dort aus einem unrelated Grund (Zeilenzahl driftete 40→50 zwischen den Lesungen, `DEFAULT_LIMIT=50` + Render-Timing bei 200 Items, keine Verbindung zu den drei Fixes) — laut Plan-Fallback auf den D2-Wegwerf gewechselt. Throwaway-verifiziert, **nicht live** |
+| P8-25 (C) | C0-Findings-Tabelle existiert im Phase-Head; jeder Fund auf Step gemappt oder als benannte Nikinger-Entscheidung eskaliert | ✅ | Tabelle in §C0 (35 Einträge, 0 eskaliert, alle auf C1–C5/D1 gemappt oder bereits aligned) |
+| P8-26 (W) | Fundament: opencode steuert nachweislich einen Browser gegen eine Wegwerf-Instanz (Smoke-Test 0.8) | ✅ | Step 0 abgeschlossen, V93 erfüllt (opencode-Setup inkl. Playwright-MCP) |
+
+### Sichtprüfungs-Status (Plan §8)
+
+| Sichtprüfung | Status | Notiz |
+|---|---|---|
+| Sichtprüfung 1 (Plan §8, nach C1+C2) | 🟡 | 9 Screenshots vorliegen (Plex Sans + Mono + Lucide-Icons), Inline-Bewertung „UI is fixed now" deutet Sichtprüfung als akzeptiert; formaler Lauf am echten Gerät offen |
+| Sichtprüfung 2 (Plan §8, in D) | 🟡 | 26-Item/3-Space-Wegwerf-Setup 18769, 6 Screenshots `sp2_*`; **echtes Gerät + Live-Build (v3.0 inkl. D) steht aus** |
+| Sichtprüfung 3 (Plan §8, nach C4+C5) | 🟡 | 4 Screenshots `c4c5_*`; „UI is fixed now" vorläufige Bestätigung, formal offen am echten Gerät |
+
