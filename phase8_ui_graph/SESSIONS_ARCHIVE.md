@@ -3,7 +3,7 @@ status: live
 purpose: Archiv älterer Session-Blöcke aus phase8_ui_graph/CLAUDE.md — newest-first, verbatim per Rotationsregel
 read-when: nur wenn der aktuelle Session-Block im Phase-Head nicht reicht und Verlauf gebraucht wird
 detail: L3
-updated: 2026-09-02 (Vormerkung-3-Punkt-1-Block nach Fixes-A/B/C-Session (Settle-Zeit,
+updated: 2026-09-08 (Fixes-A/B/C-Block (2026-09-02) nach dem Z-Closeout ins Archiv -- 27 Bloecke newest-first, Phase-8-Head jetzt mit dem neuen Z-Closeout-Block allein) | 2026-09-02 (Vormerkung-3-Punkt-1-Block nach Fixes-A/B/C-Session (Settle-Zeit,
 Foreign-Farbe, Knotenklick, Plan §9.4.6) ins Archiv -- 26 Bloecke newest-first, Phase-8-Head
 jetzt mit dem neuen Session-Block allein; Head 115.9KB->88.2KB, weiterhin ueber 40KB-Softcap
 benannt) | 2026-09-02 (Escalation-Block nach Vormerkung-3-Punkt-1-Session (Listenzeilen-Fill vereinheitlicht) ins Archiv -- 25 Bloecke newest-first, Phase-8-Head jetzt mit dem neuen Session-Block allein; Head 81.2KB->70.1KB, weiterhin ueber 40KB-Softcap benannt) | 2026-09-02 (Chevron-Vorbild-Block nach Escalation-Session (Vormerkung-3-Fixes + Deploy-Fund) ins Archiv -- 24 Bloecke newest-first, Phase-8-Head jetzt mit Escalation-Block allein; Head 75.0KB->65.8KB, immer noch ueber 40KB-Softcap benannt) | 2026-09-02 (C4+C5-Block nach Chevron-Vorbild-Session ins Archiv -- 23 Bloecke newest-first, Phase-8-Head jetzt mit Chevron-Vorbild-Block allein; Head 70.3KB->60.2KB, immer noch ueber 40KB-Softcap benannt -- Selection/Choice-Konvention-v3-Block + neuer Session-Block plus umfangreiche Vormerkung-1-ERLEDIGT-Erlaeuterung) | 2026-09-02 (D3-Block nach C4+C5-Session ins Archiv -- 22 Bloecke newest-first, Phase-8-Head jetzt mit C4+C5-Block allein; Head 50.8KB ueber 40KB-Softcap benannt -- Glas-Träger-Regeln + gruppierte Selektor-Liste am Dateiende plus ausführlicher Session-Block mit allen Verifikations-Belegen) | 2026-09-02 (D2-Block nach D3-Session ins Archiv -- 21 Bloecke newest-first, Phase-8-Head jetzt mit D3-Block allein) | 2026-09-02 (D1-Block nach D2-Session ins Archiv -- 20 Bloecke newest-first, Phase-8-Head jetzt mit D2-Block allein) | 2026-09-02 (C3-Block nach D1-Session ins Archiv -- 19 Bloecke newest-first, Phase-8-Head jetzt mit D1-Block allein; Head 41.8KB->45.1KB ueber Softcap benannt) | 2026-09-01 (Sichtpruefung-1-Block (vom Vortag) nach C3-Rotation ins Archiv gewandert -- jetzt 18 Bloecke newest-first; Phase-8-Head wieder unter dem 40KB-Softcap) | 2026-09-01 (zwölfte Rotation, 17 Blöcke)
@@ -12,6 +12,179 @@ updated: 2026-09-01 (zwoelfte Rotation: C2-Block ins Archiv nach Screenshots+REA
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8
+
+## Session stopped — 2026-09-02 (Fixes A/B/C aus §9.4.6 gebaut: Settle-Zeit, Foreign-Farbe, Knotenklick)
+
+**Auftrag:** Nikinger hat die drei in Plan §9.4.6 vorgelegten Befunde entschieden — Option
+**(a)** für alle drei, bei Befund A mit einer Verschärfung (beide Konstanten statt nur
+`ALPHA_DECAY`). Auftrag: die drei Fixes bauen, mit den bereits existierenden Smokes
+(`p8_22_smoke.py`, `phase8_e2e_smoke.py`) verifizieren, Doku im selben Commit nachziehen. Zwei
+Korrekturen an der Options-Vorlage selbst waren Teil des Auftrags: Option A(b) war
+arithmetisch nie tragfähig (`ALPHA_MIN` 0.005→0.02 allein ergibt ~259 Ticks ≈ 4.31 s, weiterhin
+über dem Budget), Option B(a)s Begründung "analog zu `serializers.py`s `shared`-Feld" war
+falsch (dieselbe Näherung wie der Bug, kein Vorbild — das echte Vorbild ist `/api/v1/spaces`).
+
+**Fix A — `phase5_ui/webui/static/js/graph.js`:** `ALPHA_MIN` 0.005→0.01, `ALPHA_DECAY`
+0.985→0.97 (Zeilen ~71-72). Modul-Header-Kommentar (Zeilen 19-29) von der widerlegten
+Behauptung "200 Knoten erreichen Ruhe in <3s" auf die gemessene Wahrheit + die neue Rechnung
+umgeschrieben, mit Datum. `MAX_TICKS_REDUCED = 300` unverändert gelassen, aber kommentiert:
+nicht mehr die bindende Grenze für `prefers-reduced-motion` (Schleife endet jetzt schon bei
+~151 Ticks am `ALPHA_MIN`-Abbruch).
+
+**Fix B — `phase5_ui/webui/api.py :: _graph_get`:** Knoten-Feld `"shared": i.space !=
+session.space` ersetzt durch `"writable": _writable(i.space)`, wobei `_writable()` eine lokale
+Closure ist, die `permissions.can_write(session.space, space)` **pro Space memoisiert**
+(ein `dict` außerhalb der List Comprehension — bei 200 Knoten ~3 Aufrufe statt 200). Kein neuer
+`mcpserver`-Import (P5-B-Disziplin: weiterhin nur `SharePolicy`, `permissions` war als Parameter
+bereits im Scope der Factory). Docstring korrigiert (war "acht Felder", die Liste hatte immer
+neun) + neuer Absatz, der erklärt, woher `writable` kommt und warum NICHT `serializers.py`
+das Vorbild ist. `phase5_ui/webui/static/js/graph.js :: nodeColor()` auf `n.writable` statt
+`n.shared` umgestellt, Kommentar korrigiert (behauptete vorher fälschlich, `spaceCategory()`
+werde hier nicht benutzt — der Code rief sie längst auf).
+
+**Fix C — `phase5_ui/webui/static/js/graph.js`:** `selectItem` aus `editor.js` importiert
+(kein Zyklus — nur `app.js` importiert `graph.js`). Neue Konstante `CLICK_SLOP = 4`, neuer
+Modul-Zustand `pressStart`. `onMouseDown` merkt sich `{x, y, node}` (node `null` bei
+Hintergrund-Press). `onMouseUp` vergleicht die Pointer-Position gegen `pressStart`; bei einer
+Bewegung < `CLICK_SLOP` UND einem getroffenen Knoten: `selectItem(pressStart.node.id)
+.catch(reportUnexpectedError)`. **Die im Plan benannte Falle vermieden:** `mouseup` und
+`mouseleave` teilten sich vorher denselben Handler — mit der neuen Klick-Erkennung hätte ein
+Drag, das den Canvas verlässt, eine Selektion ausgelöst. Eigener `onMouseLeave`-Handler
+registriert (nur Reset, nie `selectItem`), `mouseleave`-Listener umgehängt.
+
+**Tests (`phase5_ui/tests/test_graph.py`):** `shared` → `writable` in der bestehenden
+Happy-Path-Assertion + im Neun-Felder-Set (Kommentar von "acht" auf "neun" korrigiert). Neuer
+Test `test_graph_node_writable_reflects_space_level_write_grant`: zwei fremde Spaces, einer nur
+`read:`-geteilt (`writable: False` erwartet), einer `write:`-geteilt (`writable: True`
+erwartet) — der eigentliche Regressionswächter für den Bug, ohne den er lautlos zurückkommen
+könnte. 9/9 `test_graph.py` grün, Gesamtsuite 959/959 (958 + 1 neu).
+
+**Verifikation — die Smokes sind der Beweis, keine Proxy-Metrik:**
+
+1. `pytest -q` → **959/959 grün** (261 s). Kein Tabu-Diff-Treffer (`phase4_auth/`,
+   `phase2_mcp/`, `webui/security.py`, `storage/{models,frontmatter,files,patch,acl,history}.py`
+   — leer).
+2. `ui_budget.py` → **5/5 grün**, `app.js + app.css + Font (gzip)` **125.8 KB** (vorher 124.2 KB,
+   +1.6 KB durch `graph.js`-Wachstum — weiterhin weit unter dem 250 KB-Budget).
+3. **200-Knoten-Wegwerf (Port 18772) + `p8_22_smoke.py` (e2e-venv): 5/5 Kriterien, im ersten
+   Versuch 4/5** — Station "Tag-Toggle" schlug fehl (`#overview-graph-toggle-tags` "element is
+   not visible"), weil `step3_interaction`s Drag-Simulation `mouseup` an der ursprünglichen
+   `target`-Position statt der zuletzt gedraggten Position feuerte: mit Fix C sah das nach
+   einem Klick auf den Knoten aus, `selectItem` navigierte weg von der Übersicht, die Toggle-
+   Checkbox verschwand aus dem DOM. Root Cause gefunden (nicht geraten — `dx=dy=0` zwischen
+   `mousedown`- und `mouseup`-Koordinaten im Skript nachgerechnet), `p8_22_smoke.py` korrigiert
+   (`mouseup` feuert jetzt an `dragEndX/dragEndY`, mit Kommentar). Zusätzlich: der `[FUND]`-Print
+   über `shared` vs. `writable` in `step1_payload` durch eine echte Assertion ersetzt
+   (`own > 0 and shared > 0 and foreign > 0`), Text auf Vergangenheitsform + Fix-Datum
+   umgeschrieben. Danach durchgehend grün: **sichtbare Ruhe 2694.6 ms** nach dem ersten
+   Animationsframe (Budget 3000 ms; drei weitere Läufe zwischen 2650–2740 ms), **152 Ticks in
+   2509.2 ms**, Frame-p50 16.7 ms (60 fps, unverändert nicht compute-bound); `/api/v1/graph`
+   liefert **120 own / 50 shared / 30 foreign** (vorher wäre `foreign` strukturell 0 gewesen);
+   Interaktion ohne Hakeln (hover/drag/wheel p95 < 1 ms, wheel-Ausreißer bis 6.5 ms, weit unter
+   dem 16.7 ms-Budget); Tag-Toggle mit >15-Riegel wirkt; `prefers-reduced-motion` 0
+   `graph.js`-Frames, Canvas über 600 ms unverändert. Zwei Screenshots überschrieben
+   (`p8_22_01_200_knoten.png`, `p8_22_02_reduced_motion.png` — beide zeigen nach Fix B jetzt
+   sichtbar graue Knoten). **Alter Stand vorher gesichert:** `p8_22_01_vor_settle_fix.png`
+   (Vorher-Vergleich, ausschließlich blau/türkis, kein Grau) — visuell gegengeprüft (Read auf
+   beide Bilder): die neue Layout-Verteilung ist der alten vergleichbar dicht/verteilt, kein
+   sichtbares Verklumpen — Fix A freigegeben, kein Rückfall auf Option (c).
+4. **Kombinierter E2E-Ritt (`phase8_e2e_smoke.py`):** erst gegen den 200-Knoten-Wegwerf
+   versucht (wie in der Aufgabe vorgeschlagen) — Station 3 (globaler Scope, Idempotenz über
+   zwei Zeilenzahl-Lesungen) brach mit 40→50 Zeilen zwischen den Lesungen, ein Effekt aus
+   `DEFAULT_LIMIT=50` (`webui/api.py`) plus DOM-Render-Timing bei 200 Items, **ohne
+   Zusammenhang mit den drei Fixes** — laut Aufgaben-Fallback auf den **D2-Wegwerf (Port
+   18768)** gewechselt. Dort **6/6 Stationen grün**, inklusive der neuen Station 6
+   (Knotenklick → Item: Klick auf einen `beta`-Knoten öffnete die Nur-lesen-Ansicht "Beta Notiz
+   zwei", Screenshot `p8_24_03_nach_knotenklick.png` zeigt sie). **Zweiter Skript-Bug
+   gefunden+behoben:** `station6_node_click` prüfte `#editor`/`#readonly-view`/`.readonly`/
+   `#readonly-title` — keine dieser IDs/Klassen existiert in `app.html` (echt: `#detail-editor`/
+   `#detail-readonly`/`#ro-title`, `phase5_ui/webui/static/app.html:126-140`). Ohne diesen Fix
+   hätte Station 6 **auch bei funktionierendem Klick** weiter FAIL gezeigt — beim Nachprüfen
+   aufgefallen, weil `#field-title` (korrekt) schon einen echten Knotentitel lieferte, während
+   `editor_open`/`readonly_open` beide 0 blieben. `[FUND]`-Text im Skript auf den neuen,
+   tatsächlichen Fehlerfall umgeschrieben (öffnet das Item nicht / falsche Selektoren), Docstring
+   der Funktion trägt die Korrekturnotiz. Drei Screenshots überschrieben (`p8_24_01..03`, jetzt
+   vom D2-Datensatz statt vom 200-Knoten-Datensatz — historisch identische Dateinamen, neuer
+   Inhalt).
+5. **Beide Wegwerf-Instanzen sauber abgebaut** (`wegwerf_setup_200knoten.py cleanup`,
+   `wegwerf_setup_d2.py cleanup`, je PID-Datei, kein `pkill -f`). **Produktion unangetastet:**
+   `systemctl show sharefyx-mcp.service -p MainPID,ActiveEnterTimestamp` → `MainPID=195922`,
+   `ActiveEnterTimestamp=Wed 2026-09-02 11:51:57 CEST` — identisch vor und nach der gesamten
+   Sitzung, kein `systemctl`-Verb ausgeführt.
+
+6. **Unabhängige Nachverifikation durch Claude Code (Opus), 2026-09-02 abends.** Der
+   ausführende Sonnet-Agent lief nach Punkt 5 in ein Session-Limit (HTTP 429), **bevor** er
+   committen konnte; Claude Code hat den Stand übernommen, den Diff Datei für Datei gelesen und
+   **beide Smokes selbst neu gefahren** statt die Zahlen des Agenten zu übernehmen — die
+   Wegwerf-Instanzen waren zu dem Zeitpunkt bereits abgebaut, also frisch aufgesetzt:
+   - 200-Knoten-Wegwerf (Port 18772, neu aufgesetzt): `p8_22_smoke.py` **5/5**, sichtbare Ruhe
+     **2685.5 ms** (Agent maß 2694.6 ms — Differenz im Rauschen), **152 Ticks in 2511.4 ms**,
+     Frame-Abstand p50 16.7 ms / max 19.4 ms, `/api/v1/graph` **120 own / 50 shared / 30
+     foreign** über 200 Knoten und 206 explizite Kanten (Fix B: alle drei C3-Kategorien real
+     besetzt, vorher wäre `foreign` strukturell 0 gewesen), hover/drag/wheel p95 ≤ 0.5 ms,
+     `prefers-reduced-motion` 0 `graph.js`-Frames.
+   - D2-Wegwerf (Port 18768, neu aufgesetzt): `phase8_e2e_smoke.py` **6/6**, Station 6
+     `editor_open=1`, angezeigter Titel „Erste Notiz" = Knotentitel (dieser Lauf traf einen
+     eigenen `alpha`-Knoten, der Lauf des Agenten einen fremden `beta`-Knoten mit
+     Nur-lesen-Ansicht — beide Pfade grün; die drei `p8_24_*`-Screenshots stammen aus diesem
+     zweiten Lauf und wurden entsprechend nachgezogen).
+   - `pytest -q` **959/959 grün in 257.86 s** (eigener Lauf, Exit 0 — bestätigt die Zahl des
+     Agenten: 958 vorher + 1 neuer Regressionstest), `ui_budget.py` 5/5 („Alle 5 Messgrößen im
+     Zielkorridor"), Tabu-Diff §0.4 leer (eigener Lauf), nach dem Abbau kein Port 187xx mehr offen, Produktion weiterhin `MainPID=195922` /
+     `ActiveEnterTimestamp=Wed 2026-09-02 11:51:57 CEST` (Journal: genau ein Stop/Start heute,
+     11:51:57 — der Nikinger-Restart vom Vormittag, Stunden vor dieser Sitzung).
+
+**Nicht Teil der drei Befunde, aber notwendig, um sie zu verifizieren — zwei Bugs in den
+Smoke-Skripten selbst behoben** (siehe Punkte 3/4 oben): `p8_22_smoke.py`s Drag-Mouseup-Position
+und `phase8_e2e_smoke.py`s Station-6-Selektoren. Beide waren vor Fix C unsichtbar (der alte
+`onMouseUp` ignorierte Position/DOM-Zustand komplett), sind jetzt aber echte Voraussetzungen für
+eine korrekte Messung — kein Scope-Kriechen, sondern der Preis dafür, dass Fix C tatsächlich
+etwas am System ändert, das die Skripte vorher nie beobachten konnten.
+
+**Doku-Updates im selben Commit (Hard Rule 8):**
+
+- `docs/concepts/phase8_ui_graph_plan.md`: §9.4.5-Ledger-Zeile "Neu in P8 (2026-09-02, aus den
+  200-Knoten-/E2E-Smokes)" auf "geschlossen in diesem Commit" gesetzt; §9.4.6 um die
+  Nikinger-Entscheidung + beide Korrekturen (A(b) arithmetisch tot, B(a)-Begründung falsch)
+  ergänzt, Optionen-Text selbst unverändert (Entscheidungsverlauf bleibt lesbar); §3 B3 +
+  §5 D2 mit datierten Korrekturnotizen (Feldname, Alpha-Konstanten, Klick-Pfad jetzt gebaut).
+- `phase8_ui_graph/CLAUDE.md`: Modul-Status Block-D-Zeile um die drei Fixes ergänzt; §7-Matrix
+  P8-15/P8-20/P8-22/P8-24 mit neuen Belegen (Messwerte, Screenshots, Fix-Beschreibung) — **keine
+  Zeile auf ✅ gehoben**, alle vier bleiben 🟡 (throwaway-, nicht live-verifiziert). Nebenbei
+  einen stehengebliebenen Bilanz-Zähler-Widerspruch korrigiert ("9 🟡 · 2 ⬜" vs. der eigenen
+  Aufzählung direkt darunter, die schon 10 🟡/0 ⬜ auflistete) — Drift aus der
+  Step-Z-Vorstufen-Session, kein Effekt dieser Sitzung, hier mit Datum gefixt. Bilanz-Zahl
+  selbst unverändert (15 ✅ · 10 🟡 · 0 ⬜) — kein Glyphen-Sprung, wie gefordert.
+- `docs/INDEX.md`: Frontmatter-`updated:`-Zeile um diesen Eintrag ergänzt.
+- Session-Block rotiert (`scripts/rotate_session_block.sh phase8_ui_graph`, nachdem dieser
+  Block angehängt war — das Skript verlangt zwei `## Session stopped`-Marker, um etwas zu
+  bewegen; mit nur einem meldet es "bereits konform" und tut nichts, wie diese Sitzung
+  empirisch bestätigt hat. Der Auftragstext "erst rotieren, dann schreiben" war insofern nicht
+  wörtlich ausführbar — mechanisch richtig ist: neuen Block anhängen, dann rotieren).
+
+**Was diese Sitzung NICHT gemacht hat (bewusst, außerhalb des Auftrags):**
+
+- Keine Live-Verifikation, kein Deploy, kein Push. Alle vier Zeilen bleiben 🟡.
+- Kein Fix für die weiterhin offenen Restdefekte A3 Klammer/Aufzählung, Item-Link-Picker-Body,
+  Picker-A11y (§9.4.1-§9.4.3) — nicht Teil dieser drei Befunde.
+- `MAX_TICKS_REDUCED` unverändert (nur kommentiert, nicht geändert — war nicht Teil der
+  Nikinger-Entscheidung).
+
+**Commit:** ein Commit für Fixes A/B/C + Test + zwei Smoke-Skript-Korrekturen + alle
+Doku-Updates (eine Entscheidungs-Charge, ein Verifikationslauf). Hash wird nach dem Commit vom
+Nikinger im `git log` gesehen — diese Notiz zitiert bewusst kein Hash-Präfix (Henne-Ei: die
+Notiz ist Teil desselben Commits, den sie beschreibt).
+
+**Verbleibend für die nächste Session (unverändert von vorher):**
+
+- **Nikinger-Sichtprüfung 2 + 3** am echten Gerät gegen den dann deployten v3.0-Build
+  (P8-14, P8-15, P8-16, P8-18, P8-19, P8-23) — jetzt inklusive der drei frisch gebauten Fixes.
+- **A3 Klammer/Aufzählung** + **Item-Link-Picker-Body-Lücke** + **Picker-A11y** bleiben
+  wie dokumentiert (§9.4.1-§9.4.3), keine dieser drei angefasst.
+- **Glyphe ✅/🟡** ist weiterhin Nikinger-Entscheidung nach Live-Deploy + Sichtprüfung.
+
+**Keine Push.** Lokaler Commit, bleibt liegen bis zum nächsten deploy-Bündel oder bis der
+Nikinger die Fixes + Doku-Update abgenickt hat.
 
 ## Session stopped — 2026-09-02 (Vormerkung 3 Punkt 1 gebaut: Listenzeilen-Fill vereinheitlicht)
 

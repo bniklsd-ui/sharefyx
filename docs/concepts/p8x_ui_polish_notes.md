@@ -10,7 +10,7 @@ down:
   - ../phase8_5_picker_release/SESSIONS_ARCHIVE.md     # Phase-8.5-Historie (D4 archiviert)
   - ../docs/concepts/phase8_ui_graph_plan.md            # §9.4.7 Phase-Status + p8.X-Übergabepunkt
   - ../phase8_ui_graph/SESSIONS_ARCHIVE.md              # §9.4.6 drei Restdefekte (Settle-Zeit / Foreign-Farbe / Knotenklick — bereits am 2026-09-02 geschlossen, hier referenziert)
-updated: 2026-09-06 (Sichtprobe-Folgesession durch den Nikinger mit Fabian — **nur dokumentiert, kein Code-Touch**; neue Datei, sieben Themen-Cluster aus dem Bericht: 1. Spaces-Layout-Reorganisation [„alle Items"-Leiste unter Spaces + Map 40 % Breite/volle Höhe], 2. Obsidian-Map-Performance + Style [Reload-Overload + Landkarten-Stil + Collapsible mit Abhängigkeiten + Map-Field schneidet ab + Map-Reload-Drift], 3. Anzahl-Anzeige pro Ordner, 4. Edit-in-Place-Vision [„Bearbeiten"-Knopf überflüssig], 5. Layering-Design-System [3 Layer: echtes Schwarz / aktueller Standard / Liquid Glass, Selektion explizit blau], 6. „Konto" → „Einstellungen"-Rename + Positions-Tausch mit Logout, 7. Weiterer De-AI-ierungslauf nach **neuen** Kriterien; fünf bereits in D4 dokumentierte p8.X-Punkte [UX-2-Step-Knotenklick, Map-Field schneidet ab, Map fliegt, Save-Button-YAML-Header, Fabi-Sammelliste] hier zusammengeführt + Duplikatverweis; offen: was NICHT in p8.X gehört; nächstes: Planungs-Session in Claude Code, sobald die aktive Phase 8.5 Z durch ist)
+updated: 2026-09-08 (Phase-8.5-Sichtprüfungs-Folge-Sitzung am echten Gerät — drei weitere User-Feedback-Punkte in §6/§8/§9 angehängt; §6 Konto/Einstellungen-Rename re-affirmiert mit Datum + Klarstellung der drei möglichen Vertausch-Lesarten (a/b/c) gegen den aktuellen Code-Stand `app.html:31-41`; **§8 NEU — customizable Tags for tasks (kosmetisch) + Standard-Tag „blocked"** mit Aufteilung in §8.1 (User-Palette als `localStorage`, Server unverändert) und §8.2 (fester Code-Tag, offen ob kosmetisch oder mit Bucket-Semantik); **§9 NEU — direkter User-Feedback-Button** mit drei plausiblen Senken (User-Space / `/var/log/sharefyx/feedback/` / externer Endpunkt) + UI-Platzierungs-Vorschlag Rail-Unterkante + Klärungsfragen zur Planungs-Session; §E chronologische Tabelle um drei Zeilen 2026-09-08 ergänzt; **kein Code-Touch, nur Doku**; Phase-8.5-Head §Session stopped bekommt einen neuen Sub-Session-Block; pytest nicht gelaufen (kein Python-Touch), Tabu-Diff §0.3 leer, Service-Touch 0) | 2026-09-06 (Sichtprobe-Folgesession durch den Nikinger mit Fabian — **nur dokumentiert, kein Code-Touch**; neue Datei, sieben Themen-Cluster aus dem Bericht: 1. Spaces-Layout-Reorganisation [„alle Items"-Leiste unter Spaces + Map 40 % Breite/volle Höhe], 2. Obsidian-Map-Performance + Style [Reload-Overload + Landkarten-Stil + Collapsible mit Abhängigkeiten + Map-Field schneidet ab + Map-Reload-Drift], 3. Anzahl-Anzeige pro Ordner, 4. Edit-in-Place-Vision [„Bearbeiten"-Knopf überflüssig], 5. Layering-Design-System [3 Layer: echtes Schwarz / aktueller Standard / Liquid Glass, Selektion explizit blau], 6. „Konto" → „Einstellungen"-Rename + Positions-Tausch mit Logout, 7. Weiterer De-AI-ierungslauf nach **neuen** Kriterien; fünf bereits in D4 dokumentierte p8.X-Punkte [UX-2-Step-Knotenklick, Map-Field schneidet ab, Map fliegt, Save-Button-YAML-Header, Fabi-Sammelliste] hier zusammengeführt + Duplikatverweis; offen: was NICHT in p8.X gehört; nächstes: Planungs-Session in Claude Code, sobald die aktive Phase 8.5 Z durch ist)
 ---
 
 # p8.X — UI-Polish & Iterations (Notizen, keine Planung)
@@ -300,12 +300,26 @@ Claude Code, weil Layout-übergreifend.
 mit dem Logout-Button tauschen. **Resultat vermutlich:** Einstellungen oben (häufiger
 gebraucht), Logout unten (selten gebraucht, weniger prominent).
 
+**[2026-09-08, Re-Affirmation durch den Nikinger]** in der Phase-8.5-Sichtprüfungs-
+Folge-Sitzung am echten Gerät — der Punkt ist weiterhin offen und gewollt, kein
+Seiteneffekt einer anderen Änderung. Wortlaut aus dem Sitzungs-Prompt: „change the
+„Konto" and „abmelden" Button Position and change „Konto" to „Einstellungen" that's
+more suiting."
+
 **Offene Fragen:**
 
 - Genauer Tausch: nur die zwei Buttons, oder Reihenfolge aller Punkte im
   Account-Menü?
 - Sind weitere Menüpunkte betroffen? (TOTP-Reset, Passwort-Änderung,
   Recovery-Code, Space-Wechsel — hängen die an „Konto" oder „Einstellungen"?)
+- **Aktueller Code-Stand:** `app.html:31-41` rendert Konto (Zeile 32-34) **vor**
+  Abmelden (Zeile 38-40) im Block `.rail__account`. „Vertauschen" kann also nur
+  bedeuten: (a) Abmelden über Konto setzen (Logout oben, Einstellungen unten —
+  widerspricht der Interpretation oben), (b) Konto/Logout **beide** an eine andere
+  Stelle im Rail verschieben (z. B. „Einstellungen" ganz oben, „Abmelden" ans
+  Rail-Ende), oder (c) den Konto-Knopf vom Logout-Knopf durch eine visuelle
+  Trennung klarer unterscheiden (Konto gefüllt/Sektion-Header, Logout als
+  Sekundäraktion). **Klärung in der Planungs-Session nötig**, nicht raten.
 
 **Bezug:** Phase 5 Block A (Auth-Selbstverwaltung, `phase5_ui/webui/static/
 app.html` / `pages.py`). Kleiner Fix, vermutlich 5–10 Zeilen + ein i18n-String-
@@ -356,6 +370,155 @@ Vermutlich eine Session in Claude Code (researchlastig), keine opencode/M3-Sessi
 
 ---
 
+## §8 Tags für Aufgaben — konfigurierbar + Standard „blocked" (2026-09-08)
+
+**Finding (Nikinger, 2026-09-08, Phase-8.5-Sichtprüfungs-Folge-Sitzung am echten
+Gerät):**
+
+> 1. customizable Tags for tasks (only cosmetic) as well as a „blocked" Standard Tag.
+
+**Zwei Teilpunkte:**
+
+### §8.1 Customizable Tags (kosmetisch)
+
+Heute ist das Tag-Feld ein freier Texteingabe (`#field-tags`, `editor.js:154`/`352`)
+mit Komma-Trennung — alles geht, nichts ist „kanonisch". Die Wunschvorstellung:
+nutzer-kuratierte Tag-Liste, aus der im Editor bequem gewählt werden kann
+(Klick → Tag togglen, statt tippen), mit selbst-definierten Farben oder
+zumindest unterscheidbaren Chips. **„Only cosmetic":** die Tag-Auswahl ist **rein
+visuell / organisatorisch** — keine Server-Semantik, keine Filterlogik im
+Graphen ändert sich, keine Rechteauswirkung. Der Server kennt weiterhin nur
+eine Liste von Strings pro Item; die App kuratiert die *Eingabe*, nicht die
+*Interpretation*.
+
+**Heutiger Stand (Code, vor jedem Build zu lesen):** `editor.js:154`
+`tags: fieldTagsEl.value.split(",").map(s => s.trim()).filter(Boolean)` —
+reiner String-Split, keine Autocomplete-Logik, keine Tag-Wissen. `list.js:144`
+zeigt die Tags im Read-View als komma-separierte Liste; im Editor steht der
+Wert 1:1 in einem `<input type="text">`.
+
+**Mögliche Umsetzung (zur Diskussion, nicht autoritativ):**
+
+- `localStorage["sfx:tags:palette"]` als Array `[{name, color?}]`, vom User
+  im Settings-Dialog pflegbar (vermutlich in dem Dialog, der mit §6
+  „Einstellungen" gemeint ist).
+- Im Tag-`<input>`: Vorschlagsliste (Datalist oder kleines Popover)
+  gefiltert auf die Palette, neue Tags jederzeit möglich (Palette bleibt
+  gewachsen).
+- Keine Server-Änderung — Phase-8-Tabu-Liste §0.4 bleibt zu prüfen, aber
+  die Tags-Speicherung in `Store` (`storage/store.py`) ist nicht betroffen.
+
+### §8.2 Standard-Tag „blocked"
+
+Ein vom System *bereitgestellter*, immer verfügbarer Tag — kein User-pflegbarer,
+sondern fest im Code: „blocked". **Wofür?** Aus dem Kontext der Sichtprüfung
+wahrscheinlich: ein Status-Tag für Aufgaben-Items (`type: task`), die
+bewusst pausiert / wartend markiert sind, bis eine Bedingung erfüllt ist
+(Person X antwortet, anderes Item wird erledigt, etc.). „Standard" impl
+vermutlich: (a) immer in der Palette vorhanden, auch ohne explizites
+Hinzufügen, (b) im Editor mit einem festen visuellen Signal versehen
+(auffällige Farbe / Warn-Icon), (c) optional mit Sonderverhalten in
+irgendeiner Liste (z. B. Buckets „Offen / blocked / Erledigt / Notizen").
+
+**Offene Fragen (Klärung in der Planungs-Session):**
+
+- Hat „blocked" **Semantik** oder bleibt es „nur ein weiterer Tag"?
+  - „Nur kosmetisch": gleiche Code-Pfad wie jeder andere Tag, nur
+    vordefinierter Name + Farbe. **Wahrscheinlichste Lesart** — passt zur
+    Einschränkung „only cosmetic" in §8.1.
+  - „Mit Semantik": Item mit Tag „blocked" wandert in einen eigenen Bucket
+    oder bekommt einen Filter-Chip in der Liste. **Größerer Eingriff** —
+    berührt `list.js :: renderItems()`, `GET /api/v1/overview`-Buckets
+    (`webui/api.py :: _overview_get`), vermutlich auch die
+    Frontmatter-Validierung in `storage/frontmatter.py` (gibt es eine
+    Allowlist für besondere Tag-Werte?). Tabu-Frage für p8.X.
+- Reihenfolge der Chips / Position des „blocked"-Tags in der Palette
+  (oben, weil wichtig? unten, weil selten?).
+- Falls §8.1 umgesetzt wird: ist „blocked" ein **immer vorhandener
+  Standard-Tag** (im Code hartcodiert) oder ein **erster Eintrag der
+  Default-Palette**, den der User löschen kann? Ersteres ist
+  vorhersagbarer (jeder Nutzer sieht ihn), zweiteres ist sauberer
+  (Customizing = Customizing).
+
+**Bezug:** `phase5_ui/webui/static/js/editor.js` (`#field-tags`,
+`fieldTagsEl.value.split(",")`), `phase5_ui/webui/static/js/list.js:144`
+(`item.tags.join(", ")`-Render), `phase5_ui/webui/static/app.css`
+(Chip-Styles — soweit vorhanden, vermutlich generisch). Server unverändert,
+sofern §8.2 kosmetisch bleibt.
+
+---
+
+## §9 Direkter User-Feedback-Button (2026-09-08)
+
+**Finding (Nikinger, 2026-09-08, Phase-8.5-Sichtprüfungs-Folge-Sitzung am echten
+Gerät):**
+
+> 2. a direkt User Feedback Button.
+
+**Was das meint (Interpretation, **nicht** autoritativ):** ein einfach
+auffindbarer Button in der UI, der es dem User erlaubt, *direkt* ein Feedback
+abzugeben — Bug, Verbesserungsidee, Verständnisfrage — ohne den Workflow
+zu verlassen (kein „öffne GitHub, schreibe ein Issue, paste den Stacktrace").
+Heutige Realität: User müssen den Nikinger ansprechen (im Raum oder im
+Chat), oder selbst zur Tastatur greifen und die Mail an
+`nikinger@…` schreiben. Das skaliert nicht, bremst Fabi + Nikinger, und
+verschwindet still im Chat-Verlauf.
+
+**Was „direkt" wahrscheinlich meint (zur Diskussion):**
+
+- **Aus der App heraus, ohne externen Browser-Wechsel.** Vermutlich ein
+  Klick auf einen Button in der Rail oder im Settings-Dialog öffnet ein
+  Overlay/Formular mit: Freitext-Feld + optional Titel + optional
+  Screenshot-Knopf (Browser-native, nicht aus der App heraus) +
+  „Senden"-Knopf.
+- **An wen?** Drei plausible Senken:
+  - **In eine Datei im Sharefyx** (eigener Space „Feedback", Item-Type
+    „note", vom Nikinger periodisch gelesen) — *im Repo-Kern*, Hard
+    Rule 4 („fremde Spaces sind read-only") bewusst umgangen, weil
+    der User sein **eigener** Space ist.
+  - **In eine Datei auf der Platte der VM** außerhalb des `DATA_ROOT`
+    (`/var/log/sharefyx/feedback/…md`) — getrennt vom User-Storage,
+    Nikinger-only lesbar.
+  - **An einen externen Endpunkt** (E-Mail, Matrix-Bot, Webhook) — dann
+    ist der Server nicht mehr „dumm", und die Server-Tabu-Liste aus
+    Phase 8 §0.4 müsste neu bewertet werden (ein Webhook ist ein
+    *ausgehender* Call, nicht verboten, aber neu).
+- **Was darf mitgeschickt werden?** Freitext (Pflicht), User-Space (zur
+  Identifikation, kein Auth-Token), Browser/User-Agent, App-Version
+  (`v3.0.1` heute), aktuelle URL. **Kein** TOTP-Code, **kein** Passwort,
+  **kein** Recovery-Code, **kein** Session-Cookie — Feedback-Button ist
+  eine **Mensch-Aktion**, die nichts Sicherheitsrelevantes anfasst.
+
+**Was diese Phase NICHT macht (zur Klärung, damit es kein Default-Blocker wird):**
+
+- Eine Server-Implementierung. p8.X umreißt das Feature; die
+  Implementierung folgt in der Phase, die p8.X ablöst.
+- Eine UI-Komponente. Der Button-Ort ist nicht entschieden (Rail-Block?
+  Help-Menü? Settings-Dialog? Konto/Einstellungen-Dialog? Footer im
+  Read-View eines Items?).
+- Eine Selbsttest-Schleife („kann ich mich selber anpingen?"). Vermutlich
+  will der Nikinger nur die *Möglichkeit*, nicht eine sofortige Antwort.
+
+**Bezug:** „Direkt" deutet auf UI-Affordance, die keinen Umweg über Mail/
+GitHub/Chat verlangt. Phase-8-Tabu-Liste ist heute nicht betroffen (kein
+Server-Code, kein API-Endpoint, keine Schema-Änderung), solange die
+gewählte Senke im bestehenden `DATA_ROOT` (User-Space) liegt.
+
+**Offene Fragen:**
+
+- Wo wird der Button platziert? (Vorschlag: Rail unter „Einstellungen"
+  und „Abmelden", oder im Read-View-Header eines Items, oder beides.)
+- Senke: Sharefyx-Space-Feedback-Item, `/var/log/sharefyx/feedback/`,
+  oder externer Endpunkt?
+- Soll es ein **anonymer** Modus existieren (kein Space-Name)?
+  Wahrscheinlich nicht, weil der Nikinger dann nicht antworten kann —
+  aber: fragen, nicht entscheiden.
+- Throttling? (Spam-Schutz: ein Feedback pro 5 Minuten pro Space?)
+  Vermutlich überzogen, aber: Hard Rule 7-Disziplin („kein Spam, kein
+  versehentlicher DoS").
+
+---
+
 ## §A Anhang: bereits in Phase 8.5 D4 dokumentierte p8.X-Punkte
 
 Aus dem D4-Block (`phase8_5_picker_release/CLAUDE.md`), hier zusammengeführt +
@@ -396,7 +559,10 @@ Verbotsliste für die Planungs-Session, damit p8.X nicht zur Wundertüte wird:
 - Phase-8.5-Verbotsliste-Tabus (`storage/`, `authserver/`, `mcpserver/` außer dem
   Hint, `webui/{security,api,serializers,permissions}.py`) — die Tabus sind
   Phase-8.5-spezifisch, müssen für p8.X neu bewertet werden, **gelten aber
-  vorerst weiter**, bis die Planungs-Session sie aufhebt.
+  vorerst weiter**, bis die Planungs-Session sie aufhebt. **§9 Variante (b)
+  (`/var/log/sharefyx/feedback/`) und §9 Variante (c) (externer Endpunkt)
+  würden diese Verbotsliste *bewusst* berühren — kein Default-Ausschluss,
+  sondern explizite Planungs-Entscheidung.**
 
 ---
 
@@ -412,7 +578,10 @@ Fragen zu klären, **bevor** ein Plan-Doc entsteht:
    §6 (Settings-Rename, 30 min) + §3 (Anzahl-Anzeige, 1–2 h) zuerst; §1
    (Layout) + §2.3+§2.4 (Map-Layout) als zweite Welle; §5 (Layering) +
    §7 (De-AI-ierung-Lauf 2) + §4 (Edit-in-Place) als dritte Welle, jede
-   potenziell eigene Planung.
+   potenziell eigene Planung. **§8 (Tags) + §9 (Feedback-Button)** sind neue
+   Kandidaten für die erste Welle, falls der Planungs-Session die Reihenfolge
+   „klein vor groß" wichtiger ist als der ursprüngliche Vorschlag — beide
+   sind UI-only ohne Server-Eingriff, §8 zudem strikt „only cosmetic".
 3. **Aufwand-Schätzung.** Was ist in einer opencode/M3-Session machbar (≤1 Tag)?
    Was braucht Claude Code (mehrere Tage, Research)?
 4. **Fabian-Koordination.** Fabi sammelt seit D4. Welcher Prozess — Fabi gibt
@@ -425,7 +594,25 @@ Fragen zu klären, **bevor** ein Plan-Doc entsteht:
    `storage/` bleibt vermutlich tabu (keine neunte P1-Contract-Öffnung
    angekündigt), `authserver/` vermutlich auch. `webui/static/js/` ist seit
    P8.5-D4 explizit erlaubt (Bracket-Renderer-Fix als Präzedenz) — die
-   Erlaubnis gilt weiter.
+   Erlaubnis gilt weiter. **§8 (Tags) und §9 (Feedback-Button) brauchen
+   wahrscheinlich beide einen neuen Server-Endpoint (oder eine neue
+   Storage-Lokation für Feedback) — die Tabu-Frage ist hier *anders* zu
+   beantworten als für den Rest:** bewusst früh in der Planungs-Session,
+   nicht erst beim Bauen.
+7. **§8-Tags — Palette-Format.** Eine kurze JSON-Schema-Skizze für
+   `localStorage["sfx:tags:palette"]` reicht vermutlich — `{name: string,
+   color?: string}` (CSS-Farbwert, optional). Wenn „blocked" ein fester
+   Standard-Tag sein soll, ist die Frage: hartcodiert in der App-Initialisierung
+   *zusätzlich* zur User-Palette, oder ausschließlich hartcodiert und nicht
+   entfernbar?
+8. **§9-Feedback — Server-Touch.** Variante (a) User-Space-Item braucht
+   *keinen* neuen Endpoint (User nutzt `create_item` via bestehender
+   REST-API, der Button löst einen POST aus). Variante (b)
+   `/var/log/sharefyx/feedback/` braucht einen neuen Server-Write-Pfad in
+   `webui/api.py` (Tabu-Frage). Variante (c) externer Endpunkt ist eine
+   ganze Architektur-Frage (Phase-9-Tabu §0.4 verbietet aktuell ausgehende
+   Server-Calls implizit über „der Server ist dumm"). Empfehlung in der
+   Planungs-Session treffen.
 
 ---
 
@@ -464,7 +651,14 @@ Wenn aus diesen Notizen ein Plan wird:
 | 2026-09-06 | §5 Layering-Design-System | Sichtprobe-Folgesession 2026-09-06 |
 | 2026-09-06 | §6 Settings/Navigation | Sichtprobe-Folgesession 2026-09-06 |
 | 2026-09-06 | §7 De-AI-ierung Lauf 2 | Sichtprobe-Folgesession 2026-09-06 |
+| 2026-09-08 | §6 re-affirmiert (Klarstellung der drei Vertausch-Lesarten a/b/c) | Phase-8.5-Sichtprüfungs-Folge-Sitzung 2026-09-08 |
+| 2026-09-08 | §8.1 customizable Tags for tasks (kosmetisch) | Phase-8.5-Sichtprüfungs-Folge-Sitzung 2026-09-08 |
+| 2026-09-08 | §8.2 Standard-Tag „blocked" | Phase-8.5-Sichtprüfungs-Folge-Sitzung 2026-09-08 |
+| 2026-09-08 | §9 direkter User-Feedback-Button | Phase-8.5-Sichtprüfungs-Folge-Sitzung 2026-09-08 |
 
-Alle Punkte haben dasselbe Datum — die Sichtprobe-Sitzung und ihre
-Folgesession waren am selben Tag (2026-09-06). Eine chronologische Trennung
-gibt es nicht, sie sind alle in derselben Besprechungs-Runde aufgekommen.
+Die Sichtprobe-Folgesession vom 2026-09-06 und die Sichtprüfungs-Folge-Sitzung
+vom 2026-09-08 sind beides Folge-Sessions nach dem Phase-8.5-D4-Lauf, aber
+zeitlich getrennt — der Nikinger hat zwischen den beiden Tagen weitere Punkte
+am echten Gerät gesammelt. Eine chronologische Trennung gibt es innerhalb
+der beiden Tage nicht; die Punkte aus 2026-09-06 sind in einer Sitzung
+aufgekommen, die drei Punkte aus 2026-09-08 in einer weiteren.

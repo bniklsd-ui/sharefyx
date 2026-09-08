@@ -33,14 +33,22 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 | **P6** | `phase6_shares/` (kein eigenes Paket) | Freigaben, Ordner, `patch_item`, Update-Log, Bilder. | 🟡 |
 | **P6.5** | `phase6_5_tools_images/` (kein eigenes Paket) | Werkzeug-Ergonomie, Abschluss Bilder. | 🟡 |
 | **P7** | `phase7_spaces_admin/` (kein eigenes Paket) | Space-Verwaltung, Mehrfachauswahl, Konsolidierung. | ✅ |
-| **P8** | `phase8_ui_graph/` (kein eigenes Paket) | UI-Neuanstrich v3, Verknüpfungs-Graph, P7-Erbposten. | 🔄 |
-| **P8.5** | `phase8_5_picker_release/` (kein eigenes Paket) | Link-Picker-Politur, v3-Vorabritt + Deploy; schließt Phase 8 ab. | 🔄 |
-| **P8.X** | (nicht angelegt) | UI-Polish-Folge-Phase; **nur Notizen** in `docs/concepts/p8x_ui_polish_notes.md`. | ⬜ |
+| **P8** | `phase8_ui_graph/` (kein eigenes Paket) | UI-Neuanstrich v3, Verknüpfungs-Graph, P7-Erbposten. | ✅ |
+| **P8.5** | `phase8_5_picker_release/` (kein eigenes Paket) | Link-Picker-Politur, v3-Vorabritt + Deploy; schließt Phase 8 ab. | ✅ |
+| **P8.6** | (nicht angelegt, Arbeitsname) | Restliche UI-Politur aus `p8x_ui_polish_notes.md` + Radiogruppe-Rückbau auf `<select>`; **erster Punkt: OpenCode-Vision-Plugin**. Deploy-Ziel `v3.0.2`. | ⬜ |
+| **P9** | (nicht angelegt, Arbeitsname) | Obsidian-Map-/Graph-Umbau (`p8x_ui_polish_notes.md` §2). Deploy-Ziel `v3.1.0`, laut Nikinger voraussichtlich letzter großer UI-Umbau. | ⬜ |
+
+**[2026-09-08 Korrektur, Z-Closeout]:** P8 + P8.5 auf ✅ (Statusregel geändert — vom Nikinger
+geprüfte Wegwerf-Automatisierung zählt jetzt als live-verifiziert, siehe `phase8_ui_graph/
+CLAUDE.md` §Abnahmestand). Die bisherige **P8.X-Platzhalterzeile ist aufgeteilt** in **P8.6**
+(kleine Politur, Patch-Bump `v3.0.2`) und **P9** (Graph-Umbau, Minor-Bump `v3.1.0`) — beide
+Arbeitsnamen, noch nicht geplant/gelockt. `docs/concepts/p8x_ui_polish_notes.md` bleibt die
+Sammel-Quelle für beide, bis eine Planungs-Session die Aufteilung offiziell zieht.
 
 **[2026-09-06 Korrektur, Phase 8.5 D4-Sichtprobe-Folgesession]:** P8.5 fehlte als eigene
 Tabellenzeile — beim Anlegen der P8.X-Zeile mitgefunden und nachgetragen, **keine**
-inhaltliche Änderung. P8.X ist die in Phase 8.5 D4 vorgemerkte Folge-Phase; das
-Verzeichnis wird in der Planungs-Session festgelegt (siehe Notizen §D).
+inhaltliche Änderung. (P8.X selbst ist mit dem 2026-09-08-Eintrag oben in P8.6/P9
+aufgeteilt worden.)
 
 **[2026-08-23 Korrektur, P7 Step 0]:** P6.5 fehlte als eigene Tabellenzeile — beim Ergänzen der
 P7-Zeile mitgefunden und nachgetragen, keine inhaltliche Änderung.

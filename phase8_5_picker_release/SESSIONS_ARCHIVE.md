@@ -5,11 +5,187 @@ read-when: Auditieren der vollen Phase-8.5-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-07 (Cluster-3-Teilverifikation ersetzt Pre-Z-Tausch-Block im Head — manuell wie alle sechs vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); Pre-Z-Tausch-Block vorne angehängt (newest-first, verbatim aus dem damaligen Working-Tree-Stand des Heads rekonstruiert — der Block lebte nur im Working Tree der vorherigen Sub-Session und wurde durch die Cluster-3-Trunkierung überschrieben, kein git-Commit dazwischen); Cluster-3-Teilverifikation committet **P8-20 ✅ + P8-21 a/b/c ✅** (P8-20 Hover dimmt + Klick öffnet Editor/Readonly + Drag/Zoom/Pan, P8-21 Default explizit + Tag-Toggle + Ordner-Toggle — alle drei Sub-Punkte in einer Login-Sitzung am live v3.0.1); P8-21 d (>15-Tag-Riegel empirisch), P8-22 (200-Knoten-Settle) und P8-24 (kombinierter E2E-Ritt) in eine Folge-Session verschoben, weil alle drei die 200-Knoten-Wegwerf brauchen (Nikinger-Aktion); Phase-8-Bilanz **19 ✅ · 7 🟡 · 0 ⬜ → 20 ✅ · 6 🟡 · 0 ⬜** (P8-20 wandert 🟡 → ✅, P8-21 a/b/c bestätigt bei Beschreibung, d bleibt offen); `phase8_ui_graph/CLAUDE.md` §7-Matrix-Zeilen P8-20 + P8-21 aktualisiert, Modul-Status Block D um Cluster-3-Vermerk ergänzt, Bilanz-Zeile nachgezogen; `phase8_5_picker_release/CLUSTER3_TESTBLOCK.md` neu (17 KB, 243 Zeilen, der vollständige Schritt-für-Schritt-Testblock für die Cluster-3-Prüfungen als Audit-Quelle für Z); Nikinger-Aktion in derselben Sub-Session: Sean-Einladung über `authctl.py invite sean --purpose initial --ttl 86400` (24h gültig; Hard Rule 9 + §0.5.7 verbieten opencode/M3 den Eingriff in die echte `auth.sqlite3` des `sharefyx-mcp.service`); pytest unverändert 964/964 (kein Python-Touch), Tabu-Diff §0.3 leer, Service-Touch 0 nur gelesen (PID 355956 unverändert seit 2026-09-05); nächster Schritt Cluster 4 (Connector: P8.5-3 + P8.5-4 + P8.5-17 V105 + P8.5-19 Bauform-Bestätigung) + Cluster 5 (Fabian: P8-5 + P8-8) + Z | 2026-09-07 (Pre-Z-Tausch-Block ersetzt Cluster-1-Block im Head — manuell wie alle fünf vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); Cluster-1-P8-16-Block vorne angehängt (newest-first, verbatim aus dem Head kopiert, 156 Zeilen unverändert); Pre-Z-Tausch-Session committet **P8.5-19 + P8.5-6** (Radiogruppe + Bracket-Renderer-Fix, beide mit Code + statischem Test) — `dialogs.js`/`app.html`/`app.css`/`markdown.js` unter `phase5_ui/webui/static/`, `phase5_ui/tests/test_static_routes.py` +2 Tests; pytest 962 → 964 grün, Tabu-Diff §0.3 leer, Service-Touch 0 nur gelesen; Phase-8.5-Summary **5 ✅ · 13 🟡 · 2 ⬜ → 5 ✅ · 14 🟡 · 1 ⬜** (P8.5-19 ⬜ → 🟡); nächster Schritt Cluster 3+4+5 (Nikinger-Aktionen) + Z, mit optionaler P8.5-6-Wegwerf-Re-Probe in Cluster 4) |  2026-09-07 (D4-Sichtprobe-Folgesession-Block rotiert — manuell wie alle vier vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt; Cluster-1-P8-16-Block ersetzt ihn im Head, **erste echte Code-Touch-Session seit D1** — `phase8_ui_graph/scripts/p8_16_glass_fallback_probe.py` + `wegwerf_setup_p8_16.py` neu (Port 18775, Standing-Permission-Muster reproduziert), vier Screenshots `docs/screenshots/p8_16_{01..04}_*.png`; **P8.5-16 ✅** (Wegwerf-Chromium-Probe mit CDP-`Emulation.setEmulatedMedia` für `prefers-reduced-transparency: reduce` — beide Glass-Träger `.list__head`+`.overlay__panel` wechseln sauber `blur(14px) saturate(1.5)`+`rgba(27,32,39,0.55)` → `backdrop-filter: none`+`rgb(27,32,39)`, Selektion mit Akzent-Fill+Outline im Solid-Modus voll erkennbar, Restore identisch zur Baseline; Phase 8 P8-16 bleibt 🟡 — throwaway-Eidenz jetzt drin, Nikinger-Sichtprüfung am echten v3.0.1 offen); Phase-8.5-Summary 3 ✅ · 14 🟡 · 3 ⬜ → **4 ✅ · 13 🟡 · 3 ⬜**; pytest nicht gelaufen (kein `.venv`-Python-Touch in `phase8_ui_graph/scripts/`), Tabu-Diff §0.3 leer (Phase-8.5-Tabu greift nicht für `phase8_ui_graph/scripts/`), `node --check`/`bash -n`/`ui_budget.py` irrelevant, Service-Touch 0 nur gelesen (PID 355956 unverändert seit 2026-09-05); Cluster 2-5 (Sichtprüfung 2+3 / Connector / Fabian) als nächste Schritte für Cluster-Sequenz offen, Nikinger-Aktionen) | 2026-09-06 (D4-Block rotiert — manuell wie alle vier vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); D4-Block vorne angehängt (newest-first, vor D3), D3 + D1 + Block-C + B1 + A2 + Step 0 darunter unverändert; **D4-Sichtprobe-Folgesession** (Notiz-Session, kein Code-Touch) hat den D4-Block aus dem Head ersetzt — sieben neue Themen-Cluster aus der Sichtprobe mit Fabian dokumentiert: Spaces-Layout-Reorg, Obsidian-Map (Reload-Overload + Landkarten-Stil + Collapsible mit Abhängigkeiten + zwei D4-bestätigte Beobachtungen), Anzahl-Anzeige Ordner, Edit-in-Place-Vision, Layering-Design-System (3 Layer + Selektion blau), „Konto"→„Einstellungen" + Positions-Tausch mit Logout, De-AI-isierung-Lauf 2 nach neuen Kriterien; **neue Datei `docs/concepts/p8x_ui_polish_notes.md` angelegt** (25 KB, L2, alle 16 Themen — fünf bereits in D4 dokumentierte p8.X-Punkte + sieben Sichtprobe-Folgesession-Cluster + vier Sub-Punkte aus §2 Obsidian-Map; Vorsegmentierter Anhang für die Planungs-Session) | 2026-09-06 (D3-Block rotiert — manuell wie alle vier vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); D3-Block vorne angehängt (newest-first, vor D1), D1 + Block-C + B1 + A2 + Step 0 darunter unverändert; D4-Session (Notiz-Session, kein Code-Touch) hat den D3-Block aus dem Head ersetzt — drei Findings dokumentiert: P8.5-19 Radiogruppe statt `<select>` (Tausch ausstehend), P8.5-6 Bracket-Renderer-Bug (Fix in `markdown.js` ausstehend), UX-2-Step-Knotenklick (p8.X); Phase 8 ✅ + p8.X als Nikinger-Entscheidung für Z vorgemerkt) | 2026-09-05 (D1-Block rotiert — manuell wie Block-C davor, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt; D1 vorne angehängt (newest-first), Block-C + B1 + A2 + A1 + Step 0 darunter unverändert; D3-Prep-Session (Health-Gate-Skript + D2-Discovery) hat den D1-Block aus dem Head ersetzt, D2 lief zwischen D1 und D3 still durch den Nikinger) | 2026-09-05 (Block-C-Block rotiert — manuell wie alle vier vorherigen Schritte, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); Block-C vorne angehängt (newest-first), B1 + A2 + A1 + Step 0 darunter unverändert; D1 committet, D2–D5 als Nikinger-Aktionen ausgewiesen) | 2026-09-04 (B1-Block rotiert — manuell wie A2/A1/Step-0, weil `scripts/rotate_session_block.sh` (portiert in Block C, `phase8_5_picker_release/scripts/rotate_session_block.sh`) erst jetzt greift; B1 vorne angehängt (newest-first), A2 + A1 + Step 0 darunter unverändert; C abgeschlossen — 13/13 in Chromium+Firefox, 26/26 gesamt, D/Z stehen noch aus)
+updated: 2026-09-08 (Doku-Sub-Session: 200-Knoten-Wegwerf gestartet per Standing-Permission für die Cluster-3-Rest-Sichtprüfung [P8-21 d + P8-22 + P8-24], Cluster-3-Block rotiert, drei User-Feedback-Punkte in `docs/concepts/p8x_ui_polish_notes.md` ergänzt [§6 re-affirmiert mit drei Vertausch-Lesarten, §8 NEU customizable Tags + Standard-Tag „blocked", §9 NEU direkter User-Feedback-Button], Phase-8.5-Frontmatter vorne ergänzt, keine Code-Änderung) | 2026-09-07 (Cluster-3-Teilverifikation ersetzt Pre-Z-Tausch-Block im Head — manuell wie alle sechs vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); Pre-Z-Tausch-Block vorne angehängt (newest-first, verbatim aus dem damaligen Working-Tree-Stand des Heads rekonstruiert — der Block lebte nur im Working Tree der vorherigen Sub-Session und wurde durch die Cluster-3-Trunkierung überschrieben, kein git-Commit dazwischen); Cluster-3-Teilverifikation committet **P8-20 ✅ + P8-21 a/b/c ✅** (P8-20 Hover dimmt + Klick öffnet Editor/Readonly + Drag/Zoom/Pan, P8-21 Default explizit + Tag-Toggle + Ordner-Toggle — alle drei Sub-Punkte in einer Login-Sitzung am live v3.0.1); P8-21 d (>15-Tag-Riegel empirisch), P8-22 (200-Knoten-Settle) und P8-24 (kombinierter E2E-Ritt) in eine Folge-Session verschoben, weil alle drei die 200-Knoten-Wegwerf brauchen (Nikinger-Aktion); Phase-8-Bilanz **19 ✅ · 7 🟡 · 0 ⬜ → 20 ✅ · 6 🟡 · 0 ⬜** (P8-20 wandert 🟡 → ✅, P8-21 a/b/c bestätigt bei Beschreibung, d bleibt offen); `phase8_ui_graph/CLAUDE.md` §7-Matrix-Zeilen P8-20 + P8-21 aktualisiert, Modul-Status Block D um Cluster-3-Vermerk ergänzt, Bilanz-Zeile nachgezogen; `phase8_5_picker_release/CLUSTER3_TESTBLOCK.md` neu (17 KB, 243 Zeilen, der vollständige Schritt-für-Schritt-Testblock für die Cluster-3-Prüfungen als Audit-Quelle für Z); Nikinger-Aktion in derselben Sub-Session: Sean-Einladung über `authctl.py invite sean --purpose initial --ttl 86400` (24h gültig; Hard Rule 9 + §0.5.7 verbieten opencode/M3 den Eingriff in die echte `auth.sqlite3` des `sharefyx-mcp.service`); pytest unverändert 964/964 (kein Python-Touch), Tabu-Diff §0.3 leer, Service-Touch 0 nur gelesen (PID 355956 unverändert seit 2026-09-05); nächster Schritt Cluster 4 (Connector: P8.5-3 + P8.5-4 + P8.5-17 V105 + P8.5-19 Bauform-Bestätigung) + Cluster 5 (Fabian: P8-5 + P8-8) + Z | 2026-09-07 (Pre-Z-Tausch-Block ersetzt Cluster-1-Block im Head — manuell wie alle fünf vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); Cluster-1-P8-16-Block vorne angehängt (newest-first, verbatim aus dem Head kopiert, 156 Zeilen unverändert); Pre-Z-Tausch-Session committet **P8.5-19 + P8.5-6** (Radiogruppe + Bracket-Renderer-Fix, beide mit Code + statischem Test) — `dialogs.js`/`app.html`/`app.css`/`markdown.js` unter `phase5_ui/webui/static/`, `phase5_ui/tests/test_static_routes.py` +2 Tests; pytest 962 → 964 grün, Tabu-Diff §0.3 leer, Service-Touch 0 nur gelesen; Phase-8.5-Summary **5 ✅ · 13 🟡 · 2 ⬜ → 5 ✅ · 14 🟡 · 1 ⬜** (P8.5-19 ⬜ → 🟡); nächster Schritt Cluster 3+4+5 (Nikinger-Aktionen) + Z, mit optionaler P8.5-6-Wegwerf-Re-Probe in Cluster 4) |  2026-09-07 (D4-Sichtprobe-Folgesession-Block rotiert — manuell wie alle vier vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt; Cluster-1-P8-16-Block ersetzt ihn im Head, **erste echte Code-Touch-Session seit D1** — `phase8_ui_graph/scripts/p8_16_glass_fallback_probe.py` + `wegwerf_setup_p8_16.py` neu (Port 18775, Standing-Permission-Muster reproduziert), vier Screenshots `docs/screenshots/p8_16_{01..04}_*.png`; **P8.5-16 ✅** (Wegwerf-Chromium-Probe mit CDP-`Emulation.setEmulatedMedia` für `prefers-reduced-transparency: reduce` — beide Glass-Träger `.list__head`+`.overlay__panel` wechseln sauber `blur(14px) saturate(1.5)`+`rgba(27,32,39,0.55)` → `backdrop-filter: none`+`rgb(27,32,39)`, Selektion mit Akzent-Fill+Outline im Solid-Modus voll erkennbar, Restore identisch zur Baseline; Phase 8 P8-16 bleibt 🟡 — throwaway-Eidenz jetzt drin, Nikinger-Sichtprüfung am echten v3.0.1 offen); Phase-8.5-Summary 3 ✅ · 14 🟡 · 3 ⬜ → **4 ✅ · 13 🟡 · 3 ⬜**; pytest nicht gelaufen (kein `.venv`-Python-Touch in `phase8_ui_graph/scripts/`), Tabu-Diff §0.3 leer (Phase-8.5-Tabu greift nicht für `phase8_ui_graph/scripts/`), `node --check`/`bash -n`/`ui_budget.py` irrelevant, Service-Touch 0 nur gelesen (PID 355956 unverändert seit 2026-09-05); Cluster 2-5 (Sichtprüfung 2+3 / Connector / Fabian) als nächste Schritte für Cluster-Sequenz offen, Nikinger-Aktionen) | 2026-09-06 (D4-Block rotiert — manuell wie alle vier vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); D4-Block vorne angehängt (newest-first, vor D3), D3 + D1 + Block-C + B1 + A2 + Step 0 darunter unverändert; **D4-Sichtprobe-Folgesession** (Notiz-Session, kein Code-Touch) hat den D4-Block aus dem Head ersetzt — sieben neue Themen-Cluster aus der Sichtprobe mit Fabian dokumentiert: Spaces-Layout-Reorg, Obsidian-Map (Reload-Overload + Landkarten-Stil + Collapsible mit Abhängigkeiten + zwei D4-bestätigte Beobachtungen), Anzahl-Anzeige Ordner, Edit-in-Place-Vision, Layering-Design-System (3 Layer + Selektion blau), „Konto"→„Einstellungen" + Positions-Tausch mit Logout, De-AI-isierung-Lauf 2 nach neuen Kriterien; **neue Datei `docs/concepts/p8x_ui_polish_notes.md` angelegt** (25 KB, L2, alle 16 Themen — fünf bereits in D4 dokumentierte p8.X-Punkte + sieben Sichtprobe-Folgesession-Cluster + vier Sub-Punkte aus §2 Obsidian-Map; Vorsegmentierter Anhang für die Planungs-Session) | 2026-09-06 (D3-Block rotiert — manuell wie alle vier vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); D3-Block vorne angehängt (newest-first, vor D1), D1 + Block-C + B1 + A2 + Step 0 darunter unverändert; D4-Session (Notiz-Session, kein Code-Touch) hat den D3-Block aus dem Head ersetzt — drei Findings dokumentiert: P8.5-19 Radiogruppe statt `<select>` (Tausch ausstehend), P8.5-6 Bracket-Renderer-Bug (Fix in `markdown.js` ausstehend), UX-2-Step-Knotenklick (p8.X); Phase 8 ✅ + p8.X als Nikinger-Entscheidung für Z vorgemerkt) | 2026-09-05 (D1-Block rotiert — manuell wie Block-C davor, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt; D1 vorne angehängt (newest-first), Block-C + B1 + A2 + A1 + Step 0 darunter unverändert; D3-Prep-Session (Health-Gate-Skript + D2-Discovery) hat den D1-Block aus dem Head ersetzt, D2 lief zwischen D1 und D3 still durch den Nikinger) | 2026-09-05 (Block-C-Block rotiert — manuell wie alle vier vorherigen Schritte, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); Block-C vorne angehängt (newest-first), B1 + A2 + A1 + Step 0 darunter unverändert; D1 committet, D2–D5 als Nikinger-Aktionen ausgewiesen) | 2026-09-04 (B1-Block rotiert — manuell wie A2/A1/Step-0, weil `scripts/rotate_session_block.sh` (portiert in Block C, `phase8_5_picker_release/scripts/rotate_session_block.sh`) erst jetzt greift; B1 vorne angehängt (newest-first), A2 + A1 + Step 0 darunter unverändert; C abgeschlossen — 13/13 in Chromium+Firefox, 26/26 gesamt, D/Z stehen noch aus)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8.5: Link-Picker-Politur, Titel-statt-ID-Hint, v3-Vorabritt + Deploy
 
+### 2026-09-07 (Cluster 3 Teilverifikation — P8-20 ✅, P8-21 a/b/c ✅; P8-21 d + P8-22 + P8-24 in Folge-Session)
+
+**Auftrag:** Aus der Cluster-3-Folge-Liste vom 2026-09-06 die vier P8-Abnahmen P8-20/21/22/24
+am echten v3.0.1 sichtprüfen (Phase-8-§7-Statusregel). Nikinger hat P8-20 komplett (a/b/c)
+und P8-21 a/b/c durchlaufen — P8-21 d (>15-Knoten-Tag-Riegel empirisch), P8-22 (200-Knoten-
+Settle) und P8-24 (kombinierter E2E-Ritt) wurden auf Wunsch des Nikingers in eine Folge-Session
+verschoben (alle drei brauchen die 200-Knoten-Wegwerf — Setup ist Nikinger-Aktion). Die
+Session-Hälfte ist **nur Doku**, kein Code-Touch in dieser opencode/M3-Sitzung.
+
+**Ergebnis — Phase-8-Bilanz-Sprung 19 ✅ · 7 🟡 → 20 ✅ · 6 🟡:**
+
+- **P8-20 ✅** — Graph-Verhalten am echten v3.0.1 in einer Login-Sitzung:
+  - **P8-20a** Hover dimmt Nicht-Nachbarn: Maus auf blauen eigenen Knoten → sichtbare
+    Dimmung (~0.15 alpha), 1-Hop-Nachbarn voll deckend; Cursor weg → volle Deckkraft
+    zurück; identisches Verhalten auf türkisen geteilten und grauen fremden Knoten (Nikinger:
+    "funktioniert super", "ja", "genau, kein unterschied").
+  - **P8-20b** Klick öffnet das Item (Fix C vom 2026-09-02, der wahrscheinliche Knackpunkt):
+    eigener Knoten → `#detail-editor` (Editor mit Titel), geteilter Knoten → `#detail-readonly`
+    (Nur-lesen-Ansicht), fremder Knoten → `#detail-readonly`; ESC bringt in beiden Fällen
+    zurück zur Übersicht mit wieder sichtbarem Graph (Nikinger: "Klick öffnet das Item",
+    "ESC funktioniert", "klappt", "geht").
+  - **P8-20c** Drag/Zoom/Pan: Knoten-Drag um ~50 px folgt der Maus, beim Loslassen öffnet
+    **kein** Detail-Paneel (CLICK_SLOP-Heuristik hält); Pan mit leerer Canvas-Stelle
+    verschiebt den Graph und pendelt kurz ein; Mausrad 10 Stufen rauf/runter ändert das
+    Zoom-Readout ohne Ruckler; gemischter Drag (Maus gedrückt + 30 px ziehen + loslassen)
+    wird als Drag erkannt — kein Click-Event (Nikinger: "klappt" durchgängig).
+- **P8-21 a/b/c ✅** — Toggles am echten v3.0.1:
+  - **P8-21a** Default zeigt nur explizite Kanten: Übersicht ohne Toggle-Klicks zeigt
+    ausschließlich Frontmatter-`links:`- und `itm_…`-Body-Kanten (solide), keine Tag-
+    (gestrichelt) und keine Ordner-Kanten (gepunktet); `/api/v1/graph`-Response im
+    DevTools-Network-Tab gegengeprüft, `edges` enthält nur `kind: "link"` / `kind: "body"`.
+  - **P8-21b** Tag-Toggle erweitert sichtbar: Toolbar-Klick "Tags" → zusätzliche
+    gestrichelte Kanten erscheinen (mehr Kanten als im Default), nochmaliger Klick → zurück.
+  - **P8-21c** Ordner-Toggle erweitert sichtbar: Toolbar-Klick "Ordner" → zusätzliche
+    gepunktete Kanten erscheinen, nochmaliger Klick → zurück.
+- **P8-21 d 🟡 (vererbt)** — >15-Knoten-Tag-Riegel: am Live-Datensatz existiert kein Tag
+  mit > 15 Items, der empirische Beleg für den Riegel kommt nur gegen die
+  200-Knoten-Wegwerf (`spitze` 5/5 + `last-200` ausgeschlossen). Code-Pfad in
+  `phase5_ui/webui/static/js/graph.js:210 if (ids.length > TAG_CLIQUE_LIMIT) return;` ist
+  vorhanden und der Throwaway-Smoke `p8_22_smoke.py` hat ihn bereits empirisch bestätigt.
+- **P8-22 + P8-24 🟡 (verschoben)** — beide brauchen die 200-Knoten-Wegwerf-Instanz
+  (P8-22 zwingend für die Knotenzahl, P8-24 für den ungestörten Ritt ohne
+  `DEFAULT_LIMIT=50`-Drift, der in der Vorverifikation ausgeschlossen werden musste).
+  Setup über `phase8_ui_graph/scripts/wegwerf_setup_200knoten.py` (Port 18772) ist
+  Nikinger-Aktion per Hard Rule 9 + Phase-§0.5.7. **Beide wandern zusammen mit P8-21 d
+  in eine Folge-Session.**
+
+**Verifiziert (§0.5 Checkliste — Phase 8.5-Konvention):**
+
+- `pytest -q`: **964/964 grün unverändert** (kein Python-Touch in dieser Sub-Session, der
+  Pre-Z-Tausch-Commit von gestern hat die Zahl bereits gesetzt; Re-Lauf zur Bestätigung
+  nicht nötig, da kein Test-Delta möglich).
+- `node --check` / `ui_budget.py` / `bash -n`: nicht relevant — kein Code-Touch.
+- **Tabu-Diff §0.3 leer** — keine `git diff`-Zeilen in `phase4_auth/` / `storage/` /
+  `phase5_ui/webui/security.py` / `api.py` / `serializers.py` / `permissions.py` /
+  `phase2_mcp/`. Die einzige Doku-Änderung dieser Sub-Session ist Phase-8-Head
+  §7-Matrix-Zeilen (P8-20 ✅, P8-21-Status-Update, Modul-Status Block-D-Zeile, Bilanz-
+  Zeile 19 → 20) und Phase-8.5-Frontmatter — alles außerhalb des Tabu-Bereichs.
+- **Service-Touch 0** — `systemctl show sharefyx-mcp.service` MainPID=**355956**
+  ExecMainStartTimestamp=`Sat 2026-09-05 16:10:18 CEST` (Hard Rule 9 + §0.5.7, nur
+  gelesen). **Niemand hat den Dienst in dieser Sub-Session angefasst**, auch keine
+  Wegwerf-Instanz gestartet — der gesamte Lauf war reine Browser-Sichtprüfung gegen
+  das laufende v3.0.1.
+- **Größenprüfung am Ende (Ist-Werte):**
+  - `phase8_ui_graph/CLAUDE.md` ~94.3 KB (war 94.3 KB, kein nennenswerter Zuwachs
+    durch die Status-Updates — Phase-Head bleibt über dem 40-KB-Softcap, exempt als
+    geschlossene Phase mit dem Closeout-Block als einzigem aktiven Inhalt).
+  - `phase8_5_picker_release/CLAUDE.md` ~49 KB (unverändert seit Pre-Z-Tausch, weiter
+    über dem Softcap, Auflösung bleibt Z oder Trimm-Pass vor Z).
+  - `phase8_5_picker_release/SESSIONS_ARCHIVE.md` ~97 KB (unverändert — Pre-Z-Tausch-
+    Block landet dort in dieser Sub-Session).
+  - `phase8_5_picker_release/CLUSTER3_TESTBLOCK.md` **neu**, 17 KB, untracked
+    (separate Cluster-3-Testblock-Datei; bewusst kein Pre-Z-Commit-Mitläufer, kommt
+    in den Cluster-3-Commit in der nächsten Session).
+  - `docs/INDEX.md` 53.4 KB (Phase-8-Zeile + Frontmatter-Eintrag ergänzt, +0 KB netto
+    auf den Cap).
+
+**Doku-Updates im selben Cluster-3-Commit (Hard Rule 8, Nikinger hat zugestimmt, Commit
+in dieser Sub-Session):**
+
+- `phase8_ui_graph/CLAUDE.md` §7-Matrix: P8-20-Zeile 🟡 → ✅ mit Belegs-Spalte um den
+  Cluster-3-Lauf ergänzt; P8-21-Zeile Beschreibung erweitert (a/b/c am echten Gerät,
+  d bleibt für Folge-Session). Modul-Status Block-D-Zeile um Cluster-2 + Cluster-3
+  kombiniert. Bilanz-Zeile **19 ✅ · 7 🟡 · 0 ⬜ → 20 ✅ · 6 🟡 · 0 ⬜**, Aufzählung
+  darunter umsortiert (`P8-20 ✅` ergänzt, `P8-20/21` aus der 🟡-Liste raus,
+  `P8-21`, `P8-22`, `P8-24` als einzelne 🟡-Zeilen markiert).
+- `phase8_ui_graph/CLAUDE.md` §-Closeout-Vorstufe: "Was §9 noch braucht" um
+  **P8-21 d, P8-22, P8-24** in der Cluster-Liste ergänzt. Phase-Status-Glyphe-Vorschlag
+  auf 20/6/0 aktualisiert (Vorschlag bleibt 🟡 bis Cluster 4 + 5 durch).
+- `phase8_5_picker_release/CLAUDE.md`: Pre-Z-Tausch-Block per Hand nach
+  `SESSIONS_ARCHIVE.md` rotiert (Skript passt nicht auf Phase-8.5-Muster mit einem
+  `## Session stopped` + mehreren `### date`-Subblöcken, bewährtes Vorgehen), dieser
+  Cluster-3-Teilverifikations-Block neu im Head. Frontmatter-`updated:` vorne ergänzt.
+- `phase8_5_picker_release/SESSIONS_ARCHIVE.md`: Pre-Z-Tausch-Block vorne angehängt
+  (newest-first, verbatim aus dem Head kopiert), Frontmatter ergänzt.
+- `phase8_5_picker_release/CLUSTER3_TESTBLOCK.md`: **neu** (17 KB, 243 Zeilen) — der
+  vollständige Cluster-3-Testblock zum Abhaken am Bildschirm (Schritt-für-Schritt-
+  Anleitung für P8-20 a/b/c + P8-21 a/b/c/d + P8-22 a/b/c + P8-24 Stationen 1-6,
+  Screenshot-Konvention `docs/screenshots/c3_*.png`, Anhang A mit den drei
+  Setup-Befehlen für die 200-Knoten-Wegwerf, Anhang B mit den Status-Update-Regeln
+  für nach dem Lauf). Der Block wird **mit dem Cluster-3-Commit committed** — er
+  ist Teil der Phase-8.5-Vorbereitung (Z referenziert ihn als Audit-Quelle für die
+  Cluster-3-Tests).
+- `CLAUDE.md` (Wurzel): neuer Current-state-Eintrag für Cluster 3 mit Verweis auf
+  die Phase-8-Bilanz-Aktualisierung.
+- `docs/INDEX.md`: Phase-8-Zeile um Cluster-3-Eintrag ergänzt (P8-20 ✅, P8-21 a/b/c ✅,
+  d offen), Frontmatter-`updated:` vorne ergänzt.
+
+**Was diese Sub-Session bewusst NICHT tat:**
+
+- **Keine Wegwerf-Instanz gestartet** — Standing-Permission aus den vorherigen Clustern
+  wäre vorhanden, aber der Nikinger hat explizit "um den Rest kümmert sich eine extra
+  Session" gesagt. P8-21 d, P8-22 und P8-24 stehen im Block-3-Testblock bereit, der
+  nächste Lauf startet die 200-Knoten-Wegwerf eigenständig.
+- **Keine Code-Änderung** — rein dokumentarisch. Auch keine Test-Anpassung, weil P8-20/
+  21-Sub-Punkte ausschließlich manuell im Browser prüfbar sind (Smoke-Tests gegen
+  die Wegwerf-Instanzen haben sie bereits throwaway-bestätigt).
+- **Kein Live-Deploy, kein Service-Touch** — die Sichtprüfung lief gegen die bestehende
+  v3.0.1, die seit 2026-09-05 16:10:18 CEST aktiv ist (PID 355956, unverändert).
+- **Keine Phase-8.5-Bilanz-Sprünge** — die 5 ✅ · 14 🟡 · 1 ⬜ vom Pre-Z-Tausch-Block
+  bleibt; Phase-8.5 wartet weiter auf Cluster 4 (Connector) + Cluster 5 (Fabian) + Z.
+
+**Nikinger-Aktion in derselben Sub-Session (außerhalb opencode/M3-Scope):**
+
+- **Sean-Einladung erzeugen.** Neuer Nutzer "Sean" möchte die Sharefyx nutzen.
+  Hard Rule 9 + §0.5.7 verbieten opencode/M3 den Eingriff in die echte
+  `auth.sqlite3` des `sharefyx-mcp.service` — der Befehl gehört auf die
+  Nikinger-Seite (Login als `niklas` auf der VM, interaktive Vordergrund-Shell):
+
+  ```bash
+  .venv/bin/python phase4_auth/scripts/authctl.py invite sean --purpose initial --ttl 86400
+  ```
+
+  `authctl.py` schreibt den Klartext-Link einmalig auf stdout und prüft vorher
+  nachweislich, dass `SPACE_PUBLIC_BASE_URL` zur Datenbank passt (PRODUKTIV/STAGING-
+  Marker werden mit-geprintet — siehe authctl.py:117-125, der Disziplin-Kommentar
+  zum 2026-08-06-Staging-Incident). `authctl.py` selber braucht die `auth-dek`-
+  Credential aus dem systemd-LoadCredential — der opencode/M3-Prozess hat sie
+  nicht im Environment. **Der Link gilt 24 h** (`--ttl 86400`, `86400 s = 1 Tag`),
+  danach wird die Zeile in `auth.sqlite3` zwar nicht automatisch gelöscht
+  (`purge_expired()` läuft erst beim nächsten Deploy-Lauf), aber der Konsum
+  scheitert mit "Einladung ungültig oder abgelaufen" — Sean muss sich also innerhalb
+  der 24 h einmal einloggen und Enrollment + TOTP durchlaufen.
+
+**Nächster Schritt, konkret:**
+
+- **Cluster 3 — Rest (Nikinger-Aktion, gleicher Setup wie dieser Lauf):**
+  - `phase8_ui_graph/scripts/wegwerf_setup_200knoten.py {setup,seed,start}` (opencode/M3
+    auf Standing-Permission, Port 18772)
+  - **P8-21 d** in `http://127.0.0.1:18772` mit Tag-Toggle (vermutlich empirisch
+    OK anhand der `spitze`/`last-200`-Verteilung).
+  - **P8-22 a/b/c** am gleichen 200-Knoten-Wegwerf (Stoppuhr für Settle, Hover/Drag/
+    Zoom ohne Hakeln, `prefers-reduced-transparency: reduce` rendert statisch).
+  - **P8-24** am D2-Wegwerf (Port 18768, 14 Knoten) — der kombinierte E2E-Ritt
+    Übersicht → Scope → Graph → Knotenklick → Item. Der 200-Knoten-Wegwerf ist für
+    P8-24 ungeeignet, weil Station 3 (Idempotenz-Lesung über zwei Zeilenzahlen) mit
+    `DEFAULT_LIMIT=50` bei 200 Items driftet (in der Vorverifikation beobachtet).
+- **Cluster 4 (Nikinger-Aktion, ~10 Min):** P8.5-3 (Live-D5 entscheidet §9.4.1
+  Abbruchregel), P8.5-4 (Vierte A3-Probe), P8.5-17 V105 (echter Anthropic-Connector
+  verbindet), **P8.5-19 Bauform-Bestätigung** (30 Sek: Radiogruppe vs. `<select>` am
+  echten v3.0.1 — der Pre-Z-Tausch-Commit hat die Radiogruppe eingespielt, der
+  Nikinger hebt die Zeile damit auf ✅).
+- **Cluster 5 (Nikinger-Aktion, wenn Fabian verfügbar):** P8-5 + P8-8.
+- **Sean-Einladung** (Nikinger-Aktion in dieser Sub-Session, siehe oben).
+- **Z** (Phase-8.5-Closeout): nach allen Clustern; hebt P8.5-19 auf ✅ und schreibt
+  den Phase-8-✅-Nachtrag + die p8.X-Ankündigung mit Verweis auf
+  `docs/concepts/p8x_ui_polish_notes.md` als Wahrheits-Quelle. `CLUSTER3_TESTBLOCK.md`
+  bleibt im Repo als Audit-Quelle.
+
+**Größe-Hinweis (unverändert von vorher):** Phase-8-Head **94.3 KB**, Phase-8.5-Head
+**~49 KB** — beide deutlich über dem 40-KB-Softcap, Auflösung bleibt Z-Arbeit. Die
+Cluster-3-Testblock-Datei ist neu (17 KB) und nimmt keinen der Cap-empfindlichen Köpfe
+zusätzlich in Anspruch — sie lebt im `phase8_5_picker_release/`-Verzeichnis, das als
+📗 live gepflegt wird, aber dieser eine Block ist **kein Doku-Layer**, sondern ein
+Arbeitsdokument, das nach Cluster 3 abgeschlossen ist und dann eher zur Akte gehört
+(kein 📦-Snapshot nötig, L1-Card wäre Overkill für ein Einmal-Testblock).
 ### 2026-09-07 (Pre-Z-Tausch — P8.5-19 Radiogruppe committet + P8.5-6 Bracket-Renderer-Fix committet)
 
 **Auftrag:** Aus der Cluster-2-Folge-Session-Liste vom 2026-09-06 die zwei **Pre-Z-Tausch-Punkte** abzuarbeiten, die der Nikinger explizit an opencode/M3 delegiert hat: P8.5-19 (Tausch `<select>` → Radiogruppe, „5 Z. in dialogs.js + app.html" laut Special-Note) und P8.5-6 (Bracket-Renderer-Bug in `markdown.js`). Beide Punkte schließen **vor Z**, damit Z die Endabnahme-Zeilen P8.5-6 und P8.5-19 formal auf ✅ heben kann (heute 🟡). Cluster 3+ bleiben Nikinger-Aktionen.
