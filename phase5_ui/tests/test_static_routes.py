@@ -253,3 +253,98 @@ def test_insertAtCursor_defined_exactly_once_at_module_level():
         "insertAtCursor muss genau einmal in editor.js definiert sein "
         "(Phase 8.5 A1, P8.5-I: auf Modulebene gehoben)."
     )
+
+
+def test_link_picker_uses_a_radio_group_not_a_select():
+    """P8.5-19 (D4-Nikinger-Fund 2026-09-06, Pre-Z-Tausch 2026-09-07): Modus-Umschalter ist
+    eine **Radiogruppe**, kein `<select>`.
+
+    Vor dem Tausch stand im Picker-Dialog `<select class="input" id="link-picker-mode">`
+    (P8.5-F Planer-Substitution, bewusst nicht N3). Der Nikinger hat in der Sichtpruefung
+    die **Radiogruppe aus seiner N3-Vorschau** angeordnet -- ein Umschalter, der aendert
+    *was ein Klick tut*, soll seine Optionen dauerhaft zeigen, nicht erst hinter einem
+    Klick offenbaren. Bauform ist jetzt:
+      <fieldset class="link-picker-modes">
+        <legend>Einfügen</legend>
+        <label><input type="radio" name="link-picker-mode" value="body" checked> ...</label>
+        <label><input type="radio" name="link-picker-mode" value="frontmatter"> ...</label>
+      </fieldset>
+
+    Wer spaeter aus Bequemlichkeit wieder ein `<select>` einbaut (Konvention v3 drueckt
+    in diese Richtung), faellt hier auf statt erst in der naechsten Sichtpruefung.
+    """
+    html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
+    dialogs = (DEFAULT_STATIC_DIR / "js" / "dialogs.js").read_text("utf-8")
+
+    # Selektor nach Element: kein <select id="link-picker-mode"> mehr, keine #link-picker-mode-ID.
+    assert '<select class="input" id="link-picker-mode">' not in html, (
+        "Der alte <select class=\"input\" id=\"link-picker-mode\"> darf nicht mehr vorkommen "
+        "(P8.5-19, Radiogruppe statt <select>)."
+    )
+    assert 'id="link-picker-mode"' not in html, (
+        "Die ID link-picker-mode darf nicht mehr existieren -- die Radios tragen name=, nicht id= "
+        "(Selektor-Wechsel im JS: querySelectorAll('input[name=\"link-picker-mode\"]'))."
+    )
+
+    # Fieldset mit Legende ist da.
+    assert 'class="link-picker-modes"' in html, (
+        "Fieldset mit class=\"link-picker-modes\" fehlt -- die Radiogruppe braucht einen Container."
+    )
+
+    # Genau zwei Radios, beide mit name="link-picker-mode", mit den richtigen Werten.
+    radio_pattern = re.compile(
+        r'<input\s+type="radio"\s+name="link-picker-mode"\s+value="(body|frontmatter)"(?:\s+checked)?\s*>'
+    )
+    radios = radio_pattern.findall(html)
+    assert radios == ["body", "frontmatter"], (
+        f"Erwartet genau zwei Radios mit name=\"link-picker-mode\" und Werten body/frontmatter, "
+        f"gefunden: {radios}."
+    )
+
+    # JS konsumiert die Radios per Name, nicht per ID.
+    assert "input[name=\"link-picker-mode\"]" in dialogs, (
+        "dialogs.js muss die Radios per querySelector[All]('input[name=\"link-picker-mode\"]') "
+        "finden, nicht per getElementById -- die alte ID ist weg."
+    )
+    assert "getElementById(\"link-picker-mode\")" not in dialogs, (
+        "dialogs.js darf getElementById('link-picker-mode') nicht mehr aufrufen -- "
+        "ID ist entfernt, Selektor ist name=."
+    )
+
+
+def test_markdown_link_regex_allows_escaped_brackets():
+    r"""P8.5-6 (D4-Nikinger-Fund 2026-09-06, Pre-Z-Tausch 2026-09-07): Link- und Bild-Regex
+    in `markdown.js` tolerieren `\[` / `\]` als Escape im Title/Alt.
+
+    Vor dem Fix matchte `\[([^\]]+)\]` gierig bis zum ersten `]`, und ein vom Picker
+    eingefuegter Titel wie `Notiz \[Entwurf\]` (Picker-Maskierung in `editor.js ::
+    _linkTextFor`) zerlegte die URL-Zuordnung -- eckige Klammern ja, runde nein.
+    Der Fix fuehrt `\\[\[\]]` als Alternative ein (zwei Zeichen als Einheit), und der
+    gefangene Text wird danach per `\\([\[\]])` -> `$1` unescaped, damit der gerenderte
+    Link-Text die Klammern literal zeigt.
+
+    Statisch verifiziert (statt jsdom-Probe): die Regex-Quellen tragen den neuen Baustein.
+    Wer den Fix rueckgaengig macht oder auf die alte `[^\]]+`-Form zurueckfaellt, faellt
+    hier auf.
+    """
+    md = (DEFAULT_STATIC_DIR / "js" / "markdown.js").read_text("utf-8")
+
+    # Beide Regex -- Link und Bild -- muessen die Escap-Einheit tragen.
+    # Pattern: ein Backslash, gefolgt von [ oder ]. In JS-Quelltext als "\\[\[\]]" notiert.
+    assert r"\\[\[\]]" in md, (
+        r"Link-/Bild-Regex in markdown.js muss `\\[\[\]]` als Escape-Einheit tragen "
+        r"(zwei Zeichen als Einheit: Backslash + [ oder ]). Vor P8.5-6 fehlte das, "
+        r"eckige Klammern im Link-Text zerlegten die URL-Zuordnung."
+    )
+    # Unescape-Schritt: nach dem Match werden \\X -> X rueckuebersetzt, damit der
+    # gerenderte Link-Text die Klammern literal zeigt (statt mit Backslash).
+    assert r"\\([\[\]])" in md, (
+        r"markdown.js muss `\\([\[\]])` -> `$1` nach dem Regex-Match anwenden, "
+        r"damit der gerenderte Link-Text `Notiz [Entwurf]` statt `Notiz \[Entwurf\]` zeigt."
+    )
+    # Negative Regression: die alte, zu strenge Form darf nicht (mehr) allein stehen.
+    # Sie steht im Code nirgends mehr als regex.source, weil der Fix sie ersetzt hat.
+    assert re.search(r"replace\(/\[\^\]\][^\]]*\\\]\(\[\^\)\\\s\]\+\)\/g", md) is None, (
+        r"Alte Regex `\[([^\]]+)\]\(([^)\s]+)\)` darf nicht mehr im markdown.js stehen "
+        r"-- sie ist die Ursache des Bracket-Bugs und wurde durch die Escape-tolerante Form ersetzt."
+    )

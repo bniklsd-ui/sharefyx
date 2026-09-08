@@ -1301,6 +1301,43 @@ select.input:focus {
   margin-top: 2px;
 }
 
+/* Phase 8.5 P8.5-19 (D4-Fund 2026-09-06, Pre-Z-Tausch 2026-09-07): Modus-Umschalter als
+   Radiogruppe statt `<select>`. Beide Optionen dauerhaft sichtbar (Nikinger-Begründung:
+   "deutlich angenehmer" -- ein Umschalter aendert, *was ein Klick tut*, und das soll der
+   Nutzer vor dem Klick sehen). Fieldset+Legend gibt es eine saubere semantische Gruppe
+   ohne extra Beschriftungs-Klasse; der `.input`-Look aus Selection/Choice-Konvention v3 ist
+   hier bewusst NICHT uebernommen, weil Radios in v3 noch keine eigene Konvention haben und
+   die Picker-eigene Optik (gleiche Schriftgroesse wie das Suchfeld darunter, gleicher
+   Zeilenabstand) sauberer liest als ein `.input`-Kasten um zwei winzige Knoepfe. */
+.link-picker-modes {
+  border: 0;
+  padding: 0;
+  margin: 0 0 var(--space);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.link-picker-modes legend {
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 0;
+  margin-right: 4px;
+}
+.link-picker-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: var(--text);
+}
+.link-picker-mode input[type="radio"] {
+  margin: 0;
+  accent-color: var(--accent-line);
+}
+
 .editor__toolbar {
   display: flex;
   align-items: center;

@@ -273,12 +273,17 @@
   <div class="overlay__panel">
     <h2>Item verknüpfen</h2>
     <p class="overlay__hint">Sucht nach Titel oder Tag. Was der Klick einfügt, hängt vom Modus darunter ab.</p>
-    <label>Einfügen
-      <select class="input" id="link-picker-mode">
-        <option value="body">als Text-Link im Text</option>
-        <option value="frontmatter">als Kante (Feld „Links")</option>
-      </select>
-    </label>
+    <fieldset class="link-picker-modes">
+      <legend>Einfügen</legend>
+      <label class="link-picker-mode">
+        <input type="radio" name="link-picker-mode" value="body" checked>
+        als Text-Link im Text
+      </label>
+      <label class="link-picker-mode">
+        <input type="radio" name="link-picker-mode" value="frontmatter">
+        als Kante (Feld „Links")
+      </label>
+    </fieldset>
     <input type="search" class="input" id="link-picker-search" placeholder="Titel oder Tag…" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="link-picker-results">
     <p class="overlay__hint" id="link-picker-status" aria-live="polite"></p>
     <ul class="link-picker-results" id="link-picker-results" role="listbox"></ul>

@@ -38,6 +38,14 @@ function resolveAssetSrc(src, itemId) {
 // der Browser bekäme einen `404` statt eines sauberen Alt-Texts. `assetIds` (aus `item.assets`,
 // wenn mitgegeben) macht die Existenzprüfung hier explizit, bevor überhaupt ein `<img>`
 // entsteht — ohne `assetIds` bleibt das alte Verhalten (jede `ast_…`-Form wird aufgelöst).
+//
+// Phase 8.5 P8.5-6 (D4-Fund 2026-09-06, Pre-Z-Tausch 2026-09-07): Link- und Bild-Regex
+// tolerieren jetzt `\[` / `\]` als Escape im Alt/Title-Text. Vorher matchte `[^\]]+`
+// gierig bis zum ersten `]`, und ein Titel wie `Notiz \[Entwurf\]` (so eingefügt vom Picker
+// über `editor.js :: _linkTextFor`, das `[`/`]` per `\[$1` maskiert) zerlegte die URL-Zuordnung
+// -- eckige Klammern ja, runde nein. Die neue Alternative `\\[\[\]]` frisst genau zwei Zeichen
+// als Einheit (`\` + `[` oder `]`); nach dem Match wird `\[`/`\]` im Text wieder zu `[`/`]`
+// unescaped, damit der gerenderte Link-Text die Klammern literal zeigt.
 function inlineMarkdown(escaped, itemId, assetIds) {
   return escaped
     .replace(/`([^`]+)`/g, "<code>$1</code>")
@@ -45,12 +53,17 @@ function inlineMarkdown(escaped, itemId, assetIds) {
     .replace(/\*([^*]+)\*/g, "<em>$1</em>")
     // Bildzweig MUSS vor dem Link-Replace laufen (P6.5-J) — sonst frisst die Link-Regex das
     // `[alt](src)` eines `![alt](src)` und das führende `!` bleibt als Text übrig.
-    .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, function (whole, alt, src) {
+    // Phase 8.5 P8.5-6: Alt-Text darf `\[` / `\]` enthalten (siehe Kommentar oben).
+    .replace(/!\[((?:\\[\[\]]|[^\]])*)\]\(([^)\s]+)\)/g, function (whole, alt, src) {
       var m = /^asset:(ast_[0-9a-f]{8})$/.exec(src);
-      if (m && assetIds && assetIds.indexOf(m[1]) === -1) return alt;
-      return '<img src="' + resolveAssetSrc(src, itemId) + '" alt="' + alt + '">';
+      if (m && assetIds && assetIds.indexOf(m[1]) === -1) return alt.replace(/\\([\[\]])/g, "$1");
+      return '<img src="' + resolveAssetSrc(src, itemId) + '" alt="' +
+        alt.replace(/\\([\[\]])/g, "$1") + '">';
     })
-    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2">$1</a>');
+    // Phase 8.5 P8.5-6: Link-Text darf `\[` / `\]` enthalten (siehe Kommentar oben).
+    .replace(/\[((?:\\[\[\]]|[^\]])+)\]\(([^)\s]+)\)/g, function (whole, text, url) {
+      return '<a href="' + url + '">' + text.replace(/\\([\[\]])/g, "$1") + '</a>';
+    });
 }
 
 function splitTableRow(line) {
