@@ -5,10 +5,218 @@ read-when: Auditieren der vollen Phase-8.5-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-07 (D4-Sichtprobe-Folgesession-Block rotiert — manuell wie alle vier vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt; Cluster-1-P8-16-Block ersetzt ihn im Head, **erste echte Code-Touch-Session seit D1** — `phase8_ui_graph/scripts/p8_16_glass_fallback_probe.py` + `wegwerf_setup_p8_16.py` neu (Port 18775, Standing-Permission-Muster reproduziert), vier Screenshots `docs/screenshots/p8_16_{01..04}_*.png`; **P8.5-16 ✅** (Wegwerf-Chromium-Probe mit CDP-`Emulation.setEmulatedMedia` für `prefers-reduced-transparency: reduce` — beide Glass-Träger `.list__head`+`.overlay__panel` wechseln sauber `blur(14px) saturate(1.5)`+`rgba(27,32,39,0.55)` → `backdrop-filter: none`+`rgb(27,32,39)`, Selektion mit Akzent-Fill+Outline im Solid-Modus voll erkennbar, Restore identisch zur Baseline; Phase 8 P8-16 bleibt 🟡 — throwaway-Eidenz jetzt drin, Nikinger-Sichtprüfung am echten v3.0.1 offen); Phase-8.5-Summary 3 ✅ · 14 🟡 · 3 ⬜ → **4 ✅ · 13 🟡 · 3 ⬜**; pytest nicht gelaufen (kein `.venv`-Python-Touch in `phase8_ui_graph/scripts/`), Tabu-Diff §0.3 leer (Phase-8.5-Tabu greift nicht für `phase8_ui_graph/scripts/`), `node --check`/`bash -n`/`ui_budget.py` irrelevant, Service-Touch 0 nur gelesen (PID 355956 unverändert seit 2026-09-05); Cluster 2-5 (Sichtprüfung 2+3 / Connector / Fabian) als nächste Schritte für Cluster-Sequenz offen, Nikinger-Aktionen) | 2026-09-06 (D4-Block rotiert — manuell wie alle vier vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); D4-Block vorne angehängt (newest-first, vor D3), D3 + D1 + Block-C + B1 + A2 + Step 0 darunter unverändert; **D4-Sichtprobe-Folgesession** (Notiz-Session, kein Code-Touch) hat den D4-Block aus dem Head ersetzt — sieben neue Themen-Cluster aus der Sichtprobe mit Fabian dokumentiert: Spaces-Layout-Reorg, Obsidian-Map (Reload-Overload + Landkarten-Stil + Collapsible mit Abhängigkeiten + zwei D4-bestätigte Beobachtungen), Anzahl-Anzeige Ordner, Edit-in-Place-Vision, Layering-Design-System (3 Layer + Selektion blau), „Konto"→„Einstellungen" + Positions-Tausch mit Logout, De-AI-isierung-Lauf 2 nach neuen Kriterien; **neue Datei `docs/concepts/p8x_ui_polish_notes.md` angelegt** (25 KB, L2, alle 16 Themen — fünf bereits in D4 dokumentierte p8.X-Punkte + sieben Sichtprobe-Folgesession-Cluster + vier Sub-Punkte aus §2 Obsidian-Map; Vorsegmentierter Anhang für die Planungs-Session) | 2026-09-06 (D3-Block rotiert — manuell wie alle vier vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); D3-Block vorne angehängt (newest-first, vor D1), D1 + Block-C + B1 + A2 + Step 0 darunter unverändert; D4-Session (Notiz-Session, kein Code-Touch) hat den D3-Block aus dem Head ersetzt — drei Findings dokumentiert: P8.5-19 Radiogruppe statt `<select>` (Tausch ausstehend), P8.5-6 Bracket-Renderer-Bug (Fix in `markdown.js` ausstehend), UX-2-Step-Knotenklick (p8.X); Phase 8 ✅ + p8.X als Nikinger-Entscheidung für Z vorgemerkt) | 2026-09-05 (D1-Block rotiert — manuell wie Block-C davor, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt; D1 vorne angehängt (newest-first), Block-C + B1 + A2 + A1 + Step 0 darunter unverändert; D3-Prep-Session (Health-Gate-Skript + D2-Discovery) hat den D1-Block aus dem Head ersetzt, D2 lief zwischen D1 und D3 still durch den Nikinger) | 2026-09-05 (Block-C-Block rotiert — manuell wie alle vier vorherigen Schritte, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); Block-C vorne angehängt (newest-first), B1 + A2 + A1 + Step 0 darunter unverändert; D1 committet, D2–D5 als Nikinger-Aktionen ausgewiesen) | 2026-09-04 (B1-Block rotiert — manuell wie A2/A1/Step-0, weil `scripts/rotate_session_block.sh` (portiert in Block C, `phase8_5_picker_release/scripts/rotate_session_block.sh`) erst jetzt greift; B1 vorne angehängt (newest-first), A2 + A1 + Step 0 darunter unverändert; C abgeschlossen — 13/13 in Chromium+Firefox, 26/26 gesamt, D/Z stehen noch aus)
+updated: 2026-09-07 (Cluster-3-Teilverifikation ersetzt Pre-Z-Tausch-Block im Head — manuell wie alle sechs vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); Pre-Z-Tausch-Block vorne angehängt (newest-first, verbatim aus dem damaligen Working-Tree-Stand des Heads rekonstruiert — der Block lebte nur im Working Tree der vorherigen Sub-Session und wurde durch die Cluster-3-Trunkierung überschrieben, kein git-Commit dazwischen); Cluster-3-Teilverifikation committet **P8-20 ✅ + P8-21 a/b/c ✅** (P8-20 Hover dimmt + Klick öffnet Editor/Readonly + Drag/Zoom/Pan, P8-21 Default explizit + Tag-Toggle + Ordner-Toggle — alle drei Sub-Punkte in einer Login-Sitzung am live v3.0.1); P8-21 d (>15-Tag-Riegel empirisch), P8-22 (200-Knoten-Settle) und P8-24 (kombinierter E2E-Ritt) in eine Folge-Session verschoben, weil alle drei die 200-Knoten-Wegwerf brauchen (Nikinger-Aktion); Phase-8-Bilanz **19 ✅ · 7 🟡 · 0 ⬜ → 20 ✅ · 6 🟡 · 0 ⬜** (P8-20 wandert 🟡 → ✅, P8-21 a/b/c bestätigt bei Beschreibung, d bleibt offen); `phase8_ui_graph/CLAUDE.md` §7-Matrix-Zeilen P8-20 + P8-21 aktualisiert, Modul-Status Block D um Cluster-3-Vermerk ergänzt, Bilanz-Zeile nachgezogen; `phase8_5_picker_release/CLUSTER3_TESTBLOCK.md` neu (17 KB, 243 Zeilen, der vollständige Schritt-für-Schritt-Testblock für die Cluster-3-Prüfungen als Audit-Quelle für Z); Nikinger-Aktion in derselben Sub-Session: Sean-Einladung über `authctl.py invite sean --purpose initial --ttl 86400` (24h gültig; Hard Rule 9 + §0.5.7 verbieten opencode/M3 den Eingriff in die echte `auth.sqlite3` des `sharefyx-mcp.service`); pytest unverändert 964/964 (kein Python-Touch), Tabu-Diff §0.3 leer, Service-Touch 0 nur gelesen (PID 355956 unverändert seit 2026-09-05); nächster Schritt Cluster 4 (Connector: P8.5-3 + P8.5-4 + P8.5-17 V105 + P8.5-19 Bauform-Bestätigung) + Cluster 5 (Fabian: P8-5 + P8-8) + Z | 2026-09-07 (Pre-Z-Tausch-Block ersetzt Cluster-1-Block im Head — manuell wie alle fünf vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); Cluster-1-P8-16-Block vorne angehängt (newest-first, verbatim aus dem Head kopiert, 156 Zeilen unverändert); Pre-Z-Tausch-Session committet **P8.5-19 + P8.5-6** (Radiogruppe + Bracket-Renderer-Fix, beide mit Code + statischem Test) — `dialogs.js`/`app.html`/`app.css`/`markdown.js` unter `phase5_ui/webui/static/`, `phase5_ui/tests/test_static_routes.py` +2 Tests; pytest 962 → 964 grün, Tabu-Diff §0.3 leer, Service-Touch 0 nur gelesen; Phase-8.5-Summary **5 ✅ · 13 🟡 · 2 ⬜ → 5 ✅ · 14 🟡 · 1 ⬜** (P8.5-19 ⬜ → 🟡); nächster Schritt Cluster 3+4+5 (Nikinger-Aktionen) + Z, mit optionaler P8.5-6-Wegwerf-Re-Probe in Cluster 4) |  2026-09-07 (D4-Sichtprobe-Folgesession-Block rotiert — manuell wie alle vier vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt; Cluster-1-P8-16-Block ersetzt ihn im Head, **erste echte Code-Touch-Session seit D1** — `phase8_ui_graph/scripts/p8_16_glass_fallback_probe.py` + `wegwerf_setup_p8_16.py` neu (Port 18775, Standing-Permission-Muster reproduziert), vier Screenshots `docs/screenshots/p8_16_{01..04}_*.png`; **P8.5-16 ✅** (Wegwerf-Chromium-Probe mit CDP-`Emulation.setEmulatedMedia` für `prefers-reduced-transparency: reduce` — beide Glass-Träger `.list__head`+`.overlay__panel` wechseln sauber `blur(14px) saturate(1.5)`+`rgba(27,32,39,0.55)` → `backdrop-filter: none`+`rgb(27,32,39)`, Selektion mit Akzent-Fill+Outline im Solid-Modus voll erkennbar, Restore identisch zur Baseline; Phase 8 P8-16 bleibt 🟡 — throwaway-Eidenz jetzt drin, Nikinger-Sichtprüfung am echten v3.0.1 offen); Phase-8.5-Summary 3 ✅ · 14 🟡 · 3 ⬜ → **4 ✅ · 13 🟡 · 3 ⬜**; pytest nicht gelaufen (kein `.venv`-Python-Touch in `phase8_ui_graph/scripts/`), Tabu-Diff §0.3 leer (Phase-8.5-Tabu greift nicht für `phase8_ui_graph/scripts/`), `node --check`/`bash -n`/`ui_budget.py` irrelevant, Service-Touch 0 nur gelesen (PID 355956 unverändert seit 2026-09-05); Cluster 2-5 (Sichtprüfung 2+3 / Connector / Fabian) als nächste Schritte für Cluster-Sequenz offen, Nikinger-Aktionen) | 2026-09-06 (D4-Block rotiert — manuell wie alle vier vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); D4-Block vorne angehängt (newest-first, vor D3), D3 + D1 + Block-C + B1 + A2 + Step 0 darunter unverändert; **D4-Sichtprobe-Folgesession** (Notiz-Session, kein Code-Touch) hat den D4-Block aus dem Head ersetzt — sieben neue Themen-Cluster aus der Sichtprobe mit Fabian dokumentiert: Spaces-Layout-Reorg, Obsidian-Map (Reload-Overload + Landkarten-Stil + Collapsible mit Abhängigkeiten + zwei D4-bestätigte Beobachtungen), Anzahl-Anzeige Ordner, Edit-in-Place-Vision, Layering-Design-System (3 Layer + Selektion blau), „Konto"→„Einstellungen" + Positions-Tausch mit Logout, De-AI-isierung-Lauf 2 nach neuen Kriterien; **neue Datei `docs/concepts/p8x_ui_polish_notes.md` angelegt** (25 KB, L2, alle 16 Themen — fünf bereits in D4 dokumentierte p8.X-Punkte + sieben Sichtprobe-Folgesession-Cluster + vier Sub-Punkte aus §2 Obsidian-Map; Vorsegmentierter Anhang für die Planungs-Session) | 2026-09-06 (D3-Block rotiert — manuell wie alle vier vorherigen Schritte in dieser Phase, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); D3-Block vorne angehängt (newest-first, vor D1), D1 + Block-C + B1 + A2 + Step 0 darunter unverändert; D4-Session (Notiz-Session, kein Code-Touch) hat den D3-Block aus dem Head ersetzt — drei Findings dokumentiert: P8.5-19 Radiogruppe statt `<select>` (Tausch ausstehend), P8.5-6 Bracket-Renderer-Bug (Fix in `markdown.js` ausstehend), UX-2-Step-Knotenklick (p8.X); Phase 8 ✅ + p8.X als Nikinger-Entscheidung für Z vorgemerkt) | 2026-09-05 (D1-Block rotiert — manuell wie Block-C davor, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt; D1 vorne angehängt (newest-first), Block-C + B1 + A2 + A1 + Step 0 darunter unverändert; D3-Prep-Session (Health-Gate-Skript + D2-Discovery) hat den D1-Block aus dem Head ersetzt, D2 lief zwischen D1 und D3 still durch den Nikinger) | 2026-09-05 (Block-C-Block rotiert — manuell wie alle vier vorherigen Schritte, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken nicht passt (Skript zählt `## Session stopped`-Header und sieht immer genau einen → Exit 2 „Bereits konform"); Block-C vorne angehängt (newest-first), B1 + A2 + A1 + Step 0 darunter unverändert; D1 committet, D2–D5 als Nikinger-Aktionen ausgewiesen) | 2026-09-04 (B1-Block rotiert — manuell wie A2/A1/Step-0, weil `scripts/rotate_session_block.sh` (portiert in Block C, `phase8_5_picker_release/scripts/rotate_session_block.sh`) erst jetzt greift; B1 vorne angehängt (newest-first), A2 + A1 + Step 0 darunter unverändert; C abgeschlossen — 13/13 in Chromium+Firefox, 26/26 gesamt, D/Z stehen noch aus)
 ---
 
 # SESSIONS_ARCHIVE.md — Phase 8.5: Link-Picker-Politur, Titel-statt-ID-Hint, v3-Vorabritt + Deploy
+
+### 2026-09-07 (Pre-Z-Tausch — P8.5-19 Radiogruppe committet + P8.5-6 Bracket-Renderer-Fix committet)
+
+**Auftrag:** Aus der Cluster-2-Folge-Session-Liste vom 2026-09-06 die zwei **Pre-Z-Tausch-Punkte** abzuarbeiten, die der Nikinger explizit an opencode/M3 delegiert hat: P8.5-19 (Tausch `<select>` → Radiogruppe, „5 Z. in dialogs.js + app.html" laut Special-Note) und P8.5-6 (Bracket-Renderer-Bug in `markdown.js`). Beide Punkte schließen **vor Z**, damit Z die Endabnahme-Zeilen P8.5-6 und P8.5-19 formal auf ✅ heben kann (heute 🟡). Cluster 3+ bleiben Nikinger-Aktionen.
+
+**Ergebnis — beide Punkte 🟡 mit Code + statischem Test committet; Live- bzw. Wegwerf-Re-Verifikation am echten v3.0.1 durch den Nikinger steht aus** (D5 / Cluster 4 als formale Bestätigung):
+
+- **P8.5-19** (`app.html`/`dialogs.js`/`app.css`): `<select class="input" id="link-picker-mode">` raus, **Radiogruppe** rein — beide Optionen dauerhaft sichtbar (Nikinger-Begründung 2026-09-06: „deutlich angenehmer", ein Umschalter, der *was ein Klick tut* ändert, soll seine Optionen vor dem Klick zeigen). Selektor-Wechsel: `getElementById("link-picker-mode")` → `querySelector[All]('input[name="link-picker-mode"]')`. Neuer Modul-Constant `LINK_PICKER_MODE_NAME` (analog zum bestehenden `LINK_PICKER_MODE_KEY`). Modul-Variable `linkPickerModeEl` (Singular, einzelnes Element) gelöscht; `_linkPickerMode()` liest jetzt das `:checked`-Radio via `document.querySelector`, `_restoreLinkPickerMode()` iteriert per `querySelectorAll` und setzt `checked` (HTML-natives Attribut, kein JS-State daneben). `init()` setzt den change-Listener auf jedes Radio statt auf das `<select>`. CSS-Block `.link-picker-modes` (Fieldset+Legend horizontal mit `gap: 12px`) + `.link-picker-mode` (Label mit `accent-color: var(--accent-line)`); bewusst NICHT `.input`-Klasse aus der Selection/Choice-Konvention v3, weil Radios in v3 noch keine eigene Konvention haben und die Picker-eigene Optik (gleiche Schriftgröße wie das Suchfeld darunter) sauberer liest als ein `.input`-Kasten um zwei winzige Knöpfe.
+
+- **P8.5-6** (`markdown.js`): Link- und Bild-Regex in `inlineMarkdown()` tolerieren jetzt `\[` / `\]` als Escape-Einheit. Vor dem Fix matchte `\[([^\]]+)\]` gierig bis zum ersten `]`; ein vom Picker eingefügter Titel wie `Notiz \[Entwurf\]` (Picker-Maskierung in `editor.js :: _linkTextFor`) zerlegte die URL-Zuordnung — eckige Klammern ja, runde nein, exakt der D4-Befund am 2026-09-06 (`\[Vercel\]` im Titel `itm_67bb0565`). Neue Alternative `\\[\[\]]` (zwei Zeichen als Einheit gematcht) im Title/Alt-Capture; nach dem Match wird per `\\([\[\]])` → `$1` unescaped, damit der gerenderte Link-Text die Klammern literal zeigt (`Notiz [Entwurf]` statt `Notiz \[Entwurf\]`). Bild-Regex analog; URLs/Alt bleiben unverändert, das Problem saß ausschließlich in der Title/Alt-Gruppe. Verhalten bei literalen (nicht-escapeten) Klammern bleibt korrekt nach CommonMark: `[Notiz [Entwurf] hier](url)` ist KEIN Link — wer Klammern im Titel will, muss escapen.
+
+**Verifiziert (§0.5 Checkliste — Phase 8.5-Konvention):**
+
+- `pytest -q`: 962 → **964** grün, +2 (`test_link_picker_uses_a_radio_group_not_a_select` P8.5-19, `test_markdown_link_regex_allows_escaped_brackets` P8.5-6; beide in `phase5_ui/tests/test_static_routes.py` direkt unter den bestehenden P8.5-9/12/14-Tests eingefügt). Keine Regression. Gesamtlauf 254 s.
+- `node --check` auf `phase5_ui/webui/static/js/dialogs.js` und `phase5_ui/webui/static/js/markdown.js`: **OK** (beide Dateien).
+- `ui_budget.py` 5/5 im Zielkorridor: `dialogs.js` 12.6 → 13.2 KB (+0.6 KB netto durch den Radiogruppe-Umbau — Fieldset-Wrapper im HTML kostet nichts, dafür kommt die Modul-Konstante `LINK_PICKER_MODE_NAME` + die `_linkPickerMode`/`_restoreLinkPickerMode`-Anpassung dazu), `markdown.js` 4.2 KB (unverändert nach dem Regex-Tuning), `app.css` 17.9 KB (+0.4 KB durch den neuen `.link-picker-modes`-Block). Gesamt-Bundle `app.js+app.css+Font` 130.1 KB, weiter deutlich unter dem 250-KB-Zielkorridor.
+- **Tabu-Diff §0.3 leer** (per `git diff HEAD -- phase4_auth/ storage/ phase5_ui/webui/security.py phase5_ui/webui/api.py phase5_ui/webui/serializers.py phase5_ui/webui/permissions.py phase2_mcp/` — 0 Zeilen). Der einzige Phase-8.5-Tabu-Auslöser wäre `phase2_mcp/mcpserver/tools.py` für `_TITLE_NOT_ID_HINT` (B1, P8.5-D) — nicht berührt. Die fünf geänderten Dateien liegen komplett unter `phase5_ui/webui/static/` (`app.html`, `app.css`, `js/dialogs.js`, `js/markdown.js`) bzw. unter `phase5_ui/tests/` — alles P5-B-konformer Statik- und Test-Bereich, kein Servercode.
+- **Service-Touch 0**. `systemctl show sharefyx-mcp.service` MainPID=**355956** ExecMainStartTimestamp=`Sat 2026-09-05 16:10:18 CEST` (Hard Rule 9 + §0.5.7, nur gelesen — keine `systemctl ...`-Calls in dieser Session, keine Wegwerf-Instanz gestartet, keine `pkill -f`-Aufrufe).
+- **node-Probe gegen `markdown.js`** (mit minimalem Mock-`document`, ohne jsdom): 8 Test-Cases rendern wie erwartet, darunter D4-Fund-Beispiel `[Vercel \[Hosting\](#item/itm_67bb0565)` → `<a href="#item/itm_67bb0565">Vercel [Hosting]</a>` (vor dem Fix: kaputt), Plain-Link-Regression, Runde-Klammern-im-Titel-Regression, Bild-mit-escapeten-Klammern, Negativ-Probe für literal brackets.
+- **Größenprüfung am Ende**: `phase8_5_picker_release/CLAUDE.md` ~43.5 KB nach Pre-Z-Tausch-Block (war 41.3 KB vor dem Schreiben dieses Blocks); bleibt **deutlich** über dem 40-KB-Softcap. `SESSIONS_ARCHIVE.md` 86.9 → ~103 KB (L3, exempt).
+
+**Doku-Updates im selben Commit (Hard Rule 8):**
+
+- `phase5_ui/webui/static/js/dialogs.js` — `linkPickerModeEl` gelöscht, `_linkPickerMode`/`_restoreLinkPickerMode` auf Radiogruppe umgestellt, neuer `LINK_PICKER_MODE_NAME`-Modul-Constant, `init()` setzt change-Listener auf alle Radios.
+- `phase5_ui/webui/static/app.html` — `<select class="input" id="link-picker-mode">` ersetzt durch `<fieldset class="link-picker-modes">` mit `<legend>Einfügen</legend>` und zwei `<label class="link-picker-mode"><input type="radio" name="link-picker-mode" value="…" [checked]> als …</label>`.
+- `phase5_ui/webui/static/app.css` — neuer Block `.link-picker-modes` / `.link-picker-mode`.
+- `phase5_ui/webui/static/js/markdown.js` — Link-/Bild-Regex in `inlineMarkdown()` tolerieren `\[` / `\]` als Escape-Einheit; nach Match `\\([\[\]])` → `$1` im Title/Alt.
+- `phase5_ui/tests/test_static_routes.py` — zwei neue Tests (`test_link_picker_uses_a_radio_group_not_a_select` P8.5-19, `test_markdown_link_regex_allows_escaped_brackets` P8.5-6).
+- `phase8_5_picker_release/CLAUDE.md` Abnahmestand: P8.5-5 / P8.5-6 / P8.5-19 in der Status-Spalte jeweils mit dem Pre-Z-Tausch-Stand annotiert; Stand-Zeile `5 ✅ · 13 🟡 · 2 ⬜` → **`5 ✅ · 14 🟡 · 1 ⬜`** (P8.5-19 ⬜ → 🟡).
+- `phase8_5_picker_release/CLAUDE.md` Session-Block: Cluster-1-Block per Hand nach `SESSIONS_ARCHIVE.md` rotiert (Skript passt nicht auf Phase-8.5-Muster), dieser Pre-Z-Tausch-Block hier neu, Frontmatter-`updated:` vorne ergänzt.
+- `phase8_5_picker_release/SESSIONS_ARCHIVE.md`: Cluster-1-Block vorne angehängt (newest-first, verbatim aus dem Head kopiert, 156 Zeilen unverändert), Frontmatter-`updated:` vorne ergänzt.
+- `CLAUDE.md` (Wurzel): Current-state-Absatz ergänzt.
+- `docs/INDEX.md`: Phase-8.5-Header um Pre-Z-Tausch-Stand erweitert.
+
+**Was diese Session bewusst NICHT tat:**
+
+- **Keine Live-Verifikation am echten v3.0.1** für P8.5-6 / P8.5-19 — beide bleiben 🟡, weil der Tausch eingespielt und statisch getestet ist, aber erst durch den Nikinger am echten Browser gegen v3.0.1 formell bestätigt werden muss.
+- **Keine Cluster 2-5**: Sichtprüfung 2+3 (war Cluster 2, schon durch den Nikinger am 2026-09-07 gelaufen — P8-14/15/18/19/23 auf ✅), Cluster 3 (P8-20/21/22/24), Cluster 4 (P8.5-3 + P8.5-4 + P8.5-17 V105 + P8.5-19 formal), Cluster 5 (Fabian) — alle offen, alle Nikinger-Aktionen.
+- **Keine Phase-8.5-Bilanz-Sprünge auf ✅**: nur P8.5-19 hat sich bewegt (⬜ → 🟡). P8.5-5 und P8.5-6 waren schon 🟡 und bleiben es, jetzt mit Fix-Beleg statt Fix-ausstehend-Caveat.
+- **Keine Aufhebung von Phase-8/8.5-Tabus**, keine P1-Contract-Öffnung.
+- **Kein `sudo systemctl`**, kein Service-Touch, keine Wegwerf-Instanz gestartet (statische Tests + node-Probe reichen für die Code-Pfad-Bestätigung).
+- **Kein `git commit`** in dieser Sub-Session — Working Tree enthielt 7 uncommittete Dateien.
+
+**Nächster Schritt, konkret:**
+
+- **Cluster 3** (Verhalten am echten Gerät durch den Nikinger, ~15 Min): P8-20 (Hover/Klick/Drag), P8-21 (Toggles + Riegel), P8-22 (200-Knoten-Settle), P8-24 (kombinierter E2E-Ritt).
+- **Cluster 4** (Connector, ~10 Min): P8.5-3, P8.5-4, P8.5-17 V105, **P8.5-19 Bauform-Bestätigung Radiogruppe** (30 Sek).
+- **Cluster 5** (Fabian-Sitzung): P8-5 + P8-8.
+- **Z** (Phase-8.5-Closeout): nach allen Clustern.
+
+**Größe-Hinweis:** Phase-Head **~43.5 KB**, weiter über 40-KB-Softcap. Auflösung bleibt Z-Arbeit oder Trimm-Pass vor Z — beides nicht diese Session.
+
+### 2026-09-07 (Cluster 1 der Sichtprüfungen am echten Gerät — P8-16 Glass-Fallback-Probe gegen Wegwerf, P8.5-16 jetzt ✅)
+
+**Auftrag:** Cluster 1 der Sichtprüfungen aus der Liste vom 2026-09-06
+durch opencode/M3 als Wegwerf-Probe. P8-16 war die einzige Sichtprüfung
+ohne jeden empirischen Beleg (`@media (prefers-reduced-transparency: reduce)`-
+Regel im Code, aber nie im Browser gegen UA-Switch geprüft) — also die
+Probe, die sich am ehesten aus der offenen Liste ziehen ließ, ohne den
+Nikinger an den echten Browser zu binden.
+
+**Ergebnis — P8.5-16 jetzt ✅** (Phase 8 P8-16 bleibt 🟡, throwaway-Eidenz
+ist drin, Nikinger-Live-Sichtprüfung gegen v3.0.1 am echten Gerät steht separat
+aus, ist Teil der P8.5-18-Live-Verifikation).
+
+**Was gebaut wurde** (Standing-Permission-Rahmen, Phase 8 §0.0 reproduziert):
+
+- `phase8_ui_graph/scripts/wegwerf_setup_p8_16.py` — minimaler Wegwerf-Setup,
+  Port 18775, ein User (Niklas als `alpha`), ein Item („Notiz fuer P8-16-Probe"),
+  tmp-`DATA_ROOT` unter `/tmp/opencode/sharefyx-wegwerf-p8_16/`, tmp-`auth.sqlite3`,
+  File-Keyring (`keyring.set_keyring(FileBackend(...))`), `auth-dek` 32 B Random,
+  User direkt in `auth.sqlite3` provisioniert (kein `provision_user.py`),
+  `cleanup` per `kill -TERM $(cat serve.pid)` (kein `pkill -f`, Hard Rule 9).
+  Pattern 1:1 von `phase8_ui_graph/scripts/wegwerf_setup_c4c5.py` (P8-Block-C
+  C4+C5), aber auf das P8-16-Minimum reduziert (keine zweite Space, kein
+  Graph-Fixture, keine Mehrfachauswahl).
+- `phase8_ui_graph/scripts/p8_16_glass_fallback_probe.py` — Playwright-Probe
+  gegen die Wegwerf, single-step Chromium (headless), n=1 Item reicht für die
+  Glass-Probe. Sechs Stationen: (1) Login (single-step Form: `space` +
+  `password` + `totp` auf einer Seite, `pages.py:160-177` — die zwei Runden
+  password→otp im ersten Wurf waren falsch geraten und wurden nach `pages.py`-
+  Inspektion auf eine Runde korrigiert); (2) Baseline-Screenshot der Listen-
+  Ansicht mit `.list__head` als Glass-Träger; (3) Account-Dialog öffnen
+  (`#account-button` → `#account-dialog` ohne `hidden`), `.overlay__panel`-
+  Screenshot; (4) CDP-`Emulation.setEmulatedMedia` für `prefers-reduced-
+  transparency: reduce` (Playwright hat keine direkte Option für diese Media
+  Feature, CDP ist der saubere Weg), Selektor `.overlay__panel` wird
+  `wait_for_function` auf `backdrop-filter: none`; (5) Dialog schließen +
+  Selektion auf Listenzeile (Klick auf erste `.list__rows button.list__row`,
+  die Default-Bucket auf „Offen" filterte unsere eine Note raus, also
+  `#home-button` für den globalen „Alle Items"-Scope, danach ist die Zeile
+  da); (6) Restore via CDP-`setEmulatedMedia` mit `no-preference` für beide
+  Features. Computed-Style-Reads via `page.evaluate` + `getComputedStyle`.
+
+**Beleg (n=1 Probe, 7/7 grün):**
+
+| Check | backdrop-filter | background |
+|---|---|---|
+| baseline.list__head | `blur(14px) saturate(1.5)` | `rgba(27,32,39,0.55)` |
+| baseline.overlay__panel | `blur(14px) saturate(1.5)` | `rgba(27,32,39,0.55)` |
+| reduced.overlay__panel | `none` | `rgb(27,32,39)` |
+| reduced.list__head | `none` | `rgb(27,32,39)` |
+| restored.list__head | `blur(14px) saturate(1.5)` | `matchMedia=false` ✓ |
+| reduced.selection | Gradient `linear-gradient(rgba(62,141,243,.2), rgba(62,141,243,.08))` + Outline `1px solid rgba(62,141,243,.4)` — **Selektion voll erkennbar ohne Blur** (Akzent-Fill aus Vormerkung 3 Punkt 1, Outline aus dem 2026-09-02-Nachtrag, der 3-px-transparente Default-Rand reserviert das Boxmodell) | `rgba(0,0,0,0)` |
+| items_api | 200, `items,total,limit,offset`-Shape mit der einen Note drin | — |
+
+`@media (prefers-reduced-transparency: reduce)` greift sowohl für den Default-
+Block (`.glass` Utility, `app.css:194-200`) als auch für die gruppierte Liste
+am Dateiende (`.list__head, .overlay__panel, .update-banner, .toast`,
+`app.css:1734-1743`). Die Selektion im Solid-Modus ist nicht allein von
+Transparenz abhängig — N8 (Auswahl darf nicht nur über Blur erkennbar sein,
+sonst bei deaktiviertem Blur unsichtbar) ist gewahrt.
+
+**Vier Screenshots in `docs/screenshots/`:** `p8_16_01_baseline_list.png`
+(Listen-Ansicht, Glass), `p8_16_02_baseline_dialog.png` (Account-Dialog offen,
+Glass), `p8_16_03_reduced_transparency_list.png` (Listen-Ansicht mit
+`prefers-reduced-transparency: reduce`, solide `.list__head`),
+`p8_16_04_reduced_transparency_selection.png` (selektierte Listenzeile im
+Solid-Modus, Akzent-Fill + Outline sichtbar). Alle 1440×900, ~80-120 KB pro
+Stück.
+
+**Verifiziert (§0.5 Checkliste — Phase 8.5-Konvention):**
+
+- `pytest -q`: nicht gelaufen — keine `.venv`-Python-Datei in
+  `phase8_ui_graph/scripts/` berührt (Setup ruft `space_cli.py` als
+  Subprocess auf, Smoke ruft Playwright + pyotp, beide nutzen vorhandene
+  Libs ohne neue Imports).
+- Tabu-Diff §0.3 (`phase4_auth/`/`storage/`/`security.py`/`api.py`/
+  `serializers.py`/`permissions.py`/`mcpserver/`): **leer** — die neuen
+  Skripte liegen in `phase8_ui_graph/scripts/`, das vom Phase-8.5-Tabu gar
+  nicht erfasst wird (das Tabu zielt auf Servercode in `authserver`/
+  `mcpserver`/`storage`/`webui/security.py`/etc., nicht auf Wegwerf-Setups
+  und Smoke-Skripte; Phase 8 hat ein eigenes Tabu §0.4, das hier auch
+  nicht greift).
+- `bash -n`/`node --check`/`ui_budget.py`: nicht relevant — keine JS-
+  /CSS-/Servercode-Änderung in dieser Session.
+- Service-Touch **0**. `systemctl show sharefyx-mcp.service` MainPID=**355956**
+  ExecMainStartTimestamp=`Sat 2026-09-05 16:10:18 CEST` (Hard Rule 9 +
+  §0.5.7, nur gelesen). Eigene Wegwerf-Instanz sauber per PID-Datei gestoppt,
+  kein `pkill -f` mit Regex.
+- Größenprüfung am Ende (Ist-Werte): `phase8_5_picker_release/CLAUDE.md` 41.7 KB
+  (war 40.9 KB, +0.8 KB netto nach Rotation des Sichtprobe-Folgesession-Blocks
+  raus und Cluster-1-P8-16-Block rein — **+0.8 KB ÜBERSCHREITET den 40-KB-Softcap
+  erstmals in dieser Phase**, Auflösung ist Z-Arbeit oder ein Trimm-Pass vor Z);
+  `SESSIONS_ARCHIVE.md` 79 KB (L3, exempt); `phase8_ui_graph/CLAUDE.md` 94 KB
+  (war 93.6 KB, +0.4 KB durch die erweiterte P8-16-Belegs-Spalte, weiter exempt
+  als geschlossene Phase mit dem Closeout-Block als einzigem aktiven Inhalt);
+  zwei neue Skripte 9.3 KB + 6.7 KB; vier Screenshots ~380 KB gesamt.
+
+**Doku-Updates im selben Commit (Hard Rule 8):**
+
+- `phase8_ui_graph/CLAUDE.md` §7 P8-16-Zeile: Belegs-Spalte um die
+  empirische Wegwerf-Eidenz erweitert (Glass-Wechsel + Selektions-Erkennbarkeit
+  + vier Screenshots), Status bleibt 🟡 (live-Verifikation durch Nikinger offen).
+- `phase8_5_picker_release/CLAUDE.md` §Abnahmestand P8.5-16: 🟡 → ✅, Stand-Zeile
+  3 ✅ · 14 🟡 · 3 ⬜ → **4 ✅ · 13 🟡 · 3 ⬜**.
+- `phase8_5_picker_release/CLAUDE.md` Session-Block: Sichtprobe-Folgesession
+  rotiert nach `SESSIONS_ARCHIVE.md`, dieser Cluster-1-Block hier neu,
+  Frontmatter-`updated:` vorne ergänzt.
+- `phase8_5_picker_release/SESSIONS_ARCHIVE.md`: Sichtprobe-Folgesession-Block
+  vorne angehängt (newest-first, verbatim aus dem Head kopiert, 155 Zeilen
+  unverändert), Frontmatter-`updated:` vorne ergänzt.
+- `docs/INDEX.md`: zwei neue Zeilen für die Skripte unter Phase 8 + ggf.
+  eine Zeile für die Screenshots (zu prüfen, ob die Softcap-Reißer werden —
+  siehe unten).
+
+**Was diese Session bewusst NICHT tat:**
+
+- Keine Cluster 2-5 (Sichtprüfung 2+3 / Connector / Fabian) — die folgen
+  nach Cluster 1, abhängig vom Nikinger (Live-Browser / Connector).
+- Keine Phase-8.5-Bilanz-Sprünge außer P8.5-16 (Phase 8 P8-16 bleibt 🟡 bis
+  Nikinger-Live; Phase-8-Bilanz bleibt 14/12/0).
+- Keine Aufhebung von Phase-8/8.5-Tabus.
+- Kein `sudo systemctl`, keine `systemctl show`-Calls (nur eine
+  `show`-Abfrage am Anfang zur Übergabe-Notierung, danach nur die eigenen
+  Wegwerf-Instanzen via `cat serve.pid` + `kill`).
+- Kein `git commit` — Working Tree enthält jetzt 13 uncommittete Dateien
+  (7 von D4+Sichtprobe-Folgesession + 6 von Cluster 1). Nikinger entscheidet
+  Commit-Schnitt (vermutlich getrennt: D4+Sichtprobe zusammen, dann Cluster 1+
+  Status-Updates als Folge-Commit).
+
+**Nächster Schritt, konkret:**
+
+- **Cluster 2** (Sichtprüfung 2 + 3 am echten Gerät durch den Nikinger, ~25 Min):
+  P8-14 (Plex 16px), P8-15 (Farblegende), P8-18 + P8-19 (Übersicht tabellos +
+  „Alle Items"-Scope), P8-23 (post-deploy-Abnahme), P8.5-18 (umbrella) +
+  P8-16 (Phase-8-Aspekt, throwaway-Eidenz schon da). Doppelung mit Phase-8
+  P8-22/24 (200-Knoten-Settle + Ritt Übersicht→Scope→Graph→Klick→Item) und
+  P8-20 (Graph-Knotenklick) und P8-21 (Tag-/Ordner-Toggles + Cutoff) ist
+  Cluster 3.
+- **Cluster 3** (Verhalten am echten Gerät, ~15 Min): P8-20, P8-21, P8-22,
+  P8-24 — eine zusammenhängende Login-Sitzung am live v3.0.1.
+- **Cluster 4** (Connector, ~10 Min): P8.5-3 (Live-D5 entscheidet §9.4.1),
+  P8.5-4 (Vierte A3-Probe), P8.5-17 (V105), P8.5-19 (Bauform-Entscheidung
+  Radiogruppe vs. `<select>`, 30 Sek).
+- **Cluster 5** (Fabian-Sitzung): P8-5, P8-8 — wenn Fabian verfügbar oder
+  `testnutzer-p7` zur Hand.
+- **Optional vor Z** durch opencode/M3: P8.5-19-Tausch (5 Z. in `dialogs.js`+
+  `app.html`) + P8.5-6 Bracket-Renderer-Fix (in `markdown.js`) — damit Z
+  die Endabnahme-Zeilen auf ✅ heben kann.
+- **Z** (Phase-8.5-Closeout): nach allen Clustern, mit Verweis auf
+  `docs/concepts/p8x_ui_polish_notes.md` als Wahrheits-Quelle für p8.X.
+- **`git commit`**: Nikinger entscheidet.
+
+**Größe-Hinweis:** Phase-Head **41.7 KB**, erstmals über 40 KB-Softcap in
+dieser Phase (war 40.9 KB am Ende Sichtprobe-Folgesession, +0.8 KB netto).
+Auflösung bleibt Z (Phase-8.5-Closeout kann den Head auf ein normales
+Maß bringen) oder ein Trimm-Pass vor Z — beides nicht diese Session.
 ### 2026-09-06 (D4-Sichtprobe-Folgesession — p8.X-Notizen-Datei angelegt, kein Code-Touch)
 
 **Auftrag:** Notiz-Session. Im Anschluss an die D4-Sichtprüfung hat der Nikinger mit

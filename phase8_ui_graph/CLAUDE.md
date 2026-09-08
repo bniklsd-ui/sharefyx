@@ -61,7 +61,7 @@ Abnahmezeilen: `docs/concepts/phase8_ui_graph_plan.md`.
 | B4 | UI: `#item/`-Klick-Delegation (`app.js`) + Link-Picker-Dialog (`app.html`/`app.css`/`dialogs.js`/`editor.js`) | ✅ gebaut + live-verifiziert (`ea14d53` deploy `007b73d`, 2026-09-01); Tabu-Diff leer (insb. `webui/security.py` P8-Q unangetastet); JS-Syntax-Check `node --check` auf `app.js`/`editor.js`/`dialogs.js` OK; 34 statische-Tests grün; ui_budget 5/5 grün (91/250 KB app.js+css+Font) |
 | Block B abgeschlossen | `linkscan.py` + `item_links` + `Store.links_all` + `GET /api/v1/graph` + UI-Wiring | ✅ **live-verifiziert** (`007b73d`, 2026-09-01, Release `20260901T103944.634877Z`, Health-Gate 3/3, Versionsbadge v2.2.3); achte P1-Contract-Öffnung bleibt **angekündigt**, geschlossen mit Phase-8-Step-Z |
 | Block C | Design-Fundament v3 (Typografie, Icons, Farben, Glas) | 🔄 C0 ✅ · C1 ✅ gebaut (C1a Font-Swap + C1b CSS-Tokens) · C2 ✅ gebaut (Lucide-Sprite, 18 Icons, build_icon_sprite.py, js/icons.js, .icon CSS) · C3 ✅ gebaut (Farbsemantik --space-own/shared/foreign + .rail__glyph--{cat}, .space-dot--{cat}, .legend) · C4 ✅ gebaut (Liquid-Glas-Akzente, .list__head sticky, Auswahl-Sheen 3px + Outline) · C5 ✅ gebaut (F5 ::selection + F21 72ch-Editor + F22 Padding-Token) · wartet auf Nikinger-Sichtprüfung 3 am echten Gerät |
-| Block D | Übersicht tablos + Force-Graph | ✅ D1+D2+D3 gebaut (D1 = Übersicht tabellos + globaler Home-Scope, D2 = handgerollter Canvas-Force-Graph, D3 = Versionierung v3.0 + UPDATE_LOG + Sichtprüfung 2 + README Sneak Peak) — **[2026-09-02] drei Restdefekte aus den P8-22/P8-24-Smokes in D2s `js/graph.js`/`webui/api.py` geschlossen** (Settle-Zeit `ALPHA_DECAY`/`ALPHA_MIN`, Foreign-Farbe `writable` statt `shared`, Knotenklick → Item via `onMouseUp`/`selectItem`; Plan §9.4.6, Nikinger-Entscheidung Option (a) für alle drei) — wartet auf Nikinger-Sichtprüfung 2 am echten Gerät + Live-Deploy |
+| Block D | Übersicht tablos + Force-Graph | ✅ D1+D2+D3 gebaut (D1 = Übersicht tabellos + globaler Home-Scope, D2 = handgerollter Canvas-Force-Graph, D3 = Versionierung v3.0 + UPDATE_LOG + Sichtprüfung 2 + README Sneak Peak) — **[2026-09-02] drei Restdefekte aus den P8-22/P8-24-Smokes in D2s `js/graph.js`/`webui/api.py` geschlossen** (Settle-Zeit `ALPHA_DECAY`/`ALPHA_MIN`, Foreign-Farbe `writable` statt `shared`, Knotenklick → Item via `onMouseUp`/`selectItem`; Plan §9.4.6, Nikinger-Entscheidung Option (a) für alle drei) — **[2026-09-07] Cluster 2 Sichtprüfung bestätigt P8-14/15/18/19/23 ✅; [2026-09-07] Cluster 3 bestätigt P8-20 ✅ (Hover dimmt, Klick öffnet Editor/Readonly, Drag/Zoom/Pan) und P8-21 a/b/c ✅ (Default explizit, Tag-Toggle, Ordner-Toggle), P8-21 d bleibt für die 200-Knoten-Wegwerf-Session übrig, P8-22 und P8-24 komplett in eine Folge-Session verschoben** (Wegwerf-Setup ist Nikinger-Aktion) |
 | Step Z | Closeout | ⬜ |
 
 ## Geerbte Contracts
@@ -101,8 +101,8 @@ Frontmatter (Vormerkung), A11y `aria-selected` im Link-Picker nie per JS gesetzt
 | P8-17 (C) | `ui_budget.py` 5/5 grün (Fonts + Sprite + `graph.js`) | ✅ | 124.2/250 KB zuletzt gemessen am 2026-09-02 (Vormerkung 3 Punkt 1 ERLEDIGT) |
 | P8-18 (L) | Übersicht tabellos: Space-Zeilen mit klickbaren Zählern, Graph eingebettet, „Zuletzt benutzt" vorhanden, keine Deko-Kacheln | ✅ | D1 ✅ gebaut + Playwright 5/5 gegen Wegwerf 18767 + 3 Screenshots `d1_{01..03}`; **[2026-09-07] Nikinger-Sichtprüfung am echten Gerät gegen v3.0.1 bestätigt** — Screenshot `phase8_5_picker_release/screenshots/Bildschirmfoto 2026-09-07 um 17.08.37.png` zeigt tabellose Space-Zeilen (`niklas` 7 Notizen/22 Archiv, `fabian` 9 Notizen/4 Archiv, `Home-Server` 2 Notizen, `IT-Sekus-Projekt` 8 Offen/23 Erledigt/19 Notizen/14 Archiv) mit klickbaren Zähler-Chips, VERKNÜPFUNGEN-Graph (~50 Knoten, eigen blau + geteilt türkis + fremd grau klar sichtbar dank Fix B vom 2026-09-02), ZULETZT-BENUTZT-Sektion rechts unten mit drei Items + Timestamps, keine Tile-Cards. Badge `SHAREFYX v3.0.1` links oben (deckt P8-23a mit ab). |
 | P8-19 (L) | Übersicht öffnen → globaler „Alle Items"-Scope in Listen-Spalte | ✅ | D1, gleicher Smoke, V82 explizit getestet (Home-Klick im bereits-globalen Scope ist idempotent); **[2026-09-07] Nikinger-Sichtprüfung am echten Gerät gegen v3.0.1 bestätigt** — Screenshot zeigt Listen-Spalte-Header „Alle Items" mit gemischten Spaces (niklas + IT-Sekus-Projekt + fabian) im globalen Scope. |
-| P8-20 (W) | Graph: Hover dimmt Nicht-Nachbarn, Klick öffnet das Item, Drag/Zoom/Pan funktioniert | 🟡 | D2 ✅ gebaut + d2_playwright_smoke 7/7 (Markup, Login, `/api/v1/graph`, Tag-Toggle, Zoom-Readout, Canvas-Pixel); **[2026-09-02] Fix C gebaut** — `onMouseUp` erkennt jetzt Klick vs. Drag (`CLICK_SLOP = 4`, `pressStart`), ruft `selectItem(id)`; eigener `onMouseLeave`-Handler verhindert, dass ein Drag-off-canvas als Klick zählt. **Jetzt explizit Browser-assertiert:** `phase8_e2e_smoke.py` Station 6 (Klick → Item) grün gegen den D2-Wegwerf, Screenshot `p8_24_03_nach_knotenklick.png` zeigt das nach dem Klick geöffnete Item (aus dem unabhängigen Wiederholungslauf: Editor mit „Erste Notiz"; der erste Lauf traf einen fremden `beta`-Knoten und öffnete dort die Nur-lesen-Ansicht — beide Pfade grün). Drag/Zoom/Pan bleiben Code-Invarianten ohne eigene Assertion (unverändert). Throwaway-verifiziert, **Nikinger-Sichtprüfung am echten Gerät weiterhin offen** |
-| P8-21 (W) | Tag-/Ordner-Toggles wirken; Default nur explizite Kanten; >15-Knoten-Tag → keine Clique | 🟡 | D2 ✅ gebaut + d2_smoke (Tag-Toggle ON erweitert sichtbar, >15-Knoten-Cutoff-Riegel in Code); **Ordner-Toggle + Cutoff-Empirik im Browser stehen aus** |
+| P8-20 (W) | Graph: Hover dimmt Nicht-Nachbarn, Klick öffnet das Item, Drag/Zoom/Pan funktioniert | ✅ | D2 ✅ gebaut + d2_playwright_smoke 7/7 (Markup, Login, `/api/v1/graph`, Tag-Toggle, Zoom-Readout, Canvas-Pixel); **[2026-09-02] Fix C gebaut** — `onMouseUp` erkennt jetzt Klick vs. Drag (`CLICK_SLOP = 4`, `pressStart`), ruft `selectItem(id)`; eigener `onMouseLeave`-Handler verhindert, dass ein Drag-off-canvas als Klick zählt. **Jetzt explizit Browser-assertiert:** `phase8_e2e_smoke.py` Station 6 (Klick → Item) grün gegen den D2-Wegwerf, Screenshot `p8_24_03_nach_knotenklick.png` zeigt das nach dem Klick geöffnete Item. Drag/Zoom/Pan bleiben Code-Invarianten ohne eigene Assertion (unverändert). **[2026-09-07] Nikinger-Sichtprüfung am echten Gerät gegen v3.0.1 bestätigt** — drei Sub-Punkte a/b/c durchgelaufen: a) Hover dimmt Nicht-Nachbarn und kehrt beim Verlassen zurück, kein Unterschied zwischen eigenen/geteilten/fremden Knoten; b) Klick auf eigenen Knoten öffnet den Editor, auf geteilten/fremden die Nur-lesen-Ansicht, ESC zurück zur Übersicht funktioniert in beiden Fällen; c) Drag + Pan + Zoom (10 Stufen rauf/runter) ohne Ruckler, Drag-off-Knoten öffnet das Item nicht. Eine Login-Sitzung am live v3.0.1 |
+| P8-21 (W) | Tag-/Ordner-Toggles wirken; Default nur explizite Kanten; >15-Knoten-Tag → keine Clique | 🟡 | D2 ✅ gebaut + d2_smoke (Tag-Toggle ON erweitert sichtbar, >15-Knoten-Cutoff-Riegel in Code); **[2026-09-07] Nikinger-Sichtprüfung am echten Gerät gegen v3.0.1, drei Sub-Punkte a/b/c durchgelaufen**: a) Default zeigt nur explizite Frontmatter+Body-Kanten, keine Tag/Ordner-Kanten (API-Response gegengeprüft), b) Tag-Toggle erweitert sichtbar und kehrt zurück, c) Ordner-Toggle erweitert sichtbar und kehrt zurück. **Sub-Punkt d (>15-Knoten-Riegel empirisch) bleibt für eine Folge-Session übrig** — am Live-Datensatz existiert kein Tag mit >15 Items, der empirische Beleg kommt nur gegen den 200-Knoten-Wegwerf (`spitze` 5/5 + `last-200` ausgeschlossen), das Wegwerf-Setup ist Nikinger-Aktion |
 | P8-22 (W) | 200-Knoten-Wegwerf-Datensatz: Simulation kommt < 3 s zur Ruhe, Interaktion ohne Hakeln; `prefers-reduced-motion` rendert statisch | 🟡 | **[2026-09-02] Fix A gebaut, erneut gegen den 200-Knoten-Wegwerf gemessen: 5/5 Kriterien erfüllt.** `ALPHA_DECAY` 0.985→0.97 UND `ALPHA_MIN` 0.005→0.01 (nicht nur eine Konstante — mit `ALPHA_DECAY` allein bei unverändertem `ALPHA_MIN` wären es 174 Ticks ≈ 2.90 s gewesen, ~40 ms Marge auf einem gerade gerissenen Kriterium). Gemessen: **152 Ticks in 2509.2 ms, sichtbare Ruhe 2694.6 ms** nach dem ersten Animationsframe (Budget 3000 ms, mehrere Läufe zwischen 2650–2740 ms), Frame-p50 weiterhin 16.7 ms (60 fps). Interaktion ohne Hakeln, Tag-Toggle mit >15-Riegel und `prefers-reduced-motion` unverändert grün. Zwei Bugs im Smoke-Skript selbst gefunden+behoben, die die Wiederholung sonst verdeckt hätten: `step3_interaction`s Drag-Simulation feuerte `mouseup` an der ursprünglichen statt der zuletzt gedraggten Position (sah nach Fix C wie ein Klick aus, öffnete das Item, Übersicht verschwand samt Tag-Toggle-Checkbox). Befund + Optionen weiterhin in Plan §9.4.6, jetzt mit der Nikinger-Entscheidung + Messwerten. Throwaway-verifiziert, **nicht live** |
 | P8-23 (L) | `v3.0`-Badge live, UPDATE_LOG-Eintrag vorhanden, Health-Gate 3/3 nach Deploy | ✅ | D3 ✅ alles vorbereitet (`.rail__version` v3.0 in `app.html`; `docs/UPDATE_LOG.md` oberster Eintrag 2026-09-02 mit vier Bullet-Points: Übersicht tabellos, Verknüpfungs-Graph, globaler Home-Scope, Mini-Legende); **[2026-09-05] Deploy als Nikinger-Aktion gelaufen** (Release `20260905T140325.378914Z`, HEAD `6f19a8f`, Service-PID 355956); **[2026-09-07] Nikinger-Sichtprüfung am echten Gerät gegen v3.0.1 bestätigt** — Badge `SHAREFYX v3.0.1` links oben im Screenshot; Update-Banner `## 2026-09-05` mit den drei Zeilen (Picker-Modi / Tastatur / Generalisierter-Hint) laut D4-Sichtprüfungs-Bericht 2026-09-06 sichtbar; Health-Gate-Teil ✅ durch `scripts/health_gate.sh` 8/8 grün 2026-09-05 15:19:53Z. |
 | P8-24 (W) | Playwright-Durchlauf gegen Wegwerf: Übersicht → Scope → Graph → Knotenklick → Item | 🟡 | **[2026-09-02] Fix C gebaut, Ritt wiederholt: 6/6 Stationen bestanden** (D2-Wegwerf 18768). Station 6 (Knotenklick → Item) grün: der erste Lauf traf einen fremden `beta`-Knoten und öffnete die Nur-lesen-Ansicht („Beta Notiz zwei"), der unabhängige Wiederholungslauf traf einen eigenen `alpha`-Knoten und öffnete den Editor („Erste Notiz", `editor_open=1`/`readonly_open=0`) — beide Pfade grün, `p8_24_03_nach_knotenklick.png` zeigt den zweiten. Zweiter Bug im Smoke-Skript selbst gefunden+behoben: Station 6 prüfte nicht-existente DOM-IDs (`#editor`/`#readonly-view`/`.readonly` statt der echten `#detail-editor`/`#detail-readonly`, `phase5_ui/webui/static/app.html:126/138`) — hätte einen funktionierenden Klick nie als Erfolg erkannt, unabhängig vom Fix. **200-Knoten-Datensatz bewusst NICHT für diesen Ritt verwendet** — Station 3 (globaler Scope, Idempotenz-Check über zwei Zeilenzahl-Lesungen) brach dort aus einem unrelated Grund (Zeilenzahl driftete 40→50 zwischen den Lesungen, `DEFAULT_LIMIT=50` + Render-Timing bei 200 Items, keine Verbindung zu den drei Fixes) — laut Plan-Fallback auf den D2-Wegwerf gewechselt. Throwaway-verifiziert, **nicht live** |
@@ -119,7 +119,7 @@ Frontmatter (Vormerkung), A11y `aria-selected` im Link-Picker nie per JS gesetzt
 
 ### Bilanz (Stand 2026-09-07, nach Cluster-2-Sichtprüfung 2 + 3 am echten Gerät)
 
-**19 ✅ · 7 🟡 · 0 ⬜** von 26 Zeilen — maschinell gezählt, siehe Prüfkommando am Ende dieser
+**20 ✅ · 6 🟡 · 0 ⬜** von 26 Zeilen — maschinell gezählt, siehe Prüfkommando am Ende dieser
 Sektion. **[2026-09-03 Korrektur, P8.5 Step 0.4]:** die Zeile trug seit dem 2026-09-02-Block
 „15 ✅ · 10 🟡 · 0 ⬜", real waren es **14 ✅ · 12 🟡** — der Zähler ist zum dritten Mal
 gedriftet (zwei Mal am 2026-09-02 korrigiert). Statt ihn weiter mit der Hand zu pflegen,
@@ -130,33 +130,40 @@ awk '/^\| P8-[0-9]+ /{ if (/\| ✅ \|/) g++; else if (/\| 🟡 \|/) y++; else if
   END {printf "Zeilen=%d ✅=%d 🟡=%d ⬜=%d\n", n, g, y, o}' phase8_ui_graph/CLAUDE.md
 ```
 
-Ausgaben dieses Kommandos (zuletzt 2026-09-07): `Zeilen=26 ✅=19 🟡=7 ⬜=0`. Sprung 14 → 19
+ Ausgaben dieses Kommandos (zuletzt 2026-09-07): `Zeilen=26 ✅=20 🟡=6 ⬜=0`. Sprung 14 → 19 → 20
 durch Cluster-2-Live-Verifikation am echten Gerät (P8-14, P8-15, P8-18, P8-19, P8-23 alle
 ✅; P8-16 bleibt 🟡 — Cluster-1-Wegwerf-Probe ist drin, eigene Phase-8-§7-Zeile wartet auf
-eigene Live-Sichtprüfung). Die Aufzählung unten bleibt **als Beleg** stehen, was wo zählt
-— beim nächsten Schreibvorgang ist sie gegen das Kommando abzugleichen.
+eigene Live-Sichtprüfung) und Cluster-3-Teilverifikation (P8-20 ✅; P8-21 a/b/c ✅, P8-21 d
+bleibt 🟡 bis 200-Knoten-Wegwerf-Session; P8-22 + P8-24 komplett in eine Folge-Session
+verschoben). Die Aufzählung unten bleibt **als Beleg** stehen, was wo zählt — beim nächsten
+Schreibvorgang ist sie gegen das Kommando abzugleichen.
 
-- **19 ✅:** P8-1, P8-2, P8-3, P8-4 (Block A); P8-6, P8-7 (Block B Indexseite); P8-9,
+- **20 ✅:** P8-1, P8-2, P8-3, P8-4 (Block A); P8-6, P8-7 (Block B Indexseite); P8-9,
   P8-10 (Block B UI); P8-11, P8-12, P8-13 (Block B/C Constraints); P8-14, P8-15, P8-18, P8-19,
-  P8-23 (Sichtprüfung 1+2 am echten Gerät, 2026-09-07); P8-17 (Budget-Test); P8-25 (C0-Audit);
-  P8-26 (Smoke-Fundament).
-- **7 🟡:** P8-5 (A3 Restdefekt — Klammer/Aufzählung, Phase-8.5 B1 vererbt), P8-8 (B3
+  P8-23 (Sichtprüfung 1+2 am echten Gerät, 2026-09-07); **P8-20 (Cluster-3, 2026-09-07)**;
+  P8-17 (Budget-Test); P8-25 (C0-Audit); P8-26 (Smoke-Fundament).
+- **6 🟡:** P8-5 (A3 Restdefekt — Klammer/Aufzählung, Phase-8.5 B1 vererbt), P8-8 (B3
   Zweitnutzer-Pass-Through fehlt), P8-16 (Glass-Fallback Werfer-evidenz drin, Phase-8-§7-
-  Statusregel verlangt eigene Live-Verifikation), P8-20/21 (D2 Verhalten, Cluster 3
-  ausstehend), P8-22 (Fix A throwaway 5/5, ~2.7 s statt 5.95 s — Phase-8-§7 verlangt
-  Live-Verifikation am 200-Knoten-Build), P8-24 (Fix C throwaway 6/6 auf D2-Wegwerf).
-  2026-09-02-Fixe (A/B/C) throwaway-grün, Cluster 3 entscheidet über Live-Sprung.
+  Statusregel verlangt eigene Live-Verifikation), **P8-21 (Cluster-3 a/b/c ✅, d offen für
+  200-Knoten-Wegwerf)**, **P8-22 (Fix A throwaway 5/5 — 200-Knoten-Wegwerf gegen v3.0.1
+  ausstehend)**, **P8-24 (Fix C throwaway 6/6 auf D2-Wegwerf — kombinierter Ritt gegen
+  v3.0.1 ausstehend)**.
 - **0 ⬜:** keine mehr.
 
 **Was §9 (Phase-8-Closeout, P8-N) noch braucht (gesammelt, keine Auslagerung in diese
 Sitzung):**
 
 - **Nikinger-Sichtprüfungslauf am echten Gerät** gegen den dann deployten v3.0-Build für
-  P8-14, P8-15, P8-16, P8-18, P8-19, P8-23.
+  P8-16, **P8-21 d (200-Knoten-Wegwerf-Session), P8-22, P8-24** — alles in einer Folge-
+  Session zusammen mit D5/V105/Cluster-4.
 - **§9-Restdefektabschnitt** mit den drei benannten Punkten (A3 Klammer/Aufzählung,
   Item-Link-Picker-Body-Lücke, Picker-A11y `aria-selected`) plus den drei aus den Smokes
   (P8-22 Settle-Zeit, P8-15 Foreign-Farbe unerreichbar, P8-20/24 Knotenklick).
-- **Phase-Status Glyphe** (✅/🟡) — Nikinger-Entscheidung. Vorschlag nach Cluster 2 (5/6 ✅ aus Sichtprüfung 1+2, Bilanz 19/7/0): **🟡 vorerst**, weil Cluster 3 (P8-20/21/22/24 Verhalten) + Cluster 5 (P8-5/P8-8) noch offen sind; erst nach allen Clustern ist die Bilanz 22+ ✅ und der Sprung auf ✅ sauber begründet. Alternative: nach den nächsten 5-7 ✅-Zeilen (Ziel 23-25) direkt ✅.
+- **Phase-Status Glyphe** (✅/🟡) — Nikinger-Entscheidung. Vorschlag nach Cluster 3-Teil-
+  verifikation (Bilanz 20/6/0): **🟡 vorerst**, weil P8-21 d, P8-22 und P8-24 + Cluster 5
+  (P8-5/P8-8) noch offen sind; erst nach allen Clustern ist die Bilanz 23+ ✅ und der
+  Sprung auf ✅ sauber begründet. Alternative: nach den nächsten 4-6 ✅-Zeilen (Ziel 24-26)
+  direkt ✅.
 
 ---
 
