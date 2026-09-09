@@ -5,7 +5,7 @@ read-when: setting up or improving the automated-visual-check workflow for any p
 detail: L2
 up: ../INDEX.md
 down: []
-updated: 2026-09-08 (erste Fassung, nach Phase-8.5-Sichtprüfungs-Sub-Session)
+updated: 2026-09-09 (OpenCode-Vision-Plugin-Empfehlung von „spätere Session" auf „P8.6 first step (Nikinger-Vorgabe 2026-09-08)" verschärft, Begründung warum früh [Sichtungs-Reibung ohne Plugin — pro Bild ein Kontext-Sprung]; Verweis auf neue Konvention §4 der Schwester-Datei [Screenshots im Chat präsentieren sobald Plugin installiert]) | 2026-09-08 (erste Fassung, nach Phase-8.5-Sichtprüfungs-Sub-Session)
 ---
 
 # Sichtprüfungs-Automatisierung — Werkzeug-Empfehlungen
@@ -73,11 +73,24 @@ hängt.
    Architektonisch die schwergewichtigere Option — nur relevant, falls ohnehin ein
    Multi-Agent-Setup geplant ist, nicht als Erstlösung für das reine Bild-Problem.
 
-**Nächster konkreter Schritt für eine spätere Session:** `DavidEasden/opencode-vision`
-installieren, gegen genau eines der zehn Screenshots aus dieser Session testen (z. B.
-`c4_p8519_01_radiogruppe_im_dialog.png` — einfach zu verifizieren: "sind zwei Radio-Buttons
-sichtbar, ist einer markiert?"), und danach entscheiden, ob es das native `Read`-Äquivalent für
-OpenCode wird.
+**Nächster konkreter Schritt (verbindlich als P8.6 first step, Nikinger-Vorgabe 2026-09-08):**
+`DavidEasden/opencode-vision` installieren, gegen genau eines der Screenshots aus der
+Phase-8.5-Session testen (z. B. `c4_p8519_01_radiogruppe_im_dialog.png` — einfach zu
+verifizieren: "sind zwei Radio-Buttons sichtbar, ist einer markiert?"), und danach entscheiden,
+ob es das native `Read`-Äquivalent für OpenCode wird. Sobald installiert, gilt die neue
+Sichtungs-Konvention aus der Schwester-Datei
+[`sichtpruefung_automation_conventions.md`](./sichtpruefung_automation_conventions.md) §4:
+Screenshots im Chat präsentieren, darunter eine kurze Zeile „Was zu validieren ist", und der
+Nikinger sichtet direkt am Bild.
+
+**Warum das Plugin P8.6 first step ist (nicht später):** solange M3 die Screenshots nicht
+nativ im Chat zeigen kann, muss der Nikinger sie aus dem Dateisystem öffnen, was pro Bild
+einen Kontext-Sprung kostet und die Sichtungs-Runde ungleich schwerer macht. Der Nikinger
+hat 2026-09-09 explizit darauf bestanden, dass die Plugin-Installation **vor** dem ersten
+P8.6-Schritt kommt — nicht weil P8.6 sonst blockiert wäre, sondern weil ohne das Plugin die
+nächste Sichtungs-Runde (für P8.5-6 Vorschau-Beleg, für die ersten UI-Politur-Schritte aus
+`p8x_ui_polish_notes.md`, für den Radiogruppe-Rückbau) jedes Mal denselben Reibungs-Verlust
+hat.
 
 ## Empfehlung für Claude Code
 

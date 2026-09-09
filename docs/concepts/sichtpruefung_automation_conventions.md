@@ -6,7 +6,7 @@ detail: L2
 up: ../INDEX.md
 down:
   - ./sichtpruefung_automation_tooling.md   # separate concern: plugins for VIEWING screenshots (Claude Code vs. OpenCode), not for RUNNING checks
-updated: 2026-09-08 (erste Fassung, Phase-8.5-Sichtprüfungs-Sub-Session)
+updated: 2026-09-09 (vier neue Konventionen für Sichtungs-Skripte + -Output: §1 Vorschau-Pflicht bei klickbaren Links, §2 Wer validiert was [Code/auto = M3 oder Claude Code, visuell = Nikinger-Auge], §3 Deploy erst nach Testauswertung, §4 Screenshots im Chat präsentieren sobald opencode-vision installiert ist; Nikinger-Feedback 2026-09-09 aus der Sichtung der 10 P8.5-🟡-Zeilen — P8.5-6 bleibt 🟡 wegen fehlendem Vorschau-Screenshot des Bracket-Pfads) | 2026-09-08 (erste Fassung, Phase-8.5-Sichtprüfungs-Sub-Session)
 ---
 
 # Sichtprüfungs-Automatisierung — Techniken (nicht: Werkzeuge)
@@ -16,6 +16,64 @@ updated: 2026-09-08 (erste Fassung, Phase-8.5-Sichtprüfungs-Sub-Session)
 > ist das Gegenstück: **wie** man eine Sichtprüfung, die auf den ersten Blick einen echten
 > Menschen oder einen echten Connector braucht, trotzdem skriptbar macht — mit konkretem,
 > lauffähigem Code aus einer echten Session, nicht nur der Idee.
+
+## Konventionen für Sichtungs-Skripte und -Output (Nikinger-Feedback 2026-09-09)
+
+Vier Regeln aus der Phase-8.5-Sichtungs-Praxis (Block C 2026-09-04 + Sichtung 2026-09-09),
+verbindlich für alle künftigen Sichtungs-Runden. Vor jeder neuen Runde prüfen, ob eine der
+vier das Vorgehen verändert — und ggf. Skripte + Walkthroughs nachziehen.
+
+### 1. Vorschau-Pflicht bei klickbaren Links
+
+Wenn eine Sichtung **klickbare Links** prüft (Link-Picker-Einfügen, Markdown-Rendering mit
+`[…](…)`, Body-Links), genügt ein Screenshot der **Edit-Ansicht** nicht. Der Nikinger muss
+im Bild sehen können, dass der Link **gerendert als klickbarer Hyperlink** erscheint — sonst
+liest er nur den Markdown-Quelltext und kann nicht entscheiden, ob das Rendering
+funktioniert. Konkret: das Vorschau-Panel muss im Screenshot sichtbar eingeblendet sein (oder
+eine zweite Renderer-Screenshot-Variante vorliegen).
+
+Lehre aus Phase 8.5: D4 (2026-09-06) hat den Bracket-Bug in `markdown.js` gefunden, weil
+der Markdown-Source-Escape korrekt war (`\[Vercel\]`), aber der Renderer die eckige Klammer
+im Titel als Ende des Link-Texts interpretierte und der Link damit visuell zerbrach. **Wäre
+der damalige Smoke mit eingeblendetem Vorschau-Panel gelaufen, wäre der Bug schon im
+Block-C-Smoke aufgefallen, nicht erst in der manuellen D4-Sichtprüfung.** P8.5-6 bleibt
+deshalb 2026-09-09 🟡: kein Vorschau-Screenshot des Bracket-Pfads vorhanden, nur statische
+Tests + Code-Review.
+
+### 2. Wer validiert was (Code / Wegwerf / Live / Visuell)
+
+| Art | Wer validiert | Beweis-Material |
+|---|---|---|
+| **(C) Code/Test** | **vollständig durch M3 oder Claude Code** — kein Nikinger-Schritt nötig, sofern im Abnahme-Archiv dokumentiert | grünes `pytest` / `node --check` / `bash -n` + statischer-Test-Beleg |
+| **(W) Wegwerf + Nikinger-Sichtung** | M3 fährt den Smoke, Nikinger sichtet Evidenz | Smoke-Skript-Output + Screenshots (mit Vorschau bei Links, s. Regel 1) |
+| **(L) nur live** | Nikinger am echten System | Connector-Output, Browser-Session |
+| **Visuelle Sichtungen** (Markup, Layout, Rendering, Animation) | **immer Nikinger-Auge**, bis das OpenCode-Vision-Plugin (P8.6 first step) installiert ist und M3 die Bilder nativ mit-vorlegen kann | Screenshots — ab P8.6 direkt im Chat, vorher als Dateipfade + Was-zu-validieren |
+
+### 3. Deploy erst nach Testauswertung — nicht umgekehrt
+
+Reihenfolge für künftige Phasen (P8.6, P9) ist **immer**:
+
+1. **Wegwerf-Instanzen** (W-Smokes), **statische Tests**, Build-Skripte, `ui_budget.py` laufen
+   gegen einen frischen Wegwerf-Build, dessen `git checkout` identisch zum geplanten
+   Release-Stand ist (Hard Rule 9-konform über PID-Datei, niemals `pkill -f`).
+2. **Nikinger sichtet** die Evidenz (Skript-Logs, Screenshots, Console-Cross-Checks).
+3. Stand ist „sicher" — **dann** erst der Deploy als **Nikinger-Aktion** (Hard Rule 9:
+   niemals von opencode/M3 oder Claude Code ausgelöst).
+
+Nicht: Deploy → Tests → vielleicht Rollback. Der Phase-8.5-Vorlauf fährt genau dieses
+Muster — D3-Health-Gate (8/8 grün vor D2-Deploy) + Sichtungs-Block C/D → erst danach der
+eigentliche Deploy durch den Nikinger.
+
+### 4. Screenshots im Chat präsentieren (sobald opencode-vision installiert ist)
+
+Sobald das OpenCode-Vision-Plugin (`DavidEasden/opencode-vision`, siehe
+[`sichtpruefung_automation_tooling.md`](./sichtpruefung_automation_tooling.md)) als erster
+Punkt in P8.6 installiert ist, gilt für künftige Sichtungs-Runden dasselbe wie bei Claude
+Code: jeder Screenshot wird hier im Chat präsentiert, darunter steht **eine kurze Zeile „Was
+du validieren sollst"**. Der Nikinger sichtet dann direkt am Bild — ohne den Umweg über
+das Dateisystem. **Bis das Plugin installiert ist**, müssen Screenshots über das Dateisystem
+geöffnet werden, und der M3/Claude-Code listet sie als Dateipfade + kurze
+Was-zu-validieren-Beschreibung auf.
 
 ## Der Kernsatz, bevor du eine Zeile Code schreibst
 

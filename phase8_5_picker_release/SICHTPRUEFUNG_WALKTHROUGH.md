@@ -7,6 +7,14 @@
 > Beide Dateien sind Geschwister — diese hier geht mit, die andere wird
 > referenziert.
 >
+> **Wichtig (Sichtungs-Konvention 2026-09-09):** wenn eine Sichtung **klickbare Links**
+> prüft (Link-Picker-Einfügen, Markdown-Rendering mit `[…](…)`, Body-Links), muss
+> das **Vorschau-Panel im Screenshot sichtbar eingeblendet** sein. Die
+> Edit-Ansicht allein reicht nicht — du liest sonst nur den Markdown-Quelltext und
+> kannst nicht entscheiden, ob das Rendering funktioniert (Lehre aus Phase 8.5 D4
+> Bracket-Bug 2026-09-06). Volle Konvention:
+> [`docs/concepts/sichtpruefung_automation_conventions.md` §1](../docs/concepts/sichtpruefung_automation_conventions.md).
+>
 > **Voraussetzungen:**
 > - Du bist an deiner gewohnten VM mit Browser und DevTools.
 > - Die zwei Wegwerf-Instanzen laufen (200-Knoten auf Port 18772, D2 auf
