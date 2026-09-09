@@ -14,7 +14,7 @@ down:
   - docs/concepts/phase6_5_tools_images_plan.md   # ausführungsreifer P6.5-Plan
   - docs/concepts/phase7_spaces_admin_plan.md     # ausführungsreifer P7-Plan
   - docs/concepts/phase8_ui_graph_plan.md         # ausführungsreifer P8-Plan
-updated: 2026-09-09 (P8.5-6-Folge-Smoke-Sub-Session — Bracket-Pfad live-verifiziert, Phase 8.5 **vollständig abgeschlossen** Bilanz 19/1/0 → **20/0/0**; v3ritt-Wegwerf frisch hochgefahren + Item `itm_b8b989a1` „Vercel [Hosting]" via `storage.Store.create()`, Mini-Smoke `phase8_5_picker_release/scripts/p856_bracket_mini_smoke.py` neu + Screenshot `p856_bracket_preview.png` mit „Vercel [Hosting]" als klickbarem Hyperlink; Wegwerf sauber per PID-Datei gestoppt) | 2026-09-09 (Phase 8.5 Sichtungs-Sub-Session: 10 P8.5-🟡-Zeilen sichtet, 9 ✅, P8.5-6 bleibt 🟡 wegen fehlendem Vorschau-Screenshot des Bracket-Pfads; vier neue Sichtungs-Konventionen in `docs/concepts/sichtpruefung_automation_conventions.md` §1-§4 notiert [Vorschau-Pflicht / Code-vs-Visuell / Deploy-nach-Test / Screenshots-im-Chat]; Phase-8.5-Bilanz 10/10/0 → **19/1/0**; keine Code-Änderung, nur Doku-Updates in den Phase-Headern + Walkthrough/Restblock + INDEX + ROOT) | 2026-09-08 (Z-Final: Phase-1-bis-7-Rollups komprimiert — jeweils ein Status-Satz + Pointer auf Phase-Head/Plan/Handover statt der vollen Verlaufsdokumentation [P1 23→3, P2 41→4, P3 30→4, P4 30→3, P5 29→3, P6 40→4, P6.5 32→4, P7 45→4 Zeilen]; Phase 8 + 8.5 + 8.X + „Bewusst nicht" bleiben ausführlich; 44.6 KB → 28.4 KB, jetzt **unter dem 40-KB-Softcap**; Frontmatter vorne ergänzt; Phase 8 ✅, Phase 8.5 ✅, Phase 8.6 + P9 weiter als Arbeitsnamen vorgemerkt) | 2026-09-06 (Phase 8.5 D4 Sichtprüfung durch den Nikinger — **nur dokumentiert, kein Code-Touch**; Block 1–7 + Vorbereitung komplett durchgelaufen, drei echte Findings: **P8.5-19 Radiogruppe statt `<select>`** [Tausch 5 Z. ausstehend], **P8.5-6 Bracket-Renderer-Bug in `markdown.js`** [Fix ausstehend, §0.3 erlaubt `webui/static/js/`], **UX-2-Step-Knotenklick als neues Feature für p8.X** [parkiert]; Phase 8 ✅ + p8.X als Nikinger-Entscheidung für Z vorgemerkt; Modul-Status Zeile 6 Block D um D4 ✅ erweitert; P8.5-6 um Bracket-Caveat, P8.5-17 Update-Banner-Teil jetzt ✅; Summary 3 ✅ · 14 🟡 · 3 ⬜; D3-Block per Hand nach SESSIONS_ARCHIVE.md rotiert; keine Code-Tests, kein Service-Touch; nächster Schritt D5 Vierte A3-Probe + V105 Connector-Check — beides Nikinger; optional vor Z Radiogruppe-Tausch + Bracket-Fix durch opencode/M3) | 2026-09-05 (Phase 8.5 D3-Prep — `scripts/health_gate.sh` neu, **Lauf 2026-09-05 15:19:53Z 8/8 grün** gegen den frischen Deploy; **D2 lief zwischen D1 und D3 still durch den Nikinger** (PID 355956, Release `20260905T140325.378914Z`, ExecMainStartTimestamp `2026-09-05 16:10:18 CEST`); D3 ist Verifikation statt Vorbereitung; D1-Block per Hand nach SESSIONS_ARCHIVE.md rotiert; Modul-Status D um D2 ✅ + D3 🟡 erweitert; Abnahmestand P8.5-17 Health-Gate-Teil 🟡, Summary 3 ✅ · 14 🟡 · 3 ⬜; pytest nicht gelaufen (kein Python-Touch), bash -n OK, Tabu-Diff §0.3 leer, Service-Touch 0; nächster Schritt D4 Sichtprüfung am echten Gerät — Nikinger-Aktion) | 2026-09-05 (Phase 8.5 D1 committet — Badge `v3.0`→`v3.0.1` in `app.html:20` (P8.5-N7), neuer `## 2026-09-05`-Block in `docs/UPDATE_LOG.md` mit drei Zeilen Picker-Modi/Tastatur/Generalisierter-Hint — **Datums-Drift zu Block-C-Spec dokumentiert**: Block-C-Absatz schlug `## 2026-09-04` vor, `date +%F`/`date -u +%F` ist heute 2026-09-05, `deploy.sh` Z. 117–131 verlangt strikt `today_utc`/`today_local`, sonst Gate-Abbruch; Block-C-Block per Hand nach `SESSIONS_ARCHIVE.md` rotiert (Skript passt nicht auf Phase-8.5-Muster), Modul-Status D `⬜`→`🟡` mit D2–D5 als Nikinger-Aktionen vermerkt, pytest nicht gelaufen, Tabu-Diff §0.3 leer, Service-Touch 0 PID 195922 nur gelesen; nächster Schritt D2 Nikinger-Aktion) | 2026-09-01 (Phase 8 Block A+B ✅ live-verifiziert, Gate B→C bestanden -- _graph_get 12/12 manuell, Playwright 18/18 gegen Wegwerf; Block C naechster Schritt) | 2026-08-28 (Phase 8 Step 0 gestartet -- Status ⬜→🔄, phase8_ui_graph/CLAUDE.md als phase head angelegt) | 2026-08-28 (Phase 8 geplant -- Zeile + Abschnitt neu, phase8_ui_graph_plan.md in down: aufgenommen) | 2026-08-28 (Phase 7 formal abgeschlossen ✅ -- 22 von 24 Abnahmezeilen live bestanden, zwei benannte Defekte an P8 vererbt, PHASE7_CLOSEOUT_HANDOVER.md + Uebersichtsgrafik neu, zweite Rotation des Phase-Heads) | 2026-08-27 (Phase 7 inhaltlich vollstaendig, live deployt e88a624, Step Z laeuft) | 2026-08-23 (Phase 6.5 formal abgeschlossen als P7 Step A8 -- 🟡 code-complete, 12 von 14 Abnahmezeilen live, zwei per testnutzer-p7-Substitution, PHASE6_5_CLOSEOUT_HANDOVER.md neu) | 2026-08-23 (neue Phase 7 -- Space-Verwaltung, Mehrfachauswahl, Konsolidierung -- ergaenzt, Step 0 gestartet; fehlende P6.5-Tabellenzeile nachgetragen) | 2026-08-23 (Phase 6 auf 🟡 code-complete -- 12 von 39 Abnahmezeilen live, Sprung auf ✅ ist offene Nikinger-Entscheidung) | 2026-08-20 (neue Phase 6.5 -- Werkzeug-Ergonomie + Bilder -- ergaenzt, Step 0 gestartet)
+updated: 2026-09-09 (Phase-8.5-Z-Closeout — Phase 8.5 mit Step Z **vollständig abgeschlossen**; Übersichtsgrafik + `PHASE8_5_CLOSEOUT_HANDOVER.md` neu (Umkehr der Locks P8.5-S/P8.5-R durch den Nikinger, im Plan §0.2 datiert), Plan §9 gefüllt; im Phase-8.5-Abschnitt die stale „v3.0 ist nicht ausgeliefert"-Korrektur durchgestrichen (der Deploy lief am 2026-09-05) und P8.5-S aus DRAUSSEN gestrichen; im Phase-8.X-Abschnitt die stale Notiz-Zahlen „16 Themen / 25 KB" auf **zehn Abschnitte / 40.9 KB** korrigiert, Schritt 1 als erledigt markiert, **Mobile-Hälfte der Außenkante aufgehoben** (Realtime bleibt draußen), Nummern-Frage „p8.7 vs. P9" als offen notiert) | ältere Einträge: die jeweiligen Phase-Header und `docs/PROJECT_SESSION_LOG.md`
 ---
 # ROADMAP — Space-Server
 
@@ -122,11 +122,11 @@ N1–N12 in §0.1 gelockt, Entscheidungen P8-A–P8-Q, Abnahmezeilen P8-1–P8-2
 
 **Mission:** drei 🟡-Restdefekte aus Phase-8-Closeout §9.4.1–§9.4.3 schließen, einen vollständigen
 v3-Vorabritt über den nie ausgelieferten v3-Build fahren und ihn live deployen — diese Phase
-**schließt Phase 8 formal mit ab** (N6, Präzedenz P7 Step A8 für Phase 6.5). **Wichtige
-Korrektur zum Live-Stand:** v3.0 ist **nicht** ausgeliefert — `/opt/sharefyx/current` zeigt auf
-`007b73d` (Block B), Badge `v2.2.3`; Block C (Design v3) und Block D (Graph, tabellose Übersicht)
-liegen nur im Repo. Deshalb ist ein voller 13-Stationen-Vorabritt gegen eine Wegwerf-Instanz vor
-dem Deploy Teil dieser Phase (N5), nicht nur die drei Fixes.
+**schließt Phase 8 formal mit ab** (N6, Präzedenz P7 Step A8 für Phase 6.5). ~~**Wichtige Korrektur zum Live-Stand:** v3.0 ist **nicht** ausgeliefert …~~
+**[2026-09-05 erledigt]:** der Vorabritt lief 26/26, der Deploy ging durch — live seit
+`main@6f19a8f`, Release `20260905T140325.378914Z`, Badge `v3.0.1`, Service-PID 355956.
+Der Grund für den vollen 13-Stationen-Ritt (N5) bleibt der richtige: Block C/D waren ein
+UI-Umbau, den nie ein echter Nutzer gesehen hatte.
 
 - **DRIN:** Picker-Modus-Umschalter „Text-Link / Kante" mit `localStorage`-Persistenz
   (P8.5-§2 A1); Tastaturnavigation über `aria-activedescendant`-Muster (P8.5-§2 A2); Hint
@@ -138,11 +138,15 @@ dem Deploy Teil dieser Phase (N5), nicht nur die drei Fixes.
   2026-09-02 geschlossen), Phase-8-§9.4.7 Glyph-Entscheidung ✅/🟡 (Nikinger-Sache nach
   Live-Deploy + Sichtprüfung), geerbtes Phase-6/6.5/7-Ledger (`phase8_ui_graph_plan.md` §9.4.5),
   FastMCP-4/V79 (eigene Mini-Phase, P5-C), `_trash/`-Räumung, Funnel-Watchdog, Mobile/Realtime,
-  Light-Mode, Phase-8.5-Übersichtsgrafik (P8.5-S).
+  Light-Mode, ~~Phase-8.5-Übersichtsgrafik (P8.5-S)~~ **[2026-09-09 aufgehoben, Nikinger]:**
+  die Grafik existiert — `docs/concepts/phase8_5_picker_release_uebersicht.svg`, Korrekturnotiz
+  im Plan §0.2.
 
 **Plan:** `docs/concepts/phase8_5_picker_release_plan.md` (744 Zeilen, geschrieben 2026-09-03
 gegen `main@6272cad`). N1–N7 in §0.1 gelockt, Entscheidungen P8.5-A–P8.5-T, Steps 0/A/B/C/D/Z,
-Abnahmezeilen P8.5-1–P8.5-20, `[VERIFY]` V95–V105. Closeout wird §9 des Plans. **Step 0
+Abnahmezeilen P8.5-1–P8.5-20, `[VERIFY]` V95–V105. **Closeout ist §9 des Plans (gefüllt
+2026-09-09, kanonisch); Einstieg für die P8.6-Planung ist
+`docs/concepts/PHASE8_5_CLOSEOUT_HANDOVER.md` §4.** **Step 0
 abgeschlossen** (Haushalt-Funde, Skelett, Größenkorrekturen); **A1 committet** (`499d9be`,
 2026-09-04, Picker-Modus-Umschalter + Body-Markdown-Link-Helper + `localStorage`,
 Modul-Status 🟡, Tests ⬜, vollständiger Session-Block im Phase-Head); **Drift nachgezogen**
@@ -263,28 +267,36 @@ Folge-Phase die offenen UI-Polish-Wünsche aus der Sichtprobe-Folgesession 2026-
 in Phase 8.5 D4 vorgemerkt (`phase8_5_picker_release/CLAUDE.md` und
 `phase8_ui_graph_plan.md §9.4.7`).
 
-**Notiz-Sammlung:** `docs/concepts/p8x_ui_polish_notes.md` (L2, 25 KB, 2026-09-06
-angelegt) — 16 Themen in sieben Clustern: §1 Spaces-Layout-Reorg, §2 Obsidian-Map
-(fünf Sub-Punkte: Performance / Stil / Field schneidet ab / Reload-Drift /
-Collapsible mit Abhängigkeiten), §3 Anzahl-Anzeige Ordner, §4 Edit-in-Place-Vision,
-§5 Layering-Design-System, §6 „Konto"→„Einstellungen"-Rename, §7 De-AI-ierung-Lauf 2.
-Anhang §A–§E mit D4-Duplikat-Verweisen, klaren Außenkanten, sechs offenen Fragen für
-die Planungs-Session, Namens-Konvention und chronologischer Tabelle.
+**Notiz-Sammlung:** `docs/concepts/p8x_ui_polish_notes.md` (L2, **40.9 KB**, 2026-09-06
+angelegt, zuletzt 2026-09-09) — **zehn Abschnitte**: §1 Spaces-Layout-Reorg, §2 Obsidian-Map
+(fünf Sub-Punkte), §3 Anzahl-Anzeige Ordner, §4 Edit-in-Place-Vision, §5 Layering-Design-System,
+§6 „Konto"→„Einstellungen"-Rename, §7 De-AI-ierung-Lauf 2, §8 customizable Tags + Standard-Tag
+„blocked", §9 direkter Feedback-Button, **§10 (2026-09-09) neun Nikinger-Punkte aus dem
+Phase-8.5-Closeout-Auftrag** — Icon-/Trägerflächen-Radien, Hover als transparentere
+Standardauswahl, Ordner-/Tags-Auswahl, klickbare Spaces, Einstellungsmenü, alles Klickbare mit
+Farbausnahme für „Abmelden"/„Archivieren", verbundene AI-Sessions, Hochkant-/Handy-UI.
+Anhang §A–§E. **Die Zahlen „16 Themen / 25 KB" hier standen bis 2026-09-09 stale.**
 
-**Reihenfolge der nächsten Schritte (heute, post-Phase-8.5-D4):**
+**Reihenfolge der nächsten Schritte (Stand 2026-09-09):**
 
-1. **Phase 8.5 Z** (opencode/M3, Closeout) — schließt Phase 8 formal ab, referenziert
-   `p8x_ui_polish_notes.md` als Quelle für die p8.X-Ankündigung.
-2. **Planungs-Session für p8.X** (vermutlich Claude Code, weil die Fragen §5
-   Layering + §4 Edit-in-Place Layout-/Design-System-weit sind und Researchlast
-   tragen) — beantwortet §C-Fragen, schätzt Reichweite, spaltet ggf. in Sub-Phasen.
-3. **Plan-Doc + Phase-Verzeichnis** (`phase9_…plan.md` o. ä., siehe Notizen §D) —
-   sobald die Planungs-Session sich auf Reichweite + Reihenfolge geeinigt hat.
+1. ~~**Phase 8.5 Z**~~ **✅ erledigt 2026-09-09** — Phase 8 + 8.5 formal abgeschlossen,
+   Closeout in Plan §9, Handover `docs/concepts/PHASE8_5_CLOSEOUT_HANDOVER.md`.
+2. **Planungs-Session für P8.6** (Claude Code, weil §5 Layering + §10 design-system-weit
+   sind) — beantwortet die §C-Fragen, schätzt Reichweite, spaltet ggf. in Sub-Phasen.
+   **Erster Punkt der Phase: OpenCode-Vision-Plugin installieren** (Nikinger-Vorgabe).
+   Einstiegsdokument ist das Handover §4, nicht die Phase-Heads.
+3. **Plan-Doc + Phase-Verzeichnis** — Name noch nicht gelockt (Notizen §D kennt P8.6 noch
+   nicht; `phase8_6_ui_polish/` ist die naheliegende Fortführung). **Offene Nummern-Frage:**
+   der Nikinger ordnet die AI-Sessions-Anzeige „eher v3.1 also p8.7" ein, die Dokumente
+   kennen aber nur P8.6 → `v3.0.2` und P9 → `v3.1.0`. In der Planung klären, nicht raten.
 
 **Was NICHT in p8.X gehört** (klare Außenkanten, Notizen-Datei §B): Body-Volltextsuche
 in der Web-UI (Q1 gelockt), Rechteverwaltung über MCP-Tools (P6-M), Löschen von Items
-(F2), FastMCP-4/V79 (eigene Mini-Phase per P5-C), Funnel-Watchdog, Mobile/Realtime,
-Light-Mode (P5-X), Glyph-Entscheidungen P6/P6.5.
+(F2), FastMCP-4/V79 (eigene Mini-Phase per P5-C), Funnel-Watchdog, ~~Mobile/~~Realtime,
+Light-Mode (P5-X), Glyph-Entscheidungen P6/P6.5. **[2026-09-09, Nikinger]:** die
+**Mobile-Hälfte ist aufgehoben** — die Hochkant-/Handy-Ansicht ist ab sofort ein benanntes
+Zukunfts-Item (Notizen §10.9), kein P8.6-Auftrag, aber in einer freieren Phasenplanung zu
+berücksichtigen. **Realtime bleibt draußen.**
 
 ---
 

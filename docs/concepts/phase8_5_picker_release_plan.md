@@ -76,9 +76,9 @@ updated: 2026-09-03 (neu — Planungssession Claude Code/Opus gegen main@6272cad
 | **P8.5-O** | Eskalationsregel opencode/M3 → Claude Code bei Kaskaden-Ursachen (§0.0). | Empirisch aus der Sitzung vom 2026-09-02. |
 | **P8.5-P** | `.rail__version` `v3.0` → `v3.0.1`. `mcpserver.__version__` bleibt unangetastet (anderes Schema). | N7; die Trennung der beiden Versionsschemata ist seit Phase 8 A3 dokumentiert. |
 | **P8.5-Q** | Der Deploy ist eine **Nikinger-Aktion**. Claude/opencode bereitet vor, führt nicht aus, fasst den Dienst nicht an. | Hard Rule 9. `deploy.sh` braucht `SHAREFYX_SYSTEMCTL="sudo systemctl"`, `sudo` läuft nicht aus dem `savefyx`-User. |
-| **P8.5-R** | Phase 8 wird in dieser Phase formal abgeschlossen; der Nachtrag geht in `docs/concepts/phase8_ui_graph_plan.md` §9. Kein neues Handover-Dokument. | N6 + P8-N („ein Dokument pro Phase"). |
-| **P8.5-S** | **Keine Übersichtsgrafik** für Phase 8.5. | Drei Fixes und ein Deploy tragen kein eigenes SVG. „So viel wie nötig." P6/P7 hatten eine, weil dort je ein neues Rechte- bzw. Verwaltungsmodell zu erklären war. |
-| **P8.5-T** | Der Closeout wird **§9 dieses Plans**. | P8-N geerbt. |
+| **P8.5-R** | Phase 8 wird in dieser Phase formal abgeschlossen; der Nachtrag geht in `docs/concepts/phase8_ui_graph_plan.md` §9. ~~Kein neues Handover-Dokument.~~ **[2026-09-09 Korrektur, Closeout-Session]:** Der Nikinger hat im Closeout-Auftrag ausdrücklich ein Handover verlangt — `docs/concepts/PHASE8_5_CLOSEOUT_HANDOVER.md` existiert und ist der Einstiegspunkt für die P8.6-Planung. §9 unten bleibt der **kanonische** Closeout; das Handover tritt daneben, nicht an seine Stelle. Umkehr durch denselben Menschen, der den Lock gesetzt hat. | N6 + P8-N („ein Dokument pro Phase"). |
+| **P8.5-S** | ~~**Keine Übersichtsgrafik** für Phase 8.5.~~ **[2026-09-09 Korrektur, Closeout-Session]:** aufgehoben durch den Nikinger im Closeout-Auftrag — `docs/concepts/phase8_5_picker_release_uebersicht.svg` existiert (1080×1080, Stil der Phase-7-Grafik). Die ursprüngliche Begründung trug bis zum Schluss nicht mehr: die Phase erklärt am Ende zwei nicht-offensichtliche Mechanismen (Body-Link *ist* eine Kante; die Zweiteilung des Deploys durch Hard Rule 9) und eine mitten in der Phase geänderte Statusregel. | Drei Fixes und ein Deploy tragen kein eigenes SVG. „So viel wie nötig." P6/P7 hatten eine, weil dort je ein neues Rechte- bzw. Verwaltungsmodell zu erklären war. |
+| **P8.5-T** | Der Closeout wird **§9 dieses Plans**. **Gilt unverändert** — §9 ist gefüllt und bleibt kanonisch; das Handover aus der P8.5-R-Korrektur referenziert §9, statt es zu ersetzen. | P8-N geerbt. |
 
 ### §0.3 Tabu-Liste (Diff muss über die gesamte Phase leer bleiben)
 
@@ -737,8 +737,107 @@ schwach.
 
 ---
 
-## §9 Closeout
+## §9 Closeout (Phase-8.5-Closeout — P8.5-T, kanonisch)
 
-*(Wird am Ende der Phase gefüllt — P8.5-T, ein Dokument pro Phase. Struktur wie
-`phase8_ui_graph_plan.md` §9: Status in fünf Sätzen · Delta · Abnahmestand · Restdefekte
-und offene Entscheidungen · `[VERIFY]`-Bilanz V95–V105 · was dieser Closeout nicht enthält.)*
+> §9 ist nach P8.5-T **das** Closeout dieser Phase. Das am 2026-09-09 zusätzlich angelegte
+> `PHASE8_5_CLOSEOUT_HANDOVER.md` (P8.5-R-Korrektur) ist der schlanke Einstiegspunkt für die
+> P8.6-Planung und verweist hierher — es ersetzt §9 nicht.
+
+### §9.1 Status in fünf Sätzen
+
+1. **Phase 8.5 ist inhaltlich vollständig und live.** Alle drei Restdefekte aus
+   `phase8_ui_graph_plan.md` §9.4.1–§9.4.3 sind geschlossen, der v3-Vorabritt lief
+   **26/26** (13 Stationen × Chromium + Firefox) gegen eine Wegwerf-Instanz, und der
+   Deploy ging als Nikinger-Aktion durch: Release `20260905T140325.378914Z`,
+   `main`@`6f19a8f`, Badge `v3.0.1`, Service-PID **355956**.
+2. **Die Phase schließt Phase 8 formal mit ab** (N6/P8.5-R): Phase 8 steht bei
+   **26 ✅ · 0 🟡 · 0 ⬜**, Phase 8.5 bei **20 ✅ · 0 🟡 · 0 ⬜**.
+3. **Mitten in der Phase hat sich die Statusregel geändert** (Nikinger-Entscheidung
+   2026-09-08): eine von ihm geprüfte Wegwerf-Instanz-Automatisierung zählt als
+   „live-verifiziert", weil die Wegwerf ein byte-identischer Git-Checkout ist und sich nur
+   in `DATA_ROOT`/`auth.sqlite3`/Identität unterscheidet. Das hob beide Bilanzen ohne eine
+   Zeile neuen Code. Herleitung und Grenzen: `sichtpruefung_automation_conventions.md`.
+4. **Ein Befund wurde bewusst gemessen statt gefixt:** V102 — Body- und Frontmatter-Kante
+   zwischen denselben zwei Knoten zeichnen **zwei** Linien (`kinds=['body','frontmatter']`),
+   `index.py :: replace_item_links` hat kein Cross-`kind`-Dedup. Das war §0.4 so
+   vorgesehen; der Punkt geht als benannter Befund an P8.6 (§9.4.1 unten).
+5. **Die Tabu-Liste hat über die gesamte Phase gehalten.** Der §0.3-Diff war in jedem Step
+   leer bis auf die eine erlaubte Zeile (`_TITLE_NOT_ID_HINT` in `tools.py`). Keine neunte
+   P1-Contract-Öffnung, kein Service-Touch aus einer Agenten-Session, 964 pytest grün.
+
+### §9.2 Delta
+
+Die Tabelle steht in `PHASE8_5_CLOSEOUT_HANDOVER.md` §2 (Was / Wo / Commit-SHA) und wird
+hier nicht dupliziert. Kurzform der Code-Pfade: `webui/static/js/{dialogs,editor,markdown}.js`
+· `webui/static/{app.html,app.css}` · `phase2_mcp/mcpserver/tools.py` (nur der Hint-Text) ·
+`phase5_ui/tests/test_static_routes.py` · `phase8_5_picker_release/scripts/` (Wegwerf-Setups,
+`v3_ritt_playwright_smoke.py`, `health_gate.sh`, `p8519_radiogroup_probe.py`,
+`p856_bracket_mini_smoke.py`).
+
+### §9.3 Abnahmestand
+
+**20 ✅ · 0 🟡 · 0 ⬜** von 20 — Art-Verteilung **8× (C) · 8× (W) · 4× (L)**. Kanonische
+Tabelle mit Beleg, SHA, Screenshot und Nikinger-Sichtungsvermerk pro Zeile:
+`phase8_5_picker_release/SESSIONS_ARCHIVE.md` §Abnahmematrix-Archiv.
+
+Zwei Zeilen brauchen eine Erläuterung:
+
+- **P8.5-19 ist ✅ und am selben Tag überholt.** Die Frage der Zeile („welche Bauform?")
+  *wurde* beantwortet — der Nikinger ordnete am 2026-09-06 die Radiogruppe an, sie wurde
+  gebaut und gegen die 200-Knoten-Wegwerf verifiziert. Am 2026-09-08 hat er die eigene
+  Entscheidung zugunsten der Konventions-Konsistenz umgekehrt. Der Rückbau auf
+  `<select class="input">` mit Beschriftung *in* der Box ist P8.6-Arbeit.
+- **P8.5-6 fiel als letzte 🟡-Zeile am 2026-09-09**, nachdem die neu formulierte Konvention
+  §1 („Vorschau-Pflicht bei klickbaren Links") einen Screenshot des *gerenderten* Links
+  verlangte statt der Markdown-Quelle. Beleg: `p856_bracket_mini_smoke.py` +
+  `docs/screenshots/p856_bracket_preview.png`.
+
+### §9.4 Restdefekte und offene Entscheidungen
+
+Ausführlich, mit Optionen und Empfehlung, in `PHASE8_5_CLOSEOUT_HANDOVER.md` §4. Hier die
+Liste, damit sie im Plan selbst nicht fehlt:
+
+1. **V102-Zwillingskante** — zwei Linien statt einer. Drei Wege: Server-Dedup (**wäre die
+   neunte P1-Contract-Öffnung**), `graph.js`-Dedup beim Zeichnen (kein Contract berührt,
+   Vorschlag), oder bewusst so lassen. Nicht gelockt.
+2. **Radiogruppe → `<select>`** — Rückbau samt Testumbenennung
+   (`test_link_picker_uses_a_radio_group_not_a_select` wird sonst zur Lüge).
+3. **CSRF-Origin-Mismatch im Wegwerf-Setup** — `_validate_base_url` erzwingt `https://`,
+   damit fällt jeder Browser-POST gegen eine `http://127.0.0.1`-Wegwerf durch. Setup-Frage,
+   kein Server-Bug; Station 13 blieb deshalb strukturell.
+4. **P8.6-Inhalt** — zehn Abschnitte in `p8x_ui_polish_notes.md`, davon §10 neu mit den neun
+   Nikinger-Feedback-Punkte vom 2026-09-09 (§10 dort). Erster Punkt der Phase bleibt die
+   OpenCode-Vision-Plugin-Installation.
+5. **Zwei Nummerierungs-Fragen** — „v3.1 also p8.7" aus dem Nikinger-Feedback gegen die
+   dokumentierte Reihe P8.6 → `v3.0.2` / P9 → `v3.1.0`; und der Verzeichnisname der
+   Folgephase (§D der Notizen kennt P8.6 noch nicht).
+6. **Mobile/Hochkant ist keine Außenkante mehr** (Nikinger, 2026-09-09) — in
+   `p8x_ui_polish_notes.md` §B und im ROADMAP-Abschnitt durchgestrichen statt gelöscht.
+   **Realtime bleibt draußen.**
+7. **Geerbtes Ledger** unverändert offen (`phase8_ui_graph_plan.md` §9.4.5) — Phase 8.5 hat
+   davon nichts angefasst und nichts still abgeräumt.
+
+### §9.5 `[VERIFY]`-Bilanz V95–V105
+
+Volle Tabelle mit Belegen: `PHASE8_5_CLOSEOUT_HANDOVER.md` §5. Bilanz: **8 beantwortet**
+(V95, V96, V98, V99, V100, V101, V102, V105), davon **zwei mit anderem Ergebnis als
+erwartet** — **V99** (das Projekt nutzte bisher nur `sessionStorage`; `localStorage` ist
+eine bewusste Eskalation) und **V102** (zwei Linien statt einer). **Drei offen:** **V97**
+halb (Step 0 übersprang die Messung, der spätere Lauf war 5/5 grün, die Ausgangszahl
+125.8 KB wurde nie gegengeprüft), **V103** nie beobachtet (D2 lief still durch den
+Nikinger — beim nächsten Deploy einfach mitprotokollieren), **V104** gegenstandslos (Block C
+lief als geschriebenes Playwright-Skript, nicht über MCP).
+
+### §9.6 P1-Contract
+
+Die achte Öffnung bleibt geschlossen; Phase 8.5 hat **keine neunte** geöffnet und keine
+angekündigt. **Für P8.6 relevant:** die Server-Variante von §9.4.1 *wäre* die neunte —
+anzukündigen in der Planung, nicht beim Bauen zu entdecken.
+
+### §9.7 Was dieser Closeout nicht enthält
+
+- Keine Phase-8-Historie (steht in `phase8_ui_graph_plan.md` §9).
+- Keinen P8.6-Plan — dieser Closeout benennt Entscheidungen, er trifft keine.
+- Keine Auflösung des geerbten Ledgers.
+- Keine Bewertung der neun Feedback-Punkte vom 2026-09-09; sie sind in
+  `p8x_ui_polish_notes.md` §10 als Zitat plus Code-Anker abgelegt, ungewichtet.

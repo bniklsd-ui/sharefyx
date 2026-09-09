@@ -9,7 +9,7 @@ down:
   - ../phase8_ui_graph/CLAUDE.md                       # Phase 8 — schließt diese Phase mit ab (N6, P8.5-R), kein eigenes Handover
   - ../phase8_ui_graph/SESSIONS_ARCHIVE.md              # Bilanz P8-22/P8-24-Smokes, drei §9.4.6-Befunde (Settle/Farbe/Klick), P8.5-Vorgänger-Session-Block
   - SESSIONS_ARCHIVE.md                                 # ältere Session-Blöcke, newest-first
-updated: 2026-09-09 (P8.5-6-Folge-Smoke — Bracket-Pfad live-verifiziert, Bilanz 19/1/0 → **20/0/0**, Phase 8.5 vollständig abgeschlossen; v3ritt-Wegwerf frisch hochgefahren, Item `itm_b8b989a1` „Vercel [Hosting]" via `storage.Store.create()` angelegt, Mini-Smoke `phase8_5_picker_release/scripts/p856_bracket_mini_smoke.py` neu (~75 Z., Playwright + Login + Edit-Mode + Picker + 2 Screenshots in beiden Varianten); Screenshot `p856_bracket_preview.png` zeigt „Vercel [Hosting]" als **klickbaren blauen Hyperlink** — programmatische Quittung per Regex auf `<a href="#item/itm_b8b989a1">Vercel [Hosting]</a>` True; Wegwerf sauber per PID-Datei gestoppt, kein `pkill -f`; §Abnahmestand Bilanz → **20/0/0**, §Nächste Session auf P8.6-Planung umgeschrieben, Matrix-Zeile P8.5-6 in `SESSIONS_ARCHIVE.md` auf ✅ mit Folge-Smoke-Beleg; **kein Code-Touch**, pytest unverändert 964/964, Tabu-Diff §0.3 leer, Service-Touch 0 [PID 355956 unverändert]) | 2026-09-09 (Sichtung der 10 P8.5-🟡-Zeilen — 9 ✅, P8.5-6 bleibt 🟡 wegen fehlendem Vorschau-Screenshot des Bracket-Pfads; vier neue Sichtungs-Konventionen in `docs/concepts/sichtpruefung_automation_conventions.md` §1-§4 notiert [Vorschau-Pflicht / Code-vs-Visuell / Deploy-nach-Test / Screenshots-im-Chat]; `_tooling.md` Plugin-Empfehlung auf P8.6-first-step verschärft; Walkthrough/Restblock Top-Notizen; §Abnahmestand Bilanz 10/10 → 19/1/0, §Nächste Session komplett umgeschrieben auf P8.5-6-Brake-Pfad; alter Z-Closeout-Block manuell nach `SESSIONS_ARCHIVE.md` rotiert + 10 Matrix-Zeilen mit Nikinger-Vermerk; **kein Code-Touch**, pytest unverändert 964/964, Tabu-Diff §0.3 leer, Service-Touch 0 [PID 355956 unverändert], keine Wegwerf-Instanzen gestartet) | 2026-09-08 (Scope-Reversal + Session-Ende: Nikinger-Entscheidung im Review des Z-Final-Commits — die 10 P8.5-🟡-Sichtungen (P8.5-6, -7, -8, -9, -10, -11, -12, -13, -14, -15) wandern NICHT nach P8.6, sondern bleiben in Phase 8.5 als erste Sache der nächsten Session; Phase 8.5 head bekommt eine neue Sektion „Nächste Session“ mit den 10 Zeilen einzeln + Werkzeug-Setup-Stand, Stand-Summary entsprechend umformuliert; Wurzel-updated:-Pipe vorne ergänzt; Frontmatter vorne ergänzt; **kein Code-Touch**, pytest unverändert 964/964, Tabu-Diff 0.3 leer, Service-Touch 0 [PID 355956 unverändert]) | 2026-09-08 (Z-Final: §7-Abnahmematrix P8.5-1 bis P8.5-20 [alle 20 Zeilen mit Beleg] nach SESSIONS_ARCHIVE rotiert; Head von 50 KB auf 42 KB reduziert — 2 KB über Softcap, Rest ist kanonischer Mission/Scope/Harte-Regeln/Modul-Status/Vormerkung/Nächste-Phasen/Session-Block; Frontmatter vorne ergänzt) | 2026-09-08 (Folge-Sub-Session 4, Z-Closeout: Sichtprüfungs-Automatisierung fertig, Statusregel geändert, Phase 8 + 8.5 formal ✅, P8.6/P9 vorgemerkt -- siehe Session-Block am Dateiende) | 2026-09-08 (Doku-Sub-Session 2: **freundlicher Walkthrough** `phase8_5_picker_release/SICHTPRUEFUNG_WALKTHROUGH.md` neu, 29 KB / 727 Zeilen — Was-tust-du / Was-siehst-du pro Schritt, mit DevTools-Befehlen + Console-Snippets + Stoppuhr-Anleitung; Geschwister zum technischen `SICHTPRUEFUNG_RESTBLOCK.md` (dicht, mit Tabellen und Code-Ankern); Walkthrough ist das, was beim Klicken am Bildschirm vor einem liegt, Restblock ist das Nachschlagewerk; deckt C4-0 (P8-16 Glass-Fallback), C4-1 (P8.5-19 Radiogruppe), C4-2 (P8.5-3+4 Hint + Vierte A3-Probe), C4-3 (P8.5-17 V105), C3-1 (P8-21d Tag-Cutoff), C3-2 (P8-22 Settle/Interaktion/Reduced-Motion), C3-3 (P8-24 E2E gegen D2), C5-1 (P8-5 = C4-2), C5-2 (P8-8 mit Fabian); **kein Code-Touch**, nur Doku; pytest unverändert 964/964, Tabu-Diff §0.3 leer, Service-Touch 0) | 2026-09-08 (Doku-Sub-Session: 200-Knoten-Wegwerf gestartet per Standing-Permission für die Cluster-3-Rest-Sichtprüfung [P8-21 d + P8-22 + P8-24]; **drei User-Feedback-Punkte** in `docs/concepts/p8x_ui_polish_notes.md` ergänzt: §6 Konto/Einstellungen re-affirmiert mit drei Vertausch-Lesarten a/b/c gegen `app.html:31-41`, §8 NEU customizable Tags + Standard-Tag „blocked" [§8.1 User-Palette als `localStorage`, §8.2 fester Code-Tag, beide kosmetisch], §9 NEU direkter User-Feedback-Button [drei plausible Senken: User-Space / `/var/log/sharefyx/feedback/` / externer Endpunkt]; **kein Code-Touch**; pytest unverändert 964/964, Tabu-Diff §0.3 leer, Service-Touch 0 [PID 355956 unverändert], Wegwerf-PID **436596** auf Port **18772**); Cluster-3-Block per Hand nach `SESSIONS_ARCHIVE.md` rotiert (Skript passt nicht auf Phase-8.5-Muster), dieser 2026-09-08-Block neu im Head; **Polard-Notes 25.5 → 37.5 KB** knapp unter 40-KB-Softcap) | 2026-09-08 (Doku-Sub-Session Folge: **D2-Wegwerf zusätzlich hochgefahren** auf Port 18768 [PID 438765], beide Wegwerf-Instanzen laufen jetzt parallel — 200-Knoten auf 18772 für Cluster-3-Rest P8-21 d + P8-22, D2-14-Knoten auf 18768 für P8-24; **`phase8_5_picker_release/SICHTPRUEFUNG_RESTBLOCK.md` neu**, 27.5 KB / 471 Zeilen, der konsolidierte Schritt-für-Schritt-Testblock für alle restlichen Sichtprüfungen — Cluster 3-Rest (P8-21 d, P8-22, P8-24) gegen die zwei Wegwerf-Instanzen + Cluster 4 (P8-16 + P8.5-3/4/17/19) gegen Production v3.0.1 + Cluster 5 (P8-5 + P8-8, letzteres mit Fabian); Login-Snippet mit re-runnablem TOTP-Code für beide Instanzen, Screenshots-Konvention, Ergebnis-Tabellen je Cluster, Reihenfolge-Empfehlung, Cleanup-Befehle [Hard Rule 9, PID-Datei, **niemals** `pkill -f`]; **kein Code-Touch**, nur Doku + zweiter Wegwerf-Setup; pytest unverändert 964/964, Tabu-Diff §0.3 leer, Service-Touch 0 [PID 355956 unverändert]) | 2026-09-08 (Doku-Sub-Session: 200-Knoten-Wegwerf gestartet per Standing-Permission für die Cluster-3-Rest-Sichtprüfung [P8-21 d + P8-22 + P8-24]; **drei User-Feedback-Punkte** in `docs/concepts/p8x_ui_polish_notes.md` ergänzt: §6 Konto/Einstellungen re-affirmiert mit drei Vertausch-Lesarten a/b/c gegen `app.html:31-41`, §8 NEU customizable Tags + Standard-Tag „blocked" [§8.1 User-Palette als `localStorage`, §8.2 fester Code-Tag, beide kosmetisch], §9 NEU direkter User-Feedback-Button mit drei plausiblen Senken [User-Space-Item / `/var/log/sharefyx/feedback/` / externer Endpunkt] + Klärungsfragen zur Planungs-Session; **kein Code-Touch**; pytest unverändert 964/964, Tabu-Diff §0.3 leer, Service-Touch 0 [PID 355956 unverändert], Wegwerf-PID **436596** auf Port **18772**); Cluster-3-Block per Hand nach `SESSIONS_ARCHIVE.md` rotiert, dieser 2026-09-08-Block neu im Head; **Polard-Notes 25.5 → 37.5 KB** knapp unter 40-KB-Softcap) | 2026-09-07 (Cluster-3-Teilverifikation — **erste Nikinger-Live-Sichtprüfung nach Cluster 2; P8-20 ✅, P8-21 a/b/c ✅ am echten v3.0.1 in einer Login-Sitzung**; P8-20 (Hover dimmt Nicht-Nachbarn + Klick öffnet Editor bzw. Readonly mit korrekter Drag-vs-Click-Heuristik aus Fix C + Drag/Zoom/Pan ohne Ruckler) und P8-21 (Default nur explizite Kanten + Tag-Toggle + Ordner-Toggle) — Sub-Punkte a/b/c durchlaufen ohne Befund; **P8-21 d + P8-22 + P8-24 in eine Folge-Session verschoben**, weil alle drei die 200-Knoten-Wegwerf brauchen (Nikinger-Aktion per Standing-Permission in `phase8_ui_graph/scripts/wegwerf_setup_200knoten.py`, Port 18772); Phase-8-Bilanz **19 ✅ · 7 🟡 → 20 ✅ · 6 🟡** (P8-20 wandert 🟡 → ✅, `phase8_ui_graph/CLAUDE.md` §7-Matrix + Modul-Status Block D + Bilanz-Zeile + Sichtprüfungs-Status im selben Sub-Session-Commit nachgezogen); `phase8_5_picker_release/CLUSTER3_TESTBLOCK.md` neu (17 KB, 243 Zeilen, vollständiger Schritt-für-Schritt-Testblock als Audit-Quelle für Z); Pre-Z-Tausch-Block per Hand nach `SESSIONS_ARCHIVE.md` rotiert (Skript passt nicht auf Phase-8.5-Muster, Working-Tree-Rekonstruktion weil zwischen den Sub-Sessions kein Commit lag), Cluster-3-Block neu im Head; pytest unverändert 964/964, `node --check`/`ui_budget.py`/`bash -n` irrelevant (kein Code-Touch), Tabu-Diff §0.3 leer, Service-Touch 0 (PID 355956 nur gelesen, kein `sudo systemctl`, keine Wegwerf gestartet); Working Tree jetzt 9 modifizierte Dateien + 1 untracked Testblock-Datei = 10 Dateien; **Nikinger-Aktion in derselben Sub-Session:** Sean-Einladung über `authctl.py invite sean --purpose initial --ttl 86400` (24h gültig, Link wird auf stdout einmalig ausgegeben mit PRODUKTIV/STAGING-Marker zur Datenbank-Zuordnung — Hard Rule 9 + §0.5.7 verbieten opencode/M3 den Eingriff in die echte `auth.sqlite3`); nächster Schritt Cluster 4 (Connector: P8.5-3 + P8.5-4 + P8.5-17 V105 + P8.5-19 Bauform-Bestätigung Radiogruppe am echten v3.0.1) + Cluster 5 (Fabian: P8-5 + P8-8) + Z | 2026-09-07 (Pre-Z-Tausch — **erste opencode/M3-Code-Touch-Session seit Cluster 1**; **P8.5-19** (Bauform-Entscheidung Radiogruppe) und **P8.5-6** (Bracket-Renderer-Fix) committet, beide Zeilen jetzt mit Code + statischem Test; `dialogs.js` (`linkPickerModeEl` raus, neue Modul-Konstante `LINK_PICKER_MODE_NAME`, `_linkPickerMode`/`_restoreLinkPickerMode` auf `querySelector[All]('input[name="link-picker-mode"]')` umgestellt, change-Listener iteriert jetzt die Radios), `app.html` (`<fieldset class="link-picker-modes">` mit `<legend>Einfügen</legend>` + 2× `<input type="radio" name="link-picker-mode">` ersetzt `<select id="link-picker-mode">`), `app.css` neuer Block `.link-picker-modes`/`.link-picker-mode` (`accent-color: var(--accent-line)`), `markdown.js` Link- und Bild-Regex tolerieren jetzt `\[` / `\]` als Escape-Einheit (`(?:\\[\[\]] | [^\]])+` im Title-Capture, danach `\\([\[\]])` → `$1` zum Unescapen); `phase5_ui/tests/test_static_routes.py` zwei neue Tests (`test_link_picker_uses_a_radio_group_not_a_select` P8.5-19, `test_markdown_link_regex_allows_escaped_brackets` P8.5-6 mit Regressionstest gegen die alte `[^\]]+`-Form); `pytest -q` 962 → **964** grün (254 s Gesamtlauf), `node --check` grün auf `dialogs.js` + `markdown.js`, `ui_budget.py` 5/5 im Korridor (dialogs.js 12.6 → 13.2 KB, markdown.js 4.2 KB unverändert, app.css +0.4 KB), Tabu-Diff §0.3 leer (alle Änderungen unter `phase5_ui/webui/static/` + `phase5_ui/tests/`, kein Servercode-Tabu-Auslöser), node-Probe gegen `markdown.js` mit Mock-`document`: 8 Test-Cases rendern wie erwartet — darunter D4-Fund-Beispiel `[Vercel \[Hosting\](#item/itm_67bb0565)` → `<a href="#item/itm_67bb0565">Vercel [Hosting]</a>`; Abnahmestand **5 ✅ · 14 🟡 · 1 ⬜** (P8.5-19 ⬜ → 🟡, P8.5-5/-6-Beschreibungen aktualisiert); Cluster-1-Block nach `SESSIONS_ARCHIVE.md` rotiert (manuell, Skript passt nicht auf Phase-8.5-Muster), Service-Touch 0 (PID 355956 nur gelesen); nächster Schritt unverändert Cluster 3+4+5 (Nikinger-Aktionen) + Z, mit optionaler P8.5-6-Wegwerf-Re-Probe in Cluster 4) | 2026-09-06 (D4-Sichtprobe-Folgesession — **nur dokumentiert, kein Code-Touch in dieser opencode/M3-Session**; sieben neue Themen-Cluster aus der Sichtprobe mit Fabian nach D4 dokumentiert: **Spaces-Layout-Reorg** [„Alle Items"-Leiste unter Spaces + Kippschalter, Map 40 % Breite/volle Höhe, keine Duplikate], **Obsidian-Map** fünf Sub-Punkte [Performance-Reload, Landkarten-Stil, Field schneidet ab, Reload-Drift, Collapsible mit Abhängigkeiten], **Anzahl-Anzeige Ordner**, **Edit-in-Place-Vision** [„Bearbeiten"-Knopf überflüssig], **Layering-Design-System** [3 Layer: echtes Schwarz / aktueller Standard / Liquid Glass + Selektion explizit blau auf Hover, Note-Select, Checkbox], **„Konto"→„Einstellungen"-Rename** + Positions-Tausch mit Logout, **De-AI-ierung-Lauf 2** nach neuen Kriterien; neue Datei `docs/concepts/p8x_ui_polish_notes.md` 25 KB L2 mit allen 16 Themen — fünf bereits in D4 dokumentierte p8.X-Punkte [UX-2-Step-Knotenklick, Map-Field schneidet ab, Map fliegt, Save-Button-YAML-Header, Fabis Sammelliste] + sieben Sichtprobe-Folgesession-Cluster + vier Sub-Punkte aus §2 Obsidian-Map; Vorsegmentierter Anhang §A–§E für die Planungs-Session in Claude Code; **kein Phase-8/8.5-Scope-Touch**, **keine** neuen Tabu-Aufhebungen, **kein** Locking — Sammlung, kein Plan; D4-Block per Hand nach `SESSIONS_ARCHIVE.md` rotiert (Skript passt nicht auf Phase-8.5-Muster, bewährtes Vorgehen); Modul-Status P8.5 unverändert (3 ✅ · 14 🟡 · 3 ⬜); pytest nicht gelaufen, Tabu-Diff §0.3 leer, Service-Touch 0; nächster Schritt unverändert D5 + V105 + optional vor Z Radiogruppe + Bracket, dann Z) | 2026-09-06 (D4 Sichtprüfung am echten Gerät durch den Nikinger — **nur dokumentiert, kein Code-Touch in dieser opencode/M3-Session**; Block 1–7 + Vorbereitung komplett durchgelaufen, Login beide Accounts ✅, Tastaturnavigation in Firefox+Chrome+Safari auf zwei Accounts ✅, Block 2/4/5-Kern ohne Befund, drei echte Funde dokumentiert: **P8.5-19-Entscheidung Radiogruppe** [User-Präferenz „deutlich angenehmer", Tausch 5 Zeilen in `dialogs.js:584`+`app.html:277` ausstehend, Lucide-Icons `link-2`+`pilcrow`/`text-cursor-input` als Vorschlag offen], **P8.5-6 Bracket-Renderer-Bug** [Source-Escape `\[`/`\]` korrekt, aber `markdown.js`-Parser bricht Link in Vorschau — eckige Klammern zerlegen die URL-Zuordnung, runde Klammern funktionieren; §0.3 erlaubt `webui/static/js/`, Hard-Rule-9-Eskalation greift nicht, Fix-Pfad vor Z], **UX-2-Step-Knotenklick** [neues Feature „erster Klick Readonly-Vorschau, zweiter Klick vollständig" für p8.X parkiert, Fabi sammelt gerade], Save-Button-YAML-Header-Issue wahrscheinlich p8.X [parken bis Verifikation ob außerhalb Header-Kontext], zwei Map-Beobachtungen explizit bestätigt; **Phase 8 ✅ + p8.X als Folge-Phase** als Nikinger-Entscheidung für Z vorgemerkt; Modul-Status-Zeile 6 Block D um D4 ✅ erweitert (mit Findings-Anhang); P8.5-6-Zeile um Bracket-Bug-Caveat; P8.5-17-Zeile Update-Banner-live jetzt ✅; Summary-Zeile 3 ✅ · 14 🟡 · 3 ⬜ unverändert [P8.5-6 bleibt 🟡 Fix ausstehend, P8.5-17 bleibt 🟡 V105 offen]; D3-Block (154 Zeilen) per Hand nach `SESSIONS_ARCHIVE.md` rotiert (Skript passt nicht auf Phase-8.5-Muster); keine Code-Tests, kein Service-Touch; nächster Schritt D5 Vierte A3-Probe + V105 Connector-Check — beides Nikinger; optional vor Z Radiogruppe-Tausch + Bracket-Fix durch opencode/M3) | 2026-09-05 (D3-Prep — `phase8_5_picker_release/scripts/health_gate.sh` neu, 134 Zeilen bash, acht Gates (/health 200 + Retry-Loop, /ui/login 200, /api/v1/me 401, /mcp/ 401, .rail__version aus /ui/static/app.html, /opt/sharefyx/current, --require-todays-update-log, --expected-sha); **Lauf 2026-09-05 15:19:53Z 8/8 grün** gegen den frischen Deploy; **Discovery: D2 lief bereits** zwischen D1 (Commit heute früh) und dieser Session (PID **355956** statt 195922, Release `20260905T140325.378914Z`, ExecMainStartTimestamp `2026-09-05 16:10:18 CEST`), D3 ist Verifikation statt Vorbereitung; D1-Block (111 Zeilen) per Hand nach `SESSIONS_ARCHIVE.md` rotiert (Skript passt nicht auf Phase-8.5-Muster); Modul-Status-Zeile 6 Block D um D2 ✅ + D3 🟡 erweitert; Abnahmestand P8.5-17 Health-Gate-Teil jetzt 🟡 (C/L-Mix, Update-Banner-live + V105 weiter Nikinger); Summary-Zeile 3 ✅ · 14 🟡 · 3 ⬜ korrigiert; pytest nicht gelaufen (kein Python-Touch), `bash -n` OK, shellcheck nicht verfügbar (übersprungen, keine Konvention im Repo), Tabu-Diff §0.3 leer, Service-Touch 0 nur gelesen; nächster Schritt D4 Sichtprüfung am echten Gerät — Nikinger-Aktion) | 2026-09-05 (D1 committet — Badge `v3.0`→`v3.0.1` in `phase5_ui/webui/static/app.html:20` (P8.5-N7, statisches HTML nicht im Tabu §0.3); neuer `## 2026-09-05`-Block in `docs/UPDATE_LOG.md` mit drei Zeilen Picker-Modi/Tastatur/Generalisierter-Hint (Datums-Drift gegenüber Block-C-Spec dokumentiert: Block-C schlug `## 2026-09-04` vor, `date +%F`/`date -u +%F` ist heute 2026-09-05, `deploy.sh` Z. 117–131 verlangt strikt `today_utc`/`today_local`, sonst Gate-Abbruch); Block-C-Block per Hand nach `SESSIONS_ARCHIVE.md` rotiert (newest-first vor B1), Skript `scripts/rotate_session_block.sh` passt nicht auf Phase-8.5-Muster mit einem `## Session stopped` + mehreren `### date`-Subblöcken → Exit 2 „Bereits konform"; Modul-Status-Zeile D `⬜`→`🟡` (D1 fertig, D2–D5 als Nikinger-Aktionen vermerkt); pytest nicht gelaufen (kein Python-Touch), Tabu-Diff §0.3 leer (`app.html` und `docs/UPDATE_LOG.md` nicht tabu), `node --check`/`ui_budget.py` irrelevant; Service-Touch 0 PID 195922 ActiveEnterTimestamp 2026-09-02 11:51:57 CEST nur gelesen; nächster Schritt D2 = `sudo systemctl ... deploy.sh main`) | 2026-09-04 (Block C committet — `scripts/rotate_session_block.sh` aus `scripts/` nach `phase8_5_picker_release/scripts/` portiert (YAGNI aus A1/A2 geschlossen, ein Aufruf `Bereits konform` als Exit-2-Quittung), `wegwerf_setup_v3ritt.py` neu (Port 18773 V98, Standing-Permission-Muster aus Phase 8 reproduziert, 30 Items über 3 Spaces — 12 alpha + 10 beta + 8 gamma, 1 archiviertes, 1 mit item-level `share_read=["gamma"]` P6-§35-39-Fall, 1 mit Bild-Asset `ast_351d4217` per `put_asset()`, 11 explizite Kanten inkl. V102-Zwillings-Kante Buecherliste ↔ Empfehlungen Nikinger), `v3_ritt_playwright_smoke.py` neu (~720 Zeilen, `pyotp`+`async_playwright`, **26/26 Stationen grün: Chromium 13/13 + Firefox 13/13**, V101 für beide Browser bestätigt; 16 Screenshots `docs/screenshots/v3ritt_{chromium,firefox}_NN_*.png`; drei echte Befunde vorgelegt: 1. Smoke-Bug `src_id`→`src` [gefixt im Smoke, kein Server-Bug], 2. CSRF-Origin-Mismatch zwischen `http://127.0.0.1:18773` und `SPACE_PUBLIC_BASE_URL=https://wegwerf-v3ritt.invalid` wegen `_validate_base_url`-Pflicht [Befund für Step Z / Plan §4.C3], 3. Station 12 nur strukturell [bleibt, throwaway-verifiziert in P8]); Modul-Status C `⬜`→`🟡`, Abnahmestand 3 ✅ · 4 🟡 · 13 ⬜ → **3 ✅ · 13 🟡 · 4 ⬜** (P8.5-5/-6/-7/-8/-10/-11/-13/-15/-16 `⬜`→`🟡` mit Belegnotiz je Zeile); B1-Block nach `SESSIONS_ARCHIVE.md` rotiert (manuell — `rotate_session_block.sh` jetzt vorhanden, aber YAGNI-Stand aus A1/A2 gilt für die zweite Rotation nicht mehr, sobald Block D abgeschlossen ist); pytest 962/962 unverändert (kein Python-Touch im Block-C-Setup), Tabu-Diff §0.3 leer (kein `mcpserver/`/`storage/`/`authserver/`/`security.py`/`api.py`/`serializers.py`/`permissions.py`-Touch), Service-Touch 0 (PID 195922 ActiveEnterTimestamp 2026-09-02 11:51:57 CEST nur gelesen, Wegwerf PID 337447 sauber abgebaut via `kill -TERM $(cat serve.pid)`, Hard Rule 9-konform); nächster Schritt Block D) | 2026-09-04 (Wurzel-CLAUDE.md komprimiert — Phase-6-Verlaufsdokumentation + Phase-6/6.5-Vormerkungen + Funnel-Reboot-Notiz + MCP-Werkzeug-Ergonomie-Live-Feedback + End-Korrekturen P5/P4 auf Pointer-Form gestaucht; ~5 KB freigemacht; Wurzel-`updated:`-Pipe analog getrimmt; kein Code, keine Tests, kein Service-Touch; PID 195922 Active seit 2026-09-02 11:51:57 CEST nur gelesen) | 2026-09-04 (B1 committet — `_TITLE_NOT_ID_HINT` in `phase2_mcp/mcpserver/tools.py:159-164` generalisiert (Schlusssatz „Das gilt in jeder Textform — auch nicht als Tabellen-Spalte, nicht in Klammern hinter dem Titel und nicht in Aufzählungs-Zeilen." wörtlich aus Plan §3 B1), `phase2_mcp/tests/test_tools.py` um zwei Asserts (`in jeder Textform`/`Klammern`) im bestehenden `test_tool_descriptions_tell_the_agent_to_name_titles_not_ids` erweitert; neuer Phase-Head-Abschnitt `## Abbruchregel §9.4.1 (N2, verbindlich)` wörtlich aus Plan §3 B1 zwischen Modul-Status und Geerbte Contracts; Modul-Status B1 ⬜→🟡, P8.5-3 ⬜→🟡 mit Klammer-Anmerkung, Stand 3 ✅ · 3 🟡 · 14 ⬜ → 3 ✅ · 4 🟡 · 13 ⬜; pytest 962/962 unverändert (keine neue Testfunktion, nur zwei Asserts in bestehendem Test), Tabu-Diff §0.3 zeigt **genau** `phase2_mcp/mcpserver/tools.py +5/-2` und `phase2_mcp/tests/test_tools.py +2` (Plan: „genau die erlaubte Zeile + Test-Datei"), A2-Block nach `SESSIONS_ARCHIVE.md` rotiert (manuell, wie bisher); PID 195922 Active seit 2026-09-02 11:51:57 CEST nur gelesen, kein Service-Touch; nächster Schritt Block C) | 2026-09-04 (A2 committet — `dialogs.js` Module-Vars `linkPickerItems`/`linkPickerCursor` + `_renderLinkPickerResults` mit State-Reset ganz oben + `_setLinkPickerCursor`/`_pickLinkPickerAt` neu + `closeLinkPicker()`-Reset-Reihenfolge + `keydown`-Handler am Suchfeld (ArrowDown/ArrowUp/Enter, kein Wrap, kein Home/End, kein Raten); `app.css` zwei identische Auswahl-Blöcke zu einem zusammengezogen, totes `:focus` raus; zwei neue statische Tests in `test_static_routes.py` (`test_link_picker_css_has_one_selection_block` P8.5-14, `test_link_picker_picks_run_through_a_single_helper` P8.5-12) plus `test_insertAtCursor_defined_exactly_once_at_module_level` für P8.5-9; Modul-Status A2 ⬜→🟡, fünf Abnahmezeilen P8.5-9/-10/-11/-12/-14 angepasst, Stand 3 ✅ · 0 🟡 · 17 ⬜ → 3 ✅ · 3 🟡 · 14 ⬜; pytest 959→962 (+3, +0.8 KB), ui_budget 5/5 (127.6→128.7 KB, dialogs.js 11.7→12.6 KB), Tabu-Diff §0.3 leer, `node --check` grün auf dialogs.js, A1-Block nach SESSIONS_ARCHIVE.md rotiert (manuell, weil `scripts/`-Verzeichnis für `rotate_session_block.sh` aus Phase 7 noch leer ist — YAGNI für eine zweite manuelle Rotation, Plan-§0.5-Skript-Eintrag verschoben auf Block-C-Beginn mit dem Wegwerf-Setup), PID 195922 Active seit 2026-09-02 11:51:57 CEST nur gelesen, kein Service-Touch; nächster Schritt B1) | 2026-09-04 (Drift nachgezogen — Wurzel-`Current state` mit neuem 2026-09-04-Absatz ergänzt (A1-Eintrag + Drift-Hinweis + Folge-Commit-Vermerk für INDEX-Bullet-Lücke), `docs/INDEX.md` Phase-8.5-Header „⬜ geplant, nicht gestartet" → „🔄 A1 🟡, A2/B1/C/D/Z ⬜", `ROADMAP.md` Phase-8.5-Plan-Absatz „nächster Schritt: A1" → „A1 committet, Drift nachgezogen, nächster Schritt: A2"; INDEX-Bullets für `phase8_5_picker_release/CLAUDE.md` + `SESSIONS_ARCHIVE.md` bewusst NICHT in diesem Commit ergänzt — INDEX steht bei 40917 B, 43 B unter dem 40-KB-Softcap, zwei neue Bullets würden den Cap reißen; Vorschlag: Aufnahme mit gleichzeitiger Trimmung der `updated:`-Pipe in einem späteren Commit, vor A2 nicht nötig; kein Code, kein Service-Touch, pytest/ui_budget unverändert) | 2026-09-04 (A1 committet — `<select id="link-picker-mode">` in app.html:270-280, `dialogs.js` `_linkPickerMode`/`_restoreLinkPickerMode`/neue `onPick({id, title, mode})`-Signatur/change→localStorage, `editor.js` `insertAtCursor` auf Modulebene + `_linkTextFor`/`_appendLinkMarkdown`/`_onLinkPicked`, wiring auf `_onLinkPicked`; Modul-Status A1 ⬜→🟡, Tests ⬜; pytest unverändert 959/959, Tabu-Diff §0.3 leer, ui_budget 5/5 +1.8 KB, node --check grün auf dialogs.js/editor.js/app.js, Service-Touch 0 PID 195922 — V99-Korrektur im Block: erste localStorage-Nutzung des Projekts, sessionStorage→localStorage Eskalation wegen P8.5-G „überlebt Tab-Schließen", `try`/`catch` deckt SecurityError im privaten Modus ab) | 2026-09-03 (Step 0 abgeschlossen — Skelett phase8_5_picker_release/{CLAUDE.md, SESSIONS_ARCHIVE.md, scripts/} angelegt, vier Funde aus Plan §1 abgearbeitet: docs/INDEX.md 52.911 → 40.917 B (-23 %, 43 B unter 40 KB-Softcap) durch Kürzung updated: auf 5 neueste Einträge + Schlusszeile + kompakte Ausnahmenliste (Fund 2) im Wartungsblock, "Büroklammer" → "Lupe" an phase8_ui_graph/CLAUDE.md:440 mit datierter Korrekturnotiz, Phase-8-Bilanz 15/10/0 → 14/12/0 maschinell korrigiert + awk-Kommando im Bilanz-Abschnitt verankert (real 14/12/0 verifiziert); ROADMAP-Absatz + Wurzel-CLAUDE.md down: phase8_ui_graph → phase8_5_picker_release + Current-state-Absatz + updated:-Verlängerung im selben Commit; pytest unverändert 959/959 (kein Python-Touch), Tabu-Diff §0.3 leer, Service-Touch 0 (PID 195922, Active seit 2026-09-02 11:51:57 CEST — nur gelesen); eine Plan-Korrektur: Fund 1 + Fund 2 zusammen erforderten den Ausnahmenblock kompakter als anfangs geschrieben, um den Cap zu halten — kein Plan-Wortlaut gebrochen, im Session-Block dokumentiert)
+updated: 2026-09-09 (Z-Closeout Claude Code — **Übersichtsgrafik `docs/concepts/phase8_5_picker_release_uebersicht.svg` + `docs/concepts/PHASE8_5_CLOSEOUT_HANDOVER.md` neu**, beide als datierte Umkehr der Locks **P8.5-S** und **P8.5-R** durch den Nikinger (Plan §0.2 mit Korrekturnotiz); **Plan §9.1–§9.7 gefüllt** (P8.5-T, kanonischer Closeout, Handover verweist darauf statt es zu ersetzen); vier Drifts behoben: Modul-Status Zeilen 2–7 standen 🟡/⬜ gegen 20/20 ✅, Plan §9 leer, Zeile 2 nannte `<select>` statt Radiogruppe, `p8x`-§A führte die vierte A3-Probe noch als offen; **neun Nikinger-Feedback-Punkte als `p8x_ui_polish_notes.md` §10** abgelegt + §5/§6/§C-2-Querverweise, **§B Mobile-Hälfte durchgestrichen aufgehoben** (Realtime bleibt draußen), Nummern-Frage „p8.7 vs. P9" bewusst offengelassen; zwei Session-Sub-Blöcke per `sed`+`cmp` rotiert (Skript passt nicht auf das Ein-`##`-Muster), `updated:`-Pipe 22 → 3 Einträge, 19 verbatim ins Archiv (Head 52.609 → 24.569 B); **kein Code-Touch**, pytest **964/964**, Tabu-Diff §0.3 leer, Service-Touch 0 [PID 355956 unverändert]) | 2026-09-09 (P8.5-6-Folge-Smoke — Bracket-Pfad live-verifiziert, Bilanz 19/1/0 → **20/0/0**, Phase 8.5 vollständig abgeschlossen; v3ritt-Wegwerf frisch hochgefahren, Item `itm_b8b989a1` „Vercel [Hosting]" via `storage.Store.create()` angelegt, Mini-Smoke `phase8_5_picker_release/scripts/p856_bracket_mini_smoke.py` neu (~75 Z., Playwright + Login + Edit-Mode + Picker + 2 Screenshots in beiden Varianten); Screenshot `p856_bracket_preview.png` zeigt „Vercel [Hosting]" als **klickbaren blauen Hyperlink** — programmatische Quittung per Regex auf `<a href="#item/itm_b8b989a1">Vercel [Hosting]</a>` True; Wegwerf sauber per PID-Datei gestoppt, kein `pkill -f`; §Abnahmestand Bilanz → **20/0/0**, §Nächste Session auf P8.6-Planung umgeschrieben, Matrix-Zeile P8.5-6 in `SESSIONS_ARCHIVE.md` auf ✅ mit Folge-Smoke-Beleg; **kein Code-Touch**, pytest unverändert 964/964, Tabu-Diff §0.3 leer, Service-Touch 0 [PID 355956 unverändert]) | 2026-09-09 (Sichtung der 10 P8.5-🟡-Zeilen — 9 ✅, P8.5-6 bleibt 🟡 wegen fehlendem Vorschau-Screenshot des Bracket-Pfads; vier neue Sichtungs-Konventionen in `docs/concepts/sichtpruefung_automation_conventions.md` §1-§4 notiert [Vorschau-Pflicht / Code-vs-Visuell / Deploy-nach-Test / Screenshots-im-Chat]; `_tooling.md` Plugin-Empfehlung auf P8.6-first-step verschärft; Walkthrough/Restblock Top-Notizen; §Abnahmestand Bilanz 10/10 → 19/1/0, §Nächste Session komplett umgeschrieben auf P8.5-6-Brake-Pfad; alter Z-Closeout-Block manuell nach `SESSIONS_ARCHIVE.md` rotiert + 10 Matrix-Zeilen mit Nikinger-Vermerk; **kein Code-Touch**, pytest unverändert 964/964, Tabu-Diff §0.3 leer, Service-Touch 0 [PID 355956 unverändert], keine Wegwerf-Instanzen gestartet) | 2026-09-08 (Scope-Reversal + Session-Ende: Nikinger-Entscheidung im Review des Z-Final-Commits — die 10 P8.5-🟡-Sichtungen (P8.5-6, -7, -8, -9, -10, -11, -12, -13, -14, -15) wandern NICHT nach P8.6, sondern bleiben in Phase 8.5 als erste Sache der nächsten Session; Phase 8.5 head bekommt eine neue Sektion „Nächste Session“ mit den 10 Zeilen einzeln + Werkzeug-Setup-Stand, Stand-Summary entsprechend umformuliert; Wurzel-updated:-Pipe vorne ergänzt; Frontmatter vorne ergänzt; **kein Code-Touch**, pytest unverändert 964/964, Tabu-Diff 0.3 leer, Service-Touch 0 [PID 355956 unverändert]) | ältere Einträge (19) verbatim in `SESSIONS_ARCHIVE.md` §updated-Pipe-Archiv
 ---
 
 # CLAUDE.md — Phase 8.5: Link-Picker-Politur, Titel-statt-ID-Hint, v3-Vorabritt + Deploy (`phase8_5_picker_release/`)
@@ -100,12 +100,12 @@ Testliste, Abnahmezeilen: `docs/concepts/phase8_5_picker_release_plan.md`.
 | # | Modul | Step | Status | Tests |
 |---|---|---|---|---|
 | 1 | Haushalt (0.1–0.4: vier Funde aus Plan §1 abgearbeitet) + Skelett (0.5) | 0 | ✅ | 0 (Skelett, wie P1/P6/6.5/7/8 Step 0) |
-| 2 | A1 — §9.4.2 Picker-Modus-Umschalter (`<select class="input">` + `localStorage`) + Insert-at-cursor-Hub + Body-Markdown-Link-Helper | A | 🟡 | ⬜ |
-| 3 | A2 — §9.4.3 Tastaturnavigation (`aria-activedescendant`, `_pickLinkPickerAt`, CSS-Block-Entdopplung) | A | 🟡 | 🟡 (+3) |
-| 4 | B1 — §9.4.1 Hint generalisierend schärfen (`_TITLE_NOT_ID_HINT`, zwei neue Asserts in `test_tools.py`, Abbruchregel wörtlich im Head) | B | 🟡 | 🟡 (+2 Asserts in bestehendem Test) |
-| 5 | C — v3-Vorabritt (Wegwerf-Setup + 13-Stationen-Playwright-Smoke in Chromium + Firefox, drei echte Befunde vorgelegt, keine Code-Fixes im Tabu-Bereich nötig) | C | 🟡 | 🟡 (Chromium 13/13 + Firefox 13/13, 16 Screenshots) |
-| 6 | D — Release (D1 Vorbereitung opencode/M3 ✅; **D2 Deploy ✅ als Nikinger-Aktion 2026-09-05** [Release `20260905T140325.378914Z`, HEAD `6f19a8f`, Service-PID **355956**, `ExecMainStartTimestamp=2026-09-05 16:10:18 CEST`]; **D3 Health-Gate ✅** — `scripts/health_gate.sh` neu, **8/8 grün** gelaufen 2026-09-05 15:19:53Z gegen den frischen Deploy; **D4 Sichtprüfung ✅ als Nikinger-Aktion 2026-09-06** [Block 1–7 + Vorbereitung komplett durchgelaufen, drei echte Funde dokumentiert: **P8.5-19 Radiogruppe** statt `<select>` (Tausch 5 Z. ausstehend), **P8.5-6 Bracket-Renderer-Bug** in `markdown.js` (Fix ausstehend), **UX-2-Step-Knotenklick** als neues Feature für p8.X parkiert]; D5 Vierte A3-Probe ⬜ weiter Nikinger; V105 Connector-Check ⬜ weiter Nikinger) | D | 🟡 | 🟡 (Skript-Lauf + Sichtprüfung) |
-| 7 | Z — Closeout (Phase-8.5-Plan §9 füllen, Nachtrag in P8-Plan §9 + §9.4.7, Phase-8-Head §7-Matrix + Session-Block, drei Skripte/Doku-Updates, Größenprüfung) | Z | ⬜ | ⬜ |
+| 2 | A1 — §9.4.2 Picker-Modus-Umschalter (gebaut als `<select class="input">`, am 2026-09-07 auf Radiogruppe getauscht — Rückbau auf `<select>` ist P8.6-Arbeit; + `localStorage`) + Insert-at-cursor-Hub + Body-Markdown-Link-Helper | A | ✅ | ✅ (statische Asserts P8.5-5/-9) |
+| 3 | A2 — §9.4.3 Tastaturnavigation (`aria-activedescendant`, `_pickLinkPickerAt`, CSS-Block-Entdopplung) | A | ✅ | ✅ (+3) |
+| 4 | B1 — §9.4.1 Hint generalisierend schärfen (`_TITLE_NOT_ID_HINT`, zwei neue Asserts in `test_tools.py`, Abbruchregel wörtlich im Head) | B | ✅ | ✅ (+2 Asserts in bestehendem Test) |
+| 5 | C — v3-Vorabritt (Wegwerf-Setup + 13-Stationen-Playwright-Smoke in Chromium + Firefox, drei echte Befunde vorgelegt, keine Code-Fixes im Tabu-Bereich nötig) | C | ✅ | ✅ (Chromium 13/13 + Firefox 13/13, 16 Screenshots) |
+| 6 | D — Release (D1 Vorbereitung opencode/M3 ✅; **D2 Deploy ✅ als Nikinger-Aktion 2026-09-05** [Release `20260905T140325.378914Z`, HEAD `6f19a8f`, Service-PID **355956**, `ExecMainStartTimestamp=2026-09-05 16:10:18 CEST`]; **D3 Health-Gate ✅** — `scripts/health_gate.sh` neu, **8/8 grün** gelaufen 2026-09-05 15:19:53Z gegen den frischen Deploy; **D4 Sichtprüfung ✅ als Nikinger-Aktion 2026-09-06** [Block 1–7 + Vorbereitung komplett durchgelaufen, drei echte Funde dokumentiert: **P8.5-19 Radiogruppe** statt `<select>` (Tausch 5 Z. ausstehend), **P8.5-6 Bracket-Renderer-Bug** in `markdown.js` (Fix ausstehend), **UX-2-Step-Knotenklick** als neues Feature für p8.X parkiert]; D5 Vierte A3-Probe **✅ 2026-09-08** [der echte Connector nannte den Titel statt der `itm_…`-ID — §9.4.1 damit ohne fünften Hint-Edit geschlossen]; V105 Connector-Check **✅ 2026-09-08** [`list_spaces` über den reconnecteten sharefyx-MCP-Server + echter claude.ai-Chat des Nikingers]) | D | ✅ | ✅ (Health-Gate 8/8 + Sichtprüfung) |
+| 7 | Z — Closeout (Plan §9 gefüllt, Phase-8-Nachtrag, §7-Matrix, Übersichtsgrafik + Handover als **Umkehr von P8.5-S/-R**, Rotation, Größenprüfung) | Z | ✅ | ✅ (964 pytest unverändert) |
 
 ## Abbruchregel §9.4.1 (N2, verbindlich)
 
@@ -218,9 +218,14 @@ danach der große Graph-Umbau mit besserem Werkzeug in der Hand).
 
 ## Nächste Session
 
-**Phase 8.5 ist mit der P8.5-6-Folge-Smoke-Sub-Session 2026-09-09 vollständig abgeschlossen
-(20 ✅ · 0 🟡 · 0 ⬜).** Der nächste Schritt liegt **außerhalb** von Phase 8.5: P8.6-Planung
-in Claude Code (gelockte Entscheidungen + Step 0, ein Schritt vor dem ersten Code-Commit).
+**Phase 8.5 ist vollständig abgeschlossen (20 ✅ · 0 🟡 · 0 ⬜), Step Z inklusive.** Der
+Closeout liegt in `docs/concepts/phase8_5_picker_release_plan.md` **§9** (kanonisch); das
+Einstiegsdokument für die nächste Planung ist
+[`docs/concepts/PHASE8_5_CLOSEOUT_HANDOVER.md`](../docs/concepts/PHASE8_5_CLOSEOUT_HANDOVER.md)
+**§4** (offene Entscheidungen), nicht mehr dieser Head. Übersichtsgrafik:
+`docs/concepts/phase8_5_picker_release_uebersicht.svg`. Der nächste Schritt liegt
+**außerhalb** von Phase 8.5: P8.6-Planung in Claude Code (gelockte Entscheidungen + Step 0,
+ein Schritt vor dem ersten Code-Commit).
 **Nikinger-Vorgabe: erster Punkt in P8.6 ist die OpenCode-Vision-Plugin-Installation**
 (`DavidEasden/opencode-vision`, siehe
 [`docs/concepts/sichtpruefung_automation_tooling.md`](../docs/concepts/sichtpruefung_automation_tooling.md))
@@ -240,163 +245,72 @@ worden.
 
 ## Session stopped
 
-### 2026-09-09 (Sichtung der 10 P8.5-🟡-Zeilen — 9 ✅, P8.5-6 bleibt 🟡; vier neue Sichtungs-Konventionen notiert; kein Code-Touch)
+### 2026-09-09 (Z-Closeout-Session Claude Code — Übersichtsgrafik + Handover + Plan-§9, zwei Locks umgekehrt; kein Code-Touch)
 
-**Auftrag:** die seit Block C (2026-09-04) als 🟡 geführten 10 P8.5-Zeilen (P8.5-6, -7, -8,
--9, -10, -11, -12, -13, -14, -15) gegen die am 2026-09-08 geänderte Statusregel sichten
-(Nikinger-geprüfte Wegwerf-Instanz zählt als live-verifiziert) und Bilanz aktualisieren.
-Belege liegen seit Block C in `docs/screenshots/v3ritt_{chromium,firefox}_*.png` +
-`phase8_5_picker_release/scripts/v3_ritt_playwright_smoke.py` + den vier statischen Tests
-in `phase5_ui/tests/test_static_routes.py` vor. Scope-Reversal vom 2026-09-08 (nicht P8.6,
-sondern Phase 8.5 hier abschließen) ist umgesetzt.
+**Auftrag:** Phasen-Abschluss-Prompt (Prompt 3, `docs/PROMPTS.md`) — Rückblick auf die
+abgeschlossene Phase 8.5, Übersichtsgrafik, Handover, Rotationsprüfung, ein Commit. Dazu
+neun Nikinger-Feedback-Punkte, die zwischen den Sessions angefallen sind.
 
-**Methodik:** opencode/M3 sichtet die Screenshots (vision über `Read`-Tool) + die Smoke-
-Assertions + die statischen Tests grün, fasst pro Zeile Datei-zum-ersten-Check + Was-du-
-siehst + M3-Sichtung-reicht-Tabelle zusammen (10 Zeilen-Einträge im Chat), Nikinger
-bewertet jede Zeile mit „✅ / 🟡 / M3 reicht / ich muss selber ran".
+**Zwei gelockte Entscheidungen wurden vom Nikinger selbst umgekehrt** (nicht still
+aufgeweicht — an beiden Stellen datiert vermerkt, Plan §0.2):
 
-**Nikinger-Bewertung pro Zeile (verbatim aus dem Chat):**
-- **P8.5-6** — „sieht stark danach aus das Link noch nicht funktioniert, allerdings sieht
-  das auch nach der bearbeiten Ansicht aus" → 🟡 bleibt, neue Konvention §1 (Vorschau-Pflicht)
-  greift: Block-C-Screenshots zeigen nur Edit-Ansicht ohne Vorschau-Panel, Nikinger-Auge
-  reicht nicht für den Render-Test; Bracket-Fix vom 2026-09-07 ist post-Block-C und hat
-  keinen Live-Smoke-Screenshot des Bracket-Pfads
-- **P8.5-7** — „ja, aber auch hier wäre ein Screenshot mit Vorschau aktiviert besser
-  gewesen" → ✅ mit Notiz (Daten-Teil korrekt, Vorschau-Screenshot wäre besser gewesen)
-- **P8.5-8 bis -14** — jeweils „code ist deine Sache" → ✅ (Code + Smoke-Asserted-Behavior)
-- **P8.5-13** — „auch hier: nächstes mal auf Vorschau klicken zusätzlich" → ✅ mit Notiz
-- **P8.5-15** — „sieht ebenfalls korrekt aus" → ✅
+- **P8.5-S** („keine Übersichtsgrafik für Phase 8.5") → `docs/concepts/phase8_5_picker_release_uebersicht.svg`
+  (1080×1080, Stil der Phase-7-Grafik, headless-Chromium gerendert und visuell gegengeprüft).
+- **P8.5-R** („kein neues Handover-Dokument") → `docs/concepts/PHASE8_5_CLOSEOUT_HANDOVER.md`.
+  **P8.5-T bleibt unangetastet:** Plan §9 ist gefüllt und bleibt der kanonische Closeout,
+  das Handover verweist darauf, statt es zu ersetzen.
 
-**Vier neue Konventionen notiert** (Nikinger-Feedback 2026-09-09, in den richtigen Stellen
-verankert):
-1. **Vorschau-Pflicht bei klickbaren Links** (Screenshots müssen den gerenderten Link
-   zeigen, nicht nur die Markdown-Quelle) — neue Sektion in
-   `docs/concepts/sichtpruefung_automation_conventions.md` §1, plus Top-Notiz in
-   `SICHTPRUEFUNG_WALKTHROUGH.md` und `SICHTPRUEFUNG_RESTBLOCK.md` mit Verweis auf den
-   ausführlichen Konventionstext.
-2. **Wer validiert was** — (C) Code/Test durch M3/Claude Code ohne Nikinger-Schritt, (W)
-   Wegwerf-Instanz-Automatisierung mit Nikinger-Sichtung, (L) live durch Nikinger,
-   Visuelles immer Nikinger-Auge (bis OpenCode-Vision-Plugin in P8.6 installiert ist).
-   `docs/concepts/sichtpruefung_automation_conventions.md` §2 als Tabelle.
-3. **Deploy erst nach Testauswertung — nicht umgekehrt** (Tests fahren → Sichtung → Stand
-   „sicher" → Deploy als Nikinger-Aktion) — `docs/concepts/sichtpruefung_automation_conventions.md`
-   §3; gilt ab P8.6, Phase-8.5-Vorlauf fuhr bereits genau dieses Muster
-   (D3-Health-Gate 8/8 grün vor D2-Deploy).
-4. **Screenshots im Chat präsentieren, sobald OpenCode-Vision-Plugin installiert ist** —
-   `docs/concepts/sichtpruefung_automation_conventions.md` §4 plus Update der
-   Plugin-Empfehlung in `docs/concepts/sichtpruefung_automation_tooling.md`
-   (P8.6 first step ist jetzt explizit „verbindlich", nicht mehr „nächster Schritt für
-   eine spätere Session").
+**Vier Doku/Code-Drifts gefunden und im selben Commit behoben:**
 
-**Doc-Updates in diesem Commit (Hard Rule 8):**
-- `phase8_5_picker_release/CLAUDE.md` — §Abnahmestand Bilanz 10 ✅ · 10 🟡 → **19 ✅ · 1 🟡
-  · 0 ⬜** mit Erklärung pro Zeile, §Nächste Session komplett umgeschrieben auf
-  „P8.5-6-Brake-Pfad mit Vorschau-Screenshot", §Session-Block-Update (dieser Block), Frontmatter-
-  `updated:`-Pipe vorne ergänzt; alter Z-Closeout-Block rotiert nach `SESSIONS_ARCHIVE.md`
-  (manuell, weil `scripts/rotate_session_block.sh` auf das Phase-8.5-Muster mit einem
-  `## Session stopped` + mehreren `### date`-Subblöcken nicht passt — bewährtes Vorgehen aus
-  den vorherigen Rotationen).
-- `phase8_5_picker_release/SESSIONS_ARCHIVE.md` — Z-Closeout-Block vorne angehängt
-  (newest-first, verbatim aus dem damaligen Head-Stand), §Abnahmematrix-Archiv-Header
-  aktualisiert (Bilanz-Stand), zehn Zeilen P8.5-6/-7/-8/-9/-10/-11/-12/-13/-14/-15 mit neuen
-  Status + Nikinger-Sichtungs-Vermerken; Frontmatter `updated:` ergänzt.
-- `docs/concepts/sichtpruefung_automation_conventions.md` — neue Sektion
-  „Konventionen für Sichtungs-Skripte und -Output (Nikinger-Feedback 2026-09-09)" mit den
-  vier Regeln, zwischen Intro und „Der Kernsatz"-Block.
-- `docs/concepts/sichtpruefung_automation_tooling.md` — „Nächster konkreter Schritt"-Block
-  von „spätere Session" auf „P8.6 first step (Nikinger-Vorgabe 2026-09-08)" verschärft,
-  Begründung warum früh (Sichtungs-Reibung ohne Plugin).
-- `phase8_5_picker_release/SICHTPRUEFUNG_WALKTHROUGH.md` +
-  `phase8_5_picker_release/SICHTPRUEFUNG_RESTBLOCK.md` — Top-Notiz „Wichtig (Sichtungs-
-  Konvention 2026-09-09): Vorschau-Pflicht bei klickbaren Links" mit Verweis auf
-  `docs/concepts/sichtpruefung_automation_conventions.md` §1.
-- `docs/INDEX.md` — Phase-8.5-Header (Bilanz-Stand aktualisiert auf 19/1/0 + neuer Sub-Session-
-  Eintrag), Frontmatter-`updated:` vorne ergänzt.
-- `docs/ROADMAP.md` — Phase-8.5-Zeile Bilanz-Stand aktualisiert auf 19/1/0 + Sub-Session-
-  Vermerk.
-- `CLAUDE.md` (root) — Current-State-Absatz um neuen 2026-09-09-Eintrag ergänzt.
+1. **Modul-Status-Tabelle war stale** — Zeilen 2–7 standen auf 🟡/⬜ (A1/A2/B1/C/D 🟡, Z ⬜),
+   während der Abnahmestand direkt darunter 20/20 ✅ meldete. Alle sechs Zeilen nachgezogen,
+   D5 + V105 mit Datum und Beleg eingetragen.
+2. **Plan §9 war leer**, obwohl P8.5-T ihn als kanonischen Closeout festlegt und die Phase
+   seit dem 2026-09-08 als abgeschlossen geführt wird. §9.1–§9.7 gefüllt.
+3. **Modul-Status Zeile 2 nannte `<select class="input">`** als gebaute Form — seit dem
+   Pre-Z-Tausch am 2026-09-07 ist es eine Radiogruppe. Mit Rückbau-Hinweis korrigiert.
+4. **`p8x_ui_polish_notes.md` §A** führte die vierte A3-Probe noch als „wird in D5
+   entschieden" — sie lief am 2026-09-08 und ist ✅.
 
-**Bilanz-Bewegung:** 10 ✅ · 10 🟡 → **19 ✅ · 1 🟡 · 0 ⬜** (9 von 10 Sichtungs-Zeilen auf
-✅, P8.5-6 bleibt 🟡 wegen fehlendem Vorschau-Screenshot des Bracket-Pfads).
+**Neun Nikinger-Feedback-Punkte als `p8x_ui_polish_notes.md` §10 abgelegt** (Zitat +
+Code-Anker, ungewichtet): Icon-/Trägerflächen-Radien, Hover-Auswahl als transparentere
+Standardauswahl, Ordner-/Tags-Auswahl, klickbare Spaces, Einstellungsmenü, alles Klickbare
+mit Farbausnahme für „Abmelden"/„Archivieren", verbundene AI-Sessions, Hochkant-/Handy-UI.
+Sieben davon sind Verschärfungen von §5/§6 — §5, §6 und §C-2 tragen jetzt Querverweise.
+**Im Code geprüft:** `app.css` hat 37 `border-radius`-Deklarationen mit sechs Werten, davon
+ein hartkodiertes `6px` in `.link-picker-results` am Token vorbei.
 
-**Verifiziert:** kein Python-/JS-Code angefasst (alle Änderungen in `.md`-Dateien +
-Frontmatter-Pipes), Tabu-Diff §0.3 leer (kein Servercode-Touch), Production-PID 355956
-unverändert (nur gelesen via `systemctl status sharefyx-mcp`), keine Wegwerf-Instanzen
-gestartet/gestoppt (Block-C-Screenshots + statische Tests reichen für die 9 ✅-Zeilen).
-`pytest phase5_ui/tests/test_static_routes.py` 15/15 grün (für die vier (C)-Zeilen
-P8.5-6-Brace-Fix, P8.5-9, P8.5-12, P8.5-14).
+**Zwei Punkte, die bewusst nicht selbst entschieden wurden:**
 
-**Commit:** ein Commit für diese Sichtung (Doc-Updates in den oben genannten Dateien + alle
-`updated:`-Pipes + Frontmatter, kein Code-Touch) — Hard Rule 8 im selben Commit.
-Kein Push ohne weitere Anweisung.
+- **„eher v3.1 also p8.7"** kollidiert mit der dokumentierten Reihe P8.6 → `v3.0.2` /
+  P9 → `v3.1.0`. Wortlaut zitiert, **nichts umbenannt** — Frage für die P8.6-Planung.
+- **Mobile/Hochkant** stand in `p8x_ui_polish_notes.md` §B und im ROADMAP-Abschnitt als
+  bewusste Außenkante. Die Mobile-Hälfte ist jetzt durchgestrichen + datiert aufgehoben;
+  **Realtime bleibt draußen.**
 
-**Nächster Schritt:** P8.5-6-Brake-Pfad (Mini-Smoke mit Vorschau-Screenshot) als
-Nikinger-/opencode-Aktion in einer Folge-Session, dann Bilanz 20 ✅ · 0 🟡 · 0 ⬜ und Phase
-8.5 vollständig abgeschlossen. **Oder:** Sprung direkt zu P8.6-Planung mit OpenCode-Vision-
-Plugin-Installation als erstem Schritt — dann eröffnen sich dieselben Sichtungs-Erleichterungen
-(Plugin ist da), und der P8.5-6-Brake-Pfad kann inline im ersten P8.6-Schritt mitlaufen.
+**Plan-§6-Step-Z-Punkt 2 nachgeholt** — er war in *keiner* Session erledigt worden: der
+Phase-8-Plan (`docs/concepts/phase8_ui_graph_plan.md`) führte §9.4.1/§9.4.2/§9.4.3 weiter als
+offene Restdefekte, obwohl Phase 8 seit dem 2026-09-08 auf ✅ steht — ein kalter Leser hätte
+dort drei offene Defekte einer abgeschlossenen Phase gefunden. Alle drei tragen jetzt einen
+datierten **„✅ ERLEDIGT in Phase 8.5"**-Kopf mit Mechanismus, Commit-SHA und Zeiger auf
+Plan §9; §9.4.2 nennt zusätzlich den an P8.6 vererbten V102-Befund. §9.4.7 hat den
+vollzogenen ✅-Sprung (**26/0/0**) bekommen, die stale Bilanz „15 ✅ · 10 🟡" ist als
+Planungsstand markiert statt gelöscht.
 
-### 2026-09-09 (P8.5-6 Folge-Smoke — Bracket-Pfad live-verifiziert, Bilanz 20 ✅ · 0 🟡 · 0 ⬜, Phase 8.5 vollständig abgeschlossen; kein Code-Touch)
+**Rotation:** der Head trug **einen** `## Session stopped` mit **zwei** datierten
+`###`-Unterblöcken. `scripts/rotate_session_block.sh` zählt `##`-Überschriften und hätte
+„bereits konform" gemeldet — rotiert wurde deshalb per `sed`-Schnitt mit dreifacher
+`cmp`-Gegenlesung (Reassemblierung == Original · beide Blöcke byte-identisch im Archiv ·
+Archivbestand unverändert), nichts abgetippt. Head **52.609 → 41.469 B**, Archiv
+**172.010 → 183.150 B**.
 
-**Auftrag:** P8.5-6 Brake-Pfad aus der vorherigen Sub-Session schließen — Mini-Smoke gegen
-den v3ritt-Wegwerf mit einem `[…]`-Titel-Item + **Vorschau-Panel-sichtbar-Screenshot**, damit
-der gerenderte Bracket-Link als klickbarer Hyperlink sichtbar wird (statt nur in der
-Markdown-Quelle). Nikinger-Vorgabe: frischer Wegwerf + beide Screenshots, dann sichtet er.
+**Selbstprüfung (§0.5):** `pytest -q` **964 passed** in 267 s (unverändert) · Tabu-Diff §0.3
+**leer** · kein JS/CSS-Touch, also `node --check`/`ui_budget.py` gegenstandslos ·
+**Service-Touch 0** (`systemctl status` nur lesend, PID **355956**, Uptime 3 Tage) · keine
+Wegwerf-Instanz gestartet · Größenprüfung gelaufen: `p8x_ui_polish_notes.md` landete beim
+Einfügen von §10 bei 41.166 B und wurde durch Kompression der `updated:`-Pipe, des
+Intro-Blocks und von §10 selbst auf **40.866 B** unter den Softcap zurückgeholt.
 
-**Setup:** `phase8_5_picker_release/scripts/wegwerf_setup_v3ritt.py setup,seed-items,start`
-(PID 461074, Port 18773, eigene tmp-`DATA_ROOT` + `auth.sqlite3` + Keyring, Hard Rule 9-konform).
-Item `itm_b8b989a1` mit Titel `Vercel [Hosting]` (folder „Notizen", tags `infra`/`wichtig`)
-direkt via `storage.Store.create()` im alpha-Space angelegt — kein Mock, echter
-Storage-Kern.
-
-**Neues Skript** (`phase8_5_picker_release/scripts/p856_bracket_mini_smoke.py`, ~75 Zeilen):
-Login via Playwright (Passwort + TOTP aus `credentials.json`), `_go_home`-Pattern aus dem
-Block-C-Smoke (`#home-button` + Dirty-Prompt-Discard), Buecherliste Q4 in der Liste klicken,
-`_ensure_edit_mode` (Preview→Edit via `#toggle-preview` mit Text „Bearbeiten", Meta-Panel
-aufklappen weil Link-Picker-Knopf darin), Cursor an Position 0, Link-Picker öffnen
-(`#link-picker-button`), nach „Hosting" suchen (matcht `Vercel [Hosting]`), ersten Treffer
-klicken — Body enthält jetzt `[Vercel \[Hosting\]](#item/itm_b8b989a1)## Verwandt`.
-
-**Screenshots in beiden Varianten:**
-- `docs/screenshots/p856_bracket_edit_view.png` — Edit-Ansicht, Toolbar zeigt „Vorschau",
-  Body zeigt die `\[…\]`-Escapes im Markdown-Quelltext
-- `docs/screenshots/p856_bracket_preview.png` — **Vorschau-Panel aktiv**, Toolbar zeigt
-  „Bearbeiten", Body rendert **„Vercel [Hosting]" als klickbaren blauen Hyperlink**
-  (unterstrichen, Akzent-Blau) — der Bracket-Fix vom 2026-09-07 hält live
-
-**Technische Quittung:** Script prüft zusätzlich per `page.evaluate()` + Regex, ob das
-Preview-HTML einen `<a href="#item/itm_b8b989a1">Vercel [Hosting]</a>` enthält — **True**.
-Damit ist der Beleg nicht nur visuell (Screenshot), sondern auch programmatisch
-(doppelter Boden gegen Rendering-Fehler, die im Pixel-Layout übersehen werden).
-
-**Cleanup:** Wegwerf sauber per PID-Datei gestoppt (`wegwerf_setup_v3ritt.py stop` → „PID
-461074 sauber beendet"), kein `pkill -f`. Production-PID 355956 durchgehend
-unangetastet. Beide Screenshots verbleiben im Repo als lebender Beleg.
-
-**Nikinger-Sichtung:** „Perfekt, passt, soweit" — die zwei Screenshots reichen für den
-Sprung auf ✅, die programmatische Regex-Bestätigung als Bonus obendrauf.
-
-**Doc-Updates in diesem Commit:**
-- `phase8_5_picker_release/CLAUDE.md` §Abnahmestand Bilanz 19 ✅ · 1 🟡 → **20 ✅ · 0 🟡 ·
-  0 ⬜** (P8.5-6-Folge-Smoke-Vermerk direkt unter dem Stand-Block), §Nächste Session
-  komplett umgeschrieben auf P8.6-Planung + Plugin-Install als erster Punkt; aktiver
-  Session-Block (dieser) ergänzt — **kein neuer Block**, der bestehende 2026-09-09-Block
-  wird nur erweitert (Phase 8.5 hat damit weiterhin **genau einen** Session-Block,
-  Konvention gehalten).
-- `phase8_5_picker_release/SESSIONS_ARCHIVE.md` §Abnahmematrix-Archiv P8.5-6-Zeile auf ✅
-  mit Nikinger-Sichtungs-Vermerk vom 2026-09-09 (zwei Screenshots, Regex-Match True);
-  Header-Stand-Zeile aktualisiert.
-- `docs/INDEX.md`, `ROADMAP.md`, `CLAUDE.md` (root) — Frontmatter-`updated:`-Pipes vorne
-  ergänzt mit diesem P8.5-6-Folge-Eintrag, Phase-8.5-Header bzw. Current-State-Bilanz
-  auf 20/0/0.
-
-**Verifiziert:** kein Python-/JS-Code angefasst (nur Doku + neuer Mini-Smoke in
-`phase8_5_picker_release/scripts/`, Phase-8.5-Tabu §0.3 gilt nicht für Skripte unter
-`scripts/`), Tabu-Diff §0.3 leer, Production-PID 355956 unverändert, keine Wegwerf-
-Instanzen laufen mehr (sauber gestoppt), `pytest phase5_ui/tests/test_static_routes.py`
-15/15 grün.
-
-**Commit + Push:** ein Commit für die P8.5-6-Folge-Sub-Session, dann `git push` nach
-`origin/main` auf ausdrückliche Nikinger-Anweisung.
-
-**Phase 8.5 ✅ — formal abgeschlossen, Bilanz 20 ✅ · 0 🟡 · 0 ⬜ von 20.**
+**Nächster Schritt:** P8.6-Planungs-Session in Claude Code. Einstiegsdokument ist
+`docs/concepts/PHASE8_5_CLOSEOUT_HANDOVER.md` (§4 = die offenen Entscheidungen), nicht mehr
+dieser Head. Erster Punkt der Phase bleibt die OpenCode-Vision-Plugin-Installation.

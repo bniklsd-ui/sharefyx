@@ -10,23 +10,19 @@ down:
   - ../phase8_5_picker_release/SESSIONS_ARCHIVE.md     # Phase-8.5-Historie (D4 archiviert)
   - ../docs/concepts/phase8_ui_graph_plan.md            # §9.4.7 Phase-Status + p8.X-Übergabepunkt
   - ../phase8_ui_graph/SESSIONS_ARCHIVE.md              # §9.4.6 drei Restdefekte (Settle-Zeit / Foreign-Farbe / Knotenklick — bereits am 2026-09-02 geschlossen, hier referenziert)
-updated: 2026-09-08 (Phase-8.5-Sichtprüfungs-Folge-Sitzung am echten Gerät — drei weitere User-Feedback-Punkte in §6/§8/§9 angehängt; §6 Konto/Einstellungen-Rename re-affirmiert mit Datum + Klarstellung der drei möglichen Vertausch-Lesarten (a/b/c) gegen den aktuellen Code-Stand `app.html:31-41`; **§8 NEU — customizable Tags for tasks (kosmetisch) + Standard-Tag „blocked"** mit Aufteilung in §8.1 (User-Palette als `localStorage`, Server unverändert) und §8.2 (fester Code-Tag, offen ob kosmetisch oder mit Bucket-Semantik); **§9 NEU — direkter User-Feedback-Button** mit drei plausiblen Senken (User-Space / `/var/log/sharefyx/feedback/` / externer Endpunkt) + UI-Platzierungs-Vorschlag Rail-Unterkante + Klärungsfragen zur Planungs-Session; §E chronologische Tabelle um drei Zeilen 2026-09-08 ergänzt; **kein Code-Touch, nur Doku**; Phase-8.5-Head §Session stopped bekommt einen neuen Sub-Session-Block; pytest nicht gelaufen (kein Python-Touch), Tabu-Diff §0.3 leer, Service-Touch 0) | 2026-09-06 (Sichtprobe-Folgesession durch den Nikinger mit Fabian — **nur dokumentiert, kein Code-Touch**; neue Datei, sieben Themen-Cluster aus dem Bericht: 1. Spaces-Layout-Reorganisation [„alle Items"-Leiste unter Spaces + Map 40 % Breite/volle Höhe], 2. Obsidian-Map-Performance + Style [Reload-Overload + Landkarten-Stil + Collapsible mit Abhängigkeiten + Map-Field schneidet ab + Map-Reload-Drift], 3. Anzahl-Anzeige pro Ordner, 4. Edit-in-Place-Vision [„Bearbeiten"-Knopf überflüssig], 5. Layering-Design-System [3 Layer: echtes Schwarz / aktueller Standard / Liquid Glass, Selektion explizit blau], 6. „Konto" → „Einstellungen"-Rename + Positions-Tausch mit Logout, 7. Weiterer De-AI-ierungslauf nach **neuen** Kriterien; fünf bereits in D4 dokumentierte p8.X-Punkte [UX-2-Step-Knotenklick, Map-Field schneidet ab, Map fliegt, Save-Button-YAML-Header, Fabi-Sammelliste] hier zusammengeführt + Duplikatverweis; offen: was NICHT in p8.X gehört; nächstes: Planungs-Session in Claude Code, sobald die aktive Phase 8.5 Z durch ist)
+updated: 2026-09-09 (Phase-8.5-Closeout-Session — **§10 NEU**: neun Nikinger-Feedback-Punkte aus dem Closeout-Prompt [Icon-Radien, Hover-Auswahl, Ordner-/Tags-Auswahl, klickbare Spaces, Einstellungsmenü, alles Klickbare mit Farbausnahme Abmelden/Archivieren, AI-Sessions, **Hochkant-/Handy-UI**], sieben davon Verschärfungen von §5/§6; §5 + §6 + §C-2 auf §10 verwiesen; **§B: „Mobile" durchgestrichen** — Nikinger-Aufhebung, Realtime bleibt draußen; §E +9 Zeilen; `updated:`-Pipe zweimal komprimiert wegen Softcap-Nähe; kein Code-Touch) | 2026-09-08 (Sichtprüfungs-Folge-Sitzung — §6 re-affirmiert [Lesarten a/b/c gegen `app.html:31-41`], §8 NEU Tags, §9 NEU Feedback-Button, §E +3) | 2026-09-06 (Sichtprobe-Folgesession Nikinger + Fabian — neue Datei, §1–§7 angelegt, fünf D4-Punkte zusammengeführt)
 ---
 
 # p8.X — UI-Polish & Iterations (Notizen, keine Planung)
 
-> **Stand:** Sammlung von Findings, kein Plan. **Nikinger-Entscheidung Phase 8 ✅ + p8.X
-> als Folge-Phase** liegt seit Phase 8.5 D4 (2026-09-06) — `phase8_ui_graph_plan.md §9.4.7`
-> ist der Anker im Phase-8-Plan, das Phase-8.5-Z trägt die formale Übergabe.
+> **Stand:** Sammlung von Findings, kein Plan. Phase 8 ✅ + Phase 8.5 ✅ sind seit dem
+> 2026-09-08/-09 formal geschlossen; die Folge-Phase heißt inzwischen **P8.6** (→ `v3.0.2`),
+> der große Graph-Umbau **P9** (→ `v3.1.0`). Anker im Phase-8-Plan: §9.4.7.
 >
-> **Diese Datei ist die einzige Schreib-Stelle für die p8.X-Ideen**, bis eine Planungs-
-> Session stattgefunden hat (voraussichtlich Claude Code, weil die Fragen Layout- und
-> Design-System-weit sind — siehe §5 Layering). Wer einen neuen p8.X-Punkt findet, hängt
-> ihn hier an, nicht im Phase-Head einer abgeschlossenen Phase.
->
-> **Namenskonvention:** `p8x-…` ist der formlose Kurzname für die Folge-Phase. Eine
-> spätere Phase bekommt einen richtigen Namen + Plan-Doc (`phase9_…_plan.md` o. ä.),
-> sobald die Planungs-Session ihre Reichweite festgelegt hat.
+> **Diese Datei ist die einzige Schreib-Stelle**, bis eine Planungs-Session stattgefunden
+> hat (Claude Code, weil §5 Layering design-system-weit ist). Neue Punkte hier anhängen,
+> nicht im Head einer abgeschlossenen Phase. Verzeichnis- und Plan-Dateiname sind weiter
+> offen (§D) — `p8x-…` bleibt bis dahin der formlose Kurzname.
 
 ---
 
@@ -282,6 +278,10 @@ heute versehentlich Glass statt Blau? — `grep`-Sweep über `app.css` +
 allein von Transparenz/Blur abhängt). Die Politik ist konsistent mit dieser Regel
 — Selektion ist nie glass-only.
 
+**[2026-09-09] §10 verschärft diese Politik** um sieben konkrete Stellen (Hover als
+transparentere Standardauswahl, Ordner-/Tags-/Einstellungs-Auswahl, alles Klickbare) —
+§5 und §10 zusammen lesen, nicht getrennt planen.
+
 **Größter Brocken der Sichtprobe-Folgesession.** Diese Politik zu implementieren
 heißt: alle UI-Komponenten einmal auditieren, Glass-Tokens korrekt zuordnen,
 Selektions-Farbe vereinheitlichen. Vermutlich eine eigene Planungs-Session in
@@ -320,6 +320,10 @@ more suiting."
   Rail-Ende), oder (c) den Konto-Knopf vom Logout-Knopf durch eine visuelle
   Trennung klarer unterscheiden (Konto gefüllt/Sektion-Header, Logout als
   Sekundäraktion). **Klärung in der Planungs-Session nötig**, nicht raten.
+
+**[2026-09-09] §10 hängt zwei Dinge an diesen Punkt:** §10.6 (das ganze
+Einstellungsmenü bekommt die Standardauswahl) und §10.8 (verbundene AI-Sessions
+anzeigen, vom Nikinger nach hinten gelegt).
 
 **Bezug:** Phase 5 Block A (Auth-Selbstverwaltung, `phase5_ui/webui/static/
 app.html` / `pages.py`). Kleiner Fix, vermutlich 5–10 Zeilen + ein i18n-String-
@@ -519,6 +523,63 @@ gewählte Senke im bestehenden `DATA_ROOT` (User-Space) liegt.
 
 ---
 
+## §10 Auswahl-, Klick- und Form-Vereinheitlichung (Nikinger, 2026-09-09)
+
+**Herkunft:** Feedback im Phase-8.5-Closeout-Auftrag, gesammelt „in der Zwischenzeit" am
+echten Gerät. **Sieben der neun Punkte sind keine neuen Themen, sondern die konkrete
+Ausformung von §5 (Layering / Selektion ist blau) und §6 (Settings)** — wer §10 plant,
+liest §5 zuerst. Zwei Punkte sind neu: AI-Sessions (§10.8) und Hochkant-UI (§10.9).
+
+| # | Punkt (Nikinger-Wortlaut, gekürzt) | Bezug | Art |
+|---|---|---|---|
+| 10.1 | „Alle Icons auf selbe abgerundete Ecken anpassen" | neu, formal | Radien-Audit |
+| 10.2 | „auch hover auswahl unserer „Standard" Auswahl anpassen" | §5 | Selektion |
+| 10.3 | „auch die „Ordner" und „Tags" auswahl zur Standard auswahl anpassen" | §5 | Selektion |
+| 10.4 | „Spaces in der übersicht clickable" | §1 | Interaktion |
+| 10.5 | „Vorschlag für Hoverauswahl: standardauswahl aber etwas transparenter" | §5 | Selektion |
+| 10.6 | „gesamtes Einstellungsmenü … ebenfalls mit der Standard auswahl versehen" | §6 | Selektion |
+| 10.7 | „alle Buttons …, inklusive clickable Links, Item zahl bei der Übersicht, generell alles was clickable ist selbiges design, nur „abmelden" und „archivieren" evtl andere Farbe" | §5 | Selektion |
+| 10.8 | „In Einstellungen … verbundene AI Sessions anzeigen (Zukunft, eher v3.1 also p8.7)" | §6 | Feature |
+| 10.9 | „Hochkant bzw Handy version der UI als wichtiges Item der Zukunft notieren" | §B-Umkehr | Layout |
+
+**§10.1 — Ausgangslage (im Code geprüft, 2026-09-09):** `app.css` trägt **37**
+`border-radius`-Deklarationen mit **sechs** Werten — `var(--radius)` 10px,
+`var(--radius-sm)` 6px, `999px`, `50%`, ein **hartkodiertes `6px`** in
+`.link-picker-results` (am Token vorbei) und `0` in `.tree__scope`. Icons tragen meist
+selbst keinen Radius, sie erben ihn von der Trägerfläche. **Vermutlich also ein
+Trägerflächen-Audit, kein Icon-Audit** — am Screenshot verifizieren, nicht aus dieser
+Notiz übernehmen.
+
+**§10.2 + §10.5 — Hover als transparentere Standardauswahl.** Verschärfung von §5 („blau,
+nicht Glass"): §10.5 sagt jetzt *wie* blau — dieselbe Optik, reduzierte Deckkraft. Das
+braucht **keinen zweiten Token**, nur einen Alpha-Wert auf dem bestehenden. Offen: Alpha
+auf Fill, Outline oder beidem?
+
+**§10.7 — die Farbausnahme ist die eigentliche Entscheidung.** „Alles Klickbare gleich" ist
+billig; interessant ist, dass **„Abmelden" und „Archivieren" ausdrücklich anders sein
+dürfen**. Beides sind Aktionen mit Rückweg-Kosten. Zu klären: ist das eine dritte
+Button-Kategorie („destruktiv/irreversibel") im Sinne der Selection/Choice-Konvention v3,
+oder zwei Einzelfälle? **Nicht raten** — der Nikinger schreibt „evtl.".
+
+**§10.8 — verbundene AI-Sessions.** Zeitlich vom Nikinger selbst nach hinten gelegt
+(„Zukunft, eher v3.1 also p8.7"). **Achtung, Nummern-Konflikt:** die Dokumente kennen kein
+P8.7 — dort steht P8.6 → `v3.0.2` und P9 → `v3.1.0`. Der Wortlaut ist hier zitiert, es wurde
+**nichts umbenannt**; die Planungs-Session klärt, ob „p8.7" ein neuer Zwischenschritt ist
+oder das meint, was heute P9 heißt. Inhaltlich: eine Anzeige der aktiven OAuth-Grants/
+Sessions in den Einstellungen — das ist **kein reines UI-Thema**, es braucht eine Leseseite
+auf `authserver/`-Daten und fällt damit unter die Tabu-Frage (§C-6).
+
+**§10.9 — Hochkant/Handy hebt eine Außenkante auf.** Bis heute stand „Mobile/Realtime" in
+§B und im ROADMAP-Abschnitt als bewusst draußen. Der Nikinger hebt die **Mobile-Hälfte**
+auf: die Hochkant-Ansicht soll als wichtiges Zukunfts-Item notiert sein, damit eine spätere,
+freiere Phasenplanung sie berücksichtigt. **Realtime bleibt draußen.** Ausdrücklich **kein
+P8.6-Auftrag** — ein Merkposten für die Phase danach.
+
+**Reihenfolge-Hinweis:** §10.1–§10.7 fassen dieselben Selektoren an wie §5 und gehören
+plausibel in dieselbe Welle. Entscheidung: Planungs-Session (§C-2).
+
+---
+
 ## §A Anhang: bereits in Phase 8.5 D4 dokumentierte p8.X-Punkte
 
 Aus dem D4-Block (`phase8_5_picker_release/CLAUDE.md`), hier zusammengeführt +
@@ -537,9 +598,8 @@ bereits am 2026-09-02 in Phase 8 D2-Session geschlossen** (Nikinger-Entscheidung
 Option (a) für alle drei) — **nicht** p8.X, **nicht** hier referenziert als offen.
 Quelle: `phase8_ui_graph/SESSIONS_ARCHIVE.md` Session-Block 2026-09-02.
 
-**Phase 8 §9.4.1 A3 Klammer-/Aufzählungs-Kontext** (`_TITLE_NOT_ID_HINT` deckt
-drei Formen ab, vierte würde Modellverhalten dokumentieren) ist **Phase-8.5-Scope**,
-wird in D5 (Vierte A3-Probe) entschieden — **nicht** p8.X.
+**Phase 8 §9.4.1 A3** ist **erledigt, nicht p8.X**: die vierte A3-Probe lief am
+2026-09-08 über den echten Connector ohne ID-Leck (P8.5-3/-4 ✅).
 
 ---
 
@@ -552,7 +612,10 @@ Verbotsliste für die Planungs-Session, damit p8.X nicht zur Wundertüte wird:
 - Löschen von Items (F2)
 - FastMCP-4/V79 (eigene Mini-Phase per P5-C)
 - Funnel-Watchdog (P3-Erbposten, eigene Zeit)
-- Mobile/Realtime (nie angekündigt)
+- ~~Mobile/Realtime (nie angekündigt)~~ **[2026-09-09 Nikinger-Aufhebung, nur die
+  Mobile-Hälfte]:** die Hochkant-/Handy-Ansicht ist ab sofort ein benanntes
+  Zukunfts-Item (§10.9) — kein P8.6-Auftrag, aber in einer freieren Phasenplanung zu
+  berücksichtigen. **Realtime bleibt draußen.**
 - Light-Mode (Designsystem bleibt Dunkel-first, P5-X)
 - Glyph-Entscheidungen P6/P6.5 (offene Nikinger-Entscheidungen, kein P8/p8.X-Auftrag)
 - Bulk-Append-MCP-Tool (P6.5 bewusst draußen, geht heute schon mehrzeilig)
@@ -655,6 +718,7 @@ Wenn aus diesen Notizen ein Plan wird:
 | 2026-09-08 | §8.1 customizable Tags for tasks (kosmetisch) | Phase-8.5-Sichtprüfungs-Folge-Sitzung 2026-09-08 |
 | 2026-09-08 | §8.2 Standard-Tag „blocked" | Phase-8.5-Sichtprüfungs-Folge-Sitzung 2026-09-08 |
 | 2026-09-08 | §9 direkter User-Feedback-Button | Phase-8.5-Sichtprüfungs-Folge-Sitzung 2026-09-08 |
+| 2026-09-09 | §10.1–§10.9 (neun Punkte: Icon-Radien, Hover, Ordner/Tags, klickbare Spaces, Einstellungsmenü, alles Klickbare, AI-Sessions, Hochkant-UI) | Phase-8.5-Closeout-Auftrag 2026-09-09 |
 
 Die Sichtprobe-Folgesession vom 2026-09-06 und die Sichtprüfungs-Folge-Sitzung
 vom 2026-09-08 sind beides Folge-Sessions nach dem Phase-8.5-D4-Lauf, aber

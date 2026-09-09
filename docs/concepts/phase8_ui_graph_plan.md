@@ -7,7 +7,7 @@ up: ../../ROADMAP.md
 down:
   - ./PHASE7_CLOSEOUT_HANDOVER.md            # Herkunft der Erbposten P7-24 / remove-space / P7-4
   - ../../phase8_ui_graph/CLAUDE.md          # Phase-Head (entsteht in Step 0.5)
-updated: 2026-09-06 (Phase 8.5 D4-Sichtprobe-Folgesession — **nur dokumentiert, kein Code-Touch in dieser opencode/M3-Session**; §9.4.7 mit Phase-8-✅-Sprung + p8.X-Ankündigung + Verweis auf `docs/concepts/p8x_ui_polish_notes.md` als Schreib-Stelle ergänzt; sieben Sichtprobe-Folgesession-Themen [Spaces-Layout-Reorg, Obsidian-Map 5 Sub-Punkte, Anzahl-Anzeige Ordner, Edit-in-Place-Vision, Layering-Design-System, „Konto"→„Einstellungen", De-AI-ierung-Lauf 2] + fünf D4-Punkte [UX-2-Step-Knotenklick, Map-Field schneidet ab, Map fliegt, Save-Button-YAML-Header, Fabi-Sammelliste] sind in der p8.X-Notizen-Datei gesammelt; `phase8_5_picker_release/CLAUDE.md` aktiver Block auf D4-Sichtprobe-Folgesession umgestellt, D4-Block rotiert nach `SESSIONS_ARCHIVE.md`; Phase-8.5-Head Frontmatter `updated:` Pipe vorne ergänzt; keine Code-Tests, kein Service-Touch; Plan-Kern unverändert [P8-A–P8-Q, N1–N12]) | 2026-09-02 (P8-22+P8-24-Smokes gebaut, drei Phase-8-Funde als benannte Defekte in §9.4.6 -- graph.js ALPHA_DECAY / api.py _graph_get `writable` / graph.js Knotenklick-nach-Item -- mit je drei Optionen, §9.4.4 gegenstandslos (beide Substanz-Setups gebaut), Status 15-10-0; achte P1-Contract-Öffnung GESCHLOSSEN mit demselben Commit, Schliessungsbeleg in phase1_storage/CLAUDE.md §Geerbte Contracts; keine Python- oder JS-Datei in storage/mcpserver/webui/static angefasst, 958/958 pytest unveraendert, ui_budget 5/5 unveraendert) | 2026-09-02 (§9 Closeout gefüllt — Phase-8-Closeout in diesem Plan-Abschnitt per P8-N, Status 15 ✅ · 9 🟡 · 2 ⬜ vor Step-Z-Deploy; drei benannte Restdefekte + Glyph-Entscheidung dokumentiert, achte P1-Contract-Öffnung formal geschlossen; keine Python-/JS-Datei angefasst, keine Tests geändert, Sichtprüfung am echten Gerät + Sprung auf ✅ bleibt Nikinger-Aktion nach `deploy.sh main`) | 2026-08-28 (Nachtrag noch in der Planungssession: Step 0 als Fundament-Session Claude Code + Nikinger, C0 Anti-AI-Pattern-Research neu, P8-P gelockt, P8-25/26 + V93/V94) | 2026-08-28 (initial, Planungssession Claude Code Opus, N1–N12 vom Nikinger gelockt)
+updated: 2026-09-09 (Phase-8.5-Z-Closeout-Nachtrag, P8.5-R/N6 — **§9.4.1/§9.4.2/§9.4.3 auf „✅ ERLEDIGT in Phase 8.5" gesetzt** mit Mechanismus, Commit-SHA und Zeiger auf `phase8_5_picker_release_plan.md` §9; §9.4.7 um den vollzogenen ✅-Sprung ergänzt (**26 ✅ · 0 🟡 · 0 ⬜**, ermöglicht durch die Statusregel-Änderung vom 2026-09-08) und die stale Bilanz-/Notizzahlen als Planungsstand markiert; Folgephasen-Namen P8.6/P9 nachgetragen. Dieser Nachtrag war Plan-§6-Step-Z-Punkt 2 und in den vorherigen Sessions offen geblieben) | 2026-09-06 (Phase 8.5 D4-Sichtprobe-Folgesession — **nur dokumentiert, kein Code-Touch in dieser opencode/M3-Session**; §9.4.7 mit Phase-8-✅-Sprung + p8.X-Ankündigung + Verweis auf `docs/concepts/p8x_ui_polish_notes.md` als Schreib-Stelle ergänzt; sieben Sichtprobe-Folgesession-Themen [Spaces-Layout-Reorg, Obsidian-Map 5 Sub-Punkte, Anzahl-Anzeige Ordner, Edit-in-Place-Vision, Layering-Design-System, „Konto"→„Einstellungen", De-AI-ierung-Lauf 2] + fünf D4-Punkte [UX-2-Step-Knotenklick, Map-Field schneidet ab, Map fliegt, Save-Button-YAML-Header, Fabi-Sammelliste] sind in der p8.X-Notizen-Datei gesammelt; `phase8_5_picker_release/CLAUDE.md` aktiver Block auf D4-Sichtprobe-Folgesession umgestellt, D4-Block rotiert nach `SESSIONS_ARCHIVE.md`; Phase-8.5-Head Frontmatter `updated:` Pipe vorne ergänzt; keine Code-Tests, kein Service-Touch; Plan-Kern unverändert [P8-A–P8-Q, N1–N12]) | 2026-09-02 (P8-22+P8-24-Smokes gebaut, drei Phase-8-Funde als benannte Defekte in §9.4.6 -- graph.js ALPHA_DECAY / api.py _graph_get `writable` / graph.js Knotenklick-nach-Item -- mit je drei Optionen, §9.4.4 gegenstandslos (beide Substanz-Setups gebaut), Status 15-10-0; achte P1-Contract-Öffnung GESCHLOSSEN mit demselben Commit, Schliessungsbeleg in phase1_storage/CLAUDE.md §Geerbte Contracts; keine Python- oder JS-Datei in storage/mcpserver/webui/static angefasst, 958/958 pytest unveraendert, ui_budget 5/5 unveraendert) | 2026-09-02 (§9 Closeout gefüllt — Phase-8-Closeout in diesem Plan-Abschnitt per P8-N, Status 15 ✅ · 9 🟡 · 2 ⬜ vor Step-Z-Deploy; drei benannte Restdefekte + Glyph-Entscheidung dokumentiert, achte P1-Contract-Öffnung formal geschlossen; keine Python-/JS-Datei angefasst, keine Tests geändert, Sichtprüfung am echten Gerät + Sprung auf ✅ bleibt Nikinger-Aktion nach `deploy.sh main`) | 2026-08-28 (Nachtrag noch in der Planungssession: Step 0 als Fundament-Session Claude Code + Nikinger, C0 Anti-AI-Pattern-Research neu, P8-P gelockt, P8-25/26 + V93/V94) | 2026-08-28 (initial, Planungssession Claude Code Opus, N1–N12 vom Nikinger gelockt)
 ---
 # Phase 8 — UI-Neuanstrich, Verknüpfungs-Graph, QoL (`phase8_ui_graph/`)
 
@@ -725,7 +725,16 @@ Drei Zeilen brauchen eine Erläuterung, damit sie nicht falsch gelesen werden:
 
 ### §9.4 Restdefekte und offene Entscheidungen
 
-#### §9.4.1 A3 Klammer-/Aufzählungs-Kontext (P8-5)
+#### §9.4.1 A3 Klammer-/Aufzählungs-Kontext (P8-5) — **✅ ERLEDIGT in Phase 8.5 (B1)**
+
+> **[2026-09-09 Nachtrag, Phase-8.5-Z-Closeout, P8.5-R/N6]** Geschlossen über **Option (a)
+> plus verbindliche Abbruchregel** (N2): `_TITLE_NOT_ID_HINT` wurde **generalisierend**
+> formuliert statt um eine dritte Aufzählung ergänzt (P8.5-C — zwei Runden Aufzählung hatten
+> je die nächste unaufgezählte Form eingeladen). Die **vierte A3-Probe lief am 2026-09-08**
+> über den echten Connector ohne ID-Leck (P8.5-3/-4 ✅). Der Punkt ist damit **aus dem Ledger
+> heraus**, nicht weiter vererbt. Commit `5fee41e`; Belege:
+> `docs/concepts/phase8_5_picker_release_plan.md` §3 B1 + §9.
+
 
 `mcpserver/tools.py :: _TITLE_NOT_ID_HINT` nennt heute zwei Negativ-Beispiele (Plain-Text
 und Tabelle). Die Drittprobe vom 2026-09-01 hat gezeigt: in **Klammer-Kontexten** und
@@ -745,7 +754,17 @@ gewählt:
 §9 vererbt, wie P7-24/P7-4 damals — kein Scope-Silentium, ein benannter Punkt mit drei
 Optionen.
 
-#### §9.4.2 Item-Link-Picker füllt nur das Frontmatter-Feld (Vormerkung)
+#### §9.4.2 Item-Link-Picker füllt nur das Frontmatter-Feld — **✅ ERLEDIGT in Phase 8.5 (A1)**
+
+> **[2026-09-09 Nachtrag, Phase-8.5-Z-Closeout]** Geschlossen als **Modus-Umschalter im
+> Dialog** (N3), nicht als zweiter Knopf und nicht als Ein-Klick-für-beides. Der Kernbefund
+> der P8.5-Planung erklärt warum: ein Body-Link `[Titel](#item/itm_…)` **ist bereits** eine
+> Graph-Kante (`storage/linkscan.py` matcht das `itm_`-Token) — zwei Modi statt eines
+> Kombi-Klicks. Moduswahl überlebt in `localStorage`. Commit `499d9be`.
+> **Offen geblieben und an P8.6 vererbt:** V102 — Body- und Frontmatter-Kante zwischen
+> denselben zwei Knoten zeichnen **zwei** Linien (kein Cross-`kind`-Dedup in
+> `index.py :: replace_item_links`). Details: `PHASE8_5_CLOSEOUT_HANDOVER.md` §4.1.
+
 
 Der Link-Picker (`editor.js :: _appendLinkId`, B4) hängt die gewählte `itm_…`-ID an
 `links:` an — das ist das **Graph-Kanten-Futter**. Wer heute einen **klickbaren Item-Link**
@@ -757,7 +776,16 @@ Variante erweitern, die `[<Titel>](#item/<id>)` an der Cursor-Position in
 `#editor-textarea` einfügt — kein neuer Endpunkt, der Picker kennt Titel+ID bereits aus
 seinem Suchergebnis. **Aktion für die nächste Phase (kein Phase-8-Auftrag mehr).**
 
-#### §9.4.3 Picker-A11y `aria-selected` nie per JS gesetzt (Nebenfund 2026-09-02)
+#### §9.4.3 Picker-A11y `aria-selected` nie per JS gesetzt — **✅ ERLEDIGT in Phase 8.5 (A2)**
+
+> **[2026-09-09 Nachtrag, Phase-8.5-Z-Closeout]** Geschlossen über das
+> **`aria-activedescendant`-Muster** — der Fokus bleibt im Suchfeld, ein virtueller Cursor
+> wandert über `aria-selected`; **kein `tabindex` auf die `li`** (P8.5-K: das würde den Fokus
+> aus genau dem Feld ziehen, in das der Nutzer tippt). Maus- und Enter-Pfad teilen sich
+> `_pickLinkPickerAt`, `app.js` blieb unangetastet. Der als „toter Code" benannte CSS-Block
+> ist im selben Zug entdoppelt. **V101 in Chromium *und* Firefox empirisch bestätigt.**
+> Commit `7ce0be0`.
+
 
 Der `.link-picker-results li`-Selektor hat ein `role="option"`-Markup mit
 `aria-selected="true"` als Auswahl-Logik, **aber** `dialogs.js` setzt dieses Attribut nie
@@ -930,8 +958,18 @@ unverändert).
 
 #### §9.4.7 Phase-Status Glyphe ✅ vs. 🟡
 
-„✅ heißt live-verifiziert, nicht gebaut" — die Projekt-Statusregel. Die aktuelle Bilanz
-ist 15 ✅ · 10 🟡 · 0 ⬜. **Der Sprung auf ✅ ist eine Nikinger-Entscheidung nach
+> **[2026-09-09 Nachtrag, Phase-8.5-Z-Closeout] Der Sprung ist vollzogen: Phase 8 steht auf
+> ✅ mit 26 ✅ · 0 🟡 · 0 ⬜** (maschinell gezählt, `awk`-Kommando im Phase-8-Head). Möglich
+> wurde er durch die **Statusregel-Änderung vom 2026-09-08**: eine vom Nikinger geprüfte
+> Wegwerf-Instanz-Automatisierung zählt als „live-verifiziert", weil die Wegwerf ein
+> byte-identischer Git-Checkout ist und sich nur in `DATA_ROOT`/`auth.sqlite3`/Identität
+> unterscheidet (`docs/concepts/sichtpruefung_automation_conventions.md`). Die im
+> „Optional"-Absatz unten genannten sechs Schließungen sind **alle** erfolgt — die drei aus
+> §9.4.6 am 2026-09-02, die drei aus §9.4.1–§9.4.3 in Phase 8.5. Der Text unterhalb dieser
+> Notiz ist der **Planungsstand vom 2026-08-28** und bleibt als Herleitung stehen.
+
+„✅ heißt live-verifiziert, nicht gebaut" — die Projekt-Statusregel. Die Bilanz
+war zum Planungszeitpunkt 15 ✅ · 10 🟡 · 0 ⬜. **Der Sprung auf ✅ ist eine Nikinger-Entscheidung nach
 Live-Deploy + Sichtprüfung am echten Gerät** (P8-23, P8-14/15/16/18/19). Vor dem Sprung
 steht mindestens Sichtprüfung 2 (Übersicht + Graph) und Sichtprüfung 3 (C4+C5 Glass +
 Selection) auf dem Programm; beide Screenshots sind da, der formale Lauf am echten
@@ -954,9 +992,11 @@ Themen vom 2026-09-06 (Spaces-Layout-Reorg, Obsidian-Map [5 Sub-Punkte],
 Anzahl-Anzeige Ordner, Edit-in-Place-Vision, Layering-Design-System,
 „Konto"→„Einstellungen"-Rename, De-AI-ierung-Lauf 2). **Einzige Schreib-Stelle**
 für die Ideen bis zur Planungs-Session: **`docs/concepts/p8x_ui_polish_notes.md`**
-(L2, 25 KB, 2026-09-06 neu) — Sammlung, kein Plan, kein Locking, keine
-Tabu-Aufhebung. Phase-8.5-Z referenziert diese Datei als Quelle der
-p8.X-Ankündigung.
+(L2, 2026-09-06 neu; **Stand 2026-09-09: zehn Abschnitte §1–§10, 40.9 KB** — die „25 KB /
+16 Themen" oben sind der Stand vom Anlegetag) — Sammlung, kein Plan, kein Locking, keine
+Tabu-Aufhebung. Der Phase-8.5-Z-Closeout referenziert die Datei als Quelle der
+P8.6-Ankündigung; die Folge-Phase heißt inzwischen **P8.6** (→ `v3.0.2`), der große
+Graph-Umbau **P9** (→ `v3.1.0`).
 
 ### §9.5 `[VERIFY]`-Bilanz (V81–V92 + V93, V94)
 

@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080" font-family="'DejaVu Sans','Segoe UI',Helvetica,Arial,sans-serif">
+
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a6b7d"/>
+    </marker>
+    <marker id="arG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2f7a4d"/>
+    </marker>
+    <marker id="arR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b03030"/>
+    </marker>
+  </defs>
+
+  <rect width="1080" height="1080" fill="#f7f8fa"/>
+
+  <!-- ================= Kopf ================= -->
+  <rect x="0" y="0" width="1080" height="86" fill="#1d2b3a"/>
+  <text x="36" y="36" font-size="19" font-weight="700" fill="#ffffff">Phase 8.5 — Link-Picker-Politur, Titel-statt-ID-Hint, v3-Release</text>
+  <text x="36" y="62" font-size="12.5" fill="#9db2c6">Sharefyx · phase8_5_picker_release/ · live seit main@6f19a8f als v3.0.1 (2026-09-05) · Stand 2026-09-09</text>
+  <rect x="800" y="20" width="244" height="46" rx="10" fill="#2f7a4d"/>
+  <text x="922" y="39" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">20 / 20 ✅ live-verifiziert</text>
+  <text x="922" y="57" font-size="11.5" fill="#cfe6d8" text-anchor="middle">schließt Phase 8 (26/26) formal mit ab</text>
+
+  <!-- ================= Mission ================= -->
+  <rect x="36" y="102" width="1008" height="74" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="126" font-size="13.5" font-weight="700" fill="#1d2b3a">Mission: Die drei Restdefekte aus dem Phase-8-Closeout schließen — und den v3-Build ausliefern, den nie ein Nutzer sah.</text>
+  <text x="56" y="148" font-size="12" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">§9.4.2</tspan> Picker-Modus-Umschalter · <tspan font-weight="700" fill="#1d2b3a">§9.4.3</tspan> Tastaturnavigation · <tspan font-weight="700" fill="#1d2b3a">§9.4.1</tspan> Hint generalisieren · <tspan font-weight="700" fill="#1d2b3a">Block C</tspan> voller Vorabritt · <tspan font-weight="700" fill="#1d2b3a">Block D</tspan> Deploy v3.0 → v3.0.1</text>
+  <text x="56" y="167" font-size="12" fill="#4a5a6b">Fallregel <tspan font-weight="700" fill="#1d2b3a">C &gt; D &gt; A1 &gt; A2 &gt; B1</tspan>: unter Druck fällt zuerst A2, dann B1. C und D fallen nie — der Deploy ist der Zweck der Phase, nicht ihr Anhang.</text>
+
+  <!-- ================= Flussdiagramm ================= -->
+  <rect x="36" y="190" width="1008" height="352" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="215" font-size="15" font-weight="700" fill="#1d2b3a">Reihenfolge 0 → A1 → A2 → B1 → C → D → Z</text>
+
+  <!-- Reihe 1 -->
+  <rect x="60" y="230" width="220" height="124" rx="8" fill="#f2f5f8" stroke="#a8b8c8" stroke-width="1.6"/>
+  <text x="170" y="252" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">Step 0 — Haushalt</text>
+  <text x="76" y="275" font-size="10.5" fill="#4a5a6b">INDEX 52.9 → 40.7 KB</text>
+  <text x="76" y="292" font-size="10.5" fill="#4a5a6b">„Büroklammer" → Lupe</text>
+  <text x="76" y="309" font-size="10.5" fill="#4a5a6b">Bilanz-Drift zum dritten Mal:</text>
+  <text x="76" y="326" font-size="10.5" fill="#4a5a6b">awk-Zähler statt Zahl im Head</text>
+  <text x="170" y="345" font-size="10.5" fill="#2f7a4d" text-anchor="middle" font-weight="700">4 Funde abgearbeitet</text>
+
+  <rect x="308" y="230" width="220" height="124" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="418" y="252" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">A1 — Modus-Umschalter</text>
+  <text x="324" y="275" font-size="10.5" fill="#4a5a6b">ein Knopf, zwei Modi im Dialog</text>
+  <text x="324" y="292" font-size="10.5" fill="#4a5a6b">insertAtCursor auf Modulebene</text>
+  <text x="324" y="309" font-size="10.5" fill="#4a5a6b">gehoben — keine zweite Kopie</text>
+  <text x="324" y="326" font-size="10.5" fill="#4a5a6b">Moduswahl in localStorage</text>
+  <text x="418" y="345" font-size="10.5" fill="#2f7a4d" text-anchor="middle" font-weight="700">fällt nie (echter Nutzerschmerz)</text>
+
+  <rect x="556" y="230" width="220" height="124" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="666" y="252" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">A2 — Tastaturnavigation</text>
+  <text x="572" y="275" font-size="10.5" fill="#4a5a6b">aria-activedescendant, bewusst</text>
+  <text x="572" y="292" font-size="10.5" fill="#4a5a6b">kein tabindex auf die li</text>
+  <text x="572" y="309" font-size="10.5" fill="#4a5a6b">_pickLinkPickerAt: ein Pfad</text>
+  <text x="572" y="326" font-size="10.5" fill="#4a5a6b">für Maus und Enter</text>
+  <text x="666" y="345" font-size="10.5" fill="#2f7a4d" text-anchor="middle" font-weight="700">V101 in beiden Browsern</text>
+
+  <rect x="804" y="230" width="220" height="124" rx="8" fill="#e8eef5" stroke="#7f9ab5" stroke-width="1.6"/>
+  <text x="914" y="252" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">B1 — Titel statt ID</text>
+  <text x="820" y="275" font-size="10.5" fill="#4a5a6b">_TITLE_NOT_ID_HINT jetzt</text>
+  <text x="820" y="292" font-size="10.5" fill="#4a5a6b">generalisierend statt dritter</text>
+  <text x="820" y="309" font-size="10.5" fill="#4a5a6b">Aufzählung von Sonderfällen</text>
+  <text x="820" y="326" font-size="10.5" fill="#4a5a6b">Abbruchregel wörtlich im Head</text>
+  <text x="914" y="345" font-size="10.5" fill="#2f7a4d" text-anchor="middle" font-weight="700">vierte Form ⇒ geschlossen</text>
+
+  <line x1="280" y1="292" x2="308" y2="292" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <line x1="528" y1="292" x2="556" y2="292" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <line x1="776" y1="292" x2="804" y2="292" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <polyline points="914,354 914,370 210,370 210,384" fill="none" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <!-- Reihe 2 -->
+  <rect x="60" y="386" width="300" height="126" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="210" y="408" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">Block C — v3-Vorabritt gegen Wegwerf</text>
+  <text x="76" y="431" font-size="10.5" fill="#4a5a6b">13 Stationen × 2 Browser = 26/26 grün</text>
+  <text x="76" y="448" font-size="10.5" fill="#4a5a6b">3 Spaces, 12 Items, 11 Kanten, Port 18773</text>
+  <text x="76" y="465" font-size="10.5" fill="#4a5a6b">3 echte Befunde vorgelegt, keiner still gefixt</text>
+  <text x="76" y="482" font-size="10.5" fill="#4a5a6b">16 Screenshots als Beleg abgelegt</text>
+  <text x="210" y="502" font-size="10.5" fill="#2f7a4d" text-anchor="middle" font-weight="700">Erst der Ritt, dann der Deploy (N5)</text>
+
+  <rect x="396" y="386" width="300" height="126" rx="8" fill="#fdf6ea" stroke="#d4ab5a" stroke-width="1.6"/>
+  <text x="546" y="408" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">Block D — Release</text>
+  <text x="412" y="431" font-size="10.5" fill="#4a5a6b">D1 Badge v3.0 → v3.0.1 + UPDATE_LOG</text>
+  <text x="412" y="448" font-size="10.5" fill="#4a5a6b">D2 Deploy — Nikinger-Aktion (Hard Rule 9)</text>
+  <text x="412" y="465" font-size="10.5" fill="#4a5a6b">D3 Health-Gate 8/8 · D4 Sichtprüfung</text>
+  <text x="412" y="482" font-size="10.5" fill="#4a5a6b">D5 vierte A3-Probe über den Connector</text>
+  <text x="546" y="502" font-size="10.5" fill="#2f7a4d" text-anchor="middle" font-weight="700">live seit 2026-09-05, PID 355956</text>
+
+  <rect x="732" y="386" width="292" height="126" rx="8" fill="#f2f5f8" stroke="#a8b8c8" stroke-width="1.6"/>
+  <text x="878" y="408" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">Step Z — Closeout</text>
+  <text x="748" y="431" font-size="10.5" fill="#4a5a6b">Statusregel geändert: eine geprüfte</text>
+  <text x="748" y="448" font-size="10.5" fill="#4a5a6b">Wegwerf-Instanz zählt als live-verifiziert</text>
+  <text x="748" y="465" font-size="10.5" fill="#4a5a6b">Sichtung der 10 🟡 → 9 ✅, dann der</text>
+  <text x="748" y="482" font-size="10.5" fill="#4a5a6b">Bracket-Folge-Smoke für die letzte</text>
+  <text x="878" y="502" font-size="10.5" fill="#2f7a4d" text-anchor="middle" font-weight="700">Phase 8 + 8.5 formal ✅</text>
+
+  <line x1="360" y1="449" x2="396" y2="449" stroke="#2f7a4d" stroke-width="2" marker-end="url(#arG)"/>
+  <text x="378" y="440" font-size="9" fill="#2f7a4d" text-anchor="middle" font-weight="700">26/26</text>
+  <line x1="696" y1="449" x2="732" y2="449" stroke="#2f7a4d" stroke-width="2" marker-end="url(#arG)"/>
+  <text x="714" y="440" font-size="9" fill="#2f7a4d" text-anchor="middle" font-weight="700">8/8</text>
+
+  <!-- ================= Mechanismus links ================= -->
+  <rect x="36" y="558" width="496" height="204" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="582" font-size="13.5" font-weight="700" fill="#1d2b3a">Warum zwei Modi und nicht ein Klick für beides</text>
+  <text x="56" y="604" font-size="11" fill="#4a5a6b">storage/linkscan.py matcht das itm_-Token im Fließtext. Was der Nutzer</text>
+  <text x="56" y="620" font-size="11" fill="#4a5a6b">als Text-Link schreibt, ist damit <tspan font-weight="700" fill="#1d2b3a">bereits</tspan> eine Kante — ohne sein Zutun.</text>
+
+  <rect x="56" y="632" width="212" height="46" rx="6" fill="#eaf4ee" stroke="#8fb59a"/>
+  <text x="162" y="650" font-size="11" font-weight="700" fill="#1d2b3a" text-anchor="middle">Modus „Text-Link"</text>
+  <text x="162" y="668" font-size="10" fill="#4a5a6b" text-anchor="middle">[Titel](#item/itm_…) an der Cursorstelle</text>
+
+  <rect x="288" y="632" width="212" height="46" rx="6" fill="#e8eef5" stroke="#7f9ab5"/>
+  <text x="394" y="650" font-size="11" font-weight="700" fill="#1d2b3a" text-anchor="middle">Modus „Kante"</text>
+  <text x="394" y="668" font-size="10" fill="#4a5a6b" text-anchor="middle">ID wandert ins Feld links:</text>
+
+  <line x1="162" y1="678" x2="162" y2="702" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <line x1="394" y1="678" x2="394" y2="702" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <rect x="56" y="704" width="444" height="30" rx="6" fill="#f2f5f8" stroke="#a8b8c8"/>
+  <text x="278" y="723" font-size="10.5" fill="#1d2b3a" text-anchor="middle" font-weight="700">beide Wege → item_links → GET /api/v1/graph → eine Linie im Graphen</text>
+
+  <text x="56" y="752" font-size="10.5" fill="#b03030"><tspan font-weight="700">V102 gemessen:</tspan> beide Wege zugleich zeichnen zwei Linien, kein Dedup.</text>
+
+  <!-- ================= Mechanismus rechts ================= -->
+  <rect x="548" y="558" width="496" height="204" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="568" y="582" font-size="13.5" font-weight="700" fill="#1d2b3a">Wer den Dienst anfassen darf — und wer nicht</text>
+  <text x="568" y="604" font-size="11" fill="#4a5a6b">Hard Rule 9 schneidet die Phase in zwei Hälften: opencode/M3 baut und</text>
+  <text x="568" y="620" font-size="11" fill="#4a5a6b">bereitet vor, der Nikinger deployt. Kein sudo aus dem savefyx-User.</text>
+
+  <rect x="568" y="632" width="146" height="46" rx="6" fill="#f2f5f8" stroke="#a8b8c8"/>
+  <text x="641" y="650" font-size="11" font-weight="700" fill="#1d2b3a" text-anchor="middle">opencode/M3</text>
+  <text x="641" y="668" font-size="10" fill="#4a5a6b" text-anchor="middle">Badge + UPDATE_LOG</text>
+  <line x1="714" y1="655" x2="738" y2="655" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <rect x="738" y="632" width="146" height="46" rx="6" fill="#fdf6ea" stroke="#d4ab5a"/>
+  <text x="811" y="650" font-size="11" font-weight="700" fill="#1d2b3a" text-anchor="middle">Nikinger</text>
+  <text x="811" y="668" font-size="10" fill="#4a5a6b" text-anchor="middle">deploy.sh main mit sudo</text>
+  <line x1="884" y1="655" x2="908" y2="655" stroke="#2f7a4d" stroke-width="1.6" marker-end="url(#arG)"/>
+  <rect x="908" y="632" width="116" height="46" rx="6" fill="#eaf4ee" stroke="#8fb59a"/>
+  <text x="966" y="650" font-size="11" font-weight="700" fill="#1d2b3a" text-anchor="middle">Health-Gate</text>
+  <text x="966" y="668" font-size="10" fill="#4a5a6b" text-anchor="middle">8/8 grün</text>
+
+  <rect x="568" y="704" width="456" height="30" rx="6" fill="#f2f5f8" stroke="#a8b8c8"/>
+  <text x="796" y="723" font-size="10.5" fill="#1d2b3a" text-anchor="middle" font-weight="700">Wegwerf: eigener Port, tmp-DATA_ROOT, Stopp ausschließlich per PID-Datei</text>
+
+  <text x="568" y="752" font-size="10.5" fill="#b03030"><tspan font-weight="700">Nie pkill -f:</tspan> ein Regex-Treffer riss am 2026-09-01 die Produktion mit um.</text>
+
+  <!-- ================= Abnahme ================= -->
+  <rect x="36" y="778" width="1008" height="104" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="802" font-size="14.5" font-weight="700" fill="#1d2b3a">Abnahme — 20 von 20 Zeilen, und eine mitten in der Phase geänderte Statusregel</text>
+  <rect x="56" y="812" width="310" height="58" rx="6" fill="#eaf4ee" stroke="#8fb59a"/>
+  <text x="72" y="831" font-size="11.5" font-weight="700" fill="#1d2b3a">20 ✅ live-verifiziert</text>
+  <text x="72" y="848" font-size="10.5" fill="#4a5a6b">8 Zeilen per Code/Test (C), 8 per Wegwerf (W),</text>
+  <text x="72" y="864" font-size="10.5" fill="#4a5a6b">4 nur gegen die echte Produktion beweisbar (L)</text>
+  <rect x="384" y="812" width="310" height="58" rx="6" fill="#fdf6ea" stroke="#d4ab5a"/>
+  <text x="400" y="831" font-size="11.5" font-weight="700" fill="#1d2b3a">Statusregel geändert am 2026-09-08</text>
+  <text x="400" y="848" font-size="10.5" fill="#4a5a6b">geprüfte Wegwerf-Automatisierung zählt jetzt als</text>
+  <text x="400" y="864" font-size="10.5" fill="#4a5a6b">live — byte-identisch außer Daten und Identität</text>
+  <rect x="712" y="812" width="312" height="58" rx="6" fill="#e8eef5" stroke="#7f9ab5"/>
+  <text x="728" y="831" font-size="11.5" font-weight="700" fill="#1d2b3a">P8.5-19 ✅ und am selben Tag superseded</text>
+  <text x="728" y="848" font-size="10.5" fill="#4a5a6b">Radiogruppe abgenommen, dann vom Nikinger</text>
+  <text x="728" y="864" font-size="10.5" fill="#4a5a6b">selbst zurückgedreht: &lt;select&gt; wieder für P8.6</text>
+
+  <!-- ================= Was P8.6 erbt ================= -->
+  <rect x="36" y="898" width="1008" height="108" rx="8" fill="#ffffff" stroke="#d99b9b"/>
+  <text x="56" y="922" font-size="14.5" font-weight="700" fill="#b03030">Was Phase 8.6 erbt — benannt, nicht stillgelegt</text>
+  <text x="56" y="946" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">V102-Zwillingskante</tspan> — Body- und Frontmatter-Kante zwischen denselben Knoten ergeben zwei Linien. Bewusst nur gemessen, nicht gefixt (§0.4).</text>
+  <text x="56" y="967" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">CSRF-Origin-Mismatch im Wegwerf-Setup</tspan> — SPACE_PUBLIC_BASE_URL erzwingt https, jeder POST aus dem Browser fällt durch. Setup-Frage, kein Server-Bug.</text>
+  <text x="56" y="988" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">UI-Politur</tspan> — &lt;select&gt;-Rückbau · zehn Abschnitte in p8x_ui_polish_notes.md, davon §10 neu: neun Nikinger-Punkte vom 2026-09-09 (Icons, Hover, Buttons, Mobile).</text>
+
+  <!-- ================= Fuss ================= -->
+  <text x="36" y="1030" font-size="11" fill="#6b7b8c">964 pytest grün · Tabu-Diff über die ganze Phase leer bis auf die eine erlaubte Zeile (der Hint-Text) · keine neunte P1-Contract-Öffnung · Service-Touch 0</text>
+  <text x="36" y="1050" font-size="11" fill="#6b7b8c">Plan + Closeout: docs/concepts/phase8_5_picker_release_plan.md §9 · Handover: docs/concepts/PHASE8_5_CLOSEOUT_HANDOVER.md · Head: phase8_5_picker_release/CLAUDE.md</text>
+  <text x="36" y="1070" font-size="10.5" fill="#8a97a5">Diese Grafik ist eine bewusste Umkehr von P8.5-S („keine Übersichtsgrafik") — Nikinger-Entscheidung vom 2026-09-09, im Plan §0.2 datiert vermerkt.</text>
+
+</svg>
