@@ -6,7 +6,7 @@ detail: L2
 up: ../INDEX.md
 down:
   - ./sichtpruefung_automation_tooling.md   # separate concern: plugins for VIEWING screenshots (Claude Code vs. OpenCode), not for RUNNING checks
-updated: 2026-09-09 (vier neue Konventionen für Sichtungs-Skripte + -Output: §1 Vorschau-Pflicht bei klickbaren Links, §2 Wer validiert was [Code/auto = M3 oder Claude Code, visuell = Nikinger-Auge], §3 Deploy erst nach Testauswertung, §4 Screenshots im Chat präsentieren sobald opencode-vision installiert ist; Nikinger-Feedback 2026-09-09 aus der Sichtung der 10 P8.5-🟡-Zeilen — P8.5-6 bleibt 🟡 wegen fehlendem Vorschau-Screenshot des Bracket-Pfads) | 2026-09-08 (erste Fassung, Phase-8.5-Sichtprüfungs-Sub-Session)
+updated: 2026-09-09 (P8.5-6-Folge-Smoke — Bracket-Pfad live-verifiziert per Mini-Smoke gegen v3ritt-Wegwerf mit `itm_b8b989a1` „Vercel [Hosting]" + Vorschau-Panel-Screenshot, §1-Beispiel-Absatz aktualisiert mit dem Resolution-Pfad; Phase 8.5 vollständig abgeschlossen **Bilanz 20 ✅ · 0 🟡 · 0 ⬜**) | 2026-09-09 (vier neue Konventionen für Sichtungs-Skripte + -Output: §1 Vorschau-Pflicht bei klickbaren Links, §2 Wer validiert was [Code/auto = M3 oder Claude Code, visuell = Nikinger-Auge], §3 Deploy erst nach Testauswertung, §4 Screenshots im Chat präsentieren sobald opencode-vision installiert ist; Nikinger-Feedback 2026-09-09 aus der Sichtung der 10 P8.5-🟡-Zeilen — P8.5-6 bleibt 🟡 wegen fehlendem Vorschau-Screenshot des Bracket-Pfads) | 2026-09-08 (erste Fassung, Phase-8.5-Sichtprüfungs-Sub-Session)
 ---
 
 # Sichtprüfungs-Automatisierung — Techniken (nicht: Werkzeuge)
@@ -36,9 +36,14 @@ Lehre aus Phase 8.5: D4 (2026-09-06) hat den Bracket-Bug in `markdown.js` gefund
 der Markdown-Source-Escape korrekt war (`\[Vercel\]`), aber der Renderer die eckige Klammer
 im Titel als Ende des Link-Texts interpretierte und der Link damit visuell zerbrach. **Wäre
 der damalige Smoke mit eingeblendetem Vorschau-Panel gelaufen, wäre der Bug schon im
-Block-C-Smoke aufgefallen, nicht erst in der manuellen D4-Sichtprüfung.** P8.5-6 bleibt
-deshalb 2026-09-09 🟡: kein Vorschau-Screenshot des Bracket-Pfads vorhanden, nur statische
-Tests + Code-Review.
+Block-C-Smoke aufgefallen, nicht erst in der manuellen D4-Sichtprüfung.** P8.5-6 blieb
+deshalb bis 2026-09-09 🟡 (kein Vorschau-Screenshot des Bracket-Pfads vorhanden, nur
+statische Tests + Code-Review); der P8.5-6-Folge-Smoke selben Tags hat die Lücke
+geschlossen — Mini-Smoke gegen v3ritt-Wegwerf mit Item `itm_b8b989a1` „Vercel [Hosting]"
++ Vorschau-Panel-Screenshot bestätigt den Bracket-Fix live, Screenshot
+`docs/screenshots/p856_bracket_preview.png` zeigt „Vercel [Hosting]" als klickbaren
+blauen Hyperlink, programmatische Quittung per Regex auf
+`<a href="#item/itm_b8b989a1">Vercel [Hosting]</a>` True.
 
 ### 2. Wer validiert was (Code / Wegwerf / Live / Visuell)
 
