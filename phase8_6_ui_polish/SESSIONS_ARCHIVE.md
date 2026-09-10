@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-10 (Dritter archivierter Sub-Block — beide Phase-Head-Sub-Blöcke „Migration-Vorbereitung" und „Health-Check nach Proxmox-Migration" verbatim hierher rotiert vor dem Item-#5-Commit (P8.6-T-Rotationsregel); SESSIONS_ARCHIVE jetzt L3-exempt, deutlich gewachsen)
+updated: 2026-09-10 (Vierter archivierter Sub-Block — „Open Item #5 — Aktionsliste Schritt 7 verkürzt" verbatim aus dem Phase-Head hierher rotiert vor dem Block-A-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-A-Sub-Block, SESSIONS_ARCHIVE jetzt L3-exempt mit vier Sub-Blöcken)
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -350,3 +350,103 @@ pushen. Keine Doku-Erweiterung verlangt — nur die Übergabe sauber machen.
 5. **Restart-Logik in der Aktionsliste korrigieren** (Schritt 7 kürzen,
    Vormerkung „Restart-Logik" eintragen).
 6. **Phase-8.6-Block A–D** nach Plan §3–§6.
+---
+
+### 2026-09-10 (Open Item #5 — Aktionsliste Schritt 7 verkürzt, Restart-Logik-Vormerkung; nur Doku, kein Code-Touch)
+
+**Auftrag:** Open Item #5 aus dem Session-Handover (2026-09-10, „Health-Check nach
+Proxmox-Migration"). Die `sudo systemctl start`-Aufrufe in Schritt 7 der Proxmox-
+Aktionsliste sind redundant, weil eine systemd-Restart-Logik greift — der einzige
+manuelle Eingriff ist `stop` in Schritt 1 für Lock-Release. Restart-Logik
+verifizieren, Schritt 7 kürzen, Vormerkung „Restart-Logik" eintragen. Service-
+Datei-Lesen ist erlaubt (§0.5.7: `systemctl status` / `cat service` nur lesend,
+kein `sudo systemctl`).
+
+**Was diese Session getan hat (nur Doku, kein Code-Touch):**
+
+1. **Restart-Logik verifiziert** durch Lesen von
+   `/etc/systemd/system/sharefyx-mcp.service` und `/usr/lib/systemd/system/tailscaled.service`:
+   - `sharefyx-mcp.service:19-20` trägt `Restart=on-failure` + `RestartSec=5` —
+     Crash-Recovery im 5-Sekunden-Takt.
+   - `sharefyx-mcp.service:6-7` setzt `After=network-online.target tailscaled.service`
+     und `Wants=network-online.target` — Boot-Reihenfolge deterministisch.
+   - `tailscaled.service` (Vendor, `/usr/lib/systemd/system/`) trägt ebenfalls
+     `Restart=on-failure`. Beide Units sind `WantedBy=multi-user.target` (implizit).
+   - **Schlussfolgerung:** nach VM-Boot oder VM-Migration-Recovery starten die
+     Services **ohne** `systemctl start`-Aufruf. Der einzige manuelle `stop`-
+     Call bleibt in Schritt 1 (Lock-Release vor der Migration). Beleg: nach
+     der Proxmox-Migration am 2026-09-10 waren beide Dienste sofort up (PID 991
+     statt 355956) **ohne** dass opencode/M3 systemctl angerührt hat.
+
+2. **Schritt 7 der Aktionsliste verkürzt:** die `sudo systemctl start tailscaled`
+   und `sudo systemctl start sharefyx-mcp`-Zeilen entfernt, dafür eine
+   Begründung als Block-Kommentar darunter dokumentiert (Verweis auf die neue
+   Vormerkung „Restart-Logik"). Schritt 7 ist jetzt nur noch der Health-Gate-
+   Block (`bash .../health_gate.sh --expected-sha=<HEAD>`), 8/8 grün erwartet.
+
+3. **Neue Vormerkung „Restart-Logik (Nikinger-Fund 2026-09-10, ...)"** in §Vormerkungen
+   eingefügt — direkt nach der Aktionsliste, vor den Zukunfts-Notes. Vier Spiegelstriche:
+   - sharefyx-mcp Restart-Definition mit Zeilen-Ankern,
+   - tailscaled Vendor-Unit,
+   - `[Install] WantedBy=multi-user.target`-Konsequenz für Boot/Recovery,
+   - V103-Notiz für den Deploy (P8.5-V-Frage „sudo-Prompt im Vordergrund" beantwortet
+     sich durch diese Mechanik — beim Deploy nach P8.6 gibt es **keinen** `sudo`-Call
+     mehr im Agenten-Pfad, der Nikinger-deploy benötigt ggf. eine Folge-Diskussion).
+
+4. **`§Nächste Session` aktualisiert:** „sharefyx-mcp wieder starten + health_gate.sh"
+   durch „Health-Gate 8/8 (Restart-Logik übernimmt das Hochfahren)" ersetzt, mit
+   Verweis auf die Vormerkung.
+
+5. **P8.6-T-Rotation durchgeführt** (per Hand, weil Skript passt nicht auf das
+   Muster): beide vorhergehenden Sub-Blöcke „Migration-Vorbereitung" (4,2 KB) und
+   „Health-Check nach Proxmox-Migration" (3,6 KB) **verbatim** nach
+   `SESSIONS_ARCHIVE.md` verschoben — Phase-Head trägt jetzt nur diesen einen
+   Sub-Block.
+
+6. **`updated:`-Pipe** vorne ergänzt um den neuen Eintrag.
+
+**Selbstprüfung (§0.5):**
+
+- **Tabu-Diff §0.3** leer — kein Code-Touch in dieser Session
+  (`git diff --stat -- phase1_storage/storage phase4_auth/authserver
+  phase2_mcp/mcpserver phase5_ui/webui/{security,api,serializers,permissions}.py`
+  liefert keine Ausgabe).
+- `pytest -q` / `node --check` / `ui_budget.py` gegenstandslos (kein Python-,
+  kein JS-, kein CSS-Touch — Baseline V107 = 964 passed, V97 = 5/5 reichen
+  für Doku-only).
+- **Größenprüfung:** `phase8_6_ui_polish/CLAUDE.md` ist nach Rotation **34,6 KB**
+  (5,4 KB Reserve zum 40-KB-Softcap) — ausreichend für Block A/B/C/D-Code-
+  Touches + zugehörige §0.5-Selbstprüfungen. `SESSIONS_ARCHIVE.md` ist jetzt
+  26,9 KB (L3-exempt).
+- **Service-Touch 0** — `cat /etc/systemd/system/sharefyx-mcp.service` und
+  `systemctl cat tailscaled` sind **lesend**. Production-Dienst sharefyx-mcp
+  (PID 991, `ActiveEnterTimestamp=Thu 2026-09-10 19:37:48 CEST`) **nicht**
+  angefasst, kein `sudo systemctl`, kein `pkill -f`. Der `pgrep -af phase2_mcp`
+  wurde nur gelesen.
+- **`ollama list`** meldet `command not found` — bestätigt, dass die
+  Proxmox-Migration zwar durch ist, aber Ollama-Setup noch aussteht. Items #2–4
+  aus dem Handover bleiben **blockiert**.
+
+**Was diese Session bewusst NICHT getan hat:**
+
+- **Keine Phase-8.6-Block-A/B/C/D-Code-Touches** — das ist Open Item #6 und der
+  Hauptumfang, der mit Block A (§3) zwingend zuerst käme (P8.6-U). Diese Session
+  hat den Open-Item-#5-Vorbau abgeschlossen; Block A–D bleiben in dieser oder
+  der nächsten Session.
+- **Kein `hostnamectl set-hostname`** — bleibt beim Nikinger (Tailscale-Name).
+- **Kein Ollama-Setup, kein MCP-Wrapper, kein V119-Smoke** — diese sind
+  Schritt 4–6 der Aktionsliste und brauchen die Proxmox-Migration (✅ durch)
+  **plus** den Nikinger-`apt install ollama`-Schritt.
+- **Kein Push ohne Nikinger-Anweisung.**
+
+**Commit-Message (geplant):**
+`phase 8.6: Open Item #5 -- Aktionsliste Schritt 7 auf Restart-Logik verkuerzt`
+
+**Nächster Schritt (für dieselbe oder nächste Session):**
+1. **Phase-8.6-Block A** nach Plan §3 (A1 Radiogruppe→select, A2 Tokens,
+   A3 `--border-soft`-Fix, A4 Konvention v3 + „Vorsicht") + 7 neue statische Tests.
+2. Block B (§4), Block C (§5), Block D (§6) — je ein Commit, je Selbstprüfung.
+3. Block D ist unabhängig von Block C und darf mit A oder B zusammenrücken.
+4. Erst nach A/B/C/D: Gate (§7) mit Wegwerf-Instanz + Nikinger-Sichtprüfung +
+   Deploy `v3.0.2` (zweigeteilt: D-a Agent / D-b Nikinger / D-c Health-Gate).
+

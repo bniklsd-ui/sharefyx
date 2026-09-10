@@ -56,6 +56,24 @@
   --warn:          #E5A93C;   /* Konflikt */
   --danger:        #E5484D;   /* Widerruf, Archivieren */
 
+  /* Layer 0 -- echtes Schwarz. Bewusst sparsam (P8.6-E): nur dort, wo "nichts da ist".
+     Auf OLED echte Pixelabschaltung, auf LCD ein sichtbar tieferer Grund als --bg. */
+  --bg-void:       #000;
+
+  /* Selektion. EIN Blau, zwei Deckkraft-Stufen. Ersetzt fuenf rohe rgba(62,141,243,...)
+     ausserhalb dieses Blocks (P8.6-C). Hover ist dieselbe Optik, halb so deckend
+     (Nikinger 2026-09-09, Notizen 10.5) -- kein zweiter Farbton. */
+  --select-fill:        linear-gradient(180deg, rgba(62,141,243,.20), rgba(62,141,243,.08));
+  --select-fill-quiet:  linear-gradient(180deg, rgba(62,141,243,.10), rgba(62,141,243,.04));
+  --select-line:        var(--accent-line);
+  --select-line-quiet:  rgba(62,141,243,.20);
+
+  /* Vorsicht -- Aktionen mit Rueckweg-Kosten (Abmelden, Archivieren). Gleicher Wert wie
+     --danger, anderer Anlass: --danger meldet, dass etwas schiefging; --caution warnt,
+     bevor etwas passiert. Zwei Namen auf einem Wert ist hier ehrlicher als ein zweiter
+     Rotton (P8.6-F, Phase-8-Verbot 4: Farbe nur mit Bedeutung). */
+  --caution:        var(--danger);
+
   /* Farbsemantik Space-Kategorien (Phase 8 Block C C3, Plan §4.C3 P8-I) -- drei Kategorien,
      eine Farbe pro Kategorie. Statusfarben oben bleiben unveraendert (Akzent=interaktiv,
      Amber=warn, Rot=danger); die drei neuen Tokens ermoeglichen eine konsistente Kennzeichnung
@@ -115,7 +133,7 @@ html, body {
 }
 
 body {
-  background: var(--bg);
+  background: var(--bg-void);   /* Layer 0, P8.6-D/E: "nichts da" -- auf OLED echte Pixelabschaltung */
   color: var(--text);
   font-family: var(--font-ui);
   font-size: var(--fs-body);   /* 16px -- vor C1: 15px (AI-Default, Sailop Dim 2) */
@@ -400,8 +418,8 @@ select.input:focus {
 }
 
 .rail__home[aria-current="true"], .tree__folder[aria-current="true"], .tree__scope[aria-current="true"] {
-  background: linear-gradient(180deg, rgba(62,141,243,.20), rgba(62,141,243,.08));
-  border-color: var(--accent-line);
+  background: var(--select-fill);
+  border-color: var(--select-line);
   color: var(--text);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
 }
@@ -682,7 +700,7 @@ select.input:focus {
    (Nikinger-Fund: der Rail-Button-Rahmen ist gerundet, moderne Browser lassen `outline` dem
    `border-radius` der Box folgen -- Chromium/Firefox seit 90/88, kein Fallback noetig). */
 .list__row[aria-current="true"] {
-  background: linear-gradient(180deg, rgba(62,141,243,.20), rgba(62,141,243,.08));
+  background: var(--select-fill);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
   outline: 1px solid var(--accent-line);
   outline-offset: -1px;
@@ -716,7 +734,7 @@ select.input:focus {
    darüber: solider Gradient-Fill + Gloss-Highlight + umlaufender Outline (kein linker
    Akzentrand mehr, siehe Kommentar dort für die Begründung). */
 .list__rows > li.list__row--selected {
-  background: linear-gradient(180deg, rgba(62,141,243,.20), rgba(62,141,243,.08));
+  background: var(--select-fill);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
   outline: 1px solid var(--accent-line);
   outline-offset: -1px;
@@ -780,9 +798,11 @@ select.input:focus {
 }
 .visibility-chip--shared {
   /* [2026-08-16, Nikinger-Feedback] war --ok (Grün) -- Uniformitaets-Wunsch: geteilt zeigt
-     dasselbe Blau wie jede andere Hervorhebung in der App, kein zweiter Akzentton. */
+     dasselbe Blau wie jede andere Hervorhebung in der App, kein zweiter Akzentton.
+     [2026-09-10, P8.6-A2/V109] --border-soft nicht definiert; .35 an --select-line
+     (.40) angeglichen -- sichtbarer Unterschied klein, Akzent-Linie ist die Wahrheit. */
   color: var(--accent);
-  border-color: rgba(62,141,243,.35);
+  border-color: var(--select-line);
 }
 
 .list__empty, .detail__empty {
@@ -795,6 +815,7 @@ select.input:focus {
   color: var(--text-muted);
   text-align: center;
   padding: calc(var(--space) * 3);
+  background: var(--bg-void);   /* P8.6-D/E: "nichts da" als explizites Schwarz */
 }
 
 /* -- Übersichtsseite (Step 7b) ------------------------------------------------------------ */
@@ -981,6 +1002,7 @@ select.input:focus {
   font-size: var(--fs-meta);
   text-align: center;
   pointer-events: none;
+  background: var(--bg-void);   /* P8.6-D/E: "nichts da" als explizites Schwarz */
 }
 .overview__graph-empty[hidden] { display: none; }
 .overview__graph-empty code {
@@ -1267,13 +1289,13 @@ select.input:focus {
   padding: 0;
   max-height: 320px;
   overflow-y: auto;
-  border: 1px solid var(--border-soft);
+  border: 1px solid var(--line);
   border-radius: 6px;
 }
 .link-picker-results li {
   padding: 8px 10px;
   cursor: pointer;
-  border-bottom: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--line);
   font-size: 13px;
 }
 .link-picker-results li:last-child { border-bottom: 0; }
@@ -1288,8 +1310,8 @@ select.input:focus {
    nie feuern). Deklarationen byte-identisch zum 2026-09-02-Standard, hier nur entdoppelt. */
 .link-picker-results li:hover,
 .link-picker-results li[aria-selected="true"] {
-  background: linear-gradient(180deg, rgba(62,141,243,.20), rgba(62,141,243,.08));
-  outline: 1px solid var(--accent-line);
+  background: var(--select-fill);
+  outline: 1px solid var(--select-line);
   outline-offset: -1px;
   border-radius: var(--radius-sm);
 }
@@ -1301,41 +1323,30 @@ select.input:focus {
   margin-top: 2px;
 }
 
-/* Phase 8.5 P8.5-19 (D4-Fund 2026-09-06, Pre-Z-Tausch 2026-09-07): Modus-Umschalter als
-   Radiogruppe statt `<select>`. Beide Optionen dauerhaft sichtbar (Nikinger-Begründung:
-   "deutlich angenehmer" -- ein Umschalter aendert, *was ein Klick tut*, und das soll der
-   Nutzer vor dem Klick sehen). Fieldset+Legend gibt es eine saubere semantische Gruppe
-   ohne extra Beschriftungs-Klasse; der `.input`-Look aus Selection/Choice-Konvention v3 ist
-   hier bewusst NICHT uebernommen, weil Radios in v3 noch keine eigene Konvention haben und
-   die Picker-eigene Optik (gleiche Schriftgroesse wie das Suchfeld darunter, gleicher
-   Zeilenabstand) sauberer liest als ein `.input`-Kasten um zwei winzige Knoepfe. */
-.link-picker-modes {
-  border: 0;
-  padding: 0;
-  margin: 0 0 var(--space);
+/* Phase 8.6 Block A A1 (P8.6-H): Modus-Umschalter ist wieder ein **`<select class="input">`**
+   -- die Radiogruppe aus P8.5-19 wurde 2026-09-08 vom Nikinger selbst zurueckgenommen
+   (Selection/Choice-Konvention v3, Kategorie *Choice* = nativ <select>). Die Beschriftung
+   steht jetzt **innerhalb** der Box (P8.6-H: kein externes `<label>` daneben), ueber den
+   `.input--labeled`-Traeger, der das Label links und das Select rechts anordnet. Der Select
+   selbst verliert seinen Rahmen nicht (anders als eine reine Input-Variante) -- der Traeger
+   traegt **keinen** eigenen Rahmen, das Chevron-Data-URL der bestehenden `select.input`-Regel
+   bleibt in Kraft. */
+.input--labeled {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
   align-items: center;
+  gap: var(--space);
+  margin: 0 0 var(--space);
+}
+.input-label-inline {
   font-size: 13px;
   color: var(--text-muted);
+  flex: 0 0 auto;
+  padding-right: var(--space);
+  border-right: 1px solid var(--line);
 }
-.link-picker-modes legend {
-  font-size: 13px;
-  color: var(--text-muted);
-  padding: 0;
-  margin-right: 4px;
-}
-.link-picker-mode {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  color: var(--text);
-}
-.link-picker-mode input[type="radio"] {
-  margin: 0;
-  accent-color: var(--accent-line);
+.input--labeled > select.input {
+  flex: 1;
+  margin: 0;   /* Traeger hat schon margin-bottom */
 }
 
 .editor__toolbar {

@@ -258,7 +258,12 @@ heute vier optisch verwandte, semantisch aber verschiedene Affordances — die K
 sortiert sie und legt fest, was wann verwendet wird. Verbindlich ab sofort für jeden
 neuen UI-Commit in `webui/static/`.
 
-### Die vier Kategorien
+**[2026-09-10, P8.6-A4/P8.6-G]** um die Kategorie „Vorsicht" ergänzt (Block A, N4/P8.6-F).
+Die Konvention hat damit fünf Kategorien statt vier. Sie ist **kein** zweites Konventions-
+Dokument — `DOC_LAYERS_CONVENTION.md` verbietet zwei Kopien derselben Regel — und der Phase-8-
+Head ist der Ort, an dem sie ohnehin bei jedem UI-Commit gelesen wird.
+
+### Die fünf Kategorien
 
 | Kategorie | Was es macht | Vorbild (Code, Selector) | Visuelle Sprache |
 |---|---|---|---|
@@ -266,6 +271,11 @@ neuen UI-Commit in `webui/static/`.
 | **Toggle** | einzelner Bool-Zustand — an/aus, ein/aus, sichtbar/unsichtbar | Buttons mit `aria-pressed` (z. B. `.pw-toggle`, `#home-button`) ODER `<input type="checkbox">` (z. B. `#overview-graph-toggle-tags`) | Button: linear-gradient + 1 px line; Checkbox: native Browser-Default mit `--accent` |
 | **Status** | *Anzeige*, nicht Auswahl — was der Zustand IST, nicht was man darauf anwenden kann | `.visibility-chip`, `.list__row-meta`, `.rail__version`, `.tree__badge` (count) | Pill / Mono-Akzent / small-meta, niemals klickbar |
 | **Navigation** | *Springt wohin*, oft mit Zähler verbunden — kein „Wert setzen", sondern „woanders hin" | `.tree__scope` (Bucket-Filter) mit `aria-current="true"`, `.tree__folder`, `.tree__space` (Space), `.overview__space-count` (Counter-Chip) | Akzent-Gradient-Fill wenn aktuell (`linear-gradient(180deg, rgba(62,141,243,.20), rgba(62,141,243,.08))`), sonst transparent |
+| **Vorsicht** | Aktion mit **Rückweg-Kosten** — nicht zerstörend, aber teuer rückgängig zu machen | `#logout-button`, `#archive-button` (Trägerklasse `.action--caution`) | Standard-Knopfplastik, aber `color: var(--caution)` auf Label und Glyph; **keine** gefüllte rote Fläche |
+
+**Vorsicht ist keine Bestätigungspflicht.** Ein Knopf dieser Kategorie darf trotzdem einen
+Bestätigungsdialog haben (Archivieren hat einen), aber die Farbe ersetzt ihn nicht und
+verlangt ihn nicht.
 
 ### Choice — das Vorbild im Detail (Anker für künftige Commits)
 

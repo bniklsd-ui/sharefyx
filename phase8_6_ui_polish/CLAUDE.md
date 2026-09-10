@@ -9,7 +9,7 @@ down:
   - ../docs/concepts/p8x_ui_polish_notes.md       # Inhaltsquelle §1–§10 (P8.6-A benennt das Verzeichnis)
   - ../docs/concepts/PHASE8_5_CLOSEOUT_HANDOVER.md   # Einstieg für die P8.6-Planung; §4 = die offenen Entscheidungen
   - SESSIONS_ARCHIVE.md                            # ältere Session-Blöcke, newest-first
-updated: 2026-09-10 (Open Item #5 — Aktionsliste Schritt 7 auf Restart-Logik verkürzt, neue Vormerkung „Restart-Logik" mit `Restart=on-failure` + `WantedBy=multi-user.target`-Beleg aus `/etc/systemd/system/sharefyx-mcp.service` und `/usr/lib/systemd/system/tailscaled.service`; beide vorherigen Sub-Blöcke (Migration-Vorbereitung + Health-Check nach Proxmox-Migration) **verbatim** nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head jetzt 34,6 KB, 5,4 KB Reserve zum 40-KB-Softcap; `## Nächste Session` aktualisiert auf „Health-Gate 8/8 (Restart-Logik übernimmt das Hochfahren)"; **kein Code-Touch**, Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 nur gelesen via `systemctl status`) | 2026-09-10 (Migration-Aktionsliste + Zukunfts-Notes — Proxmox-Migration von Mini-PC `savefyx-VMware-Virtual-Platform` (sharefyx-mcp PID 355956) auf i5-14600KF primär / Ryzen 7 5800X sekundär steht bevor; **7-Schritte-Aktionsliste** in §Vormerkungen dokumentiert [Pause sharefyx-mcp+tailscaled → VM-Migration → VM-Resources → Ollama+InternVL 2.5 8B → MCP-Wrapper-Skript → V119-Smoke → Restart+Health-Gate]; zwei Nikinger-„would be cool"-Notes notiert: (1) **Tab-Meta dynamisch** `<title>sharefyx - {item_title}</title>`, UI-only, **[VERIFY] V120** Trigger-Events offen; (2) **Custom 404-Seite** im App-Stil, erfordert `webui/api.py`-Touch → P8.6-Tabu §0.3 → Folge-Phase P9+. **Step-V-deferred-Sub-Block** (Vorgänger-Session, 4414 B) nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head wäre sonst über 40-KB-Softcap gerissen, P8.6-T-Rotationsregel „bisherige verbatim". Vormerkungen um zwei Spiegelstriche erweitert; `## Nächste Session` auf Aktionsliste umgeschrieben; **kein Code-Touch**, Tabu-Diff §0.3 leer, Service-Touch 0 — PID 355956 nur gelesen via `systemctl status`) | 2026-09-10 (Step V deferred — Nikinger-Entscheidung: **lokales Vision-Modell** auf Proxmox-Migration (i5-14600KF primär, danach Ryzen 7 5800X) statt Anthropic-Haiku-API. Backend **`InternVL 2.5 8B`** (Apache-2.0, Q4, ~6–8 GB VRAM) auf Ollama; MCP-Wrapper ruft `POST /api/generate` mit base64-Image. Proxmox-Settings (Vorlage für Aktionsliste der nächsten Session) detailliert in §Vormerkungen + Session-Stopped-Sub-Block; Modell-Recherche gegen PromptQuorum „Local Vision Models 2026" — InternVL 2.5 8B (beste UI/Code-Passung), Qwen3-VL 8B (Fallback multilinguales OCR), Llama 3.2 Vision/MiniCPM-V/Moondream (verworfen). Plugin-Pfad (`DavidEasden/opencode-vision`) als Vormerkung zurückgestellt — 3 Commits, AGPL-3.0, kein dokumentiertes MCP-Backend, zu unreif. Kein Code-Touch; nachträglicher Commit nach Step-0-Commit `440e462`) | 2026-09-10 (Step 0 ✅ — Haushalt: Phasenverzeichnis angelegt, sechs kaputte `up:`/`down:`-Links in `p8x_ui_polish_notes.md` gefixt, vier fehlende L1-Cards ergänzt, drei `down:`-Listen korrigiert, `docs/INDEX.md` auf ≤ 38 KB komprimiert, zwei INDEX-Zeilen ergänzt + zwei Drift-Korrekturen; **pytest V107 ✅ 964 passed**, **ui_budget V97 ✅ 130,1 KB**, **V108 offen 863 ms** `_overview`-Latenz, **V106 Sammelmarker offen**, **V110/V112/V114/V115/V117/V119 Block-VERIFY offen**)
+updated: 2026-09-10 (Block A ✅ — Fundament: A1 Radiogruppe→`<select class="input">` mit Beschriftung-in-Box + ID-Selektor, A2 sechs neue Tokens in `:root` (`--bg-void`/`--select-fill`/`--select-fill-quiet`/`--select-line`/`--select-line-quiet`/`--caution`) + fünf rohe `rgba(62,141,243,…)` durch Tokens ersetzt + Z. 785 von `.35` auf `--select-line` angeglichen (V109) + `--bg-void` an genau drei Stellen (body, `.list__empty`, `.overview__graph-empty`, P8.6-E), A3 `--border-soft`→`var(--line)` an `app.css:1290/1296` (undefinierter Token, Step-0-Fund behoben), A4 Konvention v3 um fünfte Kategorie „Vorsicht" (`color: var(--caution)`, `.action--caution`-Trägerklasse) in `phase8_ui_graph/CLAUDE.md` §Selection/Choice-Konvention; **+2 statische Tests** (`test_link_picker_uses_a_select_not_a_radio_group` ersetzt P8.5-Test per P8.6-I, `test_no_raw_accent_rgba_outside_root` P8.6-C, `test_every_css_var_reference_is_defined` P8.6-A3 — würde `--border-soft`-Bug gefunden haben); `pytest` V107 ✅ **966 passed**, `ui_budget` V97 ✅ 5/5 (130,4 KB gzip), Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 nur gelesen via `systemctl status`; **Abweichung von Plan §3.5/§8.2 dokumentiert:** die anderen 4 Tests (`test_rail_order_…`, `test_account_button_…`, `test_caution_class_only_…`, `test_overview_graph_has_no_max_width`) gehören zu Block B/C und werden dort geschrieben — sonst wären sie in Block A rot und pytest nicht grün, §0.5 Punkt 2 bricht) | 2026-09-10 (Open Item #5 — Aktionsliste Schritt 7 auf Restart-Logik verkürzt, neue Vormerkung „Restart-Logik" mit `Restart=on-failure` + `WantedBy=multi-user.target`-Beleg aus `/etc/systemd/system/sharefyx-mcp.service` und `/usr/lib/systemd/system/tailscaled.service`; beide vorherigen Sub-Blöcke (Migration-Vorbereitung + Health-Check nach Proxmox-Migration) **verbatim** nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head jetzt 34,6 KB, 5,4 KB Reserve zum 40-KB-Softcap; `## Nächste Session` aktualisiert auf „Health-Gate 8/8 (Restart-Logik übernimmt das Hochfahren)"; **kein Code-Touch**, Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 nur gelesen via `systemctl status`) | 2026-09-10 (Migration-Aktionsliste + Zukunfts-Notes — Proxmox-Migration von Mini-PC `savefyx-VMware-Virtual-Platform` (sharefyx-mcp PID 355956) auf i5-14600KF primär / Ryzen 7 5800X sekundär steht bevor; **7-Schritte-Aktionsliste** in §Vormerkungen dokumentiert [Pause sharefyx-mcp+tailscaled → VM-Migration → VM-Resources → Ollama+InternVL 2.5 8B → MCP-Wrapper-Skript → V119-Smoke → Restart+Health-Gate]; zwei Nikinger-„would be cool"-Notes notiert: (1) **Tab-Meta dynamisch** `<title>sharefyx - {item_title}</title>`, UI-only, **[VERIFY] V120** Trigger-Events offen; (2) **Custom 404-Seite** im App-Stil, erfordert `webui/api.py`-Touch → P8.6-Tabu §0.3 → Folge-Phase P9+. **Step-V-deferred-Sub-Block** (Vorgänger-Session, 4414 B) nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head wäre sonst über 40-KB-Softcap gerissen, P8.6-T-Rotationsregel „bisherige verbatim". Vormerkungen um zwei Spiegelstriche erweitert; `## Nächste Session` auf Aktionsliste umgeschrieben; **kein Code-Touch**, Tabu-Diff §0.3 leer, Service-Touch 0 — PID 355956 nur gelesen via `systemctl status`) | 2026-09-10 (Step V deferred — Nikinger-Entscheidung: **lokales Vision-Modell** auf Proxmox-Migration (i5-14600KF primär, danach Ryzen 7 5800X) statt Anthropic-Haiku-API. Backend **`InternVL 2.5 8B`** (Apache-2.0, Q4, ~6–8 GB VRAM) auf Ollama; MCP-Wrapper ruft `POST /api/generate` mit base64-Image. Proxmox-Settings (Vorlage für Aktionsliste der nächsten Session) detailliert in §Vormerkungen + Session-Stopped-Sub-Block; Modell-Recherche gegen PromptQuorum „Local Vision Models 2026" — InternVL 2.5 8B (beste UI/Code-Passung), Qwen3-VL 8B (Fallback multilinguales OCR), Llama 3.2 Vision/MiniCPM-V/Moondream (verworfen). Plugin-Pfad (`DavidEasden/opencode-vision`) als Vormerkung zurückgestellt — 3 Commits, AGPL-3.0, kein dokumentiertes MCP-Backend, zu unreif. Kein Code-Touch; nachträglicher Commit nach Step-0-Commit `440e462`) | 2026-09-10 (Step 0 ✅ — Haushalt: Phasenverzeichnis angelegt, sechs kaputte `up:`/`down:`-Links in `p8x_ui_polish_notes.md` gefixt, vier fehlende L1-Cards ergänzt, drei `down:`-Listen korrigiert, `docs/INDEX.md` auf ≤ 38 KB komprimiert, zwei INDEX-Zeilen ergänzt + zwei Drift-Korrekturen; **pytest V107 ✅ 964 passed**, **ui_budget V97 ✅ 130,1 KB**, **V108 offen 863 ms** `_overview`-Latenz, **V106 Sammelmarker offen**, **V110/V112/V114/V115/V117/V119 Block-VERIFY offen**)
 ---
 # CLAUDE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes (`phase8_6_ui_polish/`)
 
@@ -118,7 +118,7 @@ Entscheidungen P8.6-A–P8.6-U, Tabu-Liste, Schritt-Sequenz, Testliste, Abnahmez
 |---|---|---|---|---|
 | 1 | Step 0 — Haushalt + Skelett: Phasenverzeichnis angelegt, sechs kaputte `up:`/`down:`-Links in `p8x_ui_polish_notes.md` gefixt, vier fehlende L1-Cards ergänzt (PROJECT_SESSION_LOG, SICHTPRUEFUNG_RESTBLOCK, SICHTPRUEFUNG_WALKTHROUGH, CLUSTER3_TESTBLOCK), drei `down:`-Listen im Inline-Format korrigiert (phase6_5_tools_images_plan, GLOBAL_SEARCH_PLAN, IMAGES_PLAN), `docs/INDEX.md` auf ≤ 38 KB komprimiert, zwei fehlende INDEX-Zeilen ergänzt (CLUSTER3_TESTBLOCK, THIRD_PARTY_LICENSES), zwei Drift-Korrekturen (`phase8_ui_graph` Softcap-Notiz + `phase5_ui` Behauptung widerrufen), Phasen-Head angelegt | 0 | ✅ | 0 (Skelett, wie P1/P6/6.5/7/8 Step 0) |
 | 2 | Step V — **aufgeschoben** (Nikinger-Entscheidung 2026-09-10): Proxmox-Migration des Hosts steht bevor (i5-14600KF, dann Ryzen 7 5800X), Plugin-Installation übersprungen. **Backend:** lokales Vision-Modell `InternVL 2.5 8B` (Q4, Apache-2.0) auf Ollama-Basis statt Anthropic-Haiku-API. Begründung: Hardware-Migration macht lokalen Modell-Server sinnvoll, Proxmox-VM-Migration ist trivial, lokales Modell vermeidet Vendor-Lock-in + Audit-Trail-Aufwand. Vollständige Settings + Modell-Recherche: siehe Session-Block-Eintrag 2026-09-10 („Step V aufgeschoben") und Vormerkungen. | V | 🟡 (deferred — Entscheidung dokumentiert) | 0 (kein Code-Commit; nächste Session liefert Aktion → Command-Liste für Migration + Ollama-Setup + MCP-Wrapper) |
-| 3 | Block A — Fundament: A1 Radiogruppe → `<select, (P8.6-H/I), A2 Layer-/Selektions-Tokens (`--bg-void`/`--select-fill`/`--select-fill-quiet`/`--select-line`/`--select-line-quiet`/`--caution`, P8.6-C/D/E/F), A3 `--border-soft`-Renderfehler-Fix (`app.css:1270/1276` → `var(--line)`, Plan §3.3), A4 Konvention v3 um fünfte Kategorie „Vorsicht" in `phase8_ui_graph/CLAUDE.md` §Selection/Choice-Konvention v3 (P8.6-G) | A | ⬜ | 0 → +7 statische Tests (`test_link_picker_uses_a_select_not_a_radio_group`, `test_no_raw_accent_rgba_outside_root`, `test_every_css_var_reference_is_defined`, `test_rail_order_settings_before_tree_logout_last`, `test_account_button_says_einstellungen`, `test_caution_class_only_on_logout_and_archive`, `test_overview_graph_has_no_max_width`) |
+| 3 | Block A — Fundament: A1 Radiogruppe → `<select, (P8.6-H/I), A2 Layer-/Selektions-Tokens (`--bg-void`/`--select-fill`/`--select-fill-quiet`/`--select-line`/`--select-line-quiet`/`--caution`, P8.6-C/D/E/F), A3 `--border-soft`-Renderfehler-Fix (`app.css:1270/1276` → `var(--line)`, Plan §3.3), A4 Konvention v3 um fünfte Kategorie „Vorsicht" in `phase8_ui_graph/CLAUDE.md` §Selection/Choice-Konvention v3 (P8.6-G) | A | ✅ | 964 → **966** (+2 statische Tests in Block A; `test_link_picker_uses_a_select_not_a_radio_group` ersetzt den P8.5-Test per P8.6-I, `test_no_raw_accent_rgba_outside_root` und `test_every_css_var_reference_is_defined` neu; **Abweichung von Plan §3.5/§8.2:** die anderen 4 Tests (`test_rail_order_…`, `test_account_button_…`, `test_caution_class_only_…`, `test_overview_graph_has_no_max_width`) gehoeren zu Block B/C und werden dort geschrieben, nicht hier — sonst waeren sie in Block A rot und pytest nicht grün, §0.5 Punkt 2 bricht) |
 | 4 | Block B — Selektion vereinheitlichen: B1 Hover = leise Standardauswahl überall (`var(--select-fill-quiet)` + `outline`), B2 Ordner/Tags/Buckets prüfen, B3 Einstellungsmenü (`#account-show-updates`/`#account-manage-spaces` Navigation), B4 Sweep „alles Klickbare" mit Vorsicht-Kennzeichnung (`class="action--caution"` an Abmelden + Archivieren), B5 Radien (genau eine Änderung: `.link-picker-results` → `var(--radius-sm)`) | B | ⬜ | 0 → +1 statischer Test (`test_caution_class_only_on_logout_and_archive`) + ui_budget bleibt grün |
 | 5 | Block C — Struktur: C1 „Konto" → „Einstellungen", Lesart b (Einstellungen nach oben, Abmelden ans Rail-Ende, P8.6-J/N3), C2 „Alle Items" unter die Spaces (`tree.js :: renderRail()`, P8.6-J), C3 Map als rechte Spalte / volle Höhe (`.overview` als Grid, P8.6-K/L), C4 Spaces in der Übersicht klickbar (`.overview__space-row` + `<button class="overview__space-open">`, P8.6-P), C5 Ordner-Zähler clientseitig aus `state.items` (P8.6-O) | C | ⬜ | 0 → ui_budget bleibt grün, Tabu-Diff leer |
 | 6 | Block D — Graph-Fixes: D1 V102-Dedup (`dedupeEdges()` ungeordnetes Paar, P8.6-N), D2 deterministischer Layout-Seed (`seedJitter()` FNV-1a-Hash, P8.6-M), D3 `.overview__graph`-Höhe (bereits in C3 erledigt, nur V112-Gegenprobe), **D4 `runSimulation()` `rafId` endlich gelesen + `cancelAnimationFrame`** — die **einzige Scope-Erweiterung** des Plans (P8.6-§6.4: §2.1-Gebiet, aber direkte Ursache von §2.4-Verschlimmerung + 3 Zeilen Fix + schon halb da; **streichen, wenn der Nikinger es in der Sichtprüfung anders sieht**) | D | ⬜ | 0 → ui_budget bleibt grün, Tabu-Diff leer |
@@ -370,101 +370,143 @@ Custom 404-Seite) sind ebenfalls in §Vormerkungen dokumentiert.
 
 ## Session stopped
 
-### 2026-09-10 (Open Item #5 — Aktionsliste Schritt 7 verkürzt, Restart-Logik-Vormerkung; nur Doku, kein Code-Touch)
+### 2026-09-10 (Block A ✅ — Fundament: Radiogruppe→`<select>`, Layer-/Selektions-Tokens, `--border-soft`-Fix, Konvention v3 um „Vorsicht"; Tabu-Diff §0.3 leer, pytest 964→966)
 
-**Auftrag:** Open Item #5 aus dem Session-Handover (2026-09-10, „Health-Check nach
-Proxmox-Migration"). Die `sudo systemctl start`-Aufrufe in Schritt 7 der Proxmox-
-Aktionsliste sind redundant, weil eine systemd-Restart-Logik greift — der einzige
-manuelle Eingriff ist `stop` in Schritt 1 für Lock-Release. Restart-Logik
-verifizieren, Schritt 7 kürzen, Vormerkung „Restart-Logik" eintragen. Service-
-Datei-Lesen ist erlaubt (§0.5.7: `systemctl status` / `cat service` nur lesend,
-kein `sudo systemctl`).
+**Auftrag:** Block A nach Plan §3 — A1 Radiogruppe → `<select class="input">` (P8.6-H/I),
+A2 Layer-/Selektions-Tokens + fünf rohe `rgba(62,141,243,…)` durch `var(--select-fill)`/
+`var(--select-line)` ersetzen (P8.6-C/D/E/F), A3 `--border-soft`-Renderfehler-Fix in
+`app.css` (P8.6-§3.3), A4 Konvention v3 um die fünfte Kategorie „Vorsicht" erweitern
+(P8.6-G). Reihenfolge: Token-Fundament zuerst (A vor B ist zwingend, P8.6-U). Ziel ist,
+dass Block B/C/D die Tokens verbrauchen, ohne selbst welche anzulegen.
 
-**Was diese Session getan hat (nur Doku, kein Code-Touch):**
+**Was in diesem Commit passiert ist:**
 
-1. **Restart-Logik verifiziert** durch Lesen von
-   `/etc/systemd/system/sharefyx-mcp.service` und `/usr/lib/systemd/system/tailscaled.service`:
-   - `sharefyx-mcp.service:19-20` trägt `Restart=on-failure` + `RestartSec=5` —
-     Crash-Recovery im 5-Sekunden-Takt.
-   - `sharefyx-mcp.service:6-7` setzt `After=network-online.target tailscaled.service`
-     und `Wants=network-online.target` — Boot-Reihenfolge deterministisch.
-   - `tailscaled.service` (Vendor, `/usr/lib/systemd/system/`) trägt ebenfalls
-     `Restart=on-failure`. Beide Units sind `WantedBy=multi-user.target` (implizit).
-   - **Schlussfolgerung:** nach VM-Boot oder VM-Migration-Recovery starten die
-     Services **ohne** `systemctl start`-Aufruf. Der einzige manuelle `stop`-
-     Call bleibt in Schritt 1 (Lock-Release vor der Migration). Beleg: nach
-     der Proxmox-Migration am 2026-09-10 waren beide Dienste sofort up (PID 991
-     statt 355956) **ohne** dass opencode/M3 systemctl angerührt hat.
+1. **`phase5_ui/webui/static/app.html` (A1):** `<fieldset class="link-picker-modes">` mit
+   zwei `<input type="radio" name="link-picker-mode">` ersetzt durch
+   `<div class="input input--labeled"><label class="input-label-inline" for="link-picker-mode">Einfügen</label><select class="input" id="link-picker-mode"><option value="body" selected>…</option><option value="frontmatter">…</option></select></div>`.
+   `localStorage["sfx:linkpicker:mode"]` und sein Wert unveraendert (bestehende Browser
+   behalten ihre Wahl).
 
-2. **Schritt 7 der Aktionsliste verkürzt:** die `sudo systemctl start tailscaled`
-   und `sudo systemctl start sharefyx-mcp`-Zeilen entfernt, dafür eine
-   Begründung als Block-Kommentar darunter dokumentiert (Verweis auf die neue
-   Vormerkung „Restart-Logik"). Schritt 7 ist jetzt nur noch der Health-Gate-
-   Block (`bash .../health_gate.sh --expected-sha=<HEAD>`), 8/8 grün erwartet.
+2. **`phase5_ui/webui/static/js/dialogs.js` (A1):** Modul-Konstante `LINK_PICKER_MODE_NAME`
+   entfernt; `_linkPickerMode()` und `_restoreLinkPickerMode()` lesen/schreiben jetzt
+   `linkPickerModeEl.value` statt `input[name="…"]:checked`; `initLinkPicker()` haengt
+   den `change`-Listener an **ein** Element statt einer `NodeList`-Schleife. Kommentar
+   zur P8.6-A1-Motivation am Konstantenblock (war: P8.5-Bezug, jetzt: P8.6-Bezug mit
+   Verlauf-Hinweis).
 
-3. **Neue Vormerkung „Restart-Logik (Nikinger-Fund 2026-09-10, ...)"** in §Vormerkungen
-   eingefügt — direkt nach der Aktionsliste, vor den Zukunfts-Notes. Vier Spiegelstriche:
-   - sharefyx-mcp Restart-Definition mit Zeilen-Ankern,
-   - tailscaled Vendor-Unit,
-   - `[Install] WantedBy=multi-user.target`-Konsequenz für Boot/Recovery,
-   - V103-Notiz für den Deploy (P8.5-V-Frage „sudo-Prompt im Vordergrund" beantwortet
-     sich durch diese Mechanik — beim Deploy nach P8.6 gibt es **keinen** `sudo`-Call
-     mehr im Agenten-Pfad, der Nikinger-deploy benötigt ggf. eine Folge-Diskussion).
+3. **`phase5_ui/webui/static/app.css` (A1/A2/A3):**
+   - `:root` (Z. 28-83) um **sechs** neue Tokens erweitert: `--bg-void: #000` (P8.6-D,
+     Layer 0, "echtes Schwarz" fuer OLED); `--select-fill` und `--select-fill-quiet`
+     (voller und halbtransparenter Selektions-Verlauf, P8.6-C); `--select-line` und
+     `--select-line-quiet` (volle und halbtransparente Akzent-Linie, P8.6-C); `--caution:
+     var(--danger)` (Alias fuer die fuenfte Konventions-Kategorie, P8.6-F).
+   - **Fuenf** rohe `rgba(62,141,243,…)`-Vorkommen ausserhalb `:root` (Z. 403/685/719/
+     785/1291) durch Tokens ersetzt; Z. 785 zusaetzlich von `.35` auf `--select-line`s
+     `.40` angeglichen (V109, "Im Zweifel angleichen"). `grep "rgba(62,141,243"` trifft
+     jetzt nur noch `:root`-Zeilen + den Erklaerungs-Kommentar.
+   - `--border-soft` (undefiniert, Step-0-Fund) an Z. 1290/1296 durch `var(--line)`
+     ersetzt — der bestehende Haarlinien-Token, den jede andere Panel-Kante verwendet.
+   - `--bg-void` an genau **drei** Stellen eingesetzt (P8.6-E): `body` (Boot/Login-
+     Hintergrund), `.list__empty, .detail__empty`, `.overview__graph-empty`. **Bewusst
+     sparsam** — die uebrigen 60+ Stellen bleiben auf `--bg` (Layer 1).
+   - `.link-picker-modes`/`.link-picker-mode*`-CSS-Bloecke (A1, Z. 1334-1361) entfernt.
+   - Neue `.input--labeled`/`.input-label-inline`-CSS-Klassen fuer den `<div>`-Traeger
+     mit Label-inline + Select-rechts.
 
-4. **`§Nächste Session` aktualisiert:** „sharefyx-mcp wieder starten + health_gate.sh"
-   durch „Health-Gate 8/8 (Restart-Logik übernimmt das Hochfahren)" ersetzt, mit
-   Verweis auf die Vormerkung.
+4. **`phase8_ui_graph/CLAUDE.md` (A4):** Selection/Choice-Konvention v3 um eine **fuenfte
+   Tabellenzeile** „Vorsicht" erweitert (`.action--caution`-Tragerklasse, `color:
+   var(--caution)`, **keine** gefuellte rote Flaeche). Ueberschrift „Die vier Kategorien"
+   → „Die **fuenf** Kategorien"; Block-Datum-Notiz am Anfang des Abschnitts (P8.6-G:
+   die Konvention bleibt in **einem** Dokument, kein zweites Konventions-Doc — `DOC_
+   LAYERS_CONVENTION.md` verbietet zwei Kopien derselben Regel). Zusatzsatz zur
+   Abgrenzung: *„Vorsicht ist keine Bestaetigungspflicht. Ein Knopf dieser Kategorie
+   darf trotzdem einen Bestaetigungsdialog haben (Archivieren hat einen), aber die
+   Farbe ersetzt ihn nicht und verlangt ihn nicht."*
 
-5. **P8.6-T-Rotation durchgeführt** (per Hand, weil Skript passt nicht auf das
-   Muster): beide vorhergehenden Sub-Blöcke „Migration-Vorbereitung" (4,2 KB) und
-   „Health-Check nach Proxmox-Migration" (3,6 KB) **verbatim** nach
-   `SESSIONS_ARCHIVE.md` verschoben — Phase-Head trägt jetzt nur diesen einen
-   Sub-Block.
+5. **`phase5_ui/tests/test_static_routes.py`:** bestehender P8.5-Test
+   `test_link_picker_uses_a_radio_group_not_a_select` → umgekehrt + umbenannt zu
+   `test_link_picker_uses_a_select_not_a_radio_group` (P8.6-I, Docstring traegt beide
+   Richtungen mit Datum). Zwei neue Tests: `test_no_raw_accent_rgba_outside_root`
+   (P8.6-C, maschineller Waelchter ueber die fuenf Stellen) und `test_every_css_var_
+   reference_is_defined` (P8.6-A3, haette den `--border-soft`-Bug gefunden — und
+   findet den naechsten; matcht nicht nur `:root`, weil `@supports`/andere Scopes auch
+   definieren duerfen, **und** strippt CSS-Kommentare, damit historische Token-Namen
+   wie `--accent-text` in Erklaerungs-Kommentaren nicht als „undefiniert" gezaehlt
+   werden).
 
-6. **`updated:`-Pipe** vorne ergänzt um den neuen Eintrag.
+6. **Hard-Rule-8-Doku-Update im selben Commit:** `phase8_6_ui_polish/CLAUDE.md` Modul-
+   Status Tabelle (Zeile 3 `⬜`→`✅`, +2 statische Tests dokumentiert, Abweichung von
+   Plan §3.5/§8.2 erklaert), Phase-Head-Session-Sub-Block (Rotation: vorheriger
+   Item-#5-Block verbatim nach `SESSIONS_ARCHIVE.md`), Frontmatter `updated:`-Pipe,
+   `docs/INDEX.md` Phase-8.6-Zeile aktualisiert, `ROADMAP.md` P8.6-Zeile aktualisiert,
+   Wurzel-`CLAUDE.md` Current-state Block ergaenzt.
 
-**Selbstprüfung (§0.5):**
+**Selbstpruefung (§0.5):**
 
-- **Tabu-Diff §0.3** leer — kein Code-Touch in dieser Session
-  (`git diff --stat -- phase1_storage/storage phase4_auth/authserver
-  phase2_mcp/mcpserver phase5_ui/webui/{security,api,serializers,permissions}.py`
-  liefert keine Ausgabe).
-- `pytest -q` / `node --check` / `ui_budget.py` gegenstandslos (kein Python-,
-  kein JS-, kein CSS-Touch — Baseline V107 = 964 passed, V97 = 5/5 reichen
-  für Doku-only).
-- **Größenprüfung:** `phase8_6_ui_polish/CLAUDE.md` ist nach Rotation **34,6 KB**
-  (5,4 KB Reserve zum 40-KB-Softcap) — ausreichend für Block A/B/C/D-Code-
-  Touches + zugehörige §0.5-Selbstprüfungen. `SESSIONS_ARCHIVE.md` ist jetzt
-  26,9 KB (L3-exempt).
-- **Service-Touch 0** — `cat /etc/systemd/system/sharefyx-mcp.service` und
-  `systemctl cat tailscaled` sind **lesend**. Production-Dienst sharefyx-mcp
-  (PID 991, `ActiveEnterTimestamp=Thu 2026-09-10 19:37:48 CEST`) **nicht**
-  angefasst, kein `sudo systemctl`, kein `pkill -f`. Der `pgrep -af phase2_mcp`
-  wurde nur gelesen.
-- **`ollama list`** meldet `command not found` — bestätigt, dass die
-  Proxmox-Migration zwar durch ist, aber Ollama-Setup noch aussteht. Items #2–4
-  aus dem Handover bleiben **blockiert**.
+- **Tabu-Diff** ueber die gesamte Phase leer: `git diff --stat -- phase1_storage/
+  storage phase4_auth/authserver phase2_mcp/mcpserver phase5_ui/webui/{security,api,
+  serializers,permissions}.py` liefert nichts. Erlaubte Pfade beruehrt:
+  `phase5_ui/webui/static/{app.html,app.css,js/dialogs.js}`, `phase5_ui/tests/
+  test_static_routes.py`, `phase8_ui_graph/CLAUDE.md` (P8.6-G explizit).
+- **`pytest -q`** **966 passed in 118 s** (V107-Baseline 964 → +2; Netto-Effekt des
+  Test-Renames + 2 neuer Tests).
+- **`node --check`** auf `dialogs.js`: OK (kein Syntax-Fehler nach der LINK_PICKER_MODE_
+  NAME-Entfernung und dem Init-Block-Umbau).
+- **`ui_budget.py`** **5/5 im Zielkorridor** (V97-Baseline gehalten): `items?limit=50`
+  roh 26,5 KB, gzip 1,3 KB; `items/{id}` 0,7 KB; `app.js+app.css+Font` gzip **130,4 KB**
+  (Baseline 130,1 KB, +0,3 KB durch die neuen Tokens und `.input--labeled`-Bloecke —
+  unter dem 250-KB-Ziel); Erstaufruf 138,6 KB (unter 400 KB). `dialogs.js` 13,1 KB
+  (Baseline 12,6 KB, +0,5 KB durch die ausfuehrlicheren Kommentare und das Entfernen
+  der NodeList-Schleife; **kein** Code-Wachstum in der heissen Pfad-Linie). V108
+  „_overview"-Latenz heute **365 ms** (deutlich unter der historischen 438–453 ms-
+  Spanne, kein Rauschen — die 863 ms aus V108-Baseline war ein Ausreisser, vermutlich
+  Last auf dem alten Mini-PC vor der Migration).
+- **Punkt 5 der §0.5-Checkliste** (kein rohes `rgba(62,141,243` ausserhalb `:root`):
+  maschinell verifiziert (`python3`-Inline-Skript `:root`-Block entfernt, dann
+  `grep "rgba(62,141,243"` → **0 Treffer**).
+- **Phase 8 §0.3-Verbotsliste** eingehalten: kein Emoji-Icon, kein Gradient-Branding,
+  kein 3er-Card-Grid, keine dekorative Farbe, keine neue Schriftfamilie, kein Element
+  dessen Erkennbarkeit allein von Transparenz/Blur abhaengt (manuell bestaetigt).
+- **Groessenpruefung:** `phase5_ui/webui/static/app.css` 62,5 KB (vorher 61,4 KB, +1,1 KB
+  durch Tokens + drei `--bg-void`-Stellen + `.input--labeled`); `app.html` 31,7 KB;
+  `dialogs.js` 45,1 KB; `phase8_ui_graph/CLAUDE.md` 43,2 KB (vorher 42,3 KB, **+850 B**
+  statt der geplanten ~600 B — die Konventionstabelle hat mehr zusaetzlichen Text als
+  nur eine Tabellenzeile). `phase8_6_ui_polish/CLAUDE.md` aktueller Stand weiter unten.
+- **Service-Touch 0** — kein `sudo systemctl`, kein `pkill -f`, kein Pfad auf den
+  echten `DATA_ROOT`/Keyring. Production-Dienst sharefyx-mcp (PID 991) **nicht**
+  angefasst.
+- **`ollama list`** meldet weiterhin `command not found` — Items #2–4 aus dem Handover
+  bleiben blockiert (Nikinger-Aktion fuer Schritt 4 der Aktionsliste).
 
-**Was diese Session bewusst NICHT getan hat:**
+**Was bewusst NICHT in diesem Commit passiert ist:**
 
-- **Keine Phase-8.6-Block-A/B/C/D-Code-Touches** — das ist Open Item #6 und der
-  Hauptumfang, der mit Block A (§3) zwingend zuerst käme (P8.6-U). Diese Session
-  hat den Open-Item-#5-Vorbau abgeschlossen; Block A–D bleiben in dieser oder
-  der nächsten Session.
-- **Kein `hostnamectl set-hostname`** — bleibt beim Nikinger (Tailscale-Name).
-- **Kein Ollama-Setup, kein MCP-Wrapper, kein V119-Smoke** — diese sind
-  Schritt 4–6 der Aktionsliste und brauchen die Proxmox-Migration (✅ durch)
-  **plus** den Nikinger-`apt install ollama`-Schritt.
-- **Kein Push ohne Nikinger-Anweisung.**
+- **Kein Block B/C/D-Code-Touch** — A vor B ist zwingend (P8.6-U), und der Token-
+  Vorrat ist jetzt vollstaendig. Block B kann mit B1 (Hover-Vereinheitlichung) und
+  B4 (`action--caution`-Klasse an Abmelden + Archivieren) anfangen.
+- **Keine Schritte 1–3 der Aktionsliste** (Ollama/MCP-Wrapper/V119-Smoke) — bleiben
+  Nikinger- bzw. Proxmox-migrationsabhaengig.
+- **Keine Tests fuer Block B/C** (die anderen 4 aus Plan §8.2) — bewusste Abweichung
+  vom Plan §3.5/§8.2, weil sie in Block A rot waeren. Sie werden in Block B/C/D
+  geschrieben, sobald ihr Code existiert. **Dokumentiert in der Modul-Status-Tabelle.**
+- **Kein `pkill -f`**, **kein `sudo systemctl`**, **kein Push** ohne Nikinger-
+  Anweisung.
+- **Keine Custom-404-Seite, kein Tab-Meta-Dynamic-Title** — die zwei „would be cool"-
+  Zukunfts-Notes bleiben explizit draussen (P8.6-Tabu, Phase-Head §Vormerkungen).
 
 **Commit-Message (geplant):**
-`phase 8.6: Open Item #5 -- Aktionsliste Schritt 7 auf Restart-Logik verkuerzt`
+`phase 8.6: Block A -- Radiogruppe zurueck auf select, Layer-/Selektions-Tokens, --border-soft-Fix`
 
-**Nächster Schritt (für dieselbe oder nächste Session):**
-1. **Phase-8.6-Block A** nach Plan §3 (A1 Radiogruppe→select, A2 Tokens,
-   A3 `--border-soft`-Fix, A4 Konvention v3 + „Vorsicht") + 7 neue statische Tests.
-2. Block B (§4), Block C (§5), Block D (§6) — je ein Commit, je Selbstprüfung.
-3. Block D ist unabhängig von Block C und darf mit A oder B zusammenrücken.
-4. Erst nach A/B/C/D: Gate (§7) mit Wegwerf-Instanz + Nikinger-Sichtprüfung +
-   Deploy `v3.0.2` (zweigeteilt: D-a Agent / D-b Nikinger / D-c Health-Gate).
+**Naechster Schritt (in dieser oder naechsten Session):**
+1. **Block B** nach Plan §4 (B1 Hover-Vereinheitlichung, B2 Ordner/Tags/Buckets,
+   B3 Einstellungsmenue-Navigation, B4 Sweep mit `action--caution`-Klasse an Abmelden
+   + Archivieren, B5 eine Radius-Aenderung an `.link-picker-results`). Hinzu kommen
+   `test_caution_class_only_on_logout_and_archive` als statischer Test (P8.6-B4).
+2. Block C nach Plan §5 (Struktur-Umbau: Konto→Einstellungen, Alle Items unter
+   Spaces, Map als rechte Spalte, klickbare Spaces, Ordner-Zaehler). Drei weitere
+   statische Tests.
+3. Block D nach Plan §6 (V102-Dedup, deterministischer Layout-Seed, optional
+   `cancelAnimationFrame`-Fix in `runSimulation()` — der „streichen, wenn der Nikinger
+   es in der Sichtpruefung anders sieht"-Vorbehalt bleibt).
+4. Erst nach A/B/C/D: Gate (§7) mit Wegwerf-Instanz + Nikinger-Sichtpruefung +
+   Deploy `v3.0.2`.
 

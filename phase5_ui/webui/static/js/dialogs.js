@@ -99,21 +99,22 @@ var pendingShareBody = null;
 // Block B). Reines Overlay-Modal, kein API-Umbau, kein neues MCP-Tool (Plan §0.5: Graph
 // ist Mensch-UI, Claude erreicht Links ueber `links:`/`get_item`).
 //
-// Phase 8.5 A1 ergaenzt einen Modus-Umschalter (`input[name="link-picker-mode"]`, zwei Werte:
-// `body` / `frontmatter`); der Trefferklick ruft `onPick({id, title, mode})`,
-// `editor.js :: _onLinkPicked` routet entsprechend. Default-Modus `body`, letzte Wahl persistent
-// in `localStorage` unter `sfx:linkpicker:mode` (P8.5-G/H). `body` ist der strikt maechtigere
-// Modus -- der Body-Link erzeugt bereits eine Graph-Kante via `storage/linkscan.py` (Plan
-// §0.3-Verweis).
+// Phase 8.5 A1 ergaenzt einen Modus-Umschalter (`<select id="link-picker-mode">`,
+// zwei Werte `body` / `frontmatter`, P8.5-F/H); Phase 8.6 A1 (P8.6-H) bestaetigt die
+// `<select>`-Bauform (Nikinger hat die zwischenzeitliche P8.5-19-Radiogruppe am
+// 2026-09-08 selbst zurueckgenommen). Der Trefferklick ruft `onPick({id, title, mode})`,
+// `editor.js :: _onLinkPicked` routet entsprechend. Default-Modus `body`, letzte Wahl
+// persistent in `localStorage` unter `sfx:linkpicker:mode` (P8.5-G/H, unveraendert).
+// `body` ist der strikt maechtigere Modus -- der Body-Link erzeugt bereits eine
+// Graph-Kante via `storage/linkscan.py` (Plan §0.3-Verweis).
 //
 // Phase 8.5 P8.5-19 (D4-Fund 2026-09-06, Pre-Z-Tausch 2026-09-07): die A1-Bauform war ein
-// `<select class="input" id="link-picker-mode">` (P8.5-F, Planer-Substitution), der Nikinger
-// hat in der Sichtpruefung stattdessen die **Radiogruppe** aus seiner N3-Vorschau angeordnet
-// -- beide Optionen bleiben sichtbar (kein "versteckt bis zum Oeffnen"). Selektor-Wechsel von
-// ID auf Name, sonst keine Verhaltensaenderung: gleiches `localStorage`-Schema, gleicher
-// Default, gleiches Fallback auf `body` bei unerwartetem Wert.
+// Phase 8.6 Block A A1 (P8.6-H/I): Modus-Umschalter ist wieder ein **`<select class="input">`**
+// -- die Radiogruppe aus P8.5-19 wurde 2026-09-08 vom Nikinger selbst zurueckgenommen. Die
+// Beschriftung steht jetzt in der Box (`<label class="input-label-inline">` innerhalb des
+// `.input`-Traegers, kein externer `<legend>`). `localStorage`-Schema und Wert bleiben
+// unveraendert, damit bestehende Browser ihre Wahl behalten.
 var LINK_PICKER_MODE_KEY = "sfx:linkpicker:mode";
-var LINK_PICKER_MODE_NAME = "link-picker-mode";
 
 var linkPickerDialogEl;
 var linkPickerSearchEl;
@@ -227,26 +228,24 @@ function _pickLinkPickerAt(index) {
   if (onPick) onPick({ id: item.id, title: item.title, mode: mode });
 }
 
-// Phase 8.5 A1 (P8.5-G): liefert den aktuell gewaehlten Modus. Faellt auf `body` zurueck,
-// wenn keiner der Radios checked ist oder der Wert unerwartet ist (z. B. bei Hand-Edit der
-// HTML-Datei oder einem fehlgeschlagenen `localStorage`-Restore). Phase 8.5 P8.5-19: Selektor
-// `input[name="…"]:checked` statt der alten ID auf dem `<select>`.
+// Phase 8.6 Block A A1 (P8.6-H): liefert den aktuell gewaehlten Modus. Faellt auf `body`
+// zurueck, wenn der Wert unerwartet ist (z. B. bei Hand-Edit der HTML-Datei oder einem
+// fehlgeschlagenen `localStorage`-Restore).
 function _linkPickerMode() {
-  var checked = document.querySelector('input[name="' + LINK_PICKER_MODE_NAME + '"]:checked');
-  return (checked && checked.value === "frontmatter") ? "frontmatter" : "body";
+  var el = document.getElementById("link-picker-mode");
+  return (el && el.value === "frontmatter") ? "frontmatter" : "body";
 }
 
-// Phase 8.5 A1 (P8.5-G): liest die gespeicherte Wahl aus `localStorage`, faellt auf
+// Phase 8.6 Block A A1 (P8.6-H): liest die gespeicherte Wahl aus `localStorage`, faellt auf
 // `body` zurueck. `try`/`catch`, weil `localStorage` im privaten Fenster mit SecurityError
-// wirft (sonst bekommt der Nutzer statt eines Pickers eine Konsolen-Exception).
-// Phase 8.5 P8.5-19: iteriert die Radiogruppe und setzt `checked` -- das native HTML-Attribut,
-// kein JS-State daneben. Reihenfolge der Radios im DOM irrelevant, weil der Wert eindeutig ist.
+// wirft (sonst bekommt der Nutzer statt eines Pickers eine Konsolen-Exception). Setzt direkt
+// `el.value` -- die HTML-`<option>`-Reihenfolge trägt den Wert.
 function _restoreLinkPickerMode() {
+  var el = document.getElementById("link-picker-mode");
+  if (!el) return;
   var saved = null;
   try { saved = window.localStorage.getItem(LINK_PICKER_MODE_KEY); } catch (e) { saved = null; }
-  var target = (saved === "frontmatter") ? "frontmatter" : "body";
-  var radios = document.querySelectorAll('input[name="' + LINK_PICKER_MODE_NAME + '"]');
-  for (var i = 0; i < radios.length; i++) radios[i].checked = (radios[i].value === target);
+  el.value = (saved === "frontmatter") ? "frontmatter" : "body";
 }
 
 function _runLinkPickerSearch(query) {
@@ -598,12 +597,12 @@ export function init() {
   linkPickerResultsEl = document.getElementById("link-picker-results");
   linkPickerCancelEl = document.getElementById("link-picker-cancel");
   linkPickerCancelEl.addEventListener("click", function () { closeLinkPicker(); });
-  var linkPickerModeEls = document.querySelectorAll('input[name="' + LINK_PICKER_MODE_NAME + '"]');
-  for (var mi = 0; mi < linkPickerModeEls.length; mi++) {
-    linkPickerModeEls[mi].addEventListener("change", function () {
-      // Beim Wechsel schreiben, nicht beim Picken -- so ueberlebt die Wahl auch einen
-      // Abbruch via Escape oder Klick neben das Overlay. `try`/`catch` deckt den privaten
-      // Modus ab (`localStorage` wirft dort SecurityError).
+  var linkPickerModeEl = document.getElementById("link-picker-mode");
+  if (linkPickerModeEl) {
+    // Beim Wechsel schreiben, nicht beim Picken -- so ueberlebt die Wahl auch einen
+    // Abbruch via Escape oder Klick neben das Overlay. `try`/`catch` deckt den privaten
+    // Modus ab (`localStorage` wirft dort SecurityError).
+    linkPickerModeEl.addEventListener("change", function () {
       var mode = _linkPickerMode();
       try { window.localStorage.setItem(LINK_PICKER_MODE_KEY, mode); } catch (e) { /* private */ }
     });

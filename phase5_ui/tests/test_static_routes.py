@@ -255,60 +255,74 @@ def test_insertAtCursor_defined_exactly_once_at_module_level():
     )
 
 
-def test_link_picker_uses_a_radio_group_not_a_select():
-    """P8.5-19 (D4-Nikinger-Fund 2026-09-06, Pre-Z-Tausch 2026-09-07): Modus-Umschalter ist
-    eine **Radiogruppe**, kein `<select>`.
+def test_link_picker_uses_a_select_not_a_radio_group():
+    """P8.6-A1 (P8.6-H/I): Modus-Umschalter ist wieder ein **`<select class="input">`**,
+    nicht die Radiogruppe aus P8.5-19.
 
-    Vor dem Tausch stand im Picker-Dialog `<select class="input" id="link-picker-mode">`
-    (P8.5-F Planer-Substitution, bewusst nicht N3). Der Nikinger hat in der Sichtpruefung
-    die **Radiogruppe aus seiner N3-Vorschau** angeordnet -- ein Umschalter, der aendert
-    *was ein Klick tut*, soll seine Optionen dauerhaft zeigen, nicht erst hinter einem
-    Klick offenbaren. Bauform ist jetzt:
-      <fieldset class="link-picker-modes">
-        <legend>Einfügen</legend>
-        <label><input type="radio" name="link-picker-mode" value="body" checked> ...</label>
-        <label><input type="radio" name="link-picker-mode" value="frontmatter"> ...</label>
-      </fieldset>
+    Historie (Docstring trägt beide Richtungen, P8.6-I):
+      - 2026-09-06: Radiogruppe angeordnet (P8.5-19, Nikinger-Fund D4) --
+        die Sichtpruefung war "deutlich angenehmer", ein Umschalter aendert
+        *was ein Klick tut*, und das soll der Nutzer vor dem Klick sehen.
+      - 2026-09-08: Nikinger nimmt das **selbst** zurueck (Handover §4.2) --
+        die Selection/Choice-Konvention v3 verlangt Choice = nativ <select>;
+        eine offene Ausnahme waere eine Regel mit eingebautem Gegenbeispiel.
+    Bauform heute:
+      <div class="input input--labeled">
+        <label class="input-label-inline" for="link-picker-mode">Einfügen</label>
+        <select class="input" id="link-picker-mode">
+          <option value="body" selected>als Text-Link im Text</option>
+          <option value="frontmatter">als Kante (Feld „Links")</option>
+        </select>
+      </div>
+    `localStorage["sfx:linkpicker:mode"]` und sein Wert bleiben unveraendert -- Nutzer
+    behalten ihre Wahl beim Bauform-Wechsel.
 
-    Wer spaeter aus Bequemlichkeit wieder ein `<select>` einbaut (Konvention v3 drueckt
-    in diese Richtung), faellt hier auf statt erst in der naechsten Sichtpruefung.
+    Wer spaeter wieder eine Radiogruppe einbaut (oder das alte `LINK_PICKER_MODE_NAME`-
+    Selektor-Konstrukt zurueckbringt), faellt hier auf statt erst in der naechsten
+    Sichtpruefung.
     """
     html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
     dialogs = (DEFAULT_STATIC_DIR / "js" / "dialogs.js").read_text("utf-8")
 
-    # Selektor nach Element: kein <select id="link-picker-mode"> mehr, keine #link-picker-mode-ID.
-    assert '<select class="input" id="link-picker-mode">' not in html, (
-        "Der alte <select class=\"input\" id=\"link-picker-mode\"> darf nicht mehr vorkommen "
-        "(P8.5-19, Radiogruppe statt <select>)."
+    # Markup: <select class="input" id="link-picker-mode"> mit genau zwei <option> in der
+    # richtigen Reihenfolge. `body` ist default (selected), `frontmatter` danach.
+    select_pattern = re.compile(
+        r'<select\s+class="input"\s+id="link-picker-mode">\s*'
+        r'<option\s+value="body"\s+selected>[^<]+</option>\s*'
+        r'<option\s+value="frontmatter">[^<]+</option>\s*'
+        r'</select>',
+        re.DOTALL,
     )
-    assert 'id="link-picker-mode"' not in html, (
-        "Die ID link-picker-mode darf nicht mehr existieren -- die Radios tragen name=, nicht id= "
-        "(Selektor-Wechsel im JS: querySelectorAll('input[name=\"link-picker-mode\"]'))."
-    )
-
-    # Fieldset mit Legende ist da.
-    assert 'class="link-picker-modes"' in html, (
-        "Fieldset mit class=\"link-picker-modes\" fehlt -- die Radiogruppe braucht einen Container."
-    )
-
-    # Genau zwei Radios, beide mit name="link-picker-mode", mit den richtigen Werten.
-    radio_pattern = re.compile(
-        r'<input\s+type="radio"\s+name="link-picker-mode"\s+value="(body|frontmatter)"(?:\s+checked)?\s*>'
-    )
-    radios = radio_pattern.findall(html)
-    assert radios == ["body", "frontmatter"], (
-        f"Erwartet genau zwei Radios mit name=\"link-picker-mode\" und Werten body/frontmatter, "
-        f"gefunden: {radios}."
+    assert select_pattern.search(html), (
+        "Picker-Modus-Markup fehlt: erwartet <select class=\"input\" id=\"link-picker-mode\"> "
+        "mit zwei <option> ('body' selected, 'frontmatter') in dieser Reihenfolge (P8.6-H)."
     )
 
-    # JS konsumiert die Radios per Name, nicht per ID.
-    assert "input[name=\"link-picker-mode\"]" in dialogs, (
-        "dialogs.js muss die Radios per querySelector[All]('input[name=\"link-picker-mode\"]') "
-        "finden, nicht per getElementById -- die alte ID ist weg."
+    # Fieldset+Legend-Konstrukt (Radiogruppe) ist weg.
+    assert 'class="link-picker-modes"' not in html, (
+        "Die alte Radiogruppe (class=\"link-picker-modes\") darf nicht mehr vorkommen "
+        "(P8.6-A1, Radiogruppe-><select>-Rueckbau)."
     )
-    assert "getElementById(\"link-picker-mode\")" not in dialogs, (
-        "dialogs.js darf getElementById('link-picker-mode') nicht mehr aufrufen -- "
-        "ID ist entfernt, Selektor ist name=."
+
+    # Radio-Eingaben unter dem Namen 'link-picker-mode' sind weg.
+    assert 'name="link-picker-mode"' not in html, (
+        "Die Radios unter name=\"link-picker-mode\" duerfen nicht mehr vorkommen "
+        "(P8.6-A1, Radiogruppe-><select>-Rueckbau)."
+    )
+
+    # JS: die alte LINK_PICKER_MODE_NAME-Konstante und der Name-Selektor sind weg,
+    # der ID-Selektor ist wieder da (getElementById).
+    assert "LINK_PICKER_MODE_NAME" not in dialogs, (
+        "dialogs.js darf die alte Konstante LINK_PICKER_MODE_NAME nicht mehr enthalten "
+        "(P8.6-A1, Name-Selektor -> ID-Selektor)."
+    )
+    assert "input[name=\"link-picker-mode\"]" not in dialogs, (
+        "dialogs.js darf nicht mehr nach 'input[name=\"link-picker-mode\"]' suchen -- "
+        "die Radios sind weg, der <select> hat eine ID."
+    )
+    assert 'getElementById("link-picker-mode")' in dialogs, (
+        "dialogs.js muss den <select> per getElementById('link-picker-mode') finden -- "
+        "ID-Selektor ist zurueck."
     )
 
 
@@ -347,4 +361,81 @@ def test_markdown_link_regex_allows_escaped_brackets():
     assert re.search(r"replace\(/\[\^\]\][^\]]*\\\]\(\[\^\)\\\s\]\+\)\/g", md) is None, (
         r"Alte Regex `\[([^\]]+)\]\(([^)\s]+)\)` darf nicht mehr im markdown.js stehen "
         r"-- sie ist die Ursache des Bracket-Bugs und wurde durch die Escape-tolerante Form ersetzt."
+    )
+
+
+def test_no_raw_accent_rgba_outside_root():
+    """P8.6-A2 (P8.6-C): maschineller Wächter ueber die fünf rohen `rgba(62,141,243,...)`,
+    die vor Block A in `app.css` dupliziert waren.
+
+    Vor Block A stand der Akzent-Verlauf vier Mal woertlich identisch im Stylesheet
+    (`app.css:403/685/719/1291`) plus eine `.35`-Variante an `app.css:785` -- jeder
+    kuenftige Hue-Shift haette vier Stellen treffen muessen. Block A fuehrt die zwei
+    Token `--select-fill` (voller Verlauf) und `--select-line` (volle Akzent-Linie) ein,
+    und ersetzt alle fuenf Vorkommen durch Verweise.
+
+    Wer nach Block A wieder einen rohen `rgba(62,141,243,...)`-Wert irgendwo ausserhalb
+    des `:root`-Blocks einfuegt (Background, Border, Outline, was auch immer), faellt
+    hier auf. Ein Kommentar in `:root`, der das Pattern erklaert, ist erlaubt --
+    die Assertion matcht nur die Funktion `rgba(...)`, nicht den Literal-String.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    # :root-Block abschneiden -- dort darf das Pattern stehen (Token-Definitionen +
+    # Kommentar).
+    stripped = re.sub(r":root\s*\{[^}]*\}", "", css, flags=re.DOTALL)
+
+    # Akzent-rgba darf ausserhalb von :root nicht mehr vorkommen.
+    matches = re.findall(r"rgba\(\s*62\s*,\s*141\s*,\s*243", stripped)
+    assert not matches, (
+        f"Roher rgba(62,141,243,...) ausserhalb von :root gefunden: "
+        f"{len(matches)} Vorkommen. P8.6-C verlangt die Token --select-fill / "
+        f"--select-fill-quiet / --select-line / --select-line-quiet. "
+        f"Erste Treffer-Zeile mit `grep -n 'rgba(62,141,243' app.css` finden."
+    )
+
+
+def test_every_css_var_reference_is_defined():
+    """P8.6-A3 (P8.6-C/F): jedes `var(--x)` in `app.css` muss **irgendwo** in der Datei
+    definiert sein.
+
+    Der Wunsch klingt trivial, ist aber die einzige strukturelle Antwort auf den
+    `--border-soft`-Renderfehler (Plan §1.8, Step-0-Fund): ein Token, der im Quelltext
+    steht, aber nirgendwo ein `--border-soft:` hat, zeichnet still einen leeren Wert
+    und niemand merkt es bis zur naechsten Sichtpruefung.
+
+    **Wichtig -- warum die Assertion NICHT auf `:root` einengt:** `@supports`-Bloecke
+    und andere Scopes (z. B. der Phase-8-Glass-Fallback unter `@supports (backdrop-filter)`)
+    definieren zulaessigerweise Tokens ausserhalb von `:root`. Eine zu strenge Variante
+    wuerde diese zurechtgestellten Stellen als Fehler markieren. **Auch** `--caution:
+    var(--danger)` ist eine `var()`-Referenz *innerhalb* von `:root` -- die Assertion
+    matcht Referenzen, nicht Werte, also ist die Alias-Definition selbst kein Problem.
+    Tokens werden oft inline in einer Property-Zeile definiert (z. B. `:root { --banner-h: 80px; }`
+    statt einer eigenen Zeile) -- auch diese Variante muss matchen.
+
+    Kommentare werden vor dem Vergleich entfernt, damit historische Notizen wie
+    `color: var(--accent-text) -- letzteres Token war nirgends definiert` (P8.5-Step-7b-
+    Erklaerung in einem Kommentar) nicht als "Referenz ohne Definition" gezaehlt werden.
+
+    Wer einen Token benutzt, der nicht (irgendwo) definiert ist, faellt hier auf --
+    auch der naechste Bug dieser Klasse.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    # CSS-Kommentare entfernen -- sie koennen historische Token-Namen erwaehnen, die
+    # es heute nicht mehr gibt (P8.5-Step-7b erklaert z. B. `--accent-text`).
+    css_no_comments = re.sub(r"/\*.*?\*/", "", css, flags=re.DOTALL)
+
+    # Alle `var(--xxx)`-Referenzen einsammeln. Pattern: `var(--name` (Klammer oder Komma folgt).
+    refs = set(re.findall(r"var\(\s*(--[a-zA-Z0-9_-]+)\s*[,)]", css_no_comments))
+
+    # Alle `--xxx:`-Definitionen einsammeln. KEIN Zeilen-Anchor, weil Tokens auch inline
+    # in einer Property-Zeile stehen koennen (`:root { --banner-h: 80px; }`).
+    defs = set(re.findall(r"(--[a-zA-Z0-9_-]+)\s*:", css_no_comments))
+
+    undefined = refs - defs
+    assert not undefined, (
+        f"Undefinierte CSS-Variablen in app.css: {sorted(undefined)}. "
+        f"Jedes `var(--x)` braucht ein `--x:` (irgendwo in der Datei, nicht nur in :root). "
+        f"Dieser Test haette den --border-soft-Bug gefunden -- und findet den naechsten."
     )
