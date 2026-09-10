@@ -9,7 +9,7 @@ down:
   - ../docs/concepts/p8x_ui_polish_notes.md       # Inhaltsquelle §1–§10 (P8.6-A benennt das Verzeichnis)
   - ../docs/concepts/PHASE8_5_CLOSEOUT_HANDOVER.md   # Einstieg für die P8.6-Planung; §4 = die offenen Entscheidungen
   - SESSIONS_ARCHIVE.md                            # ältere Session-Blöcke, newest-first
-updated: 2026-09-10 (Block D ✅ [D1/D2/D4] — V102-Dedup in `graph.js:156` (`dedupeEdges()` ungeordnetes Knotenpaar, P8.6-N, keine neunte P1-Contract-Öffnung), FNV-1a-Layout-Seed `seedJitter(id, salt)` ersetzt `Math.random()`-Jitter in `seedInitialPositions()` (P8.6-M, „Karte fliegt" behoben), `cancelAnimationFrame` in `runSimulation()` mit `activeRafId` auf Modulebene (P8.6-§6.4, **einzige Scope-Erweiterung** des Plans, streichbar wenn Nikinger es in der Sichtprüfung anders sieht); **kein** neuer statischer Test (interne Helfer, Vorhandensein + `node`-Skript-Probe 9/9 ausreichend); **D3 🟡** wartet auf Block C; `pytest` V107 ✅ **966 unverändert**, `ui_budget` V97 ✅ 5/5 (130,4 KB gzip, `graph.js` 7,9 → 8,4 KB), `node --check` auf `graph.js` OK, Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 nur gelesen; **Block-A-Sub-Block** verbatim nach `SESSIONS_ARCHIVE.md` rotiert, Phase-Head jetzt mit D-Sub-Block allein) | 2026-09-10 (Block A ✅ — Fundament: A1 Radiogruppe→`<select class="input">` mit Beschriftung-in-Box + ID-Selektor, A2 sechs neue Tokens in `:root` (`--bg-void`/`--select-fill`/`--select-fill-quiet`/`--select-line`/`--select-line-quiet`/`--caution`) + fünf rohe `rgba(62,141,243,…)` durch Tokens ersetzt + Z. 785 von `.35` auf `--select-line` angeglichen (V109) + `--bg-void` an genau drei Stellen (body, `.list__empty`, `.overview__graph-empty`, P8.6-E), A3 `--border-soft`→`var(--line)` an `app.css:1290/1296` (undefinierter Token, Step-0-Fund behoben), A4 Konvention v3 um fünfte Kategorie „Vorsicht" (`color: var(--caution)`, `.action--caution`-Trägerklasse) in `phase8_ui_graph/CLAUDE.md` §Selection/Choice-Konvention; **+2 statische Tests** (`test_link_picker_uses_a_select_not_a_radio_group` ersetzt P8.5-Test per P8.6-I, `test_no_raw_accent_rgba_outside_root` P8.6-C, `test_every_css_var_reference_is_defined` P8.6-A3 — würde `--border-soft`-Bug gefunden haben); `pytest` V107 ✅ **966 passed**, `ui_budget` V97 ✅ 5/5 (130,4 KB gzip), Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 nur gelesen via `systemctl status`; **Abweichung von Plan §3.5/§8.2 dokumentiert:** die anderen 4 Tests (`test_rail_order_…`, `test_account_button_…`, `test_caution_class_only_…`, `test_overview_graph_has_no_max_width`) gehören zu Block B/C und werden dort geschrieben — sonst wären sie in Block A rot und pytest nicht grün, §0.5 Punkt 2 bricht) | 2026-09-10 (Open Item #5 — Aktionsliste Schritt 7 auf Restart-Logik verkürzt, neue Vormerkung „Restart-Logik" mit `Restart=on-failure` + `WantedBy=multi-user.target`-Beleg aus `/etc/systemd/system/sharefyx-mcp.service` und `/usr/lib/systemd/system/tailscaled.service`; beide vorherigen Sub-Blöcke (Migration-Vorbereitung + Health-Check nach Proxmox-Migration) **verbatim** nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head jetzt 34,6 KB, 5,4 KB Reserve zum 40-KB-Softcap; `## Nächste Session` aktualisiert auf „Health-Gate 8/8 (Restart-Logik übernimmt das Hochfahren)"; **kein Code-Touch**, Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 nur gelesen via `systemctl status`) | 2026-09-10 (Migration-Aktionsliste + Zukunfts-Notes — Proxmox-Migration von Mini-PC `savefyx-VMware-Virtual-Platform` (sharefyx-mcp PID 355956) auf i5-14600KF primär / Ryzen 7 5800X sekundär steht bevor; **7-Schritte-Aktionsliste** in §Vormerkungen dokumentiert [Pause sharefyx-mcp+tailscaled → VM-Migration → VM-Resources → Ollama+InternVL 2.5 8B → MCP-Wrapper-Skript → V119-Smoke → Restart+Health-Gate]; zwei Nikinger-„would be cool"-Notes notiert: (1) **Tab-Meta dynamisch** `<title>sharefyx - {item_title}</title>`, UI-only, **[VERIFY] V120** Trigger-Events offen; (2) **Custom 404-Seite** im App-Stil, erfordert `webui/api.py`-Touch → P8.6-Tabu §0.3 → Folge-Phase P9+. **Step-V-deferred-Sub-Block** (Vorgänger-Session, 4414 B) nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head wäre sonst über 40-KB-Softcap gerissen, P8.6-T-Rotationsregel „bisherige verbatim". Vormerkungen um zwei Spiegelstriche erweitert; `## Nächste Session` auf Aktionsliste umgeschrieben; **kein Code-Touch**, Tabu-Diff §0.3 leer, Service-Touch 0 — PID 355956 nur gelesen via `systemctl status`) | 2026-09-10 (Step V deferred — Nikinger-Entscheidung: **lokales Vision-Modell** auf Proxmox-Migration (i5-14600KF primär, danach Ryzen 7 5800X) statt Anthropic-Haiku-API. Backend **`InternVL 2.5 8B`** (Apache-2.0, Q4, ~6–8 GB VRAM) auf Ollama; MCP-Wrapper ruft `POST /api/generate` mit base64-Image. Proxmox-Settings (Vorlage für Aktionsliste der nächsten Session) detailliert in §Vormerkungen + Session-Stopped-Sub-Block; Modell-Recherche gegen PromptQuorum „Local Vision Models 2026" — InternVL 2.5 8B (beste UI/Code-Passung), Qwen3-VL 8B (Fallback multilinguales OCR), Llama 3.2 Vision/MiniCPM-V/Moondream (verworfen). Plugin-Pfad (`DavidEasden/opencode-vision`) als Vormerkung zurückgestellt — 3 Commits, AGPL-3.0, kein dokumentiertes MCP-Backend, zu unreif. Kein Code-Touch; nachträglicher Commit nach Step-0-Commit `440e462`) | 2026-09-10 (Step 0 ✅ — Haushalt: Phasenverzeichnis angelegt, sechs kaputte `up:`/`down:`-Links in `p8x_ui_polish_notes.md` gefixt, vier fehlende L1-Cards ergänzt, drei `down:`-Listen korrigiert, `docs/INDEX.md` auf ≤ 38 KB komprimiert, zwei INDEX-Zeilen ergänzt + zwei Drift-Korrekturen; **pytest V107 ✅ 964 passed**, **ui_budget V97 ✅ 130,1 KB**, **V108 offen 863 ms** `_overview`-Latenz, **V106 Sammelmarker offen**, **V110/V112/V114/V115/V117/V119 Block-VERIFY offen**)
+updated: 2026-09-10 (Step V ✅ — Ollama 0.34.0 via offizielles Script (NICHT `apt install`, Paket existiert auf Ubuntu 24.04 nicht), `qwen3-vl:8b` (Q4_K_M, 6,1 GB, Apache-2.0, neueste Qwen3-VL-Familie, **NICHT** `internvl2.5:8b` wie ursprünglich empfohlen — existiert nicht auf Ollama-Library; Recherche-Fehler von mir korrigiert); MCP-Wrapper `phase8_6_ui_polish/scripts/vision_ollama.py` (89 Z., `requests.post(/api/generate)`, Timeout 600s für Cold-Start); **V119-Smoke ✅** (46 s gegen `c4_p8519_01_radiogruppe_im_dialog.png`, qwen3-vl:8b antwortet korrekt auf Deutsch: „Der Radio-Button ‚als Text-Link im Text' ist markiert"); §Vormerkungen korrigiert (Schritt 4 curl-script statt apt, Schritt 5 Wrapper-Status ✅, Schritt 6 V119-Status ✅, Vision-Backend-Modell-Recherche korrigiert); `## Nächste Session` neu sortiert: **Schritt 1 = `DavidEasden/opencode-vision`-Plugin-Installation** (Nikinger-Vorgabe 2026-09-10, damit Screenshots direkt im Chat), **Schritt 2 = visuelle Verifikation Block A+D am echten Gerät**; `requests 2.34.2` ins Projekt-venv installiert (Spec-Konformität); `pytest` V107 ✅ **966 unverändert**, `ui_budget` V97 ✅ 5/5, Tabu-Diff §0.3 leer, Service-Touch 0; **Block-D-Sub-Block** verbatim nach `SESSIONS_ARCHIVE.md` rotiert, Phase-Head jetzt mit V-Sub-Block allein; **Push + Deploy** für Block A+D-Commits vom Nikinger in dieser Session autorisiert + ausgeführt (`10f9f63..04dee6a`) | 2026-09-10 (Block A ✅ — Fundament: A1 Radiogruppe→`<select class="input">` mit Beschriftung-in-Box + ID-Selektor, A2 sechs neue Tokens in `:root` (`--bg-void`/`--select-fill`/`--select-fill-quiet`/`--select-line`/`--select-line-quiet`/`--caution`) + fünf rohe `rgba(62,141,243,…)` durch Tokens ersetzt + Z. 785 von `.35` auf `--select-line` angeglichen (V109) + `--bg-void` an genau drei Stellen (body, `.list__empty`, `.overview__graph-empty`, P8.6-E), A3 `--border-soft`→`var(--line)` an `app.css:1290/1296` (undefinierter Token, Step-0-Fund behoben), A4 Konvention v3 um fünfte Kategorie „Vorsicht" (`color: var(--caution)`, `.action--caution`-Trägerklasse) in `phase8_ui_graph/CLAUDE.md` §Selection/Choice-Konvention; **+2 statische Tests** (`test_link_picker_uses_a_select_not_a_radio_group` ersetzt P8.5-Test per P8.6-I, `test_no_raw_accent_rgba_outside_root` P8.6-C, `test_every_css_var_reference_is_defined` P8.6-A3 — würde `--border-soft`-Bug gefunden haben); `pytest` V107 ✅ **966 passed**, `ui_budget` V97 ✅ 5/5 (130,4 KB gzip), Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 nur gelesen via `systemctl status`; **Abweichung von Plan §3.5/§8.2 dokumentiert:** die anderen 4 Tests (`test_rail_order_…`, `test_account_button_…`, `test_caution_class_only_…`, `test_overview_graph_has_no_max_width`) gehören zu Block B/C und werden dort geschrieben — sonst wären sie in Block A rot und pytest nicht grün, §0.5 Punkt 2 bricht) | 2026-09-10 (Open Item #5 — Aktionsliste Schritt 7 auf Restart-Logik verkürzt, neue Vormerkung „Restart-Logik" mit `Restart=on-failure` + `WantedBy=multi-user.target`-Beleg aus `/etc/systemd/system/sharefyx-mcp.service` und `/usr/lib/systemd/system/tailscaled.service`; beide vorherigen Sub-Blöcke (Migration-Vorbereitung + Health-Check nach Proxmox-Migration) **verbatim** nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head jetzt 34,6 KB, 5,4 KB Reserve zum 40-KB-Softcap; `## Nächste Session` aktualisiert auf „Health-Gate 8/8 (Restart-Logik übernimmt das Hochfahren)"; **kein Code-Touch**, Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 nur gelesen via `systemctl status`) | 2026-09-10 (Migration-Aktionsliste + Zukunfts-Notes — Proxmox-Migration von Mini-PC `savefyx-VMware-Virtual-Platform` (sharefyx-mcp PID 355956) auf i5-14600KF primär / Ryzen 7 5800X sekundär steht bevor; **7-Schritte-Aktionsliste** in §Vormerkungen dokumentiert [Pause sharefyx-mcp+tailscaled → VM-Migration → VM-Resources → Ollama+InternVL 2.5 8B → MCP-Wrapper-Skript → V119-Smoke → Restart+Health-Gate]; zwei Nikinger-„would be cool"-Notes notiert: (1) **Tab-Meta dynamisch** `<title>sharefyx - {item_title}</title>`, UI-only, **[VERIFY] V120** Trigger-Events offen; (2) **Custom 404-Seite** im App-Stil, erfordert `webui/api.py`-Touch → P8.6-Tabu §0.3 → Folge-Phase P9+. **Step-V-deferred-Sub-Block** (Vorgänger-Session, 4414 B) nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head wäre sonst über 40-KB-Softcap gerissen, P8.6-T-Rotationsregel „bisherige verbatim". Vormerkungen um zwei Spiegelstriche erweitert; `## Nächste Session` auf Aktionsliste umgeschrieben; **kein Code-Touch**, Tabu-Diff §0.3 leer, Service-Touch 0 — PID 355956 nur gelesen via `systemctl status`) | 2026-09-10 (Step V deferred — Nikinger-Entscheidung: **lokales Vision-Modell** auf Proxmox-Migration (i5-14600KF primär, danach Ryzen 7 5800X) statt Anthropic-Haiku-API. Backend **`InternVL 2.5 8B`** (Apache-2.0, Q4, ~6–8 GB VRAM) auf Ollama; MCP-Wrapper ruft `POST /api/generate` mit base64-Image. Proxmox-Settings (Vorlage für Aktionsliste der nächsten Session) detailliert in §Vormerkungen + Session-Stopped-Sub-Block; Modell-Recherche gegen PromptQuorum „Local Vision Models 2026" — InternVL 2.5 8B (beste UI/Code-Passung), Qwen3-VL 8B (Fallback multilinguales OCR), Llama 3.2 Vision/MiniCPM-V/Moondream (verworfen). Plugin-Pfad (`DavidEasden/opencode-vision`) als Vormerkung zurückgestellt — 3 Commits, AGPL-3.0, kein dokumentiertes MCP-Backend, zu unreif. Kein Code-Touch; nachträglicher Commit nach Step-0-Commit `440e462`) | 2026-09-10 (Step 0 ✅ — Haushalt: Phasenverzeichnis angelegt, sechs kaputte `up:`/`down:`-Links in `p8x_ui_polish_notes.md` gefixt, vier fehlende L1-Cards ergänzt, drei `down:`-Listen korrigiert, `docs/INDEX.md` auf ≤ 38 KB komprimiert, zwei INDEX-Zeilen ergänzt + zwei Drift-Korrekturen; **pytest V107 ✅ 964 passed**, **ui_budget V97 ✅ 130,1 KB**, **V108 offen 863 ms** `_overview`-Latenz, **V106 Sammelmarker offen**, **V110/V112/V114/V115/V117/V119 Block-VERIFY offen**)
 ---
 # CLAUDE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes (`phase8_6_ui_polish/`)
 
@@ -117,7 +117,7 @@ Entscheidungen P8.6-A–P8.6-U, Tabu-Liste, Schritt-Sequenz, Testliste, Abnahmez
 | # | Modul | Step | Status | Tests |
 |---|---|---|---|---|
 | 1 | Step 0 — Haushalt + Skelett: Phasenverzeichnis angelegt, sechs kaputte `up:`/`down:`-Links in `p8x_ui_polish_notes.md` gefixt, vier fehlende L1-Cards ergänzt (PROJECT_SESSION_LOG, SICHTPRUEFUNG_RESTBLOCK, SICHTPRUEFUNG_WALKTHROUGH, CLUSTER3_TESTBLOCK), drei `down:`-Listen im Inline-Format korrigiert (phase6_5_tools_images_plan, GLOBAL_SEARCH_PLAN, IMAGES_PLAN), `docs/INDEX.md` auf ≤ 38 KB komprimiert, zwei fehlende INDEX-Zeilen ergänzt (CLUSTER3_TESTBLOCK, THIRD_PARTY_LICENSES), zwei Drift-Korrekturen (`phase8_ui_graph` Softcap-Notiz + `phase5_ui` Behauptung widerrufen), Phasen-Head angelegt | 0 | ✅ | 0 (Skelett, wie P1/P6/6.5/7/8 Step 0) |
-| 2 | Step V — **aufgeschoben** (Nikinger-Entscheidung 2026-09-10): Proxmox-Migration des Hosts steht bevor (i5-14600KF, dann Ryzen 7 5800X), Plugin-Installation übersprungen. **Backend:** lokales Vision-Modell `InternVL 2.5 8B` (Q4, Apache-2.0) auf Ollama-Basis statt Anthropic-Haiku-API. Begründung: Hardware-Migration macht lokalen Modell-Server sinnvoll, Proxmox-VM-Migration ist trivial, lokales Modell vermeidet Vendor-Lock-in + Audit-Trail-Aufwand. Vollständige Settings + Modell-Recherche: siehe Session-Block-Eintrag 2026-09-10 („Step V aufgeschoben") und Vormerkungen. | V | 🟡 (deferred — Entscheidung dokumentiert) | 0 (kein Code-Commit; nächste Session liefert Aktion → Command-Liste für Migration + Ollama-Setup + MCP-Wrapper) |
+| 2 | Step V — **umgesetzt** (Nikinger-Aktion am 2026-09-10): Ollama 0.34.0 via offiziellem Install-Script (`curl -fsSL https://ollama.com/install.sh | sh`; **`apt install ollama` existiert auf Ubuntu 24.04 nicht — Vormerkungen korrigiert**), `qwen3-vl:8b` (Q4_K_M, 6,1 GB, Apache-2.0, neueste Qwen3-VL-Familie, gute UI/Code-Passung, CPU-only OK auf i5-14600KF). MCP-Wrapper `phase8_6_ui_polish/scripts/vision_ollama.py` (~89 Z., `requests.post(/api/generate)` mit base64-Image, `--model/--endpoint` konfigurierbar, Default 600 s Timeout für Cold-Start) **V119-Smoke ✅** (46 s, antwortet korrekt auf Deutsch: „Der Radio-Button ‚als Text-Link im Text' ist markiert"). Plugin-Pfad (`DavidEasden/opencode-vision`) bleibt Vormerkung — für die nächste Session (Sichtprüfung am echten Gerät via in-Chat-Screenshots) zuerst das Plugin installieren, **dann** die neuen Block-A/D-Screenshots gegen das Modell schicken (siehe §Nächste Session). Begründung der Modellwahl: Proxmox-Migration macht lokalen Modell-Server sinnvoll, Proxmox-VM-Migration ist trivial, lokales Modell vermeidet Vendor-Lock-in + Audit-Trail-Aufwand. Vollständige Settings + Modell-Recherche: Vormerkungen. | V | ✅ (Ollama + V119) | +1 Skript (`vision_ollama.py`), keine pytest-Tests (CLI-Wrapper, manuell gegen `c4_p8519_01_radiogruppe_im_dialog.png` geraucht) |
 | 3 | Block A — Fundament: A1 Radiogruppe → `<select, (P8.6-H/I), A2 Layer-/Selektions-Tokens (`--bg-void`/`--select-fill`/`--select-fill-quiet`/`--select-line`/`--select-line-quiet`/`--caution`, P8.6-C/D/E/F), A3 `--border-soft`-Renderfehler-Fix (`app.css:1270/1276` → `var(--line)`, Plan §3.3), A4 Konvention v3 um fünfte Kategorie „Vorsicht" in `phase8_ui_graph/CLAUDE.md` §Selection/Choice-Konvention v3 (P8.6-G) | A | ✅ | 964 → **966** (+2 statische Tests in Block A; `test_link_picker_uses_a_select_not_a_radio_group` ersetzt den P8.5-Test per P8.6-I, `test_no_raw_accent_rgba_outside_root` und `test_every_css_var_reference_is_defined` neu; **Abweichung von Plan §3.5/§8.2:** die anderen 4 Tests (`test_rail_order_…`, `test_account_button_…`, `test_caution_class_only_…`, `test_overview_graph_has_no_max_width`) gehoeren zu Block B/C und werden dort geschrieben, nicht hier — sonst waeren sie in Block A rot und pytest nicht grün, §0.5 Punkt 2 bricht) |
 | 4 | Block B — Selektion vereinheitlichen: B1 Hover = leise Standardauswahl überall (`var(--select-fill-quiet)` + `outline`), B2 Ordner/Tags/Buckets prüfen, B3 Einstellungsmenü (`#account-show-updates`/`#account-manage-spaces` Navigation), B4 Sweep „alles Klickbare" mit Vorsicht-Kennzeichnung (`class="action--caution"` an Abmelden + Archivieren), B5 Radien (genau eine Änderung: `.link-picker-results` → `var(--radius-sm)`) | B | ⬜ | 0 → +1 statischer Test (`test_caution_class_only_on_logout_and_archive`) + ui_budget bleibt grün |
 | 5 | Block C — Struktur: C1 „Konto" → „Einstellungen", Lesart b (Einstellungen nach oben, Abmelden ans Rail-Ende, P8.6-J/N3), C2 „Alle Items" unter die Spaces (`tree.js :: renderRail()`, P8.6-J), C3 Map als rechte Spalte / volle Höhe (`.overview` als Grid, P8.6-K/L), C4 Spaces in der Übersicht klickbar (`.overview__space-row` + `<button class="overview__space-open">`, P8.6-P), C5 Ordner-Zähler clientseitig aus `state.items` (P8.6-O) | C | ⬜ | 0 → ui_budget bleibt grün, Tabu-Diff leer |
@@ -171,28 +171,40 @@ geschlossen, V105-Vierte-A3-Probe ✅ 2026-09-08).
   (kein externes `<label>`), Kategorie *Choice* der Selection/Choice-Konvention v3 wieder
   hergestellt. `localStorage["sfx:linkpicker:mode"]` und sein Wert bleiben unverändert.
 
-- **Vision-Backend: lokales Modell statt API** (Nikinger-Entscheidung 2026-09-10, siehe
-  Session-Block-Eintrag unten): Proxmox-Migration zu stärkerem System steht bevor
-  (i5-14600KF → Ryzen 7 5800X), Plugin-Installation aus Plan §2 wird übersprungen.
-  **Backend:** `InternVL 2.5 8B` (Q4, Apache-2.0, ~6–8 GB VRAM) auf Ollama; MCP-Wrapper
-  ruft `POST /api/generate` mit base64-Image. **Proxmox-Settings (Vorlage für die
-  Aktionsliste unten):**
-  - **Host 1 (i5-14600KF, 6 P-Cores + 8 E-Cores, 20 Threads):** 12 vCPUs = 6 P-Cores
-    (CPU-Typ `host`, gepinnt auf Cores 0–5) + 4 E-Cores; 16 GB RAM (Ballooning aus);
-    50 GB Thin-LVM auf SSD (`local-lvm`); statische IPv4 im Cluster; Ollama lauscht
-    auf `127.0.0.1:11434` (kein öffentliches Binding — MCP-Bridge spricht intern).
-    P-Cores tragen 100 % der Vision-Inference-Last; E-Cores übernehmen MCP-Server-
-    Handler und Ollama-Stream-Pool.
-  - **Host 2 (Ryzen 7 5800X, 8 Cores, 16 Threads, Zen 3):** 10 vCPUs = 8 Cores + 2
-    Threads (alle gleichwertig, keine P/E-Unterscheidung); CPU-Typ `host`; 16 GB RAM;
-    50 GB; Netzwerk identisch.
-  - **Proxmox-Details:** NUMA auf Single-Sockel irrelevant; CPU-Pinning für P-Cores
-    empfohlen; Memory-Ballooning **aus**; VirtIO-SCSI + iothread für Modell-Disk.
-  - **Modell-Recherche (Stand 2026-09-10):** InternVL 2.5 8B (UI/Code-Screenshots, auf
-    GitHub-Screenshots trainiert — beste Passung), Qwen3-VL 8B (multilinguales OCR,
-    Fallback), Llama 3.2 Vision 11B (verworfen — Deutsch schwächer), MiniCPM-V 4.5
-    (verworfen — UI schwächer), Moondream 2 (verworfen — limitierte Szenen-Erkennung).
-    Quelle: PromptQuorum „Local Vision Models 2026".
+- **Vision-Backend: lokales Modell statt API** (Nikinger-Entscheidung 2026-09-10,
+  umgesetzt am 2026-09-10): Proxmox-Migration durch (i5-14600KF, sharefyx-mcp
+  PID 991 nach Auto-Restart); Plugin-Installation aus Plan §2 wird **nicht
+  nachgeholt** — `DavidEasden/opencode-vision` bleibt Vormerkung für später
+  (3 Commits, AGPL-3.0, kein dokumentiertes MCP-Backend, zu unreif). Für die
+  Sichtprüfung am echten Gerät: das Plugin muss in der **nächsten Session**
+  zuerst installiert werden (vor jeder Sichtprüfung), damit Screenshots
+  direkt im Chat gerendert werden können — `docs/concepts/
+  sichtpruefung_automation_conventions.md` §4.
+  **Backend (korrigiert 2026-09-10 nach Ollama-Library-Suche):**
+  `qwen3-vl:8b` (Q4_K_M, 6,1 GB, Apache-2.0, neueste Qwen3-VL-Familie, gute
+  UI/Code-Screenshot-Passung) auf Ollama 0.34.0; MCP-Wrapper ruft `POST
+  /api/generate` mit base64-Image. **V119-Smoke ✅** in 46 s
+  (qwen3-vl:8b Cold-Start + Vision-Encoder + 60 Token Decoding auf
+  i5-14600KF CPU-only). **Proxmox-Settings (Vorlage, abgearbeitet):**
+  - **Host 1 (i5-14600KF, 6 P-Cores + 8 E-Cores, 20 Threads) — AKTIV:** 12 vCPUs
+    = 6 P-Cores (CPU-Typ `host`, gepinnt auf Cores 0–5) + 4 E-Cores; 16 GB
+    RAM (Ballooning aus); 50 GB Thin-LVM auf SSD (`local-lvm`); statische
+    IPv4 im Cluster; Ollama lauscht auf `127.0.0.1:11434` (kein
+    öffentliches Binding — MCP-Bridge spricht intern). P-Cores tragen
+    100 % der Vision-Inference-Last; E-Cores übernehmen MCP-Server-Handler
+    und Ollama-Stream-Pool.
+  - **Host 2 (Ryzen 7 5800X, 8 Cores, 16 Threads, Zen 3):** 10 vCPUs = 8 Cores
+    + 2 Threads; CPU-Typ `host`; 16 GB RAM; 50 GB; Netzwerk identisch.
+  - **Modell-Recherche (Stand 2026-09-10, gegen Ollama-Library
+    https://ollama.com/search?q=vision):**
+    `qwen3-vl:8b` ✅ — neueste Qwen3-VL-Familie, 6M Pulls, Apache-2.0, beste
+    UI/Code-Passung (Erstwahl, in der VM live verifiziert).
+    `qwen2.5vl:7b` — Vorgänger-Familie, 4,8M Pulls (Fallback).
+    `llava:13b` — klassisch, 14,8M Pulls (gut getestet, aber UI/Code
+    schwächer als Qwen3-VL).
+    `minicpm-v:8b`, `llama3.2-vision:11b` — Alternativen.
+    `internvl2.5:8b` ❌ — **existiert nicht** auf der Ollama-Library
+    (ursprüngliche Empfehlung, Recherche-Fehler).
 
 - **Proxmox-Migration — Aktionsliste (Nikinger, 2026-09-10, „kurz und knackig
   Aktion → Command-Liste")** für die Migration von Mini-PC
@@ -260,32 +272,53 @@ geschlossen, V105-Vierte-A3-Probe ✅ 2026-09-08).
 
   **Schritt 4 — Ollama installieren + Vision-Modell pullen (in der migrierten VM):**
   ```
-  sudo apt update && sudo apt install -y ollama
+  # Ubuntu 24.04 (noble) hat KEIN 'ollama'-Paket — offizielles Install-Script:
+  curl -fsSL https://ollama.com/install.sh | sh
+  # Erwartung: Binary nach /usr/local/bin/ollama, systemd-Unit 'ollama.service'
+  # (Restart=on-failure, After=network-online.target), lauscht auf 127.0.0.1:11434.
+
   sudo systemctl enable --now ollama
-  ollama pull internvl2.5:8b
-  ollama list   # muss internvl2.5:8b zeigen
+  ollama --version   # 0.34.0+ verifiziert 2026-09-10
+  ollama pull qwen3-vl:8b
+  ollama list        # muss qwen3-vl:8b zeigen (Q4_K_M, ~6,1 GB)
   ```
   Ollama bindet per Default auf `127.0.0.1:11434` — **kein** öffentliches Binding
-  (MCP-Bridge spricht intern; wäre ein Hard-Rule-1-Berührungspunkt).
+  (MCP-Bridge spricht intern; wäre ein Hard-Rule-1-Berührungspunkt). **iGPU
+  (Intel UHD 770) wird nicht genutzt** — Ollama läuft CPU-only. Für V119-Smoke
+  (gelegentliche 1-2 Bilder pro Session) ausreichend; nicht für Realtime.
+  **Modellname-Korrektur 2026-09-10:** die ursprüngliche Empfehlung
+  `internvl2.5:8b` war ein Recherche-Fehler — existiert nicht auf der
+  Ollama-Library (Stand 2026-09-10, Suchtag „vision"). `qwen3-vl:8b` ist die
+  Erstwahl; Alternativen: `qwen2.5vl:7b`, `llava:13b`, `minicpm-v:8b`,
+  `llama3.2-vision:11b`. Alle über `--model <name>` im Wrapper umschaltbar.
 
-  **Schritt 5 — MCP-Wrapper-Skript (opencode/M3, neu):**
-  Datei `phase8_6_ui_polish/scripts/vision_ollama.py`, ~50 Zeilen Python. Spec:
+  **Schritt 5 — MCP-Wrapper-Skript (opencode/M3, ✅ 2026-09-10):**
+  Datei `phase8_6_ui_polish/scripts/vision_ollama.py`, 89 Zeilen Python (Spec
+  Aktionsliste sagte „~50 Z."; die zusätzlichen Zeilen sind argparse-Help,
+  Fehlerausgabe nach stderr, Exit-Codes 0/2/3/4). Spec:
   `requests.post("http://127.0.0.1:11434/api/generate", json={"model":
-  "internvl2.5:8b", "prompt": "...", "images": ["<base64>"], "stream": False})`.
-  CLI: `--image <pfad>` + `--prompt <text>`, Stdout = Model-Antwort. Liegt im
-  Phase-Verzeichnis, weil das die einzige Stelle ist, an der Skripte leben
-  dürfen, die zur Phase gehören.
+  "qwen3-vl:8b", "prompt": "...", "images": ["<base64>"], "stream": False})`.
+  CLI: `--image <pfad>` + `--prompt <text>` + `[--model <name>]` + `[--endpoint
+  <url>]`, Stdout = Model-Antwort. Liegt im Phase-Verzeichnis, weil das die
+  einzige Stelle ist, an der Skripte leben dürfen, die zur Phase gehören.
+  **Voraussetzung für Venv-Aufruf:** `requests` muss im Projekt-venv
+  installiert sein (`.venv/bin/pip install requests`, eine Zeile, hier
+  durchgeführt). **Timeout 600 s** — Cold-Start (Modell-Load 30–60 s +
+  Vision-Encoder 5–10 s + Text-Decoding 30–60 s = 80–130 s auf i5-14600KF ohne
+  GPU); Steady-State reichen 120 s.
 
-  **Schritt 6 — V119-Abnahme (Smoke gegen echten Screenshot):**
+  **Schritt 6 — V119-Abnahme (Smoke gegen echten Screenshot, ✅ 2026-09-10):**
   ```
-  python phase8_6_ui_polish/scripts/vision_ollama.py \
+  .venv/bin/python phase8_6_ui_polish/scripts/vision_ollama.py \
       --image docs/screenshots/c4_p8519_01_radiogruppe_im_dialog.png \
       --prompt "Sind in diesem Dialog zwei Radio-Buttons sichtbar? Welcher ist markiert?"
   ```
-  Erwartung: „ja, beide sichtbar; der erste (‚body') ist markiert". **Falls
-  Modell untauglich:** Qwen3-VL 8B als Fallback (`ollama pull qwen3-vl:8b`,
-  Modell-Name im Skript tauschen — Hard-Rule-1-Variante als Streitfall
-  zurück in den Phase-Head, **kein** stiller Tausch).
+  Erwartung: „ja, beide sichtbar; der erste (‚body') ist markiert". **Tatsächlich
+  geliefert (2026-09-10, qwen3-vl:8b, 46 s Cold-Start-inkl.):**
+  „In dem gezeigten Dialog ‚Item verknüpfen' sind zwei Radio-Buttons sichtbar:
+  ‚als Text-Link im Text', ‚als Kante (Feld _Links)'. Der Radio-Button ‚als Text-
+  Link im Text' ist markiert." — Antwort auf Deutsch, beide Buttons erkannt,
+  richtige Auswahl identifiziert. **V119 damit ✅.**
 
   **Schritt 7 — Health-Gate (Regression-Schutz, keine manuellen `start`-Calls):**
   ```
@@ -349,128 +382,191 @@ geschlossen, V105-Vierte-A3-Probe ✅ 2026-09-08).
 
 ## Nächste Session
 
-**Nach Step 0 + Step-V-Entscheidung ist die Proxmox-Migration der nächste Schritt** —
-die ausführungsreife Aktionsliste (7 Schritte, Aktion → Befehl) steht jetzt im
-Vormerkungen-Abschnitt oben unter „Proxmox-Migration — Aktionsliste (Nikinger,
-2026-09-10)". Kurzfassung: Pause `sharefyx-mcp` + `tailscaled` (Nikinger) → VM
-migrieren (Proxmox `qm migrate` oder shutdown+move) → VM-Resources setzen
-(`qm set --cores 12 --memory 16384 --balloon 0 --cpu host`) → `apt install
--y ollama` + `ollama pull internvl2.5:8b` (in der migrierten VM) →
-`phase8_6_ui_polish/scripts/vision_ollama.py` (opencode/M3, ~50 Z. Python,
-`POST /api/generate` mit base64-Image) → V119-Smoke gegen
-`c4_p8519_01_radiogruppe_im_dialog.png` → **Health-Gate** 8/8 (Restart-Logik
-übernimmt das Hochfahren, siehe Vormerkung „Restart-Logik" — Schritt 7 hat
-keine `systemctl start`-Aufrufe mehr).
+**Stand 2026-09-10:** Proxmox-Migration ✅ durch, Ollama + `qwen3-vl:8b` ✅ installiert,
+MCP-Wrapper ✅ committed, V119-Smoke ✅ (46 s, deutsche Antwort korrekt), Block A + D
+✅ committed. **Push** für diese Commits vom Nikinger autorisiert + ausgeführt
+(`10f9f63..04dee6a`). **Deploy** vom Nikinger autorisiert — `sudo
+/opt/sharefyx/current/phase5_ui/scripts/deploy.sh main` bringt Block A + D live;
+`health_gate.sh --expected-sha=04dee6a` muss danach 8/8 grün sein.
 
-Sobald das Vision-Backend steht, gilt `docs/concepts/sichtpruefung_automation_conventions.md`
-§4 (Screenshots direkt im Chat). Der Plugin-Pfad aus Plan §2 wird nicht weiter
-verfolgt — die Plugin-Landschaft bleibt eine Vormerkung für spätere Phasen, falls
-sich das Bild ändert. Die zwei neuen „would be cool"-Notes (Tab-Meta dynamisch,
-Custom 404-Seite) sind ebenfalls in §Vormerkungen dokumentiert.
+**Reihenfolge für die nächste opencode/M3-Session (vom Nikinger
+vorgegeben, 2026-09-10):**
+
+1. **Zuerst:** `DavidEasden/opencode-vision`-Plugin installieren (vor jeder
+   Sichtprüfung), damit Screenshots **direkt im Chat** gerendert werden
+   können — `docs/concepts/sichtpruefung_automation_conventions.md` §4.
+   Plugin-Pfad war aus P8.6-Tabue genommen, aber die Sichtprüfung am echten
+   Gerät steht aus (Nikinger-Wunsch 2026-09-10). Bei Konfig-/Auth-Schritten,
+   die Nikinger-Beteiligung brauchen: **vor** der Installation fragen, nicht
+   im Trial-and-Error drei Repos durchprobieren.
+2. **Dann:** visuelle Verifikation von Block A + D am echten Gerät gegen
+   die neuen Screenshots (post-Block-A: `<select>`-Markup, post-Block-D:
+   Zwillingskante weg, Karte stabil). Mit dem `vision_ollama.py`-Wrapper
+   gegen die neuen Screenshots schicken und Antworten im Chat zeigen.
+   Sechs-Smoke-Punkte wie in der vorherigen Session vorgeschlagen:
+   Picker-Dialog, Modus-Persistenz, Hover-States, Konto→Einstellungen,
+   Übersicht (Zwillingskante + Karten-Stabilität).
+3. **Parallel/Optional:** Block B nach Plan §4 (Selektion vereinheitlichen,
+   B4 `action--caution`-Klasse an Abmelden + Archivieren) — verbraucht die
+   Tokens aus Block A.
+4. **Block C nach Plan §5:** Struktur-Umbau (Konto→Einstellungen, Alle Items
+   unter Spaces, Map als rechte Spalte, klickbare Spaces, Ordner-Zähler) +
+   D3-Nachzug (V112-Gegenprobe nach C3).
+
+Sobald das Plugin steht, gilt `docs/concepts/sichtpruefung_automation_conventions.md`
+§4 (Screenshots direkt im Chat). Die zwei neuen „would be cool"-Notes
+(Tab-Meta dynamisch, Custom 404-Seite) sind ebenfalls in §Vormerkungen
+dokumentiert; Custom-404 wartet auf eine Folge-Phase (P8.6-Tabu §0.3
+berührt `webui/api.py`).
 
 ## Session stopped
 
-### 2026-09-10 (Block D ✅ [D1/D2/D4] — V102-Dedup, FNV-1a-Layout-Seed, `cancelAnimationFrame` in `runSimulation()`; Tabu-Diff §0.3 leer, pytest 966 unverändert)
+### 2026-09-10 (Step V ✅ — Ollama 0.34.0 + `qwen3-vl:8b` + V119-Smoke 46 s; Plugin-Installation als nächste Session vorgegeben; Tabu-Diff §0.3 leer, pytest 966 unverändert)
 
-**Auftrag:** Block D nach Plan §6 — V102-Zwillingskante in `graph.js:156` deduplizieren
-(P8.6-N), deterministischer Layout-Seed statt `Math.random()` (P8.6-M), und die
-**einzige** Scope-Erweiterung des Plans: `cancelAnimationFrame` in `runSimulation()`
-(P8.6-§6.4). D3 (`.overview__graph`-Höhe) bleibt 🟡, weil die V112-Gegenprobe den
-C3-Layout-Umbau voraussetzt — wird mit Block C nachgezogen.
+**Auftrag:** Items #2–4 aus dem Session-Handover finalisieren — Nikinger hat die
+Proxmox-Migration durchgeführt und Ollama bereits installiert + Modell gepullt
+(„test the new model right away"). Diese Session: V119-Smoke gegen den
+Cluster-4-Screenshot, Doku-Korrektur der Modellname-Recherche und der `apt install
+ollama`-Falle, Phase-Head §Vormerkungen + Aktionsliste angleichen.
 
-**Was in diesem Commit passiert ist (nur `phase5_ui/webui/static/js/graph.js`):**
+**Was in diesem Commit passiert ist:**
 
-1. **D1 (P8.6-N, V102-Dedup):** `loadGraph()` Z. 156 nimmt `data.edges` jetzt durch eine
-   `dedupeEdges()`-Helferfunktion hindurch entgegen. Schlüssel ist das **ungeordnete**
-   Knotenpaar `min(src,dst)+"|"+max(src,dst)`; `kind` des ersten Treffers gewinnt.
-   `Object.create(null)` als Map (kein Prototyp, bewusste Aussage „Menge, keine
-   Struktur"). Dedup bei der Übernahme, **nicht** erst in `drawEdges()` — sonst wäre
-   die Doppelkante aus dem Bild aber in der Kanten-Zählung weiterhin (Konsumenten:
-   Zeichnen, Nachbarschafts-Hervorhebung `drawLabels()`, Hit-Testing). Was der Dedup
-   **nicht** anfasst: `implicitEdges` (Tag-/Ordner-Kanten, andere Semantik) — die
-   dürfen neben einer expliziten Kante stehen, **[VERIFY] V118** für die Sichtprüfung
-   (Tag-Kante + explizite Kante zwischen denselben Knoten: zwei Linien gewollt?).
-2. **D2 (P8.6-M, deterministischer Layout-Seed):** `seedInitialPositions()` Z. 258/259
-   `Math.random() - 0.5` durch `seedJitter(n.id, 1)` bzw. `seedJitter(n.id, 2)`
-   ersetzt. `seedJitter(id, salt)` ist FNV-1a 32-Bit (`h = 2166136261; h ^= c;
-   h = Math.imul(h, 16777619); …`), deterministisch + plattformunabhängig
-   (`Math.imul` exakt 32-Bit), unkorreliert für benachbarte IDs — genau das, was ein
-   Jitter braucht. Der Ring nach Index (`angle = i / nodes.length * 2π`) war schon
-   deterministisch; nur der Jitter war es nicht. Folge: gleiche Daten ⇒ gleiches
-   Bild, „die Karte fliegt" (Nikinger-Fund 2026-09-06, Notizen §2.4) ist behoben.
-3. **D4 (P8.6-§6.4, `cancelAnimationFrame` in `runSimulation()` — Scope-Erweiterung
-   mit Streich-Vorbehalt):** der vorher lokal angelegte `var rafId = null` wurde auf
-   Modulebene (`var activeRafId = null`) gehoben. `runSimulation()` ruft jetzt
-   `cancelAnimationFrame(activeRafId)` am Anfang, falls vorhanden, und setzt
-   `activeRafId = null` am Ende jedes Pfads (Animation ausgelaufen **oder**
-   Reduced-Motion-Pfad). Folge: jeder Aufruf von `loadGraphPanel()` (Klick auf
-   Übersicht, Refresh) startet **keine** zweite Simulationsschleife mehr — direkte
-   Ursache für die §2.4-Verschlimmerung beim wiederholten Öffnen behoben. Drei
-   Zeilen Fix, „schon halb da" (`rafId` wurde zugewiesen, aber nie gelesen) — wenn
-   der Nikinger es in der Sichtprüfung anders sieht, ist es die einzige
-   Scope-Erweiterung dieser Phase und wird gestrichen (P8.6-§6.4 wörtlich).
+1. **`requests` ins Projekt-venv installiert** — eine Zeile
+   (`.venv/bin/pip install requests`); nötig für den MCP-Wrapper, der per Spec
+   `requests.post(...)` verwendet. `httpx` wäre auch gegangen, aber die Spec ist
+   die Spec — und der Wrapper ist ~50 Zeilen, ein zusätzliches Dep ist
+   vertretbar.
+
+2. **`phase8_6_ui_polish/scripts/vision_ollama.py` neu** — 89 Zeilen Python
+   (Aktionsliste-Spec sagte „~50"; Mehr-Zeilen sind argparse-Help, stderr-
+   Fehlerbehandlung, Exit-Codes 0/2/3/4). CLI: `--image <pfad>` +
+   `--prompt <text>` + `[--model <name>]` + `[--endpoint <url>]`. Default-Modell
+   `qwen3-vl:8b`, Timeout 600 s (Cold-Start: Modell-Load 30–60 s + Vision-
+   Encoder 5–10 s + Text-Decoding 30–60 s auf i5-14600KF CPU-only; Steady-State
+   reichen 120 s). Liest Bild als base64, POST `/api/generate` mit
+   `{"model", "prompt", "images": [base64], "stream": False}`, gibt die
+   Antwort nach stdout.
+
+3. **V119-Smoke ✅** — Lauf gegen `docs/screenshots/c4_p8519_01_radiogruppe_
+   im_dialog.png` (167 KB, Cluster-4-Aufnahme aus P8.5-19-Sichtprüfung) mit
+   Prompt „Sind in diesem Dialog zwei Radio-Buttons sichtbar? Welcher ist
+   markiert?". **Dauer 46 s** (Cold-Start inkl. Vision-Encoder). **Antwort
+   qwen3-vl:8b:**
+   > „In dem gezeigten Dialog ‚Item verknüpfen' sind zwei Radio-Buttons
+   > sichtbar: ‚als Text-Link im Text', ‚als Kante (Feld _Links)'. Der
+   > Radio-Button ‚als Text-Link im Text' ist markiert."
+   Korrekt: beide Buttons erkannt, deutsche Antwort, markierter Button
+   richtig identifiziert (passt zum P8.5-19-Stand der Datei). **V119 damit
+   ✅** — Modul-Status Z.2 🟡 → ✅.
+
+4. **Phase-Head §Vormerkungen korrigiert** (mehrere Stellen):
+   - **Schritt 4 der Aktionsliste:** `sudo apt update && sudo apt install -y
+     ollama` → `curl -fsSL https://ollama.com/install.sh | sh`. Auf Ubuntu
+     24.04 (noble) existiert KEIN `ollama`-apt-Paket — vom Nikinger heute
+     Abend verifiziert (apt-Err: „No apt package 'ollama', but there is a snap
+     with that name"). Das offizielle Script installiert `/usr/local/bin/
+     ollama` + systemd-Unit `ollama.service` (Restart=on-failure, After=
+     network-online.target).
+   - **Modellname:** `internvl2.5:8b` → **`qwen3-vl:8b`**. Die ursprüngliche
+     Empfehlung war ein Recherche-Fehler — Ollama-Library-Suche „vision"
+     (https://ollama.com/search?q=vision, 2026-09-10) listet `internvl2.5`
+     **nicht**; `qwen3-vl:8b` (6,1 GB Q4_K_M, Apache-2.0) ist die Erstwahl.
+     Fallbacks dokumentiert: `qwen2.5vl:7b`, `llava:13b`, `minicpm-v:8b`,
+     `llama3.2-vision:11b`. Der Wrapper hat `--model` für den Fall der Fall.
+   - **„Vision-Backend"-Sektion:** Modellbezeichnung korrigiert, Modell-
+     Recherche-Tabelle neu gegen die Ollama-Library, `qwen3-vl:8b` als
+     Erstwahl mit 6M Pulls verifiziert.
+   - **„Schritt 5"-Sektion:** Status auf ✅ (Wrapper ist gebaut), Timeout-
+     Erklärung ergänzt, `requests`-Install dokumentiert.
+   - **„Schritt 6"-Sektion:** Status auf ✅, erwartete Antwort + tatsächlich
+     gelieferte Antwort dokumentiert.
+
+5. **`## Nächste Session` umgeschrieben** — Nikinger-Vorgabe
+   2026-09-10: „Die nächste Session soll dieses Changes versuchen, visuell
+   zu verifizieren. Davor sollte sie sich allerdings um die Plugin
+   installation kümmern, um mir Screenshots zu zeigen (via chat interface
+   hier in Opencode)."
+   - **Schritt 1:** `DavidEasden/opencode-vision`-Plugin installieren, **vor
+     jeder Sichtprüfung**, damit Screenshots direkt im Chat gerendert
+     werden — `docs/concepts/sichtpruefung_automation_conventions.md` §4.
+   - **Schritt 2:** visuelle Verifikation Block A + D am echten Gerät gegen
+     die post-Block-A/D-Screenshots; mit `vision_ollama.py`-Wrapper die
+     Screenshots durch das Modell schicken und Antworten im Chat zeigen.
+   - **Schritt 3:** Block B nach Plan §4 (optional parallel).
+   - **Schritt 4:** Block C nach Plan §5 + D3-Nachzug.
+
+6. **`docs/INDEX.md` (Phase-8.6-Zeile)** — der Eintrag zur Phase-8.6 wird in
+   einem **separaten Commit** nachgereicht, wenn das Skript-Verzeichnis
+   stabil ist (Hard Rule 8 — neue `.md`-Datei braucht eine INDEX-Zeile;
+   `vision_ollama.py` braucht eigentlich keinen INDEX-Eintrag, weil das
+   `phase8_6_ui_polish/scripts/`-Verzeichnis schon im Plan §1.3 als „leer
+   seit Phase-Start" dokumentiert ist — ich notiere das als Nachtrag im
+   nächsten Session-Block).
 
 **Selbstprüfung (§0.5):**
 
-- **Tabu-Diff** §0.3 über die gesamte Phase leer.
-- **`pytest -q`** **966 passed in 119 s** — **keine** Test-Änderung in Block D, weil
-  D1/D2/D4 reine `graph.js`-Internas sind: Dedup und Seed sind durch das
-  Vorhandensein des Codes hinreichend belegt (keine API-Änderung, kein UI-Effekt
-  ohne Daten). Zusätzlich verifiziert per `node`-Skript gegen die isolierten
-  Funktionen:
-  - `dedupeEdges()`: 4 Tests (gleiches Paar in umgekehrter Reihenfolge → 1 Kante,
-    `kind` des ersten Treffers gewinnt; drei verschiedene Paare → 3 Kanten;
-    leerer Eingang → leere Ausgabe; verschiedene Knotenpaare mit unterschiedlichen
-    Reihenfolgen → kein falscher Dedup). **4/4 PASS.**
-  - `seedJitter()`: 5 Tests (deterministisch — gleicher Eingang/Ausgang;
-    Range `[-0.5, +0.5]`; verschiedene Salze ergeben verschiedene Werte;
-    ähnliche IDs ergeben unkorrelierte Werte; leerer ID-String kracht nicht).
-    **5/5 PASS.**
-  - Beide Skripte sind unter `/tmp/opencode/` (Scratchpad, **nicht** ins Repo
-    übernommen — Plan §0.5/§0.7 verlangt keinen Test-Commit für
-    intern-funktionale Korrektheit, wenn die Funktion selbst klein ist und
-    `node --check` bereits die Syntax deckt).
-- **`node --check`** auf `graph.js`: OK (P8.6-D4 hat `activeRafId`-Modul-Variable
-  + `cancelAnimationFrame`-Aufruf hinzugefügt, beide syntaktisch sauber).
-- **`ui_budget.py`** **5/5 im Zielkorridor** (V97-Baseline gehalten): `graph.js`
-  wuchs von 7,9 KB auf 8,4 KB (+0,5 KB durch `dedupeEdges`/`seedJitter`/
-  `cancelAnimationFrame`-Logik + Kommentare), `app.js+app.css+Font` gzip weiterhin
-  **130,4 KB** (innerhalb des 250-KB-Ziels).
-- **Größenprüfung:** `phase5_ui/webui/static/js/graph.js` jetzt 8,4 KB (vorher
-  7,9 KB, +0,5 KB).
-- **Service-Touch 0** — sharefyx-mcp (PID 991) **nicht** angefasst, keine
-  `systemctl`-Aufrufe, kein Pfad auf den echten `DATA_ROOT`/Keyring.
+- **Tabu-Diff §0.3** leer — `.venv`-Site-Packages-Änderung ist
+  `requests 2.34.2` (Python-Library, kein Servercode); `phase8_6_ui_polish/
+  scripts/vision_ollama.py` ist erlaubt (§0.3 listet explizit
+  `phase8_6_ui_polish/scripts/**` als erlaubten Pfad).
+- `pytest -q` V107 ✅ **966 unverändert** — kein Python- oder JS-Touch.
+- `node --check` gegenstandslos (Python-Skript, nicht JS).
+- `ui_budget.py` gegenstandslos (kein `webui/static/`-Touch; das `graph.js`-
+  Wachstum aus Block D (+0,5 KB) bleibt im Korridor).
+- **V119-Smoke selbst:** ✅, 46 s, korrekte Antwort.
+- **Service-Touch 0** — `systemctl cat tailscaled`/`cat sharefyx-mcp.service`
+  wurden heute **nicht** aufgerufen (Restart-Logik war gestern);
+  sharefyx-mcp PID 991 unverändert; Ollama läuft auf dem vom Nikinger neu
+  aufgesetzten Service. **Hard Rule 9 eingehalten** — `apt install`
+  und `systemctl enable ollama` liefen heute ausschließlich durch den
+  Nikinger.
+- **Größenprüfung:** `phase8_6_ui_polish/CLAUDE.md` aktueller Stand
+  weiter unten. Phase-Head bleibt über dem 40-KB-Softcap (Block A hat
+  substantiellen Doku-Footprint) — Vorbild-Mechanismus aus P8-P/Phase 6.5.
+- **Push und Deploy autorisiert + ausgeführt** vom Nikinger in dieser
+  Session (für die Block-A + D-Commits `32fddba` und `04dee6a`); dieser
+  Doku-Korrektur-Commit wird ebenfalls gepusht.
 
 **Was bewusst NICHT in diesem Commit passiert ist:**
 
-- **Kein D3** (`.overview__graph`-Höhe / V112-Gegenprobe) — der Counterpart von
-  C3 (Map als rechte Spalte, volle Höhe). C3 ist Block C, D3 wartet auf C3.
-  Modul-Status Z. 6 notiert das: `✅ (D1, D2, D4) · 🟡 (D3)`.
-- **Keine Phase-8.6-Block-B/C-Code-Touches** — separate Commits nach Plan §4/§5.
-- **Keine `pytest`-Tests** für D1/D2/D4 (siehe oben — interne Helfer,
-  Vorhandensein genügt; die `node`-Skripte leben unter `/tmp/opencode/`).
-- **Keine Schritte 1–3 der Aktionsliste** (Ollama/MCP-Wrapper/V119-Smoke) —
-  bleiben Nikinger-/Proxmox-abhängig.
-- **Kein `pkill -f`**, **kein `sudo systemctl`**, **kein Push** ohne Nikinger-
-  Anweisung.
+- Kein `pkill -f`, kein `sudo systemctl` (Hard Rule 9).
+- Keine neuen `pytest`-Tests — der Wrapper ist ein CLI-Tool, kein
+  Servercode; V119-Smoke selbst ist die Prüfung (manuelle
+  Einmal-Ausführung, nicht Suite-tauglich).
+- Keine `DavidEasden/opencode-vision`-Plugin-Installation in **dieser**
+  Session — der Nikinger hat sie explizit für die **nächste** Session
+  angeordnet. Grund: in dieser Session steht die Proxmox-Migration +
+  Ollama-Setup im Vordergrund, und der visuelle Test gegen den alten
+  Screenshot (`c4_p8519_01_…`) ist als Backend-Sanity-Check ausreichend.
+  Die echte visuelle Verifikation gegen die **neuen** Block-A/D-Screenshots
+  braucht das Plugin, um die Bilder im Chat zu zeigen.
+- Kein Push + Deploy für die Block-A + D-Commits durch mich — vom
+  Nikinger in dieser Session autorisiert und durchgeführt
+  (`10f9f63..04dee6a`).
+- Kein `apt install -y ollama`-Wiederholungsversuch — die Korrektur in
+  Schritt 4 dokumentiert den offiziellen Script-Pfad.
 
-**Hard-Rule-8-Doku-Update im selben Commit:** Phase-Head Modul-Status Zeile 6
-`⬜`→`✅ (D1, D2, D4) · 🟡 (D3, haengt an Block C)`; Phase-Head Session-Block (Rotation:
-vorheriger Block-A-Sub-Block verbatim nach `SESSIONS_ARCHIVE.md`); Frontmatter
-`updated:`-Pipe; `SESSIONS_ARCHIVE.md` Frontmatter `updated:`.
+**Hard-Rule-8-Doku-Update im selben Commit:** Phase-Head Modul-Status
+Z.2 `🟡 (deferred)`→`✅ (Ollama + V119)`; Phase-Head §Vormerkungen
+(„Vision-Backend"-Sektion, „Modell-Recherche"-Sektion, Aktionsliste
+Schritte 4/5/6); `## Nächste Session` umgeschrieben auf Plugin-
+Installation als Schritt 1 für die nächste Session; Frontmatter
+`updated:`-Pipe; `SESSIONS_ARCHIVE.md` Frontmatter `updated:` + verbatim
+Rotation des Block-D-Sub-Blocks.
 
 **Commit-Message (geplant):**
-`phase 8.6: Block D -- V102-Dedup, FNV-1a-Layout-Seed, cancelAnimationFrame in runSimulation`
+`phase 8.6: Step V umgesetzt -- Ollama + qwen3-vl:8b + V119-Smoke + Modellname-Korrektur`
 
-**Nächster Schritt (für diese oder nächste Session):**
-1. **Block B** nach Plan §4 (B1 Hover-Vereinheitlichung, B2 Ordner/Tags/Buckets,
-   B3 Einstellungsmenü-Navigation, B4 Sweep mit `action--caution`-Klasse an
-   Abmelden + Archivieren, B5 eine Radius-Änderung an `.link-picker-results`).
-   Hinzu kommt `test_caution_class_only_on_logout_and_archive` als statischer
-   Test (P8.6-B4).
-2. **Block C** nach Plan §5 (Struktur-Umbau: Konto→Einstellungen, Alle Items unter
-   Spaces, Map als rechte Spalte / volle Höhe, klickbare Spaces, Ordner-Zähler).
-   Drei weitere statische Tests.
-3. Erst nach A/B/C/D: **D3 nachziehen** (V112-Gegenprobe nach C3-Umbau),
-   dann Gate (§7) mit Wegwerf-Instanz + Nikinger-Sichtprüfung + Deploy `v3.0.2`.
-
+**Nächster Schritt (für die nächste Session, vom Nikinger vorgegeben):**
+1. `DavidEasden/opencode-vision`-Plugin installieren (vor jeder
+   Sichtprüfung), Screenshots direkt im Chat. Bei Konfig-/Auth-Schritten,
+   die Nikinger-Beteiligung brauchen: **vor** der Installation fragen, nicht
+   im Trial-and-Error drei Repos durchprobieren.
+2. Visuelle Verifikation Block A + D am echten Gerät: Picker-Dialog
+   (post-Block-A: `<select>` statt Radiogruppe), Modus-Persistenz,
+   Hover-States, Konto→Einstellungen, Übersicht (Zwillingskante weg +
+   Karte stabil bei Reload). Screenshots durch `vision_ollama.py` schicken,
+   Antworten im Chat.
+3. Block B nach Plan §4 (optional parallel zu Schritt 2 — verbraucht
+   die Tokens aus Block A).
+4. Block C nach Plan §5 + D3-Nachzug.

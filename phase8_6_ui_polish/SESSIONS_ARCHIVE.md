@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-10 (Fünfter archivierter Sub-Block — „Block A — Fundament" verbatim aus dem Phase-Head hierher rotiert vor dem Block-D-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-D-Sub-Block, SESSIONS_ARCHIVE jetzt L3-exempt mit fünf Sub-Blöcken)
+updated: 2026-09-10 (Sechster archivierter Sub-Block — „Block D [D1/D2/D4]" verbatim aus dem Phase-Head hierher rotiert vor dem Step-V-umgesetzt-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Step-V-umgesetzt-Sub-Block, SESSIONS_ARCHIVE jetzt L3-exempt mit sechs Sub-Blöcken)
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -593,3 +593,38 @@ dass Block B/C/D die Tokens verbrauchen, ohne selbst welche anzulegen.
 4. Erst nach A/B/C/D: Gate (§7) mit Wegwerf-Instanz + Nikinger-Sichtpruefung +
    Deploy `v3.0.2`.
 
+
+---
+
+### 2026-09-10 (Block D ✅ [D1/D2/D4] — V102-Dedup, FNV-1a-Layout-Seed, `cancelAnimationFrame` in `runSimulation()`; Tabu-Diff §0.3 leer, pytest 966 unverändert)
+
+**Auftrag:** Block D nach Plan §6 — V102-Zwillingskante in `graph.js:156` deduplizieren
+(P8.6-N), deterministischer Layout-Seed statt `Math.random()` (P8.6-M), und die
+**einzige** Scope-Erweiterung des Plans: `cancelAnimationFrame` in `runSimulation()`
+(P8.6-§6.4). D3 (`.overview__graph`-Höhe) bleibt 🟡, weil die V112-Gegenprobe den
+C3-Layout-Umbau voraussetzt — wird mit Block C nachgezogen.
+
+**Was in diesem Commit passiert ist (nur `phase5_ui/webui/static/js/graph.js`):**
+
+1. **D1 (P8.6-N, V102-Dedup):** `loadGraph()` Z. 156 nimmt `data.edges` jetzt durch eine
+   `dedupeEdges()`-Helferfunktion hindurch entgegen. Schlüssel ist das **ungeordnete**
+   Knotenpaar `min(src,dst)+"|"+max(src,dst)`; `kind` des ersten Treffers gewinnt.
+   `Object.create(null)` als Map (kein Prototyp, bewusste Aussage „Menge, keine
+   Struktur"). Dedup bei der Übernahme, **nicht** erst in `drawEdges()` — sonst wäre
+   die Doppelkante aus dem Bild aber in der Kanten-Zählung weiterhin (Konsumenten:
+   Zeichnen, Nachbarschafts-Hervorhebung `drawLabels()`, Hit-Testing). Was der Dedup
+   **nicht** anfasst: `implicitEdges` (Tag-/Ordner-Kanten, andere Semantik) — die
+   dürfen neben einer expliziten Kante stehen, **[VERIFY] V118** für die Sichtprüfung
+   (Tag-Kante + explizite Kante zwischen denselben Knoten: zwei Linien gewollt?).
+2. **D2 (P8.6-M, deterministischer Layout-Seed):** `seedInitialPositions()` Z. 258/259
+   `Math.random() - 0.5` durch `seedJitter(n.id, 1)` bzw. `seedJitter(n.id, 2)`
+   ersetzt. `seedJitter(id, salt)` ist FNV-1a 32-Bit (`h = 2166136261; h ^= c;
+   h = Math.imul(h, 16777619); …`), deterministisch + plattformunabhängig
+   (`Math.imul` exakt 32-Bit), unkorreliert für benachbarte IDs — genau das, was ein
+   Jitter braucht. Der Ring nach Index (`angle = i / nodes.length * 2π`) war schon
+   deterministisch; nur der Jitter war es nicht. Folge: gleiche Daten ⇒ gleiches
+   Bild, „die Karte fliegt" (Nikinger-Fund 2026-09-06, Notizen §2.4) ist behoben.
+3. **D4 (P8.6-§6.4, `cancelAnimationFrame` in `runSimulation()` — Scope-Erweiterung
+   mit Streich-Vorbehalt):** der vorher lokal angelegte `var rafId = null` wurde auf
+   Modulebene (`var activeRafId = null`) gehoben. `runSimulation()` ruft jetzt
+   `cancelAnimationFrame(activeRafId)` am Anfang, falls vorhanden, und setzt
