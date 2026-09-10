@@ -9,7 +9,7 @@ down:
   - ../docs/concepts/p8x_ui_polish_notes.md       # Inhaltsquelle §1–§10 (P8.6-A benennt das Verzeichnis)
   - ../docs/concepts/PHASE8_5_CLOSEOUT_HANDOVER.md   # Einstieg für die P8.6-Planung; §4 = die offenen Entscheidungen
   - SESSIONS_ARCHIVE.md                            # ältere Session-Blöcke, newest-first
-updated: 2026-09-10 (Step 0 ✅ — Haushalt: Phasenverzeichnis angelegt, sechs kaputte `up:`/`down:`-Links in `p8x_ui_polish_notes.md` gefixt, vier fehlende L1-Cards ergänzt, drei `down:`-Listen korrigiert, `docs/INDEX.md` auf ≤ 38 KB komprimiert, zwei INDEX-Zeilen ergänzt + zwei Drift-Korrekturen; **pytest V107 ✅ 964 passed**, **ui_budget V97 ✅ 130,1 KB**, **V108 offen 863 ms** `_overview`-Latenz, **V106 Sammelmarker offen**, **V110/V112/V114/V115/V117/V119 Block-VERIFY offen**)
+updated: 2026-09-10 (Step V deferred — Nikinger-Entscheidung: **lokales Vision-Modell** auf Proxmox-Migration (i5-14600KF primär, danach Ryzen 7 5800X) statt Anthropic-Haiku-API. Backend **`InternVL 2.5 8B`** (Apache-2.0, Q4, ~6–8 GB VRAM) auf Ollama; MCP-Wrapper ruft `POST /api/generate` mit base64-Image. Proxmox-Settings (Vorlage für Aktionsliste der nächsten Session) detailliert in §Vormerkungen + Session-Stopped-Sub-Block; Modell-Recherche gegen PromptQuorum „Local Vision Models 2026" — InternVL 2.5 8B (beste UI/Code-Passung), Qwen3-VL 8B (Fallback multilinguales OCR), Llama 3.2 Vision/MiniCPM-V/Moondream (verworfen). Plugin-Pfad (`DavidEasden/opencode-vision`) als Vormerkung zurückgestellt — 3 Commits, AGPL-3.0, kein dokumentiertes MCP-Backend, zu unreif. Kein Code-Touch; nachträglicher Commit nach Step-0-Commit `440e462`) | 2026-09-10 (Step 0 ✅ — Haushalt: Phasenverzeichnis angelegt, sechs kaputte `up:`/`down:`-Links in `p8x_ui_polish_notes.md` gefixt, vier fehlende L1-Cards ergänzt, drei `down:`-Listen korrigiert, `docs/INDEX.md` auf ≤ 38 KB komprimiert, zwei INDEX-Zeilen ergänzt + zwei Drift-Korrekturen; **pytest V107 ✅ 964 passed**, **ui_budget V97 ✅ 130,1 KB**, **V108 offen 863 ms** `_overview`-Latenz, **V106 Sammelmarker offen**, **V110/V112/V114/V115/V117/V119 Block-VERIFY offen**)
 ---
 # CLAUDE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes (`phase8_6_ui_polish/`)
 
@@ -117,7 +117,7 @@ Entscheidungen P8.6-A–P8.6-U, Tabu-Liste, Schritt-Sequenz, Testliste, Abnahmez
 | # | Modul | Step | Status | Tests |
 |---|---|---|---|---|
 | 1 | Step 0 — Haushalt + Skelett: Phasenverzeichnis angelegt, sechs kaputte `up:`/`down:`-Links in `p8x_ui_polish_notes.md` gefixt, vier fehlende L1-Cards ergänzt (PROJECT_SESSION_LOG, SICHTPRUEFUNG_RESTBLOCK, SICHTPRUEFUNG_WALKTHROUGH, CLUSTER3_TESTBLOCK), drei `down:`-Listen im Inline-Format korrigiert (phase6_5_tools_images_plan, GLOBAL_SEARCH_PLAN, IMAGES_PLAN), `docs/INDEX.md` auf ≤ 38 KB komprimiert, zwei fehlende INDEX-Zeilen ergänzt (CLUSTER3_TESTBLOCK, THIRD_PARTY_LICENSES), zwei Drift-Korrekturen (`phase8_ui_graph` Softcap-Notiz + `phase5_ui` Behauptung widerrufen), Phasen-Head angelegt | 0 | ✅ | 0 (Skelett, wie P1/P6/6.5/7/8 Step 0) |
-| 2 | Step V — OpenCode-Vision-Plugin (`DavidEasden/opencode-vision`) installieren und gegen einen echten Screenshot verifizieren (`V119`); bei Scheitern aller drei Kandidaten: Befund protokollieren, Phase wartet nicht | V | ⬜ | 0 (kein Code-Commit, Ergebnis im Head protokolliert) |
+| 2 | Step V — **aufgeschoben** (Nikinger-Entscheidung 2026-09-10): Proxmox-Migration des Hosts steht bevor (i5-14600KF, dann Ryzen 7 5800X), Plugin-Installation übersprungen. **Backend:** lokales Vision-Modell `InternVL 2.5 8B` (Q4, Apache-2.0) auf Ollama-Basis statt Anthropic-Haiku-API. Begründung: Hardware-Migration macht lokalen Modell-Server sinnvoll, Proxmox-VM-Migration ist trivial, lokales Modell vermeidet Vendor-Lock-in + Audit-Trail-Aufwand. Vollständige Settings + Modell-Recherche: siehe Session-Block-Eintrag 2026-09-10 („Step V aufgeschoben") und Vormerkungen. | V | 🟡 (deferred — Entscheidung dokumentiert) | 0 (kein Code-Commit; nächste Session liefert Aktion → Command-Liste für Migration + Ollama-Setup + MCP-Wrapper) |
 | 3 | Block A — Fundament: A1 Radiogruppe → `<select, (P8.6-H/I), A2 Layer-/Selektions-Tokens (`--bg-void`/`--select-fill`/`--select-fill-quiet`/`--select-line`/`--select-line-quiet`/`--caution`, P8.6-C/D/E/F), A3 `--border-soft`-Renderfehler-Fix (`app.css:1270/1276` → `var(--line)`, Plan §3.3), A4 Konvention v3 um fünfte Kategorie „Vorsicht" in `phase8_ui_graph/CLAUDE.md` §Selection/Choice-Konvention v3 (P8.6-G) | A | ⬜ | 0 → +7 statische Tests (`test_link_picker_uses_a_select_not_a_radio_group`, `test_no_raw_accent_rgba_outside_root`, `test_every_css_var_reference_is_defined`, `test_rail_order_settings_before_tree_logout_last`, `test_account_button_says_einstellungen`, `test_caution_class_only_on_logout_and_archive`, `test_overview_graph_has_no_max_width`) |
 | 4 | Block B — Selektion vereinheitlichen: B1 Hover = leise Standardauswahl überall (`var(--select-fill-quiet)` + `outline`), B2 Ordner/Tags/Buckets prüfen, B3 Einstellungsmenü (`#account-show-updates`/`#account-manage-spaces` Navigation), B4 Sweep „alles Klickbare" mit Vorsicht-Kennzeichnung (`class="action--caution"` an Abmelden + Archivieren), B5 Radien (genau eine Änderung: `.link-picker-results` → `var(--radius-sm)`) | B | ⬜ | 0 → +1 statischer Test (`test_caution_class_only_on_logout_and_archive`) + ui_budget bleibt grün |
 | 5 | Block C — Struktur: C1 „Konto" → „Einstellungen", Lesart b (Einstellungen nach oben, Abmelden ans Rail-Ende, P8.6-J/N3), C2 „Alle Items" unter die Spaces (`tree.js :: renderRail()`, P8.6-J), C3 Map als rechte Spalte / volle Höhe (`.overview` als Grid, P8.6-K/L), C4 Spaces in der Übersicht klickbar (`.overview__space-row` + `<button class="overview__space-open">`, P8.6-P), C5 Ordner-Zähler clientseitig aus `state.items` (P8.6-O) | C | ⬜ | 0 → ui_budget bleibt grün, Tabu-Diff leer |
@@ -171,17 +171,46 @@ geschlossen, V105-Vierte-A3-Probe ✅ 2026-09-08).
   (kein externes `<label>`), Kategorie *Choice* der Selection/Choice-Konvention v3 wieder
   hergestellt. `localStorage["sfx:linkpicker:mode"]` und sein Wert bleiben unverändert.
 
+- **Vision-Backend: lokales Modell statt API** (Nikinger-Entscheidung 2026-09-10, siehe
+  Session-Block-Eintrag unten): Proxmox-Migration zu stärkerem System steht bevor
+  (i5-14600KF → Ryzen 7 5800X), Plugin-Installation aus Plan §2 wird übersprungen.
+  **Backend:** `InternVL 2.5 8B` (Q4, Apache-2.0, ~6–8 GB VRAM) auf Ollama; MCP-Wrapper
+  ruft `POST /api/generate` mit base64-Image. **Proxmox-Settings (Vorlage für die
+  Aktionsliste der nächsten Session):**
+  - **Host 1 (i5-14600KF, 6 P-Cores + 8 E-Cores, 20 Threads):** 12 vCPUs = 6 P-Cores
+    (CPU-Typ `host`, gepinnt auf Cores 0–5) + 4 E-Cores; 16 GB RAM (Ballooning aus);
+    50 GB Thin-LVM auf SSD (`local-lvm`); statische IPv4 im Cluster; Ollama lauscht
+    auf `127.0.0.1:11434` (kein öffentliches Binding — MCP-Bridge spricht intern).
+    P-Cores tragen 100 % der Vision-Inference-Last; E-Cores übernehmen MCP-Server-
+    Handler und Ollama-Stream-Pool.
+  - **Host 2 (Ryzen 7 5800X, 8 Cores, 16 Threads, Zen 3):** 10 vCPUs = 8 Cores + 2
+    Threads (alle gleichwertig, keine P/E-Unterscheidung); CPU-Typ `host`; 16 GB RAM;
+    50 GB; Netzwerk identisch.
+  - **Setup-Befehle (für die nächste Session als Aktionsliste aufzubereiten):**
+    `apt install -y ollama` (oder manuell), `ollama pull internvl2.5:8b`,
+    MCP-Wrapper-Skript (~50 Zeilen Python, `requests.post` mit base64).
+  - **Proxmox-Details:** NUMA auf Single-Sockel irrelevant; CPU-Pinning für P-Cores
+    empfohlen; Memory-Ballooning **aus**; VirtIO-SCSI + iothread für Modell-Disk.
+  - **Modell-Recherche (Stand 2026-09-10):** InternVL 2.5 8B (UI/Code-Screenshots, auf
+    GitHub-Screenshots trainiert — beste Passung), Qwen3-VL 8B (multilinguales OCR,
+    Fallback), Llama 3.2 Vision 11B (verworfen — Deutsch schwächer), MiniCPM-V 4.5
+    (verworfen — UI schwächer), Moondream 2 (verworfen — limitiert). Quelle:
+    PromptQuorum „Local Vision Models 2026".
+
 ## Nächste Session
 
-**Nach Step 0 ist Step V der nächste Schritt** — OpenCode-Vision-Plugin-Installation gegen
-einen echten Screenshot verifizieren (V119, Plan §2). Das Plugin wird über
-[`opencode.json`](../../opencode.json) (oder gleichwertige Konfigdatei) registriert; bei
-Scheitern aller drei Kandidaten (`DavidEasden/opencode-vision` →
-`JochenYang/opencode-vision` → `alfaoz/opencode-see-image`): Befund protokollieren, Phase
-wartet nicht. Sobald es steht, gilt `docs/concepts/sichtpruefung_automation_conventions.md`
-§4 (Screenshots direkt im Chat). **Vorbedingung für Step V:** Nikinger-Vorgabe ist
-„erster Schritt vor jedem Code-Touch" — opencode/M3 installiert selbst, kein Nikinger-
-Eingriff nötig; bei Plugin-Repository-Konfig oder System-Paketen ggf. nachfragen.
+**Nach Step 0 + Step-V-Entscheidung ist die Proxmox-Migration der nächste Schritt** —
+kurze Aktion → Command-Liste für die Migration auf i5-14600KF (primär) bzw. Ryzen 7
+5800X (sekundär), gefolgt von Ollama-Setup (`ollama pull internvl2.5:8b`) und
+MCP-Wrapper-Skript (~50 Zeilen Python, POST `http://127.0.0.1:11434/api/generate` mit
+base64-Image). **Nikinger-Wunsch:** „kurz und knackig Aktion → Command-Liste". Die
+folgenden Proxmox-Settings sind im Vormerkungen-Abschnitt unten dokumentiert; sie
+gelten als Vorlage für die Aktionsliste der nächsten Session.
+
+Sobald das Vision-Backend steht, gilt `docs/concepts/sichtpruefung_automation_conventions.md`
+§4 (Screenshots direkt im Chat). Der Plugin-Pfad aus Plan §2 wird nicht weiter
+verfolgt — die Plugin-Landschaft bleibt eine Vormerkung für spätere Phasen, falls
+sich das Bild ändert.
 
 ## Session stopped
 
@@ -269,3 +298,81 @@ für die Current-state-/ROADMAP-Updates, die P8.6 als aktive Phase markieren.
 Screenshot (V119, Plan §2). Bei Plugin-Repository-Konfig oder Authentifizierungs-Schritten,
 die Nikinger-Beteiligung brauchen: **vor** der Installation fragen, nicht im Trial-and-Error-
 Verfahren drei Repos durchprobieren.
+
+### 2026-09-10 (Step 0 — nachträglich: Step V aufgeschoben, lokales Modell + Proxmox-Migration; kein weiterer Code-Touch)
+
+**Auftrag:** Nach kurzer Recherche und drei Rückfragen hat der Nikinger entschieden, dass
+Step V (Plan §2, OpenCode-Vision-Plugin-Installation) **aufgeschoben** wird zugunsten eines
+**lokalen Vision-Modells** auf einem **neu zu migrierenden Proxmox-Host** (i5-14600KF
+primär, danach Ryzen 7 5800X). Plugin-Pfad bleibt als Vormerkung, falls die Plugin-Landschaft
+sich später ändert — die `DavidEasden/opencode-vision`-Landschaft ist zu unreif
+(3 Commits, AGPL-3.0, kein dokumentiertes MCP-Backend) für unseren produktiven Use-Case.
+
+**Entscheidung (mit Begründung):**
+- **Backend:** `InternVL 2.5 8B` (Apache-2.0, ~6–8 GB VRAM Q4) auf Ollama-Basis, MCP-Wrapper
+  ruft `POST http://127.0.0.1:11434/api/generate` mit base64-Image.
+- **Begründung lokal statt API:** Proxmox-Migration des Hosts steht bevor (i5-14600KF ist
+  primäres Ziel, danach Ryzen 7 5800X). Proxmox-VM-Migration ist trivial (im Cluster,
+  gleiche Architektur). Lokales Modell vermeidet Vendor-Lock-in + Audit-Trail-Aufwand für
+  Bild-Analysen in P8.6 + P9. Anthropic-Haiku-API hätte ~3 Cent/Phase gekostet — billig,
+  aber die Begründung war eh nie Geld, sondern Tooling-Konsistenz und Audit-Trail.
+
+**Modell-Recherche (Stand 2026-09-10, gegen PromptQuorum „Local Vision Models 2026"):**
+- **InternVL 2.5 8B** ✅ — auf GitHub-Screenshots + UI-Mockups + Code-Outputs trainiert, beste
+  Passung für unseren Use-Case („sind zwei Radio-Buttons sichtbar?").
+- Qwen3-VL 8B — Fallback (multilinguales OCR, 8 Bilder/Request, Apache-2.0).
+- Llama 3.2 Vision 11B — verworfen (Deutsch schwächer).
+- MiniCPM-V 4.5 — verworfen (UI-Verständnis schwächer).
+- Moondream 2 — verworfen (limitierte Szenen-Erkennung).
+
+**Proxmox-Settings (für die nächste Session als Vorlage — die Aktionsliste kommt dort):**
+
+*Host 1: i5-14600KF (6 P-Cores + 8 E-Cores, 20 Threads)*
+- vCPUs: **12** = 6 P-Cores (CPU-Typ `host`, gepinnt auf Cores 0–5) + 4 E-Cores
+- RAM: **16 GB** (Ballooning **aus**), 50 GB Thin-LVM auf SSD (`local-lvm`)
+- Ollama lauscht auf `127.0.0.1:11434` (kein öffentliches Binding)
+- Statische IPv4 im Cluster (für MCP-Erreichbarkeit)
+
+*Host 2: Ryzen 7 5800X (8 Cores, 16 Threads, Zen 3)*
+- vCPUs: **10** (8 Cores + 2 Threads, alle gleichwertig, CPU-Typ `host`)
+- RAM: 16 GB, 50 GB, Netzwerk identisch
+
+*Proxmox-Details (beide Hosts):* NUMA auf Single-Sockel irrelevant; CPU-Pinning empfohlen;
+Memory-Ballooning **aus**; VirtIO-SCSI + iothread für Modell-Disk.
+
+*Setup-Befehle:*
+```bash
+apt install -y ollama
+ollama pull internvl2.5:8b
+# MCP-Wrapper-Skript: ~50 Zeilen Python, requests.post mit base64-Image
+```
+
+**Was in diesem Commit passiert ist (nur Doku, kein Code-Touch):**
+1. `phase8_6_ui_polish/CLAUDE.md`: Modul-Status Zeile 2 (Step V) ⬜ → 🟡-deferred;
+   Vormerkungen-Sektion um „Vision-Backend: lokales Modell statt API" + Proxmox-Settings
+   erweitert; Session-Stopped-Block um diesen Sub-Block ergänzt (P8.6-T-Rotationsregel:
+   genau **ein** `## Session stopped`-Block mit einem oder mehreren `### date`-Subblöcken);
+   Nächste-Session-Block auf Proxmox-Migration umgeschrieben.
+2. `docs/concepts/phase8_6_ui_polish_plan.md` §2 (Step V): Korrekturnotiz am Anfang
+   („Plugin-Pfad übersprungen, siehe Phase-Head-Vormerkungen für Proxmox-Plan").
+3. `docs/INDEX.md`: updated-Pipe vorne ergänzt.
+
+**Selbstprüfung (kein Code-Touch — analog zu Step 0):**
+- Tabu-Diff §0.3 leer
+- `pytest`/`ui_budget`/`node --check` gegenstandslos (kein Code-Touch)
+- Service-Touch 0 (PID 355956 unverändert)
+- Working-Tree nach Commit sauber
+
+**Commit-Message:**
+`phase 8.6: Step V deferred -- Proxmox-Migration + lokales Modell (InternVL 2.5 8B)`
+
+**Nächster Schritt (in der nächsten Session, mit Aktions-Liste):**
+1. Proxmox-Migration der Vision-VM auf i5-14600KF-Host
+2. `ollama install` + `ollama pull internvl2.5:8b`
+3. MCP-Wrapper-Skript (~50 Zeilen Python)
+4. Smoke-Test gegen einen Phase-8.5-Screenshot (z. B. `c4_p8519_01_radiogruppe_im_dialog.png`)
+   als Regression gegen V119-Erwartung
+5. Falls erfolgreich → V119 abgehakt, Konventionen §4 aktiv, Plan §2-Aktualisierung mit
+   „Vision-Backend: lokal, InternVL 2.5 8B"
+6. Falls Ollama + InternVL auf der CPU nicht zufriedenstellend → Wechsel auf i5-14600KF
+   vor Ryzen, oder Qwen3-VL 8B als Fallback

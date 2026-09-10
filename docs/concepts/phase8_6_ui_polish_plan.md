@@ -406,6 +406,19 @@ INDEX-Zeilen, die INDEX-Kompression, und die Baselines V107/V108 im Head.
 
 ## §2 Step V — OpenCode-Vision-Plugin (erster Schritt der Phase)
 
+> **[2026-09-10 Korrekturnotiz, Nikinger-Entscheidung]** Der Plugin-Pfad wird **aufgeschoben**.
+> Proxmox-Migration des Hosts steht bevor (i5-14600KF primär, danach Ryzen 7 5800X).
+> Statt Plugin + Anthropic-Haiku-API wird **ein lokales Vision-Modell** auf dem migrierten
+> Host eingerichtet: `InternVL 2.5 8B` (Q4, Apache-2.0, ~6–8 GB VRAM) auf Ollama-Basis,
+> MCP-Wrapper ruft `POST http://127.0.0.1:11434/api/generate` mit base64-Image. **Begründung:**
+> Proxmox-VM-Migration ist trivial (im Cluster), lokales Modell vermeidet Vendor-Lock-in
+> und Audit-Trail-Aufwand; API-Kosten wären zwar nur ~3 Cent/Phase, aber Tooling-Konsistenz
+> und Audit-Trail waren der eigentliche Treiber. Plugin-Pfad bleibt als Vormerkung für
+> spätere Phasen, falls die `DavidEasden/opencode-vision`-Landschaft reift. **Vollständiger
+> Proxmox-Plan + Setup-Befehle:** `phase8_6_ui_polish/CLAUDE.md` §Vormerkungen
+> („Vision-Backend: lokales Modell statt API"). Nächster Schritt der nächsten Session:
+> Proxmox-Migration + Ollama-Setup + MCP-Wrapper. Plugin-Backend-Bedarf entfällt damit.
+
 **Nikinger-Vorgabe vom 2026-09-08, unverändert** (`sichtpruefung_automation_tooling.md`,
 Handover §4.4): dies ist der **erste** Schritt, vor jedem Code-Touch.
 
