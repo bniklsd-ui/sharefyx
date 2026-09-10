@@ -35,7 +35,7 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 | **P7** | `phase7_spaces_admin/` (kein eigenes Paket) | Space-Verwaltung, Mehrfachauswahl, Konsolidierung. | ✅ |
 | **P8** | `phase8_ui_graph/` (kein eigenes Paket) | UI-Neuanstrich v3, Verknüpfungs-Graph, P7-Erbposten. | ✅ |
 | **P8.5** | `phase8_5_picker_release/` (kein eigenes Paket) | Link-Picker-Politur, v3-Vorabritt + Deploy; schließt Phase 8 ab. | ✅ |
-| **P8.6** | `phase8_6_ui_polish/` | **Geplant 2026-09-09**, Plan: `docs/concepts/phase8_6_ui_polish_plan.md`. Reichweite „Selektions-Welle + Layout" — Layering-Tokens, eine Selektionssprache für alles Klickbare, „Konto"→„Einstellungen", Ordner-Zähler, Rail-/Übersichts-Reorg, klickbare Spaces, drei Graph-Fixes (V102/§2.3/§2.4), Radiogruppe-Rückbau auf `<select>`; **erster Punkt: OpenCode-Vision-Plugin**. Deploy-Ziel `v3.0.2`. | 🔄 |
+| **P8.6** | `phase8_6_ui_polish/` | **🔄 Step 0 ✅ + Step V aufgeschoben** (Stand 2026-09-10), Plan: `docs/concepts/phase8_6_ui_polish_plan.md`. Reichweite „Selektions-Welle + Layout" — Layering-Tokens, eine Selektionssprache für alles Klickbare, „Konto"→„Einstellungen", Ordner-Zähler, Rail-/Übersichts-Reorg, klickbare Spaces, drei Graph-Fixes (V102/§2.3/§2.4), Radiogruppe-Rückbau auf `<select>`. **Step V auf Vision-Backend** — OpenCode-Vision-Plugin-Installation **übersprungen** zugunsten eines **lokalen Modells** (`InternVL 2.5 8B` Q4 auf Ollama) auf einem **neu zu migrierenden Proxmox-Host** (i5-14600KF primär, danach Ryzen 7 5800X); 7-Schritte-Aktionsliste in `phase8_6_ui_polish/CLAUDE.md` §Vormerkungen dokumentiert (Nikinger-Aktion). **Zwei „would be cool"-Notes** (Nikinger 2026-09-10) im selben Vormerkungen-Abschnitt: Tab-Meta dynamisch (`<title>sharefyx - {item_title}</title>`, V120 offen), Custom 404-Seite (P8.6-Tabu §0.3 berührt, Folge-Phase). Deploy-Ziel `v3.0.2`. | 🔄 |
 | **P9** | (nicht angelegt, Arbeitsname) | Obsidian-Map-/Graph-Umbau (`p8x_ui_polish_notes.md` §2) + verbundene AI-Sessions (§10.8). **Vorgemerkt 2026-09-10: „Ordner umbenennen"** — in P8.6 geprüft und bewusst vertagt, volle Analyse in `phase8_6_ui_polish_plan.md` §0.4.1 (die billige Frontend-Fassung lässt die `.share.yml` eines geteilten Ordners still zurück; der saubere Weg ist die **neunte P1-Contract-Öffnung**). Deploy-Ziel `v3.1.0`, laut Nikinger voraussichtlich letzter großer UI-Umbau. | ⬜ |
 
 **[2026-09-08 Korrektur, Z-Closeout]:** P8 + P8.5 auf ✅ (Statusregel geändert — vom Nikinger
@@ -291,8 +291,11 @@ Anhang §A–§E. **Die Zahlen „16 Themen / 25 KB" hier standen bis 2026-09-09
    also p8.7" das meint, was die Dokumente **P9 → `v3.1.0`** nennen. **Es gibt kein P8.7.**
    Die verbundenen AI-Sessions (`p8x_ui_polish_notes.md` §10.8) sind damit P9-Inhalt.
    Umbenannt wurde nichts — der Wortlaut bleibt in §10.8 zitiert stehen.
-4. **Ausführung P8.6** in opencode/M3 nach Plan §1–§8, Reihenfolge Step 0 → Step V → A → B
-   → C/D → Gate → Deploy → Step Z. Der Closeout wird Plan **§9** (P8-N).
+4. **Ausführung P8.6** in opencode/M3 nach Plan §1–§8, Reihenfolge Step 0 ✅ → Step V
+   **aufgeschoben** (Migration steht bevor, Plugin-Pfad zurückgestellt) → A → B
+   → C/D → Gate → Deploy → Step Z. Der Closeout wird Plan **§9** (P8-N). **Aktuell
+   (2026-09-10): Proxmox-Migration + Ollama-Setup + MCP-Wrapper-Skript als nächster
+   Nikinger-Schritt** (Aktionsliste 7 Schritte im Phase-Head §Vormerkungen).
 
 **Was NICHT in p8.X gehört** (klare Außenkanten, Notizen-Datei §B): Body-Volltextsuche
 in der Web-UI (Q1 gelockt), Rechteverwaltung über MCP-Tools (P6-M), Löschen von Items

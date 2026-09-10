@@ -416,8 +416,11 @@ INDEX-Zeilen, die INDEX-Kompression, und die Baselines V107/V108 im Head.
 > und Audit-Trail waren der eigentliche Treiber. Plugin-Pfad bleibt als Vormerkung für
 > spätere Phasen, falls die `DavidEasden/opencode-vision`-Landschaft reift. **Vollständiger
 > Proxmox-Plan + Setup-Befehle:** `phase8_6_ui_polish/CLAUDE.md` §Vormerkungen
-> („Vision-Backend: lokales Modell statt API"). Nächster Schritt der nächsten Session:
-> Proxmox-Migration + Ollama-Setup + MCP-Wrapper. Plugin-Backend-Bedarf entfällt damit.
+> („Vision-Backend: lokales Modell statt API" — Settings + Modell-Recherche; **„Proxmox-Migration —
+> Aktionsliste"** — 7-Schritte-Aktion-→-Befehl, neu am 2026-09-10). Nächster Schritt der
+> nächsten Session: Proxmox-Migration + Ollama-Setup + MCP-Wrapper-Skript gemäß Aktionsliste.
+> Plugin-Backend-Bedarf entfällt damit; V119 (Smoke gegen `c4_p8519_01_radiogruppe_im_dialog.png`)
+> wird nach der Migration gegen das lokale Modell gefahren statt gegen das Plugin.
 
 **Nikinger-Vorgabe vom 2026-09-08, unverändert** (`sichtpruefung_automation_tooling.md`,
 Handover §4.4): dies ist der **erste** Schritt, vor jedem Code-Touch.
