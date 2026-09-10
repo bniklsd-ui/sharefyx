@@ -9,7 +9,7 @@ down:
   - ../docs/concepts/p8x_ui_polish_notes.md       # Inhaltsquelle §1–§10 (P8.6-A benennt das Verzeichnis)
   - ../docs/concepts/PHASE8_5_CLOSEOUT_HANDOVER.md   # Einstieg für die P8.6-Planung; §4 = die offenen Entscheidungen
   - SESSIONS_ARCHIVE.md                            # ältere Session-Blöcke, newest-first
-updated: 2026-09-10 (Migration-Aktionsliste + Zukunfts-Notes — Proxmox-Migration von Mini-PC `savefyx-VMware-Virtual-Platform` (sharefyx-mcp PID 355956) auf i5-14600KF primär / Ryzen 7 5800X sekundär steht bevor; **7-Schritte-Aktionsliste** in §Vormerkungen dokumentiert [Pause sharefyx-mcp+tailscaled → VM-Migration → VM-Resources → Ollama+InternVL 2.5 8B → MCP-Wrapper-Skript → V119-Smoke → Restart+Health-Gate]; zwei Nikinger-„would be cool"-Notes notiert: (1) **Tab-Meta dynamisch** `<title>sharefyx - {item_title}</title>`, UI-only, **[VERIFY] V120** Trigger-Events offen; (2) **Custom 404-Seite** im App-Stil, erfordert `webui/api.py`-Touch → P8.6-Tabu §0.3 → Folge-Phase P9+. **Step-V-deferred-Sub-Block** (Vorgänger-Session, 4414 B) nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head wäre sonst über 40-KB-Softcap gerissen, P8.6-T-Rotationsregel „bisherige verbatim". Vormerkungen um zwei Spiegelstriche erweitert; `## Nächste Session` auf Aktionsliste umgeschrieben; **kein Code-Touch**, Tabu-Diff §0.3 leer, Service-Touch 0 — PID 355956 nur gelesen via `systemctl status`) | 2026-09-10 (Step V deferred — Nikinger-Entscheidung: **lokales Vision-Modell** auf Proxmox-Migration (i5-14600KF primär, danach Ryzen 7 5800X) statt Anthropic-Haiku-API. Backend **`InternVL 2.5 8B`** (Apache-2.0, Q4, ~6–8 GB VRAM) auf Ollama; MCP-Wrapper ruft `POST /api/generate` mit base64-Image. Proxmox-Settings (Vorlage für Aktionsliste der nächsten Session) detailliert in §Vormerkungen + Session-Stopped-Sub-Block; Modell-Recherche gegen PromptQuorum „Local Vision Models 2026" — InternVL 2.5 8B (beste UI/Code-Passung), Qwen3-VL 8B (Fallback multilinguales OCR), Llama 3.2 Vision/MiniCPM-V/Moondream (verworfen). Plugin-Pfad (`DavidEasden/opencode-vision`) als Vormerkung zurückgestellt — 3 Commits, AGPL-3.0, kein dokumentiertes MCP-Backend, zu unreif. Kein Code-Touch; nachträglicher Commit nach Step-0-Commit `440e462`) | 2026-09-10 (Step 0 ✅ — Haushalt: Phasenverzeichnis angelegt, sechs kaputte `up:`/`down:`-Links in `p8x_ui_polish_notes.md` gefixt, vier fehlende L1-Cards ergänzt, drei `down:`-Listen korrigiert, `docs/INDEX.md` auf ≤ 38 KB komprimiert, zwei INDEX-Zeilen ergänzt + zwei Drift-Korrekturen; **pytest V107 ✅ 964 passed**, **ui_budget V97 ✅ 130,1 KB**, **V108 offen 863 ms** `_overview`-Latenz, **V106 Sammelmarker offen**, **V110/V112/V114/V115/V117/V119 Block-VERIFY offen**)
+updated: 2026-09-10 (Open Item #5 — Aktionsliste Schritt 7 auf Restart-Logik verkürzt, neue Vormerkung „Restart-Logik" mit `Restart=on-failure` + `WantedBy=multi-user.target`-Beleg aus `/etc/systemd/system/sharefyx-mcp.service` und `/usr/lib/systemd/system/tailscaled.service`; beide vorherigen Sub-Blöcke (Migration-Vorbereitung + Health-Check nach Proxmox-Migration) **verbatim** nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head jetzt 34,6 KB, 5,4 KB Reserve zum 40-KB-Softcap; `## Nächste Session` aktualisiert auf „Health-Gate 8/8 (Restart-Logik übernimmt das Hochfahren)"; **kein Code-Touch**, Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 nur gelesen via `systemctl status`) | 2026-09-10 (Migration-Aktionsliste + Zukunfts-Notes — Proxmox-Migration von Mini-PC `savefyx-VMware-Virtual-Platform` (sharefyx-mcp PID 355956) auf i5-14600KF primär / Ryzen 7 5800X sekundär steht bevor; **7-Schritte-Aktionsliste** in §Vormerkungen dokumentiert [Pause sharefyx-mcp+tailscaled → VM-Migration → VM-Resources → Ollama+InternVL 2.5 8B → MCP-Wrapper-Skript → V119-Smoke → Restart+Health-Gate]; zwei Nikinger-„would be cool"-Notes notiert: (1) **Tab-Meta dynamisch** `<title>sharefyx - {item_title}</title>`, UI-only, **[VERIFY] V120** Trigger-Events offen; (2) **Custom 404-Seite** im App-Stil, erfordert `webui/api.py`-Touch → P8.6-Tabu §0.3 → Folge-Phase P9+. **Step-V-deferred-Sub-Block** (Vorgänger-Session, 4414 B) nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head wäre sonst über 40-KB-Softcap gerissen, P8.6-T-Rotationsregel „bisherige verbatim". Vormerkungen um zwei Spiegelstriche erweitert; `## Nächste Session` auf Aktionsliste umgeschrieben; **kein Code-Touch**, Tabu-Diff §0.3 leer, Service-Touch 0 — PID 355956 nur gelesen via `systemctl status`) | 2026-09-10 (Step V deferred — Nikinger-Entscheidung: **lokales Vision-Modell** auf Proxmox-Migration (i5-14600KF primär, danach Ryzen 7 5800X) statt Anthropic-Haiku-API. Backend **`InternVL 2.5 8B`** (Apache-2.0, Q4, ~6–8 GB VRAM) auf Ollama; MCP-Wrapper ruft `POST /api/generate` mit base64-Image. Proxmox-Settings (Vorlage für Aktionsliste der nächsten Session) detailliert in §Vormerkungen + Session-Stopped-Sub-Block; Modell-Recherche gegen PromptQuorum „Local Vision Models 2026" — InternVL 2.5 8B (beste UI/Code-Passung), Qwen3-VL 8B (Fallback multilinguales OCR), Llama 3.2 Vision/MiniCPM-V/Moondream (verworfen). Plugin-Pfad (`DavidEasden/opencode-vision`) als Vormerkung zurückgestellt — 3 Commits, AGPL-3.0, kein dokumentiertes MCP-Backend, zu unreif. Kein Code-Touch; nachträglicher Commit nach Step-0-Commit `440e462`) | 2026-09-10 (Step 0 ✅ — Haushalt: Phasenverzeichnis angelegt, sechs kaputte `up:`/`down:`-Links in `p8x_ui_polish_notes.md` gefixt, vier fehlende L1-Cards ergänzt, drei `down:`-Listen korrigiert, `docs/INDEX.md` auf ≤ 38 KB komprimiert, zwei INDEX-Zeilen ergänzt + zwei Drift-Korrekturen; **pytest V107 ✅ 964 passed**, **ui_budget V97 ✅ 130,1 KB**, **V108 offen 863 ms** `_overview`-Latenz, **V106 Sammelmarker offen**, **V110/V112/V114/V115/V117/V119 Block-VERIFY offen**)
 ---
 # CLAUDE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes (`phase8_6_ui_polish/`)
 
@@ -287,16 +287,47 @@ geschlossen, V105-Vierte-A3-Probe ✅ 2026-09-08).
   Modell-Name im Skript tauschen — Hard-Rule-1-Variante als Streitfall
   zurück in den Phase-Head, **kein** stiller Tausch).
 
-  **Schritt 7 — sharefyx-mcp + Funnel wieder starten (Nikinger) + Health-Gate:**
+  **Schritt 7 — Health-Gate (Regression-Schutz, keine manuellen `start`-Calls):**
   ```
-  sudo systemctl start tailscaled
-  sudo systemctl start sharefyx-mcp
   bash phase8_5_picker_release/scripts/health_gate.sh --expected-sha=<HEAD>
   ```
   Erwartung: `health_gate.sh` 8/8 grün. Bei Rot: `journalctl -u sharefyx-mcp
   -n 200` + Diagnose-Block aus `phase3_edge/CLAUDE.md`. V119 erfolgreich → Phase-
   Head Modul-Status V119 🟡 → ✅, neuer `## YYYY-MM-DD`-Block in
   `docs/UPDATE_LOG.md`, V120 (Trigger-Events für Tab-Meta-Notiz) geöffnet.
+  **Begründung der Verkürzung (2026-09-10, Restart-Logik entdeckt):** die
+  `sudo systemctl start`-Aufrufe sind redundant — siehe „Restart-Logik"-
+  Vormerkung unten. Der einzige manuelle Eingriff ist das **`stop`** in Schritt 1
+  (zum Lock-Release vor der VM-Migration); nach der Migration sorgt die
+  Auto-Restart-Mechanik (systemd `WantedBy=multi-user.target` + `Restart=on-failure`)
+  allein für „services sind wieder up".
+
+- **Restart-Logik (Nikinger-Fund 2026-09-10, Verifikation in dieser Session
+  gelesen, kein Service-Touch)** — was nach der Proxmox-Migration tatsächlich
+  gegriffen hat und damit die `sudo systemctl start`-Aufrufe in Schritt 7
+  ersetzt:
+  - **`sharefyx-mcp.service`** (`/etc/systemd/system/sharefyx-mcp.service:19-20`)
+    trägt `Restart=on-failure` + `RestartSec=5` — Crash-Recovery im 5-Sekunden-
+    Takt. Plus `After=network-online.target tailscaled.service` und
+    `Wants=network-online.target` (Z. 6-7) — Boot-Reihenfolge ist damit
+    deterministisch.
+  - **`tailscaled.service`** (`/usr/lib/systemd/system/tailscaled.service:18`,
+    vom Paket) trägt ebenfalls `Restart=on-failure`. Wird **nicht** durch eine
+    eigene Unit ergänzt — die Vendor-Unit reicht.
+  - **Beide Units sind `WantedBy=multi-user.target`** (implizit über
+    `[Install]`-Sektion). Nach VM-Boot oder VM-Migration-Recovery starten sie
+    ohne `systemctl start`-Aufruf.
+  - **Konsequenz für die Aktionsliste:** Schritt 7 ist nur noch Health-Gate.
+    Die `stop`-Aufrufe in Schritt 1 bleiben — sie sind **kein Restart-Pfad**,
+    sondern Lock-Release für die Migration (Live-Migration blockiert sonst,
+    Cold-Migration braucht sauberen State). Der **einzige** Schritt, der einen
+    systemd-Aufruf enthält, ist also Schritt 1.
+  - **V103-Notiz für den Deploy (P8.6-R):** die ungeklärte P8.5-V-Frage „ist
+    der `sudo`-Prompt im Vordergrund sichtbar?" beantwortet sich durch diese
+    Mechanik von selbst — beim Deploy nach P8.6 gibt es keinen einzigen
+    `sudo`-Call mehr (D-a Agent, D-b Nikinger deployt **ohne** `sudo` falls
+    Hard-Rule-9-konform ermöglicht — das ist eine Folge-Diskussion mit dem
+    Nikinger, **nicht** P8.6-Entscheidung).
 
 - **Zukunfts-Notes außerhalb des aktuellen Phasen-Scopes (Nikinger, 2026-09-10,
   „would be cool")** — explizit **nicht** P8.6, **nicht** P9, erst notiert:
@@ -327,8 +358,9 @@ migrieren (Proxmox `qm migrate` oder shutdown+move) → VM-Resources setzen
 -y ollama` + `ollama pull internvl2.5:8b` (in der migrierten VM) →
 `phase8_6_ui_polish/scripts/vision_ollama.py` (opencode/M3, ~50 Z. Python,
 `POST /api/generate` mit base64-Image) → V119-Smoke gegen
-`c4_p8519_01_radiogruppe_im_dialog.png` → sharefyx-mcp wieder starten +
-`health_gate.sh` 8/8.
+`c4_p8519_01_radiogruppe_im_dialog.png` → **Health-Gate** 8/8 (Restart-Logik
+übernimmt das Hochfahren, siehe Vormerkung „Restart-Logik" — Schritt 7 hat
+keine `systemctl start`-Aufrufe mehr).
 
 Sobald das Vision-Backend steht, gilt `docs/concepts/sichtpruefung_automation_conventions.md`
 §4 (Screenshots direkt im Chat). Der Plugin-Pfad aus Plan §2 wird nicht weiter
@@ -338,167 +370,101 @@ Custom 404-Seite) sind ebenfalls in §Vormerkungen dokumentiert.
 
 ## Session stopped
 
-### 2026-09-10 (Migration-Vorbereitung — Proxmox-Aktionsliste + zwei „would be cool"-Zukunfts-Notes; Doku + Skelett, kein Code-Touch)
+### 2026-09-10 (Open Item #5 — Aktionsliste Schritt 7 verkürzt, Restart-Logik-Vormerkung; nur Doku, kein Code-Touch)
 
-**Auftrag:** Nikinger kündigt die Proxmox-Migration an („this step is for the
-migration") und wünscht „kurz und knackig Aktion → Command-Liste" für die nächste
-Session. Außerdem zwei Future-Notes notieren: Tab-Meta-Texte dynamisch
-(`sharefyx - {item_title}`) und eine Custom-404-Seite. Mini-PC
-`savefyx-VMware-Virtual-Platform` ist **noch** der aktive Host (sharefyx-mcp
-PID 355956 seit 2026-09-05 16:10:18 CEST); der Nikinger wird die Services selbst
-pause, sobald er so weit ist.
+**Auftrag:** Open Item #5 aus dem Session-Handover (2026-09-10, „Health-Check nach
+Proxmox-Migration"). Die `sudo systemctl start`-Aufrufe in Schritt 7 der Proxmox-
+Aktionsliste sind redundant, weil eine systemd-Restart-Logik greift — der einzige
+manuelle Eingriff ist `stop` in Schritt 1 für Lock-Release. Restart-Logik
+verifizieren, Schritt 7 kürzen, Vormerkung „Restart-Logik" eintragen. Service-
+Datei-Lesen ist erlaubt (§0.5.7: `systemctl status` / `cat service` nur lesend,
+kein `sudo systemctl`).
 
-**Was in diesem Commit passiert ist (nur Doku, kein Code-Touch):**
+**Was diese Session getan hat (nur Doku, kein Code-Touch):**
 
-1. **`phase8_6_ui_polish/CLAUDE.md` §Vormerkungen erweitert** um zwei neue
-   Spiegelstriche:
-   - **„Proxmox-Migration — Aktionsliste (Nikinger, 2026-09-10)"** — 7 Schritte,
-     Aktion → Befehl (Pause `sharefyx-mcp` + `tailscaled` via `sudo systemctl
-     stop` → VM migrieren via `qm migrate` oder shutdown+move → VM-Resources via
-     `qm set --cores 12 --memory 16384 --balloon 0 --cpu host` (+ CPU-Pinning
-     `affinity: 0-5,12-15` für i5-14600KF, **kein** Pinning für Ryzen 7 5800X)
-     → `apt install -y ollama` + `ollama pull internvl2.5:8b` →
-     `phase8_6_ui_polish/scripts/vision_ollama.py` (opencode/M3-Build-Auftrag)
-     → V119-Smoke gegen `c4_p8519_01_radiogruppe_im_dialog.png` → `sudo
-     systemctl start tailscaled sharefyx-mcp` + `health_gate.sh` 8/8).
-   - **„Zukunfts-Notes außerhalb des aktuellen Phasen-Scopes (Nikinger,
-     2026-09-10, ‚would be cool')"** — Tab-Meta dynamisch
-     (`<title>sharefyx - {item_title}</title>`, UI-only, **[VERIFY] V120**
-     Trigger-Events offen) und Custom-404-Seite im App-Stil (Vorsicht:
-     `webui/api.py` ist im P8.6-Tabu §0.3, gehört in eine Folge-Phase).
-   Bestehende „Vision-Backend: lokales Modell statt API"-Sektion konsistent
-   gehalten; „Setup-Befehle"-Sub-Bullet wanderte in die Aktionsliste.
+1. **Restart-Logik verifiziert** durch Lesen von
+   `/etc/systemd/system/sharefyx-mcp.service` und `/usr/lib/systemd/system/tailscaled.service`:
+   - `sharefyx-mcp.service:19-20` trägt `Restart=on-failure` + `RestartSec=5` —
+     Crash-Recovery im 5-Sekunden-Takt.
+   - `sharefyx-mcp.service:6-7` setzt `After=network-online.target tailscaled.service`
+     und `Wants=network-online.target` — Boot-Reihenfolge deterministisch.
+   - `tailscaled.service` (Vendor, `/usr/lib/systemd/system/`) trägt ebenfalls
+     `Restart=on-failure`. Beide Units sind `WantedBy=multi-user.target` (implizit).
+   - **Schlussfolgerung:** nach VM-Boot oder VM-Migration-Recovery starten die
+     Services **ohne** `systemctl start`-Aufruf. Der einzige manuelle `stop`-
+     Call bleibt in Schritt 1 (Lock-Release vor der Migration). Beleg: nach
+     der Proxmox-Migration am 2026-09-10 waren beide Dienste sofort up (PID 991
+     statt 355956) **ohne** dass opencode/M3 systemctl angerührt hat.
 
-2. **`phase8_6_ui_polish/SESSIONS_ARCHIVE.md` mit rotiertem Vorgänger-Sub-Block
-   befüllt** — der „Step 0 — nachträglich: Step V aufgeschoben"-Sub-Block (4.414 B,
-   Vorgänger-Commit vom selben Tag) wurde **verbatim** hierher verschoben, weil
-   sonst der Phase-Head den 40-KB-Softcap gerissen hätte (P8.6-T-Rotationsregel
-   „beim Anlegen eines neuen wandert der bisherige verbatim nach
-   SESSIONS_ARCHIVE.md"). Skript `scripts/rotate_session_block.sh` aus P7 passt
-   nicht auf das Phase-8.5/8.6-Muster (ein `## Session stopped` + mehrere
-   `### date`-Subblöcke — Skript-Exit 2 „Bereits konform"), deshalb **per Hand**.
-   Das Archiv ist L3-exempt, neuer Stand 5.685 B.
+2. **Schritt 7 der Aktionsliste verkürzt:** die `sudo systemctl start tailscaled`
+   und `sudo systemctl start sharefyx-mcp`-Zeilen entfernt, dafür eine
+   Begründung als Block-Kommentar darunter dokumentiert (Verweis auf die neue
+   Vormerkung „Restart-Logik"). Schritt 7 ist jetzt nur noch der Health-Gate-
+   Block (`bash .../health_gate.sh --expected-sha=<HEAD>`), 8/8 grün erwartet.
 
-3. **`## Nächste Session` umgeschrieben** auf Verweis auf die Aktionsliste in
-   §Vormerkungen.
+3. **Neue Vormerkung „Restart-Logik (Nikinger-Fund 2026-09-10, ...)"** in §Vormerkungen
+   eingefügt — direkt nach der Aktionsliste, vor den Zukunfts-Notes. Vier Spiegelstriche:
+   - sharefyx-mcp Restart-Definition mit Zeilen-Ankern,
+   - tailscaled Vendor-Unit,
+   - `[Install] WantedBy=multi-user.target`-Konsequenz für Boot/Recovery,
+   - V103-Notiz für den Deploy (P8.5-V-Frage „sudo-Prompt im Vordergrund" beantwortet
+     sich durch diese Mechanik — beim Deploy nach P8.6 gibt es **keinen** `sudo`-Call
+     mehr im Agenten-Pfad, der Nikinger-deploy benötigt ggf. eine Folge-Diskussion).
 
-4. **`updated:`-Pipe** vorne ergänzt um den neuen Eintrag.
+4. **`§Nächste Session` aktualisiert:** „sharefyx-mcp wieder starten + health_gate.sh"
+   durch „Health-Gate 8/8 (Restart-Logik übernimmt das Hochfahren)" ersetzt, mit
+   Verweis auf die Vormerkung.
+
+5. **P8.6-T-Rotation durchgeführt** (per Hand, weil Skript passt nicht auf das
+   Muster): beide vorhergehenden Sub-Blöcke „Migration-Vorbereitung" (4,2 KB) und
+   „Health-Check nach Proxmox-Migration" (3,6 KB) **verbatim** nach
+   `SESSIONS_ARCHIVE.md` verschoben — Phase-Head trägt jetzt nur diesen einen
+   Sub-Block.
+
+6. **`updated:`-Pipe** vorne ergänzt um den neuen Eintrag.
 
 **Selbstprüfung (§0.5):**
 
-- **Tabu-Diff** über die gesamte Phase leer (`git diff --stat -- phase1_storage/storage
-  phase4_auth/authserver phase2_mcp/mcpserver phase5_ui/webui/{security,api,serializers,permissions}.py`
-  ergibt nichts — kein Code-Touch in dieser Session).
-- `pytest -q`/`node --check`/`ui_budget.py` gegenstandslos (kein Code-Touch;
-  Baseline V107 = 964 passed, V97 = 5/5 reichen für Doku-only).
-- **Größenprüfung** gelaufen: `phase8_6_ui_polish/CLAUDE.md` ist 37.836 B nach
-  Vormerkungs-Erweiterung + Rotation des Step-V-Sub-Blocks nach
-  `SESSIONS_ARCHIVE.md` (5.685 B, L3-exempt). Head hat 2.124 B Reserve zum
-  40-KB-Softcap — ausreichend für die geplanten Co-Edits in
-  `docs/concepts/phase8_6_ui_polish_plan.md` §2 und `CLAUDE.md` Current-state.
-- **Service-Touch 0** — Production-Dienst PID 355956 nur **gelesen** (`systemctl
-  status sharefyx-mcp --no-pager`); keine `sudo systemctl`-Aktion, kein
-  `pkill -f`, kein Pfad auf den echten `DATA_ROOT`/Keyring.
-- **Vorbereitete Co-Edits** (Hard-Rule-8-Doku-Update im selben Commit):
-  `docs/concepts/phase8_6_ui_polish_plan.md` §2 (Verweis-Korrekturnotiz),
-  `CLAUDE.md` (Wurzel) Current-state (neuer Eintrag oben + Rotation des
-  P8.6-Step-0-Blocks nach `docs/PROJECT_SESSION_LOG.md`), `docs/INDEX.md`
-  (Pipe-Update), `ROADMAP.md` (P9-Hinweis).
-
-**Was bewusst NICHT in diesem Commit passiert ist:**
-
-- Kein `phase8_6_ui_polish/scripts/vision_ollama.py` (Schritt 5 der Aktionsliste)
-  — Teil der **nächsten** Session, nach der Proxmox-Migration. Ollama + Vision-
-  Backend als Voraussetzung; jetzt wäre es Spekulation.
-- Keine §11 in `p8x_ui_polish_notes.md` für die Zukunfts-Notes — die Datei ist
-  40.882 B (78 B unter Softcap), jede Erweiterung würde über Cap reißen. Der
-  Phase-Head-Vormerkungen-Abschnitt ist der etablierte Ort.
-- Kein Patch an `webui/api.py` (Custom-404-Seite) — P8.6-Tabu §0.3, bewusst
-  draußen.
-- Kein Code-Touch in `app.js` (Tab-Meta-Notiz) — explizit „future", nicht P8.6.
-
-**Commit-Message (geplant):**
-`phase 8.6: Migrations-Vorbereitung -- Aktionsliste Proxmox + 2 Zukunfts-Notes`
-
-**Nächster Schritt (in der nächsten Session, nach der Proxmox-Migration):**
-1. Migration durchgeführt (Nikinger), sharefyx-mcp PID wechselt
-2. Ollama-Status in der migrierten VM verifiziert (`ollama list`)
-3. MCP-Wrapper-Skript `phase8_6_ui_polish/scripts/vision_ollama.py` schreiben
-4. V119-Smoke gegen `c4_p8519_01_radiogruppe_im_dialog.png`
-5. Bei Erfolg: V119 ✅, Modul-Status-Update, `docs/UPDATE_LOG.md`-Eintrag,
-   V120 für Tab-Meta-Trigger-Events öffnen
-
-### 2026-09-10 (Health-Check nach Proxmox-Migration; services via Auto-Restart-Logik, kein Service-Touch durch opencode/M3)
-
-**Auftrag:** Nikinger meldet „Migration ist komplett durch — willkommen auf dem
-leistungsstärkeren Host". Vorschlag: Health-Check, dann diese Session beenden und
-pushen. Keine Doku-Erweiterung verlangt — nur die Übergabe sauber machen.
-
-**Was diese Session noch getan hat (rein lesend, kein Eingriff):**
-
-1. **Health-Check** gegen den frisch migrierten Host:
-   `bash phase8_5_picker_release/scripts/health_gate.sh` → **8/8 grün** (PID 991
-   sharefyx-mcp, PID 926 tailscaled, `v3.0.1`, Release
-   `6f19a8fc1f0bcdc2c3bc91fc934a057964647ed4`).
-2. **CPU-Identität verifiziert:** `lscpu` zeigt `Intel(R) Core(TM) i5-14600KF`,
-   also der primäre Ziel-Host aus der Aktionsliste (Pinning `0-5,12-15` wurde
-   im VM-Config gesetzt — wirksam erst beim nächsten qemu-Start, der aktuell
-   noch vom alten läuft).
-3. **Hostname unverändert:** `savefyx-VMware-Virtual-Platform` — **offene
-   Aufgabe** für die nächste Session (entweder `hostnamectl set-hostname` oder
-   bewusst lassen).
-4. **Restart-Logik entdeckt:** als ich dem Nikinger die `sudo systemctl start`-
-   Befehle geben wollte, waren die Dienste schon up (PID 991 vs. vorher 355956).
-   Nikinger-Korrektur: „das war dann wohl unsere Restart Logik". Es gibt also
-   eine Auto-Restart-Mechanik, die nach der Migration automatisch gegriffen hat.
-   **Konsequenz für die Aktionsliste:** Schritt 7 „Restart + Health-Gate" ist
-   verkürzbar — die Health-Gate-`expect`-Spalte bleibt (Regression-Schutz),
-   der `sudo systemctl start …`-Block entfällt. **Vormerken für nächste
-   Session:** Aktionsliste in §Vormerkungen entsprechend korrigieren, einen
-   Satz zur Restart-Logik (wo ist sie definiert? `Restart=on-failure` in
-   `sharefyx-mcp.service`? Eine `Requires=`-Kette? Eine eigene Timer-Unit?)
-   aufnehmen — entscheidet der Nikinger.
-
-**Selbstprüfung (§0.5, Endstand):**
-
-- **Tabu-Diff §0.3** weiterhin leer (kein Code-Touch).
-- **Service-Touch 0** über die gesamte Session — die Dienste wurden **gelesen**
-  (`systemctl status`, `systemctl is-active`, `pgrep -af`,
-  `health_gate.sh`), aber nicht gestartet/gestoppt/restartet. Der PID-Wechsel
-  355956 → 991 ist die Auto-Restart-Mechanik, nicht opencode/M3.
-- **Kein `pkill -f`**, kein `sudo systemctl`-Aufruf, kein Pfad auf den echten
-  `DATA_ROOT`/Keyring in dieser Session.
-- **`pytest` 964/964 V107 ✅**, **`ui_budget.py` 5/5 V97 ✅** unverändert.
-- **Phase-Head-Größe** 38,7 KB nach Schritt-2/3-Erweiterung (2,3 KB Reserve
-  zum 40-KB-Softcap).
-- **SESSIONS_ARCHIVE.md** 5,7 KB (rotierter Step-V-deferred-Subblock).
+- **Tabu-Diff §0.3** leer — kein Code-Touch in dieser Session
+  (`git diff --stat -- phase1_storage/storage phase4_auth/authserver
+  phase2_mcp/mcpserver phase5_ui/webui/{security,api,serializers,permissions}.py`
+  liefert keine Ausgabe).
+- `pytest -q` / `node --check` / `ui_budget.py` gegenstandslos (kein Python-,
+  kein JS-, kein CSS-Touch — Baseline V107 = 964 passed, V97 = 5/5 reichen
+  für Doku-only).
+- **Größenprüfung:** `phase8_6_ui_polish/CLAUDE.md` ist nach Rotation **34,6 KB**
+  (5,4 KB Reserve zum 40-KB-Softcap) — ausreichend für Block A/B/C/D-Code-
+  Touches + zugehörige §0.5-Selbstprüfungen. `SESSIONS_ARCHIVE.md` ist jetzt
+  26,9 KB (L3-exempt).
+- **Service-Touch 0** — `cat /etc/systemd/system/sharefyx-mcp.service` und
+  `systemctl cat tailscaled` sind **lesend**. Production-Dienst sharefyx-mcp
+  (PID 991, `ActiveEnterTimestamp=Thu 2026-09-10 19:37:48 CEST`) **nicht**
+  angefasst, kein `sudo systemctl`, kein `pkill -f`. Der `pgrep -af phase2_mcp`
+  wurde nur gelesen.
+- **`ollama list`** meldet `command not found` — bestätigt, dass die
+  Proxmox-Migration zwar durch ist, aber Ollama-Setup noch aussteht. Items #2–4
+  aus dem Handover bleiben **blockiert**.
 
 **Was diese Session bewusst NICHT getan hat:**
 
-- Kein `hostnamectl set-hostname` — der Nikinger entscheidet, ob der alte Name
-  ersetzt wird (Cluster-Konvention? `savefyx-master`? gar nichts?).
-- Kein neues `deploy.sh main` — diese Session hatte **keinen Code-Touch**,
-  also keinen Anlass für einen neuen Release. `6f19a8f` / `v3.0.1` bleibt
-  aktiv; ein Phase-8.6-Release (`v3.0.2`) kommt mit dem ersten Block-A/B/C/D.
-- Kein Ollama-Setup, kein MCP-Wrapper, kein V119-Smoke — das ist **Schritt 4–6**
-  der Aktionsliste und gehört in die nächste Session, **nachdem** der Nikinger
-  sich für Ollama-Pfad vs. alternative Vision-Lösung entschieden hat (siehe
-  „Restart-Logik"-Vormerkung oben).
-- Kein Push vor diesem Eintrag — der Commit-Block unten wird der **einzige**
-  Commit dieser Session.
+- **Keine Phase-8.6-Block-A/B/C/D-Code-Touches** — das ist Open Item #6 und der
+  Hauptumfang, der mit Block A (§3) zwingend zuerst käme (P8.6-U). Diese Session
+  hat den Open-Item-#5-Vorbau abgeschlossen; Block A–D bleiben in dieser oder
+  der nächsten Session.
+- **Kein `hostnamectl set-hostname`** — bleibt beim Nikinger (Tailscale-Name).
+- **Kein Ollama-Setup, kein MCP-Wrapper, kein V119-Smoke** — diese sind
+  Schritt 4–6 der Aktionsliste und brauchen die Proxmox-Migration (✅ durch)
+  **plus** den Nikinger-`apt install ollama`-Schritt.
+- **Kein Push ohne Nikinger-Anweisung.**
 
-**Commit-Message (final, geplant):**
-`phase 8.6: Migration durch -- Aktionsliste + 2 Zukunfts-Notes + Health-Check 8/8`
+**Commit-Message (geplant):**
+`phase 8.6: Open Item #5 -- Aktionsliste Schritt 7 auf Restart-Logik verkuerzt`
 
-**Nächster Schritt (für die neue Session nach dem Push):**
-1. **Hostname-Entscheidung** (Nikinger): `savefyx-VMware-Virtual-Platform` →
-   `savefyx-master` o.ä.? Falls ja: `sudo hostnamectl set-hostname <neu>` +
-   ggf. `/etc/hosts`-Eintrag.
-2. **Ollama + InternVL 2.5 8B** aufsetzen (Aktionsliste Schritt 4, in der
-   migrierten VM auf i5-14600KF).
-3. **MCP-Wrapper-Skript** `phase8_6_ui_polish/scripts/vision_ollama.py` (~50 Z.
-   Python, `requests.post(.../api/generate)`).
-4. **V119-Smoke** gegen `c4_p8519_01_radiogruppe_im_dialog.png`.
-5. **Restart-Logik in der Aktionsliste korrigieren** (Schritt 7 kürzen,
-   Vormerkung „Restart-Logik" eintragen).
-6. **Phase-8.6-Block A–D** nach Plan §3–§6.
+**Nächster Schritt (für dieselbe oder nächste Session):**
+1. **Phase-8.6-Block A** nach Plan §3 (A1 Radiogruppe→select, A2 Tokens,
+   A3 `--border-soft`-Fix, A4 Konvention v3 + „Vorsicht") + 7 neue statische Tests.
+2. Block B (§4), Block C (§5), Block D (§6) — je ein Commit, je Selbstprüfung.
+3. Block D ist unabhängig von Block C und darf mit A oder B zusammenrücken.
+4. Erst nach A/B/C/D: Gate (§7) mit Wegwerf-Instanz + Nikinger-Sichtprüfung +
+   Deploy `v3.0.2` (zweigeteilt: D-a Agent / D-b Nikinger / D-c Health-Gate).
+
