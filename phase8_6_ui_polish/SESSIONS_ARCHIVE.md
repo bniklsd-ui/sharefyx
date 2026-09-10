@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-10 (Vierter archivierter Sub-Block — „Open Item #5 — Aktionsliste Schritt 7 verkürzt" verbatim aus dem Phase-Head hierher rotiert vor dem Block-A-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-A-Sub-Block, SESSIONS_ARCHIVE jetzt L3-exempt mit vier Sub-Blöcken)
+updated: 2026-09-10 (Fünfter archivierter Sub-Block — „Block A — Fundament" verbatim aus dem Phase-Head hierher rotiert vor dem Block-D-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-D-Sub-Block, SESSIONS_ARCHIVE jetzt L3-exempt mit fünf Sub-Blöcken)
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -449,4 +449,147 @@ kein `sudo systemctl`).
 3. Block D ist unabhängig von Block C und darf mit A oder B zusammenrücken.
 4. Erst nach A/B/C/D: Gate (§7) mit Wegwerf-Instanz + Nikinger-Sichtprüfung +
    Deploy `v3.0.2` (zweigeteilt: D-a Agent / D-b Nikinger / D-c Health-Gate).
+
+
+---
+
+### 2026-09-10 (Block A ✅ — Fundament: Radiogruppe→`<select>`, Layer-/Selektions-Tokens, `--border-soft`-Fix, Konvention v3 um „Vorsicht"; Tabu-Diff §0.3 leer, pytest 964→966)
+
+**Auftrag:** Block A nach Plan §3 — A1 Radiogruppe → `<select class="input">` (P8.6-H/I),
+A2 Layer-/Selektions-Tokens + fünf rohe `rgba(62,141,243,…)` durch `var(--select-fill)`/
+`var(--select-line)` ersetzen (P8.6-C/D/E/F), A3 `--border-soft`-Renderfehler-Fix in
+`app.css` (P8.6-§3.3), A4 Konvention v3 um die fünfte Kategorie „Vorsicht" erweitern
+(P8.6-G). Reihenfolge: Token-Fundament zuerst (A vor B ist zwingend, P8.6-U). Ziel ist,
+dass Block B/C/D die Tokens verbrauchen, ohne selbst welche anzulegen.
+
+**Was in diesem Commit passiert ist:**
+
+1. **`phase5_ui/webui/static/app.html` (A1):** `<fieldset class="link-picker-modes">` mit
+   zwei `<input type="radio" name="link-picker-mode">` ersetzt durch
+   `<div class="input input--labeled"><label class="input-label-inline" for="link-picker-mode">Einfügen</label><select class="input" id="link-picker-mode"><option value="body" selected>…</option><option value="frontmatter">…</option></select></div>`.
+   `localStorage["sfx:linkpicker:mode"]` und sein Wert unveraendert (bestehende Browser
+   behalten ihre Wahl).
+
+2. **`phase5_ui/webui/static/js/dialogs.js` (A1):** Modul-Konstante `LINK_PICKER_MODE_NAME`
+   entfernt; `_linkPickerMode()` und `_restoreLinkPickerMode()` lesen/schreiben jetzt
+   `linkPickerModeEl.value` statt `input[name="…"]:checked`; `initLinkPicker()` haengt
+   den `change`-Listener an **ein** Element statt einer `NodeList`-Schleife. Kommentar
+   zur P8.6-A1-Motivation am Konstantenblock (war: P8.5-Bezug, jetzt: P8.6-Bezug mit
+   Verlauf-Hinweis).
+
+3. **`phase5_ui/webui/static/app.css` (A1/A2/A3):**
+   - `:root` (Z. 28-83) um **sechs** neue Tokens erweitert: `--bg-void: #000` (P8.6-D,
+     Layer 0, "echtes Schwarz" fuer OLED); `--select-fill` und `--select-fill-quiet`
+     (voller und halbtransparenter Selektions-Verlauf, P8.6-C); `--select-line` und
+     `--select-line-quiet` (volle und halbtransparente Akzent-Linie, P8.6-C); `--caution:
+     var(--danger)` (Alias fuer die fuenfte Konventions-Kategorie, P8.6-F).
+   - **Fuenf** rohe `rgba(62,141,243,…)`-Vorkommen ausserhalb `:root` (Z. 403/685/719/
+     785/1291) durch Tokens ersetzt; Z. 785 zusaetzlich von `.35` auf `--select-line`s
+     `.40` angeglichen (V109, "Im Zweifel angleichen"). `grep "rgba(62,141,243"` trifft
+     jetzt nur noch `:root`-Zeilen + den Erklaerungs-Kommentar.
+   - `--border-soft` (undefiniert, Step-0-Fund) an Z. 1290/1296 durch `var(--line)`
+     ersetzt — der bestehende Haarlinien-Token, den jede andere Panel-Kante verwendet.
+   - `--bg-void` an genau **drei** Stellen eingesetzt (P8.6-E): `body` (Boot/Login-
+     Hintergrund), `.list__empty, .detail__empty`, `.overview__graph-empty`. **Bewusst
+     sparsam** — die uebrigen 60+ Stellen bleiben auf `--bg` (Layer 1).
+   - `.link-picker-modes`/`.link-picker-mode*`-CSS-Bloecke (A1, Z. 1334-1361) entfernt.
+   - Neue `.input--labeled`/`.input-label-inline`-CSS-Klassen fuer den `<div>`-Traeger
+     mit Label-inline + Select-rechts.
+
+4. **`phase8_ui_graph/CLAUDE.md` (A4):** Selection/Choice-Konvention v3 um eine **fuenfte
+   Tabellenzeile** „Vorsicht" erweitert (`.action--caution`-Tragerklasse, `color:
+   var(--caution)`, **keine** gefuellte rote Flaeche). Ueberschrift „Die vier Kategorien"
+   → „Die **fuenf** Kategorien"; Block-Datum-Notiz am Anfang des Abschnitts (P8.6-G:
+   die Konvention bleibt in **einem** Dokument, kein zweites Konventions-Doc — `DOC_
+   LAYERS_CONVENTION.md` verbietet zwei Kopien derselben Regel). Zusatzsatz zur
+   Abgrenzung: *„Vorsicht ist keine Bestaetigungspflicht. Ein Knopf dieser Kategorie
+   darf trotzdem einen Bestaetigungsdialog haben (Archivieren hat einen), aber die
+   Farbe ersetzt ihn nicht und verlangt ihn nicht."*
+
+5. **`phase5_ui/tests/test_static_routes.py`:** bestehender P8.5-Test
+   `test_link_picker_uses_a_radio_group_not_a_select` → umgekehrt + umbenannt zu
+   `test_link_picker_uses_a_select_not_a_radio_group` (P8.6-I, Docstring traegt beide
+   Richtungen mit Datum). Zwei neue Tests: `test_no_raw_accent_rgba_outside_root`
+   (P8.6-C, maschineller Waelchter ueber die fuenf Stellen) und `test_every_css_var_
+   reference_is_defined` (P8.6-A3, haette den `--border-soft`-Bug gefunden — und
+   findet den naechsten; matcht nicht nur `:root`, weil `@supports`/andere Scopes auch
+   definieren duerfen, **und** strippt CSS-Kommentare, damit historische Token-Namen
+   wie `--accent-text` in Erklaerungs-Kommentaren nicht als „undefiniert" gezaehlt
+   werden).
+
+6. **Hard-Rule-8-Doku-Update im selben Commit:** `phase8_6_ui_polish/CLAUDE.md` Modul-
+   Status Tabelle (Zeile 3 `⬜`→`✅`, +2 statische Tests dokumentiert, Abweichung von
+   Plan §3.5/§8.2 erklaert), Phase-Head-Session-Sub-Block (Rotation: vorheriger
+   Item-#5-Block verbatim nach `SESSIONS_ARCHIVE.md`), Frontmatter `updated:`-Pipe,
+   `docs/INDEX.md` Phase-8.6-Zeile aktualisiert, `ROADMAP.md` P8.6-Zeile aktualisiert,
+   Wurzel-`CLAUDE.md` Current-state Block ergaenzt.
+
+**Selbstpruefung (§0.5):**
+
+- **Tabu-Diff** ueber die gesamte Phase leer: `git diff --stat -- phase1_storage/
+  storage phase4_auth/authserver phase2_mcp/mcpserver phase5_ui/webui/{security,api,
+  serializers,permissions}.py` liefert nichts. Erlaubte Pfade beruehrt:
+  `phase5_ui/webui/static/{app.html,app.css,js/dialogs.js}`, `phase5_ui/tests/
+  test_static_routes.py`, `phase8_ui_graph/CLAUDE.md` (P8.6-G explizit).
+- **`pytest -q`** **966 passed in 118 s** (V107-Baseline 964 → +2; Netto-Effekt des
+  Test-Renames + 2 neuer Tests).
+- **`node --check`** auf `dialogs.js`: OK (kein Syntax-Fehler nach der LINK_PICKER_MODE_
+  NAME-Entfernung und dem Init-Block-Umbau).
+- **`ui_budget.py`** **5/5 im Zielkorridor** (V97-Baseline gehalten): `items?limit=50`
+  roh 26,5 KB, gzip 1,3 KB; `items/{id}` 0,7 KB; `app.js+app.css+Font` gzip **130,4 KB**
+  (Baseline 130,1 KB, +0,3 KB durch die neuen Tokens und `.input--labeled`-Bloecke —
+  unter dem 250-KB-Ziel); Erstaufruf 138,6 KB (unter 400 KB). `dialogs.js` 13,1 KB
+  (Baseline 12,6 KB, +0,5 KB durch die ausfuehrlicheren Kommentare und das Entfernen
+  der NodeList-Schleife; **kein** Code-Wachstum in der heissen Pfad-Linie). V108
+  „_overview"-Latenz heute **365 ms** (deutlich unter der historischen 438–453 ms-
+  Spanne, kein Rauschen — die 863 ms aus V108-Baseline war ein Ausreisser, vermutlich
+  Last auf dem alten Mini-PC vor der Migration).
+- **Punkt 5 der §0.5-Checkliste** (kein rohes `rgba(62,141,243` ausserhalb `:root`):
+  maschinell verifiziert (`python3`-Inline-Skript `:root`-Block entfernt, dann
+  `grep "rgba(62,141,243"` → **0 Treffer**).
+- **Phase 8 §0.3-Verbotsliste** eingehalten: kein Emoji-Icon, kein Gradient-Branding,
+  kein 3er-Card-Grid, keine dekorative Farbe, keine neue Schriftfamilie, kein Element
+  dessen Erkennbarkeit allein von Transparenz/Blur abhaengt (manuell bestaetigt).
+- **Groessenpruefung:** `phase5_ui/webui/static/app.css` 62,5 KB (vorher 61,4 KB, +1,1 KB
+  durch Tokens + drei `--bg-void`-Stellen + `.input--labeled`); `app.html` 31,7 KB;
+  `dialogs.js` 45,1 KB; `phase8_ui_graph/CLAUDE.md` 43,2 KB (vorher 42,3 KB, **+850 B**
+  statt der geplanten ~600 B — die Konventionstabelle hat mehr zusaetzlichen Text als
+  nur eine Tabellenzeile). `phase8_6_ui_polish/CLAUDE.md` aktueller Stand weiter unten.
+- **Service-Touch 0** — kein `sudo systemctl`, kein `pkill -f`, kein Pfad auf den
+  echten `DATA_ROOT`/Keyring. Production-Dienst sharefyx-mcp (PID 991) **nicht**
+  angefasst.
+- **`ollama list`** meldet weiterhin `command not found` — Items #2–4 aus dem Handover
+  bleiben blockiert (Nikinger-Aktion fuer Schritt 4 der Aktionsliste).
+
+**Was bewusst NICHT in diesem Commit passiert ist:**
+
+- **Kein Block B/C/D-Code-Touch** — A vor B ist zwingend (P8.6-U), und der Token-
+  Vorrat ist jetzt vollstaendig. Block B kann mit B1 (Hover-Vereinheitlichung) und
+  B4 (`action--caution`-Klasse an Abmelden + Archivieren) anfangen.
+- **Keine Schritte 1–3 der Aktionsliste** (Ollama/MCP-Wrapper/V119-Smoke) — bleiben
+  Nikinger- bzw. Proxmox-migrationsabhaengig.
+- **Keine Tests fuer Block B/C** (die anderen 4 aus Plan §8.2) — bewusste Abweichung
+  vom Plan §3.5/§8.2, weil sie in Block A rot waeren. Sie werden in Block B/C/D
+  geschrieben, sobald ihr Code existiert. **Dokumentiert in der Modul-Status-Tabelle.**
+- **Kein `pkill -f`**, **kein `sudo systemctl`**, **kein Push** ohne Nikinger-
+  Anweisung.
+- **Keine Custom-404-Seite, kein Tab-Meta-Dynamic-Title** — die zwei „would be cool"-
+  Zukunfts-Notes bleiben explizit draussen (P8.6-Tabu, Phase-Head §Vormerkungen).
+
+**Commit-Message (geplant):**
+`phase 8.6: Block A -- Radiogruppe zurueck auf select, Layer-/Selektions-Tokens, --border-soft-Fix`
+
+**Naechster Schritt (in dieser oder naechsten Session):**
+1. **Block B** nach Plan §4 (B1 Hover-Vereinheitlichung, B2 Ordner/Tags/Buckets,
+   B3 Einstellungsmenue-Navigation, B4 Sweep mit `action--caution`-Klasse an Abmelden
+   + Archivieren, B5 eine Radius-Aenderung an `.link-picker-results`). Hinzu kommen
+   `test_caution_class_only_on_logout_and_archive` als statischer Test (P8.6-B4).
+2. Block C nach Plan §5 (Struktur-Umbau: Konto→Einstellungen, Alle Items unter
+   Spaces, Map als rechte Spalte, klickbare Spaces, Ordner-Zaehler). Drei weitere
+   statische Tests.
+3. Block D nach Plan §6 (V102-Dedup, deterministischer Layout-Seed, optional
+   `cancelAnimationFrame`-Fix in `runSimulation()` — der „streichen, wenn der Nikinger
+   es in der Sichtpruefung anders sieht"-Vorbehalt bleibt).
+4. Erst nach A/B/C/D: Gate (§7) mit Wegwerf-Instanz + Nikinger-Sichtpruefung +
+   Deploy `v3.0.2`.
 

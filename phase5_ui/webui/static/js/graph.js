@@ -153,7 +153,7 @@ export function loadGraph() {
     nodes = (data.nodes || []).map(function (n) {
       return Object.assign({}, n, { x: 0, y: 0, vx: 0, vy: 0, deg: 0 });
     });
-    explicitEdges = data.edges || [];
+    explicitEdges = dedupeEdges(data.edges || []);
     nodeById = Object.create(null);
     nodes.forEach(function (n) { nodeById[n.id] = n; });
     rebuildImplicitEdges();
@@ -167,6 +167,28 @@ export function loadGraph() {
     seedInitialPositions();
     runSimulation();
   }).catch(reportUnexpectedError);
+}
+
+// P8.6-D1 (P8.6-N): dieselbe Beziehung -- einmal als Body-Link und einmal als
+// Frontmatter-Eintrag -- liefert zwei Kanten aus `store.links_all()` (api.py:712).
+// Der Server dedupliziert bewusst nicht (kein Cross-`kind`-Dedup in
+// `index.py :: replace_item_links`). Hier zusammenfassen und nicht dort: eine
+// neunte P1-Contract-Oeffnung waere das teuerste Mittel fuer einen Zeichenfehler
+// (Nikinger-Entscheidung 2026-09-09, Plan P8.6-N). `kind` des ersten Treffers
+// gewinnt. Bei der Uebernahme deduplizieren, **nicht** erst in `drawEdges()` --
+// dann waere die Doppelkante aus dem Bild, aber in der Kanten-Zaehlung stuende
+// sie weiterhin.
+function dedupeEdges(edges) {
+  var seen = Object.create(null);
+  var out = [];
+  for (var i = 0; i < edges.length; i++) {
+    var e = edges[i];
+    var key = e.src < e.dst ? e.src + "|" + e.dst : e.dst + "|" + e.src;
+    if (seen[key]) continue;
+    seen[key] = true;
+    out.push(e);
+  }
+  return out;
 }
 
 function rebuildImplicitEdges() {
@@ -246,8 +268,10 @@ function buildFolderEdges(nodeList) {
 }
 
 function seedInitialPositions() {
-  // Streuung um den Canvas-Mittelpunkt -- Pseudo-Zufall reicht fuer die Startlage, die
-  // Simulation laeuft sie ohnehin zusammen.
+  // Streuung um den Canvas-Mittelpunkt -- deterministisch per Item-ID (P8.6-D2,
+  // P8.6-M). Vorher Math.random() -- dieselben Daten ergaben jedes Mal ein
+  // anderes Bild und "die Karte fliegt" beim Oeffnen. Der Ring nach Index ist
+  // schon deterministisch; nur der Jitter brauchte den Hash.
   var cx = cssWidth / 2;
   var cy = cssHeight / 2;
   var spread = Math.min(cssWidth, cssHeight) / 4;
@@ -255,26 +279,61 @@ function seedInitialPositions() {
     var n = nodes[i];
     if (n.x === 0 && n.y === 0) {
       var angle = (i / Math.max(1, nodes.length)) * 2 * Math.PI;
-      n.x = cx + Math.cos(angle) * spread + (Math.random() - 0.5) * 30;
-      n.y = cy + Math.sin(angle) * spread + (Math.random() - 0.5) * 30;
+      n.x = cx + Math.cos(angle) * spread + seedJitter(n.id, 1) * 30;
+      n.y = cy + Math.sin(angle) * spread + seedJitter(n.id, 2) * 30;
     }
     n.vx = 0;
     n.vy = 0;
   }
 }
 
+// FNV-1a, 32 Bit. Zweck ist nicht Kryptographie, sondern Reproduzierbarkeit:
+// dieselbe Item-ID muss ueber Reloads hinweg denselben Jitter ergeben, sonst
+// "fliegt" die Karte bei jedem Oeffnen neu (Nikinger 2026-09-06, Notizen §2.4).
+// Acht Zeilen, `Math.imul` ist exakt 32-Bit, und benachbarte IDs ergeben
+// unkorrelierte Werte -- genau das, was ein Jitter braucht. Ein
+// `Math.sin(seed)*10000 % 1`-Trick korreliert bei aehnlichen Eingaben, und
+// `itm_…`-IDs sind einander aehnlich.
+function seedJitter(id, salt) {
+  var h = 2166136261;
+  for (var i = 0; i < id.length; i++) {
+    h ^= id.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  h ^= salt;
+  return ((h >>> 0) / 4294967295) - 0.5;   // -0.5 .. +0.5, wie (Math.random() - 0.5)
+}
+
 function runSimulation() {
   var alpha = ALPHA_START;
-  var rafId = null;
+
+  // P8.6-D4 (Plan §6.4): jede Wiederholung von `loadGraphPanel()` (Klick auf
+  // Uebersicht, Refresh) startete bisher eine **zusaetzliche**
+  // `requestAnimationFrame`-Schleife. Solange die vorige noch ueber ALPHA_MIN
+  // lag, liefen zwei `tick()`-Schleifen gleichzeitig, beide riefen `draw()` --
+  // die direkte Ursache dafuer, dass §2.4 ("die Karte fliegt") sich beim
+  // wiederholten Oeffnen verschlimmerte. Der Abbruch war schon halb da
+  // (`var rafId` lokal angelegt + zugewiesen in Z. 277 und Z. 290, aber nie
+  // gelesen); nur `cancelAnimationFrame` fehlt. Drei Zeilen Fix, benannte
+  // Scope-Erweiterung -- wenn der Nikinger es in der Sichtpruefung anders
+  // sieht, ist es streichbar (P8.6-§6.4).
+  if (!reducedMotion && activeRafId !== null) {
+    cancelAnimationFrame(activeRafId);
+  }
 
   function tick() {
-    if (alpha < ALPHA_MIN) return;
+    if (alpha < ALPHA_MIN) {
+      activeRafId = null;
+      return;
+    }
     applyForces(alpha);
     integrate(alpha);
     alpha *= ALPHA_DECAY;
     draw();
     if (alpha >= ALPHA_MIN) {
-      rafId = requestAnimationFrame(tick);
+      activeRafId = requestAnimationFrame(tick);
+    } else {
+      activeRafId = null;
     }
   }
 
@@ -286,10 +345,14 @@ function runSimulation() {
       alpha *= ALPHA_DECAY;
     }
     draw();
+    activeRafId = null;
   } else {
-    rafId = requestAnimationFrame(tick);
+    activeRafId = requestAnimationFrame(tick);
   }
 }
+
+// Modul-Ebene (P8.6-D4): damit `runSimulation()` den vorherigen Loop abbrechen kann.
+var activeRafId = null;
 
 function applyForces(alpha) {
   // 1. Repulsion paarweise (Plan §5 D2: O(n²), Cutoff-Distanz nicht noetig -- 200 Knoten
