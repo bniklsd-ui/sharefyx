@@ -35,8 +35,8 @@ Statusglyphen: ⬜ nicht gestartet · 🔄 aktiv · 🟡 code-complete, nicht li
 | **P7** | `phase7_spaces_admin/` (kein eigenes Paket) | Space-Verwaltung, Mehrfachauswahl, Konsolidierung. | ✅ |
 | **P8** | `phase8_ui_graph/` (kein eigenes Paket) | UI-Neuanstrich v3, Verknüpfungs-Graph, P7-Erbposten. | ✅ |
 | **P8.5** | `phase8_5_picker_release/` (kein eigenes Paket) | Link-Picker-Politur, v3-Vorabritt + Deploy; schließt Phase 8 ab. | ✅ |
-| **P8.6** | (nicht angelegt, Arbeitsname) | Restliche UI-Politur aus `p8x_ui_polish_notes.md` + Radiogruppe-Rückbau auf `<select>`; **erster Punkt: OpenCode-Vision-Plugin**. Deploy-Ziel `v3.0.2`. | ⬜ |
-| **P9** | (nicht angelegt, Arbeitsname) | Obsidian-Map-/Graph-Umbau (`p8x_ui_polish_notes.md` §2). Deploy-Ziel `v3.1.0`, laut Nikinger voraussichtlich letzter großer UI-Umbau. | ⬜ |
+| **P8.6** | `phase8_6_ui_polish/` | **Geplant 2026-09-09**, Plan: `docs/concepts/phase8_6_ui_polish_plan.md`. Reichweite „Selektions-Welle + Layout" — Layering-Tokens, eine Selektionssprache für alles Klickbare, „Konto"→„Einstellungen", Ordner-Zähler, Rail-/Übersichts-Reorg, klickbare Spaces, drei Graph-Fixes (V102/§2.3/§2.4), Radiogruppe-Rückbau auf `<select>`; **erster Punkt: OpenCode-Vision-Plugin**. Deploy-Ziel `v3.0.2`. | 🔄 |
+| **P9** | (nicht angelegt, Arbeitsname) | Obsidian-Map-/Graph-Umbau (`p8x_ui_polish_notes.md` §2) + verbundene AI-Sessions (§10.8). **Vorgemerkt 2026-09-10: „Ordner umbenennen"** — in P8.6 geprüft und bewusst vertagt, volle Analyse in `phase8_6_ui_polish_plan.md` §0.4.1 (die billige Frontend-Fassung lässt die `.share.yml` eines geteilten Ordners still zurück; der saubere Weg ist die **neunte P1-Contract-Öffnung**). Deploy-Ziel `v3.1.0`, laut Nikinger voraussichtlich letzter großer UI-Umbau. | ⬜ |
 
 **[2026-09-08 Korrektur, Z-Closeout]:** P8 + P8.5 auf ✅ (Statusregel geändert — vom Nikinger
 geprüfte Wegwerf-Automatisierung zählt jetzt als live-verifiziert, siehe `phase8_ui_graph/
@@ -285,10 +285,14 @@ Anhang §A–§E. **Die Zahlen „16 Themen / 25 KB" hier standen bis 2026-09-09
    sind) — beantwortet die §C-Fragen, schätzt Reichweite, spaltet ggf. in Sub-Phasen.
    **Erster Punkt der Phase: OpenCode-Vision-Plugin installieren** (Nikinger-Vorgabe).
    Einstiegsdokument ist das Handover §4, nicht die Phase-Heads.
-3. **Plan-Doc + Phase-Verzeichnis** — Name noch nicht gelockt (Notizen §D kennt P8.6 noch
-   nicht; `phase8_6_ui_polish/` ist die naheliegende Fortführung). **Offene Nummern-Frage:**
-   der Nikinger ordnet die AI-Sessions-Anzeige „eher v3.1 also p8.7" ein, die Dokumente
-   kennen aber nur P8.6 → `v3.0.2` und P9 → `v3.1.0`. In der Planung klären, nicht raten.
+3. ~~**Plan-Doc + Phase-Verzeichnis** — Name noch nicht gelockt~~ **✅ erledigt 2026-09-09**
+   — gelockt als `phase8_6_ui_polish/` + `docs/concepts/phase8_6_ui_polish_plan.md` (P8.6-A).
+   **Die Nummern-Frage ist entschieden:** der Nikinger hat bestätigt, dass sein „eher v3.1
+   also p8.7" das meint, was die Dokumente **P9 → `v3.1.0`** nennen. **Es gibt kein P8.7.**
+   Die verbundenen AI-Sessions (`p8x_ui_polish_notes.md` §10.8) sind damit P9-Inhalt.
+   Umbenannt wurde nichts — der Wortlaut bleibt in §10.8 zitiert stehen.
+4. **Ausführung P8.6** in opencode/M3 nach Plan §1–§8, Reihenfolge Step 0 → Step V → A → B
+   → C/D → Gate → Deploy → Step Z. Der Closeout wird Plan **§9** (P8-N).
 
 **Was NICHT in p8.X gehört** (klare Außenkanten, Notizen-Datei §B): Body-Volltextsuche
 in der Web-UI (Q1 gelockt), Rechteverwaltung über MCP-Tools (P6-M), Löschen von Items

@@ -1,3 +1,13 @@
+---
+status: live
+purpose: Freundlicher Was-tust-du / Was-siehst-du-Walkthrough für die Sichtprüfung am echten Gerät — mit DevTools-Befehlen, Console-Snippets, Stoppuhr-Anleitung; Geschwister zum technischen `SICHTPRUEFUNG_RESTBLOCK.md`
+read-when: vor einer Nikinger-Sichtprüfungs-Sitzung, wenn der dichte Tabellen-Stil im Restblock zu technisch wirkt
+detail: L2
+up: ./CLAUDE.md
+down:
+  - ./SICHTPRUEFUNG_RESTBLOCK.md   # technische Referenz, gleicher Inhalt dichter (Tabellen + Code-Anker)
+updated: 2026-09-08 (Doku-Sub-Session 2 — Walkthrough mit allen 12 Min ohne Fabian / 22 Min mit Fabian; Vorschau-Pflicht-Top-Notiz)
+---
 # Sichtprüfungs-Walkthrough — Schritt für Schritt am Bildschirm
 
 > **Wofür diese Datei:** `SICHTPRUEFUNG_RESTBLOCK.md` (27 KB) ist die technische

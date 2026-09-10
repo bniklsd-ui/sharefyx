@@ -3,13 +3,13 @@ status: live
 purpose: Notizen-Sammlung für die p8.X-Folge-Phase — UI-Polish, Layout, Settings, Design-System-Layering, Edit-in-Place-Vision; Findings aus Sichtprobe-Folgesession 2026-09-06 (Nikinger + Fabian, post Phase 8.5 D4)
 read-when: Planung der p8.X-Phase, Scan der noch offenen UI-Wünsche nach Phase 8.5-Z; **nicht** eine Lese-Anweisung pro Commit — das macht der Phase-Head
 detail: L2
-up: ../CLAUDE.md
+up: ../../CLAUDE.md
 down:
-  - ../phase8_ui_graph/CLAUDE.md                       # Phase 8 — Vorgänger, Closeout-§9.4.7 ist p8.X-Anker
-  - ../phase8_5_picker_release/CLAUDE.md              # Phase 8.5 — Vorgänger, D4-Block + dieser Sichtprobe-Folgesession-Block
-  - ../phase8_5_picker_release/SESSIONS_ARCHIVE.md     # Phase-8.5-Historie (D4 archiviert)
-  - ../docs/concepts/phase8_ui_graph_plan.md            # §9.4.7 Phase-Status + p8.X-Übergabepunkt
-  - ../phase8_ui_graph/SESSIONS_ARCHIVE.md              # §9.4.6 drei Restdefekte (Settle-Zeit / Foreign-Farbe / Knotenklick — bereits am 2026-09-02 geschlossen, hier referenziert)
+  - ../../phase8_ui_graph/CLAUDE.md                       # Phase 8 — Vorgänger, Closeout-§9.4.7 ist p8.X-Anker
+  - ../../phase8_5_picker_release/CLAUDE.md              # Phase 8.5 — Vorgänger, D4-Block + dieser Sichtprobe-Folgesession-Block
+  - ../../phase8_5_picker_release/SESSIONS_ARCHIVE.md     # Phase-8.5-Historie (D4 archiviert)
+  - ./phase8_ui_graph_plan.md                            # §9.4.7 Phase-Status + p8.X-Übergabepunkt
+  - ../../phase8_ui_graph/SESSIONS_ARCHIVE.md              # §9.4.6 drei Restdefekte (Settle-Zeit / Foreign-Farbe / Knotenklick — bereits am 2026-09-02 geschlossen, hier referenziert)
 updated: 2026-09-09 (Phase-8.5-Closeout-Session — **§10 NEU**: neun Nikinger-Feedback-Punkte aus dem Closeout-Prompt [Icon-Radien, Hover-Auswahl, Ordner-/Tags-Auswahl, klickbare Spaces, Einstellungsmenü, alles Klickbare mit Farbausnahme Abmelden/Archivieren, AI-Sessions, **Hochkant-/Handy-UI**], sieben davon Verschärfungen von §5/§6; §5 + §6 + §C-2 auf §10 verwiesen; **§B: „Mobile" durchgestrichen** — Nikinger-Aufhebung, Realtime bleibt draußen; §E +9 Zeilen; `updated:`-Pipe zweimal komprimiert wegen Softcap-Nähe; kein Code-Touch) | 2026-09-08 (Sichtprüfungs-Folge-Sitzung — §6 re-affirmiert [Lesarten a/b/c gegen `app.html:31-41`], §8 NEU Tags, §9 NEU Feedback-Button, §E +3) | 2026-09-06 (Sichtprobe-Folgesession Nikinger + Fabian — neue Datei, §1–§7 angelegt, fünf D4-Punkte zusammengeführt)
 ---
 

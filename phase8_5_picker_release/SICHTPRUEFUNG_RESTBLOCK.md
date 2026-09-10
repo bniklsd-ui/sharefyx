@@ -1,3 +1,14 @@
+---
+status: live
+purpose: Konsolidierter Schritt-für-Schritt-Testblock für alle restlichen Sichtprüfungen — Cluster 3-Rest (Phase 8 P8-21d/-22/-24) + Cluster 4 (Phase 8.5 P8-16/-3/-4/-17/-19) + Cluster 5 (Phase 8 P8-5/-8 mit Fabian) gegen die zwei Wegwerf-Instanzen + Production v3.0.1
+read-when: vor einer Nikinger-Sichtprüfungs-Sitzung am echten Gerät, die mehrere offene Punkte in einer Login-Runde abarbeiten will
+detail: L2
+up: ./CLAUDE.md
+down:
+  - ./SICHTPRUEFUNG_WALKTHROUGH.md   # freundlicher Walkthrough, Geschwister (Was-tust-du / Was-siehst-du pro Schritt)
+  - ./CLUSTER3_TESTBLOCK.md           # nur P8-20/-21/-22/-24, älter, Restblock ist die konsolidierte Neufassung
+updated: 2026-09-08 (Doku-Sub-Session Folge — Cluster-3-Rest + Cluster 4 + Cluster 5 zusammengeführt; Login-Snippet mit re-runnablem TOTP-Code für beide Wegwerf-Instanzen; Hard-Rule-9-konformer Cleanup)
+---
 # Restblock-Sichtprüfungen — Phase 8 Cluster 3-Rest + Phase 8.5 Cluster 4 + 5
 
 > **Status:** ⬜ offen. Diese Datei ist der **einzige Schritt-für-Schritt-Testblock**

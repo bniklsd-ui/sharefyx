@@ -4,7 +4,10 @@ purpose: Ausführungsreifer Plan der neuen QoS-Phase — MCP-Werkzeug-Ergonomie 
 read-when: Kickoff dieser Phase, oder wenn geklärt werden muss, warum ein Tool so beschrieben ist bzw. wie ein Bild physisch liegt und wer es sehen darf
 detail: L2
 up: ../../ROADMAP.md
-down: ../../phase6_shares/IMAGES_PLAN.md (Vorgänger-Zusatzplan, ab jetzt nachrangig) · ../../phase6_shares/CLAUDE.md · ./phase6_shares_plan.md
+down:
+  - ../../phase6_shares/IMAGES_PLAN.md    # Vorgänger-Zusatzplan, ab jetzt nachrangig
+  - ../../phase6_shares/CLAUDE.md          # Phase 6 — Vorgänger
+  - ./phase6_shares_plan.md                # P6-Plan, Block A Werkzeug-Ergonomie-Kontext
 updated: 2026-08-20 (Opus-Planungssession, danach N1–N6 vom Nikinger live per AskUserQuestion beantwortet und in §0.0 gelockt — Phase 6.5, kein app.html-Fix nötig, kein Bulk-Append, Body-Suche als MCP-Opt-in, Bild-Trash statt Entfernen mit offener Vormerkung zur Langzeit-Aufräumung, MAX_MCP_ASSET_BYTES=1MiB; gelockt P6.5-A–P6.5-V, B1–B4 als Nikinger-Vorgabe eingearbeitet, V59/V61 empirisch geschlossen)
 ---
 

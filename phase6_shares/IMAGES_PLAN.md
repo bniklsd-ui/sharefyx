@@ -4,7 +4,9 @@ purpose: Zusatzplan zu P6 Block C — Bilder in Items (Speicherung, Referenzsche
 read-when: bevor Block C gebaut wird, oder wenn geklärt werden muss, wie ein Bild physisch liegt und wer es sehen darf
 detail: L2
 up: ./CLAUDE.md
-down: ../docs/concepts/phase6_shares_plan.md (Block C, nur stichwortartig) · ./GLOBAL_SEARCH_PLAN.md
+down:
+  - ../docs/concepts/phase6_shares_plan.md    # Block C, nur stichwortartig
+  - ./GLOBAL_SEARCH_PLAN.md                    # Geschwister-Zusatzplan
 updated: 2026-08-20 (nachrangig -- abgeloest durch docs/concepts/phase6_5_tools_images_plan.md, alle B1-B5 dort gelockt, V59-V62 dorthin uebernommen); 2026-08-19 (neu geschrieben, Planungssession; gelockt P6-AU–P6-BB, FÜNF offene Nikinger-Entscheidungen B1–B5, Abnahmezeilen 40–47)
 ---
 

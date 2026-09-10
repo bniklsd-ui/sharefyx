@@ -1,3 +1,13 @@
+---
+status: live
+purpose: Schritt-für-Schritt-Testblock für Phase-8-Cluster-3-Sichtprüfung (P8-20/-21/-22/-24) gegen eine 200-Knoten-Wegwerf-Instanz — älter, vom Restblock abgelöst, bleibt als Audit-Quelle für Z erhalten
+read-when: beim Nachvollziehen der Phase-8-Cluster-3-Verifikation; für aktuelle Sichtungen ist `SICHTPRUEFUNG_RESTBLOCK.md` maßgeblich
+detail: L2
+up: ./CLAUDE.md
+down:
+  - ./SICHTPRUEFUNG_RESTBLOCK.md   # konsolidierter Nachfolger, deckt auch Cluster 4 + 5 ab
+updated: 2026-09-07 (Cluster-3-Teilverifikation — erste Nikinger-Live-Sichtprüfung nach Cluster 2; P8-20 ✅ + P8-21 a/b/c ✅; restliche Zeilen in Folge-Session)
+---
 # Cluster 3 — Testblock für P8-20 / P8-21 / P8-22 / P8-24
 
 **Status:** ⬜ offen (alle vier Zeilen sind 🟡 in `phase8_ui_graph/CLAUDE.md` §7 — werfen-verifiziert, nicht live).
