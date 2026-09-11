@@ -716,6 +716,19 @@ absichtlich anders.
 
 ### §4.6 Abschluss Block B
 
+✅ **2026-09-11 (Block-B-Commit):** Plan wörtlich umgesetzt mit drei kleinen Abweichungen,
+die im Phase-Head dokumentiert sind:
+- **`.btn:hover` + `.btn-primary:hover`** auf Tokens via `color-mix(in srgb, var(--*-face),
+  white N%)` statt Pseudo-Element-Overlay (Geist der P8.6-Q erfüllt, ohne invasive
+  Architektur-Änderung).
+- **B2-Audit** statt Bau: V113-Befund „`.tree__space` hat im Code kein `aria-current`"
+  im Session-Block dokumentiert (Plan sagt „zu prüfen, nicht zu bauen"); der
+  `:not([aria-current="true"])`-Ausschluss in der neuen Hover-Regel ist trotzdem korrekt
+  und für eine künftige Reparatur vorbereitet.
+- **Link-Picker-Hover** in die konsolidierte Regel umgezogen (`var(--select-fill-quiet)`
+  statt `var(--select-fill)` für hover), die `aria-selected="true"`-Variante bleibt mit
+  vollem Fill (Auswahl schlägt Hover).
+
 Ein Commit: `phase 8.6: Block B -- eine Selektionssprache fuer alles Klickbare, Kategorie Vorsicht, ein Radius-Fix`.
 
 ---

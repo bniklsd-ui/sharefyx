@@ -34,8 +34,11 @@
       </button>
       <!-- Meldung des Nikingers: Symbol wechselte von &#9211; (Wiedergabe/Ein-Aus, zu nah am
            &#9881;-Zahnrad des Konto-Knopfs direkt daneben) zu &#9099; (Kreis mit Pfeil nach
-           links oben, das ISO-7000-Zeichen fuer "Abmelden"). -->
-      <button class="rail__action" type="button" id="logout-button">
+           links oben, das ISO-7000-Zeichen fuer "Abmelden").
+           Phase 8.6 Block B B4 (Plan §4.4): Vorsicht-Kategorie (Konvention v3) -- einziges
+           Mitglied in der Rail. Knopfplastik bleibt (gleicher Knopf wie Einstellungen), nur
+           Text- und Icon-Farbe wechseln auf --caution. -->
+      <button class="rail__action action--caution" type="button" id="logout-button">
         <svg class="rail__glyph icon" aria-hidden="true"><use href="#i-log-out"></use></svg><span class="rail__label">Abmelden</span>
       </button>
     </div>
@@ -144,7 +147,10 @@
                leicht. Jetzt am anderen Ende der Leiste, mit zusaetzlichem Abstand vor dem "×"
                (.editor__close-button in app.css), statt beider halb-destruktiven Aktionen
                nebeneinander. -->
-          <button type="button" class="btn" id="archive-button">Archivieren</button>
+          <!-- Phase 8.6 Block B B4 (Plan §4.4): Vorsicht-Kategorie (Konvention v3).
+               Einziges Mitglied im Editor; Bestätigungsdialog (editor.js :: confirmDialog)
+               bleibt unverändert (Vorsicht-Farbe ersetzt KEINE Bestätigungspflicht). -->
+          <button type="button" class="btn action--caution" id="archive-button">Archivieren</button>
           <button type="button" class="btn-primary" id="save-button">Speichern</button>
           <button type="button" class="btn btn--icon editor__close-button" id="close-button" title="Editor schlie&szlig;en" aria-label="Editor schlie&szlig;en"><svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg></button>
         </div>
@@ -444,8 +450,12 @@
     <h2>Passwort &auml;ndern</h2>
     <p class="overlay__hint">Danach musst du jeden Connector neu autorisieren, und andere
       angemeldete Browser werden abgemeldet. Diese Sitzung bleibt bestehen.</p>
-    <button type="button" class="btn account-updates-link" id="account-show-updates">Update-Log ansehen</button>
-    <button type="button" class="btn" id="account-manage-spaces">Spaces verwalten</button>
+    <!-- Phase 8.6 Block B B3 (Plan §4.3): Navigations-Sprache statt Knopfplastik. Beide öffnen
+         einen Dialog, ändern nichts -- die .btn-Form verleitete zum Fehlklick (das war die
+         Meldung des Nikingers zum Archivieren-neben-x, gleiche Muster). .account-nav hat
+         margin-bottom eingebaut; die alte .account-updates-link-Klasse fällt weg. -->
+    <button type="button" class="account-nav" id="account-show-updates">Update-Log ansehen</button>
+    <button type="button" class="account-nav" id="account-manage-spaces">Spaces verwalten</button>
     <p class="form-error" id="account-error" hidden></p>
     <label>Aktuelles Passwort
       <span class="pw-field">

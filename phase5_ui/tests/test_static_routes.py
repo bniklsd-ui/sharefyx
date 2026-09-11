@@ -439,3 +439,64 @@ def test_every_css_var_reference_is_defined():
         f"Jedes `var(--x)` braucht ein `--x:` (irgendwo in der Datei, nicht nur in :root). "
         f"Dieser Test haette den --border-soft-Bug gefunden -- und findet den naechsten."
     )
+
+
+def test_caution_class_only_on_logout_and_archive():
+    """P8.6 B4 (Plan §4.4 P8.6-G): Kategorie "Vorsicht" (Konvention v3, fünfte Kategorie in
+    `phase8_ui_graph/CLAUDE.md` Selection/Choice-Konvention v3) wird über die Trägerklasse
+    `action--caution` markiert. Genau zwei Elemente tragen sie:
+
+      - `#logout-button`  -- einziges Rail-Mitglied (Session beenden)
+      - `#archive-button` -- einziges Editor-Mitglied (Item ins Archiv verschieben)
+
+    Beide Aktionen haben Rückweg-Kosten: Logout invalidiert UI-Session + aktive Connector-
+    Token-Familien, Archivieren entfernt das Item aus der Standardansicht. "Verschieben",
+    "Abwählen", "Erste Notiz anlegen", "Space verwalten" sind alle folgenlos oder trivial
+    umkehrbar -- deshalb KEIN drittes Mitglied.
+
+    Der Test zählt die Vorkommen im Markup UND prüft, dass die zwei Elemente die richtigen
+    sind. Wer ein drittes Element mit der Klasse versieht (oder die alte ID-Selektor-Form
+    `#logout-button { color: var(--caution) }` wieder einführt), fällt hier auf statt erst in
+    der nächsten Sichtprüfung.
+    """
+    html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
+
+    # Genau zwei Vorkommen der Trägerklasse im Markup.
+    assert html.count("action--caution") == 2, (
+        "Trägerklasse `action--caution` muss genau zweimal in app.html vorkommen "
+        "(P8.6 B4: Vorsicht-Kategorie mit genau zwei Mitgliedern). "
+        f"Aktuelle Anzahl: {html.count('action--caution')}."
+    )
+
+    # Die zwei Elemente müssen die richtigen sein.
+    logout_match = re.search(
+        r'<button[^>]*id="logout-button"[^>]*>',
+        html,
+    )
+    assert logout_match is not None, "#logout-button fehlt im Markup"
+    assert "action--caution" in logout_match.group(0), (
+        "#logout-button muss Trägerklasse `action--caution` tragen "
+        "(P8.6 B4: einziges Rail-Mitglied der Vorsicht-Kategorie)."
+    )
+
+    archive_match = re.search(
+        r'<button[^>]*id="archive-button"[^>]*>',
+        html,
+    )
+    assert archive_match is not None, "#archive-button fehlt im Markup"
+    assert "action--caution" in archive_match.group(0), (
+        "#archive-button muss Trägerklasse `action--caution` tragen "
+        "(P8.6 B4: einziges Editor-Mitglied der Vorsicht-Kategorie)."
+    )
+
+    # Die CSS-Regel existiert und referenziert --caution (statt z. B. var(--danger) direkt
+    # zu wiederholen -- die Konvention verbietet zwei Farbnamen für dieselbe Bedeutung, P8.6-F).
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+    assert ".action--caution" in css, (
+        "app.css muss eine Regel für `.action--caution` tragen (P8.6 B4)."
+    )
+    assert "var(--caution)" in css, (
+        "app.css muss `var(--caution)` verwenden (P8.6-F: ein Farbname pro Bedeutung, "
+        "--danger und --caution teilen denselben Wert -- die Trägerklasse ist die "
+        "semantische Differenzierung)."
+    )

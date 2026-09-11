@@ -234,7 +234,7 @@ h3 { font-size: var(--fs-body); }   /* 16px -- Untertitel (vor C1: 15px, kleiner
   cursor: pointer;
   box-shadow: inset 0 1px 0 var(--btn-glow), var(--btn-lift);
 }
-.btn:hover { background: linear-gradient(180deg, #323A45, #212832); }
+.btn:hover { background: linear-gradient(180deg, color-mix(in srgb, var(--btn-face-top), white 7%), color-mix(in srgb, var(--btn-face-bottom), white 7%)); }
 .btn:active {
   transform: translateY(1px);
   background: linear-gradient(180deg, var(--btn-face-bottom), var(--btn-face-top));
@@ -253,7 +253,7 @@ h3 { font-size: var(--fs-body); }   /* 16px -- Untertitel (vor C1: 15px, kleiner
   text-decoration: none;
   display: inline-block;
 }
-.btn-primary:hover { background: linear-gradient(180deg, #6EACF9, #3781E2); }
+.btn-primary:hover { background: linear-gradient(180deg, color-mix(in srgb, var(--accent-face-top), white 12%), color-mix(in srgb, var(--accent-face-bottom), white 12%)); }
 .btn-primary:active {
   transform: translateY(1px);
   background: linear-gradient(180deg, var(--accent-face-bottom), var(--accent-face-top));
@@ -412,8 +412,41 @@ select.input:focus {
 .rail__home { margin: 0 var(--space) var(--space); width: auto; }
 .rail__action { width: auto; flex: 1; }
 
-.rail__home:hover, .rail__action:hover, .tree__space:hover, .tree__folder:hover, .tree__scope:hover {
-  background: var(--surface);
+/* Phase 8.6 Block B B1 (Plan §4.1 P8.6-Q): vereinheitlichte Hover-Sprache für alles Klickbare,
+   das KEINE persistente Auswahl trägt. EIN Blau, eine Deckkraft-Stufe (--select-fill-quiet,
+   halb so deckend wie --select-fill -- Nikinger 2026-09-09, Notizen §10.5). Die
+   [aria-current]-/--selected-Regeln darunter gewinnen bei gleicher Spezifität (später im
+   Stylesheet); die :not()-Ausschlüsse hier sind der Belt-and-Suspenders-Schutz gegen künftige
+   Umsortierungen -- P8.5-O-Eskalationsregel: Kaskaden-Abhängigkeit über 1300 Zeilen ist genau
+   die Falle, die es zu vermeiden gilt, Selektor-spezifische Ausschlüsse überleben jedes
+   Umsortieren. Link-Picker-Eintrag: hover-Anteil war im P8.5-Block hier eingebaut und ist
+   nach B1 auf die quiet-Variante umgezogen, das volle --select-fill bleibt für die echte
+   Auswahl (--selected, darunter). B2-Audit-Befund V113 im Phase-Head dokumentiert: die
+   aria-current-Zuweisung an .tree__space fehlt im Code (anders als der Plan annimmt), der
+   :not()-Ausschluss ist trotzdem korrekt (für künftige Reparatur vorbereitet). */
+.list__rows > li:not(.list__row--selected) .list__row:hover:not([aria-current="true"]),
+.rail__home:hover:not([aria-current="true"]),
+.rail__action:hover,
+.tree__space:hover,
+.tree__folder:hover:not([aria-current="true"]),
+.tree__scope:hover:not([aria-current="true"]),
+.overview__space-row:hover,
+.link-picker-results li:hover:not([aria-selected="true"]) {
+  background: var(--select-fill-quiet);
+  outline: 1px solid var(--select-line-quiet);
+  outline-offset: -1px;
+  border-radius: var(--radius-sm);
+}
+
+/* Bisheriger Farbwechsel auf Hover (background: var(--surface) + color: var(--text)) ist mit
+   B1 durch background: var(--select-fill-quiet) + outline ersetzt; die Hervorhebung der
+   Beschriftung (text-muted -> text) bleibt erhalten, weil sie unabhängig vom Hintergrund
+   wirkt und den Hover weiterhin spürbar macht. */
+.rail__home:hover:not([aria-current="true"]),
+.rail__action:hover,
+.tree__space:hover,
+.tree__folder:hover:not([aria-current="true"]),
+.tree__scope:hover:not([aria-current="true"]) {
   color: var(--text);
 }
 
@@ -567,6 +600,46 @@ select.input:focus {
   gap: 4px;
 }
 
+/* Phase 8.6 Block B B3 (Plan §4.3): "Navigation"-Sprache für #account-show-updates und
+   #account-manage-spaces. Beides sind KEINE Aktionen (öffnen etwas, ändern nichts), bekommen
+   deshalb nicht die Knopfplastik, sondern einen flachen Klick-Anreiz mit dem Hover aus B1.
+   Akzent-Fill (--select-fill) bleibt bewusst aus -- sie tragen kein aria-current, sind also
+   immer im Default-Zustand "transparent + Hover leise aufhellen". */
+.account-nav {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 14px;
+  margin: 0 0 calc(var(--space) * 2);
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-weight: 500;
+  font-size: var(--fs-ui);
+  cursor: pointer;
+  text-decoration: none;
+}
+.account-nav:hover {
+  background: var(--select-fill-quiet);
+  outline: 1px solid var(--select-line-quiet);
+  outline-offset: -1px;
+}
+
+/* Phase 8.6 Block B B4 (Plan §4.4): Kategorie "Vorsicht" -- Konvention v3, fünfte Kategorie
+   (siehe `phase8_ui_graph/CLAUDE.md` Selection/Choice-Konvention v3). Trägerklasse statt
+   ID-Selektor: nur so ist "genau zwei Mitglieder" maschinell prüfbar (Test §8.2), und die
+   dritte destruktive Aktion erbt die Farbe, statt sie neu zu erfinden.
+   Mit :hover im Selektor (gleiche Spezifität wie B1-Hover, später im Stylesheet = Cascade
+   gewinnt): sonst würde das B1-Hover-Color (var(--text)) die Vorsicht-Farbe auf Hover
+   überschreiben. Knopfplastik bleibt: der Archivieren-Knopf ist weiterhin ein `.btn`, der
+   Logout-Knopf ein `.rail__action` -- nur die Schrift-/Icon-Farbe wechselt. */
+.action--caution, .action--caution:hover,
+.action--caution .rail__label, .action--caution:hover .rail__label,
+.action--caution .rail__glyph, .action--caution:hover .rail__glyph {
+  color: var(--caution);
+}
+
 /* -- Listenspalte ------------------------------------------------------------------------ */
 
 .list__head {
@@ -683,8 +756,6 @@ select.input:focus {
   transition: background-color 120ms ease;
 }
 
-.list__row:hover { background: var(--surface); }
-
 /* Auswahl-Fill (Vormerkung 3 Punkt 1, Nikinger-Entscheidung 2026-09-02 Richtung (a),
    nachgeschaerft nach Sichtpruefung der ersten Fassung): loest den fruehreren Glass-Sheen
    (Blur + schwimmende -4px-Outline + 3px-Akzentrand links) vollstaendig ab -- Nikinger-
@@ -695,10 +766,13 @@ select.input:focus {
    echten `border` auf allen vier Seiten). `.list__row`s 3px-transparenter Default-Rand
    bleibt unveraendert stehen (harmlos, faerbt sich nirgends mehr ein) statt ihn zu
    entfernen -- Entfernen wuerde die Zeilenbreite fuer ALLE Zeilen um 3px aendern, nicht nur
-   fuer die ausgewaehlte. N8 (Verbotsliste §0.3 Punkt 6): weiterhin einfacher erfuellt als
-   die urspruengliche Fassung, kein Blur im Spiel. `border-radius: var(--radius-sm)` ergaenzt
+   fuer die ausgewaehlte. N8 (Verbotsliste §0.3 Punkt 6): weiterhin einfach erfuellt als die
+   urspruengliche Fassung, kein Blur im Spiel. `border-radius: var(--radius-sm)` ergaenzt
    (Nikinger-Fund: der Rail-Button-Rahmen ist gerundet, moderne Browser lassen `outline` dem
-   `border-radius` der Box folgen -- Chromium/Firefox seit 90/88, kein Fallback noetig). */
+   `border-radius` der Box folgen -- Chromium/Firefox seit 90/88, kein Fallback noetig).
+   Hover-Variante (B1) liegt weiter oben im Stylesheet in der konsolidierten Hover-Regel
+   -- sie schliesst [aria-current="true"] explizit aus, damit Auswahl nicht von Hover
+   ueberschrieben wird. */
 .list__row[aria-current="true"] {
   background: var(--select-fill);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
@@ -1290,7 +1364,7 @@ select.input:focus {
   max-height: 320px;
   overflow-y: auto;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 .link-picker-results li {
   padding: 8px 10px;
@@ -1307,8 +1381,11 @@ select.input:focus {
    fortgeschleppt.
    Phase 8.5 A2: zwei identische Regelbloecke (li:hover+li:focus und li[aria-selected=true])
    zu einem zusammengezogen; das tote `:focus` entfaellt (kein `tabindex` auf den li, kann
-   nie feuern). Deklarationen byte-identisch zum 2026-09-02-Standard, hier nur entdoppelt. */
-.link-picker-results li:hover,
+   nie feuern).
+   Phase 8.6 Block B B1: der hover-Anteil wurde in die konsolidierte Hover-Regel oben
+   verschoben (--select-fill-quiet statt --select-fill -- halb so deckend), die
+   [aria-selected]-Auswahl bleibt hier mit vollem Fill (Auswahl schlägt Hover). Deklarationen
+   byte-identisch zum 2026-09-02-Standard. */
 .link-picker-results li[aria-selected="true"] {
   background: var(--select-fill);
   outline: 1px solid var(--select-line);
@@ -1614,7 +1691,8 @@ body.has-update-banner .shell { height: calc(100vh - var(--banner-h)); margin-to
 
 /* -- Update-Log (Einstellungsdialog, P6 Step 3) --------------------------------------------- */
 
-.account-updates-link { margin-bottom: calc(var(--space) * 2); }
+/* Phase 8.6 Block B B3: .account-updates-link ist nach .account-nav migriert (siehe oben am
+   Rail-Account-Block). Die margin-bottom ist dort eingebaut, der separate Selektor fällt weg. */
 #update-log-list { max-height: 50vh; overflow-y: auto; }
 .update-log__date {
   font-size: 12px;

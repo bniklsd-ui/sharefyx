@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | 2026-09-10 (V-plugin-Sub-Block [vom 2026-09-10 früh, V-plugin-Commit `cd25712`] verbatim aus dem Phase-Head hierher rotiert vor dem V121+V122-Visual-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V121+V22-Visual-Sub-Block, SESSIONS_ARCHIVE jetzt mit acht Sub-Blöcken)
+updated: 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | 2026-09-10 (V-plugin-Sub-Block [vom 2026-09-10 früh, V-plugin-Commit `cd25712`] verbatim aus dem Phase-Head hierher rotiert vor dem V121+V122-Visual-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V121+V22-Visual-Sub-Block, SESSIONS_ARCHIVE jetzt mit acht Sub-Blöcken)
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -916,3 +916,121 @@ C3-Layout-Umbau voraussetzt — wird mit Block C nachgezogen.
 **Offene Frage für den Nikinger (nach dieser Session):**
 Soll die Sichtprüfung jetzt als belegt gelten („visuelle Verifikation Block A+D am echten Gerät” im Wortsinn war die Browser-zu-Hardware-Sitzung des Nikingers, nicht die Wegwerf-Simulation) **oder** soll ich den Plugin-im-Chat-Round nochmal gegen die echte Produktion fahren, sobald das Plugin nach Neustart aktiv ist? Beide Pfade sind im Phase-Head dokumentiert; der Plugin-Pfad ist der einzige, der die Konvention §4 der Sichtungs-Schwester-Datei (`docs/concepts/sichtpruefung_automation_conventions.md`) vollständig aktiviert (Screenshots direkt im Chat).
 
+### 2026-09-11 (Step V-vision-befund — die OpenCode-Vision-Route gemessen; das Plugin ist der Defekt)
+
+**Auftrag (Nikinger-Sondertask):** „Die OpenCode-Vision-Route funktioniert nicht wirklich."
+Zwei Beschwerden: (1) Bild-Paste vom Remote-PC über die Webkonsole kommt nicht an, (2) M3 kann
+Bilder nicht im Chat präsentieren — obwohl M3 nativ multimodal ist. Dazu zwei Recherchefragen von
+M3: gibt es inzwischen eine `provider.options`-Flagge, die M3 als bildfähig markiert, und gibt es
+ein Plugin, das den FilePart direkt in den Model-Request patcht statt einen separaten Vision-Call
+zu machen?
+
+**Antwort auf beide Fragen: nein — und beide setzen eine Prämisse voraus, die nicht stimmt.**
+Es ist keine Flagge zu setzen und kein besseres Plugin zu finden, weil nichts zu reparieren ist:
+M3 sieht Bilder in OpenCode bereits nativ. Das installierte Plugin ist das, was es kaputt macht.
+
+**Befund 1 — der Katalog führt M3 korrekt als bildfähig.**
+`~/.cache/opencode/models.json` (models.dev-Cache): `minimax/MiniMax-M3` → `attachment: true`,
+`modalities.input: [text, image, video]`. Die ganze M2.x-Familie daneben → `attachment: false`,
+`[text]`. Provider `minimax` fährt über `npm: @ai-sdk/anthropic` gegen
+`https://api.minimax.io/anthropic/v1`, also den Anthropic-kompatiblen Endpunkt mit nativen
+Bild-Blöcken. **Einschränkung zur Datierung:** die Cache-Datei wurde am 2026-09-11 aktualisiert
+(mtime 14:51); ob der M3-Eintrag am 2026-09-10 — als der Plugin-Pfad beschlossen wurde — schon
+`attachment: true` trug, ist nachträglich nicht feststellbar. Die damalige Entscheidung kann gegen
+den damaligen Katalogstand richtig gewesen sein. Die frühere Aussage in `sichtpruefung_automation_tooling.md` („OpenCodes
+Attachment-Pipeline verdrahtet Bilder für MiniMax nicht durch") war für **M2.x** richtig und ist
+für **M3** falsch.
+
+**Befund 2 — A/B-Messung, dieselbe Frage, derselbe Screenshot.**
+Testfrage bewusst nur aus Pixeln beantwortbar (Seitenleisten-Zähler „Notizen 6" + orangefarbenes
+Badge „nur lesen" neben `gamma` in `docs/screenshots/p8_6_block_a_picker_v3ritt.png`), damit eine
+generische Antwort nicht durchrutschen kann. Gelaufen in `/tmp/oc-vision-ab` (Wegwerf-Verzeichnis,
+**nicht** im Repo — M3 hat Edit-Tools):
+
+| Lauf | Kommando | Tool-Calls | Ergebnis |
+|---|---|---|---|
+| A — Plugin aus | `opencode run --pure -f shot.png -- "…"` | **0** | ✅ „1) 6 / 2) nur lesen" — nativ |
+| B — Plugin an | `opencode run -f shot.png -- "…"` | **9** | ⚠️ FilePart gelöscht → `local_vision` 2× `error` → Selbstbau per `bash`/`curl`/`base64`, 5 Fehlversuche |
+| C — mitten in Session, Plugin aus | `opencode run --pure` + „lies mit deinem `read`-Werkzeug" | **1** (`read`) | ✅ `Image read successfully`, korrekte Antwort |
+| D — dasselbe, Plugin an | `opencode run` (kein `--pure`) | **1** (`read`) | ✅ identisch korrekt — Plugin fasst Tool-Results nicht an |
+
+**Lauf C/D sind die praktisch wichtigsten:** M3 kann einen Playwright-Screenshot, den es gerade selbst
+geschrieben hat, mit dem eingebauten `read`-Tool anschauen — ohne `-f`, ohne Ollama.
+Die Sichtprüfungs-Schleife „screenshotten → hingucken → bewerten" braucht damit kein Zusatzwerkzeug.
+**Lauf D zeigt: das gilt sofort, nicht erst nach dem Rückbau.** Der Plugin-Hook greift nur die letzte
+User-Nachricht ab (`findLastUserMessage` → `isImageFilePart`); ein `read`-Ergebnis ist ein Tool-Part,
+kein User-FilePart, und läuft daran vorbei. Gemessen, nicht nur aus dem Quelltext geschlossen.
+
+**Befund 3 — warum Lauf B scheitert.** `DavidEasden/opencode-vision` hängt in
+`experimental.chat.messages.transform` und ruft `removeProcessedImageParts()` — es **löscht** den
+FilePart und ersetzt ihn durch „ruf `local_vision` mit diesem Pfad auf". Für M2.1, wofür es
+geschrieben wurde, ist das die Rettung; für M3 eine Amputation. Verschärft durch
+`~/.config/opencode/opencode-vision.json` mit `"models": ["*"]` — der Wildcard matcht auch das
+eine Modell, das die Krücke nicht braucht. **Das erklärt auch die Paste-Beschwerde:** Paste läuft
+durch denselben Hook, der FilePart wurde dort genauso gelöscht.
+
+**Befund 4 — `local_vision` ist nicht kaputt, nur zu langsam für den Tool-Pfad.** Direkt über
+stdio angesprochen antwortet `phase8_6_ui_polish/scripts/mcp_local_vision_server.py` korrekt
+(`initialize` + `tools/call` → „Fünf Einträge."). Die Fehlermeldung zu Lauf B lag nie vor — der Stream
+liefert nur `status: error`, `output: None`. **Mit hoher Wahrscheinlichkeit** OpenCodes
+MCP-Client-Timeout gegen den 46–180 s CPU-Cold-Start von `qwen3-vl:8b`; ein Schema- oder
+Framing-Fehler sähe von außen identisch aus und ist nicht ausgeschlossen. Ein 8-B-Vision-Modell auf
+CPU passt nicht in einen synchronen Tool-Call; als CLI (`vision_ollama.py`) bleibt es brauchbar.
+
+**Befund 5 — „Bilder im Chat präsentieren" ist in OpenCode gar nicht vorgesehen.** Das
+ausgelieferte Web-UI-Bundle (`/assets/index-*.js`, OpenCode 1.18.30) kennt nur die Slots
+`prompt-attachments*`, `user-message-attachment`, `user-message-attachment-image` (das einzige
+`<img>`), `user-message-attachment-file`, `user-message-attachment-name` — **alle `prompt-` oder
+`user-message-`, kein Assistant-/Tool-Result-Bild-Slot.** Die Daten wären vorhanden: ein `read`
+auf ein PNG liefert im Tool-State `attachments: [{mime: "image/png", url: "data:image/png;base64,…"}]`.
+Das UI rendert sie nur nicht. **Bilder fließen in OpenCode einbahnig: Mensch → Modell, nicht
+zurück.** Kein Plugin kann das ändern; es ist eine UI-Grenze, kein Modell-Thema. Damit ist
+Konvention §4 der Sichtungs-Schwester-Datei in OpenCode **dauerhaft unerfüllbar** — sie bleibt
+Claude-Code-only, und die dortige „Bis das Plugin installiert ist"-Variante (Dateipfad +
+Was-zu-validieren-Zeile) gilt für OpenCode auf Dauer statt übergangsweise.
+
+**Nebenbefund (Reboot-Risiko):** `~/.config/opencode/package.json` pinnt `opencode-vision` auf
+`file:../../../../tmp/opencode/opencode-vision-src`. `/tmp` überlebt keinen Reboot; ein späteres
+`npm install` in dem Verzeichnis bricht. Bei den anstehenden Proxmox-Reboots relevant.
+
+**Doku-Änderungen (kein Produkt-Code angefasst):**
+- `docs/concepts/sichtpruefung_automation_tooling.md` — §Messbefund 2026-09-11 (Katalog-Tabelle,
+  A/B-Tabelle, die fünf Befunde) + §Empfehlung (Rückbau statt Zusatz-Plugin) neu; die
+  Plugin-Rangliste vom 2026-09-08 **verbatim erhalten**, aber nach §Historisch verschoben mit der
+  Begründung, warum sie für M2.x weiterhin gilt. Frontmatter nachgezogen.
+- `docs/concepts/sichtpruefung_automation_conventions.md` — §4-Überschrift auf „nur Claude Code"
+  präzisiert, datierte Korrekturnotiz mit Beleg und Verweis eingefügt.
+- Dieser Phase-Head — Modul-Status Zeile 2b auf „⚠️ zurückgebaut" + neue Zeile 2c
+  (V-vision-befund), `Nächste Session` neu, Frontmatter-Pipe.
+
+**Verifikation:** `pytest` **966 unverändert** (keine Python-Änderung am Produkt),
+Tabu-Diff §0.3 **leer**, **Service-Touch 0** — `sharefyx-mcp` PID **991** über die ganze Session
+unverändert (nur via `systemctl show -p MainPID` gelesen). Zwei eigene Wegwerf-`opencode web`-
+Instanzen (Ports 18791/18792) gestartet und wieder gestoppt — **PID über den eindeutigen Port
+aufgelöst** (`ss -ltnp`), kein `pkill -f`, Hard Rule 9 eingehalten; beide Ports nachweislich frei.
+
+**Eigener Fehler in dieser Session, behoben:** ein Python-Edit am Phase-Head suchte
+`s.index("## Nächste Session")` — das matchte die **Frontmatter-Prosa** (dort steht
+„`## Nächste Session` neu sortiert" in einem älteren `updated:`-Eintrag) statt der Überschrift und
+löschte beim Slicen die Zeilen 23–459, also ~30 KB Head. Per `git checkout` sauber
+zurückgeholt, danach mit Zeilenumbruch-Anker (`\n## Nächste Session\n`) plus
+Eindeutigkeits-`assert` und Überschriften-Zählung vor/nach jedem Edit wiederholt.
+**Lehre für künftige Head-Edits: in diesem Repo enthält die Frontmatter-Prosa die
+Überschriftennamen als Zitat — Abschnitts-Slicing nur mit Zeilenanker und Count-Assert.**
+
+**Rückbau vollzogen (Nikinger-Freigabe 2026-09-11, in derselben Session ausgeführt):**
+`rm ~/.config/opencode/plugins/opencode-vision.js`. **Gegenprobe grün** — derselbe
+`opencode run -f shot.png` wie Lauf B, jetzt **0 Tool-Calls** und korrekte Antwort
+(„(1) 6 / (2) nur lesen"); seit dem `rm` erscheint **keine** neue `Plugin initialized`-Zeile
+mehr im OpenCode-Log (letzte um 13:32 UTC, `rm` um 18:34 UTC). **Bewusst liegen geblieben,
+weil trivial reversibel und ohne Wirkung:** `~/.config/opencode/node_modules/opencode-vision/`
+(das Paket selbst), `~/.config/opencode/opencode-vision.json` (Plugin-Config) und der
+`local_vision`-MCP-Eintrag in `opencode.jsonc`. Wiederherstellung wäre ein einzelner
+`ln -s` — deshalb kein Grund, mehr zu löschen als nötig. Wer M2.x doch braucht, verengt
+`"models"` auf `["*/MiniMax-M2*"]`, statt den Symlink wieder zu setzen.
+
+**Rohdaten der Messreihe:** `/tmp/oc-vision-ab/{A,B,C,D}.json` (JSONL-Event-Streams von
+`opencode run --format json`, die Belege hinter der Tabelle oben). Liegt bewusst in `/tmp` —
+Wegwerf-Verzeichnis, überlebt den nächsten Reboot nicht; die Tabelle ist der dauerhafte Beleg.
+
+**Nächster Schritt, konkret:** Entscheidung zum Rückbau, danach **Block B nach Plan §4**.
