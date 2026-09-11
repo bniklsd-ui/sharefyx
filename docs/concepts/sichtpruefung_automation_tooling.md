@@ -140,7 +140,10 @@ unnötig: `@pfad` bzw. `read` ist der kürzere Weg und überlebt jede Remote-Cli
 M3 bereits korrekt als bildfähig, und OpenCode liefert den FilePart aus, sobald ihn niemand
 wegnimmt.
 
-1. **Plugin deaktivieren** — Symlink weg, damit der native Pfad frei wird:
+1. **Plugin deaktivieren — ✅ vollzogen 2026-09-11** (Nikinger-Freigabe; Gegenprobe danach:
+   derselbe `opencode run -f shot.png` wie Lauf B lieferte **0 Tool-Calls** + korrekte Antwort,
+   und seit dem `rm` erscheint keine `Plugin initialized`-Zeile mehr im OpenCode-Log). Der Befehl,
+   zur Reproduktion:
    ```bash
    rm ~/.config/opencode/plugins/opencode-vision.js   # OpenCode lädt dieses Verzeichnis automatisch
    ```
