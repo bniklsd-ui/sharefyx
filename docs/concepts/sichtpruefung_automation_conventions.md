@@ -69,7 +69,7 @@ Nicht: Deploy → Tests → vielleicht Rollback. Der Phase-8.5-Vorlauf fährt ge
 Muster — D3-Health-Gate (8/8 grün vor D2-Deploy) + Sichtungs-Block C/D → erst danach der
 eigentliche Deploy durch den Nikinger.
 
-### 4. Screenshots im Chat präsentieren (sobald opencode-vision installiert ist)
+### 4. Screenshots im Chat präsentieren (**nur Claude Code** — in OpenCode nicht möglich, 2026-09-11)
 
 Sobald das OpenCode-Vision-Plugin (`DavidEasden/opencode-vision`, siehe
 [`sichtpruefung_automation_tooling.md`](./sichtpruefung_automation_tooling.md)) als erster
@@ -79,6 +79,17 @@ du validieren sollst"**. Der Nikinger sichtet dann direkt am Bild — ohne den U
 das Dateisystem. **Bis das Plugin installiert ist**, müssen Screenshots über das Dateisystem
 geöffnet werden, und der M3/Claude-Code listet sie als Dateipfade + kurze
 Was-zu-validieren-Beschreibung auf.
+
+> **[2026-09-11 Korrektur]** Diese Konvention ist in OpenCode **nicht erfüllbar** und war es nie —
+> das Plugin ändert daran nichts. OpenCodes Web-UI (1.18.30) rendert Bild-Attachments
+> ausschließlich an *User*-Nachrichten (`user-message-attachment-image`); für Assistant- bzw.
+> Tool-Result-Parts existiert kein Bild-Slot im ausgelieferten Bundle. Bilder fließen dort nur
+> Mensch → Modell, nicht zurück. Beleg + A/B-Messung:
+> [`sichtpruefung_automation_tooling.md`](./sichtpruefung_automation_tooling.md) §Messbefund
+> 2026-09-11. **Für OpenCode gilt daher weiter die „Bis das Plugin installiert ist"-Variante**
+> (Dateipfad + Was-zu-validieren-Zeile) — dauerhaft, nicht übergangsweise. Der Ausgleich: M3 liest
+> Screenshots seit demselben Befund **selbst** (`read`-Tool), muss also nicht mehr nachfragen, was
+> auf dem Bild zu sehen ist.
 
 ## Der Kernsatz, bevor du eine Zeile Code schreibst
 

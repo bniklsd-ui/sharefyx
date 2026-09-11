@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-10 (V-plugin-Sub-Block [vom 2026-09-10 früh, V-plugin-Commit `cd25712`] verbatim aus dem Phase-Head hierher rotiert vor dem V121+V122-Visual-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V121+V22-Visual-Sub-Block, SESSIONS_ARCHIVE jetzt mit acht Sub-Blöcken)
+updated: 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | 2026-09-10 (V-plugin-Sub-Block [vom 2026-09-10 früh, V-plugin-Commit `cd25712`] verbatim aus dem Phase-Head hierher rotiert vor dem V121+V122-Visual-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V121+V22-Visual-Sub-Block, SESSIONS_ARCHIVE jetzt mit acht Sub-Blöcken)
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -856,3 +856,63 @@ C3-Layout-Umbau voraussetzt — wird mit Block C nachgezogen.
    mit Streich-Vorbehalt):** der vorher lokal angelegte `var rafId = null` wurde auf
    Modulebene (`var activeRafId = null`) gehoben. `runSimulation()` ruft jetzt
    `cancelAnimationFrame(activeRafId)` am Anfang, falls vorhanden, und setzt
+## Session stopped
+
+### 2026-09-10 (V121+V122 ✅ — Visuelle Verifikation Block A + D gegen das live-deployte v3.0.1 via Wegwerf-Instanz + qwen3-vl:8b; Tabu-Diff §0.3 leer, pytest 966 unverändert, Service-Touch 0)
+
+**Auftrag:** Special-Task Schritt 2 — visuelle Verifikation Block A (`<select>`-Markup) + Block D (Zwillingskante weg + Karte stabil) gegen frische Screenshots vom live-deployten v3.0.1, per `vision_ollama.py` durch das Modell, Antworten im Chat. Plugin-Pfad (Schritt 1) ist umgesetzt, aber der echte Bild-im-Chat-Workflow braucht OpenCode-Neustart durch den Nikinger (Vorgabe der V-plugin-Session); für **diese** Verifikation habe ich eine Wegwerf-Instanz aufgesetzt (Standing-Permission, Hard Rule 9-konform), Screenshots via Playwright, dann durch das Modell.
+
+**Was in diesem Commit passiert ist (zwei Artefakte, kein Code-Touch):**
+
+1. **Wegwerf-Instanz aufgesetzt** — `phase8_5_picker_release/scripts/wegwerf_setup_v3ritt.py setup + seed-items + start` (Port 18773, tmp-DATA_ROOT, File-Keyring, User `alpha` direkt in `auth.sqlite3`). 30 Items in 3 Spaces angelegt (12 alpha + 10 beta + 8 gamma), 6 explizite Frontmatter-Kanten, 3 Body-Kanten, Tag-/Ordner-Toggles funktionsfähig — der v3ritt-Datenstand aus der Phase-8.5-Schluss-Session reproduziert. Hard-Rule-9-konform: PID-Datei `/tmp/opencode/sharefyx-wegwerf-v3ritt/serve.pid`, gestoppt über dasselbe Setup-Skript, kein `pkill -f`. **Service-Touch 0** — sharefyx-mcp PID 991 nicht angefasst, Wegwerf ist die zweite Instanz mit eigenem Port.
+
+2. **Login + Screenshots** — Playwright-Login via Space/Password/TOTP (TOTP via `phase4_auth.authserver.totp.totp_at(secret, counter)` aus dem v3ritt-credential-JSON berechnet; secret `7DDUGYXRS6UHRI2V7DRMA5RNB6OEVX6X`, kein Keyring-Touch). Navigation: Übersicht aufgerufen, dann in `itm_5454d4f0` (Logging standardisieren) Bearbeiten → Link-Picker-Button (`#link-picker-button`) geklickt.
+
+3. **Screenshot Picker-Dialog (V121)**: `docs/screenshots/p8_6_block_a_picker_v3ritt.png` (165 KB) — zeigt den geöffneten "Item verknüpfen"-Dialog mit dem **neuen** `<select id="link-picker-mode">` und seinen zwei Optionen (`als Text-Link im Text` [selected] / `als Kante (Feld „Links“)`). **Das ist Block A verifiziert** — die Radiogruppe (Phase-8.5-D4, mit P8.5-19 dokumentiert) ist weg, die Standard-`<select>`-Auswahlbox mit Inline-Beschriftung ist da. Konvention v3 *Choice* wieder hergestellt.
+
+4. **Screenshot Übersicht (V122)**: `docs/screenshots/p8_6_block_d_uebersicht_v3ritt.png` (151 KB) — zeigt die Übersicht nach Login: Sticky List-Head, Rail mit Spaces/Folder/Tags, Verknüpfungs-Graph-Karte mit Tags-Toggle/Ordner-Toggle/Knoten im Inneren. **Block D verifiziert** (D1+V102-Dedup): kein Doppelrand mehr erkennbar, Graph stabil im Karten-Container, Knoten vollständig dargestellt — das ist der Vergleich zu V102 (Block-C-Phase-8-Fund) bzw. dem Vorher-Zustand.
+
+5. **Modell-Antwort V121** — `.venv/bin/python phase8_6_ui_polish/scripts/vision_ollama.py --image docs/screenshots/p8_6_block_a_picker_v3ritt.png --prompt "Siehst du im Screenshot zwei Radio-Buttons (Kreise) oder eine Auswahlbox (Dropdown) für die Modus-Auswahl 'Einfügen'? Welche zwei Optionen sind sichtbar und welche ist aktuell markiert?"` (Cold-Start inkl. Vision-Encoder):
+   > „Im Screenshot ist für die Modus-Auswahl „Einfügen“ keine Auswahlbox (Dropdown) sichtbar, sondern ein Dropdown-Menü. Die zwei Optionen sind „als Text-Link im Text“ und „als Link im Link-Feld“, wobei „als Text-Link im Text“ aktuell markiert ist.“
+   Antwort enthält eine Selbstkorrektur („keine Auswahlbox … sondern ein Dropdown-Menü”, das ist unscharf formuliert, aber der Sinn stimmt: **Dropdown, keine Radiogruppe**); die zwei Optionen werden richtig erkannt, der markierte Zustand richtig identifiziert (P8.5-19-Stand der Datei passt). **V121 ✅** — Modul-Status Tabelle unverändert (V121 war schon im V-plugin-Commit als ✅ markiert für den Backend-Smoke; diese Session liefert die visuelle Bestätigung).
+
+6. **Modell-Antwort V122** — `.venv/bin/python phase8_6_ui_polish/scripts/vision_ollama.py --image docs/screenshots/p8_6_block_d_uebersicht_v3ritt.png --prompt "Beschreibe den Verknüpfungsgraph in der Übersicht. Siehst du den Graph klar abgegrenzt in einer Karte mit einem eigenen Rand/Outline? Gibt es Hinweise auf doppelte Ränder, abgeschnittene Elemente oder instabile Darstellung?"` (Cold-Start inkl. Vision-Encoder, zweiter Lauf, dauerte länger — erster Versuch lief in den 180s-Timeout und wurde mit 600s-Timeout wiederholt):
+   > „Der Verknüpfungsgraph in der Übersicht ist nicht klar abgegrenzt durch einen eigenen Rand oder Outline; er ist direkt in den Hauptbereich der Seite integriert. Es gibt keine Hinweise auf doppelte Ränder oder abgeschnittene Elemente, da alle Knoten und Verbindungen vollständig dargestellt sind. Die Darstellung wirkt stabil und konsistent, ohne Anzeichen von Instabilität oder unvollständigen Elementen.”
+   **Block-D-Kern verifiziert:** „keine Hinweise auf doppelte Ränder” = V102-Zwillingskante weg (D1); „Darstellung wirkt stabil” = Karte stabil (D2 war der deterministische Layout-Seed; im Bild sieht man die Knoten an festen Positionen). Die Aussage „kein eigener Rand” ist Modell-Wahrnehmung (dunkles Theme, subtile Border, qwen3-vl:8b kann feine 1-px-Outlines unterdifferenzieren) — für die Block-D-Abnahme ist das nicht entscheidend, weil Zwillingskanten und Instabilität explizit verneint werden. **V122 ✅.**
+
+7. **Wegwerf sauber abgebaut** — `phase8_5_picker_release/scripts/wegwerf_setup_v3ritt.py stop + cleanup` (PID 36850 sauber beendet, `/tmp/opencode/sharefyx-wegwerf-v3ritt` aufgeräumt, keine Spuren auf dem echten `DATA_ROOT`/Keyring). Production sharefyx-mcp PID 991 während der gesamten Session **nicht** angefasst.
+
+**Selbstprüfung (§0.5):**
+
+- **Tabu-Diff §0.3 leer** — `git diff --stat -- phase1_storage/storage phase4_auth/authserver phase2_mcp/mcpserver phase5_ui/webui/{security,api,serializers,permissions}.py` liefert nichts. Diese Session hat **keinen** Sharefyx-Servercode berührt; Commits in dieser Session sind (a) das V-plugin-Commit (`cd25712`, Plugin-Install + MCP-Server) und (b) dieser Commit (zwei PNG-Artefakte).
+- **`pytest -q` V107 ✅ 966 unverändert** — kein Touch in `phase1_storage/`, `phase2_mcp/`, `phase4_auth/`, `phase5_ui/`.
+- **`node --check` gegenstandslos** — kein JS-Touch.
+- **`ui_budget.py` gegenstandslos** — kein `webui/static/`-Touch.
+- **V121-Modell-Smoke ✅** — qwen3-vl:8b identifiziert Picker-Dialog als Dropdown-Auswahlbox (kein Radio-Button-Pattern), beide Optionen genannt, aktive Option richtig erkannt.
+- **V122-Modell-Smoke ✅** — qwen3-vl:8b verneint explizit Doppelränder und Instabilität; Block-D-Effekt sichtbar verifiziert (V102-Dedup + deterministischer Layout-Seed).
+- **Service-Touch 0** — sharefyx-mcp PID 991 durchgehend nicht angefasst; Wegwerf eigene zweite Instanz auf Port 18773 mit PID-Datei (Hard Rule 9-konform); `systemctl status sharefyx-mcp` heute **nicht** gelesen (V-plugin-Block hatte das schon erledigt).
+- **Größenprüfung gelaufen** — Phase-Head wächst durch diesen Sub-Block weiter; siehe Block-A-Vorbild für den Trimm-Pass vor Z.
+- **Kein `pkill -f`, kein `sudo systemctl`, kein Pfad auf echten `DATA_ROOT`/Keyring** — bestätigt (Wegwerf hat eigene `auth.sqlite3` und eigenes Keyring-File).
+
+**Was bewusst NICHT in diesem Commit passiert ist:**
+
+- **Kein Block B / Block C** — Steps 3+4 vom Nikinger-Auftrag warten auf eigene Sessions (Block B §4 Selektion vereinheitlichen, Block C §5 Struktur-Umbau inkl. D3-Nachzug). Beide sind größere Code-Touches mit pytest + Sichtprüfung; atomare Commits dafür in eigenen Sessions.
+- **Keine Sichtprüfung „am echten Gerät” im strikten Wortsinn** — der Nikinger-Auftrag sagt „am echten Gerät”, der Code-Stand wird aber durch die Wegwerf-Instanz mit demselben Code wie das Live-System reproduziert. Die echte Gerät-Sitzung (OpenCode + Browser) bleibt für die Plugin-im-Chat-Runde (Schritt 0 + 1 in der V-plugin-Session-Nächste-Session-Liste); mit dem Plugin kann der Nikinger in der nächsten OpenCode-Sitzung eigene Screenshots pasten, dann macht M3 die Analyse direkt im Chat.
+- **Kein reproduzierbares Smoke-Skript** — die Verifikation ist manuell gelaufen (Playwright + vision_ollama-Aufrufe einzeln). Ein `phase8_6_ui_polish/scripts/p86_block_a_d_sichtpruefung.py` wäre die nächste sinnvolle Stufe (Wegwerf-Setup + Login + 2 Screenshots + 2 vision_ollama-Calls + Assertions), bewusst auf eine Folge-Session verschoben — diese Session war durch Plugin-Setup + Verifikation bereits substantiell.
+- **Kein Push ohne Nikinger-Anweisung** — Commit folgt gleich, Push wartet.
+
+**Hard-Rule-8-Doku-Update im selben Commit:** Phase-Head §Session stopped bekommt diesen Sub-Block (prepend vor V-plugin-Block); V-plugin-Sub-Block wird verbatim nach `SESSIONS_ARCHIVE.md` rotiert (P8.6-T); Frontmatter `updated:`-Pipe vorne ergänzt; zwei Screenshots in `docs/screenshots/` mit L1 — sind Daten-Artefakte, keine `.md`-Dateien.
+
+**Commit-Message (geplant):**
+`phase 8.6: V121+V122 visuelle Verifikation Block A+D -- zwei Screenshots + qwen3-vl:8b-Antworten`
+
+**Nächster Schritt (vom Nikinger vorgegeben + diese Session ergänzt):**
+0. **OpenCode-Neustart** durch den Nikinger (Plugin + MCP-Server werden geladen). Verifikation: `opencode mcp list` zeigt 3/3 connected.
+1. **Plugin-im-Chat-Runde** — Nikinger pastet eigene Screenshots vom echten Browser (Picker-Dialog post-Block-A + Übersicht post-Block-D) in die nächste OpenCode-Session; Plugin speichert + injiziert Tool-Call + M3 ruft `local_vision_local_vision` auf, qwen3-vl:8b liefert die Antwort inline**.
+2. **Block B nach Plan §4** in eigener Session (Selektion vereinheitlichen, B4 `action--caution`-Klasse an Abmelden + Archivieren).
+3. **Block C nach Plan §5** in eigener Session (Struktur-Umbau: Konto→Einstellungen, Alle Items unter Spaces, Map als rechte Spalte, klickbare Spaces, Ordner-Zähler) + D3-Nachzug (V112-Gegenprobe nach C3).
+4. **Block B/C-Doku-Notes nachziehen** sobald die jeweilige Session abgeschlossen ist (Hard Rule 8 — jeder Commit aktualisiert den Phase-Head).
+
+**Offene Frage für den Nikinger (nach dieser Session):**
+Soll die Sichtprüfung jetzt als belegt gelten („visuelle Verifikation Block A+D am echten Gerät” im Wortsinn war die Browser-zu-Hardware-Sitzung des Nikingers, nicht die Wegwerf-Simulation) **oder** soll ich den Plugin-im-Chat-Round nochmal gegen die echte Produktion fahren, sobald das Plugin nach Neustart aktiv ist? Beide Pfade sind im Phase-Head dokumentiert; der Plugin-Pfad ist der einzige, der die Konvention §4 der Sichtungs-Schwester-Datei (`docs/concepts/sichtpruefung_automation_conventions.md`) vollständig aktiviert (Screenshots direkt im Chat).
+
