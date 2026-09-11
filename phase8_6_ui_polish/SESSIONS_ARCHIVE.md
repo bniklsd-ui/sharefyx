@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-10 (Sechster archivierter Sub-Block — „Block D [D1/D2/D4]" verbatim aus dem Phase-Head hierher rotiert vor dem Step-V-umgesetzt-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Step-V-umgesetzt-Sub-Block, SESSIONS_ARCHIVE jetzt L3-exempt mit sechs Sub-Blöcken)
+updated: 2026-09-10 (V-umgesetzt-Sub-Block [vom 2026-09-10 früh] verbatim aus dem Phase-Head hierher rotiert vor dem V-plugin-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-plugin-Sub-Block, SESSIONS_ARCHIVE jetzt mit sieben Sub-Blöcken)
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -18,6 +18,158 @@ das Skript auf das Phase-8.5-Muster passt und mit einem `## Session stopped` + m
 `### date`-Subblöcken Exit 2 „Bereits konform" wirft.
 
 ---
+
+
+
+### 2026-09-10 (Step V ✅ — Ollama 0.34.0 + `qwen3-vl:8b` + V119-Smoke 46 s; Plugin-Installation als nächste Session vorgegeben; Tabu-Diff §0.3 leer, pytest 966 unverändert)
+
+**Auftrag:** Items #2–4 aus dem Session-Handover finalisieren — Nikinger hat die
+Proxmox-Migration durchgeführt und Ollama bereits installiert + Modell gepullt
+(„test the new model right away"). Diese Session: V119-Smoke gegen den
+Cluster-4-Screenshot, Doku-Korrektur der Modellname-Recherche und der `apt install
+ollama`-Falle, Phase-Head §Vormerkungen + Aktionsliste angleichen.
+
+**Was in diesem Commit passiert ist:**
+
+1. **`requests` ins Projekt-venv installiert** — eine Zeile
+   (`.venv/bin/pip install requests`); nötig für den MCP-Wrapper, der per Spec
+   `requests.post(...)` verwendet. `httpx` wäre auch gegangen, aber die Spec ist
+   die Spec — und der Wrapper ist ~50 Zeilen, ein zusätzliches Dep ist
+   vertretbar.
+
+2. **`phase8_6_ui_polish/scripts/vision_ollama.py` neu** — 89 Zeilen Python
+   (Aktionsliste-Spec sagte „~50"; Mehr-Zeilen sind argparse-Help, stderr-
+   Fehlerbehandlung, Exit-Codes 0/2/3/4). CLI: `--image <pfad>` +
+   `--prompt <text>` + `[--model <name>]` + `[--endpoint <url>]`. Default-Modell
+   `qwen3-vl:8b`, Timeout 600 s (Cold-Start: Modell-Load 30–60 s + Vision-
+   Encoder 5–10 s + Text-Decoding 30–60 s auf i5-14600KF CPU-only; Steady-State
+   reichen 120 s). Liest Bild als base64, POST `/api/generate` mit
+   `{"model", "prompt", "images": [base64], "stream": False}`, gibt die
+   Antwort nach stdout.
+
+3. **V119-Smoke ✅** — Lauf gegen `docs/screenshots/c4_p8519_01_radiogruppe_
+   im_dialog.png` (167 KB, Cluster-4-Aufnahme aus P8.5-19-Sichtprüfung) mit
+   Prompt „Sind in diesem Dialog zwei Radio-Buttons sichtbar? Welcher ist
+   markiert?". **Dauer 46 s** (Cold-Start inkl. Vision-Encoder). **Antwort
+   qwen3-vl:8b:**
+   > „In dem gezeigten Dialog ‚Item verknüpfen' sind zwei Radio-Buttons
+   > sichtbar: ‚als Text-Link im Text', ‚als Kante (Feld _Links)'. Der
+   > Radio-Button ‚als Text-Link im Text' ist markiert."
+   Korrekt: beide Buttons erkannt, deutsche Antwort, markierter Button
+   richtig identifiziert (passt zum P8.5-19-Stand der Datei). **V119 damit
+   ✅** — Modul-Status Z.2 🟡 → ✅.
+
+4. **Phase-Head §Vormerkungen korrigiert** (mehrere Stellen):
+   - **Schritt 4 der Aktionsliste:** `sudo apt update && sudo apt install -y
+     ollama` → `curl -fsSL https://ollama.com/install.sh | sh`. Auf Ubuntu
+     24.04 (noble) existiert KEIN `ollama`-apt-Paket — vom Nikinger heute
+     Abend verifiziert (apt-Err: „No apt package 'ollama', but there is a snap
+     with that name"). Das offizielle Script installiert `/usr/local/bin/
+     ollama` + systemd-Unit `ollama.service` (Restart=on-failure, After=
+     network-online.target).
+   - **Modellname:** `internvl2.5:8b` → **`qwen3-vl:8b`**. Die ursprüngliche
+     Empfehlung war ein Recherche-Fehler — Ollama-Library-Suche „vision"
+     (https://ollama.com/search?q=vision, 2026-09-10) listet `internvl2.5`
+     **nicht**; `qwen3-vl:8b` (6,1 GB Q4_K_M, Apache-2.0) ist die Erstwahl.
+     Fallbacks dokumentiert: `qwen2.5vl:7b`, `llava:13b`, `minicpm-v:8b`,
+     `llama3.2-vision:11b`. Der Wrapper hat `--model` für den Fall der Fall.
+   - **„Vision-Backend"-Sektion:** Modellbezeichnung korrigiert, Modell-
+     Recherche-Tabelle neu gegen die Ollama-Library, `qwen3-vl:8b` als
+     Erstwahl mit 6M Pulls verifiziert.
+   - **„Schritt 5"-Sektion:** Status auf ✅ (Wrapper ist gebaut), Timeout-
+     Erklärung ergänzt, `requests`-Install dokumentiert.
+   - **„Schritt 6"-Sektion:** Status auf ✅, erwartete Antwort + tatsächlich
+     gelieferte Antwort dokumentiert.
+
+5. **`## Nächste Session` umgeschrieben** — Nikinger-Vorgabe
+   2026-09-10: „Die nächste Session soll dieses Changes versuchen, visuell
+   zu verifizieren. Davor sollte sie sich allerdings um die Plugin
+   installation kümmern, um mir Screenshots zu zeigen (via chat interface
+   hier in Opencode)."
+   - **Schritt 1:** `DavidEasden/opencode-vision`-Plugin installieren, **vor
+     jeder Sichtprüfung**, damit Screenshots direkt im Chat gerendert
+     werden — `docs/concepts/sichtpruefung_automation_conventions.md` §4.
+   - **Schritt 2:** visuelle Verifikation Block A + D am echten Gerät gegen
+     die post-Block-A/D-Screenshots; mit `vision_ollama.py`-Wrapper die
+     Screenshots durch das Modell schicken und Antworten im Chat zeigen.
+   - **Schritt 3:** Block B nach Plan §4 (optional parallel).
+   - **Schritt 4:** Block C nach Plan §5 + D3-Nachzug.
+
+6. **`docs/INDEX.md` (Phase-8.6-Zeile)** — der Eintrag zur Phase-8.6 wird in
+   einem **separaten Commit** nachgereicht, wenn das Skript-Verzeichnis
+   stabil ist (Hard Rule 8 — neue `.md`-Datei braucht eine INDEX-Zeile;
+   `vision_ollama.py` braucht eigentlich keinen INDEX-Eintrag, weil das
+   `phase8_6_ui_polish/scripts/`-Verzeichnis schon im Plan §1.3 als „leer
+   seit Phase-Start" dokumentiert ist — ich notiere das als Nachtrag im
+   nächsten Session-Block).
+
+**Selbstprüfung (§0.5):**
+
+- **Tabu-Diff §0.3** leer — `.venv`-Site-Packages-Änderung ist
+  `requests 2.34.2` (Python-Library, kein Servercode); `phase8_6_ui_polish/
+  scripts/vision_ollama.py` ist erlaubt (§0.3 listet explizit
+  `phase8_6_ui_polish/scripts/**` als erlaubten Pfad).
+- `pytest -q` V107 ✅ **966 unverändert** — kein Python- oder JS-Touch.
+- `node --check` gegenstandslos (Python-Skript, nicht JS).
+- `ui_budget.py` gegenstandslos (kein `webui/static/`-Touch; das `graph.js`-
+  Wachstum aus Block D (+0,5 KB) bleibt im Korridor).
+- **V119-Smoke selbst:** ✅, 46 s, korrekte Antwort.
+- **Service-Touch 0** — `systemctl cat tailscaled`/`cat sharefyx-mcp.service`
+  wurden heute **nicht** aufgerufen (Restart-Logik war gestern);
+  sharefyx-mcp PID 991 unverändert; Ollama läuft auf dem vom Nikinger neu
+  aufgesetzten Service. **Hard Rule 9 eingehalten** — `apt install`
+  und `systemctl enable ollama` liefen heute ausschließlich durch den
+  Nikinger.
+- **Größenprüfung:** `phase8_6_ui_polish/CLAUDE.md` aktueller Stand
+  weiter unten. Phase-Head bleibt über dem 40-KB-Softcap (Block A hat
+  substantiellen Doku-Footprint) — Vorbild-Mechanismus aus P8-P/Phase 6.5.
+- **Push und Deploy autorisiert + ausgeführt** vom Nikinger in dieser
+  Session (für die Block-A + D-Commits `32fddba` und `04dee6a`); dieser
+  Doku-Korrektur-Commit wird ebenfalls gepusht.
+
+**Was bewusst NICHT in diesem Commit passiert ist:**
+
+- Kein `pkill -f`, kein `sudo systemctl` (Hard Rule 9).
+- Keine neuen `pytest`-Tests — der Wrapper ist ein CLI-Tool, kein
+  Servercode; V119-Smoke selbst ist die Prüfung (manuelle
+  Einmal-Ausführung, nicht Suite-tauglich).
+- Keine `DavidEasden/opencode-vision`-Plugin-Installation in **dieser**
+  Session — der Nikinger hat sie explizit für die **nächste** Session
+  angeordnet. Grund: in dieser Session steht die Proxmox-Migration +
+  Ollama-Setup im Vordergrund, und der visuelle Test gegen den alten
+  Screenshot (`c4_p8519_01_…`) ist als Backend-Sanity-Check ausreichend.
+  Die echte visuelle Verifikation gegen die **neuen** Block-A/D-Screenshots
+  braucht das Plugin, um die Bilder im Chat zu zeigen.
+- Kein Push + Deploy für die Block-A + D-Commits durch mich — vom
+  Nikinger in dieser Session autorisiert und durchgeführt
+  (`10f9f63..04dee6a`).
+- Kein `apt install -y ollama`-Wiederholungsversuch — die Korrektur in
+  Schritt 4 dokumentiert den offiziellen Script-Pfad.
+
+**Hard-Rule-8-Doku-Update im selben Commit:** Phase-Head Modul-Status
+Z.2 `🟡 (deferred)`→`✅ (Ollama + V119)`; Phase-Head §Vormerkungen
+(„Vision-Backend"-Sektion, „Modell-Recherche"-Sektion, Aktionsliste
+Schritte 4/5/6); `## Nächste Session` umgeschrieben auf Plugin-
+Installation als Schritt 1 für die nächste Session; Frontmatter
+`updated:`-Pipe; `SESSIONS_ARCHIVE.md` Frontmatter `updated:` + verbatim
+Rotation des Block-D-Sub-Blocks.
+
+**Commit-Message (geplant):**
+`phase 8.6: Step V umgesetzt -- Ollama + qwen3-vl:8b + V119-Smoke + Modellname-Korrektur`
+
+**Nächster Schritt (für die nächste Session, vom Nikinger vorgegeben):**
+1. `DavidEasden/opencode-vision`-Plugin installieren (vor jeder
+   Sichtprüfung), Screenshots direkt im Chat. Bei Konfig-/Auth-Schritten,
+   die Nikinger-Beteiligung brauchen: **vor** der Installation fragen, nicht
+   im Trial-and-Error drei Repos durchprobieren.
+2. Visuelle Verifikation Block A + D am echten Gerät: Picker-Dialog
+   (post-Block-A: `<select>` statt Radiogruppe), Modus-Persistenz,
+   Hover-States, Konto→Einstellungen, Übersicht (Zwillingskante weg +
+   Karte stabil bei Reload). Screenshots durch `vision_ollama.py` schicken,
+   Antworten im Chat.
+3. Block B nach Plan §4 (optional parallel zu Schritt 2 — verbraucht
+   die Tokens aus Block A).
+4. Block C nach Plan §5 + D3-Nachzug.
 
 ### 2026-09-10 (Step 0 — nachträglich: Step V aufgeschoben, lokales Modell + Proxmox-Migration; kein weiterer Code-Touch)
 
