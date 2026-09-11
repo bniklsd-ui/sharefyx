@@ -6,7 +6,7 @@ detail: L2
 up: ../INDEX.md
 down:
   - ./sichtpruefung_automation_tooling.md   # separate concern: plugins for VIEWING screenshots (Claude Code vs. OpenCode), not for RUNNING checks
-updated: 2026-09-09 (P8.5-6-Folge-Smoke — Bracket-Pfad live-verifiziert per Mini-Smoke gegen v3ritt-Wegwerf mit `itm_b8b989a1` „Vercel [Hosting]" + Vorschau-Panel-Screenshot, §1-Beispiel-Absatz aktualisiert mit dem Resolution-Pfad; Phase 8.5 vollständig abgeschlossen **Bilanz 20 ✅ · 0 🟡 · 0 ⬜**) | 2026-09-09 (vier neue Konventionen für Sichtungs-Skripte + -Output: §1 Vorschau-Pflicht bei klickbaren Links, §2 Wer validiert was [Code/auto = M3 oder Claude Code, visuell = Nikinger-Auge], §3 Deploy erst nach Testauswertung, §4 Screenshots im Chat präsentieren sobald opencode-vision installiert ist; Nikinger-Feedback 2026-09-09 aus der Sichtung der 10 P8.5-🟡-Zeilen — P8.5-6 bleibt 🟡 wegen fehlendem Vorschau-Screenshot des Bracket-Pfads) | 2026-09-08 (erste Fassung, Phase-8.5-Sichtprüfungs-Sub-Session)
+updated: 2026-09-11 (§5 neu — Nikinger-Vorgabe: Schnellzugriff-Verzeichnis `screenshots_latest/` am Repo-Root als Symlink-Komfort auf die Originale in `docs/screenshots/<phase>_*`, dazu die Pflicht „Dateiname + Checkkriterium im Chat nennen" bei jeder Sichtprüfungs-Verifikation; volle Beschreibung in §5, README mit Tabelle + Checkkriterien liegt in `screenshots_latest/README.md` — Beispiel-Befüllung Phase 8.6 Block B mit vier Screenshots: `01_overview_logout_caution.png` / `02_list_hover_quiet_selection.png` / `03_editor_archive_caution.png` / `04_account_dialog_navigation.png`) | 2026-09-09 (P8.5-6-Folge-Smoke — Bracket-Pfad live-verifiziert per Mini-Smoke gegen v3ritt-Wegwerf mit `itm_b8b989a1` „Vercel [Hosting]" + Vorschau-Panel-Screenshot, §1-Beispiel-Absatz aktualisiert mit dem Resolution-Pfad; Phase 8.5 vollständig abgeschlossen **Bilanz 20 ✅ · 0 🟡 · 0 ⬜**) | 2026-09-09 (vier neue Konventionen für Sichtungs-Skripte + -Output: §1 Vorschau-Pflicht bei klickbaren Links, §2 Wer validiert was [Code/auto = M3 oder Claude Code, visuell = Nikinger-Auge], §3 Deploy erst nach Testauswertung, §4 Screenshots im Chat präsentieren sobald opencode-vision installiert ist; Nikinger-Feedback 2026-09-09 aus der Sichtung der 10 P8.5-🟡-Zeilen — P8.5-6 bleibt 🟡 wegen fehlendem Vorschau-Screenshot des Bracket-Pfads) | 2026-09-08 (erste Fassung, Phase-8.5-Sichtprüfungs-Sub-Session)
 ---
 
 # Sichtprüfungs-Automatisierung — Techniken (nicht: Werkzeuge)
@@ -90,6 +90,41 @@ Was-zu-validieren-Beschreibung auf.
 > (Dateipfad + Was-zu-validieren-Zeile) — dauerhaft, nicht übergangsweise. Der Ausgleich: M3 liest
 > Screenshots seit demselben Befund **selbst** (`read`-Tool), muss also nicht mehr nachfragen, was
 > auf dem Bild zu sehen ist.
+
+### 5. Schnellzugriff `screenshots_latest/` + Dateinamen + Checkkriterium (Nikinger-Vorgabe 2026-09-11)
+
+**Verzeichnis `screenshots_latest/` am Repo-Root:** enthält die Screenshots der **aktuellen**
+Phase als Symlinks auf die Originale in `docs/screenshots/<phase>_*`. Single source of truth
+bleibt `docs/screenshots/`; das Verzeichnis ist nur Lese-Komfort für den Nikinger —
+`ls screenshots_latest/` zeigt sofort, was die laufende Phase an Sichtprüfungs-Belegen
+produziert hat, ohne dass der Nikinger durch die History scrollen muss. Naming: durchnummeriert
+mit kurzem Inhalt im Filename (`01_overview_logout_caution.png` o. ä.), **nicht** mit
+Phase-Tag — der ändert sich beim Phasenwechsel, der Inhalt bleibt. **Rotation beim
+Phasenwechsel** ist Teil der Phase-Closeout-Pflichten (alte Symlinks weg, neue anlegen,
+`README.md` mit neuer Tabelle + Checkkriterien ersetzen, `updated:`-Frontmatter ergänzen —
+alles im selben Commit wie die Phasen-Closeout-Doku-Updates).
+
+**Dateiname + Checkkriterium im Chat:** wenn M3/Claude-Code einen Screenshot für eine
+Verifikation erstellt, sagt es **immer** im Chat zwei Dinge dazu:
+
+1. **Dateiname** (vorzugsweise aus `screenshots_latest/`, nicht der Original-Pfad)
+2. **Kurzes Checkkriterium** (ein bis zwei Sätze, was auf dem Bild zu sehen ist)
+
+Das gilt **unabhängig** davon, ob M3 das Bild selbst mit dem `read`-Tool beurteilen kann —
+die Nikinger-Verifikation ist der Pflicht-Beleg (siehe §2 oben: „Visuelle Sichtungen
+= immer Nikinger-Auge"). Auch wenn M3's eigene Bewertung positiv ist, nennt M3 die
+Checkkriterien, damit der Nikinger nicht erst rätseln muss, was auf dem Bild zu sehen ist.
+
+**Ausnahmen** (in denen M3 den Dateinamen + Checkkriterium nicht nennt):
+- Wenn der Screenshot ein **reiner Build-Beleg** ist (z. B. „Smoke gegen Wegwerf X
+  bestanden, hier der Konsolen-Output als Bild") und M3 den Befund bereits im Klartext
+  dokumentiert hat.
+- Wenn die Verifikation **programmatisch** ist (Regex auf gerenderten HTML-Output
+  o. ä.) und der Screenshot nur Anhang ist.
+
+Vollständige Tabelle der aktuellen Screenshots + Checkkriterien liegt in
+[`../../screenshots_latest/README.md`](../../screenshots_latest/README.md) — nicht dupliziert,
+damit sie beim Phasenwechsel nur einmal aktualisiert werden muss.
 
 ## Der Kernsatz, bevor du eine Zeile Code schreibst
 

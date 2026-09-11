@@ -159,19 +159,34 @@ geschlossen, V105-Vierte-A3-Probe ✅ 2026-09-08).
 ## Vormerkungen (nicht Teil eines aktuellen Steps)
 
 - **`docs/INDEX.md` reißt bald den 40-KB-Softcap → eigene Rotationsregel, Kandidat P9**
-  (Nikinger-Vorgabe 2026-09-11). Stand nach diesem Commit: **40.625 B, nur 335 B Reserve**
-  zum `find -size +40k`-Limit (40.960 B) — und das erst, nachdem in dieser Session **fünf**
-  ältere `updated:`-Pipe-Einträge gestrafft wurden. Jede weitere Session kostet 300–500 B;
-  der INDEX ist damit rechnerisch **in ein bis zwei Sessions voll**. Es ist derselbe
-  Mechanismus, den die Phase-Heads bereits gelöst haben: der Body ist nicht das Problem,
-  die **`updated:`-Frontmatter-Kette** ist es (2.078 B über zehn Einträge, allein der
-  jüngste 478 B). *Lösungsrichtung, noch nicht entschieden:* ein
-  `docs/INDEX_UPDATES_ARCHIVE.md` (L3) plus eine Rotation analog
-  `scripts/rotate_session_block.sh` — die Regel „ein aktueller Eintrag im Kopf, ältere
-  verbatim ins Archiv" existiert schon, sie ist nur nie auf den INDEX angewandt worden.
-  **Nicht in P8.6 lösen** (Doku-Struktur-Umbau, keine UI-Politur); bis dahin gilt die
-  Handarbeit: pro Session einen alten Pipe-Eintrag straffen. **Kein Kandidat:**
-  `DOC_LAYERS_CONVENTION.md` anfassen — die ist die byte-identische Trading-Bot-Kopie.
+  (Nikinger-Vorgabe 2026-09-11). Stand nach diesem Commit: **40.812 B, 148 B Reserve**
+  zum `find -size +40k`-Limit (40.960 B) — nach dem Hinzufügen der
+  `screenshots_latest/`-INDEX-Zeile + der §5-Konventions-Notiz wurden sieben ältere
+  `updated:`-Pipe-Einträge gestrafft (Step 0, Migration-Vorbereitung, Step V deferred,
+  Step V-vision-befund + Rückbau, Phase 8.6 eroeffnet, P8.5-Z-Closeout — die detaillierte
+  Chronik liegt in den Phase-Heads + `SESSIONS_ARCHIVE.md`s, der INDEX ist Landkarte).
+  Es ist derselbe Mechanismus, den die Phase-Heads bereits gelöst haben: der Body ist nicht
+  das Problem, die **`updated:`-Frontmatter-Kette** ist es (jetzt ~1,5 KB über sieben
+  Einträge). *Lösungsrichtung, noch nicht entschieden:* ein `docs/INDEX_UPDATES_ARCHIVE.md`
+  (L3) plus eine Rotation analog `scripts/rotate_session_block.sh` — die Regel „ein
+  aktueller Eintrag im Kopf, ältere verbatim ins Archiv" existiert schon, sie ist nur nie
+  auf den INDEX angewandt worden. **Nicht in P8.6 lösen** (Doku-Struktur-Umbau, keine
+  UI-Politur); bis dahin gilt die Handarbeit: pro Session einen alten Pipe-Eintrag straffen.
+  **Kein Kandidat:** `DOC_LAYERS_CONVENTION.md` anfassen — die ist die byte-identische
+  Trading-Bot-Kopie.
+
+- **`screenshots_latest/` + Dateinamen+Checkkriterium-Konvention (Nikinger-Vorgabe 2026-09-11,
+  etabliert).** Verzeichnis `screenshots_latest/` am Repo-Root mit Symlinks auf die
+  Originale in `docs/screenshots/<phase>_*` — Schnellzugriff für den Nikinger, kein
+  zweiter Speicherort. Bei Phasenwechsel: alte Symlinks weg, neue anlegen, README mit
+  Tabelle + Checkkriterien ersetzen, `updated:`-Frontmatter ergänzen — alles im selben
+  Commit wie die Phasen-Closeout-Doku-Updates. **Chat-Verhalten:** wenn M3/Claude-Code
+  einen Screenshot für eine Sichtprüfung aufnimmt, sagt es **immer** im Chat zwei Dinge:
+  (a) **Dateiname** (vorzugsweise aus `screenshots_latest/`, nicht der Original-Pfad),
+  (b) **kurzes Checkkriterium** (ein bis zwei Sätze, was auf dem Bild zu sehen ist). Ausnahmen:
+  reine Build-Belege („Smoke gegen Wegwerf X bestanden, Konsolen-Output als Bild")
+  oder programmatische Verifikationen (Regex auf HTML). Volle Beschreibung:
+  `docs/concepts/sichtpruefung_automation_conventions.md` §5.
 
 - **P8.6-§6.4 (`cancelAnimationFrame` in `runSimulation()`) — streichbar:** der Fix ist
   drei Zeilen + direkt Ursache von §2.4-Verschlimmerung + schon halb da (`var rafId = null`
