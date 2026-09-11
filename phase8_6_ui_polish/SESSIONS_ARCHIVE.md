@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-10 (V-umgesetzt-Sub-Block [vom 2026-09-10 früh] verbatim aus dem Phase-Head hierher rotiert vor dem V-plugin-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-plugin-Sub-Block, SESSIONS_ARCHIVE jetzt mit sieben Sub-Blöcken)
+updated: 2026-09-10 (V-plugin-Sub-Block [vom 2026-09-10 früh, V-plugin-Commit `cd25712`] verbatim aus dem Phase-Head hierher rotiert vor dem V121+V122-Visual-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V121+V22-Visual-Sub-Block, SESSIONS_ARCHIVE jetzt mit acht Sub-Blöcken)
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -20,6 +20,82 @@ das Skript auf das Phase-8.5-Muster passt und mit einem `## Session stopped` + m
 ---
 
 
+
+
+
+
+### 2026-09-10 (Step V-plugin ✅ — `DavidEasden/opencode-vision` v1.3.0 installiert + MCP-Server `local_vision` registriert; `opencode mcp list` 3/3 connected; V121-Smoke end-to-end ✅; Tabu-Diff §0.3 leer, pytest 966 unverändert)
+
+**Auftrag:** Special task für diese Session (vom Nikinger im User-Prompt vorgegeben) — **Schritt 1 = `DavidEasden/opencode-vision`-Plugin installieren** (vor jeder Sichtprüfung, damit Screenshots direkt im Chat), Schritt 2 = visuelle Verifikation Block A + D, Schritt 3 = Block B, Schritt 4 = Block C. Bei Konfig-/Auth-Schritten, die Nikinger-Beteiligung brauchen: vorher fragen, nicht Trial-and-Error. Diese Session setzt Schritt 1 um.
+
+**Was in diesem Commit passiert ist (Plugin-Installation + MCP-Backend):**
+
+1. **Plugin-Quelle vorbereitet** — `DavidEasden/opencode-vision` v1.3.0 ist auf GitHub, aber **nicht** auf npm unter dem Namen (das npm-Paket `opencode-vision` gehört `WeZZard` — ein anderes Plugin, verworfen). Install via `npm install github:DavidEasden/opencode-vision` würde leeres `node_modules/opencode-vision/` (nur LICENSE/README/package.json) hinterlassen, weil `dist/` im Repo nicht eingecheckt ist (`files: ["dist"]`) und `prepublishOnly` nur bei `npm publish` greift. **Lösung:** Repo nach `/tmp/opencode/opencode-vision-src` geklont, `npm install` + `npm run build` (`tsc`, baut `dist/index.js` + `dist/index.d.ts`), dann `cd ~/.config/opencode && npm install /tmp/opencode/opencode-vision-src` — das installiert Plugin inkl. `dist/` in `~/.config/opencode/node_modules/opencode-vision/`. Hard-Rule-9-konform (nichts am sharefyx-mcp-Service angefasst).
+
+2. **Plugin in `opencode.jsonc` aktiviert** — `"plugin": ["opencode-vision"]` in `~/.config/opencode/opencode.jsonc` ergänzt; daneben neuer `local_vision`-MCP-Server mit absoluten Pfaden auf `.venv/bin/python` + Skript. **Tool-Naming-Konvention** (aufgepasst, Stolperfalle): OpenCode wrappt MCP-Tools als `<server_name>_<tool_name>` (nicht `mcp_<server>_<tool>` wie im Plugin-README suggeriert — das README wurde für Claude-Desktop geschrieben). Server `local_vision` + Tool `local_vision` ergibt vollständigen Tool-Namen **`local_vision_local_vision`**, nicht `mcp_local_vision_local_vision`. Erste Iteration hatte `mcp_local_vision_local_vision` in der Plugin-Config — korrigiert.
+
+3. **Plugin-Config geschrieben** — `~/.config/opencode/opencode-vision.json` mit zwei Schlüsseln: `models: ["*"]` (Nikinger-Vorgabe 2026-09-10: User-level-Wildcard für alle Modelle, keine projekt-spezifische Einschränkung) und `imageAnalysisTool: "local_vision_local_vision"` (siehe Naming-Konvention oben). Plugin-Quelltext (`src/index.ts`) gelesen und gegen die OpenCode-Doku abgeglichen — die `models`-Liste wird per `matchesWildcardPattern()` geprüft; `*` matched alles.
+
+4. **MCP-Server `local_vision` geschrieben** — `phase8_6_ui_polish/scripts/mcp_local_vision_server.py`, **~167 Z. Python** (raw JSON-RPC stdio, **keine SDK-Abhängigkeit**, stdlib + `requests` aus dem Projekt-venv). Spec:
+   - `initialize` / `tools/list` / `tools/call` per JSON-RPC 2.0; Notifications ohne Antwort.
+   - Tool `local_vision(path: str, prompt: str, model?: str)` — liest Bild als base64, POST `127.0.0.1:11434/api/generate` mit `{model, prompt, images: [b64], stream: false}`, gibt die `response` zurück.
+   - **stderr-only-Logs** per Hard Rule 7, Exit-Codes 0/2/3/4 (graceful/protocol-error/ollama-unreachable/tool-error).
+   - **600 s Timeout** für Cold-Start (Modell-Load 30–60 s + Vision-Encoder 5–10 s + Text-Decoding 30–60 s auf i5-14600KF CPU-only).
+   - **`--check`-Mode** für Smoke ohne serve: `GET /api/tags` + Modell-Liste ausgeben.
+   - Env-Override pro Variable: `LOCAL_VISION_MODEL`, `LOCAL_VISION_ENDPOINT`, `LOCAL_VISION_TIMEOUT_S`.
+   - Liegt im Phase-Verzeichnis, weil das die einzige Stelle ist, an der Skripte leben dürfen, die zur Phase gehören (§0.3 Tabu-Liste).
+
+5. **End-to-End-Smoke V121 ✅** — `printf` mit `tools/call`-Request in `python mcp_local_vision_server.py` gepipt:
+   ```
+   .venv/bin/python phase8_6_ui_polish/scripts/mcp_local_vision_server.py --check
+   → [local_vision] Ollama reachable, 1 model(s) installed  /  qwen3-vl:8b
+   
+   printf '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"local_vision","arguments":{"path":"docs/screenshots/c4_p8519_01_radiogruppe_im_dialog.png","prompt":"Was siehst du? Antworte in einem Satz auf Deutsch."}}}' | \
+     .venv/bin/python phase8_6_ui_polish/scripts/mcp_local_vision_server.py
+   → {"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":"Ich sehe eine dunkle Benutzeroberfl\u00e4che der Anwendung ShareFyx mit dem aktiven Raum \u201ealpha\u201c, ... und einem Pop-up-Fenster zum Verkn\u00fcpfen von Elementen mit Optionen wie \u201eals Text-Link im Text\u201c oder \u201eals Kante (Feld _Links)\u201c."}],"isError":false}}
+   ```
+   Korrekt: Bild erkannt, ShareFyx-UI erkannt, Popup-Dialog erkannt, beide Picker-Modi genannt, deutsche Antwort. **V121 damit ✅.** — Modul-Status Z.2b ⬛ → ✅.
+
+6. **AGPL-3.0-Check** — Lizenzhinweis als Audit-Spur im Phase-Head dokumentiert (§Vormerkungen, "Vision-Backend"); **kein** README-Eintrag in `sharefxy/README.md` (kein modifiziertes Derivat, keine Verteilung, kein Sharefyx-Build-Schritt zieht das Plugin). Nikinger-Antwort 2026-09-10: „Benutzen. reicht eine Erwähnung auf z.B der Github readme main Seite (z.B dieses Projekt wurde unter anderem mithilfe XY entwickelt) um auf der sicheren Seite zu bleiben?" — Antwort: ja für ein Derivat, hier nicht nötig (siehe Lizenzanalyse oben).
+
+7. **`opencode mcp list` 3/3 connected** — verifiziert: Playwright, Websearch, local_vision. MCP-Server-Topologie ist nicht-trivial (§Vormerkungen dokumentiert die Stolperfallen Naming-Konvention, `--check`-Mode, Raw-JSON-RPC statt SDK).
+
+8. **Phase-Head aktualisiert** — Modul-Status-Zeile 2b neu eingefügt; Zeile 2 (Step V) gekürzt (Plugin-Teil raus, weil jetzt eigene Zeile); §Vormerkungen "Vision-Backend" auf "Etappe 1 / Etappe 2" umgeschrieben; `## Nächste Session` um Schritt 0 (OpenCode-Neustart) ergänzt und Schritt 1 (visuelle Verifikation) an den neuen Bild-im-Chat-Workflow angepasst; Frontmatter `updated:`-Pipe vorne ergänzt; **V-umgesetzt-Sub-Block (von heute früh)** **verbatim** nach `SESSIONS_ARCHIVE.md` rotiert.
+
+**Selbstprüfung (§0.5):**
+
+- **Tabu-Diff §0.3 leer** — `git diff --stat -- phase1_storage/storage phase4_auth/authserver phase2_mcp/mcpserver phase5_ui/webui/{security,api,serializers,permissions}.py` liefert nichts. **Erlaubte Pfade berührt:** `~/.config/opencode/{opencode.jsonc,opencode-vision.json}` (User-Scope, außerhalb des Repos — Hard Rule 9 + §0.5.7 sind serverseitig, OpenCode-Config ist nicht im Repo), `phase8_6_ui_polish/scripts/mcp_local_vision_server.py` (erlaubt nach §0.3).
+- **`pytest -q` V107 ✅ 966 unverändert** — kein Touch in `phase1_storage/`, `phase2_mcp/`, `phase4_auth/`, `phase5_ui/`. Der MCP-Server ist ein **CLI-Tool**, kein Servercode; analog zu `vision_ollama.py` ohne pytest-Tests.
+- **`node --check` gegenstandslos** — kein JS-Touch.
+- **`ui_budget.py` gegenstandslos** — kein `webui/static/`-Touch.
+- **`python -c "import ast; ast.parse(...)"` für `mcp_local_vision_server.py` ✅** — Syntax-Check.
+- **V121-Smoke selbst ✅** — Init + tools/list + tools/call, deutsche Antwort korrekt.
+- **`opencode mcp list` ✅** — 3/3 connected, inkl. local_vision.
+- **Service-Touch 0** — sharefyx-mcp PID 991 nicht angerührt, Ollama-Service ebenfalls nicht (Plugin + MCP-Server sind im User-Scope), `systemctl status` heute **nicht** aufgerufen. **Hard Rule 9 eingehalten.**
+- **Größenprüfung (gelaufen):** Phase-Head aktueller Stand wird weiter unten korrigiert — die Modul-Status-Zeile 2b ist lang. Erste Schätzung: ~40–42 KB Head nach allen Edits; **notfalls Trimm-Pass vor Z** wie bei Block A.
+- **Kein `pkill -f`, kein `sudo systemctl`, kein Pfad auf echten `DATA_ROOT`/Keyring in dieser Session** — bestätigt.
+
+**Was bewusst NICHT in diesem Commit passiert ist:**
+
+- **Keine visuelle Verifikation Block A + D** — das ist Schritt 1 der nächsten Session (nach OpenCode-Neustart durch den Nikinger). Diese Session hat das Plugin installiert + das Backend gebaut + einen Backend-Sanity-Check gefahren — die visuelle Verifikation gehört in die nächste OpenCode-Sitzung mit echten post-Block-A/D-Screenshots, nicht in diese.
+- **Keine neuen `pytest`-Tests** — der MCP-Server ist CLI-Tool, nicht Servercode. V121-Smoke ist die Prüfung.
+- **Kein `hostnamectl set-hostname`, keine Proxmox-Änderungen** — außerhalb P8.6-Scope.
+- **Keine `docs/INDEX.md`-Einträge für den MCP-Server** — das `phase8_6_ui_polish/scripts/`-Verzeichnis ist bereits dokumentiert, der MCP-Server ist Teil der V-plugin-Erweiterung. **Hard Rule 8 nicht verletzt** — keine neue `.md`.
+- **Kein README-Eintrag für AGPL-3.0-Attribution** — Lizenzanalyse zeigt, dass keine Verteilung vorliegt; Lizenzhinweis bleibt im Phase-Head als Audit-Spur.
+- **Kein Block A/B/C/D-Code-Touch** — diszipliniert auf die Plugin-Etappe beschränkt.
+- **Kein Push ohne Nikinger-Anweisung** — Commit folgt gleich, Push wartet.
+
+**Hard-Rule-8-Doku-Update im selben Commit:** Phase-Head Modul-Status Zeile 2b (neu) + Zeile 2 gekürzt; §Vormerkungen "Vision-Backend" auf Zwei-Etappen-Struktur; `## Nächste Session` Schritt 0/1 angepasst; Frontmatter `updated:`-Pipe; `SESSIONS_ARCHIVE.md` Frontmatter `updated:`-Pipe + verbatim Rotation des V-umgesetzt-Sub-Blocks.
+
+**Commit-Message (geplant):**
+`phase 8.6: Step V-plugin — DavidEasden/opencode-vision installiert + MCP-Server local_vision registriert`
+
+**Nächster Schritt (für die nächste Session, vom Nikinger vorgegeben + diese Session ergänzt):**
+0. **OpenCode-Neustart** durch den Nikinger (Plugin + MCP-Server werden erst beim nächsten OpenCode-Start geladen). Verifikation: `opencode mcp list` zeigt 3/3 connected.
+1. **Visuelle Verifikation Block A + D am echten Gerät** mit dem neuen Bild-im-Chat-Workflow: Nikinger macht einen Screenshot vom aktuellen Stand (Picker-Dialog post-Block-A, Übersicht post-Block-D), pastet ihn in die nächste OpenCode-Session — Plugin speichert + injiziert Tool-Call + M3 ruft `local_vision_local_vision` auf, qwen3-vl:8b liefert die Antwort. Sechs-Smoke-Punkte.
+2. **Bei Plugin-Bug** (M3: "I don't have a tool called X"): Korrektur `imageAnalysisTool` in `~/.config/opencode/opencode-vision.json`; Verifikation `opencode mcp list`.
+3. Block B nach Plan §4 (Selektion vereinheitlichen).
+4. Block C nach Plan §5 + D3-Nachzug.
 
 ### 2026-09-10 (Step V ✅ — Ollama 0.34.0 + `qwen3-vl:8b` + V119-Smoke 46 s; Plugin-Installation als nächste Session vorgegeben; Tabu-Diff §0.3 leer, pytest 966 unverändert)
 
