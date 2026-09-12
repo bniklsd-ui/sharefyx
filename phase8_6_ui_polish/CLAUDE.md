@@ -464,155 +464,202 @@ Rendern im OpenCode-Chat ist technisch nicht möglich (Web-UI hat keinen
 Tool-Result-Bild-Slot). Weder `vision_ollama.py` noch der `local_vision`-MCP-Server
 werden dafür gebraucht — beide bleiben als Offline-Fallback liegen.
 
-## Session stopped — 2026-09-11 (Block B ✅ — Selektion vereinheitlicht, Vorsicht-Kategorie)
+## Session stopped — 2026-09-12 (Block C ✅ — Struktur-Umbau: Einstellungen oben, Alle Items unten, Karte als rechte Spalte, klickbare Spaces, Ordner-Zähler)
 
-**Auftrag (Nikinger 2026-09-11):** „Hello there, please go on atomically with the next step
-according to plan." — Block B nach Plan §4 (Selektion vereinheitlichen, B4 Vorsicht-
-Kategorie, B5 Radien), A vor B ist zwingend (P8.6-U). Erst opencode/M3-Code-Touch seit
-Cluster 1 (P8.5-19 + P8.5-6 am 2026-09-07).
+**Auftrag (Nikinger 2026-09-12, aus Block-B-Sub-Block):** „Block C zuerst anfangen,
+dann verifizierst du noch einmal mal. Bevor wir deployen, braucht es drei Sachen:
+alle Code Tests grün, alle Bilder laut dir grün, ich habe über kritische Bilder noch
+mal rüber geschaut." — Block C nach Plan §5 (C1 „Konto"→„Einstellungen", C2 „Alle
+Items" unter den Spaces, C3 Map als rechte Spalte / volle Höhe, C4 Spaces in der
+Übersicht klickbar, C5 Ordner-Zähler clientseitig aus `state.items`) + D3-Nachzug
+(V112-Gegenprobe nach C3). Erst opencode/M3-Code-Touch seit Block B am
+2026-09-11 (3 Tage vorher). **Kein Push + Deploy in dieser Session** — die
+Drei-Bedingungen-Regel gilt für v3.0.2.
 
-**Was in diesem Commit passiert ist (B1 + B2-Audit + B3 + B4 + B5):**
+**Was in diesem Commit passiert ist (C1 + C2 + C3 + C4 + C5 + D3):**
 
-1. **B5 (eine Zeile, sofort erledigt).** `app.css:1293` `.link-picker-results`
-   `border-radius: 6px` → `var(--radius-sm)`. Der einzige Token-Drift im Radien-Bestand
-   (gemessen vom Phase-8.5-Closeout-Block: 37 Deklarationen, sieben Werte, einer davon
-   hartkodiert). Plan §4.5 Tabelle sagt es, der Code bestätigt es, Implementierung steht.
+1. **C1 — „Konto" → „Einstellungen", Reihenfolge im Rail (Plan §5.1).**
+   `#account-button` wandert aus `.rail__account` heraus direkt unter `#home-button`
+   (`app.html` Z. 30-34), Label „Konto" → „Einstellungen" (das Icon `#i-settings`
+   war schon immer ein Zahnrad, der Name hinkte hinterher — N3-Lesart b, Einstellungen
+   oben, Abmelden ans Rail-Ende). `#logout-button` bleibt in `.rail__account` als
+   einziges Kind. Neue Modifikator-Klasse `.rail__action--account` (analog
+   `.rail__home`) statt generischer `.rail__action`-Anpassung — damit Logout-Knopf
+   als einziges Kind weiterhin die volle Breite einnimmt (`flex: 1` bleibt).
 
-2. **B1 (konsolidierte Hover-Regel).** Eine Regel ersetzt drei Flickenteppich-Fassungen:
+2. **C2 — „Alle Items" unter den Spaces (Plan §5.2).**
+   `tree.js :: renderRail()` ruft `renderScopeRow()` jetzt **nach** den
+   `foreign.forEach(renderSpaceNode)` (Z. 299+), nicht mehr davor. Neue
+   `tree__group`-Überschrift „Alles" vor dem Button (analog „Mein Space" /
+   „Verbundene Spaces"), damit der Wechsel nicht ohne Überschrift an den
+   Spaces-Block klebt. `renderScopeRow()`-Kommentar wörtlich erhalten
+   („Lieber keine Zahl als eine unwahre" — der Kommentar erklärt genau den
+   Sonderfall, den C5 gleich für Folder erweitert).
 
-   ```css
-   .list__rows > li:not(.list__row--selected) .list__row:hover:not([aria-current="true"]),
-   .rail__home:hover:not([aria-current="true"]),
-   .rail__action:hover,
-   .tree__space:hover,
-   .tree__folder:hover:not([aria-current="true"]),
-   .tree__scope:hover:not([aria-current="true"]),
-   .overview__space-row:hover,
-   .link-picker-results li:hover:not([aria-selected="true"]) {
-     background: var(--select-fill-quiet);
-     outline: 1px solid var(--select-line-quiet);
-     outline-offset: -1px;
-     border-radius: var(--radius-sm);
-   }
-   ```
+3. **C3 — Map als rechte Spalte, volle Höhe (Plan §5.3).**
+   `.overview` (`app.css` Z. 898+) wird ein zweispaltiges Grid
+   (`grid-template-columns: 1fr 40%; grid-template-rows: auto 1fr; flex: 1;
+   min-height: 0; overflow: hidden`). Direkte Kinder in drei logische Gruppen
+   gefasst: `.overview__head-row` (Header + Legende, `grid-column: 1 / -1`),
+   `.overview__col-left` (Spaces + „Zuletzt benutzt" + Recent, `overflow-y:
+   auto`), `.overview__col-right` (Verknüpfungs-Heading + Graph, `flex: 1`).
+   `.overview__graph` verliert `min-height: 55vh` und `max-width: 960px`
+   (app.css Z. 1008+) — V112-Gegenprobe, „Karte schneidet unten ab" behoben.
+   `@media (max-width: 1280px)` (`app.css` Z. 1859+) kollabiert das Grid auf
+   eine Spalte, Map rutscht unter die Liste.
 
-   `:not([aria-current])`-Ausschluss pro Selektor (statt Reihenfolge-Trick über 1300
-   Zeilen) -- P8.5-O-Eskalationsregel: Kaskaden-Abhängigkeit über so viel Code ist genau
-   die Falle, die zu vermeiden ist. Der Ausschluss steht im Selektor und überlebt jedes
-   Umsortieren. Eine zweite Regel für `.rail__action:hover`/Geschwister hält den
-   bisherigen Farbwechsel `text-muted → text` fest (das war UX-Feature, nicht Flickenteppich).
+4. **C3 + V115 — `requestAnimationFrame(resize)` in `loadGraph()`.**
+   `graph.js :: loadGraph()` (Z. 150+) ruft `resize()` jetzt in einem
+   `requestAnimationFrame(...)`-Wrapper, NACHDEM die Knoten/Edges geladen sind —
+   der ResizeObserver feuert zwar beim ersten `observe()` (Spec
+   https://www.w3.org/TR/resize-observer/), aber zu diesem Zeitpunkt ist
+   `.overview__graph` im neuen Grid möglicherweise 0x0 (CSS-Layout noch nicht
+   committed); ohne den RAF würde `seedInitialPositions()` mit der 0x0-Box
+   rechnen. V115 damit belegt: gemessen, dass der ResizeObserver allein beim
+   ersten Mount nicht ausreicht — der Fix ist 8 Zeilen, kein neuer Mechanismus.
 
-3. **B1 Folge: Button-Hover auf Tokens.** `.btn:hover` und `.btn-primary:hover` trugen
-   hartkodierte Hex-Verläufe (`#323A45`/`#212832` bzw. `#6EACF9`/`#3781E2`). Jetzt
-   `color-mix(in srgb, var(--btn-face-top), white 7%)` und `color-mix(in srgb,
-   var(--accent-face-top), white 12%)` -- **kein** `var(--select-fill-quiet)` als Overlay
-   über der Knopfplastik wie der Plan wörtlich vorsah (P8.6-Q): dafür bräuchte es ein
-   Pseudo-Element oder `box-shadow` mit `<image>`, und beide Wege sind invasiv. `color-mix`
-   erfüllt den Geist (Tokens statt Hex, leichte Aufhellung) ohne den Aufwand.
-   `color-mix()` ist seit Chrome 111 / Firefox 113 / Safari 16.2 (Mai 2023) stabil.
+5. **C4 — Spaces in der Übersicht klickbar (Plan §5.4).**
+   `.overview__space-row` bekommt ein `<button class="overview__space-open">`
+   (innerhalb der `<li>`), das Name + Kategoriepunkt umschließt — Tastaturfokus +
+   Screenreader-Rolle gratis. `event.stopPropagation()` auf den Counter-Chips
+   bleibt (jetzt tragend: Eltern-Button würde sonst ebenfalls auslösen, mit
+   anderer Semantik). Neue CSS-Klasse `.overview__space-open` mit eigenem
+   Hover aus B1. `activateView()` wird **exportiert** und in `list.js`
+   importiert (V116 — `activateView(name)` statt `navigate(name, "open")`,
+   weil die Zeile den Bucket nicht explizit wählt).
+   `closeEditor().then(proceed => activateView(name))`-Gating eingebaut — wie
+   die Ordner-Buttons in `tree.js` (Phase-8-§9.3 Punkt 1). **Erster echter
+   Bug, der das Skript während des Baus stoppte:** `activateView` war
+   sowohl als `function` (Original) als auch als `export function` (C4) in
+   `tree.js` definiert — `Identifier 'activateView' has already been declared`
+   als `PAGE ERROR`, `overview__spaces` blieb leer. Original-Z. 20-33 entfernt,
+   Page-Error behoben, danach gerendert sauber.
 
-4. **B3 (`.account-nav` statt `.btn` für Konto-Dialog-Navigation).** `#account-show-updates`
-   und `#account-manage-spaces` sind KEINE Aktionen (öffnen etwas, ändern nichts) --
-   das war die Meldung des Nikingers zum Archivieren-neben-×-Muster (gleiche Klasse).
-   `.account-nav`-Trägerklasse mit `background: none` + Hover aus B1; die alte
-   `.account-updates-link`-Klasse (nur `margin-bottom`) fällt weg, ihr Wert ist in
-   `.account-nav` eingebaut.
+6. **C5 — Ordner-Zähler clientseitig aus `state.items` (Plan §5.5).**
+   `state.js` bekommt `itemsLoaded: {}` — ein einfaches `Object`, das pro Space
+   speichert, ob die Items dieses Spaces schon einmal geladen wurden. Drei Regeln
+   aus §5.5, alle umgesetzt: (1) gezählt wird alles, was der Nutzer im Ordner
+   **sehen** würde, inklusive `archived`; (2) nur direkte Kinder, kein
+   rekursiver Zähler; (3) ohne `itemsLoaded[space.name]` kein Zähler („Lieber
+   keine Zahl als eine unwahre"). `tree.js :: folderButton()` (Z. 156+)
+   bekommt `folderItemCount(spaceName, folderPath)`-Helfer, der nach
+   `item.space` UND `item.folder` filtert; `list.js :: loadItems()` (Z. 475+)
+   setzt `itemsLoaded[space]` (im space-Modus) bzw. `itemsLoaded[item.space]`
+   für jedes Item (im „all"-Modus) und ruft danach `renderRail()` auf, damit
+   die Zähler die frischen Items sehen. `.tree__count` bekommt `margin-left:
+   auto`, damit Eimer + echte Ordner rechtsbündig in ihren Buttons liegen.
 
-5. **B4 (Vorsicht-Kategorie, Konvention v3 fünfte Kategorie).** Neue Trägerklasse
-   `action--caution`, Regel mit `:hover` im Selektor (gleiche Spezifität wie B1-Hover,
-   später im Stylesheet = Cascade gewinnt -- sonst hätte das B1-Hover-Color
-   `var(--text)` die Vorsicht-Farbe auf Hover überschrieben). Zwei HTML-Änderungen:
-   `#logout-button` `class="rail__action action--caution"`, `#archive-button`
-   `class="btn action--caution"`. **Genau zwei Mitglieder** — der Plan verbietet
-   ein drittes („Verschieben"/„Abwählen"/„erste Notiz anlegen"/„Space verwalten" sind
-   alle folgenlos oder trivial umkehrbar), und der neue statische Test hält das fest.
+7. **C5 Folge: V117-Reset in `activateView()` und `navigateAll()`.**
+   `state.itemsLoaded = {}` wird in beiden Navigation-Funktionen vor
+   `renderRail()` geleert — sonst zeigt das Rail für ein paar ms Counts aus
+   dem falschen Pool (state.items wird erst in `loadItems()` umgeschaltet,
+   renderRail() läuft aber ZUVOR). **Befund während des Self-Smoke:** ohne
+   den Reset zeigte Screenshot 01 für alpha/Notizen den Counter 6 statt 3,
+   weil der vorangegangene globale Modus Items aus beta/gamma mitgezählt
+   hatte. Reset löst das; erste renderRail() zeigt bis zur loadItems-Auflösung
+   leere Folder-Counter, danach sind sie korrekt für den neuen Space.
 
-6. **B2-Audit (nur Prüfung, kein Bau).** **[VERIFY] V113** schreibt der Plan für
-   `.tree__space` („setzt `aria-current="true"`, wenn `state.space === space.name`").
-   Im Code: `tree.js :: renderSpaceNode()` (Z. 200) tut **das nicht** -- die
-   aria-current-Zuweisung an den aktiven Space fehlt komplett. Auch der Variablenname
-   `state.space` existiert nicht (es ist `state.activeSpace`, siehe `state.js:32`).
-   **B2 ist im Plan als „zu prüfen, nicht zu bauen" markiert (§4.2)** -- daher
-   der Befund nur dokumentiert, kein Code-Touch. Der `:not([aria-current="true"])`-
-   Ausschluss in der neuen Hover-Regel ist trotzdem korrekt und für eine künftige
-   Reparatur vorbereitet.
+8. **D3-Nachzug:** die `.overview__graph`-Höhe ist implizit mit C3 verifiziert
+   (Screenshots 01 + 06 zeigen die Karte in voller Spaltenhöhe, Screenshot 06
+   unter 1200px zeigt Karte unter der Liste ohne Abschneiden).
 
-7. **Folge-Korrektur: `.link-picker-results li:hover, .link-picker-results li[aria-selected="true"]`
-   getrennt.** P8.5-A2 hatte beide Zustände in einer Regel zusammengezogen (mit vollem
-   Fill). B1 verlangt hover = quiet, selection = full. Zwei Regeln: die `:hover`-Variante
-   zieht in die konsolidierte Regel (mit `:not([aria-selected="true"])`-Ausschluss),
-   die `aria-selected="true"`-Variante bleibt mit vollem Fill (Auswahl schlägt Hover).
-   Doppelter Kommentar-Block aufgereinigt (passierte beim ersten Edit-Pass).
-
-8. **`+1` statischer Test: `test_caution_class_only_on_logout_and_archive`.** Prüft
-   drei Dinge: (a) genau zwei Vorkommen von `action--caution` im Markup, (b)
-   `#logout-button` und `#archive-button` sind die Träger, (c) die CSS-Regel existiert
-   und referenziert `var(--caution)` (statt z. B. `var(--danger)` direkt — Konvention
-   verbietet zwei Farbnamen für dieselbe Bedeutung, P8.6-F). Wer ein drittes Mitglied
-   hinzufügt, fällt hier auf statt erst in der nächsten Sichtprüfung.
+9. **`+3` statische Tests** in `test_static_routes.py`:
+   - `test_rail_order_settings_before_tree_logout_last` — prüft die exakte
+     Reihenfolge der Tags im Markup (home < account < tree < logout).
+   - `test_account_button_says_einstellungen` — Label „Einstellungen" im
+     Button, „Konto" explizit nicht.
+   - `test_overview_graph_has_no_max_width_or_min_height` — regex über alle
+     `.overview__graph`-Blöcke, prüft Abwesenheit von `max-width` und
+     `min-height` (V112-Regressionswächter).
 
 **Selbstprüfung (§0.5):**
 
 - **Tabu-Diff §0.3 leer.** `git diff --stat -- phase1_storage/storage
   phase4_auth/authserver phase2_mcp/mcpserver phase5_ui/webui/security.py
   phase5_ui/webui/api.py phase5_ui/webui/serializers.py phase5_ui/webui/permissions.py`
-  liefert nichts. Erlaubte Pfade berührt: `phase5_ui/webui/static/app.{css,html}` und
-  `phase5_ui/tests/test_static_routes.py` (§0.3 whitelistet beide).
-- **`pytest -q` 967 passed in 113 s.** 18 Tests in `test_static_routes.py` (V107 +
-  Inkrement +1), 967→966 = +1 vom neuen `test_caution_class_only_on_logout_and_archive`.
-- **`node --check` gegenstandslos** (kein JS-Touch).
-- **`python phase5_ui/scripts/ui_budget.py` 5/5 im Korridor.** app.css jetzt 19.8 KB
-  (+0.4 KB gegenüber Block A), Bundle app.js+app.css+Font gzip 133.1 KB von 250 KB.
-  **`GET /api/v1/overview` 380 ms** -- besser als die 863 ms aus dem Step-0-Stand, sogar
-  unter dem P6-P-Historical von 438–453 ms; V108 öffnet sich nicht weiter (kein
-  P8.6-Auftrag, ggf. P9-Befund).
-- **`grep -nE 'rgba\(62,141,243'`** trifft nur die `:root`-Zeilen (Token-Definitionen +
-  Kommentar), `test_no_raw_accent_rgba_outside_root` und `test_every_css_var_reference_is_defined`
-  beide grün -- die Block-A-Wächter halten auch B1 sauber.
-- **Service-Touch 0.** sharefyx-mcp **PID 991** über die gesamte Session unverändert
-  (nur `systemctl show -p MainPID` gelesen). Eigener Wegwerf auf Port 18773 (PID-Datei,
-  sauber gestoppt, kein `pkill -f`).
-- **Größenprüfung:** app.css 19.8 KB (§0.3-Korridor), app.html 32.6 KB,
-  test_static_routes.py 25.4 KB. Phase-Head (dieser Head) wird durch die Rotation
-  ~50 KB groß — weiter über 40-KB-Softcap (Vorbild-Mechanismus aus P8-P / Phase 6.5).
-- **Vier Selbst-Screenshots** unter `docs/screenshots/p86_block_b_{01..04}_*.png`
-  zeigen die visuellen Ziele: Logout rot, Archivieren rot, Konto-Dialog-Navigation
-  ohne Knopfplastik, Hover-Zeile mit quiet-Selektion. M3 liest sie selbst mit dem
-  eingebauten `read`-Tool — OpenCode hat keinen Tool-Result-Bild-Slot, das Plugin
-  ist zurückgebaut, native Sicht reicht (Befund 2c).
+  liefert nichts. Erlaubte Pfade berührt: `phase5_ui/webui/static/app.{html,css}`,
+  `phase5_ui/webui/static/js/{graph,list,state,tree}.js`, `phase5_ui/tests/
+  test_static_routes.py`, `phase8_6_ui_polish/scripts/p86_block_c_self_check.py`
+  (§0.3 whitelistet alle).
+- **`pytest -q` 970 passed in 111 s.** 21 Tests in `test_static_routes.py`
+  (V107: 967 → **970**, +3 für C1/C3/C5 in Plan §8.2 — die anderen zwei
+  Tests aus der Liste waren in Block A/B).
+- **`node --check` auf alle vier berührten JS-Dateien grün** (tree.js,
+  list.js, graph.js, state.js — keine Syntax-Fehler).
+- **`python phase5_ui/scripts/ui_budget.py` 5/5 im Korridor.** app.css
+  21.1 KB, Bundle app.js+app.css+Font gzip **137.5 KB** von 250 KB (+4.4 KB
+  gegen Block B 133.1 KB, durch C1/C3/C4-CSS-Erweiterungen). Erstaufruf
+  146.7 KB von 400 KB. **`GET /api/v1/overview` 370 ms** — weiter unter dem
+  Step-0-Stand von 863 ms (V108-Befund: 380→370 ms, kein P8.6-Auftrag).
+- **`grep -nE 'rgba\(62,141,243'`** trifft nur die `:root`-Zeilen, die zwei
+  Block-A-Wächter (`test_no_raw_accent_rgba_outside_root`,
+  `test_every_css_var_reference_is_defined`) halten auch C3 sauber.
+- **Service-Touch 0.** sharefyx-mcp **PID 991** über die gesamte Session
+  unverändert (`systemctl show -p MainPID sharefyx-mcp` zu Beginn = 991, am
+  Ende = 991). Eigener Wegwerf auf Port 18773 (PID-Datei, mehrfach
+  cleanup+setup+seed-items+start durchgespielt für frische Datenlage + Reset
+  des `login_attempts`-Rate-Limits; **kein `pkill -f` mit Regex** — alle
+  Starts/Stops über PID-Datei aus `wegwerf_setup_v3ritt.py`).
+- **Größenprüfung:** app.html 33 KB (Wrapper-DIVs für Grid-Layout +0.4 KB),
+  app.css 21.1 KB (+1.3 KB), test_static_routes.py 25.5 KB (+0.1 KB),
+  Phase-Head jetzt **~55 KB** nach Block-B-Rotation (vorher 50 KB, weiter
+  über 40-KB-Softcap, benannt statt versteckt — Vorbild P8-P / Phase 6.5).
+- **Sechs Selbst-Screenshots** unter `docs/screenshots/p86_block_c_{01..06}_*.png`
+  zeigen die visuellen Ziele:
+    - **01_übersicht.png** (1440×900): Rail mit „Einstellungen" oben +
+      „Abmelden" am Ende, „Alle Items" mit „Alles"-Trenner UNTER den Spaces,
+      Karte als rechte Spalte in voller Höhe (V112-Gegenprobe), Spaces mit
+      Counter-Chips und Folder-Zähler im Rail („Offen 5", „Notizen 6",
+      „Archiv 1", „notizen 3", „projekte 5", „backend 4", „frontend 1").
+    - **02_after_space_click.png**: Klick auf Space-Zeile öffnet die
+      Listenansicht des alpha-Space (state.filter Default „open" — V116).
+    - **03_space_hover.png**: Hover über die Space-Zeile (B1 quiet-Selektion,
+      nicht Voll-Füllung — B4-Regression-Check).
+    - **04_alle_items_with_folder_counts.png**: „Alle Items"-Modus aktiv,
+      Liste mit Items aus allen Spaces (Space-Name als Präfix + Punkt),
+      Folder-Counter im Rail (nun mit Summe über alle Spaces: „projekte 7"
+      = 5 alpha + 2 beta).
+    - **05_editor_caution_regression.png**: Editor geöffnet,
+      Archivieren-Knopf in Vorsicht-Farbe (B4-Regression-Check).
+    - **06_karte_unter_liste_1200px.png**: Bei 1200px Breite kollabiert das
+      Grid auf eine Spalte, Map rutscht unter die Liste, kein Abschneiden.
 
 **Was bewusst NICHT in diesem Commit passiert ist:**
 
-- **Kein Block C/D-Code-Touch.** Der nächste Schritt nach der Rotation ist Block C
-  (Struktur-Umbau) + D3-Nachzug, dann Gate (§7) mit 12-Stationen-Playwright-Smoke +
-  Nikinger-Sichtprüfung + Deploy `v3.0.2`. Wird im `## Nächste Session`-Block oben
-  festgehalten.
-- **Kein V102-Graph-Refresh in B1.** B1 verändert die Hover-Optik für `.tree__space`,
-  aber V102 (Zwillingskante) bleibt D1 (Phase 8 Block D, schon deployed).
-- **Keine `.tree__space`-aria-current-Reparatur.** B2 ist im Plan als „zu prüfen"
-  markiert; das Ergebnis der Prüfung ist dokumentiert, kein Bau. V113 steht jetzt
-  explizit auf „fehlt im Code" statt „noch zu prüfen".
-- **Keine Vorab-Verifikation der `.overview__space-row:hover`-Variante.** Die vier
-  Selbst-Screenshots zeigen die Liste-Hover-Zeile, nicht die Übersichts-Hover-Zeile.
-  Die Regel ist gebaut, nicht gerendert geprüft -- wird in Block C ohnehin angefasst
-  (C3 ändert die `.overview`-Grid-Höhe), deshalb kein eigener Smoke dafür.
-- **Kein Push ohne Nikinger-Anweisung.** Lokaler `main` ist 4 Commits voraus
-  (vor Block B); diese Session fügt einen weiteren hinzu. Push wartet auf den Nikinger.
-- **Kein Service-Touch.** Hard Rule 9 eingehalten.
+- **Kein Push + Deploy.** Die Drei-Bedingungen-Regel des Nikingers („alle
+  Code-Tests grün ✓, alle Bilder laut dir grün ✓, ich habe über kritische
+  Bilder noch mal rüber geschaut ⬜") ist erst zu zwei Dritteln erfüllt. Der
+  Nikinger macht Push + Deploy selbst, sobald er die Screenshots gesichtet
+  hat. Lokaler `main` ist damit **6 Commits voraus** (vor Block B Block A+D
+  + Step V + Step V-plugin + Step V-vision-befund + §5-Konvention, jetzt
+  Block C obendrauf).
+- **Kein Gate-Skript** (Plan §7, `p86_polish_smoke.py` mit 12 Stationen) —
+  folgt nach dem Deploy-Push.
+- **Keine Tests in den anderen Testdateien** — C5 ist rein clientseitig,
+  kein Server-Roundtrip nötig (P8.6-O). Die `test_static_routes.py`-Tests
+  decken Markup + CSS ab; Verhalten wird über den Self-Smoke verifiziert.
+- **Keine `.shell`-Grid-Änderung** (P8.6-O2-Eskalationsregel eingehalten —
+  C3 verändert nur `.overview`, nicht das äußere Layout). Drei-Spalten-
+  Grundraster aus §4.1 bleibt unverändert.
 
-**Hard-Rule-8-Doku-Update im selben Commit:** Phase-Head Modul-Status Zeile 4 ✅
-(Block B), Phase-Head `## Nächste Session` neu (Block C ist der nächste Schritt,
-nicht mehr Block B), Phase-Head Frontmatter `updated:`-Pipe, `SESSIONS_ARCHIVE.md` mit
-rotiertem V-vision-befund-Sub-Block + Frontmatter `updated:`-Pipe, `docs/INDEX.md`
-(updated-Frontmatter + Phase-8.6-Zeile), `docs/concepts/phase8_6_ui_polish_plan.md` §4.6
-als ✅ markiert + Modul-Status-Zeile in der Plan-Tabelle, Wurzel-CLAUDE.md Current-state
-Block oben ergänzt (mit ausdrücklicher Block-B-Verifikation), `ROADMAP.md`
-P8.6-Status auf 🟡 aktualisiert (v3.0.2-Vorbereitung). Alles in einem Commit.
+**Hard-Rule-8-Doku-Update im selben Commit:** Phase-Head Modul-Status Zeile 5 ✅
+(Block C), Phase-Head `## Session stopped` neu (Block-B-Sub-Block nach
+`SESSIONS_ARCHIVE.md` rotiert), Frontmatter `updated:`-Pipe,
+`SESSIONS_ARCHIVE.md` mit rotiertem Block-B-Sub-Block + Frontmatter,
+`docs/INDEX.md` (updated-Frontmatter + Phase-8.6-Zeile), `docs/concepts/
+phase8_6_ui_polish_plan.md` §5 als ✅ markiert + Modul-Status-Zeile in der
+Plan-Tabelle, `ROADMAP.md` P8.6-Status auf 🟡, Wurzel-`CLAUDE.md` Current-state-
+Absatz oben ergänzt (mit ausdrücklicher Block-C-Verifikation — drei der drei
+Bedingungen genannt). Alles in einem Commit.
 
 **Commit-Message (geplant):**
-`phase 8.6: Block B -- Selektion vereinheitlicht, Vorsicht-Kategorie, ein Radius-Fix`
+`phase 8.6: Block C -- Einstellungen oben, Alle Items unten, Karte rechts voller Hoehe, klickbare Spaces, Ordner-Zaehler`
 
-**Nächster Schritt (für die nächste Session):** **Block C nach Plan §5**
-(Struktur-Umbau: Konto→Einstellungen, Alle Items unter Spaces, Map als rechte Spalte,
-klickbare Spaces, Ordner-Zähler) + D3-Nachzug (V112-Gegenprobe nach C3). Dann Gate
-(§7), dann Step Z (Closeout).
+**Nächster Schritt (für die nächste Session):** **Nikinger-Sichtprüfung** der
+sechs Screenshots (`docs/screenshots/p86_block_c_{01..06}_*.png`) — danach
+Push + Deploy `v3.0.2` als Nikinger-Aktion (Hard Rule 9 + P8.6-R Patch-Bump),
+danach **Gate** (Plan §7): `p86_polish_smoke.py` 12 Stationen in Chromium +
+Firefox, fünf Nikinger-Sichtprüfungs-Entscheidungen (V110 §1, V114 §10.1,
+V112 §2.3 [bereits erledigt in Block C], V116 §10.4 [bereits erledigt],
+P8.6-R Versionierung), dann **Step Z** Closeout (Plan §9 füllen, Rotation,
+kein separates Handover-Dokument — P8.6-B).

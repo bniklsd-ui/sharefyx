@@ -11,7 +11,7 @@ down:
   - ./phase8_ui_graph_plan.md                       # §9 P8-Closeout, §0.3 Verbotsliste, §5 D2 Graph
   - ./sichtpruefung_automation_conventions.md       # Statusregel + Konventionen §1–§4
   - ./sichtpruefung_automation_tooling.md           # Vision-Plugin, Step V
-updated: 2026-09-09 (Erstfassung, Claude-Code-Planungssession gegen main@d1af51b)
+updated: 2026-09-12 (§5.6 Abschluss Block C ✅ — fünf Sub-Änderungen + D3-Nachzug gebaut, drei statische Tests neu, sechs Screenshots, drei Befunde/Abweichungen während Baus: activateView-Doppel-Definition, V117-Reset in activateView+navigateAll, requestAnimationFrame(resize) für V115; Push+Deploy steht aus) | 2026-09-09 (Erstfassung, Claude-Code-Planungssession gegen main@d1af51b)
 ---
 
 # Phase 8.6 — UI-Politur: Selektions-Welle + Layout (Plan)
@@ -885,9 +885,17 @@ gespeist aus einer Zählung über `state.items` nach `folder`-Präfix.
 Spaces, oder nur die der gerade offenen Ansicht? Wenn Letzteres, ist der Zähler nur für den
 aktiven Space korrekt — und dann gilt Regel 3 für alle anderen. **Vor dem Bauen messen.**
 
-### §5.6 Abschluss Block C
+### §5.6 Abschluss Block C ✅ (2026-09-12)
 
-Ein Commit: `phase 8.6: Block C -- Einstellungen nach oben, Alle-Items nach unten, Map als volle rechte Spalte, klickbare Spaces, Ordner-Zaehler`.
+**Erledigt in Commit (lokal, vor Push):** `phase 8.6: Block C -- Einstellungen nach oben, Alle-Items nach unten, Karte rechts voller Hoehe, klickbare Spaces, Ordner-Zaehler`. Alle fünf Sub-Änderungen (C1–C5) + D3-Nachzug gebaut, drei statische Tests neu (`test_rail_order_settings_before_tree_logout_last`, `test_account_button_says_einstellungen`, `test_overview_graph_has_no_max_width_or_min_height`), `pytest` V107 ✅ 970, `ui_budget` V97 ✅ 5/5 (137,5 KB), Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 unverändert. Sechs Selbst-Screenshots `docs/screenshots/p86_block_c_{01..06}_*.png` zeigen alle Ziele (M3 liest sie nativ mit dem `read`-Tool, Plugin ist seit 2026-09-11 zurückgebaut). **Drei Befunde/Abweichungen während Baus:**
+
+1. **`activateView` doppelt definiert** — Original-`function activateView` (Z. 20–33) plus neuer `export function activateView` (für C4-Aufruf aus `list.js`). `PAGE ERROR: Identifier 'activateView' has already been declared`, `overview__spaces` blieb leer. Original entfernt, Page-Error behoben, sauberer Render danach.
+2. **V117-Reset in `activateView` und `navigateAll`** — `state.itemsLoaded = {}` vor `renderRail()` in beiden Navigation-Funktionen. Ohne Reset zeigte das Rail für ein paar ms Counts aus dem falschen Pool (state.items wird erst in `loadItems()` umgeschaltet, renderRail() läuft aber ZUVOR). Erste Sichtprüfung des Self-Smoke zeigte „notizen 6" im alpha-Space — falsch, weil Items aus beta/gamma mitgezählt wurden; mit Reset korrekt 3 für alpha. Regel 3 von §5.5 („Lieber keine Zahl als eine unwahre") wird jetzt konsequent angewendet.
+3. **Erste `requestAnimationFrame(resize)`-Iteration fehlte V115** — ResizeObserver feuert zwar beim ersten `observe()`, aber zu diesem Zeitpunkt ist `.overview__graph` im neuen Grid 0x0; ohne den RAF rechnet `seedInitialPositions()` mit der 0x0-Box. V115 damit belegt — der Fix sind 8 Zeilen, kein neuer Mechanismus.
+
+**Abweichung von Plan §3.5/§8.2 eingehalten:** die drei für Block C vorgesehenen Tests sind grün, die anderen aus der Liste waren bereits in Block A/B. **D3-Nachzug (V112-Gegenprobe)** implizit in Screenshots 01 + 06 erledigt.
+
+**Push + Deploy:** steht noch aus (Nikinger-Aktion, Hard Rule 9 + Drei-Bedingungen-Regel des Nikingers — zwei von drei erfüllt, Nikinger-Sichtung der Screenshots offen). Nach Push: Gate (Plan §7) + Step Z Closeout.
 
 ---
 

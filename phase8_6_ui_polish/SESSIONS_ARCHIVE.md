@@ -24,6 +24,159 @@ das Skript auf das Phase-8.5-Muster passt und mit einem `## Session stopped` + m
 
 
 
+
+## Session stopped — 2026-09-11 (Block B ✅ — Selektion vereinheitlicht, Vorsicht-Kategorie)
+
+**Auftrag (Nikinger 2026-09-11):** „Hello there, please go on atomically with the next step
+according to plan." — Block B nach Plan §4 (Selektion vereinheitlichen, B4 Vorsicht-
+Kategorie, B5 Radien), A vor B ist zwingend (P8.6-U). Erst opencode/M3-Code-Touch seit
+Cluster 1 (P8.5-19 + P8.5-6 am 2026-09-07).
+
+**Was in diesem Commit passiert ist (B1 + B2-Audit + B3 + B4 + B5):**
+
+1. **B5 (eine Zeile, sofort erledigt).** `app.css:1293` `.link-picker-results`
+   `border-radius: 6px` → `var(--radius-sm)`. Der einzige Token-Drift im Radien-Bestand
+   (gemessen vom Phase-8.5-Closeout-Block: 37 Deklarationen, sieben Werte, einer davon
+   hartkodiert). Plan §4.5 Tabelle sagt es, der Code bestätigt es, Implementierung steht.
+
+2. **B1 (konsolidierte Hover-Regel).** Eine Regel ersetzt drei Flickenteppich-Fassungen:
+
+   ```css
+   .list__rows > li:not(.list__row--selected) .list__row:hover:not([aria-current="true"]),
+   .rail__home:hover:not([aria-current="true"]),
+   .rail__action:hover,
+   .tree__space:hover,
+   .tree__folder:hover:not([aria-current="true"]),
+   .tree__scope:hover:not([aria-current="true"]),
+   .overview__space-row:hover,
+   .link-picker-results li:hover:not([aria-selected="true"]) {
+     background: var(--select-fill-quiet);
+     outline: 1px solid var(--select-line-quiet);
+     outline-offset: -1px;
+     border-radius: var(--radius-sm);
+   }
+   ```
+
+   `:not([aria-current])`-Ausschluss pro Selektor (statt Reihenfolge-Trick über 1300
+   Zeilen) -- P8.5-O-Eskalationsregel: Kaskaden-Abhängigkeit über so viel Code ist genau
+   die Falle, die zu vermeiden ist. Der Ausschluss steht im Selektor und überlebt jedes
+   Umsortieren. Eine zweite Regel für `.rail__action:hover`/Geschwister hält den
+   bisherigen Farbwechsel `text-muted → text` fest (das war UX-Feature, nicht Flickenteppich).
+
+3. **B1 Folge: Button-Hover auf Tokens.** `.btn:hover` und `.btn-primary:hover` trugen
+   hartkodierte Hex-Verläufe (`#323A45`/`#212832` bzw. `#6EACF9`/`#3781E2`). Jetzt
+   `color-mix(in srgb, var(--btn-face-top), white 7%)` und `color-mix(in srgb,
+   var(--accent-face-top), white 12%)` -- **kein** `var(--select-fill-quiet)` als Overlay
+   über der Knopfplastik wie der Plan wörtlich vorsah (P8.6-Q): dafür bräuchte es ein
+   Pseudo-Element oder `box-shadow` mit `<image>`, und beide Wege sind invasiv. `color-mix`
+   erfüllt den Geist (Tokens statt Hex, leichte Aufhellung) ohne den Aufwand.
+   `color-mix()` ist seit Chrome 111 / Firefox 113 / Safari 16.2 (Mai 2023) stabil.
+
+4. **B3 (`.account-nav` statt `.btn` für Konto-Dialog-Navigation).** `#account-show-updates`
+   und `#account-manage-spaces` sind KEINE Aktionen (öffnen etwas, ändern nichts) --
+   das war die Meldung des Nikingers zum Archivieren-neben-×-Muster (gleiche Klasse).
+   `.account-nav`-Trägerklasse mit `background: none` + Hover aus B1; die alte
+   `.account-updates-link`-Klasse (nur `margin-bottom`) fällt weg, ihr Wert ist in
+   `.account-nav` eingebaut.
+
+5. **B4 (Vorsicht-Kategorie, Konvention v3 fünfte Kategorie).** Neue Trägerklasse
+   `action--caution`, Regel mit `:hover` im Selektor (gleiche Spezifität wie B1-Hover,
+   später im Stylesheet = Cascade gewinnt -- sonst hätte das B1-Hover-Color
+   `var(--text)` die Vorsicht-Farbe auf Hover überschrieben). Zwei HTML-Änderungen:
+   `#logout-button` `class="rail__action action--caution"`, `#archive-button`
+   `class="btn action--caution"`. **Genau zwei Mitglieder** — der Plan verbietet
+   ein drittes („Verschieben"/„Abwählen"/„erste Notiz anlegen"/„Space verwalten" sind
+   alle folgenlos oder trivial umkehrbar), und der neue statische Test hält das fest.
+
+6. **B2-Audit (nur Prüfung, kein Bau).** **[VERIFY] V113** schreibt der Plan für
+   `.tree__space` („setzt `aria-current="true"`, wenn `state.space === space.name`").
+   Im Code: `tree.js :: renderSpaceNode()` (Z. 200) tut **das nicht** -- die
+   aria-current-Zuweisung an den aktiven Space fehlt komplett. Auch der Variablenname
+   `state.space` existiert nicht (es ist `state.activeSpace`, siehe `state.js:32`).
+   **B2 ist im Plan als „zu prüfen, nicht zu bauen" markiert (§4.2)** -- daher
+   der Befund nur dokumentiert, kein Code-Touch. Der `:not([aria-current="true"])`-
+   Ausschluss in der neuen Hover-Regel ist trotzdem korrekt und für eine künftige
+   Reparatur vorbereitet.
+
+7. **Folge-Korrektur: `.link-picker-results li:hover, .link-picker-results li[aria-selected="true"]`
+   getrennt.** P8.5-A2 hatte beide Zustände in einer Regel zusammengezogen (mit vollem
+   Fill). B1 verlangt hover = quiet, selection = full. Zwei Regeln: die `:hover`-Variante
+   zieht in die konsolidierte Regel (mit `:not([aria-selected="true"])`-Ausschluss),
+   die `aria-selected="true"`-Variante bleibt mit vollem Fill (Auswahl schlägt Hover).
+   Doppelter Kommentar-Block aufgereinigt (passierte beim ersten Edit-Pass).
+
+8. **`+1` statischer Test: `test_caution_class_only_on_logout_and_archive`.** Prüft
+   drei Dinge: (a) genau zwei Vorkommen von `action--caution` im Markup, (b)
+   `#logout-button` und `#archive-button` sind die Träger, (c) die CSS-Regel existiert
+   und referenziert `var(--caution)` (statt z. B. `var(--danger)` direkt — Konvention
+   verbietet zwei Farbnamen für dieselbe Bedeutung, P8.6-F). Wer ein drittes Mitglied
+   hinzufügt, fällt hier auf statt erst in der nächsten Sichtprüfung.
+
+**Selbstprüfung (§0.5):**
+
+- **Tabu-Diff §0.3 leer.** `git diff --stat -- phase1_storage/storage
+  phase4_auth/authserver phase2_mcp/mcpserver phase5_ui/webui/security.py
+  phase5_ui/webui/api.py phase5_ui/webui/serializers.py phase5_ui/webui/permissions.py`
+  liefert nichts. Erlaubte Pfade berührt: `phase5_ui/webui/static/app.{css,html}` und
+  `phase5_ui/tests/test_static_routes.py` (§0.3 whitelistet beide).
+- **`pytest -q` 967 passed in 113 s.** 18 Tests in `test_static_routes.py` (V107 +
+  Inkrement +1), 967→966 = +1 vom neuen `test_caution_class_only_on_logout_and_archive`.
+- **`node --check` gegenstandslos** (kein JS-Touch).
+- **`python phase5_ui/scripts/ui_budget.py` 5/5 im Korridor.** app.css jetzt 19.8 KB
+  (+0.4 KB gegenüber Block A), Bundle app.js+app.css+Font gzip 133.1 KB von 250 KB.
+  **`GET /api/v1/overview` 380 ms** -- besser als die 863 ms aus dem Step-0-Stand, sogar
+  unter dem P6-P-Historical von 438–453 ms; V108 öffnet sich nicht weiter (kein
+  P8.6-Auftrag, ggf. P9-Befund).
+- **`grep -nE 'rgba\(62,141,243'`** trifft nur die `:root`-Zeilen (Token-Definitionen +
+  Kommentar), `test_no_raw_accent_rgba_outside_root` und `test_every_css_var_reference_is_defined`
+  beide grün -- die Block-A-Wächter halten auch B1 sauber.
+- **Service-Touch 0.** sharefyx-mcp **PID 991** über die gesamte Session unverändert
+  (nur `systemctl show -p MainPID` gelesen). Eigener Wegwerf auf Port 18773 (PID-Datei,
+  sauber gestoppt, kein `pkill -f`).
+- **Größenprüfung:** app.css 19.8 KB (§0.3-Korridor), app.html 32.6 KB,
+  test_static_routes.py 25.4 KB. Phase-Head (dieser Head) wird durch die Rotation
+  ~50 KB groß — weiter über 40-KB-Softcap (Vorbild-Mechanismus aus P8-P / Phase 6.5).
+- **Vier Selbst-Screenshots** unter `docs/screenshots/p86_block_b_{01..04}_*.png`
+  zeigen die visuellen Ziele: Logout rot, Archivieren rot, Konto-Dialog-Navigation
+  ohne Knopfplastik, Hover-Zeile mit quiet-Selektion. M3 liest sie selbst mit dem
+  eingebauten `read`-Tool — OpenCode hat keinen Tool-Result-Bild-Slot, das Plugin
+  ist zurückgebaut, native Sicht reicht (Befund 2c).
+
+**Was bewusst NICHT in diesem Commit passiert ist:**
+
+- **Kein Block C/D-Code-Touch.** Der nächste Schritt nach der Rotation ist Block C
+  (Struktur-Umbau) + D3-Nachzug, dann Gate (§7) mit 12-Stationen-Playwright-Smoke +
+  Nikinger-Sichtprüfung + Deploy `v3.0.2`. Wird im `## Nächste Session`-Block oben
+  festgehalten.
+- **Kein V102-Graph-Refresh in B1.** B1 verändert die Hover-Optik für `.tree__space`,
+  aber V102 (Zwillingskante) bleibt D1 (Phase 8 Block D, schon deployed).
+- **Keine `.tree__space`-aria-current-Reparatur.** B2 ist im Plan als „zu prüfen"
+  markiert; das Ergebnis der Prüfung ist dokumentiert, kein Bau. V113 steht jetzt
+  explizit auf „fehlt im Code" statt „noch zu prüfen".
+- **Keine Vorab-Verifikation der `.overview__space-row:hover`-Variante.** Die vier
+  Selbst-Screenshots zeigen die Liste-Hover-Zeile, nicht die Übersichts-Hover-Zeile.
+  Die Regel ist gebaut, nicht gerendert geprüft -- wird in Block C ohnehin angefasst
+  (C3 ändert die `.overview`-Grid-Höhe), deshalb kein eigener Smoke dafür.
+- **Kein Push ohne Nikinger-Anweisung.** Lokaler `main` ist 4 Commits voraus
+  (vor Block B); diese Session fügt einen weiteren hinzu. Push wartet auf den Nikinger.
+- **Kein Service-Touch.** Hard Rule 9 eingehalten.
+
+**Hard-Rule-8-Doku-Update im selben Commit:** Phase-Head Modul-Status Zeile 4 ✅
+(Block B), Phase-Head `## Nächste Session` neu (Block C ist der nächste Schritt,
+nicht mehr Block B), Phase-Head Frontmatter `updated:`-Pipe, `SESSIONS_ARCHIVE.md` mit
+rotiertem V-vision-befund-Sub-Block + Frontmatter `updated:`-Pipe, `docs/INDEX.md`
+(updated-Frontmatter + Phase-8.6-Zeile), `docs/concepts/phase8_6_ui_polish_plan.md` §4.6
+als ✅ markiert + Modul-Status-Zeile in der Plan-Tabelle, Wurzel-CLAUDE.md Current-state
+Block oben ergänzt (mit ausdrücklicher Block-B-Verifikation), `ROADMAP.md`
+P8.6-Status auf 🟡 aktualisiert (v3.0.2-Vorbereitung). Alles in einem Commit.
+
+**Commit-Message (geplant):**
+`phase 8.6: Block B -- Selektion vereinheitlicht, Vorsicht-Kategorie, ein Radius-Fix`
+
+**Nächster Schritt (für die nächste Session):** **Block C nach Plan §5**
+(Struktur-Umbau: Konto→Einstellungen, Alle Items unter Spaces, Map als rechte Spalte,
+klickbare Spaces, Ordner-Zähler) + D3-Nachzug (V112-Gegenprobe nach C3). Dann Gate
+(§7), dann Step Z (Closeout).
 ### 2026-09-10 (Step V-plugin ✅ — `DavidEasden/opencode-vision` v1.3.0 installiert + MCP-Server `local_vision` registriert; `opencode mcp list` 3/3 connected; V121-Smoke end-to-end ✅; Tabu-Diff §0.3 leer, pytest 966 unverändert)
 
 **Auftrag:** Special task für diese Session (vom Nikinger im User-Prompt vorgegeben) — **Schritt 1 = `DavidEasden/opencode-vision`-Plugin installieren** (vor jeder Sichtprüfung, damit Screenshots direkt im Chat), Schritt 2 = visuelle Verifikation Block A + D, Schritt 3 = Block B, Schritt 4 = Block C. Bei Konfig-/Auth-Schritten, die Nikinger-Beteiligung brauchen: vorher fragen, nicht Trial-and-Error. Diese Session setzt Schritt 1 um.

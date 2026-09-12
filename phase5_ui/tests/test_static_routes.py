@@ -500,3 +500,111 @@ def test_caution_class_only_on_logout_and_archive():
         "--danger und --caution teilen denselben Wert -- die Trägerklasse ist die "
         "semantische Differenzierung)."
     )
+
+
+def test_rail_order_settings_before_tree_logout_last():
+    """P8.6 Block C C1 (Plan §5.1): Reihenfolge im Rail ist jetzt
+        1. .rail__brand
+        2. #home-button           ("Übersicht")
+        3. #account-button        ("Einstellungen")   <-- NEU: wandert hierhin
+        4. #rail-tree             (Spaces + "Alle Items")
+        5. #logout-button         ("Abmelden")        <-- letztes Kind in .rail__account
+
+    Begründung (Plan §5.1): ein wörtlicher Tausch würde "Abmelden" an die prominenteste
+    Stelle des Account-Blocks setzen -- Abmelden ist die seltenste und teuerste Aktion,
+    Einstellungen (Zahnrad) ist häufig und folgenlos. N3-Lesart b ist bestätigt, nicht
+    geraten.
+
+    Wer die Reihenfolge umstellt (Einstellungen wieder nach unten, oder Abmelden nach oben),
+    fällt hier auf statt erst in der nächsten Sichtprüfung. Test über die Reihenfolge der
+    Tag-Positionen im HTML-String -- billig und robust gegen CSS-Layout-Änderungen.
+    """
+    html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
+
+    def _pos(tag_id: str) -> int:
+        m = re.search(rf'id="{re.escape(tag_id)}"', html)
+        assert m is not None, f"#{tag_id} fehlt im Markup"
+        return m.start()
+
+    pos_home = _pos("home-button")
+    pos_account = _pos("account-button")
+    pos_tree = _pos("rail-tree")
+    pos_logout = _pos("logout-button")
+
+    assert pos_home < pos_account, (
+        f"#account-button (Einstellungen) muss NACH #home-button stehen, nicht davor. "
+        f"Positionen: home={pos_home}, account={pos_account}."
+    )
+    assert pos_account < pos_tree, (
+        f"#account-button (Einstellungen) muss VOR #rail-tree stehen -- das ist der Kern "
+        f"von C1 (Plan §5.1, N3-Lesart b: Einstellungen oben, Abmelden ans Rail-Ende). "
+        f"Positionen: account={pos_account}, tree={pos_tree}."
+    )
+    assert pos_tree < pos_logout, (
+        f"#logout-button (Abmelden) muss ALS LETZTES im Rail stehen -- .rail__account ist "
+        f"das Rail-Ende (margin-top: auto), und nach C1 ist Abmelden das einzige Kind dort. "
+        f"Positionen: tree={pos_tree}, logout={pos_logout}."
+    )
+
+
+def test_account_button_says_einstellungen():
+    """P8.6 Block C C1 (Plan §5.1): Label ist "Einstellungen", nicht "Konto" -- das Icon
+    war schon immer ein Zahnrad (P5 Step 7b, app.css :: .icon), der Name hinkte hinterher.
+
+    Wer den alten String zurückbringt (z. B. als vermeintliche Lokalisierung), fällt hier
+    auf. Test über das <span class="rail__label">-Kind innerhalb des #account-button-Tags,
+    nicht über freien Text im HTML -- sonst würde ein Kommentar wie "Konto-Dialog" im
+    Quelltext fälschlich matchen.
+    """
+    html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
+
+    match = re.search(
+        r'<button[^>]*id="account-button"[^>]*>(.*?)</button>',
+        html,
+        flags=re.DOTALL,
+    )
+    assert match is not None, "#account-button fehlt im Markup"
+    button_html = match.group(0)
+
+    assert "Einstellungen" in button_html, (
+        "#account-button muss 'Einstellungen' als Label tragen (P8.6 C1, N3-Lesart b)."
+    )
+    assert ">Konto<" not in button_html, (
+        "#account-button darf NICHT mehr 'Konto' als Label tragen (P8.6 C1: 'Konto' ist "
+        "weggefallen, das Zahnrad war schon immer ein Settings-Icon)."
+    )
+
+
+def test_overview_graph_has_no_max_width_or_min_height():
+    """P8.6 Block C C3 (Plan §5.3): `.overview__graph` hat WEDER `max-width` (vorher 960px)
+    NOCH `min-height` (vorher 55vh). Beide entfallen, weil der Container jetzt in einem
+    Grid-Item der rechten Spalte sitzt (`flex: 1` aus `.overview__col-right .overview__graph`),
+    das die Höhe aus dem Grid bezieht (definite Höhe durch `grid-template-rows: auto 1fr` +
+    `min-height: 0`). V112-Gegenprobe: "Map schneidet unten ab" -- jetzt behoben.
+
+    Dies ist der §2.3-Regressionswächter -- wer den alten 55vh-Trick zurückbringt, fällt
+    hier auf. Test über CSS-String-Matching: die Regel darf in keiner `.overview__graph`-
+    Deklaration diese Properties mehr enthalten.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    # Suche alle `.overview__graph`-{...}-Blöcke und prüfe jeden auf das Verbot.
+    # Pattern: ".overview__graph" gefolgt von beliebigem Selector-Text bis zur öffnenden
+    # Klammer, dann den Rumpf bis zur schließenden Klammer.
+    matches = list(re.finditer(r"\.overview__graph[^{]*\{([^}]*)\}", css, flags=re.DOTALL))
+    assert matches, (
+        "app.css muss mindestens eine Regel für `.overview__graph` enthalten "
+        "(sonst wäre der Test wirkungslos)."
+    )
+
+    for m in matches:
+        body = m.group(1)
+        assert "max-width" not in body, (
+            f"`.overview__graph` darf kein `max-width` mehr tragen (P8.6 C3). Block:\n"
+            f"  .overview__graph{(' ' + m.group(0).split('{')[0].split('overview__graph')[-1].strip()) if False else ''}{{...}}\n"
+            f"Gefunden in: {body.strip()}"
+        )
+        assert "min-height" not in body, (
+            f"`.overview__graph` darf kein `min-height` mehr tragen (P8.6 C3, V112-Gegenprobe). "
+            f"Block: {body.strip()}"
+        )

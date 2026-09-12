@@ -5,8 +5,8 @@
 import { state, BUCKET_LABELS, TYPE_LABELS, activeSpaceWritable, spaceByName, setCreateControlsPresent, isGlobalScope, spaceCategory } from "./state.js";
 import { el } from "./toasts.js";
 import { api, reportUnexpectedError } from "./api.js";
-import { navigate, renderRail, bucketNames } from "./tree.js";
-import { selectItem } from "./editor.js";
+import { navigate, renderRail, bucketNames, activateView } from "./tree.js";
+import { selectItem, closeEditor } from "./editor.js";
 import { openMoveDialog, openShareDialog } from "./dialogs.js";
 import { iconSvg } from "./icons.js";
 
@@ -46,16 +46,34 @@ export function renderOverview() {
   var buckets = bucketNames();
   orderedSpaces.forEach(function (space) {
     var row = el("li", "overview__space-row");
+    // Phase 8.6 Block C C4 (Plan §5.4): Name + Kategoriepunkt werden in einen
+    // <button class="overview__space-open"> gepackt -- die ganze Space-Zeile wird klickbar,
+    // Tastaturfokus + Screenreader-Rolle gratis. Eine klickbare <li> ohne Button wäre eine
+    // Behauptung ohne HTML-Semantik (und kein Tab-Stopp). Kategorie nach Konvention v3 ist
+    // Navigation (P8.6-P).
     var nameEl = el("div", "overview__space-name");
-    nameEl.appendChild(el(
+    var openButton = el("button", "overview__space-open");
+    openButton.type = "button";
+    openButton.appendChild(el(
       "span", "rail__glyph rail__glyph--" + spaceCategory(space),
       space.name.charAt(0).toUpperCase(),
     ));
-    nameEl.appendChild(el(
+    openButton.appendChild(el(
       "span",
       "overview__space-name-label" + (space.writable ? "" : " overview__space-name-label--readonly"),
       space.name,
     ));
+    openButton.addEventListener("click", function () {
+      // Dieselbe Rückfrage-vor-Navigation-Disziplin wie die Ordner-/Eimer-Buttons in tree.js:
+      // ein offener, ungespeicherter Editor darf auch durch die Übersichts-Navigation nicht
+      // stumm verworfen werden. activateView(name) ist semantisch "in den Space wechseln,
+      // ohne Bucket explizit zu setzen" -- V116.
+      closeEditor().then(function (proceed) {
+        if (proceed === false) return null;
+        return activateView(space.name);
+      }).catch(reportUnexpectedError);
+    });
+    nameEl.appendChild(openButton);
     row.appendChild(nameEl);
 
     var countsEl = el("div", "overview__space-counts");
@@ -73,6 +91,10 @@ export function renderOverview() {
         String(count) + " " + (BUCKET_LABELS[bucket] || bucket),
       ));
       chip.addEventListener("click", function (event) {
+        // stopPropagation ist jetzt tragend, nicht nur dekorativ -- der Eltern-<button>
+        // (overview__space-open) würde sonst ebenfalls auslösen, mit anderer Semantik
+        // ("in den Space, Bucket = state.filter") als der Chip ("in den Space mit
+        // explizitem Bucket").
         event.stopPropagation();
         navigate(space.name, bucket).catch(reportUnexpectedError);
       });
@@ -456,7 +478,25 @@ export function loadItems() {
   if (state.query) params.set("query", state.query);
   return api("/items?" + params.toString()).then(function (result) {
     state.items = result.items;
+    // Phase 8.6 Block C C5 (Plan §5.5 V117): nach jedem loadItems wird das Rail neu gerendert,
+    // damit die Folder-Zähler (`tree.js :: folderButton()`) die frischen Items sehen.
+    // searchInput-Debounce würde bei jedem Tastenanschlag ein renderRail triggern, aber
+    // renderRail ist nur Dokument-Fragment-Aufbau + ein setAttribute auf den Home-Button --
+    // 30 Spaces × ~3 Folder × Button-Aufbau = < 5 ms, weit unter dem 200ms-Debounce.
+    if (isGlobalScope()) {
+      // Globaler Modus: alle in den Items vorkommenden Spaces gelten als "gesehen".
+      // renderRail() iteriert `state.items` für die Zählung, der Flag ist nur ein
+      // "schon-mal-geladen"-Marker, damit Spaces ohne Items im Rail ebenfalls einen
+      // (leeren) Folder-Zähler bekommen können, wenn der Nutzer sie öffnet -- das ist
+      // semantisch sauberer als "noch nicht geladen".
+      result.items.forEach(function (item) {
+        state.itemsLoaded[item.space] = true;
+      });
+    } else if (state.activeSpace) {
+      state.itemsLoaded[state.activeSpace] = true;
+    }
     renderList();
+    renderRail();
   });
 }
 

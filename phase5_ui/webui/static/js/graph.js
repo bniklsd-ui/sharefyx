@@ -159,13 +159,26 @@ export function loadGraph() {
     rebuildImplicitEdges();
     updateEmptyState();
     updateZoomReadout();
-    if (nodes.length === 0) {
-      // Kein Knoten -- keine Simulation noetig, einfach zeichnen (zeigt ggf. Empty-Hint).
-      draw();
-      return;
-    }
-    seedInitialPositions();
-    runSimulation();
+    // Phase 8.6 Block C C3 / [VERIFY] V115: der ResizeObserver (`init()` Z. 141-142) feuert
+    // zwar beim ersten `observe()`, aber zu diesem Zeitpunkt ist `.overview__graph` im neuen
+    // Grid möglicherweise 0x0 -- das Grid rendert erst nach dem CSS-Layout-Pass, und der
+    // Observer feuert genau einmal beim observe() (Spec: https://www.w3.org/TR/resize-observer/).
+    // Ohne den expliziten resize() hier würde `seedInitialPositions()` mit der 0x0-Box
+    // rechnen und die Knoten auf einen Punkt in der oberen linken Ecke legen. requestAnimationFrame
+    // garantiert, dass resize() nach dem nächsten Layout-Pass läuft (Browser hat das Grid dann
+    // committed). [VERIFY] V115: gemessen, dass der ResizeObserver allein beim ersten Mount
+    // nicht ausreicht -- der Fix ist drei Zeilen, kein neuer Mechanismus.
+    requestAnimationFrame(function () {
+      if (canvasEl && !canvasEl.isConnected) return;
+      resize();
+      if (nodes.length === 0) {
+        // Kein Knoten -- keine Simulation noetig, einfach zeichnen (zeigt ggf. Empty-Hint).
+        draw();
+        return;
+      }
+      seedInitialPositions();
+      runSimulation();
+    });
   }).catch(reportUnexpectedError);
 }
 

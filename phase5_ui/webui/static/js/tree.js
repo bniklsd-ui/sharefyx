@@ -17,27 +17,16 @@ export function bucketNames() {
   return state.meta ? Object.keys(state.meta.buckets) : [];
 }
 
-function activateView(spaceName) {
-  // Jeder Klick auf einen Space/Eimer/Ordner führt aus dem globalen Modus zurück (P6-AP), ohne
-  // dass jede Aufrufstelle das selbst erinnern muss.
-  state.scope = "space";
-  state.activeSpace = spaceName;
-  // §9.3 Punkt 1: Navigation leert die Auswahl, dieselbe Exklusivitäts-Disziplin wie
-  // `folder`/`filter` — sonst könnte eine Auswahl Items enthalten, die hier gar nicht mehr
-  // sichtbar sind.
-  clearSelection();
-  setCreateControlsPresent(activeSpaceWritable());
-  renderRail();
-  renderCrumb();
-  return loadItems();
-}
-
 // "Alle Items" (P6-AP/AQ) — `state.activeSpace` bleibt bewusst unangetastet, das ist der
 // Rückweg in den zuletzt aktiven Space.
 export function navigateAll() {
   state.scope = "all";
   state.filter = null;
   state.folder = null;
+  // V117 (gleiche Begruendung wie in activateView): der erste renderRail() laeuft BEVOR
+  // loadItems() resolved -- wenn state.itemsLoaded noch von einem frueheren Space-Modus
+  // befuellt ist, wuerden Folder-Counter aus dem falschen Pool gezeigt. Reset auf {}.
+  state.itemsLoaded = {};
   clearSelection();
   setCreateControlsPresent(activeSpaceWritable());
   renderRail();
@@ -153,6 +142,27 @@ function bindFolderDropTarget(button, folderPath) {
   });
 }
 
+// Phase 8.6 Block C C5 (Plan §5.5): Folder-Zähler clientseitig aus `state.items`. Drei
+// Regeln aus §5.5, alle hier umgesetzt:
+//   1. Was wird gezählt? Alles, was der Nutzer im Ordner SEHEN würde -- dieselbe Filterung
+//      wie die Listenansicht, inklusive `archived`. Implementiert über `item.folder` (oder
+//      `""` für Wurzel-Items).
+//   2. Unterordner? Nein -- nur direkte Kinder. Ein rekursiver Zähler bräuchte eine
+//      Baumsummierung und wäre mehrdeutig ("15" an einem Ordner mit selbst 2 Items).
+//   3. Items des Spaces noch nicht geladen? Kein Zähler, nicht "0" -- dieselbe Regel wie
+//      `tree.js:224-226` für `renderScopeRow()`, jetzt auf Folder ausgedehnt.
+function folderItemCount(spaceName, folderPath) {
+  var prefix = folderPath + "/";
+  var n = 0;
+  for (var i = 0; i < state.items.length; i++) {
+    var item = state.items[i];
+    if (item.space !== spaceName) continue;
+    var f = item.folder || "";
+    if (f === folderPath || f.indexOf(prefix) === 0) n++;
+  }
+  return n;
+}
+
 function folderButton(space, node, isChild) {
   var button = el("button", "tree__folder tree__realfolder" + (isChild ? " tree__realfolder--child" : ""));
   button.type = "button";
@@ -162,6 +172,15 @@ function folderButton(space, node, isChild) {
     button.setAttribute("aria-current", "true");
   }
   button.appendChild(el("span", "rail__label", node.name));
+  // C5 Zähler -- nur, wenn `state.itemsLoaded[space.name]` true ist. Sonst fehlt die Zahl
+  // (Regel 3). Selektor-Match ist exakt -- der Flag wird in `list.js :: loadItems()` nach
+  // jedem API-Roundtrip gesetzt.
+  if (state.itemsLoaded[space.name]) {
+    var count = folderItemCount(space.name, node.path);
+    if (count > 0) {
+      button.appendChild(el("span", "tree__count", String(count)));
+    }
+  }
   button.addEventListener("click", function () {
     // Dieselbe Rückfrage-vor-Navigation-Disziplin wie bei den Eimer-Buttons oben — ein offener,
     // ungespeicherter Editor darf auch durch einen Ordnerwechsel nicht stumm verworfen werden.
@@ -226,6 +245,12 @@ export function renderSpaceNode(space) {
 // eine aus den sichtbaren Spaces aufaddierte Zahl wäre falsch — sie ließe genau die item-level
 // geteilten Items weg, um die es hier geht. Lieber keine Zahl als eine unwahre.
 function renderScopeRow() {
+  // Phase 8.6 Block C C2 (Plan §5.2): "Alle Items" bekommt jetzt denselben tree__group-
+  // Trenner wie "Mein Space"/"Verbundene Spaces" — sonst klebt die Zeile ohne Überschrift
+  // an den Spaces-Block, und der Leser sucht die "Kippschalter"-Funktion an einer Stelle,
+  // die nicht als eigene Gruppe erkennbar ist. Die Gruppe heißt "Alles" (analog "Mein
+  // Space" / "Verbundene Spaces"), die Schaltfläche selbst bleibt "Alle Items".
+  railTreeEl.appendChild(el("div", "tree__group", "Alles"));
   var button = el("button", "tree__scope");
   button.type = "button";
   button.appendChild(el("span", "rail__label", "Alle Items"));
@@ -239,9 +264,44 @@ function renderScopeRow() {
   railTreeEl.appendChild(button);
 }
 
+// Phase 8.6 Block C C4 (Plan §5.4): exportiert, weil der Space-Klick in der Übersicht
+// (`list.js :: renderOverview()`, die "overview__space-open"-Schaltfläche) auf
+// `activateView(name)` navigiert — semantisch "in den Space wechseln, ohne Filter zu
+// setzen". `navigate(name, bucket)` würde einen Bucket mitgeben, den der Nutzer in der
+// Übersicht nicht explizit wählt (er klickt die Zeile, nicht den Counter-Chip).
+//
+// V117-Befund: state.itemsLoaded wurde im globalen Modus ("Alle Items") für alle
+// sichtbaren Spaces gesetzt -- beim Übergang von "all" zurück in einen einzelnen Space
+// würde renderRail() aber die Items des globalen Pools zählen, nicht die des
+// Ziel-Spaces (state.items wird erst in loadItems() umgeschaltet, renderRail() läuft
+// aber ZUVOR). Reset auf false löst das: renderRail() zeigt bis zur loadItems-Auflösung
+// leere Folder-Counter, danach sind sie korrekt für den neuen Space.
+export function activateView(spaceName) {
+  // Jeder Klick auf einen Space/Eimer/Ordner führt aus dem globalen Modus zurück (P6-AP), ohne
+  // dass jede Aufrufstelle das selbst erinnern muss.
+  state.scope = "space";
+  state.activeSpace = spaceName;
+  // V117: alle per "all" gesetzten Loaded-Flags zurücksetzen -- sonst zeigt das Rail
+  // für ein paar ms Counts aus dem globalen Pool, die zum Ziel-Space gar nicht passen.
+  state.itemsLoaded = {};
+  // §9.3 Punkt 1: Navigation leert die Auswahl, dieselbe Exklusivitäts-Disziplin wie
+  // `folder`/`filter` — sonst könnte eine Auswahl Items enthalten, die hier gar nicht mehr
+  // sichtbar sind.
+  clearSelection();
+  setCreateControlsPresent(activeSpaceWritable());
+  renderRail();
+  renderCrumb();
+  return loadItems();
+}
+
 export function renderRail() {
   railTreeEl.textContent = "";
-  renderScopeRow();
+  // Phase 8.6 Block C C2 (Plan §5.2): "Alle Items" wandert von ganz oben hinter die Spaces —
+  // der "Kippschalter" zwischen Space-Sicht und globaler Sicht ist jetzt das LETZTE Element
+  // im Rail, nicht das erste. Der Nikinger wollte "Alle Items" nicht mehr als prominentesten
+  // Eintrag (er war visuell vor dem eigenen Space), sondern als bewusste Aktion am Ende der
+  // Navigation. Der bestehende Mechanismus (toggle über `state.scope`) bleibt — der
+  // `navigateAll()`-Klick ist unverändert.
   var own = state.spaces.filter(function (s) { return s.own; });
   var foreign = state.spaces.filter(function (s) { return !s.own; });
 
@@ -253,6 +313,7 @@ export function renderRail() {
     railTreeEl.appendChild(el("div", "tree__group", "Verbundene Spaces"));
     foreign.forEach(renderSpaceNode);
   }
+  renderScopeRow();
   homeButtonEl.setAttribute("aria-current", state.selectedId === null ? "true" : "false");
 }
 

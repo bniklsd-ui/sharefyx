@@ -43,6 +43,15 @@ export var state = {
   scope: "space",
   query: "",
   items: [],
+  // Phase 8.6 Block C C5 (Plan §5.5 V117): `{ [spaceName]: true }` -- gesetzt wird in
+  // `list.js :: loadItems()`, sobald die Items des aktiven Spaces (oder im globalen Modus
+  // alle lesbaren Items) geladen sind. Folder-Zähler im Rail (`tree.js :: folderButton()`)
+  // fragen diesen Flag ab und zeigen KEINE Zahl, solange er für den jeweiligen Space fehlt
+  // -- "Lieber keine Zahl als eine unwahre" (geltender Kommentar in tree.js:224-226, der
+  // genau für diesen Fall steht). Im globalen Modus markiert `loadItems()` zusätzlich
+  // jeden Space, von dem es Items gesehen hat, als geladen -- ein Space ohne Items im
+  // globalen Modus ist trotzdem "gesehen", sein Zähler ist 0.
+  itemsLoaded: {},
   selectedId: null,
   selectedReadonly: false,
   // Mehrfachauswahl (§9, P6-AK) — ein `Set` von Item-IDs, geleert bei jeder Navigation

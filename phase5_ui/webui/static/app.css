@@ -410,6 +410,12 @@ select.input:focus {
 }
 
 .rail__home { margin: 0 var(--space) var(--space); width: auto; }
+/* Phase 8.6 Block C C1 (Plan §5.1): #account-button wandert aus .rail__account heraus direkt
+   unter #home-button. Eigene Modifikator-Klasse statt generischer .rail__action-Anpassung,
+   damit der bestehende #logout-button-Stil (volle Breite als einziges Kind in .rail__account)
+   unveraendert bleibt -- beide Knöpfe teilen die .rail__action-Basis-Regel (Padding,
+   Hover-Verhalten aus B1), unterscheiden sich aber im Margin und in der Default-Breite. */
+.rail__action--account { margin: 0 var(--space) var(--space); width: auto; }
 .rail__action { width: auto; flex: 1; }
 
 /* Phase 8.6 Block B B1 (Plan §4.1 P8.6-Q): vereinheitlichte Hover-Sprache für alles Klickbare,
@@ -590,6 +596,11 @@ select.input:focus {
   font-size: var(--fs-meta);
   color: var(--text-faint);
   font-variant-numeric: tabular-nums;
+  /* Phase 8.6 Block C C5 (Plan §5.5): Zähler immer rechtsbündig im Button. Gilt für
+     Eimer-Folder (Offen/Erledigt/Notizen/Archiv, Phase 7) und neu für echte Ordner
+     (Step 7 Commit 1). `margin-left: auto` im Flex-Container schiebt alles, was nach
+     dem .rail__label kommt, ans Ende. */
+  margin-left: auto;
 }
 
 .rail__account {
@@ -895,10 +906,31 @@ select.input:focus {
 /* -- Übersichtsseite (Step 7b) ------------------------------------------------------------ */
 
 .overview {
+  /* Phase 8.6 Block C C3 (Plan §5.3): .overview wird ein zweispaltiges Grid (1fr 40% ab
+     ≥1281px, einspaltig darunter -- siehe @media weiter unten). `flex: 1` statt
+     `height: 100%`, weil .overview NICHT das einzige Kind von .detail ist (auch
+     .detail__back, #detail-readonly und Editor sind Geschwister; nur über 1024px sind
+     sie nicht sichtbar, aber der Grid-Bug wäre dieselbe). `min-height: 0` damit die
+     Zeile "1fr" nicht vom Inhalt aufgebläht wird und die Spalten ihren eigenen
+     overflow-y haben. `overflow: hidden` weil die Spalten scrollen, nicht die ganze
+     Übersicht. */
+  display: grid;
+  grid-template-columns: 1fr 40%;
+  grid-template-rows: auto 1fr;
+  gap: calc(var(--space) * 3);
   flex: 1;
-  overflow-y: auto;
+  min-height: 0;
+  overflow: hidden;
   padding: calc(var(--space) * 4);
 }
+/* head-row spannt beide Spalten (Header + Legende stehen oben über der ganzen Fläche). */
+.overview__head-row { grid-column: 1 / -1; min-width: 0; }
+/* Linke Spalte: Spaces + Zuletzt-Benutzt-Heading + Recent. Eigener overflow-y. */
+.overview__col-left { overflow-y: auto; min-height: 0; min-width: 0; }
+/* Rechte Spalte: Verknüpfungs-Heading + Graph. Vertikal flex, damit der Graph den Rest
+   der Zeile füllt (1fr im Grid). */
+.overview__col-right { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+.overview__col-right .overview__graph { flex: 1; }
 .overview__title { margin-bottom: calc(var(--space) * 2); }
 
 /* Mini-Legende (Phase 8 C3, P8-I) -- kleines statisches Element im Uebersichts-Kopf, das die
@@ -974,6 +1006,33 @@ select.input:focus {
   flex: 1;
   min-width: 0;
 }
+/* Phase 8.6 Block C C4 (Plan §5.4): .overview__space-open ist der eigentliche Klick-Anker
+   der Space-Zeile (statt der ganzen <li>). Eigene Button-Basis (background: none + border
+   none), damit der Name im selben visuellen Layout bleibt wie vorher -- der Hover aus B1
+   wird hier mit :hover:not([disabled]) aufgenommen, damit klickbare Zeilen die bekannte
+   quiet-Selektion bekommen, der Knopf sich aber nicht wie ein `.btn` anfühlt (er ist
+   Navigation, nicht Aktion). */
+.overview__space-open {
+  display: flex;
+  align-items: center;
+  gap: var(--space);
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+.overview__space-open:hover:not(:disabled) {
+  background: var(--select-fill-quiet);
+  outline: 1px solid var(--select-line-quiet);
+  outline-offset: -1px;
+}
 .overview__space-name-label {
   font-weight: 500;
   overflow: hidden;
@@ -1005,16 +1064,18 @@ select.input:focus {
   outline-offset: 1px;
 }
 
-/* Phase 8 Block D D2 (Plan §5 D2): Graph-Panel-Geruest, ~55vh (min-height, kann bei
-   vielen Knoten wachsen). Canvas fuellt das Panel, Ueberlauf wird abgeschnitten. */
+/* Phase 8 Block D D2 (Plan §5 D2): Graph-Panel-Geruest. Phase 8.6 Block C C3 (Plan §5.3):
+   `min-height: 55vh` und `max-width: 960px` entfallen -- das Panel sitzt jetzt in einem
+   Grid-Item der rechten Spalte (`flex: 1` aus `.overview__col-right .overview__graph`),
+   das die Höhe aus dem Grid bezieht (definite Höhe durch `grid-template-rows: auto 1fr`
+   + `min-height: 0`). Die Breite kommt aus der Spalte (40%), nicht aus einem Cap. Canvas
+   füllt 100% des jetzt definitiv großen Containers. V112-Gegenprobe (Karte schneidet
+   unten ab): jetzt behoben, weil die Karte die volle Spaltenhöhe erbt. */
 .overview__graph {
   position: relative;
-  min-height: 55vh;
-  max-width: 960px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
-  margin-bottom: calc(var(--space) * 2);
   overflow: hidden;
 }
 .overview__graph canvas {
@@ -1813,6 +1874,18 @@ body.has-update-banner .shell { height: calc(100vh - var(--banner-h)); margin-to
   .rail__home, .rail__action { justify-content: center; }
   .tree__folder { padding-left: var(--space); }
   .rail__account { flex-direction: column; }
+  /* Phase 8.6 Block C C3 (Plan §5.3): unter 1280px kollabiert das .overview-Grid auf eine
+     Spalte -- die Map rutscht unter die Liste, statt sie zu zerteilen. Reihenfolge in der
+     DOM bleibt gleich (head-row, col-left, col-right), die Spalten werden einfach zu
+     untereinander gestapelten Reihen. height wird auto, weil eine 1fr-Zeile in einem
+     einspaltigen Grid keinen Eltern-Constraint hat (sonst wären die Spalten gleich hoch
+     und die Karte erschiene wieder abgeschnitten). */
+  .overview {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    height: auto;
+  }
+  .overview__col-left, .overview__col-right { overflow: visible; }
 }
 
 @media (max-width: 1024px) {

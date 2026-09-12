@@ -23,21 +23,30 @@
       <svg class="rail__glyph icon" aria-hidden="true"><use href="#i-house"></use></svg><span class="rail__label">&Uuml;bersicht</span>
     </button>
 
+    <!-- Phase 8.6 Block C C1 (Plan §5.1): "Konto" -> "Einstellungen" (das Icon war schon immer
+         ein Zahnrad, der Name hinkte hinterher, N3-Lesart b), und der Knopf wandert aus
+         .rail__account heraus direkt unter #home-button. Begründung: "Abmelden" ist die
+         seltenste und teuerste Aktion -- ein wörtlicher Tausch würde sie an die
+         prominenteste Stelle des Blocks setzen, das ist ein Ergonomie-Argument gegen das
+         Tausch-Argument. N3-Lesart b (Einstellungen oben, Abmelden ans Rail-Ende) ist
+         bestätigt, nicht geraten. -->
+    <button class="rail__action rail__action--account" type="button" id="account-button">
+      <svg class="rail__glyph icon" aria-hidden="true"><use href="#i-settings"></use></svg><span class="rail__label">Einstellungen</span>
+    </button>
+
     <!-- Navigationsbaum (Step 7b): eigener Space mit seinen drei Ordnern, darunter die
          verbundenen Spaces. Vollstaendig aus app.js gerendert, weil erst /api/v1/overview
          weiss, welche Spaces sichtbar sind und wie viele Items in jedem Ordner liegen. -->
     <div class="rail__tree" id="rail-tree"></div>
 
     <div class="rail__account">
-      <button class="rail__action" type="button" id="account-button">
-        <svg class="rail__glyph icon" aria-hidden="true"><use href="#i-settings"></use></svg><span class="rail__label">Konto</span>
-      </button>
       <!-- Meldung des Nikingers: Symbol wechselte von &#9211; (Wiedergabe/Ein-Aus, zu nah am
            &#9881;-Zahnrad des Konto-Knopfs direkt daneben) zu &#9099; (Kreis mit Pfeil nach
            links oben, das ISO-7000-Zeichen fuer "Abmelden").
            Phase 8.6 Block B B4 (Plan §4.4): Vorsicht-Kategorie (Konvention v3) -- einziges
            Mitglied in der Rail. Knopfplastik bleibt (gleicher Knopf wie Einstellungen), nur
-           Text- und Icon-Farbe wechseln auf --caution. -->
+           Text- und Icon-Farbe wechseln auf --caution. Phase 8.6 Block C C1: einziges Kind
+           in .rail__account. -->
       <button class="rail__action action--caution" type="button" id="logout-button">
         <svg class="rail__glyph icon" aria-hidden="true"><use href="#i-log-out"></use></svg><span class="rail__label">Abmelden</span>
       </button>
@@ -72,6 +81,15 @@
 
     <!-- Startansicht (Step 7b, Phase 8 Block D D1 tabellos) -->
     <div class="overview" id="detail-overview">
+      <!-- Phase 8.6 Block C C3 (Plan §5.3): .overview ist jetzt ein zweispaltiges Grid
+           (1fr 40% ab ≥1281px, einspaltig darunter). Die direkten Kinder werden in drei
+           logische Gruppen gefasst -- head-row (Header + Legende) spannt beide Spalten,
+           col-left (Spaces + Zuletzt benutzt + Recent) und col-right (Verknüpfungen +
+           Graph) sind die zwei Spalten. Wrapper-DIVs statt grid-column-Zuweisung auf
+           den Bestand-Kindern, weil die Reihenfolge der heutigen Geschwister sonst
+           erhalten bleiben müsste und eine Spaltentrennung pro Element über grid-column
+           fragil gegen spätere Einfügungen wäre. -->
+      <div class="overview__head-row">
       <!-- Phase 8 Block D D1 (Plan §5 D1): Kopfzeile mit Titel + Refresh-Knopf. Der Refresh-
            Knopf laedt Overview (und in D2 auch den Graph) neu -- geteilte Header-Zeile mit
            Flex, damit Titel und Knopf auf einer gemeinsamen Grundlinie stehen, ohne dass
@@ -92,16 +110,26 @@
         <span class="legend__item"><span class="legend__dot legend__dot--shared"></span>Geteilter Space (schreibbar)</span>
         <span class="legend__item"><span class="legend__dot legend__dot--foreign"></span>Fremder Space</span>
       </div>
+      </div><!-- /overview__head-row -->
+      <div class="overview__col-left">
       <!-- Phase 8 Block D D1 (Plan §5 D1): tabellose Space-Zeilen statt Kachel-Grid. Eine Zeile
            je Space -- Kategoriepunkt + Name + klickbare Counter-Chips (open/done/note/archived,
            nur die mit count > 0, keine leeren Buckets, F12/F13/F23 aufgeloest). Reihenfolge:
            eigene Spaces zuerst, dann fremde. Aus dem DOM gerendert, nicht statisch -- die Liste
            selbst wird per loadOverview() befuellt. -->
       <ol class="overview__spaces" id="overview-spaces"></ol>
+      <!-- Phase 8.6 Block C C3: Heading "Zuletzt benutzt" steht jetzt in der linken Spalte
+           (vor dem Recent-Block), statt unterhalb des Graph-Panels. Reihenfolge der drei
+           Inhalte der linken Spalte: Spaces → Heading → Recent. -->
+      <h2 class="overview__heading">Zuletzt benutzt</h2>
+      <ol class="overview__recent" id="overview-recent"></ol>
+      </div><!-- /overview__col-left -->
+      <div class="overview__col-right">
       <!-- Phase 8 Block D D2 (Plan §5 D2): Graph-Panel mit <canvas>, Toggle-Toolbar und
            Leerzustand-Hinweis. Container ist 55vh (Plan §5 D2), D1 hat das Geruest gebaut,
            D2 befuellt es mit Force-Simulation, Toggles (Tags/Ordner, Default aus) und
-           dem Hinweistext fuer den leeren Fall. -->
+           dem Hinweistext fuer den leeren Fall. Phase 8.6 Block C C3: max-width/min-height
+           entfallen, der Container füllt die rechte Grid-Spalte (flex: 1, min-height: 0). -->
       <h2 class="overview__heading">Verkn&uuml;pfungen</h2>
       <div class="overview__graph" id="overview-graph">
         <div class="overview__graph-toolbar" id="overview-graph-toolbar">
@@ -122,8 +150,7 @@
           <code>itm_&hellip;</code>-Referenz im Text &mdash; dann erscheinen sie hier als Kanten.
         </p>
       </div>
-      <h2 class="overview__heading">Zuletzt benutzt</h2>
-      <ol class="overview__recent" id="overview-recent"></ol>
+      </div><!-- /overview__col-right -->
     </div>
 
     <div id="detail-readonly" hidden>
