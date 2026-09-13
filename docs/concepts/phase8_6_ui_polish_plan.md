@@ -11,7 +11,7 @@ down:
   - ./phase8_ui_graph_plan.md                       # §9 P8-Closeout, §0.3 Verbotsliste, §5 D2 Graph
   - ./sichtpruefung_automation_conventions.md       # Statusregel + Konventionen §1–§4
   - ./sichtpruefung_automation_tooling.md           # Vision-Plugin, Step V
-updated: 2026-09-12 (§5.6 Abschluss Block C ✅ — fünf Sub-Änderungen + D3-Nachzug gebaut, drei statische Tests neu, sechs Screenshots, drei Befunde/Abweichungen während Baus: activateView-Doppel-Definition, V117-Reset in activateView+navigateAll, requestAnimationFrame(resize) für V115; Push+Deploy steht aus) | 2026-09-09 (Erstfassung, Claude-Code-Planungssession gegen main@d1af51b)
+updated: 2026-09-13 (Partial Closeout — **§9 bleibt bewusst leer**, die Phase ist nicht abgeschlossen; §8.3 traegt jetzt den Verweis auf die `[VERIFY]`-Bilanz im `PHASE8_6_CLOSEOUT_HANDOVER.md` §5 [14 zu, 5 offen] und den Hinweis, dass V106 verbraucht ist und Plan 2 einen eigenen Sammelmarker gegen `bc2aa9f` braucht) | 2026-09-12 (§5.6 Abschluss Block C ✅ — fünf Sub-Änderungen + D3-Nachzug gebaut, drei statische Tests neu, sechs Screenshots, drei Befunde/Abweichungen während Baus: activateView-Doppel-Definition, V117-Reset in activateView+navigateAll, requestAnimationFrame(resize) für V115; Push+Deploy steht aus) | 2026-09-09 (Erstfassung, Claude-Code-Planungssession gegen main@d1af51b)
 ---
 
 # Phase 8.6 — UI-Politur: Selektions-Welle + Layout (Plan)
@@ -1183,6 +1183,14 @@ ist bewiesen, weil sie in `d1af51b` zweimal live steht (§1.8).
 §1.7. **V107** (`pytest`-Baseline) — 964 passed in 257 s, §1.6. **V104** bleibt
 gegenstandslos. Damit startet P8.6 mit **zwei** gemessenen Baselines statt zwei Annahmen.
 
+
+**[2026-09-13, Partial Closeout] Die Bilanz dieses Registers steht nicht hier, sondern in
+`PHASE8_6_CLOSEOUT_HANDOVER.md` §5** — **14 geschlossen, 5 offen**. Vier der fünf offenen
+(V110, V114, V118 sowie das geerbte V103) hängen am Gate bzw. am Deploy: die Sichtprüfung
+§7.3 **hat** am 2026-09-12 stattgefunden und neun UX-Befunde zurückgegeben statt der fünf
+Antworten, die sie liefern sollte. Sie sind blockiert, nicht vergessen. **Für Plan 2:** V106
+ist gegen `main`@`d1af51b` gemessen und damit verbraucht — 841 geänderte Zeilen Produktcode
+später brauchen die `Datei:Zeile`-Anker einen **eigenen** Sammelmarker gegen `bc2aa9f`.
 ---
 
 ## §9 Closeout
@@ -1194,3 +1202,11 @@ V106–V119, P1-Contract-Aussage, und was nicht enthalten ist.*
 *Bekannte Punkte, die hier landen werden, weil P8.6 sie bewusst nicht anfasst: der
 CSRF-Origin-Mismatch für Wegwerf-Instanzen (§0.4), das geerbte Ledger (§0.4), und die
 P9-Übergabe für §2.1/§2.2/§2.5/§4/§7/§8/§9/§10.8.*
+
+**[2026-09-13, Partial Closeout] Dieser Abschnitt bleibt bewusst leer.** §9 ist nach P8.6-B
+der *kanonische* Abschluss der Phase — und die Phase ist **nicht abgeschlossen**: Gate ⬜
+angehalten, Step Z ⬜, Badge `v3.0.1`, zwei ungepushte Commits. Der Teil-Stand steht in
+`PHASE8_6_CLOSEOUT_HANDOVER.md` (Nikinger-Anordnung vom 2026-09-13, die in P8.6-B vorgesehene
+Ausnahme) und in `phase8_6_ui_polish_uebersicht.svg`. Gefüllt wird §9 erst, wenn Plan 2 die
+neun Befunde abgearbeitet hat und `v3.0.2` — oder was der Nikinger nach §4.3 des Handovers
+daraus macht — ausgeliefert ist.

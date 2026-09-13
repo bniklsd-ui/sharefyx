@@ -9,7 +9,7 @@ down:
   - ../docs/concepts/p8x_ui_polish_notes.md       # Inhaltsquelle §1–§10 (P8.6-A benennt das Verzeichnis)
   - ../docs/concepts/PHASE8_5_CLOSEOUT_HANDOVER.md   # Einstieg für die P8.6-Planung; §4 = die offenen Entscheidungen
   - SESSIONS_ARCHIVE.md                            # ältere Session-Blöcke, newest-first
-updated: 2026-09-12 (Block-C-Sichtung Nikinger — 6 UX-Befund-Kategorien dokumentiert, Partial Closeout vorgeschlagen, **kein Deploy**, Plan 2 für P8.6 erforderlich [Layout-Reorg, Layering-Konsistenz, schmaler-Viewport, B-Backlog]; neue Vormerkung „p8.6 plan 2 (N.6)" im Head; Block C bleibt formal ✅ geliefert, aber nicht auslieferbar) | 2026-09-11 (**Block B ✅ — Selektion vereinheitlicht, Vorsicht-Kategorie, ein Radius-Fix** — B1 konsolidierte Hover-Regel (`--select-fill-quiet` + `--select-line-quiet` + `var(--radius-sm)`), B2-Audit-Befund V113 (`.tree__space` hat im Code kein `aria-current`, `:not()`-Ausschluss trotzdem korrekt), B3 `.account-nav` statt `.btn` für Konto-Dialog-Navigation, B4 `action--caution`-Trägerklasse auf `#logout-button` + `#archive-button` (genau zwei Mitglieder, neuer statischer Test `test_caution_class_only_on_logout_and_archive` hält das fest), B5 `.link-picker-results` `6px` → `var(--radius-sm)`; `.btn:hover`+`.btn-primary:hover` auf Tokens via `color-mix(in srgb, var(--btn-face-top), white 7%)` / `var(--accent-face-top), white 12%)` statt Pseudo-Element-Overlay wie Plan wörtlich vorsah — Geist der P8.6-Q erfüllt, ohne invasive Änderung; **Plan §3.5/§8.2-Abweichung eingehalten** — die für Block B vorgesehenen Tests sind grün, die für Block C bleiben dort; `pytest` 967 V107 ✅, `ui_budget` V97 ✅ 5/5 (133,1 KB), Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 unverändert; **vier Selbst-Screenshots** in `docs/screenshots/p86_block_b_{01..04}_*.png` zeigen alle vier visuellen Ziele; V-vision-befund-Sub-Block verbatim nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head jetzt nur Block-B-Sub-Block) | 2026-09-11 (**Step V-vision-befund ✅ + Rückbau vollzogen + P9-Vormerkung INDEX-Softcap** — Nikinger-Freigabe in derselben Session: `rm ~/.config/opencode/plugins/opencode-vision.js`, **Gegenprobe 0 Tool-Calls** und korrekte Antwort, seither keine `Plugin initialized`-Zeile mehr; Paket + Config + `local_vision`-MCP bewusst liegen gelassen (trivial reversibel). Neue §Vormerkung: **`docs/INDEX.md` 40.625 B / nur 335 B Reserve → eigene Rotationsregel als P9-Kandidat** (die `updated:`-Kette ist das Problem, nicht der Body). Modul-Status 2b auf „zurückgebaut, vollzogen". | 2026-09-11 (**Step V-vision-befund ✅ — der Plugin-Pfad war die falsche Antwort.** Nikinger-Sonderauftrag [die OpenCode-Vision-Route funktioniert nicht wirklich] gemessen statt recherchiert: `minimax/MiniMax-M3` ist im models.dev-Cache **`attachment: true`** + `modalities.input:[text,image,video]`; A/B mit `opencode run` gegen `p8_6_block_a_picker_v3ritt.png` → **Lauf A `--pure` 0 Tool-Calls korrekt** (nativ), **Lauf B mit Plugin 9 Tool-Calls** (FilePart geloescht, `local_vision` 2x error, Selbstbau per curl/base64), **Lauf C `read`-Tool 1 Tool-Call korrekt**. Befund: `removeProcessedImageParts()` + `models:["*"]` amputiert M3s nativen Bildpfad; `local_vision`-Server selbst ✅, Ursache ist OpenCodes Tool-Timeout vs. 46-180 s qwen3-vl-Cold-Start. **Zweitbefund:** Web-UI-Bundle 1.18.30 hat nur `user-message-attachment-image`, keinen Tool-Result-Bild-Slot → Konvention §4 in OpenCode **dauerhaft unerfuellbar**, bleibt Claude-Code-only. Modul-Status +Zeile 2c, 2b auf [⚠️ zurueckgebaut]; `sichtpruefung_automation_tooling.md` §Messbefund/§Empfehlung/§Historisch neu, `sichtpruefung_automation_conventions.md` §4 mit Korrekturnotiz. **Kein Produkt-Code-Touch**, Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 durchgehend unveraendert; V121+V122-Sub-Block verbatim nach `SESSIONS_ARCHIVE.md` rotiert) | 2026-09-10 (V121+V122 ✅ — Visuelle Verifikation Block A+D gegen live-deploytes v3.0.1: Wegwerf-Instanz Port 18773 (Hard Rule 9-konform, PID-Datei, Cleanup), 2 Playwright-Screenshots [`docs/screenshots/p8_6_block_a_picker_v3ritt.png` + `p8_6_block_d_uebersicht_v3ritt.png`], qwen3-vl:8b durch `vision_ollama.py` **V121 ✅** = Picker-Dialog als Dropdown-Auswahlbox (Block A `<select>` verifiziert, **keine** Radiogruppe mehr), **V122 ✅** = kein Doppelrand + stabile Graph-Karte (Block D V102-Dedup + Layout-Seed verifiziert); Plugin-Pfad (Schritt 1, V-plugin-Commit `cd25712`) ergänzt um den **Wegwerf-Pfad** (Schritt 2, dieser Commit) — beide Verifikations-Modi dokumentiert; `opencode mcp list` weiterhin 3/3 connected (Plugin wartet auf OpenCode-Neustart durch Nikinger); `pytest` V107 ✅ **966 unverändert**, Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 durchgehend nicht angefasst; **V-plugin-Sub-Block (vom 2026-09-10 früh, Plugin-Commit)** verbatim nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head jetzt nur V121+V122-Visual-Sub-Block) | 2026-09-10 (Step V-plugin ✅ — `DavidEasden/opencode-vision` v1.3.0 npm-installiert in `~/.config/opencode/` (AGPL-3.0 lokal-only, keine Sharefyx-Komponente berührt); Plugin-Config `~/.config/opencode/opencode-vision.json` (`models: ["*"]` + `imageAnalysisTool: "local_vision_local_vision"`); Plugin-Eintrag in `opencode.jsonc`-`plugin`-Array; **MCP-Server `local_vision`** in `opencode.jsonc` registriert (raw JSON-RPC stdio + `requests.post(127.0.0.1:11434/api/generate)`, qwen3-vl:8b-Default, 600s-Cold-Start-Timeout); Datei `phase8_6_ui_polish/scripts/mcp_local_vision_server.py` (~167 Z., `--check`-Smoke ✅ + End-to-End-Smoke ✅ mit qwen3-vl:8b gegen `c4_p8519_01_radiogruppe_im_dialog.png`, deutsche Antwort); **`opencode mcp list` 3/3 connected**; §Vormerkungen-Sektion „Vision-Backend“ aktualisiert: Plugin-Pfad nicht mehr zurückgestellt, sondern umgesetzt + dokumentiert; §Nächste Session angepasst: **Schritt 1 = OpenCode-Neustart durch Nikinger** + **Schritt 2 = visuelle Verifikation Block A+D am echten Gerät mit Bild-im-Chat-Workflow**; `pytest` V107 ✅ **966 unverändert**, `ui_budget` V97 ✅ 5/5, Tabu-Diff §0.3 leer, Service-Touch 0; **V-Sub-Block (vom 2026-09-10)** verbatim nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head jetzt mit V-plugin-Sub-Block allein) | 2026-09-10 (Step V ✅ — Ollama 0.34.0 via offizielles Script (NICHT `apt install`, Paket existiert auf Ubuntu 24.04 nicht), `qwen3-vl:8b` (Q4_K_M, 6,1 GB, Apache-2.0, neueste Qwen3-VL-Familie, **NICHT** `internvl2.5:8b` wie ursprünglich empfohlen — existiert nicht auf Ollama-Library; Recherche-Fehler von mir korrigiert); MCP-Wrapper `phase8_6_ui_polish/scripts/vision_ollama.py` (89 Z., `requests.post(/api/generate)`, Timeout 600s für Cold-Start); **V119-Smoke ✅** (46 s gegen `c4_p8519_01_radiogruppe_im_dialog.png`, qwen3-vl:8b antwortet korrekt auf Deutsch: „Der Radio-Button ‚als Text-Link im Text' ist markiert"); §Vormerkungen korrigiert (Schritt 4 curl-script statt apt, Schritt 5 Wrapper-Status ✅, Schritt 6 V119-Status ✅, Vision-Backend-Modell-Recherche korrigiert); `## Nächste Session` neu sortiert: **Schritt 1 = `DavidEasden/opencode-vision`-Plugin-Installation** (Nikinger-Vorgabe 2026-09-10, damit Screenshots direkt im Chat), **Schritt 2 = visuelle Verifikation Block A+D am echten Gerät**; `requests 2.34.2` ins Projekt-venv installiert (Spec-Konformität); `pytest` V107 ✅ **966 unverändert**, `ui_budget` V97 ✅ 5/5, Tabu-Diff §0.3 leer, Service-Touch 0; **Block-D-Sub-Block** verbatim nach `SESSIONS_ARCHIVE.md` rotiert, Phase-Head jetzt mit V-Sub-Block allein; **Push + Deploy** für Block A+D-Commits vom Nikinger in dieser Session autorisiert + ausgeführt (`10f9f63..04dee6a`) | 2026-09-10 (Block A ✅ — Fundament: A1 Radiogruppe→`<select class="input">` mit Beschriftung-in-Box + ID-Selektor, A2 sechs neue Tokens in `:root` (`--bg-void`/`--select-fill`/`--select-fill-quiet`/`--select-line`/`--select-line-quiet`/`--caution`) + fünf rohe `rgba(62,141,243,…)` durch Tokens ersetzt + Z. 785 von `.35` auf `--select-line` angeglichen (V109) + `--bg-void` an genau drei Stellen (body, `.list__empty`, `.overview__graph-empty`, P8.6-E), A3 `--border-soft`→`var(--line)` an `app.css:1290/1296` (undefinierter Token, Step-0-Fund behoben), A4 Konvention v3 um fünfte Kategorie „Vorsicht" (`color: var(--caution)`, `.action--caution`-Trägerklasse) in `phase8_ui_graph/CLAUDE.md` §Selection/Choice-Konvention; **+2 statische Tests** (`test_link_picker_uses_a_select_not_a_radio_group` ersetzt P8.5-Test per P8.6-I, `test_no_raw_accent_rgba_outside_root` P8.6-C, `test_every_css_var_reference_is_defined` P8.6-A3 — würde `--border-soft`-Bug gefunden haben); `pytest` V107 ✅ **966 passed**, `ui_budget` V97 ✅ 5/5 (130,4 KB gzip), Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 nur gelesen via `systemctl status`; **Abweichung von Plan §3.5/§8.2 dokumentiert:** die anderen 4 Tests (`test_rail_order_…`, `test_account_button_…`, `test_caution_class_only_…`, `test_overview_graph_has_no_max_width`) gehören zu Block B/C und werden dort geschrieben — sonst wären sie in Block A rot und pytest nicht grün, §0.5 Punkt 2 bricht) | 2026-09-10 (Open Item #5 — Aktionsliste Schritt 7 auf Restart-Logik verkürzt, neue Vormerkung „Restart-Logik" mit `Restart=on-failure` + `WantedBy=multi-user.target`-Beleg aus `/etc/systemd/system/sharefyx-mcp.service` und `/usr/lib/systemd/system/tailscaled.service`; beide vorherigen Sub-Blöcke (Migration-Vorbereitung + Health-Check nach Proxmox-Migration) **verbatim** nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head jetzt 34,6 KB, 5,4 KB Reserve zum 40-KB-Softcap; `## Nächste Session` aktualisiert auf „Health-Gate 8/8 (Restart-Logik übernimmt das Hochfahren)"; **kein Code-Touch**, Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 nur gelesen via `systemctl status`) | 2026-09-10 (Migration-Aktionsliste + Zukunfts-Notes — Proxmox-Migration von Mini-PC `savefyx-VMware-Virtual-Platform` (sharefyx-mcp PID 355956) auf i5-14600KF primär / Ryzen 7 5800X sekundär steht bevor; **7-Schritte-Aktionsliste** in §Vormerkungen dokumentiert [Pause sharefyx-mcp+tailscaled → VM-Migration → VM-Resources → Ollama+InternVL 2.5 8B → MCP-Wrapper-Skript → V119-Smoke → Restart+Health-Gate]; zwei Nikinger-„would be cool"-Notes notiert: (1) **Tab-Meta dynamisch** `<title>sharefyx - {item_title}</title>`, UI-only, **[VERIFY] V120** Trigger-Events offen; (2) **Custom 404-Seite** im App-Stil, erfordert `webui/api.py`-Touch → P8.6-Tabu §0.3 → Folge-Phase P9+. **Step-V-deferred-Sub-Block** (Vorgänger-Session, 4414 B) nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head wäre sonst über 40-KB-Softcap gerissen, P8.6-T-Rotationsregel „bisherige verbatim". Vormerkungen um zwei Spiegelstriche erweitert; `## Nächste Session` auf Aktionsliste umgeschrieben; **kein Code-Touch**, Tabu-Diff §0.3 leer, Service-Touch 0 — PID 355956 nur gelesen via `systemctl status`) | 2026-09-10 (Step V deferred — Nikinger-Entscheidung: **lokales Vision-Modell** auf Proxmox-Migration (i5-14600KF primär, danach Ryzen 7 5800X) statt Anthropic-Haiku-API. Backend **`InternVL 2.5 8B`** (Apache-2.0, Q4, ~6–8 GB VRAM) auf Ollama; MCP-Wrapper ruft `POST /api/generate` mit base64-Image. Proxmox-Settings (Vorlage für Aktionsliste der nächsten Session) detailliert in §Vormerkungen + Session-Stopped-Sub-Block; Modell-Recherche gegen PromptQuorum „Local Vision Models 2026" — InternVL 2.5 8B (beste UI/Code-Passung), Qwen3-VL 8B (Fallback multilinguales OCR), Llama 3.2 Vision/MiniCPM-V/Moondream (verworfen). Plugin-Pfad (`DavidEasden/opencode-vision`) als Vormerkung zurückgestellt — 3 Commits, AGPL-3.0, kein dokumentiertes MCP-Backend, zu unreif. Kein Code-Touch; nachträglicher Commit nach Step-0-Commit `440e462`) | 2026-09-10 (Step 0 ✅ — Haushalt: Phasenverzeichnis angelegt, sechs kaputte `up:`/`down:`-Links in `p8x_ui_polish_notes.md` gefixt, vier fehlende L1-Cards ergänzt, drei `down:`-Listen korrigiert, `docs/INDEX.md` auf ≤ 38 KB komprimiert, zwei INDEX-Zeilen ergänzt + zwei Drift-Korrekturen; **pytest V107 ✅ 964 passed**, **ui_budget V97 ✅ 130,1 KB**, **V108 offen 863 ms** `_overview`-Latenz, **V106 Sammelmarker offen**, **V110/V112/V114/V115/V117/V119 Block-VERIFY offen**)
+updated: 2026-09-13 (**Partial Closeout — die Phase ist NICHT abgeschlossen und NICHT ausgeliefert.** Rotationsregel P8.6-T war verletzt (ein `##` + ein `###`-Session-Block); `###` aufs Schema gebracht, `scripts/rotate_session_block.sh` gelaufen, alle vier Gegenproben gruen, Block-C-Block verbatim ins Archiv. **Archiv-Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz abgeschnitten — **72 Zeilen / 4.403 B** mechanisch aus `04dee6a` wiederhergestellt, `cmp`-geprueft. **Vier weitere Drifts behoben:** Modul-Status Z5 (Block C) stand auf ⬜ trotz gegenteiliger Commit-Behauptung; „7 Commits voraus" war falsch (**2**, per `git fetch` geprueft); `docs/INDEX.md` verletzte P8.6-4 (40.870 B → **38.822 B**, jetzt erfuellt); der INDEX-Frontmatter-Closer klebte am Zeilenende. **Neu:** `docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md` + `docs/concepts/phase8_6_ui_polish_uebersicht.svg` (P8.6-B-Ausnahme, Nikinger-Anordnung 2026-09-13); Plan §9 bleibt bewusst leer. `pytest` **970 ✅**, Tabu-Diff §0.3 leer, Service-Touch 0 — PID 991 nur gelesen) | 2026-09-12 (Block-C-Sichtung Nikinger — 6 UX-Befund-Kategorien dokumentiert, Partial Closeout vorgeschlagen, **kein Deploy**, Plan 2 für P8.6 erforderlich [Layout-Reorg, Layering-Konsistenz, schmaler-Viewport, B-Backlog]; neue Vormerkung „p8.6 plan 2 (N.6)" im Head; Block C bleibt formal ✅ geliefert, aber nicht auslieferbar) | 2026-09-11 (**Block B ✅ — Selektion vereinheitlicht, Vorsicht-Kategorie, ein Radius-Fix** — B1 konsolidierte Hover-Regel (`--select-fill-quiet` + `--select-line-quiet` + `var(--radius-sm)`), B2-Audit-Befund V113 (`.tree__space` hat im Code kein `aria-current`, `:not()`-Ausschluss trotzdem korrekt), B3 `.account-nav` statt `.btn` für Konto-Dialog-Navigation, B4 `action--caution`-Trägerklasse auf `#logout-button` + `#archive-button` (genau zwei Mitglieder, neuer statischer Test `test_caution_class_only_on_logout_and_archive` hält das fest), B5 `.link-picker-results` `6px` → `var(--radius-sm)`; `.btn:hover`+`.btn-primary:hover` auf Tokens via `color-mix(in srgb, var(--btn-face-top), white 7%)` / `var(--accent-face-top), white 12%)` statt Pseudo-Element-Overlay wie Plan wörtlich vorsah — Geist der P8.6-Q erfüllt, ohne invasive Änderung; **Plan §3.5/§8.2-Abweichung eingehalten** — die für Block B vorgesehenen Tests sind grün, die für Block C bleiben dort; `pytest` 967 V107 ✅, `ui_budget` V97 ✅ 5/5 (133,1 KB), Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 unverändert; **vier Selbst-Screenshots** in `docs/screenshots/p86_block_b_{01..04}_*.png` zeigen alle vier visuellen Ziele; V-vision-befund-Sub-Block verbatim nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head jetzt nur Block-B-Sub-Block) | 2026-09-11 (**Step V-vision-befund ✅ + Rückbau vollzogen + P9-Vormerkung INDEX-Softcap** — Nikinger-Freigabe in derselben Session: `rm ~/.config/opencode/plugins/opencode-vision.js`, **Gegenprobe 0 Tool-Calls** und korrekte Antwort, seither keine `Plugin initialized`-Zeile mehr; Paket + Config + `local_vision`-MCP bewusst liegen gelassen (trivial reversibel). Neue §Vormerkung: **`docs/INDEX.md` 40.625 B / nur 335 B Reserve → eigene Rotationsregel als P9-Kandidat** (die `updated:`-Kette ist das Problem, nicht der Body). Modul-Status 2b auf „zurückgebaut, vollzogen". | 2026-09-11 (**Step V-vision-befund ✅ — der Plugin-Pfad war die falsche Antwort.** Nikinger-Sonderauftrag [die OpenCode-Vision-Route funktioniert nicht wirklich] gemessen statt recherchiert: `minimax/MiniMax-M3` ist im models.dev-Cache **`attachment: true`** + `modalities.input:[text,image,video]`; A/B mit `opencode run` gegen `p8_6_block_a_picker_v3ritt.png` → **Lauf A `--pure` 0 Tool-Calls korrekt** (nativ), **Lauf B mit Plugin 9 Tool-Calls** (FilePart geloescht, `local_vision` 2x error, Selbstbau per curl/base64), **Lauf C `read`-Tool 1 Tool-Call korrekt**. Befund: `removeProcessedImageParts()` + `models:["*"]` amputiert M3s nativen Bildpfad; `local_vision`-Server selbst ✅, Ursache ist OpenCodes Tool-Timeout vs. 46-180 s qwen3-vl-Cold-Start. **Zweitbefund:** Web-UI-Bundle 1.18.30 hat nur `user-message-attachment-image`, keinen Tool-Result-Bild-Slot → Konvention §4 in OpenCode **dauerhaft unerfuellbar**, bleibt Claude-Code-only. Modul-Status +Zeile 2c, 2b auf [⚠️ zurueckgebaut]; `sichtpruefung_automation_tooling.md` §Messbefund/§Empfehlung/§Historisch neu, `sichtpruefung_automation_conventions.md` §4 mit Korrekturnotiz. **Kein Produkt-Code-Touch**, Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 durchgehend unveraendert; V121+V122-Sub-Block verbatim nach `SESSIONS_ARCHIVE.md` rotiert) | 2026-09-10 (V121+V122 ✅ — Visuelle Verifikation Block A+D gegen live-deploytes v3.0.1: Wegwerf-Instanz Port 18773 (Hard Rule 9-konform, PID-Datei, Cleanup), 2 Playwright-Screenshots [`docs/screenshots/p8_6_block_a_picker_v3ritt.png` + `p8_6_block_d_uebersicht_v3ritt.png`], qwen3-vl:8b durch `vision_ollama.py` **V121 ✅** = Picker-Dialog als Dropdown-Auswahlbox (Block A `<select>` verifiziert, **keine** Radiogruppe mehr), **V122 ✅** = kein Doppelrand + stabile Graph-Karte (Block D V102-Dedup + Layout-Seed verifiziert); Plugin-Pfad (Schritt 1, V-plugin-Commit `cd25712`) ergänzt um den **Wegwerf-Pfad** (Schritt 2, dieser Commit) — beide Verifikations-Modi dokumentiert; `opencode mcp list` weiterhin 3/3 connected (Plugin wartet auf OpenCode-Neustart durch Nikinger); `pytest` V107 ✅ **966 unverändert**, Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 durchgehend nicht angefasst; **V-plugin-Sub-Block (vom 2026-09-10 früh, Plugin-Commit)** verbatim nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head jetzt nur V121+V122-Visual-Sub-Block) | 2026-09-10 (Step V-plugin ✅ — `DavidEasden/opencode-vision` v1.3.0 npm-installiert in `~/.config/opencode/` (AGPL-3.0 lokal-only, keine Sharefyx-Komponente berührt); Plugin-Config `~/.config/opencode/opencode-vision.json` (`models: ["*"]` + `imageAnalysisTool: "local_vision_local_vision"`); Plugin-Eintrag in `opencode.jsonc`-`plugin`-Array; **MCP-Server `local_vision`** in `opencode.jsonc` registriert (raw JSON-RPC stdio + `requests.post(127.0.0.1:11434/api/generate)`, qwen3-vl:8b-Default, 600s-Cold-Start-Timeout); Datei `phase8_6_ui_polish/scripts/mcp_local_vision_server.py` (~167 Z., `--check`-Smoke ✅ + End-to-End-Smoke ✅ mit qwen3-vl:8b gegen `c4_p8519_01_radiogruppe_im_dialog.png`, deutsche Antwort); **`opencode mcp list` 3/3 connected**; §Vormerkungen-Sektion „Vision-Backend“ aktualisiert: Plugin-Pfad nicht mehr zurückgestellt, sondern umgesetzt + dokumentiert; §Nächste Session angepasst: **Schritt 1 = OpenCode-Neustart durch Nikinger** + **Schritt 2 = visuelle Verifikation Block A+D am echten Gerät mit Bild-im-Chat-Workflow**; `pytest` V107 ✅ **966 unverändert**, `ui_budget` V97 ✅ 5/5, Tabu-Diff §0.3 leer, Service-Touch 0; **V-Sub-Block (vom 2026-09-10)** verbatim nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head jetzt mit V-plugin-Sub-Block allein) | 2026-09-10 (Step V ✅ — Ollama 0.34.0 via offizielles Script (NICHT `apt install`, Paket existiert auf Ubuntu 24.04 nicht), `qwen3-vl:8b` (Q4_K_M, 6,1 GB, Apache-2.0, neueste Qwen3-VL-Familie, **NICHT** `internvl2.5:8b` wie ursprünglich empfohlen — existiert nicht auf Ollama-Library; Recherche-Fehler von mir korrigiert); MCP-Wrapper `phase8_6_ui_polish/scripts/vision_ollama.py` (89 Z., `requests.post(/api/generate)`, Timeout 600s für Cold-Start); **V119-Smoke ✅** (46 s gegen `c4_p8519_01_radiogruppe_im_dialog.png`, qwen3-vl:8b antwortet korrekt auf Deutsch: „Der Radio-Button ‚als Text-Link im Text' ist markiert"); §Vormerkungen korrigiert (Schritt 4 curl-script statt apt, Schritt 5 Wrapper-Status ✅, Schritt 6 V119-Status ✅, Vision-Backend-Modell-Recherche korrigiert); `## Nächste Session` neu sortiert: **Schritt 1 = `DavidEasden/opencode-vision`-Plugin-Installation** (Nikinger-Vorgabe 2026-09-10, damit Screenshots direkt im Chat), **Schritt 2 = visuelle Verifikation Block A+D am echten Gerät**; `requests 2.34.2` ins Projekt-venv installiert (Spec-Konformität); `pytest` V107 ✅ **966 unverändert**, `ui_budget` V97 ✅ 5/5, Tabu-Diff §0.3 leer, Service-Touch 0; **Block-D-Sub-Block** verbatim nach `SESSIONS_ARCHIVE.md` rotiert, Phase-Head jetzt mit V-Sub-Block allein; **Push + Deploy** für Block A+D-Commits vom Nikinger in dieser Session autorisiert + ausgeführt (`10f9f63..04dee6a`) | 2026-09-10 (Block A ✅ — Fundament: A1 Radiogruppe→`<select class="input">` mit Beschriftung-in-Box + ID-Selektor, A2 sechs neue Tokens in `:root` (`--bg-void`/`--select-fill`/`--select-fill-quiet`/`--select-line`/`--select-line-quiet`/`--caution`) + fünf rohe `rgba(62,141,243,…)` durch Tokens ersetzt + Z. 785 von `.35` auf `--select-line` angeglichen (V109) + `--bg-void` an genau drei Stellen (body, `.list__empty`, `.overview__graph-empty`, P8.6-E), A3 `--border-soft`→`var(--line)` an `app.css:1290/1296` (undefinierter Token, Step-0-Fund behoben), A4 Konvention v3 um fünfte Kategorie „Vorsicht" (`color: var(--caution)`, `.action--caution`-Trägerklasse) in `phase8_ui_graph/CLAUDE.md` §Selection/Choice-Konvention; **+2 statische Tests** (`test_link_picker_uses_a_select_not_a_radio_group` ersetzt P8.5-Test per P8.6-I, `test_no_raw_accent_rgba_outside_root` P8.6-C, `test_every_css_var_reference_is_defined` P8.6-A3 — würde `--border-soft`-Bug gefunden haben); `pytest` V107 ✅ **966 passed**, `ui_budget` V97 ✅ 5/5 (130,4 KB gzip), Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 nur gelesen via `systemctl status`; **Abweichung von Plan §3.5/§8.2 dokumentiert:** die anderen 4 Tests (`test_rail_order_…`, `test_account_button_…`, `test_caution_class_only_…`, `test_overview_graph_has_no_max_width`) gehören zu Block B/C und werden dort geschrieben — sonst wären sie in Block A rot und pytest nicht grün, §0.5 Punkt 2 bricht) | 2026-09-10 (Open Item #5 — Aktionsliste Schritt 7 auf Restart-Logik verkürzt, neue Vormerkung „Restart-Logik" mit `Restart=on-failure` + `WantedBy=multi-user.target`-Beleg aus `/etc/systemd/system/sharefyx-mcp.service` und `/usr/lib/systemd/system/tailscaled.service`; beide vorherigen Sub-Blöcke (Migration-Vorbereitung + Health-Check nach Proxmox-Migration) **verbatim** nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head jetzt 34,6 KB, 5,4 KB Reserve zum 40-KB-Softcap; `## Nächste Session` aktualisiert auf „Health-Gate 8/8 (Restart-Logik übernimmt das Hochfahren)"; **kein Code-Touch**, Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 nur gelesen via `systemctl status`) | 2026-09-10 (Migration-Aktionsliste + Zukunfts-Notes — Proxmox-Migration von Mini-PC `savefyx-VMware-Virtual-Platform` (sharefyx-mcp PID 355956) auf i5-14600KF primär / Ryzen 7 5800X sekundär steht bevor; **7-Schritte-Aktionsliste** in §Vormerkungen dokumentiert [Pause sharefyx-mcp+tailscaled → VM-Migration → VM-Resources → Ollama+InternVL 2.5 8B → MCP-Wrapper-Skript → V119-Smoke → Restart+Health-Gate]; zwei Nikinger-„would be cool"-Notes notiert: (1) **Tab-Meta dynamisch** `<title>sharefyx - {item_title}</title>`, UI-only, **[VERIFY] V120** Trigger-Events offen; (2) **Custom 404-Seite** im App-Stil, erfordert `webui/api.py`-Touch → P8.6-Tabu §0.3 → Folge-Phase P9+. **Step-V-deferred-Sub-Block** (Vorgänger-Session, 4414 B) nach `SESSIONS_ARCHIVE.md` rotiert — Phase-Head wäre sonst über 40-KB-Softcap gerissen, P8.6-T-Rotationsregel „bisherige verbatim". Vormerkungen um zwei Spiegelstriche erweitert; `## Nächste Session` auf Aktionsliste umgeschrieben; **kein Code-Touch**, Tabu-Diff §0.3 leer, Service-Touch 0 — PID 355956 nur gelesen via `systemctl status`) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
 ---
 # CLAUDE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes (`phase8_6_ui_polish/`)
 
@@ -122,10 +122,10 @@ Entscheidungen P8.6-A–P8.6-U, Tabu-Liste, Schritt-Sequenz, Testliste, Abnahmez
 | 2c | Step V-vision-befund — **Messung statt Recherche** (Nikinger-Sonderauftrag 2026-09-11, „die OpenCode-Vision-Route funktioniert nicht wirklich"): `minimax/MiniMax-M3` steht in OpenCodes models.dev-Cache als **`attachment: true`** + `modalities.input: [text,image,video]` (die ganze M2.x-Familie daneben: `false` / `[text]`), Provider über `@ai-sdk/anthropic` gegen `api.minimax.io/anthropic/v1`. **A/B mit `opencode run`** gegen `docs/screenshots/p8_6_block_a_picker_v3ritt.png`, Frage nur aus Pixeln beantwortbar (Zähler „Notizen 6" + orangefarbenes Badge „nur lesen" neben `gamma`): **Lauf A `--pure` (Plugin aus) → 0 Tool-Calls, korrekt** (nativ); **Lauf B (Plugin an) → 9 Tool-Calls**, FilePart vom Plugin gelöscht, `local_vision` 2× `error`, M3 baut sich per `bash`/`curl`/`base64` selbst einen Ollama-Call (5 Fehlversuche); **Lauf C `--pure` + eingebautes `read`-Tool → 1 Tool-Call, `Image read successfully`**, korrekt — ohne `-f`, ohne Plugin, ohne Ollama. **Befund: das Plugin ist nicht die Lösung, es ist der Defekt** — `removeProcessedImageParts()` amputiert bei `models: ["*"]` auch das Modell, das die Krücke nicht braucht; erklärt auch die Paste-Beschwerde (derselbe Hook). `local_vision`-MCP-Server selbst ✅ korrekt (direkt über stdio geprüft) — Ursache ist OpenCodes Tool-Timeout gegen den 46–180 s CPU-Cold-Start von `qwen3-vl:8b`. **Zweitbefund:** Web-UI-Bundle 1.18.30 kennt nur `prompt-*`/`user-message-attachment-image`-Slots, **keinen Assistant-/Tool-Result-Bild-Slot** — Bilder fließen einbahnig Mensch→Modell, Konvention §4 ist in OpenCode **dauerhaft unerfüllbar** und bleibt Claude-Code-only. | V-vision-befund | ✅ (Befund belegt; Rückbau = Nikinger-Entscheidung) | kein Produkt-Code-Touch; Doku: `sichtpruefung_automation_tooling.md` §Messbefund/§Empfehlung/§Historisch, `sichtpruefung_automation_conventions.md` §4-Korrektur |
 | 3 | Block A — Fundament: A1 Radiogruppe → `<select, (P8.6-H/I), A2 Layer-/Selektions-Tokens (`--bg-void`/`--select-fill`/`--select-fill-quiet`/`--select-line`/`--select-line-quiet`/`--caution`, P8.6-C/D/E/F), A3 `--border-soft`-Renderfehler-Fix (`app.css:1270/1276` → `var(--line)`, Plan §3.3), A4 Konvention v3 um fünfte Kategorie „Vorsicht" in `phase8_ui_graph/CLAUDE.md` §Selection/Choice-Konvention v3 (P8.6-G) | A | ✅ | 964 → **966** (+2 statische Tests in Block A; `test_link_picker_uses_a_select_not_a_radio_group` ersetzt den P8.5-Test per P8.6-I, `test_no_raw_accent_rgba_outside_root` und `test_every_css_var_reference_is_defined` neu; **Abweichung von Plan §3.5/§8.2:** die anderen 4 Tests (`test_rail_order_…`, `test_account_button_…`, `test_caution_class_only_…`, `test_overview_graph_has_no_max_width`) gehoeren zu Block B/C und werden dort geschrieben, nicht hier — sonst waeren sie in Block A rot und pytest nicht grün, §0.5 Punkt 2 bricht) |
 | 4 | Block B — Selektion vereinheitlichen: B1 Hover = leise Standardauswahl überall (`var(--select-fill-quiet)` + `outline` + `border-radius: var(--radius-sm)`, eine konsolidierte Regel statt der drei Flickenteppich-Fassungen), B2 Audit (V113-Befund: `.tree__space` hat im Code kein `aria-current` — anders als Plan §4.2 annimmt; `:not()`-Ausschluss trotzdem korrekt für künftige Reparatur vorbereitet), B3 Einstellungsmenü (`.account-nav`-Klasse statt `.btn`-Plastik für `#account-show-updates`/`#account-manage-spaces`, Navigation statt Aktion), B4 Sweep „alles Klickbare" mit Vorsicht-Kennzeichnung (`class="action--caution"`-Trägerklasse auf `#logout-button` und `#archive-button`, **genau zwei Mitglieder** — Test `test_caution_class_only_on_logout_and_archive` hält das fest), B5 Radien (genau eine Änderung: `.link-picker-results` `6px` → `var(--radius-sm)`, Block A hatte das nicht erwischt) | B | ✅ | 966 → **967** (+1 statischer Test in Block B; **Plan §3.5/§8.2-Abweichung eingehalten** — die drei für Block B vorgesehenen Tests `test_caution_class_only_on_logout_and_archive`/`test_every_css_var_reference_is_defined` (zusammen mit Block A) + `test_link_picker_uses_a_select_not_a_radio_group` (Block A, ersetzt P8.5-Test per P8.6-I) sind grün; `ui_budget.py` 5/5 im Korridor mit app.css 19.8 KB; **drei weitere** Tests aus der Plan-§8.2-Liste (`test_rail_order_…`, `test_account_button_…`, `test_overview_graph_has_no_max_width`) bleiben Block C vorbehalten — sonst waeren sie in B rot, §0.5 Punkt 2 bricht) |
-| 5 | Block C — Struktur: C1 „Konto" → „Einstellungen", Lesart b (Einstellungen nach oben, Abmelden ans Rail-Ende, P8.6-J/N3), C2 „Alle Items" unter die Spaces (`tree.js :: renderRail()`, P8.6-J), C3 Map als rechte Spalte / volle Höhe (`.overview` als Grid, P8.6-K/L), C4 Spaces in der Übersicht klickbar (`.overview__space-row` + `<button class="overview__space-open">`, P8.6-P), C5 Ordner-Zähler clientseitig aus `state.items` (P8.6-O) | C | ⬜ | 0 → ui_budget bleibt grün, Tabu-Diff leer |
+| 5 | Block C — Struktur: C1 „Konto" → „Einstellungen", Lesart b (Einstellungen nach oben, Abmelden ans Rail-Ende, P8.6-J/N3), C2 „Alle Items" unter die Spaces (`tree.js :: renderRail()`, P8.6-J), C3 Map als rechte Spalte / volle Höhe (`.overview` als Grid, P8.6-K/L), C4 Spaces in der Übersicht klickbar (`.overview__space-row` + `<button class="overview__space-open">`, P8.6-P), C5 Ordner-Zähler clientseitig aus `state.items` (P8.6-O) | C | ✅ **geliefert** · ⚠️ **nicht auslieferbar** | 967 → **970** (+3 statische Tests); `ui_budget` 5/5, Tabu-Diff leer. **[2026-09-13, Partial Closeout]** Diese Zeile stand bis heute auf ⬜, obwohl der Block-C-Commit `90c72e2` ihren Nachzug behauptet hat — Hard-Rule-8-Miss, korrigiert. Die Nikinger-Sichtung vom 2026-09-12 hat den Block **nicht abgenommen**: neun UX-Befunde, Details im Session-Block |
 | 6 | Block D — Graph-Fixes: D1 V102-Dedup (`dedupeEdges()` ungeordnetes Paar, P8.6-N), D2 deterministischer Layout-Seed (`seedJitter()` FNV-1a-Hash, P8.6-M), D3 `.overview__graph`-Höhe (V112-Gegenprobe — abhaengig von C3, daher mit Block C), **D4 `runSimulation()` `rafId` endlich gelesen + `cancelAnimationFrame`** — die **einzige Scope-Erweiterung** des Plans (P8.6-§6.4: §2.1-Gebiet, aber direkte Ursache von §2.4-Verschlimmerung + 3 Zeilen Fix + schon halb da; **streichen, wenn der Nikinger es in der Sichtprüfung anders sieht**) | D | ✅ (D1, D2, D4) · 🟡 (D3, haengt an Block C) | 966 → 966 (kein Test in Block D, dedup + seed + cancel sind graph.js-intern und durch das Vorhandensein des Codes hinreichend belegt — node-Probe gegen `dedupeEdges()`/`seedJitter()` separat verifiziert, Plan §0.5 ui_budget bleibt grün) |
-| 7 | Gate — Wegwerf-Instanz (eigener Port, eigener tmp-`DATA_ROOT`, PID-Datei, Hard Rule 9) + `p86_polish_smoke.py` 12 Stationen (Plan §7.2, Chromium + Firefox für 2/5/6/11) + Nikinger-Sichtprüfung §7.3 (fünf Entscheidungen: V110 §1, V114 §10.1, B2 §10.3, V112 §2.3, P8.6-R Versionierung) + Deploy `v3.0.2` zweigeteilt (D-a Agent, D-b Nikinger, D-c `health_gate.sh` 8/8) | Gate | ⬜ | 0 → `health_gate.sh` 8/8 + 12 Playwright-Stationen + Nikinger-Sichtprüfung |
-| 8 | Step Z — Closeout (Plan §9 füllen, Phase-8.6-N: ein Dokument pro Phase, kein separates Handover-Dokument — P8.6-B; Rotation des Heads, INDEX/ROADMAP/Wurzel-Current-State nachziehen) | Z | ⬜ | 0 → pytest unverändert 964+ grün |
+| 7 | Gate — Wegwerf-Instanz (eigener Port, eigener tmp-`DATA_ROOT`, PID-Datei, Hard Rule 9) + `p86_polish_smoke.py` 12 Stationen (Plan §7.2, Chromium + Firefox für 2/5/6/11) + Nikinger-Sichtprüfung §7.3 (fünf Entscheidungen: V110 §1, V114 §10.1, B2 §10.3, V112 §2.3, P8.6-R Versionierung) + Deploy `v3.0.2` zweigeteilt (D-a Agent, D-b Nikinger, D-c `health_gate.sh` 8/8) | Gate | ⬜ **angehalten** | 0 → `p86_polish_smoke.py` wurde nie geschrieben. Die Sichtprüfung §7.3 **hat stattgefunden** (2026-09-12) und endete mit neun UX-Befunden statt fünf Antworten — V110/V114/V118 bleiben offen, der Deploy unterbleibt |
+| 8 | Step Z — Closeout (Plan §9 füllen; Rotation des Heads, INDEX/ROADMAP/Wurzel-Current-State nachziehen) | Z | ⬜ · **Teil-Stand 2026-09-13** | 0 → `pytest` 970 grün. **Plan §9 bleibt leer**, weil §9 nach P8.6-B der *kanonische* Abschluss ist und die Phase nicht abgeschlossen ist. Stattdessen: `docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md` + `docs/concepts/phase8_6_ui_polish_uebersicht.svg`, beide auf **ausdrückliche Nikinger-Anordnung vom 2026-09-13** — das ist die in P8.6-B vorgesehene Ausnahme, keine stille Aufweichung |
 
 ## Geerbte Contracts
 
@@ -158,7 +158,7 @@ geschlossen, V105-Vierte-A3-Probe ✅ 2026-09-08).
 
 ## Vormerkungen (nicht Teil eines aktuellen Steps)
 
-- **`p8.6 plan 2 (N.6)` — Layout-Reorg + Layering-Konsistenz + schmaler-Viewport + B-Backlog.** Nikinger-Sichtung der Block-C-Screenshots am 2026-09-12 hat sieben UX-Befunde ergeben (siehe Session-Block 2026-09-12 unten: B-Backlog mit Grauton-Inkonsistenz + fehlenden Konto-Dialog-Buttons; C-Befunde Refresh-Karte-Überlappung, kleine Karte, **großer Layout-Reorg-Vorschlag** Spaces + Zuletzt benutzt links + Map rechts + Editor im rechten Slot, Hover-Effekt-Verrutschen, „Alle Items"-Modus ohne Spaces-Übersicht, Rail-Reihenfolge Einstellungen+Abmelden anschließen, Editor-Layering, schmaler-Viewport-Buttons). Eigene Folge-Phase oder Sub-Phase von P8.6 (analog zur P8.6-Planungssession am 2026-09-08 / P8.5-Planungssession am 2026-09-09). Ziel: zweiter Vorabritt + Deploy, der alle sieben Befunde abdeckt. **Vormerkung wird zur aktiven Phase, sobald die nächste Claude-Code-Planungssession startet** — diese Session macht nur die Doku, kein Push + Deploy.
+- **`p8.6 plan 2 (N.6)` — Layout-Reorg + Layering-Konsistenz + schmaler-Viewport + B-Backlog.** Nikinger-Sichtung der Block-C-Screenshots am 2026-09-12 hat sieben UX-Befunde ergeben (siehe Session-Block 2026-09-12 unten: B-Backlog mit Grauton-Inkonsistenz + fehlenden Konto-Dialog-Buttons; C-Befunde Refresh-Karte-Überlappung, kleine Karte, **großer Layout-Reorg-Vorschlag** Spaces + Zuletzt benutzt links + Map rechts + Editor im rechten Slot, Hover-Effekt-Verrutschen, „Alle Items"-Modus ohne Spaces-Übersicht, Rail-Reihenfolge Einstellungen+Abmelden anschließen, Editor-Layering, schmaler-Viewport-Buttons). Eigene Folge-Phase oder Sub-Phase von P8.6 (analog zur P8.6-Planungssession am 2026-09-08 / P8.5-Planungssession am 2026-09-09). Ziel: zweiter Vorabritt + Deploy, der alle sieben Befunde abdeckt. **Vormerkung wird zur aktiven Phase, sobald die nächste Claude-Code-Planungssession startet** — diese Session macht nur die Doku, kein Push + Deploy. **[2026-09-13, Partial Closeout]** Der Teil-Stand liegt jetzt geschrieben vor: `docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md` (§4 ordnet die neun Befunde den Locks zu, die sie öffnen) + `docs/concepts/phase8_6_ui_polish_uebersicht.svg`. Plan 2 startet dort, nicht bei null.
 
 - **`docs/INDEX.md` reißt bald den 40-KB-Softcap → eigene Rotationsregel, Kandidat P9**
   (Nikinger-Vorgabe 2026-09-11). Stand nach diesem Commit: **40.812 B, 148 B Reserve**
@@ -174,6 +174,12 @@ geschlossen, V105-Vierte-A3-Probe ✅ 2026-09-08).
   aktueller Eintrag im Kopf, ältere verbatim ins Archiv" existiert schon, sie ist nur nie
   auf den INDEX angewandt worden. **Nicht in P8.6 lösen** (Doku-Struktur-Umbau, keine
   UI-Politur); bis dahin gilt die Handarbeit: pro Session einen alten Pipe-Eintrag straffen.
+  **[2026-09-13, Partial Closeout]** Stand jetzt **38.822 B** — die Handarbeit wurde in
+  dieser Session ausgeführt (sechs Zeilen geschlossener Phasen gestrafft, zwei neue Zeilen
+  für Handover + Grafik aufgenommen). Damit ist **P8.6-4 erstmals erfüllt** (≤ 38 KB, nicht
+  bloß unter 40.960 B) — die Zeile war seit Block A verletzt. **Nebenbefund:** der
+  Frontmatter-Closer `---` klebte am Ende der `updated:`-Zeile statt auf einer eigenen Zeile
+  zu stehen; das Frontmatter war damit formal kaputt. Behoben.
   **Kein Kandidat:** `DOC_LAYERS_CONVENTION.md` anfassen — die ist die byte-identische
   Trading-Bot-Kopie.
 
@@ -440,233 +446,36 @@ geschlossen, V105-Vierte-A3-Probe ✅ 2026-09-08).
 
 ## Nächste Session
 
-**Stand 2026-09-11:** Block A ✅ + Block D ✅ committed, gepusht und deployed
-(`10f9f63..04dee6a`, `health_gate.sh --expected-sha=04dee6a` 8/8 grün). V121+V122
-visuell verifiziert. **Die Vision-Frage ist entschieden** (Step V-vision-befund,
-Modul-Status Zeile 2c): M3 sieht Bilder nativ, das Plugin war der Defekt.
+**Stand 2026-09-13 (Partial Closeout).** Block A/B/C/D sind gebaut und getestet
+(`pytest` 970, `ui_budget` 5/5), **aber nicht ausgeliefert**: `origin/main` steht auf
+`2a93e67`, lokal liegen **zwei** ungepushte Commits (`90c72e2` Block C, `bc2aa9f` Partial
+Closeout), das Badge zeigt `v3.0.1`. Die Nikinger-Sichtung vom 2026-09-12 hat **neun
+UX-Befunde** zurückgegeben — sie stehen wörtlich im `## Session stopped`-Block unten.
 
-**Reihenfolge für die nächste Session:**
+**Die nächste Session ist eine Claude-Code-Planungssession für P8.6 Plan 2**, analog zur
+P8.6-Planungssession vom 2026-09-08. Einstieg:
 
-0. ~~Plugin-Rückbau~~ — **erledigt 2026-09-11**, Symlink entfernt, Gegenprobe 0 Tool-Calls.
-   Nichts mehr zu tun; Details im Session-Block. Falls M2.x je gebraucht wird: in
-   `~/.config/opencode/opencode-vision.json` `"models"` auf `["*/MiniMax-M2*"]` verengen
-   **statt** den Symlink wiederherzustellen.
-1. **Block B nach Plan §4** (Selektion vereinheitlichen, B4 `action--caution`-Klasse
-   an Abmelden + Archivieren).
-2. **Block C nach Plan §5** (Struktur-Umbau: Konto→Einstellungen, Alle Items unter
-   Spaces, Map als rechte Spalte, klickbare Spaces, Ordner-Zähler) + D3-Nachzug
-   (V112-Gegenprobe nach C3).
-3. **Doku-Notes im selben Commit nachziehen** (Hard Rule 8).
+1. **`docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md`** — Teil-Stand, Delta, Abnahmestand,
+   `[VERIFY]`-Bilanz, und §4: welche der neun Befunde **gelockte Entscheidungen öffnen**
+   (P8.6-O2 `.shell`-Grid · C1/N3-Lesart b · P8.6-E `--bg-void`) plus die Versionsfrage
+   P8.6-R. Danach erst der Session-Block unten für den Wortlaut.
+2. **Reihenfolge-Empfehlung für Plan 2:** Befund 9 zuerst (**auf der Produktion
+   reproduziert**, hängt nicht am P8.6-Deploy) — und zwar messen, bevor repariert wird
+   (CDP-Probe gegen die Wegwerf bei 1024 / 1200 / 1440). Dann Befund 2 (ist der
+   Konto-Dialog-Knopf weg oder nur unsichtbar? ebenfalls Messfrage). Erst danach der
+   Layout-Reorg.
+3. **Plan 2 braucht einen eigenen `[VERIFY]`-Sammelmarker** gegen `bc2aa9f`. Die
+   `Datei:Zeile`-Anker aus Plan 1 zeigen auf den Stand **vor** Block A–D (V106 war gegen
+   `d1af51b` gemessen) und sind durch 841 geänderte Zeilen teilweise verschoben.
+4. **Offen zu entscheiden, nicht zu raten:** ob Push + Deploy in einem großen Schritt nach
+   Plan 2 laufen oder ob Block C vorher einzeln rausgeht.
 
-**Sichtprüfungs-Workflow ab jetzt (gilt für opencode/M3, und zwar sofort — Lauf D belegt, dass er
-auch bei noch installiertem Plugin funktioniert):** Playwright schreibt den
-Screenshot auf Platte → M3 liest ihn mit dem eingebauten `read`-Tool selbst → M3 nennt
-Pfad **und** eigene Bewertung. Der Nikinger öffnet das Bild bei Bedarf selbst; ein
-Rendern im OpenCode-Chat ist technisch nicht möglich (Web-UI hat keinen
-Tool-Result-Bild-Slot). Weder `vision_ollama.py` noch der `local_vision`-MCP-Server
-werden dafür gebraucht — beide bleiben als Offline-Fallback liegen.
+**Sichtprüfungs-Workflow (unverändert, Befund 2c):** Playwright schreibt den Screenshot auf
+Platte → M3 liest ihn mit dem eingebauten `read`-Tool → M3 nennt **Dateiname und eigenes
+Checkkriterium** (Konvention §5). Ein Rendern im OpenCode-Chat ist technisch nicht möglich;
+`vision_ollama.py` und der `local_vision`-MCP-Server bleiben als Offline-Fallback liegen.
 
-## Session stopped — 2026-09-12 (Block C ✅ — Struktur-Umbau: Einstellungen oben, Alle Items unten, Karte als rechte Spalte, klickbare Spaces, Ordner-Zähler)
-
-**Auftrag (Nikinger 2026-09-12, aus Block-B-Sub-Block):** „Block C zuerst anfangen,
-dann verifizierst du noch einmal mal. Bevor wir deployen, braucht es drei Sachen:
-alle Code Tests grün, alle Bilder laut dir grün, ich habe über kritische Bilder noch
-mal rüber geschaut." — Block C nach Plan §5 (C1 „Konto"→„Einstellungen", C2 „Alle
-Items" unter den Spaces, C3 Map als rechte Spalte / volle Höhe, C4 Spaces in der
-Übersicht klickbar, C5 Ordner-Zähler clientseitig aus `state.items`) + D3-Nachzug
-(V112-Gegenprobe nach C3). Erst opencode/M3-Code-Touch seit Block B am
-2026-09-11 (3 Tage vorher). **Kein Push + Deploy in dieser Session** — die
-Drei-Bedingungen-Regel gilt für v3.0.2.
-
-**Was in diesem Commit passiert ist (C1 + C2 + C3 + C4 + C5 + D3):**
-
-1. **C1 — „Konto" → „Einstellungen", Reihenfolge im Rail (Plan §5.1).**
-   `#account-button` wandert aus `.rail__account` heraus direkt unter `#home-button`
-   (`app.html` Z. 30-34), Label „Konto" → „Einstellungen" (das Icon `#i-settings`
-   war schon immer ein Zahnrad, der Name hinkte hinterher — N3-Lesart b, Einstellungen
-   oben, Abmelden ans Rail-Ende). `#logout-button` bleibt in `.rail__account` als
-   einziges Kind. Neue Modifikator-Klasse `.rail__action--account` (analog
-   `.rail__home`) statt generischer `.rail__action`-Anpassung — damit Logout-Knopf
-   als einziges Kind weiterhin die volle Breite einnimmt (`flex: 1` bleibt).
-
-2. **C2 — „Alle Items" unter den Spaces (Plan §5.2).**
-   `tree.js :: renderRail()` ruft `renderScopeRow()` jetzt **nach** den
-   `foreign.forEach(renderSpaceNode)` (Z. 299+), nicht mehr davor. Neue
-   `tree__group`-Überschrift „Alles" vor dem Button (analog „Mein Space" /
-   „Verbundene Spaces"), damit der Wechsel nicht ohne Überschrift an den
-   Spaces-Block klebt. `renderScopeRow()`-Kommentar wörtlich erhalten
-   („Lieber keine Zahl als eine unwahre" — der Kommentar erklärt genau den
-   Sonderfall, den C5 gleich für Folder erweitert).
-
-3. **C3 — Map als rechte Spalte, volle Höhe (Plan §5.3).**
-   `.overview` (`app.css` Z. 898+) wird ein zweispaltiges Grid
-   (`grid-template-columns: 1fr 40%; grid-template-rows: auto 1fr; flex: 1;
-   min-height: 0; overflow: hidden`). Direkte Kinder in drei logische Gruppen
-   gefasst: `.overview__head-row` (Header + Legende, `grid-column: 1 / -1`),
-   `.overview__col-left` (Spaces + „Zuletzt benutzt" + Recent, `overflow-y:
-   auto`), `.overview__col-right` (Verknüpfungs-Heading + Graph, `flex: 1`).
-   `.overview__graph` verliert `min-height: 55vh` und `max-width: 960px`
-   (app.css Z. 1008+) — V112-Gegenprobe, „Karte schneidet unten ab" behoben.
-   `@media (max-width: 1280px)` (`app.css` Z. 1859+) kollabiert das Grid auf
-   eine Spalte, Map rutscht unter die Liste.
-
-4. **C3 + V115 — `requestAnimationFrame(resize)` in `loadGraph()`.**
-   `graph.js :: loadGraph()` (Z. 150+) ruft `resize()` jetzt in einem
-   `requestAnimationFrame(...)`-Wrapper, NACHDEM die Knoten/Edges geladen sind —
-   der ResizeObserver feuert zwar beim ersten `observe()` (Spec
-   https://www.w3.org/TR/resize-observer/), aber zu diesem Zeitpunkt ist
-   `.overview__graph` im neuen Grid möglicherweise 0x0 (CSS-Layout noch nicht
-   committed); ohne den RAF würde `seedInitialPositions()` mit der 0x0-Box
-   rechnen. V115 damit belegt: gemessen, dass der ResizeObserver allein beim
-   ersten Mount nicht ausreicht — der Fix ist 8 Zeilen, kein neuer Mechanismus.
-
-5. **C4 — Spaces in der Übersicht klickbar (Plan §5.4).**
-   `.overview__space-row` bekommt ein `<button class="overview__space-open">`
-   (innerhalb der `<li>`), das Name + Kategoriepunkt umschließt — Tastaturfokus +
-   Screenreader-Rolle gratis. `event.stopPropagation()` auf den Counter-Chips
-   bleibt (jetzt tragend: Eltern-Button würde sonst ebenfalls auslösen, mit
-   anderer Semantik). Neue CSS-Klasse `.overview__space-open` mit eigenem
-   Hover aus B1. `activateView()` wird **exportiert** und in `list.js`
-   importiert (V116 — `activateView(name)` statt `navigate(name, "open")`,
-   weil die Zeile den Bucket nicht explizit wählt).
-   `closeEditor().then(proceed => activateView(name))`-Gating eingebaut — wie
-   die Ordner-Buttons in `tree.js` (Phase-8-§9.3 Punkt 1). **Erster echter
-   Bug, der das Skript während des Baus stoppte:** `activateView` war
-   sowohl als `function` (Original) als auch als `export function` (C4) in
-   `tree.js` definiert — `Identifier 'activateView' has already been declared`
-   als `PAGE ERROR`, `overview__spaces` blieb leer. Original-Z. 20-33 entfernt,
-   Page-Error behoben, danach gerendert sauber.
-
-6. **C5 — Ordner-Zähler clientseitig aus `state.items` (Plan §5.5).**
-   `state.js` bekommt `itemsLoaded: {}` — ein einfaches `Object`, das pro Space
-   speichert, ob die Items dieses Spaces schon einmal geladen wurden. Drei Regeln
-   aus §5.5, alle umgesetzt: (1) gezählt wird alles, was der Nutzer im Ordner
-   **sehen** würde, inklusive `archived`; (2) nur direkte Kinder, kein
-   rekursiver Zähler; (3) ohne `itemsLoaded[space.name]` kein Zähler („Lieber
-   keine Zahl als eine unwahre"). `tree.js :: folderButton()` (Z. 156+)
-   bekommt `folderItemCount(spaceName, folderPath)`-Helfer, der nach
-   `item.space` UND `item.folder` filtert; `list.js :: loadItems()` (Z. 475+)
-   setzt `itemsLoaded[space]` (im space-Modus) bzw. `itemsLoaded[item.space]`
-   für jedes Item (im „all"-Modus) und ruft danach `renderRail()` auf, damit
-   die Zähler die frischen Items sehen. `.tree__count` bekommt `margin-left:
-   auto`, damit Eimer + echte Ordner rechtsbündig in ihren Buttons liegen.
-
-7. **C5 Folge: V117-Reset in `activateView()` und `navigateAll()`.**
-   `state.itemsLoaded = {}` wird in beiden Navigation-Funktionen vor
-   `renderRail()` geleert — sonst zeigt das Rail für ein paar ms Counts aus
-   dem falschen Pool (state.items wird erst in `loadItems()` umgeschaltet,
-   renderRail() läuft aber ZUVOR). **Befund während des Self-Smoke:** ohne
-   den Reset zeigte Screenshot 01 für alpha/Notizen den Counter 6 statt 3,
-   weil der vorangegangene globale Modus Items aus beta/gamma mitgezählt
-   hatte. Reset löst das; erste renderRail() zeigt bis zur loadItems-Auflösung
-   leere Folder-Counter, danach sind sie korrekt für den neuen Space.
-
-8. **D3-Nachzug:** die `.overview__graph`-Höhe ist implizit mit C3 verifiziert
-   (Screenshots 01 + 06 zeigen die Karte in voller Spaltenhöhe, Screenshot 06
-   unter 1200px zeigt Karte unter der Liste ohne Abschneiden).
-
-9. **`+3` statische Tests** in `test_static_routes.py`:
-   - `test_rail_order_settings_before_tree_logout_last` — prüft die exakte
-     Reihenfolge der Tags im Markup (home < account < tree < logout).
-   - `test_account_button_says_einstellungen` — Label „Einstellungen" im
-     Button, „Konto" explizit nicht.
-   - `test_overview_graph_has_no_max_width_or_min_height` — regex über alle
-     `.overview__graph`-Blöcke, prüft Abwesenheit von `max-width` und
-     `min-height` (V112-Regressionswächter).
-
-**Selbstprüfung (§0.5):**
-
-- **Tabu-Diff §0.3 leer.** `git diff --stat -- phase1_storage/storage
-  phase4_auth/authserver phase2_mcp/mcpserver phase5_ui/webui/security.py
-  phase5_ui/webui/api.py phase5_ui/webui/serializers.py phase5_ui/webui/permissions.py`
-  liefert nichts. Erlaubte Pfade berührt: `phase5_ui/webui/static/app.{html,css}`,
-  `phase5_ui/webui/static/js/{graph,list,state,tree}.js`, `phase5_ui/tests/
-  test_static_routes.py`, `phase8_6_ui_polish/scripts/p86_block_c_self_check.py`
-  (§0.3 whitelistet alle).
-- **`pytest -q` 970 passed in 111 s.** 21 Tests in `test_static_routes.py`
-  (V107: 967 → **970**, +3 für C1/C3/C5 in Plan §8.2 — die anderen zwei
-  Tests aus der Liste waren in Block A/B).
-- **`node --check` auf alle vier berührten JS-Dateien grün** (tree.js,
-  list.js, graph.js, state.js — keine Syntax-Fehler).
-- **`python phase5_ui/scripts/ui_budget.py` 5/5 im Korridor.** app.css
-  21.1 KB, Bundle app.js+app.css+Font gzip **137.5 KB** von 250 KB (+4.4 KB
-  gegen Block B 133.1 KB, durch C1/C3/C4-CSS-Erweiterungen). Erstaufruf
-  146.7 KB von 400 KB. **`GET /api/v1/overview` 370 ms** — weiter unter dem
-  Step-0-Stand von 863 ms (V108-Befund: 380→370 ms, kein P8.6-Auftrag).
-- **`grep -nE 'rgba\(62,141,243'`** trifft nur die `:root`-Zeilen, die zwei
-  Block-A-Wächter (`test_no_raw_accent_rgba_outside_root`,
-  `test_every_css_var_reference_is_defined`) halten auch C3 sauber.
-- **Service-Touch 0.** sharefyx-mcp **PID 991** über die gesamte Session
-  unverändert (`systemctl show -p MainPID sharefyx-mcp` zu Beginn = 991, am
-  Ende = 991). Eigener Wegwerf auf Port 18773 (PID-Datei, mehrfach
-  cleanup+setup+seed-items+start durchgespielt für frische Datenlage + Reset
-  des `login_attempts`-Rate-Limits; **kein `pkill -f` mit Regex** — alle
-  Starts/Stops über PID-Datei aus `wegwerf_setup_v3ritt.py`).
-- **Größenprüfung:** app.html 33 KB (Wrapper-DIVs für Grid-Layout +0.4 KB),
-  app.css 21.1 KB (+1.3 KB), test_static_routes.py 25.5 KB (+0.1 KB),
-  Phase-Head jetzt **~55 KB** nach Block-B-Rotation (vorher 50 KB, weiter
-  über 40-KB-Softcap, benannt statt versteckt — Vorbild P8-P / Phase 6.5).
-- **Sechs Selbst-Screenshots** unter `docs/screenshots/p86_block_c_{01..06}_*.png`
-  zeigen die visuellen Ziele:
-    - **01_übersicht.png** (1440×900): Rail mit „Einstellungen" oben +
-      „Abmelden" am Ende, „Alle Items" mit „Alles"-Trenner UNTER den Spaces,
-      Karte als rechte Spalte in voller Höhe (V112-Gegenprobe), Spaces mit
-      Counter-Chips und Folder-Zähler im Rail („Offen 5", „Notizen 6",
-      „Archiv 1", „notizen 3", „projekte 5", „backend 4", „frontend 1").
-    - **02_after_space_click.png**: Klick auf Space-Zeile öffnet die
-      Listenansicht des alpha-Space (state.filter Default „open" — V116).
-    - **03_space_hover.png**: Hover über die Space-Zeile (B1 quiet-Selektion,
-      nicht Voll-Füllung — B4-Regression-Check).
-    - **04_alle_items_with_folder_counts.png**: „Alle Items"-Modus aktiv,
-      Liste mit Items aus allen Spaces (Space-Name als Präfix + Punkt),
-      Folder-Counter im Rail (nun mit Summe über alle Spaces: „projekte 7"
-      = 5 alpha + 2 beta).
-    - **05_editor_caution_regression.png**: Editor geöffnet,
-      Archivieren-Knopf in Vorsicht-Farbe (B4-Regression-Check).
-    - **06_karte_unter_liste_1200px.png**: Bei 1200px Breite kollabiert das
-      Grid auf eine Spalte, Map rutscht unter die Liste, kein Abschneiden.
-
-**Was bewusst NICHT in diesem Commit passiert ist:**
-
-- **Kein Push + Deploy.** Die Drei-Bedingungen-Regel des Nikingers („alle
-  Code-Tests grün ✓, alle Bilder laut dir grün ✓, ich habe über kritische
-  Bilder noch mal rüber geschaut ⬜") ist erst zu zwei Dritteln erfüllt. Der
-  Nikinger macht Push + Deploy selbst, sobald er die Screenshots gesichtet
-  hat. Lokaler `main` ist damit **6 Commits voraus** (vor Block B Block A+D
-  + Step V + Step V-plugin + Step V-vision-befund + §5-Konvention, jetzt
-  Block C obendrauf).
-- **Kein Gate-Skript** (Plan §7, `p86_polish_smoke.py` mit 12 Stationen) —
-  folgt nach dem Deploy-Push.
-- **Keine Tests in den anderen Testdateien** — C5 ist rein clientseitig,
-  kein Server-Roundtrip nötig (P8.6-O). Die `test_static_routes.py`-Tests
-  decken Markup + CSS ab; Verhalten wird über den Self-Smoke verifiziert.
-- **Keine `.shell`-Grid-Änderung** (P8.6-O2-Eskalationsregel eingehalten —
-  C3 verändert nur `.overview`, nicht das äußere Layout). Drei-Spalten-
-  Grundraster aus §4.1 bleibt unverändert.
-
-**Hard-Rule-8-Doku-Update im selben Commit:** Phase-Head Modul-Status Zeile 5 ✅
-(Block C), Phase-Head `## Session stopped` neu (Block-B-Sub-Block nach
-`SESSIONS_ARCHIVE.md` rotiert), Frontmatter `updated:`-Pipe,
-`SESSIONS_ARCHIVE.md` mit rotiertem Block-B-Sub-Block + Frontmatter,
-`docs/INDEX.md` (updated-Frontmatter + Phase-8.6-Zeile), `docs/concepts/
-phase8_6_ui_polish_plan.md` §5 als ✅ markiert + Modul-Status-Zeile in der
-Plan-Tabelle, `ROADMAP.md` P8.6-Status auf 🟡, Wurzel-`CLAUDE.md` Current-state-
-Absatz oben ergänzt (mit ausdrücklicher Block-C-Verifikation — drei der drei
-Bedingungen genannt). Alles in einem Commit.
-
-**Commit-Message (geplant):**
-`phase 8.6: Block C -- Einstellungen oben, Alle Items unten, Karte rechts voller Hoehe, klickbare Spaces, Ordner-Zaehler`
-
-**Nächster Schritt (für die nächste Session):** **Nikinger-Sichtprüfung** der
-sechs Screenshots (`docs/screenshots/p86_block_c_{01..06}_*.png`) — danach
-Push + Deploy `v3.0.2` als Nikinger-Aktion (Hard Rule 9 + P8.6-R Patch-Bump),
-danach **Gate** (Plan §7): `p86_polish_smoke.py` 12 Stationen in Chromium +
-Firefox, fünf Nikinger-Sichtprüfungs-Entscheidungen (V110 §1, V114 §10.1,
-V112 §2.3 [bereits erledigt in Block C], V116 §10.4 [bereits erledigt],
-P8.6-R Versionierung), dann **Step Z** Closeout (Plan §9 füllen, Rotation,
-kein separates Handover-Dokument — P8.6-B).
-
-### 2026-09-12 (Block-C-Sichtung Nikinger — 6 UX-Befund-Kategorien, Partial Closeout vorgeschlagen, kein Deploy, **Plan 2 für P8.6 erforderlich**)
+## Session stopped — 2026-09-12 (Block-C-Sichtung Nikinger — 6 UX-Befund-Kategorien, Partial Closeout vorgeschlagen, kein Deploy, **Plan 2 für P8.6 erforderlich**)
 
 **Nikinger-Sichtung der Screenshots** `docs/screenshots/p86_block_c_{01..06}_*.png`
 am 2026-09-12 (Drei-Bedingungen-Regel, Bedingung 3 — Nikinger-Sichtung der Bilder).

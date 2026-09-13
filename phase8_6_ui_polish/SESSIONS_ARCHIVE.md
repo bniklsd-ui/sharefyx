@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | 2026-09-10 (V-plugin-Sub-Block [vom 2026-09-10 früh, V-plugin-Commit `cd25712`] verbatim aus dem Phase-Head hierher rotiert vor dem V121+V122-Visual-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V121+V22-Visual-Sub-Block, SESSIONS_ARCHIVE jetzt mit acht Sub-Blöcken)
+updated: 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -24,6 +24,206 @@ das Skript auf das Phase-8.5-Muster passt und mit einem `## Session stopped` + m
 
 
 
+
+## Session stopped — 2026-09-12 (Block C ✅ — Struktur-Umbau: Einstellungen oben, Alle Items unten, Karte als rechte Spalte, klickbare Spaces, Ordner-Zähler)
+
+**Auftrag (Nikinger 2026-09-12, aus Block-B-Sub-Block):** „Block C zuerst anfangen,
+dann verifizierst du noch einmal mal. Bevor wir deployen, braucht es drei Sachen:
+alle Code Tests grün, alle Bilder laut dir grün, ich habe über kritische Bilder noch
+mal rüber geschaut." — Block C nach Plan §5 (C1 „Konto"→„Einstellungen", C2 „Alle
+Items" unter den Spaces, C3 Map als rechte Spalte / volle Höhe, C4 Spaces in der
+Übersicht klickbar, C5 Ordner-Zähler clientseitig aus `state.items`) + D3-Nachzug
+(V112-Gegenprobe nach C3). Erst opencode/M3-Code-Touch seit Block B am
+2026-09-11 (3 Tage vorher). **Kein Push + Deploy in dieser Session** — die
+Drei-Bedingungen-Regel gilt für v3.0.2.
+
+**Was in diesem Commit passiert ist (C1 + C2 + C3 + C4 + C5 + D3):**
+
+1. **C1 — „Konto" → „Einstellungen", Reihenfolge im Rail (Plan §5.1).**
+   `#account-button` wandert aus `.rail__account` heraus direkt unter `#home-button`
+   (`app.html` Z. 30-34), Label „Konto" → „Einstellungen" (das Icon `#i-settings`
+   war schon immer ein Zahnrad, der Name hinkte hinterher — N3-Lesart b, Einstellungen
+   oben, Abmelden ans Rail-Ende). `#logout-button` bleibt in `.rail__account` als
+   einziges Kind. Neue Modifikator-Klasse `.rail__action--account` (analog
+   `.rail__home`) statt generischer `.rail__action`-Anpassung — damit Logout-Knopf
+   als einziges Kind weiterhin die volle Breite einnimmt (`flex: 1` bleibt).
+
+2. **C2 — „Alle Items" unter den Spaces (Plan §5.2).**
+   `tree.js :: renderRail()` ruft `renderScopeRow()` jetzt **nach** den
+   `foreign.forEach(renderSpaceNode)` (Z. 299+), nicht mehr davor. Neue
+   `tree__group`-Überschrift „Alles" vor dem Button (analog „Mein Space" /
+   „Verbundene Spaces"), damit der Wechsel nicht ohne Überschrift an den
+   Spaces-Block klebt. `renderScopeRow()`-Kommentar wörtlich erhalten
+   („Lieber keine Zahl als eine unwahre" — der Kommentar erklärt genau den
+   Sonderfall, den C5 gleich für Folder erweitert).
+
+3. **C3 — Map als rechte Spalte, volle Höhe (Plan §5.3).**
+   `.overview` (`app.css` Z. 898+) wird ein zweispaltiges Grid
+   (`grid-template-columns: 1fr 40%; grid-template-rows: auto 1fr; flex: 1;
+   min-height: 0; overflow: hidden`). Direkte Kinder in drei logische Gruppen
+   gefasst: `.overview__head-row` (Header + Legende, `grid-column: 1 / -1`),
+   `.overview__col-left` (Spaces + „Zuletzt benutzt" + Recent, `overflow-y:
+   auto`), `.overview__col-right` (Verknüpfungs-Heading + Graph, `flex: 1`).
+   `.overview__graph` verliert `min-height: 55vh` und `max-width: 960px`
+   (app.css Z. 1008+) — V112-Gegenprobe, „Karte schneidet unten ab" behoben.
+   `@media (max-width: 1280px)` (`app.css` Z. 1859+) kollabiert das Grid auf
+   eine Spalte, Map rutscht unter die Liste.
+
+4. **C3 + V115 — `requestAnimationFrame(resize)` in `loadGraph()`.**
+   `graph.js :: loadGraph()` (Z. 150+) ruft `resize()` jetzt in einem
+   `requestAnimationFrame(...)`-Wrapper, NACHDEM die Knoten/Edges geladen sind —
+   der ResizeObserver feuert zwar beim ersten `observe()` (Spec
+   https://www.w3.org/TR/resize-observer/), aber zu diesem Zeitpunkt ist
+   `.overview__graph` im neuen Grid möglicherweise 0x0 (CSS-Layout noch nicht
+   committed); ohne den RAF würde `seedInitialPositions()` mit der 0x0-Box
+   rechnen. V115 damit belegt: gemessen, dass der ResizeObserver allein beim
+   ersten Mount nicht ausreicht — der Fix ist 8 Zeilen, kein neuer Mechanismus.
+
+5. **C4 — Spaces in der Übersicht klickbar (Plan §5.4).**
+   `.overview__space-row` bekommt ein `<button class="overview__space-open">`
+   (innerhalb der `<li>`), das Name + Kategoriepunkt umschließt — Tastaturfokus +
+   Screenreader-Rolle gratis. `event.stopPropagation()` auf den Counter-Chips
+   bleibt (jetzt tragend: Eltern-Button würde sonst ebenfalls auslösen, mit
+   anderer Semantik). Neue CSS-Klasse `.overview__space-open` mit eigenem
+   Hover aus B1. `activateView()` wird **exportiert** und in `list.js`
+   importiert (V116 — `activateView(name)` statt `navigate(name, "open")`,
+   weil die Zeile den Bucket nicht explizit wählt).
+   `closeEditor().then(proceed => activateView(name))`-Gating eingebaut — wie
+   die Ordner-Buttons in `tree.js` (Phase-8-§9.3 Punkt 1). **Erster echter
+   Bug, der das Skript während des Baus stoppte:** `activateView` war
+   sowohl als `function` (Original) als auch als `export function` (C4) in
+   `tree.js` definiert — `Identifier 'activateView' has already been declared`
+   als `PAGE ERROR`, `overview__spaces` blieb leer. Original-Z. 20-33 entfernt,
+   Page-Error behoben, danach gerendert sauber.
+
+6. **C5 — Ordner-Zähler clientseitig aus `state.items` (Plan §5.5).**
+   `state.js` bekommt `itemsLoaded: {}` — ein einfaches `Object`, das pro Space
+   speichert, ob die Items dieses Spaces schon einmal geladen wurden. Drei Regeln
+   aus §5.5, alle umgesetzt: (1) gezählt wird alles, was der Nutzer im Ordner
+   **sehen** würde, inklusive `archived`; (2) nur direkte Kinder, kein
+   rekursiver Zähler; (3) ohne `itemsLoaded[space.name]` kein Zähler („Lieber
+   keine Zahl als eine unwahre"). `tree.js :: folderButton()` (Z. 156+)
+   bekommt `folderItemCount(spaceName, folderPath)`-Helfer, der nach
+   `item.space` UND `item.folder` filtert; `list.js :: loadItems()` (Z. 475+)
+   setzt `itemsLoaded[space]` (im space-Modus) bzw. `itemsLoaded[item.space]`
+   für jedes Item (im „all"-Modus) und ruft danach `renderRail()` auf, damit
+   die Zähler die frischen Items sehen. `.tree__count` bekommt `margin-left:
+   auto`, damit Eimer + echte Ordner rechtsbündig in ihren Buttons liegen.
+
+7. **C5 Folge: V117-Reset in `activateView()` und `navigateAll()`.**
+   `state.itemsLoaded = {}` wird in beiden Navigation-Funktionen vor
+   `renderRail()` geleert — sonst zeigt das Rail für ein paar ms Counts aus
+   dem falschen Pool (state.items wird erst in `loadItems()` umgeschaltet,
+   renderRail() läuft aber ZUVOR). **Befund während des Self-Smoke:** ohne
+   den Reset zeigte Screenshot 01 für alpha/Notizen den Counter 6 statt 3,
+   weil der vorangegangene globale Modus Items aus beta/gamma mitgezählt
+   hatte. Reset löst das; erste renderRail() zeigt bis zur loadItems-Auflösung
+   leere Folder-Counter, danach sind sie korrekt für den neuen Space.
+
+8. **D3-Nachzug:** die `.overview__graph`-Höhe ist implizit mit C3 verifiziert
+   (Screenshots 01 + 06 zeigen die Karte in voller Spaltenhöhe, Screenshot 06
+   unter 1200px zeigt Karte unter der Liste ohne Abschneiden).
+
+9. **`+3` statische Tests** in `test_static_routes.py`:
+   - `test_rail_order_settings_before_tree_logout_last` — prüft die exakte
+     Reihenfolge der Tags im Markup (home < account < tree < logout).
+   - `test_account_button_says_einstellungen` — Label „Einstellungen" im
+     Button, „Konto" explizit nicht.
+   - `test_overview_graph_has_no_max_width_or_min_height` — regex über alle
+     `.overview__graph`-Blöcke, prüft Abwesenheit von `max-width` und
+     `min-height` (V112-Regressionswächter).
+
+**Selbstprüfung (§0.5):**
+
+- **Tabu-Diff §0.3 leer.** `git diff --stat -- phase1_storage/storage
+  phase4_auth/authserver phase2_mcp/mcpserver phase5_ui/webui/security.py
+  phase5_ui/webui/api.py phase5_ui/webui/serializers.py phase5_ui/webui/permissions.py`
+  liefert nichts. Erlaubte Pfade berührt: `phase5_ui/webui/static/app.{html,css}`,
+  `phase5_ui/webui/static/js/{graph,list,state,tree}.js`, `phase5_ui/tests/
+  test_static_routes.py`, `phase8_6_ui_polish/scripts/p86_block_c_self_check.py`
+  (§0.3 whitelistet alle).
+- **`pytest -q` 970 passed in 111 s.** 21 Tests in `test_static_routes.py`
+  (V107: 967 → **970**, +3 für C1/C3/C5 in Plan §8.2 — die anderen zwei
+  Tests aus der Liste waren in Block A/B).
+- **`node --check` auf alle vier berührten JS-Dateien grün** (tree.js,
+  list.js, graph.js, state.js — keine Syntax-Fehler).
+- **`python phase5_ui/scripts/ui_budget.py` 5/5 im Korridor.** app.css
+  21.1 KB, Bundle app.js+app.css+Font gzip **137.5 KB** von 250 KB (+4.4 KB
+  gegen Block B 133.1 KB, durch C1/C3/C4-CSS-Erweiterungen). Erstaufruf
+  146.7 KB von 400 KB. **`GET /api/v1/overview` 370 ms** — weiter unter dem
+  Step-0-Stand von 863 ms (V108-Befund: 380→370 ms, kein P8.6-Auftrag).
+- **`grep -nE 'rgba\(62,141,243'`** trifft nur die `:root`-Zeilen, die zwei
+  Block-A-Wächter (`test_no_raw_accent_rgba_outside_root`,
+  `test_every_css_var_reference_is_defined`) halten auch C3 sauber.
+- **Service-Touch 0.** sharefyx-mcp **PID 991** über die gesamte Session
+  unverändert (`systemctl show -p MainPID sharefyx-mcp` zu Beginn = 991, am
+  Ende = 991). Eigener Wegwerf auf Port 18773 (PID-Datei, mehrfach
+  cleanup+setup+seed-items+start durchgespielt für frische Datenlage + Reset
+  des `login_attempts`-Rate-Limits; **kein `pkill -f` mit Regex** — alle
+  Starts/Stops über PID-Datei aus `wegwerf_setup_v3ritt.py`).
+- **Größenprüfung:** app.html 33 KB (Wrapper-DIVs für Grid-Layout +0.4 KB),
+  app.css 21.1 KB (+1.3 KB), test_static_routes.py 25.5 KB (+0.1 KB),
+  Phase-Head jetzt **~55 KB** nach Block-B-Rotation (vorher 50 KB, weiter
+  über 40-KB-Softcap, benannt statt versteckt — Vorbild P8-P / Phase 6.5).
+- **Sechs Selbst-Screenshots** unter `docs/screenshots/p86_block_c_{01..06}_*.png`
+  zeigen die visuellen Ziele:
+    - **01_übersicht.png** (1440×900): Rail mit „Einstellungen" oben +
+      „Abmelden" am Ende, „Alle Items" mit „Alles"-Trenner UNTER den Spaces,
+      Karte als rechte Spalte in voller Höhe (V112-Gegenprobe), Spaces mit
+      Counter-Chips und Folder-Zähler im Rail („Offen 5", „Notizen 6",
+      „Archiv 1", „notizen 3", „projekte 5", „backend 4", „frontend 1").
+    - **02_after_space_click.png**: Klick auf Space-Zeile öffnet die
+      Listenansicht des alpha-Space (state.filter Default „open" — V116).
+    - **03_space_hover.png**: Hover über die Space-Zeile (B1 quiet-Selektion,
+      nicht Voll-Füllung — B4-Regression-Check).
+    - **04_alle_items_with_folder_counts.png**: „Alle Items"-Modus aktiv,
+      Liste mit Items aus allen Spaces (Space-Name als Präfix + Punkt),
+      Folder-Counter im Rail (nun mit Summe über alle Spaces: „projekte 7"
+      = 5 alpha + 2 beta).
+    - **05_editor_caution_regression.png**: Editor geöffnet,
+      Archivieren-Knopf in Vorsicht-Farbe (B4-Regression-Check).
+    - **06_karte_unter_liste_1200px.png**: Bei 1200px Breite kollabiert das
+      Grid auf eine Spalte, Map rutscht unter die Liste, kein Abschneiden.
+
+**Was bewusst NICHT in diesem Commit passiert ist:**
+
+- **Kein Push + Deploy.** Die Drei-Bedingungen-Regel des Nikingers („alle
+  Code-Tests grün ✓, alle Bilder laut dir grün ✓, ich habe über kritische
+  Bilder noch mal rüber geschaut ⬜") ist erst zu zwei Dritteln erfüllt. Der
+  Nikinger macht Push + Deploy selbst, sobald er die Screenshots gesichtet
+  hat. Lokaler `main` ist damit **6 Commits voraus** (vor Block B Block A+D
+  + Step V + Step V-plugin + Step V-vision-befund + §5-Konvention, jetzt
+  Block C obendrauf).
+- **Kein Gate-Skript** (Plan §7, `p86_polish_smoke.py` mit 12 Stationen) —
+  folgt nach dem Deploy-Push.
+- **Keine Tests in den anderen Testdateien** — C5 ist rein clientseitig,
+  kein Server-Roundtrip nötig (P8.6-O). Die `test_static_routes.py`-Tests
+  decken Markup + CSS ab; Verhalten wird über den Self-Smoke verifiziert.
+- **Keine `.shell`-Grid-Änderung** (P8.6-O2-Eskalationsregel eingehalten —
+  C3 verändert nur `.overview`, nicht das äußere Layout). Drei-Spalten-
+  Grundraster aus §4.1 bleibt unverändert.
+
+**Hard-Rule-8-Doku-Update im selben Commit:** Phase-Head Modul-Status Zeile 5 ✅
+(Block C), Phase-Head `## Session stopped` neu (Block-B-Sub-Block nach
+`SESSIONS_ARCHIVE.md` rotiert), Frontmatter `updated:`-Pipe,
+`SESSIONS_ARCHIVE.md` mit rotiertem Block-B-Sub-Block + Frontmatter,
+`docs/INDEX.md` (updated-Frontmatter + Phase-8.6-Zeile), `docs/concepts/
+phase8_6_ui_polish_plan.md` §5 als ✅ markiert + Modul-Status-Zeile in der
+Plan-Tabelle, `ROADMAP.md` P8.6-Status auf 🟡, Wurzel-`CLAUDE.md` Current-state-
+Absatz oben ergänzt (mit ausdrücklicher Block-C-Verifikation — drei der drei
+Bedingungen genannt). Alles in einem Commit.
+
+**Commit-Message (geplant):**
+`phase 8.6: Block C -- Einstellungen oben, Alle Items unten, Karte rechts voller Hoehe, klickbare Spaces, Ordner-Zaehler`
+
+**Nächster Schritt (für die nächste Session):** **Nikinger-Sichtprüfung** der
+sechs Screenshots (`docs/screenshots/p86_block_c_{01..06}_*.png`) — danach
+Push + Deploy `v3.0.2` als Nikinger-Aktion (Hard Rule 9 + P8.6-R Patch-Bump),
+danach **Gate** (Plan §7): `p86_polish_smoke.py` 12 Stationen in Chromium +
+Firefox, fünf Nikinger-Sichtprüfungs-Entscheidungen (V110 §1, V114 §10.1,
+V112 §2.3 [bereits erledigt in Block C], V116 §10.4 [bereits erledigt],
+P8.6-R Versionierung), dann **Step Z** Closeout (Plan §9 füllen, Rotation,
+kein separates Handover-Dokument — P8.6-B).
 
 ## Session stopped — 2026-09-11 (Block B ✅ — Selektion vereinheitlicht, Vorsicht-Kategorie)
 
@@ -1009,6 +1209,78 @@ C3-Layout-Umbau voraussetzt — wird mit Block C nachgezogen.
    mit Streich-Vorbehalt):** der vorher lokal angelegte `var rafId = null` wurde auf
    Modulebene (`var activeRafId = null`) gehoben. `runSimulation()` ruft jetzt
    `cancelAnimationFrame(activeRafId)` am Anfang, falls vorhanden, und setzt
+   `activeRafId = null` am Ende jedes Pfads (Animation ausgelaufen **oder**
+   Reduced-Motion-Pfad). Folge: jeder Aufruf von `loadGraphPanel()` (Klick auf
+   Übersicht, Refresh) startet **keine** zweite Simulationsschleife mehr — direkte
+   Ursache für die §2.4-Verschlimmerung beim wiederholten Öffnen behoben. Drei
+   Zeilen Fix, „schon halb da" (`rafId` wurde zugewiesen, aber nie gelesen) — wenn
+   der Nikinger es in der Sichtprüfung anders sieht, ist es die einzige
+   Scope-Erweiterung dieser Phase und wird gestrichen (P8.6-§6.4 wörtlich).
+
+**Selbstprüfung (§0.5):**
+
+- **Tabu-Diff** §0.3 über die gesamte Phase leer.
+- **`pytest -q`** **966 passed in 119 s** — **keine** Test-Änderung in Block D, weil
+  D1/D2/D4 reine `graph.js`-Internas sind: Dedup und Seed sind durch das
+  Vorhandensein des Codes hinreichend belegt (keine API-Änderung, kein UI-Effekt
+  ohne Daten). Zusätzlich verifiziert per `node`-Skript gegen die isolierten
+  Funktionen:
+  - `dedupeEdges()`: 4 Tests (gleiches Paar in umgekehrter Reihenfolge → 1 Kante,
+    `kind` des ersten Treffers gewinnt; drei verschiedene Paare → 3 Kanten;
+    leerer Eingang → leere Ausgabe; verschiedene Knotenpaare mit unterschiedlichen
+    Reihenfolgen → kein falscher Dedup). **4/4 PASS.**
+  - `seedJitter()`: 5 Tests (deterministisch — gleicher Eingang/Ausgang;
+    Range `[-0.5, +0.5]`; verschiedene Salze ergeben verschiedene Werte;
+    ähnliche IDs ergeben unkorrelierte Werte; leerer ID-String kracht nicht).
+    **5/5 PASS.**
+  - Beide Skripte sind unter `/tmp/opencode/` (Scratchpad, **nicht** ins Repo
+    übernommen — Plan §0.5/§0.7 verlangt keinen Test-Commit für
+    intern-funktionale Korrektheit, wenn die Funktion selbst klein ist und
+    `node --check` bereits die Syntax deckt).
+- **`node --check`** auf `graph.js`: OK (P8.6-D4 hat `activeRafId`-Modul-Variable
+  + `cancelAnimationFrame`-Aufruf hinzugefügt, beide syntaktisch sauber).
+- **`ui_budget.py`** **5/5 im Zielkorridor** (V97-Baseline gehalten): `graph.js`
+  wuchs von 7,9 KB auf 8,4 KB (+0,5 KB durch `dedupeEdges`/`seedJitter`/
+  `cancelAnimationFrame`-Logik + Kommentare), `app.js+app.css+Font` gzip weiterhin
+  **130,4 KB** (innerhalb des 250-KB-Ziels).
+- **Größenprüfung:** `phase5_ui/webui/static/js/graph.js` jetzt 8,4 KB (vorher
+  7,9 KB, +0,5 KB).
+- **Service-Touch 0** — sharefyx-mcp (PID 991) **nicht** angefasst, keine
+  `systemctl`-Aufrufe, kein Pfad auf den echten `DATA_ROOT`/Keyring.
+
+**Was bewusst NICHT in diesem Commit passiert ist:**
+
+- **Kein D3** (`.overview__graph`-Höhe / V112-Gegenprobe) — der Counterpart von
+  C3 (Map als rechte Spalte, volle Höhe). C3 ist Block C, D3 wartet auf C3.
+  Modul-Status Z. 6 notiert das: `✅ (D1, D2, D4) · 🟡 (D3)`.
+- **Keine Phase-8.6-Block-B/C-Code-Touches** — separate Commits nach Plan §4/§5.
+- **Keine `pytest`-Tests** für D1/D2/D4 (siehe oben — interne Helfer,
+  Vorhandensein genügt; die `node`-Skripte leben unter `/tmp/opencode/`).
+- **Keine Schritte 1–3 der Aktionsliste** (Ollama/MCP-Wrapper/V119-Smoke) —
+  bleiben Nikinger-/Proxmox-abhängig.
+- **Kein `pkill -f`**, **kein `sudo systemctl`**, **kein Push** ohne Nikinger-
+  Anweisung.
+
+**Hard-Rule-8-Doku-Update im selben Commit:** Phase-Head Modul-Status Zeile 6
+`⬜`→`✅ (D1, D2, D4) · 🟡 (D3, haengt an Block C)`; Phase-Head Session-Block (Rotation:
+vorheriger Block-A-Sub-Block verbatim nach `SESSIONS_ARCHIVE.md`); Frontmatter
+`updated:`-Pipe; `SESSIONS_ARCHIVE.md` Frontmatter `updated:`.
+
+**Commit-Message (geplant):**
+`phase 8.6: Block D -- V102-Dedup, FNV-1a-Layout-Seed, cancelAnimationFrame in runSimulation`
+
+**Nächster Schritt (für diese oder nächste Session):**
+1. **Block B** nach Plan §4 (B1 Hover-Vereinheitlichung, B2 Ordner/Tags/Buckets,
+   B3 Einstellungsmenü-Navigation, B4 Sweep mit `action--caution`-Klasse an
+   Abmelden + Archivieren, B5 eine Radius-Änderung an `.link-picker-results`).
+   Hinzu kommt `test_caution_class_only_on_logout_and_archive` als statischer
+   Test (P8.6-B4).
+2. **Block C** nach Plan §5 (Struktur-Umbau: Konto→Einstellungen, Alle Items unter
+   Spaces, Map als rechte Spalte / volle Höhe, klickbare Spaces, Ordner-Zähler).
+   Drei weitere statische Tests.
+3. Erst nach A/B/C/D: **D3 nachziehen** (V112-Gegenprobe nach C3-Umbau),
+   dann Gate (§7) mit Wegwerf-Instanz + Nikinger-Sichtprüfung + Deploy `v3.0.2`.
+
 ## Session stopped
 
 ### 2026-09-10 (V121+V122 ✅ — Visuelle Verifikation Block A + D gegen das live-deployte v3.0.1 via Wegwerf-Instanz + qwen3-vl:8b; Tabu-Diff §0.3 leer, pytest 966 unverändert, Service-Touch 0)

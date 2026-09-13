@@ -1,0 +1,191 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080" font-family="'DejaVu Sans','Segoe UI',Helvetica,Arial,sans-serif">
+
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a6b7d"/>
+    </marker>
+    <marker id="arG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2f7a4d"/>
+    </marker>
+    <marker id="arR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b03030"/>
+    </marker>
+  </defs>
+
+  <rect width="1080" height="1080" fill="#f7f8fa"/>
+
+  <!-- ================= Kopf ================= -->
+  <rect x="0" y="0" width="1080" height="86" fill="#1d2b3a"/>
+  <text x="36" y="34" font-size="19" font-weight="700" fill="#ffffff">Phase 8.6 — UI-Politur: Selektions-Welle + Layout</text>
+  <text x="36" y="56" font-size="12" fill="#9db2c6">Sharefyx · phase8_6_ui_polish/ · gebaut und getestet, <tspan font-weight="700" fill="#e8b4b4">nicht ausgeliefert</tspan> · live bleibt v3.0.1 · 2026-09-13</text>
+  <text x="36" y="74" font-size="11" fill="#7f94a8">origin/main@2a93e67 · 3 Commits ungepusht · Plan: docs/concepts/phase8_6_ui_polish_plan.md</text>
+  <rect x="792" y="18" width="252" height="50" rx="10" fill="#8a3535"/>
+  <text x="918" y="39" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">PARTIAL CLOSEOUT</text>
+  <text x="918" y="57" font-size="10" fill="#f0cfcf" text-anchor="middle">6 von 8 Steps ✅ · Deploy blockiert · 9 Befunde</text>
+
+  <!-- ================= Mission ================= -->
+  <rect x="36" y="102" width="1008" height="76" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="126" font-size="13" font-weight="700" fill="#1d2b3a">Mission: Ein Selektions-Design für alles Klickbare, drei benannte Layer, der Übersichts-Umbau, drei Graph-Fixes — und v3.0.2 live.</text>
+  <text x="56" y="148" font-size="12" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">A</tspan> Token-Fundament · <tspan font-weight="700" fill="#1d2b3a">B</tspan> Selektion vereinheitlichen · <tspan font-weight="700" fill="#1d2b3a">C</tspan> Struktur-Umbau · <tspan font-weight="700" fill="#1d2b3a">D</tspan> Graph-Fixes · <tspan font-weight="700" fill="#1d2b3a">Gate</tspan> Smoke + Sichtprüfung · <tspan font-weight="700" fill="#1d2b3a">Z</tspan> Closeout</text>
+  <text x="56" y="169" font-size="12" fill="#b03030"><tspan font-weight="700">Der letzte Satz ist nicht eingetreten.</tspan> Alles bis Block C ist gebaut; die Sichtprüfung vor dem Deploy hat die Phase angehalten statt sie abzunehmen.</text>
+
+  <!-- ================= Flussdiagramm ================= -->
+  <rect x="36" y="192" width="1008" height="374" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="216" font-size="15" font-weight="700" fill="#1d2b3a">Reihenfolge 0 → V → A → B → D → C → Gate → Z   <tspan font-size="11" font-weight="400" fill="#6b7b8c">(C und D dürfen tauschen, A vor B ist zwingend — P8.6-U)</tspan></text>
+
+  <!-- Reihe 1 -->
+  <rect x="60" y="230" width="220" height="118" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="170" y="251" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">Step 0 — Haushalt</text>
+  <text x="76" y="273" font-size="10.5" fill="#4a5a6b">6 kaputte Doku-Links, 4 L1-Cards</text>
+  <text x="76" y="290" font-size="10.5" fill="#4a5a6b">INDEX auf ≤ 38 KB komprimiert</text>
+  <text x="76" y="307" font-size="10.5" fill="#4a5a6b">2 Code-Defekte gefunden, nicht</text>
+  <text x="76" y="324" font-size="10.5" fill="#4a5a6b">gefixt (Befund ≠ Reparatur)</text>
+  <text x="170" y="341" font-size="10.5" fill="#2f7a4d" text-anchor="middle" font-weight="700">Baselines V97 + V107 gemessen</text>
+
+  <rect x="308" y="230" width="220" height="118" rx="8" fill="#fdf6ea" stroke="#d4ab5a" stroke-width="1.6"/>
+  <text x="418" y="251" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">Step V — Vision lokal</text>
+  <text x="324" y="273" font-size="10.5" fill="#4a5a6b">Proxmox-Migration, Ollama 0.34.0</text>
+  <text x="324" y="290" font-size="10.5" fill="#4a5a6b">qwen3-vl:8b (nicht internvl2.5 —</text>
+  <text x="324" y="307" font-size="10.5" fill="#4a5a6b">existiert nicht, Recherchefehler)</text>
+  <text x="324" y="324" font-size="10.5" fill="#b03030">Plugin installiert → zurückgebaut</text>
+  <text x="418" y="341" font-size="10.5" fill="#a06a20" text-anchor="middle" font-weight="700">Plugin war der Defekt</text>
+
+  <rect x="556" y="230" width="220" height="118" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="666" y="251" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">Block A — Fundament</text>
+  <text x="572" y="273" font-size="10.5" fill="#4a5a6b">Radiogruppe zurück auf &lt;select&gt;</text>
+  <text x="572" y="290" font-size="10.5" fill="#4a5a6b">6 neue Tokens, 5 rohe rgba() weg</text>
+  <text x="572" y="307" font-size="10.5" fill="#4a5a6b">--border-soft war undefiniert</text>
+  <text x="572" y="324" font-size="10.5" fill="#4a5a6b">Konvention v3: neu „Vorsicht"</text>
+  <text x="666" y="341" font-size="10.5" fill="#2f7a4d" text-anchor="middle" font-weight="700">964 → 966 pytest</text>
+
+  <rect x="804" y="230" width="220" height="118" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="914" y="251" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">Block B — Selektion</text>
+  <text x="820" y="273" font-size="10.5" fill="#4a5a6b">Eine Hover-Regel statt drei</text>
+  <text x="820" y="290" font-size="10.5" fill="#4a5a6b">Flickenteppich-Fassungen</text>
+  <text x="820" y="307" font-size="10.5" fill="#4a5a6b">.account-nav statt Knopf-Plastik</text>
+  <text x="820" y="324" font-size="10.5" fill="#4a5a6b">.action--caution: genau 2 Träger</text>
+  <text x="914" y="341" font-size="10.5" fill="#2f7a4d" text-anchor="middle" font-weight="700">966 → 967 pytest</text>
+
+  <line x1="280" y1="289" x2="308" y2="289" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <line x1="528" y1="289" x2="556" y2="289" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <line x1="776" y1="289" x2="804" y2="289" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <polyline points="914,348 914,362 170,362 170,376" fill="none" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <!-- Reihe 2 -->
+  <rect x="60" y="378" width="220" height="118" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="170" y="399" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">Block D — Graph</text>
+  <text x="76" y="421" font-size="10.5" fill="#4a5a6b">D1 Zwillingskante dedupliziert</text>
+  <text x="76" y="438" font-size="10.5" fill="#4a5a6b">D2 FNV-1a-Seed statt Math.random</text>
+  <text x="76" y="455" font-size="10.5" fill="#4a5a6b">D4 cancelAnimationFrame — die</text>
+  <text x="76" y="472" font-size="10.5" fill="#4a5a6b">einzige Scope-Erweiterung</text>
+  <text x="170" y="489" font-size="10.5" fill="#2f7a4d" text-anchor="middle" font-weight="700">V102 frontend, kein Contract</text>
+
+  <rect x="308" y="378" width="220" height="118" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="418" y="399" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">Block C — Struktur</text>
+  <text x="324" y="421" font-size="10.5" fill="#4a5a6b">„Konto" → „Einstellungen", oben</text>
+  <text x="324" y="438" font-size="10.5" fill="#4a5a6b">„Alle Items" unter die Spaces</text>
+  <text x="324" y="455" font-size="10.5" fill="#4a5a6b">.overview wird 1fr/40%-Grid</text>
+  <text x="324" y="472" font-size="10.5" fill="#4a5a6b">Spaces klickbar, Ordner-Zähler</text>
+  <text x="418" y="489" font-size="10.5" fill="#2f7a4d" text-anchor="middle" font-weight="700">967 → 970 pytest · 6 Bilder</text>
+
+  <rect x="556" y="378" width="220" height="118" rx="8" fill="#fbecec" stroke="#d99b9b" stroke-width="1.6"/>
+  <text x="666" y="399" font-size="13" font-weight="700" fill="#b03030" text-anchor="middle">Gate — angehalten</text>
+  <text x="572" y="421" font-size="10.5" fill="#4a5a6b">p86_polish_smoke.py mit 12</text>
+  <text x="572" y="438" font-size="10.5" fill="#4a5a6b">Stationen nie geschrieben —</text>
+  <text x="572" y="455" font-size="10.5" fill="#4a5a6b">sollte nach dem Push folgen</text>
+  <text x="572" y="472" font-size="10.5" fill="#4a5a6b">Sichtprüfung lief: Ergebnis Stopp</text>
+  <text x="666" y="489" font-size="10.5" fill="#b03030" text-anchor="middle" font-weight="700">Badge steht auf v3.0.1</text>
+
+  <rect x="804" y="378" width="220" height="118" rx="8" fill="#f2f5f8" stroke="#a8b8c8" stroke-width="1.6"/>
+  <text x="914" y="399" font-size="13" font-weight="700" fill="#1d2b3a" text-anchor="middle">Step Z — offen</text>
+  <text x="820" y="421" font-size="10.5" fill="#4a5a6b">Plan §9 bleibt bewusst leer —</text>
+  <text x="820" y="438" font-size="10.5" fill="#4a5a6b">er ist der kanonische Abschluss,</text>
+  <text x="820" y="455" font-size="10.5" fill="#4a5a6b">und die Phase ist nicht zu</text>
+  <text x="820" y="472" font-size="10.5" fill="#4a5a6b">ROADMAP + Wurzel-Head: laufend</text>
+  <text x="914" y="489" font-size="10.5" fill="#6b7b8c" text-anchor="middle" font-weight="700">dieses Blatt ist der Teil-Stand</text>
+
+  <line x1="280" y1="437" x2="308" y2="437" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <line x1="528" y1="437" x2="556" y2="437" stroke="#2f7a4d" stroke-width="2" marker-end="url(#arG)"/>
+  <text x="542" y="429" font-size="9" fill="#2f7a4d" text-anchor="middle" font-weight="700">970</text>
+  <line x1="776" y1="437" x2="804" y2="437" stroke="#b03030" stroke-width="2" marker-end="url(#arR)"/>
+
+  <!-- Rote Rueckkopplung -->
+  <rect x="60" y="510" width="964" height="44" rx="7" fill="#fbecec" stroke="#d99b9b"/>
+  <text x="76" y="530" font-size="11.5" fill="#b03030"><tspan font-weight="700">Sichtprüfung 2026-09-12 (Nikinger, Bedingung 3):</tspan> 9 UX-Befunde statt einer Abnahme — Befund 9 sogar auf der Produktion reproduziert.</text>
+  <text x="76" y="547" font-size="11.5" fill="#4a5a6b">Folge: kein Push, kein Deploy, kein <tspan font-weight="700" fill="#1d2b3a">v3.0.2</tspan>. Die Phase verlangt einen <tspan font-weight="700" fill="#1d2b3a">zweiten Plan</tspan> — innerhalb von P8.6, nicht als P8.7 (die Nummer gibt es nicht).</text>
+
+  <!-- ================= Mechanismus links ================= -->
+  <rect x="36" y="580" width="496" height="214" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="604" font-size="13.5" font-weight="700" fill="#1d2b3a">Warum der Deploy steht: drei Bedingungen, zwei erfüllt</text>
+  <text x="56" y="626" font-size="11" fill="#4a5a6b">Nikinger-Regel vom 2026-09-12, wörtlich: „alle Code-Tests grün, alle Bilder</text>
+  <text x="56" y="642" font-size="11" fill="#4a5a6b">laut dir grün, ich habe über kritische Bilder noch mal rüber geschaut."</text>
+
+  <rect x="56" y="654" width="140" height="46" rx="6" fill="#eaf4ee" stroke="#8fb59a"/>
+  <text x="126" y="672" font-size="11" font-weight="700" fill="#1d2b3a" text-anchor="middle">1 · Tests ✅</text>
+  <text x="126" y="690" font-size="10" fill="#4a5a6b" text-anchor="middle">970 grün, Tabu-Diff leer</text>
+
+  <rect x="208" y="654" width="140" height="46" rx="6" fill="#eaf4ee" stroke="#8fb59a"/>
+  <text x="278" y="672" font-size="11" font-weight="700" fill="#1d2b3a" text-anchor="middle">2 · Bilder ✅</text>
+  <text x="278" y="690" font-size="10" fill="#4a5a6b" text-anchor="middle">6 Screenshots, Agent-Urteil</text>
+
+  <rect x="360" y="654" width="140" height="46" rx="6" fill="#fbecec" stroke="#d99b9b"/>
+  <text x="430" y="672" font-size="11" font-weight="700" fill="#b03030" text-anchor="middle">3 · Sichtung ✗</text>
+  <text x="430" y="690" font-size="10" fill="#4a5a6b" text-anchor="middle">9 Befunde statt Freigabe</text>
+
+  <line x1="196" y1="677" x2="208" y2="677" stroke="#2f7a4d" stroke-width="1.6" marker-end="url(#arG)"/>
+  <line x1="348" y1="677" x2="360" y2="677" stroke="#b03030" stroke-width="1.6" marker-end="url(#arR)"/>
+
+  <rect x="56" y="712" width="444" height="30" rx="6" fill="#f2f5f8" stroke="#a8b8c8"/>
+  <text x="278" y="731" font-size="10.5" fill="#1d2b3a" text-anchor="middle" font-weight="700">Bedingung 3 ist Menschensache — §2 der Sichtprüfungs-Konvention</text>
+
+  <text x="56" y="761" font-size="10.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">Der Agent zertifiziert nicht selbst, dass etwas schöner aussieht.</tspan></text>
+  <text x="56" y="777" font-size="10.5" fill="#4a5a6b">Die Regel hat hier funktioniert statt zu bremsen: sie hat neun Defekte</text>
+  <text x="56" y="789" font-size="10.5" fill="#4a5a6b">vor dem Nutzer abgefangen.</text>
+
+  <!-- ================= Mechanismus rechts ================= -->
+  <rect x="548" y="580" width="496" height="214" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="568" y="604" font-size="13.5" font-weight="700" fill="#1d2b3a">Wo die 9 Befunde den Plan treffen — nicht nur das CSS</text>
+  <text x="568" y="624" font-size="11" fill="#4a5a6b">Drei Befunde sind keine Politur-Aufgaben, sondern Fragen an gelockte Entscheidungen.</text>
+
+  <rect x="568" y="634" width="456" height="38" rx="6" fill="#fbecec" stroke="#d99b9b"/>
+  <text x="580" y="650" font-size="10.5" fill="#b03030"><tspan font-weight="700">Befund 5</tspan> (Layout-Reorg) löst <tspan font-weight="700">P8.6-O2</tspan> aus: .shell-Grid, alle drei</text>
+  <text x="580" y="665" font-size="10.5" fill="#b03030">Breiten gleichzeitig. Architektur-Schnitt, keine Politur → eskalieren.</text>
+
+  <rect x="568" y="678" width="456" height="38" rx="6" fill="#fdf6ea" stroke="#d4ab5a"/>
+  <text x="580" y="694" font-size="10.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">Befund 7</tspan> (Einstellungen nach unten) <tspan font-weight="700" fill="#1d2b3a">kehrt C1 um</tspan> — N3-Lesart b war</text>
+  <text x="580" y="709" font-size="10.5" fill="#4a5a6b">eine beantwortete Nikinger-Frage, keine offene Stelle.</text>
+
+  <rect x="568" y="722" width="456" height="38" rx="6" fill="#fdf6ea" stroke="#d4ab5a"/>
+  <text x="580" y="738" font-size="10.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">Befund 1 + 8</tspan> (Grautöne) haben eine Wurzel: <tspan font-weight="700" fill="#1d2b3a">P8.6-E</tspan> hielt --bg-void</text>
+  <text x="580" y="753" font-size="10.5" fill="#4a5a6b">bewusst auf drei Stellen. Plan 2 weitet den Lock oder ersetzt ihn.</text>
+
+  <text x="568" y="780" font-size="10.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">P8.6-R (v3.0.2):</tspan> Befund 5 ändert die Informationsarchitektur — <tspan fill="#b03030" font-weight="700">Nikinger-Call.</tspan></text>
+
+  <!-- ================= VERIFY-Bilanz ================= -->
+  <rect x="36" y="806" width="1008" height="106" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="830" font-size="14.5" font-weight="700" fill="#1d2b3a">[VERIFY]-Bilanz — 14 geschlossen, 5 offen, und warum die offenen offen bleiben mussten</text>
+  <rect x="56" y="840" width="310" height="60" rx="6" fill="#eaf4ee" stroke="#8fb59a"/>
+  <text x="72" y="859" font-size="11.5" font-weight="700" fill="#1d2b3a">14 geschlossen ✅</text>
+  <text x="72" y="876" font-size="10.5" fill="#4a5a6b">V97 V106 V107 V108 · V109 V111 (A) · V113 (B)</text>
+  <text x="72" y="892" font-size="10.5" fill="#4a5a6b">V112 V115 V116 V117 (C) · V119 V121 V122 (Step V)</text>
+  <rect x="384" y="840" width="310" height="60" rx="6" fill="#fbecec" stroke="#d99b9b"/>
+  <text x="400" y="859" font-size="11.5" font-weight="700" fill="#b03030">5 offen — vier davon am Gate/Deploy</text>
+  <text x="400" y="876" font-size="10.5" fill="#4a5a6b">V110 V114 V118 warteten auf die Sichtprüfung,</text>
+  <text x="400" y="892" font-size="10.5" fill="#4a5a6b">die Befunde lieferte · V103 Deploy · V120 extern</text>
+  <rect x="712" y="840" width="312" height="60" rx="6" fill="#e8eef5" stroke="#7f9ab5"/>
+  <text x="728" y="859" font-size="11.5" font-weight="700" fill="#1d2b3a">V108 aufgelöst, aber keine Regression</text>
+  <text x="728" y="876" font-size="10.5" fill="#4a5a6b">863 ms war ein Ausreißer des alten Mini-PCs;</text>
+  <text x="728" y="892" font-size="10.5" fill="#4a5a6b">nach der Migration 365 / 370 / 380 ms gemessen</text>
+
+  <!-- ================= Was Plan 2 erbt ================= -->
+  <rect x="36" y="924" width="1008" height="82" rx="8" fill="#ffffff" stroke="#d99b9b"/>
+  <text x="56" y="948" font-size="14.5" font-weight="700" fill="#b03030">Was der zweite P8.6-Plan erbt — benannt, nicht stillgelegt</text>
+  <text x="56" y="971" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">Neun UX-Befunde</tspan> wörtlich im Phase-Head §Session stopped (2026-09-12) und in der Commit-Message bc2aa9f — dort nachlesen, nicht hier.</text>
+  <text x="56" y="992" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">Drei Commits ungepusht</tspan> · <tspan font-weight="700" fill="#1d2b3a">kein Gate-Skript</tspan> · <tspan font-weight="700" fill="#1d2b3a">docs/INDEX.md</tspan> heute auf 38,8 KB gestrafft, eigene Rotationsregel bleibt P9-Kandidat.</text>
+
+  <!-- ================= Fuss ================= -->
+  <text x="36" y="1032" font-size="11" fill="#6b7b8c">970 pytest grün (V107: 964 → 970) · ui_budget 5/5, Bundle 137,5 KB von 250 KB · Tabu-Diff leer · keine neunte P1-Contract-Öffnung · Service-Touch 0, PID 991</text>
+  <text x="36" y="1051" font-size="11" fill="#6b7b8c">Plan: docs/concepts/phase8_6_ui_polish_plan.md (§9 bewusst leer) · Handover: docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md · Head: phase8_6_ui_polish/CLAUDE.md</text>
+  <text x="36" y="1070" font-size="10.5" fill="#8a97a5">Diese Grafik dokumentiert einen Teil-Stand. Sie wird ersetzt, wenn Plan 2 die Phase abschließt — ROADMAP und Wurzel-Head stehen bis dahin auf „laufend".</text>
+
+</svg>
