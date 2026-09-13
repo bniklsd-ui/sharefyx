@@ -17,9 +17,10 @@ updated: 2026-09-13
 # Phase 8.6 — Partial-Closeout-Handover (P8.6 Plan 1 → P8.6 Plan 2)
 
 > **Das ist kein Phasenabschluss.** Phase 8.6 ist **nicht ausgeliefert**: Badge steht auf
-> `v3.0.1`, `origin/main` steht auf `2a93e67`, lokal liegen **drei ungepushte Commits**
-> (`90c72e2` Block C, `bc2aa9f` Partial Closeout, plus der Commit, der dieses Dokument
-> mitbringt). Sechs von acht Steps sind ✅, **Gate und Step Z sind ⬜**. Der Code ist gebaut und getestet — die Nikinger-Sichtprüfung am
+> `v3.0.1`, `origin/main` steht auf `2a93e67`, **alle Commits ab `90c72e2` sind ungepusht**.
+> Live läuft `6f19a8f` — der **P8.5**-Release vom 2026-09-05; von Phase 8.6 ist **nichts**
+> ausgeliefert, auch Block A und D nicht (§4.6, am Server gemessen). Sechs von acht Steps
+> sind ✅, **Gate und Step Z sind ⬜**. Der Code ist gebaut und getestet — die Nikinger-Sichtprüfung am
 > 2026-09-12 hat ihn nicht abgenommen, sondern **neun UX-Befunde** zurückgegeben.
 
 > **Warum dieses Dokument trotz P8.6-B existiert.** Der Lock sagt „ein Dokument pro Phase,
@@ -93,7 +94,7 @@ Closeout-Session **maschinell** nachgeprüft wurde, steht hier; alles andere ist
 
 | Zeile | Prüfung | Ergebnis |
 |---|---|---|
-| P8.6-4 | `docs/INDEX.md` ≤ 38 KB nach allen neuen Zeilen der Phase | **❌ verletzt** — 40.870 B vor dieser Session. Siehe §7 |
+| P8.6-4 | `docs/INDEX.md` ≤ 38 KB nach allen neuen Zeilen der Phase | ✅ **jetzt erfüllt, 38.866 B** — war bei Sessionbeginn mit 40.870 B **verletzt**, in dieser Session behoben. Hergang: §7 |
 | P8.6-6 | `rgba(62,141,243` nur noch in `:root` | ✅ 6 Treffer, alle `:root` bzw. Erklärungskommentar |
 | P8.6-7 | `--border-soft` kommt nicht mehr vor | ✅ nur noch als historische Notiz im Kommentar (`app.css:887`) |
 | P8.6-14 | `.btn:hover`/`.btn-primary:hover` ohne Hex-Verläufe | ✅ `color-mix()` auf Tokens |
@@ -151,6 +152,42 @@ nie die des Ausführenden — **Plan 2 legt die Frage vor, entscheidet sie nicht
 **Befund 2 ist zuerst eine Messfrage**, keine Bauaufgabe: `.account-nav` wurde in Block B
 eingeführt und der Screenshot zeigt die Knöpfe nicht — ob sie fehlen, unsichtbar sind oder
 außerhalb des Viewports liegen, ist ungeklärt.
+
+
+### 4.5 Die drei Nikinger-Entscheidungen vom 2026-09-13
+
+| # | Frage | Entscheidung |
+|---|---|---|
+| **(a)** | `v3.0.2` oder `v3.1.0` nach Befund 5? | **`v3.0.2`.** P8.6-R ist damit **bestätigt**, nicht überstimmt — der Lock bleibt wie geschrieben stehen. Plan 2 braucht die Frage nicht erneut zu öffnen; ein Minor-Bump wäre eine neue Nikinger-Entscheidung, keine Ableitung aus Befund 5. |
+| **(b)** | Sammel-Push nach Plan 2 oder Block C einzeln? | **Block C geht einzeln raus.** Die alte Schuld wird nicht bis nach Plan 2 angestaut. Siehe die Einschränkung unten — sie betrifft den Deploy, nicht den Push. |
+| **(c)** | Ein-Block-Regel für die Wurzel-`CLAUDE.md`? | **Verworfen, auf Empfehlung.** Der Nikinger hatte zugestimmt „es sei denn du empfiehlst dagegen"; die Messung riet ab: 69 % der Datei steckten in der `updated:`-Frontmatter-Kette, nicht in der Current-state-Sektion. Die Kette ist rotiert, die Sektion blieb unverändert. |
+
+### 4.6 Wichtig für (b): von Phase 8.6 ist nichts live
+
+Am 2026-09-13 am Server gemessen, nicht aus der Doku übernommen:
+
+- `/opt/sharefyx/current` → `releases/20260905T140325.378914Z`, dort `git rev-parse HEAD`
+  = **`6f19a8f`** — der **P8.5**-Release vom 2026-09-05.
+- Gegenprobe über sechs Block-Marker (`bg-void`, `select-fill`, `dedupeEdges`, `seedJitter`,
+  `account-nav`, `overview__col-right`): **0 Treffer live, 6 im Repo.**
+- `/opt/sharefyx/releases/` enthält kein Verzeichnis nach dem 2026-09-05, und `deploy.sh:107`
+  legt pro Lauf ein neues an.
+
+**Damit ist die Doku-Behauptung „Block A + D sind gepusht *und deployed*, `health_gate.sh
+--expected-sha=04dee6a` 8/8 grün" falsch.** **Das Werkzeug ist in Ordnung, die Behauptung war es nicht.** `health_gate.sh` liest den Release-SHA in Gate 8 aus `git -C /opt/sharefyx/current rev-parse HEAD` (Z. 134/160) — es kann also gar nicht gegen den Arbeitsbaum durchrutschen. Gegenprobe am 2026-09-13 gefahren: `health_gate.sh --expected-sha=04dee6a` meldet **7 OK und einen FEHLER** („Release-SHA ist 6f19a8f…, erwartet 04dee6a"). Das dokumentierte „8/8 grün gegen `--expected-sha=04dee6a`" ist damit **nie so gelaufen**. Konsequenz für Plan 2: D-c aus Plan §7.4 bleibt ein belastbarer Schritt — man muss ihn nur wirklich ausführen und das Ergebnis übernehmen, statt es zu notieren. Sie steht im Phase-Head (`updated:`-Kette, Step-V-
+Eintrag), im Step-V-Session-Block und in der Wurzel-`CLAUDE.md`. Diese Stellen sind
+historische, verbatim rotierte Blöcke — die Korrektur steht deshalb **datiert daneben**, statt
+sie rückwirkend umzuschreiben.
+
+**Konsequenz für Entscheidung (b):** einen Deploy, der *nur* Block C ausliefert, gibt es nicht.
+`deploy.sh` baut ein Release aus `main` — der nächste Lauf liefert **A + B + C + D zusammen**
+aus. Der **Push** ist davon unberührt und läuft wie entschieden einzeln.
+
+**Was das für Plan 2 bedeutet:** die Befunde 3, 4 und 6 sind von Block C **neu eingeführt** und
+stehen heute *nicht* auf Produktion. Befund 9 dagegen ist schon dort (der Nikinger hat ihn auf
+`v3.0.1` reproduziert). Ein Deploy des aktuellen `main` würde also drei neue kosmetische Defekte
+ausliefern, um die Verbesserungen aus A/B/C/D sichtbar zu machen — **ein Abwägungs-Call, der dem
+Nikinger gehört, und der mit der korrigierten Tatsachenlage neu gestellt werden muss.**
 
 ---
 

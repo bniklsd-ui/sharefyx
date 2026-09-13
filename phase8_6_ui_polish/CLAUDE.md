@@ -156,6 +156,25 @@ geschlossen, V105-Vierte-A3-Probe ✅ 2026-09-08).
 | `app.js + app.css + Font` gzip | **130,1 KB** | < 250 KB |
 | Erstaufruf `/ui/` bis interaktiv | 138,3 KB | < 400 KB |
 
+
+**[2026-09-13, Korrektur — von Phase 8.6 ist nichts live.** Am Server gemessen:
+`/opt/sharefyx/current` → `releases/20260905T140325.378914Z`, dort `git rev-parse HEAD` =
+**`6f19a8f`** (der P8.5-Release vom 2026-09-05); sechs Block-Marker (`bg-void`, `select-fill`,
+`dedupeEdges`, `seedJitter`, `account-nav`, `overview__col-right`) haben **0 Treffer live** und
+6 im Repo; unter `/opt/sharefyx/releases/` liegt kein Verzeichnis nach dem 2026-09-05, und
+`deploy.sh:107` legt pro Lauf ein neues an. **Die `updated:`-Kette und der Step-V-Session-Block
+behaupten „Push + Deploy für Block A + D ausgeführt, `health_gate.sh --expected-sha=04dee6a`
+8/8 grün" — der Push stimmt, der Deploy nicht.** **Das Werkzeug ist in Ordnung, die Behauptung war es nicht.** `health_gate.sh` liest den Release-SHA in Gate 8 aus `git -C /opt/sharefyx/current rev-parse HEAD` (Z. 134/160) — es kann also gar nicht gegen den Arbeitsbaum durchrutschen. Gegenprobe am 2026-09-13 gefahren: `health_gate.sh --expected-sha=04dee6a` meldet **7 OK und einen FEHLER** („Release-SHA ist 6f19a8f…, erwartet 04dee6a"). Das dokumentierte „8/8 grün gegen `--expected-sha=04dee6a`" ist damit **nie so gelaufen**. Konsequenz für Plan 2: D-c aus Plan §7.4 bleibt ein belastbarer Schritt — man muss ihn nur wirklich ausführen und das Ergebnis übernehmen, statt es zu notieren. Die Stellen bleiben verbatim stehen (sie sind
+rotierte Historie), diese Notiz steht datiert daneben. Folge: `deploy.sh` liefert `main` aus,
+einen Deploy „nur Block C" gibt es nicht — der nächste Lauf bringt A+B+C+D zusammen. Der Push
+ist davon unberührt. Volle Herleitung: `docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md` §4.6.**
+
+**[2026-09-13, Nikinger-Entscheidungen]** **(a)** Deploy-Ziel bleibt **`v3.0.2`** — P8.6-R
+bestätigt. **(b)** **Block C geht einzeln raus** (Push), nicht in einem Sammel-Push nach
+Plan 2 — zur Deploy-Einschränkung siehe die Korrektur darüber. **(c)** Die Ein-Block-Regel für
+die Current-state-Sektion der Wurzel-`CLAUDE.md` ist **verworfen**; stattdessen ist dort die
+`updated:`-Kette rotiert (47.094 → 21.037 B). Handover §4.5.
+
 ## Vormerkungen (nicht Teil eines aktuellen Steps)
 
 - **`p8.6 plan 2 (N.6)` — Layout-Reorg + Layering-Konsistenz + schmaler-Viewport + B-Backlog.** Nikinger-Sichtung der Block-C-Screenshots am 2026-09-12 hat sieben UX-Befunde ergeben (siehe Session-Block 2026-09-12 unten: B-Backlog mit Grauton-Inkonsistenz + fehlenden Konto-Dialog-Buttons; C-Befunde Refresh-Karte-Überlappung, kleine Karte, **großer Layout-Reorg-Vorschlag** Spaces + Zuletzt benutzt links + Map rechts + Editor im rechten Slot, Hover-Effekt-Verrutschen, „Alle Items"-Modus ohne Spaces-Übersicht, Rail-Reihenfolge Einstellungen+Abmelden anschließen, Editor-Layering, schmaler-Viewport-Buttons). Eigene Folge-Phase oder Sub-Phase von P8.6 (analog zur P8.6-Planungssession am 2026-09-08 / P8.5-Planungssession am 2026-09-09). Ziel: zweiter Vorabritt + Deploy, der alle sieben Befunde abdeckt. **Vormerkung wird zur aktiven Phase, sobald die nächste Claude-Code-Planungssession startet** — diese Session macht nur die Doku, kein Push + Deploy. **[2026-09-13, Partial Closeout]** Der Teil-Stand liegt jetzt geschrieben vor: `docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md` (§4 ordnet die neun Befunde den Locks zu, die sie öffnen) + `docs/concepts/phase8_6_ui_polish_uebersicht.svg`. Plan 2 startet dort, nicht bei null.
@@ -448,8 +467,9 @@ geschlossen, V105-Vierte-A3-Probe ✅ 2026-09-08).
 
 **Stand 2026-09-13 (Partial Closeout).** Block A/B/C/D sind gebaut und getestet
 (`pytest` 970, `ui_budget` 5/5), **aber nicht ausgeliefert**: `origin/main` steht auf
-`2a93e67`, lokal liegen **zwei** ungepushte Commits (`90c72e2` Block C, `bc2aa9f` Partial
-Closeout), das Badge zeigt `v3.0.1`. Die Nikinger-Sichtung vom 2026-09-12 hat **neun
+`2a93e67`, **alle Commits ab `90c72e2` sind ungepusht**, und live läuft `6f19a8f` — der
+**P8.5**-Release vom 2026-09-05. Von P8.6 ist **nichts** ausgeliefert, auch Block A und D
+nicht (Korrektur oben, Handover §4.6). Die Nikinger-Sichtung vom 2026-09-12 hat **neun
 UX-Befunde** zurückgegeben — sie stehen wörtlich im `## Session stopped`-Block unten.
 
 **Die nächste Session ist eine Claude-Code-Planungssession für P8.6 Plan 2**, analog zur

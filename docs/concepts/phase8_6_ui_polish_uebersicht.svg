@@ -18,7 +18,7 @@
   <rect x="0" y="0" width="1080" height="86" fill="#1d2b3a"/>
   <text x="36" y="34" font-size="19" font-weight="700" fill="#ffffff">Phase 8.6 — UI-Politur: Selektions-Welle + Layout</text>
   <text x="36" y="56" font-size="12" fill="#9db2c6">Sharefyx · phase8_6_ui_polish/ · gebaut und getestet, <tspan font-weight="700" fill="#e8b4b4">nicht ausgeliefert</tspan> · live bleibt v3.0.1 · 2026-09-13</text>
-  <text x="36" y="74" font-size="11" fill="#7f94a8">origin/main@2a93e67 · 3 Commits ungepusht · Plan: docs/concepts/phase8_6_ui_polish_plan.md</text>
+  <text x="36" y="74" font-size="11" fill="#7f94a8">origin/main@2a93e67 · alle Commits ab 90c72e2 ungepusht · live: 6f19a8f (P8.5, 2026-09-05)</text>
   <rect x="792" y="18" width="252" height="50" rx="10" fill="#8a3535"/>
   <text x="918" y="39" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">PARTIAL CLOSEOUT</text>
   <text x="918" y="57" font-size="10" fill="#f0cfcf" text-anchor="middle">6 von 8 Steps ✅ · Deploy blockiert · 9 Befunde</text>
@@ -181,7 +181,7 @@
   <rect x="36" y="924" width="1008" height="82" rx="8" fill="#ffffff" stroke="#d99b9b"/>
   <text x="56" y="948" font-size="14.5" font-weight="700" fill="#b03030">Was der zweite P8.6-Plan erbt — benannt, nicht stillgelegt</text>
   <text x="56" y="971" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">Neun UX-Befunde</tspan> wörtlich im Phase-Head §Session stopped (2026-09-12) und in der Commit-Message bc2aa9f — dort nachlesen, nicht hier.</text>
-  <text x="56" y="992" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">Drei Commits ungepusht</tspan> · <tspan font-weight="700" fill="#1d2b3a">kein Gate-Skript</tspan> · <tspan font-weight="700" fill="#1d2b3a">docs/INDEX.md</tspan> heute auf 38,8 KB gestrafft, eigene Rotationsregel bleibt P9-Kandidat.</text>
+  <text x="56" y="992" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">Von P8.6 ist nichts live</tspan> — auch Block A und D nicht, anders als die Doku bis heute behauptete. Gemessen, nicht uebernommen: Handover §4.6.</text>
 
   <!-- ================= Fuss ================= -->
   <text x="36" y="1032" font-size="11" fill="#6b7b8c">970 pytest grün (V107: 964 → 970) · ui_budget 5/5, Bundle 137,5 KB von 250 KB · Tabu-Diff leer · keine neunte P1-Contract-Öffnung · Service-Touch 0, PID 991</text>
