@@ -173,7 +173,7 @@ ist davon unberührt. Volle Herleitung: `docs/concepts/PHASE8_6_CLOSEOUT_HANDOVE
 bestätigt. **(b)** **Block C geht einzeln raus** (Push), nicht in einem Sammel-Push nach
 Plan 2 — zur Deploy-Einschränkung siehe die Korrektur darüber. **(c)** Die Ein-Block-Regel für
 die Current-state-Sektion der Wurzel-`CLAUDE.md` ist **verworfen**; stattdessen ist dort die
-`updated:`-Kette rotiert (47.094 → 21.037 B). Handover §4.5.
+`updated:`-Kette rotiert (47.094 → 23.007 B). **(d)** **Push ja, Deploy nein** (Nikinger, 2026-09-13, nachdem die Tatsachenlage aus §4.6 vorlag): die Commits gehen nach `origin/main`, **ausgeliefert wird nicht**. Live bleibt damit `6f19a8f` (P8.5). Ein Push ändert nichts an der Produktion — die drei von Block C neu eingeführten Befunde 3/4/6 erreichen keinen Nutzer, bis Plan 2 sie abgearbeitet hat. Handover §4.5.
 
 ## Vormerkungen (nicht Teil eines aktuellen Steps)
 
@@ -467,8 +467,9 @@ die Current-state-Sektion der Wurzel-`CLAUDE.md` ist **verworfen**; stattdessen 
 
 **Stand 2026-09-13 (Partial Closeout).** Block A/B/C/D sind gebaut und getestet
 (`pytest` 970, `ui_budget` 5/5), **aber nicht ausgeliefert**: `origin/main` steht auf
-`2a93e67`, **alle Commits ab `90c72e2` sind ungepusht**, und live läuft `6f19a8f` — der
-**P8.5**-Release vom 2026-09-05. Von P8.6 ist **nichts** ausgeliefert, auch Block A und D
+`2a93e67`; **die Phasen-Commits sind am 2026-09-13 gepusht worden** (Entscheidung d),
+**aber bewusst nicht ausgeliefert** — live läuft weiter `6f19a8f`, der **P8.5**-Release
+vom 2026-09-05. Von P8.6 ist **nichts** ausgeliefert, auch Block A und D
 nicht (Korrektur oben, Handover §4.6). Die Nikinger-Sichtung vom 2026-09-12 hat **neun
 UX-Befunde** zurückgegeben — sie stehen wörtlich im `## Session stopped`-Block unten.
 

@@ -18,7 +18,7 @@
   <rect x="0" y="0" width="1080" height="86" fill="#1d2b3a"/>
   <text x="36" y="34" font-size="19" font-weight="700" fill="#ffffff">Phase 8.6 — UI-Politur: Selektions-Welle + Layout</text>
   <text x="36" y="56" font-size="12" fill="#9db2c6">Sharefyx · phase8_6_ui_polish/ · gebaut und getestet, <tspan font-weight="700" fill="#e8b4b4">nicht ausgeliefert</tspan> · live bleibt v3.0.1 · 2026-09-13</text>
-  <text x="36" y="74" font-size="11" fill="#7f94a8">origin/main@2a93e67 · alle Commits ab 90c72e2 ungepusht · live: 6f19a8f (P8.5, 2026-09-05)</text>
+  <text x="36" y="74" font-size="11" fill="#7f94a8">Phasen-Commits gepusht 2026-09-13 · bewusst NICHT deployt · live: 6f19a8f (P8.5, 2026-09-05)</text>
   <rect x="792" y="18" width="252" height="50" rx="10" fill="#8a3535"/>
   <text x="918" y="39" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">PARTIAL CLOSEOUT</text>
   <text x="918" y="57" font-size="10" fill="#f0cfcf" text-anchor="middle">6 von 8 Steps ✅ · Deploy blockiert · 9 Befunde</text>
@@ -112,7 +112,7 @@
   <!-- Rote Rueckkopplung -->
   <rect x="60" y="510" width="964" height="44" rx="7" fill="#fbecec" stroke="#d99b9b"/>
   <text x="76" y="530" font-size="11.5" fill="#b03030"><tspan font-weight="700">Sichtprüfung 2026-09-12 (Nikinger, Bedingung 3):</tspan> 9 UX-Befunde statt einer Abnahme — Befund 9 sogar auf der Produktion reproduziert.</text>
-  <text x="76" y="547" font-size="11.5" fill="#4a5a6b">Folge: kein Push, kein Deploy, kein <tspan font-weight="700" fill="#1d2b3a">v3.0.2</tspan>. Die Phase verlangt einen <tspan font-weight="700" fill="#1d2b3a">zweiten Plan</tspan> — innerhalb von P8.6, nicht als P8.7 (die Nummer gibt es nicht).</text>
+  <text x="76" y="547" font-size="11.5" fill="#4a5a6b">Folge: kein Deploy, kein <tspan font-weight="700" fill="#1d2b3a">v3.0.2</tspan> (Push am 2026-09-13 nachgeholt). Die Phase verlangt einen <tspan font-weight="700" fill="#1d2b3a">zweiten Plan</tspan> — innerhalb von P8.6, nicht P8.7.</text>
 
   <!-- ================= Mechanismus links ================= -->
   <rect x="36" y="580" width="496" height="214" rx="8" fill="#ffffff" stroke="#d5dce4"/>

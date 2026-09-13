@@ -17,7 +17,8 @@ updated: 2026-09-13
 # Phase 8.6 — Partial-Closeout-Handover (P8.6 Plan 1 → P8.6 Plan 2)
 
 > **Das ist kein Phasenabschluss.** Phase 8.6 ist **nicht ausgeliefert**: Badge steht auf
-> `v3.0.1`, `origin/main` steht auf `2a93e67`, **alle Commits ab `90c72e2` sind ungepusht**.
+> `v3.0.1`. Die Phasen-Commits sind am **2026-09-13 gepusht** (Entscheidung d in §4.5),
+> **aber bewusst nicht ausgeliefert**.
 > Live läuft `6f19a8f` — der **P8.5**-Release vom 2026-09-05; von Phase 8.6 ist **nichts**
 > ausgeliefert, auch Block A und D nicht (§4.6, am Server gemessen). Sechs von acht Steps
 > sind ✅, **Gate und Step Z sind ⬜**. Der Code ist gebaut und getestet — die Nikinger-Sichtprüfung am
@@ -161,6 +162,7 @@ außerhalb des Viewports liegen, ist ungeklärt.
 | **(a)** | `v3.0.2` oder `v3.1.0` nach Befund 5? | **`v3.0.2`.** P8.6-R ist damit **bestätigt**, nicht überstimmt — der Lock bleibt wie geschrieben stehen. Plan 2 braucht die Frage nicht erneut zu öffnen; ein Minor-Bump wäre eine neue Nikinger-Entscheidung, keine Ableitung aus Befund 5. |
 | **(b)** | Sammel-Push nach Plan 2 oder Block C einzeln? | **Block C geht einzeln raus.** Die alte Schuld wird nicht bis nach Plan 2 angestaut. Siehe die Einschränkung unten — sie betrifft den Deploy, nicht den Push. |
 | **(c)** | Ein-Block-Regel für die Wurzel-`CLAUDE.md`? | **Verworfen, auf Empfehlung.** Der Nikinger hatte zugestimmt „es sei denn du empfiehlst dagegen"; die Messung riet ab: 69 % der Datei steckten in der `updated:`-Frontmatter-Kette, nicht in der Current-state-Sektion. Die Kette ist rotiert, die Sektion blieb unverändert. |
+| **(d)** | Push jetzt oder erst nach Plan 2 deployen? | **Push ja, Deploy nein** (2026-09-13, nach Vorlage der korrigierten Tatsachen aus §4.6). Die Commits gehen nach `origin/main`; ausgeliefert wird **nicht**. Live bleibt `6f19a8f`. Der Push ändert nichts an der Produktion — die von Block C neu eingeführten Befunde 3/4/6 erreichen keinen Nutzer, bis Plan 2 sie abgearbeitet hat. |
 
 ### 4.6 Wichtig für (b): von Phase 8.6 ist nichts live
 
