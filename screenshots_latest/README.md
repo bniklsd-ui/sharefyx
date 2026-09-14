@@ -6,7 +6,7 @@ detail: L3 (Pointer-Verzeichnis, keine eigene Inhaltsquelle)
 up: ../phase8_6_ui_polish/CLAUDE.md   # aktive Phase
 down:
   - ../docs/screenshots/                # kanonische Ablage; diese Verzeichnis ist nur Symlink-Komfort
-updated: 2026-09-14 (Phase 8.6 Block G — Block-B-Symlinks wurden ersetzt; Konvention gilt weiterhin, P8.6-AK)
+updated: 2026-09-14 (Phase 8.6 Block H — Block-G-Symlinks wurden ersetzt; Konvention gilt weiterhin, P8.6-AK)
 ---
 # `screenshots_latest/` — Schnellzugriff auf die Screenshots der aktuellen Phase
 
@@ -43,16 +43,15 @@ Ausnahmen, in denen M3 den Dateinamen + Checkkriterium **nicht** nennt:
 - Wenn die Verifikation programmatisch ist (Regex auf gerenderten HTML-Output
   o. ä.) und der Screenshot nur Anhang ist.
 
-## Aktueller Inhalt (Phase 8.6 Block G, Stand 2026-09-14)
+## Aktueller Inhalt (Phase 8.6 Block H, Stand 2026-09-14)
 
 | Dateiname | Original | Checkkriterium |
 |---|---|---|
-| `01_uebersicht.png` | `../docs/screenshots/p86_block_g_01_1440_uebersicht.png` | **`.shell` ist 240/480/1fr, Spaces + Zuletzt benutzt im Listen-Slot (Mitte), Verknüpfungs-Graph hat den Detail-Slot allein (~720 px breit).** Beweis: Befund 5 weg, Befund 4 weg (Karte ist 50 % statt 21 %), Befund 7a weg (`renderOverview()` wird im Listen-Slot gerendert). |
-| `02_space_geoeffnet.png` | `../docs/screenshots/p86_block_g_02_1440_space_geoeffnet.png` | **Nach Klick auf eine Space-Zeile in der Übersicht: die ganze Zeile (inkl. der drei Chip-Counter-Chips „5 Offen / 6 Notizen / 1 Archiv") ist klickbar, der Hover-Fill reicht über die ganze Zeile.** Beweis: Befund 6 weg, P8.6-P wiederhergestellt (G7). |
-| `03_editor_offen.png` | `../docs/screenshots/p86_block_g_03_1440_editor_offen.png` | **Nach Klick auf ein Item: der Editor ersetzt die Karte im Detail-Slot — Kopfdaten + Text-Panel + Anhängen-Zeile sichtbar, Karte weg.** Beweis: G2/G5, ESC-Kette funktioniert (N.8). |
-| `04_editor_nach_esc.png` | `../docs/screenshots/p86_block_g_04_1440_editor_nach_esc.png` | **Nach ESC: Editor weg, Verknüpfungs-Graph ist zurück.** Beweis: N.8 — „ESC bringt die Karte zurück". |
+| `01_rail.png` | `../docs/screenshots/p86_block_h_01_1440_rail.png` | **Bei 1440 px: Rail zeigt unten in `.rail__account` zwei gestapelte Knöpfe — oben „Einstellungen" (Zahnrad, blau), unten „Abmelden" (Logout-Icon, `--caution` rot) als äußerster Knopf im Rail.** Beweis: Befund 7b weg (Umkehr von C1/N3-Lesart b, N.9), P8.6-AE erfüllt. |
+| `02_rail_1200.png` | `../docs/screenshots/p86_block_h_02_1200_rail.png` | **Bei 1200 px: gleiches Layout wie 1440 — Rail 240 px voll sichtbar mit Labels, `.rail__account` mit beiden Knöpfen unten, kein Kollaps.** Beweis: Block H wirkt auch im schmalen Viewport (kein neuer Sonderfall, die Spalten-Anordnung ist der Normalfall in allen Breakpoints nach G-R). |
+| `03_konto_dialog.png` | `../docs/screenshots/p86_block_h_03_1440_konto_dialog.png` | **Konto-Dialog offen bei 1440 px: „Update-Log ansehen" und „Spaces verwalten" tragen eine linke Akzentkante (`2px solid var(--line-strong)`) und ein Chevron-Icon rechts (`#i-chevron-right`, `margin-left: auto`) — sichtbar bedienbar, aber keine `.btn`-Plastik (B3-Kategorie „Navigation" bleibt erhalten).** Beweis: Befund 2 weg, V133 erfüllt (`elementFromPoint` erreichbar — die Knöpfe sind da, sie hatten nur keinen Afford). |
 
-`05_1200_uebersicht.png` und `06_1024_uebersicht.png` sind in `docs/screenshots/p86_block_g_*.png` vorhanden, hier nicht gesymlinkt (Platzhalter-Konvention — vier Hauptscreenshots im Schnellzugriff, alle sechs im Original-Verzeichnis für die Sichtprüfung am Gerät).
+Drei weitere Screenshots (`01_1440_uebersicht`, `02_1440_editor_offen`, `03_1200_uebersicht`, `04_1200_editor_offen`, `05_1024_uebersicht`, `06_1024_editor_offen`) liegen in `docs/screenshots/p86_block_g_r_*.png` für die Sichtprüfung am Gerät — der Block-G-R-Layout-Umbau bleibt unverändert gültig (Block H hat das Layout nicht angefasst, nur den Rail-Inhalt und den Konto-Dialog).
 
 ## Rotation
 

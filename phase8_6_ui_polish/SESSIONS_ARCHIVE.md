@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-14 (**Block G-R erledigt ✅** — Head 82.028→85.760 B, Archiv 138.612→151.336 B. Block-G-Session-Block 159 Z./11.728 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-G-R-Session-Block. **`Phase 8.6` ist nach G-R bei Block 9 von 13 angekommen — Layout/Editor-YAML-Bündigkeit + Layer-Tone-Drift aus der Sichtung behoben, der nächste Block ist H (Rail + Konto-Dialog, Befunde 7b + 2)**) | 2026-09-14 (E2b-Sub-Block [vom 2026-09-14, E2b-Commit `cc3f342`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — sechste Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 5.058 B; Archiv 128.603 → 133.661 B) | 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
+updated: 2026-09-14 (**Block H erledigt ✅** — Head 88.519 B [unverändert nach Rotation], Archiv 151.336→169.569 B. Block-G-R-Session-Block 235 Z./18.073 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-Session-Block. **Phase 8.6 ist nach H bei Block 10 von 13 angekommen — Rail-Umkehr (Befund 7b) + Konto-Dialog-Afford (Befund 2) in einem Schritt behoben, der nächste Block ist J (der pytest-Flake, P8.6-AJ, datierte Tabu-Ausnahme für phase4_auth/authserver/{crypto.py,store.py})**) | 2026-09-14 (**Block G-R erledigt ✅** — Head 82.028→85.760 B, Archiv 138.612→151.336 B. Block-G-Session-Block 159 Z./11.728 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-G-R-Session-Block. **`Phase 8.6` ist nach G-R bei Block 9 von 13 angekommen — Layout/Editor-YAML-Bündigkeit + Layer-Tone-Drift aus der Sichtung behoben, der nächste Block ist H (Rail + Konto-Dialog, Befunde 7b + 2)**) | 2026-09-14 (E2b-Sub-Block [vom 2026-09-14, E2b-Commit `cc3f342`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — sechste Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 5.058 B; Archiv 128.603 → 133.661 B) | 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -24,6 +24,241 @@ das Skript auf das Phase-8.5-Muster passt und mit einem `## Session stopped` + m
 
 
 
+
+## Session stopped — 2026-09-14 (opencode/M3 — **Block G-R erledigt** — Layout-Revision nach Nikinger-Sichtung, vier Befunde in einem Schritt behoben)
+
+**Atomarer Block, ein Commit (Nikinger-Entscheidung 2026-09-14: „Nein, bitte als G-R anhängen", kein
+Force-Push auf `081c432`).** Block G-R nimmt die sechs Rückmeldungen aus der Nikinger-Sichtung
+der sechs Block-G-Screenshots `p86_block_g_{01..06}_*.png` auf und räumt **vier** zusammenhängende
+Befunde in einem Schritt weg: G-R.1 (Breakpoints, Nikinger-Vorgabe „Nav bleibt 240 in beiden
+Breakpoints"), G-R.2 (Map-Leerraum + Layer-Tone-Drift, Befund 1-Fortsetzung mit drei sichtbaren
+Tönen für „Spalten-Hintergrund"), G-R.3 (Editor-YAML bündig zur Suchzeile + sticky Header),
+G-R.4 (Wächter: 4 neue Tests + 1 angepasster). Die Reihenfolge G → G-R ✅ → H → J → Gate ist neu
+(Nikinger-Vorgabe vom 2026-09-14, vorher stand „H → J" als nächste Reihenfolge).
+
+**G-R.1 — Breakpoints (`@media (max-width: 1280px)` → `@media (max-width: 1200px)` + neuer `@media
+(max-width: 1024px)` mit Stapel-Logik).** `app.css:1900-1917` Block-G-Stand wird ersatzlos
+gelöscht. Der 1280-er Block kollabierte die Rail auf 64 px (Icons only, Texte weg) — Nikinger-
+Sichtung 1200-px-Screenshot: „Navigationszeile kracht zusammen" (Befund-Auslöser). Der 1024-er
+Block blendete die Karte via `[data-view]`-Switching aus — Nikinger-Sichtung 1024-px-Screenshot:
+„Map entfernt, ja, aber lieber Übersicht zusammenschieben und ‚nav bar' weiterhin vollständig
+zeigen" (Befund-Auslöser). Neu:
+- **`@media (max-width: 1200px)`**: `.shell { grid-template-columns: 240px 380px 1fr; }`. Rail
+  bleibt 240 px, Liste schrumpft von 480 auf 380 px (Item-Titel + Meta + Move/Share-Buttons passen;
+  gemessen reichten 480 mit ~100 px Luft). `display: none`-Regeln für `.rail__label`/
+  `.rail__brand`/`.tree__group`/`.tree__count`/`.tree__badge` entfallen ersatzlos.
+- **`@media (max-width: 1024px)`**: `.shell { grid-template-columns: 240px 1fr; grid-template-rows:
+  1fr 1fr; }` + `.rail { grid-row: 1 / span 2; }` + `.detail { grid-column: 2; grid-row: 2; }`.
+  Zwei Spalten, zwei Zeilen — Rail spannt beide Zeilen, Liste oben, Detail unten, gestapelt
+  statt weggeblendet. Auto-Placement ohne die explizite `.detail`-Zuweisung würde es in (2,1)
+  setzen (zeilenweise Erstzuweisung), daher die expliziten `grid-row`/`grid-column` auf `.detail`.
+
+**G-R.2 — Map-Leerraum + Layer-Tone-Vereinheitlichung.** `app.css:388-393`: `.detail { background:
+var(--bg); }` neu. Vorher erbt `.detail` von body → `--bg-void = #000`. Drei sichtbare Töne für
+„Spalten-Hintergrund" waren `--bg` (#0B0D10) in `.list`, `--bg-void` (#000) in `.detail`,
+`--surface` (#14181D) in der Karte — der F-Wächter (`test_no_raw_surface_hex_outside_root` +
+`test_meta_panel_is_not_tinted_with_the_warning_colour`) fängt nur rohe Hex außerhalb `:root` und
+die Warn-Tönung auf den drei Meta-Tokens, nicht die Token-Drift **innerhalb** eines Layers.
+Nach G-R.2 hat `.detail` denselben `--bg`-Ton wie `.list`, der schwarze Ring rund um die Karte
+(Folge von `.detail__graph`-Padding + `.detail`-Hintergrund) verschwindet. `app.css:1085-1091`:
+`.detail__graph { padding: calc(var(--space) * 2) calc(var(--space) * 4); }` — oben/unten 16 px
+statt 32 px. Nikinger-Sichtung 1440-px-Screenshot: „die map den Slot oben und unten nicht ganz"
+(Befund-Auslöser). V112-Wächter nach Umzug (`test_detail_graph_has_a_definite_height_chain`)
+bleibt scharf — die Höhenkette `.detail__graph → .overview__graph` ist unverändert.
+
+**G-R.3 — Editor-Header sticky + YAML bündig zur Suchzeile.** `app.css:1312-1326`:
+`.editor__head { position: sticky; top: 0; background: var(--surface-raised); border-bottom:
+1px solid var(--line); z-index: 1; padding: calc(var(--space) * 0.5) calc(var(--space) * 3)
+calc(var(--space) * 1.5); }`. Drei Änderungen auf einmal: (1) `position: sticky; top: 0; z-index:
+1` — Pendant zum `.list__head` aus Step 7b, Editor-Kopf bleibt beim Scrollen sichtbar.
+(2) `background: var(--surface-raised)` + bestehende `border-bottom: 1px solid var(--line)` —
+gleiches visuelles Gewicht wie `.list__head`, beide Spaltenköpfe sehen aus wie aus einem Guss.
+(3) padding-top von 12 px (`var(--space) * 1.5`) auf 4 px (`var(--space) * 0.5`) — die YAML-
+Kopfzeile rückt um 8 px nach oben, schließt bündig mit der Suchzeilen-Unterkante im Listen-
+Slot ab. Nikinger-Vorgabe 2026-09-14: „lasse das obere ende der YAML Kopfzeile bündig abschließen
+mit dem unteren ende der Suchzeile im space". `app.css:1354-1360`: `.panel__head { padding:
+11px calc(var(--space) * 3); }` — vertikales Padding von 6 px auf 11 px erhöht, Item-Row-Höhe
+(8 + 25 + 8 = 41 px) ≈ Panel-Header-Höhe (11 + 19 + 11 = 41 px) für „ziemlich genau so groß
+wie eine item Zeile" (Nikinger-Vorgabe).
+
+**G-R.4 — Wächter (vier neue + einer angepasster).** `phase5_ui/tests/test_static_routes.py`:
+
+- **`test_shell_grid_is_240_480_1fr`** (aus Block G, angepasst): prüft drei Anker statt zwei —
+  Default-Block `240px 480px 1fr` (unverändert), **1200-er-Media-Query** mit `240px 380px 1fr` und
+  Verbot von `64px`, **1024-er-Media-Query** mit `240px 1fr` + `grid-template-rows: 1fr 1fr` mit
+  genau zwei `1fr`. Negative Regression: `@media (max-width: 1280px)` darf nicht mehr vorkommen.
+- **`test_1200_breakpoint_keeps_rail_at_240`** (neu): in der 1200-er-Media-Query darf KEINE
+  `.rail__label { display: none }`-Regel stehen (Rail-Kollaps-Verbot), keine `.rail__home {
+  justify-content: center }` (Rail bleibt linksbündig).
+- **`test_1024_breakpoint_stacks_list_over_detail`** (neu): `.rail { grid-row: 1 / span 2 }` +
+  `.detail { grid-column: 2; grid-row: 2 }`. Negativ: kein `[data-view="list"] .detail
+  { display: none }` und kein `[data-view="detail"] .list { display: none }` mehr.
+- **`test_detail_uses_the_column_background_not_void`** (neu): `.detail` braucht
+  `background: var(--bg)`. Verbot: `.detail` darf nicht `var(--bg-void)` als Hintergrund tragen.
+- **`test_editor_head_is_sticky_with_the_list_head_background`** (neu): `.editor__head` braucht
+  `position: sticky; top: 0; var(--surface-raised); border-bottom; z-index: 1`.
+- **`test_panel_head_height_matches_a_list_row`** (neu): `.panel__head { padding: ... }` muss
+  mit `11px` (oder `11`) anfangen — Item-Row-Höhe ~41 px = Panel-Header-Höhe ~41 px.
+
+**Echter Fund beim Bau (im selben Commit behoben):** `test_overview_grid_and_its_media_query_are_gone`
+aus Block G enthält ein f-string mit `css[m.start():m.end()]`-Slice — beim Reinschreiben der
+neuen Test-Reihenfolge ging die schließende `]` des Slices verloren, das Test-Modul kompilierte
+nicht (`SyntaxError: closing parenthesis '}' does not match opening parenthesis '['`, Z. 1013).
+Behoben: `css[m.start():m.end()]` mit schließender `]` zurück. Selbst-Check (`pytest
+phase5_ui/tests/test_static_routes.py`) hatte das **vor dem Commit** gefangen — wäre sonst in der
+CI gelandet.
+
+**Zweiter Selbst-Check-Fund (im selben Commit behoben):** der Wort-Grenzen-Lookahead in
+`test_1024_breakpoint_stacks_list_over_detail` musste nachgerüstet werden (`\.detail(?![a-zA-Z_-])\s*\{`),
+weil das Compound `.detail__back` denselben Match-Selector-Match wie das bare `.detail` macht
+und sonst den falschen Body liefert. Zweite Iteration: die Kommentar-Beispieltexte (`shell[data-
+view="list"] .detail { display: none }`) aus dem Media-Query-Kommentar entfernt — der Regex
+matchte die Kommentar-Buchstaben und fand drei statt zwei `.detail`-Vorkommen. Drei Iterationen
+insgesamt bis grün.
+
+**Mini-Plan:** `docs/concepts/phase8_6_ui_polish_block_g_r_plan.md` neu (~12 KB) — vollständige
+Beschreibung der vier Fixes, Lock-Liste G-R.1/.2/.3 neu + G-R.4 als Wächter-Bündel, Akzeptanz-
+kriterien und „Was Block G-R NICHT tut" (kein `graph.js`-Touch, kein d3-Layout-Tuning, keine
+Editor-Inhalts-Änderung).
+
+**Selbstprüfung §0.5:** `pytest -q` **981 passed in 248 s** (Baseline 970 + 4 G + 2 F + 5 G-R),
+`ui_budget.py` **5/5 im Korridor** (**143 KB**, +1,6 KB roh gegenüber Block G; app.css 73.593 →
+77.301 B, +3.708 B für die zwei Media-Queries + Sticky-Head + Panel-Padding + die ausführlichen
+G-R-Kommentare). Tabu-Diff §0.3 trivial leer (nur `phase5_ui/webui/static/app.css` und
+`phase5_ui/tests/test_static_routes.py` berührt; `phase1_storage/storage/`,
+`phase4_auth/authserver/`, `phase2_mcp/mcpserver/`, `phase5_ui/webui/{security,api,serializers,
+permissions}.py` alle unangetastet). Kein `pkill -f`, kein `systemctl`. sharefyx-mcp **PID 991**
+nur gelesen.
+
+**Sechs Selbst-Screenshots** `p86_block_g_r_{01..06}_*.png` (111/134/110/131/93/128 KB, drei
+Viewports × zwei Zustände):
+
+- `01` 1440-Übersicht — Layer-Tone vereinheitlicht: `.detail` hat jetzt `--bg` statt
+  `--bg-void`, kein schwarzer Ring rund um die Karte mehr.
+- `02` 1440-Editor-offen — `.editor__head` sticky mit `--surface-raised`-Hintergrund, YAML-
+  Kopfzeile „Kopfdaten YAML-Frontmatter" auf gleicher Höhe wie die Item-Zeilen-„Logging
+  standardisieren" im Listen-Slot.
+- `03` 1200-Übersicht — Rail 240 px mit Labels sichtbar (kein Kollaps), Liste 380 px,
+  Karte ~620 px.
+- `04` 1200-Editor-offen — gleiche sticky-Logik bei mittlerer Breite.
+- `05` 1024-Übersicht — Rail 240 px mit Labels, Liste oben (Spaces + Zuletzt benutzt +
+  Refresh), Karte darunter GESTAPELT — nicht weg.
+- `06` 1024-Editor-offen — Editor ersetzt die Karte im unteren Slot, gestapelter Modus
+  funktioniert.
+
+**Drei Hard-Rule-Checkpoints am Session-Ende:**
+1. **Hard Rule 1** (keine Secrets): keine Credentials im Repo, alles in
+   `/tmp/opencode/sharefyx-wegwerf-v3ritt/`.
+2. **Hard Rule 9** (kein `pkill -f`): Wegwerf-Instanz gestartet mit
+   `phase8_5_picker_release/scripts/wegwerf_setup_v3ritt.py cleanup+setup+seed-items+start`
+   (eigener Port 18773, tmp-`DATA_ROOT`), gestoppt mit `kill $(cat
+   /tmp/opencode/sharefyx-wegwerf-v3ritt/serve.pid)` (PID-Datei). PID 196278 → weg, kein
+   Regex im Cmdline.
+3. **Hard Rule 8** (Commit ⇒ Doku-Update im selben Commit): Modul-Status Z13 ⬜→✅ (Reihenfolge-
+   Anpassung: Block G-R ist zwischen Block G und Block H eingeschoben — G → G-R ✅ → H → J → Gate),
+   dieser Session-Block, Rotation per `scripts/rotate_session_block.sh phase8_6_ui_polish`,
+   Frontmatter `updated:` im Phase-Head (G-R-Eintrag voran), `docs/INDEX.md`-Phase-8.6-Karte,
+   ROADMAP-P8.6-Zeile + Frontmatter, Root-`CLAUDE.md`-Current-State-Absatz,
+   `screenshots_latest/`-Symlinks (P8.6-AK) — alles im selben Commit `081c432 → G-R`.
+
+**Naechster Schritt:** **Block H (Rail + Konto-Dialog, Befunde 7b + 2).** Nikinger-Vorgabe vom
+2026-09-14: nach G-R ist die Reihenfolge **H → J → Gate**, nicht mehr J dazwischen. Plan §5:
+`.rail__account` trägt wieder Einstellungen **und** Abmelden (Abmelden bleibt äußerster Knopf —
+Umkehr von C1/N3-Lesart b, N.9). `.account-nav` bekommt eine Navigations-Anmutung (Befund 2 war
+eine Selbsttäuschung der CSS-Form, nicht eine Knopf-Lücke — die Knöpfe fehlten nie, sie sahen
+nur nach Fließtext aus). `test_rail_order_settings_and_logout_at_the_end` wird umbenannt und
+umgekehrt.
+
+**Nachtrag, 2026-09-14, Nikinger-Sichtung der sechs Screenshots nach Commit `6a43edf` — nicht
+behoben, nur notiert (G-R bleibt trotzdem ✅, das visuelle Ergebnis ist noch im Korridor
+dessen, was G-R versprochen hat; die folgenden Punkte sind das, was die Nikinger-Sichtung
+**darüber hinaus** als nächste Politur-Schicht markiert — sie gehen in den Block H/J/Gate-
+Backlog, nicht in G-R zurück):**
+
+- **`p86_block_g_r_01_1440_uebersicht.png` (1440 Übersicht, Layer-Tone-Vereinheitlichung):**
+  der schwarze Ring rund um die Karte ist **bestätigt weg**. Aber **es bleiben mindestens drei
+  unterscheidbare Töne** im Hauptbereich — Nikinger: „die Farbe hinter der Map und die der
+  Space/item Übersicht ist unterschiedlich". Mein Beschreibung im Chat („drei sichtbare Töne
+  sind jetzt einer") war **zu optimistisch** — `.detail { background: var(--bg) }` vereinheit-
+  licht die Spalte zur Liste, aber der `--surface`-Innenraum der Karte bleibt ein **vierter** Ton,
+  und die `.list__head`-Glasfläche oben ist ein **fünfter**. **Bit-by-bit-Farbvergleich steht
+  aus** — vermutlich Folge: alle `.detail__*`-Flächen auf einen einzigen Ton (entweder
+  `--bg` durchgängig ODER `--surface` durchgängig), nicht die heutige Mischung. Vormerkung
+  für eine eigene Sub-Iteration, vermutlich G-R+1 oder eigener Block.
+
+- **`p86_block_g_r_02_1440_editor_offen.png` (1440 Editor offen):** die YAML-Kopfzeile
+  sitzt heute **nicht** auf gleicher Höhe wie die `.list__head` (Suchzeile + Crumb + Chips) —
+  Nikinger: „die Titelzeile + YAML header Zeile ist genauso groß wie die alpha → Offen
+  Suchzeile. Text Kopfzeile ist so groß und damit bündig wie ein Item aus der Liste daneben".
+  Mein Chat-Claim „Kopfdaten YAML-Frontmatter beginnt auf gleicher Höhe wie die erste Item-
+  Zeile" traf die halbe Wahrheit — **gleiche Höhe wie die Items ja**, **gleiche Höhe wie die
+  Suchzeile nein** (die Items beginnen erst NACH der Suchzeile). Konsequenz: `.editor__head`
+  muss so hoch werden wie `.list__head` (Suchzeile + Crumb), nicht wie eine Item-Zeile — die
+  YAML-Leiste rutscht dadurch weiter nach unten, aber sie kommt **bündig** zur Item-Reihe
+  (weil die Items selbst auch erst unter der Suchzeile beginnen). Das ist **mehr** als Block
+  G-R.3 gemacht hat — G-R.3 hat nur das padding-top von 12 auf 4 px reduziert und sticky
+  hinzugefügt. Die volle Höhe von `.list__head` (mit Crumb + Chips) ist höher als die
+  heutige Editor-Header-Höhe. **Backlog** für eine eigene Iteration — vermutlich G-R.3+1
+  oder als Teil des Block-H-Editors.
+
+- **`p86_block_g_r_05_1024_uebersicht.png` (1024 Übersicht, Stack):** die Karte ist zurück,
+  **aber sie überlappt** — Nikinger: „sie überlappt, sieht also nicht nach Absicht aus". Mein
+  Stack-Setup (zwei 1fr-Zeilen, `.rail { grid-row: 1 / span 2 }`, `.detail { grid-column: 2;
+  grid-row: 2 }`) bringt Liste und Karte in dieselbe Höhe geteilt — wenn die Karte mehr
+  Mindestinhalt hat als die Liste ihr zugesteht, **schießt sie über die Zeile hinaus** und
+  überlappt die Liste oder den Viewport-Rand. Wahrscheinliche Fix-Linie: `min-height: 0`
+  auf `.detail` plus ein Container-Inner mit `overflow: auto`, ODER Stapel nur in
+  „Übersicht ohne Item offen" und beim ersten Klick auf ein Item den Editor statt der Karte
+  einblenden. **Backlog** — vermutlich Teil von G-R+1 oder Block H.
+
+- **`p86_block_g_r_06_1024_editor_offen.png` (1024 Editor offen, Stack-Modus):** Nikinger-
+  Vorschlag: „der Editor ersetzt die **Liste**, und mit ESC kommt man auf die Liste zurück".
+  Heute ersetzt der Editor im 1024-er Modus die **Karte** (unten im Stapel), die Liste
+  bleibt oben sichtbar — Nikinger sieht das als unsauber an. Variante: bei 1024 px ersetzt
+  der Editor die **Liste** statt der Karte (Stack-Slot oben), die Karte rutscht darunter
+  ODER verschwindet ganz. ESC bringt die Liste zurück (und damit die Karte an ihren
+  ursprünglichen Slot). **Backlog** — vermutlich Teil von G-R+1 oder Block H.
+
+**Nikinger-Realitäts-Check (2026-09-14, ehrlich, in den Chat zurückgegeben — keine
+Schuldzuweisung, eine Selbstaussage über die Diskrepanz):** „die Realität ist recht weit
+weg von dem was du hier beschreibst". Konkret: meine Checkkriterien-Texte im Chat waren
+zu optimistisch („drei Töne sind jetzt einer", „gleiche Höhe wie die Item-Zeile",
+„kein schwarzer Ring") — der schwarze Ring stimmt, die anderen beiden Vereinfachungen
+nicht. Die Screenshots sind im Repo, M3 kann sie über das `read`-Tool sehen, das hat
+auch funktioniert (siehe oben in der Sichtungs-Sektion — die Sätze sind *formal*
+korrekt, aber sie schreiben eine **geglättete** Realität, nicht die Pixel-Realität).
+**Zwei Optionen für die nächste Phase, beide notiert, keine Entscheidung jetzt:**
+
+- **Option A: Rückkehr zum manuellen MCP-Vision-Adapter mit lokalem Ollama.** Das ist
+  `phase8_6_ui_polish/scripts/mcp_local_vision_server.py` (raw JSON-RPC stdio, `requests.
+  post(127.0.0.1:11434/api/generate)`, qwen3-vl:8b-Default, 600 s Cold-Start-Timeout) aus
+  Step V-vision-befund. Das Plugin drum herum (`DavidEasden/opencode-vision`) war
+  zurückgebaut worden, weil es M3s nativen Bildpfad zerstört hat (`removeProcessedImageParts()`
+  bei `models: ["*"]` amputierte auch das Modell, das die Krücke nicht braucht). **Aber
+  der Adapter selbst bleibt korrekt** und liefert **echte, kalibrierte Bildbeschreibungen
+  statt geglätteter M3-Eigenbeschreibungen**. Vorschlag für die nächste Phase: Adapter
+  *ohne* Plugin direkt aus M3 heraus über einen Tool-Call ansprechen (z. B. ein
+  dedizierter `Bash`-Aufruf auf das Skript, oder ein lokaler Subprozess-Spawner in
+  `phase8_6_ui_polish/scripts/`) — der Vorteil: das Bild wird von qwen3-vl beschrieben,
+  M3 bekommt nur den Text und muss die Realität nicht selbst rauslesen. **Konkret
+  prüfbedürftig in der nächsten Phase:** der Cold-Start (46 s auf i5-14600KF ohne GPU
+  für V119-Smoke, 80–130 s im Worst Case) ist für „ein Bild pro Session" tragbar, aber
+  für „sechs Bilder pro Session" unbequem — Batch-Aufruf (qwen3-vl kann mehrere Bilder
+  in einem Prompt verarbeiten) reduziert das auf einmal Cold-Start.
+
+- **Option B: API-Minimax-m3 als getrennte Phase für Sichtprüfung.** Die Idee: ein
+  zweiter M3-Lauf (oder ein Claude-Code-Lauf mit M3-Modell darüber) bekommt die
+  Screenshots als Input und schreibt die **Checkkriterien** — diese landen dann in
+  M3s Chat als zu validierende Aussagen, und die Sichtprüfung wird *vom Modell gegen
+  das Modell* gemacht. Das ist eine substantielle Architektur-Änderung (zwei
+  Modell-Instanzen, ein Prompt-Stereo), gehört in eine **eigene Folge-Phase** (P9 oder
+  eine neue Phase), nicht in P8.6.
+
+**Beide Optionen nur als Vormerkung** — keine Entscheidung in dieser Session, kein Code-
+Touch. Der Session-Block endet hier mit dem Commit, Push + Quick-Note schließen die
+Session ab.
+
+---
 
 ## Session stopped — 2026-09-14 (opencode/M3 — **Block G erledigt** — Layout-Umbau, P8.6-O2 ausgelöst, drei Phasenbefunde gleichzeitig behoben)
 

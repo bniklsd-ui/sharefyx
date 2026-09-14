@@ -141,11 +141,26 @@ def test_app_html_contains_no_inline_style_attribute():
 def test_app_html_has_a_live_manage_spaces_entry():
     """P7 Step C3 — der Menüpunkt ist jetzt scharf: kein `disabled` mehr, kein Verweis auf
     „Phase 7" (die Fläche ist diese Phase). Sichtbarkeit zur Laufzeit folgt `state.meta.
-    space_admin` (`app.js`), nicht diesem statischen Markup (P5-T, kein Templating)."""
+    space_admin` (`app.js`), nicht diesem statischen Markup (P5-T, kein Templating).
+
+    Block H H2 (Plan §5.2): die Knöpfe tragen jetzt zusätzlich ein Chevron-Icon
+    (`<svg class="icon">...</svg>`); die Regex muss daher nested-Tags innerhalb des
+    Buttons erlauben, nicht nur reinen Text. Capture-Gruppe wird auf den sichtbaren
+    Text-Label-Teil eingeschränkt (erstes nicht-leeres Text-Stück vor dem ersten `<`)."""
     html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
-    match = re.search(r'<button[^>]*id="account-manage-spaces"[^>]*>([^<]*)</button>', html)
+    # non-greedy `.*?` damit das inner svg erlaubt ist, aber </button> greift
+    match = re.search(
+        r'<button[^>]*id="account-manage-spaces"[^>]*>(.*?)</button>',
+        html,
+        flags=re.DOTALL,
+    )
     assert match is not None, "Menüpunkt 'Spaces verwalten' fehlt"
-    assert "disabled" not in match.group(0)
+    button_html = match.group(0)
+    assert "disabled" not in button_html
+    # Label-Text ist im ersten Text-Knoten vor dem ersten <svg> -- regex sucht "Spaces verwalten"
+    assert re.search(r"Spaces verwalten", button_html), (
+        "#account-manage-spaces muss 'Spaces verwalten' als Label tragen (P7 C3)."
+    )
     assert "Phase 7" not in html
 
 
@@ -502,22 +517,34 @@ def test_caution_class_only_on_logout_and_archive():
     )
 
 
-def test_rail_order_settings_before_tree_logout_last():
-    """P8.6 Block C C1 (Plan §5.1): Reihenfolge im Rail ist jetzt
+def test_rail_order_settings_and_logout_at_the_end():
+    """P8.6 Block H H1 (Plan §5.1, N.9 + P8.6-AE): Reihenfolge im Rail ist wieder
         1. .rail__brand
         2. #home-button           ("Übersicht")
-        3. #account-button        ("Einstellungen")   <-- NEU: wandert hierhin
-        4. #rail-tree             (Spaces + "Alle Items")
-        5. #logout-button         ("Abmelden")        <-- letztes Kind in .rail__account
+        3. #rail-tree             (Spaces + "Alle Items")
+        4. #account-button        ("Einstellungen")   <-- ZURÜCK in .rail__account
+        5. #logout-button         ("Abmelden")        <-- letztes Element im Rail
 
-    Begründung (Plan §5.1): ein wörtlicher Tausch würde "Abmelden" an die prominenteste
-    Stelle des Account-Blocks setzen -- Abmelden ist die seltenste und teuerste Aktion,
-    Einstellungen (Zahnrad) ist häufig und folgenlos. N3-Lesart b ist bestätigt, nicht
-    geraten.
+    NAMEN + UMKEHR -- beide Richtungen sind gelockt und datiert (P8.6-I-Mechanik wörtlich
+    übernommen):
 
-    Wer die Reihenfolge umstellt (Einstellungen wieder nach unten, oder Abmelden nach oben),
-    fällt hier auf statt erst in der nächsten Sichtprüfung. Test über die Reihenfolge der
-    Tag-Positionen im HTML-String -- billig und robust gegen CSS-Layout-Änderungen.
+    • 2026-09-09, Block C C1, N3-Lesart b: Reihenfolge war .rail__brand / #home-button /
+      #account-button / #rail-tree / #logout-button (Einstellungen oben, Abmelden ans Rail-
+      Ende). Begründung damals: "Abmelden ist die seltenste und teuerste Aktion -- ein
+      wörtlicher Tausch würde sie an die prominenteste Stelle setzen." Der Test hieß
+      `test_rail_order_settings_before_tree_logout_last` und prüfte
+      pos_account < pos_tree, pos_tree < pos_logout, pos_home < pos_account.
+
+    • 2026-09-13, Plan 2 §5.1, Nikinger-Entscheidung N.9: kehrt das um, "Abmelden bleibt
+      weiterhin der äußerste Knopf" -- beide Knöpfe unten, Reihenfolge
+      Einstellungen → Abmelden. Hintergrund: das Layout ist anders als bei C1 (kein
+      einsamer Knopf oben zwischen Übersicht und Baum), die ursprüngliche Begründung
+      verfängt nicht mehr.
+
+    Wer die Reihenfolge ein drittes Mal umstellt (z. B. Einstellungen wieder oben, oder
+    Abmelden vor Einstellungen), fällt hier auf statt erst in der nächsten Sichtprüfung.
+    Test über die Reihenfolge der Tag-Positionen im HTML-String -- billig und robust gegen
+    CSS-Layout-Änderungen.
     """
     html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
 
@@ -527,23 +554,30 @@ def test_rail_order_settings_before_tree_logout_last():
         return m.start()
 
     pos_home = _pos("home-button")
-    pos_account = _pos("account-button")
     pos_tree = _pos("rail-tree")
+    pos_account = _pos("account-button")
     pos_logout = _pos("logout-button")
 
-    assert pos_home < pos_account, (
-        f"#account-button (Einstellungen) muss NACH #home-button stehen, nicht davor. "
-        f"Positionen: home={pos_home}, account={pos_account}."
+    assert pos_home < pos_tree, (
+        f"#rail-tree muss NACH #home-button stehen (unverändert seit Step 7b). "
+        f"Positionen: home={pos_home}, tree={pos_tree}."
     )
-    assert pos_account < pos_tree, (
-        f"#account-button (Einstellungen) muss VOR #rail-tree stehen -- das ist der Kern "
-        f"von C1 (Plan §5.1, N3-Lesart b: Einstellungen oben, Abmelden ans Rail-Ende). "
-        f"Positionen: account={pos_account}, tree={pos_tree}."
+    assert pos_tree < pos_account, (
+        f"#account-button (Einstellungen) muss NACH #rail-tree stehen -- das ist der Kern "
+        f"von Block H H1 (Plan §5.1, N.9 + P8.6-AE: Einstellungen zurück in .rail__account). "
+        f"Positionen: tree={pos_tree}, account={pos_account}."
     )
-    assert pos_tree < pos_logout, (
-        f"#logout-button (Abmelden) muss ALS LETZTES im Rail stehen -- .rail__account ist "
-        f"das Rail-Ende (margin-top: auto), und nach C1 ist Abmelden das einzige Kind dort. "
-        f"Positionen: tree={pos_tree}, logout={pos_logout}."
+    assert pos_account < pos_logout, (
+        f"#logout-button (Abmelden) muss NACH #account-button stehen -- die Reihenfolge in "
+        f".rail__account ist Einstellungen → Abmelden (N.9 wörtlich: 'Abmelden bleibt "
+        f"weiterhin der äußerste Knopf'). "
+        f"Positionen: account={pos_account}, logout={pos_logout}."
+    )
+    assert pos_logout == html.rfind('id="logout-button"'), (
+        f"#logout-button muss das letzte Element im Rail sein -- .rail__account ist das "
+        f"Rail-Ende (margin-top: auto), und Block H H1 verlangt 'Abmelden als äußerster "
+        f"Knopf' (N.9). "
+        f"Positionen: logout={pos_logout}, html_len={len(html)}."
     )
 
 

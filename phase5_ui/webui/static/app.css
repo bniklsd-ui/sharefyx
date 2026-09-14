@@ -435,12 +435,14 @@ select.input:focus {
 }
 
 .rail__home { margin: 0 var(--space) var(--space); width: auto; }
-/* Phase 8.6 Block C C1 (Plan §5.1): #account-button wandert aus .rail__account heraus direkt
-   unter #home-button. Eigene Modifikator-Klasse statt generischer .rail__action-Anpassung,
-   damit der bestehende #logout-button-Stil (volle Breite als einziges Kind in .rail__account)
-   unveraendert bleibt -- beide Knöpfe teilen die .rail__action-Basis-Regel (Padding,
-   Hover-Verhalten aus B1), unterscheiden sich aber im Margin und in der Default-Breite. */
-.rail__action--account { margin: 0 var(--space) var(--space); width: auto; }
+/* Phase 8.6 Block H H1 (Plan §5.1, V137 geklärt): die .rail__action--account-Klasse war ein
+   Rest der Oben-Platzierung aus Block C C1 (margin: 0 var(--space) var(--space); width: auto,
+   damit der Knopf außerhalb von .rail__account neben #home-button passte). Nach der
+   Rail-Umkehr (N.9, #account-button ist zurück in .rail__account) wird die Modifikator-
+   Klasse ersatzlos gestrichen -- die Basis-Regel .rail__action (display: flex; width: 100%
+   aus der Sammelregel oben; flex: 1 für gleichmäßige Höhe in der Spalte) reicht. Die
+   Klasse selbst bleibt im HTML-Quelltext eine Zeitlang stehen (für die Übergangsphase,
+   falls jemand die Diff nachvollziehen will); sie hat ohne diese Regel keinen Effekt. */
 .rail__action { width: auto; flex: 1; }
 
 /* Phase 8.6 Block B B1 (Plan §4.1 P8.6-Q): vereinheitlichte Hover-Sprache für alles Klickbare,
@@ -635,7 +637,13 @@ select.input:focus {
   margin-top: auto;
   border-top: 1px solid var(--line);
   padding: var(--space);
+  /* Phase 8.6 Block H H1 (Plan §5.1, N.9 + P8.6-AE): .rail__account trägt jetzt ZWEI Knöpfe
+     (#account-button "Einstellungen", #logout-button "Abmelden") -- gestapelt statt
+     nebeneinander. Die frühere Sonderregel (Spalte bei schmalem Viewport) ist ersatzlos
+     weg, weil Block G-R die schmale-Query komplett gelöscht hat (der heutige Breakpoint
+     ist 1200 px); die Spalten-Anordnung ist jetzt der Normalfall in allen Breakpoints. */
   display: flex;
+  flex-direction: column;
   gap: 4px;
 }
 
@@ -643,15 +651,23 @@ select.input:focus {
    #account-manage-spaces. Beides sind KEINE Aktionen (öffnen etwas, ändern nichts), bekommen
    deshalb nicht die Knopfplastik, sondern einen flachen Klick-Anreiz mit dem Hover aus B1.
    Akzent-Fill (--select-fill) bleibt bewusst aus -- sie tragen kein aria-current, sind also
-   immer im Default-Zustand "transparent + Hover leise aufhellen". */
+   immer im Default-Zustand "transparent + Hover leise aufhellen".
+
+   Phase 8.6 Block H H2 (Plan §5.2, Befund 2): "die Knöpfe fehlten nie, sie sahen nur nach
+   Fließtext aus" -- Nav-Sprache ohne Afford ist keine Nav-Sprache. Die Reparatur ist die
+   kleinstmögliche: linke Akzentkante 2px (visuell wie ein Listen-Eintrag in einem
+   Inhaltsverzeichnis), Chevron rechts (margin-left: auto, Flex-Container nötig), Hover
+   aus B1 bleibt. Kein Rückfall in .btn -- die Kategorie bleibt Navigation. */
 .account-nav {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: var(--space);
   width: 100%;
-  text-align: left;
-  padding: 8px 14px;
+  padding: 8px calc(var(--space) * 2);
   margin: 0 0 calc(var(--space) * 2);
   background: none;
   border: none;
+  border-left: 2px solid var(--line-strong);
   border-radius: var(--radius-sm);
   color: var(--text);
   font-weight: 500;
@@ -663,6 +679,11 @@ select.input:focus {
   background: var(--select-fill-quiet);
   outline: 1px solid var(--select-line-quiet);
   outline-offset: -1px;
+}
+.account-nav .icon {
+  /* Chevron ans rechte Ende schieben -- dieselbe Mechanik wie .tree__count (C5), gleiche
+     Begründung: margin-left: auto im Flex-Container drückt das Element an den Rand. */
+  margin-left: auto;
 }
 
 /* Phase 8.6 Block B B4 (Plan §4.4): Kategorie "Vorsicht" -- Konvention v3, fünfte Kategorie
