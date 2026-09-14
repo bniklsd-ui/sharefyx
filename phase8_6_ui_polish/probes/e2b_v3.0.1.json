@@ -1,0 +1,2750 @@
+{
+  "label": "v3.0.1",
+  "base_url": "http://127.0.0.1:18773",
+  "timestamp": "2026-09-14T08:46:27.956882+00:00",
+  "widths": [
+    1024,
+    1200,
+    1440
+  ],
+  "results": [
+    {
+      "width": 1024,
+      "height": 900,
+      "innerHeight": 900,
+      "url": "http://127.0.0.1:18773/ui/",
+      "rects": {
+        "#shell": {
+          "x": 0,
+          "y": 139,
+          "width": 1024,
+          "height": 761,
+          "bottom": 900,
+          "top": 139,
+          "right": 1024,
+          "left": 0
+        },
+        "#list": {
+          "x": 64,
+          "y": 139,
+          "width": 960,
+          "height": 761,
+          "bottom": 900,
+          "top": 139,
+          "right": 1024,
+          "left": 64
+        },
+        "#detail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "bottom": 0,
+          "top": 0,
+          "right": 0,
+          "left": 0
+        },
+        "#detail-overview": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "bottom": 0,
+          "top": 0,
+          "right": 0,
+          "left": 0
+        },
+        ".overview__col-left": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "bottom": 0,
+          "top": 0,
+          "right": 0,
+          "left": 0
+        },
+        ".overview__col-right": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "bottom": 0,
+          "top": 0,
+          "right": 0,
+          "left": 0
+        },
+        "#overview-graph": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "bottom": 0,
+          "top": 0,
+          "right": 0,
+          "left": 0
+        },
+        "#overview-refresh": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "bottom": 0,
+          "top": 0,
+          "right": 0,
+          "left": 0
+        },
+        ".rail__account": {
+          "x": 0,
+          "y": 845,
+          "width": 63,
+          "height": 47,
+          "bottom": 892,
+          "top": 845,
+          "right": 63,
+          "left": 0
+        }
+      },
+      "styles": {
+        "#detail": {
+          "overflow": "auto",
+          "overflowY": "auto",
+          "height": "auto",
+          "display": "none",
+          "gridTemplateRows": "none",
+          "flex": "0 1 auto"
+        },
+        "#detail-overview": {
+          "overflow": "hidden",
+          "overflowY": "hidden",
+          "height": "auto",
+          "display": "grid",
+          "gridTemplateRows": "auto auto auto",
+          "flex": "1 1 0%"
+        },
+        ".overview__col-left": {
+          "overflow": "visible",
+          "overflowY": "visible",
+          "height": "auto",
+          "display": "block",
+          "gridTemplateRows": "none",
+          "flex": "0 1 auto"
+        },
+        ".overview__col-right": {
+          "overflow": "visible",
+          "overflowY": "visible",
+          "height": "auto",
+          "display": "flex",
+          "gridTemplateRows": "none",
+          "flex": "0 1 auto"
+        }
+      },
+      "clipped": {
+        "#detail": false,
+        "#detail-overview": false,
+        ".overview__col-left": false,
+        ".overview__col-right": false
+      },
+      "buttons_total": 85,
+      "buttons_unreachable": 52,
+      "buttons_offscreen": 0,
+      "unreachable_details": [
+        {
+          "id": "list-selection-move",
+          "classes": "btn",
+          "text": "Verschieben",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "list-selection-clear",
+          "classes": "btn",
+          "text": "Abwählen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "create-button",
+          "classes": "btn-primary",
+          "text": "Erste Notiz anlegen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "back-button",
+          "classes": "detail__back",
+          "text": "← Zurück",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "overview-refresh",
+          "classes": "btn btn--icon overview__refresh",
+          "text": null,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "overview__space-open",
+          "text": "Aalpha",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "overview__space-count",
+          "text": "5 Offen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "overview__space-count",
+          "text": "6 Notizen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "overview__space-count",
+          "text": "1 Archiv",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "overview__space-open",
+          "text": "Bbeta",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "overview__space-count",
+          "text": "10 Notizen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "overview__space-open",
+          "text": "Ggamma",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "overview__space-count",
+          "text": "3 Offen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "overview__space-count",
+          "text": "5 Notizen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "recent-row",
+          "text": "Auth-Service refactorenv2 · 2026-09-14",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "recent-row",
+          "text": "Komponenten-Bibliothekv2 · 2026-09-14",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "recent-row",
+          "text": "Tagesnotizenv2 · 2026-09-14",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "recent-row",
+          "text": "Storybook einrichtenv2 · 2026-09-14",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "recent-row",
+          "text": "DB-Migration skriptv2 · 2026-09-14",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "ro-close-button",
+          "classes": "btn btn--icon",
+          "text": null,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "create-submit",
+          "classes": "btn-primary",
+          "text": "Anlegen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "create-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "new-folder-submit",
+          "classes": "btn-primary",
+          "text": "Anlegen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "new-folder-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "link-picker-cancel",
+          "classes": "btn",
+          "text": "Schließen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "move-submit",
+          "classes": "btn-primary",
+          "text": "Verschieben",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "move-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "share-submit",
+          "classes": "btn-primary",
+          "text": "Speichern",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "share-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "space-create-submit",
+          "classes": "btn",
+          "text": "Space anlegen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "space-member-add-submit",
+          "classes": "btn",
+          "text": "Hinzufügen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "space-remove-open",
+          "classes": "btn",
+          "text": "Space entfernen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "space-admin-close",
+          "classes": "btn",
+          "text": "Schließen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "space-remove-submit",
+          "classes": "btn-primary",
+          "text": "Entfernen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "space-remove-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "conflict-load-current",
+          "classes": "btn-primary",
+          "text": "Aktuelle Fassung laden",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "conflict-save-as-new",
+          "classes": "btn",
+          "text": "Meine Fassung als neues Item anlegen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "conflict-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "confirm-ok",
+          "classes": "btn-primary",
+          "text": null,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "confirm-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "account-show-updates",
+          "classes": "account-nav",
+          "text": "Update-Log ansehen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "account-manage-spaces",
+          "classes": "account-nav",
+          "text": "Spaces verwalten",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "account-submit",
+          "classes": "btn-primary",
+          "text": "Ändern",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "account-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "update-log-close",
+          "classes": "btn",
+          "text": "Schließen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        }
+      ]
+    },
+    {
+      "width": 1200,
+      "height": 900,
+      "innerHeight": 900,
+      "url": "http://127.0.0.1:18773/ui/",
+      "rects": {
+        "#shell": {
+          "x": 0,
+          "y": 139,
+          "width": 1200,
+          "height": 761,
+          "bottom": 900,
+          "top": 139,
+          "right": 1200,
+          "left": 0
+        },
+        "#list": {
+          "x": 64,
+          "y": 139,
+          "width": 380,
+          "height": 761,
+          "bottom": 900,
+          "top": 139,
+          "right": 444,
+          "left": 64
+        },
+        "#detail": {
+          "x": 444,
+          "y": 139,
+          "width": 756,
+          "height": 761,
+          "bottom": 900,
+          "top": 139,
+          "right": 1200,
+          "left": 444
+        },
+        "#detail-overview": {
+          "x": 444,
+          "y": 139,
+          "width": 756,
+          "height": 761,
+          "bottom": 900,
+          "top": 139,
+          "right": 1200,
+          "left": 444
+        },
+        ".overview__col-left": {
+          "x": 476,
+          "y": 276.375,
+          "width": 692,
+          "height": 284,
+          "bottom": 560.375,
+          "top": 276.375,
+          "right": 1168,
+          "left": 476
+        },
+        ".overview__col-right": {
+          "x": 476,
+          "y": 584.375,
+          "width": 692,
+          "height": 283.625,
+          "bottom": 868,
+          "top": 584.375,
+          "right": 1168,
+          "left": 476
+        },
+        "#overview-graph": {
+          "x": 476,
+          "y": 640,
+          "width": 692,
+          "height": 228,
+          "bottom": 868,
+          "top": 640,
+          "right": 1168,
+          "left": 476
+        },
+        "#overview-refresh": {
+          "x": 1138,
+          "y": 171,
+          "width": 30,
+          "height": 30,
+          "bottom": 201,
+          "top": 171,
+          "right": 1168,
+          "left": 1138
+        },
+        ".rail__account": {
+          "x": 0,
+          "y": 845,
+          "width": 63,
+          "height": 47,
+          "bottom": 892,
+          "top": 845,
+          "right": 63,
+          "left": 0
+        }
+      },
+      "styles": {
+        "#detail": {
+          "overflow": "auto",
+          "overflowY": "auto",
+          "height": "761px",
+          "display": "flex",
+          "gridTemplateRows": "none",
+          "flex": "0 1 auto"
+        },
+        "#detail-overview": {
+          "overflow": "hidden",
+          "overflowY": "hidden",
+          "height": "761px",
+          "display": "grid",
+          "gridTemplateRows": "81.375px 284px 283.625px",
+          "flex": "1 1 0%"
+        },
+        ".overview__col-left": {
+          "overflow": "visible",
+          "overflowY": "visible",
+          "height": "284px",
+          "display": "block",
+          "gridTemplateRows": "none",
+          "flex": "0 1 auto"
+        },
+        ".overview__col-right": {
+          "overflow": "visible",
+          "overflowY": "visible",
+          "height": "283.625px",
+          "display": "flex",
+          "gridTemplateRows": "none",
+          "flex": "0 1 auto"
+        }
+      },
+      "clipped": {
+        "#detail": false,
+        "#detail-overview": false,
+        ".overview__col-left": false,
+        ".overview__col-right": false
+      },
+      "buttons_total": 85,
+      "buttons_unreachable": 39,
+      "buttons_offscreen": 0,
+      "unreachable_details": [
+        {
+          "id": "list-selection-move",
+          "classes": "btn",
+          "text": "Verschieben",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "list-selection-clear",
+          "classes": "btn",
+          "text": "Abwählen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "create-button",
+          "classes": "btn-primary",
+          "text": "Erste Notiz anlegen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "back-button",
+          "classes": "detail__back",
+          "text": "← Zurück",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "recent-row",
+          "text": "Storybook einrichtenv2 · 2026-09-14",
+          "rect": {
+            "x": 476,
+            "y": 575.515625,
+            "width": 692,
+            "height": 41.796875,
+            "bottom": 617.3125,
+            "top": 575.515625
+          },
+          "cx": 822,
+          "cy": 596.4140625,
+          "reachable": false,
+          "hit_at_center": "DIV.overview__col-right",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "recent-row",
+          "text": "DB-Migration skriptv2 · 2026-09-14",
+          "rect": {
+            "x": 476,
+            "y": 617.3125,
+            "width": 692,
+            "height": 41.796875,
+            "bottom": 659.109375,
+            "top": 617.3125
+          },
+          "cx": 822,
+          "cy": 638.2109375,
+          "reachable": false,
+          "hit_at_center": "DIV.overview__col-right",
+          "offscreen": false
+        },
+        {
+          "id": "ro-close-button",
+          "classes": "btn btn--icon",
+          "text": null,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "create-submit",
+          "classes": "btn-primary",
+          "text": "Anlegen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "create-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "new-folder-submit",
+          "classes": "btn-primary",
+          "text": "Anlegen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "new-folder-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "link-picker-cancel",
+          "classes": "btn",
+          "text": "Schließen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "move-submit",
+          "classes": "btn-primary",
+          "text": "Verschieben",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "move-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "share-submit",
+          "classes": "btn-primary",
+          "text": "Speichern",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "share-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "space-create-submit",
+          "classes": "btn",
+          "text": "Space anlegen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "space-member-add-submit",
+          "classes": "btn",
+          "text": "Hinzufügen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "space-remove-open",
+          "classes": "btn",
+          "text": "Space entfernen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "space-admin-close",
+          "classes": "btn",
+          "text": "Schließen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "space-remove-submit",
+          "classes": "btn-primary",
+          "text": "Entfernen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "space-remove-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "conflict-load-current",
+          "classes": "btn-primary",
+          "text": "Aktuelle Fassung laden",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "conflict-save-as-new",
+          "classes": "btn",
+          "text": "Meine Fassung als neues Item anlegen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "conflict-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "confirm-ok",
+          "classes": "btn-primary",
+          "text": null,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "confirm-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "account-show-updates",
+          "classes": "account-nav",
+          "text": "Update-Log ansehen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "account-manage-spaces",
+          "classes": "account-nav",
+          "text": "Spaces verwalten",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "account-submit",
+          "classes": "btn-primary",
+          "text": "Ändern",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "account-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "update-log-close",
+          "classes": "btn",
+          "text": "Schließen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "innerHeight": 900,
+      "url": "http://127.0.0.1:18773/ui/",
+      "rects": {
+        "#shell": {
+          "x": 0,
+          "y": 139,
+          "width": 1440,
+          "height": 761,
+          "bottom": 900,
+          "top": 139,
+          "right": 1440,
+          "left": 0
+        },
+        "#list": {
+          "x": 240,
+          "y": 139,
+          "width": 380,
+          "height": 761,
+          "bottom": 900,
+          "top": 139,
+          "right": 620,
+          "left": 240
+        },
+        "#detail": {
+          "x": 620,
+          "y": 139,
+          "width": 820,
+          "height": 761,
+          "bottom": 900,
+          "top": 139,
+          "right": 1440,
+          "left": 620
+        },
+        "#detail-overview": {
+          "x": 620,
+          "y": 139,
+          "width": 820,
+          "height": 761,
+          "bottom": 900,
+          "top": 139,
+          "right": 1440,
+          "left": 620
+        },
+        ".overview__col-left": {
+          "x": 652,
+          "y": 276.375,
+          "width": 429.609375,
+          "height": 591.625,
+          "bottom": 868,
+          "top": 276.375,
+          "right": 1081.609375,
+          "left": 652
+        },
+        ".overview__col-right": {
+          "x": 1105.609375,
+          "y": 276.375,
+          "width": 302.390625,
+          "height": 591.625,
+          "bottom": 868,
+          "top": 276.375,
+          "right": 1408,
+          "left": 1105.609375
+        },
+        "#overview-graph": {
+          "x": 1105.609375,
+          "y": 332,
+          "width": 302.390625,
+          "height": 536,
+          "bottom": 868,
+          "top": 332,
+          "right": 1408,
+          "left": 1105.609375
+        },
+        "#overview-refresh": {
+          "x": 1378,
+          "y": 171,
+          "width": 30,
+          "height": 30,
+          "bottom": 201,
+          "top": 171,
+          "right": 1408,
+          "left": 1378
+        },
+        ".rail__account": {
+          "x": 0,
+          "y": 872.640625,
+          "width": 239,
+          "height": 55.796875,
+          "bottom": 928.4375,
+          "top": 872.640625,
+          "right": 239,
+          "left": 0
+        }
+      },
+      "styles": {
+        "#detail": {
+          "overflow": "auto",
+          "overflowY": "auto",
+          "height": "761px",
+          "display": "flex",
+          "gridTemplateRows": "none",
+          "flex": "0 1 auto"
+        },
+        "#detail-overview": {
+          "overflow": "hidden",
+          "overflowY": "hidden",
+          "height": "761px",
+          "display": "grid",
+          "gridTemplateRows": "81.375px 591.625px",
+          "flex": "1 1 0%"
+        },
+        ".overview__col-left": {
+          "overflow": "auto",
+          "overflowY": "auto",
+          "height": "591.625px",
+          "display": "block",
+          "gridTemplateRows": "none",
+          "flex": "0 1 auto"
+        },
+        ".overview__col-right": {
+          "overflow": "visible",
+          "overflowY": "visible",
+          "height": "591.625px",
+          "display": "flex",
+          "gridTemplateRows": "none",
+          "flex": "0 1 auto"
+        }
+      },
+      "clipped": {
+        "#detail": false,
+        "#detail-overview": false,
+        ".overview__col-left": false,
+        ".overview__col-right": false
+      },
+      "buttons_total": 85,
+      "buttons_unreachable": 37,
+      "buttons_offscreen": 1,
+      "unreachable_details": [
+        {
+          "id": "list-selection-move",
+          "classes": "btn",
+          "text": "Verschieben",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "list-selection-clear",
+          "classes": "btn",
+          "text": "Abwählen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "create-button",
+          "classes": "btn-primary",
+          "text": "Erste Notiz anlegen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "back-button",
+          "classes": "detail__back",
+          "text": "← Zurück",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "ro-close-button",
+          "classes": "btn btn--icon",
+          "text": null,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "create-submit",
+          "classes": "btn-primary",
+          "text": "Anlegen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "create-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "new-folder-submit",
+          "classes": "btn-primary",
+          "text": "Anlegen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "new-folder-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "link-picker-cancel",
+          "classes": "btn",
+          "text": "Schließen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "move-submit",
+          "classes": "btn-primary",
+          "text": "Verschieben",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "move-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "share-submit",
+          "classes": "btn-primary",
+          "text": "Speichern",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "share-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "space-create-submit",
+          "classes": "btn",
+          "text": "Space anlegen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "space-member-add-submit",
+          "classes": "btn",
+          "text": "Hinzufügen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "space-remove-open",
+          "classes": "btn",
+          "text": "Space entfernen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "space-admin-close",
+          "classes": "btn",
+          "text": "Schließen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "space-remove-submit",
+          "classes": "btn-primary",
+          "text": "Entfernen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "space-remove-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "conflict-load-current",
+          "classes": "btn-primary",
+          "text": "Aktuelle Fassung laden",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "conflict-save-as-new",
+          "classes": "btn",
+          "text": "Meine Fassung als neues Item anlegen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "conflict-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "confirm-ok",
+          "classes": "btn-primary",
+          "text": null,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "confirm-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "account-show-updates",
+          "classes": "account-nav",
+          "text": "Update-Log ansehen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "account-manage-spaces",
+          "classes": "account-nav",
+          "text": "Spaces verwalten",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": null,
+          "classes": "btn pw-toggle",
+          "text": "Anzeigen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "account-submit",
+          "classes": "btn-primary",
+          "text": "Ändern",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "account-cancel",
+          "classes": "btn",
+          "text": "Abbrechen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        },
+        {
+          "id": "update-log-close",
+          "classes": "btn",
+          "text": "Schließen",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "top": 0
+          },
+          "cx": 0,
+          "cy": 0,
+          "reachable": false,
+          "hit_at_center": "update-banner",
+          "offscreen": false
+        }
+      ]
+    }
+  ],
+  "login": {
+    "attempted": true,
+    "status": 200,
+    "note": "ok"
+  }
+}

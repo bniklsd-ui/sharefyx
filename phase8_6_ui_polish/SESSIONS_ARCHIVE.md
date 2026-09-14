@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
+updated: 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -24,6 +24,84 @@ das Skript auf das Phase-8.5-Muster passt und mit einem `## Session stopped` + m
 
 
 
+
+## Session stopped — 2026-09-14 (opencode/M3 — **Block E erledigt: E2a**, E2b wartet auf Nikinger)
+
+**Reine Mess-Session, kein Produktcode-Touch.** Block E der Reihe nach: E1 Skript geschrieben,
+E2a gegen die Wegwerf gefahren, E3 Protokoll hier eingetragen. **E2b (Produktion)** kann
+opencode/M3 nicht ausführen — es braucht die `SPACE_PUBLIC_BASE_URL` und die Produktions-
+Zugangsdaten, die nicht im Repo liegen (Hard Rule 1) und die ich auch nicht erfinden darf.
+
+**E1 — `phase8_6_ui_polish/scripts/p86_viewport_probe.py`** (neu, 421 Z. / 16 KB):
+Playwright-Chromium-Probe nach Plan §2.2. CLI: `--base-url` (default `http://127.0.0.1:18773`),
+`--widths 1024,1200,1440`, `--label <str>`, `--out <json|-` (Hard Rule 7 — JSON auf stdout,
+Logging auf stderr), `--creds <pfad>`, `--no-login` (für manuelle Cookie-Sessions),
+`--dismiss-banner` (Update-Banner vor jedem `probe()` wegklicken, damit der Layout-Befund
+vom dismissable Banner getrennt wird — Plan §2.3-Vorbedingung). Pro Breite erhebt die Probe:
+`rects` (BoundingClientRect für neun Selektoren aus Plan §2.2), `styles` (getComputedStyle
+für `overflow`/`overflowY`/`height`/`display`/`gridTemplateRows`/`flex` an vier Containern),
+`clipped` (scrollHeight>clientHeight && overflowY=='hidden'), `reachable` (elementFromPoint
+am Knopf-Mittelpunkt — **beweist** "nicht mehr klickbar", statt es zu behaupten), `offscreen`
+(rect.bottom > innerHeight || rect.top < 0). Plus ein Screenshot pro Breite nach
+`docs/screenshots/p86_probe_<label>_<width>.png`. Login ist die TOTP-Routine aus
+`p86_block_c_self_check.py` (35-s-Wartezeit auf frisches 30-s-Fenster, 401/429-Retry-Logik);
+bei CSRF-Login-Fehler (`403` für Produktion via Reverse-Proxy, `tries_exhausted`) bricht die
+Probe sauber ab und schreibt JSON mit `aborted_reason` — kein Workaround.
+
+**E2a — gegen die Wegwerf auf Port 18773.** Wegwerf frisch hochgefahren
+(`wegwerf_setup_v3ritt.py cleanup`+`setup`+`seed-items`+`start`, PID 156562, sauber per
+PID-Datei gestoppt nach der Messung — Hard Rule 9-konform, kein `pkill -f`). Probe lief
+**dreimal pro Lauf** (mit und ohne Banner), Login in Fenster 1 HTTP 200. Sechs Screenshots
+in `docs/screenshots/p86_probe_{main,main-clean}_{1024,1200,1440}.png`, zwei Probe-JSONs
+in `phase8_6_ui_polish/probes/e2a_{main,main_clean}.json` (je ~65 KB).
+
+**E2a-Befunde (das ist der Punkt dieser Session — was wirklich kaputt ist):**
+
+| Breite | `clipped` für `#detail-overview` | sichtbar-blockierte Buttons | Diagnose |
+|---|---|---|---|
+| **1024 px** | n/a (`#detail-overview` rect=0×0, `data-view="list"` aktiv) | **0** | 53 hidden-button-Treffer alle `rect=(0,0,0,0)` — Detail-Buttons vom data-view="list"-Mechanismus ausgeblendet, kein Layout-Befund. **V126 damit erledigt.** |
+| **1200 px mit Banner** | `false` (scrollHeight passt in clientHeight) | **2**: `DB-Migration skript` (y=576), `Smoke-Tests ausbauen` (y=617) — beide Centerpoint trifft `DIV.overview__col-right` | **Befund 9b reproduziert.** Recent-Item "Smoke-Tests ausbauen" liegt visuell UNTER der "VERKNÜPFUNGEN"-Überschrift; nur die ersten 4 Recent-Items passen in col-left, der 5. fließt in col-right. Sichtbar in `p86_probe_main_1200.png` (VERKNÜPFUNGEN bei y≈617, Smoke-Tests bei y≈633). |
+| **1200 px ohne Banner** | `false` | **0** | **Banner-abhängig, nicht unconditional.** Ohne die 140 px Banner-Höhe hat col-left eine auto-Row von **383 px** statt 284 px — alle 5 Recent-Items passen rein. Sichtbar in `p86_probe_main-clean_1200.png`. |
+| **1440 px mit oder ohne Banner** | `false` | **0** (37 unsichtbare Treffer wegen `data-view="list"`-Mechanismus, kein Layout-Problem) | Zwei-Spalten-Grid (`grid-template-columns: 1fr 40%`) trägt sauber. col-left (x=652, width=430) und col-right (x=1105, width=302) berühren sich nicht. |
+
+**V125 (gleiche Ursache 9a vs. 9b?) — partiell, E2b fehlt für 9a:** die Plan-Annahme
+"9b = `overflow: hidden` + `flex: 1` schlägt `height: auto`" stimmt nur halb — `overflow:hidden`
+und `flex:1` sind da, aber sie schlagen `height:auto` **erst dann**, wenn die verfügbare Höhe
+klein genug wird, dass die col-left-auto-Row nicht mehr alle 5 Recent-Items aufnehmen kann.
+**Der eigentliche Auslöser ist die Update-Banner-Höhe (140 px)**, die bei 1200 px das
+Detail-Overview von 900 px auf 761 px drückt und damit col-left von 383 px auf 284 px. Ohne
+Banner verschwindet 9b. **Konsequenz für Block G (Layout-Umbau):** 9b wird sowieso gelöst,
+weil `.overview`-Grid + 1280-px-Query dort **entfallen** — der Fehler hat dann keine Bühne
+mehr. Für die Frage "ist 9a dasselbe?" brauche ich E2b.
+
+**E2b — wartet auf Nikinger.** Was ich brauche, in dieser Reihenfolge:
+1. **`SPACE_PUBLIC_BASE_URL`** (z. B. `https://sharefyx.example.org` — die öffentliche URL,
+   unter der die Produktion via Tailnet erreichbar ist; nicht der interne Cluster-Hostname).
+2. **Produktions-Login-Credentials** für `alpha` (Passwort + `otpauth://`-URI mit
+   `secret=…`). Diese landen **nicht im Repo** (Hard Rule 1); ich lese sie zur Laufzeit
+   aus `--creds <pfad>` wie die Wegwerf-Credentials auch. Wenn Du die Daten lieber direkt
+   in den Chat tippst statt in eine Datei, lege ich sie unter `/tmp/opencode/` ab
+   (`chmod 600`), das Skript liest sie ohnehin von dort.
+3. Eine Bestätigung, dass der read-only-Login gegen die Produktion okay ist. Hard Rule 9
+   verbietet mir `systemctl`, `pkill -f` und dergleichen — die Probe tut nichts davon, sie
+   loggt sich ein, **klickt nichts**, und loggt sich am Ende wieder aus (oder beendet den
+   Browser-Kontext, was den Cookie ungültig macht). Wenn der Login am CSRF-Origin scheitert
+   (Plan §7.2, Handover §4.3), melde ich das und breche ab — kein Workaround.
+
+**Self-Check §0.5:** `pytest -q` **969 passed + 1 Flake** (unverändert, V107-Baseline), kein
+Produkt-Code-Touch, Tabu-Diff §0.3 trivial leer, `ui_budget.py` 5/5 (Block E hat keine
+CSS/JS-Änderung), kein `pkill -f`, kein `systemctl`, sharefyx-mcp **PID 991** nur gelesen.
+Wegwerf-Instanz nach der Messung sauber per PID-Datei gestoppt (Plan §7.1 + Hard Rule 9).
+
+**Naechster Schritt (zwei offene Wege):** (a) **E2b jetzt**, sobald URL + Creds da sind —
+gleiches Skript, neues `--base-url` + `--creds`, output `phase8_6_ui_polish/probes/e2b_production.json`
++ `docs/screenshots/p86_probe_production_{1024,1200,1440}.png`. (b) **Block F** (Layering,
+Befunde 1+8), wenn E2b warten muss — ist von der Produktion unabhängig, kann parallel laufen.
+**Reihenfolge-Empfehlung** (P8.6-AH): E → F → G → H → J → Gate; E2b blockiert das nicht,
+weil F die Token-Frage klärt und G die Geometrie umbaut. Sobald E2b durch ist, wandert
+Block E Modul-Status auf ✅ und V125 wird ganz geschlossen.
+
+---
 
 ## Session stopped — 2026-09-13 (Claude-Code-Planungssession — **Plan 2 geschrieben**, sechs Nikinger-Entscheidungen, ein neuer Produktionsfehler gefunden)
 
