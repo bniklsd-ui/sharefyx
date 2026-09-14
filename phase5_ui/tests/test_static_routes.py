@@ -577,21 +577,28 @@ def test_account_button_says_einstellungen():
 
 def test_overview_graph_has_no_max_width_or_min_height():
     """P8.6 Block C C3 (Plan §5.3): `.overview__graph` hat WEDER `max-width` (vorher 960px)
-    NOCH `min-height` (vorher 55vh). Beide entfallen, weil der Container jetzt in einem
-    Grid-Item der rechten Spalte sitzt (`flex: 1` aus `.overview__col-right .overview__graph`),
-    das die Höhe aus dem Grid bezieht (definite Höhe durch `grid-template-rows: auto 1fr` +
-    `min-height: 0`). V112-Gegenprobe: "Map schneidet unten ab" -- jetzt behoben.
+    NOCH `min-height` (vorher 55vh). Beide entfallen, weil der Container die Höhe aus
+    der `.detail__graph`-Kette bezieht (siehe `test_detail_graph_has_a_definite_height_
+    chain`).
 
     Dies ist der §2.3-Regressionswächter -- wer den alten 55vh-Trick zurückbringt, fällt
-    hier auf. Test über CSS-String-Matching: die Regel darf in keiner `.overview__graph`-
-    Deklaration diese Properties mehr enthalten.
+    hier auf. Test über CSS-String-Matching: die Regel darf in keiner **bloßen**
+    `.overview__graph`-Deklaration diese Properties mehr enthalten.
+
+    Phase 8.6 Plan 2 Block G G2: nach Block G trägt `.detail__graph .overview__graph`
+    eine Flex-Basis-Definition (`flex: 1; min-height: 0`), die compound-Selector --
+    absichtlich, der Wert ist hier kein Cap, sondern die Höhenweitergabe aus der Kette.
+    Der Test matcht deshalb den **bloßen** Selektor `.overview__graph` am Zeilenanfang,
+    nicht den compound. Anker `^` mit `re.MULTILINE`, weil `re.VERBOSE` / Lookbehinds
+    fragile gegen CSS-Reformulierungen sind.
     """
     css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
 
-    # Suche alle `.overview__graph`-{...}-Blöcke und prüfe jeden auf das Verbot.
-    # Pattern: ".overview__graph" gefolgt von beliebigem Selector-Text bis zur öffnenden
-    # Klammer, dann den Rumpf bis zur schließenden Klammer.
-    matches = list(re.finditer(r"\.overview__graph[^{]*\{([^}]*)\}", css, flags=re.DOTALL))
+    # Phase 8.6 Plan 2 Block G: nur die bloße `.overview__graph { ... }`-Regel matchen,
+    # NICHT `.detail__graph .overview__graph { ... }` (die trägt absichtlich `min-height: 0`
+    # als Teil der Höhenkette, siehe §4.2.1). `^`-Anker mit `re.MULTILINE` ist robust gegen
+    # Whitespace-Variationen und block-interne Zeilenumbrüche.
+    matches = list(re.finditer(r"^\.overview__graph\s*\{([^}]*)\}", css, flags=re.MULTILINE))
     assert matches, (
         "app.css muss mindestens eine Regel für `.overview__graph` enthalten "
         "(sonst wäre der Test wirkungslos)."
@@ -600,9 +607,8 @@ def test_overview_graph_has_no_max_width_or_min_height():
     for m in matches:
         body = m.group(1)
         assert "max-width" not in body, (
-            f"`.overview__graph` darf kein `max-width` mehr tragen (P8.6 C3). Block:\n"
-            f"  .overview__graph{(' ' + m.group(0).split('{')[0].split('overview__graph')[-1].strip()) if False else ''}{{...}}\n"
-            f"Gefunden in: {body.strip()}"
+            f"`.overview__graph` darf kein `max-width` mehr tragen (P8.6 C3). "
+            f"Block: {body.strip()}"
         )
         assert "min-height" not in body, (
             f"`.overview__graph` darf kein `min-height` mehr tragen (P8.6 C3, V112-Gegenprobe). "
@@ -704,4 +710,242 @@ def test_meta_panel_is_not_tinted_with_the_warning_colour():
         f"Meta-Panel-Token(s) verwenden die --warn-Kanäle (229,169,60) -- "
         f"Befund 8 ist zurück. P8.6-AB: Kopfdaten-Trennung läuft über Layer-Höhe, "
         f"nicht Farbton. Betroffen: {bad}"
+    )
+
+
+# -- Phase 8.6 Plan 2 Block G Wächter (P8.6-X, P8.6-Y, P8.6-AF, P8.6-AL) ----------------
+
+def test_shell_grid_is_240_480_1fr():
+    """P8.6 Plan 2 Block G G1 (P8.6-X): das seit Phase 5 unveraenderte .shell-Raster
+    wird bewusst verschoben (P8.6-O2-Ausloesung, N.7) -- von 240px 380px 1fr auf
+    240px 480px 1fr. Die 1280-px-Media-Query muss die Aenderung mitziehen
+    (64px 480px 1fr statt 64px 380px 1fr). Begruendung 480 statt 380: gemessen
+    brauchen die Space-Zeilen ~433 px (Glyph + Name + bis zu drei Zaehler-Chips),
+    380 reichte nicht.
+
+    Wer das Raster zurueckdreht, faengt diesen Test. Prueft zwei Anker: die
+    Default-Regel (Zeile mit "1fr" als dritter Spalte) und die 1280-px-Media-Query
+    (zweite ".shell { ... }"-Deklaration in einer @media-Regel). Beide muessen
+    "480px" enthalten, keine darf "380px" enthalten.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    # Default-Block: ".shell { display: grid; grid-template-columns: 240px 480px 1fr; ... }"
+    default_match = re.search(r"\.shell\s*\{[^}]*grid-template-columns\s*:\s*([^;]+);", css)
+    assert default_match is not None, (
+        ".shell muss eine grid-template-columns-Deklaration enthalten "
+        "(sonst waere der Block G-Gitterumbau rueckgaengig gemacht worden)."
+    )
+    default_cols = default_match.group(1).strip()
+    assert "480px" in default_cols, (
+        f".shell-Default-Block muss '480px' enthalten (Block G G1, P8.6-X, N.7). "
+        f"Gefunden: '{default_cols}'."
+    )
+    assert "380px" not in default_cols, (
+        f".shell-Default-Block darf '380px' NICHT mehr enthalten -- das war der "
+        f"Phase-5-Stand. Block G G1 hat das auf 480px erweitert. "
+        f"Gefunden: '{default_cols}'."
+    )
+    assert "1fr" in default_cols, (
+        f".shell-Default-Block muss die dritte Spalte als '1fr' definieren "
+        f"(Detail-Slot wächst mit dem Viewport). Gefunden: '{default_cols}'."
+    )
+
+    # 1280-px-Media-Query: sucht die @media-Regel und prueft die darin enthaltene
+    # .shell-Deklaration. Pattern: "@media (max-width: 1280px) { ... .shell { ... } ... }"
+    media_match = re.search(
+        r"@media\s*\(max-width:\s*1280px\)\s*\{(.*?)\n\}", css, flags=re.DOTALL
+    )
+    assert media_match is not None, (
+        "@media (max-width: 1280px) muss in app.css existieren "
+        "(sonst waere der Breakpoint-Block geloescht worden)."
+    )
+    media_body = media_match.group(1)
+    shell_in_media = re.search(r"\.shell\s*\{[^}]*grid-template-columns\s*:\s*([^;]+);", media_body)
+    assert shell_in_media is not None, (
+        ".shell muss INNERHALB der 1280-px-Media-Query eine grid-template-columns-"
+        "Deklaration tragen (sonst waere der schmale Viewport kaputt)."
+    )
+    media_cols = shell_in_media.group(1).strip()
+    assert "480px" in media_cols, (
+        f".shell in @media (max-width: 1280px) muss '480px' enthalten -- Block G G1 "
+        f"zieht die 480px-Breite in den schmalen Viewport mit. Gefunden: '{media_cols}'."
+    )
+    assert "380px" not in media_cols, (
+        f".shell in @media (max-width: 1280px) darf '380px' NICHT enthalten. "
+        f"Gefunden: '{media_cols}'."
+    )
+
+
+def test_overview_lives_in_the_list_slot():
+    """P8.6 Plan 2 Block G G2 (P8.6-Y): die Uebersicht (Spaces + Zuletzt benutzt)
+    zieht in den Listen-Slot (#list-overview in section.list), die Karte hat den
+    Detail-Slot fuer sich allein (#overview-graph in section.detail). Editor ersetzt
+    die Karte, ESC bringt sie zurueck (N.8).
+
+    Prueft die Position der beiden Elemente in app.html -- byte-genau ueber String-
+    Matching, billig und robust gegen CSS-Layout-Aenderungen. Wer eines der Elemente
+    an die alte Stelle zurueckverschiebt, faengt diesen Test.
+
+    Anker der beiden Elemente: das eroeffnende Tag von section.list bzw. section.detail
+    muss VOR dem eroeffnenden Tag des Ziels liegen.
+    """
+    html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
+
+    # Eroeffnende Tags finden.
+    list_open = re.search(r'<section\s+class="list"\s+id="list"\s*>', html)
+    detail_open = re.search(r'<section\s+class="detail"\s+id="detail"\s*>', html)
+    assert list_open is not None, '<section class="list" id="list"> fehlt im Markup'
+    assert detail_open is not None, '<section class="detail" id="detail"> fehlt im Markup'
+
+    # list-overview muss innerhalb von section.list stehen, NACH deren eroeffnendem Tag
+    # und VOR deren schliessendem </section>. Das eroeffnende Tag von detail-overview
+    # (vorhanden oder nicht) ist irrelevant.
+    list_overview_open = re.search(r'<div\s+class="overview"\s+id="list-overview"', html)
+    assert list_overview_open is not None, (
+        '<div class="overview" id="list-overview"> fehlt im Markup (Plan §4.2 G2).'
+    )
+    # section.list schliesst VOR section.detail; das ist die strukturelle Garantie.
+    assert list_open.start() < list_overview_open.start(), (
+        "#list-overview muss INNERHALB section.list stehen -- "
+        "eroeffnendes section.list-Tag muss VOR #list-overview kommen. "
+        f"Positionen: section.list={list_open.start()}, "
+        f"#list-overview={list_overview_open.start()}."
+    )
+
+    # overview-graph muss innerhalb section.detail stehen (V129-Bestaetigung: das Element
+    # selbst wandert mit, nur sein Elternteil wechselt von .overview__col-right nach
+    # .detail__graph).
+    overview_graph_open = re.search(r'<div\s+class="overview__graph"\s+id="overview-graph"', html)
+    assert overview_graph_open is not None, (
+        '<div class="overview__graph" id="overview-graph"> fehlt im Markup.'
+    )
+    assert detail_open.start() < overview_graph_open.start(), (
+        "#overview-graph muss INNERHALB section.detail stehen, NICHT mehr in #detail-overview "
+        "(Plan §4.2 G2: die Karte hat den Detail-Slot allein). "
+        f"Positionen: section.detail={detail_open.start()}, "
+        f"#overview-graph={overview_graph_open.start()}."
+    )
+
+    # Negative Pruefung: das alte #detail-overview darf nicht mehr im Markup sein --
+    # wurde in #list-overview umbenannt und in den Listen-Slot verschoben (G5).
+    assert 'id="detail-overview"' not in html, (
+        "#detail-overview darf nicht mehr im Markup vorkommen -- Block G G2 hat es zu "
+        "#list-overview umbenannt (war der Wrapper um Spaces + Graph, jetzt sind die "
+        "getrennt)."
+    )
+
+
+def test_detail_graph_has_a_definite_height_chain():
+    """P8.6 Plan 2 Block G G2 §4.2.1 (V112-Waechter): die Hoehenkette, die nach dem
+    Umzug der Karte in den Detail-Slot noetig ist, weil das bisherige Grid die
+    definite Hoehe geliefert hat. Wer eine der beiden Stufen vergisst, baut den
+    V112-Bug wieder ein (Karte schneidet unten ab).
+
+    Stufe 1 -- .detail__graph { display: flex; flex-direction: column; flex: 1;
+                                 min-height: 0; padding: ... }
+    Stufe 2 -- .detail__graph .overview__graph { flex: 1; min-height: 0 }
+
+    Prueft die Anwesenheit aller vier Eigenschaften pro Stufe. Reihenfolge der
+    Properties ist egal; das CSS-Parsing-Tool versteht sie in jeder Reihenfolge.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    # Stufe 1: .detail__graph { ... } als Bloeckselektor (nicht compound mit .overview__graph).
+    detail_graph_match = re.search(
+        r"^\.detail__graph\s*\{([^}]*)\}", css, flags=re.MULTILINE
+    )
+    assert detail_graph_match is not None, (
+        "app.css muss eine Regel `.detail__graph { ... }` enthalten "
+        "(sonst hat Block G G2 die Hoehenkette nicht aufgebaut)."
+    )
+    stufe1_body = detail_graph_match.group(1)
+    assert "flex: 1" in stufe1_body, (
+        f".detail__graph braucht `flex: 1` -- sonst fuellt es den Detail-Slot nicht. "
+        f"Block: {stufe1_body.strip()}"
+    )
+    assert "min-height: 0" in stufe1_body, (
+        f".detail__graph braucht `min-height: 0` -- ohne das waechst die Flex-Basis "
+        f"aus dem Inhalt, und die Karte schneidet oben ab. "
+        f"Block: {stufe1_body.strip()}"
+    )
+    assert "flex-direction: column" in stufe1_body, (
+        f".detail__graph braucht `flex-direction: column` -- sonst stapeln sich die "
+        f"Kinder horizontal statt vertikal. Block: {stufe1_body.strip()}"
+    )
+
+    # Stufe 2: .detail__graph .overview__graph { ... } als Compound-Selektor.
+    chain_match = re.search(
+        r"\.detail__graph\s+\.overview__graph\s*\{([^}]*)\}", css
+    )
+    assert chain_match is not None, (
+        "app.css braucht eine Regel `.detail__graph .overview__graph { ... }` -- "
+        "die zweite Stufe der Hoehenkette. Ohne sie hat .overview__graph keine "
+        "definite Hoehe, und das Canvas faellt auf seine Attribut-Hoehe zurueck "
+        "(V112-Bug)."
+    )
+    stufe2_body = chain_match.group(1)
+    assert "flex: 1" in stufe2_body, (
+        f".detail__graph .overview__graph braucht `flex: 1` -- die Weitergabe der "
+        f"Resthoehe an die Karte. Block: {stufe2_body.strip()}"
+    )
+    assert "min-height: 0" in stufe2_body, (
+        f".detail__graph .overview__graph braucht `min-height: 0` -- damit die "
+        f"flex-Basis nicht der Inhalt ist. Block: {stufe2_body.strip()}"
+    )
+
+
+def test_overview_grid_and_its_media_query_are_gone():
+    """P8.6 Plan 2 Block G G6 (9b-Regressionswaechter): Block G raeumt das
+    .overview-Grid und seine 1280-px-Media-Query ersatzlos ab. Befund 9b ist genau,
+    dass die Media-Query die Karte unter 1280 px verkleinerte, weil die Grid-Spalten
+    zusammenbrachen -- das Grid existiert nicht mehr, also kann die Ursache auch
+    nicht zurueckkehren.
+
+    Verbote:
+      - Keine CSS-Regel enthaelt `grid-template-columns: 1fr 40%` (das war das
+        .overview-Grid in C3, jetzt weg).
+      - Keine CSS-Regel verwendet `.overview__col-left` (Wrapper-DIV aus C3,
+        ersatzlos geloescht in G6).
+      - Keine CSS-Regel verwendet `.overview__col-right` (dasselbe fuer die rechte
+        Spalte).
+      - Keine CSS-Regel verwendet `.overview__head-row` (head-row-Spanning-DIV,
+        ersatzlos geloescht in G6).
+
+    Wer spaeter eines der vier Artefakte zurueckbringt, faengt diesen Test.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    # Hinweis: `.overview__space-row` (Space-Zeile im Uebersichts-Inhalt) und
+    # `.overview__header`, `.overview__spaces`, `.overview__recent` (Inhalte der
+    # Uebersicht) bleiben erhalten -- das hier prueft NUR die geloeschten Grid-Wrapper.
+
+    forbidden_classes = (
+        ".overview__col-left",
+        ".overview__col-right",
+        ".overview__head-row",
+    )
+    for cls in forbidden_classes:
+        # Suche nach dem Selektor in CSS-Regeln: ".overview__col-left" gefolgt von
+        # beliebigem Text bis zur Klammer.
+        pattern = re.escape(cls) + r"[^{]*\{"
+        m = re.search(pattern, css)
+        assert m is None, (
+            f"{cls} darf in app.css nicht mehr vorkommen (Block G G6 hat das "
+            f"Wrapper-DIV ersatzlos geloescht). Treffer bei Position {m.start()}: "
+            f"'{m.group(0)}'."
+        )
+
+    # 1fr 40% war die Grid-Definition des .overview-Containers in Block C.
+    # In G2 ist die Uebersicht ein einspaltiger Fluss -- diese Definition darf
+    # nirgends mehr stehen.
+    grid_pattern = re.compile(r"grid-template-columns\s*:\s*1fr\s+40%\s*;")
+    m = grid_pattern.search(css)
+    assert m is None, (
+        f"`grid-template-columns: 1fr 40%` darf in app.css nicht mehr vorkommen "
+        f"(Block G G6 hat das .overview-Grid ersatzlos geloescht). "
+        f"Treffer bei Position {m.start()}: '{css[m.start():m.end()]}'. "
+        f"Hinweis: 1fr 1fr (z.B. fuer .auth__codes) und 64px 480px 1fr (.shell "
+        f"im Breakpoint) sind erlaubt und bleiben hiervon unberuehrt -- der Regex "
+        f"matcht nur das exakte `1fr 40%`-Verhaeltnis."
     )

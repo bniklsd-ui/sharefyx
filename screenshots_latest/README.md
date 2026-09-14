@@ -6,7 +6,7 @@ detail: L3 (Pointer-Verzeichnis, keine eigene Inhaltsquelle)
 up: ../phase8_6_ui_polish/CLAUDE.md   # aktive Phase
 down:
   - ../docs/screenshots/                # kanonische Ablage; diese Verzeichnis ist nur Symlink-Komfort
-updated: 2026-09-11 (Konvention etabliert — Phase 8.6 Block B als Erstbefüllung)
+updated: 2026-09-14 (Phase 8.6 Block G — Block-B-Symlinks wurden ersetzt; Konvention gilt weiterhin, P8.6-AK)
 ---
 # `screenshots_latest/` — Schnellzugriff auf die Screenshots der aktuellen Phase
 
@@ -43,18 +43,16 @@ Ausnahmen, in denen M3 den Dateinamen + Checkkriterium **nicht** nennt:
 - Wenn die Verifikation programmatisch ist (Regex auf gerenderten HTML-Output
   o. ä.) und der Screenshot nur Anhang ist.
 
-## Aktueller Inhalt (Phase 8.6 Block B, Stand 2026-09-11)
+## Aktueller Inhalt (Phase 8.6 Block G, Stand 2026-09-14)
 
 | Dateiname | Original | Checkkriterium |
 |---|---|---|
-| `01_overview_logout_caution.png` | `../docs/screenshots/p86_block_b_01_overview.png` | **Rail-Bottom: "Abmelden" ist rot (Vorsicht-Farbe `var(--caution)`), "Konto" bleibt in Standard-Textfarbe.** Beweis: B4 `action--caution` greift auf `#logout-button`. |
-| `02_list_hover_quiet_selection.png` | `../docs/screenshots/p86_block_b_02_list_hover.png` | **Erste Listen-Zeile hat eine leise bläuliche Tönung + 1px-Outline (nicht der volle `--select-fill`-Verlauf wie bei `aria-current`).** Beweis: B1 konsolidierte Hover-Regel greift für `.list__row` ohne `aria-current`. |
-| `03_editor_archive_caution.png` | `../docs/screenshots/p86_block_b_03_editor.png` | **Editor offen, "Archivieren"-Knopf oben rechts ist rot, "Speichern"-Knopf daneben weiß.** Beweis: B4 auch auf `#archive-button`, Knopfplastik bleibt erhalten. |
-| `04_account_dialog_navigation.png` | `../docs/screenshots/p86_block_b_04_account_dialog.png` | **"Passwort ändern"-Dialog offen: "Update-Log ansehen" und "Spaces verwalten" sind Navigation (kein Knopfplastik-Hintergrund, leiser Hover-Outline), "Ändern"/"Abbrechen" sind weiterhin die echten `.btn`/`.btn-primary`.** Beweis: B3 `.account-nav`-Klasse statt `.btn`-Plastik. |
+| `01_uebersicht.png` | `../docs/screenshots/p86_block_g_01_1440_uebersicht.png` | **`.shell` ist 240/480/1fr, Spaces + Zuletzt benutzt im Listen-Slot (Mitte), Verknüpfungs-Graph hat den Detail-Slot allein (~720 px breit).** Beweis: Befund 5 weg, Befund 4 weg (Karte ist 50 % statt 21 %), Befund 7a weg (`renderOverview()` wird im Listen-Slot gerendert). |
+| `02_space_geoeffnet.png` | `../docs/screenshots/p86_block_g_02_1440_space_geoeffnet.png` | **Nach Klick auf eine Space-Zeile in der Übersicht: die ganze Zeile (inkl. der drei Chip-Counter-Chips „5 Offen / 6 Notizen / 1 Archiv") ist klickbar, der Hover-Fill reicht über die ganze Zeile.** Beweis: Befund 6 weg, P8.6-P wiederhergestellt (G7). |
+| `03_editor_offen.png` | `../docs/screenshots/p86_block_g_03_1440_editor_offen.png` | **Nach Klick auf ein Item: der Editor ersetzt die Karte im Detail-Slot — Kopfdaten + Text-Panel + Anhängen-Zeile sichtbar, Karte weg.** Beweis: G2/G5, ESC-Kette funktioniert (N.8). |
+| `04_editor_nach_esc.png` | `../docs/screenshots/p86_block_g_04_1440_editor_nach_esc.png` | **Nach ESC: Editor weg, Verknüpfungs-Graph ist zurück.** Beweis: N.8 — „ESC bringt die Karte zurück". |
 
-**Bonus für den Nikinger:** oben links in `01_overview_logout_caution.png` ist auch
-der `update-banner` zu sehen (P6-Step-3-Eintrag vom 2026-09-11) — separate
-Verifikation, nicht Teil von Block B, nur weil das Banner zufällig da ist.
+`05_1200_uebersicht.png` und `06_1024_uebersicht.png` sind in `docs/screenshots/p86_block_g_*.png` vorhanden, hier nicht gesymlinkt (Platzhalter-Konvention — vier Hauptscreenshots im Schnellzugriff, alle sechs im Original-Verzeichnis für die Sichtprüfung am Gerät).
 
 ## Rotation
 

@@ -54,7 +54,7 @@
   </nav>
 
   <section class="list" id="list">
-    <header class="list__head">
+    <header class="list__head" id="list-head">
       <div class="list__crumb" id="list-crumb"></div>
       <p class="list__readonly" id="list-readonly" hidden>Nur lesen &mdash; fremder Space</p>
       <div class="list__search">
@@ -69,6 +69,32 @@
         <button class="btn" type="button" id="list-selection-clear">Abwählen</button>
       </div>
     </header>
+    <!-- Phase 8.6 Plan 2 Block G G2 (P8.6-Y): die Uebersicht (Spaces + Zuletzt benutzt +
+         Refresh) ist in den Listen-Slot umgezogen. Sichtbarkeit rendergesteuert --
+         `renderListSlot()` in list.js schaltet hidden je nach `state.overview`. Initial
+         `hidden`, damit kein leerer Block vor `loadOverview()` aufblitzt. IDs der inneren
+         Elemente bleiben unveraendert (Plan §4.2), weil sie ueber `getElementById` aus
+         list.js / graph.js / app.js:136 erreicht werden -- ein Rename waere ein Umbau
+         ohne Ertrag. Der Refresh-Knopf (#overview-refresh) loest Befund 3 (lag vorher
+         geometrisch ueber der Karte und konnte sie ueberdecken). -->
+    <div class="overview" id="list-overview" hidden>
+      <header class="overview__header">
+        <h1 class="overview__title" id="overview-title"></h1>
+        <button class="btn btn--icon overview__refresh" id="overview-refresh" type="button"
+                title="Aktualisieren" aria-label="Aktualisieren">
+          <svg class="icon" aria-hidden="true"><use href="#i-refresh-cw"></use></svg>
+        </button>
+      </header>
+      <div class="legend" aria-label="Space-Kategorien">
+        <span class="legend__item"><span class="legend__dot legend__dot--own"></span>Eigener Space</span>
+        <span class="legend__item"><span class="legend__dot legend__dot--shared"></span>Geteilter Space (schreibbar)</span>
+        <span class="legend__item"><span class="legend__dot legend__dot--foreign"></span>Fremder Space</span>
+      </div>
+      <ol class="overview__spaces" id="overview-spaces"></ol>
+      <h2 class="overview__heading">Zuletzt benutzt</h2>
+      <ol class="overview__recent" id="overview-recent"></ol>
+    </div>
+
     <ol class="list__rows" id="list-rows"></ol>
     <div class="list__empty" id="list-empty" hidden>
       <p id="list-empty-text"></p>
@@ -79,57 +105,13 @@
   <section class="detail" id="detail">
     <button class="detail__back" type="button" id="back-button">&larr; Zur&uuml;ck</button>
 
-    <!-- Startansicht (Step 7b, Phase 8 Block D D1 tabellos) -->
-    <div class="overview" id="detail-overview">
-      <!-- Phase 8.6 Block C C3 (Plan §5.3): .overview ist jetzt ein zweispaltiges Grid
-           (1fr 40% ab ≥1281px, einspaltig darunter). Die direkten Kinder werden in drei
-           logische Gruppen gefasst -- head-row (Header + Legende) spannt beide Spalten,
-           col-left (Spaces + Zuletzt benutzt + Recent) und col-right (Verknüpfungen +
-           Graph) sind die zwei Spalten. Wrapper-DIVs statt grid-column-Zuweisung auf
-           den Bestand-Kindern, weil die Reihenfolge der heutigen Geschwister sonst
-           erhalten bleiben müsste und eine Spaltentrennung pro Element über grid-column
-           fragil gegen spätere Einfügungen wäre. -->
-      <div class="overview__head-row">
-      <!-- Phase 8 Block D D1 (Plan §5 D1): Kopfzeile mit Titel + Refresh-Knopf. Der Refresh-
-           Knopf laedt Overview (und in D2 auch den Graph) neu -- geteilte Header-Zeile mit
-           Flex, damit Titel und Knopf auf einer gemeinsamen Grundlinie stehen, ohne dass
-           der Knopf bei langen Namen umbricht. -->
-      <header class="overview__header">
-        <h1 class="overview__title" id="overview-title"></h1>
-        <button class="btn btn--icon overview__refresh" id="overview-refresh" type="button"
-                title="Aktualisieren" aria-label="Aktualisieren">
-          <svg class="icon" aria-hidden="true"><use href="#i-refresh-cw"></use></svg>
-        </button>
-      </header>
-      <!-- Phase 8 C3 (P8-I): Mini-Legende fuer die drei Space-Kategoriefarben. Statisch --
-           wird vom Renderer nicht angefasst, steht ab App-Start dort. Position direkt unter
-           dem Titel, vor den Space-Zeilen, damit der Leser die Farben dort findet, wo sie
-           zum ersten Mal auftauchen. -->
-      <div class="legend" aria-label="Space-Kategorien">
-        <span class="legend__item"><span class="legend__dot legend__dot--own"></span>Eigener Space</span>
-        <span class="legend__item"><span class="legend__dot legend__dot--shared"></span>Geteilter Space (schreibbar)</span>
-        <span class="legend__item"><span class="legend__dot legend__dot--foreign"></span>Fremder Space</span>
-      </div>
-      </div><!-- /overview__head-row -->
-      <div class="overview__col-left">
-      <!-- Phase 8 Block D D1 (Plan §5 D1): tabellose Space-Zeilen statt Kachel-Grid. Eine Zeile
-           je Space -- Kategoriepunkt + Name + klickbare Counter-Chips (open/done/note/archived,
-           nur die mit count > 0, keine leeren Buckets, F12/F13/F23 aufgeloest). Reihenfolge:
-           eigene Spaces zuerst, dann fremde. Aus dem DOM gerendert, nicht statisch -- die Liste
-           selbst wird per loadOverview() befuellt. -->
-      <ol class="overview__spaces" id="overview-spaces"></ol>
-      <!-- Phase 8.6 Block C C3: Heading "Zuletzt benutzt" steht jetzt in der linken Spalte
-           (vor dem Recent-Block), statt unterhalb des Graph-Panels. Reihenfolge der drei
-           Inhalte der linken Spalte: Spaces → Heading → Recent. -->
-      <h2 class="overview__heading">Zuletzt benutzt</h2>
-      <ol class="overview__recent" id="overview-recent"></ol>
-      </div><!-- /overview__col-left -->
-      <div class="overview__col-right">
-      <!-- Phase 8 Block D D2 (Plan §5 D2): Graph-Panel mit <canvas>, Toggle-Toolbar und
-           Leerzustand-Hinweis. Container ist 55vh (Plan §5 D2), D1 hat das Geruest gebaut,
-           D2 befuellt es mit Force-Simulation, Toggles (Tags/Ordner, Default aus) und
-           dem Hinweistext fuer den leeren Fall. Phase 8.6 Block C C3: max-width/min-height
-           entfallen, der Container füllt die rechte Grid-Spalte (flex: 1, min-height: 0). -->
+    <!-- Phase 8.6 Plan 2 Block G G2/G5 (P8.6-Y/N.8): die Karte hat den Detail-Slot fuer sich
+         allein. Editor ersetzt sie, ESC bringt sie zurueck (N.8). Die Hoehenkette
+         `.detail { flex } -> .detail__graph { flex: 1; min-height: 0 } ->
+         .overview__graph { flex: 1; min-height: 0 }` steht in app.css §4.2.1 und ist der
+         V112-Waechter -- wer nur die Loeschung des .overview-Grids umsetzt und diese
+         Ersatzkette vergisst, baut den V112-Bug wieder ein (Karte schneidet unten ab). -->
+    <div class="detail__graph" id="detail-graph">
       <h2 class="overview__heading">Verkn&uuml;pfungen</h2>
       <div class="overview__graph" id="overview-graph">
         <div class="overview__graph-toolbar" id="overview-graph-toolbar">
@@ -150,7 +132,6 @@
           <code>itm_&hellip;</code>-Referenz im Text &mdash; dann erscheinen sie hier als Kanten.
         </p>
       </div>
-      </div><!-- /overview__col-right -->
     </div>
 
     <div id="detail-readonly" hidden>

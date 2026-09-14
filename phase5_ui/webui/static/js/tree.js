@@ -23,6 +23,11 @@ export function navigateAll() {
   state.scope = "all";
   state.filter = null;
   state.folder = null;
+  // Phase 8.6 Plan 2 Block G G3/G4 (P8.6-AG / Befund 7a): im "Alle Items"-Modus ist
+  // `renderListSlot()` immer in der Listen-Ansicht, nie in der Übersicht -- setzen wir
+  // `state.overview` auf false, bevor renderListSlot() zur Frage kommt. Sonst bliebe
+  // die Übersicht sichtbar, obwohl der globale Modus sie per Definition ausschließt.
+  state.overview = false;
   // V117 (gleiche Begruendung wie in activateView): der erste renderRail() laeuft BEVOR
   // loadItems() resolved -- wenn state.itemsLoaded noch von einem frueheren Space-Modus
   // befuellt ist, wuerden Folder-Counter aus dem falschen Pool gezeigt. Reset auf {}.
@@ -281,6 +286,10 @@ export function activateView(spaceName) {
   // dass jede Aufrufstelle das selbst erinnern muss.
   state.scope = "space";
   state.activeSpace = spaceName;
+  // Phase 8.6 Plan 2 Block G G3 (P8.6-AA): ein Sprung in einen Space ist immer ein
+  // Verlassen der Übersicht. `renderListSlot()` wertet `state.overview` aus, um die
+  // Item-Liste statt der Spaces-Übersicht anzuzeigen.
+  state.overview = false;
   // V117: alle per "all" gesetzten Loaded-Flags zurücksetzen -- sonst zeigt das Rail
   // für ein paar ms Counts aus dem globalen Pool, die zum Ziel-Space gar nicht passen.
   state.itemsLoaded = {};

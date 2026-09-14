@@ -6,13 +6,17 @@ import { state, editorPart, activeSpaceWritable, setCreateControlsPresent } from
 import { el, toast } from "./toasts.js";
 import { api } from "./api.js";
 import { markdownToHtml } from "./markdown.js";
-import { loadItems, loadOverview, renderList } from "./list.js";
+import { loadItems, loadOverview, renderList, renderListSlot } from "./list.js";
 import { renderRail } from "./tree.js";
 import { confirmDialog, showConflictDialog, openLinkPicker } from "./dialogs.js";
 import { iconSvg } from "./icons.js";
 
 var shellEl;
-var overviewEl;
+// Phase 8.6 Plan 2 Block G G5: das, was in Block C `overviewEl` hieß (#detail-overview, der
+// Wrapper um Spaces + Graph), ist nach dem Umzug nur noch die Karte. Das DOM-Element heißt
+// jetzt `#detail-graph`; die Spaces-Übersicht lebt in `#list-overview` und wird von
+// `list.js :: renderListSlot()` gesteuert.
+var graphPaneEl;
 var detailReadonlyEl;
 var roTitleEl;
 var roMetaEl;
@@ -47,7 +51,7 @@ var assetStripEl;
 var linkPickerButtonEl;  // Phase 8 Block B Step B4 (Plan §3 B4)
 
 export function showOverviewPane() {
-  overviewEl.hidden = false;
+  graphPaneEl.hidden = false;
   detailReadonlyEl.hidden = true;
   detailEditorEl.hidden = true;
   editorPart.detach();
@@ -63,11 +67,24 @@ export function clearDetail() {
   // `state.scope === "all"` nach "Alle Items" -> Home stehen, `activeSpaceWritable()` gab dort
   // faelschlich `false` zurueck und liess den Anlegen-Knopf auf der eigenen, schreibbaren
   // Uebersicht ausgehaengt. Playwright-bestaetigt (Wegwerf-Instanz, kein Repo-Artefakt).
+  //
+  // Phase 8.6 Plan 2 Block G G3 (Plan §4.3): dieselbe Zeile ist jetzt AUCH das einzige,
+  // was `state.scope` aus "all" zurück auf "space" bringt, NACHDEM `navigateAll()` aus
+  // dem Home-Handler entfernt ist (Plan §4.3, G3). Der alte Handler rief closeEditor ->
+  // clearDetail (setzt scope="space") -> navigateAll (setzt scope="all" wieder). Nach
+  // G3 lässt der Home-Button den Scope auf "space" stehen, weil das, was der Nutzer
+  // sehen soll, jetzt `state.overview = true` macht (Spaces-Übersicht), nicht der
+  // globale Modus. Wer diese Zeile später als toten Code entfernt, bricht den
+  // Home-Knopf -- ohne den Reset bleibt `isGlobalScope()` true, und
+  // `renderListSlot()` ruft nie `renderOverview()` auf.
   state.scope = "space";
   setCreateControlsPresent(activeSpaceWritable());
   showOverviewPane();
   renderRail();
-  renderList();
+  // Phase 8.6 Plan 2 Block G G4 (V128): Slot-schaltend rendern, nicht direkt die Liste.
+  // Welche der beiden Ansichten (Übersicht vs. Item-Liste) sichtbar wird, entscheidet
+  // `state.overview` -- nicht diese Funktion.
+  renderListSlot();
 }
 
 function snapshotFromItem(item) {
@@ -320,7 +337,10 @@ function showReadonlyItem(item) {
   // ZULETZT geöffneten eigenen Items scharf, während rechts ein fremdes Item steht.
   detailEditorEl.hidden = true;
   state.editingSnapshot = null;
-  overviewEl.hidden = true;
+  // Phase 8.6 Plan 2 Block G G5: `overviewEl` heißt jetzt `graphPaneEl` -- das DOM-Element
+  // heißt `#detail-graph` (vorher `#detail-overview`), referenziert aber nach dem Umzug
+  // aus G2 nur noch die Karte, nicht die Spaces.
+  graphPaneEl.hidden = true;
   detailReadonlyEl.hidden = false;
   roTitleEl.textContent = item.title;
   roMetaEl.textContent = "";
@@ -337,7 +357,10 @@ function showReadonlyItem(item) {
 function showEditableItem(item, opts) {
   opts = opts || {};
   editorPart.attach();
-  overviewEl.hidden = true;
+  // Phase 8.6 Plan 2 Block G G5: dasselbe Element wie in showReadonlyItem (vorher
+  // overviewEl). Wenn der Editor aufgeht, muss die Karte aus dem Detail-Slot verschwinden;
+  // kommt sie zurück (ESC), übernimmt das clearDetail() via showOverviewPane().
+  graphPaneEl.hidden = true;
   detailReadonlyEl.hidden = true;
   detailEditorEl.hidden = false;
 
@@ -403,12 +426,17 @@ export function loadEditorFromItem(item, opts) {
 
   shellEl.dataset.view = "detail";
   renderRail();
-  renderList();
+  // Phase 8.6 Plan 2 Block G G4 (V128): Slot-schaltend rendern, nicht direkt die Liste.
+  // Bleibt der Nutzer im Listen-Modus (state.overview === false), aktualisiert das die
+  // aria-current-Markierung; ist er im Übersichts-Modus (kommt per Klick aus einem
+  // Recent-Item), wird der Listen-Slot auf die Item-Liste des Ziels umgeschaltet.
+  renderListSlot();
 }
 
 export function selectItem(id) {
   state.selectedId = id;
-  renderList();
+  // Phase 8.6 Plan 2 Block G G4 (V128): Slot-schaltend rendern.
+  renderListSlot();
   return api("/items/" + encodeURIComponent(id)).then(function (item) {
     return loadEditorFromItem(item);
   });
@@ -484,7 +512,11 @@ export function saveItem() {
 
 export function init() {
   shellEl = document.getElementById("shell");
-  overviewEl = document.getElementById("detail-overview");
+  // Phase 8.6 Plan 2 Block G G5: `#detail-overview` (Block-C-Name) wurde in G2 zu
+  // `#list-overview` (im Listen-Slot) und `#detail-graph` (im Detail-Slot, die Karte).
+  // `graphPaneEl` ist die Karte, weil das, was `showOverviewPane()` zeigt, seit G5
+  // nur noch sie ist.
+  graphPaneEl = document.getElementById("detail-graph");
 
   detailReadonlyEl = document.getElementById("detail-readonly");
   roTitleEl = document.getElementById("ro-title");

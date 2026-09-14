@@ -5,7 +5,7 @@ import {
 } from "./state.js";
 import { init as initToasts } from "./toasts.js";
 import { api, csrfToken, reportUnexpectedError } from "./api.js";
-import { init as initTree, navigateAll } from "./tree.js";
+import { init as initTree } from "./tree.js";
 import * as List from "./list.js";
 import * as Editor from "./editor.js";
 import {
@@ -89,19 +89,37 @@ function initShell() {
   // -- Übersicht / Logout / Zurück ---------------------------------------------------------
 
   var homeButtonEl = document.getElementById("home-button");
-  // Phase 8 Block D D1 + D2 (Plan §5 D1/D2): Klick auf den Übersicht-Knopf schließt den Editor
-  // (mit Rueckfrage bei ungespeicherten Aenderungen), schaltet die Listen-Spalte auf den
-  // globalen "Alle Items"-Scope UND laedt den Graph neu. `closeEditor()` ruft intern
-  // `clearDetail()`, das `state.scope` auf "space" zuruecksetzt (V82, P6-Advisor-Fund) --
-  // das `navigateAll()` HIER setzt es direkt danach wieder auf "all". Kein Umgehen,
-  // Zusammenspiel explizit getestet (Playwright-Smoke prueft beide Pfaade: Klick aus eigenem
-  // Space, Klick aus bereits aktivem globalem Scope).
+  // Phase 8 Block D D1 + D2 (Plan §5 D1/D2), Phase 8.6 Plan 2 Block G G3 (P8.6-AA): Klick
+  // auf den Übersicht-Knopf schließt den Editor (mit Rueckfrage bei ungespeicherten
+  // Aenderungen), schaltet die Listen-Spalte auf die Spaces-Übersicht UND laedt den Graph
+  // neu.
+  //
+  // **V110 als negativer Befund:** `#home-button` und `.tree__scope` ("Alle Items") riefen
+  // bisher beide `navigateAll()` -- denselben Knopf, dieselbe Aktion. Plan 2 §4.3 hat sie
+  // getrennt: `#home-button` -> Spaces-Übersicht (state.overview = true), `.tree__scope` ->
+  // globaler "Alle Items"-Modus (navigateAll, state.overview = false).
+  //
+  // **state.overview = true wird VOR closeEditor() gesetzt**, nicht im .then(). Grund:
+  // closeEditor() -> clearDetail() -> renderListSlot() rendert bereits. Würden wir erst
+  // im .then() umschalten, zeigte der erste Frame nach dem Schließen die Item-Liste statt
+  // der Übersicht. Bricht der Nutzer die Rückfrage ab (proceed === false), wird es im
+  // else-Zweig wieder auf den vorherigen Wert zurückgesetzt -- sonst wechselt ein
+  // *abgebrochener* Navigationsversuch trotzdem die Ansicht.
   homeButtonEl.addEventListener("click", function () {
+    var previousOverview = state.overview;
+    state.overview = true;
     Editor.closeEditor().then(function (proceed) {
-      if (proceed === false) return;
-      navigateAll();
+      if (proceed === false) {
+        state.overview = previousOverview;
+        return;
+      }
       loadGraphPanel();
-    }).catch(reportUnexpectedError);
+    }).catch(function (err) {
+      // Sicherheitsnetz: wenn closeEditor() wirft, müssen wir die Overview-Flag selbst
+      // wieder zurückrollen, der else-Zweig oben läuft sonst nicht.
+      state.overview = previousOverview;
+      reportUnexpectedError(err);
+    });
   });
 
   // Phase 8 Block B Step B4 (Plan §3 B4): Klick-Delegation auf `a[href^="#item/"]`. Verwendet

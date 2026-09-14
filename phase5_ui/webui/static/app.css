@@ -356,7 +356,11 @@ select.input:focus {
 
 .shell {
   display: grid;
-  grid-template-columns: 240px 380px 1fr;
+  /* Phase 8.6 Plan 2 Block G G1 (P8.6-X): das seit Phase 5 unveraenderte .shell-Raster
+     wird bewusst verschoben (P8.6-O2-Ausloesung, N.7). 480 statt 380: gemessen brauchen
+     die Space-Zeilen ~433 px (Glyph + Name + bis zu drei Zaehler-Chips); 380 reicht nicht,
+     der Name buwchstabe wuerde zwischen die Chips rutschen. */
+  grid-template-columns: 240px 480px 1fr;
   height: 100vh;
   overflow: hidden;
 }
@@ -448,7 +452,10 @@ select.input:focus {
 .tree__space:hover,
 .tree__folder:hover:not([aria-current="true"]),
 .tree__scope:hover:not([aria-current="true"]),
-.overview__space-row:hover,
+/* Phase 8.6 Plan 2 Block G G7: der Zeilen-Hover sitzt jetzt auf `.overview__space-open`,
+   das selbst die ganze Zeile ist (Glyph + Name + Chip-Leiste). Auf der <li> selbst hat
+   kein Hover etwas zu suchen -- das war Block-C-Stand, solange der Klick am Namen hing. */
+.overview__space-open:hover,
 .link-picker-results li:hover:not([aria-selected="true"]) {
   background: var(--select-fill-quiet);
   outline: 1px solid var(--select-line-quiet);
@@ -915,34 +922,22 @@ select.input:focus {
   background: var(--bg-void);   /* P8.6-D/E: "nichts da" als explizites Schwarz */
 }
 
-/* -- Übersichtsseite (Step 7b) ------------------------------------------------------------ */
+/* -- Übersichtsseite (Phase 8.6 Plan 2 Block G G2) -----------------------------------------
+   Die Übersicht (Spaces + Zuletzt benutzt) lebt jetzt in section.list als einspaltiger
+   Fluss. Das frühere zweispaltige Grid (1fr 40%) und seine 1280-px-Media-Query (G6)
+   sind gelöscht — die Karte hat den Detail-Slot für sich allein. Die Höhenkette ist
+   .list { display:flex; flex-direction:column; overflow-y:auto } -> .overview
+   { flex:1; min-height:0; overflow-y:auto } -> Kinder block-stacken vertikal. */
 
 .overview {
-  /* Phase 8.6 Block C C3 (Plan §5.3): .overview wird ein zweispaltiges Grid (1fr 40% ab
-     ≥1281px, einspaltig darunter -- siehe @media weiter unten). `flex: 1` statt
-     `height: 100%`, weil .overview NICHT das einzige Kind von .detail ist (auch
-     .detail__back, #detail-readonly und Editor sind Geschwister; nur über 1024px sind
-     sie nicht sichtbar, aber der Grid-Bug wäre dieselbe). `min-height: 0` damit die
-     Zeile "1fr" nicht vom Inhalt aufgebläht wird und die Spalten ihren eigenen
-     overflow-y haben. `overflow: hidden` weil die Spalten scrollen, nicht die ganze
-     Übersicht. */
-  display: grid;
-  grid-template-columns: 1fr 40%;
-  grid-template-rows: auto 1fr;
-  gap: calc(var(--space) * 3);
   flex: 1;
   min-height: 0;
-  overflow: hidden;
   padding: calc(var(--space) * 4);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space) * 1);
 }
-/* head-row spannt beide Spalten (Header + Legende stehen oben über der ganzen Fläche). */
-.overview__head-row { grid-column: 1 / -1; min-width: 0; }
-/* Linke Spalte: Spaces + Zuletzt-Benutzt-Heading + Recent. Eigener overflow-y. */
-.overview__col-left { overflow-y: auto; min-height: 0; min-width: 0; }
-/* Rechte Spalte: Verknüpfungs-Heading + Graph. Vertikal flex, damit der Graph den Rest
-   der Zeile füllt (1fr im Grid). */
-.overview__col-right { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
-.overview__col-right .overview__graph { flex: 1; }
 .overview__title { margin-bottom: calc(var(--space) * 2); }
 
 /* Mini-Legende (Phase 8 C3, P8-I) -- kleines statisches Element im Uebersichts-Kopf, das die
@@ -990,62 +985,53 @@ select.input:focus {
 .overview__header .overview__title { margin-bottom: 0; flex: 1; min-width: 0; }
 .overview__refresh { flex-shrink: 0; }
 
-/* Phase 8 Block D D1 (Plan §5 D1): tabellose Space-Zeilen -- ersetzt das ehemalige
-   .overview__tiles-Kachel-Grid (F12/F23) UND die .space-card-Liste der fremden Spaces
-   (F13). Eine Zeile je Space, Kategoriepunkt + Name links, Counter-Chips rechts.
-   Maximale Breite wie .recent-row (720px), damit Uebersicht und Graph-Panel visuell
-   aufeinander aufbauen. */
+/* Phase 8 Block D D1 (Plan §5 D1): tabellose Space-Zeilen. Phase 8.6 Plan 2 Block G G7
+   (P8.6-AF): `.overview__space-open` ist jetzt der Zeilen-Button -- er umschliesst
+   Glyph, Namen UND die Chip-Leiste, der <li> ist nur noch Listentraeger. Damit ist
+   die ganze Zeile inkl. Chips klickbar (Befund 6, P8.6-P wiederhergestellt). Chips
+   drinnen sind `<span role="button" tabindex="0">` statt `<button>` (verschachtelte
+   buttons waeren ungueltiges HTML); Klick- und Keydown-Handler (Enter/Space) bleiben
+   in `list.js :: renderOverview()`. Phase 8.6 Plan 2 Block G G6: `max-width: 720px`
+   ist geloescht -- der Listen-Slot ist 480 px breit, ein Cap dahin ist wirkungslos. */
 .overview__spaces {
   list-style: none;
   margin: 0 0 calc(var(--space) * 3);
   padding: 0;
-  max-width: 720px;
 }
 .overview__space-row {
-  display: flex;
-  align-items: center;
-  gap: calc(var(--space) * 2);
-  padding: calc(var(--space) * 1.25) 0;
   border-bottom: 1px solid var(--line);
 }
-.overview__space-row:first-child { padding-top: 0; }
-.overview__space-row:last-child { border-bottom: 0; padding-bottom: 0; }
+.overview__space-row:first-child { border-top: 0; }
+.overview__space-row:last-child { border-bottom: 0; }
 
-.overview__space-name {
-  display: flex;
-  align-items: center;
-  gap: var(--space);
-  flex: 1;
-  min-width: 0;
-}
-/* Phase 8.6 Block C C4 (Plan §5.4): .overview__space-open ist der eigentliche Klick-Anker
-   der Space-Zeile (statt der ganzen <li>). Eigene Button-Basis (background: none + border
-   none), damit der Name im selben visuellen Layout bleibt wie vorher -- der Hover aus B1
-   wird hier mit :hover:not([disabled]) aufgenommen, damit klickbare Zeilen die bekannte
-   quiet-Selektion bekommen, der Knopf sich aber nicht wie ein `.btn` anfühlt (er ist
-   Navigation, nicht Aktion). */
+/* G7: Zeilen-Button. Nimmt die volle Breite der Zeile, enthaelt Glyph + Name +
+   Chip-Leiste. Hover-Fill wandert vom LI (Block B) auf diesen Knopf -- Befund 6
+   ist genau, dass der Fill nur den Namen traf, nicht die Chips. */
 .overview__space-open {
   display: flex;
   align-items: center;
-  gap: var(--space);
-  flex: 1;
-  min-width: 0;
+  gap: calc(var(--space) * 2);
+  width: 100%;
+  padding: calc(var(--space) * 1.25) 0;
   background: none;
   border: none;
-  padding: 0;
-  margin: 0;
   text-align: left;
   font: inherit;
   color: inherit;
   cursor: pointer;
   border-radius: var(--radius-sm);
 }
-.overview__space-open:hover:not(:disabled) {
+.overview__space-open:hover {
   background: var(--select-fill-quiet);
   outline: 1px solid var(--select-line-quiet);
   outline-offset: -1px;
 }
+/* Glyph-Kreis + Space-Name innerhalb des Zeilen-Knopfs -- kein eigener Wrapper mehr
+   (vorher war `.overview__space-name` ein Flex-Container um den inneren Knopf; G7
+   hat den Knopf zur Zeile gemacht, der Wrapper faellt weg). */
 .overview__space-name-label {
+  flex: 1;
+  min-width: 0;
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1058,7 +1044,14 @@ select.input:focus {
   gap: calc(var(--space) * 0.5);
   flex-wrap: wrap;
   justify-content: flex-end;
+  /* G7: Chips sitzen jetzt INNERHALB des Zeilen-Buttons. `margin-left: auto` schiebt
+     sie an das Ende der Flex-Reihe, ohne dass ein separates `.overview__space-name`-
+     Wrapper noetig waere. */
+  margin-left: auto;
 }
+/* Chips sind seit G7 `<span role="button">` statt `<button>` (verschachtelte
+   `<button>` waeren ungueltig). Styling bleibt identisch zu Block C, nur die
+   display-Wahl kommt jetzt aus dem role-Element statt aus der Tag-Form. */
 .overview__space-count {
   background: var(--surface);
   border: 1px solid var(--line);
@@ -1076,13 +1069,34 @@ select.input:focus {
   outline-offset: 1px;
 }
 
+/* Phase 8.6 Plan 2 Block G G2 §4.2.1: die Höhenkette, die die Karte nach dem Umzug in den
+   Detail-Slot versorgt. `.detail` ist bereits `display: flex; flex-direction: column;
+   min-height: 0` (Block C-Stand, app.css:384-388). `.detail__graph` erbt davon und
+   gibt `flex: 1; min-height: 0` an das Kind `.overview__graph` weiter -- ohne die zweite
+   `min-height: 0` wäre die Flex-Basis der Inhalt, und die Karte wüchse statt zu füllen.
+   Der innere `.overview__heading` (Verknüpfungen) steht zwischen Wrapper und Graph, das
+   ist der Grund für die Zwei-Ebenen-Kette.
+
+   Diese zwei Regeln sind der **V112-Wächter nach dem Umzug** (test_detail_graph_has_a_
+   definite_height_chain). Wer sie löscht, baut den V112-Bug wieder ein: das Canvas fällt
+   auf seine Attribut-Höhe zurück, während `resize()` (`graph.js:550-560`) gegen den
+   Elternteil rechnet -- die Karte erscheint wieder abgeschnitten.
+*/
+.detail__graph {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  padding: calc(var(--space) * 4);
+}
+.detail__graph .overview__graph { flex: 1; min-height: 0; }
+
 /* Phase 8 Block D D2 (Plan §5 D2): Graph-Panel-Geruest. Phase 8.6 Block C C3 (Plan §5.3):
-   `min-height: 55vh` und `max-width: 960px` entfallen -- das Panel sitzt jetzt in einem
-   Grid-Item der rechten Spalte (`flex: 1` aus `.overview__col-right .overview__graph`),
-   das die Höhe aus dem Grid bezieht (definite Höhe durch `grid-template-rows: auto 1fr`
-   + `min-height: 0`). Die Breite kommt aus der Spalte (40%), nicht aus einem Cap. Canvas
-   füllt 100% des jetzt definitiv großen Containers. V112-Gegenprobe (Karte schneidet
-   unten ab): jetzt behoben, weil die Karte die volle Spaltenhöhe erbt. */
+   `min-height: 55vh` und `max-width: 960px` entfallen. Phase 8.6 Plan 2 Block G G2:
+   die Karte hat jetzt `.detail__graph` als Elternteil (siehe oben, §4.2.1), die
+   `.overview__graph`-Höhe kommt aus dieser Kette -- nicht mehr aus einem Grid-Item.
+   V112-Gegenprobe (Karte schneidet unten ab): behoben durch die `min-height: 0`-Kette
+   in beiden Ebenen. */
 .overview__graph {
   position: relative;
   border: 1px solid var(--line);
@@ -1161,7 +1175,7 @@ select.input:focus {
   border-radius: var(--radius-sm);
 }
 
-.overview__recent { list-style: none; margin: 0; padding: 0; max-width: 720px; }
+.overview__recent { list-style: none; margin: 0; padding: 0; }
 
 .recent-row {
   display: flex;
@@ -1884,23 +1898,15 @@ body.has-update-banner .shell { height: calc(100vh - var(--banner-h)); margin-to
 /* -- Breakpoints (§4.3) ------------------------------------------------------------------ */
 
 @media (max-width: 1280px) {
-  .shell { grid-template-columns: 64px 380px 1fr; }
+  /* Phase 8.6 Plan 2 Block G G1: 480 statt 380 -- dieselbe Begruendung wie im Default-Block. */
+  .shell { grid-template-columns: 64px 480px 1fr; }
   .rail__label, .rail__brand, .tree__group, .tree__count, .tree__badge { display: none; }
   .rail__home, .rail__action { justify-content: center; }
   .tree__folder { padding-left: var(--space); }
   .rail__account { flex-direction: column; }
-  /* Phase 8.6 Block C C3 (Plan §5.3): unter 1280px kollabiert das .overview-Grid auf eine
-     Spalte -- die Map rutscht unter die Liste, statt sie zu zerteilen. Reihenfolge in der
-     DOM bleibt gleich (head-row, col-left, col-right), die Spalten werden einfach zu
-     untereinander gestapelten Reihen. height wird auto, weil eine 1fr-Zeile in einem
-     einspaltigen Grid keinen Eltern-Constraint hat (sonst wären die Spalten gleich hoch
-     und die Karte erschiene wieder abgeschnitten). */
-  .overview {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-    height: auto;
-  }
-  .overview__col-left, .overview__col-right { overflow: visible; }
+  /* Phase 8.6 Plan 2 Block G G6: der .overview-Block dieser Media-Query ist geloescht --
+     das .overview-Grid und die 1280-px-Einklapp-Regel sind mit dem Umzug der Karte in
+     den Detail-Slot ersatzlos entfallen (sie loeschten Befund 9b mit). */
 }
 
 @media (max-width: 1024px) {

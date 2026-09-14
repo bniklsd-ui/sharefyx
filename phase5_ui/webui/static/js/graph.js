@@ -102,7 +102,7 @@ const COLORS = Object.freeze({
 
 export function init() {
   canvasEl = document.getElementById("overview-graph-canvas");
-  if (!canvasEl) return;        // /ui/ ist session-gated -- /ui/login rendert ohne #detail-overview
+  if (!canvasEl) return;        // /ui/ ist session-gated -- /ui/login rendert ohne #detail-graph
   ctx = canvasEl.getContext("2d");
   if (!ctx) return;             // Headless / kein Canvas-Support -- Smoke-Skripte müssen abfangen
 

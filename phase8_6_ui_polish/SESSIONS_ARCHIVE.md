@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-14 (E2b-Sub-Block [vom 2026-09-14, E2b-Commit `cc3f342`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — sechste Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 5.058 B; Archiv 128.603 → 133.661 B) | 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
+updated: 2026-09-14 (**Block F erledigt ✅** — Head 84.110→79.728 B, Archiv 133.929→138.311 B. Block-F-Session-Block 64 Z./4.382 B per Skript ins Archiv rotiert; Phase-Head jetzt nur Block-G-Session-Block. **`Phase 8.6 Plan 2` arbeitet an den neun UX-Befunden — Block G erledigt Block 5/3/4/6/7a**) | 2026-09-14 (E2b-Sub-Block [vom 2026-09-14, E2b-Commit `cc3f342`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — sechste Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 5.058 B; Archiv 128.603 → 133.661 B) | 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -24,6 +24,70 @@ das Skript auf das Phase-8.5-Muster passt und mit einem `## Session stopped` + m
 
 
 
+
+## Session stopped — 2026-09-14 (opencode/M3 — **Block F erledigt** — Layering konsequent, zwei Wächter scharf)
+
+**Atomarer Block, kein Mess-Overhead — `app.css` + zwei statische Tests.** Block F ist
+Fundament für Block G: G verschiebt Flächen und würde ohne F dieselbe Arbeit zweimal machen
+(Plan §0.2 P8.6-U + §3).
+
+**F1 — Kopfdaten werden kühl (Befund 8).** `app.css:107-123`: `--panel-meta` `#1A1611` →
+`var(--surface)` (`#14181D`), `--panel-meta-head` `#221C15` → `var(--surface-raised)`
+(`#1B2027`), `--panel-meta-line` `rgba(229,169,60,.22)` → `var(--line)`. Der Kommentarblock
+vor den Tokens ist datiert ersetzt — die Begründung „warmer Stich macht Kopfdaten erkennbar"
+steht jetzt mit dem Vermerk, dass die Trennung seit Block F über Layer-Höhe läuft (P8.6-AB,
+N.10). Die verworfene Alternative „kühl-blau statt warm-gelb" ist explizit benannt (würde
+eine zweite Nicht-Akzent-Farbe einführen, Phase-8-Verbot 4).
+
+**F2 — Editor-Layering.** Plan §3.2 sagt: "prüfen, nicht ändern" für `.panel--body`
+(`--panel-body` schon Layer 3) und `.editor__textarea` (V127: kein eigener Hintergrund,
+erbt von `.panel--body`). `.editor__append` (Layer 2 über Layer 3) trägt schon
+`background: var(--surface)` + `border-top: 1px solid var(--line)`; **V127 geschlossen:
+null B-Aufwand.** Kein Code-Touch an app.css für F2.
+
+**F3 — Drei rohe Flächen-Hex auf Token.** Neue Tokens in `:root` (Z. 35-39, direkt unter
+`--surface-raised`): `--rail-top: #0E1116` (`.rail`-Verlauf, `app.css:374`),
+`--auth-glow: #131A23` (Login-Hintergrund, `app.css:1788`), `--auth-card-top: #1A2029`
+(`.auth-card`-Verlauf, `app.css:1794`). `#fff` in `.qr-frame` (`app.css:1844`) bleibt mit
+begründendem Kommentar ("QR-Code braucht echtes Weiß"). Vorher 17 rohe Hex außerhalb `:root`,
+nachher 11 — alle dokumentiert (3 Space-Kategorie-Verläufe, QR `#fff`, plus die `--btn-primary`
+`color: #fff`).
+
+**F4 — Zwei Wächter (§8.2).** `test_no_raw_surface_hex_outside_root` (jede `background:`/
+`gradient(`-Deklaration außerhalb `:root` nutzt Token oder ist in der EXEMPT_HEX-Liste;
+Ausnahmen dokumentiert). `test_meta_panel_is_not_tinted_with_the_warning_colour`
+(prüft gezielt die drei `--panel-meta*`-Tokens, nicht "alle 229,169,60" — die
+Warnungs-Chips `.list__readonly`/`.detail__badge-readonly` mit `rgba(229,169,60,.10)`
+referenzieren `var(--warn)` und sind legitim). Beide Tests sind byte-genau: jede künftige
+Re-Tönung des Meta-Panels oder jedes neue rohe Flächen-Hex fällt auf.
+
+**Self-Check §0.5:** `pytest -q` **972 passed in 111,52 s** (V107-Baseline 970 + 2 neue
+Wächter), `ui_budget.py` 5/5 (130,1 KB → 130,1 KB im Korridor; `app.css` 60.201 → 60.319 B,
++118 B für die 3 Token-Kommentare und den aktualisierten Meta-Block), Tabu-Diff §0.3
+trivial leer (`app.css` ist statisches Asset, Phase 5 P5-B erlaubt), kein `pkill -f`, kein
+`systemctl`, sharefyx-mcp **PID 991** nur gelesen. **V127 geschlossen: 0** (textarea
+erbt von panel-body, kein eigener Hintergrund). **V126 unverändert: 0** (1024 px
+Daten-view-Mechanismus).
+
+**Zwei Selbst-Screenshots** (`p86_block_f_self_check.py` neu, ~140 Z., Playwright-Chromium +
+TOTP-Login aus `p86_block_c_self_check.py`):
+
+- `docs/screenshots/p86_block_f_01_vorher_warm_meta.png` (124.242 B) — Editor mit
+  `--panel-meta` zurück auf `#1A1611` (per `git stash` + manueller Revert für die Aufnahme,
+  danach `git stash pop`; der Revert berührte nur app.css lokal, ist im Commit nicht
+  enthalten) — sichtbar warmer Stich unter dem "Kopfdaten"-Header.
+- `docs/screenshots/p86_block_f_02_nachher_cool_meta.png` (124.196 B) — selbe Ansicht mit
+  F1-Werten: das Meta-Panel ist kühl, die Linie zwischen Head und Feldern ist die
+  Standard-Haarlinie. Befund 8 visuell bestätigt weg.
+
+**Checkkriterium (ein Satz, §5-Konvention):** das Meta-Panel zeigt eine kühle Layer-2-Fläche
+(`--surface = #14181D`) statt der warmen `rgba(229,169,60,.22)`-Tönung -- Befund 8 weg.
+
+**Naechster Schritt:** **Block G (Layout-Umbau, Befund 5 + 3/4/6/7a)** — löst P8.6-O2 aus
+(bewusst), `.shell` wird `240px 480px 1fr`, Übersicht zieht in den `.list`-Slot, Karte bekommt
+`.detail` allein, Editor ersetzt sie, **ESC bringt sie zurück** (N.8). Damit fällt auch
+Befund 9b weg (`.overview`-Grid + 1280-px-Query entfallen). Reihenfolge-Empfehlung (P8.6-AH)
+bleibt F → G, jetzt aber mit F abgeschlossen.
 
 ## Session stopped — 2026-09-14 (opencode/M3 — **Block E erledigt: E2a + E2b** mit Wegwerf-v3.0.1-Methodik-Wechsel)
 

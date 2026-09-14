@@ -43,6 +43,15 @@ export var state = {
   scope: "space",
   query: "",
   items: [],
+  // Phase 8.6 Plan 2 Block G G3 (P8.6-AA): true = der Listen-Slot zeigt die Uebersicht
+  // (Spaces + Zuletzt benutzt), false = er zeigt die Item-Liste. Eigenes Feld statt einer
+  // Ableitung aus `activeSpace === null`, aus demselben Grund wie `scope` daneben --
+  // dieses Repo ist von genau der Verwechslung schon zweimal getroffen worden
+  // (`ownSpaceActive()`-Fund 2026-08-13, `state.filter=null`-Fund Step 7 Commit 1).
+  // Wird gesetzt von `#home-button`-Klick (true, app.js), `navigateAll()`/`navigate()`/
+  // `navigateFolder()`/`activateView()` (false, tree.js). Initial true, damit der erste
+  // Frame nach App-Start die Uebersicht zeigt, nicht eine leere Liste.
+  overview: true,
   // Phase 8.6 Block C C5 (Plan §5.5 V117): `{ [spaceName]: true }` -- gesetzt wird in
   // `list.js :: loadItems()`, sobald die Items des aktiven Spaces (oder im globalen Modus
   // alle lesbaren Items) geladen sind. Folder-Zähler im Rail (`tree.js :: folderButton()`)

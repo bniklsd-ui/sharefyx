@@ -12,6 +12,12 @@ import { iconSvg } from "./icons.js";
 
 var listCrumbEl;
 var listReadonlyEl;
+// Phase 8.6 Plan 2 Block G G4 (P8.6-AA): der Listen-Slot wird von `renderListSlot()` zwischen
+// Übersicht und Item-Liste umgeschaltet. listHeadEl/listOverviewEl/listRowsEl sind die drei
+// Sichtbarkeits-Anker; `renderList()` selbst kennt `state.overview` nicht, das wäre ein
+// doppelter Dispatch.
+var listHeadEl;
+var listOverviewEl;
 var listRowsEl;
 var listEmptyEl;
 var listEmptyTextEl;
@@ -28,6 +34,34 @@ var overviewTitleEl;
 var overviewSpacesEl;
 var overviewRecentEl;
 
+// Phase 8.6 Plan 2 Block G G4 (P8.6-AA): schaltet die drei Sichtbarkeits-Anker im
+// Listen-Slot um und delegiert an renderOverview() oder renderList(). Wird von JEDER
+// Aufrufstelle gerufen, die bisher `renderList()` oder `renderOverview()` direkt rief
+// (V128: vollständige Aufrufliste gegen 26a7cc9 geprüft -- editor.js:70/406/411,
+// tree.js::activateView via loadItems, list.js::loadItems, list.js::loadOverview,
+// app.js:276 via showOverviewPane→clearDetail).
+//
+// Drei Regeln aus Plan §4.4:
+//   1. `#list-empty` hat genau einen Eigentümer, das bleibt `renderList()`. Im
+//      Übersichts-Zweig wird es hier nur ausgeblendet (V139-Gegenprobe).
+//   2. `!isGlobalScope()` (P8.6-AG / Befund 7a): im "Alle Items"-Modus ist showOverview
+//      IMMER false, also wird `renderOverview()` GAR NICHT aufgerufen -- die Blöcke
+//      entstehen nicht, statt versteckt zu werden.
+//   3. listHeadEl.hidden = showOverview: Suche bleibt im Übersichts-Zustand draußen
+//      (Plan §0.4).
+export function renderListSlot() {
+  var showOverview = state.overview && !isGlobalScope();
+  listHeadEl.hidden     = showOverview;
+  listOverviewEl.hidden = !showOverview;
+  listRowsEl.hidden     = showOverview;
+  if (showOverview) {
+    listEmptyEl.hidden = true;
+    renderOverview();
+  } else {
+    renderList();
+  }
+}
+
 export function renderOverview() {
   var own = spaceByName(state.ownSpace);
   overviewTitleEl.textContent = state.ownSpace || "";
@@ -35,10 +69,11 @@ export function renderOverview() {
   overviewRecentEl.textContent = "";
   if (!own) return;
 
-  // Phase 8 Block D D1 (Plan §5 D1): tabellose Space-Zeilen statt Kachel-Grid -- eine Zeile je
-  // Space (eigene + fremde, Kategoriepunkt C3 + Name links, Counter-Chips rechts). Reihenfolge
-  // ist dieselbe wie im Navigationsbaum: eigene Spaces zuerst, dann fremde (analog
-  // tree.js :: renderRail()).
+  // Phase 8 Block D D1 (Plan §5 D1): tabellose Space-Zeilen statt Kachel-Grid. Phase 8.6
+  // Plan 2 Block G G7 (P8.6-AF): `.overview__space-open` ist jetzt der Zeilen-Button --
+  // er umschließt Glyph + Name + Chip-Leiste. Vorher war der Knopf nur am Namen
+  // (`.overview__space-name > .overview__space-open`), Befund 6 war genau, dass der
+  // Hover-Fill nicht die ganze Zeile traf. Jetzt ist die ganze Zeile klickbar.
   var orderedSpaces = state.spaces.slice().sort(function (a, b) {
     if (a.own !== b.own) return a.own ? -1 : 1;
     return a.name.localeCompare(b.name);
@@ -46,12 +81,6 @@ export function renderOverview() {
   var buckets = bucketNames();
   orderedSpaces.forEach(function (space) {
     var row = el("li", "overview__space-row");
-    // Phase 8.6 Block C C4 (Plan §5.4): Name + Kategoriepunkt werden in einen
-    // <button class="overview__space-open"> gepackt -- die ganze Space-Zeile wird klickbar,
-    // Tastaturfokus + Screenreader-Rolle gratis. Eine klickbare <li> ohne Button wäre eine
-    // Behauptung ohne HTML-Semantik (und kein Tab-Stopp). Kategorie nach Konvention v3 ist
-    // Navigation (P8.6-P).
-    var nameEl = el("div", "overview__space-name");
     var openButton = el("button", "overview__space-open");
     openButton.type = "button";
     openButton.appendChild(el(
@@ -73,8 +102,6 @@ export function renderOverview() {
         return activateView(space.name);
       }).catch(reportUnexpectedError);
     });
-    nameEl.appendChild(openButton);
-    row.appendChild(nameEl);
 
     var countsEl = el("div", "overview__space-counts");
     buckets.forEach(function (bucket) {
@@ -82,8 +109,16 @@ export function renderOverview() {
       // Plan §5 D1: "keine leeren Buckets" -- ein 0-Chip wäre Deko und würde Klick auf
       // leere Ordner provozieren.
       if (!count) return;
-      var chip = el("button", "overview__space-count");
-      chip.type = "button";
+      // Phase 8.6 Plan 2 Block G G7: Chips sind jetzt `<span role="button" tabindex="0">`
+      // statt `<button>` -- verschachtelte `<button>` wären ungültiges HTML (der
+      // Zeilen-Knopf ist selbst einer). Klick- und Tastatur-Handler (Enter/Space) müssen
+      // beide verdrahtet werden, weil `<span>` nicht von Haus aus wie ein Button reagiert.
+      // Das stopPropagation aus Block C bleibt tragend: ohne es würde der Eltern-Knopf
+      // ebenfalls auslösen, mit anderer Semantik ("in den Space, Bucket = state.filter")
+      // als der Chip ("in den Space mit explizitem Bucket").
+      var chip = el("span", "overview__space-count");
+      chip.setAttribute("role", "button");
+      chip.setAttribute("tabindex", "0");
       chip.dataset.space = space.name;
       chip.dataset.bucket = bucket;
       chip.title = space.name + " › " + (BUCKET_LABELS[bucket] || bucket);
@@ -91,16 +126,19 @@ export function renderOverview() {
         String(count) + " " + (BUCKET_LABELS[bucket] || bucket),
       ));
       chip.addEventListener("click", function (event) {
-        // stopPropagation ist jetzt tragend, nicht nur dekorativ -- der Eltern-<button>
-        // (overview__space-open) würde sonst ebenfalls auslösen, mit anderer Semantik
-        // ("in den Space, Bucket = state.filter") als der Chip ("in den Space mit
-        // explizitem Bucket").
+        event.stopPropagation();
+        navigate(space.name, bucket).catch(reportUnexpectedError);
+      });
+      chip.addEventListener("keydown", function (event) {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
         event.stopPropagation();
         navigate(space.name, bucket).catch(reportUnexpectedError);
       });
       countsEl.appendChild(chip);
     });
-    row.appendChild(countsEl);
+    openButton.appendChild(countsEl);
+    row.appendChild(openButton);
     overviewSpacesEl.appendChild(row);
   });
 
@@ -150,7 +188,11 @@ export function loadOverview() {
     });
     state.spaces = overview;
     renderRail();
-    renderOverview();
+    // Phase 8.6 Plan 2 Block G G4 (V128): loadOverview aktualisiert nur die Overview-
+    // Daten. Die Sichtbarkeit im Listen-Slot schaltet renderListSlot() je nach
+    // `state.overview` um -- hier direkt zu rendern würde im "Alle Items"-Modus die
+    // Übersicht gegen die verbotene Liste-Position eintauschen.
+    renderListSlot();
   });
 }
 
@@ -263,7 +305,9 @@ export function clearSelection() {
 function toggleSelected(id) {
   if (state.selectedItemIds.has(id)) state.selectedItemIds.delete(id);
   else state.selectedItemIds.add(id);
-  renderList();
+  // Phase 8.6 Plan 2 Block G G4 (V128): einheitliche Slot-Schaltung statt direkt
+  // renderList() -- dieselbe Disziplin wie in loadItems().
+  renderListSlot();
 }
 
 function renderSelectionToolbar() {
@@ -495,7 +539,10 @@ export function loadItems() {
     } else if (state.activeSpace) {
       state.itemsLoaded[state.activeSpace] = true;
     }
-    renderList();
+    // Phase 8.6 Plan 2 Block G G4 (V128): Slot-schaltender Render statt direkt
+    // renderList(). Im Übersichts-Zustand unterdrückt renderListSlot() den Aufruf von
+    // renderList() komplett, im Listen-Zustand verhält es sich identisch.
+    renderListSlot();
     renderRail();
   });
 }
@@ -503,6 +550,8 @@ export function loadItems() {
 export function init() {
   listCrumbEl = document.getElementById("list-crumb");
   listReadonlyEl = document.getElementById("list-readonly");
+  listHeadEl = document.getElementById("list-head");
+  listOverviewEl = document.getElementById("list-overview");
   listRowsEl = document.getElementById("list-rows");
   listEmptyEl = document.getElementById("list-empty");
   listEmptyTextEl = document.getElementById("list-empty-text");
@@ -521,7 +570,8 @@ export function init() {
   });
   listSelectionClearEl.addEventListener("click", function () {
     state.selectedItemIds.clear();
-    renderList();
+    // Phase 8.6 Plan 2 Block G G4 (V128): Slot-schaltend rendern, nicht direkt die Liste.
+    renderListSlot();
   });
 
   overviewTitleEl = document.getElementById("overview-title");
