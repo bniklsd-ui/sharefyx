@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
+updated: 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -24,6 +24,120 @@ das Skript auf das Phase-8.5-Muster passt und mit einem `## Session stopped` + m
 
 
 
+
+## Session stopped — 2026-09-12 (Block-C-Sichtung Nikinger — 6 UX-Befund-Kategorien, Partial Closeout vorgeschlagen, kein Deploy, **Plan 2 für P8.6 erforderlich**)
+
+**Nikinger-Sichtung der Screenshots** `docs/screenshots/p86_block_c_{01..06}_*.png`
+am 2026-09-12 (Drei-Bedingungen-Regel, Bedingung 3 — Nikinger-Sichtung der Bilder).
+**Befund: so nicht auslieferbar.** Nikinger schlägt „Partial Closeout" vor, der
+einen neuen **2. Plan für P8.6** verlangt, bevor Block C deployed wird.
+
+**Befund-Kategorien (sechs, plus ein B-Backlog aus rückblickender Sichtung):**
+
+**B-Backlog (Block B, altes Material, bei Sichtung wieder aufgefallen):**
+
+1. **Verschiedene Grautöne** fallen in mehreren Block-B-Screenshots auf — die
+   Layering-Tokens (`--bg-void`/`--surface`/`--surface-raised`/`--bg-elevated`) aus
+   Block A werden in der Praxis nicht konsequent durchgehalten. Welche Stellen
+   betroffen sind, muss Block-A-Re-Audit zeigen.
+2. **Konto-Dialog: „Update-Log ansehen" + „Spaces verwalten"-Buttons scheinen
+   zu fehlen / nicht sichtbar.** Die `.account-nav`-Klasse wurde in Block B
+   eingeführt (Navigation statt Knopf-Plastik); ob die Buttons im Dialog
+   tatsächlich gerendert werden oder die Sichtung ein anderes Problem zeigt
+   (z. B. außerhalb des Viewports), muss Block-B-Re-Sichtung am echten Gerät
+   zeigen.
+
+**Block-C-Befunde (neu, aus den p86_block_c-Screenshots):**
+
+3. **Refresh-Button überlappt mit der Karte.** Der Refresh sitzt in
+   `.overview__header` (Z. 88–94), die Karte in `.overview__col-right`. Auf
+   1440px-Viewport ist der Header einspaltig über die ganze Breite und die
+   Karte beginnt darunter — visuell wirkt es, als schwebe der Refresh-Button
+   über der Karte. Vorschlag: Refresh in die Karte selbst verlegen
+   (oben links, neben den Toggle-Checkboxen), oder Header auf zwei Spalten
+   aufteilen.
+4. **Karte ist „ziemlich klein"** bei 1440px-Viewport (`grid-template-columns:
+   1fr 40%` mit Wrapper-DIVs `head-row`/`col-left`/`col-right`). Die rechte
+   Spalte bekommt nur 40 % der Detail-Breite, und die Detail-Spalte ist
+   durch das äußere `.shell`-Grid (`256px 380px 1fr` aus §4.1) ohnehin
+   nicht riesig. 30 Knoten auf einer 500×700-Box werden gedrängt. Vorschlag:
+   `grid-template-columns: 1fr 50%` oder `2fr 3fr` testen, oder die Karte
+   ohne Spalten-Cap direkt `flex: 1` setzen (Wrapper-Layout dafür anpassen).
+5. **Großer Vorschlag (Nikinger): Spaces-Übersicht + Zuletzt benutzt wandert
+   in den Standard-Listen-Slot (links).** Auf der Übersicht zeigt der
+   linke Slot die Spaces + zuletzt benutzte Items, der rechte Slot zeigt
+   die Map. **Klick auf einen Space** schließt die Übersicht-Slots
+   und öffnet die ganz normale Item-Liste des Spaces (im Listen-Slot).
+   Solange nur auf Space (nicht auf Item) geklickt ist, bleibt der
+   Editor-Slot rechts leer (mit der Karte als Default). **Klick auf ein
+   Item in der Liste** öffnet den Editor dort, wo der Leerraum war
+   (initial die Karte). Das ist eine substantielle Layout-Reorg, die
+   das aktuelle „Übersicht immer = drei-Spalten (Spaces + Karte + Recent
+   auf einer Seite)" ablöst.
+6. **Hover-Effekt verrutscht** in Screenshot 02 (nach Klick auf Space, dann
+   Hover). Vermutlich Layout-Inkonsistenz, weil nach dem Space-Wechsel die
+   Listenansicht aktiv ist und der Mauszeiger noch auf einer Übersicht-Zeile
+   ruht, deren Hover-Klasse jetzt auf `.list__row` umgebogen wird. Detail
+   muss in Plan 2 geklärt werden.
+7. **„Alle Items"-Modus: Spaces-Übersicht + Spacename + Zuletzt benutzt
+   VERSCHWINDET** (Nikinger). Direkt nur noch „Übersicht" → Item-Liste
+   + Map (die beiden Slots links + rechts). **Einstellungen + Abmelden
+   rücken zusammen** (Einstellungen unten im Rail, direkt über Abmelden,
+   kein eigener Header-Bereich dazwischen). Aktuell sind sie durch
+   `#rail-tree` getrennt — das muss sich ändern, sobald die Spaces-Übersicht
+   aus dem Übersicht-Slot verschwindet.
+8. **Editor — Verschiedene Grautöne.** YAML-Header (`details.panel--meta` mit
+   `.panel__head`) sieht „wie eine Warnung aus", gehört aber in **Layer 2
+   grau** wie die Standard-Übersicht. Der Editor selbst (Textarea,
+   Vorschau, Append) soll das einzige in **Layer 3** sein. „Zeile
+   Einfügen" (`input#append-input` + Button) ebenfalls Layer 2 wie YAML.
+   Das ist Layering-Konsistenz aus §5, die in der Implementierung
+   wahrscheinlich nicht überall durchgehalten wurde.
+9. **`p86_block_c_06_karte_unter_liste_1200px.png` — Karte sieht komisch aus,
+   keine Buttons mehr in der schmalen Ansicht klickbar.** Nikinger hat das
+   **selber auf der Produktion reproduziert** (nicht nur Wegwerf). Die
+   `@media (max-width: 1280px)`-Regel kollabiert das Grid auf eine Spalte,
+   aber die Buttons (`.btn` Knöpfe) werden in der schmalen Variante
+   wahrscheinlich zu klein oder werden vom Grid überschnitten. Detail
+   muss in Plan 2 untersucht werden (CDP-Probe gegen die Wegwerf-Instanz
+   mit Viewport-Größen 1024/1200/1440).
+
+**Anforderungen für P8.6 Plan 2 (Nikinger, zusammengefasst):**
+
+- **Layout-Reorg** gemäß Befund 5: Spaces + Zuletzt benutzt links in den
+  Standard-Listen-Slot, Map daneben, Klick auf Space öffnet Item-Liste
+  statt Spaces-Übersicht, Klick auf Item öffnet Editor im rechten Slot.
+- **„Alle Items"-Modus schlanker** gemäß Befund 7: ohne Spaces-Übersicht,
+  ohne Spacename, ohne Zuletzt benutzt; nur Item-Liste + Map.
+- **Rail-Reihenfolge anpassen**: Einstellungen unten, direkt über Abmelden
+  (Befund 7 zweite Hälfte).
+- **Karte angemessen groß** (Befund 4): `grid-template-columns`-Werte
+  testen, evtl. `flex: 1` ohne Cap.
+- **Refresh-Button umsetzen** (Befund 3): in die Karte oder Header teilen.
+- **Layering-Konsistenz** (Befund 1, 8): drei Layer sauber definieren
+  (`--bg-void`/`--surface`/`--surface-raised`/`--bg-elevated`), YAML-Header
+  + Append → Layer 2, Editor-Textarea → Layer 3, Standard-Übersicht bleibt.
+- **Schmaler-Viewport (≤1280px)** (Befund 9): Buttons bleiben klickbar,
+  Layout bleibt sinnvoll — eigene Investigation nötig (vermutlich
+  Touch-Target-Größe + Grid-Stapelung).
+- **B-Backlog mitnehmen** (Befund 1, 2): Grauton-Konsistenz + Konto-Dialog-
+  Buttons sichtbar.
+
+**Status:** Block C bleibt formal ✅ (fünf Sub-Änderungen + D3-Nachzug + 3
+Tests + 6 Screenshots geliefert), ist aber **nicht auslieferbar**. Diese
+Session macht **nur Doku** — die nächste Session beginnt eine Claude-Code-
+Planungssession für P8.6 Plan 2 (analog zur Phase-8.5-Planungssession
+am 2026-09-08). **Kein Push + Deploy** in dieser Session — Lokalstand
+bleibt 7 Commits voraus (Block A + D + V + V-plugin + V-vision-befund +
+§5-Konvention + Block B + Block C), Nikinger entscheidet nach Plan 2,
+ob die alte Schuld in einem einzigen großen Push oder mehreren
+kleinen landet.
+
+**Vormerkung neu** (in §Vormerkungen dieses Heads): **„p8.6 plan 2
+(N.6)"** — Layout-Reorg + Layering-Konsistenz + schmaler-Viewport +
+B-Backlog. Eigene Folge-Phase oder Sub-Phase von P8.6, je nach
+Umfang des Plans. Ziel: einen **zweiten Vorabritt** + Deploy, der dann
+alle sieben UX-Befunde abdeckt.
 
 ## Session stopped — 2026-09-12 (Block C ✅ — Struktur-Umbau: Einstellungen oben, Alle Items unten, Karte als rechte Spalte, klickbare Spaces, Ordner-Zähler)
 
