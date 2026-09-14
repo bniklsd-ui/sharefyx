@@ -375,29 +375,38 @@ select.input:focus {
   padding: var(--space) 0;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, var(--rail-top), var(--bg));
+  /* Phase 8.6 Block H-R H-R.1 (Plan §1, N.13): OLED-BLACK fuer die drei Slots. Der
+     fruehere linear-gradient von --rail-top nach --bg ist ersatzlos weg -- die
+     "Wortmarke oben etwas heller" verliert ihren Sinn, wenn der ganze Slot echtes
+     Schwarz sein soll (Nikinger-Sichtung 2026-09-14). --rail-top bleibt im :root
+     definiert, ist aber funktionslos (Locks H-R.1-L + N.13). */
+  background: var(--bg-void);
 }
 
 .list {
   border-right: 1px solid var(--line);
   display: flex;
   flex-direction: column;
-  background: var(--bg);
+  /* Phase 8.6 Block H-R H-R.1 (Plan §1, N.13): OLED-BLACK fuer die drei Slots. */
+  background: var(--bg-void);
 }
 
 .detail {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  /* Phase 8.6 Block G-R G-R.2: Hintergrund = --bg wie .list. Vorher erbt .detail von body
-     (--bg-void = #000), die Liste daneben hat --bg (#0B0D10). Die drei sichtbaren Toene
-     fuer "Spalten-Hintergrund" -- --bg in .list, --bg-void in .detail, --surface in der
-     Karte -- waren die Fortsetzung von Befund 1 (Token-Drift im selben Layer).
+  /* Phase 8.6 Block H-R H-R.1 (Plan §1, N.13): OLED-BLACK fuer die drei Slots.
+     G-R.2 hatte .detail auf --bg (#0B0D10) vereinheitlicht, um den schwarzen Ring
+     rund um die Karte wegzubekommen. H-R.1 geht einen Schritt weiter: alle drei
+     Slots -- .rail, .list, .detail -- auf --bg-void (#000); die Karte (--surface
+     = #14181D) bleibt als Layer 3 sichtbar auf dem schwarzen Slot, weil ihr
+     Background-Ton nicht angefasst wird (Locks H-R.1-L). Helligkeits-Distanz
+     zwischen Slot und Karte ist damit 14 Stufen (#000 vs #14181D) statt der
+     6 Stufen von vorher (#0B0D10 vs #14181D) -- die Karte "schwebt" sichtbar.
 
-     Mit dieser einen Zeile hat der .detail-Slot denselben Ton wie .list; der schwarze Ring
-     rund um die Karte (Folge von .detail__graph-Padding + .detail-Hintergrund) verschwindet,
-     der Map-Container bleibt als Karte in der etwas helleren --surface-Flaeche erkennbar. */
-  background: var(--bg);
+     Layer-Architektur-Revision, kein UI-Polish. Wer den Token zurueck auf --bg
+     dreht, hebt N.13 explizit auf -- kein stiller Refactor. */
+  background: var(--bg-void);
 }
 
 /* -- Rail: Wortmarke, Übersicht, Baum, Konto (Step 7b) ------------------------------------ */
@@ -665,9 +674,16 @@ select.input:focus {
   width: 100%;
   padding: 8px calc(var(--space) * 2);
   margin: 0 0 calc(var(--space) * 2);
-  background: none;
-  border: none;
-  border-left: 2px solid var(--line-strong);
+  /* Phase 8.6 Block H-R H-R.2 (Plan §2, N.14): Akzent-Fill auf .account-nav,
+     "ausnahmsweise" laut Nikinger-Sichtung 2026-09-14 -- die Knöpfe fehlten nie,
+     sie waren nur zu schwach (Befund "sieht man kaum"). background: var(--accent-quiet)
+     statt none; ringsum border: 1px solid var(--accent-edge); border-left ueberschreibt
+     mit 3 px und Akzent-Farbe (statt 2 px --line-strong). B3-Kategorie "Navigation"
+     bleibt -- Akzent-Fill ist die Sichtbarkeits-Antwort, kein Rueckfall in .btn-Plastik
+     (Locks H-R.2-L + N.14). */
+  background: var(--accent-quiet);
+  border: 1px solid var(--accent-edge);
+  border-left: 3px solid var(--accent);
   border-radius: var(--radius-sm);
   color: var(--text);
   font-weight: 500;
@@ -676,14 +692,18 @@ select.input:focus {
   text-decoration: none;
 }
 .account-nav:hover {
-  background: var(--select-fill-quiet);
-  outline: 1px solid var(--select-line-quiet);
+  /* H-R.2: Akzent-Fill bleibt, der Hover macht ihn etwas staerker statt den Hintergrund
+     zu wechseln -- sonst wuerde der Knopf zwischen zwei Akzent-Toenen "springen". */
+  background: color-mix(in srgb, var(--accent-quiet), var(--accent) 50%);
+  outline: 1px solid var(--accent-line);
   outline-offset: -1px;
 }
 .account-nav .icon {
   /* Chevron ans rechte Ende schieben -- dieselbe Mechanik wie .tree__count (C5), gleiche
-     Begründung: margin-left: auto im Flex-Container drückt das Element an den Rand. */
+     Begruendung: margin-left: auto im Flex-Container drueckt das Element an den Rand.
+     H-R.2: Chevron traegt Akzent-Farbe, damit das Afford sichtbar ist. */
   margin-left: auto;
+  color: var(--accent);
 }
 
 /* Phase 8.6 Block B B4 (Plan §4.4): Kategorie "Vorsicht" -- Konvention v3, fünfte Kategorie

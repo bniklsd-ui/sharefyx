@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-14 (**Block H erledigt ✅** — Head 88.519 B [unverändert nach Rotation], Archiv 151.336→169.569 B. Block-G-R-Session-Block 235 Z./18.073 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-Session-Block. **Phase 8.6 ist nach H bei Block 10 von 13 angekommen — Rail-Umkehr (Befund 7b) + Konto-Dialog-Afford (Befund 2) in einem Schritt behoben, der nächste Block ist J (der pytest-Flake, P8.6-AJ, datierte Tabu-Ausnahme für phase4_auth/authserver/{crypto.py,store.py})**) | 2026-09-14 (**Block G-R erledigt ✅** — Head 82.028→85.760 B, Archiv 138.612→151.336 B. Block-G-Session-Block 159 Z./11.728 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-G-R-Session-Block. **`Phase 8.6` ist nach G-R bei Block 9 von 13 angekommen — Layout/Editor-YAML-Bündigkeit + Layer-Tone-Drift aus der Sichtung behoben, der nächste Block ist H (Rail + Konto-Dialog, Befunde 7b + 2)**) | 2026-09-14 (E2b-Sub-Block [vom 2026-09-14, E2b-Commit `cc3f342`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — sechste Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 5.058 B; Archiv 128.603 → 133.661 B) | 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
+updated: 2026-09-14 (**Block H-R Teil 1 erledigt ✅ — H-R.1 + H-R.2** — Head 88.519→90.272 B, Archiv 169.569→198.341 B. Block-H-Session-Block per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-R-Teil-1-Session-Block. **Phase 8.6 ist nach H-R-1 bei Block 11 von 13 angekommen** — OLED-BLACK für drei Slots + account-nav-Akzent-Farbe in einem Schritt, der nächste Block ist H-R.3/.4/.5 (CDP-Probe-Welle, V142/V143/V144), dann J, dann Gate) | 2026-09-14 (**Block H erledigt ✅** — Head 88.519 B [unverändert nach Rotation], Archiv 151.336→169.569 B. Block-G-R-Session-Block 235 Z./18.073 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-Session-Block. **Phase 8.6 ist nach H bei Block 10 von 13 angekommen — Rail-Umkehr (Befund 7b) + Konto-Dialog-Afford (Befund 2) in einem Schritt behoben, der nächste Block ist J (der pytest-Flake, P8.6-AJ, datierte Tabu-Ausnahme für phase4_auth/authserver/{crypto.py,store.py})**) | 2026-09-14 (**Block G-R erledigt ✅** — Head 82.028→85.760 B, Archiv 138.612→151.336 B. Block-G-Session-Block 159 Z./11.728 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-G-R-Session-Block. **`Phase 8.6` ist nach G-R bei Block 9 von 13 angekommen — Layout/Editor-YAML-Bündigkeit + Layer-Tone-Drift aus der Sichtung behoben, der nächste Block ist H (Rail + Konto-Dialog, Befunde 7b + 2)**) | 2026-09-14 (E2b-Sub-Block [vom 2026-09-14, E2b-Commit `cc3f342`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — sechste Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 5.058 B; Archiv 128.603 → 133.661 B) | 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -24,6 +24,152 @@ das Skript auf das Phase-8.5-Muster passt und mit einem `## Session stopped` + m
 
 
 
+
+## Session stopped — 2026-09-14 (opencode/M3 — **Block H erledigt** — Rail + Konto-Dialog, zwei Befunde in einem Schritt behoben)
+
+**Atomarer Block, ein Commit.** Block H räumt die zwei verbliebenen B-/C-Backlog-Befunde
+weg: **Befund 7b** (Rail-Reihenfolge) und **Befund 2** (Konto-Dialog-Knöpfe ohne Afford).
+Reihenfolge steht jetzt G → G-R ✅ → **H ✅** → J → Gate (Nikinger-Vorgabe vom 2026-09-14).
+
+### H1 — Rail-Umkehr (Befund 7b, P8.6-AE, N.9)
+
+**`phase5_ui/webui/static/app.html:19-53`** — DOM-Reihenfolge im `.rail` ist wieder
+`.rail__brand` → `#home-button` → `#rail-tree` → **`.rail__account` mit zwei Knöpfen
+(`#account-button` zuerst, `#logout-button` zuletzt)**. Block C C1 hatte
+`#account-button` aus `.rail__account` heraus unter `#home-button` gesetzt (N3-Lesart b);
+N.9 vom 2026-09-13 kehrt das um: „Abmelden bleibt weiterhin der äußerste Knopf."
+Vorzeichen aus Block C erhalten: Knopf heißt weiter „Einstellungen" (war schon immer ein
+Zahnrad-Icon, C1 hat das benannt), `#logout-button` trägt weiter `class="action--caution"`
+(B4-Farbe aus Konvention v3).
+
+**`phase5_ui/webui/static/app.css:634-657`** — `.rail__account` ist jetzt
+`flex-direction: column` als **Normalfall**, nicht mehr als Sonderregel innerhalb einer
+Media-Query. Begründung: Block G-R hat die `@media (max-width:1280px)`-Query ersatzlos
+gelöscht; eine Spalten-Sonderregel in einer wegoptimierten Query wäre ein Geist. Die
+Notiz im Kommentar darüber ist absichtlich allgemein gehalten (enthält nicht das
+Literale `@media (max-width:1280px)`, sonst hätte der G-R-Wächter
+`test_shell_grid_is_240_480_1fr` angeschlagen — der Wächter sucht den ganzen CSS-String,
+auch in Kommentaren).
+
+**`.rail__action--account`-Regel ersatzlos weg** (`app.css:438-442`): die Modifikator-Klasse
+war ein Rest der Oben-Platzierung aus Block C C1 (`margin: 0 var(--space) var(--space);
+width: auto;`). Nach der Rückkehr in `.rail__account` reicht die Basis-Regel
+`.rail__action` (`width: auto; flex: 1` — gleichmäßige Höhe in der Spalte). Die
+Modifikator-Klasse selbst bleibt eine Zeitlang als Geist im Quelltext stehen (im Kommentar
+oben als Audit-Spur); sie hat ohne die Regel keinen Effekt. **V137 geklärt:** nicht mehr
+nötig.
+
+### H2 — Konto-Dialog mit Navigations-Afford (Befund 2)
+
+**`phase5_ui/webui/static/app.html:464-468`** — beide `.account-nav`-Buttons
+(`#account-show-updates`, `#account-manage-spaces`) tragen jetzt zusätzlich ein
+`<svg class="icon" aria-hidden="true"><use href="#i-chevron-right"></use></svg>` als
+letztes Kind. Das Chevron-Icon existierte schon (`tree.js:229` nutzt es für
+`tree__twist`, Symbol-ID `#i-chevron-right` ist im Sprite von `app.html:521`), kein
+neuer Asset nötig.
+
+**`phase5_ui/webui/static/app.css:670-708`** — `.account-nav` ist jetzt
+`display: flex; align-items: center; gap: var(--space)` (statt `display: block;
+text-align: left`) und bekommt `border-left: 2px solid var(--line-strong)` als
+sichtbare Akzentkante. Der B3-Hover (`background: var(--select-fill-quiet)` + `outline`)
+bleibt unverändert. Neu: `.account-nav .icon { margin-left: auto; }` — schiebt das
+Chevron an den rechten Rand (dieselbe Mechanik wie `.tree__count` aus Block C C5,
+gleiche Begründung: `margin-left: auto` im Flex-Container drückt das Element an den
+Rand). **Kein** Rückfall in `.btn` (B3-Kategorie „Navigation" trägt — die Knöpfe
+öffnen etwas, ändern nichts; der fehlende Afford war das Problem, nicht die Kategorie).
+
+**V133 erledigt:** `elementFromPoint` auf beiden Knöpfe-Mittelpunkten liefert jetzt das
+Button-Element statt `null` (die Knöpfe fehlten nie — sie hatten keinen sichtbaren
+Afford, daher lasen sie sich als Fließtext zwischen Erklärabsatz und Formular).
+
+### Wächter: ein Test umbenannt + umgekehrt, ein bestehender Test angepasst
+
+**`phase5_ui/tests/test_static_routes.py:505`** — `test_rail_order_settings_before_tree_
+logout_last` umbenannt zu `test_rail_order_settings_and_logout_at_the_end`, Assertions
+umgekehrt: jetzt `#home-button < #rail-tree < #account-button < #logout-button`, plus
+eine zusätzliche Assertion `#logout-button == html.rfind('id="logout-button"')` als
+harter „Abmelden ist letzter"-Wächter. Docstring trägt **beide** Richtungen mit Datum
+(2026-09-09 N3-Lesart b → 2026-09-13 N.9) — wörtlich übernommene P8.6-I-Mechanik
+(Radiogruppe → `<select>`-Umkehr), „der Testname wird sonst zur Lüge".
+
+**`phase5_ui/tests/test_static_routes.py:141`** — `test_app_html_has_a_live_manage_
+spaces_entry`-Regex angepasst: `[^<]*` durch `.*?` mit `re.DOTALL` ersetzt, weil die
+Buttons jetzt nested `<svg>` enthalten (das Chevron). Assertion „Spaces verwalten" als
+Label-Text bleibt, separat per `re.search(r"Spaces verwalten", button_html)` geprüft.
+Reiner Signatur-Fix, kein neuer Test, kein semantischer Drift.
+
+### Echte Funde beim Bau (alle im selben Commit behoben)
+
+1. **`test_rail_order_settings_before_tree_logout_last`** musste **vor** dem Commit
+   rotiert werden — das Skript `scripts/rotate_session_block.sh` akzeptiert die Aktion
+   erst, wenn der Head **zwei** Session-Blöcke trägt (siehe Skript-Logik Z. 60-74).
+   Ich habe zuerst den neuen Block H unten angehängt, dann `bash
+   scripts/rotate_session_block.sh phase8_6_ui_polish` aufgerufen — die G-R-Block-
+   Rotations-Erinnerung von P8.6-T hat gegriffen, der G-R-Sub-Block wanderte verbatim
+   ins Archiv, der Head trägt jetzt genau einen Block H.
+
+2. **`test_app_html_has_a_live_manage_spaces_entry`** schlug nach dem H2-Markup-Touch
+   rot an (`AssertionError: Menüpunkt 'Spaces verwalten' fehlt`) — die alte Regex
+   `[^<]*` mochte den nested `<svg>` nicht. Behoben durch `.*?` mit `re.DOTALL` plus
+   separate Label-Assertion. **Vor** dem Commit bemerkt durch den `pytest
+   phase5_ui/tests/test_static_routes.py`-Lauf, wäre sonst in CI gelandet.
+
+3. **`test_shell_grid_is_240_480_1fr`** (G-R-Wächter) schlug nach dem ersten
+   CSS-Edit rot an (`AssertionError: @media (max-width: 1280px) darf nicht mehr in
+   app.css vorkommen`) — meine erste Fassung des `.rail__account`-Kommentars enthielt
+   das Literale `@media (max-width:1280px)`, der Wächter matchte den Kommentar-Text
+   und behandelt ihn als Geist der alten Sonderregel. Behoben durch allgemeinere
+   Formulierung („die schmale-Query ist weg"). **Vor** dem Commit bemerkt, kein
+   Bypass, kein Test-Weichzeichner.
+
+### Selbstprüfung §0.5
+
+`pytest -q` **981 passed in 108 s** (V107-Baseline 981 unverändert — Block H ändert
+keine Test-Zahl, ein Test umbenannt + einer minimal angepasst). `node --check` auf
+alle 13 JS-Dateien ✅ (keine JS-Änderungen, Pflicht-Lauf). `ui_budget.py` **5/5 im
+Korridor**, 143,1 KB gzip, app.css jetzt **24,2 KB** gzip (vs. G-R-Stand 24,0 KB,
++0,2 KB für die `.rail__account`-Spalten-Anordnung + `.account-nav`-Flex-Container +
+Chevron-Icon-Rule + die ausführlichen Block-H-Kommentare; **innerhalb** des
+ui_budget-Korridors, app.css bleibt deutlich unter dem 250-KB-Limit). Tabu-Diff §0.3
+**leer** (nur `phase5_ui/webui/static/{app.html,app.css}` und
+`phase5_ui/tests/test_static_routes.py` berührt; `phase1_storage/storage/`,
+`phase4_auth/authserver/`, `phase2_mcp/mcpserver/`,
+`phase5_ui/webui/{security,api,serializers,permissions}.py` alle unangetastet — auch
+die enge `authserver`-Probe aus §6.4 gilt hier nicht, weil Block J noch nicht
+angefasst wurde). Kein `pkill -f`, kein `systemctl`, sharefyx-mcp **PID 991** nur
+gelesen.
+
+### Drei Selbst-Screenshots `docs/screenshots/p86_block_h_{01..03}_*.png` (111/110/141 KB)
+
+- **`01_1440_rail.png`** (111 KB) — Rail bei 1440 px: `.rail__account` trägt unten
+  zwei gestapelte Knöpfe, oben „Einstellungen" (Zahnrad, neutral), unten „Abmelden"
+  (Logout-Icon, `--caution`-Farbe aus B4) als äußerster Knopf im Rail.
+- **`02_1200_rail.png`** (110 KB) — Rail bei 1200 px: gleiches Layout wie 1440, Rail
+  bleibt 240 px voll sichtbar mit Labels, kein Kollaps (P8.6-AH — kein neuer
+  Sonderfall im schmalen Viewport).
+- **`03_1440_konto_dialog.png`** (141 KB) — Konto-Dialog offen bei 1440 px: „Update-Log
+  ansehen" und „Spaces verwalten" tragen linke Akzentkante (sichtbar) und Chevron-Icon
+  rechts (deutlich); der Hover-Outline-Test aus B1 ist im Bild nicht ausgelöst (kein
+  Hover), aber die Default-Anmutung mit Kante + Chevron ist sichtbar.
+
+### Drei Hard-Rule-Checkpoints am Session-Ende
+
+1. **Hard Rule 1** (keine Secrets): keine Credentials im Repo, Wegwerf-Credentials
+   in `/tmp/opencode/sharefyx-wegwerf-v3ritt/credentials.json`, alle Eingaben
+   `argparse`-geparst, nie ins Repo geschrieben.
+2. **Hard Rule 9** (kein `pkill -f`): Wegwerf gestartet mit
+   `phase8_5_picker_release/scripts/wegwerf_setup_v3ritt.py cleanup+setup+seed-items+
+   start` (eigener Port 18773, tmp-`DATA_ROOT`), gestoppt mit
+   `kill $(cat /tmp/opencode/sharefyx-wegwerf-v3ritt/serve.pid)` — PID-Datei, kein
+   Regex im Cmdline. PID 208386 → weg.
+3. **Hard Rule 8** (Commit ⇒ Doku-Update im selben Commit): Modul-Status Z13 ⬜→✅
+   (Reihenfolge jetzt G → G-R ✅ → **H ✅** → J → Gate, Block H ist zwischen G-R
+   und J eingeschoben), dieser Session-Block, Rotation per
+   `scripts/rotate_session_block.sh phase8_6_ui_polish` (G-R-Sub-Block verbatim ins
+   Archiv), Frontmatter `updated:` im Phase-Head (H-Eintrag voran), `docs/INDEX.md`-
+   Phase-8.6-Karte, ROADMAP-P8.6-Zeile + Frontmatter, Root-`CLAUDE.md`-Current-State-
+   Absatz, `screenshots_latest/`-Symlinks (P8.6-AK — Block-G-Symlinks wurden ersetzt,
+   Konvention hält) — alles im selben Commit.
 
 ## Session stopped — 2026-09-14 (opencode/M3 — **Block G-R erledigt** — Layout-Revision nach Nikinger-Sichtung, vier Befunde in einem Schritt behoben)
 

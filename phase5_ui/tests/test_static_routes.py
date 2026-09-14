@@ -1172,37 +1172,45 @@ def test_1024_breakpoint_stacks_list_over_detail():
         )
 
 
-def test_detail_uses_the_column_background_not_void():
-    """P8.6 Block G-R G-R.2 (Nikinger-Sichtung 2026-09-14): die drei sichtbaren Toene
-    fuer 'Spalten-Hintergrund' (--bg in .list, --bg-void in .detail durch Body-Erbe,
-    --surface in der Karte) sind die Fortsetzung von Befund 1. Block G-R hat .detail
-    einen expliziten background: var(--bg) gegeben, damit der schwarze Ring rund um
-    die Karte verschwindet.
+def test_detail_uses_the_oled_black_background():
+    """P8.6 Block H-R H-R.1 (Nikinger-Sichtung 2026-09-14): OLED-BLACK fuer die drei
+    Slots. Block G-R G-R.2 hatte .detail auf --bg (#0B0D10) gezogen, um den schwarzen
+    Ring rund um die Karte wegzubekommen. H-R.1 (N.13) geht einen Schritt weiter:
+    alle drei Slots -- .rail, .list, .detail -- auf --bg-void (#000); die Karte
+    (--surface) bleibt Layer 3 und schwebt sichtbar auf dem schwarzen Slot.
 
-    Wer den Hintergrund herausnimmt oder auf --bg-void zurueckdreht, faengt diesen
-    Test -- der schwarze Ring waere sofort wieder sichtbar.
+    NAMEN + UMKEHR -- beide Richtungen sind gelockt und datiert (P8.6-I-Mechanik):
+
+    • 2026-09-14, Block G-R G-R.2: .detail background = var(--bg), drei sichtbare
+      Toene (--bg / --bg-void / --surface) auf zwei reduziert. Begrundung: schwarzer
+      Ring rund um die Karte. Der Test hiess
+      `test_detail_uses_the_column_background_not_void` und pruefte
+      `var(--bg) in detail_body`, `var(--bg-void) not in detail_body`.
+
+    • 2026-09-14, Block H-R H-R.1, Nikinger-Entscheidung N.13: OLED-BLACK -- alle
+      drei Slots auf --bg-void. Hintergrund: "echtes OLED-BLACK" maximiert den
+      Kontrast zur Karte (--surface), die Karte "schwebt" sichtbar.
+
+    Wer den Hintergrund herausnimmt oder auf --bg zurueckdreht, faengt diesen Test --
+    N.13 ist eine Layer-Architektur-Revision, kein UI-Polish, und ein stiller
+    Refactor zurueck auf --bg bricht sie ohne explizite Aufhebung.
     """
     css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
 
-    detail_match = re.search(r"^\.detail\s*\{([^}]*)\}", css, flags=re.MULTILINE)
-    assert detail_match is not None, (
-        "app.css muss eine Regel `.detail { ... }` enthalten "
-        "(sonst waere Block G-R G-R.2 rueckgaengig gemacht worden)."
-    )
-    detail_body = detail_match.group(1)
+    detail_body = _block_body(css, ".detail")
 
     assert "background" in detail_body, (
-        f".detail braucht eine background-Deklaration (Block G-R G-R.2 -- "
-        f"Layer-Tone-Drift-Schutz). Block: {detail_body.strip()}"
-    )
-    assert "var(--bg)" in detail_body, (
-        f".detail muss 'var(--bg)' als Hintergrund tragen -- dieselbe Lage wie .list. "
-        f"Der fruehere --bg-void-Erbe fuehrte zum schwarzen Ring rund um die Karte. "
+        f".detail braucht eine background-Deklaration (H-R.1-L). "
         f"Block: {detail_body.strip()}"
     )
-    assert "var(--bg-void)" not in detail_body, (
-        f".detail darf 'var(--bg-void)' NICHT als Hintergrund tragen -- das waere der "
-        f"fruehere Zustand und sofort wieder der schwarze Ring. "
+    assert "var(--bg-void)" in detail_body, (
+        f".detail muss 'var(--bg-void)' als Hintergrund tragen (H-R.1-L N.13 "
+        f"OLED-BLACK). Gefunden: '{detail_body.strip()}'. Vor H-R.1 stand hier "
+        f"'var(--bg)' (Block G-R G-R.2)."
+    )
+    assert "var(--bg)" not in detail_body, (
+        f".detail darf 'var(--bg)' NICHT als Hintergrund tragen (H-R.1-L N.13: "
+        f"das waere der fruehere G-R.2-Zustand und bricht OLED-BLACK). "
         f"Block: {detail_body.strip()}"
     )
 
@@ -1281,4 +1289,264 @@ def test_panel_head_height_matches_a_list_row():
     assert top_padding in ("11px", "11"), (
         f".panel__head padding-top muss 11 px sein (Block G-R G-R.3 -- Item-Row-Hoehe "
         f"~41 px = 11 + Content + 11). Gefunden: '{top_padding}' (Wert: '{padding_value}')."
+    )
+
+
+# --- Phase 8.6 Block H-R (Plan: docs/concepts/phase8_6_ui_polish_block_h_r_plan.md) ----
+# Sechs neue Wächter für H-R.1 (OLED-BLACK für die drei Slots) und H-R.2 (account-nav-Akzent-Farbe).
+# H-R.3/.4/.5 (Editor-YAML-Bündigkeit + 1024-er) sind CDP-Probe-Schritte — sie werden im
+# Self-Check gemessen, nicht in statischen Tests (siehe Plan §5 / §11).
+
+
+def _block_body(css: str, selector: str) -> str:
+    """Liefert den Body des nächsten `{ ... }`-Blocks hinter dem Selector.
+
+    Drei Fixes ggü. der ersten H-R.0-Fassung:
+      1. `^`-Anker + `re.MULTILINE`: `body` matcht nur das Top-Level-`body`-Element
+         (Z. 147), nicht `html, body { height: 100%; ... }` (Z. 142) oder
+         `.rail, .list, .detail { ... }` (Z. 368, dort beginnt `.rail` am
+         Zeilenanfang, aber das Komma zwischen den Selektoren verhindert das Match
+         des `\s*{`-Patterns).
+      2. Kommentare werden aus dem Body entfernt (`/* ... */`), weil Phase 8.6
+         ausführliche Block-Kommentare trägt, die Code-Beispiele wie `var(--accent)`
+         oder `linear-gradient` enthalten — eine Suche nach CSS-Properties im
+         rohen Body würde diese Beispieltexte fälschlich matchen.
+      3. `[^}]*` body ist ausreichend — kein Block hat verschachtelte Klammern in
+         den H-R-relevanten Selektoren (Top-Level-Regeln haben alle flache Bodies).
+    """
+    m = re.search(rf"^{re.escape(selector)}\s*\{{([^}}]*)\}}", css, flags=re.MULTILINE)
+    assert m is not None, (
+        f"{selector} sollte in app.css einen Top-Level-Block haben "
+        f"(am Zeilenanfang, gefolgt von `{{ ... }}`)."
+    )
+    body = m.group(1)
+    # CSS-Kommentare strippen, sonst matcht eine Property-Suche Beispieltexte.
+    body = re.sub(r"/\*.*?\*/", "", body, flags=re.DOTALL)
+    return body
+
+
+def test_three_slots_use_oled_black():
+    """H-R.1-L (Plan §6): body, .rail, .list, .detail haben `background: var(--bg-void)`.
+    .shell hat keinen eigenen Background — erbt von body. Vor H-R.1 waren .list/.detail
+    auf `--bg` (#0B0D10), .rail hatte einen linear-Gradient. Nach H-R.1 sind alle drei
+    Slots echtes Schwarz (N.13).
+
+    Wer nach H-R.1 wieder einen der drei Slots auf `--bg` oder einen anderen Ton dreht,
+    fängt diesen Test. Ein Refactor zurück auf `--bg` ohne explizite Aufhebung von N.13
+    ist ein stiller Layer-Architektur-Bruch und wird hier geblockt.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    for sel in ("body", ".rail", ".list", ".detail"):
+        body = _block_body(css, sel)
+        m = re.search(r"background\s*:\s*([^;]+);", body)
+        assert m is not None, (
+            f"{sel} braucht eine background-Deklaration (H-R.1-L). Block: {body.strip()}"
+        )
+        value = m.group(1).strip()
+        assert value == "var(--bg-void)", (
+            f"{sel} background muss var(--bg-void) sein (H-R.1 OLED-BLACK). "
+            f"Gefunden: '{value}'. Vor H-R.1 stand hier `--bg` oder ein linear-gradient."
+        )
+
+    # .shell hat per Definition keinen eigenen Background -- erbt von body.
+    # Wer hier einen `background`-Eintrag hinzufügt, hat den Body-Erb-Mechanismus
+    # gebrochen; der Test failt dann sichtbar mit der Begründung.
+    shell_body = _block_body(css, ".shell")
+    assert "background" not in shell_body, (
+        f".shell darf KEINEN eigenen background haben (H-R.1-L: erbt von body, "
+        f"body = --bg-void). Block: {shell_body.strip()}"
+    )
+
+
+def test_rail_has_no_gradient_anymore():
+    """H-R.1-L (Plan §1, N.13): `.rail` hat keinen `linear-gradient(...)`-Hintergrund
+    mehr. Vor H-R.1: `linear-gradient(180deg, var(--rail-top), var(--bg))` für den
+    "Wortmarke oben etwas heller"-Look. Nach H-R.1: flaches `--bg-void`. Der Effekt
+    der alten Sonderregel war auf schwarzem Grund sinnlos (kein erkennbarer
+    Helligkeitsverlauf von #0E1116 zu #000).
+
+    `--rail-top` bleibt im `:root` definiert (funktionslos), das prüft ein separater
+    Test (`test_rail_top_token_still_in_root` -- bewusst NICHT hier, weil das ein
+    Doku-Thema ist, kein UI-Verhalten).
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+    rail_body = _block_body(css, ".rail")
+    assert "linear-gradient" not in rail_body, (
+        f".rail darf keinen linear-gradient mehr enthalten (H-R.1-L OLED-BLACK). "
+        f"Gefunden in Block: {rail_body.strip()}"
+    )
+    assert "radial-gradient" not in rail_body, (
+        f".rail darf keinen radial-gradient enthalten (H-R.1-L). "
+        f"Gefunden in Block: {rail_body.strip()}"
+    )
+
+
+def test_layer3_elements_keep_surface_tone():
+    """H-R.1-L (Plan §6, H-R.1-A): Layer-3-Elemente behalten ihre bisherigen Background-
+    Tokens (`--surface`, `--surface-raised`). H-R.1 ändert nur die Hintergrund-Slots,
+    nicht die Karten/Panels/Banner/Köpfe, die darauf liegen.
+
+    Geprüft werden die wichtigsten vier:
+      - `.detail__graph` (die Karte im Detail-Slot, `--surface`)
+      - `.update-banner` (transient am oberen Rand, `--surface-raised`)
+      - `.editor__head` (sticky Editor-Kopf, `--surface-raised`)
+      - `.list__head` (sticky Listen-Kopf, `--surface-raised`)
+
+    Wer nach H-R.1 die Karte versehentlich auf `--bg-void` zieht (sie würde auf dem
+    schwarzen Slot verschwinden), fängt diesen Test.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    # (selector, erwarteter Background-Token)
+    # HINWEIS: die Karte im Detail-Slot ist NICHT `.detail__graph` (das ist nur
+    # der Container mit Padding/Flex), sondern `.overview__graph` (Border +
+    # Background + Toolbar). Plan-Fehler von H-R.0 -- hier korrigiert.
+    cases = (
+        (".overview__graph", "var(--surface)"),
+        (".update-banner", "var(--surface-raised)"),
+        (".editor__head", "var(--surface-raised)"),
+        (".list__head", "var(--surface-raised)"),
+    )
+    for sel, expected in cases:
+        body = _block_body(css, sel)
+        m = re.search(r"background\s*:\s*([^;]+);", body)
+        assert m is not None, (
+            f"{sel} braucht eine background-Deklaration. Block: {body.strip()}"
+        )
+        value = m.group(1).strip()
+        assert value == expected, (
+            f"{sel} background muss '{expected}' bleiben (H-R.1-L Layer-3-Erhalt). "
+            f"Gefunden: '{value}'. Layer-3-Elemente sollen auf dem schwarzen Slot "
+            f"sichtbar 'schweben' -- wenn der Background auf --bg-void wechselt, "
+            f"verschwindet das Element."
+        )
+
+
+def test_account_nav_uses_accent_fill():
+    """H-R.2-L (Plan §2, N.14): `.account-nav` hat Akzent-Fill (genau: `var(--accent-quiet)`
+    oder `var(--accent)`). Vor H-R.2 war es `background: none` + `border: none` + eine
+    2-px-Akzentkante in `--line-strong` -- "sieht man kaum" (Nikinger-Sichtung
+    2026-09-14). Nach H-R.2: Akzent-quiet-Fill + ringsum border in `--accent-edge` +
+    `border-left: 3px solid var(--accent)`.
+
+    N.14 ist ein Spezialfall (gilt nur für .account-nav). Andere Navigations-Elemente
+    (`.rail__action`) bleiben unverändert -- siehe `test_rail_action_unchanged` weiter
+    unten.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+    body = _block_body(css, ".account-nav")
+    bg_m = re.search(r"background\s*:\s*([^;]+);", body)
+    assert bg_m is not None, (
+        f".account-nav braucht eine background-Deklaration (H-R.2-L). "
+        f"Block: {body.strip()}"
+    )
+    bg_value = bg_m.group(1).strip()
+    assert bg_value in ("var(--accent-quiet)", "var(--accent)"), (
+        f".account-nav background muss Akzent-Fill sein (H-R.2-L: var(--accent-quiet) "
+        f"oder var(--accent)). Gefunden: '{bg_value}'. Vor H-R.2 stand hier 'none'."
+    )
+
+    # border-left muss Akzent-Farbe tragen (Afford).
+    bl_m = re.search(r"border-left\s*:\s*([^;]+);", body)
+    assert bl_m is not None, (
+        f".account-nav braucht eine border-left-Deklaration (H-R.2-L). "
+        f"Block: {body.strip()}"
+    )
+    bl_value = bl_m.group(1).strip()
+    assert "var(--accent)" in bl_value, (
+        f".account-nav border-left muss var(--accent) enthalten (H-R.2-L). "
+        f"Gefunden: '{bl_value}'."
+    )
+
+
+def test_account_nav_hover_kept():
+    """H-R.2-L: `.account-nav:hover` behält ein Hover-Verhalten. Vor H-R.2 war es
+    `background: var(--select-fill-quiet) + outline: 1px solid var(--select-line-quiet)`.
+    Nach H-R.2: Akzent-Fill wird verstärkt (`color-mix`) + Outline in `--accent-line`
+    statt `--select-line-quiet`.
+
+    Wer den Hover-Block ersatzlos löscht, fängt diesen Test -- der Knopf wäre dann
+    statisch ohne Rückmeldung.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    # .account-nav + :hover zusammen als Block.
+    m = re.search(
+        r"\.account-nav\s*:\s*hover\s*\{([^}]*)\}",
+        css,
+    )
+    assert m is not None, (
+        ".account-nav:hover braucht einen eigenen Block (H-R.2-L Hover-Erhalt). "
+        "Wer den :hover-Block ersatzlos löscht, bricht diesen Test."
+    )
+    hover_body = m.group(1)
+    # Mindestens eines der folgenden muss vorhanden sein: background-Änderung,
+    # outline-Änderung, color-mix. Ein leerer Hover-Block zählt nicht als Hover.
+    has_background = "background" in hover_body
+    has_outline = "outline" in hover_body
+    assert has_background or has_outline, (
+        f".account-nav:hover muss mindestens background- oder outline-Eintrag haben "
+        f"(H-R.2-L). Block: {hover_body.strip()}"
+    )
+
+
+def test_rail_account_unchanged_from_block_h():
+    """H-R.2-L: `.rail__account` bleibt unverändert seit Block H. Block H hat es auf
+    `flex-direction: column` als Normalfall umgestellt; die alte Sonderregel in einer
+    wegoptimierten Media-Query ist weg. Nach H-R.2 (H-R.1 hat `.rail`-Background
+    geändert, nicht `.rail__account`) muss `.rail__account` weiterhin `flex-direction:
+    column` haben und genau zwei Knöpfe umschließen.
+
+    Diese Wächter ergänzen `test_rail_order_settings_and_logout_at_the_end` (Block H
+    hat dort die Reihenfolge festgehalten -- Position der Knöpfe im Markup).
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+    body = _block_body(css, ".rail__account")
+    assert "flex-direction: column" in body, (
+        f".rail__account muss flex-direction: column behalten (Block H H1, "
+        f"H-R.2-L unverändert). Block: {body.strip()}"
+    )
+
+    # Markup-Check: genau zwei Knöpfe im .rail__account (Einstellungen + Abmelden).
+    html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
+    m = re.search(
+        r'<div class="rail__account">\s*(.*?)\s*</div>\s*</nav>',
+        html,
+        re.DOTALL,
+    )
+    assert m is not None, (
+        ".rail__account sollte im Markup direkt vor </nav> stehen (Block H H1)."
+    )
+    block = m.group(1)
+    assert block.count("<button") == 2, (
+        f".rail__account muss genau zwei <button>s umschließen "
+        f"(Einstellungen + Abmelden, Block H H1). Gefunden: {block.count('<button')}"
+    )
+    assert "account-button" in block, (
+        "#account-button muss in .rail__account stehen (Block H H1, N.9-Umkehr)."
+    )
+    assert "logout-button" in block, (
+        "#logout-button muss in .rail__account stehen (Block H H1, N.9-Umkehr)."
+    )
+
+
+def test_rail_action_unchanged():
+    """H-R.2-L (N.14): `.rail__action` (Einstellungen + Abmelden unten) bleibt
+    unverändert. N.14 ist ein Spezialfall für `.account-nav` -- die Rail-Knöpfe
+    sollen weiterhin transparent + Hover sein, NICHT den Akzent-Fill der
+    Konto-Dialog-Knöpfe erben.
+
+    Nikinger-Sichtung 2026-09-14: "Bei einstellungen und abmelden passt das eigentlich
+    so, ich finde auch die kleine Trennung gut." -- das ist die Begründung für N.14.
+    Wer hier den Akzent-Fill auf `.rail__action` ausdehnt, fängt diesen Test.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+    body = _block_body(css, ".rail__action")
+    bg_m = re.search(r"background\s*:\s*([^;]+);", body)
+    bg_value = bg_m.group(1).strip() if bg_m else "(kein background-Eintrag)"
+    # .rail__action darf KEINEN Akzent-Fill haben (N.14: Spezialfall nur .account-nav).
+    assert "var(--accent)" not in bg_value or bg_value == "transparent", (
+        f".rail__action background darf nicht Akzent-Fill sein (H-R.2-L N.14 "
+        f"Spezialfall nur .account-nav). Gefunden: '{bg_value}'."
     )

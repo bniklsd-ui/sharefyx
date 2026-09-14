@@ -30,3 +30,6 @@ skills-lock.json
 
 # machine-local deployment config (P3) — Pfade + Hostname, kein Secret, aber maschinenspezifisch
 phase3_edge/local.env
+
+# debian packages lying around in the repo root (e.g. sunshine game-stream host installer)
+*.deb

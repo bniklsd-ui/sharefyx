@@ -6,7 +6,7 @@ detail: L3 (Pointer-Verzeichnis, keine eigene Inhaltsquelle)
 up: ../phase8_6_ui_polish/CLAUDE.md   # aktive Phase
 down:
   - ../docs/screenshots/                # kanonische Ablage; diese Verzeichnis ist nur Symlink-Komfort
-updated: 2026-09-14 (Phase 8.6 Block H — Block-G-Symlinks wurden ersetzt; Konvention gilt weiterhin, P8.6-AK)
+updated: 2026-09-14 (Phase 8.6 Block H-R Teil 1 — Block-H-Symlinks wurden ersetzt; Konvention gilt weiterhin, P8.6-AK. Block-H-R-Teil-1 hat nur die zwei Sichtungs-Befunde OLED-BLACK + account-nav-Akzent gebaut; H-R.3/.4/.5 (CDP-Probe-Welle) und Block J folgen noch.)
 ---
 # `screenshots_latest/` — Schnellzugriff auf die Screenshots der aktuellen Phase
 
@@ -43,15 +43,15 @@ Ausnahmen, in denen M3 den Dateinamen + Checkkriterium **nicht** nennt:
 - Wenn die Verifikation programmatisch ist (Regex auf gerenderten HTML-Output
   o. ä.) und der Screenshot nur Anhang ist.
 
-## Aktueller Inhalt (Phase 8.6 Block H, Stand 2026-09-14)
+## Aktueller Inhalt (Phase 8.6 Block H-R Teil 1, Stand 2026-09-14)
 
 | Dateiname | Original | Checkkriterium |
 |---|---|---|
-| `01_rail.png` | `../docs/screenshots/p86_block_h_01_1440_rail.png` | **Bei 1440 px: Rail zeigt unten in `.rail__account` zwei gestapelte Knöpfe — oben „Einstellungen" (Zahnrad, blau), unten „Abmelden" (Logout-Icon, `--caution` rot) als äußerster Knopf im Rail.** Beweis: Befund 7b weg (Umkehr von C1/N3-Lesart b, N.9), P8.6-AE erfüllt. |
-| `02_rail_1200.png` | `../docs/screenshots/p86_block_h_02_1200_rail.png` | **Bei 1200 px: gleiches Layout wie 1440 — Rail 240 px voll sichtbar mit Labels, `.rail__account` mit beiden Knöpfen unten, kein Kollaps.** Beweis: Block H wirkt auch im schmalen Viewport (kein neuer Sonderfall, die Spalten-Anordnung ist der Normalfall in allen Breakpoints nach G-R). |
-| `03_konto_dialog.png` | `../docs/screenshots/p86_block_h_03_1440_konto_dialog.png` | **Konto-Dialog offen bei 1440 px: „Update-Log ansehen" und „Spaces verwalten" tragen eine linke Akzentkante (`2px solid var(--line-strong)`) und ein Chevron-Icon rechts (`#i-chevron-right`, `margin-left: auto`) — sichtbar bedienbar, aber keine `.btn`-Plastik (B3-Kategorie „Navigation" bleibt erhalten).** Beweis: Befund 2 weg, V133 erfüllt (`elementFromPoint` erreichbar — die Knöpfe sind da, sie hatten nur keinen Afford). |
+| `01_uebersicht.png` | `../docs/screenshots/p86_block_h_r_01_1440_uebersicht.png` | **Bei 1440 px: Rail + Liste + Detail uniform schwarz (`--bg-void = #000`); die Karte (`.overview__graph` mit `--surface`) schwebt sichtbar als erkennbar helleres Rechteck auf dem schwarzen Detail-Slot.** Beweis: H-R.1 erfüllt (N.13 Layer-Architektur-Revision), G-R-Nachtrag-Backlog "Layer-Tone-Drift" mit-gelöst. |
+| `02_uebersicht_1200.png` | `../docs/screenshots/p86_block_h_r_02_1200_uebersicht.png` | **Bei 1200 px: gleiches Layout wie 1440 — Rail 240 px mit Labels, alle drei Slots schwarz, Karte schwebt, kein Kollaps.** Beweis: OLED-BLACK wirkt in allen Breakpoints (kein neuer Sonderfall). |
+| `03_konto_dialog.png` | `../docs/screenshots/p86_block_h_r_03_1440_konto_dialog.png` | **Konto-Dialog offen bei 1440 px: „Update-Log ansehen" und „Spaces verwalten" tragen jetzt einen deutlich blauen Akzent-Fill (`var(--accent-quiet)`) + ringsum Border (`var(--accent-edge)`) + 3-px-Akzentkante links (`var(--accent)`) + Akzent-Chevron rechts — sofort als wichtig erkennbar.** Beweis: H-R.2 erfüllt (N.14 "ausnahmsweise" für Konto-Dialog, "sieht man kaum"-Befund weg). Einstellungen + Abmelden unten sind neutral (N.14-Spezialfall greift nur für `.account-nav`). |
 
-Drei weitere Screenshots (`01_1440_uebersicht`, `02_1440_editor_offen`, `03_1200_uebersicht`, `04_1200_editor_offen`, `05_1024_uebersicht`, `06_1024_editor_offen`) liegen in `docs/screenshots/p86_block_g_r_*.png` für die Sichtprüfung am Gerät — der Block-G-R-Layout-Umbau bleibt unverändert gültig (Block H hat das Layout nicht angefasst, nur den Rail-Inhalt und den Konto-Dialog).
+Hinweis: dies sind die H-R-Teil-1-Screenshots (zwei Sichtungs-Befunde gebaut). H-R.3/.4/.5 (Editor-YAML-Bündigkeit, 1024-er Map-Overlap, 1024-er Editor-Modus) sind als Folgeblock offen — deren Screenshots kommen mit der CDP-Probe-Welle. Block G-R-Screenshots (`p86_block_g_r_{01..06}_*.png`) und Block-H-Screenshots (`p86_block_h_{01..03}_*.png`) bleiben in `docs/screenshots/` für die Historie unverändert.
 
 ## Rotation
 
