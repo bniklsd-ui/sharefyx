@@ -1373,16 +1373,19 @@ select.input:focus {
   gap: var(--space);
   border-bottom: 1px solid var(--line);
   /* Phase 8.6 Block G-R G-R.3: padding-top von 12 px auf 4 px reduziert, padding-bottom
-     bleibt 12 px. Damit rueckt die YAML-Kopfzeile um ~8 px nach oben und schliesst
-     buendig mit der Suchzeilen-Unterkante im List-Slot ab (Nikinger-Vorgabe 2026-09-14:
-     "lasse das obere ende der YAML Kopfzeile buendig abschliessen mit dem unteren ende
-     der Suchzeile im space").
+     bleibt 12 px. Block H-R H-R.3 (Plan §3, V142): padding-bottom von 12 px auf 40 px
+     erhoeht (calc(var(--space) * 5)), damit die Editor-Head-Unterkante auf gleicher
+     Y-Position liegt wie die .list__head-Unterkante (CDP-Probe pre-fix: 27,14 px Versatz
+     bei 1440+1200 px). Gemessen post-fix: Unterkante-Diff <= 2 px (H-R.3-A).
+     padding-top bleibt bei 4 px -- die YAML-Kopfzeile sitzt weiterhin oben, der Titel
+     bleibt hoch (Nikinger-Vorgabe 2026-09-14: "lasse das obere ende der YAML Kopfzeile
+     buendig abschliessen mit dem unteren ende der Suchzeile im space").
 
      Sticky + Hintergrund + z-index: machen den Editor-Kopf zum waagerechten Pendant der
      .list__head (Step 7b hat das fuer den Listen-Kopf eingefuehrt; Phase 8.6 B1 zog die
      Hover-Sprache nach). Wenn der Nutzer im Editor-Body scrollt, bleibt der Titel sichtbar
      -- parallel zum Verhalten der Suchzeile beim Listen-Scrollen. */
-  padding: calc(var(--space) * 0.5) calc(var(--space) * 3) calc(var(--space) * 1.5);
+  padding: calc(var(--space) * 0.5) calc(var(--space) * 3) calc(var(--space) * 5);
   position: sticky;
   top: 0;
   background: var(--surface-raised);

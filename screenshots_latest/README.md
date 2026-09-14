@@ -6,7 +6,7 @@ detail: L3 (Pointer-Verzeichnis, keine eigene Inhaltsquelle)
 up: ../phase8_6_ui_polish/CLAUDE.md   # aktive Phase
 down:
   - ../docs/screenshots/                # kanonische Ablage; diese Verzeichnis ist nur Symlink-Komfort
-updated: 2026-09-14 (Phase 8.6 Block H-R Teil 1 — Block-H-Symlinks wurden ersetzt; Konvention gilt weiterhin, P8.6-AK. Block-H-R-Teil-1 hat nur die zwei Sichtungs-Befunde OLED-BLACK + account-nav-Akzent gebaut; H-R.3/.4/.5 (CDP-Probe-Welle) und Block J folgen noch.)
+updated: 2026-09-14 (Phase 8.6 Block H-R Teil 2 — fünf Symlinks ersetzt (01/02 Übersichten, 03 Editor-offen bei 1440, 04 1024er Übersicht, 05 1024er Editor-offen); H-R-Teil-1-Konto-Dialog-Screenshot nicht mehr prominent — der ist über `docs/screenshots/p86_block_h_r_03_1440_konto_dialog.png` weiterhin erreichbar; H-R.3 Editor-YAML-Bündigkeit sichtbar in 03, H-R.4 1024er-Stapel in 04, H-R.5 1024er-Editor in 05.)
 ---
 # `screenshots_latest/` — Schnellzugriff auf die Screenshots der aktuellen Phase
 
@@ -43,15 +43,17 @@ Ausnahmen, in denen M3 den Dateinamen + Checkkriterium **nicht** nennt:
 - Wenn die Verifikation programmatisch ist (Regex auf gerenderten HTML-Output
   o. ä.) und der Screenshot nur Anhang ist.
 
-## Aktueller Inhalt (Phase 8.6 Block H-R Teil 1, Stand 2026-09-14)
+## Aktueller Inhalt (Phase 8.6 Block H-R Teil 1+2, Stand 2026-09-14)
 
 | Dateiname | Original | Checkkriterium |
 |---|---|---|
 | `01_uebersicht.png` | `../docs/screenshots/p86_block_h_r_01_1440_uebersicht.png` | **Bei 1440 px: Rail + Liste + Detail uniform schwarz (`--bg-void = #000`); die Karte (`.overview__graph` mit `--surface`) schwebt sichtbar als erkennbar helleres Rechteck auf dem schwarzen Detail-Slot.** Beweis: H-R.1 erfüllt (N.13 Layer-Architektur-Revision), G-R-Nachtrag-Backlog "Layer-Tone-Drift" mit-gelöst. |
 | `02_uebersicht_1200.png` | `../docs/screenshots/p86_block_h_r_02_1200_uebersicht.png` | **Bei 1200 px: gleiches Layout wie 1440 — Rail 240 px mit Labels, alle drei Slots schwarz, Karte schwebt, kein Kollaps.** Beweis: OLED-BLACK wirkt in allen Breakpoints (kein neuer Sonderfall). |
-| `03_konto_dialog.png` | `../docs/screenshots/p86_block_h_r_03_1440_konto_dialog.png` | **Konto-Dialog offen bei 1440 px: „Update-Log ansehen" und „Spaces verwalten" tragen jetzt einen deutlich blauen Akzent-Fill (`var(--accent-quiet)`) + ringsum Border (`var(--accent-edge)`) + 3-px-Akzentkante links (`var(--accent)`) + Akzent-Chevron rechts — sofort als wichtig erkennbar.** Beweis: H-R.2 erfüllt (N.14 "ausnahmsweise" für Konto-Dialog, "sieht man kaum"-Befund weg). Einstellungen + Abmelden unten sind neutral (N.14-Spezialfall greift nur für `.account-nav`). |
+| `03_editor_offen.png` | `../docs/screenshots/p86_block_h_r_03_1440_editor_offen.png` | **Bei 1440 px: Editor offen — der Editor-Kopf (Titel „Konferenz 2026" + v1-gespeichert-Badge + Archivieren + Speichern + ×) endet auf gleicher Y-Position wie der Listen-Kopf (Alle Items + Suchfeld).** Die YAML-Kopfdaten-Zeile „Kopfdaten YAML-Frontmatter" beginnt auf gleicher Höhe wie das erste Item („Konferenz 2026") im Listen-Slot — der 27-px-Versatz vor H-R.3 ist weg. Beweis: V142-CDP-Probe pre-fix 27,14 px / post-fix 0,86 px (≤ 2 px Toleranz). |
+| `04_1024_uebersicht.png` | `../docs/screenshots/p86_block_h_r_04_1024_uebersicht.png` | **Bei 1024 px: Liste oben (Spaces-Übersicht „alpha/beta/gamma" mit Counts) und Karte unten (Verknüpfungsgraph mit Tags/Ordner-Toggles) sauber gestapelt — Rail links 240 px vollständig sichtbar.** Beweis: V143-CDP-Probe misst 0 Rechteck-Schnittmenge zwischen .list/.detail__graph/.rail. |
+| `05_1024_editor.png` | `../docs/screenshots/p86_block_h_r_05_1024_editor_offen.png` | **Bei 1024 px: Editor im unteren Slot — alle Knöpfe sichtbar: Archivieren, Speichern, × (im Editor-Kopf), Format-Toolbar (B I </> Link H Anführungszeichen Liste 1. — Bild Vorschau), Anhängen-Feld + Button (am Fuß).** Beweis: V144-CDP-Probe misst 16/16 Knöpfe `reachable: true`, keiner offscreen. |
 
-Hinweis: dies sind die H-R-Teil-1-Screenshots (zwei Sichtungs-Befunde gebaut). H-R.3/.4/.5 (Editor-YAML-Bündigkeit, 1024-er Map-Overlap, 1024-er Editor-Modus) sind als Folgeblock offen — deren Screenshots kommen mit der CDP-Probe-Welle. Block G-R-Screenshots (`p86_block_g_r_{01..06}_*.png`) und Block-H-Screenshots (`p86_block_h_{01..03}_*.png`) bleiben in `docs/screenshots/` für die Historie unverändert.
+Hinweis: dies sind die H-R-Teil-1+2-Screenshots (alle fünf Sub-Blöcke gebaut). Der H-R-Teil-1-Konto-Dialog-Screenshot (`p86_block_h_r_03_1440_konto_dialog.png`) bleibt über `docs/screenshots/` für die Historie erreichbar, ist aber nicht mehr in `screenshots_latest/` prominent — der Editor-Bündigkeits-Screenshot ist hier wichtiger. Block G-R-Screenshots (`p86_block_g_r_{01..06}_*.png`) und Block-H-Screenshots (`p86_block_h_{01..03}_*.png`) bleiben in `docs/screenshots/` für die Historie unverändert.
 
 ## Rotation
 

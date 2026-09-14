@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-14 (**Block H-R Teil 1 erledigt ✅ — H-R.1 + H-R.2** — Head 88.519→90.272 B, Archiv 169.569→198.341 B. Block-H-Session-Block per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-R-Teil-1-Session-Block. **Phase 8.6 ist nach H-R-1 bei Block 11 von 13 angekommen** — OLED-BLACK für drei Slots + account-nav-Akzent-Farbe in einem Schritt, der nächste Block ist H-R.3/.4/.5 (CDP-Probe-Welle, V142/V143/V144), dann J, dann Gate) | 2026-09-14 (**Block H erledigt ✅** — Head 88.519 B [unverändert nach Rotation], Archiv 151.336→169.569 B. Block-G-R-Session-Block 235 Z./18.073 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-Session-Block. **Phase 8.6 ist nach H bei Block 10 von 13 angekommen — Rail-Umkehr (Befund 7b) + Konto-Dialog-Afford (Befund 2) in einem Schritt behoben, der nächste Block ist J (der pytest-Flake, P8.6-AJ, datierte Tabu-Ausnahme für phase4_auth/authserver/{crypto.py,store.py})**) | 2026-09-14 (**Block G-R erledigt ✅** — Head 82.028→85.760 B, Archiv 138.612→151.336 B. Block-G-Session-Block 159 Z./11.728 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-G-R-Session-Block. **`Phase 8.6` ist nach G-R bei Block 9 von 13 angekommen — Layout/Editor-YAML-Bündigkeit + Layer-Tone-Drift aus der Sichtung behoben, der nächste Block ist H (Rail + Konto-Dialog, Befunde 7b + 2)**) | 2026-09-14 (E2b-Sub-Block [vom 2026-09-14, E2b-Commit `cc3f342`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — sechste Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 5.058 B; Archiv 128.603 → 133.661 B) | 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
+updated: 2026-09-14 (**Block H-R Teil 2 erledigt ✅ — H-R.3 + H-R.4 + H-R.5** — Head 109.202→99.718 B, Archiv 180.176→189.660 B. Block-H-R-Teil-1-Session-Block 146 Z./9.484 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-R-Teil-2-Session-Block. **Phase 8.6 ist nach H-R-2 bei Block 12 von 13 angekommen** — Editor-YAML-Bündigkeit (CSS-Fix: padding-bottom 12 → 40 px, V142-CDP-Probe 27,14 → 0,86 px) + 1024-er Map-Overlap (kein Fix, V143 misst 0 Rechteck-Schnittmenge) + 1024-er Editor-Modus (kein Fix, V144 misst 16/16 Knöpfe reachable); der nächste Block ist J (der pytest-Flake, P8.6-AJ), dann Gate, dann Z (Closeout)) | 2026-09-14 (**Block H-R Teil 1 erledigt ✅ — H-R.1 + H-R.2** — Head 88.519 B [unverändert nach Rotation], Archiv 151.336→169.569 B. Block-G-R-Session-Block 235 Z./18.073 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-Session-Block. **Phase 8.6 ist nach H bei Block 10 von 13 angekommen — Rail-Umkehr (Befund 7b) + Konto-Dialog-Afford (Befund 2) in einem Schritt behoben, der nächste Block ist J (der pytest-Flake, P8.6-AJ, datierte Tabu-Ausnahme für phase4_auth/authserver/{crypto.py,store.py})**) | 2026-09-14 (**Block G-R erledigt ✅** — Head 82.028→85.760 B, Archiv 138.612→151.336 B. Block-G-Session-Block 159 Z./11.728 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-G-R-Session-Block. **`Phase 8.6` ist nach G-R bei Block 9 von 13 angekommen — Layout/Editor-YAML-Bündigkeit + Layer-Tone-Drift aus der Sichtung behoben, der nächste Block ist H (Rail + Konto-Dialog, Befunde 7b + 2)**) | 2026-09-14 (E2b-Sub-Block [vom 2026-09-14, E2b-Commit `cc3f342`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — sechste Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 5.058 B; Archiv 128.603 → 133.661 B) | 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -23,6 +23,152 @@ das Skript auf das Phase-8.5-Muster passt und mit einem `## Session stopped` + m
 
 
 
+
+
+## Session stopped — 2026-09-14 (opencode/M3 — **Block H-R Teil 1 erledigt**: H-R.1 + H-R.2 ✅, H-R.3/.4/.5 ⬜ für Folge-Session)
+
+**Atomarer Teil-Block, ein Commit.** Nikinger-Vorgabe 2026-09-14: "ein step atomar" — ich
+interpretiere das pragmatisch als "die zwei Sichtungs-Befunde (H-R.1 + H-R.2) in dieser
+Session, die drei Backlog-Punkte (H-R.3 Editor-YAML-Bündigkeit + H-R.4 1024-er Map-Overlap +
+H-R.5 1024-er Editor-Modus) als eigener Folge-Block". Begründung: H-R.1 + H-R.2 sind reines
+CSS+Markup+Tests, die Screenshots passen in eine Self-Check-Session. H-R.3/.4/.5 brauchen
+CDP-Proben (V142/V143/V144, Block-E-Methodik), drei Breiten × mehrere Proben — das ist eine
+eigene Session. Beide Sessions sind atomar, kein Patch auf `abed4c1` (analog G-R).
+
+### H-R.1 — OLED-BLACK für die drei Slots (Befund 1 neu + Layer-Tone-Drift-Backlog)
+
+**`phase5_ui/webui/static/app.css:373-379`** — `.rail` hat jetzt `background: var(--bg-void)`
+statt `linear-gradient(180deg, var(--rail-top), var(--bg))`. Der Gradient ist ersatzlos
+weg — der "Wortmarke oben etwas heller"-Look verliert seinen Sinn auf echtem Schwarz.
+`--rail-top` bleibt im `:root` definiert, ist aber funktionslos (kein Refactoring-Scope).
+
+**`app.css:381-386`** — `.list` hat jetzt `background: var(--bg-void)` statt `var(--bg)`.
+
+**`app.css:388-403`** — `.detail` hat jetzt `background: var(--bg-void)` statt `var(--bg)`.
+Der alte G-R.2-Kommentar ist ersetzt durch den H-R.1-Kommentar mit dem Hinweis auf N.13
+(Layer-Architektur-Revision) und der Helligkeits-Distanz-Rechnung (#000 vs #14181D =
+14 Stufen statt der 6 Stufen von vorher).
+
+### H-R.2 — `account-nav` Akzent-Farbe (Befund 2 neu)
+
+**`app.css:661-700`** — `.account-nav` hat jetzt `background: var(--accent-quiet)` statt
+`background: none`; ringsum `border: 1px solid var(--accent-edge)`; `border-left: 3px solid
+var(--accent)` (statt 2 px `--line-strong`). Hover wechselt auf
+`background: color-mix(in srgb, var(--accent-quiet), var(--accent) 50%)` + `outline: 1px
+solid var(--accent-line)` — kein doppelter Akzent-Fill, der Knopf "springt" nicht zwischen
+zwei Akzent-Tönen. Das Chevron-Icon bekommt `color: var(--accent)`. Begründung "ausnahmsweise"
+(N.14) im Kommentar dokumentiert; `.rail__action` (Einstellungen + Abmelden) bleibt
+unverändert — separater Wächter `test_rail_action_unchanged` hält das fest.
+
+### Wächter (7 Tests, davon 1 umbenannt + 1 angepasst + 5 neu)
+
+**Umbenannt + umgekehrt** (`test_static_routes.py:1175`):
+`test_detail_uses_the_column_background_not_void` (Block G-R G-R.2) →
+`test_detail_uses_the_oled_black_background`. Asserts umgekehrt: jetzt
+`var(--bg-void) in detail_body`, `var(--bg) not in detail_body`. Docstring trägt **beide**
+Richtungen mit Datum (P8.6-I-Mechanik wörtlich übernommen — der Testname wird sonst zur
+Lüge).
+
+**Angepasst**: `_block_body`-Helper (Z. 1301-1321) bekommt drei Fixes ggü. der ersten
+H-R.0-Fassung:
+1. `^`-Anker + `re.MULTILINE` — Selektoren matchen nur Top-Level-Blöcke, nicht
+   `html, body { height: 100% }` (Z. 142) oder `.rail, .list, .detail { ... }` (Z. 368).
+2. CSS-Kommentare werden aus dem Body gestrippt (`/* ... */`) — Phase 8.6 hat ausführliche
+   Block-Kommentare mit Code-Beispielen, eine Property-Suche im rohen Body würde sonst
+   Beispieltexte wie "var(--accent-quiet)" oder "linear-gradient" fälschlich matchen.
+3. Bessere Fehlermeldung bei fehlendem Selektor.
+
+**Fünf neue Tests**:
+- `test_three_slots_use_oled_black` — body, .rail, .list, .detail haben `var(--bg-void)`;
+  .shell hat KEIN background (erbt von body).
+- `test_rail_has_no_gradient_anymore` — `.rail` enthält keinen `linear-gradient(...)`
+  mehr.
+- `test_layer3_elements_keep_surface_tone` — `.overview__graph` hat `var(--surface)`,
+  `.update-banner`/`.editor__head`/`.list__head` haben `var(--surface-raised)`. **Plan-Korrektur:**
+  der Plan nannte `.detail__graph` als Karten-Container, der hat aber gar keinen
+  `background` — die Karte ist `.overview__graph`. Im Test-Docstring dokumentiert.
+- `test_account_nav_uses_accent_fill` — `.account-nav` Background ist `var(--accent-quiet)`
+  oder `var(--accent)`; border-left enthält `var(--accent)`.
+- `test_account_nav_hover_kept` — `.account-nav:hover` hat einen Hover-Block mit
+  `background` oder `outline`.
+- `test_rail_account_unchanged_from_block_h` — `.rail__account` hat weiterhin
+  `flex-direction: column` und umschließt genau zwei `<button>`s (Einstellungen + Abmelden).
+- `test_rail_action_unchanged` — `.rail__action` hat KEINEN Akzent-Fill (N.14-Spezialfall).
+
+### Selbstprüfung §0.5
+
+`pytest -q` **988 passed in 120 s** (V107-Baseline 981 + 7 neue Tests für H-R.1 + H-R.2;
+Block H selbst hat keinen Test hinzugefügt, nur 1 umbenannt). `node --check` auf alle
+13 JS-Dateien ✅ (keine JS-Änderungen). `ui_budget.py` **5/5 im Korridor**, app.css jetzt
+**24,7 KB** gzip (vorher 24,2 KB, +0,5 KB für die ausführlichen Block-Kommentare +
+`.account-nav`-Border-Stack + color-mix-Hover), Gesamt **143,6 KB** (vorher 143,1 KB, +0,5 KB).
+Tabu-Diff §0.3 **leer** (nur `phase5_ui/webui/static/app.css` und
+`phase5_ui/tests/test_static_routes.py` berührt). Kein `pkill -f`, kein `systemctl`,
+sharefyx-mcp **PID 991** nur gelesen.
+
+### Drei Selbst-Screenshots `docs/screenshots/p86_block_h_r_{01..03}_*.png`
+
+- **`01_1440_uebersicht.png`** (~135 KB) — Rail + Liste + Detail uniform schwarz
+  (`--bg-void`), Karte (`.overview__graph` mit `var(--surface)`) **schwebt sichtbar** als
+  erkennbar helleres Rechteck. Drei sichtbare Töne: schwarz (Slots) / `--surface` (Karte) /
+  `--surface-raised` (Update-Banner oben, dismissable). Einstellungen + Abmelden unten
+  unverändert (Block H H1 hält).
+- **`02_1200_uebersicht.png`** (~135 KB) — gleiches Layout wie Bild 01 bei 1200 px, kein
+  Kollaps. Rail 240 px + Labels sichtbar. Karte schwebt.
+- **`03_1440_konto_dialog.png`** (~150 KB) — Konto-Dialog offen, beide `.account-nav`-
+  Knöpfe (Update-Log ansehen, Spaces verwalten) tragen **deutlich blauen Akzent-Fill**
+  (`var(--accent-quiet)`) + 3-px-Akzentkante links + Akzent-Chevron rechts. Die Knöpfe
+  sind **sofort als wichtig erkennbar** (Befund "sieht man kaum" behoben). Einstellungen
+  + Abmelden unten: neutral wie vorher.
+
+### Was noch offen ist (H-R.3 / H-R.4 / H-R.5)
+
+Drei Backlog-Punkte aus dem G-R-Nachtrag vom 2026-09-14 sind **nicht** in dieser Session
+gebaut — sie brauchen CDP-Proben (V142/V143/V144, Block-E-Methodik) und sind eine eigene
+Session wert. Die nächsten Schritte im Detail:
+
+- **H-R.3 — Editor-YAML bündig zur Suchzeile (nicht zur Item-Zeile).** G-R.3 hat
+  `.editor__head { padding-top: 4px }` gesetzt, aber Nikinger-Sichtung: "die YAML-Kopfzeile
+  muss bündig zur Suchzeilen-Unterkante im Listen-Slot sein, nicht zur Item-Zeile".
+  V142-Messung (CDP-Probe `boundingBox` für `.list__head` und `.editor__head` bei 1440
+  und 1200 px) entscheidet den konkreten Padding-Wert; danach Fix in `.editor__head` +
+  möglicherweise `.list__head` angleichen.
+- **H-R.4 — 1024-er Map-Overlap.** Beim 1024-er-Stapel (Liste oben, Karte unten, Rail
+  links 240 px) überlappt die Karte aktuell mit der Liste oder ragt in die Rail hinein.
+  Drei plausible Lesarten — V143 misst per `getBoundingClientRect()` auf `.detail__graph`,
+  `.list`, `.rail` bei 1024 × 768 px, welche zutrifft; danach CSS-Fix (`height`/`max-height`/
+  `padding`-Reduktion).
+- **H-R.5 — 1024-er Editor-Modus voll bedienbar.** Editor im unteren Slot bei 1024 px:
+  alle Knöpfe (Archivieren, Speichern, ×), Formatierhilfen-Leiste, Anhängen-Zeile müssen
+  sichtbar und klickbar sein. V144 misst per `elementFromPoint` auf Knöpfe-Positionen;
+  danach CSS-Fix für `.editor__format-toolbar` (flex-wrap?), `.editor__head`-Padding,
+  ggf. Touch-Targets.
+
+### Drei Hard-Rule-Checkpoints am Session-Ende
+
+1. **Hard Rule 1** (keine Secrets): keine Credentials im Repo, Wegwerf-Credentials in
+   `/tmp/opencode/sharefyx-wegwerf-v3ritt/credentials.json`.
+2. **Hard Rule 9** (kein `pkill -f`): Wegwerf gestartet mit
+   `.venv/bin/python phase8_5_picker_release/scripts/wegwerf_setup_v3ritt.py start`
+   (PID 226155, eigener Port 18773, tmp-`DATA_ROOT`), gestoppt mit
+   `kill $(cat /tmp/opencode/sharefyx-wegwerf-v3ritt/serve.pid)` — PID-Datei, kein Regex
+   im Cmdline. sharefyx-mcp **PID 991** durchgehend nur gelesen.
+3. **Hard Rule 8** (Commit ⇒ Doku-Update im selben Commit): Modul-Status **neu** Zeile 15
+   für H-R.1 + H-R.2 ✅ (H-R.3/.4/.5 bleibt ⬜ als Folgeblock), dieser Session-Block,
+   Rotation per `scripts/rotate_session_block.sh phase8_6_ui_polish`, Frontmatter
+   `updated:` im Phase-Head (H-R-Eintrag voran), `docs/INDEX.md`-Phase-8.6-Karte,
+   `screenshots_latest/`-Symlinks (P8.6-AK) — alles im selben Commit.
+
+### Nächster Schritt: **H-R.3 / H-R.4 / H-R.5 (CDP-Probe-Welle)**
+
+Drei Backlog-Punkte, eine Session. Reihenfolge: H-R.3 (Editor-YAML-Bündigkeit) → H-R.4
+(1024-er Map-Overlap) → H-R.5 (1024-er Editor-Modus). V142/V143/V144 sind **Mess-Vor-Bau-
+Schritte** — erst CDP-Probe laufen lassen, dann fixen. Self-Check-Skript
+`p86_block_h_r_self_check.py` braucht Erweiterungen für die 1024-er-Probe (Viewport
+`set_viewport_size({"width": 1024, "height": 768})` + `boundingBox`-Probe für V142/V143 +
+`elementFromPoint`-Probe für V144). Block J (der `pytest`-Flake) kommt **nach** dieser
+H-R-Welle und dem Gate — die Reihenfolge ist G → G-R ✅ → H ✅ → **H-R-Teil-1 ✅** →
+**H-R-Teil-2 ⬜** → J → Gate.
 
 
 ## Session stopped — 2026-09-14 (opencode/M3 — **Block H erledigt** — Rail + Konto-Dialog, zwei Befunde in einem Schritt behoben)

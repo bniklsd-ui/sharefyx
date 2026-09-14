@@ -1,0 +1,422 @@
+{
+  "label": "post_fix",
+  "base_url": "http://127.0.0.1:18773",
+  "timestamp": "2026-09-14T17:37:23.090536+00:00",
+  "v142": {
+    "1440": {
+      ".list__head": {
+        "x": 240,
+        "y": 139,
+        "width": 479,
+        "height": 86.9375,
+        "bottom": 225.9375,
+        "top": 139,
+        "paddingTop": "0px",
+        "paddingBottom": "0px"
+      },
+      ".editor__head": {
+        "x": 720,
+        "y": 139,
+        "width": 720,
+        "height": 87.796875,
+        "bottom": 226.796875,
+        "top": 139,
+        "paddingTop": "4px",
+        "paddingBottom": "40px"
+      },
+      "diff_bottom_px": 0.859375,
+      "diff_top_px": 0,
+      "tolerance_ok": true
+    },
+    "1200": {
+      ".list__head": {
+        "x": 240,
+        "y": 139,
+        "width": 379,
+        "height": 86.9375,
+        "bottom": 225.9375,
+        "top": 139,
+        "paddingTop": "0px",
+        "paddingBottom": "0px"
+      },
+      ".editor__head": {
+        "x": 620,
+        "y": 139,
+        "width": 580,
+        "height": 87.796875,
+        "bottom": 226.796875,
+        "top": 139,
+        "paddingTop": "4px",
+        "paddingBottom": "40px"
+      },
+      "diff_bottom_px": 0.859375,
+      "diff_top_px": 0,
+      "tolerance_ok": true
+    }
+  },
+  "v143": {
+    "1024_overview": {
+      "rects": {
+        ".detail__graph": {
+          "x": 240,
+          "y": 453.5,
+          "width": 784,
+          "height": 314.5,
+          "bottom": 768,
+          "top": 453.5,
+          "right": 1024,
+          "left": 240
+        },
+        ".list": {
+          "x": 240,
+          "y": 139,
+          "width": 784,
+          "height": 314.5,
+          "bottom": 453.5,
+          "top": 139,
+          "right": 1024,
+          "left": 240
+        },
+        ".rail": {
+          "x": 0,
+          "y": 139,
+          "width": 240,
+          "height": 629,
+          "bottom": 768,
+          "top": 139,
+          "right": 240,
+          "left": 0
+        },
+        ".overview__graph": {
+          "x": 272,
+          "y": 525.125,
+          "width": 720,
+          "height": 226.875,
+          "bottom": 752,
+          "top": 525.125,
+          "right": 992,
+          "left": 272
+        }
+      },
+      "overlap_list_x_detail_graph": 0.0,
+      "overlap_rail_x_detail_graph": 0.0,
+      "overlap_rail_x_list": 0.0,
+      "any_overlap": false
+    },
+    "1024_editor": {
+      "rects": {
+        ".detail__graph": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "bottom": 0,
+          "top": 0,
+          "right": 0,
+          "left": 0
+        },
+        ".list": {
+          "x": 240,
+          "y": 139,
+          "width": 784,
+          "height": 314.5,
+          "bottom": 453.5,
+          "top": 139,
+          "right": 1024,
+          "left": 240
+        },
+        ".rail": {
+          "x": 0,
+          "y": 139,
+          "width": 240,
+          "height": 629,
+          "bottom": 768,
+          "top": 139,
+          "right": 240,
+          "left": 0
+        },
+        ".overview__graph": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "bottom": 0,
+          "top": 0,
+          "right": 0,
+          "left": 0
+        }
+      },
+      "overlap_list_x_detail_graph": 0.0,
+      "overlap_rail_x_detail_graph": 0.0,
+      "overlap_rail_x_list": 0.0,
+      "any_overlap": false
+    }
+  },
+  "v144": {
+    "1024": [
+      {
+        "selector": "#archive-button",
+        "present": true,
+        "rect": {
+          "x": 711,
+          "y": 458.5,
+          "width": 115,
+          "height": 40.796875,
+          "bottom": 499.296875,
+          "top": 458.5
+        },
+        "reachable": true,
+        "hit_at_center": "self",
+        "hit_tag": "BUTTON",
+        "offscreen": false
+      },
+      {
+        "selector": "#save-button",
+        "present": true,
+        "rect": {
+          "x": 834,
+          "y": 457.5,
+          "width": 116,
+          "height": 42.796875,
+          "bottom": 500.296875,
+          "top": 457.5
+        },
+        "reachable": true,
+        "hit_at_center": "self",
+        "hit_tag": "BUTTON",
+        "offscreen": false
+      },
+      {
+        "selector": "#close-button",
+        "present": true,
+        "rect": {
+          "x": 970,
+          "y": 463.890625,
+          "width": 30,
+          "height": 30,
+          "bottom": 493.890625,
+          "top": 463.890625
+        },
+        "reachable": true,
+        "hit_at_center": "self",
+        "hit_tag": "use",
+        "offscreen": false
+      },
+      {
+        "selector": "[data-md=\"bold\"]",
+        "present": true,
+        "rect": {
+          "x": 615,
+          "y": 594.671875,
+          "width": 26,
+          "height": 24,
+          "bottom": 618.671875,
+          "top": 594.671875
+        },
+        "reachable": true,
+        "hit_at_center": "self",
+        "hit_tag": "BUTTON",
+        "offscreen": false
+      },
+      {
+        "selector": "[data-md=\"italic\"]",
+        "present": true,
+        "rect": {
+          "x": 645,
+          "y": 594.671875,
+          "width": 26,
+          "height": 24,
+          "bottom": 618.671875,
+          "top": 594.671875
+        },
+        "reachable": true,
+        "hit_at_center": "self",
+        "hit_tag": "BUTTON",
+        "offscreen": false
+      },
+      {
+        "selector": "[data-md=\"code\"]",
+        "present": true,
+        "rect": {
+          "x": 675,
+          "y": 594.671875,
+          "width": 31,
+          "height": 24,
+          "bottom": 618.671875,
+          "top": 594.671875
+        },
+        "reachable": true,
+        "hit_at_center": "self",
+        "hit_tag": "BUTTON",
+        "offscreen": false
+      },
+      {
+        "selector": "[data-md=\"link\"]",
+        "present": true,
+        "rect": {
+          "x": 710,
+          "y": 594.671875,
+          "width": 26,
+          "height": 24,
+          "bottom": 618.671875,
+          "top": 594.671875
+        },
+        "reachable": true,
+        "hit_at_center": "self",
+        "hit_tag": "svg",
+        "offscreen": false
+      },
+      {
+        "selector": "[data-md=\"h\"]",
+        "present": true,
+        "rect": {
+          "x": 740,
+          "y": 594.671875,
+          "width": 26,
+          "height": 24,
+          "bottom": 618.671875,
+          "top": 594.671875
+        },
+        "reachable": true,
+        "hit_at_center": "self",
+        "hit_tag": "BUTTON",
+        "offscreen": false
+      },
+      {
+        "selector": "[data-md=\"quote\"]",
+        "present": true,
+        "rect": {
+          "x": 770,
+          "y": 594.671875,
+          "width": 26,
+          "height": 24,
+          "bottom": 618.671875,
+          "top": 594.671875
+        },
+        "reachable": true,
+        "hit_at_center": "self",
+        "hit_tag": "svg",
+        "offscreen": false
+      },
+      {
+        "selector": "[data-md=\"ul\"]",
+        "present": true,
+        "rect": {
+          "x": 800,
+          "y": 594.671875,
+          "width": 26,
+          "height": 24,
+          "bottom": 618.671875,
+          "top": 594.671875
+        },
+        "reachable": true,
+        "hit_at_center": "self",
+        "hit_tag": "BUTTON",
+        "offscreen": false
+      },
+      {
+        "selector": "[data-md=\"ol\"]",
+        "present": true,
+        "rect": {
+          "x": 830,
+          "y": 594.671875,
+          "width": 26,
+          "height": 24,
+          "bottom": 618.671875,
+          "top": 594.671875
+        },
+        "reachable": true,
+        "hit_at_center": "self",
+        "hit_tag": "BUTTON",
+        "offscreen": false
+      },
+      {
+        "selector": "[data-md=\"hr\"]",
+        "present": true,
+        "rect": {
+          "x": 860,
+          "y": 594.671875,
+          "width": 26,
+          "height": 24,
+          "bottom": 618.671875,
+          "top": 594.671875
+        },
+        "reachable": true,
+        "hit_at_center": "self",
+        "hit_tag": "BUTTON",
+        "offscreen": false
+      },
+      {
+        "selector": "#insert-image-button",
+        "present": true,
+        "rect": {
+          "x": 890,
+          "y": 594.671875,
+          "width": 26,
+          "height": 24,
+          "bottom": 618.671875,
+          "top": 594.671875
+        },
+        "reachable": true,
+        "hit_at_center": "self",
+        "hit_tag": "svg",
+        "offscreen": false
+      },
+      {
+        "selector": "#toggle-preview",
+        "present": true,
+        "rect": {
+          "x": 920,
+          "y": 594.671875,
+          "width": 80,
+          "height": 24,
+          "bottom": 618.671875,
+          "top": 594.671875
+        },
+        "reachable": true,
+        "hit_at_center": "self",
+        "hit_tag": "BUTTON",
+        "offscreen": false
+      },
+      {
+        "selector": "#append-button",
+        "present": true,
+        "rect": {
+          "x": 894,
+          "y": 719.203125,
+          "width": 106,
+          "height": 40.796875,
+          "bottom": 760,
+          "top": 719.203125
+        },
+        "reachable": true,
+        "hit_at_center": "self",
+        "hit_tag": "BUTTON",
+        "offscreen": false
+      },
+      {
+        "selector": "#append-input",
+        "present": true,
+        "rect": {
+          "x": 264,
+          "y": 719.203125,
+          "width": 622,
+          "height": 40.796875,
+          "bottom": 760,
+          "top": 719.203125
+        },
+        "reachable": true,
+        "hit_at_center": "self",
+        "hit_tag": "INPUT",
+        "offscreen": false
+      }
+    ]
+  },
+  "screenshots": [
+    "docs/screenshots/p86_block_h_r_01_1440_uebersicht.png",
+    "docs/screenshots/p86_block_h_r_03_1440_editor_offen.png",
+    "docs/screenshots/p86_block_h_r_02_1200_uebersicht.png",
+    "docs/screenshots/p86_block_h_r_04_1024_uebersicht.png",
+    "docs/screenshots/p86_block_h_r_05_1024_editor_offen.png"
+  ]
+}

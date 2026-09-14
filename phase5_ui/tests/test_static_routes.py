@@ -1550,3 +1550,212 @@ def test_rail_action_unchanged():
         f".rail__action background darf nicht Akzent-Fill sein (H-R.2-L N.14 "
         f"Spezialfall nur .account-nav). Gefunden: '{bg_value}'."
     )
+
+
+# --- Phase 8.6 Block H-R Teil 2 (Plan: docs/concepts/phase8_6_ui_polish_block_h_r_plan.md)
+# Drei Sub-Bloecke: H-R.3 (Editor-YAML-Buendigkeit), H-R.4 (1024-er Map-Overlap),
+# H-R.5 (1024-er Editor-Modus). CDP-Proben V142/V143/V144 sind pre-fix/post-fix gemessen
+# (probes/v142_v143_v144_{pre_fix,post_fix}.json); die drei Wächter hier halten die Fixes
+# statisch fest, damit ein stiller Refactor zurueck auf G-R.3-Stand geblockt wird.
+
+
+def test_editor_head_padding_bottom_aligns_with_list_head():
+    """H-R.3-L (Plan §3, V142): `.editor__head { padding-bottom }` muss >= 32 px sein,
+    damit die Editor-Head-Unterkante auf gleicher Y-Position liegt wie die
+    .list__head-Unterkante (CDP-Probe pre-fix: 27,14 px Versatz, post-fix: 0,86 px,
+    H-R.3-A Abnahmekriterium <= 2 px Toleranz).
+
+    Vorher (G-R.3-Stand): padding-bottom = calc(var(--space) * 1.5) = 12 px.
+    Block G-R.3 hatte das so gelassen, weil es nur die Item-Zeile-YAML-Bündigkeit
+    reparieren sollte ("die YAML-Kopfzeile schliesst buendig mit der Item-Zeile ab"
+    -- Nikinger-Vorgabe vom 2026-09-14 zur damaligen Zeit). Nikinger hat am selben
+    Tag in der Sichtung erkannt, dass die YAML-Kopfzeile zur Suchzeilen-Unterkante
+    bündig sein muss, nicht zur Item-Zeile (H-R.3 neu) -- und das ist nur erreichbar,
+    wenn der Editor-Head inkl. Bottom-Padding die volle .list__head-Höhe einnimmt.
+
+    padding-top bleibt klein (calc(var(--space) * 0.5) = 4 px) -- der Titel sitzt
+    weiter oben, die YAML-Box beginnt 4 px unter dem oberen Rand. Nur padding-bottom
+    muss gross genug sein, um die Unterkante auf Listen-Head-Höhe zu bringen.
+
+    Wer das padding-bottom wieder auf 12 px oder kleiner zurueckdreht, faengt diesen
+    Test. Der visuelle Effekt waere der G-R.3-Stand: YAML-Kopfzeile sitzt ~27 px
+    ueber der Suchzeilen-Unterkante, der Editor wirkt im Detail-Slot hoeher als die
+    Liste im Listen-Slot.
+
+    Parser-Hinweis: `padding: calc(var(--space) * 0.5) calc(var(--space) * 3)
+    calc(var(--space) * 5)` -- die Klammern im `calc(...)`-Ausdruck enthalten
+    Leerzeichen. Ein naiver Split auf Whitespace zerlegt das in 5 Teile (nicht 3).
+    Wir extrahieren die drei Werte deshalb per Regex-Pattern statt mit `.split()`.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    head_match = re.search(r"\.editor__head\s*\{([^}]*)\}", css)
+    assert head_match is not None, (
+        "app.css muss eine Regel `.editor__head { ... }` enthalten."
+    )
+    head_body = head_match.group(1)
+    head_body = re.sub(r"/\*.*?\*/", "", head_body, flags=re.DOTALL)
+
+    padding_match = re.search(r"padding\s*:\s*([^;]+);", head_body)
+    assert padding_match is not None, (
+        f".editor__head braucht eine padding-Deklaration. Block: {head_body.strip()}"
+    )
+    padding_value = padding_match.group(1).strip()
+
+    # Drei top-Level calc(...) oder px-/Zahl-Werte extrahieren. Ein calc-Ausdruck
+    # enthaelt selbst Klammern (var(--space) hat -- in den runden), deshalb
+    # koennen wir nicht `[^)]*` verwenden -- wir parsen manuell.
+    parts: list[str] = []
+    i = 0
+    while i < len(padding_value):
+        # Skip whitespace.
+        while i < len(padding_value) and padding_value[i].isspace():
+            i += 1
+        if i >= len(padding_value):
+            break
+        if padding_value[i:].startswith("calc("):
+            # Klammern-Balance mitnehmen -- bei einer 'calc('(' startet die
+            # Zaehlung bei 1, bei ')' dekrementiert, Ende bei 0.
+            depth = 0
+            j = i
+            while j < len(padding_value):
+                if padding_value[j] == "(":
+                    depth += 1
+                elif padding_value[j] == ")":
+                    depth -= 1
+                    if depth == 0:
+                        j += 1
+                        break
+                j += 1
+            parts.append(padding_value[i:j])
+            i = j
+        else:
+            # Zahl + optional Einheit (px, rem, em).
+            j = i
+            while j < len(padding_value) and not padding_value[j].isspace():
+                j += 1
+            parts.append(padding_value[i:j])
+            i = j
+    assert len(parts) >= 3, (
+        f".editor__head padding-Shorthand muss 3 Werte haben (top horizontal bottom), "
+        f"gefunden: '{padding_value}' (extrahierte Teile: {parts})."
+    )
+
+    bottom_raw = parts[2].strip()
+
+    def _to_px(value: str) -> float:
+        """Wandelt einen CSS-Padding-Wert in Pixel um. Akzeptiert:
+        - '40px'      -> 40
+        - 'calc(var(--space) * 5)' -> 40  (--space = 8 px per :root-Token)
+        - '5'         -> 5  (Fallback fuer Werte ohne Einheit)
+        """
+        if value.endswith("px"):
+            return float(value[:-2])
+        if value.startswith("calc(") and "var(--space)" in value:
+            # Multiplikator aus 'calc(var(--space) * N)' extrahieren.
+            m = re.search(r"\*\s*([\d.]+)", value)
+            assert m is not None, (
+                f"calc(...) mit var(--space) braucht einen Multiplikator: '{value}'"
+            )
+            return float(m.group(1)) * 8.0  # --space = 8 px per :root-Token
+        # Plain number ohne Einheit
+        return float(value)
+
+    bottom_px = _to_px(bottom_raw)
+    assert bottom_px >= 32, (
+        f".editor__head padding-bottom muss >= 32 px sein (H-R.3-L: Bündigkeit zur "
+        f".list__head-Unterkante, V142-CDP-Probe pre-fix 27,14 px / post-fix 0,86 px "
+        f"Versatz). Gefunden: '{bottom_raw}' = {bottom_px} px. "
+        f"Vor H-R.3 stand hier 'calc(var(--space) * 1.5)' = 12 px."
+    )
+
+
+def test_1024_no_overlap_in_css():
+    """H-R.4-L (Plan §4, V143): bei `@media (max-width: 1024px)` darf die Karte weder
+    die Liste noch die Rail überlappen. Konkreter Mechanismus: explizite Stapel-
+    Logik mit `grid-template-rows: 1fr 1fr` + `.rail { grid-row: 1 / span 2 }` +
+    `.detail { grid-column: 2 }`. Ohne diese drei Regeln würde CSS-Grid Auto-Placement
+    .detail in (2,1) setzen (zeilenweise Erstzuweisung) -- die Karte stuende dann
+    neben dem Rail-Bereich statt darunter, und die Rail-Bottom (y=768) wäre mit
+    der Karten-Bottom (y=768) überlappend im X-Bereich 0-240 (Rail).
+
+    CDP-Probe V143 (pre_fix + post_fix, beide): 0 overlap-Rechteck-Schnittmenge
+    zwischen .list/.detail__graph/.rail in beiden Modi (Übersicht + Editor).
+    Wer die expliziten Grid-Properties rausnimmt, faengt diesen Test -- die Karte
+    wuerde neben die Rail rutschen und der y=768-Bereich waere ueberlappend.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    m = re.search(
+        r"@media\s*\(max-width:\s*1024px\)\s*\{(.*?)\n\}",
+        css,
+        flags=re.DOTALL,
+    )
+    assert m is not None, (
+        "app.css braucht eine `@media (max-width: 1024px) { ... }`-Query "
+        "(H-R.4-L: 1024-er-Stapel-Logik)."
+    )
+    body = m.group(1)
+    body = re.sub(r"/\*.*?\*/", "", body, flags=re.DOTALL)
+
+    assert "grid-template-rows: 1fr 1fr" in body, (
+        f"1024er-Media-Query braucht 'grid-template-rows: 1fr 1fr' (H-R.4-L: "
+        f"zwei gleich hohe Zeilen, damit Liste oben + Karte unten gestapelt sind). "
+        f"Body: {body.strip()}"
+    )
+    assert "grid-row: 1 / span 2" in body, (
+        f"1024er-Media-Query braucht '.rail {{ grid-row: 1 / span 2 }}' "
+        f"(H-R.4-L: Rail muss beide Zeilen bespannen, damit sie links neben "
+        f"Liste+Karte sichtbar bleibt). Body: {body.strip()}"
+    )
+    assert ".detail { grid-column: 2" in body or "grid-column: 2" in body, (
+        f"1024er-Media-Query braucht '.detail {{ grid-column: 2 }}' "
+        f"(H-R.4-L: Karte explizit in Spalte 2 -- ohne diese Zeile wuerde "
+        f"CSS-Grid Auto-Placement .detail in (2,1) setzen, neben der Rail). "
+        f"Body: {body.strip()}"
+    )
+
+
+def test_1024_editor_buttons_present():
+    """H-R.5-L (Plan §5, V144): bei 1024 px sind alle Editor-Bedienelemente im DOM
+    und nicht `hidden`. CDP-Probe V144 (pre_fix + post_fix, beide): alle 16 Knöpfe
+    (Archivieren, Speichern, ×, 10 Format-Hilfen, Vorschau-Toggle, Anhängen +
+    Anhängen-Input) als `reachable: true` gemessen.
+
+    Konkreter Befund V144: alle Knöpfe haben positive Rect-Werte innerhalb des
+    1024x768-Viewports, keiner ist offscreen. Wer einen der Knöpfe aus dem
+    Markup nimmt oder `hidden` setzt (z. B. über `.editor__head-actions { display: none }`
+    ohne Sub-Selektor oder ähnliches), faengt diesen Test.
+
+    Wir prüfen hier nur die Markup-Ebene (kein CDP-Lauf im pytest): jede ID +
+    jedes data-md-Attribut muss in app.html vorkommen. Das ist die strukturelle
+    Garantie; das visuelle Layout wird per V144 / 1024-er-Screenshot gehalten.
+    """
+    html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
+
+    # Editor-Head-Knöpfe (im .editor__head-actions-Container)
+    for btn_id in ("archive-button", "save-button", "close-button"):
+        assert f'id="{btn_id}"' in html, (
+            f"app.html muss id='{btn_id}' enthalten (H-R.5-L Editor-Knöpfe im "
+            f"Detail-Slot, bei 1024 px im unteren Stapel-Slot)."
+        )
+
+    # Format-Toolbar im .panel__head der Text-Paneele
+    for md in ("bold", "italic", "code", "link", "h", "quote", "ul", "ol", "hr"):
+        assert f'data-md="{md}"' in html, (
+            f"app.html muss Format-Toolbar-Knopf data-md='{md}' enthalten "
+            f"(H-R.5-L Editor-Format-Hilfen)."
+        )
+
+    # Vorschau-Toggle + Bild-Insert + Append (zusätzliche Editor-Bedienelemente)
+    for btn_id in ("toggle-preview", "insert-image-button", "append-button", "append-input"):
+        assert f'id="{btn_id}"' in html, (
+            f"app.html muss id='{btn_id}' enthalten (H-R.5-L zusätzliche "
+            f"Editor-Bedienelemente)."
+        )
+
+    # Titel-Eingabefeld (für V142-Sticky-Header-Inhalt relevant)
+    assert 'id="field-title"' in html, (
+        "app.html muss id='field-title' enthalten (H-R.5-L Titel-Eingabefeld im "
+        "Editor-Head)."
+    )
