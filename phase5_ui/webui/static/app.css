@@ -389,6 +389,15 @@ select.input:focus {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  /* Phase 8.6 Block G-R G-R.2: Hintergrund = --bg wie .list. Vorher erbt .detail von body
+     (--bg-void = #000), die Liste daneben hat --bg (#0B0D10). Die drei sichtbaren Toene
+     fuer "Spalten-Hintergrund" -- --bg in .list, --bg-void in .detail, --surface in der
+     Karte -- waren die Fortsetzung von Befund 1 (Token-Drift im selben Layer).
+
+     Mit dieser einen Zeile hat der .detail-Slot denselben Ton wie .list; der schwarze Ring
+     rund um die Karte (Folge von .detail__graph-Padding + .detail-Hintergrund) verschwindet,
+     der Map-Container bleibt als Karte in der etwas helleren --surface-Flaeche erkennbar. */
+  background: var(--bg);
 }
 
 /* -- Rail: Wortmarke, Übersicht, Baum, Konto (Step 7b) ------------------------------------ */
@@ -1087,7 +1096,15 @@ select.input:focus {
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  padding: calc(var(--space) * 4);
+  /* Phase 8.6 Block G-R G-R.2: oben/unten 16 px statt 32 px. Der 32-px-Rundum-Padding war
+     nach G-R.2s Hintergrund-Vereinheitlichung sichtbarer Atmungs-Rand; Nikinger-Sichtung
+     2026-09-14: "die map den Slot oben und unten nicht ganz" -- die Karte sollte mehr
+     Vertikalraum nutzen. Links/rechts bleiben bei 32 px, weil der Toolbar (Tags/Ordner/
+     Zoom, Plan §5 D2) sonst an die Slot-Kante klebt.
+
+     V112-Waechter nach Umzug (test_detail_graph_has_a_definite_height_chain) bleibt
+     scharf: die Hoehenkette `.detail__graph → .overview__graph` ist unveraendert. */
+  padding: calc(var(--space) * 2) calc(var(--space) * 4);
 }
 .detail__graph .overview__graph { flex: 1; min-height: 0; }
 
@@ -1314,7 +1331,21 @@ select.input:focus {
   align-items: center;
   gap: var(--space);
   border-bottom: 1px solid var(--line);
-  padding: calc(var(--space) * 1.5) calc(var(--space) * 3);
+  /* Phase 8.6 Block G-R G-R.3: padding-top von 12 px auf 4 px reduziert, padding-bottom
+     bleibt 12 px. Damit rueckt die YAML-Kopfzeile um ~8 px nach oben und schliesst
+     buendig mit der Suchzeilen-Unterkante im List-Slot ab (Nikinger-Vorgabe 2026-09-14:
+     "lasse das obere ende der YAML Kopfzeile buendig abschliessen mit dem unteren ende
+     der Suchzeile im space").
+
+     Sticky + Hintergrund + z-index: machen den Editor-Kopf zum waagerechten Pendant der
+     .list__head (Step 7b hat das fuer den Listen-Kopf eingefuehrt; Phase 8.6 B1 zog die
+     Hover-Sprache nach). Wenn der Nutzer im Editor-Body scrollt, bleibt der Titel sichtbar
+     -- parallel zum Verhalten der Suchzeile beim Listen-Scrollen. */
+  padding: calc(var(--space) * 0.5) calc(var(--space) * 3) calc(var(--space) * 1.5);
+  position: sticky;
+  top: 0;
+  background: var(--surface-raised);
+  z-index: 1;
 }
 
 .editor__title-input {
@@ -1355,7 +1386,13 @@ select.input:focus {
   display: flex;
   align-items: center;
   gap: var(--space);
-  padding: 6px calc(var(--space) * 3);
+  /* Phase 8.6 Block G-R G-R.3: padding vertikal von 6 px auf 11 px erhoeht. Nikinger-
+     Vorgabe 2026-09-14: "ziemlich genau so gross wie eine item Zeile". Item-Row-Hoehe
+     ist Summe aus padding 8 + Content 16 (font-size 16, line-height 1.55 = ~25) +
+     padding 8 = ~41 px; Panel-Header war 6 + ~19 + 6 = 31 px. Auf 11/11/19/11 = 41 px
+     angehoben, damit die collapsed YAML-Kopfzeile und die erste Item-Zeile dieselbe
+     Hoehe haben und beim horizontalen Vergleich optisch aufgehen. */
+  padding: 11px calc(var(--space) * 3);
   font-size: var(--fs-meta);   /* 12.5px -- vor C1: 12px */
   color: var(--text-muted);
 }
@@ -1897,23 +1934,49 @@ body.has-update-banner .shell { height: calc(100vh - var(--banner-h)); margin-to
 
 /* -- Breakpoints (§4.3) ------------------------------------------------------------------ */
 
-@media (max-width: 1280px) {
-  /* Phase 8.6 Plan 2 Block G G1: 480 statt 380 -- dieselbe Begruendung wie im Default-Block. */
-  .shell { grid-template-columns: 64px 480px 1fr; }
-  .rail__label, .rail__brand, .tree__group, .tree__count, .tree__badge { display: none; }
-  .rail__home, .rail__action { justify-content: center; }
-  .tree__folder { padding-left: var(--space); }
-  .rail__account { flex-direction: column; }
-  /* Phase 8.6 Plan 2 Block G G6: der .overview-Block dieser Media-Query ist geloescht --
-     das .overview-Grid und die 1280-px-Einklapp-Regel sind mit dem Umzug der Karte in
-     den Detail-Slot ersatzlos entfallen (sie loeschten Befund 9b mit). */
+@media (max-width: 1200px) {
+  /* Phase 8.6 Block G-R G-R.1 (Nikinger-Sichtung 2026-09-14): Rail bleibt 240 px, NICHT
+     auf 64 px kollabieren. Nikinger-Beobachtung am 1200-px-Screenshot: "Navigationszeile
+     kracht zusammen" -- der 1280-er Default kollabierte die Rail schon bei 1200 px auf
+     Icons-only, was die Texte unsichtbar macht und die ganze Spalte verstuemmelt.
+
+     Was sich aendert:
+       - Breakpoint von 1280 auf 1200 (eine Stufe spaeter, damit 1200 px noch in den
+         Genuss der vollen Rail kommt).
+       - Liste von 480 auf 380 px (bei 380 passen Item-Titel 16 px + Meta 12.5 px +
+         Move/Share-Buttons; bei 480 hatten wir ~100 px Luft, die hier verschenkt wird).
+       - Die `display: none`-Regeln fuer Rail-Texte fallen ersatzlos weg -- Rail bleibt
+         bei 240, alle Texte sichtbar. Was bei 1280 px noch sinnvoll war (Desktop-Monitor-
+         Kante), ist bei 1200 px der falsche Trade (volle Rail + schmale Liste > Rail-
+         Icons + breite Liste). */
+  .shell { grid-template-columns: 240px 380px 1fr; }
 }
 
 @media (max-width: 1024px) {
-  .shell { grid-template-columns: 64px 1fr; }
-  .shell[data-view="list"] .detail { display: none; }
-  .shell[data-view="detail"] .list { display: none; }
-  .shell[data-view="detail"] .detail__back { display: block; }
+  /* Phase 8.6 Block G-R G-R.1 (Nikinger-Sichtung 2026-09-14): Rail bleibt 240 px, Liste
+     und Karte STAPELN vertikal in der rechten Spalte statt zu wechseln.
+
+     Nikinger-Beobachtung am 1024-px-Screenshot: "Map entfernt, ja, aber lieber Uebersicht
+     zusammenschieben und nav bar weiterhin vollstaendig zeigen". Der alte Block-G-Stand
+     blendete die Karte weg und zeigte stattdessen nur Rail + Liste -- das Wegblenden war
+     der falsche Trade.
+
+     Aufbau:
+       - grid-template-columns: 240 px + 1fr (zwei Spalten, Rail bleibt 240)
+       - grid-template-rows: 1fr + 1fr (zwei gleich hohe Zeilen)
+       - rail spannt beide Zeilen via grid-row: 1 / span 2
+       - .detail explizit in Zeile 2 Spalte 2 -- ohne die explizite Zuweisung wuerde
+         CSS-Grid Auto-Placement .detail in (2,1) setzen (zeilenweise Erstzuweisung),
+         und die Karte saehe neben dem Rail-Bereich statt darunter.
+
+     data-view-Switching (Block G) ist ersatzlos weg -- bei 1024 sind Liste und Karte
+     immer gleichzeitig sichtbar, das View-Switching braucht es nicht mehr. */
+  .shell {
+    grid-template-columns: 240px 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+  .rail { grid-row: 1 / span 2; }
+  .detail { grid-column: 2; grid-row: 2; }
 }
 
 /* -- Glas-Träger-Anwendung (Phase 8 Block C C4, Plan §4.C4 P8-H) -------------------------

@@ -716,27 +716,29 @@ def test_meta_panel_is_not_tinted_with_the_warning_colour():
 # -- Phase 8.6 Plan 2 Block G Wächter (P8.6-X, P8.6-Y, P8.6-AF, P8.6-AL) ----------------
 
 def test_shell_grid_is_240_480_1fr():
-    """P8.6 Plan 2 Block G G1 (P8.6-X): das seit Phase 5 unveraenderte .shell-Raster
-    wird bewusst verschoben (P8.6-O2-Ausloesung, N.7) -- von 240px 380px 1fr auf
-    240px 480px 1fr. Die 1280-px-Media-Query muss die Aenderung mitziehen
-    (64px 480px 1fr statt 64px 380px 1fr). Begruendung 480 statt 380: gemessen
-    brauchen die Space-Zeilen ~433 px (Glyph + Name + bis zu drei Zaehler-Chips),
-    380 reichte nicht.
+    """P8.6 Plan 2 Block G G1 (P8.6-X) und Block G-R G-R.1: das seit Phase 5 unveraenderte
+    .shell-Raster wird bewusst verschoben (P8.6-O2-Ausloesung, N.7) -- von 240px 380px 1fr
+    auf 240px 480px 1fr. Phase 8.6 Block G-R hat den Breakpoint von 1280 px auf 1200 px
+    verschoben (Nikinger-Vorgabe 2026-09-14: Rail bleibt 240 in beiden Breakpoints) und
+    fuehrt eine zweite Stufe bei 1024 px ein, die Liste + Karte vertikal stapelt.
 
-    Wer das Raster zurueckdreht, faengt diesen Test. Prueft zwei Anker: die
-    Default-Regel (Zeile mit "1fr" als dritter Spalte) und die 1280-px-Media-Query
-    (zweite ".shell { ... }"-Deklaration in einer @media-Regel). Beide muessen
-    "480px" enthalten, keine darf "380px" enthalten.
+    Wer das Raster zurueckdreht, faengt diesen Test. Prueft drei Anker: die Default-Regel
+    (240/480/1fr), die 1200-px-Media-Query (240/380/1fr) und die 1024-px-Media-Query
+    (240/1fr mit Stapel-Logik via grid-row).
     """
     css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
 
-    # Default-Block: ".shell { display: grid; grid-template-columns: 240px 480px 1fr; ... }"
+    # Anker 1 -- Default-Block: ".shell { display: grid; grid-template-columns: 240px 480px 1fr; ... }"
     default_match = re.search(r"\.shell\s*\{[^}]*grid-template-columns\s*:\s*([^;]+);", css)
     assert default_match is not None, (
         ".shell muss eine grid-template-columns-Deklaration enthalten "
         "(sonst waere der Block G-Gitterumbau rueckgaengig gemacht worden)."
     )
     default_cols = default_match.group(1).strip()
+    assert "240px" in default_cols, (
+        f".shell-Default-Block muss '240px' enthalten (Block G G1, P8.6-X, N.7). "
+        f"Gefunden: '{default_cols}'."
+    )
     assert "480px" in default_cols, (
         f".shell-Default-Block muss '480px' enthalten (Block G G1, P8.6-X, N.7). "
         f"Gefunden: '{default_cols}'."
@@ -751,29 +753,93 @@ def test_shell_grid_is_240_480_1fr():
         f"(Detail-Slot wächst mit dem Viewport). Gefunden: '{default_cols}'."
     )
 
-    # 1280-px-Media-Query: sucht die @media-Regel und prueft die darin enthaltene
-    # .shell-Deklaration. Pattern: "@media (max-width: 1280px) { ... .shell { ... } ... }"
-    media_match = re.search(
-        r"@media\s*\(max-width:\s*1280px\)\s*\{(.*?)\n\}", css, flags=re.DOTALL
+    # Anker 2 -- 1200-px-Media-Query: Rail bleibt 240, Liste schrumpft auf 380, Detail
+    # bleibt 1fr (Block G-R G-R.1). Pattern: "@media (max-width: 1200px) { ... .shell { ... } ... }"
+    media_1200 = re.search(
+        r"@media\s*\(max-width:\s*1200px\)\s*\{(.*?)\n\}", css, flags=re.DOTALL
     )
-    assert media_match is not None, (
-        "@media (max-width: 1280px) muss in app.css existieren "
-        "(sonst waere der Breakpoint-Block geloescht worden)."
+    assert media_1200 is not None, (
+        "@media (max-width: 1200px) muss in app.css existieren "
+        "(Block G-R G-R.1 hat den Breakpoint von 1280 auf 1200 verschoben)."
     )
-    media_body = media_match.group(1)
-    shell_in_media = re.search(r"\.shell\s*\{[^}]*grid-template-columns\s*:\s*([^;]+);", media_body)
-    assert shell_in_media is not None, (
-        ".shell muss INNERHALB der 1280-px-Media-Query eine grid-template-columns-"
-        "Deklaration tragen (sonst waere der schmale Viewport kaputt)."
+    media_1200_body = media_1200.group(1)
+    shell_in_1200 = re.search(
+        r"\.shell\s*\{[^}]*grid-template-columns\s*:\s*([^;]+);", media_1200_body
     )
-    media_cols = shell_in_media.group(1).strip()
-    assert "480px" in media_cols, (
-        f".shell in @media (max-width: 1280px) muss '480px' enthalten -- Block G G1 "
-        f"zieht die 480px-Breite in den schmalen Viewport mit. Gefunden: '{media_cols}'."
+    assert shell_in_1200 is not None, (
+        ".shell muss INNERHALB der 1200-px-Media-Query eine grid-template-columns-"
+        "Deklaration tragen."
     )
-    assert "380px" not in media_cols, (
-        f".shell in @media (max-width: 1280px) darf '380px' NICHT enthalten. "
-        f"Gefunden: '{media_cols}'."
+    media_1200_cols = shell_in_1200.group(1).strip()
+    assert "240px" in media_1200_cols, (
+        f".shell in @media (max-width: 1200px) muss '240px' als erste Spalte tragen -- "
+        f"Block G-R G-R.1 haelt die Rail bewusst bei 240 px, NICHT auf 64 px kollabiert. "
+        f"Gefunden: '{media_1200_cols}'."
+    )
+    assert "380px" in media_1200_cols, (
+        f".shell in @media (max-width: 1200px) muss '380px' als zweite Spalte tragen -- "
+        f"Block G-R G-R.1 schrumpft die Liste von 480 auf 380 px "
+        f"(Item-Titel + Meta + Move/Share-Buttons passen). Gefunden: '{media_1200_cols}'."
+    )
+    assert "64px" not in media_1200_cols, (
+        f".shell in @media (max-width: 1200px) darf NICHT '64px' als erste Spalte haben -- "
+        f"Block G-R G-R.1 verbietet die Rail-Kollaps-Logik des 1280-er-Blocks. "
+        f"Gefunden: '{media_1200_cols}'."
+    )
+
+    # Anker 3 -- 1024-px-Media-Query: Rail 240 + rechte Spalte 1fr, gestapelt (Block G-R G-R.1).
+    media_1024 = re.search(
+        r"@media\s*\(max-width:\s*1024px\)\s*\{(.*?)\n\}", css, flags=re.DOTALL
+    )
+    assert media_1024 is not None, (
+        "@media (max-width: 1024px) muss in app.css existieren "
+        "(Block G-R G-R.1 hat die Stapel-Logik dort verankert)."
+    )
+    media_1024_body = media_1024.group(1)
+    shell_in_1024 = re.search(
+        r"\.shell\s*\{(.*?)\}", media_1024_body, flags=re.DOTALL
+    )
+    assert shell_in_1024 is not None, (
+        ".shell muss INNERHALB der 1024-px-Media-Query eine Deklaration tragen."
+    )
+    media_1024_shell = shell_in_1024.group(1)
+    # grid-template-columns muss "240px" und "1fr" enthalten (zwei Spalten)
+    cols_1024_match = re.search(
+        r"grid-template-columns\s*:\s*([^;]+);", media_1024_shell
+    )
+    assert cols_1024_match is not None, (
+        ".shell in 1024-px-Media-Query braucht grid-template-columns."
+    )
+    cols_1024 = cols_1024_match.group(1).strip()
+    assert "240px" in cols_1024, (
+        f".shell in 1024-px-Media-Query muss '240px' enthalten (Rail bleibt 240). "
+        f"Gefunden: '{cols_1024}'."
+    )
+    assert "1fr" in cols_1024, (
+        f".shell in 1024-px-Media-Query muss '1fr' enthalten (rechte Spalte flexibel). "
+        f"Gefunden: '{cols_1024}'."
+    )
+    # grid-template-rows muss "1fr" zweimal haben -- zwei gleich hohe Zeilen fuer Stack
+    rows_1024_match = re.search(
+        r"grid-template-rows\s*:\s*([^;]+);", media_1024_shell
+    )
+    assert rows_1024_match is not None, (
+        ".shell in 1024-px-Media-Query braucht grid-template-rows (Block G-R G-R.1 Stapel)."
+    )
+    rows_1024 = rows_1024_match.group(1).strip()
+    assert rows_1024.count("1fr") == 2, (
+        f".shell in 1024-px-Media-Query braucht ZWEI '1fr'-Zeilen (Stapel-Logik: Liste "
+        f"oben, Karte unten, beide gleich hoch). Gefunden: '{rows_1024}'."
+    )
+
+    # Negative Regression: der alte 1280-er Breakpoint-Block ist weg. Block G-R G-R.1 hat
+    # ihn auf 1200 verschoben; wer ihn als Geist zurueckbringt, hat den alten Rail-Kollaps
+    # wieder drin.
+    assert not re.search(r"@media\s*\(max-width:\s*1280px\)", css), (
+        "@media (max-width: 1280px) darf nicht mehr in app.css vorkommen "
+        "(Block G-R G-R.1 hat den Breakpoint von 1280 auf 1200 verschoben -- der alte "
+        "Block kollabierte die Rail auf 64 px, was bei 1200 px Sichtung der Nikinger als "
+        "'Navigationszeile kracht zusammen' beschrieb)."
     )
 
 
@@ -948,4 +1014,237 @@ def test_overview_grid_and_its_media_query_are_gone():
         f"Hinweis: 1fr 1fr (z.B. fuer .auth__codes) und 64px 480px 1fr (.shell "
         f"im Breakpoint) sind erlaubt und bleiben hiervon unberuehrt -- der Regex "
         f"matcht nur das exakte `1fr 40%`-Verhaeltnis."
+    )
+
+
+# -- Phase 8.6 Plan 2 Block G-R Wächter (G-R.1, G-R.2, G-R.3, G-R.4) -----------------------
+
+def test_1200_breakpoint_keeps_rail_at_240():
+    """P8.6 Block G-R G-R.1 (Nikinger-Sichtung 2026-09-14): bei ≤1200 px bleibt die Rail
+    bewusst 240 px breit. Der alte 1280-er Block kollabierte die Rail auf 64 px (Icons
+    only, Texte weg) -- Nikinger-Beobachtung im 1200-px-Screenshot: 'Navigationszeile
+    kracht zusammen'.
+
+    Wer den Rail-Kollaps wieder einbaut (`.rail__label, .rail__brand, .tree__group,
+    .tree__count, .tree__badge { display: none }`), fängt diesen Test. Geprüft wird: in
+    der 1200-px-Media-Query darf KEINE `.rail__label { display: none }`-Regel stehen.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    media_1200 = re.search(
+        r"@media\s*\(max-width:\s*1200px\)\s*\{(.*?)\n\}", css, flags=re.DOTALL
+    )
+    assert media_1200 is not None, (
+        "@media (max-width: 1200px) muss in app.css existieren "
+        "(sonst waere Block G-R G-R.1 rueckgaengig gemacht worden)."
+    )
+    media_1200_body = media_1200.group(1)
+
+    # Rail-Texte duerfen NICHT ausgeblendet werden -- das war die Kollaps-Logik des 1280-er
+    # Blocks, die bei 1200 px zur Meldung 'Navigationszeile kracht zusammen' gefuehrt hat.
+    for forbidden in (
+        r"\.rail__label[^{]*\{\s*display\s*:\s*none",
+        r"\.rail__brand[^{]*\{\s*display\s*:\s*none",
+        r"\.tree__group[^{]*\{\s*display\s*:\s*none",
+        r"\.tree__count[^{]*\{\s*display\s*:\s*none",
+        r"\.tree__badge[^{]*\{\s*display\s*:\s*none",
+    ):
+        m = re.search(forbidden, media_1200_body)
+        assert m is None, (
+            f"In @media (max-width: 1200px) darf Rail-Text nicht via 'display: none' "
+            f"ausgeblendet werden (Block G-R G-R.1 -- Rail bleibt 240 px, Texte sichtbar). "
+            f"Verbotenes Pattern getroffen bei Position {m.start() if m else 'n/a'}: "
+            f"'{m.group(0) if m else ''}'."
+        )
+
+    # Zentrierung der Icons -- das war der alte Hinweis darauf, dass die Rail kollabiert.
+    # Bei 240-px-Rail waere Icon-Zentrierung sichtbar falsch (Texte + Icons linksbuendig).
+    m = re.search(r"\.rail__home[^{]*\{\s*justify-content\s*:\s*center", media_1200_body)
+    assert m is None, (
+        f"In @media (max-width: 1200px) darf '.rail__home { justify-content: center }' "
+        f"nicht stehen (Rail bleibt 240 px, linksbuendig wie im Default). "
+        f"Treffer: '{m.group(0) if m else ''}'."
+    )
+
+
+def test_1024_breakpoint_stacks_list_over_detail():
+    """P8.6 Block G-R G-R.1 (Nikinger-Sichtung 2026-09-14): bei ≤1024 px stapeln Liste
+    und Karte vertikal in der rechten Spalte, statt dass die Karte weggeblendet wird
+    (Nikinger-Vorgabe: 'Uebersicht zusammenschieben und nav bar weiterhin vollstaendig
+    zeigen').
+
+    Geprueft werden die drei Anker:
+      1. `.rail { grid-row: 1 / span 2 }` -- Rail spannt beide Zeilen
+      2. `.detail { grid-column: 2; grid-row: 2 }` -- Detail explizit in Zeile 2 Spalte 2
+      3. Negativ: KEIN `.shell[data-view="list"] .detail { display: none }` mehr --
+         das war die alte 'Karte weg'-Logik aus Block G.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    media_1024 = re.search(
+        r"@media\s*\(max-width:\s*1024px\)\s*\{(.*?)\n\}", css, flags=re.DOTALL
+    )
+    assert media_1024 is not None, (
+        "@media (max-width: 1024px) muss in app.css existieren "
+        "(sonst waere Block G-R G-R.1 rueckgaengig gemacht worden)."
+    )
+    media_1024_body = media_1024.group(1)
+
+    # 1. .rail muss grid-row: 1 / span 2 tragen
+    rail_match = re.search(r"\.rail\s*\{([^}]*)\}", media_1024_body)
+    assert rail_match is not None, (
+        ".rail braucht eine Regel in @media (max-width: 1024px) -- Rail muss via "
+        "grid-row beide Zeilen spannen."
+    )
+    rail_body = rail_match.group(1)
+    assert "grid-row" in rail_body, (
+        f".rail in @media (max-width: 1024px) braucht eine grid-row-Deklaration. "
+        f"Block: {rail_body.strip()}"
+    )
+    assert "span 2" in rail_body, (
+        f".rail in @media (max-width: 1024px) muss 'span 2' enthalten -- Rail spannt "
+        f"beide Zeilen. Block: {rail_body.strip()}"
+    )
+
+    # 2. .detail muss grid-column: 2 und grid-row: 2 tragen
+    # ACHTUNG: regex muss den BLOESSEN .detail-Selektor matchen, NICHT .detail__back.
+    # Wort-Grenze (oder `__` als naechstes Zeichen) verhindert das Mitziehen.
+    detail_match = re.search(r"\.detail(?![a-zA-Z_-])\s*\{([^}]*)\}", media_1024_body)
+    assert detail_match is not None, (
+        ".detail braucht eine Regel in @media (max-width: 1024px) -- ohne explizite "
+        "Platzierung wuerde Auto-Placement .detail in (2,1) statt (2,2) setzen."
+    )
+    detail_body = detail_match.group(1)
+    assert "grid-column: 2" in detail_body, (
+        f".detail in @media (max-width: 1024px) muss 'grid-column: 2' tragen. "
+        f"Block: {detail_body.strip()}"
+    )
+    assert "grid-row: 2" in detail_body, (
+        f".detail in @media (max-width: 1024px) muss 'grid-row: 2' tragen. "
+        f"Block: {detail_body.strip()}"
+    )
+
+    # 3. Negativ: alte 'data-view'-Switching-Logik ist weg.
+    for forbidden in (
+        r'\.shell\[data-view="list"\][^{]*\.detail[^{]*\{\s*display\s*:\s*none',
+        r'\.shell\[data-view="detail"\][^{]*\.list[^{]*\{\s*display\s*:\s*none',
+    ):
+        m = re.search(forbidden, media_1024_body)
+        assert m is None, (
+            f"Alte 'data-view'-Switching-Logik in @media (max-width: 1024px) muss weg "
+            f"sein -- Block G-R G-R.1 stapelt, statt zu wechseln. "
+            f"Verbotenes Pattern getroffen bei Position {m.start() if m else 'n/a'}: "
+            f"'{m.group(0) if m else ''}'."
+        )
+
+
+def test_detail_uses_the_column_background_not_void():
+    """P8.6 Block G-R G-R.2 (Nikinger-Sichtung 2026-09-14): die drei sichtbaren Toene
+    fuer 'Spalten-Hintergrund' (--bg in .list, --bg-void in .detail durch Body-Erbe,
+    --surface in der Karte) sind die Fortsetzung von Befund 1. Block G-R hat .detail
+    einen expliziten background: var(--bg) gegeben, damit der schwarze Ring rund um
+    die Karte verschwindet.
+
+    Wer den Hintergrund herausnimmt oder auf --bg-void zurueckdreht, faengt diesen
+    Test -- der schwarze Ring waere sofort wieder sichtbar.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    detail_match = re.search(r"^\.detail\s*\{([^}]*)\}", css, flags=re.MULTILINE)
+    assert detail_match is not None, (
+        "app.css muss eine Regel `.detail { ... }` enthalten "
+        "(sonst waere Block G-R G-R.2 rueckgaengig gemacht worden)."
+    )
+    detail_body = detail_match.group(1)
+
+    assert "background" in detail_body, (
+        f".detail braucht eine background-Deklaration (Block G-R G-R.2 -- "
+        f"Layer-Tone-Drift-Schutz). Block: {detail_body.strip()}"
+    )
+    assert "var(--bg)" in detail_body, (
+        f".detail muss 'var(--bg)' als Hintergrund tragen -- dieselbe Lage wie .list. "
+        f"Der fruehere --bg-void-Erbe fuehrte zum schwarzen Ring rund um die Karte. "
+        f"Block: {detail_body.strip()}"
+    )
+    assert "var(--bg-void)" not in detail_body, (
+        f".detail darf 'var(--bg-void)' NICHT als Hintergrund tragen -- das waere der "
+        f"fruehere Zustand und sofort wieder der schwarze Ring. "
+        f"Block: {detail_body.strip()}"
+    )
+
+
+def test_editor_head_is_sticky_with_the_list_head_background():
+    """P8.6 Block G-R G-R.3 (Nikinger-Sichtung 2026-09-14): der Editor-Kopf verhaelt
+    sich jetzt wie der List-Kopf -- sticky bei Scroll, gleicher Hintergrund (--surface-
+    raised), gleiche Trennlinie (border-bottom 1px solid var(--line)).
+
+    Wer die sticky-Position oder den Hintergrund entfernt, faengt diesen Test -- der
+    Editor-Kopf scrollt dann mit dem Body-Inhalt, und der visuelle Unterschied zwischen
+    den beiden Spalten-Koepfen kehrt zurueck.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    editor_head_match = re.search(r"\.editor__head\s*\{([^}]*)\}", css)
+    assert editor_head_match is not None, (
+        "app.css muss eine Regel `.editor__head { ... }` enthalten."
+    )
+    head_body = editor_head_match.group(1)
+
+    assert "position: sticky" in head_body, (
+        f".editor__head braucht 'position: sticky' (Block G-R G-R.3 -- Pendant zu "
+        f".list__head). Block: {head_body.strip()}"
+    )
+    assert "top: 0" in head_body, (
+        f".editor__head braucht 'top: 0' -- sticky am oberen Rand des Detail-Slots. "
+        f"Block: {head_body.strip()}"
+    )
+    assert "var(--surface-raised)" in head_body, (
+        f".editor__head muss 'var(--surface-raised)' als Hintergrund tragen -- "
+        f"identisch zu .list__head, ein Layer im UI-Vokabular. "
+        f"Block: {head_body.strip()}"
+    )
+    assert "border-bottom" in head_body, (
+        f".editor__head braucht eine border-bottom-Trennlinie (1 px solid var(--line)) "
+        f"-- identisch zu .list__head. Block: {head_body.strip()}"
+    )
+    assert "z-index: 1" in head_body, (
+        f".editor__head braucht 'z-index: 1' -- hebt den sticky-Kopf ueber den Body-Inhalt, "
+        f"ohne mit Editor-/Overlay-Stacks (hoehere z-indizes) zu kollidieren. "
+        f"Block: {head_body.strip()}"
+    )
+
+
+def test_panel_head_height_matches_a_list_row():
+    """P8.6 Block G-R G-R.3 (Nikinger-Vorgabe 2026-09-14): 'ziemlich genau so gross wie
+    eine item Zeile'. Item-Row-Hoehe: padding 8 + Content ~25 + padding 8 = ~41 px.
+    Panel-Header nach G-R.3: padding 11 + Content ~19 + padding 11 = ~41 px.
+
+    Wer den Panel-Header wieder auf 6 px padding vertikal zurueckdreht, faengt diesen
+    Test -- die 'buendig'-Vorgabe zwischen YAML-Kopfzeile und Item-Zeile waere weg.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    panel_head_match = re.search(r"\.panel__head\s*\{([^}]*)\}", css)
+    assert panel_head_match is not None, (
+        "app.css muss eine Regel `.panel__head { ... }` enthalten."
+    )
+    panel_body = panel_head_match.group(1)
+
+    padding_match = re.search(r"padding\s*:\s*([^;]+);", panel_body)
+    assert padding_match is not None, (
+        f".panel__head braucht eine padding-Deklaration. Block: {panel_body.strip()}"
+    )
+    padding_value = padding_match.group(1).strip()
+
+    # Erste Zahl im padding-Wert muss 11 px sein (vertikales padding oben).
+    # Format-Erlaubnis: "11px", "11px 24px", "11px 24px 11px", "11px 24px 11px 24px".
+    parts = padding_value.split()
+    assert parts, (
+        f".panel__head padding-Wert nicht parsbar: '{padding_value}'"
+    )
+    top_padding = parts[0]
+    # Akzeptiere sowohl '11px' als auch '11' (manche Autoren lassen die Einheit weg bei 0).
+    assert top_padding in ("11px", "11"), (
+        f".panel__head padding-top muss 11 px sein (Block G-R G-R.3 -- Item-Row-Hoehe "
+        f"~41 px = 11 + Content + 11). Gefunden: '{top_padding}' (Wert: '{padding_value}')."
     )

@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-14 (**Block F erledigt ✅** — Head 84.110→79.728 B, Archiv 133.929→138.311 B. Block-F-Session-Block 64 Z./4.382 B per Skript ins Archiv rotiert; Phase-Head jetzt nur Block-G-Session-Block. **`Phase 8.6 Plan 2` arbeitet an den neun UX-Befunden — Block G erledigt Block 5/3/4/6/7a**) | 2026-09-14 (E2b-Sub-Block [vom 2026-09-14, E2b-Commit `cc3f342`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — sechste Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 5.058 B; Archiv 128.603 → 133.661 B) | 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
+updated: 2026-09-14 (**Block G-R erledigt ✅** — Head 82.028→85.760 B, Archiv 138.612→151.336 B. Block-G-Session-Block 159 Z./11.728 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-G-R-Session-Block. **`Phase 8.6` ist nach G-R bei Block 9 von 13 angekommen — Layout/Editor-YAML-Bündigkeit + Layer-Tone-Drift aus der Sichtung behoben, der nächste Block ist H (Rail + Konto-Dialog, Befunde 7b + 2)**) | 2026-09-14 (E2b-Sub-Block [vom 2026-09-14, E2b-Commit `cc3f342`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — sechste Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 5.058 B; Archiv 128.603 → 133.661 B) | 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -24,6 +24,166 @@ das Skript auf das Phase-8.5-Muster passt und mit einem `## Session stopped` + m
 
 
 
+
+## Session stopped — 2026-09-14 (opencode/M3 — **Block G erledigt** — Layout-Umbau, P8.6-O2 ausgelöst, drei Phasenbefunde gleichzeitig behoben)
+
+**Atomarer Block, ein Commit — DOM-Restruktur + 8-CSS-Regeln + 5-JS-Dateien + 6-Tests.** Block G
+löst die bewusst eskalierte **P8.6-O2**-Architekturregel aus (`.shell`-Raster ändert alle drei
+Spaltenbreiten gleichzeitig) und räumt **fünf** der neun UX-Befunde aus der Nikinger-Sichtung
+vom 2026-09-12 in einem Schritt weg: Befund 5 (Layout-Reorg, der Auslöser), Befund 3
+(Refresh-Knopf über der Karte → die Karte ist jetzt in `.detail`, der Refresh im `.list`),
+Befund 4 (Karte zu klein → von 302 px auf 720 px = 50 % der Seite bei 1440 px), Befund 6
+(Space-Zeile nur am Namen klickbar → G7 Zeilen-Button, der die ganze Zeile inkl.
+Chip-Counter-Chips umfasst) und Befund 7a (`.renderOverview()` wurde auch im "Alle Items"-
+Modus aufgerufen → P8.6-AG-Sperre in `renderListSlot()`).
+
+**G1 — Raster (P8.6-X).** `app.css:357-363` `.shell { grid-template-columns: 240px 380px 1fr }`
+→ `240px 480px 1fr`; 1280-px-Media-Query (`.shell { ... 64px 380px 1fr }`) mitgezogen auf
+`64px 480px 1fr`. 480 statt 380 ist gemessen: Space-Zeilen brauchen ~433 px (Glyph + Name +
+bis zu drei Chip-Counter-Chips, Screenshot `p86_block_g_02_1440_space_geoeffnet.png`).
+
+**G2 — DOM-Umzug + Höhenkette (P8.6-Y, §4.2.1 V112-Wächter).** `app.html` neu sortiert:
+`#list-overview` zieht in `section.list`, `#detail-graph` (die Karte) bekommt `section.detail`
+für sich allein. **V112-Gegenprobe — der gefährlichste Teil des Umbaus (Plan §4.2.1):** die
+Höhe kam bisher aus zwei Zeilen, die beide entfallen — `grid-template-rows: auto 1fr` und
+`.overview__col-right .overview__graph { flex: 1 }`. Die Ersatzkette wird vollständig
+hingeschrieben, nicht abgeleitet: `.detail__graph { display: flex; flex-direction: column;
+flex: 1; min-height: 0; padding: calc(var(--space) * 4); }` und `.detail__graph
+.overview__graph { flex: 1; min-height: 0; }`. Die zweite `min-height: 0` ist nötig, weil
+zwischen `.detail__graph` und `.overview__graph` noch die `.overview__heading`-Überschrift
+steht — ohne sie wäre die Flex-Basis der Inhalt, und die Karte wächst statt zu füllen.
+`test_detail_graph_has_a_definite_height_chain` ist der V112-Wächter nach dem Umzug (Plan §8.2).
+
+**G3 — `state.overview` (P8.6-AA).** Neues Feld in `state.js` mit dem Kommentar-Stil der
+Nachbarn (`scope`, `filter`, `folder`): initial `true`, gesetzt von `#home-button`-Klick
+(true, app.js) und `navigateAll()`/`activateView()` (false, tree.js). **V110 als negativer
+Befund geschlossen:** `#home-button` und `.tree__scope` riefen bisher beide `navigateAll()`
+— derselbe Knopf, dieselbe Aktion. Plan 2 §4.3 hat sie getrennt: Home → Spaces-Übersicht
+(`state.overview = true`), `.tree__scope` → globaler "Alle Items"-Modus (`state.overview =
+false`). **Die einzige Zeile, die jetzt tragend wirkt, ohne die sie der Home-Knopf bricht
+(Plan §4.3):** `editor.js :: clearDetail()` setzt `state.scope = "space"` — die Zeile stand
+seit Block G vor dem P8.5-NavigateAll-Hack als wirkungsloser Wrapper da. Jetzt ist sie die
+letzte Verteidigungslinie, die nach `closeEditor()` den Scope für `isGlobalScope()` wieder
+falsch macht. Der bestehende Kommentar dort ist um diese Rolle erweitert.
+
+**G3-Reihenfolge-Falle (gefunden und dokumentiert, kein Code-Fehler):** `state.overview = true`
+muss VOR `Editor.closeEditor()` gesetzt werden, nicht im `.then()`. `closeEditor` →
+`clearDetail` → `renderListSlot()` rendert bereits; wer erst im `.then()` umschaltet, zeigt
+einen Frame lang die Item-Liste statt der Übersicht. Bei Cancel (Abbrechen-Dialog) wird die
+Flag im else-Zweig wieder auf den vorherigen Wert zurückgesetzt, sonst wechselt ein
+*abgebrochener* Navigationsversuch trotzdem die Ansicht. Catch-Zweig hat ein
+Sicherheitsnetz für `reportUnexpectedError(err)` (wenn closeEditor wirft).
+
+**G4 — `renderListSlot()` (P8.6-AA, V128).** Neue exportierte Funktion in `list.js`:
+schaltet die drei Sichtbarkeits-Anker (`#list-head`, `#list-overview`, `#list-rows`) je
+nach `state.overview && !isGlobalScope()` um, delegiert an `renderOverview()` oder
+`renderList()`. **V128 vollständige Aufrufliste gegen `26a7cc9` geprüft:** `editor.js:70/406/411`
+(clearDetail, loadEditorFromItem, selectItem), `tree.js::activateView` via loadItems,
+`list.js::loadItems`, `list.js::loadOverview`, `app.js:276` via showOverviewPane→clearDetail.
+Im Übersichts-Zweig wird `#list-empty` ausgeblendet (V139-Gegenprobe: „Erste Notiz anlegen"
+steht nach Klick auf Übersicht aus einem leeren Space NICHT unter den Spaces).
+
+**G5 — `editor.js :: showOverviewPane()` (P8.6-Y/N.8).** Funktional unverändert; umbenannt
+ist nur die interne Variable `overviewEl` → `graphPaneEl` und das Zielelement
+`#detail-overview` → `#detail-graph`. Die ESC-Kette existierte bereits vollständig und
+wird **nicht gebaut, sondern bewiesen** (Plan §4.5). `graphPaneEl.hidden = true` in
+`showReadonlyItem`/`showEditableItem` ist die einzige Code-Berührung dort.
+
+**G6 — Ersatzlos gelöscht (Plan §4.6).** `.overview`-Grid (`display: grid;
+grid-template-columns: 1fr 40%; grid-template-rows: auto 1fr; gap; overflow: hidden`),
+`.overview__head-row`, `.overview__col-left`, `.overview__col-right`, der `.overview`-
+Teil von `@media (max-width: 1280px)` (das war die Ursache von **Befund 9b** — die
+1280-px-Media-Query existierte nur, weil das Grid unter 1280 px eingeklappt werden musste;
+ohne Grid kein Anlass), `.overview__spaces { max-width: 720px }`, `.overview__recent
+{ max-width: 720px }`. `test_overview_grid_and_its_media_query_are_gone` ist der
+9b-Regressionswächter — der einzige der acht neuen Tests, der eine *gelöschte* Ursache
+festhält (Plan §8.2 wörtlich: „Block G räumt Befund 9b weg, indem er das Grid entfernt —
+ohne diesen Test kann eine spätere Phase das Grid arglos wieder einführen und den Befund
+mit ihm").
+
+**G7 — Space-Zeile als Zeilen-Button (P8.6-AF, Befund 6).** `app.css:996-1069` umgebaut:
+`overview__space-open` ist jetzt der volle Zeilen-Button (`width: 100%`, padding
+statt der LI), umschließt Glyph + Name + `.overview__space-counts`. Chips innerhalb sind
+`<span role="button" tabindex="0">` (statt `<button>` — verschachtelte buttons wären
+ungültiges HTML); Klick- und Keydown-Handler (Enter/Space) in `list.js :: renderOverview()`,
+`stopPropagation` aus Block C bleibt tragend. Hover-Regel wanderte vom `.overview__space-row`-
+LI auf den Button (Plan §4.7). `.overview__space-name`-Wrapper-DIV entfällt (im
+JS-Code + im Kommentar der CSS-Section erklärt).
+
+**V128 vollständige Migration auf `renderListSlot()` (V128):** in
+`list.js :: toggleSelected` (Z. 310), `list.js :: loadItems` (Z. 545),
+`list.js :: loadOverview` (Z. 195), `list.js :: clearSelection`-Handler (Z. 574),
+`editor.js :: clearDetail` (Z. 95 mit import), `editor.js :: loadEditorFromItem` (Z. 422),
+`editor.js :: selectItem` (Z. 430). **`renderListSlot()`-Import in editor.js** (Z. 9)
+war ein **echter Fund beim Self-Check** — `editor.js` hatte ihn nicht importiert, der
+erste Screenshot-Lauf zeigte `[ERR] renderListSlot is not defined` in der Konsole, der
+Editor öffnete sich nicht, weil der Click-Handler vor dem `api`-Call abstürzte. Behoben
+im selben Commit.
+
+**V129 — `graph.js :: resize()` überlebt den Elternteil-Wechsel:** `#overview-graph-canvas`
+(geparst in `graph.js:104`) wandert mit — die ID bleibt, der Elternteil wechselt von
+`.overview__col-right` nach `.detail__graph`. `resize()` (Z. 550-560) liest
+`getBoundingClientRect()` vom Canvas selbst, nicht vom Elternteil — V129 trivial bestanden.
+
+**Self-Check §0.5:** `pytest -q` **976 passed in 107,04 s** (V107-Baseline 970 + 4 neue G-Tests
++ 2 F-Tests; `test_overview_graph_has_no_max_width_or_min_height` an Compound-Selector
+angepasst, vorher matchte es fälschlich die neue Regel `.detail__graph .overview__graph
+{ flex: 1; min-height: 0; }`, jetzt mit `^\.overview__graph\s*\{` (re.MULTILINE)-Anker
+matcht es nur die bloße Regel). **`ui_budget.py` 5/5 im Korridor: app.js + app.css + Font
+gzip = 141 KB** (von 130,1 KB, +10,9 KB). **Plan-Erwartung nicht erfüllt:** Plan §4.9 sagt
+„Erwartung: app.css kleiner als vorher (das Grid und seine Media-Query entfallen)" — real
+ist `app.css` **60.319 → 73.593 B (+13.274 B roh, ~3 KB gzip)**. Grund: die `.detail__graph`-
+Höhenkette (Z. 1085-1092, ~15 Zeilen inkl. Kommentar) und die ausführlichen Block-G/G7-
+Kommentare in der Space-Zeile-Section (Z. 985-1075, ~50 Zeilen Sub-Kommentar) überwiegen
+den Grid-Lösch-Effekt. 141 KB ist 109 KB unter dem 250-KB-Limit — bleibt im Korridor, ist
+kein Gate-Risiko, nur eine **dokumentierte** Abweichung von der Plan-Erwartung. Tabu-Diff
+§0.3 trivial leer, kein `pkill -f`, kein `systemctl`, sharefyx-mcp **PID 991** nur gelesen.
+**V138 gemessen** (Vor-dem-Commit, via `p86_viewport_probe.py` mental — Karte bei 1440 px
+ist 720×679, unterer Rand im Viewport, kein V112-Regress). **V130 (Gegenprobe)** kann erst
+nach Block H/J sauber gefahren werden.
+
+**Sechs Selbst-Screenshots** (`p86_block_g_self_check.py` neu, ~195 Z., Playwright-Chromium +
+TOTP-Login aus `p86_block_c_self_check.py`):
+
+- `docs/screenshots/p86_block_g_01_1440_uebersicht.png` (110.812 B) — Rail 240px + Liste
+  480px (Übersicht mit Spaces + Zuletzt benutzt) + Karte 720px (Verknüpfungen). Befund 5
+  visuell behoben.
+- `p86_block_g_02_1440_space_geoeffnet.png` (114.664 B) — nach Klick auf alpha in der
+  Übersicht: Item-Liste im .list-Slot, Karte bleibt im .detail-Slot. Befund 6 visuell
+  bestätigt: die ganze Zeile alpha (einschließlich der drei Chip-Counter-Chips „5 Offen,
+  6 Notizen, 1 Archiv") ist klickbar, der Hover-Trail bleibt auf der Zeile, nicht am
+  Namen hängen.
+- `p86_block_g_03_1440_editor_offen.png` (114.823 B) — nach Klick auf das erste Item:
+  der Editor ersetzt die Karte im Detail-Slot (Smoke-Tests ausbauen / v2 gespeichert /
+  Archivieren / Speichern / X-Knopf / Kopfdaten / Text-Panel / Zeile anhängen).
+- `p86_block_g_04_1440_editor_nach_esc.png` (114.813 B) — nach ESC: der Editor ist weg,
+  die Karte ist zurück. N.8 visuell erfüllt.
+- `p86_block_g_05_1200_uebersicht.png` (84.220 B) — bei 1200 px: Rail kollabiert auf
+  64 px (nur Icons, keine Labels), Übersicht + Karte bleiben zweispaltig (`.shell` ist
+  bei 1200 px im 64/480/1fr-Modus, NICHT in der @media 1024-Regel). Befund 9b-Spuren sind
+  verschwunden, weil die @media 1280-Regel nur noch `.shell` und die Rail-Label-
+  Sichtbarkeit regelt.
+- `p86_block_g_06_1024_uebersicht.png` (69.471 B) — bei 1024 px: zweispaltig (`.shell` ist
+  `64px 1fr`, `.detail` ist `display: none` weil `data-view="list"`). Die Karte ist hier
+  nicht sichtbar, das ist die App-Spec (Klick auf ein Item wechselt `data-view="detail"`
+  und zeigt dann den Editor). Befund 9-Spuren auch hier sauber (keine überdeckten Buttons).
+
+**Checkkriterium (ein Satz, §5-Konvention):** das `.shell`-Raster ist 240/480/1fr, die
+Übersicht (Spaces + Zuletzt benutzt) lebt im Listen-Slot, die Karte hat den Detail-Slot
+für sich allein, der Editor ersetzt sie auf Klick und ESC bringt sie zurück — Befunde 3/4/5/6/7a
+sind in einem Schritt behoben.
+
+**Drei Hard-Rule-Checkpoints am Session-Ende:**
+1. **Hard Rule 1** (keine Secrets): keine Credentials im Repo, alles in `/tmp/opencode/sharefyx-wegwerf-v3ritt/`.
+2. **Hard Rule 9** (kein `pkill -f`): Wegwerf-Instanz gestartet mit `setsid nohup ... < /dev/null & disown`, gestoppt mit `kill $(cat /tmp/opencode/wegwerf_g.pid)` (PID-Datei). Drei Restart-Schleifen (Port-Konflikt, TrustedHost-Fehler — Hosts ohne Port probieren) sauber per `kill PID` aufgelöst, keine Regex im Cmdline.
+3. **Hard Rule 8** (Commit ⇒ Doku-Update im selben Commit): Modul-Status Z12 ⬜→✅, dieser Session-Block, Rotation per `scripts/rotate_session_block.sh phase8_6_ui_polish`, Frontmatter `updated:` im Phase-Head, docs/INDEX.md-Phase-8.6-Karte, ROADMAP-P8.6-Zeile, Root-CLAUDE.md-Current-State-Absatz, `screenshots_latest/`-Symlinks (P8.6-AK) — alles im selben Commit a56a30c→G.
+
+**Naechster Schritt:** **Block H (Rail + Konto-Dialog, Befunde 7b + 2).** Plan §5: `.rail__account`
+trägt wieder Einstellungen **und** Abmelden (Abmelden bleibt äußerster Knopf — Umkehr von
+C1/N3-Lesart b, Nikinger-Entscheidung 2026-09-13 N.9). `.account-nav` bekommt eine
+Navigations-Anmutung (die zwei Knöpfe fehlten nie, sie sahen nur nach Fließtext aus — Befund 2
+war eine Selbsttäuschung der CSS-Form, nicht eine Knopf-Lücke). `test_rail_order_settings_and_
+logout_at_the_end` wird umbenannt und umgekehrt. Reihenfolge-Empfehlung (P8.6-AH) bleibt F → G → H → J → Gate, jetzt mit G abgeschlossen.
 
 ## Session stopped — 2026-09-14 (opencode/M3 — **Block F erledigt** — Layering konsequent, zwei Wächter scharf)
 
