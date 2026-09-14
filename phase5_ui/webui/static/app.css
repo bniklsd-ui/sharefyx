@@ -29,6 +29,14 @@
   --bg:            #0B0D10;   /* nahezu schwarz, leicht kühl — BMW-App-Grund */
   --surface:       #14181D;   /* Karten, Listenflächen */
   --surface-raised:#1B2027;   /* aktive Zeile, Eingabefelder */
+
+  /* Layer-Flächen außerhalb des Standardschemas -- drei Stellen, an denen der Verlauf in
+     eine bestimmte Tiefe zeigen muss (P8.6-F F3). Bewusst rohe Hex-Werte hier zentral
+     definiert, damit sie genau einmal in der Datei stehen; jede Verwendung außerhalb
+     dieses Blocks fängt der Wächter `test_no_raw_surface_hex_outside_root`. */
+  --rail-top:      #0E1116;   /* .rail-Verlauf oben, knapp unter --surface-raised */
+  --auth-glow:     #131A23;   /* Login-Hintergrund, radialer Glow am oberen Rand */
+  --auth-card-top: #1A2029;   /* .auth-card-Verlauf oben */
   --line:          rgba(255,255,255,.08);   /* Haarlinie */
   --line-strong:   rgba(255,255,255,.16);
 
@@ -100,15 +108,19 @@
   --fs-title: 18px;
   --fs-page:  22px;
 
-  /* -- Plastische Schicht (Step 7b) ------------------------------------------------------
+  /* -- Plastische Schicht (Step 7b; P8.6-F F1 2026-09-14: Layer-Tiefe statt Farbton) -----
      Zwei Panelfarben, damit „wo kommt der Text hin" und „wo kommen die Kopfdaten hin" ohne
-     Beschriftung unterscheidbar sind: die Textfläche bleibt kühl wie der Rest der App, die
-     Kopfdaten bekommen einen warmen Stich. */
+     Beschriftung unterscheidbar sind: die Textfläche (Layer 3) bleibt kühl wie der Rest der
+     App, die Kopfdaten (Layer 2) liegen eine Stufe darüber. Vor Block F trug die Kopfdaten-
+     Ebene einen warmen Bernsteinstich (--panel-meta/--panel-meta-head mit #1A1611/#221C15,
+     --panel-meta-line = rgba(229,169,60,.22) == --warn bei 22 %) -- das verwechselte die
+     Information „Kopfdaten" mit der Bedeutung „Warnung" (Befund 8). Nach Block F ist die
+     Unterscheidung Layer-Höhe statt Farbton, und die meta-Linie ist die Standard-Haarlinie. */
   --panel-body:    #10151B;
   --panel-body-head: #161C24;
-  --panel-meta:    #1A1611;
-  --panel-meta-head: #221C15;
-  --panel-meta-line: rgba(229,169,60,.22);
+  --panel-meta:    var(--surface);
+  --panel-meta-head: var(--surface-raised);
+  --panel-meta-line: var(--line);
 
   --btn-face-top:    #2A313A;
   --btn-face-bottom: #1C222A;
@@ -359,7 +371,7 @@ select.input:focus {
   padding: var(--space) 0;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, #0E1116, var(--bg));
+  background: linear-gradient(180deg, var(--rail-top), var(--bg));
 }
 
 .list {
@@ -1773,13 +1785,13 @@ body.has-update-banner .shell { height: calc(100vh - var(--banner-h)); margin-to
   align-items: center;
   justify-content: center;
   padding: calc(var(--space) * 4);
-  background: radial-gradient(120% 80% at 50% 0%, #131A23 0%, var(--bg) 70%);
+  background: radial-gradient(120% 80% at 50% 0%, var(--auth-glow) 0%, var(--bg) 70%);
 }
 
 .auth-card {
   width: 100%;
   max-width: 420px;
-  background: linear-gradient(180deg, #1A2029, var(--surface));
+  background: linear-gradient(180deg, var(--auth-card-top), var(--surface));
   border: 1px solid var(--line-strong);
   border-radius: var(--radius);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 24px 64px rgba(0,0,0,.55);
@@ -1826,6 +1838,9 @@ body.has-update-banner .shell { height: calc(100vh - var(--banner-h)); margin-to
    war damit wirkungslos: `security.py` setzt `style-src 'self'` OHNE `unsafe-inline`, das
    blockiert auch Style-Attribute. */
 .qr-frame {
+  /* Echtes Weiß -- ein QR-Code braucht es; das ist kein Flächenton, sondern eine harte
+     Lese-Anforderung des Scanners. P8.6-AD-Ausnahme, vom Wächter
+     `test_no_raw_surface_hex_outside_root` ausdrücklich erlaubt. */
   background: #fff;
   padding: var(--space);
   border-radius: var(--radius-sm);

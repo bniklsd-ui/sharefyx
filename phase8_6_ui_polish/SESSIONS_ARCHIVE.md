@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
+updated: 2026-09-14 (E2b-Sub-Block [vom 2026-09-14, E2b-Commit `cc3f342`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — sechste Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 5.058 B; Archiv 128.603 → 133.661 B) | 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -24,6 +24,76 @@ das Skript auf das Phase-8.5-Muster passt und mit einem `## Session stopped` + m
 
 
 
+
+## Session stopped — 2026-09-14 (opencode/M3 — **Block E erledigt: E2a + E2b** mit Wegwerf-v3.0.1-Methodik-Wechsel)
+
+**Reine Mess-Session, kein Produktcode-Touch.** Block E der Reihe nach: E1 Skript (E2a),
+E2a Wegwerf auf aktuellem `main`, **E2b Wegwerf auf v3.0.1-Stand statt Produktion**
+(Nikinger-Korrektur 2026-09-14: keine echten Creds, Wegwerf-Instanz als Vorabritts-Ersatz
+genügt — ist exakt der Code, der auf der Produktion läuft).
+
+**Methodik-Wechsel E2b:** statt Login gegen die echte Produktion eine zweite Wegwerf-Instanz
+auf dem **gleichen** Setup, aber mit dem **v3.0.1-Stand** (`6f19a8f`, der Release vom
+2026-09-05, der live ist; `/opt/sharefyx/current` → `releases/20260905T140325.378914Z`).
+Vermeidet Hard Rule 1 (keine echten Creds im Repo) und Hard Rule 9 (kein Service-Touch)
+**vollständig**, ohne den Mess-Punkt aufzugeben. Aufbau:
+- `git worktree add -d /tmp/opencode/v301-worktree 6f19a8f` → HEAD bestätigt
+- `ln -s /home/savefyx/dev/savefxy/.venv .venv` → Python 3.12.3, identischer Dep-Satz
+- `wegwerf_setup_v3ritt.py cleanup + setup + seed-items + start` → PID 162337, Port 18773
+- Sanity-Check: `grep -c "bg-void\|select-fill\|overview__col-right" phase5_ui/webui/static/app.css` = **0** (bestätigt Vor-Block-C)
+- `p86_viewport_probe.py --base-url http://127.0.0.1:18773 --label v3.0.1 [--dismiss-banner]` — identisches Skript wie E2a, anderes Label
+
+**E2b-Befunde (das ist der eigentliche Punkt — direkter Vergleich E2a vs E2b):**
+
+| Breite | E2a (main, Block C) Geometrie | E2b (v3.0.1, kein Block C) Geometrie | Layout-blockiert E2a / E2b |
+|---|---|---|---|
+| 1024 | n/a (`data-view="list"`) | n/a (gleich) | **0 / 0** |
+| 1200 mit Banner | col-left 692×284, col-right 692×284 (gestapelt) | **byte-identisch**: col-left 692×284, col-right 692×284 | 2 / 2 (`DB-Migration skript`+`Smoke-Tests ausbauen` / `Storybook einrichten`+`DB-Migration skript`) |
+| 1200 ohne Banner | col-left 692×**383** | **byte-identisch**: col-left 692×383 | **0 / 0** |
+| 1440 | col-left 430×731, col-right 302×731 (zwei-spaltig) | **byte-identisch**: col-left 430×731, col-right 302×731 | **0 / 0** |
+
+**Visuelle Bestätigung** (`docs/screenshots/p86_probe_v3.0.1_{1200,1200-clean}.png`): mit
+Banner ragt das 5. Recent-Item (`DB-Migration skript`) in die `VERKNÜPFUNGEN`-Überschrift
+hinein — **exakt dasselbe Bild** wie auf Block C; ohne Banner sind alle 5 Recent-Items
+sauber gestapelt, `VERKNÜPFUNGEN` klar getrennt.
+
+**V125 — geschlossen: 9a = 9b, gleiche Ursache, falsche Plan-Annahme.** Die Behauptung
+„9b durch Block C eingeführt (`overflow: hidden` + `flex: 1` schlägt `height: auto`)" stimmt
+**nicht**: Block C hat weder die Layout-Geometrie noch die Container-Höhe geändert — bei
+1200 px mit Banner sind die Maße **byte-identisch** zu v3.0.1. Was Block C geändert hat,
+ist **welche** Recent-Items in welcher Reihenfolge erscheinen (deshalb die zwei blockierten
+Items je Version), nicht das Layout. **Die wahre Ursache war schon immer die 140-px-Banner-
+Höhe** und war schon auf v3.0.1 vorhanden — die Aufteilung in „9a (live) / 9b (Block-C-
+eingeführt)" war eine **unbewiesene Hypothese**, die nie gegen v3.0.1 verifiziert wurde.
+V126 (1024 px) bleibt erledigt: 0.
+
+**Konsequenz für Plan 2** (für die nächste Claude-Code-Planungs-Session): Befund 9 ist
+**ein** Bug, nicht zwei — und der Bug wird sowieso von Block G gelöst (`.overview`-Grid +
+1280-px-Query entfallen dort, Plan 2 §0.1 P8.6-AA). Die E2b-Messung war trotzdem nötig,
+weil sie die **falsche Diagnose** im Phase-Head ausgeräumt hat. Der Methodik-Wechsel
+„Wegwerf-vor-Produktion für Befund-Reproduktion" wird in
+`docs/concepts/sichtpruefung_automation_conventions.md` als §6 ergänzt — **nach** dieser
+Session (kein Hard-Rule-Scope-Creep hier, die Konvention wird vom Nikinger in einer eigenen
+Session freigegeben oder verworfen).
+
+**Self-Check §0.5:** `pytest -q` **970 passed in 103,90 s** (V107-Baseline 969 + 1 Flake;
+dieser Lauf hat den Flake nicht gezogen — der `authctl revoke --family-id`-Test hängt am
+Zufallswert von `secrets.token_urlsafe`), kein Produkt-Code-Touch, Tabu-Diff §0.3 trivial
+leer, `ui_budget.py` 5/5 (unverändert), kein `pkill -f`, kein `systemctl`. Wegwerf-Instanz
+nach Messung sauber per PID-Datei gestoppt (PID 162337), Worktree `git worktree remove
+--force`, venv-Symlink entfernt. sharefyx-mcp **PID 991** nur gelesen. **Kein Service-Touch.**
+
+**Artefakte:** 6 neue Screenshots `docs/screenshots/p86_probe_v3.0.1{,-clean}_{1024,1200,1440}.png`,
+2 neue Probe-JSONs `phase8_6_ui_polish/probes/e2b_v3.0.1{,_clean}.json` (~65 KB je),
+Worktree-Verzeichnis nach Messung abgebaut. Keine `.md`- oder `.py`-Datei neu (Skript- und
+Daten-Only-Session).
+
+**Naechster Schritt:** **Block F (Layering, Befunde 1+8)** — ist von der Produktion
+komplett unabhängig (reine Token-Arbeit in `phase5_ui/webui/static/app.css`, +2 statische
+Tests), kann ohne zu warten starten. Reihenfolge-Empfehlung (P8.6-AH) bleibt E → F → G
+→ H → J → Gate, jetzt aber mit E abgeschlossen.
+
+---
 
 ## Session stopped — 2026-09-14 (opencode/M3 — **Block E erledigt: E2a**, E2b wartet auf Nikinger)
 

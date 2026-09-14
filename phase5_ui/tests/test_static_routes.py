@@ -608,3 +608,100 @@ def test_overview_graph_has_no_max_width_or_min_height():
             f"`.overview__graph` darf kein `min-height` mehr tragen (P8.6 C3, V112-Gegenprobe). "
             f"Block: {body.strip()}"
         )
+
+
+def test_no_raw_surface_hex_outside_root():
+    """P8.6-AD (Plan §8.2): Wächter über die drei rohen Flächen-Hex `#0E1116`, `#131A23`,
+    `#1A2029`, die vor Block F als `.rail`-, Login- und `.auth-card`-Verlauf in `app.css`
+    standen.
+
+    Jede `background`-Deklaration außerhalb `:root` muss entweder `var(--…)` führen oder
+    eine **dokumentierte Ausnahme** sein. Ausnahmen (vom Plan erlaubt):
+
+      - `#fff` in `.qr-frame` (P8.6-AD wörtlich — QR-Code braucht echtes Weiß, keine
+        Flächen-Semantik). Diese Stelle trägt einen begründenden Kommentar.
+      - Die neun Hex-Werte der Space-Kategorien-Glyphen
+        (`.rail__glyph--own/--shared/--foreign`, app.css Zeilen 499/504/509) — das sind
+        Kategoriefarben, vom Plan §3.3 explizit ausgenommen („keine Grautöne, bleiben").
+
+    Vor Block F waren es 17 rohe Hex-Treffer außerhalb `:root` (drei davon die hier
+    zu schließenden Flächen-Hex); nach Block F sind es 11 Treffer, alle entweder
+    dokumentierte Ausnahme (`#fff` QR) oder Space-Kategorie.
+
+    Wer nach Block F wieder einen rohen Flächen-Hex irgendwo außerhalb des
+    `:root`-Blocks einfügt, fängt diesen Test. Ein Kommentar in `:root`, der das
+    Pattern erklärt, ist erlaubt -- die Assertion matcht nur Hex außerhalb `:root`,
+    nicht den Token-Literal-String.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    # :root-Block abschneiden -- dort darf das Pattern stehen (Token-Definitionen +
+    # Kommentar).
+    stripped = re.sub(r":root\s*\{[^}]*\}", "", css, flags=re.DOTALL)
+
+    # Ausnahmen: dokumentiert + explizit erlaubt.
+    EXEMPT_HEX = {
+        "#FFF",  # QR-Code-Hintergrund in .qr-frame (P8.6-AD)
+        # Space-Kategorien-Glyphen (P8.6 §3.3 explizit ausgenommen):
+        "#5DA8F7", "#3A7DCB", "#1F4F8F",   # own-Verlauf + Border
+        "#48C9B6", "#259C8C", "#156959",   # shared-Verlauf + Border
+        "#9CA3B0", "#6F7686", "#3F4452",   # foreign-Verlauf + Border
+    }
+
+    # Nur `background:`- und `linear-gradient(...)`/`radial-gradient(...)`-Zeilen sind
+    # „Flächen"; `color:`/`border:`/Outline/Box-Shadow sind keine. Wir picken die
+    # `background`-Eigenschaft und alle gradient-funktionen, wo auch immer sie stehen.
+    found: list[tuple[int, str, str]] = []
+    for ln, line in enumerate(stripped.splitlines(), 1):
+        # Nur Linien, die nach `background:` greifen ODER eine gradient()-Funktion
+        # enthalten (Verläufe können auch auf anderen Properties liegen, z. B.
+        # `background-image`).
+        if "background" not in line and "gradient(" not in line:
+            continue
+        for m in re.finditer(r"#[0-9A-Fa-f]{3,8}\b", line):
+            hexv = m.group(0).upper()
+            if hexv in EXEMPT_HEX:
+                continue
+            found.append((ln, hexv, line.strip()))
+
+    assert not found, (
+        f"Roher Flächen-Hex außerhalb von :root gefunden: {len(found)} Vorkommen. "
+        f"P8.6-AD verlangt für alle nicht-dokumentierten Stellen einen Token. "
+        f"Erste Treffer:\n" + "\n".join(f"  app.css:{ln}  {hexv}  {ctx}"
+                                        for ln, hexv, ctx in found[:5])
+    )
+
+
+def test_meta_panel_is_not_tinted_with_the_warning_colour():
+    """P8.6-AB (Plan §8.2, F1): Wächter über die Beobachtung, dass das Meta-Panel vor
+    Block F mit `rgba(229,169,60,.22)` getönt war -- denselben Kanälen wie `--warn:
+    #E5A93C` bei 22 % Deckkraft (Befund 8). Die Information „Kopfdaten" wurde mit
+    der Bedeutung „Warnung" verwechselt.
+
+    Der Test prüft **gezielt** die `--panel-meta*`-Tokens: keiner von ihnen darf
+    die Warn-Kanäle (229,169,60) enthalten. Andere Stellen, die mit `var(--warn)`
+    ein warn-getöntes Element bauen (z. B. die `.list__readonly`/
+    `.detail__badge-readonly`-Chips mit `rgba(229,169,60,.10)`), bleiben erlaubt
+    -- sie sind genau dann legitim, wenn sie `var(--warn)` referenzieren.
+
+    Vor Block F: `--panel-meta-line: rgba(229,169,60,.22)` -- illegitime Verwendung.
+    Nach Block F: `--panel-meta-line: var(--line)` -- Standard-Haarlinie, Layer-Höhe
+    trägt die Unterscheidung statt Farbton.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    # Finde die drei Meta-Tokens und prüfe jeden einzeln.
+    meta_tokens = ("--panel-meta", "--panel-meta-head", "--panel-meta-line")
+    bad: list[str] = []
+    for name in meta_tokens:
+        m = re.search(rf"{re.escape(name)}\s*:\s*([^;]+);", css)
+        assert m, f"{name} sollte in :root definiert sein"
+        value = m.group(1).strip()
+        if "229,169,60" in value or "229 ,169 ,60" in value:
+            bad.append(f"{name}: {value}")
+
+    assert not bad, (
+        f"Meta-Panel-Token(s) verwenden die --warn-Kanäle (229,169,60) -- "
+        f"Befund 8 ist zurück. P8.6-AB: Kopfdaten-Trennung läuft über Layer-Höhe, "
+        f"nicht Farbton. Betroffen: {bad}"
+    )
