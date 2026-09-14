@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
+updated: 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -24,6 +24,84 @@ das Skript auf das Phase-8.5-Muster passt und mit einem `## Session stopped` + m
 
 
 
+
+## Session stopped — 2026-09-13 (Claude-Code-Planungssession — **Plan 2 geschrieben**, sechs Nikinger-Entscheidungen, ein neuer Produktionsfehler gefunden)
+
+**Reine Planungssession, kein Produktcode-Touch.** Ergebnis: `docs/concepts/phase8_6_ui_polish_plan2.md`
+(~69 KB, 📕-Snapshot gegen `main`@`26a7cc9`) — ausführungsreifer Plan für alle neun UX-Befunde,
+mit Blöcken **E/F/G/H/J**, Locks **P8.6-W–P8.6-AL**, Abnahme **P8.6-33–P8.6-54**,
+`[VERIFY]` **V123–V139**.
+
+**Sechs Nikinger-Entscheidungen (N.7–N.12), alle in Plan 2 §0.1 datiert:**
+**(N.7)** `.shell` wird **`240px 480px 1fr`** — die bewusste, vorgelegte und entschiedene
+Auslösung von **P8.6-O2**; Begründung ist eine Messung (Space-Zeilen brauchen ~433 px, 380
+reichen nicht). **(N.8)** Editor **ersetzt** die Karte, **ESC bringt sie zurück** — gilt auch
+für den Klick auf einen Karten-Knoten; ist damit Abnahmekriterium P8.6-36. **(N.9)** Befund 7b
+kehrt **C1 / N3-Lesart b** um: Einstellungen und Abmelden wieder unten, **Abmelden bleibt der
+äußerste Knopf**. **(N.10)** Layering per **Tiefe statt Farbe** — der warme Stich der
+Kopfdaten fällt weg. **(N.11)** Plan 2 ist ein **eigenes Dokument**; Plan 1 bleibt als 📕
+unangetastet, der kanonische Closeout wandert nach Plan 2 §9 (**P8.6-W**). **(N.12)** Der
+`pytest`-Flake wird **beidseitig** gefixt — Test *und* Produktionscode.
+
+**Fünf der neun Befunde haben in dieser Session eine gemessene Ursache bekommen, statt einer
+Vermutung:**
+
+| Befund | Gemessene Ursache |
+|---|---|
+| **8** (YAML-Header „sieht wie Warnung aus") | `--panel-meta-line: rgba(229,169,60,.22)` **ist** `--warn: #E5A93C` bei 22 % — byte-genau dieselben Kanäle. Keine Wahrnehmungsfrage, eine Tokenfrage |
+| **1** (verschiedene Grautöne) | **10 Flächen-Token in `:root` + 4 rohe Hex außerhalb**: `#0E1116` (`app.css:362`), `#131A23` (`:1776`), `#1A2029` (`:1782`), `#fff` (`:1829`, QR — bleibt). Die drei Verläufe bei `:487/492/497` sind Kategoriefarben, keine Grautöne |
+| **2** (Konto-Dialog-Knöpfe „fehlen") | **Messfrage geschlossen: sie fehlen nicht.** `app.html:484-485` rendert beide, sichtbar in `p86_block_b_04_account_dialog.png` bei y≈306/358. `app.css:619-633` gibt ihnen `background: none; border: none` — sie lesen sich als Fließtext |
+| **4** (Karte zu klein) | `1fr 40%` = 40 % des **Detail-Slots**, nicht der Seite: 756 px × 40 % = **302 px** bei 1440 px = 21 % der Seite. Vorhersage und Messung stimmen aufs Pixel. P8.6-K zitierte §1 mit „ca. 40 % der gesamten Seite" — das war nie erfüllt |
+| **6** (Hover verrutscht) | **Lock-Abweichung, keine CSS-Wanze.** P8.6-P sagt „die Zeile als Ganzes klickbar"; C4 baute einen **inneren** Button. Der Hover-Fill endet in `p86_block_c_02` bei x=845, die Zeile reicht bis x=1083 |
+
+**Befund 9 zerfällt in zwei Befunde** (Plan 2 §2.1): **9a** läuft live auf `v3.0.1`, wo Block C
+gar nicht existiert — Ursache **unbekannt**, wird in Block E gemessen. **9b** ist von Block C
+eingeführt (`overflow: hidden` + `flex: 1` schlägt `height: auto` in der 1280-px-Query ⇒ kein
+Scroll-Container). **Die Falle, die Block E vermeidet:** 9b reparieren und „behoben" melden,
+während 9a live stehen bleibt.
+
+**Neuer Produktionsfehler, beim Messen der Baseline gefunden:** `pytest` ergab **969 passed +
+1 failed**, nicht die dokumentierten 970. `phase4_auth/tests/test_authctl.py::test_revoke_kills_the_family`
+scheitert an `argument --family-id: expected one argument`. Isoliert grün, das ganze
+`phase4_auth/tests/` grün (261 passed) — **keine Reihenfolgenabhängigkeit**. Ursache:
+`family_id = secrets.token_urlsafe(16)` (`store.py:393`) beginnt in **1,569 %** der Fälle
+(200.000 Ziehungen gemessen) mit `-`, dann hält `argparse` den Wert für eine Option. Das
+trifft nicht nur den Test, sondern **`authctl revoke --family-id <id>` für einen echten
+Operator bei jeder 64. Familie**. Behandlung: Block J, beide Hälften, auf ausdrückliche
+Anordnung (N.12) — und damit die erste **datierte Tabu-Ausnahme** der Phase (**P8.6-AJ**,
+`phase4_auth/authserver/crypto.py` + zwei Zeilen `store.py`). **`phase1_storage/storage/**`
+bleibt zu — keine neunte P1-Contract-Öffnung.**
+
+**Ein weiterer Befund aus der Planung, der eine offene Frage schließt:** `#home-button` ruft
+heute **`navigateAll()`** (`app.js:99-105`) — „Übersicht" und „Alle Items" sind **dieselbe
+Aktion**. **V110** („ist der bestehende Mechanismus der Kippschalter?") ist damit als
+*negativer* Befund beantwortet: es gibt keinen Zwei-Zustands-Schalter, es gibt zwei Knöpfe
+für **einen** Zustand. Block G trennt sie (Plan 2 §4.3).
+
+**Doku-Hygiene (Step 0' der Planungssession):** repo-weiter Scan über 109 `.md` — **0**
+unauflösbare `up:`/`down:`-Links, **0** echte fehlende L1-Cards, **0** echte fehlende
+INDEX-Zeilen (alle Treffer sind die vier dokumentierten Ausnahmen plus Test-Fixtures).
+**„Nichts zu tun" war hier das Ergebnis** — mit einer Ausnahme: `docs/INDEX.md` stand bei
+**38.815 B** gegen ein Kriterium von ≤ 38.912 B, also **97 B Luft**, und Plan 2 fügt eine
+Zeile von 1,2 KB hinzu. Sieben Zeilen geschlossener Phasen gestrafft (**−1.549 B**), Plan-2-
+Zeile + Abschnitts-Überschrift + `updated:` (**+1.205 B**) ⇒ **38.471 B, 441 B Luft**. Die
+`updated:`-Kette war hier **nicht** die Quelle (nur 554 B) — anders als in der
+Wurzel-`CLAUDE.md`, wo am 2026-09-13 69 % der Dateigröße darin steckten. Gemessen, nicht
+angenommen.
+
+**Anker-Drift belegt** (Plan 2 §1.5): P8.6-O2 nennt das `.shell`-Grid bei `app.css:327-332`,
+real steht es bei **`345-350`**; `.overview__graph` ist von `915` auf **`1074`** gewandert;
+`renderRail()` von `tree.js:242` auf **`297`**. V106 ist verbraucht, **V123** gegen
+`26a7cc9` ist der neue Sammelmarker. Die drei Commits zwischen `bc2aa9f` und `26a7cc9` sind
+reine Doku-Commits — `git diff --stat bc2aa9f..26a7cc9 -- phase5_ui/webui/static` ist leer.
+
+**`ui_budget.py` 5/5** im Korridor (137,5 KB von 250 KB; `app.css` 21,1 KB gzip).
+`GET /api/v1/overview` **372,9 ms** — bestätigt **V108** ein zweites Mal: die 863 ms vom
+Phasenstart waren Last auf dem alten Mini-PC, keine Regression.
+
+**Tabu-Diff §0.3 trivial leer** (kein Code-Touch). **Service-Touch 0** — `sharefyx-mcp`
+wurde in dieser Session nicht angefasst, nur der `pytest`-Lauf mit gestrippten
+`SHAREFYX_*`/`SFX_*`-Variablen gefahren (keine waren gesetzt). Kein `pkill`, kein `systemctl`.
 
 ## Session stopped — 2026-09-12 (Block-C-Sichtung Nikinger — 6 UX-Befund-Kategorien, Partial Closeout vorgeschlagen, kein Deploy, **Plan 2 für P8.6 erforderlich**)
 
