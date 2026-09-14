@@ -470,6 +470,28 @@ die Current-state-Sektion der Wurzel-`CLAUDE.md` ist **verworfen**; stattdessen 
     Nicht-P8.6, vermutlich P9+ oder eigene Mini-Phase. Niedrigschwellig
     technisch, aber tabu-berührt.
 
+- **Sichtprüfungs-Realität vs. Chat-Beschreibung — Diskrepanz am 2026-09-14 dokumentiert
+  (Nachtrag im Block-G-R-Session-Block).** Nikinger: „die Realität ist recht weit weg
+  von dem was du hier beschreibst". Konkret: meine Checkkriterien-Texte im Chat zu den
+  sechs G-R-Screenshots waren **zu optimistisch** — der schwarze Ring rund um die Karte
+  ist tatsächlich weg (Block G-R.2 hat geliefert), aber „drei Töne sind jetzt einer" und
+  „YAML-Kopfzeile bündig zur Item-Zeile" waren **geglättete M3-Eigenbeschreibungen**, nicht
+  Pixel-Realität. Mindestens drei unterscheidbare Töne bleiben sichtbar (Nikinger:
+  „Farbe hinter der Map und der Space/item Übersicht ist unterschiedlich"); die YAML-
+  Kopfzeile ist heute bündig zur Item-Reihe, aber **nicht** zur Suchzeile (Nikinger will
+  beide Header auf Suchzeilen-Höhe). Drei weitere Sichtungs-Punkte (1024-er Map-Overlap,
+  1024-er Editor-Modus, genereller Bedarf nach echter Pixel-Verifikation) sind im Block-G-R-
+  Session-Block festgehalten. **Zwei Optionen, beide nur als Vormerkung, keine Entscheidung
+  jetzt:** (A) Rückkehr zum manuellen MCP-Vision-Adapter mit lokalem Ollama (qwen3-vl:8b,
+  Cold-Start 46–130 s — Batch-Aufruf für mehrere Bilder in einem Prompt reduziert das auf
+  einmal Cold-Start; das Plugin drum herum war zurückgebaut worden, weil es M3s nativen
+  Bildpfad zerstörte — der Adapter selbst bleibt korrekt und liefert echte, kalibrierte
+  Bildbeschreibungen statt geglätteter M3-Eigenbeschreibungen). (B) API-Minimax-m3 als
+  getrennte Phase für Sichtprüfung (zwei Modell-Instanzen, ein Prompt-Stereo; substantielle
+  Architektur-Änderung, gehört in eine eigene Folge-Phase P9 oder eine neue Phase, nicht
+  in P8.6). **Beide Optionen sind explizit kein P8.6-Auftrag** — sie sind Backlog für die
+  nächste Phase-Planungssession.
+
 ## Nächste Session
 
 **Stand 2026-09-13 (Plan 2 geschrieben).** Block A/B/C/D sind gebaut und getestet, **aber
@@ -643,3 +665,92 @@ Umkehr von C1/N3-Lesart b, N.9). `.account-nav` bekommt eine Navigations-Anmutun
 eine Selbsttäuschung der CSS-Form, nicht eine Knopf-Lücke — die Knöpfe fehlten nie, sie sahen
 nur nach Fließtext aus). `test_rail_order_settings_and_logout_at_the_end` wird umbenannt und
 umgekehrt.
+
+**Nachtrag, 2026-09-14, Nikinger-Sichtung der sechs Screenshots nach Commit `6a43edf` — nicht
+behoben, nur notiert (G-R bleibt trotzdem ✅, das visuelle Ergebnis ist noch im Korridor
+dessen, was G-R versprochen hat; die folgenden Punkte sind das, was die Nikinger-Sichtung
+**darüber hinaus** als nächste Politur-Schicht markiert — sie gehen in den Block H/J/Gate-
+Backlog, nicht in G-R zurück):**
+
+- **`p86_block_g_r_01_1440_uebersicht.png` (1440 Übersicht, Layer-Tone-Vereinheitlichung):**
+  der schwarze Ring rund um die Karte ist **bestätigt weg**. Aber **es bleiben mindestens drei
+  unterscheidbare Töne** im Hauptbereich — Nikinger: „die Farbe hinter der Map und die der
+  Space/item Übersicht ist unterschiedlich". Mein Beschreibung im Chat („drei sichtbare Töne
+  sind jetzt einer") war **zu optimistisch** — `.detail { background: var(--bg) }` vereinheit-
+  licht die Spalte zur Liste, aber der `--surface`-Innenraum der Karte bleibt ein **vierter** Ton,
+  und die `.list__head`-Glasfläche oben ist ein **fünfter**. **Bit-by-bit-Farbvergleich steht
+  aus** — vermutlich Folge: alle `.detail__*`-Flächen auf einen einzigen Ton (entweder
+  `--bg` durchgängig ODER `--surface` durchgängig), nicht die heutige Mischung. Vormerkung
+  für eine eigene Sub-Iteration, vermutlich G-R+1 oder eigener Block.
+
+- **`p86_block_g_r_02_1440_editor_offen.png` (1440 Editor offen):** die YAML-Kopfzeile
+  sitzt heute **nicht** auf gleicher Höhe wie die `.list__head` (Suchzeile + Crumb + Chips) —
+  Nikinger: „die Titelzeile + YAML header Zeile ist genauso groß wie die alpha → Offen
+  Suchzeile. Text Kopfzeile ist so groß und damit bündig wie ein Item aus der Liste daneben".
+  Mein Chat-Claim „Kopfdaten YAML-Frontmatter beginnt auf gleicher Höhe wie die erste Item-
+  Zeile" traf die halbe Wahrheit — **gleiche Höhe wie die Items ja**, **gleiche Höhe wie die
+  Suchzeile nein** (die Items beginnen erst NACH der Suchzeile). Konsequenz: `.editor__head`
+  muss so hoch werden wie `.list__head` (Suchzeile + Crumb), nicht wie eine Item-Zeile — die
+  YAML-Leiste rutscht dadurch weiter nach unten, aber sie kommt **bündig** zur Item-Reihe
+  (weil die Items selbst auch erst unter der Suchzeile beginnen). Das ist **mehr** als Block
+  G-R.3 gemacht hat — G-R.3 hat nur das padding-top von 12 auf 4 px reduziert und sticky
+  hinzugefügt. Die volle Höhe von `.list__head` (mit Crumb + Chips) ist höher als die
+  heutige Editor-Header-Höhe. **Backlog** für eine eigene Iteration — vermutlich G-R.3+1
+  oder als Teil des Block-H-Editors.
+
+- **`p86_block_g_r_05_1024_uebersicht.png` (1024 Übersicht, Stack):** die Karte ist zurück,
+  **aber sie überlappt** — Nikinger: „sie überlappt, sieht also nicht nach Absicht aus". Mein
+  Stack-Setup (zwei 1fr-Zeilen, `.rail { grid-row: 1 / span 2 }`, `.detail { grid-column: 2;
+  grid-row: 2 }`) bringt Liste und Karte in dieselbe Höhe geteilt — wenn die Karte mehr
+  Mindestinhalt hat als die Liste ihr zugesteht, **schießt sie über die Zeile hinaus** und
+  überlappt die Liste oder den Viewport-Rand. Wahrscheinliche Fix-Linie: `min-height: 0`
+  auf `.detail` plus ein Container-Inner mit `overflow: auto`, ODER Stapel nur in
+  „Übersicht ohne Item offen" und beim ersten Klick auf ein Item den Editor statt der Karte
+  einblenden. **Backlog** — vermutlich Teil von G-R+1 oder Block H.
+
+- **`p86_block_g_r_06_1024_editor_offen.png` (1024 Editor offen, Stack-Modus):** Nikinger-
+  Vorschlag: „der Editor ersetzt die **Liste**, und mit ESC kommt man auf die Liste zurück".
+  Heute ersetzt der Editor im 1024-er Modus die **Karte** (unten im Stapel), die Liste
+  bleibt oben sichtbar — Nikinger sieht das als unsauber an. Variante: bei 1024 px ersetzt
+  der Editor die **Liste** statt der Karte (Stack-Slot oben), die Karte rutscht darunter
+  ODER verschwindet ganz. ESC bringt die Liste zurück (und damit die Karte an ihren
+  ursprünglichen Slot). **Backlog** — vermutlich Teil von G-R+1 oder Block H.
+
+**Nikinger-Realitäts-Check (2026-09-14, ehrlich, in den Chat zurückgegeben — keine
+Schuldzuweisung, eine Selbstaussage über die Diskrepanz):** „die Realität ist recht weit
+weg von dem was du hier beschreibst". Konkret: meine Checkkriterien-Texte im Chat waren
+zu optimistisch („drei Töne sind jetzt einer", „gleiche Höhe wie die Item-Zeile",
+„kein schwarzer Ring") — der schwarze Ring stimmt, die anderen beiden Vereinfachungen
+nicht. Die Screenshots sind im Repo, M3 kann sie über das `read`-Tool sehen, das hat
+auch funktioniert (siehe oben in der Sichtungs-Sektion — die Sätze sind *formal*
+korrekt, aber sie schreiben eine **geglättete** Realität, nicht die Pixel-Realität).
+**Zwei Optionen für die nächste Phase, beide notiert, keine Entscheidung jetzt:**
+
+- **Option A: Rückkehr zum manuellen MCP-Vision-Adapter mit lokalem Ollama.** Das ist
+  `phase8_6_ui_polish/scripts/mcp_local_vision_server.py` (raw JSON-RPC stdio, `requests.
+  post(127.0.0.1:11434/api/generate)`, qwen3-vl:8b-Default, 600 s Cold-Start-Timeout) aus
+  Step V-vision-befund. Das Plugin drum herum (`DavidEasden/opencode-vision`) war
+  zurückgebaut worden, weil es M3s nativen Bildpfad zerstört hat (`removeProcessedImageParts()`
+  bei `models: ["*"]` amputierte auch das Modell, das die Krücke nicht braucht). **Aber
+  der Adapter selbst bleibt korrekt** und liefert **echte, kalibrierte Bildbeschreibungen
+  statt geglätteter M3-Eigenbeschreibungen**. Vorschlag für die nächste Phase: Adapter
+  *ohne* Plugin direkt aus M3 heraus über einen Tool-Call ansprechen (z. B. ein
+  dedizierter `Bash`-Aufruf auf das Skript, oder ein lokaler Subprozess-Spawner in
+  `phase8_6_ui_polish/scripts/`) — der Vorteil: das Bild wird von qwen3-vl beschrieben,
+  M3 bekommt nur den Text und muss die Realität nicht selbst rauslesen. **Konkret
+  prüfbedürftig in der nächsten Phase:** der Cold-Start (46 s auf i5-14600KF ohne GPU
+  für V119-Smoke, 80–130 s im Worst Case) ist für „ein Bild pro Session" tragbar, aber
+  für „sechs Bilder pro Session" unbequem — Batch-Aufruf (qwen3-vl kann mehrere Bilder
+  in einem Prompt verarbeiten) reduziert das auf einmal Cold-Start.
+
+- **Option B: API-Minimax-m3 als getrennte Phase für Sichtprüfung.** Die Idee: ein
+  zweiter M3-Lauf (oder ein Claude-Code-Lauf mit M3-Modell darüber) bekommt die
+  Screenshots als Input und schreibt die **Checkkriterien** — diese landen dann in
+  M3s Chat als zu validierende Aussagen, und die Sichtprüfung wird *vom Modell gegen
+  das Modell* gemacht. Das ist eine substantielle Architektur-Änderung (zwei
+  Modell-Instanzen, ein Prompt-Stereo), gehört in eine **eigene Folge-Phase** (P9 oder
+  eine neue Phase), nicht in P8.6.
+
+**Beide Optionen nur als Vormerkung** — keine Entscheidung in dieser Session, kein Code-
+Touch. Der Session-Block endet hier mit dem Commit, Push + Quick-Note schließen die
+Session ab.
