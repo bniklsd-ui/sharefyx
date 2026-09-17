@@ -60,7 +60,13 @@ export function renderFolders(space) {
     button.type = "button";
     button.dataset.space = space.name;
     button.dataset.bucket = bucket;
-    if (space.name === state.activeSpace && bucket === state.filter) {
+    // P8.6-H-R-3-Nachtrag (Nikinger-Fund 2026-09-17): Übersicht und ein Space/Eimer sind
+    // unterschiedliche Aktionen -- `!state.overview` verhindert, dass ein Eimer aus einer
+    // vorigen Space-Navigation als "aktuell" stehen bleibt, waehrend die Übersicht gezeigt
+    // wird (`state.activeSpace`/`state.filter` werden beim Wechsel in die Übersicht bewusst
+    // NICHT geleert, siehe app.js homeButtonEl-Handler -- der Rückweg in den Space soll die
+    // Filterung wiederfinden).
+    if (!state.overview && space.name === state.activeSpace && bucket === state.filter) {
       button.setAttribute("aria-current", "true");
     }
     button.appendChild(el("span", "rail__label", BUCKET_LABELS[bucket] || bucket));
@@ -173,7 +179,9 @@ function folderButton(space, node, isChild) {
   button.type = "button";
   button.dataset.space = space.name;
   button.dataset.folder = node.path;
-  if (space.name === state.activeSpace && state.folder === node.path) {
+  // P8.6-H-R-3-Nachtrag: gleiche Begründung wie bei renderFolders() oben -- ein Ordner
+  // bleibt sonst als "aktuell" markiert, waehrend die Übersicht gezeigt wird.
+  if (!state.overview && space.name === state.activeSpace && state.folder === node.path) {
     button.setAttribute("aria-current", "true");
   }
   button.appendChild(el("span", "rail__label", node.name));
@@ -323,7 +331,13 @@ export function renderRail() {
     foreign.forEach(renderSpaceNode);
   }
   renderScopeRow();
-  homeButtonEl.setAttribute("aria-current", state.selectedId === null ? "true" : "false");
+  // P8.6-H-R-3-Nachtrag (Nikinger-Fund 2026-09-17): `selectedId === null` markierte
+  // Home/Übersicht auch dann als "aktuell", wenn tatsächlich ein Space/Eimer/Ordner oder
+  // der globale "Alle Items"-Modus ohne ausgewähltes Item angezeigt wurde -- zwei
+  // gleichzeitig "aktuelle" Rail-Einträge für zwei verschiedene Aktionen. `#home-button`
+  // steht seit Block G konkret für die Übersicht (Plan 2 §4.3), also ist deren eigener
+  // Zustandsflag `state.overview` der richtige Schalter, nicht die Item-Auswahl.
+  homeButtonEl.setAttribute("aria-current", state.overview === true ? "true" : "false");
 }
 
 export function init() {

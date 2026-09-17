@@ -6,7 +6,7 @@ detail: L3 (Pointer-Verzeichnis, keine eigene Inhaltsquelle)
 up: ../phase8_6_ui_polish/CLAUDE.md   # aktive Phase
 down:
   - ../docs/screenshots/                # kanonische Ablage; diese Verzeichnis ist nur Symlink-Komfort
-updated: 2026-09-17 (Phase 8.6 Block H-R-3 — vier Symlinks ersetzt: 01 1440-Editor-offen [Listen-Slot weg, H-R.8], 02 1200-Kontrolle [gleiches Verhalten wie 1440, H-R.7 leckt nicht], 03 1024-ohne-Karte [H-R.6, Umkehr von G-R.1], 04 1024-Editor-fullview [H-R.7, Rail+Liste weg]. H-R-Teil-2-Screenshots (Editor-YAML-Bündigkeit, 1024er-Stapel) bleiben über `docs/screenshots/p86_block_h_r_{01..05}_*.png` erreichbar, nicht mehr prominent — der 1024er-Stapel aus H-R-Teil-2 ist durch H-R.6 ersetzt.)
+updated: 2026-09-17 (Phase 8.6 Block H-R-3 Nachtrag — fünfter Symlink `05_uebersicht_exklusiv.png` neu: Rail-Exklusivität Übersicht vs. Space/Eimer, Nikinger-Fund nach Sichtung von 03. Vorheriger Eintrag unverändert: vier Symlinks ersetzt — 01 1440-Editor-offen [H-R.8], 02 1200-Kontrolle [H-R.7 leckt nicht], 03 1024-ohne-Karte [H-R.6], 04 1024-Editor-fullview [H-R.7]. H-R-Teil-2-Screenshots bleiben über `docs/screenshots/p86_block_h_r_{01..05}_*.png` erreichbar, nicht mehr prominent.)
 ---
 # `screenshots_latest/` — Schnellzugriff auf die Screenshots der aktuellen Phase
 
@@ -51,6 +51,7 @@ Ausnahmen, in denen M3 den Dateinamen + Checkkriterium **nicht** nennt:
 | `02_1200_editor_offen.png` | `../docs/screenshots/p86_block_h_r_3_04_1200_editor_open.png` | **Bei 1200 px mit offenem Item: identisches Verhalten wie bei 1440 — Rail bleibt sichtbar, nur die Liste ist weg.** Beweis: H-R.7 (Editor-Fullview) greift NICHT bei 1200 px, nur bei ≤1024 px — Kontroll-Screenshot. |
 | `03_1024_ohne_karte.png` | `../docs/screenshots/p86_block_h_r_3_02_1024_list_only.png` | **Bei 1024 px in der Übersicht: keine Karte/Graph mehr sichtbar — nur Rail + Liste in einer Zeile.** Beweis: Lock H-R.6 (Umkehr von G-R.1), Probe `detail_graph_display=none`. |
 | `04_1024_editor_fullview.png` | `../docs/screenshots/p86_block_h_r_3_03_1024_editor_fullview.png` | **Bei 1024 px mit offenem Item: Rail UND Liste komplett weg, der Editor füllt den vollen Viewport (1024×768).** Beweis: Lock H-R.7, Probe `rail_display=none, list_display=none, grid-template-columns=1024px`. |
+| `05_uebersicht_exklusiv.png` | `../docs/screenshots/p86_block_h_r_3_nachtrag_uebersicht_exklusiv.png` | **In der Übersicht ist nur „Übersicht" markiert (blaue Hervorhebung) — ein zuvor besuchter Eimer („Offen") trägt keine Markierung mehr.** Beweis: Nachtrag-Fix in `tree.js` (`!state.overview`-Guard + `homeButtonEl` auf `state.overview` statt `selectedId`), Probe zeigt `home=true, offen=null` nach dem Wechsel in die Übersicht. |
 
 Hinweis: dies sind die H-R-3-Screenshots (drei Locks H-R.6/H-R.7/H-R.8, ein Commit). Die H-R-Teil-1+2-Screenshots (`p86_block_h_r_{01..05}_*.png`, Editor-YAML-Bündigkeit + der jetzt ersetzte 1024er-Stapel) bleiben über `docs/screenshots/` für die Historie erreichbar, sind aber nicht mehr prominent — der 1024er-Stapel aus Teil 2 existiert nach H-R.6 nicht mehr. Block G-R-Screenshots (`p86_block_g_r_{01..06}_*.png`) und Block-H-Screenshots (`p86_block_h_{01..03}_*.png`) bleiben in `docs/screenshots/` für die Historie unverändert.
 

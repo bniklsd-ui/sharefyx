@@ -666,3 +666,40 @@ das neue Skript nachgezogen, `screenshots_latest/README.md` im selben Commit.
 **Nächster Schritt:** Block J (`pytest`-Flake, P8.6-AJ, datierte Tabu-Ausnahme
 `phase4_auth/authserver/{crypto.py,store.py}`) — Reihenfolge P8.6-AH jetzt: G ✅ → G-R ✅ →
 H ✅ → H-R-Teil-1+2 ✅ → **H-R-3 ✅** → **J ⬜** → **Gate ⬜** → **Z ⬜** (Closeout).
+
+**Nachtrag, 2026-09-17 — Rail-Exklusivität Übersicht vs. Space/Eimer/Ordner (Nikinger-Fund
+aus dem `03_1024_ohne_karte.png`-Screenshot):** Nikinger-Feedback nach Sichtung der vier
+H-R-3-Screenshots: „wenn ich 'Übersicht' auswähle, sollte das jede andere Auswahl (wie
+alpha→Offen) ausschließen, da das unterschiedliche Aktionen sind." Beleg: `state.activeSpace`/
+`state.filter`/`state.folder` werden beim Wechsel in die Übersicht (`state.overview = true`,
+`app.js` homeButtonEl-Handler) **bewusst nicht** geleert — der Rückweg in den zuvor besuchten
+Space soll die Filterung wiederfinden (siehe Kommentar `list.js :: clearDetail()`). `tree.js`s
+Highlight-Logik (`renderFolders()` Zeile 63, `folderButton()` Zeile 182, `homeButtonEl.setAttribute`
+Zeile 334) prüfte das aber nie gegen `state.overview` — ein zuvor markierter Eimer/Ordner blieb
+`aria-current="true"`, während gleichzeitig die Übersicht angezeigt wurde. Zusätzlich war
+`#home-button`s eigene Logik zu grob: `state.selectedId === null` markierte Home auch dann als
+aktuell, wenn tatsächlich ein Space/Eimer/Ordner **oder** der globale „Alle Items"-Modus ohne
+ausgewähltes Item gezeigt wurde — dieselbe Doppel-Markierungs-Klasse in zwei weiteren
+Kombinationen, nicht nur der vom Nikinger gemeldeten.
+
+**Fix (`phase5_ui/webui/static/js/tree.js`, kein CSS-/HTML-Touch):** drei Stellen ergänzt um
+die fehlende Übersicht-Exklusivität — `renderFolders()`- und `folderButton()`-Bedingungen
+bekommen `!state.overview` als zusätzliche Voraussetzung für `aria-current="true"`;
+`homeButtonEl`s Bedingung wechselt von `state.selectedId === null` auf `state.overview === true`
+(Home steht seit Block G konkret für die Übersicht, Plan 2 §4.3 — der eigene Zustandsflag ist
+der richtige Schalter, nicht die Item-Auswahl). `isGlobalScope()`/„Alle Items" brauchte keine
+Änderung — `state.scope === "all"` und `state.overview === true` schließen sich durch die
+bestehenden Setter (`navigateAll()`, homeButtonEl-Handler) bereits strukturell aus.
+
+**Verifikation:** eigenes Skript `phase8_6_ui_polish/scripts/p86_block_h_r_3_nachtrag_self_check.py`
+gegen die Wegwerf-Instanz v3ritt (Port 18773, PID-Datei-gestoppt) — navigiert nach
+`alpha → Offen` (`aria-current`: home=false, Offen=true), dann zurück in die Übersicht
+(`aria-current`: home=true, Offen=null, Alle-Items=null) — **exklusiv, wie gefordert**.
+Screenshot `docs/screenshots/p86_block_h_r_3_nachtrag_uebersicht_exklusiv.png` zeigt nur noch
+„Übersicht" markiert, „Offen" ohne Hervorhebung, „alpha" bleibt aufgeklappt (das ist reiner
+Expand-Zustand, keine Aktuell-Markierung, unverändert).
+
+**Selbstprüfung:** `pytest -q` **992 passed** (unverändert, keine pytest-Berührung — JS bleibt
+laut P5-T unit-ungetestet), `node --check` auf `tree.js` ✅, `ui_budget` 5/5 (144,7 KB, +0,5 KB
+Kommentare), Tabu-Diff §0.3 leer, sharefyx-mcp PID 991 nur gelesen. Zweiter Commit dieser
+Session (der erste war der H-R-3-Bau oben) — eigener Fund nach Sichtung, kein Amend.
