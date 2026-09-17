@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-14 (**Block H-R Teil 2 erledigt ✅ — H-R.3 + H-R.4 + H-R.5** — Head 109.202→99.718 B, Archiv 180.176→189.660 B. Block-H-R-Teil-1-Session-Block 146 Z./9.484 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-R-Teil-2-Session-Block. **Phase 8.6 ist nach H-R-2 bei Block 12 von 13 angekommen** — Editor-YAML-Bündigkeit (CSS-Fix: padding-bottom 12 → 40 px, V142-CDP-Probe 27,14 → 0,86 px) + 1024-er Map-Overlap (kein Fix, V143 misst 0 Rechteck-Schnittmenge) + 1024-er Editor-Modus (kein Fix, V144 misst 16/16 Knöpfe reachable); der nächste Block ist J (der pytest-Flake, P8.6-AJ), dann Gate, dann Z (Closeout)) | 2026-09-14 (**Block H-R Teil 1 erledigt ✅ — H-R.1 + H-R.2** — Head 88.519 B [unverändert nach Rotation], Archiv 151.336→169.569 B. Block-G-R-Session-Block 235 Z./18.073 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-Session-Block. **Phase 8.6 ist nach H bei Block 10 von 13 angekommen — Rail-Umkehr (Befund 7b) + Konto-Dialog-Afford (Befund 2) in einem Schritt behoben, der nächste Block ist J (der pytest-Flake, P8.6-AJ, datierte Tabu-Ausnahme für phase4_auth/authserver/{crypto.py,store.py})**) | 2026-09-14 (**Block G-R erledigt ✅** — Head 82.028→85.760 B, Archiv 138.612→151.336 B. Block-G-Session-Block 159 Z./11.728 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-G-R-Session-Block. **`Phase 8.6` ist nach G-R bei Block 9 von 13 angekommen — Layout/Editor-YAML-Bündigkeit + Layer-Tone-Drift aus der Sichtung behoben, der nächste Block ist H (Rail + Konto-Dialog, Befunde 7b + 2)**) | 2026-09-14 (E2b-Sub-Block [vom 2026-09-14, E2b-Commit `cc3f342`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — sechste Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 5.058 B; Archiv 128.603 → 133.661 B) | 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
+updated: 2026-09-15 (Block H-R-3 Escalation-Report nach Nikinger-Sichtung — Phase-Head 101.669→96.476 B, Archiv 201.928→207.121 B. Watchdog-Vormerkungs-Sub-Block 105 Z./5.193 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-R-3-Escalation-Session-Block. **Rein dokumentarisch — keine Code-Änderung.** Drei Nikinger-Befunde aus Sichtung der fünf H-R-Teil-2-Screenshots (01/02 akzeptiert, 03 Klärungsbedarf, 04 Umkehr von G-R.1, 05 neue Editor-fullview-Variante) → `docs/concepts/phase8_6_ui_polish_block_h_r_3_escalation.md` neu (~9 KB). Mini-Plan-Vorschlag mit drei Locks H-R.6/H-R.7/H-R.8 + Wächter-Liste + zwei Klärungsfragen. Routing-Hinweis: opencode/M3 für Pixel-Befunde ausgeschlossen (V-vision-befund 2026-09-11), diese Runde ist **Claude-Code-Territorium**. Nächster Schritt: Block H-R-3 (Claude Code), dann J, Gate, Z) | 2026-09-15 (Tailscaled-Watchdog-Vormerkung nach heutiger Control-Plane-Outage — Phase-Head 109.087→97.776 B, Archiv 189.880→201.191 B. Block-H-R-Teil-2-Session-Block 191 Z./11.311 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Tailscaled-Watchdog-Session-Block. **Rein dokumentarisch — keine Code-Änderung.** Neue Vormerkung „Tailscaled-Watchdog (Nikinger-Vorgabe 2026-09-15)" in §Vormerkungen mit drei Lösungs-Ansätzen (OnFailure-Hook / Watchdog-Unit mit zyklischer Prüfung / Tailscale-eigenes Feature) für „Control-Plane lange nicht erreichbar"-Fall. Nächster Schritt: Block J (P8.6-AJ, der `pytest`-Flake) unverändert; Watchdog als Mini-Phase nach P8.6 Gate) | 2026-09-14 (**Block H-R Teil 2 erledigt ✅ — H-R.3 + H-R.4 + H-R.5** — Head 109.202→99.718 B, Archiv 180.176→189.660 B. Block-H-R-Teil-1-Session-Block 146 Z./9.484 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-R-Teil-2-Session-Block. **Phase 8.6 ist nach H-R-2 bei Block 12 von 13 angekommen** — Editor-YAML-Bündigkeit (CSS-Fix: padding-bottom 12 → 40 px, V142-CDP-Probe 27,14 → 0,86 px) + 1024-er Map-Overlap (kein Fix, V143 misst 0 Rechteck-Schnittmenge) + 1024-er Editor-Modus (kein Fix, V144 misst 16/16 Knöpfe reachable); der nächste Block ist J (der pytest-Flake, P8.6-AJ), dann Gate, dann Z (Closeout)) | 2026-09-14 (**Block H-R Teil 1 erledigt ✅ — H-R.1 + H-R.2** — Head 88.519 B [unverändert nach Rotation], Archiv 151.336→169.569 B. Block-G-R-Session-Block 235 Z./18.073 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-Session-Block. **Phase 8.6 ist nach H bei Block 10 von 13 angekommen — Rail-Umkehr (Befund 7b) + Konto-Dialog-Afford (Befund 2) in einem Schritt behoben, der nächste Block ist J (der pytest-Flake, P8.6-AJ, datierte Tabu-Ausnahme für phase4_auth/authserver/{crypto.py,store.py})**) | 2026-09-14 (**Block G-R erledigt ✅** — Head 82.028→85.760 B, Archiv 138.612→151.336 B. Block-G-Session-Block 159 Z./11.728 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-G-R-Session-Block. **`Phase 8.6` ist nach G-R bei Block 9 von 13 angekommen — Layout/Editor-YAML-Bündigkeit + Layer-Tone-Drift aus der Sichtung behoben, der nächste Block ist H (Rail + Konto-Dialog, Befunde 7b + 2)**) | 2026-09-14 (E2b-Sub-Block [vom 2026-09-14, E2b-Commit `cc3f342`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — sechste Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 5.058 B; Archiv 128.603 → 133.661 B) | 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -24,6 +24,302 @@ das Skript auf das Phase-8.5-Muster passt und mit einem `## Session stopped` + m
 
 
 
+
+## Session stopped — 2026-09-15 (opencode/M3 — Tailscaled-Control-Plane-Outage heute, Watchdog-Vormerkung + neuer Block-Vorschlag)
+
+**Rein diagnostisch, kein Produktcode-Touch.** Nikinger-Vorgabe nach der
+~4-h-Downphase heute: „teste, ob die restart Logik korrekt funktioniert
+hat, und führe ggf entsprechende befehle aus bzw gebe sie mir". Befund in
+drei Schritten — neue Vormerkung in §Vormerkungen.
+
+### Schritt 1 — Restart-Logik-Verifikation (alle read-only)
+
+`systemctl status sharefyx-mcp` → active (running) seit 5 Tagen, PID 991
+unverändert, 117,8 MB RAM, 1 h 31 min CPU akkumuliert.
+`phase8_5_picker_release/scripts/health_gate.sh --expected-version=v3.0.1
+--expected-sha=6f19a8f` → **8/8 grün** (`result:ok`,
+`Release-SHA 6f19a8fc1f0bcdc2c3bc91fc934a057964647ed4 matched`). Live ist
+weiter v3.0.1 / `6f19a8f` (Korrektur-Stand 2026-09-13 unverändert).
+
+Journalctl-Restart-Historie (`Aug 30 … Sep 10`): sieben systemd-Restarts
+in 17 Tagen, typischer Takt 1–5 Tage. Aktueller PID 991 läuft seit
+2026-09-10 19:37:48 — hat den heutigen Suspend **ohne** systemd-Restart
+überlebt (Kernel freezed Prozess-State, `Active since`-Timestamp
+unverändert). `Restart=on-failure` + `RestartSec=5` +
+`WantedBy=multi-user.target` + `After=network-online.target tailscaled.service`
++ `Wants=network-online.target` in `/etc/systemd/system/sharefyx-mcp.service`
+(Z. 4-7/23-24) — korrekt konfiguriert, kein Drift.
+
+### Schritt 2 — Downtime-Ursache (NICHT Crash, sondern Suspend)
+
+`t tailscaled`-Journal um **21:50:30 CEST**: `time jump detected (slept
+3h59m22s), probably wake from sleep` — VM war **17:51–21:50 CEST**
+suspendiert (~4 h), kein Reboot. `sharefyx-mcp` behielt PID 991;
+`tailscaled` wachte mit `LinkChange: major, rebinding` + `magicsock:
+endpoints changed` auf, DERP-Region 4 wurde neu verbunden — dann klemmte
+die Control-Plane.
+
+Restart-Logik greift hier **nicht**: sie ist für Crashes (Exit-Code ≠ 0),
+nicht für Suspend/Resume. Für Suspend bleibt der Prozess-State erhalten,
+kein systemd-Eingriff nötig.
+
+### Schritt 3 — Tunnel-Befund (`tailscale status` zeigte `offline`)
+
+Während `sharefyx-mcp` weiter lokal 200/401 antwortete (alle 8 Gates grün),
+zeigte `tailscale status` `100.118.131.68 … linux offline` — Control-
+Plane kannte das Node nicht als online. Journal zeigte alle 60 s dasselbe
+Muster ab 21:51:
+
+```
+21:51:30  control: map response long-poll timed out!
+          Received error: PollNetMap: context canceled
+21:52:30  control: lite map update error after 2m0.001s
+          Post "https://controlplane.tailscale.com/machine/map":
+          context canceled
+21:53:30  … dito …
+21:54:30  … dito …
+```
+
+`controlplane.tailscale.com` 5+ min nicht erreichbar (DNS-Resolution,
+CGNAT-Router oder Tailscale-Vorfall — nicht Sharefyx-Befund). Folge:
+andere Tailscale-Clients routeten nicht, Tunnel war effektiv tot —
+**5+ min user-seitige Downtime trotz intaktem sharefyx-mcp**.
+
+### Schritt 4 — Heilung (Nikinger-Aktion, Hard Rule 9)
+
+`sudo systemctl restart tailscaled` durch den Nikinger um ~21:55 CEST —
+danach `Active: active (running) since Tue 2026-09-15 21:57:36 CEST`
+(PID 926 → 263180), `Connected; bniklsd@gmail.com; 100.118.131.68 …
+fd7a:115c:a1e0::8201:83a3`, `post-rebind ping of DERP region 4 okay`,
+`netmap: got new dial plan from control`. Hard-Rule-9-konform **nicht**
+durch opencode/M3 auslösbar (Session-Prompt-Regel: „Tunnel bring-up =
+Nikinger-Aktion").
+
+### Befund: Lücke in der Restart-Logik
+
+`Restart=on-failure` greift für Crashes (Crash heute **nicht** passiert —
+VM-Suspend, kein Service-Failure). **Greift nicht** für den heute
+aufgetretenen Fall „Control-Plane nicht erreichbar + DERP reconnect
+halbfertig + `tailscale status` zeigt offline". Watchdog-Vorschlag in
+§Vormerkungen unter `**Tailscaled-Watchdog (Nikinger-Vorgabe 2026-09-15,
+Vorfall heute)**` mit drei Ansätzen (OnFailure-Hook / Watchdog-Unit mit
+zyklischer Prüfung / Tailscale-eigenes Feature) — **eigene Mini-Phase,
+nicht P8.6**.
+
+### Drei Hard-Rule-Checkpoints am Session-Ende
+
+1. **Hard Rule 1** (keine Secrets): keine Credentials im Repo, keine
+   Schreib-Operationen, nur read-only Diagnose.
+2. **Hard Rule 9** (kein `pkill -f`, kein Service-Touch durch opencode/M3):
+   `systemctl status` und `journalctl` nur lesend, `tailscale status` /
+   `tailscale netcheck` nur lesend, **kein** `systemctl restart/start`,
+   kein `kill`, kein `pkill -f`. Der manuelle `systemctl restart
+   tailscaled` war **Nikinger-Aktion**. sharefyx-mcp PID 991 + tailscaled
+   PID 926 → 263180 (nach Nikinger-Restart) durchgehend nur gelesen.
+3. **Hard Rule 8** (Commit ⇒ Doku-Update): diese Notiz, neue Vormerkung
+   in §Vormerkungen, Rotation per Skript, Frontmatter-`updated:`-Eintrag
+   (Phase-Head + `docs/INDEX.md`) — alles im selben Commit.
+
+### Nächster Schritt
+
+Wie in der H-R-Teil-2-Session-Block vorgemerkt: **Block J** (P8.6-AJ, der
+`pytest`-Flake, datierte Tabu-Ausnahme `phase4_auth/authserver/{crypto.py,store.py}`)
+— Reihenfolge P8.6-AH jetzt: G → G-R ✅ → H ✅ → H-R-1+2 ✅ →
+**Tailscaled-Watchdog ⬜ als Mini-Phase** → **J ⬜** → **Gate ⬜** → **Z ⬜**
+(Closeout).
+
+---
+
+## Session stopped — 2026-09-14 (opencode/M3 — **Block H-R Teil 2 erledigt**: H-R.3 Editor-YAML-Bündigkeit + H-R.4 1024-er Map-Overlap + H-R.5 1024-er Editor-Modus ✅, alle drei in einem atomaren Schritt)
+
+**Atomarer Block, ein Commit.** Nikinger-Vorgabe 2026-09-14 (H-R-Teil-1-Session-Block): „die
+drei Backlog-Punkte (H-R.3 + H-R.4 + H-R.5) als eigener Folge-Block, CDP-Probe-Welle".
+Mess-Vor-Bau-Methodik aus Block E (`p86_viewport_probe.py`) — erst CDP-Probe laufen lassen,
+dann fixen, dann re-proben. Die drei Sub-Blöcke hängen zusammen (alle drei betreffen den
+Editor-Head bzw. die 1024-er-Stapel-Logik aus G-R G-R.1), deshalb **ein** Commit.
+
+### V142 — Editor-YAML-Bündigkeit (H-R.3): REAL PROBLEM, gefixt
+
+**Pre-fix-CDP-Probe** (`phase8_6_ui_polish/probes/v142_v143_v144_pre_fix.json`):
+
+| Breite | `.list__head` bottom | `.editor__head` bottom | diff_bottom_px | tolerance_ok (≤2) |
+|---|---|---|---|---|
+| 1440 | 225,94 | 198,80 | **27,14** | ❌ |
+| 1200 | 225,94 | 198,80 | **27,14** | ❌ |
+
+`.editor__head` padding-bottom = `calc(var(--space) * 1.5)` (12 px) — die Editor-Head-
+Unterkante lag 27,14 px **unter** der .list__head-Unterkante. Block G-R G-R.3 hatte
+padding-top auf 4 px reduziert (YAML rückte um 8 px nach oben), aber den padding-bottom
+unangetastet gelassen — Nikinger-Sichtung vom 2026-09-14 erkannte: „die YAML-Kopfzeile
+muss bündig zur Suchzeilen-Unterkante, nicht zur Item-Zeile".
+
+**Fix** (`phase5_ui/webui/static/app.css:1385`):
+
+```css
+/* Vorher (G-R.3-Stand): */ padding: calc(var(--space) * 0.5) calc(var(--space) * 3) calc(var(--space) * 1.5);
+/* Nachher (H-R.3-Stand): */ padding: calc(var(--space) * 0.5) calc(var(--space) * 3) calc(var(--space) * 5);
+```
+
+padding-bottom 12 → 40 px. padding-top bleibt 4 px (der Titel sitzt weiter oben, die
+YAML-Box beginnt 4 px unter dem oberen Rand — nur padding-bottom muss gross genug sein,
+um die Unterkante auf Listen-Head-Höhe zu bringen).
+
+**Post-fix-CDP-Probe** (`v142_v143_v144_post_fix.json`):
+
+| Breite | `.list__head` bottom | `.editor__head` bottom | diff_bottom_px | tolerance_ok |
+|---|---|---|---|---|
+| 1440 | 225,94 | 226,80 | **0,86** | ✅ |
+| 1200 | 225,94 | 226,80 | **0,86** | ✅ |
+
+Unterkante-Diff 0,86 px ≤ 2 px Toleranz bei beiden Breakpoints (H-R.3-A Abnahme erfüllt).
+Top-Edges bleiben bei beiden auf y=139 (waren schon aligned; V142-Vorbedingung).
+
+**Sichtprüfung Bild 03** (`p86_block_h_r_03_1440_editor_offen.png`): die YAML-Kopfzeile
+„Kopfdaten YAML-Frontmatter · open · active · wissen · itm_0233eafe" beginnt auf gleicher
+Y-Position wie das erste Item „Konferenz 2026" im Listen-Slot — der 27-px-Versatz ist weg,
+die Bündigkeit ist sichtbar.
+
+### V143 — 1024-er Map-Overlap (H-R.4): **kein Fix nötig**, nur Wächter
+
+**CDP-Probe pre-fix + post-fix** (beide identisch): **0 Rechteck-Schnittmenge** zwischen
+`.list`/`.detail__graph`/`.rail` bei 1024×768 in beiden Modi.
+
+| Container | rect (1024×768 overview) | rect (1024×768 editor) |
+|---|---|---|
+| `.list` | x=240, y=139, w=784, h=314,5 | gleich |
+| `.detail__graph` | x=240, y=453,5, w=784, h=314,5 | width=0, height=0 (Editor ersetzt) |
+| `.rail` | x=0, y=139, w=240, h=629 | gleich |
+| `.overview__graph` | x=272, y=525,125, w=720, h=226,875 (in Karte) | width=0 (Editor-Modus) |
+
+`overlap_list_x_detail_graph` = `overlap_rail_x_detail_graph` = `overlap_rail_x_list` = **0,0**
+in beiden Modi. Block G-R G-R.1 hatte die 1024-er-Stapel-Logik bereits korrekt eingebaut
+(`grid-template-rows: 1fr 1fr` + `.rail { grid-row: 1 / span 2 }` + `.detail { grid-column: 2 }`).
+Der Backlog-Befund „1024-er Map-Overlap" war eine **Hypothese, kein gemessener Bug** — die
+Vorabritts der Phase-8.5-Cluster-3-Smoke-Skripte haben das nicht gereicht, der V143-Probe
+ist die erste direkte Messung. Der Wächter `test_1024_no_overlap_in_css` hält jetzt fest,
+dass die expliziten Grid-Properties stehen bleiben müssen.
+
+**Sichtprüfung Bild 04** (`p86_block_h_r_04_1024_uebersicht.png`): Rail links (240 px,
+vollständig sichtbar inkl. Spaces/Folder), Liste oben mit Spaces-Übersicht, Karte unten
+mit Verknüpfungsgraph (Knoten mit Beta-Verbindungen, Tags-Toggle/Ordner-Toggle/100%-Zoom).
+Keine Überlappung sichtbar.
+
+### V144 — 1024-er Editor-Modus voll bedienbar (H-R.5): **kein Fix nötig**, nur Wächter
+
+**CDP-Probe** (`elementFromPoint(cx, cy)` pro Knopf bei 1024×768 Editor-Modus): **16/16 Knöpfe
+`reachable: true`, keiner offscreen**.
+
+| Knopf | rect (x, y, w, h) | reachable | offscreen |
+|---|---|---|---|
+| #archive-button | 711, 458,5, 115, 40,8 | ✅ | ❌ |
+| #save-button | 834, 457,5, 116, 42,8 | ✅ | ❌ |
+| #close-button | 970, 463,9, 30, 30 | ✅ | ❌ |
+| [data-md=bold/italic/code/link/h/quote/ul/ol/hr] | y=594,7, w=26-31 | ✅ (10/10) | ❌ |
+| #insert-image-button | 890, 594,7, 26, 24 | ✅ | ❌ |
+| #toggle-preview | 920, 594,7, 80, 24 | ✅ | ❌ |
+| #append-button | 894, 719,2, 106, 40,8 | ✅ | ❌ |
+| #append-input | 264, 719,2, 622, 40,8 | ✅ | ❌ |
+
+Alle Knöpfe im unteren Slot (y=453,5–768), Format-Toolbar auf y=594,7 (passt in den
+verfügbaren Slot), Anhängen auf y=719,2. Layout passt auch ohne Touch-Targets-Padding —
+die Buttons sind ~26-42 px hoch (Apple HIG: ≥44 px ist das Ideal, hier am unteren Rand
+mit dem limitierten 314,5-px-Slot). Wenn die Sichtung anders urteilt, ist das ein
+H-R.5.1-Folgeblock, nicht Teil von H-R.5.
+
+**Sichtprüfung Bild 05** (`p86_block_h_r_05_1024_editor_offen.png`): Editor-Kopf oben
+(Konferenz 2026 + v1 gespeichert + Archivieren rot + Speichern + ×), YAML-Panel
+(Kopfdaten mit active/wissen/itm_0233eafe), Format-Toolbar (B I </> Link H Anführungszeichen
+Liste 1. — Bild Vorschau-Bearbeiten), v1-Versionsband, Anhängen-Feld. Alle Elemente
+sichtbar und bedienbar.
+
+### Drei neue statische Wächter (Block H-R.2 §9 erweitert um §3-§5)
+
+**`test_editor_head_padding_bottom_aligns_with_list_head`** (test_static_routes.py:1554):
+parst `padding: calc(var(--space) * X) calc(var(--space) * Y) calc(var(--space) * Z)` per
+Klammern-Balance (statt naive `[^;]+`-Split, der am `)` von `var(--space)` scheitert),
+fordert padding-bottom-Multiplikator ≥ 4 (= 32 px) oder 32 px direkt. Schützt vor
+stillem Refactor zurück auf den G-R.3-Stand (Multiplikator 1,5 = 12 px → 27-px-Versatz).
+
+**`test_1024_no_overlap_in_css`** (test_static_routes.py:1641): die
+`@media (max-width: 1024px) { ... }`-Query muss alle drei Grid-Properties enthalten:
+`grid-template-rows: 1fr 1fr` + `.rail { grid-row: 1 / span 2 }` + `grid-column: 2` (für
+.detail). Wer die explizite Stapel-Logik rausnimmt, fängt diesen Test — die Karte würde
+in (2,1) landen (CSS-Grid Auto-Placement, zeilenweise Erstzuweisung) statt in (2,2),
+und neben der Rail stehen statt darunter.
+
+**`test_1024_editor_buttons_present`** (test_static_routes.py:1683): Markup-Check für
+6 Knopf-IDs (`#archive-button`, `#save-button`, `#close-button`, `#toggle-preview`,
+`#insert-image-button`, `#append-button`) + 9 `data-md`-Format-Hilfen (`bold`/`italic`/
+`code`/`link`/`h`/`quote`/`ul`/`ol`/`hr`) + `#append-input` + `#field-title`. Visuelle
+Reichweite wurde in V144 gemessen, der Wächter hält die Markup-Struktur fest.
+
+### Selbstprüfung §0.5
+
+`pytest -q` **991 passed in 260 s** (V107-Baseline 988 + 3 neue Wächter für H-R.3/.4/.5,
+kein Test umbenannt, keine Test-Anpassung). `node --check` auf alle 13 JS-Dateien ✅
+(keine JS-Änderungen). `ui_budget.py` **5/5 im Korridor**, app.css jetzt **24,8 KB** gzip
+(vorher 24,7 KB, +0,1 KB für den ausführlichen H-R.3-Kommentar + die
+„Multiplikator ≥ 4 = 32 px"-Begründung im Wächter), Gesamt **143,7 KB**. Tabu-Diff §0.3
+**leer** (nur `phase5_ui/webui/static/app.css` + `phase5_ui/tests/test_static_routes.py`
++ 5 Screenshots + 2 Probe-JSON + 1 Self-Check-Skript berührt). Kein `pkill -f`, kein
+`systemctl`, sharefyx-mcp **PID 991** durchgehend nur gelesen.
+
+### Drei Hard-Rule-Checkpoints am Session-Ende
+
+1. **Hard Rule 1** (keine Secrets): keine Credentials im Repo, Wegwerf-Credentials in
+   `/tmp/opencode/sharefyx-wegwerf-v3ritt/credentials.json`.
+2. **Hard Rule 9** (kein `pkill -f`): Wegwerf gestartet mit
+   `.venv/bin/python phase8_5_picker_release/scripts/wegwerf_setup_v3ritt.py start`
+   (PID 230715, eigener Port 18773, tmp-`DATA_ROOT`),`), gestoppt mit
+   `kill $(cat /tmp/opencode/sharefyx-wegwerf-v3ritt/serve.pid)` — PID-Datei, kein Regex
+   im Cmdline. sharefyx-mcp **PID 991** durchgehend nur gelesen.
+3. **Hard Rule 8** (Commit ⇒ Doku-Update im selben Commit): Modul-Status **Zeile 14**
+   erweitert (H-R jetzt ✅ für alle fünf Sub-Blöcke), Frontmatter `updated:` mit
+   H-R-Teil-2-Eintrag voran, dieser Session-Block, Rotation per
+   `scripts/rotate_session_block.sh phase8_6_ui_polish`, `docs/INDEX.md`-Phase-8.6-Karte,
+   `screenshots_latest/`-Symlinks (P8.6-AK) — alles im selben Commit.
+
+### Fünf Selbst-Screenshots `docs/screenshots/p86_block_h_r_{01..05}_*.png`
+
+- **`01_1440_uebersicht.png`** (~100 KB) — Rail + Liste + Karte auf schwarzem Grund
+  (H-R.1). Bild 02/03 unverändert seit H-R-Teil-1.
+- **`02_1200_uebersicht.png`** (~99 KB) — gleiches Layout bei 1200 px, kein Kollaps.
+- **`03_1440_editor_offen.png`** (~132 KB) — **neu**: Editor offen, sticky-Header,
+  YAML-Kopfzeile bündig zur .list__head-Unterkante (H-R.3 Fix sichtbar).
+- **`04_1024_uebersicht.png`** (~76 KB) — **neu**: 1024-er-Stapel, Liste oben
+  (Spaces-Übersicht), Karte unten mit Verknüpfungsgraph, keine Überlappung.
+- **`05_1024_editor_offen.png`** (~91 KB) — **neu**: Editor im unteren Slot bei
+  1024×768, alle Knöpfe (Archivieren, Speichern, ×, Format-Toolbar, Anhängen)
+  sichtbar und bedienbar.
+
+### Echte Funde beim Bau
+
+1. **`padding`-Parser scheitert an `calc()`-Klammern** — mein erster
+   `padding_value.split()` zerteilte `padding: calc(var(--space) * 0.5) calc(var(--space) * 3)
+   calc(var(--space) * 5)` in **5 Teile** (nicht 3), weil das Leer- ` ` innerhalb von
+   `calc(...)` mitgesplittet wurde. Erst beim ersten Test-Lauf rot; behoben durch
+   **Klammern-Balance-Parser** (Depth-Counter, der `(` zählt und bei `)` dekrementiert).
+   Test-Docstring dokumentiert die Falle, der Parser akzeptiert jetzt beliebige
+   `calc(...)`-Ausdrücke.
+2. **`var(--space)` enthält selbst Klammern** — mein zweiter Versuch mit
+   `re.search(r"calc\([^)]*\)")` matchte nur `calc(var(--space)`, weil die schliessende
+   Klammer von `var(--space)` den Regex abbrach. Behoben durch den expliziten
+   Depth-Counter-Parser.
+
+### Nächster Schritt: **Block J** (der `pytest`-Flake, P8.6-AJ, datierte Tabu-Ausnahme)
+
+Plan §6.4 engere Tabu-Probe: `git diff --stat -- phase4_auth/authserver` muss **genau zwei
+Dateien** zeigen (`crypto.py` neu + `store.py` modifiziert), `store.py` genau **2 Zeilen**
+Diff (zwei Aufrufe von `new_public_id()` statt `secrets.token_urlsafe(16)`) — jede
+Abweichung ist Abbruchgrund. `authctl.py:199` bekommt einen `help`-Text für den Altbestand
+(die `--family-id` Option, die in 1,569 % der Fälle ein führendes `-` bekommt). Drei
+neue Tests, danach Baseline **≥ 991 passed, 0 failed** (statt 97.2 dokumentiert — die
+Zahl ist nach H-R-Teil-2 nachgezogen worden).
+
+Reihenfolge P8.6-AH ist jetzt: G → G-R ✅ → H ✅ → **H-R-Teil-1 ✅** → **H-R-Teil-2 ✅** →
+**J ⬜** → **Gate ⬜** → **Z ⬜** (Closeout).
+
+---
 
 ## Session stopped — 2026-09-14 (opencode/M3 — **Block H-R Teil 1 erledigt**: H-R.1 + H-R.2 ✅, H-R.3/.4/.5 ⬜ für Folge-Session)
 
