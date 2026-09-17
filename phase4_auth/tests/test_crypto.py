@@ -1,5 +1,6 @@
 from authserver.crypto import (
     hash_secret,
+    new_public_id,
     new_secret,
     pkce_challenge,
     secrets_equal,
@@ -18,6 +19,15 @@ def test_new_secret_has_expected_entropy():
     # secrets.token_urlsafe(32) -> ceil(32*4/3) == 43 base64url chars, no padding.
     assert len(token) == 43
     assert new_secret() != new_secret()
+
+
+def test_new_public_id_never_starts_with_a_dash():
+    # secrets.token_urlsafe(16) leads with "-" ~1.569 % of the time (P8.6-AJ) --
+    # 5000 draws makes a silent regression to plain new_secret() vanishingly unlikely to pass.
+    ids = [new_public_id() for _ in range(5000)]
+    assert not any(value.startswith("-") for value in ids)
+    assert all(len(value) == len(new_secret(16)) for value in ids)
+    assert len(set(ids)) == len(ids)
 
 
 def test_hash_secret_is_stable_and_hex():

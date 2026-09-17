@@ -291,7 +291,7 @@ class AuthStore:
         application_type: str | None,
         redirect_uris: Iterable[str],
     ) -> Client:
-        client_id = crypto.new_secret(16)
+        client_id = crypto.new_public_id(16)
         redirect_list = list(redirect_uris)
         now = self._now_fn()
         with self._lock:
@@ -390,7 +390,7 @@ class AuthStore:
         kann (Plan §2.4 POST /oauth/authorize Schritt 8: "token_families-Zeile anlegen,
         Authorization-Code erzeugen" — zwei Schritte, zwei Aufrufe).
         """
-        family_id = crypto.new_secret(16)
+        family_id = crypto.new_public_id(16)
         now = self._now_fn()
         with self._lock:
             self._conn.execute(

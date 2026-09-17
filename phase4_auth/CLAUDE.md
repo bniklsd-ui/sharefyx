@@ -210,13 +210,21 @@ darunter ein Migrationstest v2→v3 nach dem Muster des bestehenden v1→v2-Test
 Update-Log-Banner in `phase5_ui/webui/api.py`. Volle Herleitung: `phase6_shares/CLAUDE.md`
 Step-3-Session-Block — lebt dort, gleiche Begründung wie beim O2-Absatz oben.
 
-**[2026-08-20, außerhalb P4-Scope, nur vermerkt] Bekannter Flake:**
+**[2026-08-20, außerhalb P4-Scope, nur vermerkt] Bekannter Flake — behoben 2026-09-17:**
 `phase4_auth/tests/test_authctl.py::test_revoke_kills_the_family` schlug im ersten vollen
 `pytest`-Lauf einer Phase-6.5-Kickoff-Session fehl (`argparse: --family-id: expected one
-argument`), lief isoliert grün und im vollständigen Re-Run ebenfalls grün — reihenfolgeabhängig,
-vermutlich ein `family_id`-Kollisionsfall mit einem vorangehenden Test statt ein echter Bug.
-Nicht untersucht (kein P4-Code angefasst, außerhalb des aktuellen Auftrags). Vermerkt hier, damit
-ein künftiges „`pytest` nicht grün" nicht neu diagnostiziert werden muss, bevor jemand es fixt.
+argument`), lief isoliert grün und im vollständigen Re-Run ebenfalls grün — hier ursprünglich
+als „reihenfolgeabhängig, vermutlich ein `family_id`-Kollisionsfall" vermerkt und nicht weiter
+untersucht. **Echte Ursache**, gemessen in P8.6 Plan 2 §1.3 (2026-09-13):
+`secrets.token_urlsafe(16)` liefert in **1,569 %** der Ziehungen ein führendes `-`, das
+`argparse` dann als Optionsflag statt als Wert liest — kein Kollisionsfall, sondern derselbe
+Bug bei jeder 64. `family_id`. **Fix in P8.6 Block J** (datierte Tabu-Ausnahme P8.6-AJ,
+2026-09-17): `authserver/crypto.py :: new_public_id()` (Rejection-Sampling gegen führendes `-`,
+gleiches Alphabet/Länge wie `new_secret`), eingesetzt an den zwei Stellen, deren Wert je auf
+einer Kommandozeile landet (`store.py:294` `create_client` → `client_id`, `store.py:393`
+`create_family` → `family_id`). Altbestands-IDs (vor dem Fix vergeben, können noch mit `-`
+beginnen) laufen über `authctl.py`s neuen `--family-id`-Hilfetext (Gleichheitsform
+`--family-id=-abc`). Details: `phase8_6_ui_polish/CLAUDE.md` Session-Block 2026-09-17 §Block J.
 
 ---
 

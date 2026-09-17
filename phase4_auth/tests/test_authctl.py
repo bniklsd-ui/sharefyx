@@ -105,12 +105,24 @@ def test_revoke_kills_the_family(env, store, capsys):
     )
     access, _refresh = store.issue_token_pair(family_id, access_ttl_s=3600, refresh_ttl_s=2_592_000)
 
-    rc = authctl.main(["revoke", "--family-id", family_id], env=env)
+    # "--family-id=" statt zwei Argumenten: Verteidigung in der Tiefe -- der Test bleibt
+    # gruen, auch falls eine kuenftige family_id wieder mit "-" beginnt (P8.6-AJ).
+    rc = authctl.main(["revoke", "--family-id=" + family_id], env=env)
 
     out = capsys.readouterr().out
     assert rc == 0
     assert "2 Token(s) widerrufen" in out
     assert store.lookup_access_token(access) is None
+
+
+def test_revoke_accepts_a_family_id_starting_with_a_dash(env, store, capsys):
+    """Altbestands-Pfad (P8.6-AJ J2): vor dem Generator-Fix vergebene IDs koennen mit '-'
+    beginnen. `--family-id=-abc` (Gleichheitsform) muss argparse trotzdem erreichen."""
+    rc = authctl.main(["revoke", "--family-id=-abc"], env=env)
+
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "unbekannt" in out or "0 Token" in out
 
 
 def test_revoke_unknown_family_is_a_no_op(env, capsys):

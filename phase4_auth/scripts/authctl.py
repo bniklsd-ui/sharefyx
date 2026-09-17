@@ -196,7 +196,10 @@ def main(argv: list[str] | None = None, *, env: dict[str, str] | None = None) ->
     p_tokens.add_argument("--space", metavar="NAME", default=None, help="nur diesen Space zeigen")
 
     p_revoke = sub.add_parser("revoke", help="eine Token-Familie widerrufen")
-    p_revoke.add_argument("--family-id", metavar="ID", required=True)
+    p_revoke.add_argument(
+        "--family-id", metavar="ID", required=True,
+        help="Familien-ID. Beginnt sie mit '-', die Gleichheitsform verwenden: --family-id=-abc",
+    )
 
     p_unlock = sub.add_parser("unlock", help="Fehlversuchssperre eines Space aufheben")
     p_unlock.add_argument("--space", metavar="NAME", required=True)
