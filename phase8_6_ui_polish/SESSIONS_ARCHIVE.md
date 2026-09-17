@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-15 (Block H-R-3 Escalation-Report nach Nikinger-Sichtung — Phase-Head 101.669→96.476 B, Archiv 201.928→207.121 B. Watchdog-Vormerkungs-Sub-Block 105 Z./5.193 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-R-3-Escalation-Session-Block. **Rein dokumentarisch — keine Code-Änderung.** Drei Nikinger-Befunde aus Sichtung der fünf H-R-Teil-2-Screenshots (01/02 akzeptiert, 03 Klärungsbedarf, 04 Umkehr von G-R.1, 05 neue Editor-fullview-Variante) → `docs/concepts/phase8_6_ui_polish_block_h_r_3_escalation.md` neu (~9 KB). Mini-Plan-Vorschlag mit drei Locks H-R.6/H-R.7/H-R.8 + Wächter-Liste + zwei Klärungsfragen. Routing-Hinweis: opencode/M3 für Pixel-Befunde ausgeschlossen (V-vision-befund 2026-09-11), diese Runde ist **Claude-Code-Territorium**. Nächster Schritt: Block H-R-3 (Claude Code), dann J, Gate, Z) | 2026-09-15 (Tailscaled-Watchdog-Vormerkung nach heutiger Control-Plane-Outage — Phase-Head 109.087→97.776 B, Archiv 189.880→201.191 B. Block-H-R-Teil-2-Session-Block 191 Z./11.311 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Tailscaled-Watchdog-Session-Block. **Rein dokumentarisch — keine Code-Änderung.** Neue Vormerkung „Tailscaled-Watchdog (Nikinger-Vorgabe 2026-09-15)" in §Vormerkungen mit drei Lösungs-Ansätzen (OnFailure-Hook / Watchdog-Unit mit zyklischer Prüfung / Tailscale-eigenes Feature) für „Control-Plane lange nicht erreichbar"-Fall. Nächster Schritt: Block J (P8.6-AJ, der `pytest`-Flake) unverändert; Watchdog als Mini-Phase nach P8.6 Gate) | 2026-09-14 (**Block H-R Teil 2 erledigt ✅ — H-R.3 + H-R.4 + H-R.5** — Head 109.202→99.718 B, Archiv 180.176→189.660 B. Block-H-R-Teil-1-Session-Block 146 Z./9.484 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-R-Teil-2-Session-Block. **Phase 8.6 ist nach H-R-2 bei Block 12 von 13 angekommen** — Editor-YAML-Bündigkeit (CSS-Fix: padding-bottom 12 → 40 px, V142-CDP-Probe 27,14 → 0,86 px) + 1024-er Map-Overlap (kein Fix, V143 misst 0 Rechteck-Schnittmenge) + 1024-er Editor-Modus (kein Fix, V144 misst 16/16 Knöpfe reachable); der nächste Block ist J (der pytest-Flake, P8.6-AJ), dann Gate, dann Z (Closeout)) | 2026-09-14 (**Block H-R Teil 1 erledigt ✅ — H-R.1 + H-R.2** — Head 88.519 B [unverändert nach Rotation], Archiv 151.336→169.569 B. Block-G-R-Session-Block 235 Z./18.073 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-Session-Block. **Phase 8.6 ist nach H bei Block 10 von 13 angekommen — Rail-Umkehr (Befund 7b) + Konto-Dialog-Afford (Befund 2) in einem Schritt behoben, der nächste Block ist J (der pytest-Flake, P8.6-AJ, datierte Tabu-Ausnahme für phase4_auth/authserver/{crypto.py,store.py})**) | 2026-09-14 (**Block G-R erledigt ✅** — Head 82.028→85.760 B, Archiv 138.612→151.336 B. Block-G-Session-Block 159 Z./11.728 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-G-R-Session-Block. **`Phase 8.6` ist nach G-R bei Block 9 von 13 angekommen — Layout/Editor-YAML-Bündigkeit + Layer-Tone-Drift aus der Sichtung behoben, der nächste Block ist H (Rail + Konto-Dialog, Befunde 7b + 2)**) | 2026-09-14 (E2b-Sub-Block [vom 2026-09-14, E2b-Commit `cc3f342`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — sechste Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 5.058 B; Archiv 128.603 → 133.661 B) | 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
+updated: 2026-09-17 (Block H-R-3 Escalation-Session-Block [Claude Code, 2026-09-15] per `scripts/rotate_session_block.sh phase8_6_ui_polish` verbatim ins Archiv rotiert — Phase-Head 105.433→101.545 B, Archiv 208.018→211.906 B. Phase-Head trägt jetzt den Block-H-R-3-Bau-Session-Block [Claude Code, drei Locks H-R.6/H-R.7/H-R.8, pytest 991→992, Live-Verifikation gegen Wegwerf v3ritt]) | 2026-09-15 (Block H-R-3 Escalation-Report nach Nikinger-Sichtung — Phase-Head 101.669→96.476 B, Archiv 201.928→207.121 B. Watchdog-Vormerkungs-Sub-Block 105 Z./5.193 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-R-3-Escalation-Session-Block. **Rein dokumentarisch — keine Code-Änderung.** Drei Nikinger-Befunde aus Sichtung der fünf H-R-Teil-2-Screenshots (01/02 akzeptiert, 03 Klärungsbedarf, 04 Umkehr von G-R.1, 05 neue Editor-fullview-Variante) → `docs/concepts/phase8_6_ui_polish_block_h_r_3_escalation.md` neu (~9 KB). Mini-Plan-Vorschlag mit drei Locks H-R.6/H-R.7/H-R.8 + Wächter-Liste + zwei Klärungsfragen. Routing-Hinweis: opencode/M3 für Pixel-Befunde ausgeschlossen (V-vision-befund 2026-09-11), diese Runde ist **Claude-Code-Territorium**. Nächster Schritt: Block H-R-3 (Claude Code), dann J, Gate, Z) | 2026-09-15 (Tailscaled-Watchdog-Vormerkung nach heutiger Control-Plane-Outage — Phase-Head 109.087→97.776 B, Archiv 189.880→201.191 B. Block-H-R-Teil-2-Session-Block 191 Z./11.311 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Tailscaled-Watchdog-Session-Block. **Rein dokumentarisch — keine Code-Änderung.** Neue Vormerkung „Tailscaled-Watchdog (Nikinger-Vorgabe 2026-09-15)" in §Vormerkungen mit drei Lösungs-Ansätzen (OnFailure-Hook / Watchdog-Unit mit zyklischer Prüfung / Tailscale-eigenes Feature) für „Control-Plane lange nicht erreichbar"-Fall. Nächster Schritt: Block J (P8.6-AJ, der `pytest`-Flake) unverändert; Watchdog als Mini-Phase nach P8.6 Gate) | 2026-09-14 (**Block H-R Teil 2 erledigt ✅ — H-R.3 + H-R.4 + H-R.5** — Head 109.202→99.718 B, Archiv 180.176→189.660 B. Block-H-R-Teil-1-Session-Block 146 Z./9.484 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-R-Teil-2-Session-Block. **Phase 8.6 ist nach H-R-2 bei Block 12 von 13 angekommen** — Editor-YAML-Bündigkeit (CSS-Fix: padding-bottom 12 → 40 px, V142-CDP-Probe 27,14 → 0,86 px) + 1024-er Map-Overlap (kein Fix, V143 misst 0 Rechteck-Schnittmenge) + 1024-er Editor-Modus (kein Fix, V144 misst 16/16 Knöpfe reachable); der nächste Block ist J (der pytest-Flake, P8.6-AJ), dann Gate, dann Z (Closeout)) | 2026-09-14 (**Block H-R Teil 1 erledigt ✅ — H-R.1 + H-R.2** — Head 88.519 B [unverändert nach Rotation], Archiv 151.336→169.569 B. Block-G-R-Session-Block 235 Z./18.073 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-Session-Block. **Phase 8.6 ist nach H bei Block 10 von 13 angekommen — Rail-Umkehr (Befund 7b) + Konto-Dialog-Afford (Befund 2) in einem Schritt behoben, der nächste Block ist J (der pytest-Flake, P8.6-AJ, datierte Tabu-Ausnahme für phase4_auth/authserver/{crypto.py,store.py})**) | 2026-09-14 (**Block G-R erledigt ✅** — Head 82.028→85.760 B, Archiv 138.612→151.336 B. Block-G-Session-Block 159 Z./11.728 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-G-R-Session-Block. **`Phase 8.6` ist nach G-R bei Block 9 von 13 angekommen — Layout/Editor-YAML-Bündigkeit + Layer-Tone-Drift aus der Sichtung behoben, der nächste Block ist H (Rail + Konto-Dialog, Befunde 7b + 2)**) | 2026-09-14 (E2b-Sub-Block [vom 2026-09-14, E2b-Commit `cc3f342`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — sechste Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 5.058 B; Archiv 128.603 → 133.661 B) | 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -24,6 +24,75 @@ das Skript auf das Phase-8.5-Muster passt und mit einem `## Session stopped` + m
 
 
 
+
+## Session stopped — 2026-09-15 (opencode/M3 — Block H-R-3 Escalation-Report, Übergabe an Claude Code)
+
+**Rein dokumentarisch, kein Produktcode-Touch, kein Service-Touch.**
+Nikinger-Sichtung der fünf `p86_block_h_r_{01..05}_*.png`-Screenshots hat
+drei neue UX-Befunde ergeben, die über Block H-R-Teil-2 hinausgehen:
+
+| # | Befund | Schwere |
+|---|---|---|
+| 01 | super, sieht nach dem aus was wir wollen | ✅ akzeptiert |
+| 02 | konsistentes Design | ✅ akzeptiert |
+| 03 | „Alle Items" + „Übersicht" sind zwei Buttons für eine Aktion (V110), und Listen-Slot bei 1440 px Editor-open zeigt Übersicht statt Items — redundant | Klärungsbedarf |
+| 04 | 1024 px **keine Map** — Umkehr von Block G-R G-R.1 | Layout-Revision |
+| 05 | 1024 px **nur Editor** (Navbar + Liste + Karte weg), ESC/× zurück | neue Variante |
+
+### Was ausgeliefert wurde (dieser Commit)
+
+- **`docs/concepts/phase8_6_ui_polish_block_h_r_3_escalation.md` neu (~9 KB)** —
+  Anlass, Stand, Mini-Plan-Vorschlag mit drei Locks H-R.6/H-R.7/H-R.8,
+  zwei offene Klärungsfragen, technischer Scope, Tabu-§0.3-Verträglichkeit,
+  erwartete Kennzahlen, fünf empfohlene Screenshots, Modell-Empfehlung für
+  die Claude-Code-Session. **Direkt-Einstieg-fähig** — Claude Code kann
+  ohne weitere M3-Vermittlung mit dem Report arbeiten.
+- **`docs/INDEX.md`** — Frontmatter `updated:` mit H-R-3-Eintrag
+  prependet, neue Zeile 47 für den Escalation-Report nachgezogen.
+- **`phase8_6_ui_polish/CLAUDE.md`** — dieser Session-Block.
+- **Rotation per `scripts/rotate_session_block.sh phase8_6_ui_polish`** —
+  Watchdog-Sub-Block vom Vorturn (191 Z./11.311 B) ins Archiv rotiert;
+  Phase-Head trägt jetzt diesen Escalation-Session-Block allein.
+
+### Was NICHT ausgeliefert wurde (mit Begründung)
+
+- **Keine Code-Touches** an `phase5_ui/webui/static/{app.css,app.html,app.js,tree.js}`
+  oder `phase5_ui/tests/test_static_routes.py` — die H-R.3-Locks werden
+  von Claude Code in der nächsten Session gebaut, mit Pixel-Verifikation
+  am laufenden System. opencode/M3 ist für Pixel-Befunde nicht der
+  richtige Adressat (Nikinger-Vorgabe: „Evtl sollte sich Claude Code
+  darum kümmern, solange das Vision plugin bzw die Weiterleitung der
+  Bilder an dich nicht 100% funktioniert"; V-vision-befund 2026-09-11
+  dokumentiert die Lücke).
+- **Keine Klärung der zwei offenen Fragen** (H-R.8 Lesart a vs. b;
+  G-R.1-raus-Bestätigung) — diese gehen mit dem Escalation-Report an
+  Claude Code, der sie mit dem Nikinger direkt durchgeht.
+
+### Drei Hard-Rule-Checkpoints am Session-Ende
+
+1. **Hard Rule 1** (keine Secrets): keine Credentials, kein neuer
+   Code-Touch, keine Schreib-Operationen außer den Doc-Updates.
+2. **Hard Rule 9** (kein Service-Touch durch opencode/M3): `systemctl
+   status` + `journalctl` + `tailscale status`/`netcheck` + `curl`/
+   `health_gate.sh` weiterhin nur lesend, **kein** `systemctl
+   restart/start`, kein `kill`, kein `pkill -f`. Der manuelle
+   `systemctl restart tailscaled` um ~21:55 CEST war **Nikinger-Aktion**;
+   sharefyx-mcp PID 991 + tailscaled PID 263180 durchgehend nur gelesen.
+3. **Hard Rule 8** (Commit ⇒ Doku-Update im selben Commit):
+   Escalation-Report + INDEX.md-Updates + dieser Session-Block +
+   Frontmatter-`updated:`-Eintrag in Phase-Head + SESSIONS_ARCHIVE.md-
+   `updated:`-Eintrag (nach Rotation) — alles im selben Commit.
+
+### Nächster Schritt
+
+Push dieses Commits (Nikinger-Aktion), dann Übergabe an Claude Code für
+Block H-R-3. Nach Klärung der zwei offenen Fragen mit dem Nikinger baut
+Claude Code die drei Locks + drei Wächter in einem atomaren Commit. Reihenfolge
+P8.6-AH jetzt: G ✅ → G-R ✅ → H ✅ → H-R-Teil-1+2 ✅ → **H-R-3 ⬜
+(Claude Code)** → **J ⬜** → **Gate ⬜** → **Z ⬜** (Closeout).
+
+Tailscaled-Watchdog bleibt als Mini-Phase nach P8.6 Gate eingereiht
+(siehe §Vormerkungen im Phase-Head).
 
 ## Session stopped — 2026-09-15 (opencode/M3 — Tailscaled-Control-Plane-Outage heute, Watchdog-Vormerkung + neuer Block-Vorschlag)
 

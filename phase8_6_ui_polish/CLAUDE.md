@@ -133,6 +133,7 @@ Entscheidungen P8.6-A–P8.6-U, Tabu-Liste, Schritt-Sequenz, Testliste, Abnahmez
 | 12b | **Block G-R — Layout-Revision nach Nikinger-Sichtung** (vier Befunde in einem Schritt, eingeschoben zwischen G und H auf Nikinger-Vorgabe 2026-09-14): **G-R.1 Breakpoints** — `@media (max-width: 1280px)` ersetzt durch zwei getrennte Queries: `≤1200px` Rail bleibt 240 / Liste 380 / Detail 1fr (Nikinger-Vorgabe: „Navigationszeile kracht zusammen" bei 1280-er Kollaps), `≤1024px` Stapel-Logik (Liste oben + Karte unten, Nav 240 bleibt sichtbar — Nikinger-Vorgabe: „Übersicht zusammenschieben und nav bar weiterhin vollständig zeigen", nicht Karte wegblenden); data-view-Switching-Logik aus Block G ersatzlos raus. **G-R.2 Map-Leerraum + Layer-Tone** — `.detail { background: var(--bg) }` neu (vorher Body-Erbe `--bg-void = #000`, drei sichtbare Töne für „Spalten-Hintergrund" --bg/--bg-void/--surface statt einem); `.detail__graph { padding: 16px 32px }` statt 32px rundum. **G-R.3 Editor-Header sticky + YAML bündig** — `.editor__head { position: sticky; background: var(--surface-raised); padding-top: 4px }` (Pendant zu `.list__head`, YAML-Kopfzeile rückt um 8 px nach oben); `.panel__head { padding: 11px 24px }` (Item-Row-Höhe ~41 px ≈ Panel-Header-Höhe ~41 px). **G-R.4 Wächter** — `test_shell_grid_is_240_480_1fr` umgestellt (drei Anker statt zwei, neue 1200/1024-Werte), vier neue Tests: `test_1200_breakpoint_keeps_rail_at_240`, `test_1024_breakpoint_stacks_list_over_detail`, `test_detail_uses_the_column_background_not_void`, `test_editor_head_is_sticky_with_the_list_head_background` + `test_panel_head_height_matches_a_list_row`. Mini-Plan `docs/concepts/phase8_6_ui_polish_block_g_r_plan.md` neu. | G-R | ✅ | 976 → **981** (Baseline 970 + 4 G + 2 F + 5 G-R); `ui_budget` 5/5 (**143 KB**, +1,6 KB roh, app.css 73.593 → 77.301 B); Tabu-Diff §0.3 trivial leer; sechs Selbst-Screenshots `p86_block_g_r_{01..06}_*.png` (111/134/110/131/93/128 KB) — Layer-Tone vereinheitlicht, Editor-sticky-Header sichtbar, Rail-240-Bleibt-Verhalten bei 1200 px, Stack-Logik bei 1024 px (Liste oben + Karte darunter, beide sichtbar). **Echter Fund beim Bau:** f-string-Regex-Match in `test_overview_grid_and_its_media_query_are_gone` hatte eine `]`-Klammer zu wenig (das Test-Modul kompilierte nicht) — behoben im selben Commit. |
 | 13 | **Block H — Rail + Konto-Dialog** (Befunde 7b, 2): `.rail__account` trägt wieder Einstellungen **und** Abmelden (Abmelden bleibt äußerster Knopf) — **Umkehr von C1/N3-Lesart b**, Test wird umgekehrt und umbenannt; `.account-nav` bekommt eine Navigations-Anmutung (die Knöpfe fehlten nie, sie sahen nur nach Fließtext aus) | H | ✅ | 1 Test umbenannt + 1 angepasst (nested `<svg>`-Regex in `test_app_html_has_a_live_manage_spaces_entry`), 0 neu; `pytest` 981 unverändert, `ui_budget` 5/5 (143,1 KB, app.css 24,0 → 24,2 KB gzip), Tabu-Diff §0.3 leer |
 | 14 | **Block H-R — Sichtungs-Revision nach Block H (fünf Sub-Blöcke)** (P8.6-AK-Plan `phase8_6_ui_polish_block_h_r_plan.md`): **H-R.1 OLED-BLACK für die drei Slots** (N.13 = Layer-Architektur-Revision, kein Polish) — `body`/`.shell`/`.rail`/`.list`/`.detail` auf `var(--bg-void) = #000`, `.rail`-`linear-gradient` ersatzlos weg; Layer-3-Elemente (`.overview__graph`, `.update-banner`, `.editor__head`, `.list__head`) behalten ihre `--surface`/`--surface-raised`-Tokens, Karte schwebt sichtbar (14 Stufen Helligkeits-Distanz statt 6); `--rail-top`-Token bleibt im `:root` als Geist stehen (kein Refactor-Scope). **H-R.2 `.account-nav` Akzent-Farbe** (N.14 = Spezialfall Konto-Dialog, "ausnahmsweise" laut Nikinger) — `background: var(--accent-quiet)` + ringsum `border: 1px solid var(--accent-edge)` + `border-left: 3px solid var(--accent)` + Chevron `color: var(--accent)`; Hover `color-mix(in srgb, var(--accent-quiet), var(--accent) 50%)` + `outline: var(--accent-line)`; `.rail__action` (Einstellungen + Abmelden) bleibt unverändert (N.14-Spezialfall nur `.account-nav`). **H-R.3 Editor-YAML-Bündigkeit** — `.editor__head padding-bottom` 12 → 40 px (`calc(var(--space) * 1.5)` → `* 5`), Editor-Head-Unterkante wandert von y=198,80 auf y=226,80 (1440 px) — Diff zur .list__head-Unterkante (y=225,94) **0,86 px ≤ 2 px Toleranz** (pre-fix: 27,14 px). **H-R.4 1024-er Map-Overlap** — V143-Probe misst **0 Rechteck-Schnittmenge** zwischen .list/.detail__graph/.rail bei 1024×768 (Übersicht + Editor); bestehende Stapel-Logik (`grid-template-rows: 1fr 1fr` + `.rail { grid-row: 1 / span 2 }` + `.detail { grid-column: 2 }`) ist korrekt — **kein CSS-Fix nötig, nur Wächter**. **H-R.5 1024-er Editor-Modus** — V144-Probe misst 16/16 Knöpfe `reachable: true`, keiner offscreen bei 1024×768; **kein CSS-Fix nötig, nur Markup-Wächter**. | H-R | ✅ | 981 → 988 (Teil 1: 1 Test umbenannt + 6 neue Wächter) → **991** (Teil 2: 3 neue Wächter für H-R.3/.4/.5); `ui_budget` 5/5 (**143,7 KB**, app.css 24,2 → 24,8 KB gzip, +0,6 KB für Block-Kommentare + Padding-Touch + Wächter-Komment); Tabu-Diff §0.3 leer; 5 Selbst-Screenshots `p86_block_h_r_{01..05}_*.png` (100/99/132/76/91 KB) — bei 1440 ist die YAML-Kopfzeile bündig zur .list__head-Unterkante, bei 1024 sind Liste oben + Karte unten sauber gestapelt, Editor-Knöpfe alle im unteren Slot sichtbar; CDP-Proben `probes/v142_v143_v144_{pre,post}_fix.json` (~9 KB je) |
+| 14b | **Block H-R-3 — Claude-Code-Session, drei UX-Befunde aus der H-R-Teil-2-Sichtung** (`docs/concepts/phase8_6_ui_polish_block_h_r_3_escalation.md`): **H-R.6** (Befund 2, Umkehr von G-R.1, Nikinger-bestätigt 2026-09-17 „bei 'ohne Map' Entscheidung bleiben") — bei ≤1024 px eine Zeile statt zwei, `.detail__graph { display: none }` unabhängig vom JS-`hidden`-Attribut. **H-R.7** (Befund 3, Editor-Fullview bei ≤1024 px) — `.shell[data-view="detail"] { grid-template-columns: 1fr }` + `.rail { display: none }` innerhalb der 1024-Media-Query. **H-R.8** (Befund 1, Lesart b — Lesart a verworfen: ihre Prämisse „beide Rail-Knöpfe redundant" [V110] ist seit Block G/Plan 2 §4.3 überholt, `#home-button`/`.tree__scope` sind seither getrennte Aktionen) — `.shell[data-view="detail"] { grid-template-columns: 240px 1fr }` + `.list { display: none }` **ohne** Media-Query-Wrapper, gilt bei 1440/1200/1024 gleichermaßen. **Kein JS-/HTML-Touch nötig** — `shellEl.dataset.view` togglet bereits seit Block G zwischen „list"/„detail" (`editor.js` Zeilen 58/82/427), nur bislang ohne CSS-Konsument; ESC/× liefen schon vor diesem Block durch `closeEditor() → clearDetail() → showOverviewPane()`. | H-R-3 | ✅ | 992 (991 + 1 netto: zwei alte G-R.1-Tests `test_1024_breakpoint_stacks_list_over_detail` + `test_1024_no_overlap_in_css` waren nach dem Wegfall der Stapel-Logik reine Duplikate — ersterer umbenannt/umgeschrieben zu `test_1024_breakpoint_has_single_row_no_map`, zweiter gelöscht statt ein drittes Mal dieselben toten Grid-Properties zu prüfen; `test_shell_grid_is_240_480_1fr`s Anker 3 auf `grid-template-rows: 1fr` [statt `1fr 1fr`] nachgezogen; +2 neu `test_1024_editor_fullview_hides_rail_and_list` + `test_editor_open_hides_list_at_all_viewports`. **Abweichung von der Escalation-Report-Schätzung** (991 unverändert): die Schätzung kannte nur einen G-R.1-Test, tatsächlich gab es zwei). `ui_budget` 5/5 (144,2 KB gzip, +0,5 KB); Tabu-Diff §0.3 leer (nur `app.css` + `test_static_routes.py`); vier Selbst-Screenshots + Live-CDP-Probe `p86_block_h_r_3_self_check.py` gegen Wegwerf v3ritt (Port 18773, PID-Datei gestoppt) bestätigen alle drei Locks pixelgenau (`probes/h_r_3_probe.json`) |
 | 15 | **Block J — `pytest`-Flake** (P8.6-AJ, datierte Tabu-Ausnahme): `crypto.new_public_id()` (Rejection-Sampling gegen führendes `-`, 1,569 % gemessen) + zwei Aufrufe in `store.py:294/393`; `authctl.py:199` bekommt einen `help`-Text für den Altbestand | J | ⬜ | +3 Tests, danach Baseline **≥ 972 passed, 0 failed** |
 
 ## Geerbte Contracts
@@ -570,71 +571,98 @@ Checkkriterium** (Konvention §5). Ein Rendern im OpenCode-Chat ist technisch ni
 Nikinger-Sichtung mit, nicht erst beim Phasenwechsel — die Symlinks zeigen derzeit noch auf
 Block B, obwohl Block C gesichtet wurde.
 
-## Session stopped — 2026-09-15 (opencode/M3 — Block H-R-3 Escalation-Report, Übergabe an Claude Code)
+## Session stopped — 2026-09-17 (Claude Code — Block H-R-3, drei Locks, ein Commit)
 
-**Rein dokumentarisch, kein Produktcode-Touch, kein Service-Touch.**
-Nikinger-Sichtung der fünf `p86_block_h_r_{01..05}_*.png`-Screenshots hat
-drei neue UX-Befunde ergeben, die über Block H-R-Teil-2 hinausgehen:
+**Auftrag:** Escalation-Report `phase8_6_ui_polish_block_h_r_3_escalation.md` übernehmen,
+zwei offene Klärungsfragen mit dem Nikinger durchgehen, dann H-R.6/H-R.7/H-R.8 bauen und live
+gegen die Wegwerf-Instanz verifizieren (opencode/M3 ist für Pixel-Befunde nicht der richtige
+Adressat, siehe Vorsitzung).
 
-| # | Befund | Schwere |
-|---|---|---|
-| 01 | super, sieht nach dem aus was wir wollen | ✅ akzeptiert |
-| 02 | konsistentes Design | ✅ akzeptiert |
-| 03 | „Alle Items" + „Übersicht" sind zwei Buttons für eine Aktion (V110), und Listen-Slot bei 1440 px Editor-open zeigt Übersicht statt Items — redundant | Klärungsbedarf |
-| 04 | 1024 px **keine Map** — Umkehr von Block G-R G-R.1 | Layout-Revision |
-| 05 | 1024 px **nur Editor** (Navbar + Liste + Karte weg), ESC/× zurück | neue Variante |
+**Klärung (AskUserQuestion, vor dem Bau):**
 
-### Was ausgeliefert wurde (dieser Commit)
+1. **H-R.8:** Nikinger wählte **Lesart b** (Layout-Wechsel). Vorher recherchiert und dem
+   Nikinger vorgelegt: Lesart a stützte sich auf eine überholte Prämisse — `app.js:97-100`
+   dokumentiert, dass `#home-button` (→ Spaces-Übersicht) und `.tree__scope` (→ globaler
+   „Alle Items"-Modus) seit Block G / Plan 2 §4.3 **getrennte, nicht-redundante** Aktionen
+   sind, nicht mehr dieselbe wie zur V110-Zeit. Lesart a hätte eine funktionierende Funktion
+   gelöscht, keine Redundanz behoben.
+2. **G-R.1-raus:** Nikinger bestätigte „bei 'ohne Map' Entscheidung bleiben und umsetzen" —
+   sauberer Schnitt statt Override-Layer (Empfehlung übernommen, keine explizite
+   Einzelentscheidung dazu nötig).
 
-- **`docs/concepts/phase8_6_ui_polish_block_h_r_3_escalation.md` neu (~9 KB)** —
-  Anlass, Stand, Mini-Plan-Vorschlag mit drei Locks H-R.6/H-R.7/H-R.8,
-  zwei offene Klärungsfragen, technischer Scope, Tabu-§0.3-Verträglichkeit,
-  erwartete Kennzahlen, fünf empfohlene Screenshots, Modell-Empfehlung für
-  die Claude-Code-Session. **Direkt-Einstieg-fähig** — Claude Code kann
-  ohne weitere M3-Vermittlung mit dem Report arbeiten.
-- **`docs/INDEX.md`** — Frontmatter `updated:` mit H-R-3-Eintrag
-  prependet, neue Zeile 47 für den Escalation-Report nachgezogen.
-- **`phase8_6_ui_polish/CLAUDE.md`** — dieser Session-Block.
-- **Rotation per `scripts/rotate_session_block.sh phase8_6_ui_polish`** —
-  Watchdog-Sub-Block vom Vorturn (191 Z./11.311 B) ins Archiv rotiert;
-  Phase-Head trägt jetzt diesen Escalation-Session-Block allein.
+**Code-Erkenntnis vor dem Bau, senkt den Scope drastisch:** `shellEl.dataset.view` togglet
+bereits seit Block G zwischen `"list"`/`"detail"` (`editor.js:58` `showOverviewPane()`,
+`editor.js:82` `clearDetail()`, `editor.js:427` `loadEditorFromItem()`) — **ohne** CSS-
+Konsument bislang. ESC (`app.js:216`) und die ×-Buttons (`editor.js:554`) laufen beide durch
+`closeEditor() → clearDetail() → showOverviewPane()`. Das deckt „ESC/× bringt zurück" für
+H-R.7 **und** H-R.8 vollständig ab, ohne eine Zeile JS oder HTML anzufassen — die Escalation-
+Report-Schätzung („app.js + editor.js: ~5–10 Zeilen JS-Touch") war zu hoch gegriffen.
 
-### Was NICHT ausgeliefert wurde (mit Begründung)
+**Gebaut (`phase5_ui/webui/static/app.css`, ein Commit):**
 
-- **Keine Code-Touches** an `phase5_ui/webui/static/{app.css,app.html,app.js,tree.js}`
-  oder `phase5_ui/tests/test_static_routes.py` — die H-R.3-Locks werden
-  von Claude Code in der nächsten Session gebaut, mit Pixel-Verifikation
-  am laufenden System. opencode/M3 ist für Pixel-Befunde nicht der
-  richtige Adressat (Nikinger-Vorgabe: „Evtl sollte sich Claude Code
-  darum kümmern, solange das Vision plugin bzw die Weiterleitung der
-  Bilder an dich nicht 100% funktioniert"; V-vision-befund 2026-09-11
-  dokumentiert die Lücke).
-- **Keine Klärung der zwei offenen Fragen** (H-R.8 Lesart a vs. b;
-  G-R.1-raus-Bestätigung) — diese gehen mit dem Escalation-Report an
-  Claude Code, der sie mit dem Nikinger direkt durchgeht.
+- **Lock H-R.8** (außerhalb jeder `@media`-Query, gilt bei allen Breiten):
+  `.shell[data-view="detail"] { grid-template-columns: 240px 1fr }` +
+  `.shell[data-view="detail"] .list { display: none }`.
+- **Lock H-R.6** (innerhalb `@media (max-width: 1024px)`, ersetzt G-R.1 komplett):
+  `.shell { grid-template-columns: 240px 1fr; grid-template-rows: 1fr }` (eine Zeile statt
+  zwei), `.rail { grid-row: 1 }`, `.detail__graph { display: none }`.
+- **Lock H-R.7** (innerhalb derselben Media-Query, baut auf H-R.8s Basisregel auf — gleiche
+  Spezifität, spätere Quellreihenfolge gewinnt): `.shell[data-view="detail"] {
+  grid-template-columns: 1fr }` + `.shell[data-view="detail"] .rail { display: none }`.
 
-### Drei Hard-Rule-Checkpoints am Session-Ende
+**Cascade-Probe vor dem Testlauf:** `.shell[data-view="detail"]` hat Spezifität (0,2,0),
+schlägt die reinen `.shell`-Regeln in den 1200/1024-Media-Queries (0,1,0) unabhängig von der
+Quellreihenfolge — die 1024-interne Fassung von `.shell[data-view="detail"]` (gleiche
+Spezifität wie die Basisregel, aber später im Quelltext) gewinnt dort zusätzlich gegen die
+Basisregel. Beide Mechanismen von Hand durchgerechnet, dann live per Probe bestätigt (unten).
 
-1. **Hard Rule 1** (keine Secrets): keine Credentials, kein neuer
-   Code-Touch, keine Schreib-Operationen außer den Doc-Updates.
-2. **Hard Rule 9** (kein Service-Touch durch opencode/M3): `systemctl
-   status` + `journalctl` + `tailscale status`/`netcheck` + `curl`/
-   `health_gate.sh` weiterhin nur lesend, **kein** `systemctl
-   restart/start`, kein `kill`, kein `pkill -f`. Der manuelle
-   `systemctl restart tailscaled` um ~21:55 CEST war **Nikinger-Aktion**;
-   sharefyx-mcp PID 991 + tailscaled PID 263180 durchgehend nur gelesen.
-3. **Hard Rule 8** (Commit ⇒ Doku-Update im selben Commit):
-   Escalation-Report + INDEX.md-Updates + dieser Session-Block +
-   Frontmatter-`updated:`-Eintrag in Phase-Head + SESSIONS_ARCHIVE.md-
-   `updated:`-Eintrag (nach Rotation) — alles im selben Commit.
+**Tests (`phase5_ui/tests/test_static_routes.py`):** zwei G-R.1-Tests waren nach dem Wegfall
+der Stapel-Logik reine Duplikate derselben jetzt toten Grid-Properties —
+`test_1024_breakpoint_stacks_list_over_detail` umbenannt + neu geschrieben zu
+`test_1024_breakpoint_has_single_row_no_map` (prüft `grid-template-rows: 1fr` statt `1fr 1fr`,
+`.detail__graph display:none`, Negativ-Check auf alle G-R.1-Marker), `test_1024_no_overlap_in_css`
+**gelöscht** (seine gesamte Prämisse — Überlapp-Risiko zwischen Karte und Rail/Liste — entfällt,
+wenn die Karte nie sichtbar ist; ein dritter Test mit denselben Assertions wäre reine
+Duplikation gewesen). `test_shell_grid_is_240_480_1fr`s dritter Anker (1024-px-Zeilen) auf
+`grid-template-rows: 1fr` nachgezogen (schlug sonst rot an — im ersten Testlauf gefunden, nicht
+vorher gesehen). Zwei neue Tests: `test_1024_editor_fullview_hides_rail_and_list` (H-R.7),
+`test_editor_open_hides_list_at_all_viewports` (H-R.8, inkl. Negativ-Check, dass `#home-button`
+nicht verschwunden ist — Lesart a wurde verworfen). **Netto +1 Test** (991 → **992**) —
+Abweichung von der Escalation-Report-Schätzung „991 unverändert", die nur von einem
+G-R.1-Test ausging statt den tatsächlich vorhandenen zwei.
 
-### Nächster Schritt
+**Live-Verifikation (eigenes Skript `phase8_6_ui_polish/scripts/p86_block_h_r_3_self_check.py`,
+Wegwerf-Instanz v3ritt, Port 18773, `.venv/bin/python wegwerf_setup_v3ritt.py start`/`stop`,
+PID-Datei-gestoppt, Hard-Rule-9-konform):**
 
-Push dieses Commits (Nikinger-Aktion), dann Übergabe an Claude Code für
-Block H-R-3. Nach Klärung der zwei offenen Fragen mit dem Nikinger baut
-Claude Code die drei Locks + drei Wächter in einem atomaren Commit. Reihenfolge
-P8.6-AH jetzt: G ✅ → G-R ✅ → H ✅ → H-R-Teil-1+2 ✅ → **H-R-3 ⬜
-(Claude Code)** → **J ⬜** → **Gate ⬜** → **Z ⬜** (Closeout).
+| Viewport | Zustand | `dataset.view` | `.rail` | `.list` | `.detail__graph` | Grid |
+|---|---|---|---|---|---|---|
+| 1440 | Editor offen | detail | flex | **none** | none | `240px 1200px` |
+| 1200 (Kontrolle) | Editor offen | detail | flex | **none** | none | `240px 960px` |
+| 1024 | Übersicht | list | flex | flex | **none** | `240px 784px` |
+| 1024 | Editor offen | detail | **none** | **none** | none | `1024px` |
 
-Tailscaled-Watchdog bleibt als Mini-Phase nach P8.6 Gate eingereiht
-(siehe §Vormerkungen im Phase-Head).
+Alle vier Zeilen bestätigen die Locks exakt wie vorhergesagt — inklusive der Kontroll-Zeile
+(1200 px verhält sich wie 1440, H-R.7 leckt nicht in den 1200-Breakpoint). Vier Screenshots
+`docs/screenshots/p86_block_h_r_3_{01,02,03,04}_*.png`, visuell gegengeprüft (kein
+Layout-Bruch, Editor-Kopf + Format-Toolbar + Anhängen-Zeile bleiben in allen vier Zuständen
+korrekt gerendert). `screenshots_latest/` im selben Commit nachgezogen (P8.6-AK, vier
+Symlinks + README-Tabelle ersetzt).
+
+**Selbstprüfung §0.5:** `pytest -q` **992 passed in 116,64 s** (Baseline 991 unverändert
++1 netto, siehe oben), Tabu-Diff §0.3 leer (`git diff --stat` gegen die Tabu-Pfade: leer;
+tatsächlich berührt nur `phase5_ui/webui/static/app.css` +
+`phase5_ui/tests/test_static_routes.py` + das neue Self-Check-Skript), `node --check` auf
+alle 13 JS-Dateien ✅ (keine JS-Änderung), `ui_budget.py` **5/5 im Korridor** (144,2 KB gzip,
++0,5 KB ggü. 143,7 KB — passt zur erwarteten +1–2 KB roh). Kein `pkill -f`, kein `systemctl`,
+sharefyx-mcp **PID 991** durchgehend nur gelesen (`systemctl status` read-only bestätigt,
+Uptime 1 Woche).
+
+**Doku-Hygiene:** Modul-Status neue Zeile 14b (H-R-3), dieser Session-Block, Rotation per
+`scripts/rotate_session_block.sh phase8_6_ui_polish` (H-R-3-Escalation-Session-Block vom
+2026-09-15 wandert verbatim ins Archiv), `docs/INDEX.md`-Zeile für die neuen Screenshots +
+das neue Skript nachgezogen, `screenshots_latest/README.md` im selben Commit.
+
+**Nächster Schritt:** Block J (`pytest`-Flake, P8.6-AJ, datierte Tabu-Ausnahme
+`phase4_auth/authserver/{crypto.py,store.py}`) — Reihenfolge P8.6-AH jetzt: G ✅ → G-R ✅ →
+H ✅ → H-R-Teil-1+2 ✅ → **H-R-3 ✅** → **J ⬜** → **Gate ⬜** → **Z ⬜** (Closeout).

@@ -409,6 +409,22 @@ select.input:focus {
   background: var(--bg-void);
 }
 
+/* Phase 8.6 Block H-R-3, Lock H-R.8 (Befund 1, Lesart b, Nikinger-Entscheidung 2026-09-17):
+   der Listen-Slot ist redundant, sobald der Detail-Slot etwas zeigt (Uebersicht neben
+   offenem Editor doppelt gemoppelt). `shellEl.dataset.view` togglet bereits zwischen
+   "list"/"detail" (editor.js :: showOverviewPane()/loadEditorFromItem(), unveraendert seit
+   Block G) -- bislang ohne CSS-Konsument. Bewusst OHNE Media-Query-Wrapper: der Effekt gilt
+   bei 1440 px genauso wie bei 1024 (die 1024-Ueberschreibung fuer die Editor-Fullview folgt
+   unten in @media (max-width: 1024px), Lock H-R.7). ESC/× brauchen keinen neuen Handler --
+   beide Pfade laufen bereits durch closeEditor() -> clearDetail() -> showOverviewPane(),
+   die dataset.view zurueck auf "list" setzt. */
+.shell[data-view="detail"] {
+  grid-template-columns: 240px 1fr;
+}
+.shell[data-view="detail"] .list {
+  display: none;
+}
+
 /* -- Rail: Wortmarke, Übersicht, Baum, Konto (Step 7b) ------------------------------------ */
 
 .rail__brand {
@@ -1997,30 +2013,35 @@ body.has-update-banner .shell { height: calc(100vh - var(--banner-h)); margin-to
 }
 
 @media (max-width: 1024px) {
-  /* Phase 8.6 Block G-R G-R.1 (Nikinger-Sichtung 2026-09-14): Rail bleibt 240 px, Liste
-     und Karte STAPELN vertikal in der rechten Spalte statt zu wechseln.
+  /* Phase 8.6 Block H-R-3, Lock H-R.6 (Befund 2, Umkehr von G-R.1, Nikinger-Bestaetigung
+     2026-09-17: "bei 'ohne Map' Entscheidung bleiben und umsetzen"): G-R.1s Stapel-Layout
+     (Liste + Karte gleichzeitig sichtbar, zwei Zeilen) ist ersatzlos weg -- kein toter Code,
+     kein Override-Layer, sauberer Schnitt (Nikinger-Sichtung 2026-09-15: "Map entfernt" soll
+     bei 1024 px wieder gelten, G-R.1s eigene Umkehr des urspruenglichen Block-G-Stands war
+     zwei Sichtungen zuvor die richtige Antwort, ist es jetzt nicht mehr).
 
-     Nikinger-Beobachtung am 1024-px-Screenshot: "Map entfernt, ja, aber lieber Uebersicht
-     zusammenschieben und nav bar weiterhin vollstaendig zeigen". Der alte Block-G-Stand
-     blendete die Karte weg und zeigte stattdessen nur Rail + Liste -- das Wegblenden war
-     der falsche Trade.
-
-     Aufbau:
-       - grid-template-columns: 240 px + 1fr (zwei Spalten, Rail bleibt 240)
-       - grid-template-rows: 1fr + 1fr (zwei gleich hohe Zeilen)
-       - rail spannt beide Zeilen via grid-row: 1 / span 2
-       - .detail explizit in Zeile 2 Spalte 2 -- ohne die explizite Zuweisung wuerde
-         CSS-Grid Auto-Placement .detail in (2,1) setzen (zeilenweise Erstzuweisung),
-         und die Karte saehe neben dem Rail-Bereich statt darunter.
-
-     data-view-Switching (Block G) ist ersatzlos weg -- bei 1024 sind Liste und Karte
-     immer gleichzeitig sichtbar, das View-Switching braucht es nicht mehr. */
+     Aufbau: Rail 240 px + Liste 1fr, EINE Zeile. `.detail__graph { display: none }` blendet
+     die Karte unabhaengig vom `hidden`-Attribut aus dem JS aus -- auch in der Uebersichts-
+     Ansicht (state.overview = true, dataset.view = "list") bleibt sie bei <=1024 px weg. */
   .shell {
     grid-template-columns: 240px 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: 1fr;
   }
-  .rail { grid-row: 1 / span 2; }
-  .detail { grid-column: 2; grid-row: 2; }
+  .rail { grid-row: 1; }
+  .detail__graph { display: none; }
+
+  /* Lock H-R.7 (Befund 3, Editor-Fullview): bei offenem Detail-/Editor-Slot blenden Rail
+     UND Liste komplett aus, .detail nimmt den vollen Viewport ein. Baut auf der
+     `.shell[data-view="detail"]`-Basisregel oben auf (die blendet dort schon die Liste aus
+     und zieht .detail auf 240px 1fr) -- hier zusaetzlich Rail weg und eine Spalte statt zwei,
+     gleiche Spezifitaet + spaetere Quellreihenfolge gewinnt gegen die Basisregel. ESC/×
+     brauchen wie bei H-R.8 keinen neuen Handler, derselbe closeEditor()-Pfad greift. */
+  .shell[data-view="detail"] {
+    grid-template-columns: 1fr;
+  }
+  .shell[data-view="detail"] .rail {
+    display: none;
+  }
 }
 
 /* -- Glas-Träger-Anwendung (Phase 8 Block C C4, Plan §4.C4 P8-H) -------------------------

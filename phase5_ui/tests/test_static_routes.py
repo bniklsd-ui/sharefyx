@@ -821,13 +821,14 @@ def test_shell_grid_is_240_480_1fr():
         f"Gefunden: '{media_1200_cols}'."
     )
 
-    # Anker 3 -- 1024-px-Media-Query: Rail 240 + rechte Spalte 1fr, gestapelt (Block G-R G-R.1).
+    # Anker 3 -- 1024-px-Media-Query: Rail 240 + rechte Spalte 1fr, EINE Zeile (Block H-R-3
+    # H-R.6 -- Umkehr von G-R.1s Stapel-Logik, siehe test_1024_breakpoint_has_single_row_no_map
+    # fuer die volle Herleitung).
     media_1024 = re.search(
         r"@media\s*\(max-width:\s*1024px\)\s*\{(.*?)\n\}", css, flags=re.DOTALL
     )
     assert media_1024 is not None, (
-        "@media (max-width: 1024px) muss in app.css existieren "
-        "(Block G-R G-R.1 hat die Stapel-Logik dort verankert)."
+        "@media (max-width: 1024px) muss in app.css existieren."
     )
     media_1024_body = media_1024.group(1)
     shell_in_1024 = re.search(
@@ -853,17 +854,17 @@ def test_shell_grid_is_240_480_1fr():
         f".shell in 1024-px-Media-Query muss '1fr' enthalten (rechte Spalte flexibel). "
         f"Gefunden: '{cols_1024}'."
     )
-    # grid-template-rows muss "1fr" zweimal haben -- zwei gleich hohe Zeilen fuer Stack
+    # grid-template-rows muss "1fr" genau EINMAL haben -- eine Zeile (H-R.6, kein Stapel mehr).
     rows_1024_match = re.search(
         r"grid-template-rows\s*:\s*([^;]+);", media_1024_shell
     )
     assert rows_1024_match is not None, (
-        ".shell in 1024-px-Media-Query braucht grid-template-rows (Block G-R G-R.1 Stapel)."
+        ".shell in 1024-px-Media-Query braucht grid-template-rows (H-R.6)."
     )
     rows_1024 = rows_1024_match.group(1).strip()
-    assert rows_1024.count("1fr") == 2, (
-        f".shell in 1024-px-Media-Query braucht ZWEI '1fr'-Zeilen (Stapel-Logik: Liste "
-        f"oben, Karte unten, beide gleich hoch). Gefunden: '{rows_1024}'."
+    assert rows_1024.count("1fr") == 1, (
+        f".shell in 1024-px-Media-Query braucht GENAU EINE '1fr'-Zeile (H-R.6: kein "
+        f"Stapel mehr, Karte ist weg). Gefunden: '{rows_1024}'."
     )
 
     # Negative Regression: der alte 1280-er Breakpoint-Block ist weg. Block G-R G-R.1 hat
@@ -1101,17 +1102,21 @@ def test_1200_breakpoint_keeps_rail_at_240():
     )
 
 
-def test_1024_breakpoint_stacks_list_over_detail():
-    """P8.6 Block G-R G-R.1 (Nikinger-Sichtung 2026-09-14): bei ≤1024 px stapeln Liste
-    und Karte vertikal in der rechten Spalte, statt dass die Karte weggeblendet wird
-    (Nikinger-Vorgabe: 'Uebersicht zusammenschieben und nav bar weiterhin vollstaendig
-    zeigen').
+def test_1024_breakpoint_has_single_row_no_map():
+    """P8.6 Block H-R-3, Lock H-R.6 (Befund 2, Nikinger-Sichtung 2026-09-15, Umkehr von
+    G-R.1, bestaetigt 2026-09-17: 'bei 'ohne Map' Entscheidung bleiben und umsetzen').
 
-    Geprueft werden die drei Anker:
-      1. `.rail { grid-row: 1 / span 2 }` -- Rail spannt beide Zeilen
-      2. `.detail { grid-column: 2; grid-row: 2 }` -- Detail explizit in Zeile 2 Spalte 2
-      3. Negativ: KEIN `.shell[data-view="list"] .detail { display: none }` mehr --
-         das war die alte 'Karte weg'-Logik aus Block G.
+    G-R.1 (2026-09-14) hatte bei <=1024 px Liste + Karte vertikal gestapelt (zwei Zeilen,
+    Rail spannt beide via `grid-row: 1 / span 2`, `.detail` explizit in Zeile 2). Die naechste
+    Sichtung (2026-09-15) kehrt das um: bei 1024 px soll es KEINE Karte mehr geben, Rail +
+    Liste in einer Zeile. Ersetzt sowohl diesen Test (vormals
+    `test_1024_breakpoint_stacks_list_over_detail`) als auch das eigenstaendige
+    `test_1024_no_overlap_in_css` (H-R.4-L) -- beide prueften exakt dieselben jetzt toten
+    G-R.1-Grid-Properties (`grid-template-rows: 1fr 1fr` / `.rail { grid-row: 1 / span 2 }` /
+    `.detail { grid-column: 2 }`); nach dem Wegfall der Stapel-Logik waeren sie reine
+    Duplikate geworden. `_konsequenz aus dem stapel-wegfall_`: ein Overlap zwischen Karte und
+    Rail/Liste kann nicht mehr auftreten, wenn die Karte nie sichtbar ist -- H-R.4-Ls Sorge
+    ist damit strukturell erledigt, kein eigener Test noetig.
     """
     css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
 
@@ -1119,57 +1124,151 @@ def test_1024_breakpoint_stacks_list_over_detail():
         r"@media\s*\(max-width:\s*1024px\)\s*\{(.*?)\n\}", css, flags=re.DOTALL
     )
     assert media_1024 is not None, (
-        "@media (max-width: 1024px) muss in app.css existieren "
-        "(sonst waere Block G-R G-R.1 rueckgaengig gemacht worden)."
+        "@media (max-width: 1024px) muss in app.css existieren."
     )
     media_1024_body = media_1024.group(1)
+    media_1024_body_nc = re.sub(r"/\*.*?\*/", "", media_1024_body, flags=re.DOTALL)
 
-    # 1. .rail muss grid-row: 1 / span 2 tragen
-    rail_match = re.search(r"\.rail\s*\{([^}]*)\}", media_1024_body)
+    # 1. .shell traegt eine EINZIGE Zeile, nicht mehr zwei gleich hohe.
+    shell_match = re.search(r"\.shell\s*\{([^}]*)\}", media_1024_body_nc)
+    assert shell_match is not None, (
+        ".shell braucht eine Regel in @media (max-width: 1024px)."
+    )
+    shell_body = shell_match.group(1)
+    assert "grid-template-rows: 1fr;" in shell_body or re.search(
+        r"grid-template-rows:\s*1fr\s*;", shell_body
+    ), (
+        f".shell in @media (max-width: 1024px) muss 'grid-template-rows: 1fr' tragen "
+        f"(H-R.6: eine Zeile, kein Stapel mehr). Block: {shell_body.strip()}"
+    )
+
+    # 2. .rail spannt nicht mehr zwei Zeilen -- eine Zeile reicht, es gibt nur noch eine.
+    rail_match = re.search(r"\.rail\s*\{([^}]*)\}", media_1024_body_nc)
     assert rail_match is not None, (
-        ".rail braucht eine Regel in @media (max-width: 1024px) -- Rail muss via "
-        "grid-row beide Zeilen spannen."
+        ".rail braucht eine Regel in @media (max-width: 1024px)."
     )
     rail_body = rail_match.group(1)
-    assert "grid-row" in rail_body, (
-        f".rail in @media (max-width: 1024px) braucht eine grid-row-Deklaration. "
-        f"Block: {rail_body.strip()}"
-    )
-    assert "span 2" in rail_body, (
-        f".rail in @media (max-width: 1024px) muss 'span 2' enthalten -- Rail spannt "
-        f"beide Zeilen. Block: {rail_body.strip()}"
+    assert "grid-row: 1;" in rail_body or re.search(r"grid-row:\s*1\s*;", rail_body), (
+        f".rail in @media (max-width: 1024px) muss 'grid-row: 1' tragen (H-R.6: keine "
+        f"zweite Zeile mehr zum Spannen). Block: {rail_body.strip()}"
     )
 
-    # 2. .detail muss grid-column: 2 und grid-row: 2 tragen
-    # ACHTUNG: regex muss den BLOESSEN .detail-Selektor matchen, NICHT .detail__back.
-    # Wort-Grenze (oder `__` als naechstes Zeichen) verhindert das Mitziehen.
-    detail_match = re.search(r"\.detail(?![a-zA-Z_-])\s*\{([^}]*)\}", media_1024_body)
-    assert detail_match is not None, (
-        ".detail braucht eine Regel in @media (max-width: 1024px) -- ohne explizite "
-        "Platzierung wuerde Auto-Placement .detail in (2,1) statt (2,2) setzen."
+    # 3. .detail__graph (die Karte) ist unabhaengig vom JS-`hidden`-Attribut ausgeblendet.
+    graph_match = re.search(r"\.detail__graph\s*\{([^}]*)\}", media_1024_body_nc)
+    assert graph_match is not None, (
+        ".detail__graph braucht eine Regel in @media (max-width: 1024px) (H-R.6: keine "
+        "Karte bei <=1024 px)."
     )
-    detail_body = detail_match.group(1)
-    assert "grid-column: 2" in detail_body, (
-        f".detail in @media (max-width: 1024px) muss 'grid-column: 2' tragen. "
-        f"Block: {detail_body.strip()}"
-    )
-    assert "grid-row: 2" in detail_body, (
-        f".detail in @media (max-width: 1024px) muss 'grid-row: 2' tragen. "
-        f"Block: {detail_body.strip()}"
+    assert "display: none" in graph_match.group(1), (
+        f".detail__graph in @media (max-width: 1024px) muss 'display: none' tragen. "
+        f"Block: {graph_match.group(1).strip()}"
     )
 
-    # 3. Negativ: alte 'data-view'-Switching-Logik ist weg.
-    for forbidden in (
-        r'\.shell\[data-view="list"\][^{]*\.detail[^{]*\{\s*display\s*:\s*none',
-        r'\.shell\[data-view="detail"\][^{]*\.list[^{]*\{\s*display\s*:\s*none',
+    # 4. Negativ: G-R.1s Stapel-Marker sind vollstaendig weg.
+    for forbidden, label in (
+        (r"grid-template-rows:\s*1fr\s+1fr", "grid-template-rows: 1fr 1fr (G-R.1-Stapel)"),
+        (r"span\s*2", "grid-row: ... span 2 (G-R.1-Rail-Spannung)"),
+        (r"\.detail(?![a-zA-Z_-])\s*\{[^}]*grid-column", ".detail { grid-column: ... } (G-R.1-Platzierung)"),
     ):
-        m = re.search(forbidden, media_1024_body)
+        m = re.search(forbidden, media_1024_body_nc)
         assert m is None, (
-            f"Alte 'data-view'-Switching-Logik in @media (max-width: 1024px) muss weg "
-            f"sein -- Block G-R G-R.1 stapelt, statt zu wechseln. "
-            f"Verbotenes Pattern getroffen bei Position {m.start() if m else 'n/a'}: "
-            f"'{m.group(0) if m else ''}'."
+            f"G-R.1-Erbe '{label}' muss aus @media (max-width: 1024px) weg sein (H-R.6: "
+            f"sauberer Schnitt, kein Override-Layer). Treffer: '{m.group(0) if m else ''}'."
         )
+
+
+def test_1024_editor_fullview_hides_rail_and_list():
+    """P8.6 Block H-R-3, Lock H-R.7 (Befund 3, Nikinger-Sichtung 2026-09-15): bei <=1024 px
+    UND offenem Detail-/Editor-Slot (`dataset.view === "detail"`) fuellt der Editor den
+    kompletten Viewport -- Rail und Liste sind komplett weg, nicht nur die Karte (die ist ab
+    H-R.6 sowieso immer weg bei 1024 px).
+
+    ESC/× brauchen keinen neuen JS-Handler: `closeEditor() -> clearDetail() ->
+    showOverviewPane()` setzt `dataset.view` bereits seit Block G auf "list" zurueck
+    (editor.js:58/82) -- das war nur bislang ohne CSS-Konsumenten. Kein `app.js`/`editor.js`-
+    Touch in diesem Block.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    media_1024 = re.search(
+        r"@media\s*\(max-width:\s*1024px\)\s*\{(.*?)\n\}", css, flags=re.DOTALL
+    )
+    assert media_1024 is not None
+    body = re.sub(r"/\*.*?\*/", "", media_1024.group(1), flags=re.DOTALL)
+
+    detail_view_match = re.search(
+        r'\.shell\[data-view="detail"\]\s*\{([^}]*)\}', body
+    )
+    assert detail_view_match is not None, (
+        '@media (max-width: 1024px) braucht eine .shell[data-view="detail"]-Regel '
+        "(H-R.7: Editor-Fullview -- eine Spalte statt zwei)."
+    )
+    assert "grid-template-columns: 1fr" in detail_view_match.group(1), (
+        f'.shell[data-view="detail"] in @media (max-width: 1024px) muss '
+        f"'grid-template-columns: 1fr' tragen (H-R.7: volle Breite fuer .detail). "
+        f"Block: {detail_view_match.group(1).strip()}"
+    )
+
+    rail_hidden_match = re.search(
+        r'\.shell\[data-view="detail"\]\s+\.rail\s*\{([^}]*)\}', body
+    )
+    assert rail_hidden_match is not None, (
+        '@media (max-width: 1024px) braucht .shell[data-view="detail"] .rail '
+        "(H-R.7: Rail komplett weg im Editor-Fullview)."
+    )
+    assert "display: none" in rail_hidden_match.group(1), (
+        f'.shell[data-view="detail"] .rail in @media (max-width: 1024px) muss '
+        f"'display: none' tragen. Block: {rail_hidden_match.group(1).strip()}"
+    )
+
+
+def test_editor_open_hides_list_at_all_viewports():
+    """P8.6 Block H-R-3, Lock H-R.8 (Befund 1, Lesart b -- Nikinger-Entscheidung
+    2026-09-17, Lesart a verworfen: ihre Praemisse 'beide Rail-Knoepfe fuehren zur selben
+    Aktion' [V110] ist seit Block G / Plan 2 §4.3 ueberholt, `#home-button` und
+    `.tree__scope` sind seither getrennte, nicht-redundante Aktionen -- app.js:97-100,
+    tree.js:252 `renderScopeRow()`).
+
+    Der eigentliche Befund war der Listen-Slot NEBEN einem offenen Editor, nicht die
+    Rail-Knoepfe. Fix: `.shell[data-view="detail"] .list { display: none }` OHNE
+    Media-Query-Wrapper -- gilt bei 1440 px genauso wie bei 1024 px. Rail bleibt bei
+    Desktop-Breiten sichtbar (nur bei <=1024 px blendet H-R.7 sie zusaetzlich aus).
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    # Muss AUSSERHALB jeder @media-Regel stehen -- am Zeilenanfang, keine Einrueckung.
+    m = re.search(
+        r'^\.shell\[data-view="detail"\]\s*\{([^}]*)\}', css, flags=re.MULTILINE
+    )
+    assert m is not None, (
+        'app.css braucht eine Top-Level-Regel .shell[data-view="detail"] { ... } '
+        "ausserhalb jeder @media-Query (H-R.8 Lesart b: gilt bei allen Breiten)."
+    )
+    assert "grid-template-columns: 240px 1fr" in m.group(1), (
+        f'.shell[data-view="detail"] muss "grid-template-columns: 240px 1fr" tragen -- '
+        f"die Liste faellt weg, die Karte/Editor-Spalte nimmt den freien Platz. "
+        f"Block: {m.group(1).strip()}"
+    )
+
+    list_hidden = re.search(
+        r'^\.shell\[data-view="detail"\]\s+\.list\s*\{([^}]*)\}', css, flags=re.MULTILINE
+    )
+    assert list_hidden is not None, (
+        'app.css braucht eine Top-Level-Regel .shell[data-view="detail"] .list '
+        "{ display: none } ausserhalb jeder @media-Query."
+    )
+    assert "display: none" in list_hidden.group(1), (
+        f'.shell[data-view="detail"] .list muss "display: none" tragen. '
+        f"Block: {list_hidden.group(1).strip()}"
+    )
+
+    # Negativ: Lesart a (Rail-Knopf loeschen) wurde NICHT umgesetzt -- beide Knoepfe bleiben,
+    # sie sind seit Block G unterschiedliche Aktionen, keine Redundanz mehr.
+    html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
+    assert 'id="home-button"' in html, (
+        "#home-button darf nicht verschwinden -- H-R.8 Lesart a wurde verworfen "
+        "(V110-Praemisse ueberholt seit Block G)."
+    )
 
 
 def test_detail_uses_the_oled_black_background():
@@ -1667,52 +1766,6 @@ def test_editor_head_padding_bottom_aligns_with_list_head():
         f".list__head-Unterkante, V142-CDP-Probe pre-fix 27,14 px / post-fix 0,86 px "
         f"Versatz). Gefunden: '{bottom_raw}' = {bottom_px} px. "
         f"Vor H-R.3 stand hier 'calc(var(--space) * 1.5)' = 12 px."
-    )
-
-
-def test_1024_no_overlap_in_css():
-    """H-R.4-L (Plan §4, V143): bei `@media (max-width: 1024px)` darf die Karte weder
-    die Liste noch die Rail überlappen. Konkreter Mechanismus: explizite Stapel-
-    Logik mit `grid-template-rows: 1fr 1fr` + `.rail { grid-row: 1 / span 2 }` +
-    `.detail { grid-column: 2 }`. Ohne diese drei Regeln würde CSS-Grid Auto-Placement
-    .detail in (2,1) setzen (zeilenweise Erstzuweisung) -- die Karte stuende dann
-    neben dem Rail-Bereich statt darunter, und die Rail-Bottom (y=768) wäre mit
-    der Karten-Bottom (y=768) überlappend im X-Bereich 0-240 (Rail).
-
-    CDP-Probe V143 (pre_fix + post_fix, beide): 0 overlap-Rechteck-Schnittmenge
-    zwischen .list/.detail__graph/.rail in beiden Modi (Übersicht + Editor).
-    Wer die expliziten Grid-Properties rausnimmt, faengt diesen Test -- die Karte
-    wuerde neben die Rail rutschen und der y=768-Bereich waere ueberlappend.
-    """
-    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
-
-    m = re.search(
-        r"@media\s*\(max-width:\s*1024px\)\s*\{(.*?)\n\}",
-        css,
-        flags=re.DOTALL,
-    )
-    assert m is not None, (
-        "app.css braucht eine `@media (max-width: 1024px) { ... }`-Query "
-        "(H-R.4-L: 1024-er-Stapel-Logik)."
-    )
-    body = m.group(1)
-    body = re.sub(r"/\*.*?\*/", "", body, flags=re.DOTALL)
-
-    assert "grid-template-rows: 1fr 1fr" in body, (
-        f"1024er-Media-Query braucht 'grid-template-rows: 1fr 1fr' (H-R.4-L: "
-        f"zwei gleich hohe Zeilen, damit Liste oben + Karte unten gestapelt sind). "
-        f"Body: {body.strip()}"
-    )
-    assert "grid-row: 1 / span 2" in body, (
-        f"1024er-Media-Query braucht '.rail {{ grid-row: 1 / span 2 }}' "
-        f"(H-R.4-L: Rail muss beide Zeilen bespannen, damit sie links neben "
-        f"Liste+Karte sichtbar bleibt). Body: {body.strip()}"
-    )
-    assert ".detail { grid-column: 2" in body or "grid-column: 2" in body, (
-        f"1024er-Media-Query braucht '.detail {{ grid-column: 2 }}' "
-        f"(H-R.4-L: Karte explizit in Spalte 2 -- ohne diese Zeile wuerde "
-        f"CSS-Grid Auto-Placement .detail in (2,1) setzen, neben der Rail). "
-        f"Body: {body.strip()}"
     )
 
 

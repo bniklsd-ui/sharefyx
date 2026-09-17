@@ -1,0 +1,55 @@
+{
+  "timestamp": "2026-09-17T20:06:21.579415+00:00",
+  "probes": {
+    "1440_editor_open": {
+      "dataset_view": "detail",
+      "rail_display": "flex",
+      "list_display": "none",
+      "detail_graph_display": "none",
+      "shell_grid_template_columns": "240px 1200px",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    "1200_editor_open": {
+      "dataset_view": "detail",
+      "rail_display": "flex",
+      "list_display": "none",
+      "detail_graph_display": "none",
+      "shell_grid_template_columns": "240px 960px",
+      "viewport": {
+        "width": 1200,
+        "height": 900
+      }
+    },
+    "1024_list_only": {
+      "dataset_view": "list",
+      "rail_display": "flex",
+      "list_display": "flex",
+      "detail_graph_display": "none",
+      "shell_grid_template_columns": "240px 784px",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      }
+    },
+    "1024_editor_fullview": {
+      "dataset_view": "detail",
+      "rail_display": "none",
+      "list_display": "none",
+      "detail_graph_display": "none",
+      "shell_grid_template_columns": "1024px",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      }
+    }
+  },
+  "screenshots": [
+    "docs/screenshots/p86_block_h_r_3_01_1440_editor_open.png",
+    "docs/screenshots/p86_block_h_r_3_04_1200_editor_open.png",
+    "docs/screenshots/p86_block_h_r_3_02_1024_list_only.png",
+    "docs/screenshots/p86_block_h_r_3_03_1024_editor_fullview.png"
+  ]
+}
