@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-17 (Block H-R-3 Escalation-Session-Block [Claude Code, 2026-09-15] per `scripts/rotate_session_block.sh phase8_6_ui_polish` verbatim ins Archiv rotiert — Phase-Head 105.433→101.545 B, Archiv 208.018→211.906 B. Phase-Head trägt jetzt den Block-H-R-3-Bau-Session-Block [Claude Code, drei Locks H-R.6/H-R.7/H-R.8, pytest 991→992, Live-Verifikation gegen Wegwerf v3ritt]) | 2026-09-15 (Block H-R-3 Escalation-Report nach Nikinger-Sichtung — Phase-Head 101.669→96.476 B, Archiv 201.928→207.121 B. Watchdog-Vormerkungs-Sub-Block 105 Z./5.193 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-R-3-Escalation-Session-Block. **Rein dokumentarisch — keine Code-Änderung.** Drei Nikinger-Befunde aus Sichtung der fünf H-R-Teil-2-Screenshots (01/02 akzeptiert, 03 Klärungsbedarf, 04 Umkehr von G-R.1, 05 neue Editor-fullview-Variante) → `docs/concepts/phase8_6_ui_polish_block_h_r_3_escalation.md` neu (~9 KB). Mini-Plan-Vorschlag mit drei Locks H-R.6/H-R.7/H-R.8 + Wächter-Liste + zwei Klärungsfragen. Routing-Hinweis: opencode/M3 für Pixel-Befunde ausgeschlossen (V-vision-befund 2026-09-11), diese Runde ist **Claude-Code-Territorium**. Nächster Schritt: Block H-R-3 (Claude Code), dann J, Gate, Z) | 2026-09-15 (Tailscaled-Watchdog-Vormerkung nach heutiger Control-Plane-Outage — Phase-Head 109.087→97.776 B, Archiv 189.880→201.191 B. Block-H-R-Teil-2-Session-Block 191 Z./11.311 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Tailscaled-Watchdog-Session-Block. **Rein dokumentarisch — keine Code-Änderung.** Neue Vormerkung „Tailscaled-Watchdog (Nikinger-Vorgabe 2026-09-15)" in §Vormerkungen mit drei Lösungs-Ansätzen (OnFailure-Hook / Watchdog-Unit mit zyklischer Prüfung / Tailscale-eigenes Feature) für „Control-Plane lange nicht erreichbar"-Fall. Nächster Schritt: Block J (P8.6-AJ, der `pytest`-Flake) unverändert; Watchdog als Mini-Phase nach P8.6 Gate) | 2026-09-14 (**Block H-R Teil 2 erledigt ✅ — H-R.3 + H-R.4 + H-R.5** — Head 109.202→99.718 B, Archiv 180.176→189.660 B. Block-H-R-Teil-1-Session-Block 146 Z./9.484 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-R-Teil-2-Session-Block. **Phase 8.6 ist nach H-R-2 bei Block 12 von 13 angekommen** — Editor-YAML-Bündigkeit (CSS-Fix: padding-bottom 12 → 40 px, V142-CDP-Probe 27,14 → 0,86 px) + 1024-er Map-Overlap (kein Fix, V143 misst 0 Rechteck-Schnittmenge) + 1024-er Editor-Modus (kein Fix, V144 misst 16/16 Knöpfe reachable); der nächste Block ist J (der pytest-Flake, P8.6-AJ), dann Gate, dann Z (Closeout)) | 2026-09-14 (**Block H-R Teil 1 erledigt ✅ — H-R.1 + H-R.2** — Head 88.519 B [unverändert nach Rotation], Archiv 151.336→169.569 B. Block-G-R-Session-Block 235 Z./18.073 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-Session-Block. **Phase 8.6 ist nach H bei Block 10 von 13 angekommen — Rail-Umkehr (Befund 7b) + Konto-Dialog-Afford (Befund 2) in einem Schritt behoben, der nächste Block ist J (der pytest-Flake, P8.6-AJ, datierte Tabu-Ausnahme für phase4_auth/authserver/{crypto.py,store.py})**) | 2026-09-14 (**Block G-R erledigt ✅** — Head 82.028→85.760 B, Archiv 138.612→151.336 B. Block-G-Session-Block 159 Z./11.728 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-G-R-Session-Block. **`Phase 8.6` ist nach G-R bei Block 9 von 13 angekommen — Layout/Editor-YAML-Bündigkeit + Layer-Tone-Drift aus der Sichtung behoben, der nächste Block ist H (Rail + Konto-Dialog, Befunde 7b + 2)**) | 2026-09-14 (E2b-Sub-Block [vom 2026-09-14, E2b-Commit `cc3f342`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — sechste Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 5.058 B; Archiv 128.603 → 133.661 B) | 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
+updated: 2026-09-18 (Block-H-R-3-Bau-Session-Block [Claude Code, 2026-09-17] per `scripts/rotate_session_block.sh phase8_6_ui_polish` verbatim ins Archiv rotiert — Phase-Head 118.450→104.826 B, Archiv 212.293→225.917 B. Phase-Head trägt jetzt den Gate-GA1+GA2-Session-Block [Claude Code, Wegwerf-Ritt + `p86_polish_smoke.py` neu, 18/18 Stationen grün, ein Produktbefund `.detail__back` toter Code]. **Korrektur-Notiz:** erster Rotationslauf dieser Session hatte das neue Session-Block VOR dem alten eingefügt — das Skript hält Konvention „neuester Block steht zuletzt im Head" (`KEEP_INDEX = STARTS.length - 1`), archivierte dadurch den neuen statt des alten Blocks. Aus den Skript-eigenen `.bak`-Backups wiederhergestellt, Blockreihenfolge vor dem zweiten Lauf vertauscht, zweiter Lauf korrekt) | 2026-09-17 (Block H-R-3 Escalation-Session-Block [Claude Code, 2026-09-15] per `scripts/rotate_session_block.sh phase8_6_ui_polish` verbatim ins Archiv rotiert — Phase-Head 105.433→101.545 B, Archiv 208.018→211.906 B. Phase-Head trägt jetzt den Block-H-R-3-Bau-Session-Block [Claude Code, drei Locks H-R.6/H-R.7/H-R.8, pytest 991→992, Live-Verifikation gegen Wegwerf v3ritt]) | 2026-09-15 (Block H-R-3 Escalation-Report nach Nikinger-Sichtung — Phase-Head 101.669→96.476 B, Archiv 201.928→207.121 B. Watchdog-Vormerkungs-Sub-Block 105 Z./5.193 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-R-3-Escalation-Session-Block. **Rein dokumentarisch — keine Code-Änderung.** Drei Nikinger-Befunde aus Sichtung der fünf H-R-Teil-2-Screenshots (01/02 akzeptiert, 03 Klärungsbedarf, 04 Umkehr von G-R.1, 05 neue Editor-fullview-Variante) → `docs/concepts/phase8_6_ui_polish_block_h_r_3_escalation.md` neu (~9 KB). Mini-Plan-Vorschlag mit drei Locks H-R.6/H-R.7/H-R.8 + Wächter-Liste + zwei Klärungsfragen. Routing-Hinweis: opencode/M3 für Pixel-Befunde ausgeschlossen (V-vision-befund 2026-09-11), diese Runde ist **Claude-Code-Territorium**. Nächster Schritt: Block H-R-3 (Claude Code), dann J, Gate, Z) | 2026-09-15 (Tailscaled-Watchdog-Vormerkung nach heutiger Control-Plane-Outage — Phase-Head 109.087→97.776 B, Archiv 189.880→201.191 B. Block-H-R-Teil-2-Session-Block 191 Z./11.311 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Tailscaled-Watchdog-Session-Block. **Rein dokumentarisch — keine Code-Änderung.** Neue Vormerkung „Tailscaled-Watchdog (Nikinger-Vorgabe 2026-09-15)" in §Vormerkungen mit drei Lösungs-Ansätzen (OnFailure-Hook / Watchdog-Unit mit zyklischer Prüfung / Tailscale-eigenes Feature) für „Control-Plane lange nicht erreichbar"-Fall. Nächster Schritt: Block J (P8.6-AJ, der `pytest`-Flake) unverändert; Watchdog als Mini-Phase nach P8.6 Gate) | 2026-09-14 (**Block H-R Teil 2 erledigt ✅ — H-R.3 + H-R.4 + H-R.5** — Head 109.202→99.718 B, Archiv 180.176→189.660 B. Block-H-R-Teil-1-Session-Block 146 Z./9.484 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-R-Teil-2-Session-Block. **Phase 8.6 ist nach H-R-2 bei Block 12 von 13 angekommen** — Editor-YAML-Bündigkeit (CSS-Fix: padding-bottom 12 → 40 px, V142-CDP-Probe 27,14 → 0,86 px) + 1024-er Map-Overlap (kein Fix, V143 misst 0 Rechteck-Schnittmenge) + 1024-er Editor-Modus (kein Fix, V144 misst 16/16 Knöpfe reachable); der nächste Block ist J (der pytest-Flake, P8.6-AJ), dann Gate, dann Z (Closeout)) | 2026-09-14 (**Block H-R Teil 1 erledigt ✅ — H-R.1 + H-R.2** — Head 88.519 B [unverändert nach Rotation], Archiv 151.336→169.569 B. Block-G-R-Session-Block 235 Z./18.073 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-Session-Block. **Phase 8.6 ist nach H bei Block 10 von 13 angekommen — Rail-Umkehr (Befund 7b) + Konto-Dialog-Afford (Befund 2) in einem Schritt behoben, der nächste Block ist J (der pytest-Flake, P8.6-AJ, datierte Tabu-Ausnahme für phase4_auth/authserver/{crypto.py,store.py})**) | 2026-09-14 (**Block G-R erledigt ✅** — Head 82.028→85.760 B, Archiv 138.612→151.336 B. Block-G-Session-Block 159 Z./11.728 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-G-R-Session-Block. **`Phase 8.6` ist nach G-R bei Block 9 von 13 angekommen — Layout/Editor-YAML-Bündigkeit + Layer-Tone-Drift aus der Sichtung behoben, der nächste Block ist H (Rail + Konto-Dialog, Befunde 7b + 2)**) | 2026-09-14 (E2b-Sub-Block [vom 2026-09-14, E2b-Commit `cc3f342`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — sechste Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 5.058 B; Archiv 128.603 → 133.661 B) | 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -25,6 +25,190 @@ das Skript auf das Phase-8.5-Muster passt und mit einem `## Session stopped` + m
 
 
 
+## Session stopped — 2026-09-17 (Claude Code — Block H-R-3, drei Locks, ein Commit)
+
+**Auftrag:** Escalation-Report `phase8_6_ui_polish_block_h_r_3_escalation.md` übernehmen,
+zwei offene Klärungsfragen mit dem Nikinger durchgehen, dann H-R.6/H-R.7/H-R.8 bauen und live
+gegen die Wegwerf-Instanz verifizieren (opencode/M3 ist für Pixel-Befunde nicht der richtige
+Adressat, siehe Vorsitzung).
+
+**Klärung (AskUserQuestion, vor dem Bau):**
+
+1. **H-R.8:** Nikinger wählte **Lesart b** (Layout-Wechsel). Vorher recherchiert und dem
+   Nikinger vorgelegt: Lesart a stützte sich auf eine überholte Prämisse — `app.js:97-100`
+   dokumentiert, dass `#home-button` (→ Spaces-Übersicht) und `.tree__scope` (→ globaler
+   „Alle Items"-Modus) seit Block G / Plan 2 §4.3 **getrennte, nicht-redundante** Aktionen
+   sind, nicht mehr dieselbe wie zur V110-Zeit. Lesart a hätte eine funktionierende Funktion
+   gelöscht, keine Redundanz behoben.
+2. **G-R.1-raus:** Nikinger bestätigte „bei 'ohne Map' Entscheidung bleiben und umsetzen" —
+   sauberer Schnitt statt Override-Layer (Empfehlung übernommen, keine explizite
+   Einzelentscheidung dazu nötig).
+
+**Code-Erkenntnis vor dem Bau, senkt den Scope drastisch:** `shellEl.dataset.view` togglet
+bereits seit Block G zwischen `"list"`/`"detail"` (`editor.js:58` `showOverviewPane()`,
+`editor.js:82` `clearDetail()`, `editor.js:427` `loadEditorFromItem()`) — **ohne** CSS-
+Konsument bislang. ESC (`app.js:216`) und die ×-Buttons (`editor.js:554`) laufen beide durch
+`closeEditor() → clearDetail() → showOverviewPane()`. Das deckt „ESC/× bringt zurück" für
+H-R.7 **und** H-R.8 vollständig ab, ohne eine Zeile JS oder HTML anzufassen — die Escalation-
+Report-Schätzung („app.js + editor.js: ~5–10 Zeilen JS-Touch") war zu hoch gegriffen.
+
+**Gebaut (`phase5_ui/webui/static/app.css`, ein Commit):**
+
+- **Lock H-R.8** (außerhalb jeder `@media`-Query, gilt bei allen Breiten):
+  `.shell[data-view="detail"] { grid-template-columns: 240px 1fr }` +
+  `.shell[data-view="detail"] .list { display: none }`.
+- **Lock H-R.6** (innerhalb `@media (max-width: 1024px)`, ersetzt G-R.1 komplett):
+  `.shell { grid-template-columns: 240px 1fr; grid-template-rows: 1fr }` (eine Zeile statt
+  zwei), `.rail { grid-row: 1 }`, `.detail__graph { display: none }`.
+- **Lock H-R.7** (innerhalb derselben Media-Query, baut auf H-R.8s Basisregel auf — gleiche
+  Spezifität, spätere Quellreihenfolge gewinnt): `.shell[data-view="detail"] {
+  grid-template-columns: 1fr }` + `.shell[data-view="detail"] .rail { display: none }`.
+
+**Cascade-Probe vor dem Testlauf:** `.shell[data-view="detail"]` hat Spezifität (0,2,0),
+schlägt die reinen `.shell`-Regeln in den 1200/1024-Media-Queries (0,1,0) unabhängig von der
+Quellreihenfolge — die 1024-interne Fassung von `.shell[data-view="detail"]` (gleiche
+Spezifität wie die Basisregel, aber später im Quelltext) gewinnt dort zusätzlich gegen die
+Basisregel. Beide Mechanismen von Hand durchgerechnet, dann live per Probe bestätigt (unten).
+
+**Tests (`phase5_ui/tests/test_static_routes.py`):** zwei G-R.1-Tests waren nach dem Wegfall
+der Stapel-Logik reine Duplikate derselben jetzt toten Grid-Properties —
+`test_1024_breakpoint_stacks_list_over_detail` umbenannt + neu geschrieben zu
+`test_1024_breakpoint_has_single_row_no_map` (prüft `grid-template-rows: 1fr` statt `1fr 1fr`,
+`.detail__graph display:none`, Negativ-Check auf alle G-R.1-Marker), `test_1024_no_overlap_in_css`
+**gelöscht** (seine gesamte Prämisse — Überlapp-Risiko zwischen Karte und Rail/Liste — entfällt,
+wenn die Karte nie sichtbar ist; ein dritter Test mit denselben Assertions wäre reine
+Duplikation gewesen). `test_shell_grid_is_240_480_1fr`s dritter Anker (1024-px-Zeilen) auf
+`grid-template-rows: 1fr` nachgezogen (schlug sonst rot an — im ersten Testlauf gefunden, nicht
+vorher gesehen). Zwei neue Tests: `test_1024_editor_fullview_hides_rail_and_list` (H-R.7),
+`test_editor_open_hides_list_at_all_viewports` (H-R.8, inkl. Negativ-Check, dass `#home-button`
+nicht verschwunden ist — Lesart a wurde verworfen). **Netto +1 Test** (991 → **992**) —
+Abweichung von der Escalation-Report-Schätzung „991 unverändert", die nur von einem
+G-R.1-Test ausging statt den tatsächlich vorhandenen zwei.
+
+**Live-Verifikation (eigenes Skript `phase8_6_ui_polish/scripts/p86_block_h_r_3_self_check.py`,
+Wegwerf-Instanz v3ritt, Port 18773, `.venv/bin/python wegwerf_setup_v3ritt.py start`/`stop`,
+PID-Datei-gestoppt, Hard-Rule-9-konform):**
+
+| Viewport | Zustand | `dataset.view` | `.rail` | `.list` | `.detail__graph` | Grid |
+|---|---|---|---|---|---|---|
+| 1440 | Editor offen | detail | flex | **none** | none | `240px 1200px` |
+| 1200 (Kontrolle) | Editor offen | detail | flex | **none** | none | `240px 960px` |
+| 1024 | Übersicht | list | flex | flex | **none** | `240px 784px` |
+| 1024 | Editor offen | detail | **none** | **none** | none | `1024px` |
+
+Alle vier Zeilen bestätigen die Locks exakt wie vorhergesagt — inklusive der Kontroll-Zeile
+(1200 px verhält sich wie 1440, H-R.7 leckt nicht in den 1200-Breakpoint). Vier Screenshots
+`docs/screenshots/p86_block_h_r_3_{01,02,03,04}_*.png`, visuell gegengeprüft (kein
+Layout-Bruch, Editor-Kopf + Format-Toolbar + Anhängen-Zeile bleiben in allen vier Zuständen
+korrekt gerendert). `screenshots_latest/` im selben Commit nachgezogen (P8.6-AK, vier
+Symlinks + README-Tabelle ersetzt).
+
+**Selbstprüfung §0.5:** `pytest -q` **992 passed in 116,64 s** (Baseline 991 unverändert
++1 netto, siehe oben), Tabu-Diff §0.3 leer (`git diff --stat` gegen die Tabu-Pfade: leer;
+tatsächlich berührt nur `phase5_ui/webui/static/app.css` +
+`phase5_ui/tests/test_static_routes.py` + das neue Self-Check-Skript), `node --check` auf
+alle 13 JS-Dateien ✅ (keine JS-Änderung), `ui_budget.py` **5/5 im Korridor** (144,2 KB gzip,
++0,5 KB ggü. 143,7 KB — passt zur erwarteten +1–2 KB roh). Kein `pkill -f`, kein `systemctl`,
+sharefyx-mcp **PID 991** durchgehend nur gelesen (`systemctl status` read-only bestätigt,
+Uptime 1 Woche).
+
+**Doku-Hygiene:** Modul-Status neue Zeile 14b (H-R-3), dieser Session-Block, Rotation per
+`scripts/rotate_session_block.sh phase8_6_ui_polish` (H-R-3-Escalation-Session-Block vom
+2026-09-15 wandert verbatim ins Archiv), `docs/INDEX.md`-Zeile für die neuen Screenshots +
+das neue Skript nachgezogen, `screenshots_latest/README.md` im selben Commit.
+
+**Nächster Schritt:** Block J (`pytest`-Flake, P8.6-AJ, datierte Tabu-Ausnahme
+`phase4_auth/authserver/{crypto.py,store.py}`) — Reihenfolge P8.6-AH jetzt: G ✅ → G-R ✅ →
+H ✅ → H-R-Teil-1+2 ✅ → **H-R-3 ✅** → **J ⬜** → **Gate ⬜** → **Z ⬜** (Closeout).
+
+**Nachtrag, 2026-09-17 — Rail-Exklusivität Übersicht vs. Space/Eimer/Ordner (Nikinger-Fund
+aus dem `03_1024_ohne_karte.png`-Screenshot):** Nikinger-Feedback nach Sichtung der vier
+H-R-3-Screenshots: „wenn ich 'Übersicht' auswähle, sollte das jede andere Auswahl (wie
+alpha→Offen) ausschließen, da das unterschiedliche Aktionen sind." Beleg: `state.activeSpace`/
+`state.filter`/`state.folder` werden beim Wechsel in die Übersicht (`state.overview = true`,
+`app.js` homeButtonEl-Handler) **bewusst nicht** geleert — der Rückweg in den zuvor besuchten
+Space soll die Filterung wiederfinden (siehe Kommentar `list.js :: clearDetail()`). `tree.js`s
+Highlight-Logik (`renderFolders()` Zeile 63, `folderButton()` Zeile 182, `homeButtonEl.setAttribute`
+Zeile 334) prüfte das aber nie gegen `state.overview` — ein zuvor markierter Eimer/Ordner blieb
+`aria-current="true"`, während gleichzeitig die Übersicht angezeigt wurde. Zusätzlich war
+`#home-button`s eigene Logik zu grob: `state.selectedId === null` markierte Home auch dann als
+aktuell, wenn tatsächlich ein Space/Eimer/Ordner **oder** der globale „Alle Items"-Modus ohne
+ausgewähltes Item gezeigt wurde — dieselbe Doppel-Markierungs-Klasse in zwei weiteren
+Kombinationen, nicht nur der vom Nikinger gemeldeten.
+
+**Fix (`phase5_ui/webui/static/js/tree.js`, kein CSS-/HTML-Touch):** drei Stellen ergänzt um
+die fehlende Übersicht-Exklusivität — `renderFolders()`- und `folderButton()`-Bedingungen
+bekommen `!state.overview` als zusätzliche Voraussetzung für `aria-current="true"`;
+`homeButtonEl`s Bedingung wechselt von `state.selectedId === null` auf `state.overview === true`
+(Home steht seit Block G konkret für die Übersicht, Plan 2 §4.3 — der eigene Zustandsflag ist
+der richtige Schalter, nicht die Item-Auswahl). `isGlobalScope()`/„Alle Items" brauchte keine
+Änderung — `state.scope === "all"` und `state.overview === true` schließen sich durch die
+bestehenden Setter (`navigateAll()`, homeButtonEl-Handler) bereits strukturell aus.
+
+**Verifikation:** eigenes Skript `phase8_6_ui_polish/scripts/p86_block_h_r_3_nachtrag_self_check.py`
+gegen die Wegwerf-Instanz v3ritt (Port 18773, PID-Datei-gestoppt) — navigiert nach
+`alpha → Offen` (`aria-current`: home=false, Offen=true), dann zurück in die Übersicht
+(`aria-current`: home=true, Offen=null, Alle-Items=null) — **exklusiv, wie gefordert**.
+Screenshot `docs/screenshots/p86_block_h_r_3_nachtrag_uebersicht_exklusiv.png` zeigt nur noch
+„Übersicht" markiert, „Offen" ohne Hervorhebung, „alpha" bleibt aufgeklappt (das ist reiner
+Expand-Zustand, keine Aktuell-Markierung, unverändert).
+
+**Selbstprüfung:** `pytest -q` **992 passed** (unverändert, keine pytest-Berührung — JS bleibt
+laut P5-T unit-ungetestet), `node --check` auf `tree.js` ✅, `ui_budget` 5/5 (144,7 KB, +0,5 KB
+Kommentare), Tabu-Diff §0.3 leer, sharefyx-mcp PID 991 nur gelesen. Zweiter Commit dieser
+Session (der erste war der H-R-3-Bau oben) — eigener Fund nach Sichtung, kein Amend.
+
+**Nachtrag 2, 2026-09-17 — Block J erledigt (P8.6-AJ, `pytest`-Flake, beide Hälften nach
+Plan 2 §6 wörtlich).** Dritter Commit dieser Session, bewusst getrennt vom UI-Diff oben (§6.5:
+„ein Auth-Touch gehört nicht in einen CSS-Diff").
+
+**J1 (Produktionsfehler):** `phase4_auth/authserver/crypto.py` bekommt `new_public_id(nbytes:
+int = 16)` direkt unter `new_secret()` — Rejection-Sampling (`while not value.startswith("-")`)
+statt Umkodierung, damit Alphabet und Länge zu `new_secret` identisch bleiben (Entropieverlust
+= ein verworfenes 64stel). `store.py:294` (`create_client` → `client_id`) und `store.py:393`
+(`create_family` → `family_id`) auf `crypto.new_public_id(16)` umgestellt — genau die zwei
+Stellen, deren Wert später auf einer Kommandozeile steht (`authctl revoke --family-id <ID>`).
+Die zehn übrigen `new_secret`-Aufrufstellen (`store.py:339, 465, 516, 517, 578, 579, 905, 1019,
+1020` plus die eine in `create_client` selbst für `client_secret`, sofern vorhanden) bleiben
+unverändert — sie erzeugen opake Geheimnisse, die nie eine Kommandozeile sehen.
+
+**J2 (Altbestand):** `phase4_auth/scripts/authctl.py`s `p_revoke.add_argument("--family-id",
+…)` bekommt einen `help`-Text, der die Gleichheitsform (`--family-id=-abc`) nennt — der einzig
+sinnvolle Ausweg für IDs, die vor diesem Fix vergeben wurden. Keine `sys.argv`-Vorverarbeitung
+(wäre ein Sonderweg an `argparse` vorbei).
+
+**J3 (Tests):** `test_revoke_kills_the_family` (`phase4_auth/tests/test_authctl.py`) auf
+`"--family-id=" + family_id` umgestellt — Verteidigung in der Tiefe, der Test bleibt grün, auch
+falls je wieder eine führende `-` vorkäme. Neu: `test_revoke_accepts_a_family_id_starting_with_a_dash`
+(Altbestands-Pfad, `--family-id=-abc` → rc 0) und `test_new_public_id_never_starts_with_a_dash`
+(`phase4_auth/tests/test_crypto.py`, 5.000 Ziehungen, zusätzlich Länge/Alphabet-Gleichheit zu
+`new_secret` geprüft — bei 1,569 % gemessener Trefferquote macht das einen stillen Rückfall auf
+`new_secret` praktisch unmöglich unentdeckt).
+
+**J4 (enge Tabu-Probe, vor dem Commit ausgeführt):** `git diff --stat -- phase4_auth/authserver`
+→ **genau zwei Dateien** (`crypto.py`, `store.py`), in `store.py` **genau 2 geänderte Zeilen**
+(4 Diff-Zeilen: 2 entfernt, 2 hinzugefügt) — deckungsgleich mit der Plan-2-§6.4-Erwartung. Die
+breitere Tabu-Probe (§0.3, `phase1_storage/storage` + `phase2_mcp/mcpserver` +
+`phase5_ui/webui/{security,api,serializers,permissions}.py`) blieb ebenfalls leer — **keine**
+neunte P1-Contract-Öffnung.
+
+**Selbstprüfung §0.5:** `pytest -q` **994 passed in 111,5 s** (992 + 2 netto — J3 fügt zwei
+Tests hinzu, `test_revoke_kills_the_family` ist eine Umstellung, kein neuer Test; Plan-2-§6.5-
+Erwartung „+3, ≥ 972 passed" war gegen die alte 969-Baseline geschätzt, die reale Baseline ist
+seit H-R-3 bei 992 gewachsen). `phase4_auth/tests/{test_crypto,test_authctl}.py` isoliert
+**26/26 grün**. Keine `ui_budget`-Prüfung nötig (kein `phase5_ui/webui/static/**`-Touch, Block
+J ist reiner Auth-Code + Auth-Tests). Kein `pkill -f`, kein `systemctl`, sharefyx-mcp **PID 991**
+nicht angefasst.
+
+**Doku-Hygiene:** Modul-Status Zeile 15 ⬜→✅, dieser Nachtrag-2-Abschnitt, `docs/INDEX.md`-
+Phase-8.6-Zeile + Wurzel-`CLAUDE.md`-Current-state + `phase4_auth/CLAUDE.md`s Flake-Notiz
+(„bekannter Flake" → „behoben, siehe hier") im selben Commit nachgezogen.
+
+**Nächster Schritt:** Reihenfolge P8.6-AH damit **G ✅ → G-R ✅ → H ✅ → H-R-1+2 ✅ → H-R-3 ✅ →
+J ✅ → Gate ⬜ → Z ⬜.** Gate ist ein eigener, größerer Schritt (Wegwerf-Ritt +
+`p86_polish_smoke.py`, 14 Stationen aus Plan 2 §7.2, Chromium+Firefox für vier Stationen,
+Nikinger-Sichtprüfung mit fünf offenen Entscheidungen §7.3, danach Deploy `v3.0.2` — Plan 2
+§7) — bewusst nicht in diesem atomaren Schritt mitgebaut.
 ## Session stopped — 2026-09-15 (opencode/M3 — Block H-R-3 Escalation-Report, Übergabe an Claude Code)
 
 **Rein dokumentarisch, kein Produktcode-Touch, kein Service-Touch.**

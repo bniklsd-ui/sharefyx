@@ -135,7 +135,7 @@ Entscheidungen P8.6-A–P8.6-U, Tabu-Liste, Schritt-Sequenz, Testliste, Abnahmez
 | 4 | Block B — Selektion vereinheitlichen: B1 Hover = leise Standardauswahl überall (`var(--select-fill-quiet)` + `outline` + `border-radius: var(--radius-sm)`, eine konsolidierte Regel statt der drei Flickenteppich-Fassungen), B2 Audit (V113-Befund: `.tree__space` hat im Code kein `aria-current` — anders als Plan §4.2 annimmt; `:not()`-Ausschluss trotzdem korrekt für künftige Reparatur vorbereitet), B3 Einstellungsmenü (`.account-nav`-Klasse statt `.btn`-Plastik für `#account-show-updates`/`#account-manage-spaces`, Navigation statt Aktion), B4 Sweep „alles Klickbare" mit Vorsicht-Kennzeichnung (`class="action--caution"`-Trägerklasse auf `#logout-button` und `#archive-button`, **genau zwei Mitglieder** — Test `test_caution_class_only_on_logout_and_archive` hält das fest), B5 Radien (genau eine Änderung: `.link-picker-results` `6px` → `var(--radius-sm)`, Block A hatte das nicht erwischt) | B | ✅ | 966 → **967** (+1 statischer Test in Block B; **Plan §3.5/§8.2-Abweichung eingehalten** — die drei für Block B vorgesehenen Tests `test_caution_class_only_on_logout_and_archive`/`test_every_css_var_reference_is_defined` (zusammen mit Block A) + `test_link_picker_uses_a_select_not_a_radio_group` (Block A, ersetzt P8.5-Test per P8.6-I) sind grün; `ui_budget.py` 5/5 im Korridor mit app.css 19.8 KB; **drei weitere** Tests aus der Plan-§8.2-Liste (`test_rail_order_…`, `test_account_button_…`, `test_overview_graph_has_no_max_width`) bleiben Block C vorbehalten — sonst waeren sie in B rot, §0.5 Punkt 2 bricht) |
 | 5 | Block C — Struktur: C1 „Konto" → „Einstellungen", Lesart b (Einstellungen nach oben, Abmelden ans Rail-Ende, P8.6-J/N3), C2 „Alle Items" unter die Spaces (`tree.js :: renderRail()`, P8.6-J), C3 Map als rechte Spalte / volle Höhe (`.overview` als Grid, P8.6-K/L), C4 Spaces in der Übersicht klickbar (`.overview__space-row` + `<button class="overview__space-open">`, P8.6-P), C5 Ordner-Zähler clientseitig aus `state.items` (P8.6-O) | C | ✅ **geliefert** · ⚠️ **nicht auslieferbar** | 967 → **970** (+3 statische Tests); `ui_budget` 5/5, Tabu-Diff leer. **[2026-09-13, Partial Closeout]** Diese Zeile stand bis heute auf ⬜, obwohl der Block-C-Commit `90c72e2` ihren Nachzug behauptet hat — Hard-Rule-8-Miss, korrigiert. Die Nikinger-Sichtung vom 2026-09-12 hat den Block **nicht abgenommen**: neun UX-Befunde, Details im Session-Block |
 | 6 | Block D — Graph-Fixes: D1 V102-Dedup (`dedupeEdges()` ungeordnetes Paar, P8.6-N), D2 deterministischer Layout-Seed (`seedJitter()` FNV-1a-Hash, P8.6-M), D3 `.overview__graph`-Höhe (V112-Gegenprobe — abhaengig von C3, daher mit Block C), **D4 `runSimulation()` `rafId` endlich gelesen + `cancelAnimationFrame`** — die **einzige Scope-Erweiterung** des Plans (P8.6-§6.4: §2.1-Gebiet, aber direkte Ursache von §2.4-Verschlimmerung + 3 Zeilen Fix + schon halb da; **streichen, wenn der Nikinger es in der Sichtprüfung anders sieht**) | D | ✅ (D1, D2, D4) · 🟡 (D3, haengt an Block C) | 966 → 966 (kein Test in Block D, dedup + seed + cancel sind graph.js-intern und durch das Vorhandensein des Codes hinreichend belegt — node-Probe gegen `dedupeEdges()`/`seedJitter()` separat verifiziert, Plan §0.5 ui_budget bleibt grün) |
-| 7 | Gate — Wegwerf-Instanz (eigener Port, eigener tmp-`DATA_ROOT`, PID-Datei, Hard Rule 9) + `p86_polish_smoke.py` — **maßgeblich ist jetzt die 14-Stationen-Liste aus Plan 2 §7.2**, nicht die 12 aus Plan 1 §7.2 (die prüft ein Layout, das Block G löscht); Chromium + Firefox für Station 3/5/8/10 + Nikinger-Sichtprüfung (fünf Entscheidungen, Plan 2 §7.3) + Deploy `v3.0.2` zweigeteilt (D-a Agent, D-b Nikinger, D-c `health_gate.sh` 8/8 **mit Ausgabe im Commit**) | Gate | ⬜ **angehalten bis Block J** | `p86_polish_smoke.py` ist weiterhin nicht geschrieben. Die Sichtprüfung §7.3 **hat stattgefunden** (2026-09-12) und endete mit neun UX-Befunden statt fünf Antworten |
+| 7 | Gate — **GA1+GA2 ✅ 2026-09-18**: Wegwerf-Instanz (Port 18773, PID-Datei, Hard Rule 9) + `p86_polish_smoke.py` neu (14 Stationen aus Plan 2 §7.2, Chromium + Firefox für Station 3/5/8/10) — **18/18 grün** nach drei Korrektur-Runden gegen den aktuellen Code (§7.2s Wortlaut war stellenweise stale, Details im Session-Block). **GA3 (Nikinger-Sichtprüfung, fünf Entscheidungen Plan 2 §7.3) + GA4 (Deploy `v3.0.2`) offen** — beides Nikinger-Schritte | Gate | 🟡 **GA1+GA2 ✅, GA3/GA4 ⬜** | 18 Screenshots `docs/screenshots/p86_smoke_*.png`, Report `phase8_6_ui_polish/scripts/p86_polish_smoke_report.json`. **Ein Befund unterwegs gefunden:** `#back-button`/`.detail__back` ist toter Code — `app.css:1367` fest `display: none` ohne jede Override-Regel im gesamten Stylesheet; H-R.7 hat das Zurück-Muster durch `#close-button` + ESC ersetzt, der Knopf wurde nie nachgezogen |
 | 8 | Step Z — Closeout | Z | ⬜ · **Teil-Stand 2026-09-13** | **[2026-09-13, Plan 2]** Der kanonische Closeout wandert nach **`phase8_6_ui_polish_plan2.md` §9** (Lock **P8.6-W**). Plan 1 §9 bleibt leer und bekommt in Step Z **eine** Zeiger-Zeile — die einzige erlaubte Änderung an dem 📕-Snapshot. `PHASE8_6_CLOSEOUT_HANDOVER.md` + `phase8_6_ui_polish_uebersicht.svg` bleiben als Teil-Stand bestehen |
 | 9 | **Plan 2 — Step 0'** (Planungssession 2026-09-13): Doku-Hygiene repo-weit verifiziert (0 kaputte Links, 0 fehlende Cards, 0 fehlende INDEX-Zeilen), `docs/INDEX.md` von 38.815 auf **38.471 B** gebracht (sieben geschlossene Phasen-Zeilen gestrafft, −1.549 B; Plan-2-Zeile +1.205 B), Baselines neu gemessen, Anker-Drift gegen Plan 1 belegt | 0' | ✅ | `pytest` **969 passed + 1 Flake** (§1.3), `ui_budget` 5/5 (137,5 KB), `/api/v1/overview` 372,9 ms |
 | 10 | **Block E — messen, nicht bauen** (Befund 9): `p86_viewport_probe.py` (CDP, `getBoundingClientRect` + `getComputedStyle` + `elementFromPoint` auf jeden Knopf-Mittelpunkt) bei 1024/1200/1440 px, **zweimal** — gegen die Wegwerf auf aktuellem `main` **und gegen eine zweite Wegwerf auf v3.0.1-Stand** (Methodik-Wechsel 2026-09-14: keine echten Produktions-Creds, Wegwerf-vor-Produktion reicht, ist exakt der Code der läuft). Trennt **9a** (live auf `v3.0.1`) von **9b** (durch Block C eingeführt). **E2a + E2b erledigt 2026-09-14:** Befund **9 banner-abhängig, nicht unconditional** — bei 1200 px **mit** Update-Banner zwei Recent-Items vom `.overview__col-right`-Container überdeckt; **ohne** Banner kein sichtbar unerreichbarer Knopf. **V125 geschlossen: 9a = 9b, gleiche Ursache, falsche Plan-Annahme** — bei 1200 px mit Banner sind die Maße auf main (Block C) und auf v3.0.1 **byte-identisch** (col-left 692×284, col-right 692×284). Block C hat nur die Recent-Items-Reihenfolge geändert, nicht das Layout. Die wahre Ursache ist die 140-px-Banner-Höhe und war schon auf v3.0.1 vorhanden. **V126** (1024 px unerreichbar?) **erledigt**: **0** sichtbare Buttons blockiert, alle 53 hidden-button-Treffer haben `rect=(0,0,0,0)` (data-view="list" blendet die Detail-Buttons aus — separater Mechanismus, kein Layout-Bug). | E | ✅ | +1 Skript (`p86_viewport_probe.py`, 421 Z. / 16 KB), +12 Screenshots `p86_probe_{main,main-clean,v3.0.1,v3.0.1-clean}_{1024,1200,1440}.png`, +4 Probe-JSON `phase8_6_ui_polish/probes/e2{a_main,a_main_clean,b_v3.0.1,b_v3.0.1_clean}.json` (~65 KB je), kein Produktcode, Tabu-Diff §0.3 leer |
@@ -597,187 +597,77 @@ Checkkriterium** (Konvention §5). Ein Rendern im OpenCode-Chat ist technisch ni
 Nikinger-Sichtung mit, nicht erst beim Phasenwechsel — die Symlinks zeigen derzeit noch auf
 Block B, obwohl Block C gesichtet wurde.
 
-## Session stopped — 2026-09-17 (Claude Code — Block H-R-3, drei Locks, ein Commit)
+## Session stopped — 2026-09-18 (Claude Code — Gate GA1+GA2, Smoke-Skript neu, 18/18 grün)
 
-**Auftrag:** Escalation-Report `phase8_6_ui_polish_block_h_r_3_escalation.md` übernehmen,
-zwei offene Klärungsfragen mit dem Nikinger durchgehen, dann H-R.6/H-R.7/H-R.8 bauen und live
-gegen die Wegwerf-Instanz verifizieren (opencode/M3 ist für Pixel-Befunde nicht der richtige
-Adressat, siehe Vorsitzung).
+**Auftrag:** Nächster atomarer Schritt nach Block J (siehe voriger Session-Block, jetzt im
+Archiv) ist der Gate — Plan 2 §7. Session-Vorgabe war „ein atomarer Schritt, dann anhalten für
+den Nikinger". GA3 (Sichtprüfung) und GA4-D-b (`deploy.sh`) sind Nikinger-Schritte per Hard
+Rule 9 und §7.3 — diese Session deckt GA1+GA2 ab: Wegwerf-Instanz + das bisher nie geschriebene
+`p86_polish_smoke.py`, dann anhalten.
 
-**Klärung (AskUserQuestion, vor dem Bau):**
+**Vor dem Schreiben gegen den Code geprüft, nicht gegen Plan 2 §7.2s Wortlaut übernommen**
+(§7.2 datiert 2026-09-13, seither liefen G-R/H/H-R-1..3/Nachtrag) — vier Abweichungen
+gefunden und im Skript-Docstring dokumentiert, bevor eine Zeile Station geschrieben wurde:
 
-1. **H-R.8:** Nikinger wählte **Lesart b** (Layout-Wechsel). Vorher recherchiert und dem
-   Nikinger vorgelegt: Lesart a stützte sich auf eine überholte Prämisse — `app.js:97-100`
-   dokumentiert, dass `#home-button` (→ Spaces-Übersicht) und `.tree__scope` (→ globaler
-   „Alle Items"-Modus) seit Block G / Plan 2 §4.3 **getrennte, nicht-redundante** Aktionen
-   sind, nicht mehr dieselbe wie zur V110-Zeit. Lesart a hätte eine funktionierende Funktion
-   gelöscht, keine Redundanz behoben.
-2. **G-R.1-raus:** Nikinger bestätigte „bei 'ohne Map' Entscheidung bleiben und umsetzen" —
-   sauberer Schnitt statt Override-Layer (Empfehlung übernommen, keine explizite
-   Einzelentscheidung dazu nötig).
+1. **`data-view`-Werte sind `"list"`/`"detail"`, nicht `"editor"`** (H-R.8 Lesart b) — gilt
+   OHNE Media-Query-Wrapper bei jeder Breite, nicht nur beim Editor.
+2. **Graph-Knoten öffnen per einfachem Klick**, nicht per Doppelklick — `dblclick`
+   (`graph.js:685`) resettet nur Zoom/Pan bei einem Hintergrund-Doppelklick, das Öffnen läuft
+   über `onMouseUp` + `hitTest()` (`graph.js:586/629`).
+3. **H-R.8 Lesart a wurde nicht gebaut** — der „Alle Items"-Rail-Knopf existiert weiterhin und
+   führt zur selben Aktion wie Home (V110, negativer Befund).
+4. **G-R.1s 1024-Stapel ist durch H-R.6 ersetzt** — kein Zwei-Zeilen-Grid mehr,
+   `.detail__graph { display: none }` bei jeder Breite ≤1024px.
 
-**Code-Erkenntnis vor dem Bau, senkt den Scope drastisch:** `shellEl.dataset.view` togglet
-bereits seit Block G zwischen `"list"`/`"detail"` (`editor.js:58` `showOverviewPane()`,
-`editor.js:82` `clearDetail()`, `editor.js:427` `loadEditorFromItem()`) — **ohne** CSS-
-Konsument bislang. ESC (`app.js:216`) und die ×-Buttons (`editor.js:554`) laufen beide durch
-`closeEditor() → clearDetail() → showOverviewPane()`. Das deckt „ESC/× bringt zurück" für
-H-R.7 **und** H-R.8 vollständig ab, ohne eine Zeile JS oder HTML anzufassen — die Escalation-
-Report-Schätzung („app.js + editor.js: ~5–10 Zeilen JS-Touch") war zu hoch gegriffen.
+**Wegwerf-Instanz:** `phase8_5_picker_release/scripts/wegwerf_setup_v3ritt.py start`
+(bereits gesetzte Daten aus einer Vorsitzung wiederverwendet — Port 18773, 30 Items über
+alpha/beta/gamma, PID 347520). Gestoppt über dieselbe Skript-`stop`-Subcommand am Sessionende
+(PID-Datei, kein `pkill -f`, Hard Rule 9). `sharefyx-mcp.service` nicht angefasst.
 
-**Gebaut (`phase5_ui/webui/static/app.css`, ein Commit):**
+**`phase8_6_ui_polish/scripts/p86_polish_smoke.py` neu** (14 Stationen + Login/TOTP-Muster aus
+`p86_block_h_r_3_nachtrag_self_check.py` übernommen, Setup-CLI aus `wegwerf_setup_v3ritt.py`).
+Erster Lauf: **11/18** (Chromium 14 + Firefox 4 für Station 3/5/8/10). Drei Runden Korrektur
+bis 18/18 — alle vier Ursachen waren Skript-Bugs, nicht Produktbefunde (bis auf einen echten
+Fund, siehe unten):
 
-- **Lock H-R.8** (außerhalb jeder `@media`-Query, gilt bei allen Breiten):
-  `.shell[data-view="detail"] { grid-template-columns: 240px 1fr }` +
-  `.shell[data-view="detail"] .list { display: none }`.
-- **Lock H-R.6** (innerhalb `@media (max-width: 1024px)`, ersetzt G-R.1 komplett):
-  `.shell { grid-template-columns: 240px 1fr; grid-template-rows: 1fr }` (eine Zeile statt
-  zwei), `.rail { grid-row: 1 }`, `.detail__graph { display: none }`.
-- **Lock H-R.7** (innerhalb derselben Media-Query, baut auf H-R.8s Basisregel auf — gleiche
-  Spezifität, spätere Quellreihenfolge gewinnt): `.shell[data-view="detail"] {
-  grid-template-columns: 1fr }` + `.shell[data-view="detail"] .rail { display: none }`.
+| Station | Ursache | Fix |
+|---|---|---|
+| 3 (hover, Firefox) | `--select-fill-quiet` ist ein `linear-gradient()`-Token — landet in `background-image`, nicht `background-color`; erste Fassung prüfte die falsche Property | `backgroundImage` statt `backgroundColor` |
+| 3/5 (Chromium, 2. Lauf) | Vorherige Stationen ließen den Editor offen/Space gewechselt, `.overview__space-open` war nicht sichtbar | `_ensure_overview()`-Helfer, klickt `#home-button` defensiv vor jeder Station |
+| 6 (Knoten-Klick) | Doppelklick-Annahme war falsch (siehe Abweichung 2 oben); danach ein 5×5-Rastersuche verfehlte den einzigen sichtbaren Knoten knapp | Pixel-Scan über `canvas.getImageData()` findet den ersten nicht-Hintergrund-Pixel direkt, klickt dort — robust unabhängig von Knotenzahl/-position |
+| 11 (back-button) | **Echter Fund, kein Skript-Bug:** `.detail__back { display: none }` (`app.css:1367`) hat **keine einzige Override-Regel** im gesamten Stylesheet (grep bestätigt) — der Knopf ist toter Code. H-R.7 hat das Zurück-Muster durch `#close-button` + ESC ersetzt, `back-button` wurde nie nachgezogen | Station prüft jetzt `#close-button`-Erreichbarkeit statt `back-button`, dokumentiert den toten Knopf separat als Befund-Zeile |
+| 12 (Kartenbild zweimal) | Volle-PNG-Byte-Vergleich schlug trotz 3,5s Settle-Wartezeit fehl — `integrate()` läuft über echte `requestAnimationFrame`-Zeitschritte, zwei Läufe treffen nie exakt dieselbe Frame-Zahl vor dem `ALPHA_MIN`-Abbruch (Sub-Pixel-Drift, kein Determinismus-Bruch des FNV-Seeds) | Canvas-Pixel-Checksum (Summe + „helle" Pixelzahl) mit 5%-Toleranz statt Byte-Gleichheit; Ergebnis 0,0% Abweichung |
+| 14 (Link-Picker) | `.toolbar-btn[data-md="link"]` fügt nur ein statisches `[Linktext](Ziel-URL)`-Snippet ein (`editor.js:660-668`), öffnet **keinen** Dialog — der echte Trigger ist `#link-picker-button` neben dem Frontmatter-Feld „Links", sitzt in einem `<details>`, das erst aufgeklappt sein muss | Richtigen Selektor benutzt + `<details>` per `.open = true` aufgeklappt, falls nötig |
+| 14 (Folgefehler) | Dialog blieb nach dem Test offen, blockierte `#home-button` in allen folgenden Stationen (`pointer-events` vom `.overlay`) | `Escape` am Ende der Station, `finally`-Block |
 
-**Cascade-Probe vor dem Testlauf:** `.shell[data-view="detail"]` hat Spezifität (0,2,0),
-schlägt die reinen `.shell`-Regeln in den 1200/1024-Media-Queries (0,1,0) unabhängig von der
-Quellreihenfolge — die 1024-interne Fassung von `.shell[data-view="detail"]` (gleiche
-Spezifität wie die Basisregel, aber später im Quelltext) gewinnt dort zusätzlich gegen die
-Basisregel. Beide Mechanismen von Hand durchgerechnet, dann live per Probe bestätigt (unten).
+**Ergebnis: 18/18 Stationen grün**, 18 Screenshots unter `docs/screenshots/p86_smoke_*.png`,
+strukturierter Report `phase8_6_ui_polish/scripts/p86_polish_smoke_report.json`. Zwei Stationen
+(12 Kartenbild-Determinismus, 13 Zwillingskanten-Präparat `itm_fbe90e4a`→`itm_579b35c1`) sind
+bewusst nur teilweise automatisiert — pixelgenaue Layout-Fragen bleiben Nikinger-Sache (§2 der
+Sichtprüfungs-Konvention), das Skript liefert die Screenshots + ein grobes Toleranz-Signal, kein
+hartes Pass/Fail für die visuelle Qualität selbst.
 
-**Tests (`phase5_ui/tests/test_static_routes.py`):** zwei G-R.1-Tests waren nach dem Wegfall
-der Stapel-Logik reine Duplikate derselben jetzt toten Grid-Properties —
-`test_1024_breakpoint_stacks_list_over_detail` umbenannt + neu geschrieben zu
-`test_1024_breakpoint_has_single_row_no_map` (prüft `grid-template-rows: 1fr` statt `1fr 1fr`,
-`.detail__graph display:none`, Negativ-Check auf alle G-R.1-Marker), `test_1024_no_overlap_in_css`
-**gelöscht** (seine gesamte Prämisse — Überlapp-Risiko zwischen Karte und Rail/Liste — entfällt,
-wenn die Karte nie sichtbar ist; ein dritter Test mit denselben Assertions wäre reine
-Duplikation gewesen). `test_shell_grid_is_240_480_1fr`s dritter Anker (1024-px-Zeilen) auf
-`grid-template-rows: 1fr` nachgezogen (schlug sonst rot an — im ersten Testlauf gefunden, nicht
-vorher gesehen). Zwei neue Tests: `test_1024_editor_fullview_hides_rail_and_list` (H-R.7),
-`test_editor_open_hides_list_at_all_viewports` (H-R.8, inkl. Negativ-Check, dass `#home-button`
-nicht verschwunden ist — Lesart a wurde verworfen). **Netto +1 Test** (991 → **992**) —
-Abweichung von der Escalation-Report-Schätzung „991 unverändert", die nur von einem
-G-R.1-Test ausging statt den tatsächlich vorhandenen zwei.
+**Ein Produktbefund für die Nikinger-Sichtprüfung (GA3) mitgeliefert:** `#back-button` /
+`.detail__back` ("← Zurück") ist erreichbarer, funktionsfähiger, aber **visuell niemals
+sichtbarer** toter Code — `app.css:1367` setzt `display: none` fest, keine einzige Regel im
+Stylesheet hebt das je auf, in keinem Breakpoint. Kein Regressionsrisiko (war nie sichtbar,
+seit wann ist unklar — H-R.7 hat das Zurück-Muster jedenfalls durch `#close-button`+ESC
+ersetzt), aber ein Kandidat zum Aufräumen (Markup + `app.js:159`s Klick-Listener) in Step Z
+oder einer Folgephase, kein Blocker für den Gate selbst.
 
-**Live-Verifikation (eigenes Skript `phase8_6_ui_polish/scripts/p86_block_h_r_3_self_check.py`,
-Wegwerf-Instanz v3ritt, Port 18773, `.venv/bin/python wegwerf_setup_v3ritt.py start`/`stop`,
-PID-Datei-gestoppt, Hard-Rule-9-konform):**
+**Selbstprüfung:** kein Produkt-/Test-Code berührt (nur `phase8_6_ui_polish/scripts/`,
+`docs/screenshots/`) — `pytest` läuft unverändert bei 994, kein erneuter Lauf nötig. Tabu-Diff
+§0.3 leer (`git diff --stat` gegen alle vier Tabu-Pfade). Kein `node --check`/`ui_budget.py`
+nötig (kein CSS/JS-Touch). Kein `pkill -f`, kein `systemctl` — Wegwerf per PID-Datei gestoppt,
+sharefyx-mcp **PID 991** nicht berührt.
 
-| Viewport | Zustand | `dataset.view` | `.rail` | `.list` | `.detail__graph` | Grid |
-|---|---|---|---|---|---|---|
-| 1440 | Editor offen | detail | flex | **none** | none | `240px 1200px` |
-| 1200 (Kontrolle) | Editor offen | detail | flex | **none** | none | `240px 960px` |
-| 1024 | Übersicht | list | flex | flex | **none** | `240px 784px` |
-| 1024 | Editor offen | detail | **none** | **none** | none | `1024px` |
+**Nächster Schritt: GA3 + GA4, beide beim Nikinger.** GA3 — die 18 Screenshots unter
+`docs/screenshots/p86_smoke_*.png` sichten, die fünf offenen Entscheidungen aus Plan 2 §7.3
+treffen (Kartengröße 720px/50%, Trägerflächen §10.1, `cancelAnimationFrame`-Fix behalten,
+Tag-Kante+explizite-Kante zwei Linien gewollt, 1024-px-Zustand erstmals im Bild — Screenshots
+11a/11b), plus den `back-button`-Fund einordnen (aufräumen jetzt oder in Step Z vormerken).
+GA4 danach: D-a (Agent, Badge `v3.0.1`→`v3.0.2` + `UPDATE_LOG.md`-Eintrag) erst NACH GA3, dann
+D-b `deploy.sh` durch den Nikinger, dann D-c `health_gate.sh --expected-sha=<neu>` durch den
+Agenten mit Ausgabe im Commit (Plan 2 §7.4 — genau die Stelle, an der Plan 1 zuvor eine
+Behauptung statt eines Laufs hinterlassen hatte).
 
-Alle vier Zeilen bestätigen die Locks exakt wie vorhergesagt — inklusive der Kontroll-Zeile
-(1200 px verhält sich wie 1440, H-R.7 leckt nicht in den 1200-Breakpoint). Vier Screenshots
-`docs/screenshots/p86_block_h_r_3_{01,02,03,04}_*.png`, visuell gegengeprüft (kein
-Layout-Bruch, Editor-Kopf + Format-Toolbar + Anhängen-Zeile bleiben in allen vier Zuständen
-korrekt gerendert). `screenshots_latest/` im selben Commit nachgezogen (P8.6-AK, vier
-Symlinks + README-Tabelle ersetzt).
-
-**Selbstprüfung §0.5:** `pytest -q` **992 passed in 116,64 s** (Baseline 991 unverändert
-+1 netto, siehe oben), Tabu-Diff §0.3 leer (`git diff --stat` gegen die Tabu-Pfade: leer;
-tatsächlich berührt nur `phase5_ui/webui/static/app.css` +
-`phase5_ui/tests/test_static_routes.py` + das neue Self-Check-Skript), `node --check` auf
-alle 13 JS-Dateien ✅ (keine JS-Änderung), `ui_budget.py` **5/5 im Korridor** (144,2 KB gzip,
-+0,5 KB ggü. 143,7 KB — passt zur erwarteten +1–2 KB roh). Kein `pkill -f`, kein `systemctl`,
-sharefyx-mcp **PID 991** durchgehend nur gelesen (`systemctl status` read-only bestätigt,
-Uptime 1 Woche).
-
-**Doku-Hygiene:** Modul-Status neue Zeile 14b (H-R-3), dieser Session-Block, Rotation per
-`scripts/rotate_session_block.sh phase8_6_ui_polish` (H-R-3-Escalation-Session-Block vom
-2026-09-15 wandert verbatim ins Archiv), `docs/INDEX.md`-Zeile für die neuen Screenshots +
-das neue Skript nachgezogen, `screenshots_latest/README.md` im selben Commit.
-
-**Nächster Schritt:** Block J (`pytest`-Flake, P8.6-AJ, datierte Tabu-Ausnahme
-`phase4_auth/authserver/{crypto.py,store.py}`) — Reihenfolge P8.6-AH jetzt: G ✅ → G-R ✅ →
-H ✅ → H-R-Teil-1+2 ✅ → **H-R-3 ✅** → **J ⬜** → **Gate ⬜** → **Z ⬜** (Closeout).
-
-**Nachtrag, 2026-09-17 — Rail-Exklusivität Übersicht vs. Space/Eimer/Ordner (Nikinger-Fund
-aus dem `03_1024_ohne_karte.png`-Screenshot):** Nikinger-Feedback nach Sichtung der vier
-H-R-3-Screenshots: „wenn ich 'Übersicht' auswähle, sollte das jede andere Auswahl (wie
-alpha→Offen) ausschließen, da das unterschiedliche Aktionen sind." Beleg: `state.activeSpace`/
-`state.filter`/`state.folder` werden beim Wechsel in die Übersicht (`state.overview = true`,
-`app.js` homeButtonEl-Handler) **bewusst nicht** geleert — der Rückweg in den zuvor besuchten
-Space soll die Filterung wiederfinden (siehe Kommentar `list.js :: clearDetail()`). `tree.js`s
-Highlight-Logik (`renderFolders()` Zeile 63, `folderButton()` Zeile 182, `homeButtonEl.setAttribute`
-Zeile 334) prüfte das aber nie gegen `state.overview` — ein zuvor markierter Eimer/Ordner blieb
-`aria-current="true"`, während gleichzeitig die Übersicht angezeigt wurde. Zusätzlich war
-`#home-button`s eigene Logik zu grob: `state.selectedId === null` markierte Home auch dann als
-aktuell, wenn tatsächlich ein Space/Eimer/Ordner **oder** der globale „Alle Items"-Modus ohne
-ausgewähltes Item gezeigt wurde — dieselbe Doppel-Markierungs-Klasse in zwei weiteren
-Kombinationen, nicht nur der vom Nikinger gemeldeten.
-
-**Fix (`phase5_ui/webui/static/js/tree.js`, kein CSS-/HTML-Touch):** drei Stellen ergänzt um
-die fehlende Übersicht-Exklusivität — `renderFolders()`- und `folderButton()`-Bedingungen
-bekommen `!state.overview` als zusätzliche Voraussetzung für `aria-current="true"`;
-`homeButtonEl`s Bedingung wechselt von `state.selectedId === null` auf `state.overview === true`
-(Home steht seit Block G konkret für die Übersicht, Plan 2 §4.3 — der eigene Zustandsflag ist
-der richtige Schalter, nicht die Item-Auswahl). `isGlobalScope()`/„Alle Items" brauchte keine
-Änderung — `state.scope === "all"` und `state.overview === true` schließen sich durch die
-bestehenden Setter (`navigateAll()`, homeButtonEl-Handler) bereits strukturell aus.
-
-**Verifikation:** eigenes Skript `phase8_6_ui_polish/scripts/p86_block_h_r_3_nachtrag_self_check.py`
-gegen die Wegwerf-Instanz v3ritt (Port 18773, PID-Datei-gestoppt) — navigiert nach
-`alpha → Offen` (`aria-current`: home=false, Offen=true), dann zurück in die Übersicht
-(`aria-current`: home=true, Offen=null, Alle-Items=null) — **exklusiv, wie gefordert**.
-Screenshot `docs/screenshots/p86_block_h_r_3_nachtrag_uebersicht_exklusiv.png` zeigt nur noch
-„Übersicht" markiert, „Offen" ohne Hervorhebung, „alpha" bleibt aufgeklappt (das ist reiner
-Expand-Zustand, keine Aktuell-Markierung, unverändert).
-
-**Selbstprüfung:** `pytest -q` **992 passed** (unverändert, keine pytest-Berührung — JS bleibt
-laut P5-T unit-ungetestet), `node --check` auf `tree.js` ✅, `ui_budget` 5/5 (144,7 KB, +0,5 KB
-Kommentare), Tabu-Diff §0.3 leer, sharefyx-mcp PID 991 nur gelesen. Zweiter Commit dieser
-Session (der erste war der H-R-3-Bau oben) — eigener Fund nach Sichtung, kein Amend.
-
-**Nachtrag 2, 2026-09-17 — Block J erledigt (P8.6-AJ, `pytest`-Flake, beide Hälften nach
-Plan 2 §6 wörtlich).** Dritter Commit dieser Session, bewusst getrennt vom UI-Diff oben (§6.5:
-„ein Auth-Touch gehört nicht in einen CSS-Diff").
-
-**J1 (Produktionsfehler):** `phase4_auth/authserver/crypto.py` bekommt `new_public_id(nbytes:
-int = 16)` direkt unter `new_secret()` — Rejection-Sampling (`while not value.startswith("-")`)
-statt Umkodierung, damit Alphabet und Länge zu `new_secret` identisch bleiben (Entropieverlust
-= ein verworfenes 64stel). `store.py:294` (`create_client` → `client_id`) und `store.py:393`
-(`create_family` → `family_id`) auf `crypto.new_public_id(16)` umgestellt — genau die zwei
-Stellen, deren Wert später auf einer Kommandozeile steht (`authctl revoke --family-id <ID>`).
-Die zehn übrigen `new_secret`-Aufrufstellen (`store.py:339, 465, 516, 517, 578, 579, 905, 1019,
-1020` plus die eine in `create_client` selbst für `client_secret`, sofern vorhanden) bleiben
-unverändert — sie erzeugen opake Geheimnisse, die nie eine Kommandozeile sehen.
-
-**J2 (Altbestand):** `phase4_auth/scripts/authctl.py`s `p_revoke.add_argument("--family-id",
-…)` bekommt einen `help`-Text, der die Gleichheitsform (`--family-id=-abc`) nennt — der einzig
-sinnvolle Ausweg für IDs, die vor diesem Fix vergeben wurden. Keine `sys.argv`-Vorverarbeitung
-(wäre ein Sonderweg an `argparse` vorbei).
-
-**J3 (Tests):** `test_revoke_kills_the_family` (`phase4_auth/tests/test_authctl.py`) auf
-`"--family-id=" + family_id` umgestellt — Verteidigung in der Tiefe, der Test bleibt grün, auch
-falls je wieder eine führende `-` vorkäme. Neu: `test_revoke_accepts_a_family_id_starting_with_a_dash`
-(Altbestands-Pfad, `--family-id=-abc` → rc 0) und `test_new_public_id_never_starts_with_a_dash`
-(`phase4_auth/tests/test_crypto.py`, 5.000 Ziehungen, zusätzlich Länge/Alphabet-Gleichheit zu
-`new_secret` geprüft — bei 1,569 % gemessener Trefferquote macht das einen stillen Rückfall auf
-`new_secret` praktisch unmöglich unentdeckt).
-
-**J4 (enge Tabu-Probe, vor dem Commit ausgeführt):** `git diff --stat -- phase4_auth/authserver`
-→ **genau zwei Dateien** (`crypto.py`, `store.py`), in `store.py` **genau 2 geänderte Zeilen**
-(4 Diff-Zeilen: 2 entfernt, 2 hinzugefügt) — deckungsgleich mit der Plan-2-§6.4-Erwartung. Die
-breitere Tabu-Probe (§0.3, `phase1_storage/storage` + `phase2_mcp/mcpserver` +
-`phase5_ui/webui/{security,api,serializers,permissions}.py`) blieb ebenfalls leer — **keine**
-neunte P1-Contract-Öffnung.
-
-**Selbstprüfung §0.5:** `pytest -q` **994 passed in 111,5 s** (992 + 2 netto — J3 fügt zwei
-Tests hinzu, `test_revoke_kills_the_family` ist eine Umstellung, kein neuer Test; Plan-2-§6.5-
-Erwartung „+3, ≥ 972 passed" war gegen die alte 969-Baseline geschätzt, die reale Baseline ist
-seit H-R-3 bei 992 gewachsen). `phase4_auth/tests/{test_crypto,test_authctl}.py` isoliert
-**26/26 grün**. Keine `ui_budget`-Prüfung nötig (kein `phase5_ui/webui/static/**`-Touch, Block
-J ist reiner Auth-Code + Auth-Tests). Kein `pkill -f`, kein `systemctl`, sharefyx-mcp **PID 991**
-nicht angefasst.
-
-**Doku-Hygiene:** Modul-Status Zeile 15 ⬜→✅, dieser Nachtrag-2-Abschnitt, `docs/INDEX.md`-
-Phase-8.6-Zeile + Wurzel-`CLAUDE.md`-Current-state + `phase4_auth/CLAUDE.md`s Flake-Notiz
-(„bekannter Flake" → „behoben, siehe hier") im selben Commit nachgezogen.
-
-**Nächster Schritt:** Reihenfolge P8.6-AH damit **G ✅ → G-R ✅ → H ✅ → H-R-1+2 ✅ → H-R-3 ✅ →
-J ✅ → Gate ⬜ → Z ⬜.** Gate ist ein eigener, größerer Schritt (Wegwerf-Ritt +
-`p86_polish_smoke.py`, 14 Stationen aus Plan 2 §7.2, Chromium+Firefox für vier Stationen,
-Nikinger-Sichtprüfung mit fünf offenen Entscheidungen §7.3, danach Deploy `v3.0.2` — Plan 2
-§7) — bewusst nicht in diesem atomaren Schritt mitgebaut.

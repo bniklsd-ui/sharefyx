@@ -1,0 +1,128 @@
+[
+  {
+    "station": "station_01_uebersicht_1440",
+    "ok": true,
+    "note": "overview_visible=True graph_visible=True",
+    "shot": "p86_smoke_01_1440_uebersicht.png",
+    "browser": "chromium"
+  },
+  {
+    "station": "station_02_rail_reihenfolge",
+    "ok": true,
+    "note": "home<rail-tree<account-button<logout-button = True",
+    "shot": "p86_smoke_02_rail_reihenfolge.png",
+    "browser": "chromium"
+  },
+  {
+    "station": "station_04_space_zeile_klicken",
+    "ok": true,
+    "note": "rows_visible=True graph_before=True graph_after=True",
+    "shot": "p86_smoke_04_space_zeile_klicken.png",
+    "browser": "chromium"
+  },
+  {
+    "station": "station_06_karten_knoten_esc",
+    "ok": true,
+    "note": "hit_at_offset=(996, 369.8) view_after_click=detail view_after_esc=list",
+    "shot": "p86_smoke_06_karten_knoten_klick.png",
+    "browser": "chromium"
+  },
+  {
+    "station": "station_07_alle_items",
+    "ok": true,
+    "note": "overview_hidden=True rows_visible=True",
+    "shot": "p86_smoke_07_alle_items.png",
+    "browser": "chromium"
+  },
+  {
+    "station": "station_09_konto_dialog",
+    "ok": true,
+    "note": "account-nav reachability: [{'id': 'account-show-updates', 'reachable': True}, {'id': 'account-manage-spaces', 'reachable': True}]",
+    "shot": "p86_smoke_09_konto_dialog.png",
+    "browser": "chromium"
+  },
+  {
+    "station": "station_11_1024px",
+    "ok": true,
+    "note": "graph_display_none=True rail_hidden=True list_hidden=True close_reachable=True BEFUND_back_button_ist_tot(display:none ohne Override)=True",
+    "shot": "p86_smoke_11a_1024_ohne_map.png,p86_smoke_11b_1024_editor_fullview.png",
+    "browser": "chromium"
+  },
+  {
+    "station": "station_12_uebersicht_zweimal",
+    "ok": true,
+    "note": "checksum1={'width': 654, 'height': 810, 'sum': 1783238, 'litPixels': 4136} checksum2={'width': 654, 'height': 810, 'sum': 1783378, 'litPixels': 4137} lit_delta=1 (0.0%) -- visuelle Gegenprobe der Screenshots empfohlen (§7.3)",
+    "shot": "p86_smoke_12a_uebersicht_erstmalig.png,p86_smoke_12b_uebersicht_zweites_mal.png",
+    "browser": "chromium"
+  },
+  {
+    "station": "station_13_zwillingskanten",
+    "ok": true,
+    "note": "screenshot-only, target_id=itm_fbe90e4a -- Nikinger prueft visuell",
+    "shot": "p86_smoke_13_zwillingskanten_buecherliste.png",
+    "browser": "chromium"
+  },
+  {
+    "station": "station_14_link_picker",
+    "ok": true,
+    "note": "select_present=True opened=True localStorage_after_change=frontmatter restored_on_reopen=frontmatter",
+    "shot": "p86_smoke_14a_link_picker_frontmatter.png",
+    "browser": "chromium"
+  },
+  {
+    "station": "station_03_space_zeile_hover",
+    "ok": true,
+    "note": "hover_background-image=linear-gradient(rgba(62, 141, 243, 0.1), rgba(62, 141, 243, 0.04)) width=415",
+    "shot": "p86_smoke_03_space_zeile_hover.png",
+    "browser": "chromium"
+  },
+  {
+    "station": "station_05_item_klicken_esc",
+    "ok": true,
+    "note": "view_after_open=detail view_after_esc=list",
+    "shot": "p86_smoke_05a_item_editor_open.png,p86_smoke_05b_item_editor_esc.png",
+    "browser": "chromium"
+  },
+  {
+    "station": "station_08_editor_kopfdaten",
+    "ok": true,
+    "note": "editor__head background=rgb(27, 32, 39) padding-bottom=40px",
+    "shot": "p86_smoke_08_editor_kopfdaten.png",
+    "browser": "chromium"
+  },
+  {
+    "station": "station_10_1200px",
+    "ok": true,
+    "note": "buttons_ok=True clipped(bad if true)=False",
+    "shot": "p86_smoke_10_1200px.png",
+    "browser": "chromium"
+  },
+  {
+    "station": "station_03_space_zeile_hover",
+    "ok": true,
+    "note": "hover_background-image=linear-gradient(rgba(62, 141, 243, 0.1), rgba(62, 141, 243, 0.04)) width=415",
+    "shot": "p86_smoke_03_space_zeile_hover.png",
+    "browser": "firefox"
+  },
+  {
+    "station": "station_05_item_klicken_esc",
+    "ok": true,
+    "note": "view_after_open=detail view_after_esc=list",
+    "shot": "p86_smoke_05a_item_editor_open.png,p86_smoke_05b_item_editor_esc.png",
+    "browser": "firefox"
+  },
+  {
+    "station": "station_08_editor_kopfdaten",
+    "ok": true,
+    "note": "editor__head background=rgb(27, 32, 39) padding-bottom=40px",
+    "shot": "p86_smoke_08_editor_kopfdaten.png",
+    "browser": "firefox"
+  },
+  {
+    "station": "station_10_1200px",
+    "ok": true,
+    "note": "buttons_ok=True clipped(bad if true)=False",
+    "shot": "p86_smoke_10_1200px.png",
+    "browser": "firefox"
+  }
+]
