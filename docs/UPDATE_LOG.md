@@ -9,6 +9,14 @@
      (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
+## 2026-09-18
+- Die Übersicht zeigt deine Spaces jetzt direkt neben der Verknüpfungs-Karte statt darüber — beides auf einen Blick, kein Umschalten mehr nötig.
+- Ein Klick auf eine Notiz oder einen Punkt in der Karte öffnet den Editor an derselben Stelle; Escape oder das Kreuz oben rechts bringt dich sauber zur Karte zurück.
+- Space-Zeilen in der Übersicht sind jetzt über ihre ganze Breite klickbar, nicht nur am Namen.
+- Die Karte „fliegt" nicht mehr bei jedem Öffnen — Notizen behalten ihre Position, doppelte Linien zwischen zwei verknüpften Notizen sind verschwunden.
+- Einstellungen und Abmelden sitzen wieder unten in der Navigation, mit einer deutlicheren Markierung, dass es klickbare Menüpunkte sind.
+- Auf schmaleren Bildschirmen (bis 1024 Pixel Breite) zeigt die Ansicht jetzt entweder deine Liste oder den geöffneten Editor in voller Breite, nicht mehr beides gleichzeitig zusammengequetscht.
+
 ## 2026-09-05
 - Im Suchdialog für Verknüpfungen kannst du wählen, ob eine Notiz als Text-Link im Notiztext oder als Eintrag im Links-Feld angelegt wird — die letzte Wahl wird gemerkt.
 - Im Suchdialog für Verknüpfungen kannst du mit Pfeiltasten und Enter durch die Treffer navigieren — das Suchfeld behält den Fokus, die Maus brauchst du dafür nicht.
