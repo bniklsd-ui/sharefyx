@@ -4,10 +4,48 @@ purpose: Archiv älterer Session-stopped-Blöcke aus phase3_edge/CLAUDE.md, newe
 read-when: Audit vergangener Sessions dieser Phase; NICHT für normalen Session-Start
 detail: L3
 up: CLAUDE.md
-updated: 2026-08-02 (2026-07-29-Session „Zeile 6 passiv erfüllt" archiviert)
+updated: 2026-09-18 (2026-08-02-Session „Zeile 13 vom Nikinger bestätigt" archiviert, per
+`scripts/rotate_session_block.sh phase3_edge` — Kopf trägt jetzt den 2026-09-18-Incident-Block
+über die Tailscale-Account-Migration)
 ---
 
 # Session-Archiv — Phase 3 Exposure & Betrieb
+
+## Session stopped — 2026-08-02 (Zeile 13 vom Nikinger bestätigt — 13/13, Phase 3 ✅; Rückbau-Berührung aus P5 Step 0)
+
+**Für den nächsten, kalten Leser:** kein aktiver P3-Arbeitsschritt — diese Session lief in P5
+Step 0 (Haushalt/Rückbau/Doku-Drift, siehe `phase5_ui/CLAUDE.md`), berührte diesen Head aber an
+zwei Stellen, beide read-only bzw. mechanisch, keine neue P3-Entscheidung.
+
+**1. Zeile 13 (Restore-Nachweis) — vom Nikinger selbst bestätigt, jetzt Abnahme.** Claude Code
+hatte `restore_check.sh` zunächst selbst gegen das frischeste Bundle
+(`sharefyx-data-20260801T220156.234086Z.bundle`) gefahren (`ok:true`) — bewusst nur als
+Kandidatenbeleg gewertet, weil der Session-Auftrag „jeden End-to-End-Test gegen das echte
+Datenverzeichnis" dem Nikinger vorbehält. Der Nikinger hat denselben Befehl danach selbst
+ausgeführt: `{"ts":"2026-08-02T18:01:39.959Z","bundle":"…20260801T220156…","head":
+"3756c26a7d826def1246bb4dc826e9ee10e764b3","ok":true}` — identischer HEAD, echte Nikinger-Abnahme.
+**Damit stehen 13 von 13 Abnahmezeilen, Phase 3 wechselt von 🟡 auf ✅.** `ROADMAP.md`,
+Root-`CLAUDE.md` und `docs/INDEX.md` im selben Commit nachgezogen.
+
+**2. Rückbau-Konsequenz aus P5 Step 0 A dokumentiert.** `docs/concepts/
+PHASE4_CLOSEOUT_HANDOVER.md` §4.5 verlangte den Rückbau von `spaces.cred` und den P2-Token-Resten
+— `phase2_mcp/scripts/issue_token.py` und **dieses** Phase-Eigentum,
+`phase3_edge/scripts/export_space_map.py`, sind gelöscht (der P5-Plan nannte für Letzteres
+fälschlich `phase2_mcp/scripts/`, kleine Pfaddrift, korrigiert statt blind übernommen). Die
+`LoadCredentialEncrypted=spaces:…`-Zeile ist aus `phase4_auth/systemd/sharefyx-mcp.service`
+entfernt. Das „Inbetriebnahme"-Runbook oben trägt jetzt eine datierte Korrekturnotiz, die
+Schritte 3/4 als historisch (nicht mehr ausführbar) markiert, statt sie rückwirkend
+umzuschreiben. `phase3_edge/tests/test_units.py :: test_unit_loads_credential_encrypted`
+angepasst (prüft jetzt zusätzlich die **Abwesenheit** der `spaces:`-Zeile).
+
+**Verifiziert:** `pytest -q` grün (Gesamtzahl + Aufschlüsselung im P5-Step-0-Session-Block,
+`phase5_ui/CLAUDE.md`, nicht hier dupliziert — die gelöschten Tests lagen alle in
+`phase2_mcp/tests/`, nicht in `phase3_edge/tests/`).
+
+**Nächster Schritt (konkret):** keiner für P3 — die Phase ist komplett. Alles Weitere läuft
+unter P5.
+
+---
 
 ## Session stopped — 2026-07-29 (Zeile 6 passiv erfüllt — unbeabsichtigter Reboot)
 

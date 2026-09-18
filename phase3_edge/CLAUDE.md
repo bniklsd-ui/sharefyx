@@ -8,7 +8,10 @@ down:
   - ../docs/concepts/phase3_edge_plan.md          # voller Plan, Entscheidungen P3-A–P3-N, Steps 0–7
   - ../docs/concepts/PHASE2_CLOSEOUT_HANDOVER.md  # Herkunft der offenen Entscheidungen 1–8
   - SESSIONS_ARCHIVE.md                            # ältere Session-Blöcke, newest-first
-updated: 2026-07-29
+updated: 2026-09-18 (Tailscale-Account-Migration hat den Funnel zerstört — Tailnet-Suffix
+`tail89fc2a.ts.net` → `tail4a8b49.ts.net`, zweiteiliger Fix + ein neu entdeckter Fallstrick,
+siehe Runbook-Ergänzung unten. Neue öffentliche URL:
+`https://savefyx-vmware-virtual-platform.tail4a8b49.ts.net`)
 ---
 
 # CLAUDE.md — Phase 3: Exposure & Betrieb (`phase3_edge/`)
@@ -346,36 +349,92 @@ Top-Commit `a400221c` im `DATA_ROOT`. Details: `docs/concepts/P3_ABNAHME_2026-07
 
 ---
 
-## Session stopped — 2026-08-02 (Zeile 13 vom Nikinger bestätigt — 13/13, Phase 3 ✅; Rückbau-Berührung aus P5 Step 0)
+## Session stopped — 2026-09-18 (Tailscale-Account-Migration hat den Funnel zerstört — behoben, ein neuer Fallstrick dokumentiert)
 
-**Für den nächsten, kalten Leser:** kein aktiver P3-Arbeitsschritt — diese Session lief in P5
-Step 0 (Haushalt/Rückbau/Doku-Drift, siehe `phase5_ui/CLAUDE.md`), berührte diesen Head aber an
-zwei Stellen, beide read-only bzw. mechanisch, keine neue P3-Entscheidung.
+**Für den nächsten, kalten Leser:** kein aktiver P3-Arbeitsschritt — die Phase ist seit
+2026-08-02 komplett (13/13). Diese Session ist ein Live-Incident-Response außerhalb der
+Step-Zählung, dokumentiert hier, weil `diagnose.sh`, `local.env`, `install_units.sh` und das
+Runbook „Connector zeigt Disconnected" P3-Eigentum sind (gleiche Konvention wie der
+2026-08-19-Fund weiter oben in diesem Kopf).
 
-**1. Zeile 13 (Restore-Nachweis) — vom Nikinger selbst bestätigt, jetzt Abnahme.** Claude Code
-hatte `restore_check.sh` zunächst selbst gegen das frischeste Bundle
-(`sharefyx-data-20260801T220156.234086Z.bundle`) gefahren (`ok:true`) — bewusst nur als
-Kandidatenbeleg gewertet, weil der Session-Auftrag „jeden End-to-End-Test gegen das echte
-Datenverzeichnis" dem Nikinger vorbehält. Der Nikinger hat denselben Befehl danach selbst
-ausgeführt: `{"ts":"2026-08-02T18:01:39.959Z","bundle":"…20260801T220156…","head":
-"3756c26a7d826def1246bb4dc826e9ee10e764b3","ok":true}` — identischer HEAD, echte Nikinger-Abnahme.
-**Damit stehen 13 von 13 Abnahmezeilen, Phase 3 wechselt von 🟡 auf ✅.** `ROADMAP.md`,
-Root-`CLAUDE.md` und `docs/INDEX.md` im selben Commit nachgezogen.
+**Auslöser (Nikinger-Meldung):** eine notwendige Migration hat den Tailscale-Node auf den
+Haupt-Account umgehängt und dabei den bisherigen Funnel zerstört.
 
-**2. Rückbau-Konsequenz aus P5 Step 0 A dokumentiert.** `docs/concepts/
-PHASE4_CLOSEOUT_HANDOVER.md` §4.5 verlangte den Rückbau von `spaces.cred` und den P2-Token-Resten
-— `phase2_mcp/scripts/issue_token.py` und **dieses** Phase-Eigentum,
-`phase3_edge/scripts/export_space_map.py`, sind gelöscht (der P5-Plan nannte für Letzteres
-fälschlich `phase2_mcp/scripts/`, kleine Pfaddrift, korrigiert statt blind übernommen). Die
-`LoadCredentialEncrypted=spaces:…`-Zeile ist aus `phase4_auth/systemd/sharefyx-mcp.service`
-entfernt. Das „Inbetriebnahme"-Runbook oben trägt jetzt eine datierte Korrekturnotiz, die
-Schritte 3/4 als historisch (nicht mehr ausführbar) markiert, statt sie rückwirkend
-umzuschreiben. `phase3_edge/tests/test_units.py :: test_unit_loads_credential_encrypted`
-angepasst (prüft jetzt zusätzlich die **Abwesenheit** der `spaces:`-Zeile).
+**Diagnose (read-only, vor jedem Eingriff):** `tailscale status --json` zeigte den Node unter
+dem neuen Account (`bniklsd-ui@`) mit einem **neuen** `MagicDNSSuffix`:
+`tail4a8b49.ts.net` statt des alten `tail89fc2a.ts.net` — ein Account-Wechsel hängt den Node an
+ein neues Tailnet, nicht nur an einen neuen Login. `phase3_edge/scripts/diagnose.sh` bestätigte
+das lückenlos: Prüfungen 1–3 grün (Dienst aktiv, lokal erreichbar, Tailscale online), Prüfung 4
+rot — `tailscale funnel status` zeigte Port 8765 nicht mehr aktiv. Funnel-Aktivierung ist eine
+Tailnet-Eigenschaft; ein neues Tailnet hat sie nicht geerbt.
 
-**Verifiziert:** `pytest -q` grün (Gesamtzahl + Aufschlüsselung im P5-Step-0-Session-Block,
-`phase5_ui/CLAUDE.md`, nicht hier dupliziert — die gelöschten Tests lagen alle in
-`phase2_mcp/tests/`, nicht in `phase3_edge/tests/`).
+**Fix, Teil 1 — Hostname-Drift:** `phase3_edge/local.env` (git-ignoriert, Quelle für
+`install_units.sh`s Platzhalter-Ersetzung) trug an zwei Stellen noch den alten Hostnamen
+(`ALLOWED_HOSTS`, `PUBLIC_BASE_URL`) — genau wie die lebende `sharefyx-mcp.service`-Unit unter
+`/etc/systemd/system/`. Beide auf `tail4a8b49.ts.net` korrigiert, dann `sudo
+phase3_edge/scripts/install_units.sh` (Nikinger) — regeneriert alle acht Units aus den
+Vorlagen und lädt sie neu.
 
-**Nächster Schritt (konkret):** keiner für P3 — die Phase ist komplett. Alles Weitere läuft
-unter P5.
+**Fix, Teil 2 — Funnel neu aktivieren:** `sudo tailscale funnel --bg 8765` (Nikinger). Verlangte
+diesmal eine einmalige Freigabe über die Tailscale-Login-Konsole
+(`https://login.tailscale.com/f/funnel?node=…`) — der von P3-A vorausgesetzte
+`nodeAttrs: funnel`-Grant existierte im alten Tailnet, im neuen (persönlichen Haupt-Account)
+noch nicht und musste einmalig bestätigt werden. Danach lief Funnel korrekt und proxyte auf
+`127.0.0.1:8765`.
+
+**Dritter, bis dahin unbekannter Fallstrick — `install_units.sh` restart't keinen bereits
+laufenden Dienst:** `install_units.sh` meldete „sharefyx-mcp.service installiert und
+gestartet", aber `systemctl show sharefyx-mcp -p MainPID -p ActiveEnterTimestamp` zeigte
+danach unverändert `MainPID=991` / `ActiveEnterTimestamp=2026-09-10` — derselbe Prozess wie vor
+der ganzen Migration, eine Woche alt. Ursache: das Skript ruft (wie die meisten
+Installer-Skripte) `systemctl enable --now` — auf einer bereits **aktiven** Unit ist das ein
+No-Op fürs Neustarten, es setzt nur das Enable-Flag. Der laufende Python-Prozess hatte die
+alten `SPACE_ALLOWED_HOSTS`/`SPACE_PUBLIC_BASE_URL`-Werte längst in seinen Speicher geladen und
+las die aktualisierte Unit-Datei nicht nach. **Beweis, nicht Vermutung:** `curl -H "Host:
+<alter-Hostname>" http://127.0.0.1:8765/health` → `200` (!), `curl -H "Host: <neuer-Hostname>"
+…` → `400` — der neue Funnel-Endpunkt zeigte auf einen Prozess, der ihn per
+`TrustedHostMiddleware` ablehnte. Fix: `sudo systemctl restart sharefyx-mcp` (Nikinger) — neue
+`MainPID=346559`, `ActiveEnterTimestamp=2026-09-18 12:30:53`. Derselbe Beweis-Curl kehrte sich
+danach um (alt → 400, neu → 200).
+
+**Verifikation, vollständig read-only:** `phase3_edge/scripts/diagnose.sh` — **alle sechs
+Kern-Prüfungen grün, Exit 0**, inklusive Prüfung 5 (öffentlicher Pfad über einen echten
+externen DNS-Resolver aufgelöst, nicht über MagicDNS — genau die Reboot-Falle vom
+2026-08-19-Fund oben, hier sauber bestanden: `185.40.234.55`).
+
+**Neuer Fallstrick fürs Runbook (Ergänzung zur Liste oben, Punkt 4):** nach jedem
+`install_units.sh`-Lauf, der eine **bereits laufende** `sharefyx-mcp`-Unit betrifft, folgt
+zwingend `sudo systemctl restart sharefyx-mcp` — „installiert und gestartet" in der
+Skript-Ausgabe bedeutet nicht „mit neuer Konfiguration aktiv". `install_units.sh` selbst nicht
+angefasst (kein P3-Code-Touch, reines Betriebs-Wissen; ein automatischer Restart-on-diff wäre
+ein eigener Entscheidungsschritt, kein Ad-hoc-Fix mitten im Incident).
+
+**Neue öffentliche URL:** `https://savefyx-vmware-virtual-platform.tail4a8b49.ts.net` — der
+alte Funnel-Endpunkt (`…tail89fc2a.ts.net`) ist mit der Migration endgültig weg, keine
+Weiterleitung.
+
+**Noch offen (Nikinger-Sache, außerhalb des Repos):** der Claude-Connector in beiden Accounts
+(niklas + fabian) zeigt noch auf die alte URL — Connector-Einstellungen in den jeweiligen
+Claude-Accounts müssen auf den neuen Hostnamen aktualisiert werden, sonst bleibt der MCP-Server
+für Claude "Disconnected", obwohl der Server selbst gesund ist.
+
+**Empfehlung (stark, nicht nur vermerkt):** eine dritte CGNAT-Migration in derselben
+Betriebsdauer der Phase (Proxmox-Umzug, jetzt Account-Wechsel) hat bereits zweimal die
+öffentliche Adresse verändert oder den Funnel zerstört — beim Proxmox-Umzug blieb der Hostname
+gleich, diesmal nicht, weil er an den *Tailnet*-Namen hängt, nicht an die Maschine. Eine echte
+Domain (z. B. `sharefyx.<eigene-domain>` per CNAME auf den Funnel-Hostnamen, oder später ein
+eigener Reverse-Proxy mit Let's-Encrypt-Zertifikat) würde diese Kopplung auflösen: der
+Connector-Eintrag in beiden Claude-Accounts bliebe über jede künftige Tailscale-Account- oder
+Node-Migration hinweg stabil, nur ein DNS-Eintrag müsste bei Bedarf umgezeigt werden statt zwei
+Connector-Konfigurationen von Hand. Das bleibt eine Nikinger-Entscheidung (Budget, ob die
+Domain schon existiert) — hier nur als wiederholt aufgetretenes Betriebsrisiko benannt, kein
+Auftrag an mich, sie zu registrieren.
+
+**Kein Code-Touch, kein Commit** — `phase3_edge/local.env` ist git-ignoriert (siehe oben),
+alle übrigen Änderungen (Tailscale-Konsole, systemd) leben außerhalb des Repos. Dieser
+Session-Block plus die Frontmatter-`updated:`-Zeile sind die einzige Repo-Spur des Incidents.
+Kein `pkill -f`, kein direkter `systemctl`-Aufruf durch mich — beide Restarts liefen über den
+Nikinger.
+
+**Nächster Schritt:** Connector-URLs in beiden Claude-Accounts aktualisieren (Nikinger). Domain-
+Frage bei Gelegenheit entscheiden, kein Zeitdruck — der Funnel-Pfad funktioniert bis dahin.
