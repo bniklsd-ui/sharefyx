@@ -197,6 +197,21 @@ die Current-state-Sektion der Wurzel-`CLAUDE.md` ist **verworfen**; stattdessen 
 
 ## Vormerkungen (nicht Teil eines aktuellen Steps)
 
+- **Echte Domain statt `<node>.<tailnet>.ts.net` — Kandidat P9+ (2026-09-18, aus einem
+  Live-Incident, nicht aus UI-Feedback).** Anlass: eine Tailscale-Account-Migration hat den
+  Node auf ein neues Tailnet gehängt und damit den Funnel-Hostnamen komplett gewechselt
+  (`tail89fc2a.ts.net` → `tail4a8b49.ts.net`) — zweite öffentliche-Adress-Änderung in der
+  Betriebsdauer dieses Projekts (erste: der Proxmox-Umzug, dort blieb der Hostname zufällig
+  gleich). Volle Herleitung, Diagnose und Fix: `phase3_edge/CLAUDE.md` Session-Block
+  2026-09-18. **Warum das ein P9-Kandidat und kein P8.6-Punkt ist:** es berührt keine der neun
+  UX-Befunde dieser Phase, sondern Betrieb/Exposure (P3-Eigentum) — passt eher neben oder vor
+  den P9-Obsidian-Umbau als in die laufende UI-Politur. **Vorschlag, nicht entschieden:** ein
+  CNAME auf den Funnel-Hostnamen (kleinster Schritt, DNS-Eintrag genügt, Funnel bleibt
+  TLS-Terminierung) oder später ein eigener Reverse-Proxy mit Let's-Encrypt-Zertifikat
+  (größerer Schritt, löst die Kopplung an Tailscale vollständig). Beides braucht eine bereits
+  vorhandene oder neu zu beschaffende Domain — **Nikinger-Entscheidung, kein Auftrag an mich,
+  eine zu registrieren.**
+
 - **`p8.6 plan 2 (N.6)` — Layout-Reorg + Layering-Konsistenz + schmaler-Viewport + B-Backlog.** Nikinger-Sichtung der Block-C-Screenshots am 2026-09-12 hat sieben UX-Befunde ergeben (siehe Session-Block 2026-09-12 unten: B-Backlog mit Grauton-Inkonsistenz + fehlenden Konto-Dialog-Buttons; C-Befunde Refresh-Karte-Überlappung, kleine Karte, **großer Layout-Reorg-Vorschlag** Spaces + Zuletzt benutzt links + Map rechts + Editor im rechten Slot, Hover-Effekt-Verrutschen, „Alle Items"-Modus ohne Spaces-Übersicht, Rail-Reihenfolge Einstellungen+Abmelden anschließen, Editor-Layering, schmaler-Viewport-Buttons). Eigene Folge-Phase oder Sub-Phase von P8.6 (analog zur P8.6-Planungssession am 2026-09-08 / P8.5-Planungssession am 2026-09-09). Ziel: zweiter Vorabritt + Deploy, der alle sieben Befunde abdeckt. **Vormerkung wird zur aktiven Phase, sobald die nächste Claude-Code-Planungssession startet** — diese Session macht nur die Doku, kein Push + Deploy. **[2026-09-13, Partial Closeout]** Der Teil-Stand liegt jetzt geschrieben vor: `docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md` (§4 ordnet die neun Befunde den Locks zu, die sie öffnen) + `docs/concepts/phase8_6_ui_polish_uebersicht.svg`. Plan 2 startet dort, nicht bei null.
 
 - **`docs/INDEX.md` reißt bald den 40-KB-Softcap → eigene Rotationsregel, Kandidat P9**

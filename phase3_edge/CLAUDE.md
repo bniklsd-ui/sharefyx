@@ -428,7 +428,9 @@ Connector-Eintrag in beiden Claude-Accounts bliebe über jede künftige Tailscal
 Node-Migration hinweg stabil, nur ein DNS-Eintrag müsste bei Bedarf umgezeigt werden statt zwei
 Connector-Konfigurationen von Hand. Das bleibt eine Nikinger-Entscheidung (Budget, ob die
 Domain schon existiert) — hier nur als wiederholt aufgetretenes Betriebsrisiko benannt, kein
-Auftrag an mich, sie zu registrieren.
+Auftrag an mich, sie zu registrieren. **Als Vormerkung Kandidat P9+ festgehalten:**
+`phase8_6_ui_polish/CLAUDE.md` §Vormerkungen, damit sie bei der nächsten Planungssession
+tatsächlich aufgegriffen wird statt nur hier in einem geschlossenen Phasenkopf zu stehen.
 
 **Kein Code-Touch, kein Commit** — `phase3_edge/local.env` ist git-ignoriert (siehe oben),
 alle übrigen Änderungen (Tailscale-Konsole, systemd) leben außerhalb des Repos. Dieser
