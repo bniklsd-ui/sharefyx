@@ -189,6 +189,32 @@ def test_deploy_creates_release_and_moves_symlink(stubs, tmp_path, layout, sourc
     assert "restart sharefyx-mcp" in (tmp_path / "systemctl.log").read_text(encoding="utf-8")
 
 
+def test_deploy_succeeds_under_a_restrictive_ambient_umask(stubs, tmp_path, layout, source_repo):
+    """Live-Fund 2026-09-18 (P8.6 Gate D-b): `umask 0177` in der aufrufenden Shell strippte das
+    Execute-Bit von `git clone`s neu angelegten Verzeichnissen (0777 & ~0177 = 0600, kein `x` --
+    auch nicht für den Eigentümer), das Release-Verzeichnis wurde für sich selbst nicht mehr
+    traversierbar. `deploy.sh` setzt seither `umask 022` selbst, statt die der aufrufenden Shell
+    zu erben. Die restriktive Maske wird hier im TESTPROZESS gesetzt (nicht in der Subshell) --
+    `subprocess.run` vererbt den Umask des Elternprozesses an das Kind, genau wie eine
+    interaktive Shell ihn an `deploy.sh` vererbt hätte."""
+    releases, current = layout
+    _set_codes(tmp_path)
+    old_umask = os.umask(0o177)
+    try:
+        result = _run_deploy(stubs, tmp_path, releases, current, source_repo)
+    finally:
+        os.umask(old_umask)
+
+    assert result.returncode == 0, result.stderr
+    payload = json.loads(result.stdout)
+    assert payload["result"] == "ok"
+    release_dir = Path(payload["release"])
+    assert release_dir.stat().st_mode & 0o700 == 0o700, (
+        "Release-Verzeichnis fehlt das Execute-Bit -- unter der geerbten Shell-Maske "
+        "nicht mehr traversierbar, selbst für den Eigentümer"
+    )
+
+
 def test_deploy_script_aborts_when_tests_fail(stubs, tmp_path, layout, source_repo):
     """Der wichtigste Fehlschlagpfad: ein gescheiterter `pytest`-Lauf im Release darf den
     Symlink nicht anfassen. Geprüft wird genau das — nicht nur der Exit-Code, sondern **wohin der

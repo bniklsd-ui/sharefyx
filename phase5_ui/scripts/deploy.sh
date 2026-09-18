@@ -37,6 +37,18 @@
 
 set -euo pipefail
 
+# Fund 2026-09-18 (P8.6 Gate D-b, Live-Deploy-Blocker): ein restriktives `umask 0177` in der
+# aufrufenden Shell strippt bei `git clone` NICHT nur die Rechte der angelegten Dateien, sondern
+# auch das Execute-Bit der neu angelegten Verzeichnisse (0777 & ~0177 = 0600 -- kein `x`, auch
+# nicht fuer den Eigentuemer). Ein Verzeichnis ohne `x` ist nicht traversierbar, selbst fuer den
+# Eigentuemer selbst -- jeder Schreibversuch INNERHALB (z. B. `git clone`s eigenes `mkdir .git`)
+# scheitert dann mit `Permission denied`, obwohl Eigentuemer/Gruppe und die Elternverzeichnisse
+# vollkommen in Ordnung sind. Eigene, deterministische Maske statt der geerbten der aufrufenden
+# Shell -- ein Release-Verzeichnis mit 022 (755 fuer neue Verzeichnisse) ist die einzige Annahme,
+# unter der der Rest des Skripts (Health-Gate liest `app.html`, `systemctl` liest die Unit-Datei
+# aus dem Release) je getestet wurde.
+umask 022
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 

@@ -135,7 +135,7 @@ Entscheidungen P8.6-A–P8.6-U, Tabu-Liste, Schritt-Sequenz, Testliste, Abnahmez
 | 4 | Block B — Selektion vereinheitlichen: B1 Hover = leise Standardauswahl überall (`var(--select-fill-quiet)` + `outline` + `border-radius: var(--radius-sm)`, eine konsolidierte Regel statt der drei Flickenteppich-Fassungen), B2 Audit (V113-Befund: `.tree__space` hat im Code kein `aria-current` — anders als Plan §4.2 annimmt; `:not()`-Ausschluss trotzdem korrekt für künftige Reparatur vorbereitet), B3 Einstellungsmenü (`.account-nav`-Klasse statt `.btn`-Plastik für `#account-show-updates`/`#account-manage-spaces`, Navigation statt Aktion), B4 Sweep „alles Klickbare" mit Vorsicht-Kennzeichnung (`class="action--caution"`-Trägerklasse auf `#logout-button` und `#archive-button`, **genau zwei Mitglieder** — Test `test_caution_class_only_on_logout_and_archive` hält das fest), B5 Radien (genau eine Änderung: `.link-picker-results` `6px` → `var(--radius-sm)`, Block A hatte das nicht erwischt) | B | ✅ | 966 → **967** (+1 statischer Test in Block B; **Plan §3.5/§8.2-Abweichung eingehalten** — die drei für Block B vorgesehenen Tests `test_caution_class_only_on_logout_and_archive`/`test_every_css_var_reference_is_defined` (zusammen mit Block A) + `test_link_picker_uses_a_select_not_a_radio_group` (Block A, ersetzt P8.5-Test per P8.6-I) sind grün; `ui_budget.py` 5/5 im Korridor mit app.css 19.8 KB; **drei weitere** Tests aus der Plan-§8.2-Liste (`test_rail_order_…`, `test_account_button_…`, `test_overview_graph_has_no_max_width`) bleiben Block C vorbehalten — sonst waeren sie in B rot, §0.5 Punkt 2 bricht) |
 | 5 | Block C — Struktur: C1 „Konto" → „Einstellungen", Lesart b (Einstellungen nach oben, Abmelden ans Rail-Ende, P8.6-J/N3), C2 „Alle Items" unter die Spaces (`tree.js :: renderRail()`, P8.6-J), C3 Map als rechte Spalte / volle Höhe (`.overview` als Grid, P8.6-K/L), C4 Spaces in der Übersicht klickbar (`.overview__space-row` + `<button class="overview__space-open">`, P8.6-P), C5 Ordner-Zähler clientseitig aus `state.items` (P8.6-O) | C | ✅ **geliefert** · ⚠️ **nicht auslieferbar** | 967 → **970** (+3 statische Tests); `ui_budget` 5/5, Tabu-Diff leer. **[2026-09-13, Partial Closeout]** Diese Zeile stand bis heute auf ⬜, obwohl der Block-C-Commit `90c72e2` ihren Nachzug behauptet hat — Hard-Rule-8-Miss, korrigiert. Die Nikinger-Sichtung vom 2026-09-12 hat den Block **nicht abgenommen**: neun UX-Befunde, Details im Session-Block |
 | 6 | Block D — Graph-Fixes: D1 V102-Dedup (`dedupeEdges()` ungeordnetes Paar, P8.6-N), D2 deterministischer Layout-Seed (`seedJitter()` FNV-1a-Hash, P8.6-M), D3 `.overview__graph`-Höhe (V112-Gegenprobe — abhaengig von C3, daher mit Block C), **D4 `runSimulation()` `rafId` endlich gelesen + `cancelAnimationFrame`** — die **einzige Scope-Erweiterung** des Plans (P8.6-§6.4: §2.1-Gebiet, aber direkte Ursache von §2.4-Verschlimmerung + 3 Zeilen Fix + schon halb da; **streichen, wenn der Nikinger es in der Sichtprüfung anders sieht**) | D | ✅ (D1, D2, D4) · 🟡 (D3, haengt an Block C) | 966 → 966 (kein Test in Block D, dedup + seed + cancel sind graph.js-intern und durch das Vorhandensein des Codes hinreichend belegt — node-Probe gegen `dedupeEdges()`/`seedJitter()` separat verifiziert, Plan §0.5 ui_budget bleibt grün) |
-| 7 | Gate — **GA1+GA2 ✅ 2026-09-18**: Wegwerf-Instanz (Port 18773, PID-Datei, Hard Rule 9) + `p86_polish_smoke.py` neu (14 Stationen aus Plan 2 §7.2, Chromium + Firefox für Station 3/5/8/10) — **18/18 grün** nach drei Korrektur-Runden gegen den aktuellen Code (§7.2s Wortlaut war stellenweise stale, Details im Session-Block). **GA3 ✅ 2026-09-18** — Nikinger-Sichtprüfung der 18 Screenshots; `back-button`-Fund als unkritisch entschieden (`#close-button` + ESC decken „zurück" bereits vollständig ab, der tote Pfeil bleibt liegen, kein Fix nötig). **GA4-D-a ✅ 2026-09-18**: Badge `app.html:20` `v3.0.1` → `v3.0.2`, `docs/UPDATE_LOG.md` neuer `## 2026-09-18`-Block (6 Zeilen). **GA4-D-b/D-c offen** — Deploy + Health-Gate, beides Nikinger-Schritte (Hard Rule 9) | Gate | 🟡 **GA1–GA3 ✅, GA4-D-a ✅, D-b/D-c ⬜** | 18 Screenshots `docs/screenshots/p86_smoke_*.png`, Report `phase8_6_ui_polish/scripts/p86_polish_smoke_report.json`. **Ein Befund unterwegs gefunden, geklärt:** `#back-button`/`.detail__back` ist toter Code (`app.css:1367` fest `display: none`, keine Override-Regel) — Nikinger-Entscheidung 2026-09-18: unkritisch, `#close-button`+ESC reichen als UI+Tastatur-Weg, kein Aufräum-Zwang |
+| 7 | Gate — **GA1+GA2 ✅ 2026-09-18**: Wegwerf-Instanz (Port 18773, PID-Datei, Hard Rule 9) + `p86_polish_smoke.py` neu (14 Stationen aus Plan 2 §7.2, Chromium + Firefox für Station 3/5/8/10) — **18/18 grün** nach drei Korrektur-Runden gegen den aktuellen Code (§7.2s Wortlaut war stellenweise stale, Details im Session-Block). **GA3 ✅ 2026-09-18** — Nikinger-Sichtprüfung der 18 Screenshots; `back-button`-Fund als unkritisch entschieden (`#close-button` + ESC decken „zurück" bereits vollständig ab, der tote Pfeil bleibt liegen, kein Fix nötig). **GA4-D-a ✅ 2026-09-18**: Badge `app.html:20` `v3.0.1` → `v3.0.2`, `docs/UPDATE_LOG.md` neuer `## 2026-09-18`-Block (6 Zeilen). **GA4-D-b ✅ 2026-09-18** — `deploy.sh` durch den Nikinger, Release `/opt/sharefyx/releases/20260918T183907.597248Z`, SHA `1ad2665`, **995 pytest grün im Release** (deploy.sh führt sie selbst aus), automatischer Health-Check des Skripts 3/3 grün. Erster Lauf scheiterte am `git clone` (`Invalid path '.../.git': Permission denied`) — Ursache **kein** Rechte-/Mount-/Platzproblem (alles read-only geprüft, sogar per manuellem Reproduktionsversuch), sondern ein `umask 0177` in der Nikinger-Shell: strippt bei neu angelegten Verzeichnissen auch das Execute-Bit (`0777 & ~0177 = 0600`), macht sie für den eigenen Eigentümer untraversierbar. Fix: `deploy.sh` setzt jetzt `umask 022` selbst statt die der aufrufenden Shell zu erben (Zeile 39-49) + Regressionstest `test_deploy_succeeds_under_a_restrictive_ambient_umask` (setzt `umask 0177` im Testprozess vor `subprocess.run`, reproduziert den exakten Produktionsfehler ohne den Fix, grün mit ihm). **GA4-D-c ✅ 2026-09-18** — echter `health_gate.sh`-Lauf, kein Bericht ohne Beleg (Plan 2 §7.4, genau die Stelle, an der Plan 1 nur behauptet hatte): `--expected-version=v3.0.2 --require-todays-update-log --expected-sha=1ad2665` → **9/9 grün**, `{"result":"ok","actual_version":"v3.0.2","release_sha":"1ad266504c7b709a479666264232490434705102",...}`. | Gate | ✅ **GA1–GA4 alle ✅, Gate abgeschlossen** | 18 Screenshots `docs/screenshots/p86_smoke_*.png`, Report `phase8_6_ui_polish/scripts/p86_polish_smoke_report.json`. **Ein Befund unterwegs gefunden, geklärt:** `#back-button`/`.detail__back` ist toter Code (`app.css:1367` fest `display: none`, keine Override-Regel) — Nikinger-Entscheidung 2026-09-18: unkritisch, `#close-button`+ESC reichen als UI+Tastatur-Weg, kein Aufräum-Zwang. **v3.0.2 ist damit live.** Nächster und letzter Schritt: **Step Z** |
 | 8 | Step Z — Closeout | Z | ⬜ · **Teil-Stand 2026-09-13** | **[2026-09-13, Plan 2]** Der kanonische Closeout wandert nach **`phase8_6_ui_polish_plan2.md` §9** (Lock **P8.6-W**). Plan 1 §9 bleibt leer und bekommt in Step Z **eine** Zeiger-Zeile — die einzige erlaubte Änderung an dem 📕-Snapshot. `PHASE8_6_CLOSEOUT_HANDOVER.md` + `phase8_6_ui_polish_uebersicht.svg` bleiben als Teil-Stand bestehen |
 | 9 | **Plan 2 — Step 0'** (Planungssession 2026-09-13): Doku-Hygiene repo-weit verifiziert (0 kaputte Links, 0 fehlende Cards, 0 fehlende INDEX-Zeilen), `docs/INDEX.md` von 38.815 auf **38.471 B** gebracht (sieben geschlossene Phasen-Zeilen gestrafft, −1.549 B; Plan-2-Zeile +1.205 B), Baselines neu gemessen, Anker-Drift gegen Plan 1 belegt | 0' | ✅ | `pytest` **969 passed + 1 Flake** (§1.3), `ui_budget` 5/5 (137,5 KB), `/api/v1/overview` 372,9 ms |
 | 10 | **Block E — messen, nicht bauen** (Befund 9): `p86_viewport_probe.py` (CDP, `getBoundingClientRect` + `getComputedStyle` + `elementFromPoint` auf jeden Knopf-Mittelpunkt) bei 1024/1200/1440 px, **zweimal** — gegen die Wegwerf auf aktuellem `main` **und gegen eine zweite Wegwerf auf v3.0.1-Stand** (Methodik-Wechsel 2026-09-14: keine echten Produktions-Creds, Wegwerf-vor-Produktion reicht, ist exakt der Code der läuft). Trennt **9a** (live auf `v3.0.1`) von **9b** (durch Block C eingeführt). **E2a + E2b erledigt 2026-09-14:** Befund **9 banner-abhängig, nicht unconditional** — bei 1200 px **mit** Update-Banner zwei Recent-Items vom `.overview__col-right`-Container überdeckt; **ohne** Banner kein sichtbar unerreichbarer Knopf. **V125 geschlossen: 9a = 9b, gleiche Ursache, falsche Plan-Annahme** — bei 1200 px mit Banner sind die Maße auf main (Block C) und auf v3.0.1 **byte-identisch** (col-left 692×284, col-right 692×284). Block C hat nur die Recent-Items-Reihenfolge geändert, nicht das Layout. Die wahre Ursache ist die 140-px-Banner-Höhe und war schon auf v3.0.1 vorhanden. **V126** (1024 px unerreichbar?) **erledigt**: **0** sichtbare Buttons blockiert, alle 53 hidden-button-Treffer haben `rect=(0,0,0,0)` (data-view="list" blendet die Detail-Buttons aus — separater Mechanismus, kein Layout-Bug). | E | ✅ | +1 Skript (`p86_viewport_probe.py`, 421 Z. / 16 KB), +12 Screenshots `p86_probe_{main,main-clean,v3.0.1,v3.0.1-clean}_{1024,1200,1440}.png`, +4 Probe-JSON `phase8_6_ui_polish/probes/e2{a_main,a_main_clean,b_v3.0.1,b_v3.0.1_clean}.json` (~65 KB je), kein Produktcode, Tabu-Diff §0.3 leer |
@@ -682,10 +682,78 @@ Nutzer-sichtbares Verhalten. `pytest -k update` (3 Tests gegen `test_static_rout
 `test_api.py`) grün, keine Version-String-Assertions im Repo gefunden, die hätten nachziehen
 müssen. Tabu-Diff §0.3 leer (`app.html`/`UPDATE_LOG.md` sind explizit nicht tabu).
 
-**Nächster Schritt: GA4-D-b + D-c, beide beim Nikinger.** D-b — `deploy.sh` ausführen (Befehl
-im Chat mitgegeben, Hard Rule 9: kein Agent fasst `systemctl` an). D-c danach durch den
-Agenten: `health_gate.sh --expected-sha=<neuer SHA>` mit Ausgabe im Commit (Plan 2 §7.4 — genau
-die Stelle, an der Plan 1 zuvor nur eine Behauptung ohne echten Lauf hinterlassen hatte). Nach
-D-c: Step Z (Abnahmematrix, `[VERIFY]`-Bilanz, Plan 2 §9 als kanonischer Closeout, Phase-Head/
-ROADMAP/INDEX/Wurzel-CLAUDE.md auf ✅, Übersichtsgrafik, letzte Rotation).
+**Nachtrag, 2026-09-18 — GA4-D-b (Deploy) + D-c (Health-Gate), beide durch den Nikinger/den
+Agenten wie vorgesehen:**
+
+**D-b, erster Versuch, scheiterte** — `deploy.sh` brach beim `git clone`-Schritt ab:
+`fatal: Invalid path '/opt/sharefyx/releases/<ts>/.git': Permission denied`. Read-only-Diagnose
+ergab **keine** kaputte Ursache: `/opt/sharefyx`/`releases` beide `savefyx:savefyx 755`, gleiche
+`ext4`-Partition wie das Quell-Repo, `rw,relatime`, 15 GB frei, kein Lock-Mechanismus in
+`deploy.sh`. Ein manueller Reproduktionsversuch **im Agenten-Bash** mit demselben Befehl
+gelang zweimal anstandslos — was die erste, falsche Diagnose „transient" nahelegte. **Der
+zweite Fehlschlag beim Nikinger widerlegte das.** Ursache erst gefunden, nachdem der Nikinger
+`umask` in der eigenen Shell ausgegeben hatte: **`0177`**. Ein `git clone` legt neue
+Verzeichnisse mit `0777 & ~umask` an — bei `0177` ergibt das `0600`, also **kein Execute-Bit**,
+auch nicht für den Eigentümer selbst. Ein Verzeichnis ohne `x` ist für niemanden traversierbar,
+auch nicht für den, dem es gehört — jeder Schreibversuch innerhalb (hier: `git clone`s eigenes
+`mkdir .git`) scheitert dann mit exakt dieser Fehlermeldung, obwohl Eigentümer, Gruppe und alle
+Elternverzeichnisse vollkommen in Ordnung sind. Diese Klasse Fehler ist mit `ls -la` **nicht**
+sichtbar, solange man nicht das gerade neu angelegte Kind-Verzeichnis selbst prüft — die
+Standard-Werkzeuge zeigen die vererbte Prozess-Eigenschaft (`umask`) nirgends an.
+
+**Fix:** `phase5_ui/scripts/deploy.sh` setzt jetzt `umask 022` explizit direkt nach
+`set -euo pipefail`, statt die der aufrufenden Shell zu erben — eine deterministische Maske
+für das ganze Skript, unabhängig davon, was die interaktive Shell des jeweiligen Nikinger-
+Kontos gerade gesetzt hat. **Regressionstest** `test_deploy_succeeds_under_a_restrictive_ambient_umask`
+neu in `phase5_ui/tests/test_deploy_scripts.py`: setzt `umask 0177` **im Testprozess** vor
+`subprocess.run` (der Kindprozess erbt den Umask genau wie eine echte Shell ihn an `deploy.sh`
+vererbt), reproduziert **ohne** den Fix denselben Fehlertext wie in Produktion (gegengeprüft:
+Fix temporär per `sed` deaktiviert, Test schlägt mit identischer Meldung fehl, Fix
+zurückgespielt, Test wieder grün — kein False-Positive). `pytest` 994 → **995**.
+
+**D-b, zweiter Versuch (mit `umask 022` vorangestellt) — Erfolg:** Release
+`/opt/sharefyx/releases/20260918T183907.597248Z`, SHA `1ad266504c7b709a479666264232490434705102`,
+**995 pytest grün im Release selbst** (`deploy.sh` führt die Suite als Teil des Gates aus),
+Symlink-Cutover + `systemctl restart sharefyx-mcp` (Nikinger, `sudo`-Prompt sichtbar — V134
+damit geschlossen), Retention entfernte das älteste Release (`20260827T165737...`, KEEP=5).
+
+**D-c, echter Lauf mit Ausgabe im Commit** (Plan 2 §7.4 — genau die Stelle, an der Plan 1
+nur behauptet hatte, ohne dass die Behauptung stimmte):
+```
+$ phase8_5_picker_release/scripts/health_gate.sh --expected-version=v3.0.2 \
+    --require-todays-update-log --expected-sha=1ad2665
+OK  /health -> 200
+OK  /ui/login -> 200
+OK  /api/v1/me -> 401
+OK  /mcp/ -> 401
+OK  .rail__version -> v3.0.2
+OK  /opt/sharefyx/current -> /opt/sharefyx/releases/20260918T183907.597248Z
+OK  Release-SHA: 1ad266504c7b709a479666264232490434705102
+OK  docs/UPDATE_LOG.md oberster Eintrag: 2026-09-18
+OK  Release-SHA 1ad266504c7b709a479666264232490434705102 matched --expected-sha=1ad2665
+{"ts":"2026-09-18T18:46:27.747Z","action":"health_gate","result":"ok",
+ "expected_version":"v3.0.2","actual_version":"v3.0.2",
+ "active_release":"/opt/sharefyx/releases/20260918T183907.597248Z",
+ "release_sha":"1ad266504c7b709a479666264232490434705102","port":8765}
+```
+**9/9 grün, exit 0. v3.0.2 ist live.**
+
+**Selbstprüfung:** `pytest -q` 995 passed (112 s), Tabu-Diff §0.3 leer, `node --check` nicht
+nötig (kein JS/CSS-Touch, nur `deploy.sh` + sein Test), kein `pkill -f`. `systemctl restart`
+lief ausschließlich über den Nikinger (`sudo`-Prompt live gesehen), der Agent hat an keiner
+Stelle `systemctl` selbst aufgerufen — Hard Rule 9 durchgehend eingehalten.
+
+**Die Phase bleibt 🔄, nicht ✅ — nur der Gate ist geschlossen, Step Z fehlt noch.**
+Root-`CLAUDE.md` und `ROADMAP.md` entsprechend NICHT auf ✅ gesetzt; das wäre die stille
+Abweichung, die die eigene Arbeitsweise-Regel ausdrücklich verbietet.
+
+**Nächster Schritt: Step Z (Closeout), eigene Session.** Plan 2 §7.5, sieben Punkte:
+Abnahmematrix §8.1 **vollständig** auswerten (jede Zeile mit Beleg, nicht mit Zuversicht),
+`[VERIFY]`-Register §8.3 bilanzieren (**V118 — Zwillingskanten-Linienzahl — bleibt offen**,
+aus dem Screenshot nicht beantwortbar, keine Knoten-Labels ohne Hover; entweder live nachklicken
+oder den Smoke-Test um eine Label-Capture erweitern, bevor Z sie als geschlossen führt), Plan 2
+§9 als kanonischer Closeout füllen (P8.6-W), eine Zeiger-Zeile in Plan 1 §9 (die einzige
+erlaubte Änderung an dem 📕-Snapshot), Phase-Head/`ROADMAP.md`/`docs/INDEX.md`/Wurzel-
+`CLAUDE.md` erst dann auf ✅, Übersichtsgrafik von „PARTIAL CLOSEOUT" auf die echte
+Abnahmezahl, letzte `rotate_session_block.sh`-Rotation.
 
