@@ -1,6 +1,6 @@
 ---
 status: snapshot
-purpose: "Abschluss-Handover P8.6 → P9 — Status, Delta seit dem Partial-Closeout vom 2026-09-13, offene Entscheidungen für die P9-Planung (inkl. des Nikinger-Feedbacks vom 2026-09-19), [VERIFY]-Bilanz mit den zwei offenen Markern. Phase 8.6 ist abgeschlossen und als v3.0.2 live."
+purpose: "Abschluss-Handover P8.6 → P9 — Status, Delta seit dem Partial-Closeout vom 2026-09-13, offene UND entschiedene Punkte für die P9-Planung (Nikinger-Feedback vom 2026-09-19 in §4.1, drei Entscheidungen im §4-Kopf, GPU-Dienst-Empfehlung in §4.8), [VERIFY]-Bilanz mit den zwei offenen Markern. Phase 8.6 ist abgeschlossen und als v3.0.2 live."
 read-when: vor dem Entwurf des P9-Plans einmal ganz lesen — ersetzt das Nachlesen von Phase-Head und SESSIONS_ARCHIVE für alles außer der Detailhistorie
 detail: L2
 up: ../../ROADMAP.md
@@ -12,7 +12,7 @@ down:
   - ./p8x_ui_polish_notes.md                        # Inhaltsquelle §1–§10; P9 erbt §2/§2.5/§4/§7/§8/§9/§10.8/§10.9
   - ./PHASE8_5_CLOSEOUT_HANDOVER.md                 # Vorgänger — §4.7 das geerbte Ledger, weiter offen
   - ./sichtpruefung_automation_conventions.md       # §2 Visuelles ist Nikinger-Sache · §5 screenshots_latest
-updated: 2026-09-19 (Abschluss-Handover P8.6 → P9; ersetzt den Partial-Closeout-Stand vom 2026-09-13, der in `373a431` erhalten bleibt)
+updated: 2026-09-19 (Abschluss-Handover P8.6 → P9; ersetzt den Partial-Closeout-Stand vom 2026-09-13, der in `373a431` erhalten bleibt. **Nachtrag desselben Tages: drei Nikinger-Entscheidungen eingearbeitet** — Domain als früher P9-Schritt (§4.2), Tailscaled-Watchdog freigegeben (§4.3, mit der Tabelle welcher der drei Ansätze den gemessenen Vorfall überhaupt deckt), und **neu §4.8**: die ungenutzte RTX 3060 bekommt einen eigenen internen CUDA-Dienst, der die CPU-only-Vision-Strecke ablöst — Empfehlung LXC auf dem 3060-Host, Form entscheidet die Planungssession)
 ---
 # Phase 8.6 — Closeout-Handover (P8.6 → P9)
 
@@ -117,7 +117,14 @@ ersten beiden als ersetzt gekennzeichnet; der Nachtrag steht in §9.3.
 
 ---
 
-## 4 Offene Entscheidungen für die P9-Planung
+## 4 Entscheidungen für die P9-Planung — drei getroffen, der Rest offen
+
+> **[2026-09-19, Nikinger-Entscheidungen — drei der hier gelisteten Punkte sind entschieden.]**
+> **(1) Die Domain kommt als einer der ersten Schritte in P9** — nicht mehr „P9+ Kandidat",
+> siehe §4.2. **(2) Der Tailscaled-Watchdog wird gebaut**, siehe §4.3. **(3) Neu und nicht aus
+> P8.6 stammend: die ungenutzte RTX 3060 (12 GB) im Proxmox-Verbund bekommt einen eigenen
+> Dienst**, der die CPU-only-Vision-Strecke ablöst — Entscheidung „ja, Form nach Empfehlung",
+> die Ausarbeitung gehört in die Planungssession. **§4.8**, und sie beantwortet §4.6.
 
 ### 4.1 Neues Nikinger-Feedback vom 2026-09-19 — acht Punkte, drei Klassen
 
@@ -152,24 +159,46 @@ phase6_shares_plan.md` §0.7(a)/§1.2 ist der Einstieg, **nicht** `app.css`.
 | **Eine Aufgabe sich selbst „assignen"** | Gehört zum vorigen Punkt; gemeinsam planen, sonst entstehen zwei Felder für einen Zustand |
 | **Dateien vollständig löschen — nach zweifacher Rückfrage, human-only, kein Bulk, Namenseingabe als Gate** | Löschen steht seit P5 als **F2** im geerbten Ledger draußen. Der Wunsch ist explizit: kein Bulk, Name eintippen, nur Mensch. Das ist ein Sicherheits-Design, kein Knopf — und es berührt die Git-Historie im Datenverzeichnis (Hard Rule 5) |
 
-### 4.2 Echte Domain statt `<node>.<tailnet>.ts.net` — P9+, Nikinger-Entscheidung
+### 4.2 Echte Domain statt `<node>.<tailnet>.ts.net` — **entschieden: früher P9-Schritt**
 
-Bereits als Vormerkung abgelegt (`782f046`, Phase-Head §Vormerkungen). Anlass war ein **realer
+**[2026-09-19] Der Nikinger hat entschieden: die Domain wird als einer der ersten Schritte in
+P9 eingebaut.** Damit ist der Punkt aus der „P9+"-Warteschleife heraus und hat eine Position in
+der Build-Reihenfolge. Die Wahl des Weges (CNAME vs. eigener Reverse-Proxy) ist damit **nicht**
+mitentschieden — das ist Planungsarbeit, und sie hängt daran, welche Domain beschafft wird.
+
+**Warum früh und nicht spät:** eine Adressänderung zieht den Claude-Connector in **beiden**
+Konten nach sich (der steht bis heute auf dem alten Hostnamen, siehe `phase3_edge/CLAUDE.md`).
+Wer die Domain erst am Ende von P9 einzieht, macht diesen Schnitt zweimal — einmal jetzt und
+einmal beim nächsten Tailnet-Wechsel.
+
+Hintergrund (Vormerkung `782f046`, Phase-Head §Vormerkungen): Anlass war ein **realer
 Vorfall**, keine Kosmetik: eine Tailscale-Account-Migration hat den Funnel-Hostnamen komplett
 gewechselt (`tail89fc2a.ts.net` → `tail4a8b49.ts.net`) — die zweite Adressänderung in der
 Betriebsdauer. Zwei Wege, keiner entschieden: CNAME auf den Funnel-Hostnamen (klein, DNS
 genügt, Funnel bleibt TLS-Terminierung) oder eigener Reverse-Proxy mit Let's Encrypt (groß,
-löst die Tailscale-Kopplung). **Beide brauchen eine Domain — die zu beschaffen ist eine
-Nikinger-Entscheidung, kein Agenten-Auftrag.** Herleitung: `phase3_edge/CLAUDE.md`,
+löst die Tailscale-Kopplung). **Beide brauchen eine Domain — die Beschaffung bleibt
+Nikinger-Sache, kein Agenten-Auftrag.** Herleitung: `phase3_edge/CLAUDE.md`,
 Session-Block 2026-09-18.
 
-### 4.3 Tailscaled-Watchdog — eigene Mini-Phase, nicht P9-Inhalt
+### 4.3 Tailscaled-Watchdog — **entschieden: wird gebaut**
 
 Vorfall 2026-09-15: nach ~4 h VM-Suspend kam `tailscaled` nicht mehr auf die Control-Plane,
 `sharefyx-mcp` antwortete lokal weiter mit 200, das Node war extern aber **offline**. Die
 vorhandene Restart-Logik deckt nur Crashes (`Restart=on-failure`), nicht „Dienst läuft,
-Control-Plane klemmt". Drei Ansätze stehen im Phase-Head §Vormerkungen; die Wahl ist eine
-eigene Entscheidung, und der Auslöser **muss** systemd sein, nicht ein Agent (Hard Rule 9).
+Control-Plane klemmt". **[2026-09-19] Der Nikinger hat den Watchdog freigegeben.**
+
+Drei Ansätze stehen im Phase-Head §Vormerkungen. **Nur einer davon deckt den gemessenen
+Vorfall** — das ist keine Empfehlung, sondern eine Eigenschaft der Ansätze:
+
+| Ansatz | Deckt „Dienst läuft, Control-Plane klemmt"? |
+|---|---|
+| 1 — `OnFailure=`-Hook auf eine zweite Unit | **Nein.** Feuert nur, wenn die Unit fehlschlägt; am 2026-09-15 lief `tailscaled` durchgehend |
+| 2 — eigene `tailscaled-watchdog.service`, zyklische Prüfung (`tailscale netcheck` bzw. `curl` gegen die Control-Plane), bei Fehlschlag `systemctl restart tailscaled` | **Ja.** Der einzige Ansatz, der den beobachteten Zustand überhaupt sieht |
+| 3 — Tailscale-eigenes Feature | **Unbekannt**, Recherche offen; vermutlich nicht ohne kommerzielles Add-on |
+
+Die Planungssession entscheidet die Form; die Tabelle nimmt ihr die Messarbeit ab, nicht die
+Wahl. Unverändert gilt: der Auslöser **muss** systemd sein, nicht ein Agent (Hard Rule 9), und
+die Unit ist mit `User=`, `NoNewPrivileges=true`, `ProtectSystem=strict` zu härten.
 
 ### 4.4 `docs/INDEX.md` — die Rotation ist überfällig
 
@@ -180,9 +209,12 @@ und unverändert: die **`updated:`-Frontmatter-Kette**, nicht der Body. Die Lös
 ist geplant, aber nie gebaut worden. **Empfehlung: in P9 bauen, nicht wieder vertagen** — die
 Handarbeit hat jetzt dreimal nicht getragen.
 
-**Konkreter Stand nach dieser Straffung: 38.885 B.** Das Kriterium liegt bei 38.912 B — das sind
-**27 Byte Luft**, kein Spielraum. Die nächste neue `.md` mit INDEX-Zeile reißt das Kriterium
-sofort wieder; wer eine anlegt, muss im selben Commit straffen oder die Rotation bauen.
+**Konkreter Stand nach dieser Straffung: 38.756 B.** Das Kriterium liegt bei 38.912 B — das sind
+**156 Byte Luft**, kein Spielraum. Die nächste neue `.md` mit INDEX-Zeile reißt das Kriterium
+sofort wieder; wer eine anlegt, muss im selben Commit straffen oder die Rotation bauen. Allein
+das Eintragen der drei Entscheidungen vom 2026-09-19 (§4.2/§4.3/§4.8) hat **229 B** gekostet und
+musste durch das Straffen zweier abgeschlossener Phasen-Zeilen gegenfinanziert werden — genau
+der Kreislauf, den die Rotation beenden soll.
 
 ### 4.5 Versionsziel und Nummerierung
 
@@ -197,7 +229,12 @@ Der Nikinger am 2026-09-14, nach der G-R-Sichtung: *„die Realität ist recht w
 was du hier beschreibst."* Das ist der Kern: **opencode/M3 beschreibt seine eigenen Screenshots
 geglättet**, und drei der fünf Revisionsrunden dieser Phase gehen darauf zurück. Zwei Optionen
 liegen als Vormerkung bereit (Rückkehr zum manuellen Ollama-Adapter mit Batch-Aufruf gegen den
-Cold-Start / zwei Modell-Instanzen als getrennte Phase), **keine ist entschieden**. Das
+Cold-Start / zwei Modell-Instanzen als getrennte Phase), **keine ist entschieden**.
+
+**[2026-09-19] Die Hardware-Hälfte dieser Frage ist beantwortet: §4.8.** Der Grund, warum
+Option (A) bisher unattraktiv war, ist der **Cold-Start von 46–180 s auf CPU** — mit der
+3060 fällt genau dieser Einwand weg. Die inhaltliche Hälfte („wer beurteilt das Bild, und mit
+welchem Prompt") bleibt offen und gehört in die Planungssession. Das
 OpenCode-Plugin ist kein Weg: gemessen (Befund 2c) zerstört es M3s nativen Bildpfad, und das
 Web-UI hat keinen Tool-Result-Bild-Slot — Konvention §4 ist dort **dauerhaft unerfüllbar**.
 
@@ -208,6 +245,67 @@ Rechteverwaltung über MCP-Tools (P6-M), Löschen von Items (F2 — siehe aber �
 FastMCP-4 (V79), Realtime, Light-Mode (P5-X), Bulk-Append-MCP-Tool, Ordner umbenennen
 (Analyse in `phase8_6_ui_polish_plan.md` §0.4.1 — die billige Fassung verliert still eine
 `.share.yml`-Freigabe). Voller Stand: `PHASE8_5_CLOSEOUT_HANDOVER.md` §4.7.
+
+### 4.8 GPU-Dienst für die Sichtprüfung — **entschieden: ja, Form nach Empfehlung**
+
+**[2026-09-19, Nikinger-Entscheidung.]** Im Proxmox-Verbund hängt eine ungenutzte **RTX 3060
+(12 GB)**. Sie bekommt einen eigenen, internen Dienst, der seine CUDA-Leistung anbietet und die
+**CPU-only-Vision-Strecke ablöst**. Die genaue Form ist als Empfehlung erbeten und wird in der
+P9-Planungssession festgelegt — was hier steht, ist Vorarbeit, keine Entscheidung.
+
+**Eine Präzisierung vorweg, weil sie sonst in die Planung einwandert:** das *Plugin*
+(`DavidEasden/opencode-vision`) ist bereits **seit dem 2026-09-11 zurückgebaut** — gemessen,
+nicht vermutet: es amputiert M3s nativen Bildpfad. Was der GPU-Dienst ersetzt, ist also nicht
+das Plugin, sondern das **CPU-only-Ollama-Backend** auf der sharefyx-VM (Ollama 0.34.0 +
+`qwen3-vl:8b`, `127.0.0.1:11434`).
+
+**Empfehlung: eigener LXC-Container auf dem 3060-Host, Ollama darin, erreichbar als interner
+HTTP-Dienst auf der Proxmox-Bridge.** Nicht in die sharefyx-VM, und kein Passthrough in die
+Produktions-VM. Vier Gründe, in der Reihenfolge ihres Gewichts:
+
+1. **Das Bauprinzip bleibt physisch, nicht bloß versprochen.** „Der Server ist dumm" heißt: kein
+   LLM-Call im Serverpfad. Das Vision-Modell bedient die **Sichtprüfung des Agenten**, niemals
+   eine sharefyx-Anfrage. Steht es in einer eigenen Kiste, ist diese Grenze nachprüfbar; steht es
+   in der sharefyx-VM, muss jeder künftige Leser dem Satz glauben. Genau diese Unterscheidung ist
+   der Grund, warum die Wurzel-`CLAUDE.md` „wer hier ein LLM einbauen will → stop" schreibt — der
+   GPU-Dienst verletzt die Regel **nicht**, aber nur, solange er außerhalb steht.
+2. **Die Client-Seite ist bereits verdrahtet und konfigurierbar — es ist kein Code-Änderung.**
+   `mcp_local_vision_server.py:195` liest den Endpoint aus **`LOCAL_VISION_ENDPOINT`**,
+   `vision_ollama.py:44` hat ein `--endpoint`-Flag. Der Umzug ist **eine Umgebungsvariable**.
+   Wer stattdessen die Karte in die sharefyx-VM reicht, spart diese eine Variable und bezahlt mit
+   einem Treiber-Stack in der Produktions-VM.
+3. **LXC statt voller VM mit PCIe-Passthrough:** kein VFIO/IOMMU-Blacklisting, kein Risiko für die
+   Host-Konsole, geringerer Overhead, Snapshots funktionieren. **Der bekannte Preis:** der
+   nvidia-Treiber lebt auf dem Proxmox-Host, der Container teilt dessen Kernel — ein
+   Kernel-Upgrade, das dem Treiber davonläuft, legt den Container still, bis DKMS neu baut. Das
+   ist eine Betriebsnotiz, kein Ausschlussgrund. **Die Alternative**, wenn harte Isolation mehr
+   zählt als Bequemlichkeit: volle VM mit PCIe-Passthrough — kostet IOMMU-Einrichtung und
+   **pinnt die VM auf diesen Host** (keine Live-Migration mehr).
+4. **Hard Rule 6 bleibt unberührt:** Bindung nur auf die interne Bridge, kein Funnel, kein Port
+   am Router. Der Dienst ist von außen nicht erreichbar und soll es nicht sein.
+
+**Was die 12 GB praktisch ändern:** `qwen3-vl:8b` liegt bei Q4_K_M **6,1 GB** und passt damit
+vollständig in den VRAM — der heutige Cold-Start von **46–180 s** (gemessen, CPU-only auf dem
+i5-14600KF) fällt auf Sekunden. Erst das macht die in §4.6 geparkte Option (A) überhaupt
+benutzbar: ein Batch-Aufruf über mehrere Screenshots war bisher nur deshalb die einzige
+brauchbare Form, weil man den Cold-Start nicht mehrfach zahlen wollte. Nebenbei entsteht Luft
+für ein größeres Modell (praktische Obergrenze ~12–14B bei Q4), aber das ist eine
+Planungsfrage, keine Empfehlung.
+
+**Zwei Ungereimtheiten in den bestehenden Skripten, beim Nachsehen gefunden** — beide kosten
+sonst eine Stunde Fehlersuche, sobald der Endpoint nicht mehr `127.0.0.1` ist:
+
+- `mcp_local_vision_server.py:223` loggt beim Start `DEFAULT_ENDPOINT`, während der echte Aufruf
+  (`:195`) `LOCAL_VISION_ENDPOINT` auflöst. Mit gesetzter Variable **behauptet die Startzeile
+  `127.0.0.1:11434`, obwohl die Anfragen zur GPU-Kiste gehen.** Kosmetisch, aber irreführend.
+- Dasselbe Skript hat ein `--endpoint`-Flag (`:274`), das **nur `--check` benutzt**; `serve()`
+  liest `args.endpoint` nie. Für den Serverbetrieb zählt ausschließlich die Umgebungsvariable.
+
+**Offene Fragen für die Planungssession** (benannt, nicht entschieden): LXC oder VM — hängt am
+IOMMU-Zustand des Hosts · welches Modell (auf `qwen3-vl:8b` bleiben oder die VRAM-Luft nutzen) ·
+ob die sharefyx-VM ein CPU-Fallback behält oder ihr Ollama abgebaut wird · feste interne Adresse
+für die Kiste und wo `LOCAL_VISION_ENDPOINT` gesetzt wird (`~/.config/opencode/`, **nicht** im
+Repo — kein Geheimnis, aber hostspezifisch).
 
 ---
 

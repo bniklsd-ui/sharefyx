@@ -164,6 +164,37 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 
 ## Current state
 
+**[2026-09-19, Nachtrag — Step-Z-Commit gepusht, drei Nikinger-Entscheidungen zu P9
+aufgenommen.]** `1e61429` steht auf `origin/main` (`860ed72..1e61429`), Arbeitsbaum sauber.
+**Die drei Entscheidungen, alle im `PHASE8_6_CLOSEOUT_HANDOVER.md` §4 verankert:**
+**(1) Die echte Domain wird einer der ersten P9-Schritte** — raus aus der „P9+"-Warteschleife
+(§4.2). Begründung für „früh": eine Adressänderung zieht den Claude-Connector in **beiden**
+Konten nach sich; wer sie ans Ende legt, macht den Schnitt zweimal.
+**(2) Der Tailscaled-Watchdog wird gebaut** (§4.3). Von den drei vorgemerkten Ansätzen deckt
+nachweislich **nur einer** den Vorfall vom 2026-09-15 — ein `OnFailure=`-Hook feuert dort gar
+nicht, weil `tailscaled` durchlief und nur die Control-Plane klemmte; nötig ist die zyklisch
+prüfende Unit. Die Tabelle dazu nimmt der Planungssession die Messarbeit ab, nicht die Wahl.
+**(3) Neu und nicht aus P8.6 stammend: die ungenutzte RTX 3060 (12 GB) im Proxmox-Verbund
+bekommt einen eigenen internen CUDA-Dienst** (§4.8), der die CPU-only-Vision-Strecke ablöst;
+Form „nach Empfehlung", Ausarbeitung in der Planungssession. **Empfehlung: eigener
+LXC-Container auf dem 3060-Host mit Ollama, erreichbar als interner HTTP-Dienst auf der
+Proxmox-Bridge — nicht in die sharefyx-VM.** Der Grund ist das Bauprinzip selbst: „der Server
+ist dumm" heißt kein LLM im Serverpfad, und diese Grenze ist nachprüfbar, solange das Modell in
+einer eigenen Kiste steht — steht es in der Produktions-VM, muss jeder künftige Leser dem Satz
+glauben. Die Client-Seite ist dafür schon gebaut: `mcp_local_vision_server.py:195` liest
+`LOCAL_VISION_ENDPOINT`, `vision_ollama.py:44` hat `--endpoint` — der Umzug ist **eine
+Umgebungsvariable, kein Code**. Hard Rule 6 bleibt unberührt (interne Bindung, kein Funnel).
+**Zwei Präzisierungen, die sonst in die Planung einwandern:** ersetzt wird **nicht** das Plugin
+(das ist seit 2026-09-11 gemessen zurückgebaut), sondern das **CPU-only-Ollama-Backend** auf der
+sharefyx-VM; und `mcp_local_vision_server.py` hat zwei Ungereimtheiten, die genau dann beißen,
+wenn der Endpoint nicht mehr `127.0.0.1` ist — `:223` loggt beim Start `DEFAULT_ENDPOINT` statt
+des aufgelösten Endpoints, und das `--endpoint`-Flag (`:274`) wirkt nur auf `--check`, nie auf
+`serve()`. **Praktische Folge der 12 GB:** `qwen3-vl:8b` (Q4_K_M, 6,1 GB) passt vollständig in
+den VRAM, der heutige Cold-Start von 46–180 s fällt auf Sekunden — erst das macht die in §4.6
+geparkte Sichtprüfungs-Option (A) benutzbar, die drei Revisionsrunden dieser Phase verursacht
+hat. ROADMAP-P9-Zeile und Handover-Frontmatter im selben Commit nachgezogen.
+
+
 **[2026-09-19, Phase 8.6 abgeschlossen ✅ — Step Z durchgeführt, `v3.0.2` ist live, die Phase
 steht auf ✅ — Claude Code — reine Doku-Session, kein Produktcode-Touch.** Abnahmematrix beider
 Pläne vollständig ausgewertet: **45 ✅ · 5 ⚠️ · 0 ⬜ · 4 ersetzt** von 54 Zeilen, jede mit Beleg.
