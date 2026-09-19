@@ -261,7 +261,7 @@ das Plugin, sondern das **CPU-only-Ollama-Backend** auf der sharefyx-VM (Ollama 
 
 **Empfehlung: eigener LXC-Container auf dem 3060-Host, Ollama darin, erreichbar als interner
 HTTP-Dienst auf der Proxmox-Bridge.** Nicht in die sharefyx-VM, und kein Passthrough in die
-Produktions-VM. Vier Gründe, in der Reihenfolge ihres Gewichts:
+Produktions-VM. Fünf Gründe, in der Reihenfolge ihres Gewichts:
 
 1. **Das Bauprinzip bleibt physisch, nicht bloß versprochen.** „Der Server ist dumm" heißt: kein
    LLM-Call im Serverpfad. Das Vision-Modell bedient die **Sichtprüfung des Agenten**, niemals
@@ -274,14 +274,28 @@ Produktions-VM. Vier Gründe, in der Reihenfolge ihres Gewichts:
    `vision_ollama.py:44` hat ein `--endpoint`-Flag. Der Umzug ist **eine Umgebungsvariable**.
    Wer stattdessen die Karte in die sharefyx-VM reicht, spart diese eine Variable und bezahlt mit
    einem Treiber-Stack in der Produktions-VM.
-3. **LXC statt voller VM mit PCIe-Passthrough:** kein VFIO/IOMMU-Blacklisting, kein Risiko für die
-   Host-Konsole, geringerer Overhead, Snapshots funktionieren. **Der bekannte Preis:** der
-   nvidia-Treiber lebt auf dem Proxmox-Host, der Container teilt dessen Kernel — ein
-   Kernel-Upgrade, das dem Treiber davonläuft, legt den Container still, bis DKMS neu baut. Das
-   ist eine Betriebsnotiz, kein Ausschlussgrund. **Die Alternative**, wenn harte Isolation mehr
-   zählt als Bequemlichkeit: volle VM mit PCIe-Passthrough — kostet IOMMU-Einrichtung und
-   **pinnt die VM auf diesen Host** (keine Live-Migration mehr).
-4. **Hard Rule 6 bleibt unberührt:** Bindung nur auf die interne Bridge, kein Funnel, kein Port
+3. **Der Ops-Grund, der schwerer wiegt als das Prinzip: die sharefyx-VM bleibt migrierbar.**
+   Die Karte steckt in **einem** Host; ein Passthrough — egal ob in die sharefyx-VM oder in eine
+   VM daneben — **pinnt diese VM auf genau diesen Host**. Die Proxmox-Vormerkung führt
+   ausdrücklich einen primären (i5-14600KF) **und** einen sekundären Node (Ryzen 7 5800X), und
+   die Migration von 2026-09-10 hat das schon einmal genutzt. Steckt das Modell in einer eigenen,
+   auf den 3060-Host gepinnten Kiste, ist genau **eine** Sache unbeweglich — die, die im
+   Zweifelsfall auch stillstehen darf. Steckt es in der sharefyx-VM, verliert die Produktion ihre
+   Beweglichkeit, um eine Sichtprüfung zu beschleunigen.
+4. **LXC statt voller VM mit PCIe-Passthrough:** kein VFIO/IOMMU-Blacklisting, kein Risiko für
+   die Host-Konsole, geringerer Overhead, Snapshots funktionieren. **Zwei bekannte Preise, damit
+   sie in der Planung budgetiert werden und nicht überraschen:**
+   **(a) „Treiber lebt auf dem Host" ist verkürzt** — der Container braucht den **Kernel**-Teil
+   nicht, aber sehr wohl **dieselbe Treiberversion im Userspace** (Installation im Container mit
+   `--no-kernel-module`) **plus** cgroup-Device-Regeln für `/dev/nvidia*`. Host-Treiber allein
+   reicht **nicht**; Host- und Container-Version müssen übereinstimmen.
+   **(b) Kernel-Kopplung:** der Container teilt den Host-Kernel — ein Proxmox-Kernel-Upgrade, das
+   dem Treiber davonläuft, legt ihn still, bis DKMS neu baut.
+   **Die Alternative**, wenn harte Isolation mehr zählt als Bequemlichkeit: volle VM mit
+   PCIe-Passthrough — kostet IOMMU-Einrichtung, dafür ist der Treiber vollständig in der VM
+   gekapselt und vom Host-Kernel unabhängig. Beide Varianten pinnen die **GPU**-Kiste auf den
+   3060-Host; das ist gewollt (Punkt 3), nicht der Unterschied zwischen ihnen.
+5. **Hard Rule 6 bleibt unberührt:** Bindung nur auf die interne Bridge, kein Funnel, kein Port
    am Router. Der Dienst ist von außen nicht erreichbar und soll es nicht sein.
 
 **Was die 12 GB praktisch ändern:** `qwen3-vl:8b` liegt bei Q4_K_M **6,1 GB** und passt damit
@@ -302,7 +316,7 @@ sonst eine Stunde Fehlersuche, sobald der Endpoint nicht mehr `127.0.0.1` ist:
   liest `args.endpoint` nie. Für den Serverbetrieb zählt ausschließlich die Umgebungsvariable.
 
 **Offene Fragen für die Planungssession** (benannt, nicht entschieden): LXC oder VM — hängt am
-IOMMU-Zustand des Hosts · welches Modell (auf `qwen3-vl:8b` bleiben oder die VRAM-Luft nutzen) ·
+IOMMU-Zustand des Hosts und daran, wie viel Kernel-/Treiber-Pflege tragbar ist · welches Modell (auf `qwen3-vl:8b` bleiben oder die VRAM-Luft nutzen) ·
 ob die sharefyx-VM ein CPU-Fallback behält oder ihr Ollama abgebaut wird · feste interne Adresse
 für die Kiste und wo `LOCAL_VISION_ENDPOINT` gesetzt wird (`~/.config/opencode/`, **nicht** im
 Repo — kein Geheimnis, aber hostspezifisch).
