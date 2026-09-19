@@ -11,7 +11,7 @@ down:
   - ../../phase8_6_ui_polish/SESSIONS_ARCHIVE.md    # volle Phasenhistorie, Wortlaut der neun Befunde
   - ./p8x_ui_polish_notes.md                        # Inhaltsquelle §1–§10
   - ./sichtpruefung_automation_conventions.md       # §2 Visuelles ist Nikinger-Sache · §5 screenshots_latest
-updated: 2026-09-13 (Plan 2 geschrieben — Claude-Code-Planungssession gegen `main`@`26a7cc9`; sechs Nikinger-Entscheidungen, Locks P8.6-W–P8.6-AL, Abnahme P8.6-33–P8.6-54, VERIFY V123–V139)
+updated: 2026-09-19 (**Step Z — §9 gefuellt, die Phase ist abgeschlossen.** Kanonischer Closeout nach P8.6-W: Status in fuenf Saetzen, Delta ueber beide Plaene (38 Commits, 930/256 Produktcode), Abnahmestand **45 ✅ · 5 ⚠️ · 0 ⬜ · 4 ersetzt** von 54 Zeilen, Restdefekte, `[VERIFY]`-Bilanz V97/V103–V144 (**37 zu · 2 offen: V118, V136 · 2 nachtraeglich bilanziert: V140/V141**), P1-Contract-Aussage. `v3.0.2` live seit 2026-09-18, SHA `1ad2665`, `health_gate` 9/9, `pytest` **995**) | 2026-09-13 (Plan 2 geschrieben — Claude-Code-Planungssession gegen `main`@`26a7cc9`; sechs Nikinger-Entscheidungen, Locks P8.6-W–P8.6-AL, Abnahme P8.6-33–P8.6-54, VERIFY V123–V139)
 ---
 # Phase 8.6 — Plan 2: Layout-Reorg, Layering, Rail-Umkehr (Plan)
 
@@ -1062,7 +1062,199 @@ in die Sichtprüfung §7.3.
 
 ## §9 Closeout
 
-*Leer bis Step Z. Dieser Abschnitt ist nach **P8.6-W** der **kanonische** Abschluss der Phase
-8.6 — Status in fünf Sätzen, Delta über **beide** Pläne, Abnahmestand 1–52, Restdefekte,
-`[VERIFY]`-Bilanz V95–V139, P1-Contract-Aussage, und was nicht enthalten ist. Plan 1 §9 bleibt
-leer und trägt nur eine Zeiger-Zeile hierher.*
+**[2026-09-19, Step Z — Claude Code.]** Dies ist nach **P8.6-W** der **kanonische** Abschluss
+der Phase 8.6. Plan 1 §9 bleibt leer und trägt nur eine Zeiger-Zeile hierher.
+
+### §9.1 Status in fünf Sätzen
+
+1. **Phase 8.6 ist abgeschlossen und live.** `v3.0.2` läuft seit dem 2026-09-18 aus Release
+   `/opt/sharefyx/releases/20260918T183907.597248Z`, SHA **`1ad2665`**;
+   `health_gate.sh --expected-version=v3.0.2 --require-todays-update-log --expected-sha=1ad2665`
+   meldet **9/9 grün**, der echte Lauf samt JSON steht in der Commit-Historie (Plan 1 hatte an
+   genau dieser Stelle einmal behauptet statt belegt — siehe §9.5).
+2. **Die Phase hat zwei Pläne gebraucht, weil die Sichtprüfung ihre Aufgabe getan hat.** Plan 1
+   lieferte A–D und wurde am 2026-09-12 **nicht abgenommen** (neun UX-Befunde); Plan 2 arbeitete
+   sie ab und brauchte dafür selbst drei Sichtungs-Revisionen (**G-R**, **H-R**, **H-R-3**) —
+   jede eine Antwort auf Pixel, die erst nach dem Bau sichtbar wurden.
+3. **Gemessen am Ende:** `pytest` **995 passed in 117,6 s** (Baseline V107 war 964),
+   `ui_budget.py` **5/5 im Korridor** (Bundle 144,7 KB von 250 KB), 38 Commits,
+   **930 insertions / 256 deletions** Produktcode über 12 Dateien, **1.556 / 44** in den Tests.
+4. **Keine neunte P1-Contract-Öffnung, und der Tabu-Diff hält über die ganze Phase** — mit
+   **genau einer** Ausnahme, die vorher angekündigt und datiert war (P8.6-AJ, Block J): der
+   Bereichs-Diff `440e462^..HEAD` über `phase4_auth/authserver` zeigt exakt zwei Dateien und in
+   `store.py` exakt zwei geänderte Zeilen. Über die sechs harten Tabu-Pfade ist er **leer**.
+5. **Zwei Marker bleiben offen und werden als offen übergeben**, nicht stillschweigend
+   geschlossen: **V118** (Zwillingskanten-Linienzahl, aus dem Screenshot nicht beantwortbar) und
+   **V136** (Chip-`<span role="button">` vs. `bindFolderDropTarget()`) — letzteres bekommt durch
+   ein frisches Nikinger-Feedback nachträglich Gewicht, §9.6.
+
+### §9.2 Delta über beide Pläne
+
+**38 Commits**, `440e462..860ed72`. Was wo liegt — die Implementierung steht im Code, hier nur
+die Landkarte:
+
+| Etappe | Ergebnis | Wo |
+|---|---|---|
+| Step 0 / 0' | Phasenverzeichnis, 6 Doku-Links, 4 L1-Cards, INDEX-Budget, Baselines | `docs/INDEX.md`, Phase-Head |
+| Step V (+ V-plugin, V-vision-befund) | Ollama 0.34.0 + `qwen3-vl:8b`; **Plugin gemessen und zurückgebaut** — es amputiert M3s nativen Bildpfad | `phase8_6_ui_polish/scripts/`, `sichtpruefung_automation_tooling.md` |
+| Block A–B (Plan 1) | `<select>`-Rückbau, sechs Layer-/Selektions-Tokens, `--border-soft`-Fix, eine konsolidierte Hover-Regel, Kategorie „Vorsicht" | `app.{html,css}`, `js/dialogs.js`, `phase8_ui_graph/CLAUDE.md` |
+| Block C–D (Plan 1) | Rail-Reihenfolge, „Alle Items" unten, `.overview`-Grid, klickbare Spaces, Ordner-Zähler · V102-Dedup, FNV-1a-Seed, `cancelAnimationFrame` | `app.{html,css}`, `js/{tree,list,state,graph}.js` |
+| **Sichtung 2026-09-12** | **neun UX-Befunde statt Freigabe** — Plan 2 erforderlich | `SESSIONS_ARCHIVE.md`, Commit `bc2aa9f` |
+| Block E (Plan 2) | **Messen, nicht bauen.** CDP-Probe; V125 geschlossen: 9a **ist** 9b, Ursache ist die 140-px-Banner-Höhe, auf `v3.0.1` byte-identisch | `scripts/p86_viewport_probe.py`, `probes/e2*.json` |
+| Block F | Layering per Tiefe: `--panel-meta*` verlieren den `--warn`-Bezug, drei rohe Flächen-Hex auf Token, zwei Wächter | `app.css`, `test_static_routes.py` |
+| Block G + **G-R** | `.shell` → `240px 480px 1fr` (P8.6-O2 ausgelöst und entschieden), Übersicht in den Listen-Slot, Karte allein im Detail-Slot, ESC stellt sie wieder her · Breakpoints 1200/1024, Layer-Ton vereinheitlicht, Editor-Head sticky | `app.{html,css}`, `js/{list,editor,app}.js`, `block_g_r_plan.md` |
+| Block H + **H-R** + **H-R-3** | Rail-Umkehr (Abmelden bleibt äußerster Knopf), `.account-nav` mit Navigations-Afford · OLED-BLACK für die drei Slots, Akzent-Fill, YAML-Bündigkeit (V142: 27,14 → 0,86 px) · 1024 ohne Map, Editor-Fullview, Listen-Slot exklusiv | `app.{html,css}`, `block_h_r_plan.md`, `block_h_r_3_escalation.md` |
+| Block J | `pytest`-Flake an der **Wurzel** behoben: `crypto.new_public_id()` mit Rejection-Sampling; `secrets.token_urlsafe(16)` liefert in **1,569 %** ein führendes `-`, das `argparse` als Optionsflag liest | `phase4_auth/authserver/{crypto,store}.py`, `scripts/authctl.py` |
+| Gate GA1–GA4 | Wegwerf-Ritt + `p86_polish_smoke.py` (14 Stationen, **18/18** über zwei Browser), Nikinger-Sichtprüfung, Badge + `UPDATE_LOG`, Deploy, Health-Gate 9/9 | `scripts/p86_polish_smoke*.{py,json}`, `docs/screenshots/p86_smoke_*.png` |
+
+**Zwei Dinge, die der Deploy selbst zutage gefördert hat** und die ohne ihn niemand gefunden
+hätte: der `umask 0177` in der Nikinger-Shell (Fix in `deploy.sh`, Regressionstest
+`test_deploy_succeeds_under_a_restrictive_ambient_umask`, `pytest` 994 → 995) und die
+Bestätigung, dass `health_gate.sh` den Release-SHA wirklich aus `/opt/sharefyx/current` liest.
+
+**Stand von `main` gegen live:** live ist `1ad2665`, `main` steht auf **`860ed72`**. Die
+Differenz sind `deploy.sh` + sein Regressionstest + Doku — **kein Anwendungs-Code**. Es fehlt
+also nichts Nutzersichtbares in der Produktion; der nächste Deploy zieht den umask-Fix nach.
+
+### §9.3 Abnahmestand — 54 Zeilen, 4 davon ersetzt
+
+**Bilanz: 45 ✅ · 5 ⚠️ · 0 ⬜ · 4 ersetzt.** Jede Zeile mit Beleg; wo der Beleg ein Smoke-Lauf
+ist, steht die Station dabei (`p86_polish_smoke_report.json`), wo er eine Nikinger-Entscheidung
+ist, das Datum.
+
+**Plan 1 (P8.6-1 … P8.6-32)**
+
+| # | Ergebnis | Beleg |
+|---|---|---|
+| 1, 2, 3 | ✅ | Step 0 — Verzeichnis + Card + INDEX-Zeilen, 0 Bruchstellen im Re-Scan |
+| **4** | ✅ **erst in Step Z wieder erfüllt** | `docs/INDEX.md` war bei Step-Z-Beginn auf **45.870 B** gewachsen (Kriterium ≤ 38 KB) — gemessen, gestrafft, im selben Commit behoben. Der dritte Verstoß derselben Zeile in dieser Phase, §9.5 |
+| 5 | ✅ | Plugin installiert, gemessen, **zurückgebaut** — das protokollierte Scheitern, das die Zeile ausdrücklich zulässt |
+| 6, 7 | ✅ | `rgba(62,141,243` nur in `:root` (6 Treffer, Zeilen 61–77) · `--border-soft` nur noch als historischer Kommentar |
+| 8, 9, 10 | ✅ | Smoke Station 14: `select_present=True`, `localStorage_after_change=frontmatter`, `restored_on_reopen=frontmatter` |
+| 11 | ✅ | Konvention v3, fünfte Kategorie „Vorsicht", `phase8_ui_graph/CLAUDE.md` |
+| 12, 13 | ✅ | Station 3 (Chromium + Firefox): `background-image=linear-gradient(rgba(62,141,243,.1), …)`; Auswahl schlägt Hover über `:not([aria-selected])` |
+| 14 | ✅ | `.btn:hover` auf `color-mix()` über Tokens |
+| **15** | ⚠️ **im Sinn erfüllt** | Der B4-Sweep fand statt und sein Ergebnis ist **maschinell** gehalten (`test_caution_class_only_on_logout_and_archive`, genau zwei Träger) — eine **Zuordnungstabelle im Phase-Head**, wie die Zeile sie wörtlich fordert, wurde nie geschrieben. Der Test ist der bessere Träger; die Zeile war zu eng formuliert |
+| 16 | ✅ | genau 2 `.action--caution`, Test hält es |
+| **17** | ⚠️ **im Sinn erfüllt** | Token-Drift (`6px`) weg; vier `border-radius: 999px` bleiben — Pillenform, kein Token |
+| **18, 19** | **ersetzt** | Durch **N.9 / P8.6-AE** aktiv umgekehrt: `.rail__account` trägt wieder **beide** Knöpfe. Nachfolger ist **P8.6-42**. *Plan 2 §8.1 hat nur -21/-22 als ersetzt benannt — diese beiden sind durch die Rail-Umkehr still obsolet geworden und werden hier nachgetragen* |
+| **20** | ⚠️ **im Sinn erfüllt** | Kein sichtbares Label „Konto"; Restvorkommen sind das deutsche Wort in Sperrmeldungen. Plan 2 hat die Zeile auf „kein Label" geschärft |
+| **21, 22** | **ersetzt** | Durch die Befunde 4 und 9 widerlegt; Nachfolger **P8.6-41** und **P8.6-50** (Plan 2 §8.1) |
+| 23, 24 | ✅ | Station 4 (`rows_visible/graph_before/graph_after` alle True) · Ordner-Zähler clientseitig, ungeladene Spaces ohne Zahl |
+| **25** | ⚠️ **teilbelegt** | `dedupeEdges()` existiert und ist per `node`-Probe belegt; die **visuelle** Bestätigung fehlt — Station 13 ist screenshot-only, und **V118 bleibt offen** |
+| 26 | ✅ | Station 12: zwei Läufe, `lit_delta=1` bei 4.136 Pixeln = **0,0 %** (Toleranz 5 %) |
+| 27 | ✅ | `cancelAnimationFrame` in `runSimulation()` (D4); kein separater (W)-Beleg, Station 12 ist indirekte Stütze |
+| 28, 29 | ✅ | `pytest` **995**, `ui_budget` **5/5 / 144,7 KB** |
+| 30 | ✅ | Bereichs-Diff über die sechs harten Pfade leer — Details §9.4 |
+| 31 | ✅ | `v3.0.2` live, `health_gate.sh` **9/9** (nicht 8/8 — zwei zusätzliche Flags) |
+| 32 | ✅ | Service-Touch durch einen Agenten **0**; `systemctl` ausschließlich über den Nikinger |
+
+**Plan 2 (P8.6-33 … P8.6-54)**
+
+| # | Ergebnis | Beleg |
+|---|---|---|
+| **33** | ✅ **erst in Step Z** | Identisch zu P8.6-4: gemessen, gestrafft, im selben Commit |
+| 34 | ✅ | `p86_viewport_probe.py` (421 Z.) + vier Probe-JSON, 1024/1200/1440 gegen `main` **und** gegen eine Wegwerf auf `6f19a8f` |
+| 35 | ✅ | `app.css:363` `240px 480px 1fr`; Queries bei `:2012` (1200) und `:2027` (1024) mitgezogen — die ursprüngliche 1280er ist durch G-R.1/H-R.6 ersetzt |
+| 36 | ✅ | Station 5 (Liste, beide Browser) **und** Station 6 (Karten-Knoten): `view_after_click=detail`, `view_after_esc=list` |
+| 37 | ✅ | Station 1 + `test_overview_lives_in_the_list_slot` |
+| 38 | ✅ | Station 7: `overview_hidden=True`, `rows_visible=True` — maschinell, nicht gesichtet |
+| 39 | ✅ | Station 3: Hover-Fill `width=415` über die volle Zeile inkl. Chips; Station 4 belegt Klick + Tastaturweg |
+| 40 | ✅ | Der Refresh zog mit der Übersicht in den Listen-Slot — die Ursache ist gelöscht, nicht überdeckt (V131) |
+| **41** | ✅ **mit Präzisierung** | Der `.detail`-Slot ist bei 1440 px **720 px** breit (P8.6-X-Rechnung). Die Zeichenfläche misst **654 × 810 px** (Station 12) — die Differenz ist `.detail__graph { padding: 16px 32px }`. Die Zeile meint den Slot; wer sie auf das Canvas liest, zählt 654 |
+| 42 | ✅ | Station 2: `home < rail-tree < account-button < logout-button = True` |
+| 43 | ✅ | Station 9: beide `.account-nav` `reachable: True`; H-R.2 gab ihnen den Akzent-Fill |
+| **44** | ⚠️ **im Sinn erfüllt** | `--panel-meta/-head/-line` sind auf `var(--surface)`/`var(--surface-raised)`/`var(--line)` — der Befund-8-Grund ist weg. Die wörtliche Forderung „`grep -c 229,169,60` = 0" ist **nicht** erfüllt: `app.css:770` (`.list__readonly`) und `:1306` (`.detail__badge-readonly`) tragen weiter `rgba(229,169,60,.10)`. Beide sind **echte Warnungen** mit `border`/`color: var(--warn)` — die Zeile war zu breit, nicht der Code zu warm |
+| 45 | ✅ | `test_no_raw_surface_hex_outside_root` hält es; Ausnahmeliste dokumentiert (`#fff` im QR, neun Space-Kategoriefarben) |
+| 46 | ✅ | 995 ≥ 972 |
+| 47 | ✅ | `git diff --stat 440e462^..HEAD -- phase4_auth/authserver` → **2 Dateien**, `store.py` **2/2 Zeilen** |
+| 48 | ✅ | §9.4 |
+| 49 | ✅ | 5/5 |
+| 50 | ✅ | Station 10 (1200, beide Browser): `buttons_ok=True`, `clipped=False` · Station 11 (1024): `close_reachable=True` |
+| 51 | ✅ | 9/9, Ausgabe im Commit `860ed72` |
+| 52 | ✅ | PID 991 durchgehend nur gelesen; Wegwerf über PID-Datei gestoppt |
+| 53 | ✅ | Höhenkette `flex: 1` + `min-height: 0` als Wächter; Station 12 misst 810 px Höhe — der V112-Bug ist nicht zurück |
+| 54 | ✅ | `#list-empty` bleibt im Übersichts-Zustand unsichtbar (V139, Block G §4.4) |
+
+### §9.4 Restdefekte und bewusst liegen Gelassenes
+
+| Was | Bewertung | Wo weiter |
+|---|---|---|
+| **`#back-button` / `.detail__back` ist toter Code** | `app.css:1367` setzt `display: none`, **keine** Override-Regel im ganzen Stylesheet. Nikinger-Entscheidung 2026-09-18: **unkritisch, kein Fix** — `#close-button` deckt den UI-Weg, ESC den Tastaturweg | Aufräumkandidat (Markup + `app.js:159`), P9 oder später |
+| **`ui_budget` wächst, statt zu schrumpfen** | Plan 1 §4.9 erwartete ein kleineres `app.css`. Real: 130,1 → **144,7 KB** Bundle. Dokumentierte Abweichung, kein Defekt — die Höhenketten, Breakpoint-Sätze und die ausführlichen Block-Kommentare überwiegen den Grid-Lösch-Effekt. Korridor (250 KB) hält mit Reserve | P9, falls das Budget je knapp wird |
+| **`--rail-top` ist ein Geist-Token** | Nach H-R.1 (OLED-BLACK) definiert, aber nicht mehr benutzt — bewusst nicht entfernt, Refactor war kein H-R-Scope | P9 |
+| **`.tree__space` setzt kein `aria-current`** | V113, negativer Befund aus Block B. Der `:not([aria-current])`-Ausschluss in der Hover-Regel ist trotzdem korrekt vorbereitet | P9, echte A11y-Runde |
+| **`main` ist einen Commit vor live** | `860ed72` (deploy.sh-umask-Fix + Test + Doku) ist nicht ausgeliefert. Kein Anwendungs-Code | nächster Deploy |
+
+**Tabu und P1-Contract.** Der Bereichs-Diff über die gesamte Phase
+(`git diff --stat 440e462^..HEAD -- phase1_storage/storage phase2_mcp/mcpserver
+phase5_ui/webui/{security,api,serializers,permissions}.py`) ist **leer**. `phase4_auth/authserver`
+zeigt `crypto.py` (+16) und `store.py` (2/2) — **exakt** die am 2026-09-13 angekündigte,
+datierte Ausnahme P8.6-AJ, nicht mehr. **Es gibt keine neunte P1-Contract-Öffnung**; die achte
+(`storage/linkscan.py`) bleibt die letzte. V102 wurde im Frontend dedupliziert (N2), der
+Ordner-Zähler clientseitig gerechnet (P8.6-O) — beides bewusst, um den Index nicht zu öffnen.
+
+### §9.5 Was diese Phase über ihre eigene Doku gelernt hat
+
+Drei Muster, die sich in P8.6 **wiederholt** haben und deshalb hier stehen statt in einem
+Session-Block:
+
+1. **Eine Behauptung im Dokument ist kein Beleg.** Die Phase hat zweimal eine Zahl übernommen,
+   die nie gemessen wurde: „Deploy für Block A+D ausgeführt, `health_gate` 8/8" (2026-09-13
+   widerlegt — es gab keinen Deploy) und die `pytest`-Baseline „970" (2026-09-13 widerlegt —
+   969 + ein Flake, der in Block J als **echter Produktionsfehler** entlarvt wurde). Beide Male
+   war das Werkzeug in Ordnung und der Satz daneben. Plan 2 §7.4 hat daraus die Regel gemacht,
+   die Gate-Ausgabe **in den Commit** zu schreiben — und genau das ist am 2026-09-18 passiert.
+2. **`docs/INDEX.md` reißt sein Budget schneller, als Handarbeit es zurückholt.** Dritter
+   Verstoß in dieser Phase (40.870 → 38.822 → 38.471 → **45.870 B**). Die Ursache ist bekannt und
+   benannt: die `updated:`-Frontmatter-Kette, nicht der Body. Die Lösung — eine Rotation analog
+   `rotate_session_block.sh` — ist als **P9-Vormerkung** offen; Step Z hat wieder von Hand
+   gestrafft, weil ein Doku-Struktur-Umbau kein Closeout-Auftrag ist.
+3. **Rotation gehört ins Skript.** Die Hand-Rotation vom 2026-09-10 hatte 72 Zeilen mitten im
+   Satz gekappt; die Reparatur lief mechanisch aus `04dee6a`. Seitdem läuft jede Rotation über
+   `scripts/rotate_session_block.sh` — auch die dieser Session.
+
+### §9.6 `[VERIFY]`-Bilanz V97 / V103–V144
+
+**Bilanz: 37 geschlossen · 2 offen · 2 nachträglich bilanziert.**
+
+| Marker | Ergebnis |
+|---|---|
+| V97, V107 | ✅ Baselines vor dem ersten Code-Touch; am Ende 144,7 KB / 995 passed |
+| V103 → **V134** | ✅ `deploy.sh`-`sudo`-Prompt im Vordergrund **sichtbar** — am 2026-09-18 live bestätigt. Nach zwei Phasen Wartezeit geschlossen |
+| V104, V105 | ✅ gegenstandslos bzw. in P8.5 geschlossen |
+| V106 | ✅ kein Anker-Drift in Plan 1; **verbraucht**, ersetzt durch V123 |
+| V108 | ✅ keine Regression — 863 ms war Last auf dem alten Mini-PC; nach der Migration 365/370/380 ms, heute **395,1 ms** |
+| V109, V111, V112, V115, V116, V117, V119, V121, V122 | ✅ in den Blöcken A–D geschlossen (Details: Handover-Historie `373a431`) |
+| **V110** | ✅ **negativer Befund:** `#home-button` ruft `navigateAll()` — „Übersicht" und „Alle Items" sind **dieselbe** Aktion. Es gibt keinen Zwei-Zustands-Schalter. Der Befund hat später H-R.8 Lesart a verworfen |
+| **V113** | ✅ **negativer Befund:** `.tree__space` setzt gar kein `aria-current`; Plan §4.2 lag falsch. Bewusst nicht repariert (B2 war „prüfen, nicht bauen") |
+| **V114** | ✅ am 2026-09-18 in der GA3-Runde **durchgewunken** (Trägerflächen) |
+| **V118** | ⬜ **offen und bewusst offen übergeben.** Zwillingskante = Tag-Kante + explizite Kante zwischen denselben Knoten: zwei Linien gewollt? Screenshot 13 zeigt nur unbeschriftete Punkte, ohne Hover keine Knoten-Labels — aus dem Bild **nicht** beantwortbar. `dedupeEdges()` fasst `implicitEdges` bewusst nicht an. **Weg:** live nachklicken oder den Smoke um eine Label-Capture erweitern |
+| V120 | ⬜ offen, **bewusst** — dynamischer Tab-Titel, „would be cool"-Note außerhalb jedes Scopes |
+| V123 | ✅ Sammelmarker; die Drift wurde **gemeldet statt geraten** — GA2 fand vier Abweichungen zwischen Plan-2-Wortlaut und Code und schrieb sie in den Skript-Docstring, bevor eine Station entstand |
+| V124 | ✅ Step 0' (38.471 B) — seitdem wieder gerissen, §9.5 |
+| **V125** | ✅ **9a = 9b, gleiche Ursache.** Bei 1200 px mit Banner sind die Maße auf `main` und `v3.0.1` byte-identisch (col-left/col-right je 692 × 284). Die Plan-Annahme „Block C hat 9b eingeführt" war falsch; Auslöser ist die 140-px-Banner-Höhe, schon auf `v3.0.1` vorhanden |
+| V126 | ✅ **0** — alle 53 hidden-button-Treffer bei 1024 px haben `rect=(0,0,0,0)`, das ist `data-view`, kein Layout-Bug |
+| V127 | ✅ 0 Aufwand — `.editor__append` trug `var(--surface)` bereits |
+| V128, V129, V130, V131, V138, V139 | ✅ Block G, jeweils gemessen statt angenommen |
+| V132 | ✅ am 2026-09-18 durchgewunken (Kartengröße) |
+| V133 | ✅ Station 9, beide Knöpfe `reachable: True` |
+| V135 | ✅ das `login_attempts`-Rate-Limit hat den 18-Stationen-Lauf **nicht** gebrochen |
+| **V136** | ⬜ **offen — nie beantwortet.** Plan 2 §8.3 stellt die Frage für Block G, kein Block-Protokoll greift sie auf. **Sie ist seit dem 2026-09-19 nicht mehr akademisch:** der Nikinger meldet „Drag and Drop aus selbst erstellten Ordnern geht nicht". Erster Messbefund dieser Session: `bindFolderDropTarget()` hat **genau eine** Aufrufstelle (`tree.js:205`, `if (space.own)`) — es gibt ein Drop-Ziel *in* einen Ordner, aber **keines zurück auf die Space-Wurzel**. Das erklärt „rein ja, raus nein" ohne Chip-Bezug; V136s Chip-Frage bleibt daneben offen |
+| V137 | ✅ `.rail__action--account` war Rest der Oben-Platzierung, mit Block H ersatzlos entfernt |
+| V142, V143, V144 | ✅ CDP-Proben: 27,14 → 0,86 px Versatz · **0** Rechteck-Schnittmenge bei 1024 · **16/16** Knöpfe erreichbar |
+| **V140, V141** | ✅ **nachträglich bilanziert.** Beide wurden im H-R-Mini-Plan als Sichtprüfungs-Marker eröffnet und **materiell beantwortet** — die H-R-Sichtung fand statt und lieferte die drei Befunde, die Block H-R-3 abgearbeitet hat. Unter ihrem Namen wurden sie nie abgehakt; das holt diese Zeile nach |
+
+### §9.7 Was dieser Closeout nicht enthält
+
+- **Den Wortlaut der neun Befunde.** `phase8_6_ui_polish/SESSIONS_ARCHIVE.md`, Block
+  „2026-09-12 (Block-C-Sichtung Nikinger)", und Commit `bc2aa9f`.
+- **Die Implementierungsdetails.** Code und §2–§7 dieses Plans bzw. Plan 1 §3–§6. Wer wissen
+  will, *warum* der Layout-Seed ein FNV-1a-Hash ist, liest P8.6-M — dort steht das verworfene
+  Gegenmodell.
+- **Den Teil-Stand vom 2026-09-13.** Er war der Einstieg in diese Planungsrunde und ist in
+  `373a431:docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md` erhalten; die heutige Fassung desselben
+  Pfades ist der **Abschluss**-Handover P8.6 → P9.
+- **Die P9-Planung.** Der Handover benennt, was P9 erbt — er entscheidet nichts.
+- **Das geerbte Ledger.** Unverändert offen, von P8.6 nichts angefasst und nichts still
+  abgeräumt: `PHASE8_5_CLOSEOUT_HANDOVER.md` §4.7.

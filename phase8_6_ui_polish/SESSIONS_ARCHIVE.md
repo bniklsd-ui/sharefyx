@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Phase-8.6-Historie — der aktuelle Session-Blo
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-18 (Block-H-R-3-Bau-Session-Block [Claude Code, 2026-09-17] per `scripts/rotate_session_block.sh phase8_6_ui_polish` verbatim ins Archiv rotiert — Phase-Head 118.450→104.826 B, Archiv 212.293→225.917 B. Phase-Head trägt jetzt den Gate-GA1+GA2-Session-Block [Claude Code, Wegwerf-Ritt + `p86_polish_smoke.py` neu, 18/18 Stationen grün, ein Produktbefund `.detail__back` toter Code]. **Korrektur-Notiz:** erster Rotationslauf dieser Session hatte das neue Session-Block VOR dem alten eingefügt — das Skript hält Konvention „neuester Block steht zuletzt im Head" (`KEEP_INDEX = STARTS.length - 1`), archivierte dadurch den neuen statt des alten Blocks. Aus den Skript-eigenen `.bak`-Backups wiederhergestellt, Blockreihenfolge vor dem zweiten Lauf vertauscht, zweiter Lauf korrekt) | 2026-09-17 (Block H-R-3 Escalation-Session-Block [Claude Code, 2026-09-15] per `scripts/rotate_session_block.sh phase8_6_ui_polish` verbatim ins Archiv rotiert — Phase-Head 105.433→101.545 B, Archiv 208.018→211.906 B. Phase-Head trägt jetzt den Block-H-R-3-Bau-Session-Block [Claude Code, drei Locks H-R.6/H-R.7/H-R.8, pytest 991→992, Live-Verifikation gegen Wegwerf v3ritt]) | 2026-09-15 (Block H-R-3 Escalation-Report nach Nikinger-Sichtung — Phase-Head 101.669→96.476 B, Archiv 201.928→207.121 B. Watchdog-Vormerkungs-Sub-Block 105 Z./5.193 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-R-3-Escalation-Session-Block. **Rein dokumentarisch — keine Code-Änderung.** Drei Nikinger-Befunde aus Sichtung der fünf H-R-Teil-2-Screenshots (01/02 akzeptiert, 03 Klärungsbedarf, 04 Umkehr von G-R.1, 05 neue Editor-fullview-Variante) → `docs/concepts/phase8_6_ui_polish_block_h_r_3_escalation.md` neu (~9 KB). Mini-Plan-Vorschlag mit drei Locks H-R.6/H-R.7/H-R.8 + Wächter-Liste + zwei Klärungsfragen. Routing-Hinweis: opencode/M3 für Pixel-Befunde ausgeschlossen (V-vision-befund 2026-09-11), diese Runde ist **Claude-Code-Territorium**. Nächster Schritt: Block H-R-3 (Claude Code), dann J, Gate, Z) | 2026-09-15 (Tailscaled-Watchdog-Vormerkung nach heutiger Control-Plane-Outage — Phase-Head 109.087→97.776 B, Archiv 189.880→201.191 B. Block-H-R-Teil-2-Session-Block 191 Z./11.311 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Tailscaled-Watchdog-Session-Block. **Rein dokumentarisch — keine Code-Änderung.** Neue Vormerkung „Tailscaled-Watchdog (Nikinger-Vorgabe 2026-09-15)" in §Vormerkungen mit drei Lösungs-Ansätzen (OnFailure-Hook / Watchdog-Unit mit zyklischer Prüfung / Tailscale-eigenes Feature) für „Control-Plane lange nicht erreichbar"-Fall. Nächster Schritt: Block J (P8.6-AJ, der `pytest`-Flake) unverändert; Watchdog als Mini-Phase nach P8.6 Gate) | 2026-09-14 (**Block H-R Teil 2 erledigt ✅ — H-R.3 + H-R.4 + H-R.5** — Head 109.202→99.718 B, Archiv 180.176→189.660 B. Block-H-R-Teil-1-Session-Block 146 Z./9.484 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-R-Teil-2-Session-Block. **Phase 8.6 ist nach H-R-2 bei Block 12 von 13 angekommen** — Editor-YAML-Bündigkeit (CSS-Fix: padding-bottom 12 → 40 px, V142-CDP-Probe 27,14 → 0,86 px) + 1024-er Map-Overlap (kein Fix, V143 misst 0 Rechteck-Schnittmenge) + 1024-er Editor-Modus (kein Fix, V144 misst 16/16 Knöpfe reachable); der nächste Block ist J (der pytest-Flake, P8.6-AJ), dann Gate, dann Z (Closeout)) | 2026-09-14 (**Block H-R Teil 1 erledigt ✅ — H-R.1 + H-R.2** — Head 88.519 B [unverändert nach Rotation], Archiv 151.336→169.569 B. Block-G-R-Session-Block 235 Z./18.073 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-Session-Block. **Phase 8.6 ist nach H bei Block 10 von 13 angekommen — Rail-Umkehr (Befund 7b) + Konto-Dialog-Afford (Befund 2) in einem Schritt behoben, der nächste Block ist J (der pytest-Flake, P8.6-AJ, datierte Tabu-Ausnahme für phase4_auth/authserver/{crypto.py,store.py})**) | 2026-09-14 (**Block G-R erledigt ✅** — Head 82.028→85.760 B, Archiv 138.612→151.336 B. Block-G-Session-Block 159 Z./11.728 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-G-R-Session-Block. **`Phase 8.6` ist nach G-R bei Block 9 von 13 angekommen — Layout/Editor-YAML-Bündigkeit + Layer-Tone-Drift aus der Sichtung behoben, der nächste Block ist H (Rail + Konto-Dialog, Befunde 7b + 2)**) | 2026-09-14 (E2b-Sub-Block [vom 2026-09-14, E2b-Commit `cc3f342`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — sechste Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 5.058 B; Archiv 128.603 → 133.661 B) | 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
+updated: 2026-09-19 (Step-Z-Rotation per `scripts/rotate_session_block.sh` — der Gate-Block vom 2026-09-18 [160 Z. / 13.043 B] verbatim aufgenommen, alle vier Gegenproben gruen; Archiv 226.720 → 239.763 B) | 2026-09-18 (Block-H-R-3-Bau-Session-Block [Claude Code, 2026-09-17] per `scripts/rotate_session_block.sh phase8_6_ui_polish` verbatim ins Archiv rotiert — Phase-Head 118.450→104.826 B, Archiv 212.293→225.917 B. Phase-Head trägt jetzt den Gate-GA1+GA2-Session-Block [Claude Code, Wegwerf-Ritt + `p86_polish_smoke.py` neu, 18/18 Stationen grün, ein Produktbefund `.detail__back` toter Code]. **Korrektur-Notiz:** erster Rotationslauf dieser Session hatte das neue Session-Block VOR dem alten eingefügt — das Skript hält Konvention „neuester Block steht zuletzt im Head" (`KEEP_INDEX = STARTS.length - 1`), archivierte dadurch den neuen statt des alten Blocks. Aus den Skript-eigenen `.bak`-Backups wiederhergestellt, Blockreihenfolge vor dem zweiten Lauf vertauscht, zweiter Lauf korrekt) | 2026-09-17 (Block H-R-3 Escalation-Session-Block [Claude Code, 2026-09-15] per `scripts/rotate_session_block.sh phase8_6_ui_polish` verbatim ins Archiv rotiert — Phase-Head 105.433→101.545 B, Archiv 208.018→211.906 B. Phase-Head trägt jetzt den Block-H-R-3-Bau-Session-Block [Claude Code, drei Locks H-R.6/H-R.7/H-R.8, pytest 991→992, Live-Verifikation gegen Wegwerf v3ritt]) | 2026-09-15 (Block H-R-3 Escalation-Report nach Nikinger-Sichtung — Phase-Head 101.669→96.476 B, Archiv 201.928→207.121 B. Watchdog-Vormerkungs-Sub-Block 105 Z./5.193 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-R-3-Escalation-Session-Block. **Rein dokumentarisch — keine Code-Änderung.** Drei Nikinger-Befunde aus Sichtung der fünf H-R-Teil-2-Screenshots (01/02 akzeptiert, 03 Klärungsbedarf, 04 Umkehr von G-R.1, 05 neue Editor-fullview-Variante) → `docs/concepts/phase8_6_ui_polish_block_h_r_3_escalation.md` neu (~9 KB). Mini-Plan-Vorschlag mit drei Locks H-R.6/H-R.7/H-R.8 + Wächter-Liste + zwei Klärungsfragen. Routing-Hinweis: opencode/M3 für Pixel-Befunde ausgeschlossen (V-vision-befund 2026-09-11), diese Runde ist **Claude-Code-Territorium**. Nächster Schritt: Block H-R-3 (Claude Code), dann J, Gate, Z) | 2026-09-15 (Tailscaled-Watchdog-Vormerkung nach heutiger Control-Plane-Outage — Phase-Head 109.087→97.776 B, Archiv 189.880→201.191 B. Block-H-R-Teil-2-Session-Block 191 Z./11.311 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Tailscaled-Watchdog-Session-Block. **Rein dokumentarisch — keine Code-Änderung.** Neue Vormerkung „Tailscaled-Watchdog (Nikinger-Vorgabe 2026-09-15)" in §Vormerkungen mit drei Lösungs-Ansätzen (OnFailure-Hook / Watchdog-Unit mit zyklischer Prüfung / Tailscale-eigenes Feature) für „Control-Plane lange nicht erreichbar"-Fall. Nächster Schritt: Block J (P8.6-AJ, der `pytest`-Flake) unverändert; Watchdog als Mini-Phase nach P8.6 Gate) | 2026-09-14 (**Block H-R Teil 2 erledigt ✅ — H-R.3 + H-R.4 + H-R.5** — Head 109.202→99.718 B, Archiv 180.176→189.660 B. Block-H-R-Teil-1-Session-Block 146 Z./9.484 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-R-Teil-2-Session-Block. **Phase 8.6 ist nach H-R-2 bei Block 12 von 13 angekommen** — Editor-YAML-Bündigkeit (CSS-Fix: padding-bottom 12 → 40 px, V142-CDP-Probe 27,14 → 0,86 px) + 1024-er Map-Overlap (kein Fix, V143 misst 0 Rechteck-Schnittmenge) + 1024-er Editor-Modus (kein Fix, V144 misst 16/16 Knöpfe reachable); der nächste Block ist J (der pytest-Flake, P8.6-AJ), dann Gate, dann Z (Closeout)) | 2026-09-14 (**Block H-R Teil 1 erledigt ✅ — H-R.1 + H-R.2** — Head 88.519 B [unverändert nach Rotation], Archiv 151.336→169.569 B. Block-G-R-Session-Block 235 Z./18.073 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-H-Session-Block. **Phase 8.6 ist nach H bei Block 10 von 13 angekommen — Rail-Umkehr (Befund 7b) + Konto-Dialog-Afford (Befund 2) in einem Schritt behoben, der nächste Block ist J (der pytest-Flake, P8.6-AJ, datierte Tabu-Ausnahme für phase4_auth/authserver/{crypto.py,store.py})**) | 2026-09-14 (**Block G-R erledigt ✅** — Head 82.028→85.760 B, Archiv 138.612→151.336 B. Block-G-Session-Block 159 Z./11.728 B per `scripts/rotate_session_block.sh phase8_6_ui_polish` ins Archiv rotiert; Phase-Head jetzt nur Block-G-R-Session-Block. **`Phase 8.6` ist nach G-R bei Block 9 von 13 angekommen — Layout/Editor-YAML-Bündigkeit + Layer-Tone-Drift aus der Sichtung behoben, der nächste Block ist H (Rail + Konto-Dialog, Befunde 7b + 2)**) | 2026-09-14 (E2b-Sub-Block [vom 2026-09-14, E2b-Commit `cc3f342`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — sechste Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 5.058 B; Archiv 128.603 → 133.661 B) | 2026-09-14 (E2a-Sub-Block [vom 2026-09-14 früh, E2a-Commit `f8e413c`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — fünfte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.720 B; Archiv 121.609 → 128.329 B) | 2026-09-14 (Plan-2-Block [vom 2026-09-13] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — vierte Skript-Rotation der Phase, alle vier Gegenproben gruen; 78 Zeilen / 6.410 B; Archiv 114.955 → 121.365 B) | 2026-09-13 (Block-C-Sichtungs-Sub-Block [vom 2026-09-12, Commit `bc2aa9f`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — zweite Skript-Rotation der Phase, alle vier Gegenproben gruen; 114 Zeilen / 7.142 B; Archiv 107.535 → 114.677 B) | 2026-09-13 (Block-C-Sub-Block [vom 2026-09-12, Commit `90c72e2`] per `scripts/rotate_session_block.sh` verbatim aus dem Phase-Head hierher rotiert — erste Skript-Rotation dieser Phase, alle vier Gegenproben gruen. **Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 mitten im Satz gekappt; **72 Zeilen / 4.403 B** aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` mechanisch wiederhergestellt, `cmp` gegen das Original byte-identisch, Altbestand nachweislich unveraendert. Der vormals verwaiste `## Session stopped`-Header fuehrt seither korrekt die beiden `###`-Sub-Bloecke darunter) | 2026-09-11 (Block-B-Sub-Block [vom 2026-09-11, Block-B-Commit] verbatim aus dem Phase-Head hierher rotiert vor dem Block-B-Nächste-Session-Update (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den Block-B-Sub-Block) | 2026-09-11 (V121+V122-Visual-Sub-Block [vom 2026-09-10, Commit `5152d35`] verbatim aus dem Phase-Head hierher rotiert vor dem V-vision-befund-Commit (P8.6-T-Rotationsregel); Phase-Head trägt jetzt nur den V-vision-befund-Sub-Block, SESSIONS_ARCHIVE jetzt mit neun Sub-Blöcken) | aeltere Eintraege: die `### date`-Sub-Bloecke in `SESSIONS_ARCHIVE.md`
 ---
 # SESSIONS_ARCHIVE.md — Phase 8.6: UI-Politur, Selektion + Layout, drei Graph-Fixes
 
@@ -19,11 +19,165 @@ das Skript auf das Phase-8.5-Muster passt und mit einem `## Session stopped` + m
 
 ---
 
+## Session stopped — 2026-09-18 (Claude Code — Gate GA1+GA2, Smoke-Skript neu, 18/18 grün)
 
+**Auftrag:** Nächster atomarer Schritt nach Block J (siehe voriger Session-Block, jetzt im
+Archiv) ist der Gate — Plan 2 §7. Session-Vorgabe war „ein atomarer Schritt, dann anhalten für
+den Nikinger". GA3 (Sichtprüfung) und GA4-D-b (`deploy.sh`) sind Nikinger-Schritte per Hard
+Rule 9 und §7.3 — diese Session deckt GA1+GA2 ab: Wegwerf-Instanz + das bisher nie geschriebene
+`p86_polish_smoke.py`, dann anhalten.
 
+**Vor dem Schreiben gegen den Code geprüft, nicht gegen Plan 2 §7.2s Wortlaut übernommen**
+(§7.2 datiert 2026-09-13, seither liefen G-R/H/H-R-1..3/Nachtrag) — vier Abweichungen
+gefunden und im Skript-Docstring dokumentiert, bevor eine Zeile Station geschrieben wurde:
 
+1. **`data-view`-Werte sind `"list"`/`"detail"`, nicht `"editor"`** (H-R.8 Lesart b) — gilt
+   OHNE Media-Query-Wrapper bei jeder Breite, nicht nur beim Editor.
+2. **Graph-Knoten öffnen per einfachem Klick**, nicht per Doppelklick — `dblclick`
+   (`graph.js:685`) resettet nur Zoom/Pan bei einem Hintergrund-Doppelklick, das Öffnen läuft
+   über `onMouseUp` + `hitTest()` (`graph.js:586/629`).
+3. **H-R.8 Lesart a wurde nicht gebaut** — der „Alle Items"-Rail-Knopf existiert weiterhin und
+   führt zur selben Aktion wie Home (V110, negativer Befund).
+4. **G-R.1s 1024-Stapel ist durch H-R.6 ersetzt** — kein Zwei-Zeilen-Grid mehr,
+   `.detail__graph { display: none }` bei jeder Breite ≤1024px.
 
+**Wegwerf-Instanz:** `phase8_5_picker_release/scripts/wegwerf_setup_v3ritt.py start`
+(bereits gesetzte Daten aus einer Vorsitzung wiederverwendet — Port 18773, 30 Items über
+alpha/beta/gamma, PID 347520). Gestoppt über dieselbe Skript-`stop`-Subcommand am Sessionende
+(PID-Datei, kein `pkill -f`, Hard Rule 9). `sharefyx-mcp.service` nicht angefasst.
 
+**`phase8_6_ui_polish/scripts/p86_polish_smoke.py` neu** (14 Stationen + Login/TOTP-Muster aus
+`p86_block_h_r_3_nachtrag_self_check.py` übernommen, Setup-CLI aus `wegwerf_setup_v3ritt.py`).
+Erster Lauf: **11/18** (Chromium 14 + Firefox 4 für Station 3/5/8/10). Drei Runden Korrektur
+bis 18/18 — alle vier Ursachen waren Skript-Bugs, nicht Produktbefunde (bis auf einen echten
+Fund, siehe unten):
+
+| Station | Ursache | Fix |
+|---|---|---|
+| 3 (hover, Firefox) | `--select-fill-quiet` ist ein `linear-gradient()`-Token — landet in `background-image`, nicht `background-color`; erste Fassung prüfte die falsche Property | `backgroundImage` statt `backgroundColor` |
+| 3/5 (Chromium, 2. Lauf) | Vorherige Stationen ließen den Editor offen/Space gewechselt, `.overview__space-open` war nicht sichtbar | `_ensure_overview()`-Helfer, klickt `#home-button` defensiv vor jeder Station |
+| 6 (Knoten-Klick) | Doppelklick-Annahme war falsch (siehe Abweichung 2 oben); danach ein 5×5-Rastersuche verfehlte den einzigen sichtbaren Knoten knapp | Pixel-Scan über `canvas.getImageData()` findet den ersten nicht-Hintergrund-Pixel direkt, klickt dort — robust unabhängig von Knotenzahl/-position |
+| 11 (back-button) | **Echter Fund, kein Skript-Bug:** `.detail__back { display: none }` (`app.css:1367`) hat **keine einzige Override-Regel** im gesamten Stylesheet (grep bestätigt) — der Knopf ist toter Code. H-R.7 hat das Zurück-Muster durch `#close-button` + ESC ersetzt, `back-button` wurde nie nachgezogen | Station prüft jetzt `#close-button`-Erreichbarkeit statt `back-button`, dokumentiert den toten Knopf separat als Befund-Zeile |
+| 12 (Kartenbild zweimal) | Volle-PNG-Byte-Vergleich schlug trotz 3,5s Settle-Wartezeit fehl — `integrate()` läuft über echte `requestAnimationFrame`-Zeitschritte, zwei Läufe treffen nie exakt dieselbe Frame-Zahl vor dem `ALPHA_MIN`-Abbruch (Sub-Pixel-Drift, kein Determinismus-Bruch des FNV-Seeds) | Canvas-Pixel-Checksum (Summe + „helle" Pixelzahl) mit 5%-Toleranz statt Byte-Gleichheit; Ergebnis 0,0% Abweichung |
+| 14 (Link-Picker) | `.toolbar-btn[data-md="link"]` fügt nur ein statisches `[Linktext](Ziel-URL)`-Snippet ein (`editor.js:660-668`), öffnet **keinen** Dialog — der echte Trigger ist `#link-picker-button` neben dem Frontmatter-Feld „Links", sitzt in einem `<details>`, das erst aufgeklappt sein muss | Richtigen Selektor benutzt + `<details>` per `.open = true` aufgeklappt, falls nötig |
+| 14 (Folgefehler) | Dialog blieb nach dem Test offen, blockierte `#home-button` in allen folgenden Stationen (`pointer-events` vom `.overlay`) | `Escape` am Ende der Station, `finally`-Block |
+
+**Ergebnis: 18/18 Stationen grün**, 18 Screenshots unter `docs/screenshots/p86_smoke_*.png`,
+strukturierter Report `phase8_6_ui_polish/scripts/p86_polish_smoke_report.json`. Zwei Stationen
+(12 Kartenbild-Determinismus, 13 Zwillingskanten-Präparat `itm_fbe90e4a`→`itm_579b35c1`) sind
+bewusst nur teilweise automatisiert — pixelgenaue Layout-Fragen bleiben Nikinger-Sache (§2 der
+Sichtprüfungs-Konvention), das Skript liefert die Screenshots + ein grobes Toleranz-Signal, kein
+hartes Pass/Fail für die visuelle Qualität selbst.
+
+**Ein Produktbefund für die Nikinger-Sichtprüfung (GA3) mitgeliefert:** `#back-button` /
+`.detail__back` ("← Zurück") ist erreichbarer, funktionsfähiger, aber **visuell niemals
+sichtbarer** toter Code — `app.css:1367` setzt `display: none` fest, keine einzige Regel im
+Stylesheet hebt das je auf, in keinem Breakpoint. Kein Regressionsrisiko (war nie sichtbar,
+seit wann ist unklar — H-R.7 hat das Zurück-Muster jedenfalls durch `#close-button`+ESC
+ersetzt), aber ein Kandidat zum Aufräumen (Markup + `app.js:159`s Klick-Listener) in Step Z
+oder einer Folgephase, kein Blocker für den Gate selbst.
+
+**Selbstprüfung:** kein Produkt-/Test-Code berührt (nur `phase8_6_ui_polish/scripts/`,
+`docs/screenshots/`) — `pytest` läuft unverändert bei 994, kein erneuter Lauf nötig. Tabu-Diff
+§0.3 leer (`git diff --stat` gegen alle vier Tabu-Pfade). Kein `node --check`/`ui_budget.py`
+nötig (kein CSS/JS-Touch). Kein `pkill -f`, kein `systemctl` — Wegwerf per PID-Datei gestoppt,
+sharefyx-mcp **PID 991** nicht berührt.
+
+**Nachtrag, 2026-09-18 — GA3 (Sichtprüfung) + GA4-D-a (Badge + Changelog):** drei der
+Screenshots (13 Übersicht/Graph, 11a 1024px ohne Map, 11b 1024px Editor-Fullview) im Chat
+gezeigt. Nikinger-Entscheidung zum `back-button`-Fund: **unkritisch, kein Fix** — „es sollte
+sowohl über UI als auch über ESC zurückgehen, das ist ja gegeben" — `#close-button` deckt den
+UI-Weg bereits ab (Station 11 bestätigt `close_reachable=True`), ESC den Tastatur-Weg; der tote
+`.detail__back`-Pfeil bleibt als redundanter, ungenutzter Code liegen, kein Aufräum-Zwang für
+den Gate. V118 (Zwillingskanten-Linienzahl) bleibt **offen** — Screenshot 13 zeigt nur
+unbeschriftete Punkte, keine Knoten-Labels ohne Hover; nicht aus dem Bild beantwortbar,
+Live-Klick durch den Nikinger oder eine Skript-Erweiterung nötig, hat den Gate aber nicht
+blockiert. Die übrigen vier Entscheidungspunkte aus Plan 2 §7.3 (Kartengröße, Trägerflächen,
+`cancelAnimationFrame`-Fix, 1024-px-Ersteindruck) wurden in derselben Runde durchgewunken.
+
+**GA4-D-a ausgeführt:** `phase5_ui/webui/static/app.html:20` Badge `v3.0.1` → `v3.0.2`;
+`docs/UPDATE_LOG.md` neuer `## 2026-09-18`-Block, sechs nutzersichtbare Zeilen (Übersicht
+neben der Karte, Editor ersetzt/ESC stellt wieder her, volle Space-Zeile klickbar, Karte
+"fliegt" nicht mehr + keine doppelten Kanten, Einstellungen/Abmelden-Reihenfolge, 1024px-Ansicht
+ohne Gedränge) — Block J (`pytest`-Flake-Fix) bewusst nicht erwähnt, rein intern, kein
+Nutzer-sichtbares Verhalten. `pytest -k update` (3 Tests gegen `test_static_routes.py`/
+`test_api.py`) grün, keine Version-String-Assertions im Repo gefunden, die hätten nachziehen
+müssen. Tabu-Diff §0.3 leer (`app.html`/`UPDATE_LOG.md` sind explizit nicht tabu).
+
+**Nachtrag, 2026-09-18 — GA4-D-b (Deploy) + D-c (Health-Gate), beide durch den Nikinger/den
+Agenten wie vorgesehen:**
+
+**D-b, erster Versuch, scheiterte** — `deploy.sh` brach beim `git clone`-Schritt ab:
+`fatal: Invalid path '/opt/sharefyx/releases/<ts>/.git': Permission denied`. Read-only-Diagnose
+ergab **keine** kaputte Ursache: `/opt/sharefyx`/`releases` beide `savefyx:savefyx 755`, gleiche
+`ext4`-Partition wie das Quell-Repo, `rw,relatime`, 15 GB frei, kein Lock-Mechanismus in
+`deploy.sh`. Ein manueller Reproduktionsversuch **im Agenten-Bash** mit demselben Befehl
+gelang zweimal anstandslos — was die erste, falsche Diagnose „transient" nahelegte. **Der
+zweite Fehlschlag beim Nikinger widerlegte das.** Ursache erst gefunden, nachdem der Nikinger
+`umask` in der eigenen Shell ausgegeben hatte: **`0177`**. Ein `git clone` legt neue
+Verzeichnisse mit `0777 & ~umask` an — bei `0177` ergibt das `0600`, also **kein Execute-Bit**,
+auch nicht für den Eigentümer selbst. Ein Verzeichnis ohne `x` ist für niemanden traversierbar,
+auch nicht für den, dem es gehört — jeder Schreibversuch innerhalb (hier: `git clone`s eigenes
+`mkdir .git`) scheitert dann mit exakt dieser Fehlermeldung, obwohl Eigentümer, Gruppe und alle
+Elternverzeichnisse vollkommen in Ordnung sind. Diese Klasse Fehler ist mit `ls -la` **nicht**
+sichtbar, solange man nicht das gerade neu angelegte Kind-Verzeichnis selbst prüft — die
+Standard-Werkzeuge zeigen die vererbte Prozess-Eigenschaft (`umask`) nirgends an.
+
+**Fix:** `phase5_ui/scripts/deploy.sh` setzt jetzt `umask 022` explizit direkt nach
+`set -euo pipefail`, statt die der aufrufenden Shell zu erben — eine deterministische Maske
+für das ganze Skript, unabhängig davon, was die interaktive Shell des jeweiligen Nikinger-
+Kontos gerade gesetzt hat. **Regressionstest** `test_deploy_succeeds_under_a_restrictive_ambient_umask`
+neu in `phase5_ui/tests/test_deploy_scripts.py`: setzt `umask 0177` **im Testprozess** vor
+`subprocess.run` (der Kindprozess erbt den Umask genau wie eine echte Shell ihn an `deploy.sh`
+vererbt), reproduziert **ohne** den Fix denselben Fehlertext wie in Produktion (gegengeprüft:
+Fix temporär per `sed` deaktiviert, Test schlägt mit identischer Meldung fehl, Fix
+zurückgespielt, Test wieder grün — kein False-Positive). `pytest` 994 → **995**.
+
+**D-b, zweiter Versuch (mit `umask 022` vorangestellt) — Erfolg:** Release
+`/opt/sharefyx/releases/20260918T183907.597248Z`, SHA `1ad266504c7b709a479666264232490434705102`,
+**995 pytest grün im Release selbst** (`deploy.sh` führt die Suite als Teil des Gates aus),
+Symlink-Cutover + `systemctl restart sharefyx-mcp` (Nikinger, `sudo`-Prompt sichtbar — V134
+damit geschlossen), Retention entfernte das älteste Release (`20260827T165737...`, KEEP=5).
+
+**D-c, echter Lauf mit Ausgabe im Commit** (Plan 2 §7.4 — genau die Stelle, an der Plan 1
+nur behauptet hatte, ohne dass die Behauptung stimmte):
+```
+$ phase8_5_picker_release/scripts/health_gate.sh --expected-version=v3.0.2 \
+    --require-todays-update-log --expected-sha=1ad2665
+OK  /health -> 200
+OK  /ui/login -> 200
+OK  /api/v1/me -> 401
+OK  /mcp/ -> 401
+OK  .rail__version -> v3.0.2
+OK  /opt/sharefyx/current -> /opt/sharefyx/releases/20260918T183907.597248Z
+OK  Release-SHA: 1ad266504c7b709a479666264232490434705102
+OK  docs/UPDATE_LOG.md oberster Eintrag: 2026-09-18
+OK  Release-SHA 1ad266504c7b709a479666264232490434705102 matched --expected-sha=1ad2665
+{"ts":"2026-09-18T18:46:27.747Z","action":"health_gate","result":"ok",
+ "expected_version":"v3.0.2","actual_version":"v3.0.2",
+ "active_release":"/opt/sharefyx/releases/20260918T183907.597248Z",
+ "release_sha":"1ad266504c7b709a479666264232490434705102","port":8765}
+```
+**9/9 grün, exit 0. v3.0.2 ist live.**
+
+**Selbstprüfung:** `pytest -q` 995 passed (112 s), Tabu-Diff §0.3 leer, `node --check` nicht
+nötig (kein JS/CSS-Touch, nur `deploy.sh` + sein Test), kein `pkill -f`. `systemctl restart`
+lief ausschließlich über den Nikinger (`sudo`-Prompt live gesehen), der Agent hat an keiner
+Stelle `systemctl` selbst aufgerufen — Hard Rule 9 durchgehend eingehalten.
+
+**Die Phase bleibt 🔄, nicht ✅ — nur der Gate ist geschlossen, Step Z fehlt noch.**
+Root-`CLAUDE.md` und `ROADMAP.md` entsprechend NICHT auf ✅ gesetzt; das wäre die stille
+Abweichung, die die eigene Arbeitsweise-Regel ausdrücklich verbietet.
+
+**Nächster Schritt: Step Z (Closeout), eigene Session.** Plan 2 §7.5, sieben Punkte:
+Abnahmematrix §8.1 **vollständig** auswerten (jede Zeile mit Beleg, nicht mit Zuversicht),
+`[VERIFY]`-Register §8.3 bilanzieren (**V118 — Zwillingskanten-Linienzahl — bleibt offen**,
+aus dem Screenshot nicht beantwortbar, keine Knoten-Labels ohne Hover; entweder live nachklicken
+oder den Smoke-Test um eine Label-Capture erweitern, bevor Z sie als geschlossen führt), Plan 2
+§9 als kanonischer Closeout füllen (P8.6-W), eine Zeiger-Zeile in Plan 1 §9 (die einzige
+erlaubte Änderung an dem 📕-Snapshot), Phase-Head/`ROADMAP.md`/`docs/INDEX.md`/Wurzel-
+`CLAUDE.md` erst dann auf ✅, Übersichtsgrafik von „PARTIAL CLOSEOUT" auf die echte
+Abnahmezahl, letzte `rotate_session_block.sh`-Rotation.
 
 ## Session stopped — 2026-09-17 (Claude Code — Block H-R-3, drei Locks, ein Commit)
 

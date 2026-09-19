@@ -1195,6 +1195,10 @@ später brauchen die `Datei:Zeile`-Anker einen **eigenen** Sammelmarker gegen `b
 
 ## §9 Closeout
 
+**→ Der kanonische Closeout der Phase 8.6 steht in `phase8_6_ui_polish_plan2.md` §9** (Lock
+**P8.6-W**, Step Z am 2026-09-19). Diese Zeile ist die einzige Änderung, die dieser
+📕-Snapshot nach seiner Fertigstellung erhalten hat.
+
 *Leer bis Step Z. Dieser Abschnitt ist nach P8.6-B/P8-N der **kanonische** Abschluss der
 Phase — Status in fünf Sätzen, Delta, Abnahmestand, Restdefekte, `[VERIFY]`-Bilanz
 V106–V119, P1-Contract-Aussage, und was nicht enthalten ist.*

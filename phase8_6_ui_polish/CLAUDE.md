@@ -9,7 +9,7 @@ down:
   - ../docs/concepts/p8x_ui_polish_notes.md       # Inhaltsquelle §1–§10 (P8.6-A benennt das Verzeichnis)
   - ../docs/concepts/PHASE8_5_CLOSEOUT_HANDOVER.md   # Einstieg für die P8.6-Planung; §4 = die offenen Entscheidungen
   - SESSIONS_ARCHIVE.md                            # ältere Session-Blöcke, newest-first
-updated: 2026-09-17 (**Block H-R-3 + Nachtrag + Block J — Kettenkorrektur.** Diese `updated:`-
+updated: 2026-09-19 (**Step Z — Closeout, Phase 8.6 formal abgeschlossen ✅.** Reine Doku-Session, kein Produktcode-Touch. Abnahmematrix beider Plaene vollstaendig ausgewertet (**45 ✅ · 5 ⚠️ · 0 ⬜ · 4 ersetzt** von 54 Zeilen), `[VERIFY]`-Bilanz V97/V103–V144 (**37 zu · 2 offen: V118, V136 · 2 nachtraeglich bilanziert: V140/V141**), **Plan 2 §9 als kanonischer Closeout gefuellt** (P8.6-W) + Zeiger-Zeile in Plan 1 §9, `PHASE8_6_CLOSEOUT_HANDOVER.md` von Partial- auf **Abschluss**-Handover P8.6 → P9 umgeschrieben, Uebersichtsgrafik von PARTIAL CLOSEOUT auf die Abnahmezahl, ROADMAP + Wurzel-`CLAUDE.md` auf ✅. Gemessen: `pytest` **995**, `ui_budget` 5/5 (144,7 KB), Bereichs-Tabu-Diff `440e462^..HEAD` leer bis auf P8.6-AJ. Vier Step-Z-Funde: `docs/INDEX.md` auf **45.870 B** gewachsen (dritter Verstoss, gestrafft); P8.6-18/-19 zusaetzlich ersetzt; V136 nie beantwortet; V140/V141 nie bilanziert. Nikinger-Feedback vom 2026-09-19 im Handover §4.1 abgelegt — zwei Bugs mit erstem Messbefund, ein Rechte-Thema, fuenf Feature-Wuensche) | 2026-09-17 (**Block H-R-3 + Nachtrag + Block J — Kettenkorrektur.** Diese `updated:`-
 Kette war seit dem 2026-09-15-Eintrag nicht mehr nachgezogen worden, obwohl seither drei
 Commits liefen (Block H-R-3-Bau, Rail-Exklusivitäts-Nachtrag, Block J) — jeweils mit
 vollständigem Protokoll im `## Session stopped — 2026-09-17`-Block unten, nur ohne Spiegelung
@@ -136,7 +136,7 @@ Entscheidungen P8.6-A–P8.6-U, Tabu-Liste, Schritt-Sequenz, Testliste, Abnahmez
 | 5 | Block C — Struktur: C1 „Konto" → „Einstellungen", Lesart b (Einstellungen nach oben, Abmelden ans Rail-Ende, P8.6-J/N3), C2 „Alle Items" unter die Spaces (`tree.js :: renderRail()`, P8.6-J), C3 Map als rechte Spalte / volle Höhe (`.overview` als Grid, P8.6-K/L), C4 Spaces in der Übersicht klickbar (`.overview__space-row` + `<button class="overview__space-open">`, P8.6-P), C5 Ordner-Zähler clientseitig aus `state.items` (P8.6-O) | C | ✅ **geliefert** · ⚠️ **nicht auslieferbar** | 967 → **970** (+3 statische Tests); `ui_budget` 5/5, Tabu-Diff leer. **[2026-09-13, Partial Closeout]** Diese Zeile stand bis heute auf ⬜, obwohl der Block-C-Commit `90c72e2` ihren Nachzug behauptet hat — Hard-Rule-8-Miss, korrigiert. Die Nikinger-Sichtung vom 2026-09-12 hat den Block **nicht abgenommen**: neun UX-Befunde, Details im Session-Block |
 | 6 | Block D — Graph-Fixes: D1 V102-Dedup (`dedupeEdges()` ungeordnetes Paar, P8.6-N), D2 deterministischer Layout-Seed (`seedJitter()` FNV-1a-Hash, P8.6-M), D3 `.overview__graph`-Höhe (V112-Gegenprobe — abhaengig von C3, daher mit Block C), **D4 `runSimulation()` `rafId` endlich gelesen + `cancelAnimationFrame`** — die **einzige Scope-Erweiterung** des Plans (P8.6-§6.4: §2.1-Gebiet, aber direkte Ursache von §2.4-Verschlimmerung + 3 Zeilen Fix + schon halb da; **streichen, wenn der Nikinger es in der Sichtprüfung anders sieht**) | D | ✅ (D1, D2, D4) · 🟡 (D3, haengt an Block C) | 966 → 966 (kein Test in Block D, dedup + seed + cancel sind graph.js-intern und durch das Vorhandensein des Codes hinreichend belegt — node-Probe gegen `dedupeEdges()`/`seedJitter()` separat verifiziert, Plan §0.5 ui_budget bleibt grün) |
 | 7 | Gate — **GA1+GA2 ✅ 2026-09-18**: Wegwerf-Instanz (Port 18773, PID-Datei, Hard Rule 9) + `p86_polish_smoke.py` neu (14 Stationen aus Plan 2 §7.2, Chromium + Firefox für Station 3/5/8/10) — **18/18 grün** nach drei Korrektur-Runden gegen den aktuellen Code (§7.2s Wortlaut war stellenweise stale, Details im Session-Block). **GA3 ✅ 2026-09-18** — Nikinger-Sichtprüfung der 18 Screenshots; `back-button`-Fund als unkritisch entschieden (`#close-button` + ESC decken „zurück" bereits vollständig ab, der tote Pfeil bleibt liegen, kein Fix nötig). **GA4-D-a ✅ 2026-09-18**: Badge `app.html:20` `v3.0.1` → `v3.0.2`, `docs/UPDATE_LOG.md` neuer `## 2026-09-18`-Block (6 Zeilen). **GA4-D-b ✅ 2026-09-18** — `deploy.sh` durch den Nikinger, Release `/opt/sharefyx/releases/20260918T183907.597248Z`, SHA `1ad2665`, **995 pytest grün im Release** (deploy.sh führt sie selbst aus), automatischer Health-Check des Skripts 3/3 grün. Erster Lauf scheiterte am `git clone` (`Invalid path '.../.git': Permission denied`) — Ursache **kein** Rechte-/Mount-/Platzproblem (alles read-only geprüft, sogar per manuellem Reproduktionsversuch), sondern ein `umask 0177` in der Nikinger-Shell: strippt bei neu angelegten Verzeichnissen auch das Execute-Bit (`0777 & ~0177 = 0600`), macht sie für den eigenen Eigentümer untraversierbar. Fix: `deploy.sh` setzt jetzt `umask 022` selbst statt die der aufrufenden Shell zu erben (Zeile 39-49) + Regressionstest `test_deploy_succeeds_under_a_restrictive_ambient_umask` (setzt `umask 0177` im Testprozess vor `subprocess.run`, reproduziert den exakten Produktionsfehler ohne den Fix, grün mit ihm). **GA4-D-c ✅ 2026-09-18** — echter `health_gate.sh`-Lauf, kein Bericht ohne Beleg (Plan 2 §7.4, genau die Stelle, an der Plan 1 nur behauptet hatte): `--expected-version=v3.0.2 --require-todays-update-log --expected-sha=1ad2665` → **9/9 grün**, `{"result":"ok","actual_version":"v3.0.2","release_sha":"1ad266504c7b709a479666264232490434705102",...}`. | Gate | ✅ **GA1–GA4 alle ✅, Gate abgeschlossen** | 18 Screenshots `docs/screenshots/p86_smoke_*.png`, Report `phase8_6_ui_polish/scripts/p86_polish_smoke_report.json`. **Ein Befund unterwegs gefunden, geklärt:** `#back-button`/`.detail__back` ist toter Code (`app.css:1367` fest `display: none`, keine Override-Regel) — Nikinger-Entscheidung 2026-09-18: unkritisch, `#close-button`+ESC reichen als UI+Tastatur-Weg, kein Aufräum-Zwang. **v3.0.2 ist damit live.** Nächster und letzter Schritt: **Step Z** |
-| 8 | Step Z — Closeout | Z | ⬜ · **Teil-Stand 2026-09-13** | **[2026-09-13, Plan 2]** Der kanonische Closeout wandert nach **`phase8_6_ui_polish_plan2.md` §9** (Lock **P8.6-W**). Plan 1 §9 bleibt leer und bekommt in Step Z **eine** Zeiger-Zeile — die einzige erlaubte Änderung an dem 📕-Snapshot. `PHASE8_6_CLOSEOUT_HANDOVER.md` + `phase8_6_ui_polish_uebersicht.svg` bleiben als Teil-Stand bestehen |
+| 8 | Step Z — Closeout: Abnahmematrix §8.1 beider Plaene vollstaendig ausgewertet (**45 ✅ · 5 ⚠️ · 0 ⬜ · 4 ersetzt** von 54 Zeilen), `[VERIFY]`-Register bilanziert (**37 zu · 2 offen: V118, V136 · 2 nachtraeglich: V140/V141**), **Plan 2 §9 als kanonischer Closeout gefuellt** (P8.6-W), Zeiger-Zeile in Plan 1 §9 (die einzige erlaubte Aenderung am 📕-Snapshot), `PHASE8_6_CLOSEOUT_HANDOVER.md` von Partial- auf **Abschluss**-Handover P8.6 → P9 umgeschrieben, `phase8_6_ui_polish_uebersicht.svg` von **PARTIAL CLOSEOUT** auf die Abnahmezahl, Phase-Head/`ROADMAP.md`/`docs/INDEX.md`/Wurzel-`CLAUDE.md` auf ✅, Rotation per Skript | Z | ✅ | `pytest` **995 passed in 117,6 s**, `ui_budget` 5/5 (144,7 KB), Bereichs-Tabu-Diff `440e462^..HEAD` leer bis auf die angekuendigte P8.6-AJ-Ausnahme (2 Dateien, `store.py` 2/2 Zeilen). **Drei Funde in Step Z selbst:** `docs/INDEX.md` war auf **45.870 B** gewachsen (Kriterium ≤ 38 KB, dritter Verstoss der Phase) — im selben Commit gestrafft; **P8.6-18/-19 sind zusaetzlich zu -21/-22 ersetzt** (die Rail-Umkehr N.9 hat sie still umgedreht, Plan 2 §8.1 nannte nur die ersten beiden); **V136 wurde nie beantwortet** — das Nikinger-Feedback vom 2026-09-19 liefert dafuer jetzt einen realen Anlass |
 | 9 | **Plan 2 — Step 0'** (Planungssession 2026-09-13): Doku-Hygiene repo-weit verifiziert (0 kaputte Links, 0 fehlende Cards, 0 fehlende INDEX-Zeilen), `docs/INDEX.md` von 38.815 auf **38.471 B** gebracht (sieben geschlossene Phasen-Zeilen gestrafft, −1.549 B; Plan-2-Zeile +1.205 B), Baselines neu gemessen, Anker-Drift gegen Plan 1 belegt | 0' | ✅ | `pytest` **969 passed + 1 Flake** (§1.3), `ui_budget` 5/5 (137,5 KB), `/api/v1/overview` 372,9 ms |
 | 10 | **Block E — messen, nicht bauen** (Befund 9): `p86_viewport_probe.py` (CDP, `getBoundingClientRect` + `getComputedStyle` + `elementFromPoint` auf jeden Knopf-Mittelpunkt) bei 1024/1200/1440 px, **zweimal** — gegen die Wegwerf auf aktuellem `main` **und gegen eine zweite Wegwerf auf v3.0.1-Stand** (Methodik-Wechsel 2026-09-14: keine echten Produktions-Creds, Wegwerf-vor-Produktion reicht, ist exakt der Code der läuft). Trennt **9a** (live auf `v3.0.1`) von **9b** (durch Block C eingeführt). **E2a + E2b erledigt 2026-09-14:** Befund **9 banner-abhängig, nicht unconditional** — bei 1200 px **mit** Update-Banner zwei Recent-Items vom `.overview__col-right`-Container überdeckt; **ohne** Banner kein sichtbar unerreichbarer Knopf. **V125 geschlossen: 9a = 9b, gleiche Ursache, falsche Plan-Annahme** — bei 1200 px mit Banner sind die Maße auf main (Block C) und auf v3.0.1 **byte-identisch** (col-left 692×284, col-right 692×284). Block C hat nur die Recent-Items-Reihenfolge geändert, nicht das Layout. Die wahre Ursache ist die 140-px-Banner-Höhe und war schon auf v3.0.1 vorhanden. **V126** (1024 px unerreichbar?) **erledigt**: **0** sichtbare Buttons blockiert, alle 53 hidden-button-Treffer haben `rect=(0,0,0,0)` (data-view="list" blendet die Detail-Buttons aus — separater Mechanismus, kein Layout-Bug). | E | ✅ | +1 Skript (`p86_viewport_probe.py`, 421 Z. / 16 KB), +12 Screenshots `p86_probe_{main,main-clean,v3.0.1,v3.0.1-clean}_{1024,1200,1440}.png`, +4 Probe-JSON `phase8_6_ui_polish/probes/e2{a_main,a_main_clean,b_v3.0.1,b_v3.0.1_clean}.json` (~65 KB je), kein Produktcode, Tabu-Diff §0.3 leer |
 | 11 | **Block F — Layering** (Befunde 1+8): `--panel-meta`/`--panel-meta-head`/`--panel-meta-line` verlieren ihren `--warn`-Bezug (gemessen: `rgba(229,169,60,.22)` **ist** `--warn` bei 22 %), Kopfdaten = Layer 2 / Editor = Layer 3 / Append-Zeile = Layer 2, vier rohe Flächen-Hex außerhalb `:root` auf Token (`#0E1116`/`#131A23`/`#1A2029`; `#fff` im QR bleibt) | F | ✅ | 970 → **972** (+2 statische Tests `test_no_raw_surface_hex_outside_root` P8.6-AD + `test_meta_panel_is_not_tinted_with_the_warning_colour` P8.6-AB, beide als byte-genaue Wächter); `ui_budget` 5/5 (130,1 KB, +0,1 KB app.css), Tabu-Diff §0.3 leer |
@@ -569,191 +569,128 @@ die Current-state-Sektion der Wurzel-`CLAUDE.md` ist **verworfen**; stattdessen 
 
 ## Nächste Session
 
-**Stand 2026-09-13 (Plan 2 geschrieben).** Block A/B/C/D sind gebaut und getestet, **aber
-nicht ausgeliefert**: live läuft weiter `6f19a8f`, der **P8.5**-Release vom 2026-09-05. Von
-P8.6 ist **nichts** ausgeliefert, auch Block A und D nicht (Handover §4.6).
+**Phase 8.6 ist abgeschlossen.** `v3.0.2` ist seit dem 2026-09-18 live (SHA `1ad2665`,
+`health_gate.sh` 9/9); Step Z ist am 2026-09-19 durchgeführt, ROADMAP und Wurzel-`CLAUDE.md`
+stehen auf ✅. **In diesem Verzeichnis ist nichts mehr zu tun** — es ist ab jetzt Archiv.
 
-**Die Planungssession hat stattgefunden. Der ausführende Agent (opencode/M3) beginnt bei
-Block E.**
+**Der Einstieg in die nächste Phase ist `docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md`**
+(Abschluss-Handover P8.6 → P9), nicht dieser Head. Der kanonische Closeout mit Abnahmematrix,
+`[VERIFY]`-Bilanz und Restdefekten steht in `docs/concepts/phase8_6_ui_polish_plan2.md` §9
+(Lock P8.6-W).
 
-1. **`docs/concepts/phase8_6_ui_polish_plan2.md` ist der maßgebliche Plan.** §0.2 (Locks
-   P8.6-W–P8.6-AL) und §0.3 (Tabu, **eine** datierte Ausnahme) vor dem ersten Code-Touch,
-   danach der jeweilige Block-Abschnitt. Plan 1 wird nur noch für die Historie der Blöcke
-   A–D gebraucht.
-2. **Step 0' ist erledigt** (Plan 2 §1) — Doku-Hygiene verifiziert, INDEX-Budget hergestellt,
-   Baselines gemessen. Für den Agenten bleibt dort nichts zu tun.
-3. **Reihenfolge ist gelockt (P8.6-AH):** E (messen) → F (Token) → G (Umbau) → H → J → Gate.
-   **Block E ändert keine Zeile Produktcode** — wer dort CSS anfasst, hat ihn missverstanden.
-4. **Zwei Zahlen, die nicht geraten werden dürfen:** `pytest`-Baseline ist **969 passed +
-   1 bekannter Flake** (Plan 2 §1.3), nicht 970. `docs/INDEX.md` hat **441 B Luft** gegen
-   das 38-KB-Kriterium — jede neue `.md` frisst davon.
-5. **Der neue Anker-Sammelmarker ist `[VERIFY] V123` gegen `main`@`26a7cc9`.** V106 ist
-   verbraucht.
+**Drei Dinge, die eine P9-Planungssession aus dieser Phase mitnehmen sollte:**
+
+1. **Zwei offene Marker gehen mit über:** **V118** (Zwillingskanten-Linienzahl — aus dem
+   Screenshot nicht beantwortbar, ohne Hover zeigt die Karte keine Knoten-Labels) und **V136**
+   (Chip-`<span role="button">` vs. `bindFolderDropTarget()` — nie beantwortet, und seit dem
+   Nikinger-Feedback vom 2026-09-19 nicht mehr akademisch).
+2. **Das Nikinger-Feedback vom 2026-09-19** liegt vollständig im Handover §4.1, bewusst in drei
+   Klassen sortiert: zwei Bugs mit erstem Messbefund, **ein Rechte-Thema** (Verschieben in fremde
+   Spaces ist Hard Rule 4 / `.share.yml`, nicht CSS), fünf gewöhnliche Feature-Wünsche.
+3. **Die Sichtprüfungs-Frage ist offen** (Handover §4.6). Drei der fünf Revisionsrunden dieser
+   Phase gehen darauf zurück, dass opencode/M3 seine eigenen Screenshots geglättet beschreibt.
+   Zwei Optionen liegen als Vormerkung bereit, **keine ist entschieden.**
 
 **Sichtprüfungs-Workflow (unverändert, Befund 2c):** Playwright schreibt den Screenshot auf
 Platte → M3 liest ihn mit dem eingebauten `read`-Tool → M3 nennt **Dateiname und eigenes
 Checkkriterium** (Konvention §5). Ein Rendern im OpenCode-Chat ist technisch nicht möglich.
-**Neu gelockt (P8.6-AK):** `screenshots_latest/` zieht **blockweise** mit der
-Nikinger-Sichtung mit, nicht erst beim Phasenwechsel — die Symlinks zeigen derzeit noch auf
-Block B, obwohl Block C gesichtet wurde.
 
-## Session stopped — 2026-09-18 (Claude Code — Gate GA1+GA2, Smoke-Skript neu, 18/18 grün)
+## Session stopped — 2026-09-19 (Claude Code — Step Z: Closeout, Phase 8.6 formal abgeschlossen)
 
-**Auftrag:** Nächster atomarer Schritt nach Block J (siehe voriger Session-Block, jetzt im
-Archiv) ist der Gate — Plan 2 §7. Session-Vorgabe war „ein atomarer Schritt, dann anhalten für
-den Nikinger". GA3 (Sichtprüfung) und GA4-D-b (`deploy.sh`) sind Nikinger-Schritte per Hard
-Rule 9 und §7.3 — diese Session deckt GA1+GA2 ab: Wegwerf-Instanz + das bisher nie geschriebene
-`p86_polish_smoke.py`, dann anhalten.
+**Auftrag:** Rückblick auf die beendete Phase, Übersichtsgrafik, Handover für den P9-Chat,
+Rotationsprüfung, alles in **einem** Commit (Hard Rule 8). Reine Doku-Session — **kein
+Produktcode-Touch**, der Tabu-Diff dieser Session ist trivial leer.
 
-**Vor dem Schreiben gegen den Code geprüft, nicht gegen Plan 2 §7.2s Wortlaut übernommen**
-(§7.2 datiert 2026-09-13, seither liefen G-R/H/H-R-1..3/Nachtrag) — vier Abweichungen
-gefunden und im Skript-Docstring dokumentiert, bevor eine Zeile Station geschrieben wurde:
+**Vorab gemessen statt übernommen** (Plan 2 §7.5.1: „jede Zeile mit Beleg, nicht mit
+Zuversicht"):
 
-1. **`data-view`-Werte sind `"list"`/`"detail"`, nicht `"editor"`** (H-R.8 Lesart b) — gilt
-   OHNE Media-Query-Wrapper bei jeder Breite, nicht nur beim Editor.
-2. **Graph-Knoten öffnen per einfachem Klick**, nicht per Doppelklick — `dblclick`
-   (`graph.js:685`) resettet nur Zoom/Pan bei einem Hintergrund-Doppelklick, das Öffnen läuft
-   über `onMouseUp` + `hitTest()` (`graph.js:586/629`).
-3. **H-R.8 Lesart a wurde nicht gebaut** — der „Alle Items"-Rail-Knopf existiert weiterhin und
-   führt zur selben Aktion wie Home (V110, negativer Befund).
-4. **G-R.1s 1024-Stapel ist durch H-R.6 ersetzt** — kein Zwei-Zeilen-Grid mehr,
-   `.detail__graph { display: none }` bei jeder Breite ≤1024px.
+| Messung | Ergebnis |
+|---|---|
+| `pytest -q` | **995 passed in 117,63 s**, exit 0 |
+| `ui_budget.py` | **5/5 im Korridor**, Bundle 144,7 KB von 250 KB, `app.css` 25,4 KB gzip, `/api/v1/overview` 395,1 ms |
+| Tabu-Diff **über die ganze Phase** (`440e462^..HEAD`, nicht Working Tree) | **leer** für die sechs harten Pfade |
+| enge `authserver`-Probe, gleicher Bereich | **2 Dateien** (`crypto.py` +16, `store.py` 2/2 Zeilen) — exakt P8.6-AJ |
+| live vs. `main` | live `1ad2665`, HEAD `860ed72`; Differenz = `deploy.sh` + sein Test + Doku, **kein Anwendungscode** |
+| Smoke-Report | 18/18 Stationen `ok: true`, 17 PNG unter `docs/screenshots/p86_smoke_*.png` |
 
-**Wegwerf-Instanz:** `phase8_5_picker_release/scripts/wegwerf_setup_v3ritt.py start`
-(bereits gesetzte Daten aus einer Vorsitzung wiederverwendet — Port 18773, 30 Items über
-alpha/beta/gamma, PID 347520). Gestoppt über dieselbe Skript-`stop`-Subcommand am Sessionende
-(PID-Datei, kein `pkill -f`, Hard Rule 9). `sharefyx-mcp.service` nicht angefasst.
+**Warum der Bereichs-Diff und nicht `git diff`:** der Arbeitsbaum war zu Sessionbeginn sauber,
+ein Working-Tree-Diff hätte also *vakuös* leer gemeldet und über die Phase gar nichts bewiesen.
+P8.6-30/-48 fordern „über die **gesamte** Phase" — das ist ein Bereichs-Diff gegen den ersten
+Phasen-Commit, sonst ist die Abnahmezeile eine Selbstbestätigung. Dieselbe Falle, in die die
+Phase am 2026-09-13 schon einmal getreten ist (Plan 2 §9.5).
 
-**`phase8_6_ui_polish/scripts/p86_polish_smoke.py` neu** (14 Stationen + Login/TOTP-Muster aus
-`p86_block_h_r_3_nachtrag_self_check.py` übernommen, Setup-CLI aus `wegwerf_setup_v3ritt.py`).
-Erster Lauf: **11/18** (Chromium 14 + Firefox 4 für Station 3/5/8/10). Drei Runden Korrektur
-bis 18/18 — alle vier Ursachen waren Skript-Bugs, nicht Produktbefunde (bis auf einen echten
-Fund, siehe unten):
+**Vier Funde in Step Z selbst — alle im selben Commit behoben oder benannt:**
 
-| Station | Ursache | Fix |
-|---|---|---|
-| 3 (hover, Firefox) | `--select-fill-quiet` ist ein `linear-gradient()`-Token — landet in `background-image`, nicht `background-color`; erste Fassung prüfte die falsche Property | `backgroundImage` statt `backgroundColor` |
-| 3/5 (Chromium, 2. Lauf) | Vorherige Stationen ließen den Editor offen/Space gewechselt, `.overview__space-open` war nicht sichtbar | `_ensure_overview()`-Helfer, klickt `#home-button` defensiv vor jeder Station |
-| 6 (Knoten-Klick) | Doppelklick-Annahme war falsch (siehe Abweichung 2 oben); danach ein 5×5-Rastersuche verfehlte den einzigen sichtbaren Knoten knapp | Pixel-Scan über `canvas.getImageData()` findet den ersten nicht-Hintergrund-Pixel direkt, klickt dort — robust unabhängig von Knotenzahl/-position |
-| 11 (back-button) | **Echter Fund, kein Skript-Bug:** `.detail__back { display: none }` (`app.css:1367`) hat **keine einzige Override-Regel** im gesamten Stylesheet (grep bestätigt) — der Knopf ist toter Code. H-R.7 hat das Zurück-Muster durch `#close-button` + ESC ersetzt, `back-button` wurde nie nachgezogen | Station prüft jetzt `#close-button`-Erreichbarkeit statt `back-button`, dokumentiert den toten Knopf separat als Befund-Zeile |
-| 12 (Kartenbild zweimal) | Volle-PNG-Byte-Vergleich schlug trotz 3,5s Settle-Wartezeit fehl — `integrate()` läuft über echte `requestAnimationFrame`-Zeitschritte, zwei Läufe treffen nie exakt dieselbe Frame-Zahl vor dem `ALPHA_MIN`-Abbruch (Sub-Pixel-Drift, kein Determinismus-Bruch des FNV-Seeds) | Canvas-Pixel-Checksum (Summe + „helle" Pixelzahl) mit 5%-Toleranz statt Byte-Gleichheit; Ergebnis 0,0% Abweichung |
-| 14 (Link-Picker) | `.toolbar-btn[data-md="link"]` fügt nur ein statisches `[Linktext](Ziel-URL)`-Snippet ein (`editor.js:660-668`), öffnet **keinen** Dialog — der echte Trigger ist `#link-picker-button` neben dem Frontmatter-Feld „Links", sitzt in einem `<details>`, das erst aufgeklappt sein muss | Richtigen Selektor benutzt + `<details>` per `.open = true` aufgeklappt, falls nötig |
-| 14 (Folgefehler) | Dialog blieb nach dem Test offen, blockierte `#home-button` in allen folgenden Stationen (`pointer-events` vom `.overlay`) | `Escape` am Ende der Station, `finally`-Block |
+1. **`docs/INDEX.md` stand auf 45.870 B** gegen das ≤-38-KB-Kriterium (P8.6-4 / P8.6-33).
+   **Dritter Verstoß derselben Zeile in dieser Phase** (40.870 → 38.822 → 38.471 → 45.870). In
+   diesem Commit wieder von Hand gestrafft: `updated:`-Kette auf einen aktuellen Eintrag plus
+   Zeiger, P8.6-Block auf den Umfang einer abgeschlossenen Phase gebracht. **Nicht** gelöst wurde
+   die Ursache — `docs/INDEX_UPDATES_ARCHIVE.md` + Rotation ist und bleibt P9-Arbeit, ein
+   Doku-Struktur-Umbau ist kein Closeout-Auftrag. Die Empfehlung steht jetzt im Handover §4.4.
+2. **P8.6-18 und P8.6-19 sind ebenfalls ersetzt**, nicht nur -21/-22. Plan 2 §8.1 hat zwei
+   ersetzte Zeilen benannt; die Rail-Umkehr (N.9 / P8.6-AE) hat zwei weitere **still** obsolet
+   gemacht — sie fordern „Einstellungen oben, Abmelden allein unten", das Gegenteil des heutigen
+   Zustands. Nachfolger ist P8.6-42. Nachgetragen in Plan 2 §9.3.
+3. **V136 ist nie beantwortet worden.** Plan 2 §8.3 stellt die Frage für Block G; kein einziges
+   Block-Protokoll greift sie auf — sie ist durchgerutscht, nicht entschieden. Sie steht deshalb
+   als **offen** in der Bilanz, nicht als geschlossen.
+4. **V140/V141 waren materiell beantwortet, aber nie bilanziert.** Beide wurden im
+   H-R-Mini-Plan als Sichtprüfungs-Marker eröffnet; die H-R-Sichtung fand statt und lieferte die
+   drei Befunde, die Block H-R-3 abgearbeitet hat. Unter ihrem Namen abgehakt wurden sie nie —
+   in Plan 2 §9.6 nachgeholt.
 
-**Ergebnis: 18/18 Stationen grün**, 18 Screenshots unter `docs/screenshots/p86_smoke_*.png`,
-strukturierter Report `phase8_6_ui_polish/scripts/p86_polish_smoke_report.json`. Zwei Stationen
-(12 Kartenbild-Determinismus, 13 Zwillingskanten-Präparat `itm_fbe90e4a`→`itm_579b35c1`) sind
-bewusst nur teilweise automatisiert — pixelgenaue Layout-Fragen bleiben Nikinger-Sache (§2 der
-Sichtprüfungs-Konvention), das Skript liefert die Screenshots + ein grobes Toleranz-Signal, kein
-hartes Pass/Fail für die visuelle Qualität selbst.
+**Zwei Abnahmezeilen bewusst nicht grün gemeldet**, obwohl der Code tut, was gemeint war:
+**P8.6-15** (die geforderte *Zuordnungstabelle im Phase-Head* wurde nie geschrieben — der Sweep
+lief, sein Ergebnis hält ein Test) und **P8.6-44** (die `--panel-meta*`-Tokens tragen keinen
+`--warn`-Bezug mehr, aber `app.css:770`/`:1306` behalten `rgba(229,169,60,.10)` — beides
+**echte** Warn-Elemente mit `border`/`color: var(--warn)`; das Kriterium forderte `grep = 0` und
+war damit breiter als sein eigener Zweck). Beide Male ist die Zeile zu weit gefasst, nicht der
+Code zu nachlässig — und beide Male wäre ein ✅ eine kleine Lüge.
 
-**Ein Produktbefund für die Nikinger-Sichtprüfung (GA3) mitgeliefert:** `#back-button` /
-`.detail__back` ("← Zurück") ist erreichbarer, funktionsfähiger, aber **visuell niemals
-sichtbarer** toter Code — `app.css:1367` setzt `display: none` fest, keine einzige Regel im
-Stylesheet hebt das je auf, in keinem Breakpoint. Kein Regressionsrisiko (war nie sichtbar,
-seit wann ist unklar — H-R.7 hat das Zurück-Muster jedenfalls durch `#close-button`+ESC
-ersetzt), aber ein Kandidat zum Aufräumen (Markup + `app.js:159`s Klick-Listener) in Step Z
-oder einer Folgephase, kein Blocker für den Gate selbst.
+**Das Nikinger-Feedback vom 2026-09-19** ist im Handover §4.1 abgelegt, **nicht** als flache
+Feature-Liste: zwei der acht Punkte sind Bugs und einer ist ein Rechte-Thema. Zu den beiden Bugs
+liegt ein erster, read-only gemessener Befund bei, damit der P9-Planer nicht bei null anfängt:
+`bindFolderDropTarget()` hat **genau eine** Aufrufstelle (`tree.js:205`, `if (space.own)`) — es
+gibt ein Drop-Ziel *in* einen Ordner, aber keines zurück auf die Space-Wurzel; und der globale
+ESC-Handler (`app.js:204`) prüft **nicht** auf `document.fullscreenElement`, weshalb ein
+Tastendruck auf dem Mac zwei Aktionen auslöst. Beide Befunde sind Hinweise, keine Diagnosen.
 
-**Selbstprüfung:** kein Produkt-/Test-Code berührt (nur `phase8_6_ui_polish/scripts/`,
-`docs/screenshots/`) — `pytest` läuft unverändert bei 994, kein erneuter Lauf nötig. Tabu-Diff
-§0.3 leer (`git diff --stat` gegen alle vier Tabu-Pfade). Kein `node --check`/`ui_budget.py`
-nötig (kein CSS/JS-Touch). Kein `pkill -f`, kein `systemctl` — Wegwerf per PID-Datei gestoppt,
-sharefyx-mcp **PID 991** nicht berührt.
+**Geschrieben in diesem Commit:** Plan 2 §9 (kanonischer Closeout, P8.6-W) · eine Zeiger-Zeile
+in Plan 1 §9 (die einzige erlaubte Änderung am 📕-Snapshot) ·
+`docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md` von Partial- auf **Abschluss**-Handover P8.6 → P9
+umgeschrieben (die beiden von ROADMAP/Head/Plan 2 zitierten Abschnitte §4.5/§4.6 sind im Kopf
+gesichert, die alte Fassung liegt in `373a431`) · `phase8_6_ui_polish_uebersicht.svg` neu
+gezeichnet, Badge von **PARTIAL CLOSEOUT** auf **45 ✅ · 5 ⚠️ · 0 ⬜**, zwei Bahnen (Plan 1 /
+Plan 2) mit der roten Bruchstelle dazwischen · ROADMAP-Zeile und Wurzel-`CLAUDE.md` auf ✅ ·
+`docs/INDEX.md` gestrafft und nachgezogen · `screenshots_latest/` auf die Gate-Bilder umgehängt
+(P8.6-AK).
 
-**Nachtrag, 2026-09-18 — GA3 (Sichtprüfung) + GA4-D-a (Badge + Changelog):** drei der
-Screenshots (13 Übersicht/Graph, 11a 1024px ohne Map, 11b 1024px Editor-Fullview) im Chat
-gezeigt. Nikinger-Entscheidung zum `back-button`-Fund: **unkritisch, kein Fix** — „es sollte
-sowohl über UI als auch über ESC zurückgehen, das ist ja gegeben" — `#close-button` deckt den
-UI-Weg bereits ab (Station 11 bestätigt `close_reachable=True`), ESC den Tastatur-Weg; der tote
-`.detail__back`-Pfeil bleibt als redundanter, ungenutzter Code liegen, kein Aufräum-Zwang für
-den Gate. V118 (Zwillingskanten-Linienzahl) bleibt **offen** — Screenshot 13 zeigt nur
-unbeschriftete Punkte, keine Knoten-Labels ohne Hover; nicht aus dem Bild beantwortbar,
-Live-Klick durch den Nikinger oder eine Skript-Erweiterung nötig, hat den Gate aber nicht
-blockiert. Die übrigen vier Entscheidungspunkte aus Plan 2 §7.3 (Kartengröße, Trägerflächen,
-`cancelAnimationFrame`-Fix, 1024-px-Ersteindruck) wurden in derselben Runde durchgewunken.
+**Die Grafik ist vor dem Abschluss gerendert und angesehen worden**, nicht ungesehen gemeldet:
+`~/.claude-code-tools/svg_to_png.py` → PNG → gelesen. Der erste Durchgang hatte **sechs**
+Textüberläufe (Kopfzeile unter dem Badge, Mission-Zeile 1, Gate-Box, drei VERIFY-Kästen, Fußzeile)
+und zwei Pfeile, die von der nachfolgenden `<rect>` überdeckt wurden — SVG kennt keine
+z-Reihenfolge außer der Dokumentreihenfolge. Beides behoben, zweiter und dritter Durchgang sauber.
 
-**GA4-D-a ausgeführt:** `phase5_ui/webui/static/app.html:20` Badge `v3.0.1` → `v3.0.2`;
-`docs/UPDATE_LOG.md` neuer `## 2026-09-18`-Block, sechs nutzersichtbare Zeilen (Übersicht
-neben der Karte, Editor ersetzt/ESC stellt wieder her, volle Space-Zeile klickbar, Karte
-"fliegt" nicht mehr + keine doppelten Kanten, Einstellungen/Abmelden-Reihenfolge, 1024px-Ansicht
-ohne Gedränge) — Block J (`pytest`-Flake-Fix) bewusst nicht erwähnt, rein intern, kein
-Nutzer-sichtbares Verhalten. `pytest -k update` (3 Tests gegen `test_static_routes.py`/
-`test_api.py`) grün, keine Version-String-Assertions im Repo gefunden, die hätten nachziehen
-müssen. Tabu-Diff §0.3 leer (`app.html`/`UPDATE_LOG.md` sind explizit nicht tabu).
+**Rotationsprüfung (Punkt 4 des Auftrags):** der Head trug bei Sessionbeginn **genau einen**
+`## Session stopped`-Block (2026-09-18) — das Skript hätte mit Exit 2 abgebrochen. Erst nach dem
+Anhängen dieses Blocks sind es zwei, und die Rotation läuft; der 2026-09-18-Block wandert
+**verbatim** ins Archiv. Die vier Gegenproben des Skripts (verlustfreier Schnitt, genau ein Block
+im neuen Head, byte-identische Ablage, unveränderter Archivbestand) sind der Prüfschritt, der
+laut Auftrag bleibt.
 
-**Nachtrag, 2026-09-18 — GA4-D-b (Deploy) + D-c (Health-Gate), beide durch den Nikinger/den
-Agenten wie vorgesehen:**
+**Eine Falle unterwegs, sofort zurückgerollt:** der erste Patch-Versuch an diesem Head hat
+`str.index("## Nächste Session")` benutzt — der Treffer lag in der **`updated:`-Frontmatter-Kette**
+(Zeile 23), nicht auf der Überschrift (Zeile 570), und hätte 66 KB aus der Datei geschnitten.
+`git checkout --` hat den Stand wiederhergestellt, der zweite Versuch schneidet ausschließlich
+mit Zeilenumbruch-Ankern und prüft vorher die Trefferzahl (`assert s.count(A) == 1`). Der Head
+zitiert seine eigenen Überschriften in der Kette — wer hier ohne Anker schneidet, trifft die
+Kopie statt des Originals.
 
-**D-b, erster Versuch, scheiterte** — `deploy.sh` brach beim `git clone`-Schritt ab:
-`fatal: Invalid path '/opt/sharefyx/releases/<ts>/.git': Permission denied`. Read-only-Diagnose
-ergab **keine** kaputte Ursache: `/opt/sharefyx`/`releases` beide `savefyx:savefyx 755`, gleiche
-`ext4`-Partition wie das Quell-Repo, `rw,relatime`, 15 GB frei, kein Lock-Mechanismus in
-`deploy.sh`. Ein manueller Reproduktionsversuch **im Agenten-Bash** mit demselben Befehl
-gelang zweimal anstandslos — was die erste, falsche Diagnose „transient" nahelegte. **Der
-zweite Fehlschlag beim Nikinger widerlegte das.** Ursache erst gefunden, nachdem der Nikinger
-`umask` in der eigenen Shell ausgegeben hatte: **`0177`**. Ein `git clone` legt neue
-Verzeichnisse mit `0777 & ~umask` an — bei `0177` ergibt das `0600`, also **kein Execute-Bit**,
-auch nicht für den Eigentümer selbst. Ein Verzeichnis ohne `x` ist für niemanden traversierbar,
-auch nicht für den, dem es gehört — jeder Schreibversuch innerhalb (hier: `git clone`s eigenes
-`mkdir .git`) scheitert dann mit exakt dieser Fehlermeldung, obwohl Eigentümer, Gruppe und alle
-Elternverzeichnisse vollkommen in Ordnung sind. Diese Klasse Fehler ist mit `ls -la` **nicht**
-sichtbar, solange man nicht das gerade neu angelegte Kind-Verzeichnis selbst prüft — die
-Standard-Werkzeuge zeigen die vererbte Prozess-Eigenschaft (`umask`) nirgends an.
+**Selbstprüfung §0.5:** Tabu-Diff leer (diese Session berührt nur `docs/`, `*.md`, `*.svg` und
+`screenshots_latest/`) · `pytest` **995 passed** · `ui_budget` 5/5 · kein `node --check` nötig
+(kein JS/CSS-Touch) · kein `pkill -f`, kein `systemctl` · `sharefyx-mcp` nicht angefasst ·
+keine neue `.md` ohne INDEX-Zeile (das Handover hat seine Zeile behalten, die Grafik ebenfalls).
 
-**Fix:** `phase5_ui/scripts/deploy.sh` setzt jetzt `umask 022` explizit direkt nach
-`set -euo pipefail`, statt die der aufrufenden Shell zu erben — eine deterministische Maske
-für das ganze Skript, unabhängig davon, was die interaktive Shell des jeweiligen Nikinger-
-Kontos gerade gesetzt hat. **Regressionstest** `test_deploy_succeeds_under_a_restrictive_ambient_umask`
-neu in `phase5_ui/tests/test_deploy_scripts.py`: setzt `umask 0177` **im Testprozess** vor
-`subprocess.run` (der Kindprozess erbt den Umask genau wie eine echte Shell ihn an `deploy.sh`
-vererbt), reproduziert **ohne** den Fix denselben Fehlertext wie in Produktion (gegengeprüft:
-Fix temporär per `sed` deaktiviert, Test schlägt mit identischer Meldung fehl, Fix
-zurückgespielt, Test wieder grün — kein False-Positive). `pytest` 994 → **995**.
-
-**D-b, zweiter Versuch (mit `umask 022` vorangestellt) — Erfolg:** Release
-`/opt/sharefyx/releases/20260918T183907.597248Z`, SHA `1ad266504c7b709a479666264232490434705102`,
-**995 pytest grün im Release selbst** (`deploy.sh` führt die Suite als Teil des Gates aus),
-Symlink-Cutover + `systemctl restart sharefyx-mcp` (Nikinger, `sudo`-Prompt sichtbar — V134
-damit geschlossen), Retention entfernte das älteste Release (`20260827T165737...`, KEEP=5).
-
-**D-c, echter Lauf mit Ausgabe im Commit** (Plan 2 §7.4 — genau die Stelle, an der Plan 1
-nur behauptet hatte, ohne dass die Behauptung stimmte):
-```
-$ phase8_5_picker_release/scripts/health_gate.sh --expected-version=v3.0.2 \
-    --require-todays-update-log --expected-sha=1ad2665
-OK  /health -> 200
-OK  /ui/login -> 200
-OK  /api/v1/me -> 401
-OK  /mcp/ -> 401
-OK  .rail__version -> v3.0.2
-OK  /opt/sharefyx/current -> /opt/sharefyx/releases/20260918T183907.597248Z
-OK  Release-SHA: 1ad266504c7b709a479666264232490434705102
-OK  docs/UPDATE_LOG.md oberster Eintrag: 2026-09-18
-OK  Release-SHA 1ad266504c7b709a479666264232490434705102 matched --expected-sha=1ad2665
-{"ts":"2026-09-18T18:46:27.747Z","action":"health_gate","result":"ok",
- "expected_version":"v3.0.2","actual_version":"v3.0.2",
- "active_release":"/opt/sharefyx/releases/20260918T183907.597248Z",
- "release_sha":"1ad266504c7b709a479666264232490434705102","port":8765}
-```
-**9/9 grün, exit 0. v3.0.2 ist live.**
-
-**Selbstprüfung:** `pytest -q` 995 passed (112 s), Tabu-Diff §0.3 leer, `node --check` nicht
-nötig (kein JS/CSS-Touch, nur `deploy.sh` + sein Test), kein `pkill -f`. `systemctl restart`
-lief ausschließlich über den Nikinger (`sudo`-Prompt live gesehen), der Agent hat an keiner
-Stelle `systemctl` selbst aufgerufen — Hard Rule 9 durchgehend eingehalten.
-
-**Die Phase bleibt 🔄, nicht ✅ — nur der Gate ist geschlossen, Step Z fehlt noch.**
-Root-`CLAUDE.md` und `ROADMAP.md` entsprechend NICHT auf ✅ gesetzt; das wäre die stille
-Abweichung, die die eigene Arbeitsweise-Regel ausdrücklich verbietet.
-
-**Nächster Schritt: Step Z (Closeout), eigene Session.** Plan 2 §7.5, sieben Punkte:
-Abnahmematrix §8.1 **vollständig** auswerten (jede Zeile mit Beleg, nicht mit Zuversicht),
-`[VERIFY]`-Register §8.3 bilanzieren (**V118 — Zwillingskanten-Linienzahl — bleibt offen**,
-aus dem Screenshot nicht beantwortbar, keine Knoten-Labels ohne Hover; entweder live nachklicken
-oder den Smoke-Test um eine Label-Capture erweitern, bevor Z sie als geschlossen führt), Plan 2
-§9 als kanonischer Closeout füllen (P8.6-W), eine Zeiger-Zeile in Plan 1 §9 (die einzige
-erlaubte Änderung an dem 📕-Snapshot), Phase-Head/`ROADMAP.md`/`docs/INDEX.md`/Wurzel-
-`CLAUDE.md` erst dann auf ✅, Übersichtsgrafik von „PARTIAL CLOSEOUT" auf die echte
-Abnahmezahl, letzte `rotate_session_block.sh`-Rotation.
-
+**Nächster Schritt: P9-Planungssession.** Einstieg ist
+`docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md`, nicht dieser Head. Dieses Verzeichnis ist ab
+jetzt Archiv.

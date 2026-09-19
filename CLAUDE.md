@@ -164,6 +164,50 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 
 ## Current state
 
+**[2026-09-19, Phase 8.6 abgeschlossen ✅ — Step Z durchgeführt, `v3.0.2` ist live, die Phase
+steht auf ✅ — Claude Code — reine Doku-Session, kein Produktcode-Touch.** Abnahmematrix beider
+Pläne vollständig ausgewertet: **45 ✅ · 5 ⚠️ · 0 ⬜ · 4 ersetzt** von 54 Zeilen, jede mit Beleg.
+`[VERIFY]`-Bilanz V97/V103–V144: **37 geschlossen · 2 offen · 2 nachträglich bilanziert**.
+Der **kanonische Closeout steht in `docs/concepts/phase8_6_ui_polish_plan2.md` §9** (Lock
+P8.6-W); Plan 1 §9 trägt jetzt die eine erlaubte Zeiger-Zeile. `PHASE8_6_CLOSEOUT_HANDOVER.md`
+ist von Partial- auf **Abschluss**-Handover P8.6 → P9 umgeschrieben (die beiden zitierten
+Abschnitte §4.5/§4.6 sind im Kopf gesichert, die alte Fassung liegt in `373a431`);
+`phase8_6_ui_polish_uebersicht.svg` neu gezeichnet, Badge von **PARTIAL CLOSEOUT** auf die
+Abnahmezahl, zwei Bahnen mit der roten Bruchstelle dazwischen — gerendert und **angesehen**,
+nicht ungesehen gemeldet (erster Durchgang hatte sechs Textüberläufe und zwei von `<rect>`
+verdeckte Pfeile). **Gemessen, nicht übernommen:** `pytest` **995 passed in 117,6 s**,
+`ui_budget` 5/5 (144,7 KB von 250 KB), **Bereichs**-Tabu-Diff `440e462^..HEAD` leer für die
+sechs harten Pfade — bewusst als Bereichs-Diff und nicht als Working-Tree-Diff, der bei sauberem
+Baum vakuös leer meldet und über die Phase nichts beweist; die enge `authserver`-Probe zeigt
+exakt die angekündigte P8.6-AJ-Ausnahme (2 Dateien, `store.py` 2/2 Zeilen). **Vier Funde in
+Step Z selbst:** `docs/INDEX.md` war auf **45.870 B** gewachsen (Kriterium ≤ 38 KB, **dritter**
+Verstoß der Phase — gestrafft, aber die Ursache bleibt P9-Arbeit: die `updated:`-Kette braucht
+eine Rotation, die Handarbeit trägt nicht mehr) · **P8.6-18/-19 sind zusätzlich zu -21/-22
+ersetzt** (die Rail-Umkehr N.9 hat sie still umgedreht, Plan 2 §8.1 nannte nur die ersten zwei)
+· **V136 wurde nie beantwortet** — durchgerutscht, nicht entschieden · **V140/V141 waren
+materiell beantwortet, aber nie bilanziert**. **Zwei Abnahmezeilen bewusst nicht grün gemeldet:**
+P8.6-15 (die geforderte Zuordnungstabelle im Phase-Head wurde nie geschrieben — der Sweep lief,
+sein Ergebnis hält ein Test) und P8.6-44 (`--panel-meta*` tragen keinen `--warn`-Bezug mehr,
+aber `app.css:770`/`:1306` behalten `rgba(229,169,60,.10)` an **echten** Warn-Elementen; das
+Kriterium forderte `grep = 0` und war breiter als sein Zweck). **Das Nikinger-Feedback vom
+2026-09-19** liegt im Handover §4.1, bewusst in drei Klassen statt als Feature-Liste: zwei Bugs
+mit erstem read-only-Messbefund (`bindFolderDropTarget()` hat genau eine Aufrufstelle,
+`tree.js:205` — es gibt ein Drop-Ziel *in* einen Ordner, aber keines zurück auf die
+Space-Wurzel · der globale ESC-Handler `app.js:204` prüft kein `document.fullscreenElement`,
+deshalb löst ein Tastendruck auf dem Mac zwei Aktionen aus), **ein Rechte-Thema** (Verschieben in
+fremde Spaces ist Hard Rule 4 / `.share.yml`, Einstieg `phase6_shares_plan.md`, nicht `app.css`)
+und fünf gewöhnliche Feature-Wünsche. **Eine Falle unterwegs, sofort zurückgerollt:** der erste
+Patch-Versuch am Phase-Head schnitt mit `str.index("## Nächste Session")` — der Treffer lag in
+der `updated:`-Frontmatter-Kette, nicht auf der Überschrift, und hätte 66 KB entfernt;
+`git checkout --` hat es zurückgeholt, der zweite Versuch schneidet nur mit Zeilenumbruch-Ankern
+und prüft vorher die Trefferzahl. **Rotation per `scripts/rotate_session_block.sh`** (Gate-Block
+2026-09-18, 160 Z. / 13.043 B, verbatim ins Archiv, alle vier Gegenproben grün); Head
+121.842 → 108.799 B. ROADMAP-P8.6-Zeile neu geschrieben und auf ✅, P9-Zeile um das Feedback
+ergänzt, `docs/INDEX.md` gestrafft und nachgezogen, `screenshots_latest/` auf die Gate-Bilder
+umgehängt (P8.6-AK) — alles im selben Commit. **Nächster Schritt: P9-Planungssession**, Einstieg
+`docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md`. Dieses Phasenverzeichnis ist ab jetzt Archiv.
+
+
 **[2026-09-18, P8.6 Gate abgeschlossen — `v3.0.2` ist live ✅ — Claude Code — GA1–GA4 alle
 erledigt, nur Step Z (Closeout) offen, Phase bleibt 🔄.** GA1 (Wegwerf-Instanz Port 18773) +
 GA2 (`p86_polish_smoke.py` neu, 14 Stationen aus Plan 2 §7.2, 18/18 grün nach drei

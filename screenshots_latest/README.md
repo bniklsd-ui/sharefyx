@@ -6,7 +6,7 @@ detail: L3 (Pointer-Verzeichnis, keine eigene Inhaltsquelle)
 up: ../phase8_6_ui_polish/CLAUDE.md   # aktive Phase
 down:
   - ../docs/screenshots/                # kanonische Ablage; diese Verzeichnis ist nur Symlink-Komfort
-updated: 2026-09-17 (Phase 8.6 Block H-R-3 Nachtrag — fünfter Symlink `05_uebersicht_exklusiv.png` neu: Rail-Exklusivität Übersicht vs. Space/Eimer, Nikinger-Fund nach Sichtung von 03. Vorheriger Eintrag unverändert: vier Symlinks ersetzt — 01 1440-Editor-offen [H-R.8], 02 1200-Kontrolle [H-R.7 leckt nicht], 03 1024-ohne-Karte [H-R.6], 04 1024-Editor-fullview [H-R.7]. H-R-Teil-2-Screenshots bleiben über `docs/screenshots/p86_block_h_r_{01..05}_*.png` erreichbar, nicht mehr prominent.)
+updated: 2026-09-19 (Phase 8.6 abgeschlossen — Rotation auf die **Gate-Belege**: sieben Symlinks auf `p86_smoke_*` ersetzen die fünf H-R-3-Links. Das sind die Bilder, auf denen die Freigabe von `v3.0.2` beruht. Bleiben stehen, bis P9 eigene Screenshots produziert.)
 ---
 # `screenshots_latest/` — Schnellzugriff auf die Screenshots der aktuellen Phase
 
@@ -43,17 +43,25 @@ Ausnahmen, in denen M3 den Dateinamen + Checkkriterium **nicht** nennt:
 - Wenn die Verifikation programmatisch ist (Regex auf gerenderten HTML-Output
   o. ä.) und der Screenshot nur Anhang ist.
 
-## Aktueller Inhalt (Phase 8.6 Block H-R-3, Stand 2026-09-17)
+## Aktueller Inhalt (Phase 8.6 **abgeschlossen**, Gate-Belege, Stand 2026-09-19)
+
+Dies sind die Bilder aus dem **Gate-Lauf** (`p86_polish_smoke.py`, 18/18 Stationen, zwei
+Browser) — also genau die Belege, auf denen die Freigabe von `v3.0.2` am 2026-09-18 beruht.
+Sie bleiben hier stehen, bis P9 eigene Screenshots produziert.
 
 | Dateiname | Original | Checkkriterium |
 |---|---|---|
-| `01_1440_editor_offen.png` | `../docs/screenshots/p86_block_h_r_3_01_1440_editor_open.png` | **Bei 1440 px mit offenem Item: der Listen-Slot ist komplett weg — Rail (240 px) direkt gefolgt vom Editor, der den restlichen Platz füllt.** Beweis: Lock H-R.8 (Lesart b), Probe `dataset_view=detail, list_display=none, rail_display=flex`. |
-| `02_1200_editor_offen.png` | `../docs/screenshots/p86_block_h_r_3_04_1200_editor_open.png` | **Bei 1200 px mit offenem Item: identisches Verhalten wie bei 1440 — Rail bleibt sichtbar, nur die Liste ist weg.** Beweis: H-R.7 (Editor-Fullview) greift NICHT bei 1200 px, nur bei ≤1024 px — Kontroll-Screenshot. |
-| `03_1024_ohne_karte.png` | `../docs/screenshots/p86_block_h_r_3_02_1024_list_only.png` | **Bei 1024 px in der Übersicht: keine Karte/Graph mehr sichtbar — nur Rail + Liste in einer Zeile.** Beweis: Lock H-R.6 (Umkehr von G-R.1), Probe `detail_graph_display=none`. |
-| `04_1024_editor_fullview.png` | `../docs/screenshots/p86_block_h_r_3_03_1024_editor_fullview.png` | **Bei 1024 px mit offenem Item: Rail UND Liste komplett weg, der Editor füllt den vollen Viewport (1024×768).** Beweis: Lock H-R.7, Probe `rail_display=none, list_display=none, grid-template-columns=1024px`. |
-| `05_uebersicht_exklusiv.png` | `../docs/screenshots/p86_block_h_r_3_nachtrag_uebersicht_exklusiv.png` | **In der Übersicht ist nur „Übersicht" markiert (blaue Hervorhebung) — ein zuvor besuchter Eimer („Offen") trägt keine Markierung mehr.** Beweis: Nachtrag-Fix in `tree.js` (`!state.overview`-Guard + `homeButtonEl` auf `state.overview` statt `selectedId`), Probe zeigt `home=true, offen=null` nach dem Wechsel in die Übersicht. |
+| `01_1440_uebersicht.png` | `../docs/screenshots/p86_smoke_01_1440_uebersicht.png` | **Bei 1440 px: die Übersicht (Spaces + Zuletzt benutzt) steht im linken Listen-Slot, die Karte hat den rechten Slot allein.** Das ist das Ergebnis des Layout-Umbaus aus Block G (P8.6-Y). |
+| `02_esc_holt_die_karte_zurueck.png` | `../docs/screenshots/p86_smoke_05b_item_editor_esc.png` | **Nach ESC ist die Karte wieder da, wo eben noch der Editor war.** Der Rückweg ist Abnahmekriterium (N.8), nicht Nebenwirkung; Probe `view_after_esc=list`. |
+| `03_kartenknoten_oeffnet_editor.png` | `../docs/screenshots/p86_smoke_06_karten_knoten_klick.png` | **Ein Klick auf einen Karten-Knoten öffnet den Editor** — einfacher Klick, kein Doppelklick. Der Doppelklick setzt nur Zoom/Pan zurück. |
+| `04_rail_reihenfolge.png` | `../docs/screenshots/p86_smoke_02_rail_reihenfolge.png` | **Einstellungen und Abmelden stehen wieder beide unten, Abmelden als äußerster Knopf.** Die bewusste Umkehr von C1/N3-Lesart b (N.9); Probe `home < rail-tree < account-button < logout-button`. |
+| `05_konto_dialog.png` | `../docs/screenshots/p86_smoke_09_konto_dialog.png` | **Beide Knöpfe im Konto-Dialog sehen bedienbar aus** (Akzentkante + Chevron) und sind per `elementFromPoint` erreichbar. Sie haben nie gefehlt — sie lasen sich nur wie Fließtext. |
+| `06_1024_ohne_karte.png` | `../docs/screenshots/p86_smoke_11a_1024_ohne_map.png` | **Bei 1024 px in der Übersicht: keine Karte, nur Rail + Liste in einer Zeile.** Lock H-R.6, die Umkehr des 1024er-Stapels aus G-R.1. |
+| `07_1024_editor_fullview.png` | `../docs/screenshots/p86_smoke_11b_1024_editor_fullview.png` | **Bei 1024 px mit offenem Item: Rail und Liste weg, der Editor füllt den Viewport.** Lock H-R.7. |
 
-Hinweis: dies sind die H-R-3-Screenshots (drei Locks H-R.6/H-R.7/H-R.8, ein Commit). Die H-R-Teil-1+2-Screenshots (`p86_block_h_r_{01..05}_*.png`, Editor-YAML-Bündigkeit + der jetzt ersetzte 1024er-Stapel) bleiben über `docs/screenshots/` für die Historie erreichbar, sind aber nicht mehr prominent — der 1024er-Stapel aus Teil 2 existiert nach H-R.6 nicht mehr. Block G-R-Screenshots (`p86_block_g_r_{01..06}_*.png`) und Block-H-Screenshots (`p86_block_h_{01..03}_*.png`) bleiben in `docs/screenshots/` für die Historie unverändert.
+Ältere Bilder dieser Phase (`p86_block_*`, `p86_probe_*`) bleiben in `docs/screenshots/` für die
+Historie erreichbar, sind aber nicht mehr prominent.
+
 
 ## Rotation
 
