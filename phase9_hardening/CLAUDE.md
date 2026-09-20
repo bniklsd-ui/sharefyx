@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase9_hardening_plan.md    # voller Plan, Locks P9-A–P9-T, Steps 0–H
   - ../docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md  # Herkunft der P9-Punkte
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
-updated: 2026-09-20 (Step 0 abgeschlossen — Phasenverzeichnis, INDEX-Rotationsskript, vier Doku-Defekte plus ein fünfter ungeplanter Fund repariert, `doc_health.py` als Test festgenagelt, Baseline gemessen)
+updated: 2026-09-20 (Step 0 abgeschlossen — Phasenverzeichnis, INDEX-Rotationsskript, vier geplante plus drei ungeplante Doku-Defekte repariert, `doc_health.py` als Test festgenagelt, Baseline gemessen)
 ---
 
 # Phase 9 — Härtung
@@ -54,7 +54,11 @@ eine `tmp_path`-Fixture mit synthetischer Mehr-Eintrags-Kette (`test_rotate_inde
 nicht gegen die echte `docs/INDEX.md` — die Kette dort trägt aktuell nur einen Eintrag (vom
 2026-09-19 von Hand rotiert), das Skript liefe dort auf den „nichts zu tun"-Pfad.
 
-**Vier gemessene Defekte repariert (§2.2):**
+**Vier geplante Defekte repariert (§2.2) plus drei ungeplante, vom `doc_health.py`-Bau selbst
+aufgedeckt (nicht im Plan, aber trivial und im selben Commit behoben statt liegengelassen) —
+sieben insgesamt:**
+
+*Geplant, §2.2:*
 - **0-a** die fünf `up:`/`down:`-Links in `phase8_6_ui_polish_block_h_r_3_escalation.md`
   korrigiert (drei waren `docs/concepts`-Geschwister und brauchten `./`, zwei zeigten auf
   `phase8_6_ui_polish/` und brauchten `../../`)
@@ -68,8 +72,17 @@ nicht gegen die echte `docs/INDEX.md` — die Kette dort trägt aktuell nur eine
   `docs/screenshots/`); `screenshots_latest/` am Repo-Root ist die von Konvention §5 und
   `docs/INDEX.md:143` gemeinte Instanz und bleibt
 
-**Zwei weitere, ungeplante Funde, beide vom `doc_health.py`-Bau selbst aufgedeckt (nicht im
-Plan §2.2, aber trivial und im selben Commit behoben statt liegengelassen):**
+*Ungeplant:*
+- Wurzel-`CLAUDE.md` stand bei **64.401 B**, deutlich über dem 40-KB-Softcap —
+  `docs/INDEX.md`s eigene Zeile dafür behauptete noch „~22 KB" aus der Frontmatter-Rotation vom
+  2026-09-13; seither haben drei P9-Planungscommits (`06ab4f6`, `633338d`, `2f752f9`) den
+  `## Current state`-Body weiter wachsen lassen (die Rotation von 2026-09-13 betraf nur die
+  `updated:`-Kette, nicht den Body — P9-A hat eine Ein-Block-Regel für den Body ausdrücklich
+  verworfen). Nikinger-Entscheidung: **benennen, nicht kürzen** — dieselbe P8-P-Konvention wie
+  `phase8_6_ui_polish/CLAUDE.md` und `phase6_shares/CLAUDE.md`. Die Zeile trägt jetzt die reale
+  Größe und die Benennung statt der stalen Zahl. **Der größte Einzelbefund dieser Session** —
+  eine Datei war eine Woche lang um das Dreifache größer, als ihre eigene Index-Zeile behauptete,
+  unbemerkt bis `doc_health.py` sie fing.
 - `docs/PROJECT_SESSION_LOG.md` begann mit einer führenden Leerzeile vor der Frontmatter
   (`\n---\n...`) statt direkt mit `---` — einzige Datei im Repo mit diesem Defekt, `header_cards`
   hätte ihn sonst als Befund gemeldet. Entfernt.
@@ -82,16 +95,6 @@ Plan §2.2, aber trivial und im selben Commit behoben statt liegengelassen):**
   diesem Repo braucht ab jetzt entweder denselben Direktlink-auf-README-Zeigers oder eine
   eigene INDEX-Zeile — `doc_health.py`s `index_lines`-Prüfung erzwingt das ab sofort. Wer das
   zurück auf einen Verzeichnislink „korrigiert", bricht den Scan.
-
-**Ein fünfter, ungeplanter Fund (nicht im Plan §2.2, per Nikinger-Entscheidung in dieser Session
-behandelt):** Wurzel-`CLAUDE.md` stand bei **64.401 B**, deutlich über dem 40-KB-Softcap —
-`docs/INDEX.md`s eigene Zeile dafür behauptete noch „~22 KB" aus der Frontmatter-Rotation vom
-2026-09-13; seither haben drei P9-Planungscommits (`06ab4f6`, `633338d`, `2f752f9`) den
-`## Current state`-Body weiter wachsen lassen (die Rotation von 2026-09-13 betraf nur die
-`updated:`-Kette, nicht den Body — P9-A hat eine Ein-Block-Regel für den Body ausdrücklich
-verworfen). Nikinger-Entscheidung: **benennen, nicht kürzen** — dieselbe P8-P-Konvention wie
-`phase8_6_ui_polish/CLAUDE.md` und `phase6_shares/CLAUDE.md`. `docs/INDEX.md`s `CLAUDE.md`-Zeile
-trägt jetzt die reale Größe und die Benennung statt der stalen Zahl.
 
 **`doc_health.py` gebaut** (`scripts/doc_health.py`, stdout nur JSON, Logging nach stderr —
 Hard Rule 7) mit den vier Prüfungen aus §2.3 (`index_lines`, `header_cards`, `updown_links`,
