@@ -1,4 +1,3 @@
-
 ---
 status: archive
 purpose: Archiv der historischen `[YYYY-MM-DD]`-Session-Blöcke, die bis zum Z-Closeout in `CLAUDE.md` §Current state standen — Phase 1/2/3/4/5/6/6.5/7/8/8.5-Vorlauf + Hard-Rule-Korrekturen + Phase-5-Block-D-Detailnarrative + Deploy-Blocker/Funnel-Recovery-Notizen + diverse Korrekturen

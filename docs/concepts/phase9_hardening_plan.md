@@ -5,6 +5,7 @@ read-when: Arbeiten an Phase 9 — vor jedem Step einmal §0 und die Step-Sektio
 detail: L2
 up: ../../ROADMAP.md
 down:
+  - ../../phase9_hardening/CLAUDE.md                # Phase-Head, Modulstatus + Session-Blöcke (§2.0)
   - ./PHASE8_6_CLOSEOUT_HANDOVER.md                 # Einstieg, §4 ist die Quelle der P9-Punkte
   - ./phase3_edge_plan.md                           # §0.3 P3-A (Funnel statt Cloudflare), §0.4 R4-Korrektur
   - ./phase6_shares_plan.md                         # §0.7(a)/§1.2 — Rechte-Grenze für Cross-Space

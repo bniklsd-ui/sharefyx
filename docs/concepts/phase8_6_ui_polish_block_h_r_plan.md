@@ -1,3 +1,14 @@
+---
+status: snapshot
+purpose: Mini-Plan Revision 2 zu Block H — sechs Fixes aus der Nikinger-Sichtung (OLED-BLACK, `.account-nav`-Akzent, CDP-Proben V142/V143/V144)
+read-when: Herkunft von Block H-R nachvollziehen — was die Sichtung fand und wie es behoben wurde
+detail: L2
+up: ../../phase8_6_ui_polish/CLAUDE.md
+down:
+  - ./phase8_6_ui_polish_plan2.md   # der übergeordnete Plan, dem H-R folgt
+updated: 2026-09-14 (Mini-Plan geschrieben, Block H-R gebaut und abgenommen — Datei bleibt seither unverändert)
+---
+
 # Phase 8.6 — Block H-R (Revision nach Sichtung)
 
 > **Block H-R — Datum 2026-09-14, opencode/M3.** Eigener Commit, kein Patch auf `abed4c1`

@@ -1,3 +1,14 @@
+---
+status: snapshot
+purpose: Mini-Plan Revision 1 zu Block G — vier Fixes aus der Nikinger-Sichtung der Block-G-Screenshots (Breakpoints 1200/1024, Layer-Ton, Editor-Head sticky)
+read-when: Herkunft von Block G-R nachvollziehen — was die Sichtung fand und wie es behoben wurde
+detail: L2
+up: ../../phase8_6_ui_polish/CLAUDE.md
+down:
+  - ./phase8_6_ui_polish_plan2.md   # der übergeordnete Plan, dem G-R folgt
+updated: 2026-09-14 (Mini-Plan geschrieben, Block G-R gebaut und abgenommen — Datei bleibt seither unverändert)
+---
+
 # Phase 8.6 — Block G-R (Revision nach Sichtung)
 
 > **Block G-R — Datum 2026-09-14, opencode/M3.** Eigener Commit, kein Force-Push auf `081c432`

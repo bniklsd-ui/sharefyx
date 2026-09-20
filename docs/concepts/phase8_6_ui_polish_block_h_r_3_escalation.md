@@ -3,12 +3,12 @@ status: live
 purpose: Phase-8.6-Block-H-R-3-Escalation-Report — drei Nikinger-Befunde aus Sichtung der H-R-Teil-2-Screenshots (2026-09-15), Mini-Plan-Vorschlag mit drei Locks (H-R.6/H-R.7/H-R.8) und zwei offenen Klärungsfragen für Claude Code zum Direkt-Einstieg
 read-when: Claude Code übernimmt Phase-8.6-Block-H-R-3 (oder eine Folge-Phase); opencode/M3 nicht in der Lage, Pixel-Befunde zuverlässig selbst zu verifizieren (V-vision-befund 2026-09-11 — der Plugin-Pfad zerstört M3s nativen Bildpfad, der `read`-Tool-Pfad liefert nur 1 von 16 Bildern korrekt)
 detail: L2
-up: ../phase8_6_ui_polish/CLAUDE.md               # aktive Phase (Stand: 2026-09-15, Block H-R-Teil-2 ✅, Watchdog-Vormerkung in §Vormerkungen)
+up: ../../phase8_6_ui_polish/CLAUDE.md            # aktive Phase (Stand: 2026-09-15, Block H-R-Teil-2 ✅, Watchdog-Vormerkung in §Vormerkungen)
 down:
-  - ../docs/concepts/phase8_6_ui_polish_plan2.md   # aktiver Plan; §3 Block G/H/J-Locks, §5 Self-Check
-  - ../docs/concepts/phase8_6_ui_polish_block_h_r_plan.md  # was H-R-Teil-2 gebaut hat (5 Sub-Blöcke)
-  - ../docs/concepts/sichtpruefung_automation_tooling.md  # V-vision-befund, warum M3 für Pixel-Befunde ausscheidet
-  - ../phase8_6_ui_polish/SESSIONS_ARCHIVE.md      # rotierte H-R-Teil-2 + Watchdog-Session-Blöcke
+  - ./phase8_6_ui_polish_plan2.md                  # aktiver Plan; §3 Block G/H/J-Locks, §5 Self-Check
+  - ./phase8_6_ui_polish_block_h_r_plan.md         # was H-R-Teil-2 gebaut hat (5 Sub-Blöcke)
+  - ./sichtpruefung_automation_tooling.md          # V-vision-befund, warum M3 für Pixel-Befunde ausscheidet
+  - ../../phase8_6_ui_polish/SESSIONS_ARCHIVE.md   # rotierte H-R-Teil-2 + Watchdog-Session-Blöcke
 updated: 2026-09-15 (Escalation-Report neu — drei Nikinger-Befunde aus Sichtung der fünf H-R-Teil-2-Screenshots vom 2026-09-15; Mini-Plan-Vorschlag Block H-R-3 mit drei Locks H-R.6 (1024 px ohne Map = Umkehr von G-R.1) + H-R.7 (1024 px Editor-fullview) + H-R.8 (1440 px Listen-Slot bei Editor-open, Lesart-Klärung nötig); zwei offene Klärungsfragen für Claude Code vor dem Bau)
 ---
 
