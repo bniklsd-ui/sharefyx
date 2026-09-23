@@ -202,6 +202,10 @@ function initShell() {
       return;
     }
     if (event.key === "Escape") {
+      // Der Browser verlaesst bei ESC selbst den Vollbildmodus und liefert denselben
+      // Tastendruck zusaetzlich an die App -- ohne diese Zeile loest ein Druck zwei
+      // Aktionen aus (Nikinger-Meldung 2026-09-19, Mac; P9 Step D1).
+      if (document.fullscreenElement) return;
       if (!confirmDialogEl.hidden && pendingConfirmCancel) pendingConfirmCancel();
       else if (!conflictDialogEl.hidden) hideConflictDialog();
       else if (!createDialogEl.hidden) closeCreateDialog();

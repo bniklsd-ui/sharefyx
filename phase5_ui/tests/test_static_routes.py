@@ -1812,3 +1812,64 @@ def test_1024_editor_buttons_present():
         "app.html muss id='field-title' enthalten (H-R.5-L Titel-Eingabefeld im "
         "Editor-Head)."
     )
+
+
+def test_escape_handler_checks_fullscreen_element():
+    """P9 Step D1 (Befund Nikinger 2026-09-19, Mac): der Browser verlässt bei ESC selbst den
+    Vollbildmodus und liefert denselben Tastendruck zusätzlich an die App. Ohne einen Guard
+    löst ein Druck zwei Aktionen aus. Der Guard muss als ERSTE Bedingung im `Escape`-Zweig
+    stehen (vor jedem Dialog-Zweig), sonst schließt ESC im Vollbild trotzdem einen Dialog/das
+    Item -- gemessen (Playwright/Chromium, `document.fullscreenElement` bleibt während des
+    `keydown`-Events noch gesetzt, V157 Chromium-Teil; WebKit war in dieser Session nicht
+    gecacht und blieb ungemessen).
+    """
+    js = (DEFAULT_STATIC_DIR / "js" / "app.js").read_text("utf-8")
+    escape_pos = js.index('event.key === "Escape"')
+    branch = js[escape_pos:escape_pos + 400]
+    guard_pos = branch.index("document.fullscreenElement")
+    first_branch_pos = branch.index("pendingConfirmCancel")
+    assert guard_pos < first_branch_pos, (
+        "document.fullscreenElement muss VOR jedem Dialog-Zweig im Escape-Handler geprüft "
+        "werden (P9 Step D1) -- sonst schließt ESC im Vollbild weiterhin zusätzlich einen "
+        "Dialog oder das Item."
+    )
+    assert "if (document.fullscreenElement) return;" in js
+
+
+def test_space_row_is_a_drop_target_for_the_space_root():
+    """P9 Step D2 (Befund 2026-09-19): `bindFolderDropTarget()` hatte bisher genau eine
+    Aufrufstelle (Ordner-Buttons, tree.js:205) -- ein Drop-Ziel HINEIN in einen Ordner, aber
+    keines HERAUS zurück auf die Space-Wurzel. `renderSpaceNode()` muss jetzt denselben
+    Eigentümer-Riegel (`space.own`) und dieselbe Funktion mit leerem `folderPath` verwenden.
+    """
+    js = (DEFAULT_STATIC_DIR / "js" / "tree.js").read_text("utf-8")
+    # Nur echte Aufrufstellen zaehlen, nicht die Funktionsdefinition selbst und nicht diese
+    # Docstring/Kommentar-Erwaehnungen -- eine Aufrufstelle ist immer `bindFolderDropTarget(`
+    # gefolgt von einem Argument, nie von einem weiteren Parameternamen wie `button, f`.
+    calls = [
+        m.start() for m in __import__("re").finditer(
+            r"(?<!function )bindFolderDropTarget\((button|row), ", js,
+        )
+    ]
+    assert len(calls) == 2, (
+        f"bindFolderDropTarget() muss genau zwei Aufrufstellen haben (Ordner + Space-Wurzel), "
+        f"gefunden: {len(calls)}."
+    )
+    assert 'bindFolderDropTarget(row, "")' in js, (
+        "renderSpaceNode() muss bindFolderDropTarget(row, \"\") für space.own aufrufen (P9 "
+        "Step D2 -- die Space-Zeile selbst wird zum Drop-Ziel für die Wurzel)."
+    )
+
+
+def test_space_drop_target_uses_the_same_owner_guard_as_folders():
+    """Begleittest zu D2: der neue Aufruf muss hinter demselben `if (space.own)`-Riegel stehen
+    wie der bestehende Ordner-Aufruf -- ein fremder, nur-lesbarer Space darf kein Drop-Ziel
+    werden (derselbe Eigentümer-Riegel gilt serverseitig ohnehin, das ist nur die UX-Vorstufe).
+    """
+    js = (DEFAULT_STATIC_DIR / "js" / "tree.js").read_text("utf-8")
+    anchor = js.index('bindFolderDropTarget(row, "")')
+    preceding = js[max(0, anchor - 80):anchor]
+    assert "if (space.own)" in preceding, (
+        "bindFolderDropTarget(row, \"\") muss hinter einem if (space.own)-Riegel stehen, "
+        "genau wie der bestehende Ordner-Aufruf (P9 Step D2)."
+    )

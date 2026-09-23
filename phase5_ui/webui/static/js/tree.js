@@ -138,7 +138,10 @@ function bindFolderDropTarget(button, folderPath) {
     // schwerer aus Versehen auszulösen, deshalb hier behoben und dort nur benannt).
     if ((item.folder || "") === folderPath) return;
     moveItemToFolder(item, folderPath).then(function () {
-      toast("Verschoben nach " + folderPath.split("/").join(" / "));
+      // P9 Step D2: leerer folderPath (Space-Wurzel) -- ohne diesen Zweig haengt der Text
+      // hinter "Verschoben nach " ins Leere. Gleiches Label wie der Verschieben-Dialog
+      // (dialogs.js:396 "(Space-Wurzel)").
+      toast("Verschoben nach " + (folderPath ? folderPath.split("/").join(" / ") : "(Space-Wurzel)"));
     }).catch(function (err) {
       if (err.code === "conflict") {
         toast(
@@ -246,6 +249,10 @@ export function renderSpaceNode(space) {
     state.expanded[space.name] = !open;
     renderRail();
   });
+  // P9 Step D2: Drop-Ziel zurueck auf die Space-Wurzel -- bindFolderDropTarget() hatte bisher
+  // nur eine Aufrufstelle (Ordner-Buttons), es gab also ein Ziel HINEIN in einen Ordner, aber
+  // keines HERAUS. Gleicher Eigentuemer-Riegel wie dort (space.own), leerer folderPath = Wurzel.
+  if (space.own) bindFolderDropTarget(row, "");
   railTreeEl.appendChild(row);
   if (open) {
     railTreeEl.appendChild(renderFolders(space));

@@ -7,6 +7,8 @@ up: ./INDEX.md
 down:
 updated: 2026-09-19 (Archiv angelegt — erste Rotation der INDEX-`updated:`-Kette, von Hand ausgeführt; das Skript `scripts/rotate_index_updates.sh` entsteht in P9 Step 0.1 [Lock P9-L] und übernimmt danach jede weitere Rotation)
 ---
+- 2026-09-20 (**P9 Step 0** — Phasenverzeichnis, INDEX-Rotationsskript, vier Doku-Defekte plus ROADMAP/CLAUDE.md oversize benannt, `doc_health.py`)
+- 2026-09-19 (**P9 aufgenommen** — `phase9_hardening_plan.md` + dieses Archiv. Ältere Einträge verbatim: `docs/INDEX_UPDATES_ARCHIVE.md`)
 # `docs/INDEX.md` — Archiv der `updated:`-Einträge (L3)
 
 > Die Kette in der Frontmatter von `docs/INDEX.md` trägt **einen** aktuellen Eintrag; ältere
