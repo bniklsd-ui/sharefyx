@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase9_hardening_plan.md    # voller Plan, Locks P9-A–P9-T, Steps 0–H
   - ../docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md  # Herkunft der P9-Punkte
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
-updated: 2026-09-23 (Step D code-complete — die zwei gemeldeten Bugs, ESC/Vollbild + Drop-Ziel Space-Wurzel, gebaut in Claude Code statt opencode/M3, benannte Abweichung von P9-Q) | 2026-09-20 (Step 0 abgeschlossen — Phasenverzeichnis, INDEX-Rotationsskript, vier geplante plus drei ungeplante Doku-Defekte repariert, `doc_health.py` als Test festgenagelt, Baseline gemessen)
+updated: 2026-09-23 (D1/ESC-Bug auf Nikinger-Anordnung zurückgestellt, `## Backlog` neu) | 2026-09-23 (Step D code-complete — Drop-Ziel Space-Wurzel, ESC/Vollbild-Guard gebaut, gebaut in Claude Code statt opencode/M3, benannte Abweichung von P9-Q) | 2026-09-20 (Step 0 abgeschlossen — Phasenverzeichnis, INDEX-Rotationsskript, vier geplante plus drei ungeplante Doku-Defekte repariert, `doc_health.py` als Test festgenagelt, Baseline gemessen)
 ---
 
 # Phase 9 — Härtung
@@ -24,12 +24,22 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | A | Echte Domain über eigenen VPS | ⬜ |
 | B | `tailscaled-watchdog.service` | ⬜ |
 | C | Vision-Dienst auf der RTX 3060 | ⬜ |
-| D | Zwei gemeldete Bugs (ESC/Vollbild, Drop-Ziel Space-Wurzel) | 🟡 D2 fertig; D1-Guard gebaut, adressiert vermutlich nicht macOS-Safari-natives Vollbild — zweiter Anlauf nötig |
+| D | Zwei gemeldete Bugs (ESC/Vollbild, Drop-Ziel Space-Wurzel) | 🟡 D2 fertig; D1 (ESC/Vollbild) **bewusst zurückgestellt** — Nikinger-Entscheidung 2026-09-23, kein aktiver Blocker mehr, siehe Backlog unten |
 | E | Karte: Reload-Overload, V118 | ⬜ |
 | F | Schema-Fundament (neunte P1-Contract-Öffnung: `doing`/`assignee`) | ⬜ |
 | G | Löschen (F2) nach `_trash/` | ⬜ |
 | H | Abhängigkeits-Hygiene | ⬜ |
 | Gate/Z | Abnahme, Closeout | ⬜ |
+
+## Backlog (bewusst zurückgestellt, kein Phasen-Blocker)
+
+- **D1 — ESC im Vollbild schließt zusätzlich das Item.** Diagnose geklärt (macOS Safari,
+  natives Vollbild über den grünen Knopf), Fix nicht — der gebaute
+  `document.fullscreenElement`-Guard (Session 2026-09-23) sieht diesen Fall nicht, weil die
+  Web-Fullscreen-API dort per Spezifikation nicht greift. **Nikinger-Entscheidung 2026-09-23:**
+  zurückstellen, angehen, sobald genug Zeit da ist — kein aktiver Blocker für den Rest von P9.
+  Ansatzpunkte für den nächsten Anlauf stehen im Session-Block 2026-09-23 unten (gegen echtes
+  Safari messen, keine Heuristik raten).
 
 ## Session stopped — 2026-09-23
 
@@ -124,13 +134,13 @@ kein `systemctl`, sharefyx-mcp nicht berührt.
 **Offen für Step D, nicht in dieser Session erledigbar:** `P9-29`/`P9-30` (Drag-Drop-Verifikation
 am echten Gerät) bleiben normale Sichtprüfung, Nikinger-Sache. `P9-31` (Chip-Nicht-Auslöser) ist
 am gewählten Anker gegenstandslos, siehe oben — sollte im Gate/Z-Schritt als „gegenstandslos",
-nicht als „vergessen" gebucht werden. **`P9-27`/`P9-28` (ESC im Vollbild) sind der offene
-Punkt mit Vorrang** — Diagnose jetzt geklärt (macOS Safari, grüner Knopf), aber der gebaute
-Guard adressiert diesen Fall vermutlich nicht (siehe D1-Befund oben). Braucht einen zweiten
-Anlauf, keine Live-Sichtprüfung des aktuellen Codes. Modulstatus Step D deshalb 🟡 mit diesem
-Vorbehalt, nicht ✅.
+nicht als „vergessen" gebucht werden. **`P9-27`/`P9-28` (ESC im Vollbild) — Nikinger-
+Entscheidung im Anschluss an diese Session: bewusst zurückgestellt, kein aktiver Blocker.**
+Diagnose ist geklärt (macOS Safari, grüner Knopf), der gebaute Guard adressiert diesen Fall
+vermutlich nicht — siehe D1-Befund oben und der neue `## Backlog`-Abschnitt am Kopf dieser
+Datei. Modulstatus Step D deshalb 🟡, nicht ✅, aber ohne Zeitdruck.
 
 **Nächster Schritt:** kein weiterer Claude-Code-eigener Step ohne erneute Nikinger-Freigabe —
 E/F/G/H sind laut Plan weiterhin opencode/M3, A/B/C weiterhin Coarbeit. Vor dem nächsten
 Claude-Code-Block: fragen, nicht per Präzedenzfall annehmen (dieselbe Vorsicht, die P9-Q selbst
-für die Infra-Steps verlangt).
+für die Infra-Steps verlangt). D1 wartet im Backlog, bis Zeit dafür ist — kein aktiver Auftrag.
