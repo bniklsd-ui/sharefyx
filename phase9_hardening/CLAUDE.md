@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase9_hardening_plan.md    # voller Plan, Locks P9-A–P9-T, Steps 0–H
   - ../docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md  # Herkunft der P9-Punkte
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
-updated: 2026-09-23 (D1/ESC-Bug auf Nikinger-Anordnung zurückgestellt, `## Backlog` neu) | 2026-09-23 (Step D code-complete — Drop-Ziel Space-Wurzel, ESC/Vollbild-Guard gebaut, gebaut in Claude Code statt opencode/M3, benannte Abweichung von P9-Q) | 2026-09-20 (Step 0 abgeschlossen — Phasenverzeichnis, INDEX-Rotationsskript, vier geplante plus drei ungeplante Doku-Defekte repariert, `doc_health.py` als Test festgenagelt, Baseline gemessen)
+updated: 2026-09-24 (Backlog: "opencode via Tailscale"-Behandlung für sharefyx-/Trading-Bot-VM nachgetragen, Nikinger-Feedback aus Netzwerk-Diagnosesession, kein Produktcode-Touch) | 2026-09-23 (D1/ESC-Bug auf Nikinger-Anordnung zurückgestellt, `## Backlog` neu) | 2026-09-23 (Step D code-complete — Drop-Ziel Space-Wurzel, ESC/Vollbild-Guard gebaut, gebaut in Claude Code statt opencode/M3, benannte Abweichung von P9-Q) | 2026-09-20 (Step 0 abgeschlossen — Phasenverzeichnis, INDEX-Rotationsskript, vier geplante plus drei ungeplante Doku-Defekte repariert, `doc_health.py` als Test festgenagelt, Baseline gemessen)
 ---
 
 # Phase 9 — Härtung
@@ -40,6 +40,20 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückstellen, angehen, sobald genug Zeit da ist — kein aktiver Blocker für den Rest von P9.
   Ansatzpunkte für den nächsten Anlauf stehen im Session-Block 2026-09-23 unten (gegen echtes
   Safari messen, keine Heuristik raten).
+- **sharefyx-VM soll die "opencode via Tailscale"-Behandlung der traktion-VM bekommen**
+  (Nikinger-Feedback 2026-09-24, während einer reinen Netzwerk-Diagnosesession — kein
+  Produktcode-Touch). Beobachtung: sharefyx-VM ist "pretty laggy and often not accessible";
+  `traktion-vmware-virtual-platform` (Tailnet-Peer `100.89.157.61`) hat bereits ein Setup, das
+  sharefyx-VM und die separate Trading-Bot-VM noch nicht haben. Genaue Form unbekannt — liegt
+  vermutlich außerhalb dieses Repos (Trading-Bot-Repo oder Nikinger-eigene Infra-Notizen), **nicht
+  raten, vor dem Bau beim Nikinger nachfragen**. Vermutlich relevant für Step A (VPS/Domain) und
+  Step B (`tailscaled-watchdog.service`) — ein flakiger Tailscale-Pfad würde genau die Art
+  Control-Plane-Hänger erklären, die der Watchdog fangen soll, aber das ist Vermutung, keine
+  bestätigte Ursache. Volle Notiz: `[[project_sharefyx_vm_infra_lag]]` im Claude-Memory.
+  IP-Nebenbefund derselben Session: `ens18` bezieht `.175` korrekt per DHCP — das ist die
+  gewünschte Adresse (Tippfehler in einer früheren Nikinger-Nachricht sprach von `.125`), eine
+  statische Pinnung wurde bewusst **nicht** vorgenommen (Nikinger: kostet ihm die Internet-
+  verbindung, wenn er es selbst versucht).
 
 ## Session stopped — 2026-09-23
 
