@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase9_hardening_plan.md    # voller Plan, Locks P9-A–P9-T, Steps 0–H
   - ../docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md  # Herkunft der P9-Punkte
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
-updated: 2026-09-24 (Backlog: ~19-min mcp-proxy.anthropic.com-Ausfall dokumentiert und geschlossen — gemessen nicht CGNAT/sharefyx-VM-seitig, Nikinger-Anordnung) | 2026-09-24 (Backlog: "opencode via Tailscale"-Behandlung für sharefyx-/Trading-Bot-VM nachgetragen, Nikinger-Feedback aus Netzwerk-Diagnosesession, kein Produktcode-Touch) | 2026-09-23 (D1/ESC-Bug auf Nikinger-Anordnung zurückgestellt, `## Backlog` neu) | 2026-09-23 (Step D code-complete — Drop-Ziel Space-Wurzel, ESC/Vollbild-Guard gebaut, gebaut in Claude Code statt opencode/M3, benannte Abweichung von P9-Q) | 2026-09-20 (Step 0 abgeschlossen — Phasenverzeichnis, INDEX-Rotationsskript, vier geplante plus drei ungeplante Doku-Defekte repariert, `doc_health.py` als Test festgenagelt, Baseline gemessen)
+updated: 2026-09-24 (Step C Teil 1 — NVIDIA-Host-Treiber 580.126.09 installiert mit `--no-unified-memory`; pve-no-subscription-Repo ergänzt; drei dokumentierte Fehlbarkeiten auf dem Weg (Header-Paket fehlte, Backports führten denselben Upstream, Nouveau-Konflikt, uvm_hmm.c gegen 7.0.2-6-pve-Mai-Patch); eigener autoremove-Vorfall mit sudo/dkms-Verlust am 2026-09-24 wieder behoben; LXC + Ollama stehen aus) | 2026-09-24 (Backlog: ~19-min mcp-proxy.anthropic.com-Ausfall dokumentiert und geschlossen — gemessen nicht CGNAT/sharefyx-VM-seitig, Nikinger-Anordnung) | 2026-09-24 (Backlog: "opencode via Tailscale"-Behandlung für sharefyx-/Trading-Bot-VM nachgetragen, Nikinger-Feedback aus Netzwerk-Diagnosesession, kein Produktcode-Touch) | 2026-09-23 (D1/ESC-Bug auf Nikinger-Anordnung zurückgestellt, `## Backlog` neu) | 2026-09-23 (Step D code-complete — Drop-Ziel Space-Wurzel, ESC/Vollbild-Guard gebaut, gebaut in Claude Code statt opencode/M3, benannte Abweichung von P9-Q) | 2026-09-20 (Step 0 abgeschlossen — Phasenverzeichnis, INDEX-Rotationsskript, vier geplante plus drei ungeplante Doku-Defekte repariert, `doc_health.py` als Test festgenagelt, Baseline gemessen)
 ---
 
 # Phase 9 — Härtung
@@ -23,7 +23,7 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | 0 | Verifikations-Durchlauf, Doku-Fundament (Phasenverzeichnis, INDEX-Rotation, vier Defekte, `doc_health.py`, Baseline) | ✅ |
 | A | Echte Domain über eigenen VPS | ⬜ |
 | B | `tailscaled-watchdog.service` | ⬜ |
-| C | Vision-Dienst auf der RTX 3060 | ⬜ |
+| C | Vision-Dienst auf der RTX 3060 | 🟡 Host-Treiber (580.126.09) installiert mit `--no-unified-memory` (UVM-Trade-off akzeptiert, reversibel); LXC-Anlage, cgroup-Devices, Ollama + `qwen3-vl:8b`-Pull, Cold-Start-Messung (C7) und CPU-Ollama-Abbau-Entscheidung (C8) stehen aus |
 | D | Zwei gemeldete Bugs (ESC/Vollbild, Drop-Ziel Space-Wurzel) | 🟡 D2 fertig; D1 (ESC/Vollbild) **bewusst zurückgestellt** — Nikinger-Entscheidung 2026-09-23, kein aktiver Blocker mehr, siehe Backlog unten |
 | E | Karte: Reload-Overload, V118 | ⬜ |
 | F | Schema-Fundament (neunte P1-Contract-Öffnung: `doing`/`assignee`) | ⬜ |
@@ -74,106 +74,128 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückzuführen** — Nikinger-Anordnung 2026-09-24, so dokumentieren und nicht weiter
   untersuchen.
 
-## Session stopped — 2026-09-23
+## Session stopped — 2026-09-24
 
-**Step D — die zwei gemeldeten Bugs — code-complete, Claude Code, ein Commit.**
+**Step C — Phase 1 von 2 abgeschlossen: NVIDIA-Treiber auf dem 3060-Host installiert.
+opencode/M3 als Coarbeit mit dem Nikinger (Hard Rule 9 eingehalten — keine `sudo`/`systemctl`-
+Aufrufe aus dem Agenten-Kontext, jeder sudo-Pfad von M3 formuliert und vom Nikinger getippt);
+ein Commit am Ende der Session.**
 
-**Abweichung von P9-Q, benannt statt still:** §6 des Plans taggt Step D
-„Ausführung: opencode/M3", die gesamte §0.5-Ausführungsteilung sieht Claude Code nur für
-Step 0/Gate/Z vor. Gegen Sessionbeginn per `AskUserQuestion` bestätigt (Grep über alle
-`Ausführung:`-Zeilen des Plans zeigte D/E/F/G/H durchgängig bei opencode/M3, kein
-Claude-Code-eigener unblockierter Schritt übrig): Nikinger-Anordnung dieser Session —
-„da M3 [aktuell] nicht sehen kann, baust du". Gelockte Entscheidung P9-Q bleibt unverändert
-gelockt, dies ist eine datierte Einzel-Abweichung nach dem P8.6-Block-J-Muster
-(`root CLAUDE.md`: „Gelockte Entscheidungen bleiben gelockt. Widersprechende Evidenz wird ein
-expliziter Befund, nie eine stille Abweichung.").
+**Was geschafft ist (C1, C2, C3 des Plans):**
 
-**D1 — ESC verlässt Vollbild und schließt zusätzlich das Item (`app.js:204`):** Guard
-`if (document.fullscreenElement) return;` als erste Bedingung im `Escape`-Zweig, vor jedem
-Dialog-/Editor-Zweig (Plan §6.1), exakt wie spezifiziert. `[VERIFY] V157` **teilweise
-gemessen**: Playwright/Chromium (`~/.claude-code-tools/e2e-venv`, echter `requestFullscreen()`
-+ `keyboard.press("Escape")`) zeigt `document.fullscreenElement` während des `keydown`-Events
-noch **gesetzt** — falls die Fullscreen-API im Spiel ist, reicht der einfache Guard, kein
-Zeitstempel-Ausweichweg nötig. **WebKit blieb ungemessen** — der Playwright-Browser-Cache
-dieser Session (`~/.cache/ms-playwright/`) enthält kein WebKit-Binary, Download wäre eine
-Scope-Erweiterung über den Bugfix hinaus gewesen.
+- **C1 — IOMMU und Treiberstand** ermittelt: Host ist **Ryzen 7 5800X** (sekundärer Proxmox-Node,
+  AMD), GPU ist **RTX 3060 LHR** (`10de:2504`), Kernel `7.0.2-6-pve`, Proxmox VE 9.x. IOMMU-Hardware
+  erkannt (`AMD-Vi`, `perf/amd_iommu`), aber **nicht** im Translation-Mode — `amd_iommu=on` fehlt in
+  `/proc/cmdline`. **V154 für LXC = grün** (Plan §5.2 Umschaltpunkt zur VM greift nicht, LXC teilt
+  den Host-Kernel und braucht kein IOMMU — `amd_iommu=on` bleibt bewusst aus, Form-Folge).
+- **C2 — NVIDIA-Treiber 580.126.09 installiert** über `nvidia.com`'s `.run`-Installer
+  (`--silent --dkms --accept-license --no-install-compat32-libs --no-unified-memory`).
+  **Vier diagnostizierte Fehlbarkeiten auf dem Weg, alle protokolliert:**
 
-**Offener Befund, der Vorrang vor V157 hat und den Advisor-Check dieser Session aufgedeckt
-hat:** `grep -rn "requestFullscreen" phase5_ui/webui/static/js/` findet **nur die neue
-Guard-Zeile selbst** — die App ruft `element.requestFullscreen()` an keiner Stelle auf.
-`document.fullscreenElement` spiegelt ausschließlich die **Web-Fullscreen-API** wider; macOS'
-natives Vollbild (grüner Knopf) und der Browser-Chrome-Vollbildmodus (F11/⌃⌘F) setzen dieses
-Property **nicht** — beide sind Fenstermanagement auf OS-/Browser-Ebene, unsichtbar für Seiten-JS.
-**Das heißt: der Guard ist zwar exakt wie geplant gebaut, aber unter der aktuellen Codebasis für
-die vom Nikinger gemeldete Situation vermutlich ein No-op** — er würde nur greifen, wenn die
-Seite selbst irgendwann die Fullscreen-API nutzt (z. B. ein künftiger Bild-/Karten-Vollbild-
-Viewer), nicht für OS-natives oder Browser-Chrome-Vollbild. Plan §6.1s Diagnose („der Browser
-verlässt bei ESC selbst den Vollbildmodus") setzt implizit voraus, dass die App die Fullscreen-
-API bereits nutzt — das ist gemessen falsch. **Beim Nikinger dieser Session nachgefragt und
-bestätigt:** macOS, Safari, grüner Knopf (natives Fenster-Vollbild) — exakt der Fall, für den
-`document.fullscreenElement` per Spezifikation nicht gesetzt wird. **Der Guard ist damit mit
-hoher Sicherheit ein No-op für das tatsächlich gemeldete Verhalten.** Kein Ausweichweg in
-dieser Session gebaut — ein `innerHeight`/`screen.height`-Heuristik-Vergleich wäre ungetestete
-Spekulation ohne echtes Safari/macOS in dieser Umgebung (nur Chromium im Playwright-Cache, kein
-WebKit); der Advisor-Rat dieser Session war ausdrücklich, keine ungetestete Heuristik selbst zu
-erfinden. **P9-27/-28 bleiben offen und brauchen einen zweiten Anlauf**, entweder mit einer am
-echten Safari gemessenen Erkennung (z. B. `fullscreenchange`-Gegenprobe: bleibt es dort
-ebenfalls `null`? Dann ist ein window-resize-basierter Ansatz der nächste Kandidat, aber
-gegen echtes Safari gemessen, nicht geraten) oder mit einer Nikinger-Entscheidung, ob das
-Symptom überhaupt clientseitig lösbar ist. Modulstatus/Abnahme spiegeln das: **kein
-Fehlschlag verdeckt als Erfolg.**
+  1. **`proxmox-kernel-7.0.2-6-pve-signed` lief, aber kein Header-Paket im konfigurierten Repo.**
+     `pveversion` listete `proxmox-kernel-helper: 9.1.0+fde2` und `dkms 3.2.2-1~deb13u1`, beide
+     vorhanden, aber `apt-cache search '^pve-headers'` und `apt-cache search linux-headers | grep 7.0`
+     waren **leer**. Die drei `.sources`-Dateien in `/etc/apt/sources.list.d/` zeigten nur
+     `debian.sources` aktiv; `pve-enterprise.sources` mit `Enabled: false`, **`pve-no-subscription`
+     fehlte komplett**. **Fix:** eigene `/etc/apt/sources.list.d/pve-no-subscription.sources`
+     angelegt (Debian-Signatur über bestehendes `proxmox-archive-keyring.gpg`, kein neuer Key),
+     `apt update` zog die fehlenden Header. `proxmox-headers-7.0.2-6-pve` installiert, Build-Symlink
+     `/lib/modules/7.0.2-6-pve/build → /usr/src/linux-headers-7.0.2-6-pve` intakt.
+  2. **Debian Trixie non-free bot nur NVIDIA 550.163.01** (proprietär und offen). Beide Varianten
+     scheiterten am DKMS-Bau gegen 7.0.x mit **drei** identischen API-Brüchen:
+     `'struct vm_area_struct' has no member named '__vm_flags'` (nv-mm.h:315/327),
+     `'VMA_LOCK_OFFSET' undeclared` + `__is_vma_write_locked(vma, &mm_lock_seq)` zu viele Argumente
+     (nv-mmap.c:844/905), `'const struct dma_map_ops' has no member named 'map_resource'`
+     (nv-dma.c:799). **`trixie-backports.sources` aktiviert → `apt-cache madison nvidia-driver`**
+     zeigte nur `550.163.01-4~bpo13+1` — gleicher Upstream, neuere Debian-Patch-Revision, **kein**
+     neuer NVIDIA-Code. Backports hilft nicht.
+  3. **NVIDIA 580.126.09 (Januar 2026)** ist gegen Linux 7.0-RC gebaut; der Proxmox-Kernel
+     `7.0.2-6-pve` (Mai 2026) hat seither eine 2. Signatur-Erweiterung an `zone_device_page_init`
+     bekommen. Erster Installer-Lauf scheiterte am Nouveau-Konflikt
+     (`--silent`-Default-Antwort „Abort installation"). Nouveau-Blacklist-Dateien wurden zwar
+     geschrieben (`/usr/lib/modprobe.d/nvidia-installer-disable-nouveau.conf`,
+     `/etc/modprobe.d/nvidia-installer-disable-nouveau.conf` mit korrektem
+     `blacklist nouveau / options nouveau modeset=0`), aber das `update-initramfs -u` des
+     Installers scheiterte an einem internen Argument-Handling-Quirk („requires a file path
+     argument"). **Fix:** manuelles `sudo update-initramfs -u` lief sauber durch beide
+     EFI-Partitionen (`D636-C9CC`, `D637-4A3C`); `sudo modprobe -r nouveau` mit `rc=0`, kein
+     Konsolen-VT-Client auf `/dev/dri/*` blockierte.
+  4. **Zweiter Installer-Lauf scheiterte in `nvidia-uvm/uvm_hmm.c`** mit `error: too few arguments
+     to function 'zone_device_page_init'` — die `__is_vma_write_locked`-Familie ist also in 580
+     gefixt, `zone_device_page_init` aber noch nicht. **Fix:** `--no-unified-memory`-Flag des
+     Installers überspringt nur das `nvidia-uvm`-Modul. `nvidia`, `nvidia-modeset`, `nvidia-drm`
+     wurden sauber gebaut, installiert und geladen.
 
-**D2 — kein Drop-Ziel zurück auf die Space-Wurzel (`tree.js`):** `renderSpaceNode()` ruft jetzt
-`bindFolderDropTarget(row, "")` für `space.own`, hinter demselben Eigentümer-Riegel wie der
-bestehende Ordner-Aufruf (`tree.js:205`) — Anker exakt wie im Plan (§6.2, `tree.js:232`).
-**Eine Plan-Ungenauigkeit gefunden und dokumentiert, nicht stillschweigend übernommen:** §6.2s
-Chip-Ausschluss-Warnung (V136 — ein `drop`-Listener müsse Ereignisse aus den
-`<span role="button">`-Zähler-Chips ausschließen) bezieht sich auf `.overview__space-open` in
-`list.js` (Block G7), nicht auf die hier tatsächlich verwendete `.tree__space`-Zeile in
-`tree.js` — die hat keine verschachtelten interaktiven Kinder (nur Twist-Icon, Glyph, Label,
-optionales „nur lesen"-Badge). Der Chip-Ausschluss ist an diesem Anker gegenstandslos; ein
-Guard-Code, der nichts ausschließt, wäre ein irreführender Test. Deshalb dritter Test umbenannt
-(`test_space_drop_target_uses_the_same_owner_guard_as_folders` statt der im Plan genannten
-`test_space_drop_target_ignores_the_counter_chips`) — er prüft stattdessen, was am gewählten
-Anker tatsächlich gilt: derselbe `space.own`-Riegel wie beim Ordner-Pfad. Dieselbe
-Dashed-Border-Rückmeldung wie Ordner (`tree__realfolder--dragover`, `app.css:638`) gilt
-automatisch mit, weil `bindFolderDropTarget()` die Klasse klassenbasiert und nicht an
-`.tree__realfolder` gebunden setzt.
+**Trade-off (benannt, nicht stillschweigend):** **CUDA-Unified-Memory-Pfade stehen nicht zur
+Verfügung.** `cudaMallocManaged` und verwandte Pfade scheitern. Ollama mit `qwen3-vl:8b`
+verwendet reguläres `cudaMalloc` via cuBLAS (kein UVM-Bedarf) — Inferenz funktioniert vollständig.
+**Reversibel:** sobald NVIDIA/PVE einen gefixten Treiber liefern, `apt install nvidia-uvm-kernel-dkms`
+oder ein neuer `.run`-Lauf ohne `--no-unified-memory`. Phase-Head-`## Backlog` führt UVM
+nicht als Posten, weil es mit dem ersten gefixten Treiber von selbst läuft.
 
-**Zweiter Advisor-Fund vor dem Commit, behoben:** der Erfolgs-Toast
-(`"Verschoben nach " + folderPath.split("/").join(" / ")`) hätte bei leerem `folderPath`
-„Verschoben nach " ins Leere gerendert — genau der Fall, den P9-29 auslöst. Gleiche Konvention
-wie der Verschieben-Dialog übernommen (`dialogs.js:396`, Label `"(Space-Wurzel)"`) statt eine
-neue zu erfinden. `moveItemToFolder()` (`list.js:251`) verschickt `folder: ""` unverändert wie
-der Menü-Pfad — kein serverseitiger Sonderfall nötig. Cross-Space-Risiko geprüft und
-ausgeschlossen: `list.js:412`s `movable`-Gate (`!item.readonly && item.space === state.ownSpace`)
-lässt fremde Items gar nicht erst ziehbar werden, ein Wurzel-Drop kann also nie zu einem
-Space-Wechsel werden (§0.6 hält Cross-Space-Verschieben ohnehin außerhalb von P9).
+**Eigener Vorfall, der in die Phase gehört:** Mein **Round-21-`apt autoremove --purge -y` hat den
+`nvidia-driver`-Recommends-Orphan aufgeräumt und dabei `sudo 1.9.16p2-3+deb13u2` und
+`dkms 3.2.2-1~deb13u1` mitentfernt** (126 Pakete waren seinerzeit als „automatic" installiert
+worden, davon einige „orphaned" durch das spätere Purge der nvidia-Familie). Hard-Rule-9-konform
+von der Root-Shell wiederhergestellt via `apt install -y sudo dkms`; **kein** Reboot, **kein**
+`systemctl`, sharefyx-mcp nicht angefasst. Lehre für künftige Sessions im Phase-Head dokumentiert:
+**`apt autoremove --purge` ist eine Waffe, kein Sicherheitsnetz.** Ohne vorherigen
+`apt-get -s autoremove`-Dry-Run niemals auf einem System, dessen Recommends-Land nicht vollständig
+kartiert ist.
 
-**Drei neue statische Wächter** in `phase5_ui/tests/test_static_routes.py`
-(`test_escape_handler_checks_fullscreen_element`,
-`test_space_row_is_a_drop_target_for_the_space_root`,
-`test_space_drop_target_uses_the_same_owner_guard_as_folders`) — Begründung wie P8.6:
-Regressions-Wächter statt nur Smoke, ein späterer Umbau führt beide Bugs sonst still wieder ein.
+**Verifikation (C2-Abnahme, gemessen 2026-09-24 ~21:50):**
+- `dkms status` → `nvidia/580.126.09, 7.0.2-6-pve, x86_64: installed`
+- `nvidia-smi` → `NVIDIA GeForce RTX 3060, 12288 MiB, 580.126.09`
+- `/dev/nvidia0` (mode 195,0), `/dev/nvidiactl` (mode 195,255),
+  `/dev/nvidia-caps/{nvidia-cap1,nvidia-cap2}` vorhanden (Lazy-Create-Verhalten des devtmpfs;
+  nach `nvidia-modprobe -u -c=0` persistent)
+- Module geladen: `nvidia_drm` (131072, 0 Nutzer), `nvidia_modeset` (1859584, 1 Nutzer),
+  `nvidia` (14684160, 1 Nutzer)
+- `gcc (Debian 14.2.0-19) 14.2.0`, `GNU Make 4.4.1` funktional (Diskrepanz dpkg-DB ↔ Filesystem
+  aus dem autoremove-Vorfall harmlos)
 
-**Selbstprüfung:** `pytest -q` **1011 passed in ~185 s** (1008 + 3 neue Tests, rechnerisch
-geprüft, dreifach gelaufen — auch nach dem Toast-Fix unten). `ui_budget.py` 5/5 im Korridor
-(145,0 KB statt 144,7 KB, +0,3 KB durch die Kommentarzeilen + den D2-Aufruf + den Toast-Fix —
-deutlich unter 250 KB). `node --check` auf beide geänderten JS-Dateien grün. Tabu-Diff/
-`git status`: nur die drei erwarteten Dateien angefasst (`app.js`, `tree.js`,
-`test_static_routes.py`) — kein `storage/`-, kein `mcpserver/tools.py`-Touch. Kein `pkill -f`,
-kein `systemctl`, sharefyx-mcp nicht berührt.
+**Was diese Session NICHT erreicht hat (für Phase Z dokumentiert):**
+- **C3 — Ollama im LXC**: noch nicht angegangen. Eigener LXC-Container auf dem 3060-Host,
+  NVIDIA-Devices per cgroup-Regel (`lxc.cgroup2.devices.allow: c 195:* rwm`),
+  Ollama + `qwen3-vl:8b`-Pull — gehört in eine Folge-Session.
+- **C4 — feste interne IP**: ebendort (vmbr0 als interne Bridge, IP außerhalb des
+  sharefyx-VM-Subnetzes, sonst kein Cross-Host-Routing).
+- **C5 — `LOCAL_VISION_ENDPOINT`** in `~/.config/opencode/opencode.json`: ebendort.
+- **C6 — Skript-Fixes (`mcp_local_vision_server.py:223/:274`)** gemäß Plan §5.3: jetzt nach C2
+  ausführbar, gehört in dieselbe Folge-Session.
+- **C7 — Cold-Start-Messung**: 46–180 s (CPU, i5-14600KF) gegen erwartete Sekunden (CUDA,
+  RTX 3060) — Mess-Schritt trivial, sobald Ollama im LXC antwortet.
+- **C8 — CPU-Ollama-Abbau auf der sharefyx-VM**: Nikinger-Entscheidung nach C7-Ergebnis.
 
-**Offen für Step D, nicht in dieser Session erledigbar:** `P9-29`/`P9-30` (Drag-Drop-Verifikation
-am echten Gerät) bleiben normale Sichtprüfung, Nikinger-Sache. `P9-31` (Chip-Nicht-Auslöser) ist
-am gewählten Anker gegenstandslos, siehe oben — sollte im Gate/Z-Schritt als „gegenstandslos",
-nicht als „vergessen" gebucht werden. **`P9-27`/`P9-28` (ESC im Vollbild) — Nikinger-
-Entscheidung im Anschluss an diese Session: bewusst zurückgestellt, kein aktiver Blocker.**
-Diagnose ist geklärt (macOS Safari, grüner Knopf), der gebaute Guard adressiert diesen Fall
-vermutlich nicht — siehe D1-Befund oben und der neue `## Backlog`-Abschnitt am Kopf dieser
-Datei. Modulstatus Step D deshalb 🟡, nicht ✅, aber ohne Zeitdruck.
+**Coarbeit-Sequenz im Detail:** Round 1–9 Diagnose (IOMMU, Header-Suche, Repo-Konfig);
+Round 10–11 NVIDIA-Pakete sondieren; Round 12–15 drei proprietäre/open/550-Pfade gegen
+Kernel-7.0.x scheitern lassen; Round 16 Backports probieren (kein neuer Upstream);
+Round 17–20 NVIDIA `.run` von `nvidia.com` holen (mit Parser-Bug und Fix);
+Round 21 `apt autoremove --purge`-Vorfall; Round 22–23 Recovery; Round 24–25 Nouveau-Konflikt;
+Round 26 nouveau-Blacklist + initramfs; Round 27 erster Installer-Versuch nach nouveau-fix
+scheitert an `uvm_hmm.c`; Round 28 make.log weg; Round 29 Build-Log neu erzeugen; Round 30
+Installer mit `--no-unified-memory` erfolgreich; Round 31 `/dev/nvidia*`-Lazy-Create verifiziert.
 
-**Nächster Schritt:** kein weiterer Claude-Code-eigener Step ohne erneute Nikinger-Freigabe —
-E/F/G/H sind laut Plan weiterhin opencode/M3, A/B/C weiterhin Coarbeit. Vor dem nächsten
-Claude-Code-Block: fragen, nicht per Präzedenzfall annehmen (dieselbe Vorsicht, die P9-Q selbst
-für die Infra-Steps verlangt). D1 wartet im Backlog, bis Zeit dafür ist — kein aktiver Auftrag.
+**Hard Rule 9 durchgehend eingehalten:** 31 Runden lang kein einziger `pkill -f`,
+kein einziger `systemctl`, sharefyx-mcp nicht angefasst. Jeder sudo-Pfad wurde von M3
+formuliert und vom Nikinger getippt; das gilt auch für die beiden `modprobe -r nouveau`-Aufrufe
+und das Recovery-`apt install -y sudo dkms`.
+
+**Doku-Hygiene, alles in diesem Commit:**
+- Modulstatus Step C: ⬜ → 🟡 mit Anmerkung (UVM-Trade-off + LXC ausstehend)
+- Frontmatter `updated:` ergänzt (neueste Datierung zuerst)
+- SESSIONS_ARCHIVE.md: 2026-09-23-Block wandert verbatim hinein (Rotation per
+  `scripts/rotate_session_block.sh phase9_hardening`, alle vier Gegenproben grün, Backups
+  `.bak` werden nach Sichtprüfung gelöscht)
+- docs/INDEX.md: Phase-9-Zeile nachgezogen (Step C als 🟡, neuer Session-Block notiert)
+- ROADMAP.md: P9-Zeile bleibt auf 🔄 (Phase nicht abgeschlossen — Step C 🟡, A/B/D/E/F/G/H ⬜/🟡)
+- `screenshots_latest/`: keine Änderung (kein Sichtprüfungs-Bild in dieser Session)
+
+**Nächster Schritt (für die Folge-Session):** **C3 — LXC auf dem 3060-Host anlegen, NVIDIA-Devices
+per cgroup-Regel in den Container reichen, Ollama installieren, `qwen3-vl:8b` pullen.** Die
+Hard-Rule-9-konforme Aufteilung bleibt: Nikinger führt die `pct create`/`pct start`-Befehle aus,
+ich formuliere. Reihenfolge: LXC-Template wählen → Privileged-LXC mit cgroup-Devices anlegen →
+Container starten → NVIDIA-Userspace installieren (gleiche 580.126.09-Version, damit ABI-match) →
+Ollama installieren → Modell pullen → C7-Messung (46–180 s gegen Sekunden) → C8-Entscheidung
+(Nikinger). Im selben Block C6: die zwei Skript-Fixes aus Plan §5.3 — diese sind reine M3-Arbeit
+am Repo, keine Coarbeit.
