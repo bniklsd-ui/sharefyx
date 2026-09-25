@@ -985,6 +985,7 @@ schneiden und vorher die Trefferzahl prüfen. Der Fehler hätte einmal 66 KB ent
 | V162 | Wächst `_trash/` durch die Asset-Verschiebungen seit N5 messbar? | G |
 | V163 | Betrifft der 3.4.7-Security-Fix dieses Projekt? (Erster Befund: vermutlich nein) | H |
 | V164 | Läuft `deploy.sh` unter der neuen Domain-Konfiguration durch? | Gate |
+| V165 | *(neu 2026-09-25)* Baut `nvidia-uvm` eines neueren 580ers (Forum: 580.159.04/580.173.02 auf `7.0.14-4-pve`+) gegen den pve-Kernel? Signatur `zone_device_page_init` in `uvm_hmm.c` prüfen | C |
 | **V118** | *(geerbt)* Zwillingskanten — zwei Linien gewollt? | E |
 | **V136** | *(geerbt)* Chip-Umstellung vs. `bindFolderDropTarget()` | D |
 | **V120** | *(geerbt)* Dynamischer Tab-Titel — bleibt bewusst offen, außerhalb jedes Scopes | — |

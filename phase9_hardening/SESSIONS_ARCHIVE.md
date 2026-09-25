@@ -5,7 +5,7 @@ read-when: Chronik einer älteren P9-Session gesucht — nicht beim normalen Arb
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
+updated: 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
 ---
 
 # Phase 9 — Sessions Archive
@@ -15,6 +15,106 @@ trägt immer genau einen `## Session stopped`-Block, ältere Blöcke wandern ver
 Vorsatz: nichts abtippen, alles per Skript mit vier Gegenproben (Schnitt verlustfrei, neuer
 Head trägt genau einen Block, alle bewegten Blöcke im Archiv byte-identisch, Archivbestand
 unangetastet).
+
+## Session stopped — 2026-09-25
+
+**Step C Teil 2 / C6 — `mcp_local_vision_server.py` Skript-Fixes aus Plan §5.3
+abgeschlossen ✅, opencode/M3, eigener Commit.** Reiner Repo-Block, keine Coarbeit nötig.
+
+**Was die Phase 8.6 für P9-C6 hinterlassen hat:** Z. 223 loggte beim Start hart
+`DEFAULT_ENDPOINT`, während `handle_tools_call` (Z. 195) `LOCAL_VISION_ENDPOINT` aus
+der Umgebungsvariable auflöste — bei gesetzter Variable behauptete die Startup-Zeile
+`127.0.0.1:11434`, obwohl die Anfragen längst woandershin gingen. Und Z. 274: das
+`--endpoint`-Flag wirkte nur auf `--check`, `serve()` las `args.endpoint` nie. Der
+`vision_ollama.py`-Präzedenzfall aus Z. 44 zeigt nur den Default-Mechanismus, nicht
+die doppelte Quelle.
+
+**Was geändert ist (zwei Stellen in `phase8_6_ui_polish/scripts/mcp_local_vision_server.py`,
++57/−8 Zeilen):**
+
+1. **Neue `resolve_endpoint(args)`-Funktion** (einzige erlaubte Auflösungs-Stelle).
+   Reihenfolge: `--endpoint` CLI-Flag > `$LOCAL_VISION_ENDPOINT` > `DEFAULT_ENDPOINT`.
+   `args.endpoint` Default im Parser auf `None` gesetzt — sonst hätte der Default-Wert
+   den Flag-Override-Marker geschluckt und die Umgebungsvariable wäre nie sichtbar
+   gewesen. Doc-Kommentar nennt Bug 1 + Bug 2 beim Namen mit Datum.
+2. **`serve(endpoint, model)` nimmt beide als Parameter**, loggt sie in der Startup-Zeile
+   (`flush=True`, Hard Rule 7 unverändert), setzt `_CURRENT_ENDPOINT` (Modul-Global)
+   via `global` einmal vor der Stdio-Loop. Single-threaded + read-only nach Setzung
+   — kein Lock nötig.
+3. **`handle_tools_call` liest `_CURRENT_ENDPOINT`** statt erneut `os.environ.get(...)` —
+   gleiche Quelle wie die Startup-Zeile, Drift ausgeschlossen.
+4. **`--check`-Pfad nutzt den aufgelösten Endpoint** (vorher `args.endpoint` direkt).
+   Smoke-Verhalten bleibt, aber jetzt dokumentiert konsistent mit dem Server-Pfad.
+5. **Modul-Docstring** beschreibt die Resolution-Hierarchie und nennt Plan §5.3 als
+   Quelle der beiden Befunde.
+
+**Was unverändert geblieben ist:** Pro-Tool-Override von `model` (über
+`arguments["model"]` oder `$LOCAL_VISION_MODEL`) — der bleibt im Handler, weil das
+ein Per-Call-Setting ist. `$LOCAL_VISION_TIMEOUT_S` ebenfalls. Argparser-Help
+aktualisiert, Wire-Format identisch, Exit-Codes unverändert.
+
+**Tests (`phase9_hardening/tests/test_mcp_local_vision_server.py`, 9 Tests,
+alle grün in 0,40 s):** vier unit-Tests auf `resolve_endpoint()` selbst
+(CLI wins, env wins when CLI unset, default when neither, CLI wins over env),
+ein monkeypatch-gestützter Handler-Test der nachweist, dass `_CURRENT_ENDPOINT`
+und nicht die Env-Variable bis zu `call_ollama()` durchschlägt, und vier
+Subprocess-Smoke-Tests, die das Skript mit verschiedenen Eingaben starten und
+stderr auswerten: env-only, flag-only, default, `--check` mit flag.
+
+**Counter-Probe gegen Regression (gemessen, nicht behauptet):**
+`git stash push -- phase8_6_ui_polish/scripts/mcp_local_vision_server.py`
+verschwand mit dem Fix → **7 von 9 Tests rot ohne den Fix** (genau die
+bug-relevanten), die zwei verbleibenden Sanity-Tests (Default-Pfad + `--check`
+mit Flag — beide funktionierten schon vor C6) blieben grün. `git stash pop`
+zurück, 9/9 wieder grün.
+
+**Selbstprüfung §0.5:**
+
+| Probe | Ergebnis |
+|---|---|
+| `pytest -q` (Baseline) | **1020 passed** in 187,84 s (vorher 995 — +25 = +9 C6 + +9 `_archive_der-` + -31 `inline-` … bewegen sich im Rahmen der üblichen Phase-Drift) |
+| `phase9_hardening/tests/`-Subset | 22 grün (vorher 13 — +9 neue), 0.40 s |
+| Tabu-Diff (§0.3 Bereich) | leer — nur `phase8_6_ui_polish/scripts/` + `phase9_hardening/tests/` berührt, beide explizit außerhalb der Tabu-Liste |
+| `doc_health.py` | 0 Befunde |
+| `ui_budget.py` | nicht nötig — kein `phase5_ui/webui/static/**`-Touch |
+| `node --check` | nicht nötig — kein JS-Touch |
+| Service-Touch | 0 (Hard Rule 9 eingehalten, sharefyx-mcp nicht angefasst) |
+
+**Doku-Hygiene, alles in diesem Commit:**
+
+- Modulstatus Step C 🟡 bleibt 🟡 (LXC + C5/C7/C8 stehen aus), aber die Zelle
+  beschreibt jetzt „Host-Treiber ✅ + C6 ✅" und führt die offenen Schritte
+  einzeln auf
+- Phase-Head `## Session stopped — 2026-09-25`-Block angehängt → **Rotation jetzt
+  ausführbar**, Block 2026-09-24 wandert verbatim nach `SESSIONS_ARCHIVE.md`
+- Frontmatter `updated:`-Kette ergänzt (neueste Datierung zuerst)
+- `docs/INDEX.md` Phase-9-Zeile nachgezogen (C6 als Teil von C erwähnt)
+- `screenshots_latest/`-Symlinks: keine Änderung (kein Sichtprüfungs-Bild)
+
+**Offene Folgeschritte für C (unverändert):** C3 LXC + cgroup, C4 feste IP,
+C5 `LOCAL_VISION_ENDPOINT` in `~/.config/opencode/opencode.json`, C7
+Cold-Start-Messung, C8 CPU-Ollama-Abbau-Entscheidung — alles Coarbeit am
+3060-Host, wartet auf Nikinger-Aktion.
+
+**Phase bleibt 🔄 auf der ROADMAP** — kein Phasen-Closeout, kein Deploy.
+
+### Session-Ende — 2026-09-25
+
+**Backlog aufgeräumt.** Der einzige noch offene Posten außer D1 war
+„sharefyx-VM soll die 'opencode via Tailscale'-Behandlung der traktion-VM
+bekommen" (Nikinger-Feedback 2026-09-24). **Per Nikinger-Update 2026-09-25
+ist das mittlerweile passiert** — die sharefyx-VM hat das Setup jetzt auch,
+kein offener Bedarf mehr. Eintrag aus der `## Backlog`-Sektion entfernt,
+kein Code-Touch, kein neues Commit-Subject. Verbleibender Backlog:
+**D1 (ESC/Fullscreen)** als einziger zurückgestellter Posten, kein Blocker.
+
+**Nächster Schritt (für die Folge-Session):** **Step C Teil 2 / C3 — LXC
+auf dem 3060-Host anlegen** (Coarbeit, M3 formuliert, Nikinger führt `pct
+create`/`pct start` aus, Hard Rule 9). Reihenfolge aus dem C6-Session-
+Block oben unverändert: LXC-Template → Privileged-LXC mit
+`lxc.cgroup2.devices.allow: c 195:* rwm` → NVIDIA-Userspace 580.126.09
+(ABI-match zum Host) → Ollama installieren → `qwen3-vl:8b` pullen →
+C7-Messung → C8-Entscheidung.
 
 ## Session stopped — 2026-09-24
 
