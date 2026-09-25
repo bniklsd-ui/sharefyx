@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase9_hardening_plan.md    # voller Plan, Locks P9-A–P9-T, Steps 0–H
   - ../docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md  # Herkunft der P9-Punkte
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
-updated: 2026-09-25 (Host-Treiber 580.173.02 mit `nvidia-uvm` installiert und geladen, kein Reboot) | 2026-09-25 (V165 beantwortet: 580.173.02 kennt die neue `zone_device_page_init`-Signatur) | 2026-09-25 (Step C Diagnose bestätigt: kein `/dev/nvidia-uvm`, `cuInit = 999`) | 2026-09-25 (Step C Diagnose, Claude Code: CUDA fehlt, weil `nvidia-uvm` fehlt — C2-Trade-off-Satz datiert korrigiert, Modulstatus C nachgezogen, Nikinger-Entscheidung zum Host-Fix offen) | 2026-09-25 (Backlog aufgeräumt: „opencode via Tailscale" für sharefyx-VM per Nikinger-Update mittlerweile passiert, Eintrag aus der Backlog-Sektion entfernt; nur noch D1 zurückgestellt) | 2026-09-25 (Step C Teil 2 / C6 — `mcp_local_vision_server.py` Skript-Fixes aus Plan §5.3: `serve()` loggt aufgelösten Endpoint, `--endpoint` wirkt jetzt auch ohne `--check`; neue zentrale `resolve_endpoint(args)` mit Präzedenz `--endpoint` > `$LOCAL_VISION_ENDPOINT` > `DEFAULT_ENDPOINT`; `_CURRENT_ENDPOINT` als Modul-Globals wird in `serve()` einmal gesetzt und von `handle_tools_call` gelesen statt erneut die Umgebungsvariable; 9 neue Tests + Counter-Probe ohne den Fix 7/9 rot — exakt die zwei gemeldeten Bugs; LXC + Ollama + C5/C7/C8 stehen aus) | 2026-09-24 (Step C Teil 1 — NVIDIA-Host-Treiber 580.126.09 installiert mit `--no-unified-memory`; pve-no-subscription-Repo ergänzt; drei dokumentierte Fehlbarkeiten auf dem Weg (Header-Paket fehlte, Backports führten denselben Upstream, Nouveau-Konflikt, uvm_hmm.c gegen 7.0.2-6-pve-Mai-Patch); eigener autoremove-Vorfall mit sudo/dkms-Verlust am 2026-09-24 wieder behoben; LXC + Ollama stehen aus) | 2026-09-24 (Backlog: ~19-min mcp-proxy.anthropic.com-Ausfall dokumentiert und geschlossen — gemessen nicht CGNAT/sharefyx-VM-seitig, Nikinger-Anordnung) | 2026-09-24 (Backlog: "opencode via Tailscale"-Behandlung für sharefyx-/Trading-Bot-VM nachgetragen, Nikinger-Feedback aus Netzwerk-Diagnosesession, kein Produktcode-Touch) | 2026-09-23 (D1/ESC-Bug auf Nikinger-Anordnung zurückgestellt, `## Backlog` neu) | 2026-09-23 (Step D code-complete — Drop-Ziel Space-Wurzel, ESC/Vollbild-Guard gebaut, gebaut in Claude Code statt opencode/M3, benannte Abweichung von P9-Q) | 2026-09-20 (Step 0 abgeschlossen — Phasenverzeichnis, INDEX-Rotationsskript, vier geplante plus drei ungeplante Doku-Defekte repariert, `doc_health.py` als Test festgenagelt, Baseline gemessen)
+updated: 2026-09-25 (GPU-Inferenz läuft: CT 111 auf 580.173.02, `size_vram` = `size`, 63 tok/s, P9-21/-23/-26 ✅; Boot-Persistenz offen) | 2026-09-25 (Host-Treiber 580.173.02 mit `nvidia-uvm` installiert und geladen, kein Reboot) | 2026-09-25 (V165 beantwortet: 580.173.02 kennt die neue `zone_device_page_init`-Signatur) | 2026-09-25 (Step C Diagnose bestätigt: kein `/dev/nvidia-uvm`, `cuInit = 999`) | 2026-09-25 (Step C Diagnose, Claude Code: CUDA fehlt, weil `nvidia-uvm` fehlt — C2-Trade-off-Satz datiert korrigiert, Modulstatus C nachgezogen, Nikinger-Entscheidung zum Host-Fix offen) | 2026-09-25 (Backlog aufgeräumt: „opencode via Tailscale" für sharefyx-VM per Nikinger-Update mittlerweile passiert, Eintrag aus der Backlog-Sektion entfernt; nur noch D1 zurückgestellt) | 2026-09-25 (Step C Teil 2 / C6 — `mcp_local_vision_server.py` Skript-Fixes aus Plan §5.3: `serve()` loggt aufgelösten Endpoint, `--endpoint` wirkt jetzt auch ohne `--check`; neue zentrale `resolve_endpoint(args)` mit Präzedenz `--endpoint` > `$LOCAL_VISION_ENDPOINT` > `DEFAULT_ENDPOINT`; `_CURRENT_ENDPOINT` als Modul-Globals wird in `serve()` einmal gesetzt und von `handle_tools_call` gelesen statt erneut die Umgebungsvariable; 9 neue Tests + Counter-Probe ohne den Fix 7/9 rot — exakt die zwei gemeldeten Bugs; LXC + Ollama + C5/C7/C8 stehen aus) | 2026-09-24 (Step C Teil 1 — NVIDIA-Host-Treiber 580.126.09 installiert mit `--no-unified-memory`; pve-no-subscription-Repo ergänzt; drei dokumentierte Fehlbarkeiten auf dem Weg (Header-Paket fehlte, Backports führten denselben Upstream, Nouveau-Konflikt, uvm_hmm.c gegen 7.0.2-6-pve-Mai-Patch); eigener autoremove-Vorfall mit sudo/dkms-Verlust am 2026-09-24 wieder behoben; LXC + Ollama stehen aus) | 2026-09-24 (Backlog: ~19-min mcp-proxy.anthropic.com-Ausfall dokumentiert und geschlossen — gemessen nicht CGNAT/sharefyx-VM-seitig, Nikinger-Anordnung) | 2026-09-24 (Backlog: "opencode via Tailscale"-Behandlung für sharefyx-/Trading-Bot-VM nachgetragen, Nikinger-Feedback aus Netzwerk-Diagnosesession, kein Produktcode-Touch) | 2026-09-23 (D1/ESC-Bug auf Nikinger-Anordnung zurückgestellt, `## Backlog` neu) | 2026-09-23 (Step D code-complete — Drop-Ziel Space-Wurzel, ESC/Vollbild-Guard gebaut, gebaut in Claude Code statt opencode/M3, benannte Abweichung von P9-Q) | 2026-09-20 (Step 0 abgeschlossen — Phasenverzeichnis, INDEX-Rotationsskript, vier geplante plus drei ungeplante Doku-Defekte repariert, `doc_health.py` als Test festgenagelt, Baseline gemessen)
 ---
 
 # Phase 9 — Härtung
@@ -23,7 +23,7 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | 0 | Verifikations-Durchlauf, Doku-Fundament (Phasenverzeichnis, INDEX-Rotation, vier Defekte, `doc_health.py`, Baseline) | ✅ |
 | A | Echte Domain über eigenen VPS | ⬜ |
 | B | `tailscaled-watchdog.service` | ⬜ |
-| C | Vision-Dienst auf der RTX 3060 | 🟡 **Blockiert am Host-Modul `nvidia-uvm`, siehe Session-Block 2026-09-25 (2).** C1 Host-Treiber 580.126.09 ✅ (aber ohne `nvidia-uvm`, und damit **ohne CUDA**) · C6 ✅ · C2 LXC CT 111 `gpu-vision` ✅ · C3 Userspace + Ollama 0.34.4 + `qwen3-vl:8b` laufen, **Inferenz aber nur auf CPU** (`runner.vram="0 B"`) 🟡 · C7 23 s gemessen = **CPU-Lauf auf dem Ryzen, kein GPU-Gewinn** · C4/C5/C8/P9-26 offen |
+| C | Vision-Dienst auf der RTX 3060 | 🟡 **GPU-Inferenz läuft ✅** (Session-Block 2026-09-25 (2)): Host + CT 111 auf 580.173.02 inkl. `nvidia-uvm`, `size_vram` = `size`, 63 tok/s statt 0,35 · P9-21 ✅ · P9-23 ✅ (Cold 26,8 s, warm 7,0 s) · P9-26 ✅ · C6 ✅ · **offen:** Boot-Persistenz (`nvidia-uvm` + Knoten), C4 feste IP, C5 opencode-Config, C8, P9-22-Nachweis |
 | D | Zwei gemeldete Bugs (ESC/Vollbild, Drop-Ziel Space-Wurzel) | 🟡 D2 fertig; D1 (ESC/Vollbild) **bewusst zurückgestellt** — Nikinger-Entscheidung 2026-09-23, kein aktiver Blocker mehr, siehe Backlog unten |
 | E | Karte: Reload-Overload, V118 | ⬜ |
 | F | Schema-Fundament (neunte P1-Contract-Öffnung: `doing`/`assignee`) | ⬜ |
@@ -172,6 +172,47 @@ Ursache ist damit gemessen und nicht mehr nur hergeleitet.
 gegen `/proc/devices` gegenprüfen. Offen: `111.conf` um Major 511 + zwei Bind-Mounts ergänzen,
 Container-Userspace auf 580.173.02 (ABI-Match), Laden von `nvidia-uvm` + Knoten beim Boot, Messung.
 
+**Container-Seite und Messung (2026-09-25, 20:18–20:29 UTC) ✅:**
+
+- `111.conf` +3 Zeilen: `lxc.cgroup2.devices.allow: c 511:* rwm` plus Bind-Mounts
+  `/dev/nvidia-uvm` und `/dev/nvidia-uvm-tools` (`optional,create=file`). Danach zwei
+  `devices.allow` und fünf `mount.entry`, keine Dubletten.
+- Userspace im CT: 580.173.02 `--no-kernel-module` (ohne `--no-unified-memory`),
+  `INSTALL_EXIT=0`, im CT `cuInit = 0` (vorher 999).
+- Ollama-Discovery, Debug-Instanz auf `127.0.0.1:11435`: `inference compute … library=CUDA
+  … RTX 3060 … libdirs=ollama,cuda_v13 driver=13.0 total="11.6 GiB"`. Die erste
+  Service-Journalzeile nach dem Start zeigte noch `library=cpu total="8.0 GiB"` — das waren die
+  8 GiB **Container-RAM** unter dem CPU-Eintrag. Warum ausgerechnet dieser Start (PID 147) keine
+  GPU fand, ist **nicht geklärt**; ab dem nächsten Service-Start stimmt es (Messung unten).
+- Die Env-Overrides der Vorsession stehen **nicht mehr** in der Unit (`systemctl cat` zeigt nur
+  `PATH`, `OLLAMA_HOST=0.0.0.0:11434`, `OLLAMA_ORIGINS=*`).
+
+**Messung von der sharefyx-VM aus (Claude Code, `vision_ollama.py --endpoint http://192.168.68.140:11434`):**
+
+| Messung | Vorher | Jetzt |
+|---|---|---|
+| `/api/ps` | `size_vram` 0 | `size_vram` = `size` = 5.793.780.858 B — **komplett im VRAM** |
+| Decode | 0,32–0,35 tok/s | **63,15 tok/s** |
+| Erster Load nach Service-Start (Platte kalt) | — | 48,3 s Wand, davon 33,4 s Load |
+| Vision-Lauf, Modell entladen (`keep_alive:0`), Cold-Start | 46–180 s (i5-CPU, 2026-09-10) | **26,8 s** |
+| Vision-Lauf, Modell geladen | — | **7,0 s** |
+| P9-26-Aussage (`c4_p8519_01_radiogruppe_im_dialog.png`) | „Der Radio-Button ‚als Text-Link im Text' ist markiert" | „Der Radio-Button „als Text-Link im Text" ist im Dialog markiert." — **gleiche Aussage** |
+
+Abnahme damit: **P9-21 ✅** (antwortet von der sharefyx-VM aus) · **P9-23 ✅** · **P9-26 ✅** ·
+V156: beim alten Modell geblieben, wie empfohlen, damit der Gewinn zuzuordnen ist.
+**P9-22 nicht nachgewiesen:** `0.0.0.0:11434` hängt nur im Heim-LAN hinter CGNAT, ohne
+Funnel und ohne Port-Forward. Ein ausdrücklicher Test von außen fehlt noch. `OLLAMA_ORIGINS=*`
+ist im LAN hinnehmbar, notiert.
+
+**Offen, und ohne diesen Punkt überlebt der Fix keinen Host-Reboot:** `nvidia-uvm` wird heute von
+Hand geladen, die Knoten legt `nvidia-modprobe -u -c=0` von Hand an. Nötig sind:
+`/etc/modules-load.d/` mit `nvidia` + `nvidia-uvm` und eine Oneshot-Unit, die
+`nvidia-modprobe -u -c=0` **vor** dem CT-Autostart ausführt. Danach die uvm-Major
+gegen `/proc/devices` gegenprüfen (511 ist dynamisch vergeben). Außerdem offen: C4 feste IP ·
+C5 `LOCAL_VISION_ENDPOINT` in `~/.config/opencode/` · C8 CPU-Ollama auf der sharefyx-VM
+(läuft weiter auf `127.0.0.1:11434`) · `/tmp/nv580173` und der alte 580.126.09-Installer auf dem
+Host löschen.
+
 **Zur Einordnung der Messwerte:** Die 23 s Cold-Start (C7) sind ein **CPU**-Lauf auf dem
 Ryzen 7 5800X. Er ist schneller als die 46–180 s auf dem i5-VM-CPU-Pfad, aber **kein GPU-Gewinn**.
 P9-23 darf damit nicht als erfüllt gelten.
@@ -179,7 +220,7 @@ P9-23 darf damit nicht als erfüllt gelten.
 **Doku in diesem Commit:** Modulstatus C nachgezogen · diese Korrektur · Rotation per Skript ·
 INDEX-Phase-9-Zeile + `updated:`-Kette (per `rotate_index_updates.sh`) · V165 neu.
 
-**Nächster Schritt:** Nikinger entscheidet den Host-Pfad: **(a)** neuerer 580er + neuerer
-pve-Kernel, **(b)** Kernel-Pin auf eine 6.17er-Version oder **(c)** Versuch 3, also P9-26 auf CPU
-mit 0,32 tok/s durchziehen und den GPU-Fix mit Messbefund nach P10 schieben. Vorher die
-read-only-Runde oben.
+**Nächster Schritt:** Boot-Persistenz auf dem 3060-Host (Coarbeit, eine Runde:
+`modules-load.d` + Oneshot-Unit, danach ein Host-Reboot als Probe mit `cuInit` im CT und
+`/api/ps`). Dann C4 → C5 → C8. Der Host-Pfad ist entschieden: **(a) nur Treiber-Upgrade, ohne
+Kernel-Wechsel**, ohne Reboot durchgeführt.
