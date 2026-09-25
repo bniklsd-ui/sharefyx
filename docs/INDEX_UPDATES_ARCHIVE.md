@@ -7,6 +7,7 @@ up: ./INDEX.md
 down:
 updated: 2026-09-19 (Archiv angelegt — erste Rotation der INDEX-`updated:`-Kette, von Hand ausgeführt; das Skript `scripts/rotate_index_updates.sh` entsteht in P9 Step 0.1 [Lock P9-L] und übernimmt danach jede weitere Rotation)
 ---
+- 2026-09-25 (**P9 Step C** GPU-Inferenz läuft, Host-Fix ohne Reboot) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 - 2026-09-25 (**P9 Step C** Diagnose — GPU-Inferenz scheitert an fehlendem `nvidia-uvm`, C2-Trade-off-Satz datiert korrigiert, Host-Fix wartet auf Nikinger, V165 neu) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 - 2026-09-25 (**P9 Step C** Teil 2 / C6 — `mcp_local_vision_server.py` Skript-Fixes aus Plan §5.3: `serve()` loggt aufgelösten Endpoint, `--endpoint` wirkt jetzt auch ohne `--check`; neue zentrale `resolve_endpoint(args)` mit Präzedenz CLI > Env > Default; `_CURRENT_ENDPOINT` Modul-Global; 9 neue Tests + Counter-Probe 7/9 rot ohne den Fix; reine M3-Arbeit, kein Service-Touch, kein `pkill -f`, sharefyx-mcp nicht angefasst, Tabu-Diff §0.3 leer)
 - 2026-09-24 (**P9 Step C** Teil 1 — NVIDIA-Host-Treiber 580.126.09 installiert mit `--no-unified-memory` auf dem Ryzen-7-5800X-Proxmox-Node mit der RTX 3060, `pve-no-subscription`-Repo ergänzt, drei dokumentierte Fehlbarkeiten auf dem Weg [Header-Paket fehlte, Backports führten denselben 550er-Upstream, Nouveau-Konflikt, `uvm_hmm.c` gegen 7.0.2-6-pve-Mai-Patch]; eigener `apt autoremove --purge`-Vorfall mit sudo/dkms-Verlust sauber von der Root-Shell wieder hergestellt, Hard Rule 9 durchgehend eingehalten)
