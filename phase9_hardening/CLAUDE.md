@@ -127,7 +127,9 @@ gleich), `size_vram` = `size` = 5.793.780.858 B.
    (gpu-vision.lan)` → `192.168.68.140`, Hostname `gpu-vision.lan` — MAC und IP stimmen exakt mit
    `pct config 111` / C5 überein. Grenze: ein Screenshot zeigt nicht, ob „Save & Apply" gedrückt
    wurde, und die Reservierung entspricht dem laufenden Lease, ändert also nichts Messbares — der
-   Nachweis ist die Nikinger-Aussage plus der nächste Lease-Wechsel. Ursprüngliche Begründung: C5
+   Nachweis ist die Nikinger-Aussage plus der nächste Lease-Wechsel. **Lief auf der GPU ✅:** `/api/ps`
+   um 23:05 CEST zeigt `size_vram` = `size` = 5.793.780.858 B, `expires_at` 21:08:32Z = genau 5 min
+   `keep_alive` nach diesem Aufruf (23:03:32 CEST) — kein anderer Lauf dazwischen. Ursprüngliche Begründung: C5
    schreibt `.140` fest, die Adresse war bis dahin nur ein DHCP-Lease. `net0` ist `ip=dhcp`, MAC `BC:24:11:FB:EA:CD`, Gateway `192.168.68.1`; auch die
    sharefyx-VM selbst hängt per DHCP im LAN. Empfehlung: **DHCP-Reservierung im RUT X50** (MAC →
    `.140`) statt statischer IP in `pct config` — eine statische `.140` im DHCP-Pool des Routers
