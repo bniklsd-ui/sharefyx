@@ -14,6 +14,14 @@ small; the existing `vision_ollama.py` CLI wrapper covers ad-hoc use.
 
 Exit codes (Hard Rule 7): 0 on graceful shutdown, 2 on protocol error,
 3 on Ollama unreachable, 4 on tool error.
+
+Endpoint resolution (P9 Step C Teil 2 / C6 -- plan §5.3):
+    --endpoint <url>  >  $LOCAL_VISION_ENDPOINT  >  DEFAULT_ENDPOINT
+Before C6 the startup line hard-coded `DEFAULT_ENDPOINT` and the `--endpoint`
+flag only affected `--check`; `tools/call` always read the env var directly.
+With the env set, the log claimed `127.0.0.1:11434` while requests were going
+elsewhere. `resolve_endpoint()` is now the single source of truth, set into
+`_CURRENT_ENDPOINT` once by `serve()` before the stdio loop.
 """
 
 from __future__ import annotations
@@ -42,6 +50,11 @@ SUPPORTED_MIMES = {
     "image/jpg": "jpg",
     "image/webp": "webp",
 }
+
+# Single source of truth for `tools/call`. Set once by `serve()` before the
+# stdio loop starts, then read-only. The server is single-threaded (JSON-RPC
+# over stdio = one request at a time), so this is safe without a lock.
+_CURRENT_ENDPOINT: str = DEFAULT_ENDPOINT
 
 
 def log(msg: str) -> None:
@@ -73,6 +86,26 @@ def err(id_: Any, code: int, message: str, data: Any = None) -> None:
 
 def tool_result(text: str, is_error: bool = False) -> dict[str, Any]:
     return {"content": [{"type": "text", "text": text}], "isError": is_error}
+
+
+def resolve_endpoint(args: argparse.Namespace) -> str:
+    """Auflösung des Ollama-Endpoints (Plan §5.3, P9-C6).
+
+    Reihenfolge:
+      1. `--endpoint` CLI-Flag — Plan §5.3 Bug 2: das Flag wirkt jetzt auch
+         ohne `--check`, nicht nur im Smoke-Modus.
+      2. `$LOCAL_VISION_ENDPOINT` Umgebungsvariable — die einzige Quelle, die
+         der `tools/call`-Handler bisher kannte.
+      3. `DEFAULT_ENDPOINT` (`http://127.0.0.1:11434`).
+
+    `args.endpoint` wird im Parser auf `default=None` gesetzt, damit "nicht
+    explizit gesetzt" sauber vom echten Default unterscheidbar bleibt — sonst
+    wäre `--endpoint http://127.0.0.1:11434` nicht von "Flag nicht angegeben"
+    zu trennen, und die Umgebungsvariable hätte nie eine Chance.
+    """
+    if args.endpoint is not None:
+        return args.endpoint
+    return os.environ.get("LOCAL_VISION_ENDPOINT", DEFAULT_ENDPOINT)
 
 
 def handle_initialize(params: dict[str, Any]) -> dict[str, Any]:
@@ -192,7 +225,11 @@ def handle_tools_call(params: dict[str, Any]) -> dict[str, Any]:
         )
 
     model = arguments.get("model") or os.environ.get("LOCAL_VISION_MODEL", DEFAULT_MODEL)
-    endpoint = os.environ.get("LOCAL_VISION_ENDPOINT", DEFAULT_ENDPOINT)
+    # C6 (Plan §5.3): der aufgelöste Endpoint kommt aus `serve()` über das
+    # Modul-Global, nicht mehr frisch aus der Umgebungsvariablen -- sonst
+    # könnte die Startup-Zeile einen anderen Wert loggen als der Handler
+    # tatsächlich benutzt.
+    endpoint = _CURRENT_ENDPOINT
     try:
         timeout_s = int(os.environ.get("LOCAL_VISION_TIMEOUT_S", str(DEFAULT_TIMEOUT_S)))
     except ValueError:
@@ -219,8 +256,10 @@ HANDLERS = {
 }
 
 
-def serve() -> int:
-    log(f"starting (endpoint={DEFAULT_ENDPOINT}, model={DEFAULT_MODEL})")
+def serve(endpoint: str, model: str) -> int:
+    global _CURRENT_ENDPOINT
+    _CURRENT_ENDPOINT = endpoint
+    log(f"starting (endpoint={endpoint}, model={model})")
     for raw in sys.stdin:
         line = raw.strip()
         if not line:
@@ -271,22 +310,32 @@ def main() -> int:
         ),
     )
     parser.add_argument("--check", action="store_true", help="smoke-check Ollama reachability, do not serve")
-    parser.add_argument("--endpoint", default=DEFAULT_ENDPOINT, help="Ollama base URL")
+    parser.add_argument(
+        "--endpoint",
+        default=None,
+        help=(
+            f"Ollama base URL. Reihenfolge: --endpoint > $LOCAL_VISION_ENDPOINT > "
+            f"{DEFAULT_ENDPOINT} (Plan §5.3, P9-C6)."
+        ),
+    )
     args = parser.parse_args()
+
+    endpoint = resolve_endpoint(args)
+    model = os.environ.get("LOCAL_VISION_MODEL", DEFAULT_MODEL)
 
     if args.check:
         try:
-            r = requests.get(args.endpoint.rstrip("/") + "/api/tags", timeout=5)
+            r = requests.get(endpoint.rstrip("/") + "/api/tags", timeout=5)
             r.raise_for_status()
             models = [m["name"] for m in r.json().get("models", [])]
-            log(f"Ollama reachable, {len(models)} model(s) installed")
+            log(f"Ollama reachable, {len(models)} model(s) installed (endpoint={endpoint})")
             for n in models:
                 log(f"  - {n}")
             return 0
         except Exception as exc:
-            fail(3, f"Ollama not reachable at {args.endpoint}: {exc}")
+            fail(3, f"Ollama not reachable at {endpoint}: {exc}")
 
-    return serve()
+    return serve(endpoint, model)
 
 
 if __name__ == "__main__":

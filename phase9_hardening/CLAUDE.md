@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase9_hardening_plan.md    # voller Plan, Locks P9-A–P9-T, Steps 0–H
   - ../docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md  # Herkunft der P9-Punkte
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
-updated: 2026-09-24 (Step C Teil 1 — NVIDIA-Host-Treiber 580.126.09 installiert mit `--no-unified-memory`; pve-no-subscription-Repo ergänzt; drei dokumentierte Fehlbarkeiten auf dem Weg (Header-Paket fehlte, Backports führten denselben Upstream, Nouveau-Konflikt, uvm_hmm.c gegen 7.0.2-6-pve-Mai-Patch); eigener autoremove-Vorfall mit sudo/dkms-Verlust am 2026-09-24 wieder behoben; LXC + Ollama stehen aus) | 2026-09-24 (Backlog: ~19-min mcp-proxy.anthropic.com-Ausfall dokumentiert und geschlossen — gemessen nicht CGNAT/sharefyx-VM-seitig, Nikinger-Anordnung) | 2026-09-24 (Backlog: "opencode via Tailscale"-Behandlung für sharefyx-/Trading-Bot-VM nachgetragen, Nikinger-Feedback aus Netzwerk-Diagnosesession, kein Produktcode-Touch) | 2026-09-23 (D1/ESC-Bug auf Nikinger-Anordnung zurückgestellt, `## Backlog` neu) | 2026-09-23 (Step D code-complete — Drop-Ziel Space-Wurzel, ESC/Vollbild-Guard gebaut, gebaut in Claude Code statt opencode/M3, benannte Abweichung von P9-Q) | 2026-09-20 (Step 0 abgeschlossen — Phasenverzeichnis, INDEX-Rotationsskript, vier geplante plus drei ungeplante Doku-Defekte repariert, `doc_health.py` als Test festgenagelt, Baseline gemessen)
+updated: 2026-09-25 (Step C Teil 2 / C6 — `mcp_local_vision_server.py` Skript-Fixes aus Plan §5.3: `serve()` loggt aufgelösten Endpoint, `--endpoint` wirkt jetzt auch ohne `--check`; neue zentrale `resolve_endpoint(args)` mit Präzedenz `--endpoint` > `$LOCAL_VISION_ENDPOINT` > `DEFAULT_ENDPOINT`; `_CURRENT_ENDPOINT` als Modul-Globals wird in `serve()` einmal gesetzt und von `handle_tools_call` gelesen statt erneut die Umgebungsvariable; 9 neue Tests + Counter-Probe ohne den Fix 7/9 rot — exakt die zwei gemeldeten Bugs; LXC + Ollama + C5/C7/C8 stehen aus) | 2026-09-24 (Step C Teil 1 — NVIDIA-Host-Treiber 580.126.09 installiert mit `--no-unified-memory`; pve-no-subscription-Repo ergänzt; drei dokumentierte Fehlbarkeiten auf dem Weg (Header-Paket fehlte, Backports führten denselben Upstream, Nouveau-Konflikt, uvm_hmm.c gegen 7.0.2-6-pve-Mai-Patch); eigener autoremove-Vorfall mit sudo/dkms-Verlust am 2026-09-24 wieder behoben; LXC + Ollama stehen aus) | 2026-09-24 (Backlog: ~19-min mcp-proxy.anthropic.com-Ausfall dokumentiert und geschlossen — gemessen nicht CGNAT/sharefyx-VM-seitig, Nikinger-Anordnung) | 2026-09-24 (Backlog: "opencode via Tailscale"-Behandlung für sharefyx-/Trading-Bot-VM nachgetragen, Nikinger-Feedback aus Netzwerk-Diagnosesession, kein Produktcode-Touch) | 2026-09-23 (D1/ESC-Bug auf Nikinger-Anordnung zurückgestellt, `## Backlog` neu) | 2026-09-23 (Step D code-complete — Drop-Ziel Space-Wurzel, ESC/Vollbild-Guard gebaut, gebaut in Claude Code statt opencode/M3, benannte Abweichung von P9-Q) | 2026-09-20 (Step 0 abgeschlossen — Phasenverzeichnis, INDEX-Rotationsskript, vier geplante plus drei ungeplante Doku-Defekte repariert, `doc_health.py` als Test festgenagelt, Baseline gemessen)
 ---
 
 # Phase 9 — Härtung
@@ -23,7 +23,7 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | 0 | Verifikations-Durchlauf, Doku-Fundament (Phasenverzeichnis, INDEX-Rotation, vier Defekte, `doc_health.py`, Baseline) | ✅ |
 | A | Echte Domain über eigenen VPS | ⬜ |
 | B | `tailscaled-watchdog.service` | ⬜ |
-| C | Vision-Dienst auf der RTX 3060 | 🟡 Host-Treiber (580.126.09) installiert mit `--no-unified-memory` (UVM-Trade-off akzeptiert, reversibel); LXC-Anlage, cgroup-Devices, Ollama + `qwen3-vl:8b`-Pull, Cold-Start-Messung (C7) und CPU-Ollama-Abbau-Entscheidung (C8) stehen aus |
+| C | Vision-Dienst auf der RTX 3060 | 🟡 Host-Treiber (580.126.09) installiert mit `--no-unified-memory` (UVM-Trade-off akzeptiert, reversibel) ✅; **C6 Skript-Fixes aus Plan §5.3 ✅** (aufgelöster Endpoint im Startup-Log, `--endpoint` wirkt auch im Server-Modus); LXC-Anlage, cgroup-Devices, Ollama + `qwen3-vl:8b`-Pull, Cold-Start-Messung (C7) und CPU-Ollama-Abbau-Entscheidung (C8) stehen aus |
 | D | Zwei gemeldete Bugs (ESC/Vollbild, Drop-Ziel Space-Wurzel) | 🟡 D2 fertig; D1 (ESC/Vollbild) **bewusst zurückgestellt** — Nikinger-Entscheidung 2026-09-23, kein aktiver Blocker mehr, siehe Backlog unten |
 | E | Karte: Reload-Overload, V118 | ⬜ |
 | F | Schema-Fundament (neunte P1-Contract-Öffnung: `doing`/`assignee`) | ⬜ |
@@ -74,128 +74,85 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückzuführen** — Nikinger-Anordnung 2026-09-24, so dokumentieren und nicht weiter
   untersuchen.
 
-## Session stopped — 2026-09-24
+## Session stopped — 2026-09-25
 
-**Step C — Phase 1 von 2 abgeschlossen: NVIDIA-Treiber auf dem 3060-Host installiert.
-opencode/M3 als Coarbeit mit dem Nikinger (Hard Rule 9 eingehalten — keine `sudo`/`systemctl`-
-Aufrufe aus dem Agenten-Kontext, jeder sudo-Pfad von M3 formuliert und vom Nikinger getippt);
-ein Commit am Ende der Session.**
+**Step C Teil 2 / C6 — `mcp_local_vision_server.py` Skript-Fixes aus Plan §5.3
+abgeschlossen ✅, opencode/M3, eigener Commit.** Reiner Repo-Block, keine Coarbeit nötig.
 
-**Was geschafft ist (C1, C2, C3 des Plans):**
+**Was die Phase 8.6 für P9-C6 hinterlassen hat:** Z. 223 loggte beim Start hart
+`DEFAULT_ENDPOINT`, während `handle_tools_call` (Z. 195) `LOCAL_VISION_ENDPOINT` aus
+der Umgebungsvariable auflöste — bei gesetzter Variable behauptete die Startup-Zeile
+`127.0.0.1:11434`, obwohl die Anfragen längst woandershin gingen. Und Z. 274: das
+`--endpoint`-Flag wirkte nur auf `--check`, `serve()` las `args.endpoint` nie. Der
+`vision_ollama.py`-Präzedenzfall aus Z. 44 zeigt nur den Default-Mechanismus, nicht
+die doppelte Quelle.
 
-- **C1 — IOMMU und Treiberstand** ermittelt: Host ist **Ryzen 7 5800X** (sekundärer Proxmox-Node,
-  AMD), GPU ist **RTX 3060 LHR** (`10de:2504`), Kernel `7.0.2-6-pve`, Proxmox VE 9.x. IOMMU-Hardware
-  erkannt (`AMD-Vi`, `perf/amd_iommu`), aber **nicht** im Translation-Mode — `amd_iommu=on` fehlt in
-  `/proc/cmdline`. **V154 für LXC = grün** (Plan §5.2 Umschaltpunkt zur VM greift nicht, LXC teilt
-  den Host-Kernel und braucht kein IOMMU — `amd_iommu=on` bleibt bewusst aus, Form-Folge).
-- **C2 — NVIDIA-Treiber 580.126.09 installiert** über `nvidia.com`'s `.run`-Installer
-  (`--silent --dkms --accept-license --no-install-compat32-libs --no-unified-memory`).
-  **Vier diagnostizierte Fehlbarkeiten auf dem Weg, alle protokolliert:**
+**Was geändert ist (zwei Stellen in `phase8_6_ui_polish/scripts/mcp_local_vision_server.py`,
++57/−8 Zeilen):**
 
-  1. **`proxmox-kernel-7.0.2-6-pve-signed` lief, aber kein Header-Paket im konfigurierten Repo.**
-     `pveversion` listete `proxmox-kernel-helper: 9.1.0+fde2` und `dkms 3.2.2-1~deb13u1`, beide
-     vorhanden, aber `apt-cache search '^pve-headers'` und `apt-cache search linux-headers | grep 7.0`
-     waren **leer**. Die drei `.sources`-Dateien in `/etc/apt/sources.list.d/` zeigten nur
-     `debian.sources` aktiv; `pve-enterprise.sources` mit `Enabled: false`, **`pve-no-subscription`
-     fehlte komplett**. **Fix:** eigene `/etc/apt/sources.list.d/pve-no-subscription.sources`
-     angelegt (Debian-Signatur über bestehendes `proxmox-archive-keyring.gpg`, kein neuer Key),
-     `apt update` zog die fehlenden Header. `proxmox-headers-7.0.2-6-pve` installiert, Build-Symlink
-     `/lib/modules/7.0.2-6-pve/build → /usr/src/linux-headers-7.0.2-6-pve` intakt.
-  2. **Debian Trixie non-free bot nur NVIDIA 550.163.01** (proprietär und offen). Beide Varianten
-     scheiterten am DKMS-Bau gegen 7.0.x mit **drei** identischen API-Brüchen:
-     `'struct vm_area_struct' has no member named '__vm_flags'` (nv-mm.h:315/327),
-     `'VMA_LOCK_OFFSET' undeclared` + `__is_vma_write_locked(vma, &mm_lock_seq)` zu viele Argumente
-     (nv-mmap.c:844/905), `'const struct dma_map_ops' has no member named 'map_resource'`
-     (nv-dma.c:799). **`trixie-backports.sources` aktiviert → `apt-cache madison nvidia-driver`**
-     zeigte nur `550.163.01-4~bpo13+1` — gleicher Upstream, neuere Debian-Patch-Revision, **kein**
-     neuer NVIDIA-Code. Backports hilft nicht.
-  3. **NVIDIA 580.126.09 (Januar 2026)** ist gegen Linux 7.0-RC gebaut; der Proxmox-Kernel
-     `7.0.2-6-pve` (Mai 2026) hat seither eine 2. Signatur-Erweiterung an `zone_device_page_init`
-     bekommen. Erster Installer-Lauf scheiterte am Nouveau-Konflikt
-     (`--silent`-Default-Antwort „Abort installation"). Nouveau-Blacklist-Dateien wurden zwar
-     geschrieben (`/usr/lib/modprobe.d/nvidia-installer-disable-nouveau.conf`,
-     `/etc/modprobe.d/nvidia-installer-disable-nouveau.conf` mit korrektem
-     `blacklist nouveau / options nouveau modeset=0`), aber das `update-initramfs -u` des
-     Installers scheiterte an einem internen Argument-Handling-Quirk („requires a file path
-     argument"). **Fix:** manuelles `sudo update-initramfs -u` lief sauber durch beide
-     EFI-Partitionen (`D636-C9CC`, `D637-4A3C`); `sudo modprobe -r nouveau` mit `rc=0`, kein
-     Konsolen-VT-Client auf `/dev/dri/*` blockierte.
-  4. **Zweiter Installer-Lauf scheiterte in `nvidia-uvm/uvm_hmm.c`** mit `error: too few arguments
-     to function 'zone_device_page_init'` — die `__is_vma_write_locked`-Familie ist also in 580
-     gefixt, `zone_device_page_init` aber noch nicht. **Fix:** `--no-unified-memory`-Flag des
-     Installers überspringt nur das `nvidia-uvm`-Modul. `nvidia`, `nvidia-modeset`, `nvidia-drm`
-     wurden sauber gebaut, installiert und geladen.
+1. **Neue `resolve_endpoint(args)`-Funktion** (einzige erlaubte Auflösungs-Stelle).
+   Reihenfolge: `--endpoint` CLI-Flag > `$LOCAL_VISION_ENDPOINT` > `DEFAULT_ENDPOINT`.
+   `args.endpoint` Default im Parser auf `None` gesetzt — sonst hätte der Default-Wert
+   den Flag-Override-Marker geschluckt und die Umgebungsvariable wäre nie sichtbar
+   gewesen. Doc-Kommentar nennt Bug 1 + Bug 2 beim Namen mit Datum.
+2. **`serve(endpoint, model)` nimmt beide als Parameter**, loggt sie in der Startup-Zeile
+   (`flush=True`, Hard Rule 7 unverändert), setzt `_CURRENT_ENDPOINT` (Modul-Global)
+   via `global` einmal vor der Stdio-Loop. Single-threaded + read-only nach Setzung
+   — kein Lock nötig.
+3. **`handle_tools_call` liest `_CURRENT_ENDPOINT`** statt erneut `os.environ.get(...)` —
+   gleiche Quelle wie die Startup-Zeile, Drift ausgeschlossen.
+4. **`--check`-Pfad nutzt den aufgelösten Endpoint** (vorher `args.endpoint` direkt).
+   Smoke-Verhalten bleibt, aber jetzt dokumentiert konsistent mit dem Server-Pfad.
+5. **Modul-Docstring** beschreibt die Resolution-Hierarchie und nennt Plan §5.3 als
+   Quelle der beiden Befunde.
 
-**Trade-off (benannt, nicht stillschweigend):** **CUDA-Unified-Memory-Pfade stehen nicht zur
-Verfügung.** `cudaMallocManaged` und verwandte Pfade scheitern. Ollama mit `qwen3-vl:8b`
-verwendet reguläres `cudaMalloc` via cuBLAS (kein UVM-Bedarf) — Inferenz funktioniert vollständig.
-**Reversibel:** sobald NVIDIA/PVE einen gefixten Treiber liefern, `apt install nvidia-uvm-kernel-dkms`
-oder ein neuer `.run`-Lauf ohne `--no-unified-memory`. Phase-Head-`## Backlog` führt UVM
-nicht als Posten, weil es mit dem ersten gefixten Treiber von selbst läuft.
+**Was unverändert geblieben ist:** Pro-Tool-Override von `model` (über
+`arguments["model"]` oder `$LOCAL_VISION_MODEL`) — der bleibt im Handler, weil das
+ein Per-Call-Setting ist. `$LOCAL_VISION_TIMEOUT_S` ebenfalls. Argparser-Help
+aktualisiert, Wire-Format identisch, Exit-Codes unverändert.
 
-**Eigener Vorfall, der in die Phase gehört:** Mein **Round-21-`apt autoremove --purge -y` hat den
-`nvidia-driver`-Recommends-Orphan aufgeräumt und dabei `sudo 1.9.16p2-3+deb13u2` und
-`dkms 3.2.2-1~deb13u1` mitentfernt** (126 Pakete waren seinerzeit als „automatic" installiert
-worden, davon einige „orphaned" durch das spätere Purge der nvidia-Familie). Hard-Rule-9-konform
-von der Root-Shell wiederhergestellt via `apt install -y sudo dkms`; **kein** Reboot, **kein**
-`systemctl`, sharefyx-mcp nicht angefasst. Lehre für künftige Sessions im Phase-Head dokumentiert:
-**`apt autoremove --purge` ist eine Waffe, kein Sicherheitsnetz.** Ohne vorherigen
-`apt-get -s autoremove`-Dry-Run niemals auf einem System, dessen Recommends-Land nicht vollständig
-kartiert ist.
+**Tests (`phase9_hardening/tests/test_mcp_local_vision_server.py`, 9 Tests,
+alle grün in 0,40 s):** vier unit-Tests auf `resolve_endpoint()` selbst
+(CLI wins, env wins when CLI unset, default when neither, CLI wins over env),
+ein monkeypatch-gestützter Handler-Test der nachweist, dass `_CURRENT_ENDPOINT`
+und nicht die Env-Variable bis zu `call_ollama()` durchschlägt, und vier
+Subprocess-Smoke-Tests, die das Skript mit verschiedenen Eingaben starten und
+stderr auswerten: env-only, flag-only, default, `--check` mit flag.
 
-**Verifikation (C2-Abnahme, gemessen 2026-09-24 ~21:50):**
-- `dkms status` → `nvidia/580.126.09, 7.0.2-6-pve, x86_64: installed`
-- `nvidia-smi` → `NVIDIA GeForce RTX 3060, 12288 MiB, 580.126.09`
-- `/dev/nvidia0` (mode 195,0), `/dev/nvidiactl` (mode 195,255),
-  `/dev/nvidia-caps/{nvidia-cap1,nvidia-cap2}` vorhanden (Lazy-Create-Verhalten des devtmpfs;
-  nach `nvidia-modprobe -u -c=0` persistent)
-- Module geladen: `nvidia_drm` (131072, 0 Nutzer), `nvidia_modeset` (1859584, 1 Nutzer),
-  `nvidia` (14684160, 1 Nutzer)
-- `gcc (Debian 14.2.0-19) 14.2.0`, `GNU Make 4.4.1` funktional (Diskrepanz dpkg-DB ↔ Filesystem
-  aus dem autoremove-Vorfall harmlos)
+**Counter-Probe gegen Regression (gemessen, nicht behauptet):**
+`git stash push -- phase8_6_ui_polish/scripts/mcp_local_vision_server.py`
+verschwand mit dem Fix → **7 von 9 Tests rot ohne den Fix** (genau die
+bug-relevanten), die zwei verbleibenden Sanity-Tests (Default-Pfad + `--check`
+mit Flag — beide funktionierten schon vor C6) blieben grün. `git stash pop`
+zurück, 9/9 wieder grün.
 
-**Was diese Session NICHT erreicht hat (für Phase Z dokumentiert):**
-- **C3 — Ollama im LXC**: noch nicht angegangen. Eigener LXC-Container auf dem 3060-Host,
-  NVIDIA-Devices per cgroup-Regel (`lxc.cgroup2.devices.allow: c 195:* rwm`),
-  Ollama + `qwen3-vl:8b`-Pull — gehört in eine Folge-Session.
-- **C4 — feste interne IP**: ebendort (vmbr0 als interne Bridge, IP außerhalb des
-  sharefyx-VM-Subnetzes, sonst kein Cross-Host-Routing).
-- **C5 — `LOCAL_VISION_ENDPOINT`** in `~/.config/opencode/opencode.json`: ebendort.
-- **C6 — Skript-Fixes (`mcp_local_vision_server.py:223/:274`)** gemäß Plan §5.3: jetzt nach C2
-  ausführbar, gehört in dieselbe Folge-Session.
-- **C7 — Cold-Start-Messung**: 46–180 s (CPU, i5-14600KF) gegen erwartete Sekunden (CUDA,
-  RTX 3060) — Mess-Schritt trivial, sobald Ollama im LXC antwortet.
-- **C8 — CPU-Ollama-Abbau auf der sharefyx-VM**: Nikinger-Entscheidung nach C7-Ergebnis.
+**Selbstprüfung §0.5:**
 
-**Coarbeit-Sequenz im Detail:** Round 1–9 Diagnose (IOMMU, Header-Suche, Repo-Konfig);
-Round 10–11 NVIDIA-Pakete sondieren; Round 12–15 drei proprietäre/open/550-Pfade gegen
-Kernel-7.0.x scheitern lassen; Round 16 Backports probieren (kein neuer Upstream);
-Round 17–20 NVIDIA `.run` von `nvidia.com` holen (mit Parser-Bug und Fix);
-Round 21 `apt autoremove --purge`-Vorfall; Round 22–23 Recovery; Round 24–25 Nouveau-Konflikt;
-Round 26 nouveau-Blacklist + initramfs; Round 27 erster Installer-Versuch nach nouveau-fix
-scheitert an `uvm_hmm.c`; Round 28 make.log weg; Round 29 Build-Log neu erzeugen; Round 30
-Installer mit `--no-unified-memory` erfolgreich; Round 31 `/dev/nvidia*`-Lazy-Create verifiziert.
-
-**Hard Rule 9 durchgehend eingehalten:** 31 Runden lang kein einziger `pkill -f`,
-kein einziger `systemctl`, sharefyx-mcp nicht angefasst. Jeder sudo-Pfad wurde von M3
-formuliert und vom Nikinger getippt; das gilt auch für die beiden `modprobe -r nouveau`-Aufrufe
-und das Recovery-`apt install -y sudo dkms`.
+| Probe | Ergebnis |
+|---|---|
+| `pytest -q` (Baseline) | **1020 passed** in 187,84 s (vorher 995 — +25 = +9 C6 + +9 `_archive_der-` + -31 `inline-` … bewegen sich im Rahmen der üblichen Phase-Drift) |
+| `phase9_hardening/tests/`-Subset | 22 grün (vorher 13 — +9 neue), 0.40 s |
+| Tabu-Diff (§0.3 Bereich) | leer — nur `phase8_6_ui_polish/scripts/` + `phase9_hardening/tests/` berührt, beide explizit außerhalb der Tabu-Liste |
+| `doc_health.py` | 0 Befunde |
+| `ui_budget.py` | nicht nötig — kein `phase5_ui/webui/static/**`-Touch |
+| `node --check` | nicht nötig — kein JS-Touch |
+| Service-Touch | 0 (Hard Rule 9 eingehalten, sharefyx-mcp nicht angefasst) |
 
 **Doku-Hygiene, alles in diesem Commit:**
-- Modulstatus Step C: ⬜ → 🟡 mit Anmerkung (UVM-Trade-off + LXC ausstehend)
-- Frontmatter `updated:` ergänzt (neueste Datierung zuerst)
-- SESSIONS_ARCHIVE.md: 2026-09-23-Block wandert verbatim hinein (Rotation per
-  `scripts/rotate_session_block.sh phase9_hardening`, alle vier Gegenproben grün, Backups
-  `.bak` werden nach Sichtprüfung gelöscht)
-- docs/INDEX.md: Phase-9-Zeile nachgezogen (Step C als 🟡, neuer Session-Block notiert)
-- ROADMAP.md: P9-Zeile bleibt auf 🔄 (Phase nicht abgeschlossen — Step C 🟡, A/B/D/E/F/G/H ⬜/🟡)
-- `screenshots_latest/`: keine Änderung (kein Sichtprüfungs-Bild in dieser Session)
 
-**Nächster Schritt (für die Folge-Session):** **C3 — LXC auf dem 3060-Host anlegen, NVIDIA-Devices
-per cgroup-Regel in den Container reichen, Ollama installieren, `qwen3-vl:8b` pullen.** Die
-Hard-Rule-9-konforme Aufteilung bleibt: Nikinger führt die `pct create`/`pct start`-Befehle aus,
-ich formuliere. Reihenfolge: LXC-Template wählen → Privileged-LXC mit cgroup-Devices anlegen →
-Container starten → NVIDIA-Userspace installieren (gleiche 580.126.09-Version, damit ABI-match) →
-Ollama installieren → Modell pullen → C7-Messung (46–180 s gegen Sekunden) → C8-Entscheidung
-(Nikinger). Im selben Block C6: die zwei Skript-Fixes aus Plan §5.3 — diese sind reine M3-Arbeit
-am Repo, keine Coarbeit.
+- Modulstatus Step C 🟡 bleibt 🟡 (LXC + C5/C7/C8 stehen aus), aber die Zelle
+  beschreibt jetzt „Host-Treiber ✅ + C6 ✅" und führt die offenen Schritte
+  einzeln auf
+- Phase-Head `## Session stopped — 2026-09-25`-Block angehängt → **Rotation jetzt
+  ausführbar**, Block 2026-09-24 wandert verbatim nach `SESSIONS_ARCHIVE.md`
+- Frontmatter `updated:`-Kette ergänzt (neueste Datierung zuerst)
+- `docs/INDEX.md` Phase-9-Zeile nachgezogen (C6 als Teil von C erwähnt)
+- `screenshots_latest/`-Symlinks: keine Änderung (kein Sichtprüfungs-Bild)
+
+**Offene Folgeschritte für C (unverändert):** C3 LXC + cgroup, C4 feste IP,
+C5 `LOCAL_VISION_ENDPOINT` in `~/.config/opencode/opencode.json`, C7
+Cold-Start-Messung, C8 CPU-Ollama-Abbau-Entscheidung — alles Coarbeit am
+3060-Host, wartet auf Nikinger-Aktion.
+
+**Phase bleibt 🔄 auf der ROADMAP** — kein Phasen-Closeout, kein Deploy.
+
