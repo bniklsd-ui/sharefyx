@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase9_hardening_plan.md    # voller Plan, Locks P9-A–P9-T, Steps 0–H
   - ../docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md  # Herkunft der P9-Punkte
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
-updated: 2026-09-25 (Step C Teil 2 / C6 — `mcp_local_vision_server.py` Skript-Fixes aus Plan §5.3: `serve()` loggt aufgelösten Endpoint, `--endpoint` wirkt jetzt auch ohne `--check`; neue zentrale `resolve_endpoint(args)` mit Präzedenz `--endpoint` > `$LOCAL_VISION_ENDPOINT` > `DEFAULT_ENDPOINT`; `_CURRENT_ENDPOINT` als Modul-Globals wird in `serve()` einmal gesetzt und von `handle_tools_call` gelesen statt erneut die Umgebungsvariable; 9 neue Tests + Counter-Probe ohne den Fix 7/9 rot — exakt die zwei gemeldeten Bugs; LXC + Ollama + C5/C7/C8 stehen aus) | 2026-09-24 (Step C Teil 1 — NVIDIA-Host-Treiber 580.126.09 installiert mit `--no-unified-memory`; pve-no-subscription-Repo ergänzt; drei dokumentierte Fehlbarkeiten auf dem Weg (Header-Paket fehlte, Backports führten denselben Upstream, Nouveau-Konflikt, uvm_hmm.c gegen 7.0.2-6-pve-Mai-Patch); eigener autoremove-Vorfall mit sudo/dkms-Verlust am 2026-09-24 wieder behoben; LXC + Ollama stehen aus) | 2026-09-24 (Backlog: ~19-min mcp-proxy.anthropic.com-Ausfall dokumentiert und geschlossen — gemessen nicht CGNAT/sharefyx-VM-seitig, Nikinger-Anordnung) | 2026-09-24 (Backlog: "opencode via Tailscale"-Behandlung für sharefyx-/Trading-Bot-VM nachgetragen, Nikinger-Feedback aus Netzwerk-Diagnosesession, kein Produktcode-Touch) | 2026-09-23 (D1/ESC-Bug auf Nikinger-Anordnung zurückgestellt, `## Backlog` neu) | 2026-09-23 (Step D code-complete — Drop-Ziel Space-Wurzel, ESC/Vollbild-Guard gebaut, gebaut in Claude Code statt opencode/M3, benannte Abweichung von P9-Q) | 2026-09-20 (Step 0 abgeschlossen — Phasenverzeichnis, INDEX-Rotationsskript, vier geplante plus drei ungeplante Doku-Defekte repariert, `doc_health.py` als Test festgenagelt, Baseline gemessen)
+updated: 2026-09-25 (Backlog aufgeräumt: „opencode via Tailscale" für sharefyx-VM per Nikinger-Update mittlerweile passiert, Eintrag aus der Backlog-Sektion entfernt; nur noch D1 zurückgestellt) | 2026-09-25 (Step C Teil 2 / C6 — `mcp_local_vision_server.py` Skript-Fixes aus Plan §5.3: `serve()` loggt aufgelösten Endpoint, `--endpoint` wirkt jetzt auch ohne `--check`; neue zentrale `resolve_endpoint(args)` mit Präzedenz `--endpoint` > `$LOCAL_VISION_ENDPOINT` > `DEFAULT_ENDPOINT`; `_CURRENT_ENDPOINT` als Modul-Globals wird in `serve()` einmal gesetzt und von `handle_tools_call` gelesen statt erneut die Umgebungsvariable; 9 neue Tests + Counter-Probe ohne den Fix 7/9 rot — exakt die zwei gemeldeten Bugs; LXC + Ollama + C5/C7/C8 stehen aus) | 2026-09-24 (Step C Teil 1 — NVIDIA-Host-Treiber 580.126.09 installiert mit `--no-unified-memory`; pve-no-subscription-Repo ergänzt; drei dokumentierte Fehlbarkeiten auf dem Weg (Header-Paket fehlte, Backports führten denselben Upstream, Nouveau-Konflikt, uvm_hmm.c gegen 7.0.2-6-pve-Mai-Patch); eigener autoremove-Vorfall mit sudo/dkms-Verlust am 2026-09-24 wieder behoben; LXC + Ollama stehen aus) | 2026-09-24 (Backlog: ~19-min mcp-proxy.anthropic.com-Ausfall dokumentiert und geschlossen — gemessen nicht CGNAT/sharefyx-VM-seitig, Nikinger-Anordnung) | 2026-09-24 (Backlog: "opencode via Tailscale"-Behandlung für sharefyx-/Trading-Bot-VM nachgetragen, Nikinger-Feedback aus Netzwerk-Diagnosesession, kein Produktcode-Touch) | 2026-09-23 (D1/ESC-Bug auf Nikinger-Anordnung zurückgestellt, `## Backlog` neu) | 2026-09-23 (Step D code-complete — Drop-Ziel Space-Wurzel, ESC/Vollbild-Guard gebaut, gebaut in Claude Code statt opencode/M3, benannte Abweichung von P9-Q) | 2026-09-20 (Step 0 abgeschlossen — Phasenverzeichnis, INDEX-Rotationsskript, vier geplante plus drei ungeplante Doku-Defekte repariert, `doc_health.py` als Test festgenagelt, Baseline gemessen)
 ---
 
 # Phase 9 — Härtung
@@ -40,20 +40,6 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückstellen, angehen, sobald genug Zeit da ist — kein aktiver Blocker für den Rest von P9.
   Ansatzpunkte für den nächsten Anlauf stehen im Session-Block 2026-09-23 unten (gegen echtes
   Safari messen, keine Heuristik raten).
-- **sharefyx-VM soll die "opencode via Tailscale"-Behandlung der traktion-VM bekommen**
-  (Nikinger-Feedback 2026-09-24, während einer reinen Netzwerk-Diagnosesession — kein
-  Produktcode-Touch). Beobachtung: sharefyx-VM ist "pretty laggy and often not accessible";
-  `traktion-vmware-virtual-platform` (Tailnet-Peer `100.89.157.61`) hat bereits ein Setup, das
-  sharefyx-VM und die separate Trading-Bot-VM noch nicht haben. Genaue Form unbekannt — liegt
-  vermutlich außerhalb dieses Repos (Trading-Bot-Repo oder Nikinger-eigene Infra-Notizen), **nicht
-  raten, vor dem Bau beim Nikinger nachfragen**. Vermutlich relevant für Step A (VPS/Domain) und
-  Step B (`tailscaled-watchdog.service`) — ein flakiger Tailscale-Pfad würde genau die Art
-  Control-Plane-Hänger erklären, die der Watchdog fangen soll, aber das ist Vermutung, keine
-  bestätigte Ursache. Volle Notiz: `[[project_sharefyx_vm_infra_lag]]` im Claude-Memory.
-  IP-Nebenbefund derselben Session: `ens18` bezieht `.175` korrekt per DHCP — das ist die
-  gewünschte Adresse (Tippfehler in einer früheren Nikinger-Nachricht sprach von `.125`), eine
-  statische Pinnung wurde bewusst **nicht** vorgenommen (Nikinger: kostet ihm die Internet-
-  verbindung, wenn er es selbst versucht).
 - **Derselbe Vormittag, separater Vorfall, jetzt geschlossen: `mcp-proxy.anthropic.com`
   (Anthropics eigenes Connector-Relay für claude.ai) lieferte ~19 Minuten lang durchgehend
   Cloudflare-502 auf jeden `Sharefyx`-Connector-Call** (`list_spaces`, viermal probiert,
@@ -155,4 +141,22 @@ Cold-Start-Messung, C8 CPU-Ollama-Abbau-Entscheidung — alles Coarbeit am
 3060-Host, wartet auf Nikinger-Aktion.
 
 **Phase bleibt 🔄 auf der ROADMAP** — kein Phasen-Closeout, kein Deploy.
+
+### Session-Ende — 2026-09-25
+
+**Backlog aufgeräumt.** Der einzige noch offene Posten außer D1 war
+„sharefyx-VM soll die 'opencode via Tailscale'-Behandlung der traktion-VM
+bekommen" (Nikinger-Feedback 2026-09-24). **Per Nikinger-Update 2026-09-25
+ist das mittlerweile passiert** — die sharefyx-VM hat das Setup jetzt auch,
+kein offener Bedarf mehr. Eintrag aus der `## Backlog`-Sektion entfernt,
+kein Code-Touch, kein neues Commit-Subject. Verbleibender Backlog:
+**D1 (ESC/Fullscreen)** als einziger zurückgestellter Posten, kein Blocker.
+
+**Nächster Schritt (für die Folge-Session):** **Step C Teil 2 / C3 — LXC
+auf dem 3060-Host anlegen** (Coarbeit, M3 formuliert, Nikinger führt `pct
+create`/`pct start` aus, Hard Rule 9). Reihenfolge aus dem C6-Session-
+Block oben unverändert: LXC-Template → Privileged-LXC mit
+`lxc.cgroup2.devices.allow: c 195:* rwm` → NVIDIA-Userspace 580.126.09
+(ABI-match zum Host) → Ollama installieren → `qwen3-vl:8b` pullen →
+C7-Messung → C8-Entscheidung.
 
