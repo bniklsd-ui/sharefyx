@@ -5,7 +5,7 @@ read-when: Chronik einer älteren P9-Session gesucht — nicht beim normalen Arb
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
+updated: 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
 ---
 
 # Phase 9 — Sessions Archive
@@ -15,6 +15,96 @@ trägt immer genau einen `## Session stopped`-Block, ältere Blöcke wandern ver
 Vorsatz: nichts abtippen, alles per Skript mit vier Gegenproben (Schnitt verlustfrei, neuer
 Head trägt genau einen Block, alle bewegten Blöcke im Archiv byte-identisch, Archivbestand
 unangetastet).
+
+## Session stopped — 2026-09-25 (3)
+
+**Step C: die GPU-Inferenz übersteht einen Host-Reboot ✅ — nach einem zweiten Fix, den die erste
+Reboot-Probe erzwungen hat; die zweite Reboot-Probe hat ihn bestätigt.** Coarbeit Claude Code ↔ Nikinger (dieselbe benannte
+P9-Q-Abweichung wie Block (2), archiviert): jeder Host-Befehl vom Nikinger als root auf `pve`
+ausgeführt, jede Ausgabe gelesen. Kein Repo-Code-Touch, kein `systemctl` aus dieser Session.
+
+**Die Reboot-Probe ist zuerst gescheitert, und genau dafür war sie da.** Nach `pct set 111
+--onboot 1` + Reboot: `nvidia-uvm-nodes.service` active, `nvidia_uvm` geladen, beide Knoten da,
+CT 111 `running` (onboot greift) — aber **`235 nvidia-uvm`** statt 511, und im CT **`cuInit =
+999`**. Die uvm-Major ist dynamisch und hängt an der Ladereihenfolge: 511 beim Hand-`modprobe` im
+laufenden System, 235 beim Laden über `modules-load.d` beim Boot. `lxc.cgroup2.devices.allow: c
+511:* rwm` ließ den Container den Knoten sehen, aber nicht öffnen.
+
+**Fix: Proxmox-Device-Passthrough (`devN`) statt einer festgeschriebenen Major.** Verworfen wurde
+511→235 umschreiben: hält nur, bis sich die Ladereihenfolge ändert (Kernel-/Treiber-Update), und
+das Symptom ist dann wieder der stille CPU-Fallback, der eine ganze Session gekostet hat. `devN`
+liest Major/Minor beim CT-Start vom Host-Knoten und setzt die cgroup-Regel selbst.
+**V166 beantwortet ✅** (`devN` für LXC braucht PVE ≥ 8.1): `pve-manager/9.2.2`.
+
+| Runde | Befehl (Kern) | Ergebnis |
+|---|---|---|
+| 4a | `pct stop 111`, Backup `/root/111.conf.bak-p9c`, `grep -v` nach Zeileninhalt → `/root/111.conf.new`, `diff` | genau die drei Zeilen 19–21 weg (`c 511:*` + zwei uvm-`mount.entry`), sonst nichts |
+| 4b | `cat /root/111.conf.new > /etc/pve/lxc/111.conf` (kein Rename auf pmxcfs), `pct set 111 --dev0 /dev/nvidia-uvm,mode=0666 --dev1 /dev/nvidia-uvm-tools,mode=0666`, `pct start 111` | `dev0`/`dev1` in Zeile 5/6, im CT `crw-rw-rw- 235,0/235,1`, **`cuInit = 0`** |
+
+`mode=0666` explizit, weil der alte Bind-Mount die Host-Rechte `crw-rw-rw-` mitbrachte und der
+`devN`-Default nicht gemessen ist — ein root-only-Knoten hätte bei Ollama als Nicht-root-Nutzer
+dasselbe Symptom erzeugt wie der Major-Fehler.
+
+**Messung von der sharefyx-VM aus, nach dem `devN`-Fix (CT-Neustart, kein Host-Reboot):** `vision_ollama.py --endpoint
+http://192.168.68.140:11434` gegen `c4_p8519_01_radiogruppe_im_dialog.png` → „Der markierte
+Radio-Button im Dialog ist „als Text-Link im Text"." (**gleiche Aussage**, P9-26) in **19,9 s**
+Wand (Modell kalt nach CT-Neustart); `/api/ps`: `size_vram` = `size` = 5.793.780.858 B.
+
+**Stand CT 111 (`gpu-vision`) nach dieser Session, für einen kalten Leser:**
+Host 580.173.02 (offene Module, DKMS gegen `7.0.2-6-pve`) · `/etc/modules-load.d/nvidia.conf`
+(`nvidia`, `nvidia-uvm`) · `nvidia-uvm-nodes.service` (Oneshot `nvidia-modprobe -c=0 -u`,
+`Before=pve-guests.service`) · `111.conf`: `onboot: 1`, cgroup-Allow `c 195:*` + Bind-Mounts
+`nvidia0`/`nvidiactl`/`nvidia-caps` (Major 195 ist fest), **uvm über `dev0`/`dev1`** · CT-Userspace
+580.173.02 `--no-kernel-module` · Ollama 0.34.4 auf `0.0.0.0:11434`, `qwen3-vl:8b`.
+
+**C5 ✅:** `~/.config/opencode/opencode.jsonc` → `mcp.local_vision.environment.LOCAL_VISION_ENDPOINT
+= http://192.168.68.140:11434` (nicht im Repo, P9-Plan §5.4). `mcp_local_vision_server.py
+--check` mit diesem Wert: *„Ollama reachable, 1 model(s) installed
+(endpoint=http://192.168.68.140:11434)"*. Dass opencode die `environment`-Map an den Prozess
+durchreicht, zeigt erst die Startzeile beim nächsten opencode-Start (`opencode` ist aus der
+Claude-Code-Shell nicht im `PATH`) — dort `endpoint=http://192.168.68.140:…` erwarten.
+
+**Offen, Reihenfolge:**
+**Zweite Reboot-Probe ✅ (Nikinger, 2026-09-25):** `nvidia-uvm-nodes.service` active ·
+`235 nvidia-uvm` · CT 111 `running` · `dev0`/`dev1` in der Config · im CT `crw-rw-rw- 235,0/235,1`
+mit Zeitstempel **20:54** (nach dem Reboot, gegenüber 20:42 aus Runde 4b — belegt, dass die Knoten
+aus diesem Boot stammen, nicht aus der Vorsitzung) · **`cuInit = 0`**. Nötig war sie, weil `devN`
+anders als der alte Bind-Mount (`optional,create=file`) bei fehlendem `/dev/nvidia-uvm` den CT-Start
+verhindern kann; `Before=pve-guests.service` hat die Reihenfolge gehalten. Danach von der sharefyx-VM:
+Vision-Lauf 19,7 s Wand, „Der Radio-Button „als Text-Link im Text" ist im Dialog markiert." (P9-26
+gleich), `size_vram` = `size` = 5.793.780.858 B.
+
+1. ~~**C4**~~ **✅ (Nikinger, 2026-09-25):** Static Lease im RUT X50 angelegt. **Ausgelesen nicht von
+   Claude, sondern über den Vision-Dienst selbst** (Nikinger-Vorgabe: „nicht selbst ansehen"):
+   `mcp_local_vision_server.py` per stdio-JSON-RPC (`initialize` → `tools/call local_vision`), Env
+   nur `LOCAL_VISION_ENDPOINT` aus `opencode.jsonc` — derselbe Pfad, den opencode startet.
+   Startzeile `endpoint=http://192.168.68.140:11434` (C6-Fix sichtbar), 50,8 s Wand für eine lange
+   Volltranskription. Gelesen: Tab IPv4, Abschnitt „Static lease", **eine** Zeile `BC:24:11:FB:EA:CD
+   (gpu-vision.lan)` → `192.168.68.140`, Hostname `gpu-vision.lan` — MAC und IP stimmen exakt mit
+   `pct config 111` / C5 überein. Grenze: ein Screenshot zeigt nicht, ob „Save & Apply" gedrückt
+   wurde, und die Reservierung entspricht dem laufenden Lease, ändert also nichts Messbares — der
+   Nachweis ist die Nikinger-Aussage plus der nächste Lease-Wechsel. **Lief auf der GPU ✅:** `/api/ps`
+   um 23:05 CEST zeigt `size_vram` = `size` = 5.793.780.858 B, `expires_at` 21:08:32Z = genau 5 min
+   `keep_alive` nach diesem Aufruf (23:03:32 CEST) — kein anderer Lauf dazwischen. Ursprüngliche Begründung: C5
+   schreibt `.140` fest, die Adresse war bis dahin nur ein DHCP-Lease. `net0` ist `ip=dhcp`, MAC `BC:24:11:FB:EA:CD`, Gateway `192.168.68.1`; auch die
+   sharefyx-VM selbst hängt per DHCP im LAN. Empfehlung: **DHCP-Reservierung im RUT X50** (MAC →
+   `.140`) statt statischer IP in `pct config` — eine statische `.140` im DHCP-Pool des Routers
+   kann der Router einem anderen Gerät geben, die Reservierung hält die Adresse an der einen
+   Stelle, die das LAN ohnehin verwaltet.
+2. **C8 (Claude-Code-Entscheidung, Nikinger-Auftrag):** CPU-Ollama auf der sharefyx-VM
+   **stilllegen, noch nicht löschen** — `sudo systemctl disable --now ollama` (Nikinger).
+   Grund: ohne gesetzten Endpoint fällt das Skript still auf `127.0.0.1` zurück, ein 180-s-CPU-
+   Lauf sieht dann aus wie ein funktionierender Dienst — dieselbe Fehlerklasse, die das fehlende
+   `nvidia-uvm` verdeckt hat. Gestoppt heißt: Fehlkonfiguration = sofort `connection refused`.
+   Binary + Modell (6,14 GB, Platte 14 GB frei) bleiben als kalter Fallback bis Step Z, dort
+   `ollama rm qwen3-vl:8b` + Deinstallation.
+3. **Aufräumen Host** (erst `ls`, PVE 9 hat evtl. tmpfs-`/tmp`): `/tmp/nv580173`, alter
+   580.126.09-Installer, `/root/111.conf.new`, `/root/111.conf.bak-p9c` (zweite Reboot-Probe grün, Rollback nicht mehr
+   nötig).
+4. **P9-22** (von außen nicht erreichbar) weiterhin ohne ausdrücklichen Test.
+5. **Benannt, nicht behoben: `docs/INDEX.md` steht bei 39.391 B** gegen das Kriterium ≤ 38 KB
+   (V145: < 38.912 B) — schon vor dieser Session drüber, dieser Commit hat es um ~0,3 KB
+   vergrößert. `doc_health.py` prüft die Größe nicht; eine Lücke im Step-0-Test, kein Freispruch.
 
 ## Session stopped — 2026-09-25 (2)
 
