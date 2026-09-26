@@ -1,0 +1,22 @@
+[Unit]
+Description=Tailscaled Watchdog — restartet tailscaled, wenn die Control-Plane klemmt
+Documentation=file://__REPO_ROOT__/phase3_edge/CLAUDE.md
+After=network-online.target tailscaled.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=savefyx
+Group=savefyx
+ExecStart=__REPO_ROOT__/phase3_edge/scripts/tailscaled_watchdog.sh
+RuntimeDirectory=tailscaled-watchdog
+RuntimeDirectoryMode=0700
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+MemoryDenyWriteExecute=true
+SystemCallFilter=@system-service

@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase9_hardening_plan.md    # voller Plan, Locks P9-A–P9-T, Steps 0–H
   - ../docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md  # Herkunft der P9-Punkte
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
-updated: 2026-09-26 (Step C abgeschlossen: C8 `sudo systemctl disable --now ollama` Nikinger-Cobefehl, sharefyx-VM `inactive`/`disabled`, `curl 127.0.0.1:11434` → HTTP 000 exit 7 `Connection refused` (bestätigt aus dieser Shell als zweite Sichtprobe), binary + Modell bleiben als kalter Fallback bis Step Z; Host-Aufräumen pve: `/root/111.conf.new` (633 B, 2026-09-25 22:41) und `/root/111.conf.bak-p9c` (842 B, 2026-09-25 22:41) per `rm -f` entfernt, `/tmp/nv580173` und alter `NVIDIA-Linux-x86_64-580.126.09.run` waren bereits weg — PVE-9-tmpfs bzw. im Vorrundezweig schon entfernt; P9-22 deferred — kein externer Test möglich, architektonischer Beweis captured: 192.168.68.140 ist RFC1918, sharefyx-VM hat keine öffentliche IP (CGNAT via RUT X50, default route via 192.168.68.1), Tailscale-Funnel mappt nur `127.0.0.1:8765` (kein `*:11434` auf sharefyx-VM), kein Port-Forward auf RUT X50, der einzige 11434-Listener ist innerhalb CT 111; Step C 🟡→✅, Modulstatus nachgezogen, Session-Block 2026-09-26 angehängt) | 2026-09-25 (C4 ✅ DHCP-Reservierung im RUT X50, per `local_vision`-MCP-Aufruf gegen die GPU ausgelesen — erster echter Einsatz über den opencode-Pfad) | 2026-09-25 (zweite Reboot-Probe grün: CT-Knoten 20:54 > 20:42, Major 235 = `/proc/devices`, `cuInit = 0`, `size_vram` = `size` — Boot-Persistenz ✅) | 2026-09-25 (Reboot-Probe: uvm-Major 511→235, `cuInit = 999`; Fix per `devN`-Passthrough, per CT-Neustart bewiesen `cuInit = 0`, zweite Reboot-Probe offen, `size_vram` = `size`; C5 gesetzt; V166 beantwortet) | 2026-09-25 (Boot-Persistenz eingerichtet, CT 111 `onboot: 0` gefunden, Reboot-Probe offen) | 2026-09-25 (GPU-Inferenz läuft: CT 111 auf 580.173.02, `size_vram` = `size`, 63 tok/s, P9-21/-23/-26 ✅; Boot-Persistenz offen) | 2026-09-25 (Host-Treiber 580.173.02 mit `nvidia-uvm` installiert und geladen, kein Reboot) | 2026-09-25 (V165 beantwortet: 580.173.02 kennt die neue `zone_device_page_init`-Signatur) | 2026-09-25 (Step C Diagnose bestätigt: kein `/dev/nvidia-uvm`, `cuInit = 999`) | 2026-09-25 (Step C Diagnose, Claude Code: CUDA fehlt, weil `nvidia-uvm` fehlt — C2-Trade-off-Satz datiert korrigiert, Modulstatus C nachgezogen, Nikinger-Entscheidung zum Host-Fix offen) | 2026-09-25 (Backlog aufgeräumt: „opencode via Tailscale" für sharefyx-VM per Nikinger-Update mittlerweile passiert, Eintrag aus der Backlog-Sektion entfernt; nur noch D1 zurückgestellt) | 2026-09-25 (Step C Teil 2 / C6 — `mcp_local_vision_server.py` Skript-Fixes aus Plan §5.3: `serve()` loggt aufgelösten Endpoint, `--endpoint` wirkt jetzt auch ohne `--check`; neue zentrale `resolve_endpoint(args)` mit Präzedenz `--endpoint` > `$LOCAL_VISION_ENDPOINT` > `DEFAULT_ENDPOINT`; `_CURRENT_ENDPOINT` als Modul-Globals wird in `serve()` einmal gesetzt und von `handle_tools_call` gelesen statt erneut die Umgebungsvariable; 9 neue Tests + Counter-Probe ohne den Fix 7/9 rot — exakt die zwei gemeldeten Bugs; LXC + Ollama + C5/C7/C8 stehen aus) | 2026-09-24 (Step C Teil 1 — NVIDIA-Host-Treiber 580.126.09 installiert mit `--no-unified-memory`; pve-no-subscription-Repo ergänzt; drei dokumentierte Fehlbarkeiten auf dem Weg (Header-Paket fehlte, Backports führten denselben Upstream, Nouveau-Konflikt, uvm_hmm.c gegen 7.0.2-6-pve-Mai-Patch); eigener autoremove-Vorfall mit sudo/dkms-Verlust am 2026-09-24 wieder behoben; LXC + Ollama stehen aus) | 2026-09-24 (Backlog: ~19-min mcp-proxy.anthropic.com-Ausfall dokumentiert und geschlossen — gemessen nicht CGNAT/sharefyx-VM-seitig, Nikinger-Anordnung) | 2026-09-24 (Backlog: "opencode via Tailscale"-Behandlung für sharefyx-/Trading-Bot-VM nachgetragen, Nikinger-Feedback aus Netzwerk-Diagnosesession, kein Produktcode-Touch) | 2026-09-23 (D1/ESC-Bug auf Nikinger-Anordnung zurückgestellt, `## Backlog` neu) | 2026-09-23 (Step D code-complete — Drop-Ziel Space-Wurzel, ESC/Vollbild-Guard gebaut, gebaut in Claude Code statt opencode/M3, benannte Abweichung von P9-Q) | 2026-09-20 (Step 0 abgeschlossen — Phasenverzeichnis, INDEX-Rotationsskript, vier geplante plus drei ungeplante Doku-Defekte repariert, `doc_health.py` als Test festgenagelt, Baseline gemessen)
+updated: 2026-09-26 (Step B code-complete, install ausstehend: vier neue Dateien — `phase3_edge/scripts/tailscaled_watchdog.sh` + `phase3_edge/systemd/tailscaled-watchdog.{service,timer}` + `phase9_hardening/tests/test_tailscaled_watchdog.py` (5/5 grün); V152 beantwortet (kein Tailscale-eigenes Feature ohne kommerzielles Add-on), V153 als Empfehlung dokumentiert (Polkit `.rules`-Datei `/etc/polkit-1/rules.d/99-tailscaled-watchdog-restart.rules`, Sudoers-Fallback `/etc/sudoers.d/tailscaled-watchdog-restart`); Modulstatus Step B ⬜→🟡, Phase-9-###-Sub-Sektion ergänzt; Phase-9-Zeile in `docs/INDEX.md` nachgezogen; kein Touch an bestehendem Code, Hard Rule 8 (Doc-Update im selben Commit) und Hard Rule 9 (kein `systemctl` durch M3) eingehalten) | 2026-09-26 (Step C abgeschlossen: C8 `sudo systemctl disable --now ollama` Nikinger-Cobefehl, sharefyx-VM `inactive`/`disabled`, `curl 127.0.0.1:11434` → HTTP 000 exit 7 `Connection refused` (bestätigt aus dieser Shell als zweite Sichtprobe), binary + Modell bleiben als kalter Fallback bis Step Z; Host-Aufräumen pve: `/root/111.conf.new` (633 B, 2026-09-25 22:41) und `/root/111.conf.bak-p9c` (842 B, 2026-09-25 22:41) per `rm -f` entfernt, `/tmp/nv580173` und alter `NVIDIA-Linux-x86_64-580.126.09.run` waren bereits weg — PVE-9-tmpfs bzw. im Vorrundezweig schon entfernt; P9-22 deferred — kein externer Test möglich, architektonischer Beweis captured: 192.168.68.140 ist RFC1918, sharefyx-VM hat keine öffentliche IP (CGNAT via RUT X50, default route via 192.168.68.1), Tailscale-Funnel mappt nur `127.0.0.1:8765` (kein `*:11434` auf sharefyx-VM), kein Port-Forward auf RUT X50, der einzige 11434-Listener ist innerhalb CT 111; Step C 🟡→✅, Modulstatus nachgezogen, Session-Block 2026-09-26 angehängt) | 2026-09-25 (C4 ✅ DHCP-Reservierung im RUT X50, per `local_vision`-MCP-Aufruf gegen die GPU ausgelesen — erster echter Einsatz über den opencode-Pfad) | 2026-09-25 (zweite Reboot-Probe grün: CT-Knoten 20:54 > 20:42, Major 235 = `/proc/devices`, `cuInit = 0`, `size_vram` = `size` — Boot-Persistenz ✅) | 2026-09-25 (Reboot-Probe: uvm-Major 511→235, `cuInit = 999`; Fix per `devN`-Passthrough, per CT-Neustart bewiesen `cuInit = 0`, zweite Reboot-Probe offen, `size_vram` = `size`; C5 gesetzt; V166 beantwortet) | 2026-09-25 (Boot-Persistenz eingerichtet, CT 111 `onboot: 0` gefunden, Reboot-Probe offen) | 2026-09-25 (GPU-Inferenz läuft: CT 111 auf 580.173.02, `size_vram` = `size`, 63 tok/s, P9-21/-23/-26 ✅; Boot-Persistenz offen) | 2026-09-25 (Host-Treiber 580.173.02 mit `nvidia-uvm` installiert und geladen, kein Reboot) | 2026-09-25 (V165 beantwortet: 580.173.02 kennt die neue `zone_device_page_init`-Signatur) | 2026-09-25 (Step C Diagnose bestätigt: kein `/dev/nvidia-uvm`, `cuInit = 999`) | 2026-09-25 (Step C Diagnose, Claude Code: CUDA fehlt, weil `nvidia-uvm` fehlt — C2-Trade-off-Satz datiert korrigiert, Modulstatus C nachgezogen, Nikinger-Entscheidung zum Host-Fix offen) | 2026-09-25 (Backlog aufgeräumt: „opencode via Tailscale" für sharefyx-VM per Nikinger-Update mittlerweile passiert, Eintrag aus der Backlog-Sektion entfernt; nur noch D1 zurückgestellt) | 2026-09-25 (Step C Teil 2 / C6 — `mcp_local_vision_server.py` Skript-Fixes aus Plan §5.3: `serve()` loggt aufgelösten Endpoint, `--endpoint` wirkt jetzt auch ohne `--check`; neue zentrale `resolve_endpoint(args)` mit Präzedenz `--endpoint` > `$LOCAL_VISION_ENDPOINT` > `DEFAULT_ENDPOINT`; `_CURRENT_ENDPOINT` als Modul-Globals wird in `serve()` einmal gesetzt und von `handle_tools_call` gelesen statt erneut die Umgebungsvariable; 9 neue Tests + Counter-Probe ohne den Fix 7/9 rot — exakt die zwei gemeldeten Bugs; LXC + Ollama + C5/C7/C8 stehen aus) | 2026-09-24 (Step C Teil 1 — NVIDIA-Host-Treiber 580.126.09 installiert mit `--no-unified-memory`; pve-no-subscription-Repo ergänzt; drei dokumentierte Fehlbarkeiten auf dem Weg (Header-Paket fehlte, Backports führten denselben Upstream, Nouveau-Konflikt, uvm_hmm.c gegen 7.0.2-6-pve-Mai-Patch); eigener autoremove-Vorfall mit sudo/dkms-Verlust am 2026-09-24 wieder behoben; LXC + Ollama stehen aus) | 2026-09-24 (Backlog: ~19-min mcp-proxy.anthropic.com-Ausfall dokumentiert und geschlossen — gemessen nicht CGNAT/sharefyx-VM-seitig, Nikinger-Anordnung) | 2026-09-24 (Backlog: "opencode via Tailscale"-Behandlung für sharefyx-/Trading-Bot-VM nachgetragen, Nikinger-Feedback aus Netzwerk-Diagnosesession, kein Produktcode-Touch) | 2026-09-23 (D1/ESC-Bug auf Nikinger-Anordnung zurückgestellt, `## Backlog` neu) | 2026-09-23 (Step D code-complete — Drop-Ziel Space-Wurzel, ESC/Vollbild-Guard gebaut, gebaut in Claude Code statt opencode/M3, benannte Abweichung von P9-Q) | 2026-09-20 (Step 0 abgeschlossen — Phasenverzeichnis, INDEX-Rotationsskript, vier geplante plus drei ungeplante Doku-Defekte repariert, `doc_health.py` als Test festgenagelt, Baseline gemessen)
 ---
 
 # Phase 9 — Härtung
@@ -22,7 +22,7 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 |---|---|---|
 | 0 | Verifikations-Durchlauf, Doku-Fundament (Phasenverzeichnis, INDEX-Rotation, vier Defekte, `doc_health.py`, Baseline) | ✅ |
 | A | Echte Domain über eigenen VPS | ⬜ |
-| B | `tailscaled-watchdog.service` | ⬜ |
+| B | `tailscaled-watchdog.service` | 🟡 **Code-complete (M3-Anteil 2026-09-26)**, install ausstehend — Repo-Anteil: `phase3_edge/scripts/tailscaled_watchdog.sh` + `phase3_edge/systemd/tailscaled-watchdog.{service,timer}` + `phase9_hardening/tests/test_tailscaled_watchdog.py` (5/5 grün, drei Stufen + Rate-Limit, identische Härtungs-Direktiven wie `sharefyx-mcp.service`); Polkit/Sudoers-Pfad (V153) + `systemctl enable --now tailscaled-watchdog.timer` + Intended-Offline-Probe (P9-19) sind Nikinger-Schritte · V152 beantwortet (kein Tailscale-eigenes Feature ohne kommerzielles Add-on, `pragmaxim/tailscale-watchdog` macht denselben Job) |
 | C | Vision-Dienst auf der RTX 3060 | ✅ **Step C abgeschlossen** (Session-Block 2026-09-26): GPU-Inferenz reboot-fest (Host + CT 111 auf 580.173.02 inkl. `nvidia-uvm`, uvm per `devN`-Passthrough, zweite Reboot-Probe grün) + C8 (`ollama` auf sharefyx-VM `inactive`/`disabled`, `curl 127.0.0.1:11434` → `Connection refused`, binary + Modell bleiben als kalter Fallback bis Step Z) + Host-Aufräumen pve (zwei `/root/111.conf.{new,bak-p9c}` per `rm -f` weg; `/tmp/nv580173` und alter `NVIDIA-Linux-x86_64-580.126.09.run` bereits weg — PVE-9-tmpfs bzw. im Vorrundezweig entfernt) · P9-21 ✅ · P9-23 ✅ · P9-26 ✅ · C4 ✅ · C5 ✅ · C6 ✅ · **P9-22 deferred** (Nikinger-Entscheidung 2026-09-26, kein externer Test möglich) — architektonischer Beweis statt externem Test: 192.168.68.140 ist RFC1918, sharefyx-VM hat keine öffentliche IP (CGNAT via RUT X50), Tailscale-Funnel mappt nur `127.0.0.1:8765` (kein `*:11434` auf sharefyx-VM), kein Port-Forward auf RUT X50, einziger 11434-Listener sitzt innerhalb CT 111; Revisit-Step **Step Z oder P10-Backlog** |
 | D | Zwei gemeldete Bugs (ESC/Vollbild, Drop-Ziel Space-Wurzel) | 🟡 D2 fertig; D1 (ESC/Vollbild) **bewusst zurückgestellt** — Nikinger-Entscheidung 2026-09-23, kein aktiver Blocker mehr, siehe Backlog unten |
 | E | Karte: Reload-Overload, V118 | ⬜ |
@@ -210,11 +210,65 @@ Item** (Nikinger-Entscheidung 2026-09-23, zurückgestellt, kein aktiver Blocker)
 vorübergehender Ausfall bei Anthropic, nicht auf CGNAT/Mobilfunk-Setup oder sharefyx-VM
 zurückzuführen" abgelegt — kein neuer Vorfall in dieser Session.
 
+### Step B — `tailscaled-watchdog` Code (M3-Anteil, install ausstehend)
+
+Diese Session hat mit `B` begonnen (Coarbeit §0.5.1: M3 schreibt Repo-Anteil, Nikinger
+installiert + verifiziert). Vier neue Dateien, **kein Touch an bestehendem Code**:
+
+| Datei | Zweck |
+|---|---|
+| `phase3_edge/scripts/tailscaled_watchdog.sh` (~120 Z., +x) | Drei-Stufen-Prüfung + Rate-Limit, ENV-überschreibbar für Tests |
+| `phase3_edge/systemd/tailscaled-watchdog.service` (~25 Z.) | Härtung wie `sharefyx-mcp.service` (User=savefyx, NoNewPrivileges, ProtectSystem=strict, RuntimeDirectory=tailscaled-watchdog); `__REPO_ROOT__`-Placeholder, wird von `install_units.sh` ersetzt |
+| `phase3_edge/systemd/tailscaled-watchdog.timer` (~10 Z.) | `OnBootSec=2min`, `OnUnitActiveSec=60s`, `AccuracySec=5s` |
+| `phase9_hardening/tests/test_tailscaled_watchdog.py` (~230 Z.) | 5 Tests aus Plan §4.3, mock-via-PATH-Mechanik (kein Netz, kein root) |
+
+**Logik des Skripts** (drei Stufen, in dieser Reihenfolge — die Reihenfolge ist der Punkt aus
+§4.2): (1) `tailscale status --json` → `Self.Online` (billig, lokal, kein Netz); (2) **nur wenn
+1 unklar**: `tailscale netcheck` mit Timeout 30 s; (3) **nur wenn 1 und 2 scheitern**:
+`systemctl restart tailscaled.service` mit Rate-Limit 1/15 min, State in
+`/run/tailscaled-watchdog/last_restart`. Stage 1 nutzt inline-Python (sharefyx-mcp nutzt
+denselben Interpreter, also da; jq nicht garantiert, grep auf JSON wäre fragil).
+
+**V152 beantwortet:** Tailscale hat **kein** eigenes Watchdog-Feature ohne kommerzielles
+Add-on. Suche findet nur `pragmaxim/tailscale-watchdog` (GitHub) — das macht exakt dasselbe
+wie unseres. Funnel-Recovery-Issue tailscale/tailscale#21114 betrifft State-Re-Registration,
+nicht Control-Plane-Recovery. → Eigenbau richtig, „gibt es nicht" als zulässiges Ergebnis
+(Plan §4.4 erlaubt das ausdrücklich).
+
+**V153 — Empfehlung:** Polkit mit `.rules`-Datei unter
+`/etc/polkit-1/rules.d/99-tailscaled-restart.rules`. Begründung: nur die
+`manage-units`-Aktion auf `tailscaled.service` (restart + try-restart) für `savefyx`, kein
+`NOPASSWD` sudo nötig, Ubuntu 24.04 hat das moderne polkit ≥ 0.106. Sudoers-Fallback
+(`/etc/sudoers.d/tailscaled-watchdog-restart`, eine Zeile, `chmod 0440`) bleibt reversibel
+verfügbar.
+
+**Test-Stand:** `phase9_hardening/tests/test_tailscaled_watchdog.py` 5/5 grün in 0,20 s;
+`phase9_hardening/tests/` + `phase3_edge/tests/` zusammen 56/56 grün in 1,24 s;
+`scripts/doc_health.py` 0 Befunde. Eine Iteration nötig (`mkdir(parents=True)` im
+`_make_mock_bin`-Helper für die Sub-Cases von Test 4).
+
+**Ausstehend (Nikinger-Schritte, geordnet):** (1) Polkit-Regel oder sudoers-Snippet
+anlegen — Hard Rule 9: Agent fasst `systemctl`/`sudo` nicht an; (2)
+`phase3_edge/scripts/install_units.sh` laufen lassen — findet die zwei neuen Units
+automatisch, ersetzt das `__REPO_ROOT__`-Placeholder, ruft `daemon-reload` und enablet
+`sharefyx-mcp.service` (nicht den Watchdog); (3) `sudo systemctl enable --now
+tailscaled-watchdog.timer` — **nicht** `--now` für die `.service`, der Timer startet sie
+selbst; (4) `systemctl list-timers tailscaled-watchdog.timer` — erste Auslösung nach
+OnBootSec=2min; (5) Abnahme P9-19 (intentional offline): `sudo tailscale logout` in
+einem zweiten Terminal, `journalctl -u tailscaled-watchdog.service -f` — **genau ein**
+Restart innerhalb 15 min, dann Stille.
+
+**P9-Plan §0.3 Tabu-Diff geprüft:** kein Eingriff in `phase1_storage/storage/**`,
+`mcp_local_vision_server.py`, `vision_ollama.py`, `sharefyx-mcp.service`-Direktiven oder
+`install_units.sh`-Pflege — nur Phase-3-Repo-Erweiterung. **P9-Q (Coarbeit)** und
+**P9-S (Hard Rule 9)** eingehalten. Frontmatter-Kette, Modulstatus und Phase-9-Zeile in
+`docs/INDEX.md` im selben Commit nachgezogen (Hard Rule 8).
+
 ### Nächster Schritt
 
-**Step D — die zwei gemeldeten Bugs** ist weiterhin 🟡 (D2 fertig, D1 zurückgestellt) — keine
-Veränderung. Der nächste **offene** Step nach C ist **A (echte Domain über eigenen VPS)** oder
-**B (`tailscaled-watchdog.service`)**; das Handover §4.2 hatte die Domain als „einer der
-ersten P9-Schritte" markiert, was begründet ist (Adressänderung zieht den Claude-Connector in
-beiden Konten nach sich, wer sie ans Ende legt, macht den Schnitt zweimal). Wahl liegt beim
-Nikinger — diese Session hat darauf keinen Zugriff genommen.
+**Step D** weiterhin 🟡 (D2 fertig, D1 zurückgestellt) — keine Veränderung.
+**Step B** wartet auf die fünf Nikinger-Schritte oben; danach geht das Modulstatus-🟡 auf ✅,
+die `## Backlog`-Sektion verliert ihre einzige Position (D1), und der nächste **offene**
+Step nach B ist **A (echte Domain über eigenen VPS)** — Handover §4.2 hat das als „einer der
+ersten P9-Schritte" markiert (Adressänderung zieht den Claude-Connector in beiden Konten
+nach sich, wer sie ans Ende legt, macht den Schnitt zweimal). Wahl liegt beim Nikinger.

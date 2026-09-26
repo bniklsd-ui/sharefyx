@@ -1,0 +1,12 @@
+[Unit]
+Description=Tailscaled Watchdog — alle 60 Sekunden prüfen
+Documentation=file://__REPO_ROOT__/phase3_edge/CLAUDE.md
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=60s
+AccuracySec=5s
+Unit=tailscaled-watchdog.service
+
+[Install]
+WantedBy=timers.target
