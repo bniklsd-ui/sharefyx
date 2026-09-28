@@ -61,6 +61,20 @@ export var state = {
   // jeden Space, von dem es Items gesehen hat, als geladen -- ein Space ohne Items im
   // globalen Modus ist trotzdem "gesehen", sein Zähler ist 0.
   itemsLoaded: {},
+  // P9 Step E (Plan §7.2a): Signatur des zuletzt gesehenen `/overview`-Payloads, gesetzt von
+  // `list.js :: loadOverview()` — also von **jedem** Pfad, der den Zählerstand holt: Bootstrap,
+  // 20s-Zähler-Poll, Fokus, und jeder Schreibvorgang (`afterWrite`, Archivieren, Ordner,
+  // Space anlegen/entfernen). Gelesen von `graph.js :: loadGraph()`, das ohne Token-Wechsel den
+  // `/graph`-Abruf überspringt (P9-33).
+  //
+  // **Warum das Feld hier steht und nicht in `graph.js`:** der Erzeuger (`list.js`) und der
+  // Verbraucher (`graph.js`) kennen sich nicht — `graph.js` importiert `editor.js`, `editor.js`
+  // importiert `list.js`. Ein Import von `list.js` nach `graph.js` wäre ein Zyklus, und ein
+  // Melde-Aufruf in den fünf Schreibpfaden (`editor.js`, `dialogs.js`, `spaces.js`) wäre eine
+  // zweite Wahrheit über "hat sich etwas geändert", die man beim Hinzufügen eines sechsten
+  // Schreibpfades leicht übersieht. Das Blatt-Modul `state.js` wird von beiden ohnehin
+  // importiert, hält das Format an **einer** Stelle und kennt die Aufrufer nicht.
+  graphToken: null,
   selectedId: null,
   selectedReadonly: false,
   // Mehrfachauswahl (§9, P6-AK) — ein `Set` von Item-IDs, geleert bei jeder Navigation
@@ -77,6 +91,45 @@ export function spaceByName(name) {
     if (state.spaces[i].name === name) return state.spaces[i];
   }
   return null;
+}
+
+// P9 Step E (Plan §7.2a): reduziert ein `/api/v1/overview`-Payload auf eine Signatur des
+// Nutzdatenstands. Bewusst als Zeichenkette statt als Hash — `===` auf einem String ist beim
+// Lesen nachvollziehbar, und der Aufbau ist O(n) über wenige hundert Zeilen: billiger als jeder
+// Round-Trip, für den diese Signatur ihn einspart.
+//
+// Was hineingeht, und warum genau das: je Space der `item_count`, die Bucket-Zähler und die
+// fünf zuletzt geänderten Items mit `id`/`version`/`updated` (`api.py :: _overview`,
+// `_RECENT_LIMIT = 5`). Ein Schreibvorgang setzt `updated` hoch, das Item rückt damit in die
+// "Zuletzt benutzt"-Liste und erhöht `version` — die Signatur ändert sich also bei jedem
+// Schreibvorgang, im eigenen Space wie in einem fremden.
+//
+// **Die bewusst in Kauf genommene Grenze:** ändert ein Item nur seine Tags und ist es in
+// seinem Space nicht mehr unter den fünf zuletzt geänderten Items, bleibt die Signatur gleich
+// und der Graph steht bis zum manuellen Refresh. Genau dieses Item ist dann aber auch in der
+// Übersicht daneben nicht zu sehen — der Graph ist nie reichhaltiger als die Seite, auf der
+// er hängt. Ohne diese Grenze gäbe es nur zwei Auswege: ein Feld am Graph-Payload (P9-M
+// verbietet es) oder ein serverseitiger Änderungs-Zähler (eine neue Route, noch teurer).
+export function overviewToken(overview) {
+  if (!overview || !overview.length) return null;
+  var parts = [];
+  for (var i = 0; i < overview.length; i++) {
+    var space = overview[i];
+    var counts = space.counts || {};
+    var countParts = [];
+    var keys = Object.keys(counts).sort();
+    for (var k = 0; k < keys.length; k++) countParts.push(keys[k] + "=" + counts[keys[k]]);
+    var recent = space.recent || [];
+    var recentParts = [];
+    for (var r = 0; r < recent.length; r++) {
+      recentParts.push(recent[r].id + "@" + recent[r].version + "@" + (recent[r].updated || ""));
+    }
+    parts.push(
+      space.name + "#" + space.item_count + "#" + countParts.join(",") + "#" + recentParts.join(",")
+    );
+  }
+  parts.sort();     // die Reihenfolge der Spaces im Payload ist eine Server-Detailfrage
+  return parts.join("|");
 }
 
 // Live-Fund 2026-08-13, zweiter Teil desselben Bugs: der Sidebar-/Übersicht-Fix (writable

@@ -14,7 +14,9 @@
 //
 // **Bewusst NICHT gemacht:** persistent layout (kein Save der Positionen zwischen Reloads),
 // WebWorker-Simulation (Datenmenge ist klein genug fuer requestAnimationFrame), Mobile-Pinch-
-// Zoom (Step 7b-W Desktop-first).
+// Zoom (Step 7b-W Desktop-first). Seit P9 Step E (b) überleben die Positionen immerhin den
+// Wiedereintritt in die Übersicht innerhalb einer Sitzung -- der Seed ist ohnehin deterministisch
+// (P8.6-D2), nur die Simulation begann nach jedem Eintritt von vorn.
 //
 // **Settle-Zeit bei 200 Knoten (Fix A, Plan §9.4.6 Befund A, 2026-09-02):** mit den
 // urspruenglichen Konstanten (ALPHA_DECAY 0.985 / ALPHA_MIN 0.005) kam die Simulation
@@ -29,7 +31,7 @@
 // gerechnet -- Zahl steht im Phase-Head-Session-Block und in Plan §9.4.6.
 
 import { api, reportUnexpectedError } from "./api.js";
-import { spaceCategory } from "./state.js";
+import { spaceCategory, state } from "./state.js";
 import { selectItem } from "./editor.js";
 
 var nodes = [];
@@ -58,6 +60,33 @@ var pressStart = null;
 
 var tagsEnabled = false;    // Default aus (Plan §5 D2: "Default zeigt nur explizite Kanten")
 var foldersEnabled = false;
+
+// -- P9 Step E: Reload-Overload (Plan §7.2a, Abnahme P9-33) ----------------------------------
+//
+// `loadGraph()` wurde bei **jedem** Aufruf zu einem vollen `api("/graph")`-Abruf. Aufrufer sind
+// `app.js` (Home-Knopf, Refresh-Knopf, Bootstrap) -- seit P8.6 N.8 kommt ESC dazu, der Weg in die
+// Übersicht wird also häufiger gegangen, nicht seltener. Das ist der gemeldete "Reload-Overload"
+// (`p8x_ui_polish_notes.md` §2.1).
+//
+// **Die Korrektur am Plan-Vorschlag, datiert 2026-09-26 (Code schlägt Plan, wie Hard Rule der
+// Working style verlangt):** Plan §7.2(a) wollte die Signatur aus "Knotenzahl + Kantenzahl +
+// höchstem `updated`" bilden und nennt als Quelle ausdrücklich den Graph-Payload. Der
+// `/api/v1/graph`-Knoten hat aber **genau neun Felder** (`api.py :: _graph_get`, Z. 698-708) und
+// **kein `updated`, kein `version`** -- die Signatur ließe sich dort gar nicht bilden, und ein
+// zehntes Feld wäre eine API-Contract-Öffnung, die ausdrücklich nicht zu diesem Step gehört
+// (P9-M, §7.2 "Was dieser Step ausdrücklich nicht anfasst").
+//
+// **Was stattdessen trägt, ohne eine einzige neue Server-Antwort:** das `/api/v1/overview`-
+// Payload, das der Client ohnehin holt -- beim Bootstrap, alle 20 s im Zähler-Poll, bei
+// Fokus/Sichtbarkeit (`app.js :: pollCounters`) und nach jedem Schreibvorgang. Reduziert auf eine
+// Signatur liegt es in `state.js :: overviewToken()`, gesetzt in `list.js :: loadOverview()`,
+// gelesen hier. Warum die Signatur dort und nicht hier: siehe das Feld `state.graphToken`.
+//
+// **Bekannte, benannte Grenze** (aus `state.js :: overviewToken()`): ändert ein Item nur seine
+// Tags und ist es in seinem Space nicht mehr unter den fünf zuletzt geänderten Items, bleibt
+// der Graph bis zum manuellen Refresh stehen -- dieses Item ist dann aber auch in der
+// Übersicht daneben nicht zu sehen.
+var tokenAtFetch = null;       // Signatur, die der letzte /graph-Abruf abgedeckt hat
 
 const REPULSION_STRENGTH = 800;   // ~ Coulomb-Konstante (willkuerlich, durch Augenschein justiert)
 const SPRING_LENGTH = 60;          // Ruhelaenge in CSS-Pixeln
@@ -147,11 +176,32 @@ export function init() {
   resize();
 }
 
-export function loadGraph() {
+// `opts.force` holt die Daten unbedingt neu -- nur der **explizite** Refresh-Knopf benutzt das
+// (der Knopf heißt "aktualisieren"; der Home-Knopf ist der Weg, den P9-33 misst). Der
+// Bootstrap-Aufruf braucht es nicht: `tokenAtFetch === null` heißt "noch nie geholt".
+export function loadGraph(opts) {
   if (!canvasEl) return Promise.resolve();
+  var force = !!(opts && opts.force);
+  if (!force && tokenAtFetch !== null && state.graphToken !== null
+      && state.graphToken === tokenAtFetch) {
+    // (a) Nichts geändert -- kein Abruf, kein Neuaufbau, keine Simulation neu (P9-34: die Karte
+    // springt beim Wiedereintritt nicht). `resize()` zieht die Canvas-Box neu ein, falls der
+    // Editor den Detail-Slot in der Zwischenzeit belegt hatte, und zeichnet selbst.
+    redrawAfterReentry();
+    return Promise.resolve();
+  }
   return api("/graph").then(function (data) {
+    var previousById = nodeById;
     nodes = (data.nodes || []).map(function (n) {
-      return Object.assign({}, n, { x: 0, y: 0, vx: 0, vy: 0, deg: 0 });
+      // (b) P9-34: eine bekannte ID behält x/y. Vorher bekam **jeder** Knoten `x: 0, y: 0`, und
+      // `seedInitialPositions()` verteilte daraufhin den ganzen Ring neu -- der Sprung beim
+      // Wiedereintritt kam also nicht aus dem Jitter (der ist seit P8.6-D2 deterministisch),
+      // sondern daraus, dass die Simulation nach jedem Eintritt von vorn begann. Nur neue
+      // Knoten bleiben bei 0/0 und werden gesät.
+      var prev = previousById[n.id];
+      return prev
+        ? Object.assign({}, n, { x: prev.x, y: prev.y, vx: 0, vy: 0, deg: 0 })
+        : Object.assign({}, n, { x: 0, y: 0, vx: 0, vy: 0, deg: 0 });
     });
     explicitEdges = dedupeEdges(data.edges || []);
     nodeById = Object.create(null);
@@ -159,6 +209,9 @@ export function loadGraph() {
     rebuildImplicitEdges();
     updateEmptyState();
     updateZoomReadout();
+    // Die Signatur wird NACH dem Abruf gesetzt, nicht davor: ein /overview, das während des
+    // laufenden Abrufs eintrifft, soll den nächsten Eintritt neu laden lassen, nicht diesen.
+    tokenAtFetch = state.graphToken;
     // Phase 8.6 Block C C3 / [VERIFY] V115: der ResizeObserver (`init()` Z. 141-142) feuert
     // zwar beim ersten `observe()`, aber zu diesem Zeitpunkt ist `.overview__graph` im neuen
     // Grid möglicherweise 0x0 -- das Grid rendert erst nach dem CSS-Layout-Pass, und der
@@ -180,6 +233,20 @@ export function loadGraph() {
       runSimulation();
     });
   }).catch(reportUnexpectedError);
+}
+
+// Wiedereintritt ohne Datenabruf. Gleiches rAF-Fenster wie der Abruf-Pfad oben, damit die Box
+// nach dem Layout-Pass stimmt -- der Canvas war während eines offenen Editors 0x0 groß.
+function redrawAfterReentry() {
+  requestAnimationFrame(function () {
+    if (!canvasEl || !canvasEl.isConnected) return;
+    // `resize()` zeichnet selbst, aber nur wenn die Box von 0x0 gewachsen ist. Der zweite
+    // `draw()` deckt den Fall ab, in dem der Canvas noch 0x0 ist (Editor weiterhin offen) --
+    // der ResizeObserver würde das beim Wiedereinblenden zwar auch holen, sein Fallback ohne
+    // Observer (`window.addEventListener("resize", …)`) aber nicht.
+    resize();
+    draw();
+  });
 }
 
 // P8.6-D1 (P8.6-N): dieselbe Beziehung -- einmal als Body-Link und einmal als
@@ -463,6 +530,14 @@ function draw() {
 }
 
 function drawEdges(all, dim) {
+  // [VERIFY] V118 (P9 Step E, beantwortet 2026-09-26): eine Tag-Kante UND eine explizite Kante
+  // zwischen denselben zwei Knoten werden **zwei Linien**. `dedupeEdges()` fasst nur die
+  // expliziten Kanten zusammen und `buildTagEdges()` nur die Tag-Kanten -- die Zusammenführung
+  // beider Listen passiert erst hier, ohne Dedup, also zeichnet `all` denselben Knotenpaar zweimal
+  // (solid + gestrichelt). Kein Mess-Screenshot nötig: `drawEdges()` iteriert `all` und ruft je
+  // Eintrag genau einmal `ctx.stroke()`; zwei Einträge für ein Paar sind zwei Striche. Ob das
+  // gewollt ist (eine Linie, die beides bedeutet, oder zwei, die zwei Beziehungen zeigen), ist
+  // eine **Design-Frage für den Nikinger** (P9-36) und wird hier nicht stillschweigend entschieden.
   ctx.lineWidth = 1;
   ctx.strokeStyle = COLORS.edge;
   for (var i = 0; i < all.length; i++) {

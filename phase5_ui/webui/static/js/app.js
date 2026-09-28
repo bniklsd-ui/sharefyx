@@ -151,9 +151,13 @@ function initShell() {
   // haelt den 20s-Polling auf die Zaehler beschraenkt, Refresh ist der einzige Ausloeser
   // fuer den Graph-Reload, damit der Server nicht bei jedem Tick die `/graph`-Query feuert).
   // Beide Calls laufen parallel; ein Fehler in einem blockiert den anderen nicht.
+  // P9 Step E: `force: true` ist die **einzige** Ausnahme vom Token-Mechanismus — der Knopf
+  // heißt "aktualisieren", und genau für ihn darf die Reihenfolge der zwei parallelen Calls
+  // nicht entscheiden (ohne force könnte der Graph laufen, bevor das neue /overview da ist,
+  // und deshalb einen Abruf überspringen, obwohl sich etwas geändert hat).
   document.getElementById("overview-refresh").addEventListener("click", function () {
     List.loadOverview().catch(reportUnexpectedError);
-    loadGraphPanel();
+    loadGraphPanel({ force: true });
   });
 
   document.getElementById("back-button").addEventListener("click", function () {
@@ -253,6 +257,9 @@ function initShell() {
         document.getElementById("account-manage-spaces").hidden = !meta.space_admin;
         var names = Object.keys(meta.buckets);
         if (names.indexOf(state.filter) === -1) state.filter = names[0];
+        // P9 Step E: `loadOverview()` setzt `state.graphToken`, das `loadGraph()` unten liest —
+        // deshalb muss dieser Aufruf VOR dem ersten `loadGraphPanel()` stehen, sonst erfasst der
+        // erste Abruf `null` und der erste Sprung in die Übersicht holt erneut.
         return List.loadOverview();
       })
       .then(function () {
@@ -283,6 +290,10 @@ function initShell() {
 
   function pollCounters() {
     if (document.hidden) return;
+    // P9 Step E (Plan §7.2a): dieses `/overview` ist zugleich die Signatur für den Graphen
+    // (`state.graphToken`, gesetzt in `list.js`). Der Poll läuft alle 20 s, bei Fokus und bei
+    // Rückkehr in den Tab — der Home-Knopf weiß dadurch ohne eigenen Abruf, ob sich seit dem
+    // letzten Graphen-Laden etwas geändert hat (P9-33).
     List.loadOverview().catch(reportUnexpectedError);
   }
 

@@ -5,7 +5,7 @@ read-when: Chronik einer älteren P9-Session gesucht — nicht beim normalen Arb
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
+updated: 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
 ---
 
 # Phase 9 — Sessions Archive
@@ -15,6 +15,221 @@ trägt immer genau einen `## Session stopped`-Block, ältere Blöcke wandern ver
 Vorsatz: nichts abtippen, alles per Skript mit vier Gegenproben (Schnitt verlustfrei, neuer
 Head trägt genau einen Block, alle bewegten Blöcke im Archiv byte-identisch, Archivbestand
 unangetastet).
+
+## Session stopped — 2026-09-26
+
+**Step C abgeschlossen ✅ — C8 + Host-Aufräumen pve + P9-22 deferred.** Coarbeit Claude Code
+↔ Nikinger (P9-Q-Muster): drei Host-/Service-Schritte liefen auf Nikingers Seite (sharefyx-VM
+`sudo` braucht Password, pve ist von sharefyx-VM aus nicht erreichbar, kein Test-Setup von
+außerhalb des LAN verfügbar), jede Ausgabe zurückgespielt. Mein Anteil: Verifikation der
+Verbindungs-Verweigerung, architektonischer Beweis für P9-22, Modulstatus + Session-Block +
+Rotation. Kein Repo-Code-Touch, kein `pytest`, kein `ui_budget`, kein `systemctl` von meiner
+Seite, sharefyx-mcp **unangetastet**.
+
+### C8 — `ollama` CPU-Backend stilllegen (Nikinger, sharefyx-VM)
+
+Verbatim-Ausgabe der Nikinger-Sequenz (Sharefyx-VM):
+
+```
+$ sudo systemctl disable --now ollama
+[sudo] password for savefyx:
+Removed "/etc/systemd/system/default.target.wants/ollama.service".
+
+$ curl -sS --max-time 3 -o /dev/null -w "HTTP %{http_code} | exit=%{exitcode} | err=%{errormsg}\n" http://127.0.0.1:11434/
+curl: (7) Failed to connect to 127.0.0.1 port 11434 after 0 ms: Couldn't connect to server
+HTTP 000 | exit=7 | err=Failed to connect to 127.0.0.1 port 11434 after 0 ms: Couldn't connect to server
+$ systemctl is-active ollama; systemctl is-enabled ollama
+inactive
+disabled
+```
+
+Mein zweiter Sichtproben-Lauf von dieser Shell (Claude Code, sharefyx-VM):
+
+```
+$ curl -sS --max-time 3 -o /dev/null -w "HTTP %{http_code} | exit=%{exitcode} | err=%{errormsg}\n" http://127.0.0.1:11434/
+curl: (7) Failed to connect to 127.0.0.1 port 11434 after 0 ms: Couldn't connect to server
+HTTP 000 | exit=7 | err=Failed to connect to 127.0.0.1 port 11434 after 0 ms: Couldn't connect to server
+$ systemctl is-active ollama; systemctl is-enabled ollama
+inactive
+disabled
+```
+
+Unit noch auf Platte (`/etc/systemd/system/ollama.service`, 423 B, 2026-09-10), Binary auch
+(`/usr/local/bin/ollama`, 40.014.640 B, 2026-09-10), Modell auch
+(`/usr/share/ollama/.ollama/models/manifests/registry.ollama.ai/library/qwen3-vl`) — alles
+bewusst stehen gelassen als **kalter Fallback bis Step Z**, dort `ollama rm qwen3-vl:8b` +
+Deinstallation (Plan §5.4 Ende).
+
+### Host-Aufräumen pve (Nikinger, Proxmox-Host)
+
+Verbatim-Ausgabe der Nikinger-Sequenz (root@pve):
+
+```
+root@pve:~# ls -la /tmp/nv580173/ 2>&1
+ls: cannot access '/tmp/nv580173/': No such file or directory
+root@pve:~# ls -d /tmp/nv* 2>&1
+ls: cannot access '/tmp/nv*': No such file or directory
+root@pve:~# ls -la /root/111.conf.new /root/111.conf.bak-p9c 2>&1
+-rw-r--r-- 1 root root 633 Sep 25 22:41 /root/111.conf.new
+-rw-r----- 1 root root 842 Sep 25 22:41 /root/111.conf.bak-p9c
+root@pve:~# ls -la /root/NVIDIA-Linux-x86_64-580.126.09.run /tmp/NVIDIA-Linux-x86_64-580.126.09.run 2>&1
+ls: cannot access '/root/NVIDIA-Linux-x86_64-580.126.09.run': No such file or directory
+ls: cannot access '/tmp/NVIDIA-Linux-x86_64-580.126.09.run': No such file or directory
+root@pve:~# rm -rf /tmp/nv580173
+root@pve:~# rm -f  /root/NVIDIA-Linux-x86_64-580.126.09.run /tmp/NVIDIA-Linux-x86_64-580.126.09.run
+root@pve:~# rm -f  /root/111.conf.new /root/111.conf.bak-p9c
+root@pve:~# ls /tmp/nv580173 /root/111.conf.new /root/111.conf.bak-p9c 2>&1
+ls: cannot access '/tmp/nv580173': No such file or directory
+ls: cannot access '/root/111.conf.new': No such file or directory
+ls: cannot access '/root/111.conf.bak-p9c': No such file or directory
+root@pve:~# ls /root/NVIDIA-Linux-x86_64-580.126.09.run /tmp/NVIDIA-Linux-x86_64-580.126.09.run 2>&1
+ls: cannot access '/root/NVIDIA-Linux-x86_64-580.126.09.run': No such file or directory
+ls: cannot access '/tmp/NVIDIA-Linux-x86_64-580.126.09.run': No such file or directory
+```
+
+Drei Befunde aus der Nikinger-Sequenz, die in den Plan-Doku-Stand zurückfließen:
+
+1. **`/tmp/nv580173` und `/tmp/nv*` waren bereits weg** — bestätigt die im Session-Block 2026-09-25
+   (3) offen gehaltene Vermerkung „PVE 9 hat evtl. tmpfs-`/tmp`" als Tatsache: das Verzeichnis
+   wurde vermutlich beim letzten Host-Boot (oder durch das tmpfs-Verhalten selbst) abgeräumt. Die
+   `rm -rf /tmp/nv580173` lief ins Leere und ist im Audit-Output trotzdem enthalten — nil-volens
+   ist hier Beleg, nicht Schlamperei.
+2. **`/root/111.conf.new` (633 B) und `/root/111.conf.bak-p9c` (842 B)** waren noch da, beide
+   datiert 2026-09-25 22:41 (= Block (3) Runde 4a „Backup `/root/111.conf.bak-p9c`,
+   `grep -v` nach Zeileninhalt → `/root/111.conf.new`"). Jetzt weg — der `devN`-Fix ist
+   reboot-bewährt (zweite Reboot-Probe 2026-09-25 20:54 grün), das Rollback-Material wird nicht
+   mehr gebraucht.
+3. **Alter `NVIDIA-Linux-x86_64-580.126.09.run`-Installer war weder in `/root/` noch in `/tmp/`.**
+   Wahrscheinlich beim Vorrundezweig-Umbau auf 580.173.02 (Session-Block 2026-09-25 (3) Runde 17)
+   schon entfernt; nicht mehr nachvollziehbar, wann genau — der Plan hat ihn nicht eigens
+   dokumentiert, also auch keinen Konflikt.
+
+### P9-22 — deferred, architektonischer Beweis
+
+**Nikinger-Entscheidung 2026-09-26:** kein externer Test möglich (kein Mobilfunk-Test-Setup zur
+Hand, sharefyx-VM hat keinen LAN-Externen Pfad), P9-22 wird **deferred** statt offen gelassen.
+Begründung: der architektonische Beweis deckt denselben Sachverhalt — dass
+`192.168.68.140:11434` von außerhalb des Heim-LAN nicht erreichbar ist — aus fünf
+voneinander unabhängigen Indikatoren ab:
+
+| # | Indikator | Beleg |
+|---|---|---|
+| 1 | `192.168.68.0/24` ist RFC1918 — auf dem öffentlichen Internet nicht routbar | Definition, kein Messbedarf |
+| 2 | sharefyx-VM hat **keine** öffentliche IP | `ip -4 addr` zeigt nur `192.168.68.175/24` (ens18, DHCP) + `100.93.43.122/32` (tailscale0); `ip route` default via `192.168.68.1` (RUT X50) |
+| 3 | RUT X50 hat **kein** Port-Forwarding auf 11434 | Hard Rule 6 (Egress-only-Tunnel, CGNAT-Setup, niemals ein offener Port am Router) — etablierte Invariante, kein Befund dieser Session |
+| 4 | sharefyx-VM-Tailscale-Funnel mappt **nicht** auf 11434 | `tailscale funnel status` zeigt genau eine Map: `https://savefyx-vmware-virtual-platform.tail4a8b49.ts.net → http://127.0.0.1:8765` (sharefyx-mcp). `:11434` kommt nicht vor |
+| 5 | sharefyx-VM hat **keinen** `*:11434`-Listener und keine iptables/nft-Regel, die ihn weiterleiten würde | `ss -tlnp` zeigt kein 0.0.0.0:11434 und kein 100.93.43.122:11434 (rootless-Check für ufw/nft/iptables gescheitert mit „Permission denied", aber irrelevant: kein Listener = keine Regel kann ihn weiterleiten, weil nichts da ist, das ankommt) |
+
+Was ein echter externer Test zusätzlich bewiesen hätte: eine konkrete Log-Zeile wie
+„`Connection timed out` from `100.x.y.z (T-Mobile)`". Diese Probe-Lücke wird in **Step Z**
+(oder im P10-Backlog) adressiert — nicht hier, weil das Hard-Rule-6-Fundament schon steht
+und der Test ohne Mobilfunk-Setup technisch nicht ausführbar ist.
+
+### Stand Step C für einen kalten Leser
+
+Alle 7 P9-Abnahmezeilen von Step C (`docs/concepts/phase9_hardening_plan.md` §5.6) sind erledigt
+oder mit architektonischem Ersatz belegt:
+
+- **P9-21** ✅ Dienst antwortet von sharefyx-VM aus auf der internen Adresse — gemessen
+  (Block (3) Runde 4b).
+- **P9-22** ⚠️ **deferred** (s. o., Revisit Step Z oder P10-Backlog).
+- **P9-23** ✅ Cold-Start gemessen und gegen 46–180 s gestellt (Block (3) Runde 4b: 19,9 s,
+  Block (3) Runde 5: 19,7 s).
+- **P9-24** ✅ Beide Skript-Fixes aus §5.3 im Code, Startzeile zeigt den echten Endpoint
+  (Session-Block 2026-09-25 (2)).
+- **P9-25** ✅ V154 und V156 beantwortet (im selben Block).
+- **P9-26** ✅ Echter Sichtprüfungslauf gegen `c4_p8519_01_radiogruppe_im_dialog.png` liefert
+  dieselbe Aussage wie der CPU-Lauf vom 2026-09-10 (Block (3) Runde 4b + Runde 5).
+
+Modulstatus Step C: 🟡 → **✅** (in dieser Session nachgezogen).
+
+### Rotation + Doku-Hygiene
+
+`scripts/rotate_session_block.sh phase9_hardening` läuft im selben Commit: Session-Block
+**2026-09-25 (3)** wandert verbatim nach `SESSIONS_ARCHIVE.md` (newest-first, oben an), Head
+trägt danach exakt einen Session-Block (den heutigen). `SESSIONS_ARCHIVE.md`-Frontmatter
+`updated:` wird per Hand nachgezogen (Skript-Logik-Zeile 163). `docs/INDEX.md`-Phase-9-Zeile
+steht auf `Step 0 ✅ · **Step C ✅** · Step D 🟡 · A/B/E/F/G/H ⬜ · Gate/Z ⬜` mit aktualisierten
+Größenangaben für Head und Archiv. INDEX-Größe selbst weiter über dem 38-KB-Softcap (V145
+bleibt offen, keine Verschlechterung in dieser Session — der Modulstatus-Eintrag wurde nur
+länger, weil die P9-22-Begründung jetzt mitläuft).
+
+Kein Touch auf `phase5_ui/`, `phase1_storage/`, `tests/`, `webui/`, `docs/concepts/`,
+`scripts/doc_health.py` — keine Test-Änderung, keine UI-Änderung, kein Frontend-Touch
+(`mcp_local_vision_server.py` und `vision_ollama.py` sind seit C6 unverändert).
+
+### Backlog
+
+Unverändert seit Block 2026-09-25 (3): nur noch **D1 — ESC im Vollbild schließt zusätzlich das
+Item** (Nikinger-Entscheidung 2026-09-23, zurückgestellt, kein aktiver Blocker). Der separate
+„Anthropic-MCP-Proxy-502-Vorfall vom Vormittag 2026-09-24" ist weiterhin als „unbekannter,
+vorübergehender Ausfall bei Anthropic, nicht auf CGNAT/Mobilfunk-Setup oder sharefyx-VM
+zurückzuführen" abgelegt — kein neuer Vorfall in dieser Session.
+
+### Step B — `tailscaled-watchdog` Code (M3-Anteil, install ausstehend)
+
+Diese Session hat mit `B` begonnen (Coarbeit §0.5.1: M3 schreibt Repo-Anteil, Nikinger
+installiert + verifiziert). Vier neue Dateien, **kein Touch an bestehendem Code**:
+
+| Datei | Zweck |
+|---|---|
+| `phase3_edge/scripts/tailscaled_watchdog.sh` (~120 Z., +x) | Drei-Stufen-Prüfung + Rate-Limit, ENV-überschreibbar für Tests |
+| `phase3_edge/systemd/tailscaled-watchdog.service` (~25 Z.) | Härtung wie `sharefyx-mcp.service` (User=savefyx, NoNewPrivileges, ProtectSystem=strict, RuntimeDirectory=tailscaled-watchdog); `__REPO_ROOT__`-Placeholder, wird von `install_units.sh` ersetzt |
+| `phase3_edge/systemd/tailscaled-watchdog.timer` (~10 Z.) | `OnBootSec=2min`, `OnUnitActiveSec=60s`, `AccuracySec=5s` |
+| `phase9_hardening/tests/test_tailscaled_watchdog.py` (~230 Z.) | 5 Tests aus Plan §4.3, mock-via-PATH-Mechanik (kein Netz, kein root) |
+
+**Logik des Skripts** (drei Stufen, in dieser Reihenfolge — die Reihenfolge ist der Punkt aus
+§4.2): (1) `tailscale status --json` → `Self.Online` (billig, lokal, kein Netz); (2) **nur wenn
+1 unklar**: `tailscale netcheck` mit Timeout 30 s; (3) **nur wenn 1 und 2 scheitern**:
+`systemctl restart tailscaled.service` mit Rate-Limit 1/15 min, State in
+`/run/tailscaled-watchdog/last_restart`. Stage 1 nutzt inline-Python (sharefyx-mcp nutzt
+denselben Interpreter, also da; jq nicht garantiert, grep auf JSON wäre fragil).
+
+**V152 beantwortet:** Tailscale hat **kein** eigenes Watchdog-Feature ohne kommerzielles
+Add-on. Suche findet nur `pragmaxim/tailscale-watchdog` (GitHub) — das macht exakt dasselbe
+wie unseres. Funnel-Recovery-Issue tailscale/tailscale#21114 betrifft State-Re-Registration,
+nicht Control-Plane-Recovery. → Eigenbau richtig, „gibt es nicht" als zulässiges Ergebnis
+(Plan §4.4 erlaubt das ausdrücklich).
+
+**V153 — Empfehlung:** Polkit mit `.rules`-Datei unter
+`/etc/polkit-1/rules.d/99-tailscaled-restart.rules`. Begründung: nur die
+`manage-units`-Aktion auf `tailscaled.service` (restart + try-restart) für `savefyx`, kein
+`NOPASSWD` sudo nötig, Ubuntu 24.04 hat das moderne polkit ≥ 0.106. Sudoers-Fallback
+(`/etc/sudoers.d/tailscaled-watchdog-restart`, eine Zeile, `chmod 0440`) bleibt reversibel
+verfügbar.
+
+**Test-Stand:** `phase9_hardening/tests/test_tailscaled_watchdog.py` 5/5 grün in 0,20 s;
+`phase9_hardening/tests/` + `phase3_edge/tests/` zusammen 56/56 grün in 1,24 s;
+`scripts/doc_health.py` 0 Befunde. Eine Iteration nötig (`mkdir(parents=True)` im
+`_make_mock_bin`-Helper für die Sub-Cases von Test 4).
+
+**Ausstehend (Nikinger-Schritte, geordnet):** (1) Polkit-Regel oder sudoers-Snippet
+anlegen — Hard Rule 9: Agent fasst `systemctl`/`sudo` nicht an; (2)
+`phase3_edge/scripts/install_units.sh` laufen lassen — findet die zwei neuen Units
+automatisch, ersetzt das `__REPO_ROOT__`-Placeholder, ruft `daemon-reload` und enablet
+`sharefyx-mcp.service` (nicht den Watchdog); (3) `sudo systemctl enable --now
+tailscaled-watchdog.timer` — **nicht** `--now` für die `.service`, der Timer startet sie
+selbst; (4) `systemctl list-timers tailscaled-watchdog.timer` — erste Auslösung nach
+OnBootSec=2min; (5) Abnahme P9-19 (intentional offline): `sudo tailscale logout` in
+einem zweiten Terminal, `journalctl -u tailscaled-watchdog.service -f` — **genau ein**
+Restart innerhalb 15 min, dann Stille.
+
+**P9-Plan §0.3 Tabu-Diff geprüft:** kein Eingriff in `phase1_storage/storage/**`,
+`mcp_local_vision_server.py`, `vision_ollama.py`, `sharefyx-mcp.service`-Direktiven oder
+`install_units.sh`-Pflege — nur Phase-3-Repo-Erweiterung. **P9-Q (Coarbeit)** und
+**P9-S (Hard Rule 9)** eingehalten. Frontmatter-Kette, Modulstatus und Phase-9-Zeile in
+`docs/INDEX.md` im selben Commit nachgezogen (Hard Rule 8).
+
+### Nächster Schritt
+
+**Step D** weiterhin 🟡 (D2 fertig, D1 zurückgestellt) — keine Veränderung.
+**Step B** wartet auf die fünf Nikinger-Schritte oben; danach geht das Modulstatus-🟡 auf ✅,
+die `## Backlog`-Sektion verliert ihre einzige Position (D1), und der nächste **offene**
+Step nach B ist **A (echte Domain über eigenen VPS)** — Handover §4.2 hat das als „einer der
+ersten P9-Schritte" markiert (Adressänderung zieht den Claude-Connector in beiden Konten
+nach sich, wer sie ans Ende legt, macht den Schnitt zweimal). Wahl liegt beim Nikinger.
+
+---
 
 ## Session stopped — 2026-09-25 (3)
 

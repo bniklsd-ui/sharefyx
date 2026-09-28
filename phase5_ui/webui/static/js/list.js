@@ -2,7 +2,7 @@
 
 // -- Übersichtsseite + Liste ------------------------------------------------------------------
 
-import { state, BUCKET_LABELS, TYPE_LABELS, activeSpaceWritable, spaceByName, setCreateControlsPresent, isGlobalScope, spaceCategory } from "./state.js";
+import { state, BUCKET_LABELS, TYPE_LABELS, activeSpaceWritable, spaceByName, setCreateControlsPresent, isGlobalScope, spaceCategory, overviewToken } from "./state.js";
 import { el } from "./toasts.js";
 import { api, reportUnexpectedError } from "./api.js";
 import { navigate, renderRail, bucketNames, activateView } from "./tree.js";
@@ -193,6 +193,14 @@ export function loadOverview() {
     // `state.overview` um -- hier direkt zu rendern würde im "Alle Items"-Modus die
     // Übersicht gegen die verbotene Liste-Position eintauschen.
     renderListSlot();
+    // P9 Step E (Plan §7.2a): die Signatur des Nutzdatenstandes wird hier gesetzt, und zwar
+    // **an der einen Stelle, die jeder Pfad mit Zählerstand schon benutzt** — Bootstrap,
+    // 20s-Poll, Fokus und jeder Schreibvorgang laufen durch `loadOverview()`. Der Verbraucher
+    // ist `graph.js :: loadGraph()` (P9-33). Das Feld und sein Format liegen in `state.js`,
+    // weil Erzeuger und Verbraucher sich nicht importieren können, ohne einen Zyklus zu bauen
+    // (`graph.js` → `editor.js` → `list.js`).
+    state.graphToken = overviewToken(overview);
+    return overview;
   });
 }
 
