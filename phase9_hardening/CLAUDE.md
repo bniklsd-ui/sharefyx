@@ -246,6 +246,59 @@ Zuständigkeitsgrenze VLM-binär ↔ Messung-quantitativ, und die ist in P9 bere
 (4B/2B) lohnt sich erst, wenn jemand die **Latenz** des Adapters im Chatbetrieb als störend
 empfindet — und dann als Beschleunigung, nicht als Genauigkeitsgewinn.
 
+### Install-Vorbereitung Step B — zwei Befunde, die die Reihenfolge bestimmen (2026-09-28)
+
+Vor der Frage „was installiere ich eigentlich?" geprüft, was `install_units.sh` mit den neuen
+Units **wirklich** tut und wohin `__REPO_ROOT__` zeigt. Zwei Befunde, **beide gemessen, nicht
+aus dem Session-Block abgelesen**:
+
+**1. `__REPO_ROOT__` zeigt auf ein Release, das die Datei nicht enthält — Reihenfolge-Constraint.**
+`phase3_edge/local.env` trägt `REPO_ROOT=/opt/sharefyx/current` (Zeile 11, Stand 2026-09-18 nach
+dem Cutover), und `/opt/sharefyx/current` ist ein **Symlink** auf
+`releases/20260918T183907.597248Z`. Geprüft:
+
+```
+test -f /opt/sharefyx/current/phase3_edge/scripts/tailscaled_watchdog.sh   -> NEIN
+test -f /opt/sharefyx/current/phase3_edge/systemd/tailscaled-watchdog.service -> NEIN
+```
+
+Das Release vom 2026-09-18 ist **drei Wochen älter als Step B** und enthält die Dateien nicht
+(der Umzug nach `/opt/sharefyx/current` ist der Cutover aus P5; im Git-Arbeitsverzeichnis sind sie
+natürlich da). **Folge:** `install_units.sh` schreibt die Unit korrekt, aber `ExecStart` zeigt ins
+Leere — der Timer feuert alle 60 s und der Dienst startet nicht. Drei Wege, alle vertretbar:
+
+| Weg | Bewertung |
+|---|---|
+| **Warten auf das Gate** (deployt `v3.1.0` und damit ein Release mit den Dateien) | **empfohlen** — vermeidet einen absichtlich kaputten Zustand und ist ohne Zusatzaufwand, weil das Gate ohnehin deployt |
+| Installieren und den Fehlschlag bis dahin in Kauf nehmen | funktioniert, aber `journalctl` zeigt 60 s lang Fehlschläge — die sieht nach einem Defekt aus und ist es nicht |
+| `ExecStart` temporär auf den Git-Checkout zeigen | **nicht** — beim nächsten `install_units.sh` überschrieben, und zwei Pfade für dieselbe Datei sind die Art Drift, die dieses Repo gerade rausgebaut hat |
+
+Das ist **kein Fehler in `install_units.sh`** (es substituiert korrekt, was in `local.env` steht),
+sondern eine Folge der Cutover-Entscheidung aus P5 Step 8: die Live-Unit läuft aus dem Release,
+nicht aus dem Checkout. Ein Watchdog, der einen Pfad nutzt, den nur ein Deploy aktualisiert, ist
+eine echte Kopplung — **für Step Z zu notieren**: Watchdog-Pfade entweder relativ zum Release
+auflösen (mit Restart nach jedem Deploy) oder bewusst auf den Checkout legen und dort lassen.
+
+**2. V153-Dateiname: zwei Namen in der eigenen Doku, einer davon falsch verbreitet.**
+
+| Fundstelle | Dateiname |
+|---|---|
+| Frontmatter dieses Heads (`updated:` 2026-09-26) | `/etc/polkit-1/rules.d/99-tailscaled-watchdog-restart.rules` |
+| `SESSIONS_ARCHIVE.md` Z. 195 (Block 2026-09-26, **verbatim, bleibt stehen**) | `/etc/polkit-1/rules.d/99-tailscaled-restart.rules` |
+
+Das Archiv wird nicht angefasst (Rotationsregel: verbatim). **Kanonisch ist der Name aus dem
+Frontmatter**, `99-tailscaled-watchdog-restart.rules` — er nennt die Komponente, nicht nur die
+Aktion, und ist damit der eindeutigere der beiden. Wer die Regel anlegt, sollte genau den
+verwenden und sich die Abweichung merken: die Datei im Archiv hat einen kürzeren Namen, weil sie
+dort zuerst notiert wurde.
+
+**3. Die Härtung ist tatsächlich identisch, nicht nur behauptet.** Zeile für Zeile gegengeprüft:
+`sharefyx-mcp.service` und `tailscaled-watchdog.service` tragen dieselben zehn Direktiven
+(`User=savefyx`, `Group=savefyx`, `NoNewPrivileges`, `PrivateTmp`, `ProtectSystem=strict`,
+`ProtectHome=read-only`, `ProtectKernelTunables`, `ProtectControlGroups`,
+`RestrictAddressFamilies`, `MemoryDenyWriteExecute`, `SystemCallFilter=@system-service`). Die
+Aussage im Block 2026-09-26 hält der Prüfung stand — sie wird hier nur von Behauptung zu Beleg.
+
 ### Der INDEX-Befund — aufgelöst, mit einer Grenze, die benannt bleibt
 
 `doc_health.py` meldete `docs/INDEX.md: 41.303 B > 40.960 B, glyph=None, nicht als 📕/📦
