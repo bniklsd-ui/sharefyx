@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase3_edge_plan.md          # voller Plan, Entscheidungen P3-A–P3-N, Steps 0–7
   - ../docs/concepts/PHASE2_CLOSEOUT_HANDOVER.md  # Herkunft der offenen Entscheidungen 1–8
   - SESSIONS_ARCHIVE.md                            # ältere Session-Blöcke, newest-first
-updated: 2026-09-18 (Tailscale-Account-Migration hat den Funnel zerstört — Tailnet-Suffix
+updated: 2026-09-29 (P9 Step A: neue Unit `systemd/sharefyx-tail-proxy.service` — socat-Relay von der Tailnet-IP auf 127.0.0.1:8765, weil der künftige TLS-Terminator auf dem VPS sonst nichts zu proxen findet; P3-B unberührt, `install_units.sh` bewusst nicht erweitert, 7 Wächter in `phase9_hardening/tests/test_tail_proxy.py`, **Installation offen** — Nikinger-Schritt) | 2026-09-18 (Tailscale-Account-Migration hat den Funnel zerstört — Tailnet-Suffix
 `tail89fc2a.ts.net` → `tail4a8b49.ts.net`, zweiteiliger Fix + ein neu entdeckter Fallstrick,
 siehe Runbook-Ergänzung unten. Neue öffentliche URL:
 `https://savefyx-vmware-virtual-platform.tail4a8b49.ts.net`)
@@ -87,6 +87,21 @@ lesbar (als root aufrufen ...)` statt der falschen `WARNUNG`, `sudo`-Lauf bliebe
 korrekt. `pytest -q` weiterhin 747/747 (reine Bash-Änderung, kein Python berührt). Gefunden
 während der Post-Deploy-Verifikation von Phase 6 Step 7/7a (`phase6_shares/CLAUDE.md`), hier
 statt dort dokumentiert, weil `diagnose.sh` P3-Eigentum ist.
+
+**[2026-09-29, P9 Step A — eine neue Unit in diesem Verzeichnis, aus einem gemessenen Befund
+heraus]:** `systemd/sharefyx-tail-proxy.service` (socat-Relay
+`100.93.43.122:8765 → 127.0.0.1:8765`). **P3-B bleibt unberührt** — die App bindet weiter auf
+Loopback; das Relay macht den Port nur auf der Tailnet-IP erreichbar, weil ein
+Reverse-Proxy auf einem künftigen VPS sonst nichts zu proxen findet (`ss -ltnp` belegt:
+kein Listener auf der Tailnet-Adresse). Sie liegt hier, weil `tailscaled-watchdog.*` und
+`sharefyx-backup.*` ebenfalls P3-Betrieb sind. **Bewusst ohne `__REPO_ROOT__` im `ExecStart`**
+(zeigt auf `/usr/bin/socat`): damit greift die Kopplung aus dem Session-Block 2026-09-28
+gar nicht erst — dort zeigte der Watchdog-Pfad auf ein Release, das die Datei nicht enthält.
+`install_units.sh` wurde deshalb **nicht** erweitert; installiert wird per
+`sudo install -m 0644` (Runbook: `phase9_hardening/step_a/RUNBOOK_STEP_A.md` §2 A0b).
+Wächter: `phase9_hardening/tests/test_tail_proxy.py` (7, inkl. „Härtung identisch mit der
+MCP-Unit"). **Die Installation ist ein Nikinger-Schritt — bisher ist auf der VM nichts
+installiert und der Dienst läuft nicht.**
 
 **[2026-07-29 Korrektur, P4 Step 7]:** Zeile 5 nennt „systemd-Units" — `sharefyx-mcp.service`
 ist davon inzwischen nicht mehr eine. Die MCP-Unit zog nach `phase4_auth/systemd/` um (Plan §5

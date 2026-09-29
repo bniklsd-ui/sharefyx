@@ -1,0 +1,51 @@
+[Unit]
+Description=Sharefyx Tail-Proxy — macht 127.0.0.1:8765 ueber die Tailnet-IP erreichbar
+# Zweck (P9 Step A, Plan §3.2 A4): der TLS-Terminator auf dem VPS muss die Heim-VM
+# im Tailnet erreichen koennen. Der MCP-Server lauscht aber per gelockerter P3-B-Entscheidung
+# auf 127.0.0.1:8765 — auf der Tailnet-IP lauscht nichts. Dieser Relay macht genau diese eine
+# Luecke schliessen, ohne SPACE_HOST zu aendern.
+#
+# Warum socat und nicht `tailscale serve --tcp`: der Tailscale-eigene TCP-Forwarder haette
+# keinen zusaetzlichen Prozess, aber ob er die Tailnet-ACLs durchsetzt, war in der
+# Planungssession NICHT verifizierbar (kein Netzzugriff, RUNBOOK §6 V162). Ein gewoehnlicher
+# Listener auf der tailscale0-Adresse faellt unter das ACL-Modell, das im Tailnet ohnehin
+# fuer jeden Port gilt — die Variante, deren Sicherheitseigenschaft nicht von einer offenen
+# Frage abhaengt.
+#
+# Bewusst KEIN __REPO_ROOT__ in ExecStart: /usr/bin/socat ist ein Systempfad, die Unit
+# funktioniert damit unabhaengig davon, welches Release /opt/sharefyx/current gerade zeigt.
+# Genau die Kopplung, die beim tailscaled-watchdog (Session-Block 2026-09-28) zum Befund
+# wurde, ist hier konstruktiv ausgeschlossen. `Documentation=` entfaellt deshalb auch.
+After=network-online.target tailscaled.service sharefyx-mcp.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=savefyx
+Group=savefyx
+# Bind-Adresse = die Tailnet-IP dieser Maschine (`ip -br addr show tailscale0`).
+# 100.93.43.122/32, gemessen 2026-09-29. Nach einem Tailnet-Wechsel (Account-Migration
+# 2026-09-18) aendert sich die IP — dann ist DIESE Datei die Stelle, die nachgezogen wird.
+Environment=TAILNET_ADDR=100.93.43.122
+Environment=APP_ADDR=127.0.0.1
+Environment=APP_PORT=8765
+# TCP4 auf beiden Seiten bewusst: die Tailnet-Adresse ist IPv4 (100.64.0.0/10), und ein
+# zusaetzlicher IPv6-Pfad waere eine ungepruefte zweite Route, kein Vorteil.
+ExecStart=/usr/bin/socat TCP4-LISTEN:${APP_PORT},bind=${TAILNET_ADDR},fork,reuseaddr TCP4:${APP_ADDR}:${APP_PORT}
+Restart=on-failure
+RestartSec=5
+# Härtung zeichengleich mit sharefyx-mcp.service und tailscaled-watchdog.service.
+# Wird von phase9_hardening/tests/test_tail_proxy.py gegen die MCP-Unit geprüft — eine
+# gelockerte Direktive fällt dort auf, nicht erst im Review.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+MemoryDenyWriteExecute=true
+SystemCallFilter=@system-service
+
+[Install]
+WantedBy=multi-user.target

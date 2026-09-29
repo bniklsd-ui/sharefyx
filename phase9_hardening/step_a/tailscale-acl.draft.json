@@ -1,0 +1,36 @@
+{
+  "_MERGE_HINWEIS": "Diese Datei ist ein FRAGMENT, kein vollstaendiges Policy-File. Sie wird in die bestehende Tailscale-Policy des Tailnets EINGEHAENGT (Plan §3.2 A3), nie als Ersatz angelegt - die bestehende ACL des Tailnets regelt die sieben jetzigen Nodes und darf beim Merge nicht verloren gehen. Nikinger-Schritt A3, Merge im Admin-UI unter Access Controls. Klassische ACL-Form, weil ein persoenliches Tailnet mit einer bestehenden Policy fast immer im klassischen 'acls'-Format laeuft; die Grants-Form steht gleichwertig im Runbook §2 A3.",
+
+  "tagOwners": {
+    "tag:sharefyx-edge": ["autogroup:admin"]
+  },
+
+  "acls": [
+    {
+      "action": "accept",
+      "src": ["tag:sharefyx-edge"],
+      "dst": ["100.93.43.122:8765"]
+    }
+  ],
+
+  "hosts": {
+    "sharefyx-home": "100.93.43.122"
+  },
+
+  "_WARUM": [
+    "1. Die Regel ist ZUSATZLICH, nicht ersetzend: sie erlaubt dem VPS, genau einen Port auf",
+    "   genau einer Adresse zu erreichen. Alles andere im Tailnet bleibt unveraendert.",
+    "2. 100.93.43.122 ist die Tailnet-IP der Heim-VM (gemessen 2026-09-29 per",
+    "   'ip -br addr show tailscale0'). Sie ist stabil, solange der Node im selben Tailnet",
+    "   bleibt - die 2026-09-18-Migration hat den Tailnet-Suffix gewechselt, nicht die IP.",
+    "   Wird die IP doch einmal neu vergeben, ist die 'hosts'-Regel oben die einzige Stelle,",
+    "   die nachgezogen werden muss.",
+    "3. Bewusst per IP statt per Tag der Heim-VM: die Heim-VM ist ein Nutzergeraet mit",
+    "   aktivem Funnel-Grant. Ein Tag wuerde in die Funnel-Attruktur eingreifen, und genau",
+    "   diese Kopplung hat am 2026-09-18 den Funnel zerstoert. Fuer eine einzelne Regel ist",
+    "   das Risiko groesser als der Nutzen.",
+    "4. Bewusst KEINE Regel fuer Port 22/8765 vom VPS zur Heim-VM in Gegenrichtung und",
+    "   keine Regel fuer andere Ports: diese Regel ist die ganze Erlaubnis. Wer mehr",
+    "   braucht, misst erst, warum."
+  ]
+}

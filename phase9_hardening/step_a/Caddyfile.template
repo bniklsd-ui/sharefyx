@@ -1,0 +1,58 @@
+# Caddyfile-Vorlage fuer den TLS-Terminator (P9 Step A, Plan §3.2 A4)
+#
+# Ziel dieser Datei: die Konfiguration, die auf den VPS gehoert, versioniert im Repo statt
+# nur auf der Maschine zu liegen. Der Nikinger setzt die drei Platzhalter in seiner Shell
+# (NICHT hier im Repo — die Datei bleibt eine Vorlage) und legt sie nach /etc/caddy/Caddyfile.
+#
+#   <domain>        die eigene Domain, z. B. space.<eigene-domain>   (A1, Nikinger)
+#   <vps-tailnet>   der Tailscale-Node-Name des VPS im selben Tailnet  (A3, Nikinger)
+#   <kontakt>       E-Mail-Adresse fuer die Let's-Encrypt-ACME-Registrierung (A4)
+#
+# Bewusst NICHT konfiguriert und warum:
+#
+#   * KEIN header Strict-Transport-Security. Die Anwendung setzt den HSTS-Header selbst
+#     (phase4_auth/authserver/routes.py:66, phase5_ui/webui/security.py:56, beide
+#     "max-age=63072000; includeSubDomains"). Ein zweiter HSTS-Header von Caddy waere eine
+#     doppelte, abweichende Angabe — Browser werten das unterschiedlich aus. Genau eine
+#     Stelle soll HSTS sagen.
+#   * KEIN CNAME auf *.ts.net (Lock P9-E). Tailscale Funnel bedient nur Namen in der
+#     Tailnet-Domain; ein CNAME darauf erzeugt einen TLS-Namens-Mismatch, weil Funnel per
+#     SNI an die Node durchreicht und diese ein *.ts.net-Zertifikat praesentiert.
+#   * KEIN eigener /health-Pfad. Die Anwendung hat genau eine Health-Route: /health
+#     (phase2_mcp/mcpserver/app.py:216). Der Plan nannte in P9-10 /healthz — das gibt es
+#     nicht, Abnahme laeuft gegen /health (RUNBOOK §0, Befund 2).
+#
+# Der Proxy reicht den Host-Header des Clients unveraendert durch (Caddy-Default). Genau
+# deshalb muss die neue Domain in SPACE_ALLOWED_HOSTS stehen, sonst antwortet die
+# TrustedHostMiddleware der Anwendung mit "400 Invalid host header" — derselbe Fehler, der
+# am 2026-09-18 nach der Tailscale-Account-Migration auftrat (phase3_edge/CLAUDE.md).
+
+{
+	email <kontakt>
+	# Caddy soll als systemd-Dienst laufen; die von Caddy selbst verwaltete Unit ist die
+	# einfachste Form, weil sie Zertifikatsspeicher und Neustart gemeinsam uebernimmt.
+}
+
+<domain> {
+	# Ziel ist der Tailnet-Name der Heim-VM auf Port 8765. Erreichbar wird dieser Port
+	# durch sharefyx-tail-proxy.service auf der Heim-VM (socat-Relay auf die Tailnet-IP);
+	# ohne dieses Relay lauscht dort nichts (die App bindet per P3-B auf 127.0.0.1).
+	reverse_proxy <vps-tailnet>:8765
+
+	# Innerhalb des WireGuard-Tunnels ist Klartexttransport unkritisch — die Uebertragung
+	# ist bereits durch das Tailnet verschluesselt. Bewusst kein mTLS und kein
+	# Client-Zertifikat: es gaeber einen zweiten Identitaetspfad fuer ein System, das es
+	# sonst nicht gibt.
+	log {
+		# Strukturierte Zugriffszeilen: Methode, Pfad, Status, Dauer, Upstream-Dauer.
+		# Enthaelt keine Token — die stehen im Authorization-Header, den Caddy nicht loggt.
+		output file /var/log/caddy/access.log {
+			roll_size 10MiB
+			roll_keep 5
+		}
+		format json
+	}
+
+	# Kein `header`-Block, kein manuelles TLS-Opt-Out: die ACME-HTTP-01-Pruefung laeuft
+	# ueber Port 80, Caddy nimmt Port 80 fuer die Challenge automatisch in Betrieb.
+}

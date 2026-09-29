@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase9_hardening_plan.md    # voller Plan, Locks P9-A–P9-T, Steps 0–H
   - ../docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md  # Herkunft der P9-Punkte
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
-updated: 2026-09-28 (**Nachtrag**: §Vormerkung Vision-Modell — Messbefund aus Step E dokumentiert, Recherche in `docs/concepts/sichtpruefung_automation_tooling.md`, Schluss: ein Modellwechsel ist nicht der Hebel, die Zuständigkeitsgrenze ist es; kein P9-Block) | 2026-09-28 (Step E abgeschlossen ✅ — Reload-Overload der Karte: (a) kein zweiter `/graph`-Abruf ohne Datenänderung, Signatur aus dem `/overview`-Payload statt aus dem Graph-Payload (Plan-Korrektur: der Graph-Knoten hat kein `updated`, `api.py:698-708`), Erzeugung in `list.js :: loadOverview()` (deckt jeden Schreibpfad mit), Format in `state.js :: overviewToken()` (Blatt-Modul statt Zyklus), `force` nur am expliziten Refresh-Knopf; (b) bekannte Knoten behalten x/y über den Refetch. Sieben Tests (Node-Harness `graph_reload_probe.mjs` + statisch) und eine Browser-Probe (`p9e_reload_probe.py`, Wegwerf-Instanz Port 18768), beide mit Gegenprobe gegen HEAD: dort 1 statt 0 Abrufe und 10 statt 1 verschiedene Bilder in 1,5 s, im Node-Harness 467,6 px Positionssprung statt 0. V118 beantwortet (zwei Linien, eine gestrichelt) — Design-Frage eine-oder-zwei beim Nikinger. `pytest` 1031 passed + 1 failed (der Fehlschlag ist der Vortrag: `docs/INDEX.md` über der doc_health-Schwelle, auf HEAD genauso rot, gehört nach Step Z), `ui_budget` 5/5 (149,0 KB), Tabu-Bereichs-Diff leer, Wegwerf-Instanz über die PID-Datei gestoppt. Drei eigene Fehler dokumentiert (falsche erste Verdrahtung, Messgerät zählte sich selbst, Test scheiterte an eigenem Kommentar) | 2026-09-26 (Step B code-complete, install ausstehend: vier neue Dateien — `phase3_edge/scripts/tailscaled_watchdog.sh` + `phase3_edge/systemd/tailscaled-watchdog.{service,timer}` + `phase9_hardening/tests/test_tailscaled_watchdog.py` (5/5 grün); V152 beantwortet (kein Tailscale-eigenes Feature ohne kommerzielles Add-on), V153 als Empfehlung dokumentiert (Polkit `.rules`-Datei `/etc/polkit-1/rules.d/99-tailscaled-watchdog-restart.rules`, Sudoers-Fallback `/etc/sudoers.d/tailscaled-watchdog-restart`); Modulstatus Step B ⬜→🟡, Phase-9-###-Sub-Sektion ergänzt; Phase-9-Zeile in `docs/INDEX.md` nachgezogen; kein Touch an bestehendem Code, Hard Rule 8 (Doc-Update im selben Commit) und Hard Rule 9 (kein `systemctl` durch M3) eingehalten) | 2026-09-26 (Step C abgeschlossen: C8 `sudo systemctl disable --now ollama` Nikinger-Cobefehl, sharefyx-VM `inactive`/`disabled`, `curl 127.0.0.1:11434` → HTTP 000 exit 7 `Connection refused` (bestätigt aus dieser Shell als zweite Sichtprobe), binary + Modell bleiben als kalter Fallback bis Step Z; Host-Aufräumen pve: `/root/111.conf.new` (633 B, 2026-09-25 22:41) und `/root/111.conf.bak-p9c` (842 B, 2026-09-25 22:41) per `rm -f` entfernt, `/tmp/nv580173` und alter `NVIDIA-Linux-x86_64-580.126.09.run` waren bereits weg — PVE-9-tmpfs bzw. im Vorrundezweig schon entfernt; P9-22 deferred — kein externer Test möglich, architektonischer Beweis captured: 192.168.68.140 ist RFC1918, sharefyx-VM hat keine öffentliche IP (CGNAT via RUT X50, default route via 192.168.68.1), Tailscale-Funnel mappt nur `127.0.0.1:8765` (kein `*:11434` auf sharefyx-VM), kein Port-Forward auf RUT X50, der einzige 11434-Listener ist innerhalb CT 111; Step C 🟡→✅, Modulstatus nachgezogen, Session-Block 2026-09-26 angehängt) | 2026-09-25 (C4 ✅ DHCP-Reservierung im RUT X50, per `local_vision`-MCP-Aufruf gegen die GPU ausgelesen — erster echter Einsatz über den opencode-Pfad) | 2026-09-25 (zweite Reboot-Probe grün: CT-Knoten 20:54 > 20:42, Major 235 = `/proc/devices`, `cuInit = 0`, `size_vram` = `size` — Boot-Persistenz ✅) | 2026-09-25 (Reboot-Probe: uvm-Major 511→235, `cuInit = 999`; Fix per `devN`-Passthrough, per CT-Neustart bewiesen `cuInit = 0`, zweite Reboot-Probe offen, `size_vram` = `size`; C5 gesetzt; V166 beantwortet) | 2026-09-25 (Boot-Persistenz eingerichtet, CT 111 `onboot: 0` gefunden, Reboot-Probe offen) | 2026-09-25 (GPU-Inferenz läuft: CT 111 auf 580.173.02, `size_vram` = `size`, 63 tok/s, P9-21/-23/-26 ✅; Boot-Persistenz offen) | 2026-09-25 (Host-Treiber 580.173.02 mit `nvidia-uvm` installiert und geladen, kein Reboot) | 2026-09-25 (V165 beantwortet: 580.173.02 kennt die neue `zone_device_page_init`-Signatur) | 2026-09-25 (Step C Diagnose bestätigt: kein `/dev/nvidia-uvm`, `cuInit = 999`) | 2026-09-25 (Step C Diagnose, Claude Code: CUDA fehlt, weil `nvidia-uvm` fehlt — C2-Trade-off-Satz datiert korrigiert, Modulstatus C nachgezogen, Nikinger-Entscheidung zum Host-Fix offen) | 2026-09-25 (Backlog aufgeräumt: „opencode via Tailscale" für sharefyx-VM per Nikinger-Update mittlerweile passiert, Eintrag aus der Backlog-Sektion entfernt; nur noch D1 zurückgestellt) | 2026-09-25 (Step C Teil 2 / C6 — `mcp_local_vision_server.py` Skript-Fixes aus Plan §5.3: `serve()` loggt aufgelösten Endpoint, `--endpoint` wirkt jetzt auch ohne `--check`; neue zentrale `resolve_endpoint(args)` mit Präzedenz `--endpoint` > `$LOCAL_VISION_ENDPOINT` > `DEFAULT_ENDPOINT`; `_CURRENT_ENDPOINT` als Modul-Globals wird in `serve()` einmal gesetzt und von `handle_tools_call` gelesen statt erneut die Umgebungsvariable; 9 neue Tests + Counter-Probe ohne den Fix 7/9 rot — exakt die zwei gemeldeten Bugs; LXC + Ollama + C5/C7/C8 stehen aus) | 2026-09-24 (Step C Teil 1 — NVIDIA-Host-Treiber 580.126.09 installiert mit `--no-unified-memory`; pve-no-subscription-Repo ergänzt; drei dokumentierte Fehlbarkeiten auf dem Weg (Header-Paket fehlte, Backports führten denselben Upstream, Nouveau-Konflikt, uvm_hmm.c gegen 7.0.2-6-pve-Mai-Patch); eigener autoremove-Vorfall mit sudo/dkms-Verlust am 2026-09-24 wieder behoben; LXC + Ollama stehen aus) | 2026-09-24 (Backlog: ~19-min mcp-proxy.anthropic.com-Ausfall dokumentiert und geschlossen — gemessen nicht CGNAT/sharefyx-VM-seitig, Nikinger-Anordnung) | 2026-09-24 (Backlog: "opencode via Tailscale"-Behandlung für sharefyx-/Trading-Bot-VM nachgetragen, Nikinger-Feedback aus Netzwerk-Diagnosesession, kein Produktcode-Touch) | 2026-09-23 (D1/ESC-Bug auf Nikinger-Anordnung zurückgestellt, `## Backlog` neu) | 2026-09-23 (Step D code-complete — Drop-Ziel Space-Wurzel, ESC/Vollbild-Guard gebaut, gebaut in Claude Code statt opencode/M3, benannte Abweichung von P9-Q) | 2026-09-20 (Step 0 abgeschlossen — Phasenverzeichnis, INDEX-Rotationsskript, vier geplante plus drei ungeplante Doku-Defekte repariert, `doc_health.py` als Test festgenagelt, Baseline gemessen)
+updated: 2026-09-29 (Step A: M3-Anteil gebaut, Ausführung liegt beim Nikinger — **Plan-A4 nachweislich unbaubar** (auf der Tailnet-IP lauscht nichts: `SPACE_HOST=127.0.0.1`, `ss -ltnp` belegt; `SPACE_HOST=0.0.0.0` wäre P3-B gebrochen) → **socat-Relay-Unit** `phase3_edge/systemd/sharefyx-tail-proxy.service` ohne `__REPO_ROOT__` im `ExecStart` (die Release-Pfad-Kopplung aus dem Step-B-Befund ist damit konstruktiv ausgeschlossen); Caddy-Vorlage + ACL-Fragment + `phase9_hardening/step_a/RUNBOOK_STEP_A.md` (A1–A9, ein Schritt pro Runde) + 7 Wächter, Gegenprobe 4/4; **V149 beantwortet** (alle Metadatenfelder abgeleitet, keines fest, kein `iss`-Check beim Einlösen), Befund 2 (`/health` statt `/healthz`) und Befund 3 (`ALLOWED_HOSTS` fehlt in Plan-A7) als Plan-Korrekturen, **Befund 5** = der Funnel bleibt nach A7 lesbar, aber nicht beschreibbar (CSRF-Origin exakt, `security.py:84`); **V162 neu offen** = ACL-Durchsetzung von `tailscale serve --tcp`, der Grund für die socat-Wahl; Step A ⬜→🟡) | 2026-09-28 (**Nachtrag**: §Vormerkung Vision-Modell — Messbefund aus Step E dokumentiert, Recherche in `docs/concepts/sichtpruefung_automation_tooling.md`, Schluss: ein Modellwechsel ist nicht der Hebel, die Zuständigkeitsgrenze ist es; kein P9-Block) | 2026-09-28 (Step E abgeschlossen ✅ — Reload-Overload der Karte: (a) kein zweiter `/graph`-Abruf ohne Datenänderung, Signatur aus dem `/overview`-Payload statt aus dem Graph-Payload (Plan-Korrektur: der Graph-Knoten hat kein `updated`, `api.py:698-708`), Erzeugung in `list.js :: loadOverview()` (deckt jeden Schreibpfad mit), Format in `state.js :: overviewToken()` (Blatt-Modul statt Zyklus), `force` nur am expliziten Refresh-Knopf; (b) bekannte Knoten behalten x/y über den Refetch. Sieben Tests (Node-Harness `graph_reload_probe.mjs` + statisch) und eine Browser-Probe (`p9e_reload_probe.py`, Wegwerf-Instanz Port 18768), beide mit Gegenprobe gegen HEAD: dort 1 statt 0 Abrufe und 10 statt 1 verschiedene Bilder in 1,5 s, im Node-Harness 467,6 px Positionssprung statt 0. V118 beantwortet (zwei Linien, eine gestrichelt) — Design-Frage eine-oder-zwei beim Nikinger. `pytest` 1031 passed + 1 failed (der Fehlschlag ist der Vortrag: `docs/INDEX.md` über der doc_health-Schwelle, auf HEAD genauso rot, gehört nach Step Z), `ui_budget` 5/5 (149,0 KB), Tabu-Bereichs-Diff leer, Wegwerf-Instanz über die PID-Datei gestoppt. Drei eigene Fehler dokumentiert (falsche erste Verdrahtung, Messgerät zählte sich selbst, Test scheiterte an eigenem Kommentar) | 2026-09-26 (Step B code-complete, install ausstehend: vier neue Dateien — `phase3_edge/scripts/tailscaled_watchdog.sh` + `phase3_edge/systemd/tailscaled-watchdog.{service,timer}` + `phase9_hardening/tests/test_tailscaled_watchdog.py` (5/5 grün); V152 beantwortet (kein Tailscale-eigenes Feature ohne kommerzielles Add-on), V153 als Empfehlung dokumentiert (Polkit `.rules`-Datei `/etc/polkit-1/rules.d/99-tailscaled-watchdog-restart.rules`, Sudoers-Fallback `/etc/sudoers.d/tailscaled-watchdog-restart`); Modulstatus Step B ⬜→🟡, Phase-9-###-Sub-Sektion ergänzt; Phase-9-Zeile in `docs/INDEX.md` nachgezogen; kein Touch an bestehendem Code, Hard Rule 8 (Doc-Update im selben Commit) und Hard Rule 9 (kein `systemctl` durch M3) eingehalten) | 2026-09-26 (Step C abgeschlossen: C8 `sudo systemctl disable --now ollama` Nikinger-Cobefehl, sharefyx-VM `inactive`/`disabled`, `curl 127.0.0.1:11434` → HTTP 000 exit 7 `Connection refused` (bestätigt aus dieser Shell als zweite Sichtprobe), binary + Modell bleiben als kalter Fallback bis Step Z; Host-Aufräumen pve: `/root/111.conf.new` (633 B, 2026-09-25 22:41) und `/root/111.conf.bak-p9c` (842 B, 2026-09-25 22:41) per `rm -f` entfernt, `/tmp/nv580173` und alter `NVIDIA-Linux-x86_64-580.126.09.run` waren bereits weg — PVE-9-tmpfs bzw. im Vorrundezweig schon entfernt; P9-22 deferred — kein externer Test möglich, architektonischer Beweis captured: 192.168.68.140 ist RFC1918, sharefyx-VM hat keine öffentliche IP (CGNAT via RUT X50, default route via 192.168.68.1), Tailscale-Funnel mappt nur `127.0.0.1:8765` (kein `*:11434` auf sharefyx-VM), kein Port-Forward auf RUT X50, der einzige 11434-Listener ist innerhalb CT 111; Step C 🟡→✅, Modulstatus nachgezogen, Session-Block 2026-09-26 angehängt) | 2026-09-25 (C4 ✅ DHCP-Reservierung im RUT X50, per `local_vision`-MCP-Aufruf gegen die GPU ausgelesen — erster echter Einsatz über den opencode-Pfad) | 2026-09-25 (zweite Reboot-Probe grün: CT-Knoten 20:54 > 20:42, Major 235 = `/proc/devices`, `cuInit = 0`, `size_vram` = `size` — Boot-Persistenz ✅) | 2026-09-25 (Reboot-Probe: uvm-Major 511→235, `cuInit = 999`; Fix per `devN`-Passthrough, per CT-Neustart bewiesen `cuInit = 0`, zweite Reboot-Probe offen, `size_vram` = `size`; C5 gesetzt; V166 beantwortet) | 2026-09-25 (Boot-Persistenz eingerichtet, CT 111 `onboot: 0` gefunden, Reboot-Probe offen) | 2026-09-25 (GPU-Inferenz läuft: CT 111 auf 580.173.02, `size_vram` = `size`, 63 tok/s, P9-21/-23/-26 ✅; Boot-Persistenz offen) | 2026-09-25 (Host-Treiber 580.173.02 mit `nvidia-uvm` installiert und geladen, kein Reboot) | 2026-09-25 (V165 beantwortet: 580.173.02 kennt die neue `zone_device_page_init`-Signatur) | 2026-09-25 (Step C Diagnose bestätigt: kein `/dev/nvidia-uvm`, `cuInit = 999`) | 2026-09-25 (Step C Diagnose, Claude Code: CUDA fehlt, weil `nvidia-uvm` fehlt — C2-Trade-off-Satz datiert korrigiert, Modulstatus C nachgezogen, Nikinger-Entscheidung zum Host-Fix offen) | 2026-09-25 (Backlog aufgeräumt: „opencode via Tailscale" für sharefyx-VM per Nikinger-Update mittlerweile passiert, Eintrag aus der Backlog-Sektion entfernt; nur noch D1 zurückgestellt) | 2026-09-25 (Step C Teil 2 / C6 — `mcp_local_vision_server.py` Skript-Fixes aus Plan §5.3: `serve()` loggt aufgelösten Endpoint, `--endpoint` wirkt jetzt auch ohne `--check`; neue zentrale `resolve_endpoint(args)` mit Präzedenz `--endpoint` > `$LOCAL_VISION_ENDPOINT` > `DEFAULT_ENDPOINT`; `_CURRENT_ENDPOINT` als Modul-Globals wird in `serve()` einmal gesetzt und von `handle_tools_call` gelesen statt erneut die Umgebungsvariable; 9 neue Tests + Counter-Probe ohne den Fix 7/9 rot — exakt die zwei gemeldeten Bugs; LXC + Ollama + C5/C7/C8 stehen aus) | 2026-09-24 (Step C Teil 1 — NVIDIA-Host-Treiber 580.126.09 installiert mit `--no-unified-memory`; pve-no-subscription-Repo ergänzt; drei dokumentierte Fehlbarkeiten auf dem Weg (Header-Paket fehlte, Backports führten denselben Upstream, Nouveau-Konflikt, uvm_hmm.c gegen 7.0.2-6-pve-Mai-Patch); eigener autoremove-Vorfall mit sudo/dkms-Verlust am 2026-09-24 wieder behoben; LXC + Ollama stehen aus) | 2026-09-24 (Backlog: ~19-min mcp-proxy.anthropic.com-Ausfall dokumentiert und geschlossen — gemessen nicht CGNAT/sharefyx-VM-seitig, Nikinger-Anordnung) | 2026-09-24 (Backlog: "opencode via Tailscale"-Behandlung für sharefyx-/Trading-Bot-VM nachgetragen, Nikinger-Feedback aus Netzwerk-Diagnosesession, kein Produktcode-Touch) | 2026-09-23 (D1/ESC-Bug auf Nikinger-Anordnung zurückgestellt, `## Backlog` neu) | 2026-09-23 (Step D code-complete — Drop-Ziel Space-Wurzel, ESC/Vollbild-Guard gebaut, gebaut in Claude Code statt opencode/M3, benannte Abweichung von P9-Q) | 2026-09-20 (Step 0 abgeschlossen — Phasenverzeichnis, INDEX-Rotationsskript, vier geplante plus drei ungeplante Doku-Defekte repariert, `doc_health.py` als Test festgenagelt, Baseline gemessen)
 ---
 
 # Phase 9 — Härtung
@@ -21,7 +21,7 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | Step | Inhalt | Status |
 |---|---|---|
 | 0 | Verifikations-Durchlauf, Doku-Fundament (Phasenverzeichnis, INDEX-Rotation, vier Defekte, `doc_health.py`, Baseline) | ✅ |
-| A | Echte Domain über eigenen VPS | ⬜ |
+| A | Echte Domain über eigenen VPS | 🟡 **M3-Anteil gebaut 2026-09-29, Ausführung Nikinger-Schritte** — `phase9_hardening/step_a/RUNBOOK_STEP_A.md` (der geführte Ablauf A1–A9 mit sechs gemessenen Befunden, die den Plan korrigiert haben) + `Caddyfile.template` (A4) + `tailscale-acl.draft.json` (A3) + `phase3_edge/systemd/sharefyx-tail-proxy.service` (der fehlende Erreichbarkeitsweg) + `phase9_hardening/tests/test_tail_proxy.py` (7/7 grün, Gegenprobe 4/4). **Befund 1 ist der teuerste: Plan-A4 ist unbaubar, auf der Tailnet-IP lauscht nichts** (`SPACE_HOST=127.0.0.1`, `ss -ltnp` belegt) — gelöst per socat-Relay, **ohne** P3-B zu brechen. A1/A2 (Domain, VPS) + A0b–A8 sind Nikinger-Schritte · **V149 beantwortet** (alle Metadatenfelder abgeleitet, keines fest) · **V162 neu offen** (ACL-Durchsetzung von `tailscale serve --tcp`, Grund für die socat-Wahl) |
 | B | `tailscaled-watchdog.service` | 🟡 **Code-complete (M3-Anteil 2026-09-26)**, install ausstehend — Repo-Anteil: `phase3_edge/scripts/tailscaled_watchdog.sh` + `phase3_edge/systemd/tailscaled-watchdog.{service,timer}` + `phase9_hardening/tests/test_tailscaled_watchdog.py` (5/5 grün, drei Stufen + Rate-Limit, identische Härtungs-Direktiven wie `sharefyx-mcp.service`); Polkit/Sudoers-Pfad (V153) + `systemctl enable --now tailscaled-watchdog.timer` + Intended-Offline-Probe (P9-19) sind Nikinger-Schritte · V152 beantwortet (kein Tailscale-eigenes Feature ohne kommerzielles Add-on, `pragmaxim/tailscale-watchdog` macht denselben Job) |
 | C | Vision-Dienst auf der RTX 3060 | ✅ **Step C abgeschlossen** (Session-Block 2026-09-26): GPU-Inferenz reboot-fest (Host + CT 111 auf 580.173.02 inkl. `nvidia-uvm`, uvm per `devN`-Passthrough, zweite Reboot-Probe grün) + C8 (`ollama` auf sharefyx-VM `inactive`/`disabled`, `curl 127.0.0.1:11434` → `Connection refused`, binary + Modell bleiben als kalter Fallback bis Step Z) + Host-Aufräumen pve (zwei `/root/111.conf.{new,bak-p9c}` per `rm -f` weg; `/tmp/nv580173` und alter `NVIDIA-Linux-x86_64-580.126.09.run` bereits weg — PVE-9-tmpfs bzw. im Vorrundezweig entfernt) · P9-21 ✅ · P9-23 ✅ · P9-26 ✅ · C4 ✅ · C5 ✅ · C6 ✅ · **P9-22 deferred** (Nikinger-Entscheidung 2026-09-26, kein externer Test möglich) — architektonischer Beweis statt externem Test: 192.168.68.140 ist RFC1918, sharefyx-VM hat keine öffentliche IP (CGNAT via RUT X50), Tailscale-Funnel mappt nur `127.0.0.1:8765` (kein `*:11434` auf sharefyx-VM), kein Port-Forward auf RUT X50, einziger 11434-Listener sitzt innerhalb CT 111; Revisit-Step **Step Z oder P10-Backlog** |
 | D | Zwei gemeldete Bugs (ESC/Vollbild, Drop-Ziel Space-Wurzel) | 🟡 D2 fertig; D1 (ESC/Vollbild) **bewusst zurückgestellt** — Nikinger-Entscheidung 2026-09-23, kein aktiver Blocker mehr, siehe Backlog unten |
@@ -60,283 +60,126 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückzuführen** — Nikinger-Anordnung 2026-09-24, so dokumentieren und nicht weiter
   untersuchen.
 
-## Session stopped — 2026-09-28
+## Session stopped — 2026-09-29
 
-**Step E ✅ gebaut und beides belegt: Modul-Ebene (Node-Harness) und Browser (Wegwerf +
-Playwright), jede Ebene mit Gegenprobe gegen `HEAD`.** Reiner Frontend-Step, kein Server-Touch,
-kein `pytest`-Rückgang, `ui_budget` 5/5, Tabu-Bereichs-Diff leer, kein `pkill -f`, kein
-`systemctl` von meiner Seite, `sharefyx-mcp` unangetastet (Hard Rule 9).
+**Step A: der M3-Anteil ist gebaut, ausgeführt wird er vom Nikinger.** Kein Produktcode
+berührt, kein Service-Touch, `pytest` grün, Tabu-Bereichs-Diff leer (Hard Rule 9 durchgehend:
+kein `systemctl` von mir, nur `ss`/`tailscale status` als lesende Messung).
 
-### Was gebaut wurde — und eine Plan-Korrektur, die der Code erzwungen hat
+**Erste Handlung dieser Session war eine Rückfrage, kein Code.** Die Notiz aus der letzten
+Runde lautete „Schritt f — die feste Domain". Der Plan trägt **A** = Domain (§3) und **F** =
+Schema `doing`/`assignee` (§8) — zwei völlig verschiedene Arbeiten. Bevor ich etwas baue, wurde
+gemessen, ob der Vorlauf von Step A überhaupt stattgefunden hat: `tailscale status` zeigt sieben
+Nodes, **keiner ist ein Terminator**; `phase3_edge/local.env` trägt `PUBLIC_BASE_URL` und
+`ALLOWED_HOSTS` weiter auf `…tail4a8b49.ts.net`. Der Vorlauf fehlt also, und der Plan sagt
+ausdrücklich, dass Beschaffung **kein** Agenten-Auftrag ist. Nikinger-Antwort: **Step A,
+mein Anteil vorbereiten.**
 
-| Datei | Änderung |
-|---|---|
-| `phase5_ui/webui/static/js/state.js` | Feld `state.graphToken` + **exportierte** reine Funktion `overviewToken(overview)` (Format an **einer** Stelle) |
-| `phase5_ui/webui/static/js/list.js` | `loadOverview()` setzt `state.graphToken` am Ende (vier Zeilen inkl. Begründung) |
-| `phase5_ui/webui/static/js/graph.js` | (a) Abruf-Skipper gegen die Signatur, (b) `x`/`y`-Übernahme für bekannte IDs, V118-Kommentar an `drawEdges()` |
-| `phase5_ui/webui/static/js/app.js` | nur `loadGraphPanel({ force: true })` am Refresh-Knopf + zwei Kommentare — **kein** neuer Import, **keine** neue Aufrufstelle |
-| `phase9_hardening/scripts/graph_reload_probe.mjs` (neu, ~350 Z.) | Node-Harness: lädt das echte Modul mit DOM-Shim, zählt `fetch`, misst Bilder |
-| `phase9_hardening/tests/test_graph_reload.py` (neu, ~160 Z.) | 7 Tests, einer pro Abnahmezeile plus Kontroll- und Eigentums-Wächter |
-| `phase9_hardening/scripts/p9e_reload_probe.py` (neu, ~300 Z.) | Browser-Probe (Playwright, Wegwerf-Instanz Port 18768) |
+### Der Befund, der die Bauform gerettet hat
 
-**Plan-Korrektur, datiert 2026-09-26 (Code schlägt Plan — Working style der Wurzel-`CLAUDE.md`):**
-Plan §7.2(a) wollte die Signatur aus „Knotenzahl + Kantenzahl + höchstem `updated`" bilden und
-nennt als Quelle ausdrücklich den **Graph**-Payload. Gemessen in `api.py :: _graph_get`
-(Z. 698-708): der Knoten hat **genau neun Felder** (`id/title/space/own/writable/type/status/
-folder/tags`) und **kein `updated`, kein `version`** — die geforderte Signatur lässt sich dort
-gar nicht bilden, und ein zehntes Feld wäre eine Contract-Öffnung, die §7.2 für diesen Step
-ausdrücklich ausschließt (P9-M).
+**Plan §3.2 A4 ist unbaubar, und zwar nicht wegen einer Kleinigkeit.** Die Anweisung lautet
+`reverse_proxy <heimvm-tailnet-name>:<port>`. Gemessen:
 
-**Was stattdessen trägt, ohne eine einzige neue Server-Antwort:** das `/api/v1/overview`-
-Payload, das der Client ohnehin holt — Bootstrap, 20s-Zähler-Poll, Fokus, **jeder Schreibvorgang**.
-Je Space: `item_count`, die Bucket-Zähler, die fünf zuletzt geänderten Items mit
-`id`/`version`/`updated` (`_RECENT_LIMIT = 5`).
+- `phase4_auth/systemd/sharefyx-mcp.service:13` — `Environment=SPACE_HOST=127.0.0.1`
+- `ss -ltnp` — `LISTEN 127.0.0.1:8765` und **kein** Listener auf `100.93.43.122:8765`
+- `tailscale serve status` — der Funnel proxyt auf `http://127.0.0.1:8765`; er funktioniert
+  genau deshalb, weil `tailscaled` auf derselben Maschine in die Schleife connectet
 
-**Warum das Feld in `state.js` steht und nicht in `graph.js`** (der erste Entwurf hatte einen
-Export `noteOverview` in `graph.js`, aufgerufen aus `app.js` — **verworfen**, Begründung unten):
-Erzeuger (`list.js`) und Verbraucher (`graph.js`) importieren sich nicht, ohne einen Zyklus zu
-bauen (`graph.js` → `editor.js` → `list.js`). `state.js` ist das Blatt, das beide ohnehin
-importieren.
+Auf der Tailnet-Adresse gibt es nichts, womit ein VPS sich verbinden könnte. Die naheliegende
+Reparatur — `SPACE_HOST=0.0.0.0` — ist die **gelockte P3-B-Entscheidung** („wird nie
+`0.0.0.0`", gilt am Host, nicht nur am Router). Sie zu brechen, um einen Proxy zu retten,
+wäre genau die stille Abweichung, die P8.6 zweimal gekostet hat.
 
-**Warum der erste Entwurf verworfen wurde — ein echter Fund, kein Geschmack:** das Token an
-`app.js` zu hängen (drei Stellen: Bootstrap, Poll, Refresh) ließ **jeden eigenen Schreibvorgang
-unsichtbar**. `editor.js :: afterWrite`, `dialogs.js` (Ordner, Freigabe, Verschieben) und
-`spaces.js` rufen `loadOverview()` themselves — aber nicht meinen Melder. Der Nutzer hätte seinen
-gerade gespeicherten Titel erst nach dem nächsten 20s-Poll im Graphen gesehen, und P9-35 („eine
-Datenänderung führt weiterhin zum Neuladen") wäre auf die fremde Hälfte der Welt wahr und auf die
-eigene falsch. `loadOverview()` ist die **eine** Funktion, durch die jeder Zählerstand läuft —
-dort gehört das Token hin. Zwei Wächter sichern das ab: `p9_35_own_write_is_visible_immediately`
-(Unit) und Schritt 5 der Browser-Probe.
+**Gebaut: ein Relay, das die eine Lücke schließt, ohne P3-B zu brechen.**
+`phase3_edge/systemd/sharefyx-tail-proxy.service` macht `100.93.43.122:8765 → 127.0.0.1:8765`
+mit `socat`; die App bindet unverändert auf Loopback. Bewusst **ohne** `__REPO_ROOT__` im
+`ExecStart` — genau damit ist die Kopplung konstruktiv ausgeschlossen, die beim Watchdog zum
+Befund wurde (dort zeigte `ExecStart` auf ein Release, das die Datei nicht enthält,
+Session-Block 2026-09-28). `install_units.sh` wurde dafür **nicht** angefasst: das ist
+P3-Code, und der Commit bleibt additiv; das Runbook installiert die Unit mit
+`sudo install -m 0644`.
 
-### `force` und der Refresh-Knopf — der eine Ausnahmepfad
+**Die Alternative wurde nicht aus Bequemlichkeit verworfen.** Tailscale **1.102.4** kann
+`tailscale serve --tcp` (gemessen an `serve --help`) — kein zusätzlicher Prozess, der
+elegantere Weg. Ob Tailscale-TCP-Forwarder die Tailnet-ACLs durchsetzen, war in dieser
+Session **nicht verifizierbar** (kein Netzzugriff: `tailscale.com` per DNS nicht auflösbar,
+Suchprovider leer). Eine offene Frage darf nicht die Grundlage einer Firewall-Entscheidung
+sein → der Relay ist ein gewöhnlicher Listener auf `tailscale0`, für den das ACL-Modell ohne
+Zusatzannahme gilt. Als **V162** offen notiert, mit der Frage und wo sie zu beantworten ist.
 
-Nur der **explizite** Refresh-Knopf erzwingt einen Abruf. Grund, nicht Kosmetik: der Knopf ruft
-`loadOverview()` und `loadGraphPanel()` **parallel** — ohne `force` könnte der Graph laufen,
-bevor das neue `/overview` da ist, und deshalb einen Abruf überspringen, obwohl sich etwas
-geändert hat. Der Home-Knopf (der Weg, den P9-33 misst) und der Bootstrap laufen über die
-Signatur.
+### Vier weitere Befunde, alle mit Fundstelle
 
-### Test-Stand, und was die Gegenprobe gegen `HEAD` ergab
+1. **Die Health-Route heißt `/health`, nicht `/healthz`.** `app.py:216` registriert genau
+   eine. Plan §3.4 (P9-10) nennt den falschen Pfad — Abnahmezeile mit datierter Korrektur.
+2. **`ALLOWED_HOSTS` fehlt in Plan-A7.** Caddy reicht den Host-Header durch, die
+   `TrustedHostMiddleware` (`app.py:214`) antwortet sonst auf **jede** Anfrage mit
+   `400 Invalid host header`. Keine Theorie: der Live-Incident vom 2026-09-18 war genau das.
+3. **V149 beantwortet:** `AuthSettings.issuer` **ist** `base_url` **ist**
+   `SPACE_PUBLIC_BASE_URL` (`config.py:45`), `metadata.py:24-29` leitet vier Felder daraus ab,
+   `resource` ebenso, und `allowed_redirect_origins` hat einen eigenen Default — die
+   Redirect-URIs der Claude-Clients bleiben also unberührt. **Kein Feld steht fest.** A7 ist
+   damit eine Handvoll Env-Werte; die §3.3-Falle bleibt trotzdem real, weil der `iss` Teil der
+   Client-Registrierung ist (RFC 9207, `routes.py:154`) → **A7 vor A8**. Und: es gibt
+   **nirgends** eine `iss`-Prüfung beim Einlösen (`resolver.py` enthält kein `iss`) — der
+   Wechsel invalidiert keine bestehende Token-Familie.
+4. **Der Funnel bleibt nach A7 lesbar, aber nicht beschreibbar.** `security.py:84` prüft
+   `origin != settings.base_url` **exakt**. Nach A7 schickt ein Browser am alten
+   Funnel-Host `Origin: …ts.net` → jeder Schreibvorgang 403, GETs laufen. Das ist die
+   Präzisierung, die P9-14 braucht. Ein echter Dual-Betrieb bräuchte eine zweite erlaubte
+   Origin im Code, `UiSettings` hat genau ein `base_url`-Feld — **das wird nicht gebaut**
+   (außerhalb Step A). Der Funnel ist der Rückfallweg für „VPS weg"; Lesen und ein
+   intakter Connector reichen dafür.
 
-`pytest` **1031 passed + 1 failed** in 180,9 s. Die **eine** Fehlschlagung ist
-`phase9_hardening/tests/test_doc_health.py::test_oversize_clean` und **kein** Befund dieses
-Steps: `docs/INDEX.md` ist 41.303 B gegen die 40.960-B-Schwelle, und **derselbe Test schlägt auf
-unverändertem `HEAD` (`git stash -u`) genauso rot** — vorher gemessen, 1 failed / 8 passed. Der
-Befund ist im INDEX-Frontmatter bereits benannt (V145) und gehört laut Plan in **Step Z** (die
-INDEX-Rotation); die dortige „aktuelle Größe" (40.976 B) ist inzwischen stale, weil die
-Step-B/C-Einträge danach gewachsen sind. Baseline vorher 1024 → nachher 1031 = **+7**, alle aus
-diesem Step.
+### Tests
 
-**Gegenprobe Node-Harness** (vier JS-Dateien auf `HEAD` via `git stash push -- …/static/js/`),
-5 von 8 Prüfungen rot:
+`phase9_hardening/tests/test_tail_proxy.py`, 7 Wächter: Ziel bleibt Loopback · Bind ist eine
+Tailnet-IP und nicht `0.0.0.0` · Härtungs-Direktiven **identisch mit der MCP-Unit** (die
+Behauptung aus dem Step-B-Block wird hier gemessen statt geglaubt) · kein Repo-Pfad im
+`ExecStart` · Port identisch mit `SPACE_PORT` · Health-Routen-Korrektur hält · ACL-Entwurf
+fail-closed (genau eine Regel, genau ein Port, genau eine Adresse).
 
-| Prüfung | mit Fix | auf HEAD |
-|---|---|---|
-| `state_module_exposes_the_token_builder` | ✅ | ❌ |
-| `p9_33_no_second_fetch` | 1 Abruf | **2 Abrufe** |
-| `p9_34_reentry_does_not_restart_the_simulation` | 0 Frames | 1 Frame |
-| `p9_34_known_nodes_keep_their_position` | 0,0 px nach Refetch | **467,6 px** (Sprung auf den Seed-Ring) |
-| `p9_35_own_write_is_visible_immediately` | 1 / 0 | 1 / **1** |
-| `p9_34_control_drop_point_is_off_the_ring` | ✅ | ✅ (Kontrollmessung, darf auf beiden Seiten gleich sein) |
-| `p9_35_a_change_still_reloads` | ✅ | ✅ (P9-35 ist die Nicht-Regressions-Seite) |
-| `v118_tag_edge_plus_explicit_edge` | 2 Linien | 2 Linien (dokumentiert **bestehendes** Verhalten) |
+**Gegenprobe:** vier Verstöße eingebaut (`TAILNET_ADDR=0.0.0.0`, `APP_ADDR=0.0.0.0`,
+`ProtectSystem=false`, `APP_PORT=9999`) → **4 von 7 rot, exakt die vier dafür zuständigen**;
+nach dem Zurücksetzen 7/7 grün. Ein Wächter, der bei einem eingebauten Verstoß grün bleibt,
+ist eine Behauptung.
 
-**Gegenprobe Browser** (Wegwerf-Instanz, dieselbe Stash-Technik), 2 von 6 Prüfungen rot:
+### Vier eigene Fehler, alle vor dem Commit behoben
 
-| Prüfung | mit Fix | auf HEAD |
-|---|---|---|
-| Login lädt die Karte genau einmal | 1 | 1 (unverändert) |
-| **P9-33 Wiedereintritt: Abrufe** | **0** | **1** |
-| **P9-34 Wiedereintritt: verschiedene Bilder in 1,5 s** | **1 von 10** | **10 von 10** |
-| P9-35 Refresh-Knopf erzwingt | 1 | 1 (auf HEAD erfüllt der Button das ohnehin) |
-| P9-35 fremde Änderung wird aufgenommen (Knoten 14 → 15) | 1 | 1 |
-| Konsole | 0 Fehler | 0 |
+1. `_env_value` verglich gegen `^NAME=` und vergaß das `Environment=`-Präfix — **drei** Tests
+   schlugen aus einem Grund rot, den sie nicht prüfen sollten.
+2. `addr in ip_address("100.64.0.0/10")` — ein Netz ist keine Adresse, `ValueError` statt
+   Aussage. `ip_network` ist die richtige Funktion.
+3. Der `/healthz`-Wächter schlug an einem **eigenen Kommentar** an, der die Korrektur
+   erklärt. Dieselbe Klasse wie in Step E (`test_graph_module_does_not_touch_the_api_
+   contract`): ein Kommentar darf eine Route nennen, eine Anweisung nicht — der Wächter
+   prüft jetzt nur die Nicht-Kommentar-Zeilen.
+4. In den ACL-Entwurf rutschten zwei chinesische Zeichen (`古典`) in einen Nebensatz. Der
+   Absatz ist ersetzt, JSON parsebar geprüft, die Datei auf Zeichen außerhalb des
+   lateinischen/typografischen Bereichs geprüft.
 
-**Der P9-34-Browserbefund war eine Korrektur meiner eigenen Messung** und steht deshalb hier, weil
-er die Abnahmezeile trägt: der erste Vergleich nahm die Fingerabdrücke **nach** dem Einschwingen
-und fand auf `HEAD` wie mit Fix dasselbe Bild — der Seed ist seit P8.6-D2 deterministisch, beide
-Wege landen im selben Gleichgewicht. Der Unterschied ist der **Weg**: ohne (b) bekommt jeder
-Knoten wieder `x: 0, y: 0` und die Simulation läuft ~2,5 s sichtbar auseinander. Gemessen wird
-jetzt eine **Serie** von Bildern nach dem Wiedereintritt. Ein Screenshot-**Paar** im
-eingeschwungenen Zustand hätte diese Abnahmezeile nicht belegen können — das ist der Grund,
-warum der Plan sie als „im Screenshot-Paar belegt" formuliert hat und sie trotzdem so nicht
-belegbar ist.
+### Selbstprüfung §0.4
 
-**Zwei weitere Fehler derselben Klasse, beide in der Browser-Probe gefunden und behoben:** (1) der
-ESC-Handler (`app.js` Z. 207 ff.) ruft `Editor.closeEditor()` und **kein** `loadGraphPanel()` —
-die Karte kommt seit jeher aus dem Speicher zurück. Der Eintritt in die Übersicht ist
-ausschließlich der `#home-button`; ein Abruf-Zähler um den ESC herum hätte 0 gemessen, weil gar
-nichts angefordert wurde. (2) Die Knotenzählung der Probe lief **im** Messfenster und zählte sich
-selbst mit — der Lauf meldete „2 Abrufe" und war rot für einen Grund, den es nicht gab. Zwei
-Korrekturen, eine Klasse: **ein Messgerät, das sein eigenes Messinstrument mitzählt, misst
-nichts.**
+1. `pytest -q` → siehe Commit-Body (Baseline 1031 + 7 aus diesem Commit).
+2. `ui_budget` **nicht nötig** — `phase5_ui/webui/static/**` unberührt.
+3. `node --check` **nicht nötig** — keine JS-Datei berührt.
+4. Tabu-Bereichs-Diff leer für `permissions.py`, `server.py`, `authserver/`, `phase6_shares`,
+   `phase7_spaces_admin` (Bereichs-Diff, nicht Working-Tree).
+5. Doc-Update im selben Commit: dieser Block, Modulstatus, Rotation, INDEX-Zeile,
+   `phase3_edge/CLAUDE.md`-Notiz (die neue Unit liegt in dessen Verzeichnis).
+6. Kein Service-Touch. `sharefyx-mcp` nur **gelesen** (`ss`, `tailscale status`); die
+   Live-Unit wurde nicht angefasst, kein `pkill -f`, kein `systemctl`.
 
-### V118 — beantwortet, die Design-Frage bleibt beim Nikinger
+### Nächster Schritt — beim Nikinger, nicht bei mir
 
-**Frage:** wird eine Tag-Kante **und** eine explizite Kante zwischen denselben zwei Knoten als
-zwei Linien gezeichnet? **Antwort: ja — zwei, von denen die zweite gestrichelt ist.** Gemessen an
-einem echten Frame im Node-Harness (`segments_in_last_frame: 2`, `duplicate_segments: 1`,
-`a_dashed_line_was_drawn: true`), nicht geraten: `dedupeEdges()` fasst nur die expliziten Kanten
-zusammen, `buildTagEdges()` nur die Tag-Kanten, und die Zusammenführung beider Listen passiert
-erst in `drawEdges()` — ohne Dedup, ein `ctx.stroke()` je Eintrag.
+**A1 (Domain) und A2 (VPS) sind Beschaffung und ausdrücklich kein Agenten-Auftrag.** Danach
+läuft die Kette, ein Schritt pro Runde: **A3** (VPS ins Tailnet + ACL-Fragment) → **A0b**
+(`socat` + Relay, sonst geht A4 nicht) → **A5** (DNS-A-Record) → **A4** (Caddy) → **A6**
+(Firewall) → **A7** (Basis-URL + `ALLOWED_HOSTS`) → **A8** (Connector in beiden Konten, echter
+`list_spaces`) → **A9** (Rückfall, Inhalt steht im Runbook) → P9-10–P9-15.
 
-**Was ich nicht entschieden habe:** ob zwei Linien gewollt sind. Der Plan (§7.3) sagt selbst,
-das sei eine Nikinger-Frage und keine Bauentscheidung. Die Karte zeigt heute beides als
-gleichzeitige Aussage über ein Paar: eine Linie hieße „irgendeine Beziehung", zwei heißen
-„verlinkt **und** gleicher Tag". Der Test friert das gemessene Verhalten ein; ein Umstieg auf
-eine Linie ist eine bewusste Entscheidung, kein Fix, und würde den Test bewusst umdrehen.
-
-### Benannte Grenze des Mechanismus (mit übernommen, nicht verschwiegen)
-
-Ändert ein Item **nur seine Tags** und ist es in seinem Space nicht mehr unter den fünf zuletzt
-geänderten Items, bleibt die Signatur gleich und der Graph steht bis zum manuellen Refresh. Der
-Grund ist dieselbe Grenze wie beim Zähler-Poll: die Übersicht selbst zeigt dieses Item dann auch
-nicht. Die beiden Auswege wären ein Feld am Graph-Payload (P9-M verbietet es) oder ein
-serverseitiger Änderungs-Zähler (eine neue Route, noch teurer). Beides ist **nicht** gebaut und
-nicht stillschweigend verworfen — es steht hier.
-
-### Selbstprüfung §0.4 — alle sechs Punkte
-
-1. `pytest -q` → **1031 passed, 0 failed** (vorher 1024 passed + **1 failed**, +7 aus diesem
-   Step). Die eine Fehlschlagung war `test_doc_health.py::test_oversize_clean` und **kein** Befund
-   dieses Steps: `docs/INDEX.md` lag über der 40.960-B-Schwelle, **auf unverändertem `HEAD`
-   (`git stash -u`) genauso rot** — vorher gemessen, 1 failed / 8 passed. Siehe „Der
-   INDEX-Befund" unten für die Auflösung und ihre Grenze.
-2. `ui_budget.py` → **5/5**, `app.js + app.css + Font (gzip)` **149,0 KB** von 250 KB
-   (P8.6-Closeout-Baseline 144,7 KB; die Zunahme ist die vier JS-Dateien dieser Session, davon
-   `graph.js` 12,0 KB gzip).
-3. `node --check` ✅ auf `app.js`, `graph.js`, `list.js`, `state.js` **und** dem `.mjs`-Harness.
-4. Tabu-Bereichs-Diff `git diff --stat 2f752f9^ -- …` **leer** für `permissions.py`, `server.py`,
-   `authserver/`, `phase6_shares`, `phase7_spaces_admin`. Zusatzprobe `phase1_storage` **leer** —
-   `space_cli.py` wurde nur **ausgeführt** (Wegwerf-DATA_ROOT), nicht angefasst.
-5. Doc-Update im selben Commit (Hard Rule 8): Modulstatus, dieser Block, Rotation, INDEX-Zeile.
-6. Kein Service-Touch. Die Wegwerf-Instanz wurde über ihre **PID-Datei** gestoppt
-   (`wegwerf_setup_d2.py stop`, PID 644239) — kein `pkill -f`, kein `systemctl`.
-
-### Drei Fehler, die diese Session gemacht hat (alle vor dem Commit behoben)
-
-1. **Die erste Verdrahtung war falsch** (Token an `app.js`, eigene Schreibvorgänge unsichtbar) —
-   im vorigen Abschnitt erklärt. Klassenpunkt: die Modul-Tests waren grün, weil sie das Token
-   selbst gesetzt haben; der Fehler lag in der **Verdrahtung zwischen Modulen**, die ein
-   Modul-Test prinzipiell nicht sieht. Genau dafür gibt es die Browser-Probe.
-2. **Die erste Browser-Messung maß ihren eigenen Versuchsaufbau** (feste Wartezeit statt
-   Ruhe-Erkennung, ESC statt Home-Knopf, Zählung im Messfenster) — drei Korrekturen, alle im
-   Probe-Skript kommentiert.
-3. **Ein Fehler in einem der eigenen Testdokumente**: `test_graph_module_does_not_touch_the_api_
-   contract` schlug an einem **eigenen Kommentar** an, der `/api/v1/overview` nennt. Der Textvergleich
-   wurde auf **String-Literale** umgestellt — ein Kommentar darf eine Route erwähnen, ein
-   String-Literal im Code nicht.
-
-### Vormerkung für später — das Modell im Vision-Adapter (2026-09-28)
-
-Am Rande von Step E: der `local_vision`-Adapter wurde auf den P9-Screenshots **zusätzlich** benutzt
-(qualitative Fragen gut, **Zählen unbrauchbar** — dasselbe Bild, zwei Läufe, zwei Zahlen: 10/6
-gegen 6/5, sowie „1 Knoten" in einer 14-Knoten-Karte). Die Abnahme blieb belastbar, weil die
-eigentliche Messung **programmatisch** war (Canvas-Fingerabdruck, Knotenzahl aus dem API-Payload);
-das Bild war Anhang, nicht Beleg.
-
-**Recherche, Schluss und Kandidaten stehen in
-[`docs/concepts/sichtpruefung_automation_tooling.md`](../docs/concepts/sichtpruefung_automation_tooling.md)
-§Vormerkung 2026-09-28.** Das Ergebnis in einem Satz: **ein Modellwechsel ist nicht der Hebel** —
-Zählen ist eine modellübergreifend dokumentierte VLM-Schwachstelle (arXiv 2605.30170: *data
-scaling alone is insufficient*; GroundCount 2603.10978: 64–74,7 % über fünf SOTA-Modelle, unser
-`qwen3-vl` namentlich in TrustNLP 2026 mit *stochastic counting errors*), der Hebel ist die
-Zuständigkeitsgrenze VLM-binär ↔ Messung-quantitativ, und die ist in P9 bereits richtig gesetzt.
-**Kein P9-Block.** Ein Stack-Wechsel (`llama.cpp`/`vLLM` statt `ollama`) oder ein kleineres Modell
-(4B/2B) lohnt sich erst, wenn jemand die **Latenz** des Adapters im Chatbetrieb als störend
-empfindet — und dann als Beschleunigung, nicht als Genauigkeitsgewinn.
-
-### Install-Vorbereitung Step B — zwei Befunde, die die Reihenfolge bestimmen (2026-09-28)
-
-Vor der Frage „was installiere ich eigentlich?" geprüft, was `install_units.sh` mit den neuen
-Units **wirklich** tut und wohin `__REPO_ROOT__` zeigt. Zwei Befunde, **beide gemessen, nicht
-aus dem Session-Block abgelesen**:
-
-**1. `__REPO_ROOT__` zeigt auf ein Release, das die Datei nicht enthält — Reihenfolge-Constraint.**
-`phase3_edge/local.env` trägt `REPO_ROOT=/opt/sharefyx/current` (Zeile 11, Stand 2026-09-18 nach
-dem Cutover), und `/opt/sharefyx/current` ist ein **Symlink** auf
-`releases/20260918T183907.597248Z`. Geprüft:
-
-```
-test -f /opt/sharefyx/current/phase3_edge/scripts/tailscaled_watchdog.sh   -> NEIN
-test -f /opt/sharefyx/current/phase3_edge/systemd/tailscaled-watchdog.service -> NEIN
-```
-
-Das Release vom 2026-09-18 ist **drei Wochen älter als Step B** und enthält die Dateien nicht
-(der Umzug nach `/opt/sharefyx/current` ist der Cutover aus P5; im Git-Arbeitsverzeichnis sind sie
-natürlich da). **Folge:** `install_units.sh` schreibt die Unit korrekt, aber `ExecStart` zeigt ins
-Leere — der Timer feuert alle 60 s und der Dienst startet nicht. Drei Wege, alle vertretbar:
-
-| Weg | Bewertung |
-|---|---|
-| **Warten auf das Gate** (deployt `v3.1.0` und damit ein Release mit den Dateien) | **empfohlen** — vermeidet einen absichtlich kaputten Zustand und ist ohne Zusatzaufwand, weil das Gate ohnehin deployt |
-| Installieren und den Fehlschlag bis dahin in Kauf nehmen | funktioniert, aber `journalctl` zeigt 60 s lang Fehlschläge — die sieht nach einem Defekt aus und ist es nicht |
-| `ExecStart` temporär auf den Git-Checkout zeigen | **nicht** — beim nächsten `install_units.sh` überschrieben, und zwei Pfade für dieselbe Datei sind die Art Drift, die dieses Repo gerade rausgebaut hat |
-
-Das ist **kein Fehler in `install_units.sh`** (es substituiert korrekt, was in `local.env` steht),
-sondern eine Folge der Cutover-Entscheidung aus P5 Step 8: die Live-Unit läuft aus dem Release,
-nicht aus dem Checkout. Ein Watchdog, der einen Pfad nutzt, den nur ein Deploy aktualisiert, ist
-eine echte Kopplung — **für Step Z zu notieren**: Watchdog-Pfade entweder relativ zum Release
-auflösen (mit Restart nach jedem Deploy) oder bewusst auf den Checkout legen und dort lassen.
-
-**2. V153-Dateiname: zwei Namen in der eigenen Doku, einer davon falsch verbreitet.**
-
-| Fundstelle | Dateiname |
-|---|---|
-| Frontmatter dieses Heads (`updated:` 2026-09-26) | `/etc/polkit-1/rules.d/99-tailscaled-watchdog-restart.rules` |
-| `SESSIONS_ARCHIVE.md` Z. 195 (Block 2026-09-26, **verbatim, bleibt stehen**) | `/etc/polkit-1/rules.d/99-tailscaled-restart.rules` |
-
-Das Archiv wird nicht angefasst (Rotationsregel: verbatim). **Kanonisch ist der Name aus dem
-Frontmatter**, `99-tailscaled-watchdog-restart.rules` — er nennt die Komponente, nicht nur die
-Aktion, und ist damit der eindeutigere der beiden. Wer die Regel anlegt, sollte genau den
-verwenden und sich die Abweichung merken: die Datei im Archiv hat einen kürzeren Namen, weil sie
-dort zuerst notiert wurde.
-
-**3. Die Härtung ist tatsächlich identisch, nicht nur behauptet.** Zeile für Zeile gegengeprüft:
-`sharefyx-mcp.service` und `tailscaled-watchdog.service` tragen dieselben zehn Direktiven
-(`User=savefyx`, `Group=savefyx`, `NoNewPrivileges`, `PrivateTmp`, `ProtectSystem=strict`,
-`ProtectHome=read-only`, `ProtectKernelTunables`, `ProtectControlGroups`,
-`RestrictAddressFamilies`, `MemoryDenyWriteExecute`, `SystemCallFilter=@system-service`). Die
-Aussage im Block 2026-09-26 hält der Prüfung stand — sie wird hier nur von Behauptung zu Beleg.
-
-### Der INDEX-Befund — aufgelöst, mit einer Grenze, die benannt bleibt
-
-`doc_health.py` meldete `docs/INDEX.md: 41.303 B > 40.960 B, glyph=None, nicht als 📕/📦
-markiert und nicht mit aktueller Größe benannt`. **Zwei Ursachen, beide gemessen:**
-
-1. Die im Frontmatter genannte Größe war **stale** (40.976 B aus dem 2026-09-26-Eintrag, während
-   die Datei durch die Step-B/C-Einträge auf 41.303 B gewachsen war).
-2. **Die Prüfung liest ausschließlich Zeilen, die mit `- [` beginnen** (`_index_line_for()`), und
-   der INDEX hat keine Aufzählungszeile über sich selbst** — die Benennung im Frontmatter war für
-   das Werkzeug unsichtbar. Das ist kein Fehler in meinem Text, sondern eine Lücke in der
-   Werkzeug-Logik: für `CLAUDE.md`, `ROADMAP.md` und die Phasen-Heads greift derselbe Ausweg
-   (Bullet mit `benannt statt versteckt` und aktueller Byte-Zahl), für die Karte selbst gab es ihn
-   nicht.
-
-**Was ich gemacht habe:** eine Selbst-Aufzählungszeile in der Sektion „Root & governance" angelegt
-(🔗 diese Karte, 42.513 B, benannt statt versteckt) und die Frontmatter-Größe als **Fixpunkt**
-nachgezogen — beide Zahlen stimmen jetzt exakt mit `stat()` überein (42.513 B), was per
-zweimaligem Schreiben geprüft wurde, nicht per Absicht. `scripts/doc_health.py`: **0 Befunde**,
-`test_doc_health.py`: **9/9 grün**.
-
-**Was das nicht ist:** der INDEX ist weiterhin **42.513 B** und damit 1.553 B über der Schwelle des
-Werkzeugs und ~3,5 KB über dem 38-KB-Softcap (V145). Benannt statt versteckt (P8-P) — die
-tatsächliche Lösung bleibt die INDEX-Rotation in **Step Z** (P9-L). Was diese Session beweist,
-ist nur: das Werkzeug kann den Zustand jetzt *sehen* und der Benutzer wird nicht mehr von einem
-roten Test überrascht, den niemand erklären kann. **Hinweis für später:** die Selbst-Zeile ist
-ein Fixpunkt — jede spätere Zeile im INDEX macht die genannte Größe wieder stale, und dann
-schlägt `test_oversize_clean` erneut rot. Das ist beabsichtigt: der Test soll genau dann
-aufschrei, wenn jemand den INDEX ohne Rotierung wachsen lässt.
-
-### Nächster Schritt
-
-**Offen bleiben B** (fünf Nikinger-Schritte, siehe Block 2026-09-26) und **A** (Domain +
-VPS, Beschaffung ist ausdrücklich kein Agenten-Auftrag). Die nächsten reinen Code-Steps sind
-**F** (Schema-Fundament, neunte P1-Contract-Öffnung P9-G, neun Stellen zeilengenau in §8.2, enge
-Probe in §8.7 ist Abbruchkriterium) und **G** (Löschen nach `_trash/`) — **F** zuerst, weil
-**G** das `store`-Umfeld von **F** braucht. **H** (fastmcp 3.4.4 → 3.4.7) ist ein Einzeiler, aber
-bewusst **nach** F/G, weil ein Dependency-Bump in einer Phase mit angekündigter Contract-Öffnung
-schwer zu isolieren ist.
-
-**Für den Nikinger, zwei Dinge:** (1) die fünf Step-B-Schritte aus dem Block 2026-09-26, sobald
-Zeit ist — danach Step B 🟡→✅; (2) die V118-Frage oben: **eine Linie oder zwei?**
+**Offen für den Nikinger, drei Entscheidungen:** (1) **A6-SSH** — die Firewall-Anweisung
+lässt 22 bewusst zu; wer die Kiste nicht nur über Tailscale erreichbar haben will, entscheidet
+das. (2) **Befund 5** — ob der Funnel nach A7 als **Lese**-Fallback genügt (Empfehlung) oder
+ob ein echter Dual-Betrieb gewünscht ist (dann ist das eine Codeänderung, die außerhalb
+Step A liegt und eine eigene Entscheidung braucht). (3) **`assignee`** (V160) für Step F —
+unabhängig von A, aber es ist die einzige Frage, die F vor dem Bauen braucht.

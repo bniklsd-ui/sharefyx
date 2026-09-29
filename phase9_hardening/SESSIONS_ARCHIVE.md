@@ -5,7 +5,7 @@ read-when: Chronik einer älteren P9-Session gesucht — nicht beim normalen Arb
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
+updated: 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
 ---
 
 # Phase 9 — Sessions Archive
@@ -15,6 +15,287 @@ trägt immer genau einen `## Session stopped`-Block, ältere Blöcke wandern ver
 Vorsatz: nichts abtippen, alles per Skript mit vier Gegenproben (Schnitt verlustfrei, neuer
 Head trägt genau einen Block, alle bewegten Blöcke im Archiv byte-identisch, Archivbestand
 unangetastet).
+
+## Session stopped — 2026-09-28
+
+**Step E ✅ gebaut und beides belegt: Modul-Ebene (Node-Harness) und Browser (Wegwerf +
+Playwright), jede Ebene mit Gegenprobe gegen `HEAD`.** Reiner Frontend-Step, kein Server-Touch,
+kein `pytest`-Rückgang, `ui_budget` 5/5, Tabu-Bereichs-Diff leer, kein `pkill -f`, kein
+`systemctl` von meiner Seite, `sharefyx-mcp` unangetastet (Hard Rule 9).
+
+### Was gebaut wurde — und eine Plan-Korrektur, die der Code erzwungen hat
+
+| Datei | Änderung |
+|---|---|
+| `phase5_ui/webui/static/js/state.js` | Feld `state.graphToken` + **exportierte** reine Funktion `overviewToken(overview)` (Format an **einer** Stelle) |
+| `phase5_ui/webui/static/js/list.js` | `loadOverview()` setzt `state.graphToken` am Ende (vier Zeilen inkl. Begründung) |
+| `phase5_ui/webui/static/js/graph.js` | (a) Abruf-Skipper gegen die Signatur, (b) `x`/`y`-Übernahme für bekannte IDs, V118-Kommentar an `drawEdges()` |
+| `phase5_ui/webui/static/js/app.js` | nur `loadGraphPanel({ force: true })` am Refresh-Knopf + zwei Kommentare — **kein** neuer Import, **keine** neue Aufrufstelle |
+| `phase9_hardening/scripts/graph_reload_probe.mjs` (neu, ~350 Z.) | Node-Harness: lädt das echte Modul mit DOM-Shim, zählt `fetch`, misst Bilder |
+| `phase9_hardening/tests/test_graph_reload.py` (neu, ~160 Z.) | 7 Tests, einer pro Abnahmezeile plus Kontroll- und Eigentums-Wächter |
+| `phase9_hardening/scripts/p9e_reload_probe.py` (neu, ~300 Z.) | Browser-Probe (Playwright, Wegwerf-Instanz Port 18768) |
+
+**Plan-Korrektur, datiert 2026-09-26 (Code schlägt Plan — Working style der Wurzel-`CLAUDE.md`):**
+Plan §7.2(a) wollte die Signatur aus „Knotenzahl + Kantenzahl + höchstem `updated`" bilden und
+nennt als Quelle ausdrücklich den **Graph**-Payload. Gemessen in `api.py :: _graph_get`
+(Z. 698-708): der Knoten hat **genau neun Felder** (`id/title/space/own/writable/type/status/
+folder/tags`) und **kein `updated`, kein `version`** — die geforderte Signatur lässt sich dort
+gar nicht bilden, und ein zehntes Feld wäre eine Contract-Öffnung, die §7.2 für diesen Step
+ausdrücklich ausschließt (P9-M).
+
+**Was stattdessen trägt, ohne eine einzige neue Server-Antwort:** das `/api/v1/overview`-
+Payload, das der Client ohnehin holt — Bootstrap, 20s-Zähler-Poll, Fokus, **jeder Schreibvorgang**.
+Je Space: `item_count`, die Bucket-Zähler, die fünf zuletzt geänderten Items mit
+`id`/`version`/`updated` (`_RECENT_LIMIT = 5`).
+
+**Warum das Feld in `state.js` steht und nicht in `graph.js`** (der erste Entwurf hatte einen
+Export `noteOverview` in `graph.js`, aufgerufen aus `app.js` — **verworfen**, Begründung unten):
+Erzeuger (`list.js`) und Verbraucher (`graph.js`) importieren sich nicht, ohne einen Zyklus zu
+bauen (`graph.js` → `editor.js` → `list.js`). `state.js` ist das Blatt, das beide ohnehin
+importieren.
+
+**Warum der erste Entwurf verworfen wurde — ein echter Fund, kein Geschmack:** das Token an
+`app.js` zu hängen (drei Stellen: Bootstrap, Poll, Refresh) ließ **jeden eigenen Schreibvorgang
+unsichtbar**. `editor.js :: afterWrite`, `dialogs.js` (Ordner, Freigabe, Verschieben) und
+`spaces.js` rufen `loadOverview()` themselves — aber nicht meinen Melder. Der Nutzer hätte seinen
+gerade gespeicherten Titel erst nach dem nächsten 20s-Poll im Graphen gesehen, und P9-35 („eine
+Datenänderung führt weiterhin zum Neuladen") wäre auf die fremde Hälfte der Welt wahr und auf die
+eigene falsch. `loadOverview()` ist die **eine** Funktion, durch die jeder Zählerstand läuft —
+dort gehört das Token hin. Zwei Wächter sichern das ab: `p9_35_own_write_is_visible_immediately`
+(Unit) und Schritt 5 der Browser-Probe.
+
+### `force` und der Refresh-Knopf — der eine Ausnahmepfad
+
+Nur der **explizite** Refresh-Knopf erzwingt einen Abruf. Grund, nicht Kosmetik: der Knopf ruft
+`loadOverview()` und `loadGraphPanel()` **parallel** — ohne `force` könnte der Graph laufen,
+bevor das neue `/overview` da ist, und deshalb einen Abruf überspringen, obwohl sich etwas
+geändert hat. Der Home-Knopf (der Weg, den P9-33 misst) und der Bootstrap laufen über die
+Signatur.
+
+### Test-Stand, und was die Gegenprobe gegen `HEAD` ergab
+
+`pytest` **1031 passed + 1 failed** in 180,9 s. Die **eine** Fehlschlagung ist
+`phase9_hardening/tests/test_doc_health.py::test_oversize_clean` und **kein** Befund dieses
+Steps: `docs/INDEX.md` ist 41.303 B gegen die 40.960-B-Schwelle, und **derselbe Test schlägt auf
+unverändertem `HEAD` (`git stash -u`) genauso rot** — vorher gemessen, 1 failed / 8 passed. Der
+Befund ist im INDEX-Frontmatter bereits benannt (V145) und gehört laut Plan in **Step Z** (die
+INDEX-Rotation); die dortige „aktuelle Größe" (40.976 B) ist inzwischen stale, weil die
+Step-B/C-Einträge danach gewachsen sind. Baseline vorher 1024 → nachher 1031 = **+7**, alle aus
+diesem Step.
+
+**Gegenprobe Node-Harness** (vier JS-Dateien auf `HEAD` via `git stash push -- …/static/js/`),
+5 von 8 Prüfungen rot:
+
+| Prüfung | mit Fix | auf HEAD |
+|---|---|---|
+| `state_module_exposes_the_token_builder` | ✅ | ❌ |
+| `p9_33_no_second_fetch` | 1 Abruf | **2 Abrufe** |
+| `p9_34_reentry_does_not_restart_the_simulation` | 0 Frames | 1 Frame |
+| `p9_34_known_nodes_keep_their_position` | 0,0 px nach Refetch | **467,6 px** (Sprung auf den Seed-Ring) |
+| `p9_35_own_write_is_visible_immediately` | 1 / 0 | 1 / **1** |
+| `p9_34_control_drop_point_is_off_the_ring` | ✅ | ✅ (Kontrollmessung, darf auf beiden Seiten gleich sein) |
+| `p9_35_a_change_still_reloads` | ✅ | ✅ (P9-35 ist die Nicht-Regressions-Seite) |
+| `v118_tag_edge_plus_explicit_edge` | 2 Linien | 2 Linien (dokumentiert **bestehendes** Verhalten) |
+
+**Gegenprobe Browser** (Wegwerf-Instanz, dieselbe Stash-Technik), 2 von 6 Prüfungen rot:
+
+| Prüfung | mit Fix | auf HEAD |
+|---|---|---|
+| Login lädt die Karte genau einmal | 1 | 1 (unverändert) |
+| **P9-33 Wiedereintritt: Abrufe** | **0** | **1** |
+| **P9-34 Wiedereintritt: verschiedene Bilder in 1,5 s** | **1 von 10** | **10 von 10** |
+| P9-35 Refresh-Knopf erzwingt | 1 | 1 (auf HEAD erfüllt der Button das ohnehin) |
+| P9-35 fremde Änderung wird aufgenommen (Knoten 14 → 15) | 1 | 1 |
+| Konsole | 0 Fehler | 0 |
+
+**Der P9-34-Browserbefund war eine Korrektur meiner eigenen Messung** und steht deshalb hier, weil
+er die Abnahmezeile trägt: der erste Vergleich nahm die Fingerabdrücke **nach** dem Einschwingen
+und fand auf `HEAD` wie mit Fix dasselbe Bild — der Seed ist seit P8.6-D2 deterministisch, beide
+Wege landen im selben Gleichgewicht. Der Unterschied ist der **Weg**: ohne (b) bekommt jeder
+Knoten wieder `x: 0, y: 0` und die Simulation läuft ~2,5 s sichtbar auseinander. Gemessen wird
+jetzt eine **Serie** von Bildern nach dem Wiedereintritt. Ein Screenshot-**Paar** im
+eingeschwungenen Zustand hätte diese Abnahmezeile nicht belegen können — das ist der Grund,
+warum der Plan sie als „im Screenshot-Paar belegt" formuliert hat und sie trotzdem so nicht
+belegbar ist.
+
+**Zwei weitere Fehler derselben Klasse, beide in der Browser-Probe gefunden und behoben:** (1) der
+ESC-Handler (`app.js` Z. 207 ff.) ruft `Editor.closeEditor()` und **kein** `loadGraphPanel()` —
+die Karte kommt seit jeher aus dem Speicher zurück. Der Eintritt in die Übersicht ist
+ausschließlich der `#home-button`; ein Abruf-Zähler um den ESC herum hätte 0 gemessen, weil gar
+nichts angefordert wurde. (2) Die Knotenzählung der Probe lief **im** Messfenster und zählte sich
+selbst mit — der Lauf meldete „2 Abrufe" und war rot für einen Grund, den es nicht gab. Zwei
+Korrekturen, eine Klasse: **ein Messgerät, das sein eigenes Messinstrument mitzählt, misst
+nichts.**
+
+### V118 — beantwortet, die Design-Frage bleibt beim Nikinger
+
+**Frage:** wird eine Tag-Kante **und** eine explizite Kante zwischen denselben zwei Knoten als
+zwei Linien gezeichnet? **Antwort: ja — zwei, von denen die zweite gestrichelt ist.** Gemessen an
+einem echten Frame im Node-Harness (`segments_in_last_frame: 2`, `duplicate_segments: 1`,
+`a_dashed_line_was_drawn: true`), nicht geraten: `dedupeEdges()` fasst nur die expliziten Kanten
+zusammen, `buildTagEdges()` nur die Tag-Kanten, und die Zusammenführung beider Listen passiert
+erst in `drawEdges()` — ohne Dedup, ein `ctx.stroke()` je Eintrag.
+
+**Was ich nicht entschieden habe:** ob zwei Linien gewollt sind. Der Plan (§7.3) sagt selbst,
+das sei eine Nikinger-Frage und keine Bauentscheidung. Die Karte zeigt heute beides als
+gleichzeitige Aussage über ein Paar: eine Linie hieße „irgendeine Beziehung", zwei heißen
+„verlinkt **und** gleicher Tag". Der Test friert das gemessene Verhalten ein; ein Umstieg auf
+eine Linie ist eine bewusste Entscheidung, kein Fix, und würde den Test bewusst umdrehen.
+
+### Benannte Grenze des Mechanismus (mit übernommen, nicht verschwiegen)
+
+Ändert ein Item **nur seine Tags** und ist es in seinem Space nicht mehr unter den fünf zuletzt
+geänderten Items, bleibt die Signatur gleich und der Graph steht bis zum manuellen Refresh. Der
+Grund ist dieselbe Grenze wie beim Zähler-Poll: die Übersicht selbst zeigt dieses Item dann auch
+nicht. Die beiden Auswege wären ein Feld am Graph-Payload (P9-M verbietet es) oder ein
+serverseitiger Änderungs-Zähler (eine neue Route, noch teurer). Beides ist **nicht** gebaut und
+nicht stillschweigend verworfen — es steht hier.
+
+### Selbstprüfung §0.4 — alle sechs Punkte
+
+1. `pytest -q` → **1031 passed, 0 failed** (vorher 1024 passed + **1 failed**, +7 aus diesem
+   Step). Die eine Fehlschlagung war `test_doc_health.py::test_oversize_clean` und **kein** Befund
+   dieses Steps: `docs/INDEX.md` lag über der 40.960-B-Schwelle, **auf unverändertem `HEAD`
+   (`git stash -u`) genauso rot** — vorher gemessen, 1 failed / 8 passed. Siehe „Der
+   INDEX-Befund" unten für die Auflösung und ihre Grenze.
+2. `ui_budget.py` → **5/5**, `app.js + app.css + Font (gzip)` **149,0 KB** von 250 KB
+   (P8.6-Closeout-Baseline 144,7 KB; die Zunahme ist die vier JS-Dateien dieser Session, davon
+   `graph.js` 12,0 KB gzip).
+3. `node --check` ✅ auf `app.js`, `graph.js`, `list.js`, `state.js` **und** dem `.mjs`-Harness.
+4. Tabu-Bereichs-Diff `git diff --stat 2f752f9^ -- …` **leer** für `permissions.py`, `server.py`,
+   `authserver/`, `phase6_shares`, `phase7_spaces_admin`. Zusatzprobe `phase1_storage` **leer** —
+   `space_cli.py` wurde nur **ausgeführt** (Wegwerf-DATA_ROOT), nicht angefasst.
+5. Doc-Update im selben Commit (Hard Rule 8): Modulstatus, dieser Block, Rotation, INDEX-Zeile.
+6. Kein Service-Touch. Die Wegwerf-Instanz wurde über ihre **PID-Datei** gestoppt
+   (`wegwerf_setup_d2.py stop`, PID 644239) — kein `pkill -f`, kein `systemctl`.
+
+### Drei Fehler, die diese Session gemacht hat (alle vor dem Commit behoben)
+
+1. **Die erste Verdrahtung war falsch** (Token an `app.js`, eigene Schreibvorgänge unsichtbar) —
+   im vorigen Abschnitt erklärt. Klassenpunkt: die Modul-Tests waren grün, weil sie das Token
+   selbst gesetzt haben; der Fehler lag in der **Verdrahtung zwischen Modulen**, die ein
+   Modul-Test prinzipiell nicht sieht. Genau dafür gibt es die Browser-Probe.
+2. **Die erste Browser-Messung maß ihren eigenen Versuchsaufbau** (feste Wartezeit statt
+   Ruhe-Erkennung, ESC statt Home-Knopf, Zählung im Messfenster) — drei Korrekturen, alle im
+   Probe-Skript kommentiert.
+3. **Ein Fehler in einem der eigenen Testdokumente**: `test_graph_module_does_not_touch_the_api_
+   contract` schlug an einem **eigenen Kommentar** an, der `/api/v1/overview` nennt. Der Textvergleich
+   wurde auf **String-Literale** umgestellt — ein Kommentar darf eine Route erwähnen, ein
+   String-Literal im Code nicht.
+
+### Vormerkung für später — das Modell im Vision-Adapter (2026-09-28)
+
+Am Rande von Step E: der `local_vision`-Adapter wurde auf den P9-Screenshots **zusätzlich** benutzt
+(qualitative Fragen gut, **Zählen unbrauchbar** — dasselbe Bild, zwei Läufe, zwei Zahlen: 10/6
+gegen 6/5, sowie „1 Knoten" in einer 14-Knoten-Karte). Die Abnahme blieb belastbar, weil die
+eigentliche Messung **programmatisch** war (Canvas-Fingerabdruck, Knotenzahl aus dem API-Payload);
+das Bild war Anhang, nicht Beleg.
+
+**Recherche, Schluss und Kandidaten stehen in
+[`docs/concepts/sichtpruefung_automation_tooling.md`](../docs/concepts/sichtpruefung_automation_tooling.md)
+§Vormerkung 2026-09-28.** Das Ergebnis in einem Satz: **ein Modellwechsel ist nicht der Hebel** —
+Zählen ist eine modellübergreifend dokumentierte VLM-Schwachstelle (arXiv 2605.30170: *data
+scaling alone is insufficient*; GroundCount 2603.10978: 64–74,7 % über fünf SOTA-Modelle, unser
+`qwen3-vl` namentlich in TrustNLP 2026 mit *stochastic counting errors*), der Hebel ist die
+Zuständigkeitsgrenze VLM-binär ↔ Messung-quantitativ, und die ist in P9 bereits richtig gesetzt.
+**Kein P9-Block.** Ein Stack-Wechsel (`llama.cpp`/`vLLM` statt `ollama`) oder ein kleineres Modell
+(4B/2B) lohnt sich erst, wenn jemand die **Latenz** des Adapters im Chatbetrieb als störend
+empfindet — und dann als Beschleunigung, nicht als Genauigkeitsgewinn.
+
+### Install-Vorbereitung Step B — zwei Befunde, die die Reihenfolge bestimmen (2026-09-28)
+
+Vor der Frage „was installiere ich eigentlich?" geprüft, was `install_units.sh` mit den neuen
+Units **wirklich** tut und wohin `__REPO_ROOT__` zeigt. Zwei Befunde, **beide gemessen, nicht
+aus dem Session-Block abgelesen**:
+
+**1. `__REPO_ROOT__` zeigt auf ein Release, das die Datei nicht enthält — Reihenfolge-Constraint.**
+`phase3_edge/local.env` trägt `REPO_ROOT=/opt/sharefyx/current` (Zeile 11, Stand 2026-09-18 nach
+dem Cutover), und `/opt/sharefyx/current` ist ein **Symlink** auf
+`releases/20260918T183907.597248Z`. Geprüft:
+
+```
+test -f /opt/sharefyx/current/phase3_edge/scripts/tailscaled_watchdog.sh   -> NEIN
+test -f /opt/sharefyx/current/phase3_edge/systemd/tailscaled-watchdog.service -> NEIN
+```
+
+Das Release vom 2026-09-18 ist **drei Wochen älter als Step B** und enthält die Dateien nicht
+(der Umzug nach `/opt/sharefyx/current` ist der Cutover aus P5; im Git-Arbeitsverzeichnis sind sie
+natürlich da). **Folge:** `install_units.sh` schreibt die Unit korrekt, aber `ExecStart` zeigt ins
+Leere — der Timer feuert alle 60 s und der Dienst startet nicht. Drei Wege, alle vertretbar:
+
+| Weg | Bewertung |
+|---|---|
+| **Warten auf das Gate** (deployt `v3.1.0` und damit ein Release mit den Dateien) | **empfohlen** — vermeidet einen absichtlich kaputten Zustand und ist ohne Zusatzaufwand, weil das Gate ohnehin deployt |
+| Installieren und den Fehlschlag bis dahin in Kauf nehmen | funktioniert, aber `journalctl` zeigt 60 s lang Fehlschläge — die sieht nach einem Defekt aus und ist es nicht |
+| `ExecStart` temporär auf den Git-Checkout zeigen | **nicht** — beim nächsten `install_units.sh` überschrieben, und zwei Pfade für dieselbe Datei sind die Art Drift, die dieses Repo gerade rausgebaut hat |
+
+Das ist **kein Fehler in `install_units.sh`** (es substituiert korrekt, was in `local.env` steht),
+sondern eine Folge der Cutover-Entscheidung aus P5 Step 8: die Live-Unit läuft aus dem Release,
+nicht aus dem Checkout. Ein Watchdog, der einen Pfad nutzt, den nur ein Deploy aktualisiert, ist
+eine echte Kopplung — **für Step Z zu notieren**: Watchdog-Pfade entweder relativ zum Release
+auflösen (mit Restart nach jedem Deploy) oder bewusst auf den Checkout legen und dort lassen.
+
+**2. V153-Dateiname: zwei Namen in der eigenen Doku, einer davon falsch verbreitet.**
+
+| Fundstelle | Dateiname |
+|---|---|
+| Frontmatter dieses Heads (`updated:` 2026-09-26) | `/etc/polkit-1/rules.d/99-tailscaled-watchdog-restart.rules` |
+| `SESSIONS_ARCHIVE.md` Z. 195 (Block 2026-09-26, **verbatim, bleibt stehen**) | `/etc/polkit-1/rules.d/99-tailscaled-restart.rules` |
+
+Das Archiv wird nicht angefasst (Rotationsregel: verbatim). **Kanonisch ist der Name aus dem
+Frontmatter**, `99-tailscaled-watchdog-restart.rules` — er nennt die Komponente, nicht nur die
+Aktion, und ist damit der eindeutigere der beiden. Wer die Regel anlegt, sollte genau den
+verwenden und sich die Abweichung merken: die Datei im Archiv hat einen kürzeren Namen, weil sie
+dort zuerst notiert wurde.
+
+**3. Die Härtung ist tatsächlich identisch, nicht nur behauptet.** Zeile für Zeile gegengeprüft:
+`sharefyx-mcp.service` und `tailscaled-watchdog.service` tragen dieselben zehn Direktiven
+(`User=savefyx`, `Group=savefyx`, `NoNewPrivileges`, `PrivateTmp`, `ProtectSystem=strict`,
+`ProtectHome=read-only`, `ProtectKernelTunables`, `ProtectControlGroups`,
+`RestrictAddressFamilies`, `MemoryDenyWriteExecute`, `SystemCallFilter=@system-service`). Die
+Aussage im Block 2026-09-26 hält der Prüfung stand — sie wird hier nur von Behauptung zu Beleg.
+
+### Der INDEX-Befund — aufgelöst, mit einer Grenze, die benannt bleibt
+
+`doc_health.py` meldete `docs/INDEX.md: 41.303 B > 40.960 B, glyph=None, nicht als 📕/📦
+markiert und nicht mit aktueller Größe benannt`. **Zwei Ursachen, beide gemessen:**
+
+1. Die im Frontmatter genannte Größe war **stale** (40.976 B aus dem 2026-09-26-Eintrag, während
+   die Datei durch die Step-B/C-Einträge auf 41.303 B gewachsen war).
+2. **Die Prüfung liest ausschließlich Zeilen, die mit `- [` beginnen** (`_index_line_for()`), und
+   der INDEX hat keine Aufzählungszeile über sich selbst** — die Benennung im Frontmatter war für
+   das Werkzeug unsichtbar. Das ist kein Fehler in meinem Text, sondern eine Lücke in der
+   Werkzeug-Logik: für `CLAUDE.md`, `ROADMAP.md` und die Phasen-Heads greift derselbe Ausweg
+   (Bullet mit `benannt statt versteckt` und aktueller Byte-Zahl), für die Karte selbst gab es ihn
+   nicht.
+
+**Was ich gemacht habe:** eine Selbst-Aufzählungszeile in der Sektion „Root & governance" angelegt
+(🔗 diese Karte, 42.513 B, benannt statt versteckt) und die Frontmatter-Größe als **Fixpunkt**
+nachgezogen — beide Zahlen stimmen jetzt exakt mit `stat()` überein (42.513 B), was per
+zweimaligem Schreiben geprüft wurde, nicht per Absicht. `scripts/doc_health.py`: **0 Befunde**,
+`test_doc_health.py`: **9/9 grün**.
+
+**Was das nicht ist:** der INDEX ist weiterhin **42.513 B** und damit 1.553 B über der Schwelle des
+Werkzeugs und ~3,5 KB über dem 38-KB-Softcap (V145). Benannt statt versteckt (P8-P) — die
+tatsächliche Lösung bleibt die INDEX-Rotation in **Step Z** (P9-L). Was diese Session beweist,
+ist nur: das Werkzeug kann den Zustand jetzt *sehen* und der Benutzer wird nicht mehr von einem
+roten Test überrascht, den niemand erklären kann. **Hinweis für später:** die Selbst-Zeile ist
+ein Fixpunkt — jede spätere Zeile im INDEX macht die genannte Größe wieder stale, und dann
+schlägt `test_oversize_clean` erneut rot. Das ist beabsichtigt: der Test soll genau dann
+aufschrei, wenn jemand den INDEX ohne Rotierung wachsen lässt.
+
+### Nächster Schritt
+
+**Offen bleiben B** (fünf Nikinger-Schritte, siehe Block 2026-09-26) und **A** (Domain +
+VPS, Beschaffung ist ausdrücklich kein Agenten-Auftrag). Die nächsten reinen Code-Steps sind
+**F** (Schema-Fundament, neunte P1-Contract-Öffnung P9-G, neun Stellen zeilengenau in §8.2, enge
+Probe in §8.7 ist Abbruchkriterium) und **G** (Löschen nach `_trash/`) — **F** zuerst, weil
+**G** das `store`-Umfeld von **F** braucht. **H** (fastmcp 3.4.4 → 3.4.7) ist ein Einzeiler, aber
+bewusst **nach** F/G, weil ein Dependency-Bump in einer Phase mit angekündigter Contract-Öffnung
+schwer zu isolieren ist.
+
+**Für den Nikinger, zwei Dinge:** (1) die fünf Step-B-Schritte aus dem Block 2026-09-26, sobald
+Zeit ist — danach Step B 🟡→✅; (2) die V118-Frage oben: **eine Linie oder zwei?**
 
 ## Session stopped — 2026-09-26
 
