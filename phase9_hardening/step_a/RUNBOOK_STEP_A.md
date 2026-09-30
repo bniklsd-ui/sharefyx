@@ -166,11 +166,34 @@ ist die Ausgabe selbst das Ergebnis; „ok" genügt nicht (P8.6-Lektion, `umask 
 
 ### A1 — Domain beschaffen (du)
 
-Ziel: eine Domain, deren DNS-Zone du erreichst. Der Name selbst ist deine Entscheidung;
-technisch relevant ist nur, dass du die A-Records selbst setzen kannst (Schritt A5).
+**Beschlossen 2026-09-29: `sharefyx.eurofyx.de`** (Domain `eurofyx.de` beim Nikinger, Kauf zum
+Zeitpunkt dieser Zeile **offen**). `eurofyx` ist der Firmenname, `sharefyx` der Produktname —
+beides steht vollständig in der Adresse, und genau das war der Grund, die Subdomain zu nehmen:
+das Apex `eurofyx.de` bleibt für eine spätere Firmen-Website frei, ohne dass an Sharefyx
+etwas angefasst wird.
 
-- Kauf die Domain. Nenne mir den gewünschten Hostnamen, z. B. `space.<deine-domain>`.
-- **Ausgabe lesen:** welche Zone, welcher Registrar, ist der Hostname frei.
+**Warum nicht `space.eurofyx.de`** (M3 hatte das zuerst vorgeschlagen, aus Kürzegründen — die
+Empfehlung ist zurückgenommen): an vier Stellen wird die Adresse als **exakter String**
+verglichen (CSRF-Origin `security.py:84`, `TrustedHostMiddleware`, OAuth-`issuer`, Connector in
+beiden Konten). Ein Alltagswort wie `space` ist das, was man falsch erinnert
+(`spaces.`? `share.`?); `sharefyx` ist ein unverwechselbarer String. **Kürze ist hier nicht
+das Kriterium, Wiedererkennbarkeit schon.**
+
+**Gemessen, bevor das beschlossen wurde:** die Basis-URL wird nirgends strukturell zerlegt —
+die einzigen `urlsplit`-Aufrufe im Projekt (`clients.py:33`, `routes.py:165`,
+`oauth_smoke.py:114`) gelten den Redirect-URIs der *Clients* (`claude.ai/...`), nicht unserer
+Adresse. Die einzige Prüfung an `SPACE_PUBLIC_BASE_URL` (`authserver/config.py:85`) verlangt
+`https://` vorn, kein `/` hinten, kein `?`, kein `#` — ein dreigliedriger Name erfüllt alle
+vier. Vorlage und ACL-Entwurf nehmen den Namen als Platzhalter, an den Dateien ändert sich
+kein Byte.
+
+Ziel: eine Domain, deren DNS-Zone du erreichst. Technisch relevant ist nur, dass du die
+A-Records selbst setzen kannst (Schritt A5).
+
+- Kauf `eurofyx.de`. **Ausreichend ist jede normale Registrar-Oberfläche.** Praktisch ist
+  derselbe Anbieter wie beim VPS: dann pflegst du den A-Record im selben Panel, in dem auch
+  der VPS liegt. Ein Konto, eine Rechnung.
+- **Ausgabe lesen:** welche Zone, welcher Registrar, ist `eurofyx.de` frei?
 
 *Falls unentschieden:* eine Subdomain genügt (`space.<domain>`). Der Plan setzt keine Apex-
 Domain voraus; Let's Encrypt stellt für beides kostenlos aus.
