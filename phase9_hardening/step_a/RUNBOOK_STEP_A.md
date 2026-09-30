@@ -26,7 +26,7 @@ nicht „niemand sieht es", sondern „der, der es sieht, bist du".
 
 ---
 
-## §0 Sechs Befunde, die vor A1 gemessen wurden
+## §0 Sieben Befunde, die vor A1 gemessen wurden
 
 Diese sechs sind **kein Vorwand, nichts zu tun** — jeder davon ist entweder eine
 Plan-Korrektur (der Code sagt etwas anderes als der Plan) oder ein Klärungsbedarf, der
@@ -142,6 +142,48 @@ Für den gewählten Weg wird die TCP-Fähigkeit **nicht** gebraucht — sie ist 
 warum die Alternative nicht am fehlenden Werkzeug scheitern würde.
 
 ---
+
+### Befund 7 — die Tailnet-Policy heute (abgeschrieben am 2026-09-30)
+
+Der Nikinger hat die aktive Policy gepostet. Sie ist die **unveränderte Standardvorlage**, und
+zwei Stellen darin sind für diesen Step wichtiger als der Grant selbst.
+
+**1. `tagOwners` ist als auskommentierter Block schon vorhanden** — dritter Block von oben,
+direkt nach `groups`. Der *Add rule*-Knopf bleibt gesperrt, bis dort ein Tag *besitzt* wird.
+Wörtlich so ersetzen (die `//` wegnehmen, den Tag umbenennen, sonst nichts):
+
+```json
+	"tagOwners": {
+		"tag:sharefyx-edge": ["autogroup:admin"],
+	},
+```
+
+**2. `nodeAttrs` mit dem `funnel`-Attribut für `autogroup:member` steht in dieser Datei.**
+Das ist der Grant aus dem Incident vom 2026-09-18. **Nicht anfassen, nicht wegräumen, nicht
+„aufräumen".** Wer die Vorlage zurücksetzt, verliert genau das, woran der öffentliche Funnel
+hängt — und die Reparatur kostet eine erneute Freigabe in der Login-Console
+(`phase3_edge/CLAUDE.md`, Session-Block 2026-09-18). Ebenso unangetastet: der `ssh`-Block
+(Tailscale SSH im *check*-Modus) und der auskommentierte `postures`-Block.
+
+**3. Befund, benannt statt mitgenommen: die Policy erlaubt heute alles.**
+
+```json
+"grants": [ {"src": ["*"], "dst": ["*"], "ip": ["*"]} ]
+```
+
+Unser Grant ist damit **zusätzlich, nicht einschränkend** — er verändert die aktuelle
+Erlaubnis nicht, er dokumentiert nur, welche Erlaubnis der VPS *haben soll*. Für Step A ist das
+richtig (die Tailnet-Konfiguration wird nicht nebenbei umgebaut), es heißt aber auch: **solange
+die `*`-Regel steht, käme der VPS auch ohne unseren Grant auf alles.** Erst wenn die `*`-Regel
+später durch spezifische Regeln ersetzt wird, trägt unser Grant die Erlaubnis. Den Ausbau der
+`*`-Regel zu einer echten Liste machen wir **nicht** — das beträft alle sieben Knoten, den
+Funnel und den Subnet-Router und ist eine eigene Entscheidung, kein Nebenposten von Step A.
+Als Kandidat notiert, nicht gebaut.
+
+**Nebenbei nützlich:** die Vorlage enthält einen auskommentierten `tests`-Block („Test access
+rules every time they're saved"). Man kann unseren Test dort dauerhaft eintragen, dann prüft
+Tailscale die Regel bei **jedem** Speichern der Policy — statt einmalig über
+`Access controls` → `Tests`. Optional, wirkt erst, wenn jemand die Policy anfasst.
 
 ## §1 Was in dieser Runde passiert und was nicht
 
