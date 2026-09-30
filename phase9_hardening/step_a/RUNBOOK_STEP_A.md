@@ -233,11 +233,34 @@ curl -fsSL https://tailscale.com/install.sh | sh     # Nikinger, sudo
 sudo tailscale up --advertise-tags=tag:sharefyx-edge
 ```
 
-Im Tailscale-Admin-UI die bestehende Policy erweitern. **Reihenfolge: erst die Policy, dann
-der Beitritt** — ohne `tagOwners` nimmt Tailscale das `--advertise-tags` beim Beitritt nicht
-an (der Tag existiert dann nicht). Die Datei ist ein **Fragment**, kein Ersatz: die beiden
-`_`-Schlüssel (`_MERGE_HINWEIS`, `_WARUM`) sind Kommentar und gehören **nicht** ins
-Policy-File. Was du einfügst, ist genau:
+**Reihenfolge: erst die Policy, dann der Beitritt** — ohne `tagOwners` nimmt Tailscale das `--advertise-tags` nicht an, der Tag existiert dann nicht. Die Datei ist ein **Fragment**, kein Ersatz: die beiden `_`-Schlüssel (`_MERGE_HINWEIS`, `_WARUM`) sind Kommentar und gehören **nicht** ins Policy-File.
+
+**Wo genau** (aus dem Screenshot vom 2026-09-30 belegt, nicht aus dem Gedächtnis): in der
+linken Leiste **`Access controls` → `Policies`**. Das ist der Policy-Editor.
+
+> **Die Verwechslungsfalle in dieser Console:** `Settings` → `Policy file management` klingt
+> noch passender, ist aber die **Versionshistorie** (sehen, zurückrollen) — dort kannst du
+> nichts sinnvoll editieren. Direktlink, falls du die Leiste nicht brauchst:
+> `console.tailscale.com/admin/acls`
+
+**Prüfwerkzeug, das direkt daneben liegt — benutze es.** `Access controls` → **`Tests`** ist
+der ACL-Testharness der Tailnet-Policy: Quelle, erlaubtes Ziel, verweigertes Ziel eingeben,
+die Console wertet gegen die *aktuelle* Policy aus. Trage dort ein:
+
+```
+source:        tag:sharefyx-edge
+accept:        100.93.43.122:8765
+deny:          (leer)
+```
+
+Erwartet: **accepted**. Das ist ein Nachweis, den `tailscale ping` dir *nicht* liefert (siehe
+unten) — und er kostet keine Runde.
+
+**Was in deiner Policy schon steht, entscheidet die Form.** Steht dort ein `"acls": [...]`,
+hängst du die Regel in dieses Array. Steht dort ein `"grants": [...]`, nimm die Grants-Form
+unten. Beides gleichzeitig ist nicht nötig.
+
+Was du einfügst, ist genau:
 
 ```json
 "tagOwners": {
@@ -256,9 +279,13 @@ Gleichwertig in der neueren `grants`-Form (falls dein Tailnet die nutzt):
 ]
 ```
 
-- **Ausgabe lesen:** `tailscale status` vom VPS zeigt die Tailnet-IP des VPS; `tailscale ping
-  100.93.43.122` **antwortet noch nicht** (der Port ist erst nach A0b offen) — das ist der
-  erwartete Zustand, kein Fehler.
+- **Ausgabe lesen:** `tailscale status` vom VPS zeigt die Tailnet-IP des VPS.
+- **`tailscale ping 100.93.43.122` ist ausdrücklich KEIN Nachweis** — weder für die Erreichbar-
+  keit noch für die ACL-Regel. Der Befehl prüft den WireGuard-Pfad zwischen zwei `tailscaled`,
+  nicht die Datenebene, auf der die ACL greift; er kann grün sein, während die Regel fehlt.
+  **[Korrektur vom 2026-09-30: diese Erwartung stand hier vorher als „antwortet noch nicht"
+  — das war geraten.]** Der echte Nachweis ist eine **TCP-Verbindung auf Port 8765** und der
+  ist bis A0b nicht möglich. Bis dahin gilt: `status` zeigt die Node, mehr nicht.
 
 ### A0b — socat + Relay auf der Heim-VM (du; Unit liegt im Repo)
 
