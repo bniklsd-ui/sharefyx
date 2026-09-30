@@ -267,13 +267,31 @@ unten) — und er kostet keine Runde.
 
 | Feld | Eingabe | Warum genau das |
 |---|---|---|
-| **Source** | `tag:sharefyx-edge` | **Lehnt das Feld den unbekannten Tag ab**, existiert der Tag noch nicht: links auf **`JSON editor`**, dort `"tagOwners": {"tag:sharefyx-edge": ["autogroup:admin"]}` ergänzen, speichern, zurück zu *Add rule*. |
+| **Source** | `tag:sharefyx-edge` | **Hier stand am 2026-09-30 rot `tag not found` und der Knopf *Save grant* war deaktiviert** — der Tag existierte noch nicht. Das ist der erwartete erste Stolperstein, kein Fehler in der Eingabe. **Auflösung:** links `JSON editor`, dort `tagOwners` ergänzen (siehe unten), speichern, zurück zu *Add rule*. |
 | **Destination** | `100.93.43.122` — oder aus der Liste das **Gerät** `savefyx-vmware-virtual-platform` | Beides gültig. Das Gerät ist lesbarer und überlebt eine IP-Änderung; der Entwurf im Repo nennt bewusst die IP, damit die Regel beim Merge nicht versehentlich auf ein anderes Gerät zeigt. |
 | **Port and protocol** | **`tcp:8765` — unbedingt ändern!** | Steht dort unverändert *„All ports and protocols"*, steht in der Vorschau `{"ip": ["*:*"]}` und die Regel erlaubt **alles**. Das ist das eine Feld, bei dem ein Klick den Unterschied macht. |
 | **Note** | `P9 Step A: TLS-Terminator darf nur den Sharefyx-Port der Heim-VM` | Optional, aber das Feld ist genau dafür da, und in einem Jahr weiß sonst niemand mehr, warum es die Regel gibt. |
 | **Source posture / Via / App / Capability** | **leer lassen** | Nichts davon wird für diesen Weg gebraucht. |
 | **JSON preview** | muss zeigen: `"ip": ["tcp:8765"]` | **Das ist die Abnahme — vor dem Speichern, nicht danach.** |
 | → **Save grant** | | |
+
+**Der `tagOwners`-Eintrag, wörtlich** (im `JSON editor`, **direkt nach der öffnenden Klammer**
+einsetzen — dort braucht es kein Komma am Ende, das ist der fehlerfreie Ort):
+
+```json
+{
+  "tagOwners": {
+    "tag:sharefyx-edge": ["autogroup:admin"]
+  },
+  … deine bestehenden Schlüssel …
+}
+```
+
+`autogroup:admin` = alle Admins dieses Tailnets. **Kein Komma nach der schließenden Klammer
+von `tagOwners`** — nur zwischen den Schlüsseln. (Am Screenshot vom 2026-09-30 ist zu sehen,
+dass die Console das *Note*-Feld selbst als `//`-Kommentar über das Objekt schreibt: in der
+Policy-Datei sind Kommentare also erlaubt. Die `_`-Schlüssel aus `tailscale-acl.draft.json`
+sind dagegen **echte JSON-Schlüssel** und gehören nicht in die Policy-Datei.)
 
 Was `tagOwners` ist und wofür: der Tag muss einen *Besitzer* haben, sonst lehnt Tailscale
 `--advertise-tags` beim Beitritt ab. `autogroup:admin` heißt „alle Admins dieses Tailnets".
