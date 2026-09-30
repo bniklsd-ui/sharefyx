@@ -187,19 +187,30 @@ def test_health_route_correction_holds():
 # --- Wächter für die VPS-seite ----------------------------------------------
 
 def test_acl_draft_grants_exactly_one_port_on_one_address():
-    """Der ACL-Entwurf darf genau eine Regel tragen: 8765 auf 100.93.43.122.
+    """Der ACL-Entwurf darf genau einen Grant tragen: tcp:8765 auf 100.93.43.122.
 
     Ein Entwurf, der zu weit gefasst ist, scheitert erst am Deploy — deshalb hier fail-closed.
+    Die Form ist `grants`, nicht `acls`: belegt am 2026-09-30 am Screenshot der Console-Seite
+    "Add rule" (Knopf "Save grant", Vorschau `{"ip": ...}`). Der Test prüft die Grants-Form,
+    weil das die Form ist, die diese Console erzeugt.
     """
     draft = json.loads(ACL_DRAFT.read_text())
-    rules = [r for r in draft["acls"] if r.get("action") == "accept"]
-    granted = [r for r in rules if "tag:sharefyx-edge" in r.get("src", [])]
-    assert len(granted) == 1, f"erwartet genau eine accept-Regel für den VPS, gefunden: {granted}"
+    grants = draft["grants"]
+    assert len(grants) == 1, f"erwartet genau einen Grant, gefunden: {grants}"
 
-    rule = granted[0]
-    assert rule["dst"] == ["100.93.43.122:8765"], \
-        f"die Freigabe muss genau 100.93.43.122:8765 sein, ist {rule['dst']}"
-    assert rule["src"] == ["tag:sharefyx-edge"], \
+    grant = grants[0]
+    assert grant["src"] == ["tag:sharefyx-edge"], \
         "die Quelle muss der getaggte VPS sein, nicht ein ganzer Benutzer"
+    assert grant["dst"] == ["100.93.43.122"], \
+        f"das Ziel muss die Heim-VM sein, ist {grant['dst']}"
+    assert grant["ip"] == ["tcp:8765"], \
+        f"es darf genau TCP 8765 sein, ist {grant['ip']} -- 'tcp:*' oder '*:*' waere die " \
+        "andere Regel als die beabsichtigte"
     assert "tagOwners" in draft and "tag:sharefyx-edge" in draft["tagOwners"], \
         "der Tag braucht einen Owner, sonst nimmt Tailscale die Policy nicht an"
+
+    # Die Kommentar-Schluessel duerfen nicht ins Policy-File wandern -- sie sind Meta, und
+    # Tailscale lehnt unbekannte Top-Level-Schluessel ab.
+    meta = {k for k in draft if k.startswith("_")}
+    assert not (meta & {"tagOwners", "grants"}), \
+        "Kommentar-Schluessel duerfen die echten Schluessel nicht verdecken"

@@ -210,8 +210,8 @@ A-Records selbst setzen kannst (Schritt A5).
   der VPS liegt. Ein Konto, eine Rechnung.
 - **Ausgabe lesen:** welche Zone, welcher Registrar, ist `eurofyx.de` frei?
 
-*Falls unentschieden:* eine Subdomain genügt (`space.<domain>`). Der Plan setzt keine Apex-
-Domain voraus; Let's Encrypt stellt für beides kostenlos aus.
+*Zur Form:* eine Subdomain genügt, eine Apex-Domain nicht — Letzteres ist hier entschieden
+(siehe oben), weil das Apex für eine Firmen-Website frei bleiben soll.
 
 ### A2 — VPS beschaffen (du)
 
@@ -256,28 +256,27 @@ deny:          (leer)
 Erwartet: **accepted**. Das ist ein Nachweis, den `tailscale ping` dir *nicht* liefert (siehe
 unten) — und er kostet keine Runde.
 
-**Was in deiner Policy schon steht, entscheidet die Form.** Steht dort ein `"acls": [...]`,
-hängst du die Regel in dieses Array. Steht dort ein `"grants": [...]`, nimm die Grants-Form
-unten. Beides gleichzeitig ist nicht nötig.
+> **Belegt am Screenshot vom 2026-09-30, nicht aus dem Gedächtnis: diese Console baut
+> `grants`, nicht `acls`.** Auf der Seite *Add rule* heißt der Knopf **„Save grant"**, die
+> Live-Vorschau zeigt `{"ip": ["*:*"]}`, und das Formular hat *Source / Destination / Port and
+> protocol*. Die klassische `acls`-Form geht auch, aber die GUI erzeugt sie nicht — sie
+> auszutippen wäre Arbeit ohne Gegenwert. **Angekommen war zuerst die `acls`-Form; sie ist
+> hiermit ersetzt, samt Test und ACL-Entwurf im Repo.**
 
-Was du einfügst, ist genau:
+### Feld für Feld im Formular „Add rule"
 
-```json
-"tagOwners": {
-  "tag:sharefyx-edge": ["autogroup:admin"]
-},
-"acls": [ … bestehende Regeln … ,
-  { "action": "accept", "src": ["tag:sharefyx-edge"], "dst": ["100.93.43.122:8765"] }
-]
-```
+| Feld | Eingabe | Warum genau das |
+|---|---|---|
+| **Source** | `tag:sharefyx-edge` | **Lehnt das Feld den unbekannten Tag ab**, existiert der Tag noch nicht: links auf **`JSON editor`**, dort `"tagOwners": {"tag:sharefyx-edge": ["autogroup:admin"]}` ergänzen, speichern, zurück zu *Add rule*. |
+| **Destination** | `100.93.43.122` — oder aus der Liste das **Gerät** `savefyx-vmware-virtual-platform` | Beides gültig. Das Gerät ist lesbarer und überlebt eine IP-Änderung; der Entwurf im Repo nennt bewusst die IP, damit die Regel beim Merge nicht versehentlich auf ein anderes Gerät zeigt. |
+| **Port and protocol** | **`tcp:8765` — unbedingt ändern!** | Steht dort unverändert *„All ports and protocols"*, steht in der Vorschau `{"ip": ["*:*"]}` und die Regel erlaubt **alles**. Das ist das eine Feld, bei dem ein Klick den Unterschied macht. |
+| **Note** | `P9 Step A: TLS-Terminator darf nur den Sharefyx-Port der Heim-VM` | Optional, aber das Feld ist genau dafür da, und in einem Jahr weiß sonst niemand mehr, warum es die Regel gibt. |
+| **Source posture / Via / App / Capability** | **leer lassen** | Nichts davon wird für diesen Weg gebraucht. |
+| **JSON preview** | muss zeigen: `"ip": ["tcp:8765"]` | **Das ist die Abnahme — vor dem Speichern, nicht danach.** |
+| → **Save grant** | | |
 
-Gleichwertig in der neueren `grants`-Form (falls dein Tailnet die nutzt):
-
-```json
-"grants": [
-  { "src": ["tag:sharefyx-edge"], "dst": ["100.93.43.122"], "ip": ["tcp:8765"] }
-]
-```
+Was `tagOwners` ist und wofür: der Tag muss einen *Besitzer* haben, sonst lehnt Tailscale
+`--advertise-tags` beim Beitritt ab. `autogroup:admin` heißt „alle Admins dieses Tailnets".
 
 - **Ausgabe lesen:** `tailscale status` vom VPS zeigt die Tailnet-IP des VPS.
 - **`tailscale ping 100.93.43.122` ist ausdrücklich KEIN Nachweis** — weder für die Erreichbar-

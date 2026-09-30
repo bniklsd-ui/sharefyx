@@ -1,36 +1,41 @@
 {
-  "_MERGE_HINWEIS": "Diese Datei ist ein FRAGMENT, kein vollstaendiges Policy-File. Sie wird in die bestehende Tailscale-Policy des Tailnets EINGEHAENGT (Plan §3.2 A3), nie als Ersatz angelegt - die bestehende ACL des Tailnets regelt die sieben jetzigen Nodes und darf beim Merge nicht verloren gehen. Nikinger-Schritt A3, Merge im Admin-UI unter Access Controls. Klassische ACL-Form, weil ein persoenliches Tailnet mit einer bestehenden Policy fast immer im klassischen 'acls'-Format laeuft; die Grants-Form steht gleichwertig im Runbook §2 A3.",
-
+  "_MERGE_HINWEIS": "Fragment, KEIN vollstaendiges Policy-File. In die bestehende Policy des Tailnets EINGERHAENGT (Plan §3.2 A3), nie als Ersatz angelegt -- die bestehenden Regeln des Tailnets regeln die sieben jetzigen Nodes und duerfen beim Merge nicht verloren gehen. Die beiden _-Schlüssel (_MERGE_HINWEIS, _WARUM) sind Kommentar und gehoeren NICHT ins Policy-File.",
+  "_FORM": "Diese Datei traegt die GRANTS-Form, weil die Console des Nikingers die Grants-Form baut -- belegt am 2026-09-30 am Screenshot der Seite 'Add rule': der Knopf heisst 'Save grant', die Live-Vorschau zeigt {\"ip\": [\"*\"]}, und das Formular hat Source/Destination/Port-and-protocol. Die klassische 'acls'-Form funktioniert ebenfalls, wird hier aber NICHT mehr empfohlen, weil die GUI sie nicht erzeugt und ein Hand-Eintrag in der falschen Form die Arbeit von zwei Klicks macht.",
   "tagOwners": {
-    "tag:sharefyx-edge": ["autogroup:admin"]
+    "tag:sharefyx-edge": [
+      "autogroup:admin"
+    ]
   },
-
-  "acls": [
+  "grants": [
     {
-      "action": "accept",
-      "src": ["tag:sharefyx-edge"],
-      "dst": ["100.93.43.122:8765"]
+      "src": [
+        "tag:sharefyx-edge"
+      ],
+      "dst": [
+        "100.93.43.122"
+      ],
+      "ip": [
+        "tcp:8765"
+      ],
+      "note": "P9 Step A: der TLS-Terminator auf dem VPS darf genau den Sharefyx-Port der Heim-VM erreichen -- mehr nicht."
     }
   ],
-
   "hosts": {
     "sharefyx-home": "100.93.43.122"
   },
-
   "_WARUM": [
-    "1. Die Regel ist ZUSATZLICH, nicht ersetzend: sie erlaubt dem VPS, genau einen Port auf",
-    "   genau einer Adresse zu erreichen. Alles andere im Tailnet bleibt unveraendert.",
+    "1. Die Regel ist ZUSATZLICH, nicht ersetzend: sie erlaubt dem VPS genau einen Port auf",
+    "   genau einer Adresse. Alles andere im Tailnet bleibt unveraendert.",
     "2. 100.93.43.122 ist die Tailnet-IP der Heim-VM (gemessen 2026-09-29 per",
-    "   'ip -br addr show tailscale0'). Sie ist stabil, solange der Node im selben Tailnet",
-    "   bleibt - die 2026-09-18-Migration hat den Tailnet-Suffix gewechselt, nicht die IP.",
-    "   Wird die IP doch einmal neu vergeben, ist die 'hosts'-Regel oben die einzige Stelle,",
-    "   die nachgezogen werden muss.",
-    "3. Bewusst per IP statt per Tag der Heim-VM: die Heim-VM ist ein Nutzergeraet mit",
-    "   aktivem Funnel-Grant. Ein Tag wuerde in die Funnel-Attruktur eingreifen, und genau",
-    "   diese Kopplung hat am 2026-09-18 den Funnel zerstoert. Fuer eine einzelne Regel ist",
-    "   das Risiko groesser als der Nutzen.",
-    "4. Bewusst KEINE Regel fuer Port 22/8765 vom VPS zur Heim-VM in Gegenrichtung und",
-    "   keine Regel fuer andere Ports: diese Regel ist die ganze Erlaubnis. Wer mehr",
-    "   braucht, misst erst, warum."
+    "   'ip -br addr show tailscale0', im Machines-Bild vom 2026-09-30 bestaetigt). Sie ist",
+    "   stabil, solange der Node im selben Tailnet bleibt -- die Account-Migration vom",
+    "   2026-09-18 hat den Tailnet-Suffix gewechselt, nicht die IP. Wird sie neu vergeben,",
+    "   ist die 'hosts'-Regel die einzige Stelle, die nachgezogen werden muss.",
+    "3. 'dst' nennt die Adresse, nicht die Maschine: in der GUI laesst sich als Ziel auch das",
+    "   Geraet 'savefyx-vmware-virtual-platform' waehlen, was lesbarer ist und eine",
+    "   IP-Aenderung ueberlebt. Beides ist gueltig; der Test erzwingt bewusst die IP, damit",
+    "   die Regel beim Merge nicht versehentlich auf ein anderes Geraet zeigt.",
+    "4. Bewusst KEIN zweites Grant fuer die Gegenrichtung und keins fuer 22: diese eine",
+    "   Regel ist die ganze Erlaubnis. Wer mehr braucht, misst erst, warum."
   ]
 }
