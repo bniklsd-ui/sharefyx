@@ -5,7 +5,7 @@ read-when: Chronik einer älteren P9-Session gesucht — nicht beim normalen Arb
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-30 (**elfte Rotation, Step G** — Step-G-Block [Lösch-Ort war unbaubar, TLS-Wegwerf für den Browserbeleg, 14/14] im Head **angehängt**, Step-F-Block verbatim ins Archiv; Head 32.668 B → 25.740 B) | 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
+updated: 2026-09-30 (**zwoelfte Rotation, Step H** — Step-H-Block [`fastmcp` exakt gepinnt `==3.4.7`, der Range-Pin hatte den Live-Release bereits lautlos auf 3.4.7 gezogen, V163 mit drei Codepunkten beantwortet, Wächter als Deploy-Riegel, Gegenprobe 4 Verstöße → 7 rot] im Head **angehängt**, Step-G-Block verbatim ins Archiv; Head 33.175 B → 26.210 B) | 2026-09-30 (**elfte Rotation, Step G** — Step-G-Block [Lösch-Ort war unbaubar, TLS-Wegwerf für den Browserbeleg, 14/14] im Head **angehängt**, Step-F-Block verbatim ins Archiv; Head 32.668 B → 25.740 B) | 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
 ---
 
 # Phase 9 — Sessions Archive
@@ -15,6 +15,99 @@ trägt immer genau einen `## Session stopped`-Block, ältere Blöcke wandern ver
 Vorsatz: nichts abtippen, alles per Skript mit vier Gegenproben (Schnitt verlustfrei, neuer
 Head trägt genau einen Block, alle bewegten Blöcke im Archiv byte-identisch, Archivbestand
 unangetastet).
+
+## Session stopped — 2026-09-30 (dritter Block, Step G)
+
+**Step G ist gebaut: Löschen heißt Verschieben nach `._trash/`, und der Ort musste vor dem Bau
+korrigiert werden — sonst hätte die halbe Step-Definition nicht funktioniert.** Commit folgt
+unten; `pytest` **1078**, Browser **14/14**, kein Service-Touch.
+
+### Der teuerste Fund der Session: der Plan-Ort hätte das Versprechen gebrochen
+
+Plan §9.1 sagt, die Unsichtbarkeit sei „vorhandenes Verhalten", belegt mit `store.py:815`. Der
+Anker zeigt auf `ensure_folder()`; der echte `_trash`-Skip sitzt bei 860/868 in **`list_assets()`**
+— für **Assets**, nicht für Items. Der Präzedenzfall trägt nicht. Mit dem `<space>/_trash/` aus
+§9.3 gemessen:
+
+| | `<space>/_trash/` (Plan) | `DATA_ROOT/._trash/<space>/` (gebaut) |
+|---|---|---|
+| `search()` nach `rebuild_index()` | **Item wieder da** (`folder="_trash"`) | weg |
+| `list_spaces()` | **`['_trash', 'sp']`** — Phantom-Space | `['sp']` |
+| P1-Änderungen | `index.py` **und** `files.py` = **zehnte** Öffnung | **keine** |
+
+`rebuild_index()` macht `space_dir.rglob("*.md")` **ohne Skip**, `list_spaces()` führt jedes
+Nicht-Punkt-Verzeichnis als Space, und `RESERVED_DIR_NAMES` ist `{"_archive", "_assets"}`. Der
+Plan-Ort hätte einen **sichtbaren Ordner mit dem gelöschten Item** erzeugt — exakt das Gegenteil
+von P9-J — und die Reparatur wäre eine P1-Contract-Öffnung gewesen, die niemand angekündigt hat.
+**Nikinger-Entscheidung 2026-09-30: `._trash` auf DATA_ROOT-Ebene.** Damit stimmt die Prämisse
+wieder, nur eine Ebene höher und mit einem Punkt: beide Scanner überspringen Punkt-Verzeichnisse
+bereits. Die Lehre ist die des Tages: *„der Code hat diese Funktion schon"* ist eine Behauptung
+über **welche** Funktion — der Anker war eine Zeile daneben.
+
+### Der Dialog: nach dem Vorbild im Repo, nicht neu erfunden
+
+Vor dem Bauen habe ich `space-remove-dialog` (P7-K) gelesen — es ist bereits **zweistufig mit
+eingetipptem Namen**, und der Server prüft `body["confirm"]` exakt (`api.py:567`). Ich hatte
+zuerst nur eine Stufe gebaut (sichtbarer Konsequenztext + gesperrter Knopf), was **ein** Gate ist;
+der Plan verlangt zwei zwingende und sagt wörtlich, das Confirm-Muster zu wiederverwenden. Also
+nachgezogen: Stufe 1 = vorhandenes `confirmDialog()`, Stufe 2 = `trashRefreshSubmit()` als
+**eine** Funktion, die den Knopf an `value.trim() !== ziel.title` bindet.
+
+Dabei zwei eigene Fehler, beide beim Wächter-Schreiben aufgefallen:
+- Der erste Wächter suchte `toLowerCase` im Dialog-Block und schlug an — weil mein **Kommentar**
+  dieses Wort enthält, um es auszuschließen. Dieselbe Falle wie in P8.6 Block H. Der Test filtert
+  jetzt Kommentarzeilen, statt auf meine Formulierung zu vertrauen.
+- Ich hatte zwei `--caution-*`-Tokens benutzt, die es nicht gibt. Der Wächter
+  `test_every_css_var_reference_is_defined` hätte es gefangen; ich habe es vorher selbst gesehen
+  und auf `--caution` + `.asset-strip__remove` (der vorhandene Entfernen-Knopf) umgestellt.
+
+### Der Browserbeleg brauchte eine eigene TLS-Instanz — und der Grund ist eine Produktinvariante
+
+Der 18773er-Wegwerf kann **keinen** Schreibvorgang annehmen. `require_csrf`
+(`security.py:79-95`) verlangt `Origin` **exakt** gleich `settings.base_url`, sonst
+`sec-fetch-site: same-origin`, plus Token. `settings.base_url` ist in `app.py:204` genau
+`oauth.settings.base_url` = `SPACE_PUBLIC_BASE_URL`, und das muss laut `config.py:87` zwingend
+`https://` sein (OAuth-Issuer). Ein Browser auf `http://127.0.0.1:18773` kann das **strukturell
+nie** erfüllen, `Origin` lässt sich nicht entfernen (verbotener Header — `page.route()` bleibt
+wirkungslos, gemessen), und `serve.py` ruft `uvicorn.run()` ohne `ssl_*`. **Das ist der „Befund
+für Block D / Step Z", den der Kommentar im Setup-Skript (Zeile 341) seit P8.6 nennt — bis auf
+die Ursache zurückgeführt.**
+
+Lösung ohne Produktänderung: eigenes Harness mit selbstsigniertem Zertifikat für `IP:127.0.0.1`
+und einem Launcher, der **dieselbe** App baut wie `serve.py`, nur mit `ssl_keyfile`. `serve.py`
+selbst bleibt unberührt — einen Produktparameter nur für einen Testharness zu ergänzen wäre die
+Scope-Ausweitung, die P9-K gerade vermeiden soll. Damit laufen **alle drei** CSRF-Schichten
+normal, und der 14/14-Lauf ist ein echter Klick, kein nachgespielter Request.
+
+**Ein Werkzeug, das sich selbst widersprach:** die Sichtprüfung meldete den gesperrten „Löschen"-
+Knopf als *aktiv*. `is_disabled()` sagt `True`, `app.css:278` stylt `:disabled` mit
+`cursor: not-allowed`. Das ist genau die Grenze aus
+`docs/concepts/sichtpruefung_automation_tooling.md` (Zustands- und Detailaussagen eines VLM sind
+unbrauchbar). Darum pinnt jetzt ein **Test die Regel** statt dass ich dem Bild glaube.
+
+### Was gemessen wurde
+
+| Gegenstand | Nachweis |
+|---|---|
+| **Gegenprobe** | vier Verstöße eingebaut (Trash in den Space, `index.delete_item` raus, Server-Gate raus, Kleinschreibungs-Toleranz) → **11 Tests rot** über beide Schichten, danach zurückgebaut |
+| **Browser** | `p9_step_g_self_check.py`, **14/14**, zwei Läufe hintereinander unabhängig (das Harness säet bei jedem Start neu — ein unsichtbarer Papierkorb lässt sich gerade nicht zurücksetzen, ein zweiter Lauf fände sonst eine leere Liste) · 6 Screenshots `docs/screenshots/p9_step_g_{01..06}_*.png` · Probe `probes/p9_step_g_probe.json` |
+| **Tests** | 13 in `test_step_g_trash.py` (die 7 der Plan-Liste + 6 für gemessene Lücken) + 5 Endpunkt-Tests in `test_api.py`; `pytest` 1062 → **1078** in 190 s, `ui_budget` 5/5 (151,5 KB, +2,5 KB für Dialog/CSS/Icon), `doc_health` 0, `node --check` über alle 13 JS-Dateien grün |
+| **P1-Tabu** | nur `phase1_storage/storage/store.py` berührt (keine zweite P1-Datei, weil der Punkt-Ort die Änderung in `index.py`/`files.py` überflüssig macht) |
+| **Hard Rule 9** | beide Wegwerf-Instanzen ausschließlich über ihre PID-Datei gestoppt, kein `pkill -f`, kein `systemctl`; `sharefyx-mcp` nur gelesen (PID 1033, unverändert) |
+
+### Nächster Schritt
+
+**Step H** (`fastmcp` 3.4.4 → 3.4.7) ist der letzte Code-Step und der kleinste: eine
+Versionsnummer plus ein Test. **V163** ist die einzige offene Frage dort, und sie ist in der
+Planungssession schon beantwortet worden — der 3.4.7-Fix betrifft `OAuthProxy`/`private_key_jwt`,
+dieses Projekt nutzt einen eigenen `BearerAuthASGI`, der Bump ist also Hygiene, kein
+Sicherheitsbedarf. Wer H zieht, sollte das als **einen** Commit tun und den Lock P9-R
+(`fastmcp` bleibt auf 3.4.x) **nicht** antasten: FastMCP 4 bleibt V79 und eine eigene Mini-Phase.
+
+**Offen und bewusst nicht gebaut:** V162 (wächst `._trash/` messbar — die Menge im Harness ist
+kein Messwert für den echten `DATA_ROOT`), die Räumung von `._trash/` (P10-Liste), und die
+Asset-Dateien eines gelöschten Items bleiben unerreichbar unter `<space>/_assets/<item_id>/`
+liegen — bewusst, sonst würde aus einer atomaren Operation eine halbe.
 
 ## Session stopped — 2026-09-30 (zweiter Block, Step F)
 

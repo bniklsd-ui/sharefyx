@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase2_mcp_plan.md          # voller Plan, Entscheidungen P2-A–P2-N, Steps 0–7
   - ../docs/concepts/PHASE1_CLOSEOUT_HANDOVER.md # Herkunft der Entscheidungen D1–D6
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
-updated: 2026-08-20 (Phase 6.5 Block A: achtes Tool get_item_meta, Beschreibungskorrekturen, search_items in_body=, 132 Tests)
+updated: 2026-09-30 (P9 Step H: `fastmcp` **exakt** gepinnt, `>=3.4,<3.5` → `==3.4.7` — P3-D/P4-R verlangten den exakten Pin seit 2026-08 und im Code stand nie einer; der Range-Pin hatte den Live-Release lautlos auf 3.4.7 gezogen (gemessen: `/opt/sharefyx/current/.venv`), während diese Datei weiter 3.4.4 behauptete. Wächter `phase9_hardening/tests/test_step_h_deps.py` (5 Tests, einer davon läuft im Release-venv mit, `deploy.sh:169`); V163 beantwortet: der 3.4.7-Security-Fix greift ins Leere (CIMD per P4-E aus, `token_endpoint_auth_methods_supported: ["none"]`, kein `OAuthProxy`/`JWTVerifier`). Kein Funktions-Code berührt. `pytest` 1079 → 1084 · `ui_budget` 5/5) | 2026-08-20 (Phase 6.5 Block A: achtes Tool get_item_meta, Beschreibungskorrekturen, search_items in_body=, 132 Tests)
 ---
 # CLAUDE.md — Phase 2: MCP-Server (`phase2_mcp/`)
 
@@ -85,6 +85,18 @@ Archivieren nur über `update_item(status="archived")`, kein siebtes Tool (K) ·
 P1-Contract-Erweiterungen (L, Step 2) · OAuth bleibt hinter P3, Seam wird gebaut (M) ·
 Fehlerabbildung mit handlungsfähigem Text (N).
 
+**[2026-09-30 Korrektur, P9 Step H — die Kurzform steht hier seit P2 unverändert, war aber nie
+exakt:** A ist als „`>=3.4,<3.5`, exakt gepinnt" formuliert, und im Code stand von Anfang an die
+**Range**. Ein Range ist unter einem Dauerdienst ein stiller Versionskanal: `deploy.sh:153` baut
+pro Release ein frisches venv, also löste jeder Deploy auf das damalige neueste 3.4.x auf — der
+Live-Release lief stillschweigend auf **3.4.7**, während diese Zeile weiter 3.4.4 behauptete. Jetzt
+steht in `pyproject.toml` **`fastmcp==3.4.7`** exakt, mit datiertem Kommentar an der Zeile, und
+`phase9_hardening/tests/test_step_h_deps.py` vergleicht die installierte Version damit — im
+Release-venv, weil `deploy.sh:169` dort `pytest -q` aufruft. Grundlage sind P3-D und P4-R
+(beide verlangten den exakten Pin und waren nie umgesetzt), nicht eine neue Entscheidung. Das
+transitive `mcp` bleibt **ungepinnt** (Dev 1.28.1, Live 1.30.0 — benannt statt versteckt,
+P9-Backlog-Kandidat). Lock P9-R: 3.4.x bleibt, FastMCP 4 ist V79.
+
 **[2026-08-09 Korrektur, P6 Step 1]:** K ist überholt — `patch_item` ist ein siebtes Tool
 (P6-E/F/G, `phase6_shares_plan.md`). Der Teil von K, der Archivieren betrifft
 („nur über `update_item(status=archived)`") bleibt unverändert richtig; nur der Nebensatz
@@ -109,6 +121,7 @@ Streichung.
 | 11 | Rechtepolitik (P6 Step 5): `permissions.py` (`Surface`, `SharePolicy` ersetzt `OwnSpaceWritable`, `can_read_item`/`can_write_item` beide surface-scharf inkl. `visibility` — Advisor-Fund am `can_write_item`, siehe Nachtrag im Phase-Head), `tools.py` (alle sieben Tools auf `acl_of()`+`can_read_item`/`can_write_item`, `search_items`/`list_spaces` item-weise gefiltert, `create_item(space=,folder=)`, `update_item(folder=)` mit Fail-Closed-Riegel gegen Nicht-Eigentümer-Verschiebung — Nikinger-Entscheidung, kein Plan-Text), `app.py` (Verdrahtung über `store.acl_reader`) | P6 Step 5 | ✅ **gebaut** — Details, alle zwölf Pflichttests, die Fail-Closed-Ergänzung und der `can_write_item`-Fix: `phase6_shares/CLAUDE.md` Step-5-Session-Block | +10 (`test_tools.py` 30→40), `test_permissions.py` vollständig neu (3→12 Tests, `OwnSpaceWritable`-Klasse entfernt), Kollateralkorrekturen in `test_app.py`/`mcp_smoke.py` (keine neuen Tests, Assertions auf die neue Fail-Closed-Sichtbarkeit umgestellt) |
 | 12 | Phase-6.5-Block-A (Werkzeug-Ergonomie): achtes Tool `get_item_meta` (P6.5-E/F), Beschreibungskorrekturen (`list_spaces`-Falschaussage raus P6.5-B, `_status_hint()`/`WRITE_TOOL_DIVISION`-Helfer P6.5-C/D, Suchreichweite ehrlich benannt P6.5-H), `search_items` bekommt `in_body: bool = False` durchgereicht (P6.5-N4) | Phase 6.5 Step A1/A2/A4 | ✅ **gebaut** | +12 `test_tools.py` (46→58: 6 Beschreibungstests, 4 `get_item_meta`, 2 `in_body`-Durchreichung), `test_app.py` umbenannt/erweitert (`test_all_eight_tools_are_callable_over_http`, keine neue Testfunktion), `mcp_smoke.py` 13→14 Prüfungen (kein neuer Test) |
 | 13 | Phase-6.5-Block-B Step B4 (MCP-Fläche Bilder): neuntes/zehntes Tool `get_item_asset`/`put_item_asset` (P6.5-M/N/O/P), `get_item_meta` bekommt `assets`-Liste (Metadaten, nie Bytes), eigene `AssetNotFound`-Ausnahme + `map_storage_error()`-Zweig (schließt B1s liegen gebliebenen Fund — `ItemNotFound`s „prüfe die ID mit search_items" ist für eine Asset-ID sachlich falsch), `MAX_MCP_ASSET_BYTES = 1 MiB` (N6) | Phase 6.5 Step B4 | ✅ **gebaut**, noch nicht deployt | +10 `test_tools.py` (58→68: 7 aus dem Plan + 1 `AssetNotFound`-Test + 2 Advisor-Fixes — Existenz-Symmetrie im `may_see_bytes=False`-Zweig, echter Marker statt der `_PNG`-Fixture-Kürze im Struktur-Test), `test_app.py` umbenannt/erweitert (`test_all_ten_tools_are_callable_over_http`, keine neue Testfunktion), `mcp_smoke.py` 14→16 Prüfungen (kein neuer Test) |
+| 14 | `fastmcp` **exakt** gepinnt: `pyproject.toml` `>=3.4,<3.5` → `==3.4.7` (P3-D/P4-R, beide seit 2026-08 beschlossen und nie umgesetzt), Kommentar mit Grund + Messung + P9-R/V79-Verweis an der Pin-Zeile. Wächter in `phase9_hardening/tests/test_step_h_deps.py` (5 Tests, davon einer installiert-gegen-deklariert — **läuft im Release-venv mit**, `deploy.sh:169`) | P9 Step H | ✅ **gebaut 2026-09-30** — V163 beantwortet (der 3.4.7-Security-Fix betrifft dieses Projekt nicht: CIMD ist per P4-E abgeschaltet, `token_endpoint_auth_methods_supported: ["none"]`, kein `OAuthProxy`/`JWTVerifier`). **Kein Funktions-Code berührt**, nur `pyproject.toml` + eine Testdatei in P9 | +5 (in `phase9_hardening/tests/`), `pytest` 1079 → 1084 |
 
 **Zeile 7, Step 6 abgeschlossen:** `search_items`, `get_item`, `create_item`, `update_item`,
 `append_to_item` lösen ihre seit Step 5 bestehenden `NotImplementedError`-Platzhalter ein

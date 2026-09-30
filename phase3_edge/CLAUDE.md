@@ -146,6 +146,13 @@ Vier Fakten, die spätere Steps direkt gaten — volle Inventartabelle in `SESSI
 
 - venv für `ExecStart` (V6): `/home/savefyx/dev/savefxy/.venv/bin/python`.
 - `fastmcp` **3.4.4** bereits installiert — deckt sich mit dem P3-D-Pin, keine Änderung nötig.
+  **[2026-09-30 Korrektur, P9 Step H:]** Diese Zeile war zwei Jahre lang die halbe Wahrheit und
+  ist jetzt falsch. Sie beschrieb den Dev-Stand von P3 Step 0; **der Live-Release lief bereits auf
+  `fastmcp` 3.4.7** (read-only gemessen an `/opt/sharefyx/current/.venv`, Release
+  `20260918T183907`), weil `deploy.sh:153` pro Release ein frisches venv baut und der Pin ein
+  **Range** war. P3-D verlangte einen *exakten* Pin, im Code stand nie einer — das ist in P9-H
+  korrigiert (`phase2_mcp/pyproject.toml`: `fastmcp==3.4.7`, dazu ein Wächter, der im
+  Release-venv mitläuft). „Keine Änderung nötig" gilt erst wieder, seit der Pin exakt ist.
 - `systemd-creds` vorhanden, `has-tpm2` → partial → `encrypt` läuft über Host-Key statt TPM2 (für
   P3-F ausreichend, siehe Plan-Begründung).
 - **Tailscale ist auf dieser VM nicht installiert.** Blockiert nicht Steps 1–6, blockiert

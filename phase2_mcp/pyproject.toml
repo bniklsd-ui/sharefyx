@@ -7,7 +7,22 @@ name = "mcpserver"
 version = "0.1.0"
 description = "MCP-Server des Space-Servers (Phase 2) — Streamable HTTP, Token-Auth, sechs Tools"
 requires-python = ">=3.10"
-dependencies = ["storage", "fastmcp>=3.4,<3.5", "keyring>=25", "uvicorn>=0.30"]
+# `fastmcp` EXAKT, nicht als Range — das ist P3-D ("Patchversionen ändern hier Verhalten, und
+# unter einem Dauerdienst darf sich das nicht unbemerkt bewegen") und P4-R, beide seit 2026-08
+# beschlossen und bis 2026-09-30 **nie im Code umgesetzt**: hier stand `>=3.4,<3.5` seit dem
+# ersten Commit (1c131c2). Gemessene Folge, 2026-09-30: `deploy.sh:153` baut pro Release ein
+# frisches venv + `pip install -e` (scripts/dev_install.sh:9-13), ein Range-Pin löst also auf das
+# jeweils neueste 3.4.x auf — der Live-Release `20260918T183907` (read-only gemessen)
+# `fastmcp 3.4.7 / mcp 1.30.0`, während das Dev-venv noch 3.4.4 trug. Genau der stumme Drift,
+# den P3-D verbieten wollte, hatte also bereits stattgefunden. Der exakte Pin macht daraus eine
+# bewusste Entscheidung; `phase9_hardening/tests/test_step_h_deps.py` vergleicht die installierte
+# Version gegen diese Zeile und läuft im Release-venv mit (deploy.sh:169) — ein Drift ist damit
+# ein roter Deploy statt ein stiller.
+# Obergrenze bleibt 3.4.x (P9-R): FastMCP 4 / MCP-Revision 2026-07-28 ist **nicht** diese Zeile,
+# sondern V79, eigene Mini-Phase seit P5-C. Ein Bump auf 4.x ist eine eigene Entscheidung, kein
+# Nebenbei-Update — und die drei Releases 3.4.5/3.4.6/3.4.7 änderten ausschließlich OAuth-,
+# SSRF- und JWKS-Pfade, die dieses Projekt nicht benutzt (V163, siehe Plan §10).
+dependencies = ["storage", "fastmcp==3.4.7", "keyring>=25", "uvicorn>=0.30"]
 
 [project.optional-dependencies]
 dev = ["pytest", "pytest-asyncio", "httpx"]

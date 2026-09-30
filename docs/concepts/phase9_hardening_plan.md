@@ -1028,22 +1028,75 @@ der 3.4-Linie ist **3.4.7** (2026-08-10). Die 3.4.7 trägt einen Security-Fix: C
 werden gegen den exakt beworbenen Token-Endpunkt validiert (CIMD `private_key_jwt` bei
 `OAuthProxy`-Aufbauten an nackten Origins).
 
-**`[VERIFY] V163` — betrifft der Fix dieses Projekt überhaupt?** Erster Messbefund
-(2026-09-19): sharefyx benutzt FastMCPs `OAuthProxy` **nicht**; die Authentifizierung läuft über
-`phase2_mcp/mcpserver/asgi.py :: BearerAuthASGI` gegen den eigenen `phase4_auth/authserver`.
-Der Fix greift damit **vermutlich ins Leere** — der Bump ist Hygiene, kein Brand. **Das ist eine
-Vermutung aus dem Aufrufbild, keine Codemessung; vor dem Bump gegenprüfen.**
+> **Korrektur der Prämisse, 2026-09-30 (Step H ausgeführt).** „Installiert ist 3.4.4" war falsch,
+> und der Fehler war der Fund des Steps. Gemessen (read-only, ohne Service-Touch):
+>
+> | Ort | `fastmcp` | `mcp` |
+> |---|---|---|
+> | Live-Release `/opt/sharefyx/current/.venv` | **3.4.7** | 1.30.0 |
+> | Dev-`.venv` (vor dem Step) | 3.4.4 | 1.28.1 |
+> | `pyproject.toml` (seit dem ersten Commit `1c131c2`) | `>=3.4,<3.5` | — |
+>
+> `phase5_ui/scripts/deploy.sh:153` baut pro Release ein **frisches** venv, und
+> `scripts/dev_install.sh:9-13` installiert die Phasenpakete editable — ein Range-Pin löst bei
+> jedem Deploy auf das **damalige** neueste 3.4.x auf. Der Patch-Wechsel 3.4.4 → 3.4.7 hat also
+> **unbemerkt stattgefunden**, mit dem Release vom 2026-09-18. Genau das verbietet P3-D
+> (`phase3_edge_plan.md:106`): „Patchversionen ändern hier Verhalten, und unter einem Dauerdienst
+> darf sich das nicht unbemerkt bewegen." P3-D und P4-R behaupteten beide einen exakten Pin —
+> **im Code stand nie einer.**
 
-**Der Pin bleibt `<3.5` (P9-R).** FastMCP 4.0.0 (2026-08-31) bringt die MCP-Revision
+**Was gebaut wurde (2026-09-30, M3):** `fastmcp==3.4.7` exakt, mit datiertem Kommentar an der
+Pin-Zeile (Grund, Messung, Verweis auf P9-R/V79/V163). Damit ist P3-D zum ersten Mal umgesetzt,
+und `phase9_hardening/tests/test_step_h_deps.py` vergleicht die installierte Version gegen diese
+Zeile — **im Release-venv**, denn `deploy.sh:169` ruft dort `pytest -q` und bricht den Deploy bei
+Fehlschlag ab. Ein Patch-Drift ist damit ein roter Deploy statt einer Randnotiz. Fünf Wächter,
+Gegenprobe mit vier eingebauten Verstößen → 7 rote Assertions über vier Tests, danach
+zurückgebaut.
+
+**V163 — beantwortet, mit drei Codepunkten statt einer Vermutung.** Die Planungssession hatte
+2026-09-19 aus dem Aufrufbild geschlossen, der Fix greife ins Leere; vor dem Bump gegengeprüft:
+
+1. **`phase4_auth/authserver/metadata.py:19`** lässt `client_id_metadata_document_supported`
+   **bewusst abwesend** (nicht `false`) — CIMD ist damit aus, Claude nimmt DCR (P4-E, V14). Der
+   Fix betrifft CIMD.
+2. **`metadata.py:32`** führt `token_endpoint_auth_methods_supported: ["none"]` — öffentlicher
+   Client, es werden **gar keine** Client-Assertions erzeugt.
+3. Die benutzte fastmcp-Fläche ist `FastMCP`, `Client`, `StreamableHttpTransport`, `ToolError`,
+   `Image`, `Middleware`, `get_http_request` und `http_app(...)` — **kein `OAuthProxy`, kein
+   `JWTVerifier`, kein SSRF-Fetch**. Der eigene `BearerAuthASGI` (`phase2_mcp/mcpserver/asgi.py:40`)
+   trägt die Authentifizierung.
+
+Alle drei Releases zwischen 3.4.4 und 3.4.7 (3.4.5 JWKS-Key-Skip, 3.4.6 Trusted-Proxy für
+SSRF-Metadaten-Fetches, 3.4.7 CIMD-Audience) liegen damit auf Pfaden, die dieses Projekt nicht
+benutzt. **Ergebnis: der Fix ist inert, der Bump ist Hygiene — genau wie am 2026-09-19 vermutet,
+jetzt gemessen.** Der Patch hat trotzdem prod-seitig stattgefunden (siehe die Tabelle oben), das
+ist der Grund, warum der Step nicht nur ein Kommentar war.
+
+**Der Pin bleibt in der 3.4-Linie (P9-R).** FastMCP 4.0.0 (2026-08-31) bringt die MCP-Revision
 `2026-07-28` — zustandslos, ohne `initialize`-Handshake, ohne `Mcp-Session-Id`, mit neuen
 Pflicht-Headern. Alt-Protokoll-Clients laufen per Aushandlung weiter, es gibt also keinen Zwang.
 Die Migration bleibt **V79**, eigene Mini-Phase, seit P5-C so festgelegt. **Eine
 Protokollmigration mitten in einer Härtungsphase ist genau die Vermischung, die P8.6 zwei Pläne
-gekostet hat.**
+gekostet hat.** Ein Wächter nagelt die 3.x/3.4-Linie fest, ein zweiter verlangt, dass der
+Kommentar P9-R **und** V79 nennt — sonst steht irgendwann ein exakter Pin ohne Begründung da.
 
-**Abnahme:** `P9-53` `fastmcp` 3.4.7 installiert, `pytest` unverändert grün ·
-`P9-54` V163 beantwortet · `P9-55` Der Pin ist weiterhin `<3.5`, mit Kommentar und Verweis auf
-V79.
+> **Dokumentierte Abweichung von P9-55, Nikinger-Entscheidung 2026-09-30.** P9-55 verlangte
+> wörtlich „Der Pin ist weiterhin `<3.5`". Gebaut ist `==3.4.7` — **oberhalb** jeder 3.4-Version,
+> also innerhalb dessen, was P9-R erlaubt, aber ohne die Range-Form. Grund ist die Messung oben:
+> die Range-Form **ist** der Mechanismus des unbemerkten Drifts, den P3-D verbietet. Präzedenz
+> im Repo: `phase4_auth/pyproject.toml` pinnt `argon2-cffi==25.1.0` und `cryptography==49.0.0`
+> genau so exakt, mit derselben Begründung („Patchversionen ändern hier Verhalten").
+>
+> **Nicht gemacht, bewusst benannt:** das transitive `mcp` ist weiterhin **nicht** gepinnt und
+> läuft in der Dev-Umgebung auf 1.28.1, im Live-Release auf 1.30.0. Ein expliziter `mcp`-Pin wäre
+> eine neue Lock-Entscheidung, die kein Plan getragen hat — der Rest bleibt der gemessene
+> Abstand. **P9-Backlog-Kandidat, kein P9-Blocker.**
+
+**Abnahme:** `P9-53` ✅ `fastmcp` 3.4.7 installiert — im Live-Release war es das **schon**,
+die Abnahme ist damit durch die Messung erfüllt, nicht durch eine Änderung · `P9-54` ✅ V163
+beantwortet (drei Codepunkte oben) · `P9-55` ⚠️ **in der Form abweichend** (`==3.4.7` statt einer
+Range, Kommentar mit P9-R/V79/V163 vorhanden, Nikinger-Entscheidung oben) · `pytest`
+1079 → **1084** (5 neue Wächter, Bestand unverändert grün) · `ui_budget` 5/5 (151,8 KB).
 
 ---
 
@@ -1115,7 +1168,7 @@ schneiden und vorher die Trefferzahl prüfen. Der Fehler hätte einmal 66 KB ent
 | V160 | Was ist `assignee` — freier String, Space-Name, Principal? | F | **beantwortet 2026-09-30: Space-Name, ohne Validierung (Lock P9-U)**, s. §8.4-Korrekturnotiz |
 | V161 | Dauer des Index-Neuaufbaus über den echten `DATA_ROOT` | F | **Vorabwert 2026-09-30** (synthetisch 2,45–4,01 ms/Item; 153 reale Items ⇒ 0,4–0,6 s). **Offen** bleibt P9-43: die Messung am echten `DATA_ROOT` beim Deploy, Nikinger-Schritt |
 | V162 | Wächst `_trash/` durch die Asset-Verschiebungen seit N5 messbar? | G |
-| V163 | Betrifft der 3.4.7-Security-Fix dieses Projekt? (Erster Befund: vermutlich nein) | H |
+| V163 | Betrifft der 3.4.7-Security-Fix dieses Projekt? (Erster Befund: vermutlich nein) | H | **beantwortet 2026-09-30, gegen den Code statt gegen das Aufrufbild: nein.** Drei Belege — CIMD ist abgeschaltet (`metadata.py:19`, P4-E/V14), `token_endpoint_auth_methods_supported: ["none"]` ⇒ gar keine Client-Assertions (`metadata.py:32`), und die benutzte fastmcp-Fläche enthält weder `OAuthProxy` noch `JWTVerifier`; Auth läuft über den eigenen `BearerAuthASGI`. Bump also Hygiene, kein Brand. s. §10 |
 | V164 | Läuft `deploy.sh` unter der neuen Domain-Konfiguration durch? | Gate |
 | V165 | *(neu 2026-09-25)* Baut `nvidia-uvm` eines neueren 580ers (Forum: 580.159.04/580.173.02 auf `7.0.14-4-pve`+) gegen den pve-Kernel? Signatur `zone_device_page_init` in `uvm_hmm.c` prüfen | C |
 | **V118** | *(geerbt)* Zwillingskanten — zwei Linien gewollt? | E |
