@@ -206,7 +206,10 @@ A1 ✅ Domain `eurofyx.<tld>` bestellt, TLD-Entscheidung `.com` empfohlen · A2 
 `tag:sharefyx-edge` → `100.93.43.122`, `tcp:8765`) und Beitritt mit
 `--advertise-tags` erledigt · **A0b ✅ socat 1.8.0.0 + `sharefyx-tail-proxy.service` laeuft**
 (zwei Listener: `127.0.0.1:8765` und `100.93.43.122:8765`; `diagnose.sh` danach unverändert
-alle Prüfungen grün inklusive des öffentlichen Pfads — der Bestand ist unberührt) · **A5 wartet** auf die Domain-Registrierung (A-Record kann erst
+alle Prüfungen grün inklusive des öffentlichen Pfads — der Bestand ist unberührt) · **A6 ✅ Firewall auf dem VPS: 22 nur auf `tailscale0`, 80/443 offen, default deny —
+Gegenprobe von der Heim-VM: Tailnet-SSH **offen**, öffentliches SSH **timeout**
+(ufw *droppt* still, `deny` ≠ `reject`), 443 **refused** (Paket kommt am Host an,
+lauscht noch nichts — der Zustand vor A4) · **A5 wartet** auf die Domain-Registrierung (A-Record kann erst
 mit Zone) · **als Nächstes A0b** (socat + Relay) — danach erst A4/A6, weil A4 ohne Relay nichts
 zu proxen findet. Ab A7 hängt die Reihenfolge: **A7 vor A8**.
 
