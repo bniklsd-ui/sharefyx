@@ -11,6 +11,7 @@ down:
   - ../../phase3_edge/systemd/sharefyx-tail-proxy.service  # der Relay, ohne den A4 nicht geht
 ---
 
+[2026-09-29, beim Durchgehen von A3 gefunden: die ACL-Anweisung zeigte nur den `acls`-Block, nicht `tagOwners` — ohne den lehnt Tailscale `--advertise-tags` beim Beitritt ab. Reihenfolge „erst Policy, dann Beitritt" jetzt explizit, beides im Code-Block.] 
 # Step A — Echte Domain über einen eigenen VPS
 
 **Form: Coarbeit (P9-Q, Plan §0.5.1).** M3 leitet an, der Nikinger führt aus und liefert
@@ -194,12 +195,16 @@ curl -fsSL https://tailscale.com/install.sh | sh     # Nikinger, sudo
 sudo tailscale up --advertise-tags=tag:sharefyx-edge
 ```
 
-Im Tailscale-Admin-UI die bestehende Policy um das Fragment aus
-`tailscale-acl.draft.json` erweitern. **Wichtig: zuhaengen, nicht ersetzen** — die Datei ist
-ein Fragment, und die beiden `_`-Schlüssel (`_MERGE_HINWEIS`, `_WARUM`) sind Kommentar und
-gehören **nicht** in das Policy-File. Was du einfügst, ist genau:
+Im Tailscale-Admin-UI die bestehende Policy erweitern. **Reihenfolge: erst die Policy, dann
+der Beitritt** — ohne `tagOwners` nimmt Tailscale das `--advertise-tags` beim Beitritt nicht
+an (der Tag existiert dann nicht). Die Datei ist ein **Fragment**, kein Ersatz: die beiden
+`_`-Schlüssel (`_MERGE_HINWEIS`, `_WARUM`) sind Kommentar und gehören **nicht** ins
+Policy-File. Was du einfügst, ist genau:
 
 ```json
+"tagOwners": {
+  "tag:sharefyx-edge": ["autogroup:admin"]
+},
 "acls": [ … bestehende Regeln … ,
   { "action": "accept", "src": ["tag:sharefyx-edge"], "dst": ["100.93.43.122:8765"] }
 ]
