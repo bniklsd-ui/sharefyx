@@ -164,7 +164,57 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 
 ## Current state
 
-**[2026-09-30, P9 Step H gebaut — `fastmcp` exakt gepinnt, und die Reihenfolge entschied sich an
+**[2026-09-30, P9 Step B (zweiter Teil) — V153 entschieden, und einer der beiden Wege im Plan ist
+nachweislich unbaubar — opencode/M3 — Repo-Seite fertig, Ausführung bleibt beim Nikinger.]**
+`pytest` **1088** (1084 + 4 Wächter), kein `systemctl` durch einen Agenten, kein Service-Touch. **Befund 1: der
+`sudoers`-Weg aus Plan §4.2 funktioniert auf dieser VM nicht.** Die Unit setzt
+`NoNewPrivileges=true`, und sudo lebt vom setuid-Bit — gemessen: `setpriv --no-new-privs --
+sudo -n -l` → `sudo: The "no new privileges" flag is set, which prevents sudo from running as
+root.` Ein `NOPASSWD:`-Fragment wäre wirkungslos, und es zu retten hieße, die Härtung
+abzuschwächen. **Es bleibt polkit — V153 entschieden, und zwar per Messung statt Präferenz.**
+**Befund 2: polkit kann es auf dieser Box nicht eng genug, und das steht in keinem Plan.**
+`systemctl --version` → **255.4-1ubuntu8.17**, und der lokal installierte Manpage-Abschnitt
+*Security* in `org.freedesktop.systemd1(5)` nennt für `StartUnit()`/`StopUnit()`/`RestartUnit()`
+**eine gemeinsame** Aktion: `org.freedesktop.systemd1.manage-units`. Die feingranularen
+`manager.restart-unit` gibt es erst ab neuerem systemd — ein `<defaults>`-Eintrag kann danach
+**gar nicht** nach Unit filtern. Ob systemd 255 der Aktion ein `unit`-Attribut mitgibt, ist
+unprivilegiert **nicht** auslesbar (`pkcheck` sagt *not registered*, weil systemd die Aktion erst
+zur Laufzeit bei polkitd registriert) — ein Fehlversuch wäre also nur am echten Neustart zu
+entdecken. **Gebaut ist die Form, die in beiden Fällen das Richtige tut:**
+`phase3_edge/polkit/49-tailscaled-watchdog-restart.rules` als **JS**-Regel (nur sie kann auf
+`action.lookup("unit")` prüfen), die `manage-units` **und** die feingranulare Aktion abdeckt, in
+beiden Blöcken zusätzlich `unit == "tailscaled.service"` und `subject.user == "savefyx"`. Fehlt
+das Attribut, greift die Regel **nicht** und der Watchdog loggt seine vorhandene Zeile —
+sicherheitsseitig der gewünschte Fehlerfall. **Ohne** den Unit-Abgleich hätte `savefyx` das
+Management **aller** Units, auch aus `sharefyx-mcp` heraus; das wäre in einer Härtungsphase eine
+Regressionsstelle und steht deshalb nicht im Repo. **Befund 3: die Probe, die die Restfrage
+entscheidet, ohne `tailscaled` anzufassen** — `phase9_hardening/step_b/` mit einer Wegwerf-Unit
+(`ExecStart=/bin/true`, dieselbe Härtung) und einer Wegwerf-Regel, die *diese* Unit freigibt.
+**Befund 4: die Units sind auf der VM überhaupt nicht installiert** (`ls
+/etc/systemd/system/tailscaled-watchdog.*` → *No such file*, `systemctl list-timers` → 0 Timer;
+der Deploy vom 2026-09-18 liegt vor dem Step-B-Code vom 2026-09-26). **Vier neue Wächter** in
+`phase9_hardening/tests/test_tailscaled_watchdog.py` (**9/9 grün**, Gegenprobe mit vier
+eingebauten Verstößen → **6 rote Assertions**): Form jedes Blocks (Aktion+Unit+User, genau ein
+`YES` und das als letzter Ausgang), **Kopplung** zwischen Regel, Skript
+(`systemctl restart tailscaled.service`) und Unit (`User=savefyx`), die drei Nachbar-Aktionen
+bleiben unberührt, und die Probe darf `tailscaled` nicht nennen — **alle vier filtern
+Kommentarzeilen vorher heraus**, weil die Regel dieselben Begriffe in ihren Befund-Kommentaren
+nennt (dritte Wiederholung derselben Falle: P8.6 Block H, P9 Step G). `phase3_edge/polkit/` ist
+bewusst ein **eigenes Verzeichnis** und nicht `systemd/`: eine polkit-Regel ist keine Unit, und
+`install_units.sh` globbt `systemd/*.service|timer` — eine `.rules`-Datei dort wäre eine Falle
+für den Nächsten, der den Glob erweitert. **Ablauf für den Nikinger:**
+`phase9_hardening/step_b/RUNBOOK_STEP_B.md` §2 B0–B3, mit den zwei bekannten Fallen
+(`install_units.sh` aktiviert nur `sharefyx-mcp` **und startet es dabei neu**; der Watchdog-Timer
+braucht ein eigenes `systemctl enable --now`) und drei Induktions-Varianten für P9-19 samt
+Risiko. **Benannt, nicht entschieden:** die beiden Alternativen, falls die Probe `VERWEIGERT`
+sagt, berühren die Härtung (breites `manage-units` = abgelehnt; `User=root` = PATH-aufgelöste
+Binaries mit Root-Rechten) — das ist eine Entscheidung des Ningkers, und der dritte, sauberere Weg
+(fixer Root-Oneshot mit hartkodiertem `ExecStart`, per Flag angestoßen) wäre echte
+Umfangserweiterung und ist **nicht** gebaut. **Nächster Schritt:** B0 — drei `sudo install` plus
+ein `systemctl restart` auf die Wegwerf-Unit, danach aufräumen. Unverändert gilt: Step A wartet
+auf die Domain, Gate/Z auf A4–A8.
+
+ — `fastmcp` exakt gepinnt, und die Reihenfolge entschied sich an
 einer Domain-Messung — opencode/M3 — ein Commit, kein Service-Touch.]** **Erst die Domain
 geprüft, wie der Handover es verlangte: sie ist nicht registriert.** `eurofyx.com` liefert
 `NXDOMAIN` **und** `rdap.verisign.com` 404, dieselbe Antwort für `.de`/`.tech`/`.app`/`.cloud`/

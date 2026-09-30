@@ -1,0 +1,76 @@
+// 49-tailscaled-watchdog-restart.rules — polkit-Regel für GENAU EINEN Befehl:
+// `systemctl restart tailscaled.service`, ausgeführt vom tailscaled-watchdog.
+//
+// Installieren:  sudo install -m 0644 phase3_edge/polkit/49-tailscaled-watchdog-restart.rules \
+//                            /etc/polkit-1/rules.d/
+// Entfernen:     sudo rm -f /etc/polkit-1/rules.d/49-tailscaled-watchdog-restart.rules
+//
+// ---------------------------------------------------------------------------
+// Warum polkit und nicht sudoers — V153, beantwortet 2026-09-30 durch Messung
+// ---------------------------------------------------------------------------
+// Der Plan §4.2 nennt beide Wege. Der sudoers-Weg ist auf dieser VM **nicht
+// baubar**, weil die Unit `NoNewPrivileges=true` setzt und sudo vom setuid-Bit
+// lebt. Gemessen:
+//
+//   $ setpriv --no-new-privs -- /usr/bin/sudo -n -l
+//   sudo: The "no new privileges" flag is set, which prevents sudo from running as root.
+//
+// eine Zeile `NOPASSWD: /usr/bin/systemctl restart tailscaled.service` wäre unter
+// dieser Unit also wirkungslos — und sie zu retten hieße, `NoNewPrivileges`
+// abzuschwächen. polkit braucht kein setuid: die Autorierung läuft über
+// polkitd/D-Bus, die Unit redet dafür über `AF_UNIX` (in `RestrictAddressFamilies=`
+// zugelassen), und `ProtectSystem=strict` lässt `/run/systemd` beschreibbar.
+//
+// ---------------------------------------------------------------------------
+// Warum die Regel so eng ist, wie sie auf dieser Box nur sein kann
+// ---------------------------------------------------------------------------
+// systemd 255.4-1ubuntu8.17 kennt für Unit-Zustandsänderungen (StartUnit, StopUnit,
+// RestartUnit, KillUnit, SetProperty …) **eine** gemeinsame Aktion:
+// `org.freedesktop.systemd1.manage-units`. Die feingranularen
+// `org.freedesktop.systemd1.manager.restart-unit` gibt es erst ab neuerem systemd.
+// Ein XML-/pkla-`<defaults>`-Eintrag kann deshalb gar nicht nach Unit filtern.
+//
+// Diese Regel ist deshalb als **JS-Regel** geschrieben, weil nur sie auf das
+// `unit`-Attribut der Aktion prüfen kann. Zwei Blöcke, jeder für sich eng:
+//
+//   * `manage-units`          — die Aktion, die es auf dieser VM gibt (systemd 255)
+//   * `manager.restart-unit`  — dieselbe Absicht auf neuerem systemd, hier inert
+//
+// Beide verlangen zusätzlich `action.lookup("unit") == "tailscaled.service"`. **Wenn
+// systemd 255 dieses Detail nicht mitgibt, greift die Regel nicht** — und das ist
+// der gewollte Fehlerfall: der Watchdog loggt dann seine vorhandene Zeile
+// "restart fehlgeschlag (Polkit-Regel oder sudoers-Fragment fehlt? — V153)" und tut
+// sonst nichts. Eine Regel OHNE den `unit`-Abgleich würde `savefyx` das Starten und
+// Stoppen **jeder** Unit auf der Maschine geben, auch von `sharefyx-mcp` aus — das
+// ist in einer Härtungsphase eine Regression und wird hier bewusst nicht gebaut.
+//
+// Ob systemd 255 das `unit`-Detail mitschickt, ist unprivilegiert **nicht**
+// auslesbar (`pkcheck` sieht die Aktion gar nicht, sie wird erst zur Laufzeit bei
+// polkitd registriert). Die Probe dafür steht in
+// `phase9_hardening/step_b/RUNBOOK_STEP_B.md` und fasst `tailscaled` nicht an.
+//
+polkit.addRule(function (action, subject) {
+    if (action.id !== "org.freedesktop.systemd1.manage-units") {
+        return polkit.Result.DEFAULT;   // manage-unit-files, set-environment, reload-daemon …
+    }
+    if (action.lookup("unit") !== "tailscaled.service") {
+        return polkit.Result.DEFAULT;   // nur diese eine Unit
+    }
+    if (subject.user !== "savefyx") {
+        return polkit.Result.DEFAULT;   // nur der Watchdog-User der tailscaled-watchdog.service
+    }
+    return polkit.Result.YES;
+});
+
+polkit.addRule(function (action, subject) {
+    if (action.id !== "org.freedesktop.systemd1.manager.restart-unit") {
+        return polkit.Result.DEFAULT;   // auf systemd 255 nie erreicht
+    }
+    if (action.lookup("unit") !== "tailscaled.service") {
+        return polkit.Result.DEFAULT;
+    }
+    if (subject.user !== "savefyx") {
+        return polkit.Result.DEFAULT;
+    }
+    return polkit.Result.YES;
+});

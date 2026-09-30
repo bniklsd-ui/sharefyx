@@ -106,6 +106,30 @@ inklusive des öffentlichen Pfads — die Bestandspfade sind unberührt). **[Kor
 Zeile von 2026-09-29: sie stand hier auf „Installation ist ein Nikinger-Schritt, bisher ist
 nichts installiert" — das ist seit dem 30.09. überholt, die Unit läuft.]**
 
+**[2026-09-30, P9 Step B — ein neues Verzeichnis `polkit/` in diesem Bereich, plus die
+Entscheidung V153]:** `polkit/49-tailscaled-watchdog-restart.rules` ist die polkit-Regel, ohne die
+`tailscaled-watchdog.service` (`User=savefyx`, `NoNewPrivileges=true`) seinen einen
+Befehl nicht ausführen dürfte. **Warum ein eigenes Verzeichnis und nicht `systemd/`:** eine
+polkit-Regel ist keine Unit, und `install_units.sh` globbt `systemd/*.service|timer` — eine
+`.rules`-Datei dort wäre eine Falle für den Nächsten, der den Glob erweitert.
+
+**V153 ist entschieden, und einer der beiden im Plan genannten Wege ist nachweislich unbaubar:**
+`sudoers` lebt vom setuid-Bit, und `NoNewPrivileges` lässt der Kernel das nicht zu — gemessen mit
+`setpriv --no-new-privs -- sudo -n -l` → `sudo: The "no new privileges" flag is set, which prevents
+sudo from running as root.` Die Unit braucht also polkit. **Und polkit kann es auf dieser Box
+nicht eng genug**, ohne ein Attribut zu prüfen, dessen Vorhandensein niemand kennt: `systemctl
+--version` sagt **255.4-1ubuntu8.17**, und man `org.freedesktop.systemd1(5)` (Security, lokal
+installiert) nennt für `StartUnit()`/`StopUnit()`/`RestartUnit()` **eine** Aktion,
+`org.freedesktop.systemd1.manage-units`. Die Regel prüft deshalb zusätzlich
+`action.lookup("unit") == "tailscaled.service"` und `subject.user == "savefyx"`; fehlt das
+Attribut, greift sie nicht und der Watchdog loggt es (gewollter Fehlerfall). **Ohne** den
+Unit-Abgleich hätte `savefyx` das Management **aller** Units — auch aus `sharefyx-mcp` heraus.
+Vier Wächter in `phase9_hardening/tests/test_tailscaled_watchdog.py` (9/9, Gegenprobe 4 Verstöße
+→ 6 rot) halten Form, Kopplung zum Skript, Nachbar-Aktionen und den Probe-Satz fest. Ablauf für
+den Nikinger: `phase9_hardening/step_b/RUNBOOK_STEP_B.md` (B0 Probe, B1 Regel, B2 Units, B3
+P9-19). **Noch nicht installiert** — auf der VM fehlen beide Units bisher (`ls
+/etc/systemd/system/tailscaled-watchdog.*` → *No such file*, `systemctl list-timers` zeigt 0).
+
 **[2026-07-29 Korrektur, P4 Step 7]:** Zeile 5 nennt „systemd-Units" — `sharefyx-mcp.service`
 ist davon inzwischen nicht mehr eine. Die MCP-Unit zog nach `phase4_auth/systemd/` um (Plan §5
 Step 7: „ERSETZT die P3-Fassung", inhaltlich jetzt eine P4-Unit — `StateDirectory`, zweites

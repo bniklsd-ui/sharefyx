@@ -1,0 +1,40 @@
+# sharefyx-watchdog-probe.service — WEGWERF-Unit für die V153-Probe (P9 Step B)
+#
+# Existiert nur, um zu beweisen, ob eine polkit-Regel auf dieser Box (systemd 255,
+# eine gemeinsame `manage-units`-Aktion) überhaupt nach Unit filtern kann. Der Test
+# ist: darf `savefyx` diese Unit per D-Bus restarten, obwohl sie per `User=root`
+# läuft? Restarting `/bin/true` ist folgenlos — restarting `tailscaled` nicht, genau
+# darum ist es eine eigene Unit.
+#
+# Installieren (root):  sudo install -m 0644 phase9_hardening/step_b/sharefyx-watchdog-probe.service \
+#                            /etc/systemd/system/ && sudo systemctl daemon-reload
+# Ausprobieren (als savefyx, ohne sudo):
+#     systemctl restart sharefyx-watchdog-probe.service && echo AUTORISIERT || echo VERWEIGERT
+# Aufraeumen:           sudo rm -f /etc/systemd/system/sharefyx-watchdog-probe.service \
+#                            /etc/polkit-1/rules.d/99-tailscaled-watchdog-probe.rules \
+#                     && sudo systemctl daemon-reload
+#
+# Die Härtungs-Direktiven sind dieselben wie in `tailscaled-watchdog.service`, damit
+# die Probe dieselbe Sandbox durchläuft wie der echte Watchdog — `NoNewPrivileges`
+# ist der Grund, warum der sudoers-Weg überhaupt ausscheidet (V153, Plan §4.2).
+
+[Unit]
+Description=WEGWERF-Probe für die polkit-Regel des tailscaled-watchdog (P9 Step B, V153)
+Documentation=file://__REPO_ROOT__/phase9_hardening/step_b/RUNBOOK_STEP_B.md
+After=dbus.service
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+ExecStart=/bin/true
+RemainAfterExit=no
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+MemoryDenyWriteExecute=true
+SystemCallFilter=@system-service

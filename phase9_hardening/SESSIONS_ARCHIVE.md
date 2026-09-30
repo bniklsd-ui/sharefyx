@@ -5,7 +5,7 @@ read-when: Chronik einer älteren P9-Session gesucht — nicht beim normalen Arb
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-30 (**zwoelfte Rotation, Step H** — Step-H-Block [`fastmcp` exakt gepinnt `==3.4.7`, der Range-Pin hatte den Live-Release bereits lautlos auf 3.4.7 gezogen, V163 mit drei Codepunkten beantwortet, Wächter als Deploy-Riegel, Gegenprobe 4 Verstöße → 7 rot] im Head **angehängt**, Step-G-Block verbatim ins Archiv; Head 33.175 B → 26.210 B) | 2026-09-30 (**elfte Rotation, Step G** — Step-G-Block [Lösch-Ort war unbaubar, TLS-Wegwerf für den Browserbeleg, 14/14] im Head **angehängt**, Step-F-Block verbatim ins Archiv; Head 32.668 B → 25.740 B) | 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
+updated: 2026-09-30 (**dreizehnte Rotation, Step B** — Step-B-Block [polkit-Regel gebaut, V153 entschieden: sudoers ist unter NoNewPrivileges unbaubar; systemd 255 kennt nur die grobe `manage-units`-Aktion, deshalb JS-Regel mit Unit-Attribut; V153-Probe ohne tailscaled-Kontakt] im Head **angehängt**, Step-H-Block verbatim ins Archiv; Head 34.873 B → 28.685 B) | 2026-09-30 (**zwoelfte Rotation, Step H** — Step-H-Block [`fastmcp` exakt gepinnt `==3.4.7`, der Range-Pin hatte den Live-Release bereits lautlos auf 3.4.7 gezogen, V163 mit drei Codepunkten beantwortet, Wächter als Deploy-Riegel, Gegenprobe 4 Verstöße → 7 rot] im Head **angehängt**, Step-G-Block verbatim ins Archiv; Head 33.175 B → 26.210 B) | 2026-09-30 (**elfte Rotation, Step G** — Step-G-Block [Lösch-Ort war unbaubar, TLS-Wegwerf für den Browserbeleg, 14/14] im Head **angehängt**, Step-F-Block verbatim ins Archiv; Head 32.668 B → 25.740 B) | 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
 ---
 
 # Phase 9 — Sessions Archive
@@ -15,6 +15,93 @@ trägt immer genau einen `## Session stopped`-Block, ältere Blöcke wandern ver
 Vorsatz: nichts abtippen, alles per Skript mit vier Gegenproben (Schnitt verlustfrei, neuer
 Head trägt genau einen Block, alle bewegten Blöcke im Archiv byte-identisch, Archivbestand
 unangetastet).
+
+## Session stopped — 2026-09-30 (vierter Block, Step H)
+
+**Step H ist gebaut, und die Reihenfolge entschied sich an einer Messung: die Domain ist nicht
+registriert.** `eurofyx.com` liefert `NXDOMAIN` **und** `rdap.verisign.com` 404, dieselbe Antwort
+für `.de`/`.tech`/`.app`/`.cloud`/`.net`/`.org`/`.eu` — A4 braucht eine auflösende Domain fürs
+Zertifikat, also bleiben A4/A5/A7/A8 blockiert und der letzte Code-Step wird gezogen. `pytest`
+**1084**, `ui_budget` 5/5, kein Service-Touch.
+
+### Der Fund: die Plan-Prämisse „installiert ist 3.4.4" war falsch — der Drift hatte schon stattgefunden
+
+| Ort | `fastmcp` | `mcp` |
+|---|---|---|
+| Live-Release `/opt/sharefyx/current/.venv` (read-only) | **3.4.7** | 1.30.0 |
+| Dev-`.venv` (vorher) | 3.4.4 | 1.28.1 |
+| `phase2_mcp/pyproject.toml` — seit dem ersten Commit `1c131c2` | `>=3.4,<3.5` | — |
+
+`deploy.sh:153` baut pro Release ein **frisches** venv, `scripts/dev_install.sh:9-13` installiert
+editable — ein Range-Pin löst bei jedem Deploy auf das **damalige** neueste 3.4.x auf. Der
+Patch-Wechsel hat also unbemerkt stattgefunden, mit dem Release vom 2026-09-18. P3-D
+(`phase3_edge_plan.md:106`) wollte genau das verbieten („unter einem Dauerdienst darf sich das
+nicht unbemerkt bewegen"), P4-R wiederholte es — **im Code stand nie ein exakter Pin.** Zwei
+Pläne, eine Entscheidung, null Umsetzung; das war der Drift, nicht der Bump.
+
+**Gebaut:** `fastmcp==3.4.7` exakt, mit datiertem Kommentar an der Zeile (Grund, Messung,
+P9-R/V79/V163). Das ist die Einlösung von P3-D, keine neue Entscheidung — Präzedenz ist
+`phase4_auth/pyproject.toml` mit `argon2-cffi==25.1.0` und `cryptography==49.0.0`.
+**P9-55 verlangte wörtlich „weiterhin `<3.5`"**; gebaut ist `==3.4.7`, oberhalb jeder 3.4-Version,
+also innerhalb P9-R, aber ohne die Range-Form — **Nikinger-Entscheidung 2026-09-30**, weil die
+Range-Form der Mechanismus des gemessenen Drifts ist. Als Abweichung im Plan §10 dokumentiert,
+nicht stillschweigend.
+
+**Der eigentliche Riegel ist ein Test.** `test_the_installed_fastmcp_matches_the_pin` vergleicht
+die installierte Version mit der Pin-Zeile — und läuft im **Release-venv** mit, weil `deploy.sh:169`
+dort `pytest -q` aufruft und den Deploy bei Fehlschlag abbricht. Ein Patch-Drift ist damit ein
+roter Deploy statt einer Randnotiz. Fünf Wächter, **Gegenprobe mit vier eingebauten Verstößen →
+7 rote Assertions über vier Tests**: Range-Pin (3 rot), Pin auf 4.x (2 rot), `V79` aus dem
+Kommentar entfernt (1 rot), zweiter Pin in `phase4_auth` (1 rot). Alles zurückgebaut, 5/5 grün.
+
+### V163 ist beantwortet — drei Codepunkte statt einer Vermutung aus dem Aufrufbild
+
+1. `phase4_auth/authserver/metadata.py:19` lässt `client_id_metadata_document_supported`
+   **bewusst abwesend** — CIMD ist aus, Claude nimmt DCR (P4-E, V14). Der Fix betrifft CIMD.
+2. `metadata.py:32`: `token_endpoint_auth_methods_supported: ["none"]` — öffentlicher Client, es
+   werden gar keine Client-Assertions erzeugt.
+3. Die benutzte fastmcp-Fläche ist `FastMCP`/`Client`/`StreamableHttpTransport`/`ToolError`/
+   `Image`/`Middleware`/`get_http_request`/`http_app` — **kein `OAuthProxy`, kein `JWTVerifier`**;
+   Auth trägt der eigene `BearerAuthASGI` (`asgi.py:40`).
+
+Die drei Releases dazwischen (3.4.5 JWKS-Key-Skip, 3.4.6 Trusted-Proxy für SSRF-Metadaten, 3.4.7
+CIMD-Audience) liegen alle auf Pfaden, die dieses Projekt nicht benutzt. **Der Fix ist inert, der
+Bump ist Hygiene** — genau wie am 2026-09-19 vermutet, jetzt gemessen. Dass er trotzdem prod-seitig
+stattgefunden hat, ist der Grund, warum der Step nicht nur ein Kommentar war.
+
+### Ein eigener Fehler, beim Wächter-Schreiben
+
+`req.specifier.version` gibt es nicht (`SpecifierSet` hat kein `.version`) — zwei Tests rot, bevor
+der Helper existierte. Genau die Klasse Fehler, die der Wächter verhindern soll, hat mich der
+Wächter zuerst einmal selbst gekostet. Beim selben Durchgang: ein `edit` auf die P2-Modulstatus-
+Tabelle hat **Zeile 13 mitgefressen** (Anker war der Zeilenanfang statt des Zeilenendes). Beides
+gesehen, weil `git diff` nach dem Edit **rein additiv** hätte sein müssen — der Nachweis steht
+jetzt im Diff (13 Zeilen rein, 0 raus).
+
+### Was gemessen wurde
+
+| Gegenstand | Nachweis |
+|---|---|
+| **Domain** | `dig +short eurofyx.<tld> @1.1.1.1` → **NXDOMAIN** für alle sieben Kandidaten; `rdap.verisign.com/com/v1/domain/eurofyx.com` → **404** |
+| **Prod-Version** | read-only über `/opt/sharefyx/current/.venv/bin/python` → `fastmcp 3.4.7`, `mcp 1.30.0` — **nur gelesen**, kein `systemctl`, kein Restart |
+| **Gegenprobe** | vier Verstöße eingebaut → 7 rote Assertions, danach per `cp` aus dem Backup zurückgebaut; `git diff --stat` zeigt nur `phase2_mcp/pyproject.toml` |
+| **Tests** | 5 neue in `phase9_hardening/tests/test_step_h_deps.py`; `pytest` 1079 → **1084** in 186 s (Bestand unverändert, **mit** 3.4.7 im Dev-venv) · `ui_budget` **5/5** (151,8 KB; `search_items` 128,6 ms / `get_item` 4,7 ms über den echten MCP-Stack, also der 3.4.7-Pfad wirklich gelaufen) · `doc_health` 0 Befunde |
+| **P1-Tabu** | nichts in `phase1_storage/` berührt — der Pin ist Phase-2-Terrrain, die Tabu-Liste nicht |
+
+**Benannt, nicht gebaut:** das transitive `mcp` ist weiterhin **nicht** gepinnt (Dev 1.28.1, Live
+1.30.0). Ein expliziter `mcp`-Pin wäre eine Lock-Entscheidung, die kein Plan getragen hat —
+P9-Backlog-Kandidat, kein Blocker.
+
+### Nächster Schritt
+
+**Step A wartet auf die Domain-Registrierung** — das ist jetzt die einzige offene Kette in P9 und
+der Grund, warum H gezogen wurde, bevor Gate/Z kam. Sobald `eurofyx.<tld>` auflöst: A4 (Caddyfile,
+drei Platzhalter) → A5 DNS → **A7 ist der riskante Schritt** (drei gemessene Fallen:
+`ALLOWED_HOSTS` braucht neue Domain **und** Funnel-Host **und** `127.0.0.1`, `/health` statt
+`/healthz`, und nach `install_units.sh` ein eigener `restart sharefyx-mcp`) → A8 Connector in
+beiden Konten. **Gate/Z** kann ohne A4–A8 nicht abgeschlossen werden; die beiden Doku-Posten
+daraus (INDEX-Rotation P9-L bei 50.033 B, Contract-Rotation in `phase1_storage/CLAUDE.md` bei
+43.333 B) sind strukturell und nicht durch Kürzen lösbar.
 
 ## Session stopped — 2026-09-30 (dritter Block, Step G)
 

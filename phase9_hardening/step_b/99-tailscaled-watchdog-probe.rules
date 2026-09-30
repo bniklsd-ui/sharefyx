@@ -1,0 +1,27 @@
+# 99-tailscaled-watchdog-probe.rules — WEGWERF, nur für die V153-Probe
+#
+# Zweck: beweisen, ob systemd 255 der Aktion `org.freedesktop.systemd1.manage-units`
+# das `unit`-Attribut mitgibt. Ohne dieses Detail kann keine polkit-Regel nach Unit
+# filtern, und die Repo-Regel `phase3_edge/polkit/49-tailscaled-watchdog-restart.rules`
+# bleibt wirkungslos (siehe deren Kommentar).
+#
+# Diese Datei nennt ABSICHT eine andere Unit (`sharefyx-watchdog-probe.service`),
+# damit die Probe nichts mit tailscaled zu tun hat: restarting `ExecStart=/bin/true`
+# ist folgenlos, restarting tailscaled nicht. Steht hier `tailscaled.service`, wäre
+# die Probe genau die Sache, vor der sie warnen soll.
+#
+# Installieren (root, zusammen mit der Unit):  sudo install -m 0644 … /etc/polkit-1/rules.d/
+# WIEDER ENTFERNEN:                              sudo rm -f /etc/polkit-1/rules.d/99-tailscaled-watchdog-probe.rules
+#
+polkit.addRule(function (action, subject) {
+    if (action.id !== "org.freedesktop.systemd1.manage-units") {
+        return polkit.Result.DEFAULT;
+    }
+    if (action.lookup("unit") !== "sharefyx-watchdog-probe.service") {
+        return polkit.Result.DEFAULT;
+    }
+    if (subject.user !== "savefyx") {
+        return polkit.Result.DEFAULT;
+    }
+    return polkit.Result.YES;
+});

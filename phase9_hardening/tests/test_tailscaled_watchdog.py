@@ -263,3 +263,149 @@ def test_unit_file_has_the_three_hardening_directives():
         "timer missing OnUnitActiveSec — watchdog wouldn't actually fire"
     assert re.search(r"^Unit=tailscaled-watchdog\.service\s*$", timer_content, re.MULTILINE), \
         "timer must reference tailscaled-watchdog.service"
+
+
+# --- Tests 6-9: die polkit-Regel (P9 Step B, V153, 2026-09-30) --------------------
+#
+# Warum es diese vier überhaupt braucht: der Watchdog läuft als `User=savefyx` und darf
+# `systemctl restart tailscaled.service` — dafür braucht er eine Autorisierung, und auf
+# dieser Box (systemd 255) ist die passende Aktion die **grobe**
+# `org.freedesktop.systemd1.manage-units`, nicht `manager.restart-unit`. Ein XML-`<defaults>`
+# kann danach nicht filtern; nur eine JS-Regel kann, über `action.lookup("unit")`.
+# Ohne Wächter wandert der Unit-Abgleich bei der nächsten Politur weg und `savefyx` kann
+# plötzlich **alle** Units der Maschine verwalten — von `sharefyx-mcp` aus.
+#
+# Alle vier Wächter lesen **nur Codezeilen**: die Regel enthält dieselben Begriffe in ihren
+# Kommentaren (Befund-Notizen), und ein Test, der Kommentare mitliest, prüft meine
+# Formulierung statt der Absicht. Dieselbe Falle wie in P8.6 Block H und P9 Step G.
+
+POLKIT_RULE = REPO_ROOT / "phase3_edge" / "polkit" / "49-tailscaled-watchdog-restart.rules"
+PROBE_RULE = REPO_ROOT / "phase9_hardening" / "step_b" / "99-tailscaled-watchdog-probe.rules"
+PROBE_UNIT = REPO_ROOT / "phase9_hardening" / "step_b" / "sharefyx-watchdog-probe.service"
+
+# Die Nachbar-Aktionen desselben systemd-255-Aktionssatzes. Quelle: die lokal installierte
+# /usr/share/polkit-1/actions/org.freedesktop.systemd1.policy und der Manpage-Abschnitt
+# "Security" in org.freedesktop.systemd1(5) (gelesen 2026-09-30).
+NEIGHBOUR_ACTIONS = (
+    "org.freedesktop.systemd1.manage-unit-files",
+    "org.freedesktop.systemd1.set-environment",
+    "org.freedesktop.systemd1.reload-daemon",
+    "org.freedesktop.systemd1.bypass-dump-ratelimit",
+)
+
+
+def _code_only(path: Path) -> str:
+    """Der Datei-Inhalt ohne Kommentarzeilen.
+
+    `//` für die beiden polkit-Regeln, `#` für die systemd-Unit. Zeilenweise gefiltert
+    statt per Regex über den ganzen Text — ein `//` in einem Pfad darf keine Zeile
+    verschlucken.
+    """
+    kept = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if stripped.startswith("//") or stripped.startswith("#"):
+            continue
+        kept.append(line)
+    return "\n".join(kept)
+
+
+def _add_rule_blocks(code: str) -> list[str]:
+    """Die Rümpfe jeder `polkit.addRule(...)`-Funktion, ohne Kommentare."""
+    blocks = re.split(r"polkit\.addRule\(", code)
+    return [b for b in blocks[1:] if "return" in b]
+
+
+# --- Test 6 -----------------------------------------------------------------
+
+def test_the_polkit_rule_grants_exactly_one_action_one_unit_one_user():
+    """Jeder addRule-Block prüft Aktion, Unit und User — und sonst nichts.
+
+    Die Reihenfolge ist zusätzlich Teil der Zusicherung: der Unit-Abgleich steht vor dem
+    `return YES`. Ein Block, der `YES` zurückgibt, ohne vorher `unit` und `subject.user`
+    geprüft zu haben, ist genau die Rechteausweitung, die hier nicht gebaut wird.
+    """
+    code = _code_only(POLKIT_RULE)
+    blocks = _add_rule_blocks(code)
+    assert len(blocks) == 2, f"erwartet: die Aktionen dieser Box und die eines neuen systemd, gefunden: {len(blocks)}"
+
+    for block in blocks:
+        aktion = re.search(r'action\.id\s*!==\s*"([^"]+)"', block)
+        unit = re.search(r'action\.lookup\("unit"\)\s*!==\s*"([^"]+)"', block)
+        user = re.search(r'subject\.user\s*!==\s*"([^"]+)"', block)
+        assert aktion and unit and user, f"Block prüft nicht Aktion+Unit+User: {block.strip()[:200]}"
+        assert unit.group(1) == "tailscaled.service", f"Rule grants unit {unit.group(1)!r}"
+        assert user.group(1) == "savefyx", f"Rule grants user {user.group(1)!r}"
+
+        # Jeder Ausgang ist YES oder DEFAULT, es gibt genau ein YES, und es ist der letzte:
+        # ein früher `return YES` vor den Prüfungen wäre die Ausnahme, gegen die der Test da ist.
+        returns = re.findall(r"return (polkit\.Result\.\w+);", block)
+        assert set(returns) <= {"polkit.Result.YES", "polkit.Result.DEFAULT"}, \
+            f"unbekannter Ausgang: {returns}"
+        assert returns.count("polkit.Result.YES") == 1, f"mehr als ein YES-Ausgang: {returns}"
+        assert returns[-1] == "polkit.Result.YES", \
+            f"das YES muss der letzte Ausgang sein, ist es aber nicht: {returns}"
+
+
+# --- Test 7 -----------------------------------------------------------------
+
+def test_the_polkit_rule_and_the_watchdog_name_the_same_unit_and_user():
+    """Regel und Skript/Unit dürfen nicht auseinanderlaufen.
+
+    Der historische Nachbar dieser Wächter ist der Port-Test beim tail-proxy („der Port darf
+    nicht auseinanderlaufen"). Hier sind es drei Namen: das Skript startet eine Unit, die
+    Unit läuft als ein User, und die Regel nennt Unit und User. Wird eines davon umbenannt,
+    greift die Regel ins Leere und der Watchdog kann seinen einzigen Zweck nicht erfüllen —
+    still, weil Stufe 1 im gesunden Fall nie weiterläuft.
+    """
+    code = _code_only(POLKIT_RULE)
+    units = set(re.findall(r'action\.lookup\("unit"\)\s*!==\s*"([^"]+)"', code))
+    users = set(re.findall(r'subject\.user\s*!==\s*"([^"]+)"', code))
+    assert units == {"tailscaled.service"}, f"die Regel muss genau eine Unit nennen, nennt: {units}"
+    assert users == {"savefyx"}, f"die Regel muss genau einen User nennen, nennt: {users}"
+
+    # Was das Skript wirklich aufruft — der Name, den die Regel treffen muss.
+    script = _code_only(WATCHDOG_SCRIPT)
+    restarts = re.findall(r"systemctl restart ([\w.-]+)", script)
+    assert restarts == ["tailscaled.service"], f"Skript startet andere Units: {restarts}"
+
+    # Und der User aus der Unit, gegen den die Regel prüft.
+    unit_user = re.search(r"^User=(\S+)\s*$", _code_only(WATCHDOG_SERVICE), re.MULTILINE)
+    assert unit_user and unit_user.group(1) in users, \
+        f"die Unit laeuft als {unit_user and unit_user.group(1)!r}, die Regel kennt {users}"
+
+
+# --- Test 8 -----------------------------------------------------------------
+
+def test_the_polkit_rule_does_not_touch_the_neighbour_actions():
+    """Die drei anderen Unit-Aktionen dieses systemd bleiben unberührt.
+
+    Wer `manage-units` freigibt, hat nicht nur Restart im Kopf — derselbe Aufrufkanal
+    kann Units anhalten, maskieren, die Environment des Managers setzen oder den Daemon
+    reloaden. Diese Namen dürfen deshalb **nicht** im Code der Regel vorkommen (in den
+    Kommentaren schon: dort steht, warum sie ausgepartet bleiben).
+    """
+    code = _code_only(POLKIT_RULE)
+    for action in NEIGHBOUR_ACTIONS:
+        assert action not in code, f"die Regel fasst {action} an — das ist nicht der Auftrag"
+
+
+# --- Test 9 -----------------------------------------------------------------
+
+def test_the_probe_never_names_the_real_unit():
+    """Die V153-Probe darf tailscaled nicht nennen — sonst wäre sie die Sache, vor der sie warnt.
+
+    Die Probe beweist an `ExecStart=/bin/true`, ob systemd der polkit-Aktion das
+    `unit`-Attribut mitgibt. Würde sie `tailscaled.service` nennen, hinge an ihr genau der
+    Neustart, den sie vermeiden soll. Der Test liest wieder nur Code, nicht die Warnung
+    im Kommentar darüber.
+    """
+    for path in (PROBE_RULE, PROBE_UNIT):
+        code = _code_only(path)
+        assert "tailscaled" not in code.replace("tailscaled-watchdog", ""), \
+            f"{path.name} nennt tailscaled im Code — die Probe muss folgenlos sein"
+        assert path.exists(), f"{path} fehlt — ohne sie ist die V153-Frage nicht entscheidbar"
+    # Und sie muss die Wegwerf-Unit auch wirklich benennen, sonst prüft sie nichts.
+    assert "sharefyx-watchdog-probe.service" in _code_only(PROBE_RULE)
+    assert re.search(r"^ExecStart=/bin/true\s*$", _code_only(PROBE_UNIT), re.MULTILINE), \
+        "die Probe-Unit muss etwas folgenloses tun"

@@ -425,6 +425,51 @@ Ausfall verlängert statt ihn zu beheben.
 geschnittene Polkit-Regel oder ein `sudoers`-Fragment mit genau diesem einen Befehl —
 `[VERIFY] V153`, welcher der beiden Wege auf dieser Ubuntu-24.04-VM der tragfähigere ist.
 
+> **Korrektur und V153-Antwort, 2026-09-30 (Step B, M3-Anteil gebaut — Ausführung bleibt beim
+> Nikinger).** Von den zwei Wegen ist einer **nachweislich unbaubar**, und der andere ist auf
+> dieser Box **nicht so eng, wie der Text suggeriert**. Beides gemessen, nicht vermutet:
+>
+> **1. `sudoers` ist ausgeschlossen, weil die Unit `NoNewPrivileges=true` setzt.** sudo lebt vom
+> setuid-Bit, und `no_new_privs` lässt der Kernel genau das nicht mehr zu:
+> `setpriv --no-new-privs -- /usr/bin/sudo -n -l` → `sudo: The "no new privileges" flag is set,
+> which prevents sudo from running as root.` Eine `NOPASSWD:`-Zeile wäre unter dieser Unit
+> wirkungslos; sie zu retten hieße, die Härtung abzuschwächen. **Es bleibt polkit** — polkit
+> braucht kein setuid, die Autorisierung läuft über polkitd/D-Bus (`AF_UNIX` ist in
+> `RestrictAddressFamilies=` zugelassen, `ProtectSystem=strict` lässt `/run/systemd` zu).
+>
+> **2. Die Aktion dieser Box ist die grobe.** `polkitd` ist da (`124-2ubuntu1.24.04.4`), aber
+> `systemctl --version` sagt **255.4-1ubuntu8.17**, und der lokal installierte Manpage-Abschnitt
+> *Security* in `org.freedesktop.systemd1(5)` benennt für `StartUnit()`/`StopUnit()`/`RestartUnit()`
+> **eine gemeinsame** Aktion: `org.freedesktop.systemd1.manage-units`. Die feingranularen
+> `org.freedesktop.systemd1.manager.restart-unit` gibt es erst ab neuerem systemd. Ein
+> `<defaults>`-Eintrag kann danach also **gar nicht** nach Unit filtern — die „eng geschnittene
+> Regel" aus §4.2 setzt voraus, dass es so etwas wie ein Unit-Attribut gibt.
+>
+> **Was gebaut wurde:** `phase3_edge/polkit/49-tailscaled-watchdog-restart.rules` als **JS**-Regel
+> (nur sie kann auf `action.lookup("unit")` prüfen), die `manage-units` **und** die feingranulare
+> Aktion abdeckt, in beiden Blöcken zusätzlich `unit == "tailscaled.service"` und
+> `subject.user == "savefyx"`. Fehlt systemd 255 das `unit`-Attribut, greift die Regel **nicht** —
+> gewollter Fehlerfall: der Watchdog loggt seine vorhandene Zeile und tut sonst nichts. Eine Regel
+> **ohne** Unit-Abgleich würde `savefyx` das Management **aller** Units geben, auch aus
+> `sharefyx-mcp` heraus; das ist in einer Härtungsphase eine Regression und wird nicht gebaut.
+>
+> **Die offene Restfrage ist billig entscheidbar und deshalb nicht offen gelassen:** ob systemd 255
+> das `unit`-Attribut mitschickt, ist unprivilegiert nicht auslesbar (`pkcheck` kennt die Aktion
+> nicht — sie wird erst zur Laufzeit bei polkitd registriert). Dafür liegt eine Probe, die
+> `tailscaled` **nicht** anfasst: `phase9_hardening/step_b/` installiert eine Wegwerf-Unit
+> (`ExecStart=/bin/true`) und eine Wegwerf-Regel, die *diese* Unit freigibt. `systemctl restart`
+> darauf ist folgenlos; gelingt er, trägt das Attribut, und die Repo-Regel funktioniert. Ablauf:
+> `phase9_hardening/step_b/RUNBOOK_STEP_B.md` §2 B0–B3.
+>
+> Vier neue Wächter in `phase9_hardening/tests/test_tailscaled_watchdog.py` (9/9 grün,
+> Gegenprobe mit vier eingebauten Verstößen → 6 rote Assertions): Form jedes Blocks
+> (Aktion+Unit+User, genau ein YES und das als letzter Ausgang), **Kopplung** zwischen Regel,
+> Skript (`systemctl restart tailscaled.service`) und Unit (`User=savefyx`),
+> die drei Nachbar-Aktionen (`manage-unit-files`/`set-environment`/`reload-daemon`) bleiben
+> unberührt, und die Probe darf `tailscaled` nicht nennen. Alle vier lesen **nur Codezeilen** —
+> die Regel nennt dieselben Begriffe in ihren Kommentaren, und ein Wächter, der Kommentare mitliest,
+> prüft die Formulierung statt der Absicht (dieselbe Falle wie P8.6 Block H und P9 Step G).
+
 **Hard Rule 9:** Auslöser ist systemd, nie ein Agent. Installation und `systemctl enable` führt
 **der Nikinger** aus.
 
@@ -446,7 +491,8 @@ strippen. Das hat einmal die Produktion 52× neu gestartet; die Regel ist nicht 
 ### 4.4 Abnahme Step B
 
 `P9-16` Unit + Timer existieren, `systemctl list-timers` zeigt den Timer (Nikinger) ·
-`P9-17` 5 Tests grün · `P9-18` Härtungs-Direktiven per statischem Wächter belegt ·
+`P9-17` Tests grün — **9/9** (5 aus §4.3, 4 für die polkit-Regel; die Plan-Zahl „5" ist die
+Zeile, nicht die Summe) · `P9-18` Härtungs-Direktiven per statischem Wächter belegt ·
 `P9-19` Ein absichtlich herbeigeführter Offline-Zustand löst genau einen Restart aus, im Journal
 belegt (Nikinger) · `P9-20` V152 beantwortet — mit „gibt es nicht" als zulässigem Ergebnis.
 
@@ -1158,7 +1204,7 @@ schneiden und vorher die Trefferzahl prüfen. Der Fehler hätte einmal 66 KB ent
 | V150 | Hält der Anthropic-Connector unter der neuen Domain, in **beiden** Konten? | A |
 | V151 | Latenz über den VPS gegenüber 372,9 ms über Funnel? | A |
 | V152 | Gibt es ein Tailscale-eigenes Watchdog-Feature ohne kommerzielles Add-on? | B |
-| V153 | Polkit-Regel oder `sudoers`-Fragment für den einen `restart`-Aufruf? | B |
+| V153 | Polkit-Regel oder `sudoers`-Fragment für den einen `restart`-Aufruf? | B | **beantwortet 2026-09-30: polkit, und `sudoers` ist nachweislich ausgeschlossen** — die Unit setzt `NoNewPrivileges=true`, sudo scheitert darunter an `no_new_privs` (gemessen mit `setpriv`). **Aber:** `systemd 255.4` kennt nur die grobe Aktion `org.freedesktop.systemd1.manage-units` (man `org.freedesktop.systemd1(5)`, *Security*), ein `<defaults>`-Eintrag kann deshalb nicht nach Unit filtern. Gebaut ist eine JS-Regel, die zusätzlich `action.lookup("unit") == "tailscaled.service"` **und** `subject.user == "savefyx"` verlangt. Ob systemd 255 das Attribut mitschickt, entscheidet die **V153-Probe** in `phase9_hardening/step_b/` (fasst `tailscaled` nicht an). s. §4.2 |
 | V154 | IOMMU-Zustand des 3060-Hosts — LXC oder volle VM? | C |
 | V155 | Zeilennummern `mcp_local_vision_server.py:223/274` gegen den aktuellen Stand | C |
 | V156 | Bei `qwen3-vl:8b` bleiben oder VRAM-Luft nutzen? | C |
