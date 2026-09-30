@@ -204,7 +204,9 @@ P3-Eigentum, das Tailnet zu betreiben — dasselbe Muster wie der Watchdog aus S
 A1 ✅ Domain `eurofyx.<tld>` bestellt, TLD-Entscheidung `.com` empfohlen · A2 ✅ VPS
 `217.160.128.146`, Ubuntu 24.04.5, 1 vCPU/2 GB · A3 ✅ Policy (`tagOwners` + Grant
 `tag:sharefyx-edge` → `100.93.43.122`, `tcp:8765`) und Beitritt mit
-`--advertise-tags` erledigt · **A5 wartet** auf die Domain-Registrierung (A-Record kann erst
+`--advertise-tags` erledigt · **A0b ✅ socat 1.8.0.0 + `sharefyx-tail-proxy.service` laeuft**
+(zwei Listener: `127.0.0.1:8765` und `100.93.43.122:8765`; `diagnose.sh` danach unverändert
+alle Prüfungen grün inklusive des öffentlichen Pfads — der Bestand ist unberührt) · **A5 wartet** auf die Domain-Registrierung (A-Record kann erst
 mit Zone) · **als Nächstes A0b** (socat + Relay) — danach erst A4/A6, weil A4 ohne Relay nichts
 zu proxen findet. Ab A7 hängt die Reihenfolge: **A7 vor A8**.
 
@@ -441,22 +443,38 @@ erzeugt einen TLS-Namens-Mismatch, weil Funnel per SNI an die Node durchreicht u
 
 ### A6 — Firewall am VPS (du; Entwurf von mir)
 
-Ziel: 80/443 offen, alles andere zu, SSH nur über das Tailnet.
+Ziel: 80/443 offen, alles andere zu, SSH **nur** über das Tailnet.
+
+> **[Korrektur 2026-09-30, BEVOR der Schritt lief: meine erste Fassung dieses Schritts war
+> fehlerhaft und hätte dich ausgesperrt.]** `ufw default deny incoming` gilt **auf allen
+> Interfaces** — auch auf `tailscale0`. Die erste Fassung erlaubte 80/443, aber **kein SSH
+> über das Tailnet**; wer zu dem Zeitpunkt über die Tailnet-IP verbunden ist, verliert die
+> Verbindung, und wer über die öffentliche IP verbunden ist, verliert sie auch. Zurück kommt
+> man nur über die IONOS-Webconsole. Die Regel für `tailscale0` fehlt in der ersten Fassung
+> vollständig — sie ist unten ergänzt.
 
 ```bash
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
+sudo ufw allow in on tailscale0 to any port 22 proto tcp comment "SSH nur ueber Tailscale"
 sudo ufw allow 80/tcp comment "ACME + HTTP -> HTTPS"
 sudo ufw allow 443/tcp comment "HTTPS"
 sudo ufw enable
 sudo ufw status verbose
 ```
 
-- **Ausgabe lesen:** die Statusausgabe. Erwartet: 22 **nicht** offen, 80/443 offen.
-- **Danach die Gegenprobe** (nicht im Terminal des VPS, sondern von deinem normalen Gerät):
-  `ssh` auf die öffentliche IP muss ** scheitern**, über die Tailnet-IP muss es gehen.
-  Schick beide Ausgaben — „ssh: connection refused" und „timeout" sind beide ein Fehlschlag,
-  aber aus unterschiedlichen Gründen, und der Unterschied ist die Diagnose.
+- **Ausgabe lesen:** die Statusausgabe. Erwartet: 80/443 offen, 22 **mit der
+  `tailscale0`-Beschränkung** offen, sonst nichts.
+- **Gegenprobe, in dieser Reihenfolge** (nicht im Terminal des VPS):
+  1. **Erst** die Tailnet-Verbindung prüfen: `ssh root@100.121.142.113` von einem Gerät im
+     Tailnet. **Muss gehen.** Scheitert sie, ist die `tailscale0`-Regel falsch oder
+     fehlend — dann **nicht** `ufw disable` als Krücke, sondern die Regel prüfen.
+  2. **Dann** die öffentliche IP: `ssh root@217.160.128.146` von einem Gerät **ohne** VPN
+     muss **scheitern**. „connection refused" und „timeout" sind beide ein Fehlschlag, aber
+     aus unterschiedlichen Gründen, und der Unterschied ist die Diagnose.
+- **Reihenfolge innerhalb des Schritts:** `ufw enable` erst, **nachdem** alle vier Regeln
+  stehen. `ufw enable` bei leerer Regeliste ist genau der Fehler, aus dem man nur mit
+  Webconsole zurückkommt.
 
 ### A7 — Die Heim-VM auf die neue Adresse stellen (du, sudo; Liste von mir)
 
@@ -570,7 +588,7 @@ was beweist, dass A4 überhaupt etwas findet).
 |---|---|---|
 | **V149** (Plan) | Welche Metadatenfelder sind abgeleitet, welche fest? | **beantwortet** — alle abgeleitet, keines fest, s. Befund 4 |
 | **V150** (Plan) | Hält der Anthropic-Connector nach dem Wechsel? | offen — A8, echter `list_spaces`, kein curl |
-| **V151** (Plan) | Wie teuer ist der Weg über den VPS? | offen — P9-15, drei Läufe gegen 372,9 ms |
+| **V151** (Vorabmessung, 2026-09-30) | Wie teuer ist der Weg über den VPS? | **erster Teilwert gemessen:** `tailscale ping` von der Heim-VM zum VPS antwortet in **28–37 ms über DERP Frankfurt**, nicht direkt („direct connection not established", erwartbar hinter CGNAT). Das ist das Tailnet-Bein, nicht der ganze Weg — die Referenz 372,9 ms gilt für einen kompletten `/api/v1/overview` über den Funnel. Ein DERP-Bein von ~30 ms ist dagegen vernachlässigbar, die eigentliche Latenz liegt zwischen Claude und dem VPS. **Der vollständige Vergleich (A7) steht noch aus.** | offen — P9-15, drei Läufe gegen 372,9 ms |
 | **V148** (Plan) | Tailscale-Doku zu Funnel + eigener Domain | **bleibt `[VERIFY]`** — die Plan-Aussage (Funnel kann keine eigene Domain bedienen) ist plausibel und im Repo schon herangezogen, war in dieser Session aber **nicht** gegen die Live-Doku prüfbar (kein Netzzugriff). Ein VPS-Terminator umgeht diese Frage, statt sie zu beantworten — das ist der Grund, warum sie offen bleiben darf, ohne zu blockieren. |
 | **V162** (neu, hier) | Setzt ein Tailscale-TCP-Forwarder (`tailscale serve --tcp`) die Tailnet-ACLs durch? | **offen und ungeprüft** — Grund, warum der Weg über `socat` gewählt wurde (§0 Befund 1). Wenn die Antwort „ja" lautet, ist `socat` ersetzbar und die Antwort gehört in den Plan. |
 | **V163** (neu, hier) | Reicht `socat` mit `SystemCallFilter=@system-service` und `MemoryDenyWriteExecute=true`? | **offen** — der Wächter prüft nur, dass die Direktiven *gesetzt* sind; ob `socat` damit wirklich startet, zeigt sich erst beim ersten `systemctl start` in A0b. Falls es an der Syscall-Filterung scheitert, ist die Diagnose `systemd-analyze security` + die Meldung in `journalctl`; **nicht** einfach die Direktive fallen lassen, ohne es hier zu notieren. |
