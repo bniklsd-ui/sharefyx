@@ -166,11 +166,25 @@ ist die Ausgabe selbst das Ergebnis; „ok" genügt nicht (P8.6-Lektion, `umask 
 
 ### A1 — Domain beschaffen (du)
 
-**Beschlossen 2026-09-29: `sharefyx.eurofyx.de`** (Domain `eurofyx.de` beim Nikinger, Kauf zum
-Zeitpunkt dieser Zeile **offen**). `eurofyx` ist der Firmenname, `sharefyx` der Produktname —
-beides steht vollständig in der Adresse, und genau das war der Grund, die Subdomain zu nehmen:
-das Apex `eurofyx.de` bleibt für eine spätere Firmen-Website frei, ohne dass an Sharefyx
-etwas angefasst wird.
+**Beschlossen 2026-09-29: Produktname `sharefyx` + Firmenname `eurofyx`, als Subdomain des
+Apex.** Die TLD ist **noch offen** — `eurofyx.de` war bei IONOS nicht verfügbar, angeboten
+werden `eurofyx.com` und `eurofyx.{tech,app,cloud}`. **Empfehlung: `.com`**, und zwar aus
+einem Grund, den man später nicht mehr hat: die Adresse steht dauerhaft in zwei
+Claude-Konten, ein TLD-Wechsel später ist ein DNS-Wechsel **plus** A7/A8 in beiden Konten.
+`.tech`/`.app`/`.cloud` altern nicht; `.app` trägt zusätzlich die HSTS-Preload-Pflicht
+(unkritisch für uns, wir liefern ohnehin HTTPS, aber ein Detail, das man nicht tragen will).
+**Technisch sind alle vier identisch** — Let's Encrypt stellt für jede aus, und die Basis-URL
+wird nirgends geparst. `.de` ist damit nicht verloren: ist der Name später frei, ist er
+registrierbar; für Firmennamen gibt es bei DENIC zusätzlich einen Nachweisweg über den
+Handelsregisterauszug — *das ist ungeprüft, in dieser Umgebung gibt es keinen Netzzugriff*,
+also als Möglichkeit genannt, nicht als Zusage.
+
+**Beim Kauf prüfen: automatische Verlängerung einschalten.** Die Domain ist ab hier ein
+Single-Point-of-Failure: Läuft sie aus, ist das Projekt weg, weil Connector-Adresse und
+Zertifikat daran hängen.
+
+`eurofyx.de` bleibt als Elternteil die richtige Form, weil das Apex für eine spätere
+Firmen-Website frei bleibt, ohne dass an Sharefyx etwas angefasst wird.
 
 **Warum nicht `space.eurofyx.de`** (M3 hatte das zuerst vorgeschlagen, aus Kürzegründen — die
 Empfehlung ist zurückgenommen): an vier Stellen wird die Adresse als **exakter String**
