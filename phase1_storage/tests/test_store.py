@@ -300,6 +300,18 @@ def test_search_listing_of_30_items_stays_within_calibrated_json_bound(store, cl
     ein Regression, der die Listing-Größe schrumpfen lässt (z.B. `snippet` verschwindet aus
     `ItemSummary` oder `_snippet`s Cap sinkt drastisch), soll auffallen -- das wäre eine
     `ItemSummary`-Feldsatz-Änderung und damit Nikinger-Sache, kein stiller Nebeneffekt.
+
+    **[P9 Step F, 2026-09-30 — Neukalibrierung, Pflicht nach der eigenen Regel oben, mit
+    Messung statt Schätzung]:** `ItemSummary` trägt seit Step F ein Feld mehr (`assignee`, F3),
+    und dieser Docstring sagt ausdrücklich, dass eine Feldsatz-Änderung **kein stiller
+    Nebeneffekt** sein darf -- deshalb die Zahlen hier und nicht bloß ein erhöhter Wert.
+    Dieselbe Fixture, gemessen: **16.390 B** mit `assignee` gegen **16.300 B** ohne, also exakt
+    **+16 B/Item** (`"assignee": "",` im Rahmen) und **559 B/Item** statt 543. Die alte
+    Obergrenze 16 KB ist damit zu Recht rot geworden -- sie hat die echte Zunahme bemerkt.
+    Neues Band **13–18 KB**: die Obergrenze behält ihre ~1,6 KB Marge über dem Messwert (vorher
+    ~2 KB über 14 KB), die Untergrenze ihre ~3,4 KB darunter (vorher ~4 KB unter 15,9 KB). Die
+    Untergrenze ist die eigentliche Wache: sie schlägt an, falls das Feld je wieder verschwindet.
+    (Die 3-Tag-/Maximal-Stufe aus dem Docstring oben steigt entsprechend von ~470 auf ~486 B/Item.)
     """
     long_body = (
         "Ein realistischer Body-Text mit ein paar Saetzen, damit der Snippet auch wirklich "
@@ -321,7 +333,7 @@ def test_search_listing_of_30_items_stays_within_calibrated_json_bound(store, cl
 
     size = len(text.encode("utf-8"))
     assert len(result.items) == 30
-    assert 12 * 1024 < size < 16 * 1024
+    assert 13 * 1024 < size < 18 * 1024
 
 
 def test_rebuild_index_repopulates_from_files(store, tmp_path):

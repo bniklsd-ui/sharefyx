@@ -140,7 +140,9 @@ nach Phasenabschluss ist eine Scope-Änderung und braucht eine Entscheidung, kei
 (`docs/concepts/phase2_mcp_plan.md` §0.4 Punkt L, §4 Step 2) — danach ist der Contract wieder
 zu, keine stille Abweichung:
 - `models.py`: `STATUS_VALUES`/`valid_statuses()` — Statusvokabular je `type`
-  (`note`: `active`/`archived`; `task`: `open`/`done`/`archived`). `store.py :: create()`/
+  (`note`: `active`/`archived`; `task`: `open`/`doing`/`done`/`archived` — **`doing` kam am
+  2026-09-30 mit P9 Step F hinzu, der Satz von 2026-07-25 nannte nur `open`/`done`/`archived`**).
+  `store.py :: create()`/
   `update()` werfen jetzt `ValidationError` bei unbekanntem `type` oder unerlaubtem `status`
   statt es unvalidiert durchzulassen (Entscheidung D2) — die CLI hielt das bisher nur über
   `argparse choices` ab, ein zweiter Adapter (MCP) wäre daran vorbeigelaufen.
@@ -371,6 +373,52 @@ Phase-8-Befunde aus der 200-Knoten- und E2E-Smoke-Sitzung** (`graph.js` ALPHA_DE
 gehören in eine P9-Planung, nicht in einen `storage/`-Umbau. Die P1-Contract-Disziplin
 der Vorgänger-Öffnungen 3–7 gilt weiter: jede künftige P9-Arbeit an `storage/` braucht
 eine neue, benannte Öffnung mit eigenem Absatz hier, kein stiller Anbau.
+
+**[2026-09-30, P9 Step F] Neunte, benannte P1-Contract-Öffnung gebaut** — angekündigt am
+2026-09-19 mit Plan und Datum (P9-G, `docs/concepts/phase9_hardening_plan.md` §8), also
+**abgearbeitet, nicht entdeckt**. Umfang am Diff gemessen: **18 Hunks in genau drei Dateien**
+(`models.py` 4, `store.py` 8, `index.py` 6) — die enge Probe des Plans (§8.7) ist erfüllt,
+`acl.py`/`linkscan.py`/`patch.py`/`files.py`/`history.py`/`frontmatter.py` unberührt.
+- `models.py`: `STATUS_VALUES["task"]` → `{open, doing, done, archived}`, **`note` bleibt
+  `{active, archived}`** (eine Notiz kennt keine Arbeit); `Item`/`ItemSummary` bekommen
+  `assignee: str = ""`.
+- `store.py`: `"assignee"` in `_KNOWN_FIELDS` (sonst `Item.extra`); `create()` poppt und
+  reicht durch; `_item_to_text()` schreibt **nur bei nicht-leer** (Muster `visibility`/
+  `share_*` — sonst bekäme jeder Altbestand-Item ein stilles `assignee: ""`); neu
+  `_coerce_assignee()`.
+- `index.py`: Spalte `assignee TEXT NOT NULL DEFAULT ''`, `INDEX_SCHEMA_VERSION` **3 → 4**,
+  `row_from_file()` plus **alle drei** Statement-Teile von `_upsert_no_commit()`. **Keine
+  Migration** — `connect()` verwirft einen Index mit abweichender `user_version`, `Store.__init__`
+  ruft `rebuild_index()`. Hard Rule 2 in Aktion, und der Grund, warum diese Öffnung billig ist.
+
+**V160 (2026-09-30, Nikinger): `assignee` ist ein Space-Name, ohne Validierung** — eine Prüfung
+gegen die Space-Liste wäre eine **zweite**, nicht angekündigte Öffnung (der Schreibpfad müsste
+den Space auflösen, mit dem ein Item in einem fremden Space belegt sein könnte). Ein toter
+Space-Name ist ein Anzeigefehler, ein *erfundener* Zweiter Space wäre es nicht.
+
+**Drei Stellen, die der Plan nicht nannte und ohne die es nicht funktioniert hätte** (gemessen,
+`phase9_hardening/tests/test_step_f_schema.py`): `store._summary()` **F10** (sonst stünde in jeder
+Trefferliste dauerhaft `""`, während `get()` den echten Wert liefert — F3 wäre ein totes Feld),
+`store.update()` **F11** (sonst wandert der Wert über den `else`-Zweig nach `Item.extra`: er
+landete **trotzdem** in der Datei, `item.assignee` bliebe auf `""` und F6 feuerte nie — der am
+leichtesten übersehene Fall, weil „es funktioniert" hier kein Beweis ist), und die Typprüfung in
+einem Helper statt in drei Adaptern.
+
+23 neue Tests (17 `test_step_f_schema.py`, 4 `test_tools.py`, 2 `test_api.py`), `pytest`
+1039 → **1062** (191 in diesem Paket). **Zwei Alt-Tests mussten mitgezogen werden, beide mit
+Begründung im Code:** `test_index.py::test_upsert_get_delete_roundtrip` (handgebaute Zeile ohne
+den neuen Key — benannte Parameter schlagen **laut** fehl, was richtig ist; der Test trägt ihn
+jetzt und prüft zusätzlich den `ON CONFLICT`-Zweig) und
+`test_store.py::test_search_listing_of_30_items_stays_within_calibrated_json_bound`, dessen
+Docstring eine `ItemSummary`-Feldsatz-Änderung ausdrücklich für **nicht still** erklärt: neue
+Messung **16.390 B** gegen 16.300 B ohne das Feld (exakt +16 B/Item), Band 12–16 KB → **13–18 KB**
+mit der alten Marge.
+
+**Ein hier NICHT behobener Befund:** `_BUCKETS` (`phase5_ui/webui/api.py`, außerhalb dieses
+Pakets) kennt `doing` nicht, `bucketFor()` vergleicht exakt — eine `doing`-Aufgabe fällt durch
+alle vier Eimer (derselbe Fund wie bei `done` im Phase-5-Step-7b). Beide Kandidaten sind
+Darstellungsentscheidungen, die P9-P P10 zuteilt; vollständig mit beiden Kandidaten im Code
+kommentiert, ein Wächter pinnt, dass der Befund nicht verschwindet, ohne dass P10 ihn behoben hat.
 
 **[2026-08-17, P6 Step 7b Commit 1/3] Vierte, benannte Contract-Öffnung gebaut** (angekündigt in
 `phase6_shares/CLAUDE.md`s Session-Block vom selben Tag, `phase6_shares/ITEM_MOVE_PLAN.md` §4.1,

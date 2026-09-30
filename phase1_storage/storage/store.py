@@ -38,6 +38,9 @@ from .patch import PatchResult, TextEdit, apply_edits
 _KNOWN_FIELDS = {
     "id", "space", "type", "title", "status", "due", "tags", "links",
     "created", "updated", "version", "visibility", "share_read", "share_write",
+    # P9 Step F (F4): ohne diesen Eintrag landet `assignee` in `Item.extra` — und damit wäre
+    # es ein unbekanntes Feld im Round-Trip statt eines Felds mit Default und Index-Spalte.
+    "assignee",
 }
 _DEFAULT_STATUS = {"task": "open", "note": "active"}
 # Vom Store selbst verwaltet — dürfen nie über **fields/**changes hereinkommen, sonst
@@ -57,6 +60,25 @@ def _coerce_due(value: Any) -> date | None:
     if isinstance(value, str):
         return date.fromisoformat(value)
     raise ValidationError(f"'due' muss date, ISO-String oder None sein, nicht {type(value)!r}")
+
+
+def _coerce_assignee(value: Any) -> str:
+    """P9 Step F (V160): `assignee` ist ein **Space-Name** als freier String — validiert wird
+    nur der Typ, nie der Inhalt. Die Typprüfung ist kein Widerspruch zu "ohne Validierung":
+    sie verhindert, dass `assignee: 42` als Zahl im Frontmatter landet, und greift für jeden
+    Adapter (REST, MCP, CLI) an einer Stelle, statt in jedem neu.
+
+    **Warum keine Prüfung gegen die Space-Liste** (Plan §8.4, V160): der Server müsste dafür
+    den Space anlegen oder auflösen, mit dem ein Item in einem fremden Space belegt sein
+    könnte — das ist eine zweite Contract-Öffnung, die P9-G nicht ankündigt, und ein
+    Verzeichnis-Scan pro Schreibvorgang. Ein toter Space-Name ist ein Anzeigefehler, kein
+    Datenverlust; ein *erfundener* Zweiter Space wäre es.
+    """
+    if value is None:
+        return ""
+    if not isinstance(value, str):
+        raise ValidationError(f"'assignee' muss ein String (Space-Name) sein, nicht {type(value)!r}")
+    return value.strip()
 
 
 def _parse_dt(value: str) -> datetime:
@@ -87,6 +109,9 @@ def _item_from_text(text: str, *, version_override: int | None = None, folder_ov
         visibility=fields.get("visibility", DEFAULT_VISIBILITY),
         share_read=list(fields.get("share_read", []) or []),
         share_write=list(fields.get("share_write", []) or []),
+        # P9 Step F: fehlt das Feld (jeder Altbestand-Item), gilt der Default — siehe F6, warum
+        # genau deshalb nie ein leeres `assignee:` in eine bestehende Datei geschrieben wird.
+        assignee=str(fields.get("assignee", "") or ""),
         extra=extra,
     )
 
@@ -117,6 +142,12 @@ def _item_to_text(item: Item) -> str:
         fields["share_read"] = list(item.share_read)
     if item.share_write:
         fields["share_write"] = list(item.share_write)
+    # P9 Step F (F6): **nur bei nicht-leer**, exakt nach dem Muster von `visibility`/`share_*`
+    # direkt darüber, und aus demselben Grund. Ohne diese Bedingung bekäme *jedes* bestehende
+    # Item beim nächsten beliebigen Write ein stilles `assignee: ""` — ein Frontmatter-Diff,
+    # den niemand bestellt hat, in jedem einzelnen Altbestand-Item (P9-42).
+    if item.assignee:
+        fields["assignee"] = item.assignee
     fields.update(item.extra)
     return serialize_frontmatter(fields, item.body)
 
@@ -154,6 +185,12 @@ def _summary(item: Item) -> ItemSummary:
         snippet=_snippet(item.body),
         folder=item.folder, visibility=item.visibility,
         share_read=list(item.share_read), share_write=list(item.share_write),
+        # P9 Step F (F10): **nicht im Plan §8.2 genannt und trotzdem Pflicht.** `ItemSummary` zu
+        # erweitern (F3) ohne diese Zeile wäre ein totes Feld: `_summary()` ist die einzige
+        # Stelle, die eine Trefferzeile baut, und sie bekommt ein `Item` — ohne hier durchzureichen
+        # stünde in jeder Liste und jeder Suchtrefferliste dauerhaft `assignee: ""`, während
+        # `get()` den echten Wert liefert. Genau die Klasse Drift, die F4 (_KNOWN_FIELDS) verhindert.
+        assignee=item.assignee,
     )
 
 
@@ -546,11 +583,17 @@ class Store:
                 )
             share_read = fields.pop("share_read", [])
             share_write = fields.pop("share_write", [])
+            # P9 Step F (F5): aus `fields` **heraus**poppen, damit es nicht zugleich in
+            # `extra=fields` landet — sonst hätte das Item den Wert zweimal, einmal im Feld
+            # und einmal im unbekannten-Schlüssel-Sack, und `_item_to_text` schriebe den
+            # Extra-Wert über den Feld-Wert hinweg (`fields.update(item.extra)`).
+            assignee = _coerce_assignee(fields.pop("assignee", ""))
             item = Item(
                 id=files.generate_id(), space=space, type=type, title=title, status=status,
                 body=body, due=due, tags=list(tags), links=list(links),
                 created=now, updated=now, version=1, folder=folder,
                 visibility=visibility, share_read=list(share_read), share_write=list(share_write),
+                assignee=assignee,
                 extra=fields,
             )
             self._write_item_file(item, old_path=None, op="create")
@@ -588,6 +631,16 @@ class Store:
                     kwargs["visibility"] = value
                 elif key in ("share_read", "share_write"):
                     kwargs[key] = list(value)
+                elif key == "assignee":
+                    # P9 Step F (F11): **nicht im Plan §8.2 genannt und trotzdem Pflicht.**
+                    # `assignee` steht nicht in `known_updatable`, also *würde* es ohne diese
+                    # Zweig in den `else`-Zweig fallen und damit in `updated_extra` — es ginge
+                    # über `fields.update(item.extra)` trotzdem in die Datei, aber `item.assignee`
+                    # bliebe dabei auf "" stehen. Zwei Quellen für ein Feld, von denen eine
+                    # schweigt: F6 (`if item.assignee`) feuierte nie, `get()` und `search()`
+                    # widersprächen sich. Der Zweig ist der Grund, warum "es funktioniert" hier
+                    # kein ausreichender Beweis war — der Wert landete ja scheinbar richtig.
+                    kwargs["assignee"] = _coerce_assignee(value)
                 elif key in known_updatable:
                     kwargs[key] = value
                 else:

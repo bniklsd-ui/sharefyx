@@ -65,15 +65,26 @@ def test_upsert_get_delete_roundtrip(tmp_path):
         "created": "2026-07-24T18:20:00Z", "updated": "2026-07-24T18:20:00Z", "version": 1,
         "path": "nikinger/itm_a1b2c3d4__test.md", "mtime": 0.0, "size": 10, "sha256": "x",
         "folder": "", "visibility": "private", "share_read_json": "[]", "share_write_json": "[]",
+        # P9 Step F (F9): Teil des Zeilenvertrags. Bewusst **hier** gesetzt und nicht per
+        # `row.setdefault` im Test kaschiert — `_upsert_no_commit()` benutzt benannte Parameter
+        # (`:assignee`), also muss jede Zeile, die hereinkommt, den Key tragen. Ein Test, der
+        # die Lücke mit einem Default zuklebt, prüft nicht mehr den Vertrag, den der Produktivpfad
+        # erfüllt: `row_from_file()` liefert den Key immer.
+        "assignee": "",
     }
     index.upsert_item(conn, row)
 
     fetched = index.get_item_row(conn, "itm_a1b2c3d4")
     assert fetched["title"] == "Test"
+    assert fetched["assignee"] == ""
 
     row["title"] = "Geändert"
+    row["assignee"] = "sp"
     index.upsert_item(conn, row)
     assert index.get_item_row(conn, "itm_a1b2c3d4")["title"] == "Geändert"
+    # Auch der `ON CONFLICT DO UPDATE`-Zweig muss die Spalte mitnehmen — sonst bliebe nach
+    # einem Re-Index ein alter `assignee`-Wert stehen, während die Datei längst einen anderen hat.
+    assert index.get_item_row(conn, "itm_a1b2c3d4")["assignee"] == "sp"
     assert len(index.all_rows(conn)) == 1
 
     index.delete_item(conn, "itm_a1b2c3d4")

@@ -28,7 +28,14 @@ SAFE_FILESYSTEMS = {"ext4", "xfs", "btrfs"}
 # Phase 8 Block B (P8-M, achte P1-Contract-Oeffnung): Version 3 fuegt `item_links` hinzu --
 # Kantenmenge zwischen Items, getrennt nach `kind` (`frontmatter`/`body`). Rebuild heilt
 # alte Indices ueber `CREATE IF NOT EXISTS` + `rebuild_index()` (Hard Rule 2, keine Migration).
-INDEX_SCHEMA_VERSION = 3
+#
+# P9 Step F (F8, neunte P1-Contract-Oeffnung, P9-G): Version 4 fuegt die Spalte `assignee`
+# hinzu. **Deshalb ist diese Oeffnung billig** (Plan §8.2): `connect()` verwirft einen Index
+# mit abweichender `user_version` und legt ihn leer neu an, `Store.__init__` ruft dann
+# `rebuild_index()`. Wer hier ein `ALTER TABLE` baut, hat Hard Rule 2 missverstanden -- die
+# Dateien sind die Wahrheit, der Index ist Ableitung. (V161: die Zeit dieses Neuaufbaus auf
+# dem echten DATA_ROOT ist eine Nikinger-Messung, siehe Plan §8.6.)
+INDEX_SCHEMA_VERSION = 4
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS items (
@@ -50,7 +57,13 @@ CREATE TABLE IF NOT EXISTS items (
     folder TEXT NOT NULL DEFAULT '',
     visibility TEXT NOT NULL DEFAULT 'private',
     share_read_json TEXT NOT NULL DEFAULT '[]',
-    share_write_json TEXT NOT NULL DEFAULT '[]'
+    share_write_json TEXT NOT NULL DEFAULT '[]',
+    -- P9 Step F (F7): bewusst TEXT und keine Fremdspalte. `assignee` ist ein Space-**Name**
+    -- (V160), und der Index darf diese Beziehung nicht als erzwungene ausdruecken: der
+    -- Kern validiert gegen die Space-Liste nicht (waere eine zweite Contract-Oeffnung), also
+    -- darf es der Index erst recht nicht. NOT NULL DEFAULT '' wie die anderen ableitbaren
+    -- Spalten, damit ein Neuaufbau ueber einen Altbestand ohne `assignee` durchlaeuft.
+    assignee TEXT NOT NULL DEFAULT ''
 );
 
 -- Phase 8 Block B Step B2 (P8-M): Item-zu-Item-Kanten. `src_id` ist immer ein existierendes
@@ -146,10 +159,10 @@ def _upsert_no_commit(conn: sqlite3.Connection, row: dict) -> None:
         """
         INSERT INTO items (id, space, type, title, status, due, tags_json, links_json,
                             created, updated, version, path, mtime, size, sha256,
-                            folder, visibility, share_read_json, share_write_json)
+                            folder, visibility, share_read_json, share_write_json, assignee)
         VALUES (:id, :space, :type, :title, :status, :due, :tags_json, :links_json,
                 :created, :updated, :version, :path, :mtime, :size, :sha256,
-                :folder, :visibility, :share_read_json, :share_write_json)
+                :folder, :visibility, :share_read_json, :share_write_json, :assignee)
         ON CONFLICT(id) DO UPDATE SET
             space=excluded.space, type=excluded.type, title=excluded.title,
             status=excluded.status, due=excluded.due, tags_json=excluded.tags_json,
@@ -157,7 +170,8 @@ def _upsert_no_commit(conn: sqlite3.Connection, row: dict) -> None:
             updated=excluded.updated, version=excluded.version, path=excluded.path,
             mtime=excluded.mtime, size=excluded.size, sha256=excluded.sha256,
             folder=excluded.folder, visibility=excluded.visibility,
-            share_read_json=excluded.share_read_json, share_write_json=excluded.share_write_json
+            share_read_json=excluded.share_read_json, share_write_json=excluded.share_write_json,
+            assignee=excluded.assignee
         """,
         row,
     )
@@ -247,6 +261,11 @@ def row_from_file(data_root: Path, path: Path) -> dict:
         "visibility": fields.get("visibility", "private"),
         "share_read_json": json.dumps(fields.get("share_read", []) or []),
         "share_write_json": json.dumps(fields.get("share_write", []) or []),
+        # P9 Step F (F9): `assignee` ist ein echtes Dateifeld, im Gegensatz zu `folder` (Zeile
+        # darueber) also durchgereicht statt abgeleitet. Das `or ""` faengt einen
+        # `assignee:`-Eintrag ohne Wert ab -- im YAML ein echter Zustand, der sonst als `None`
+        # in eine NOT NULL-Spalte lief.
+        "assignee": fields.get("assignee", "") or "",
         # Body-Referenzen, NICHT in `items` gespeichert, nur fuer `item_links`-Befuellung.
         "body_refs": extract_item_refs(body),
     }

@@ -1039,3 +1039,60 @@ def test_no_tool_response_ever_carries_a_base64_image_payload(tools_map, store):
     for response in (put_receipt, get_meta, get_full, search):
         assert data_b64 not in response
         assert marker_text not in response
+
+
+# -- P9 Step F: `doing` und `assignee` über MCP (Plan §8.3) ----------------------------------
+
+
+def test_create_item_accepts_the_doing_status_and_the_assignee(tools_map):
+    """`doing` braucht keine Werkzeug-Änderung — `_status_hint()` generiert das Vokabular aus
+    `STATUS_VALUES` (P6.5-C), und `assignee` ist ein gewöhnlicher Inhaltsparameter wie `due`."""
+    with _as(SPACE_A):
+        receipt = json.loads(
+            tools_map["create_item"](
+                type="task", title="Angebot schreiben", status="doing", assignee=SPACE_B,
+            )
+        )
+    assert receipt["op"] == "create"
+    assert store_assignee_via_search(tools_map, receipt["id"]) == SPACE_B
+
+
+def test_return_body_shows_the_assignee_that_was_just_written(tools_map):
+    """`item_to_filetext()` dupliziert bewusst die Feldreihenfolge von `storage.store._item_to_text`
+    (Modul-Docstring). Ohne ihren `assignee`-Eintrag gäbe dieser Aufruf einen Dateitext zurück,
+    der das Feld nicht enthält, während es auf der Platte steht — ein Werkzeug, das etwas
+    anderes zurückgibt als es geschrieben hat."""
+    with _as(SPACE_A):
+        text = tools_map["create_item"](
+            type="task", title="Filetext", assignee=SPACE_B, return_body=True,
+        )
+    assert "assignee: " + SPACE_B in text
+
+
+def test_update_item_clears_the_assignee_with_an_empty_string(tools_map):
+    """`assignee=""` ist "niemand zugewiesen" und **nicht** "unverändert": der Kern behandelt
+    den leeren String als Default und schreibt das Feld dann nicht in die Datei. Deshalb `is not
+    None` im Werkzeug statt eines truthiness-Tests — sonst könnte ein Agent eine Aufgabe nie
+    wieder freigeben."""
+    with _as(SPACE_A):
+        created = json.loads(
+            tools_map["create_item"](type="task", title="Zuweisen", assignee=SPACE_B)
+        )
+        tools_map["update_item"](created["id"], created["version"], assignee="")
+    assert store_assignee_via_search(tools_map, created["id"]) == ""
+
+
+def test_update_item_rejects_a_non_string_assignee(tools_map):
+    with _as(SPACE_A):
+        created = json.loads(tools_map["create_item"](type="task", title="Typfehler"))
+        with pytest.raises(ToolError, match="assignee"):
+            tools_map["update_item"](created["id"], created["version"], assignee=42)
+
+
+def store_assignee_via_search(tools_map, item_id: str) -> str:
+    """Liest `assignee` über den Agenten-Pfad zurück (`search_items`), nicht über den Store —
+    ein Test, der denselben Speicher liest, den er eben geschrieben hat, beweist die
+    Serialisierung nicht."""
+    with _as(SPACE_A):
+        found = json.loads(tools_map["search_items"](query="", limit=50))
+    return next(row["assignee"] for row in found["items"] if row["id"] == item_id)

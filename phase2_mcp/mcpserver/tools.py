@@ -198,6 +198,13 @@ def item_to_filetext(item: Item) -> str:
     fields["created"] = _format_dt(item.created)
     fields["updated"] = _format_dt(item.updated)
     fields["version"] = item.version
+    # P9 Step F: **nicht im Plan §8.3 genannt, trotzdem Pflicht.** Diese Funktion dupliziert
+    # bewusst die Feldreihenfolge von `storage.store._item_to_text` (siehe Docstring) — ohne
+    # diese Zeile schriebe `create_item(assignee=..., return_body=True)` einen Dateitext
+    # **ohne** das Feld zurück, während die Datei auf der Platte es hätte. Ein Werkzeug, das
+    # etwas anderes zurückgibt als es geschrieben hat, ist schlimmer als ein fehlendes.
+    if item.assignee:
+        fields["assignee"] = item.assignee
     fields.update(item.extra)
     return serialize_frontmatter(fields, item.body)
 
@@ -215,6 +222,12 @@ def summary_to_dict(item: ItemSummary, *, own: bool) -> dict[str, Any]:
         "links": list(item.links),
         "updated": _format_dt(item.updated),
         "version": item.version,
+        # P9 Step F: ohne das wäre `assignee` über MCP **schreibgeschützt lesbar** — gesetzt
+        # ja, gelesen nein. Ein Feld, das ein Agent setzen, aber nicht mehr vorfinden kann,
+        # taugt nichts; die Liste ist der Weg, über den er den Zustand überhaupt kennt.
+        # Nebenschutz: die Liste ist der eine Ort, an dem ItemSummary ohnehin komplett
+        # durchgereicht wird — `assignee` ist hiermit genauso vollständig wie `status`.
+        "assignee": item.assignee,
         "snippet": item.snippet if own else wrap_untrusted(item.snippet, space=item.space),
     }
 
@@ -540,6 +553,12 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             "visibility": item.visibility,
             "share_read": list(item.share_read),
             "share_write": list(item.share_write),
+            # P9 Step F: dasselbe Argument wie in `summary_to_dict()` — `get_item` ist der
+            # Volltext-Pfad, die Liste der Metadaten-Pfad, und ein Agent, der auf einer Seite
+            # `assignee` sieht und auf der anderen nicht, kann die beiden nicht mehr
+            # gegeneinander halten. Fremde Metadaten sind unkritisch (kein Snippet, kein
+            # Body), das Wrapper-Problem von Rule 4 betrifft hier nichts.
+            "assignee": item.assignee,
             "version": item.version,
             "created": _format_dt(item.created),
             "updated": _format_dt(item.updated),
@@ -577,6 +596,10 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         status: str | None = None,
         space: str | None = None,
         folder: str | None = None,
+        # P9 Step F (V160): Space-Name, optional, **ohne** Prüfung gegen die Space-Liste
+        # (der Kern kennt nur den Typ). Bewusst kein `visibility`/`share_*`-Parameter — die
+        # sind per P6-M über kein MCP-Tool änderbar, `assignee` ist gewöhnlicher Inhalt.
+        assignee: str | None = None,
         return_body: bool = False,
     ) -> str:
         principal = _authenticated_principal()
@@ -593,6 +616,8 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             kwargs["status"] = status
         if folder is not None:
             kwargs["folder"] = folder
+        if assignee is not None:
+            kwargs["assignee"] = assignee
         try:
             item = store.create(target_space, type=type, title=title, body=body, **kwargs)
         except ValidationError as exc:
@@ -636,6 +661,10 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         type: str | None = None,
         folder: str | None = None,
         space: str | None = None,
+        # P9 Step F: siehe `create_item`. `""` leert das Feld bewusst (der Kern behandelt den
+        # leeren String als "niemand zugewiesen" und schreibt das Feld dann nicht) — deshalb
+        # `is not None` und nicht `if assignee:`.
+        assignee: str | None = None,
         visibility: str | None = None,
         share_read: list[str] | None = None,
         share_write: list[str] | None = None,
@@ -702,6 +731,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
                 "due": due,
                 "type": type,
                 "folder": folder,
+                "assignee": assignee,
             }.items()
             if value is not None
         }

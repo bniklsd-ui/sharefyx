@@ -125,6 +125,27 @@ MAX_ASSET_BYTES = 5 * 1024 * 1024
 # Notizen, Archiv) decken `STATUS_VALUES["task"]` nicht vollständig ab — eine auf `done` gesetzte
 # Aufgabe fiel durch alle drei und war in der Oberfläche nirgends mehr auffindbar, bis sie jemand
 # archivierte. Vier Ordner statt drei schließen das Loch.
+#
+# [P9 Step F, 2026-09-30 — **BEFUND, bewusst NICHT hier behoben, mit den zwei Kandidaten
+# gemessen**]: `doing` reißt exakt dasselbe Loch wieder auf. `bucketFor()`
+# (`static/js/list.js:516`) nimmt den ERSTEN passenden Eintrag und vergleicht
+# `f.status === item.status` exakt; `_overview()` (Zeile 620) zaehlt je Bucket per
+# `store.search(**filters)`. Eine Aufgabe mit `status="doing"` passt auf keinen der vier
+# Eintraege → `bucketFor()` liefert `null`, beide Aufrufer fallen auf `|| state.filter`
+# zurueck: sie fehlt in jedem Eimer-Zaehler und ist in der Liste nur sichtbar, solange man
+# zufaellig im passenden Filter steht.
+#
+# Warum Step F das nicht fixt, obwohl der Fund echt ist (P9-P): **beide Kandidaten sind
+# Darstellungsentscheidungen, und die hat der Plan ausdruecklich nach P10 verwiesen.**
+# (a) ein fuenfter `_BUCKETS`-Eintrag — `bucketNames()` ist `Object.keys(state.meta.buckets)`
+# und `tree.js:72` rendert daraus **einen Rail-Eintrag pro Bucket** mit `BUCKET_LABELS[b] || b`,
+# also ein fuenfter, unuebersetzter Ordner „doing" plus ein Chip in der Uebersicht; das ist
+# genau die Hervorhebung, die P9-P P10 zuteilt, und es braucht eindeutsches Label.
+# (b) „Offen" als Menge `status: ["open", "doing"]` — kein neuer Chip, vier Rail-Eintraege
+# bleiben, aber es aendert den Vertrag des `meta`-Payloads und braucht dieselbe
+# Mengen-Prüfung in ZWEI Konsumenten (`list.js:516` und der Vergleich
+# `item.status != status` in `store.py:520`, getestet von `_overview()`), also eine zweite
+# Contract-Öffnung ausserhalb von P9-G.
 _BUCKETS: dict[str, dict[str, str]] = {
     "open": {"type": "task", "status": "open"},
     "done": {"type": "task", "status": "done"},
@@ -157,6 +178,10 @@ _STORE_FETCH_LIMIT = 5000
 _PATCH_FIELDS = frozenset({
     "version", "title", "body", "status", "due", "tags", "links", "type", "format",
     "folder", "space", "visibility", "share_read", "share_write",
+    # P9 Step F: `assignee` ist ein gewöhnliches inhaltliches Feld — es geht durch denselben
+    # `changes`-Pfad wie `title`/`status`. Es steht hier, damit die Whitelist-Prüfung oben es
+    # nicht als "Unbekanntes Feld" ablehnt; die Uebergabe an `store.update()` ist unveraendert.
+    "assignee",
     "password", "totp",
     # P8-A: Reauth-Grant, ausgestellt von POST /api/v1/reauth; session-gebunden, in-memory,
     # TTL 90 s. Wird in `webui/shares.py` ZUERST geprüft (vor `password`/`totp`), damit ein
@@ -800,7 +825,9 @@ def api_routes(
         kwargs: dict[str, Any] = {
             key: value
             for key, value in body.items()
-            if key in {"status", "due", "tags", "links", "format", "folder"}
+            # P9 Step F: `assignee` in der Whitelist — der Kern validiert den Typ selbst
+            # (`store._coerce_assignee`), hier ist nur die Feld-Auswahl gefiltert.
+            if key in {"status", "due", "tags", "links", "format", "folder", "assignee"}
         }
         try:
             item = store.create(session.space, type=item_type, title=title, body=item_body, **kwargs)

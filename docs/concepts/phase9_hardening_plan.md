@@ -186,6 +186,7 @@ abgeräumter Posten nach P10; Einstieg `phase6_shares_plan.md` §0.7(a)/§1.2.
 | **P9-R** | **`fastmcp` bleibt auf `3.4.x`.** FastMCP 4 / MCP-Revision `2026-07-28` ist und bleibt eine eigene Mini-Phase (V79) | Das Ledger hat das seit P5-C so festgelegt. FastMCP 4.0.0 (2026-08-31) bringt die neue Protokollrevision mit Per-Connection-Aushandlung, Alt-Clients laufen weiter — es gibt keinen Zwang, und eine Protokollmigration mitten in einer Härtungsphase ist genau die Vermischung, die P8.6 zwei Pläne gekostet hat |
 | **P9-S** | **Hard Rule 9 unverändert.** Kein `pkill -f`, kein `systemctl` durch einen Agenten | Hat über die ganze P8.6 getragen, inklusive des Deploys |
 | **P9-T** | **Ein Dokument pro Phase.** Dieser Plan ist das einzige P9-Konzeptdokument; Mini-Pläne für Revisionsrunden sind erlaubt, aber sie tragen `phase9_hardening_block_<X>_plan.md` und **im selben Commit** eine INDEX-Zeile | P8.6 hat drei Mini-Pläne produziert, von denen zwei ohne L1-Card blieben — genau der Defekt, den Step 0.3 repariert |
+| **P9-U** | *(neu 2026-09-30, Step F)* **`assignee` ist ein Space-Name und wird NICHT gegen die Space-Liste validiert**; `_coerce_assignee()` prüft nur den Typ | Die Antwort auf V160, die §8.4 dem Nikinger vorgelegt hat (P9-44 verlangt genau diese Nachtragung). Eine Validierung müsste den Space auflösen, mit dem ein Item in einem fremden Space belegt sein könnte — eine **zweite**, nicht angekündigte Contract-Öffnung, also genau die, die P9-G vermieden wollte. Die einzige Kennung, die der Server ohnehin kennt; ein toter Space-Name ist ein Anzeigefehler, ein *erfundener* Zweiter Space wäre es nicht |
 
 ---
 
@@ -758,6 +759,64 @@ Principal? Der Server darf keine Identität erfinden, und ein freier String erze
 Kennung ist, die der Server ohnehin kennt und autorisiert — aber **nicht validiert**, denn eine
 Validierung gegen die Space-Liste wäre eine zweite Contract-Öffnung. Nikinger entscheidet.
 
+> ### [2026-09-30, Step F ausgeführt — datierte Korrekturnotiz nach der Regel aus §0]
+>
+> **P9-U (neuer Lock, hier nachgetragen wie P9-44 es verlangt): `assignee` ist ein Space-Name,
+> ohne Validierung** — Nikinger-Entscheidung 2026-09-30, die Empfehlung oben bestätigt.
+> `store._coerce_assignee()` prüft **nur den Typ** (`str`, getrimmt, `None` ⇒ `""`). Warum die
+> Typprüfung kein Widerspruch zu „ohne Validierung" ist: sie verhindert `assignee: 42` im
+> Frontmatter und greift für jeden Adapter an einer Stelle; eine Prüfung gegen die Space-Liste
+> müsste den Space auflösen, mit dem ein Item in einem fremden Space belegt sein könnte — das
+> wäre die zweite, nicht angekündigte Öffnung, die §8.4 vermeiden wollte.
+>
+> **§8.2 ist von neun auf achtzehn Fundstellen zu korrigieren.** Gemessen am Diff:
+> **18 Hunks in genau drei Dateien** (`models.py` 4, `store.py` 8, `index.py` 6) — die enge
+> Probe §8.7 ist erfüllt, die sechs Hartpfade sind unberührt. Die Liste war nicht gepfuscht,
+> sie war unvollständig:
+> - **F9 („Upsert") sind vier Hunks, nicht einer**: `row_from_file()` plus Spaltenliste, `VALUES`
+>   und `ON CONFLICT DO UPDATE SET` in `_upsert_no_commit()`. Nur das Row-Dict zu ändern hätte
+>   den Index beim ersten Schreiben mit `ProgrammingError: missing parameter` abbrechen lassen —
+>   benannte Parameter schlagen laut fehl, statt still einen Default zu nehmen.
+> - **F10 (`store._summary()`, neu)**: `_summary()` ist die einzige Stelle, die eine
+>   Trefferzeile baut. Ohne sie wäre F3 ein totes Feld — `get()` hätte den echten Wert
+>   geliefert, jede Liste und jede Suche dauerhaft `""`.
+> - **F11 (`store.update()`, neu)**: `assignee` steht nicht in `known_updatable`, wäre also über
+>   den `else`-Zweig in `Item.extra` gelandet — der Wert **wäre trotzdem** in der Dateie
+>   gelandet, `item.assignee` wäre auf `""` geblieben und F6 hätte nie gefeuert. Der am
+>   leichtesten übersehene Fall, weil „es funktioniert" hier kein Beweis ist.
+> - **`_coerce_assignee()` (neu)**, die Typprüfung einmal im Kern statt dreimal in den Adaptern.
+>
+> **§8.3 ist unvollständig, ohne dass es falsch ist.** `serializers.py` braucht **zwei** Eingriffe
+> (`overview_row_to_json()` erbt `assignee` über `summary_to_json()`), `api.py` **zwei**
+> (POST-Whitelist, `_PATCH_FIELDS`) — und `tools.py` **fünf**, nicht zwei: `create_item`,
+> `update_item` wie geplant, dazu `item_to_filetext()` (dupliziert bewusst die Feldreihenfolge
+> von `_item_to_text` — ohne den Eintrag gäbe `return_body=True` etwas anderes zurück als
+> geschrieben wurde), `summary_to_dict()` und der `get_item`-Payload (sonst wäre `assignee` über
+> MCP **schreibgeschützt lesbar** — gesetzt ja, gelesen nein).
+>
+> **Ein Befund aus §8.3, bewusst NICHT behoben:** `_BUCKETS` (`phase5_ui/webui/api.py`) kennt
+> `doing` nicht, und `bucketFor()` (`list.js:516`) vergleicht `f.status === item.status` exakt —
+> eine `doing`-Aufgabe fällt durch alle vier Eimer, `bucketFor()` liefert `null`, beide Aufrufer
+> fallen auf `|| state.filter` zurück. Derselbe Fund wie bei `done` im Phase-5-Step-7b. **Beide
+> Kandidaten sind Darstellungsentscheidungen und damit P10 (P9-P):** (a) ein fünfter
+> `_BUCKETS`-Eintrag erzeugt über `bucketNames() = Object.keys(state.meta.buckets)` und
+> `tree.js:72` einen fünften Rail-Eintrag mit **unübersetztem** Label; (b) „Offen" als Menge
+> `status: ["open", "doing"]` ändert den `meta`-Vertrag und braucht dieselbe Mengen-Prüfung in
+> zwei Konsumenten (`list.js:516` und `store.py:520`). Der Befund steht vollständig im Code, ein
+> Wächter pinnt ihn.
+>
+> **V159 ist beantwortet und die Plan-Aussage dabei korrigiert:** `doing` erscheint im
+> **Editor**-Dropdown ohne JS-Änderung (`editor.js:246` liest `state.meta.status_values[itemType]`
+> und rendert rohe Werte). Für `dialogs.js:323` ist die Aussage **gegenstandslos**: dort iteriert
+> `Object.keys(state.meta.status_values)`, also das **Typ**-Vokabular, und der Anlegen-Dialog hat
+> überhaupt keinen Status-Knopf (`createStatus` existiert nicht im `static/`).
+>
+> **V161 hat einen synthetischen Vorabwert, P9-43 bleibt der Nikinger-Schritt:** gemessen
+> 2,45 / 2,48 / 4,01 ms pro Item bei 500 / 1500 / 3000 Items in `tmp_path`; der echte `DATA_ROOT`
+> hat 153 Items außerhalb `_archive` (197 mit) ⇒ **0,4–0,6 s** einmalige Startkosten beim
+> Schema-Sprung. Ein `rebuild_index()` auf dem echten `DATA_ROOT` wäre ein Schreibzugriff auf
+> Produktivdaten und bleibt deshalb beim Nikinger.
+
 ### 8.5 Tests
 
 | Test | Prüft |
@@ -803,6 +862,16 @@ jede Berührung von `acl.py`, `linkscan.py`, `patch.py`, `files.py`, `history.py
 `P9-41` `note` akzeptiert `doing` nicht · `P9-42` Ein Altbestands-Item bekommt beim Write kein
 leeres `assignee` · `P9-43` Index-Neuaufbau über den echten `DATA_ROOT` gelaufen, Zeit notiert
 (V161) · `P9-44` V160 beantwortet und im Plan als Lock nachgetragen.
+
+**[Stand 2026-09-30, nach Ausführung von Step F]** `P9-38` ✅ (18 Hunks, genau drei Dateien,
+die sechs Hartpfade leer) · `P9-39` ✅ (**23** Tests grün, nicht 9 — fünf der Test-Liste waren
+Verhaltenstests, die restlichen Wächter; `pytest` 1039 → 1062) · `P9-40` ✅ · `P9-41` ✅ ·
+`P9-42` ✅ · `P9-43` **⬜ offen, Nikinger-Schritt** (V161 hat den synthetischen Vorabwert) ·
+`P9-44` ✅ (Lock **P9-U**, s. §8.4). **Zwei Zusicherungen, die nicht geplant waren und deshalb
+keine eigene `P9-`-Nummer bekommen** (P9-45 – P9-52 gehört Step G, sie hätten ihn kollidiert) —
+beide als Zeugen von `P9-39`: **kein `doing`-Item verlässt den Speicher-Pfad mit einer zweiten
+Wahrheit** (`_summary()`/`update()` durchgereicht, `Item.extra` bleibt leer) und **`assignee` ist
+über MCP und REST les- und schreibbar**, nicht schreibgeschützt lesbar.
 
 ---
 
@@ -979,9 +1048,9 @@ schneiden und vorher die Trefferzahl prüfen. Der Fehler hätte einmal 66 KB ent
 | V156 | Bei `qwen3-vl:8b` bleiben oder VRAM-Luft nutzen? | C |
 | V157 | Ist `document.fullscreenElement` während des ESC-`keydown` gesetzt? Chromium **und** WebKit | D |
 | V158 | Reicht `closest()` zur Chip-Unterscheidung, oder braucht es eine eigene Klasse? | D |
-| V159 | Erscheint `doing` im `<select>` ohne Codeänderung (`dialogs.js:323`)? | F |
-| V160 | Was ist `assignee` — freier String, Space-Name, Principal? | F |
-| V161 | Dauer des Index-Neuaufbaus über den echten `DATA_ROOT` | F |
+| V159 | Erscheint `doing` im `<select>` ohne Codeänderung (`dialogs.js:323`)? | F | **beantwortet 2026-09-30:** ja im Editor-Dropdown (`editor.js:246`), für `dialogs.js:323` gegenstandslos (TYP-Vokabular, kein Status-Knopf im Dialog) — s. §8.4-Korrekturnotiz |
+| V160 | Was ist `assignee` — freier String, Space-Name, Principal? | F | **beantwortet 2026-09-30: Space-Name, ohne Validierung (Lock P9-U)**, s. §8.4-Korrekturnotiz |
+| V161 | Dauer des Index-Neuaufbaus über den echten `DATA_ROOT` | F | **Vorabwert 2026-09-30** (synthetisch 2,45–4,01 ms/Item; 153 reale Items ⇒ 0,4–0,6 s). **Offen** bleibt P9-43: die Messung am echten `DATA_ROOT` beim Deploy, Nikinger-Schritt |
 | V162 | Wächst `_trash/` durch die Asset-Verschiebungen seit N5 messbar? | G |
 | V163 | Betrifft der 3.4.7-Security-Fix dieses Projekt? (Erster Befund: vermutlich nein) | H |
 | V164 | Läuft `deploy.sh` unter der neuen Domain-Konfiguration durch? | Gate |
@@ -1018,6 +1087,16 @@ Selection/Choice-Konvention v3 in `phase8_ui_graph/CLAUDE.md`, **nicht** ihr Ers
 To-do-Checkboxen im Text (`markdown.js` **und** Schreibpfad ⇒ Hard Rule 3) · Hervorhebung von
 `doing` auf der Übersicht · Assignee-Picker und -Filter · Verschieben in fremde Spaces
 (Rechte-Thema, §0.6).
+
+**Aus dem Step-F-Bau vom 2026-09-30, neu und konkret:** das **Eimer-Loch für `doing`**
+(`_BUCKETS` in `phase5_ui/webui/api.py` kennt den Status nicht, `bucketFor()` vergleicht exakt —
+eine `doing`-Aufgabe fällt durch alle vier Eimer und erscheint in keinem Zähler). Die
+Hervorhebung von `doing` und der Assignee-Picker sind die breite Fassung davon; die **engere,
+zuerst fällige** Frage ist, ob „Offen" `open` **und** `doing` umfasst (Kandidat b: `status` als
+Menge im `meta`-Payload, Mengen-Prüfung in `list.js:516` **und** `store.py:520`) oder ob es einen
+fünften Eimer gibt (Kandidat a: ein Rail-Eintrag „In Arbeit" mit Label, denn
+`bucketNames() = Object.keys(state.meta.buckets)` rendert **pro Bucket** einen Rail-Eintrag). Beide
+Kandidaten sind Darstellungsentscheidungen und stehen hier, weil P9-P sie P10 zuweist.
 
 **Aus `p8x_ui_polish_notes.md`:** Karten-Stilumbau §2.2 · Karte einklappen §2.5 · verbundene
 AI-Sessions §10.8 · Hochkant-/Handy-UI §10.9 · die Radien-/Auswahl-Vereinheitlichung §10.1–§10.7.

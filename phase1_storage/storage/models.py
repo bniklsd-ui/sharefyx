@@ -34,6 +34,13 @@ class Item:
     visibility: str = DEFAULT_VISIBILITY
     share_read: list[str] = field(default_factory=list)
     share_write: list[str] = field(default_factory=list)
+    # P9 Step F (P9-H, neunte P1-Contract-Öffnung P9-G): Name des Space, dem die Aufgabe
+    # zugewiesen ist — V160, Nikinger-Entscheidung 2026-09-30: Space-Name, **ohne** Prüfung
+    # gegen die Space-Liste (eine solche Prüfung wäre eine zweite, nicht angekündigte
+    # Contract-Öffnung). "" = niemand zugewiesen, und genau dann steht das Feld auch nicht im
+    # Frontmatter (`store._item_to_text`) — ein leerer Default darf keinen Altbestand-Item ein
+    # stilles `assignee: ""` einhängen.
+    assignee: str = ""
     # Unbekannte Frontmatter-Felder — überleben Round-Trips unangetastet (Entscheidung A).
     extra: dict[str, Any] = field(default_factory=dict)
 
@@ -69,6 +76,10 @@ class ItemSummary:
     visibility: str = DEFAULT_VISIBILITY
     share_read: list[str] = field(default_factory=list)
     share_write: list[str] = field(default_factory=list)
+    # P9 Step F: dasselbe Feld wie auf `Item` — ohne hier kennt jede Trefferliste den Zustand
+    # nicht, und die Liste ist der Weg, über den ein Mensch (und ein Agent) überhaupt merkt,
+    # wem etwas zugewiesen ist. Gefüllt wird es in `store._summary()`.
+    assignee: str = ""
 
 
 @dataclass(kw_only=True)
@@ -105,9 +116,18 @@ class AssetInfo:
 # Statusvokabular je `type` (P2 Step 2, Entscheidung D2). Die CLI hielt ungültige Werte bisher
 # nur über `argparse choices` ab — ein zweiter Adapter (MCP) wäre daran vorbeigelaufen. Deshalb
 # einmal im Kern statt in jedem Adapter neu.
+#
+# P9 Step F (P9-H): `doing` ist bei `task` dazugekommen — der Wunsch "aktuelle Aufgabe markieren"
+# und "Aufgabe zuweisen" sind ein Zustand, kein zweites Feld (P9-G/P9-H). **`note` bleibt
+# unangetastet `{active, archived}`**: eine Notiz kennt keine Arbeit, und genau diese Trennung
+# ist der Punkt der Zeile — ein `doing` auf einer Notiz ist ein Tippfehler, kein Feature.
+# Bewusst **kein** Tag und **kein** `extra`-Schlüssel: nur so ist das Vokabular erzwungen
+# (ein Tag-Tippfehler erzeugt still einen zweiten Zustand, den niemand bemerkt) und nur so
+# erreicht der Wert alle Adapter — `_status_hint()` (`mcpserver/tools.py`) und `GET /api/v1/meta`
+# generieren ihre Listen aus diesem Dict, es gibt nirgends eine zweite abgetippte Quelle.
 STATUS_VALUES: dict[str, frozenset[str]] = {
     "note": frozenset({"active", "archived"}),
-    "task": frozenset({"open", "done", "archived"}),
+    "task": frozenset({"open", "doing", "done", "archived"}),
 }
 
 

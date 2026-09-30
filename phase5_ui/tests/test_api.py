@@ -1205,3 +1205,56 @@ def test_ui_settings_space_admin_enabled_defaults_to_true():
     # Block C komplett hinter einem `False` versenden, ohne dass eine Testsuite es merkt (die
     # `_env()`-Helfer-Erfahrung aus P6-X zeigte genau diese Art still überschriebener Defaults).
     assert UiSettings(base_url=BASE_URL).space_admin_enabled is True
+
+
+# -- P9 Step F: `doing` und `assignee` über REST (Plan §8.3) ---------------------------------
+
+
+@pytest.mark.asyncio
+async def test_post_and_patch_carry_the_assignee(full_app_items, item_store, totp_code):
+    """`POST /api/v1/items` filtert den Body über eine Feld-Whitelist, `PATCH` über
+    `_PATCH_FIELDS` — fehlt `assignee` in einer von beiden, antwortet die API
+    `validation_failed`, und das wäre über REST unschreibbar, obwohl der Kern es kann."""
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+
+        created = await client.post(
+            "/api/v1/items",
+            json={"type": "task", "title": "Angebot", "status": "doing", "assignee": FOREIGN_SPACE},
+            headers=_headers(csrf),
+        )
+        assert created.status_code == 201
+        body = created.json()
+        assert body["status"] == "doing"
+        assert body["assignee"] == FOREIGN_SPACE
+
+        # Das Item traegt den Wert wirklich — ueber den Store, nicht ueber die HTTP-Antwort.
+        assert item_store.get(body["id"]).assignee == FOREIGN_SPACE
+
+        patched = await client.patch(
+            f"/api/v1/items/{body['id']}",
+            json={"version": body["version"], "assignee": ""},
+            headers=_headers(csrf),
+        )
+        assert patched.status_code == 200
+        assert patched.json()["assignee"] == ""
+
+        # Und die Liste sieht denselben Stand (P9-F10: `summary_to_json`).
+        listed = await client.get("/api/v1/items?space=" + SPACE, headers=_headers(csrf))
+        assert listed.status_code == 200
+        row = next(r for r in listed.json()["items"] if r["id"] == body["id"])
+        assert row["assignee"] == ""
+
+
+@pytest.mark.asyncio
+async def test_patch_rejects_a_non_string_assignee(full_app_items, item_store, totp_code):
+    item = item_store.create(SPACE, type="task", title="Typfehler")
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.patch(
+            f"/api/v1/items/{item.id}",
+            json={"version": item.version, "assignee": 42},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 422
+    assert response.json()["error"] == "validation_failed"

@@ -57,6 +57,10 @@ def item_to_json(
         "visibility": item.visibility,
         "share_read": list(item.share_read),
         "share_write": list(item.share_write),
+        # P9 Step F: Teil des Frontmatter-Vertrags, deshalb bei jedem Item mit — ein Feld, das
+        # nur in der einen Serialisierung auftaucht, ist ein Feld, das die andere Fläche
+        # stumm als "unbekannt" behandelt.
+        "assignee": item.assignee,
         "shared": item.space != own_space,
         "readonly": readonly,
         "assets": [asset_to_json(a) for a in assets] if assets is not None else [],
@@ -83,6 +87,9 @@ def summary_to_json(
         "visibility": s.visibility,
         "share_read": list(s.share_read),
         "share_write": list(s.share_write),
+        # P9 Step F: `overview_row_to_json()` erbt es über `summary_to_json()` — dieselbe
+        # eine Quelle, kein zweites `assignee` in einer zweiten Funktion.
+        "assignee": s.assignee,
         "shared": s.space != own_space,
         "readonly": readonly,
     }

@@ -5,7 +5,7 @@ read-when: Chronik einer älteren P9-Session gesucht — nicht beim normalen Arb
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
+updated: 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
 ---
 
 # Phase 9 — Sessions Archive
@@ -15,6 +15,113 @@ trägt immer genau einen `## Session stopped`-Block, ältere Blöcke wandern ver
 Vorsatz: nichts abtippen, alles per Skript mit vier Gegenproben (Schnitt verlustfrei, neuer
 Head trägt genau einen Block, alle bewegten Blöcke im Archiv byte-identisch, Archivbestand
 unangetastet).
+
+## Session stopped — 2026-09-30
+
+**Step A ist halb gelaufen: der Repo-Anteil ist gebaut, und der Nikinger hat A1, A2, A3, A0b
+und A6 ausgeführt.** Die Kette hängt jetzt an genau einer Stelle — der Domain-Registrierung
+für A5. A4 (Caddy) braucht eine auflösende Domain für das Let's-Encrypt-Zertifikat, A7 und A8
+hängen an A4. **Kein Produktcode berührt**, `pytest` grün, Tabu-Bereichs-Diff leer, kein
+`systemctl` von mir, `sharefyx-mcp` nur gelesen (Hard Rule 9).
+
+### Der Befund, der die Bauform getragen hat — und der war teuer
+
+Plan §3.2 A4 verlangt `reverse_proxy <heimvm-tailnet-name>:<port>`. **Das ist unbaubar.**
+`sharefyx-mcp.service:13` setzt `SPACE_HOST=127.0.0.1`, `ss -ltnp` zeigte keinen Listener auf
+`100.93.43.122:8765`, und der Funnel funktioniert nur, weil `tailscaled` auf derselben Maschine
+in die Schleife connectet. Die naheliegende Reparatur `SPACE_HOST=0.0.0.0` verstößt gegen die
+**gelockte P3-B-Entscheidung**. Statt dessen ein Relay, das die eine Lücke schließt ohne P3-B
+zu brechen — und **ohne `__REPO_ROOT__` im `ExecStart`**, womit sich die Release-Pfad-Kopplung
+aus dem Step-B-Befund gar nicht erst eintritt.
+
+`tailscale serve --tcp` (1.102.4 kann es) wäre eleganter und ist **nicht** gewählt: die
+ACL-Durchsetzung von Tailscale-TCP-Forwardern war nicht verifizierbar (kein Netzzugriff), und
+eine offene Frage darf nicht die Grundlage einer Firewall-Entscheidung sein → **V162** offen.
+
+### Sieben Befunde, alle mit Fundstelle (Volltext im Runbook §0)
+
+`/health` statt `/healthz` (`app.py:216`) · `ALLOWED_HOSTS` fehlt in Plan-A7 (sonst 400 auf
+*jede* Anfrage, Live-Incident 2026-09-18) · **V149 beantwortet**: `issuer` **ist** `base_url`
+**ist** `SPACE_PUBLIC_BASE_URL`, kein `iss`-Check beim Einlösen, also invalidiert der Wechsel
+keine Token-Familie · der Funnel bleibt nach A7 **lesbar, aber nicht beschreibbar** (CSRF-Origin
+exakt, `security.py:84`) — die Präzisierung, die P9-14 braucht · `socat` fehlte · die
+Tailnet-Policy erlaubt heute **alles** (`src/dst/ip` je `*`), unser Grant ist damit **zusätzlich
+und nicht einschränkend** — benannt, nicht mitgenommen.
+
+### Der Fund dieser Session, der am meisten zählt: mein eigenes A6 hätte den Betrieb gekappt
+
+`ufw default deny incoming` gilt **auf allen Interfaces, auch `tailscale0`**. Meine erste
+Fassung von A6 erlaubte 80/443, aber **kein SSH über das Tailnet** — wer über die Tailnet-IP
+verbunden ist, verliert die Verbindung, und zurück kommt man nur über die IONOS-Webconsole.
+Gefallen ist mir das **erst beim Durchdenken der Firewall-Semantik**, nicht beim Schreiben —
+und der Nikinger hatte ausgerechnet vorher gefragt, ob die Schritte den laufenden Betrieb
+überhaupt anfassen. Diese Frage war die bessere Prüfung als meine Checkliste.
+
+### Vier eigene Fehler, alle vor dem Commit behoben
+
+1. **`tailscale ping` als Beleg** — ich hatte ins Runbook geschrieben, er antworte „noch
+   nicht". Falsch in die Richtung: der Befehl prüft den WireGuard-Pfad zwischen zwei
+   `tailscaled`, nicht die Datenebene, auf der die ACL greift, und **kann grün sein, während
+   die Regel fehlt**. Er ist kein Nachweis. Der echte Nachweis ist der ACL-Testharness.
+2. **`acls` statt `grants`** — der Screenshot der Seite *Add rule* zeigte den Knopf
+   **„Save grant"**. Die klassische Form hätte der Nikinger abtippen müssen, weil die GUI sie
+   nicht erzeugt. Entwurf, Test und Runbook folgen jetzt der belegten Form.
+3. **Ein erfundener Drift** — ich meldete dem Nikinger, `local.env` und die installierte Unit
+   wichen im `DATA_ROOT` ab. **Falsch**: beide nennen `/home/savefyx/savefyx-data`, das
+   Verzeichnis existiert. Ich hatte mein eigenes `cat`-Ergebnis falsch gelesen und die
+   Differenz durch eine Diagnose bestätigt, die ich nicht gemacht hatte. Zurückgenommen, bevor
+   daraus eine Aufgabe wurde.
+4. **`space.` statt `sharefyx.`** — mein Vorschlag aus Kürzegründen war der schwächere: die
+   Adresse wird an vier Stellen als exakter String verglichen, und ein Alltagswort ist das,
+   was man falsch erinnert. Zurückgenommen, mit Begründung im Runbook.
+
+Dazu eine **Warnung, die ich mir selbst nicht gegönnt habe**: `docs/INDEX.md` steht bei
+**44.669 B** und damit ~6,6 KB über dem 40-KB-Schwellwert des Werkzeugs. Benannt statt
+versteckt, wie in P8.6; die Lösung bleibt die INDEX-Rotation in Step Z (P9-L).
+
+### Was gemessen wurde — und von wem
+
+| Schritt | Nachweis |
+|---|---|
+| **A3** Beitritt | von der **Gegenseite**: die Heim-VM sieht `ubuntu` als `100.121.142.113` mit `Tags=['tag:sharefyx-edge']` und `User=None` — genau das beweist, dass der Tag griff und die Node nicht als Nutzergerät läuft |
+| **A0b** Relay | `socat` 1.8.0.0, `ProtectSystem=strict`/`NoNewPrivileges`/`MemoryDenyWriteExecute` gesetzt, **zwei** Listener, `diagnose.sh` danach unverändert alle Prüfungen grün **inklusive des echten öffentlichen Pfads** — die Bestandspfade sind unberührt |
+| **A6** Firewall | Gegenprobe von der Heim-VM (die weder im Tailnet des VPS noch in dessen LAN ist): Tailnet-SSH **offen**, öffentliches SSH **timeout** (ufw *droppt* still, `deny` ≠ `reject`), 443 **refused** (Paket kommt am Host an, lauscht noch nichts) |
+| **V151** Vorabwert | `tailscale ping` → **28–37 ms über DERP Frankfurt**, nicht direkt (erwartbar hinter CGNAT). Das ist das Tailnet-Bein, nicht der ganze Weg; der Vergleich gegen 372,9 ms folgt in A7 |
+
+**Die wechselnde PID ist aufgeklärt** (Reboot gestern Nacht): der Dienst startete 6 Sekunden
+nach dem System-Boot — das gesunde Muster der P3-Rebootzeile 6, kein Incident. Ich hatte sie
+zuvor als ungeklärt notiert, statt eine Erfindung zu liefern; die eine Messung
+(`journalctl -b -u sharefyx-mcp`) hätte es sofort gezeigt.
+
+### Tests und Selbstprüfung
+
+`phase9_hardening/tests/test_tail_proxy.py`, 7 Wächter: Ziel bleibt Loopback · Bind ist eine
+Tailnet-IP und nicht `0.0.0.0` · Härtung **identisch mit der MCP-Unit** · kein Repo-Pfad im
+`ExecStart` · Port identisch mit `SPACE_PORT` · Health-Routen-Korrektur hält · ACL-Entwurf
+fail-closed. **Gegenprobe: vier Verstöße eingebaut → 4/7 rot, exakt die vier zuständigen.**
+
+`pytest -q` → siehe Commit-Body. `doc_health.py` → **0 Befunde**. Tabu-Bereichs-Diff leer.
+Kein Service-Touch; die Wegwerf-Instanz gab es nicht, nur eine einzelne TCP-Verbindung auf Port
+22 als Vorprüfung des VPS.
+
+### Nächster Schritt
+
+**Blockiert an einer Stelle: die Domain.** Sobald `eurofyx.<tld>` registriert ist:
+**A5** (A-Record `sharefyx` → `217.160.128.146`, **kein** AAAA) → **A4** (Caddy, drei
+Platzhalter in `step_a/Caddyfile.template` füllen) → **A7** (der riskante Schritt: fasst den
+laufenden Prod-Dienst an) → **A8** (Connector in beiden Konten, echter `list_spaces`).
+
+**Zwei Entscheidungen liegen beim Nikinger:** (1) die TLD, `.com` ist empfohlen; (2) falls die
+Domain-Aktivierung länger dauert, **Step F** (Schema `doing`/`assignee`) vorziehen — reiner
+Code-Step, braucht nur **V160**: `assignee` als **Space-Name**? Empfehlung ja, **ohne**
+Validierung, weil eine Prüfung gegen die Space-Liste eine zweite, nicht angekündigte
+Contract-Öffnung wäre.
+
+**Uncommitted geblieben, absichtlich:** `screenshots_latest/` enthält drei Arbeitsdateien des
+Nikingers (zwei Tailscale-Console-Screenshots + das als HTML gespeicherte Seitenquelltext).
+Sie sind **nicht** im Repo und sollen es nicht werden: das HTML enthält die Knotenliste des
+Tailnets mit Owner-Kontakten. Die `git add`-Aufrufe dieser Session nehmen `phase9_hardening/`
+explizit, nicht `-A`.
 
 ## Session stopped — 2026-09-29
 
