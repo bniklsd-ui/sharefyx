@@ -37,6 +37,7 @@ var KNOWN = Object.freeze([
   "search",
   "settings",
   "share-2",
+  "trash-2",
   "triangle-alert",
   "waypoints",
   "x",

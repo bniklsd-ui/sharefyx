@@ -5,7 +5,7 @@ read-when: Chronik einer älteren P9-Session gesucht — nicht beim normalen Arb
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
+updated: 2026-09-30 (**elfte Rotation, Step G** — Step-G-Block [Lösch-Ort war unbaubar, TLS-Wegwerf für den Browserbeleg, 14/14] im Head **angehängt**, Step-F-Block verbatim ins Archiv; Head 32.668 B → 25.740 B) | 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
 ---
 
 # Phase 9 — Sessions Archive
@@ -15,6 +15,98 @@ trägt immer genau einen `## Session stopped`-Block, ältere Blöcke wandern ver
 Vorsatz: nichts abtippen, alles per Skript mit vier Gegenproben (Schnitt verlustfrei, neuer
 Head trägt genau einen Block, alle bewegten Blöcke im Archiv byte-identisch, Archivbestand
 unangetastet).
+
+## Session stopped — 2026-09-30 (zweiter Block, Step F)
+
+**Step F ist gebaut: `doing` wird ein Statuswert, `assignee` ein erstklassiges Feld mit
+Index-Spalte — die neunte und bis jetzt letzte P1-Contract-Öffnung.** Der Domain-Block hängt
+weiter an der Registrierung; F war der einzige Step, der neben ihm ohne externe Abhängigkeit
+lag. Kein Service-Touch, `pytest` grün, Tabu-Hartpfade unberührt.
+
+### V160 ist beantwortet: `assignee` ist ein Space-Name, ohne Validierung
+
+Der Plan (§8.4) hat die Frage gestellt und die Empfehlung offengelassen; der Nikinger hat
+2026-09-30 die Empfehlung bestätigt. `_coerce_assignee()` prüft **nur den Typ**. Warum keine
+Prüfung gegen die Space-Liste: das wäre eine **zweite**, nicht angekündigte Contract-Öffnung —
+der Schreibpfad müsste den Space auflösen, mit dem ein Item in einem fremden Space belegt sein
+könnte. Die Formulierung, die ich mir gemerkt habe: ein toter Space-Name ist ein Anzeigefehler,
+ein *erfundener* Zweiter Space wäre es nicht.
+
+### Der Plan sagte neun Stellen, der Diff hat achtzehn
+
+Plan §8.2 listet F1–F9 in genau drei Dateien. Gemessen am Diff: **18 Hunks** (`models.py` 4,
+`store.py` 8, `index.py` 6). Die Differenz ist kein Pfusch, sondern eine Lücke in der Liste:
+**F9 („Upsert") sind drei Statement-Teile plus ein Row-Dict**, nicht eine Stelle — nur das
+Row-Dict zu ändern hätte den Index mit `ProgrammingError` laufen lassen. Dazu kamen **drei
+Stellen, die der Plan nicht nannte und ohne die es nicht funktioniert hätte**:
+
+| # | Stelle | Was ohne sie passiert wäre |
+|---|---|---|
+| **F10** | `store._summary()` | `get()` kennt den Wert, **jede Liste und jede Suche** stünde dauerhaft auf `""`. F3 wäre ein totes Feld — und kein Test hätte es gemerkt, weil beide Seiten „funktionieren" |
+| **F11** | `store.update()` | Der Wert **würde** in die Datei gelangen (über `Item.extra` → `fields.update()`), `item.assignee` bliebe auf `""`, F6 (`if item.assignee`) feuerte nie. Der am leichtesten übersehene Fall, weil „es funktioniert" hier kein Beweis ist |
+| — | `store._coerce_assignee()` | Die Typprüfung einmal im Kern statt dreimal in den Adaptern — dieselbe Begründung wie `_check_type_and_status()` (D2) |
+
+Die Kette dahinter ist immer dieselbe: ein Feld, das nur halb verdrahtet ist, sieht fertig aus.
+
+### Ein Befund, den ich gefunden, gemessen und **nicht** behoben habe
+
+`_BUCKETS` in `api.py` kennt kein `doing`. `bucketFor()` (`list.js:516`) vergleicht
+`f.status === item.status` **exakt**, eine `doing`-Aufgabe passt auf keinen der vier Eimer,
+`bucketFor()` liefert `null`, beide Aufrufer fallen auf `|| state.filter` zurück: sie fehlt in
+jedem Zähler und ist in der Liste nur sichtbar, wenn man zufällig im passenden Filter steht.
+**Derselbe Fund wie bei `done` im Phase-5-Step-7b**, eine Statusversion später.
+
+Ich habe den Fix gebaut und dann **verworfen**, weil beide Kandidaten Darstellungsentscheidungen
+sind, die P9-P ausdrücklich P10 zuteilt: ein fünfter `_BUCKETS`-Eintrag erzeugt über
+`bucketNames() = Object.keys(state.meta.buckets)` und `tree.js:72` einen **fünften Rail-Eintrag
+mit unübersetztem Label** — das ist genau die Hervorhebung, die nicht in diesen Step gehört. Der
+Befund steht vollständig mit beiden Kandidaten im Code, und ein Wächter pinnt, dass er nicht
+verschwindet, ohne dass P10 ihn behoben hat.
+
+### Zwei Alt-Tests, die mitgezogen werden mussten — und was sie über Kalibrierung lehren
+
+`test_upsert_get_delete_roundtrip` baut seine Indexzeile von Hand und schlug mit
+`ProgrammingError: missing parameter` fehl. **Das ist richtig so** — benannte Parameter schlagen
+laut fehl, statt still einen Default zu nehmen. Der Test trägt den Key jetzt und prüft zusätzlich
+den `ON CONFLICT`-Zweig.
+
+Der zweite war der lehrreichere: `test_search_listing_of_30_items_stays_within_calibrated_json_bound`
+sagt in seinem eigenen Docstring, dass eine `ItemSummary`-Feldsatz-Änderung **Nikinger-Sache und
+kein stiller Nebeneffekt** ist. Also gemessen statt erhöht: **16.390 B** mit Feld gegen **16.300 B**
+ohne, exakt **+16 B/Item** (`"assignee": "",`). Band 12–16 KB → **13–18 KB**, mit ungefähr
+gleicher Marge. Der Test hat die echte Zunahme bemerkt, statt eine Toleranz zu schlucken.
+
+Eine eigene Fehlannahme unterwegs: ich hatte `400` für einen Validierungsfehler erwartet, die API
+liefert `422` (`errors.py:50`). Der Code hatte recht, mein Test nicht.
+
+### V161: mit einem synthetischen Vorabwert beantwortet, P9-43 bleibt beim Nikinger
+
+`rebuild_index()` über 500/1500/3000 Items in `tmp_path`: **2,45 / 2,48 / 4,01 ms pro Item** —
+bis 1500 linear, bei 3000 etwas schlechter. Der echte `DATA_ROOT` (nur gelesen) hat **153 Items**
+außerhalb `_archive`, 197 mit: **0,4–0,6 s** einmalige Startkosten beim Schema-Sprung 3 → 4.
+Das ist der Vorabwert, den die Plan-Session brauchte; **P9-43 bleibt die Messung am echten
+`DATA_ROOT` beim Deploy**, denn ein `rebuild_index()` dort ist ein Schreibzugriff auf Produktivdaten.
+
+### Was gemessen wurde
+
+| Gegenstand | Nachweis |
+|---|---|
+| **Enge Probe §8.7** | `git diff --stat -- phase1_storage/storage` = **genau drei Dateien**; die sechs Hartpfade `acl.py`/`linkscan.py`/`patch.py`/`files.py`/`history.py`/`frontmatter.py` leer |
+| **Gegenprobe** | vier Verstöße eingebaut (F10 raus, F11 raus, Version zurück auf 3, F6 ohne `if`) → **10 Tests rot**, exakt die zuständigen; danach zurückgebaut |
+| **`doing` in der Oberfläche** | **V159 gemessen, nicht geglaubt**: `editor.js:246` liest `state.meta.status_values[itemType]` und rendert rohe Werte — `doing` erscheint im Editor-Dropdown ohne JS-Änderung. Die Plan-Behauptung zu `dialogs.js:323` ist **halb richtig**: dort iteriert `Object.keys(state.meta.status_values)`, also das **Typ**-Vokabular, und der Anlegen-Dialog hat gar keinen Status-Knopf (`createStatus` existiert nicht) — für ihn ist die Aussage gegenstandslos |
+| **Tests** | `pytest` **1039 → 1062** in 186,8 s (23 neu: 17 `test_step_f_schema.py`, 4 `test_tools.py`, 2 `test_api.py`), davon 191 in `phase1_storage`; `ui_budget` 5/5; `doc_health.py` 0 Befunde; `node --check` über alle 13 JS-Dateien grün (keine JS-Datei geändert) |
+
+### Nächster Schritt
+
+**Zwei Kandidaten, und sie sind nicht gleichwertig:**
+
+1. **Warten auf die Domain** (A5 → A4 → A7 → A8), sobald `eurofyx.<tld>` registriert ist. Die
+   Kette ist unberührt und der Nikinger hatte sie zuletzt in der Hand.
+2. **Step G** (Löschen nach `_trash/`, P9-I/J/K) — der andere reine Code-Step. **Achtung, die
+   Reihenfolge ist nicht beliebig:** §8.7 warnt ausdrücklich davor, F und G zu vermischen, weil
+   G `store.py` erneut anfasst (`Store.trash()`); der enge Diff gegen **diesen** Commit bleibt
+   sauber, solange G ein eigener Commit ist. **V160-analoge Frage für G:** `delete` für
+   wen sichtbar? Der Plan sagt human-only und für Nutzer unsichtbar, das wäre also geklärt.
 
 ## Session stopped — 2026-09-30
 

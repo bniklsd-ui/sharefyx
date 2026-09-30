@@ -985,6 +985,77 @@ def api_routes(
             headers={"Cache-Control": "no-store"},
         )
 
+    async def _items_delete(request: Request) -> Response:
+        """P9 Step G (P9-I/J/K): `DELETE /api/v1/items/{id}` — **verschiebt** nach `._trash/`,
+        löscht nie (Hard Rule 5: `tmp` + `os.replace` + `fsync`, plus Git-Commit im
+        Datenverzeichnis). Der Pfad zur Unsichtbarkeit steht in `store.TRASH_DIR`.
+
+        **Das Gate wird hier serverseitig geprüft, nicht nur durch einen gesperrten Knopf.**
+        Das Muster ist das des Space-Entfernens (`_spaces_delete`, P7-K, `api.py:567`): der
+        Client schickt den eingetippten Titel als `confirm`, und der Server vergleicht exakt.
+        Ein nur im Client existierendes Gate wäre für jeden HTTP-Client umgehbar — und „löschen"
+        ist die eine Operation, bei der das keine Formsache ist.
+
+        Verglichen wird **exakt** (kein `lower()`, kein Fuzzy): P9-52/§9.2 wollen genau die Sekunde
+        Nachdenken, und jede Toleranz nimmt sie weg. `trim()` passiert im Client, weil ein
+        versehentliches Leerzeichen am Ende kein Fehlklick ist; Groß-/Kleinschreibung ist
+        dagegen ein Signal, das der Mensch lesen muss.
+
+        **`version` ist Pflicht** (Hard Rule 3) — der Kalender-`If-Match` schützt Felder, hier die
+        Entscheidung selbst. Zwischen `get()` (für den Titel-Vergleich) und `trash()` (das nochmal
+        prüft) kann ein Parallel-Client schreiben; dann greift der Versionsvergleich im Store und
+        der Aufrufer bekommt `409` statt eines Löschens der falschen Fassung.
+
+        **P9-K: nur eigene, schreibbare Items.** `can_write_item_as_human` allein genügt nicht —
+        ein `share_write`-Halter dürfte fremde Items ändern, aber nicht löschen: Löschen ist der
+        eine Fall, in dem „darf ich das ändern" nicht „darf ich das wegnehmen" heißt. Dieselbe
+        Bedingung wie `list.js:420` `movable` (`space === state.ownSpace`), serverseitig formuliert.
+        """
+        session = await _require_session(request)
+        await _require_csrf_json(request, session)
+        body = await _json_body(request)
+        item_id = request.path_params["item_id"]
+
+        version = body.get("version")
+        if not isinstance(version, int):
+            raise ApiError("validation_failed", "'version' ist Pflichtfeld (int).")
+
+        try:
+            acl = store.acl_of(item_id)
+        except ItemNotFound as exc:
+            raise _map_store_error(exc, own_space=session.space) from exc
+
+        if not permissions.can_write_item_as_human(session.space, acl):
+            raise ApiError("forbidden", "Kein Schreibzugriff auf dieses Item.")
+        if acl.space != session.space:
+            raise ApiError(
+                "forbidden",
+                "Löschen ist nur im eigenen Space möglich — ein geteilter Schreibzugriff erlaubt "
+                "kein Wegnehmen.",
+            )
+
+        # Der Titel-Vergleich braucht den echten Titel, also einen Lesezugriff. `repair_drift`
+        # folgt derselben Regel wie in `_items_patch`: nur der Eigentümer-Space darf eine
+        # erkannte Fremdänderung zurückschreiben (Rule 4 — ein Lesezugriff auf einen fremden
+        # Space fasst keine Datei an).
+        try:
+            item = store.get(item_id, repair_drift=acl.space == session.space)
+        except (ItemNotFound, ValidationError) as exc:
+            raise _map_store_error(exc, own_space=session.space) from exc
+
+        if body.get("confirm") != item.title:
+            raise ApiError(
+                "validation_failed", "'confirm' muss exakt dem Titel des Items entsprechen."
+            )
+
+        try:
+            store.trash(item_id, version=version)
+        except (ItemNotFound, ConflictError, ValidationError, ValueError) as exc:
+            raise _map_store_error(exc, own_space=session.space) from exc
+        # `204` ohne Body: es gibt nichts zurückzugeben (P9-J — kein wiederherstellbarer
+        # Zustand, keine ID für einen Endpoint, den es nicht gibt).
+        return Response(status_code=204, headers={"Cache-Control": "no-store"})
+
     async def _items_append(request: Request) -> Response:
         session = await _require_session(request)
         await _require_csrf_json(request, session)
@@ -1199,6 +1270,9 @@ def api_routes(
         Route("/api/v1/items", _catch(_items_post), methods=["POST"]),
         Route("/api/v1/items/{item_id}", _catch(_items_get_one), methods=["GET"]),
         Route("/api/v1/items/{item_id}", _catch(_items_patch), methods=["PATCH"]),
+        # P9 Step G (P9-K): kein MCP-Werkzeug, kein Bulk, kein Tastenkürzel — nur dieser
+        # eine Endpunkt, und er verlangt den eingetippten Titel serverseitig.
+        Route("/api/v1/items/{item_id}", _catch(_items_delete), methods=["DELETE"]),
         Route("/api/v1/items/{item_id}/append", _catch(_items_append), methods=["POST"]),
         Route("/api/v1/items/{item_id}/archive", _catch(_items_archive), methods=["POST"]),
         Route("/api/v1/items/{item_id}/assets", _catch(_assets_post), methods=["POST"]),

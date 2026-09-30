@@ -11,6 +11,7 @@ import * as Editor from "./editor.js";
 import {
   init as initDialogs, pendingConfirmCancel, hideConflictDialog, closeCreateDialog,
   closeNewFolderDialog, closeMoveDialog, closeShareDialog, closeLinkPicker,
+  closeTrashDialog,
 } from "./dialogs.js";
 import { init as initUpdates } from "./updates.js";
 import {
@@ -180,6 +181,10 @@ function initShell() {
   // jeden Overlay-Dialog, kein Sonderfall für den neuen.
   var shareDialogEl = document.getElementById("share-dialog");
   var confirmDialogEl = document.getElementById("confirm-dialog");
+  // P9 Step G: der Löschdialog ist ein Overlay wie alle anderen und gehört deshalb in
+  // `anyOverlayOpen()` und in die ESC-Kette -- sonst wäre er der einzige Dialog, den ESC nicht
+  // schliesst und den die Tastaturbedienung nicht kennt.
+  var trashDialogEl = document.getElementById("trash-dialog");
   var accountDialogEl = document.getElementById("account-dialog");
   var detailEditorEl = document.getElementById("detail-editor");
   var searchInputEl = document.getElementById("search-input");
@@ -192,7 +197,8 @@ function initShell() {
   function anyOverlayOpen() {
     return !conflictDialogEl.hidden || !createDialogEl.hidden || !newFolderDialogEl.hidden
       || !moveDialogEl.hidden || !shareDialogEl.hidden || !confirmDialogEl.hidden
-      || !accountDialogEl.hidden || !updateLogDialogEl.hidden || !spaceAdminDialogEl.hidden
+      || !trashDialogEl.hidden || !accountDialogEl.hidden || !updateLogDialogEl.hidden
+      || !spaceAdminDialogEl.hidden
       || !spaceRemoveDialogEl.hidden || !linkPickerDialogEl.hidden;
   }
 
@@ -217,6 +223,10 @@ function initShell() {
       else if (!moveDialogEl.hidden) closeMoveDialog();
       else if (!shareDialogEl.hidden) closeShareDialog();
       else if (!updateLogDialogEl.hidden) updateLogDialogEl.hidden = true;
+      // P9 Step G: `closeTrashDialog()` statt `hidden = true` — der Dialog hält einen
+      // `pendingTrashCancel`, der das Promise auflöst; ein bloßes Verstecken ließe es hängen
+      // und der Aufrufer (list.js) wartete ewig auf eine Antwort.
+      else if (!trashDialogEl.hidden) closeTrashDialog();
       else if (!accountDialogEl.hidden) accountDialogEl.hidden = true;
       else if (!spaceRemoveDialogEl.hidden) closeRemoveSpaceDialog();
       else if (!spaceAdminDialogEl.hidden) closeSpaceAdminDialog();

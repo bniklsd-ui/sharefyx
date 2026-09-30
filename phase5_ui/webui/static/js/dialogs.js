@@ -297,6 +297,124 @@ export function confirmDialog(options) {
   });
 }
 
+// -- Löschdialog (P9 Step G, P9-J/P9-K) ------------------------------------------------------
+//
+// **Zweistufig, weil eine Stufe keine ist.** Stufe 1 ist das vorhandene `confirmDialog()` oben —
+// Konsequenztext und Ja/Nein. Stufe 2 ist das hier: der Titel muss **exakt** eingetippt werden,
+// und der Knopf bleibt gesperrt, bis er es ist. Beide Stufen sind clientseitig nur die
+// Oberfläche; **geprüft wird serverseitig** (`api.py :: _items_delete` vergleicht `confirm` exakt
+// gegen `item.title`), weil ein Gate, das nur einen Knopf sperrt, für jeden HTTP-Client umgehbar
+// wäre — dasselbe Muster wie beim Space-Entfernen (`api.py:567`).
+//
+// `trim()`, aber **kein** `toLowerCase()` und kein Fuzzy-Matching: ein versehentliches
+// Leerzeichen am Ende ist kein Fehlklick, die falsche Großschreibung dagegen ein Signal, das der
+// Mensch lesen muss. Jede Toleranz nimmt dem Gate genau die Sekunde, die es erzwingen soll (§9.2).
+
+var trashDialogEl;
+var trashConsequenceEl;
+var trashErrorEl;
+var trashConfirmInputEl;
+var trashSubmitEl;
+var trashCancelEl;
+var trashTargetItem = null;
+var pendingTrashCancel = null;
+
+export function closeTrashDialog() {
+  trashDialogEl.hidden = true;
+  trashConfirmInputEl.value = "";
+  trashTargetItem = null;
+  trashRefreshSubmit();          // ohne Zielitem => gesperrt, derselbe Pfad wie beim Oeffnen
+  if (pendingTrashCancel) {
+    var cancel = pendingTrashCancel;
+    pendingTrashCancel = null;
+    cancel();
+  }
+}
+
+function trashError(message) {
+  trashErrorEl.textContent = message;
+  trashErrorEl.hidden = false;
+}
+
+// Die **gesamte** zweite Stufe in einer Funktion: der Knopf ist gesperrt, solange der eingetippte
+// Text nicht exakt dem Titel entspricht. `trim()`, kein `toLowerCase()`, kein `startsWith` —
+// siehe die Begründung im Blockkommentar oben. Bewusst hier und nicht im `input`-Listener in
+// `init()`: das Gate ist eine Eigenschaft des Dialogs, und wer es später ändert, soll es an
+// genau einer Stelle finden.
+function trashRefreshSubmit() {
+  var ziel = trashTargetItem;
+  trashSubmitEl.disabled = !ziel || trashConfirmInputEl.value.trim() !== ziel.title;
+}
+
+// Liefert `true`, wenn der Mensch den Titel **exakt** bestätigt hat, sonst `false`. Ein Fehler des
+// Servers (Konflikt, Rechte) wird **nicht** aufgelöst, sondern im Dialog angezeigt — sonst sähe
+// ein 409 wie ein Abbrechen aus, und der Mensch griffe noch einmal zu, obwohl nichts passiert ist.
+// **Zwei Stufen, beide zwingend** (Plan §9.2) — und Stufe 1 ist das **vorhandene**
+// `confirmDialog()`, nicht eine Nachbildung: „Bestätigen / Abbrechen" mit der Konsequenz.
+// Erst danach öffnet sich der Dialog mit dem einzutippenden Titel. Warum zwei und nicht einer:
+// eine sichtbare Konsequenz neben einem gesperrten Knopf ist **ein** Gate; die zweite Stufe
+// verlangt eine bewusste Handlung (Eintippen), und genau die verhindert den Klick im Reflex.
+export function openTrashDialog(item) {
+  return confirmDialog({
+    title: "Item löschen",
+    message: "„" + item.title + "“ wird gelöscht. Es erscheint danach in keiner Liste, "
+      + "keiner Suche und nicht auf der Karte.",
+    ok: "Weiter",
+  }).then(function (bestätigt) {
+    if (!bestätigt) return false;
+    return openTrashTitleDialog(item);
+  });
+}
+
+function openTrashTitleDialog(item) {
+  trashTargetItem = item;
+  trashErrorEl.hidden = true;
+  trashConfirmInputEl.value = "";
+  trashRefreshSubmit();
+  trashConsequenceEl.textContent =
+    "Zur Sicherheit den Titel eintippen. Zurückholen kannst du es danach nur über Git.";
+  trashDialogEl.hidden = false;
+  trashConfirmInputEl.focus();
+
+
+  return new Promise(function (resolve) {
+    var fertig = false;
+    function finish(value) {
+      if (fertig) return;
+      fertig = true;
+      trashDialogEl.hidden = true;
+      trashConfirmInputEl.value = "";
+      trashTargetItem = null;
+      trashRefreshSubmit();
+      pendingTrashCancel = null;
+      resolve(value);
+    }
+    pendingTrashCancel = function () { finish(false); };
+    // `{ once: true }` an beiden: `openTrashDialog()` darf mehrfach laufen (zwei Klicks auf zwei
+    // Zeilen), und ein Listener, der überlebt, hinge beim zweiten Mal noch am alten Dialog.
+    trashCancelEl.addEventListener("click", function () { finish(false); }, { once: true });
+    trashSubmitEl.addEventListener("click", function () {
+      var ziel = trashTargetItem;
+      if (!ziel) return;
+      // Der eingetippte Titel wandert als `confirm` mit — verglichen wird vom Server, nicht hier.
+      api("/items/" + encodeURIComponent(ziel.id), {
+        method: "DELETE",
+        body: JSON.stringify({ version: ziel.version, confirm: trashConfirmInputEl.value.trim() }),
+      }).then(function () {
+        finish(true);
+      }).catch(function (err) {
+        if (err.message === "unauthenticated") return;
+        if (err.code === "conflict") {
+          trashError("Ein anderer Client hat dieses Item zwischenzeitlich geändert — es wurde "
+            + "nichts gelöscht. Lade die Liste neu und entscheide erneut.");
+          return;
+        }
+        trashError(err.message || "Löschen fehlgeschlagen.");
+      });
+    }, { once: true });
+  });
+}
+
 // -- Speichern / Konflikt (§4.5, Akzeptanzkriterium 11) ------------------------------------
 
 export function showConflictDialog(current) {
@@ -581,6 +699,18 @@ export function init() {
   confirmMessageEl = document.getElementById("confirm-message");
   confirmOkEl = document.getElementById("confirm-ok");
   confirmCancelEl = document.getElementById("confirm-cancel");
+
+  // P9 Step G: der Löschdialog. `trash-submit` bleibt gesperrt, bis der eingetippte Titel exakt
+  // passt — die Sperre ist die clientseitige Hälfte des Gates, die eigentliche Prüfung macht der
+  // Endpunkt. Der `input`-Listener ist der ganze Trick des Dialogs: ohne ihn gäbe es keine
+  // Stufe 2, sondern nur einen Text.
+  trashDialogEl = document.getElementById("trash-dialog");
+  trashConsequenceEl = document.getElementById("trash-consequence");
+  trashErrorEl = document.getElementById("trash-error");
+  trashConfirmInputEl = document.getElementById("trash-confirm-input");
+  trashSubmitEl = document.getElementById("trash-submit");
+  trashCancelEl = document.getElementById("trash-cancel");
+  trashConfirmInputEl.addEventListener("input", trashRefreshSubmit);
 
   accountDialogEl = document.getElementById("account-dialog");
 

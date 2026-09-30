@@ -35,6 +35,22 @@ from .models import (
 )
 from .patch import PatchResult, TextEdit, apply_edits
 
+# P9 Step G (P9-I/J): Ziel des „Löschens" — **Verschieben, nie `unlink`**. Der Punkt-Praefix ist
+# keine Kosmetik, sondern die ganze Unsichtbarkeit, und er ist **gemessen** (Plan §9.1 behauptete
+# sie, §9.2/.3 legten den Ort ohne den Punkt fest):
+#   - `._trash` auf DATA_ROOT-Ebene: `rebuild_index()` iteriert `data_root.iterdir()` und
+#     `list_spaces()` ebenso, beide ueberspringen Punkt-Verzeichnisse — ein hier abgelegtes Item
+#     ist nachweislich unsichtbar (kein Index-Eintrag, `get()` → ItemNotFound, kein Rail-Ordner),
+#     und **kein** P1-Code muss sich ädern.
+#   - `<space>/_trash` (die Fassung im Plan): `rebuild_index()` macht `space_dir.rglob("*.md")`
+#     OHNE Skip — das Item taucht beim naechsten Neuaufbau mit `folder="_trash"` wieder auf, und
+#     `_trash` wird von `list_spaces()` sogar als **Phantom-Space** gefuehrt. Dagegen braucht es
+#     Aenderungen an `index.py` UND `files.py`, also eine **zehnte** P1-Contract-Oeffnung, die
+#     niemand angekuendigt hat (P9-G kuendigt nur die neunte, fuer Step F).
+# Layout `._trash/<space>/<id>__<slug>.md` statt flach: der Space-Name bleibt im Pfad lesbar, und
+# ein spaeteres Aufraeumen kann je Space entscheiden, ohne die Dateinamen zu rueckschreiben.
+TRASH_DIR = "._trash"
+
 _KNOWN_FIELDS = {
     "id", "space", "type", "title", "status", "due", "tags", "links",
     "created", "updated", "version", "visibility", "share_read", "share_write",
@@ -914,6 +930,53 @@ class Store:
             trash_dir.mkdir(parents=True, exist_ok=True)
             files.move_file(matches[0], trash_dir / matches[0].name)
             self._commit("asset_trash", item_id, space)
+
+    def trash(self, item_id: str, *, version: int) -> None:
+        """P9 Step G (P9-I, P9-J, P9-K): **Löschen heißt Verschieben nach `._trash/`, nie
+        `unlink`** — derselbe Präzedenzfall wie `delete_asset()` (N5), mit dem Unterschied, dass
+        dort die Unsichtbarkeit aus einem expliziten `if path.name == "_trash"` im Asset-Listing
+        kommt und hier aus dem Punkt-Präfix am DATA_ROOT (siehe `TRASH_DIR`).
+
+        **`version` ist Pflicht** (Hard Rule 3): Löschen ist der Write, bei dem ein verlorener
+        Konflikt am teuersten ist — der Kalender-`If-Match` schützt nur Felder, hier schützt er
+        die Entscheidung „das wollte ich löschen, in dieser Fassung". Genau wie `archive()`.
+
+        Zurück kommt **nichts** (`-> None`, im Gegensatz zu `archive()`): es gibt keinen
+        wiederherstellbaren Zustand, das Item existiert danach nicht mehr — P9-J nennt das
+        ausdrücklich („kein API-Endpunkt, der `_trash/` listet, keine Wiederherstellung in der
+        UI"). Wer es zurückholen will, geht über Git bzw. das Dateisystem.
+
+        **Die Asset-Dateien des Items wandern nicht mit.** Bewusst, nicht vergessen: sie liegen
+        danach unerreichbar unter `<space>/_assets/<item_id>/` (ohne Index-Zeile findet
+        `list_assets()` sie nicht mehr), und ein zweiter Move würde aus einer atomaren Operation
+        zwei halbe machen. Der Aufräum-Posten dafür ist benannt (V162), nicht gebaut.
+
+        Autorisierung passiert **nicht** hier, wie überall im Store — der Aufrufer prüft Rechte
+        VOR dem Aufruf (`api.py :: _items_delete`, P9-K: nur eigene, schreibbare Items).
+        """
+        with self._lock, self._file_write_lock():
+            row = self._reconcile_and_get_row(item_id)
+            current = self._row_to_item(row)
+            if current.version != version:
+                raise ConflictError(item_id, expected_version=version, current=current)
+
+            old_path = self._data_root / row["path"]
+            trash_path = (
+                self._data_root / TRASH_DIR / current.space
+                / files.item_filename(current.id, files.slugify(current.title))
+            )
+            # Reihenfolge ist die ganze Fehlerklasse: erst der atomare Move, dann der Index.
+            # Umgekehrt gäbe es ein Fenster, in dem die Datei im Papierkorb liegt, der Index aber
+            # noch ein Item führt — `get()` fände eine Datei, die es nicht mehr gibt. `move_file`
+            # macht `os.replace` + Verzeichnis-fsync auf Quelle **und** Ziel (Hard Rule 5).
+            files.move_file(old_path, trash_path)
+            # `delete_item()` räumt auch die ausgehenden `item_links`-Zeilen mit dieser `src_id`
+            # auf. **Eingehende** Kanten (`dst_id` == dieses Item) bleiben als dangling stehen —
+            # dieselbe Entscheidung wie bei Assets und bei `delete_item()`s Docstring: die API
+            # filtert sie beim Lesen, `_graph_get` verlangt für eine Kante, dass **beide**
+            # Endpunkte in der sichtbaren Knotenmenge sind, und die kommt aus `search()`.
+            index.delete_item(self._conn, item_id)
+            self._commit("trash", item_id, current.space)
 
     def rebuild_index(self) -> IndexStats:
         with self._lock:

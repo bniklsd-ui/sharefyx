@@ -452,6 +452,26 @@
   </div>
 </div>
 
+<!-- P9 Step G (P9-J/P9-K): Loeschen-dialog. **Zweistufig**, wie `space-remove-dialog` oben --
+     derselbe Mechanismus, nicht nachgebaut: Konsequenz-Text, dann der Titel zum Eintippen, und
+     der Bestaetigungs-Knoepfel bleibt gesperrt, bis er exakt passt. P9-J: der Dialog verspricht
+     nichts rueckgaengig zu machen, weil es nichts gibt, was man rueckgaengig machen koennte --
+     die Datei liegt unter `._trash/`, fuer die Oberflaeche existiert das Item nicht mehr. -->
+<div class="overlay" id="trash-dialog" hidden>
+  <div class="overlay__panel">
+    <h2>Item loeschen</h2>
+    <p class="overlay__hint" id="trash-consequence"></p>
+    <p class="form-error" id="trash-error" hidden></p>
+    <label>Titel zur Bestaetigung eintippen
+      <input type="text" class="input" id="trash-confirm-input" autocomplete="off">
+    </label>
+    <div class="overlay__actions">
+      <button type="button" class="btn-primary" id="trash-submit" disabled>Loeschen</button>
+      <button type="button" class="btn" id="trash-cancel">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="account-dialog" hidden>
   <div class="overlay__panel">
     <h2>Passwort &auml;ndern</h2>
@@ -584,6 +604,13 @@
       <circle cx="18" cy="19" r="3" />
       <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
       <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
+  </symbol>
+  <symbol id="i-trash-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10 11v6" />
+      <path d="M14 11v6" />
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+      <path d="M3 6h18" />
+      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
   </symbol>
   <symbol id="i-triangle-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />

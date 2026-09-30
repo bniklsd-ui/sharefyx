@@ -877,7 +877,14 @@ select.input:focus {
   border-radius: var(--radius-sm);
 }
 
-.list__row-move, .list__row-share {
+/* P9 Step G: der Löschknopf ist das dritte Geschwister — gleiche Geometrie, damit die Zeile nicht
+   springt, aber mit der **Vorsicht**-Bedeutung der Selection/Choice-Konvention v3 (fünfte
+   Kategorie, `--caution` aus Block A, vgl. `.action--caution`). Ein Löschknopf, der wie
+   „Verschieben" aussieht, lädt das falsche Versehen ein: die Aktion ist nicht umkehrbar (P9-J —
+   zurück nur über Git). Der Ruhezustand ist `--text-faint` wie die beiden anderen, damit die
+   Zeile ruhig bleibt; **die Warnung erscheint erst beim Hover**, wie beim Asset-Entfernen
+   (`.asset-strip__remove`) — dieselbe Afford-Stärke, dieselbe Bedeutung. */
+.list__row-move, .list__row-share, .list__row-trash {
   align-self: center;
   flex-shrink: 0;
   width: 28px;
@@ -894,6 +901,7 @@ select.input:focus {
   cursor: pointer;
 }
 .list__row-move:hover, .list__row-share:hover { color: var(--text); background: var(--line); }
+.list__row-trash:hover { color: var(--caution); background: var(--line); }
 
 /* Drag & Drop (Step 7 Commit 4) — Pflicht-Alternative bleibt der Menü-Knopf oben (P6-AB),
    dies ist nur der Ziehgriff-Cursor + eine gedimmte Zeile während des Ziehens selbst. */

@@ -1,0 +1,78 @@
+{
+  "base_url": "https://127.0.0.1:18775",
+  "item_id": "itm_7055c9e4",
+  "titel": "Löschen in Probe",
+  "befunde": [
+    {
+      "pruefung": "1 Liste gerendert",
+      "ok": true,
+      "detail": "2 Zeilen"
+    },
+    {
+      "pruefung": "1 Löschknopf an eigenen Items",
+      "ok": true,
+      "detail": "2 Knöpfe bei 2 Zeilen"
+    },
+    {
+      "pruefung": "1 Ziel-Item bestimmt",
+      "ok": true,
+      "detail": "itm_7055c9e4 / 'Löschen in Probe'"
+    },
+    {
+      "pruefung": "2 Stufe 1: Rueckfrage mit Konsequenz",
+      "ok": true,
+      "detail": "„Löschen in Probe“ wird gelöscht. Es erscheint danach in keiner Liste, keiner Su"
+    },
+    {
+      "pruefung": "2 Abbrechen loescht nichts",
+      "ok": true,
+      "detail": "GET /api/v1/items/itm_7055c9e4 -> 200"
+    },
+    {
+      "pruefung": "3 Stufe 2: Dialog offen, Knopf gesperrt",
+      "ok": true,
+      "detail": "offen=True disabled=True"
+    },
+    {
+      "pruefung": "4 Grossschreibung bleibt gesperrt",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "pruefung": "5 Exakter Titel schaltet frei",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "pruefung": "6 Klick loescht, Dialog schliesst, Toast erscheint",
+      "ok": true,
+      "detail": "Toast=True Dialog-zu=True"
+    },
+    {
+      "pruefung": "6 Zeile nach Reload weg",
+      "ok": true,
+      "detail": "2 -> 1 Zeilen"
+    },
+    {
+      "pruefung": "8 GET auf das geloeschte Item -> 404",
+      "ok": true,
+      "detail": "HTTP 404"
+    },
+    {
+      "pruefung": "8 Datei liegt unter ._trash",
+      "ok": true,
+      "detail": "._trash/alpha/itm_30124c04__dritte-aufgabe.md, ._trash/alpha/itm_3b7a8b99__nachbar-bleibt.md, ._trash/alpha/itm_3fcef216__loeschen-in-probe.md, ._trash/alpha/itm_7055c9e4__loeschen-in-probe.md, ._trash/alpha/itm_8dda7229__dritte-aufgabe.md"
+    },
+    {
+      "pruefung": "8 nach rebuild_index() NICHT wieder aufgetaucht",
+      "ok": true,
+      "detail": "'Löschen in Probe' im Index? False — im Index: ['Nachbar bleibt']"
+    },
+    {
+      "pruefung": "8 ._trash ist kein Phantom-Space",
+      "ok": true,
+      "detail": "list_spaces()=['alpha']"
+    }
+  ],
+  "alle_ok": true
+}

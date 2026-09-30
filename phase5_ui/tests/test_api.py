@@ -1258,3 +1258,114 @@ async def test_patch_rejects_a_non_string_assignee(full_app_items, item_store, t
         )
     assert response.status_code == 422
     assert response.json()["error"] == "validation_failed"
+
+
+# -- P9 Step G: Löschen nach `._trash/` (Plan §9, P9-45 – P9-52) ---------------------------
+
+
+@pytest.mark.asyncio
+async def test_delete_moves_the_item_to_trash_and_hides_it_everywhere(
+    full_app_items, item_store, totp_code, tmp_path
+):
+    """P9-45/-47/-49. `204`, die Datei liegt unter `._trash/`, und das Item ist weg aus Liste,
+    Suche **und** nach einem Index-Neuaufbau.
+
+    Der Neuaufbau ist der Punkt, den die Plan-Testliste nicht abdeckt: die Datei ist nach dem
+    `move` sofort aus jeder Sicht, aber `rebuild_index()` ist der Moment, in dem ein Item an
+    einem unbekannten Ort **wieder auftauchen** könnte. Genau das war der gemessene Defekt der
+    Plan-Variante `<space>/_trash/`."""
+    from storage.store import TRASH_DIR
+
+    item = item_store.create(SPACE, type="task", title="Weg damit", body="Inhalt.")
+    vorher = (item_store._data_root / SPACE / f"{item.id}__weg-damit.md").read_bytes()
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.request(
+            "DELETE", f"/api/v1/items/{item.id}",
+            json={"version": item.version, "confirm": "Weg damit"},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 204
+    assert not response.content
+
+    trashed = list((item_store._data_root / TRASH_DIR).rglob("*.md"))
+    assert [p.name for p in trashed] == [f"{item.id}__weg-damit.md"]
+    # P9-47: byte-identisch. Nur der Pfad hat sich geaendert — kein Rewrite, kein Frontmatter-
+    # Verlust, weil gar kein Schreibvorgang stattfindet, sondern ein `os.replace`.
+    assert trashed[0].read_bytes() == vorher
+    assert not (item_store._data_root / SPACE / f"{item.id}__weg-damit.md").exists()
+
+    assert item_store.search(space=SPACE).total == 0
+    item_store.rebuild_index()
+    assert item_store.search(space=SPACE).total == 0, "nach rebuild_index wieder aufgetaucht"
+    assert [s.name for s in item_store.list_spaces()] == [SPACE], "_trash ist als Space sichtbar"
+
+
+@pytest.mark.asyncio
+async def test_delete_without_the_exact_title_is_refused(full_app_items, item_store, totp_code):
+    """P9-46 — und zwar **serverseitig**. Ein Gate, das nur den Knopf sperrt, wäre für jeden
+    HTTP-Client umgehbar; die Prüfung sitzt deshalb im Endpunkt, wie beim Space-Entfernen
+    (`api.py:567`)."""
+    item = item_store.create(SPACE, type="task", title="Angebot schreiben")
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        for falsch in ("angebot schreiben", "Angebot", "Angebot schreiben ", "Angebot schreibe"):
+            response = await client.request(
+                "DELETE", f"/api/v1/items/{item.id}",
+                json={"version": item.version, "confirm": falsch},
+                headers=_headers(csrf),
+            )
+            assert response.status_code == 422, falsch
+            assert response.json()["error"] == "validation_failed"
+        # ... und nach vier Fehlversuchen ist das Item noch da.
+        assert item_store.get(item.id).title == "Angebot schreiben"
+
+
+@pytest.mark.asyncio
+async def test_delete_with_a_stale_version_is_a_conflict(full_app_items, item_store, totp_code):
+    """Hard Rule 3: Löschen ist der Write, bei dem ein verlorener Konflikt am teuersten ist.
+
+    Zwei Fehlerarten, zwei Antworten — und die Reihenfolge ist gemessen, nicht angenommen: der
+    **Titel**-Vergleich läuft vor dem Versionsvergleich. Ein veralteter Request, dessen
+    `confirm` zum *alten* Titel passt, antwortet deshalb `422` ("Titel stimmt nicht"), nicht
+    `409`; `409` kommt nur, wenn der eingetippte Titel dem **aktuellen** entspricht und die
+    Version veraltet ist. Beides ist richtig: ein falsch getippter Titel ist ein Tippfehler, ein
+    passender Titel mit alter Version ein Konflikt."""
+    item = item_store.create(SPACE, type="task", title="Konkurrenz")
+    item_store.update(item.id, version=item.version, title="Konkurrenz, inzwischen geändert")
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+
+        # Falscher Titel (der zum Zeitpunkt des Lesens gültige war) -> 422, kein Löschen.
+        alter_titel = await client.request(
+            "DELETE", f"/api/v1/items/{item.id}",
+            json={"version": item.version, "confirm": "Konkurrenz"},
+            headers=_headers(csrf),
+        )
+        assert alter_titel.status_code == 422
+
+        # Richtiger Titel, aber veraltete Version -> 409.
+        conflict = await client.request(
+            "DELETE", f"/api/v1/items/{item.id}",
+            json={"version": item.version, "confirm": "Konkurrenz, inzwischen geändert"},
+            headers=_headers(csrf),
+        )
+    assert conflict.status_code == 409
+    assert item_store.get(item.id).title == "Konkurrenz, inzwischen geändert"
+
+
+@pytest.mark.asyncio
+async def test_delete_of_a_foreign_item_is_forbidden(full_app_items, item_store, totp_code):
+    """P9-51/P9-K. Ein geteilter Schreibzugriff erlaubt Ändern, nicht Wegnehmen — die zwei
+    unterscheiden sich, und ohne diese Trennung dürfte jeder Lese-Helfer fremde Items löschen."""
+    item = item_store.create(FOREIGN_SPACE, type="task", title="Fremd, freigegeben")
+    item_store.update(item.id, version=item.version, share_write=[SPACE])
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.request(
+            "DELETE", f"/api/v1/items/{item.id}",
+            json={"version": item.version, "confirm": "Fremd, freigegeben"},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 403
+    assert item_store.get(item.id).id == item.id

@@ -954,7 +954,70 @@ Titel bleibt der Knopf gesperrt · `P9-47` Die Datei liegt unter `_trash/`, byte
 Liste, Suche, Karte oder Übersicht · `P9-50` Kein MCP-Werkzeug kann löschen ·
 `P9-51` Ein fremdes Item lässt sich nicht löschen · `P9-52` 7 Tests grün.
 
+**[Stand 2026-09-30, nach Ausführung von Step G]** `P9-45` ✅ · `P9-46` ✅ (**serverseitig** geprüft,
+nicht nur ein gesperrter Knopf) · `P9-47` ✅ (byte-identisch gemessen) · `P9-48` ✅ (Commit-Existenz
+**und** Datei im Commit per `git log`/`git ls-files` geprüft, nicht per Spy auf `_commit()`) ·
+`P9-49` ✅ inklusive Karte **und** nach `rebuild_index()` · `P9-50` ✅ (statisch: kein `@mcp.tool`
+mit Lösch-Namen, `tools.py` referenziert `trash()` nicht) · `P9-51` ✅ · `P9-52` ✅ — **13 statt 7**
+Tests in `test_step_g_trash.py` (die sieben der Plan-Liste plus sechs für die gemessenen Lücken) und
+fünf Endpunkt-Tests in `phase5_ui/tests/test_api.py`. **Browserbeleg:** `p9_step_g_self_check.py`
+gegen eine eigene TLS-Wegwerf-Instanz, **14/14 Prüfungen grün** (zwei Läufe hintereinander
+unabhängig — das Harness säet bei jedem Start neu, weil ein unsichtbarer Papierkorb sich gerade
+nicht zurücksetzen lässt), 6 Screenshots `docs/screenshots/p9_step_g_*.png`, Probe
+`phase9_hardening/probes/p9_step_g_probe.json`. **V162 bleibt benannt, nicht gebaut** (§9.5) — die
+Menge unter `._trash/` im Harness ist kein Messwert für den echten `DATA_ROOT`.
+
 ---
+
+> ### [2026-09-30, Step G ausgeführt — datierte Korrekturnotiz, **zwei Befunde vor dem Bau**]
+>
+> **Befund 1, der teuerste: der Lösch-Ort aus §9.1/§9.3 hält das Versprechen nicht.** Die
+> Unsichtbarkeit sollte „vorhandenes Verhalten" sein, belegt mit `store.py:815`. Der Anker zeigt
+> auf `ensure_folder()`; der echte `_trash`-Skip sitzt bei 860/868 in **`list_assets()`** — für
+> **Assets**, nicht für Items. Der Asset-Präzedenzfall trägt für Items nicht, und mit dem
+> `<space>/_trash/` aus §9.3 gemessen:
+>
+> | | `<space>/_trash/` (Plan) | `DATA_ROOT/._trash/<space>/` (gebaut) |
+> |---|---|---|
+> | `search()` nach `rebuild_index()` | **Item wieder da** (`folder="_trash"`) | weg |
+> | `list_spaces()` | **`['_trash', 'sp']`** — ein Phantom-Space | `['sp']` |
+> | P1-Änderungen nötig | `index.py` **und** `files.py` | **keine** |
+>
+> `rebuild_index()` macht `space_dir.rglob("*.md")` **ohne Skip**, und `list_spaces()` führt jedes
+> Nicht-Punkt-Verzeichnis unter `DATA_ROOT` als Space. Der Plan-Ort hätte also einen sichtbaren
+> Ordner mit dem gelöschten Item erzeugt — das Gegenteil von P9-J — und die Reparatur wäre eine
+> **zehnte** P1-Contract-Öffnung gewesen, die niemand angekündigt hat (P9-G kündigt nur die
+> neunte, für Step F). **Nikinger-Entscheidung 2026-09-30: `DATA_ROOT/._trash/<space>/`.**
+> Damit stimmt die Prämisse von §9.1 wieder — nur eine Ebene höher und mit einem Punkt, denn beide
+> Scanner überspringen Punkt-Verzeichnisse bereits.
+>
+> **Befund 2: §9.3 nennt vier Dateien, es sind sieben.** Erzwungen durch Tatsachen, nicht durch
+> Geschmack: ein Dialog, in dem ein **Titel eingetippt** wird, braucht Markup (`app.html`) und ein
+> Overlay braucht ESC-Verdrahtung (`app.js`); ein Zeilen-Knopf braucht eine Klasse (`app.css`);
+> ein neues Icon braucht einen vendorten Lucide-Sprite (`trash-2.svg` + `icons.js` + der
+> Sprite-Block). **Das Vorbild stand im Repo:** `space-remove-dialog` (P7-K) ist bereits
+> zweistufig mit einzutippendem Namen, inklusive serverseitiger Prüfung (`api.py:567`) — Step G
+> folgt ihm statt ein zweites Muster zu erfinden. Der `trash-2.svg` wurde **geholt, nicht aus dem
+> Gedächtnis getippt** (lucide-static 0.544.0, Lizenzkommentar und `class` wie bei allen anderen
+> entfernt), weil eine aus dem Kopf nachgebaute Drittanbieter-Datei ein still falsches Glyph ist.
+>
+> **Weiter gegen den Plan geprüft und übernommen:** `version` ist Pflicht (Hard Rule 3), der Move
+> ist atomar (`files.move_file` = `os.replace` + fsync auf Quelle *und* Ziel, derselbe Helper wie
+> bei `archive()`), es entsteht ein Git-Commit `trash` (P9-48), und `index.delete_item()` räumt
+> die ausgehenden `item_links` mit. **Eingehende** Kanten bleiben dangling — so dokumentiert in
+> `delete_item()` und gefiltert von `_graph_get` (P9-49 nennt die Karte; der Test prüft die Kette).
+>
+> **Was §9.4 nicht nannte und der Bau brauchte:** ein Test für das **Verhalten nach
+> `rebuild_index()`** (der Plan-Test „verschwindet aus Liste und Suche" hätte den gemessenen
+> Defekt der Plan-Variante **durchgelassen**), einer gegen den **Phantom-Space**, einer für die
+> **Karte**, einer gegen **Nachbarn**, und einer für P9-Js „kein API-Endpunkt, der `_trash/`
+> listet" — das ist der einzige Teil von P9-J, der sich still verschlechtern kann.
+>
+> **Ein Test-Fehler beim Bauen, der eine Fallklasse zeigt:** der erste Wächter für den
+> Titelvergleich suchte `toLowerCase` im **Dialog-Block** und schlug an — weil der *Kommentar*
+> dieses Wortes enthält, um es auszuschließen. Dieselbe Falle wie in P8.6 Block H (ein Kommentar
+> mit dem Literal `@media (max-width:1280px)` ließ einen Wächter anschlagen). Der Test filtert
+> jetzt Kommentarzeilen heraus, statt auf meine Formulierung zu vertrauen.
 
 ## §10 Step H — Abhängigkeits-Hygiene
 

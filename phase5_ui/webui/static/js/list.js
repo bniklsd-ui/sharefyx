@@ -7,7 +7,7 @@ import { el } from "./toasts.js";
 import { api, reportUnexpectedError } from "./api.js";
 import { navigate, renderRail, bucketNames, activateView } from "./tree.js";
 import { selectItem, closeEditor } from "./editor.js";
-import { openMoveDialog, openShareDialog } from "./dialogs.js";
+import { openMoveDialog, openShareDialog, openTrashDialog } from "./dialogs.js";
 import { iconSvg } from "./icons.js";
 
 var listCrumbEl;
@@ -479,6 +479,34 @@ export function renderList() {
         openShareDialog(item);
       });
       li.appendChild(shareButton);
+
+      // Löschknopf (P9 Step G, P9-K) — dieselbe Geschwister-Regel und dieselbe `movable`-
+      // Bedingung wie die beiden Knöpfe darüber, aus demselben Grund: zwei `<button>` ineinander
+      // wäre ungültiges HTML. **Kein Tastenkürzel, kein Bulk, kein MCP-Werkzeug** — der Weg vom
+      // Menschen zum Löschen soll genau eine Hand erfordern und sonst nichts.
+      //
+      // Nach dem Löschen: Zeile weg, `state.selectedId` auf null (das Item existiert nicht mehr),
+      // Liste und Übersicht neu laden, damit **Zähler und Karte** mitziehen — der Server hat das
+      // Item aus dem Index genommen, aber der Client hält eine Kopie seiner Antworten.
+      var trashButton = el("button", "list__row-trash");
+      trashButton.type = "button";
+      trashButton.title = "Löschen";
+      trashButton.setAttribute("aria-label", "Löschen");
+      trashButton.appendChild(iconSvg("trash-2"));
+      trashButton.addEventListener("click", function (event) {
+        event.stopPropagation();
+        openTrashDialog(item).then(function (geloescht) {
+          if (!geloescht) return;
+          if (state.selectedId === item.id) {
+            state.selectedId = null;
+            closeEditor();
+          }
+          return Promise.all([loadItems(), loadOverview()]);
+        }).then(function () {
+          toast("Gelöscht · " + item.title);
+        }).catch(reportUnexpectedError);
+      });
+      li.appendChild(trashButton);
 
       // Drag & Drop (Step 7 Commit 4) — die `<li>` ist der Ziehgriff, nicht `.list__row`,
       // damit ein Klick auf den Button weiterhin normal öffnet/navigiert; nur `dragstart`

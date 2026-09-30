@@ -27,7 +27,7 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | D | Zwei gemeldete Bugs (ESC/Vollbild, Drop-Ziel Space-Wurzel) | 🟡 D2 fertig; D1 (ESC/Vollbild) **bewusst zurückgestellt** — Nikinger-Entscheidung 2026-09-23, kein aktiver Blocker mehr, siehe Backlog unten |
 | E | Karte: Reload-Overload, V118 | ✅ **Step E abgeschlossen** (Session-Block 2026-09-28): (a) kein zweiter `/graph`-Abruf ohne Datenänderung — Signatur aus dem `/overview`-Payload, das der Client ohnehin holt (Plan §7.2(a) nannte den Graph-Payload; der hat **kein** `updated`, datierte Plan-Korrektur) · (b) bekannte Knoten behalten `x`/`y` über den Refetch · `force` nur am expliziten Refresh-Knopf · 7 Tests (Node-Harness + statisch) + Browser-Probe gegen die Wegwerf-Instanz, beide mit Gegenprobe gegen HEAD (dort 1 Abruf und 10 verschiedene Bilder in 1,5 s) · **P9-33/-34/-35 ✅** · **V118 beantwortet (zwei Linien, eine davon gestrichelt)** — die Design-Frage „eine oder zwei Linien" liegt beim Nikinger (P9-36) |
 | F | Schema-Fundament (neunte P1-Contract-Öffnung: `doing`/`assignee`) | 🟡 **code-complete 2026-09-30 (M3), nicht live-bewiesen** — V160 vom Nikinger beantwortet (**Space-Name, ohne Validierung**), Plan §8.2 auf **18 Hunks in genau drei Dateien** korrigiert (die Probe §8.7 erfüllt: `models.py`/`store.py`/`index.py`, sonst nichts); drei vom Plan nicht genannte Stellen ergänzt (`_summary()` = F10, `update()` = F11, `_coerce_assignee()`) · **ein Befund bewusst NICHT behoben**: `_BUCKETS` kennt `doing` nicht, beide Kandidaten sind Darstellungsentscheidungen und damit P10 (P9-P) · `pytest` 1039 → **1062** (23 neu), `ui_budget` 5/5, Tabu-Hartpfade unberührt. Der Contract-Absatz steht in `phase1_storage/CLAUDE.md` §Geerbte Contracts · **V161 mit synthetischem Vorabwert** (2,5–4,0 ms/Item gemessen, 153 reale Items ⇒ **0,4–0,6 s** einmalige Startkosten; P9-43 selbst bleibt Nikinger-Schritt am echten DATA_ROOT) |
-| G | Löschen (F2) nach `_trash/` | ⬜ |
+| G | Löschen (F2) nach `_trash/` | 🟡 **code-complete 2026-09-30 (M3), nicht live-bewiesen** — **der Lösch-Ort aus Plan §9.3 war unbaubar** (`<space>/_trash/` ⇒ Item nach `rebuild_index()` wieder da, `_trash` sogar als **Phantom-Space** in `list_spaces()`; `rebuild_index()` rglobbt ohne Skip, `RESERVED_DIR_NAMES` kennt `_trash` nicht) — Nikinger-Entscheidung: `DATA_ROOT/._trash/<space>/`, beide Scanner überspringen Punkt-Verzeichnisse, **null P1-Änderungen** · `Store.trash(item_id, *, version)` atomar + Git-Commit `trash`, `DELETE /api/v1/items/{id}` mit **serverseitigem** Titel-Gate (Muster `api.py:567`), `version` Pflicht, P9-K: kein MCP-Werkzeug, kein Bulk, kein Tastenkürzel, fremde Items gesperrt · 13 + 5 Tests, **Gegenprobe 4 Verstöße → 11 Tests rot**, **Browser 14/14** (eigene TLS-Wegwerf-Instanz) · §9.3 nannte 4 Dateien, gebaut wurden 7 (Markup, ESC, CSS und Icon sind durch das Getippte-Gate erzwungen) · `pytest` 1062 → **1078** |
 | H | Abhängigkeits-Hygiene | ⬜ |
 | Gate/Z | Abnahme, Closeout | ⬜ |
 
@@ -60,94 +60,95 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückzuführen** — Nikinger-Anordnung 2026-09-24, so dokumentieren und nicht weiter
   untersuchen.
 
-## Session stopped — 2026-09-30 (zweiter Block, Step F)
+## Session stopped — 2026-09-30 (dritter Block, Step G)
 
-**Step F ist gebaut: `doing` wird ein Statuswert, `assignee` ein erstklassiges Feld mit
-Index-Spalte — die neunte und bis jetzt letzte P1-Contract-Öffnung.** Der Domain-Block hängt
-weiter an der Registrierung; F war der einzige Step, der neben ihm ohne externe Abhängigkeit
-lag. Kein Service-Touch, `pytest` grün, Tabu-Hartpfade unberührt.
+**Step G ist gebaut: Löschen heißt Verschieben nach `._trash/`, und der Ort musste vor dem Bau
+korrigiert werden — sonst hätte die halbe Step-Definition nicht funktioniert.** Commit folgt
+unten; `pytest` **1078**, Browser **14/14**, kein Service-Touch.
 
-### V160 ist beantwortet: `assignee` ist ein Space-Name, ohne Validierung
+### Der teuerste Fund der Session: der Plan-Ort hätte das Versprechen gebrochen
 
-Der Plan (§8.4) hat die Frage gestellt und die Empfehlung offengelassen; der Nikinger hat
-2026-09-30 die Empfehlung bestätigt. `_coerce_assignee()` prüft **nur den Typ**. Warum keine
-Prüfung gegen die Space-Liste: das wäre eine **zweite**, nicht angekündigte Contract-Öffnung —
-der Schreibpfad müsste den Space auflösen, mit dem ein Item in einem fremden Space belegt sein
-könnte. Die Formulierung, die ich mir gemerkt habe: ein toter Space-Name ist ein Anzeigefehler,
-ein *erfundener* Zweiter Space wäre es nicht.
+Plan §9.1 sagt, die Unsichtbarkeit sei „vorhandenes Verhalten", belegt mit `store.py:815`. Der
+Anker zeigt auf `ensure_folder()`; der echte `_trash`-Skip sitzt bei 860/868 in **`list_assets()`**
+— für **Assets**, nicht für Items. Der Präzedenzfall trägt nicht. Mit dem `<space>/_trash/` aus
+§9.3 gemessen:
 
-### Der Plan sagte neun Stellen, der Diff hat achtzehn
-
-Plan §8.2 listet F1–F9 in genau drei Dateien. Gemessen am Diff: **18 Hunks** (`models.py` 4,
-`store.py` 8, `index.py` 6). Die Differenz ist kein Pfusch, sondern eine Lücke in der Liste:
-**F9 („Upsert") sind drei Statement-Teile plus ein Row-Dict**, nicht eine Stelle — nur das
-Row-Dict zu ändern hätte den Index mit `ProgrammingError` laufen lassen. Dazu kamen **drei
-Stellen, die der Plan nicht nannte und ohne die es nicht funktioniert hätte**:
-
-| # | Stelle | Was ohne sie passiert wäre |
+| | `<space>/_trash/` (Plan) | `DATA_ROOT/._trash/<space>/` (gebaut) |
 |---|---|---|
-| **F10** | `store._summary()` | `get()` kennt den Wert, **jede Liste und jede Suche** stünde dauerhaft auf `""`. F3 wäre ein totes Feld — und kein Test hätte es gemerkt, weil beide Seiten „funktionieren" |
-| **F11** | `store.update()` | Der Wert **würde** in die Datei gelangen (über `Item.extra` → `fields.update()`), `item.assignee` bliebe auf `""`, F6 (`if item.assignee`) feuerte nie. Der am leichtesten übersehene Fall, weil „es funktioniert" hier kein Beweis ist |
-| — | `store._coerce_assignee()` | Die Typprüfung einmal im Kern statt dreimal in den Adaptern — dieselbe Begründung wie `_check_type_and_status()` (D2) |
+| `search()` nach `rebuild_index()` | **Item wieder da** (`folder="_trash"`) | weg |
+| `list_spaces()` | **`['_trash', 'sp']`** — Phantom-Space | `['sp']` |
+| P1-Änderungen | `index.py` **und** `files.py` = **zehnte** Öffnung | **keine** |
 
-Die Kette dahinter ist immer dieselbe: ein Feld, das nur halb verdrahtet ist, sieht fertig aus.
+`rebuild_index()` macht `space_dir.rglob("*.md")` **ohne Skip**, `list_spaces()` führt jedes
+Nicht-Punkt-Verzeichnis als Space, und `RESERVED_DIR_NAMES` ist `{"_archive", "_assets"}`. Der
+Plan-Ort hätte einen **sichtbaren Ordner mit dem gelöschten Item** erzeugt — exakt das Gegenteil
+von P9-J — und die Reparatur wäre eine P1-Contract-Öffnung gewesen, die niemand angekündigt hat.
+**Nikinger-Entscheidung 2026-09-30: `._trash` auf DATA_ROOT-Ebene.** Damit stimmt die Prämisse
+wieder, nur eine Ebene höher und mit einem Punkt: beide Scanner überspringen Punkt-Verzeichnisse
+bereits. Die Lehre ist die des Tages: *„der Code hat diese Funktion schon"* ist eine Behauptung
+über **welche** Funktion — der Anker war eine Zeile daneben.
 
-### Ein Befund, den ich gefunden, gemessen und **nicht** behoben habe
+### Der Dialog: nach dem Vorbild im Repo, nicht neu erfunden
 
-`_BUCKETS` in `api.py` kennt kein `doing`. `bucketFor()` (`list.js:516`) vergleicht
-`f.status === item.status` **exakt**, eine `doing`-Aufgabe passt auf keinen der vier Eimer,
-`bucketFor()` liefert `null`, beide Aufrufer fallen auf `|| state.filter` zurück: sie fehlt in
-jedem Zähler und ist in der Liste nur sichtbar, wenn man zufällig im passenden Filter steht.
-**Derselbe Fund wie bei `done` im Phase-5-Step-7b**, eine Statusversion später.
+Vor dem Bauen habe ich `space-remove-dialog` (P7-K) gelesen — es ist bereits **zweistufig mit
+eingetipptem Namen**, und der Server prüft `body["confirm"]` exakt (`api.py:567`). Ich hatte
+zuerst nur eine Stufe gebaut (sichtbarer Konsequenztext + gesperrter Knopf), was **ein** Gate ist;
+der Plan verlangt zwei zwingende und sagt wörtlich, das Confirm-Muster zu wiederverwenden. Also
+nachgezogen: Stufe 1 = vorhandenes `confirmDialog()`, Stufe 2 = `trashRefreshSubmit()` als
+**eine** Funktion, die den Knopf an `value.trim() !== ziel.title` bindet.
 
-Ich habe den Fix gebaut und dann **verworfen**, weil beide Kandidaten Darstellungsentscheidungen
-sind, die P9-P ausdrücklich P10 zuteilt: ein fünfter `_BUCKETS`-Eintrag erzeugt über
-`bucketNames() = Object.keys(state.meta.buckets)` und `tree.js:72` einen **fünften Rail-Eintrag
-mit unübersetztem Label** — das ist genau die Hervorhebung, die nicht in diesen Step gehört. Der
-Befund steht vollständig mit beiden Kandidaten im Code, und ein Wächter pinnt, dass er nicht
-verschwindet, ohne dass P10 ihn behoben hat.
+Dabei zwei eigene Fehler, beide beim Wächter-Schreiben aufgefallen:
+- Der erste Wächter suchte `toLowerCase` im Dialog-Block und schlug an — weil mein **Kommentar**
+  dieses Wort enthält, um es auszuschließen. Dieselbe Falle wie in P8.6 Block H. Der Test filtert
+  jetzt Kommentarzeilen, statt auf meine Formulierung zu vertrauen.
+- Ich hatte zwei `--caution-*`-Tokens benutzt, die es nicht gibt. Der Wächter
+  `test_every_css_var_reference_is_defined` hätte es gefangen; ich habe es vorher selbst gesehen
+  und auf `--caution` + `.asset-strip__remove` (der vorhandene Entfernen-Knopf) umgestellt.
 
-### Zwei Alt-Tests, die mitgezogen werden mussten — und was sie über Kalibrierung lehren
+### Der Browserbeleg brauchte eine eigene TLS-Instanz — und der Grund ist eine Produktinvariante
 
-`test_upsert_get_delete_roundtrip` baut seine Indexzeile von Hand und schlug mit
-`ProgrammingError: missing parameter` fehl. **Das ist richtig so** — benannte Parameter schlagen
-laut fehl, statt still einen Default zu nehmen. Der Test trägt den Key jetzt und prüft zusätzlich
-den `ON CONFLICT`-Zweig.
+Der 18773er-Wegwerf kann **keinen** Schreibvorgang annehmen. `require_csrf`
+(`security.py:79-95`) verlangt `Origin` **exakt** gleich `settings.base_url`, sonst
+`sec-fetch-site: same-origin`, plus Token. `settings.base_url` ist in `app.py:204` genau
+`oauth.settings.base_url` = `SPACE_PUBLIC_BASE_URL`, und das muss laut `config.py:87` zwingend
+`https://` sein (OAuth-Issuer). Ein Browser auf `http://127.0.0.1:18773` kann das **strukturell
+nie** erfüllen, `Origin` lässt sich nicht entfernen (verbotener Header — `page.route()` bleibt
+wirkungslos, gemessen), und `serve.py` ruft `uvicorn.run()` ohne `ssl_*`. **Das ist der „Befund
+für Block D / Step Z", den der Kommentar im Setup-Skript (Zeile 341) seit P8.6 nennt — bis auf
+die Ursache zurückgeführt.**
 
-Der zweite war der lehrreichere: `test_search_listing_of_30_items_stays_within_calibrated_json_bound`
-sagt in seinem eigenen Docstring, dass eine `ItemSummary`-Feldsatz-Änderung **Nikinger-Sache und
-kein stiller Nebeneffekt** ist. Also gemessen statt erhöht: **16.390 B** mit Feld gegen **16.300 B**
-ohne, exakt **+16 B/Item** (`"assignee": "",`). Band 12–16 KB → **13–18 KB**, mit ungefähr
-gleicher Marge. Der Test hat die echte Zunahme bemerkt, statt eine Toleranz zu schlucken.
+Lösung ohne Produktänderung: eigenes Harness mit selbstsigniertem Zertifikat für `IP:127.0.0.1`
+und einem Launcher, der **dieselbe** App baut wie `serve.py`, nur mit `ssl_keyfile`. `serve.py`
+selbst bleibt unberührt — einen Produktparameter nur für einen Testharness zu ergänzen wäre die
+Scope-Ausweitung, die P9-K gerade vermeiden soll. Damit laufen **alle drei** CSRF-Schichten
+normal, und der 14/14-Lauf ist ein echter Klick, kein nachgespielter Request.
 
-Eine eigene Fehlannahme unterwegs: ich hatte `400` für einen Validierungsfehler erwartet, die API
-liefert `422` (`errors.py:50`). Der Code hatte recht, mein Test nicht.
-
-### V161: mit einem synthetischen Vorabwert beantwortet, P9-43 bleibt beim Nikinger
-
-`rebuild_index()` über 500/1500/3000 Items in `tmp_path`: **2,45 / 2,48 / 4,01 ms pro Item** —
-bis 1500 linear, bei 3000 etwas schlechter. Der echte `DATA_ROOT` (nur gelesen) hat **153 Items**
-außerhalb `_archive`, 197 mit: **0,4–0,6 s** einmalige Startkosten beim Schema-Sprung 3 → 4.
-Das ist der Vorabwert, den die Plan-Session brauchte; **P9-43 bleibt die Messung am echten
-`DATA_ROOT` beim Deploy**, denn ein `rebuild_index()` dort ist ein Schreibzugriff auf Produktivdaten.
+**Ein Werkzeug, das sich selbst widersprach:** die Sichtprüfung meldete den gesperrten „Löschen"-
+Knopf als *aktiv*. `is_disabled()` sagt `True`, `app.css:278` stylt `:disabled` mit
+`cursor: not-allowed`. Das ist genau die Grenze aus
+`docs/concepts/sichtpruefung_automation_tooling.md` (Zustands- und Detailaussagen eines VLM sind
+unbrauchbar). Darum pinnt jetzt ein **Test die Regel** statt dass ich dem Bild glaube.
 
 ### Was gemessen wurde
 
 | Gegenstand | Nachweis |
 |---|---|
-| **Enge Probe §8.7** | `git diff --stat -- phase1_storage/storage` = **genau drei Dateien**; die sechs Hartpfade `acl.py`/`linkscan.py`/`patch.py`/`files.py`/`history.py`/`frontmatter.py` leer |
-| **Gegenprobe** | vier Verstöße eingebaut (F10 raus, F11 raus, Version zurück auf 3, F6 ohne `if`) → **10 Tests rot**, exakt die zuständigen; danach zurückgebaut |
-| **`doing` in der Oberfläche** | **V159 gemessen, nicht geglaubt**: `editor.js:246` liest `state.meta.status_values[itemType]` und rendert rohe Werte — `doing` erscheint im Editor-Dropdown ohne JS-Änderung. Die Plan-Behauptung zu `dialogs.js:323` ist **halb richtig**: dort iteriert `Object.keys(state.meta.status_values)`, also das **Typ**-Vokabular, und der Anlegen-Dialog hat gar keinen Status-Knopf (`createStatus` existiert nicht) — für ihn ist die Aussage gegenstandslos |
-| **Tests** | `pytest` **1039 → 1062** in 186,8 s (23 neu: 17 `test_step_f_schema.py`, 4 `test_tools.py`, 2 `test_api.py`), davon 191 in `phase1_storage`; `ui_budget` 5/5; `doc_health.py` 0 Befunde; `node --check` über alle 13 JS-Dateien grün (keine JS-Datei geändert) |
+| **Gegenprobe** | vier Verstöße eingebaut (Trash in den Space, `index.delete_item` raus, Server-Gate raus, Kleinschreibungs-Toleranz) → **11 Tests rot** über beide Schichten, danach zurückgebaut |
+| **Browser** | `p9_step_g_self_check.py`, **14/14**, zwei Läufe hintereinander unabhängig (das Harness säet bei jedem Start neu — ein unsichtbarer Papierkorb lässt sich gerade nicht zurücksetzen, ein zweiter Lauf fände sonst eine leere Liste) · 6 Screenshots `docs/screenshots/p9_step_g_{01..06}_*.png` · Probe `probes/p9_step_g_probe.json` |
+| **Tests** | 13 in `test_step_g_trash.py` (die 7 der Plan-Liste + 6 für gemessene Lücken) + 5 Endpunkt-Tests in `test_api.py`; `pytest` 1062 → **1078** in 190 s, `ui_budget` 5/5 (151,5 KB, +2,5 KB für Dialog/CSS/Icon), `doc_health` 0, `node --check` über alle 13 JS-Dateien grün |
+| **P1-Tabu** | nur `phase1_storage/storage/store.py` berührt (keine zweite P1-Datei, weil der Punkt-Ort die Änderung in `index.py`/`files.py` überflüssig macht) |
+| **Hard Rule 9** | beide Wegwerf-Instanzen ausschließlich über ihre PID-Datei gestoppt, kein `pkill -f`, kein `systemctl`; `sharefyx-mcp` nur gelesen (PID 1033, unverändert) |
 
 ### Nächster Schritt
 
-**Zwei Kandidaten, und sie sind nicht gleichwertig:**
+**Step H** (`fastmcp` 3.4.4 → 3.4.7) ist der letzte Code-Step und der kleinste: eine
+Versionsnummer plus ein Test. **V163** ist die einzige offene Frage dort, und sie ist in der
+Planungssession schon beantwortet worden — der 3.4.7-Fix betrifft `OAuthProxy`/`private_key_jwt`,
+dieses Projekt nutzt einen eigenen `BearerAuthASGI`, der Bump ist also Hygiene, kein
+Sicherheitsbedarf. Wer H zieht, sollte das als **einen** Commit tun und den Lock P9-R
+(`fastmcp` bleibt auf 3.4.x) **nicht** antasten: FastMCP 4 bleibt V79 und eine eigene Mini-Phase.
 
-1. **Warten auf die Domain** (A5 → A4 → A7 → A8), sobald `eurofyx.<tld>` registriert ist. Die
-   Kette ist unberührt und der Nikinger hatte sie zuletzt in der Hand.
-2. **Step G** (Löschen nach `_trash/`, P9-I/J/K) — der andere reine Code-Step. **Achtung, die
-   Reihenfolge ist nicht beliebig:** §8.7 warnt ausdrücklich davor, F und G zu vermischen, weil
-   G `store.py` erneut anfasst (`Store.trash()`); der enge Diff gegen **diesen** Commit bleibt
-   sauber, solange G ein eigener Commit ist. **V160-analoge Frage für G:** `delete` für
-   wen sichtbar? Der Plan sagt human-only und für Nutzer unsichtbar, das wäre also geklärt.
+**Offen und bewusst nicht gebaut:** V162 (wächst `._trash/` messbar — die Menge im Harness ist
+kein Messwert für den echten `DATA_ROOT`), die Räumung von `._trash/` (P10-Liste), und die
+Asset-Dateien eines gelöschten Items bleiben unerreichbar unter `<space>/_assets/<item_id>/`
+liegen — bewusst, sonst würde aus einer atomaren Operation eine halbe.

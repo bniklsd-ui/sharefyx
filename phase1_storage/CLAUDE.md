@@ -132,6 +132,16 @@ korrekte Bedeutung von „0 Tests", kein Fehlerzustand.
 
 ## Geerbte Contracts
 
+> **[2026-09-30, benannt statt versteckt (P8-P)]** Diese Datei steht bei **42.638 B** und damit
+> **1.678 B über dem 40-KiB-Softcap** — verursacht von den P9-Einträgen (F + G, zusammen ~4,3 KB),
+> nicht von einem Versehen. Siehe `docs/INDEX.md` (gleiche Meldung, `doc_health.py` prüft sie).
+> **Die Lösung ist eine Rotation, kein weiteres Kürzen:** neun Contract-Öffnungen an einem Ort sind
+> die Ursache, und die zwei ältesten (P2/P6) sind längst geschlossen und stehen in
+> `SESSIONS_ARCHIVE.md`. Das gehört in Step Z (P9-L) — dieselbe Art Arbeit wie die
+> `docs/INDEX.md`-Rotation. **Bis dahin wird hier nichts gestrichen, was eine Zusicherung über den
+> Contract entfernt.**
+
+
 Keine — dies ist die erste Phase. **Die in Plan §1/§2 definierten Frontmatter-Felder und
 Store-Signaturen werden mit Abschluss dieser Phase zum Contract für P2.** Eine Änderung daran
 nach Phasenabschluss ist eine Scope-Änderung und braucht eine Entscheidung, kein Refactoring.
@@ -377,42 +387,67 @@ eine neue, benannte Öffnung mit eigenem Absatz hier, kein stiller Anbau.
 **[2026-09-30, P9 Step F] Neunte, benannte P1-Contract-Öffnung gebaut** — angekündigt am
 2026-09-19 mit Plan und Datum (P9-G, `docs/concepts/phase9_hardening_plan.md` §8), also
 **abgearbeitet, nicht entdeckt**. Umfang am Diff gemessen: **18 Hunks in genau drei Dateien**
-(`models.py` 4, `store.py` 8, `index.py` 6) — die enge Probe des Plans (§8.7) ist erfüllt,
-`acl.py`/`linkscan.py`/`patch.py`/`files.py`/`history.py`/`frontmatter.py` unberührt.
+(`models.py` 4, `store.py` 8, `index.py` 6) — die enge Probe §8.7 erfüllt, die sechs Hartpfade
+`acl/linkscan/patch/files/history/frontmatter` unberührt.
 - `models.py`: `STATUS_VALUES["task"]` → `{open, doing, done, archived}`, **`note` bleibt
   `{active, archived}`** (eine Notiz kennt keine Arbeit); `Item`/`ItemSummary` bekommen
   `assignee: str = ""`.
-- `store.py`: `"assignee"` in `_KNOWN_FIELDS` (sonst `Item.extra`); `create()` poppt und
-  reicht durch; `_item_to_text()` schreibt **nur bei nicht-leer** (Muster `visibility`/
-  `share_*` — sonst bekäme jeder Altbestand-Item ein stilles `assignee: ""`); neu
-  `_coerce_assignee()`.
+- `store.py`: `"assignee"` in `_KNOWN_FIELDS` (sonst `Item.extra`); `create()` poppt und reicht
+  durch; `_item_to_text()` schreibt **nur bei nicht-leer** (Muster `visibility`/`share_*` — sonst
+  bekäme jeder Altbestand-Item ein stilles `assignee: ""`); neu `_coerce_assignee()`.
 - `index.py`: Spalte `assignee TEXT NOT NULL DEFAULT ''`, `INDEX_SCHEMA_VERSION` **3 → 4**,
   `row_from_file()` plus **alle drei** Statement-Teile von `_upsert_no_commit()`. **Keine
-  Migration** — `connect()` verwirft einen Index mit abweichender `user_version`, `Store.__init__`
-  ruft `rebuild_index()`. Hard Rule 2 in Aktion, und der Grund, warum diese Öffnung billig ist.
+  Migration** — `connect()` verwirft einen Index mit abweichender `user_version`,
+  `Store.__init__` ruft `rebuild_index()`. Hard Rule 2 in Aktion, und der Grund, warum diese
+  Öffnung billig ist.
 
 **V160 (2026-09-30, Nikinger): `assignee` ist ein Space-Name, ohne Validierung** — eine Prüfung
 gegen die Space-Liste wäre eine **zweite**, nicht angekündigte Öffnung (der Schreibpfad müsste
-den Space auflösen, mit dem ein Item in einem fremden Space belegt sein könnte). Ein toter
-Space-Name ist ein Anzeigefehler, ein *erfundener* Zweiter Space wäre es nicht.
+den Space auflösen, mit dem ein Item in einem fremden Space belegt sein könnte).
 
-**Drei Stellen, die der Plan nicht nannte und ohne die es nicht funktioniert hätte** (gemessen,
-`phase9_hardening/tests/test_step_f_schema.py`): `store._summary()` **F10** (sonst stünde in jeder
-Trefferliste dauerhaft `""`, während `get()` den echten Wert liefert — F3 wäre ein totes Feld),
-`store.update()` **F11** (sonst wandert der Wert über den `else`-Zweig nach `Item.extra`: er
-landete **trotzdem** in der Datei, `item.assignee` bliebe auf `""` und F6 feuerte nie — der am
-leichtesten übersehene Fall, weil „es funktioniert" hier kein Beweis ist), und die Typprüfung in
-einem Helper statt in drei Adaptern.
+**Drei Stellen, die der Plan nicht nannte und ohne die es nicht funktioniert hätte:** `_summary()`
+(**F10** — ohne sie stünde in jeder Trefferliste dauerhaft `""`, F3 wäre ein totes Feld),
+`update()` (**F11** — ohne sie wanderte der Wert über den `else`-Zweig nach `Item.extra`: er landete
+**trotzdem** in der Datei, `item.assignee` bliebe auf `""` und F6 feuerte nie; der am leichtesten
+übersehene Fall, weil „es funktioniert" hier kein Beweis ist) und `_coerce_assignee()` (Typprüfung
+einmal im Kern statt in drei Adaptern).
 
 23 neue Tests (17 `test_step_f_schema.py`, 4 `test_tools.py`, 2 `test_api.py`), `pytest`
-1039 → **1062** (191 in diesem Paket). **Zwei Alt-Tests mussten mitgezogen werden, beide mit
-Begründung im Code:** `test_index.py::test_upsert_get_delete_roundtrip` (handgebaute Zeile ohne
-den neuen Key — benannte Parameter schlagen **laut** fehl, was richtig ist; der Test trägt ihn
-jetzt und prüft zusätzlich den `ON CONFLICT`-Zweig) und
-`test_store.py::test_search_listing_of_30_items_stays_within_calibrated_json_bound`, dessen
-Docstring eine `ItemSummary`-Feldsatz-Änderung ausdrücklich für **nicht still** erklärt: neue
-Messung **16.390 B** gegen 16.300 B ohne das Feld (exakt +16 B/Item), Band 12–16 KB → **13–18 KB**
-mit der alten Marge.
+1039 → **1062**. **Zwei Alt-Tests mussten mitgezogen werden:** `test_index.py::
+test_upsert_get_delete_roundtrip` (handgebaute Zeile ohne den neuen Key — benannte Parameter
+schlagen **laut** fehl, was richtig ist) und der kalibrierte JSON-Bound, dessen Docstring eine
+`ItemSummary`-Feldsatz-Änderung ausdrücklich für **nicht still** erklärt: gemessen **16.390 B**
+gegen 16.300 B ohne das Feld (+16 B/Item), Band 12–16 KB → **13–18 KB** mit der alten Marge.
+
+**Nicht in `storage/` behobener Befund:** `_BUCKETS` (`webui/api.py`) kennt `doing` nicht, und
+`bucketFor()` vergleicht exakt — eine `doing`-Aufgabe fällt durch alle vier Eimer. Beide
+Fix-Kandidaten sind Darstellungsentscheidungen und stehen als P10-Posten in
+`docs/concepts/phase9_hardening_plan.md` §15; ein Wächter pinnt den Befund. Steht hier nur als
+Eintrag, der **keinen** `storage/`-Code betrifft — die Herleitung wäre sonst an vier Stellen.
+
+**[2026-09-30, P9 Step G] `Store.trash(item_id, *, version) -> None` — Löschen ist Verschieben,
+kein `unlink`.** `version` ist **Pflicht** (Hard Rule 3). Ablauf wie `archive()`: beide Sperren →
+`_reconcile_and_get_row` → Versionsprüfung → `files.move_file()` (`os.replace` + fsync auf Quelle
+**und** Ziel) → `index.delete_item()` → Git-Commit `trash`. Autorisierung passiert **nicht** im
+Store, wie überall — der Aufrufer prüft sie vorher (`webui/api.py :: _items_delete`, P9-K: nur
+eigene Items).
+
+**Ziel ist `DATA_ROOT/._trash/<space>/` (neue Modulkonstante `TRASH_DIR`) — gemessen, nicht
+gewählt.** `rebuild_index()` rglobbt **ohne Skip** und `list_spaces()` führt jedes Nicht-Punkt-
+Verzeichnis unter `DATA_ROOT` als Space: der im P9-Plan vorgesehene Ort **im** Space
+(`<space>/_trash/`) ließ das gelöschte Item beim nächsten Neuaufbau **wieder auftauchen**
+(`folder="_trash"`) und erzeugte zusätzlich einen **Phantom-Space** `['_trash', 'sp']`. Der
+Punkt-Präfix auf `DATA_ROOT`-Ebene wird von beiden Scans bereits übersprungen (auch nach
+`rebuild_index()` leer). So bleibt der P1-Fußabdruck **eine Datei**; die Alternative hätte
+`index.py` **und** `files.py` gebraucht, also eine **zehnte** Öffnung ohne Ankündigung.
+
+**Ausgehende `item_links` werden mitgeräumt, eingehende nicht** — `delete_item()` löscht nur
+Zeilen mit dieser `src_id`; eine dangling `dst_id`-Zeile bleibt stehen und wird von `_graph_get`
+weggefiltert (dort müssen **beide** Endpunkte in der sichtbaren Knotenmenge sein). Die
+**Asset-Dateien** des Items wandern bewusst **nicht** mit — sie bleiben unerreichbar unter
+`<space>/_assets/<item_id>/`, weil ein zweiter Move aus einer atomaren Operation zwei halbe
+machte. Herleitung und Browserbeleg: `phase9_hardening/CLAUDE.md` (Block 2026-09-30) und die
+datierte Korrekturnotiz in `docs/concepts/phase9_hardening_plan.md` §9.
 
 **Ein hier NICHT behobener Befund:** `_BUCKETS` (`phase5_ui/webui/api.py`, außerhalb dieses
 Pakets) kennt `doing` nicht, `bucketFor()` vergleicht exakt — eine `doing`-Aufgabe fällt durch
