@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase3_edge_plan.md          # voller Plan, Entscheidungen P3-A–P3-N, Steps 0–7
   - ../docs/concepts/PHASE2_CLOSEOUT_HANDOVER.md  # Herkunft der offenen Entscheidungen 1–8
   - SESSIONS_ARCHIVE.md                            # ältere Session-Blöcke, newest-first
-updated: 2026-09-29 (P9 Step A: neue Unit `systemd/sharefyx-tail-proxy.service` — socat-Relay von der Tailnet-IP auf 127.0.0.1:8765, weil der künftige TLS-Terminator auf dem VPS sonst nichts zu proxen findet; P3-B unberührt, `install_units.sh` bewusst nicht erweitert, 7 Wächter in `phase9_hardening/tests/test_tail_proxy.py`, **Installation offen** — Nikinger-Schritt) | 2026-09-18 (Tailscale-Account-Migration hat den Funnel zerstört — Tailnet-Suffix
+updated: 2026-09-30 (P9 Step A: `sharefyx-tail-proxy.service` ist **installiert und laeuft** — socat 1.8.0.0, zwei Listener, `diagnose.sh` unveraendert gruen inklusive des oeffentlichen Pfads; korrigiert die 2026-09-29-Notiz, die noch von einer offenen Installation sprach) | 2026-09-29 (P9 Step A: neue Unit `systemd/sharefyx-tail-proxy.service` — socat-Relay von der Tailnet-IP auf 127.0.0.1:8765, weil der künftige TLS-Terminator auf dem VPS sonst nichts zu proxen findet; P3-B unberührt, `install_units.sh` bewusst nicht erweitert, 7 Wächter in `phase9_hardening/tests/test_tail_proxy.py`, **Installation offen** — Nikinger-Schritt) | 2026-09-18 (Tailscale-Account-Migration hat den Funnel zerstört — Tailnet-Suffix
 `tail89fc2a.ts.net` → `tail4a8b49.ts.net`, zweiteiliger Fix + ein neu entdeckter Fallstrick,
 siehe Runbook-Ergänzung unten. Neue öffentliche URL:
 `https://savefyx-vmware-virtual-platform.tail4a8b49.ts.net`)
@@ -100,8 +100,11 @@ gar nicht erst — dort zeigte der Watchdog-Pfad auf ein Release, das die Datei 
 `install_units.sh` wurde deshalb **nicht** erweitert; installiert wird per
 `sudo install -m 0644` (Runbook: `phase9_hardening/step_a/RUNBOOK_STEP_A.md` §2 A0b).
 Wächter: `phase9_hardening/tests/test_tail_proxy.py` (7, inkl. „Härtung identisch mit der
-MCP-Unit"). **Die Installation ist ein Nikinger-Schritt — bisher ist auf der VM nichts
-installiert und der Dienst läuft nicht.**
+MCP-Unit"). **Installiert und laufend seit 2026-09-30** (`socat` 1.8.0.0, MainPID 362706,
+zwei Listener `127.0.0.1:8765` + `100.93.43.122:8765`, `diagnose.sh` danach unverändert grün
+inklusive des öffentlichen Pfads — die Bestandspfade sind unberührt). **[Korrektur an der
+Zeile von 2026-09-29: sie stand hier auf „Installation ist ein Nikinger-Schritt, bisher ist
+nichts installiert" — das ist seit dem 30.09. überholt, die Unit läuft.]**
 
 **[2026-07-29 Korrektur, P4 Step 7]:** Zeile 5 nennt „systemd-Units" — `sharefyx-mcp.service`
 ist davon inzwischen nicht mehr eine. Die MCP-Unit zog nach `phase4_auth/systemd/` um (Plan §5

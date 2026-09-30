@@ -5,7 +5,7 @@ read-when: Chronik einer älteren P9-Session gesucht — nicht beim normalen Arb
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
+updated: 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
 ---
 
 # Phase 9 — Sessions Archive
@@ -15,6 +15,130 @@ trägt immer genau einen `## Session stopped`-Block, ältere Blöcke wandern ver
 Vorsatz: nichts abtippen, alles per Skript mit vier Gegenproben (Schnitt verlustfrei, neuer
 Head trägt genau einen Block, alle bewegten Blöcke im Archiv byte-identisch, Archivbestand
 unangetastet).
+
+## Session stopped — 2026-09-29
+
+**Step A: der M3-Anteil ist gebaut, ausgeführt wird er vom Nikinger.** Kein Produktcode
+berührt, kein Service-Touch, `pytest` grün, Tabu-Bereichs-Diff leer (Hard Rule 9 durchgehend:
+kein `systemctl` von mir, nur `ss`/`tailscale status` als lesende Messung).
+
+**Erste Handlung dieser Session war eine Rückfrage, kein Code.** Die Notiz aus der letzten
+Runde lautete „Schritt f — die feste Domain". Der Plan trägt **A** = Domain (§3) und **F** =
+Schema `doing`/`assignee` (§8) — zwei völlig verschiedene Arbeiten. Bevor ich etwas baue, wurde
+gemessen, ob der Vorlauf von Step A überhaupt stattgefunden hat: `tailscale status` zeigt sieben
+Nodes, **keiner ist ein Terminator**; `phase3_edge/local.env` trägt `PUBLIC_BASE_URL` und
+`ALLOWED_HOSTS` weiter auf `…tail4a8b49.ts.net`. Der Vorlauf fehlt also, und der Plan sagt
+ausdrücklich, dass Beschaffung **kein** Agenten-Auftrag ist. Nikinger-Antwort: **Step A,
+mein Anteil vorbereiten.**
+
+### Der Befund, der die Bauform gerettet hat
+
+**Plan §3.2 A4 ist unbaubar, und zwar nicht wegen einer Kleinigkeit.** Die Anweisung lautet
+`reverse_proxy <heimvm-tailnet-name>:<port>`. Gemessen:
+
+- `phase4_auth/systemd/sharefyx-mcp.service:13` — `Environment=SPACE_HOST=127.0.0.1`
+- `ss -ltnp` — `LISTEN 127.0.0.1:8765` und **kein** Listener auf `100.93.43.122:8765`
+- `tailscale serve status` — der Funnel proxyt auf `http://127.0.0.1:8765`; er funktioniert
+  genau deshalb, weil `tailscaled` auf derselben Maschine in die Schleife connectet
+
+Auf der Tailnet-Adresse gibt es nichts, womit ein VPS sich verbinden könnte. Die naheliegende
+Reparatur — `SPACE_HOST=0.0.0.0` — ist die **gelockte P3-B-Entscheidung** („wird nie
+`0.0.0.0`", gilt am Host, nicht nur am Router). Sie zu brechen, um einen Proxy zu retten,
+wäre genau die stille Abweichung, die P8.6 zweimal gekostet hat.
+
+**Gebaut: ein Relay, das die eine Lücke schließt, ohne P3-B zu brechen.**
+`phase3_edge/systemd/sharefyx-tail-proxy.service` macht `100.93.43.122:8765 → 127.0.0.1:8765`
+mit `socat`; die App bindet unverändert auf Loopback. Bewusst **ohne** `__REPO_ROOT__` im
+`ExecStart` — genau damit ist die Kopplung konstruktiv ausgeschlossen, die beim Watchdog zum
+Befund wurde (dort zeigte `ExecStart` auf ein Release, das die Datei nicht enthält,
+Session-Block 2026-09-28). `install_units.sh` wurde dafür **nicht** angefasst: das ist
+P3-Code, und der Commit bleibt additiv; das Runbook installiert die Unit mit
+`sudo install -m 0644`.
+
+**Die Alternative wurde nicht aus Bequemlichkeit verworfen.** Tailscale **1.102.4** kann
+`tailscale serve --tcp` (gemessen an `serve --help`) — kein zusätzlicher Prozess, der
+elegantere Weg. Ob Tailscale-TCP-Forwarder die Tailnet-ACLs durchsetzen, war in dieser
+Session **nicht verifizierbar** (kein Netzzugriff: `tailscale.com` per DNS nicht auflösbar,
+Suchprovider leer). Eine offene Frage darf nicht die Grundlage einer Firewall-Entscheidung
+sein → der Relay ist ein gewöhnlicher Listener auf `tailscale0`, für den das ACL-Modell ohne
+Zusatzannahme gilt. Als **V162** offen notiert, mit der Frage und wo sie zu beantworten ist.
+
+### Vier weitere Befunde, alle mit Fundstelle
+
+1. **Die Health-Route heißt `/health`, nicht `/healthz`.** `app.py:216` registriert genau
+   eine. Plan §3.4 (P9-10) nennt den falschen Pfad — Abnahmezeile mit datierter Korrektur.
+2. **`ALLOWED_HOSTS` fehlt in Plan-A7.** Caddy reicht den Host-Header durch, die
+   `TrustedHostMiddleware` (`app.py:214`) antwortet sonst auf **jede** Anfrage mit
+   `400 Invalid host header`. Keine Theorie: der Live-Incident vom 2026-09-18 war genau das.
+3. **V149 beantwortet:** `AuthSettings.issuer` **ist** `base_url` **ist**
+   `SPACE_PUBLIC_BASE_URL` (`config.py:45`), `metadata.py:24-29` leitet vier Felder daraus ab,
+   `resource` ebenso, und `allowed_redirect_origins` hat einen eigenen Default — die
+   Redirect-URIs der Claude-Clients bleiben also unberührt. **Kein Feld steht fest.** A7 ist
+   damit eine Handvoll Env-Werte; die §3.3-Falle bleibt trotzdem real, weil der `iss` Teil der
+   Client-Registrierung ist (RFC 9207, `routes.py:154`) → **A7 vor A8**. Und: es gibt
+   **nirgends** eine `iss`-Prüfung beim Einlösen (`resolver.py` enthält kein `iss`) — der
+   Wechsel invalidiert keine bestehende Token-Familie.
+4. **Der Funnel bleibt nach A7 lesbar, aber nicht beschreibbar.** `security.py:84` prüft
+   `origin != settings.base_url` **exakt**. Nach A7 schickt ein Browser am alten
+   Funnel-Host `Origin: …ts.net` → jeder Schreibvorgang 403, GETs laufen. Das ist die
+   Präzisierung, die P9-14 braucht. Ein echter Dual-Betrieb bräuchte eine zweite erlaubte
+   Origin im Code, `UiSettings` hat genau ein `base_url`-Feld — **das wird nicht gebaut**
+   (außerhalb Step A). Der Funnel ist der Rückfallweg für „VPS weg"; Lesen und ein
+   intakter Connector reichen dafür.
+
+### Tests
+
+`phase9_hardening/tests/test_tail_proxy.py`, 7 Wächter: Ziel bleibt Loopback · Bind ist eine
+Tailnet-IP und nicht `0.0.0.0` · Härtungs-Direktiven **identisch mit der MCP-Unit** (die
+Behauptung aus dem Step-B-Block wird hier gemessen statt geglaubt) · kein Repo-Pfad im
+`ExecStart` · Port identisch mit `SPACE_PORT` · Health-Routen-Korrektur hält · ACL-Entwurf
+fail-closed (genau eine Regel, genau ein Port, genau eine Adresse).
+
+**Gegenprobe:** vier Verstöße eingebaut (`TAILNET_ADDR=0.0.0.0`, `APP_ADDR=0.0.0.0`,
+`ProtectSystem=false`, `APP_PORT=9999`) → **4 von 7 rot, exakt die vier dafür zuständigen**;
+nach dem Zurücksetzen 7/7 grün. Ein Wächter, der bei einem eingebauten Verstoß grün bleibt,
+ist eine Behauptung.
+
+### Vier eigene Fehler, alle vor dem Commit behoben
+
+1. `_env_value` verglich gegen `^NAME=` und vergaß das `Environment=`-Präfix — **drei** Tests
+   schlugen aus einem Grund rot, den sie nicht prüfen sollten.
+2. `addr in ip_address("100.64.0.0/10")` — ein Netz ist keine Adresse, `ValueError` statt
+   Aussage. `ip_network` ist die richtige Funktion.
+3. Der `/healthz`-Wächter schlug an einem **eigenen Kommentar** an, der die Korrektur
+   erklärt. Dieselbe Klasse wie in Step E (`test_graph_module_does_not_touch_the_api_
+   contract`): ein Kommentar darf eine Route nennen, eine Anweisung nicht — der Wächter
+   prüft jetzt nur die Nicht-Kommentar-Zeilen.
+4. In den ACL-Entwurf rutschten zwei chinesische Zeichen (`古典`) in einen Nebensatz. Der
+   Absatz ist ersetzt, JSON parsebar geprüft, die Datei auf Zeichen außerhalb des
+   lateinischen/typografischen Bereichs geprüft.
+
+### Selbstprüfung §0.4
+
+1. `pytest -q` → siehe Commit-Body (Baseline 1031 + 7 aus diesem Commit).
+2. `ui_budget` **nicht nötig** — `phase5_ui/webui/static/**` unberührt.
+3. `node --check` **nicht nötig** — keine JS-Datei berührt.
+4. Tabu-Bereichs-Diff leer für `permissions.py`, `server.py`, `authserver/`, `phase6_shares`,
+   `phase7_spaces_admin` (Bereichs-Diff, nicht Working-Tree).
+5. Doc-Update im selben Commit: dieser Block, Modulstatus, Rotation, INDEX-Zeile,
+   `phase3_edge/CLAUDE.md`-Notiz (die neue Unit liegt in dessen Verzeichnis).
+6. Kein Service-Touch. `sharefyx-mcp` nur **gelesen** (`ss`, `tailscale status`); die
+   Live-Unit wurde nicht angefasst, kein `pkill -f`, kein `systemctl`.
+
+### Nächster Schritt — beim Nikinger, nicht bei mir
+
+**A1 (Domain) und A2 (VPS) sind Beschaffung und ausdrücklich kein Agenten-Auftrag.** Danach
+läuft die Kette, ein Schritt pro Runde: **A3** (VPS ins Tailnet + ACL-Fragment) → **A0b**
+(`socat` + Relay, sonst geht A4 nicht) → **A5** (DNS-A-Record) → **A4** (Caddy) → **A6**
+(Firewall) → **A7** (Basis-URL + `ALLOWED_HOSTS`) → **A8** (Connector in beiden Konten, echter
+`list_spaces`) → **A9** (Rückfall, Inhalt steht im Runbook) → P9-10–P9-15.
+
+**Offen für den Nikinger, drei Entscheidungen:** (1) **A6-SSH** — die Firewall-Anweisung
+lässt 22 bewusst zu; wer die Kiste nicht nur über Tailscale erreichbar haben will, entscheidet
+das. (2) **Befund 5** — ob der Funnel nach A7 als **Lese**-Fallback genügt (Empfehlung) oder
+ob ein echter Dual-Betrieb gewünscht ist (dann ist das eine Codeänderung, die außerhalb
+Step A liegt und eine eigene Entscheidung braucht). (3) **`assignee`** (V160) für Step F —
+unabhängig von A, aber es ist die einzige Frage, die F vor dem Bauen braucht.
 
 ## Session stopped — 2026-09-28
 
