@@ -200,6 +200,14 @@ P3-Eigentum, das Tailnet zu betreiben — dasselbe Muster wie der Watchdog aus S
 
 ---
 
+**Stand 2026-09-30 (Session-Verlauf, damit ein kalter Leser nicht bei null startet):**
+A1 ✅ Domain `eurofyx.<tld>` bestellt, TLD-Entscheidung `.com` empfohlen · A2 ✅ VPS
+`217.160.128.146`, Ubuntu 24.04.5, 1 vCPU/2 GB · A3 ✅ Policy (`tagOwners` + Grant
+`tag:sharefyx-edge` → `100.93.43.122`, `tcp:8765`) und Beitritt mit
+`--advertise-tags` erledigt · **A5 wartet** auf die Domain-Registrierung (A-Record kann erst
+mit Zone) · **als Nächstes A0b** (socat + Relay) — danach erst A4/A6, weil A4 ohne Relay nichts
+zu proxen findet. Ab A7 hängt die Reihenfolge: **A7 vor A8**.
+
 ## §2 Die Schritte
 
 Jeder Schritt: **Ziel · was du tippst · was ich erwarte.** „Was ich erwarte" ist die
