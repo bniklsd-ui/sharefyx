@@ -204,7 +204,8 @@ kein Byte.
 Ziel: eine Domain, deren DNS-Zone du erreichst. Technisch relevant ist nur, dass du die
 A-Records selbst setzen kannst (Schritt A5).
 
-- Kauf `eurofyx.de`. **Ausreichend ist jede normale Registrar-Oberfläche.** Praktisch ist
+- **Stand 2026-09-29: bestellt und bezahlt, Registrierung noch nicht abgeschlossen** — A5 ist bis dahin blockiert, A3 und A0b nicht.
+- Kauf `eurofyx.<tld>`. **Ausreichend ist jede normale Registrar-Oberfläche.** Praktisch ist
   derselbe Anbieter wie beim VPS: dann pflegst du den A-Record im selben Panel, in dem auch
   der VPS liegt. Ein Konto, eine Rechnung.
 - **Ausgabe lesen:** welche Zone, welcher Registrar, ist `eurofyx.de` frei?
@@ -312,12 +313,37 @@ sudo systemctl reload caddy                # bzw. restart beim ersten Mal
 
 ### A5 — DNS auf den VPS (du)
 
-Ziel: `A`-Record der Domain auf die öffentliche IPv4 des VPS. **Kein CNAME auf `ts.net`** —
-das ist Lock P9-E und der Grund, warum der Plan diesen Weg verworfen hat (Tailscale Funnel
-bedient nur Namen in der Tailnet-Domain; ein CNAME darauf erzeugt einen TLS-Namens-Mismatch).
+**Ziel-IP steht fest: `217.160.128.146`** (vom Nikinger am 2026-09-29 genannt, gegen die
+tatsächliche Erreichbarkeit geprüft: öffentlich routbar, nicht privat, nicht im
+Tailscale-Bereich `100.64.0.0/10`; Port 22 antwortet, der Server läuft).
+
+Sobald die Zone existiert, **genau ein** Datensatz:
+
+| Feld | Wert |
+|---|---|
+| Typ | `A` |
+| Name/Host | `sharefyx` |
+| Wert | `217.160.128.146` |
+| TTL | Standard / 3600 |
+
+**Kein `AAAA`.** IONOS schreibt dir eine IPv6 hin, die ist aber ein **separater** Datensatz
+und bleibt leer. Zwei Adressen für einen Namen sind zwei Fehlerbilder, und die eine
+Fehlersuche, die wir bei DNS nicht brauchen, ist die mit der zweiten. Kommt eine IPv6
+später zurück, ist das ein eigener, bewusster Schritt.
+
+**Kein CNAME auf `*.ts.net`** — das ist Lock P9-E und der Grund, warum der Plan diesen Weg
+verworfen hat (Tailscale Funnel bedient nur Namen in der Tailnet-Domain; ein CNAME darauf
+erzeugt einen TLS-Namens-Mismatch, weil Funnel per SNI an die Node durchreicht und diese ein
+`*.ts.net`-Zertifikat präsentiert).
 
 - **Ausgabe lesen:** von einem Gerät **ohne** VPN die IP auflösen lassen und die Ausgabe
-  schicken. Auf der sharefyx-VM selbst löst MagicDNS auf — das ist als Prüfung wertlos.
+  schicken. Auf der sharefyx-VM selbst löst MagicDNS auf — das ist als Prüfung wertlos. Der
+  Auflösungsbefehl, mit dem wir in der nächsten Runde prüfen:
+  `dig +short sharefyx.<deine-tld> @1.1.1.1`
+  Erwartet: exakt `217.160.128.146`.
+- **Was dieser A-Record öffentlich macht:** die IP steht ab dann in jedem öffentlichen
+  Resolver. Das ist gewollt — es ist eine öffentliche Adresse. Kein Geheimnis (Hard Rule 1
+  betrifft Tokens und Schlüssel, keine ohnehin auflösbaren IPs).
 
 ### A6 — Firewall am VPS (du; Entwurf von mir)
 
