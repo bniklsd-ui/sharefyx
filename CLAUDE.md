@@ -187,9 +187,15 @@ beiden Blöcken zusätzlich `unit == "tailscaled.service"` und `subject.user == 
 das Attribut, greift die Regel **nicht** und der Watchdog loggt seine vorhandene Zeile —
 sicherheitsseitig der gewünschte Fehlerfall. **Ohne** den Unit-Abgleich hätte `savefyx` das
 Management **aller** Units, auch aus `sharefyx-mcp` heraus; das wäre in einer Härtungsphase eine
-Regressionsstelle und steht deshalb nicht im Repo. **Befund 3: die Probe, die die Restfrage
+**Befund 3 (ausgeführt, Ergebnis da): die Probe, die die Restfrage
 entscheidet, ohne `tailscaled` anzufassen** — `phase9_hardening/step_b/` mit einer Wegwerf-Unit
 (`ExecStart=/bin/true`, dieselbe Härtung) und einer Wegwerf-Regel, die *diese* Unit freigibt.
+Ergebnis: `systemctl restart sharefyx-watchdog-probe.service` → **`AUTORISIERT`**, Journal
+`Starting … Deactivated successfully … Finished` bei `User=root` — ohne polkit hätte `savefyx` diese
+root-Unit nicht starten können, also war polkit das Tor, und **systemd 255.4 schickt das
+`unit`-Detail doch**: die enge Regel trägt. Nebenbefund mit praktischem Wert: eine Verweigerung
+kostet hier **25 s** (kein polkit-Agent, headless → Agent-Timeout), ein künftiges Nichtgreifen der
+Regel zeigt sich also als Hänger, nicht als schnelles „restart fehlgeschlag".
 **Befund 4: die Units sind auf der VM überhaupt nicht installiert** (`ls
 /etc/systemd/system/tailscaled-watchdog.*` → *No such file*, `systemctl list-timers` → 0 Timer;
 der Deploy vom 2026-09-18 liegt vor dem Step-B-Code vom 2026-09-26). **Vier neue Wächter** in

@@ -44,10 +44,13 @@
 // Stoppen **jeder** Unit auf der Maschine geben, auch von `sharefyx-mcp` aus — das
 // ist in einer Härtungsphase eine Regression und wird hier bewusst nicht gebaut.
 //
-// Ob systemd 255 das `unit`-Detail mitschickt, ist unprivilegiert **nicht**
-// auslesbar (`pkcheck` sieht die Aktion gar nicht, sie wird erst zur Laufzeit bei
-// polkitd registriert). Die Probe dafür steht in
-// `phase9_hardening/step_b/RUNBOOK_STEP_B.md` und fasst `tailscaled` nicht an.
+// **B0, gemessen 2026-09-30: die Regel greift.** Die Probe aus
+// `phase9_hardening/step_b/` (Wegwerf-Unit `ExecStart=/bin/true` + eigene Regel,
+// `tailscaled` nicht angefasst) ergab `systemctl restart sharefyx-watchdog-probe.service`
+// → **AUTORISIERT**, mit Journal-Beleg (`Starting … Finished`) bei `User=root` — polkit war
+// also das Tor, und systemd 255.4 schickt das `unit`-Detail tatsächlich mit.
+// Das Gegenstück, eine Unit, die diese Regel **nicht** nennt, wurde verweigert.
+// Die Details: `phase9_hardening/step_b/RUNBOOK_STEP_B.md` §0 Befund 5 und §2 B0.
 //
 polkit.addRule(function (action, subject) {
     if (action.id !== "org.freedesktop.systemd1.manage-units") {

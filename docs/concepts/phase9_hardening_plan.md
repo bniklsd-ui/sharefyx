@@ -453,13 +453,18 @@ geschnittene Polkit-Regel oder ein `sudoers`-Fragment mit genau diesem einen Bef
 > **ohne** Unit-Abgleich würde `savefyx` das Management **aller** Units geben, auch aus
 > `sharefyx-mcp` heraus; das ist in einer Härtungsphase eine Regression und wird nicht gebaut.
 >
-> **Die offene Restfrage ist billig entscheidbar und deshalb nicht offen gelassen:** ob systemd 255
-> das `unit`-Attribut mitschickt, ist unprivilegiert nicht auslesbar (`pkcheck` kennt die Aktion
-> nicht — sie wird erst zur Laufzeit bei polkitd registriert). Dafür liegt eine Probe, die
-> `tailscaled` **nicht** anfasst: `phase9_hardening/step_b/` installiert eine Wegwerf-Unit
-> (`ExecStart=/bin/true`) und eine Wegwerf-Regel, die *diese* Unit freigibt. `systemctl restart`
-> darauf ist folgenlos; gelingt er, trägt das Attribut, und die Repo-Regel funktioniert. Ablauf:
-> `phase9_hardening/step_b/RUNBOOK_STEP_B.md` §2 B0–B3.
+> **Die Restfrage ist entschieden (2026-09-30, B0 ausgeführt): die Probe ergab `AUTORISIERT`.**
+> Ob systemd 255 das `unit`-Attribut mitschickt, ist unprivilegiert nicht auslesbar (`pkcheck`
+> kennt die Aktion nicht — sie wird erst zur Laufzeit bei polkitd registriert). Dafür liegt eine
+> Probe, die `tailscaled` **nicht** anfasst: `phase9_hardening/step_b/` installiert eine
+> Wegwerf-Unit (`ExecStart=/bin/true`) und eine Wegwerf-Regel, die *diese* Unit freigibt.
+> Belege: `AUTORISIERT`, Journal `Starting … Deactivated successfully … Finished`, `User=root` —
+> ohne polkit hätte `savefyx` diese root-Unit nicht starten können. **Die Repo-Regel greift damit
+> und bleibt eng.** Nebenbefund mit praktischem Wert: eine **Verweigerung kostet auf dieser VM
+> 25 s** (kein polkit-Agent, headless → Agent-Timeout), gemessen an einer Unit, die die Regel
+> nicht nennt — ein künftiges Nichtgreifen der Regel zeigt sich also im Journal als Hänger, nicht
+> als schnelles „restart fehlgeschlag". Ablauf samt C0-Gegenprobe:
+> `phase9_hardening/step_b/RUNBOOK_STEP_B.md` §2 B0–C0, B3.
 >
 > Vier neue Wächter in `phase9_hardening/tests/test_tailscaled_watchdog.py` (9/9 grün,
 > Gegenprobe mit vier eingebauten Verstößen → 6 rote Assertions): Form jedes Blocks
@@ -1204,7 +1209,7 @@ schneiden und vorher die Trefferzahl prüfen. Der Fehler hätte einmal 66 KB ent
 | V150 | Hält der Anthropic-Connector unter der neuen Domain, in **beiden** Konten? | A |
 | V151 | Latenz über den VPS gegenüber 372,9 ms über Funnel? | A |
 | V152 | Gibt es ein Tailscale-eigenes Watchdog-Feature ohne kommerzielles Add-on? | B |
-| V153 | Polkit-Regel oder `sudoers`-Fragment für den einen `restart`-Aufruf? | B | **beantwortet 2026-09-30: polkit, und `sudoers` ist nachweislich ausgeschlossen** — die Unit setzt `NoNewPrivileges=true`, sudo scheitert darunter an `no_new_privs` (gemessen mit `setpriv`). **Aber:** `systemd 255.4` kennt nur die grobe Aktion `org.freedesktop.systemd1.manage-units` (man `org.freedesktop.systemd1(5)`, *Security*), ein `<defaults>`-Eintrag kann deshalb nicht nach Unit filtern. Gebaut ist eine JS-Regel, die zusätzlich `action.lookup("unit") == "tailscaled.service"` **und** `subject.user == "savefyx"` verlangt. Ob systemd 255 das Attribut mitschickt, entscheidet die **V153-Probe** in `phase9_hardening/step_b/` (fasst `tailscaled` nicht an). s. §4.2 |
+| V153 | Polkit-Regel oder `sudoers`-Fragment für den einen `restart`-Aufruf? | B | **beantwortet 2026-09-30: polkit, und `sudoers` ist nachweislich ausgeschlossen** — die Unit setzt `NoNewPrivileges=true`, sudo scheitert darunter an `no_new_privs` (gemessen mit `setpriv`). **Aber:** `systemd 255.4` kennt nur die grobe Aktion `org.freedesktop.systemd1.manage-units` (man `org.freedesktop.systemd1(5)`, *Security*), ein `<defaults>`-Eintrag kann deshalb nicht nach Unit filtern. Gebaut ist eine JS-Regel, die zusätzlich `action.lookup("unit") == "tailscaled.service"` **und** `subject.user == "savefyx"` verlangt. Ob systemd 255 das Attribut mitschickt, entscheidet die **V153-Probe** in `phase9_hardening/step_b/` (fasst `tailscaled` nicht an) — **ausgeführt 2026-09-30: `AUTORISIERT`**, Journal-Beleg bei `User=root`, die Regel greift. s. §4.2 |
 | V154 | IOMMU-Zustand des 3060-Hosts — LXC oder volle VM? | C |
 | V155 | Zeilennummern `mcp_local_vision_server.py:223/274` gegen den aktuellen Stand | C |
 | V156 | Bei `qwen3-vl:8b` bleiben oder VRAM-Luft nutzen? | C |

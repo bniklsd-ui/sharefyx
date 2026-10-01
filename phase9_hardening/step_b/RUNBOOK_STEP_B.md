@@ -60,6 +60,42 @@ gebaut. Die Repo-Regel verlangt deshalb zusätzlich `action.lookup("unit") == "t
 — im ungünstigen Fall greift sie nicht und der Watchdog loggt seine vorhandene Fehlerzeile.
 **Welcher der beiden Fälle gilt, entscheidet B0, und B0 fasst `tailscaled` nicht an.**
 
+### Befund 5 — die Probe ist gelaufen: `AUTORISIERT`, und eine Verweigerung kostet 25 Sekunden
+
+**B0 ist ausgeführt (2026-09-30, Belege vom Nikinger):**
+
+```
+$ systemctl restart sharefyx-watchdog-probe.service && echo AUTORISIERT || echo VERWEIGERT
+AUTORISIERT
+
+$ journalctl -u sharefyx-watchdog-probe.service -n 3 --no-pager
+… systemd[1]: Starting sharefyx-watchdog-probe.service - WEGWERF-Probe …
+… systemd[1]: sharefyx-watchdog-probe.service: Deactivated successfully.
+… systemd[1]: Finished sharefyx-watchdog-probe.service - WEGWERF-Probe …
+$ systemctl show -p User sharefyx-watchdog-probe.service
+User=root
+```
+
+`User=root` und ein trotzdem erfolgreicher Restart aus der Hand von `savefyx` heißt: **polkit war
+das Tor**, und `systemd 255.4` schickt das `unit`-Detail an die Aktion. **Die Repo-Regel greift
+und ist eng.** Damit ist V153 vollständig entschieden und B1 kann laufen.
+
+**Zwei Nebenbefunde, die in B3 zählen:**
+
+1. **Eine Verweigerung kostet hier 25 Sekunden, nicht eine Sekunde.** Gegengetest mit einer Unit,
+   die die Regel *nicht* nennt: `systemctl restart sharefyx-watchdog-probe.timer` →
+   `Failed to restart …: Connection timed out`, `rc=1`, **gemessene Dauer 25 s**. Auf dieser VM
+   läuft **kein polkit-Agent** (headless), eine nicht erteilte Autorisierung versucht also erst
+   eine Rückfrage und läuft dann in den Agent-Timeout. Praktische Folge: **sollte die Regel
+   irgendwann nicht mehr greifen, zeigt sich das im Journal als ~25-Sekunden-Hänger und nicht als
+   ein schnelles „restart fehlgeschlag".** Für die Fehlersuche in B3 ist das die Kennzahl.
+2. **Die Gegenprobe ist noch nicht sauber.** Der Test mit der `.timer`-Unit beweist nur, dass die
+   Berechtigung nicht erteilt wurde; *warum* (Regel greift nicht vs. Unit existiert gar nicht —
+   `systemctl is-enabled sharefyx-watchdog-probe.timer` sagt `not-found`) ist damit nicht
+   getrennt. **Die saubere Gegenprobe braucht dein `sudo`** und steht als C0 in §2. Ohne sie bleibt
+   der Schluss „polkit war das Tor" auf dem Journal-Beleg und der `User=root`-Messung — das trägt,
+   aber C0 macht es eindeutig.
+
 ## §1 Was in dieser Runde passiert und was nicht
 
 | | |
@@ -70,7 +106,7 @@ gebaut. Die Repo-Regel verlangt deshalb zusätzlich `action.lookup("unit") == "t
 
 ## §2 Die Schritte
 
-### B0 — Probe: trägt die polkit-Aktion ein `unit`-Attribut? *(du, zwei `sudo`-Befehle)*
+### B0 — Probe: trägt die polkit-Aktion ein `unit`-Attribut? *(✅ gelaufen 2026-09-30 → AUTORISIERT)*
 
 **Ziel:** entscheiden, ob die Repo-Regel überhaupt greifen kann — ohne dass `tailscaled`
 irgendwann neugestartet wird.
@@ -109,7 +145,21 @@ sudo rm -f /etc/systemd/system/sharefyx-watchdog-probe.service \
 sudo systemctl daemon-reload
 ```
 
-### B1 — die echte Regel installieren *(du, nur bei `AUTORISIERT`)*
+### C0 — Gegenprobe: ohne Regel derselbe Befehl *(du, ein `sudo`; optional, aber eindeutig)*
+
+Solange die Probe-Unit installiert ist, lässt sich der Beweis schließen: Regel weg, derselbe
+Befehl, jetzt muss er verweigert werden.
+
+```bash
+sudo rm -f /etc/polkit-1/rules.d/99-tailscaled-watchdog-probe.rules
+systemctl restart sharefyx-watchdog-probe.service; echo "rc=$?"
+```
+
+**Was ich erwarte:** `rc=1`, wiederum nach ~25 s (kein Agent, Befund 5). **Wichtig: nicht auf
+`AUTORISIERT` hoffen** — falls er *doch* autorisiert wird, wäre polkit auf dieser Box nicht die
+Grenze, die wir angenommen haben, und das wäre ein Befund für V153, kein Grund zur Eile.
+
+### ### B1 — die echte Regel installieren *(du, nur bei `AUTORISIERT`)*
 
 ```bash
 sudo install -m 0644 phase3_edge/polkit/49-tailscaled-watchdog-restart.rules \
@@ -224,7 +274,7 @@ per `sudo systemctl start tailscaled`. Genau dafür steht die Zeile im Skript.
 | `P9-18` | Härtungs-Direktiven per statischem Wächter belegt | ✅ `test_unit_file_has_the_three_hardening_directives` |
 | `P9-19` | Absichtlicher Offline-Zustand ⇒ genau ein Restart, im Journal belegt | ⬜ **B3** (du) |
 | `P9-20` | V152 beantwortet | ✅ „gibt es nicht" (kein Tailscale-Feature ohne Add-on, `pragmaxim/tailscaled-watchdog` macht denselben Job) |
-| `V153` | Polkit oder sudoers? | ✅ **polkit**, gemessen (Befund 1) — mit einer offenen *Zweig*frage, die B0 entscheidet (Befund 3) |
+| `V153` | Polkit oder sudoers? | ✅ **beantwortet**: `sudoers` ist ausgeschlossen (Befund 1), polkit greift und trägt (Befund 5, `AUTORISIERT` mit Journal-Beleg bei `User=root`) |
 
 ## §4 Was dieser Schritt ausdrücklich nicht löst
 
@@ -245,6 +295,6 @@ per `sudo systemctl start tailscaled`. Genau dafür steht die Zeile im Skript.
 
 ## §5 Nächste Runde
 
-Nach B0/B1/B2 ist B3 der einzige Rest. Bleibt er aus, ist Step B **nicht** 🟡→✅: P9-19 ist eine
+**B0 ist gelaufen** (`AUTORISIERT`) — es fehlen B1 (Regel), B2 (Units + Timer), optional C0 (Gegenprobe) und B3 (P9-19). Danach ist B3 der einzige Rest, der Abnahme trägt. Bleibt er aus, ist Step B **nicht** 🟡→✅: P9-19 ist eine
 Abnahmezeile mit Beweischarakter, keine Formsache. Der nächste inhaltliche P9-Schritt ist
 unabhängig davon **A4/A5** — beide hängen an der Domain und nicht am Watchdog.
