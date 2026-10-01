@@ -164,7 +164,7 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 
 ## Current state
 
-**[2026-10-02, P9 Step A — A4 vorbereitet: zwei Befunde, ein Vorlagen-Defekt, ein Testfund —
+**[2026-10-01, P9 Step A — A4 vorbereitet: zwei Befunde, ein Vorlagen-Defekt, ein Testfund —
 opencode/M3 — ein Commit, kein Eingriff in einen laufenden Dienst.]** Cooperation-Runde (P9-Q,
 ein Schritt pro Runde): A4 ist ein `sudo`-Schritt auf dem VPS, also war meine Aufgabe die Vorlage,
 die Befunde und die Erwartungshaltung. **Befund 8 — P9-10 ist bis A7 nicht erfüllbar:** die

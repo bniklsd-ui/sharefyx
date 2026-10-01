@@ -16,7 +16,7 @@ gehen kann:
   5. test_the_port_is_the_one_the_app_listens_on   # Port darf nicht auseinanderlaufen
   6. test_health_route_correction_holds             # /health, nicht /healthz (Befund 2)
 
-Dazu vier Wächter für die Caddy-Vorlage (Stand 2026-10-02, aus der A4-Vorbereitungsrunde). Sie
+Dazu vier Wächter für die Caddy-Vorlage (Stand 2026-10-01, aus der A4-Vorbereitungsrunde). Sie
 sind nicht theoretisch: der Platzhalter `<vps-tailnet>` war im Kopfkommentar als Adresse *des
 VPS* beschrieben, während `reverse_proxy` darunter auf die Heim-VM zeigt — wer nach der Kopfzeile
 einsetzt, proxt Caddy auf sich selbst und der Fehler sieht in A4 wie ein totes Relay aus.
@@ -35,7 +35,7 @@ Tailscale-TCP-Forwardern, `[VERIFY] V162`), steht in `phase9_hardening/step_a/
 RUNBOOK_STEP_A.md` §0 Befund 1 — dieser Test kann sie nicht beantworten, nur verhindern,
 dass die getroffene Wahl unbemerkt verboten wird.
 
-Die Vorlage wurde am 2026-10-02 gegen das **echte** `caddy validate` der Ubuntu-24.04-Version
+Die Vorlage wurde am 2026-10-01 gegen das **echte** `caddy validate` der Ubuntu-24.04-Version
 geprüft (`caddy 2.6.2-6ubuntu0.24.04.3`, `Valid configuration`) und der Host-Header-Durchreich
 daran gemessen (Befund 8 im Runbook). Diese Messung braucht das Binary und ist deshalb kein
 Test — sie ist die Grundlage der Wächter 7–10, die ohne Binary auskommen.
@@ -231,7 +231,7 @@ def test_acl_draft_grants_exactly_one_port_on_one_address():
         "Kommentar-Schluessel duerfen die echten Schluessel nicht verdecken"
 
 
-# --- Wächter für die Caddy-Vorlage (2026-10-02, A4-Vorbereitungsrunde) ---------
+# --- Wächter für die Caddy-Vorlage (2026-10-01, A4-Vorbereitungsrunde) ---------
 
 def _announced_placeholders(head: str) -> set[str]:
     """Die Platzhalter, die der Kopf als *Wert* ankündigt.
@@ -257,7 +257,7 @@ def _caddy_split() -> tuple[str, str]:
 def _directives_only(text: str) -> str:
     """Nur die Anweisungen, ohne Kommentarzeilen.
 
-    [2026-10-02, vierte Wiederholung derselben Falle] P8.6 Block H, P9 Step G und der
+    [2026-10-01, vierte Wiederholung derselben Falle] P8.6 Block H, P9 Step G und der
     tailscaled-watchdog-Wächter sind alle daran gescheitert, dass ein Kommentar einen Begriff
     nennt, den ein Wächter verbietet. Diese Vorlage erklärt *im Kommentar*, welches der alte,
     falsche Platzhalter war und warum kein `/healthz` konfiguriert wird — beides ist genau das,
@@ -273,7 +273,7 @@ def _directives_only(text: str) -> str:
 def test_the_upstream_placeholder_names_the_home_vm():
     """`reverse_proxy` zeigt auf die HEIM-VM, also muss der Platzhalter das auch sagen.
 
-    [2026-10-02, datierter Fund] Der Platzhalter hieß `<vps-tailnet>` und war im Kopfkommentar
+    [2026-10-01, datierter Fund] Der Platzhalter hieß `<vps-tailnet>` und war im Kopfkommentar
     als „Tailscale-Node-Name des VPS" beschrieben — während `reverse_proxy` darunter auf die
     Heim-VM zeigte. Wer nach der Kopfzeile einsetzt, lässt Caddy auf sich selbst proxen: der VPS
     lauscht auf 80/443, nicht auf 8765, also `connection refused` — das Fehlerbild eines toten
@@ -290,7 +290,7 @@ def test_the_upstream_placeholder_names_the_home_vm():
     assert "<heimvm-tailnet>" in config, \
         "reverse_proxy benutzt den alten Platzhalter nicht (Ziel ist die Heim-VM, nicht der VPS)"
     assert "<heimvm-tailnet>" in announced, \
-        "der Kopf kündigt <heimvm-tailnet> nicht als Wert an — das war der Fund vom 2026-10-02"
+        "der Kopf kündigt <heimvm-tailnet> nicht als Wert an — das war der Fund vom 2026-10-01"
     assert re.search(r"^\s*reverse_proxy\s+<heimvm-tailnet>:(\d+)\s*$", config, re.MULTILINE), \
         "reverse_proxy muss auf <heimvm-tailnet>:<port> zeigen"
 
@@ -298,7 +298,7 @@ def test_the_upstream_placeholder_names_the_home_vm():
 def test_the_template_and_its_header_name_the_same_placeholders():
     """Was der Kopf ankündigt, muss die Anweisung benutzen — und umgekehrt.
 
-    Genau dieser Bruch zwischen Kopfzeile und `reverse_proxy` war der Fund vom 2026-10-02, und
+    Genau dieser Bruch zwischen Kopfzeile und `reverse_proxy` war der Fund vom 2026-10-01, und
     er wirkt in beide Richtungen: ein Wert, den nur der Kopf nennt, wird beim Einsetzen nicht
     ersetzt (Caddy lehnt die Datei dann ab — erst auf dem VPS sichtbar); ein Platzhalter, den
     nur die Anweisung benutzt, wird durch eine frei erfundene Adresse ersetzt.
@@ -308,7 +308,7 @@ def test_the_template_and_its_header_name_the_same_placeholders():
     used = {f"<{name}>" for name in re.findall(r"<([a-z-]+)>", _directives_only(body))}
     assert announced == used, (
         f"der Kopf kündigt {sorted(announced)} an, die Anweisung benutzt {sorted(used)} — "
-        "das war der Fehler vom 2026-10-02"
+        "das war der Fehler vom 2026-10-01"
     )
     assert used, "kein Platzhalter in der Anweisung gefunden — die Vorlage ist vollständig?"
 
@@ -342,7 +342,7 @@ def test_no_second_hsts_header_and_no_admin_off():
       (`phase4_auth/authserver/routes.py:66`, `phase5_ui/webui/security.py:56`, beide
       `max-age=63072000; includeSubDomains` hinter `if settings.hsts`, Default `True`).
       Ein zweiter Header ist eine doppelte, abweichende Angabe.
-    * **Kein `admin off`.** Gemessen am 2026-10-02 mit dem echten 2.6.2: die Paket-Unit hat
+    * **Kein `admin off`.** Gemessen am 2026-10-01 mit dem echten 2.6.2: die Paket-Unit hat
       `ExecReload=/usr/bin/caddy reload --config /etc/caddy/Caddyfile --force`, und genau der
       bricht mit `admin off` in `dial tcp 127.0.0.1:2019: connect: connection refused` ab.
       Wer die API abschaltet, kaputt macht `systemctl reload caddy` — und merkt es beim ersten
@@ -355,9 +355,9 @@ def test_no_second_hsts_header_and_no_admin_off():
         "ein zweiter Header im Caddy wäre eine abweichende Doppelangabe"
     assert not re.search(r"^\s*admin\s+off\s*$", config, re.MULTILINE), (
         "kein `admin off`: die ExecReload-Zeile der Paket-Unit braucht die Admin-API "
-        "(gemessen 2026-10-02: connection refused auf 127.0.0.1:2019)"
+        "(gemessen 2026-10-01: connection refused auf 127.0.0.1:2019)"
     )
-    # Und der Host-Header soll *durchgereicht* werden (gemessen 2026-10-02 vor dem Relay), also
+    # Und der Host-Header soll *durchgereicht* werden (gemessen 2026-10-01 vor dem Relay), also
     # darf auch kein `header_up` den Umschreiben erzwingen.
     assert "header_up" not in config, \
         "kein header_up: der Host-Header soll durchgereicht werden, sonst antwortet " \
@@ -369,7 +369,7 @@ def test_the_substituted_template_has_no_placeholder_left():
 
     Der Nikinger substituiert auf dem VPS per Hand. Diese Probe macht die Handarbeit prüfbar:
     sie ersetzt genau die dokumentierten Werte und prüft das Ergebnis. Sie validiert nicht die
-    Caddy-Syntax — dafür gab es am 2026-10-02 ein echtes `caddy validate` gegen 2.6.2
+    Caddy-Syntax — dafür gab es am 2026-10-01 ein echtes `caddy validate` gegen 2.6.2
     (`Valid configuration`, im Runbook Befund 9 festgehalten) — sondern die Lücke zwischen
     Vorlage und Ergebnis.
     """

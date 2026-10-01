@@ -5,12 +5,12 @@
 # (NICHT hier im Repo — die Datei bleibt eine Vorlage) und legt sie nach /etc/caddy/Caddyfile.
 #
 #   <domain>          die eigene Domain, gemessen 2026-10-01: sharefyx.eurofyx.com  (A1)
-#   <heimvm-tailnet>  die HEIM-VM im Tailnet auf Port 8765 — gemessen 2026-10-02:
+#   <heimvm-tailnet>  die HEIM-VM im Tailnet auf Port 8765 — gemessen 2026-10-01:
 #                     100.93.43.122 (ihre Tailnet-IP, auf die das Relay bindet) oder der
 #                     MagicDNS-Name savefyx-vmware-virtual-platform.tail4a8b49.ts.net
 #   <kontakt>         E-Mail-Adresse fuer die Let's-Encrypt-ACME-Registrierung (A4)
 #
-# [2026-10-02, datierte Korrektur] Der zweite Platzhalter hieß vorher `<vps-tailnet>` und war
+# [2026-10-01, datierte Korrektur] Der zweite Platzhalter hieß vorher `<vps-tailnet>` und war
 # im Kopfkommentar als "Node-Name des VPS" beschrieben, obwohl `reverse_proxy` darunter auf
 # die HEIM-VM zeigt. Wer nach der Kopfzeile einsetzt, proxt Caddy auf sich selbst — und der
 # Fehler sieht in A4 wie ein totes Relay aus. Darum heisst er jetzt `<heimvm-tailnet>`.
@@ -32,14 +32,14 @@
 #   * KEIN eigener /health-Pfad. Die Anwendung hat genau eine Health-Route: /health
 #     (phase2_mcp/mcpserver/app.py:220). Der Plan nannte in P9-10 /healthz — das gibt es
 #     nicht, Abnahme laeuft gegen /health (RUNBOOK §0, Befund 2).
-#   * KEIN `admin off`. [2026-10-02 gemessen] Die Paket-Unit hat
+#   * KEIN `admin off`. [2026-10-01 gemessen] Die Paket-Unit hat
 #     `ExecReload=/usr/bin/caddy reload --config /etc/caddy/Caddyfile --force`, und genau
 #     der braucht die Admin-API: mit `admin off` endet `caddy reload` in
 #     `Post "http://localhost:2019/load": dial tcp 127.0.0.1:2019: connect: connection
 #     refused`. "Härten" heisst hier also: die API bleibt auf Loopback (Default) und wird
 #     nicht abgeschaltet, denn `systemctl reload caddy` wäre danach kaputt.
 #
-# Der Proxy reicht den Host-Header des Clients unveraendert durch. [2026-10-02 gemessen,
+# Der Proxy reicht den Host-Header des Clients unveraendert durch. [2026-10-01 gemessen,
 # nicht behauptet: Caddy 2.6.2 lokal vor die Relay-Adresse gestellt, `Host:`-Header
 # durchgereicht und die Antwort der Anwendung gelesen — `sharefyx.eurofyx.com` -> 400
 # "Invalid host header", der erlaubte ts.net-Name -> 200 mit `{"status":"ok",...}`.]
@@ -69,7 +69,7 @@
 	# Client-Zertifikat: es gaeber einen zweiten Identitaetspfad fuer ein System, das es
 	# sonst nicht gibt.
 	#
-	# [2026-10-02 gemessen] Das Ubuntu-Paket (caddy 2.6.2-6ubuntu0.24.04.3) legt /var/log/caddy
+	# [2026-10-01 gemessen] Das Ubuntu-Paket (caddy 2.6.2-6ubuntu0.24.04.3) legt /var/log/caddy
 	# im postinst an und chownt es auf caddy:caddy — der Dienst laeuft als User=caddy, das
 	# Verzeichnis ist also beschreibbar. `caddy validate` gegen diese Vorlage mit 2.6.2 sagt
 	# "Valid configuration"; `caddy fmt` moegte sie kosmetisch umformatieren (Tabs/Spaces),
