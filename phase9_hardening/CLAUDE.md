@@ -140,3 +140,17 @@ Schwarz bzw. auf dem eigenen Fill verrechnet. Pixel-Gegenprobe (Playwright-Eleme
 Wegwerf-Instanz): Übersicht oben/Mitte/unten/Kante `(26,41,60)/(8,19,33)/(5,11,20)/(29,67,116)`,
 Einstellungen-Knopf `(26,40,60)/(8,19,34)/(5,11,20)/(29,67,116)`. Wächter auf die neuen Tokens umgestellt.
 
+### Session-Ende 2026-10-01 — Entscheidungen und nächster Einstieg
+
+**Nikinger-Entscheidungen zum Abschluss:** (1) **noch kein Deploy** — Live bleibt Release
+`20260918T183907` (`v3.0.2`); (2) der nächste Deploy trägt **`v3.1.0`** (Badge `app.html` +
+`docs/UPDATE_LOG.md`-Eintrag erst im Deploy-Commit, wie GA4 in P8.6); (3) gepusht.
+
+**Nächste Session — kurz:**
+1. **A4 Caddy auf dem VPS** (`RUNBOOK_STEP_A.md` A4, Vorlage `Caddyfile.template`, Domain
+   `sharefyx.eurofyx.com`) → Prüfung `https://sharefyx.eurofyx.com/health` mit LE-Zertifikat (P9-10).
+2. **Deploy `v3.1.0` vor A7** — liefert UI-Übergangsfenster, Standardknöpfe und P9 D–H mit;
+   danach `LEGACY_ORIGIN`/`LEGACY_UNTIL` in `local.env` (A7).
+3. **A7+A8 in einer Sitzung, Fabian zeitgleich** (Token-`resource`-Bindung kappt beide Connectoren).
+4. Offen, klein: `.toolbar-btn` und die kleineren „Anzeigen"-Knöpfe in Standardoptik? · Gate/Z wartet auf A4–A8.
+

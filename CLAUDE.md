@@ -173,6 +173,9 @@ die alte Funnel-Adresse (eine zusätzliche CSRF-Origin bis `SPACE_UI_LEGACY_UNTI
 fail-closed; Warndialog in `.account-nav`-Form bei jedem Laden), 23 Tests + Browser 16/16, `pytest`
 **1114**. **Offen beim Nikinger:** Deploy vor A7 (liefert P9 D–H mit), Badge-Version. Nächster Schritt
 A4 (Caddy). Details: `phase9_hardening/CLAUDE.md`.
+**Nachtrag Session-Ende:** Standardknöpfe tragen jetzt das exakte Bild des Übersicht-Knopfs
+(deckende Tokens `--btn-std-*`, pixelgeprüft). **Nikinger: noch kein Deploy; der nächste trägt
+`v3.1.0`.** Nächste Session: A4 → Deploy `v3.1.0` → A7+A8 in einer Sitzung.
 
 **[2026-09-30, P9 Step B (zweiter Teil) — V153 entschieden, und einer der beiden Wege im Plan ist
 nachweislich unbaubar — opencode/M3 — Repo-Seite fertig, Ausführung bleibt beim Nikinger.]**
