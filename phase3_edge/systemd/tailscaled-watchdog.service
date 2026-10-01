@@ -1,6 +1,5 @@
 [Unit]
 Description=Tailscaled Watchdog — restartet tailscaled, wenn die Control-Plane klemmt
-Documentation=file://__REPO_ROOT__/phase3_edge/CLAUDE.md
 After=network-online.target tailscaled.service
 Wants=network-online.target
 
@@ -8,7 +7,26 @@ Wants=network-online.target
 Type=oneshot
 User=savefyx
 Group=savefyx
-ExecStart=__REPO_ROOT__/phase3_edge/scripts/tailscaled_watchdog.sh
+# Bewusst KEIN __REPO_ROOT__ im ExecStart — und `Documentation=` entfällt deshalb mit.
+# Gemessener Befund vom 2026-10-01 (P9 Step B, B2): mit `__REPO_ROOT__` zeigte die Unit auf
+# /opt/sharefyx/current, ein Symlink auf das Release 20260918T183907 — und dort liegt
+# `tailscaled_watchdog.sh` NICHT, weil das Skript erst am 2026-09-26 ins Repo kam. Die Unit
+# lieferte deshalb alle 60 s `status=203/EXEC`. Ursache ist nicht ein Fehler in der Pfadlogik,
+# sondern eine Verzögerung: `local.env` setzt `REPO_ROOT=/opt/sharefyx/current` (das Skript
+# install_units.sh:53 verlangt die Variable bewusst, sie überschreibt die berechnete REPO_DIR),
+# also zeigt **jede** Unit mit diesem Platzhalter aufs Release — und alles, was beim letzten
+# Deploy schon drin war, funktioniert. Jede neu hinzugekommene operative Datei ist damit die
+# erste, die im Release fehlt. Scan über alle installierten Units (2026-10-01): genau eine
+# zeigte ins Leere, diese.
+# Dasselbe Muster ist beim tail-proxy bereits angewandt (Phase-3-Head 2026-09-29, derselbe
+# Befund im Session-Block 2026-09-28) — die Lehre ist hier nur nicht angekommen, weil der
+# Step-B-Code einen Tag älter ist als der Befund.
+# Der Systempfad ist die Konsequenz: unabhängig von Release und Checkout, überlebt Rollback
+# und Deploy. Installieren: sudo install -D -m 0755 phase3_edge/scripts/tailscaled_watchdog.sh \
+#                          /usr/local/libexec/sharefyx/tailscaled_watchdog.sh
+# Nach einem Skript-Update dasselbe Kommando erneut — Wächter:
+# phase9_hardening/tests/test_tailscaled_watchdog.py :: test_execstart_carries_no_repo_path
+ExecStart=/usr/local/libexec/sharefyx/tailscaled_watchdog.sh
 RuntimeDirectory=tailscaled-watchdog
 RuntimeDirectoryMode=0700
 NoNewPrivileges=true

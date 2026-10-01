@@ -89,12 +89,58 @@ und ist eng.** Damit ist V153 vollständig entschieden und B1 kann laufen.
    eine Rückfrage und läuft dann in den Agent-Timeout. Praktische Folge: **sollte die Regel
    irgendwann nicht mehr greifen, zeigt sich das im Journal als ~25-Sekunden-Hänger und nicht als
    ein schnelles „restart fehlgeschlag".** Für die Fehlersuche in B3 ist das die Kennzahl.
-2. **Die Gegenprobe ist noch nicht sauber.** Der Test mit der `.timer`-Unit beweist nur, dass die
+2. **Die Gegenprobe ist jetzt sauber — nach einem Nachlade-Rennen, das ich selbst produziert
+habe.** Der erste Versuch nach dem Löschen der Probe-Regel lieferte `rc=0`; die Wiederholung
+wenige Minuten später lieferte `rc=1` nach 25 s. Erklärung: polkitd hält die gelöschte Regel noch
+kurz im Speicher. **Damit ist B0 vollständig bewiesen — mit** Regel autorisiert, **ohne** Regel
+verweigert, gleiche Unit, gleicher User. Wer C0 wiederholt, sollte nach dem `rm` ein paar Sekunden
+warten, sonst misst er das Rennen statt der Berechtigung.
+
+ Der Test mit der `.timer`-Unit beweist nur, dass die
    Berechtigung nicht erteilt wurde; *warum* (Regel greift nicht vs. Unit existiert gar nicht —
    `systemctl is-enabled sharefyx-watchdog-probe.timer` sagt `not-found`) ist damit nicht
    getrennt. **Die saubere Gegenprobe braucht dein `sudo`** und steht als C0 in §2. Ohne sie bleibt
    der Schluss „polkit war das Tor" auf dem Journal-Beleg und der `User=root`-Messung — das trägt,
    aber C0 macht es eindeutig.
+
+### Befund 6 — B2 hat es beim ersten Mal nicht getan: `status=203/EXEC` in jedem Takt
+
+**Gemessen 2026-10-01, vom Nikinger ausgeführt und hier verifiziert:** `install_units.sh` lief
+sauber durch, der Timer wurde `enabled`, `list-timers` zeigt ihn — und der Dienst scheiterte in
+jedem Takt mit `Main process exited, code=exited, status=203/EXEC`.
+
+Ursache, in zwei Schritten gemessen:
+
+1. `systemctl cat tailscaled-watchdog.service | grep ExecStart` →
+   `/opt/sharefyx/current/phase3_edge/scripts/tailscaled_watchdog.sh`. **Auf das Release, nicht
+   auf den Checkout.**
+2. `local.env:8` → `REPO_ROOT=/opt/sharefyx/current`, und `install_units.sh:53` verlangt diese
+   Variable und überschreibt damit die berechnete `REPO_DIR` (gewollt: Prod-Units sollen aufs
+   Release zeigen). Das Release ist `20260918T183907`; dort liegt das Skript **nicht**, es kam
+   erst am 2026-09-26 ins Repo.
+
+Der Scan über **alle** installierten Units derselben Art macht den Punkt präzise:
+
+| Unit | ExecStart | |
+|---|---|---|
+| `sharefyx-backup` | `…/current/phase3_edge/scripts/backup_data_root.sh` | OK |
+| `sharefyx-authbackup`, `-mcp`, `-purge`, `-staging` | `…/current/.venv/bin/python` | OK |
+| `sharefyx-tail-proxy` | `/usr/bin/socat` | OK (Systempfad) |
+| `tailscaled-watchdog` | `…/current/…/tailscaled_watchdog.sh` | **FEHLT** |
+
+**Es ist also kein Fehler der Pfadlogik, sondern eine Verzögerung:** alles, was beim letzten
+Deploy schon im Repo war, ist im Release; die erste danach hinzugekommene operative Datei fehlt —
+und trifft zuerst die neueste Unit. **Die Lehre stand im Repo bereits:** der Phase-3-Head
+notiert den Befund seit 2026-09-28 wörtlich („der Watchdog startete dadurch ins Leere"), und der
+tail-proxy wurde am 2026-09-29 genau deshalb **ohne** `__REPO_ROOT__` gebaut. Nur die
+watchdog-Unit selbst ist nie nachgezogen worden — der Step-B-Code ist einen Tag älter als der
+Befund. **Nikinger-Entscheidung 2026-10-01: Systempfad `/usr/local/libexec/sharefyx/`**, wie beim
+tail-proxy. `Documentation=` entfällt mit derselben Begründung (es zeigte auf die Doku des
+Releases). Ein elfter Wächter nagelt beides fest.
+
+**Was das über den Watchdog sagt:** `203/EXEC` ist harmlos — das Skript lief nie, es wurde nichts
+neugestartet. Aber es zeigt, dass ein durchlaufender Timer **nicht** beweist, dass ein Dienst
+arbeitet. Seit B2a ist der Beweis die `healthy`-Zeile, nicht die Timer-Zeile.
 
 ## §1 Was in dieser Runde passiert und was nicht
 
@@ -170,12 +216,31 @@ sudo install -m 0644 phase3_edge/polkit/49-tailscaled-watchdog-restart.rules \
 liest `rules.d` bei jeder Anfrage neu. `install` überschreibt eine alte Fassung derselben Regel
 folgenlos, deshalb ist der Befehl wiederholbar.
 
+### B2a — Skript an den Systempfad installieren *(du, ein `sudo`; neu seit 2026-10-01)*
+
+**Ziel:** das Skript dorthin legen, wo die Unit es sucht. `local.env` setzt
+`REPO_ROOT=/opt/sharefyx/current`, deshalb zeigte der alte `ExecStart=__REPO_ROOT__/…` aufs
+**Release** — und dort lag `tailscaled_watchdog.sh` nicht, weil es erst nach dem Deploy vom
+2026-09-18 ins Repo kam. Das Ergebnis war `status=203/EXEC` in jedem Takt. Die Unit zeigt jetzt
+auf einen Systempfad; dieses Kommando ist der Gegenstück und muss **vor** B2 laufen:
+
+```bash
+sudo install -D -m 0755 phase3_edge/scripts/tailscaled_watchdog.sh \
+     /usr/local/libexec/sharefyx/tailscaled_watchdog.sh
+```
+
+**Was ich erwarte:** keine Ausgabe. **Nach jedem Skript-Update dasselbe Kommando erneut** — die
+Unit startet die installierte Kopie, nicht die im Repo.
+
 ### B2 — Units installieren und den Timer aktivieren *(du)*
 
 ```bash
 sudo phase3_edge/scripts/install_units.sh      # kopiert u. a. beide Watchdog-Units
 sudo systemctl enable --now tailscaled-watchdog.timer
 ```
+
+**B2a muss vorher gelaufen sein**, sonst startet die Unit ins Leere (203/EXEC) — genau das ist
+am 2026-10-01 passiert.
 
 **Zwei Fallen, beide bekannt:**
 
@@ -205,8 +270,10 @@ systemctl list-timers tailscaled-watchdog.timer     # → eine Zeile mit NEXT
 systemctl cat tailscaled-watchdog.service | grep ExecStart
 ```
 
-**Was ich erwarte:** `enabled`, eine Timer-Zeile, und ein `ExecStart` **ohne** `__REPO_ROOT__`
-sondern mit dem echten Pfad (sonst hat die Substitution nicht stattgefunden). Das ist **P9-16**.
+**Was ich erwarte:** `enabled`, eine Timer-Zeile, und ein `ExecStart` **ohne** `__REPO_ROOT__` —
+er muss jetzt `/usr/local/libexec/sharefyx/tailscaled_watchdog.sh` lauten. Ein `__REPO_ROOT__`
+oder ein `/opt/sharefyx`-Pfad bedeutet: alte Unit im System, `install_units.sh` lief nicht
+durch. Das ist **P9-16**.
 
 **Dann der kostenlose Teil des Beweises, noch ohne jeden Ausfall:** der Timer feuert nach dem
 Aktivieren praktisch sofort (`OnBootSec` liegt in der Vergangenheit). Innerhalb einer Minute:
@@ -269,8 +336,8 @@ per `sudo systemctl start tailscaled`. Genau dafür steht die Zeile im Skript.
 
 | # | Kriterium | Stand |
 |---|---|---|
-| `P9-16` | `systemctl list-timers` zeigt den Timer | ⬜ **B2** (du) |
-| `P9-17` | 5 Tests grün | ✅ 9/9 grün (5 Alt + 4 neu aus der Wächter-Runde) |
+| `P9-16` | `systemctl list-timers` zeigt den Timer | ✅ **2026-10-01** (Timer-Zeile mit `NEXT` vorhanden) — **aber:** der erste B2-Durchlauf lieferte noch `203/EXEC`, siehe Befund 6; der eigentliche Abschluss ist die `healthy`-Zeile nach B2a |
+| `P9-17` | 5 Tests grün | ✅ **10/10** grün (5 Alt + 5 neu aus den Wächter-Runden, zuletzt `test_execstart_carries_no_repo_path` nach dem 203/EXEC-Befund) |
 | `P9-18` | Härtungs-Direktiven per statischem Wächter belegt | ✅ `test_unit_file_has_the_three_hardening_directives` |
 | `P9-19` | Absichtlicher Offline-Zustand ⇒ genau ein Restart, im Journal belegt | ⬜ **B3** (du) |
 | `P9-20` | V152 beantwortet | ✅ „gibt es nicht" (kein Tailscale-Feature ohne Add-on, `pragmaxim/tailscaled-watchdog` macht denselben Job) |
@@ -287,6 +354,7 @@ per `sudo systemctl start tailscaled`. Genau dafür steht die Zeile im Skript.
   Form wäre ein **fixer Root-Oneshot** (`ExecStart=/usr/bin/systemctl restart tailscaled.service`,
   keine Shell, keine PATH-Auflösung), den die unprivilegierte Einheit per Flag anstößt — das ist
   echte Umfangserweiterung und **nicht** in diesem Runde gebaut.
+- **Ein Skript-Update braucht ein `sudo install -D -m 0755 …` an den Systempfad.** Das ist der Preis des release-unabhängigen Pfades und der Grund, warum B2a überhaupt existiert: die Unit startet die installierte Kopie, nicht die Datei im Repo.
 - Der Watchdog erkennt **nur** einen Offline-Zustand des Knotens. Ein Ausfall, bei dem
   `tailscaled` läuft und die Control-Plane hängt, wird genau dann gesehen, wenn der Knoten
   dadurch auch als offline gilt — die Logik ist die des Plans (§4.2), nicht mehr.
@@ -295,6 +363,6 @@ per `sudo systemctl start tailscaled`. Genau dafür steht die Zeile im Skript.
 
 ## §5 Nächste Runde
 
-**B0 ist gelaufen** (`AUTORISIERT`) — es fehlen B1 (Regel), B2 (Units + Timer), optional C0 (Gegenprobe) und B3 (P9-19). Danach ist B3 der einzige Rest, der Abnahme trägt. Bleibt er aus, ist Step B **nicht** 🟡→✅: P9-19 ist eine
+**B0, C0, B1 und B2 sind gelaufen** (B2 einmal gescheitert, Befund 6). **Es fehlen B2a** (Skript an den Systempfad, ein `sudo install -D -m 0755`), **B2 wiederholen** und **B3 (P9-19)**. Erst die `healthy`-Zeile im Journal belegt, dass die Unit wirklich arbeitet — eine laufende Timer-Zeile beweist es nicht. Bleibt er aus, ist Step B **nicht** 🟡→✅: P9-19 ist eine
 Abnahmezeile mit Beweischarakter, keine Formsache. Der nächste inhaltliche P9-Schritt ist
 unabhängig davon **A4/A5** — beide hängen an der Domain und nicht am Watchdog.

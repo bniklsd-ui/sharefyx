@@ -22,7 +22,7 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 |---|---|---|
 | 0 | Verifikations-Durchlauf, Doku-Fundament (Phasenverzeichnis, INDEX-Rotation, vier Defekte, `doc_health.py`, Baseline) | ✅ |
 | A | Echte Domain über eigenen VPS | 🟡 **M3-Anteil gebaut 2026-09-29, **A1/A2/A3/A0b/A6 seit 2026-09-30 ausgeführt** (Domain bestellt, VPS `217.160.128.146`, Policy+Beitritt mit `tag:sharefyx-edge`, socat-Relay laufend, Firewall `22` nur auf `tailscale0`)** — **A5 wartet auf die Domain-Registrierung, A4/A7/A8 hängen daran** — `phase9_hardening/step_a/RUNBOOK_STEP_A.md` (der geführte Ablauf A1–A9 mit sechs gemessenen Befunden, die den Plan korrigiert haben) + `Caddyfile.template` (A4) + `tailscale-acl.draft.json` (A3) + `phase3_edge/systemd/sharefyx-tail-proxy.service` (der fehlende Erreichbarkeitsweg) + `phase9_hardening/tests/test_tail_proxy.py` (7/7 grün, Gegenprobe 4/4). **Befund 1 ist der teuerste: Plan-A4 ist unbaubar, auf der Tailnet-IP lauscht nichts** (`SPACE_HOST=127.0.0.1`, `ss -ltnp` belegt) — gelöst per socat-Relay, **ohne** P3-B zu brechen. A1/A2 (Domain, VPS) + A0b–A8 sind Nikinger-Schritte · **V149 beantwortet** (alle Metadatenfelder abgeleitet, keines fest) · **V162 neu offen** (ACL-Durchsetzung von `tailscale serve --tcp`, Grund für die socat-Wahl) |
-| B | `tailscaled-watchdog.service` | 🟡 **M3-Anteil 2026-09-30 ergänzt, install + P9-19 ausstehend (Nikinger)** — **V153 entschieden und einer der beiden Plan-Wege nachweislich unbaubar:** `sudoers` lebt vom setuid-Bit, `NoNewPrivileges=true` lässt der Kernel das nicht zu (`setpriv --no-new-privs -- sudo -n -l` → *"no new privileges" flag is set*). Es bleibt polkit — und **polkit kann es auf dieser Box nicht eng genug**: `systemd 255.4` kennt nur die **grobe** Aktion `org.freedesktop.systemd1.manage-units` (man `org.freedesktop.systemd1(5)`, Security), ein `<defaults>`-Eintrag kann nicht nach Unit filtern. Gebaut: `phase3_edge/polkit/49-tailscaled-watchdog-restart.rules` als **JS**-Regel mit zusätzlichem `action.lookup("unit") == "tailscaled.service"` + `subject.user == "savefyx"` (fehlt das Attribut, greift sie nicht — gewollter Fehlerfall; **ohne** den Abgleich hätte `savefyx` das Management *aller* Units) · **V153-Probe ist gelaufen: `AUTORISIERT`** (Journal-Beleg, `User=root` — polkit war das Tor; systemd 255.4 schickt das `unit`-Detail doch) ⇒ die enge Regel trägt, ohne `tailscaled` anzufassen (Wegwerf-Unit `ExecStart=/bin/true` + eigene Regel) · 4 neue Wächter in `phase9_hardening/tests/test_tailscaled_watchdog.py` (**9/9**, Gegenprobe 4 Verstöße → 6 rote Assertions; alle lesen nur **Codezeilen**, nicht die Kommentare) · `phase9_hardening/step_b/RUNBOOK_STEP_B.md` (B0 Probe, B1 Regel, B2 Units, B3 P9-19, mit den zwei bekannten Fallen: `install_units.sh` aktiviert nur `sharefyx-mcp`, und es startet es dabei neu) · **gemessen: die Units sind auf der VM noch gar nicht installiert** (`/etc/systemd/system/tailscaled-watchdog.*` fehlt, `list-timers` = 0) · V152 beantwortet
+| B | `tailscaled-watchdog.service` | 🟡 **M3-Anteil 2026-09-30 ergänzt, install + P9-19 ausstehend (Nikinger)** — **V153 entschieden und einer der beiden Plan-Wege nachweislich unbaubar:** `sudoers` lebt vom setuid-Bit, `NoNewPrivileges=true` lässt der Kernel das nicht zu (`setpriv --no-new-privs -- sudo -n -l` → *"no new privileges" flag is set*). Es bleibt polkit — und **polkit kann es auf dieser Box nicht eng genug**: `systemd 255.4` kennt nur die **grobe** Aktion `org.freedesktop.systemd1.manage-units` (man `org.freedesktop.systemd1(5)`, Security), ein `<defaults>`-Eintrag kann nicht nach Unit filtern. Gebaut: `phase3_edge/polkit/49-tailscaled-watchdog-restart.rules` als **JS**-Regel mit zusätzlichem `action.lookup("unit") == "tailscaled.service"` + `subject.user == "savefyx"` (fehlt das Attribut, greift sie nicht — gewollter Fehlerfall; **ohne** den Abgleich hätte `savefyx` das Management *aller* Units) · **V153-Probe ist gelaufen: `AUTORISIERT`** (Journal-Beleg, `User=root` — polkit war das Tor; systemd 255.4 schickt das `unit`-Detail doch) ⇒ die enge Regel trägt, ohne `tailscaled` anzufassen (Wegwerf-Unit `ExecStart=/bin/true` + eigene Regel) · **B0 ✅ `AUTORISIERT`** (Journal-Beleg bei `User=root`) und **C0 ✅ sauber** (Wiederholung `rc=1` nach 25 s — der erste Versuch war ein polkitd-Nachlade-Rennen) ⇒ die enge Regel trägt · **B2 hat es beim ersten Mal nicht getan: `status=203/EXEC`**, weil `local.env` `REPO_ROOT=/opt/sharefyx/current` setzt und das Release von 2026-09-18 das Skript (26.09.) nicht enthält — **Nikinger-Entscheidung 2026-10-01: `ExecStart` auf Systempfad `/usr/local/libexec/sharefyx/`, `Documentation=` raus, Installation per `sudo install -D -m 0755`**, elfter Wächter · Wächter in `phase9_hardening/tests/test_tailscaled_watchdog.py` (**10/10**, Gegenprobe 4 Verstöße → 6 rote Assertions; alle lesen nur **Codezeilen**, nicht die Kommentare) · `phase9_hardening/step_b/RUNBOOK_STEP_B.md` (B0 Probe, B1 Regel, B2 Units, B3 P9-19, mit den zwei bekannten Fallen: `install_units.sh` aktiviert nur `sharefyx-mcp`, und es startet es dabei neu) · **gemessen: die Units sind auf der VM noch gar nicht installiert** (`/etc/systemd/system/tailscaled-watchdog.*` fehlt, `list-timers` = 0) · V152 beantwortet
 | C | Vision-Dienst auf der RTX 3060 | ✅ **Step C abgeschlossen** (Session-Block 2026-09-26): GPU-Inferenz reboot-fest (Host + CT 111 auf 580.173.02 inkl. `nvidia-uvm`, uvm per `devN`-Passthrough, zweite Reboot-Probe grün) + C8 (`ollama` auf sharefyx-VM `inactive`/`disabled`, `curl 127.0.0.1:11434` → `Connection refused`, binary + Modell bleiben als kalter Fallback bis Step Z) + Host-Aufräumen pve (zwei `/root/111.conf.{new,bak-p9c}` per `rm -f` weg; `/tmp/nv580173` und alter `NVIDIA-Linux-x86_64-580.126.09.run` bereits weg — PVE-9-tmpfs bzw. im Vorrundezweig entfernt) · P9-21 ✅ · P9-23 ✅ · P9-26 ✅ · C4 ✅ · C5 ✅ · C6 ✅ · **P9-22 deferred** (Nikinger-Entscheidung 2026-09-26, kein externer Test möglich) — architektonischer Beweis statt externem Test: 192.168.68.140 ist RFC1918, sharefyx-VM hat keine öffentliche IP (CGNAT via RUT X50), Tailscale-Funnel mappt nur `127.0.0.1:8765` (kein `*:11434` auf sharefyx-VM), kein Port-Forward auf RUT X50, einziger 11434-Listener sitzt innerhalb CT 111; Revisit-Step **Step Z oder P10-Backlog** |
 | D | Zwei gemeldete Bugs (ESC/Vollbild, Drop-Ziel Space-Wurzel) | 🟡 D2 fertig; D1 (ESC/Vollbild) **bewusst zurückgestellt** — Nikinger-Entscheidung 2026-09-23, kein aktiver Blocker mehr, siehe Backlog unten |
 | E | Karte: Reload-Overload, V118 | ✅ **Step E abgeschlossen** (Session-Block 2026-09-28): (a) kein zweiter `/graph`-Abruf ohne Datenänderung — Signatur aus dem `/overview`-Payload, das der Client ohnehin holt (Plan §7.2(a) nannte den Graph-Payload; der hat **kein** `updated`, datierte Plan-Korrektur) · (b) bekannte Knoten behalten `x`/`y` über den Refetch · `force` nur am expliziten Refresh-Knopf · 7 Tests (Node-Harness + statisch) + Browser-Probe gegen die Wegwerf-Instanz, beide mit Gegenprobe gegen HEAD (dort 1 Abruf und 10 verschiedene Bilder in 1,5 s) · **P9-33/-34/-35 ✅** · **V118 beantwortet (zwei Linien, eine davon gestrichelt)** — die Design-Frage „eine oder zwei Linien" liegt beim Nikinger (P9-36) |
@@ -63,8 +63,8 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 ## Session stopped — 2026-09-30 (fünfter Block, Step B — polkit-Regel gebaut, V153 entschieden, Ausführung bleibt beim Nikinger)
 
 **Blocker B war die Bitte dieser Runde. Die Repo-Seite ist fertig, und die beiden offenen Fragen
-sind nicht dieselben, die der Plan stellt — das war der Fund.** `pytest` **1088** = 1084 + 4 neue Wächter (in `test_tailscaled_watchdog.py`
-steht damit 9/9), kein Service-Touch, kein `systemctl` durch mich.
+sind nicht dieselben, die der Plan stellt — das war der Fund.** `pytest` **1089** = 1084 + 5 neue Wächter (in `test_tailscaled_watchdog.py`
+steht damit 10/10), kein Service-Touch, kein `systemctl` durch mich.
 
 ### Befund 1 — der Plan bietet zwei Wege an, einer ist unbaubar
 
@@ -125,7 +125,7 @@ Umfangserweiterung und ist **nicht** gebaut.
 | **Aktion** | `systemctl --version` 255.4-1ubuntu8.17 + man `org.freedesktop.systemd1(5)` §Security ⇒ nur `manage-units` |
 | **Sichtbarkeit** | `pkcheck --action-id …manager.restart-unit` → *not registered*; `pkaction` ebenso ⇒ die Restfrage ist unprivilegiert nicht entscheidbar, daher die Probe |
 | **Ist-Zustand** | `ls /etc/systemd/system/tailscaled-watchdog.*` → *No such file*; `systemctl list-timers` → 0 Timer; `polkitd 124-2ubuntu1.24.04.4` vorhanden; `Self.Online = True`, `BackendState = Running` |
-| **Tests** | 4 neue Wächter, **9/9 grün**; Gegenprobe mit vier eingebauten Verstößen → **6 rote Assertions** (Unit-Abgleich raus 2 · Nachbar-Aktion mitgenommen 1 · Skript startet andere Unit 2 · Probe zeigt auf die echte Unit 1), danach zurückgebaut, `git diff` für Skript und Regel leer |
+| **Tests** | 5 neue Wächter, **10/10 grün**; Gegenprobe mit vier eingebauten Verstößen → **6 rote Assertions** (Unit-Abgleich raus 2 · Nachbar-Aktion mitgenommen 1 · Skript startet andere Unit 2 · Probe zeigt auf die echte Unit 1), danach zurückgebaut, `git diff` für Skript und Regel leer |
 | **Lesehinweis** | alle vier Wächter filtern **Kommentarzeilen** vorher heraus — die Regel nennt `manage-units` und `tailscaled.service` auch in ihren Befund-Kommentaren, und ein Test, der Kommentare mitliest, prüft meine Formulierung statt der Absicht (dritte Wiederholung derselben Falle: P8.6 Block H, P9 Step G, jetzt hier) |
 
 ### Nächster Schritt
@@ -163,6 +163,38 @@ reicht, aber C0 macht ihn eindeutig.
 
 **Nächster Schritt:** B1 (`sudo install` der Regel) · B2 (`install_units.sh` + `enable --now` des
 Timers) · dann B3. C0 ist optional und nur für den eindeutigen Beweis.
+
+### Zweiter Nachtrag — B2 ist gescheitert, und der Befund stand seit drei Tagen im Repo
+
+`install_units.sh` lief sauber durch, `enable --now` legte den Symlink an, `list-timers` zeigt
+den Timer — und der Dienst lieferte **in jedem Takt `status=203/EXEC`**. Zwei Messungen, und die
+Ursache ist nicht die Pfadlogik:
+
+1. `systemctl cat … | grep ExecStart` → `/opt/sharefyx/current/phase3_edge/scripts/…` — **das
+   Release, nicht den Checkout.**
+2. `local.env:8` → `REPO_ROOT=/opt/sharefyx/current`, und `install_units.sh:53` verlangt die
+   Variable bewusst (Prod-Units sollen aufs Release zeigen).
+
+Der Scan über alle installierten Units traf **genau eine** mit totem Pfad — alle anderen
+Skripte waren beim Deploy vom 2026-09-18 schon im Release. **Es ist eine Verzögerung, und sie
+trifft zuerst jede neu hinzugekommene operative Datei.**
+
+**Die bittere Zeile: dieser Befund stand wörtlich im Repo.** `phase3_edge/CLAUDE.md` notiert seit
+2026-09-28 „der Watchdog startete dadurch ins Leere", und der tail-proxy wurde am 2026-09-29
+**genau deshalb** ohne `__REPO_ROOT__` gebaut — mit einem Kommentar, der die Kopplung als
+„konstruktiv ausgeschlossen" führt. Die Watchdog-Unit (Code vom 2026-09-26) ist einen Tag älter
+als der Befund und hat die Lehre nicht bekommen. **Dritte Wiederholung derselben Lehre in diesem
+Projekt** (nach der Schnitt-Anker-Falle in P8.6 und den Kommentar-Fallen in den Wächtern): Ein
+Befund, der neben einer Entscheidung steht, wirkt nicht auf deren Nachbarn. **Nikinger-Entscheidung
+2026-10-01: Systempfad** — `ExecStart=/usr/local/libexec/sharefyx/tailscaled_watchdog.sh`,
+`Documentation=` fällt mit derselben Begründung, Installation per
+`sudo install -D -m 0755` **vor** `install_units.sh`. Der Preis ist benannt: ein Skript-Update
+braucht ein erneutes `sudo install`, die Unit startet die installierte Kopie. Elfter Wächter
+(`test_execstart_carries_no_repo_path`), Gegenprobe mit zwei Verstößen → 2 rote Assertions.
+
+**Und was das über den Betrieb sagt:** `203/EXEC` war harmlos (das Skript lief nie, es wurde nichts
+neugestartet) — aber ein **laufender Timer beweist nicht, dass ein Dienst arbeitet**. Ab jetzt ist
+der Abschluss die `healthy: Self.Online=true`-Zeile, nicht die Timer-Zeile.
 
 **Ein Posten, den ich benannt, nicht entschieden habe:** das transitive `mcp` bleibt ungepinnt
 (Dev 1.28.1, Live 1.30.0), und die drei alternativen Autorisierungswege oben sind deine Wahl, nicht

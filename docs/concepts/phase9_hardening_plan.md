@@ -402,6 +402,22 @@ ist ein Befund, kein Gesichtsverlust.
 Neu: `phase3_edge/systemd/tailscaled-watchdog.service` + `.timer`, und
 `phase3_edge/scripts/tailscaled_watchdog.sh`.
 
+> **Bauform-Korrektur, 2026-10-01: der `ExecStart` darf nicht `__REPO_ROOT__` nennen.**
+> §4.2 schrieb `ExecStart=__REPO_ROOT__/phase3_edge/scripts/tailscaled_watchdog.sh` vor. Gemessen
+> bei B2: `local.env` setzt `REPO_ROOT=/opt/sharefyx/current` (und `install_units.sh:53` verlangt
+> die Variable bewusst), der Platzhalter zeigte also aufs **Release** `20260918T183907` — wo das
+> Skript nicht liegt, weil es erst nach diesem Deploy ins Repo kam. Ergebnis: `status=203/EXEC` in
+> jedem Takt. Ein Scan über alle installierten Units traf genau **eine**: alle anderen Skripte waren
+> schon beim Deploy im Release. **Es ist eine Verzögerung, keine Pfadlogik-Fehler — und damit trifft
+> sie zuerst jede neu hinzugekommene operative Datei.** Der Phase-3-Head hatte den Befund seit
+> 2026-09-28 und der tail-proxy war am 2026-09-29 genau deshalb ohne `__REPO_ROOT__` gebaut; die
+> Watchdog-Unit (Code vom 2026-09-26, einen Tag älter) trug die Falle weiter.
+> **Nikinger-Entscheidung 2026-10-01: `ExecStart=/usr/local/libexec/sharefyx/tailscaled_watchdog.sh`**,
+> `Documentation=` entfällt mit derselben Begründung, Installation per
+> `sudo install -D -m 0755`. Preis, benannt: ein Skript-Update braucht ein erneutes `sudo install`.
+> Wächter: `test_execstart_carries_no_repo_path` in
+> `phase9_hardening/tests/test_tailscaled_watchdog.py`.
+
 **Timer statt `while`-Schleife im Dienst.** Ein `Type=oneshot` + `OnUnitActiveSec=` ist
 beobachtbar (`systemctl list-timers`), überlebt einen Fehler im Skript und braucht keinen
 eigenen Prozess im Leerlauf.

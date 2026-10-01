@@ -166,7 +166,7 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 
 **[2026-09-30, P9 Step B (zweiter Teil) — V153 entschieden, und einer der beiden Wege im Plan ist
 nachweislich unbaubar — opencode/M3 — Repo-Seite fertig, Ausführung bleibt beim Nikinger.]**
-`pytest` **1088** (1084 + 4 Wächter), kein `systemctl` durch einen Agenten, kein Service-Touch. **Befund 1: der
+`pytest` **1089** (1084 + 5 Wächter), kein `systemctl` durch einen Agenten, kein Service-Touch. **Befund 1: der
 `sudoers`-Weg aus Plan §4.2 funktioniert auf dieser VM nicht.** Die Unit setzt
 `NoNewPrivileges=true`, und sudo lebt vom setuid-Bit — gemessen: `setpriv --no-new-privs --
 sudo -n -l` → `sudo: The "no new privileges" flag is set, which prevents sudo from running as
@@ -196,10 +196,12 @@ root-Unit nicht starten können, also war polkit das Tor, und **systemd 255.4 sc
 `unit`-Detail doch**: die enge Regel trägt. Nebenbefund mit praktischem Wert: eine Verweigerung
 kostet hier **25 s** (kein polkit-Agent, headless → Agent-Timeout), ein künftiges Nichtgreifen der
 Regel zeigt sich also als Hänger, nicht als schnelles „restart fehlgeschlag".
+**Befund 4 (2026-10-01, B2 ausgeführt und beim ersten Mal gescheitert): die Units waren installiert — und der Dienst startete ins Leere.** `install_units.sh` lief durch, der Timer wurde `enabled`, `list-timers` zeigte ihn, und trotzdem **`status=203/EXEC` in jedem Takt**. Ursache: `local.env` setzt `REPO_ROOT=/opt/sharefyx/current` (und `install_units.sh:53` verlangt die Variable bewusst), der `__REPO_ROOT__` in der Unit zeigte also aufs **Release** `20260918T183907` — und dort liegt `tailscaled_watchdog.sh` nicht, weil das Skript erst am 2026-09-26 ins Repo kam. Ein Scan über alle installierten Units traf **genau eine** mit totem Pfad: **es ist eine Verzögerung, keine Pfadlogik — und sie trifft zuerst jede neu hinzugekommene operative Datei.** Der Befund stand wörtlich im Repo: `phase3_edge/CLAUDE.md` notiert ihn seit 2026-09-28 („der Watchdog startete dadurch ins Leere"), und der tail-proxy wurde am 2026-09-29 genau deshalb **ohne** `__REPO_ROOT__` gebaut. Nur die watchdog-Unit (Code vom 26.09., einen Tag älter als der Befund) hat die Lehre nicht bekommen. **Nikinger-Entscheidung 2026-10-01: Systempfad** — `ExecStart=/usr/local/libexec/sharefyx/tailscaled_watchdog.sh`, `Documentation=` fällt mit derselben Begründung, Installation per `sudo install -D -m 0755` **vor** `install_units.sh`; elfter Wächter (`test_execstart_carries_no_repo_path`, 10/10, Gegenprobe 2 Verstöße → 2 rot). **Und die Lehre über den Betrieb:** `203/EXEC` war harmlos, aber ein **laufender Timer beweist nicht, dass ein Dienst arbeitet** — der Abschluss ist jetzt die `healthy: Self.Online=true`-Zeile. **Befund 5: C0 ist sauber, nachdem ich selbst einmal ein Nachlade-Rennen produziert hatte** — die erste Wiederholung nach dem Löschen der Probe-Regel ergab `rc=0`, die zweite `rc=1` nach 25 s (polkitd hält die gelöschte Regel kurz im Speicher). Damit ist B0 vollständig bewiesen: mit Regel autorisiert, ohne Regel verweigert. 
+
 **Befund 4: die Units sind auf der VM überhaupt nicht installiert** (`ls
 /etc/systemd/system/tailscaled-watchdog.*` → *No such file*, `systemctl list-timers` → 0 Timer;
 der Deploy vom 2026-09-18 liegt vor dem Step-B-Code vom 2026-09-26). **Vier neue Wächter** in
-`phase9_hardening/tests/test_tailscaled_watchdog.py` (**9/9 grün**, Gegenprobe mit vier
+`phase9_hardening/tests/test_tailscaled_watchdog.py` (**10/10 grün**, Gegenprobe mit vier
 eingebauten Verstößen → **6 rote Assertions**): Form jedes Blocks (Aktion+Unit+User, genau ein
 `YES` und das als letzter Ausgang), **Kopplung** zwischen Regel, Skript
 (`systemctl restart tailscaled.service`) und Unit (`User=savefyx`), die drei Nachbar-Aktionen

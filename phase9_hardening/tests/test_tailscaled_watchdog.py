@@ -409,3 +409,39 @@ def test_the_probe_never_names_the_real_unit():
     assert "sharefyx-watchdog-probe.service" in _code_only(PROBE_RULE)
     assert re.search(r"^ExecStart=/bin/true\s*$", _code_only(PROBE_UNIT), re.MULTILINE), \
         "die Probe-Unit muss etwas folgenloses tun"
+
+
+# --- Test 10: der ExecStart ist release-unabhängig ----------------------------
+#
+# Zehnter Wächter, am 2026-10-01 nach einem echten Fehlschlag gebaut: B2 lieferte
+# `status=203/EXEC` in jedem Takt. Ursache war `__REPO_ROOT__` — `local.env` setzt
+# `REPO_ROOT=/opt/sharefyx/current`, also aufs Release 20260918T183907, und dort liegt das
+# Skript nicht (es kam erst am 2026-09-26 ins Repo). Der tail-proxy war bereits vorher genau
+# deshalb ohne `__REPO_ROOT__` gebaut worden; die Lehre aus dem Session-Block 2026-09-28 war
+# an der watchdog-Unit nur nicht angekommen.
+
+def test_execstart_carries_no_repo_path():
+    """ExecStart nennt einen Systempfad, keinen Release-Pfad.
+
+    `__REPO_ROOT__` löst in dieser Installation auf `/opt/sharefyx/current` — einen Symlink
+    auf ein Release, das eine **neu hinzugekommene** Datei nicht enthält. Damit ist jede
+    Unit mit diesem Platzhalter genau dann kaputt, wenn ihr Skript nach dem letzten Deploy
+    ins Repo kam. Der Pfad muss stattdessen `/usr/local/libexec/sharefyx/` sein: dort liegt
+    das Skript unabhängig von Deploy, Rollback und Checkout-Pfad.
+    """
+    content = WATCHDOG_SERVICE.read_text()
+    zeile = re.search(r"^ExecStart=(.*)$", content, re.MULTILINE)
+    assert zeile, "die Unit hat keine ExecStart-Zeile"
+    ziel = zeile.group(1).strip()
+
+    assert "__REPO_ROOT__" not in ziel, \
+        "ExecStart darf keinen __REPO_ROOT__ nennen — er zeigt auf /opt/sharefyx/current"
+    assert "/opt/sharefyx" not in ziel, \
+        f"ExecStart darf nicht ins Release zeigen, das eine neue Datei nicht enthaelt: {ziel}"
+    assert ziel == "/usr/local/libexec/sharefyx/tailscaled_watchdog.sh", \
+        f"unerwarteter ExecStart: {ziel}"
+
+    # Und `Documentation=` muss dasselbe Motiv haben: ein file:// auf das Release waere eine
+    # veraltete Doku, kein Link auf den Grund dieser Zeile. Der tail-proxy traegt es auch nicht.
+    assert not re.search(r"^Documentation=file://__REPO_ROOT__", content, re.MULTILINE), \
+        "Documentation= zeigt auf das Release — dieselbe Kopplung, nur im Kommentarfeld"

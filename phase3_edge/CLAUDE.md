@@ -130,6 +130,24 @@ den Nikinger: `phase9_hardening/step_b/RUNBOOK_STEP_B.md` (B0 Probe, B1 Regel, B
 P9-19). **Noch nicht installiert** — auf der VM fehlen beide Units bisher (`ls
 /etc/systemd/system/tailscaled-watchdog.*` → *No such file*, `systemctl list-timers` zeigt 0).
 
+**[2026-10-01, P9 Step B — der Befund vom 2026-09-28 ist jetzt an der Unit selbst angekommen und
+behoben]:** `systemd/tailscaled-watchdog.service` trug `ExecStart=__REPO_ROOT__/…`, und `local.env`
+setzt `REPO_ROOT=/opt/sharefyx/current` — die Unit zeigte damit aufs Release `20260918T183907`, in
+dem `tailscaled_watchdog.sh` nicht liegt (es kam erst am 2026-09-26 ins Repo). B2 lieferte
+`status=203/EXEC` in jedem Takt. **Exakt der Befund, den der Absatz unten seit 2026-09-28 wörtlich
+festhält und für den der tail-proxy bereits konstruktionslos gebaut wurde** — die Lehre war nur
+nicht an der watchdog-Unit angekommen, weil deren Code einen Tag älter ist. **Nikinger-Entscheidung
+2026-10-01: Systempfad**, `ExecStart=/usr/local/libexec/sharefyx/tailscaled_watchdog.sh`,
+`Documentation=` entfällt mit derselben Begründung, Installation per
+`sudo install -D -m 0755 phase3_edge/scripts/tailscaled_watchdog.sh /usr/local/libexec/sharefyx/` —
+**vor** `install_units.sh`. Der Preis, benannt statt versteckt: ein Skript-Update braucht ein
+erneutes `sudo install`, die Unit startet die installierte Kopie. Wächter:
+`phase9_hardening/tests/test_tailscaled_watchdog.py :: test_execstart_carries_no_repo_path` (10/10
+insgesamt, Gegenprobe 2 Verstöße → 2 rot). **Generelle Lehre für jede neue operative Datei in
+diesem Bereich:** ein `__REPO_ROOT__` in einer Unit bedeutet „muss im Release sein" — das ist
+zum Deploy-Zeitpunkt richtig und eine Woche später die häufigste denkbare Ursache für
+`203/EXEC`. Ablauf: `phase9_hardening/step_b/RUNBOOK_STEP_B.md` §2 B2a.
+
 **[2026-07-29 Korrektur, P4 Step 7]:** Zeile 5 nennt „systemd-Units" — `sharefyx-mcp.service`
 ist davon inzwischen nicht mehr eine. Die MCP-Unit zog nach `phase4_auth/systemd/` um (Plan §5
 Step 7: „ERSETZT die P3-Fassung", inhaltlich jetzt eine P4-Unit — `StateDirectory`, zweites
