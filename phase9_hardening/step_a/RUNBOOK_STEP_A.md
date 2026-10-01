@@ -555,11 +555,21 @@ zwei Hälften** — vorher fehlte der Install-Schritt und der Schritt wäre mit 
 >    durch die neue Domain weder besser noch schlechter: die Scanner kennen `sharefyx.eurofyx.com`
 >    erst, seit der A-Record steht.
 >
-> **Ein Platzhalter ist live geworden:** die ACME-Adresse steht als `deine@adresse.de` in
+> **✅ 2026-10-01, später: der ACME-Platzhalter ist raus.** `read -rp` + `sed` hat die echte
+> Adresse des Nikingers gesetzt (Zeile 21), `caddy validate` sagt wieder `Valid configuration`,
+> `systemctl reload caddy` ohne Fehler — und der Erfolgsbeleg ist der, den es vorher nicht
+> geben konnte: **`notBefore` ist unverändert** (`Oct  1 18:31:33 2026 GMT`). Genau das war
+> vorhergesagt: die `email` gehört zum ACME-*Konto*, nicht zum Zertifikat, es wird nichts neu
+> ausgestellt und erst die nächste Renewal-Runde legt ein Konto mit der richtigen Adresse an.
+> **Die Adresse steht bewusst nicht in diesem Repo** — sie ist eine private, und der Ort für
+> sie ist `/etc/caddy/Caddyfile` plus dein Postfach, nicht eine Doku, die jeder mit Lesezugriff
+> auf das Repo sieht.
+>
+> **Ein Platzhalter war live geworden:** die ACME-Adresse stand als `deine@adresse.de` in
 > `/etc/caddy/Caddyfile` — mein Beispielwert aus der Vorlage, von der `sed`-Zeile wörtlich
 > übernommen. Funktionell folgenlos (Let's Encrypt prüft die Adresse nicht, es gehen nur keine
 > Ablauf-Hinweise dorthin), in einer Härtungsphase aber eine falsche Angabe in einer
-> Betriebsdatei. Korrektur, sobald du sie willst, ist ein Einzeiler ohne Zertifikatsneuausgabe:
+> Betriebsdatei. (Erledigt, siehe oben — der Text bleibt als Beleg, wie der Fehler aussah.)
 >
 > ```bash
 > sudo sed -i 's/deine@adresse.de/DEINE@ADRESSE/' /etc/caddy/Caddyfile

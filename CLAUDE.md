@@ -189,7 +189,7 @@ als Adresse *des VPS* beschrieben, während `reverse_proxy` die **Heim-VM** mein
 in der INDEX als Oversize benannt, P8-P). **Vorgeschlagen, nicht entschieden: A7a** —
 `ALLOWED_HOSTS` vor A7 ziehen, dort wechselt kein `resource` (Befund 4), also bleiben beide
 Connectoren gültig und Fabian ist nicht nötig; ein Neustart des Produktionsdiensts ist
-Nikinger-Sache. **Offen:** A4 selbst, dann Deploy `v3.1.0` (sonst ist das `LEGACY_*`-Fenster
+Nikinger-Sache. **A4 ist danach ausgeführt** (A4a `2.6.2` via apt, A4b `Valid configuration` + `certificate obtained successfully`, LE `YE1`, CN `sharefyx.eurofyx.com`; extern `400 Invalid host header` = Befund 8, und derselbe `400` als `status=400 ua=curl/8.7.1` im Journal der Heim-VM belegt VPS → Tailnet → Relay → App) ⇒ **P9-10a ✅**; **Befund 10** = `caddy validate` liest den Adapter aus dem Dateinamen; der ACME-Platzhalter ist per `sed` ersetzt, `notBefore` blieb unverändert. **Und mein Datum war ein Tag falsch:** der erste Commit war durchgehend mit 2026-10-02 datiert, ohne dass ich das Datum gemessen hatte — die Gegenprobe kam erst mit dem LE-Zertifikat `notBefore=Oct 1`; 41 Fundstellen, ein Korrektur-Commit. **Offen:** Deploy `v3.1.0` (sonst ist das `LEGACY_*`-Fenster
 wirkungslos), dann A7+A8 in einer Sitzung. Details: `phase9_hardening/CLAUDE.md`.
 
 **[2026-10-01, P9 Step A — Domain live, A5 ✅, und eine Korrektur, die A7/A8 zusammenlegt — Claude
