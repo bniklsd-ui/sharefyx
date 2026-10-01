@@ -211,6 +211,27 @@ damit die beiden Orte nicht auseinanderlaufen). Gegenprobe: Direktive entfernt �
 nach `/tmp` umgehängt → 1 rot. **Nach einem Reboot bleibt das Fenster leer** (`/run` ist flüchtig) —
 das ist Absicht, ein frischer Boot soll nicht gedrosselt werden.
 
+### Befund 8 — geschlossen, und ein eigener Messfehler zum Protokoll
+
+**P9-19 ist erfüllt** (Belege oben: die Abnahmetabelle). Der Ablauf nach dem Fix, in Zahlen:
+18:05:40 erster Restart, State-Datei real und beschrieben, 18:09:28 zweiter Ausfall, danach
+**zehn `rate-limited`-Zeilen ohne Restart**, Fenster 900 s, `Self.Online` wieder `true` um 18:20:33.
+
+**Nicht live gesehen wurde eine Sache, die kein Abnahmekriterium ist:** der Ablauf „Fenster
+abgelaufen ⇒ wieder ein Restart". Das Fenster endete um 18:20:40, der Knoten war um 18:20:33
+schon gesund, also fehlt diese eine Beobachtung. Der Pfad ist im Test abgedeckt
+(`test_restart_is_rate_limited_to_once_per_15_minutes`, jetzt mit existierendem Speicher), und ein
+zweiter Ausfall dafür zu erzwingen hieße, absichtlich 15 Minuten einen Knoten offline zu halten.
+**Benannt statt getrieben.**
+
+**Und ein Fehler von mir, der in dieselbe Kategorie gehört:** ich habe unmittelbar nach
+`install_units.sh` „`/run/tailscaled-watchdog/` fehlt" gemeldet — weil ich **parallel zum Takt**
+geprüft hatte statt danach. Der Lauf um 18:03:31 (nach dem daemon-reload) legte das Verzeichnis an
+und ließ es stehen, wie `RuntimeDirectoryPreserve=yes` es vorsieht. **Ein `ls` in derselben Sekunde
+wie ein 60-Sekunden-Timer ist eine Wette**, und ich habe sie verloren. Die Merkform für jede
+künftige Prüfung gegen einen Timer: **erst den Takt abwarten, dann messen** — sonst misst man den
+Zustand *vor* der Wirkung und nennt es einen Befund.
+
 ## §1 Was in dieser Runde passiert und was nicht
 
 | | |
@@ -408,7 +429,7 @@ per `sudo systemctl start tailscaled`. Genau dafür steht die Zeile im Skript.
 | `P9-16` | `systemctl list-timers` zeigt den Timer | ✅ **2026-10-01** — Timer `enabled` **und** `active`, `NEXT` gesetzt. Der erste B2-Durchlauf lieferte noch `203/EXEC` (Befund 6); nach **B2a** steht der eigentliche Beleg: `tailscaled_watchdog.sh[…]: tailscaled-watchdog: healthy: Self.Online=true` + `Finished` |
 | `P9-17` | 5 Tests grün | ✅ **12/12** grün (5 Alt + 7 neu aus den Wächter-Runden; zuletzt die beiden Rate-Limit-Wächter nach Befund 7) |
 | `P9-18` | Härtungs-Direktiven per statischem Wächter belegt | ✅ `test_unit_file_has_the_three_hardening_directives` |
-| `P9-19` | Absichtlicher Offline-Zustand ⇒ genau ein Restart, im Journal belegt | 🟡 **B3 am 2026-10-01: der Restart ist mit Stufe 1→2→3 und polkit-Pfad im Journal belegt** (17:39:17), **der Rate-Limit-Teil ist gescheitert** — zwei Restarts 189 s auseinander, Ursache Befund 7 (`RuntimeDirectoryPreserve=no`). Nach dem Fix ist nur der zweite Ausfall neu zu fahren |
+| `P9-19` | Absichtlicher Offline-Zustand ⇒ genau ein Restart, im Journal belegt | ✅ **2026-10-01.** Erst **ein** Restart 9 s nach dem Stopp (18:05:40, Stufe 1→2→3, polkit-Pfad, State-Datei `1790870740`), danach **zehn Takte `rate-limited` ohne einen einzigen Restart** (256s → 829s, Fenster 900 s) — `tailscaled` blieb dabei ~10 min unten, der Watchdog standhielt. Nebenbefund: um 18:19:29 lief der Pfad über `unhealthy: Self.Online=false` (Dienst lief, noch nicht online) — damit ist **auch der `false`-Zweig von Stufe 1 live belegt**, den vorher nur Mocks kannten |
 | `P9-20` | V152 beantwortet | ✅ „gibt es nicht" (kein Tailscale-Feature ohne Add-on, `pragmaxim/tailscaled-watchdog` macht denselben Job) |
 | `V153` | Polkit oder sudoers? | ✅ **beantwortet**: `sudoers` ist ausgeschlossen (Befund 1), polkit greift und trägt (Befund 5, `AUTORISIERT` mit Journal-Beleg bei `User=root`) |
 
@@ -432,6 +453,6 @@ per `sudo systemctl start tailscaled`. Genau dafür steht die Zeile im Skript.
 
 ## §5 Nächste Runde
 
-**B0, C0, B1 und B2 sind gelaufen** (B2 einmal gescheitert, Befund 6). **Es fehlen B2a** (Skript an den Systempfad, ein `sudo install -D -m 0755`), **B2 wiederholen** und **B3 (P9-19)**. Erst die `healthy`-Zeile im Journal belegt, dass die Unit wirklich arbeitet — eine laufende Timer-Zeile beweist es nicht. **Und für B3 gilt dasselbe für den zweiten Teil:** der erste Restart war belegt, der Rate-Limit-Teil nicht. Befund 7 muss mit einem neuen Fenster geschlossen werden (Unit neu installieren, dann **zwei** Stopps im 15-Minuten-Fenster). Bleibt er aus, ist Step B **nicht** 🟡→✅: P9-19 ist eine
+**B0, C0, B1 und B2 sind gelaufen** (B2 einmal gescheitert, Befund 6). **Es fehlen B2a** (Skript an den Systempfad, ein `sudo install -D -m 0755`), **B2 wiederholen** und **B3 (P9-19)**. Erst die `healthy`-Zeile im Journal belegt, dass die Unit wirklich arbeitet — eine laufende Timer-Zeile beweist es nicht. **Beides ist erledigt:** der erste Restart war belegt, der Rate-Limit-Teil wurde nach dem Befund-7-Fix in einem zweiten Fenster geschlossen (Befund 8). Bleibt er aus, ist Step B **nicht** 🟡→✅: P9-19 ist eine
 Abnahmezeile mit Beweischarakter, keine Formsache. Der nächste inhaltliche P9-Schritt ist
 unabhängig davon **A4/A5** — beide hängen an der Domain und nicht am Watchdog.
