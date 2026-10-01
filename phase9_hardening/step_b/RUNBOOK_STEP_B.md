@@ -138,6 +138,20 @@ Befund. **Nikinger-Entscheidung 2026-10-01: Systempfad `/usr/local/libexec/share
 tail-proxy. `Documentation=` entfällt mit derselben Begründung (es zeigte auf die Doku des
 Releases). Ein elfter Wächter nagelt beides fest.
 
+**Und dann gelöst, im dritten Takt** (B2a + B2 wiederholt, 2026-10-01, Journal-Beleg des
+Nikingers verifiziert):
+
+```
+11:42:54  status=203/EXEC                                                        ← noch vor daemon-reload
+11:43:59  tailscaled_watchdog.sh[1173002]: … healthy: Self.Online=true
+11:43:59  Deactivated successfully. / Finished.
+```
+
+Die `healthy`-Zeile belegt mehr als den Pfad: die Unit läuft als `savefyx` unter
+`NoNewPrivileges` + `ProtectSystem=strict` + `SystemCallFilter=@system-service` und findet
+`tailscale`, `python3`, `date` und `timeout` im Sandbox-PATH. **Damit sind Stufe 1 und der
+gesunde Normalfall live; Stufe 2 (netcheck) und Stufe 3 (Restart) warten auf B3.**
+
 **Was das über den Watchdog sagt:** `203/EXEC` ist harmlos — das Skript lief nie, es wurde nichts
 neugestartet. Aber es zeigt, dass ein durchlaufender Timer **nicht** beweist, dass ein Dienst
 arbeitet. Seit B2a ist der Beweis die `healthy`-Zeile, nicht die Timer-Zeile.
@@ -336,7 +350,7 @@ per `sudo systemctl start tailscaled`. Genau dafür steht die Zeile im Skript.
 
 | # | Kriterium | Stand |
 |---|---|---|
-| `P9-16` | `systemctl list-timers` zeigt den Timer | ✅ **2026-10-01** (Timer-Zeile mit `NEXT` vorhanden) — **aber:** der erste B2-Durchlauf lieferte noch `203/EXEC`, siehe Befund 6; der eigentliche Abschluss ist die `healthy`-Zeile nach B2a |
+| `P9-16` | `systemctl list-timers` zeigt den Timer | ✅ **2026-10-01** — Timer `enabled` **und** `active`, `NEXT` gesetzt. Der erste B2-Durchlauf lieferte noch `203/EXEC` (Befund 6); nach **B2a** steht der eigentliche Beleg: `tailscaled_watchdog.sh[…]: tailscaled-watchdog: healthy: Self.Online=true` + `Finished` |
 | `P9-17` | 5 Tests grün | ✅ **10/10** grün (5 Alt + 5 neu aus den Wächter-Runden, zuletzt `test_execstart_carries_no_repo_path` nach dem 203/EXEC-Befund) |
 | `P9-18` | Härtungs-Direktiven per statischem Wächter belegt | ✅ `test_unit_file_has_the_three_hardening_directives` |
 | `P9-19` | Absichtlicher Offline-Zustand ⇒ genau ein Restart, im Journal belegt | ⬜ **B3** (du) |
