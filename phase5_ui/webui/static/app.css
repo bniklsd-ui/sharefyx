@@ -75,9 +75,15 @@
   --select-fill-quiet:  linear-gradient(180deg, rgba(62,141,243,.10), rgba(62,141,243,.04));
   --select-line:        var(--accent-line);
   --select-line-quiet:  rgba(62,141,243,.20);
-  /* Hover des Standardknopfs (P9, Nikinger 2026-10-01): eine Stufe ueber --select-fill,
-     weil der Knopf im Ruhezustand schon --select-fill traegt. */
-  --select-fill-strong: linear-gradient(180deg, rgba(62,141,243,.30), rgba(62,141,243,.13));
+  /* Standardknopf (P9, Nikinger 2026-10-01): EXAKT das Bild des #home-button auf der
+     schwarzen Rail -- --select-fill/--select-line dort auf #000 verrechnet und als DECKENDE
+     Werte festgeschrieben. Die halbtransparenten Originale sehen auf dem grauen Dialog-Panel
+     sichtbar blauer aus (gemessen Mitte (21,34,52) statt (8,19,33)); deckend sieht der Knopf
+     auf jedem Untergrund gleich aus. Hover/Active: dieselbe Rechnung mit .30/.13 bzw. .10/.04. */
+  --btn-std-fill:        linear-gradient(180deg, #0C1C31, #050B13);
+  --btn-std-fill-hover:  linear-gradient(180deg, #132A49, #081220);
+  --btn-std-fill-active: linear-gradient(180deg, #060E18, #02060A);
+  --btn-std-line:        #1D4374;  /* .40-Kante über dem eigenen Fill (nicht über Schwarz) */
 
   /* Vorsicht -- Aktionen mit Rueckweg-Kosten (Abmelden, Archivieren). Gleicher Wert wie
      --danger, anderer Anlass: --danger meldet, dass etwas schiefging; --caution warnt,
@@ -241,23 +247,23 @@ h3 { font-size: var(--fs-body); }   /* 16px -- Untertitel (vor C1: 15px, kleiner
 
 .btn {
   /* P9, Nikinger-Entscheidung 2026-10-01: der Standardknopf traegt die Optik des aktiven
-     Rail-Knopfs (#home-button[aria-current]) -- --select-fill + 1 px --select-line. Erweitert
+     Rail-Knopfs (#home-button[aria-current]) -- als deckende Werte, siehe --btn-std-* in :root. Erweitert
      die 2026-09-02-Vereinheitlichung (Listenzeilen) auf alle Standardknoepfe. Ausnahmen mit
      eigener Bedeutung bleiben: .btn-primary (Hauptaktion) und .action--caution (Vorsicht,
      z. B. Archivieren -- behaelt die graue Plastik, siehe unten). */
-  background: var(--select-fill);
+  background: var(--btn-std-fill);
   color: var(--text);
-  border: 1px solid var(--select-line);
+  border: 1px solid var(--btn-std-line);
   border-radius: var(--radius-sm);
   padding: 7px 14px;
   font-weight: 500;
   cursor: pointer;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
 }
-.btn:hover { background: var(--select-fill-strong); }
+.btn:hover { background: var(--btn-std-fill-hover); }
 .btn:active {
   transform: translateY(1px);
-  background: var(--select-fill-quiet);
+  background: var(--btn-std-fill-active);
   box-shadow: none;
 }
 .btn.action--caution {
@@ -702,27 +708,17 @@ select.input:focus {
    Inhaltsverzeichnis), Chevron rechts (margin-left: auto, Flex-Container nötig), Hover
    aus B1 bleibt. Kein Rückfall in .btn -- die Kategorie bleibt Navigation. */
 .account-nav {
+  /* P9, Nikinger 2026-10-01 (zweite Runde): die Knöpfe tragen zusätzlich die Klasse .btn und
+     damit EXAKT dessen Optik (Fill, Kante, Schrift, Polster, Hover). Hier steht nur noch das
+     Layout: volle Breite, Chevron rechts, Abstand nach unten. Eine eigene Kopie der Optik war
+     der Grund für die "dritte Variante" (eigene Schriftgröße --fs-ui). */
   display: flex;
   align-items: center;
   gap: var(--space);
   width: 100%;
-  padding: 8px calc(var(--space) * 2);
   margin: 0 0 calc(var(--space) * 2);
-  /* P9, Nikinger-Entscheidung 2026-10-01: dieselbe Optik wie .btn und der aktive Rail-Knopf
-     (--select-fill + 1 px --select-line). Ersetzt H-R.2 (Akzent-quiet-Fill + 3-px-Akzentkante
-     links, 2026-09-14) -- der Chevron rechts traegt den Navigations-Afford weiter. */
-  background: var(--select-fill);
-  border: 1px solid var(--select-line);
-  border-radius: var(--radius-sm);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-  color: var(--text);
-  font-weight: 500;
-  font-size: var(--fs-ui);
-  cursor: pointer;
+  text-align: left;
   text-decoration: none;
-}
-.account-nav:hover {
-  background: var(--select-fill-strong);
 }
 .account-nav .icon {
   /* Chevron ans rechte Ende schieben -- dieselbe Mechanik wie .tree__count (C5), gleiche

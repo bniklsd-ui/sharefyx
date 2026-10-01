@@ -130,3 +130,13 @@ Selbst-Screenshots `docs/screenshots/p9_btn_0{1,2,3}_*.png` (Einstellungen, Spac
 Editor). **Nicht angefasst, benannt:** `.toolbar-btn` (Format-Leiste, „Bearbeiten") bleibt grau.
 Geht mit demselben Deploy wie das Übergangsfenster raus.
 
+**Zweite und dritte Runde, derselbe Tag (Nikinger-Sichtung):** zwei Abweichungen vom Vorbild, beide
+gemessen statt geschätzt. **(1)** Die Einstellungen-Navigation war eine dritte Variante (eigene Kopie
+der Optik mit `--fs-ui`) → die Knöpfe tragen jetzt die Klasse `.btn` selbst, `.account-nav` ist nur
+noch Layout. **(2)** „Zu blau": `--select-fill` ist **halbtransparent** und wirkt nur auf der
+schwarzen Rail dunkel — auf dem grauen Dialog-Panel gemessen Mitte `(21,34,52)` statt `(8,19,33)`.
+Neue **deckende** Tokens `--btn-std-fill`/`-hover`/`-active`/`--btn-std-line` = die Originale auf
+Schwarz bzw. auf dem eigenen Fill verrechnet. Pixel-Gegenprobe (Playwright-Elementscreenshot,
+Wegwerf-Instanz): Übersicht oben/Mitte/unten/Kante `(26,41,60)/(8,19,33)/(5,11,20)/(29,67,116)`,
+Einstellungen-Knopf `(26,40,60)/(8,19,34)/(5,11,20)/(29,67,116)`. Wächter auf die neuen Tokens umgestellt.
+

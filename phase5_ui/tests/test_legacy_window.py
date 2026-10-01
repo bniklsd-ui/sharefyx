@@ -165,7 +165,7 @@ def test_dialog_markup_reuses_the_settings_nav_style():
     html = (STATIC / "app.html").read_text(encoding="utf-8")
     block = re.search(r'<div class="overlay" id="legacy-host-dialog" hidden>.*?\n</div>', html, re.DOTALL)
     assert block, "legacy-host-dialog fehlt"
-    assert 'class="account-nav" id="legacy-host-link"' in block.group(0)
+    assert 'class="btn account-nav" id="legacy-host-link"' in block.group(0)
     assert 'id="legacy-host-close"' in block.group(0)
 
 

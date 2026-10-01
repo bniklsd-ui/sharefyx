@@ -1523,17 +1523,23 @@ def test_layer3_elements_keep_surface_tone():
 
 
 def test_account_nav_and_standard_button_wear_the_rail_selection_look():
-    """**[2026-10-01, P9, Nikinger-Entscheidung] ersetzt H-R.2-L.** Vorher: `.account-nav` mit
-    `var(--accent-quiet)` + 3-px-Akzentkante links (2026-09-14, N.14). Jetzt tragen `.btn` und
-    `.account-nav` dieselbe Optik wie der aktive Rail-Knopf (`#home-button[aria-current]`):
-    `var(--select-fill)` + 1 px `var(--select-line)`. Die 3-px-Kante ist bewusst weg.
+    """**[2026-10-01, P9, Nikinger-Entscheidung] ersetzt H-R.2-L.** `.btn` trägt die Optik des
+    aktiven Rail-Knopfs, als deckende Werte (`--btn-std-fill`/`--btn-std-line`, auf Schwarz verrechnet). Die
+    Navigationsknöpfe im Einstellungen-Dialog tragen die Klasse `.btn` **selbst** (zweite Runde
+    am selben Tag: eine eigene Kopie der Optik in `.account-nav` ergab eine dritte Variante) —
+    `.account-nav` darf deshalb keine eigene Optik mehr deklarieren, nur Layout.
     """
     css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
-    for selector in (".btn", ".account-nav"):
-        body = _block_body(css, selector)
-        assert re.search(r"background\s*:\s*var\(--select-fill\)\s*;", body), (selector, body)
-        assert re.search(r"border\s*:\s*1px solid var\(--select-line\)\s*;", body), (selector, body)
-        assert "border-left" not in body, (selector, body)
+    body = _block_body(css, ".btn")
+    assert re.search(r"background\s*:\s*var\(--btn-std-fill\)\s*;", body), body
+    assert re.search(r"border\s*:\s*1px solid var\(--btn-std-line\)\s*;", body), body
+    nav = _block_body(css, ".account-nav")
+    for prop in ("background", "border", "padding", "font-size", "font-weight", "color", "box-shadow"):
+        assert not re.search(rf"(^|[;\s]){prop}\s*:", nav), (prop, nav)
+    assert not re.search(r"\.account-nav\s*:\s*hover", css)
+    html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
+    navs = re.findall(r'class="([^"]*\baccount-nav\b[^"]*)"', html)
+    assert navs and all("btn" in c.split() for c in navs), navs
 
 
 def test_caution_and_primary_buttons_keep_their_own_look():
@@ -1543,17 +1549,16 @@ def test_caution_and_primary_buttons_keep_their_own_look():
     caution = _block_body(css, ".btn.action--caution")
     assert "var(--btn-face-top)" in caution, caution
     primary = _block_body(css, ".btn-primary")
-    assert "select-fill" not in primary, primary
+    assert "btn-std" not in primary, primary
 
 
-def test_account_nav_hover_kept():
-    """`.account-nav:hover` und `.btn:hover` behalten ein Hover-Verhalten (seit 2026-10-01:
-    `--select-fill-strong`). Wer den Hover-Block ersatzlos löscht, fängt diesen Test."""
+def test_standard_button_hover_kept():
+    """`.btn:hover` behält ein Hover-Verhalten (seit 2026-10-01: `--btn-std-fill-hover`); die
+    Navigationsknöpfe erben es über die Klasse `.btn`."""
     css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
-    for selector in (r"\.account-nav", r"\.btn"):
-        m = re.search(selector + r"\s*:\s*hover\s*\{([^}]*)\}", css)
-        assert m is not None, selector
-        assert "var(--select-fill-strong)" in m.group(1), (selector, m.group(1))
+    m = re.search(r"^\.btn\s*:\s*hover\s*\{([^}]*)\}", css, re.MULTILINE)
+    assert m is not None
+    assert "var(--btn-std-fill-hover)" in m.group(1), m.group(1)
 
 
 def test_rail_account_unchanged_from_block_h():
