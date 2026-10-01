@@ -305,6 +305,12 @@ verlangt ihn nicht.
 
 ### Was diese Konvention NICHT macht
 
+- **[2026-10-01 Ergänzung, P9, Nikinger-Entscheidung]** Die Rail-Optik gilt jetzt für **alle
+  Standardknöpfe**: `.btn` und `.account-nav` tragen `--select-fill` + 1 px `--select-line`
+  (wie `#home-button[aria-current]`), Hover `--select-fill-strong`. Ausnahmen: `.btn-primary`
+  (Hauptaktion) und `.action--caution` (Vorsicht, z. B. Archivieren — behält die graue Plastik).
+  Ersetzt H-R.2 (Akzentkante an `.account-nav`). `.toolbar-btn` (Format-Leiste) unverändert.
+
 - **[2026-09-02 Korrektur]** Der Absatz unten stand hier als Momentaufnahme der Sitzung vom
   2026-09-01/-02 und ist überholt: der Nikinger hat die dort verworfene Vereinheitlichung am
   2026-09-02 explizit angeordnet (Vormerkung 3 Punkt 1, Richtung (a), „i like the rail Button

@@ -75,6 +75,9 @@
   --select-fill-quiet:  linear-gradient(180deg, rgba(62,141,243,.10), rgba(62,141,243,.04));
   --select-line:        var(--accent-line);
   --select-line-quiet:  rgba(62,141,243,.20);
+  /* Hover des Standardknopfs (P9, Nikinger 2026-10-01): eine Stufe ueber --select-fill,
+     weil der Knopf im Ruhezustand schon --select-fill traegt. */
+  --select-fill-strong: linear-gradient(180deg, rgba(62,141,243,.30), rgba(62,141,243,.13));
 
   /* Vorsicht -- Aktionen mit Rueckweg-Kosten (Abmelden, Archivieren). Gleicher Wert wie
      --danger, anderer Anlass: --danger meldet, dass etwas schiefging; --caution warnt,
@@ -237,18 +240,33 @@ h3 { font-size: var(--fs-body); }   /* 16px -- Untertitel (vor C1: 15px, kleiner
 }
 
 .btn {
-  background: linear-gradient(180deg, var(--btn-face-top), var(--btn-face-bottom));
+  /* P9, Nikinger-Entscheidung 2026-10-01: der Standardknopf traegt die Optik des aktiven
+     Rail-Knopfs (#home-button[aria-current]) -- --select-fill + 1 px --select-line. Erweitert
+     die 2026-09-02-Vereinheitlichung (Listenzeilen) auf alle Standardknoepfe. Ausnahmen mit
+     eigener Bedeutung bleiben: .btn-primary (Hauptaktion) und .action--caution (Vorsicht,
+     z. B. Archivieren -- behaelt die graue Plastik, siehe unten). */
+  background: var(--select-fill);
   color: var(--text);
-  border: 1px solid var(--btn-edge);
+  border: 1px solid var(--select-line);
   border-radius: var(--radius-sm);
   padding: 7px 14px;
   font-weight: 500;
   cursor: pointer;
-  box-shadow: inset 0 1px 0 var(--btn-glow), var(--btn-lift);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
 }
-.btn:hover { background: linear-gradient(180deg, color-mix(in srgb, var(--btn-face-top), white 7%), color-mix(in srgb, var(--btn-face-bottom), white 7%)); }
+.btn:hover { background: var(--select-fill-strong); }
 .btn:active {
   transform: translateY(1px);
+  background: var(--select-fill-quiet);
+  box-shadow: none;
+}
+.btn.action--caution {
+  background: linear-gradient(180deg, var(--btn-face-top), var(--btn-face-bottom));
+  border-color: var(--btn-edge);
+  box-shadow: inset 0 1px 0 var(--btn-glow), var(--btn-lift);
+}
+.btn.action--caution:hover { background: linear-gradient(180deg, color-mix(in srgb, var(--btn-face-top), white 7%), color-mix(in srgb, var(--btn-face-bottom), white 7%)); }
+.btn.action--caution:active {
   background: linear-gradient(180deg, var(--btn-face-bottom), var(--btn-face-top));
   box-shadow: var(--btn-press);
 }
@@ -690,17 +708,13 @@ select.input:focus {
   width: 100%;
   padding: 8px calc(var(--space) * 2);
   margin: 0 0 calc(var(--space) * 2);
-  /* Phase 8.6 Block H-R H-R.2 (Plan §2, N.14): Akzent-Fill auf .account-nav,
-     "ausnahmsweise" laut Nikinger-Sichtung 2026-09-14 -- die Knöpfe fehlten nie,
-     sie waren nur zu schwach (Befund "sieht man kaum"). background: var(--accent-quiet)
-     statt none; ringsum border: 1px solid var(--accent-edge); border-left ueberschreibt
-     mit 3 px und Akzent-Farbe (statt 2 px --line-strong). B3-Kategorie "Navigation"
-     bleibt -- Akzent-Fill ist die Sichtbarkeits-Antwort, kein Rueckfall in .btn-Plastik
-     (Locks H-R.2-L + N.14). */
-  background: var(--accent-quiet);
-  border: 1px solid var(--accent-edge);
-  border-left: 3px solid var(--accent);
+  /* P9, Nikinger-Entscheidung 2026-10-01: dieselbe Optik wie .btn und der aktive Rail-Knopf
+     (--select-fill + 1 px --select-line). Ersetzt H-R.2 (Akzent-quiet-Fill + 3-px-Akzentkante
+     links, 2026-09-14) -- der Chevron rechts traegt den Navigations-Afford weiter. */
+  background: var(--select-fill);
+  border: 1px solid var(--select-line);
   border-radius: var(--radius-sm);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
   color: var(--text);
   font-weight: 500;
   font-size: var(--fs-ui);
@@ -708,11 +722,7 @@ select.input:focus {
   text-decoration: none;
 }
 .account-nav:hover {
-  /* H-R.2: Akzent-Fill bleibt, der Hover macht ihn etwas staerker statt den Hintergrund
-     zu wechseln -- sonst wuerde der Knopf zwischen zwei Akzent-Toenen "springen". */
-  background: color-mix(in srgb, var(--accent-quiet), var(--accent) 50%);
-  outline: 1px solid var(--accent-line);
-  outline-offset: -1px;
+  background: var(--select-fill-strong);
 }
 .account-nav .icon {
   /* Chevron ans rechte Ende schieben -- dieselbe Mechanik wie .tree__count (C5), gleiche

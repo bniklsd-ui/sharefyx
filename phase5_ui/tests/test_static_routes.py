@@ -1522,72 +1522,38 @@ def test_layer3_elements_keep_surface_tone():
         )
 
 
-def test_account_nav_uses_accent_fill():
-    """H-R.2-L (Plan §2, N.14): `.account-nav` hat Akzent-Fill (genau: `var(--accent-quiet)`
-    oder `var(--accent)`). Vor H-R.2 war es `background: none` + `border: none` + eine
-    2-px-Akzentkante in `--line-strong` -- "sieht man kaum" (Nikinger-Sichtung
-    2026-09-14). Nach H-R.2: Akzent-quiet-Fill + ringsum border in `--accent-edge` +
-    `border-left: 3px solid var(--accent)`.
-
-    N.14 ist ein Spezialfall (gilt nur für .account-nav). Andere Navigations-Elemente
-    (`.rail__action`) bleiben unverändert -- siehe `test_rail_action_unchanged` weiter
-    unten.
+def test_account_nav_and_standard_button_wear_the_rail_selection_look():
+    """**[2026-10-01, P9, Nikinger-Entscheidung] ersetzt H-R.2-L.** Vorher: `.account-nav` mit
+    `var(--accent-quiet)` + 3-px-Akzentkante links (2026-09-14, N.14). Jetzt tragen `.btn` und
+    `.account-nav` dieselbe Optik wie der aktive Rail-Knopf (`#home-button[aria-current]`):
+    `var(--select-fill)` + 1 px `var(--select-line)`. Die 3-px-Kante ist bewusst weg.
     """
     css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
-    body = _block_body(css, ".account-nav")
-    bg_m = re.search(r"background\s*:\s*([^;]+);", body)
-    assert bg_m is not None, (
-        f".account-nav braucht eine background-Deklaration (H-R.2-L). "
-        f"Block: {body.strip()}"
-    )
-    bg_value = bg_m.group(1).strip()
-    assert bg_value in ("var(--accent-quiet)", "var(--accent)"), (
-        f".account-nav background muss Akzent-Fill sein (H-R.2-L: var(--accent-quiet) "
-        f"oder var(--accent)). Gefunden: '{bg_value}'. Vor H-R.2 stand hier 'none'."
-    )
+    for selector in (".btn", ".account-nav"):
+        body = _block_body(css, selector)
+        assert re.search(r"background\s*:\s*var\(--select-fill\)\s*;", body), (selector, body)
+        assert re.search(r"border\s*:\s*1px solid var\(--select-line\)\s*;", body), (selector, body)
+        assert "border-left" not in body, (selector, body)
 
-    # border-left muss Akzent-Farbe tragen (Afford).
-    bl_m = re.search(r"border-left\s*:\s*([^;]+);", body)
-    assert bl_m is not None, (
-        f".account-nav braucht eine border-left-Deklaration (H-R.2-L). "
-        f"Block: {body.strip()}"
-    )
-    bl_value = bl_m.group(1).strip()
-    assert "var(--accent)" in bl_value, (
-        f".account-nav border-left muss var(--accent) enthalten (H-R.2-L). "
-        f"Gefunden: '{bl_value}'."
-    )
+
+def test_caution_and_primary_buttons_keep_their_own_look():
+    """Die zwei Ausnahmen der 2026-10-01-Entscheidung: Vorsicht (Archivieren) und Hauptaktion
+    tragen **nicht** den Auswahl-Fill -- sonst sähe Archivieren aus wie jeder andere Knopf."""
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+    caution = _block_body(css, ".btn.action--caution")
+    assert "var(--btn-face-top)" in caution, caution
+    primary = _block_body(css, ".btn-primary")
+    assert "select-fill" not in primary, primary
 
 
 def test_account_nav_hover_kept():
-    """H-R.2-L: `.account-nav:hover` behält ein Hover-Verhalten. Vor H-R.2 war es
-    `background: var(--select-fill-quiet) + outline: 1px solid var(--select-line-quiet)`.
-    Nach H-R.2: Akzent-Fill wird verstärkt (`color-mix`) + Outline in `--accent-line`
-    statt `--select-line-quiet`.
-
-    Wer den Hover-Block ersatzlos löscht, fängt diesen Test -- der Knopf wäre dann
-    statisch ohne Rückmeldung.
-    """
+    """`.account-nav:hover` und `.btn:hover` behalten ein Hover-Verhalten (seit 2026-10-01:
+    `--select-fill-strong`). Wer den Hover-Block ersatzlos löscht, fängt diesen Test."""
     css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
-
-    # .account-nav + :hover zusammen als Block.
-    m = re.search(
-        r"\.account-nav\s*:\s*hover\s*\{([^}]*)\}",
-        css,
-    )
-    assert m is not None, (
-        ".account-nav:hover braucht einen eigenen Block (H-R.2-L Hover-Erhalt). "
-        "Wer den :hover-Block ersatzlos löscht, bricht diesen Test."
-    )
-    hover_body = m.group(1)
-    # Mindestens eines der folgenden muss vorhanden sein: background-Änderung,
-    # outline-Änderung, color-mix. Ein leerer Hover-Block zählt nicht als Hover.
-    has_background = "background" in hover_body
-    has_outline = "outline" in hover_body
-    assert has_background or has_outline, (
-        f".account-nav:hover muss mindestens background- oder outline-Eintrag haben "
-        f"(H-R.2-L). Block: {hover_body.strip()}"
-    )
+    for selector in (r"\.account-nav", r"\.btn"):
+        m = re.search(selector + r"\s*:\s*hover\s*\{([^}]*)\}", css)
+        assert m is not None, selector
+        assert "var(--select-fill-strong)" in m.group(1), (selector, m.group(1))
 
 
 def test_rail_account_unchanged_from_block_h():
