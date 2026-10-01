@@ -436,6 +436,23 @@ Die billige lokale Prüfung filtert den Normalfall heraus, bevor irgendetwas gem
 `/run/`. Ohne das baut ein Watchdog bei einem echten Ausfall eine Restart-Schleife, die den
 Ausfall verlängert statt ihn zu beheben.
 
+> **Korrektur, 2026-10-01 (P9-19): „Zustand in einer Datei unter `/run/`" war ungenügend, das
+> Rate-Limit war nie in Kraft.** Gemessen bei B3: zwei Abschaltungen 189 s auseinander ⇒ **zwei**
+> Restarts. `systemctl show -p RuntimeDirectoryPreserve tailscaled-watchdog.service` → `no`, und
+> `/run/tailscaled-watchdog/` existierte nicht mehr. Die Unit legt das Verzeichnis vor `ExecStart`
+> an und **löscht es beim Deaktivieren wieder** — bei einem Timer-`Type=oneshot` also nach jedem
+> Takt. Das Skript schreibt seine State-Datei genau dorthin, das Schreiben gelingt (die Log-Zeile
+> danach beweist es), Sekundenbruchteile später ist sie weg.
+> **Die Klausel „in einer Datei unter `/run/`" ist damit zu schwach: der Ort muss zusätzlich über
+> den Unit-Lebenszyklus hinaus erhalten werden.** Gebaut: `RuntimeDirectoryPreserve=yes` (systemd
+> ≥ 235) plus zwei Wächter — einer verlangt die Direktive, der andere verlangt, dass die State-Datei
+> des Skripts *im* erhaltenen RuntimeDirectory liegt. **Und die Lehre, die der Befund über den Befund
+> hinaus liefert:** `test_restart_is_rate_limited_to_once_per_15_minutes` war grün, weil der
+> Harness den Zustand in eine `tmp_path`-Datei legt, die zwischen zwei Läufen überlebt. **Ein Test,
+> der einen Zustandsspeicher simuliert, den es in Produktion nicht gibt, meldet Grünes über eine
+> Eigenschaft, die nicht existiert.** Bei jedem Zustand, den ein Test *mockt*, ist zu fragen, wer
+> ihn im echten Betrieb bereitstellt — und ob die Betriebseinheit ihn am Leben hält.
+
 **Härtung (Handover §4.3, wörtlich übernommen):** `User=`, `NoNewPrivileges=true`,
 `ProtectSystem=strict`. Der `systemctl restart tailscaled`-Aufruf braucht dafür eine eng
 geschnittene Polkit-Regel oder ein `sudoers`-Fragment mit genau diesem einen Befehl —

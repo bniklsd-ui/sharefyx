@@ -27,7 +27,19 @@ Group=savefyx
 # Nach einem Skript-Update dasselbe Kommando erneut — Wächter:
 # phase9_hardening/tests/test_tailscaled_watchdog.py :: test_execstart_carries_no_repo_path
 ExecStart=/usr/local/libexec/sharefyx/tailscaled_watchdog.sh
+# `RuntimeDirectoryPreserve=yes` ist **keine Kosmetik** — ohne sie ist das Rate-Limit aus
+# Plan §4.2 nicht in Kraft. Gemessen am 2026-10-01 bei P9-19: zwei Abschaltungen 189 s
+# auseinander ⇒ **zwei** Restarts, und `systemctl show -p RuntimeDirectoryPreserve` sagte `no`.
+# systemd legt /run/tailscaled-watchdog vor ExecStart an und **löscht es beim Deaktivieren der
+# Unit** — bei einem Timer-`Type=oneshot` also nach *jedem* Takt. Das Skript schreibt seine
+# State-Datei genau dorthin (tailscaled_watchdog.sh:25); die Log-Zeile unmittelbar danach
+# beweist, dass das Schreiben gelang, und Sekundenbruchteile später ist die Datei wieder weg.
+# `test_restart_is_rate_limited_to_once_per_15_minutes` war dabei grün: der Harness zeigt auf
+# eine tmp-Datei, die zwischen zwei Läufen überlebt — er prüft die Rechnung, nicht den Mechanismus.
+# Nach einem Reboot ist das Fenster wieder leer (/run ist flüchtig) — das ist Absicht: ein frischer
+# Boot soll nicht gedrosselt werden.
 RuntimeDirectory=tailscaled-watchdog
+RuntimeDirectoryPreserve=yes
 RuntimeDirectoryMode=0700
 NoNewPrivileges=true
 PrivateTmp=true

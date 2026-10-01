@@ -156,6 +156,61 @@ gesunde Normalfall live; Stufe 2 (netcheck) und Stufe 3 (Restart) warten auf B3.
 neugestartet. Aber es zeigt, dass ein durchlaufender Timer **nicht** beweist, dass ein Dienst
 arbeitet. Seit B2a ist der Beweis die `healthy`-Zeile, nicht die Timer-Zeile.
 
+### Befund 7 — P9-19 hat genau das gefunden, wofür es da ist: das Rate-Limit war nie in Kraft
+
+**Der erste Teil von B3 ist genau wie vorhergesagt gelaufen** (Journal des Ningkers, verifiziert):
+
+```
+17:38:48  Stopping tailscaled.service                                      ← Stop 1
+17:39:17  tailscaled-watchdog: status unclear; falling back to netcheck     ← Stufe 1
+17:39:17  tailscaled-watchdog: netcheck failed; will restart                 ← Stufe 2
+17:39:17  tailscaled-watchdog: tailscaled restarted (rate-limit window …)   ← Stufe 3, polkit-Pfad
+17:39:17  Starting/Started tailscaled.service                               ← vom Watchdog gestartet
+17:40:19  tailscaled-watchdog: healthy: Self.Online=true
+```
+
+Das ist der Beweis, den P9-19 verlangt — **bis auf das „genau einen".**
+
+**Der zweite Teil ist gescheitert, und der Grund ist kein Messfehler:**
+
+```
+17:41:56  Stopped tailscaled.service          ← Stop 2, 189 s nach Stop 1
+17:42:26  tailscaled-watchdog: tailscaled restarted (rate-limit window …)   ← Restart 2
+$ ls /run/tailscaled-watchdog/                → No such file or directory
+$ systemctl show -p RuntimeDirectoryPreserve tailscaled-watchdog.service
+RuntimeDirectoryPreserve=no
+```
+
+**Zwei Restarts im 15-Minuten-Fenster.** Ursache, vollständig belegt:
+
+1. Die Unit hat `RuntimeDirectory=tailscaled-watchdog` und **kein** `RuntimeDirectoryPreserve`.
+   systemd legt das Verzeichnis vor `ExecStart` an und **löscht es beim Deaktivieren der Unit**
+   weg — bei einem Timer-`Type=oneshot` also **nach jedem Takt**.
+2. `tailscaled_watchdog.sh:25` schreibt die State-Datei genau dorthin
+   (`/run/tailscaled-watchdog/last_restart`). Das Schreiben gelingt; die Log-Zeile unmittelbar
+   danach (`set -euo pipefail` wäre sonst abgebrochen) ist der Beweis. Sekundenbruchteile später
+   ist die Datei wieder weg.
+
+**Und hier ist die Lehre, die teurer ist als der Bug:** `test_restart_is_rate_limited_to_once_per_
+15_minutes` war **grün**. Der Harness zeigt `TAILSCALED_WATCHDOG_STATE_FILE` auf eine `tmp_path`-
+Datei, die zwischen zwei Läufen überlebt — **er prüft die Rechnung, nicht den Mechanismus**, und
+simuliert damit einen Zustandsspeicher, den es in Produktion nicht gibt. Ein Test, der die
+Abwesenheit des Zustandsspeichers nicht bemerken kann, ist schlimmer als kein Test, weil er
+Grünes meldet. Das ist die vierte Wiederholung derselben Repo-Lehre (Schnitt-Anker, Kommentar-
+Fallen, Befund neben Entscheidung, jetzt: gemockter Zustand).
+
+**Was das operativ bedeutet:** Plan §4.2 wollte das Rate-Limit, „weil ohne das ein Watchdog bei
+einem echten Ausfall eine Restart-Schleife baut, die den Ausfall verlängert statt ihn zu beheben".
+Genau die Schleife wäre aktiv gewesen — alle 60 s ein Neustart. In der Probe heilte jeder Neustart
+innerhalb von Sekunden, ein echter Control-Plane-Hänger wäre anders gelaufen.
+
+**Gebaut:** `RuntimeDirectoryPreserve=yes` in der Unit (die dafür gedachte systemd-Direktive, seit
+235 vorhanden, auf dieser Box 255) plus zwei Wächter: einer verlangt die Direktive, der andere
+verlangt, dass die State-Datei des Skripts **im** erhaltenen RuntimeDirectory liegt (die Kopplung,
+damit die beiden Orte nicht auseinanderlaufen). Gegenprobe: Direktive entfernt → 1 rot; State-Datei
+nach `/tmp` umgehängt → 1 rot. **Nach einem Reboot bleibt das Fenster leer** (`/run` ist flüchtig) —
+das ist Absicht, ein frischer Boot soll nicht gedrosselt werden.
+
 ## §1 Was in dieser Runde passiert und was nicht
 
 | | |
@@ -301,7 +356,7 @@ ihrer Härtung durchläuft, Stufe 1 antwortet, und der Timer den Dienst wirklich
 dass irgendetwas neugestartet wurde. (Aktueller Ausgangszustand, 2026-09-30, read-only gemessen:
 `Self.Online = True`, `BackendState = Running`.)
 
-### B3 — P9-19: ein absichtlich herbeigeführter Offline-Zustand *(du, Fenster mit LAN-Zugang)*
+### B3 — P9-19: ein absichtlich herbeigeführter Offline-Zustand *(🟡 halb gelaufen 2026-10-01: Restart bewiesen, Rate-Limit fiel durch Befund 7 — nach dem Fix neu)*
 
 **Vorher lesen:** B3 ist der einzige Schritt, bei dem der Tailnet-Knoten kurz von außen
 verschwindet. Der Claude-Connector ist währenddessen **nicht erreichbar** (er hängt am
@@ -351,9 +406,9 @@ per `sudo systemctl start tailscaled`. Genau dafür steht die Zeile im Skript.
 | # | Kriterium | Stand |
 |---|---|---|
 | `P9-16` | `systemctl list-timers` zeigt den Timer | ✅ **2026-10-01** — Timer `enabled` **und** `active`, `NEXT` gesetzt. Der erste B2-Durchlauf lieferte noch `203/EXEC` (Befund 6); nach **B2a** steht der eigentliche Beleg: `tailscaled_watchdog.sh[…]: tailscaled-watchdog: healthy: Self.Online=true` + `Finished` |
-| `P9-17` | 5 Tests grün | ✅ **10/10** grün (5 Alt + 5 neu aus den Wächter-Runden, zuletzt `test_execstart_carries_no_repo_path` nach dem 203/EXEC-Befund) |
+| `P9-17` | 5 Tests grün | ✅ **12/12** grün (5 Alt + 7 neu aus den Wächter-Runden; zuletzt die beiden Rate-Limit-Wächter nach Befund 7) |
 | `P9-18` | Härtungs-Direktiven per statischem Wächter belegt | ✅ `test_unit_file_has_the_three_hardening_directives` |
-| `P9-19` | Absichtlicher Offline-Zustand ⇒ genau ein Restart, im Journal belegt | ⬜ **B3** (du) |
+| `P9-19` | Absichtlicher Offline-Zustand ⇒ genau ein Restart, im Journal belegt | 🟡 **B3 am 2026-10-01: der Restart ist mit Stufe 1→2→3 und polkit-Pfad im Journal belegt** (17:39:17), **der Rate-Limit-Teil ist gescheitert** — zwei Restarts 189 s auseinander, Ursache Befund 7 (`RuntimeDirectoryPreserve=no`). Nach dem Fix ist nur der zweite Ausfall neu zu fahren |
 | `P9-20` | V152 beantwortet | ✅ „gibt es nicht" (kein Tailscale-Feature ohne Add-on, `pragmaxim/tailscaled-watchdog` macht denselben Job) |
 | `V153` | Polkit oder sudoers? | ✅ **beantwortet**: `sudoers` ist ausgeschlossen (Befund 1), polkit greift und trägt (Befund 5, `AUTORISIERT` mit Journal-Beleg bei `User=root`) |
 
@@ -377,6 +432,6 @@ per `sudo systemctl start tailscaled`. Genau dafür steht die Zeile im Skript.
 
 ## §5 Nächste Runde
 
-**B0, C0, B1 und B2 sind gelaufen** (B2 einmal gescheitert, Befund 6). **Es fehlen B2a** (Skript an den Systempfad, ein `sudo install -D -m 0755`), **B2 wiederholen** und **B3 (P9-19)**. Erst die `healthy`-Zeile im Journal belegt, dass die Unit wirklich arbeitet — eine laufende Timer-Zeile beweist es nicht. Bleibt er aus, ist Step B **nicht** 🟡→✅: P9-19 ist eine
+**B0, C0, B1 und B2 sind gelaufen** (B2 einmal gescheitert, Befund 6). **Es fehlen B2a** (Skript an den Systempfad, ein `sudo install -D -m 0755`), **B2 wiederholen** und **B3 (P9-19)**. Erst die `healthy`-Zeile im Journal belegt, dass die Unit wirklich arbeitet — eine laufende Timer-Zeile beweist es nicht. **Und für B3 gilt dasselbe für den zweiten Teil:** der erste Restart war belegt, der Rate-Limit-Teil nicht. Befund 7 muss mit einem neuen Fenster geschlossen werden (Unit neu installieren, dann **zwei** Stopps im 15-Minuten-Fenster). Bleibt er aus, ist Step B **nicht** 🟡→✅: P9-19 ist eine
 Abnahmezeile mit Beweischarakter, keine Formsache. Der nächste inhaltliche P9-Schritt ist
 unabhängig davon **A4/A5** — beide hängen an der Domain und nicht am Watchdog.

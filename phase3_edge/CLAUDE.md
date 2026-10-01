@@ -148,6 +148,22 @@ diesem Bereich:** ein `__REPO_ROOT__` in einer Unit bedeutet „muss im Release 
 zum Deploy-Zeitpunkt richtig und eine Woche später die häufigste denkbare Ursache für
 `203/EXEC`. Ablauf: `phase9_hardening/step_b/RUNBOOK_STEP_B.md` §2 B2a.
 
+**[2026-10-01, P9 Step B — die Unit läuft, und der erste echte Ausfall hat einen Bug
+gefunden, den kein Test sehen konnte]:** Nach dem `__REPO_ROOT__`-Fix (s.o.) liefert die Unit
+`healthy: Self.Online=true`; bei P9-19 hat der Watchdog einen realen Ausfall in **29 s** erkannt
+(`status unclear → netcheck failed → tailscaled restarted`, polkit-Pfad, Journal-Beleg) — und
+dann **zweimal** innerhalb von 15 Minuten neu gestartet. Ursache: `RuntimeDirectoryPreserve=no`,
+also legt systemd `/run/tailscaled-watchdog` vor `ExecStart` an und **löscht es beim Deaktivieren
+wieder** — bei einem Timer-`Type=oneshot` nach *jedem* Takt. Die State-Datei des Skripts
+(`tailscaled_watchdog.sh:25`) liegt genau dort und ist damit Sekundenbruchteile nach dem Schreiben
+wieder weg. **Das Rate-Limit aus Plan §4.2 war nie in Kraft**, und der Test dafür war grün, weil
+sein Mock die Datei in `tmp_path` legt, wo sie überlebt. **Fix:** `RuntimeDirectoryPreserve=yes`
+(zwei Wächter: die Direktive, und die Kopplung State-Datei ⊂ RuntimeDirectory). **Für jede
+künftige Unit in diesem Verzeichnis gilt damit: wer Zustand über Takte hinweg braucht, braucht
+`RuntimeDirectoryPreserve=yes` — `RuntimeDirectory=` allein ist ein Arbeitsverzeichnis, kein
+Speicher.** Vollständiger Ablauf und Belege: `phase9_hardening/step_b/RUNBOOK_STEP_B.md` §0
+Befund 7.
+
 **[2026-07-29 Korrektur, P4 Step 7]:** Zeile 5 nennt „systemd-Units" — `sharefyx-mcp.service`
 ist davon inzwischen nicht mehr eine. Die MCP-Unit zog nach `phase4_auth/systemd/` um (Plan §5
 Step 7: „ERSETZT die P3-Fassung", inhaltlich jetzt eine P4-Unit — `StateDirectory`, zweites

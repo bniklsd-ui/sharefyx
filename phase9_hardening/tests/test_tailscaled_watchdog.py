@@ -445,3 +445,45 @@ def test_execstart_carries_no_repo_path():
     # veraltete Doku, kein Link auf den Grund dieser Zeile. Der tail-proxy traegt es auch nicht.
     assert not re.search(r"^Documentation=file://__REPO_ROOT__", content, re.MULTILINE), \
         "Documentation= zeigt auf das Release — dieselbe Kopplung, nur im Kommentarfeld"
+
+
+# --- Tests 12-13: das Rate-Limit muss überhaupt eine Grundlage haben -----------
+#
+# Zwei Wächter, am 2026-10-01 nach P9-19 gebaut. Die Abnahmezeile verlangt „genau einen
+# Restart" — die Probe lieferte zwei, 189 s auseinander. Der Test, der das Rate-Limit prüft,
+# war grün: er zeigt `TAILSCALED_WATCHDOG_STATE_FILE` auf eine tmp-Datei, die zwischen zwei
+# Läufen überlebt, während systemd das echte Verzeichnis nach jedem Takt löscht. Ein Test, der
+# einen Zustandsspeicher simuliert, den es in Produktion nicht gibt, beweist die Rechnung.
+
+def test_the_rate_limit_state_outlives_the_run():
+    """`RuntimeDirectoryPreserve=yes` — sonst ist der Zustand nach jedem Takt weg.
+
+    Ohne die Direktive legt systemd `/run/tailscaled-watchdog` vor ExecStart an und löscht es
+    beim Deaktivieren wieder. Gemessen: `RuntimeDirectoryPreserve=no`, Verzeichnis nach dem
+    Lauf nicht vorhanden, zwei Restarts im 15-Minuten-Fenster."""
+    content = _code_only(WATCHDOG_SERVICE)
+    assert re.search(r"^RuntimeDirectory=tailscaled-watchdog\s*$", content, re.MULTILINE), \
+        "die Unit braucht RuntimeDirectory, sonst hat das Skript keinen Ort für die State-Datei"
+    assert re.search(r"^RuntimeDirectoryPreserve=yes\s*$", content, re.MULTILINE), \
+        "RuntimeDirectoryPreserve=yes fehlt — systemd löscht das Verzeichnis nach jedem Takt " \
+        "und das Rate-Limit aus Plan §4.2 kommt nie zur Wirkung"
+
+
+def test_the_state_file_lives_inside_the_preserved_runtime_directory():
+    """Kopplung: das, was das Skript schreibt, muss das sein, was die Unit stehen lässt.
+
+    Die beiden Orte auseinanderlaufen zu lassen ist der ganze Fehler — das Skript schreibt
+    in /run/tailscaled-watchdog/, die Unit verwaltet /run/tailscaled-watchdog. Diese Prüfung
+    greift, sobald jemand einen der beiden Werte anfasst."""
+    unit = _code_only(WATCHDOG_SERVICE)
+    script = _code_only(WATCHDOG_SCRIPT)
+
+    runtime_dir = re.search(r"^RuntimeDirectory=(\S+)\s*$", unit, re.MULTILINE)
+    assert runtime_dir, "RuntimeDirectory= fehlt in der Unit"
+    # systemd legt relative RuntimeDirectory-Namen unter /run ab.
+    basis = runtime_dir.group(1) if runtime_dir.group(1).startswith("/") else f"/run/{runtime_dir.group(1)}"
+
+    standard = re.search(r"TAILSCALED_WATCHDOG_STATE_FILE:-(/run/\S+)", script)
+    assert standard, "im Skript steckt keine Default-STATE_FILE unter /run"
+    assert standard.group(1).startswith(f"{basis}/"), \
+        f"das Skript schreibt nach {standard.group(1)!r}, die Unit erhält aber {basis}/"
