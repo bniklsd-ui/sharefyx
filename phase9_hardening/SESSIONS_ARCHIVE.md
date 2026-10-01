@@ -5,7 +5,7 @@ read-when: Chronik einer älteren P9-Session gesucht — nicht beim normalen Arb
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-09-30 (**dreizehnte Rotation, Step B** — Step-B-Block [polkit-Regel gebaut, V153 entschieden: sudoers ist unter NoNewPrivileges unbaubar; systemd 255 kennt nur die grobe `manage-units`-Aktion, deshalb JS-Regel mit Unit-Attribut; V153-Probe ohne tailscaled-Kontakt] im Head **angehängt**, Step-H-Block verbatim ins Archiv; Head 34.873 B → 28.685 B) | 2026-09-30 (**zwoelfte Rotation, Step H** — Step-H-Block [`fastmcp` exakt gepinnt `==3.4.7`, der Range-Pin hatte den Live-Release bereits lautlos auf 3.4.7 gezogen, V163 mit drei Codepunkten beantwortet, Wächter als Deploy-Riegel, Gegenprobe 4 Verstöße → 7 rot] im Head **angehängt**, Step-G-Block verbatim ins Archiv; Head 33.175 B → 26.210 B) | 2026-09-30 (**elfte Rotation, Step G** — Step-G-Block [Lösch-Ort war unbaubar, TLS-Wegwerf für den Browserbeleg, 14/14] im Head **angehängt**, Step-F-Block verbatim ins Archiv; Head 32.668 B → 25.740 B) | 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
+updated: 2026-10-01 (**vierzehnte Rotation, Step A** — Step-B-Block verbatim aus dem Head; Head 41.707 B → 29.415 B) | 2026-09-30 (**dreizehnte Rotation, Step B** — Step-B-Block [polkit-Regel gebaut, V153 entschieden: sudoers ist unter NoNewPrivileges unbaubar; systemd 255 kennt nur die grobe `manage-units`-Aktion, deshalb JS-Regel mit Unit-Attribut; V153-Probe ohne tailscaled-Kontakt] im Head **angehängt**, Step-H-Block verbatim ins Archiv; Head 34.873 B → 28.685 B) | 2026-09-30 (**zwoelfte Rotation, Step H** — Step-H-Block [`fastmcp` exakt gepinnt `==3.4.7`, der Range-Pin hatte den Live-Release bereits lautlos auf 3.4.7 gezogen, V163 mit drei Codepunkten beantwortet, Wächter als Deploy-Riegel, Gegenprobe 4 Verstöße → 7 rot] im Head **angehängt**, Step-G-Block verbatim ins Archiv; Head 33.175 B → 26.210 B) | 2026-09-30 (**elfte Rotation, Step G** — Step-G-Block [Lösch-Ort war unbaubar, TLS-Wegwerf für den Browserbeleg, 14/14] im Head **angehängt**, Step-F-Block verbatim ins Archiv; Head 32.668 B → 25.740 B) | 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
 ---
 
 # Phase 9 — Sessions Archive
@@ -15,6 +15,180 @@ trägt immer genau einen `## Session stopped`-Block, ältere Blöcke wandern ver
 Vorsatz: nichts abtippen, alles per Skript mit vier Gegenproben (Schnitt verlustfrei, neuer
 Head trägt genau einen Block, alle bewegten Blöcke im Archiv byte-identisch, Archivbestand
 unangetastet).
+
+## Session stopped — 2026-09-30 (fünfter Block, Step B — polkit-Regel gebaut, V153 entschieden, Ausführung bleibt beim Nikinger)
+
+**Blocker B war die Bitte dieser Runde. Die Repo-Seite ist fertig, und die beiden offenen Fragen
+sind nicht dieselben, die der Plan stellt — das war der Fund.** `pytest` **1091** = 1084 + 7 neue Wächter (in `test_tailscaled_watchdog.py`
+steht damit 12/12), kein Service-Touch, kein `systemctl` durch mich.
+
+### Befund 1 — der Plan bietet zwei Wege an, einer ist unbaubar
+
+Plan §4.2: „eng geschnittene Polkit-Regel **oder** ein `sudoers`-Fragment". Die Unit setzt
+`NoNewPrivileges=true`, und sudo lebt vom setuid-Bit:
+
+```
+$ setpriv --no-new-privs -- /usr/bin/sudo -n -l
+sudo: The "no new privileges" flag is set, which prevents sudo from running as root.
+```
+
+Eine `NOPASSWD:`-Zeile wäre unter dieser Unit wirkungslos; sie zu retten hieße, die Härtung
+abzuschwächen. **V153 ist damit entschieden: polkit.** Das ist eine Messung, keine Präferenz —
+und es dreht den Plan um, weil der zweite genannt, aber nie funktionsfähig war.
+
+### Befund 2 — polkit kann es auf dieser Box nicht eng genug, und das steht in keinem Plan
+
+`systemctl --version` → **255.4-1ubuntu8.17**. Der lokal installierte Manpage-Abschnitt *Security*
+in `org.freedesktop.systemd1(5)` nennt für `StartUnit()`/`StopUnit()`/`RestartUnit()` **eine
+gemeinsame** Aktion: `org.freedesktop.systemd1.manage-units`. Die feingranularen
+`manager.restart-unit` gibt es erst ab neuerem systemd. **Ein `<defaults>`-Eintrag kann danach
+gar nicht nach Unit filtern** — „eng geschnitten" setzt voraus, dass es so etwas wie ein
+Unit-Attribut gibt.
+
+Und ob es das auf 255 gibt, ist unprivilegiert **nicht** auslesbar: `pkcheck` kennt die Aktion
+gar nicht, weil systemd sie erst zur Laufzeit bei polkitd registriert
+(`Action … is not registered`). Ein Fehlversuch wäre also nur am echten Neustart zu entdecken —
+genau dem, was man nicht riskieren will, solange die Alternative eine Email mit ausgehendem
+Anschluss ist.
+
+**Gebaut ist deshalb die Form, die in beiden Fällen das Richtige tut:**
+`phase3_edge/polkit/49-tailscaled-watchdog-restart.rules` als **JS**-Regel (nur sie kann auf
+`action.lookup("unit")` prüfen), die `manage-units` **und** die feingranulare Aktion abdeckt, in
+beiden Blöcken zusätzlich `unit == "tailscaled.service"` und `subject.user == "savefyx"`. Fehlt systemd 255 das Attribut, greift die Regel **nicht**, und der Watchdog loggt
+seine vorhandene Zeile `restart fehlgeschlag (Polkit-Regel … V153)` — der Fehlerfall ist
+sicherheitsseitig der gewünschte. **Ohne** den Unit-Abgleich hätte `savefyx` das Starten und
+Stoppen **jeder** Unit, auch aus `sharefyx-mcp` heraus. Das wäre in einer Härtungsphase eine
+Regressionsstelle, und es steht deshalb nicht im Repo.
+
+### Befund 3 — die Probe, die die Restfrage entscheidet, ohne `tailscaled` anzufassen
+
+`phase9_hardening/step_b/`: eine Wegwerf-Unit (`sharefyx-watchdog-probe.service`,
+`ExecStart=/bin/true`, dieselbe Härtung) und eine Wegwerf-Regel, die **diese** Unit freigibt.
+`systemctl restart` darauf ist folgenlos. Antwortet polkit mit ja, trägt die Aktion das
+`unit`-Attribut und die Repo-Regel funktioniert; antwortet es mit nein, ist die Repo-Regel stumm
+und B1 entfällt — dann zurück ans Zeichenbrett, mit zwei Alternativen, die beide die Härtung
+berühren und deshalb **deine Entscheidung** sind (`manage-units` breit freigeben — abgelehnt; oder
+den Watchdog als `User=root` fahren und gar nicht autorisieren — dann trägt das Skript
+PATH-aufgelöste Binaries mit Root-Rechten). Der dritte, sauberere Weg (fixer Root-Oneshot mit
+hartkodiertem `ExecStart`, von der unprivilegierten Einheit per Flag angestoßen) wäre echte
+Umfangserweiterung und ist **nicht** gebaut.
+
+### Was gemessen wurde
+
+| Gegenstand | Nachweis |
+|---|---|
+| **V153** | `setpriv --no-new-privs -- sudo -n -l` → *no new privileges*-Meldung ⇒ sudoers ausgeschlossen |
+| **Aktion** | `systemctl --version` 255.4-1ubuntu8.17 + man `org.freedesktop.systemd1(5)` §Security ⇒ nur `manage-units` |
+| **Sichtbarkeit** | `pkcheck --action-id …manager.restart-unit` → *not registered*; `pkaction` ebenso ⇒ die Restfrage ist unprivilegiert nicht entscheidbar, daher die Probe |
+| **Ist-Zustand** | `ls /etc/systemd/system/tailscaled-watchdog.*` → *No such file*; `systemctl list-timers` → 0 Timer; `polkitd 124-2ubuntu1.24.04.4` vorhanden; `Self.Online = True`, `BackendState = Running` |
+| **Tests** | 7 neue Wächter, **12/12 grün**; Gegenprobe mit vier eingebauten Verstößen → **6 rote Assertions** (Unit-Abgleich raus 2 · Nachbar-Aktion mitgenommen 1 · Skript startet andere Unit 2 · Probe zeigt auf die echte Unit 1), danach zurückgebaut, `git diff` für Skript und Regel leer |
+| **Lesehinweis** | alle vier Wächter filtern **Kommentarzeilen** vorher heraus — die Regel nennt `manage-units` und `tailscaled.service` auch in ihren Befund-Kommentaren, und ein Test, der Kommentare mitliest, prüft meine Formulierung statt der Absicht (dritte Wiederholung derselben Falle: P8.6 Block H, P9 Step G, jetzt hier) |
+
+### Nächster Schritt
+
+**B0 ist die ganze Kette:** drei `sudo install`-Befehle plus ein `systemctl restart` auf eine
+Wegwerf-Unit, danach aufräumen. Danach B1 (Regel), B2 (Units + `systemctl enable --now
+tailscaled-watchdog.timer` — **`install_units.sh` aktiviert nur `sharefyx-mcp`**, und startet es
+dabei neu), B3 (P9-19, erstes Fenster selbstheilend über `systemctl stop tailscaled`). Vollständige
+Befehlsfolgen mit Soll-Ausgaben: `phase9_hardening/step_b/RUNBOOK_STEP_B.md` §2.
+
+**Unverändert:** Step A wartet auf die Domain (NXDOMAIN + RDAP 404), Gate/Z auf A4–A8. Und
+**P9-19 zählt nicht als erledigt, nur weil der Watchdog läuft** — die Abnahmezeile verlangt den
+Journal-Beleg für genau einen Restart.
+
+### Nachtrag derselben Session — B0 ist ausgeführt, und die Antwort war die erhoffte
+
+`systemctl restart sharefyx-watchdog-probe.service` → **`AUTORISIERT`**, mit Journal-Beleg
+(`Starting … Deactivated successfully … Finished`) bei `User=root`. **Damit ist V153 vollständig
+entschieden und die Restfrage aus Befund 3 ausgeräumt: systemd 255.4 schickt das `unit`-Detail an
+die Aktion, die JS-Regel greift, und sie bleibt dabei eng.** B1 kann laufen.
+
+**Ein Nebenbefund, der in B3 zählt und den ich vorher nicht erwartet hatte:** eine **Verweigerung
+kostet hier 25 Sekunden**, nicht eine — gegengetestet an einer Unit, die die Regel nicht nennt:
+`Failed to restart …: Connection timed out`, `rc=1`, **gemessen 25 s**. Auf dieser VM läuft kein
+polkit-Agent (headless), eine nicht erteilte Autorisierung versucht erst die Rückfrage und läuft
+in den Agent-Timeout. **Sollte die Regel irgendwann nicht mehr greifen, sieht man das im Journal
+als Hänger, nicht als schnelles „restart fehlgeschlag"** — die 25 s sind die Kennzahl für die
+Fehlersuche, und sie addieren sich auf die 60 s des Timer-Takts.
+
+**Die Gegenprobe ist ehrlich gesagt noch nicht sauber:** mein Test mit der `.timer`-Unit trennt
+„Regel greift nicht" nicht von „Unit existiert gar nicht" (`is-enabled` sagt `not-found`). Die
+eindeutige Form braucht dein `sudo` (Regel weg, derselbe Restart, jetzt `rc=1`) und steht als
+**C0** im Runbook. Ohne sie trägt der Schluss auf Journal-Beleg plus `User=root`-Messung — das
+reicht, aber C0 macht ihn eindeutig.
+
+**Nächster Schritt:** B1 (`sudo install` der Regel) · B2 (`install_units.sh` + `enable --now` des
+Timers) · dann B3. C0 ist optional und nur für den eindeutigen Beweis.
+
+### Zweiter Nachtrag — B2 ist gescheitert, und der Befund stand seit drei Tagen im Repo
+
+`install_units.sh` lief sauber durch, `enable --now` legte den Symlink an, `list-timers` zeigt
+den Timer — und der Dienst lieferte **in jedem Takt `status=203/EXEC`**. Zwei Messungen, und die
+Ursache ist nicht die Pfadlogik:
+
+1. `systemctl cat … | grep ExecStart` → `/opt/sharefyx/current/phase3_edge/scripts/…` — **das
+   Release, nicht den Checkout.**
+2. `local.env:8` → `REPO_ROOT=/opt/sharefyx/current`, und `install_units.sh:53` verlangt die
+   Variable bewusst (Prod-Units sollen aufs Release zeigen).
+
+Der Scan über alle installierten Units traf **genau eine** mit totem Pfad — alle anderen
+Skripte waren beim Deploy vom 2026-09-18 schon im Release. **Es ist eine Verzögerung, und sie
+trifft zuerst jede neu hinzugekommene operative Datei.**
+
+**Die bittere Zeile: dieser Befund stand wörtlich im Repo.** `phase3_edge/CLAUDE.md` notiert seit
+2026-09-28 „der Watchdog startete dadurch ins Leere", und der tail-proxy wurde am 2026-09-29
+**genau deshalb** ohne `__REPO_ROOT__` gebaut — mit einem Kommentar, der die Kopplung als
+„konstruktiv ausgeschlossen" führt. Die Watchdog-Unit (Code vom 2026-09-26) ist einen Tag älter
+als der Befund und hat die Lehre nicht bekommen. **Dritte Wiederholung derselben Lehre in diesem
+Projekt** (nach der Schnitt-Anker-Falle in P8.6 und den Kommentar-Fallen in den Wächtern): Ein
+Befund, der neben einer Entscheidung steht, wirkt nicht auf deren Nachbarn. **Nikinger-Entscheidung
+2026-10-01: Systempfad** — `ExecStart=/usr/local/libexec/sharefyx/tailscaled_watchdog.sh`,
+`Documentation=` fällt mit derselben Begründung, Installation per
+`sudo install -D -m 0755` **vor** `install_units.sh`. Der Preis ist benannt: ein Skript-Update
+braucht ein erneutes `sudo install`, die Unit startet die installierte Kopie. Elfter Wächter
+(`test_execstart_carries_no_repo_path`), Gegenprobe mit zwei Verstößen → 2 rote Assertions.
+
+**Und was das über den Betrieb sagt:** `203/EXEC` war harmlos (das Skript lief nie, es wurde nichts
+neugestartet) — aber ein **laufender Timer beweist nicht, dass ein Dienst arbeitet**. Ab jetzt ist
+der Abschluss die `healthy: Self.Online=true`-Zeile, nicht die Timer-Zeile.
+
+### Abschluss — Step B ist ✅, und die Abnahme hat ihren Job erfüllt
+
+**P9-19 ist geschlossen.** Nach dem Befund-7-Fix, im zweiten Fenster:
+
+```
+18:05:31  Stopped tailscaled                              ← Stop 1
+18:05:40  status unclear → netcheck failed → tailscaled restarted   ← 9 s, polkit-Pfad
+          State-Datei: 1790870740 (18:05:40)              ← der Speicher existiert jetzt real
+18:09:28  Stopped tailscaled                              ← Stop 2
+18:09:56  rate-limited (256s since last, threshold 900s)
+18:11:01  (321s) · 18:12:06 (386s) · 18:13:11 (451s) · 18:14:11 (511s) · 18:15:16 (576s)
+18:16:21  (641s) · 18:17:26 (706s) · 18:18:26 (767s) · 18:19:29 (829s)   ← zehn Takte, null Restarts
+18:19:29  unhealthy: Self.Online=false                    ← manueller Start, noch nicht online
+18:20:33  healthy: Self.Online=true
+```
+
+**Zehn Takte ohne einen Restart, `tailscaled` rund zehn Minuten unten** — das Rate-Limit ist kein
+Vermerk, es hat den Dienst tatsächlich am Laufen gehalten. **Und ein Fund obendrauf:** um 18:19:29
+nahm der Pfad `unhealthy: Self.Online=false` statt `status unclear`, weil der Dienst da lief, aber
+noch nicht verbunden war. Damit ist **auch der `false`-Zweig von Stufe 1 live belegt** — den
+vorher nur die Mock-Tests kannten. Die gestufte Logik aus Plan §4.2 ist damit in beiden Verzweigungen
+des Stufe-1-Ausgangs gemessen, nicht behauptet.
+
+**Nicht live gesehen und bewusst nicht erzwungen:** der Ablauf „Fenster abgelaufen ⇒ wieder ein
+Restart" (Fenster endete 18:20:40, der Knoten war um 18:20:33 gesund). Für dieses Bild hätte man
+absichtlich 15 Minuten einen Knoten offline halten müssen — der Pfad ist im Test abgedeckt, das
+Fehlen der Beobachtung ist benannt, kein Abnahmekriterium.
+
+**Und ein eigener Fehler, der in dieselbe Rubrik gehört:** unmittelbar nach `install_units.sh` habe
+ich „`/run/tailscaled-watchdog/` fehlt" gemeldet — weil ich **parallel zum Takt** prüfte statt danach.
+Der Lauf eine Minute später legte das Verzeichnis an und ließ es stehen. **Ein `ls` in derselben
+Sekunde wie ein 60-Sekunden-Timer ist eine Wette.** Merkform für jede Prüfung gegen einen Timer:
+erst den Takt abwarten, dann messen.
+
+**Ein Posten, den ich benannt, nicht entschieden habe:** das transitive `mcp` bleibt ungepinnt
+(Dev 1.28.1, Live 1.30.0), und die drei alternativen Autorisierungswege oben sind deine Wahl, nicht
+meine — einer davon verändert die Härtung.
 
 ## Session stopped — 2026-09-30 (vierter Block, Step H)
 

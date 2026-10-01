@@ -117,6 +117,19 @@ gegen `settings.issuer` beim Einlösen von Tokens — `resolver.py` enthält üb
 Der Wechsel der Basis-URL invalidiert also **keine** bestehende Token-Familie. Es ist kein
 Massen-Re-Login zu befürchten; A8 betrifft nur die Connector-Adresse in den Konten.
 
+> **[2026-10-01 Korrektur — der letzte Absatz ist falsch.]** Es gibt keine `iss`-Prüfung, aber
+> eine **`resource`-Prüfung**: `phase2_mcp/mcpserver/app.py:196` baut den Resolver mit
+> `expected_resource=oauth.settings.resource` (= `{base_url}/mcp`), und
+> `phase4_auth/authserver/resolver.py:49` weist jedes Token ab, dessen `record.resource`
+> davon abweicht (RFC-8707-Audience-Bindung, S3/S4 aus dem P4-Review). Die Familie speichert
+> ihre `resource` (`store.py:387`), neue Tokens aus einem Refresh erben sie. **Folge: in dem
+> Moment, in dem `sharefyx-mcp` mit der neuen Basis-URL startet (A7, nicht A8), lehnt `/mcp`
+> jedes bestehende Token beider Konten ab** — beide Connectoren sind weg, bis sie neu
+> verbunden sind. Ein Übergang „beide Adressen für den Connector" bräuchte eine Änderung in
+> `phase4_auth/authserver/` (Tabu-Liste P9 §0.3). **Nikinger-Entscheidung 2026-10-01: harter
+> Schnitt auf der Connector-Seite** — A7 und A8 in einer Sitzung, beide Konten verbinden sofort
+> neu, kein Tabu-Eingriff.
+
 ### Befund 5 — Der Funnel bleibt danach **lesbar, aber nicht beschreibbar**
 
 `phase5_ui/webui/security.py:84` — CSRF prüft `origin != settings.base_url`, **exakt**, ohne
@@ -129,11 +142,19 @@ Das ist die Präzisierung, die Abnahmezeile P9-14 braucht („der Funnel-Hostnam
 weiterhin"). Richtig ist: **er antwortet, und er liest — Schreibvorgänge sind nach A7 weg.**
 Ein echter Dual-Betrieb bräuchte eine zweite erlaubte Origin im Code, und `UiSettings`
 (config.py:41) hat genau ein `base_url`-Feld; das wäre eine Codeänderung **außerhalb** von
-Step A. **Empfehlung: nicht bauen.** Der Funnel ist der Rückfallweg für den Fall „der VPS
+Step A. **Empfehlung: nicht bauen.** *[2026-10-01: vom Nikinger umentschieden, siehe unten.]* Der Funnel ist der Rückfallweg für den Fall „der VPS
 ist weg" — Lesen und ein intakter Connector reichen dafür, und der Schreibpfad läuft nach
 A8 über die Domain. Wer es anders will, entscheidet das ausdrücklich; es ist eine
 bewusste Mehrorigin-Mechanik, kein Konfigurationsdetail.
 
+> **[2026-10-01 Nikinger-Entscheidung — Übergangsfenster für die Web-UI.]** Es wird gebaut,
+> und zwar eng: **genau eine** zusätzliche erlaubte Origin (der alte Funnel-Hostname,
+> exakter String) mit einem **Enddatum in der Konfiguration** (Vorschlag zwei Wochen nach A7).
+> Bis zum Enddatum kann die alte Adresse lesen und schreiben, danach nur noch lesen (der
+> Zustand dieses Befunds). Auf der alten Adresse öffnet sich **bei jedem Laden** ein Dialog im
+> Stil des Einstellungen-Dialogs mit dem Verweis auf die neue Adresse — schließbar, kommt beim
+> nächsten Laden wieder. **Gilt nur für die Web-UI**; der Connector hat keinen Übergang
+> (Korrektur zu Befund 4). Leer/ungesetzt = heutiges Verhalten.
 ### Befund 6 — `socat` fehlt auf der VM, `tailscale` kann es (1.102.4)
 
 `command -v socat` → nichts. Der Install ist ein Nikinger-Schritt (sudo, eine Zeile, §2 A0b).
@@ -209,9 +230,9 @@ A1 ✅ Domain `eurofyx.<tld>` bestellt, TLD-Entscheidung `.com` empfohlen · A2 
 alle Prüfungen grün inklusive des öffentlichen Pfads — der Bestand ist unberührt) · **A6 ✅ Firewall auf dem VPS: 22 nur auf `tailscale0`, 80/443 offen, default deny —
 Gegenprobe von der Heim-VM: Tailnet-SSH **offen**, öffentliches SSH **timeout**
 (ufw *droppt* still, `deny` ≠ `reject`), 443 **refused** (Paket kommt am Host an,
-lauscht noch nichts — der Zustand vor A4) · **A5 wartet** auf die Domain-Registrierung (A-Record kann erst
-mit Zone) · **als Nächstes A0b** (socat + Relay) — danach erst A4/A6, weil A4 ohne Relay nichts
-zu proxen findet. Ab A7 hängt die Reihenfolge: **A7 vor A8**.
+lauscht noch nichts — der Zustand vor A4) · ~~**A5 wartet** auf die Domain-Registrierung~~
+**[2026-10-01] A1 registriert, A5 ✅ (`sharefyx.eurofyx.com` → `217.160.128.146`)** · **als Nächstes
+A4 (Caddy)**. Ab A7 hängt die Reihenfolge: **A7 und A8 in einer Sitzung** (Korrektur zu Befund 4).
 
 ## §2 Die Schritte
 
@@ -260,6 +281,7 @@ Ziel: eine Domain, deren DNS-Zone du erreichst. Technisch relevant ist nur, dass
 A-Records selbst setzen kannst (Schritt A5).
 
 - **Stand 2026-09-29: bestellt und bezahlt, Registrierung noch nicht abgeschlossen** — A5 ist bis dahin blockiert, A3 und A0b nicht.
+- **[2026-10-01] Registrierung abgeschlossen, `eurofyx.com` bei IONOS** — gemessen über `@1.1.1.1`/`@8.8.8.8`: NS `ns1084.ui-dns.org` u. a. (IONOS-Zone aktiv), Apex zeigt auf IONOS-Parking (`217.160.0.175` + AAAA), **kein** Wildcard, **kein** CAA (Let's Encrypt darf ausstellen), `sharefyx.eurofyx.com` noch ohne Datensatz. Das IONOS-Panel meldet „Domain wird nicht genutzt" und „SSL aktivieren" — **beides ignorieren**: das Apex bleibt bewusst frei, das Zertifikat holt Caddy (A4). A5 ist damit freigegeben.
 - Kauf `eurofyx.<tld>`. **Ausreichend ist jede normale Registrar-Oberfläche.** Praktisch ist
   derselbe Anbieter wie beim VPS: dann pflegst du den A-Record im selben Panel, in dem auch
   der VPS liegt. Ein Konto, eine Rechnung.
@@ -412,6 +434,10 @@ sudo systemctl reload caddy                # bzw. restart beim ersten Mal
 
 ### A5 — DNS auf den VPS (du)
 
+> **✅ 2026-10-01:** A-Record `sharefyx` → `217.160.128.146` bei IONOS gesetzt. Gegenprobe vom
+> Mac ohne VPN: `dig +short sharefyx.eurofyx.com @1.1.1.1` → `217.160.128.146`. **Die Domain
+> ist `sharefyx.eurofyx.com`.**
+
 **Ziel-IP steht fest: `217.160.128.146`** (vom Nikinger am 2026-09-29 genannt, gegen die
 tatsächliche Erreichbarkeit geprüft: öffentlich routbar, nicht privat, nicht im
 Tailscale-Bereich `100.64.0.0/10`; Port 22 antwortet, der Server läuft).
@@ -483,6 +509,10 @@ sudo ufw status verbose
 
 Ziel: `SPACE_PUBLIC_BASE_URL` und `ALLOWED_HOSTS` auf die neue Domain. **Befund 3 und 4.**
 
+> **[2026-10-01] Der `restart` in diesem Schritt kappt beide Connectoren** (Korrektur zu
+> Befund 4). Den Restart deshalb nur ansetzen, wenn **Fabian zeitgleich** A8 machen kann —
+> A7 und A8 sind ab jetzt eine Sitzung, kein Abend dazwischen.
+
 In `phase3_edge/local.env` (git-ignoriert, die einzige echte Konfigurationsquelle):
 
 ```
@@ -546,7 +576,9 @@ Rückfall in nummerierten Schritten:
    `phase3_edge/scripts/diagnose.sh` (alle sechs Prüfungen, Exit 0 = gesund).
 4. Ist der VPS selbst weg: in `phase3_edge/local.env` `PUBLIC_BASE_URL` und `ALLOWED_HOSTS`
    auf den Funnel-Hostnamen zurückdrehen, `install_units.sh` + `restart sharefyx-mcp`, danach
-   die Connector-Adresse in **beiden** Konten zurückstellen. Das ist dieselbe A7/A8-Sequenz
+   die Connector-Adresse in **beiden** Konten zurückstellen — **und neu verbinden**: auch der
+   Rückweg wechselt die `resource`, jedes Token beider Konten wird beim Restart ungültig
+   (Korrektur zu Befund 4, 2026-10-01). Das ist dieselbe A7/A8-Sequenz
    rückwärts — es gibt keinen zweiten, kürzeren Weg, und genau deshalb steht er hier.
 
 ---
