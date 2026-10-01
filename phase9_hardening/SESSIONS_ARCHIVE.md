@@ -5,7 +5,7 @@ read-when: Chronik einer älteren P9-Session gesucht — nicht beim normalen Arb
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-01 (**vierzehnte Rotation, Step A** — Step-B-Block verbatim aus dem Head; Head 41.707 B → 29.415 B) | 2026-09-30 (**dreizehnte Rotation, Step B** — Step-B-Block [polkit-Regel gebaut, V153 entschieden: sudoers ist unter NoNewPrivileges unbaubar; systemd 255 kennt nur die grobe `manage-units`-Aktion, deshalb JS-Regel mit Unit-Attribut; V153-Probe ohne tailscaled-Kontakt] im Head **angehängt**, Step-H-Block verbatim ins Archiv; Head 34.873 B → 28.685 B) | 2026-09-30 (**zwoelfte Rotation, Step H** — Step-H-Block [`fastmcp` exakt gepinnt `==3.4.7`, der Range-Pin hatte den Live-Release bereits lautlos auf 3.4.7 gezogen, V163 mit drei Codepunkten beantwortet, Wächter als Deploy-Riegel, Gegenprobe 4 Verstöße → 7 rot] im Head **angehängt**, Step-G-Block verbatim ins Archiv; Head 33.175 B → 26.210 B) | 2026-09-30 (**elfte Rotation, Step G** — Step-G-Block [Lösch-Ort war unbaubar, TLS-Wegwerf für den Browserbeleg, 14/14] im Head **angehängt**, Step-F-Block verbatim ins Archiv; Head 32.668 B → 25.740 B) | 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
+updated: 2026-10-02 (**fünfzehnte Rotation, A4-Vorbereitung** — Step-A-Block (2026-10-01, Domain live) verbatim aus dem Head; Head 42.376 B → 34.795 B) | 2026-10-01 (**vierzehnte Rotation, Step A** — Step-B-Block verbatim aus dem Head; Head 41.707 B → 29.415 B) | 2026-09-30 (**dreizehnte Rotation, Step B** — Step-B-Block [polkit-Regel gebaut, V153 entschieden: sudoers ist unter NoNewPrivileges unbaubar; systemd 255 kennt nur die grobe `manage-units`-Aktion, deshalb JS-Regel mit Unit-Attribut; V153-Probe ohne tailscaled-Kontakt] im Head **angehängt**, Step-H-Block verbatim ins Archiv; Head 34.873 B → 28.685 B) | 2026-09-30 (**zwoelfte Rotation, Step H** — Step-H-Block [`fastmcp` exakt gepinnt `==3.4.7`, der Range-Pin hatte den Live-Release bereits lautlos auf 3.4.7 gezogen, V163 mit drei Codepunkten beantwortet, Wächter als Deploy-Riegel, Gegenprobe 4 Verstöße → 7 rot] im Head **angehängt**, Step-G-Block verbatim ins Archiv; Head 33.175 B → 26.210 B) | 2026-09-30 (**elfte Rotation, Step G** — Step-G-Block [Lösch-Ort war unbaubar, TLS-Wegwerf für den Browserbeleg, 14/14] im Head **angehängt**, Step-F-Block verbatim ins Archiv; Head 32.668 B → 25.740 B) | 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
 ---
 
 # Phase 9 — Sessions Archive
@@ -15,6 +15,101 @@ trägt immer genau einen `## Session stopped`-Block, ältere Blöcke wandern ver
 Vorsatz: nichts abtippen, alles per Skript mit vier Gegenproben (Schnitt verlustfrei, neuer
 Head trägt genau einen Block, alle bewegten Blöcke im Archiv byte-identisch, Archivbestand
 unangetastet).
+
+## Session stopped — 2026-10-01 (sechster Block, Step A — Domain live, A5 ✅, eine Korrektur, die A7 umplant)
+
+**`sharefyx.eurofyx.com` löst auf `217.160.128.146` auf** (vom Mac ohne VPN, `dig +short … @1.1.1.1`).
+Die Registrierung bei IONOS ist durch: NS `ns1084.ui-dns.org` u. a., Apex auf IONOS-Parking (bleibt so,
+das Apex ist für eine Firmen-Website reserviert), **kein Wildcard, kein CAA** — Let's Encrypt darf in
+A4 ausstellen. Die Panel-Hinweise „Domain nicht genutzt" / „SSL aktivieren" sind bewusst ignoriert:
+das Zertifikat holt Caddy.
+
+**Befund dieser Session — Runbook-Befund 4 war falsch, und das ändert die Reihenfolge von A7/A8.**
+Befund 4 versprach „kein Massen-Re-Login", weil es keine `iss`-Prüfung gibt. Es gibt aber eine
+**`resource`-Prüfung**: `app.py:196` baut den Resolver mit `expected_resource = {base_url}/mcp`,
+`resolver.py:49` weist jedes Token mit abweichender `resource` ab, und die Familie vererbt ihre
+`resource` an jedes Refresh-Token. **Der A7-Restart macht also beide Connectoren sofort ungültig —
+nicht erst A8.** Dasselbe gilt rückwärts für den Rückfall A9 Schritt 4. Einen Übergang auch für den
+Connector gäbe es nur mit einer Änderung in `phase4_auth/authserver/` (Tabu §0.3).
+
+**Zwei Nikinger-Entscheidungen 2026-10-01:**
+
+| # | Entscheidung | Folge |
+|---|---|---|
+| 1 | **Connector: harter Schnitt** | A7 und A8 in einer Sitzung, Fabian verbindet zeitgleich neu; kein Tabu-Eingriff |
+| 2 | **Web-UI: Übergangsfenster** (Befund 5 umentschieden) | genau eine zusätzliche erlaubte CSRF-Origin (alter Funnel-Host, exakter String) bis zu einem **Enddatum in der Konfiguration**; danach liest die alte Adresse nur noch. Auf der alten Adresse öffnet sich **bei jedem Laden** ein Dialog im Stil des Einstellungen-Dialogs mit Verweis auf die neue Adresse (schließbar, kommt wieder). Leer = heutiges Verhalten |
+
+**Noch nicht gebaut:** Entscheidung 2 ist Code (`phase5_ui/webui/` + Konfig-Durchreichung über
+`install_units.sh`/Unit/`phase2_mcp` `Settings`) und kommt als eigener Commit. **Offen und deine
+Entscheidung:** das Fenster wirkt nur, wenn es **vor A7 deployt** ist — `deploy.sh` liefert `main`,
+also zusammen mit P9 D–H (neunte P1-Öffnung, `._trash`, `fastmcp==3.4.7`), die bisher auf Gate/Z
+warten. Badge-Version ebenfalls deine Wahl.
+
+**Nächster Schritt:** A4 (Caddy auf dem VPS) — unabhängig vom Fenster-Code, braucht nur die
+auflösende Domain, die jetzt steht.
+
+### Nachtrag derselben Session — das Übergangsfenster ist gebaut
+
+**Entscheidung 2 ist Code, und er tut, was beschlossen ist** — gemessen in einem echten Browser,
+nicht nur in Unit-Tests. Konfiguration: `local.env` `LEGACY_ORIGIN` + `LEGACY_UNTIL` →
+`install_units.sh` (Platzhalter mit `${…:-}`-Default, eine alte `local.env` bricht also nicht) →
+Unit `SPACE_UI_LEGACY_ORIGIN`/`_UNTIL` → `phase2_mcp` `Settings` (fail-closed: halb gesetzt,
+`http://`, `/` am Ende oder Pfad ⇒ Startfehler) → `UiSettings.origin_allowed()` in `require_csrf`.
+
+| Gegenstand | Nachweis |
+|---|---|
+| **Uhr statt Flag** | `UiSettings.clock` wird **pro Anfrage** gefragt — das Fenster schließt am Enddatum ohne Neustart (den macht nur der Nikinger). Test: dieselbe Instanz, Tag 15 erlaubt, Tag 16 nicht |
+| **Datumsgrenze** | Europe/Berlin, einschließlich — beide Seiten getestet |
+| **Andere Origins** | bleiben 403, auch im Fenster (`http://`-Variante, mit `/`, `null`, fremd) |
+| **Ungesetzt** | exakt das alte Verhalten |
+| **Dialog** | `#legacy-host-dialog` in `.account-nav`-Form, **kein neues CSS**; erscheint nur, wenn `location.origin == meta.legacy.origin` (nie auf der neuen Adresse, nie in einer Wegwerf-Instanz ohne Konfiguration); in `anyOverlayOpen()` und der ESC-Kette |
+| **Tests** | `phase5_ui/tests/test_legacy_window.py` **23/23**; Gegenprobe (Datumsprüfung raus 2 rot, CSRF-Haken raus 3 rot) |
+| **Browser** | `phase9_hardening/scripts/p9a_legacy_probe.py` gegen die TLS-Wegwerf-Instanz (18775), **16/16**: offen ⇒ Dialog mit Datum, ESC/Knopf schließen, kommt nach Reload wieder, **POST 201**; abgelaufen ⇒ „nur noch lesbar", **POST 403**. Bild: `docs/screenshots/p9a_legacy_offen.png` |
+| **Bestand** | `pytest` **1114** (1091 + 23), `ui_budget` 5/5 (152,2 KB), Tabu-Pfade leer, kein `systemctl` |
+
+**Berührt außerhalb `phase9_hardening/`, mit Deinem Auftrag:** `phase5_ui/webui/{config,security,api}.py`,
+`app.html`, `js/app.js`, `phase2_mcp/mcpserver/{config,app}.py`, `phase3_edge/scripts/install_units.sh`,
+`phase3_edge/local.env.example`, `phase4_auth/systemd/sharefyx-mcp.service` (nicht `authserver/`).
+
+**Deine Entscheidung vor A7:** das Fenster existiert live erst nach einem Deploy, und `deploy.sh`
+liefert `main` — also mit P9 D–H. Ohne Deploy vor A7 gilt Befund 5 unverändert (alte Adresse nur
+lesend), und `LEGACY_*` in `local.env` wäre wirkungslos. Badge-Version ebenfalls Deine Wahl.
+
+### Zweiter Nachtrag — Standardknöpfe in Rail-Optik (Nikinger-Entscheidung 2026-10-01)
+
+`.btn` und `.account-nav` tragen jetzt die Optik des aktiven Übersicht-Knopfs (`--select-fill` +
+1 px `--select-line`, Hover über neues Token `--select-fill-strong`). **Ausnahmen:** `.btn-primary`
+und `.action--caution` (Archivieren behält graue Plastik + Vorsicht-Rot). **Ersetzt H-R.2-L**
+(Akzentkante an `.account-nav`, 2026-09-14) — die zwei Wächter dafür sind datiert umgeschrieben,
+nicht gelöscht; Gegenprobe mit dem alten CSS → 3 rot. Konvention v3 im Phase-8-Head ergänzt.
+Selbst-Screenshots `docs/screenshots/p9_btn_0{1,2,3}_*.png` (Einstellungen, Spaces verwalten,
+Editor). **Nicht angefasst, benannt:** `.toolbar-btn` (Format-Leiste, „Bearbeiten") bleibt grau.
+Geht mit demselben Deploy wie das Übergangsfenster raus.
+
+**Zweite und dritte Runde, derselbe Tag (Nikinger-Sichtung):** zwei Abweichungen vom Vorbild, beide
+gemessen statt geschätzt. **(1)** Die Einstellungen-Navigation war eine dritte Variante (eigene Kopie
+der Optik mit `--fs-ui`) → die Knöpfe tragen jetzt die Klasse `.btn` selbst, `.account-nav` ist nur
+noch Layout. **(2)** „Zu blau": `--select-fill` ist **halbtransparent** und wirkt nur auf der
+schwarzen Rail dunkel — auf dem grauen Dialog-Panel gemessen Mitte `(21,34,52)` statt `(8,19,33)`.
+Neue **deckende** Tokens `--btn-std-fill`/`-hover`/`-active`/`--btn-std-line` = die Originale auf
+Schwarz bzw. auf dem eigenen Fill verrechnet. Pixel-Gegenprobe (Playwright-Elementscreenshot,
+Wegwerf-Instanz): Übersicht oben/Mitte/unten/Kante `(26,41,60)/(8,19,33)/(5,11,20)/(29,67,116)`,
+Einstellungen-Knopf `(26,40,60)/(8,19,34)/(5,11,20)/(29,67,116)`. Wächter auf die neuen Tokens umgestellt.
+
+### Session-Ende 2026-10-01 — Entscheidungen und nächster Einstieg
+
+**Nikinger-Entscheidungen zum Abschluss:** (1) **noch kein Deploy** — Live bleibt Release
+`20260918T183907` (`v3.0.2`); (2) der nächste Deploy trägt **`v3.1.0`** (Badge `app.html` +
+`docs/UPDATE_LOG.md`-Eintrag erst im Deploy-Commit, wie GA4 in P8.6); (3) gepusht.
+
+**Nächste Session — kurz:**
+1. **A4 Caddy auf dem VPS** (`RUNBOOK_STEP_A.md` A4, Vorlage `Caddyfile.template`, Domain
+   `sharefyx.eurofyx.com`) → Prüfung `https://sharefyx.eurofyx.com/health` mit LE-Zertifikat (P9-10).
+2. **Deploy `v3.1.0` vor A7** — liefert UI-Übergangsfenster, Standardknöpfe und P9 D–H mit;
+   danach `LEGACY_ORIGIN`/`LEGACY_UNTIL` in `local.env` (A7).
+3. **A7+A8 in einer Sitzung, Fabian zeitgleich** (Token-`resource`-Bindung kappt beide Connectoren).
+4. Offen, klein: `.toolbar-btn` und die kleineren „Anzeigen"-Knöpfe in Standardoptik? · Gate/Z wartet auf A4–A8.
+
 
 ## Session stopped — 2026-09-30 (fünfter Block, Step B — polkit-Regel gebaut, V153 entschieden, Ausführung bleibt beim Nikinger)
 

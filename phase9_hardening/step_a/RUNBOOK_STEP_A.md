@@ -26,9 +26,13 @@ nicht „niemand sieht es", sondern „der, der es sieht, bist du".
 
 ---
 
-## §0 Sieben Befunde, die vor A1 gemessen wurden
+## §0 Neun Befunde, die den Step geändert haben
 
-Diese sechs sind **kein Vorwand, nichts zu tun** — jeder davon ist entweder eine
+[2026-10-02: 7 → 9. **Befund 8** (P9-10 ist bis A7 nicht erfüllbar, gemessen gegen den laufenden
+Dienst) und **Befund 9** (kein Caddy auf dem VPS, A4 hatte keinen Install-Schritt) sind
+nachträglich dazugekommen; beide haben den Ablauf geändert, nicht nur beschrieben.]
+
+Diese neun sind **kein Vorwand, nichts zu tun** — jeder davon ist entweder eine
 Plan-Korrektur (der Code sagt etwas anderes als der Plan) oder ein Klärungsbedarf, der
 sonst mitten in A4 aufgetaucht wäre. Alle mit Fundstelle, damit sie nachprüfbar sind, nicht
 behauptet.
@@ -206,6 +210,74 @@ rules every time they're saved"). Man kann unseren Test dort dauerhaft eintragen
 Tailscale die Regel bei **jedem** Speichern der Policy — statt einmalig über
 `Access controls` → `Tests`. Optional, wirkt erst, wenn jemand die Policy anfasst.
 
+### Befund 8 — P9-10 ist bis A7 nicht erfüllbar, und der Grund steht nicht in der Zeile
+**gemessen am 2026-10-02, gegen die laufende Instanz**
+
+Abnahmezeile P9-10 verlangt: *`/health` antwortet 200 mit gültigem LE-Zertifikat*. Die
+Zertifikats-Hälfte ist eine Caddy-Eigenschaft. Die **200** ist eine Eigenschaft der Anwendung —
+und die antwortet für die neue Domain heute `400 Invalid host header`, weil `ALLOWED_HOSTS`
+(noch nicht die Domain enthält. Befund 3 hat diese Kopplung richtig beschrieben, aber sie steht
+als „A7 gehört dazu" im Plan und damit **hinter** der Abnahme, die A4 prüfen soll.
+
+Belege, beide gegen den laufenden Dienst, nicht aus dem Code gelesen:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:8765/health                      # 200
+curl -s -w '\n%{http_code}\n'    -H "Host: sharefyx.eurofyx.com" http://127.0.0.1:8765/health
+# Invalid host header
+# 400
+curl -s -o /dev/null -w '%{http_code}\n' \
+     -H "Host: savefyx-vmware-virtual-platform.tail4a8b49.ts.net" http://127.0.0.1:8765/health  # 200
+```
+
+Und die **ganze Kette** einmal mit einem echten Caddy davor, statt nur zu schließen: Caddy 2.6.2
+(die Version, die das Ubuntu-24.04-Paket liefert) lokal auf einem Wegwerf-Port vor die
+Relay-Adresse `100.93.43.122:8765` gestellt, also genau die Strecke, die der VPS in A4 nimmt:
+
+| `Host:` | Antwort |
+|---|---|
+| `sharefyx.eurofyx.com` | `400` + `Invalid host header` |
+| `100.93.43.122` | `400` + `Invalid host header` |
+| `savefyx-vmware-virtual-platform.tail4a8b49.ts.net` | `200` + `{"status":"ok","service":"sharefyx-mcp",...}` |
+
+Damit ist beides zugleich belegt: **das Relay funktioniert** (die dritte Zeile geht durch den
+socat-Relay durch und kommt von der App), **und Caddy reicht den Host-Header unverändert
+durch** — die Behauptung stand vorher nur als „Caddy-Default" im Kommentar.
+
+**Was ich daraus gemacht habe:** P9-10 ist in §3 in **P9-10a** (Zertifikat, in A4) und **P9-10b**
+(`200`, nach dem `ALLOWED_HOSTS`-Teil von A7) geteilt, und A4 nennt die `400` als das erwartete
+Ergebnis. Das ist die ehrliche Form: „die Abnahme ist noch nicht reif" statt „A4 ist fertig und
+etwas stimmt noch nicht".
+
+**Offen, deine Entscheidung (nicht gebaut):** Man kann die `ALLOWED_HOSTS`-Hälfte von A7
+**vorziehen** (dort als A7a ausformuliert) — dort passiert **kein** `resource`-Wechsel, also
+bleiben beide Connectoren gültig und Fabian ist nicht nötig. Ich habe es nicht entschieden,
+weil ein Neustart des Produktionsdiensts deine Sache ist.
+
+### Befund 9 — auf dem VPS ist kein Caddy installiert, und A4 fing trotzdem mit „install" an
+**gemessen am 2026-10-02, von der Heim-VM aus**
+
+```
+tailscale status  ->  100.121.142.113  ubuntu  tagged-devices  linux  (Online: true, Tags: ['tag:sharefyx-edge'])
+curl http://100.121.142.113:80/   -> 000
+curl http://100.121.142.113:443/  -> 000
+```
+
+`000` heißt: kein Listener. Das ist derselbe Zustand, den der A6-Test am 2026-09-30 als
+„443 refused — Paket kommt am Host an, lauscht noch nichts" protokolliert hat, also **kein
+Firewall-Problem**, sondern ein fehlendes Programm. Der Schritt A4 im Runbook fing trotzdem mit
+`sudo install -m 644 /etc/caddy/Caddyfile` an — ein Befehl, der auf einer Maschine ohne Caddy
+mit `No such file or directory` endet und den du dann Zwischenstand meldest. A4 hat jetzt
+darum **A4a (installieren)** und **A4b (Konfiguration)**, und **A4a startet mit der Messung**,
+ob überhaupt etwas da ist.
+
+Zwei Nebensachen aus derselben Messung, weil sie die Wahl der Quelle bestimmen — beide mit den
+Belegen in `Caddyfile.template`: das Paket ist **2.6.2** und legt `/var/log/caddy` im `postinst`
+an (das Datei-Log der Vorlage ist damit beschreibbar, `caddy validate` sagt auf dieser Version
+`Valid configuration`); und die Paket-Unit hat `ExecReload=… caddy reload … --force`, weshalb
+**kein `admin off`** in der Vorlage steht — gemessen bricht `caddy reload` damit in
+`dial tcp 127.0.0.1:2019: connection refused` ab.
+
 ## §1 Was in dieser Runde passiert und was nicht
 
 | | |
@@ -233,6 +305,14 @@ Gegenprobe von der Heim-VM: Tailnet-SSH **offen**, öffentliches SSH **timeout**
 lauscht noch nichts — der Zustand vor A4) · ~~**A5 wartet** auf die Domain-Registrierung~~
 **[2026-10-01] A1 registriert, A5 ✅ (`sharefyx.eurofyx.com` → `217.160.128.146`)** · **als Nächstes
 A4 (Caddy)**. Ab A7 hängt die Reihenfolge: **A7 und A8 in einer Sitzung** (Korrektur zu Befund 4).
+
+**Stand 2026-10-02 (A4-Vorbereitungsrunde):** A4 ist als **A4a + A4b** neu gefasst (Befund 9:
+kein Caddy auf dem VPS, gemessen an 80/443 = kein Listener) und die Abnahmezeile **P9-10 ist in
+P9-10a/P9-10b geteilt** (Befund 8: gemessen `400 Invalid host header` für die neue Domain, die
+ganze Kette über einen echten Caddy 2.6.2 vor dem Relay durchgespielt). Der zweite Platzhalter
+der Vorlage hieß `<vps-tailnet>` und war als *VPS*-Adresse beschrieben, obwohl `reverse_proxy`
+auf die **Heim-VM** zeigt — jetzt `<heimvm-tailnet>`, mit der gemessenen Ziel-IP im Kommentar.
+**Offen ist genau ein Schritt: A4.**
 
 ## §2 Die Schritte
 
@@ -416,21 +496,75 @@ wird hier **nicht** angefasst: das ist P3-Code, und dieser Commit bleibt additiv
 
 ### A4 — Caddy auf dem VPS (Konfiguration von mir, sudo von dir)
 
-Ziel: TLS-Terminierung für die eigene Domain, Weiterleitung über das Tailnet.
+Ziel: TLS-Terminierung für die eigene Domain, Weiterleitung über das Tailnet. **Ab 2026-10-02
+zwei Hälften** — vorher fehlte der Install-Schritt und der Schritt wäre mit einem
+`No such file or directory` geendet (Befund 9).
+
+#### A4a — erst messen, dann installieren
 
 ```bash
-# auf dem VPS
-# 1. Vorlage holen:  phase9_hardening/step_a/Caddyfile.template
-# 2. Die drei Platzhalter ersetzen: <domain>, <vps-tailnet>, <kontakt>
-sudo install -m 644 /etc/caddy/Caddyfile   # bzw. anlegen, Rechte root:root 0644
-sudo systemctl reload caddy                # bzw. restart beim ersten Mal
+# auf dem VPS (SSH übers Tailnet: ssh -i <key> root@100.121.142.113)
+command -v caddy && caddy version || echo "kein Caddy — Installation folgt"
 ```
 
-- **Ausgabe lesen:** `journalctl -u caddy -n 30 --no-pager` — Caddy holt das Zertifikat per
-  ACME. **Erwartet: eine Zeile ohne Fehler und der Hinweis auf die Zertifikatsausstellung.**
-  Ein Zertifikatsfehler hier bedeutet fast immer: DNS auf A steht noch nicht (A5) oder Port
-  80 ist nicht erreichbar. Deshalb ist die Reihenfolge A5 → A4 die sichere; wenn du A4 vor
-  A5 machst, erwarte ich den Fehler und wir machen A5 sofort danach.
+**Erwartet: `kein Caddy` (Befund 9, gemessen am 2026-10-02: nichts lauscht auf 80/443).**
+Kommt eine Version, ist A4a erledigt und wir gehen zu A4b — dann bitte die Version mitschicken,
+weil die Vorlage gegen **2.6.2** validiert ist.
+
+Installation, falls `kein Caddy`:
+
+```bash
+sudo apt update
+sudo apt install -y caddy
+caddy version          # nicht sudo: /usr/bin/caddy ist world-readable
+```
+
+**Erwartet: `2.6.2`** (das Ubuntu-24.04-Paket, `apt-cache policy caddy` am 2026-10-02). Der
+`apt install` legt gleichzeitig die Unit an, den Nutzer `caddy` und `/var/log/caddy` (im
+`postinst`, deshalb ist das Datei-Log der Vorlage beschreibbar) — **und ein Default-Caddyfile mit
+einem `:80`-Block**, das A4b ersetzt.
+
+#### A4b — Konfiguration und Neustart
+
+```bash
+# 1. Die drei Platzhalter ersetzen — auf dem VPS, nicht im Repo (die Datei bleibt Vorlage):
+#      <domain>         -> sharefyx.eurofyx.com
+#      <heimvm-tailnet> -> 100.93.43.122          (die HEIM-VM, nicht der VPS)
+#      <kontakt>        -> deine E-Mail-Adresse
+#    z. B. mit sed auf eine Kopie, dann nach /etc/caddy/Caddyfile:
+sudo install -d -m 755 /etc/caddy
+sudo install -m 644 /tmp/Caddyfile.sub /etc/caddy/Caddyfile
+sudo caddy validate --config /etc/caddy/Caddyfile     # <- die Prüfung, die A4 gerettet hat
+sudo systemctl restart caddy
+```
+
+**`<heimvm-tailnet>` ist die Falle in diesem Schritt** (2026-10-02 korrigiert: der Platzhalter
+hieß vorher `<vps-tailnet>` und war als Node-Name *des VPS* beschrieben). Der VPS heißt
+`ubuntu`, `100.121.142.113`. Trägt der VPS sich selbst als Ziel ein, sieht der Fehler aus wie
+ein totes Relay — `connection refused` auf dem VPS statt „Ziel falsch".
+
+**Warum `validate` vor `restart`:** ein Tippfehler wird sonst erst beim Neustart sichtbar —
+und dann ist der Dienst weg, der vorher lief (die Paket-Unit startet Caddy als `User=caddy`).
+
+- **Ausgabe lesen — drei getrennte Dinge, alle drei zählen:**
+
+  1. `caddy version` → `2.6.2` (oder höher)
+  2. `sudo journalctl -u caddy -n 40 --no-pager` → **die ACME-Zeile.** Erwartet etwas wie
+     `certificate obtained successfully` / `serving initial configuration` **ohne** Fehler und
+     ohne mehrfaches `retrying`. Ein Zertifikatsfehler heißt fast immer: Port 80 nicht
+     erreichbar oder DNS zeigt noch nicht auf den VPS. Port 80/443 sind bei A6 offen, DNS steht
+     seit A5 — wenn es trotzdem scheitert, ist die Zeile selbst das Ergebnis, nicht „ok".
+  3. **Von einem Gerät ohne VPN:**
+     ```bash
+     curl -s -o /dev/null -w '%{http_code}\n' https://sharefyx.eurofyx.com/health
+     openssl s_client -connect sharefyx.eurofyx.com:443 -servername sharefyx.eurofyx.com </dev/null 2>/dev/null \
+       | openssl x509 -noout -subject -issuer -dates
+     ```
+     **Erwartet: `400` mit Rumpf `Invalid host header`, und ein LE-Zertifikat auf
+     `subject=CN = sharefyx.eurofyx.com`.** Das ist **kein Fehlschlag**, sondern Befund 8: TLS
+     steht, die Anwendung kennt die Domain noch nicht. Ein `000` oder ein
+     `unable to get local issuer certificate` bedeutet dagegen: A4 ist nicht fertig — dann
+     kommst du mit der Journalzeile zurück, nicht mit „geht nicht".
 
 ### A5 — DNS auf den VPS (du)
 
@@ -513,6 +647,23 @@ Ziel: `SPACE_PUBLIC_BASE_URL` und `ALLOWED_HOSTS` auf die neue Domain. **Befund 
 > Befund 4). Den Restart deshalb nur ansetzen, wenn **Fabian zeitgleich** A8 machen kann —
 > A7 und A8 sind ab jetzt eine Sitzung, kein Abend dazwischen.
 
+> **[2026-10-02, Vorschlag, wartet auf deine Anordnung — Befund 8] `ALLOWED_HOSTS` lässt sich
+> als eigene Hälfte vorziehen** (`A7a`), weil dort **kein** `resource`-Wechsel passiert:
+>
+> ```bash
+> # in phase3_edge/local.env: ALLOWED_HOSTS=sharefyx.eurofyx.com,savefyx-vmware-virtual-platform.tail4a8b49.ts.net,127.0.0.1
+> sudo phase3_edge/scripts/install_units.sh
+> sudo systemctl restart sharefyx-mcp
+> curl -s -o /dev/null -w '%{http_code}\n' -H "Host: sharefyx.eurofyx.com" http://127.0.0.1:8765/health
+> ```
+>
+> Erwartet: `200`. Danach ist P9-10b grün und der ganze öffentliche Weg (TLS, Zertifikat,
+> Health) steht **vor** A7 — A7/A8 bleiben dann der einzige Schnitt mit Token-Folge.
+> Gegenprobe, dass die alte Adresse dadurch nicht verloren geht: derselbe Befehl mit
+> `-H "Host: savefyx-...ts.net"` → weiterhin `200`. **Nicht gebaut**: ein Neustart des
+> Produktionsdiensts ist deine Sache, und ein `install_units.sh` ohne Not ist der Moment, in
+> dem aus einem Kalibrier-Schritt ein Betriebsereignis wird.
+
 In `phase3_edge/local.env` (git-ignoriert, die einzige echte Konfigurationsquelle):
 
 ```
@@ -594,12 +745,21 @@ Rückfall in nummerierten Schritten:
 
 | # | Abnahmezeile | Wie sie belegt wird | Status |
 |---|---|---|---|
-| P9-10 | `/health` antwortet 200 mit gültigem LE-Zertifikat | `curl` + Zertifikatsprüfung von extern (Pfad `/health`, s. Befund 2) | ⬜ |
+| **P9-10a** | **`/health` über die eigene Domain mit gültigem LE-Zertifikat erreichbar — TLS-Hälfte** | A4b: `openssl s_client` (Subject, Issuer, Dates) + `curl -s -o /dev/null -w '%{http_code}' https://sharefyx.eurofyx.com/health`. **Erwartet `400` + `Invalid host header`** (Befund 8) — die `400` gehört zur Abnahme, sie ist der Beweis, dass die Kette bis zur App steht | ⬜ |
+| **P9-10b** | **`/health` antwortet 200** (ursprünglicher Wortlaut von P9-10) | nach dem `ALLOWED_HOSTS`-Teil von A7 (oder A7a): `curl -s https://sharefyx.eurofyx.com/health` → `{"status":"ok",...}` | ⬜ |
 | P9-11 | `nmap` gegen die **Heim**-IP zeigt keinen offenen Port | Gegenprobe mit Nikinger | ⬜ |
 | P9-12 | `/.well-known/oauth-authorization-server` liefert den neuen `issuer` | A7-Messung | ⬜ |
 | P9-13 | `list_spaces` aus **beiden** Konten über die neue Adresse | A8, echter Aufruf (V150) | ⬜ |
 | P9-14 | Funnel antwortet weiter, Rückfall beschrieben | A9 — **mit der Befund-5-Einschränkung** | ⬜ |
 | P9-15 | `/api/v1/overview` gemessen gegen 372,9 ms (V151) | drei Läufe, nicht einer | ⬜ |
+
+**[2026-10-02, datierte Plan-Korrektur] P9-10 war als eine Zeile formuliert und ist damit zwei
+Zeilen:** „200 **und** gültiges LE-Zertifikat" kann an keinem einzigen Punkt dieses Ablaufs
+gleichzeitig erfüllt werden, weil die Zertifikats-Hälfte Caddy und die 200-Hälfte
+`SPACE_ALLOWED_HOSTS` gehören, und `ALLOWED_HOSTS` ist A7. Die Aussage der Ursprungszeile
+bleibt vollständig erhalten — sie ist nur in zwei prüfbare Hälften zerlegt, mit der Reihenfolge
+P9-10a (A4) → P9-10b (A7). Das ist dieselbe Form wie Befund 2 (`/health` statt `/healthz`):
+**der Plan-Wortlaut wird an der Code-Wahrheit ausgerichtet, nicht die Abnahme abgeschwächt.**
 
 **P9-11 ist der Test, den dieser Step am leichtesten besteht und am leichtesten verliert:**
 `sharefyx-tail-proxy` öffnet 8765 auf `100.93.43.122`, also auf der **Tailnet**-Adresse. Das
@@ -646,3 +806,15 @@ Relay)** → A5 (DNS) → A4 (Caddy) → A6 (Firewall) → A7 (Basis-URL) → A8
 
 **Modulstatus Step A bleibt 🟡**, nicht ✅: gebaut ist der Repo-Anteil, ausgeführt ist noch
 nichts — dieselbe Einstufung wie Step B (🟡 = code-complete, install ausstehend).
+
+**[2026-10-02, Stand nach der A4-Vorbereitungsrunde]** Offen ist genau **ein** Schritt: **A4**,
+mit A4a (messen, dann `apt install -y caddy`) und A4b (Caddyfile, `validate`, Restart) und den
+drei Ausgaben, die ich oben nenne. **A4a ist reine Messung plus Paketinstallation, A4b ist
+eine Datei und ein Neustart auf einer Maschine, die heute nichts Dienst-relevantes trägt.**
+Danach ist die Reihenfolge, wie in §6 steht, mit zwei Änderungen aus den neuen Befunden:
+
+1. **P9-10 ist zwei Abnahmezeilen** (§3, Befund 8). Die Zertifikats-Hälfte fällt in A4 an, die
+   `200`-Hälfte wartet auf `ALLOWED_HOSTS` — A7 oder das vorgeschlagene A7a.
+2. **A7 ist die einzige Stelle mit Token-Folge**, seit Befund 4 korrigiert ist. Alles davor
+   (A4a, A4b, A7a) ist für beide Connectoren folgenlos; das ist der Grund, warum der Deploy von
+   `v3.1.0` und das `LEGACY_*`-Fenster **vor** A7 gehört und nicht danach.

@@ -16,6 +16,16 @@ gehen kann:
   5. test_the_port_is_the_one_the_app_listens_on   # Port darf nicht auseinanderlaufen
   6. test_health_route_correction_holds             # /health, nicht /healthz (Befund 2)
 
+Dazu vier Wächter für die Caddy-Vorlage (Stand 2026-10-02, aus der A4-Vorbereitungsrunde). Sie
+sind nicht theoretisch: der Platzhalter `<vps-tailnet>` war im Kopfkommentar als Adresse *des
+VPS* beschrieben, während `reverse_proxy` darunter auf die Heim-VM zeigt — wer nach der Kopfzeile
+einsetzt, proxt Caddy auf sich selbst und der Fehler sieht in A4 wie ein totes Relay aus.
+
+  7. test_the_upstream_placeholder_names_the_home_vm
+  8. test_the_template_and_its_header_name_the_same_placeholders
+  9. test_the_upstream_port_is_the_relay_port
+ 10. test_no_second_hsts_header_and_no_admin_off
+
 Kein Netz, kein Dienst, kein root — alles statisch gegen die Dateien im Repo. Die
 VPS-seitigen Artefakte (Caddyfile-Vorlage, ACL-Entwurf) haben je einen Wächter, weil ein
 Fehler dort still ist: ein zu weit gefasster ACL-Entwurf scheitert erst am Deploy.
@@ -24,6 +34,11 @@ Die offene Frage, warum `socat` und nicht `tailscale serve --tcp` (ACL-Durchsetz
 Tailscale-TCP-Forwardern, `[VERIFY] V162`), steht in `phase9_hardening/step_a/
 RUNBOOK_STEP_A.md` §0 Befund 1 — dieser Test kann sie nicht beantworten, nur verhindern,
 dass die getroffene Wahl unbemerkt verboten wird.
+
+Die Vorlage wurde am 2026-10-02 gegen das **echte** `caddy validate` der Ubuntu-24.04-Version
+geprüft (`caddy 2.6.2-6ubuntu0.24.04.3`, `Valid configuration`) und der Host-Header-Durchreich
+daran gemessen (Befund 8 im Runbook). Diese Messung braucht das Binary und ist deshalb kein
+Test — sie ist die Grundlage der Wächter 7–10, die ohne Binary auskommen.
 """
 
 from __future__ import annotations
@@ -214,3 +229,165 @@ def test_acl_draft_grants_exactly_one_port_on_one_address():
     meta = {k for k in draft if k.startswith("_")}
     assert not (meta & {"tagOwners", "grants"}), \
         "Kommentar-Schluessel duerfen die echten Schluessel nicht verdecken"
+
+
+# --- Wächter für die Caddy-Vorlage (2026-10-02, A4-Vorbereitungsrunde) ---------
+
+def _announced_placeholders(head: str) -> set[str]:
+    """Die Platzhalter, die der Kopf als *Wert* ankündigt.
+
+    Nur die Aufzaehlungszeilen (`#   <name>  Beschreibung`), nicht der ganze Kopf: der Kopf
+    erklaert inzwischen auch, welcher Platzhalter vorher falsch war — diese Nennung ist eine
+    Korrekturnotiz, keine Ankuendigung.
+    """
+    lines = [line for line in head.splitlines() if re.match(r"^#\s{2,}<[a-z-]+>", line)]
+    assert lines, "keine Platzhalter-Zeile im Kopf gefunden — Vorlage ist ungewoehn"
+    # Mit Klammern, weil die Wächter gegen die Zeichenfolge in der Datei vergleichen und
+    # nicht gegen den Regex-Namen — ein Platzhalter ohne `<` ist kein Platzhalter.
+    return {f"<{name}>" for name in re.findall(r"<([a-z-]+)>", "\n".join(lines))}
+
+
+def _caddy_split() -> tuple[str, str]:
+    """Die Vorlage in (Kopf, Konfigurationsteil) — getrennt am globalen Block `{` in Spalte 0."""
+    head, sep, body = CADDYFILE.read_text().partition("\n{\n")
+    assert sep, "kein globaler `{`-Block in Spalte 0 gefunden — Vorlage ist ungewohnt"
+    return head, body
+
+
+def _directives_only(text: str) -> str:
+    """Nur die Anweisungen, ohne Kommentarzeilen.
+
+    [2026-10-02, vierte Wiederholung derselben Falle] P8.6 Block H, P9 Step G und der
+    tailscaled-watchdog-Wächter sind alle daran gescheitert, dass ein Kommentar einen Begriff
+    nennt, den ein Wächter verbietet. Diese Vorlage erklärt *im Kommentar*, welches der alte,
+    falsche Platzhalter war und warum kein `/healthz` konfiguriert wird — beides ist genau das,
+    wonach die Wächter suchen. Darum wird hier strukturell getrennt: ein Kommentar darf einen
+    Namen nennen, eine Anweisung nicht.
+    """
+    return "\n".join(
+        line for line in text.splitlines()
+        if not line.lstrip().startswith("#")
+    )
+
+
+def test_the_upstream_placeholder_names_the_home_vm():
+    """`reverse_proxy` zeigt auf die HEIM-VM, also muss der Platzhalter das auch sagen.
+
+    [2026-10-02, datierter Fund] Der Platzhalter hieß `<vps-tailnet>` und war im Kopfkommentar
+    als „Tailscale-Node-Name des VPS" beschrieben — während `reverse_proxy` darunter auf die
+    Heim-VM zeigte. Wer nach der Kopfzeile einsetzt, lässt Caddy auf sich selbst proxen: der VPS
+    lauscht auf 80/443, nicht auf 8765, also `connection refused` — das Fehlerbild eines toten
+    Relays, mitten in der Abnahme (RUNBOOK §0 Befund 9, Schritt A4b).
+    """
+    head, body = _caddy_split()
+    config = _directives_only(body)
+    announced = _announced_placeholders(head)
+
+    assert "<vps-tailnet>" not in config, \
+        "reverse_proxy darf den alten VPS-Platzhalter nicht mehr benutzen — er zeigt auf die Heim-VM"
+    assert "<vps-tailnet>" not in announced, \
+        "der Kopf darf den alten Platzhalter nicht mehr als Wert ankündigen"
+    assert "<heimvm-tailnet>" in config, \
+        "reverse_proxy benutzt den alten Platzhalter nicht (Ziel ist die Heim-VM, nicht der VPS)"
+    assert "<heimvm-tailnet>" in announced, \
+        "der Kopf kündigt <heimvm-tailnet> nicht als Wert an — das war der Fund vom 2026-10-02"
+    assert re.search(r"^\s*reverse_proxy\s+<heimvm-tailnet>:(\d+)\s*$", config, re.MULTILINE), \
+        "reverse_proxy muss auf <heimvm-tailnet>:<port> zeigen"
+
+
+def test_the_template_and_its_header_name_the_same_placeholders():
+    """Was der Kopf ankündigt, muss die Anweisung benutzen — und umgekehrt.
+
+    Genau dieser Bruch zwischen Kopfzeile und `reverse_proxy` war der Fund vom 2026-10-02, und
+    er wirkt in beide Richtungen: ein Wert, den nur der Kopf nennt, wird beim Einsetzen nicht
+    ersetzt (Caddy lehnt die Datei dann ab — erst auf dem VPS sichtbar); ein Platzhalter, den
+    nur die Anweisung benutzt, wird durch eine frei erfundene Adresse ersetzt.
+    """
+    head, body = _caddy_split()
+    announced = _announced_placeholders(head)
+    used = {f"<{name}>" for name in re.findall(r"<([a-z-]+)>", _directives_only(body))}
+    assert announced == used, (
+        f"der Kopf kündigt {sorted(announced)} an, die Anweisung benutzt {sorted(used)} — "
+        "das war der Fehler vom 2026-10-02"
+    )
+    assert used, "kein Platzhalter in der Anweisung gefunden — die Vorlage ist vollständig?"
+
+
+def test_the_upstream_port_is_the_relay_port():
+    """Der Upstream-Port muss der Port sein, auf dem das Relay lauscht.
+
+    Sonst antwortet A4 mit `connection refused` auf dem VPS, und der Fehler sieht wie ein
+    Firewall- oder ACL-Problem aus — Befund 9 hat schon einmal einen „firewall"-Fehler
+    eingeordnet, der in Wahrheit ein fehlendes Programm war.
+    """
+    _, body = _caddy_split()
+    port = re.search(
+        r"^\s*reverse_proxy\s+<heimvm-tailnet>:(\d+)\s*$",
+        _directives_only(body),
+        re.MULTILINE,
+    )
+    assert port, "reverse_proxy-Zeile nicht gefunden"
+    relay_port = _env_value(PROXY_SERVICE.read_text(), "APP_PORT")
+    mcp_port = _env_value(MCP_SERVICE.read_text(), "SPACE_PORT")
+    assert port.group(1) == relay_port == mcp_port, (
+        f"Caddy zielt auf {port.group(1)}, das Relay lauscht auf {relay_port}, die App auf "
+        f"{mcp_port} — das sind drei Zahlen, die gleich sein müssen"
+    )
+
+
+def test_no_second_hsts_header_and_no_admin_off():
+    """Zwei Dinge, die man „härten" würde und die dabei etwas anderes zerstören.
+
+    * **Kein `Strict-Transport-Security` in Caddy.** Die Anwendung setzt ihn selbst
+      (`phase4_auth/authserver/routes.py:66`, `phase5_ui/webui/security.py:56`, beide
+      `max-age=63072000; includeSubDomains` hinter `if settings.hsts`, Default `True`).
+      Ein zweiter Header ist eine doppelte, abweichende Angabe.
+    * **Kein `admin off`.** Gemessen am 2026-10-02 mit dem echten 2.6.2: die Paket-Unit hat
+      `ExecReload=/usr/bin/caddy reload --config /etc/caddy/Caddyfile --force`, und genau der
+      bricht mit `admin off` in `dial tcp 127.0.0.1:2019: connect: connection refused` ab.
+      Wer die API abschaltet, kaputt macht `systemctl reload caddy` — und merkt es beim ersten
+      Mal, wenn jemand die Konfiguration ändern will.
+    """
+    _, body = _caddy_split()
+    config = _directives_only(body)
+    assert "Strict-Transport-Security" not in config, \
+        "die Anwendung setzt HSTS selbst (authserver/routes.py:66, webui/security.py:56) — " \
+        "ein zweiter Header im Caddy wäre eine abweichende Doppelangabe"
+    assert not re.search(r"^\s*admin\s+off\s*$", config, re.MULTILINE), (
+        "kein `admin off`: die ExecReload-Zeile der Paket-Unit braucht die Admin-API "
+        "(gemessen 2026-10-02: connection refused auf 127.0.0.1:2019)"
+    )
+    # Und der Host-Header soll *durchgereicht* werden (gemessen 2026-10-02 vor dem Relay), also
+    # darf auch kein `header_up` den Umschreiben erzwingen.
+    assert "header_up" not in config, \
+        "kein header_up: der Host-Header soll durchgereicht werden, sonst antwortet " \
+        "TrustedHostMiddleware auf der falschen Domain"
+
+
+def test_the_substituted_template_has_no_placeholder_left():
+    """Nach dem Einsetzen der drei Werte darf in der Anweisung kein `<…>` übrig sein.
+
+    Der Nikinger substituiert auf dem VPS per Hand. Diese Probe macht die Handarbeit prüfbar:
+    sie ersetzt genau die dokumentierten Werte und prüft das Ergebnis. Sie validiert nicht die
+    Caddy-Syntax — dafür gab es am 2026-10-02 ein echtes `caddy validate` gegen 2.6.2
+    (`Valid configuration`, im Runbook Befund 9 festgehalten) — sondern die Lücke zwischen
+    Vorlage und Ergebnis.
+    """
+    values = {
+        "<domain>": "sharefyx.eurofyx.com",
+        "<heimvm-tailnet>": "100.93.43.122",
+        "<kontakt>": "probe@example.invalid",
+    }
+    substituted = CADDYFILE.read_text()
+    for placeholder, value in values.items():
+        assert placeholder in substituted, f"{placeholder} steht nicht mehr in der Vorlage"
+        substituted = substituted.replace(placeholder, value)
+
+    config = _directives_only(substituted.partition("\n{\n")[2])
+    assert "<" not in config, \
+        "nach dem Einsetzen steht noch ein Platzhalter in der Anweisung — welche Angabe fehlt?"
+    assert "reverse_proxy 100.93.43.122:8765" in config, \
+        "nach dem Einsetzen muss `reverse_proxy 100.93.43.122:8765` dastehen"
+    assert "/healthz" not in config, \
+        "/healthz gibt es nicht (app.py:220) — Befund 2; hier wird der Pfad konfiguriert, " \
+        "nicht im Kommentar erklärt"

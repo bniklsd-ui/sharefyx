@@ -164,6 +164,34 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 
 ## Current state
 
+**[2026-10-02, P9 Step A — A4 vorbereitet: zwei Befunde, ein Vorlagen-Defekt, ein Testfund —
+opencode/M3 — ein Commit, kein Eingriff in einen laufenden Dienst.]** Cooperation-Runde (P9-Q,
+ein Schritt pro Runde): A4 ist ein `sudo`-Schritt auf dem VPS, also war meine Aufgabe die Vorlage,
+die Befunde und die Erwartungshaltung. **Befund 8 — P9-10 ist bis A7 nicht erfüllbar:** die
+Abnahmezeile verlangt *200 **und** LE-Zertifikat*, aber die Zertifikats-Hälfte gehört Caddy und
+die `200` gehört `SPACE_ALLOWED_HOSTS` (A7). Gemessen am laufenden Dienst: `curl -H "Host:
+sharefyx.eurofyx.com" http://127.0.0.1:8765/health` → `400 Invalid host header`. **Die ganze Kette
+einmal mit echtem Caddy davor gespielt** (Ubuntu-Paket entpackt, `caddy 2.6.2` auf Wegwerf-Port vor
+die Relay-Adresse `100.93.43.122:8765`, also exakt die Strecke des VPS): neuer Host 400,
+`100.93.43.122` 400, erlaubter ts.net-Host **200 mit `{"status":"ok",…}`** — damit sind **das Relay
+funktionierend** und **Caddys Host-Durchreich** belegt, wo vorher nur „Caddy-Default" stand. Folge:
+**P9-10 ist in P9-10a (Zertifikat, A4) und P9-10b (`200`, nach `ALLOWED_HOSTS`) geteilt**, die 400 ist
+in A4 das erwartete Ergebnis. **Befund 9 — auf dem VPS ist kein Caddy** (`ubuntu`/100.121.142.113,
+Tag `tag:sharefyx-edge`, 80+443 ohne Listener) und A4 fing mit `install … /etc/caddy/Caddyfile` an:
+**A4 ist jetzt A4a (messen, `apt install -y caddy`, Paket ist 2.6.2, `validate` → `Valid
+configuration`, `postinst` legt `/var/log/caddy` an) + A4b (Konfiguration, `validate`, Restart)**;
+**kein `admin off`**, weil die Paket-Unit `ExecReload=… caddy reload …` hat und der Reload ohne
+Admin-API measured `connection refused` gibt. **Vorlagen-Defekt:** der Platzhalter `<vps-tailnet>` war
+als Adresse *des VPS* beschrieben, während `reverse_proxy` die **Heim-VM** meint → jetzt
+`<heimvm-tailnet>` mit der gemessenen Ziel-IP im Kommentar. **5 neue Wächter**
+(`phase9_hardening/tests/test_tail_proxy.py`, **12/12**, Gegenprobe 4 Verstöße → 5 rot),
+`pytest` 1115 → **1120**, `ui_budget` 5/5, `doc_health` 0 (der Runbook-Zuwachs von Befund 8+9 ist
+in der INDEX als Oversize benannt, P8-P). **Vorgeschlagen, nicht entschieden: A7a** —
+`ALLOWED_HOSTS` vor A7 ziehen, dort wechselt kein `resource` (Befund 4), also bleiben beide
+Connectoren gültig und Fabian ist nicht nötig; ein Neustart des Produktionsdiensts ist
+Nikinger-Sache. **Offen:** A4 selbst, dann Deploy `v3.1.0` (sonst ist das `LEGACY_*`-Fenster
+wirkungslos), dann A7+A8 in einer Sitzung. Details: `phase9_hardening/CLAUDE.md`.
+
 **[2026-10-01, P9 Step A — Domain live, A5 ✅, und eine Korrektur, die A7/A8 zusammenlegt — Claude
 Code.]** `sharefyx.eurofyx.com` → `217.160.128.146` (IONOS, kein CAA, kein Wildcard). **Runbook-Befund 4
 war falsch:** Tokens sind an `resource = {base_url}/mcp` gebunden (`resolver.py:49`), der A7-Restart
