@@ -164,6 +164,16 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 
 ## Current state
 
+**[2026-10-01, P9 Step A — Domain live, A5 ✅, und eine Korrektur, die A7/A8 zusammenlegt — Claude
+Code.]** `sharefyx.eurofyx.com` → `217.160.128.146` (IONOS, kein CAA, kein Wildcard). **Runbook-Befund 4
+war falsch:** Tokens sind an `resource = {base_url}/mcp` gebunden (`resolver.py:49`), der A7-Restart
+kappt also beide Connectoren sofort — **Nikinger: harter Schnitt, A7+A8 in einer Sitzung**, kein
+Eingriff in `phase4_auth/authserver/`. **Befund 5 umentschieden und gebaut:** UI-Übergangsfenster für
+die alte Funnel-Adresse (eine zusätzliche CSRF-Origin bis `SPACE_UI_LEGACY_UNTIL`, Uhr pro Anfrage,
+fail-closed; Warndialog in `.account-nav`-Form bei jedem Laden), 23 Tests + Browser 16/16, `pytest`
+**1114**. **Offen beim Nikinger:** Deploy vor A7 (liefert P9 D–H mit), Badge-Version. Nächster Schritt
+A4 (Caddy). Details: `phase9_hardening/CLAUDE.md`.
+
 **[2026-09-30, P9 Step B (zweiter Teil) — V153 entschieden, und einer der beiden Wege im Plan ist
 nachweislich unbaubar — opencode/M3 — Repo-Seite fertig, Ausführung bleibt beim Nikinger.]**
 `pytest` **1091** (1084 + 7 Wächter), kein `systemctl` durch einen Agenten, kein Service-Touch. **Befund 1: der

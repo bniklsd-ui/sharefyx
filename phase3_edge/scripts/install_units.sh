@@ -108,6 +108,8 @@ for unit in "${units[@]}"; do
     -e "s#__STAGING_PORT__#${STAGING_PORT}#g" \
     -e "s#__STAGING_DATA_ROOT__#${STAGING_DATA_ROOT}#g" \
     -e "s#__STAGING_BASE_URL__#${STAGING_BASE_URL}#g" \
+    -e "s#__LEGACY_ORIGIN__#${LEGACY_ORIGIN:-}#g" \
+    -e "s#__LEGACY_UNTIL__#${LEGACY_UNTIL:-}#g" \
     "$unit" > "$dest"
 
   if grep -qE '__[A-Z_]+__' "$dest"; then

@@ -16,6 +16,8 @@ Environment=SPACE_LOG_LEVEL=INFO
 Environment=SPACE_ALLOWED_HOSTS=__ALLOWED_HOSTS__
 Environment=SPACE_AUTH_MODE=__AUTH_MODE__
 Environment=SPACE_PUBLIC_BASE_URL=__PUBLIC_BASE_URL__
+Environment=SPACE_UI_LEGACY_ORIGIN=__LEGACY_ORIGIN__
+Environment=SPACE_UI_LEGACY_UNTIL=__LEGACY_UNTIL__
 StateDirectory=sharefyx
 StateDirectoryMode=0700
 LoadCredentialEncrypted=auth-dek:/etc/sharefyx/auth-dek.cred

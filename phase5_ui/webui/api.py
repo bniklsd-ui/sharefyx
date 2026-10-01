@@ -355,6 +355,15 @@ def api_routes(
             {
                 "status_values": status_values, "buckets": _BUCKETS,
                 "space_admin": settings.space_admin_enabled,
+                # P9 Step A: der Warndialog auf der alten Adresse. Der Client vergleicht
+                # `legacy.origin` mit `location.origin` — so erscheint er nur dort, nie auf der
+                # neuen Adresse und nie in einer Wegwerf-Instanz ohne diese Konfiguration.
+                "canonical_url": settings.base_url,
+                "legacy": None if settings.legacy_origin is None else {
+                    "origin": settings.legacy_origin,
+                    "until": settings.legacy_until.isoformat() if settings.legacy_until else None,
+                    "writable": settings.legacy_writable(),
+                },
             },
             headers={"Cache-Control": "no-store"},
         )

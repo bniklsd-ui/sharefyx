@@ -81,7 +81,7 @@ def require_csrf(
 
     origin = request.headers.get("origin")
     if origin is not None:
-        if origin != settings.base_url:
+        if not settings.origin_allowed(origin):
             # Nur ins Server-Log (stderr, Hard Rule 7), nie in die Client-Antwort — der
             # Klartextvergleich hier ist der einzige Weg, eine strukturelle Origin-Abweichung
             # (zweite reale URL-Variante, Tippfehler in der Config, o.ä.) ohne Browser-DevTools

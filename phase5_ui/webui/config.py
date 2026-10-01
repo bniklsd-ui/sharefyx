@@ -27,14 +27,24 @@ Tests injizieren einen `tmp_path`-Pfad, kein Live-Testbedarf für eine echte Env
 """
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
+from datetime import date, datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 COOKIE_NAME = "__Host-sfx_session"
 IDLE_TTL_S = 12 * 3600  # P5-E
 ABSOLUTE_TTL_S = 7 * 24 * 3600  # P5-E
 DEFAULT_STATIC_DIR = Path(__file__).resolve().parent / "static"
 DEFAULT_UPDATE_LOG_PATH = Path(__file__).resolve().parents[2] / "docs" / "UPDATE_LOG.md"
+# Datumsgrenze des Übergangsfensters (P9 Step A, 2026-10-01): das Enddatum gilt bis einschließlich
+# 23:59 Ortszeit des Betreibers, nicht UTC — „bis zum 15." soll heißen, was man liest.
+LEGACY_TZ = ZoneInfo("Europe/Berlin")
+
+
+def _today_local() -> date:
+    return datetime.now(LEGACY_TZ).date()
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -51,3 +61,21 @@ class UiSettings:
     # Default `True`, weil die Fläche jetzt live gebaut ist — kein Grund mehr, sie ausgeliefert
     # aber abgeschaltet zu lassen.
     space_admin_enabled: bool = True
+    # Übergangsfenster der alten Adresse (P9 Step A, Nikinger-Entscheidung 2026-10-01, Runbook
+    # Befund 5): GENAU EINE zusätzliche erlaubte CSRF-Origin, exakter String, bis einschließlich
+    # `legacy_until`. Danach liest die alte Adresse nur noch. `None` = heutiges Verhalten.
+    # `clock` statt eines einmal berechneten Flags: das Fenster muss am Enddatum schließen, ohne
+    # dass jemand den Dienst neu startet (den startet nur der Nikinger, Hard Rule 9).
+    legacy_origin: str | None = None
+    legacy_until: date | None = None
+    clock: Callable[[], date] = field(default=_today_local)
+
+    def legacy_writable(self) -> bool:
+        if self.legacy_origin is None or self.legacy_until is None:
+            return False
+        return self.clock() <= self.legacy_until
+
+    def origin_allowed(self, origin: str) -> bool:
+        if origin == self.base_url:
+            return True
+        return origin == self.legacy_origin and self.legacy_writable()

@@ -527,6 +527,22 @@
   </div>
 </div>
 
+<!-- P9 Step A (Nikinger-Entscheidung 2026-10-01): Hinweis auf der ALTEN Adresse. Öffnet sich bei
+     jedem Laden, solange /api/v1/meta ein `legacy` liefert und location.origin genau diese Origin
+     ist -- schließbar, kommt beim nächsten Laden wieder. Bewusst die .account-nav-Form des
+     Einstellungen-Dialogs (Akzent-Fill), kein neues CSS. Der Text kommt aus app.js, weil er vom
+     Datum abhängt (kein Templating, P5-T). -->
+<div class="overlay" id="legacy-host-dialog" hidden>
+  <div class="overlay__panel">
+    <h2>Diese Adresse wird abgeschaltet</h2>
+    <p class="overlay__hint" id="legacy-host-text"></p>
+    <a class="account-nav" id="legacy-host-link" href="/ui/">Zur neuen Adresse<svg class="icon" aria-hidden="true"><use href="#i-chevron-right"></use></svg></a>
+    <div class="overlay__actions">
+      <button type="button" class="btn" id="legacy-host-close">Trotzdem hier bleiben</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="session-expired-card" hidden>
   <div class="overlay__panel">
     <h2>Sitzung abgelaufen</h2>

@@ -193,13 +193,37 @@ function initShell() {
   // für jeden Overlay-Dialog, kein Sonderfall für den neuen.
   var spaceAdminDialogEl = document.getElementById("space-admin-dialog");
   var spaceRemoveDialogEl = document.getElementById("space-remove-dialog");
+  // P9 Step A: Hinweis auf der alten Adresse -- ein Overlay wie alle anderen, also auch in
+  // `anyOverlayOpen()` und in der ESC-Kette (dieselbe Begründung wie beim Löschdialog).
+  var legacyHostDialogEl = document.getElementById("legacy-host-dialog");
+  document.getElementById("legacy-host-close").addEventListener("click", function () {
+    legacyHostDialogEl.hidden = true;
+  });
+
+  function formatGermanDate(iso) {
+    var parts = iso.split("-");
+    return parts[2] + "." + parts[1] + "." + parts[0];
+  }
+
+  function showLegacyHostDialog(meta) {
+    var legacy = meta.legacy;
+    if (!legacy || location.origin !== legacy.origin) return;
+    var text = legacy.writable
+      ? "Bitte ab sofort " + meta.canonical_url + " verwenden. Hier funktioniert bis einschließlich "
+        + formatGermanDate(legacy.until) + " noch alles, danach nur noch Lesen."
+      : "Diese Adresse ist nur noch lesbar — Änderungen gehen nur noch über "
+        + meta.canonical_url + ".";
+    document.getElementById("legacy-host-text").textContent = text;
+    document.getElementById("legacy-host-link").href = meta.canonical_url + "/ui/";
+    legacyHostDialogEl.hidden = false;
+  }
 
   function anyOverlayOpen() {
     return !conflictDialogEl.hidden || !createDialogEl.hidden || !newFolderDialogEl.hidden
       || !moveDialogEl.hidden || !shareDialogEl.hidden || !confirmDialogEl.hidden
       || !trashDialogEl.hidden || !accountDialogEl.hidden || !updateLogDialogEl.hidden
       || !spaceAdminDialogEl.hidden
-      || !spaceRemoveDialogEl.hidden || !linkPickerDialogEl.hidden;
+      || !spaceRemoveDialogEl.hidden || !linkPickerDialogEl.hidden || !legacyHostDialogEl.hidden;
   }
 
   document.addEventListener("keydown", function (event) {
@@ -231,6 +255,7 @@ function initShell() {
       else if (!spaceRemoveDialogEl.hidden) closeRemoveSpaceDialog();
       else if (!spaceAdminDialogEl.hidden) closeSpaceAdminDialog();
       else if (!linkPickerDialogEl.hidden) closeLinkPicker();
+      else if (!legacyHostDialogEl.hidden) legacyHostDialogEl.hidden = true;
       else if (state.selectedId !== null) Editor.closeEditor();
       return;
     }
@@ -265,6 +290,7 @@ function initShell() {
         // (kein Templating, P5-T) -- ohne diese Zeile führte ein `False` nur serverseitig zu
         // `404`, der Knopf bliebe sichtbar und würde bei jedem Klick nur einen Fehler zeigen.
         document.getElementById("account-manage-spaces").hidden = !meta.space_admin;
+        showLegacyHostDialog(meta);
         var names = Object.keys(meta.buckets);
         if (names.indexOf(state.filter) === -1) state.filter = names[0];
         // P9 Step E: `loadOverview()` setzt `state.graphToken`, das `loadGraph()` unten liest —

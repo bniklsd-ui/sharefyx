@@ -281,7 +281,7 @@ Ziel: eine Domain, deren DNS-Zone du erreichst. Technisch relevant ist nur, dass
 A-Records selbst setzen kannst (Schritt A5).
 
 - **Stand 2026-09-29: bestellt und bezahlt, Registrierung noch nicht abgeschlossen** — A5 ist bis dahin blockiert, A3 und A0b nicht.
-- **[2026-10-01] Registrierung abgeschlossen, `eurofyx.com` bei IONOS** — gemessen über `@1.1.1.1`/`@8.8.8.8`: NS `ns1084.ui-dns.org` u. a. (IONOS-Zone aktiv), Apex zeigt auf IONOS-Parking (`217.160.0.175` + AAAA), **kein** Wildcard, **kein** CAA (Let's Encrypt darf ausstellen), `sharefyx.eurofyx.com` noch ohne Datensatz. Das IONOS-Panel meldet „Domain wird nicht genutzt" und „SSL aktivieren" — **beides ignorieren**: das Apex bleibt bewusst frei, das Zertifikat holt Caddy (A4). A5 ist damit freigegeben.
+- **[2026-10-01] Registrierung abgeschlossen, `eurofyx.com` bei IONOS** — gemessen über `@1.1.1.1`/`@8.8.8.8`: NS `ns1084.ui-dns.org` u. a. (IONOS-Zone aktiv), Apex zeigt auf IONOS-Parking (`217.160.0.175` + AAAA), **kein** Wildcard, **kein** CAA (Let's Encrypt darf ausstellen), `sharefyx.eurofyx.com` noch ohne Datensatz. IONOS-Hinweise „nicht genutzt"/„SSL aktivieren" **ignorieren**: Apex bleibt frei, das Zertifikat holt Caddy (A4).
 - Kauf `eurofyx.<tld>`. **Ausreichend ist jede normale Registrar-Oberfläche.** Praktisch ist
   derselbe Anbieter wie beim VPS: dann pflegst du den A-Record im selben Panel, in dem auch
   der VPS liegt. Ein Konto, eine Rechnung.
@@ -518,7 +518,14 @@ In `phase3_edge/local.env` (git-ignoriert, die einzige echte Konfigurationsquell
 ```
 PUBLIC_BASE_URL=https://<domain>
 ALLOWED_HOSTS=<domain>,savefyx-vmware-virtual-platform.tail4a8b49.ts.net,127.0.0.1
+LEGACY_ORIGIN=https://savefyx-vmware-virtual-platform.tail4a8b49.ts.net
+LEGACY_UNTIL=<A7-Datum + 14 Tage, JJJJ-MM-TT>
 ```
+
+**[2026-10-01] `LEGACY_*` = das UI-Übergangsfenster** (Befund 5, umentschieden): die alte Adresse
+schreibt bis einschließlich `LEGACY_UNTIL` (Europe/Berlin), danach liest sie nur; Warndialog bei
+jedem Laden. Wirkt **nur, wenn der Code vor A7 deployt ist** — der Live-Release ist vom 2026-09-18.
+Ein Tippfehler in den zwei Zeilen ist ein Startfehler (fail-closed), kein stilles „aus".
 
 Drei Punkte, die dabei nicht verloren gehen dürfen:
 

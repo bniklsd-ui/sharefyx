@@ -201,7 +201,11 @@ def create_app(
     # `/ui/*` vorgezogen aus P5 Step 5 (siehe Moduldocstring oben, Nachtrag 2026-08-03) — kein
     # zweiter DB-Handle: `UiSettings`/`SessionManager` laufen über dieselbe `oauth.store`/
     # `oauth.users`-Instanz, die auch `oauth_routes()` bedient.
-    ui_settings = UiSettings(base_url=oauth.settings.base_url)
+    ui_settings = UiSettings(
+        base_url=oauth.settings.base_url,
+        legacy_origin=settings.ui_legacy_origin,
+        legacy_until=settings.ui_legacy_until,
+    )
     ui_sessions = SessionManager(oauth.store, settings=ui_settings)
 
     routes: list[Route | Mount] = list(oauth_routes(oauth.settings, oauth.store, oauth.users))
