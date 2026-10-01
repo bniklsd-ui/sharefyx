@@ -6,7 +6,7 @@ detail: L3 (Pointer-Verzeichnis, keine eigene Inhaltsquelle)
 up: ../phase9_hardening/CLAUDE.md   # aktive Phase
 down:
   - ../docs/screenshots/                # kanonische Ablage; diese Verzeichnis ist nur Symlink-Komfort
-updated: 2026-09-28 (Phase **9** — Rotation auf die ersten P9-Bilder: die sieben P8.6-Gate-Symlinks sind weg, drei `p9_step_e_*`-Links rein (P8.6-AK sagt genau das: "sie bleiben stehen, bis P9 eigene Screenshots produziert" — Step E hat als erster P9-Step welche produziert) | 2026-09-19 (Phase 8.6 abgeschlossen — Rotation auf die **Gate-Belege**: sieben Symlinks auf `p86_smoke_*` ersetzen die fünf H-R-3-Links. Das sind die Bilder, auf denen die Freigabe von `v3.0.2` beruht. Bleiben stehen, bis P9 eigene Screenshots produziert.)
+updated: 2026-10-01 (Rotation auf die `.toolbar-btn`-Belege (`p9_btn2_*`): drei Symlinks neu, die drei `p9_step_e_*`-Links raus — Step E ist als Beleg in `docs/screenshots/` erledigt und die aktuell offene Sichtfrage ist die Knopfoptik vor dem Deploy. **Vier unversionierte Tailscale-Kopien** mit Leerzeichen im Namen wandern nach `docs/screenshots/p9_step_a_01..04_*` (Infra-Beleg zu A3, ausdrücklich keine Sichtprüfung), die fünfte Datei `Machines - Tailscale.html` ist gelöscht: leere SPA-Hülle, `tailscale-api-prefetch` = `{}`, kein Bildwert) | updated: 2026-09-28 (Phase **9** — Rotation auf die ersten P9-Bilder: die sieben P8.6-Gate-Symlinks sind weg, drei `p9_step_e_*`-Links rein (P8.6-AK sagt genau das: "sie bleiben stehen, bis P9 eigene Screenshots produziert" — Step E hat als erster P9-Step welche produziert) | 2026-09-19 (Phase 8.6 abgeschlossen — Rotation auf die **Gate-Belege**: sieben Symlinks auf `p86_smoke_*` ersetzen die fünf H-R-3-Links. Das sind die Bilder, auf denen die Freigabe von `v3.0.2` beruht. Bleiben stehen, bis P9 eigene Screenshots produziert.)
 ---
 # `screenshots_latest/` — Schnellzugriff auf die Screenshots der aktuellen Phase
 
@@ -43,28 +43,36 @@ Ausnahmen, in denen M3 den Dateinamen + Checkkriterium **nicht** nennt:
 - Wenn die Verifikation programmatisch ist (Regex auf gerenderten HTML-Output
   o. ä.) und der Screenshot nur Anhang ist.
 
-## Aktueller Inhalt (Phase **9**, Step E, Stand 2026-09-28)
+## Aktueller Inhalt (Phase **9**, `.toolbar-btn` in Standardoptik, Stand 2026-10-01)
 
-Drei Bilder aus `p9e_reload_probe.py` gegen die Wegwerf-Instanz (Port 18768, 14 Items, Chromium
-1440x900). Sie sind die **Belegbilder** der Abnahmezeilen P9-33/-34/-35 — die Zahlen (0 Abrufe,
-1 statt 10 Bilder) stehen im Phase-9-Head, die Bilder zeigen den Zustand, in dem sie gemessen
-wurden. **Zur Sichtprüfung durch den Nikinger geeignet, aber nicht deren Ersatz:** die
-programmatische Messung ist der Beleg, ein Bild kann den Abruf-Zähler nicht zeigen.
+Drei Bilder aus `phase9_hardening/scripts/p9_btn2_toolbar_probe.py` gegen die **eigene**
+TLS-Wegwerf-Instanz (`p9_step_g_wegwerf.py`, Port 18775, Chromium 1440x900). Sie zeigen den Stand,
+der die offene Frage aus dem Session-Ende 2026-10-01 beantworten soll: tragen die zehn
+Formatierhilfen + „Vorschau" jetzt **dieselbe Optik** wie der aktive Übersichtsknopf.
+
+**Der Beleg ist die Messung, nicht das Bild.** Das Skript vergleicht echte Screenshot-Pixel
+(`probes/p9_btn2_toolbar_probe.json`, 13/13 grün, Gegenprobe mit eingebautem Verstoß → 5 rot):
+gerechnete Fläche stringgleich mit `.btn`, Verlauf in drei Höhen Δ ≤ 2, Randpixel Δ = 0. Das Bild
+beantwortet die eine Frage, die eine Messung nicht kann: **gefällt es.**
 
 | Dateiname | Original | Checkkriterium |
 |---|---|---|
-| `01_uebersicht_vor_wiedereintritt.png` | `../docs/screenshots/p9_step_e_01_uebersicht_vor_wiedereintritt.png` | **Ausgangslage vor dem Wiedereintritt:** Karte rechts im eigenen Slot, Rail links, Spaces + Zuletzt benutzt in der Mitte. Das ist der Zustand, mit dem Bild 02 verglichen wird — die Canvas-Fingerabdrücke beider Bilder sind **byte-gleich im Canvas-Teil** (`25481930`, 2.160 gezeichnete Pixel, 654x530 — aus dem finalen Lauf 2026-09-28). |
-| `02_uebersicht_nach_wiedereintritt.png` | `../docs/screenshots/p9_step_e_02_uebersicht_nach_wiedereintritt.png` | **Nach Item-auf + ESC + Klick auf "Übersicht": exakt dasselbe Kartenbild.** Karte springt nicht, es gab **null** `/api/v1/graph`-Abrufe. Auf dem alten Stand wären es 1 Abruf und ~2,5 s sichtbare Bewegung gewesen. |
-| `03_uebersicht_nach_fremder_aenderung.png` | `../docs/screenshots/p9_step_e_03_uebersicht_nach_fremder_aenderung.png` | **Nach einer Änderung von außen (CLI, nicht über die UI):** "P9 E von aussen" steht in "Zuletzt benutzt", die Karte hat einen Knoten mehr (14 → 15, programmatisch gezählt). Damit ist P9-35 belegt: eine echte Änderung wird beim nächsten Eintritt aufgenommen. |
+| `01_formatierleiste.png` | `../docs/screenshots/p9_btn2_01_formatierleiste.png` | **Die Leiste im Zuschnitt (379x25):** elf Knöpfe, dunkelblau mit heller Kante, in der Mitte der breitere „Vorschau". Auf dem alten Stand trugen sie die graue Plastik und stochen sichtbar gegen die Panel-Fläche. |
+| `02_editor_standardoptik.png` | `../docs/screenshots/p9_btn2_02_editor.png` | **Das ganze Fenster — der eine Blick, um den es ging:** Rail-Knopf „Übersicht" oben links (dieselbe Optik), Formatierleiste rechts, „Anhängen" unten rechts als `.btn` im selben Panel. Drei Knopfoptiken auf einem Bild: entscheidend ist, dass alle drei **gleich** aussehen. |
+| `03_formatierleiste_deaktiviert.png` | `../docs/screenshots/p9_btn2_03_formatierleiste_deaktiviert.png` | **Zustand in der Vorschau (385x25):** alle Formatierhilfen flach und matter statt im Verlauf — so soll „inaktiv lesbar" aussehen. Absicht und nicht Versehen: `:disabled` trägt `--surface`, nicht `--btn-std-fill`. |
 
 **Warum die Wegwerf-Instanz und nicht das echte Gerät:** die Probe braucht einen
- reproduzierbaren Vorher/Nachher-Zustand und einen Abruf-Zähler, beides am echten Datenbestand
-nicht. Für die *gefühlte* Karte (Lesebarkeit bei 200 Knoten, Bewegung bei Zoom/Pan) bleibt die
+reproduzierbaren Zustand **und** einen Pixelvergleich in einem Lauf; am echten Datenbestand wäre
+beides nicht gegen eine Vorher-Version zu halten. Für den Gesamteindruck der Oberfläche bleibt die
 Sichtprüfung am echten Gerät nötig — dafür ist ohnehin Step Z (Gate) zuständig.
 
-Ältere Bilder der Phase 8.6 (`p86_smoke_*`, `p86_block_*`, `p86_probe_*`) bleiben in
-`docs/screenshots/` für die Historie erreichbar, sind aber nicht mehr prominent.
-
+**Nicht hier, mit Begründung.** Die vier Tailscale-Adminbilder aus A3 (2026-09-30) lagen als
+unversionierte Kopien mit Leerzeichen im Dateinamen in diesem Verzeichnis. Sie sind jetzt unter
+`docs/screenshots/p9_step_a_01..04_*` versioniert (Infra-Beleg zu `RUNBOOK_STEP_A.md` §A3, **keine
+Sichtprüfung der Oberfläche**) und gehören deshalb nicht in die Schnellansicht. Die fünfte Datei,
+`Machines - Tailscale.html`, ist **gelöscht**: die gespeicherte Seite war nur die leere SPA-Hülle
+(`<div id="root">` leer, `tailscale-api-prefetch` = `{}`, 2,7 KB) — ohne Bildwert, und eine
+Admin-Seite im Repo ist kein Beweis, den ein Bild liefert.
 
 ## Rotation
 

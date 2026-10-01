@@ -311,7 +311,27 @@ verlangt ihn nicht.
   auf grauem Grund blauer); Navigationsknöpfe tragen `.btn` selbst, `.account-nav` ist nur Layout.
   Ausnahmen: `.btn-primary`
   (Hauptaktion) und `.action--caution` (Vorsicht, z. B. Archivieren — behält die graue Plastik).
-  Ersetzt H-R.2 (Akzentkante an `.account-nav`). `.toolbar-btn` (Format-Leiste) unverändert.
+  Ersetzt H-R.2 (Akzentkante an `.account-nav`).
+
+- **[2026-10-01, zweite Runde desselben Tages, P9, Nikinger-Entscheidung] `.toolbar-btn` ist
+  mitgezogen** — die zehn Formatierhilfen + der Vorschau-Umschalter waren der **letzte** echte
+  Knopf auf der alten grauen Plastik (`--btn-face-*`), nachdem `.btn` am Vortag umgestellt worden
+  war; zwei Knopfoptiken in einem Panel sind genau der Befund, den die erste Runde an
+  `.account-nav` gestellt hatte. **Maße und Typografie bleiben** (24 px Höhe, Monospace,
+  `--text-muted`): die Formatierleiste ist eine Werkzeugleiste, keine Dialogleiste — sie
+  unterscheidet sich in der Größe, nicht in der Sorte. Vier Punkte, die beim Nachziehen zu
+  entscheiden waren und die als Regeln bleiben:
+  1. **`:disabled` bleibt auf `--surface`, nicht auf `--btn-std-fill`.** Die Hilfen sind in der
+     Vorschau abgeschaltet (`editor.js :: setEditorMode`); ein deaktivierter Standardknopf muss
+     „inaktiv lesbar" heißen, nicht „Standardknopf in einem anderen Zustand".
+  2. **Der äußere Schlagschatten fällt weg** (`0 1px 2px rgba(0,0,0,.45)`), weil `.btn` ihn auch
+     nicht trägt — sonst wäre jeder Pixelvergleich mit `#home-button` genau an der Unterkante
+     daneben.
+  3. **`.rail__glyph` (der 20×20-Buchstaben-Badge am Space) bleibt auf `--btn-face-*`** — ein Badge
+     ist kein Knopf: er hat keine Aktion, und die drei Kategorie-Varianten daneben tragen ohnehin
+     eigene Hex-Werte (Phase 8 C3).
+  4. **`.pw-toggle` (die kleinen „Anzeigen"-Knöpfe) waren nie eine offene Frage** — sie tragen
+     `.btn` und sind mitgezogen worden; sie überschreiben nur `padding`/`font-size`.
 
 - **[2026-09-02 Korrektur]** Der Absatz unten stand hier als Momentaufnahme der Sitzung vom
   2026-09-01/-02 und ist überholt: der Nikinger hat die dort verworfene Vereinheitlichung am

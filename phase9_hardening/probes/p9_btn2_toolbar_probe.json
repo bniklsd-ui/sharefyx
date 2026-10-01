@@ -1,0 +1,70 @@
+{
+  "result": "ok",
+  "befunde": [
+    {
+      "pruefung": "Vorbild-Knopf ist WIRKLICH aktiv (aria-current == 'true')",
+      "ok": true,
+      "detail": "aria-current='true'"
+    },
+    {
+      "pruefung": "Vorbild traegt den Auswahl-Fill, nicht 'none'",
+      "ok": true,
+      "detail": "#home-button background-image='linear-gradient(rgba(62, 141, 243, 0.2), rgba(62, 141, 243, 0.08))'"
+    },
+    {
+      "pruefung": "Editor öffnet in der Vorschau (P5-Regel)",
+      "ok": true,
+      "detail": "#toggle-preview = 'Bearbeiten'"
+    },
+    {
+      "pruefung": "Formatierhilfen sind im Bearbeiten-Modus aktiv",
+      "ok": true,
+      "detail": "data-md=bold nicht disabled"
+    },
+    {
+      "pruefung": "gerechnete Flaeche ist identisch (backgroundImage, Stringgleichheit)",
+      "ok": true,
+      "detail": "toolbar='linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))' btn='linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))'"
+    },
+    {
+      "pruefung": "toolbar == .btn, Verlauf Kopf (Spalte x=4px)",
+      "ok": true,
+      "detail": "toolbar=(10, 23, 40) btn=(10, 23, 40) max|Δ|=0 (Toleranz ±2)"
+    },
+    {
+      "pruefung": "toolbar == .btn, Verlauf Mitte (Spalte x=4px)",
+      "ok": true,
+      "detail": "toolbar=(8, 19, 33) btn=(9, 20, 34) max|Δ|=1 (Toleranz ±2)"
+    },
+    {
+      "pruefung": "toolbar == .btn, Verlauf Fuss (Spalte x=4px)",
+      "ok": true,
+      "detail": "toolbar=(6, 14, 25) btn=(7, 15, 27) max|Δ|=2 (Toleranz ±2)"
+    },
+    {
+      "pruefung": "toolbar == .btn an der Kante (x=0px)",
+      "ok": true,
+      "detail": "toolbar=(29, 67, 116) btn=(29, 67, 116) max|Δ|=0 (Toleranz ±2)"
+    },
+    {
+      "pruefung": "aktiver Knopf traegt einen Verlauf (oben != unten)",
+      "ok": true,
+      "detail": "aktiv oben=(10, 24, 41) unten=(6, 14, 25) max|Δ|=16"
+    },
+    {
+      "pruefung": "Formatierhilfen sind in der Vorschau deaktiviert",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "pruefung": "deaktivierter Knopf ist flach (backgroundImage none) und matter beschriftet",
+      "ok": true,
+      "detail": "color=rgb(167, 178, 191) bg='none' border=rgba(255, 255, 255, 0.08)"
+    },
+    {
+      "pruefung": "deaktivierter Knopf ist FLACH (oben == unten)",
+      "ok": true,
+      "detail": "deaktiviert oben=(20, 24, 29) unten=(20, 24, 29) max|Δ|=0"
+    }
+  ]
+}

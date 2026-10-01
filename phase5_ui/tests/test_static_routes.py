@@ -1552,6 +1552,48 @@ def test_caution_and_primary_buttons_keep_their_own_look():
     assert "btn-std" not in primary, primary
 
 
+def test_toolbar_buttons_wear_the_standard_look():
+    """**[2026-10-01, P9, Nikinger-Entscheidung — zweite Runde]** `.toolbar-btn` (zehn
+    Formatierhilfen + der Vorschau-Umschalter) trägt dieselben deckenden `--btn-std-*`-Tokens wie
+    `.btn`. Vorher war es der **letzte** echte Knopf auf der alten grauen Plastik
+    (`--btn-face-*`) — dieselbe Klasse Befund wie bei `.account-nav` einen Tag zuvor: eine zweite
+    Knopfoptik im selben Panel.
+
+    Geprüft werden alle vier Zustände, weil ein halb umgestellter Knopf schlechter aussieht als ein
+    unumgestellter: Grundzustand, Hover, Active und — als bewusste Ausnahme — `:disabled` auf
+    `--surface`. Der aktivierte Zustand ist wichtig, weil die Formatierhilfen in der Vorschau
+    deaktiviert sind; ohne `:active` bliebe dort ein Klickbild in der alten Plastik stehen.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+    body = _block_body(css, ".toolbar-btn")
+    assert re.search(r"background\s*:\s*var\(--btn-std-fill\)\s*;", body), body
+    assert re.search(r"border\s*:\s*1px solid var\(--btn-std-line\)\s*;", body), body
+    assert "btn-face" not in body and "btn-edge" not in body and "btn-glow" not in body, body
+    for pseudo, token in (
+        (":hover", "--btn-std-fill-hover"),
+        (":active", "--btn-std-fill-active"),
+    ):
+        m = re.search(rf"^\.toolbar-btn{pseudo}\s*\{{([^}}]*)\}}", css, flags=re.MULTILINE)
+        assert m is not None, f".toolbar-btn{pseudo} fehlt"
+        assert f"var({token})" in m.group(1), (pseudo, m.group(1))
+    disabled = _block_body(css, ".toolbar-btn:disabled")
+    assert re.search(r"background\s*:\s*var\(--surface\)\s*;", disabled), disabled
+    assert "btn-std" not in disabled, disabled
+
+
+def test_rail_glyph_is_a_badge_and_keeps_the_plastic():
+    """**Gegenstück zum Vorigen, absichtlich.** `.rail__glyph` (der 20x20-Buchstaben-Badge am
+    Space im Rail) ist der **letzte** Verbraucher von `--btn-face-top`, und er bleibt dabei: ein
+    Badge ist kein Knopf, er hat keine Aktion, und die drei Kategorie-Varianten daneben
+    (`.rail__glyph--own/--shared/--foreign`) tragen ohnehin eigene Hex-Werte (Phase 8 C3).
+    Dieses `assert` ist kein Test über eine Absicht, sondern die Markierung: wer die alte Optik
+    zum dritten Mal aus dem Repo wirft, liest hier zuerst, warum sie bleiben darf.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+    glyph = _block_body(css, ".rail__glyph")
+    assert "var(--btn-face-top)" in glyph, glyph
+
+
 def test_standard_button_hover_kept():
     """`.btn:hover` behält ein Hover-Verhalten (seit 2026-10-01: `--btn-std-fill-hover`); die
     Navigationsknöpfe erben es über die Klasse `.btn`."""

@@ -5,7 +5,7 @@ read-when: Chronik einer älteren P9-Session gesucht — nicht beim normalen Arb
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-01 (**fünfzehnte Rotation, A4-Vorbereitung** — Step-A-Block (2026-10-01, Domain live) verbatim aus dem Head; Head 42.376 B → 34.795 B) | 2026-10-01 (**vierzehnte Rotation, Step A** — Step-B-Block verbatim aus dem Head; Head 41.707 B → 29.415 B) | 2026-09-30 (**dreizehnte Rotation, Step B** — Step-B-Block [polkit-Regel gebaut, V153 entschieden: sudoers ist unter NoNewPrivileges unbaubar; systemd 255 kennt nur die grobe `manage-units`-Aktion, deshalb JS-Regel mit Unit-Attribut; V153-Probe ohne tailscaled-Kontakt] im Head **angehängt**, Step-H-Block verbatim ins Archiv; Head 34.873 B → 28.685 B) | 2026-09-30 (**zwoelfte Rotation, Step H** — Step-H-Block [`fastmcp` exakt gepinnt `==3.4.7`, der Range-Pin hatte den Live-Release bereits lautlos auf 3.4.7 gezogen, V163 mit drei Codepunkten beantwortet, Wächter als Deploy-Riegel, Gegenprobe 4 Verstöße → 7 rot] im Head **angehängt**, Step-G-Block verbatim ins Archiv; Head 33.175 B → 26.210 B) | 2026-09-30 (**elfte Rotation, Step G** — Step-G-Block [Lösch-Ort war unbaubar, TLS-Wegwerf für den Browserbeleg, 14/14] im Head **angehängt**, Step-F-Block verbatim ins Archiv; Head 32.668 B → 25.740 B) | 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
+updated: 2026-10-01 (**sechzehnte Rotation, achter Block** — Deploy verschoben (Befund 11: `doing` ist im Deploy-Fall im Status-Feld erreichbar und zählt in keinem Ordner), `.toolbar-btn` in Standardoptik mit Pixel-Beleg 13/13, vier Tailscale-Bilder geklärt; Head 41.306 B, Archiv 152.730 B) | updated: 2026-10-01 (**fünfzehnte Rotation, A4-Vorbereitung** — Step-A-Block (2026-10-01, Domain live) verbatim aus dem Head; Head 42.376 B → 34.795 B) | 2026-10-01 (**vierzehnte Rotation, Step A** — Step-B-Block verbatim aus dem Head; Head 41.707 B → 29.415 B) | 2026-09-30 (**dreizehnte Rotation, Step B** — Step-B-Block [polkit-Regel gebaut, V153 entschieden: sudoers ist unter NoNewPrivileges unbaubar; systemd 255 kennt nur die grobe `manage-units`-Aktion, deshalb JS-Regel mit Unit-Attribut; V153-Probe ohne tailscaled-Kontakt] im Head **angehängt**, Step-H-Block verbatim ins Archiv; Head 34.873 B → 28.685 B) | 2026-09-30 (**zwoelfte Rotation, Step H** — Step-H-Block [`fastmcp` exakt gepinnt `==3.4.7`, der Range-Pin hatte den Live-Release bereits lautlos auf 3.4.7 gezogen, V163 mit drei Codepunkten beantwortet, Wächter als Deploy-Riegel, Gegenprobe 4 Verstöße → 7 rot] im Head **angehängt**, Step-G-Block verbatim ins Archiv; Head 33.175 B → 26.210 B) | 2026-09-30 (**elfte Rotation, Step G** — Step-G-Block [Lösch-Ort war unbaubar, TLS-Wegwerf für den Browserbeleg, 14/14] im Head **angehängt**, Step-F-Block verbatim ins Archiv; Head 32.668 B → 25.740 B) | 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
 ---
 
 # Phase 9 — Sessions Archive
@@ -15,6 +15,110 @@ trägt immer genau einen `## Session stopped`-Block, ältere Blöcke wandern ver
 Vorsatz: nichts abtippen, alles per Skript mit vier Gegenproben (Schnitt verlustfrei, neuer
 Head trägt genau einen Block, alle bewegten Blöcke im Archiv byte-identisch, Archivbestand
 unangetastet).
+
+## Session stopped — 2026-10-01 (siebter Block, A4-Vorbereitung: zwei neue Befunde, ein Vorlagen-Defekt, 5 neue Wächter)
+
+**Diese Runde hat nichts ausgeführt, sie hat A4 messbar gemacht.** Form ist Cooperation
+(P9-Q, ein Schritt pro Runde): A4 ist ein `sudo`-Schritt auf einer Kiste, die ich nicht
+anfassen darf — also war meine Aufgabe die Vorlage, die Befunde und die Erwartungshaltung.
+
+**Befund 8 — P9-10 ist bis A7 nicht erfüllbar, und die Ursache steht nicht in der Zeile.**
+Abnahmezeile P9-10 verlangt *200 **und** gültiges LE-Zertifikat*. Die Zertifikats-Hälfte
+gehört Caddy, die `200` gehört `SPACE_ALLOWED_HOSTS` — und das ist A7. Gemessen gegen den
+laufenden Dienst: `curl -H "Host: sharefyx.eurofyx.com" http://127.0.0.1:8765/health` →
+`400 Invalid host header` (unveränderter Host → 200, der erlaubte ts.net-Name → 200).
+**Die ganze Kette einmal mit echtem Caddy davor gespielt**, statt nur geschlossen: das
+Ubuntu-Paket entpackt (ohne Installation), `caddy 2.6.2` auf einem Wegwerf-Port vor die
+Relay-Adresse `100.93.43.122:8765`, also exakt die Strecke, die der VPS in A4 nimmt →
+`sharefyx.eurofyx.com` 400, `100.93.43.122` 400, ts.net-Name **200 mit
+`{"status":"ok","service":"sharefyx-mcp",...}`**. Zwei Dinge damit zugleich belegt: das
+**Relay funktioniert**, und **Caddy reicht den Host-Header unverändert durch** — die
+Behauptung stand vorher nur als „Caddy-Default" im Kommentar, ohne Messung. Folge: P9-10
+ist in **P9-10a** (Zertifikat, A4) und **P9-10b** (`200`, nach `ALLOWED_HOSTS`) geteilt, und
+die `400` ist in A4 das erwartete Ergebnis. **Vorgeschlagen, nicht entschieden:** `ALLOWED_HOSTS`
+als eigene Hälfte **vorziehen** (A7a) — dort wechselt kein `resource`, beide Connectoren
+bleiben gültig, Fabian ist nicht nötig. Ein Neustart des Produktionsdiensts ist deine Sache.
+
+**Befund 9 — auf dem VPS ist kein Caddy, und A4 fing trotzdem mit „install" an.**
+`tailscale status`: der VPS heißt **`ubuntu`**, `100.121.142.113`, Tag `tag:sharefyx-edge`,
+online. `curl` auf 80 und 443 gegen seine Tailnet-IP: **kein Listener** (gleicher Zustand wie
+der A6-Test am 2026-09-30 — kein Firewall-Problem, ein fehlendes Programm). Der Schritt A4
+begann mit `sudo install -m 644 /etc/caddy/Caddyfile`, einem Befehl, der ohne Caddy mit
+`No such file or directory` endet. **A4 ist jetzt A4a (messen, dann `apt install -y caddy`)
++ A4b (Caddyfile, `validate`, Restart)** und nennt drei getrennte Ausgaben, von denen die
+`openssl s_client`-Zeile der eigentliche Zertifikatsbeleg ist. Zwei Nebensachen aus
+derselben Messung, weil sie die Quellenwahl bestimmen: Ubuntu 24.04 liefert **`caddy 2.6.2`**,
+dessen `postinst` `/var/log/caddy` anlegt und auf `caddy:caddy` chownt (das Datei-Log der
+Vorlage ist damit beschreibbar — und `caddy validate` sagt auf dieser Version
+`Valid configuration`, inklusive `roll_size`/`roll_keep`), und die Paket-Unit hat
+`ExecReload=… caddy reload … --force`. Letzteres ist der Grund, warum die Vorlage **kein
+`admin off`** trägt: gemessen bricht `caddy reload` damit in `dial tcp 127.0.0.1:2019:
+connect: connection refused` ab — „Härten" hätte `systemctl reload caddy` kaputtgemacht.
+
+**Vorlagen-Defekt, gefunden durch den Test, nicht durch das Lesen.** Der zweite Platzhalter
+hieß `<vps-tailnet>` und war im Kopfkommentar als „Node-Name **des VPS**" beschrieben —
+während `reverse_proxy` darunter auf die **Heim-VM** zeigt. Wer nach der Kopfzeile
+einsetzt, lässt Caddy auf sich selbst proxen; der Fehler sieht aus wie ein totes Relay
+(`connection refused`), mitten in der Abnahme. Jetzt `<heimvm-tailnet>`, mit der gemessenen
+Ziel-IP `100.93.43.122` im Kommentar und der ausdrücklichen Warnung, dass `ubuntu` /
+`100.121.142.113` **nicht** hingehören.
+
+**Fünf neue Wächter** in `phase9_hardening/tests/test_tail_proxy.py` (**12/12 grün**):
+Ziel-Platzhalter benennt die Heim-VM · Kopf und Anweisung nennen dieselben Platzhalzer ·
+Upstream-Port = Relay-Port = App-Port · kein zweiter HSTS und kein `admin off` ·
+nach dem Einsetzen bleibt kein `<…>` in der Anweisung stehen. **Gegenprobe mit vier
+eingebauten Verstößen → 5 rote Assertions**, danach zurückgebaut. Zwei eigene Fehler dabei:
+ein `and` in einer Assertion (Python nennt nicht, welche Hälfte fehlt) und ein Helper, der die
+Platzhalternamen **ohne** Klammern zurückgab, während die Wächter die Zeichenfolge **mit**
+Klammern prüfen — beide im selben Commit behoben. Und die vierte Wiederholung derselben
+Falle (P8.6 Block H, P9 Step G, Step B, jetzt hier): **mein eigener Kommentar** im Vorlagen-
+Kopf nennt den alten Platzhalter und `/healthz`, weil er die Korrektur erklärt — die Wächter
+trennen deshalb strukturell Anweisung und Kommentar (`_directives_only`).
+
+| Gegenstand | Nachweis |
+|---|---|
+| **Befund 8** | `400 Invalid host header` für die neue Domain am laufenden Dienst; dieselbe Kette über echten Caddy 2.6.2 durch den echten socat-Relay → 200 mit `{"status":"ok",…}` |
+| **Befund 9** | `tailscale status` (ubuntu/100.121.142.113/`tag:sharefyx-edge`), 80+443 ohne Listener, `apt-cache policy caddy` → 2.6.2, `postinst` + Unit aus dem `.deb` gelesen, `caddy validate` → `Valid configuration`, `caddy reload` mit `admin off` → connection refused |
+| **Tests** | `phase9_hardening/tests/test_tail_proxy.py` 12/12 (5 neu), Gegenprobe 4 Verstöße → 5 rot |
+| **Bestand** | `pytest` **1120** (1115 + 5), `ui_budget` **5/5** (152,5 KB), Tabu-Pfade leer, **kein `systemctl`, kein `pkill -f`, kein Eingriff in den laufenden Dienst** (nur `GET /health` gegen `127.0.0.1`, `tailscale status` read-only und ein Verbindungsversuch gegen die VPS-IP) |
+| **Doku-Hygiene** | `RUNBOOK_STEP_A.md` **51.613 B, 10.653 B über dem 40-KiB-Softcap — benannt statt versteckt** (P8-P) in `docs/INDEX.md`, mit dem Hinweis, dass §0 Befund 8+9 der Zuwachs sind und die Straffung Step-Z-Arbeit ist |
+
+### Zweiter Teil derselben Runde — A4 ist ausgeführt, und ein Fehler von mir ist es auch
+
+**A4a und A4b sind durch, mit den erwarteten Ausgaben** (Tabelle im Runbook, Schritt A4). Der
+Punkt, den vorher nur die Behauptung trug: **die `400 Invalid host header` kam aus der
+Anwendung, nicht aus Caddy** — auf der Heim-VM steht zur selben Sekunde
+`19:30:49 GET /health status=400 ua=curl/8.7.1`. Damit steht die Kette
+VPS → WireGuard → `sharefyx-tail-proxy` → App, und **P9-10a ist grün**.
+
+**Befund 10 — `caddy validate` liest den Adapter aus dem Dateinamen.** Beim Vorprüfen der
+A4b-Datei: `Error: decoding config: invalid character '#'` bei `/tmp/opencode/A4b.Caddyfile`,
+`Valid configuration` bei derselben Datei als `Caddyfile`. Gemessen: `Caddyfile*` (case-sensitiv,
+auch `.fertig`/`.txt`/`.new`) wird gelesen, `caddyfile` klein und `A4b.Caddyfile` nicht. **Der
+Fehlertext deutet auf Syntax und kaputte Klammern** — wer ihn nicht kennt, repariert die Datei
+oder ersetzt sie durch eine ohne Protokoll, nur weil die erste sich weigerte.
+
+**Und mein eigener Fehler, benannt statt weggeredet: ich habe die ganze Runde mit
+`2026-10-02` datiert, ohne das Datum zu messen — es ist `2026-10-01`.** Aus dem Handover-Datum
+(2026-10-01) plus einem Tag gerechnet, also eine Zahl **behauptet statt gemessen**; die
+Gegenprobe kam erst, als der VPS ein LE-Zertifikat mit `notBefore=Oct 1` ausstellte. **41
+Fundstellen** in sieben Dateien, darunter der Session-Block-Header, die Phase-Statuszeile und
+der aktuelle Eintrag in der Wurzel-`CLAUDE.md` — korrigiert in `10e3c50`→`HEAD`, ein Commit,
+nicht am Stück. Die Datumsangaben selbst bleiben als Beweis stehen, warum sie korrigiert wurden.
+Zwei Session-Blöcke mit demselben Datum sind normal (2026-09-30 trägt fünf).
+
+**Und der Platzhalter ist raus (2026-10-01, später):** `read -rp` + `sed` hat die echte
+ACME-Adresse gesetzt, `validate` wieder `Valid configuration`, `reload` sauber — und der
+Erfolgsbeleg ist der, den es vorher nicht geben konnte: **`notBefore` unverändert**
+(`Oct 1 18:31:33 2026 GMT`), also keine Zertifikatsneuausgabe, wie vorhergesagt. **Die Adresse
+steht bewusst nicht im Repo** (privat; ihr Ort ist `/etc/caddy/Caddyfile` und das Postfach).
+
+**Offen und deine Entscheidung:** **(a)** ob `ALLOWED_HOSTS` als
+A7a vorgezogen wird (dann ist P9-10b vor dem Schnitt grün und A7 zerfällt in zwei kalibrierte
+Hälften); **(c)** der Deploy von `v3.1.0` vor A7, sonst ist das `LEGACY_*`-Fenster wirkungslos.
+
+**Nächster Schritt:** Deploy `v3.1.0` (dein Schritt, `deploy.sh` braucht sudo) → dann A7/A8 in
+einer Sitzung mit Fabian. Gate/Z wartet weiter auf A7/A8.
 
 ## Session stopped — 2026-10-01 (sechster Block, Step A — Domain live, A5 ✅, eine Korrektur, die A7 umplant)
 

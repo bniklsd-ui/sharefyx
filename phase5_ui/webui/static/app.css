@@ -1633,10 +1633,20 @@ select.input:focus {
   justify-content: flex-end;
 }
 .toolbar-btn {
-  background: linear-gradient(180deg, var(--btn-face-top), var(--btn-face-bottom));
-  border: 1px solid var(--btn-edge);
+  /* P9, Nikinger-Entscheidung 2026-10-01 (zweite Runde am selben Tag): die Formatierhilfen der
+     Textleiste tragen jetzt dieselben deckenden Tokens wie `.btn` (siehe `--btn-std-*` in :root)
+     und nicht mehr die alte graue Plastik aus `--btn-face-*`. Der Weg dorthin war eine Messung:
+     `.toolbar-btn` stand als einziger echter Knopf noch auf `--btn-face-top`, nachdem `.btn` am
+     Vortag umgestellt worden war — eine zweite Knopfoptik im selben Panel ist genau das, was die
+     erste Runde an `.account-nav` beanstandet hat. **Maße und Typografie bleiben unberührt**
+     (24px Höhe, Monospace, `--text-muted`) — die Formatierhilfen sind eine Werkzeugleiste, kein
+     Dialog; sie unterscheiden sich in der Größe, nicht in der Sorte. Der äußere Schlagschatten
+     (`0 1px 2px rgba(0,0,0,.45)`) fällt weg, weil `.btn` ihn auch nicht mehr trägt — sonst wäre
+     der Pixelvergleich mit `#home-button` genau an der Unterkante um 2 px daneben. */
+  background: var(--btn-std-fill);
+  border: 1px solid var(--btn-std-line);
   border-radius: var(--radius-sm);
-  box-shadow: inset 0 1px 0 var(--btn-glow), 0 1px 2px rgba(0,0,0,.45);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
   color: var(--text-muted);
   font-family: var(--font-mono);
   font-size: 12px;
@@ -1645,8 +1655,18 @@ select.input:focus {
   padding: 0 4px;
   cursor: pointer;
 }
-.toolbar-btn:hover { color: var(--text); border-color: var(--line-strong); }
-.toolbar-btn:active { transform: translateY(1px); box-shadow: var(--btn-press); }
+.toolbar-btn:hover {
+  background: var(--btn-std-fill-hover);
+  color: var(--text);
+}
+.toolbar-btn:active {
+  transform: translateY(1px);
+  background: var(--btn-std-fill-active);
+  box-shadow: none;
+}
+/* `:disabled` bleibt bewusst auf `--surface`: die Formatierhilfen sind in der Vorschau
+   deaktiviert (editor.js :: setEditorMode) und müssen dort als inaktiv lesbar sein, nicht als
+   "Standardknopf in einem anderen Zustand". */
 .toolbar-btn:disabled {
   background: var(--surface);
   color: var(--text-faint);
