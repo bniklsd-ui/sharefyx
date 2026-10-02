@@ -1,0 +1,62 @@
+{
+  "base_url": "https://127.0.0.1:18776",
+  "item_id": "itm_5acffea8",
+  "befunde": [
+    {
+      "pruefung": "S1 Uebersicht: Chip '1 In Arbeit' bei alpha",
+      "ok": true,
+      "detail": "'1 In Arbeit'"
+    },
+    {
+      "pruefung": "S2 Rail: fuenf Eimer in Reihenfolge open, doing, done, note, archived",
+      "ok": true,
+      "detail": "['open', 'doing', 'done', 'note', 'archived']"
+    },
+    {
+      "pruefung": "S2 Rail: alle fuenf Labels deutsch, keines roh 'doing'",
+      "ok": true,
+      "detail": "['Offen', 'In Arbeit', 'Erledigt', 'Notizen', 'Archiv']"
+    },
+    {
+      "pruefung": "S3 Zaehler: Offen=1, In Arbeit=1",
+      "ok": true,
+      "detail": "{'open': '1', 'doing': '1', 'done': '1', 'note': '1', 'archived': '0'}"
+    },
+    {
+      "pruefung": "S4 Liste 'In Arbeit' enthaelt genau die laufende Aufgabe",
+      "ok": true,
+      "detail": "['Laufende Probe']"
+    },
+    {
+      "pruefung": "S4 Brotkrumen zeigen 'In Arbeit', nicht 'doing'",
+      "ok": true,
+      "detail": "'alpha › In Arbeit'"
+    },
+    {
+      "pruefung": "S5 Editor: Status auf 'doing' gesetzt und gespeichert (Toast)",
+      "ok": true,
+      "detail": "meta-panel offen=True Toast='Gespeichert · v2'"
+    },
+    {
+      "pruefung": "S6 ohne Reload: Offen 1->0, In Arbeit 1->2",
+      "ok": true,
+      "detail": "vorher={'open': '1', 'doing': '1', 'done': '1', 'note': '1', 'archived': '0'} nachher={'open': '0', 'doing': '2', 'done': '1', 'note': '1', 'archived': '0'}"
+    },
+    {
+      "pruefung": "S7 API: /overview liefert genau die Rail-Zahlen (offen=0, doing=2)",
+      "ok": true,
+      "detail": "HTTP 200 {'open': '0', 'doing': '2', 'done': '1', 'note': '1', 'archived': '0'} vs {'open': '0', 'doing': '2', 'done': '1', 'note': '1', 'archived': '0'}"
+    },
+    {
+      "pruefung": "S7 API: /items?type=task&status=doing liefert total=2",
+      "ok": true,
+      "detail": "HTTP 200 ['Laufende Probe', 'Offene Probe']"
+    },
+    {
+      "pruefung": "S8 API: Item meldet status='doing' und assignee='alpha' unveraendert",
+      "ok": true,
+      "detail": "HTTP 200 status='doing' assignee='alpha'"
+    }
+  ],
+  "alle_ok": true
+}

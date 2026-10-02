@@ -1,12 +1,12 @@
 ---
-status: live
+status: snapshot
 purpose: "Mini-Plan P9 Block doing — schließt das Eimer-Loch für `doing` per fünftem `_BUCKETS`-Eintrag „In Arbeit" (Lock P9-V), Voraussetzung für den Deploy `v3.1.0`. Locks P9-V–P9-X, Abnahme P9-59–P9-68, [VERIFY] V173–V178."
 read-when: Bau des doing-Blocks (opencode/M3) oder Herkunft von P9-V nachvollziehen
 detail: L2
 up: ../../phase9_hardening/CLAUDE.md
 down:
   - ./phase9_hardening_plan.md   # 📕 übergeordneter P9-Plan; P9-P §1, §8.3, §15 werden hier datiert korrigiert
-updated: 2026-10-02 (Mini-Plan geschrieben, Claude Code; Kandidatenentscheidung (a) vom Nikinger)
+updated: 2026-10-02 (Block **gebaut** von opencode/M3, §12 Ergebnis: 8 ✅ · 1 ⬜, `pytest` 1128, Browser 11/11 mit Gegenlauf 7 rot; Abweichung §12.3, Befunde B1–B4, ab hier nicht mehr editiert)
 ---
 
 # Phase 9 — Block doing (fünfter Eimer „In Arbeit")
@@ -395,3 +395,123 @@ Reihenfolge am Deploy-Tag:
 
 `main@97de3d6`, Arbeitsbaum sauber vor diesem Plan-Commit. `doc_health` **0 Befunde**. `pytest`
 **1122 passed in 200,9 s** (ohne `SHAREFYX_*`/`SFX_*` im Env). Kein Code-Touch, kein Service-Touch.
+
+---
+
+## §12 Ergebnis (Block gebaut 2026-10-02, opencode/M3)
+
+Gebaut in **einem** Commit, gegen `main@92a0cfa`. Doku, Tests, Browser-Beleg und dieses Ergebnis
+gehören dazu (Hard Rule 8). Nach diesem Abschnitt wird die Datei **nicht mehr editiert** — sie ist
+ab jetzt ein 📕-Snapshot. Jede Korrektur an ihr steht hier, datiert.
+
+### 12.1 Abnahmematrix §9
+
+| Zeile | Stand | Beleg (nicht nur „Test grün") |
+|---|---|---|
+| **P9-59** | ✅ | **T3** `test_doing_task_counts_in_doing_and_nowhere_else` — `counts == {"open":1,"doing":1,"done":1,"note":1,"archived":2}` als **Dict-Gleichheit**, `sum == item_count == 6`, und die **Mitgliedschaften** der fünf Eimer schließen sich paarweise aus und decken zusammen alle sechs Items. Browser **S3** (vor dem Schreibvorgang `1/1`) + **S6** (danach `0/2`) |
+| **P9-60** | ✅ | **T4** `test_doing_counter_equals_doing_list` — `total == counts["doing"] == 1` **und** `items[0].title == "laufende Aufgabe"` (das konkrete Item, nicht nur die Zahl). **T8**: `seeded` hat jetzt ein `doing`-Item, deshalb läuft der Altbestand `test_counts_match_the_item_list_for_the_same_bucket` für diesen Eimer **nicht mehr vakuös** (0 == 0) — und `counts["open"] == 1` steht weiter, belegt das *Nicht*-Mitzählen in „Offen". Browser **S7** (`total == 2` nach dem Statuswechsel) |
+| **P9-61** | ✅ | **T2** `test_every_status_value_lands_in_exactly_one_bucket` — **aus `STATUS_VALUES` generiert** (6 Kombinationen), `bucketFor()`s Bedingung in Python nachgebildet, plus die Umkehrung „jeder Eimer wird von mindestens einer Kombination erreicht". Gegenlauf **G1 → 7 rot**, **G3 → 2 rot** |
+| **P9-62** | ✅ | **T1** (Reihenfolge aus dem **Quelltext** gelesen, plus Abgleich mit dem, was der Server ausliefert) + `test_meta.py:60` (`archived` zuletzt). Gegenlauf **G2 → 2 rot**. Browser **S2**: `data-bucket` im DOM in Reihenfolge `open, doing, done, note, archived` |
+| **P9-63** | ✅ | **T6** `test_every_bucket_has_a_german_label` — Label-Menge == Eimer-Menge (der `BUCKET_LABELS[b] \|\| b`-Rückfall in `tree.js` ist sonst kein Fehler, er sieht nur aus wie ein Feature) und `labels["doing"] == "In Arbeit"`. Browser **S1** (Chip „1 In Arbeit") + **S2** (kein Label roh `doing`) + Screenshot `p9_doing_02_rail_fuenf_ordner.png`. Sichtprüfung qualitativ: nichts abgeschnitten, nichts überlappt |
+| **P9-64** | ✅ | Browser **S5/S6**: Statuswechsel `open → doing` im Editor, Toast „Gespeichert · v2“, danach **ohne Reload** `offen 1 → 0` und `in Arbeit 1 → 2`. Screenshot `p9_doing_04_nach_statuswechsel.png`. Gegenlauf: **rot**, weil es den Ordner gar nicht gibt |
+| **P9-65** | ✅ | **T5** `test_ui_shaped_patch_keeps_doing_and_assignee` — PATCH mit **exakt** `editor.js :: saveItem()`s Feldsatz (`version, format, title, body, status, due, tags, links`, **ohne** `assignee`; am `currentFormValues()`/`saveItem()`-Quelltext verifiziert), danach `status == "doing"` und `assignee == "niklas"` über **drei** Lesepfade (API-Antwort, `GET`, `store.search`). Bestehend `phase2_mcp/tests/test_tools.py:1047` für die MCP-Seite. Browser **S8**: `status == "doing"`, `assignee == "alpha"`. Gegenlauf **G5 → rot** (wenn der Body `assignee` mitschickt) |
+| **P9-66** | ✅ | `git diff --stat -- phase1_storage phase2_mcp/mcpserver phase4_auth/authserver phase6_shares phase7_spaces_admin` → **leer**, im Commit ausgegeben. Damit V174 beantwortet: `phase1_storage/CLAUDE.md` §Geerbte Contracts musste **nicht** mitgezogen werden, und es ist keine zehnte Contract-Öffnung entstanden |
+| **P9-67** | ✅ | Alle fünf Verstöße einzeln eingebaut, G0 als Kontrolllauf: **G0 0 · G1 7 · G2 2 · G3 2 · G4 1 · G5 1** (§12.2) |
+| **P9-68** | ⬜ | **Nikinger-Schritt.** Deploy `v3.1.0` + `health_gate.sh` + P9-43, Ablauf §8 |
+
+**Bilanz: 8 ✅ · 0 ⚠️ · 1 ⬜** (P9-68 hängt per Konstruktion am Deploy, der nicht Teil des
+Blocks ist).
+
+### 12.2 Gegenlauf §5 — gemessene Zahlen
+
+Kontrolllauf **G0 (Bau-Stand) = 0 rot** steht in derselben Tabelle als Zeile, weil ein
+Gegenlauf ohne Kontrolllauf nicht zeigt, ob die Testauswahl selbst schuld war.
+
+| Verstoß | rot | welche Wächter |
+|---|---|---|
+| G0 Bau-Stand (Kontrolle) | **0** | — |
+| G1 `"doing"`-Eintrag aus `_BUCKETS` entfernt | **7** | T1, T2, T3, T4, T6, T7, T8 |
+| G2 `"archived"` **vor** `"doing"` | **2** | T1, `test_meta.py:60` |
+| G3 `_BUCKETS["doing"]["status"] = "open"` (Duplikat) | **2** | T2, **T3 — erst nach dem Nachschnitt unten** |
+| G4 `doing: "In Arbeit"` aus `BUCKET_LABELS` entfernt | **1** | T6 |
+| G5 im T5-PATCH-Body `"assignee": ""` | **1** | T5 |
+
+**Browser-Gegenlauf: 7 von 11 Stationen rot** (nur D1+D2 per
+`git stash push -- phase5_ui/webui/api.py phase5_ui/webui/static/js/state.js` zurückgenommen,
+frisch gesätet, `git stash pop` danach). Rot: S1, S2 (2 Prüfungen), S3, S4 (2), S6. **Grün
+bleiben S5, S7, S8** — siehe den Befund in §12.4.
+
+### 12.3 Abweichung vom Plan (eine, mit Begründung)
+
+**§5 T3/T4 sind schärfer geschnitten als beschrieben.** Der Plan sagte, G3 mache **T2, T3 und T4**
+rot. Gemessen: **nur T2**. Grund: der `seeded`-Datensatz hat je **eine** offene und **eine**
+laufende Aufgabe, also stehen „die Zahl der Aufgaben mit Status `open`" und „die Zahl der
+Aufgaben mit Status `doing`" beide auf 1 — und ein Duplikat-Filter ändert daran nichts. T3 und T4
+prüften **Zahlen**, und die Duplikat-Eigenschaft ist keine Zahl, sondern eine **Mitgliedschaft**.
+
+Der Plan hat dafür eine eigene Regel (§5, letzter Absatz): *„Wird ein Verstoß nicht rot, ist der
+zugehörige Wächter wertlos und muss neu geschnitten werden. Das ist dann ein Befund, nicht
+stillschweigend weiterbauen."* Also neu geschnitten: **T3 holt jetzt die Item-Mengen** der fünf
+Eimer (fünf Listenabfragen) und beweist paarweise Disjunktheit + Vollständigkeit. Damit ist
+„zählt in „In Arbeit" und in **keinem** anderen Eimer" (P9-59) **behavioural** bewiesen statt
+behauptet, und G3 ist rot.
+
+**T4 bleibt unter G3 grün — und das ist richtig, nicht ein Loch.** T4 trägt P9-60 („Zähler == Liste
+für „In Arbeit“"), und unter G3 gilt Zähler == Liste. Die Duplikat-Eigenschaft tragen T2 (statisch,
+über die Gesamtregel) und T3 (behavioural, über die Mitgliedschaft).
+
+### 12.4 Befunde, die der Block erbracht hat
+
+**B1 — das Loch war rein navigativ, und der Gegenlauf beweist es.** Im Browser-Gegenlauf bleiben
+**S5, S7 und S8 grün**: der Statuswechsel auf `doing` ließ sich **schon ohne diesen Block**
+speichern, `/overview` und `/items` lieferten `doing` roh, und `assignee` überlebte den
+Editor-Pfad. P9-W stand als Behauptung im Plan; hier ist es ein Messlauf. Konsequenz für P10: die
+Hervorhebung von „In Arbeit“ braucht **keine** Arbeit an der Maschinenebene.
+
+**B2 — dieselbe Repo-Lehre zum sechsten Mal, diesmal im eigenen Prüfskript.** Der erste
+Browser-Gegenlauf **stürzte ab**, statt rot zu melden: ein `click()` auf den Ordner „In Arbeit",
+den es ohne den Fix nicht gibt, ist ein 30-Sekunden-Timeout, kein Befund — und ein Skript, das
+beim Beweis seines eigenen Lochs stirbt, beweist nichts. Nachgebessert: S4/S5/S8 prüfen jetzt
+zuerst auf Existenz und melden sich mit Begründung rot. Danach beide Läufe neu gefahren
+(grün 11/11 mit dem gehärteten Skript, rot 7/11 im Gegenlauf).
+
+**B3 — §1 dieses Plans ist an einer Stelle falsch, und der Fehler war die Überschreitung.**
+§1 behauptet, `phase9_hardening/CLAUDE.md` sei **42.393 B** und damit über dem Softcap. Gemessen
+am Bau-Tag: **`git show HEAD:phase9_hardening/CLAUDE.md | wc -c` = 35.794 B**, also knapp *unter*
+dem Softcap, und `doc_health` meldete zu Recht **0** Befunde. Die 42.393 B waren ein **Zustand vor
+der siebzehnten Rotation**; §1 hat sie nach der Rotation weitergetragen. Die Überschreitung ist
+trotzdem entstanden — aber erst durch den **zehnten Block** (Rotationsbilanz 44.508 B → 41.192 B,
+232 B über), nicht vorher. Sie ist jetzt im INDEX benannt (P8-P), wie es die Konvention verlangt.
+
+**B4 — K5, eine kleine Abweichung von §4 D1.** §4 verlangte, die Zeilen `api.py:115–127`
+**wörtlich** stehen zu lassen. Zwei davon tragen aber eine **Anzahl** („Die **drei** Ordner des
+Navigationsbaums", „**Vier** Ordner statt drei schließen das Loch") — die wäre nach dem fünften
+Eintrag eine Lüge gewesen, und ein Kommentar, der das Gegenteil des Codes behauptet, ist schlechter
+als keiner (dieselbe Regel, an der T7 festhing). **Nur die Zahlen korrigiert, alle
+Begründungen wörtlich.**
+
+### 12.5 Selbstprüfung §0.4
+
+| Schritt | Ergebnis |
+|---|---|
+| `pytest -q` | **1128 passed in 202,4 s** (Baseline 1122 = V177, **+6** neu: T1, T2, T6, T3, T4, T5; T7 umbenannt, T8 an Bestehendem) |
+| `ui_budget.py` | **5/5** im Korridor, `app.js + app.css + Font (gzip)` **153,2 KB** (153,0 KB vorher) |
+| `node --check state.js` | ✅ (und alle 13 übrigen JS-Dateien mitgeprüft) |
+| Tabu-Diff §0.3 | **leer** |
+| `doc_health.py` | **0 Befunde** (nach dem Bau; **1** während, der Head lag 232 B über dem Softcap — INDEX-Zeile entsprechend benannt, s. B3) |
+| Service-Touch | **kein** `systemctl`, **kein** `pkill -f`, **kein** Deploy. Wegwerf-Instanz nur über `p9_doing_wegwerf.py stop` (PID-Datei) gestoppt |
+| Env | `env \| grep -E '^(SHAREFYX_\|SFX_)'` **leer** |
+
+### 12.6 Screenshots
+
+`docs/screenshots/p9_doing_{01_uebersicht_chip, 02_rail_fuenf_ordner, 03_liste_in_arbeit,
+04_nach_statuswechsel}.png` (1440×900, 56/42/42/60 KB). **Keiner** zeigt den Login-QR oder die
+`credentials.json` (Hard Rule 1: Passwort und TOTP-Seed werden zur Laufzeit unter
+`/tmp/opencode/p9-doing-wegwerf/` mit `0600` erzeugt und nichts davon ist committet).
+`screenshots_latest/` auf `p9_doing_*` umgehängt.
+
+Qualitative Sichtprüfung mit dem lokalen Vision-Modell: Rail zeigt `Offen, In Arbeit, Erledigt,
+Notizen, Archiv` + „+ Ordner“, **nichts abgeschnitten, nichts überlappt**; Bild 04 zeigt
+`Offen 0` / `In Arbeit 2`, deckungsgleich mit S6. **Gezählt wurde nicht** (dokumentierte
+VLM-Schwachstelle, `docs/concepts/sichtpruefung_automation_tooling.md`) — **gezählt haben die
+Stationen**, aus dem echten DOM.

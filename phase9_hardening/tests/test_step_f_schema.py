@@ -29,8 +29,9 @@ alle fünf sind beim Bauen am Code aufgefallen, jeder mit eigener Fehlerklasse:
  14. test_the_editor_status_dropdown_reads_the_vocabulary      (V159, statisch: `doing` erscheint
         im Editor-Dropdown, weil es `state.meta.status_values[itemType]` liest — gegen die
         Behauptung des Plans, **gemessen** am Aufrufer und nicht geglaubt)
- 15. test_the_bucket_hole_for_doing_is_named_not_silently_fixed (Befund aus dem Bau, statisch:
-        `_BUCKETS` kennt `doing` nicht — die Oberfläche ist P10, der Befund muss im Code stehen)
+  15. test_the_doing_bucket_closes_the_hole                        (Befund aus dem Bau, statisch:
+         `_BUCKETS` kennt `doing` — **seit 2026-10-02 per Lock P9-V umgedreht**, siehe den
+         Docstring des Tests für beide Richtungen)
 
 **V160 (2026-09-30, Nikinger): `assignee` ist ein Space-Name, ohne Validierung gegen die
 Space-Liste.** Test 3/16 pinen das nicht semantisch, sondern am *Mechanismus*: es gibt
@@ -297,23 +298,40 @@ def test_the_editor_status_dropdown_reads_the_vocabulary():
     )
 
 
-# -- 15.  Der Befund, den Step F nicht fixt --------------------------------------------------
+# -- 15.  Der Befund, den Step F nicht fixt — und den der doing-Block gefixt hat ---------------
 
 
-def test_the_bucket_hole_for_doing_is_named_not_silently_fixed():
-    """`_BUCKETS` (`api.py`) kennt `doing` nicht, und das ist **eine bewusste Unterlassung**,
-    keine Vollständigkeit. `bucketFor()` (`list.js`) vergleicht `f.status === item.status`
-    exakt und liefert fuer eine `doing`-Aufgabe `null`; beide Aufrufer fallen auf
-    `|| state.filter` zurueck. Warum trotzdem nicht hier gefixt: ein fuenfter `_BUCKETS`-Eintrag
-    erzeugt ueber `bucketNames() = Object.keys(state.meta.buckets)` einen **fuenften Rail-Eintrag**
-    (`tree.js:72`) mit unuebersetztem Label — das ist die Hervorhebung, die P9-P P10 zuteilt.
-    Dieser Test pinnt den Befund **im Code**: faellt er irgendwann weg, ohne dass P10 es behoben
-    hat, ist das ein Fehler."""
+def test_the_doing_bucket_closes_the_hole():
+    """`_BUCKETS` (`api.py`) **kennt** `doing` seit 2026-10-02 (Lock P9-V). Der Test ist
+    darum **umgedreht**, und der alte Name wäre nach dem Umbau eine Lüge gewesen (P8.6-I-
+    Mechanik: ein Testname ist eine Behauptung).
+
+    **Beide Richtungen, mit Datum:**
+    - 2026-09-30 (Step F): `_BUCKETS` kannte `doing` **nicht**, und das war eine *bewusste
+      Unterlassung* — `bucketFor()` (`list.js`) vergleicht `f.status === item.status` exakt und
+      lieferte für eine `doing`-Aufgabe `null`; beide Aufrufer fielen auf `|| state.filter`
+      zurück. Nicht gefixt, weil beide Kandidaten Darstellungsentscheidungen waren und der Plan
+      sie nach P10 verwies. Der alte Test pinnte diesen Zustand **im Code** fest.
+    - 2026-10-02 (P9 Block doing, Lock P9-V, Nikinger-Entscheidung Kandidat (a)): der fünfte
+      `_BUCKETS`-Eintrag ist gebaut. Nicht weil eine Hervorhebung verlangt wäre, sondern weil
+      `doing` **erreichbar** war — im Status-`<select>` des Editors (`populateStatusSelect()`
+      listet `state.meta.status_values` roh) und per MCP `update_item(status="doing")`. Ein
+      Wert, den die Oberfläche anbietet und nicht wiederfindet, ist kaputt: dieselbe Klasse wie
+      „done" in P5 Step 7b.
+
+    Der Geheimvermerk-Marker wandert deshalb mit: `_BUCKETS` trägt jetzt `[P9 Block doing,
+    2026-10-02 — Lock P9-V …]`, und der Step-F-Satz „bewusst NICHT hier behoben" ist weg."""
     source = API_PY.read_text(encoding="utf-8")
     buckets = re.search(r"_BUCKETS: dict\[str, dict\[str, str\]\] = \{(.*?)\n\}", source, re.DOTALL)
     assert buckets, "_BUCKETS nicht gefunden"
-    assert '"doing"' not in buckets.group(1)
-    assert "P9 Step F" in source.split("_BUCKETS:")[0], "der Befund-Geheimvermerk fehlt"
+    assert '"doing"' in buckets.group(1), (
+        "der fünfte Eimer fehlt wieder — eine `doing`-Aufgabe fällt dann durch ALLE Ordner "
+        "(P9-P/P9-V)"
+    )
+    assert "P9-V" in source.split("_BUCKETS:")[0], "der Befund-Geheimvermerk fehlt"
+    assert "bewusst NICHT hier behoben" not in source, (
+        "der Step-F-Satz steht noch und behauptet das Gegenteil des Codes"
+    )
 
 
 # -- V160: die Entscheidung, die die Tests 3/4/16 mechanisch tragen -------------------------

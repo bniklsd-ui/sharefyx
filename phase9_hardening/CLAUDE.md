@@ -27,10 +27,10 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | C | Vision-Dienst auf der RTX 3060 | ✅ **Step C abgeschlossen** (Session-Block 2026-09-26): GPU-Inferenz reboot-fest (Host + CT 111 auf 580.173.02 inkl. `nvidia-uvm`, uvm per `devN`-Passthrough, zweite Reboot-Probe grün) + C8 (`ollama` auf sharefyx-VM `inactive`/`disabled`, `curl 127.0.0.1:11434` → `Connection refused`, binary + Modell bleiben als kalter Fallback bis Step Z) + Host-Aufräumen pve (zwei `/root/111.conf.{new,bak-p9c}` per `rm -f` weg; `/tmp/nv580173` und alter `NVIDIA-Linux-x86_64-580.126.09.run` bereits weg — PVE-9-tmpfs bzw. im Vorrundezweig entfernt) · P9-21 ✅ · P9-23 ✅ · P9-26 ✅ · C4 ✅ · C5 ✅ · C6 ✅ · **P9-22 deferred** (Nikinger-Entscheidung 2026-09-26, kein externer Test möglich) — architektonischer Beweis statt externem Test: 192.168.68.140 ist RFC1918, sharefyx-VM hat keine öffentliche IP (CGNAT via RUT X50), Tailscale-Funnel mappt nur `127.0.0.1:8765` (kein `*:11434` auf sharefyx-VM), kein Port-Forward auf RUT X50, einziger 11434-Listener sitzt innerhalb CT 111; Revisit-Step **Step Z oder P10-Backlog** |
 | D | Zwei gemeldete Bugs (ESC/Vollbild, Drop-Ziel Space-Wurzel) | 🟡 D2 fertig; D1 (ESC/Vollbild) **bewusst zurückgestellt** — Nikinger-Entscheidung 2026-09-23, kein aktiver Blocker mehr, siehe Backlog unten |
 | E | Karte: Reload-Overload, V118 | ✅ **Step E abgeschlossen** (Session-Block 2026-09-28): (a) kein zweiter `/graph`-Abruf ohne Datenänderung — Signatur aus dem `/overview`-Payload, das der Client ohnehin holt (Plan §7.2(a) nannte den Graph-Payload; der hat **kein** `updated`, datierte Plan-Korrektur) · (b) bekannte Knoten behalten `x`/`y` über den Refetch · `force` nur am expliziten Refresh-Knopf · 7 Tests (Node-Harness + statisch) + Browser-Probe gegen die Wegwerf-Instanz, beide mit Gegenprobe gegen HEAD (dort 1 Abruf und 10 verschiedene Bilder in 1,5 s) · **P9-33/-34/-35 ✅** · **V118 beantwortet (zwei Linien, eine davon gestrichelt)** — die Design-Frage „eine oder zwei Linien" liegt beim Nikinger (P9-36) |
-| F | Schema-Fundament (neunte P1-Contract-Öffnung: `doing`/`assignee`) | 🟡 **code-complete 2026-09-30 (M3), nicht live-bewiesen** — V160 vom Nikinger beantwortet (**Space-Name, ohne Validierung**), Plan §8.2 auf **18 Hunks in genau drei Dateien** korrigiert (die Probe §8.7 erfüllt: `models.py`/`store.py`/`index.py`, sonst nichts); drei vom Plan nicht genannte Stellen ergänzt (`_summary()` = F10, `update()` = F11, `_coerce_assignee()`) · **ein Befund bewusst NICHT behoben**: `_BUCKETS` kennt `doing` nicht, beide Kandidaten sind Darstellungsentscheidungen und damit P10 (P9-P) — **[2026-10-01] der Deploy ist deshalb vom Nikinger auf einen Mini-Plan verschoben, und der Grund ist gemessen, nicht vermutet**: `doing` ist im Deploy-Fall für einen Menschen **erreichbar** (das Status-`<select>` der Kopfdaten listet `state.meta.status_values` roh, also `doing` als echte Option — `editor.js :: populateStatusSelect`), und seine Folge ist genau dieser Befund: `bucketFor()` (`list.js`) und `_overview()` (`api.py`) kennen den Wert nicht ⇒ eine Aufgabe mit `doing` taucht in **keinem** der vier Ordner-Zähler auf (nur im Filter „Alle Items" und in der Suche). Ein Deploy hätte den Wert samt dieser Eigenschaft in die Hand jedes Menschen gegeben · `pytest` 1039 → **1062** (23 neu), `ui_budget` 5/5, Tabu-Hartpfade unberührt. Der Contract-Absatz steht in `phase1_storage/CLAUDE.md` §Geerbte Contracts · **V161 mit synthetischem Vorabwert** (2,5–4,0 ms/Item gemessen, 153 reale Items ⇒ **0,4–0,6 s** einmalige Startkosten; P9-43 selbst bleibt Nikinger-Schritt am echten DATA_ROOT) |
+| F | Schema-Fundament (neunte P1-Contract-Öffnung: `doing`/`assignee`) | 🟡 **code-complete 2026-09-30 (M3), nicht live-bewiesen** — V160 vom Nikinger beantwortet (**Space-Name, ohne Validierung**), Plan §8.2 auf **18 Hunks in genau drei Dateien** korrigiert (die Probe §8.7 erfüllt: `models.py`/`store.py`/`index.py`, sonst nichts); drei vom Plan nicht genannte Stellen ergänzt (`_summary()` = F10, `update()` = F11, `_coerce_assignee()`) · **ein Befund bewusst NICHT behoben**: `_BUCKETS` kennt `doing` nicht, beide Kandidaten sind Darstellungsentscheidungen und damit P10 (P9-P) — **[2026-10-01] der Deploy ist deshalb vom Nikinger auf einen Mini-Plan verschoben, und der Grund ist gemessen, nicht vermutet** (Details im nächsten Absatz) — **[2026-10-02 geschlossen per Lock P9-V (doing-Block):** der fünfte Eimer „In Arbeit" ist gebaut, Reihenfolge `open, doing, done, note, archived`; **P9-P ist damit datiert eingeengt, nicht erledigt** — ein Eimer pro Statuswert ist Navigations-Vollständigkeit (dieselbe Klasse wie `done` in P5 Step 7b), die *prominente* Darstellung bleibt P10: `doing` ist im Deploy-Fall für einen Menschen **erreichbar** (das Status-`<select>` der Kopfdaten listet `state.meta.status_values` roh, also `doing` als echte Option — `editor.js :: populateStatusSelect`), und seine Folge ist genau dieser Befund: `bucketFor()` (`list.js`) und `_overview()` (`api.py`) kennen den Wert nicht ⇒ eine Aufgabe mit `doing` taucht in **keinem** der vier Ordner-Zähler auf (nur im Filter „Alle Items" und in der Suche). Ein Deploy hätte den Wert samt dieser Eigenschaft in die Hand jedes Menschen gegeben · `pytest` 1039 → **1062** (23 neu), `ui_budget` 5/5, Tabu-Hartpfade unberührt. Der Contract-Absatz steht in `phase1_storage/CLAUDE.md` §Geerbte Contracts · **V161 mit synthetischem Vorabwert** (2,5–4,0 ms/Item gemessen, 153 reale Items ⇒ **0,4–0,6 s** einmalige Startkosten; P9-43 selbst bleibt Nikinger-Schritt am echten DATA_ROOT) |
 | G | Löschen (F2) nach `_trash/` | 🟡 **code-complete 2026-09-30 (M3), nicht live-bewiesen** — **der Lösch-Ort aus Plan §9.3 war unbaubar** (`<space>/_trash/` ⇒ Item nach `rebuild_index()` wieder da, `_trash` sogar als **Phantom-Space** in `list_spaces()`; `rebuild_index()` rglobbt ohne Skip, `RESERVED_DIR_NAMES` kennt `_trash` nicht) — Nikinger-Entscheidung: `DATA_ROOT/._trash/<space>/`, beide Scanner überspringen Punkt-Verzeichnisse, **null P1-Änderungen** · `Store.trash(item_id, *, version)` atomar + Git-Commit `trash`, `DELETE /api/v1/items/{id}` mit **serverseitigem** Titel-Gate (Muster `api.py:567`), `version` Pflicht, P9-K: kein MCP-Werkzeug, kein Bulk, kein Tastenkürzel, fremde Items gesperrt · 13 + 5 Tests, **Gegenprobe 4 Verstöße → 11 Tests rot**, **Browser 14/14** (eigene TLS-Wegwerf-Instanz) · §9.3 nannte 4 Dateien, gebaut wurden 7 (Markup, ESC, CSS und Icon sind durch das Getippte-Gate erzwungen) · `pytest` 1062 → **1078** |
 | H | Abhängigkeits-Hygiene | 🟡 **code-complete 2026-09-30 (M3)** — **die Plan-Prämisse „installiert ist 3.4.4" war falsch, und genau das war der Fund:** der Live-Release lief bereits auf **3.4.7** (read-only gemessen an `/opt/sharefyx/current/.venv`), weil `deploy.sh:153` pro Release ein frisches venv baut und der Pin ein **Range** war — der stumme Patch-Drift, den P3-D verbieten wollte, hatte also schon stattgefunden. `phase2_mcp/pyproject.toml` pinnt jetzt **`fastmcp==3.4.7`** exakt (P3-D/P4-R, beide seit 2026-08 beschlossen und nie umgesetzt) + datierter Kommentar; **V163 beantwortet** (drei Codepunkte: CIMD per P4-E abgeschaltet, `token_endpoint_auth_methods_supported: ["none"]`, kein `OAuthProxy`/`JWTVerifier` — der Fix ist inert, der Bump ist Hygiene) · **P9-55 in der Form abweichend** (`==3.4.7` statt Range, Nikinger-Entscheidung 2026-09-30) · 5 Wächter in `phase9_hardening/tests/test_step_h_deps.py`, einer vergleicht installiert-gegen-deklariert und **läuft im Release-venv mit** (`deploy.sh:169`) — Gegenprobe 4 Verstöße → 7 rote Assertions. `pytest` 1079 → **1084**, `ui_budget` 5/5. **Benannt, nicht gebaut:** das transitive `mcp` bleibt ungepinnt (Dev 1.28.1, Live 1.30.0), P9-Backlog-Kandidat. Lock P9-R unangetastet, V79 bleibt |
-| doing | Fünfter Eimer „In Arbeit" (Lock **P9-V**, Kandidat (a)) — Voraussetzung für den Deploy `v3.1.0` | ⬜ **geplant 2026-10-02** (Claude Code): `docs/concepts/phase9_hardening_block_doing_plan.md`, Locks P9-V/W/X, Abnahme P9-59–P9-68, Bau durch opencode/M3 in einem Commit, Deploy danach durch den Nikinger |
+| doing | Fünfter Eimer „In Arbeit" (Lock **P9-V**, Kandidat (a)) — Voraussetzung für den Deploy `v3.1.0` | ✅ **code-complete 2026-10-02 (opencode/M3), nicht deployt** — `_BUCKETS["doing"]` (Reihenfolge `open, doing, done, note, archived`, P9-X) + Rail-Label „In Arbeit" (P9-W: **nur** die Navigationsebene übersetzt, Schema/REST/MCP bleiben roh) + der Step-F-Wächter **umgedreht** (`test_the_bucket_hole_for_doing_is_named_not_silently_fixed` → `test_the_doing_bucket_closes_the_hole`, Docstring mit beiden Richtungen) · **6 neue Tests** (T1/T2/T6 in `phase9_hardening/tests/test_doing_bucket.py`, T3/T4/T5 in `phase5_ui/tests/test_overview.py`), `pytest` 1122 → **1128** · **Gegenlauf 5 Verstöße**: G1 → 7 rot, G2 → 2, G3 → 2, G4 → 1, G5 → 1 · **Browser 11/11** gegen eine eigene TLS-Wegwerf-Instanz (Port 18776), Kernbeleg S6: Rail-Zähler springen **ohne Reload** von `1/1` auf `0/2` · **Browser-Gegenlauf 7 rot** (nur D1/D2 zurückgenommen) · Tabu-Diff leer, **keine zehnte P1-Contract-Öffnung** (V174: `phase1_storage/CLAUDE.md` §Geerbte Contracts bleibt unberührt) · 4 Screenshots `p9_doing_01..04_*` · **Deploy bleibt Nikinger-Schritt** (Mini-Plan §8) |
 | Gate/Z | Abnahme, Closeout | ⬜ |
 
 ## Backlog (bewusst zurückgestellt, kein Phasen-Blocker)
@@ -62,59 +62,103 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückzuführen** — Nikinger-Anordnung 2026-09-24, so dokumentieren und nicht weiter
   untersuchen.
 
-## Session stopped — 2026-10-02 (neunter Block: Mini-Plan doing-Block, Lock P9-V — Claude Code, reine Planungssession)
+## Session stopped — 2026-10-02 (zehnter Block: doing-Block gebaut, Lock P9-V — opencode/M3, ein Commit, kein Deploy, kein Service-Touch)
 
-**Ergebnis: der Mini-Plan steht, die Darstellungsentscheidung ist gefallen.**
-`docs/concepts/phase9_hardening_block_doing_plan.md`, ausführungsreif für opencode/M3. Kein Code-Touch
-und kein Service-Touch. `pytest` **1122 passed** (bereinigtes Env, 200,9 s), `doc_health` 0 Befunde.
+**Ergebnis: das Eimer-Loch ist zu, `v3.1.0` ist freigegeben für den Deploy.** `_BUCKETS` führt
+`doing`, die Rail zeigt „In Arbeit", und Zähler und Liste stimmen für diesen Ordner per
+Konstruktion. `pytest` **1128** (1122 + 6 neu), `ui_budget` 5/5 (153,2 KB), `doc_health` 0,
+Tabu-Diff leer.
 
-**Nikinger-Entscheidungen 2026-10-02:**
+**Gebaut wurde genau das, was der Mini-Plan §4 vorschrieb — und nichts darüber hinaus:**
 
-- **P9-V = Kandidat (a).** `_BUCKETS["doing"] = {"type": "task", "status": "doing"}` mit Rail-Label
-  „In Arbeit". Reihenfolge `open, doing, done, note, archived` (P9-X).
-- **P9-P ist damit datiert eingeengt.** Ein Eimer pro Statuswert ist Navigations-Vollständigkeit,
-  dieselbe Klasse wie `done` in P5 Step 7b. Die Hervorhebung bleibt P10.
-- **P9-W, Sprachebenen.** Nur das Rail-Label wird übersetzt. Schema, REST und MCP bleiben roh,
-  „so dass ein angeschlossenes LLM aus Ausgaben entnehmen kann, wem sie zugeteilt ist".
-  Ein Test (T5) sichert ab, dass das UI-Speichern `assignee` nicht verliert.
+- **D1** `phase5_ui/webui/api.py`: `"doing": {"type": "task", "status": "doing"}` nach `"open"`.
+  Der Absatz `:129–148` (Step-F-Befund) ist **ersetzt**, und der neue trägt **keine
+  Zeilennummern** — die des Vorläufers waren zum Schreibzeitpunkt schon gedriftet (K4), und
+  gedriftete Verweise sind schlechter als keine.
+- **D2** `static/js/state.js`: `doing: "In Arbeit"`. `editor.js` bleibt **unberührt**, damit bleibt
+  Wächter #14 in `test_step_f_schema.py` (`editor.js` nennt `doing` nicht) grün — gewollt (P9-W).
+- **D3** 6 neue Tests + 2 Änderungen an Bestehendem (T7 umgedreht, T8 `seeded`-Fixture).
 
-**Verworfen, mit Argument.**
+**Befund beim Bauen, der die Plan-Rechnung veränderte (P9-61, Gegenlauf G3):** der Plan sagte,
+G3 (`_BUCKETS["doing"]["status"] = "open"`, ein Duplikat) mache **T2, T3 und T4** rot. Gemessen:
+**nur T2**. T3 (Dict-Gleichheit aller fünf Zähler) und T4 (Zähler == Liste) blieben grün, und der
+Grund ist so simpel, dass er beim Lesen des Tests unsichtbar war: der Seed hat je **eine** offene
+und **eine** laufende Aufgabe, also stehen „die Zahl der Aufgaben mit Status X" und „die Zahl der
+Aufgaben mit Status Y" beide auf 1 — ein Duplikat ändert daran **nichts**. Zahlen, die sich nicht
+unterscheiden, unterscheiden sich auch nicht, wenn man sie falsch zuordnet.
 
-(b) „Offen = {open, doing}":
-- `URLSearchParams` macht aus der Liste `open%2Cdoing`, und `store.search` vergleicht exakt. Das
-  ergibt eine stille leere Liste.
-- Repariert man es, kostet das entweder die zehnte Contract-Öffnung oder Mengenlogik neben
-  `store.search`. Letzteres bricht „Zähler == Liste per Konstruktion".
+Der Plan hat dafür eine Regel: *„Wird ein Verstoß nicht rot, ist der zugehörige Wächter wertlos
+und muss neu geschnitten werden. Das ist dann ein Befund, nicht stillschweigend weiterbauen."*
+Also neu geschnitten: **T3 holt jetzt die Mitgliedschaften**, nicht nur die Zahlen — fünf
+Listenabfragen, ihre Item-Mengen müssen sich paarweise ausschließen und zusammen alle sechs Items
+des Space abdecken. Damit ist P9-59 („zählt in „In Arbeit" und in **keinem** anderen Eimer")
+behavioural bewiesen statt behauptet, und G3 ist rot. **T4 bleibt unter G3 grün, und das ist
+richtig**: T4 trägt P9-60 („Zähler == Liste"), und unter G3 gilt Zähler == Liste — die
+Duplikat-Eigenschaft tragen T2 und T3.
 
-(c) „`doing` nicht ins Select":
-- **schließt das Loch nicht**, weil `doing` per MCP hereinkommt (P9-H).
-- und es zerbricht den Editor für genau diese Items:
-  - Ohne passende Option wird der Select-Wert `""`.
-  - `isDirty()` meldet das Item damit schon beim Öffnen als geändert.
-  - Speichern sendet `status: ""`, und `store.py:190` lehnt das ab.
+**Gemessene Gegenläufe** (jeder Verstoß einzeln eingebaut, `phase9_hardening/tests/
+{test_doing_bucket,test_step_f_schema}.py` + `phase5_ui/tests/{test_overview,test_meta}.py`, G0
+als Kontrolllauf mit **0**):
 
-**Vier datierte Korrekturen** (K1–K4 im Mini-Plan):
-1. Die P9-P-Prämisse „in keinem UI-Pfad" war für die Erreichbarkeit falsch: Select **und** MCP führen hin.
-2. Die Abnahme beginnt bei **P9-59**, nicht bei P9-45 (das gehört Step G).
-3. Der Dateiname folgt **P9-T** und nicht dem Briefing-Vorschlag.
-4. Die Zeilenverweise im `_BUCKETS`-Kommentar sind gedriftet; D1 schreibt den Kommentar neu.
+| Verstoß | rot | wer |
+|---|---|---|
+| G1 `"doing"` aus `_BUCKETS` entfernt | **7** | T1, T2, T3, T4, T6, T7, T8 |
+| G2 `"archived"` vor `"doing"` | **2** | T1, `test_meta.py` |
+| G3 `_BUCKETS["doing"]["status"] = "open"` | **2** | T2, **T3 (nach dem Nachschnitteoben; vorher 1)** |
+| G4 `doing: "In Arbeit"` aus `BUCKET_LABELS` entfernt | **1** | T6 |
+| G5 im T5-PATCH-Body `"assignee": ""` | **1** | T5 |
 
-**Gemessen statt vermutet:**
-- V176: `phase9_hardening/tests/` hat kein `conftest.py`, die HTTP-Tests gehören deshalb nach
-  `phase5_ui/tests/test_overview.py`, wie bei Step G.
-- V178: `#field-status` ist im Vorschau-Modus bedienbar, sitzt aber im zugeklappten
-  `<details id="meta-panel">`.
-- Bestehender Konsistenztest `test_counts_match_the_item_list_for_the_same_bucket`: Er wäre für
-  `doing` **vakuös** gelaufen (0 == 0), weil das Seed kein `doing`-Item hat. Der Plan ergänzt eins (T8).
+**Browser-Beleg: 11/11** gegen eine eigene TLS-Wegwerf-Instanz (Port **18776**,
+`p9_doing_wegwerf.py`/`p9_doing_self_check.py`, Kopien der Step-G-Serie mit geänderten
+Konstanten). Kernbeleg **S6**: nach dem Speichern eines Statuswechsels `open → doing` springen
+die Rail-Zähler **ohne Reload** von `1/1` auf `0/2` (`afterWrite()` → `loadOverview()`, das
+prüft kein Server-Test). S7 gleicht die Rail-Texte gegen `GET /api/v1/overview` ab, S8 gegen
+`GET /api/v1/items/{id}`: `status == "doing"`, `assignee == "alpha"` — das UI-Speichern hat die
+Zuweisung nicht verloren (P9-W). V178 aus dem Plan damit im Browser bestätigt (`#meta-panel` ist
+im Vorschau-Modus bedienbar, es ist ein `<details>` und stand in **jedem** Lauf offen).
 
-**Abschluss der Session:** Der Nikinger hat den Plan bestätigt, **P9-W eingeschlossen**
-(„Status-Optionen bleiben roh" war von Claude Code abgeleitet). Commit und Push nach `origin/main`.
+**Browser-Gegenlauf: 7 von 11 rot** (nur D1+D2 per `git stash push -- <zwei Pfade>` zurückgenommen,
+frisch gesätet). Rot: S1 (kein Chip), S2 (4 Ordner, Labels `Offen, Erledigt, Notizen, Archiv`),
+S3, S4, S6. **Grün bleiben S5, S7, S8** — und das ist der eigentliche Befund des Gegenlaufs, kein
+Schwächenzeichen: **S5/S7/S8 prüfen die Maschinenebene, und die war schon vor diesem Block
+korrekt.** `status: "doing"` ließ sich speichern, `/overview` und `/items` lieferten roh, und
+`assignee` überlebte den Editor-Pfad. Das Loch war **rein navigativ** — genau die Aussage, die
+P9-W behauptet, jetzt an einem Lauf statt an einem Argument.
+
+**Fünfte Wiederholung derselben Repo-Lehre, diesmal im eigenen Prüfskript:** der erste
+Gegenlauf **stürzte ab** statt rot zu melden — ein `click()` auf den Ordner „In Arbeit", den es
+ohne den Fix nicht gibt, ist ein 30-Sekunden-Timeout, kein Befund. Ein Skript, das beim Beweis
+seines eigenen Lochs stirbt, beweist nichts. S4/S5/S8 prüfen deshalb jetzt zuerst auf
+Existenz und melden sich mit Begründung rot, statt die Folge zu blockieren. Danach beide Läufe
+neu (grün 11/11 mit dem gehärteten Skript).
+
+**Vier Screenshots** `docs/screenshots/p9_doing_{01_uebersicht_chip, 02_rail_fuenf_ordner,
+03_liste_in_arbeit, 04_nach_statuswechsel}.png` (56/42/42/60 KB), `screenshots_latest/` darauf
+umgehängt. Sichtprüfung qualitativ mit dem lokalen Vision-Modell: Rail zeigt `Offen, In Arbeit,
+Erledigt, Notizen, Archiv` + „+ Ordner", **nichts abgeschnitten, nichts überlappt**, Bild 04 zeigt
+`Offen 0` / `In Arbeit 2` — deckungsgleich mit den Stationen. Gezählt wurde nicht (Modell-Schwachstelle,
+`docs/concepts/sichtpruefung_automation_tooling.md`); **gezählt haben die Stationen** aus dem echten DOM.
+
+**Eine kleine Doku-Korrektur, die der Plan nicht vorsah (K5):** der Mini-Plan §4 D1 verlangte, die
+Zeilen `:115–127` **wörtlich** stehen zu lassen. Zwei davon tragen aber eine **Anzahl**
+(„Die drei Ordner des Navigationsbaums", „Vier Ordner statt drei schließen das Loch"), und die wäre
+nach dem fünften Eintrag falsch gewesen — ein Kommentar, der das Gegenteil des Codes behauptet,
+ist schlechter als keiner (dieselbe Regel, an der T7 festhing). Nur die Zahlen korrigiert, alle
+Begründungen wörtlich.
+
+**Doku im selben Commit** (Hard Rule 8): Phase-Head (diese Zeile Modulstatus + F-Nachsatz + dieser
+Block, dann `scripts/rotate_session_block.sh phase9_hardening`) · Mini-Plan §12 Ergebnis und
+`status: snapshot` · `docs/INDEX.md` (🔄 → 📕, Phase-9-Head-Zeile) · Root-`CLAUDE.md` §Current state.
+**Nicht** angefasst, bewusst: `docs/UPDATE_LOG.md` und das Badge `app.html:20` — beide gehören in
+den Release-Commit am Deploy-Tag (Mini-Plan §8.1), ein heute datierter Log-Eintrag ließe das
+`deploy.sh`-Gate bei einem späteren Deploy-Tag abbrennen.
 
 **Nächste Schritte, mit Zuständigkeit:**
-1. **opencode/M3** baut den Block nach Mini-Plan §4–§7: ein Commit, Browser-Beleg 8/8 auf
-   Wegwerf-Port 18776.
-2. **opencode/M3** macht den Release-Commit am Deploy-Tag: Badge `v3.1.0` (`app.html:20`) und ein
-   neuer `## <Deploy-Tag>`-Block in `docs/UPDATE_LOG.md` (Mini-Plan §8.1).
-3. **Nikinger** führt `deploy.sh` und `health_gate.sh` aus und misst dabei P9-43.
+1. **Nikinger:** Deploy `v3.1.0`. Ablauf im Mini-Plan §8 — Release-Commit (Badge + `UPDATE_LOG`,
+   von opencode/M3 am Deploy-Tag), dann `deploy.sh main` + `health_gate.sh`, und dabei **P9-43**
+   messen (Dauer des Index-Neuaufbaus am echten `DATA_ROOT` — der erste Deploy mit Step F).
+2. **Nikinger:** kurzer Augenschein im echten Browser — Rail zeigt in jedem Space „In Arbeit".
+3. **Gate/Z** wartet weiter auf A7+A8 (eine Sitzung, harter Schnitt).
 
-Gate/Z wartet weiter auf A7/A8.
+**Unverändert in diesem Block:** kein `systemctl`, kein `pkill -f`, kein Deploy. Die Wegwerf-Instanz
+wurde ausschließlich über ihre PID-Datei gestoppt; Testumgebung ohne `SHAREFYX_*`/`SFX_*`.

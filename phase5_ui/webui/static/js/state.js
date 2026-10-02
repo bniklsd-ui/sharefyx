@@ -9,8 +9,16 @@
 // Beschriftung der Ordner. Die Ordner SELBST (und ihre Filterkombinationen) kommen aus
 // `GET /api/v1/meta`, nicht von hier — sonst gäbe es zwei Definitionen desselben Vokabulars
 // (siehe `api.py :: _BUCKETS`). Diese Tabelle liefert nur die deutschen Namen.
+//
+// [P9 Block doing, 2026-10-02, Lock P9-W] Diese Tabelle ist die **einzige** Stelle, an der ein
+// Eimer-Name übersetzt wird — und `doing` ist der einzige, der neu dazukam. Das ist die
+// **oberste** von drei Sprachebenen: Schema (`STATUS_VALUES`), API-Vertrag (REST + MCP) und die
+// Statusanzeigen im Editor bleiben bewusst roh, damit ein angeschlossenes LLM aus den Ausgaben
+// `status: "doing"` und `assignee` entnehmen kann. Übersetzt wird nur, was ein Mensch liest,
+// während er navigiert.
 export var BUCKET_LABELS = {
   open: "Offen",
+  doing: "In Arbeit",
   done: "Erledigt",
   note: "Notizen",
   archived: "Archiv",

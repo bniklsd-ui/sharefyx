@@ -112,7 +112,9 @@ MAX_BODY_BYTES = 1 * 1024 * 1024  # Plan §3.1
 # unterschiedliche Grenzen für zwei unterschiedliche Datenarten, keine gemeinsame Zahl.
 MAX_ASSET_BYTES = 5 * 1024 * 1024
 
-# Die drei Ordner des Navigationsbaums, einmal definiert (Step 7b). Vorher standen dieselben drei
+# Die Ordner des Navigationsbaums, einmal definiert (Step 7b; seit 2026-10-02 sind es fünf, siehe
+# den P9-Block darunter — die Begründungen dieses Absatzes gelten unverändert). Vorher standen
+# dieselben drei
 # Filterkombinationen ausschließlich in `app.js :: filterParams()` — die Übersichtszähler hätten
 # sie ein zweites Mal gebraucht, und zwei Kopien einer Filterdefinition driften. `GET
 # /api/v1/meta` gibt sie deshalb an `app.js` heraus, `_overview()` zählt mit denselben Werten.
@@ -124,30 +126,45 @@ MAX_ASSET_BYTES = 5 * 1024 * 1024
 # „done" ist ein Fund dieses Steps, nicht aus dem Plan: die drei Ordner des Mockups (Offen,
 # Notizen, Archiv) decken `STATUS_VALUES["task"]` nicht vollständig ab — eine auf `done` gesetzte
 # Aufgabe fiel durch alle drei und war in der Oberfläche nirgends mehr auffindbar, bis sie jemand
-# archivierte. Vier Ordner statt drei schließen das Loch.
+# archivierte. Vier Ordner statt drei schlossen das Loch; der fünfte (`doing`) folgt derselben
+# Regel, siehe darunter.
 #
-# [P9 Step F, 2026-09-30 — **BEFUND, bewusst NICHT hier behoben, mit den zwei Kandidaten
-# gemessen**]: `doing` reißt exakt dasselbe Loch wieder auf. `bucketFor()`
-# (`static/js/list.js:516`) nimmt den ERSTEN passenden Eintrag und vergleicht
-# `f.status === item.status` exakt; `_overview()` (Zeile 620) zaehlt je Bucket per
-# `store.search(**filters)`. Eine Aufgabe mit `status="doing"` passt auf keinen der vier
-# Eintraege → `bucketFor()` liefert `null`, beide Aufrufer fallen auf `|| state.filter`
-# zurueck: sie fehlt in jedem Eimer-Zaehler und ist in der Liste nur sichtbar, solange man
-# zufaellig im passenden Filter steht.
+# [P9 Block doing, 2026-10-02 — Lock P9-V, das Loch ist GESCHLOSSEN]: `doing` hätte exakt
+# dasselbe Loch wieder aufgerissen, das „done" in Step 7b gerissen hat. `bucketFor()`
+# (`static/js/list.js`) nimmt den ERSTEN passenden Eintrag und vergleicht
+# `f.status === item.status` exakt; `_overview()` zaehlt je Bucket per `store.search(**filters)`.
+# Eine Aufgabe mit `status="doing"` passte auf keinen der vier Eintraege → `bucketFor()` lieferte
+# `null`, beide Aufrufer fielen auf `|| state.filter` zurueck: sie fehlte in jedem Eimer-Zaehler
+# und war in der Liste nur sichtbar, solange man zufaellig im passenden Filter stand. Der fünfte
+# Eintrag schliesst das.
 #
-# Warum Step F das nicht fixt, obwohl der Fund echt ist (P9-P): **beide Kandidaten sind
-# Darstellungsentscheidungen, und die hat der Plan ausdruecklich nach P10 verwiesen.**
-# (a) ein fuenfter `_BUCKETS`-Eintrag — `bucketNames()` ist `Object.keys(state.meta.buckets)`
-# und `tree.js:72` rendert daraus **einen Rail-Eintrag pro Bucket** mit `BUCKET_LABELS[b] || b`,
-# also ein fuenfter, unuebersetzter Ordner „doing" plus ein Chip in der Uebersicht; das ist
-# genau die Hervorhebung, die P9-P P10 zuteilt, und es braucht eindeutsches Label.
-# (b) „Offen" als Menge `status: ["open", "doing"]` — kein neuer Chip, vier Rail-Eintraege
-# bleiben, aber es aendert den Vertrag des `meta`-Payloads und braucht dieselbe
-# Mengen-Prüfung in ZWEI Konsumenten (`list.js:516` und der Vergleich
-# `item.status != status` in `store.py:520`, getestet von `_overview()`), also eine zweite
-# Contract-Öffnung ausserhalb von P9-G.
+# Warum das ueberhaupt dringlich war, obwohl Step F den Fund eintrug (P9-P, P9-H, K1 im
+# doing-Mini-Plan): `doing` ist **erreichbar**, auf zwei Wegen — `populateStatusSelect()`
+# (`static/js/editor.js`) listet `state.meta.status_values` roh, also `doing` als echte Option im
+# Statusfeld, und Claude setzt `status="doing"` per MCP `update_item`. Ein Deploy haette den Wert
+# samt dieser Eigenschaft in die Hand jedes Menschen gegeben.
+#
+# **Ein Eimer pro Statuswert ist Navigations-Vollstaendigkeit, keine Hervorhebung.** Dieselbe
+# Klasse wie „done" in Step 7b, und aus demselben Grund: ein Wert, den die Oberflaeche anbietet,
+# aber nicht mehr findet, ist kaputt. Die *prominente* Darstellung von „In Arbeit" (Uebersichts-
+# Chip ab Null, „aktuelle Aufgabe", Assignee-Anzeige und -Picker) bleibt P10 — P9-P ist damit
+# datiert eingeengt, nicht erledigt.
+#
+# Die Mengen-Variante „Offen = {open, doing}" ist **verworfen**, mit Argument: `filterParams()`
+# gibt den Bucket per `URLSearchParams` weiter, eine Liste wird daraus `status=open%2Cdoing`, und
+# `store.search` vergleicht exakt — das ergaebe eine **stille leere Liste**. Reparieren muesste man
+# es im Store (zehnte Contract-Oeffnung) oder mit Mengenlogik neben `store.search` in Web-UI und
+# `_overview()`; letzteres bricht die Konstruktionseigenschaft „Zaehler == Liste", die der
+# `_overview()`-Kommentar traegt.
+#
+# Wächter: `phase9_hardening/tests/test_doing_bucket.py` (Partitions-Prüfung aus
+# `STATUS_VALUES` + deutsche Labels) und `phase5_ui/tests/test_overview.py` (Zähler == Liste mit
+# einem echten `doing`-Item). Bewusst **ohne Zeilennummern** in diesem Absatz — die des
+# Vorläufers waren zum Zeitpunkt des Schreibens schon gedriftet (K4), und gedriftete Verweise
+# sind schlechter als keine.
 _BUCKETS: dict[str, dict[str, str]] = {
     "open": {"type": "task", "status": "open"},
+    "doing": {"type": "task", "status": "doing"},
     "done": {"type": "task", "status": "done"},
     "note": {"type": "note", "status": "active"},
     "archived": {"status": "archived"},

@@ -6,7 +6,7 @@ detail: L3 (Pointer-Verzeichnis, keine eigene Inhaltsquelle)
 up: ../phase9_hardening/CLAUDE.md   # aktive Phase
 down:
   - ../docs/screenshots/                # kanonische Ablage; diese Verzeichnis ist nur Symlink-Komfort
-updated: 2026-10-01 (Rotation auf die `.toolbar-btn`-Belege (`p9_btn2_*`): drei Symlinks neu, die drei `p9_step_e_*`-Links raus — Step E ist als Beleg in `docs/screenshots/` erledigt und die aktuell offene Sichtfrage ist die Knopfoptik vor dem Deploy. **Vier unversionierte Tailscale-Kopien** mit Leerzeichen im Namen wandern nach `docs/screenshots/p9_step_a_01..04_*` (Infra-Beleg zu A3, ausdrücklich keine Sichtprüfung), die fünfte Datei `Machines - Tailscale.html` ist gelöscht: leere SPA-Hülle, `tailscale-api-prefetch` = `{}`, kein Bildwert) | updated: 2026-09-28 (Phase **9** — Rotation auf die ersten P9-Bilder: die sieben P8.6-Gate-Symlinks sind weg, drei `p9_step_e_*`-Links rein (P8.6-AK sagt genau das: "sie bleiben stehen, bis P9 eigene Screenshots produziert" — Step E hat als erster P9-Step welche produziert) | 2026-09-19 (Phase 8.6 abgeschlossen — Rotation auf die **Gate-Belege**: sieben Symlinks auf `p86_smoke_*` ersetzen die fünf H-R-3-Links. Das sind die Bilder, auf denen die Freigabe von `v3.0.2` beruht. Bleiben stehen, bis P9 eigene Screenshots produziert.)
+updated: 2026-10-02 (Rotation auf die `p9_doing_*`-Belege: vier Symlinks neu, die drei `p9_btn2_*`-Links raus — der Knopfoptik-Fall ist erledigt und abgenommen) | 2026-10-01 (Rotation auf die `.toolbar-btn`-Belege (`p9_btn2_*`): drei Symlinks neu, die drei `p9_step_e_*`-Links raus — Step E ist als Beleg in `docs/screenshots/` erledigt und die aktuell offene Sichtfrage ist die Knopfoptik vor dem Deploy. **Vier unversionierte Tailscale-Kopien** mit Leerzeichen im Namen wandern nach `docs/screenshots/p9_step_a_01..04_*` (Infra-Beleg zu A3, ausdrücklich keine Sichtprüfung), die fünfte Datei `Machines - Tailscale.html` ist gelöscht: leere SPA-Hülle, `tailscale-api-prefetch` = `{}`, kein Bildwert) | updated: 2026-09-28 (Phase **9** — Rotation auf die ersten P9-Bilder: die sieben P8.6-Gate-Symlinks sind weg, drei `p9_step_e_*`-Links rein (P8.6-AK sagt genau das: "sie bleiben stehen, bis P9 eigene Screenshots produziert" — Step E hat als erster P9-Step welche produziert) | 2026-09-19 (Phase 8.6 abgeschlossen — Rotation auf die **Gate-Belege**: sieben Symlinks auf `p86_smoke_*` ersetzen die fünf H-R-3-Links. Das sind die Bilder, auf denen die Freigabe von `v3.0.2` beruht. Bleiben stehen, bis P9 eigene Screenshots produziert.)
 ---
 # `screenshots_latest/` — Schnellzugriff auf die Screenshots der aktuellen Phase
 
@@ -43,36 +43,37 @@ Ausnahmen, in denen M3 den Dateinamen + Checkkriterium **nicht** nennt:
 - Wenn die Verifikation programmatisch ist (Regex auf gerenderten HTML-Output
   o. ä.) und der Screenshot nur Anhang ist.
 
-## Aktueller Inhalt (Phase **9**, `.toolbar-btn` in Standardoptik, Stand 2026-10-01)
+## Aktueller Inhalt (Phase **9**, fünfter Eimer „In Arbeit", Stand 2026-10-02)
 
-Drei Bilder aus `phase9_hardening/scripts/p9_btn2_toolbar_probe.py` gegen die **eigene**
-TLS-Wegwerf-Instanz (`p9_step_g_wegwerf.py`, Port 18775, Chromium 1440x900). Sie zeigen den Stand,
-der die offene Frage aus dem Session-Ende 2026-10-01 beantworten soll: tragen die zehn
-Formatierhilfen + „Vorschau" jetzt **dieselbe Optik** wie der aktive Übersichtsknopf.
+Vier Bilder aus `phase9_hardening/scripts/p9_doing_self_check.py` gegen die **eigene**
+TLS-Wegwerf-Instanz (`p9_doing_wegwerf.py`, Port 18776, Chromium 1440x900). Sie zeigen den Block,
+der die Voraussetzung für den Deploy `v3.1.0` war: eine Aufgabe mit `status: doing` bekommt einen
+eigenen Navigationsordner, und beim Speichern im Editor springen die Rail-Zähler **ohne Reload**
+um.
 
-**Der Beleg ist die Messung, nicht das Bild.** Das Skript vergleicht echte Screenshot-Pixel
-(`probes/p9_btn2_toolbar_probe.json`, 13/13 grün, Gegenprobe mit eingebautem Verstoß → 5 rot):
-gerechnete Fläche stringgleich mit `.btn`, Verlauf in drei Höhen Δ ≤ 2, Randpixel Δ = 0. Das Bild
-beantwortet die eine Frage, die eine Messung nicht kann: **gefällt es.**
+**Der Beleg ist die Messung, nicht das Bild.** Das Skript prüft 11 Stationen aus dem echten DOM
+(`probes/p9_doing_probe.json`, 11/11 grün). Die **Gegenprobe** ist der eigentliche Beleg: mit
+zurückgenommenem `_BUCKETS`-Eintrag melden **7 von 11** Stationen rot. **Grün bleiben dabei
+S5/S7/S8** — die prüfen die Maschinenebene, und die war schon vorher korrekt; das Loch war rein
+navigativ. Das Bild beantwortet die eine Frage, die keine Messung kann: **gefällt es.**
 
 | Dateiname | Original | Checkkriterium |
 |---|---|---|
-| `01_formatierleiste.png` | `../docs/screenshots/p9_btn2_01_formatierleiste.png` | **Die Leiste im Zuschnitt (379x25):** elf Knöpfe, dunkelblau mit heller Kante, in der Mitte der breitere „Vorschau". Auf dem alten Stand trugen sie die graue Plastik und stochen sichtbar gegen die Panel-Fläche. |
-| `02_editor_standardoptik.png` | `../docs/screenshots/p9_btn2_02_editor.png` | **Das ganze Fenster — der eine Blick, um den es ging:** Rail-Knopf „Übersicht" oben links (dieselbe Optik), Formatierleiste rechts, „Anhängen" unten rechts als `.btn` im selben Panel. Drei Knopfoptiken auf einem Bild: entscheidend ist, dass alle drei **gleich** aussehen. |
-| `03_formatierleiste_deaktiviert.png` | `../docs/screenshots/p9_btn2_03_formatierleiste_deaktiviert.png` | **Zustand in der Vorschau (385x25):** alle Formatierhilfen flach und matter statt im Verlauf — so soll „inaktiv lesbar" aussehen. Absicht und nicht Versehen: `:disabled` trägt `--surface`, nicht `--btn-std-fill`. |
+| `01_uebersicht_chip.png` | `../docs/screenshots/p9_doing_01_uebersicht_chip.png` | **Die Übersicht:** die Zeile `alpha` trägt neben „Offen 1“ und „Erledigt 1“ einen Chip **„1 In Arbeit“**. Wichtig: **deutsch**, nicht das rohe Schema-Wort `doing` — genau die eine Ebene, die P9-W übersetzt. |
+| `02_rail_fuenf_ordner.png` | `../docs/screenshots/p9_doing_02_rail_fuenf_ordner.png` | **Die Rail mit fünf Ordnern** (oben nach unten): Offen 1 · **In Arbeit 1** · Erledigt 1 · Notizen 1 · Archiv 0. Prüfen: nichts abgeschnitten, nichts überlappt, „In Arbeit“ steht zwischen „Offen“ und „Erledigt“. |
+| `03_liste_in_arbeit.png` | `../docs/screenshots/p9_doing_03_liste_in_arbeit.png` | **Der Ordner „In Arbeit“ geöffnet:** enthält genau **eine** Zeile, „Laufende Probe“. Die Brotkrume oben muss `alpha › In Arbeit` zeigen — derselbe deutsche Begriff, nicht `doing`. |
+| `04_nach_statuswechsel.png` | `../docs/screenshots/p9_doing_04_nach_statuswechsel.png` | **Der Kernbeleg:** nach dem Speichern eines Statuswechsels `offen → doing` stehen in der Rail **Offen 0** und **In Arbeit 2** — **ohne einen Reload**. Genau daran hängt P9-64. |
 
-**Warum die Wegwerf-Instanz und nicht das echte Gerät:** die Probe braucht einen
-reproduzierbaren Zustand **und** einen Pixelvergleich in einem Lauf; am echten Datenbestand wäre
-beides nicht gegen eine Vorher-Version zu halten. Für den Gesamteindruck der Oberfläche bleibt die
-Sichtprüfung am echten Gerät nötig — dafür ist ohnehin Step Z (Gate) zuständig.
+**Warum die Wegwerf-Instanz und nicht das echte Gerät:** der Beleg braucht einen reproduzierbaren
+Vorher-Zustand (S5 **verbraucht** den Zustand — die offene Aufgabe wird zur laufenden) und einen
+Gegenlauf, also zwei Instanzen mit demselben Seed. Am echten Datenbestand wäre beides nicht zu
+halten. Für den Gesamteindruck bleibt die Sichtprüfung am echten Gerät nötig — dafür ist der
+Augenschein am Deploy-Tag (Mini-Plan §8.5) zuständig.
 
-**Nicht hier, mit Begründung.** Die vier Tailscale-Adminbilder aus A3 (2026-09-30) lagen als
-unversionierte Kopien mit Leerzeichen im Dateinamen in diesem Verzeichnis. Sie sind jetzt unter
-`docs/screenshots/p9_step_a_01..04_*` versioniert (Infra-Beleg zu `RUNBOOK_STEP_A.md` §A3, **keine
-Sichtprüfung der Oberfläche**) und gehören deshalb nicht in die Schnellansicht. Die fünfte Datei,
-`Machines - Tailscale.html`, ist **gelöscht**: die gespeicherte Seite war nur die leere SPA-Hülle
-(`<div id="root">` leer, `tailscale-api-prefetch` = `{}`, 2,7 KB) — ohne Bildwert, und eine
-Admin-Seite im Repo ist kein Beweis, den ein Bild liefert.
+**Nicht hier, mit Begründung.** Die vier Tailscale-Adminbilder aus A3 (2026-09-30) und die
+`.toolbar-btn`-Belege aus dem 2026-10-01 sind versioniert unter `docs/screenshots/p9_step_a_01..04_*`
+bzw. `p9_btn2_*` und gehören nicht in die Schnellansicht: die ersteren sind Infra-Beleg ohne
+Bildwert, die letzteren sind mit der Standardoptik der Knöpfe erledigt.
 
 ## Rotation
 
