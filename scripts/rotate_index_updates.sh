@@ -9,11 +9,19 @@
 # (`\d{4}-\d{2}-\d{2}`) — ein ` | ` innerhalb eines Eintrags (z. B. in einer Markdown-Tabelle im
 # Eintragstext) darf den Schnitt nicht verfälschen.
 #
-# Erhalten bleibt genau der jüngste Eintrag plus ein Zeiger auf das Archiv. Vier Gegenproben vor
+# Erhalten bleibt genau der jüngste Eintrag plus ein Zeiger auf das Archiv. Fuenf Gegenproben vor
 # dem Schreiben: (a) Byte-Buchhaltung, (b) `cmp` der Reassemblierung, (c) jeder rotierte Eintrag
 # byte-identisch im Archiv wiedergefunden, (d) der Frontmatter-Closer `---` steht danach auf
-# einer eigenen Zeile. Bei jeder Abweichung bricht das Skript ab, ohne eine Zieldatei
-# angefasst zu haben.
+# einer eigenen Zeile, (e) die Kette traegt **kein zweites** `updated: `-Praefix. Bei jeder
+# Abweichung bricht das Skript ab, ohne eine Zieldatei angefasst zu haben.
+#
+# **(e) ist keine Formalie — sie ist der Fund vom 2026-10-02.** Der Split-Anker ist
+# `' | (?=\d{4}-\d{2}-\d{2})'`: ein Faden, der mit `updated: ` beginnt, sieht fuer ihn nicht wie
+# ein Kettenanfang aus und wird deshalb *nicht* geschnitten. Die Kette von `docs/INDEX.md` trug
+# genau einen solchen Faden, der erste echte Lauf rotierte daraufhin **1 von 3** Eintraegen und
+# meldete dabei "Split ist verlustfrei" — verlustfrei ja, aber zur Haelfte: ein stiller
+# Teil-Erfolg ist schlimmer als ein Abbruch, weil die Kette danach *konform* aussieht und nie
+# jemand nachsieht.
 #
 # Aufruf:   scripts/rotate_index_updates.sh [repo_root]
 # Exit: 0 = rotiert · 1 = Abbruch, nichts geändert · 2 = nichts zu tun (bereits ein Eintrag)
@@ -49,6 +57,13 @@ UPDATED_LINE="$(sed -n "${UPDATED_LINE_NO}p" "$INDEX")"
 PREFIX="updated: "
 BODY="${UPDATED_LINE#"$PREFIX"}"
 
+# Gegenprobe (e): die Kette ist EINE physische Zeile. Ein weiteres 'updated: ' darin ist ein
+# Tippfehler eines früheren Laufs (siehe Kopfkommentar) und macht den Split-Anker blind — also
+# Abbruch statt halber Rotation.
+case "$BODY" in
+  *"updated: "*) die "Die 'updated:'-Zeile traegt ein zweites 'updated: '-Praefix (${BODY%%updated: *}<...>updated: ...). Das ist der Defekt vom 2026-10-02: der Split-Anker ' | ' + ISO-Datum sieht so einen Faden nicht als Kettenanfang und rotiert ihn still nicht. Praefix entfernen, dann erneut laufen." ;;
+esac
+
 # ---------------------------------------------------------------- Kette splitten
 # Split nur an ' | ' gefolgt von einem ISO-Datum — kein Split an einem ' | ' im Eintragstext.
 mapfile -t ENTRIES < <(python3 - "$BODY" <<'PYEOF'
@@ -73,6 +88,7 @@ SEP=" | "
 RECOMPOSED="$KEEP"
 for e in "${ROTATED[@]}"; do RECOMPOSED+="${SEP}${e}"; done
 [[ "$RECOMPOSED" == "$BODY" ]] || die "Byte-Buchhaltung schlägt fehl — Split ist nicht verlustfrei."
+echo "OK  Kette traegt genau ein 'updated: '-Praefix"
 echo "OK  Byte-Buchhaltung: ${#ROTATED[@]} rotierte(r) Eintrag/Einträge, Split verlustfrei"
 
 # ---------------------------------------------------------------- neue Zeile bauen

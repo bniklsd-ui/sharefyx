@@ -32,7 +32,7 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | H | Abhängigkeits-Hygiene | 🟡 **code-complete 2026-09-30 (M3)** — **[2026-10-02] Nachtrag Deploy-Abbruch:** der erste `v3.1.0`-Deploy brach in `pytest` im Release ab (4 failed + 5 errors, alle `ModuleNotFoundError: requests` in `test_mcp_local_vision_server.py`) — `requests` war nie deklariert, nur von Hand im Dev-venv; `mcp_local_vision_server.py` jetzt stdlib-only (`urllib`), Beleg im frischen venv 1128/1128 (Session-Block 2026-10-02, elfter). — **die Plan-Prämisse „installiert ist 3.4.4" war falsch, und genau das war der Fund:** der Live-Release lief bereits auf **3.4.7** (read-only gemessen an `/opt/sharefyx/current/.venv`), weil `deploy.sh:153` pro Release ein frisches venv baut und der Pin ein **Range** war — der stumme Patch-Drift, den P3-D verbieten wollte, hatte also schon stattgefunden. `phase2_mcp/pyproject.toml` pinnt jetzt **`fastmcp==3.4.7`** exakt (P3-D/P4-R, beide seit 2026-08 beschlossen und nie umgesetzt) + datierter Kommentar; **V163 beantwortet** (drei Codepunkte: CIMD per P4-E abgeschaltet, `token_endpoint_auth_methods_supported: ["none"]`, kein `OAuthProxy`/`JWTVerifier` — der Fix ist inert, der Bump ist Hygiene) · **P9-55 in der Form abweichend** (`==3.4.7` statt Range, Nikinger-Entscheidung 2026-09-30) · 5 Wächter in `phase9_hardening/tests/test_step_h_deps.py`, einer vergleicht installiert-gegen-deklariert und **läuft im Release-venv mit** (`deploy.sh:169`) — Gegenprobe 4 Verstöße → 7 rote Assertions. `pytest` 1079 → **1084**, `ui_budget` 5/5. **Benannt, nicht gebaut:** das transitive `mcp` bleibt ungepinnt (Dev 1.28.1, Live 1.30.0), P9-Backlog-Kandidat. Lock P9-R unangetastet, V79 bleibt |
 | doing | Fünfter Eimer „In Arbeit" (Lock **P9-V**, Kandidat (a)) — Voraussetzung für den Deploy `v3.1.0` | ✅ **live seit 2026-10-02 (`v3.1.0`, Release `5414cb7`, Health-Gate 9/9)** — `_BUCKETS["doing"]` (Reihenfolge `open, doing, done, note, archived`, P9-X) + Rail-Label „In Arbeit" (P9-W: **nur** die Navigationsebene übersetzt, Schema/REST/MCP bleiben roh) + der Step-F-Wächter **umgedreht** (`test_the_bucket_hole_for_doing_is_named_not_silently_fixed` → `test_the_doing_bucket_closes_the_hole`, Docstring mit beiden Richtungen) · **6 neue Tests** (T1/T2/T6 in `phase9_hardening/tests/test_doing_bucket.py`, T3/T4/T5 in `phase5_ui/tests/test_overview.py`), `pytest` 1122 → **1128** · **Gegenlauf 5 Verstöße**: G1 → 7 rot, G2 → 2, G3 → 2, G4 → 1, G5 → 1 · **Browser 11/11** gegen eine eigene TLS-Wegwerf-Instanz (Port 18776), Kernbeleg S6: Rail-Zähler springen **ohne Reload** von `1/1` auf `0/2` · **Browser-Gegenlauf 7 rot** (nur D1/D2 zurückgenommen) · Tabu-Diff leer, **keine zehnte P1-Contract-Öffnung** (V174: `phase1_storage/CLAUDE.md` §Geerbte Contracts bleibt unberührt) · 4 Screenshots `p9_doing_01..04_*` · **[2026-10-02] Release-Commit für den Deploy `v3.1.0` steht: Badge `v3.0.2` → `v3.1.0` (`app.html:20`) + neuer `## 2026-10-02`-Block in `docs/UPDATE_LOG.md` (6 Zeilen, jede eine physische Zeile — am echten `parse_update_log()` gegengeprüft, nicht am Augenschein), `pytest` 1128, `ui_budget` 5/5** — **der Deploy selbst bleibt Nikinger-Schritt** (sudo, Hard Rule 9), die Health-Checks sind reine `curl`-GETs ohne Rechte und laufen durch M3 (Mini-Plan §8) |
 | trace | Nachvollziehbarkeit: `assignee` sichtbar (UI + MCP, vom Client gefüllt, P9-Z) + `updated_by` + Git-Autor (P9-AA–AC); **zehnte P1-Contract-Öffnung** | 🟡 **code-complete 2026-10-02 (M3), nicht live-bewiesen** — Locks P9-Y–AD · **kein Index-Schema-Sprung** (kein Feld im Index, weil niemand danach filtert ⇒ beim Deploy **kein** Neuaufbau, anders als Step F) · Kern: `updated_by` in `_KNOWN_FIELDS` + `_SYSTEM_MANAGED_FIELDS`, `actor: str = ""` an allen neun Store-Schreibmethoden, **leerer Akteur = unverändert** (P9-AB, lieber der alte wahre Wert als ein erfundener), `history.commit(author=)` mit `--author` (Committer bleibt `Space Server`) · Adapter: `actor=principal.space` (7 Aufrufe) / `actor=session.space` (9 Aufrufe) · UI: „bei X" in der Listenzeile, Feld **„Bei"** mit `<datalist>`, Lesezeile **„Zuletzt geändert von X"**, P9-Z füllt **nur bei leerem** Feld · **24 neue Tests** (gezählt, nicht addiert: 5 `test_store.py` + 4 `test_history.py` + 6 `test_trace_block.py` + 4 `test_tools.py` + 1 `test_api.py` + 4 `test_static_routes.py`), `pytest` 1128 → **1152** · **Gegenlauf G1 → 1 · G2 → 2 · G3 → 1 · G4 → 2 · G5 → 4 rot**, alle danach zurückgebaut und grün · **Browser 8/8** gegen eine eigene **Zwei-Principalen**-TLS-Wegwerf-Instanz (Port 18777, echte Git-Historie), Kernbeleg: B sieht „Zuletzt geändert von A", schreibt selbst, und danach steht B — während „Bei" **A** bleibt; **Gegenlauf: ohne die Leer-Prüfung springt der Assignee von A auf B** (S5 rot) · 6 Screenshots `p9_trace_01..06_*`, `screenshots_latest/` umgehängt · **ein Bestandstest mitgezogen** (`test_app.py`, exakte Quittungs-Assertion) und **ein Wächter datiert zugeschnitten statt entfernt** (`test_step_f_schema.py`, siehe dort) — Deploy bleibt Nikinger-Schritt |
-| Gate/Z | Abnahme, Closeout | ⬜ |
+| Gate/Z | Abnahme, Closeout | 🟡 **Doku-Hälfte erledigt 2026-10-02 (M3)** — die zwei benannten Softcap-Überschreitungen sind behoben (§Geerbte Contracts → `phase1_storage/CONTRACTS_ARCHIVE.md`, §Abnahmestand → `phase5_ui/ABNAHME_MATRIX_ARCHIVE.md`, beide verbatim mit Roundtrip-Gegenprobe), die INDEX-`updated:`-Kette per P9-L rotiert · **ein Skript-Defekt dabei gefunden und behoben**: `rotate_index_updates.sh` rotierte 1 von 3 Einträgen, weil die Kette einen Faden mit `updated: `-Präfix trug, den der Split-Anker nicht sieht → Gegenprobe (e) + 2 Tests + datierte Korrektur · **offen:** Abnahmematrix P9-1–P9-82, `[VERIFY]`-Bilanz V145–V184, Rest-Rotationen (dieser Head, Wurzel-`CLAUDE.md`, `docs/INDEX.md` — alle drei benannt statt versteckt) |
 
 ## Backlog (bewusst zurückgestellt, kein Phasen-Blocker)
 
@@ -63,65 +63,71 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückzuführen** — Nikinger-Anordnung 2026-09-24, so dokumentieren und nicht weiter
   untersuchen.
 
-## Session stopped — 2026-10-02 (zwölfter Block: Block trace gebaut — `assignee` sichtbar, `updated_by` + Git-Autor, P9-Y–AD; opencode/M3, ein Commit, kein Deploy, kein Service-Touch) Die Frage, die Claude Codes Planungssession aufwarf: *was bedeutet
-`doing` in einem Space mit zwei Personen?* Antwort vorher: der Status ist geteilt, aber **niemand
-wird aufgezeichnet** — nicht im Item, nicht in Git (`git log` im DATA_ROOT kannte nur
-`Space Server`). Jetzt beides, für Menschen **und** für ein angeschlossenes LLM.
+## Session stopped — 2026-10-02 (dreizehnter Block: Gate/Z-Doku-Hälfte — zwei Sektions-Rotationen, P9-L-Lauf und ein Skript-Defekt; opencode/M3, ein Commit, kein Deploy, kein Service-Touch, kein Code-Touch) Kein Code-Schritt war offen, und die drei
+Posten der Übergabe, die nicht dem Nikinger gehören, waren alle Doku-Arbeit. Also die
+Doku-Hälfte von Gate/Z, und mit ihr ein Fund, der größer war als die Aufgabe.
 
-**Gebaut (Locks P9-Y–AD, ein Commit):** `assignee` wird in Liste und Editor sichtbar und
-editierbar, und der **Client** füllt es beim Wechsel auf `doing`; neu ist das
-server-verwaltete `updated_by` (Home-Space des authentifizierten Principals, über **keinen**
-Kanal setzbar) plus der Git-**Autor** (`--author`, Committer bleibt `Space Server`). MCP liefert
-beide Felder in jedem Item- und Trefferobjekt und sagt dem LLM per `_ASSIGNEE_HINT`, wann es
-`assignee` setzen soll — wörtlich identisch an `create_item` und `update_item`.
+**Die zwei benannten Softcap-Überschreitungen sind weg — durch Verschieben, nicht durch Streichen:**
 
-**Zwei Entscheidungen, die der Plan so nicht hatte, beide im Code begründet:**
-1. **Die Regel sitzt beim Client, weil sie einem Statuswert Bedeutung gibt** (P9-Z). Der Server
-   kennt Token → Space; „in Arbeit heißt: X arbeitet daran" wäre genau die Statussemantik, die
-   das Kernprinzip verbietet. Deshalb ein JS-Zweig plus ein Werkzeug-Beschreibungssatz, **keine**
-   `if`-Verzweigung im Kern.
-2. **`actor` ist ein optionales Keyword mit Default `""`** (P9-AD). Der Preis ist benannt: eine
-   vergessene Aufrufstelle fällt nicht mehr per `TypeError` auf, sondern erzeugt still ein
-   `updated_by: ""`. Der Ersatz ist **ein Wächter über den AST**, der *jedes* Nicht-Test-Modul in
-   `mcpserver/` und `webui/` abklapft — nicht nur `tools.py`/`api.py`. Gemessen war dabei: ein
-   blinder Attribut-Scan findet in den beiden Paketen 17 Treffer, davon **8 Listen-/dict-Methoden**
-   (`routes.append`, `fields.update`); der Wächter prüft deshalb am *Empfänger*, sonst wäre er
-   bei Falsch-Positiven rot und damit abgeschaltet.
+| Datei | Abschnitt | Bewegung | Ergebnis |
+|---|---|---|---|
+| `phase1_storage/CLAUDE.md` | „Geerbte Contracts" (388 Zeilen / 31.422 B) | → `CONTRACTS_ARCHIVE.md` (neu, L3, mit L1-Card) | **47.570 B → 19.498 B**, erstmals seit 2026-09-30 wieder unter dem Softcap |
+| `phase5_ui/CLAUDE.md` | „Abnahmestand (Plan §6)" (99 Zeilen / 12.195 B) | → `ABNAHME_MATRIX_ARCHIVE.md` (neu, L3, mit L1-Card) | **43.801 B → 33.1 KB**, unter dem Softcap |
 
-**Der Git-Autor ist live belegt, nicht behauptet:** die Wegwerf-Instanz des Blocks hat **zwei
-Konten** (`alpha`, `beta`) in einem geteilten Space und **echte Git-Historie** (`git=True`).
-`git log --format=%an -3` nach dem Lauf: `beta, alpha, alpha`. Ohne den zweiten Principal hätten
-`updated_by` und `assignee` denselben Wert getragen und die häufigste Verwechslung wäre unsichtbar
-gewesen — deshalb zwei Browser-Kontexte statt einem.
+Beide **verbatim**, per `python`-Schnitt statt Abtippen, mit einer Roundtrip-Gegenprobe *vor* dem
+Schreiben (`Original == Prefix + verschobener Block + Suffix`) und einem byte-identischen
+Gegenlesen *danach*. In den Heads bleibt jeweils genau das, was jemand zum Entscheiden braucht:
+die **Zusicherung** im Wortlaut („Eine Änderung daran nach Phasenabschluss ist eine
+Scope-Änderung") plus ein **Index** (welche Öffnung, welche Phase, welcher Stand), und der
+**Abschnittsname bleibt stehen** — `phase6_shares_plan.md` §, `PHASE7_CLOSEOUT_HANDOVER.md` §4,
+P8-M und die P9-Pläne verweisen wörtlich auf „§Geerbte Contracts", und ein toter Verweis wäre
+eine stille Lüge im Doku-Layer.
 
-**Browser 8/8** (`probes/p9_trace_probe.json`), und die **Gegenprobe ist der eigentliche Beleg:**
-ohne die Leer-Prüfung im P9-Z-Zweig springt der Assignee einer **A zugewiesenen** Aufgabe von
-`alpha` auf `beta`, sobald B sie in Arbeit zieht (S5 rot). Genau das ist die Klausel, die P9-Z
-wörtlich verlangt („ein gesetztes `assignee` überschreibst du nur, wenn ein Mensch es ausdrücklich
-sagt"). **Ein Test musste datiert zugeschnitten werden, nicht entfernt:** der Wächter gegen
-abgetipptes Step-F-Vokabular in `editor.js` (`test_step_f_schema.py`) verbot jedes Vorkommen von
-`assignee|doing` — P9-Z verlangt genau das Gegenteil, weil sich „bei `doing` füllen" nicht ohne
-den Namen des Statuswerts ausdrücken lässt. Neu gilt: keine abgetippte Vokabular-*Liste*, aber
-genau **eine** benannte Verzweigung mit Leer-Prüfung; der Docstring trägt beide Richtungen mit
-Datum. **Und ein Bestandstest kam mit:** `test_app.py` prüft die Patch-Quittung als exaktes Dict
-und war der erste Ort, an dem die neue Quittungszeile auffiel.
+**Der Fund: das Rotationsskript hat die Hälfte rotiert und es gemeldet.** Der erste echte Lauf
+von `scripts/rotate_index_updates.sh` gegen die echte `docs/INDEX.md` meldete „Split ist
+verlustfrei" — und rotierte **1 von 3** Einträgen. Ursache: der Split-Anker ist
+`' | (?=\d{4}-\d{2}-\d{2})'`, und die Kette trug einen Faden mit **`updated: `-Präfix**, den der
+Anker deshalb nicht als Kettenanfang sieht. Verlustfrei war die Aussage nur *innerhalb* des
+geschnittenen Teils; die Kette sah danach konform aus, also wäre nie jemand nachgesehen.
+**Sechste Wiederholung derselben Repo-Lehre** (ein Wächter, der etwas anderes prüft als er
+behauptet — diesmal sogar einer, der die Richtigkeit *seiner eigenen* Byte-Bilanz meldet).
+Gebaut: **Gegenprobe (e)** im Skript (bricht mit klarer Meldung ab, wenn die Kette ein zweites
+`updated: `-Präfix trägt) und **zwei Tests** — einer, der den Abbruch prüft, und einer als
+Gegenprobe, dass ein sauberer Lauf *alle* älteren Fäden rotiert, damit (e) nicht stillschweigend
+alles ablehnt. **Gegenprobe am Wächter selbst:** (e) entfernt → genau der Abbruch-Test rot.
+Dazu die datierte Drift-Korrektur an der Kette (das Fremd-Präfix entfernt) und eine Korrektur am
+Docstring des Testmoduls, der noch „carries one entry" behauptete.
 
-**Eine Plan-Klammer war ungenau, gemessen statt geglättet:** P9-AA sagt „ein mitgeschicktes Feld
-ist `ValidationError`, wie heute `updated`". Für **PATCH** stimmt das (`422 validation_failed`,
-`api.py:890`) und für den Kern (`_SYSTEM_MANAGED_FIELDS`), für **POST** nicht: `_items_post` hat
-keine `unknown`-Prüfung, sondern filtert lautlos auf eine Whitelist — ein `updated_by` im POST-Body
-wird still verworfen, genau wie `created`/`version`/`space` heute. Der Kern bleibt unberührt
-(P9-74 hält: kein Kanal kann es setzen), aber die *Form* der Ablehnung ist je Route eine andere.
-**Bewusst nicht vereinheitlicht** — eine `unknown`-Prüfung im POST würde Round-Trips über
-Schreib-Clients brechen, die den vollen Item-JSON zurückschicken.
+**Was ich bewusst nicht getan habe, mit Zahlen statt mit Bauchgefühl.** Dieser Head steht nach
+diesem Block **über dem Softcap**. Die Rotation allein bringt ihn auf 38.256 B; mein Block liegt
+darüber. Der Rest ist der **Modulstatus (18.217 B)**, und darin stehen **zwei durchgestrichene
+Statusabsätze mit zusammen 7.467 B** — überholte Zustände wie „install + P9-19 ausstehend", von
+denen die aktuelle Spalte denselben Befund schon trägt. **Streichen wäre die einzige Maßnahme,
+die den Head sicher unter den Softcap brächte** — und sie ist eine Nikinger-Entscheidung, weil sie
+7 KB aus dem Head der *laufenden* Phase nimmt, auch wenn der Wortlaut im Archiv steckt. Vorgeschlagen,
+nicht getan. Ebenfalls unangetastet: die Wurzel-`CLAUDE.md` (99.051 B, §Current state 77.794 B —
+dort ist die Rotation der Current-state-Abschnitte die benannte Lösung) und `docs/INDEX.md`
+(57.595 B, **heute größer als vorher**: zwei Pflicht-Zeilen für die neuen Archive kamen hinzu, die
+`updated:`-Rotation sparte nur 347 B netto). Alle drei bleiben **benannt statt versteckt**, wie
+P8-P es verlangt.
 
-**Nicht gebaut, mit Argument:** eine Verlaufsansicht („wer hat wann was geändert", aus `git log`) —
-P9-Y, vom Nikinger nicht gewählt, P10-Kandidat. `created_by` wäre ein zweites Feld für eine
-Angabe, die bereits im ersten Git-Commit **des Items** als Autor steht.
+**Selbstprüfung:** `doc_health` **0 Befunde** (vorher 0, mit zwei erwarteten Befunden zwischen den
+Schritten: die zwei neuen .md ohne INDEX-Zeile, nach deren Eintrag wieder 0) · `pytest` **1152 →
+1162** (**10 neu**: 2 für die Skript-Gegenprobe (e) + **8 neue Wächter** in
+`phase9_hardening/tests/test_doc_rotations.py`, die beide Rotations-Hälften festnageln — kein echtes
+Repo-Diff, nur die Dateien selbst) · **Gegenprobe: fünf eingebaute Verstöße → fünf rote Tests**, jeder mit
+eigener Assertion; ein erster Entwurf der Wächter suchte den Zeiger über die *ganze* Datei und blieb bei zwei
+der fünf Verstöße grün (der `down:`-Eintrag der L1-Card nennt das Archiv ebenfalls) — erst auf den Abschnitt
+selbst eingegrenzt ·
+`ui_budget` 5/5 unberührt (kein `phase5_ui/webui/static/**`-Touch) · Tabu-Diff auf die sechs
+Hartpfade **leer** — es wurden ausschließlich `.md`-Dateien und ein Skript angefasst, kein Python,
+kein JS, kein `storage/`/`mcpserver/`/`authserver/` · kein `systemctl`, kein `pkill -f`, keine
+Wegwerf-Instanz gestartet, `sharefyx-mcp` nicht berührt.
 
-**Nächster Schritt:** Release-Commit (Badge + `##`-Block in `docs/UPDATE_LOG.md`) und Deploy
-`v3.1.1` (Vorschlag aus dem Plan §6; die Nummer entscheidet der Nikinger) — beides
-Nikinger-Schritt, Hard Rule 9. **Danach A7+A8 in einer Sitzung** (Step A, Befund 4: der A7-Restart
-kappt beide Connectoren). **Nikinger-Sichtprüfung** der sechs Bilder in
-`screenshots_latest/`: Feld „Bei", die Lesezeile, und dass ein Altbestand-Item **keine** leere
-Zeile bekommt.
+**Nächster Schritt, unverändert die Zuständigkeiten des Nikingers:** (1) **Sichtung** der sechs
+`p9_trace_*`-Bilder, Kriterien in `screenshots_latest/README.md`; (2) **Release-Commit + Deploy
+`v3.1.1`** — der Badge und der `##`-Block müssen am Deploy-Tag entstehen, ein heute datierter
+Block ließe das `deploy.sh`-Gate (P6-X) bei einem späteren Deploy abbrennen; (3) **A7+A8 in einer
+Sitzung** (Befund 4: der A7-Restart kappt beide Connectoren), danach ist SP9-10b geschlossen und
+der Warndialog auf der alten Funnel-Adresse darf sterben. Danach der Rest von Gate/Z: Abnahmematrix
+P9-1–P9-82 und die `[VERIFY]`-Bilanz V145–V184.
