@@ -124,7 +124,15 @@ Hartpfade **leer** — es wurden ausschließlich `.md`-Dateien und ein Skript an
 kein JS, kein `storage/`/`mcpserver/`/`authserver/` · kein `systemctl`, kein `pkill -f`, keine
 Wegwerf-Instanz gestartet, `sharefyx-mcp` nicht berührt.
 
-**Nächster Schritt, unverändert die Zuständigkeiten des Nikingers:** (1) **Sichtung** der sechs
+**Zweite Überraschung derselben Session, gefunden beim erneuten Lesen der Sichtprüfungs-Bilder:** der
+eingecheckte Browser-Beleg des trace-Blocks war **der Gegenlauf selbst** (`alle_ok: false`, Bild 05 zeigte
+`beta` statt `alpha`), weil Skript und Ausgabepfade beim Hand-Gegenlauf identisch waren — im Repo blieb
+alles glatt, weil die Datei existierte und nur die Zahl im Kopf falsch war. Code war korrekt
+(`editor.js:781`), Beleg war es nicht. Eigener Lauf gegen die Zwei-Principalen-Wegwerf-Instanz →
+**8/8 grün**, Probe und fünf der sechs Bilder neu erzeugt, `test_committed_probe_evidence.py` (4 Tests)
+hält das fest, **Gegenprobe 2 Verstöße → 3 rote Tests**. Vollständig im Korrekturabsatz weiter oben.
+
+**Nächster Schritt, unverändert die Zuständigkeiten des Nikinger:** (1) **Sichtung** der sechs
 `p9_trace_*`-Bilder, Kriterien in `screenshots_latest/README.md`; (2) **Release-Commit + Deploy
 `v3.1.1`** — der Badge und der `##`-Block müssen am Deploy-Tag entstehen, ein heute datierter
 Block ließe das `deploy.sh`-Gate (P6-X) bei einem späteren Deploy abbrennen; (3) **A7+A8 in einer

@@ -15,17 +15,17 @@
     {
       "pruefung": "S3 B sieht 'bei A' und 'Zuletzt geaendert von A'",
       "ok": true,
-      "detail": "Liste='task · doing · bei alpha\\nprivat' Panel='Zuletzt geändert von alpha · 2026-10-02T10:34:45Z' Feld='alpha'"
+      "detail": "Liste='task · doing · bei alpha\\nprivat' Panel='Zuletzt geändert von alpha · 2026-10-02T19:54:15Z' Feld='alpha'"
     },
     {
       "pruefung": "S4 B aendert den Titel: 'Zuletzt geaendert von B', assignee bleibt A",
       "ok": true,
-      "detail": "Panel='Zuletzt geändert von beta · 2026-10-02T10:34:57Z' Feld='alpha'"
+      "detail": "Panel='Zuletzt geändert von beta · 2026-10-02T19:54:27Z' Feld='alpha'"
     },
     {
       "pruefung": "S5 P9-Z: fremd zugewiesene Aufgabe bleibt bei A",
-      "ok": false,
-      "detail": "vorher='alpha' nachher='beta'"
+      "ok": true,
+      "detail": "vorher='alpha' nachher='alpha'"
     },
     {
       "pruefung": "S6 Git-Autor: neuester Commit ist B, A unter den ersten drei",
@@ -43,5 +43,5 @@
       "detail": "HTTP 200 updated_by='beta' assignee='alpha'"
     }
   ],
-  "alle_ok": false
+  "alle_ok": true
 }
