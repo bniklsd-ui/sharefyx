@@ -273,6 +273,27 @@ Head ist der Ort, an dem sie ohnehin bei jedem UI-Commit gelesen wird.
 | **Navigation** | *Springt wohin*, oft mit Zähler verbunden — kein „Wert setzen", sondern „woanders hin" | `.tree__scope` (Bucket-Filter) mit `aria-current="true"`, `.tree__folder`, `.tree__space` (Space), `.overview__space-count` (Counter-Chip) | Akzent-Gradient-Fill wenn aktuell (`linear-gradient(180deg, rgba(62,141,243,.20), rgba(62,141,243,.08))`), sonst transparent |
 | **Vorsicht** | Aktion mit **Rückweg-Kosten** — nicht zerstörend, aber teuer rückgängig zu machen | `#logout-button`, `#archive-button` (Trägerklasse `.action--caution`) | Standard-Knopfplastik, aber `color: var(--caution)` auf Label und Glyph; **keine** gefüllte rote Fläche |
 
+**[2026-10-02, B17 — was „Standard-Knopfplastik" heute heißt, und eine gemessene Korrektur an der
+Umsetzung.** Die Zeile oben stand aus dem Jahr 2026-09-10, als „Standard-Knopfplastik" die graue
+`--btn-face-*`-Fläche meinte. Seit dem 2026-10-01 trägt `.btn` die **Rail-Optik**
+(`--btn-std-fill`/`--btn-std-line`, deckende Werte). Der Wortlaut der Konvention gilt unverändert —
+**und er war zwischenzeitlich nicht eingehalten:** `#archive-button` behielt als *einziger* Knopf
+die alte graue Fläche, und die ist `#2A313A`, also **heller** als die Standardfläche `#0C1C31`.
+Gemessen heißt das: „Vorsicht" war der auffälligste Knopf der Editor-Fußzeile statt des Standards —
+das Gegenteil dessen, was diese Zeile verlangt. `.btn.action--caution` trägt seit dem 2026-10-02
+**exakt** die Standardfläche, und die Unterscheidung sitzt allein in der Beschriftung.
+
+**Von den beiden Trägern hat ohnehin nur einer eine Fläche:** `#logout-button` ist ein
+`.rail__action` (`background: none`, Rail-Knopf) und trägt die Vorsicht nur an der Farbe; nur
+`#archive-button` ist ein `.btn` und erbt damit die Fläche. Wer hier künftig „die beiden
+Vorsicht-Knöpfe" liest, muss das nicht verwechseln.
+
+**Was ausdrücklich *nicht* gebaut wurde:** eine eigene, rot getönte Flächenfamilie
+(`--caution-std-*`). Sie *wäre* die „gefüllte rote Fläche", die diese Zeile ausschließt — sie war
+der erste Kandidat und wurde vom Nikinger am 2026-10-02 nach dem Vorlegen des Konflikt-Zitats
+verworfen. Das ist der Grund, warum die Linie „**keine** gefüllte rote Fläche" hier steht und nicht
+weichen muss.
+
 **Vorsicht ist keine Bestätigungspflicht.** Ein Knopf dieser Kategorie darf trotzdem einen
 Bestätigungsdialog haben (Archivieren hat einen), aber die Farbe ersetzt ihn nicht und
 verlangt ihn nicht.
@@ -312,6 +333,17 @@ verlangt ihn nicht.
   Ausnahmen: `.btn-primary`
   (Hauptaktion) und `.action--caution` (Vorsicht, z. B. Archivieren — behält die graue Plastik).
   Ersetzt H-R.2 (Akzentkante an `.account-nav`).
+
+  **[2026-10-02, B17, Nikinger-Entscheidung — der Satz „behält die graue Plastik" ist hiermit
+  überholt und darf nicht mehr als Ist-Stand gelesen werden.]** Er beschrieb den Zustand zwischen
+  dem 2026-10-01 und dem 2026-10-02; heute trägt `.btn.action--caution` **exakt** die
+  Standardfläche, und der alte `--btn-face-*`-Satz hängt nur noch am Badge `.rail__glyph`
+  (dort ausdrücklich gewollt, siehe `test_rail_glyph_is_a_badge_and_keeps_the_plastic`).
+  Grund, gemessen statt geschmeckt: die graue Fläche ist heller als die Standardfläche, „Vorsicht"
+  war damit der auffälligste Knopf der Fußzeile statt des Standards. Die **Kategorie** bleibt
+  sichtbar, nur an der Beschriftung (`--caution`) statt an der Fläche — das ist die Zeile der
+  Kategorientabelle oben, wortgleich. `.btn-primary` (Hauptaktion) bleibt wie gehabt die einzige
+  Fläche-Ausnahme.
 
 - **[2026-10-01, zweite Runde desselben Tages, P9, Nikinger-Entscheidung] `.toolbar-btn` ist
   mitgezogen** — die zehn Formatierhilfen + der Vorschau-Umschalter waren der **letzte** echte

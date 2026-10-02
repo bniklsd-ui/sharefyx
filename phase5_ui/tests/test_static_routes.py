@@ -1542,14 +1542,98 @@ def test_account_nav_and_standard_button_wear_the_rail_selection_look():
     assert navs and all("btn" in c.split() for c in navs), navs
 
 
-def test_caution_and_primary_buttons_keep_their_own_look():
-    """Die zwei Ausnahmen der 2026-10-01-Entscheidung: Vorsicht (Archivieren) und Hauptaktion
-    tragen **nicht** den Auswahl-Fill -- sonst sähe Archivieren aus wie jeder andere Knopf."""
+def test_primary_keeps_its_own_face_and_caution_wears_the_standard_one():
+    """**[2026-10-02, B17, Nikinger-Entscheidung — UMDREHUNG, mit Datum in beide Richtungen.]**
+
+    Zwei Ausnahmen der 2026-10-01-Entscheidung gab es: Vorsicht (Archivieren) und Hauptaktion
+    trugen **nicht** den Auswahl-Fill, damit Archivieren nicht wie jeder andere Knopf aussieht.
+    Dieser Wächter hieß `test_caution_and_primary_buttons_keep_their_own_look` und behauptete
+    für beide `var(--btn-face-top)`. **Das war bis zum 2026-10-02 richtig und ist es jetzt nicht
+    mehr** — ein Testname, der die Behauptung umkehrt, wäre eine Lüge, deshalb der Wechsel mit
+    Datum statt eines stillen Löschens.
+
+    **Warum die Umkehr kam, gemessen und nicht geschmeckt:** die alte graue Familie
+    `--btn-face-top/bottom` (`#2A313A`/`#1C222A`) ist **heller** als die Standardfläche
+    `--btn-std-fill` (`#0C1C31`/`#050B13`). „Vorsicht" war damit der auffälligste Knopf der
+    Editor-Fußzeile statt des Standards — das Gegenteil der Absicht, die der Wächter beschrieb.
+
+    **Was jetzt gilt:** `.btn-primary` (Hauptaktion) behält ihre Akzentfläche, das ist weiterhin
+    eine Ausnahme. `.btn.action--caution` trägt **exakt** die Standardfläche — wortgleich die Zeile
+    der Selection/Choice-Konvention v3 (`phase8_ui_graph/CLAUDE.md`, Kategorie „Vorsicht"):
+    *Standard-Knopfplastik, aber `color: var(--caution)` auf Label und Glyph; **keine** gefüllte
+    rote Fläche.* Die ausgefragte Alternative (eine eigene, rot getönte Familie `--caution-std-*`)
+    wurde bewusst **nicht** gebaut: sie *wäre* die gefüllte rote Fläche, die die Konvention
+    ausschließt. Die Vorsicht bleibt an der Beschriftung erkennbar (`--danger`/`--caution`).
+    """
     css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
-    caution = _block_body(css, ".btn.action--caution")
-    assert "var(--btn-face-top)" in caution, caution
     primary = _block_body(css, ".btn-primary")
     assert "btn-std" not in primary, primary
+    # Die Vorsicht erbt die Basisregel `.btn` — es darf KEINE eigene Flaeche geben. Geprueft
+    # werden die Properties, die eine Fläche ausmachen; `color` ist ausgenommen, denn genau
+    # die kommt woanders (`.action--caution`) dazu.
+    for pseudo in ("", ":hover", ":active"):
+        m = re.search(rf"^\.btn\.action--caution{pseudo}\s*\{{([^}}]*)\}}", css, flags=re.MULTILINE)
+        assert m is None, (f".btn.action--caution{pseudo} darf keine eigene Regel mehr haben: "
+                           f"{m.group(1) if m else ''}")
+    assert "var(--btn-face-top)" in _block_body(css, ".rail__glyph"), (
+        "die alte Familie ist jetzt Badge-only (.rail__glyph) — ihr letzter Verbraucher "
+        "darf sie nicht mit benutzen"
+    )
+
+
+def test_caution_class_is_carried_by_exactly_one_button_with_a_face():
+    """**Vorbedingung zu Obigem, und der Grund, warum Obiges nicht vakuös ist.** Ein Wächter, der
+    prüft „`.btn.action--caution` deklariert keine Fläche", ist grün, wenn die Klasse aus dem
+    Markup verschwindet — dann gäbe es schlicht nichts mehr zu erben. Gezählt wird deshalb das
+    Markup, nicht der CSS-Text.
+
+    **Die Zahl ist 1, nicht 2, und das ist der korrigierte Befund vom 2026-10-02.** Von den beiden
+    Trägern der Klasse ist `#logout-button` ein `.rail__action` (Rail-Knopf, `background: none`)
+    und trägt die Vorsicht nur an der **Farbe**; **nur `#archive-button` (`class="btn
+    action--caution"`) hatte je eine Fläche.** Der Backlog-Eintrag B17 zählte beide als
+    „`.btn.action--caution`" — der Selektor matcht aber nur eines, und genau dieses Zählen über
+    Klassen-Präsenz statt über den Selektor ist dieselbe Sorte Fehler, die im btn2-Lauf als
+    `count() == 1` für `[aria-current]` aufgetaucht ist.
+    """
+    html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+    # Genau EIN Element traegt beide Klassen zusammen.
+    beide = re.findall(r'class="([^"]*\bbtn\b[^"]*\baction--caution\b[^"]*)"', html)
+    assert len(beide) == 1, f"genau ein .btn.action--caution erwartet, gefunden: {beide!r}"
+    assert 'id="archive-button"' in html and "action--caution" in beide[0], beide[0]
+    # Und es ist genau der Editor-Knopf, der die Fläche erbt.
+    archiv = re.search(r'<button[^>]*id="archive-button"[^>]*>', html)
+    assert archiv and "btn action--caution" in archiv.group(0), archiv.group(0) if archiv else None
+    # Die Vorsichtfarbe ist weiterhin deklariert -- ohne sie waere die Kategorie unsichtbar und
+    # "exakt die Standardflaeche" waere eine stille Abschaffung der Kategorie. **Kommentare
+    # werden vorher entfernt**, sonst waere genau dieser Wächter der naechste Fund dieser Repo-Lehre:
+    # der neue `.btn`-Kommentar in `app.css` *erwaehnt* die Vorsicht-Farbe im Klartext, und die
+    # Regex waere grun, ohne dass eine einzige Zeile Code sie setzt.
+    code = re.sub(r"/\*.*?\*/", "", css, flags=re.DOTALL)
+    assert re.search(r"\.action--caution[^{]*\{[^}]*color\s*:\s*var\(--caution\)", code), (
+        "die Vorsicht-Farbe an Label/Glyph (Konvention v3) muss bleiben"
+    )
+
+
+def test_the_old_button_plastic_is_badge_only():
+    """**Nach B17 (2026-10-02): die alte graue Familie `--btn-face-*` gehört genau einem
+    Verbraucher** — dem 20x20-Buchstaben-Badge `.rail__glyph`. Drei Knöpfe waren ihr letzter
+    gemeinsamer Nutzer (`.btn`, `.toolbar-btn`, `.btn.action--caution`); die beiden ersten waren
+    es am 2026-10-01, der dritte am 2026-10-02.
+
+    Kommentare werden vorher entfernt: `app.css` **nennt** `--btn-face-top` an mehreren Stellen
+    im Klartext (dieser Test wäre sonst der sechste Fall derselben Repo-Lehre — ein Wächter, der
+    den Kommentar über den Code prüft).
+    """
+    css = re.sub(r"/\*.*?\*/", "", (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8"),
+                 flags=re.DOTALL)
+    verbraucher = []
+    for m in re.finditer(r"^([^{}]+)\{([^}]*)\}", css, flags=re.MULTILINE):
+        if "var(--btn-face-" in m.group(2):
+            verbraucher.append(m.group(1).strip())
+    assert verbraucher == [".rail__glyph"], (
+        f"nur der Badge darf die alte Plastik benutzen, gefunden: {verbraucher!r}"
+    )
 
 
 def test_toolbar_buttons_wear_the_standard_look():
@@ -1582,12 +1666,20 @@ def test_toolbar_buttons_wear_the_standard_look():
 
 
 def test_rail_glyph_is_a_badge_and_keeps_the_plastic():
-    """**Gegenstück zum Vorigen, absichtlich.** `.rail__glyph` (der 20x20-Buchstaben-Badge am
-    Space im Rail) ist der **letzte** Verbraucher von `--btn-face-top`, und er bleibt dabei: ein
-    Badge ist kein Knopf, er hat keine Aktion, und die drei Kategorie-Varianten daneben
+    """**Gegenstück zu den Knopf-Wächtern, absichtlich.** `.rail__glyph` (der 20x20-Buchstaben-Badge am
+    Space im Rail) benutzt die alte Familie `--btn-face-*` und bleibt dabei: ein Badge ist kein
+    Knopf, er hat keine Aktion, und die drei Kategorie-Varianten daneben
     (`.rail__glyph--own/--shared/--foreign`) tragen ohnehin eigene Hex-Werte (Phase 8 C3).
     Dieses `assert` ist kein Test über eine Absicht, sondern die Markierung: wer die alte Optik
-    zum dritten Mal aus dem Repo wirft, liest hier zuerst, warum sie bleiben darf.
+    aus dem Repo wirft, liest hier zuerst, warum sie bleiben darf.
+
+    **[2026-10-02, B17 — die Formulierung dieses Docstrings musste mitwandern.** Er stand hier als
+    „der **letzte** Verbraucher von `--btn-face-top`", und das war nach dem btn2-Block richtig
+    (`.btn` und `.toolbar-btn` waren umgestellt). Nach B17 ist er der **einzige**: mit
+    `#archive-button` hat auch der letzte Knopf die alte Fläche verlassen. „Letzter Verbraucher"
+    wäre ab jetzt eine Behauptung gewesen, die das CSS nicht mehr trägt — der Satz wurde darum
+    korrigiert statt weggelassen. Der harte Teil ist `test_the_old_button_plastic_is_badge_only`:
+    der Badge darf sie benutzen, und **niemand sonst**.
     """
     css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
     glyph = _block_body(css, ".rail__glyph")

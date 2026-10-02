@@ -191,6 +191,27 @@ anderes VLM tauscht, kauft dieselbe Fehlerklasse neu. Der Hebel ist die **Zustä
 |---|---|---|
 | „Ist die Karte gezeichnet?", „ist das Item sichtbar?", „gibt es eine Fehlermeldung?" | **VLM (dieser Adapter)** | grobe Lage, binär gestellt, zuverlässig |
 | „Wie viele Knoten?", „wo liegt der Knoten?", „hat sich das Bild verändert?" | **programmatisch** (Canvas-Pixel, DOM, CDP, API-Payload) | GroundCount: Detektion/Abfrage kann zählen, VLM nicht; bei uns gratis, weil die Daten schon da sind |
+| „**Welche Fläche hat welcher Knopf**?", „welche Eigenschaft gehört zu welchem Element?" | **programmatisch** (zweite Messung, siehe 2026-10-02) | der Adapter kann ein Element *isoliert* lesen, vertauscht aber die Zuordnung, sobald mehrere ähnliche Elemente im Bild stehen |
+
+**Zweite, eigene Fehlerklasse — Messbefund 2026-10-02 (B17), dieselbe Konsequenz, anderer Anlass.**
+Die Tabelle oben trennt *Fragearten*. Der Fall vom 2026-10-02 ist enger und deshalb gefährlicher: das
+Bild enthielt **zwei** Knöpfe derselben Art („Archivieren" mit Standardfläche, „Speichern" mit
+Akzentfläche), und die Frage war nicht „wie viele", sondern „welche Beschriftung trägt welche
+Fläche". Der Adapter antwortete mit einer **Vertauschung**: er meldete „Archivieren" mit
+dunkelrotem Hintergrund und „Speichern" mit hellgrauem. Die berechneten Werte waren
+`linear-gradient(rgb(12,28,49), rgb(5,11,19))` für den einen und der Akzentverlauf für den anderen,
+und die rote Fläche **gab es im Bild nicht** — sie war die rote *Beschriftung*, die er als
+Hintergrund las. Auf **denselben** Pixeln, auf den isolierten Zuschnitt des Knopfes (115×41, ohne
+Nachbarn) war die Antwort dann brauchbar: Fläche „(10,10,50)" gegen gemessen `(10,23,40)` — der
+**R-Kanal stimmt exakt** — und die Schrift wurde korrekt als rot erkannt.
+
+**Die Regel daraus, präziser als „binär fragen":** Ein VLM ist als *Farbmessgerät* an einem
+isolierten Element brauchbar und als *Zuordner* über mehrere Elemente hinweg unbrauchbar. Für
+Optik-Aussagen heißt das: **ein Bild, ein Element, eine Frage** — und für alles, was in eine
+Abnahmezeile geht, trotzdem die Zahl daneben (hier `getComputedStyle().backgroundImage` als
+Stringgleichheit plus vier Pixelproben, `p9_btn3_caution_probe.py`). Das ist keine neue
+Einschränkung des Adapters, sondern dieselbe Zuständigkeitsgrenze von 2026-09-28 an einem zweiten
+Beispiel: **programmatisch messen, VLM nur ansehen.**
 
 **Was sich in der Praxis geändert hat (kostet nichts):** (1) Fragen an den Adapter **binär**
 formulieren, nie als offene Zählfrage — das ist der GHOST-Befund als Prompt-Disziplin; (2) für

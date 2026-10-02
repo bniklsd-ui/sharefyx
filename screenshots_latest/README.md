@@ -6,7 +6,7 @@ detail: L3 (Pointer-Verzeichnis, keine eigene Inhaltsquelle)
 up: ../phase9_hardening/CLAUDE.md   # aktive Phase
 down:
   - ../docs/screenshots/                # kanonische Ablage; diese Verzeichnis ist nur Symlink-Komfort
-updated: 2026-10-02 (**Abnahme durch den Nikinger mit Restbefund**: die sechs Bilder sind freigegeben; als Notiz hält er fest, dass noch nicht alle Knöpfe an das Schema angepasst sind — abgelegt als **B17** im Backlog von `phase9_hardening/CLAUDE.md` mit der gemessenen Klassenliste, *kein* Code-Touch) | 2026-10-02 (**die fünf Bilder und die Probe sind neu — der alte Beleg war der Gegenlauf.** Beim erneuten Lesen fiel auf: `p9_trace_probe.json` stand auf `alle_ok: false` (S5 rot) und Bild 05 zeigte `beta` statt `alpha`, weil der Hand-Gegenlauf des trace-Blocks Skript und Ausgabepfade geteilt hat. Eigener Lauf gegen die Zwei-Principalen-Wegwerf-Instanz → **8/8**, Bilder neu (Bild 02 ist zeichengleich), Wächter `test_committed_probe_evidence.py` verhindert die Wiederholung) | 2026-10-02 (Rotation auf die `p9_trace_*`-Belege: sechs Symlinks neu, die vier `p9_doing_*`-Links raus — der doing-Block ist mit dem Deploy `v3.1.0` erledigt und abgenommen) | 2026-10-02 (Rotation auf die `p9_doing_*`-Belege: vier Symlinks neu, die drei `p9_btn2_*`-Links raus — der Knopfoptik-Fall ist erledigt und abgenommen) | 2026-10-01 (Rotation auf die `.toolbar-btn`-Belege (`p9_btn2_*`): drei Symlinks neu, die drei `p9_step_e_*`-Links raus — Step E ist als Beleg in `docs/screenshots/` erledigt und die aktuell offene Sichtfrage ist die Knopfoptik vor dem Deploy. **Vier unversionierte Tailscale-Kopien** mit Leerzeichen im Namen wandern nach `docs/screenshots/p9_step_a_01..04_*` (Infra-Beleg zu A3, ausdrücklich keine Sichtprüfung), die fünfte Datei `Machines - Tailscale.html` ist gelöscht: leere SPA-Hülle, `tailscale-api-prefetch` = `{}`, kein Bildwert) | updated: 2026-09-28 (Phase **9** — Rotation auf die ersten P9-Bilder: die sieben P8.6-Gate-Symlinks sind weg, drei `p9_step_e_*`-Links rein (P8.6-AK sagt genau das: "sie bleiben stehen, bis P9 eigene Screenshots produziert" — Step E hat als erster P9-Step welche produziert) | 2026-09-19 (Phase 8.6 abgeschlossen — Rotation auf die **Gate-Belege**: sieben Symlinks auf `p86_smoke_*` ersetzen die fünf H-R-3-Links. Das sind die Bilder, auf denen die Freigabe von `v3.0.2` beruht. Bleiben stehen, bis P9 eigene Screenshots produziert.)
+updated: 2026-10-02 (**Rotation auf die B17-Belege** — vier Symlinks neu, die sechs `p9_trace_*`-Links raus; die sind abgenommen und liegen versioniert in `docs/screenshots/`. Der Block ersetzt den Vorsichtsknopf auf die Standardfläche, und **diese Bilder sind die offene Sichtfrage**: die Messung ist 14/14, die Sichtung steht aus) | updated: 2026-10-02 (**Abnahme durch den Nikinger mit Restbefund**: die sechs Bilder sind freigegeben; als Notiz hält er fest, dass noch nicht alle Knöpfe an das Schema angepasst sind — abgelegt als **B17** im Backlog von `phase9_hardening/CLAUDE.md` mit der gemessenen Klassenliste, *kein* Code-Touch) | 2026-10-02 (**die fünf Bilder und die Probe sind neu — der alte Beleg war der Gegenlauf.** Beim erneuten Lesen fiel auf: `p9_trace_probe.json` stand auf `alle_ok: false` (S5 rot) und Bild 05 zeigte `beta` statt `alpha`, weil der Hand-Gegenlauf des trace-Blocks Skript und Ausgabepfade geteilt hat. Eigener Lauf gegen die Zwei-Principalen-Wegwerf-Instanz → **8/8**, Bilder neu (Bild 02 ist zeichengleich), Wächter `test_committed_probe_evidence.py` verhindert die Wiederholung) | 2026-10-02 (Rotation auf die `p9_trace_*`-Belege: sechs Symlinks neu, die vier `p9_doing_*`-Links raus — der doing-Block ist mit dem Deploy `v3.1.0` erledigt und abgenommen) | 2026-10-02 (Rotation auf die `p9_doing_*`-Belege: vier Symlinks neu, die drei `p9_btn2_*`-Links raus — der Knopfoptik-Fall ist erledigt und abgenommen) | 2026-10-01 (Rotation auf die `.toolbar-btn`-Belege (`p9_btn2_*`): drei Symlinks neu, die drei `p9_step_e_*`-Links raus — Step E ist als Beleg in `docs/screenshots/` erledigt und die aktuell offene Sichtfrage ist die Knopfoptik vor dem Deploy. **Vier unversionierte Tailscale-Kopien** mit Leerzeichen im Namen wandern nach `docs/screenshots/p9_step_a_01..04_*` (Infra-Beleg zu A3, ausdrücklich keine Sichtprüfung), die fünfte Datei `Machines - Tailscale.html` ist gelöscht: leere SPA-Hülle, `tailscale-api-prefetch` = `{}`, kein Bildwert) | updated: 2026-09-28 (Phase **9** — Rotation auf die ersten P9-Bilder: die sieben P8.6-Gate-Symlinks sind weg, drei `p9_step_e_*`-Links rein (P8.6-AK sagt genau das: "sie bleiben stehen, bis P9 eigene Screenshots produziert" — Step E hat als erster P9-Step welche produziert) | 2026-09-19 (Phase 8.6 abgeschlossen — Rotation auf die **Gate-Belege**: sieben Symlinks auf `p86_smoke_*` ersetzen die fünf H-R-3-Links. Das sind die Bilder, auf denen die Freigabe von `v3.0.2` beruht. Bleiben stehen, bis P9 eigene Screenshots produziert.)
 ---
 # `screenshots_latest/` — Schnellzugriff auf die Screenshots der aktuellen Phase
 
@@ -43,45 +43,38 @@ Ausnahmen, in denen M3 den Dateinamen + Checkkriterium **nicht** nennt:
 - Wenn die Verifikation programmatisch ist (Regex auf gerenderten HTML-Output
   o. ä.) und der Screenshot nur Anhang ist.
 
-## Aktueller Inhalt (Phase **9**, Block trace, Stand 2026-10-02)
+## Aktueller Inhalt (Phase **9**, Block B17, Stand 2026-10-02)
 
-Sechs Bilder aus `phase9_hardening/scripts/p9_trace_self_check.py` gegen die **eigene**
-TLS-Wegwerf-Instanz (`p9_trace_wegwerf.py`, Port 18777, Chromium 1440x900). Sie zeigen den
-Block, der die Frage „wer arbeitet dran, wer hat zuletzt geändert" beantwortet: `assignee`
-wird sichtbar und vom **Client** gefüllt, `updated_by` steht als Lesezeile im Kopfdaten-Panel.
+Vier Bilder aus `phase9_hardening/scripts/p9_btn3_caution_probe.py` gegen die eigene
+TLS-Wegwerf-Instanz (`p9_step_g_wegwerf.py`, Port 18775, Chromium 1440x900). Sie zeigen **eine
+einzige Änderung**: der Knopf „Archivieren" (`.btn.action--caution`, Kategorie „Vorsicht") trägt
+jetzt **exakt** die Standardfläche, nur seine Beschriftung bleibt rot.
 
-**Die Instanz hat zwei Konten (`alpha`, `beta`) und echte Git-Historie** — beides ist der
-Beleg, nicht Beiwerk. Mit einem eingeloggten Menschen trügen `updated_by` und `assignee`
-denselben Wert und jede Verwechslung bliebe unsichtbar; ohne Git gäbe es nichts, was S6
-prüfen könnte.
-
-**Der Beleg ist die Messung, nicht das Bild — und die Messung muss passen zum Code, der laeuft.** **[2026-10-02]** Genau hier ist es fast schiefgegangen: die eingecheckte Probe war der Gegenlauf selbst (rote Station, Bild 05 mit `beta`), der Code war korrekt. Ein Wächter (`phase9_hardening/tests/test_committed_probe_evidence.py`) verlangt jetzt von jeder committeten Probe: keine rote Station, und die Zusammenfassung darf den Stationen nicht widersprechen; ein Gegenlauf muss `*_gegenprobe.json` heißen. **Die beiden übrigen Proben im selben Verzeichnis waren grün — der Fehler fiel also nur auf, wenn man genau die eine Datei öffnet, um die es geht.**
-
-**Der Beleg ist die Messung, nicht das Bild.** Das Skript prüft 8 Stationen aus dem echten DOM
-(`probes/p9_trace_probe.json`, 8/8 grün). Die **Gegenprobe** ist der eigentliche Beleg: ohne
-die Leer-Prüfung im P9-Z-Zweig meldet **S5** rot — und zwar genau die Aussage, die der Zweig
-tragen soll: B zieht eine **A zugewiesene** Aufgabe auf „In Arbeit" und der Assignee springt
-von `alpha` auf `beta`. Ein Zufuehlen, das kein Messwert bemerkt.
+**Die Behauptung, um die es geht, ist eine Gleichheit, keine Schönheit.** Vorher trug der Knopf
+die alte graue Familie `--btn-face-*` (`#2A313A`) — und die ist **heller** als die Standardfläche
+`#0C1C31`. „Vorsicht" war damit der auffälligste Knopf der Editor-Fußzeile statt des Standards.
+**Gemessen:** die berechneten `backgroundImage`-Strings sind jetzt stringgleich
+(`linear-gradient(rgb(12,28,49), rgb(5,11,19))` auf beiden), vier Pixelproben an der glyphenfreien
+Spalte x=4 px mit **max |Δ| = 1**, die Vorsichtfarbe sitzt in der Beschriftung (`rgb(229,72,77)`
+gegen `rgb(233,237,242)` beim Standard). **Gegenprobe:** alte Fläche wieder eingebaut → 6 von 13
+Stationen rot, Δ 25–28 an allen drei Höhen.
 
 | Dateiname | Original | Checkkriterium |
 |---|---|---|
-| `01_bei_wird_gefuellt.png` | `../docs/screenshots/p9_trace_01_auftrag_vor_speichern.png` | **Die P9-Z-Regel, im Moment des Auslösens:** der Status steht auf `doing`, und das Feld **„Bei“** daneben trägt `alpha` — **noch bevor** gespeichert wurde (Versionsband sagt „ungespeichert"). Unter den Feldern die Lesezeile „Zuletzt geändert von alpha · Datum". |
-| `02_liste_bei_alpha.png` | `../docs/screenshots/p9_trace_02_gespeichert_liste.png` | **Die Listenzeile:** die Metazeile führt „bei alpha“ direkt nach dem Status, vor der Fälligkeit. Wer den Ordner „In Arbeit“ öffnet, sieht ohne Klick, wer dran ist. |
-| `03_ansicht_von_b.png` | `../docs/screenshots/p9_trace_03_ansicht_von_b.png` | **Ansicht von B** auf dieselbe Aufgabe: Metazeile „bei alpha“, Kopfdaten-Feld „Bei“ = `alpha`, Lesezeile „Zuletzt geändert von **alpha**“. B sieht A als letzten Schreiber — obwohl B selbst noch nichts angefasst hat. |
-| `04_zuletzt_geaendert_von_b.png` | `../docs/screenshots/p9_trace_04_nach_b.png` | **Nach Bs eigenem Schreibvorgang:** die Lesezeile wechselt auf „Zuletzt geändert von **beta**“, das Feld „Bei“ bleibt **alpha**. Genau diese beiden Zeilen sind die Aussage des ganzen Blocks. |
-| `05_p9z_fremd.png` | `../docs/screenshots/p9_trace_05_p9z_fremd.png` | **Der harte P9-Z-Fall:** B zieht eine Aufgabe, die **A** zugewiesen ist, auf „In Arbeit" — das Feld behält `alpha`. Ein Zufuehlen, das nur bei leerem Feld arbeitet. **Genau dieses Bild war das erste, was den Gegenlauf-Beleg verriet:** in der Version vom 2026-10-02, 10:34 stand hier `beta`, weil der Gegenlauf dieselben Pfade überschrieben hatte. Die Datei ist seither neu aufgenommen (8/8). |
-| `06_legacy_ohne_feld.png` | `../docs/screenshots/p9_trace_06_legacy_ohne_feld.png` | **Der Altbestand:** dasselbe Item **ohne** `updated_by` (von Hand so erzeugt). Die Lesezeile ist **weg** — keine leere Zeile, kein „unbekannt“, kein Platzhalter; das Feld „Bei“ zeigt seinen Platzhalter. |
+| `01_archivieren_und_speichern.png` | `../docs/screenshots/p9_btn3_01_kopfleiste.png` | **Der eine Blick, um den es geht:** „Archivieren" und „Speichern" nebeneinander. Der Knopf darf **nicht heller** wirken als der Standard — er ist jetzt dieselbe dunkelblaue Fläche, unterschieden nur an der **roten Beschriftung**. „Speichern" bleibt bewusst die helle Akzentfläche (Hauptaktion). |
+| `02_archivieren_ruhe.png` | `../docs/screenshots/p9_btn3_02_ruhe.png` | **Derselbe Knopf isoliert, 115×41, Ruhezustand** (die Aufnahme entsteht nach dem Wegziehen des Zeigers — ein Hover-Bild hätte den Beleg verfälscht). Fläche dunkelblau mit einer hellblauen 1-px-Kante, Schrift rot. Zum Vergleich: das war vorher ein heller grauer Block. |
+| `03_archivieren_hover.png` | `../docs/screenshots/p9_btn3_04_hover.png` | **Der Hover-Zustand:** die Fläche wird **einen Tick heller** (der Standard-Hover `--btn-std-fill-hover`), die Beschriftung bleibt unverändert rot. Der Knopf darf auf Hover nicht aus der Reihe fallen. |
+| `04_editor_gesamt.png` | `../docs/screenshots/p9_btn3_03_editor.png` | **Der ganze Editor** zur Einordnung: Knopfleiste, Kopfdaten, Formatierleiste, Anhängen-Streifen — alle Standardknöpfe tragen jetzt dieselbe Fläche, und „Archivieren" ist die einzige Abweichung in der Farbe, nicht in der Form. |
 
-**Warum die Wegwerf-Instanz und nicht das echte Gerät:** der Beleg braucht einen
-reproduzierbaren Vorher-Zustand (S1/S4/S5 **verbrauchen** ihn) **und** einen zweiten
-Principal, und der Legacy-Item lässt sich nur auf einem frischen Seed ohne Feld anlegen. Am
-echten Datenbestand wäre nichts davon zu halten. Für den Gesamteindruck bleibt die
-Sichtprüfung am echten Gerät nötig — dafür ist der Augenschein am Deploy-Tag zuständig.
+**Zwei Dinge, die der Sichtprüfung nicht zu Entscheidung gehören, die aber benannt sind.** Der
+**Kontrast** der roten Beschriftung liegt bei 4,38:1 (vorher 3,36:1) — besser, aber unter dem
+WCAG-AA-Wert 4,5:1 für normalgroßen Text; ob die Schrift heller wird, ist eine Design-Entscheidung.
+Und eine **eigene rote Fläche** (`--caution-std-*`) wurde bewusst **nicht** gebaut: die
+Selection/Choice-Konvention v3 schließt eine „gefüllte rote Fläche" aus.
 
-**Nicht hier, mit Begründung.** Die vier `p9_doing_*`-Belege (fünfter Eimer „In Arbeit") sind
-mit dem Deploy `v3.1.0` abgenommen, die Tailscale-Bilder aus A3 sind Infra-Beleg ohne
-Bildwert, und die `p9_btn2_*`-Belege sind mit der Standardoptik der Knöpfe erledigt. Alle
-sechs liegen versioniert in `docs/screenshots/`.
+**Nicht hier, mit Begründung.** Die sechs `p9_trace_*`-Belege sind am 2026-10-02 abgenommen
+(der Restbefund daraus ist genau dieser Block), die vier `p9_doing_*` mit dem Deploy `v3.1.0`, die
+`p9_btn2_*` mit der Standardoptik der Knöpfe. Alle liegen versioniert in `docs/screenshots/`.
 
 ## Rotation
 

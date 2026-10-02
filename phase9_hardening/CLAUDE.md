@@ -32,25 +32,34 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | H | Abhängigkeits-Hygiene | 🟡 **code-complete 2026-09-30 (M3)** — **[2026-10-02] Nachtrag Deploy-Abbruch:** der erste `v3.1.0`-Deploy brach in `pytest` im Release ab (4 failed + 5 errors, alle `ModuleNotFoundError: requests` in `test_mcp_local_vision_server.py`) — `requests` war nie deklariert, nur von Hand im Dev-venv; `mcp_local_vision_server.py` jetzt stdlib-only (`urllib`), Beleg im frischen venv 1128/1128 (Session-Block 2026-10-02, elfter). — **die Plan-Prämisse „installiert ist 3.4.4" war falsch, und genau das war der Fund:** der Live-Release lief bereits auf **3.4.7** (read-only gemessen an `/opt/sharefyx/current/.venv`), weil `deploy.sh:153` pro Release ein frisches venv baut und der Pin ein **Range** war — der stumme Patch-Drift, den P3-D verbieten wollte, hatte also schon stattgefunden. `phase2_mcp/pyproject.toml` pinnt jetzt **`fastmcp==3.4.7`** exakt (P3-D/P4-R, beide seit 2026-08 beschlossen und nie umgesetzt) + datierter Kommentar; **V163 beantwortet** (drei Codepunkte: CIMD per P4-E abgeschaltet, `token_endpoint_auth_methods_supported: ["none"]`, kein `OAuthProxy`/`JWTVerifier` — der Fix ist inert, der Bump ist Hygiene) · **P9-55 in der Form abweichend** (`==3.4.7` statt Range, Nikinger-Entscheidung 2026-09-30) · 5 Wächter in `phase9_hardening/tests/test_step_h_deps.py`, einer vergleicht installiert-gegen-deklariert und **läuft im Release-venv mit** (`deploy.sh:169`) — Gegenprobe 4 Verstöße → 7 rote Assertions. `pytest` 1079 → **1084**, `ui_budget` 5/5. **Benannt, nicht gebaut:** das transitive `mcp` bleibt ungepinnt (Dev 1.28.1, Live 1.30.0), P9-Backlog-Kandidat. Lock P9-R unangetastet, V79 bleibt |
 | doing | Fünfter Eimer „In Arbeit" (Lock **P9-V**, Kandidat (a)) — Voraussetzung für den Deploy `v3.1.0` | ✅ **live seit 2026-10-02 (`v3.1.0`, Release `5414cb7`, Health-Gate 9/9)** — `_BUCKETS["doing"]` (Reihenfolge `open, doing, done, note, archived`, P9-X) + Rail-Label „In Arbeit" (P9-W: **nur** die Navigationsebene übersetzt, Schema/REST/MCP bleiben roh) + der Step-F-Wächter **umgedreht** (`test_the_bucket_hole_for_doing_is_named_not_silently_fixed` → `test_the_doing_bucket_closes_the_hole`, Docstring mit beiden Richtungen) · **6 neue Tests** (T1/T2/T6 in `phase9_hardening/tests/test_doing_bucket.py`, T3/T4/T5 in `phase5_ui/tests/test_overview.py`), `pytest` 1122 → **1128** · **Gegenlauf 5 Verstöße**: G1 → 7 rot, G2 → 2, G3 → 2, G4 → 1, G5 → 1 · **Browser 11/11** gegen eine eigene TLS-Wegwerf-Instanz (Port 18776), Kernbeleg S6: Rail-Zähler springen **ohne Reload** von `1/1` auf `0/2` · **Browser-Gegenlauf 7 rot** (nur D1/D2 zurückgenommen) · Tabu-Diff leer, **keine zehnte P1-Contract-Öffnung** (V174: `phase1_storage/CLAUDE.md` §Geerbte Contracts bleibt unberührt) · 4 Screenshots `p9_doing_01..04_*` · **[2026-10-02] Release-Commit für den Deploy `v3.1.0` steht: Badge `v3.0.2` → `v3.1.0` (`app.html:20`) + neuer `## 2026-10-02`-Block in `docs/UPDATE_LOG.md` (6 Zeilen, jede eine physische Zeile — am echten `parse_update_log()` gegengeprüft, nicht am Augenschein), `pytest` 1128, `ui_budget` 5/5** — **der Deploy selbst bleibt Nikinger-Schritt** (sudo, Hard Rule 9), die Health-Checks sind reine `curl`-GETs ohne Rechte und laufen durch M3 (Mini-Plan §8) |
 | trace | Nachvollziehbarkeit: `assignee` sichtbar (UI + MCP, vom Client gefüllt, P9-Z) + `updated_by` + Git-Autor (P9-AA–AC); **zehnte P1-Contract-Öffnung** | 🟡 **code-complete 2026-10-02 (M3), nicht live-bewiesen** — Locks P9-Y–AD · **kein Index-Schema-Sprung** (kein Feld im Index, weil niemand danach filtert ⇒ beim Deploy **kein** Neuaufbau, anders als Step F) · Kern: `updated_by` in `_KNOWN_FIELDS` + `_SYSTEM_MANAGED_FIELDS`, `actor: str = ""` an allen neun Store-Schreibmethoden, **leerer Akteur = unverändert** (P9-AB, lieber der alte wahre Wert als ein erfundener), `history.commit(author=)` mit `--author` (Committer bleibt `Space Server`) · Adapter: `actor=principal.space` (7 Aufrufe) / `actor=session.space` (9 Aufrufe) · UI: „bei X" in der Listenzeile, Feld **„Bei"** mit `<datalist>`, Lesezeile **„Zuletzt geändert von X"**, P9-Z füllt **nur bei leerem** Feld · **24 neue Tests** (gezählt, nicht addiert: 5 `test_store.py` + 4 `test_history.py` + 6 `test_trace_block.py` + 4 `test_tools.py` + 1 `test_api.py` + 4 `test_static_routes.py`), `pytest` 1128 → **1152** · **Gegenlauf G1 → 1 · G2 → 2 · G3 → 1 · G4 → 2 · G5 → 4 rot**, alle danach zurückgebaut und grün · **Browser 8/8** gegen eine eigene **Zwei-Principalen**-TLS-Wegwerf-Instanz (Port 18777, echte Git-Historie), Kernbeleg: B sieht „Zuletzt geändert von A", schreibt selbst, und danach steht B — während „Bei" **A** bleibt; **Gegenlauf: ohne die Leer-Prüfung springt der Assignee von A auf B** (S5 rot) · 6 Screenshots `p9_trace_01..06_*`, `screenshots_latest/` umgehängt · **ein Bestandstest mitgezogen** (`test_app.py`, exakte Quittungs-Assertion) und **ein Wächter datiert zugeschnitten statt entfernt** (`test_step_f_schema.py`, siehe dort) — Deploy bleibt Nikinger-Schritt |
-| E (Extra) | **Buttons ans Schema** (B17): die 15 Knöpfe mit eigenen Flächen auf die Standard-Tokens `--btn-std-*` umstellen | ⬜ **als potentieller Extra-Schritt vorgeschlagen, nicht entschieden (Nikinger 2026-10-02)** — Umfang und Reihenfolge stehen in §Backlog B17, die gemessene Klassenliste ist dort vollständig (`.btn-primary` 13, `.btn.action--caution` 2 von 77). **Die offene Frage ist die Reihenfolge, nicht die Absicht:** ob die beiden Klassen am Schema *teilhaben* sollen (Konvention v3: Aktion/Vorsicht bleiben eigene Flächen) oder ob `.action--caution` die alte `--btn-face-*`-Familie verlassen muss, entscheidet der Nikinger — solange ist das ein Design-Schritt und kein Aufräumen · **je 1 UI-Block plus Pixel-Beleg im Muster `p9_btn2_toolbar_probe.py`** (13/13 mit Gegenprobe) · **kein `storage/`-Berührungsrisiko**, reiner `app.css`-Block |
+| E (Extra) | **Buttons ans Schema** (B17): die Knöpfe mit eigenen Flächen auf die Standard-Tokens `--btn-std-*` umstellen | ✅ **gebaut 2026-10-02 (M3), code-complete, nicht live-bewiesen** — **die Backlog-Liste war an zwei Stellen falsch, beides vor dem Bau gemessen statt geglaubt.** Von 77 Knöpfen im Markup tragen **75** die Standard-Fläche; die zwei Ausnahmen sind je **eine Klasse mit eigener Bedeutung**, und nur **eine** davon war überhaupt ein Befund: **`.btn.action--caution` (1 Knopf, `#archive-button`)** auf der alten Familie `--btn-face-*` · **`.btn-primary` (13)** auf `--accent-face-*` — das ist **kein** Reststand, sondern die dokumentierte Ausnahme der Nikinger-Entscheidung vom 2026-10-01 (`app.css`, Kommentar in `.btn`: „Ausnahme mit eigener Bedeutung bleibt: `.btn-primary`"), und sie bleibt. **Die Korrektur zur Zahl:** der Backlog nannte „`.btn.action--caution` (2 Knöpfe)" — **2 ist falsch, es ist 1.** Der Selektor `.btn.action--caution` matcht nur `#archive-button`; der zweite Träger, `#logout-button`, ist ein `.rail__action` (`background: none`) und trägt die Vorsicht nur an der **Farbe**, hatte also nie eine Fläche. Zählen über Klassen-Präsenz statt über den Selektor — dieselbe Sorte Fehler wie `count() == 1` für `[aria-current]` im btn2-Lauf · **Gebaut:** die drei `.btn.action--caution`-Regeln sind **gelöscht**, nicht umgeschrieben — `.btn` *ist* die Standardfläche, eine eigene Kopie wäre die „zweite Knopfoptik im selben Panel", die derselbe Tag schon einmal abgestellt hat. Kein `:root`-Token kommt hinzu, keins wird verwaist (die alte Familie hängt jetzt nur noch am Badge `.rail__glyph`, ausdrücklich gewollt) · **Der eigentliche Befund ist eine Helligkeit, kein Token:** `--btn-face-top` `#2A313A` ist **heller** als `--btn-std-fill` `#0C1C31` — „Vorsicht" war damit der auffälligste Knopf der Editor-Fußzeile statt des Standards · **Die Nikinger-Entscheidung war ausdrücklich gegen eine rote Fläche** (`--caution-std-*` war der erste Kandidat und fiel, nachdem der Konflikt mit der Konvention v3 offengelegt war) · **3 Wächter** (1 umgedreht mit Datum in beide Richtungen, 2 neu), **Gegenprobe 4 Verstöße → 8 rote Assertions**, Kontrolllauf 0 · **Pixel-Probe 14/14**, Gegenlauf 6 rot (Δ 25–28 gemessen) · `pytest` 1167 → **1169** · `ui_budget` 5/5 (**+0,2 KB**, gemessen per Stash-Gegenprobe) |
 | Gate/Z | Abnahme, Closeout | 🟡 **Doku-Hälfte erledigt 2026-10-02 (M3)** — die zwei benannten Softcap-Überschreitungen sind behoben (§Geerbte Contracts → `phase1_storage/CONTRACTS_ARCHIVE.md`, §Abnahmestand → `phase5_ui/ABNAHME_MATRIX_ARCHIVE.md`, beide verbatim mit Roundtrip-Gegenprobe), die INDEX-`updated:`-Kette per P9-L rotiert · **ein Skript-Defekt dabei gefunden und behoben**: `rotate_index_updates.sh` rotierte 1 von 3 Einträgen, weil die Kette einen Faden mit `updated: `-Präfix trug, den der Split-Anker nicht sieht → Gegenprobe (e) + 2 Tests + datierte Korrektur · **offen:** Abnahmematrix P9-1–P9-82, `[VERIFY]`-Bilanz V145–V184, Rest-Rotationen (dieser Head, Wurzel-`CLAUDE.md`, `docs/INDEX.md` — alle drei benannt statt versteckt) |
 
 ## Backlog (bewusst zurückgestellt, kein Phasen-Blocker)
 
-- **B17 — **potentieller Extra-Schritt** (in der Modulstatus-Tabelle als „E (Extra)" geführt; wann und ob in P9, entscheidet der Nikinger). Nicht alle Knöpfe tragen das Standard-Schema. Vom Nikinger bei der Sichtprüfung am
-  2026-10-02 als Restbefund notiert und die sechs `p9_trace_*`-Bilder damit abgenommen.**
-  **Gemessen am Markup und CSS, nicht geschmeckt:** `app.html` trägt 77 `<button>`/`<a>` mit einer
-  Button-Klasse. **62 laufen auf den Standard-Tokens** `--btn-std-*` — `.btn` (37), `.toolbar-btn` (11),
-  `.btn--icon` (4), `.pw-toggle` (7), `.account-nav` (3). **15 tragen noch eigene Flächen** und damit einen
-  zweiten bzw. dritten Tokensatz: **`.btn-primary` (13 Knöpfe)** auf `--accent-face-top/bottom` + `--accent-edge`
-  und **`.btn.action--caution` (2 Knöpfe)** auf der **alten** Familie `--btn-face-top/bottom`, `--btn-edge`,
-  `--btn-glow`, `--btn-lift`, `--btn-press` — genau die Familie, die der btn2-Block für `.btn` abgelöst hat.
-  **Kein Renderfehler:** alle sechs Tokens sind in `:root` definiert (verwaiste `var()`-Nutzung: 0), der Befund
-  ist also eine *Konsistenz*-Lücke, kein Bruch. Ob `.btn-primary` und `.action--caution` semantisch
-  abweichen **sollen** (Selection/Choice-Konvention v3: Aktion vs. Vorsicht), ist die offene Frage — die
-  Notiz des Nikingers sagt „noch nicht angepasst", also ist es bis auf Weiteres Restbefund, kein Fix.
-  **Kein Code in dieser Session angefasst** (kein `phase5_ui/webui/static/**`-Touch), Gehörenheit: der nächste
-  UI-Block, nicht Gate/Z.
+- **B17 — ✅ GESCHLOSSEN am 2026-10-02** (war: „potentieller Extra-Schritt", in der Modulstatus-Tabelle
+  als „E (Extra)" geführt). **Alle Knöpfe tragen jetzt eine Fläche aus einem Schema, und die zwei
+  verbleibenden Ausnahmen sind je eine Klasse mit eigener Bedeutung.** Die Details, die Messungen und
+  der Gegenlauf stehen in der Modulstatus-Zeile und im Session-Block 2026-10-02; hier bleiben die
+  drei Punkte, die ein späterer Leser sonst falsch wüsste:
+  1. **Die Liste dieses Eintrags war an zwei Stellen falsch** — sie nannte 15 Knöpfe und
+     „`.btn.action--caution` (2 Knöpfe)". Richtig sind **1 Knopf** auf der alten Familie
+     (`#archive-button`; der zweite Träger `#logout-button` ist ein `.rail__action` und hat keine
+     Fläche) und **13** auf `--accent-face-*` (`.btn-primary`). Die 13 sind **kein Reststand**:
+     Hauptaktion ist eine dokumentierte Ausnahme der Nikinger-Entscheidung vom 2026-10-01.
+  2. **`.btn.action--caution` trägt exakt die Standardfläche**, nur die Beschriftung ist rot
+     (`--caution`). Das ist wortgleich die Konvention-v3-Zeile „Standard-Knopfplastik, aber
+     `color: var(--caution)`; **keine** gefüllte rote Fläche" — und die Konvention war zwischen
+     dem 2026-10-01 und dem 2026-10-02 **nicht eingehalten** (die alte graue Fläche ist heller als
+     die Standardfläche). Beide Stellen in `phase8_ui_graph/CLAUDE.md` sind datiert korrigiert.
+  3. **Benannt, nicht entschieden:** der Kontrast der Vorsicht-Beschriftung liegt bei
+     **4,38:1** (vorher 3,36:1 auf der grauen Plastik) — **unter** WCAG-AA 4,5:1 für normalgroßen
+     Text (14 px/500 ist kein „large text"). Besser als vorher ist das keine Erfüllung. Die
+     Kandidaten (hellere Vorschriftfarbe wie `--btn-std-line` als Text, oder die Kategorie doch an
+     eine 1-px-Kante hängen) sind Design-Entscheidungen und gehören dem Nikinger.
+  **Was ausdrücklich nicht gebaut wurde:** die eigene rot getönte Flächenfamilie `--caution-std-*`
+  — sie *wäre* die gefüllte rote Fläche, die die Konvention ausschließt, und fiel deshalb.
+
 - **D1 — ESC im Vollbild schließt zusätzlich das Item.** Diagnose geklärt (macOS Safari,
   natives Vollbild über den grünen Knopf), Fix nicht — der gebaute
   `document.fullscreenElement`-Guard (Session 2026-09-23) sieht diesen Fall nicht, weil die
@@ -78,113 +87,122 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückzuführen** — Nikinger-Anordnung 2026-09-24, so dokumentieren und nicht weiter
   untersuchen.
 
-## Session stopped — 2026-10-02 (dreizehnter Block: Gate/Z-Doku-Hälfte — zwei Sektions-Rotationen, P9-L-Lauf und ein Skript-Defekt; opencode/M3, ein Commit, kein Deploy, kein Service-Touch, kein Code-Touch) Kein Code-Schritt war offen, und die drei
-Posten der Übergabe, die nicht dem Nikinger gehören, waren alle Doku-Arbeit. Also die
-Doku-Hälfte von Gate/Z, und mit ihr ein Fund, der größer war als die Aufgabe.
+## Session stopped — 2026-10-02 (vierzehnter Block: B17 gebaut — ein Knopf, zwei falsche Zahlen im Backlog und ein Konflikt mit einer gelockten Zeile; opencode/M3, ein Commit, kein Deploy, kein Service-Touch)
 
-**Die zwei benannten Softcap-Überschreitungen sind weg — durch Verschieben, nicht durch Streichen:**
+**Der Auftrag war die kleinste offene Aufgabe, und die Übergabe hat ihren Umfang selbst falsch
+beschrieben.** Von vier Posten waren drei deine Infra-Schritte; der vierte (B17) wurde als „15 Knöpfe
+ans Schema" notiert. **Gemessen vor dem Bauen** — Markup *und* CSS, nicht geglaubt — waren es
+**ein** Knopf mit einem Befund und **zwei** Klassen mit je eigener Bedeutung.
 
-| Datei | Abschnitt | Bewegung | Ergebnis |
-|---|---|---|---|
-| `phase1_storage/CLAUDE.md` | „Geerbte Contracts" (388 Zeilen / 31.422 B) | → `CONTRACTS_ARCHIVE.md` (neu, L3, mit L1-Card) | **47.570 B → 19.498 B**, erstmals seit 2026-09-30 wieder unter dem Softcap |
-| `phase5_ui/CLAUDE.md` | „Abnahmestand (Plan §6)" (99 Zeilen / 12.195 B) | → `ABNAHME_MATRIX_ARCHIVE.md` (neu, L3, mit L1-Card) | **43.801 B → 33.1 KB**, unter dem Softcap |
+| Vorher behauptet | Gemessen | Folge |
+|---|---|---|
+| 15 Knöpfe mit eigenen Flächen | **75 von 77** tragen eine Standard-Fläche; Ausnahmen sind `.btn-primary` (**13**, Akzent) und `.btn.action--caution` (**1**) | `.btn-primary` ist **kein Reststand**, sondern die dokumentierte Ausnahme deiner Entscheidung vom 2026-10-01 (`app.css`, Kommentar in `.btn`) — sie bleibt, sonst hätte ich einen Lock gerissen |
+| „`.btn.action--caution` (**2** Knöpfe)" auf `--btn-face-*` | **1**. Der Selektor matcht nur `#archive-button`; `#logout-button` ist ein `.rail__action` (`background: none`) und trägt die Vorsicht nur an der **Farbe** — er hatte nie eine Fläche | Zählen über Klassen-Präsenz statt über den Selektor: **dieselbe Fehlerklasse wie `count() == 1` für `[aria-current]`** im btn2-Lauf (Selektoren matchen ein Attribut, nicht seinen Wert) |
 
-Beide **verbatim**, per `python`-Schnitt statt Abtippen, mit einer Roundtrip-Gegenprobe *vor* dem
-Schreiben (`Original == Prefix + verschobener Block + Suffix`) und einem byte-identischen
-Gegenlesen *danach*. In den Heads bleibt jeweils genau das, was jemand zum Entscheiden braucht:
-die **Zusicherung** im Wortlaut („Eine Änderung daran nach Phasenabschluss ist eine
-Scope-Änderung") plus ein **Index** (welche Öffnung, welche Phase, welcher Stand), und der
-**Abschnittsname bleibt stehen** — `phase6_shares_plan.md` §, `PHASE7_CLOSEOUT_HANDOVER.md` §4,
-P8-M und die P9-Pläne verweisen wörtlich auf „§Geerbte Contracts", und ein toter Verweis wäre
-eine stille Lüge im Doku-Layer.
+**Der eigentliche Befund ist eine Helligkeit, kein Token — und er ist beim Messen entstanden, nicht
+beim Umstellen.** `--btn-face-top` `#2A313A` ist **heller** als die Standardfläche
+`--btn-std-fill` `#0C1C31`. „Vorsicht" war damit der **auffälligste** Knopf der Editor-Fußzeile statt
+des Standards — genau das Gegenteil der Absicht, die der Wächter
+`test_caution_and_primary_buttons_keep_their_own_look` beschrieb („Archivieren [sieht aus] sonst
+aus wie jeder andere Knopf"). Die Backlog-Liste hatte den Zustand als *Konsistenz*-Lücke beschrieben
+und damit die sichtbare Wirkung aus dem Blick verloren.
 
-**Der Fund: das Rotationsskript hat die Hälfte rotiert und es gemeldet.** Der erste echte Lauf
-von `scripts/rotate_index_updates.sh` gegen die echte `docs/INDEX.md` meldete „Split ist
-verlustfrei" — und rotierte **1 von 3** Einträgen. Ursache: der Split-Anker ist
-`' | (?=\d{4}-\d{2}-\d{2})'`, und die Kette trug einen Faden mit **`updated: `-Präfix**, den der
-Anker deshalb nicht als Kettenanfang sieht. Verlustfrei war die Aussage nur *innerhalb* des
-geschnittenen Teils; die Kette sah danach konform aus, also wäre nie jemand nachgesehen.
-**Sechste Wiederholung derselben Repo-Lehre** (ein Wächter, der etwas anderes prüft als er
-behauptet — diesmal sogar einer, der die Richtigkeit *seiner eigenen* Byte-Bilanz meldet).
-Gebaut: **Gegenprobe (e)** im Skript (bricht mit klarer Meldung ab, wenn die Kette ein zweites
-`updated: `-Präfix trägt) und **zwei Tests** — einer, der den Abbruch prüft, und einer als
-Gegenprobe, dass ein sauberer Lauf *alle* älteren Fäden rotiert, damit (e) nicht stillschweigend
-alles ablehnt. **Gegenprobe am Wächter selbst:** (e) entfernt → genau der Abbruch-Test rot.
-Dazu die datierte Drift-Korrektur an der Kette (das Fremd-Präfix entfernt) und eine Korrektur am
-Docstring des Testmoduls, der noch „carries one entry" behauptete.
+**Der Konflikt, den ich gestoppt und zurückgebracht habe.** Mein Vorschlag war eine eigene
+`--caution-std-*`-Familie: dieselbe Struktur wie `--btn-std-*`, nur in der Vorsicht-Farbtiefe, in der
+Rechnung also deckend und dunkel. Du hast sie gewählt. Beim Vorbereiten des Blocks stieß ich auf
+`phase8_ui_graph/CLAUDE.md` und musste die Frage zurückstellen, weil sie zwei gelockte Zeilen bricht:
+die Konvention v3 sagt für „Vorsicht" wörtlich *Standard-Knopfplastik, aber `color: var(--caution)`
+auf Label und Glyph; **keine** gefüllte rote Fläche*, und deine P9-Notiz vom 2026-10-01 nennt
+`.action--caution` als Ausnahme, die „behält die graue Plastik". **Eine rot getönte Fläche *ist* die
+gefüllte rote Fläche**, die die Konvention ausschließt — das war keine Interpretationsfrage, sondern
+der Wortlaut. Nach der Rückfrage: **exakt die Standardfläche**, wortgleich mit v3, und damit ohne
+Konventionsänderung.
 
-**Was ich bewusst nicht getan habe, mit Zahlen statt mit Bauchgefühl.** Dieser Head steht nach
-diesem Block **über dem Softcap**. Die Rotation allein bringt ihn auf 38.256 B; mein Block liegt
-darüber. Der Rest ist der **Modulstatus (18.217 B)**, und darin stehen **zwei durchgestrichene
-Statusabsätze mit zusammen 7.467 B** — überholte Zustände wie „install + P9-19 ausstehend", von
-denen die aktuelle Spalte denselben Befund schon trägt. **Streichen wäre die einzige Maßnahme,
-die den Head sicher unter den Softcap brächte** — und sie ist eine Nikinger-Entscheidung, weil sie
-7 KB aus dem Head der *laufenden* Phase nimmt, auch wenn der Wortlaut im Archiv steckt. Vorgeschlagen,
-nicht getan. Ebenfalls unangetastet: die Wurzel-`CLAUDE.md` (99.051 B, §Current state 77.794 B —
-dort ist die Rotation der Current-state-Abschnitte die benannte Lösung) und `docs/INDEX.md`
-(57.595 B, **heute größer als vorher**: zwei Pflicht-Zeilen für die neuen Archive kamen hinzu, die
-`updated:`-Rotation sparte nur 347 B netto). Alle drei bleiben **benannt statt versteckt**, wie
-P8-P es verlangt.
+**Was gebaut wurde, ist folgerichtig die kleinste mögliche Änderung: die drei
+`.btn.action--caution`-Regeln sind gelöscht, nicht umgeschrieben.** `.btn` *ist* die Standardfläche;
+eine eigene Kopie davon wäre genau die „zweite Knopfoptik im selben Panel", die derselbe Tag am
+2026-10-01 an `.account-nav` abgestellt hatte. Kein `:root`-Token kommt hinzu, keins wird verwaist —
+die alte Familie `--btn-face-*` hängt jetzt **nur noch am Badge `.rail__glyph`**, wo sie
+ausdrücklich bleiben soll. Die Kategorie bleibt sichtbar, aber an der **Beschriftung** statt an der
+Fläche.
 
-**Selbstprüfung:** `doc_health` **0 Befunde** (vorher 0, mit zwei erwarteten Befunden zwischen den
-Schritten: die zwei neuen .md ohne INDEX-Zeile, nach deren Eintrag wieder 0) · `pytest` **1152 →
-1162** (**10 neu**: 2 für die Skript-Gegenprobe (e) + **8 neue Wächter** in
-`phase9_hardening/tests/test_doc_rotations.py`, die beide Rotations-Hälften festnageln — kein echtes
-Repo-Diff, nur die Dateien selbst) · **Gegenprobe: fünf eingebaute Verstöße → fünf rote Tests**, jeder mit
-eigener Assertion; ein erster Entwurf der Wächter suchte den Zeiger über die *ganze* Datei und blieb bei zwei
-der fünf Verstöße grün (der `down:`-Eintrag der L1-Card nennt das Archiv ebenfalls) — erst auf den Abschnitt
-selbst eingegrenzt ·
-`ui_budget` 5/5 unberührt (kein `phase5_ui/webui/static/**`-Touch) · Tabu-Diff auf die sechs
-Hartpfade **leer** — es wurden ausschließlich `.md`-Dateien und ein Skript angefasst, kein Python,
-kein JS, kein `storage/`/`mcpserver/`/`authserver/` · kein `systemctl`, kein `pkill -f`, keine
-Wegwerf-Instanz gestartet, `sharefyx-mcp` nicht berührt.
+**Die Wächter, und einer davon musste umgedreht werden.** `test_caution_and_primary_buttons_keep_their_own_look`
+hätte nach dem Umbau genau das behauptet, was jetzt **falsch** ist. Ein umgedrehter Testname wäre eine
+Lüge gewesen, also: heißt jetzt `test_primary_keeps_its_own_face_and_caution_wears_the_standard_one`
+und trägt **beide** Richtungen mit Datum im Docstring (dasselbe Muster wie der umgedrehte
+doing-Wächter des 2026-10-02). Neu sind zwei: einer zählt die **Markup**-Träger statt der
+CSS-Textstellen — ein Wächter, der „`.btn.action--caution` deklariert keine Fläche" prüft, ist
+sonst grün, wenn die Klasse aus dem Markup verschwindet; der andere macht die alte Familie
+**badge-only** (Kommentare vorher entfernt, denn `app.css` *nennt* `--btn-face-top` an mehreren
+Stellen im Klartext). Der Docstring von `test_rail_glyph_is_a_badge_and_keeps_the_plastic` musste
+mitwandern: er stand auf „**letzter** Verbraucher", und das war ab hier eine Behauptung, die das CSS
+nicht mehr trägt.
+**Gegenprobe mit vier eingebauten Verstößen → 8 rote Assertions** (G1 alte Fläche zurück → 2 rot ·
+G2 Vorsichtfarbe entfernt → 1 rot · G3 Trägerklasse aus dem Markup → 2 rot · G4 Badge steigt mit → 3
+rot), Kontrolllauf 0 rot, danach byte-identisch wiederhergestellt.
 
-**Zweite Überraschung derselben Session, gefunden beim erneuten Lesen der Sichtprüfungs-Bilder:** der
-eingecheckte Browser-Beleg des trace-Blocks war **der Gegenlauf selbst** (`alle_ok: false`, Bild 05 zeigte
-`beta` statt `alpha`), weil Skript und Ausgabepfade beim Hand-Gegenlauf identisch waren — im Repo blieb
-alles glatt, weil die Datei existierte und nur die Zahl im Kopf falsch war. Code war korrekt
-(`editor.js:781`), Beleg war es nicht. Eigener Lauf gegen die Zwei-Principalen-Wegwerf-Instanz →
-**8/8 grün**, Probe und fünf der sechs Bilder neu erzeugt, `test_committed_probe_evidence.py` (4 Tests)
-hält das fest, **Gegenprobe 2 Verstöße → 3 rote Tests**, plus ein Test mehr, weil die (e)-Prüfung beim ersten echten Anwenden **zu blinder** war als ihre Behauptung (dritter Fund unten). Vollständig im Korrekturabsatz darüber.
+**Pixel-Beleg `p9_btn3_caution_probe.py` 14/14** (eigene TLS-Wegwerf-Instanz auf Port 18775,
+gestoppt über die PID-Datei). Kernstation: die **berechneten** `backgroundImage`-Strings sind
+stringgleich (`linear-gradient(rgb(12,28,49), rgb(5,11,19))` auf beiden), vier Pixelproben an der
+glyphenfreien Spalte x=4 px mit **max |Δ| = 1** (Toleranz ±2), die Vorsichtfarbe sitzt in der
+Beschriftung (`rgb(229,72,77)` gegen `rgb(233,237,242)` beim Standard). **Gegenlauf:** die alte
+Fläche wieder eingebaut → **6 von 13 Stationen rot**, Δ 25–28 an allen drei Höhen; die Datei kam
+danach als `*_gegenprobe.json` und wurde wieder entfernt (Muster aus dem trace-Block).
 
-**Sichtung vom 2026-10-02: erledigt.** Der Nikinger hat die sechs Bilder **abgenommen — mit der Notiz,
-dass noch nicht alle Knöpfe an das Schema angepasst sind** (B17 im Backlog, dort mit der gemessenen
-Klassenliste). Vor der Sichtung habe ich sie mit dem Vision-Wrapper quer gelesen; fünf Bilder trafen ihr
-Kriterium, Bild 05 verriet den Gegenlauf-Beleg. **Was ich daraus gelernt habe, ohne es zu vergrößern:** ein
-Restbefund, den ein Mensch sieht, muss nicht erst *wiederentdeckt* werden — er gehört mit der Messung ins
-Backlog, sonst steht er in zwei Sitzungen als Überraschung da.
+**Zwei eigene Fehler, beide in derselben Stunde, beide im selben Commit behoben.** (1) Mein
+`.btn`-Kommentar enthielt eine `{ }`-Klammer — `_block_body` schneidet mit `[^}]*`, der Kommentar
+hat also den Block abgeschnitten und den bestehenden Wächter rot gemacht. (2) Derselbe Kommentar
+hätte **genau den neuen Wächter grün gemacht**: er *nennt* `color: var(--caution)` im Klartext, und
+die Regex für die Vorsichtfarbe hätte den Kommentar statt des Codes getroffen. Der Wächter strippt
+jetzt die Kommentare vorher — **ich hätte beim selben Mal die siebte Wiederholung derselben Repo-Lehre
+gebaut (ein Wächter, der den Kommentar über den Code prüft) und es erst beim Ausführen gemerkt.**
 
-**Und ein dritter Fund, aus dem allerletzten Schritt — er betrifft die Gegenprobe selbst.** Beim Anwenden
-der (e)-Prüfung auf die *echte* Kette hat das Skript **abgebrochen**, obwohl die Kette in Ordnung war: der
-`updated:`-Eintrag vom 2026-10-02 **erwähnt** die Zeichenkette ``updated: ``, weil er genau diesen Defekt
-beschreibt, und meine `case`-Prüfung suchte das nackte `updated: ` irgendwo im Text. Geprüft wird jetzt nur
-der **Fadenanfang** `` | updated: <ISO>``; ein zusätzlicher Test erlaubt ausdrücklich, die Zeichenkette im
-eigenen Eintragstext zu nennen. **Das ist die kleine Schwester der Lehre vom selben Nachmittag — ein Wächter,
-der blinder ist als seine Behauptung, ist schlimmer als gar keiner**, und hier hätte er den einzigen Mechanismus
-lahmgelegt, der die Kette klein hält. Der anschließende echte Lauf rotiert **3 Fäden** (59.335 → 57.672 B).
+**Ein dritter Fund, diesmal im eigenen Beleg.** Das erste Bild der Probe hieß `p9_btn3_01_footer.png`
+und zeigte `#editor-toolbar` — die **Formatierleiste**, die den Vorsichtsknopf gar nicht enthält. Der
+Dateiname behauptete das Gegenteil, und das ist derselbe Fehler wie der trace-Beleg, der der Gegenlauf
+selbst war: **ein Beleg, der etwas anderes zeigt als das, wofür er zitiert wird.** Jetzt ist es der
+Zuschnitt von `.editor__head-actions` (dort stehen „Archivieren", „Speichern" und „×" nebeneinander),
+und die Ruhe-Aufnahme entsteht **nach** dem Wegziehen des Zeigers — im ersten Entwurf wäre sie im
+Hover-Zustand entstanden, also im btn2-Lauf derselbe Reihenfolgefehler wie bei der Verlaufsmessung.
 
-**Session beendet 2026-10-02. Für die nächste Session, der Zustand in fünf Zeilen:**
+**Und der Vision-Adapter hat dasselbe Bild falsch gelesen — das gehört dokumentiert, nicht versteckt.**
+Am Vollbild meldete er „Archivieren" mit **dunkelrotem** Hintergrund und „Speichern" mit hellgrauem:
+eine **Vertauschung**, und die rote Fläche existierte im Bild gar nicht (es war die rote
+*Beschriftung*). Am isolierten Zuschnitt desselben Knopfes war die Antwort brauchbar — Fläche
+`(10,10,50)` gegen gemessen `(10,23,40)`, der **R-Kanal exakt**. Also nicht „das Modell taugt nicht",
+sonne eine **eigene Fehlerklasse**: ein VLM ist als Farbmessgerät an *einem* Element brauchbar und als
+**Zuordner über mehrere Elemente** unbrauchbar. Als neue Zeile in
+`docs/concepts/sichtpruefung_automation_tooling.md` §Vormerkung 2026-09-28 abgelegt, mit der
+präzisierten Regel **„ein Bild, ein Element, eine Frage"** — dieselbe Zuständigkeitsgrenze wie
+2026-09-28, am zweiten Beispiel. **Eigene Kontrollmessung, ohne Modell:** Histogramm der
+eingecheckten PNGs — Fläche `(10,23,40)`/`(7,16,28)`, Kante `(29,67,116)` = `--btn-std-line`, 281 rote
+Beschriftungspixel, **3** Pixel in der alten Grau-Umgebung (Kanten-Antialiasing).
 
-1. **B17 ist als potentieller Extra-Schritt dokumentiert** (Modulstatus-Zeile „E (Extra)"), nicht entschieden.
-   Er ist der einzige Punkt, der *hier* ohne deine Infra-Schritte liegen bleiben kann — die anderen warten
-   alle auf dich.
-2. **Offen und nur bei dir:** A7+A8 in einer Sitzung (Befund 4: der A7-Restart kappt beide Connectoren).
-3. **Danach:** Release-Commit (Badge `app.html:20` + `##`-Block in `docs/UPDATE_LOG.md`, **beides erst am
-   Deploy-Tag**, sonst brennt das `deploy.sh`-Gate P6-X) und Deploy **`v3.1.1`**.
-4. **Danach Gate/Z:** Abnahmematrix P9-1–P9-82, `[VERIFY]`-Bilanz V145–V184. Kann inhaltlich erst nach
-   dem Deploy abschließend bewertet werden.
-5. **Doku-Rest, benannt statt versteckt:** Phase-9-Head 48.550 B (davon 7.467 B durchgestrichene
-   Statusabsätze im Modulstatus), Wurzel-`CLAUDE.md` 107.330 B, `docs/INDEX.md` ~58 KB. Für den Head
-   ist die Rotation des Modulstatus der benannte Weg und **deine Entscheidung**; die anderen beiden haben
-   ihre benannten Lösungen in `CLAUDE.md`/`docs/INDEX.md`.
+**Benannt, nicht entschieden — der Kontrast.** Die Vorschrift-Beschriftung liegt jetzt bei
+**4,38:1** gegen die Standardfläche (vorher 3,36:1 auf der grauen Plastik). Das ist **besser und
+weiterhin kein AA**: WCAG verlangt 4,5:1 für normalgroßen Text, und 14 px/500 ist kein „large
+text". Ich habe den Wert als *Verschlechterungsverbot* in die Probe aufgenommen (eine echte
+Eigenschaft, die diese Runde zusichert) und den Absolutwert **nicht** zum Schwellwert gemacht. Die
+Kandidaten — hellere Vorschriftfarbe, oder die Kategorie doch an eine 1-px-Kante — sind
+Design-Entscheidungen und gehören dir.
 
-**Diese Session hat keinen Code angefasst.** Drei Commits: `deb72df` (Doku-Hälfte Gate/Z), `f544f8c`
-(Beleg-Defekt + 8/8 nachgefahren), `68d3314` (Sichtung abgenommen, B17) — plus dieser Abschluss.
+**Selbstprüfung:** `pytest` **1167 → 1169** (netto +2: ein Wächter umgedreht, zwei neu; Baseline
+vorher gemessen, nicht aus der Doku übernommen) · `ui_budget` **5/5**, und die Zahl **gemessen statt
+behauptet**: mit Stash-Gegenprobe **165,0 KB auf HEAD gegen 165,2 KB mit diesem Block** — die in der
+Wurzel-`CLAUDE.md` protokollierte **155,1 KB war schon veraltet**, sie stammt aus dem trace-Block; mein
+Anteil ist +0,2 KB (KommentarZeilen, die die Löschung aufwiegen) · `doc_health` **0 Befunde** ·
+Tabu-Diff auf die sechs Hartpfade **leer** (nur `app.css`, eine Testdatei, ein Skript, `.md`) ·
+Wegwerf-Instanz **über die PID-Datei** gestoppt, kein `pkill -f`, kein `systemctl`, `sharefyx-mcp`
+nicht berührt.
 
-**Nächster Schritt, unverändert die Zuständigkeiten des Nikinger:** (1) ~~Sichtung~~ **erledigt**; es bleibt
-`p9_trace_*`-Bilder, Kriterien in `screenshots_latest/README.md`; (2) **Release-Commit + Deploy
-`v3.1.1`** — der Badge und der `##`-Block müssen am Deploy-Tag entstehen, ein heute datierter
-Block ließe das `deploy.sh`-Gate (P6-X) bei einem späteren Deploy abbrennen; (3) **A7+A8 in einer
-Sitzung** (Befund 4: der A7-Restart kappt beide Connectoren), danach ist SP9-10b geschlossen und
-der Warndialog auf der alten Funnel-Adresse darf sterben. Danach der Rest von Gate/Z: Abnahmematrix
-P9-1–P9-82 und die `[VERIFY]`-Bilanz V145–V184.
+**Nächster Schritt, unverändert die Zuständigkeiten des Nikinger:** (1) **Release-Commit + Deploy
+`v3.1.1`** — Badge `app.html:20` + `##`-Block in `docs/UPDATE_LOG.md`, **beides erst am Deploy-Tag**,
+sonst brennt das `deploy.sh`-Gate P6-X bei späterem Deploy ab; dieser Block kommt mitdeployt, ist
+aber eine reine CSS-Änderung. (2) **A7+A8 in einer Sitzung** (Befund 4: der A7-Restart kappt beide
+Connectoren), danach ist SP9-10b geschlossen und der Warndialog auf der alten Funnel-Adresse darf
+sterben. (3) Danach der Rest von Gate/Z: Abnahmematrix P9-1–P9-82 und `[VERIFY]`-Bilanz V145–V184.
+
+**Doku-Rest, benannt statt versteckt, unverändert:** Phase-9-Head jetzt über dem Softcap (vor diesem
+Block 50.904 B, mit dem Block mehr), Wurzel-`CLAUDE.md` 107.576 B, `docs/INDEX.md` ~58 KB. Für den
+Head ist die Rotation des Modulstatus der benannte Weg und **deine Entscheidung** — die
+durchgestrichenen Statusabsätze (7.467 B) habe ich **nicht** angefasst, auch nicht in dieser Session.

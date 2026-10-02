@@ -1,0 +1,75 @@
+{
+  "result": "ok",
+  "befunde": [
+    {
+      "pruefung": "Vorbedingung: #archive-button traegt .btn UND .action--caution",
+      "ok": true,
+      "detail": "class=['btn', 'action--caution']"
+    },
+    {
+      "pruefung": "Vorbedingung: #archive-button ist sichtbar und NICHT deaktiviert",
+      "ok": true,
+      "detail": "der Knopf wird im Code nie deaktiviert (editor.js) — behauptet, nicht angenommen"
+    },
+    {
+      "pruefung": "Vorbedingung: #append-button ist ein .btn ohne action--caution (Vergleichsbasis)",
+      "ok": true,
+      "detail": "class=['btn']"
+    },
+    {
+      "pruefung": "gerechnete Flaeche ist identisch (backgroundImage, Stringgleichheit)",
+      "ok": true,
+      "detail": "archive='linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))' btn='linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))'"
+    },
+    {
+      "pruefung": "Kante, Polster und Typografie sind identisch (nur die Beschriftungsfarbe nicht)",
+      "ok": true,
+      "detail": "archive='rgb(29, 67, 116)|1px|solid|rgba(255, 255, 255, 0.06) 0px 1px 0px 0px inset|7px|16px|500' btn='rgb(29, 67, 116)|1px|solid|rgba(255, 255, 255, 0.06) 0px 1px 0px 0px inset|7px|16px|500'"
+    },
+    {
+      "pruefung": "Vorsichtsknopf traegt NICHT mehr die alte graue Plastik (--btn-face-*)",
+      "ok": true,
+      "detail": "kein Stopp (42, 49, 58)/(28, 34, 42) in 'linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))'"
+    },
+    {
+      "pruefung": "archive == .btn, Verlauf Kopf (Spalte x=4px)",
+      "ok": true,
+      "detail": "archive=(10, 23, 40) btn=(10, 23, 40) max|Δ|=0 (Toleranz ±2)"
+    },
+    {
+      "pruefung": "archive == .btn, Verlauf Mitte (Spalte x=4px)",
+      "ok": true,
+      "detail": "archive=(8, 19, 34) btn=(9, 20, 34) max|Δ|=1 (Toleranz ±2)"
+    },
+    {
+      "pruefung": "archive == .btn, Verlauf Fuss (Spalte x=4px)",
+      "ok": true,
+      "detail": "archive=(7, 16, 27) btn=(7, 15, 27) max|Δ|=1 (Toleranz ±2)"
+    },
+    {
+      "pruefung": "Vorsichtsknopf traegt einen Verlauf (oben != unten, nicht die deaktivierte Flaeche)",
+      "ok": true,
+      "detail": "oben=(10, 24, 42) unten=(7, 15, 26) max|Δ|=16"
+    },
+    {
+      "pruefung": "Beschriftung traegt die Vorsichtsfarbe, nicht die Standardfarbe",
+      "ok": true,
+      "detail": "archive=rgb(229, 72, 77) btn=rgb(233, 237, 242) (--caution == --danger == #E5484D)"
+    },
+    {
+      "pruefung": "Hover traegt einen eigenen Zustand (--btn-std-fill-hover), nicht denselben",
+      "ok": true,
+      "detail": "hover='linear-gradient(rgb(19, 42, 73), rgb(8, 18, 32))' ruhe='linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))'"
+    },
+    {
+      "pruefung": "nach dem Wegziehen des Zeigers ist der Ruhe-Zustand wieder da (Aufnahme stimmt)",
+      "ok": true,
+      "detail": "ruhe='linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))' erwartet='linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))'"
+    },
+    {
+      "pruefung": "Beschriftungskontrast ist NICHT schlechter als auf der alten grauen Plastik",
+      "ok": true,
+      "detail": "neu 4.38:1 (Text #E5484D auf (12, 28, 49)) gegen alt 3.36:1 (auf #2A313A) — WCAG-AA (4.5:1) fuer 14px/500 bleibt offen, siehe Docstring"
+    }
+  ]
+}
