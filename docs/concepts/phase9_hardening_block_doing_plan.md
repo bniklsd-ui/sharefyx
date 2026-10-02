@@ -124,7 +124,7 @@ und eine Größe ist bereits benannt.
 | Lock | Entscheidung | Begründung |
 |---|---|---|
 | **P9-V** | *(Nikinger, 2026-10-02)* **Kandidat (a): ein fünfter `_BUCKETS`-Eintrag `"doing": {"type": "task", "status": "doing"}`.** Damit wird **P9-P datiert eingeengt**: ein Eimer für einen Statuswert ist **Navigations-Vollständigkeit**, dieselbe Klasse wie `done` in P5 Step 7b (Kommentar `api.py:124–127`). Er ist keine Hervorhebung. P10 behält die prominente Darstellung auf der Übersicht, „aktuelle Aufgabe" und die Assignee-Anzeige bzw. den -Picker | Kosten gemessen: ein Rail-Ordner mehr pro Space, **immer** sichtbar, auch bei 0 (`tree.js:58` `renderFolders()` kennt keinen Zero-Skip). Ein Übersichts-Chip kommt **erst ab Zähler ≥ 1** dazu (`list.js:116` `if (!count) return`). Kein `storage/`-Touch, keine Vertragsänderung am `meta`-Payload, Zähler == Liste bleibt per Konstruktion wahr (`_overview()` ruft `store.search(**filters)` mit denselben Filtern auf, die `filterParams()` sendet). Verworfen sind (b) und (c), siehe §2.1 |
-| **P9-W** | **Drei Sprachebenen, nur die oberste wird übersetzt.** (1) Schema `STATUS_VALUES`: roher Wert `doing`. (2) API-Vertrag REST `/meta`, `/items`, `/overview` und MCP `search_items`/`get_item`: roh `status: "doing"` plus `assignee`. (3) UI: **nur** `BUCKET_LABELS.doing = "In Arbeit"`. Status-`<option>`, Listen-Metazeile, `roMeta` und `metaDigest` bleiben roh, wie heute für `open`/`done`/`active`/`archived` | Nikinger-Vorgabe 2026-10-02: die Übersetzung soll so sein, *„dass ein angeschlossenes LLM aus Ausgaben entnehmen kann, wem sie zugeteilt ist"*. Das verlangt, dass Ebene 1 und 2 nie übersetzt werden und das UI-Speichern `assignee` nicht verliert (P9-65). Eine Übersetzung aller Statuswerte hieße: neue `STATUS_LABELS`-Tabelle mit vier Konsumenten. Das ist ein eigener P10-Punkt, kein Teil des Lochs |
+| **P9-W** | *(abgeleitet aus der Nikinger-Vorgabe, vom Nikinger bestätigt 2026-10-02)* **Drei Sprachebenen, nur die oberste wird übersetzt.** (1) Schema `STATUS_VALUES`: roher Wert `doing`. (2) API-Vertrag REST `/meta`, `/items`, `/overview` und MCP `search_items`/`get_item`: roh `status: "doing"` plus `assignee`. (3) UI: **nur** `BUCKET_LABELS.doing = "In Arbeit"`. Status-`<option>`, Listen-Metazeile, `roMeta` und `metaDigest` bleiben roh, wie heute für `open`/`done`/`active`/`archived` | Nikinger-Vorgabe 2026-10-02: die Übersetzung soll so sein, *„dass ein angeschlossenes LLM aus Ausgaben entnehmen kann, wem sie zugeteilt ist"*. Das verlangt, dass Ebene 1 und 2 nie übersetzt werden und das UI-Speichern `assignee` nicht verliert (P9-65). Eine Übersetzung aller Statuswerte hieße: neue `STATUS_LABELS`-Tabelle mit vier Konsumenten. Das ist ein eigener P10-Punkt, kein Teil des Lochs |
 | **P9-X** | **`_BUCKETS`-Reihenfolge: `open`, `doing`, `done`, `note`, `archived`.** `archived` bleibt **letzter** Eintrag, `open` bleibt **erster** | `archived` zuletzt: `bucketFor()` (`list.js:544`) nimmt den ersten Treffer, Begründung im Kommentar `api.py:119–122`, gepinnt von `test_meta.py:60`. `open` zuerst: `app.js:295` fällt bei unbekanntem `state.filter` auf `names[0]` zurück, und `state.js:34` startet mit `filter: "open"`. `doing` steht zwischen `open` und `done`, weil das die Lebenslaufrichtung einer Aufgabe ist, und genau so liest man die Rail von oben nach unten |
 
 ### 2.1 Verworfene Kandidaten (Argument, kein Geschmack)
@@ -341,7 +341,7 @@ Ablauf: `python phase9_hardening/scripts/p9_doing_wegwerf.py start` →
 `sudo`, `systemctl` und `deploy.sh` sind ausschließlich Nikinger-Schritte (Hard Rule 9, P9-S).
 Reihenfolge am Deploy-Tag:
 
-1. **Release-Commit** (darf M3 vorbereiten, am Deploy-Tag):
+1. **Release-Commit — opencode/M3** (Nikinger-Festlegung 2026-10-02: M3 bearbeitet Badge und `UPDATE_LOG`, am Deploy-Tag, als eigener Commit nach dem Block-Commit):
    - `phase5_ui/webui/static/app.html:20` `v3.0.2` → `v3.1.0`
    - **neuer** Block `## <Deploy-Tag YYYY-MM-DD>` **oben** in `docs/UPDATE_LOG.md`, unter dem
      Format-Kommentar. **Jede Aussage eine einzige `- `-Zeile**: `parse_update_log()` liest jede
@@ -350,9 +350,9 @@ Reihenfolge am Deploy-Tag:
      - weitere Zeilen für die übrigen seit `v3.0.2` gebauten Steps (D2, E, G, `.toolbar-btn` …),
        jeweils eine Zeile. Den Wortlaut legt der Nikinger fest
    - `pytest` grün, `ui_budget` 5/5, Push
-2. `sudo /opt/sharefyx/… /deploy.sh main` (Pfad wie am 2026-09-18, siehe
+2. **Nikinger:** `sudo /opt/sharefyx/… /deploy.sh main` (Pfad wie am 2026-09-18, siehe
    `phase5_ui/scripts/deploy.sh` und Phase-8.6-Gate-Protokoll).
-3. `phase8_5_picker_release/scripts/health_gate.sh --expected-version=v3.1.0
+3. **Nikinger:** `phase8_5_picker_release/scripts/health_gate.sh --expected-version=v3.1.0
    --require-todays-update-log --expected-sha=<sha des Release-Commits>` → alle Prüfungen grün.
 4. **Bei diesem Deploy mitnehmen, weil es der erste mit Step F ist:** die Dauer des
    Index-Neuaufbaus am echten `DATA_ROOT` notieren (**P9-43**, V161 hat nur den synthetischen

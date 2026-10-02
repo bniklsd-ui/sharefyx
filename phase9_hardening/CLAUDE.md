@@ -107,6 +107,14 @@ und kein Service-Touch. `pytest` **1122 passed** (bereinigtes Env, 200,9 s), `do
 - Bestehender Konsistenztest `test_counts_match_the_item_list_for_the_same_bucket`: Er wäre für
   `doing` **vakuös** gelaufen (0 == 0), weil das Seed kein `doing`-Item hat. Der Plan ergänzt eins (T8).
 
-**Nächster Schritt:** opencode/M3 baut den Block nach Mini-Plan §4–§7 in einem Commit, mit
-Browser-Beleg 8/8 auf Wegwerf-Port 18776. Danach der Release-Commit und der Deploy `v3.1.0` durch
-den Nikinger (Mini-Plan §8), dabei P9-43 messen. Gate/Z wartet weiter auf A7/A8.
+**Abschluss der Session:** Der Nikinger hat den Plan bestätigt, **P9-W eingeschlossen**
+(„Status-Optionen bleiben roh" war von Claude Code abgeleitet). Commit und Push nach `origin/main`.
+
+**Nächste Schritte, mit Zuständigkeit:**
+1. **opencode/M3** baut den Block nach Mini-Plan §4–§7: ein Commit, Browser-Beleg 8/8 auf
+   Wegwerf-Port 18776.
+2. **opencode/M3** macht den Release-Commit am Deploy-Tag: Badge `v3.1.0` (`app.html:20`) und ein
+   neuer `## <Deploy-Tag>`-Block in `docs/UPDATE_LOG.md` (Mini-Plan §8.1).
+3. **Nikinger** führt `deploy.sh` und `health_gate.sh` aus und misst dabei P9-43.
+
+Gate/Z wartet weiter auf A7/A8.
