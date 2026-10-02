@@ -36,6 +36,20 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 
 ## Backlog (bewusst zurückgestellt, kein Phasen-Blocker)
 
+- **B17 — nicht alle Knöpfe tragen das Standard-Schema. Vom Nikinger bei der Sichtprüfung am
+  2026-10-02 als Restbefund notiert und die sechs `p9_trace_*`-Bilder damit abgenommen.**
+  **Gemessen am Markup und CSS, nicht geschmeckt:** `app.html` trägt 77 `<button>`/`<a>` mit einer
+  Button-Klasse. **62 laufen auf den Standard-Tokens** `--btn-std-*` — `.btn` (37), `.toolbar-btn` (11),
+  `.btn--icon` (4), `.pw-toggle` (7), `.account-nav` (3). **15 tragen noch eigene Flächen** und damit einen
+  zweiten bzw. dritten Tokensatz: **`.btn-primary` (13 Knöpfe)** auf `--accent-face-top/bottom` + `--accent-edge`
+  und **`.btn.action--caution` (2 Knöpfe)** auf der **alten** Familie `--btn-face-top/bottom`, `--btn-edge`,
+  `--btn-glow`, `--btn-lift`, `--btn-press` — genau die Familie, die der btn2-Block für `.btn` abgelöst hat.
+  **Kein Renderfehler:** alle sechs Tokens sind in `:root` definiert (verwaiste `var()`-Nutzung: 0), der Befund
+  ist also eine *Konsistenz*-Lücke, kein Bruch. Ob `.btn-primary` und `.action--caution` semantisch
+  abweichen **sollen** (Selection/Choice-Konvention v3: Aktion vs. Vorsicht), ist die offene Frage — die
+  Notiz des Nikingers sagt „noch nicht angepasst", also ist es bis auf Weiteres Restbefund, kein Fix.
+  **Kein Code in dieser Session angefasst** (kein `phase5_ui/webui/static/**`-Touch), Gehörenheit: der nächste
+  UI-Block, nicht Gate/Z.
 - **D1 — ESC im Vollbild schließt zusätzlich das Item.** Diagnose geklärt (macOS Safari,
   natives Vollbild über den grünen Knopf), Fix nicht — der gebaute
   `document.fullscreenElement`-Guard (Session 2026-09-23) sieht diesen Fall nicht, weil die
@@ -132,7 +146,14 @@ alles glatt, weil die Datei existierte und nur die Zahl im Kopf falsch war. Code
 **8/8 grün**, Probe und fünf der sechs Bilder neu erzeugt, `test_committed_probe_evidence.py` (4 Tests)
 hält das fest, **Gegenprobe 2 Verstöße → 3 rote Tests**. Vollständig im Korrekturabsatz weiter oben.
 
-**Nächster Schritt, unverändert die Zuständigkeiten des Nikinger:** (1) **Sichtung** der sechs
+**Sichtung vom 2026-10-02: erledigt.** Der Nikinger hat die sechs Bilder **abgenommen — mit der Notiz,
+dass noch nicht alle Knöpfe an das Schema angepasst sind** (B17 im Backlog, dort mit der gemessenen
+Klassenliste). Vor der Sichtung habe ich sie mit dem Vision-Wrapper quer gelesen; fünf Bilder trafen ihr
+Kriterium, Bild 05 verriet den Gegenlauf-Beleg. **Was ich daraus gelernt habe, ohne es zu vergrößern:** ein
+Restbefund, den ein Mensch sieht, muss nicht erst *wiederentdeckt* werden — er gehört mit der Messung ins
+Backlog, sonst steht er in zwei Sitzungen als Überraschung da.
+
+**Nächster Schritt, unverändert die Zuständigkeiten des Nikinger:** (1) ~~Sichtung~~ **erledigt**; es bleibt
 `p9_trace_*`-Bilder, Kriterien in `screenshots_latest/README.md`; (2) **Release-Commit + Deploy
 `v3.1.1`** — der Badge und der `##`-Block müssen am Deploy-Tag entstehen, ein heute datierter
 Block ließe das `deploy.sh`-Gate (P6-X) bei einem späteren Deploy abbrennen; (3) **A7+A8 in einer
