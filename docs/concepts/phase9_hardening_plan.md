@@ -950,7 +950,7 @@ leeres `assignee` · `P9-43` Index-Neuaufbau über den echten `DATA_ROOT` gelauf
 **[Stand 2026-09-30, nach Ausführung von Step F]** `P9-38` ✅ (18 Hunks, genau drei Dateien,
 die sechs Hartpfade leer) · `P9-39` ✅ (**23** Tests grün, nicht 9 — fünf der Test-Liste waren
 Verhaltenstests, die restlichen Wächter; `pytest` 1039 → 1062) · `P9-40` ✅ · `P9-41` ✅ ·
-`P9-42` ✅ · `P9-43` **⬜ offen, Nikinger-Schritt** (V161 hat den synthetischen Vorabwert) ·
+`P9-42` ✅ · `P9-43` **⬜ offen, Nikinger-Schritt** (V161 hat den synthetischen Vorabwert) **[2026-10-02] ✅ beim Deploy `v3.1.0` gemessen: ≤ 1,05 s für 197 Items am echten DATA_ROOT (Journal, Schema 3 → 4), Index danach `user_version 4` mit 197 Zeilen** ·
 `P9-44` ✅ (Lock **P9-U**, s. §8.4). **Zwei Zusicherungen, die nicht geplant waren und deshalb
 keine eigene `P9-`-Nummer bekommen** (P9-45 – P9-52 gehört Step G, sie hätten ihn kollidiert) —
 beide als Zeugen von `P9-39`: **kein `doing`-Item verlässt den Speicher-Pfad mit einer zweiten
