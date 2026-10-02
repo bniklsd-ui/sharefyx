@@ -5,7 +5,7 @@ read-when: Chronik einer älteren P9-Session gesucht — nicht beim normalen Arb
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-01 (**sechzehnte Rotation, achter Block** — Deploy verschoben (Befund 11: `doing` ist im Deploy-Fall im Status-Feld erreichbar und zählt in keinem Ordner), `.toolbar-btn` in Standardoptik mit Pixel-Beleg 13/13, vier Tailscale-Bilder geklärt; Head 41.306 B, Archiv 152.730 B) | updated: 2026-10-01 (**fünfzehnte Rotation, A4-Vorbereitung** — Step-A-Block (2026-10-01, Domain live) verbatim aus dem Head; Head 42.376 B → 34.795 B) | 2026-10-01 (**vierzehnte Rotation, Step A** — Step-B-Block verbatim aus dem Head; Head 41.707 B → 29.415 B) | 2026-09-30 (**dreizehnte Rotation, Step B** — Step-B-Block [polkit-Regel gebaut, V153 entschieden: sudoers ist unter NoNewPrivileges unbaubar; systemd 255 kennt nur die grobe `manage-units`-Aktion, deshalb JS-Regel mit Unit-Attribut; V153-Probe ohne tailscaled-Kontakt] im Head **angehängt**, Step-H-Block verbatim ins Archiv; Head 34.873 B → 28.685 B) | 2026-09-30 (**zwoelfte Rotation, Step H** — Step-H-Block [`fastmcp` exakt gepinnt `==3.4.7`, der Range-Pin hatte den Live-Release bereits lautlos auf 3.4.7 gezogen, V163 mit drei Codepunkten beantwortet, Wächter als Deploy-Riegel, Gegenprobe 4 Verstöße → 7 rot] im Head **angehängt**, Step-G-Block verbatim ins Archiv; Head 33.175 B → 26.210 B) | 2026-09-30 (**elfte Rotation, Step G** — Step-G-Block [Lösch-Ort war unbaubar, TLS-Wegwerf für den Browserbeleg, 14/14] im Head **angehängt**, Step-F-Block verbatim ins Archiv; Head 32.668 B → 25.740 B) | 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
+updated: 2026-10-02 (**siebzehnte Rotation, neunter Block** — der achte Block (Deploy verschoben, Befund 11) wandert verbatim hierher; neuer Head-Block = Mini-Plan doing-Block, Lock P9-V) | 2026-10-01 (**sechzehnte Rotation, achter Block** — Deploy verschoben (Befund 11: `doing` ist im Deploy-Fall im Status-Feld erreichbar und zählt in keinem Ordner), `.toolbar-btn` in Standardoptik mit Pixel-Beleg 13/13, vier Tailscale-Bilder geklärt; Head 41.306 B, Archiv 152.730 B) | updated: 2026-10-01 (**fünfzehnte Rotation, A4-Vorbereitung** — Step-A-Block (2026-10-01, Domain live) verbatim aus dem Head; Head 42.376 B → 34.795 B) | 2026-10-01 (**vierzehnte Rotation, Step A** — Step-B-Block verbatim aus dem Head; Head 41.707 B → 29.415 B) | 2026-09-30 (**dreizehnte Rotation, Step B** — Step-B-Block [polkit-Regel gebaut, V153 entschieden: sudoers ist unter NoNewPrivileges unbaubar; systemd 255 kennt nur die grobe `manage-units`-Aktion, deshalb JS-Regel mit Unit-Attribut; V153-Probe ohne tailscaled-Kontakt] im Head **angehängt**, Step-H-Block verbatim ins Archiv; Head 34.873 B → 28.685 B) | 2026-09-30 (**zwoelfte Rotation, Step H** — Step-H-Block [`fastmcp` exakt gepinnt `==3.4.7`, der Range-Pin hatte den Live-Release bereits lautlos auf 3.4.7 gezogen, V163 mit drei Codepunkten beantwortet, Wächter als Deploy-Riegel, Gegenprobe 4 Verstöße → 7 rot] im Head **angehängt**, Step-G-Block verbatim ins Archiv; Head 33.175 B → 26.210 B) | 2026-09-30 (**elfte Rotation, Step G** — Step-G-Block [Lösch-Ort war unbaubar, TLS-Wegwerf für den Browserbeleg, 14/14] im Head **angehängt**, Step-F-Block verbatim ins Archiv; Head 32.668 B → 25.740 B) | 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
 ---
 
 # Phase 9 — Sessions Archive
@@ -15,6 +15,128 @@ trägt immer genau einen `## Session stopped`-Block, ältere Blöcke wandern ver
 Vorsatz: nichts abtippen, alles per Skript mit vier Gegenproben (Schnitt verlustfrei, neuer
 Head trägt genau einen Block, alle bewegten Blöcke im Archiv byte-identisch, Archivbestand
 unangetastet).
+
+## Session stopped — 2026-10-01 ( achter Block: Deploy **verschoben** (Nikinger-Entscheidung), `.toolbar-btn` in Standardoptik, vier Tailscale-Bilder geklärt)
+
+**Diese Runde hat den Deploy nicht vorbereitet, sondern abgesagt — mit einem Messbefund als
+Begründung.** Der Auftrag der Runde war Punkt 1 der Übergabe (Deploy `v3.1.0`, Badge +
+`docs/UPDATE_LOG.md` im Deploy-Commit). Beim Durchgehen des Codes für einen **ehrlichen**
+Changelog-Eintrag kam der Befund, der ihn kippt.
+
+**Befund 11 — `doing` ist im Deploy-Fall für einen Menschen erreichbar, und genau seine
+Eigenschaft ist der offene Befund.** `models.py :: STATUS_VALUES["task"]` trägt seit Step F
+`{open, doing, done, archived}`; `editor.js :: populateStatusSelect()` füllt das Status-Feld der
+Kopfdaten aus `state.meta.status_values[itemType]` — **rohe Werte, unübersetzt**. Nach dem Deploy
+kann ein Mensch also `doing` wählen. Und dann: `bucketFor()` (`list.js`) nimmt den **ersten**
+passenden `_BUCKETS`-Eintrag und vergleicht `f.status === item.status` exakt; `_overview()`
+(`api.py`) zählt je Bucket per `store.search(**filters)`. Ein Wert, den keiner der vier Einträge
+kennt, passt auf keinen ⇒ **die Aufgabe erscheint in keinem Ordner-Zähler und in keinem der vier
+Ordner der Rail**, findet sich aber über „Alle Items" und in der Suche. Das ist der seit dem
+2026-09-30 bekannte Befund P9-P, der laut Plan als Darstellungsentscheidung nach P10 wanderte —
+als **„in keinem UI-Pfad sichtbar"** war das vertretbar, per Deploy wäre es **eine Eigenschaft,
+mit der ein Mensch rechnen muss**. `assignee` ist davon nicht betroffen (kein UI-Feld, nur
+MCP/REST — `tools.py :: update_item(assignee=…)`, serialisiert in `summary_to_json`/`item_to_json`).
+
+**Nikinger-Entscheidung 2026-10-01: Deploy verschieben, Mini-Plan von Opus (Claude Code) für den
+`doing`-Fix, danach implementieren + deployen.** Damit ist **kein** Release-Vorbereitungs-Commit
+gefallen, und zwar aus zwei gemessenen Gründen, nicht aus Vorsicht: (a) der `## <Datum>`-Block in
+`docs/UPDATE_LOG.md` wäre auf den Deploy-Tag datiert — ein heute geschriebener Eintrag lässt das
+`deploy.sh`-Gate (P6-X, `today_utc`/`today_local`) genau dann abbrennen, wenn der Deploy Tage
+später kommt; (b) der Changelog-Text ist ohne die Entscheidung über `doing` nicht schreibbar, und
+ein Eintrag, den man später ersetzt, steht zwei Commits lang in einem Menschen-Banner.
+
+**Was die Release-Vorbereitung dann umfasst** (unverändert gültig, nur nicht heute fällig): Badge
+`.rail__version` in `phase5_ui/webui/static/app.html:20` `v3.0.2` → `v3.1.0` (P8-K-Schema „bump je
+Deploy, nie zurück"; die Vorgänger-Runden sind `6f19a8f` und `1ad2665`, beide **eigene Commits**
+mit Badge + UPDATE_LOG-Block, nicht der Deploy selbst), neuer `## <Deploy-Tag>`-Block in
+`docs/UPDATE_LOG.md`, danach `deploy.sh main` und
+`phase8_5_picker_release/scripts/health_gate.sh --expected-version=v3.1.0 --require-todays-update-log
+--expected-sha=<sha>` (Gates 5/7/8 — Gate 5 liest `.rail__version` aus `/ui/static/app.html`, nicht
+aus `/ui/login`).
+
+**Punkt 2 der Übergabe — `.toolbar-btn` — ist gebaut, und Punkt 4b mit entschieden.** Die
+Formatierhilfen der Textleiste waren nach `.btn` und `.account-nav` der **letzte** echte Knopf auf
+der alten grauen Plastik (`--btn-face-top/bottom`, `--btn-edge`, plus ein äußerer Schlagschatten,
+den `.btn` nicht mehr trägt). `app.css :: .toolbar-btn` trägt jetzt dieselben deckenden
+`--btn-std-*`-Tokens, `:hover`/`::active` die jeweiligen Fill-Varianten; **Maße und Typografie
+bleiben** (24 px, Monospace, `--text-muted`), und **`:disabled` bleibt auf `--surface`** — in der
+Vorschau sind die Hilfen abgeschaltet, ein deaktivierter Standardknopf soll „inaktiv lesbar"
+heißen und nicht „Standardknopf in einem anderen Zustand". `.rail__glyph` (der 20×20-Badge am
+Space) bleibt bewusst auf der alten Optik: ein Badge ist kein Knopf. Konvention in
+`phase8_ui_graph/CLAUDE.md` §Was diese Konvention NICHT macht ergänzt (zweite Runde am selben Tag).
+
+**Beleg ist die Messung, das Bild die Geschmacksfrage.** Neu: `phase9_hardening/scripts/p9_btn2_toolbar_probe.py`
+(Playwright gegen die eigene TLS-Wegwerf-Instanz `p9_step_g_wegwerf.py`, Port 18775, eigenes
+`DATA_ROOT`, Stopp ausschließlich über die PID-Datei). **13/13 grün**, Ergebnis in
+`phase9_hardening/probes/p9_btn2_toolbar_probe.json`. **Gegenprobe:** ein eingebauter Verstoß (alte
+Plastik wiederhergestellt) ⇒ **5 rote Prüfungen**, danach zurückgebaut und 13/13 wieder grün. Geprüft
+wird zweistufig, weil „dasselbe Bild" zwei Fragen hat: die **gerechnete Fläche** (Stringgleichheit
+von `backgroundImage` gegen `.btn` im selben Panel) und die **Interpolation** (drei Höhen in einer
+glyphenfreien Spalte, ±2 — die beiden Knöpfe sind 24 px bzw. 41 px hoch, dieselbe relative Position
+landet auf Zeile 17 gegen Zeile 29; ±1 würde hier die PNG-Rundung prüfen, nicht die Farbe) plus der
+Randpixel bei absolutem x=0. Der deaktivierte Zustand wird **eigenschaftsbasiert** geprüft — flach
+(oben == unten) statt „heller", was eine falsche Behauptung gewesen wäre (gemessen Δsumme 11).
+
+**Drei Fehler, die diese Probe selbst gemacht hat — alle drei von der Sorte, die dieses Repo
+schon viermal teuer geworden ist** (P8.6 Block H, P9 Step G, Step B, A4-Vorbereitung): **ein
+Wächter, der etwas anderes prüft als er behauptet.** (a) Die Vorbedingung
+`count() == 1` für `#home-button[aria-current]` war **wertlos**: CSS-/DOM-Selektoren matchen ein
+Attribut, nicht seinen Wert — der Knopf trug `aria-current="false"` und die Probe verglich die
+schwarze Rail `(0,0,0)`; jetzt `get_attribute(...) == "true"`, geprüft **vor** der
+Zustandsänderung, weil der Knopf nur in der Übersicht aktiv ist. (b) Der erste Pixelvergleich traf
+bei `fx = fy = 0.5` die **Beschriftung** von „Anhängen" (Zeile h/2 trägt `(128,196,242)`,
+`(233,230,203)` — Antialiasing einer Schrift, Δ 34 zum Knopf daneben); jetzt feste Spalte x = 4 px.
+(c) Die Verlaufsmessung des **aktiven** Knopfs stand im Deaktiviert-Block und maß zweimal denselben
+Zustand — erkannt am roten Ergebnis, weil oben == unten == `(20,24,29)` die Farbe von `--surface`
+ist, nicht die des Verlaufs. Dazu die Produktinvariante, die (b) und (c) beide ausgelöst hat: der
+Editor öffnet per P5-Entscheidung **in der Vorschau**, die Formatierhilfen sind dort also
+`:disabled` — jetzt behauptet (Text des Umschalters + `is_disabled()`), nicht angenommen.
+
+**Punkt 4b — die fünf unversionierten Tailscale-Dateien sind entschieden.** Vier PNGs lagen als
+Kopien mit Leerzeichen im Dateinamen in `screenshots_latest/`: jetzt versioniert als
+`docs/screenshots/p9_step_a_01_machines.png`, `02_add_rule_dialog.png`, `03_add_rule_fertig.png`,
+`04_policies.png` (Infra-Beleg zu `RUNBOOK_STEP_A.md` §A3, **keine Sichtprüfung der Oberfläche**,
+deshalb nicht in der Schnellansicht). Die fünfte Datei, `Machines - Tailscale.html`, ist
+**gelöscht**: die gespeicherte Seite war die leere SPA-Hülle (`<div id="browser-support">` ohne
+Inhalt, `<script id="tailscale-api-prefetch">{}</script>`, 2,7 KB, keine Geheimnisse — geprüft,
+nicht vermutet). Eine leere HTML-Hülle ist kein Beweis; sie ist nur eine Datei, die jemand irgendwann
+öffnet und für einen Beleg hält. Zusätzlich `screenshots_latest/` rotiert: die drei
+`p9_step_e_*`-Links raus, drei `p9_btn2_*`-Links rein (Step E ist als Abnahmebeleg erledigt, die
+offene Sichtfrage ist die Knopfoptik) — die Rotation macht das Skript-Kit laut eigener README
+selbst, ohne Rückfrage.
+
+**Zwei neue Wächter** in `phase5_ui/tests/test_static_routes.py` (beide mit Gegenprobe):
+`test_toolbar_buttons_wear_the_standard_look` (alle vier Zustände nennen die richtigen Tokens, und
+`--btn-face*`/`--btn-edge`/`--btn-glow` kommen im Block nicht mehr vor) und
+`test_rail_glyph_is_a_badge_and_keeps_the_plastic` (das Gegenteil, als Markierung: wer die alte
+Optik zum dritten Mal wegwirft, liest hier zuerst, warum sie bleiben darf). **Gegenprobe mit vier
+eingebauten Verstößen → 2 rote Tests**, danach zurückgebaut.
+
+| Gegenstand | Nachweis |
+|---|---|
+| **Befund 11** | `editor.js :: populateStatusSelect` (rohe `status_values`) + `api.py :: _BUCKETS` / `_overview()` + `list.js :: bucketFor()` — gelesen, nicht aus dem Plan übernommen |
+| **`.toolbar-btn`** | `p9_btn2_toolbar_probe.py` **13/13** (`probes/p9_btn2_toolbar_probe.json`), Gegenprobe 1 Verstoß → **5 rot**; 3 Bilder `docs/screenshots/p9_btn2_0{1,2,3}_*.png` |
+| **Tests** | `phase5_ui/tests/test_static_routes.py` +2, Gegenprobe 4 Verstöße → 2 rot; `pytest` **1122** (1120 + 2) |
+| **Bestand** | `ui_budget` **5/5** (153,0 KB, app.css 26,5 KB gzip), `doc_health` **0**, Tabu-Pfad-Diff leer, **kein `systemctl`, kein `pkill -f`, kein Eingriff in den laufenden Dienst** — die Wegwerf-Instanz nur über ihre PID-Datei gestoppt |
+| **Doku-Hygiene** | Phase-8-Head §Konvention ergänzt · `docs/screenshots/README.md`-Card + `screenshots_latest/README.md` (Tabelle + `updated:`) · `docs/INDEX.md` · Wurzel-`CLAUDE.md` — alles im selben Commit |
+
+**Offen und deine Entscheidung:** der **Mini-Plan für `doing`** (Opus über Claude Code). Zwei
+Kandidaten stehen im Code kommentiert, beide sind Darstellungsentscheidungen und damit P10-Arbeit
+waren (P9-P): (a) ein fünfter `_BUCKETS`-Eintrag ⇒ **ein Rail-Ordner mehr** plus Chip in der
+Übersicht (dieselbe Hervorhebung, die P9-P an P10 verwies) und ein unübersetztes Label;
+(b) „Offen" als Menge `{open, doing}` ⇒ vier Rail-Einträge bleiben, aber der `meta`-Vertrag ändert
+sich und **zwei** Konsumenten müssen dieselbe Mengenprüfung tragen (`list.js :: bucketFor` und
+`store.py`-Vergleich in `_overview()`) — eine **zweite** Contract-Öffnung außerhalb von P9-G.
+Ein dritter, im Repo noch nicht bewerteter Weg: das Status-`<select>` **nicht** mit `doing` füllen,
+sondern einen vorhandenen Wert überschreiben lassen („In Arbeit" ist eine Ansicht, kein Wert) —
+dann ändert sich kein Schema, aber es geht wieder an dieselbe Produktentscheidung zurück, die der
+Plan einmal getroffen hat.
+
+**Nächster Schritt:** Mini-Plan abwarten, dann dessen Umsetzung; **erst danach** die
+Release-Vorbereitung (Badge + `## <Deploy-Tag>`-Block) und der Deploy. Gate/Z wartet weiter auf
+A7/A8 — und A7a (die offene Frage vom 2026-10-01, `ALLOWED_HOSTS` vorziehen) ist durch die
+Deploy-Verschiebung **nicht** dringlicher geworden: dort wechselt kein `resource`, beide
+Connectoren blieben gültig, und der Restart ist deine Sache.
 
 ## Session stopped — 2026-10-01 (siebter Block, A4-Vorbereitung: zwei neue Befunde, ein Vorlagen-Defekt, 5 neue Wächter)
 
