@@ -9,6 +9,14 @@
      (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
+## 2026-10-02
+- Aufgaben können jetzt den Status „In Arbeit" bekommen und tauchen in einem eigenen Ordner „In Arbeit" in der Navigation auf — vorher war eine so markierte Aufgabe in keinem einzigen Ordner mehr auffindbar.
+- Claude kann einer Aufgabe jetzt zuweisen, wer sie übernimmt; die Zuweisung steht in den Kopfdaten und überlebt das Bearbeiten im Browser.
+- Notizen und Aufgaben lassen sich jetzt wirklich löschen statt nur zu archivieren — es fragt zweimal nach, beim zweiten Mal muss der Titel abgetippt werden. In der Oberfläche lässt sich ein gelöschtes Item nicht zurückholen.
+- Die Verknüpfungs-Karte springt bei jeder Änderung nicht mehr neu an, und bekannte Notizen behalten ihren Platz.
+- Ziehst du eine Notiz in der Navigation auf den Space-Namen, landet sie wieder auf der obersten Ebene des Space statt in einem Unterordner.
+- Die Formatierleiste im Editor sieht jetzt genauso aus wie die übrigen Knöpfe statt als eigene graue Fläche.
+
 ## 2026-09-18
 - Die Übersicht zeigt deine Spaces jetzt direkt neben der Verknüpfungs-Karte statt darüber — beides auf einen Blick, kein Umschalten mehr nötig.
 - Ein Klick auf eine Notiz oder einen Punkt in der Karte öffnet den Editor an derselben Stelle; Escape oder das Kreuz oben rechts bringt dich sauber zur Karte zurück.
