@@ -421,7 +421,13 @@ die Current-state-Sektion der Wurzel-`CLAUDE.md` ist **verworfen**; stattdessen 
   einzige Stelle ist, an der Skripte leben dürfen, die zur Phase gehören.
   **Voraussetzung für Venv-Aufruf:** `requests` muss im Projekt-venv
   installiert sein (`.venv/bin/pip install requests`, eine Zeile, hier
-  durchgeführt). **Timeout 600 s** — Cold-Start (Modell-Load 30–60 s +
+  durchgeführt). **[2026-10-02 Korrektur, P9]:** „installiert" hieß nur
+  *von Hand ins Dev-venv*, kein `pyproject.toml` deklariert `requests`. Das
+  frische Release-venv von `deploy.sh` hat es nicht, und die P9-C6-Tests auf
+  `mcp_local_vision_server.py` brachen dort den `v3.1.0`-Deploy ab. Der
+  MCP-Server ist seitdem stdlib-only (`urllib`), **dieses CLI-Skript braucht
+  `requests` weiterhin** — aus einem Release-venv läuft es nicht.
+  **Timeout 600 s** — Cold-Start (Modell-Load 30–60 s +
   Vision-Encoder 5–10 s + Text-Decoding 30–60 s = 80–130 s auf i5-14600KF ohne
   GPU); Steady-State reichen 120 s.
 

@@ -28,8 +28,10 @@ SCRIPT = REPO_ROOT / "phase8_6_ui_polish" / "scripts" / "mcp_local_vision_server
 def mod():
     """Import the script as a module without triggering its `__main__` guard.
 
-    `requests` is in the project venv (Hard Rule 7: no install per test) --
-    not a network call is made here, the import is enough.
+    The script is stdlib-only since 2026-10-02 -- it used to import `requests`,
+    which only the hand-grown dev venv had; the fresh release venv of `deploy.sh`
+    did not, and these tests aborted the v3.1.0 deploy. No network call is made
+    here, the import is enough.
     """
     spec = importlib.util.spec_from_file_location("mcp_local_vision_server", SCRIPT)
     m = importlib.util.module_from_spec(spec)
@@ -87,18 +89,18 @@ def test_handle_tools_call_reads_current_endpoint_not_env(mod, monkeypatch):
     )
 
     class _FakeResp:
-        status_code = 200
-        text = ""
-        def json(self_inner):
-            return {"response": "ok"}
-        def raise_for_status(self_inner):
-            pass
+        def __enter__(self_inner):
+            return self_inner
+        def __exit__(self_inner, *exc):
+            return False
+        def read(self_inner):
+            return b'{"response": "ok"}'
 
-    def fake_post(url, json, timeout):
-        captured["url"] = url
+    def fake_urlopen(req, timeout):
+        captured["url"] = req.full_url
         return _FakeResp()
 
-    monkeypatch.setattr(mod.requests, "post", fake_post)
+    monkeypatch.setattr(mod.urllib.request, "urlopen", fake_urlopen)
 
     with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as f:
         f.write(png_bytes)

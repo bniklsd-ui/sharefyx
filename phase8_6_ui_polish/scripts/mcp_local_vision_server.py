@@ -9,8 +9,14 @@ call this tool with the saved path.
 
 Protocol: MCP (Model Context Protocol) JSON-RPC over stdio. stderr is for logs
 (Hard Rule 7 -- stdout only carries MCP responses). No external SDK -- just
-stdlib + requests (already in the project venv). Implementation is intentionally
-small; the existing `vision_ollama.py` CLI wrapper covers ad-hoc use.
+stdlib only. Implementation is intentionally small; the existing
+`vision_ollama.py` CLI wrapper covers ad-hoc use.
+
+[2026-10-02 Korrektur, P9 Deploy-Abbruch]: bis heute stand hier "stdlib + requests
+(already in the project venv)". Das stimmte nur fuer das Dev-venv, in das `requests`
+am 2026-09-10 (P8.6 Step V) von Hand installiert wurde; kein pyproject deklariert es.
+`deploy.sh` baut pro Release ein frisches venv, die C6-Tests brachen dort mit
+`ModuleNotFoundError` ab und stoppten den v3.1.0-Deploy. Jetzt: `urllib.request`.
 
 Exit codes (Hard Rule 7): 0 on graceful shutdown, 2 on protocol error,
 3 on Ollama unreachable, 4 on tool error.
@@ -33,8 +39,8 @@ import os
 import sys
 from pathlib import Path
 from typing import Any
-
-import requests
+import urllib.error
+import urllib.request
 
 SERVER_NAME = "local_vision"
 SERVER_VERSION = "1.0.0"
@@ -194,17 +200,25 @@ def call_ollama(
     payload = {"model": model, "prompt": prompt, "images": [b64], "stream": False}
     log(f"POST {url} model={model} prompt={len(prompt)}c image={p.name} ({len(data)}B)")
 
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
     try:
-        resp = requests.post(url, json=payload, timeout=timeout_s)
-    except requests.RequestException as exc:
+        with urllib.request.urlopen(req, timeout=timeout_s) as resp:
+            raw = resp.read()
+    except urllib.error.HTTPError as exc:
+        # urlopen raises on 4xx/5xx -- the status branch lives here, not after.
+        snippet = exc.read()[:300].decode("utf-8", "replace")
+        raise RuntimeError(f"Ollama HTTP {exc.code}: {snippet}") from exc
+    except OSError as exc:
+        # URLError and socket timeouts are both OSError subclasses.
         raise RuntimeError(f"Ollama unreachable at {endpoint}: {exc}") from exc
 
-    if resp.status_code != 200:
-        snippet = resp.text[:300]
-        raise RuntimeError(f"Ollama HTTP {resp.status_code}: {snippet}")
-
     try:
-        body = resp.json()
+        body = json.loads(raw)
     except ValueError as exc:
         raise RuntimeError(f"Ollama returned non-JSON: {exc}") from exc
 
@@ -325,9 +339,8 @@ def main() -> int:
 
     if args.check:
         try:
-            r = requests.get(endpoint.rstrip("/") + "/api/tags", timeout=5)
-            r.raise_for_status()
-            models = [m["name"] for m in r.json().get("models", [])]
+            with urllib.request.urlopen(endpoint.rstrip("/") + "/api/tags", timeout=5) as r:
+                models = [m["name"] for m in json.loads(r.read()).get("models", [])]
             log(f"Ollama reachable, {len(models)} model(s) installed (endpoint={endpoint})")
             for n in models:
                 log(f"  - {n}")
