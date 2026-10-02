@@ -122,9 +122,33 @@ def test_a_second_updated_prefix_aborts_instead_of_rotating_half_the_chain(repo)
 
     result = run_script(repo)
     assert result.returncode == 1
-    assert "zweites 'updated: '-Praefix" in result.stderr
+    assert "Faden, der mit 'updated: ' beginnt" in result.stderr
     assert index.read_text(encoding="utf-8") == original
     assert (repo / "docs" / "INDEX_UPDATES_ARCHIVE.md").read_text(encoding="utf-8") == archive_original
+
+
+def test_a_chain_may_mention_the_prefix_in_its_own_prose(repo):
+    """Gegenprobe zur Probe oben, und die kam einen Tag später als echter Lauf: der
+    INDEX-`updated:`-Eintrag vom 2026-10-02 *beschreibt* den Defekt und nennt dabei die Zeichenkette
+    ``updated: ``. Die erste Fassung der Gegenprobe suchte das nackte `updated: ` und hat den Skript
+    genau daran blockiert — ein Wächter, der blinder ist als seine Behauptung. Geprueft wird darum
+    nur der Fadenanfang `` | updated: <ISO>``."""
+    index = repo / "docs" / "INDEX.md"
+    index.write_text(
+        INDEX_FIXTURE.replace(
+            " | 2026-09-19 (P9 aufgenommen) |",
+            " | 2026-09-19 (rotierte 1 von 3, weil ein Faden mit `updated: `-Praefix durchging) |",
+        ),
+        encoding="utf-8",
+    )
+    result = run_script(repo)
+    assert result.returncode == 0, result.stderr
+    assert "Kein Faden der Kette beginnt mit 'updated: '" in result.stdout
+    # Der Eintrag mit der Erwaehnung ist der aeltere von zweien — er wandert ins Archiv, und genau
+    # dort muss der Hinweis landen (die Erklaerung des Defekts geht nicht verloren, nur aus der Kette).
+    archive_text = (repo / "docs" / "INDEX_UPDATES_ARCHIVE.md").read_text(encoding="utf-8")
+    assert "rotierte 1 von 3" in archive_text
+    assert "rotierte 1 von 3" not in index.read_text(encoding="utf-8")
 
 
 def test_a_clean_three_entry_chain_rotates_but_the_newest(repo):

@@ -32,11 +32,12 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | H | Abhängigkeits-Hygiene | 🟡 **code-complete 2026-09-30 (M3)** — **[2026-10-02] Nachtrag Deploy-Abbruch:** der erste `v3.1.0`-Deploy brach in `pytest` im Release ab (4 failed + 5 errors, alle `ModuleNotFoundError: requests` in `test_mcp_local_vision_server.py`) — `requests` war nie deklariert, nur von Hand im Dev-venv; `mcp_local_vision_server.py` jetzt stdlib-only (`urllib`), Beleg im frischen venv 1128/1128 (Session-Block 2026-10-02, elfter). — **die Plan-Prämisse „installiert ist 3.4.4" war falsch, und genau das war der Fund:** der Live-Release lief bereits auf **3.4.7** (read-only gemessen an `/opt/sharefyx/current/.venv`), weil `deploy.sh:153` pro Release ein frisches venv baut und der Pin ein **Range** war — der stumme Patch-Drift, den P3-D verbieten wollte, hatte also schon stattgefunden. `phase2_mcp/pyproject.toml` pinnt jetzt **`fastmcp==3.4.7`** exakt (P3-D/P4-R, beide seit 2026-08 beschlossen und nie umgesetzt) + datierter Kommentar; **V163 beantwortet** (drei Codepunkte: CIMD per P4-E abgeschaltet, `token_endpoint_auth_methods_supported: ["none"]`, kein `OAuthProxy`/`JWTVerifier` — der Fix ist inert, der Bump ist Hygiene) · **P9-55 in der Form abweichend** (`==3.4.7` statt Range, Nikinger-Entscheidung 2026-09-30) · 5 Wächter in `phase9_hardening/tests/test_step_h_deps.py`, einer vergleicht installiert-gegen-deklariert und **läuft im Release-venv mit** (`deploy.sh:169`) — Gegenprobe 4 Verstöße → 7 rote Assertions. `pytest` 1079 → **1084**, `ui_budget` 5/5. **Benannt, nicht gebaut:** das transitive `mcp` bleibt ungepinnt (Dev 1.28.1, Live 1.30.0), P9-Backlog-Kandidat. Lock P9-R unangetastet, V79 bleibt |
 | doing | Fünfter Eimer „In Arbeit" (Lock **P9-V**, Kandidat (a)) — Voraussetzung für den Deploy `v3.1.0` | ✅ **live seit 2026-10-02 (`v3.1.0`, Release `5414cb7`, Health-Gate 9/9)** — `_BUCKETS["doing"]` (Reihenfolge `open, doing, done, note, archived`, P9-X) + Rail-Label „In Arbeit" (P9-W: **nur** die Navigationsebene übersetzt, Schema/REST/MCP bleiben roh) + der Step-F-Wächter **umgedreht** (`test_the_bucket_hole_for_doing_is_named_not_silently_fixed` → `test_the_doing_bucket_closes_the_hole`, Docstring mit beiden Richtungen) · **6 neue Tests** (T1/T2/T6 in `phase9_hardening/tests/test_doing_bucket.py`, T3/T4/T5 in `phase5_ui/tests/test_overview.py`), `pytest` 1122 → **1128** · **Gegenlauf 5 Verstöße**: G1 → 7 rot, G2 → 2, G3 → 2, G4 → 1, G5 → 1 · **Browser 11/11** gegen eine eigene TLS-Wegwerf-Instanz (Port 18776), Kernbeleg S6: Rail-Zähler springen **ohne Reload** von `1/1` auf `0/2` · **Browser-Gegenlauf 7 rot** (nur D1/D2 zurückgenommen) · Tabu-Diff leer, **keine zehnte P1-Contract-Öffnung** (V174: `phase1_storage/CLAUDE.md` §Geerbte Contracts bleibt unberührt) · 4 Screenshots `p9_doing_01..04_*` · **[2026-10-02] Release-Commit für den Deploy `v3.1.0` steht: Badge `v3.0.2` → `v3.1.0` (`app.html:20`) + neuer `## 2026-10-02`-Block in `docs/UPDATE_LOG.md` (6 Zeilen, jede eine physische Zeile — am echten `parse_update_log()` gegengeprüft, nicht am Augenschein), `pytest` 1128, `ui_budget` 5/5** — **der Deploy selbst bleibt Nikinger-Schritt** (sudo, Hard Rule 9), die Health-Checks sind reine `curl`-GETs ohne Rechte und laufen durch M3 (Mini-Plan §8) |
 | trace | Nachvollziehbarkeit: `assignee` sichtbar (UI + MCP, vom Client gefüllt, P9-Z) + `updated_by` + Git-Autor (P9-AA–AC); **zehnte P1-Contract-Öffnung** | 🟡 **code-complete 2026-10-02 (M3), nicht live-bewiesen** — Locks P9-Y–AD · **kein Index-Schema-Sprung** (kein Feld im Index, weil niemand danach filtert ⇒ beim Deploy **kein** Neuaufbau, anders als Step F) · Kern: `updated_by` in `_KNOWN_FIELDS` + `_SYSTEM_MANAGED_FIELDS`, `actor: str = ""` an allen neun Store-Schreibmethoden, **leerer Akteur = unverändert** (P9-AB, lieber der alte wahre Wert als ein erfundener), `history.commit(author=)` mit `--author` (Committer bleibt `Space Server`) · Adapter: `actor=principal.space` (7 Aufrufe) / `actor=session.space` (9 Aufrufe) · UI: „bei X" in der Listenzeile, Feld **„Bei"** mit `<datalist>`, Lesezeile **„Zuletzt geändert von X"**, P9-Z füllt **nur bei leerem** Feld · **24 neue Tests** (gezählt, nicht addiert: 5 `test_store.py` + 4 `test_history.py` + 6 `test_trace_block.py` + 4 `test_tools.py` + 1 `test_api.py` + 4 `test_static_routes.py`), `pytest` 1128 → **1152** · **Gegenlauf G1 → 1 · G2 → 2 · G3 → 1 · G4 → 2 · G5 → 4 rot**, alle danach zurückgebaut und grün · **Browser 8/8** gegen eine eigene **Zwei-Principalen**-TLS-Wegwerf-Instanz (Port 18777, echte Git-Historie), Kernbeleg: B sieht „Zuletzt geändert von A", schreibt selbst, und danach steht B — während „Bei" **A** bleibt; **Gegenlauf: ohne die Leer-Prüfung springt der Assignee von A auf B** (S5 rot) · 6 Screenshots `p9_trace_01..06_*`, `screenshots_latest/` umgehängt · **ein Bestandstest mitgezogen** (`test_app.py`, exakte Quittungs-Assertion) und **ein Wächter datiert zugeschnitten statt entfernt** (`test_step_f_schema.py`, siehe dort) — Deploy bleibt Nikinger-Schritt |
+| E (Extra) | **Buttons ans Schema** (B17): die 15 Knöpfe mit eigenen Flächen auf die Standard-Tokens `--btn-std-*` umstellen | ⬜ **als potentieller Extra-Schritt vorgeschlagen, nicht entschieden (Nikinger 2026-10-02)** — Umfang und Reihenfolge stehen in §Backlog B17, die gemessene Klassenliste ist dort vollständig (`.btn-primary` 13, `.btn.action--caution` 2 von 77). **Die offene Frage ist die Reihenfolge, nicht die Absicht:** ob die beiden Klassen am Schema *teilhaben* sollen (Konvention v3: Aktion/Vorsicht bleiben eigene Flächen) oder ob `.action--caution` die alte `--btn-face-*`-Familie verlassen muss, entscheidet der Nikinger — solange ist das ein Design-Schritt und kein Aufräumen · **je 1 UI-Block plus Pixel-Beleg im Muster `p9_btn2_toolbar_probe.py`** (13/13 mit Gegenprobe) · **kein `storage/`-Berührungsrisiko**, reiner `app.css`-Block |
 | Gate/Z | Abnahme, Closeout | 🟡 **Doku-Hälfte erledigt 2026-10-02 (M3)** — die zwei benannten Softcap-Überschreitungen sind behoben (§Geerbte Contracts → `phase1_storage/CONTRACTS_ARCHIVE.md`, §Abnahmestand → `phase5_ui/ABNAHME_MATRIX_ARCHIVE.md`, beide verbatim mit Roundtrip-Gegenprobe), die INDEX-`updated:`-Kette per P9-L rotiert · **ein Skript-Defekt dabei gefunden und behoben**: `rotate_index_updates.sh` rotierte 1 von 3 Einträgen, weil die Kette einen Faden mit `updated: `-Präfix trug, den der Split-Anker nicht sieht → Gegenprobe (e) + 2 Tests + datierte Korrektur · **offen:** Abnahmematrix P9-1–P9-82, `[VERIFY]`-Bilanz V145–V184, Rest-Rotationen (dieser Head, Wurzel-`CLAUDE.md`, `docs/INDEX.md` — alle drei benannt statt versteckt) |
 
 ## Backlog (bewusst zurückgestellt, kein Phasen-Blocker)
 
-- **B17 — nicht alle Knöpfe tragen das Standard-Schema. Vom Nikinger bei der Sichtprüfung am
+- **B17 — **potentieller Extra-Schritt** (in der Modulstatus-Tabelle als „E (Extra)" geführt; wann und ob in P9, entscheidet der Nikinger). Nicht alle Knöpfe tragen das Standard-Schema. Vom Nikinger bei der Sichtprüfung am
   2026-10-02 als Restbefund notiert und die sechs `p9_trace_*`-Bilder damit abgenommen.**
   **Gemessen am Markup und CSS, nicht geschmeckt:** `app.html` trägt 77 `<button>`/`<a>` mit einer
   Button-Klasse. **62 laufen auf den Standard-Tokens** `--btn-std-*` — `.btn` (37), `.toolbar-btn` (11),
@@ -144,7 +145,7 @@ eingecheckte Browser-Beleg des trace-Blocks war **der Gegenlauf selbst** (`alle_
 alles glatt, weil die Datei existierte und nur die Zahl im Kopf falsch war. Code war korrekt
 (`editor.js:781`), Beleg war es nicht. Eigener Lauf gegen die Zwei-Principalen-Wegwerf-Instanz →
 **8/8 grün**, Probe und fünf der sechs Bilder neu erzeugt, `test_committed_probe_evidence.py` (4 Tests)
-hält das fest, **Gegenprobe 2 Verstöße → 3 rote Tests**. Vollständig im Korrekturabsatz weiter oben.
+hält das fest, **Gegenprobe 2 Verstöße → 3 rote Tests**, plus ein Test mehr, weil die (e)-Prüfung beim ersten echten Anwenden **zu blinder** war als ihre Behauptung (dritter Fund unten). Vollständig im Korrekturabsatz darüber.
 
 **Sichtung vom 2026-10-02: erledigt.** Der Nikinger hat die sechs Bilder **abgenommen — mit der Notiz,
 dass noch nicht alle Knöpfe an das Schema angepasst sind** (B17 im Backlog, dort mit der gemessenen
@@ -152,6 +153,33 @@ Klassenliste). Vor der Sichtung habe ich sie mit dem Vision-Wrapper quer gelesen
 Kriterium, Bild 05 verriet den Gegenlauf-Beleg. **Was ich daraus gelernt habe, ohne es zu vergrößern:** ein
 Restbefund, den ein Mensch sieht, muss nicht erst *wiederentdeckt* werden — er gehört mit der Messung ins
 Backlog, sonst steht er in zwei Sitzungen als Überraschung da.
+
+**Und ein dritter Fund, aus dem allerletzten Schritt — er betrifft die Gegenprobe selbst.** Beim Anwenden
+der (e)-Prüfung auf die *echte* Kette hat das Skript **abgebrochen**, obwohl die Kette in Ordnung war: der
+`updated:`-Eintrag vom 2026-10-02 **erwähnt** die Zeichenkette ``updated: ``, weil er genau diesen Defekt
+beschreibt, und meine `case`-Prüfung suchte das nackte `updated: ` irgendwo im Text. Geprüft wird jetzt nur
+der **Fadenanfang** `` | updated: <ISO>``; ein zusätzlicher Test erlaubt ausdrücklich, die Zeichenkette im
+eigenen Eintragstext zu nennen. **Das ist die kleine Schwester der Lehre vom selben Nachmittag — ein Wächter,
+der blinder ist als seine Behauptung, ist schlimmer als gar keiner**, und hier hätte er den einzigen Mechanismus
+lahmgelegt, der die Kette klein hält. Der anschließende echte Lauf rotiert **3 Fäden** (59.335 → 57.672 B).
+
+**Session beendet 2026-10-02. Für die nächste Session, der Zustand in fünf Zeilen:**
+
+1. **B17 ist als potentieller Extra-Schritt dokumentiert** (Modulstatus-Zeile „E (Extra)"), nicht entschieden.
+   Er ist der einzige Punkt, der *hier* ohne deine Infra-Schritte liegen bleiben kann — die anderen warten
+   alle auf dich.
+2. **Offen und nur bei dir:** A7+A8 in einer Sitzung (Befund 4: der A7-Restart kappt beide Connectoren).
+3. **Danach:** Release-Commit (Badge `app.html:20` + `##`-Block in `docs/UPDATE_LOG.md`, **beides erst am
+   Deploy-Tag**, sonst brennt das `deploy.sh`-Gate P6-X) und Deploy **`v3.1.1`**.
+4. **Danach Gate/Z:** Abnahmematrix P9-1–P9-82, `[VERIFY]`-Bilanz V145–V184. Kann inhaltlich erst nach
+   dem Deploy abschließend bewertet werden.
+5. **Doku-Rest, benannt statt versteckt:** Phase-9-Head 48.550 B (davon 7.467 B durchgestrichene
+   Statusabsätze im Modulstatus), Wurzel-`CLAUDE.md` 107.330 B, `docs/INDEX.md` ~58 KB. Für den Head
+   ist die Rotation des Modulstatus der benannte Weg und **deine Entscheidung**; die anderen beiden haben
+   ihre benannten Lösungen in `CLAUDE.md`/`docs/INDEX.md`.
+
+**Diese Session hat keinen Code angefasst.** Drei Commits: `deb72df` (Doku-Hälfte Gate/Z), `f544f8c`
+(Beleg-Defekt + 8/8 nachgefahren), `68d3314` (Sichtung abgenommen, B17) — plus dieser Abschluss.
 
 **Nächster Schritt, unverändert die Zuständigkeiten des Nikinger:** (1) ~~Sichtung~~ **erledigt**; es bleibt
 `p9_trace_*`-Bilder, Kriterien in `screenshots_latest/README.md`; (2) **Release-Commit + Deploy

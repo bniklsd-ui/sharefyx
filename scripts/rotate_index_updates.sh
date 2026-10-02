@@ -57,11 +57,15 @@ UPDATED_LINE="$(sed -n "${UPDATED_LINE_NO}p" "$INDEX")"
 PREFIX="updated: "
 BODY="${UPDATED_LINE#"$PREFIX"}"
 
-# Gegenprobe (e): die Kette ist EINE physische Zeile. Ein weiteres 'updated: ' darin ist ein
-# Tippfehler eines früheren Laufs (siehe Kopfkommentar) und macht den Split-Anker blind — also
-# Abbruch statt halber Rotation.
+# Gegenprobe (e): die Kette ist EINE physische Zeile. Ein **Fadenanfang** ` | updated: ` darin ist
+# ein Tippfehler eines früheren Laufs (siehe Kopfkommentar) und macht den Split-Anker blind — also
+# Abbruch statt halber Rotation. **Geprüft wird nur der Fadenanfang, nicht jedes Vorkommen im Text:**
+# die Kette darf die Zeichenkette sehr wohl *erwähnen* — der INDEX-`updated:`-Eintrag vom 2026-10-02 tut
+# genau das, weil er den Defekt beschreibt, und eine `case`-Prüfung auf das nackte `updated: ` hat den
+# Skript einen Tag nach dem Bau genau daran blockiert. Das ist die kleine Schwester der Repo-Lehre aus
+# demselben Commit: **ein Wächter, der blinder ist als seine Behauptung, ist schlimmer als keiner.**
 case "$BODY" in
-  *"updated: "*) die "Die 'updated:'-Zeile traegt ein zweites 'updated: '-Praefix (${BODY%%updated: *}<...>updated: ...). Das ist der Defekt vom 2026-10-02: der Split-Anker ' | ' + ISO-Datum sieht so einen Faden nicht als Kettenanfang und rotiert ihn still nicht. Praefix entfernen, dann erneut laufen." ;;
+  *" | updated: "[0-9][0-9][0-9][0-9]-*) die "Die 'updated:'-Zeile traegt einen Faden, der mit 'updated: ' beginnt (${BODY%% | updated: *}<...> | updated: ... (${BODY%%updated: *}<...>updated: ...). Das ist der Defekt vom 2026-10-02: der Split-Anker ' | ' + ISO-Datum sieht so einen Faden nicht als Kettenanfang und rotiert ihn still nicht. Praefix entfernen, dann erneut laufen." ;;
 esac
 
 # ---------------------------------------------------------------- Kette splitten
@@ -88,7 +92,7 @@ SEP=" | "
 RECOMPOSED="$KEEP"
 for e in "${ROTATED[@]}"; do RECOMPOSED+="${SEP}${e}"; done
 [[ "$RECOMPOSED" == "$BODY" ]] || die "Byte-Buchhaltung schlägt fehl — Split ist nicht verlustfrei."
-echo "OK  Kette traegt genau ein 'updated: '-Praefix"
+echo "OK  Kein Faden der Kette beginnt mit 'updated: '"
 echo "OK  Byte-Buchhaltung: ${#ROTATED[@]} rotierte(r) Eintrag/Einträge, Split verlustfrei"
 
 # ---------------------------------------------------------------- neue Zeile bauen
