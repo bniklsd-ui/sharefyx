@@ -6,7 +6,7 @@ detail: L3 (Pointer-Verzeichnis, keine eigene Inhaltsquelle)
 up: ../phase9_hardening/CLAUDE.md   # aktive Phase
 down:
   - ../docs/screenshots/                # kanonische Ablage; diese Verzeichnis ist nur Symlink-Komfort
-updated: 2026-10-02 (Rotation auf die `p9_doing_*`-Belege: vier Symlinks neu, die drei `p9_btn2_*`-Links raus — der Knopfoptik-Fall ist erledigt und abgenommen) | 2026-10-01 (Rotation auf die `.toolbar-btn`-Belege (`p9_btn2_*`): drei Symlinks neu, die drei `p9_step_e_*`-Links raus — Step E ist als Beleg in `docs/screenshots/` erledigt und die aktuell offene Sichtfrage ist die Knopfoptik vor dem Deploy. **Vier unversionierte Tailscale-Kopien** mit Leerzeichen im Namen wandern nach `docs/screenshots/p9_step_a_01..04_*` (Infra-Beleg zu A3, ausdrücklich keine Sichtprüfung), die fünfte Datei `Machines - Tailscale.html` ist gelöscht: leere SPA-Hülle, `tailscale-api-prefetch` = `{}`, kein Bildwert) | updated: 2026-09-28 (Phase **9** — Rotation auf die ersten P9-Bilder: die sieben P8.6-Gate-Symlinks sind weg, drei `p9_step_e_*`-Links rein (P8.6-AK sagt genau das: "sie bleiben stehen, bis P9 eigene Screenshots produziert" — Step E hat als erster P9-Step welche produziert) | 2026-09-19 (Phase 8.6 abgeschlossen — Rotation auf die **Gate-Belege**: sieben Symlinks auf `p86_smoke_*` ersetzen die fünf H-R-3-Links. Das sind die Bilder, auf denen die Freigabe von `v3.0.2` beruht. Bleiben stehen, bis P9 eigene Screenshots produziert.)
+updated: 2026-10-02 (Rotation auf die `p9_trace_*`-Belege: sechs Symlinks neu, die vier `p9_doing_*`-Links raus — der doing-Block ist mit dem Deploy `v3.1.0` erledigt und abgenommen) | 2026-10-02 (Rotation auf die `p9_doing_*`-Belege: vier Symlinks neu, die drei `p9_btn2_*`-Links raus — der Knopfoptik-Fall ist erledigt und abgenommen) | 2026-10-01 (Rotation auf die `.toolbar-btn`-Belege (`p9_btn2_*`): drei Symlinks neu, die drei `p9_step_e_*`-Links raus — Step E ist als Beleg in `docs/screenshots/` erledigt und die aktuell offene Sichtfrage ist die Knopfoptik vor dem Deploy. **Vier unversionierte Tailscale-Kopien** mit Leerzeichen im Namen wandern nach `docs/screenshots/p9_step_a_01..04_*` (Infra-Beleg zu A3, ausdrücklich keine Sichtprüfung), die fünfte Datei `Machines - Tailscale.html` ist gelöscht: leere SPA-Hülle, `tailscale-api-prefetch` = `{}`, kein Bildwert) | updated: 2026-09-28 (Phase **9** — Rotation auf die ersten P9-Bilder: die sieben P8.6-Gate-Symlinks sind weg, drei `p9_step_e_*`-Links rein (P8.6-AK sagt genau das: "sie bleiben stehen, bis P9 eigene Screenshots produziert" — Step E hat als erster P9-Step welche produziert) | 2026-09-19 (Phase 8.6 abgeschlossen — Rotation auf die **Gate-Belege**: sieben Symlinks auf `p86_smoke_*` ersetzen die fünf H-R-3-Links. Das sind die Bilder, auf denen die Freigabe von `v3.0.2` beruht. Bleiben stehen, bis P9 eigene Screenshots produziert.)
 ---
 # `screenshots_latest/` — Schnellzugriff auf die Screenshots der aktuellen Phase
 
@@ -43,37 +43,43 @@ Ausnahmen, in denen M3 den Dateinamen + Checkkriterium **nicht** nennt:
 - Wenn die Verifikation programmatisch ist (Regex auf gerenderten HTML-Output
   o. ä.) und der Screenshot nur Anhang ist.
 
-## Aktueller Inhalt (Phase **9**, fünfter Eimer „In Arbeit", Stand 2026-10-02)
+## Aktueller Inhalt (Phase **9**, Block trace, Stand 2026-10-02)
 
-Vier Bilder aus `phase9_hardening/scripts/p9_doing_self_check.py` gegen die **eigene**
-TLS-Wegwerf-Instanz (`p9_doing_wegwerf.py`, Port 18776, Chromium 1440x900). Sie zeigen den Block,
-der die Voraussetzung für den Deploy `v3.1.0` war: eine Aufgabe mit `status: doing` bekommt einen
-eigenen Navigationsordner, und beim Speichern im Editor springen die Rail-Zähler **ohne Reload**
-um.
+Sechs Bilder aus `phase9_hardening/scripts/p9_trace_self_check.py` gegen die **eigene**
+TLS-Wegwerf-Instanz (`p9_trace_wegwerf.py`, Port 18777, Chromium 1440x900). Sie zeigen den
+Block, der die Frage „wer arbeitet dran, wer hat zuletzt geändert" beantwortet: `assignee`
+wird sichtbar und vom **Client** gefüllt, `updated_by` steht als Lesezeile im Kopfdaten-Panel.
 
-**Der Beleg ist die Messung, nicht das Bild.** Das Skript prüft 11 Stationen aus dem echten DOM
-(`probes/p9_doing_probe.json`, 11/11 grün). Die **Gegenprobe** ist der eigentliche Beleg: mit
-zurückgenommenem `_BUCKETS`-Eintrag melden **7 von 11** Stationen rot. **Grün bleiben dabei
-S5/S7/S8** — die prüfen die Maschinenebene, und die war schon vorher korrekt; das Loch war rein
-navigativ. Das Bild beantwortet die eine Frage, die keine Messung kann: **gefällt es.**
+**Die Instanz hat zwei Konten (`alpha`, `beta`) und echte Git-Historie** — beides ist der
+Beleg, nicht Beiwerk. Mit einem eingeloggten Menschen trügen `updated_by` und `assignee`
+denselben Wert und jede Verwechslung bliebe unsichtbar; ohne Git gäbe es nichts, was S6
+prüfen könnte.
+
+**Der Beleg ist die Messung, nicht das Bild.** Das Skript prüft 8 Stationen aus dem echten DOM
+(`probes/p9_trace_probe.json`, 8/8 grün). Die **Gegenprobe** ist der eigentliche Beleg: ohne
+die Leer-Prüfung im P9-Z-Zweig meldet **S5** rot — und zwar genau die Aussage, die der Zweig
+tragen soll: B zieht eine **A zugewiesene** Aufgabe auf „In Arbeit" und der Assignee springt
+von `alpha` auf `beta`. Ein Zufuehlen, das kein Messwert bemerkt.
 
 | Dateiname | Original | Checkkriterium |
 |---|---|---|
-| `01_uebersicht_chip.png` | `../docs/screenshots/p9_doing_01_uebersicht_chip.png` | **Die Übersicht:** die Zeile `alpha` trägt neben „Offen 1“ und „Erledigt 1“ einen Chip **„1 In Arbeit“**. Wichtig: **deutsch**, nicht das rohe Schema-Wort `doing` — genau die eine Ebene, die P9-W übersetzt. |
-| `02_rail_fuenf_ordner.png` | `../docs/screenshots/p9_doing_02_rail_fuenf_ordner.png` | **Die Rail mit fünf Ordnern** (oben nach unten): Offen 1 · **In Arbeit 1** · Erledigt 1 · Notizen 1 · Archiv 0. Prüfen: nichts abgeschnitten, nichts überlappt, „In Arbeit“ steht zwischen „Offen“ und „Erledigt“. |
-| `03_liste_in_arbeit.png` | `../docs/screenshots/p9_doing_03_liste_in_arbeit.png` | **Der Ordner „In Arbeit“ geöffnet:** enthält genau **eine** Zeile, „Laufende Probe“. Die Brotkrume oben muss `alpha › In Arbeit` zeigen — derselbe deutsche Begriff, nicht `doing`. |
-| `04_nach_statuswechsel.png` | `../docs/screenshots/p9_doing_04_nach_statuswechsel.png` | **Der Kernbeleg:** nach dem Speichern eines Statuswechsels `offen → doing` stehen in der Rail **Offen 0** und **In Arbeit 2** — **ohne einen Reload**. Genau daran hängt P9-64. |
+| `01_bei_wird_gefuellt.png` | `../docs/screenshots/p9_trace_01_auftrag_vor_speichern.png` | **Die P9-Z-Regel, im Moment des Auslösens:** der Status steht auf `doing`, und das Feld **„Bei“** daneben trägt `alpha` — **noch bevor** gespeichert wurde (Versionsband sagt „ungespeichert"). Unter den Feldern die Lesezeile „Zuletzt geändert von alpha · Datum". |
+| `02_liste_bei_alpha.png` | `../docs/screenshots/p9_trace_02_gespeichert_liste.png` | **Die Listenzeile:** die Metazeile führt „bei alpha“ direkt nach dem Status, vor der Fälligkeit. Wer den Ordner „In Arbeit“ öffnet, sieht ohne Klick, wer dran ist. |
+| `03_ansicht_von_b.png` | `../docs/screenshots/p9_trace_03_ansicht_von_b.png` | **Ansicht von B** auf dieselbe Aufgabe: Metazeile „bei alpha“, Kopfdaten-Feld „Bei“ = `alpha`, Lesezeile „Zuletzt geändert von **alpha**“. B sieht A als letzten Schreiber — obwohl B selbst noch nichts angefasst hat. |
+| `04_zuletzt_geaendert_von_b.png` | `../docs/screenshots/p9_trace_04_nach_b.png` | **Nach Bs eigenem Schreibvorgang:** die Lesezeile wechselt auf „Zuletzt geändert von **beta**“, das Feld „Bei“ bleibt **alpha**. Genau diese beiden Zeilen sind die Aussage des ganzen Blocks. |
+| `05_p9z_fremd.png` | `../docs/screenshots/p9_trace_05_p9z_fremd.png` | **Der harte P9-Z-Fall:** B zieht eine Aufgabe, die **A** zugewiesen ist, auf „In Arbeit" — das Feld behält `alpha`. Ein Zufuehlen, das nur bei leerem Feld arbeitet. |
+| `06_legacy_ohne_feld.png` | `../docs/screenshots/p9_trace_06_legacy_ohne_feld.png` | **Der Altbestand:** dasselbe Item **ohne** `updated_by` (von Hand so erzeugt). Die Lesezeile ist **weg** — keine leere Zeile, kein „unbekannt“, kein Platzhalter; das Feld „Bei“ zeigt seinen Platzhalter. |
 
-**Warum die Wegwerf-Instanz und nicht das echte Gerät:** der Beleg braucht einen reproduzierbaren
-Vorher-Zustand (S5 **verbraucht** den Zustand — die offene Aufgabe wird zur laufenden) und einen
-Gegenlauf, also zwei Instanzen mit demselben Seed. Am echten Datenbestand wäre beides nicht zu
-halten. Für den Gesamteindruck bleibt die Sichtprüfung am echten Gerät nötig — dafür ist der
-Augenschein am Deploy-Tag (Mini-Plan §8.5) zuständig.
+**Warum die Wegwerf-Instanz und nicht das echte Gerät:** der Beleg braucht einen
+reproduzierbaren Vorher-Zustand (S1/S4/S5 **verbrauchen** ihn) **und** einen zweiten
+Principal, und der Legacy-Item lässt sich nur auf einem frischen Seed ohne Feld anlegen. Am
+echten Datenbestand wäre nichts davon zu halten. Für den Gesamteindruck bleibt die
+Sichtprüfung am echten Gerät nötig — dafür ist der Augenschein am Deploy-Tag zuständig.
 
-**Nicht hier, mit Begründung.** Die vier Tailscale-Adminbilder aus A3 (2026-09-30) und die
-`.toolbar-btn`-Belege aus dem 2026-10-01 sind versioniert unter `docs/screenshots/p9_step_a_01..04_*`
-bzw. `p9_btn2_*` und gehören nicht in die Schnellansicht: die ersteren sind Infra-Beleg ohne
-Bildwert, die letzteren sind mit der Standardoptik der Knöpfe erledigt.
+**Nicht hier, mit Begründung.** Die vier `p9_doing_*`-Belege (fünfter Eimer „In Arbeit") sind
+mit dem Deploy `v3.1.0` abgenommen, die Tailscale-Bilder aus A3 sind Infra-Beleg ohne
+Bildwert, und die `p9_btn2_*`-Belege sind mit der Standardoptik der Knöpfe erledigt. Alle
+sechs liegen versioniert in `docs/screenshots/`.
 
 ## Rotation
 

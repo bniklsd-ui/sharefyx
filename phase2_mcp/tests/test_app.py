@@ -514,6 +514,11 @@ async def test_all_ten_tools_are_callable_over_http(app, token_alpha, token_beta
             assert patched_receipt == {
                 "op": "patch", "id": new_id, "space": "alpha", "title": "Über HTTP angelegt",
                 "version": 3, "updated": patched_receipt["updated"],
+                # P9 Block trace (P9-72): die Quittung trägt den Schreiber. Der Principal hier
+                # ist `alpha`, also steht `alpha` drin — der Wert kommt aus dem Token, nicht
+                # aus dem Aufruf. Diese Assertion ist deshalb gleichzeitig der Beleg dafür,
+                # dass `actor=principal.space` an jedem Schreibpfad angekommen ist.
+                "updated_by": "alpha",
                 "replacements": 1, "lines": [1],
                 "bytes": {"before": len("Angehängt.".encode()), "after": len("Angehängt. Gepatcht.".encode())},
             }

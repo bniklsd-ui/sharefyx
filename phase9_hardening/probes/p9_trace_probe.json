@@ -1,0 +1,47 @@
+{
+  "base_url": "https://127.0.0.1:18777",
+  "data_root": "/tmp/opencode/p9-trace-wegwerf/data",
+  "befunde": [
+    {
+      "pruefung": "S1 P9-Z: #field-assignee zeigt A vor dem Speichern",
+      "ok": true,
+      "detail": "vorher='' nachher='alpha'"
+    },
+    {
+      "pruefung": "S2 Speichern: Listenzeile zeigt 'doing · bei A'",
+      "ok": true,
+      "detail": "Toast='Gespeichert · v2' Meta='task · doing · bei alpha\\nprivat'"
+    },
+    {
+      "pruefung": "S3 B sieht 'bei A' und 'Zuletzt geaendert von A'",
+      "ok": true,
+      "detail": "Liste='task · doing · bei alpha\\nprivat' Panel='Zuletzt geändert von alpha · 2026-10-02T10:34:45Z' Feld='alpha'"
+    },
+    {
+      "pruefung": "S4 B aendert den Titel: 'Zuletzt geaendert von B', assignee bleibt A",
+      "ok": true,
+      "detail": "Panel='Zuletzt geändert von beta · 2026-10-02T10:34:57Z' Feld='alpha'"
+    },
+    {
+      "pruefung": "S5 P9-Z: fremd zugewiesene Aufgabe bleibt bei A",
+      "ok": false,
+      "detail": "vorher='alpha' nachher='beta'"
+    },
+    {
+      "pruefung": "S6 Git-Autor: neuester Commit ist B, A unter den ersten drei",
+      "ok": true,
+      "detail": "neueste drei Autoren=['beta', 'alpha', 'alpha']"
+    },
+    {
+      "pruefung": "S7 Legacy-Item: keine leere Zeile, kein 'undefined'",
+      "ok": true,
+      "detail": "Panel='' Liste='note · activeprivat'"
+    },
+    {
+      "pruefung": "S7b API: updated_by=B, assignee=alpha am selben Item",
+      "ok": true,
+      "detail": "HTTP 200 updated_by='beta' assignee='alpha'"
+    }
+  ],
+  "alle_ok": false
+}

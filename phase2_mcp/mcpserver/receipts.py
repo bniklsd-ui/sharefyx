@@ -55,6 +55,13 @@ def write_receipt(
         "version": item.version,
         "updated": _format_dt(item.updated),
     }
+    # P9 Block trace (P9-72): die Quittung **nur** bei gesetztem Wert, exakt nach dem Muster von
+    # `tools.py :: item_to_filetext()` — ein Item ohne `updated_by` (der Altbestand) darf keine
+    # leere Quittungszeile bekommen. Fuer den Schreibenden selbst ist das Feld redundant (er
+    # kennt sich), fuer den Folgenden nicht: `search_items` zeigt es in jeder Zeile, und die
+    # Quittung ist die Antwort, in der ein Agent nach einem fremden Write staellt, was jetzt gilt.
+    if item.updated_by:
+        payload["updated_by"] = item.updated_by
     if replacements is not None:
         payload["replacements"] = replacements
         payload["lines"] = list(lines)

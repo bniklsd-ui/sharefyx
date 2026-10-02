@@ -180,6 +180,13 @@
             <label class="field">F&auml;llig
               <input type="date" class="input" id="field-due">
             </label>
+            <!-- P9 Block trace (P9-Z): `assignee` ist ein Space-Name (V160, ohne Pruefung
+                 gegen die Space-Liste), deshalb ein Freitextfeld mit Vorschlagsliste statt
+                 eines `<select>` — derselbe Space, an dem der Eigentuemer nicht schreiben
+                 darf, ist ein gueltiger Wert. Die Liste befuellt editor.js aus state.spaces. -->
+            <label class="field">Bei
+              <input type="text" class="input" id="field-assignee" list="assignee-options" autocomplete="off" placeholder="Space-Name">
+            </label>
             <label class="field field--wide">Tags
               <input type="text" class="input" id="field-tags" placeholder="kommagetrennt">
             </label>
@@ -198,6 +205,11 @@
               </span>
             </label>
           </div>
+          <!-- P9 Block trace: reine Lesezeile, kein Feld. `updated_by` ist serververwaltet
+               (P9-AA) und ueber keinen Kanal setzbar — ein Eingabefeld waere eine
+               Bedienmoeglichkeit, die nichts bewirkt. Leer bei Altbestand (P9-AB). -->
+          <p class="panel__readline" id="meta-updated-by"></p>
+          <datalist id="assignee-options"></datalist>
         </div>
       </details>
 
@@ -225,8 +237,8 @@
           <div class="version-band" id="version-band"><span class="version-band__number" id="version-band-number"></span></div>
           <textarea class="editor__textarea" id="editor-textarea" aria-label="Inhalt"></textarea>
           <div class="preview editor__preview" id="editor-preview" hidden></div>
+          </div>
         </div>
-      </div>
 
       <div class="editor__append">
         <input type="text" class="input" id="append-input" placeholder="Zeile anh&auml;ngen&hellip;" aria-label="Zeile anh&auml;ngen">

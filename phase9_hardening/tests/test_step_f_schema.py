@@ -279,6 +279,17 @@ def test_rest_whitelists_carry_assignee():
 
 # -- 14.  V159: `doing` im Editor-Dropdown, ohne JS-Aenderung ---------------------------------
 
+# P9 Block trace (2026-10-02): die Wache unten muss in der Lage sein, einen echten
+# Code-Verstoss von einer Erklaerung im Kommentar zu unterscheiden — dieselbe Technik wie in
+# `test_tailscaled_watchdog.py` (dort trennen vier Waechter Kommentarzeilen vorher heraus).
+# Die Einschraenkung ist ehrlich benannt: `//` innerhalb eines Regex-Literals oder eines
+# Strings wuerde abgeschnitten. Fuer die beiden gesuchten Woerter (`"doing"`, `fieldAssigneeEl
+# .value =`) ist das irrelevant — sie stehen in keinem Regex und in keinem String, und ein
+# Verstoss in einem davon wuerde eher **sichtbar** bleiben als verschwinden.
+def _code_without_comments(source: str) -> str:
+    source = re.sub(r"/\*.*?\*/", "", source, flags=re.DOTALL)
+    return re.sub(r"(?m)//.*$", "", source)
+
 
 def test_the_editor_status_dropdown_reads_the_vocabulary():
     """[VERIFY] V159, **gemessen am Aufrufer statt geglaubt**. Plan §8.3 behauptet, `dialogs.js`
@@ -292,9 +303,30 @@ def test_the_editor_status_dropdown_reads_the_vocabulary():
     assert "state.meta.status_values[itemType]" in source
     # Der Wert kommt unuebersetzt in die Option — deshalb genuegt der Kern-Eintrag.
     assert re.search(r"opt\.textContent = s;", source)
-    assert not re.search(r"assignee|doing", source), (
-        "editor.js nennt Step-F-Vokabular — dann waere der Test hier keine Wache mehr, sondern "
-        "eine zweite Quelle (genau das, was die Konvention verbietet)"
+
+    # **Datierte Einengung, 2026-10-02 (P9 Block trace, Lock P9-Z).** Diese Assertion lautete
+    # urspruenglich `assert not re.search(r"assignee|doing", source)` — editor.js duerfte
+    # keinerlei Step-F-Vokabular nennen. P9-Z verlangt genau das Gegenteil: der Editor soll
+    # `assignee` fuellen, **wenn der Status `doing` wird**, und das laesst sich nicht ohne den
+    # Namen des Statuswerts ausdruecken. Der Wächter wird deshalb nicht entfernt, sondern
+    # **zugeschnitten**: er verbietet weiterhin eine abgetippte Vokabular-*Liste* und
+    # erlaubt genau eine benannte Verzweigung.
+    code = _code_without_comments(source)
+    # (a) Die Dropdown-Quelle selbst nennt keinen Statuswert — die Liste kommt aus `state.meta`.
+    populate = re.search(r"function populateStatusSelect\(.*?\n\}", code, re.DOTALL)
+    assert populate, "populateStatusSelect() nicht gefunden"
+    assert not re.search(r"\"(open|doing|done|archived|active)\"", populate.group(0))
+    # (b) `doing` kommt im **Code** genau einmal vor, im P9-Z-Zweig, und mit der Leer-Prüfung.
+    doing_hits = re.findall(r"\"doing\"", code)
+    assert len(doing_hits) == 1, f"editor.js nennt \"doing\" {len(doing_hits)}-mal im Code"
+    assert 'fieldStatusEl.value !== "doing"' in code
+    assert 'fieldAssigneeEl.value.trim() !== ""' in code
+    # (c) `assignee` wird **zweimal** zugewiesen und nur so: laden und Entwurf. Der
+    #     Auto-Fuell-Zweig schreibt ebenfalls, taet es aber ueber dieselbe Zuweisung — er
+    #     steht hinter (b) und wird von T11 im trace-Block-Waechter zugespitzt.
+    assert code.count("fieldAssigneeEl.value =") == 3, (
+        "drei Zuweisungen an fieldAssigneeEl.value: Laden, Entwurf, P9-Z. Jede weitere waere "
+        "eine zweite Stelle, die `assignee` aendert (P9-Z: nur bei leer)."
     )
 
 

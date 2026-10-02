@@ -324,10 +324,23 @@ async def test_removal_aborts_on_conflict_mid_run_space_stays(app, item_store, t
 
     original_move = item_store.move
 
-    def _move_with_conflict(item_id, *, version, space=None, folder=None):
+    # **Datierte Anpassung, 2026-10-02 (P9 Block trace).** `Store.move()` hat das optionale
+    # Keyword `actor: str = ""` bekommen (zehnte P1-Contract-Öffnung), und `api.py ::
+    # _spaces_delete` reicht es durch. Diese **Doppelgängerin** nannte vorher nur die alten
+    # Keyword-only-Parameter — ein `TypeError: unexpected keyword argument 'actor'` war die
+    # Folge, und zwar als **HTTP 500** mitten im Space-Entfernen.
+    #
+    # Die Lektion ist die aus P9-AD: ein optionales Keyword hält **Aufrufstellen** heil, nicht
+    # **Attrappen mit eigener Signatur**. Der Wächter über alle Adapter-Aufrufe
+    # (`phase9_hardening/tests/test_trace_block.py`) scannt nur Nicht-Test-Module und fängt
+    # diese Klasse per Konstruktion nicht ab — erfunden wurde sie hier, in `phase7_spaces_admin/`,
+    # drei Phasen entfernt vom Code, den sie nachstellt.
+    def _move_with_conflict(item_id, *, version, space=None, folder=None, actor=""):
         if item_id == second_id:
             raise ConflictError(second_id, expected_version=version, current=item_store.get(second_id))
-        return original_move(item_id, version=version, space=space, folder=folder)
+        return original_move(
+            item_id, version=version, space=space, folder=folder, actor=actor,
+        )
 
     monkeypatch.setattr(item_store, "move", _move_with_conflict)
 

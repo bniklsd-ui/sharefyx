@@ -1369,3 +1369,54 @@ async def test_delete_of_a_foreign_item_is_forbidden(full_app_items, item_store,
         )
     assert response.status_code == 403
     assert item_store.get(item.id).id == item.id
+
+
+# -- P9 Block trace: `updated_by` über REST (Plan §4 T10) -------------------------------------
+#
+# Zwei Behauptungen, eine Testfunktion, weil sie dieselbe Route betreffen: der **positive**
+# Fall (die API trägt `updated_by` in jeder Antwort) und der **negative** (kein Kanal kann es
+# setzen). Ein Test, der nur den positiven Fall prueft, wuerde durch eine API bestehen, die
+# `updated_by` zurueckgibt, weil der Client es hineingeschickt hat.
+
+
+@pytest.mark.asyncio
+async def test_updated_by_is_recorded_from_the_session_and_cannot_be_written(
+    full_app_items, item_store, totp_code
+):
+    """P9-AA: Der Wert kommt aus der **Sitzung**, und die API nimmt ihn nicht entgegen.
+
+    Beide Haelften in einem Test, weil eine davon ohne die andere nicht pruefbar ist: gibt die
+    API `updated_by: ""` zurueck (positiver Fall fehlt), sieht es aus, als waere der Wert
+    schreibgeschuetzt; nimmt die API einen mitgeschickten Wert an (negativer Fall fehlt),
+    sieht es aus, als waere alles in Ordnung. Zusammen sind sie erst die Aussage."""
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+
+        created = await client.post(
+            "/api/v1/items", json={"type": "task", "title": "Rechnung"}, headers=_headers(csrf)
+        )
+        assert created.status_code == 201
+        created_body = created.json()
+        # Der eingeloggte Mensch ist `SPACE` (die Fixture-Sitzung) — nicht irgendein Wert
+        # aus dem Request.
+        assert created_body["updated_by"] == SPACE
+        assert item_store.get(created_body["id"]).updated_by == SPACE
+
+        # Der negative Fall: PATCH mit `updated_by` → 422, Datei unangetastet. `_PATCH_FIELDS`
+        # kennt das Feld absichtlich nicht (P9-AA).
+        patched = await client.patch(
+            f"/api/v1/items/{created_body['id']}",
+            json={"version": created_body["version"], "title": "Rechnung II",
+                  "updated_by": FOREIGN_SPACE},
+            headers=_headers(csrf),
+        )
+        assert patched.status_code == 422
+        assert patched.json()["error"] == "validation_failed"
+        unangetastet = item_store.get(created_body["id"])
+        assert unangetastet.title == "Rechnung"
+        assert unangetastet.updated_by == SPACE
+
+        # Und der Listenpfad liefert denselben Stand (P9-F10, dieselbe Quelle).
+        listed = await client.get("/api/v1/items?space=" + SPACE, headers=_headers(csrf))
+        row = next(r for r in listed.json()["items"] if r["id"] == created_body["id"])
+        assert row["updated_by"] == SPACE

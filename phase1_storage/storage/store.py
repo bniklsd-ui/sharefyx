@@ -57,11 +57,22 @@ _KNOWN_FIELDS = {
     # P9 Step F (F4): ohne diesen Eintrag landet `assignee` in `Item.extra` — und damit wäre
     # es ein unbekanntes Feld im Round-Trip statt eines Felds mit Default und Index-Spalte.
     "assignee",
+    # P9 Block trace: ohne diesen Eintrag landet `updated_by` in `Item.extra` — dieselbe
+    # Konsequenz wie bei `assignee` zwei Zeilen darüber (F4).
+    "updated_by",
 }
 _DEFAULT_STATUS = {"task": "open", "note": "active"}
 # Vom Store selbst verwaltet — dürfen nie über **fields/**changes hereinkommen, sonst
 # überschreibt `Item.extra` beim Schreiben (`fields.update(item.extra)`) die berechneten Werte.
-_SYSTEM_MANAGED_FIELDS = {"id", "space", "created", "updated", "version"}
+#
+# P9 Block trace: `updated_by` steht ab hier mit drin (P9-AA). Es ist damit **über keinen
+# Kanal setzbar** — weder `create(updated_by=…)` noch `update(updated_by=…)` kommen durch
+# (beide werfen `ValidationError`), und die Adapter (MCP, REST) geben es gar nicht erst
+# weiter. Gesetzt wird es aus dem `actor`-Argument, das die aufrufende Schicht aus dem
+# authentifizierten Principal fuellt. Das ist dieselbe Klasse wie `updated`: ein Feld, dessen
+# Wert die Identitaet behauptet, die der Server kennt, nicht die der Client behauptet.
+_SYSTEM_MANAGED_FIELDS = {"id", "space", "created", "updated", "version", "updated_by"}
+
 
 
 def _default_now() -> datetime:
@@ -128,6 +139,10 @@ def _item_from_text(text: str, *, version_override: int | None = None, folder_ov
         # P9 Step F: fehlt das Feld (jeder Altbestand-Item), gilt der Default — siehe F6, warum
         # genau deshalb nie ein leeres `assignee:` in eine bestehende Datei geschrieben wird.
         assignee=str(fields.get("assignee", "") or ""),
+        # P9 Block trace (P9-AB): fehlt das Feld — jeder Altbestand-Item, und nach dem Deploy
+        # praktisch jedes vorhandene Item —, gilt der Default. `str(... or "")` faengt dazu
+        # ein `updated_by:` mit leerem Wert ab, das jemand von Hand eingetragen hat.
+        updated_by=str(fields.get("updated_by", "") or ""),
         extra=extra,
     )
 
@@ -164,6 +179,13 @@ def _item_to_text(item: Item) -> str:
     # den niemand bestellt hat, in jedem einzelnen Altbestand-Item (P9-42).
     if item.assignee:
         fields["assignee"] = item.assignee
+    # P9 Block trace (P9-AB): dieselbe Bedingung ein drittes Mal, aus demselben Grund wie
+    # `visibility`/`share_*`/`assignee`. Ohne sie bekaeme jeder Altbestand-Item beim naechsten
+    # beliebigen Write ein stilles `updated_by: ""` — und das waere hier schlimmer als bei den
+    # anderen, denn die UI **liest** dieses Feld als "zuletzt geaendert von" (eine leere Zeile
+    # waere eine leere Anzeige an prominenter Stelle, kein unauffaelliger Diff).
+    if item.updated_by:
+        fields["updated_by"] = item.updated_by
     fields.update(item.extra)
     return serialize_frontmatter(fields, item.body)
 
@@ -207,6 +229,12 @@ def _summary(item: Item) -> ItemSummary:
         # stünde in jeder Liste und jeder Suchtrefferliste dauerhaft `assignee: ""`, während
         # `get()` den echten Wert liefert. Genau die Klasse Drift, die F4 (_KNOWN_FIELDS) verhindert.
         assignee=item.assignee,
+        # P9 Block trace: **wieder** die Pflichtstelle, die der Plan nicht nennt und ohne die
+        # es ein totes Feld waere — exakt F10 aus P9 Step F, jetzt fuer `updated_by`. `search()`
+        # ist der Weg, ueber den ein Agent (und die UI-Liste) merkt, dass jemand anderes
+        # geschrieben hat. Ohne diese Zeile stuende dort dauerhaft `""`, waehrend `get()` den
+        # echten Wert lieferte.
+        updated_by=item.updated_by,
     )
 
 
@@ -250,15 +278,19 @@ class Store:
             finally:
                 fcntl.flock(f, fcntl.LOCK_UN)
 
-    def _commit(self, op: str, item_id: str, space: str) -> None:
+    def _commit(self, op: str, item_id: str, space: str, actor: str = "") -> None:
         """Git-Commit nach einem erfolgreichen Write (Entscheidung E), Message `<op> <id>
         [<space>]`. Wird ausschließlich aus Aufrufern heraus benutzt, die bereits
         `self._file_write_lock()` halten — das serialisiert die Git-Aufrufe auch über
         Prozessgrenzen hinweg (siehe `history.commit`-Docstring). Nie fatal: `history.commit`
         loggt selbst `critical` und wirft nie.
+
+        `actor` (P9-AC) ist der optionale Git-**Autor**; der Committer bleibt `Space Server`.
+        Leer heißt "unbekannter Schreiber" (Operator-Skripte, Tests, Drift-Abgleich) — dann
+        laeuft der Commit mit der Default-Identitaet, statt einen zu erfinden.
         """
         if self._git_enabled:
-            history.commit(self._data_root, f"{op} {item_id} [{space}]")
+            history.commit(self._data_root, f"{op} {item_id} [{space}]", author=actor)
 
     # -- Interne Helfer ------------------------------------------------------------
 
@@ -308,6 +340,12 @@ class Store:
                 if repair_drift:
                     new_version = row["version"] + 1
                     self._rewrite_version_in_file(path, new_version)
+                    # P9 Block trace: **kein** `actor`. Eine Fremdänderung hat per Definition
+                    # keinen Akteur durch diesen Prozess — der auslösende Aufrufer repariert
+                    # nur die Versionsnummer, er hat den Inhalt nicht geschrieben. Ihm den
+                    # Akteur des aufrufenden Schreibvorgangs zu geben (es ist dieselbe Methode,
+                    # derselbe Prozess) würde `git blame` eine Zeile zuschreiben, die niemand
+                    # geschrieben hat — die genaue Sorte Zuschreibung, die P9-AB vermeiden will.
                     self._commit("drift", item_id, row["space"])
                     fresh = index.row_from_file(self._data_root, path)
                 # sonst: `fresh["version"]` trägt bereits die Version aus der Datei selbst
@@ -361,7 +399,9 @@ class Store:
         )
         index.replace_item_links(self._conn, item.id, rows)
 
-    def _write_item_file(self, item: Item, *, old_path: Path | None, op: str) -> Path:
+    def _write_item_file(
+        self, item: Item, *, old_path: Path | None, op: str, actor: str = ""
+    ) -> Path:
         """Schreibt `item` an den (ggf. neuen) Pfad, benennt bei Titeländerung um, aktualisiert
         den Index und committet (`op` benennt den Git-Commit, z.B. "create"/"update"/"append").
         Muss unter `self._lock` **und** `self._file_write_lock()` aufgerufen werden.
@@ -370,6 +410,10 @@ class Store:
         `_replace_links_for_item` -- damit JEDER Schreibpfad (`create`/`update`/`patch`/
         `append`/`move`/`archive`) genau einmal pro Operation die `item_links`-Tabelle
         aktualisiert, ohne dass jede Store-Methode das selbst tun muss.
+
+        `actor` (P9 Block trace) wandert nur an `_commit()` — `updated_by` steht bereits im
+        `item`, weil jede aufrufende Methode es vorher gesetzt hat. Hier noch einmal setzen
+        waere eine zweite Wahrheit; genau die Divergenz, die F11 in `update()` aufgedeckt hat.
         """
         slug = files.slugify(item.title)
         if item.status == "archived":
@@ -389,7 +433,7 @@ class Store:
         row = index.row_from_file(self._data_root, target_path)
         index.upsert_item(self._conn, row)
         self._replace_links_for_item(item)
-        self._commit(op, item.id, item.space)
+        self._commit(op, item.id, item.space, actor)
         return target_path
 
     # -- Öffentliche API (Plan §2) ---------------------------------------------------
@@ -570,8 +614,21 @@ class Store:
             return self._row_to_item(row)
 
     def create(
-        self, space: str, *, type: str, title: str, body: str = "", folder: str = "", **fields
+        self,
+        space: str,
+        *,
+        type: str,
+        title: str,
+        body: str = "",
+        folder: str = "",
+        # P9 Block trace (P9-AA/AD): der Akteur, aus dem `updated_by` und der Git-Autor
+        # entstehen. **Optional** mit Default `""` — 294 Testaufrufe von `create()` ohne
+        # Akteur bleiben sonst rot, und P9-AD hat genau das entschieden. Der Schutz gegen eine
+        # vergessene Aufrufstelle ist ein Waechter ueber die Adapter (Plan §4 T7), nicht der Typ.
+        actor: str = "",
+        **fields,
     ) -> Item:
+
         with self._lock, self._file_write_lock():
             reserved = _SYSTEM_MANAGED_FIELDS & fields.keys()
             if reserved:
@@ -610,12 +667,23 @@ class Store:
                 created=now, updated=now, version=1, folder=folder,
                 visibility=visibility, share_read=list(share_read), share_write=list(share_write),
                 assignee=assignee,
+                # P9 Block trace: das Anlegen **ist** der erste Schreibvorgang, es gibt keinen
+                # Vorgaenger, dessen `updated_by` bleiben koennte — der Wert kommt allein aus
+                # dem Akteur (leer = unbekannt, dann steht das Feld gar nicht in der Datei).
+                updated_by=actor,
                 extra=fields,
             )
-            self._write_item_file(item, old_path=None, op="create")
+            self._write_item_file(item, old_path=None, op="create", actor=actor)
             return item
 
-    def update(self, item_id: str, *, version: int, **changes) -> Item:
+    def update(self, item_id: str, *, version: int, actor: str = "", **changes) -> Item:
+        """**`actor` (P9 Block trace) ist ein reservierter Name**, kein Frontmatter-Feld: wer
+        `update(id, version=1, actor="x")` ruft, setzt `updated_by` und legt **kein** Feld `actor`
+        in die Datei an. Ein Item mit einem echten, von Hand gesetzten Frontmatter-Feld `actor`
+        kann damit nicht mehr geschrieben werden — der Trade-off ist bewusst (P9-AD, gleiche
+        Form wie der Langzeit-Default bei `now_fn`) und betrifft kein Feld, das je in diesem
+        Repo verwendet wurde. `create()` hat dieselbe Eigenschaft mit `**fields`."""
+
         with self._lock, self._file_write_lock():
             row = self._reconcile_and_get_row(item_id)
             current = self._row_to_item(row)
@@ -672,11 +740,18 @@ class Store:
                 extra=updated_extra,
                 version=current.version + 1,
                 updated=self._now_fn(),
+                # P9 Block trace (P9-AB): **leerer Akteur heisst unveraendert, nicht leer.**
+                # Genau die Entscheidung, die einen erfundenen (falschen) Eintrag in der
+                # Historie verhindert — ein Item, das ein Operator-Skript ohne Akteur anfasst,
+                # behaelt den Namen des letzten *bekannten* Editors. Und weil
+                # `_item_to_text()` nur bei nicht-leerem Wert schreibt, entsteht fuer einen
+                # Altbestand-Item ohne Feld dadurch auch **keine** leere Zeile (Test 4).
+                updated_by=actor or current.updated_by,
             )
-            self._write_item_file(new_item, old_path=old_path, op="update")
+            self._write_item_file(new_item, old_path=old_path, op="update", actor=actor)
             return new_item
 
-    def append(self, item_id: str, *, version: int, text: str) -> Item:
+    def append(self, item_id: str, *, version: int, text: str, actor: str = "") -> Item:
         with self._lock, self._file_write_lock():
             row = self._reconcile_and_get_row(item_id)
             current = self._row_to_item(row)
@@ -692,11 +767,14 @@ class Store:
                 body=current.body + separator + text,
                 version=current.version + 1,
                 updated=self._now_fn(),
+                updated_by=actor or current.updated_by,
             )
-            self._write_item_file(new_item, old_path=old_path, op="append")
+            self._write_item_file(new_item, old_path=old_path, op="append", actor=actor)
             return new_item
 
-    def patch(self, item_id: str, *, version: int, edits: Sequence[TextEdit]) -> PatchResult:
+    def patch(
+        self, item_id: str, *, version: int, edits: Sequence[TextEdit], actor: str = ""
+    ) -> PatchResult:
         """Ersetzt exakte Textstellen im Body, ohne ihn komplett neu zu schreiben (P6-E).
         Reihenfolge wie `update`/`append`, mit einem zusätzlichen Schritt: `apply_edits()`
         läuft auf einer Kopie des Bodys, **bevor** irgendetwas geschrieben wird — ein
@@ -718,14 +796,15 @@ class Store:
 
             new_item = replace(
                 current, body=new_body, version=current.version + 1, updated=self._now_fn(),
+                updated_by=actor or current.updated_by,
             )
-            self._write_item_file(new_item, old_path=old_path, op="patch")
+            self._write_item_file(new_item, old_path=old_path, op="patch", actor=actor)
             return PatchResult(
                 item=new_item, replacements=len(edits), lines=lines,
                 bytes_before=bytes_before, bytes_after=bytes_after,
             )
 
-    def archive(self, item_id: str, *, version: int) -> Item:
+    def archive(self, item_id: str, *, version: int, actor: str = "") -> Item:
         with self._lock, self._file_write_lock():
             row = self._reconcile_and_get_row(item_id)
             current = self._row_to_item(row)
@@ -736,6 +815,7 @@ class Store:
             new_item = replace(
                 current, status="archived", folder="",
                 version=current.version + 1, updated=self._now_fn(),
+                updated_by=actor or current.updated_by,
             )
             slug = files.slugify(new_item.title)
             archive_path = (
@@ -745,11 +825,17 @@ class Store:
             files.move_file(old_path, archive_path)
             row2 = index.row_from_file(self._data_root, archive_path)
             index.upsert_item(self._conn, row2)
-            self._commit("archive", new_item.id, new_item.space)
+            self._commit("archive", new_item.id, new_item.space, actor)
             return new_item
 
     def move(
-        self, item_id: str, *, version: int, space: str | None = None, folder: str | None = None
+        self,
+        item_id: str,
+        *,
+        version: int,
+        space: str | None = None,
+        folder: str | None = None,
+        actor: str = "",
     ) -> Item:
         """Verschiebt ein Item in einen anderen Space und/oder Ordner (P6-AD,
         `phase6_shares/ITEM_MOVE_PLAN.md` §4.1). Eigene Methode statt eines `space=`-Feldes an
@@ -808,6 +894,7 @@ class Store:
             new_item = replace(
                 current, space=target_space, folder=target_folder,
                 version=current.version + 1, updated=self._now_fn(),
+                updated_by=actor or current.updated_by,
             )
             # P6.5-T: das Asset-Verzeichnis zieht mit, BEVOR `_write_item_file()` committet —
             # ein Move erzeugt weiterhin genau einen Git-Commit (P6-Abnahmezeile 26s Mechanik).
@@ -815,7 +902,7 @@ class Store:
                 files.asset_dir(self._data_root, current.space, current.id),
                 files.asset_dir(self._data_root, target_space, current.id),
             )
-            self._write_item_file(new_item, old_path=old_path, op="move")
+            self._write_item_file(new_item, old_path=old_path, op="move", actor=actor)
             self._cleanup_emptied_folders(old_path.parent, current.space)
             return new_item
 
@@ -840,11 +927,16 @@ class Store:
             current = current.parent
 
     def put_asset(
-        self, item_id: str, *, data: bytes, filename: str | None = None
+        self, item_id: str, *, data: bytes, filename: str | None = None, actor: str = ""
     ) -> AssetInfo:
         """Legt ein Bild unter `<space>/_assets/<item_id>/` ab (P6.5-T, fünfte Contract-
         Öffnung). Kein `version`-Parameter — Assets sind nicht Teil der Item-Versionierung,
-        ein Upload konkurriert nie mit einem Text-Write um dieselbe `version`."""
+        ein Upload konkurriert nie mit einem Text-Write um dieselbe `version`.
+
+        `actor` (P9 Block trace) wandert **ausschließlich** an den Git-Autor. Ein Bild-Upload
+        fasst den Item-Text nicht an und setzt `updated_by` deshalb **nicht** — die Versions-
+        und Frontmatter-Wahrheit des Items bleibt die des letzten echten Text-Writes. Wer ein
+        Bild hochlaedt, will im Git-Log stehen, nicht im Item-Header."""
         with self._lock, self._file_write_lock():
             row = self._reconcile_and_get_row(item_id, repair_drift=False)
             space = row["space"]
@@ -860,7 +952,7 @@ class Store:
             target_dir.mkdir(parents=True, exist_ok=True)
             path = files.asset_path(self._data_root, space, item_id, asset_id, ext)
             files.atomic_write_bytes(path, data)
-            self._commit("asset", item_id, space)
+            self._commit("asset", item_id, space, actor)
             # `created` kommt aus der Datei-mtime, nicht aus `self._now_fn()` — nichts
             # persistiert den Upload-Zeitpunkt separat, also muss put_asset() dieselbe Quelle
             # liefern, die list_assets() beim nächsten Listing sieht (Advisor-Fund, sonst
@@ -914,11 +1006,12 @@ class Store:
             mime = sniffed[0] if sniffed is not None else "application/octet-stream"
             return data, mime
 
-    def delete_asset(self, item_id: str, asset_id: str) -> None:
+    def delete_asset(self, item_id: str, asset_id: str, actor: str = "") -> None:
         """„Verschieben statt Entfernen" (N5, gelockt): das Bild landet in `_trash/`,
         Entscheidung H (kein Hard-Delete im Kern-API) bleibt formal unangetastet. Die
         Body-Referenz läuft danach ins Leere und rendert als Alt-Text — kein Rewrite des
-        Bodys hier, das ist Aufgabe der aufrufenden Schicht, falls gewünscht."""
+        Bodys hier, das ist Aufgabe der aufrufenden Schicht, falls gewünscht. Wie `put_asset()`
+        nur Git-Autor, kein `updated_by` (P9 Block trace)."""
         with self._lock, self._file_write_lock():
             row = self._reconcile_and_get_row(item_id, repair_drift=False)
             space = row["space"]
@@ -929,9 +1022,9 @@ class Store:
             trash_dir = target_dir / "_trash"
             trash_dir.mkdir(parents=True, exist_ok=True)
             files.move_file(matches[0], trash_dir / matches[0].name)
-            self._commit("asset_trash", item_id, space)
+            self._commit("asset_trash", item_id, space, actor)
 
-    def trash(self, item_id: str, *, version: int) -> None:
+    def trash(self, item_id: str, *, version: int, actor: str = "") -> None:
         """P9 Step G (P9-I, P9-J, P9-K): **Löschen heißt Verschieben nach `._trash/`, nie
         `unlink`** — derselbe Präzedenzfall wie `delete_asset()` (N5), mit dem Unterschied, dass
         dort die Unsichtbarkeit aus einem expliziten `if path.name == "_trash"` im Asset-Listing
@@ -953,6 +1046,13 @@ class Store:
 
         Autorisierung passiert **nicht** hier, wie überall im Store — der Aufrufer prüft Rechte
         VOR dem Aufruf (`api.py :: _items_delete`, P9-K: nur eigene, schreibbare Items).
+
+        **`actor` (P9 Block trace) setzt `updated_by` nicht** — die Datei wird hier nicht neu
+        geschrieben, sie wandert nur. Im Papierkorb steht deshalb der letzte Editor des Items,
+        waehrend der Loeschende als Git-Autor auftaucht. Das ist die eine Stelle, an der die
+        beiden Spuren auseinanderlaufen, und es ist so gewollt: `updated_by` ist eine Aussage
+        ueber den **Inhalt**, und der Inhalt wurde hier von niemandem geaendert. Nicht
+        nachbessern.
         """
         with self._lock, self._file_write_lock():
             row = self._reconcile_and_get_row(item_id)
@@ -976,7 +1076,7 @@ class Store:
             # filtert sie beim Lesen, `_graph_get` verlangt für eine Kante, dass **beide**
             # Endpunkte in der sichtbaren Knotenmenge sind, und die kommt aus `search()`.
             index.delete_item(self._conn, item_id)
-            self._commit("trash", item_id, current.space)
+            self._commit("trash", item_id, current.space, actor)
 
     def rebuild_index(self) -> IndexStats:
         with self._lock:

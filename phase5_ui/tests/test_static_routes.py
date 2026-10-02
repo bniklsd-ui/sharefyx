@@ -1886,3 +1886,103 @@ def test_space_drop_target_uses_the_same_owner_guard_as_folders():
         "bindFolderDropTarget(row, \"\") muss hinter einem if (space.own)-Riegel stehen, "
         "genau wie der bestehende Ordner-Aufruf (P9 Step D2)."
     )
+
+
+# -- P9 Block trace: `assignee` im Editor, `updated_by` als Lesezeile (Plan §4 T11) ------------
+#
+# Der P9-Z-Zweig ist **das** Verhaltensstueck des UI-Teils: der Client fuellt `assignee`, wenn
+# der Status `doing` wird. Ein statischer Wächter kann das Verhalten nicht fahren (P5-T: kein
+# Build-Step, JS ohne Unit-Test) — er kann aber die beiden Bedingungen *am Text* festnageln,
+# an denen die Regel hängt: der Wert `doing` und die Leer-Prüfung. Die Gegenprobe G4 nimmt die
+# Leer-Prüfung weg und macht genau diesen Test rot.
+
+
+def _js_ohne_kommentare(quelle: str) -> str:
+    """Zeilen- und Blockkommentare raus, damit eine **Erklaerung** im Kommentar nicht als
+    Verstoss gilt (dritte Wiederholung derselben Falle im Repo: P8.6 Block H, P9 Step G). Die
+    Einschraenkung: `//` in einem Regex-Literal oder String wird mit abgeschnitten — fuer die
+    beiden hier gesuchten Muster ist das irrelevant, sie stehen in keinem davon."""
+    quelle = re.sub(r"/\*.*?\*/", "", quelle, flags=re.DOTALL)
+    return re.sub(r"(?m)//.*$", "", quelle)
+
+
+def test_editor_fills_assignee_only_when_the_status_becomes_doing():
+    """T11/P9-Z: der Zweig existiert, er nennt `doing`, und er **fragt vorher nach einem
+    gesetzten `assignee`**. Die dritte Bedingung — `state.ownSpace` statt eines geratenen
+    Namens — ist mit drin, weil ein `undefined` als Space-Name die schlimmste denkbare
+    Ausgabe waere (V184)."""
+    js = _js_ohne_kommentare(
+        (DEFAULT_STATIC_DIR / "js" / "editor.js").read_text("utf-8")
+    )
+    zweig = re.search(
+        r'fieldStatusEl\.addEventListener\("change", function \(\) \{(.*?)\n  \}\);', js, re.DOTALL
+    )
+    assert zweig, "kein change-Zweig an #field-status gefunden"
+    koerper = zweig.group(1)
+    assert 'fieldStatusEl.value !== "doing"' in koerper, "der Zweig prueft nicht auf doing"
+    assert 'fieldAssigneeEl.value.trim() !== ""' in koerper, (
+        "P9-Z ohne Leer-Pruefung: jeder, der eine fremde Aufgabe in Arbeit zieht, wuerde sie "
+        "sich selbst zuschreiben"
+    )
+    assert "state.ownSpace" in koerper, "der Zweig nimmt nicht den eigenen Space"
+    assert "!state.ownSpace" in koerper, "kein Guard gegen `state.ownSpace === null` (V184)"
+    assert koerper.index('fieldStatusEl.value !== "doing"') < koerper.index(
+        "fieldAssigneeEl.value ="
+    ), "erst pruefen, dann schreiben"
+
+
+def test_no_other_branch_touches_the_assignee_field():
+    """T11, die Enge: `fieldAssigneeEl.value` wird an **genau drei** Stellen geschrieben —
+    Laden, Entwurf und P9-Z. Jede vierte waere eine Stelle, an der `assignee` ohne
+    ausdrueckliche menschliche Absicht veraendert wird; genau das hat P9-Z ausgeschlossen."""
+    js = _js_ohne_kommentare(
+        (DEFAULT_STATIC_DIR / "js" / "editor.js").read_text("utf-8")
+    )
+    zuweisungen = [
+        m.start() for m in re.finditer(r"fieldAssigneeEl\.value =", js)
+    ]
+    assert len(zuweisungen) == 3, (
+        f"erwartet 3 Zuweisungen (Laden, Entwurf, P9-Z), gefunden {len(zuweisungen)}"
+    )
+    # Und `assignee` ist ueberhaupt im Formular- und Schnappschuss-Weg, sonst waere das Feld
+    # ein Bild, das beim Speichern wieder verschwindet (V180: saveItem() schickt den ganzen
+    # `currentFormValues()`-Stand).
+    assert "assignee: fieldAssigneeEl.value.trim()" in js
+    assert "assignee: item.assignee || \"\"" in js, "der Schnappschuss kennt `assignee` nicht"
+    assert "current.assignee !== (snap.assignee || \"\")" in js, (
+        "isDirty() kennt `assignee` nicht — ein getippter Assignee waere nicht speicherbar"
+    )
+
+
+def test_the_meta_panel_has_an_assignee_field_and_a_readonly_updated_by_line():
+    """`assignee` ist ein **Feld** mit Vorschlagsliste, `updated_by` ist eine **Lesezeile**.
+    Genau diese Unterscheidung ist P9-AA in Markup: ein Eingabefeld fuer `updated_by` waere
+    eine Bedienmoeglichkeit, die der Server zurueckweist."""
+    html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
+    assert 'id="field-assignee"' in html
+    assert 'list="assignee-options"' in html, "ohne `<datalist>` gibt es keine Vorschlaege"
+    assert 'id="assignee-options"' in html
+    assert 'id="meta-updated-by"' in html
+    # Kein Eingabefeld fuer `updated_by` — weder sichtbar noch versteckt.
+    assert not re.search(r"<(input|select|textarea)[^>]*id=\"[^\"]*updated[_-]?by", html)
+    # Die Lesezeile liegt im Kopfdaten-Panel, nicht im Text-Panel: sie gehoert zu den
+    # Kopfdaten, und im Text-Panel wuerde sie beim Scrollen aus dem Blick geraten.
+    panel = re.search(r'<details class="panel panel--meta" id="meta-panel">(.*?)</details>', html, re.DOTALL)
+    assert panel and 'id="meta-updated-by"' in panel.group(1)
+
+
+def test_the_list_meta_line_shows_the_assignee():
+    """`itemMetaLine()` traegt „bei X" — und **nur** bei gesetztem `assignee`, damit der
+    Altbestand keine Luecke in der Metazeile bekommt (P9-AB, dieselbe Bedingung wie im
+    Kern)."""
+    js = (DEFAULT_STATIC_DIR / "js" / "list.js").read_text("utf-8")
+    zeile = re.search(r"export function itemMetaLine\(item\) \{(.*?)\n\}", js, re.DOTALL)
+    assert zeile, "itemMetaLine() nicht gefunden"
+    koerper = zeile.group(1)
+    assert 'parts.push("bei " + item.assignee)' in koerper
+    assert "if (item.assignee)" in koerper, "ohne Bedingung stuende bei jedem Item 'bei undefined'"
+    # Und nicht `updated_by` — die Listenzeile soll den Schreiber nicht pro Zeile zeigen.
+    # **Kommentare werden vorher entfernt**: der Kommentar an dieser Zeile *nennt* das Feld
+    # (um genau das hier zu begruenden), und ein Wächter, der sich selbst zaehlt, muss
+    # abgeschaltet werden, sobald jemand die Zeile laesst.
+    assert "updated_by" not in _js_ohne_kommentare(koerper)

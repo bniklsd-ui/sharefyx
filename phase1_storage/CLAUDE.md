@@ -455,6 +455,57 @@ alle vier Eimer (derselbe Fund wie bei `done` im Phase-5-Step-7b). Beide Kandida
 Darstellungsentscheidungen, die P9-P P10 zuteilt; vollständig mit beiden Kandidaten im Code
 kommentiert, ein Wächter pinnt, dass der Befund nicht verschwindet, ohne dass P10 ihn behoben hat.
 
+**[2026-10-02, P9 Block trace] Zehnte, benannte P1-Contract-Öffnung gebaut** — angekündigt am
+2026-10-02 mit dem Mini-Plan und Datum (P9-AA–P9-AD,
+`docs/concepts/phase9_hardening_block_trace_plan.md` §3), also **abgearbeitet, nicht entdeckt**.
+Umfang am Diff gemessen: **genau drei Dateien** (`models.py` 2, `store.py` +`history.py`),
+die enge Probe §0.4 erfüllt, die sechs Hartpfade `index/frontmatter/acl/files/patch/linkscan`
+unberührt. **Kein Index-Schema-Sprung** — im Gegensatz zur neunten Öffnung ist das Feld
+überhaupt nicht im Index, weil niemand danach filtert (P9-AA); die Trefferzeilen kommen aus
+`_summary()` (F10-Pendant), also beim Deploy kein Neuaufbau.
+- `models.py`: `Item`/`ItemSummary` bekommen `updated_by: str = ""`.
+- `store.py`: `"updated_by"` in `_KNOWN_FIELDS` (sonst `Item.extra`, F4) **und** in
+  `_SYSTEM_MANAGED_FIELDS` (sonst über `**fields`/`**changes` setzbar, P9-AA) · `_item_to_text()`
+  schreibt **nur bei nicht-leer** (dritte Wiederholung des F6-Musters: ein leeres
+  `updated_by:` wäre hier schlimmer als bei `assignee`, weil die UI es **liest**); `_summary()`
+  reicht es durch; `create/update/append/patch/archive/move` nehmen `actor: str = ""` und setzen
+  `updated_by` nur bei **nicht-leerem** Akteur (P9-AB: leer = unbekannt = **unverändert lassen**,
+  lieber der alte, wahre Wert als ein erfundener) · `_write_item_file()`/`_commit()` reichen den
+  Akteur an `history.commit(author=)` durch, ebenso die direkten `_commit`-Aufrufe in `archive`,
+  `put_asset`, `delete_asset`, `trash`. **Drift-Commits bekommen bewusst keinen** — eine
+  Fremdänderung hat per Definition keinen Akteur durch diesen Prozess.
+- `history.py`: `commit(data_root, message, author="")` setzt `--author "<name> <name@sharefyx.invalid>"`;
+  der **Committer** bleibt `Space Server` (P9-AC). Ein Name mit `<`, `>` oder Zeilenumbruch ⇒
+  kein `--author`, `logger.warning`, der Commit läuft **trotzdem** — `history.py`s Vertrag
+  („ein Write scheitert nie an Git") hat Vorrang vor einer hübscheren Zuschreibung.
+
+**Drei Entscheidungen, die am Code auffielen und nicht im Plan standen (alle datiert im Code):**
+1. **`actor` ist ein reservierter Name in `create`/`update`.** `update(id, version=1, actor="x")`
+   setzt `updated_by` und legt **kein** Feld `actor` in die Datei. P9-AD hat die Optionalität
+   bewusst gewählt (294 Testaufrufe), damit ist der Preis bekannt; ein Item mit einem echten
+   Frontmatter-Feld `actor` kann so nicht mehr geschrieben werden. Kein solches Feld existiert.
+2. **`put_asset`/`delete_asset` setzen `updated_by` nicht**, nur den Git-Autor — ein Bild-Upload
+   fasst den Item-Text nicht an. Ebenso `trash`: die Datei wird verschoben, nicht geschrieben, im
+   Papierkorb steht der letzte *Editor*, der Löschende steht im Git-Log. **So gewollt, nicht
+   nachbessern.**
+3. **Ein Altbestand-Item ohne Feld bekommt auch durch einen schreibenden Zugriff keine leere
+   Zeile** — dieselbe Eigenschaft wie P9-42/F6, hier mit eigener Test-Absicherung (`test_store.py`).
+
+**Test-Trennung, die die Fixture-Lage erzwang:** T1–T5 liegen in `test_store.py`, T6 in
+`test_history.py`, die **strukturellen** Wächter (AST über *jedes* Nicht-Test-Modul in
+`mcpserver/` und `webui/`, plus die Rolle von `_SYSTEM_MANAGED_FIELDS`) in
+`phase9_hardening/tests/test_trace_block.py`, T8/T9 in `test_tools.py` (dort wohnen die
+MCP-Fixtures), T10 in `test_api.py`, T11 in `test_static_routes.py`. `pytest` **1128 → 1152** (24 neu).
+**Ein bestehender Wächter wurde datiert zugeschnitten, nicht entfernt:**
+`test_step_f_schema.py::test_the_editor_status_dropdown_reads_the_vocabulary` verbot previously
+jedes Vorkommen von `assignee|doing` in `editor.js` — P9-Z verlangt genau das Gegenteil, weil
+sich „bei `doing` füllen" nicht ohne den Namen des Statuswerts ausdrücken lässt. Jetzt gilt:
+keine abgetippte Vokabular-*Liste*, aber genau **eine** benannte Verzweigung mit Leer-Prüfung.
+
+**Nicht in `storage/` gebaut, mit Argument:** eine Verlaufsansicht („wer hat wann was geändert",
+aus `git log`) — P9-Y, vom Nikinger nicht gewählt, P10-Kandidat. `created_by` wäre ein zweites
+Feld für eine Angabe, die bereits im ersten Git-Commit **des Items** als Autor steht.
+
 **[2026-08-17, P6 Step 7b Commit 1/3] Vierte, benannte Contract-Öffnung gebaut** (angekündigt in
 `phase6_shares/CLAUDE.md`s Session-Block vom selben Tag, `phase6_shares/ITEM_MOVE_PLAN.md` §4.1,
 P6-AD): `store.py :: move(item_id, *, version, space=, folder=) -> Item` (neu) + intern

@@ -14,6 +14,14 @@ logger = logging.getLogger(__name__)
 
 _GITIGNORE_CONTENT = ".index.sqlite3*\n.write.lock\n"
 
+# P9 Block trace (P9-AC): der Autor geht als **eigenes argv-Element** an `--author`, deshalb
+# braucht es hier keine Shell-Quoting. Verboten sind genau die Zeichen, die die Form
+# `Name <mail>` zerlegen oder einen zweiten Commit-Parameter einschleusen koennten. Ein Name
+# mit einem davon ist ein Datenfehler, kein Schreibfehler: der Commit laeuft trotzdem, nur eben
+# mit der Default-Identitaet (`Space Server`) — History geht immer, Auth-Buchhaltung nie auf
+# Kosten der Historie.
+_AUTHOR_FORBIDDEN = ("<", ">", "\n", "\r")
+
 
 def _run_git(data_root: Path, *args: str) -> subprocess.CompletedProcess[str] | None:
     try:
@@ -57,11 +65,34 @@ def ensure_repo(data_root: Path) -> None:
         _run_git(data_root, "config", "--local", "user.email", "space-server@localhost")
 
 
-def commit(data_root: Path, message: str) -> None:
+def _author_args(author: str) -> list[str]:
+    """P9-AC: `--author`-Argumente fuer `author` — leer, wenn kein Akteur bekannt ist (P9-AB:
+    lieber der alte `updated_by` als ein erfundener) oder wenn der Name die Form
+    `Name <mail>` sprengen wuerde. Der Adress-teil ist bewusst `.invalid` (RFC 2606): es gibt
+    keine Mail-Zustellung, die E-Mail-Adresse steht nur, damit Git eine syntaktisch gueltige
+    Identitaet hat — `git log --format=%an` und `git blame` lesen den **Namen** davor."""
+    if not author:
+        return []
+    if any(ch in author for ch in _AUTHOR_FORBIDDEN):
+        logger.warning(
+            "Git-Autor %r verworfen (enthaelt eines von %r) — der Commit laeuft mit der "
+            "Default-Identitaet, der Inhalt ist unberuehrt",
+            author, _AUTHOR_FORBIDDEN,
+        )
+        return []
+    return ["--author", f"{author} <{author}@sharefyx.invalid>"]
+
+
+def commit(data_root: Path, message: str, author: str = "") -> None:
     """`git add -A` + `git commit -m message` in `data_root`. Muss vom Aufrufer bereits unter
     `Store._file_write_lock()` gehalten werden — serialisiert Git-Aufrufe auch über
     Prozessgrenzen hinweg und verhindert, dass zwei gleichzeitige `git commit`-Prozesse sich
     über `.git/index.lock` in die Quere kommen.
+
+    `author` (P9-AC) setzt `--author`; der **Committer** bleibt `Space Server`. Das ist
+    Absicht: Committer ist die Maschine ("welcher Prozess"), Autor der Mensch bzw. dessen
+    Space ("wer hat es gewollt") — dieselbe Unterscheidung, die `git log` seit jeher zeigt und
+    die ein Zugriff auf fremde Commits nicht verauscht.
     """
     add_result = _run_git(data_root, "add", "-A")
     if add_result is None or add_result.returncode != 0:
@@ -70,11 +101,14 @@ def commit(data_root: Path, message: str) -> None:
         )
         return
 
-    commit_result = _run_git(data_root, "commit", "-m", message)
+    author_args = _author_args(author)
+    commit_result = _run_git(data_root, "commit", "-m", message, *author_args)
     if commit_result is None or commit_result.returncode != 0:
         logger.critical(
-            "git commit in %s fehlgeschlagen (Message %r): %s",
+            "git commit in %s fehlgeschlagen (Message %r, Autor %r): %s",
             data_root,
             message,
+            author or None,
             commit_result.stderr if commit_result else "",
         )
+

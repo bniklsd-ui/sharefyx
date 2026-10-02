@@ -33,6 +33,9 @@ var metaItemIdEl;
 var fieldTitleEl;
 var fieldStatusEl;
 var fieldDueEl;
+// P9 Block trace: `assignee` (editierbar) und `updated_by` (reine Anzeige, P9-AA).
+var fieldAssigneeEl;
+var metaUpdatedByEl;
 var fieldTagsEl;
 var fieldLinksEl;
 var editorToolbarEl;
@@ -91,7 +94,8 @@ function snapshotFromItem(item) {
   return {
     id: item.id, type: item.type, version: item.version,
     title: item.title, body: item.body, status: item.status,
-    due: item.due, tags: item.tags.slice(), links: item.links.slice(),
+    due: item.due, assignee: item.assignee || "",
+    tags: item.tags.slice(), links: item.links.slice(),
     assets: (item.assets || []).slice(),
   };
 }
@@ -168,6 +172,9 @@ export function currentFormValues() {
     body: editorTextareaEl.value,
     status: fieldStatusEl.value,
     due: fieldDueEl.value || null,
+    // P9 Block trace: getrimmt, weil `_coerce_assignee()` den Wert ebenfalls `.strip()`t —
+    // sonst waere "  niklas " vs. "niklas" ein Dauer-Ungespeichert-Zustand ohne Aenderung.
+    assignee: fieldAssigneeEl.value.trim(),
     tags: fieldTagsEl.value.split(",").map(function (s) { return s.trim(); }).filter(Boolean),
     links: fieldLinksEl.value.split(",").map(function (s) { return s.trim(); }).filter(Boolean),
   };
@@ -181,6 +188,7 @@ function isDirty() {
     || current.body !== snap.body
     || current.status !== snap.status
     || (current.due || "") !== (snap.due || "")
+    || current.assignee !== (snap.assignee || "")
     || current.tags.join(",") !== snap.tags.join(",")
     || current.links.join(",") !== snap.links.join(",");
 }
@@ -188,6 +196,7 @@ function isDirty() {
 function renderMetaDigest() {
   var v = currentFormValues();
   var parts = [v.status];
+  if (v.assignee) parts.push("bei " + v.assignee);
   if (v.due) parts.push("fällig " + v.due);
   if (v.tags.length) parts.push(v.tags.join(", "));
   metaDigestEl.textContent = parts.join(" · ");
@@ -249,6 +258,34 @@ function populateStatusSelect(itemType) {
     opt.textContent = s;
     fieldStatusEl.appendChild(opt);
   });
+}
+
+// P9 Block trace: die Vorschlagsliste hinter `#field-assignee`. Aus `state.spaces`, nicht aus
+// einer eigenen Abfrage — es ist dieselbe Liste, die die Rail zeigt, damit "bei <Space>" immer
+// einen Space nennt, den es gibt. **Vorschlag, keine Whitelist**: `assignee` ist ein freier
+// Space-Name (V160, keine Pruefung gegen die Liste), und ein Feld, das einen vorhandenen Wert
+// ablehnen wuerde, waere eine stille Datenverweigerung. Fremde Spaces stehen mit drin — sie sind
+// sichtbar (`writable: false`) und genau die, die man in einem geteilten Space eintragen will.
+function fillAssigneeOptions() {
+  var list = document.getElementById("assignee-options");
+  if (!list) return;
+  list.textContent = "";
+  state.spaces.forEach(function (space) {
+    var opt = document.createElement("option");
+    opt.value = space.name;
+    list.appendChild(opt);
+  });
+}
+
+// P9 Block trace: die Lesezeile "zuletzt geändert von X". Leer, wenn das Item das Feld nicht
+// trägt — P9-AB (kein Backfill, kein erfundener Name) heißt hier: **keine Zeile**, nicht
+// "zuletzt geändert von unbekannt". Das Datum kommt aus demselben Item, `updated_by` behauptet
+// den Menschen dahinter.
+function renderUpdatedByLine(item) {
+  if (!metaUpdatedByEl) return;
+  metaUpdatedByEl.textContent = item.updated_by
+    ? "Zuletzt geändert von " + item.updated_by + " · " + (item.updated || "")
+    : "";
 }
 
 function setEditorMode(mode) {
@@ -348,6 +385,13 @@ function showReadonlyItem(item) {
   roMetaEl.appendChild(el("span", "tnum version-num", "v" + item.version));
   roMetaEl.appendChild(idChip(item.id));
   roMetaEl.appendChild(el("span", null, item.type + " · " + item.status));
+  // P9 Block trace: dieselben beiden Angaben wie im Editor — fuer ein fremdes Item gibt es
+  // kein Kopfdaten-Panel (der Editor wird da gar nicht erst angehaengt, Akzeptanzkriterium 12),
+  // also waere die Meta-Zeile die einzige Stelle, an der man sie ueberhaupt sieht.
+  if (item.assignee) roMetaEl.appendChild(el("span", null, "bei " + item.assignee));
+  if (item.updated_by) {
+    roMetaEl.appendChild(el("span", null, "zuletzt geändert von " + item.updated_by));
+  }
   if (item.due) roMetaEl.appendChild(el("span", "tnum", "fällig " + item.due));
   roPreviewEl.innerHTML = markdownToHtml(item.body, {
     itemId: item.id, assetIds: assetIdsOf(item.assets),
@@ -372,6 +416,9 @@ function showEditableItem(item, opts) {
   populateStatusSelect(item.type);
   fieldStatusEl.value = item.status;
   fieldDueEl.value = item.due || "";
+  fieldAssigneeEl.value = item.assignee || "";
+  renderUpdatedByLine(item);
+  fillAssigneeOptions();
   fieldTagsEl.value = item.tags.join(", ");
   fieldLinksEl.value = item.links.join(", ");
   editorTextareaEl.value = item.body;
@@ -398,6 +445,7 @@ function showEditableItem(item, opts) {
       editorTextareaEl.value = draft.body;
       fieldStatusEl.value = draft.status;
       fieldDueEl.value = draft.due || "";
+      fieldAssigneeEl.value = draft.assignee || "";
       fieldTagsEl.value = draft.tags.join(", ");
       fieldLinksEl.value = draft.links.join(", ");
       updateVersionBand();
@@ -534,6 +582,8 @@ export function init() {
   fieldTitleEl = document.getElementById("field-title");
   fieldStatusEl = document.getElementById("field-status");
   fieldDueEl = document.getElementById("field-due");
+  fieldAssigneeEl = document.getElementById("field-assignee");
+  metaUpdatedByEl = document.getElementById("meta-updated-by");
   fieldTagsEl = document.getElementById("field-tags");
   fieldLinksEl = document.getElementById("field-links");
   editorToolbarEl = document.getElementById("editor-toolbar");
@@ -709,7 +759,31 @@ export function init() {
     });
   });
 
-  [fieldTitleEl, fieldStatusEl, fieldDueEl, fieldTagsEl, fieldLinksEl, editorTextareaEl].forEach(
+  // P9 Block trace, Lock P9-Z — der Client fuellt `assignee`, der Server niemals. Dem Server
+  // Bedeutung zu geben ("in Arbeit heisst: X arbeitet daran") waere genau die Statussemantik, die
+  // das Kernprinzip verbietet; der Server kennt Token → Space, nicht die Absicht eines
+  // Menschen. Diese Regel steht deshalb in einem Client-Zweig — und in `_ASSIGNEE_HINT` fuer
+  // das LLM, damit beide Clients dieselbe Regel haben.
+  //
+  // **Zwei Bedingungen, beide notwendig:**
+  // 1. nur beim Wert `doing` — jeder andere Status fasst `assignee` nicht an,
+  // 2. nur wenn das Feld **leer** ist — ein gesetzter Wert wird nie ueberschrieben (P9-Z
+  //    woertlich: "Ein gesetztes assignee ueberschreibst du nur, wenn ein Mensch es
+  //    ausdruecklich sagt"). Ohne diese zweite Bedingung wuerde jeder, der eine fremde
+  //    Aufgabe in Arbeit zieht, sie sich selbst zuschreiben.
+  //
+  // **V184:** `state.ownSpace` ist in `app.js :: init()` gesetzt, bevor ueberhaupt eine Liste
+  // geladen wird — der Editor kann also nicht ohne ihn offen sein. Der `!state.ownSpace`-Guard
+  // steht trotzdem da: die Alternative waere ein `undefined` als Space-Name in einer
+  // Nutzeroberflaeche, und die kostet nichts.
+  fieldStatusEl.addEventListener("change", function () {
+    if (fieldStatusEl.value !== "doing") return;
+    if (fieldAssigneeEl.value.trim() !== "" || !state.ownSpace) return;
+    fieldAssigneeEl.value = state.ownSpace;
+    renderMetaDigest();
+  });
+
+  [fieldTitleEl, fieldStatusEl, fieldDueEl, fieldAssigneeEl, fieldTagsEl, fieldLinksEl, editorTextareaEl].forEach(
     function (input) {
       input.addEventListener("input", function () {
         updateVersionBand();

@@ -164,6 +164,23 @@ _TITLE_NOT_ID_HINT = (
     "nicht in Aufzählungs-Zeilen."
 )
 
+# P9 Block trace, Lock P9-Z: **`assignee` füllt der Client, der Server niemals.** Die Regel
+# gibt einem Statuswert (`doing`) Bedeutung — das wäre im Server genau die Art
+# Statussemantik, die das Kernprinzip verbietet: der Server kennt Token → Space, er weiß
+# nicht, was „in Arbeit" bedeutet. Der Server kann nur sagen, *wer* gerade schreibt; was
+# dieser Mensch damit meint, entscheidet der Client. Deshalb steht der Hinweis in der
+# **Werkzeugbeschreibung** (die ein LLM liest) und nicht in einer `if`-Verzweigung im Code.
+#
+# Wörtlich identisch an `create_item` und `update_item` — zwei Wortlautvarianten wären eine
+# zweite, widersprüchliche Definition derselben Regel (P9-W: die einzige übersetzte Ebene ist
+# die Navigation; hier ist es eine Verhaltensregel, und die muss überall gleich lauten).
+_ASSIGNEE_HINT = (
+    "Setzt du eine Aufgabe auf status doing und ist assignee leer, setze assignee auf deinen "
+    "eigenen Space (list_spaces: own:true). Ein gesetztes assignee überschreibst du nur, wenn "
+    "ein Mensch es ausdrücklich sagt. updated_by setzt der Server — du kannst es lesen, nicht "
+    "schreiben."
+)
+
 
 def _format_dt(value: datetime) -> str:
     """Gleiche Formatierung wie `storage.store._format_dt` — Dateitext und JSON-Ausgabe zeigen
@@ -205,6 +222,11 @@ def item_to_filetext(item: Item) -> str:
     # etwas anderes zurückgibt als es geschrieben hat, ist schlimmer als ein fehlendes.
     if item.assignee:
         fields["assignee"] = item.assignee
+    # P9 Block trace: dasselbe Argument wie bei `assignee` — die Datei auf der Platte hätte das
+    # Feld, `return_body=True` lieferte eines ohne. Ein Werkzeug, das etwas anderes zurückgibt
+    # als es geschrieben hat, ist schlimmer als ein fehlendes (Kommentar direkt darüber).
+    if item.updated_by:
+        fields["updated_by"] = item.updated_by
     fields.update(item.extra)
     return serialize_frontmatter(fields, item.body)
 
@@ -228,6 +250,11 @@ def summary_to_dict(item: ItemSummary, *, own: bool) -> dict[str, Any]:
         # Nebenschutz: die Liste ist der eine Ort, an dem ItemSummary ohnehin komplett
         # durchgereicht wird — `assignee` ist hiermit genauso vollständig wie `status`.
         "assignee": item.assignee,
+        # P9 Block trace: `updated_by` ist der Name des Spaces, aus dessen authentifiziertem
+        # Principal der letzte Schreibvorgang kam — ueber MCP gesetzt, ueber MCP nicht setzbar.
+        # Bewusst neben `assignee` und **nicht** im gewrappten Snippet: beides sind vom Server
+        # gesetzte Metadaten, keine Fremdinhalte (Rule 4 / V182).
+        "updated_by": item.updated_by,
         "snippet": item.snippet if own else wrap_untrusted(item.snippet, space=item.space),
     }
 
@@ -559,6 +586,11 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             # gegeneinander halten. Fremde Metadaten sind unkritisch (kein Snippet, kein
             # Body), das Wrapper-Problem von Rule 4 betrifft hier nichts.
             "assignee": item.assignee,
+            # P9 Block trace: wie im `search_items`-Listing — dort sieht der Agent `updated_by`
+            # auf einer Seite, hier waere es der Volltext-Pfad ohne. Ein Feld, das auf der
+            # einen Flaeche lesbar ist und auf der anderen fehlt, ist genau die Divergenz, die
+            # der Kommentar zur `assignee`-Zeile darueber beschreibt.
+            "updated_by": item.updated_by,
             "version": item.version,
             "created": _format_dt(item.created),
             "updated": _format_dt(item.updated),
@@ -577,7 +609,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             "folder=<pfad> legt es in einen Unterordner. Liefert standardmäßig eine Quittung "
             "statt des vollen Texts — return_body=True holt ihn zurück. "
             + _status_hint() + " " + WRITE_TOOL_DIVISION + " " + _LIST_SPACES_POINTER
-            + " " + _TITLE_NOT_ID_HINT
+            + " " + _TITLE_NOT_ID_HINT + " " + _ASSIGNEE_HINT
         ),
         annotations={
             "readOnlyHint": False,
@@ -619,7 +651,10 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         if assignee is not None:
             kwargs["assignee"] = assignee
         try:
-            item = store.create(target_space, type=type, title=title, body=body, **kwargs)
+            item = store.create(
+                target_space, type=type, title=title, body=body,
+                actor=principal.space, **kwargs,
+            )
         except ValidationError as exc:
             raise map_storage_error(exc) from exc
         if return_body:
@@ -641,6 +676,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             "ihn zurück. Sichtbarkeit/Freigaben (visibility/share_read/share_write) gehen über "
             "kein Tool, nur über die UI. "
             + _status_hint() + " " + WRITE_TOOL_DIVISION + " " + _LIST_SPACES_POINTER
+            + " " + _ASSIGNEE_HINT
         ),
         annotations={
             "readOnlyHint": False,
@@ -745,18 +781,23 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
                         "Feldern oder status im selben Aufruf (folder darf mitgegeben werden, "
                         "als Zielordner im neuen Space)"
                     )
-                item = store.move(item_id, version=version, space=space, folder=folder)
+                item = store.move(
+                    item_id, version=version, space=space, folder=folder,
+                    actor=principal.space,
+                )
             elif status == "archived":
                 if changes:
                     raise ValidationError(
                         "status=archived erlaubt keine weiteren Felder — erst inhaltlich "
                         "updaten, dann archivieren"
                     )
-                item = store.archive(item_id, version=version)
+                item = store.archive(item_id, version=version, actor=principal.space)
             else:
                 if status is not None:
                     changes["status"] = status
-                item = store.update(item_id, version=version, **changes)
+                item = store.update(
+                    item_id, version=version, actor=principal.space, **changes,
+                )
         except (ItemNotFound, ConflictError, ValidationError) as exc:
             raise map_storage_error(exc) from exc
         if return_body:
@@ -795,7 +836,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             raise map_storage_error(PermissionDenied(acl.space)) from None
 
         try:
-            item = store.append(item_id, version=version, text=text)
+            item = store.append(item_id, version=version, text=text, actor=principal.space)
         except (ItemNotFound, ConflictError, ValidationError) as exc:
             raise map_storage_error(exc) from exc
         if return_body:
@@ -833,7 +874,9 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             raise map_storage_error(PermissionDenied(acl.space)) from None
 
         try:
-            result = store.patch(item_id, version=version, edits=edits)
+            result = store.patch(
+                item_id, version=version, edits=edits, actor=principal.space,
+            )
         except (ItemNotFound, ConflictError, ValidationError) as exc:
             raise map_storage_error(exc) from exc
         if return_body:
@@ -960,7 +1003,9 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             )) from None
 
         try:
-            asset = store.put_asset(item_id, data=data, filename=filename)
+            asset = store.put_asset(
+                item_id, data=data, filename=filename, actor=principal.space,
+            )
         except (ItemNotFound, ValidationError) as exc:
             raise map_storage_error(exc) from exc
 

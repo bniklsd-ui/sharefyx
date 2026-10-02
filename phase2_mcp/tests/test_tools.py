@@ -1096,3 +1096,89 @@ def store_assignee_via_search(tools_map, item_id: str) -> str:
     with _as(SPACE_A):
         found = json.loads(tools_map["search_items"](query="", limit=50))
     return next(row["assignee"] for row in found["items"] if row["id"] == item_id)
+
+
+# -- P9 Block trace: `updated_by` + `_ASSIGNEE_HINT` (Plan §4 T8/T9) -------------------------
+#
+# Die Wächter, die nicht hier wohnen, stehen in `phase9_hardening/tests/test_trace_block.py`
+# (AST ueber beide Adapterpakete) — hier steht alles, was die echten Tools und die echten
+# Werkzeugbeschreibungen betrifft, denn `_as()`/`tools_map` leben hier.
+
+
+def test_mcp_write_records_the_writing_principal_and_leaves_assignee_alone(tools_map, store, tmp_path):
+    """T8: A legt eine Aufgabe in einem geteilten Space an und setzt `assignee` auf sich, B
+    aendert spaeter nur den Titel. Danach gilt: **`updated_by` ist B, `assignee` weiter A.**
+
+    Genau diese beiden Haelfaften sind die Aussage des Blocks. Ein Test, der nur `updated_by`
+    prueft, wuerde durch eine Implementierung bestehen, die bei jedem Schreibvorgang auch
+    `assignee` ueberschreibt — und das waere die Zerstoerung von Lock P9-Z, die niemand
+    bemerkt, weil beide Felder plausible Werte tragen."""
+    _write_share_yml(tmp_path / SPACE_B, f"write: [{SPACE_A}]\n")
+    item = store.create(
+        SPACE_B, type="task", title="Angebot schreiben", folder="", assignee=SPACE_A,
+        actor=SPACE_A,
+    )
+
+    with _as(SPACE_B):
+        receipt = json.loads(
+            tools_map["update_item"](item.id, version=item.version, title="Angebot schreiben (neu)")
+        )
+
+    assert receipt["updated_by"] == SPACE_B
+    assert receipt["version"] == item.version + 1
+    aktualisiert = store.get(item.id)
+    assert aktualisiert.updated_by == SPACE_B
+    assert aktualisiert.assignee == SPACE_A, "der Assignee gehoert A, B hat ihn nicht angefasst"
+
+
+def test_both_write_tools_carry_the_assignee_hint_verbatim(described_mcp):
+    """T9: `_ASSIGNEE_HINT` steht **woertlich identisch** in `create_item` und `update_item`.
+
+    Das ist der Lock P9-Z fuer den zweiten Client: der Server kann einem Agenten nicht
+    beibringen, was „in Arbeit" bedeutet, also steht die Regel im Text, den der Agent liest.
+    Zwei Wortlautvarianten wuerden zwei Regeln sein — und eine davon gewinnt, ohne dass es
+    jemand gemerkt haette."""
+    for name in ("create_item", "update_item"):
+        assert tools._ASSIGNEE_HINT in _description_of(described_mcp, name), name
+    # Und die Regel sagt beides: setzen **und** nicht ueberschreiben. Nur die erste Haelfte
+    # zu pruefen haette eine Implementierung passieren lassen, die fremde Aufgaben klaut.
+    assert "überschreibst" in tools._ASSIGNEE_HINT
+    assert "updated_by setzt der Server" in tools._ASSIGNEE_HINT
+
+
+def test_no_mcp_tool_accepts_updated_by(tools_map):
+    """P9-AA ueber MCP: `update_item` und `create_item` haben **keinen** `updated_by`-Parameter.
+    Ueber FastMCP laeuft ein unbekanntes Argument als Tool-Fehler, nicht als stiller
+    Verzicht — der Agent kann es also gar nicht erst losschicken, ohne es zu merken."""
+    import inspect
+
+    for name in ("create_item", "update_item"):
+        parameter = inspect.signature(tools_map[name]).parameters
+        assert "updated_by" not in parameter, f"{name} hat einen updated_by-Parameter"
+    with _as(SPACE_A):
+        with pytest.raises(Exception) as excinfo:
+            tools_map["update_item"]("itm_00000000", version=1, title="x", updated_by="fabian")
+    assert "updated_by" in str(excinfo.value) or "unexpected" in str(excinfo.value).lower()
+
+
+def test_read_paths_and_the_receipt_carry_updated_by(tools_map, store):
+    """P9-72: `search_items`, `get_item_meta` und die Schreibquittung tragen den Schreiber.
+    Der Volltext-Pfad (`return_body=True`) ist durch T12 in P9 Step F bereits fuer `assignee`
+    abgesichert und hier derselbe Weg — `item_to_filetext()` bekommt dieselbe Zeile."""
+    item = store.create(SPACE_A, type="task", title="Rechnung", actor=SPACE_A)
+
+    with _as(SPACE_A):
+        treffer = json.loads(tools_map["search_items"]())
+        meta = json.loads(tools_map["get_item_meta"](item.id))
+        quittung = tools_map["update_item"](item.id, version=item.version, title="Rechnung II")
+        volltext = tools_map["update_item"](
+            item.id, version=item.version + 1, title="Rechnung III", return_body=True
+        )
+
+    assert treffer["items"][0]["updated_by"] == SPACE_A
+    assert meta["updated_by"] == SPACE_A
+    # Die **Standard**-Antwort eines Schreibvorgangs ist die Quittung (P6-H), nicht der
+    # Dateitext — beide sind geprueft, weil ein Agent je nach Aufruf die eine oder die andere
+    # sieht. `return_body=True` holt denselben Inhalt als YAML-Frontmatter.
+    assert json.loads(quittung)["updated_by"] == SPACE_A
+    assert "updated_by: alpha" in volltext

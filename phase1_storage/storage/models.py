@@ -41,6 +41,14 @@ class Item:
     # Frontmatter (`store._item_to_text`) — ein leerer Default darf keinen Altbestand-Item ein
     # stilles `assignee: ""` einhängen.
     assignee: str = ""
+    # P9 Block trace (P9-AA/AB, zehnte P1-Contract-Öffnung): Name des Space, aus dessen
+    # **authentifiziertem** Principal der letzte Schreibvorgang kam — **vom Server gesetzt,
+    # über kein Werkzeug und keine REST-Route setzbar** (es steht in
+    # `store._SYSTEM_MANAGED_FIELDS`). Dieselbe Form wie `updated`: leer heißt „unbekannt",
+    # und leer heißt **unverändert lassen** (P9-AB) — lieber der alte, wahre Wert als ein
+    # erfundener. Ein Item ohne Feld bleibt ohne Feld, es wird nie ein leeres `updated_by:`
+    # geschrieben (`store._item_to_text`).
+    updated_by: str = ""
     # Unbekannte Frontmatter-Felder — überleben Round-Trips unangetastet (Entscheidung A).
     extra: dict[str, Any] = field(default_factory=dict)
 
@@ -80,6 +88,11 @@ class ItemSummary:
     # nicht, und die Liste ist der Weg, über den ein Mensch (und ein Agent) überhaupt merkt,
     # wem etwas zugewiesen ist. Gefüllt wird es in `store._summary()`.
     assignee: str = ""
+    # P9 Block trace: dasselbe Feld wie auf `Item` — aus demselben Grund wie `assignee` darunter.
+    # Eine Trefferliste ohne `updated_by` wäre eine Liste, in der ein Agent sieht, **wer**
+    # etwas bearbeitet hat, aber nicht, **ob** es seit dem letzten Lesen jemand getan hat.
+    # Gefüllt wird es in `store._summary()` — genau die Stelle, die P9 Step F als F10 benannt hat.
+    updated_by: str = ""
 
 
 @dataclass(kw_only=True)

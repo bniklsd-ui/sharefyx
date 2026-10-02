@@ -200,6 +200,22 @@ _PATCH_FIELDS = frozenset({
     # nicht als "Unbekanntes Feld" ablehnt; die Uebergabe an `store.update()` ist unveraendert.
     "assignee",
     "password", "totp",
+    # P9 Block trace (P9-AA): `updated_by` steht hier **bewusst nicht** und wird auch in
+    # `_items_post`s Whitelist nicht ergaenzt. Ein PATCH, der es mitschickt, bekommt damit
+    # `422 validation_failed` ("Unbekannte Felder") statt es zu schreiben — die Datei bleibt
+    # unberuehrt. Wer es spaeter aufnehmen will, hat es mit dem Kern-Aufruf zu tun: dort
+    # steht es in `_SYSTEM_MANAGED_FIELDS` und wird mit `ValidationError` abgelehnt, d. h. der
+    # Kern laesst es auch dann nicht zu, wenn die Whitelist es durchlaesst.
+    #
+    # **Gemessen, nicht behauptet (Abweichung von P9-AA):** `_items_post` kennt **keine**
+    # `unknown`-Pruefung, es filtert lautlos auf eine Whitelist. Ein `POST` mit `updated_by`
+    # im Body wird also stillschweigend verworfen statt mit 422 quittiert — dieselbe
+    # Eigenschaft, die heute `created`/`version`/`space` im POST-Body haben. Der Kern
+    # bleibt unberuehrt (P9-74 haelt: kein Kanal kann es setzen), aber die *Form* der
+    # Ablehnung ist je nach Route eine andere. Bewusst nicht vereinheitlicht: eine
+    # `unknown`-Pruefung im POST wuerde jedes unbekannte Feld ablehnen und damit
+    # Round-Trips ueber Schreib-Clients brechen, die den vollen Item-JSON zurueckschicken.
+
     # P8-A: Reauth-Grant, ausgestellt von POST /api/v1/reauth; session-gebunden, in-memory,
     # TTL 90 s. Wird in `webui/shares.py` ZUERST geprüft (vor `password`/`totp`), damit ein
     # Batch mit N rechteerweiternden Items nur EINEN Credentials-Block braucht (P7-24).
@@ -605,9 +621,12 @@ def api_routes(
         moved: list[str] = []
         try:
             for item in items:
-                it = store.move(item.id, version=item.version, space=home, folder="")
+                it = store.move(
+                    item.id, version=item.version, space=home, folder="",
+                    actor=session.space,
+                )
                 if it.status != "archived":
-                    store.archive(it.id, version=it.version)
+                    store.archive(it.id, version=it.version, actor=session.space)
                 moved.append(item.id)
         except ConflictError as exc:
             remaining = [item.id for item in items if item.id not in moved]
@@ -853,10 +872,16 @@ def api_routes(
             for key, value in body.items()
             # P9 Step F: `assignee` in der Whitelist — der Kern validiert den Typ selbst
             # (`store._coerce_assignee`), hier ist nur die Feld-Auswahl gefiltert.
+            # P9 Block trace: `updated_by` fehlt hier **absichtlich** (P9-AA) und wird still
+            # verworfen — siehe die Notiz an `_PATCH_FIELDS`, dort steht die gemessene
+            # Abweichung: POST quittiert unbekannte Felder nicht mit 422, PATCH schon.
             if key in {"status", "due", "tags", "links", "format", "folder", "assignee"}
         }
         try:
-            item = store.create(session.space, type=item_type, title=title, body=item_body, **kwargs)
+            item = store.create(
+                session.space, type=item_type, title=title, body=item_body,
+                actor=session.space, **kwargs,
+            )
         except (ValidationError, ValueError) as exc:
             raise _map_store_error(exc, own_space=session.space) from exc
         return JSONResponse(
@@ -998,9 +1023,14 @@ def api_routes(
                         "space verschiebt ein Item pur — kombiniere es nicht mit anderen "
                         "Feldern im selben Aufruf.",
                     )
-                item = store.move(item_id, version=version, space=target_space, folder=new_folder)
+                item = store.move(
+                    item_id, version=version, space=target_space, folder=new_folder,
+                    actor=session.space,
+                )
             else:
-                item = store.update(item_id, version=version, **changes)
+                item = store.update(
+                    item_id, version=version, actor=session.space, **changes,
+                )
         except (ItemNotFound, ConflictError, ValidationError, ValueError) as exc:
             raise _map_store_error(exc, own_space=session.space) from exc
         return JSONResponse(
@@ -1075,7 +1105,7 @@ def api_routes(
             )
 
         try:
-            store.trash(item_id, version=version)
+            store.trash(item_id, version=version, actor=session.space)
         except (ItemNotFound, ConflictError, ValidationError, ValueError) as exc:
             raise _map_store_error(exc, own_space=session.space) from exc
         # `204` ohne Body: es gibt nichts zurückzugeben (P9-J — kein wiederherstellbarer
@@ -1101,7 +1131,7 @@ def api_routes(
             raise ApiError("forbidden", "Kein Schreibzugriff auf dieses Item.")
 
         try:
-            item = store.append(item_id, version=version, text=text)
+            item = store.append(item_id, version=version, text=text, actor=session.space)
         except (ItemNotFound, ConflictError, ValidationError, ValueError) as exc:
             raise _map_store_error(exc, own_space=session.space) from exc
         return JSONResponse(
@@ -1142,7 +1172,7 @@ def api_routes(
             raise ApiError("validation_failed", "Item ist bereits archiviert.")
 
         try:
-            item = store.archive(item_id, version=version)
+            item = store.archive(item_id, version=version, actor=session.space)
         except (ItemNotFound, ConflictError) as exc:
             raise _map_store_error(exc, own_space=session.space) from exc
         return JSONResponse(
@@ -1173,7 +1203,7 @@ def api_routes(
         # dem eine Entscheidung (Persistenz vs. Parameter streichen) etwas zu tragen hätte.
         data = await _raw_body(request)
         try:
-            asset = store.put_asset(item_id, data=data)
+            asset = store.put_asset(item_id, data=data, actor=session.space)
         except (ItemNotFound, ValidationError) as exc:
             raise _map_store_error(exc, own_space=session.space) from exc
         return JSONResponse(
@@ -1234,7 +1264,7 @@ def api_routes(
         if not permissions.can_write_item_as_human(session.space, acl):
             raise ApiError("forbidden", "Kein Schreibzugriff auf dieses Item.")
         try:
-            store.delete_asset(item_id, asset_id)
+            store.delete_asset(item_id, asset_id, actor=session.space)
         except ItemNotFound as exc:
             raise _map_store_error(exc, own_space=session.space) from exc
         return JSONResponse({"ok": True}, headers={"Cache-Control": "no-store"})

@@ -1478,6 +1478,17 @@ select.input:focus {
   color: var(--text-faint);
 }
 .panel__inner { padding: 0 calc(var(--space) * 3) calc(var(--space) * 2); }
+/* P9 Block trace: die Lesezeile "zuletzt geändert von X · Datum". Bewusst auf der unteren
+   Layer-Ton (`--text-faint`, dieselbe Stufe wie `.panel__hint`) und **nicht** auf der
+   Akzentfarbe: sie ist eine Angabe, keine Aktion — dieselbe Trennung, die Block C (P8.6-N.10)
+   ueber die Tiefe statt ueber die Farbe gezogen hat. Leerer Inhalt = keine Zeile, deshalb kein
+   Platzhalter-Schriftsatz. */
+.panel__readline {
+  margin: 0 0 var(--space);
+  font-size: var(--fs-meta);
+  color: var(--text-faint);
+}
+.panel__readline:empty { display: none; }
 
 .panel--meta {
   background: var(--panel-meta);

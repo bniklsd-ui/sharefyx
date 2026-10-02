@@ -7,7 +7,7 @@ up: ../../phase9_hardening/CLAUDE.md
 down:
   - ./phase9_hardening_block_doing_plan.md   # 📕 Vorgänger-Block; `doing` + Eimer „In Arbeit"
   - ./phase9_hardening_plan.md               # 📕 übergeordneter P9-Plan; P9-P (Hervorhebung → P10) wird hier datiert eingeengt
-updated: 2026-10-02 (geschrieben, Claude Code, Planungssession nach dem Deploy `v3.1.0`; beide Kernentscheidungen vom Nikinger getroffen)
+updated: 2026-10-02 (§9 gefüllt, opencode/M3, ein Commit — 🔄 → 📕, ab jetzt nicht mehr editiert) | updated: 2026-10-02 (geschrieben, Claude Code, Planungssession nach dem Deploy `v3.1.0`; beide Kernentscheidungen vom Nikinger getroffen)
 ---
 
 # Phase 9 — Block trace (wer arbeitet dran, wer hat zuletzt geändert)
@@ -261,4 +261,82 @@ P9-Z: Auto-Füllen nur bei leer, nie überschreiben · `P9-80` Browser S1–S7 g
 
 ## §9 Ergebnis
 
-_(leer — füllt der Block-Commit)_
+**Bilanz: 8 ✅ · 1 ⚠️ · 0 ⬜** (P9-69 – P9-82), `pytest` **1128 → 1152** (24 neue Tests — im frischen venv gezählt, nicht addiert),
+`ui_budget` 5/5 (**155,1 KB**), enge Probe §0.4 = **genau drei Dateien** (`models.py`,
+`store.py`, `history.py`), Tabu-Bereichs-Diff leer, `doc_health` 0, **kein `pkill -f`, kein
+`systemctl`**, `sharefyx-mcp` nicht angefasst.
+
+| # | Abnahmezeile | Stand | Beleg |
+|---|---|---|---|
+| P9-69 | enge Probe = drei Dateien | ✅ | `git diff --stat -- phase1_storage/storage` → `history.py`, `models.py`, `store.py` |
+| P9-70 | T1–T6 grün | ✅ | 5 Tests `test_store.py` + 4 `test_history.py` |
+| P9-71 | Wächter T7 grün und mit G1 rot | ✅ | `test_trace_block.py::test_every_store_write_call_in_the_adapters_carries_an_actor`; G1 → **1 rot** |
+| P9-72 | MCP liefert `updated_by` in `get_item`, `search_items` und Schreibantworten | ✅ ⚠️ | `test_read_paths_and_the_receipt_carry_updated_by` — **eine Datei mehr als §0.3 vorsah:** `mcpserver/receipts.py` (Schreibantwort). Begründung unten |
+| P9-73 | `_ASSIGNEE_HINT` an beiden Tools wörtlich | ✅ | `test_both_write_tools_carry_the_assignee_hint_verbatim` (prüft zusätzlich die *nicht*-überschreiben-Hälfte) |
+| P9-74 | kein Kanal kann `updated_by` setzen | ✅ ⚠️ | Store `ValidationError` · PATCH `422` · kein MCP-Parameter · **POST verwirft lautlos** (Abweichung, unten) |
+| P9-75 | Altbestand bleibt ohne Feld | ✅ | `test_legacy_item_without_the_field_never_gets_an_empty_one` + Browser S7 (Lesezeile **weg**, kein „unbekannt") |
+| P9-76 | Git-Autor = Schreiber, Committer unverändert | ✅ | `test_commit_sets_the_author_and_leaves_the_committer_at_the_default` + **live im Wegwerf-`DATA_ROOT`**: `git log --format=%an -3` → `beta, alpha, alpha` |
+| P9-77 | UI: „bei X" in der Liste | ✅ | Browser S2 (`task · doing · bei alpha`), statisch `test_the_list_meta_line_shows_the_assignee` |
+| P9-78 | UI: Editorfeld + „zuletzt geändert von" | ✅ | Browser S1/S3/S4, `test_the_meta_panel_has_an_assignee_field_and_a_readonly_updated_by_line` |
+| P9-79 | P9-Z: Auto-Füllen nur bei leer, nie überschreiben | ✅ | Browser S1 (`'' → alpha`) und S5 (`alpha → alpha`); Gegenlauf **S5 rot** (`alpha → beta`) |
+| P9-80 | Browser S1–S7 grün, Gegenlauf rot | ✅ | `probes/p9_trace_probe.json` **8/8**; mit G4 **7/8** (S5 rot, `alpha → beta`) |
+| P9-81 | Gegenlauf G1–G5 jeder ≥ 1 rot | ✅ | G1→**1** · G2→**2** · G3→**1** · G4→**2** · G5→**4** |
+| P9-82 | frisches venv grün | ✅ | siehe unten |
+
+### Drei Dinge, die der Plan nicht wusste
+
+**1. Die Klammer in P9-AA war für eine Route ungenau (P9-74 ⚠️).** P9-AA sagt „ein
+mitgeschicktes Feld ist `ValidationError`, wie heute `updated`". Gemessen: für **PATCH** stimmt
+das (`422 validation_failed`, `api.py:890`) und für den Kern (`_SYSTEM_MANAGED_FIELDS`), für
+**POST** nicht — `_items_post` hat keine `unknown`-Prüfung, sondern filtert **lautlos** auf eine
+Whitelist. Ein `updated_by` im POST-Body wird also still verworfen, dieselbe Eigenschaft, die
+heute `created`/`version`/`space` dort haben. **Nicht vereinheitlicht:** eine `unknown`-Prüfung im
+POST würde jedes unbekannte Feld ablehnen und damit Round-Trips über Schreib-Clients brechen,
+die den vollen Item-JSON zurückschicken. Beide Stellen im Code kommentiert.
+
+**2. P9-72 verlangte eine Datei, die §0.3 nicht listet (P9-72 ⚠️).** „Schreibantworten" — die
+**Standard**-Antwort jedes Schreib-Tools ist die *Quittung* (`receipts.py :: write_receipt()`),
+nicht der Dateitext (`return_body=True`). Ohne diese eine Zeile hätte ein Agent nach einem
+fremden Write genau die Antwort nicht bekommen, in der er nachschaut. `receipts.py` ist
+bewusst nicht in §0.3 — und nicht in §0.4s Tabu-Liste; die Abweichung ist eine Zeile plus ein
+Kommentar.
+
+**3. Zwei Wächter aus dem Bestand kamen mit und wurden datiert behandelt.**
+- `test_app.py::test_all_ten_tools_are_callable_over_http` prüft die Patch-Quittung als
+  **exaktes Dict** und war der erste Ort, an dem die neue Zeile auffiel. Die Assertion nennt
+  jetzt `updated_by: alpha` — und ist damit nebenbei der Beleg dafür, dass der Akteur aus dem
+  **Token** kommt, nicht aus dem Aufruf.
+- `test_step_f_schema.py::test_the_editor_status_dropdown_reads_the_vocabulary` verbot
+  **jedes** Vorkommen von `assignee|doing` in `editor.js`. P9-Z verlangt genau das Gegenteil:
+  „bei `doing` füllen" lässt sich nicht ohne den Namen des Statuswerts ausdrücken. Der Wächter
+  ist **zugeschnitten, nicht entfernt**: keine abgetippte Vokabular-*Liste* in
+  `populateStatusSelect()`, aber genau **eine** benannte Verzweigung mit Leer-Prüfung. Der
+  Docstring trägt beide Richtungen mit Datum.
+
+### Und ein Fund drei Phasen entfernt
+
+`phase7_spaces_admin/tests/test_space_removal.py` hatte eine **Doppelgängerin** für
+`Store.move()` mit eigener Signatur (`version, space=None, folder=None`). Das neue `actor=`
+machte daraus einen `TypeError` — als **HTTP 500 mitten im Space-Entfernen**, also genau an der
+Stelle, an der ein halb gelaufener Space-Entferner am teuersten ist. **Die Lektion ist die aus
+P9-AD, an ihrem Gegenstück gemessen:** ein optionales Keyword hält *Aufrufstellen* heil, nicht
+*Attrappen mit eigener Signatur*. Der Wächter T7 scannt nur Nicht-Test-Module und fängt diese
+Klasse per Konstruktion **nicht** ab — sie wird in fremden Phasen erfunden.
+
+### Was nicht gebaut wurde, mit Argument
+
+Verlaufsansicht aus `git log` (P9-Y nicht gewählt, P10-Kandidat) · `created_by` (steht bereits
+als Autor im ersten Git-Commit **des Items**) · Index-Spalte (niemand filtert danach, kostete
+Schema v5 und einen weiteren Neuaufbau) · `actor` als Pflichtparameter (P9-AD, ~400
+Testanpassungen in fremden Phasen) · ein `--author` mit Namensvalidierung über Space-Namen
+(P9-AC: `<`, `>` und Zeilenumbruch ⇒ Warnung, Commit läuft trotzdem — `history.py`s Vertrag
+„ein Write scheitert nie an Git" hat Vorrang).
+
+### Deploy (Nikinger, nicht Teil des Blocks)
+
+Badge `v3.1.0` → **`v3.1.1`** in `app.html:20`, neuer `## <Deploy-Tag>`-Block in
+`docs/UPDATE_LOG.md` (P6-X-Gate), dann `deploy.sh main` und
+`health_gate.sh --expected-version=v3.1.1 --require-todays-update-log --expected-sha=<sha>`.
+**Nach dem Deploy erwartbar:** jedes bestehende Item zeigt **kein** „Zuletzt geändert von", bis
+es das erste Mal geschrieben wird (P9-AB) — Eigenschaft, kein Fehler, gehört in den
+Changelog-Text. **Kein Index-Neuaufbau** (kein Schema-Sprung) — anders als nach Step F.

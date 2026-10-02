@@ -212,6 +212,12 @@ export function itemMetaLine(item) {
   // Im nicht-globalen Modus bleibt die Zeile wie vorher -- ein Space ist dort ohnehin
   // implizit (activeSpace), eine Wiederholung wäre redundant.
   var parts = [item.type, item.status];
+  // P9 Block trace: "bei X" direkt nach dem Status, vor der Fälligkeit — dort steht die
+  // Information, nach der man in einer Liste sucht (wer macht was), und nicht am Ende hinter
+  // den Tags. Nur bei gesetztem `assignee`, damit der Altbestand (Feld fehlt) keine leere
+  // Stelle bekommt. `updated_by` steht hier bewusst **nicht**: die Listenzeile würde pro Item
+  // einen Namen tragen, den niemand liest — im Meta-Panel ist er der richtige Ort.
+  if (item.assignee) parts.push("bei " + item.assignee);
   if (item.due) parts.push(item.due);
   if (item.tags && item.tags.length) parts.push(item.tags.join(", "));
   return parts.join(" · ");

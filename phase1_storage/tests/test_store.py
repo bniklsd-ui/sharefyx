@@ -1024,3 +1024,89 @@ def test_move_without_assets_is_unchanged(store, tmp_path):
     moved = store.move(item.id, version=item.version, space="fabian")
 
     assert moved.space == "fabian"
+
+
+# -- P9 Block trace: `updated_by` (P9-AA–AD) ------------------------------------------------
+#
+# Reihenfolge wie in `docs/concepts/phase9_hardening_block_trace_plan.md` §4 T1–T5. Die
+# Behauptung, die alle fuenf Tests zusammen tragen: **der Server weiss, wer geschrieben hat,
+# und der Client kann das nicht behaupten.** Test 1 ist der positive Fall, Test 2 der
+# Wechsel, Test 3 die Leere, Test 4 der Altbestand, Test 5 die Sperre.
+
+
+def test_updated_by_is_written_to_the_file_and_read_back_by_get_and_search(store, tmp_path):
+    """T1: `create(actor=...)` setzt `updated_by`, und **beide** Lesepfade liefern ihn.
+
+    `get()` **und** `search()` sind geprueft, weil genau die Divergenz sonst unentdeckt
+    bliebe, die P9 Step F als F10 aufgedeckt hat: `_summary()` vergisst ein Feld, `get()`
+    liefert es, und die Datei sieht richtig aus. Ein Test auf `get()` allein waere die Haelfte."""
+    item = store.create("nikinger", type="task", title="Kühlschrank prüfen", actor="niklas")
+
+    pfad = tmp_path / "nikinger" / f"{item.id}__kuehlschrank-pruefen.md"
+    assert "updated_by: niklas" in pfad.read_text(encoding="utf-8")
+    assert store.get(item.id).updated_by == "niklas"
+    assert store.search(space="nikinger").items[0].updated_by == "niklas"
+
+
+def test_update_with_a_new_actor_overwrites_and_produces_exactly_one_commit(store_git, tmp_path):
+    """T2: der Wert wechselt mit dem Schreiber, die Version mit, und es bleibt bei **einem**
+    Commit. Der Commit-Teil ist kein Beiwerk: eine zweite Schreiboperation (etwa ein
+    nachtraegliches Setzen von `updated_by`) wuerde die Versionsnummer ohne sichtbare
+    Aenderung einmal mehr hochzaehlen."""
+    item = store_git.create("nikinger", type="task", title="Umzug", actor="niklas")
+
+    updated = store_git.update(item.id, version=item.version, title="Umzug Nord", actor="fabian")
+
+    assert updated.updated_by == "fabian"
+    assert updated.version == item.version + 1
+    assert len([m for m in _git_log(tmp_path) if m.startswith("update ")]) == 1
+    assert store_git.get(item.id).updated_by == "fabian"
+
+
+def test_update_without_an_actor_leaves_updated_by_untouched(store):
+    """T3 (P9-AB): leerer Akteur heisst **unbekannt**, nicht leer. Ein Operator-Skript, das
+    eine Datei anfasst, darf den letzten *bekannten* Editor nicht aus dem Item loeschen —
+    der alternative Weg waere ein erfundener Name, und eine erfundene Zuschreibung ist schlimmer
+    als keine."""
+    item = store.create("nikinger", type="task", title="Kabel suchen", actor="niklas")
+
+    updated = store.update(item.id, version=item.version, title="Kabel finden")
+
+    assert updated.updated_by == "niklas"
+
+
+def test_legacy_item_without_the_field_never_gets_an_empty_one(store, tmp_path):
+    """T4: der **Altbestand** bekommt durch einen schreibenden Zugriff keine leere Zeile.
+    Das ist dieselbe Eigenschaft wie F6/P9-42 bei `assignee`, und dieselbe Bedingung in
+    `_item_to_text()`. Ohne sie stuende nach dem ersten Speichern `updated_by: ""` in jeder
+    bestehenden Datei — und die UI zeigte eine leere Zeile an prominenter Stelle."""
+    item = store.create("nikinger", type="task", title="Altbestand", actor="")
+    # Pfad ueber den Index, nicht ueber den Slug: der Titelwechsel unten **benennt die Datei
+    # um** (`rename_for_new_slug`), ein hart kodierter Dateiname waere hier still falsch —
+    # und ein still falscher Fixture-Pfad sieht aus wie ein Befund am Produktivcode.
+    def _datei():
+        (treffer,) = list((tmp_path / "nikinger").glob(f"{item.id}__*.md"))
+        return treffer
+
+    assert "updated_by" not in _datei().read_text(encoding="utf-8")
+
+    store.update(item.id, version=item.version, title="Altbestand (neu)")
+
+    text = _datei().read_text(encoding="utf-8")
+    assert "updated_by" not in text
+    assert store.get(item.id).updated_by == ""
+
+
+def test_updated_by_cannot_be_set_by_the_caller(store):
+    """T5 (P9-AA): **kein** Schreibpfad nimmt das Feld an — weder beim Anlegen noch beim
+    Aendern. `updated_by` steht in `_SYSTEM_MANAGED_FIELDS`; die Ablehnung ist eine
+    `ValidationError`, also derselbe Fehler, den heute `created`/`updated` bekommen. Wer sich
+    als jemand anderes ausgeben will, bekommt damit nicht etwa eine stille Fehlannahme, sondern
+    eine laute."""
+    with pytest.raises(ValidationError):
+        store.create("nikinger", type="task", title="Erfunden", updated_by="fabian")
+
+    item = store.create("nikinger", type="task", title="Echt", actor="niklas")
+    with pytest.raises(ValidationError):
+        store.update(item.id, version=item.version, updated_by="fabian")
+    assert store.get(item.id).updated_by == "niklas"

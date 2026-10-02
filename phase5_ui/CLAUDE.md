@@ -242,6 +242,41 @@ vorgefunden (kein Kommando nötig, Session-Block). Alle Step-9-Abschlussarbeiten
 Session-Block, kein Rotieren nötig) und Root-`CLAUDE.md`/`ROADMAP.md` auf ✅, alle im selben
 Commit (vierter Nachtrag unten). **Phase 5 formal abgeschlossen, 2026-08-09.**
 
+**[2026-10-02, P9 Block trace] Nachvollziehbarkeit in der Oberfläche** (zehnte
+P1-Contract-Öffnung, angekündigt; Locks P9-Z/AA/AB): `api.py` reicht `actor=session.space` an
+**alle neun** Store-Schreibaufrufe durch (inkl. `_spaces_delete`, das beim Space-Entfernen fremde
+Items in den Home-Space verschiebt — ein Mensch-Akt, also mit Akteur); `serializers.py` gibt
+`updated_by` in `item_to_json()`/`summary_to_json()` mit; **`_PATCH_FIELDS` und die
+POST-Whitelist bleiben ohne `updated_by`** (P9-AA) · `static/list.js :: itemMetaLine()` führt
+„bei X" nach dem Status · `static/app.html` bekommt das Feld `#field-assignee` (Text +
+`<datalist>` aus `state.spaces`) und die Lesezeile `#meta-updated-by` · `static/js/editor.js`
+führt `assignee` in Schnappschuss/`currentFormValues()`/`isDirty()`/`renderMetaDigest()`/Laden/
+Entwurf, **füllt es beim Wechsel auf `doing` nur wenn es leer ist** (P9-Z) und zeigt beide
+Angaben in der Nur-lesen-Ansicht · `static/app.css` bekommt `.panel__readline` (`:empty` →
+`display: none`).
+
+**Gemessene Abweichung von P9-AA, im Code dokumentiert statt geglättet:** die Klammer in P9-AA
+lautet „ein mitgeschicktes Feld ist `ValidationError`, wie heute `updated`" — das gilt für
+**PATCH** (unbekanntes Feld → `422 validation_failed`, `api.py:890`) und für den Kern
+(`_SYSTEM_MANAGED_FIELDS`), **nicht** für **POST**: `_items_post` hat keine `unknown`-Prüfung,
+sondern filtert lautlos auf eine Whitelist, ein `updated_by` im POST-Body wird also still
+verworfen — dieselbe Eigenschaft, die heute `created`/`version`/`space` dort haben. Der Kern
+bleibt unberührt (P9-74 hält: kein Kanal kann es setzen), aber die *Form* der Ablehnung ist je
+Route eine andere. **Bewusst nicht vereinheitlicht:** eine `unknown`-Prüfung im POST würde jedes
+unbekannte Feld ablehnen und damit Round-Trips über Schreib-Clients brechen, die den vollen
+Item-JSON zurückschicken.
+
+**Ein Test datiert zugeschnitten** (in `phase9_hardening/tests/test_step_f_schema.py`, nicht
+hier): der Wächter gegen abgetipptes Step-F-Vokabular in `editor.js` musste P9-Z weichen — siehe
+den dortigen Docstring. **Fünf neue Tests** in `phase5_ui/tests/`: einer in `test_api.py`
+(`updated_by` aus der Sitzung **und** PATCH → 422 mit unangetasteter Datei, beide Hälften in
+einem Test), vier in `test_static_routes.py` (P9-Z-Zweig am Text, „genau drei Zuweisungen an
+`fieldAssigneeEl.value`", Markup-Feld-vs-Lesezeile, Listenzeile). **Browser 8/8** gegen eine
+eigene **Zwei-Principalen**-TLS-Wegwerf-Instanz (Port 18777, `p9_trace_wegwerf.py`/
+`p9_trace_self_check.py`), Gegenprobe: ohne die Leer-Prüfung im P9-Z-Zweig meldet S5 rot —
+B zieht eine **A zugewiesene** Aufgabe auf „In Arbeit" und der Assignee springt von `alpha` auf
+`beta`. Sechs Bilder `p9_trace_01..06_*`, `screenshots_latest/` darauf umgehängt.
+
 **[2026-08-13 Korrektur, Nikinger-Feedback aus echtem Betrieb, außerhalb eines Plan-Steps]:**
 die Wortmarke oben links (`.rail__brand`, `app.html`/`app.css`) trug keine Versionsnummer.
 Ergänzt: `<span class="rail__version">v2</span>` neben „sharefyx" — Phase 6 entspricht laut

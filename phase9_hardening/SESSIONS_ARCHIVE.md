@@ -5,7 +5,7 @@ read-when: Chronik einer älteren P9-Session gesucht — nicht beim normalen Arb
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-02 (**neunzehnte Rotation, elfter Block** — der zehnte Block (doing-Block gebaut) wandert verbatim hierher; neuer Head-Block = Deploy-Abbruch `v3.1.0` behoben, `requests` war nie deklariert) · 2026-10-02 (**achtzehnte Rotation, zehnter Block** — der neunte Block (Mini-Plan doing-Block, Lock P9-V) wandert verbatim hierher; neuer Head-Block = doing-Block **gebaut**: `_BUCKETS["doing"]` + Rail-Label „In Arbeit", 6 neue Tests, Browser 11/11 mit Gegenlauf 7 rot, `pytest` 1128. **Head 44.508 B → 41.192 B** — und damit wieder 232 B **über** dem 40-KiB-Softcap, im INDEX neu benannt) | 2026-10-02 (**siebzehnte Rotation, neunter Block** — der achte Block (Deploy verschoben, Befund 11) wandert verbatim hierher; neuer Head-Block = Mini-Plan doing-Block, Lock P9-V) | 2026-10-01 (**sechzehnte Rotation, achter Block** — Deploy verschoben (Befund 11: `doing` ist im Deploy-Fall im Status-Feld erreichbar und zählt in keinem Ordner), `.toolbar-btn` in Standardoptik mit Pixel-Beleg 13/13, vier Tailscale-Bilder geklärt; Head 41.306 B, Archiv 152.730 B) | updated: 2026-10-01 (**fünfzehnte Rotation, A4-Vorbereitung** — Step-A-Block (2026-10-01, Domain live) verbatim aus dem Head; Head 42.376 B → 34.795 B) | 2026-10-01 (**vierzehnte Rotation, Step A** — Step-B-Block verbatim aus dem Head; Head 41.707 B → 29.415 B) | 2026-09-30 (**dreizehnte Rotation, Step B** — Step-B-Block [polkit-Regel gebaut, V153 entschieden: sudoers ist unter NoNewPrivileges unbaubar; systemd 255 kennt nur die grobe `manage-units`-Aktion, deshalb JS-Regel mit Unit-Attribut; V153-Probe ohne tailscaled-Kontakt] im Head **angehängt**, Step-H-Block verbatim ins Archiv; Head 34.873 B → 28.685 B) | 2026-09-30 (**zwoelfte Rotation, Step H** — Step-H-Block [`fastmcp` exakt gepinnt `==3.4.7`, der Range-Pin hatte den Live-Release bereits lautlos auf 3.4.7 gezogen, V163 mit drei Codepunkten beantwortet, Wächter als Deploy-Riegel, Gegenprobe 4 Verstöße → 7 rot] im Head **angehängt**, Step-G-Block verbatim ins Archiv; Head 33.175 B → 26.210 B) | 2026-09-30 (**elfte Rotation, Step G** — Step-G-Block [Lösch-Ort war unbaubar, TLS-Wegwerf für den Browserbeleg, 14/14] im Head **angehängt**, Step-F-Block verbatim ins Archiv; Head 32.668 B → 25.740 B) | 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
+updated: 2026-10-02 (zwanzigste Rotation: der zwölfte Block — Block trace gebaut, opencode/M3 — ist ans Dateiende gewandert, der elfte Block (Deploy-Abbruch behoben, `v3.1.0` live, Planungssession) verbatim ins Archiv; Head 46.993 B → 42.012 B) | 2026-10-02 (**neunzehnte Rotation, elfter Block** — der zehnte Block (doing-Block gebaut) wandert verbatim hierher; neuer Head-Block = Deploy-Abbruch `v3.1.0` behoben, `requests` war nie deklariert) · 2026-10-02 (**achtzehnte Rotation, zehnter Block** — der neunte Block (Mini-Plan doing-Block, Lock P9-V) wandert verbatim hierher; neuer Head-Block = doing-Block **gebaut**: `_BUCKETS["doing"]` + Rail-Label „In Arbeit", 6 neue Tests, Browser 11/11 mit Gegenlauf 7 rot, `pytest` 1128. **Head 44.508 B → 41.192 B** — und damit wieder 232 B **über** dem 40-KiB-Softcap, im INDEX neu benannt) | 2026-10-02 (**siebzehnte Rotation, neunter Block** — der achte Block (Deploy verschoben, Befund 11) wandert verbatim hierher; neuer Head-Block = Mini-Plan doing-Block, Lock P9-V) | 2026-10-01 (**sechzehnte Rotation, achter Block** — Deploy verschoben (Befund 11: `doing` ist im Deploy-Fall im Status-Feld erreichbar und zählt in keinem Ordner), `.toolbar-btn` in Standardoptik mit Pixel-Beleg 13/13, vier Tailscale-Bilder geklärt; Head 41.306 B, Archiv 152.730 B) | updated: 2026-10-01 (**fünfzehnte Rotation, A4-Vorbereitung** — Step-A-Block (2026-10-01, Domain live) verbatim aus dem Head; Head 42.376 B → 34.795 B) | 2026-10-01 (**vierzehnte Rotation, Step A** — Step-B-Block verbatim aus dem Head; Head 41.707 B → 29.415 B) | 2026-09-30 (**dreizehnte Rotation, Step B** — Step-B-Block [polkit-Regel gebaut, V153 entschieden: sudoers ist unter NoNewPrivileges unbaubar; systemd 255 kennt nur die grobe `manage-units`-Aktion, deshalb JS-Regel mit Unit-Attribut; V153-Probe ohne tailscaled-Kontakt] im Head **angehängt**, Step-H-Block verbatim ins Archiv; Head 34.873 B → 28.685 B) | 2026-09-30 (**zwoelfte Rotation, Step H** — Step-H-Block [`fastmcp` exakt gepinnt `==3.4.7`, der Range-Pin hatte den Live-Release bereits lautlos auf 3.4.7 gezogen, V163 mit drei Codepunkten beantwortet, Wächter als Deploy-Riegel, Gegenprobe 4 Verstöße → 7 rot] im Head **angehängt**, Step-G-Block verbatim ins Archiv; Head 33.175 B → 26.210 B) | 2026-09-30 (**elfte Rotation, Step G** — Step-G-Block [Lösch-Ort war unbaubar, TLS-Wegwerf für den Browserbeleg, 14/14] im Head **angehängt**, Step-F-Block verbatim ins Archiv; Head 32.668 B → 25.740 B) | 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
 ---
 
 # Phase 9 — Sessions Archive
@@ -15,6 +15,71 @@ trägt immer genau einen `## Session stopped`-Block, ältere Blöcke wandern ver
 Vorsatz: nichts abtippen, alles per Skript mit vier Gegenproben (Schnitt verlustfrei, neuer
 Head trägt genau einen Block, alle bewegten Blöcke im Archiv byte-identisch, Archivbestand
 unangetastet).
+
+## Session stopped — 2026-10-02 (elfter Block: Deploy-Abbruch `v3.1.0` behoben, danach Nikinger-Deploy live + Block trace geplant — Claude Code, kein Service-Touch)
+
+**Ergebnis: der Abbruchgrund ist weg, der Deploy kann wiederholt werden — mit neuem SHA.**
+Der erste `deploy.sh`-Lauf (Release `20261002T090429.818809Z`) brach in Schritt 4 ab:
+`4 failed, 1119 passed, 5 errors`, alle neun in
+`phase9_hardening/tests/test_mcp_local_vision_server.py`, alle
+`ModuleNotFoundError: No module named 'requests'`. `deploy.sh` hat das Release entfernt, der
+Symlink blieb unberührt — **live ist unverändert `v3.0.2`**.
+
+**Ursache, gemessen:** `requests` steht in keinem der vier `pyproject.toml`. Es kam am
+2026-09-10 (P8.6 Step V) per `.venv/bin/pip install requests` von Hand ins Dev-venv. Die
+C6-Tests (`a70dc2c`) importieren das Skript und liefen nur im Dev-venv, deshalb grün.
+`deploy.sh:153` baut pro Release ein **frisches** venv aus `dev_install.sh`, und dort fehlt es.
+Der Fixture-Docstring sagte wörtlich „`requests` is in the project venv" — die falsche
+Behauptung, die den Fehler versteckt hat. Dieselbe Klasse wie der Mock-Zustand aus Step B
+Befund 6: grün in einer Umgebung, die es live nicht gibt.
+
+**Fix:** `phase8_6_ui_polish/scripts/mcp_local_vision_server.py` ist jetzt **stdlib-only**
+(`urllib.request`). `HTTPError` trägt den Status-Zweig (urlopen wirft bei 4xx/5xx, ein
+`status != 200`-Vergleich danach liefe nie), `OSError` fängt `URLError` **und** Socket-Timeouts.
+`--check` gibt gegen Port 1 weiter Exit 3. Der Test patcht `urllib.request.urlopen` statt
+`requests.post`. **Verworfen:** `requests` in ein `[dev]`-Extra — kein pyproject besitzt das
+Skript (es gibt keins für `phase8_6`/`phase9`), die Abhängigkeit landete in einer fremden
+Phase. **Verworfen:** `pytest.importorskip` — das Gate würde stumm überspringen.
+
+**Beleg, und zwar am Gate selbst, nicht im Dev-venv:** frischer Baum (`git archive HEAD` +
+die zwei geänderten Dateien) nach `/tmp/relcheck`, `python3 -m venv`, `dev_install.sh`,
+`pytest -q` → **1127 passed, 1 failed**. Der eine rote ist ein Artefakt des Prüfaufbaus:
+`test_backup_creates_verifiable_bundle` ruft `git bundle verify` und braucht ein Repo als cwd,
+`git archive` liefert keins (`deploy.sh` klont, im echten Release war er grün). Nach `git init`
+dort: 16/16 grün. `import requests` im frischen venv → `ModuleNotFoundError`, der Beleg prüft
+also wirklich ohne `requests`. **Gesamt 1128/1128.**
+
+**Benannt, nicht gebaut:** `phase8_6_ui_polish/scripts/vision_ollama.py` (CLI) braucht `requests`
+weiter. Kein Test importiert es, es blockiert kein Gate, aus einem Release-venv läuft es aber
+nicht. Datierte Korrektur dazu in `phase8_6_ui_polish/CLAUDE.md` (Step V). Das Dev-venv trägt
+noch mehr nicht deklarierte Pakete (`playwright`, `pillow`, `pyflakes`, `brotli` u. a.); keins
+hat im frischen venv einen Test rot gemacht.
+
+**Nächster Schritt (Nikinger):** `deploy.sh main` erneut, dann `health_gate.sh
+--expected-version=v3.1.0 --require-todays-update-log --expected-sha=<neuer HEAD>`. **Nicht**
+`bdecfde` übergeben — der Fix-Commit ist der neue HEAD. Der `UPDATE_LOG`-Eintrag vom
+2026-10-02 bleibt gültig; wird erst morgen deployt, braucht es einen neuen Eintrag (P6-X-Gate).
+Danach P9-43 messen (Dauer des Index-Neuaufbaus am echten DATA_ROOT) und Augenschein.
+
+**Nachtrag desselben Tages — `v3.1.0` ist live.** Der Nikinger hat `deploy.sh main` mit
+`5414cb7` gefahren: durchgelaufen, **3:55 min** (Nikinger-Handmessung, „3:55:28"). Release
+`/opt/sharefyx/releases/20261002T093629.531459Z`. `health_gate.sh --expected-version=v3.1.0
+--require-todays-update-log --expected-sha=5414cb7` von mir gefahren: **9/9 OK**, JSON
+`"result":"ok"`, `actual_version` `v3.1.0`. **P9-43 gemessen** (Journal, read-only): Restart
+11:40:29,448 → `Index … Schema-Version 3 (erwartet 4) — wird verworfen` 11:40:30,240 →
+`Started server process` 11:40:31,287 → `Application startup complete` 11:40:31,294. Der
+Neuaufbau läuft synchron in `Store.__init__` (`store.py:235`), also ist **≤ 1,05 s** die
+Obergrenze für **197 Items** (inkl. App-Aufbau); Start bis bereit 1,85 s. V161 sagte
+0,4–0,6 s für 153 Items voraus — gleiche Größenordnung, real höchstens doppelt so lang. Index
+danach read-only geprüft (`mode=ro`): `user_version 4`, **197 Zeilen** (32 `open`, 29 `done`,
+92 `active`, 44 `archived`, 0 `doing`). **Offen:** Nikinger-Augenschein im echten Browser
+(Rail „In Arbeit", Badge `v3.1.0`), danach A7+A8 in einer Sitzung (Step A).
+
+**Zweiter Nachtrag — Block trace geplant.** Gemessen: `doing` ist geteilt, `assignee` in keiner
+UI-Zeile, und **niemand** wird aufgezeichnet (`git log` im DATA_ROOT: Autor stets `Space Server`).
+Warndialog alte Adresse = Absicht bis A7 (`RUNBOOK_STEP_A.md:753`). Nikinger: **P9-Y** (Who + last
+editor), **P9-Z** (Client füllt `assignee`). Plan + nächster Schritt (M3 baut, ein Commit):
+`docs/concepts/phase9_hardening_block_trace_plan.md`.
 
 ## Session stopped — 2026-10-02 (zehnter Block: doing-Block gebaut, Lock P9-V — opencode/M3, ein Commit, kein Deploy, kein Service-Touch)
 
