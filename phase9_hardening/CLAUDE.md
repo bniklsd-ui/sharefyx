@@ -195,6 +195,31 @@ Tabu-Diff auf die sechs Hartpfade **leer** (nur `app.css`, eine Testdatei, ein S
 Wegwerf-Instanz **über die PID-Datei** gestoppt, kein `pkill -f`, kein `systemctl`, `sharefyx-mcp`
 nicht berührt.
 
+**Zwei Entscheidungen nach diesem Commit, hier festgehalten, weil sie den nächsten Block
+definieren.** (1) **Gate/Z kommt jetzt** — die Abnahmematrix und die `[VERIFY]`-Bilanz sind das
+nächste Item, und sie brauchen **keinen Deploy und keinen Code**. Der Umfang ist gegen die drei
+Planquellen **verifiziert**, lückenlos und nicht geschätzt: **P9-1 – P9-58** (Plan §14) ·
+**P9-59 – P9-68** (`block_doing_plan.md`) · **P9-69 – P9-82** (`block_trace_plan.md`) — zusammen
+**82** Zeilen; `[VERIFY]` **V145–V172** · **V173–V178** · **V179–V184** — zusammen **40**. Ich hatte
+die Zahl angezweifelt, weil der Gate/Z-Status seit zwei Sitzungen „P9-1–P9-82" behauptet, ohne
+dass eine Quelle sie getragen hätte: **sie stimmt**, und die Bereiche schließen lückenlos. (Fast
+hätte ich sie selbst korrigiert — die Umkehrung wäre eine stille Abweichung gewesen.)
+(2) **Die Matrix kommt in eine neue Datei** `phase9_hardening/ABNAHME_MATRIX.md` (L2 mit L1-Card +
+INDEX-Zeile) plus Pointer im Head — **Nikinger-Entscheidung 2026-10-02**, gegen die P8.6-Lesart
+(kanonischer Closeout in Plan §9, ein 📕-Snapshot, der bisher unberührt ist). Der Grund ist nicht
+die Ordnung, sondern der Softcap: der Head liegt **13.008 B über** der Grenze, und ein 82-zeiliges
+Archiv hineinzuschreiben hieße, das Falsche zu tun. Die Disziplin der Zeilen: `✅`/`⚠️`/`⬜`/
+`ersetzt` **mit Beleg** (Testname, Probe-Datei, Journalzeile, Bild), und was den Live-Deploy braucht
+(trace-Block, B17-Sichtung, Gs Live-Löschung, Hs Release-venv-Beleg) bekommt **`pending: Deploy
+v3.1.1`** statt einer Vermutung. **Drei Zeilen sind schon heute messbar** und gehören nicht auf die
+later-Warte-Liste: `P9-56` (Bereichs-Tabu-Diff mit genau der angekündigten Step-F-Ausnahme),
+`P9-57` (Service-Touch durch einen Agenten = 0), `P9-58` (`pytest`, `ui_budget`, Doc-Update je
+Commit).
+
+**Und eine Zeile, die bewusst liegen bleibt:** `docs/INDEX.md` nennt als Ziel der Phase 9 weiterhin
+`v3.1.0`. Das ist mit dem heutigen Deploy überholt, aber es ist eine **Ziel-Angabe** — sie gehört in
+den Release-Commit, der ohnehin `v3.1.1` macht, und nicht in eine Gate/Z-Doku-Runde.
+
 **Nächster Schritt, unverändert die Zuständigkeiten des Nikinger:** (1) **Release-Commit + Deploy
 `v3.1.1`** — Badge `app.html:20` + `##`-Block in `docs/UPDATE_LOG.md`, **beides erst am Deploy-Tag**,
 sonst brennt das `deploy.sh`-Gate P6-X bei späterem Deploy ab; dieser Block kommt mitdeployt, ist
