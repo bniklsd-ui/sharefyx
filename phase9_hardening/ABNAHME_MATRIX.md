@@ -1,0 +1,303 @@
+---
+status: live
+purpose: Abnahmematrix der Phase 9 (P9-1 – P9-82) und [VERIFY]-Bilanz (V145 – V184) — jede Zeile mit Stand und Beleg, jeder Marker mit Antwort oder offenem Grund
+read-when: beim Gate/Z-Checkout, bei jeder Frage „ist das schon abgenommen?", wenn eine Abnahmezeile oder ein [VERIFY] aus den Plänen nicht auffindbar ist, oder wenn jemand eine Zeile auf ✅ setzen will, für die es keinen Beleg gibt
+detail: L2
+up: ./CLAUDE.md
+down:
+  - ../docs/concepts/phase9_hardening_plan.md        # P9-1 – P9-58, §13-Register, §15 P10-Liste
+  - ../docs/concepts/phase9_hardening_block_doing_plan.md   # P9-59 – P9-68, V173 – V178
+  - ../docs/concepts/phase9_hardening_block_trace_plan.md   # P9-69 – P9-82, V179 – V184
+  - ./step_a/RUNBOOK_STEP_A.md                       # Step-A-Ablauf A0b – A9, Abnahme P9-10 – P9-15
+  - ./step_b/RUNBOOK_STEP_B.md                       # Step-B-Ablauf B0 – B3, Abnahme P9-16 – P9-20
+  - SESSIONS_ARCHIVE.md                              # die Herleitung jeder Zeile im Wortlaut
+updated: 2026-10-03 (erste Fassung, Gate/Z-Doku-Hälfte Nummer zwei, opencode/M3, **kein Code-Touch**, kein Deploy) — **82 Abnahmezeilen (83 Tabellenzeilen, P9-10 geteilt): 65 ✅ · 10 ⚠️ · 8 ⬜** und **34 belegte [VERIFY]-Einträge**, nicht 40 (V167–V172 sind nie belegt) · **P9-56/57/58 heute gemessen**: Tabu-Diff hat **einen** unangekündigten Treffer (`phase7_spaces_admin/tests/test_space_removal.py`, 17 Z.) · `pytest` 1169, `ui_budget` 5/5 (155,2 KB), `doc_health` 0/0/0/0 · **P9-14 heute geschlossen** (Funnel-Host live 200), P9-10b heute gemessen (weiter 400, erwartet bis A7) · **V146/V148/V155 heute beantwortet**, V182/V184 am Code · **zwei Nummerkollisionen gefunden** (V162, V163 je zweimal vergeben)
+---
+
+# Abnahmematrix Phase 9 — P9-1 … P9-82 und `[VERIFY]`-Bilanz V145 … V184
+
+Diese Datei ist der **eine** Ort, an dem steht, welche der 82 Abnahmezeilen der Phase 9 mit welchem
+Beleg stehen. Sie ist **L2, nicht Archiv** — die Phase läuft, die Zeilen ändern sich noch. Herkunft
+jeder Zeile: Plan §2.5/§3.4/§4.4/§5.6/§6.4/§7.5/§8.8/§9.6/§10/§14 plus die beiden Mini-Pläne;
+Herleitung im Wortsinn in `SESSIONS_ARCHIVE.md`. **Nikinger-Entscheidung 2026-10-02:** die Matrix
+kommt hierher und nicht in den Phase-Head — der Head liegt über dem Softcap, und ein 82-zeiliges
+Archiv hineinzuschreiben hieße, das Falsche zu tun.
+
+## Stand in einem Satz
+
+**83 Tabellenzeilen für 82 Abnahmezeilen: 65 ✅ · 10 ⚠️ · 8 ⬜** (P9-10 in zwei prüfbare Hälften
+geteilt). Alle 8 offenen Zeilen hängen an **zwei** Nikinger-Schritten (A7+A8 in einer Sitzung, D1 als
+zurückgestellter Backlog-Posten) plus zwei Zeilen, die eine Entscheidung brauchen, die keine Messung
+liefern kann. **Kein ⬜ ist offene Code-Arbeit.**
+
+## Statusregel (was ein ✅ hier bedeutet)
+
+| ✅ | erfüllt, **und der Beleg steht in der Spalte rechts** — Testname, Probe-Datei, Journalzeile, Bild oder eine heute ausgeführte Messung. „Würde beim nächsten Lauf stimmen" ist kein ✅ |
+| ⚠️ | erfüllt **mit benannter Abweichung**: andere Form als im Plan, Testzahl über der Plan-Zahl, gegenstandslos am gewählten Anker, oder zum Bauzeitpunkt erfüllt und heute überholt |
+| ⬜ | nicht erfüllt, mit Grund und Zuständigkeit. Ein ⬜ ohne Begründung ist ein Befund gegen dieses Dokument |
+| ersetzt | **in P9: 0.** Wo eine Planzeile praktisch nicht mehr greift (P9-10 geteilt, P9-28/P9-31 gegenstandslos), steht ⚠️ mit Begründung — eine Ersatzzeile, die man abnehmen kann, gibt es dort nicht |
+
+**Zeilen mit `pending: Deploy v3.1.1`** sind nicht ⬜, wenn ihr Kriterium gegen eine Wegwerf-Instanz
+messbar war — sie sind ✅ mit dem Zusatz „live bewiesen erst mit v3.1.1". Die Liste steht am Ende.
+
+---
+
+## Step 0 — Doku-Fundament (P9-1 … P9-9)
+
+| # | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| **P9-1** | Phasenverzeichnis existiert, beide `.md` mit Card und INDEX-Zeile | ✅ | `CLAUDE.md` + `SESSIONS_ARCHIVE.md` mit L1-Card, INDEX-Abschnitt „Phase 9" mit beiden Zeilen; `doc_health` heute **0 Befunde** |
+| **P9-2** | `rotate_index_updates.sh` läuft, alle vier Gegenproben grün | ✅ + datierte Nachtrags-Korrektur | Vier Gegenproben (a) Byte-Buchhaltung (b) `cmp` der Reassemblierung (c) jeder rotierte Eintrag byte-identisch im Archiv (d) `---` auf eigener Zeile, + `test_rotate_index_updates.py`. **Nachtrag 2026-10-02:** der erste *echte* Lauf rotierte 1 von 3 Fäden, weil einer ein `updated: `-Präfix trug, das der Split-Anker nicht sieht — „verlustfrei" war nur *im geschnittenen Teil* wahr. Behoben: **Gegenprobe (e)** (Abbruch bei einem zweiten Präfix) + 2 Tests; (e) entfernt → genau der Abbruch-Test rot |
+| **P9-3** | `docs/INDEX.md` < 38.912 B **nach** Aufnahme aller P9-Zeilen | ⚠️ beim Bau ja, **heute nicht mehr** | Phasenstart `06ab4f6`: **38.822 B**; heute **61.108 B** = +22.286 B aus Pflichtpflege laufender Schritte. **Benannt statt versteckt** (P8-P): die Datei trägt die Benennung in ihrer eigenen INDEX-Zeile, und `oversize` akzeptiert sie, weil die Angabe im ±2-KB-Fenster liegt. Dieselbe Sache noch einmal: V145 |
+| **P9-4** | Die fünf Links in `…_h_r_3_escalation.md` lösen auf | ✅ | repariert (drei `./`, zwei `../../`); `updown_links` heute **0 Befunde** über alle `.md` |
+| **P9-5** | Beide Mini-Pläne tragen eine L1-Card | ✅ | `phase8_6_ui_polish_block_g_r_plan.md` + `…_block_h_r_plan.md`, beide `status: snapshot` |
+| **P9-6** | Die `ROADMAP.md`-INDEX-Zeile nennt die reale Größe und P9 | ⚠️ **beim Bau korrigiert, seither wieder stale** | damals 42.080 B, heute `ROADMAP.md` **48.498 B** — die Oversize-Benennung steht, die Zahl nicht. Straffung bleibt Step-Z-Arbeit |
+| **P9-7** | Genau ein `screenshots_latest/`-Pfad, begründet gewählt | ✅ | `docs/screenshots_latest/` entfernt (alle sechs Symlinks dort waren tot), die Root-Instanz bleibt. **Nachtrag 2026-09-30:** die drei Tailscale-Arbeitsdateien des Nikinger blieben bewusst außen — eine enthielt die Knotenliste des Tailnets |
+| **P9-8** | `doc_health.py` läuft, `test_doc_health.py` grün, alle vier Prüfungen 0 Befunde | ✅ **heute gemessen** | `index_lines 0 · header_cards 0 · updown_links 0 · oversize 0` (2026-10-03); der Wächter kennt die drei `oversize`-Fälle (benannt / unbenannt / stale benannt) |
+| **P9-9** | `pytest` ≥ 995 (Step 0 addiert die neuen `doc_health`-Tests) | ✅ | **995 passed in 185,98 s** (2026-09-20, V147) → 1008 nach Step 0; **heute 1169 passed in 218,31 s**. Nebenbefund von damals, der P9-9 erst erfüllbar machte: `pytest.ini` listete `phase9_hardening/tests` nicht |
+
+## Step A — Echte Domain über einen eigenen VPS (P9-10 … P9-15)
+
+> **Datierte Plan-Korrektur 2026-10-01:** P9-10 war *eine* Zeile („200 **und** gültiges
+> LE-Zertifikat") und ist damit **zwei** — die Zertifikats-Hälfte gehört Caddy (A4), die
+> `200`-Hälfte `SPACE_ALLOWED_HOSTS` (A7). Der Wortlaut ist nicht abgeschwächt, sondern in zwei
+> prüfbare Hälften zerlegt (dieselbe Form wie Befund 2: `/health` statt `/healthz`).
+
+| # | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| **P9-10a** | `/health` über die eigene Domain, **TLS-Hälfte** | ✅ | **heute nachgemessen**: `CN=sharefyx.eurofyx.com`, `issuer=Let's Encrypt YE1`, gültig 01.10.–30.12.2026; `curl -w '%{http_code} %{ssl_verify_result}'` → `400 0` — die Kette steht, der `400` ist Befund 8 |
+| **P9-10b** | `/health` antwortet 200 | ⬜ **A7** | **heute gemessen: `400 Invalid host header`**, wie erwartet — `local.env` trägt `ALLOWED_HOSTS=savefyx-vmware-virtual-platform.tail4a8b49.ts.net,127.0.0.1`. Schließt mit dem `ALLOWED_HOSTS`-Teil von A7 (oder A7a: dort wechselt kein `resource`, beide Connectoren bleiben gültig) |
+| **P9-11** | `nmap` gegen die **Heim**-IP zeigt keinen offenen Port | ⬜ **Gegenprobe von außen** | Nicht gelaufen, und **vom Host selbst sinnlos**: er erreicht seine eigenen Loopback-Dienste per Definition, ein Scan von innen prüft `SPACE_HOST=127.0.0.1`, nicht die Erreichbarkeit von außen. Die Gegenprobe ist beides (Runbook §3): `nmap 192.168.68.175` alles `filtered` **und** `nmap 100.93.43.122` genau 8765 |
+| **P9-12** | `/.well-known/oauth-authorization-server` liefert den neuen `issuer` | ⬜ **A7** | setzt A7 voraus. V149 nimmt der Zeile die halbe Sorge: alle Felder sind aus der Basis-URL **abgeleitet**, keines steht fest, beim Einlösen gibt es keinen `iss`-Check ⇒ der Wechsel invalidiert keine Token-Familie |
+| **P9-13** | `list_spaces` aus **beiden** Claude-Konten über die neue Adresse (V150) | ⬜ **A8** | echter Connector-Aufruf, kein `curl`. Befund 4: Tokens hängen an `resource = {base_url}/mcp`, der A7-Restart kappt **beide** Connectoren ⇒ **A7+A8 in einer Sitzung** |
+| **P9-14** | Der Funnel-Hostname antwortet weiterhin; das Runbook beschreibt den Rückfall in nummerierten Schritten | ✅ **heute geschlossen** | **gemessen** `curl …tail4a8b49.ts.net/health` → `200`; **geschrieben** Runbook §2 A9, vier nummerierte Schritte inkl. der Korrektur zu Befund 4 (Rückweg = dieselbe A7/A8-Sequenz rückwärts, weil auch er die `resource` wechselt). **Befund 5 bleibt und ist keine offene Zeile:** nach A7 liest der Funnel, jeder Schreibvorgang der Web-UI über ihn wird 403 (CSRF-Origin, `security.py:84`) |
+| **P9-15** | `/api/v1/overview`-Zeit gemessen und gegen 372,9 ms verglichen (V151) | ⬜ **A7** | nur das Tailnet-Bein ist gemessen: `tailscale ping` **28–37 ms über DERP Frankfurt** (erwartbar hinter CGNAT). Der vollständige Vergleich braucht drei Läufe über die Domain |
+
+## Step B — `tailscaled-watchdog.service` (P9-16 … P9-20)
+
+| # | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| **P9-16** | Unit + Timer existieren, `systemctl list-timers` zeigt den Timer | ✅ | Timer `enabled` **und** `active`, `NEXT` gesetzt. Der eigentliche Beleg ist `healthy: Self.Online=true` + `Finished` im Journal — **ein laufender Timer beweist nicht, dass ein Dienst arbeitet** (der erste B2-Lauf lieferte `203/EXEC`) |
+| **P9-17** | Tests grün (Plan sagt 5) | ✅ **12/12** | `test_tailscaled_watchdog.py`, 5 alt + 7 aus den Wächter-Runden. Die Plan-Zahl 5 war die Zeile, nicht die Summe — wie bei P9-39 und P9-52 |
+| **P9-18** | Härtungs-Direktiven per statischem Wächter belegt | ✅ | `test_unit_file_has_the_three_hardening_directives` |
+| **P9-19** | Absichtlich herbeigeführter Offline-Zustand ⇒ **genau ein** Restart, im Journal belegt | ✅ | ein Restart 9 s nach dem Stopp (18:05:40, Stufe 1→2→3, polkit-Pfad), danach **zehn Takte `rate-limited` ohne einen Restart** (256 s → 829 s, Fenster 900 s), `tailscaled` ~10 min unten. **Die Zeile hat ihren Zweck erfüllt:** `RuntimeDirectoryPreserve=no` löschte die State-Datei je Takt, das Limit war nie in Kraft — und der Test dafür war grün, weil sein Mock einen Zustandsspeicher simuliert, den es live nicht gibt |
+| **P9-20** | V152 beantwortet — „gibt es nicht" ist zulässig | ✅ | „Gibt es nicht": kein Tailscale-eigenes Watchdog-Feature ohne kommerzielles Add-on |
+
+## Step C — Vision-Dienst auf der RTX 3060 (P9-21 … P9-26)
+
+| # | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| **P9-21** | Der Dienst antwortet von der sharefyx-VM aus auf der internen Adresse | ✅ | Block (3) Runde 4b: 63 tok/s, `size_vram = size` |
+| **P9-22** | Von außen nicht erreichbar — kein Funnel, kein Port (Hard Rule 6) | ⚠️ **deferred, architektonischer Beweis** | 192.168.68.140 ist RFC1918, die VM hat keine öffentliche IP (CGNAT), der Funnel mappt nur `127.0.0.1:8765`, kein Port-Forward am RUT X50, der einzige 11434-Listener sitzt in CT 111. **Nikinger-Entscheidung 2026-09-26:** extern nicht testbar |
+| **P9-23** | Cold-Start gemessen und gegen 46–180 s gestellt | ✅ | **19,9 s** (Runde 4b) und **19,7 s** (Runde 5) |
+| **P9-24** | Beide Skript-Fixes aus §5.3 im Code, Startzeile zeigt den echten Endpoint | ✅ | `serve()` loggt den aufgelösten Endpoint; `--endpoint` wirkt auch ohne `--check`; zentrale `resolve_endpoint(args)` mit Präzedenz `--endpoint` > `$LOCAL_VISION_ENDPOINT` > `DEFAULT_ENDPOINT`. 9 Tests + Gegenprobe: ohne den Fix **7/9 rot** |
+| **P9-25** | V154 und V156 beantwortet | ✅ | **V154:** LXC — der Plan-§5.2-Umschaltpunkt greift nicht, LXC teilt den Host-Kernel und braucht kein IOMMU. **V156:** bei `qwen3-vl:8b` geblieben, damit der Gewinn zuzuordnen ist |
+| **P9-26** | Echter Sichtprüfungslauf liefert dieselbe Aussage wie der CPU-Lauf vom 2026-09-10 | ✅ | beide Läufe gegen `c4_p8519_01_radiogruppe_im_dialog.png` mit **derselben Aussage**, 19,9 s statt 46 s Wand |
+
+## Step D — Die zwei gemeldeten Bugs (P9-27 … P9-32)
+
+| # | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| **P9-27** | ESC im Vollbild verlässt den Vollbildmodus und schließt **nichts** — am echten Gerät belegt | ⬜ **Backlog D1, zurückgestellt** | **Nikinger-Entscheidung 2026-09-23.** Der Befund ist geklärt und gegen die Hoffnung: `grep requestFullscreen` findet **nur den Guard selbst** — die App nutzt die Web-Fullscreen-API nirgends, und macOS' natives Vollbild setzt `document.fullscreenElement` per Spezifikation nicht. Für den gemeldeten Fall ist der Guard mit hoher Sicherheit ein No-op. **Kein Fehlschlag als Erfolg verbucht** |
+| **P9-28** | ESC außerhalb des Vollbilds verhält sich unverändert wie vor P9 | ⚠️ **strukturell erfüllt, nicht am Gerät belegt** | Der Guard ist die **erste** Bedingung im Escape-Zweig und kehrt nur bei gesetztem `fullscreenElement` zurück (`test_escape_handler_checks_fullscreen_element`) — die Nicht-Regression ist eine Eigenschaft der Form. **Was fehlt:** eine Browser-Probe; die GA2-Stationen wurden nie gebaut (unten) |
+| **P9-29** | Ein Item lässt sich aus einem Ordner auf die Space-Zeile zurückziehen | ⬜ **Sichtprüfung am echten Gerät** | Code steht: `renderSpaceNode()` ruft `bindFolderDropTarget(row, "")` für `space.own` hinter demselben Eigentümer-Riegel wie der Ordner-Pfad; `moveItemToFolder()` schickt `folder: ""` unverändert; der Toast rendert `"(Space-Wurzel)"`. **Nicht belegt** — genau die erste GA2-Station, die nie lief |
+| **P9-30** | Der Drop-Zustand ist sichtbar | ⬜ **Sichtprüfung am echten Gerät** | Die Dashed-Border-Rückmeldung (`tree__realfolder--dragover`) gilt automatisch mit, weil `bindFolderDropTarget()` die Klasse klassenbasiert setzt — **per Konstruktion**, nicht gemessen |
+| **P9-31** | Ein Zug auf einen Zähler-Chip löst **kein** Verschieben aus (V136) | ⚠️ **gegenstandslos am gewählten Anker** | Die Plan-Warnung zielt auf `.overview__space-open` (`list.js`); der Anker ist die `.tree__space`-Zeile (`tree.js`), und die hat **keine** verschachtelten interaktiven Kinder. Ein Guard, der nichts ausschließt, wäre ein irreführender Test — der dritte Test prüft deshalb den `space.own`-Riegel |
+| **P9-32** | 3 neue Tests grün, `ui_budget` 5/5 | ✅ | die drei Wächter unter P9-27/28/29. `ui_budget` damals 145,0 KB, **heute nachgemessen 5/5 bei 155,2 KB** |
+
+## Step E — Karte: Reload-Overload und V118 (P9-33 … P9-37)
+
+| # | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| **P9-33** | Zweiter Eintritt ohne Datenänderung erzeugt **keinen** zweiten `/graph`-Abruf | ✅ | Signatur aus dem `/overview`-Payload — **Plan-Korrektur:** der Graph-Knoten hat kein `updated`. Node-Harness und Browser-Probe (Port 18768): **0** Abrufe, auf `HEAD` **1** |
+| **P9-34** | Die Karte springt beim Wiedereintritt nicht — im Screenshot-Paar belegt | ✅ | **1 von 10** verschiedenen Bildern in 1,5 s (auf `HEAD` 10 von 10, 467,6 px Sprung). Der Plan-Test hätte das **durchgelassen** — deshalb trägt die Zeile den Bildvergleich |
+| **P9-35** | Datenänderung führt weiterhin zum Neuladen | ✅ | Refresh-Knopf erzwingt 1 · fremde Änderung wird aufgenommen (Knoten 14 → 15) 1 |
+| **P9-36** | V118 beantwortet, **mit Nikinger-Entscheidung, falls es zwei Linien sind** | ⚠️ **beantwortet, die Entscheidung steht aus** | im Harness an einem echten Frame gemessen: `segments_in_last_frame: 2`, `duplicate_segments: 1`, gestrichelte Linie gezeichnet — `dedupeEdges()` und `buildTagEdges()` deduplizieren getrennt, erst `drawEdges()` führt zusammen. **Ob zwei Linien gewollt sind, ist deine Design-Frage**; ein Umstieg wäre samt Umkehr des Tests eine bewusste Änderung |
+| **P9-37** | Tabu-Diff leer, `ui_budget` 5/5 | ✅ | Tabu-Bereichs-Diff `2f752f9^..HEAD` leer (Zusatzprobe `phase1_storage` ebenfalls leer, `space_cli.py` wurde nur **ausgeführt**, nicht angefasst); `ui_budget` 5/5, 149,0 KB |
+
+## Step F — Schema-Fundament (P9-38 … P9-44)
+
+| # | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| **P9-38** | Die enge Probe zeigt genau drei Dateien | ✅ | `66117ff^..66117ff -- phase1_storage/storage` → `index.py`, `models.py`, `store.py`. **Plan-Korrektur:** §8.2 sagte neun Stellen, der Diff hat **18 Hunks** in genau diesen drei |
+| **P9-39** | 9 Tests grün | ✅ **23** | Fünf der Plan-Tests waren Verhaltenstests, der Rest Wächter; `pytest` 1039 → 1062. Gegenprobe mit vier eingebauten Verstößen → **10 Tests rot** |
+| **P9-40** | `_status_hint()` nennt `doing`, ohne dass `tools.py` es enthält | ✅ | Trennung Maschinen-/Navigations-Ebene, siehe auch P9-65 |
+| **P9-41** | `note` akzeptiert `doing` nicht | ✅ | `STATUS_VALUES["note"]` bleibt `{active, archived}` |
+| **P9-42** | Ein Altbestands-Item bekommt beim Write kein leeres `assignee` | ✅ | `_coerce_assignee()` behandelt fehlend ≠ leer |
+| **P9-43** | Index-Neuaufbau über den echten `DATA_ROOT` gelaufen, Zeit notiert (V161) | ✅ | Deploy `v3.1.0`: Journal `wird verworfen` 11:40:30,240 → `Started server process` 11:40:31,287 = **≤ 1,05 s** für **197 Items** (V161 sagte 0,4–0,6 s für 153). Index danach `user_version 4`, 197 Zeilen |
+| **P9-44** | V160 beantwortet und im Plan als Lock nachgetragen | ✅ | **Space-Name, ohne Validierung** (Lock **P9-U**) — eine Prüfung gegen die Space-Liste wäre eine zweite, nicht angekündigte Öffnung |
+
+## Step G — Löschen (F2) nach `_trash/` (P9-45 … P9-52)
+
+| # | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| **P9-45** | Ein eigenes Item lässt sich nach zweifacher Rückfrage löschen | ✅ | Browser **14/14** gegen eine eigene TLS-Wegwerf-Instanz, zwei unabhängige Läufe; 6 Screenshots `docs/screenshots/p9_step_g_*`, Probe `probes/p9_step_g_probe.json` |
+| **P9-46** | Ohne exakten Titel bleibt der Knopf gesperrt | ✅ | **serverseitig** geprüft (Muster `api.py:567`), nicht nur ein gesperrter Knopf |
+| **P9-47** | Die Datei liegt unter `_trash/`, byte-identisch | ✅ | `DATA_ROOT/._trash/<space>/` — der Plan-Ort `<space>/_trash/` war **unbaubar** (Item nach `rebuild_index()` wieder da, `_trash` als Phantom-Space). Byte-Gleichheit gemessen |
+| **P9-48** | Git-Commit im Datenverzeichnis vorhanden | ✅ | Commit-Existenz **und** Datei im Commit per `git log`/`git ls-files` geprüft, nicht per Spy auf `_commit()` |
+| **P9-49** | Das Item erscheint in **keiner** Liste, Suche, Karte oder Übersicht | ✅ | inkl. **nach** `rebuild_index()` und **inkl. Karte** — der Plan-Test hätte den Defekt der Plan-Variante durchgelassen. Eingehende Kanten bleiben dangling, `_graph_get` filtert sie |
+| **P9-50** | Kein MCP-Werkzeug kann löschen | ✅ | statisch: kein `@mcp.tool` mit Lösch-Namen, `tools.py` referenziert `trash()` nicht; plus Test gegen jeden Endpunkt, der `_trash/` listen könnte |
+| **P9-51** | Ein fremdes Item lässt sich nicht löschen | ✅ | Rechte-Grenze gemessen, dazu Kartengeometrie und Nachbarn unberührt |
+| **P9-52** | 7 Tests grün | ✅ **13 + 5** | die sieben der Plan-Liste plus sechs für die gemessenen Lücken (`test_step_g_trash.py`), fünf Endpunkt-Tests in `test_api.py`. Gegenprobe mit vier Verstößen → **11 rot**; `pytest` 1062 → 1078 |
+
+## Step H — Abhängigkeits-Hygiene (P9-53 … P9-55)
+
+| # | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| **P9-53** | `fastmcp` 3.4.7 installiert | ✅ | durch die **Messung** erfüllt, nicht durch eine Änderung: der Live-Release lief bereits auf **3.4.7**, weil `deploy.sh:153` pro Release ein frisches venv baut und der Pin ein **Range** war — genau der stumme Drift, den P3-D verbietet |
+| **P9-54** | V163 beantwortet | ✅ | Gegen den Code statt gegen das Aufrufbild: **nein** — CIMD abgeschaltet (`metadata.py:19`, P4-E/V14), `token_endpoint_auth_methods_supported: ["none"]` ⇒ gar keine Client-Assertions (`metadata.py:32`), und die benutzte Fläche enthält weder `OAuthProxy` noch `JWTVerifier`; Auth trägt der eigene `BearerAuthASGI`. Bump = Hygiene, kein Brand |
+| **P9-55** | Der Pin bleibt `<3.5` | ⚠️ **in der Form abweichend** | gebaut ist `fastmcp==3.4.7` — innerhalb P9-R, aber ohne die Range-Form, weil die Range-Form der Mechanismus des gemessenen Drifts ist. **Nikinger-Entscheidung 2026-09-30**, im Plan §10 als Abweichung dokumentiert. Riegel: `test_the_installed_fastmcp_matches_the_pin`, läuft im **Release-venv** mit (`deploy.sh:169`) |
+
+## Phasenweit (P9-56 … P9-58) — heute gemessen
+
+| # | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| **P9-56** | Bereichs-Tabu-Diff `<start>^..HEAD` über §0.3 leer — mit **genau einer** Ausnahme (Step F) | ⚠️ **ein Treffer, der nicht auf der Ausnahmenliste steht** | `git diff --stat 06ab4f6^..HEAD` über die sechs Pfade → **ein** Treffer: `phase7_spaces_admin/tests/test_space_removal.py`, 17 Zeilen (+15/−2). Grund: die Test-Attrappe für `Store.move()` hatte eine eigene Signatur, das neue `actor=` machte daraus einen HTTP 500 mitten im Space-Entfernen (trace-Plan §9: „ein Fund drei Phasen entfernt"). **Nicht umbenannt:** §0.3 sagt für `phase7_spaces_admin/` „Code; Doku-Zeilen erlaubt" — eine Testdatei ist beides nicht. **Die beiden angekündigten Öffnungen sind unberührt** und je gemessen: Step F genau drei Dateien, trace genau drei |
+| **P9-57** | Service-Touch durch einen Agenten **0**: kein `pkill -f`, kein `systemctl`; Wegwerf-Instanz über PID-Datei oder Port gestoppt | ✅ | **messbare Hälfte heute:** kein Listener auf den P9-Wegwerf-Ports 18765–18780 (`ss -ltn`), die Produktionsinstanz läuft unverändert als PID 1994214 (nur gelesen). **Nicht prüfbar** ist die Behauptung „kein `systemctl` durch einen Agenten" — sie steht je Session-Block und ist kein maschinell prüfbarer Zustand |
+| **P9-58** | `pytest` ≥ 995 + die neuen Tests, `ui_budget` 5/5, jeder Step-Commit mit Doc-Update im selben Commit | ✅ | **heute:** `pytest` **1169 passed** (218,31 s), `ui_budget` **5/5** (155,2 KB gzip von 250 KB), `doc_health` **0**. Doc-Update je Commit **über alle 72 Commits seit `06ab4f6` geprüft**: kein einziger ohne `.md`, und — die schärfere Form — **kein Commit mit Produktcode ohne `phase9_hardening/CLAUDE.md` im selben Commit** (die 11 Commits ohne Head sind reine Runbook-Commits). Hard Rule 8 ist damit nicht behauptet, sondern durchgezählt |
+
+## Block doing — fünfter Eimer „In Arbeit" (P9-59 … P9-68)
+
+| # | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| **P9-59** | Eine `doing`-Aufgabe zählt in „In Arbeit" und in **keinem** anderen Eimer | ✅ | T3 `test_doing_task_counts_in_doing_and_nowhere_else` als **Mitgliedschafts-Beweis** (fünf Eimermengen, disjunkt und vollständig) — als Zahlengleichheit hätte es den Duplikat-Fall durchgelassen. Browser S3/S6 |
+| **P9-60** | Zähler == Liste für „In Arbeit", mit nichtleerem Bestand | ✅ | T4 prüft `total == counts["doing"] == 1` **und** `items[0].title == "laufende Aufgabe"`; T8 (Altbestand) ist für diesen Eimer nicht mehr vakuös |
+| **P9-61** | Jede `(type, status)`-Kombination aus `STATUS_VALUES` landet in genau einem Eimer | ✅ | T2, **generiert** aus `STATUS_VALUES` statt handgeschrieben; G1 → 7 rot, G3 → 2 rot |
+| **P9-62** | Reihenfolge `open, doing, done, note, archived` | ✅ | T1 liest die Reihenfolge aus dem **Quelltext**; Browser S2 prüft die `data-bucket`-Folge im DOM |
+| **P9-63** | Rail und Chips zeigen „In Arbeit", nirgends roh `doing` | ✅ | T6 vergleicht Label-**Menge** gegen Eimer-**Menge** (der `BUCKET_LABELS[b] \|\| b`-Rückfall ist sonst kein Fehler, er sieht nur aus wie ein Feature) |
+| **P9-64** | Statuswechsel `open` → `doing` lässt die Rail-Zähler **ohne Reload** umspringen | ✅ | Browser S5/S6: Toast „Gespeichert · v2", danach `offen 1 → 0`, `in Arbeit 1 → 2`; Screenshot `p9_doing_04_*`; Browser-Gegenlauf **rot** |
+| **P9-65** | Maschinenebene roh und vollständig; UI-Speichern verliert `assignee` nicht | ✅ | T5 schickt **exakt** `editor.js :: saveItem()`s Feldsatz (ohne `assignee`), danach über drei Lesepfade geprüft; Browser S8. **Der Browser-Gegenlauf ist der eigentliche Beleg für P9-W:** S5/S7/S8 bleiben auch ohne den Block grün — das Loch war rein navigativ |
+| **P9-66** | Kein `storage/`-, MCP- oder Tabu-Touch, keine zehnte Contract-Öffnung | ✅ | Tabu-Diff leer, im Commit ausgegeben. Damit V174 beantwortet: §Geerbte Contracts musste **nicht** mitgezogen werden |
+| **P9-67** | Jeder neue bzw. umgedrehte Wächter wird an einem eingebauten Verstoß rot | ✅ | G0 (Kontrolle) **0** · G1 **7** · G2 **2** · G3 **2** · G4 **1** · G5 **1**; Browser-Gegenlauf 7 von 11 rot |
+| **P9-68** | `v3.1.0` live, `health_gate` grün, P9-43 gemessen | ✅ | Release `5414cb7`, Health-Gate **9/9**, P9-43 ≤ 1,05 s (siehe dort) |
+
+## Block trace — Nachvollziehbarkeit (P9-69 … P9-82)
+
+| # | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| **P9-69** | Enge Probe = drei Dateien | ✅ | `git diff --stat 43fcac0^..43fcac0 -- phase1_storage/storage` → `history.py`, `models.py`, `store.py` — genau die drei in §0.4 angekündigten |
+| **P9-70** | T1–T6 grün | ✅ | 5 `test_store.py` + 4 `test_history.py`; `pytest` 1128 → 1152 (**24** neue, im frischen venv gezählt) |
+| **P9-71** | Wächter T7 grün und mit G1 rot | ✅ | `test_every_store_write_call_in_the_adapters_carries_an_actor`; G1 → 1 rot. Er scannt nur **Nicht-Test**-Module — die Attrappen-Klasse fängt er per Konstruktion nicht ab (P9-56) |
+| **P9-72** | MCP liefert `updated_by` in `get_item`, `search_items` und Schreibantworten | ⚠️ **eine Datei mehr als §0.3 vorsah** | `mcpserver/receipts.py` — die Standardantwort eines Schreib-Tools ist die *Quittung*, nicht der Dateitext. Ohne diese eine Zeile hätte ein Agent nach einem fremden Write nicht die Antwort bekommen, in der er nachschaut |
+| **P9-73** | `_ASSIGNEE_HINT` an beiden Tools wörtlich | ✅ | prüft zusätzlich die Nicht-Überschreiben-Hälfte |
+| **P9-74** | Kein Kanal kann `updated_by` setzen | ⚠️ **eine Route verwirft statt abzulehnen** | Kern `ValidationError` · PATCH `422` · kein MCP-Parameter · **POST filtert lautlos auf eine Whitelist**. **Bewusst nicht vereinheitlicht:** eine `unknown`-Prüfung im POST würde jedes unbekannte Feld ablehnen und damit Round-Trips brechen, die den vollen Item-JSON zurückschicken. Beide Stellen im Code kommentiert |
+| **P9-75** | Altbestand bleibt ohne Feld | ✅ | Test + Browser S7: die Lesezeile ist **weg**, nicht „unbekannt" |
+| **P9-76** | Git-Autor = Schreiber, Committer unverändert | ✅ | Test + **live im Wegwerf-DATA_ROOT**: `git log --format=%an -3` → `beta, alpha, alpha` |
+| **P9-77** | UI: „bei X" in der Liste | ✅ | Browser S2 (`task · doing · bei alpha`) + statischer Wächter |
+| **P9-78** | UI: Editorfeld + „Zuletzt geändert von X" | ✅ | Browser S1/S3/S4 + Wächter für Feld **„Bei"** mit `<datalist>` und die Lesezeile |
+| **P9-79** | P9-Z: Auto-Füllen nur bei leer, nie überschreiben | ✅ | Browser S1 (`'' → alpha`), S5 (`alpha → alpha`); Gegenlauf **S5 rot** (`alpha → beta`) — der eigentliche Beweis |
+| **P9-80** | Browser S1–S7 grün, Gegenlauf rot | ✅ `pending: Deploy v3.1.1` | `probes/p9_trace_probe.json` **8/8** gegen eine Zwei-Principalen-TLS-Instanz mit echter Git-Historie; mit G4 **7/8** (S5 rot, `alpha → beta`) |
+| **P9-81** | Gegenlauf G1–G5 jeder ≥ 1 rot | ✅ | G1 → **1** · G2 → **2** · G3 → **1** · G4 → **2** · G5 → **4** |
+| **P9-82** | Frisches venv grün | ✅ `pending: Deploy v3.1.1` | `pytest` **1128/1128** im frischen Release-venv, mit dem `requests`-Defekt behoben (dessen Beleg ist der Lehrfall „eine unbenannte Handinstallation") |
+
+---
+
+# `[VERIFY]`-Bilanz
+
+## Was diese Zahl nicht ist
+
+**34 belegte Einträge, nicht 40.** Die 40 ist die Größe des **Nummernbereichs** V145–V184, und die
+Übergabe führte sie als „40 Einträge". Gegen die Quellen gezählt:
+
+| Bereich | Zahlen | Belegt |
+|---|---|---|
+| V145–V166 (Plan §13 + Step C) | 22 | **22** — V166 steht nicht im Plan-Register, sondern nur im Session-Block vom 2026-09-25 (`devN` für LXC braucht PVE ≥ 8.1) |
+| V167–V172 | 6 | **0** — in keiner Repo-Datei definiert, sie kommen nur als Bereichsangabe vor (`§12`/`§13`: „V145–V172") |
+| V173–V178 (doing §10) | 6 | **6** |
+| V179–V184 (trace §8) | 6 | **6** |
+
+**V167–V172 sind reserviert und unbelegt.** Sie zu belegen wäre Erfindung, sie umzunummerieren hieße,
+einen 📕-Snapshot zu editieren. Sie bleiben als Lücke stehen, damit niemand darauf aufbaut.
+
+**Und zwei Nummern sind je zweimal vergeben:**
+
+| Nummer | Lesart A (Plan §13) | Lesart B (Step-A-Runbook §5, „neu, hier") |
+|---|---|---|
+| **V162** | Wächst `_trash/` durch die Asset-Verschiebungen seit N5 messbar? (Step G) | Setzt ein Tailscale-TCP-Forwarder (`tailscale serve --tcp`) die Tailnet-ACLs durch? |
+| **V163** | Betrifft der 3.4.7-Security-Fix dieses Projekt? (Step H) | Reicht `socat` mit `SystemCallFilter=@system-service` und `MemoryDenyWriteExecute=true`? |
+
+Beide Lesarten stehen unten je mit ihrem eigenen Stand — eine stille Auswahl einer der beiden wäre
+die Sorte Falschheit, die diese Matrix verhindern soll.
+
+## Stand je Eintrag
+
+| ID | Frage | Stand | Antwort / Beleg |
+|---|---|---|---|
+| V145 | `docs/INDEX.md` nach der Rotation < 38.912 B, mit allen P9-Zeilen? | ⚠️ | **Beim Bau ja** (38.822 B auf `06ab4f6`), **heute nein** (61.108 B). Der Zuwachs ist Pflichtpflege laufender Schritte; die Datei benennt es selbst (P8-P). Dieselbe Sache wie P9-3 |
+| V146 | Ausnahmeliste in `doc_health.py` deckungsgleich mit der in `docs/INDEX.md` benannten? | ✅ | **heute beantwortet.** `CARD_EXEMPT` (7 Einträge) auf die vier INDEX-Kategorien abgebildet: Harness `.claude/RESUME.md` · Fixtures `phase6_shares/tests/golden/*.md` (3) · geparst `docs/UPDATE_LOG.md` · Vendor/Lizenz 2. **Kein ungenannter Fall:** `header_cards` = 0 Befunde |
+| V147 | `pytest`-Baseline wirklich 995? | ✅ | 2026-09-20 gemessen: **995 passed in 185,98 s** |
+| V148 | Funnel-Custom-Domain-Ausschluss gegen die **aktuelle** Tailscale-Doku bestätigt? | ✅ | **heute beantwortet.** (a) Die Doku-Seite zu eigenen Domains gibt es nur für **Tailscale PAM**, nicht für Funnel. (b) `tailscale/tailscale#11563`: ein CNAME trägt nicht, *„all tailscale sees (via SNI) is the CNAMEd name and does not know where to route the connection"*. **P9-E damit bestätigt**; der Weg (a) aus `PHASE8_6_CLOSEOUT_HANDOVER.md` §4.2 existiert weiterhin nicht |
+| V149 | Welche Metadatenfelder leiten sich aus der Basis-URL ab? | ✅ | **alle abgeleitet, keines fest**; beim Einlösen kein `iss`-Check ⇒ der Basis-URL-Wechsel invalidiert keine Token-Familie |
+| V150 | Hält der Anthropic-Connector unter der neuen Domain, in **beiden** Konten? | ⬜ | A8, echter `list_spaces`; Befund 4: der A7-Restart kappt beide Connectoren (`resource`-Bindung) |
+| V151 | Latenz über den VPS gegenüber 372,9 ms über Funnel? | ⚠️ | Tailnet-Bein gemessen (28–37 ms, DERP Frankfurt); der Vergleich gegen die **Referenz 372,9 ms** für einen vollen `/api/v1/overview` steht aus (P9-15) |
+| V152 | Tailscale-eigenes Watchdog-Feature ohne Add-on? | ✅ | „Gibt es nicht" |
+| V153 | Polkit-Regel oder `sudoers`-Fragment? | ✅ | **polkit**; `sudoers` ist nachweislich ausgeschlossen (`NoNewPrivileges=true` → `setpriv` belegt `no_new_privs`). Die JS-Regel prüft zusätzlich `unit == "tailscaled.service"` und `subject.user == "savefyx"`; die Probe (Wegwerf-Unit, `tailscaled` unberührt) meldete `AUTORISIERT` bei `User=root` |
+| V154 | IOMMU-Zustand des 3060-Hosts — LXC oder volle VM? | ✅ | **LXC** — Plan-§5.2-Umschaltpunkt greift nicht, LXC teilt den Host-Kernel |
+| V155 | Zeilennummern `mcp_local_vision_server.py:223/274` gegen den aktuellen Stand | ✅ | **heute beantwortet: beide Anker sind gewandert** (C6 hat die Datei umgebaut, 361 Zeilen). `:223` ist heute die Nicht-JSON-Fehlerbehandlung, **nicht** die Startzeile; `:274` ist heute `def serve(endpoint, model)` — die reparierte Funktion, aber aus einem anderen Grund als geplant. Echte Anker heute: `resolve_endpoint()` `:97`, `DEFAULT_ENDPOINT` `:50`, `--endpoint` `:328`. **Drift klein, hier datiert korrigiert statt im 📕-Plan** |
+| V156 | Bei `qwen3-vl:8b` bleiben oder VRAM-Luft nutzen? | ✅ | **bleiben**, damit der Geschwindigkeitsgewinn dem GPU-Wechsel und nicht dem Modell zuzuschreiben ist |
+| V157 | Ist `document.fullscreenElement` beim ESC-`keydown` gesetzt? Chromium **und** WebKit | ⚠️ | **Chromium gemessen** (echter `requestFullscreen()` + `press("Escape")`): gesetzt, der einfache Guard genügt. **WebKit ungemessen** (kein Binary im Playwright-Cache). **Und für den gemeldeten Fall gegenstandslos:** die App ruft `requestFullscreen()` nirgends auf, der Guard adressiert natives macOS-Vollbild nicht (P9-27) |
+| V158 | Reicht `closest()` zur Chip-Unterscheidung, oder braucht es eine eigene Klasse? | ✅ | **Am gewählten Anker nicht nötig** — `.tree__space` hat keine verschachtelten interaktiven Kinder. Ein Guard, der nichts ausschließt, wäre ein irreführender Test (P9-31) |
+| V159 | Erscheint `doing` im `<select>` ohne Codeänderung? | ✅ | ja im Editor-Dropdown (`editor.js`), für den Anlegen-Dialog gegenstandslos (TYP-Vokabular, kein Status-Knopf) |
+| V160 | Was ist `assignee`? | ✅ | **Space-Name, ohne Validierung** (Lock P9-U) |
+| V161 | Dauer des Index-Neuaufbaus über den echten `DATA_ROOT` | ✅ | **≤ 1,05 s für 197 Items** beim Deploy `v3.1.0` (P9-43) |
+| V162 *(Lesart A)* | Wächst `_trash/` durch die Asset-Verschiebungen seit N5 messbar? | ⬜ | unberührt — eine Löschung wurde live noch nicht beobachtet |
+| V162 *(Lesart B)* | Setzt `tailscale serve --tcp` die Tailnet-ACLs durch? | ⬜ | ungeprüft, kein Netzzugriff in der Session. **Der Grund, warum `socat` gewählt wurde** — eine offene Frage darf nicht die Grundlage einer Firewall-Entscheidung sein |
+| V163 *(Lesart A)* | Betrifft der 3.4.7-Security-Fix dieses Projekt? | ✅ | **nein**, drei Codepunkte (P9-54) |
+| V163 *(Lesart B)* | Reicht `socat` mit Syscall-Filter und `MemoryDenyWriteExecute`? | ✅ | **beantwortet durch die Ausführung**: A0b lief, `socat` 1.8.0.0 läuft mit zwei Listenern, `diagnose.sh` danach alle Prüfungen grün |
+| V164 | Läuft `deploy.sh` unter der neuen Domain-Konfiguration durch? | ⬜ | **blockiert auf A7** — der Deploy `v3.1.0` lief mit der alten Basis-URL, `ALLOWED_HOSTS` trägt die Domain noch nicht |
+| V165 | Baut ein neuerer 580er `nvidia-uvm` gegen den pve-Kernel? | ✅ | 580.173.02 entpackt, `cuInit = 0` nach zweiter Reboot-Probe grün |
+| V166 | Braucht `devN`-Passthrough für LXC PVE ≥ 8.1? | ✅ | `pve-manager/9.2.2` — Bedingung erfüllt |
+| V167–V172 | *(nie definiert)* | — | **reserviert, unbelegt.** Siehe oben |
+| V173 | Steht irgendwo ein Eimer-Name oder Status-Anzeigewort fest im Code? | ✅ | **gemessen:** ein Treffer (`state.js`, `filter: "open"`), ein Kommentar, Archiv-Skripte, die nicht erneut laufen. Die vier alten Smokes nehmen `.overview__space-count.first` und sind unkritisch |
+| V174 | Muss `phase1_storage/CLAUDE.md` §Geerbte Contracts mitgezogen werden? | ✅ | **Nein**, solange P9-66 hält — und es hält (P9-66) |
+| V175 | Port 18776 frei? | ✅ | im Repo frei; zur Laufzeit `ss -ltn` leer, weiterhin frei |
+| V176 | Lassen sich die App-Fixtures in `phase9_hardening/tests/` benutzen? | ✅ | **nein**, gemessen: dort kein `conftest.py`. Deshalb stehen die Overview-Tests in `phase5_ui/tests/test_overview.py` |
+| V177 | `pytest`-Baseline am Bau-Tag? | ✅ | 1122 passed in 200,9 s; Erwartung nach dem Block 1128 — eingetroffen |
+| V178 | Ist `#field-status` im Vorschau-Modus bedienbar? | ✅ | `setEditorMode()` deaktiviert nur `[data-md]`; das Select sitzt im zugeklappten `<details id="meta-panel">`, die Probe klappt es auf — im Browser bestätigt |
+| V179 | Echte Space-Namen als Git-Autor unproblematisch? | ✅ | `fabian`, `Home-Server`, `IT-Sekus-Projekt`, `Janick`, `niklas` — keiner berührt P9-AC; ein führendes `-` ist kritisch (`--author` bekommt den Wert als eigenes argv). **Gemeldeter Nebenbefund:** im DATA_ROOT liegt ein Eintrag namens wörtlich `*.sqlite3` |
+| V180 | Schickt `saveItem()` den ganzen Formularstand? | ✅ | `editor.js:500–503` |
+| V181 | `api.py:1001/1003` ein `if/else`? | ✅ | ein Request, ein Store-Aufruf, ein Commit |
+| V182 | `updated_by` eines fremden Items innerhalb oder außerhalb von `<untrusted_content>`? | ✅ | **heute am Code: außerhalb.** `wrap_untrusted()` wirkt nur auf `item.snippet` (`tools.py:258`) und `item.body` (`:529`); `updated_by` steht neben `assignee` in der Metadaten-Liste. Rule 4 unberührt |
+| V183 | Schreiben außerhalb `tools.py`/`api.py` noch irgendwo `updated_by`? | ✅ | nein — nur Operator- und Fixture-Skripte, alle bei `actor=""` (P9-AB); die T7-Allowlist ist deshalb heute **leer** |
+| V184 | Ist `state.ownSpace` beim Öffnen des Editors immer gesetzt? | ✅ | **heute am Code: ja.** `app.js:283` setzt es in `init()` aus `/me`, **vor** `/meta` und vor `loadOverview()` — der Editor kann nicht ohne ihn offen sein. Der `!state.ownSpace`-Guard (`editor.js:781`) bleibt trotzdem die richtige Verteidigung |
+
+**Bilanz: 34 belegte Einträge — 28 ✅ · 3 ⚠️ · 3 ⬜.** Dazu 6 reservierte, unbelegte Nummern
+(V167–V172) und die drei geerbten:
+
+| ID | Frage | Stand |
+|---|---|---|
+| **V118** *(geerbt)* | Zwillingskanten — zwei Linien gewollt? | ⚠️ **beantwortet** (zwei, die zweite gestrichelt), **Entscheidung offen** = P9-36 |
+| **V136** *(geerbt)* | Chip-Umstellung vs. `bindFolderDropTarget()` | ✅ **gegenstandslos am gewählten Anker** (P9-31/V158) |
+| **V120** *(geerbt)* | Dynamischer Tab-Titel | ⬜ **bewusst offen**, außerhalb jedes Scopes (Plan §15) |
+
+---
+
+# Was diese Matrix nicht beweist
+
+**Vier Dinge warten auf den Deploy `v3.1.1`** (Badge `app.html:20` + `##`-Block am Deploy-Tag, sonst
+brennt das `deploy.sh`-Gate P6-X ab). Keines ist eine offene `P9-`-Zeile — sie stehen hier, damit
+niemand sie mit einem eingecheckten Block verwechselt:
+
+1. **trace-Block live.** P9-69–P9-82 sind gegen eine Zwei-Principalen-Wegwerf-Instanz mit echter
+   Git-Historie belegt (8/8) — live sehen ist eine andere Aussage. Erwartbar: jedes bestehende Item
+   zeigt **kein** „Zuletzt geändert von", bis es erstmals geschrieben wird (P9-AB); Eigenschaft,
+   kein Fehler, gehört in den Changelog-Text. **Kein** Index-Neuaufbau, anders als nach Step F.
+2. **B17 live gesehen.** Die Vorschrift-Fläche ist per Pixel-Probe 14/14 belegt, die Sichtprüfung am
+   echten Gerät steht aus. Offen bleibt der **Kontrast 4,38:1** — besser als vorher (3,36:1) und
+   weiterhin kein WCAG-AA (4,5:1 für normalgroßen Text; 14 px/500 ist kein „large text").
+3. **Eine Live-Löschung.** Step G ist im Browser belegt (14/14), die Beobachtung am echten Space steht aus.
+4. **Step H im Release-venv nach dem Pin** — gehört an den nächsten Deploy.
+
+**Und zwei Lücken, die keine Messung schließen kann:**
+
+- **Der Gate-Smoke aus Plan §11 (GA2) wurde nie gebaut.** `phase9_hardening/scripts/` hat die sechs
+  Block-Proben (Reload, doing, trace, btn2, btn3, Step G), aber **kein** `p9_hardening_smoke.py`.
+  Damit sind die Stationen ersetzt, die ein Block für sich trug — und genau die drei, die niemand
+  trug, sind die drei offenen Zeilen P9-27/-29/-30. Kein Zufall: alle drei sind Sichtprüfungen am
+  echten Gerät, und das ist Nikinger-Arbeit.
+- **GA1/GA4** sind durch die Block-Proben und den Deploy `v3.1.0` überholt; die Nikinger-Sichtprüfung
+  (GA3) ist für die sechs `p9_trace_*`-Bilder am 2026-10-02 erfolgt, für B17 offen.
+
+**Reihenfolge:** A7+A8 in einer Sitzung (schließt P9-10b, P9-12, P9-13, P9-15, V150, V164), dann
+Deploy `v3.1.1`, dann der Rest von Gate/Z (Übersichtsgrafik §12.4, Rotationen, ROADMAP-Zeile, Phase
+auf ✅). Herleitung im Phase-Head und in `SESSIONS_ARCHIVE.md`.

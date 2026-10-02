@@ -5,7 +5,7 @@ read-when: Chronik einer älteren P9-Session gesucht — nicht beim normalen Arb
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-02 (zweiundzwanzigste Rotation: der dreizehnte Block — Gate/Z-Doku-Hälfte (zwei Sektions-Rotationen, P9-L-Lauf, Skript-Defekt `rotate_index_updates.sh`) — wandert verbatim hierher; neuer Head-Block = **B17 gebaut** (ein Knopf, zwei korrigierte Zahlen im Backlog, Konflikt mit Konvention v3 zurückgestellt); Head 63.470 B → 53.968 B — **weiter über dem Softcap, neu benannt**, die Restmasse sind weiter die 7.467 B durchgestrichenen Statusabsätze im Modulstatus, Streichen bleibt Nikinger-Entscheidung) | updated: 2026-10-02 (einundzwanzigste Rotation: der zwölfte Block — Block trace gebaut, opencode/M3 — wandert verbatim hierher; neuer Head-Block = Gate/Z-Doku-Hälfte (zwei Sektions-Rotationen, P9-L-Lauf, Skript-Defekt `rotate_index_updates.sh`); Head 49.440 B → 44.360 B — **weiter über dem Softcap, neu benannt**, die Restmasse sind 7.467 B durchgestrichene Statusabsätze im Modulstatus, Streichen ist Nikinger-Entscheidung) | 2026-10-02 (zwanzigste Rotation: der zwölfte Block — Block trace gebaut, opencode/M3 — ist ans Dateiende gewandert, der elfte Block (Deploy-Abbruch behoben, `v3.1.0` live, Planungssession) verbatim ins Archiv; Head 46.993 B → 42.012 B) | 2026-10-02 (**neunzehnte Rotation, elfter Block** — der zehnte Block (doing-Block gebaut) wandert verbatim hierher; neuer Head-Block = Deploy-Abbruch `v3.1.0` behoben, `requests` war nie deklariert) · 2026-10-02 (**achtzehnte Rotation, zehnter Block** — der neunte Block (Mini-Plan doing-Block, Lock P9-V) wandert verbatim hierher; neuer Head-Block = doing-Block **gebaut**: `_BUCKETS["doing"]` + Rail-Label „In Arbeit", 6 neue Tests, Browser 11/11 mit Gegenlauf 7 rot, `pytest` 1128. **Head 44.508 B → 41.192 B** — und damit wieder 232 B **über** dem 40-KiB-Softcap, im INDEX neu benannt) | 2026-10-02 (**siebzehnte Rotation, neunter Block** — der achte Block (Deploy verschoben, Befund 11) wandert verbatim hierher; neuer Head-Block = Mini-Plan doing-Block, Lock P9-V) | 2026-10-01 (**sechzehnte Rotation, achter Block** — Deploy verschoben (Befund 11: `doing` ist im Deploy-Fall im Status-Feld erreichbar und zählt in keinem Ordner), `.toolbar-btn` in Standardoptik mit Pixel-Beleg 13/13, vier Tailscale-Bilder geklärt; Head 41.306 B, Archiv 152.730 B) | updated: 2026-10-01 (**fünfzehnte Rotation, A4-Vorbereitung** — Step-A-Block (2026-10-01, Domain live) verbatim aus dem Head; Head 42.376 B → 34.795 B) | 2026-10-01 (**vierzehnte Rotation, Step A** — Step-B-Block verbatim aus dem Head; Head 41.707 B → 29.415 B) | 2026-09-30 (**dreizehnte Rotation, Step B** — Step-B-Block [polkit-Regel gebaut, V153 entschieden: sudoers ist unter NoNewPrivileges unbaubar; systemd 255 kennt nur die grobe `manage-units`-Aktion, deshalb JS-Regel mit Unit-Attribut; V153-Probe ohne tailscaled-Kontakt] im Head **angehängt**, Step-H-Block verbatim ins Archiv; Head 34.873 B → 28.685 B) | 2026-09-30 (**zwoelfte Rotation, Step H** — Step-H-Block [`fastmcp` exakt gepinnt `==3.4.7`, der Range-Pin hatte den Live-Release bereits lautlos auf 3.4.7 gezogen, V163 mit drei Codepunkten beantwortet, Wächter als Deploy-Riegel, Gegenprobe 4 Verstöße → 7 rot] im Head **angehängt**, Step-G-Block verbatim ins Archiv; Head 33.175 B → 26.210 B) | 2026-09-30 (**elfte Rotation, Step G** — Step-G-Block [Lösch-Ort war unbaubar, TLS-Wegwerf für den Browserbeleg, 14/14] im Head **angehängt**, Step-F-Block verbatim ins Archiv; Head 32.668 B → 25.740 B) | 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
+updated: 2026-10-03 (dreiundzwanzigste Rotation: der **fünfzehnte** Block — Abnahmematrix P9-1–P9-82 + `[VERIFY]`-Bilanz steht (`ABNAHME_MATRIX.md` neu), und drei Funde, die die Übergabe nicht trug: die „40 Einträge" waren ein Nummernbereich (belegt: **34**, V167–V172 unbelegt), P9-56 hat einen nicht angekündigten Tabu-Treffer (`phase7_hardening/tests/test_space_removal.py`, 17 Z.), und **GA2 wurde nie gebaut** — genau P9-27/-29/-30 sind die Zeilen ohne Probe; der **vierzehnte** Block (B17) wandert verbatim hierher, neuer Head-Block = 2026-10-03; Head **56.142 B → 53.215 B**, Archiv 195.890 B → 209.333 B — **weiter über dem Softcap, neu benannt**, die Restmasse bleiben die 7.467 B durchgestrichenen Statusabsätze im Modulstatus, Streichen bleibt Nikinger-Entscheidung) | 2026-10-02 (zweiundzwanzigste Rotation: der dreizehnte Block — Gate/Z-Doku-Hälfte (zwei Sektions-Rotationen, P9-L-Lauf, Skript-Defekt `rotate_index_updates.sh`) — wandert verbatim hierher; neuer Head-Block = **B17 gebaut** (ein Knopf, zwei korrigierte Zahlen im Backlog, Konflikt mit Konvention v3 zurückgestellt); Head 63.470 B → 53.968 B — **weiter über dem Softcap, neu benannt**, die Restmasse sind weiter die 7.467 B durchgestrichenen Statusabsätze im Modulstatus, Streichen bleibt Nikinger-Entscheidung) | updated: 2026-10-02 (einundzwanzigste Rotation: der zwölfte Block — Block trace gebaut, opencode/M3 — wandert verbatim hierher; neuer Head-Block = Gate/Z-Doku-Hälfte (zwei Sektions-Rotationen, P9-L-Lauf, Skript-Defekt `rotate_index_updates.sh`); Head 49.440 B → 44.360 B — **weiter über dem Softcap, neu benannt**, die Restmasse sind 7.467 B durchgestrichene Statusabsätze im Modulstatus, Streichen ist Nikinger-Entscheidung) | 2026-10-02 (zwanzigste Rotation: der zwölfte Block — Block trace gebaut, opencode/M3 — ist ans Dateiende gewandert, der elfte Block (Deploy-Abbruch behoben, `v3.1.0` live, Planungssession) verbatim ins Archiv; Head 46.993 B → 42.012 B) | 2026-10-02 (**neunzehnte Rotation, elfter Block** — der zehnte Block (doing-Block gebaut) wandert verbatim hierher; neuer Head-Block = Deploy-Abbruch `v3.1.0` behoben, `requests` war nie deklariert) · 2026-10-02 (**achtzehnte Rotation, zehnter Block** — der neunte Block (Mini-Plan doing-Block, Lock P9-V) wandert verbatim hierher; neuer Head-Block = doing-Block **gebaut**: `_BUCKETS["doing"]` + Rail-Label „In Arbeit", 6 neue Tests, Browser 11/11 mit Gegenlauf 7 rot, `pytest` 1128. **Head 44.508 B → 41.192 B** — und damit wieder 232 B **über** dem 40-KiB-Softcap, im INDEX neu benannt) | 2026-10-02 (**siebzehnte Rotation, neunter Block** — der achte Block (Deploy verschoben, Befund 11) wandert verbatim hierher; neuer Head-Block = Mini-Plan doing-Block, Lock P9-V) | 2026-10-01 (**sechzehnte Rotation, achter Block** — Deploy verschoben (Befund 11: `doing` ist im Deploy-Fall im Status-Feld erreichbar und zählt in keinem Ordner), `.toolbar-btn` in Standardoptik mit Pixel-Beleg 13/13, vier Tailscale-Bilder geklärt; Head 41.306 B, Archiv 152.730 B) | updated: 2026-10-01 (**fünfzehnte Rotation, A4-Vorbereitung** — Step-A-Block (2026-10-01, Domain live) verbatim aus dem Head; Head 42.376 B → 34.795 B) | 2026-10-01 (**vierzehnte Rotation, Step A** — Step-B-Block verbatim aus dem Head; Head 41.707 B → 29.415 B) | 2026-09-30 (**dreizehnte Rotation, Step B** — Step-B-Block [polkit-Regel gebaut, V153 entschieden: sudoers ist unter NoNewPrivileges unbaubar; systemd 255 kennt nur die grobe `manage-units`-Aktion, deshalb JS-Regel mit Unit-Attribut; V153-Probe ohne tailscaled-Kontakt] im Head **angehängt**, Step-H-Block verbatim ins Archiv; Head 34.873 B → 28.685 B) | 2026-09-30 (**zwoelfte Rotation, Step H** — Step-H-Block [`fastmcp` exakt gepinnt `==3.4.7`, der Range-Pin hatte den Live-Release bereits lautlos auf 3.4.7 gezogen, V163 mit drei Codepunkten beantwortet, Wächter als Deploy-Riegel, Gegenprobe 4 Verstöße → 7 rot] im Head **angehängt**, Step-G-Block verbatim ins Archiv; Head 33.175 B → 26.210 B) | 2026-09-30 (**elfte Rotation, Step G** — Step-G-Block [Lösch-Ort war unbaubar, TLS-Wegwerf für den Browserbeleg, 14/14] im Head **angehängt**, Step-F-Block verbatim ins Archiv; Head 32.668 B → 25.740 B) | 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
 ---
 
 # Phase 9 — Sessions Archive
@@ -15,6 +15,151 @@ trägt immer genau einen `## Session stopped`-Block, ältere Blöcke wandern ver
 Vorsatz: nichts abtippen, alles per Skript mit vier Gegenproben (Schnitt verlustfrei, neuer
 Head trägt genau einen Block, alle bewegten Blöcke im Archiv byte-identisch, Archivbestand
 unangetastet).
+
+## Session stopped — 2026-10-02 (vierzehnter Block: B17 gebaut — ein Knopf, zwei falsche Zahlen im Backlog und ein Konflikt mit einer gelockten Zeile; opencode/M3, ein Commit, kein Deploy, kein Service-Touch)
+
+**Der Auftrag war die kleinste offene Aufgabe, und die Übergabe hat ihren Umfang selbst falsch
+beschrieben.** Von vier Posten waren drei deine Infra-Schritte; der vierte (B17) wurde als „15 Knöpfe
+ans Schema" notiert. **Gemessen vor dem Bauen** — Markup *und* CSS, nicht geglaubt — waren es
+**ein** Knopf mit einem Befund und **zwei** Klassen mit je eigener Bedeutung.
+
+| Vorher behauptet | Gemessen | Folge |
+|---|---|---|
+| 15 Knöpfe mit eigenen Flächen | **75 von 77** tragen eine Standard-Fläche; Ausnahmen sind `.btn-primary` (**13**, Akzent) und `.btn.action--caution` (**1**) | `.btn-primary` ist **kein Reststand**, sondern die dokumentierte Ausnahme deiner Entscheidung vom 2026-10-01 (`app.css`, Kommentar in `.btn`) — sie bleibt, sonst hätte ich einen Lock gerissen |
+| „`.btn.action--caution` (**2** Knöpfe)" auf `--btn-face-*` | **1**. Der Selektor matcht nur `#archive-button`; `#logout-button` ist ein `.rail__action` (`background: none`) und trägt die Vorsicht nur an der **Farbe** — er hatte nie eine Fläche | Zählen über Klassen-Präsenz statt über den Selektor: **dieselbe Fehlerklasse wie `count() == 1` für `[aria-current]`** im btn2-Lauf (Selektoren matchen ein Attribut, nicht seinen Wert) |
+
+**Der eigentliche Befund ist eine Helligkeit, kein Token — und er ist beim Messen entstanden, nicht
+beim Umstellen.** `--btn-face-top` `#2A313A` ist **heller** als die Standardfläche
+`--btn-std-fill` `#0C1C31`. „Vorsicht" war damit der **auffälligste** Knopf der Editor-Fußzeile statt
+des Standards — genau das Gegenteil der Absicht, die der Wächter
+`test_caution_and_primary_buttons_keep_their_own_look` beschrieb („Archivieren [sieht aus] sonst
+aus wie jeder andere Knopf"). Die Backlog-Liste hatte den Zustand als *Konsistenz*-Lücke beschrieben
+und damit die sichtbare Wirkung aus dem Blick verloren.
+
+**Der Konflikt, den ich gestoppt und zurückgebracht habe.** Mein Vorschlag war eine eigene
+`--caution-std-*`-Familie: dieselbe Struktur wie `--btn-std-*`, nur in der Vorsicht-Farbtiefe, in der
+Rechnung also deckend und dunkel. Du hast sie gewählt. Beim Vorbereiten des Blocks stieß ich auf
+`phase8_ui_graph/CLAUDE.md` und musste die Frage zurückstellen, weil sie zwei gelockte Zeilen bricht:
+die Konvention v3 sagt für „Vorsicht" wörtlich *Standard-Knopfplastik, aber `color: var(--caution)`
+auf Label und Glyph; **keine** gefüllte rote Fläche*, und deine P9-Notiz vom 2026-10-01 nennt
+`.action--caution` als Ausnahme, die „behält die graue Plastik". **Eine rot getönte Fläche *ist* die
+gefüllte rote Fläche**, die die Konvention ausschließt — das war keine Interpretationsfrage, sondern
+der Wortlaut. Nach der Rückfrage: **exakt die Standardfläche**, wortgleich mit v3, und damit ohne
+Konventionsänderung.
+
+**Was gebaut wurde, ist folgerichtig die kleinste mögliche Änderung: die drei
+`.btn.action--caution`-Regeln sind gelöscht, nicht umgeschrieben.** `.btn` *ist* die Standardfläche;
+eine eigene Kopie davon wäre genau die „zweite Knopfoptik im selben Panel", die derselbe Tag am
+2026-10-01 an `.account-nav` abgestellt hatte. Kein `:root`-Token kommt hinzu, keins wird verwaist —
+die alte Familie `--btn-face-*` hängt jetzt **nur noch am Badge `.rail__glyph`**, wo sie
+ausdrücklich bleiben soll. Die Kategorie bleibt sichtbar, aber an der **Beschriftung** statt an der
+Fläche.
+
+**Die Wächter, und einer davon musste umgedreht werden.** `test_caution_and_primary_buttons_keep_their_own_look`
+hätte nach dem Umbau genau das behauptet, was jetzt **falsch** ist. Ein umgedrehter Testname wäre eine
+Lüge gewesen, also: heißt jetzt `test_primary_keeps_its_own_face_and_caution_wears_the_standard_one`
+und trägt **beide** Richtungen mit Datum im Docstring (dasselbe Muster wie der umgedrehte
+doing-Wächter des 2026-10-02). Neu sind zwei: einer zählt die **Markup**-Träger statt der
+CSS-Textstellen — ein Wächter, der „`.btn.action--caution` deklariert keine Fläche" prüft, ist
+sonst grün, wenn die Klasse aus dem Markup verschwindet; der andere macht die alte Familie
+**badge-only** (Kommentare vorher entfernt, denn `app.css` *nennt* `--btn-face-top` an mehreren
+Stellen im Klartext). Der Docstring von `test_rail_glyph_is_a_badge_and_keeps_the_plastic` musste
+mitwandern: er stand auf „**letzter** Verbraucher", und das war ab hier eine Behauptung, die das CSS
+nicht mehr trägt.
+**Gegenprobe mit vier eingebauten Verstößen → 8 rote Assertions** (G1 alte Fläche zurück → 2 rot ·
+G2 Vorsichtfarbe entfernt → 1 rot · G3 Trägerklasse aus dem Markup → 2 rot · G4 Badge steigt mit → 3
+rot), Kontrolllauf 0 rot, danach byte-identisch wiederhergestellt.
+
+**Pixel-Beleg `p9_btn3_caution_probe.py` 14/14** (eigene TLS-Wegwerf-Instanz auf Port 18775,
+gestoppt über die PID-Datei). Kernstation: die **berechneten** `backgroundImage`-Strings sind
+stringgleich (`linear-gradient(rgb(12,28,49), rgb(5,11,19))` auf beiden), vier Pixelproben an der
+glyphenfreien Spalte x=4 px mit **max |Δ| = 1** (Toleranz ±2), die Vorsichtfarbe sitzt in der
+Beschriftung (`rgb(229,72,77)` gegen `rgb(233,237,242)` beim Standard). **Gegenlauf:** die alte
+Fläche wieder eingebaut → **6 von 13 Stationen rot**, Δ 25–28 an allen drei Höhen; die Datei kam
+danach als `*_gegenprobe.json` und wurde wieder entfernt (Muster aus dem trace-Block).
+
+**Zwei eigene Fehler, beide in derselben Stunde, beide im selben Commit behoben.** (1) Mein
+`.btn`-Kommentar enthielt eine `{ }`-Klammer — `_block_body` schneidet mit `[^}]*`, der Kommentar
+hat also den Block abgeschnitten und den bestehenden Wächter rot gemacht. (2) Derselbe Kommentar
+hätte **genau den neuen Wächter grün gemacht**: er *nennt* `color: var(--caution)` im Klartext, und
+die Regex für die Vorsichtfarbe hätte den Kommentar statt des Codes getroffen. Der Wächter strippt
+jetzt die Kommentare vorher — **ich hätte beim selben Mal die siebte Wiederholung derselben Repo-Lehre
+gebaut (ein Wächter, der den Kommentar über den Code prüft) und es erst beim Ausführen gemerkt.**
+
+**Ein dritter Fund, diesmal im eigenen Beleg.** Das erste Bild der Probe hieß `p9_btn3_01_footer.png`
+und zeigte `#editor-toolbar` — die **Formatierleiste**, die den Vorsichtsknopf gar nicht enthält. Der
+Dateiname behauptete das Gegenteil, und das ist derselbe Fehler wie der trace-Beleg, der der Gegenlauf
+selbst war: **ein Beleg, der etwas anderes zeigt als das, wofür er zitiert wird.** Jetzt ist es der
+Zuschnitt von `.editor__head-actions` (dort stehen „Archivieren", „Speichern" und „×" nebeneinander),
+und die Ruhe-Aufnahme entsteht **nach** dem Wegziehen des Zeigers — im ersten Entwurf wäre sie im
+Hover-Zustand entstanden, also im btn2-Lauf derselbe Reihenfolgefehler wie bei der Verlaufsmessung.
+
+**Und der Vision-Adapter hat dasselbe Bild falsch gelesen — das gehört dokumentiert, nicht versteckt.**
+Am Vollbild meldete er „Archivieren" mit **dunkelrotem** Hintergrund und „Speichern" mit hellgrauem:
+eine **Vertauschung**, und die rote Fläche existierte im Bild gar nicht (es war die rote
+*Beschriftung*). Am isolierten Zuschnitt desselben Knopfes war die Antwort brauchbar — Fläche
+`(10,10,50)` gegen gemessen `(10,23,40)`, der **R-Kanal exakt**. Also nicht „das Modell taugt nicht",
+sonne eine **eigene Fehlerklasse**: ein VLM ist als Farbmessgerät an *einem* Element brauchbar und als
+**Zuordner über mehrere Elemente** unbrauchbar. Als neue Zeile in
+`docs/concepts/sichtpruefung_automation_tooling.md` §Vormerkung 2026-09-28 abgelegt, mit der
+präzisierten Regel **„ein Bild, ein Element, eine Frage"** — dieselbe Zuständigkeitsgrenze wie
+2026-09-28, am zweiten Beispiel. **Eigene Kontrollmessung, ohne Modell:** Histogramm der
+eingecheckten PNGs — Fläche `(10,23,40)`/`(7,16,28)`, Kante `(29,67,116)` = `--btn-std-line`, 281 rote
+Beschriftungspixel, **3** Pixel in der alten Grau-Umgebung (Kanten-Antialiasing).
+
+**Benannt, nicht entschieden — der Kontrast.** Die Vorschrift-Beschriftung liegt jetzt bei
+**4,38:1** gegen die Standardfläche (vorher 3,36:1 auf der grauen Plastik). Das ist **besser und
+weiterhin kein AA**: WCAG verlangt 4,5:1 für normalgroßen Text, und 14 px/500 ist kein „large
+text". Ich habe den Wert als *Verschlechterungsverbot* in die Probe aufgenommen (eine echte
+Eigenschaft, die diese Runde zusichert) und den Absolutwert **nicht** zum Schwellwert gemacht. Die
+Kandidaten — hellere Vorschriftfarbe, oder die Kategorie doch an eine 1-px-Kante — sind
+Design-Entscheidungen und gehören dir.
+
+**Selbstprüfung:** `pytest` **1167 → 1169** (netto +2: ein Wächter umgedreht, zwei neu; Baseline
+vorher gemessen, nicht aus der Doku übernommen) · `ui_budget` **5/5**, und die Zahl **gemessen statt
+behauptet**: mit Stash-Gegenprobe **165,0 KB auf HEAD gegen 165,2 KB mit diesem Block** — die in der
+Wurzel-`CLAUDE.md` protokollierte **155,1 KB war schon veraltet**, sie stammt aus dem trace-Block; mein
+Anteil ist +0,2 KB (KommentarZeilen, die die Löschung aufwiegen) · `doc_health` **0 Befunde** ·
+Tabu-Diff auf die sechs Hartpfade **leer** (nur `app.css`, eine Testdatei, ein Skript, `.md`) ·
+Wegwerf-Instanz **über die PID-Datei** gestoppt, kein `pkill -f`, kein `systemctl`, `sharefyx-mcp`
+nicht berührt.
+
+**Zwei Entscheidungen nach diesem Commit, hier festgehalten, weil sie den nächsten Block
+definieren.** (1) **Gate/Z kommt jetzt** — die Abnahmematrix und die `[VERIFY]`-Bilanz sind das
+nächste Item, und sie brauchen **keinen Deploy und keinen Code**. Der Umfang ist gegen die drei
+Planquellen **verifiziert**, lückenlos und nicht geschätzt: **P9-1 – P9-58** (Plan §14) ·
+**P9-59 – P9-68** (`block_doing_plan.md`) · **P9-69 – P9-82** (`block_trace_plan.md`) — zusammen
+**82** Zeilen; `[VERIFY]` **V145–V172** · **V173–V178** · **V179–V184** — zusammen **40**. Ich hatte
+die Zahl angezweifelt, weil der Gate/Z-Status seit zwei Sitzungen „P9-1–P9-82" behauptet, ohne
+dass eine Quelle sie getragen hätte: **sie stimmt**, und die Bereiche schließen lückenlos. (Fast
+hätte ich sie selbst korrigiert — die Umkehrung wäre eine stille Abweichung gewesen.)
+(2) **Die Matrix kommt in eine neue Datei** `phase9_hardening/ABNAHME_MATRIX.md` (L2 mit L1-Card +
+INDEX-Zeile) plus Pointer im Head — **Nikinger-Entscheidung 2026-10-02**, gegen die P8.6-Lesart
+(kanonischer Closeout in Plan §9, ein 📕-Snapshot, der bisher unberührt ist). Der Grund ist nicht
+die Ordnung, sondern der Softcap: der Head liegt **13.008 B über** der Grenze, und ein 82-zeiliges
+Archiv hineinzuschreiben hieße, das Falsche zu tun. Die Disziplin der Zeilen: `✅`/`⚠️`/`⬜`/
+`ersetzt` **mit Beleg** (Testname, Probe-Datei, Journalzeile, Bild), und was den Live-Deploy braucht
+(trace-Block, B17-Sichtung, Gs Live-Löschung, Hs Release-venv-Beleg) bekommt **`pending: Deploy
+v3.1.1`** statt einer Vermutung. **Drei Zeilen sind schon heute messbar** und gehören nicht auf die
+later-Warte-Liste: `P9-56` (Bereichs-Tabu-Diff mit genau der angekündigten Step-F-Ausnahme),
+`P9-57` (Service-Touch durch einen Agenten = 0), `P9-58` (`pytest`, `ui_budget`, Doc-Update je
+Commit).
+
+**Und eine Zeile, die bewusst liegen bleibt:** `docs/INDEX.md` nennt als Ziel der Phase 9 weiterhin
+`v3.1.0`. Das ist mit dem heutigen Deploy überholt, aber es ist eine **Ziel-Angabe** — sie gehört in
+den Release-Commit, der ohnehin `v3.1.1` macht, und nicht in eine Gate/Z-Doku-Runde.
+
+**Nächster Schritt, unverändert die Zuständigkeiten des Nikinger:** (1) **Release-Commit + Deploy
+`v3.1.1`** — Badge `app.html:20` + `##`-Block in `docs/UPDATE_LOG.md`, **beides erst am Deploy-Tag**,
+sonst brennt das `deploy.sh`-Gate P6-X bei späterem Deploy ab; dieser Block kommt mitdeployt, ist
+aber eine reine CSS-Änderung. (2) **A7+A8 in einer Sitzung** (Befund 4: der A7-Restart kappt beide
+Connectoren), danach ist SP9-10b geschlossen und der Warndialog auf der alten Funnel-Adresse darf
+sterben. (3) Danach der Rest von Gate/Z: Abnahmematrix P9-1–P9-82 und `[VERIFY]`-Bilanz V145–V184.
+
+**Doku-Rest, benannt statt versteckt, unverändert:** Phase-9-Head jetzt über dem Softcap (vor diesem
+Block 50.904 B, mit dem Block mehr), Wurzel-`CLAUDE.md` 107.576 B, `docs/INDEX.md` ~58 KB. Für den
+Head ist die Rotation des Modulstatus der benannte Weg und **deine Entscheidung** — die
+durchgestrichenen Statusabsätze (7.467 B) habe ich **nicht** angefasst, auch nicht in dieser Session.
 
 ## Session stopped — 2026-10-02 (dreizehnter Block: Gate/Z-Doku-Hälfte — zwei Sektions-Rotationen, P9-L-Lauf und ein Skript-Defekt; opencode/M3, ein Commit, kein Deploy, kein Service-Touch, kein Code-Touch) Kein Code-Schritt war offen, und die drei
 Posten der Übergabe, die nicht dem Nikinger gehören, waren alle Doku-Arbeit. Also die
