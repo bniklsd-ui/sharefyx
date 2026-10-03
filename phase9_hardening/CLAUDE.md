@@ -11,7 +11,7 @@ down:
   - ABNAHME_MATRIX.md                            # P9-1 – P9-82 mit Stand und Beleg + [VERIFY]-Bilanz (2026-10-03)
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
   - UPDATES_ARCHIVE.md                          # ältere `updated:`-Fäden dieses Heads, verbatim (2026-10-03, 36 von 37)
-updated: 2026-10-04 (**die Zahlen der Abnahmematrix dürfen nicht mehr still veralten** — opencode/M3, ein Commit, **kein Produktcode-Touch**, kein Deploy) · **ein Fund mit acht Kilobyte:** P9-3 und V145 nannten `61.108 B` für `docs/INDEX.md`, real **69.357 B** — zwei Tage lang, in genau der Zeile, deren Gegenstand eine Dateigröße ist · **drei Fundstellen derselben Bilanz, drei Zahlen** (65/10/8 · 68/9/6 · 70/10/3) → **eine Quelle für die Zahl**: Modulstatus und INDEX-Zeile tragen jetzt einen Zeiger, der datierte Faden darf seine Momentaufnahme nennen, aber nicht in der Gegenwartsform · **die `[VERIFY]`-Bilanz ging auf, stimmte aber nicht:** 28/3/3 statt **28/4/2** (⚠️ und ⬜ gegeneinander vertauscht), Ursache: V162/V163 sind je zweimal vergeben, die **Zählregel stand nirgends** · **der benannte Hebel für die INDEX-Überschreitung war ein No-op, dreifach belegt:** Kette **1.155 B** (rotiert), Nachtrags-Bytes **30.145 B**, und selbst 300 B/Zeile ergäben **39.971 B** — das Kriterium 38.912 B ist per Kürzen unerreichbar; **drei Wege raus, keiner gebaut, alle Nikinger-Entscheidung** · **8 neue Tests** in zwei Dateien (`test_acceptance_numbers.py` 7/7 mit **8 Gegenproben G1–G8 rot** + Kontrolllauf grün · `test_rotate_index_updates.py` 1/1 für die verklebte Kettenstruktur) · **Band statt exakter Gleichheit** (±2 KB, das Band von `doc_health`), weil die Matrix die Größe einer Datei nennt, in der die Zeile steht, die diese Zahl nennt · **vier eigene Fehler, alle im selben Commit behoben** (Fließtext nie geprüft · dateiweite Suche statt zeilenweiser · Anker `| V145` griff die Bereichszeile · **Gegenprobe G6 meldete grün, weil sie nur eine von zwei Nennungen gefälscht hat**) · **Fund am Skript:** `rotate_index_updates.sh` meldete „Bereits konform: nur ein Eintrag" und meinte es richtig — die Kette trug zwei **ohne ` | ` verklebte** Fäden; der Trenner fehlt, (e) kann das nicht sehen, und die **beiden** ` | updated: `-Präfixe der Wurzel-`CLAUDE.md` sind entfernt (die Phase-9-Notiz „dort nicht rotierbar" ist damit **überholt**, das Skript ist seit dem 2026-10-03 verallgemeinert) · `pytest` **1180 → 1187**, `ui_budget` 5/5, `doc_health` 0 · **Wurzel-`CLAUDE.md` gemessen, nicht entschieden:** 114.789 B, §Current state 91.574 B in 24 Blöcken, Kette 13.718 B → **die Blockschnittzahl ist Nikinger-Entscheidung** | ältere Einträge: phase9_hardening/UPDATES_ARCHIVE.md
+updated: 2026-10-04 (**die Karte schrumpft** — opencode/M3, ein Commit, **kein Produktcode-Touch**, kein Deploy) · **`docs/INDEX.md` 71.573 → 38.532 B**: die **37.391 B** datierte Nachträge in 43 von 93 Einträgen wandern nach `docs/INDEX_ENTRIES_ARCHIVE.md`, das Kriterium ist vom P8.6-Wert 38.912 B auf den **40-KiB-Softcap** neu baseliniert (Nikinger-Entscheidung 2026-10-04) ⇒ **P9-3 ✅ und V145 ✅**, Balance **71 ✅ · 9 ⚠️ · 3 ⬜** · `scripts/archive_index_entries.sh` mit **fünf Gegenproben**, darunter die **byteweise Reassemblierung des Originals** · **vier Skript-Gegenproben waren rot, bevor es lief**: Schnitt mitten im Satz (`**` blieb im Kopf) · die Satzgrenzen-Prüfung strenger als `doc_health` (`~106KB` abgelehnt) · der **Zeiger als Markdown-Link**, den `_index_line_for` für die INDEX-Zeile des Archivs hielt · **ein echter Entwurfsfehler:** die Reassemblierung ging den Zeigern nach statt den Etiketten — das stimmt genau beim ersten Lauf · **eine eigene Behauptung korrigiert:** Gegenprobe (d) trägt nicht, was ich ihr zugeschrieben hatte · **10 neue Tests** (`test_index_archive.py` 4, `test_acceptance_numbers.py` 7 Bestand); die Wächter haben mich zweimal beim **eigenen** Zurückschreiben der Bilanz erwischt · **die Wurzel-`CLAUDE.md` bleibt auf Nikinger-Entscheidung unangetastet** und ist gemessen: 114.771 B, Kette 13.700 B, §Current state 91.574 B in 24 Blöcken; **K≥4 passt nie**, mit Kettenrotation K=1 → 17.515 B; **Umkehr von P9-A nötig — deine Entscheidung** · `pytest` **1188 → 1198**, `ui_budget` 5/5, `doc_health` 0, kein `systemctl`, kein `pkill -f` | 2026-10-04 (**die Zahlen der Abnahmematrix dürfen nicht mehr still veralten** — opencode/M3, ein Commit, **kein Produktcode-Touch**, kein Deploy) · **ein Fund mit acht Kilobyte:** P9-3 und V145 nannten `61.108 B` für `docs/INDEX.md`, real **69.357 B** — zwei Tage lang, in genau der Zeile, deren Gegenstand eine Dateigröße ist · **drei Fundstellen derselben Bilanz, drei Zahlen** (65/10/8 · 68/9/6 · 70/10/3) → **eine Quelle für die Zahl**: Modulstatus und INDEX-Zeile tragen jetzt einen Zeiger, der datierte Faden darf seine Momentaufnahme nennen, aber nicht in der Gegenwartsform · **die `[VERIFY]`-Bilanz ging auf, stimmte aber nicht:** 28/3/3 statt **28/4/2** (⚠️ und ⬜ gegeneinander vertauscht), Ursache: V162/V163 sind je zweimal vergeben, die **Zählregel stand nirgends** · **der benannte Hebel für die INDEX-Überschreitung war ein No-op, dreifach belegt:** Kette **1.155 B** (rotiert), Nachtrags-Bytes **30.145 B**, und selbst 300 B/Zeile ergäben **39.971 B** — das Kriterium 38.912 B ist per Kürzen unerreichbar; **drei Wege raus, keiner gebaut, alle Nikinger-Entscheidung** · **8 neue Tests** in zwei Dateien (`test_acceptance_numbers.py` 7/7 mit **8 Gegenproben G1–G8 rot** + Kontrolllauf grün · `test_rotate_index_updates.py` 1/1 für die verklebte Kettenstruktur) · **Band statt exakter Gleichheit** (±2 KB, das Band von `doc_health`), weil die Matrix die Größe einer Datei nennt, in der die Zeile steht, die diese Zahl nennt · **vier eigene Fehler, alle im selben Commit behoben** (Fließtext nie geprüft · dateiweite Suche statt zeilenweiser · Anker `| V145` griff die Bereichszeile · **Gegenprobe G6 meldete grün, weil sie nur eine von zwei Nennungen gefälscht hat**) · **Fund am Skript:** `rotate_index_updates.sh` meldete „Bereits konform: nur ein Eintrag" und meinte es richtig — die Kette trug zwei **ohne ` | ` verklebte** Fäden; der Trenner fehlt, (e) kann das nicht sehen, und die **beiden** ` | updated: `-Präfixe der Wurzel-`CLAUDE.md` sind entfernt (die Phase-9-Notiz „dort nicht rotierbar" ist damit **überholt**, das Skript ist seit dem 2026-10-03 verallgemeinert) · `pytest` **1180 → 1187**, `ui_budget` 5/5, `doc_health` 0 · **Wurzel-`CLAUDE.md` gemessen, nicht entschieden:** 114.789 B, §Current state 91.574 B in 24 Blöcken, Kette 13.718 B → **die Blockschnittzahl ist Nikinger-Entscheidung** | ältere Einträge: phase9_hardening/UPDATES_ARCHIVE.md
 ---
 
 # Phase 9 — Härtung
@@ -35,7 +35,7 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | doing | Fünfter Eimer „In Arbeit" (Lock **P9-V**, Kandidat (a)) — Voraussetzung für den Deploy `v3.1.0` | ✅ **live seit 2026-10-02 (`v3.1.0`, Release `5414cb7`, Health-Gate 9/9)** — `_BUCKETS["doing"]` (Reihenfolge `open, doing, done, note, archived`, P9-X) + Rail-Label „In Arbeit" (P9-W: **nur** die Navigationsebene übersetzt, Schema/REST/MCP bleiben roh) + der Step-F-Wächter **umgedreht** (`test_the_bucket_hole_for_doing_is_named_not_silently_fixed` → `test_the_doing_bucket_closes_the_hole`, Docstring mit beiden Richtungen) · **6 neue Tests** (T1/T2/T6 in `phase9_hardening/tests/test_doing_bucket.py`, T3/T4/T5 in `phase5_ui/tests/test_overview.py`), `pytest` 1122 → **1128** · **Gegenlauf 5 Verstöße**: G1 → 7 rot, G2 → 2, G3 → 2, G4 → 1, G5 → 1 · **Browser 11/11** gegen eine eigene TLS-Wegwerf-Instanz (Port 18776), Kernbeleg S6: Rail-Zähler springen **ohne Reload** von `1/1` auf `0/2` · **Browser-Gegenlauf 7 rot** (nur D1/D2 zurückgenommen) · Tabu-Diff leer, **keine zehnte P1-Contract-Öffnung** (V174: `phase1_storage/CLAUDE.md` §Geerbte Contracts bleibt unberührt) · 4 Screenshots `p9_doing_01..04_*` · **[2026-10-02] Release-Commit für den Deploy `v3.1.0` steht: Badge `v3.0.2` → `v3.1.0` (`app.html:20`) + neuer `## 2026-10-02`-Block in `docs/UPDATE_LOG.md` (6 Zeilen, jede eine physische Zeile — am echten `parse_update_log()` gegengeprüft, nicht am Augenschein), `pytest` 1128, `ui_budget` 5/5** — **der Deploy selbst bleibt Nikinger-Schritt** (sudo, Hard Rule 9), die Health-Checks sind reine `curl`-GETs ohne Rechte und laufen durch M3 (Mini-Plan §8) |
 | trace | Nachvollziehbarkeit: `assignee` sichtbar (UI + MCP, vom Client gefüllt, P9-Z) + `updated_by` + Git-Autor (P9-AA–AC); **zehnte P1-Contract-Öffnung** | 🟡 **code-complete 2026-10-02 (M3), nicht live-bewiesen** — Locks P9-Y–AD · **kein Index-Schema-Sprung** (kein Feld im Index, weil niemand danach filtert ⇒ beim Deploy **kein** Neuaufbau, anders als Step F) · Kern: `updated_by` in `_KNOWN_FIELDS` + `_SYSTEM_MANAGED_FIELDS`, `actor: str = ""` an allen neun Store-Schreibmethoden, **leerer Akteur = unverändert** (P9-AB, lieber der alte wahre Wert als ein erfundener), `history.commit(author=)` mit `--author` (Committer bleibt `Space Server`) · Adapter: `actor=principal.space` (7 Aufrufe) / `actor=session.space` (9 Aufrufe) · UI: „bei X" in der Listenzeile, Feld **„Bei"** mit `<datalist>`, Lesezeile **„Zuletzt geändert von X"**, P9-Z füllt **nur bei leerem** Feld · **24 neue Tests** (gezählt, nicht addiert: 5 `test_store.py` + 4 `test_history.py` + 6 `test_trace_block.py` + 4 `test_tools.py` + 1 `test_api.py` + 4 `test_static_routes.py`), `pytest` 1128 → **1152** · **Gegenlauf G1 → 1 · G2 → 2 · G3 → 1 · G4 → 2 · G5 → 4 rot**, alle danach zurückgebaut und grün · **Browser 8/8** gegen eine eigene **Zwei-Principalen**-TLS-Wegwerf-Instanz (Port 18777, echte Git-Historie), Kernbeleg: B sieht „Zuletzt geändert von A", schreibt selbst, und danach steht B — während „Bei" **A** bleibt; **Gegenlauf: ohne die Leer-Prüfung springt der Assignee von A auf B** (S5 rot) · 6 Screenshots `p9_trace_01..06_*`, `screenshots_latest/` umgehängt · **ein Bestandstest mitgezogen** (`test_app.py`, exakte Quittungs-Assertion) und **ein Wächter datiert zugeschnitten statt entfernt** (`test_step_f_schema.py`, siehe dort) — Deploy bleibt Nikinger-Schritt |
 | E (Extra) | **Buttons ans Schema** (B17): die Knöpfe mit eigenen Flächen auf die Standard-Tokens `--btn-std-*` umstellen | ✅ **gebaut 2026-10-02 (M3), code-complete, nicht live-bewiesen** — **die Backlog-Liste war an zwei Stellen falsch, beides vor dem Bau gemessen statt geglaubt.** Von 77 Knöpfen im Markup tragen **75** die Standard-Fläche; die zwei Ausnahmen sind je **eine Klasse mit eigener Bedeutung**, und nur **eine** davon war überhaupt ein Befund: **`.btn.action--caution` (1 Knopf, `#archive-button`)** auf der alten Familie `--btn-face-*` · **`.btn-primary` (13)** auf `--accent-face-*` — das ist **kein** Reststand, sondern die dokumentierte Ausnahme der Nikinger-Entscheidung vom 2026-10-01 (`app.css`, Kommentar in `.btn`: „Ausnahme mit eigener Bedeutung bleibt: `.btn-primary`"), und sie bleibt. **Die Korrektur zur Zahl:** der Backlog nannte „`.btn.action--caution` (2 Knöpfe)" — **2 ist falsch, es ist 1.** Der Selektor `.btn.action--caution` matcht nur `#archive-button`; der zweite Träger, `#logout-button`, ist ein `.rail__action` (`background: none`) und trägt die Vorsicht nur an der **Farbe**, hatte also nie eine Fläche. Zählen über Klassen-Präsenz statt über den Selektor — dieselbe Sorte Fehler wie `count() == 1` für `[aria-current]` im btn2-Lauf · **Gebaut:** die drei `.btn.action--caution`-Regeln sind **gelöscht**, nicht umgeschrieben — `.btn` *ist* die Standardfläche, eine eigene Kopie wäre die „zweite Knopfoptik im selben Panel", die derselbe Tag schon einmal abgestellt hat. Kein `:root`-Token kommt hinzu, keins wird verwaist (die alte Familie hängt jetzt nur noch am Badge `.rail__glyph`, ausdrücklich gewollt) · **Der eigentliche Befund ist eine Helligkeit, kein Token:** `--btn-face-top` `#2A313A` ist **heller** als `--btn-std-fill` `#0C1C31` — „Vorsicht" war damit der auffälligste Knopf der Editor-Fußzeile statt des Standards · **Die Nikinger-Entscheidung war ausdrücklich gegen eine rote Fläche** (`--caution-std-*` war der erste Kandidat und fiel, nachdem der Konflikt mit der Konvention v3 offengelegt war) · **3 Wächter** (1 umgedreht mit Datum in beide Richtungen, 2 neu), **Gegenprobe 4 Verstöße → 8 rote Assertions**, Kontrolllauf 0 · **Pixel-Probe 14/14**, Gegenlauf 6 rot (Δ 25–28 gemessen) · `pytest` 1167 → **1169** · `ui_budget` 5/5 (**+0,2 KB**, gemessen per Stash-Gegenprobe) |
-| Gate/Z | Abnahme, Closeout | 🟡 **beide Doku-Hälften erledigt** — **[2026-10-02]** die zwei benannten Softcap-Überschreitungen (`phase1_storage/CONTRACTS_ARCHIVE.md`, `phase5_ui/ABNAHME_MATRIX_ARCHIVE.md`, beide verbatim mit Roundtrip-Gegenprobe) + INDEX-`updated:`-Rotation per P9-L · **ein Skript-Defekt dabei gefunden und behoben**: `rotate_index_updates.sh` rotierte 1 von 3 Einträgen (ein `updated: `-Präfix, das der Split-Anker nicht sieht) → Gegenprobe (e) + 2 Tests · **[2026-10-03] `ABNAHME_MATRIX.md` steht:** 82 Abnahmezeilen (83 Zeilen, P9-10 geteilt) — **die Bilanz steht in der Matrix, nicht hier: sie wandert mit jedem Step, und eine zweite Kopie wäre irgendwann die falsche** (`test_acceptance_numbers.py` schützt das) + `[VERIFY]`-Bilanz mit **34 belegten** statt 40 (V167–V172 unbelegt) · **drei Funde, die die Übergabe nicht trug:** P9-56 hat einen nicht angekündigten Tabu-Treffer, **GA2 (`p9_hardening_smoke.py`) wurde nie gebaut** — und genau P9-27/-29/-30 sind die Zeilen ohne Probe —, und **V162/V163 sind je zweimal vergeben** · **[2026-10-03] A7a+A7+A8 gefahren:** P9-10b ✅ und P9-12 ✅ neu, P9-13/V150 auf ⚠️ „1 von 2 Konten", P9-15 bleibt ⬜ (gehört an den Deploy-Tag) · **[2026-10-04] die Zahlen der Matrix sind jetzt gemessen statt geglaubt, und der Wächter dafür ist gebaut** (`tests/test_acceptance_numbers.py`, 6 Tests, 6 Gegenproben rot) — **vier Fundstellen derselben Bilanz mit drei verschiedenen Zahlen**, und P9-3/V145 nannten `61.108 B` für eine Datei, die **69.357 B** groß ist (8.249 B daneben, zwei Tage lang). **Und der benannte Hebel für die INDEX-Überschreitung war ein No-op:** die `updated:`-Kette hat **1.155 B** und ist rotiert; die **30.145 B** sind datierte Nachträge, und selbst 300 B pro Zeile ergäben **39.971 B** — das Kriterium 38.912 B ist per Kürzen **unerreichbar**. Drei Wege raus, **keiner gebaut, alle Nikinger-Entscheidung** (Nachträge ins L3-Archiv · Kriterium neu baselinen · Benennung als Endzustand) · **offen:** zweites Claude-Konto (P9-13/V150) · Release-Commit + Deploy `v3.1.1` (V164, P9-15) · Übersichtsgrafik §12.4 · **Wurzel-`CLAUDE.md`** (114.789 B, `updated:`-Kette **13.718 B** mit 2 Präfixen, 24 Session-Blöcke **91.574 B** — die Rotation ist der einzige benannte Hebel, die Blockschnittzahl ist offen) · ~~`docs/INDEX.md` rotieren~~ **(2026-10-04 als No-op nachgewiesen)** · ROADMAP-Zeile · Phase auf ✅ |
+| Gate/Z | Abnahme, Closeout | 🟡 **beide Doku-Hälften erledigt** — **[2026-10-02]** die zwei benannten Softcap-Überschreitungen (`phase1_storage/CONTRACTS_ARCHIVE.md`, `phase5_ui/ABNAHME_MATRIX_ARCHIVE.md`, beide verbatim mit Roundtrip-Gegenprobe) + INDEX-`updated:`-Rotation per P9-L · **ein Skript-Defekt dabei gefunden und behoben**: `rotate_index_updates.sh` rotierte 1 von 3 Einträgen (ein `updated: `-Präfix, das der Split-Anker nicht sieht) → Gegenprobe (e) + 2 Tests · **[2026-10-03] `ABNAHME_MATRIX.md` steht:** 82 Abnahmezeilen (83 Zeilen, P9-10 geteilt) — **die Bilanz steht in der Matrix, nicht hier: sie wandert mit jedem Step, und eine zweite Kopie wäre irgendwann die falsche** (`test_acceptance_numbers.py` schützt das) + `[VERIFY]`-Bilanz mit **34 belegten** statt 40 (V167–V172 unbelegt) · **drei Funde, die die Übergabe nicht trug:** P9-56 hat einen nicht angekündigten Tabu-Treffer, **GA2 (`p9_hardening_smoke.py`) wurde nie gebaut** — und genau P9-27/-29/-30 sind die Zeilen ohne Probe —, und **V162/V163 sind je zweimal vergeben** · **[2026-10-03] A7a+A7+A8 gefahren:** P9-10b ✅ und P9-12 ✅ neu, P9-13/V150 auf ⚠️ „1 von 2 Konten", P9-15 bleibt ⬜ (gehört an den Deploy-Tag) · **[2026-10-04] die Zahlen der Matrix sind jetzt gemessen statt geglaubt, und der Wächter dafür ist gebaut** (`tests/test_acceptance_numbers.py`, 6 Tests, 6 Gegenproben rot) — **vier Fundstellen derselben Bilanz mit drei verschiedenen Zahlen**, und P9-3/V145 nannten `61.108 B` für eine Datei, die **69.357 B** groß ist (8.249 B daneben, zwei Tage lang). **Und der benannte Hebel für die INDEX-Überschreitung war ein No-op:** die `updated:`-Kette hat **1.155 B** und ist rotiert; die **30.145 B** sind datierte Nachträge, und selbst 300 B pro Zeile ergäben **39.971 B** — das Kriterium 38.912 B ist per Kürzen **unerreichbar**. Drei Wege raus, **keiner gebaut, alle Nikinger-Entscheidung** (Nachträge ins L3-Archiv · Kriterium neu baselinen · Benennung als Endzustand) · **[2026-10-04] P9-3 und V145 sind ✅, das Kriterium ist neu baseliniert** (Nikinger-Entscheidung: Nachträge ins L3-Archiv **und** Kriterium auf den 40-KiB-Softcap): `docs/INDEX.md` **71.573 → 38.532 B**, `docs/INDEX_ENTRIES_ARCHIVE.md` neu, `scripts/archive_index_entries.sh` mit **fünf Gegenproben** (byteweise Reassemblierung des Originals) · **10 neue Tests** in `test_index_archive.py` (4) und `test_acceptance_numbers.py` (7, Bestand) · **Balance in der Matrix, nicht hier** (sie wandert mit jedem Step) · **ein Entwurfsfehler gefunden und behoben:** die Reassemblierung ist den Zeigern nachgegangen statt nach Etiketten — das stimmt genau beim ersten Lauf · **eine eigene Behauptung korrigiert:** Gegenprobe (d) trägt nicht, was ich ihr zugeschrieben hatte, die Satzgrenzen-Prüfung fängt den geschwächten Anker · **offen:** zweites Claude-Konto (P9-13/V150) · Release-Commit + Deploy `v3.1.1` (V164, P9-15) · Übersichtsgrafik §12.4 · **Wurzel-`CLAUDE.md`** (114.789 B, `updated:`-Kette **13.718 B** mit 2 Präfixen, 24 Session-Blöcke **91.574 B** — die Rotation ist der einzige benannte Hebel, die Blockschnittzahl ist offen) · ~~`docs/INDEX.md` rotieren~~ **(2026-10-04 als No-op nachgewiesen)** · ROADMAP-Zeile · Phase auf ✅ |
 
 ## Backlog (bewusst zurückgestellt, kein Phasen-Blocker)
 
@@ -89,108 +89,83 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückzuführen** — Nikinger-Anordnung 2026-09-24, so dokumentieren und nicht weiter
   untersuchen.
 
-## Session stopped — 2026-10-04 (neunzehnter Block: **die Zahlen der Abnahmematrix dürfen nicht mehr still veralten** — vier Fundstellen mit drei Bilanzen, eine davon 8.249 B falsch, ein benannter Hebel als No-op nachgewiesen; 7 Tests, 6 Gegenproben rot; ein Commit, kein Produktcode-Touch, kein Deploy)
+## Session stopped — 2026-10-04 (zwanzigster Block: **die Karte schrumpft — 71.573 → 38.532 B, die Nachträge sind im L3-Archiv und das Kriterium ist neu baseliniert**; die Wurzel-`CLAUDE.md` bleibt, wie entschieden, unangetastet und ist stattdessen gemessen; 10 neue Tests, ein Skript mit fünf Gegenproben; ein Commit, kein Produktcode-Touch, kein Deploy)
 
-**Von den drei „Rest Gate/Z"-Posten ist keiner meiner** — das zweite Claude-Konto ist ein Konto, der
-Deploy `v3.1.1` ist dein sudo-Schritt, die Übersichtsgrafik wartet auf endgültige Zahlen. Was blieb, war
-die Datei, an der das Gate am Ende gemessen wird. Beim Nachmessen fand sie **vier Stellen, an denen
-dieselbe Zahl viermal steht und dreimal falsch ist.**
+**Die zwei offenen Entscheidungen sind entschieden, und sie sind nicht gleich ausgegangen.** Für
+`docs/INDEX.md`: Nachträge ins L3-Archiv **und** Kriterium neu baseliniert — beides gebaut. Für die
+Wurzel-`CLAUDE.md`: **nicht jetzt**, nur messen und protokollieren — die Messung steht unten, mit
+der Rechnung, die sie entscheidbar macht, damit die Entscheidung nicht noch einmal von vorn
+gemessen werden muss.
 
-**Der Fund: eine Zeile, deren Gegenstand die Größe einer Datei ist, nannte deren Größe falsch.** Die
-Matrix ist das zentrale Artefakt des Gates — 82 Abnahmezeilen, 34 belegte `[VERIFY]`-Einträge. Ihre
-**Bilanz stand an vier Stellen** (Matrix · Modulstatus · `updated:`-Kette · INDEX-Zeile) mit **drei
-verschiedenen Zahlen** — und P9-3 wie V145 schrieben „heute **61.108 B**" für `docs/INDEX.md`, das
-**69.357 B** groß ist. Acht Kilobyte daneben, zwei Tage lang. **Warum das passieren konnte, und die
-Antwort ist eine Lücke statt eines Schlampers:** `doc_health.py` prüft die Bytezahl einer Datei gegen ihre
-**INDEX-Zeile** (`oversize`, ±2-KB-Band), nicht die Bytezahlen **innerhalb** der Matrix. Geschlossen
-worden ist die Lücke durch eine zweite Regel daneben — nicht durch Weglassen der ersten.
+**Was an der Karte wirklich dran war, ist jetzt eine Rechnung statt einer Vermutung.** Stand
+**71.573 B**, davon **37.391 B datierte Nachträge in 43 von 93 Einträgen** — mehr als die Hälfte der
+Datei. Die `updated:`-Kette der Karte hat **1.155 B** und war am 2026-10-03 rotiert; sie war nie die
+Restmasse, und „`docs/INDEX.md` rotieren" — so stand es bis gestern in der Übergabe — hätte rund
+1 KB gespart statt 30 KB. Und das Kriterium **38.912 B** aus P8.6 Plan 2 §1.2 war **per Kürzen
+unerreichbar**: selbst ein Cap von 300 B je Eintragszeile ergäbe **39.971 B**. Gebaut:
+`docs/INDEX_ENTRIES_ARCHIVE.md` (verbatim, ein Abschnitt je Karte in Kartenreihenfolge) und
+`scripts/archive_index_entries.sh` mit **fünf Gegenproben**, darunter die **byteweise Reassemblierung
+des Originals** — „verbatim" ist damit eine geprüfte Eigenschaft und keine Behauptung im Kommentar.
+**71.573 → 38.532 B: die Karte ist zum ersten Mal seit `06ab4f6` unter dem Softcap**, und das neue
+Kriterium (40.960 B, der Wert, den `doc_health` ohnehin prüft) ist erstmals eine **Prüfung** statt
+einer Angabe: `test_the_index_is_under_the_rebaselined_criterion` wird rot, sobald die Karte darüber
+wächst.
 
-**Die Diagnose der Überschreitung war dreifach falsch, und diesmal gemessen statt geglaubt.** „`docs/INDEX.md`
-rotieren" stand bis eben in der Übergabe und im Phase-Head. (a) Die `updated:`-Kette ist rotiert und
-hat **1.155 B** von 69.357 B; sie noch einmal zu rotieren spart rund 1 KB, nicht 30 KB. (b) Die
-Restmasse sind datierte Nachträge: von 55.119 B Eintragsbytes in 93 Zeilen liegen **30.145 B** ab dem
-ersten `[YYYY-MM-DD`-Nachtrag. (c) **Das Kriterium 38.912 B ist per Kürzen unerreichbar** — selbst ein
-harter Cap von 300 B je Zeile ergäbe **39.971 B**. Es stammt aus P8.6 Plan 2 §1.2 für eine Datei mit
-weniger Zeilen und ist nicht mitgewachsen. **Drei Wege raus, keiner gebaut, weil alle drei deine
-sind:** Nachträge in ein L3-Archiv (Form wie `UPDATES_ARCHIVE.md`) · Kriterium neu baselinen ·
-Benennung als Endzustand. **Dieselbe Fehldiagnose ist in zwei Phase-Heads schon zweimal passiert** (im einen die
-gestrichenen Statusabsätze, im anderen der B17-Block) — zum dritten Mal ist die benannte Restmasse nicht
-die, die übrig bleibt. Das ist jetzt eine Eigenschaft des Musters, keine Überraschung.
+**Vier Skript-Gegenproben waren rot, bevor es lief, und jede davon war ein Fehler im Werkzeug, nicht
+im Datenbestand.** (1) Der erste Schnitt endete **mitten im Satz** (`… (V145; **`), weil der Anker
+das `**` nicht mitgenommen hat — die Auszeichnung wäre im Kopf geblieben und der Archivabschnitt mit
+`**[` begonnen. (2) Die Satzgrenzen-Prüfung selbst war zu streng für `~106KB` in der P8.6-Zeile: sie
+verlangte eine fette Bytezahl, `doc_health` akzeptiert aber auch die gerundete Form — **ein Wächter,
+strenger als die Regel, die er verteidigt, verteidigt sie nicht.** (3) Der Zeiger war ein
+Markdown-Link, und `doc_health._index_line_for()` erkennt Zeilen an `](pfad)`: das Archiv wurde für
+eine Karte mit `glyph='🔗'` gehalten, die gar keine INDEX-Zeile hatte. **Ein Zeiger, der wie ein
+Eintrag aussieht, ist für einen Zeiger die falsche Form.** (4) Der Reassemblierungs-Abgleich hat den
+Nachtrag in die Zeile der **Karte selbst** gesetzt, weil er den Zeigern nachging statt nach
+Etiketten: „der n-te Zeiger gehört zum n-ten Abschnitt" stimmt genau einmal, beim ersten Lauf — und der
+Alltagsfall ist ein INDEX, der schon rotiert ist, plus *ein* neuer Nachtrag. **Das war ein echter
+Entwurfsfehler**, gefunden von dem Test, der genau den Alltagsfall baut.
 
-**Der zweite Fund war kleiner und gefährlicher: eine Bilanz, die aufgeht.** Die `[VERIFY]`-Bilanz nannte
-`28 ✅ · 3 ⚠️ · 3 ⬜` — Summe 34 richtig, die beiden anderen Zahlen je eins daneben und **gegeneinander
-vertauscht** (nachgemessen `28 ✅ · 4 ⚠️ · 2 ⬜` in der Nummern-Lesart). Ursache ist strukturell und war
-nirgends genannt: **V162 und V163 sind je zweimal vergeben** (Lesart A/B), die Tabelle hat zwei Zeilen
-mehr als Nummern — „zählen" war mehrdeutig, und eine mehrdeutige Bilanz ist keine Bilanz. Die Regel steht
-jetzt im Text **und** als Test-Konstante.
+**Und eine Korrektur an meiner eigenen Behauptung, die der Test mir abgenommen hat:** ich habe
+Gegenprobe (d) — „kein datierter Nachtrag bleibt im INDEX" — als die Prüfung gepriesen, die einen
+vergessenen Nachtrag fängt. **Der Test zeigt: ein geschwächter Anker wird zuerst von der
+Satzgrenzen-Prüfung gefangen**, und mit dem heutigen Anker ist ein „zu später" Schnitt gar nicht
+erzeugbar. (d) bleibt als Rückfall und als Vorabversion desselben Satzes, den
+`test_no_entry_line_carries_a_dated_addendum_any_more` am echten Artefakt prüft — aber sie trägt
+nicht, was ich ihr zugeschrieben hatte. **Vier Wächter in `test_index_archive.py` und sieben in
+`test_acceptance_numbers.py`; die Zahlen der Matrix werden von letzterem maschinell geprüft, und
+sie haben die Bilanz zweimal mitgezogen: 70/10/3 → 71/9/3 — **und mich zweimal dabei erwischt, wie ich die Zahl selbst wieder in den Modulstatus und in die Kette schreibe; beide Wächter standen sofort rot**.**
 
-**Gebaut: 8 Tests in zwei Regelnwerken.** `test_acceptance_numbers.py` (7) in drei Regeln — *eine Quelle
-für die Bilanz* (Modulstatus und INDEX-Zeile dürfen keine zitieren, **die Kette darf**, weil sie ein
-datierter Record ist; ihr „Matrix **jetzt** 68 ✅…" war zwei Tage alt) · *keine Gegenwartsform* ·
-*jede lebende Bytezahl nachgemessen, und zeilenweise, in der Zeile, die die Aussage macht*. Dazu
-`test_rotate_index_updates.py` (1), siehe den Skript-Fund unten. **Das Byte-Band ist ±2 KB statt exakter
-Gleichheit** — die Matrix nennt die Größe einer Datei, in der die Zeile steht, die diese Zahl nennt, und
-`docs/INDEX.md` wird am Ende jeder Session angefasst; exakte Gleichheit wäre eine Wartungsschleife. Das
-Band ist **das** Band, an dem `doc_health` die INDEX-Zeile ohnehin misst: die neue Regel ist nicht
-strenger als die bestehende, und der Fehler von 8.249 B bleibt darin rot.
+**Gemessen, nicht entschieden: die Wurzel-`CLAUDE.md`.** 114.771 B, davon Regeln+Rest **9.479 B**,
+`updated:`-Kette **13.700 B** und §Current state **91.574 B** in 24 Blöcken. Die Rechnung macht die
+Entscheidung scharf, und sie ist eindeutig: **K ≥ 4 passt nie** (40.281 B bei stehengebliebener
+Kette), und **ohne Kettenrotation passt selbst K=1 nur knapp**. Mit Kettenrotation (≈1.500 B):
+**K=1 → 17.515 B · K=2 → 24.777 B · K=3 → 27.350 B**, Luft 23,4 / 16,2 / 13,6 KB. Ich empfehle **K=1**,
+weil der neueste Block nach der eigenen Erfolgskriterie ein Handover für einen kalten Leser ist und
+die anderen 23 Blöcke **verbatim bereits in `phase9_hardening/SESSIONS_ARCHIVE.md` (244.641 B),
+`phase8_6_ui_polish/SESSIONS_ARCHIVE.md` (239.960 B) und `docs/PROJECT_SESSION_LOG.md` (101.450 B)**
+stehen. **Das braucht deine ausdrückliche Umkehr von P9-A** („kein Ein-Block-Limit", Lock vom
+2026-09-30) — sie ist die direkte Ursache der 73.811 B, und eine stille Aufweichung wäre genau die
+Sorte Falschheit, die diese Datei verhindert.
 
-**Sechs eigene Fehler, alle im selben Commit behoben — jeder war derselbe Fehler wie der, den der
-Wächter sucht, und drei davon hat erst die Gegenprobe gezeigt.** (1) Die erste Fassung verglich die
-Tabelle mit einer abgetippten Konstante: **der Fließtext, also genau die Stelle, die veraltet, wurde nie
-geprüft.** (2) Die erste Suche ging **dateiweit** und war grün, obwohl die P9-3-Zeile falsch war — eine
-dritte richtige Nennung genügte; der Anker `| V145` griff zusätzlich die Bereichszeile `| V145–V166`.
-(3) **Gegenprobe G6 meldete grün für einen falschen Zustand:** sie hatte nur **eine** von zwei Nennungen
-gefälscht — eine Probe, die etwas anderes prüft als sie behauptet, mit grünem Ergebnis; ihr Kontrolllauf
-meldete zusätzlich „ROT" für einen grünen Lauf, weil die Variable die Gegenfarbe benannte. (4) Die
-Zahlenprüfung „irgendwo im Text eine Bytezahl im Band" ging **zweimal** grün, obwohl die Aussage falsch
-war — eine Kandidatenliste findet in einem langen Dokument immer eine passende Zahl; der Anker musste
-das **Wort** sein, das die Messung benennt. (5) Der Zahlen-**Parser** kannte nur die punktgeschriebene
-Form und war blind für `229 B`. (6) Eine Textsuche mit `sed` hat mir zweimal die falsche Stelle
-zugschnitten. **Ein Wächter, der nicht beweisen kann, dass er falsch liegt, prüft die Hälfte** — und
-**G1–G8, alle acht rot, Kontrolllauf grün**, ist der einzige Weg, das zu merken.
+**Und dieselbe Strukturaussage für diesen Head, weil sie sich sonst beim nächsten Block wiederholt:**
+Er stand nach der gestrigen Rotation bei **40.154 B, also 806 B Luft** — und jeder Session-Block ist
+größer. **Eine Rotation kauft genau eine Session, keinen Zustand.** Die Masse ist der *lebendige*
+Modulstatus (**26.346 B** in vier Zeilen, A 4.915 · B 4.050 · Gate/Z 2.454 · D 2.069), nicht die
+durchgestrichenen Absätze (**229 B** — der seit gestern benannte Hebel war um Faktor 33 zu groß
+behauptet). Ein Wächter nagelt beides fest. **Streichen wäre Deine Entscheidung**, weil es Zeilen aus
+dem Kopf der laufenden Phase nimmt.
 
-**Fund am Skript, und er ist derselbe Fehler noch einmal:** `rotate_index_updates.sh` meldete für den
-Head **„Bereits konform: die 'updated:'-Kette hat nur einen Eintrag"** (exit 2) — und meinte es richtig,
-was das Problem war: die Kette trug **zwei Fäden, die ohne den ` | `-Trenner verklebt** waren. Der
-Split-Anker ist ` | ` + ISO-Datum, ein fehlender Trenner ist für ihn nicht von einem sehr langen
-Eintrag zu unterscheiden, und (e) prüft das *Split-Ergebnis* — bei nichts zu splitten kann es nichts
-finden. Also prüft jetzt ein Test den Zustand **vor** dem Skript. Und die **beiden** ` | updated: `-Präfixe
-der **Wurzel**-`CLAUDE.md` sind entfernt: die Phase-9-Notiz „dort nicht rotierbar" ist damit **überholt**,
-denn das Skript ist seit dem 2026-10-03 verallgemeinert. Ich habe die Kette des Heads dabei mitrotiert
-(45.126 → 42.836 B, alle Gegenproben grün).
+**Selbstprüfung:** `pytest` **1188 → 1198** (10 neu) · `ui_budget` 5/5 (kein
+`phase5_ui/webui/static/**`-Berührung) · `doc_health` **0** — es hat mich zweimal rot gemeldet,
+beimal zu Recht: einmal weil die Matrix über ihr eigenes ±2-KB-Fenster wuchs, einmal weil die
+Größenangabe einer Karte nach dem Umbau nicht mehr galt · Tabu-Pfade unberührt · **kein `systemctl`,
+kein `pkill -f`**, keine Wegwerf-Instanz.
 
-**Gemessen, aber nicht entschieden: die Wurzel-`CLAUDE.md`.** 114.789 B, davon §Current state
-**91.574 B** in **24 Session-Blöcken** (der größte allein 19.337 B) und die Kette **13.718 B**. Die
-Rotation der Current-state-Abschnitte ist der einzige im Dateikopf selbst benannte Hebel und ist jetzt
-zum ersten Mal ausführbar. **Wie viel Historie im Head bleibt, ist Deine Entscheidung** — sie bestimmt,
-was jeder Session-Start liest.
-
-**Und eine Strukturaussage, die beim Rechnen auffiel und die ich nicht wegtrimme:** Der Head stand nach
-der Rotation vom 2026-10-03 bei **40.154 B, also 806 B Luft** — und jeder Session-Block ist größer als
-806 B. **Eine Rotation kauft damit genau eine Session, keinen Zustand.** Dieser Block bringt den Head auf
-**44.079 B**, also über den Softcap — benannt statt versteckt, die exakte Überschreitung steht in der
-INDEX-Zeile und `doc_health` bestätigt sie. Der
-Und hier kommt der vierte Fund derselben Serie, und er ist der billigste: **der Hebel, der den Head
-unter den Softcap bringen soll, existiert in der Größe nicht, in der er benannt ist.** Seit gestern steht
-in diesem Dateikopf, in der INDEX-Zeile und in zwei archivierten Blöcken, die **„7.467 B durchgestrichene
-Statusabsätze im Modulstatus"** seien der Rest — **gemessen sind es 229 B in der ganzen Datei** (A 42 ·
-B 9 · D 150 · Gate/Z 28). Faktor 33. Der Vorschlag vom 2026-10-03 („Streichen wäre die einzige Maßnahme,
-die den Head sicher unter den Softcap brächte") hätte **229 B** gebracht; bei der damaligen Größe von
-44.360 B bliebe der Head bei **44.131 B**, also 3.171 B darüber — er hätte nichts gelöst. **Die Masse
-ist woanders: die Modulstatus-Tabelle ist 26.346 B _lebendiger_ Text**, und davon stehen die vier
-größten Zeilen (A 4.915 · B 4.050 · Gate/Z 2.454 · D 2.069) **doppelt** — einmal im jetzigen Stand und
-einmal im durchgestrichenen historischen Absatz derselben Zelle. Dort stünde die Streichung an, und
-das ist **Deine Entscheidung**, weil sie Zeilen aus dem Kopf der *laufenden* Phase nimmt.
-
-**Selbstprüfung:** `pytest` **1180 → 1188** (8 neu, Baseline vorab gemessen) · `ui_budget` 5/5 (kein
-`phase5_ui/webui/static/**`-Berührung) · `doc_health` **0** — der Scan hat mich zuerst rot gemeldet,
-weil meine eigene Korrektur die Matrix über sein ±2-KB-Fenster hob; der Wächter bei seiner Arbeit ·
-Tabu-Pfade unberührt · **kein `systemctl`, kein `pkill -f`**, keine Wegwerf-Instanz.
-
-**Nächster Schritt, nach Zuständigkeit.** (1) **Zweites Claude-Konto umstellen** — danach P9-13/V150 ✅.
-(2) **Release-Commit + Deploy `v3.1.1`** — Badge + `##`-Block **erst am Deploy-Tag**, trace-Block kommt
-mit, **kein** Index-Neuaufbau; `health_gate.sh` liefert V164 und die P9-15-Läufe. (3) **Die drei Wege aus
-der INDEX-Überschreitung entscheiden** — P9-3 bleibt ⚠️, und der Wächter meldet, wenn die Datei unter das
-Kriterium fällt. (4) **Übersichtsgrafik §12.4** (gerendert **und angesehen**) und ROADMAP-Zeile, wenn die
-Zahlen endgültig sind. **Mit Datum im Kalender:** am **2026-10-18** schließt das Übergangsfenster von
-selbst — die alte Adresse liest dann nur noch. Absicht, kein Versehen.
+**Nächster Schritt, nach Zuständigkeit.** (1) **Deploy-Tag `v3.1.1`**: Badge + `##`-Block in
+`docs/UPDATE_LOG.md` **erst am Tag selbst**, der trace-Block kommt mit, **kein** Index-Neuaufbau;
+`health_gate.sh` liefert V164 und die P9-15-Läufe. (2) **Das zweite Claude-Konto umstellen** — ein
+Konto, kein Code; danach P9-13/V150 ✅. (3) **Die beiden Benennungen entscheiden**: INDEX-Zeilenlänge
+für die Phase (K=? plus Modulstatus) und die Blockgrenze für die Wurzel. (4) **Übersichtsgrafik
+§12.4** (gerendert **und angesehen**) und ROADMAP-Zeile, wenn die Zahlen endgültig sind. **Mit Datum im
+Kalender:** am **2026-10-18** schließt das Übergangsfenster von selbst — die alte Adresse liest dann
+nur noch. Absicht, kein Versehen.

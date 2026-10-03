@@ -50,14 +50,15 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 MATRIX = REPO_ROOT / "phase9_hardening" / "ABNAHME_MATRIX.md"
 HEAD = REPO_ROOT / "phase9_hardening" / "CLAUDE.md"
 INDEX = REPO_ROOT / "docs" / "INDEX.md"
-INDEX_CRITERION_BYTES = 38912  # P8.6 Plan 2 §1.2, von P9-3 und V145 übernommen
+INDEX_CRITERION_BYTES = 38912  # der P8.6-Plan-2-Wert, seit 2026-10-04 **ersetzt** (Nikinger-Entscheidung)
+SOFTCAP_BYTES = 40 * 1024   # das Kriterium, das seit 2026-10-04 gilt — und das `doc_health` bereits prüft
 SIZE_TOLERANCE_BYTES = 2048  # dasselbe absolute Band wie doc_health._named_size_is_current
 CAP_BYTES = 300  # der Cap, mit dem P9-3/V145 die Unerreichbarkeit des Kriteriums belegen
 
 # Abgetippt, nicht abgeleitet — der Test soll die Behauptung prüfen, nicht sie wiederholen.
-ABNAHME_BILANCE = {"✅": 70, "⚠️": 10, "⬜": 3}
+ABNAHME_BILANCE = {"✅": 71, "⚠️": 9, "⬜": 3}
 ABNAHME_ROWS = 83  # 82 Abnahmezeilen, P9-10 in zwei prüfbare Hälften geteilt
-VERIFY_BILANCE = {"✅": 28, "⚠️": 4, "⬜": 2}  # Nummern-Lesart, eine Nummer = eine Zeile
+VERIFY_BILANCE = {"✅": 29, "⚠️": 3, "⬜": 2}  # Nummern-Lesart, eine Nummer = eine Zeile
 VERIFY_ROWS = 37  # 34 Nummern + 2 Zweit-Lesarten + 1 reservierte Bereichszeile
 
 MARKERS = ("✅", "⚠️", "⬜")
@@ -244,39 +245,55 @@ def test_the_live_byte_figures_in_the_matrix_are_the_real_sizes():
         )
     # Der historische Vergleichswert darf stehen, aber nicht als heutiger.
     assert "38.822 B" in _row("| **P9-3**"), "der Vergleichswert vom Phasenstart (06ab4f6) ist weg — Kontext prüfen"
-    assert INDEX.stat().st_size > INDEX_CRITERION_BYTES, (
-        "P9-3/V145 stehen auf ⚠️, weil docs/INDEX.md über dem Kriterium liegt. Ist die Datei inzwischen "
-        "darunter, müssen beide Zeilen auf ✅ — dieser Test sagt absichtlich nicht, welche Zeile stimmt."
+
+    # **Das ist der neu baselinerte Wert, und er ist zum ersten Mal eine Prüfung statt einer Angabe.**
+    # Vorher stand hier `assert size > 38.912` — eine Prüfung, die nur *fehlschlagen* konnte, wenn
+    # die Datei schrumpfte, und die seit dem 2026-10-04 ohnehin überholt war. Jetzt gilt die
+    # Gegenrichtung: P9-3 und V145 stehen auf ✅, und ✅ ist nur wahr, wenn die Karte unter dem
+    # Kriterium liegt. Wächst sie darüber, wird nicht die Zeile stillschweigend falsch, sondern
+    # dieser Test rot.
+    for prefix in ("| **P9-3**", "| V145 |"):
+        assert _row(prefix).split("|")[3].strip().startswith("✅"), (
+            f"{prefix} steht nicht auf ✅, obwohl die Karte jetzt unter dem Kriterium liegt — die "
+            "Abnahmezeile und der Zustand muessen zusammenpassen"
+        )
+    assert INDEX.stat().st_size <= SOFTCAP_BYTES, (
+        f"docs/INDEX.md ist auf {INDEX.stat().st_size} B gewachsen und damit über dem "
+        f"{SOFTCAP_BYTES}-B-Softcap. P9-3/V145 stehen dann nicht mehr zu Recht auf ✅: die "
+        "Nachtraege gehoeren nach docs/INDEX_ENTRIES_ARCHIVE.md (scripts/archive_index_entries.sh), "
+        "nicht in die Kartenzeilen."
     )
 
 
-def test_the_overage_attribution_names_its_three_measured_numbers():
-    """Die Begründung, warum P9-3 ⚠️ bleibt und warum „rotieren" nicht die Lösung ist, ist selbst
-    eine Zahl in Prosa. Sie wird nachgemessen: Kette, Nachtrags-Bytes und die Cap-Rechnung.
+def test_the_nightrags_stay_archived_and_the_row_keeps_its_derivation():
+    """P9-3 ist am 2026-10-04 von ⚠️ auf ✅ gewandert, und damit stellt sich die Frage neu, was diese
+    Zeile jetzt noch tragen muss.
 
-    **10 % relativ, nicht absolut:** dieselbe Kopplung wie oben, aber hier trägt die Fehlerklasse
-    die Rechnung — Kette und Nachträge unterscheiden sich um den Faktor 28, ein Fehlattribut wäre
-    rund 100 % daneben und fällt durch jedes vernünftige Band. Die beiden Relationen, auf die es
-    ankommt, werden exakt geprüft.
+    **Zwei Dinge, und sie werden verwechselt.** Der *Zustand* ist: die Nachträge sind archiviert,
+    die Karte ist unter dem Kriterium. Die *Herleitung* — 37.391 B Nachträge in 43 von 93
+    Einträgen, ein Cap von 300 B ergäbe 39.971 B, die Kette hat 1.155 B — ist die Begründung
+    dafür, warum das Kriterium neu baseliniert und nicht gekürzt wurde. Sie gehört weiter in die
+    Zeile, sonst ist das ✅ in fünf Jahren eine Behauptung. **Beide werden geprüft und sie sind
+    verschiedene Prüfungen:** der Zustand am Zustand, die Herleitung an ihren Zahlen.
+
+    Die Nachtragszahl wird **ohne Band** geprüft und **nicht** gegen die alte 37.391 B: die ist
+    Geschichte. Geprüft wird, dass der Schwanz wieder klein ist — wächst er zurück auf ein Viertel
+    der Datei, ist die Rotation entweder rückgängig gemacht oder umgangen worden.
     """
-    text = MATRIX.read_text(encoding="utf-8").replace("\n", " ")
     m = _measure_index()
-    assert _has_figure_near(text, m["chain"], m["chain"] * 0.10), (
-        f"die Ursachenangabe nennt keine Bytezahl für die `updated:`-Kette (real {_de(m['chain'])} B)"
+    assert m["addenda"] < m["total"] * 0.10, (
+        f"die datierten Nachträge sind wieder {_de(m['addenda'])} B von {_de(m['total'])} B — die "
+        "Nachtrags-Rotation wurde umgangen oder zurückgenommen"
     )
-    assert _has_figure_near(text, m["addenda"], m["addenda"] * 0.10), (
-        f"die Ursachenangabe nennt keine Bytezahl für die datierten Nachträge (real {_de(m['addenda'])} B)"
-    )
-    assert m["chain"] < m["total"] / 2, "die Kette ist nicht mehr die halbe Datei — die Diagnose ist zu neu"
-    entries = [l for l in INDEX.read_text(encoding="utf-8").splitlines() if l.startswith("- [")]
-    capped = m["total"] - sum(max(0, len(l.encode("utf-8")) - CAP_BYTES) for l in entries)
-    assert _has_figure_near(text, capped, capped * 0.10), (
-        f"die Cap-Rechnung stimmt nicht: {CAP_BYTES} B/Zeile ergäbe {_de(capped)} B, das steht nicht in der Matrix"
-    )
-    assert capped > INDEX_CRITERION_BYTES, (
-        f"die Cap-Rechnung ergäbe jetzt {_de(capped)} B und läge damit unter dem Kriterium — das Kriterium "
-        "wäre per Kürzen erreichbar geworden, und die Begründung in P9-3/V145 ist damit überholt"
-    )
+    assert m["chain"] < m["total"] / 2, "die Kette ist nicht mehr ein Bruchteil der Datei — die Diagnose ist zu neu"
+    row = _row("| **P9-3**")
+    for figure, what in ((37391, "der Nachtragsmasse von 2026-10-03"), (39971, "der Cap-Rechnung"),
+                         (1155, "der `updated:`-Kette")):
+        assert f"{_de(figure)} B" in row, (
+            f"P9-3 nennt die Zahl für {what} ({_de(figure)} B) nicht mehr — ohne sie ist das ✅ eine "
+            "Behauptung statt einer Herleitung"
+        )
+    assert "38.822 B" in row, "der Vergleichswert vom Phasenstart (06ab4f6) ist weg — Kontext prüfen"
 
 
 def _figure_near_word(text: str, word: str, value: int, tolerance: float) -> bool:
