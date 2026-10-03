@@ -185,3 +185,28 @@ A7-Restart kappt beide Connectoren, also ist es ein Schnitt und kein Zwei-Schrit
 Index-Neuaufbau. (3) Dann der Rest von Gate/Z: Übersichtsgrafik §12.4 (gerendert **und angesehen**),
 Wurzel-`CLAUDE.md` und `docs/INDEX.md` rotieren, ROADMAP-Zeile, Phase auf ✅. Die `v3.1.0`-Ziel-Angabe
 in `docs/INDEX.md` bleibt bis zum Release-Commit liegen, wie am 2026-10-02 entschieden.
+
+### Nachtrag Session-Ende 2026-10-03 — ein Amend, ausdrücklich angeordnet, mit zwei Gegenproben
+
+Am Commit-Body stand ein von mir beim Formulieren **zerstörter Satz** („phase7_sard... nein,
+phase7_spaces_admin/…"). Ich hatte den Commit bewusst nicht angefasst, weil ein Amend nicht beauftragt
+war; der Nikinger hat ihn danach ausdrücklich verlangt, und **der Commit war zu dem Zeitpunkt rein
+lokal** (`ahead 1`, `git branch -r --contains` leer) — **also ohne Force-Push**, was die Regel gegen
+amendierte Historie nicht verletzt.
+
+**Was repariert wurde:** genau ein Absatz, der P9-56-Fund. `723abcf` → **`953a125`**.
+
+**Gegenproben statt Hoffnung:** (1) die neue Nachricht ist **byte-identisch zur alten**, wenn der
+reparierte Absatz wieder eingesetzt wird (in Python geprüft, nicht behauptet — der ganze Rest des
+Bodies, auch die Schlussabsätze zu meinem Ketten-Fehler und zur Doku-Hygiene, ist unangetastet);
+(2) **`git diff --stat 723abcf 953a125` ist leer** — der Commit-Baum ist identisch, es ist nur die
+Nachricht neu. Das ist der Beweis, dass ein Amend hier nichts am Repo geändert hat.
+
+**Danach ist dieser Block geschlossen.** Kein weiterer Posten aus Gate/Z ist offen, der zu einer
+offenen-Code-Zeile führt: die Abnahmematrix steht, die `[VERIFY]`-Bilanz steht, die drei Funde sind
+benannt. Was bleibt, ist die Abnahme selbst — und die gehört dem Nikinger: **A7+A8 in einer Sitzung**
+(schließt P9-10b, P9-12, P9-13, P9-15, V150, V164 — ein Schnitt, weil der A7-Restart beide Connectoren
+kappt), dann **Release-Commit + Deploy `v3.1.1`** (Badge + `##`-Block erst am Deploy-Tag, sonst
+brennt P6-X; der trace-Block kommt mit, **kein** Index-Neuaufbau). Danach der Rest von Gate/Z:
+Übersichtsgrafik §12.4 (**gerendert und angesehen**, nicht ungesehen gemeldet), Wurzel-`CLAUDE.md` und
+`docs/INDEX.md` rotieren, ROADMAP-Zeile neu, Phase auf ✅.
