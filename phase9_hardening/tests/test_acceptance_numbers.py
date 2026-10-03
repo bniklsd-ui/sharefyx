@@ -1,0 +1,344 @@
+"""Gate/Z (2026-10-04) — die Zahlen der Abnahmematrix dürfen nicht still veralten.
+
+Die Abnahmematrix ist das zentrale Artefakt des Gates: 82 Abnahmezeilen und 34 belegte
+`[VERIFY]`-Einträge, jede mit Stand und Beleg. Ihre **Bilanz** stand am 2026-10-04 an **vier**
+Stellen im Repo — in der Matrix selbst, in der Modulstatus-Zeile des Phase-Heads, in der
+`updated:`-Kette des Heads und in der INDEX-Zeile der Matrix — und die vier Stellen nannten
+**drei verschiedene Zahlen**. Eine davon war schlicht falsch: P9-3 und V145 nannten
+`61.108 B` für `docs/INDEX.md`, real sind es 71.491 B. Ein Fehler von 8.249 B in einer
+Zeile, die ausgerechnet die *Größe einer Datei* zum Gegenstand hat.
+
+`doc_health.py` prüft die Bytezahl einer Datei gegen ihre **INDEX-Zeile** (`oversize`). Es
+prüft nicht die Bytezahlen, die **innerhalb** der Matrix stehen. Diese Lücke ist die Ursache
+des Fehlers, nicht die Sorgfalt des Schreibers.
+
+Diese Tests schließen genau diese Lücke, in drei Regeln:
+
+1. **EINE Quelle für die Bilanz.** Die Matrix besitzt die Zahl. Modulstatus und INDEX-Zeile
+   dürfen sie nicht wiederholen, sonst ist die Kopie irgendwann die veraltete (das ist der
+   Fund). Nicht die ganze Datei: die `updated:`-Kette ist ein datierter Session-Record.
+2. **KEINE Gegenwartsform auf einer Zahl in einer Kette.** Ein datierter Faden darf seine
+   Momentaufnahme nennen, aber nicht behaupten, sie sei „jetzt der Stand". Wortverbot auf
+   `"jetzt"`, nicht auf die Zahl — sonst müsste man Historie löschen.
+3. **Jede lebende Bytezahl wird nachgemessen** — und zwar **in der Zeile, die die Aussage
+   macht**, nicht dateiweit.
+
+Dazu zwei Wächter, die jeweils eine *gemessene Diagnose* festnageln, statt sie zu behaupten:
+die Unerreichbarkeit des INDEX-Kriteriums und der Hebel, der den Phase-9-Head unter den
+Softcap bringen soll. Beide sind am 2026-10-04 aus **falschen** Annahmen entstanden, und eine
+falsche Annahme, die einmal im Repo steht, wird sonst zur Entscheidungsgrundlage.
+
+**Warum die Zählregel für `[VERIFY]` hier steht und nicht nur in der Matrix:** V162 und V163
+sind je zweimal vergeben (Lesart A/B), die Tabelle hat deshalb zwei Zeilen mehr als
+Nummern. „Zählen" ist ohne die Regel mehrdeutig — und eine mehrdeutige Bilanz ist keine
+Bilanz. Die Regel steht als eigene Test-Konstante, damit ein drittes Lesart-Muster das
+Wort „A" nicht stillschweigend mitzählt.
+
+**Kein Test prüft eine Zahl, die er sich aus dem subject bildet.** Die Erwartungen
+(`ABNAHME_BILANCE`, `VERIFY_BILANCE`) sind abgetippt; die Tests rechnen sie nach — und
+vergleichen sie mit dem, was im **Fließtext** der Matrix steht. Die erste Fassung prüfte nur
+die Tabelle gegen die Konstante und war damit grün, während genau die Stelle veraltete, die am
+schnellsten altert.
+"""
+import importlib.util
+import re
+import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
+MATRIX = REPO_ROOT / "phase9_hardening" / "ABNAHME_MATRIX.md"
+HEAD = REPO_ROOT / "phase9_hardening" / "CLAUDE.md"
+INDEX = REPO_ROOT / "docs" / "INDEX.md"
+INDEX_CRITERION_BYTES = 38912  # P8.6 Plan 2 §1.2, von P9-3 und V145 übernommen
+SIZE_TOLERANCE_BYTES = 2048  # dasselbe absolute Band wie doc_health._named_size_is_current
+CAP_BYTES = 300  # der Cap, mit dem P9-3/V145 die Unerreichbarkeit des Kriteriums belegen
+
+# Abgetippt, nicht abgeleitet — der Test soll die Behauptung prüfen, nicht sie wiederholen.
+ABNAHME_BILANCE = {"✅": 70, "⚠️": 10, "⬜": 3}
+ABNAHME_ROWS = 83  # 82 Abnahmezeilen, P9-10 in zwei prüfbare Hälften geteilt
+VERIFY_BILANCE = {"✅": 28, "⚠️": 4, "⬜": 2}  # Nummern-Lesart, eine Nummer = eine Zeile
+VERIFY_ROWS = 37  # 34 Nummern + 2 Zweit-Lesarten + 1 reservierte Bereichszeile
+
+MARKERS = ("✅", "⚠️", "⬜")
+# Als Regex-Teile gebaut, damit dieses Modul die Wörter nicht selbst enthält, die es verbietet
+# (dieselbe Falle wie der Step-D-Wächter am 2026-10-03, der wegen seines eigenen Docstrings rot war).
+BALANCE_TRIPLE_RE = re.compile(r"\d+ ✅ · \d+ ⚠️ · \d+ ⬜")
+PRESENT_TENSE_RE = re.compile(r"je" + r"tzt \d+ ✅ · \d+ ⚠️ · \d+ ⬜")
+
+spec = importlib.util.spec_from_file_location("doc_health", REPO_ROOT / "scripts" / "doc_health.py")
+doc_health = importlib.util.module_from_spec(spec)
+sys.modules["doc_health"] = doc_health
+spec.loader.exec_module(doc_health)
+
+
+def _cells(line: str) -> list[str]:
+    return [c.strip() for c in line.strip().strip("|").split("|")]
+
+
+def _abnahme_rows() -> list[list[str]]:
+    return [_cells(l) for l in MATRIX.read_text(encoding="utf-8").splitlines() if l.startswith("| **P9-")]
+
+
+def _verify_rows() -> list[list[str]]:
+    text = MATRIX.read_text(encoding="utf-8").splitlines()
+    start = next(i for i, l in enumerate(text) if l.startswith("## Stand je Eintrag"))
+    return [_cells(l) for l in text[start:] if l.startswith("| V")]
+
+
+def _row(prefix: str) -> str:
+    """Die Tabellenzeile, die die Aussage macht — strukturell über ihre Nummer gefunden, damit
+    der Test die Zahl nicht ein zweites Mal im Anker festschreibt."""
+    lines = [l for l in MATRIX.read_text(encoding="utf-8").splitlines() if l.startswith(prefix)]
+    assert len(lines) == 1, f"genau eine Zeile mit {prefix!r} erwartet, gefunden {len(lines)}"
+    return lines[0]
+
+
+def _stand_marker(stand: str) -> str | None:
+    for m in MARKERS:
+        if stand.startswith(m):
+            return m
+    return None
+
+
+def _verify_number_key(id_cell: str) -> str:
+    """`V162 *(Lesart A)*` und `V162 *(Lesart B)*` sind dieselbe Nummer — die Bilanz zählt sie
+    einmal, mit Lesart A (die Reihenfolge im Text)."""
+    return re.sub(r"\s*\*\(Lesart [AB]\)\*", "", id_cell)
+
+
+def _measure_index() -> dict:
+    """Die drei Zahlen, mit denen P9-3/V145 ihre Ursache belegen."""
+    text = INDEX.read_text(encoding="utf-8")
+    total = len(text.encode("utf-8"))
+    chain = len(re.search(r"^updated: (.*)$", text, re.M).group(1).encode("utf-8"))
+    addenda = 0
+    for line in text.splitlines():
+        if not line.startswith("- ["):
+            continue
+        m = re.search(r"\[20\d\d-\d\d-\d\d", line)
+        if m:
+            addenda += len(line[m.start():].encode("utf-8"))
+    return {"total": total, "chain": chain, "addenda": addenda}
+
+
+def _de(b: int) -> str:
+    """Bytezahl in der Schreibweise des Repos: 69.357 B (Punkt als Tausendertrenner)."""
+    return f"{b:,}".replace(",", ".")
+
+
+def _byte_figures(text: str) -> list[int]:
+    """Alle Bytezahlen im Text, mit und ohne Tausendertrenner (`69.357 B` **und** `229 B`).
+
+    Bewusst als Kandidatenliste und nicht als Extraktion an einem Anker: der Anker wäre die
+    zweite Kopie der Aussage, die der Test prüft. Die erste Fassung kannte nur die
+    punktgeschriebene Form und war deshalb **blind für die 229 B gestrichene Masse** — ein
+    Wächter, der die Zahl sucht, die er prüfen soll, aber nicht findet, meldet Grün.
+    """
+    return [
+        int(m.group(1).replace(".", ""))
+        for m in re.finditer(r"(\d{1,3}(?:\.\d{3})+|\d{1,5})\s*B", text)
+    ]
+
+
+def _has_figure_near(text: str, value: int, tolerance: float) -> bool:
+    return any(abs(f - value) <= tolerance for f in _byte_figures(text))
+
+
+def _headline_triple(text: str, anchor: str) -> dict[str, int]:
+    """Die Bilanz, wie sie im Fließtext der Matrix steht — der Ort, der veraltet."""
+    lines = [l for l in text.splitlines() if anchor in l]
+    assert len(lines) == 1, f"genau eine Zeile mit {anchor!r} erwartet, gefunden {len(lines)}"
+    m = re.search(r"(\d+) ✅ · (\d+) ⚠️ · (\d+) ⬜", lines[0])
+    assert m is not None, f"keine Marker-Dreierfolge in der Zeile mit {anchor!r}: {lines[0][:120]!r}"
+    return dict(zip(MARKERS, (int(m.group(1)), int(m.group(2)), int(m.group(3)))))
+
+
+def test_the_abnahme_balance_is_the_machine_count_of_its_own_table():
+    rows = _abnahme_rows()
+    assert len(rows) == ABNAHME_ROWS, f"erwartet {ABNAHME_ROWS} Abnahmezeilen, gefunden {len(rows)}"
+    counted: dict[str, int] = {m: 0 for m in MARKERS}
+    for cells in rows:
+        marker = _stand_marker(cells[2])
+        assert marker is not None, f"{cells[0]}: Spalte `Stand` beginnt mit keinem Marker — {cells[2][:60]!r}"
+        counted[marker] += 1
+    assert counted == ABNAHME_BILANCE
+    # Der Fließtext gegen dieselbe Zählung — die Hälfte, die ohne Test veraltet.
+    assert _headline_triple(MATRIX.read_text(encoding="utf-8"), "Tabellenzeilen für") == counted
+
+
+def test_the_verify_balance_is_the_machine_count_under_the_stated_rule():
+    rows = _verify_rows()
+    assert len(rows) == VERIFY_ROWS, f"erwartet {VERIFY_ROWS} [VERIFY]-Zeilen, gefunden {len(rows)}"
+    counted: dict[str, int] = {m: 0 for m in MARKERS}
+    reserved = 0
+    seen: set[str] = set()
+    for cells in rows:
+        stand = cells[2]
+        if stand.startswith("—"):
+            reserved += 1
+            continue
+        marker = _stand_marker(stand)
+        assert marker is not None, f"{cells[0]}: kein Marker in `Stand` — {stand[:60]!r}"
+        key = _verify_number_key(cells[0])
+        if key in seen:
+            continue  # zweite Lesart derselben Nummer
+        seen.add(key)
+        counted[marker] += 1
+    assert reserved == 1, f"genau eine reservierte Bereichszeile erwartet, gefunden {reserved}"
+    assert counted == VERIFY_BILANCE
+    assert sum(counted.values()) == 34, "34 belegte Einträge — die Übergabezahl 40 war der Nummernbereich"
+    assert _headline_triple(MATRIX.read_text(encoding="utf-8"), "belegte Einträge —") == counted
+
+
+def test_only_the_matrix_carries_the_balance_not_the_head_and_not_the_index():
+    """Regel 1: die Matrix besitzt die Zahl. Eine zweite Kopie ist irgendwann die falsche.
+
+    Geprüft wird der **Modulstatus** des Heads, nicht die ganze Datei: die `updated:`-Kette ist
+    ein datierter Session-Record und darf die Momentaufnahme ihres Tages nennen (dafür gibt es
+    Regel 2). Der Modulstatus ist dagegen der *live* Status — dort ist eine Kopie eine Lüge mit
+    Verzögerung, und genau so stand es hier: 65/10/8, während die Matrix 70/10/3 zählte.
+    """
+    modulstatus = HEAD.read_text(encoding="utf-8").split("## Modulstatus", 1)[1].split("\n## ", 1)[0]
+    found = BALANCE_TRIPLE_RE.search(modulstatus)
+    assert found is None, f"der Modulstatus zitiert eine Abnahmebilanz — {found.group(0)!r}"
+    index_line = doc_health._index_line_for(INDEX.read_text(encoding="utf-8"), "phase9_hardening/ABNAHME_MATRIX.md")
+    assert index_line is not None, "docs/INDEX.md hat keine Zeile für die Abnahmematrix"
+    found = BALANCE_TRIPLE_RE.search(index_line)
+    assert found is None, f"die INDEX-Zeile der Matrix zitiert eine Abnahmebilanz — {found.group(0)!r}"
+
+
+def test_no_living_phase9_file_calls_a_dated_balance_the_present_one():
+    """Regel 2: ein datierter Faden darf seine Momentaufnahme nennen, nicht behaupten, sie sei
+    heute der Stand. Genau das stand am 2026-10-04 als „Matrix <Tagesbilanz>" in der Kette des
+    Phase-9-Heads — zwei Tage nach dem Stand, den die Zahl nennt. Die verbotene Form steht hier
+    bewusst **nicht** wörtlich: ein Wächter, der das Wort verbietet, darf es nicht selbst im
+    Docstring tragen (dieselbe Falle wie der Step-D-Wächter vom 2026-10-03, der daran rot war).
+    """
+    for path in (HEAD, MATRIX):
+        found = PRESENT_TENSE_RE.search(path.read_text(encoding="utf-8"))
+        assert found is None, f"{path.name}: eine Bilanz in der Gegenwartsform — {found.group(0)!r}"
+
+
+def test_the_live_byte_figures_in_the_matrix_are_the_real_sizes():
+    """Regel 3: die lebenden Bytezahlen der Matrix werden nachgemessen, nicht geglaubt.
+    `61.108 B` stand hier zwei Tage lang als „heute" und war um 8.249 B falsch.
+
+    **Zeilenweise, nicht dateiweit:** der erste Entwurf suchte die Zahl in der ganzen Datei und
+    war grün, obwohl die P9-3-Zeile falsch war — eine dritte, korrekte Nennung irgendwo genügte.
+    Eine Zahl, die eine Zeile behauptet, wird in **ihrer** Zeile geprüft.
+
+    **Warum ein Band und keine exakte Gleichheit:** die Matrix nennt die Größe einer Datei, in
+    der die Zeile steht, die diese Zahl nennt. Jeder Edit dort verschiebt die Zahl — und
+    `docs/INDEX.md` wird am Ende jeder Session angefasst. Exakte Gleichheit hieße eine
+    Wartungsschleife: dieselbe Zahl gekoppelt an zwei Stellen. Das Band ist **±2 KB**, weil es
+    das Band ist, an dem `doc_health._named_size_is_current` die INDEX-Zeile schon misst — die
+    Matrix soll nicht strenger sein als die Regel, die ohnehin für dieselbe Zahl gilt. Der Fehler,
+    um den es geht, lag bei 8.249 B und bleibt darin rot.
+    """
+    for prefix, path in (("| **P9-3**", INDEX), ("| V145 |", INDEX), ("| **P9-6**", REPO_ROOT / "ROADMAP.md")):
+        size = path.stat().st_size
+        assert _has_figure_near(_row(prefix), size, SIZE_TOLERANCE_BYTES), (
+            f"die Zeile {prefix!r} nennt keine Bytezahl im ±{SIZE_TOLERANCE_BYTES}-B-Band zur heutigen "
+            f"Größe von {path.name} ({_de(size)} B)"
+        )
+    # Der historische Vergleichswert darf stehen, aber nicht als heutiger.
+    assert "38.822 B" in _row("| **P9-3**"), "der Vergleichswert vom Phasenstart (06ab4f6) ist weg — Kontext prüfen"
+    assert INDEX.stat().st_size > INDEX_CRITERION_BYTES, (
+        "P9-3/V145 stehen auf ⚠️, weil docs/INDEX.md über dem Kriterium liegt. Ist die Datei inzwischen "
+        "darunter, müssen beide Zeilen auf ✅ — dieser Test sagt absichtlich nicht, welche Zeile stimmt."
+    )
+
+
+def test_the_overage_attribution_names_its_three_measured_numbers():
+    """Die Begründung, warum P9-3 ⚠️ bleibt und warum „rotieren" nicht die Lösung ist, ist selbst
+    eine Zahl in Prosa. Sie wird nachgemessen: Kette, Nachtrags-Bytes und die Cap-Rechnung.
+
+    **10 % relativ, nicht absolut:** dieselbe Kopplung wie oben, aber hier trägt die Fehlerklasse
+    die Rechnung — Kette und Nachträge unterscheiden sich um den Faktor 28, ein Fehlattribut wäre
+    rund 100 % daneben und fällt durch jedes vernünftige Band. Die beiden Relationen, auf die es
+    ankommt, werden exakt geprüft.
+    """
+    text = MATRIX.read_text(encoding="utf-8").replace("\n", " ")
+    m = _measure_index()
+    assert _has_figure_near(text, m["chain"], m["chain"] * 0.10), (
+        f"die Ursachenangabe nennt keine Bytezahl für die `updated:`-Kette (real {_de(m['chain'])} B)"
+    )
+    assert _has_figure_near(text, m["addenda"], m["addenda"] * 0.10), (
+        f"die Ursachenangabe nennt keine Bytezahl für die datierten Nachträge (real {_de(m['addenda'])} B)"
+    )
+    assert m["chain"] < m["total"] / 2, "die Kette ist nicht mehr die halbe Datei — die Diagnose ist zu neu"
+    entries = [l for l in INDEX.read_text(encoding="utf-8").splitlines() if l.startswith("- [")]
+    capped = m["total"] - sum(max(0, len(l.encode("utf-8")) - CAP_BYTES) for l in entries)
+    assert _has_figure_near(text, capped, capped * 0.10), (
+        f"die Cap-Rechnung stimmt nicht: {CAP_BYTES} B/Zeile ergäbe {_de(capped)} B, das steht nicht in der Matrix"
+    )
+    assert capped > INDEX_CRITERION_BYTES, (
+        f"die Cap-Rechnung ergäbe jetzt {_de(capped)} B und läge damit unter dem Kriterium — das Kriterium "
+        "wäre per Kürzen erreichbar geworden, und die Begründung in P9-3/V145 ist damit überholt"
+    )
+
+
+def _figure_near_word(text: str, word: str, value: int, tolerance: float) -> bool:
+    """Existiert **im Fenster um das Wort herum** eine Bytezahl mit passendem Wert?
+
+    Die dritte Fassung derselben Prüfung. „Irgendwo im Text eine Zahl im Band" ist grün
+    gelaufen, obwohl die Aussage falsch war (Gegenprobe G7) — eine Kandidatenliste findet immer
+    eine passende Zahl, wenn das Dokument lang genug ist. Der Anker muss das **Wort** sein, das
+    die Messung benennt, nicht eine beliebige Stelle im Satz. Fenster 120 Zeichen, symmetrisch.
+    """
+    for m in re.finditer(r"(\d{1,3}(?:\.\d{3})+|\d{1,5})\s*B", text):
+        if abs(int(m.group(1).replace(".", "")) - value) > tolerance:
+            continue
+        for w in re.finditer(re.escape(word), text):
+            if abs(m.start() - w.start()) <= 120:
+                return True
+    return False
+
+
+def _struck_mass(path: Path) -> int:
+    """Die Masse des durchgestrichenen Textes **in der ganzen Datei** — nicht nur in der
+    Modulstatus-Tabelle, denn die Behauptung lautete „durchgestrichene Statusabsätze im
+    Modulstatus", und eine Prüfung, die enger sucht als die Behauptung, prüft die Behauptung
+    nicht."""
+    return sum(
+        len(m.group(0).encode("utf-8"))
+        for m in re.finditer(r"~~.+?~~", path.read_text(encoding="utf-8"), re.S)
+    )
+
+
+def test_the_lever_named_against_the_head_oversize_is_the_measured_one():
+    """Der vierte Fund vom 2026-10-04, und der billigste: **der Hebel existiert nicht in der
+    benannten Größe.**
+
+    Seit dem 2026-10-03 steht in diesem Dateikopf, in der `docs/INDEX.md`-Zeile dazu und in zwei
+    archivierten Blöcken, der Rest über dem Softcap seien die durchgestrichenen Statusabsätze im
+    Modulstatus — die Größe war als **7.467 B** genannt, mit dem Zusatz, Streichen sei „die
+    einzige Maßnahme, die den Head sicher unter den Softcap brächte". **Gemessen sind es 189 B in
+    der ganzen Datei.** Faktor 39; die Maßnahme hätte 189 B gebracht und den Head bei ~42.421 B
+    gelassen. Die Masse ist der *lebendige* Modulstatus (13.488 B in vier Zeilen).
+
+    Geprüft wird der Zustand, nicht die Prosa: **(a)** ein Hebel, der kleiner ist als die
+    Überschreitung, die er beseitigen soll, kann sie nicht beseitigen; **(b)** die lebende Masse
+    daneben muss die tragende sein; **(c)** der neueste Session-Block nennt die gemessene Zahl,
+    sonst liest der nächste Session-Start wieder nur die falsche.
+
+    **Bewusst nicht gebaut:** ein Textverbot auf die alte, zu große Zahl. Eine Korrektur muss die
+    alte Zahl nennen können, um zu sagen, was falsch war — und jeder Versuch, Prosa statt des
+    Zustands zu prüfen, hat in diesem Repo bisher einen Wächter erzeugt, der etwas anderes misst
+    als sein Name (diese Datei hat in derselben Stunde zwei solche Fehler gefunden).
+    """
+    struck = _struck_mass(HEAD)
+    oversize = HEAD.stat().st_size - 40960
+    assert struck < oversize, (
+        f"die gestrichene Masse ({struck} B) ist größer als die Überschreitung ({oversize} B) — dann "
+        "trägt die Diagnose 'durchgestrichene Absätze streichen', und dieser Test wäre zu eng"
+    )
+    modulstatus = HEAD.read_text(encoding="utf-8").split("## Modulstatus", 1)[1].split("\n## ", 1)[0]
+    live = sum(len(l.encode("utf-8")) for l in modulstatus.splitlines() if l.startswith("|"))
+    assert live > oversize, "der Modulstatus ist nicht mehr die tragende Masse — die Diagnose wandert"
+    block = HEAD.read_text(encoding="utf-8").split("## Session stopped", 1)[1]
+    assert _figure_near_word(block, "gestrichen", struck, max(struck * 0.10, 1)), (
+        f"der neueste Session-Block nennt keine Bytezahl im Fenster um das Wort „gestrichen“ herum "
+        f"für die gemessene Masse ({struck} B) — die Zahl muss an ihrem Wort stehen"
+    )

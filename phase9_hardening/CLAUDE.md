@@ -11,7 +11,7 @@ down:
   - ABNAHME_MATRIX.md                            # P9-1 – P9-82 mit Stand und Beleg + [VERIFY]-Bilanz (2026-10-03)
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
   - UPDATES_ARCHIVE.md                          # ältere `updated:`-Fäden dieses Heads, verbatim (2026-10-03, 36 von 37)
-updated: 2026-10-03 (**Kettenrotation + Skript verallgemeinert** — opencode/M3, ein Commit, **kein Produktcode-Touch**, kein Deploy) · `scripts/rotate_index_updates.sh` nimmt jetzt Zieldatei + Archiv als Argumente (Default `docs/INDEX.md` unverändert, alle fünf Gegenproben unverändert) — **jeder lebende Head trägt dieselbe Kette**, und dieser Head stand bei **19.488 B Kette in 57.873 B Datei** (37 Fäden, ein Drittel) · **die im eigenen Kopf benannte Ursache der Überschreitung war damit die falsche:** dort galten die 7.467 B durchgestrichenen Statusabsätze als Restmasse, die Rotation spart ~18 KB · 5 neue Tests (12/12), **Gegenprobe 3 Verstöße → je genau 1 roter Test** · **vier ` | updated: `-Präfixe** aus der Kette entfernt (derselbe Defekt wie am 2026-10-02; Gegenprobe (e) hätte den Lauf abgebrochen)2026-10-03 (**Step D belegt** — die letzte Zeile mit fehlendem Beleg, opencode/M3, **kein Produktcode-Touch**, kein Deploy) · P9-28/-29/-30 von ⬜/⚠️ auf ✅: Browser-Probe **16/16** (echte Maus-Input-Pipeline, kein `dispatchEvent`; Station 2 zählt den vom Browser erzeugten Ereignisstrom), **zwei Gegenproben liegen rot im Repo** (G1 → 5 Stationen rot bei grünen 6–9, G2 → Station 9 rot), **6 Wächter** mit Deckung in beiden Richtungen · **0 Zeilen Produktcode** — `git diff` auf `app.js`/`tree.js` ist nach den Gegenläufen leer · **Matrix jetzt 68 ✅ · 9 ⚠️ · 6 ⬜** und **44.222 B = 3.262 B über dem Softcap, benannt** (P8-P) · **drei eigene Fehler, alle im selben Commit behoben**: der Ereigniszähler zählte **sich selbst** (`start=3, over=57` für *einen* Zug — die Listener waren bei jedem `evaluate` neu registriert), `store.create()` **hängt** an statt zu leeren (der zweite `start` sah jedes Item doppelt), und der neue Wächter war rot, weil er das verbotene Wort im **Docstring** selbst nennt — er läuft jetzt über `tokenize` statt Rohtext, dieselbe Falle wie P8.6 Block H / Step G / B17 · **ein vierter Fund:** die Regel „der Dateiname **endet** auf `_gegenprobe`" hat **keiner** der sechs älteren Block-Belege erfüllt, weil keiner einen Gegenlauf im Repo hat — die Regel war gegen nicht existierende Dateien geschrieben und hat deshalb noch nie zugeschlagen | ältere Einträge: phase9_hardening/UPDATES_ARCHIVE.md
+updated: 2026-10-04 (**die Zahlen der Abnahmematrix dürfen nicht mehr still veralten** — opencode/M3, ein Commit, **kein Produktcode-Touch**, kein Deploy) · **ein Fund mit acht Kilobyte:** P9-3 und V145 nannten `61.108 B` für `docs/INDEX.md`, real **69.357 B** — zwei Tage lang, in genau der Zeile, deren Gegenstand eine Dateigröße ist · **drei Fundstellen derselben Bilanz, drei Zahlen** (65/10/8 · 68/9/6 · 70/10/3) → **eine Quelle für die Zahl**: Modulstatus und INDEX-Zeile tragen jetzt einen Zeiger, der datierte Faden darf seine Momentaufnahme nennen, aber nicht in der Gegenwartsform · **die `[VERIFY]`-Bilanz ging auf, stimmte aber nicht:** 28/3/3 statt **28/4/2** (⚠️ und ⬜ gegeneinander vertauscht), Ursache: V162/V163 sind je zweimal vergeben, die **Zählregel stand nirgends** · **der benannte Hebel für die INDEX-Überschreitung war ein No-op, dreifach belegt:** Kette **1.155 B** (rotiert), Nachtrags-Bytes **30.145 B**, und selbst 300 B/Zeile ergäben **39.971 B** — das Kriterium 38.912 B ist per Kürzen unerreichbar; **drei Wege raus, keiner gebaut, alle Nikinger-Entscheidung** · **8 neue Tests** in zwei Dateien (`test_acceptance_numbers.py` 7/7 mit **8 Gegenproben G1–G8 rot** + Kontrolllauf grün · `test_rotate_index_updates.py` 1/1 für die verklebte Kettenstruktur) · **Band statt exakter Gleichheit** (±2 KB, das Band von `doc_health`), weil die Matrix die Größe einer Datei nennt, in der die Zeile steht, die diese Zahl nennt · **vier eigene Fehler, alle im selben Commit behoben** (Fließtext nie geprüft · dateiweite Suche statt zeilenweiser · Anker `| V145` griff die Bereichszeile · **Gegenprobe G6 meldete grün, weil sie nur eine von zwei Nennungen gefälscht hat**) · **Fund am Skript:** `rotate_index_updates.sh` meldete „Bereits konform: nur ein Eintrag" und meinte es richtig — die Kette trug zwei **ohne ` | ` verklebte** Fäden; der Trenner fehlt, (e) kann das nicht sehen, und die **beiden** ` | updated: `-Präfixe der Wurzel-`CLAUDE.md` sind entfernt (die Phase-9-Notiz „dort nicht rotierbar" ist damit **überholt**, das Skript ist seit dem 2026-10-03 verallgemeinert) · `pytest` **1180 → 1187**, `ui_budget` 5/5, `doc_health` 0 · **Wurzel-`CLAUDE.md` gemessen, nicht entschieden:** 114.789 B, §Current state 91.574 B in 24 Blöcken, Kette 13.718 B → **die Blockschnittzahl ist Nikinger-Entscheidung** | ältere Einträge: phase9_hardening/UPDATES_ARCHIVE.md
 ---
 
 # Phase 9 — Härtung
@@ -35,7 +35,7 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | doing | Fünfter Eimer „In Arbeit" (Lock **P9-V**, Kandidat (a)) — Voraussetzung für den Deploy `v3.1.0` | ✅ **live seit 2026-10-02 (`v3.1.0`, Release `5414cb7`, Health-Gate 9/9)** — `_BUCKETS["doing"]` (Reihenfolge `open, doing, done, note, archived`, P9-X) + Rail-Label „In Arbeit" (P9-W: **nur** die Navigationsebene übersetzt, Schema/REST/MCP bleiben roh) + der Step-F-Wächter **umgedreht** (`test_the_bucket_hole_for_doing_is_named_not_silently_fixed` → `test_the_doing_bucket_closes_the_hole`, Docstring mit beiden Richtungen) · **6 neue Tests** (T1/T2/T6 in `phase9_hardening/tests/test_doing_bucket.py`, T3/T4/T5 in `phase5_ui/tests/test_overview.py`), `pytest` 1122 → **1128** · **Gegenlauf 5 Verstöße**: G1 → 7 rot, G2 → 2, G3 → 2, G4 → 1, G5 → 1 · **Browser 11/11** gegen eine eigene TLS-Wegwerf-Instanz (Port 18776), Kernbeleg S6: Rail-Zähler springen **ohne Reload** von `1/1` auf `0/2` · **Browser-Gegenlauf 7 rot** (nur D1/D2 zurückgenommen) · Tabu-Diff leer, **keine zehnte P1-Contract-Öffnung** (V174: `phase1_storage/CLAUDE.md` §Geerbte Contracts bleibt unberührt) · 4 Screenshots `p9_doing_01..04_*` · **[2026-10-02] Release-Commit für den Deploy `v3.1.0` steht: Badge `v3.0.2` → `v3.1.0` (`app.html:20`) + neuer `## 2026-10-02`-Block in `docs/UPDATE_LOG.md` (6 Zeilen, jede eine physische Zeile — am echten `parse_update_log()` gegengeprüft, nicht am Augenschein), `pytest` 1128, `ui_budget` 5/5** — **der Deploy selbst bleibt Nikinger-Schritt** (sudo, Hard Rule 9), die Health-Checks sind reine `curl`-GETs ohne Rechte und laufen durch M3 (Mini-Plan §8) |
 | trace | Nachvollziehbarkeit: `assignee` sichtbar (UI + MCP, vom Client gefüllt, P9-Z) + `updated_by` + Git-Autor (P9-AA–AC); **zehnte P1-Contract-Öffnung** | 🟡 **code-complete 2026-10-02 (M3), nicht live-bewiesen** — Locks P9-Y–AD · **kein Index-Schema-Sprung** (kein Feld im Index, weil niemand danach filtert ⇒ beim Deploy **kein** Neuaufbau, anders als Step F) · Kern: `updated_by` in `_KNOWN_FIELDS` + `_SYSTEM_MANAGED_FIELDS`, `actor: str = ""` an allen neun Store-Schreibmethoden, **leerer Akteur = unverändert** (P9-AB, lieber der alte wahre Wert als ein erfundener), `history.commit(author=)` mit `--author` (Committer bleibt `Space Server`) · Adapter: `actor=principal.space` (7 Aufrufe) / `actor=session.space` (9 Aufrufe) · UI: „bei X" in der Listenzeile, Feld **„Bei"** mit `<datalist>`, Lesezeile **„Zuletzt geändert von X"**, P9-Z füllt **nur bei leerem** Feld · **24 neue Tests** (gezählt, nicht addiert: 5 `test_store.py` + 4 `test_history.py` + 6 `test_trace_block.py` + 4 `test_tools.py` + 1 `test_api.py` + 4 `test_static_routes.py`), `pytest` 1128 → **1152** · **Gegenlauf G1 → 1 · G2 → 2 · G3 → 1 · G4 → 2 · G5 → 4 rot**, alle danach zurückgebaut und grün · **Browser 8/8** gegen eine eigene **Zwei-Principalen**-TLS-Wegwerf-Instanz (Port 18777, echte Git-Historie), Kernbeleg: B sieht „Zuletzt geändert von A", schreibt selbst, und danach steht B — während „Bei" **A** bleibt; **Gegenlauf: ohne die Leer-Prüfung springt der Assignee von A auf B** (S5 rot) · 6 Screenshots `p9_trace_01..06_*`, `screenshots_latest/` umgehängt · **ein Bestandstest mitgezogen** (`test_app.py`, exakte Quittungs-Assertion) und **ein Wächter datiert zugeschnitten statt entfernt** (`test_step_f_schema.py`, siehe dort) — Deploy bleibt Nikinger-Schritt |
 | E (Extra) | **Buttons ans Schema** (B17): die Knöpfe mit eigenen Flächen auf die Standard-Tokens `--btn-std-*` umstellen | ✅ **gebaut 2026-10-02 (M3), code-complete, nicht live-bewiesen** — **die Backlog-Liste war an zwei Stellen falsch, beides vor dem Bau gemessen statt geglaubt.** Von 77 Knöpfen im Markup tragen **75** die Standard-Fläche; die zwei Ausnahmen sind je **eine Klasse mit eigener Bedeutung**, und nur **eine** davon war überhaupt ein Befund: **`.btn.action--caution` (1 Knopf, `#archive-button`)** auf der alten Familie `--btn-face-*` · **`.btn-primary` (13)** auf `--accent-face-*` — das ist **kein** Reststand, sondern die dokumentierte Ausnahme der Nikinger-Entscheidung vom 2026-10-01 (`app.css`, Kommentar in `.btn`: „Ausnahme mit eigener Bedeutung bleibt: `.btn-primary`"), und sie bleibt. **Die Korrektur zur Zahl:** der Backlog nannte „`.btn.action--caution` (2 Knöpfe)" — **2 ist falsch, es ist 1.** Der Selektor `.btn.action--caution` matcht nur `#archive-button`; der zweite Träger, `#logout-button`, ist ein `.rail__action` (`background: none`) und trägt die Vorsicht nur an der **Farbe**, hatte also nie eine Fläche. Zählen über Klassen-Präsenz statt über den Selektor — dieselbe Sorte Fehler wie `count() == 1` für `[aria-current]` im btn2-Lauf · **Gebaut:** die drei `.btn.action--caution`-Regeln sind **gelöscht**, nicht umgeschrieben — `.btn` *ist* die Standardfläche, eine eigene Kopie wäre die „zweite Knopfoptik im selben Panel", die derselbe Tag schon einmal abgestellt hat. Kein `:root`-Token kommt hinzu, keins wird verwaist (die alte Familie hängt jetzt nur noch am Badge `.rail__glyph`, ausdrücklich gewollt) · **Der eigentliche Befund ist eine Helligkeit, kein Token:** `--btn-face-top` `#2A313A` ist **heller** als `--btn-std-fill` `#0C1C31` — „Vorsicht" war damit der auffälligste Knopf der Editor-Fußzeile statt des Standards · **Die Nikinger-Entscheidung war ausdrücklich gegen eine rote Fläche** (`--caution-std-*` war der erste Kandidat und fiel, nachdem der Konflikt mit der Konvention v3 offengelegt war) · **3 Wächter** (1 umgedreht mit Datum in beide Richtungen, 2 neu), **Gegenprobe 4 Verstöße → 8 rote Assertions**, Kontrolllauf 0 · **Pixel-Probe 14/14**, Gegenlauf 6 rot (Δ 25–28 gemessen) · `pytest` 1167 → **1169** · `ui_budget` 5/5 (**+0,2 KB**, gemessen per Stash-Gegenprobe) |
-| Gate/Z | Abnahme, Closeout | 🟡 **beide Doku-Hälften erledigt** — **[2026-10-02]** die zwei benannten Softcap-Überschreitungen (`phase1_storage/CONTRACTS_ARCHIVE.md`, `phase5_ui/ABNAHME_MATRIX_ARCHIVE.md`, beide verbatim mit Roundtrip-Gegenprobe) + INDEX-`updated:`-Rotation per P9-L · **ein Skript-Defekt dabei gefunden und behoben**: `rotate_index_updates.sh` rotierte 1 von 3 Einträgen (ein `updated: `-Präfix, das der Split-Anker nicht sieht) → Gegenprobe (e) + 2 Tests · **[2026-10-03] `ABNAHME_MATRIX.md` steht:** 82 Abnahmezeilen (83 Zeilen, P9-10 geteilt) **65 ✅ · 10 ⚠️ · 8 ⬜** + `[VERIFY]`-Bilanz mit **34 belegten** statt 40 (V167–V172 unbelegt) · **drei Funde, die die Übergabe nicht trug:** P9-56 hat einen nicht angekündigten Tabu-Treffer, **GA2 (`p9_hardening_smoke.py`) wurde nie gebaut** — und genau P9-27/-29/-30 sind die Zeilen ohne Probe —, und **V162/V163 sind je zweimal vergeben** · **[2026-10-03] A7a+A7+A8 gefahren:** P9-10b ✅ und P9-12 ✅ neu, P9-13/V150 auf ⚠️ „1 von 2 Konten", P9-15 bleibt ⬜ (gehört an den Deploy-Tag) · **offen:** zweites Claude-Konto (P9-13/V150) · Release-Commit + Deploy `v3.1.1` (V164, P9-15) · Übersichtsgrafik §12.4 · Rest-Rotationen (Wurzel-`CLAUDE.md`, `docs/INDEX.md`) · ROADMAP-Zeile · Phase auf ✅ |
+| Gate/Z | Abnahme, Closeout | 🟡 **beide Doku-Hälften erledigt** — **[2026-10-02]** die zwei benannten Softcap-Überschreitungen (`phase1_storage/CONTRACTS_ARCHIVE.md`, `phase5_ui/ABNAHME_MATRIX_ARCHIVE.md`, beide verbatim mit Roundtrip-Gegenprobe) + INDEX-`updated:`-Rotation per P9-L · **ein Skript-Defekt dabei gefunden und behoben**: `rotate_index_updates.sh` rotierte 1 von 3 Einträgen (ein `updated: `-Präfix, das der Split-Anker nicht sieht) → Gegenprobe (e) + 2 Tests · **[2026-10-03] `ABNAHME_MATRIX.md` steht:** 82 Abnahmezeilen (83 Zeilen, P9-10 geteilt) — **die Bilanz steht in der Matrix, nicht hier: sie wandert mit jedem Step, und eine zweite Kopie wäre irgendwann die falsche** (`test_acceptance_numbers.py` schützt das) + `[VERIFY]`-Bilanz mit **34 belegten** statt 40 (V167–V172 unbelegt) · **drei Funde, die die Übergabe nicht trug:** P9-56 hat einen nicht angekündigten Tabu-Treffer, **GA2 (`p9_hardening_smoke.py`) wurde nie gebaut** — und genau P9-27/-29/-30 sind die Zeilen ohne Probe —, und **V162/V163 sind je zweimal vergeben** · **[2026-10-03] A7a+A7+A8 gefahren:** P9-10b ✅ und P9-12 ✅ neu, P9-13/V150 auf ⚠️ „1 von 2 Konten", P9-15 bleibt ⬜ (gehört an den Deploy-Tag) · **[2026-10-04] die Zahlen der Matrix sind jetzt gemessen statt geglaubt, und der Wächter dafür ist gebaut** (`tests/test_acceptance_numbers.py`, 6 Tests, 6 Gegenproben rot) — **vier Fundstellen derselben Bilanz mit drei verschiedenen Zahlen**, und P9-3/V145 nannten `61.108 B` für eine Datei, die **69.357 B** groß ist (8.249 B daneben, zwei Tage lang). **Und der benannte Hebel für die INDEX-Überschreitung war ein No-op:** die `updated:`-Kette hat **1.155 B** und ist rotiert; die **30.145 B** sind datierte Nachträge, und selbst 300 B pro Zeile ergäben **39.971 B** — das Kriterium 38.912 B ist per Kürzen **unerreichbar**. Drei Wege raus, **keiner gebaut, alle Nikinger-Entscheidung** (Nachträge ins L3-Archiv · Kriterium neu baselinen · Benennung als Endzustand) · **offen:** zweites Claude-Konto (P9-13/V150) · Release-Commit + Deploy `v3.1.1` (V164, P9-15) · Übersichtsgrafik §12.4 · **Wurzel-`CLAUDE.md`** (114.789 B, `updated:`-Kette **13.718 B** mit 2 Präfixen, 24 Session-Blöcke **91.574 B** — die Rotation ist der einzige benannte Hebel, die Blockschnittzahl ist offen) · ~~`docs/INDEX.md` rotieren~~ **(2026-10-04 als No-op nachgewiesen)** · ROADMAP-Zeile · Phase auf ✅ |
 
 ## Backlog (bewusst zurückgestellt, kein Phasen-Blocker)
 
@@ -89,85 +89,108 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückzuführen** — Nikinger-Anordnung 2026-09-24, so dokumentieren und nicht weiter
   untersuchen.
 
-## Session stopped — 2026-10-03 (achtzehnter Block: **A7a + A7 + A8 gefahren** — die Domain ist live, der Connector läuft über die eigene Adresse; Nikinger-Schritte, von M3 vorbereitet, gegengemessen und protokolliert; ein Commit, kein Deploy, kein Produktcode-Touch)
+## Session stopped — 2026-10-04 (neunzehnter Block: **die Zahlen der Abnahmematrix dürfen nicht mehr still veralten** — vier Fundstellen mit drei Bilanzen, eine davon 8.249 B falsch, ein benannter Hebel als No-op nachgewiesen; 7 Tests, 6 Gegenproben rot; ein Commit, kein Produktcode-Touch, kein Deploy)
 
-**Diese Session hatte keinen Code-Step, sondern einen Schnitt mit Token-Folge — und die
-Vorbereitung dafür war die eigentliche Arbeit.** Der Auftrag lautete „A7 und A8 durchführen";
-beides sind deine sudo-Schritte, also habe ich die *Liste* gemacht (so steht es im Runbook:
-„du, sudo; Liste von mir") und jede Zeile vorher am Code und an der Konfiguration geprüft, damit
-der Schnitt **ein** Versuch ist und nicht drei.
+**Von den drei „Rest Gate/Z"-Posten ist keiner meiner** — das zweite Claude-Konto ist ein Konto, der
+Deploy `v3.1.1` ist dein sudo-Schritt, die Übersichtsgrafik wartet auf endgültige Zahlen. Was blieb, war
+die Datei, an der das Gate am Ende gemessen wird. Beim Nachmessen fand sie **vier Stellen, an denen
+dieselbe Zahl viermal steht und dreimal falsch ist.**
 
-**Drei Vorprüfungen, die den Schnitt von einem Experiment zu einer Messung gemacht haben.**
-(1) `load_settings()` mit den **exakten** Environment-Zeilen der künftigen Unit: kein Startfehler —
-`config.py` ist fail-closed, ein Tippfehler wäre also ein **toter Dienst** gewesen, nicht ein
-leises „aus". (2) Die Form von `LEGACY_ORIGIN` steht im Code, nicht in der Erinnerung:
-`config.py:47` verlangt exakt `https://host`, und der Funnel liefert **`https://`/443**
-(`TLS=0` gemessen) — die alte Form `http://host:8765` hätte das Fenster nie geöffnet, und
-`config.py:76` rechnet `clock() <= legacy_until` pro Request, das Fenster schließt am Enddatum
-**ohne** Neustart. (3) Das Verhalten des Fensters drei Tage lang durchgespielt: 2026-10-03 und
-17. alt-Adresse schreibbar ✅, 18. nur noch lesend — eine Behauptung über Zeit wird hier nicht
-behauptet, sondern durchgerechnet.
+**Der Fund: eine Zeile, deren Gegenstand die Größe einer Datei ist, nannte deren Größe falsch.** Die
+Matrix ist das zentrale Artefakt des Gates — 82 Abnahmezeilen, 34 belegte `[VERIFY]`-Einträge. Ihre
+**Bilanz stand an vier Stellen** (Matrix · Modulstatus · `updated:`-Kette · INDEX-Zeile) mit **drei
+verschiedenen Zahlen** — und P9-3 wie V145 schrieben „heute **61.108 B**" für `docs/INDEX.md`, das
+**69.357 B** groß ist. Acht Kilobyte daneben, zwei Tage lang. **Warum das passieren konnte, und die
+Antwort ist eine Lücke statt eines Schlampers:** `doc_health.py` prüft die Bytezahl einer Datei gegen ihre
+**INDEX-Zeile** (`oversize`, ±2-KB-Band), nicht die Bytezahlen **innerhalb** der Matrix. Geschlossen
+worden ist die Lücke durch eine zweite Regel daneben — nicht durch Weglassen der ersten.
 
-**Der Vorlauf A7a hat bezahlt, wofür er gebaut war.** `ALLOWED_HOSTS` bekam die Domain dazu, sonst
-nichts: **neu lokal 200 · alter Funnel lokal 200 · extern `https://sharefyx.eurofyx.com/health`
-→ 200 mit `ssl_verify_result=0`** und JSON. Dieselbe Adresse lieferte **eine Stunde vorher 400 bei
-gültigem TLS** — das ist der ganze öffentliche Weg als ein einziger Vorher/Nachher-Beleg: Caddy
-terminiert, das LE-Zertifikat gilt, und die 400 kam aus dem **Prozess** (6× `GET /health
-status=200` im Journal, drei von dir, drei von mir). **P9-10b ✅, und die zweite Hälfte P9-10a
-(A4, Zertifikat) war seit dem 2026-10-01 grün** — die Zeile ist damit vollständig abgenommen.
-**Und die Gegenprobe, die A7a von A7 trennt:** nach A7a stand der `issuer` **unverändert** auf der
-alten Adresse. Damit ist nicht nur behauptet, sondern gemessen, dass der Vorlauf den `resource`
-nicht angefasst hat — die Token blieben gültig, ein Fehler dort wäre ohne Messung ein Verdacht
-geblieben.
+**Die Diagnose der Überschreitung war dreifach falsch, und diesmal gemessen statt geglaubt.** „`docs/INDEX.md`
+rotieren" stand bis eben in der Übergabe und im Phase-Head. (a) Die `updated:`-Kette ist rotiert und
+hat **1.155 B** von 69.357 B; sie noch einmal zu rotieren spart rund 1 KB, nicht 30 KB. (b) Die
+Restmasse sind datierte Nachträge: von 55.119 B Eintragsbytes in 93 Zeilen liegen **30.145 B** ab dem
+ersten `[YYYY-MM-DD`-Nachtrag. (c) **Das Kriterium 38.912 B ist per Kürzen unerreichbar** — selbst ein
+harter Cap von 300 B je Zeile ergäbe **39.971 B**. Es stammt aus P8.6 Plan 2 §1.2 für eine Datei mit
+weniger Zeilen und ist nicht mitgewachsen. **Drei Wege raus, keiner gebaut, weil alle drei deine
+sind:** Nachträge in ein L3-Archiv (Form wie `UPDATES_ARCHIVE.md`) · Kriterium neu baselinen ·
+Benennung als Endzustand. **Dieselbe Fehldiagnose ist in zwei Phase-Heads schon zweimal passiert** (im einen die
+gestrichenen Statusabsätze, im anderen der B17-Block) — zum dritten Mal ist die benannte Restmasse nicht
+die, die übrig bleibt. Das ist jetzt eine Eigenschaft des Musters, keine Überraschung.
 
-**Der Schnitt A7 war der teure, und er ist dokumentiert statt gefühlt.** `PUBLIC_BASE_URL` auf die
-Domain, `LEGACY_ORIGIN`/`LEGACY_UNTIL=2026-10-17` dazu, Gate = der `issuer`:
-`{"issuer":"https://sharefyx.eurofyx.com", …}` — **alle vier** Endpunkte aus der Basis-URL, wie
-V149 vorhergesagt hatte. **Befund 4 hat sich bestätigt, an der Stelle, wo er hingeschrieben war:**
-`resolver.py:48` vergleicht `record.resource` mit dem neuen `expected_resource`, also waren nach
-dem Restart **alle** alten Token tot und die Neuanmeldung über die neue Adresse war **zwingend** —
-kein Neustart-Fehler, und genau deshalb die Warnung im Vorfeld, damit hier kein falscher Incident
-wie der `mcp-proxy`-502 vom 2026-09-24 entsteht. Konto **niklas** läuft inzwischen über die eigene
-Adresse; **das zweite Konto steht aus**, deshalb stehen **P9-13 und V150 auf ⚠️ „1 von 2"** und
-nicht auf ✅ — die Zeile verlangt **beide** Konten, und ein Konto ist kein Code.
+**Der zweite Fund war kleiner und gefährlicher: eine Bilanz, die aufgeht.** Die `[VERIFY]`-Bilanz nannte
+`28 ✅ · 3 ⚠️ · 3 ⬜` — Summe 34 richtig, die beiden anderen Zahlen je eins daneben und **gegeneinander
+vertauscht** (nachgemessen `28 ✅ · 4 ⚠️ · 2 ⬜` in der Nummern-Lesart). Ursache ist strukturell und war
+nirgends genannt: **V162 und V163 sind je zweimal vergeben** (Lesart A/B), die Tabelle hat zwei Zeilen
+mehr als Nummern — „zählen" war mehrdeutig, und eine mehrdeutige Bilanz ist keine Bilanz. Die Regel steht
+jetzt im Text **und** als Test-Konstante.
 
-**Was ich nicht gemessen habe, mit Begründung: P9-15.** Der authentifizierte Vergleich von
-`/api/v1/overview` gegen die Referenz **372,9 ms** wäre ein authentifizierter Aufruf am echten
-DATA_ROOT mit echtem Keyring-Token — das ist Nikinger-Wirklichkeit, nicht meine. Die Zeile bleibt
-**⬜** und gehört an den **Deploy-Tag**: `health_gate.sh` macht genau diese Aufrufe, also hängt sie
-an `v3.1.1` und nicht an einer vergessenen Messung.
+**Gebaut: 8 Tests in zwei Regelnwerken.** `test_acceptance_numbers.py` (7) in drei Regeln — *eine Quelle
+für die Bilanz* (Modulstatus und INDEX-Zeile dürfen keine zitieren, **die Kette darf**, weil sie ein
+datierter Record ist; ihr „Matrix **jetzt** 68 ✅…" war zwei Tage alt) · *keine Gegenwartsform* ·
+*jede lebende Bytezahl nachgemessen, und zeilenweise, in der Zeile, die die Aussage macht*. Dazu
+`test_rotate_index_updates.py` (1), siehe den Skript-Fund unten. **Das Byte-Band ist ±2 KB statt exakter
+Gleichheit** — die Matrix nennt die Größe einer Datei, in der die Zeile steht, die diese Zahl nennt, und
+`docs/INDEX.md` wird am Ende jeder Session angefasst; exakte Gleichheit wäre eine Wartungsschleife. Das
+Band ist **das** Band, an dem `doc_health` die INDEX-Zeile ohnehin misst: die neue Regel ist nicht
+strenger als die bestehende, und der Fehler von 8.249 B bleibt darin rot.
 
-**Ein Fund, der eine Zeile in einer fremden Datei gerettet hat:** `install_units.sh` erzeugt **zehn**
-Units, und die neu entstandene `sharefyx-mcp.service` trägt jetzt Zeilen 19/20
-`SPACE_UI_LEGACY_ORIGIN=` / `_UNTIL=`. Sie waren **leer**, weil `local.env` noch keine
-`LEGACY_*`-Zeilen hatte — und leer **beide** ist laut `config.py:44` ausdrücklich *kein Fenster*,
-also kein halbes Fenster und kein Startfehler. **Ohne diese Messung hätte ich dir „zwei leere
-Zeilen, das ist verdächtig" gemeldet**, und du hättest vermutlich nachgeforscht, statt einfach
-weiterzumachen. **Meine eigene Vorhersage war daneben:** ich schrieb „5–6 Units", es waren zehn;
-ich hatte eine Vorlage nachgeschlagen statt alle zu zählen. Vorher hatte ich außerdem nur 2 der 10
-installierten Units gegen die Vorlagen geprüft — nach dem Lauf sind es **alle 4 Timer** (`enabled`
-**und** `active`, mit plausiblen nächsten Terminen) und ein **echter Watchdog-Takt** nach der
-Regeneration (`13:01:49 healthy: Self.Online=true` + `Finished`), denn ein laufender Timer beweist
-keinen arbeitenden Dienst — die Lehre vom 2026-10-01, diesmal an meinem eigenen Optimismus.
+**Sechs eigene Fehler, alle im selben Commit behoben — jeder war derselbe Fehler wie der, den der
+Wächter sucht, und drei davon hat erst die Gegenprobe gezeigt.** (1) Die erste Fassung verglich die
+Tabelle mit einer abgetippten Konstante: **der Fließtext, also genau die Stelle, die veraltet, wurde nie
+geprüft.** (2) Die erste Suche ging **dateiweit** und war grün, obwohl die P9-3-Zeile falsch war — eine
+dritte richtige Nennung genügte; der Anker `| V145` griff zusätzlich die Bereichszeile `| V145–V166`.
+(3) **Gegenprobe G6 meldete grün für einen falschen Zustand:** sie hatte nur **eine** von zwei Nennungen
+gefälscht — eine Probe, die etwas anderes prüft als sie behauptet, mit grünem Ergebnis; ihr Kontrolllauf
+meldete zusätzlich „ROT" für einen grünen Lauf, weil die Variable die Gegenfarbe benannte. (4) Die
+Zahlenprüfung „irgendwo im Text eine Bytezahl im Band" ging **zweimal** grün, obwohl die Aussage falsch
+war — eine Kandidatenliste findet in einem langen Dokument immer eine passende Zahl; der Anker musste
+das **Wort** sein, das die Messung benennt. (5) Der Zahlen-**Parser** kannte nur die punktgeschriebene
+Form und war blind für `229 B`. (6) Eine Textsuche mit `sed` hat mir zweimal die falsche Stelle
+zugschnitten. **Ein Wächter, der nicht beweisen kann, dass er falsch liegt, prüft die Hälfte** — und
+**G1–G8, alle acht rot, Kontrolllauf grün**, ist der einzige Weg, das zu merken.
 
-**Und eine Konfigurationslücke, die nur existiert, weil sie niemand aufschreibt:** `local.env` ist
-git-ignoriert, und ein Neustart setzt sie **nicht** zurück. Wer sie nicht im Repo findet, findet
-sie nirgends. Der **Live-Ist-Zustand** steht deshalb jetzt in `step_a/RUNBOOK_STEP_A.md` §2 A7/A8 —
-mit beiden ausgeführten Blöcken, dem Gate-Befehl, dem Rückweg (falls A8 klemmt: `PUBLIC_BASE_URL`
-zurück, `install_units.sh`, Restart ⇒ die alten Token leben wieder) und der Erkenntnis, dass das
-`LEGACY_*`-Fenster **nur die Web-UI** schützt: für den Connector gibt es keinen Übergang.
+**Fund am Skript, und er ist derselbe Fehler noch einmal:** `rotate_index_updates.sh` meldete für den
+Head **„Bereits konform: die 'updated:'-Kette hat nur einen Eintrag"** (exit 2) — und meinte es richtig,
+was das Problem war: die Kette trug **zwei Fäden, die ohne den ` | `-Trenner verklebt** waren. Der
+Split-Anker ist ` | ` + ISO-Datum, ein fehlender Trenner ist für ihn nicht von einem sehr langen
+Eintrag zu unterscheiden, und (e) prüft das *Split-Ergebnis* — bei nichts zu splitten kann es nichts
+finden. Also prüft jetzt ein Test den Zustand **vor** dem Skript. Und die **beiden** ` | updated: `-Präfixe
+der **Wurzel**-`CLAUDE.md` sind entfernt: die Phase-9-Notiz „dort nicht rotierbar" ist damit **überholt**,
+denn das Skript ist seit dem 2026-10-03 verallgemeinert. Ich habe die Kette des Heads dabei mitrotiert
+(45.126 → 42.836 B, alle Gegenproben grün).
 
-**Selbstprüfung:** `pytest` 1180 (unverändert, kein Test-Touch in diesem Block) · `ui_budget` 5/5 ·
-`doc_health` 0 Befunde · Tabu-Pfade unberührt · **kein `systemctl`, kein `pkill -f`** von mir — die
-drei sudo-Befehle waren deine, ich habe sie nur vorbereitet und die Ausgabe gelesen · Live-Zustand
-zum Schluss selbst gemessen: neue Domain 200/TLS ok, alter Funnel 200/TLS ok, Live-Release
-`5414cb7` = Badge `v3.1.0`, `SPACE_ALLOWED_HOSTS`/`SPACE_PUBLIC_BASE_URL` tragen beide die Domain.
+**Gemessen, aber nicht entschieden: die Wurzel-`CLAUDE.md`.** 114.789 B, davon §Current state
+**91.574 B** in **24 Session-Blöcken** (der größte allein 19.337 B) und die Kette **13.718 B**. Die
+Rotation der Current-state-Abschnitte ist der einzige im Dateikopf selbst benannte Hebel und ist jetzt
+zum ersten Mal ausführbar. **Wie viel Historie im Head bleibt, ist Deine Entscheidung** — sie bestimmt,
+was jeder Session-Start liest.
 
-**Nächster Schritt.** (1) **Das zweite Claude-Konto umstellen** — dieselben drei Handgriffe, es ist
-ein Konto und kein Code; danach sind P9-13 und V150 ✅. (2) **Release-Commit + Deploy `v3.1.1`**:
-Badge `app.html` + `##`-Block in `docs/UPDATE_LOG.md` **erst am Deploy-Tag** (sonst brennt das
-`deploy.sh`-Gate P6-X), der trace-Block kommt mit, **kein** Index-Neuaufbau; `health_gate.sh` liefert
-dabei V164 und die P9-15-Läufe. (3) Rest Gate/Z: Übersichtsgrafik §12.4 (**gerendert und
-angesehen**), `docs/INDEX.md` rotieren, ROADMAP-Zeile, Phase auf ✅. **Termin mit Datum im Kalender:**
-am **2026-10-18** schließt das Übergangsfenster von selbst — die alte Adresse liest dann nur noch.
-Das ist Absicht, kein Versehen, und es braucht keinen Neustart.
+**Und eine Strukturaussage, die beim Rechnen auffiel und die ich nicht wegtrimme:** Der Head stand nach
+der Rotation vom 2026-10-03 bei **40.154 B, also 806 B Luft** — und jeder Session-Block ist größer als
+806 B. **Eine Rotation kauft damit genau eine Session, keinen Zustand.** Dieser Block bringt den Head auf
+**44.079 B**, also über den Softcap — benannt statt versteckt, die exakte Überschreitung steht in der
+INDEX-Zeile und `doc_health` bestätigt sie. Der
+Und hier kommt der vierte Fund derselben Serie, und er ist der billigste: **der Hebel, der den Head
+unter den Softcap bringen soll, existiert in der Größe nicht, in der er benannt ist.** Seit gestern steht
+in diesem Dateikopf, in der INDEX-Zeile und in zwei archivierten Blöcken, die **„7.467 B durchgestrichene
+Statusabsätze im Modulstatus"** seien der Rest — **gemessen sind es 229 B in der ganzen Datei** (A 42 ·
+B 9 · D 150 · Gate/Z 28). Faktor 33. Der Vorschlag vom 2026-10-03 („Streichen wäre die einzige Maßnahme,
+die den Head sicher unter den Softcap brächte") hätte **229 B** gebracht; bei der damaligen Größe von
+44.360 B bliebe der Head bei **44.131 B**, also 3.171 B darüber — er hätte nichts gelöst. **Die Masse
+ist woanders: die Modulstatus-Tabelle ist 26.346 B _lebendiger_ Text**, und davon stehen die vier
+größten Zeilen (A 4.915 · B 4.050 · Gate/Z 2.454 · D 2.069) **doppelt** — einmal im jetzigen Stand und
+einmal im durchgestrichenen historischen Absatz derselben Zelle. Dort stünde die Streichung an, und
+das ist **Deine Entscheidung**, weil sie Zeilen aus dem Kopf der *laufenden* Phase nimmt.
+
+**Selbstprüfung:** `pytest` **1180 → 1188** (8 neu, Baseline vorab gemessen) · `ui_budget` 5/5 (kein
+`phase5_ui/webui/static/**`-Berührung) · `doc_health` **0** — der Scan hat mich zuerst rot gemeldet,
+weil meine eigene Korrektur die Matrix über sein ±2-KB-Fenster hob; der Wächter bei seiner Arbeit ·
+Tabu-Pfade unberührt · **kein `systemctl`, kein `pkill -f`**, keine Wegwerf-Instanz.
+
+**Nächster Schritt, nach Zuständigkeit.** (1) **Zweites Claude-Konto umstellen** — danach P9-13/V150 ✅.
+(2) **Release-Commit + Deploy `v3.1.1`** — Badge + `##`-Block **erst am Deploy-Tag**, trace-Block kommt
+mit, **kein** Index-Neuaufbau; `health_gate.sh` liefert V164 und die P9-15-Läufe. (3) **Die drei Wege aus
+der INDEX-Überschreitung entscheiden** — P9-3 bleibt ⚠️, und der Wächter meldet, wenn die Datei unter das
+Kriterium fällt. (4) **Übersichtsgrafik §12.4** (gerendert **und angesehen**) und ROADMAP-Zeile, wenn die
+Zahlen endgültig sind. **Mit Datum im Kalender:** am **2026-10-18** schließt das Übergangsfenster von
+selbst — die alte Adresse liest dann nur noch. Absicht, kein Versehen.

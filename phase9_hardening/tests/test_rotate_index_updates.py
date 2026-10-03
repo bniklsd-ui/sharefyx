@@ -11,6 +11,7 @@ own text, so the ISO-date-anchored split is actually exercised.
 docs/INDEX.md). The last block carries that extension and its two traps — a hardcoded pointer
 (here unprovable by a naive `in`-check, by construction) and a target equal to its own archive.
 """
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -310,3 +311,27 @@ def test_a_missing_target_under_an_explicit_path_names_that_path(tmp_path):
     )
     assert result.returncode == 1
     assert "phase9_hardening/CLAUDE.md" in result.stderr
+
+
+def test_every_thread_of_a_living_head_chain_is_separated():
+    """Fund vom 2026-10-04 — die dritte Ausprägung derselben Fehlerklasse.
+
+    `scripts/rotate_index_updates.sh` meldete für `phase9_hardening/CLAUDE.md` **„Bereits konform:
+    die 'updated:'-Kette hat nur einen Eintrag"** (exit 2), und das war *wahr* und zugleich das
+    Problem: die Kette trug **zwei** Fäden, die ohne den Trenner ` | ` aneinandergeklebt waren.
+    Der Split-Anker ist ` | ` + ISO-Datum, ein fehlender Trenner ist für ihn nicht von einem
+    einzigen sehr langen Eintrag zu unterscheiden — und (e) kann nicht helfen, weil es das
+    *Split-Ergebnis* prüft und hier nichts zu splitten ist.
+
+    Also muss der Zustand vor dem Skript geprüft werden. Die Regel ist eng genug, um keine
+    Falsch-positive zu produzieren: ein Faden **beginnt** mit `YYYY-MM-DD (**`, und eine
+    Datumsnennung im Fließtext eines Fadens steht nie direkt vor `(**`.
+    """
+    for rel in ("CLAUDE.md", "phase9_hardening/CLAUDE.md", "phase8_6_ui_polish/CLAUDE.md"):
+        body = re.search(r"^updated: (.*)$", (REPO_ROOT / rel).read_text(encoding="utf-8"), re.M).group(1)
+        starts = [m.start() for m in re.finditer(r"\d{4}-\d{2}-\d{2} \(\*\*", body)]
+        glued = [i for i in starts if i != 0 and not body[:i].endswith(" | ")]
+        assert not glued, (
+            f"{rel}: {len(glued)} Faden/Fäden ohne ' | '-Trenner (Position {glued}) — die Kette sieht für "
+            f"das Skript wie ein Eintrag aus und rotiert erst beim nächsten Lauf als Ganzes ins Archiv"
+        )
