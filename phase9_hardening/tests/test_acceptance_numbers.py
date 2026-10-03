@@ -58,7 +58,10 @@ CAP_BYTES = 300  # der Cap, mit dem P9-3/V145 die Unerreichbarkeit des Kriterium
 # Abgetippt, nicht abgeleitet — der Test soll die Behauptung prüfen, nicht sie wiederholen.
 ABNAHME_BILANCE = {"✅": 71, "⚠️": 9, "⬜": 3}
 ABNAHME_ROWS = 83  # 82 Abnahmezeilen, P9-10 in zwei prüfbare Hälften geteilt
-VERIFY_BILANCE = {"✅": 29, "⚠️": 3, "⬜": 2}  # Nummern-Lesart, eine Nummer = eine Zeile
+# 2026-10-03: V164 von ⬜ auf ✅ (Deploy `v3.1.1` + Health-Gate 9/9). Die Konstante steht
+# **vor** dem Zählen, sonst wäre der Test eine Tautologie -- deshalb hat er mich beim
+# Zurueckschreiben der Bilanz in die Matrix rot gemeldet, statt sie zu bestaetigen.
+VERIFY_BILANCE = {"✅": 30, "⚠️": 3, "⬜": 1}  # Nummern-Lesart, eine Nummer = eine Zeile
 VERIFY_ROWS = 37  # 34 Nummern + 2 Zweit-Lesarten + 1 reservierte Bereichszeile
 
 MARKERS = ("✅", "⚠️", "⬜")
