@@ -6,6 +6,10 @@ correction]** it carries three again, and the first real run found a defect the 
 asked about — see `test_a_second_updated_prefix_aborts_instead_of_rotating_half_the_chain`.
 The fixture below carries a synthetic multi-entry chain, including a ' | ' inside an entry's
 own text, so the ISO-date-anchored split is actually exercised.
+
+**[2026-10-03, P9-Gate/Z]** The script grew an explicit target/archive pair (default unchanged:
+docs/INDEX.md). The last block carries that extension and its two traps — a hardcoded pointer
+(here unprovable by a naive `in`-check, by construction) and a target equal to its own archive.
 """
 import shutil
 import subprocess
@@ -174,3 +178,135 @@ def test_a_clean_three_entry_chain_rotates_but_the_newest(repo):
     # Der jüngste Faden bleibt im Index und wandert NICHT ins Archiv.
     assert "2026-09-20 (neuester)" not in archive_text
     assert "2026-09-20 (neuester)" in index.read_text(encoding="utf-8")
+
+
+# --------------------------------------------------------------------- Zieldatei/Archiv (2026-10-03)
+# Vorher war das Skript auf docs/INDEX.md festgenagelt, obwohl jeder lebende Head dieselbe Kette
+# trägt (phase9_hardening/CLAUDE.md: 19.488 B Kette in 57.873 B Datei). Die folgenden Tests tragen
+# die Erweiterung — und die beiden Fallen, die eine naive Form davon nicht fände.
+
+HEAD_FIXTURE = """---
+status: live
+purpose: test-head
+read-when: test
+detail: L2
+up: ../CLAUDE.md
+updated: 2026-10-03 (neuester, nennt selbst docs/INDEX_UPDATES_ARCHIVE.md im Text) | 2026-10-02 (zweiter) | 2026-10-01 (dritter)
+---
+# Head
+Body bleibt unangetastet.
+"""
+
+HEAD_ARCHIVE_FIXTURE = """---
+status: archive
+purpose: test-archive
+read-when: test
+detail: L3
+up: ./CLAUDE.md
+updated: 2026-10-03 (Archiv angelegt)
+---
+"""
+
+
+@pytest.fixture
+def head_repo(tmp_path):
+    phase = tmp_path / "phase9_hardening"
+    phase.mkdir()
+    (phase / "CLAUDE.md").write_text(HEAD_FIXTURE, encoding="utf-8")
+    (phase / "UPDATES_ARCHIVE.md").write_text(HEAD_ARCHIVE_FIXTURE, encoding="utf-8")
+    return tmp_path
+
+
+def run_head_script(repo_root):
+    return subprocess.run(
+        [str(SCRIPT), str(repo_root), "phase9_hardening/CLAUDE.md",
+         "phase9_hardening/UPDATES_ARCHIVE.md"],
+        capture_output=True,
+        text=True,
+    )
+
+
+def test_an_explicit_target_and_archive_rotate_a_living_head(head_repo):
+    result = run_head_script(head_repo)
+    assert result.returncode == 0, result.stderr
+
+    head_text = (head_repo / "phase9_hardening" / "CLAUDE.md").read_text(encoding="utf-8")
+    updated = [l for l in head_text.splitlines() if l.startswith("updated: ")]
+    assert len(updated) == 1
+    assert "2026-10-03 (neuester" in updated[0]
+    assert "2026-10-02 (zweiter)" not in updated[0]
+    assert "2026-10-01 (dritter)" not in updated[0]
+    # Body und Frontmatter-Rahmen unangetastet
+    assert head_text.count("# Head") == 1
+    assert "Body bleibt unangetastet." in head_text
+    assert head_text.count("---") == 2  # der Frontmatter-Rahmen des Heads, unveraendert
+
+    archive_text = (head_repo / "phase9_hardening" / "UPDATES_ARCHIVE.md").read_text(encoding="utf-8")
+    assert "- 2026-10-02 (zweiter)" in archive_text
+    assert "- 2026-10-01 (dritter)" in archive_text
+    assert "2026-10-03 (neuester" not in archive_text
+
+
+def test_the_pointer_names_the_given_archive_not_the_index_one(head_repo):
+    """Die Falle dieser Erweiterung: ein **hartkodierter** Zeiger auf `docs/INDEX_UPDATES_ARCHIVE.md`
+    wäre für jeden anderen Head eine stille Lüge — die Kette zeigt dann auf ein Archiv, in dem
+    ihre Einträge nicht stehen.
+
+    Der Test ist absichtlich so gebaut, dass eine `in`-Prüfung auf `docs/INDEX_UPDATES_ARCHIVE.md`
+    **nicht** grün werden kann: der jüngste Faden des Fixtures nennt diese Zeichenkette selbst im
+    eigenen Text, und er bleibt stehen. Wer den Zeiger wieder hartkodiert, bekommt darum einen
+    **roten** Test statt eines grünen — dieselbe Falle wie bei (e) am 2026-10-02."""
+    run_head_script(head_repo)
+    head_text = (head_repo / "phase9_hardening" / "CLAUDE.md").read_text(encoding="utf-8")
+    updated = [l for l in head_text.splitlines() if l.startswith("updated: ")][0]
+    assert "ältere Einträge: phase9_hardening/UPDATES_ARCHIVE.md" in updated
+    assert updated.count("docs/INDEX_UPDATES_ARCHIVE.md") == 1  # nur die Erwähnung im Faden-Text
+    # Und der Zeiger löst von der Zieldatei aus wirklich auf:
+    pointer = updated.split("ältere Einträge: ")[1]
+    assert (head_repo / pointer).is_file()
+
+
+def test_target_and_archive_may_not_be_the_same_file(head_repo):
+    """Selbst-Rotation wäre Datenverlust **ohne** Fehlermeldung: beide Schreibziele wären dieselbe
+    Datei, und das zweite `cp` überschriebe den gerade gedrehten Rest der Kette."""
+    head = head_repo / "phase9_hardening" / "CLAUDE.md"
+    original = head.read_text(encoding="utf-8")
+    result = subprocess.run(
+        [str(SCRIPT), str(head_repo), "phase9_hardening/CLAUDE.md", "phase9_hardening/CLAUDE.md"],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 1
+    assert "dieselbe Datei" in result.stderr
+    assert head.read_text(encoding="utf-8") == original
+
+
+def test_an_absolute_or_dotdot_path_aborts_before_writing(head_repo):
+    """Der Zeiger in der neuen Zeile ist der übergebene Archivpfad wörtlich. Ein absoluter Pfad
+    oder ein `..` würde dort etwas hinschreiben, das in keinem Dokument auflösbar ist."""
+    head = head_repo / "phase9_hardening" / "CLAUDE.md"
+    original = head.read_text(encoding="utf-8")
+    for bad in ("/tmp/x.md", "../docs/INDEX_UPDATES_ARCHIVE.md"):
+        result = subprocess.run(
+            [str(SCRIPT), str(head_repo), "phase9_hardening/CLAUDE.md", bad],
+            capture_output=True,
+            text=True,
+        )
+        assert result.returncode == 1, bad
+        assert "repo-root-relativ" in result.stderr
+    assert head.read_text(encoding="utf-8") == original
+
+
+def test_a_missing_target_under_an_explicit_path_names_that_path(tmp_path):
+    """Die Fehlermeldung muss den **übergebenen** Pfad nennen, nicht mehr 'Index' — sonst sucht
+    jemand den Index, während das Skript an einem ganz anderen File hängengeblieben ist."""
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "INDEX_UPDATES_ARCHIVE.md").write_text(ARCHIVE_FIXTURE, encoding="utf-8")
+    result = subprocess.run(
+        [str(SCRIPT), str(tmp_path), "phase9_hardening/CLAUDE.md",
+         "docs/INDEX_UPDATES_ARCHIVE.md"],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 1
+    assert "phase9_hardening/CLAUDE.md" in result.stderr

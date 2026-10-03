@@ -10,7 +10,8 @@ down:
   - ../docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md  # Herkunft der P9-Punkte
   - ABNAHME_MATRIX.md                            # P9-1 – P9-82 mit Stand und Beleg + [VERIFY]-Bilanz (2026-10-03)
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
-updated: 2026-10-03 (**Step D belegt** — die letzte Zeile mit fehlendem Beleg, opencode/M3, **kein Produktcode-Touch**, kein Deploy) · P9-28/-29/-30 von ⬜/⚠️ auf ✅: Browser-Probe **16/16** (echte Maus-Input-Pipeline, kein `dispatchEvent`; Station 2 zählt den vom Browser erzeugten Ereignisstrom), **zwei Gegenproben liegen rot im Repo** (G1 → 5 Stationen rot bei grünen 6–9, G2 → Station 9 rot), **6 Wächter** mit Deckung in beiden Richtungen · **0 Zeilen Produktcode** — `git diff` auf `app.js`/`tree.js` ist nach den Gegenläufen leer · **Matrix jetzt 68 ✅ · 9 ⚠️ · 6 ⬜** und **44.222 B = 3.262 B über dem Softcap, benannt** (P8-P) · **drei eigene Fehler, alle im selben Commit behoben**: der Ereigniszähler zählte **sich selbst** (`start=3, over=57` für *einen* Zug — die Listener waren bei jedem `evaluate` neu registriert), `store.create()` **hängt** an statt zu leeren (der zweite `start` sah jedes Item doppelt), und der neue Wächter war rot, weil er das verbotene Wort im **Docstring** selbst nennt — er läuft jetzt über `tokenize` statt Rohtext, dieselbe Falle wie P8.6 Block H / Step G / B17 · **ein vierter Fund:** die Regel „der Dateiname **endet** auf `_gegenprobe`" hat **keiner** der sechs älteren Block-Belege erfüllt, weil keiner einen Gegenlauf im Repo hat — die Regel war gegen nicht existierende Dateien geschrieben und hat deshalb noch nie zugeschlagen | updated: 2026-10-03 (**Abnahmematrix steht** — Gate/Z-Doku-Hälfte Nummer zwei, opencode/M3, **kein Code-Touch**, kein Deploy) · `phase9_hardening/ABNAHME_MATRIX.md` neu: **82 Abnahmezeilen in 83 Tabellenzeilen (P9-10 geteilt) — 65 ✅ · 10 ⚠️ · 8 ⬜**, jede Zeile mit Beleg; **kein ⬜ ist offene Code-Arbeit** (8 hängen an A7+A8 und D1) · **[VERIFY]-Bilanz: 34 belegte Einträge, nicht 40** — V167–V172 sind in keiner Quelle definiert, die Übergabezahl war die Bereichsgröße · **zwei Nummerkollisionen** (V162, V163 je zweimal vergeben; beide Lesarten je mit Stand geführt) · **P9-56 ⚠️**: der Tabu-Bereichs-Diff hat einen Treffer, der nicht auf der Ausnahmenliste steht (`phase7_spaces_admin/tests/test_space_removal.py`, 17 Z.) · **GA2 wurde nie gebaut**, und genau die drei Zeilen, die niemand getragen hat, sind P9-27/-29/-30 · **P9-14 heute geschlossen** (Funnel live 200), P9-10b heute gemessen (weiter 400), **V146/V148/V155 heute beantwortet**, V182/V184 am Code · `pytest` 1169, `ui_budget` 5/5 (155,2 KB), `doc_health` 0/0/0/0, Hard Rule 8 über alle 72 Commits durchgezählt · neue Datei 40.573 B (387 B unter dem Softcap, benannt) · **Rotation:** der B17-Block (12.649 B) wandert verbatim ins Archiv, Head 56.142 → ~48.500 B | updated: 2026-10-02 (**Block trace gebaut**, zwölfter Block, opencode/M3, ein Commit, kein Deploy): Locks P9-Y–AD, **zehnte P1-Contract-Öffnung** (kein Index-Schema-Sprung ⇒ kein Neuaufbau beim Deploy) · `updated_by` serververwaltet (`_SYSTEM_MANAGED_FIELDS`, leerer Akteur = **unverändert**, P9-AB) + Git-**Autor** (`--author`, Committer bleibt `Space Server`) · `actor=principal.space` (7) / `actor=session.space` (9) · UI „bei X", Feld **„Bei“** mit `<datalist>`, Lesezeile **„Zuletzt geändert von X“** · **24 neue Tests** (gezählt, nicht addiert: 5 `test_store.py` + 4 `test_history.py` + 6 `test_trace_block.py` + 4 `test_tools.py` + 1 `test_api.py` + 4 `test_static_routes.py`), `pytest` 1128 → **1152** · **Gegenlauf** G1→1 G2→2 G3→1 G4→2 G5→4 · **Browser 8/8** gegen eine Zwei-Principalen-Instanz mit echter Git-Historie, Gegenlauf: ohne Leer-Prüfung springt der Assignee von A auf B · 6 Screenshots `p9_trace_*` · **ein Bestandstest mitgezogen** (`test_app.py`) und **ein Wächter zugeschnitten statt entfernt** (`test_step_f_schema.py`) · **eine Plan-Klammer war ungenau** (POST verwirft `updated_by` lautlos statt 422) | 2026-10-02 (**Release-Commit `v3.1.0` steht** — Badge `app.html:20` + `## 2026-10-02`-Block in `docs/UPDATE_LOG.md` mit 6 Zeilen, jede Aussage eine physische Zeile und am echten `parse_update_log()` gegengeprüft; `pytest` 1128, `ui_budget` 5/5. Deploy selbst beim Nikinger, Health-Checks ohne sudo bei M3) | updated: 2026-10-02 (**Mini-Plan doing-Block geschrieben** — Nikinger-Entscheidung **P9-V = Kandidat (a)**, fünfter Eimer „In Arbeit"; Maschinenebene bleibt roh (P9-W); Bau durch M3, Deploy danach) | 2026-10-01 (**Deploy vom 2026-10-01 verschoben (Nikinger-Entscheidung)** — Befund 11: `doing` steht nach dem Deploy als echte Option im Status-Feld der Kopfdaten und taucht dann in **keinem** der vier Ordner-Zähler auf; Mini-Plan (Opus) abwarten, dann bauen + deployen. **Kein** Release-Vorbereitungs-Commit: ein heute datierter `## `Block würde das `deploy.sh`-Gate bei späterem Deploy abbrechen lassen, und der Changelog-Text ist ohne die `doing`-Entscheidung nicht schreibbar · **`.toolbar-btn` in Standardoptik gebaut** (letzter echter Knopf auf der alten Plastik), Pixel-Probe 13/13 mit Gegenprobe → 5 rot, `:disabled` bleibt `--surface`, `.rail__glyph` bleibt bewusst alt · **Befunde 11–13** aus der eigenen Probe: `aria-current` als Selektor ist wertlos, ein Pixelvergleich trifft Beschriftungen, und die Verlaufsmessung stand im falschen Block — fünfte Wiederholung derselben Repo-Lehre · vier Tailscale-Bilder nach `docs/screenshots/p9_step_a_*` versioniert, leere SPA-Hülle gelöscht, `screenshots_latest/` rotiert · `pytest` 1122, `ui_budget` 5/5) | updated: 2026-10-01 (**A4 ausgeführt — P9-10a grün**: `caddy 2.6.2` via apt, `Valid configuration`, `certificate obtained successfully` (LE `YE1`, CN `sharefyx.eurofyx.com`); extern `400 Invalid host header` = Befund 8, und derselbe `400` im Journal der Heim-VM belegt VPS → Tailnet → Relay → App; **Befund 10 neu** = `caddy validate` liest den Adapter aus dem Dateinamen; **Datums-Korrektur**: mein Commit 10e3c50 war durchgehend mit 2026-10-02 datiert, richtig ist 2026-10-01) | 2026-10-01 (A4 vorbereitet — **Befund 8: P9-10 ist bis A7 nicht erfüllbar** (`400 Invalid host header` gemessen; dieselbe Kette über echten Caddy 2.6.2 vor dem echten Relay durchgespielt → 200), **Befund 9: kein Caddy auf dem VPS** ⇒ A4 = A4a messen+installieren / A4b Konfiguration, **P9-10 in P9-10a/P9-10b geteilt**, **`<vps-tailnet>` → `<heimvm-tailnet>`** (der Platzhalter war als VPS-Adresse beschrieben, `reverse_proxy` meint die Heim-VM), A7a vorgeschlagen, 5 Wächter 12/12, `pytest` 1120) | 2026-10-01 (Standardknöpfe in Rail-Optik, ersetzt H-R.2-L, Nikinger) | 2026-10-01 (Step A: UI-Übergangsfenster gebaut — 23 Tests, Gegenprobe 2 Verstöße → 5 rot, Browser 16/16, `pytest` 1114) | 2026-10-01 (Step A: Domain registriert, A5 ✅; Befund 4 korrigiert — Token-`resource`-Bindung kappt beide Connectoren beim A7-Restart, Nikinger: harter Schnitt; UI-Übergangsfenster beschlossen, Befund 5 umentschieden) | 2026-09-30 (**Step B, zweiter Teil gebaut — V153 entschieden und einer der beiden Plan-Wege nachweislich unbaubar**: `sudoers` lebt vom setuid-Bit, `NoNewPrivileges=true` lässt der Kernel das nicht zu (`setpriv --no-new-privs -- sudo -n -l` → *"no new privileges" flag is set*). **Aber:** `systemd 255.4` kennt für Start/Stop/Restart nur die **grobe** Aktion `org.freedesktop.systemd1.manage-units` (man `org.freedesktop.systemd1(5)` §Security), ein `<defaults>`-Eintrag kann nicht nach Unit filtern — und ob systemd 255 das `unit`-Attribut mitschickt, ist unprivilegiert nicht auslesbar (`pkcheck`: *not registered*). Gebaut: `phase3_edge/polkit/49-tailscaled-watchdog-restart.rules` als **JS**-Regel, die zusätzlich `action.lookup("unit") == "tailscaled.service"` und `subject.user == "savefyx"` verlangt — greift sie ohne das Attribut nicht (gewollter Fehlerfall), **ohne** den Abgleich hätte `savefyx` das Management *aller* Units. **V153-Probe** in `phase9_hardening/step_b/` entscheidet die Restfrage über eine Wegwerf-Unit (`ExecStart=/bin/true`), ohne `tailscaled` anzufassen. 4 neue Wächter (9/9, Gegenprobe 4 Verstöße → 6 rote Assertions, alle lesen nur Codezeilen). Gemessen: die Units sind auf der VM **noch nicht installiert**. Ablauf: `phase9_hardening/step_b/RUNBOOK_STEP_B.md` B0–B3) | 2026-09-30 (**Step H gebaut — der letzte Code-Step, und seine Plan-Prämisse war falsch: „installiert ist 3.4.4". Gemessen (read-only) lief der Live-Release bereits auf **3.4.7**, weil `deploy.sh:153` pro Release ein frisches venv baut und der Pin ein **Range** war — der stumme Patch-Drift, den P3-D verbieten wollte, hatte also schon stattgefunden. `phase2_mcp/pyproject.toml` pinnt jetzt **`fastmcp==3.4.7`** exakt (P3-D/P4-R, beide seit 2026-08 beschlossen und nie umgesetzt) + datierter Kommentar; **V163 beantwortet** mit drei Codepunkten statt einer Vermutung: CIMD ist per P4-E abgeschaltet (`metadata.py:19`), `token_endpoint_auth_methods_supported: ["none"]` (`metadata.py:32`), kein `OAuthProxy`/`JWTVerifier` in der benutzten Fläche — der 3.4.7-Fix ist inert, der Bump ist Hygiene. **P9-55 in der Form abweichend** (`==3.4.7` statt Range, Nikinger-Entscheidung 2026-09-30), im Plan §10 als Abweichung dokumentiert. **Der Riegel ist ein Test:** `test_the_installed_fastmcp_matches_the_pin` läuft im **Release-venv** mit (`deploy.sh:169` ruft dort `pytest -q` und bricht den Deploy ab) — ein Drift ist damit ein roter Deploy. 5 Wächter, Gegenprobe 4 Verstöße → 7 rote Assertions. `pytest` 1079 → **1084**, `ui_budget` 5/5. **Benannt, nicht gebaut:** transitives `mcp` bleibt ungepinnt (Dev 1.28.1, Live 1.30.0). Zwei eigene Fehler (ein `SpecifierSet.version`, das es nicht gibt; ein `edit`, das P2-Zeile 13 mitgefressen hat — beide im selben Commit behoben, der Diff ist der Nachweis). **Domain weiter nicht registriert** (NXDOMAIN + RDAP 404) → A4/A5/A7/A8 blockiert, Gate/Z wartet) | 2026-09-30 (**Step F gebaut — neunte und bis jetzt letzte P1-Contract-Öffnung, code-complete, nicht live-bewiesen**: `doing` wird ein Statuswert (nur bei `task`, `note` bleibt `{active, archived}`), `assignee` ein erstklassiges Feld mit Index-Spalte, `INDEX_SCHEMA_VERSION` 3 → 4, **keine Migration** (Hard Rule 2). **V160 vom Nikinger beantwortet: Space-Name, ohne Validierung** — eine Prüfung gegen die Space-Liste wäre eine zweite, nicht angekündigte Öffnung. **Plan §8.2 auf den Diff korrigiert: neun Stellen sind gemessen achtzehn Hunks** (F9 sind drei Statement-Teile plus ein Row-Dict, nicht eine Stelle), dazu drei vom Plan nicht genannte Pflichtstellen (`_summary()` F10, `update()` F11, `_coerce_assignee()`). Enge Probe §8.7 erfüllt: **genau drei Dateien**, die sechs Hartpfade leer; Gegenprobe mit vier eingebauten Verstößen → 10 Tests rot. `pytest` 1039 → **1062** (23 neu), `ui_budget` 5/5, `doc_health` 0, `node --check` grün. **Ein Befund bewusst NICHT behoben:** `_BUCKETS` kennt `doing` nicht — beide Fix-Kandidaten sind Darstellungsentscheidungen und P10-Arbeit (P9-P), der Befund steht im Code und ein Wächter pinnt ihn. **V161 mit synthetischem Vorabwert** (2,5–4,0 ms/Item; 153 reale Items ⇒ 0,4–0,6 s einmalig), P9-43 bleibt Nikinger-Schritt am echten DATA_ROOT. **V159 gemessen statt geglaubt:** richtig für den Editor-Dropdown, gegenstandslos für den Anlegen-Dialog (der hat keinen Status-Knopf)) | 2026-09-30 (Step A halb ausgeführt — **A1/A2/A3/A0b/A6 erledigt**: Domain bestellt, VPS `217.160.128.146` (Ubuntu 24.04.5), Policy + Beitritt mit `tag:sharefyx-edge` (von der Gegenseite belegt: Tags gesetzt, User=None), socat-Relay laufend mit identischer Härtung, Firewall `22` nur auf `tailscale0` mit Gegenprobe. **Kette blockiert an der Domain-Registrierung** — A4 braucht eine auflösende Domain fürs Zertifikat. Der Session-Fund: **mein eigenes A6 hätte den Betrieb gekappt** (`ufw default deny incoming` gilt auch auf `tailscale0`, SSH-Regel fehlte). Vier eigene Fehler dokumentiert, darunter ein erfundener Drift, der zurückgenommen wurde. V162/V163 neu offen, V151 Vorabwert 28–37 ms über DERP. 7 Tests + Gegenprobe 4/4) | 2026-09-29 (Step A: M3-Anteil gebaut, Ausführung liegt beim Nikinger — **Plan-A4 nachweislich unbaubar** (auf der Tailnet-IP lauscht nichts: `SPACE_HOST=127.0.0.1`, `ss -ltnp` belegt; `SPACE_HOST=0.0.0.0` wäre P3-B gebrochen) → **socat-Relay-Unit** `phase3_edge/systemd/sharefyx-tail-proxy.service` ohne `__REPO_ROOT__` im `ExecStart` (die Release-Pfad-Kopplung aus dem Step-B-Befund ist damit konstruktiv ausgeschlossen); Caddy-Vorlage + ACL-Fragment + `phase9_hardening/step_a/RUNBOOK_STEP_A.md` (A1–A9, ein Schritt pro Runde) + 7 Wächter, Gegenprobe 4/4; **V149 beantwortet** (alle Metadatenfelder abgeleitet, keines fest, kein `iss`-Check beim Einlösen), Befund 2 (`/health` statt `/healthz`) und Befund 3 (`ALLOWED_HOSTS` fehlt in Plan-A7) als Plan-Korrekturen, **Befund 5** = der Funnel bleibt nach A7 lesbar, aber nicht beschreibbar (CSRF-Origin exakt, `security.py:84`); **V162 neu offen** = ACL-Durchsetzung von `tailscale serve --tcp`, der Grund für die socat-Wahl; Step A ⬜→🟡) | 2026-09-28 (**Nachtrag**: §Vormerkung Vision-Modell — Messbefund aus Step E dokumentiert, Recherche in `docs/concepts/sichtpruefung_automation_tooling.md`, Schluss: ein Modellwechsel ist nicht der Hebel, die Zuständigkeitsgrenze ist es; kein P9-Block) | 2026-09-28 (Step E abgeschlossen ✅ — Reload-Overload der Karte: (a) kein zweiter `/graph`-Abruf ohne Datenänderung, Signatur aus dem `/overview`-Payload statt aus dem Graph-Payload (Plan-Korrektur: der Graph-Knoten hat kein `updated`, `api.py:698-708`), Erzeugung in `list.js :: loadOverview()` (deckt jeden Schreibpfad mit), Format in `state.js :: overviewToken()` (Blatt-Modul statt Zyklus), `force` nur am expliziten Refresh-Knopf; (b) bekannte Knoten behalten x/y über den Refetch. Sieben Tests (Node-Harness `graph_reload_probe.mjs` + statisch) und eine Browser-Probe (`p9e_reload_probe.py`, Wegwerf-Instanz Port 18768), beide mit Gegenprobe gegen HEAD: dort 1 statt 0 Abrufe und 10 statt 1 verschiedene Bilder in 1,5 s, im Node-Harness 467,6 px Positionssprung statt 0. V118 beantwortet (zwei Linien, eine gestrichelt) — Design-Frage eine-oder-zwei beim Nikinger. `pytest` 1031 passed + 1 failed (der Fehlschlag ist der Vortrag: `docs/INDEX.md` über der doc_health-Schwelle, auf HEAD genauso rot, gehört nach Step Z), `ui_budget` 5/5 (149,0 KB), Tabu-Bereichs-Diff leer, Wegwerf-Instanz über die PID-Datei gestoppt. Drei eigene Fehler dokumentiert (falsche erste Verdrahtung, Messgerät zählte sich selbst, Test scheiterte an eigenem Kommentar) | 2026-09-26 (Step B code-complete, install ausstehend: vier neue Dateien — `phase3_edge/scripts/tailscaled_watchdog.sh` + `phase3_edge/systemd/tailscaled-watchdog.{service,timer}` + `phase9_hardening/tests/test_tailscaled_watchdog.py` (5/5 grün); V152 beantwortet (kein Tailscale-eigenes Feature ohne kommerzielles Add-on), V153 als Empfehlung dokumentiert (Polkit `.rules`-Datei `/etc/polkit-1/rules.d/99-tailscaled-watchdog-restart.rules`, Sudoers-Fallback `/etc/sudoers.d/tailscaled-watchdog-restart`); Modulstatus Step B ⬜→🟡, Phase-9-###-Sub-Sektion ergänzt; Phase-9-Zeile in `docs/INDEX.md` nachgezogen; kein Touch an bestehendem Code, Hard Rule 8 (Doc-Update im selben Commit) und Hard Rule 9 (kein `systemctl` durch M3) eingehalten) | 2026-09-26 (Step C abgeschlossen: C8 `sudo systemctl disable --now ollama` Nikinger-Cobefehl, sharefyx-VM `inactive`/`disabled`, `curl 127.0.0.1:11434` → HTTP 000 exit 7 `Connection refused` (bestätigt aus dieser Shell als zweite Sichtprobe), binary + Modell bleiben als kalter Fallback bis Step Z; Host-Aufräumen pve: `/root/111.conf.new` (633 B, 2026-09-25 22:41) und `/root/111.conf.bak-p9c` (842 B, 2026-09-25 22:41) per `rm -f` entfernt, `/tmp/nv580173` und alter `NVIDIA-Linux-x86_64-580.126.09.run` waren bereits weg — PVE-9-tmpfs bzw. im Vorrundezweig schon entfernt; P9-22 deferred — kein externer Test möglich, architektonischer Beweis captured: 192.168.68.140 ist RFC1918, sharefyx-VM hat keine öffentliche IP (CGNAT via RUT X50, default route via 192.168.68.1), Tailscale-Funnel mappt nur `127.0.0.1:8765` (kein `*:11434` auf sharefyx-VM), kein Port-Forward auf RUT X50, der einzige 11434-Listener ist innerhalb CT 111; Step C 🟡→✅, Modulstatus nachgezogen, Session-Block 2026-09-26 angehängt) | 2026-09-25 (C4 ✅ DHCP-Reservierung im RUT X50, per `local_vision`-MCP-Aufruf gegen die GPU ausgelesen — erster echter Einsatz über den opencode-Pfad) | 2026-09-25 (zweite Reboot-Probe grün: CT-Knoten 20:54 > 20:42, Major 235 = `/proc/devices`, `cuInit = 0`, `size_vram` = `size` — Boot-Persistenz ✅) | 2026-09-25 (Reboot-Probe: uvm-Major 511→235, `cuInit = 999`; Fix per `devN`-Passthrough, per CT-Neustart bewiesen `cuInit = 0`, zweite Reboot-Probe offen, `size_vram` = `size`; C5 gesetzt; V166 beantwortet) | 2026-09-25 (Boot-Persistenz eingerichtet, CT 111 `onboot: 0` gefunden, Reboot-Probe offen) | 2026-09-25 (GPU-Inferenz läuft: CT 111 auf 580.173.02, `size_vram` = `size`, 63 tok/s, P9-21/-23/-26 ✅; Boot-Persistenz offen) | 2026-09-25 (Host-Treiber 580.173.02 mit `nvidia-uvm` installiert und geladen, kein Reboot) | 2026-09-25 (V165 beantwortet: 580.173.02 kennt die neue `zone_device_page_init`-Signatur) | 2026-09-25 (Step C Diagnose bestätigt: kein `/dev/nvidia-uvm`, `cuInit = 999`) | 2026-09-25 (Step C Diagnose, Claude Code: CUDA fehlt, weil `nvidia-uvm` fehlt — C2-Trade-off-Satz datiert korrigiert, Modulstatus C nachgezogen, Nikinger-Entscheidung zum Host-Fix offen) | 2026-09-25 (Backlog aufgeräumt: „opencode via Tailscale" für sharefyx-VM per Nikinger-Update mittlerweile passiert, Eintrag aus der Backlog-Sektion entfernt; nur noch D1 zurückgestellt) | 2026-09-25 (Step C Teil 2 / C6 — `mcp_local_vision_server.py` Skript-Fixes aus Plan §5.3: `serve()` loggt aufgelösten Endpoint, `--endpoint` wirkt jetzt auch ohne `--check`; neue zentrale `resolve_endpoint(args)` mit Präzedenz `--endpoint` > `$LOCAL_VISION_ENDPOINT` > `DEFAULT_ENDPOINT`; `_CURRENT_ENDPOINT` als Modul-Globals wird in `serve()` einmal gesetzt und von `handle_tools_call` gelesen statt erneut die Umgebungsvariable; 9 neue Tests + Counter-Probe ohne den Fix 7/9 rot — exakt die zwei gemeldeten Bugs; LXC + Ollama + C5/C7/C8 stehen aus) | 2026-09-24 (Step C Teil 1 — NVIDIA-Host-Treiber 580.126.09 installiert mit `--no-unified-memory`; pve-no-subscription-Repo ergänzt; drei dokumentierte Fehlbarkeiten auf dem Weg (Header-Paket fehlte, Backports führten denselben Upstream, Nouveau-Konflikt, uvm_hmm.c gegen 7.0.2-6-pve-Mai-Patch); eigener autoremove-Vorfall mit sudo/dkms-Verlust am 2026-09-24 wieder behoben; LXC + Ollama stehen aus) | 2026-09-24 (Backlog: ~19-min mcp-proxy.anthropic.com-Ausfall dokumentiert und geschlossen — gemessen nicht CGNAT/sharefyx-VM-seitig, Nikinger-Anordnung) | 2026-09-24 (Backlog: "opencode via Tailscale"-Behandlung für sharefyx-/Trading-Bot-VM nachgetragen, Nikinger-Feedback aus Netzwerk-Diagnosesession, kein Produktcode-Touch) | 2026-09-23 (D1/ESC-Bug auf Nikinger-Anordnung zurückgestellt, `## Backlog` neu) | 2026-09-23 (Step D code-complete — Drop-Ziel Space-Wurzel, ESC/Vollbild-Guard gebaut, gebaut in Claude Code statt opencode/M3, benannte Abweichung von P9-Q) | 2026-09-20 (Step 0 abgeschlossen — Phasenverzeichnis, INDEX-Rotationsskript, vier geplante plus drei ungeplante Doku-Defekte repariert, `doc_health.py` als Test festgenagelt, Baseline gemessen)
+  - UPDATES_ARCHIVE.md                          # ältere `updated:`-Fäden dieses Heads, verbatim (2026-10-03, 36 von 37)
+updated: 2026-10-03 (**Kettenrotation + Skript verallgemeinert** — opencode/M3, ein Commit, **kein Produktcode-Touch**, kein Deploy) · `scripts/rotate_index_updates.sh` nimmt jetzt Zieldatei + Archiv als Argumente (Default `docs/INDEX.md` unverändert, alle fünf Gegenproben unverändert) — **jeder lebende Head trägt dieselbe Kette**, und dieser Head stand bei **19.488 B Kette in 57.873 B Datei** (37 Fäden, ein Drittel) · **die im eigenen Kopf benannte Ursache der Überschreitung war damit die falsche:** dort galten die 7.467 B durchgestrichenen Statusabsätze als Restmasse, die Rotation spart ~18 KB · 5 neue Tests (12/12), **Gegenprobe 3 Verstöße → je genau 1 roter Test** · **vier ` | updated: `-Präfixe** aus der Kette entfernt (derselbe Defekt wie am 2026-10-02; Gegenprobe (e) hätte den Lauf abgebrochen)2026-10-03 (**Step D belegt** — die letzte Zeile mit fehlendem Beleg, opencode/M3, **kein Produktcode-Touch**, kein Deploy) · P9-28/-29/-30 von ⬜/⚠️ auf ✅: Browser-Probe **16/16** (echte Maus-Input-Pipeline, kein `dispatchEvent`; Station 2 zählt den vom Browser erzeugten Ereignisstrom), **zwei Gegenproben liegen rot im Repo** (G1 → 5 Stationen rot bei grünen 6–9, G2 → Station 9 rot), **6 Wächter** mit Deckung in beiden Richtungen · **0 Zeilen Produktcode** — `git diff` auf `app.js`/`tree.js` ist nach den Gegenläufen leer · **Matrix jetzt 68 ✅ · 9 ⚠️ · 6 ⬜** und **44.222 B = 3.262 B über dem Softcap, benannt** (P8-P) · **drei eigene Fehler, alle im selben Commit behoben**: der Ereigniszähler zählte **sich selbst** (`start=3, over=57` für *einen* Zug — die Listener waren bei jedem `evaluate` neu registriert), `store.create()` **hängt** an statt zu leeren (der zweite `start` sah jedes Item doppelt), und der neue Wächter war rot, weil er das verbotene Wort im **Docstring** selbst nennt — er läuft jetzt über `tokenize` statt Rohtext, dieselbe Falle wie P8.6 Block H / Step G / B17 · **ein vierter Fund:** die Regel „der Dateiname **endet** auf `_gegenprobe`" hat **keiner** der sechs älteren Block-Belege erfüllt, weil keiner einen Gegenlauf im Repo hat — die Regel war gegen nicht existierende Dateien geschrieben und hat deshalb noch nie zugeschlagen | ältere Einträge: phase9_hardening/UPDATES_ARCHIVE.md
 ---
 
 # Phase 9 — Härtung
@@ -88,113 +89,94 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückzuführen** — Nikinger-Anordnung 2026-09-24, so dokumentieren und nicht weiter
   untersuchen.
 
-## Session stopped — 2026-10-03 (sechzehnter Block: Step D ist endlich gefahren — drei Abnahmezeilen, die seit dem 2026-09-23 als „gebaut, aber nie belegt" im Kopf standen; opencode/M3, ein Commit, **kein Produktcode-Touch**, kein Deploy, kein Service-Touch)
+## Session stopped — 2026-10-03 (siebzehnter Block: der Head trug dieselbe Regel, die nur für den INDEX gebaut war — Kette rotiert, Skript verallgemeinert, **zum ersten Mal unter dem Softcap**; opencode/M3, ein Commit, **kein Produktcode-Touch**, kein Deploy, kein Service-Touch)
 
-**Die Frage am Anfang war „sind keine Coding-Schritte in P9 mehr vorhanden?" — die ehrliche Antwort
-war: kein Feature-Schritt, aber eine Zeile, die seit drei Wochen behauptet, sie sei gebaut.** Step D2
-(Drop-Ziel zurück auf die Space-Wurzel) steht seit dem 2026-09-23 als gebaut in der Modulstatus-
-Tabelle, mit **drei** statischen Wächtern in `test_static_routes.py` — und **null** Fahrten am
-Browser. Die Wächter prüfen die *Form* des Aufrufs (`bindFolderDropTarget()` hat genau zwei
-Aufrufstellen, die Space-Zeile hängt hinter einem `if (space.own)`), nicht sein *Verhalten*.
-Drei Abnahmezeilen standen deshalb als ⬜ bzw. ⚠️ „strukturell erfüllt, nicht am Gerät belegt", und
-**die Station, die sie hätte schließen können, war die erste von GA2 in Plan §11 — die nie gebaut
-wurde.** Das ist dieselbe Fehlerklasse wie der trace-Beleg vom 2026-10-02: die Aussage über den
-Code war richtig, der Beleg für den Zustand *beim Menschen* fehlte, und beim Öffnen des Heads ist
-beides nicht unterscheidbar.
+**Der Auftrag war „drei Zeilen, vorhandene Tests" — die drei Zeilen waren die richtige
+Diagnose und die falsche Datei.** Das Skript `scripts/rotate_index_updates.sh` war auf
+`docs/INDEX.md` festgenagelt, obwohl **jeder lebende Head dieselbe `updated:`-Kette trägt**. Bevor
+ich irgendetwas gebaut habe, habe ich gemessen, welche Kette überhaupt die große ist:
 
-**Gebaut ist eine Browser-Probe, kein Produktcode:** `phase9_hardening/scripts/p9_step_d_self_check.py`
-**16/16** gegen eine eigene TLS-Wegwerf-Instanz (`p9_step_d_wegwerf.py`, Port 18781 — außerhalb des
-belegten Bandes 18765–18780, damit P9-57s Aussage für dieses Band gültig bleibt). **16 Stationen für
-drei Zeilen** ist die eigentliche Aussage: ein Zug hat drei Fehlermöglichkeiten, und jede Station
-trägt eine Abnahmezeile im JSON-Feld `zeile` — die Zuordnung steht **im Beleg**, nicht im Fließtext,
-weil sie beim Zitieren sonst von der Station wegrutscht, die sie trägt.
+| Datei | Datei | Kette | Fäden | davon ` \| updated: `-Präfixe |
+|---|---|---|---|---|
+| `phase9_hardening/CLAUDE.md` | 57.873 B | **19.488 B (33 %)** | 37 | 4 |
+| `CLAUDE.md` (Wurzel) | 114.789 B | 13.728 B (11 %) | 9 | 2 |
+| `phase9_hardening/ABNAHME_MATRIX.md` | 44.222 B | 2.451 B | 2 | 1 |
+| `phase8_ui_graph/CLAUDE.md` | 47.861 B | 1.896 B | 4 | 0 |
+| `docs/INDEX.md` | 65.235 B | 307 B | 1 | 0 |
 
-**Die eine Entscheidung, die den Block kippen konnte — und warum sie so ausgegangen ist.** Ein
-`element.dispatchEvent(new DragEvent(...))` hätte dieselben Stationen grün bekommen und **nichts**
-belegt: den Listener, nicht den Zug eines Menschen. Vorab gemessen, nicht angenommen — Playwrights
-echte Maus-Input-Pipeline in Chromium feuert die volle Kette (`dragstart` → `dragover` → `drop`
-**mit** `dataTransfer`-Inhalt), sogar am Chromium-Headless-Shell, also ohne CDP-Drag-Interception.
-Station 2 misst diesen Ereignisstrom deshalb mit und trägt `dragstart=1, dragover=19, drop=1`.
-**Und die Gegenprobe G1 macht den Unterschied sichtbar:** mit entfernter Space-Bindung bleibt
-`over=19` stehen (der Zeiger lag wohl auf der Zeile), `drop=0` — der Browser hat den Drop nie
-angenommen, weil ohne `preventDefault` auf `dragover` kein Ziel gilt. „Der Code fehlt" und „der
-Mauszeiger war nicht dort" sind zwei verschiedene Fehler, und diese Probe unterscheidet sie.
+**Die Überschreitung dieses Heads war also falsch diagnostiziert — und zwar von mir, zwei Tage
+zuvor.** Als „Restmasse" galten im Kopf (und in der INDEX-Zeile) die **7.467 B durchgestrichenen
+Statusabsätze** im Modulstatus, mit dem Zusatz, das Streichen sei eine Nikinger-Entscheidung. Die
+Kettenrotation spart **~18 KB** — Faktor 2,4. Der Streich-Vorschlag wäre die teurere von zwei
+richtigen Wegen gewesen; er bleibt als Entscheidung offen, ist aber jetzt **nicht mehr der Hebel**.
+Das ist die_repo-Lehre in ihrer Doc-Form: *die Zahl im Kopf ist eine Behauptung, `wc -c` ist eine
+Messung*, und diesmal stand die Behauptung im selben Dokument, das sie beschrieb.
 
-**P9-30 ist als *Aussehen* belegt, nicht als Klassennamen:** berechneter Stil am Ziel während des
-Zugs — `border-top-style: dashed`, Farbe `rgb(62, 141, 243)` = `--accent` — auf der Space-Zeile, die
-im Normalzustand keine gestrichelte Kante hat, plus zwei Bilder (Rail-Zuschnitt im Zug gegen
-denselben Rail nach dem Zug: Toast, Ordnerzähler 3 → 2, Kante weg). Station 4 prüft das
-**Wieder-Verschwinden** und bleibt im Gegenlauf G1 grün, weil ihre Aussage eine *Abwesenheit* ist —
-bei nie gesetzter Klasse ist „nicht mehr da" trivial wahr. Das ist kein Loch, sondern die Aussage;
-ich hätte es als „grün im Gegenlauf = wertlos" verbuchen können, und wäre falsch gewesen.
+**Gebaut wurde die Verallgemeinerung mit den zwei Fallen, die eine naive Form nicht findet.**
+Aufruf jetzt `scripts/rotate_index_updates.sh [repo_root] [zieldatei] [archivdatei]`, Default
+unverändert `docs/INDEX.md` · `docs/INDEX_UPDATES_ARCHIVE.md`; alle fünf Gegenproben (a)–(e)
+unverändert, nur die Schnittstelle ist allgemeiner. (1) **Der Zeiger muss der übergebene
+Archivpfad sein, nicht der INDEX-Pfad** — hartkodiert wäre er für jeden anderen Head eine stille
+Lüge: die Kette zeigte auf ein Archiv, in dem ihre Einträge nicht stehen. Der Test dafür ist
+absichtlich so gebaut, dass eine `in`-Prüfung auf `docs/INDEX_UPDATES_ARCHIVE.md` **nicht** grün
+werden kann (der jüngste Faden des Fixtures nennt die Zeichenkette selbst und bleibt stehen) —
+nach der Wiederholung vom 2026-10-02 wäre ein Test, der nur im richtigen Fall anschlägt, wertlos.
+(2) **Zieldatei ≠ Archiv** — Selbst-Rotation wäre Datenverlust *ohne* Fehlermeldung, weil das
+zweite `cp` den gerade gedrehten Ketten-Rest überschreibt. Dazu die Pfad-Formprüfung
+(kein absoluter Pfad, kein `..`), denn der Zeiger landet wörtlich im Dokument. **5 neue Tests,
+12/12; Gegenprobe C1 (Zeiger hartkodiert) → 1 rot · C2 (Selbst-Rotation raus) → 1 rot · C3
+(Pfadform raus) → 1 rot**, Kontrolllauf 0. **Ein eigener Fehler, vom neuen Test gefunden:** die
+Pfadprüfung stand ursprünglich *hinter* den Existenzprüfungen — ein absoluter Pfad brach dann mit
+„Archiv fehlt" ab und verschwieg die eigentliche Ursache. Steht jetzt davor.
 
-**Drei eigene Fehler, alle im selben Commit behoben — und jeder davon war ein Messgerät, das
-etwas anderes maß als behauptet.** (1) Der Ereigniszähler zählte **sich selbst**: `start=3, over=57,
-drop=3` für *einen* Zug, weil das Zähler-Snippet bei jedem `evaluate` die drei Listener erneut am
-`document` registrierte. Behoben mit Einmal-Flag plus getrenntem Reset. (2) `store.create()`
-**hängt** an, es leert nicht — der zweite `start` auf demselben `DATA_ROOT` sah jedes Item doppelt,
-und der Zug fand die Zeile nicht mehr, weil der Vorlauf sie schon verschoben hatte. Behoben durch
-Leeren **vor** dem Säen, mit einer harten Schranke: gelöscht wird nur `/tmp/opencode/p9-step-d-*`,
-`ROOT` muss so heißen, sonst Abbruch. (3) Der neue Wächter war **rot**, weil er das verbotene Wort
-im Docstring des Skripts selbst verbietet — ein Wächter, der die Begründung verbietet, verbietet die
-Sache nicht. Behoben durch `tokenize` statt Rohtext. **Neunte Wiederholung derselben Repo-Lehre,
-zum ersten Mal am eigenen neuen Test.**
+**Vier ` | updated: `-Präfixe, derselbe Defekt wie am 2026-10-02 — zum zweiten Mal, in einer
+anderen Datei.** Sie sind Handarbeit aus den letzten Tagen; ohne sie sähe der Faden für den
+Split-Anker `' | ' + ISO-Datum` nicht wie ein Kettenanfang aus und würde still nicht rotiert.
+Gegenprobe (e) hätte abgebrochen (genau dafür ist sie da), Präfixe entfernt, dann rotiert: **36 von
+37 Fäden**, Rekonstruktion `gekaufter Faden + 36 Archiv-Fäden == alte Kette` **byte-identisch
+20.266 B**, jeder Faden genau einmal im Archiv. Das ist meine eigene Nachrechnung, nicht die
+Byte-Buchhaltung des Skripts — ein Wächter, der die Richtigkeit *seiner eigenen* Bilanz meldet,
+ist die teuerste Sorte Wächter (der Fund vom 2026-10-02). **Ergebnis: Head 58.661 → 40.694 B durch
+die Rotation und auf 39.106 B nach dem Block-Wechsel (Plan §12.5, der sechzehnte Block wandert
+verbatim ins `SESSIONS_ARCHIVE.md`) — zum ersten Mal in dieser Phase unter dem 40-KiB-Softcap**; das
+neue `UPDATES_ARCHIVE.md` trägt 19.379 B inklusive L1-Card. Summe vorher/nachher 60.016 → 60.073 B, die +57 B sind der Zeiger (52 B),
+die eigene Karte des Archivs und `2 B` je Faden (`- ` im Archiv gegen ` | ` in der Kette).
 
-**Ein vierter Fund, gegen den ich nichts gebaut habe, nur benannt:** die Regel in
-`test_committed_probe_evidence.py` erkennt einen Gegenlauf daran, dass der Dateiname **endet** auf
-`_gegenprobe` — und **keiner** der sechs älteren Block-Belege erfüllt sie, weil keiner einen
-Gegenlauf im Repo hat. Die Regel wurde also gegen nicht existierende Dateien geschrieben und hat
-noch nie zugeschlagen; meine beiden Dateien fielen zuerst darauf und wurden umbenannt. Der
-generelle Punkt: eine Prüfung, die nie etwas gefunden hat, ist nicht „erfolgreich", sie ist
-ungeprüft. Diesmal wie beim trace-Block haben **meine** Dateien die Regel ausgelöst, nicht eine
-fremde.
+**Und die dritte Datei mit demselben Defekt bleibt unangetastet:** die **Wurzel-`CLAUDE.md`** trägt
+zwei ` | updated: `-Präfixe und eine 13.728-B-Kette. Sie ist nicht mein Head, ihre Kette ist
+rotierbar (dieselbe Regel), aber die *benannte* Lösung für ihre 114.789 B ist die Rotation der
+Current-state-Abschnitte nach `docs/PROJECT_SESSION_LOG.md` — und eine Kettenrotation allein
+würde sie auf ~101 KB bringen, also immer noch 60 KB über der Grenze. **Benannt, nicht getan:**
+es erst zu tun, wenn die Current-state-Rotation ohnehin kommt, sonst zwei Rotationen für eine
+Datei. Derselbe Satz gilt für `ABNAHME_MATRIX.md` (2.451 B Kette, ein Präfix — der dortige Hebel
+sind die vier „warten auf den Deploy"-Posten, ~4 KB in einem Block).
 
-**Selbstprüfung §0.4 — heute gemessen, nicht aus der Doku übernommen:** Probe **16/16**,
-Gegenproben **11/16** (G1) und **15/16** (G2), `pytest` **1169 → 1175** (6 neue Wächter),
-`ui_budget` 5/5, `doc_health` 0/0/0/0 nach dem Nachziehen der INDEX-Zeilen, Tabu-Bereichs-Diff auf
-die sechs Hartpfade **leer** — `git diff` auf `app.js` und `tree.js` ist nach beiden Gegenläufen
-leer, das ist der Nachweis, dass die Probe Produktcode **nur gelesen** hat · **kein `systemctl`, kein
-`pkill -f`**: die Wegwerf-Instanz ausschließlich über ihre PID-Datei gestoppt · Live-Zustand vorher
-gemessen und unverändert: neue Domain `400` (erwartet bis A7), Funnel-Rückfall `200`, Live-Release
-`5414cb7` = Badge `v3.1.0`, `local.env` unverändert.
+**Selbstprüfung, heute gemessen:** `pytest` **1175 → 1180** (5 neu) · `ui_budget` 5/5 (kein
+`phase5_ui/webui/static/**`-Touch in diesem Commit) · `doc_health` 0 Befunde, die zwei neuen
+INDEX-Zeilen inklusive · Tabu-Bereichs-Diff auf die sechs Hartpfade leer · **kein `systemctl`, kein
+`pkill -f`**, keine Wegwerf-Instanz, Produktionsdienst nur gelesen · Live-Zustand vorher und
+nachher gemessen und identisch: neue Domain `400 Invalid host header` (erwartet bis A7), Funnel-
+Rückfall `200`, Live-Release `5414cb7` = Badge `v3.1.0`, `local.env` trägt unverändert
+`ALLOWED_HOSTS=savefyx-….ts.net,127.0.0.1`.
 
-**Benannt, nicht entschieden:** `phase9_hardening/ABNAHME_MATRIX.md` steht jetzt bei **44.222 B =
-3.262 B über dem Softcap** (vor diesem Block 40.573 B) — der Zuwachs ist Pflichtpflege eines
-gebauten Belegs, und die drei Zeilen sind bereits auf Stand + Beleg gestrafft, die Herleitung steht
-im Docstring und in diesem Block. Die zwei benannten Wege raus: der Deploy `v3.1.1` löst die vier
-„warten auf den Deploy"-Posten am Dateiende auf (~4 KB in einem Block), und die `updated:`-Kette
-ließe sich per `scripts/rotate_index_updates.sh` rotieren — das Skript ist allerdings auf
-`docs/INDEX.md` festgenagelt und braucht dafür eine Datei/Archiv-Angabe; **ein Restposten, in
-diesem Block nicht gebaut**, weil es gemeinsame Infrastruktur wäre.
+**Benannt, nicht gebaut: `doc_health.py` sieht das Feld `updated:` überhaupt nicht.** `_parse_fm`
+liest genau `status`/`purpose`/`read-when`/`detail` — ein **fehlendes** `updated:` ist darum kein
+Befund, und der Fund oben (`aee387d` nahm dem `SESSIONS_ARCHIVE.md` das Präfix) blieb deshalb bis
+heute stumm; eine Rotation *dieser* Datei wäre mit „Keine `updated:`-Zeile in der Frontmatter"
+abgebrochen, also mit einer Meldung, die den Fehler erst verrät, wenn jemand ihn auslöst. Der
+Riegel wäre eine Zeile (`updated` in die Feldliste) plus eine Befundkategorie — **hier nicht
+gebaut**, weil er gemeinsame Infrastruktur ist und zuerst ein Scan über alle `.md` zeigen müsste,
+ob er repo-weit Rot produziert; die Entscheidung gehört zum nächsten Schritt, der `doc_health`
+anfasst.
 
-**Nächster Schritt — unverändert deine Zuständigkeit, und diese Session hat daran nichts
+**Nächster Schritt — unverändert deine Zuständigkeit, diese Session hat daran nichts
 verschoben:** (1) **A7+A8 in einer Sitzung** (`step_a/RUNBOOK_STEP_A.md`; schließt P9-10b, P9-12,
 P9-13, P9-15, V150, V164 — ein Schnitt, weil der A7-Restart beide Connectoren kappt), (2)
 **Release-Commit + Deploy `v3.1.1`** (Badge + `##`-Block erst am Deploy-Tag, sonst brennt P6-X; der
-trace-Block kommt mit, **kein** Index-Neuaufbau), (3) danach der Rest von Gate/Z: Übersichtsgrafik
-§12.4 (gerendert **und angesehen**), Wurzel-`CLAUDE.md` + `docs/INDEX.md` rotieren, ROADMAP-Zeile,
-Phase auf ✅. **Neu und klein:** `rotate_index_updates.sh` um eine Datei/Archiv-Angabe erweitern
-(drei Zeilen, mit vorhandenen Tests) — damit wäre die Kettenrotation auch für die lebenden Heads
-mit langen Ketten benutzbar statt nur für `docs/INDEX.md`.
-
-### Nachtrag — drei Funde aus der Selbstprüfung, alle drei im selben Commit behoben
-
-**Die Tabelle, die vier Zellen in einer dreispaltigen Tabelle hatte.** Die Step-D-Zeile im
-Modulstatus bekam von mir einen durchgestrichenen Alt-Stand **nach** der letzten Pipe — also als
-vierte Spalte. Das bricht die Tabelle still: kein Fehler, kein roter Test, `doc_health` schweigt,
-und der Text rendert eine Zelle zu weit. Sichtbar geworden erst durch den Zellvergleich mit den
-Nachbarzeilen (3 vs. 4). Ein durchgestrichener Alt-Stand gehört **in** die Statusspalte.
-
-**Die Größenangabe, die 2 Byte daneben lag, und warum das ein roter Test war.** `doc_health ::
-_named_size_is_current` ist für die **Byte**-Form exakt; das ±2-KB-Fenster gilt nur der gerundeten
-`~NNKB`-Form. Meine INDEX-Zeile nannte 56.140 B für eine 56.138-B-Datei — 2 Byte, und `oversize`
-ging rot. Ich hatte das Fenster auch für die Byte-Form angenommen; die Toleranz ist eine bewusste
-Entscheidung gegen wachsende Dateien (ein Prozentfenster würde bei 106 KB ein 32-KB-Loch öffnen),
-und sie gilt nicht für Bytes. Kein Befund an der Sache, aber eine Erinnerung: die Zahl in der
-INDEX-Zeile ist der **gemessene** Wert, sonst arbeitet der Wächter gegen den, der ihn schreibt.
-
-**Die Wegwerf-Instanz lief noch, als ich fast committet hätte.** Nach dem letzten Probelauf bleibt
-sie per Konstruktion stehen (der Aufrufer stoppt sie, Hard Rule 9). P9-57 verlangt genau das als
-Prüfzeile — `ss -ltnp` zeigte beim Sammlen der Selbstprüfung noch `127.0.0.1:18781` (PID 2833710).
-Gestoppt **ausschließlich** über die PID-Datei, danach `ss` ohne Treffer auf 18765–18781. Die
-Produktionsinstanz (PID 1994214, Release `5414cb7`) wurde durchgehend nur gelesen.
+trace-Block kommt mit, **kein** Index-Neuaufbau), (3) danach der Rest von Gate/Z:
+Übersichtsgrafik §12.4 (**gerendert und angesehen**), `docs/INDEX.md` rotieren, ROADMAP-Zeile,
+Phase auf ✅. **Entfallen** ist der Restposten „`rotate_index_updates.sh` um eine Datei/Archiv-
+Angabe erweitern" — gebaut. **Neu offen, weil es dieser Block sichtbar gemacht hat:** die
+Wurzel-`CLAUDE.md` (114.789 B, 13.728 B Kette, 2 Präfixe) und `phase8_ui_graph/CLAUDE.md`
+(47.861 B) sind mit demselben Skript inzwischen je **einem** Befehl rotierbar — die Entscheidung
+über die Current-state-Rotation liegt bei dir.

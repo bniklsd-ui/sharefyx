@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
-# rotate_index_updates.sh — Rotationsregel für die `updated:`-Kette von docs/INDEX.md.
+# rotate_index_updates.sh — Rotationsregel für die `updated:`-Kette eines lebenden .md-Heads
+# (Default: docs/INDEX.md; seit 2026-10-03 mit Zieldatei/Archiv als Argumente).
 #
 # Vorbild ist rotate_session_block.sh: nichts wird abgetippt. Der Unterschied ist keine neue
 # Mechanik, sondern eine andere Schnittstelle — rotate_session_block.sh schneidet an
@@ -23,22 +24,49 @@
 # Teil-Erfolg ist schlimmer als ein Abbruch, weil die Kette danach *konform* aussieht und nie
 # jemand nachsieht.
 #
-# Aufruf:   scripts/rotate_index_updates.sh [repo_root]
+# **[2026-10-03, P9-Gate/Z]** Zwei optionale Argumente: Zieldatei und Archiv. Vorher war das
+# Skript auf `docs/INDEX.md` festgenagelt, obwohl **jeder** lebende Head dieselbe Kette trägt —
+# `phase9_hardening/CLAUDE.md` stand am 2026-10-03 bei **19.488 B Kette in 57.873 B Datei**,
+# also bei einem Drittel, das genau dieselbe Regel brauchte. Die Regel ist unverändert
+# dieselbe; nur die Schnittstelle ist allgemeiner geworden.
+#
+# Aufruf:   scripts/rotate_index_updates.sh [repo_root] [zieldatei] [archivdatei]
+#           Defaults: docs/INDEX.md · docs/INDEX_UPDATES_ARCHIVE.md
+#           Beide Pfade sind **repo-root-relativ** — der Zeiger, den die neue Zeile bekommt,
+#           ist genau der übergebene Archivpfad, und ein absoluter Pfad oder ein `..` würde
+#           dort eine Zeichenkette hinschreiben, die in keinem Dokument auflösbar ist
+#           (deshalb Abbruch statt stiller Unlesbarkeit).
 # Exit: 0 = rotiert · 1 = Abbruch, nichts geändert · 2 = nichts zu tun (bereits ein Eintrag)
 
 set -euo pipefail
 
 REPO_ROOT="${1:-.}"
-INDEX="${REPO_ROOT}/docs/INDEX.md"
-ARCHIVE="${REPO_ROOT}/docs/INDEX_UPDATES_ARCHIVE.md"
+TARGET_REL="${2:-docs/INDEX.md}"
+ARCHIVE_REL="${3:-docs/INDEX_UPDATES_ARCHIVE.md}"
+INDEX="${REPO_ROOT}/${TARGET_REL}"
+ARCHIVE="${REPO_ROOT}/${ARCHIVE_REL}"
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
 die() { echo "ABBRUCH: $*" >&2; exit 1; }
 
-[[ -f "$INDEX" ]] || die "Index nicht gefunden: $INDEX"
+# Der Zeiger in der neuen Zeile ist der übergebene Archivpfad wörtlich. Er muss als Relativpfad
+# innerhalb des Repos auflösbar sein, sonst schreibt die Rotation einen Zeiger, den kein Leser
+# findet — und niemand bemerkt es, weil die Datei danach sauber aussieht. **Diese Prüfung steht
+# vor den Existenzprüfungen**, nicht danach: ein absoluter Pfad, der nicht existiert, würde sonst
+# mit "Archiv fehlt" abbrechen und die eigentliche Ursache (der Pfad ist unbrauchbar) verschweigen.
+for p in "$TARGET_REL" "$ARCHIVE_REL"; do
+  case "$p" in
+    /*|../*|*/../*|*/..|./*) die "Pfad muss repo-root-relativ und ohne '..' sein: $p" ;;
+  esac
+done
+[[ -f "$INDEX" ]] || die "Zieldatei nicht gefunden: $INDEX"
 [[ -f "$ARCHIVE" ]] || die "Archiv fehlt: $ARCHIVE — mit L1-Header-Card anlegen, dann erneut laufen."
+# Selbst-Rotation wäre Datenverlust ohne Fehlermeldung: beide Schreibziele wären dieselbe Datei,
+# das `cp` des Archivs überschriebe den gerade gedrehten Ketten-Rest. Also vorher drauf schauen.
+[[ "$TARGET_REL" != "$ARCHIVE_REL" ]] \
+  || die "Zieldatei und Archiv sind dieselbe Datei ($TARGET_REL) — das würde die Kette in sich selbst drehen."
 
 cp "$INDEX" "$WORK/index.orig"
 cp "$ARCHIVE" "$WORK/archive.orig"
@@ -96,7 +124,7 @@ echo "OK  Kein Faden der Kette beginnt mit 'updated: '"
 echo "OK  Byte-Buchhaltung: ${#ROTATED[@]} rotierte(r) Eintrag/Einträge, Split verlustfrei"
 
 # ---------------------------------------------------------------- neue Zeile bauen
-NEW_LINE="${PREFIX}${KEEP} | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md"
+NEW_LINE="${PREFIX}${KEEP} | ältere Einträge: ${ARCHIVE_REL}"
 
 # ---------------------------------------------------------------- neuen Index bauen
 TOTAL_LINES="$(wc -l < "$INDEX")"
@@ -161,6 +189,6 @@ cp "$WORK/archive.orig" "${ARCHIVE}.bak"
 cp "$WORK/index.new"    "$INDEX"
 cp "$WORK/archive.new"  "$ARCHIVE"
 
-echo "OK  Index:  $(wc -c < "$WORK/index.orig") B → $(wc -c < "$INDEX") B"
-echo "OK  Archiv: $(wc -c < "$WORK/archive.orig") B → $(wc -c < "$ARCHIVE") B"
+echo "OK  Zieldatei ${TARGET_REL}: $(wc -c < "$WORK/index.orig") B → $(wc -c < "$INDEX") B"
+echo "OK  Archiv ${ARCHIVE_REL}: $(wc -c < "$WORK/archive.orig") B → $(wc -c < "$ARCHIVE") B"
 echo "    Backups: ${INDEX}.bak · ${ARCHIVE}.bak  (nach Sichtprüfung löschen)"

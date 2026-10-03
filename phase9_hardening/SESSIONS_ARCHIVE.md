@@ -5,7 +5,7 @@ read-when: Chronik einer älteren P9-Session gesucht — nicht beim normalen Arb
 detail: L3
 up: ./CLAUDE.md
 down:
-2026-10-03 (vierundzwanzigste Rotation: der **sechzehnte** Block wandert verbatim hierher — Step D endlich gefahren, P9-28/-29/-30 von ⬜/⚠️ auf ✅, Browser-Probe 16/16 mit **zwei** Gegenproben im Repo, 0 Zeilen Produktcode; Archiv 209.333 → 219.179 B, Head 65.986 → 56.140 B) | updated: 2026-10-03 (dreiundzwanzigste Rotation: der **fünfzehnte** Block — Abnahmematrix P9-1–P9-82 + `[VERIFY]`-Bilanz steht (`ABNAHME_MATRIX.md` neu), und drei Funde, die die Übergabe nicht trug: die „40 Einträge" waren ein Nummernbereich (belegt: **34**, V167–V172 unbelegt), P9-56 hat einen nicht angekündigten Tabu-Treffer (`phase7_hardening/tests/test_space_removal.py`, 17 Z.), und **GA2 wurde nie gebaut** — genau P9-27/-29/-30 sind die Zeilen ohne Probe; der **vierzehnte** Block (B17) wandert verbatim hierher, neuer Head-Block = 2026-10-03; Head **56.142 B → 53.215 B**, Archiv 195.890 B → 209.333 B — **weiter über dem Softcap, neu benannt**, die Restmasse bleiben die 7.467 B durchgestrichenen Statusabsätze im Modulstatus, Streichen bleibt Nikinger-Entscheidung) | 2026-10-02 (zweiundzwanzigste Rotation: der dreizehnte Block — Gate/Z-Doku-Hälfte (zwei Sektions-Rotationen, P9-L-Lauf, Skript-Defekt `rotate_index_updates.sh`) — wandert verbatim hierher; neuer Head-Block = **B17 gebaut** (ein Knopf, zwei korrigierte Zahlen im Backlog, Konflikt mit Konvention v3 zurückgestellt); Head 63.470 B → 53.968 B — **weiter über dem Softcap, neu benannt**, die Restmasse sind weiter die 7.467 B durchgestrichenen Statusabsätze im Modulstatus, Streichen bleibt Nikinger-Entscheidung) | updated: 2026-10-02 (einundzwanzigste Rotation: der zwölfte Block — Block trace gebaut, opencode/M3 — wandert verbatim hierher; neuer Head-Block = Gate/Z-Doku-Hälfte (zwei Sektions-Rotationen, P9-L-Lauf, Skript-Defekt `rotate_index_updates.sh`); Head 49.440 B → 44.360 B — **weiter über dem Softcap, neu benannt**, die Restmasse sind 7.467 B durchgestrichene Statusabsätze im Modulstatus, Streichen ist Nikinger-Entscheidung) | 2026-10-02 (zwanzigste Rotation: der zwölfte Block — Block trace gebaut, opencode/M3 — ist ans Dateiende gewandert, der elfte Block (Deploy-Abbruch behoben, `v3.1.0` live, Planungssession) verbatim ins Archiv; Head 46.993 B → 42.012 B) | 2026-10-02 (**neunzehnte Rotation, elfter Block** — der zehnte Block (doing-Block gebaut) wandert verbatim hierher; neuer Head-Block = Deploy-Abbruch `v3.1.0` behoben, `requests` war nie deklariert) · 2026-10-02 (**achtzehnte Rotation, zehnter Block** — der neunte Block (Mini-Plan doing-Block, Lock P9-V) wandert verbatim hierher; neuer Head-Block = doing-Block **gebaut**: `_BUCKETS["doing"]` + Rail-Label „In Arbeit", 6 neue Tests, Browser 11/11 mit Gegenlauf 7 rot, `pytest` 1128. **Head 44.508 B → 41.192 B** — und damit wieder 232 B **über** dem 40-KiB-Softcap, im INDEX neu benannt) | 2026-10-02 (**siebzehnte Rotation, neunter Block** — der achte Block (Deploy verschoben, Befund 11) wandert verbatim hierher; neuer Head-Block = Mini-Plan doing-Block, Lock P9-V) | 2026-10-01 (**sechzehnte Rotation, achter Block** — Deploy verschoben (Befund 11: `doing` ist im Deploy-Fall im Status-Feld erreichbar und zählt in keinem Ordner), `.toolbar-btn` in Standardoptik mit Pixel-Beleg 13/13, vier Tailscale-Bilder geklärt; Head 41.306 B, Archiv 152.730 B) | updated: 2026-10-01 (**fünfzehnte Rotation, A4-Vorbereitung** — Step-A-Block (2026-10-01, Domain live) verbatim aus dem Head; Head 42.376 B → 34.795 B) | 2026-10-01 (**vierzehnte Rotation, Step A** — Step-B-Block verbatim aus dem Head; Head 41.707 B → 29.415 B) | 2026-09-30 (**dreizehnte Rotation, Step B** — Step-B-Block [polkit-Regel gebaut, V153 entschieden: sudoers ist unter NoNewPrivileges unbaubar; systemd 255 kennt nur die grobe `manage-units`-Aktion, deshalb JS-Regel mit Unit-Attribut; V153-Probe ohne tailscaled-Kontakt] im Head **angehängt**, Step-H-Block verbatim ins Archiv; Head 34.873 B → 28.685 B) | 2026-09-30 (**zwoelfte Rotation, Step H** — Step-H-Block [`fastmcp` exakt gepinnt `==3.4.7`, der Range-Pin hatte den Live-Release bereits lautlos auf 3.4.7 gezogen, V163 mit drei Codepunkten beantwortet, Wächter als Deploy-Riegel, Gegenprobe 4 Verstöße → 7 rot] im Head **angehängt**, Step-G-Block verbatim ins Archiv; Head 33.175 B → 26.210 B) | 2026-09-30 (**elfte Rotation, Step G** — Step-G-Block [Lösch-Ort war unbaubar, TLS-Wegwerf für den Browserbeleg, 14/14] im Head **angehängt**, Step-F-Block verbatim ins Archiv; Head 32.668 B → 25.740 B) | 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
+updated: 2026-10-03 (fünfundzwanzigste Rotation: der **siebzehnte** Block wandert verbatim hierher — Kettenrotation des Heads (`UPDATES_ARCHIVE.md`, 36 von 37 Fäden) + `rotate_index_updates.sh` um Zieldatei/Archiv erweitert; **und ein Fund aus dem allerersten Schritt: die vorige Rotation hat dieser Zeile das `updated: `-Präfix genommen** (Commit aee387d, 2026-10-03) — das Feld war damit für jedes Werkzeug unsichtbar, `doc_health` prüft es nicht und eine Rotation dieses Archivs würde mit 'Keine updated:-Zeile' abbrechen. Präfix wiederhergestellt, Fehler benannt statt still mitgenommen) | 2026-10-03 (vierundzwanzigste Rotation: der **sechzehnte** Block wandert verbatim hierher — Step D endlich gefahren, P9-28/-29/-30 von ⬜/⚠️ auf ✅, Browser-Probe 16/16 mit **zwei** Gegenproben im Repo, 0 Zeilen Produktcode; Archiv 209.333 → 219.179 B, Head 65.986 → 56.140 B) | updated: 2026-10-03 (dreiundzwanzigste Rotation: der **fünfzehnte** Block — Abnahmematrix P9-1–P9-82 + `[VERIFY]`-Bilanz steht (`ABNAHME_MATRIX.md` neu), und drei Funde, die die Übergabe nicht trug: die „40 Einträge" waren ein Nummernbereich (belegt: **34**, V167–V172 unbelegt), P9-56 hat einen nicht angekündigten Tabu-Treffer (`phase7_hardening/tests/test_space_removal.py`, 17 Z.), und **GA2 wurde nie gebaut** — genau P9-27/-29/-30 sind die Zeilen ohne Probe; der **vierzehnte** Block (B17) wandert verbatim hierher, neuer Head-Block = 2026-10-03; Head **56.142 B → 53.215 B**, Archiv 195.890 B → 209.333 B — **weiter über dem Softcap, neu benannt**, die Restmasse bleiben die 7.467 B durchgestrichenen Statusabsätze im Modulstatus, Streichen bleibt Nikinger-Entscheidung) | 2026-10-02 (zweiundzwanzigste Rotation: der dreizehnte Block — Gate/Z-Doku-Hälfte (zwei Sektions-Rotationen, P9-L-Lauf, Skript-Defekt `rotate_index_updates.sh`) — wandert verbatim hierher; neuer Head-Block = **B17 gebaut** (ein Knopf, zwei korrigierte Zahlen im Backlog, Konflikt mit Konvention v3 zurückgestellt); Head 63.470 B → 53.968 B — **weiter über dem Softcap, neu benannt**, die Restmasse sind weiter die 7.467 B durchgestrichenen Statusabsätze im Modulstatus, Streichen bleibt Nikinger-Entscheidung) | updated: 2026-10-02 (einundzwanzigste Rotation: der zwölfte Block — Block trace gebaut, opencode/M3 — wandert verbatim hierher; neuer Head-Block = Gate/Z-Doku-Hälfte (zwei Sektions-Rotationen, P9-L-Lauf, Skript-Defekt `rotate_index_updates.sh`); Head 49.440 B → 44.360 B — **weiter über dem Softcap, neu benannt**, die Restmasse sind 7.467 B durchgestrichene Statusabsätze im Modulstatus, Streichen ist Nikinger-Entscheidung) | 2026-10-02 (zwanzigste Rotation: der zwölfte Block — Block trace gebaut, opencode/M3 — ist ans Dateiende gewandert, der elfte Block (Deploy-Abbruch behoben, `v3.1.0` live, Planungssession) verbatim ins Archiv; Head 46.993 B → 42.012 B) | 2026-10-02 (**neunzehnte Rotation, elfter Block** — der zehnte Block (doing-Block gebaut) wandert verbatim hierher; neuer Head-Block = Deploy-Abbruch `v3.1.0` behoben, `requests` war nie deklariert) · 2026-10-02 (**achtzehnte Rotation, zehnter Block** — der neunte Block (Mini-Plan doing-Block, Lock P9-V) wandert verbatim hierher; neuer Head-Block = doing-Block **gebaut**: `_BUCKETS["doing"]` + Rail-Label „In Arbeit", 6 neue Tests, Browser 11/11 mit Gegenlauf 7 rot, `pytest` 1128. **Head 44.508 B → 41.192 B** — und damit wieder 232 B **über** dem 40-KiB-Softcap, im INDEX neu benannt) | 2026-10-02 (**siebzehnte Rotation, neunter Block** — der achte Block (Deploy verschoben, Befund 11) wandert verbatim hierher; neuer Head-Block = Mini-Plan doing-Block, Lock P9-V) | 2026-10-01 (**sechzehnte Rotation, achter Block** — Deploy verschoben (Befund 11: `doing` ist im Deploy-Fall im Status-Feld erreichbar und zählt in keinem Ordner), `.toolbar-btn` in Standardoptik mit Pixel-Beleg 13/13, vier Tailscale-Bilder geklärt; Head 41.306 B, Archiv 152.730 B) | updated: 2026-10-01 (**fünfzehnte Rotation, A4-Vorbereitung** — Step-A-Block (2026-10-01, Domain live) verbatim aus dem Head; Head 42.376 B → 34.795 B) | 2026-10-01 (**vierzehnte Rotation, Step A** — Step-B-Block verbatim aus dem Head; Head 41.707 B → 29.415 B) | 2026-09-30 (**dreizehnte Rotation, Step B** — Step-B-Block [polkit-Regel gebaut, V153 entschieden: sudoers ist unter NoNewPrivileges unbaubar; systemd 255 kennt nur die grobe `manage-units`-Aktion, deshalb JS-Regel mit Unit-Attribut; V153-Probe ohne tailscaled-Kontakt] im Head **angehängt**, Step-H-Block verbatim ins Archiv; Head 34.873 B → 28.685 B) | 2026-09-30 (**zwoelfte Rotation, Step H** — Step-H-Block [`fastmcp` exakt gepinnt `==3.4.7`, der Range-Pin hatte den Live-Release bereits lautlos auf 3.4.7 gezogen, V163 mit drei Codepunkten beantwortet, Wächter als Deploy-Riegel, Gegenprobe 4 Verstöße → 7 rot] im Head **angehängt**, Step-G-Block verbatim ins Archiv; Head 33.175 B → 26.210 B) | 2026-09-30 (**elfte Rotation, Step G** — Step-G-Block [Lösch-Ort war unbaubar, TLS-Wegwerf für den Browserbeleg, 14/14] im Head **angehängt**, Step-F-Block verbatim ins Archiv; Head 32.668 B → 25.740 B) | 2026-09-30 (**zehnte Rotation, Step F** — Step-F-Block 2026-09-30 [doing/assignee, neunte P1-Contract-Öffnung, V160 beantwortet, Plan-§8.2-Korrektur 9 → 18 Hunks, `_BUCKETS`-Befund bewusst nicht behoben, V161-Vorabwert] im Head **angehängt**, Block 2026-09-30 [A1/A2/A3/A0b/A6] verbatim ins Archiv; Head 30.868 B → 23.312 B) | 2026-09-30 (neunte Rotation — Step-A-Block 2026-09-30 [A1/A2/A3/A0b/A6 ausgeführt, A6-eigener-Fehler, vier eigene Fehler, Gegenseiten-Belege] im Head angehängt, Block 2026-09-29 [Step A vorbereitet: Plan-A4 unbaubar, socat-Relay gebaut] verbatim ins Archiv; Head 41.523 B → 23.080 B) | 2026-09-29 (achte Rotation — Step-A-Vorbereitungs-Block 2026-09-29 [sechs gemessene Befunde, Plan-A4 als unbaubar nachgewiesen, socat-Relay-Unit + Caddy-Vorlage + ACL-Entwurf + geführtes Runbook, V149 beantwortet, V162 neu offen] im Head angehängt, Block 2026-09-28 [Step E: Reload-Overload] verbatim ins Archiv; Head 41.523 B → 21.880 B) | 2026-09-28 (siebte Rotation — Step-E-Block 2026-09-28 [Reload-Overload: Signatur aus dem /overview-Payload statt aus dem Graph-Payload, Positionen überleben den Wiedereintritt, V118 beantwortet] im Head angehängt, Block 2026-09-26 [Step C abgeschlossen: C8 + Host-Aufräumen pve + P9-22 deferred] verbatim ins Archiv; 13.606 B, 215 Zeilen) | 2026-09-26 (sechste Rotation — Step-C-Abschluss-Block 2026-09-26 [C8 + Host-Aufräumen pve + P9-22 deferred] im Head angehängt, Block 2026-09-25 (3) [GPU-Reboot-Persistenz / devN-Fix / C4 / C5] verbatim ins Archiv verschoben; Head trägt jetzt exakt einen Session-Block) | 2026-09-25 (fünfte Rotation — Step-C-Block 2026-09-25 (2) [Diagnose, Host-Fix, GPU-Messung, Boot-Persistenz] verbatim ins Archiv; Head trägt Block 2026-09-25 (3)) | 2026-09-25 (vierte Rotation — C6-/Backlog-Block vom 2026-09-25 verbatim ins Archiv; Head trägt den Step-C-Diagnose-Block 2026-09-25 (2)) | 2026-09-25 (dritte Rotation — Step-C-Teil-1-Block vom 2026-09-24 ins Archiv verschoben, verbatim; Head trägt jetzt den Step-C-Teil-2 / C6-Block vom 2026-09-25 allein) | 2026-09-24 (zweite Rotation — Step-D-Block vom 2026-09-23 aus dem Head verschoben, verbatim) | 2026-09-23 (erste Rotation — Step-0-Block aus dem Head verschoben, verbatim) | 2026-09-20 (angelegt, noch leer)
 ---
 
 # Phase 9 — Sessions Archive
@@ -15,6 +15,117 @@ trägt immer genau einen `## Session stopped`-Block, ältere Blöcke wandern ver
 Vorsatz: nichts abtippen, alles per Skript mit vier Gegenproben (Schnitt verlustfrei, neuer
 Head trägt genau einen Block, alle bewegten Blöcke im Archiv byte-identisch, Archivbestand
 unangetastet).
+
+## Session stopped — 2026-10-03 (sechzehnter Block: Step D ist endlich gefahren — drei Abnahmezeilen, die seit dem 2026-09-23 als „gebaut, aber nie belegt" im Kopf standen; opencode/M3, ein Commit, **kein Produktcode-Touch**, kein Deploy, kein Service-Touch)
+
+**Die Frage am Anfang war „sind keine Coding-Schritte in P9 mehr vorhanden?" — die ehrliche Antwort
+war: kein Feature-Schritt, aber eine Zeile, die seit drei Wochen behauptet, sie sei gebaut.** Step D2
+(Drop-Ziel zurück auf die Space-Wurzel) steht seit dem 2026-09-23 als gebaut in der Modulstatus-
+Tabelle, mit **drei** statischen Wächtern in `test_static_routes.py` — und **null** Fahrten am
+Browser. Die Wächter prüfen die *Form* des Aufrufs (`bindFolderDropTarget()` hat genau zwei
+Aufrufstellen, die Space-Zeile hängt hinter einem `if (space.own)`), nicht sein *Verhalten*.
+Drei Abnahmezeilen standen deshalb als ⬜ bzw. ⚠️ „strukturell erfüllt, nicht am Gerät belegt", und
+**die Station, die sie hätte schließen können, war die erste von GA2 in Plan §11 — die nie gebaut
+wurde.** Das ist dieselbe Fehlerklasse wie der trace-Beleg vom 2026-10-02: die Aussage über den
+Code war richtig, der Beleg für den Zustand *beim Menschen* fehlte, und beim Öffnen des Heads ist
+beides nicht unterscheidbar.
+
+**Gebaut ist eine Browser-Probe, kein Produktcode:** `phase9_hardening/scripts/p9_step_d_self_check.py`
+**16/16** gegen eine eigene TLS-Wegwerf-Instanz (`p9_step_d_wegwerf.py`, Port 18781 — außerhalb des
+belegten Bandes 18765–18780, damit P9-57s Aussage für dieses Band gültig bleibt). **16 Stationen für
+drei Zeilen** ist die eigentliche Aussage: ein Zug hat drei Fehlermöglichkeiten, und jede Station
+trägt eine Abnahmezeile im JSON-Feld `zeile` — die Zuordnung steht **im Beleg**, nicht im Fließtext,
+weil sie beim Zitieren sonst von der Station wegrutscht, die sie trägt.
+
+**Die eine Entscheidung, die den Block kippen konnte — und warum sie so ausgegangen ist.** Ein
+`element.dispatchEvent(new DragEvent(...))` hätte dieselben Stationen grün bekommen und **nichts**
+belegt: den Listener, nicht den Zug eines Menschen. Vorab gemessen, nicht angenommen — Playwrights
+echte Maus-Input-Pipeline in Chromium feuert die volle Kette (`dragstart` → `dragover` → `drop`
+**mit** `dataTransfer`-Inhalt), sogar am Chromium-Headless-Shell, also ohne CDP-Drag-Interception.
+Station 2 misst diesen Ereignisstrom deshalb mit und trägt `dragstart=1, dragover=19, drop=1`.
+**Und die Gegenprobe G1 macht den Unterschied sichtbar:** mit entfernter Space-Bindung bleibt
+`over=19` stehen (der Zeiger lag wohl auf der Zeile), `drop=0` — der Browser hat den Drop nie
+angenommen, weil ohne `preventDefault` auf `dragover` kein Ziel gilt. „Der Code fehlt" und „der
+Mauszeiger war nicht dort" sind zwei verschiedene Fehler, und diese Probe unterscheidet sie.
+
+**P9-30 ist als *Aussehen* belegt, nicht als Klassennamen:** berechneter Stil am Ziel während des
+Zugs — `border-top-style: dashed`, Farbe `rgb(62, 141, 243)` = `--accent` — auf der Space-Zeile, die
+im Normalzustand keine gestrichelte Kante hat, plus zwei Bilder (Rail-Zuschnitt im Zug gegen
+denselben Rail nach dem Zug: Toast, Ordnerzähler 3 → 2, Kante weg). Station 4 prüft das
+**Wieder-Verschwinden** und bleibt im Gegenlauf G1 grün, weil ihre Aussage eine *Abwesenheit* ist —
+bei nie gesetzter Klasse ist „nicht mehr da" trivial wahr. Das ist kein Loch, sondern die Aussage;
+ich hätte es als „grün im Gegenlauf = wertlos" verbuchen können, und wäre falsch gewesen.
+
+**Drei eigene Fehler, alle im selben Commit behoben — und jeder davon war ein Messgerät, das
+etwas anderes maß als behauptet.** (1) Der Ereigniszähler zählte **sich selbst**: `start=3, over=57,
+drop=3` für *einen* Zug, weil das Zähler-Snippet bei jedem `evaluate` die drei Listener erneut am
+`document` registrierte. Behoben mit Einmal-Flag plus getrenntem Reset. (2) `store.create()`
+**hängt** an, es leert nicht — der zweite `start` auf demselben `DATA_ROOT` sah jedes Item doppelt,
+und der Zug fand die Zeile nicht mehr, weil der Vorlauf sie schon verschoben hatte. Behoben durch
+Leeren **vor** dem Säen, mit einer harten Schranke: gelöscht wird nur `/tmp/opencode/p9-step-d-*`,
+`ROOT` muss so heißen, sonst Abbruch. (3) Der neue Wächter war **rot**, weil er das verbotene Wort
+im Docstring des Skripts selbst verbietet — ein Wächter, der die Begründung verbietet, verbietet die
+Sache nicht. Behoben durch `tokenize` statt Rohtext. **Neunte Wiederholung derselben Repo-Lehre,
+zum ersten Mal am eigenen neuen Test.**
+
+**Ein vierter Fund, gegen den ich nichts gebaut habe, nur benannt:** die Regel in
+`test_committed_probe_evidence.py` erkennt einen Gegenlauf daran, dass der Dateiname **endet** auf
+`_gegenprobe` — und **keiner** der sechs älteren Block-Belege erfüllt sie, weil keiner einen
+Gegenlauf im Repo hat. Die Regel wurde also gegen nicht existierende Dateien geschrieben und hat
+noch nie zugeschlagen; meine beiden Dateien fielen zuerst darauf und wurden umbenannt. Der
+generelle Punkt: eine Prüfung, die nie etwas gefunden hat, ist nicht „erfolgreich", sie ist
+ungeprüft. Diesmal wie beim trace-Block haben **meine** Dateien die Regel ausgelöst, nicht eine
+fremde.
+
+**Selbstprüfung §0.4 — heute gemessen, nicht aus der Doku übernommen:** Probe **16/16**,
+Gegenproben **11/16** (G1) und **15/16** (G2), `pytest` **1169 → 1175** (6 neue Wächter),
+`ui_budget` 5/5, `doc_health` 0/0/0/0 nach dem Nachziehen der INDEX-Zeilen, Tabu-Bereichs-Diff auf
+die sechs Hartpfade **leer** — `git diff` auf `app.js` und `tree.js` ist nach beiden Gegenläufen
+leer, das ist der Nachweis, dass die Probe Produktcode **nur gelesen** hat · **kein `systemctl`, kein
+`pkill -f`**: die Wegwerf-Instanz ausschließlich über ihre PID-Datei gestoppt · Live-Zustand vorher
+gemessen und unverändert: neue Domain `400` (erwartet bis A7), Funnel-Rückfall `200`, Live-Release
+`5414cb7` = Badge `v3.1.0`, `local.env` unverändert.
+
+**Benannt, nicht entschieden:** `phase9_hardening/ABNAHME_MATRIX.md` steht jetzt bei **44.222 B =
+3.262 B über dem Softcap** (vor diesem Block 40.573 B) — der Zuwachs ist Pflichtpflege eines
+gebauten Belegs, und die drei Zeilen sind bereits auf Stand + Beleg gestrafft, die Herleitung steht
+im Docstring und in diesem Block. Die zwei benannten Wege raus: der Deploy `v3.1.1` löst die vier
+„warten auf den Deploy"-Posten am Dateiende auf (~4 KB in einem Block), und die `updated:`-Kette
+ließe sich per `scripts/rotate_index_updates.sh` rotieren — das Skript ist allerdings auf
+`docs/INDEX.md` festgenagelt und braucht dafür eine Datei/Archiv-Angabe; **ein Restposten, in
+diesem Block nicht gebaut**, weil es gemeinsame Infrastruktur wäre.
+
+**Nächster Schritt — unverändert deine Zuständigkeit, und diese Session hat daran nichts
+verschoben:** (1) **A7+A8 in einer Sitzung** (`step_a/RUNBOOK_STEP_A.md`; schließt P9-10b, P9-12,
+P9-13, P9-15, V150, V164 — ein Schnitt, weil der A7-Restart beide Connectoren kappt), (2)
+**Release-Commit + Deploy `v3.1.1`** (Badge + `##`-Block erst am Deploy-Tag, sonst brennt P6-X; der
+trace-Block kommt mit, **kein** Index-Neuaufbau), (3) danach der Rest von Gate/Z: Übersichtsgrafik
+§12.4 (gerendert **und angesehen**), Wurzel-`CLAUDE.md` + `docs/INDEX.md` rotieren, ROADMAP-Zeile,
+Phase auf ✅. **Neu und klein:** `rotate_index_updates.sh` um eine Datei/Archiv-Angabe erweitern
+(drei Zeilen, mit vorhandenen Tests) — damit wäre die Kettenrotation auch für die lebenden Heads
+mit langen Ketten benutzbar statt nur für `docs/INDEX.md`.
+
+### Nachtrag — drei Funde aus der Selbstprüfung, alle drei im selben Commit behoben
+
+**Die Tabelle, die vier Zellen in einer dreispaltigen Tabelle hatte.** Die Step-D-Zeile im
+Modulstatus bekam von mir einen durchgestrichenen Alt-Stand **nach** der letzten Pipe — also als
+vierte Spalte. Das bricht die Tabelle still: kein Fehler, kein roter Test, `doc_health` schweigt,
+und der Text rendert eine Zelle zu weit. Sichtbar geworden erst durch den Zellvergleich mit den
+Nachbarzeilen (3 vs. 4). Ein durchgestrichener Alt-Stand gehört **in** die Statusspalte.
+
+**Die Größenangabe, die 2 Byte daneben lag, und warum das ein roter Test war.** `doc_health ::
+_named_size_is_current` ist für die **Byte**-Form exakt; das ±2-KB-Fenster gilt nur der gerundeten
+`~NNKB`-Form. Meine INDEX-Zeile nannte 56.140 B für eine 56.138-B-Datei — 2 Byte, und `oversize`
+ging rot. Ich hatte das Fenster auch für die Byte-Form angenommen; die Toleranz ist eine bewusste
+Entscheidung gegen wachsende Dateien (ein Prozentfenster würde bei 106 KB ein 32-KB-Loch öffnen),
+und sie gilt nicht für Bytes. Kein Befund an der Sache, aber eine Erinnerung: die Zahl in der
+INDEX-Zeile ist der **gemessene** Wert, sonst arbeitet der Wächter gegen den, der ihn schreibt.
+
+**Die Wegwerf-Instanz lief noch, als ich fast committet hätte.** Nach dem letzten Probelauf bleibt
+sie per Konstruktion stehen (der Aufrufer stoppt sie, Hard Rule 9). P9-57 verlangt genau das als
+Prüfzeile — `ss -ltnp` zeigte beim Sammlen der Selbstprüfung noch `127.0.0.1:18781` (PID 2833710).
+Gestoppt **ausschließlich** über die PID-Datei, danach `ss` ohne Treffer auf 18765–18781. Die
+Produktionsinstanz (PID 1994214, Release `5414cb7`) wurde durchgehend nur gelesen.
 
 ## Session stopped — 2026-10-03 (fünfzehnter Block: Abnahmematrix P9-1–P9-82 und `[VERIFY]`-Bilanz stehen — und die Übergabezahl „40 Einträge" war ein Nummernbereich; opencode/M3, ein Commit, kein Code-Touch, kein Deploy, kein Service-Touch)
 
