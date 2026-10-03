@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #
 # archive_index_entries.sh — die datierten Nachtraige der INDEX-Eintraege verbatim in ein
-# L3-Archiv verschieben (Gate/Z, 2026-10-04; Nikinger-Entscheidung 2026-10-04).
+# L3-Archiv verschieben (Gate/Z, 2026-10-03; Nikinger-Entscheidung 2026-10-03).
 #
 # **Was das loest.** `docs/INDEX.md` waechst nicht an einem Stueck, sondern an den *Nachtraegen*:
 # jeder Session-Eintrag haengt seinen datierten Nachtrag an die Zeile des betroffenen Dokuments.
-# Am 2026-10-04 waren das **37.391 B von 71.491 B** (43 von 93 Eintraegen) — mehr als die Haelfte
+# Am 2026-10-03 waren das **37.391 B von 71.491 B** (43 von 93 Eintraegen) — mehr als die Haelfte
 # der Datei, und der Grund fuer die Ueberschreitung, die P9-3 und V145 seit Wochen als ungeklaert
 # fuehren. Die `updated:`-Kette des INDEX ist davon **nicht** betroffen (1.155 B, am 2026-10-03
 # rotiert) — wer die Datei rotieren wollte, hat die falsche Stelle angefasst.

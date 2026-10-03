@@ -314,7 +314,7 @@ def test_a_missing_target_under_an_explicit_path_names_that_path(tmp_path):
 
 
 def test_every_thread_of_a_living_head_chain_is_separated():
-    """Fund vom 2026-10-04 — die dritte Ausprägung derselben Fehlerklasse.
+    """Fund vom 2026-10-03 — die dritte Ausprägung derselben Fehlerklasse.
 
     `scripts/rotate_index_updates.sh` meldete für `phase9_hardening/CLAUDE.md` **„Bereits konform:
     die 'updated:'-Kette hat nur einen Eintrag"** (exit 2), und das war *wahr* und zugleich das

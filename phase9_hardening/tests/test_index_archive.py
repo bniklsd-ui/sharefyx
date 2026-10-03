@@ -1,11 +1,11 @@
-"""Gate/Z (2026-10-04) — die Nachtrags-Rotation der INDEX-Karte, und was sie wieder verbietet.
+"""Gate/Z (2026-10-03) — die Nachtrags-Rotation der INDEX-Karte, und was sie wieder verbietet.
 
-`docs/INDEX.md` stand am 2026-10-04 bei 71.573 B, davon **37.391 B datierte Nachträge in 43 von
+`docs/INDEX.md` stand am 2026-10-03 bei 71.573 B, davon **37.391 B datierte Nachträge in 43 von
 93 Einträgen**. Das ist die seit Wochen als ungeklärt geführte Überschreitung (P9-3/V145), und
 sie ist am 2026-10-03 **gemessen** worden: die `updated:`-Kette der Karte hat 1.155 B und war
 rotiert, und selbst ein Cap von 300 B je Eintragszeile hätte 39.971 B ergeben — das alte
 Kriterium 38.912 B (P8.6 Plan 2 §1.2, für eine Datei mit weniger Zeilen gesetzt) war per
-Kürzen **unerreichbar**. Nikinger-Entscheidung 2026-10-04: Nachträge ins L3-Archiv, Kriterium
+Kürzen **unerreichbar**. Nikinger-Entscheidung 2026-10-03: Nachträge ins L3-Archiv, Kriterium
 auf den 40-KiB-Softcap neu baseliniert.
 
 Diese Tests halten das Ergebnis fest und **die vier Grenzen, an denen der erste Entwurf des

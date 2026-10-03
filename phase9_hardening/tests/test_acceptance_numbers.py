@@ -1,7 +1,7 @@
-"""Gate/Z (2026-10-04) — die Zahlen der Abnahmematrix dürfen nicht still veralten.
+"""Gate/Z (2026-10-03) — die Zahlen der Abnahmematrix dürfen nicht still veralten.
 
 Die Abnahmematrix ist das zentrale Artefakt des Gates: 82 Abnahmezeilen und 34 belegte
-`[VERIFY]`-Einträge, jede mit Stand und Beleg. Ihre **Bilanz** stand am 2026-10-04 an **vier**
+`[VERIFY]`-Einträge, jede mit Stand und Beleg. Ihre **Bilanz** stand am 2026-10-03 an **vier**
 Stellen im Repo — in der Matrix selbst, in der Modulstatus-Zeile des Phase-Heads, in der
 `updated:`-Kette des Heads und in der INDEX-Zeile der Matrix — und die vier Stellen nannten
 **drei verschiedene Zahlen**. Eine davon war schlicht falsch: P9-3 und V145 nannten
@@ -25,7 +25,7 @@ Diese Tests schließen genau diese Lücke, in drei Regeln:
 
 Dazu zwei Wächter, die jeweils eine *gemessene Diagnose* festnageln, statt sie zu behaupten:
 die Unerreichbarkeit des INDEX-Kriteriums und der Hebel, der den Phase-9-Head unter den
-Softcap bringen soll. Beide sind am 2026-10-04 aus **falschen** Annahmen entstanden, und eine
+Softcap bringen soll. Beide sind am 2026-10-03 aus **falschen** Annahmen entstanden, und eine
 falsche Annahme, die einmal im Repo steht, wird sonst zur Entscheidungsgrundlage.
 
 **Warum die Zählregel für `[VERIFY]` hier steht und nicht nur in der Matrix:** V162 und V163
@@ -50,8 +50,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 MATRIX = REPO_ROOT / "phase9_hardening" / "ABNAHME_MATRIX.md"
 HEAD = REPO_ROOT / "phase9_hardening" / "CLAUDE.md"
 INDEX = REPO_ROOT / "docs" / "INDEX.md"
-INDEX_CRITERION_BYTES = 38912  # der P8.6-Plan-2-Wert, seit 2026-10-04 **ersetzt** (Nikinger-Entscheidung)
-SOFTCAP_BYTES = 40 * 1024   # das Kriterium, das seit 2026-10-04 gilt — und das `doc_health` bereits prüft
+INDEX_CRITERION_BYTES = 38912  # der P8.6-Plan-2-Wert, seit 2026-10-03 **ersetzt** (Nikinger-Entscheidung)
+SOFTCAP_BYTES = 40 * 1024   # das Kriterium, das seit 2026-10-03 gilt — und das `doc_health` bereits prüft
 SIZE_TOLERANCE_BYTES = 2048  # dasselbe absolute Band wie doc_health._named_size_is_current
 CAP_BYTES = 300  # der Cap, mit dem P9-3/V145 die Unerreichbarkeit des Kriteriums belegen
 
@@ -211,7 +211,7 @@ def test_only_the_matrix_carries_the_balance_not_the_head_and_not_the_index():
 
 def test_no_living_phase9_file_calls_a_dated_balance_the_present_one():
     """Regel 2: ein datierter Faden darf seine Momentaufnahme nennen, nicht behaupten, sie sei
-    heute der Stand. Genau das stand am 2026-10-04 als „Matrix <Tagesbilanz>" in der Kette des
+    heute der Stand. Genau das stand am 2026-10-03 als „Matrix <Tagesbilanz>" in der Kette des
     Phase-9-Heads — zwei Tage nach dem Stand, den die Zahl nennt. Die verbotene Form steht hier
     bewusst **nicht** wörtlich: ein Wächter, der das Wort verbietet, darf es nicht selbst im
     Docstring tragen (dieselbe Falle wie der Step-D-Wächter vom 2026-10-03, der daran rot war).
@@ -248,7 +248,7 @@ def test_the_live_byte_figures_in_the_matrix_are_the_real_sizes():
 
     # **Das ist der neu baselinerte Wert, und er ist zum ersten Mal eine Prüfung statt einer Angabe.**
     # Vorher stand hier `assert size > 38.912` — eine Prüfung, die nur *fehlschlagen* konnte, wenn
-    # die Datei schrumpfte, und die seit dem 2026-10-04 ohnehin überholt war. Jetzt gilt die
+    # die Datei schrumpfte, und die seit dem 2026-10-03 ohnehin überholt war. Jetzt gilt die
     # Gegenrichtung: P9-3 und V145 stehen auf ✅, und ✅ ist nur wahr, wenn die Karte unter dem
     # Kriterium liegt. Wächst sie darüber, wird nicht die Zeile stillschweigend falsch, sondern
     # dieser Test rot.
@@ -266,7 +266,7 @@ def test_the_live_byte_figures_in_the_matrix_are_the_real_sizes():
 
 
 def test_the_nightrags_stay_archived_and_the_row_keeps_its_derivation():
-    """P9-3 ist am 2026-10-04 von ⚠️ auf ✅ gewandert, und damit stellt sich die Frage neu, was diese
+    """P9-3 ist am 2026-10-03 von ⚠️ auf ✅ gewandert, und damit stellt sich die Frage neu, was diese
     Zeile jetzt noch tragen muss.
 
     **Zwei Dinge, und sie werden verwechselt.** Der *Zustand* ist: die Nachträge sind archiviert,
@@ -325,7 +325,7 @@ def _struck_mass(path: Path) -> int:
 
 
 def test_the_lever_named_against_the_head_oversize_is_the_measured_one():
-    """Der vierte Fund vom 2026-10-04, und der billigste: **der Hebel existiert nicht in der
+    """Der vierte Fund vom 2026-10-03, und der billigste: **der Hebel existiert nicht in der
     benannten Größe.**
 
     Seit dem 2026-10-03 steht in diesem Dateikopf, in der `docs/INDEX.md`-Zeile dazu und in zwei
