@@ -744,8 +744,33 @@ Ziel: `SPACE_PUBLIC_BASE_URL` und `ALLOWED_HOSTS` auf die neue Domain. **Befund 
 > `-H "Host: savefyx-...ts.net"` → weiterhin `200`. **Nicht gebaut**: ein Neustart des
 > Produktionsdiensts ist deine Sache, und ein `install_units.sh` ohne Not ist der Moment, in
 > dem aus einem Kalibrier-Schritt ein Betriebsereignis wird.
+>
+> **✅ AUSGEFÜHRT 2026-10-03, 12:59 Uhr** — der Vorschlag ist damit entschieden und erledigt, in
+> genau dieser Reihenfolge (A7a, dann A7, dann A8 am selben Tag). **Die Ausgabe, die kam:**
+> `install_units.sh` erzeugt **zehn** Units (nicht fünf bis sechs — die Vorhersage in der Übergabe
+> war zu niedrig, es waren nur die *Maße* falsch, nicht der Ablauf), alle vier Timer danach
+> `enabled` **und** `active`, `tailscaled-watchdog` mit einem echten Takt `healthy: Self.Online=true`
+> (der Takt ist der Beweis, nicht der laufende Timer — Lehre vom 2026-10-01). **Neu dabei:** die
+> Unit trägt jetzt `SPACE_UI_LEGACY_ORIGIN=` / `_UNTIL=` **leer**, weil `local.env` noch keine
+> `LEGACY_*`-Zeilen hatte; leer **beide** heißt laut `config.py:44` ausdrücklich *kein Fenster* und
+> ist kein halbes Fenster, also kein Startfehler. **Gegenprobe, die A7a von A7 trennt:** der
+> `issuer` stand nach A7a unverändert auf der alten Adresse — damit ist belegt, dass der Vorlauf
+> den `resource` nicht angefasst hat.
 
-In `phase3_edge/local.env` (git-ignoriert, die einzige echte Konfigurationsquelle):
+**✅ AUSGEFÜHRT 2026-10-03, 13:05 Uhr** (A7, der Schnitt — `issuer` und alle drei Endpunkte zeigen
+auf die neue Domain, App-Start ohne Traceback, beide Adressen extern 200 mit gültigem TLS).
+**Der Ist-Zustand von `local.env` steht hier, weil die Datei git-ignoriert ist und ein
+Neustart sie nicht zurücksetzt** — wer sie nicht im Repo findet, findet sie hier:
+
+```
+ALLOWED_HOSTS=sharefyx.eurofyx.com,savefyx-vmware-virtual-platform.tail4a8b49.ts.net,127.0.0.1
+PUBLIC_BASE_URL=https://sharefyx.eurofyx.com
+LEGACY_ORIGIN=https://savefyx-vmware-virtual-platform.tail4a8b49.ts.net
+LEGACY_UNTIL=2026-10-17
+```
+
+Vor dem Lauf in `phase3_edge/local.env` (git-ignoriert, die einzige echte Konfigurationsquelle —
+die beiden folgenden Blöcke sind die **Zielwerte**, und seit dem 2026-10-03 der **Ist-Zustand**):
 
 ```
 PUBLIC_BASE_URL=https://<domain>
@@ -756,7 +781,12 @@ LEGACY_UNTIL=<A7-Datum + 14 Tage, JJJJ-MM-TT>
 
 **[2026-10-01] `LEGACY_*` = das UI-Übergangsfenster** (Befund 5, umentschieden): die alte Adresse
 schreibt bis einschließlich `LEGACY_UNTIL` (Europe/Berlin), danach liest sie nur; Warndialog bei
-jedem Laden. Wirkt **nur, wenn der Code vor A7 deployt ist** — der Live-Release ist vom 2026-09-18.
+jedem Laden. Wirkt **nur, wenn der Code vor A7 deployt ist** — ~~der Live-Release ist vom 2026-09-18~~
+**[2026-10-03: Bedingung erfüllt]** der Live-Release ist `v3.1.0` vom 2026-10-02, das
+Übergangsfenster ist also **live**, und A7 hat es scharf geschaltet. Gemessen: das Fenster öffnet
+die Schreibpfade der alten Adresse **heute und am letzten Tag (2026-10-17, `clock() <= legacy_until`,
+`config.py:76`) und schließt am 2026-10-18 von selbst** — `clock` ist pro Request, der Dienst muss
+dafür **nicht** neu gestartet werden (genau dafür ist es ein `Callable`, kein Flag).
 Ein Tippfehler in den zwei Zeilen ist ein Startfehler (fail-closed), kein stilles „aus".
 
 Drei Punkte, die dabei nicht verloren gehen dürfen:
@@ -796,6 +826,19 @@ A7 die Metadaten mit dem neuen `issuer` liefert (Befund 4, Plan §3.3).
 - **Ausgabe lesen:** je Konto ein echter `list_spaces`-Aufruf, **kein `curl`**. Ein gültiges
   Zertifikat und ein 200 auf `/health` sagen nichts darüber, ob der Anthropic-Connector die
   Adresse akzeptiert — das ist `[VERIFY] V150` und nur ein echter Aufruf schließt sie.
+
+**✅ TEILWEISE AUSGEFÜHRT 2026-10-03, 13:1x Uhr:** Konto **niklas** läuft über
+`https://sharefyx.eurofyx.com/mcp` (echter Aufruf, Spaces kommen an) — das zweite Konto steht aus,
+also sind **P9-13 und V150 ⚠️ „1 von 2"** und nicht ✅. **Was der Schnitt real gekostet hat:** die
+alten Token wurden entwertet (`resolver.py:48` — „Token für eine andere Ressource ausgestellt"), die
+Neuanmeldung über die neue Adresse war **zwingend**, kein Neustart-Fehler. **Reihenfolge-Regel,
+aus dieser Sitzung:** das zweite Konto **erst** umstellen, wenn das erste steht — ein halb
+umgestellter Zustand macht die Fehlersuche unbrauchbar. **Für den Connector gibt es keinen
+Übergang**: das `LEGACY_*`-Fenster gilt ausschließlich der Web-UI (CSRF-Origin, `config.py:81`),
+die alte Adresse bleibt als **Browser**-Rückweg bis 2026-10-17 nutzbar, der alte **MCP**-Pfad
+nicht. **Rückweg, falls A8 klemmt:** `PUBLIC_BASE_URL` in `local.env` zurück auf die alte Adresse,
+`install_units.sh`, `systemctl restart sharefyx-mcp` — dann sind die alten Token wieder gültig
+(„Rückweg = dieselbe A7/A8-Sequenz rückwärts", Befund 4).
 
 ### A9 — Funnel als Rückfall dokumentieren (mache ich, sobald A1–A8 stehen)
 
