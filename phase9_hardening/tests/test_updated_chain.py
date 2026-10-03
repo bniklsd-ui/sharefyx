@@ -39,6 +39,16 @@ FIELD_RE = re.compile(r"^updated: ", re.M)
 CHAIN_RE = re.compile(r"\d{4}-\d{2}-\d{2}\s*\(")          # eine datierte Kette ist da …
 SPLIT_ANCHOR_RE = re.compile(r" \| (?=\d{4}-\d{2}-\d{2})")  # … und so sieht der Anker ihren Anfang
 THREAD_PREFIX_RE = re.compile(r" \| updated: (?=\d{4}-\d{2}-\d{2})")
+# Ein Faden, der **gar keinen** ` | `-Trenner hat, ist für denselben Anker ebenfalls blind — und
+# das ist die **vierte** Ausprägung, gefunden am 2026-10-04 von `prepend_updated_chain.sh`, das
+# beim Voranstellen eines Fadens abbrach: "ein Faden beginnt bei 8919 ohne ' | '-Trenner". Die drei
+# vorhandenen Prüfungen dieses Moduls (Feld, ` | updated: `, ` · `) erkennen das **nicht**.
+DATE_START_RE = re.compile(r"\d{4}-\d{2}-\d{2}\s*\(")
+# Der zweite Blickblick schließt den ` | updated: `-Präfix aus: ein präfigierter Faden ist blind,
+# aber **aus dem anderen Grund** — Clause 2 dieser Datei meldet ihn schon, undClause 4 soll nicht
+# dieselbe Fundstelle zweimal zählen. Zwei getrennte Assertions, weil Python keine Lookbehinds
+# verschiedener Breite in einer Klammer erlaubt.
+BLIND_RE = re.compile(r"(?<! \| )(?<!updated: )\d{4}-\d{2}-\d{2}\s*\(")
 DOT_SEPARATOR_RE = re.compile(r" · (?=\d{4}-\d{2}-\d{2}\s*\()")
 
 # Datei -> (fehlendes `updated:`-Feld, Fäden mit Präfix, Fäden hinter ` · `).
@@ -76,6 +86,47 @@ def chain_defects(fm: str) -> tuple[bool, int, int]:
         len(THREAD_PREFIX_RE.findall(fm)),
         len(DOT_SEPARATOR_RE.findall(fm)),
     )
+
+# Datumsanfänge, die der Anker nicht sieht und die **doch** keine Verstoße sind — oder
+# Verstoße in fremden Dateien, die nicht gebaut wurden. Zwei Arten, eine Liste: Sie sind
+# harmlos — ohne ` | ` davor schneidet der Anker dort nie —, aber sie tauchen in jeder Zählung auf
+# und müssen deshalb **namentlich** benannt sein, sonst ist die Zahl nicht prüfbar. Nach dem Kontext
+# benannt, nicht nach Byte-Offset: ein Offset ändert sich bei jedem neuen Faden.
+KNOWN_BLIND: dict[str, list[str]] = {
+    # **Zwei echte verklebte Fäden in fremden Phasen — nicht gebaut.** Sie folgen dem Muster der
+    # beiden anderen Ausnahmelisten dieses Moduls: gemessen, benannt, nicht angefasst. Wer sie
+    # repariert, streicht sie hier, und `test_the_named_blind_spots_still_exist` meldet den Eintrag
+    # als tot. Nach dem Kontext benannt, nicht nach Byte-Offset — ein Offset ändert sich bei jedem
+    # neuen Faden, ein Kontext nicht.
+    "phase6_shares/IMAGES_PLAN.md": [
+        "2026-08-19 (neu geschrieben, Planungssession",  # 1 Faden, abgeschlossene Phase
+    ],
+    "phase8_5_picker_release/SESSIONS_ARCHIVE.md": [
+        "2026-09-07 (D4-Sichtprobe-Folgesession-Block rotiert",  # 1 Faden, Archiv
+    ],
+}
+# **`phase9_hardening/SESSIONS_ARCHIVE.md` stand am 2026-10-04 kurz in dieser Liste und ist jetzt
+# leer** — und damit ist das der Grund, warum die Liste kein leeres Element zulassen darf: ein
+# Kommentar-Element wäre ein Wächter, der **nur grün werden kann**, die schlimmere Form von
+# "kein Fund". Die Datei trug drei verklebte Fäden (repariert, +9 B) **und** eine Prosa-Erwähnung
+# "Head trägt Block 2026-09-25 (3)", die wie ein Faden aussieht: das Datum ist das Datum *dieses*
+# Fadens und steht bereits am Fadenanfang, also ist "Head trägt Block (3)" **verlustfrei in der
+# Sache** und behebt zugleich den Abbruch von `prepend_updated_chain.sh` — das Skript kann einen
+# Faden und eine Erwähnung nicht unterscheiden und bricht fail-closed ab, was richtig ist. Seitdem
+# hat diese Datei **null** blinde Stellen, und taucht wieder eine auf, ist sie ein frischer Verstoß.
+
+
+def blind_positions(fm: str) -> list[str]:
+    """Datumsanfänge einer Kette, die der Rotations-Anker nicht sieht (Kette selbst ausgenommen)."""
+    if not CHAIN_RE.search(fm):
+        return []
+    line = next((l for l in fm.splitlines() if l.startswith("updated: ")), "")
+    body = line[len("updated: ") :]
+    # Gesucht wird in `body[1:]`, damit der **erste** Faden (Position 0) nicht als verklebt gilt —
+    # und indiziert wird in denselben String. Ein Off-by-one an dieser Stelle hat die erste Fassung
+    # erzeugt: die Treffer begannen mit dem Trennerzeichen statt mit dem Datum.
+    rest = body[1:]
+    return [rest[mm.start() : mm.start() + 60] for mm in BLIND_RE.finditer(rest)]
 
 
 def md_files() -> list[Path]:
@@ -157,6 +208,49 @@ def test_the_split_anchor_really_is_blind_for_a_prefixed_thread():
     fixed = "2026-10-03 (a) | 2026-10-02 (b)"
     assert len(SPLIT_ANCHOR_RE.split(broken)) == 1
     assert len(SPLIT_ANCHOR_RE.split(fixed)) == 2
+
+
+def test_no_thread_is_invisible_to_the_rotation_anchor():
+    """Die vierte Ausprägung, und die ist von `prepend_updated_chain.sh` gefunden worden.
+
+    Am 2026-10-04 brach das Skript beim Voranstellen ab: die Kette von `SESSIONS_ARCHIVE.md` trug
+    **drei** Fäden, die ohne jeden ` | `-Trenner in ihrem Vorgänger klebten (30 sichtbare Fäden bei
+    33 Rotationssätzen). Repariert (+9 B, Fadeninhalte byte-identisch). Ohne diesen Test wäre der
+    Defekt beim nächsten Rotieren **stillschweigend** wieder aufgetreten — das Skript bricht ab,
+    aber es *findet* nicht, und diese Datei wird nicht bei jedem Rotieren angefasst.
+    """
+    for path in md_files():
+        rel = path.relative_to(REPO_ROOT).as_posix()
+        fm = frontmatter(path)
+        if fm is None:
+            continue
+        blind = blind_positions(fm)
+        if not blind:
+            continue
+        named = KNOWN_BLIND.get(rel, [])
+        unexpected = [b for b in blind if not any(b.startswith(n[:20]) for n in named)]
+        assert not unexpected, (
+            f"{rel}: {len(unexpected)} Faden(fäden) ohne ' | '-Trenner, also für "
+            f"rotate_index_updates.sh unsichtbar — in KNOWN_BLIND eintragen, wenn es eine "
+            f"Erwähnung im Fließtext ist, sonst reparieren: {unexpected}"
+        )
+
+
+def test_the_named_blind_spots_still_exist():
+    """Gegenprobe: eine Ausnahme ohne Text darf nicht still verschwinden.
+
+    **Und die Grenze der Nadel, ausdrücklich:** sie identifiziert den Text **ab** dem Datum, nicht
+    den Satz davor. Eine Änderung im Fließtext *vor* der Stelle wird deshalb nicht gemeldet — das ist
+    keine Lücke im Wächter, sondern eine Eigenschaft einer Nadel: sie ist ein Fingerabdruck, kein
+    vollständiger Kontext. Der Gegenlauf, der das beweisen sollte, hat zuerst genau den Text vor der
+    Stelle geändert und war deshalb **grün** — die zweite Fassung ändert den Text, an dem die Nadel
+    hängt, und meldet rot.
+    """
+    for rel, needles in KNOWN_BLIND.items():
+        fm = frontmatter(REPO_ROOT / rel)
+        assert fm is not None, f"{rel} hat kein Frontmatter mehr"
+        for needle in needles:
+            assert needle in fm, f"{rel}: die als Prosa benannte Stelle {needle!r} gibt es nicht mehr"
 
 
 def test_the_p9_sessions_archive_carries_its_field_and_all_its_threads():

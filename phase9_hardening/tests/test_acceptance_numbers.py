@@ -67,6 +67,21 @@ ABNAHME_ROWS = 83  # 82 Abnahmezeilen, P9-10 in zwei prüfbare Hälften geteilt
 VERIFY_BILANCE = {"✅": 31, "⚠️": 2, "⬜": 1}  # Nummern-Lesart, eine Nummer = eine Zeile
 VERIFY_ROWS = 37  # 34 Nummern + 2 Zweit-Lesarten + 1 reservierte Bereichszeile
 
+# **2026-10-04, der Fund, der diese Konstante erzwang.** Die Zählregel („eine doppelt vergebene
+# Nummer zählt einmal, mit ihrer Lesart A") wirkt den Marker der **zweiten Lesart weg** — und der
+# landet damit in *keiner* Bilanz: nicht in der Überschrift, nicht in `VERIFY_BALANCE`, nirgends.
+# Beim Schreiben von V162 *(Lesart B)* (⬜ → ⚠️, mit Doku-Zitat) blieb
+# `test_the_verify_balance_is_the_machine_count_under_the_stated_rule` deshalb **grün**, obwohl
+# sich der Zustand des Eintrags geändert hatte. Das ist die Repo-Lehre zum achten Mal: ein Wächter,
+# der etwas anderes prüft als er behauptet — er behauptet „machine count", und Verwerfen ist auch
+# ein Zählen.
+#
+# Die Arithmetik bleibt bei 34 (das ist die aussagekräftige Übergabezahl, sie steht im Fließtext der
+# Matrix und in der Kopfzeile des Phase-Heads), aber **jede zweite Lesart wird hier namentlich
+# festgenagelt**: sie kann ihren Marker nicht mehr stillschweigend wechseln, und eine **dritte**
+# Lesart fällt als neuer Schlüssel auf, weil der Test die Menge vergleicht.
+SECOND_READING_MARKERS = {"V162": "⚠️", "V163": "✅"}
+
 MARKERS = ("✅", "⚠️", "⬜")
 # Als Regex-Teile gebaut, damit dieses Modul die Wörter nicht selbst enthält, die es verbietet
 # (dieselbe Falle wie der Step-D-Wächter am 2026-10-03, der wegen seines eigenen Docstrings rot war).
@@ -180,6 +195,7 @@ def test_the_verify_balance_is_the_machine_count_under_the_stated_rule():
     counted: dict[str, int] = {m: 0 for m in MARKERS}
     reserved = 0
     seen: set[str] = set()
+    second: dict[str, str] = {}
     for cells in rows:
         stand = cells[2]
         if stand.startswith("—"):
@@ -189,11 +205,18 @@ def test_the_verify_balance_is_the_machine_count_under_the_stated_rule():
         assert marker is not None, f"{cells[0]}: kein Marker in `Stand` — {stand[:60]!r}"
         key = _verify_number_key(cells[0])
         if key in seen:
-            continue  # zweite Lesart derselben Nummer
+            # Die zweite Lesart zählt **nicht** in die Bilanz — und genau deshalb wird ihr Marker
+            # hier festgehalten, sonst wäre er durch keinen Wächter gedeckt (2026-10-04).
+            second[key] = marker
+            continue
         seen.add(key)
         counted[marker] += 1
     assert reserved == 1, f"genau eine reservierte Bereichszeile erwartet, gefunden {reserved}"
     assert counted == VERIFY_BILANCE
+    assert second == SECOND_READING_MARKERS, (
+        f"die Marker der zweiten Lesarten haben sich geändert: gemessen {second}, "
+        f"festgenagelt {SECOND_READING_MARKERS}"
+    )
     assert sum(counted.values()) == 34, "34 belegte Einträge — die Übergabezahl 40 war der Nummernbereich"
     assert _headline_triple(MATRIX.read_text(encoding="utf-8"), "belegte Einträge —") == counted
 
