@@ -9,6 +9,11 @@
      (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
+## 2026-10-03
+- Die Kopfdaten haben ein neues Feld „Bei“: damit steht, wer eine Aufgabe übernommen hat. Setzt du den Status auf „In Arbeit“ und das Feld ist noch leer, trägt die Oberfläche deinen eigenen Space selbst ein.
+- In der Liste und in der Nur-lesen-Ansicht steht jetzt „bei <Name>“ mit drin, und im Editor darunter, von wem die Notiz zuletzt geändert wurde.
+- Der Knopf „Archivieren“ trägt jetzt dieselbe Fläche wie die übrigen Knöpfe — die Vorsichtfarbe sitzt nur noch an der Beschriftung.
+
 ## 2026-10-02
 - Aufgaben können jetzt den Status „In Arbeit" bekommen und tauchen in einem eigenen Ordner „In Arbeit" in der Navigation auf — vorher war eine so markierte Aufgabe in keinem einzigen Ordner mehr auffindbar.
 - Claude kann einer Aufgabe jetzt zuweisen, wer sie übernimmt; die Zuweisung steht in den Kopfdaten und überlebt das Bearbeiten im Browser.
