@@ -1,0 +1,108 @@
+{
+  "base_url": "https://127.0.0.1:18781",
+  "ordner": "rechnungen",
+  "item_ids": {
+    "raus": "itm_5eba7627",
+    "wurzel": "itm_8136bc28",
+    "ordner": "itm_9400f842"
+  },
+  "befunde": [
+    {
+      "pruefung": "1 Space-Zeile in der Rail",
+      "ok": true,
+      "detail": "1 Treffer auf .tree__space",
+      "zeile": "P9-29"
+    },
+    {
+      "pruefung": "1 Ordnerzeile sichtbar",
+      "ok": true,
+      "detail": "1 Treffer auf .tree__realfolder[data-folder='rechnungen']",
+      "zeile": "P9-29"
+    },
+    {
+      "pruefung": "1 Space-Ansicht gerendert",
+      "ok": true,
+      "detail": "3 Zeilen",
+      "zeile": "P9-29"
+    },
+    {
+      "pruefung": "1 Item-IDs bestimmt",
+      "ok": true,
+      "detail": "raus=itm_5eba7627 wurzel=itm_8136bc28 ordner=itm_9400f842",
+      "zeile": "P9-29"
+    },
+    {
+      "pruefung": "6 Wurzel-Item in den Ordner gezogen (Gegenrichtung)",
+      "ok": true,
+      "detail": "folder='rechnungen', PATCHes=1",
+      "zeile": "P9-29"
+    },
+    {
+      "pruefung": "1 Ordneransicht zeigt nur Ordner-Items",
+      "ok": true,
+      "detail": "3 Zeilen (das Wurzel-Item ist Station 6 in den Ordner gewandert)",
+      "zeile": "P9-29"
+    },
+    {
+      "pruefung": "2 Browser-Ereigniskette: dragstart → dragover → drop",
+      "ok": true,
+      "detail": "start=1 over=19 drop=1 daten=['itm_5eba7627']",
+      "zeile": "P9-29"
+    },
+    {
+      "pruefung": "3 Drop-Zustand sichtbar (Klasse + gestrichelte Akzentkante)",
+      "ok": true,
+      "detail": "dragover=True border=dashed farbe=rgb(62, 141, 243)",
+      "zeile": "P9-30"
+    },
+    {
+      "pruefung": "4 Drop-Zustand nach dem Drop wieder weg",
+      "ok": true,
+      "detail": "0 Elemente mit der Klasse",
+      "zeile": "P9-30"
+    },
+    {
+      "pruefung": "5 Toast nennt die Space-Wurzel",
+      "ok": true,
+      "detail": "'Verschoben nach (Space-Wurzel)'",
+      "zeile": "P9-29"
+    },
+    {
+      "pruefung": "5 Item steht in der Space-Wurzel (Server)",
+      "ok": true,
+      "detail": "GET /api/v1/items/itm_5eba7627 -> 200, folder=''",
+      "zeile": "P9-29"
+    },
+    {
+      "pruefung": "5 Ordnerliste ohne das Item",
+      "ok": true,
+      "detail": "3 -> 2 Zeilen",
+      "zeile": "P9-29"
+    },
+    {
+      "pruefung": "7 Drop auf den eigenen Ordner löst keinen PATCH aus",
+      "ok": true,
+      "detail": "drop=1 (der Zug kam an), PATCHes=0",
+      "zeile": "P9-29"
+    },
+    {
+      "pruefung": "7 Item im Ordner geblieben",
+      "ok": true,
+      "detail": "folder='rechnungen'",
+      "zeile": "P9-29"
+    },
+    {
+      "pruefung": "8 ESC außerhalb Vollbild schließt das Item",
+      "ok": true,
+      "detail": "offen=True zu=True",
+      "zeile": "P9-28"
+    },
+    {
+      "pruefung": "9 ESC bei gesetztem fullscreenElement schließt nichts",
+      "ok": true,
+      "detail": "fullscreenElement=True, Item-offen=True (der Browser selbst verlässt im Automationslauf den Vollbildmodus nicht — synthetische Tastendrücke; die App-Seite des Guards ist die geprüfte)",
+      "zeile": "P9-28"
+    }
+  ],
+  "alle_ok": true
+}

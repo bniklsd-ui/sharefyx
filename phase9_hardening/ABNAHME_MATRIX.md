@@ -11,7 +11,7 @@ down:
   - ./step_a/RUNBOOK_STEP_A.md                       # Step-A-Ablauf A0b – A9, Abnahme P9-10 – P9-15
   - ./step_b/RUNBOOK_STEP_B.md                       # Step-B-Ablauf B0 – B3, Abnahme P9-16 – P9-20
   - SESSIONS_ARCHIVE.md                              # die Herleitung jeder Zeile im Wortlaut
-updated: 2026-10-03 (erste Fassung, Gate/Z-Doku-Hälfte Nummer zwei, opencode/M3, **kein Code-Touch**, kein Deploy) — **82 Abnahmezeilen (83 Tabellenzeilen, P9-10 geteilt): 65 ✅ · 10 ⚠️ · 8 ⬜** und **34 belegte [VERIFY]-Einträge**, nicht 40 (V167–V172 sind nie belegt) · **P9-56/57/58 heute gemessen**: Tabu-Diff hat **einen** unangekündigten Treffer (`phase7_spaces_admin/tests/test_space_removal.py`, 17 Z.) · `pytest` 1169, `ui_budget` 5/5 (155,2 KB), `doc_health` 0/0/0/0 · **P9-14 heute geschlossen** (Funnel-Host live 200), P9-10b heute gemessen (weiter 400, erwartet bis A7) · **V146/V148/V155 heute beantwortet**, V182/V184 am Code · **zwei Nummerkollisionen gefunden** (V162, V163 je zweimal vergeben)
+updated: 2026-10-03 (**Step D belegt** — zweite Fassung, opencode/M3, **kein Produktcode-Touch**, kein Deploy) · **P9-28/P9-29/P9-30 von ⚠️/⬜ auf ✅**: die Browser-Probe `p9_step_d_self_check.py` (Plan-§11 GA2-Station 1, die erste von dreien, die nie lief) fährt **16/16** gegen eine eigene TLS-Wegwerf-Instanz auf Port 18781 · **echte Maus-Input-Pipeline**, nicht `dispatchEvent` — Station 2 misst den vom Browser erzeugten Ereignisstrom (`dragstart=1, dragover=19, drop=1`, Item-ID im `dataTransfer`), weil sonst nur der Listener belegt wäre · **P9-30 als berechneter Stil** (`dashed`, `rgb(62,141,243)`) plus zwei Bilder, nicht als Klassennamen · **zwei Gegenläufe liegen rot im Repo** (G1 Space-Bindung raus → 5 Stationen rot, 6–9 grün; G2 `fullscreenElement`-Guard raus → Station 9 rot), mit `--report`/`--screenshots-dir` getrennt, damit kein Gegenlauf den Erfolgsbeleg überschreibt (derselbe Fehler wie beim trace-Block 2026-10-02) · **6 Wächter** in `test_step_d_drop_target.py`, Deckung in **beiden** Richtungen (jede ✅-Zeile braucht eine Station, jede Station eine existierende Zeile) · **Bilanz jetzt 68 ✅ · 9 ⚠️ · 6 ⬜** · **P9-27 bleibt ⬜** und das ist eine Eigenschaft: kein WebKit-Binary, natives Vollbild nicht automatisierbar · **drei eigene Fehler im selben Commit behoben**: der Ereigniszähler zählte sich selbst (`start=3, over=57` für einen Zug — Listener bei jedem `evaluate` neu registriert), `store.create()` **hängt** an statt zu leeren (der zweite `start` sah jedes Item doppelt), und die erste Fassung des neuen Tests war rot, weil er `dispatchEvent` im **Docstring** verbot — Wächter läuft jetzt über `tokenize`, nicht über Rohtext | updated: 2026-10-03 (erste Fassung, Gate/Z-Doku-Hälfte Nummer zwei, opencode/M3, **kein Code-Touch**, kein Deploy) — **82 Abnahmezeilen (83 Tabellenzeilen, P9-10 geteilt): 65 ✅ · 10 ⚠️ · 8 ⬜** und **34 belegte [VERIFY]-Einträge**, nicht 40 (V167–V172 sind nie belegt) · **P9-56/57/58 heute gemessen**: Tabu-Diff hat **einen** unangekündigten Treffer (`phase7_spaces_admin/tests/test_space_removal.py`, 17 Z.) · `pytest` 1169, `ui_budget` 5/5 (155,2 KB), `doc_health` 0/0/0/0 · **P9-14 heute geschlossen** (Funnel-Host live 200), P9-10b heute gemessen (weiter 400, erwartet bis A7) · **V146/V148/V155 heute beantwortet**, V182/V184 am Code · **zwei Nummerkollisionen gefunden** (V162, V163 je zweimal vergeben)
 ---
 
 # Abnahmematrix Phase 9 — P9-1 … P9-82 und `[VERIFY]`-Bilanz V145 … V184
@@ -25,17 +25,20 @@ Archiv hineinzuschreiben hieße, das Falsche zu tun.
 
 ## Stand in einem Satz
 
-**83 Tabellenzeilen für 82 Abnahmezeilen: 65 ✅ · 10 ⚠️ · 8 ⬜** (P9-10 in zwei prüfbare Hälften
-geteilt). Alle 8 offenen Zeilen hängen an **zwei** Nikinger-Schritten (A7+A8 in einer Sitzung, D1 als
-zurückgestellter Backlog-Posten) plus zwei Zeilen, die eine Entscheidung brauchen, die keine Messung
-liefern kann. **Kein ⬜ ist offene Code-Arbeit.**
+**83 Tabellenzeilen für 82 Abnahmezeilen: 68 ✅ · 9 ⚠️ · 6 ⬜** (P9-10 in zwei prüfbare Hälften
+geteilt). Von den 6 offenen Zeilen hängen **fünf** an **zwei** Nikinger-Schritten (A7+A8 in einer
+Sitzung: P9-10b, P9-12, P9-13, P9-15 · P9-11 ist der `nmap`-Gegenlauf von außen) und **eine** an D1
+als zurückgestelltem Backlog-Posten (P9-27, natives macOS-Vollbild). **Kein ⬜ ist offene
+Code-Arbeit.** Die drei Zeilen, die am 2026-10-03 durch die Step-D-Probe von ⬜/⚠️ auf ✅ gewandert
+sind, waren vorher ausdrücklich als „strukturell erfüllt, nicht am Gerät belegt" geführt — der
+Unterschied zwischen beidem ist der ganze Gegenstand dieser Matrix.
 
 ## Statusregel (was ein ✅ hier bedeutet)
 
 | ✅ | erfüllt, **und der Beleg steht in der Spalte rechts** — Testname, Probe-Datei, Journalzeile, Bild oder eine heute ausgeführte Messung. „Würde beim nächsten Lauf stimmen" ist kein ✅ |
 | ⚠️ | erfüllt **mit benannter Abweichung**: andere Form als im Plan, Testzahl über der Plan-Zahl, gegenstandslos am gewählten Anker, oder zum Bauzeitpunkt erfüllt und heute überholt |
 | ⬜ | nicht erfüllt, mit Grund und Zuständigkeit. Ein ⬜ ohne Begründung ist ein Befund gegen dieses Dokument |
-| ersetzt | **in P9: 0.** Wo eine Planzeile praktisch nicht mehr greift (P9-10 geteilt, P9-28/P9-31 gegenstandslos), steht ⚠️ mit Begründung — eine Ersatzzeile, die man abnehmen kann, gibt es dort nicht |
+| ersetzt | **in P9: 0.** Wo eine Planzeile praktisch nicht mehr greift (P9-10 geteilt, P9-31 gegenstandslos), steht ⚠️ mit Begründung — eine Ersatzzeile, die man abnehmen kann, gibt es dort nicht. (P9-28 stand bis zum 2026-10-03 unter dieser Ausnahme und ist heute eine normale ✅: gegenstandslos war nur die **Form** der Nicht-Regression, nicht die Zeile) |
 
 **Zeilen mit `pending: Deploy v3.1.1`** sind nicht ⬜, wenn ihr Kriterium gegen eine Wegwerf-Instanz
 messbar war — sie sind ✅ mit dem Zusatz „live bewiesen erst mit v3.1.1". Die Liste steht am Ende.
@@ -99,9 +102,9 @@ messbar war — sie sind ✅ mit dem Zusatz „live bewiesen erst mit v3.1.1". D
 | # | Kriterium | Stand | Beleg |
 |---|---|---|---|
 | **P9-27** | ESC im Vollbild verlässt den Vollbildmodus und schließt **nichts** — am echten Gerät belegt | ⬜ **Backlog D1, zurückgestellt** | **Nikinger-Entscheidung 2026-09-23.** Der Befund ist geklärt und gegen die Hoffnung: `grep requestFullscreen` findet **nur den Guard selbst** — die App nutzt die Web-Fullscreen-API nirgends, und macOS' natives Vollbild setzt `document.fullscreenElement` per Spezifikation nicht. Für den gemeldeten Fall ist der Guard mit hoher Sicherheit ein No-op. **Kein Fehlschlag als Erfolg verbucht** |
-| **P9-28** | ESC außerhalb des Vollbilds verhält sich unverändert wie vor P9 | ⚠️ **strukturell erfüllt, nicht am Gerät belegt** | Der Guard ist die **erste** Bedingung im Escape-Zweig und kehrt nur bei gesetztem `fullscreenElement` zurück (`test_escape_handler_checks_fullscreen_element`) — die Nicht-Regression ist eine Eigenschaft der Form. **Was fehlt:** eine Browser-Probe; die GA2-Stationen wurden nie gebaut (unten) |
-| **P9-29** | Ein Item lässt sich aus einem Ordner auf die Space-Zeile zurückziehen | ⬜ **Sichtprüfung am echten Gerät** | Code steht: `renderSpaceNode()` ruft `bindFolderDropTarget(row, "")` für `space.own` hinter demselben Eigentümer-Riegel wie der Ordner-Pfad; `moveItemToFolder()` schickt `folder: ""` unverändert; der Toast rendert `"(Space-Wurzel)"`. **Nicht belegt** — genau die erste GA2-Station, die nie lief |
-| **P9-30** | Der Drop-Zustand ist sichtbar | ⬜ **Sichtprüfung am echten Gerät** | Die Dashed-Border-Rückmeldung (`tree__realfolder--dragover`) gilt automatisch mit, weil `bindFolderDropTarget()` die Klasse klassenbasiert setzt — **per Konstruktion**, nicht gemessen |
+| **P9-28** | ESC außerhalb des Vollbilds verhält sich unverändert wie vor P9 | ✅ **am 2026-10-03 im Browser belegt** (`p9_step_d_probe.json`, Stationen 8+9) | Beide Richtungen, und das gesetzte `fullscreenElement` ist im selben Lauf **gemessen**, nicht behauptet: ohne → ESC schließt das Item (`offen=True` → `zu=True`), mit → es schließt **nichts**. War bis heute „strukturell erfüllt, nicht am Gerät belegt". **Gegenprobe G2** (Guard raus) → genau Station 9 rot. *Grenze:* der Browser verlässt im Automationslauf bei ESC **nicht** den Vollbildmodus — synthetische Tastendrücke lösen seinen Exit nicht aus; geprüft ist die App-Seite des Guards |
+| **P9-29** | Ein Item lässt sich aus einem Ordner auf die Space-Zeile zurückziehen | ✅ **am 2026-10-03 im Browser belegt** (`p9_step_d_probe.json`, 12 Stationen) | Drei Teile, weil ein Zug drei Fehler haben kann: **(a)** die Ereigniskette kam vom Browser — `dragstart=1`, `dragover=19`, `drop=1`, Item-ID im `dataTransfer` (ohne diese Station bewiesen die anderen nur den Listener); **(b)** der Serverzustand: `GET …/{id}` → `folder: ""`; **(c)** die Liste: 3 → 2 Zeilen, Toast „Verschoben nach (Space-Wurzel)". Ohne Restschaden belegt: die Gegenrichtung (Wurzel → Ordner, 1 PATCH) und der Leerlauf-Riegel `tree.js:139` (Drop kommt an, `drop=1`, aber **0** PATCH — an der Request-Zahl gemessen). **Gegenprobe G1** (Space-Bindung raus) → 5 Stationen rot, **6–9 grün** |
+| **P9-30** | Der Drop-Zustand ist sichtbar | ✅ **am 2026-10-03 im Browser belegt** (`p9_step_d_probe.json`, Stationen 3+4) | Nicht „die Klasse ist gesetzt", sondern **wie sie aussieht**: berechneter Stil am Ziel im Zug — `dashed`, `rgb(62,141,243)` = `--accent`, auf der Space-Zeile, die sonst keine gestrichelte Kante hat. Bilder `p9_step_d_04_dragover_space_zeile.png` (im Zug) gegen `…_05_nach_dem_zug.png` (Toast, Zähler 3 → 2, ohne Kante). Station 4 prüft das **Wieder-Verschwinden** und bleibt in G1 grün, weil ihre Aussage eine *Abwesenheit* ist — kein Loch, sondern die Aussage |
 | **P9-31** | Ein Zug auf einen Zähler-Chip löst **kein** Verschieben aus (V136) | ⚠️ **gegenstandslos am gewählten Anker** | Die Plan-Warnung zielt auf `.overview__space-open` (`list.js`); der Anker ist die `.tree__space`-Zeile (`tree.js`), und die hat **keine** verschachtelten interaktiven Kinder. Ein Guard, der nichts ausschließt, wäre ein irreführender Test — der dritte Test prüft deshalb den `space.own`-Riegel |
 | **P9-32** | 3 neue Tests grün, `ui_budget` 5/5 | ✅ | die drei Wächter unter P9-27/28/29. `ui_budget` damals 145,0 KB, **heute nachgemessen 5/5 bei 155,2 KB** |
 
@@ -290,11 +293,16 @@ niemand sie mit einem eingecheckten Block verwechselt:
 
 **Und zwei Lücken, die keine Messung schließen kann:**
 
-- **Der Gate-Smoke aus Plan §11 (GA2) wurde nie gebaut.** `phase9_hardening/scripts/` hat die sechs
-  Block-Proben (Reload, doing, trace, btn2, btn3, Step G), aber **kein** `p9_hardening_smoke.py`.
-  Damit sind die Stationen ersetzt, die ein Block für sich trug — und genau die drei, die niemand
-  trug, sind die drei offenen Zeilen P9-27/-29/-30. Kein Zufall: alle drei sind Sichtprüfungen am
-  echten Gerät, und das ist Nikinger-Arbeit.
+- **Der Gate-Smoke aus Plan §11 (GA2) wurde nie gebaut — und die Lücke ist heute um eine Station
+  kleiner.** `phase9_hardening/scripts/` hat die sechs Block-Proben (Reload, doing, trace, btn2,
+  btn3, Step G) und seit dem 2026-10-03 eine siebte (`p9_step_d_self_check.py`, **16/16** mit zwei
+  Gegenläufen im Repo); ein `p9_hardening_smoke.py` als **ein** Skript mit allen Stationen gibt es
+  weiterhin nicht. Damit ist von den drei Zeilen, die 2026-10-03 als „ohne Probe" gemeldet waren,
+  **eine** geschlossen: **P9-29 und P9-30 sind jetzt gefahren** (Plan-§11-Station 1 und 3, plus
+  die ESC-Stationen zu P9-28). Offen bleibt **allein P9-27** — ESC im **nativen** macOS-Vollbild.
+  Das ist keine Versäumnis, sondern eine Eigenschaft: kein WebKit-Binary im Playwright-Cache, und
+  natives Vollbild ist per Spezifikation nicht automatisierbar (der Guard selbst ist für den
+  gemeldeten Fall nachweislich ein No-op, `app.js` ruft `requestFullscreen()` nirgends auf).
 - **GA1/GA4** sind durch die Block-Proben und den Deploy `v3.1.0` überholt; die Nikinger-Sichtprüfung
   (GA3) ist für die sechs `p9_trace_*`-Bilder am 2026-10-02 erfolgt, für B17 offen.
 

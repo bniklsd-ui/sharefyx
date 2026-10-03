@@ -1,0 +1,92 @@
+{
+  "base_url": "https://127.0.0.1:18781",
+  "ordner": "rechnungen",
+  "item_ids": {
+    "raus": "itm_ca88294d",
+    "wurzel": "itm_cd9d2eea",
+    "ordner": "itm_fa66f8d1"
+  },
+  "befunde": [
+    {
+      "pruefung": "1 Space-Zeile in der Rail",
+      "ok": true,
+      "detail": "1 Treffer auf .tree__space"
+    },
+    {
+      "pruefung": "1 Ordnerzeile sichtbar",
+      "ok": true,
+      "detail": "1 Treffer auf .tree__realfolder[data-folder='rechnungen']"
+    },
+    {
+      "pruefung": "1 Space-Ansicht gerendert",
+      "ok": true,
+      "detail": "3 Zeilen"
+    },
+    {
+      "pruefung": "1 Item-IDs bestimmt",
+      "ok": true,
+      "detail": "raus=itm_ca88294d wurzel=itm_cd9d2eea ordner=itm_fa66f8d1"
+    },
+    {
+      "pruefung": "6 Wurzel-Item in den Ordner gezogen (Gegenrichtung)",
+      "ok": true,
+      "detail": "folder='rechnungen', PATCHes=1"
+    },
+    {
+      "pruefung": "1 Ordneransicht zeigt nur Ordner-Items",
+      "ok": true,
+      "detail": "3 Zeilen (das Wurzel-Item ist Station 6 in den Ordner gewandert)"
+    },
+    {
+      "pruefung": "2 Browser-Ereigniskette: dragstart → dragover → drop",
+      "ok": true,
+      "detail": "start=1 over=19 drop=1 daten=['itm_ca88294d']"
+    },
+    {
+      "pruefung": "3 Drop-Zustand sichtbar (Klasse + gestrichelte Akzentkante)",
+      "ok": true,
+      "detail": "dragover=True border=dashed farbe=rgb(62, 141, 243)"
+    },
+    {
+      "pruefung": "4 Drop-Zustand nach dem Drop wieder weg",
+      "ok": true,
+      "detail": "0 Elemente mit der Klasse"
+    },
+    {
+      "pruefung": "5 Toast nennt die Space-Wurzel",
+      "ok": true,
+      "detail": "'Verschoben nach (Space-Wurzel)'"
+    },
+    {
+      "pruefung": "5 Item steht in der Space-Wurzel (Server)",
+      "ok": true,
+      "detail": "GET /api/v1/items/itm_ca88294d -> 200, folder=''"
+    },
+    {
+      "pruefung": "5 Ordnerliste ohne das Item",
+      "ok": true,
+      "detail": "3 -> 2 Zeilen"
+    },
+    {
+      "pruefung": "7 Drop auf den eigenen Ordner löst keinen PATCH aus",
+      "ok": true,
+      "detail": "drop=1 (der Zug kam an), PATCHes=0"
+    },
+    {
+      "pruefung": "7 Item im Ordner geblieben",
+      "ok": true,
+      "detail": "folder='rechnungen'"
+    },
+    {
+      "pruefung": "8 ESC außerhalb Vollbild schließt das Item",
+      "ok": true,
+      "detail": "offen=True zu=True"
+    },
+    {
+      "pruefung": "9 ESC bei gesetztem fullscreenElement schließt nichts",
+      "ok": false,
+      "detail": "fullscreenElement=True, Item-offen=False (der Browser selbst verlässt im Automationslauf den Vollbildmodus nicht — synthetische Tastendrücke; die App-Seite des Guards ist die geprüfte)"
+    }
+  ],
+  "alle_ok": false
+}
