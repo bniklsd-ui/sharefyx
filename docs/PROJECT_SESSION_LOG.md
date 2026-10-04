@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Wurzel-CLAUDE.md-Historie — der aktuelle Curr
 detail: L3
 up: ../CLAUDE.md
 down:
-updated: 2026-09-10 (P8.6 Step 0 Haushalt-Block aus Wurzel-`CLAUDE.md` §Current state rotiert — Migration-Vorbereitungs-Block brauchte Platz im Wurzel-Head, deshalb der Vorgänger nach hier verschoben; Project-Pattern: jeder neue Current-state-Eintrag rotiert den bisherigen verbatim hierher)
+updated: 2026-10-04 (**24 Blöcke der Wurzel-`CLAUDE.md` §Current state verbatim hierher**, per `scripts/rotate_root_current_state.sh` K=1; KEEP ist der **neueste** Block, weil die Wurzel newest-**first** ist — im Phase-Head ist es umgekehrt, und die erste Fassung des Skripts hat den ältesten behalten; **sechs Gegenproben**, darunter die byteweise Reassemblierung und die Nachlese jedes Blocks, **221.957 B vorher == 221.957 B nachher**) | 2026-09-10 (P8.6 Step 0 Haushalt-Block aus Wurzel-`CLAUDE.md` §Current state rotiert — Migration-Vorbereitungs-Block brauchte Platz im Wurzel-Head, deshalb der Vorgänger nach hier verschoben; Project-Pattern: jeder neue Current-state-Eintrag rotiert den bisherigen verbatim hierher)
 ---
 
 
@@ -46,6 +46,473 @@ Newest-first, genau wie sie im Kopf standen:
 26. 2026-09-04 (Phase 8.5 Drift nachgezogen `4424310` + A1 committet `499d9be` -- Picker-Modus-Umschalter + `localStorage` `sfx:linkpicker:mode`; V99 `session` zu `local` als Eskalation wegen P8.5-G; erste `localStorage`-Nutzung des Projekts)
 27. 2026-09-03 (Phase 8.5 Step 0 -- Skelett phase8_5_picker_release/{CLAUDE.md, SESSIONS_ARCHIVE.md, scripts/} angelegt; vier Paragraph-1-Funde: INDEX 52.911 zu 40.917 B unter Cap, Bueroklammer-zu-Lupe-Drift in phase8_ui_graph/CLAUDE.md:440, Phase-8-Bilanz korrigiert; ROADMAP-Abschnitt neu; Wurzel-`down:` umgestellt)
 28. 2026-09-01 (Phase 8 Sichtpruefung 1 + Gate B zu C bestanden; **Hard Rule 9 ergaenzt** -- kein `pkill -f` mit Regex, niemals den systemd-Dienst anfassen, Lehre aus dem Prod-Vorfall 2026-09-01 Phase 8 Step A3 Nachbereitung)
+
+**[2026-09-10, P8.6 Block A ✅ — Fundament:** Radiogruppe→`<select>`, sechs neue Tokens (`--bg-void`/`--select-fill`/`--select-line`/`--caution` u. a.), `--border-soft`→`var(--line)`, Konvention v3 um „Vorsicht". Erste echte Code-Touch-Session der Phase. Tabu-Diff §0.3 leer, `pytest` 964→966, `ui_budget.py` 5/5. Nikinger hat die P8.5-19-Radiogruppe am 2026-09-08 selbst zurückgenommen. +2 statische Tests (P8.5-Test ersetzt, `test_no_raw_accent_rgba_outside_root`, `test_every_css_var_reference_is_defined` — hätte `--border-soft`-Bug gefunden). **Abweichung von Plan §3.5/§8.2 dokumentiert:** die anderen 4 Tests gehören zu Block B/C.
+
+_Vollständige Chronik der älteren Einträge (Phase 8, Phase 8.5-Vorlauf, Phase 7/6.5/6-Abschluss,
+Phase-5/4/3/2/1-Zusammenfassungen, Hard-Rule-Korrekturen): `docs/PROJECT_SESSION_LOG.md` (L3).
+Neue Session-Blöcke wachsen oben in dieser Current-state-Sektion; ältere Blöcke rotieren
+verbatim nach `PROJECT_SESSION_LOG.md`. **[2026-09-13]** Eine Ein-Block-Regel wurde erwogen und
+**verworfen**: gemessen steckten 69 % der Dateigröße in der `updated:`-Frontmatter-Kette
+(28.090 B über 30 Einträge, davon 3.290 B glatte Duplikate), nicht in dieser Sektion
+(3.376 B). Die Kette ist verbatim nach `PROJECT_SESSION_LOG.md` §Frontmatter-Archiv rotiert —
+dieselbe Lösungsrichtung, die für `docs/INDEX.md` vorgemerkt ist._
+
+
+
+**[2026-09-10, P8.6 Block D ✅ [D1/D2/D4]** — Reiner `graph.js`-Commit (8,4 KB, +0,5 KB). D1 V102-Dedup (`dedupeEdges()` ungeordnetes Knotenpaar, P8.6-N, keine neunte P1-Contract-Öffnung), D2 FNV-1a-Layout-Seed (`seedJitter(id, salt)`, P8.6-M, „Karte fliegt" behoben), D4 `cancelAnimationFrame` in `runSimulation()` (P8.6-§6.4, **einzige Scope-Erweiterung**, streichbar). D3 🟡 wartet auf Block C. `pytest` 966 unverändert, `ui_budget` 5/5, Tabu-Diff §0.3 leer, Service-Touch 0. Items #2/3/4 aus dem Handover blockiert (Ollama-Migration steht bevor).
+
+**[2026-09-10, P8.6 Step V ✅ — Ollama + `qwen3-vl:8b` + V119-Smoke 46 s, Modellname-Korrektur + Plugin-Pfad für nächste Session.** Proxmox-Migration ✅ durch (i5-14600KF, sharefyx-mcp PID 991 nach Auto-Restart), Nikinger hat Ollama 0.34.0 via offizielles `curl | sh`-Script installiert (apt-Paket existiert auf Ubuntu 24.04 nicht — Korrektur in §Vormerkungen), `qwen3-vl:8b` (Q4_K_M, 6,1 GB) gepullt + V119-Smoke ✅ in 46 s gegen `c4_p8519_01_radiogruppe_im_dialog.png` (qwen3-vl:8b Cold-Start inkl. Vision-Encoder; deutsche Antwort korrekt: „Der Radio-Button ‚als Text-Link im Text' ist markiert"). `requests 2.34.2` ins Projekt-venv installiert; `phase8_6_ui_polish/scripts/vision_ollama.py` (89 Z., `requests.post(/api/generate)`, 600s-Timeout). **Modellname-Korrektur:** `internvl2.5:8b` (ursprüngliche Empfehlung) existiert nicht auf Ollama-Library — Recherche-Fehler von mir korrigiert auf `qwen3-vl:8b`. Phase-Head §Vormerkungen + Aktionsliste + Vision-Backend-Sektion entsprechend korrigiert. `pytest` V107 ✅ **966 unverändert**, `ui_budget` V97 ✅ 5/5, Tabu-Diff §0.3 leer, Service-Touch 0. **Push + Deploy** für Block A + D-Commits (`32fddba`, `04dee6a`) vom Nikinger in dieser Session autorisiert + ausgeführt (`10f9f63..04dee6a`). **Nächster Schritt** (Nikinger-Vorgabe 2026-09-10): **Schritt 1 = `DavidEasden/opencode-vision`-Plugin installieren** (vor jeder Sichtprüfung, damit Screenshots direkt im Chat gerendert werden — `docs/concepts/sichtpruefung_automation_conventions.md` §4), **Schritt 2 = visuelle Verifikation Block A + D** am echten Gerät gegen die neuen Screenshots (post-Block-A: `<select>`-Markup, post-Block-D: Zwillingskante weg + Karte stabil); Schritt 3 = Block B nach Plan §4; Schritt 4 = Block C nach Plan §5 + D3-Nachzug.
+
+**[2026-09-12, P8.6 Block C ✅ — Struktur-Umbau: Einstellungen oben, Alle Items unten, Karte rechts voller Hoehe, klickbare Spaces, Ordner-Zaehler.** Erst opencode/M3-Code-Touch seit Block B am 2026-09-11. **C1** `#account-button` raus aus `.rail__account` direkt unter `#home-button` + Label „Konto"→„Einstellungen" (N3-Lesart b, das `#i-settings`-Icon war schon immer ein Zahnrad). **C2** `tree.js :: renderRail()` ruft `renderScopeRow()` jetzt HINTER die Spaces + neue `tree__group`-Überschrift „Alles"; bestehende Kommentar zu „Lieber keine Zahl als eine unwahre" bleibt wörtlich erhalten (er ist die Antwort auf C5). **C3** `.overview` wird zweispaltiges Grid (`grid-template-columns: 1fr 40%` ab ≥1281px, Wrapper-DIVs `head-row`/`col-left`/`col-right`, `.overview__graph` ohne `max-width`/`min-height` [V112-Gegenprobe], `@media (max-width: 1280px)` kollabiert auf eine Spalte — Map rutscht unter die Liste); `requestAnimationFrame(resize)` in `loadGraph()` [V115] damit `seedInitialPositions()` nach dem nächsten Layout-Pass die endgültige Kartengröße hat. **C4** `.overview__space-open` als innerer `<button>` mit B1-hover + V116 `activateView`-Export (semantisch „in den Space wechseln ohne Bucket zu setzen") + `closeEditor().then(proceed => ...)`-Gating (dieselbe Disziplin wie Ordner-Buttons). **C5** `state.itemsLoaded`-Flag + `folderItemCount()`-Helfer + neuer V117-Reset in `activateView`/`navigateAll` (sonst zeigt das Rail für ein paar ms Counts aus dem falschen Pool); `.tree__count` bekommt `margin-left: auto` (gilt für Eimer + echte Ordner). **Drei Befunde/Abweichungen während Baus dokumentiert:** `activateView` doppelt definiert (Original-`function` plus neuer `export function`) → `PAGE ERROR: already declared` → `overview__spaces` blieb leer → Original entfernt; V117-Reset in beiden Navigation-Funktionen eingebaut; `requestAnimationFrame(resize)` als V115-Fix. **`pytest` 970 V107 ✅ (+3 statische Tests `test_rail_order_settings_before_tree_logout_last`/`test_account_button_says_einstellungen`/`test_overview_graph_has_no_max_width_or_min_height`), `ui_budget` V97 ✅ 5/5 (137,5 KB, +4,4 KB durch C1/C3/C4-CSS)**, Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp **PID 991** durchgehend unverändert. **Sechs Selbst-Screenshots** in `docs/screenshots/p86_block_c_{01..06}_*.png` zeigen alle fünf Sub-Ziele (Rail-Reihenfolge, „Alle Items" am Rail-Ende, Karte als rechte Spalte, klickbare Space-Zeile, Folder-Zähler) + B4-Vorsicht-Regression. Eigenes Self-Skript `phase8_6_ui_polish/scripts/p86_block_c_self_check.py` (~250 Z., Playwright + Login mit TOTP-Window-Retry + 6 Screenshots); Wegwerf-Setup reproduziert den v3ritt-Datenstand auf Port 18773, gestoppt über PID-Datei (Hard Rule 9-konform, kein `pkill -f`; `login_attempts`-Rate-Limit durch `cleanup`+`setup`+`seed-items`+`start` zurückgesetzt — das war nötig, nachdem drei fehlgeschlagene Login-Attempts die Bremse ausgelöst hatten). **Push + Deploy** für Block C wartet noch auf Dich (Drei-Bedingungen-Regel zu zwei Dritteln erfüllt — Code-Tests grün ✓, Bilder grün ✓, Nikinger-Sichtung ⬜).
+
+**[2026-09-13, P8.6 Partial Closeout — die Phase ist NICHT abgeschlossen und NICHT ausgeliefert.** Reine Doku-Session. **Klarstellung zum Stand:** `origin/main` steht auf `2a93e67`, lokal liegen **zwei** ungepushte Commits (`90c72e2` Block C, `bc2aa9f` Partial Closeout) — die Behauptung „7 Commits voraus" aus dem 2026-09-12-Block war falsch, per `git fetch` geprüft. Badge steht auf `v3.0.1`, Gate ⬜ **angehalten**, Step Z ⬜. **Neu:** `docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md` (Teil-Stand, Delta, §4 ordnet die neun UX-Befunde den Locks zu, die sie öffnen — **P8.6-O2** `.shell`-Grid für Befund 5, **C1/N3-Lesart b** für Befund 7, **P8.6-E** für Befund 1+8, plus die Versionsfrage **P8.6-R**; §5 `[VERIFY]`-Bilanz 14 zu / 5 offen) + `docs/concepts/phase8_6_ui_polish_uebersicht.svg` (1080×1080, gerendert und visuell gegengeprüft, Badge **PARTIAL CLOSEOUT**). Beide existieren per **ausdrücklicher Nikinger-Anordnung vom 2026-09-13** — die in **P8.6-B** vorgesehene Ausnahme; **Plan §9 bleibt bewusst leer**, weil §9 der kanonische Abschluss ist und die Phase nicht abgeschlossen ist. **Rotation:** der Head verletzte **P8.6-T** (ein `## Session stopped` **plus** ein zweiter Session-Block als `###` — das Muster, bei dem `rotate_session_block.sh` fälschlich „bereits konform" meldet); `###` aufs `## Session stopped — <Datum>`-Schema gebracht, dann das Skript gelaufen: alle vier Gegenproben grün, Head **72.958 → 59.797 B**. **Archiv-Reparatur:** der Block-D-Sub-Block war seit der Hand-Rotation vom 2026-09-10 **mitten im Satz abgeschnitten** — **72 Zeilen / 4.403 B** fehlten; mechanisch aus `04dee6a:phase8_6_ui_polish/CLAUDE.md` wiederhergestellt, `cmp` byte-identisch, Altbestand nachweislich unverändert. **Drei weitere Drifts behoben:** Modul-Status Zeile 5 (Block C) stand auf ⬜, obwohl Commit `90c72e2` ihren Nachzug behauptet — Hard-Rule-8-Miss; `docs/INDEX.md` verletzte **P8.6-4** (40.870 B gegen ≤ 38 KB) → sechs Zeilen geschlossener Phasen gestrafft, zwei neue Zeilen aufgenommen, jetzt **38.822 B**, Kriterium erstmals seit Block A erfüllt; der Frontmatter-Closer `---` des INDEX klebte am Ende der `updated:`-Zeile statt auf einer eigenen — Frontmatter war formal kaputt. **`pytest` 970 passed in 116 s ✅** (V107-Baseline 964), Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp **PID 991** nur gelesen. **Nächster Schritt: Claude-Code-Planungssession für P8.6 Plan 2.** Empfohlene Reihenfolge (im Handover begründet): Befund 9 zuerst, weil er als einziger **auf der Produktion** reproduziert ist und damit nicht am P8.6-Deploy hängt — und zwar messen (CDP-Probe bei 1024/1200/1440), bevor repariert wird.  **Nikinger-Entscheidungen vom 2026-09-13:** **(a)** Deploy-Ziel bleibt **`v3.0.2`** — P8.6-R ist damit bestätigt, nicht überstimmt. **(b)** **Block C geht einzeln raus**, nicht in einem Sammel-Push nach Plan 2. **(c)** Die Ein-Block-Regel für die Current-state-Sektion hat er mir überlassen — **ich rate ab und habe sie verworfen**: sie hätte 3,4 KB gebracht und beim nächsten Session-Block wieder gerissen, weil **69 % der Datei in der `updated:`-Kette** steckten (28.090 B über 30 Einträge, davon 3.290 B glatte Duplikate) und nur 3.376 B in dieser Sektion. Die Kette ist stattdessen verbatim nach `PROJECT_SESSION_LOG.md` §Frontmatter-Archiv rotiert: **47.094 → 23.007 B**, alle fünf Session-Blöcke bleiben erhalten. **(d)** **Push ja, Deploy nein** (Nikinger, 2026-09-13, nachdem die Tatsachenlage aus §4.6 vorlag): die Commits gehen nach `origin/main`, **ausgeliefert wird nicht**. Live bleibt damit `6f19a8f` (P8.5). Ein Push ändert nichts an der Produktion — die drei von Block C neu eingeführten Befunde 3/4/6 erreichen keinen Nutzer, bis Plan 2 sie abgearbeitet hat. **Siebter Drift, in dieser Runde gefunden und der folgenreichste: von Phase 8.6 ist NICHTS live.** Phase-Head und der Step-V-Block unten behaupten „Push + Deploy für Block A + D vom Nikinger ausgeführt (`10f9f63..04dee6a`), `health_gate.sh --expected-sha=04dee6a` 8/8 grün". Das Werkzeug ist dabei in Ordnung: `health_gate.sh` liest den Release-SHA aus `/opt/sharefyx/current` (Z. 134/160); die Gegenprobe am 2026-09-13 meldet 7 OK + 1 FEHLER — das „8/8" ist nie so gelaufen. Gemessen am Server: `/opt/sharefyx/current` → `releases/20260905T140325.378914Z`, `git rev-parse HEAD` dort = **`6f19a8f`** — das ist der **P8.5**-Release vom 2026-09-05. Gegenprobe über sechs Block-Marker (`bg-void`, `select-fill`, `dedupeEdges`, `seedJitter`, `account-nav`, `overview__col-right`): **0 Treffer live, alle im Repo.** Das jüngste Verzeichnis unter `/opt/sharefyx/releases/` ist ebenfalls das vom 2026-09-05, und `deploy.sh:107` legt pro Lauf ein neues an — es hat also **kein** P8.6-Deploy gegeben. **Konsequenz für Entscheidung (b):** ein Deploy, der „nur Block C" ausliefert, existiert nicht — `deploy.sh` liefert `main` aus, also A+B+C+D zusammen. Der Push ist davon unberührt und läuft wie entschieden einzeln. **ROADMAP und diese Datei bleiben auf 🔄** — der formale Phasenschluss wäre eine stille Abweichung, solange Gate und Step Z offen sind.
+
+**[2026-09-13, P8.6 Plan 2 geschrieben — Claude-Code-Planungssession, kein Produktcode-Touch.]** Ergebnis: `docs/concepts/phase8_6_ui_polish_plan2.md` (~69 KB, 📕-Snapshot gegen `main`@`26a7cc9`) — ausfuehrungsreif fuer alle neun UX-Befunde, Bloecke **E/F/G/H/J**, Locks **P8.6-W–P8.6-AL**, Abnahme **P8.6-33–P8.6-54**, `[VERIFY]` **V123–V139**. Die Phase bleibt **🔄 und nicht ausgeliefert**; live ist weiter `6f19a8f` (P8.5). **Sechs Nikinger-Entscheidungen (N.7–N.12):** **(N.7)** `.shell` wird **`240px 480px 1fr`** — die bewusste, vorgelegte und entschiedene Ausloesung von **P8.6-O2** (Messung: Space-Zeilen brauchen ~433 px, 380 reichen nicht). **(N.8)** Editor **ersetzt** die Karte, **ESC bringt sie zurueck** — auch nach Klick auf einen Karten-Knoten; ist Abnahmekriterium, nicht Nebenwirkung. **(N.9)** Befund 7b kehrt **C1 / N3-Lesart b** um (Einstellungen + Abmelden wieder unten, **Abmelden bleibt aeusserster Knopf**) — datierte Umkehr einer beantworteten Frage, keine stille Abweichung. **(N.10)** Layering per **Tiefe statt Farbe**. **(N.11)** Plan 2 ist ein eigenes Dokument; Plan 1 bleibt 📕 unangetastet, der **kanonische Closeout wandert nach Plan 2 §9** (P8.6-W). **(N.12)** Der `pytest`-Flake wird beidseitig gefixt. **Fuenf der neun Befunde haben jetzt eine gemessene Ursache statt einer Vermutung:** Befund 8 — `--panel-meta-line: rgba(229,169,60,.22)` **ist** `--warn: #E5A93C` bei 22 %, byte-genau; Befund 1 — 10 Flaechen-Token in `:root` plus **4 rohe Hex ausserhalb** (`#0E1116`/`#131A23`/`#1A2029`, dazu `#fff` im QR, das bleibt); **Befund 2 ist als Messfrage geschlossen — die Knoepfe fehlen nicht**, `app.html:484-485` rendert beide (sichtbar in `p86_block_b_04_account_dialog.png`), sie lesen sich wegen `background: none; border: none` nur als Fliesstext; Befund 4 — `1fr 40%` meint 40 % des **Detail-Slots**, also 302 px bei 1440 = 21 % der Seite, nicht die in P8.6-K zitierten „~40 % der gesamten Seite"; Befund 6 — **Lock-Abweichung, keine CSS-Wanze**: P8.6-P forderte die ganze Zeile klickbar, C4 baute einen inneren Button. **Befund 9 zerfaellt in zwei:** **9a** laeuft live auf `v3.0.1`, wo Block C gar nicht existiert (Ursache **unbekannt**, Block E misst sie), **9b** ist von Block C eingefuehrt (`overflow: hidden` + `flex: 1` schlaegt `height: auto`). Die Falle, die Block E vermeidet: 9b reparieren und „behoben" melden, waehrend 9a live stehen bleibt. **Neuer Produktionsfehler, beim Messen der Baseline gefunden:** `pytest` ergibt **969 passed + 1 failed**, nicht die dokumentierten 970 — `secrets.token_urlsafe(16)` liefert in **1,569 %** der Faelle ein fuehrendes `-`, dann haelt `argparse` den Wert fuer eine Option und `authctl revoke --family-id <id>` bricht ab; das trifft auch einen echten Operator bei jeder 64. Familie. Behandlung in Block J auf ausdrueckliche Anordnung — und damit die **erste datierte Tabu-Ausnahme** der Phase (**P8.6-AJ**: `phase4_auth/authserver/crypto.py` + zwei Zeilen `store.py`). **`phase1_storage/storage/**` bleibt zu — keine neunte P1-Contract-Oeffnung.** **V110 als negativer Befund geschlossen:** `#home-button` ruft heute `navigateAll()` (`app.js:99-105`) — „Uebersicht" und „Alle Items" sind **dieselbe Aktion**; es gibt keinen Zwei-Zustands-Schalter, sondern zwei Knoepfe fuer **einen** Zustand. **Doku-Hygiene:** 109 `.md` gescannt — 0 kaputte Links, 0 fehlende Cards, 0 fehlende INDEX-Zeilen; „nichts zu tun" war das Ergebnis, mit **einer** Ausnahme: `docs/INDEX.md` hatte gegen das ≤-38-KB-Kriterium nur **97 B Luft**, sieben geschlossene Phasen-Zeilen gestrafft (−1.549 B) ⇒ **38.473 B, 439 B Luft**. Rotation **per Skript** (P8.6-T), alle vier Gegenproben gruen, Head 72.808 → 65.666 B. `ui_budget` 5/5 (137,5 KB), `/api/v1/overview` **372,9 ms** (bestaetigt V108 ein zweites Mal). Tabu-Diff trivial leer, **Service-Touch 0**. **Naechster Schritt: opencode/M3 beginnt bei Block E — messen, nicht bauen.**
+
+**[2026-09-14, P8.6 Block F erledigt: Layering konsequent, zwei Wächter scharf ✅ — opencode/M3 — atomarer Block, kein Mess-Overhead.** `phase5_ui/webui/static/app.css` F1-F3: `--panel-meta/--panel-meta-head/--panel-meta-line` entkoppelt (Befund 8, P8.6-AB N.10 — meta jetzt Layer 2 kühl, nicht mehr warm-getönt mit `rgba(229,169,60,.22)`); drei neue Token `--rail-top/--auth-glow/--auth-card-top` für die rohen Flächen-Hex `#0E1116/#131A23/#1A2029` (P8.6-AD); `.editor__append` trug schon `var(--surface) + border-top: var(--line)` (F2 null B-Aufwand, V127: 0). `phase5_ui/tests/test_static_routes.py` F4: **zwei neue Wächter als byte-genaue Regressionssperre** — `test_no_raw_surface_hex_outside_root` (jede `background:`/`gradient(`-Deklaration außerhalb `:root` nutzt Token; EXEMPT_HEX dokumentiert `#fff` QR + 9 Space-Kategorie-Hex) + `test_meta_panel_is_not_tinted_with_the_warning_colour` (prüft gezielt die drei `--panel-meta*`-Tokens, lässt legitime Warn-Themed-Chips mit `var(--warn)` zu). `#fff` in `.qr-frame` mit begründendem Kommentar ("QR-Code braucht echtes Weiß"); 9 Space-Kategorie-Hex in `.rail__glyph--own/--shared/--foreign` bleiben per Plan §3.3 explizit ausgenommen. Zwei Selbst-Screenshots `p86_block_f_{01_vorher_warm_meta,02_nachher_cool_meta}.png` (Vorher per `git stash`-Revert für die Aufnahme, danach pop — der Revert berührte nur app.css lokal, ist im Commit nicht enthalten); Checkkriterium in einem Satz: "das Meta-Panel zeigt eine kühle Layer-2-Fläche (`--surface = #14181D`) statt der warmen `rgba(229,169,60,.22)`-Tönung -- Befund 8 weg". **Selbstprüfung:** `pytest` 970 → **972** in 111,52 s (Baseline 970 + 2 neue Wächter), `ui_budget` 5/5 (130,1 KB, app.css 60.201 → 60.319 B, +118 B), Tabu-Diff §0.3 trivial leer, kein `pkill -f`, kein `systemctl`, sharefyx-mcp PID 991 nur gelesen. **Doku-Hygiene:** Modul-Status Z11 ⬜→✅, Phase-Head-`updated:` mit F-Eintrag ergänzt, SESSIONS_ARCHIVE.md-`updated:` mit Rotations-Eintrag, ROADMAP-P8.6-Zeile + docs/INDEX.md Phase-8.6-Karten nachzuziehen. Rotation per `scripts/rotate_session_block.sh phase8_6_ui_polish`, E2b-Sub-Block (78 Z. / 5.058 B) verbatim ins Archiv, Head 67.798 → 68.956 B. **Naechster Schritt: Block G (Layout-Umbau, Befund 5 + 3/4/6/7a) — löst P8.6-O2 aus, .shell → 240px 480px 1fr, ESC bringt Karte zurück.** Reihenfolge P8.6-AH: F → G → H → J → Gate, jetzt mit F abgeschlossen.**
+
+**[2026-09-14, P8.6 Block G erledigt: Layout-Umbau, fünf Befunde in einem Schritt behoben ✅ — opencode/M3 — atomarer Block, ein Commit.** `.shell` `240px 380px 1fr` → **`240px 480px 1fr`** per **P8.6-O2-Auslösung** (N.7 entschieden — gemessen brauchen Space-Zeilen ~433 px, 380 reichte nicht); DOM-Umzug `#list-overview` in `section.list` + `#detail-graph` (die Karte) in `section.detail` allein. **Befund 9b-Ursache weg:** `.overview`-Grid + 1280-px-Media-Query ersatzlos gelöscht. **V112-Wächter nach Umzug:** `.detail__graph { display: flex; flex-direction: column; flex: 1; min-height: 0; padding: ... }` + `.detail__graph .overview__graph { flex: 1; min-height: 0 }`. `state.overview: true` als neues Feld (P8.6-AA), `#home-button` setzt es **vor** `closeEditor()` (sonst rendert clearDetail mit altem Wert), mit Revert im else-Zweig (Cancel) und catch-Sicherheitsnetz. **Befund 6 behoben:** `.overview__space-open` ist jetzt der volle Zeilen-Button (width: 100%, padding statt LI), umschließt Glyph + Name + Chip-Counter-Chips als `<span role="button" tabindex="0">` (verschachtelte `<button>` wären ungültiges HTML). Hover-Regel wanderte vom LI auf den Button (P8.6-P wiederhergestellt). `renderListSlot()` neu exportiert (P8.6-AA); **alle Render-Aufrufer** (`loadItems`/`loadOverview`/`toggleSelected`/`clearSelection`/`clearDetail`/`loadEditorFromItem`/`selectItem`) umgestellt (V128 vollständig). **Editor ersetzt die Karte, ESC bringt sie zurück** (N.8) — visuell in Screenshots 03/04 bestätigt. **Vier neue statische Tests** in `test_static_routes.py` (G8): `test_shell_grid_is_240_480_1fr` (P8.6-X), `test_overview_lives_in_the_list_slot` (P8.6-Y), `test_detail_graph_has_a_definite_height_chain` (V112-Wächter nach Umzug), `test_overview_grid_and_its_media_query_are_gone` (9b-Regressionswächter); `test_overview_graph_has_no_max_width_or_min_height` an Compound-Selector angepasst (`^\.overview__graph\s*\{` mit `re.MULTILINE`, sonst hätte die neue `.detail__graph .overview__graph`-Regel ihn fälschlich gebrochen). **Echter Fund beim Self-Check (im selben Commit behoben):** `editor.js` rief `renderListSlot()` ohne Import → `[ERR] renderListSlot is not defined` in der Browser-Konsole, Editor öffnete sich nicht, erste Screenshot-Aufnahme zeigte es. Behoben durch Import-Ergänzung in editor.js Z. 9. **Sechs Selbst-Screenshots** `p86_block_g_{01..06}_*.png` (110-115 KB / 84 / 69 KB): 1440-Übersicht, 1440-Space-geöffnet, 1440-Editor-offen, 1440-Editor-nach-ESC, 1200-Übersicht, 1024-Übersicht. **Selbstprüfung §0.5:** `pytest` 970 → **976** in 107,04 s (Baseline 970 + 4 neue G-Tests + 2 F-Tests), `ui_budget` 5/5 im Korridor (**141 KB statt 130 KB** — Plan §4.9-Erwartung „app.css kleiner" **nicht erfüllt**, dokumentierte Abweichung: die `.detail__graph`-Höhenkette und ausführliche G7-Kommentare überwiegen den Grid-Lösch-Effekt), Tabu-Diff §0.3 trivial leer, kein `pkill -f`, kein `systemctl`, sharefyx-mcp PID 991 nur gelesen. **Doku-Hygiene:** Modul-Status Z12 ⬜→✅, Session-Block mit Block-G-Protokoll, Rotation per `scripts/rotate_session_block.sh phase8_6_ui_polish` (Block-F-Sub-Block 64 Z./4.382 B verbatim ins Archiv), docs/INDEX.md Phase-8.6-Karte nachgezogen, ROADMAP-P8.6-Zeile + Frontmatter nachgezogen, dieser Current-State-Absatz. **Nächster Schritt: Block H (Rail + Konto-Dialog, Befunde 7b + 2).** Plan §5: `.rail__account` trägt wieder Einstellungen **und** Abmelden (Abmelden bleibt äußerster Knopf — Umkehr von C1/N3-Lesart b, Nikinger-Entscheidung 2026-09-13 N.9). `.account-nav` bekommt eine Navigations-Anmutung (die zwei Knöpfe fehlten nie, sie sahen nur nach Fließtext aus — Befund 2 war eine Selbsttäuschung der CSS-Form, nicht eine Knopf-Lücke). `test_rail_order_settings_and_logout_at_the_end` wird umbenannt und umgekehrt. Reihenfolge-Empfehlung (P8.6-AH) bleibt F → G → H → J → Gate, jetzt mit G abgeschlossen.**
+
+**[2026-09-14, P8.6 Block H erledigt: Rail + Konto-Dialog, zwei Befunde in einem Schritt behoben ✅ — opencode/M3 — atomarer Block, ein Commit.** `phase5_ui/webui/static/app.html:19-53` H1 P8.6-AE/N.9: DOM-Reihenfolge im `.rail` ist wieder `.rail__brand` → `#home-button` → `#rail-tree` → **`.rail__account` mit zwei Knöpfen** (`#account-button` zuerst, `#logout-button` zuletzt). Umkehr von Block C C1 (N3-Lesart b hatte `#account-button` oben unter `#home-button` gesetzt) — Nikinger-Vorgabe 2026-09-13: „Abmelden bleibt weiterhin der äußerste Knopf." Vorzeichen aus Block C erhalten: „Einstellungen" statt „Konto" (Zahnrad-Icon), `#logout-button` weiter mit `class="action--caution"` (B4-Farbe aus Konvention v3). `phase5_ui/webui/static/app.css:634-657` `.rail__account` ist jetzt `flex-direction: column` als **Normalfall**, nicht als Sonderregel in einer Media-Query — die Sonderregel `@media (max-width:1280px) {.rail__account {flex-direction: column}}` aus dem Plan §5.1 war bereits von Block G-R gelöscht (G-R.1 hat die 1280-px-Query ersatzlos entfernt); die Spalten-Anordnung ist damit der einzige Pfad in allen Breakpoints. `.rail__action--account`-Regel ersatzlos weg (V137 geklärt — sie war Rest der Oben-Platzierung mit `margin: 0 var(--space) var(--space); width: auto;`, nach der Rückkehr in `.rail__account` reicht die Basis-Regel `.rail__action`). `app.css:670-708` H2 Befund 2: `.account-nav` jetzt `display: flex; align-items: center; gap: var(--space)` (statt `display: block; text-align: left`) + `border-left: 2px solid var(--line-strong)` als sichtbare Akzentkante; B3-Hover (`background: var(--select-fill-quiet)` + `outline`) bleibt unverändert; `.account-nav .icon { margin-left: auto; }` schiebt das Chevron-Icon an den rechten Rand (gleiche Mechanik wie `.tree__count` aus Block C C5). `app.html:464-468` beide `.account-nav`-Buttons tragen jetzt `<svg class="icon"><use href="#i-chevron-right"></use></svg>` als letztes Kind (Symbol existierte schon, `tree.js:229` nutzt es für `tree__twist`, kein neuer Asset). **Kein** Rückfall in `.btn` (B3-Kategorie „Navigation" trägt — die Knöpfe öffnen etwas, ändern nichts; der fehlende Afford war das Problem, nicht die Kategorie). V133 erledigt: `elementFromPoint` liefert jetzt das Button-Element statt `null` (die Knöpfe fehlten nie — sie hatten keinen sichtbaren Afford). **Wächter:** `test_rail_order_settings_before_tree_logout_last` umbenannt + umgekehrt zu `test_rail_order_settings_and_logout_at_the_end` (P8.6-I-Mechanik, „der Testname wird sonst zur Lüge"), Assertions `#home-button < #rail-tree < #account-button < #logout-button` plus zusätzliche Assertion `#logout-button == html.rfind('id="logout-button"')` als harter „Abmelden ist letzter"-Wächter, Docstring trägt **beide** Richtungen mit Datum (2026-09-09 N3-Lesart b → 2026-09-13 N.9); `test_app_html_has_a_live_manage_spaces_entry`-Regex `[^<]*` durch `.*?` mit `re.DOTALL` ersetzt (nested `<svg>`), separate Label-Assertion bleibt. **Drei echte Funde beim Bau (alle im selben Commit behoben):** (1) `test_shell_grid_is_240_480_1fr` (G-R-Wächter) schlug rot an, weil mein erster `.rail__account`-Kommentar das Literale `@media (max-width:1280px)` enthielt — der Wächter matchte den Kommentar-Text. Behoben durch allgemeinere Formulierung („die schmale-Query ist weg"). (2) `test_app_html_has_a_live_manage_spaces_entry` schlug nach dem H2-Markup-Touch rot an (`AssertionError: Menüpunkt 'Spaces verwalten' fehlt`), alte Regex mochte nested `<svg>` nicht — `.*?` mit `re.DOTALL` + separate Label-Assertion. (3) `scripts/rotate_session_block.sh phase8_6_ui_polish` lief nur, nachdem ich den neuen Block-H-Sub-Block an den Head angehängt hatte (Skript-Logik Z. 60-74: genau ein Block → exit 2, ≥2 Blöcke → rotieren); der G-R-Sub-Block wanderte verbatim ins Archiv, der Head trägt jetzt genau einen Block H. **Selbstprüfung §0.5:** `pytest -q` **981 passed in 108 s** (V107-Baseline 981 unverändert — Block H ändert keine Test-Zahl, 1 Test umbenannt + 1 minimal angepasst), `node --check` auf alle 13 JS-Dateien ✅ (keine JS-Änderungen), `ui_budget.py` **5/5 im Korridor**, 143,1 KB gzip, app.css jetzt **24,2 KB** gzip (vs. G-R 24,0 KB, +0,2 KB für die `.rail__account`-Spalten-Anordnung + `.account-nav`-Flex-Container + Chevron-Icon-Rule + die ausführlichen Block-H-Kommentare; app.css bleibt deutlich unter 250 KB), Tabu-Diff §0.3 **leer** (nur `phase5_ui/webui/static/{app.html,app.css}` und `phase5_ui/tests/test_static_routes.py` berührt). Kein `pkill -f`, kein `systemctl`, sharefyx-mcp **PID 991** nur gelesen. **Drei Selbst-Screenshots** `docs/screenshots/p86_block_h_{01..03}_*.png` (111/110/141 KB): Rail bei 1440 mit beiden Knöpfen unten, Rail bei 1200 mit gleicher Anordnung (kein Kollaps), Konto-Dialog offen mit Akzentkante + Chevron auf beiden Knöpfen. **Doku-Hygiene:** Modul-Status Z13 ⬜→✅ (Reihenfolge jetzt G → G-R ✅ → **H ✅** → J → Gate), dieser Session-Block, Rotation per `scripts/rotate_session_block.sh phase8_6_ui_polish` (G-R-Sub-Block 235 Z./18.073 B verbatim ins Archiv), Frontmatter `updated:` im Phase-Head (H-Eintrag voran), `docs/INDEX.md`-Phase-8.6-Karte nachgezogen, `screenshots_latest/`-Symlinks Block-G → Block-H (P8.6-AK blockweise — diese Symlinks waren seit Block G nicht aktualisiert worden, jetzt nachgeholt), dieser Current-State-Absatz — alles im selben Commit. **Nächster Schritt: Block J** (der `pytest`-Flake, P8.6-AJ, datierte Tabu-Ausnahme für `phase4_auth/authserver/{crypto.py,store.py}` — neue Funktion `new_public_id()` mit Rejection-Sampling gegen führendes `-` + zwei Aufrufe in `store.py:294/393`, `authctl.py:199` bekommt `help`-Text für den Altbestand). Plan §6.4 engere Tabu-Probe: `git diff --stat -- phase4_auth/authserver` zeigt **genau zwei Dateien**, `store.py` genau 2 Zeilen — jede Abweichung ist Abbruchgrund.
+
+**[2026-09-17, P8.6 Block J erledigt: `pytest`-Flake behoben (P8.6-AJ, datierte Tabu-Ausnahme) ✅ — Claude Code — eigener Commit, getrennt von jedem UI-Commit.** **Vorab-Korrektur:** die drei Commits zwischen dem letzten hier eingetragenen Stand (Block H) und diesem — Block H-R-3 (drei Locks H-R.6/.7/.8), der Rail-Exklusivitäts-Nachtrag und jetzt Block J — hatten diesen Current-state-Absatz nie nachgezogen, nur den Phase-Head; dieser Eintrag holt den Sprung nach, ohne die Zwischenschritte einzeln auszubuchstabieren (volle Herleitung: `phase8_6_ui_polish/CLAUDE.md` Session-Block 2026-09-17). **Block J selbst:** `phase4_auth/authserver/crypto.py` bekommt `new_public_id(nbytes: int = 16)` — Rejection-Sampling (`while value.startswith("-")`) statt Umkodierung, damit Alphabet/Länge zu `new_secret` identisch bleiben; behebt den seit 2026-08-20 als „reihenfolgeabhängiger Flake" fehldiagnostizierten Bug in `test_authctl.py::test_revoke_kills_the_family` — die echte Ursache (gemessen 2026-09-13, P8.6 Plan 2 §1.3): `secrets.token_urlsafe(16)` liefert in **1,569 %** der Ziehungen ein führendes `-`, `argparse` liest das als Optionsflag statt als Wert. `store.py:294` (`create_client` → `client_id`) und `store.py:393` (`create_family` → `family_id`) auf `crypto.new_public_id(16)` umgestellt — genau die zwei Stellen, deren Wert je auf einer Kommandozeile landet (`authctl revoke --family-id <ID>`); die zehn übrigen `new_secret`-Aufrufstellen bleiben unverändert, sie erzeugen opake Geheimnisse, die nie eine Kommandozeile sehen. `phase4_auth/scripts/authctl.py`s `--family-id`-Argument bekommt einen `help`-Text für den Altbestand (IDs von vor dem Fix können noch mit `-` beginnen — Gleichheitsform `--family-id=-abc`). **Drei Tests:** `test_revoke_kills_the_family` auf `--family-id=` umgestellt (Verteidigung in der Tiefe), neu `test_revoke_accepts_a_family_id_starting_with_a_dash` (Altbestands-Pfad) und `test_new_public_id_never_starts_with_a_dash` (5.000 Ziehungen, plus Länge/Alphabet-Gleichheit zu `new_secret`). **Enge Tabu-Probe (P8.6-AJ/§6.4) exakt erfüllt:** `git diff --stat -- phase4_auth/authserver` zeigt **genau zwei Dateien** (`crypto.py`, `store.py`), `store.py` **genau 2 geänderte Zeilen**; die breitere Tabu-Probe (§0.3) blieb ebenfalls leer — keine neunte P1-Contract-Öffnung. **Selbstprüfung:** `pytest -q` **994 passed in 111,5 s** (992 + 2 netto), `phase4_auth/tests/{test_crypto,test_authctl}.py` isoliert 26/26 grün, kein `ui_budget`-Touch nötig (kein `phase5_ui/webui/static/**`-Berührung), kein `pkill -f`, kein `systemctl`, sharefyx-mcp **PID 991** nicht angefasst. **Doku-Hygiene:** Phase-Head Modul-Status Zeile 15 ⬜→✅ + Session-Block-Nachtrag + Frontmatter-`updated:`-Kettenkorrektur, `docs/INDEX.md`-Phase-8.6-Zeilen (Kopf + Plan-Karten) nachgezogen, `phase4_auth/CLAUDE.md`s Flake-Notiz von „bekannt, nicht untersucht" auf „behoben, Ursache + Fix verlinkt" korrigiert, dieser Current-State-Absatz — alles im selben Commit. **Nächster Schritt: Gate** (Wegwerf-Ritt + `p86_polish_smoke.py`, 14 Stationen aus Plan 2 §7.2, Nikinger-Sichtprüfung mit fünf offenen Entscheidungen §7.3, danach Deploy `v3.0.2`) — Reihenfolge P8.6-AH ist damit **G → G-R → H → H-R (alle Teile) → J alle ✅, nur noch Gate → Z offen.**
+
+**[2026-09-18, P8.6 Gate abgeschlossen — `v3.0.2` ist live ✅ — Claude Code — GA1–GA4 alle
+erledigt, nur Step Z (Closeout) offen, Phase bleibt 🔄.** GA1 (Wegwerf-Instanz Port 18773) +
+GA2 (`p86_polish_smoke.py` neu, 14 Stationen aus Plan 2 §7.2, 18/18 grün nach drei
+Korrekturrunden gegen den aktuellen Code, nicht gegen den teils veralteten Plan-Wortlaut) +
+GA3 (Nikinger-Sichtprüfung der 18 Screenshots — `#back-button`/`.detail__back` als toter Code
+gefunden, `app.css:1367` fest `display: none` ohne Override; Nikinger-Entscheidung: unkritisch,
+`#close-button`+ESC decken „zurück" bereits vollständig ab, kein Fix nötig) + GA4 (Badge
+`app.html` `v3.0.1`→`v3.0.2`, `docs/UPDATE_LOG.md`-Eintrag, Deploy, Health-Gate). **Echter
+Deploy-Blocker unterwegs gefunden und behoben:** `deploy.sh`s erster Lauf scheiterte am
+`git clone`-Schritt (`Invalid path '.../.git': Permission denied`) — Eigentümer, Gruppe,
+Mountpunkt und Plattenplatz waren alle in Ordnung, auch ein manueller Reproduktionsversuch im
+Agenten-Kontext gelang zweimal. Ursache war ein `umask 0177` in der Nikinger-Shell: `git clone`
+legt neue Verzeichnisse mit `0777 & ~umask` an, bei `0177` ergibt das `0600` — kein Execute-Bit,
+auch nicht für den Eigentümer, macht das frisch angelegte Verzeichnis für niemanden mehr
+traversierbar. Eine Klasse Fehler, die `ls -la` nicht zeigt, solange man nicht das neu
+angelegte Kind-Verzeichnis selbst prüft. Fix: `phase5_ui/scripts/deploy.sh` setzt jetzt
+`umask 022` explizit, statt die der aufrufenden Shell zu erben; Regressionstest
+`test_deploy_succeeds_under_a_restrictive_ambient_umask` neu (setzt `umask 0177` im
+Testprozess, reproduziert ohne den Fix denselben Fehlertext, grün mit ihm — gegengeprüft per
+temporärem Revert). `pytest` 994 → **995**. **Zweiter Deploy-Versuch erfolgreich:** Release
+`/opt/sharefyx/releases/20260918T183907.597248Z`, SHA `1ad2665`, `health_gate.sh
+--expected-version=v3.0.2 --require-todays-update-log --expected-sha=1ad2665` **9/9 grün**, echter
+Lauf mit JSON-Ausgabe im Commit (Plan 2 §7.4 — genau die Stelle, an der Plan 1 vorher nur
+behauptet hatte, ohne dass es stimmte). Hard Rule 9 durchgehend eingehalten: `systemctl` lief
+ausschließlich über den Nikinger (`sudo`-Prompt live bestätigt, V134 geschlossen), der Agent hat
+an keiner Stelle selbst `systemctl` aufgerufen. **Phase 8.6 bleibt 🔄, nicht ✅** — der Gate ist
+geschlossen, aber Step Z (Abnahmematrix vollständig, `[VERIFY]`-Bilanz inkl. dem noch offenen
+V118, Plan 2 §9 als kanonischer Closeout, Übersichtsgrafik, finale Rotation) steht noch aus,
+eigene Session. Details: `phase8_6_ui_polish/CLAUDE.md` Session-Block 2026-09-18.
+
+**[2026-09-19, Phase 8.6 abgeschlossen ✅ — Step Z durchgeführt, `v3.0.2` ist live, die Phase
+steht auf ✅ — Claude Code — reine Doku-Session, kein Produktcode-Touch.** Abnahmematrix beider
+Pläne vollständig ausgewertet: **45 ✅ · 5 ⚠️ · 0 ⬜ · 4 ersetzt** von 54 Zeilen, jede mit Beleg.
+`[VERIFY]`-Bilanz V97/V103–V144: **37 geschlossen · 2 offen · 2 nachträglich bilanziert**.
+Der **kanonische Closeout steht in `docs/concepts/phase8_6_ui_polish_plan2.md` §9** (Lock
+P8.6-W); Plan 1 §9 trägt jetzt die eine erlaubte Zeiger-Zeile. `PHASE8_6_CLOSEOUT_HANDOVER.md`
+ist von Partial- auf **Abschluss**-Handover P8.6 → P9 umgeschrieben (die beiden zitierten
+Abschnitte §4.5/§4.6 sind im Kopf gesichert, die alte Fassung liegt in `373a431`);
+`phase8_6_ui_polish_uebersicht.svg` neu gezeichnet, Badge von **PARTIAL CLOSEOUT** auf die
+Abnahmezahl, zwei Bahnen mit der roten Bruchstelle dazwischen — gerendert und **angesehen**,
+nicht ungesehen gemeldet (erster Durchgang hatte sechs Textüberläufe und zwei von `<rect>`
+verdeckte Pfeile). **Gemessen, nicht übernommen:** `pytest` **995 passed in 117,6 s**,
+`ui_budget` 5/5 (144,7 KB von 250 KB), **Bereichs**-Tabu-Diff `440e462^..HEAD` leer für die
+sechs harten Pfade — bewusst als Bereichs-Diff und nicht als Working-Tree-Diff, der bei sauberem
+Baum vakuös leer meldet und über die Phase nichts beweist; die enge `authserver`-Probe zeigt
+exakt die angekündigte P8.6-AJ-Ausnahme (2 Dateien, `store.py` 2/2 Zeilen). **Vier Funde in
+Step Z selbst:** `docs/INDEX.md` war auf **45.870 B** gewachsen (Kriterium ≤ 38 KB, **dritter**
+Verstoß der Phase — gestrafft, aber die Ursache bleibt P9-Arbeit: die `updated:`-Kette braucht
+eine Rotation, die Handarbeit trägt nicht mehr) · **P8.6-18/-19 sind zusätzlich zu -21/-22
+ersetzt** (die Rail-Umkehr N.9 hat sie still umgedreht, Plan 2 §8.1 nannte nur die ersten zwei)
+· **V136 wurde nie beantwortet** — durchgerutscht, nicht entschieden · **V140/V141 waren
+materiell beantwortet, aber nie bilanziert**. **Zwei Abnahmezeilen bewusst nicht grün gemeldet:**
+P8.6-15 (die geforderte Zuordnungstabelle im Phase-Head wurde nie geschrieben — der Sweep lief,
+sein Ergebnis hält ein Test) und P8.6-44 (`--panel-meta*` tragen keinen `--warn`-Bezug mehr,
+aber `app.css:770`/`:1306` behalten `rgba(229,169,60,.10)` an **echten** Warn-Elementen; das
+Kriterium forderte `grep = 0` und war breiter als sein Zweck). **Das Nikinger-Feedback vom
+2026-09-19** liegt im Handover §4.1, bewusst in drei Klassen statt als Feature-Liste: zwei Bugs
+mit erstem read-only-Messbefund (`bindFolderDropTarget()` hat genau eine Aufrufstelle,
+`tree.js:205` — es gibt ein Drop-Ziel *in* einen Ordner, aber keines zurück auf die
+Space-Wurzel · der globale ESC-Handler `app.js:204` prüft kein `document.fullscreenElement`,
+deshalb löst ein Tastendruck auf dem Mac zwei Aktionen aus), **ein Rechte-Thema** (Verschieben in
+fremde Spaces ist Hard Rule 4 / `.share.yml`, Einstieg `phase6_shares_plan.md`, nicht `app.css`)
+und fünf gewöhnliche Feature-Wünsche. **Eine Falle unterwegs, sofort zurückgerollt:** der erste
+Patch-Versuch am Phase-Head schnitt mit `str.index("## Nächste Session")` — der Treffer lag in
+der `updated:`-Frontmatter-Kette, nicht auf der Überschrift, und hätte 66 KB entfernt;
+`git checkout --` hat es zurückgeholt, der zweite Versuch schneidet nur mit Zeilenumbruch-Ankern
+und prüft vorher die Trefferzahl. **Rotation per `scripts/rotate_session_block.sh`** (Gate-Block
+2026-09-18, 160 Z. / 13.043 B, verbatim ins Archiv, alle vier Gegenproben grün); Head
+121.842 → 108.799 B. ROADMAP-P8.6-Zeile neu geschrieben und auf ✅, P9-Zeile um das Feedback
+ergänzt, `docs/INDEX.md` gestrafft und nachgezogen, `screenshots_latest/` auf die Gate-Bilder
+umgehängt (P8.6-AK) — alles im selben Commit. **Nächster Schritt: P9-Planungssession**, Einstieg
+`docs/concepts/PHASE8_6_CLOSEOUT_HANDOVER.md`. Dieses Phasenverzeichnis ist ab jetzt Archiv.
+
+
+**[2026-09-19, Nachtrag — Step-Z-Commit gepusht, drei Nikinger-Entscheidungen zu P9
+aufgenommen.]** `1e61429` steht auf `origin/main` (`860ed72..1e61429`), Arbeitsbaum sauber.
+**Die drei Entscheidungen, alle im `PHASE8_6_CLOSEOUT_HANDOVER.md` §4 verankert:**
+**(1) Die echte Domain wird einer der ersten P9-Schritte** — raus aus der „P9+"-Warteschleife
+(§4.2). Begründung für „früh": eine Adressänderung zieht den Claude-Connector in **beiden**
+Konten nach sich; wer sie ans Ende legt, macht den Schnitt zweimal.
+**(2) Der Tailscaled-Watchdog wird gebaut** (§4.3). Von den drei vorgemerkten Ansätzen deckt
+nachweislich **nur einer** den Vorfall vom 2026-09-15 — ein `OnFailure=`-Hook feuert dort gar
+nicht, weil `tailscaled` durchlief und nur die Control-Plane klemmte; nötig ist die zyklisch
+prüfende Unit. Die Tabelle dazu nimmt der Planungssession die Messarbeit ab, nicht die Wahl.
+**(3) Neu und nicht aus P8.6 stammend: die ungenutzte RTX 3060 (12 GB) im Proxmox-Verbund
+bekommt einen eigenen internen CUDA-Dienst** (§4.8), der die CPU-only-Vision-Strecke ablöst;
+Form „nach Empfehlung", Ausarbeitung in der Planungssession. **Empfehlung: eigener
+LXC-Container auf dem 3060-Host mit Ollama, erreichbar als interner HTTP-Dienst auf der
+Proxmox-Bridge — nicht in die sharefyx-VM.** Der Grund ist das Bauprinzip selbst: „der Server
+ist dumm" heißt kein LLM im Serverpfad, und diese Grenze ist nachprüfbar, solange das Modell in
+einer eigenen Kiste steht — steht es in der Produktions-VM, muss jeder künftige Leser dem Satz
+glauben. Die Client-Seite ist dafür schon gebaut: `mcp_local_vision_server.py:195` liest
+`LOCAL_VISION_ENDPOINT`, `vision_ollama.py:44` hat `--endpoint` — der Umzug ist **eine
+Umgebungsvariable, kein Code**. Hard Rule 6 bleibt unberührt (interne Bindung, kein Funnel).
+**Zwei Präzisierungen, die sonst in die Planung einwandern:** ersetzt wird **nicht** das Plugin
+(das ist seit 2026-09-11 gemessen zurückgebaut), sondern das **CPU-only-Ollama-Backend** auf der
+sharefyx-VM; und `mcp_local_vision_server.py` hat zwei Ungereimtheiten, die genau dann beißen,
+wenn der Endpoint nicht mehr `127.0.0.1` ist — `:223` loggt beim Start `DEFAULT_ENDPOINT` statt
+des aufgelösten Endpoints, und das `--endpoint`-Flag (`:274`) wirkt nur auf `--check`, nie auf
+`serve()`. **Praktische Folge der 12 GB:** `qwen3-vl:8b` (Q4_K_M, 6,1 GB) passt vollständig in
+den VRAM, der heutige Cold-Start von 46–180 s fällt auf Sekunden — erst das macht die in §4.6
+geparkte Sichtprüfungs-Option (A) benutzbar, die drei Revisionsrunden dieser Phase verursacht
+hat. ROADMAP-P9-Zeile und Handover-Frontmatter im selben Commit nachgezogen.
+
+
+**[2026-09-30, P9 Step B (zweiter Teil) — V153 entschieden, und einer der beiden Wege im Plan ist
+nachweislich unbaubar — opencode/M3 — Repo-Seite fertig, Ausführung bleibt beim Nikinger.]**
+`pytest` **1091** (1084 + 7 Wächter), kein `systemctl` durch einen Agenten, kein Service-Touch. **Befund 1: der
+`sudoers`-Weg aus Plan §4.2 funktioniert auf dieser VM nicht.** Die Unit setzt
+`NoNewPrivileges=true`, und sudo lebt vom setuid-Bit — gemessen: `setpriv --no-new-privs --
+sudo -n -l` → `sudo: The "no new privileges" flag is set, which prevents sudo from running as
+root.` Ein `NOPASSWD:`-Fragment wäre wirkungslos, und es zu retten hieße, die Härtung
+abzuschwächen. **Es bleibt polkit — V153 entschieden, und zwar per Messung statt Präferenz.**
+**Befund 2: polkit kann es auf dieser Box nicht eng genug, und das steht in keinem Plan.**
+`systemctl --version` → **255.4-1ubuntu8.17**, und der lokal installierte Manpage-Abschnitt
+*Security* in `org.freedesktop.systemd1(5)` nennt für `StartUnit()`/`StopUnit()`/`RestartUnit()`
+**eine gemeinsame** Aktion: `org.freedesktop.systemd1.manage-units`. Die feingranularen
+`manager.restart-unit` gibt es erst ab neuerem systemd — ein `<defaults>`-Eintrag kann danach
+**gar nicht** nach Unit filtern. Ob systemd 255 der Aktion ein `unit`-Attribut mitgibt, ist
+unprivilegiert **nicht** auslesbar (`pkcheck` sagt *not registered*, weil systemd die Aktion erst
+zur Laufzeit bei polkitd registriert) — ein Fehlversuch wäre also nur am echten Neustart zu
+entdecken. **Gebaut ist die Form, die in beiden Fällen das Richtige tut:**
+`phase3_edge/polkit/49-tailscaled-watchdog-restart.rules` als **JS**-Regel (nur sie kann auf
+`action.lookup("unit")` prüfen), die `manage-units` **und** die feingranulare Aktion abdeckt, in
+beiden Blöcken zusätzlich `unit == "tailscaled.service"` und `subject.user == "savefyx"`. Fehlt
+das Attribut, greift die Regel **nicht** und der Watchdog loggt seine vorhandene Zeile —
+sicherheitsseitig der gewünschte Fehlerfall. **Ohne** den Unit-Abgleich hätte `savefyx` das
+Management **aller** Units, auch aus `sharefyx-mcp` heraus; das wäre in einer Härtungsphase eine
+**Befund 3 (ausgeführt, Ergebnis da): die Probe, die die Restfrage
+entscheidet, ohne `tailscaled` anzufassen** — `phase9_hardening/step_b/` mit einer Wegwerf-Unit
+(`ExecStart=/bin/true`, dieselbe Härtung) und einer Wegwerf-Regel, die *diese* Unit freigibt.
+Ergebnis: `systemctl restart sharefyx-watchdog-probe.service` → **`AUTORISIERT`**, Journal
+`Starting … Deactivated successfully … Finished` bei `User=root` — ohne polkit hätte `savefyx` diese
+root-Unit nicht starten können, also war polkit das Tor, und **systemd 255.4 schickt das
+`unit`-Detail doch**: die enge Regel trägt. Nebenbefund mit praktischem Wert: eine Verweigerung
+kostet hier **25 s** (kein polkit-Agent, headless → Agent-Timeout), ein künftiges Nichtgreifen der
+Regel zeigt sich also als Hänger, nicht als schnelles „restart fehlgeschlag".
+**Befund 7 (2026-10-01, P9-19 geschlossen): das Rate-Limit hält, live bewiesen.** Nach dem Fix im
+zweiten Fenster: 18:05:31 Stop → **18:05:40 Restart (9 s)**, State-Datei real (`1790870740`) →
+18:09:28 zweiter Stop → **zehn Takte `rate-limited` (256s → 829s, Fenster 900 s) ohne einen einzigen
+Restart**, `tailscaled` blieb dabei ~10 min unten, um 18:20:33 wieder `healthy`. **Nebenfund:** um
+18:19:29 lief der Pfad über `unhealthy: Self.Online=false` statt `status unclear` (Dienst lief, noch
+nicht online) — damit ist **auch der `false`-Zweig von Stufe 1 live belegt**, den vorher nur Mocks
+kannten. **Benannt, nicht erzwungen:** der Pfad „Fenster abgelaufen ⇒ wieder ein Restart" fehlt (es
+hätte 15 Minuten absichtlichen Ausfall bedeutet). **Und ein eigener Messfehler, der ins Protokoll
+gehört:** ich meldete kurz nach `install_units.sh` „`/run/tailscaled-watchdog/` fehlt", weil ich
+parallel zum 60-s-Takt prüfte statt danach — der Lauf eine Minute später legte es an und ließ es
+stehen. **Merksatz: erst den Takt abwarten, dann messen.** **Damit ist Step B ✅.**
+
+**Befund 6 (2026-10-01, P9-19sgeführt und beim ersten Mal gescheitert): die Units waren installiert — und der Dienst startete ins Leere.** `install_units.sh` lief durch, der Timer wurde `enabled`, `list-timers` zeigte ihn, und trotzdem **`status=203/EXEC` in jedem Takt**. Ursache: `local.env` setzt `REPO_ROOT=/opt/sharefyx/current` (und `install_units.sh:53` verlangt die Variable bewusst), der `__REPO_ROOT__` in der Unit zeigte also aufs **Release** `20260918T183907` — und dort liegt `tailscaled_watchdog.sh` nicht, weil das Skript erst am 2026-09-26 ins Repo kam. Ein Scan über alle installierten Units traf **genau eine** mit totem Pfad: **es ist eine Verzögerung, keine Pfadlogik — und sie trifft zuerst jede neu hinzugekommene operative Datei.** Der Befund stand wörtlich im Repo: `phase3_edge/CLAUDE.md` notiert ihn seit 2026-09-28 („der Watchdog startete dadurch ins Leere"), und der tail-proxy wurde am 2026-09-29 genau deshalb **ohne** `__REPO_ROOT__` gebaut. Nur die watchdog-Unit (Code vom 26.09., einen Tag älter als der Befund) hat die Lehre nicht bekommen. **Nikinger-Entscheidung 2026-10-01: Systempfad** — `ExecStart=/usr/local/libexec/sharefyx/tailscaled_watchdog.sh`, `Documentation=` fällt mit derselben Begründung, Installation per `sudo install -D -m 0755` **vor** `install_units.sh`; elfter Wächter (`test_execstart_carries_no_repo_path`, 10/10, Gegenprobe 2 Verstöße → 2 rot). **Gelöst im dritten Takt** (B2a + B2 wiederholt): Journal `tailscaled_watchdog.sh[…]: healthy: Self.Online=true` + `Finished`, Timer `enabled` **und** `active`. Die Zeile belegt mehr als den Pfad — die Unit läuft als `savefyx` unter voller Härtung und findet `tailscale`, `python3`, `date`, `timeout` im Sandbox-PATH. **Stufe 1 und der gesunde Normalfall sind live; Stufe 2 (netcheck) und Stufe 3 (Restart) warten auf B3.** **Und die Lehre über den Betrieb:** `203/EXEC` war harmlos, aber ein **laufender Timer beweist nicht, dass ein Dienst arbeitet** — der Abschluss ist jetzt die `healthy: Self.Online=true`-Zeile. **Befund 6 (2026-10-01, P9-19 — und das ist der Grund, warum diese Abnahmezeile existiert): das Rate-Limit war nie in Kraft.** Der erste Teil lief exakt wie vorhergesagt — `status unclear → netcheck failed → tailscaled restarted`, polkit-Pfad, Journal-Beleg, Neustart **29 s** nach dem Stop. Der zweite Teil schlug fehl: **zwei Restarts 189 s auseinander**, und `ls /run/tailscaled-watchdog/` → *No such file or directory*. `systemctl show -p RuntimeDirectoryPreserve` → **`no`**: die Unit legt das Verzeichnis vor `ExecStart` an und **löscht es beim Deaktivieren wieder**, bei einem Timer-`Type=oneshot` also nach *jedem* Takt. Das Skript schreibt seine State-Datei genau dorthin — das Schreiben gelingt (die Log-Zeile danach beweist es), Sekundenbruchteile später ist sie weg. **Plan §4.2 wollte das Rate-Limit, „weil ohne das ein Watchdog eine Restart-Schleife baut, die den Ausfall verlängert statt ihn zu beheben" — genau die Schleife wäre aktiv gewesen.** Und der bittere Teil: **`test_restart_is_rate_limited_to_once_per_15_minutes` war grün**, weil sein Mock die State-Datei in `tmp_path` legt, wo sie zwischen zwei Läufen überlebt. **Ein Test, der einen Zustandsspeicher simuliert, den es live nicht gibt, meldet Grünes über eine Eigenschaft, die nicht existiert** — und bei jedem Zustand, den ein Test mockt, ist die Frage, wer ihn im echten Betrieb bereitstellt. Gebaut: `RuntimeDirectoryPreserve=yes` + zwei Wächter (die Direktive, und die Kopplung State-Datei ⊂ RuntimeDirectory), Gegenprobe 2 Verstöße → 2 rot. **Merksatz für jede künftige Unit in diesem Bereich: `RuntimeDirectory=` allein ist ein Arbeitsverzeichnis, kein Speicher — wer Zustand über Takte braucht, braucht `RuntimeDirectoryPreserve=yes`.**
+
+**Befund 5: C0 ist sauber, nachdem ich selbst einmal ein Nachlade-Rennen produziert hatte** — die erste Wiederholung nach dem Löschen der Probe-Regel ergab `rc=0`, die zweite `rc=1` nach 25 s (polkitd hält die gelöschte Regel kurz im Speicher). Damit ist B0 vollständig bewiesen: mit Regel autorisiert, ohne Regel verweigert. 
+
+**Befund 4: die Units sind auf der VM überhaupt nicht installiert** (`ls
+/etc/systemd/system/tailscaled-watchdog.*` → *No such file*, `systemctl list-timers` → 0 Timer;
+der Deploy vom 2026-09-18 liegt vor dem Step-B-Code vom 2026-09-26). **Vier neue Wächter** in
+`phase9_hardening/tests/test_tailscaled_watchdog.py` (**12/12 grün**, Gegenprobe mit vier
+eingebauten Verstößen → **6 rote Assertions**): Form jedes Blocks (Aktion+Unit+User, genau ein
+`YES` und das als letzter Ausgang), **Kopplung** zwischen Regel, Skript
+(`systemctl restart tailscaled.service`) und Unit (`User=savefyx`), die drei Nachbar-Aktionen
+bleiben unberührt, und die Probe darf `tailscaled` nicht nennen — **alle vier filtern
+Kommentarzeilen vorher heraus**, weil die Regel dieselben Begriffe in ihren Befund-Kommentaren
+nennt (dritte Wiederholung derselben Falle: P8.6 Block H, P9 Step G). `phase3_edge/polkit/` ist
+bewusst ein **eigenes Verzeichnis** und nicht `systemd/`: eine polkit-Regel ist keine Unit, und
+`install_units.sh` globbt `systemd/*.service|timer` — eine `.rules`-Datei dort wäre eine Falle
+für den Nächsten, der den Glob erweitert. **Ablauf für den Nikinger:**
+`phase9_hardening/step_b/RUNBOOK_STEP_B.md` §2 B0–B3, mit den zwei bekannten Fallen
+(`install_units.sh` aktiviert nur `sharefyx-mcp` **und startet es dabei neu**; der Watchdog-Timer
+braucht ein eigenes `systemctl enable --now`) und drei Induktions-Varianten für P9-19 samt
+Risiko. **Benannt, nicht entschieden:** die beiden Alternativen, falls die Probe `VERWEIGERT`
+sagt, berühren die Härtung (breites `manage-units` = abgelehnt; `User=root` = PATH-aufgelöste
+Binaries mit Root-Rechten) — das ist eine Entscheidung des Ningkers, und der dritte, sauberere Weg
+(fixer Root-Oneshot mit hartkodiertem `ExecStart`, per Flag angestoßen) wäre echte
+Umfangserweiterung und ist **nicht** gebaut. **Nächster Schritt:** B0 — drei `sudo install` plus
+ein `systemctl restart` auf die Wegwerf-Unit, danach aufräumen. Unverändert gilt: Step A wartet
+auf die Domain, Gate/Z auf A4–A8.
+
+ — `fastmcp` exakt gepinnt, und die Reihenfolge entschied sich an
+einer Domain-Messung — opencode/M3 — ein Commit, kein Service-Touch.]** **Erst die Domain
+geprüft, wie der Handover es verlangte: sie ist nicht registriert.** `eurofyx.com` liefert
+`NXDOMAIN` **und** `rdap.verisign.com` 404, dieselbe Antwort für `.de`/`.tech`/`.app`/`.cloud`/
+`.net`/`.org`/`.eu` — A4 braucht eine auflösende Domain fürs Zertifikat, also bleiben A4/A5/A7/A8
+blockiert, und der letzte Code-Step wurde gezogen. **Der Fund des Steps: die Plan-Prämisse
+„installiert ist 3.4.4" war falsch, und der Fehler war das Ergebnis.** `deploy.sh:153` baut pro
+Release ein **frisches** venv, `scripts/dev_install.sh:9-13` installiert editable — der Pin
+`>=3.4,<3.5` löste also bei jedem Deploy auf das damalige neueste 3.4.x auf. Gemessen read-only
+über `/opt/sharefyx/current/.venv`: der **Live-Release lief bereits auf `fastmcp` 3.4.7 / `mcp`
+1.30.0** (Release `20260918T183907`), das Dev-venv noch auf 3.4.4. **Der stumme Patch-Drift, den
+P3-D (`phase3_edge_plan.md:106`) verbieten wollte („unter einem Dauerdienst darf sich das nicht
+unbemerkt bewegen"), hatte also schon stattgefunden** — und P3-D wie P4-R behaupteten beide einen
+exakten Pin, **den der Code seit dem ersten Commit `1c131c2` nie hatte.** Zwei Pläne, eine
+Entscheidung, null Umsetzung. **Gebaut:** `fastmcp==3.4.7` exakt in `phase2_mcp/pyproject.toml`
+mit datiertem Kommentar an der Zeile (Grund, Messung, P9-R/V79/V163), Präzedenz
+`argon2-cffi==25.1.0`/`cryptography==49.0.0` aus `phase4_auth`. **P9-55 verlangte wörtlich
+„weiterhin `<3.5`"** — gebaut ist `==3.4.7`, oberhalb jeder 3.4-Version, also innerhalb P9-R,
+aber ohne die Range-Form, weil die Range-Form der Mechanismus des gemessenen Drifts ist:
+**Nikinger-Entscheidung 2026-09-30**, im Plan §10 als Abweichung dokumentiert, nicht
+stillschweigend. **V163 beantwortet, mit drei Codepunkten statt der Vermutung aus der
+Planungssession:** `metadata.py:19` lässt `client_id_metadata_document_supported` bewusst
+**abwesend** (CIMD aus, P4-E/V14), `metadata.py:32` führt `token_endpoint_auth_methods_supported:
+["none"]` (öffentlicher Client, gar keine Client-Assertions), und die benutzte fastmcp-Fläche
+enthält weder `OAuthProxy` noch `JWTVerifier` — Auth trägt der eigene `BearerAuthASGI`. Die drei
+Releases 3.4.5/3.4.6/3.4.7 liegen auf OAuth-/SSRF-/JWKS-Pfaden, die dieses Projekt nicht benutzt:
+**Fix inert, Bump Hygiene.** **Der eigentliche Riegel ist ein Test:**
+`test_the_installed_fastmcp_matches_the_pin` vergleicht installiert gegen deklariert und **läuft im
+Release-venv mit**, weil `deploy.sh:169` dort `pytest -q` aufruft und den Deploy abbricht — ein
+Drift ist damit ein roter Deploy statt einer Randnotiz. Fünf Wächter in
+`phase9_hardening/tests/test_step_h_deps.py`, **Gegenprobe mit vier eingebauten Verstößen → 7 rote
+Assertions über vier Tests**, danach zurückgebaut. `pytest` 1079 → **1084** in 186 s (Bestand
+unverändert grün **mit** 3.4.7), `ui_budget` **5/5** (151,8 KB; `search_items` 128,6 ms /
+`get_item` 4,7 ms über den echten MCP-Stack, der 3.4.7-Pfad ist also wirklich gelaufen),
+`doc_health` 0 Befunde, **kein `pkill -f`, kein `systemctl`**, `sharefyx-mcp` nur gelesen. **Zwei
+eigene Fehler, beide im selben Commit behoben:** `req.specifier.version` gibt es nicht
+(`SpecifierSet` hat kein `.version` — zwei Tests rot, bevor der Helper existierte), und ein
+`edit` auf die P2-Modulstatus-Tabelle hat Zeile 13 mitgefressen, weil der Anker am Zeilenanfang
+statt am Zeilenende saß; der Diff (13 Zeilen rein, 0 raus) ist der Nachweis. **Benannt, nicht
+gebaut:** das transitive `mcp` bleibt ungepinnt (Dev 1.28.1, Live 1.30.0 — P9-Backlog-Kandidat,
+kein Blocker). Kollateral-Korrekturen mitgezogen, weil sie sonst falsche Behauptungen
+festgeschrieben hätten: `phase3_edge/CLAUDE.md:148` („`fastmcp` 3.4.4 installiert — keine Änderung
+nötig") war seit P3 Step 0 stehengeblieben und ist jetzt datiert korrigiert, `phase2_mcp/CLAUDE.md`
+Modul-Status Zeile 14 neu. **Nächster Schritt: nichts im Code** — Gate/Z wartet auf A4–A8, und
+dessen zwei Doku-Posten sind strukturell, nicht durch Kürzen lösbar: INDEX-Rotation (P9-L, jetzt
+48.118 B, 7.158 B über dem Softcap) und die Contract-Sektion in `phase1_storage/CLAUDE.md`
+(43.333 B).
+
+ — Haertungsphase, `docs/concepts/phase9_hardening_plan.md` geschrieben — Claude Code — reine Planungssession, kein Produktcode-Touch.]** **Vier Nikinger-Entscheidungen, alle im Plan §1 gelockt:** **(1) P9 ist eine Haertungsphase, kein UI-Umbau** (**P9-A**) — die ROADMAP-P9-Zeile („Obsidian-Map-Umbau + verbundene AI-Sessions, letzter grosser UI-Umbau") ist **ersetzt, nicht erledigt**; der Inhalt geht nach P10, die Liste steht in Plan §15. **(2) Die Domain kommt ueber einen eigenen VPS als TLS-Terminator**, der per Tailscale im Tailnet haengt und intern zur Heim-VM proxyt; der Funnel-Hostname bleibt betriebsbereiter, dokumentierter Fallback (**P9-C**). **(3) Neunte P1-Contract-Oeffnung, angekuendigt und datiert** (**P9-G/P9-H**): `doing` als Statuswert und `assignee` als erstklassiges Feld mit Index-Spalte — neun Stellen in `models.py`/`store.py`/`index.py`, die enge Probe (`git diff --stat -- phase1_storage/storage` = genau drei Dateien) ist Abbruchkriterium. **(4) Loeschen (F2) = Verschieben nach `_trash/`** nach dem bestehenden Asset-Muster (Lock N5, `store.py:849`), **fuer Nutzer unsichtbar** (kein Papierkorb-UI, keine Wiederherstellung im UI), human-only, Gate = zweifache Rueckfrage **plus** Eintippen des Item-Titels (**P9-I/J/K**). **Zwei Planungsbefunde, die Annahmen aus dem P8.6-Handover widerlegen — beide gemessen, nicht vermutet:** **(a) Tailscale Funnel kann keine eigene Domain bedienen.** Die Doku ist eindeutig (*„Funnel can only use DNS names in your tailnet's domain"*), ein CNAME darauf erzeugt einen TLS-Namens-Mismatch (tailscale/tailscale#16478) — **Option (a) aus Handover §4.2 existiert nicht** (**P9-E**). Der billige Ersatz Cloudflare Tunnel ist per **P9-D** ausgeschlossen, und zwar mit Beleg statt Geschmack: `phase3_edge_plan.md` §0.4 hat R4 datiert korrigiert, weil bei Funnel **die Node selbst** TLS terminiert — ein Wechsel zu Cloudflare waere ein gemessener Rueckschritt, keine neutrale Umstellung. **(b) `SharePolicy` ist bereits gebaut** (`storage/acl.py`, `webui/shares.py`, `share_write`-Fixtures in `phase7_spaces_admin/scripts/`): das Cross-Space-Rechte-Thema aus Handover §4.1b braucht **kein** fertiges P6 — es ist billiger als dort vermutet, bleibt aber Hard-Rule-4-Arbeit und geht als **benannter** Posten nach P10 (Plan §0.6). **Step 0 ist bereits gelaufen und war nicht leer** — vier gemessene Doku-Defekte: 5 kaputte `up:`/`down:`-Links in `phase8_6_ui_polish_block_h_r_3_escalation.md` (die Karte nutzt `../`, braucht `../../`) · zwei Mini-Plaene ohne L1-Card · die `ROADMAP.md`-INDEX-Zeile stale („~26KB · Phasen 1–8", real 41.784 B inkl. P9) · **zwei** `screenshots_latest/`-Verzeichnisse. Step 0 repariert sie und nagelt den Scan als `scripts/doc_health.py` + Test fest. **Die INDEX-Rotation ist in dieser Session begonnen worden, weil sie Voraussetzung der eigenen Lieferung war:** `docs/INDEX.md` hatte **156 B Luft**, die `updated:`-Kette (916 B) liegt jetzt verbatim in `docs/INDEX_UPDATES_ARCHIVE.md`, die Datei steht bei **38.822 B** (90 B Luft). Das **Skript** `scripts/rotate_index_updates.sh` baut Step 0.1 (**P9-L**) — die Handarbeit hat jetzt viermal nicht getragen. **Weitere Recherchebefunde, im Plan als `[VERIFY]` statt als Gewissheit abgelegt:** `fastmcp` 3.4.4 installiert, 3.4.7 (2026-08-10) traegt einen Security-Fix fuer CIMD/`private_key_jwt` im **OAuthProxy** — den dieses Projekt nicht benutzt (eigener `BearerAuthASGI` gegen `phase4_auth`), der Bump ist also Hygiene (Step H, V163) · FastMCP 4.0.0 (2026-08-31) bringt die MCP-Revision `2026-07-28` (zustandslos, kein `initialize`-Handshake, kein `Mcp-Session-Id`), Alt-Clients laufen per Aushandlung weiter — **V79 bleibt eigene Mini-Phase** (**P9-R**), eine Protokollmigration mitten in einer Haertungsphase ist genau die Vermischung, die P8.6 zwei Plaene gekostet hat · CIMD ist bei claude.ai inzwischen der empfohlene Connector-Modus vor DCR, vorgemerkt, nicht eingeplant. **Fuenfte Vorgabe desselben Tages (P9-Q):** die Infra-Steps A/B/C laufen als **Coarbeit in opencode** — M3 leitet Schritt fuer Schritt an, der Nikinger fuehrt aus und liefert jede echte Ausgabe zurueck; dasselbe Muster wie Proxmox-Migration und Ollama-Setup. Ein Schritt pro Runde, weil bei DNS, Zertifikaten und Treibern jeder Schritt an der Ausgabe des vorigen haengt — und weil eine nur quittierte statt gelesene Ausgabe genau die Klasse Fehler durchlaesst, die der `umask 0177`-Deploy-Blocker war. **Naechster Schritt: P9 Step 0** (Phasenverzeichnis `phase9_hardening/` anlegen, Rotationsskript bauen, die vier Doku-Defekte reparieren, Baseline `pytest` 995 / `ui_budget` 5/5 messen). Ausfuehrungsteilung pro Step in Plan §0.5.
+
+**[2026-10-01, P9 Step A — Domain live, A5 ✅, und eine Korrektur, die A7/A8 zusammenlegt — Claude
+Code.]** `sharefyx.eurofyx.com` → `217.160.128.146` (IONOS, kein CAA, kein Wildcard). **Runbook-Befund 4
+war falsch:** Tokens sind an `resource = {base_url}/mcp` gebunden (`resolver.py:49`), der A7-Restart
+kappt also beide Connectoren sofort — **Nikinger: harter Schnitt, A7+A8 in einer Sitzung**, kein
+Eingriff in `phase4_auth/authserver/`. **Befund 5 umentschieden und gebaut:** UI-Übergangsfenster für
+die alte Funnel-Adresse (eine zusätzliche CSRF-Origin bis `SPACE_UI_LEGACY_UNTIL`, Uhr pro Anfrage,
+fail-closed; Warndialog in `.account-nav`-Form bei jedem Laden), 23 Tests + Browser 16/16, `pytest`
+**1114**. **Offen beim Nikinger:** Deploy vor A7 (liefert P9 D–H mit), Badge-Version. Nächster Schritt
+A4 (Caddy). Details: `phase9_hardening/CLAUDE.md`.
+**Nachtrag Session-Ende:** Standardknöpfe tragen jetzt das exakte Bild des Übersicht-Knopfs
+(deckende Tokens `--btn-std-*`, pixelgeprüft). **Nikinger: noch kein Deploy; der nächste trägt
+`v3.1.0`.** Nächste Session: A4 → Deploy `v3.1.0` → A7+A8 in einer Sitzung.
+
+**[2026-10-01, P9 Step A — A4 vorbereitet: zwei Befunde, ein Vorlagen-Defekt, ein Testfund —
+opencode/M3 — ein Commit, kein Eingriff in einen laufenden Dienst.]** Cooperation-Runde (P9-Q,
+ein Schritt pro Runde): A4 ist ein `sudo`-Schritt auf dem VPS, also war meine Aufgabe die Vorlage,
+die Befunde und die Erwartungshaltung. **Befund 8 — P9-10 ist bis A7 nicht erfüllbar:** die
+Abnahmezeile verlangt *200 **und** LE-Zertifikat*, aber die Zertifikats-Hälfte gehört Caddy und
+die `200` gehört `SPACE_ALLOWED_HOSTS` (A7). Gemessen am laufenden Dienst: `curl -H "Host:
+sharefyx.eurofyx.com" http://127.0.0.1:8765/health` → `400 Invalid host header`. **Die ganze Kette
+einmal mit echtem Caddy davor gespielt** (Ubuntu-Paket entpackt, `caddy 2.6.2` auf Wegwerf-Port vor
+die Relay-Adresse `100.93.43.122:8765`, also exakt die Strecke des VPS): neuer Host 400,
+`100.93.43.122` 400, erlaubter ts.net-Host **200 mit `{"status":"ok",…}`** — damit sind **das Relay
+funktionierend** und **Caddys Host-Durchreich** belegt, wo vorher nur „Caddy-Default" stand. Folge:
+**P9-10 ist in P9-10a (Zertifikat, A4) und P9-10b (`200`, nach `ALLOWED_HOSTS`) geteilt**, die 400 ist
+in A4 das erwartete Ergebnis. **Befund 9 — auf dem VPS ist kein Caddy** (`ubuntu`/100.121.142.113,
+Tag `tag:sharefyx-edge`, 80+443 ohne Listener) und A4 fing mit `install … /etc/caddy/Caddyfile` an:
+**A4 ist jetzt A4a (messen, `apt install -y caddy`, Paket ist 2.6.2, `validate` → `Valid
+configuration`, `postinst` legt `/var/log/caddy` an) + A4b (Konfiguration, `validate`, Restart)**;
+**kein `admin off`**, weil die Paket-Unit `ExecReload=… caddy reload …` hat und der Reload ohne
+Admin-API measured `connection refused` gibt. **Vorlagen-Defekt:** der Platzhalter `<vps-tailnet>` war
+als Adresse *des VPS* beschrieben, während `reverse_proxy` die **Heim-VM** meint → jetzt
+`<heimvm-tailnet>` mit der gemessenen Ziel-IP im Kommentar. **5 neue Wächter**
+(`phase9_hardening/tests/test_tail_proxy.py`, **12/12**, Gegenprobe 4 Verstöße → 5 rot),
+`pytest` 1115 → **1120**, `ui_budget` 5/5, `doc_health` 0 (der Runbook-Zuwachs von Befund 8+9 ist
+in der INDEX als Oversize benannt, P8-P). **Vorgeschlagen, nicht entschieden: A7a** —
+`ALLOWED_HOSTS` vor A7 ziehen, dort wechselt kein `resource` (Befund 4), also bleiben beide
+Connectoren gültig und Fabian ist nicht nötig; ein Neustart des Produktionsdiensts ist
+Nikinger-Sache. **A4 ist danach ausgeführt** (A4a `2.6.2` via apt, A4b `Valid configuration` + `certificate obtained successfully`, LE `YE1`, CN `sharefyx.eurofyx.com`; extern `400 Invalid host header` = Befund 8, und derselbe `400` als `status=400 ua=curl/8.7.1` im Journal der Heim-VM belegt VPS → Tailnet → Relay → App) ⇒ **P9-10a ✅**; **Befund 10** = `caddy validate` liest den Adapter aus dem Dateinamen; der ACME-Platzhalter ist per `sed` ersetzt, `notBefore` blieb unverändert. **Und mein Datum war ein Tag falsch:** der erste Commit war durchgehend mit 2026-10-02 datiert, ohne dass ich das Datum gemessen hatte — die Gegenprobe kam erst mit dem LE-Zertifikat `notBefore=Oct 1`; 41 Fundstellen, ein Korrektur-Commit. **Offen:** Deploy `v3.1.0` (sonst ist das `LEGACY_*`-Fenster
+wirkungslos), dann A7+A8 in einer Sitzung. Details: `phase9_hardening/CLAUDE.md`.
+
+**[2026-10-01, P9 — Deploy `v3.1.0` **verschoben**, `.toolbar-btn` in Standardoptik, vier
+Tailscale-Bilder geklärt — opencode/M3 — zwei Commits, kein Deploy, kein Eingriff in einen laufenden
+Dienst.]** Der Auftrag war Punkt 1 der Übergabe (Release-Vorbereitung). Beim Durchgehen des Codes für
+einen **ehrlichen** Changelog-Eintrag kam der Befund, der ihn kippt: **`doing` ist im Deploy-Fall für
+einen Menschen erreichbar, und genau seine Eigenschaft ist der offene Befund.** `models.py ::
+STATUS_VALUES["task"]` trägt `doing`, und `editor.js :: populateStatusSelect()` füllt das
+Status-Feld der Kopfdaten aus `state.meta.status_values` — **rohe Werte**. Nach dem Deploy kann ein
+Mensch `doing` wählen; und dann passt der Wert auf keinen der vier `_BUCKETS`-Einträge
+(`bucketFor()` vergleicht exakt, `_overview()` zählt per `store.search`), die Aufgabe erscheint in
+**keinem** Ordner-Zähler und in keinem der vier Rail-Ordner, findet sich aber über „Alle Items" und
+die Suche. Das ist P9-P, das der Plan als Darstellungsentscheidung nach P10 verwies — als „in keinem
+UI-Pfad sichtbar" vertretbar, per Deploy eine Eigenschaft, mit der ein Mensch rechnen muss.
+**Nikinger-Entscheidung: Mini-Plan von Opus (Claude Code), dann bauen + deployen.** **Deshalb kein
+Release-Vorbereitungs-Commit** — zwei gemessene Gründe, nicht Vorsicht: ein heute datierter
+`## <Datum>`-Block in `docs/UPDATE_LOG.md` lässt das `deploy.sh`-Gate (P6-X) bei einem späteren
+Deploy abbrennen, und der Changelog-Text ist ohne die `doing`-Entscheidung nicht schreibbar (ein
+Eintrag, den man später ersetzt, steht zwei Commits lang in einem Menschen-Banner).
+**Gebaut wurde Punkt 2 der Übergabe:** `.toolbar-btn` (zehn Formatierhilfen + Vorschau) war nach
+`.btn` und `.account-nav` der **letzte** echte Knopf auf der alten grauen Plastik — jetzt dieselben
+deckenden `--btn-std-*`-Tokens, `:disabled` bleibt `--surface` (in der Vorschau abgeschaltet, soll
+„inaktiv lesbar" heißen), `.rail__glyph` bleibt als Badge bewusst alt. Beleg ist die Messung:
+`p9_btn2_toolbar_probe.py` **13/13** (gerechnete Fläche stringgleich mit `.btn`, drei Verlaufshöhen
+Δ ≤ 2, Randpixel Δ = 0, deaktiviert **flach** statt „heller"), Gegenprobe 1 Verstoß → 5 rot.
+**Fünfte Wiederholung derselben Repo-Lehre in der eigenen Probe:** `count() == 1` für
+`#home-button[aria-current]` war wertlos — Selektoren matchen das Attribut, nicht den Wert, der
+Knopf trug `"false"`; ein Pixelvergleich bei `fx = fy = 0.5` traf die Beschriftung von „Anhängen"
+(Δ 34); und die Verlaufsmessung des aktiven Knopfs stand im Deaktiviert-Block. Dazu die
+Produktinvariante, die zwei davon ausgelöst hat: **der Editor öffnet per P5-Entscheidung in der
+Vorschau** — die Formatierhilfen sind dort `:disabled`, jetzt behauptet statt angenommen.
+**Punkt 4b geklärt:** vier unversionierte Tailscale-Kopien (Leerzeichen im Dateinamen) liegen jetzt
+als `docs/screenshots/p9_step_a_01..04_*` versioniert (Infra-Beleg zu A3, keine Sichtprüfung), die
+fünfte Datei `Machines - Tailscale.html` ist **gelöscht** — die gespeicherte Seite war die leere
+SPA-Hülle (`tailscale-api-prefetch` = `{}`, 2,7 KB, keine Geheimnisse: geprüft, nicht vermutet);
+eine leere Hülle ist kein Beweis, nur eine Datei, die jemand irgendwann für einen hält.
+`screenshots_latest/` rotiert auf `p9_btn2_*`. **Was die Release-Vorbereitung dann umfasst:** Badge
+`v3.0.2` → `v3.1.0` in `app.html:20` + neuer `## <Deploy-Tag>`-Block, dann `deploy.sh main` und
+`health_gate.sh --expected-version=v3.1.0 --require-todays-update-log --expected-sha=<sha>`.
+`pytest` **1122**, `ui_budget` 5/5 (153,0 KB), `doc_health` 0, Tabu-Pfade leer, **kein `systemctl`,
+kein `pkill -f`** (Wegwerf-Instanz nur über ihre PID-Datei gestoppt). Details:
+`phase9_hardening/CLAUDE.md`.
+
+**[2026-10-02, P9 Block doing: Mini-Plan geschritten, Kandidat (a) entschieden — Claude Code — reine Planungssession, kein Code- oder Service-Touch.]** `docs/concepts/phase9_hardening_block_doing_plan.md` ist ausführungsreif für opencode/M3. **Nikinger-Entscheidung P9-V:** `doing` bekommt einen fünften `_BUCKETS`-Eintrag mit Rail-Label „In Arbeit" (Reihenfolge `open, doing, done, note, archived`, P9-X). P9-P ist damit datiert eingeengt: ein Eimer pro Statuswert ist Navigations-Vollständigkeit, die Hervorhebung bleibt P10. **P9-W:** nur das Rail-Label wird übersetzt, REST und MCP bleiben roh, damit ein angeschlossenes LLM `status: doing` und `assignee` liest. **Verworfen mit Argument:** (b) „Offen = {open, doing}" ergibt über `URLSearchParams` stillschweigend `open%2Cdoing` und damit eine leere Liste. (c) „`doing` nicht ins Select" schließt das Loch nicht, weil `doing` per MCP kommt, und es zerbricht den Editor für genau diese Items (Select-Wert `""`, beim Öffnen „ungespeichert", Speichern abgelehnt). **Korrigiert:** die Abnahme beginnt bei **P9-59** (P9-45–58 sind vergeben), der Dateiname folgt P9-T. `pytest` **1122**, `doc_health` 0. `phase9_hardening/CLAUDE.md` ist nach der Rotation wieder unter dem Softcap (~35 KB). **Plan vom Nikinger bestätigt, P9-W eingeschlossen.** **Nächster Schritt:** M3 baut den Block (ein Commit, Browser-Beleg 8/8). Danach macht M3 den Release-Commit (Badge `v3.1.0` und `UPDATE_LOG`), und der Nikinger führt den Deploy aus (Mini-Plan §8). Details: `phase9_hardening/CLAUDE.md`.
+
+**[2026-10-02, P9 Block doing gebaut — das Eimer-Loch ist zu, `v3.1.0` ist freigegeben — opencode/M3 — ein Commit, kein Deploy, kein Service-Touch.]** Eine Aufgabe mit `status: doing` hat jetzt ihren eigenen Navigationsordner „In Arbeit": `_BUCKETS["doing"]` in `api.py` (Reihenfolge `open, doing, done, note, archived`, P9-X), Rail-Label in `state.js`. Danach erscheint sie in **genau einem** Zähler und **genau einem** Ordner, und Zähler == Liste gilt per Konstruktion, weil beide dieselben Filter benutzen. **P9-W:** übersetzt wird nur die Navigationsebene — Schema, REST und MCP liefern weiter roh `status: "doing"` plus `assignee`. **Der Step-F-Wächter ist umgedreht** (`test_the_bucket_hole_for_doing_is_named_not_silently_fixed` → `test_the_doing_bucket_closes_the_hole`, Docstring trägt beide Richtungen mit Datum; ein Testname, der die Behauptung umkehrt, wäre eine Lüge). **6 neue Tests** (T1/T2/T6 in `phase9_hardening/tests/test_doing_bucket.py`, T3/T4/T5 in `phase5_ui/tests/test_overview.py`), `pytest` 1122 → **1128**, `ui_budget` 5/5 (153,2 KB), Tabu-Diff **leer** ⇒ **keine zehnte P1-Contract-Öffnung** (V174: `phase1_storage/CLAUDE.md` §Geerbte Contracts bleibt unberührt). **Gegenlauf 5 Verstöße:** G1 → 7 rot, G2 → 2, G3 → 2, G4 → 1, G5 → 1, Kontrolllauf G0 = 0. **Browser 11/11** gegen eine eigene TLS-Wegwerf-Instanz (Port 18776); Kernbeleg: die Rail-Zähler springen nach einem Statuswechsel im Editor **ohne Reload** von `1/1` auf `0/2`. **Browser-Gegenlauf 7 von 11 rot** — und **S5/S7/S8 bleiben grün**, weil sie die Maschinenebene prüfen: die war schon vorher korrekt, das Loch war **rein navigativ**. **Befund beim Bauen:** der Plan sagte, das Duplikat-Filter-Verstöß G3 mache drei Wächter rot, gemessen machte es **einen** — Zähler und Listen prüfen **Zahlen**, und bei je einer offenen und einer laufenden Aufgabe stehen die beiden Duplikat-Zähler beide auf 1. Nach der Plan-Regel („nicht rot ⇒ Wächter wertlos ⇒ neu schneiden") holt T3 jetzt die **Item-Mitgliedschaften** aller fünf Eimer und beweist Disjunktheit + Vollständigkeit; damit ist P9-59 behavioural statt behauptet. **Und:** der erste Browser-Gegenlauf **stürzte ab**, statt rot zu melden (ein Klick auf einen Ordner, den es ohne den Fix nicht gibt) — dieselbe Repo-Lehre zum sechsten Mal, diesmal im eigenen Prüfskript; nachgebessert und beide Läufe neu gefahren. Vier Screenshots `p9_doing_*`, `screenshots_latest/` darauf umgehängt. `doc_health` 0. **Nächster Schritt, mit Zuständigkeit:** (1) **opencode/M3** macht am Deploy-Tag den Release-Commit — Badge `v3.1.0` (`app.html:20`) + neuer `## <Deploy-Tag>`-Block in `docs/UPDATE_LOG.md`; (2) **Nikinger** führt `deploy.sh` + `health_gate.sh` aus und misst dabei **P9-43** (erster Deploy mit Step F: Dauer des Index-Neuaufbaus am echten DATA_ROOT); (3) **Nikinger** kurzer Augenschein im echten Browser. Ablauf: `docs/concepts/phase9_hardening_block_doing_plan.md` §8. Details: `phase9_hardening/CLAUDE.md`.
+
+**[2026-10-02, P9 — `v3.1.0` ist LIVE ✅ (Release `5414cb7`, Nikinger-Deploy 3:55 min, Health-Gate 9/9, P9-43 ✅ ≤ 1,05 s für 197 Items) — davor: erster `v3.1.0`-Deploy abgebrochen, Ursache behoben — Claude Code.]** `deploy.sh` brach in `pytest` im Release ab (`4 failed, 1119 passed, 5 errors`), alle neun in `phase9_hardening/tests/test_mcp_local_vision_server.py` mit `ModuleNotFoundError: requests`; das Release wurde entfernt, der Symlink blieb stehen, **live ist weiter `v3.0.2`**. **Ursache:** `requests` steht in keinem `pyproject.toml`, es kam 2026-09-10 (P8.6 Step V) von Hand ins Dev-venv; `deploy.sh` baut pro Release ein frisches venv. **Fix:** `phase8_6_ui_polish/scripts/mcp_local_vision_server.py` ist stdlib-only (`urllib`), der Test patcht `urlopen`. **Beleg am Gate selbst:** frischer Baum + frisches venv + `dev_install.sh` → **1128/1128** (ein Prüfaufbau-Artefakt — `git bundle verify` ohne Repo — nach `git init` grün), `import requests` dort nachweislich rot. **Benannt:** `vision_ollama.py` (CLI) braucht `requests` weiter, kein Gate betroffen. **Nächster Schritt (Nikinger):** Augenschein im echten Browser (Rail „In Arbeit", Badge `v3.1.0`), dann Step A: A7+A8 in einer Sitzung. Details: `phase9_hardening/CLAUDE.md`.
+
+**[2026-10-02, P9 Block trace geplant — Claude Code — reine Planungssession.]** `docs/concepts/phase9_hardening_block_trace_plan.md`: `assignee` wird in UI und MCP sichtbar und beim Wechsel auf „In Arbeit" vom **Client** gefüllt (P9-Z, nie überschreibend); neues server-verwaltetes `updated_by` aus dem Principal plus Git-Autor im DATA_ROOT (P9-AA–AC) — heute zeichnet **nichts** den Schreiber auf. **Zehnte P1-Contract-Öffnung angekündigt** (`models.py`/`store.py`/`history.py`, kein Index-Schema-Sprung, kein Neuaufbau beim Deploy). Umfang und Auto-Füllen vom Nikinger entschieden. **Nächster Schritt:** opencode/M3 baut den Block (ein Commit). Der fehlende Warndialog auf der Funnel-Adresse ist Absicht bis A7.
+
+**[2026-10-02, P9 Block trace gebaut — opencode/M3 — ein Commit, kein Deploy, kein
+Service-Touch.]** Die Frage nach dem Deploy `v3.1.0`: was bedeutet `doing` in einem Space mit
+zwei Personen? Vorher: der Status ist geteilt, aber **niemand wird aufgezeichnet**. Jetzt
+beides, für Menschen und für ein angeschlossenes LLM. `assignee` wird in Liste und Editor
+sichtbar, und der **Client** füllt es beim Wechsel auf „In Arbeit" (P9-Z — dem Server
+Statussemantik zu geben, wäre das Kernprinzip auf den Kopf; er kennt Token → Space); neu ist
+das server-verwaltete `updated_by` (Home-Space des authentifizierten Principals, über **keinen**
+Kanal setzbar) plus der Git-**Autor** (`--author`, Committer bleibt `Space Server`, P9-AC).
+**Zehnte P1-Contract-Öffnung** (`models.py`/`store.py`/`history.py`, enge Probe erfüllt) mit
+**keinem Index-Schema-Sprung** ⇒ beim Deploy **kein** Neuaufbau, anders als nach Step F.
+**24 neue Tests** (gezählt, nicht addiert: 5 `test_store.py` + 4 `test_history.py` + 6 `test_trace_block.py` + 4 `test_tools.py` + 1 `test_api.py` + 4 `test_static_routes.py`), `pytest` 1128 → **1152**, `ui_budget` 5/5 (155,1 KB), Tabu-Diff leer,
+`doc_health` 0. **Gegenlauf** G1 → 1 · G2 → 2 · G3 → 1 · G4 → 2 · G5 → 4 rote Tests.
+**Browser 8/8** gegen eine eigene TLS-Wegwerf-Instanz mit **zwei Principals und echter
+Git-Historie** (Port 18777): B sieht „Zuletzt geändert von A", schreibt selbst, danach steht B —
+während „Bei" **A** bleibt. Die Gegenprobe ist der eigentliche Beleg: ohne die Leer-Prüfung im
+P9-Z-Zweig springt der Assignee einer A zugewiesenen Aufgabe von `alpha` auf `beta`. **Zwei
+Bestandstests kamen mit:** einer in `test_app.py` (exakte Quittungs-Assertion) und einer, der
+**datiert zugeschnitten statt entfernt** wurde (`test_step_f_schema.py` — er verbot jedes
+`doing`/`assignee` in `editor.js`, P9-Z verlangt genau das Gegenteil); dazu ein Fund drei
+Phasen entfernt: eine Test-Attrappe für `Store.move()` mit eigener Signatur wurde vom neuen
+`actor=`-Keyword zu einem HTTP 500 mitten im Space-Entfernen — **ein optionales Keyword
+hält Aufrufstellen heil, nicht Attrappen mit eigener Signatur.** **Eine Plan-Klammer war
+ungenau** (POST verwirft `updated_by` lautlos statt 422; PATCH und der Kern lehnen ab) und
+**eine Datei mehr als geplant** (`mcpserver/receipts.py`, weil die Standard-Schreibantwort die
+Quittung ist). **Nächster Schritt (Nikinger):** Release-Commit (Badge + `UPDATE_LOG`) und
+Deploy **`v3.1.1`**, danach A7+A8 in einer Sitzung. Details: `phase9_hardening/CLAUDE.md`.
+
+**[2026-10-02, Gate/Z-Doku-Hälfte — die zwei benannten Softcap-Überschreitungen sind weg, und ein Rotationsskript hat beim ersten echten Lauf die Hälfte seiner Arbeit als Erfolg gemeldet — opencode/M3 — ein Commit, kein Deploy, kein Code-Touch, kein Service-Touch.]** Kein Code-Schritt war offen; die Posten der Übergabe, die nicht dem Nikinger gehören, waren Doku-Arbeit. Also die Doku-Hälfte von Gate/Z, und zwei **Section-Rotationen** statt eines Kürzens: `phase1_storage/CLAUDE.md` §„Geerbte Contracts“ (388 Zeilen / 31.422 B) → `CONTRACTS_ARCHIVE.md`, `phase5_ui/CLAUDE.md` §„Abnahmestand“ (99 Zeilen / 12.195 B, inkl. der Kurzfassung, der beiden späteren Nachträge (2026-08-13-Korrektur, 2026-10-02 trace-Block) und der Cutover-Notiz) → `ABNAHME_MATRIX_ARCHIVE.md`. Beide **verbatim** (`python`-Schnitt, Roundtrip-Gegenprobe vor dem Schreiben, byte-identitäts-Gegenlesen danach), beide neu mit L1-Card, beide mit INDEX-Zeile im selben Commit. In den **Heads bleibt genau das, was jemand zum Entscheiden braucht**: die Abschluss-Zusicherung im Wortlaut („Eine Änderung daran nach Phasenabschluss ist eine Scope-Änderung“) plus ein Index der Öffnungen — und der **Abschnittsname bleibt stehen**, weil `phase6_shares_plan.md`, `PHASE7_CLOSEOUT_HANDOVER.md` §4, P8-M und die P9-Pläne wörtlich auf „§Geerbte Contracts“ verweisen; ein toter Verweis wäre eine stille Lüge im Doku-Layer. **47.570 → 20.212 B** und **43.801 → 33.126 B**: beide Überschreitungen betreffen geschlossene Phasen und sind damit Pflichtpflege einer laufenden Phase (so hat es die Übergabe benannt, und `phase1_storage/CLAUDE.md` hatte die Lösung seit 2026-09-30 selbst notiert).
+
+**Der Fund ist der Grund, warum diese Session einen Test und keine nur eine Drehung hinterlässt.** Der erste echte Lauf von `scripts/rotate_index_updates.sh` (P9-L, 2026-09-30 gebaut) meldete „Split ist verlustfrei“ — und rotierte **1 von 3** Einträgen der INDEX-`updated:`-Kette. Der Split-Anker ist `' | (?=\d{4}-\d{2}-\d{2})'`; einer der Fäden begann mit **`updated: `**, sieht für den Anker also nicht wie ein Kettenanfang aus und blieb stehen. „Verlustfrei“ war die Aussage nur *innerhalb* des geschnittenen Teils — die Kette sah danach konform aus, also hätte niemand nachgesehen. **Siebte Wiederholung derselben Repo-Lehre**, und die bisher teuerste: ein Wächter, der die Richtigkeit *seiner eigenen* Byte-Bilanz meldet. Gebaut: **Gegenprobe (e)** im Skript (abbruch mit klarer Meldung, wenn die Kette ein zweites `updated: `-Präfix trägt) und **zwei Tests** — einer prüft den Abbruch, einer ist die Gegenprobe, dass ein sauberer Lauf *alle* älteren Fäden rotiert (sonst könnte (e) auch alles ablehnen und niemand merkte es). **Gegenprobe am Wächter selbst:** (e) entfernt → genau der Abbruch-Test rot. Das Fremd-Präfix kam aus Handarbeit und steht in **derselben Form bis heute in der `updated:`-Kette der Wurzel-`CLAUDE.md`** — dieselbe Ursache, andere Datei, dort nicht rotierbar und deshalb hier nur benannt.
+
+**Nicht getan, mit Zahlen statt Bauchgefühl:** `phase9_hardening/CLAUDE.md` steht nach Rotation **über** dem Softcap (44.360 B). Der Rest ist der Modulstatus (18.217 B) mit **7.467 B durchgestrichenen Statusabsätzen** — überholte Zustände („install + P9-19 ausstehend“), deren Befund die aktuelle Spalte schon trägt. Streichen brächte den Head sicher unter die Grenze, ist aber eine **Nikinger-Entscheidung**, weil es 7 KB aus dem Head der *laufenden* Phase nimmt ⇒ **vorgeschlagen, nicht getan**. Ebenso unangetastet: die Wurzel-`CLAUDE.md` selbst (**~103 KB**, davon §Current state der Löwenanteil — benannte Lösung ist die Rotation der Current-state-Abschnitte nach `docs/PROJECT_SESSION_LOG.md`; die exakte Bytezahl steht in der INDEX-Zeile, hier absichtlich gerundet, weil jeder Eintrag in diesem Absatz die Zahl sofort wieder veraltet) und `docs/INDEX.md` (**~57 KB, heute größer als vorher**: zwei Pflicht-Zeilen für die neuen Archive +1.432 B, Ketten-Rotation −347 B netto, dieser Eintrag +~1,3 KB — **gemessen und benannt statt als Erfolg verbucht**). Alle drei bleiben **benannt statt versteckt** (P8-P).
+
+**Eigener Fehler, im selben Commit behoben und hier genannt, weil er eine Lehre trägt:** mein erster INDEX-Schreibvorgang hat die Datei **um 13,5 KB gekürzt** — `t[:i] + neu + t[i:j][…]` ohne `+ t[j:]`. Der Schnitt war als Trockenlauf mit einer *Größen*-Erwartung abgesichert, und die expectation traf zu: die Datei wurde kleiner. Richtig wäre eine **Struktur**-Erwartung gewesen (Zeilenzahl, Linkziele, Frontmatter), nicht eine Größe — die wäre bei einem *echten* Kürzen derselbe Fehler durchgegangen. `INDEX.md` wurde aus `HEAD` reproduzierbar neu gebaut (alle Schritte sind Skript-Aufrufe), das Archiv des Rotationslaufs war dabei zweimal dupliziert und wurde bereinigt (Gegenprobe: jeder Faden genau einmal).
+
+**Selbstprüfung:** `doc_health` 0 Befunde (dazwischen die zwei erwarteten „keine Zeile in docs/INDEX.md“ für die neuen Archive, nach deren Eintrag wieder 0) · `pytest` **1152 → 1162** (10 neu: 2 für die Skript-Gegenprobe (e) + 8 Rotations-Wächter in `phase9_hardening/tests/test_doc_rotations.py` — **Gegenprobe: fünf eingebaute Verstöße → fünf rote Tests**; ein erster Entwurf schrieb *2* und wäre bei einem echten Kürzen derselbe Fehler gewesen) · `ui_budget` 5/5 unberührt (kein `phase5_ui/webui/static/**`-Touch) · Tabu-Diff auf die sechs Hartpfade **leer** · kein `systemctl`, kein `pkill -f`, keine Wegwerf-Instanz, `sharefyx-mcp` nicht berührt.
+
+**Sichtung vom 2026-10-02: abgenommen, mit Restbefund** — der Nikinger hat die sechs `p9_trace_*`-Bilder freigegeben **mit der Notiz, dass noch nicht alle Knöpfe an das Schema angepasst sind.** Das ist als **B17** im Backlog von `phase9_hardening/CLAUDE.md` abgelegt, und zwar **mit der gemessenen Liste** statt allgemein: von 77 Knöpfen im Markup laufen **62 auf den Standard-Tokens** `--btn-std-*`; **15 nicht** — `.btn-primary` (13) auf `--accent-face-*` und `.btn.action--caution` (2) auf der **alten** `--btn-face-*`-Familie, die der btn2-Block für `.btn` abgelöst hat. **Kein Renderfehler** (alle Tokens definiert, 0 verwaiste `var()`), also Konsistenz-Lücke; ob die beiden Klassen semantisch abweichen *sollen* (Konvention v3: Aktion vs. Vorsicht), ist offen und bleibt es — **kein Code in dieser Session angefasst**.
+
+**B17 ist als potentieller Extra-Schritt dokumentiert** (Phase-9-Head, Modulstatus-Zeile „E (Extra)“), **nicht entschieden** — der einzige Punkt, der ohne deine Infra-Schritte liegen bleiben kann.
+
+**Nächster Schritt, weiterhin Nikinger:** (1) ~~Sichtung~~ **erledigt 2026-10-02**; es bleibt (2) **Release-Commit + Deploy `v3.1.1`** — Badge und `##`-Block müssen **am Deploy-Tag** entstehen, ein heute datierter Block ließe das `deploy.sh`-Gate (P6-X) bei einem späteren Deploy abbrennen; (3) **A7+A8 in einer Sitzung** (Befund 4: der A7-Restart kappt beide Connectoren), danach ist SP9-10b geschlossen und der Warndialog auf der alten Funnel-Adresse darf sterben. Danach der Rest von Gate/Z: Abnahmematrix P9-1–P9-82 und die `[VERIFY]`-Bilanz V145–V184. Details: `phase9_hardening/CLAUDE.md`.
+
+**[2026-10-02, P9 B17 gebaut — deine Sichtprüfungs-Notiz war ein Knopf, nicht fünfzehn, und die
+Zahl im Backlog war falsch — opencode/M3 — ein Commit, kein Deploy, kein Service-Touch.]** Die
+Sichtung vom 2026-10-02 hatte als Restbefund notiert, „noch nicht alle Knöpfe ans Schema
+angepasst", und der Backlog daraus maß **15 Knöpfe** in zwei Klassen. **Vor dem Bauen gemessen, nicht
+geglaubt** (Markup *und* CSS): es war **ein** Knopf mit einem Befund. `.btn.action--caution` trägt
+**1** Fläche, nicht 2 — der Selektor matcht nur `#archive-button`; der zweite Träger
+`#logout-button` ist ein `.rail__action` (`background: none`) und trägt die Vorsicht nur an der
+**Farbe**, er hatte nie eine Fläche. Und die **13** `.btn-primary` sind **kein Reststand**, sondern
+deine dokumentierte Ausnahme vom 2026-10-01. **Dasselbe Zählen über Klassen-Präsenz statt über den
+Selektor** wie beim btn2-Fund mit `count() == 1` für `[aria-current]`.
+
+**Der Befund, der beim Messen entstanden ist, war eine Helligkeit, kein Token:** `--btn-face-top`
+`#2A313A` ist **heller** als die Standardfläche `--btn-std-fill` `#0C1C31`. „Vorsicht" war damit der
+**auffälligste** Knopf der Editor-Fußzeile statt des Standards — das Gegenteil dessen, was der
+Wächter beschrieb, dessen Namen ich deshalb **datiert umgedreht** habe (mit beiden Richtungen im
+Docstring, Muster wie beim doing-Wächter desselben Tages). Gebaut ist die kleinstmögliche Änderung:
+die drei `.btn.action--caution`-Regeln sind **gelöscht**, nicht umgeschrieben — `.btn` *ist* die
+Standardfläche, und eine eigene Kopie davon wäre die „zweite Knopfoptik im selben Panel", die
+derselbe Tag am 2026-10-01 an `.account-nav` abgestellt hatte. `:root` unberührt, kein Token verwaist,
+die alte Familie hängt jetzt **badge-only** am `.rail__glyph`.
+
+**Und ein Lock-Konflikt, den ich zurückgestellt habe, statt ihn stillschweigend zu brechen.** Mein
+Vorschlag war eine eigene, rot getönte Flächenfamilie `--caution-std-*` (deckend, dunkel — die
+„Vorsicht-Farbtiefe" des Standards). Du hast sie gewählt; beim Vorbereiten des Blocks stieß ich auf
+zwei gelockte Zeilen, die sie bricht: die Selection/Choice-Konvention v3 sagt wörtlich *Standard-
+Knopfplastik, aber `color: var(--caution)` auf Label und Glyph; **keine** gefüllte rote Fläche*, und
+deine P9-Notiz vom 2026-10-01 führt `.action--caution` als Ausnahme, die „behält die graue Plastik".
+**Eine rot getönte Fläche *ist* die gefüllte rote Fläche** — das war keine Interpretationsfrage.
+Nach der Rückfrage: **exakt die Standardfläche**, wortgleich v3, ohne Konventionsänderung. Beide
+Stellen in `phase8_ui_graph/CLAUDE.md` sind datiert korrigiert (die Konvention war zwischen dem
+2026-10-01 und dem 2026-10-02 tatsächlich **nicht eingehalten**, und das steht jetzt dort).
+
+**Belegt, nicht behauptet:** **3 Wächter** in `phase5_ui/tests/test_static_routes.py` (1 umgedreht,
+2 neu: einer zählt die **Markup**-Träger, damit „keine eigene Fläche" nicht vakuös grün ist, der
+andere macht die alte Familie badge-only und strippt vorher die Kommentare) · **Gegenprobe 4
+eingebaute Verstöße → 8 rote Assertions**, Kontrolllauf 0, danach byte-identisch wiederhergestellt ·
+**Pixel-Probe `p9_btn3_caution_probe.py` 14/14** gegen eine eigene TLS-Wegwerf-Instanz (Port 18775,
+über die **PID-Datei** gestoppt, kein `pkill -f`): die berechneten `backgroundImage`-Strings sind
+stringgleich, vier Pixelproben an der glyphenfreien Spalte mit **max |Δ| = 1**, die Vorsichtfarbe
+sitzt in der Beschriftung. **Gegenlauf:** alte Fläche zurück → 6 von 13 Stationen rot, Δ 25–28.
+**Drei eigene Fehler, alle im selben Commit behoben:** mein `.btn`-Kommentar enthielt eine `{ }`-
+Klammer (`_block_body` schneidet mit `[^}]*`, er schnitt mir den Block ab) **und** hätte den neuen
+Vorschrift-Wächter grün gemacht, weil er `color: var(--caution)` im Klartext *nennt* — der Wächter
+strippt jetzt die Kommentare vorher, sonst hätte ich beim siebten Mal dieselbe Repo-Lehre gebaut. Der
+Dateiname des ersten Bildes behauptete „footer" und zeigte die Formatierleiste; die Aufnahme ist jetzt
+der Zuschnitt der Knopfleiste. Und der **Vision-Adapter** hat dasselbe Bild **vertaucht** (rote
+*Beschriftung* als roter Hintergrund, „Speichern" hellgrau) — das ist als **eigene Fehlerklasse**
+dokumentiert: ein VLM ist als Farbmessgerät an *einem* Element brauchbar, als **Zuordner über mehrere
+Elemente** unbrauchbar (neue Zeile in
+`docs/concepts/sichtpruefung_automation_tooling.md`).
+
+**Selbstprüfung:** `pytest` **1167 → 1169** (Baseline vorab gemessen, nicht aus der Doku übernommen) ·
+`ui_budget` **5/5**, und die Zahl **per Stash-Gegenprobe gemessen**: **165,0 KB auf HEAD gegen 165,2 KB
+mit diesem Block** — die hier protokollierte **155,1 KB war also schon veraltet**, sie stammt aus dem
+trace-Block; mein Anteil ist +0,2 KB · `doc_health` **0** · Tabu-Diff auf die sechs Hartpfade leer.
+
+**Benannt, nicht entschieden:** der Kontrast der Vorschrift-Beschriftung liegt bei **4,38:1** (vorher
+3,36:1) — besser und **weiterhin kein WCAG-AA** (4,5:1 für normalgroßen Text, 14 px/500 ist kein
+„large text"). Ich habe ihn als *Verschlechterungsverbot* in die Probe genommen, nicht als
+Bestandenheitsschwelle; hellere Schrift oder eine 1-px-Kante sind deine Design-Entscheidung.
+
+**Doku-Hygiene:** Phase-9-Head 53.968 B (Rotation des dreizehnten Blocks per Skript, **53.968 B =
+13.008 B über dem Softcap, benannt statt versteckt** — die 7.467 B durchgestrichenen Statusabsätze im
+Modulstatus habe ich **nicht** angefasst, das bleibt deine Entscheidung), `docs/INDEX.md` **60.793 B
+(≈60 KB)** — fünf Pflichtzeilen nachgezogen, darunter die `phase8_ui_graph`-Zeile, die **schon auf
+HEAD** über der Grenze lag (45.365 B) und nur noch im Toleranzfenster des Wächters stand,
+`screenshots_latest/` auf die vier B17-Belege rotiert (die sechs `p9_trace_*` sind abgenommen und
+versioniert) — alles im selben Commit.
+
+**Nächster Schritt, unverändert deine Zuständigkeiten:** (1) **Release-Commit + Deploy `v3.1.1`** —
+Badge `app.html:20` + `##`-Block in `docs/UPDATE_LOG.md`, **beides erst am Deploy-Tag**, sonst
+brennt das `deploy.sh`-Gate P6-X ab; dieser Block kommt mit, ist aber eine reine CSS-Änderung und
+braucht **keinen** Index-Neuaufbau. (2) **A7+A8 in einer Sitzung** (Befund 4: der A7-Restart kappt
+beide Connectoren), danach ist SP9-10b geschlossen. (3) Danach der Rest von Gate/Z: Abnahmematrix
+P9-1–P9-82 und `[VERIFY]`-Bilanz V145–V184.
 
 **[2026-09-10, P8.6 Open Item #5 — Aktionsliste Schritt 7 auf Restart-Logik verkürzt; nur Doku, kein Code-Touch.** Restart-Logik verifiziert durch Lesen von `/etc/systemd/system/sharefyx-mcp.service` (`Restart=on-failure` + `RestartSec=5`) und `/usr/lib/systemd/system/tailscaled.service`; beide `WantedBy=multi-user.target`. Tabu-Diff §0.3 leer, Service-Touch 0 — sharefyx-mcp PID 991 unverändert.
 

@@ -203,18 +203,81 @@ def test_the_two_repaired_rows_kept_their_text():
 
     ` · ` statt ` | ` in Step B, und in Gate/Z wanderte der Rohstrich aus dem Codespan heraus.
     Beides verliert kein Zeichen — dieser Test verhindert, dass eine künftige „Kürzung" die
-    Behebung für eine Auslassung hält. **Geprüft wird nur die §-Modulstatus-Tabelle:** die
-    kaputte Form kommt im Session-Block und in der `updated:`-Kette weiterhin *wörtlich* vor,
-    weil beide den Defekt beschreiben — das ist gewollt und wäre als Treffer falsch gemeldet.
+    Behebung für eine Auslassung hält.
+
+    **Seit 2026-10-04 wird der erhaltene Text im L3-Archiv geprüft, nicht in der Tabelle:** Die
+    ausführlichen Statusspalten sind nach `MODULE_STATUS_ARCHIVE.md` gewandert (Nikinger-
+    Entscheidung, der letzte Hebel gegen die Softcap-Überschreitung), im Head steht der Kurzstand.
+    Der Satz, der kaputte Form kommt im Session-Block und in der `updated:`-Kette weiterhin
+    *wörtlich* vor, weil beide den Defekt beschreiben — das ist gewollt und wäre als Treffer
+    falsch gemeldet.
     """
-    text = (REPO_ROOT / "phase9_hardening" / "CLAUDE.md").read_text(encoding="utf-8")
-    table = text.split("\n## Modulstatus\n", 1)[1].split("\n## ", 1)[0]
-    assert "Add-on) · ~~🟡 ~~ M3-Anteil" in table
-    assert "Fäden mit `updated: `-Präfix + 3 mit ` · `-Trenner" in table
+    table = _p9_module_status()
+    archive = (REPO_ROOT / "phase9_hardening" / "MODULE_STATUS_ARCHIVE.md").read_text(encoding="utf-8")
     assert "Fäden mit ` | updated: `-Präfix" not in table
+    assert "Add-on) · ~~🟡 ~~ M3-Anteil" in archive
+    assert "Fäden mit `updated: `-Präfix + 3 mit ` · `-Trenner" in archive
     # Die beiden geretteten Passagen stehen noch drin — echte Bytes, nicht nur Trenner.
-    assert "V153 entschieden und einer der beiden Plan-Wege nachweislich unbaubar" in table
-    assert "für `rotate_index_updates.sh` unsichtbar**" in table
+    assert "V153 entschieden und einer der beiden Plan-Wege nachweislich unbaubar" in archive
+    assert "für `rotate_index_updates.sh` unsichtbar**" in archive
+
+
+def _p9_module_status() -> str:
+    return (
+        (REPO_ROOT / "phase9_hardening" / "CLAUDE.md")
+        .read_text(encoding="utf-8")
+        .split("\n## Modulstatus\n", 1)[1]
+        .split("\n## ", 1)[0]
+    )
+
+
+def test_every_status_cell_of_the_head_survives_verbatim_in_the_l3_archive():
+    """Die Roundtrip-Gegenprobe des Abschnitts-Splits als Dauerwächter.
+
+    Am 2026-10-04 sind die ausführlichen Statusspalten nach `MODULE_STATUS_ARCHIVE.md` gewandert
+    und im Head steht je Step ein Kurzstand. Das ist verlustfrei **nur dann**, wenn der
+    Langtext vollständig im Archiv liegt — und „verlustfrei" ist hier eine Behauptung, die ohne
+    Wächter mit der nächsten Kürzung verschwindet. Geprüft wird in **beide** Richtungen:
+    jede Zeile des Heads hat eine Sektion (nichts ist gewandert worden, ohne dass es ankommt), und
+    keine Sektion ist leer oder nur ein Verweis.
+
+    Die Zählung ist bewusst **über die Step-Namen**, nicht über Bytes: die Bytezahl ändert sich
+    mit jedem Status, der Name nicht.
+    """
+    archive = (REPO_ROOT / "phase9_hardening" / "MODULE_STATUS_ARCHIVE.md").read_text(encoding="utf-8")
+    sections = dict(
+        (m.group(1), m.group(2))
+        for m in re.finditer(r"^## `([^`]+)`\n\n(.*?)(?=\n## `|\Z)", archive, re.M | re.S)
+    )
+    # Die erste Fassung schrieb `cell_count_row[0]` — aber `cell_count_row` ist ein **String**,
+    # also lieferte das das erste *Zeichen*: „doing" wurde zu „d" und „trace" zu „t". Der Test
+    # meldete daraufhin vier Sektionen ohne Zeile, die es gab. Ein Wächter, der die Daten falsch
+    # liest, ist derselbe Fehler wie einer, der die falschen Daten prüft.
+    steps = [
+        step
+        for step in (
+            CELL_SPLIT_RE.split(l.strip().strip("|"))[0].strip()
+            for l in _p9_module_status().splitlines()
+            if l.startswith("| ") and not SEPARATOR_RE.match(l.strip())
+        )
+        if step != "Step"
+    ]
+    assert steps, "die Modulstatus-Tabelle ist leer — dieser Test darf dann nicht grün werden"
+    assert set(steps) == set(sections), (
+        f"Head-Zeilen ohne Sektion: {sorted(set(steps) - set(sections))} · "
+        f"Sektionen ohne Zeile: {sorted(set(sections) - set(steps))}"
+    )
+    # **Keine Mindestlänge je Sektion:** die Zeile `0` trug schon immer nur `✅` (4 B) — eine
+    # Längenschwelle hätte dort nichts zu prüfen und an der falschen Stelle gemeckert. Stattdessen
+    # die **Masse**: alle Sektionen zusammen müssen das tragen, was vorher in den Zellen stand
+    # (29.559 B gemessen am 2026-10-04, Schwelle 95 % davon als Band — dieselbe Technik wie bei
+    # `test_acceptance_numbers.py`). Eine künftige Kürzung, die beim Wandern mitnimmt, fällt hier
+    # auf; eine bloße Umschreibung des Kurzstands im Head nicht, denn der ist absichtlich kurz.
+    mass = sum(len(b.encode("utf-8")) for b in sections.values())
+    assert mass > 0.95 * 29559, f"die Sektionen tragen nur {mass} B von 29.559 B — Text fehlt"
+    for step, body in sections.items():
+        assert body.strip(), f"Sektion `{step}` ist leer — eine gewanderte Zelle kann nicht leer sein"
+        assert "Herleitung im L3-Archiv" not in body, f"Sektion `{step}` verweist auf sich selbst"
 
 
 def test_hidden_bytes_is_measured_not_guessed():

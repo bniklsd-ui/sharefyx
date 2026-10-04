@@ -50,6 +50,9 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 MATRIX = REPO_ROOT / "phase9_hardening" / "ABNAHME_MATRIX.md"
 HEAD = REPO_ROOT / "phase9_hardening" / "CLAUDE.md"
 INDEX = REPO_ROOT / "docs" / "INDEX.md"
+# Die gestrichene Masse wird seit dem Split vom 2026-10-04 im **L3-Archiv** gemessen, nicht im
+# Head: die durchgestrichenen Statusabsätze standen in den Statusspalten, und die sind gewandert.
+STATUS_ARCHIVE = REPO_ROOT / "phase9_hardening" / "MODULE_STATUS_ARCHIVE.md"
 INDEX_CRITERION_BYTES = 38912  # der P8.6-Plan-2-Wert, seit 2026-10-03 **ersetzt** (Nikinger-Entscheidung)
 SOFTCAP_BYTES = 40 * 1024   # das Kriterium, das seit 2026-10-03 gilt — und das `doc_health` bereits prüft
 SIZE_TOLERANCE_BYTES = 2048  # dasselbe absolute Band wie doc_health._named_size_is_current
@@ -353,36 +356,61 @@ def _struck_mass(path: Path) -> int:
     )
 
 
-def test_the_lever_named_against_the_head_oversize_is_the_measured_one():
-    """Der vierte Fund vom 2026-10-03, und der billigste: **der Hebel existiert nicht in der
-    benannten Größe.**
+def test_the_head_is_under_the_softcap_and_the_struck_mass_is_no_lever():
+    """**Umgekehrt am 2026-10-04, und die Begründung steht hier, weil ein umgedrehter Wächter sonst
+    zur Lüge wird.** (Muster wie beim doing-Wächter am 2026-10-02 und beim Step-F-Wächter: beide
+    Richtungen mit Datum.)
 
-    Seit dem 2026-10-03 steht in diesem Dateikopf, in der `docs/INDEX.md`-Zeile dazu und in zwei
-    archivierten Blöcken, der Rest über dem Softcap seien die durchgestrichenen Statusabsätze im
-    Modulstatus — die Größe war als **7.467 B** genannt, mit dem Zusatz, Streichen sei „die
-    einzige Maßnahme, die den Head sicher unter den Softcap brächte". **Gemessen sind es 189 B in
-    der ganzen Datei.** Faktor 39; die Maßnahme hätte 189 B gebracht und den Head bei ~42.421 B
-    gelassen. Die Masse ist der *lebendige* Modulstatus (13.488 B in vier Zeilen).
+    **Die Aussage am 2026-10-03** (dieses Modul, „der vierte Fund"): der Rest über dem Softcap seien
+    die durchgestrichenen Statusabsätze im Modulstatus — genannt als **7.467 B** mit dem Zusatz,
+    Streichen sei „die einzige Maßnahme, die den Head sicher unter dem Softcap brächte". Gemessen
+    waren **189 B** in der ganzen Datei (heute 229 B), die tragende Masse war der *lebendige*
+    Modulstatus. Geprüft wurde: (a) ein zu kleiner Hebel kann die Überschreitung nicht beseitigen,
+    (b) die lebende Masse ist die tragende, (c) der neueste Session-Block nennt die gemessene
+    Zahl, sonst liest der nächste Start wieder die alte.
 
-    Geprüft wird der Zustand, nicht die Prosa: **(a)** ein Hebel, der kleiner ist als die
-    Überschreitung, die er beseitigen soll, kann sie nicht beseitigen; **(b)** die lebende Masse
-    daneben muss die tragende sein; **(c)** der neueste Session-Block nennt die gemessene Zahl,
-    sonst liest der nächste Session-Start wieder nur die falsche.
+    **Die Lage am 2026-10-04:** Nikinger entschied, die ausführlichen Statusspalten nach
+    `MODULE_STATUS_ARCHIVE.md` zu ziehen (verbatim, Roundtrip-Gegenprobe). Der Head stand bei
+    56.860 B und liegt jetzt **unter** dem 40-KiB-Softcap. Damit ist (a) **gegenstandslos** — es
+    gibt keine Überschreitung, die ein Hebel beseitigen müsste — und (b) ist **falsch geworden**:
+    der Modulstatus ist nicht mehr die tragende Masse, er ist der kleinste Teil des Heads.
 
-    **Bewusst nicht gebaut:** ein Textverbot auf die alte, zu große Zahl. Eine Korrektur muss die
-    alte Zahl nennen können, um zu sagen, was falsch war — und jeder Versuch, Prosa statt des
-    Zustands zu prüfen, hat in diesem Repo bisher einen Wächter erzeugt, der etwas anderes misst
-    als sein Name (diese Datei hat in derselben Stunde zwei solche Fehler gefunden).
+    Also nicht die alten Zeilen löschen, sondern die Aussage drehen und **beide** herstellen:
+    * **(1) Der neue Zustand, hart:** der Head liegt unter dem Softcap. Ohne Band, denn eine
+      Überschreitung versteckt sich nicht „ein bisschen" — `doc_health` prüft dieselbe Größe
+      zusätzlich gegen die `docs/INDEX.md`-Zeile.
+    * **(2) Die alte Diagnose bleibt widerlegt, aber ohne Vakuum:** statt `struck < oversize` (bei
+      negativem `oversize` wäre das `229 < −4.000`, also **immer** wahr und damit wertlos) gilt
+      „die gestrichene Masse bleibt ein Bruchteil der Datei". In **beiden** Lagen wahr, in keiner
+      vakuos.
+    * **(3) Die tragende Masse ist Kurzstand plus L3-Archiv**, nicht eine breite Tabelle: geprüft
+      in `test_table_shape.py :: test_every_status_cell_of_the_head_survives_verbatim_in_the_l3_archive`.
+    * **(c) bleibt unverändert:** der neueste Session-Block nennt die gemessene Zahl am Wort
+      „gestrichen".
+
+    **Nicht gebaut:** ein Textverbot auf die alte, zu große Zahl — eine Korrektur muss sie nennen
+    können, um zu sagen, was falsch war.
     """
-    struck = _struck_mass(HEAD)
-    oversize = HEAD.stat().st_size - 40960
-    assert struck < oversize, (
-        f"die gestrichene Masse ({struck} B) ist größer als die Überschreitung ({oversize} B) — dann "
-        "trägt die Diagnose 'durchgestrichene Absätze streichen', und dieser Test wäre zu eng"
+    size = HEAD.stat().st_size
+    assert size <= SOFTCAP_BYTES, (
+        f"der Phase-9-Head steht bei {_de(size)} B, das sind {_de(size - SOFTCAP_BYTES)} B über dem "
+        "40-KiB-Softcap — nach dem Split vom 2026-10-04 wäre das ein Rückschritt, kein Zustand"
     )
-    modulstatus = HEAD.read_text(encoding="utf-8").split("## Modulstatus", 1)[1].split("\n## ", 1)[0]
-    live = sum(len(l.encode("utf-8")) for l in modulstatus.splitlines() if l.startswith("|"))
-    assert live > oversize, "der Modulstatus ist nicht mehr die tragende Masse — die Diagnose wandert"
+    # **Die gestrichene Masse wird im L3-Archiv gemessen, seitdem die Statusspalten dorthin
+    # gewandert sind** — im Head sind es **0 B**, und eine Prüfung „0 B ist ein Bruchteil der
+    # Datei" wäre die Formkorrektur eines Wächters ohne Aussage. Die Diagnose vom 2026-10-03
+    # lautete über die Statusspalten, also wird sie dort gemessen, wo die jetzt stehen.
+    struck = _struck_mass(STATUS_ARCHIVE)
+    assert struck > 0, "im L3-Archiv ist keine gestrichene Masse mehr — die Widerlegung ist gegenstandslos"
+    # Die erste Fassung verglich `struck < _struck_mass(ARCHIV) + size * 0.05` — also **gegen sich
+    # selbst** plus 5 %: bei 229 B ist `229 < 229 + 1.559` immer wahr. Eine Prüfung, die
+    # unveränderlich grün ist, ist die schlimmere Form von "kein Fund"; sie ist hier ersetzt durch
+    # den Bruchteil an der Datei, die die Massen trägt.
+    assert struck < STATUS_ARCHIVE.stat().st_size * 0.05, (
+        f"die gestrichene Masse ({struck} B) ist ein nennenswerter Teil des Archivs "
+        f"({_de(STATUS_ARCHIVE.stat().st_size)} B) — die Widerlegung vom 2026-10-03 (7.467 B "
+        "behauptet, 189 B gemessen) gilt dann nicht mehr"
+    )
     block = HEAD.read_text(encoding="utf-8").split("## Session stopped", 1)[1]
     assert _figure_near_word(block, "gestrichen", struck, max(struck * 0.10, 1)), (
         f"der neueste Session-Block nennt keine Bytezahl im Fenster um das Wort „gestrichen“ herum "
