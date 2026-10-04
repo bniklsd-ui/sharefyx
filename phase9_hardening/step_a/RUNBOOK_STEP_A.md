@@ -829,7 +829,17 @@ A7 die Metadaten mit dem neuen `issuer` liefert (Befund 4, Plan §3.3).
 
 **✅ TEILWEISE AUSGEFÜHRT 2026-10-03, 13:1x Uhr:** Konto **niklas** läuft über
 `https://sharefyx.eurofyx.com/mcp` (echter Aufruf, Spaces kommen an) — das zweite Konto steht aus,
-also sind **P9-13 und V150 ⚠️ „1 von 2"** und nicht ✅. **Was der Schnitt real gekostet hat:** die
+also sind **P9-13 und V150 ⚠️ „1 von 2"** und nicht ✅.
+
+**[2026-10-04, Nikinger-Entscheidung: zurückgestellt, wandert nach P10, und ausdrücklich **kein**
+Phasen-Blocker.]** Ein Schritt, der nur ein Konto braucht, ist kein Blocker, er ist ein Termin —
+ein echter Blocker wäre ein **Code**-Fehler oder ein **Mess**-Befund. Die Marke wandert deshalb
+von ⚠️ auf **⬜** (in der Matrix: P9-13 und V150, beide mit Wanderungsvermerk; Plan §0.1a, und
+die Regel steht in der Wurzel-`CLAUDE.md` §Working style). **Was hier unverändert gilt:** die
+Reihenfolge-Regel unterhalb — das zweite Konto **erst** umstellen, wenn das erste steht, und die
+Reihenfolge-Regel wandert mit der Zeile nach P10, weil sie dieselbe Zeile meint. **P9-15** (drei
+Läufe `/api/v1/overview` mit echter UI-Session) ist davon **unberührt** und die Arbeit der
+nächsten Session. **Was der Schnitt real gekostet hat:** die
 alten Token wurden entwertet (`resolver.py:48` — „Token für eine andere Ressource ausgestellt"), die
 Neuanmeldung über die neue Adresse war **zwingend**, kein Neustart-Fehler. **Reihenfolge-Regel,
 aus dieser Sitzung:** das zweite Konto **erst** umstellen, wenn das erste steht — ein halb

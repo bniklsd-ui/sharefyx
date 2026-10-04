@@ -137,6 +137,15 @@ und er importiert Prompt-Injection direkt in den Speicherpfad.
   Scope-Änderungen und Out-of-Scope-Edits stoppen und fragen.
 - **Handover für einen kalten Leser schreiben.** Ergebnis zuerst, kein Session-Slang, nächster
   Schritt konkret genug zum Sofortstart.
+- **Schritte, die am Fabi-Konto hängen, sind nie ein Phasen-Blocker.** Wenn eine Abnahmezeile nur
+  durch eine Handlung des zweiten Claude-Kontos erfüllbar wäre, ist sie **zurückgestellt** und
+  wandert in die nächste Phase — sie steht dann als ⬜ mit Grund und Zuständigkeit in der Matrix und
+  **nicht** als offener Rest in der Übergabe. *Datierte Nikinger-Entscheidung 2026-10-04:* P9-13 und
+  V150 („`list_spaces` aus **beidem** Claude-Konten über die neue Adresse") waren über zwei Sessions
+  ⚠️ „1 von 2 Konten" und damit faktisch ein Blocker; sie sind heute auf ⬜ mit Wanderungsvermerk
+  nach P10 gesetzt. **Begründung, die man merken muss:** ein Schritt, den nur ein Mensch mit einem
+  Konto tun kann, ist keine Arbeit, die eine Phase aufhält — er ist ein Termin. Ein echter Blocker
+  wäre ein **Code**-Fehler oder ein **Mess**-Befund.
 - **Vor „das braucht einen echten Menschen/Connector" nachsehen, nicht neu erfinden:**
   `docs/concepts/sichtpruefung_automation_conventions.md` sammelt Techniken, mit denen sich
   Sichtprüfungen, die auf den ersten Blick blockiert wirken, doch skripten lassen (Canvas-
@@ -216,12 +225,15 @@ eine offene Frage soll keine Firewall-Entscheidung tragen.
 Index-Neuaufbau. Abnahme **71 ✅ · 10 ⚠️ · 2 ⬜** · `[VERIFY]` **31 ✅ · 3 ⚠️ · 1 ⬜** — beide Zahlen
 stehen in `phase9_hardening/ABNAHME_MATRIX.md` und **nur** dort, weil die zweite Kopie erfahrungsgemäß
 die veraltete ist (vier Fundstellen, drei Zahlen, zwei Tage lang). **Kein ⬜ ist offene
-Code-Arbeit.** Offen sind ausschließlich **deine** Schritte: das **zweite Claude-Konto** umstellen
-(P9-13/V150, drei Handgriffe, kein Code) · **P9-15** (drei Läufe `/api/v1/overview` mit echter
-UI-Session — ein Cookie-Jar mit echten Zugangsdaten gehört nicht in eine Datei, Hard Rule 1) · **die
-beiden Benennungen** von gestern, beide heute entschieden und gebaut · danach Übersichtsgrafik §12.4
+Code-Arbeit.** Und seit dem **2026-10-04** ist **kein offener Rest ein Personenschritt**: die beiden
+Benennungen sind entschieden und gebaut (beide Heads unter dem Softcap), und **P9-13/V150 — das zweite
+Claude-Konto — sind zurückgestellt und wandern nach P10**, weil ein Schritt, den nur ein Konto braucht,
+kein Blocker ist, sondern ein Termin (Regel in §Working style, Plan §0.1a). **Was bleibt, ist eine
+Aufgabe: P9-15** — drei Läufe `/api/v1/overview` mit echter UI-Session, **Arbeit der nächsten
+Session**; ein Cookie-Jar mit echten Zugangsdaten gehört nicht in eine Datei (Hard Rule 1), der Weg
+dafür steht im Nachtrag des Phase-9-Heads. Danach Übersichtsgrafik §12.4
 **gerendert und angesehen**, ROADMAP-Zeile, Phase auf ✅. **Fester Termin: am 2026-10-18 schließt
-das Übergangsfenster von selbst** — die alte Funnel-Adresse liest dann nur noch noch, schreibt nicht
+das Übergangsfenster von selbst** — die alte Funnel-Adresse liest dann nur noch, schreibt nicht
 mehr. Absicht, kein Versehen.
 
 **Details, Herleitungen, Gegenproben und die dreizehn eigenen Fehler dieses Tages: der

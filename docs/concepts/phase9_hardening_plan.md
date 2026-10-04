@@ -42,6 +42,25 @@ updated: 2026-09-19 (Plan geschrieben — Claude-Code-Planungssession. Vier Niki
    Item-Schema um `doing`/`assignee` erweitern und einen Löschpfad bauen — damit P10 Features
    baut statt erst Grundlagen.
 
+### 0.1a Nikinger-Entscheidung vom 2026-10-04 — Fabi-Schritte sind kein Blocker
+
+**Ein Schritt, der am Konto des zweiten Menschen hängt, ist kein Phasen-Blocker.** Eine Abnahmezeile,
+die nur durch eine solche Handlung erfüllbar wäre, wird **zurückgestellt** und wandert in die nächste
+Phase; sie bleibt als ⬜ mit Grund und Zuständigkeit sichtbar und taucht **nicht** als offener Rest in der
+Übergabe auf.
+
+**Anlass und Konkretion in P9:** P9-13 und V150 verlangen `list_spaces` aus **beiden** Claude-Konten über
+die neue Domain. Am 2026-10-03 stand Konto *niklas*, das zweite nicht; die Zeile stand über zwei
+Sessions auf ⚠️ „1 von 2 Konten", und die Übergabe führte sie als „deine Schritte". Das war
+**faktisch ein Blocker durch eine Person**, nicht durch einen Fehler. **Heute:** beide Zeilen auf ⬜,
+**wandert nach P10** (Phase-10-Liste in §15), und **P9-15** — die drei Läufe `/api/v1/overview` mit
+echter UI-Session — ist die Arbeit der **nächsten** Session.
+
+**Was das für die Abnahme-Zählung heißt:** eine zurückgestellte Zeile ist **nicht** ⚠️. ⚠️ steht in der
+Matrix für *erfüllt mit benannter Abweichung* (siehe §Statusregel dort), und eine Zeile, die ein Konto
+verlangt, ist nicht erfüllt — sie ist ⬜. Das ist dieselbe Unterscheidung, an der am 2026-10-04 die
+P9-15-Zeile litt, und sie hat die Bilanz bewegt.
+
 ### 0.2 Scope
 
 **DRIN (acht Steps):**

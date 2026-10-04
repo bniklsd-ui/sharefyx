@@ -51,20 +51,37 @@ CELL_SPLIT_RE = re.compile(r"(?<!\\)\|")
 # Eine Trennzeile `|---|---|---|` zählt nicht als Datenzeile.
 SEPARATOR_RE = re.compile(r"^\|[\s:|-]+\|$")
 
-# datei -> [(Zeile, Zellenzahl-Kopf, Zellenzahl-Zeile), …] — **alle gemessen** am 2026-10-04 mit
-# demselben Prüfer, den dieser Test benutzt. Zeilennummern stehen mit drin, weil eine Ausnahme ohne
-# Ort ein Gerücht ist.
-KNOWN_OFFENDERS: dict[str, list[tuple[int, int, int]]] = {
-    "docs/concepts/phase4_auth_plan.md": [(112, 3, 2)],
-    "docs/concepts/phase5_ui_plan.md": [(316, 2, 3)],
-    "docs/concepts/phase8_6_ui_polish_plan.md": [(66, 3, 4)],  # 📕
-    "phase6_shares/GLOBAL_SEARCH_PLAN.md": [(309, 3, 2), (310, 3, 2)],
-    "docs/concepts/phase9_hardening_plan.md": [(1245, 3, 4), (1251, 3, 4), (1252, 3, 4), (1253, 3, 4), (1255, 3, 4)],
-    "docs/concepts/phase9_hardening_block_doing_plan.md": [(172, 3, 5)],
-    "docs/concepts/phase9_hardening_block_trace_plan.md": [(185, 3, 11)],  # 📕
-    "phase2_mcp/CLAUDE.md": [(125, 5, 4)],
-    "phase8_6_ui_polish/CLAUDE.md": [(131, 5, 6)],  # abgeschlossene Phase
-    "phase9_hardening/step_a/RUNBOOK_STEP_A.md": [(917, 3, 4)],
+# datei -> [(Anfang der Zeile, Zellenzahl-Kopf, Zellenzahl-Zeile), …] — **alle gemessen** am 2026-10-04
+# mit demselben Prüfer, den dieser Test benutzt.
+#
+# **Die Fundstelle ist der Zeilenanfang, nicht die Zeilennummer, und das ist die zweite Fassung.**
+# Die erste führte `(Zeile, Kopf, Zeile)` — und die Zeilennummer ist **per Konstruktion brüchig**: ein
+# Absatz, der **über** der Fundstelle eingefügt wird, verschiebt sie, und der Wächter meldet dann die
+# fünf alten V-Zeilen des P9-Plans als *unbekannte* Verstöße. Genau das ist am selben Tag passiert,
+# beim Einfügen von §0.1a. Eine Ausnahmeliste, die bei jedem neuen Absatz über ihr selbst pflegt
+# werden muss, ist ein Wächter, der seine eigenen Verstöße erzeugt — also **Positionsangaben durch
+# Inhaltsangaben** ersetzt. Die Zeilennummern standen in der ersten Fassung mit drin, „weil eine
+# Ausnahme ohne Ort ein Gerücht ist"; der Ort ist jetzt der Zeilenanfang, und der ist stabil.
+KNOWN_OFFENDERS: dict[str, list[tuple[str, int, int]]] = {
+    "docs/concepts/phase4_auth_plan.md": [("| **RFC 9700** (Jan 2025), OAuth 2.0 Securit", 3, 2)],
+    "docs/concepts/phase5_ui_plan.md": [("| **S6** | Entfällt strukturell mit `UserDir", 2, 3)],
+    "docs/concepts/phase8_6_ui_polish_plan.md": [("| **P8.6-N** | **V102-Dedup in `graph.js:156", 3, 4)],  # 📕
+    "docs/concepts/phase9_hardening_block_doing_plan.md": [("| `list.js:169` `openFromOverview()`, `dialo", 3, 5)],
+    "docs/concepts/phase9_hardening_block_trace_plan.md": [("| 7 | `phase9_hardening/tests/test_trace_blo", 3, 11)],  # 📕
+    "docs/concepts/phase9_hardening_plan.md": [
+        ("| V153 | Polkit-Regel oder `sudoers`-Fragmen", 3, 4),
+        ("| V159 | Erscheint `doing` im `<select>` ohn", 3, 4),
+        ("| V160 | Was ist `assignee` — freier String,", 3, 4),
+        ("| V161 | Dauer des Index-Neuaufbaus über den", 3, 4),
+        ("| V163 | Betrifft der 3.4.7-Security-Fix die", 3, 4),
+    ],
+    "phase2_mcp/CLAUDE.md": [("| 15 | P9-Block trace (zehnte P1-Contract-Öf", 5, 4)],
+    "phase6_shares/GLOBAL_SEARCH_PLAN.md": [
+        ("| **V57** | ~~`listReadonlyEl`-Verhalten im ", 3, 2),
+        ("| **V58** | ~~Kein Render-Pfad dereferenzier", 3, 2),
+    ],
+    "phase8_6_ui_polish/CLAUDE.md": [("| 2 | Step V — **umgesetzt** (Nikinger-Aktio", 5, 6)],  # abgeschlossene Phase
+    "phase9_hardening/step_a/RUNBOOK_STEP_A.md": [("| **V151** (Vorabmessung, 2026-09-30) | Wie ", 3, 4)],
 }
 # `phase9_hardening/CLAUDE.md` steht **nicht** in der Liste: die beiden Fundstellen dort sind am
 # 2026-10-04 behoben (verlustfrei, ` · ` bzw. entfernt), und genau das ist der Punkt dieser Datei.
@@ -78,16 +95,17 @@ def cell_count(line: str) -> int:
     return len(CELL_SPLIT_RE.split(stripped.strip("|")))
 
 
-def table_defects(text: str) -> list[tuple[int, int, int]]:
-    """Alle (Zeile, Kopf, Zeile) im Text, bei denen die Zellenanzahl nicht zum Kopf passt.
+def table_defects(text: str) -> list[tuple[str, int, int]]:
+    """Alle (Anfang der Zeile, Zellenzahl-Kopf, Zellenzahl-Zeile) im Text, bei denen die
+    Zellenzahl nicht zum Kopf passt.
 
     Eine nicht-`|`-Zeile beendet die laufende Tabelle — so wird aus zwei direkt aufeinander
     folgenden Blöcken nicht eine gemeinsame Tabelle, und ein Codeblock mit Masken zählt nicht.
     """
-    defects: list[tuple[int, int, int]] = []
+    defects: list[tuple[str, int, int]] = []
     expected: int | None = None
     in_fence = False
-    for lineno, line in enumerate(text.split("\n"), start=1):
+    for line in text.split("\n"):
         if line.lstrip().startswith("```"):
             in_fence = not in_fence
             expected = None
@@ -104,7 +122,7 @@ def table_defects(text: str) -> list[tuple[int, int, int]]:
             expected = found
             continue
         if found != expected:
-            defects.append((lineno, expected, found))
+            defects.append((line.strip()[:44], expected, found))
     return defects
 
 
@@ -120,7 +138,7 @@ def offenders() -> list[str]:
             continue
         if rel in KNOWN_OFFENDERS and defects == KNOWN_OFFENDERS[rel]:
             continue  # gemessen, benannt, unverändert — siehe Moduldocstring
-        rendered = ", ".join(f"{ln}: Kopf {exp} vs. Zeile {got}" for ln, exp, got in defects)
+        rendered = ", ".join(f"`{head}`: Kopf {exp} vs. Zeile {got}" for head, exp, got in defects)
         found.append(f"{rel}: {rendered}")
     return found
 
@@ -147,7 +165,7 @@ def test_the_known_offenders_still_look_exactly_as_measured():
     reparierter Eintrag nicht einfach: er taucht als frischer Verstoß auf. Muster wie in
     `test_updated_chain.py`.
     """
-    measured: dict[str, list[tuple[int, int, int]]] = {}
+    measured: dict[str, list[tuple[str, int, int]]] = {}
     for path in sorted(REPO_ROOT.rglob("*.md")):
         rel_path = path.relative_to(REPO_ROOT)
         if SKIP_DIRS & set(rel_path.parts):
@@ -161,7 +179,8 @@ def test_the_known_offenders_still_look_exactly_as_measured():
     assert measured == KNOWN_OFFENDERS, (
         "Die Ausnahmeliste stimmt nicht mehr mit dem Repo überein — entweder ist eine Fundstelle "
         "repariert (dann hier streichen, die Korrektur aber in der Session festhalten) oder ein "
-        "neuer Verstoß ist dazugekommen (dann in KNOWN_OFFENDERS mit Zeilennummer aufnehmen)"
+        "neuer Verstoß ist dazugekommen (dann in KNOWN_OFFENDERS mit dem **Zeilenanfang** "
+        "aufnehmen — nicht mit der Zeilennummer, die beim nächsten Absatz darüber verrutscht)"
     )
 
 
@@ -174,11 +193,17 @@ def test_the_checker_itself_catches_what_it_claims():
     zwei_tabellen = "| a | b |\n|---|---|\n| 1 | 2 |\n\nFließtext\n\n| a | b |\n|---|---|\n| 1 | 2 | 3 |\n"
     im_fence = "```\n| a | b | c |\n```\n"
 
-    assert table_defects(sauber) == []
-    assert table_defects(zu_breit) == [(3, 2, 3)]
-    assert table_defects(zu_schmal) == [(3, 2, 1)]
-    assert table_defects(escaped) == []
-    assert table_defects(zwei_tabellen) == [(9, 2, 3)]
+    def kurz(*zeilen: str) -> list[tuple[str, int, int]]:
+        """Die Defekte einer Mini-Tabelle, als (Anfang, Kopf, Zeile) — die Form, die
+        `table_defects` liefert. Der Anfang genügt: er ist eindeutig in jeder Zeile."""
+        return [(d[0][:44], d[1], d[2]) for d in table_defects("\n".join(zeilen) + "\n")]
+
+    assert kurz("| a | b |", "|---|---|", "| 1 | 2 |", "| 3 | 4 |") == []
+    assert kurz("| a | b |", "|---|---|", "| 1 | 2 | 3 |") == [("| 1 | 2 | 3 |", 2, 3)]
+    assert kurz("| a | b |", "|---|---|", "| nur eins |") == [("| nur eins |", 2, 1)]
+    assert kurz("| a | b |", "|---|---|", "| `x \\| y` | 2 |") == []
+    assert kurz("| a | b |", "|---|---|", "| 1 | 2 |", "", "Fliesstext", "",
+                "| a | b |", "|---|---|", "| 1 | 2 | 3 |") == [("| 1 | 2 | 3 |", 2, 3)]
     assert table_defects(im_fence) == []
 
 

@@ -25,7 +25,7 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | Step | Inhalt | Status |
 |---|---|---|
 | 0 | Verifikations-Durchlauf, Doku-Fundament (Phasenverzeichnis, INDEX-Rotation, vier Defekte, `doc_health.py`, Baseline) | ✅ (Details im L3-Archiv) · Herleitung im L3-Archiv |
-| A | Echte Domain über eigenen VPS | 🟡 **A7a + A7 ✅ 2026-10-03; A8 bei 1 von 2 Konten** — offen ist nur das zweite Konto. P9-10b ✅ · P9-12 ✅ · P9-14 ✅ · P9-13/V150 ⚠️ · **P9-15 ⬜** (drei Läufe mit echter UI-Session, Nikinger-Wirklichkeit). Übergangsfenster schließt **2026-10-18** · Herleitung im L3-Archiv |
+| A | Echte Domain über eigenen VPS | 🟡 **A7a + A7 ✅ 2026-10-03; A8 für Konto *niklas* ✅** — P9-10b ✅ · P9-12 ✅ · P9-14 ✅ · **P9-13/V150 ⬜ zurückgestellt, wandert nach P10, ist kein Blocker** (Nikinger 2026-10-04: ein Schritt, der nur ein Konto braucht, ist ein Termin, kein Blocker; Plan §0.1a) · **P9-15 ⬜ = Arbeit der nächsten Session** (drei Läufe `/api/v1/overview` mit echter UI-Session). Übergangsfenster schließt **2026-10-18** · Herleitung im L3-Archiv |
 | B | `tailscaled-watchdog.service` | ✅ **abgeschlossen 2026-10-01**, live; P9-16–P9-20 ✅, V152/V153 ✅. `socat` 1.8.0.0 + Unit laufen unter voller Härtung, `RuntimeDirectoryPreserve=yes` (Befund 7) und Systempfad (Befund `__REPO_ROOT__`) behoben · V153: `sudoers` unbaubar, polkit greift · Herleitung im L3-Archiv |
 | C | Vision-Dienst auf der RTX 3060 | ✅ **abgeschlossen** (2026-09-26): GPU-Inferenz reboot-fest + C8 (`ollama` auf der VM `inactive`) · P9-21/-23/-26 ✅ · **P9-22 deferred** (Nikinger 2026-09-26, architektonisch belegt statt extern getestet) → Revisit Step Z oder P10 · Herleitung im L3-Archiv |
 | D | Zwei gemeldete Bugs (ESC/Vollbild, Drop-Ziel Space-Wurzel) | 🟡 **D2 am Browser belegt 2026-10-03** (P9-28/-29/-30 ✅, Probe **16/16**); **D1 bewusst zurückgestellt** (Nikinger 2026-09-23) · **P9-27 ⬜** und bleibt es: natives macOS-Vollbild ist nicht automatisierbar, der `fullscreenElement`-Guard ist dafür ein No-op · Herleitung im L3-Archiv |
@@ -237,6 +237,11 @@ Wurzel-`CLAUDE.md` (Umkehr + K=?; `K=1` ⇒ 17.515 B, liegt bereit). Danach, und
 am 2026-10-18 schließt das Übergangsfenster von selbst** — die alte Adresse liest dann nur noch.
 Absicht, kein Versehen.
 
+**[2026-10-04, wie dieser Block überholt ist]** (1) und (4) sind **erledigt** — beide Strukturen
+rotiert, beide Heads unter dem Softcap (Nachtrag unten). **(2) ist zurückgestellt und wandert nach
+P10**: ein Schritt, der ein Konto braucht, ist kein Blocker (Plan §0.1a). **(3) P9-15 ist die Arbeit
+der nächsten Session.** Die Liste bleibt unverändert stehen, weil ein Block ein Datumszeug ist.
+
 ### Nachtrag — die Wurzel-Rotation und das L3-Archiv: beide Heads jetzt unter dem Softcap
 
 **Zwei Benennungen, die zwei Sessions lang offen waren, sind entschieden und gebaut (Nikinger,
@@ -279,7 +284,25 @@ siehe die datierte Korrektur in der Wurzel.
 unberührt · **kein `systemctl`, kein `pkill -f`**, keine Wegwerf-Instanz, kein Deploy. **`doc_health`
 hat viermal rot gemeldet, viermal zu Recht** — nach jeder Größenänderung eine exakte INDEX-Angabe.
 
-**Nächster Schritt — es ist nichts mehr, was an mir hängt.** **Du:** das **zweite Claude-Konto**
-umstellen (P9-13/V150, drei Handgriffe, kein Code) · **P9-15** (drei Läufe `/api/v1/overview` mit echter
-UI-Session) · danach **Übersichtsgrafik §12.4** gerendert **und angesehen**, ROADMAP-Zeile, Phase auf
-✅. Beide Benennungen von heute sind gebaut; beide Heads liegen unter dem Softcap.
+**Nächster Schritt — es ist nichts mehr, was an mir hängt, und genau das hat sich heute geändert.**
+**Nikinger-Entscheidung 2026-10-04: Schritte, die am Fabi-Konto hängen, sind nie ein Phasen-Blocker.**
+P9-13/V150 (das zweite Claude-Konto) standen zwei Sessions auf ⚠️ „1 von 2 Konten" und wurden damit
+**faktisch zum Blocker durch eine Person**; sie sind heute auf ⬜ mit Wanderungsvermerk nach P10
+gesetzt, und die Regel steht in der Wurzel-`CLAUDE.md` §Working style wie im Plan §0.1a. **Die
+Marke wechselt dabei von ⚠️ auf ⬜, weil das zwei verschiedene Dinge sind:** ⚠️ heißt in dieser Matrix
+*erfüllt mit benannter Abweichung*, und ein Konto ist keine Abweichung, sondern ein fehlender
+Schritt. **Die Begründung, die man merken muss:** ein Schritt, den nur ein Mensch mit einem Konto tun
+kann, ist **ein Termin**. Ein echter Blocker wäre ein **Code**-Fehler oder ein **Mess**-Befund.
+
+**Und was bleibt, ist jetzt eine Aufgabe und kein Termin mehr: P9-15 ist die Arbeit der nächsten
+Session.** Drei Läufe `/api/v1/overview` mit **echter UI-Session** (Passwort + TOTP) gegen die
+Referenz 372,9 ms, die selbst falsch ist (in-process, `ui_budget.py`, nie über Funnel — gemessen am
+2026-10-03, see dort). **Der offene Weg, damit daraus kein Cookie-Jar in einer Datei wird:** der
+Browser wird von Playwright bedient und die **Anmeldung macht der Nikinger einmal im sichtbaren
+Fenster** — das Passwort und der TOTP verlassen sein Fenster nie, es steht in keiner Datei und in
+keinem Kommando, und der nächste Lauf kann die drei Läufe gegen dieselbe Session wiederholen. **Vor
+dem Bau kurz in `docs/concepts/sichtpruefung_automation_conventions.md` nachsehen**, ob das dort
+schon als Muster steht.
+
+Danach, und **erst dann**: Übersichtsgrafik §12.4 gerendert **und angesehen**, ROADMAP-Zeile, Phase
+auf ✅. Beide Benennungen von heute sind gebaut; beide Heads liegen unter dem Softcap.

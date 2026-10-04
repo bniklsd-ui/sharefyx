@@ -61,14 +61,21 @@ CAP_BYTES = 300  # der Cap, mit dem P9-3/V145 die Unerreichbarkeit des Kriterium
 # Abgetippt, nicht abgeleitet — der Test soll die Behauptung prüfen, nicht sie wiederholen.
 # 2026-10-03: P9-15 von ⬜ auf ⚠️ (gemessen, aber in anderer Form als im Kriterium -- die
 # dort genannte Referenz 372,9 ms ist im Code nie ueber Funnel gemessen worden).
-ABNAHME_BILANCE = {"✅": 71, "⚠️": 10, "⬜": 2}
+ABNAHME_BILANCE = {"✅": 71, "⚠️": 9, "⬜": 3}
 ABNAHME_ROWS = 83  # 82 Abnahmezeilen, P9-10 in zwei prüfbare Hälften geteilt
 # 2026-10-03: V164 von ⬜ auf ✅ (Deploy `v3.1.1` + Health-Gate 9/9). Die Konstante steht
 # **vor** dem Zählen, sonst wäre der Test eine Tautologie -- deshalb hat er mich beim
 # Zurueckschreiben der Bilanz in die Matrix rot gemeldet, statt sie zu bestaetigen.
 # 2026-10-03: V151 von ⚠️ auf ✅ (beide Beine gemessen, VPS-Anteil 2,4-3,6 %).
-VERIFY_BILANCE = {"✅": 31, "⚠️": 2, "⬜": 1}  # Nummern-Lesart, eine Nummer = eine Zeile
+VERIFY_BILANCE = {"✅": 31, "⚠️": 1, "⬜": 2}  # Nummern-Lesart, eine Nummer = eine Zeile
 VERIFY_ROWS = 37  # 34 Nummern + 2 Zweit-Lesarten + 1 reservierte Bereichszeile
+# 2026-10-04 (Nikinger): P9-13/V150 (das zweite Claude-Konto) von ⚠️ auf ⬜ — **zurückgestellt, wandert
+# nach P10, ist kein Blocker** (Plan §0.1a; die Regel steht auch in der Wurzel-`CLAUDE.md`
+# §Working style). V157 ist damit der einzige verbleibende ⚠️, V150 und V162 *(Lesart A)* die beiden ⬜.
+# **Woran man sieht, dass dieser Wächter zählt und nicht nachschlägt:** vor dem Zurückschreiben dieser
+# beiden Konstanten meldete er rot und nannte die Differenz `{⚠️: 9} != {⚠️: 10}` — obwohl nirgends eine
+# Zahl von Hand angefasst worden war. Genau das ist der Unterschied zwischen einer Maschine, die den
+# Zustand prüft, und einer, die die Behauptung wiederholt.
 
 # **2026-10-04, der Fund, der diese Konstante erzwang.** Die Zählregel („eine doppelt vergebene
 # Nummer zählt einmal, mit ihrer Lesart A") wirkt den Marker der **zweiten Lesart weg** — und der
