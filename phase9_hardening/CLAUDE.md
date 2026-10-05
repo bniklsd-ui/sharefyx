@@ -25,7 +25,7 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | Step | Inhalt | Status |
 |---|---|---|
 | 0 | Verifikations-Durchlauf, Doku-Fundament (Phasenverzeichnis, INDEX-Rotation, vier Defekte, `doc_health.py`, Baseline) | ✅ (Details im L3-Archiv) · Herleitung im L3-Archiv |
-| A | Echte Domain über eigenen VPS | 🟡 **A7a + A7 ✅ 2026-10-03; A8 für Konto *niklas* ✅** — P9-10b ✅ · P9-12 ✅ · P9-14 ✅ · **P9-13/V150 ⬜ zurückgestellt, wandert nach P10, ist kein Blocker** (Nikinger 2026-10-04: ein Schritt, der nur ein Konto braucht, ist ein Termin, kein Blocker; Plan §0.1a) · **P9-15 ⬜ = Arbeit der nächsten Session** (drei Läufe `/api/v1/overview` mit echter UI-Session). Übergangsfenster **unbefristet** gebaut (`LEGACY_UNTIL=open`, Nikinger 2026-10-05, Firmen-VPN erreicht die neue Domain nicht). Bis zum Deploy und `install_units.sh` gilt weiter `2026-10-17` · Herleitung im L3-Archiv |
+| A | Echte Domain über eigenen VPS | 🟡 **A7a + A7 ✅ 2026-10-03; A8 für Konto *niklas* ✅** — P9-10b ✅ · P9-12 ✅ · P9-14 ✅ · **P9-13/V150 ⬜ zurückgestellt, wandert nach P10, ist kein Blocker** (Nikinger 2026-10-04: ein Schritt, der nur ein Konto braucht, ist ein Termin, kein Blocker; Plan §0.1a) · **P9-15 ⬜ = Arbeit der nächsten Session** (drei Läufe `/api/v1/overview` mit echter UI-Session). Übergangsfenster **unbefristet, live seit 2026-10-05** (`v3.1.2`, `LEGACY_UNTIL=open`, Nikinger-Entscheidung: Firmen-Proxy setzt die neue Domain zurück) · Herleitung im L3-Archiv |
 | B | `tailscaled-watchdog.service` | ✅ **abgeschlossen 2026-10-01**, live; P9-16–P9-20 ✅, V152/V153 ✅. `socat` 1.8.0.0 + Unit laufen unter voller Härtung, `RuntimeDirectoryPreserve=yes` (Befund 7) und Systempfad (Befund `__REPO_ROOT__`) behoben · V153: `sudoers` unbaubar, polkit greift · Herleitung im L3-Archiv |
 | C | Vision-Dienst auf der RTX 3060 | ✅ **abgeschlossen** (2026-09-26): GPU-Inferenz reboot-fest + C8 (`ollama` auf der VM `inactive`) · P9-21/-23/-26 ✅ · **P9-22 deferred** (Nikinger 2026-09-26, architektonisch belegt statt extern getestet) → Revisit Step Z oder P10 · Herleitung im L3-Archiv |
 | D | Zwei gemeldete Bugs (ESC/Vollbild, Drop-Ziel Space-Wurzel) | 🟡 **D2 am Browser belegt 2026-10-03** (P9-28/-29/-30 ✅, Probe **16/16**); **D1 bewusst zurückgestellt** (Nikinger 2026-09-23) · **P9-27 ⬜** und bleibt es: natives macOS-Vollbild ist nicht automatisierbar, der `fullscreenElement`-Guard ist dafür ein No-op · Herleitung im L3-Archiv |
@@ -216,3 +216,19 @@ Ein Ticket beschleunigt es.
 **Notlösung ohne Release:** nur `LEGACY_UNTIL` auf ein späteres Datum setzen und Schritte 3–4
 ausführen; der Dialog nennt dann dieses Datum. **Wann zurück auf ein Datum:** erst wenn der
 Arbeitslaptop die neue Adresse belegt erreicht.
+
+### Nachtrag 2026-10-05 — `v3.1.2` ist live, und das Fenster ist offen
+
+**Deploy durch den Nikinger:**
+- Release `/opt/sharefyx/releases/20261005T101727.915085Z`, SHA `f4ef319`, vorher `20261003T205843`
+- Release-`pytest` 1223
+- `health_gate.sh --expected-version=v3.1.2 --require-todays-update-log --expected-sha=f4ef319` → `"result":"ok"`
+- danach `LEGACY_UNTIL=open`, `install_units.sh`, Restart (aktiv seit 12:23:13 CEST); Gate erneut `ok`
+
+**Read-only gegengeprüft:**
+- die installierte Unit trägt `SPACE_UI_LEGACY_UNTIL=open`
+- `/proc/<MainPID>/environ` des laufenden Prozesses trägt `open` ebenso
+- `/ui/login` antwortet auf **beiden** Adressen mit `200`
+
+**Nicht gegengeprüft:** Dialog und Schreib-POST auf der alten Adresse mit echter Sitzung. Das ist
+die Sichtprüfung des Nikingers. Die Wegwerf-Probe (24/24) deckt denselben Code ab.

@@ -186,8 +186,8 @@ Vermutet, nicht belegt, ist ein Filter gegen neu registrierte Domains. **Nikinge
 2026-10-05:** beide Adressen schreiben parallel, bis die neue vom Arbeitslaptop aus belegt funktioniert.
 Dafür gibt es `LEGACY_UNTIL=open` (fail-closed, nur das exakte Wort; CSRF-Pfad byte-identisch). Der
 Dialog auf der alten Adresse nennt dann keinen Termin. **Damit ist der Satz „am 2026-10-18 schließt
-das Übergangsfenster von selbst" aus dem Block vom 2026-10-04 überholt — aber erst ab dem Deploy.**
-Bis dahin gilt `2026-10-17`. Die Deploy-Schritte, die Notlösung ohne Release und die
+das Übergangsfenster von selbst" aus dem Block vom 2026-10-04 überholt.** **Live seit 2026-10-05:**
+`v3.1.2` (SHA `f4ef319`), Gate `ok`, und der laufende Prozess trägt `LEGACY_UNTIL=open`. Die Deploy-Schritte, die Notlösung ohne Release und die
 PowerShell-Diagnose für den Laptop stehen im Session-Block vom 2026-10-05 in `phase9_hardening/CLAUDE.md`.
 Der übrige Stand der Phase 9 ist unverändert: Abnahmezahlen in `phase9_hardening/ABNAHME_MATRIX.md`,
 P9-15 ist die offene Aufgabe.
