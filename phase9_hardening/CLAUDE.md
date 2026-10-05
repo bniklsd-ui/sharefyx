@@ -245,3 +245,26 @@ Der Nikinger hat drei offene Fragen beantwortet:
 Dazu wünscht er einen Umbau des Einstellungs-Menüs. **Alles geplant, nichts gebaut:**
 `docs/concepts/phase9_hardening_block_settings_plan.md`. Der P9-11-Portscan ist dort in §5 für den
 Nikinger aufgeschrieben (MacBook, Hotspot, vier Ziele).
+
+### Nachtrag 2026-10-05 — Vision-Timeouts über MCP: opencode wartet nur 5 s
+
+**Befund (Nikinger):** `local_vision` über MCP läuft oft in einen Timeout, als Skript direkt
+aufgerufen fast nie.
+
+**Ursache, gemessen:**
+- opencode setzt für MCP-Anfragen ohne eigenes `timeout` **5000 ms**. Das sagt das Config-Schema
+  (`https://opencode.ai/config.json`, `McpLocalConfig.timeout`) wörtlich.
+- `~/.config/opencode/opencode.jsonc` setzte für `local_vision` keins.
+- Zwei echte Aufrufe über den MCP-Server (stdio, dasselbe Bild): **kalt 15,9 s** (Modell lädt auf
+  die GPU), **warm 1,2 s**. Daher „oft": nur der erste Aufruf nach einer Pause reißt die 5 s.
+- Das Skript direkt hat kein äußeres Limit, nur das innere `DEFAULT_TIMEOUT_S = 600`.
+
+**Behoben:** `"timeout": 600000` am Eintrag `local_vision`, gleich dem inneren Limit, mit Kommentar.
+Die Datei liegt **außerhalb des Repos**; hier steht deshalb der Befund. **Wirksam erst nach einem
+Neustart von opencode.** MCP bleibt der Standardweg, der Skript-Umweg ist nicht mehr nötig.
+
+**Dazu die Nikinger-Antworten zum settings-Plan:**
+- V185: die Knöpfe sehen aus wie die Baumzeile „Offen", nicht wie „Verschieben"
+- P9-AI bestätigt
+- D1/P9-27 wird V188 — belegen, dass es macOS-Verhalten ist, kein Code
+- **Gebaut wird von M3.**

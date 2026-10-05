@@ -73,10 +73,10 @@ Block ist reines Frontend.
 | Lock | Inhalt | Herkunft |
 |---|---|---|
 | **P9-AE** | Das Menü heißt **„Einstellungen"**. Es trägt **keinen** Hinweistext und genau drei Knöpfe in dieser Reihenfolge: **Passwort ändern · Spaces verwalten · Update-Log**. „Spaces verwalten" bleibt hinter `meta.space_admin` (P7-R). | Nikinger 2026-10-05 |
-| **P9-AF** | Die Menüknöpfe sind **Standard-`.btn`**, also dieselbe Höhe, Polster und Schrift wie „Verschieben" (`#list-selection-move`, öffnet die Ordnerwahl). Untereinander, alle so breit wie der breiteste, **nicht** volle Panelbreite. Die Klasse `.account-nav` fällt im Menü weg und bleibt nur am Alte-Adresse-Dialog. | Nikinger 2026-10-05 („exakt die Größe des Standardknopfs"); Annahme „Verschieben" = der gemeinte Knopf, siehe V185 |
+| **P9-AF** | Die Menüknöpfe tragen die **Optik der Ordnerzeilen im Navigationsbaum** (`.tree__folder`, z. B. „Offen“ unter dem eigenen Space): dieselbe Höhe, Polster, Schrift und Rundung, und **derselbe Auswahlzustand** (`aria-current="true"` mit Kante und Fill), wenn das zugehörige Unterfenster offen ist. Untereinander, alle so breit wie das Menü-Panel, das selbst nach Inhalt breit ist. Die Klasse `.account-nav` fällt im Menü weg und bleibt nur am Alte-Adresse-Dialog. **[2026-10-05] Korrigiert:** die erste Fassung nannte „Verschieben“ (`.btn`); der Nikinger hat per Bild die Baumzeile gezeigt (V185 ✅). Umsetzung: die Regeln von `.tree__folder` **wiederverwenden** (gemeinsame Klasse oder Selektorliste), nicht kopieren. Eine Kopie wäre die „dritte Variante“, die P9 am 2026-10-01 bei `.account-nav` schon einmal entfernt hat | Nikinger 2026-10-05, mit Bild |
 | **P9-AG** | **Fensterkette statt Overlay-Wechsel:** ein Overlay `#settings-overlay` mit **einer Reihe** von Panels nebeneinander. Stufe 1 ist das Menü, Stufe 2 das gewählte Unterfenster, Stufe 3 das Space-Detail. Ein Klick auf einen anderen Menüknopf **ersetzt** Stufe 2 und schließt Stufe 3. Der Knopf des offenen Unterfensters trägt den Auswahlzustand der Konvention (`aria-current`, `--select-fill`), damit man sieht, wozu das Fenster daneben gehört. | Nikinger 2026-10-05; Auswahl-Markierung: Konvention v3 (`phase8_ui_graph/CLAUDE.md`) |
 | **P9-AH** | **Schließen von rechts nach links:** ESC schließt das **rechteste** Panel. Jedes Unterfenster hat sein eigenes „Schließen", das nur dieses Panel und alles rechts davon schließt. Das Menü schließt die ganze Kette. Der Klick auf den Hintergrund verhält sich wie bei jedem anderen Overlay heute. | Folgerung aus P9-AG; ESC-Kette wie `app.js:258 ff.` |
-| **P9-AI** | **Schmale Fenster (< Summe der Panelbreiten, Richtwert 1024 px):** es bleibt nur das **rechteste** Panel sichtbar, mit einem „Zurück"-Knopf links oben. Kein Quetschen, kein horizontales Scrollen. | Claude Code; dieselbe Regel wie P8.6 Plan 2 (≤ 1024 px: Liste **oder** Editor, nie beides) |
+| **P9-AI** | **Schmale Fenster (< Summe der Panelbreiten, Richtwert 1024 px):** es bleibt nur das **rechteste** Panel sichtbar, mit einem „Zurück"-Knopf links oben. Kein Quetschen, kein horizontales Scrollen. **[2026-10-05] Bestätigt:** schmal nur das rechteste Panel, auf voller Breite alle drei. | Claude Code; dieselbe Regel wie P8.6 Plan 2 (≤ 1024 px: Liste **oder** Editor, nie beides) |
 | **P9-AJ** | **Passwort-Reihenfolge:** aktuelles Passwort → neues → wiederholen → **TOTP zuletzt**. So ist der Code beim Absenden noch frisch. Der Hinweis zu Connectoren und Sitzungen wandert **in** dieses Unterfenster. Die Request-Form bleibt byte-identisch. | Nikinger 2026-10-05 |
 | **P9-AK** | **Spaces-Unterfenster:** Zeilen mit sichtbarem Abstand (`gap: var(--space)`), zwischen Liste und Anlege-Zeile eine Trennlinie, **dasselbe `<hr>`**, das heute vor dem Detail steht. Ein Klick auf einen Space öffnet Stufe 3 mit Mitgliedern, Hinzufügen, Re-Auth-Feldern und „Space entfernen". Update-Log-Unterfenster: **Inhalt identisch**, nur der Ort ändert sich. | Nikinger 2026-10-05 |
 | **P9-AL** | **Größen:** Panels nach Inhalt statt `90 % / 440 px`. Richtwerte: Menü `fit-content`, Passwort und Spaces etwa 320–360 px, Update-Log behält seine Lesebreite. Knöpfe in Panels nie `width: 100 %`. Die Werte legt der Bau gegen Bilder fest, nicht vorher. | Nikinger 2026-10-05 („viel breiter als nötig") |
@@ -150,7 +150,7 @@ Block ist reines Frontend.
      werden **nicht** umgebaut, bekommen aber einen datierten Kopfvermerk.
 6. **Browser-Probe** `phase9_hardening/scripts/p9_settings_chain_probe.py` gegen die Wegwerf-Instanz
    (Port 18775, PID-Datei):
-   - S1: Menü — drei Knöpfe, Reihenfolge, Höhe gleich `#list-selection-move` (±1 px), keine volle Breite
+   - S1: Menü — drei Knöpfe, Reihenfolge, berechnete Höhe, Polster und Rundung gleich einer `.tree__folder`-Zeile (±1 px), aktiver Knopf mit derselben Kante und demselben Fill wie „Offen“
    - S2: Passwort daneben, Menü bleibt sichtbar, Knopf trägt `aria-current`
    - S3: Wechsel auf Spaces ersetzt Stufe 2
    - S4: Klick auf Space öffnet Stufe 3, drei Panels gleichzeitig sichtbar bei 1440 px
@@ -179,9 +179,10 @@ Item (gewollt), und macOS beendet dabei das native Vollbildfenster (der grüne K
 - **Was eine Seite tun könnte:** ESC per Keyboard Lock API reservieren. Die gibt es meines Wissens
   **nur in Chromium** und nur im Web-Vollbild. **[VERIFY] V188**, aus dem Gedächtnis, nicht
   nachgelesen.
-- **Vorschlag:** P9-27 auf ⚠️ *„Verhalten belegt (Nikinger 2026-10-05), Vollbild-Ende ist
-  OS-Verhalten und von der Seite nicht abfangbar"* setzen und D1 schließen. Bestätigt sich V188
-  anders, wird es wieder ein Backlog-Posten für P10. **Kein Code.**
+- **Entschieden (Nikinger 2026-10-05): kein Code.** P9-27 wird zu einem `[VERIFY]`-Eintrag mit
+  dieser Aufgabe: **belegen, dass das macOS-Verhalten ist, auf das die Seite keinen Einfluss hat**
+  (V188). Danach geht die Phase weiter. D1 ist damit geschlossen, und P9-27 wird ⚠️ mit Verweis
+  auf V188.
 
 ## §5 P9-11 — Portscan (Nikinger, MacBook, Firmen-VPN aus, Handy-Hotspot)
 
@@ -235,10 +236,10 @@ Befund. V162 B bekommt einen Vermerk.
 
 | Nr. | Frage |
 |---|---|
-| V185 | Ist „Verschieben" (`#list-selection-move`) der Knopf, den der Nikinger mit „zeigt die Ordnerwahl" meint? Wenn nicht, gilt dessen Höhe |
+| V185 | ✅ **beantwortet 2026-10-05:** gemeint ist die Baumzeile `.tree__folder` („Offen“), nicht „Verschieben“ — Bild des Nikingers. P9-AF ist danach korrigiert |
 | V186 | Öffnet das Update-Banner heute `#update-log-dialog` (dann muss es die Kette öffnen)? |
 | V187 | Welche historischen Proben sprechen die alten Overlay-IDs an? |
-| V188 | Kann eine Seite in Safari bzw. im macOS-Vollbild ESC reservieren (Keyboard Lock API)? |
+| V188 | **Belegen, dass das Beenden des macOS-Vollbilds per ESC Betriebssystem- bzw. Browser-Verhalten ist und die Seite es nicht verhindern kann.** Quelle nennen (Apple/WebKit-Doku oder Spezifikation der Keyboard Lock API mit Browser-Support). Kein Code, keine Heuristik — Nikinger 2026-10-05 |
 
 ## §9 Ergebnis
 
