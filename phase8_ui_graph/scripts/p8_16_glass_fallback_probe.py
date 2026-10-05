@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 """Phase 8 P8-16 -- Glass-Fallback-Probe gegen eine Wegwerf-Instanz.
 
+[V187, 2026-10-05 — historische Probe, gegen `main` nicht mehr lauffähig.] Die beiden
+`#account-dialog`-Zugriffe (Z. 125/126 und 174) zielen auf ein Overlay, das der P9-Block
+settings am 2026-10-05 durch `#settings-overlay` ersetzt hat. Nicht umgebaut: der Beleg
+eines abgeschlossenen Blocks. Die Glas-Fragestellung selbst ist davon unberührt — sie
+trifft `.overlay__panel`, und die Panels der Kette tragen dieselbe Klasse.
+
 Pruefauftrag aus phase8_ui_graph_plan.md §8 Station 11: Glass-Träger bleiben
 solid und Auswahl erkennbar, wenn der Browser `prefers-reduced-transparency:
 reduce` meldet (oder `backdrop-filter` deaktiviert ist).

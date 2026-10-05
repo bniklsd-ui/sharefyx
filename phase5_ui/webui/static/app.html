@@ -17,7 +17,7 @@
 
 <div class="shell" data-view="list" id="shell">
   <nav class="rail" id="rail">
-    <div class="rail__brand">sharefyx<span class="rail__version">v3.1.2</span></div>
+    <div class="rail__brand">sharefyx<span class="rail__version">v3.1.3</span></div>
 
     <button class="rail__home" type="button" id="home-button" aria-current="true">
       <svg class="rail__glyph icon" aria-hidden="true"><use href="#i-house"></use></svg><span class="rail__label">&Uuml;bersicht</span>
@@ -368,21 +368,91 @@
   </div>
 </div>
 
-<!-- Space-Verwaltung (P7 Step C3, P7-Q) -- Liste aller schreibbaren Spaces, je Space
+<!-- P9 Block settings (Plan §3 Schritt 1, P9-AG): **eine** Fensterkette statt drei
+     Overlays. `#settings-overlay` traegt die Panels nebeneinander -- Stufe 1 ist das Menü,
+     Stufe 2 das gewaehlte Unterfenster, Stufe 3 das Space-Detail. Layout, ESC-Kette und der
+     Schmal-Modus stehen in `settings.js` bzw. `.settings-chain` (app.css); die API-Routen
+     bleiben byte-identisch.
+
+     Die **Inhalts-IDs** sind unveraendert uebernommen (`space-admin-list`, `account-current`,
+     `update-log-list`, ...) -- JS und Tests haengen an ihnen, ein Rename waere ein Umbau
+     ohne Ertrag.
+
+     Space-Verwaltung (P7 Step C3, P7-Q) -- Liste aller schreibbaren Spaces, je Space
      Mitgliederverwaltung, Anlegen. Home-Spaces erscheinen in der Liste, aber ohne
-     Entfernen-Knopf (P7-K) -- das Entfernen selbst laeuft ueber #space-remove-dialog. -->
-<div class="overlay" id="space-admin-dialog" hidden>
-  <div class="overlay__panel">
-    <h2>Spaces verwalten</h2>
-    <p class="form-error" id="space-admin-error" hidden></p>
-    <div id="space-admin-list"></div>
-    <div class="overlay__actions">
-      <input type="text" class="input" id="space-create-name-input" placeholder="Name des neuen Space">
-      <button type="button" class="btn" id="space-create-submit">Space anlegen</button>
+     Entfernen-Knopf (P7-K) -- das Entfernen selbst laeuft ueber #space-remove-dialog
+     (bleibt ein modales Fenster, P9-AG/Plan §0.3). -->
+<div class="overlay" id="settings-overlay" hidden>
+  <div class="settings-chain">
+
+    <!-- Stufe 1: das Menue. Genau drei Knoepfe in der Reihenfolge aus P9-AE, kein
+         Hinweistext. Die Knoepfe tragen `.tree__folder` -- die Optik der Ordnerzeile im
+         Navigationsbaum, reusing statt kopieren (P9-AF: eine Kopie waere die "dritte
+         Variante", die P9 am 2026-10-01 bei `.account-nav` schon einmal entfernt hat). -->
+    <div class="overlay__panel settings-panel settings-panel--menu" id="settings-menu">
+      <h2>Einstellungen</h2>
+      <button type="button" class="tree__folder settings-menu__item" id="settings-open-password" data-panel="password">Passwort &auml;ndern</button>
+      <button type="button" class="tree__folder settings-menu__item" id="account-manage-spaces" data-panel="spaces">Spaces verwalten</button>
+      <button type="button" class="tree__folder settings-menu__item" id="account-show-updates" data-panel="updates">Update-Log</button>
     </div>
-    <hr>
-    <div id="space-detail" hidden>
-      <h3 id="space-detail-name"></h3>
+
+    <!-- Stufe 2a: Passwort. Reihenfolge aktuell -> neu -> wiederholen -> TOTP (P9-AJ), der
+         Hinweis zu Connectoren und Sitzungen ist aus dem alten Konto-Dialog hierher
+         gewandert. Die Request-Form bleibt byte-identisch (`dialogs.js`). -->
+    <div class="overlay__panel settings-panel" id="settings-password" hidden>
+      <button type="button" class="btn settings-back" id="settings-back-password">&larr; Zur&uuml;ck</button>
+      <h2>Passwort &auml;ndern</h2>
+      <p class="overlay__hint">Danach musst du jeden Connector neu autorisieren, und andere
+        angemeldete Browser werden abgemeldet. Diese Sitzung bleibt bestehen.</p>
+      <p class="form-error" id="account-error" hidden></p>
+      <label>Aktuelles Passwort
+        <span class="pw-field">
+          <input type="password" class="input" id="account-current" autocomplete="current-password">
+          <button type="button" class="btn pw-toggle" data-target="account-current" aria-pressed="false">Anzeigen</button>
+        </span>
+      </label>
+      <label>Neues Passwort
+        <span class="pw-field">
+          <input type="password" class="input" id="account-new" autocomplete="new-password">
+          <button type="button" class="btn pw-toggle" data-target="account-new" aria-pressed="false">Anzeigen</button>
+        </span>
+      </label>
+      <label>Neues Passwort wiederholen
+        <span class="pw-field">
+          <input type="password" class="input" id="account-repeat" autocomplete="new-password">
+          <button type="button" class="btn pw-toggle" data-target="account-repeat" aria-pressed="false">Anzeigen</button>
+        </span>
+      </label>
+      <label>Code aus der Authenticator-App
+        <input type="text" class="input" id="account-totp" autocomplete="one-time-code">
+      </label>
+      <div class="overlay__actions">
+        <button type="button" class="btn-primary" id="account-submit">&Auml;ndern</button>
+        <button type="button" class="btn" id="account-cancel">Abbrechen</button>
+      </div>
+    </div>
+
+    <!-- Stufe 2b: Spaces verwalten. Zeilen mit sichtbarem Abstand und dieselbe Trennlinie
+         (`<hr>`) zwischen Liste und Anlege-Zeile, die heute vor dem Detail steht (P9-AK). -->
+    <div class="overlay__panel settings-panel" id="settings-spaces" hidden>
+      <button type="button" class="btn settings-back" id="settings-back-spaces">&larr; Zur&uuml;ck</button>
+      <h2>Spaces verwalten</h2>
+      <p class="form-error" id="space-admin-error" hidden></p>
+      <div id="space-admin-list"></div>
+      <hr>
+      <div class="overlay__actions">
+        <input type="text" class="input" id="space-create-name-input" placeholder="Name des neuen Space">
+        <button type="button" class="btn" id="space-create-submit">Space anlegen</button>
+      </div>
+      <div class="overlay__actions">
+        <button type="button" class="btn" id="space-admin-close">Schlie&szlig;en</button>
+      </div>
+    </div>
+
+    <!-- Stufe 3: Detail eines Spaces. -->
+    <div class="overlay__panel settings-panel" id="settings-space-detail" hidden>
+      <button type="button" class="btn settings-back" id="settings-back-space-detail">&larr; Zur&uuml;ck</button>
+      <h2 id="space-detail-name"></h2>
       <p class="overlay__hint" id="space-detail-home-hint" hidden>Dies ist ein Home-Space -- er
         kann nicht entfernt werden, nur seine Mitgliederliste.</p>
       <ul id="space-member-list"></ul>
@@ -392,7 +462,7 @@
           <option value="">lesen</option>
           <option value="write">schreiben</option>
         </select>
-        <button type="button" class="btn" id="space-member-add-submit">Hinzufügen</button>
+        <button type="button" class="btn" id="space-member-add-submit">Hinzuf&uuml;gen</button>
       </div>
       <div id="space-member-reauth-fields" hidden>
         <label>Passwort
@@ -405,11 +475,23 @@
           <input type="text" class="input" id="space-member-reauth-totp" autocomplete="one-time-code">
         </label>
       </div>
-      <button type="button" class="btn" id="space-remove-open">Space entfernen</button>
+      <div class="overlay__actions">
+        <button type="button" class="btn" id="space-remove-open">Space entfernen</button>
+        <button type="button" class="btn" id="space-detail-close">Schlie&szlig;en</button>
+      </div>
     </div>
-    <div class="overlay__actions">
-      <button type="button" class="btn" id="space-admin-close">Schließen</button>
+
+    <!-- Stufe 2c: Update-Log. Inhalt identisch zum alten #update-log-dialog, nur der Ort
+         aendert sich (P9-AK). -->
+    <div class="overlay__panel settings-panel settings-panel--wide" id="settings-updates" hidden>
+      <button type="button" class="btn settings-back" id="settings-back-updates">&larr; Zur&uuml;ck</button>
+      <h2>Update-Log</h2>
+      <div id="update-log-list"></div>
+      <div class="overlay__actions">
+        <button type="button" class="btn" id="update-log-close">Schlie&szlig;en</button>
+      </div>
     </div>
+
   </div>
 </div>
 
@@ -484,67 +566,12 @@
   </div>
 </div>
 
-<div class="overlay" id="account-dialog" hidden>
-  <div class="overlay__panel">
-    <h2>Passwort &auml;ndern</h2>
-    <p class="overlay__hint">Danach musst du jeden Connector neu autorisieren, und andere
-      angemeldete Browser werden abgemeldet. Diese Sitzung bleibt bestehen.</p>
-    <!-- Phase 8.6 Block B B3 (Plan §4.3): Navigations-Sprache statt Knopfplastik. Beide öffnen
-         einen Dialog, ändern nichts -- die .btn-Form verleitete zum Fehlklick (das war die
-         Meldung des Nikingers zum Archivieren-neben-x, gleiche Muster). .account-nav hat
-         margin-bottom eingebaut; die alte .account-updates-link-Klasse fällt weg.
-         Phase 8.6 Block H H2 (Plan §5.2, Befund 2): Navigations-Anmutung statt Fließtext.
-         Linke Akzentkante (2px solid var(--line-strong)) + Chevron-Icon rechts via
-         margin-left: auto macht die Knöpfe sichtbar bedienbar, ohne in die .btn-Plastik
-         zurückzufallen (B3-Begründung "sind keine Aktionen" trägt -- die Kategorie bleibt
-         Navigation, der fehlende Afford war das Problem). -->
-    <button type="button" class="btn account-nav" id="account-show-updates">Update-Log ansehen<svg class="icon" aria-hidden="true"><use href="#i-chevron-right"></use></svg></button>
-    <button type="button" class="btn account-nav" id="account-manage-spaces">Spaces verwalten<svg class="icon" aria-hidden="true"><use href="#i-chevron-right"></use></svg></button>
-    <p class="form-error" id="account-error" hidden></p>
-    <label>Aktuelles Passwort
-      <span class="pw-field">
-        <input type="password" class="input" id="account-current" autocomplete="current-password">
-        <button type="button" class="btn pw-toggle" data-target="account-current" aria-pressed="false">Anzeigen</button>
-      </span>
-    </label>
-    <label>Code aus der Authenticator-App
-      <input type="text" class="input" id="account-totp" autocomplete="one-time-code">
-    </label>
-    <label>Neues Passwort
-      <span class="pw-field">
-        <input type="password" class="input" id="account-new" autocomplete="new-password">
-        <button type="button" class="btn pw-toggle" data-target="account-new" aria-pressed="false">Anzeigen</button>
-      </span>
-    </label>
-    <label>Neues Passwort wiederholen
-      <span class="pw-field">
-        <input type="password" class="input" id="account-repeat" autocomplete="new-password">
-        <button type="button" class="btn pw-toggle" data-target="account-repeat" aria-pressed="false">Anzeigen</button>
-      </span>
-    </label>
-    <div class="overlay__actions">
-      <button type="button" class="btn-primary" id="account-submit">&Auml;ndern</button>
-      <button type="button" class="btn" id="account-cancel">Abbrechen</button>
-    </div>
-  </div>
-</div>
-
-<div class="overlay" id="update-log-dialog" hidden>
-  <div class="overlay__panel">
-    <h2>Update-Log</h2>
-    <div id="update-log-list"></div>
-    <div class="overlay__actions">
-      <button type="button" class="btn" id="update-log-close">Schlie&szlig;en</button>
-    </div>
-  </div>
-</div>
-
 <!-- P9 Step A (Nikinger-Entscheidung 2026-10-01): Hinweis auf der ALTEN Adresse. Öffnet sich bei
      jedem Laden, solange /api/v1/meta ein `legacy` liefert und location.origin genau diese Origin
-     ist -- schließbar, kommt beim nächsten Laden wieder. Bewusst die .account-nav-Form des
-     Einstellungen-Dialogs (Akzent-Fill), kein neues CSS. Titel, Text und Knopf kommen aus app.js,
-     weil sie vom Datum abhängen -- oder von dessen Fehlen, `LEGACY_UNTIL=open` seit 2026-10-05
-     (kein Templating, P5-T). -->
+     ist -- schließbar, kommt beim nächsten Laden wieder. Bewusst die .account-nav-Form (Akzent-
+     Fill), kein neues CSS; seit dem settings-Block (2026-10-05) der einzige verbleibende Träger
+     dieser Klasse (P9-AF). Titel, Text und Knopf kommen aus app.js, weil sie vom Datum abhängen --
+     oder von dessen Fehlen, `LEGACY_UNTIL=open` seit 2026-10-05 (kein Templating, P5-T). -->
 <div class="overlay" id="legacy-host-dialog" hidden>
   <div class="overlay__panel">
     <h2 id="legacy-host-title">Diese Adresse wird abgeschaltet</h2>

@@ -277,6 +277,32 @@ function rebuildImplicitEdges() {
   implicitEdges = [];
   if (tagsEnabled) implicitEdges = implicitEdges.concat(buildTagEdges(nodes));
   if (foldersEnabled) implicitEdges = implicitEdges.concat(buildFolderEdges(nodes));
+  // P9 Step E / P9-36, **[VERIFY] V118 vom Nikinger beantwortet 2026-10-05: eine Linie.**
+  // *"Wenn A auf B verlinkt, ist B für A automatisch relevant."* Die **explizite** Kante
+  // gewinnt und bleibt durchgezogen; die implizite Tag-/Ordner-Kante desselben Paares
+  // entfaellt -- durchgezogen und gestrichelt ueberlagern sich sonst genau auf derselben
+  // Strecke und lesen sich als zwei Beziehungen, obwohl es eine ist.
+  //
+  // **Warum hier und nicht in `drawEdges()`:** dort waere nur das Bild richtig. Die Grad-
+  // und Nachbarzaehlung (`recomputeDegrees()`) laeuft ueber `explicitEdges.concat(
+  // implicitEdges)` und wuerde die Zwillingskante weiter mitzaehlen -- ein Knoten saehe
+  // verknuepfter aus, als er ist, und `drawNodes()` skaaliert seinen Radius danach. Dasselbe
+  // Argument wie bei `dedupeEdges()` eine Zeile weiter oben: **bei der Uebernahme**
+  // zusammenfassen, nicht erst beim Zeichnen (P8.6-N).
+  //
+  // Der Test `test_a_tag_edge_and_an_explicit_edge_draw_two_lines` hat dieses Verhalten
+  // eingefroren und ist mit Datum umgedreht und umbenannt --
+  // `test_a_tag_edge_beside_an_explicit_edge_draws_one_line`.
+  if (explicitEdges.length) {
+    var explicitPairs = Object.create(null);
+    for (var i = 0; i < explicitEdges.length; i++) {
+      var x = explicitEdges[i];
+      explicitPairs[x.src < x.dst ? x.src + "|" + x.dst : x.dst + "|" + x.src] = true;
+    }
+    implicitEdges = implicitEdges.filter(function (e) {
+      return !explicitPairs[e.src < e.dst ? e.src + "|" + e.dst : e.dst + "|" + e.src];
+    });
+  }
   recomputeDegrees();
 }
 
@@ -530,14 +556,17 @@ function draw() {
 }
 
 function drawEdges(all, dim) {
-  // [VERIFY] V118 (P9 Step E, beantwortet 2026-09-26): eine Tag-Kante UND eine explizite Kante
-  // zwischen denselben zwei Knoten werden **zwei Linien**. `dedupeEdges()` fasst nur die
-  // expliziten Kanten zusammen und `buildTagEdges()` nur die Tag-Kanten -- die Zusammenführung
-  // beider Listen passiert erst hier, ohne Dedup, also zeichnet `all` denselben Knotenpaar zweimal
-  // (solid + gestrichelt). Kein Mess-Screenshot nötig: `drawEdges()` iteriert `all` und ruft je
-  // Eintrag genau einmal `ctx.stroke()`; zwei Einträge für ein Paar sind zwei Striche. Ob das
-  // gewollt ist (eine Linie, die beides bedeutet, oder zwei, die zwei Beziehungen zeigen), ist
-  // eine **Design-Frage für den Nikinger** (P9-36) und wird hier nicht stillschweigend entschieden.
+  // **V118, zwei Lesarten, beide datiert:**
+  //  *2026-09-26 (Antwort des Nikingers auf P9 Step E):* eine Tag-Kante UND eine explizite
+  // Kante zwischen denselben zwei Knoten ergeben **zwei Linien** (solid + gestrichelt), weil
+  // `dedupeEdges()` nur die expliziten Kanten zusammenfasst und `buildTagEdges()` nur die
+  // Tag-Kanten -- die Zusammenführung beider Listen passiert erst hier, ohne Dedup.
+  //  *2026-10-05 (zweite Antwort, P9-36):* **eine Linie.** *"Wenn A auf B verlinkt, ist B für A
+  // automatisch relevant."* Die explizite Kante gewinnt, die implizite entfällt -- gefiltert
+  // wird bei der Übernahme in `rebuildImplicitEdges()`, nicht erst hier, damit die Gradzählung
+  // dasselbe Bild zeigt (P8.6-N). `drawEdges()` zeichnet nur noch, wonach es gefragt wird.
+  // Der alte Kommentarstand wurde **ersetzt**, nicht ergänzt: eine Notiz, die beides behauptet,
+  // erklärt gar nichts.
   ctx.lineWidth = 1;
   ctx.strokeStyle = COLORS.edge;
   for (var i = 0; i < all.length; i++) {

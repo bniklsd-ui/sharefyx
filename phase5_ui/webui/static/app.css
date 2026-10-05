@@ -467,7 +467,15 @@ select.input:focus {
   vertical-align: super;
 }
 
-.rail__home, .rail__action, .tree__space, .tree__folder, .tree__scope {
+/* P9 Block settings (P9-AF): die drei Menüpunkte tragen `.tree__folder` **selbst** und
+   werden hier in die Sammelregeln daneben aufgenommen — dieselbe Höhe, Polster, Schrift und
+   Rundung wie eine Zeile im Navigationsbaum, ohne dass ein Wert kopiert wird. Ein Wert, der
+   hier noch einmal notiert wird, kann von dort abweichen, ohne dass es jemand merkt; genau
+   das war am 2026-10-01 die "dritte Variante", die P9 bei `.account-nav` wieder entfernt
+   hat. `.settings-space-row` (die Space-Liste im Unterfenster) gehört aus demselben Grund
+   in dieselben Listen. */
+.rail__home, .rail__action, .tree__space, .tree__folder, .tree__scope,
+.settings-menu__item, .settings-space-row {
   display: flex;
   align-items: center;
   gap: var(--space);
@@ -510,6 +518,8 @@ select.input:focus {
 .tree__space:hover,
 .tree__folder:hover:not([aria-current="true"]),
 .tree__scope:hover:not([aria-current="true"]),
+.settings-menu__item:hover:not([aria-current="true"]),
+.settings-space-row:hover:not([aria-current="true"]),
 /* Phase 8.6 Plan 2 Block G G7: der Zeilen-Hover sitzt jetzt auf `.overview__space-open`,
    das selbst die ganze Zeile ist (Glyph + Name + Chip-Leiste). Auf der <li> selbst hat
    kein Hover etwas zu suchen -- das war Block-C-Stand, solange der Klick am Namen hing. */
@@ -529,11 +539,16 @@ select.input:focus {
 .rail__action:hover,
 .tree__space:hover,
 .tree__folder:hover:not([aria-current="true"]),
-.tree__scope:hover:not([aria-current="true"]) {
+.tree__scope:hover:not([aria-current="true"]),
+.settings-menu__item:hover:not([aria-current="true"]),
+.settings-space-row:hover:not([aria-current="true"]) {
   color: var(--text);
 }
 
-.rail__home[aria-current="true"], .tree__folder[aria-current="true"], .tree__scope[aria-current="true"] {
+.rail__home[aria-current="true"], .tree__folder[aria-current="true"], .tree__scope[aria-current="true"],
+/* P9-AF/P9-AG: der Menüpunkt des offenen Unterfensters trägt exakt denselben Auswahl-
+   zustand wie die aktive Baumzeile — dieselbe eine Regel, keine zweite Fläche. */
+.settings-menu__item[aria-current="true"], .settings-space-row[aria-current="true"] {
   background: var(--select-fill);
   border-color: var(--select-line);
   color: var(--text);
@@ -1852,6 +1867,93 @@ select.input:focus {
   flex-wrap: wrap;
   gap: var(--space);
   margin-top: calc(var(--space) * 2);
+}
+
+/* -- Einstellungen als Fensterkette (P9 Block settings, P9-AG/AH/AI/AL) --------------------
+   Eine Reihe von Panels nebeneinander statt drei Overlays übereinander. Der Zustand — was
+   offen ist — liegt in `settings.js` (`hidden` je Panel); hier steht nur die Geometrie.
+
+   **Warum `align-items: flex-start`:** die Panels haben sehr verschiedene Höhen (Menü drei
+   Zeilen, Passwort ein Formular, Spaces eine Liste). Zentriert man sie, hinge das Menü
+   mittig auf halber Höhe des Nachbarpanels und die Kette sähe aus wie ein Dialog mit
+   Beistand. Oben bündig liest sie sich als Fenster, die nebeneinander stehen.
+
+   **Kein neuer Farbwert** (Plan §3 Schritt 3): Glas, Schatten und Auswahl-Fill kommen
+   unverändert aus den Tokens der `.overlay__panel`-Regel oben und aus `--select-fill`. */
+.settings-chain {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--space) * 2);
+  max-width: calc(100vw - var(--space) * 8);
+}
+
+/* Panels nach Inhalt (P9-AL) statt `width: 90%; max-width: 440px` wie die übrigen
+   Overlays. Das alte `90%` war der Grund für den Wunsch „viel breiter als nötig" — die
+   Kette darf hier nicht mit dem einen erzwungenen Maßband laufen, sonst schrumpft das Menü
+   auf ein Wort. `min-width` gibt den Formularfeldern ihre Zeilenlänge, `max-width` der
+   Space-Liste eine Zeile ohne Umbruch. */
+.settings-panel {
+  width: fit-content;
+  min-width: 340px;
+  max-width: 380px;
+  max-height: calc(100vh - var(--space) * 8);
+  overflow-y: auto;
+}
+/* Das Menü ist so breit wie sein breitester Knopf — die `min-width` eines Formulars wäre
+   hier leerer Rand. */
+.settings-panel--menu {
+  min-width: 0;
+  max-width: none;
+}
+/* Der Update-Log ist Fließtext und braucht eine Lesebreite, keine Formularbreite. */
+.settings-panel--wide {
+  min-width: 0;
+  max-width: none;
+  width: 560px;
+}
+
+/* Die Menüknöpfe sind `.tree__folder` und erben Höhe/Polster/Rundung; hier ist nur der
+   Abstand der drei Zeilen untereinander — dieselbe Forderung wie bei den Space-Zeilen
+   darunter (P9-AK: Zeilen mit sichtbarem Abstand). */
+.settings-menu__item { width: 100%; }
+#space-admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space);
+}
+.settings-space-row { width: 100%; }
+
+/* „Zurück" ist ausschließlich die Bedienung des Schmal-Modus (P9-AI). Im breiten Modus ist
+   es toter Ballast und deshalb gar nicht erst im DOM-Baum (`display: none`, nicht nur
+   `hidden` — sonst stünde ein Knopf im Tab-Order-Lauf, der nichts tut). */
+.settings-back { display: none; margin-bottom: var(--space); }
+
+/* P9-AI: unterhalb der Summe der Panelbreiten bleibt **nur das rechteste** Panel. Kein
+   Quetschen, kein horizontales Scrollen — dieselbe Regel wie im P8.6-Editor (≤1024 px:
+   Liste **oder** Editor, nie beides).
+
+   **Zwei Ausschaltungen, nicht eine.** Die erste Fassung blendete nur das Menü aus; bei
+   offenem Space-Detail blieben damit **zwei** Panels stehen (die Spaces-Liste *und* das
+   Detail) — genau das, was die Regel verbietet, und die Browser-Probe S8 hat es gemeldet.
+   „Welches Panel ist das rechteste" steht im Zustand (`hidden`) und nicht im Markup (das
+   Menü steht immer zuerst im DOM), deshalb zwei `:has()`-Regeln statt einer Raterunde:
+   ist das Detail offen, tritt Stufe 2 zurück; ist irgendetwas rechts vom Menü offen, tritt
+   das Menü zurück. Zusammen bleibt in jedem Zustand genau ein Panel übrig.
+
+   **Gemessen, nicht geraten** (Wegwerf-Instanz, 2026-10-05): Menü 202 px + Passwort 356 px
+   = 574 px, das Space-Detail 366 px; drei Panels nebeneinander brauchen 202 + 16 + 366 +
+   16 + 366 = 966 px plus je 2×24 px Panel-Polster — die 1024 px sind also die Stelle, an der
+   die breiteste Kette (Menü + Spaces + Detail) gerade noch passt. */
+@media (max-width: 1024px) {
+  .settings-chain:has(> #settings-space-detail:not([hidden])) > #settings-spaces {
+    display: none;
+  }
+  .settings-chain:has(> .settings-panel:not([hidden]):not(#settings-menu)) > #settings-menu {
+    display: none;
+  }
+  .settings-back { display: inline-flex; }
+  .settings-panel { min-width: 0; width: auto; flex: 1; }
+  .settings-panel--wide { width: auto; }
 }
 
 /* Passwort-Sichtbarkeit (Meldung des Nikingers): Feld + Umschalt-Knopf in einer Reihe, in

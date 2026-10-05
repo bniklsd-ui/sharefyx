@@ -14,6 +14,7 @@ import {
   currentFormValues,
 } from "./editor.js";
 import { loadOverview, loadItems, bucketFor, moveSelectedItems } from "./list.js";
+import { registerPanel, openSettings, closeFrom } from "./settings.js";
 
 var createDialogEl;
 var createTypeEl;
@@ -35,7 +36,6 @@ var confirmMessageEl;
 var confirmOkEl;
 var confirmCancelEl;
 
-var accountDialogEl;
 var accountErrorEl;
 var accountCurrentEl;
 var accountTotpEl;
@@ -663,16 +663,21 @@ function collectShareBody(item) {
 }
 
 // -- Konto: Passwort ändern (Block-A-Abnahmezeilen 5/6) --------------------------------------
+// P9 Block settings: Stufe 2 der Fensterkette, kein eigenes Overlay mehr. Das Menü (Stufe 1)
+// bleibt sichtbar; ESC und „Abbrechen" schließen nur dieses Panel (P9-AH). Wie bei den Spaces
+// ist der **Reset** hier und das Öffnen in `settings.js` — `registerPanel()` ist der einzige
+// Weg von außen hinein. Die Request-Form ist unverändert: dieselben drei Felder, dieselbe
+// Route, byte-identischer Body (P9-AJ betrifft nur die **Reihenfolge** im Markup).
 
-function openAccountDialog() {
+function prepareAccountPanel() {
   accountErrorEl.hidden = true;
   accountCurrentEl.value = "";
   accountTotpEl.value = "";
   accountNewEl.value = "";
   accountRepeatEl.value = "";
-  accountDialogEl.hidden = false;
   accountCurrentEl.focus();
 }
+registerPanel("password", prepareAccountPanel);
 
 function accountError(message) {
   accountErrorEl.textContent = message;
@@ -711,8 +716,6 @@ export function init() {
   trashSubmitEl = document.getElementById("trash-submit");
   trashCancelEl = document.getElementById("trash-cancel");
   trashConfirmInputEl.addEventListener("input", trashRefreshSubmit);
-
-  accountDialogEl = document.getElementById("account-dialog");
 
   // Phase 8 Block B Step B4 (Plan §3 B4): Link-Picker-Verkabelung. Der Picker-Knopf selbst
   // wird in editor.js verkabelt (er weiss, an welches Feld die ID angehaengt werden soll);
@@ -1086,8 +1089,11 @@ export function init() {
     });
   });
 
-  accountButtonEl.addEventListener("click", openAccountDialog);
-  accountCancelEl.addEventListener("click", function () { accountDialogEl.hidden = true; });
+  // Der Rail-Knopf „Einstellungen" öffnet seit dem settings-Block (2026-10-05) **das Menü**,
+  // nicht direkt das Passwort-Panel. Der Nikinger wollte die Kette, und ein Menü, das man
+  // nicht sieht, ist keins (P9-AG).
+  accountButtonEl.addEventListener("click", openSettings);
+  accountCancelEl.addEventListener("click", function () { closeFrom("password"); });
 
   accountSubmitEl.addEventListener("click", function () {
     if (accountNewEl.value !== accountRepeatEl.value) {
@@ -1119,7 +1125,9 @@ export function init() {
         // dieser Antwort — ohne diese Zeile schlüge jede folgende Schreibanfrage mit
         // `403 csrf_failed` fehl.
         if (body && body.csrf_token) sessionStorage.setItem("sfx:csrf", body.csrf_token);
-        accountDialogEl.hidden = true;
+        // Erfolg schließt nur das Passwort-Panel; das Menü bleibt stehen (P9-AH). Der Toast
+        // liegt über dem Overlay und ist nach dem Schließen wieder lesbar.
+        closeFrom("password");
         toast("Passwort geändert. Connectoren müssen neu autorisiert werden.", "warn");
       });
     }).catch(function () {

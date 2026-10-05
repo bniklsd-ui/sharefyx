@@ -8,7 +8,7 @@ Vier Tests, die Abnahmezeilen P9-33/P9-34/P9-35 und V118:
   4. test_own_writes_reload_the_graph_immediately                        (P9-35)
   5. test_the_token_format_has_a_single_owner          (Eigentums-Wächter)
   6. test_graph_module_does_not_touch_the_api_contract  (P9-M / §7.2)
-  7. test_a_tag_edge_and_an_explicit_edge_draw_two_lines                 (V118 / P9-36)
+  7. test_a_tag_edge_beside_an_explicit_edge_draws_one_line              (V118 / P9-36)
 
 **Warum ein Node-Prozess und kein reiner Text-Test:** `graph.js` ist ein ES-Modul ohne
 Build-Schritt (P5-T). Ob der zweite Eintritt in die Übersicht wirklich *keinen* `/graph`-Abruf
@@ -25,8 +25,10 @@ Test-Sitzung (Modul-Fixture), jeder Test liest seinen Ausschnitt.
 `p9_34_reentry_does_not_restart_the_simulation`,
 `p9_34_known_nodes_keep_their_position` (Knoten springt **467,6 px** zurück auf den Seed-Ring
 statt 0) und `p9_35_own_write_is_visible_immediately`. Die beiden ausgenommenen Prüfungen sind
-Absicht: die Kontrollmessung misst einen Punkt des Messaufbaus, und der V118-Test dokumentiert
-ein **bestehendes** Verhalten (die Zwillingskante) — er behauptet keinen Fix.
+Absicht: die Kontrollmessung misst einen Punkt des Messaufbaus, und der V118-Test hat am
+2026-10-05 eine **Datumsumkehr** erfahren (die Zwillingskante wurde zur einen Linie) — die
+Gegenprobe-Liste hier beschreibt also den Stand **vor** diesem Tag; der V118-Eintrag ist seit
+dem settings-Block die **umgedrehte** Fassung desselben Gedankens.
 
 Kein Netz, kein Browser, kein DATA_ROOT, kein Dienst. Node muss vorhanden sein (das Repo prüft
 schon `node --check` in seiner Selbstprüf-Liste); fehlt es, werden die drei Laufzeit-Tests
@@ -165,22 +167,36 @@ def test_graph_module_does_not_touch_the_api_contract() -> None:
 
 
 @needs_node
-def test_a_tag_edge_and_an_explicit_edge_draw_two_lines(probe: dict) -> None:
-    """V118 (P9-36): die Antwort auf die Plan-Frage, gemessen am gezeichneten Frame.
+def test_a_tag_edge_beside_an_explicit_edge_draws_one_line(probe: dict) -> None:
+    """V118 (P9-36), **zweite Lesart, mit Datum in beide Richtungen.**
 
-    Beide Kanten zwischen denselben zwei Knoten (eine explizite, eine aus dem Tag-Toggle) ⇒
-    **zwei Linien**, von denen eine gestrichelt ist. `dedupeEdges()` fasst nur die expliziten
-    Kanten zusammen, die Zusammenführung beider Listen passiert erst in `drawEdges()`.
+    ***2026-09-26, erste Lesart (gemessen, vom Code eingefroren):*** eine Tag-Kante UND eine
+    explizite Kante zwischen denselben zwei Knoten ergaben **zwei Linien**, von denen eine
+    gestrichelt war — `dedupeEdges()` fasste nur die Expliziten zusammen, `buildTagEdges()`
+    nur die Tag-Kanten, und `drawEdges()` führte beides ohne Dedup zusammen.
 
-    Ob zwei Linien gewollt sind, ist eine Design-Frage und damit eine Entscheidung des
-    Nikingers — dieser Test **friert das gemessene Verhalten ein**, er ändert es nicht. Soll
-    der Nikinger eine Linie statt zwei, wird dieser Test bewusst umgedreht (und die Dedup-Stelle
-    in `drawEdges()`) — das ist eine Entscheidung, keine Regression.
+    ***2026-10-05, zweite Lesart (Nikinger):*** **eine Linie.** *„Wenn A auf B verlinkt, ist B
+    für A automatisch relevant."* Die explizite Kante gewinnt und bleibt durchgezogen; die
+    implizite Kante desselben Paares entfällt bereits bei der Übernahme in
+    `rebuildImplicitEdges()` — nicht erst in `drawEdges()`, damit die Gradzählung
+    (`recomputeDegrees()`, davon die Knotengröße) dasselbe Bild zeigt. Dasselbe Argument wie
+    bei `dedupeEdges()` (P8.6-N).
+
+    **Der Testname wurde umgedreht, nicht der Test gelöscht:** ein Name, der das Gegenteil
+    behauptet, wäre eine Lüge. Der Docstring nennt beide Lesarten mit Datum, damit ein
+    späterer Leser nicht denkt, die Zwillingskante sei nie gemessen gewesen.
     """
-    result = probe["v118_tag_edge_plus_explicit_edge"]
+    result = probe["v118_tag_edge_beside_explicit_edge"]
     assert result["ok"], result
-    assert result["segments_in_last_frame"] == 2, result
-    assert result["duplicate_segments"] == 1, (
-        "Erwartet: genau ein doppelt gezeichnetes Segment (Zwillingskante)"
+    assert result["segments_in_last_frame"] == 1, result
+    assert result["duplicate_segments"] == 0, (
+        "Erwartet: genau eine Linie für das Paar, keine doppelt gezeichnete Strecke"
     )
-    assert result["a_dashed_line_was_drawn"], result
+    assert result["a_solid_line_was_drawn"], (
+        "Die durchgezogene Linie muss bleiben — der Test darf nicht grün werden, indem die "
+        "Kante einfach verschwindet"
+    )
+    assert not result["a_dashed_line_was_drawn"], (
+        "Es darf keine gestrichelte Linie mehr im Bild sein: die implizite Kante wird "
+        "gebaut und bei der Übernahme verworfen, nicht erst beim Zeichnen"
+    )

@@ -25,8 +25,9 @@ Archiv hineinzuschreiben hieße, das Falsche zu tun.
 
 ## Stand in einem Satz
 
-**83 Tabellenzeilen für 82 Abnahmezeilen: 71 ✅ · 9 ⚠️ · 3 ⬜** (P9-10 in zwei prüfbare Hälften
-geteilt). **A7+A8 sind am 2026-10-03 gefahren** (A7a als risikoarmer Vorlauf, dann A7, dann A8):
+**96 Tabellenzeilen für 96 Abnahmezeilen: 83 ✅ · 9 ⚠️ · 4 ⬜** (P9-10 in zwei prüfbare Hälften
+geteilt; seit 2026-10-05 kommt der **settings-Block** P9-83–P9-95 mit 12 ✅ und **einem** ⬜
+dazu — P9-94, der Portscan, ist ein Schritt des Nikingers und durch keinen Test ersetzbar). **A7+A8 sind am 2026-10-03 gefahren** (A7a als risikoarmer Vorlauf, dann A7, dann A8):
 P9-10b und P9-12 sind **beide ✅**. Von den 3 offenen Zeilen ist **keine** mehr Code-Arbeit und
 **keine** hängt an A7: **P9-11** ist der `nmap`-Gegenlauf von außen, **P9-15** ist der
 authentifizierte Latenzvergleich und gehört an den **Deploy-Tag** (`health_gate.sh` macht genau
@@ -200,6 +201,37 @@ messbar war — sie sind ✅ mit dem Zusatz „live bewiesen erst mit v3.1.1". D
 | **P9-81** | Gegenlauf G1–G5 jeder ≥ 1 rot | ✅ | G1 → **1** · G2 → **2** · G3 → **1** · G4 → **2** · G5 → **4** |
 | **P9-82** | Frisches venv grün | ✅ `pending: Deploy v3.1.1` | `pytest` **1128/1128** im frischen Release-venv, mit dem `requests`-Defekt behoben (dessen Beleg ist der Lehrfall „eine unbenannte Handinstallation") |
 
+## Block settings — Einstellungen als Fensterkette (P9-83 … P9-95)
+
+| # | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| **P9-83** | Menütitel „Einstellungen", kein Hinweistext | ✅ | `test_settings_chain.py::test_the_settings_menu_carries_exactly_three_buttons_in_the_locked_order` (prüft **Anzahl und Reihenfolge**, nicht das Vorhandensein der drei — ein vierter Knopf wäre sonst still durchgegangen) + Browser S1 |
+| **P9-84** | Drei Knöpfe in der Reihenfolge aus P9-AE, Standardhöhe, nicht volle Breite | ✅ | Browser **S1, gemessen**: alle drei `h=35.69 px, padding 6px/32px, radius 6px` — **identisch** mit einer echten, inaktiven `.tree__folder`-Zeile in der Rail desselben Fensters (Toleranz ±1 px). Kein eigener Wert notiert, die Knöpfe tragen die Klasse selbst (P9-AF) |
+| **P9-85** | Unterfenster öffnet **neben** dem Menü, Menü bleibt sichtbar, aktiver Knopf markiert | ✅ | Browser **S2**: `['settings-menu', 'settings-password']`, `x(Passwort) > x(Menü)`, `aria-current="true"` genau am aktiven, `"false"` an den anderen; `backgroundImage` = derselbe `linear-gradient` wie die aktive Baumzeile. Gegenlauf **G1 → 4 Stationen rot** |
+| **P9-86** | Knopfwechsel ersetzt Stufe 2 | ✅ | Browser **S3**: Passwort → Update-Log, kein Passwort-Panel mehr, der neue Knopf markiert, 7 171 Zeichen Log-Inhalt |
+| **P9-87** | Space-Klick öffnet Stufe 3, drei Panels bei 1440 px | ✅ | Browser **S4**: `['settings-menu', 'settings-spaces', 'settings-space-detail']` **in dieser x-Reihenfolge** (gemessen, nicht aus dem DOM abgeleitet — das Menü steht im Markup zuerst) |
+| **P9-88** | ESC und „Schließen" schließen von rechts nach links | ✅ | Browser **S5**, drei ESC hintereinander: `3 Panels → 2 → 1 → 0`, danach `#settings-overlay[hidden]`. Gegenlauf **G2 → 2 Stationen rot** (ESC schloss alles) |
+| **P9-89** | ≤ 1024 px nur das rechteste Panel plus „Zurück" | ✅ **nach einem echten Befund** | Browser **S8**. Die erste CSS-Fassung blendete nur das Menü aus und ließ bei offenem Detail **zwei** Panels stehen — genau das, was P9-AI verbietet. Zwei `:has()`-Regeln statt einer: Detail offen ⇒ Stufe 2 tritt zurück; irgendetwas rechts vom Menü offen ⇒ Menü tritt zurück |
+| **P9-90** | Passwort: alt → neu → wiederholen → TOTP, Wechsel live gegen Wegwerf grün | ✅ | Browser **S6**: HTTP **200**, Panel geschlossen, Menü bleibt, Toast, `/api/v1/me` danach 200 (Sitzung besteht). Reihenfolge im Bild **angesehen** und im Wächter festgehalten |
+| **P9-91** | Space-Zeilen mit Abstand, Trennlinie vor der Anlege-Zeile, Update-Log-Inhalt unverändert | ✅ | Browser **S4** (`row-gap` 8 px, `<hr>` über dem Eingabefeld) und **S7** am echten Paar (**8 px**). Update-Log: dieselbe Liste, 7 171 Zeichen, derselbe Parser `parse_update_log()` |
+| **P9-92** | Keine Knöpfe mit leerem Überraum, Alte-Adresse-Dialog unverändert | ✅ **Bilder angesehen** | `p9_settings_01…04` bei 1440, `05` bei 1024. Das Menü misst **202 px** bei `min-width: 0` (kein Formularmaßband) — der Grund für „viel breiter als nötig" ist damit weg. `#legacy-host-dialog` byte-gleich, nur sein Kommentar trägt den neuen Hinweis |
+| **P9-93** | V118: eine Linie, Gradzählung ohne implizite Doppelkante, Test umgedreht | ✅ | `test_a_tag_edge_beside_an_explicit_edge_draw_one_line`: 1 Segment, 0 Duplikate, **keine** gestrichelte Linie, durchgezogene vorhanden. Gefiltert bei der **Übernahme** (`rebuildImplicitEdges()`), nicht in `drawEdges()` — sonst zählte `recomputeDegrees()` die Zwillingskante weiter und `drawNodes()` skaliert danach den Radius. Gegenlauf **G3 → rot** |
+| **P9-94** | P9-11 vier Läufe eingetragen | ⬜ **Nikinger-Schritt** | Portscan auf dem MacBook mit Handy-Hotspot, Anleitung Mini-Plan §5. Kein Code, kein Test, kein Counterlauf ersetzt das — ein Scan von außen ist genau das, was nur der Nikinger tun kann |
+| **P9-95** | `pytest` ≥ 1223 + neue, `ui_budget` 5/5, Gegenläufe G1–G3 rot, Tabu-Diff leer | ✅ | `pytest` **1223 → 1233** (10 neue, 1 umgedreht, 3 umgeschrieben) · `ui_budget` **5/5** (163,4 KB; `js/settings.js` 3,0 KB gzip) · `node --check` grün · Tabu-Diff §0.3 **leer** (auch `api.py`/`security.py`/`phase4_auth/` unberührt, der Block ist reines Frontend) · G1 → 4 rot · G2 → 2 rot · G3 → rot |
+
+**Zwei Zeilen, die nicht beim Umsatz liegen — sie sind benannt, weil sie jemand suchen wird:**
+
+- **P9-92 wurde gegen den *Alte-Adresse*-Dialog eng gezogen**: `.account-nav` hat seit dem Umbau
+  genau **einen** Träger, und ein Wächter prüft das mit — sonst wäre „nur noch eine Stelle" eine
+  Behauptung, die beim nächsten Umbau stillschweigend falsch würde
+  (`test_account_nav_stays_layout_only_on_the_legacy_dialog`).
+- **P9-84 misst gegen die echte Baumzeile**, nicht gegen eine Zahl aus demselben Skript. Ein
+  Wächter, der die Optik *behauptet* statt sie zu messen, wäre die neunte Wiederholung der Lehre
+  aus den letzten Phasen; der Test prüft deshalb die **Ursache** (keine kopierten Werte), das
+  Skript die **Wirkung** (gemessene Werte).
+
+---
+
 ---
 
 # `[VERIFY]`-Bilanz
@@ -270,8 +302,15 @@ die Sorte Falschheit, die diese Matrix verhindern soll.
 | V182 | `updated_by` eines fremden Items innerhalb oder außerhalb von `<untrusted_content>`? | ✅ | **heute am Code: außerhalb.** `wrap_untrusted()` wirkt nur auf `item.snippet` (`tools.py:258`) und `item.body` (`:529`); `updated_by` steht neben `assignee` in der Metadaten-Liste. Rule 4 unberührt |
 | V183 | Schreiben außerhalb `tools.py`/`api.py` noch irgendwo `updated_by`? | ✅ | nein — nur Operator- und Fixture-Skripte, alle bei `actor=""` (P9-AB); die T7-Allowlist ist deshalb heute **leer** |
 | V184 | Ist `state.ownSpace` beim Öffnen des Editors immer gesetzt? | ✅ | **heute am Code: ja.** `app.js:283` setzt es in `init()` aus `/me`, **vor** `/meta` und vor `loadOverview()` — der Editor kann nicht ohne ihn offen sein. Der `!state.ownSpace`-Guard (`editor.js:781`) bleibt trotzdem die richtige Verteidigung |
+| V185 | Welche Optik meinen die Menüknöpfe — „Verschieben" oder die Baumzeile? | ✅ | **beantwortet 2026-10-05 per Bild: die Baumzeile `.tree__folder`** („Offen"), nicht „Verschreiben". P9-AF wurde danach korrigiert, und die Umsetzung **verwendet die Klasse** statt die Optik zu kopieren — sonst wäre die dritte Variante entstanden, die P9 am 2026-10-01 bei `.account-nav` erst entfernt hat |
+| V186 | Öffnet das Update-Banner heute `#update-log-dialog`? | ✅ | **nein.** Das Banner trägt **einen** Knopf, „Verstanden" (`#update-banner-dismiss`), und keinen zweiten Weg ins Log. Plan §3 Schritt 1 sprach von einem „Alle Updates ansehen" — das war eine Annahme über ein Bedienelement, das es nicht gibt. Der einzige Weg ist der Menüpunkt |
+| V187 | Welche historischen Proben sprechen die alten Overlay-IDs an? | ✅ | **zwei Skripte, beide mit datiertem Kopfvermerk, keines umgebaut** (Plan §3 Schritt 5): `phase8_6_ui_polish/scripts/p86_block_b_self_check.py` (wartet auf `#account-dialog:not([hidden])`) und `phase8_ui_graph/scripts/p8_16_glass_fallback_probe.py` (drei Zugriffe). **Ein umgebauter historischer Beleg beweist nichts mehr über den Block, für den er steht** — dieselbe Begründung wie bei den gegen Proben. `p86_block_h_self_check.py`/`_h_r_*`/`p86_polish_smoke.py` erwähnen `.account-nav` nur im Kommentar bzw. als Klassenabfrage und laufen weiter |
+| V188 | Ist das Beenden des macOS-Vollbilds per ESC Betriebssystem- oder Browser-Verhalten, und kann die Seite es verhindern? | ⬜ **offen, kein Code** | Der Plan hat die Richtung klargestellt: *kein* Code, sondern **eine Quelle**. Der Keyboard-Lock-Ansatz (`requestPointerLock`-Zeitfenster) ist **aus dem Gedächtnis und nicht nachgelesen** — es steht in keiner Repo-Datei, dass er existiert oder dass er Chromium-only ist. **P9-27/D1 bleibt ⚠️**, bis eine belegte Quelle vorliegt; bis dahin ist die Matrix die Aussage, nicht eine Erinnerung |
 
-**Bilanz: 34 belegte Einträge — 31 ✅ · 1 ⚠️ · 2 ⬜.** **Zählregel, ausdrücklich:** eine doppelt
+**Bilanz: 38 belegte Einträge — 34 ✅ · 1 ⚠️ · 3 ⬜.** *(Stand 2026-10-05, settings-Block: V185/V186/V187
+beantwortet ⬜→✅, V188 neu und offen. Die Zahl **40** von 2026-10-03 war der Nummernbereich; sie stimmt
+jetzt zufällig wieder, weil vier belegte Nummern dazukamen und sechs weiterhin reserviert sind — eine
+Koinzidenz, keine Bestätigung. Die Regel zählt Zeilen, nicht Bereiche.)* **Zählregel, ausdrücklich:** eine doppelt
 vergebene Nummer (V162, V163) zählt **einmal**, und zwar mit ihrer **Lesart A**; die Tabelle hat
 deshalb 36 Markerzeilen plus die reservierte Bereichszeile V167–V172 = 37. Wer nach der
 Zeilen-Lesart zählt, kommt auf 30 ✅ · 3 ⚠️ · 3 ⬜. *Datierte Korrektur 2026-10-03:* hier stand
@@ -282,7 +321,7 @@ Dazu 6 reservierte, unbelegte Nummern
 
 | ID | Frage | Stand |
 |---|---|---|
-| **V118** *(geerbt)* | Zwillingskanten — zwei Linien gewollt? | ⚠️ **beantwortet** (zwei, die zweite gestrichelt), **Entscheidung offen** = P9-36 |
+| **V118** *(geerbt)* | Zwillingskanten — zwei Linien gewollt? | ✅ **beantwortet 2026-09-26 und entschieden 2026-10-05: eine Linie.** Erste Lesart (gemessen, eingefroren): zwei Linien, die zweite gestrichelt. Zweite Lesart (Nikinger): *„Wenn A auf B verlinkt, ist B für A automatisch relevant."* Gebaut als Verwerfen der impliziten Kante **bei der Übernahme** (`rebuildImplicitEdges()`), nicht in `drawEdges()` — sonst zählte die Gradzahl weiter, und die Knotengröße folgt ihr. Der Test ist mit Datum **umgedreht und umbenannt**, nicht gelöscht; beide Lesarten stehen in seinem Docstring |
 | **V136** *(geerbt)* | Chip-Umstellung vs. `bindFolderDropTarget()` | ✅ **gegenstandslos am gewählten Anker** (P9-31/V158) |
 | **V120** *(geerbt)* | Dynamischer Tab-Titel | ⬜ **bewusst offen**, außerhalb jedes Scopes (Plan §15) |
 

@@ -1,0 +1,229 @@
+{
+  "base_url": "https://127.0.0.1:18775",
+  "messwerte": {
+    "baumzeile": {
+      "height": 35.69,
+      "width": 223,
+      "padTop": "6px",
+      "padBottom": "6px",
+      "padLeft": "32px",
+      "radius": "6px",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "background": "rgba(0, 0, 0, 0)",
+      "backgroundImage": "none"
+    },
+    "menuepunkt": {
+      "height": 35.69,
+      "width": 155,
+      "padTop": "6px",
+      "padBottom": "6px",
+      "padLeft": "32px",
+      "radius": "6px",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "background": "rgba(0, 0, 0, 0)",
+      "backgroundImage": "none"
+    }
+  },
+  "befunde": [
+    {
+      "pruefung": "S1 Kette offen, nur das Menü",
+      "ok": true,
+      "detail": "sichtbar: ['settings-menu']"
+    },
+    {
+      "pruefung": "S1 genau drei Menüpunkte",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "pruefung": "S1 Reihenfolge aus P9-AE",
+      "ok": true,
+      "detail": "['Passwort ändern', 'Spaces verwalten', 'Update-Log']"
+    },
+    {
+      "pruefung": "S1 Vergleichszeile in der Rail vorhanden",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "pruefung": "S1 Menüpunkt 1 optisch = Baumzeile",
+      "ok": true,
+      "detail": "Knopf h=35.69 p=6px/32px r=6px | Baum h=35.69 p=6px/32px r=6px"
+    },
+    {
+      "pruefung": "S1 Menüpunkt 2 optisch = Baumzeile",
+      "ok": true,
+      "detail": "Knopf h=35.69 p=6px/32px r=6px | Baum h=35.69 p=6px/32px r=6px"
+    },
+    {
+      "pruefung": "S1 Menüpunkt 3 optisch = Baumzeile",
+      "ok": true,
+      "detail": "Knopf h=35.69 p=6px/32px r=6px | Baum h=35.69 p=6px/32px r=6px"
+    },
+    {
+      "pruefung": "S2 Menü und Passwort nebeneinander",
+      "ok": true,
+      "detail": "['settings-menu', 'settings-password']"
+    },
+    {
+      "pruefung": "S2 Passwort-Panel liegt rechts vom Menü",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "pruefung": "S2 aktiver Menüpunkt trägt aria-current",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "pruefung": "S2 die anderen beiden tragen aria-current=false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "pruefung": "S2 aktiver Menüpunkt bekommt den Auswahl-Fill",
+      "ok": true,
+      "detail": "aktiv=linear-gradient(rgba(62, 141, 243, 0.2), rgba(62 inaktiv=none"
+    },
+    {
+      "pruefung": "S3 Wechsel ersetzt Stufe 2 (kein Passwort mehr)",
+      "ok": true,
+      "detail": "['settings-menu', 'settings-updates']"
+    },
+    {
+      "pruefung": "S3 der neue Menüpunkt ist markiert",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "pruefung": "S3 Update-Log hat Inhalt",
+      "ok": true,
+      "detail": "7723 Zeichen"
+    },
+    {
+      "pruefung": "S4 Spaces als Stufe 2",
+      "ok": true,
+      "detail": "['settings-menu', 'settings-spaces']"
+    },
+    {
+      "pruefung": "S4 Space-Liste gerendert",
+      "ok": true,
+      "detail": "7 Zeilen"
+    },
+    {
+      "pruefung": "S4 Space-Zeilen mit sichtbarem Abstand (P9-AK)",
+      "ok": true,
+      "detail": "row-gap=8px"
+    },
+    {
+      "pruefung": "S4 Trennlinie zwischen Liste und Anlege-Zeile",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "pruefung": "S4 Space-Klick öffnet Stufe 3, drei Panels sichtbar",
+      "ok": true,
+      "detail": "['settings-menu', 'settings-spaces', 'settings-space-detail']"
+    },
+    {
+      "pruefung": "S4 Detail zeigt den Space-Namen",
+      "ok": true,
+      "detail": "alpha"
+    },
+    {
+      "pruefung": "S4 Home-Space-Hinweis sichtbar (P7-K)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "pruefung": "S4 Entfernen-Knopf im Home-Space gesperrt (P7-K)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "pruefung": "S4 Panels in Stufenfolge von links nach rechts",
+      "ok": true,
+      "detail": "['settings-menu', 'settings-spaces', 'settings-space-detail']"
+    },
+    {
+      "pruefung": "S5 ESC -> ['settings-menu', 'settings-spaces']",
+      "ok": true,
+      "detail": "gesehen: ['settings-menu', 'settings-spaces']"
+    },
+    {
+      "pruefung": "S5 ESC -> ['settings-menu']",
+      "ok": true,
+      "detail": "gesehen: ['settings-menu']"
+    },
+    {
+      "pruefung": "S5 ESC -> []",
+      "ok": true,
+      "detail": "gesehen: []"
+    },
+    {
+      "pruefung": "S5 Overlay nach vier ESC geschlossen",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "pruefung": "S8 bei 1024 px nur das rechteste Panel",
+      "ok": true,
+      "detail": "['settings-space-detail']"
+    },
+    {
+      "pruefung": "S8 'Zurück' sichtbar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "pruefung": "S8 'Zurück' öffnet Stufe 2",
+      "ok": true,
+      "detail": "['settings-spaces']"
+    },
+    {
+      "pruefung": "S6 Passwortwechsel HTTP 200",
+      "ok": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "pruefung": "S6 Passwort-Panel geschlossen, Menü bleibt",
+      "ok": true,
+      "detail": "['settings-menu']"
+    },
+    {
+      "pruefung": "S6 Toast nennt den Wechsel",
+      "ok": true,
+      "detail": "'Passwort geändert. Connectoren müssen neu autorisiert werden.'"
+    },
+    {
+      "pruefung": "S6 Sitzung besteht weiter",
+      "ok": true,
+      "detail": "/api/v1/me -> 200"
+    },
+    {
+      "pruefung": "S7 Space anlegen: Zeile mehr",
+      "ok": false,
+      "detail": "7 -> 7"
+    },
+    {
+      "pruefung": "S7 neue Zeile sichtbar",
+      "ok": false,
+      "detail": "settings-135834"
+    },
+    {
+      "pruefung": "S7 Detail zeigt den neuen Space",
+      "ok": true,
+      "detail": "settings-135834"
+    },
+    {
+      "pruefung": "S7 Zeilenabstand zwischen zwei echten Zeilen > 0 (P9-AK)",
+      "ok": true,
+      "detail": "8 px"
+    }
+  ],
+  "alle_ok": false
+}

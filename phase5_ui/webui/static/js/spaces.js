@@ -13,15 +13,14 @@ import { state, spaceByName } from "./state.js";
 import { el, toast } from "./toasts.js";
 import { api } from "./api.js";
 import { loadOverview } from "./list.js";
+import { registerPanel, openSpaceDetail, closeFrom, closeSettings } from "./settings.js";
 
-var spaceAdminDialogEl;
 var spaceAdminErrorEl;
 var spaceAdminListEl;
 var spaceCreateNameInputEl;
 var spaceCreateSubmitEl;
 var spaceAdminCloseEl;
 
-var spaceDetailEl;
 var spaceDetailNameEl;
 var spaceDetailHomeHintEl;
 var spaceMemberListEl;
@@ -32,6 +31,7 @@ var spaceMemberReauthFieldsEl;
 var spaceMemberReauthPasswordEl;
 var spaceMemberReauthTotpEl;
 var spaceRemoveOpenEl;
+var spaceDetailCloseEl;
 
 var spaceRemoveDialogEl;
 var spaceRemoveConsequenceEl;
@@ -54,11 +54,13 @@ function spaceAdminError(message) {
 function renderSpaceList() {
   spaceAdminListEl.textContent = "";
   state.spaces.filter(function (space) { return space.writable; }).forEach(function (space) {
-    var row = el("div", "space-admin-row");
-    var button = el("button", "btn", space.name + (space.name === state.ownSpace ? " (eigener Space)" : ""));
-    button.type = "button";
-    button.addEventListener("click", function () { selectSpace(space.name); });
-    row.appendChild(button);
+    var row = el("button", "tree__folder settings-space-row", space.name + (space.name === state.ownSpace ? " (eigener Space)" : ""));
+    row.type = "button";
+    // P9-AG: die Zeile traegt denselben Auswahlzustand wie eine Baumzeile, wenn ihr Panel
+    // offen ist (Stufe 3). `aria-current` ist hier die Anzeige, nicht der Zustand — der
+    // Zustand ist `selectedSpaceName` darunter, genau wie in der Rail.
+    if (selectedSpaceName === space.name) row.setAttribute("aria-current", "true");
+    row.addEventListener("click", function () { selectSpace(space.name); });
     spaceAdminListEl.appendChild(row);
   });
 }
@@ -76,7 +78,6 @@ function selectSpace(name) {
   selectedSpaceName = name;
   spaceAdminErrorEl.hidden = true;
   return api("/spaces/" + encodeURIComponent(name) + "/members").then(function (info) {
-    spaceDetailEl.hidden = false;
     spaceDetailNameEl.textContent = name;
     spaceDetailHomeHintEl.hidden = !info.home;
     spaceRemoveOpenEl.hidden = info.home;
@@ -91,6 +92,9 @@ function selectSpace(name) {
       row.appendChild(el("span", null, name + " (verwaist -- kein solcher Space mehr)"));
       spaceMemberListEl.appendChild(row);
     });
+    // Erst jetzt das Detail-Panel aufmachen (P9 Block settings §3 Schritt 2): vorher
+    // stünde Stufe 3 für einen Frame offen, ohne Namen und ohne Mitgliederliste.
+    openSpaceDetail();
   }).catch(function (err) {
     if (err.message === "unauthenticated") return;
     spaceAdminError(err.message || "Mitgliederliste konnte nicht geladen werden.");
@@ -117,9 +121,12 @@ function memberRow(space, name, canWrite) {
   return row;
 }
 
-export function openSpaceAdminDialog() {
+// P9 Block settings: **der Reset** des Spaces-Panels. Das Öffnen macht `settings.js`, das
+// Panel wird hier nicht mehr am DOM gesteuert. `registerPanel()` ist der einzige Weg von
+// außen in dieses Modul — derselbe Ablauf, ob das Panel aus dem Menü, aus dem
+// Update-Banner oder programmatisch geöffnet wird.
+function prepareSpacesPanel() {
   spaceAdminErrorEl.hidden = true;
-  spaceDetailEl.hidden = true;
   selectedSpaceName = null;
   pendingMemberBody = null;
   spaceCreateNameInputEl.value = "";
@@ -128,13 +135,12 @@ export function openSpaceAdminDialog() {
   spaceMemberReauthPasswordEl.value = "";
   spaceMemberReauthTotpEl.value = "";
   renderSpaceList();
-  spaceAdminDialogEl.hidden = false;
 }
+registerPanel("spaces", prepareSpacesPanel);
 
+// P9-AH: „Schließen" schließt dieses Panel und alles rechts davon, nicht die ganze Kette.
 export function closeSpaceAdminDialog() {
-  spaceAdminDialogEl.hidden = true;
-  selectedSpaceName = null;
-  pendingMemberBody = null;
+  closeFrom("spaces");
 }
 
 function spaceRemoveError(message) {
@@ -160,14 +166,16 @@ export function closeRemoveSpaceDialog() {
 }
 
 export function init() {
-  spaceAdminDialogEl = document.getElementById("space-admin-dialog");
   spaceAdminErrorEl = document.getElementById("space-admin-error");
   spaceAdminListEl = document.getElementById("space-admin-list");
   spaceCreateNameInputEl = document.getElementById("space-create-name-input");
   spaceCreateSubmitEl = document.getElementById("space-create-submit");
   spaceAdminCloseEl = document.getElementById("space-admin-close");
 
-  spaceDetailEl = document.getElementById("space-detail");
+  // P9 Block settings: `#space-detail` ist als **Panel** in die Kette gewandert
+  // (`#settings-space-detail`), deshalb existiert der alte Container nicht mehr. `init()`
+  // liest die Kindelemente des Panels direkt -- es gibt keinen zweiten Zustand, den ein
+  // ausgetauschtes Panel zurücksetzen müsste.
   spaceDetailNameEl = document.getElementById("space-detail-name");
   spaceDetailHomeHintEl = document.getElementById("space-detail-home-hint");
   spaceMemberListEl = document.getElementById("space-member-list");
@@ -178,6 +186,7 @@ export function init() {
   spaceMemberReauthPasswordEl = document.getElementById("space-member-reauth-password");
   spaceMemberReauthTotpEl = document.getElementById("space-member-reauth-totp");
   spaceRemoveOpenEl = document.getElementById("space-remove-open");
+  spaceDetailCloseEl = document.getElementById("space-detail-close");
 
   spaceRemoveDialogEl = document.getElementById("space-remove-dialog");
   spaceRemoveConsequenceEl = document.getElementById("space-remove-consequence");
@@ -189,7 +198,11 @@ export function init() {
   spaceRemoveSubmitEl = document.getElementById("space-remove-submit");
   spaceRemoveCancelEl = document.getElementById("space-remove-cancel");
 
+  // P9-AH: „Schließen" schließt sein Panel und alles rechts davon. Stufe 3 (Detail) hat
+  // seinen eigenen, Stufe 2 (Spaces) ebenfalls — deshalb zwei Aufrufe mit demselben Muster
+  // und nicht einer für die ganze Kette.
   spaceAdminCloseEl.addEventListener("click", closeSpaceAdminDialog);
+  spaceDetailCloseEl.addEventListener("click", function () { closeFrom("space-detail"); });
 
   spaceCreateSubmitEl.addEventListener("click", function () {
     var name = spaceCreateNameInputEl.value.trim();
@@ -255,7 +268,12 @@ export function init() {
     api("/spaces/" + encodeURIComponent(space), { method: "DELETE", body: JSON.stringify(body) })
       .then(function (result) {
         closeRemoveSpaceDialog();
-        closeSpaceAdminDialog();
+        // Die ganze Kette, nicht nur Stufe 2: der eben entfernte Space steht als Zeile in der
+        // Liste, und die Liste wird hier **nicht** neu gerendert (`loadOverview()` lädt nur
+        // die Zähler). Vor dem Umbau war das unmerklich, weil das Overlay mit verschwand --
+        // jetzt bliebe eine Zeile stehen, deren Space es nicht mehr gibt. Ein destruktiver
+        // Vorgang, der seinen Kontext verlässt, darf das Fenster schließen.
+        closeSettings();
         toast("Space entfernt · " + result.archived + " Item(s) archiviert");
         return loadOverview();
       }).catch(function (err) {

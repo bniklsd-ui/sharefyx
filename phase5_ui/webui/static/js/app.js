@@ -14,9 +14,8 @@ import {
   closeTrashDialog,
 } from "./dialogs.js";
 import { init as initUpdates } from "./updates.js";
-import {
-  init as initSpaces, openSpaceAdminDialog, closeSpaceAdminDialog, closeRemoveSpaceDialog,
-} from "./spaces.js";
+import { init as initSpaces, closeRemoveSpaceDialog } from "./spaces.js";
+import { init as initSettings, closeRightmost } from "./settings.js";
 import { init as initGraph, loadGraph as loadGraphPanel } from "./graph.js";
 
 // -- Bootstrap: Übernahme des CSRF-Tokens von der Login-Erfolgsseite (Plan-Abweichung 2,
@@ -78,14 +77,15 @@ function initShell() {
   initTree();
   List.init();
   initDialogs();
+  // `settings.js` (P9 Block settings): das Modul verdrahtet die Menüpunkte des Einstellungs-
+  // Fensters und hält die Kette. Seine drei Eigentümer (`dialogs.js`, `spaces.js`,
+  // `updates.js`) melden sich schon beim **Modul-Auswerten** über `registerPanel()`, also vor
+  // dieser Zeile — die Aufrufreihenfolge der `init()`s spielt hier keine Rolle. Steht hier,
+  // weil das Modul ohne `init()` gar nichts verdrahtet.
+  initSettings();
   initSpaces();
   Editor.init();
   initGraph();
-
-  document.getElementById("account-manage-spaces").addEventListener("click", function () {
-    document.getElementById("account-dialog").hidden = true;
-    openSpaceAdminDialog();
-  });
 
   // -- Übersicht / Logout / Zurück ---------------------------------------------------------
 
@@ -167,7 +167,6 @@ function initShell() {
 
   // -- Tastatur (§4.6) ----------------------------------------------------------------------
 
-  var updateLogDialogEl = document.getElementById("update-log-dialog");
   var conflictDialogEl = document.getElementById("conflict-dialog");
   var createDialogEl = document.getElementById("create-dialog");
   // Step 7 Commit 3, kleine dokumentierte Abweichung vom Plan-Dateiwortlaut (der app.js für
@@ -185,14 +184,18 @@ function initShell() {
   // `anyOverlayOpen()` und in die ESC-Kette -- sonst wäre er der einzige Dialog, den ESC nicht
   // schliesst und den die Tastaturbedienung nicht kennt.
   var trashDialogEl = document.getElementById("trash-dialog");
-  var accountDialogEl = document.getElementById("account-dialog");
+  // P9 Block settings: die drei früheren Overlays (#account-dialog, #space-admin-dialog,
+  // #update-log-dialog) sind **eine** Kette. Für ESC ist sie ein Dialog mit einer eigenen
+  // Reihenfolge (P9-AH: das rechteste Panel zuerst) — deshalb `closeRightmost()` statt
+  // dreier Einzelzweige. `#space-remove-dialog` steht in der Kette **darüber**: es ist ein
+  // modales Bestätigungsfenster (Plan §0.3) und muss vor `closeRightmost()` geprüft werden,
+  // sonst schlöß ein ESC das Entfernen-Fenster und der Klick daneben läge wieder frei.
+  var settingsOverlayEl = document.getElementById("settings-overlay");
+  // P7 Step C3: das Entfernen-Fenster. Es bleibt ein eigenes modales Overlay **über** der
+  // Kette (Plan §0.3) und steht deshalb in der ESC-Kette vor `closeRightmost()`.
+  var spaceRemoveDialogEl = document.getElementById("space-remove-dialog");
   var detailEditorEl = document.getElementById("detail-editor");
   var searchInputEl = document.getElementById("search-input");
-  // Step C3, dieselbe dokumentierte Abweichung wie bei jedem Dialog seit Step 7 Commit 3
-  // (app.js steht nicht auf der Plan-Dateiliste dieses Commits) -- konsistente Tastaturbedienung
-  // für jeden Overlay-Dialog, kein Sonderfall für den neuen.
-  var spaceAdminDialogEl = document.getElementById("space-admin-dialog");
-  var spaceRemoveDialogEl = document.getElementById("space-remove-dialog");
   // P9 Step A: Hinweis auf der alten Adresse -- ein Overlay wie alle anderen, also auch in
   // `anyOverlayOpen()` und in der ESC-Kette (dieselbe Begründung wie beim Löschdialog).
   var legacyHostDialogEl = document.getElementById("legacy-host-dialog");
@@ -236,8 +239,7 @@ function initShell() {
   function anyOverlayOpen() {
     return !conflictDialogEl.hidden || !createDialogEl.hidden || !newFolderDialogEl.hidden
       || !moveDialogEl.hidden || !shareDialogEl.hidden || !confirmDialogEl.hidden
-      || !trashDialogEl.hidden || !accountDialogEl.hidden || !updateLogDialogEl.hidden
-      || !spaceAdminDialogEl.hidden
+      || !trashDialogEl.hidden || !settingsOverlayEl.hidden
       || !spaceRemoveDialogEl.hidden || !linkPickerDialogEl.hidden || !legacyHostDialogEl.hidden;
   }
 
@@ -261,14 +263,13 @@ function initShell() {
       else if (!newFolderDialogEl.hidden) closeNewFolderDialog();
       else if (!moveDialogEl.hidden) closeMoveDialog();
       else if (!shareDialogEl.hidden) closeShareDialog();
-      else if (!updateLogDialogEl.hidden) updateLogDialogEl.hidden = true;
       // P9 Step G: `closeTrashDialog()` statt `hidden = true` — der Dialog hält einen
       // `pendingTrashCancel`, der das Promise auflöst; ein bloßes Verstecken ließe es hängen
       // und der Aufrufer (list.js) wartete ewig auf eine Antwort.
       else if (!trashDialogEl.hidden) closeTrashDialog();
-      else if (!accountDialogEl.hidden) accountDialogEl.hidden = true;
       else if (!spaceRemoveDialogEl.hidden) closeRemoveSpaceDialog();
-      else if (!spaceAdminDialogEl.hidden) closeSpaceAdminDialog();
+      // Die Kette schließt von rechts nach links (P9-AH) und weiß selbst, was rechts steht.
+      else if (!settingsOverlayEl.hidden) closeRightmost();
       else if (!linkPickerDialogEl.hidden) closeLinkPicker();
       else if (!legacyHostDialogEl.hidden) legacyHostDialogEl.hidden = true;
       else if (state.selectedId !== null) Editor.closeEditor();

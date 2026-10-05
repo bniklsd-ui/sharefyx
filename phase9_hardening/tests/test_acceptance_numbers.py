@@ -61,14 +61,14 @@ CAP_BYTES = 300  # der Cap, mit dem P9-3/V145 die Unerreichbarkeit des Kriterium
 # Abgetippt, nicht abgeleitet — der Test soll die Behauptung prüfen, nicht sie wiederholen.
 # 2026-10-03: P9-15 von ⬜ auf ⚠️ (gemessen, aber in anderer Form als im Kriterium -- die
 # dort genannte Referenz 372,9 ms ist im Code nie ueber Funnel gemessen worden).
-ABNAHME_BILANCE = {"✅": 71, "⚠️": 9, "⬜": 3}
-ABNAHME_ROWS = 83  # 82 Abnahmezeilen, P9-10 in zwei prüfbare Hälften geteilt
+ABNAHME_BILANCE = {"✅": 83, "⚠️": 9, "⬜": 4}
+ABNAHME_ROWS = 96  # 96 Abnahmezeilen; seit 2026-10-05 kommt der settings-Block (P9-83–P9-95) dazu
 # 2026-10-03: V164 von ⬜ auf ✅ (Deploy `v3.1.1` + Health-Gate 9/9). Die Konstante steht
 # **vor** dem Zählen, sonst wäre der Test eine Tautologie -- deshalb hat er mich beim
 # Zurueckschreiben der Bilanz in die Matrix rot gemeldet, statt sie zu bestaetigen.
 # 2026-10-03: V151 von ⚠️ auf ✅ (beide Beine gemessen, VPS-Anteil 2,4-3,6 %).
-VERIFY_BILANCE = {"✅": 31, "⚠️": 1, "⬜": 2}  # Nummern-Lesart, eine Nummer = eine Zeile
-VERIFY_ROWS = 37  # 34 Nummern + 2 Zweit-Lesarten + 1 reservierte Bereichszeile
+VERIFY_BILANCE = {"✅": 34, "⚠️": 1, "⬜": 3}  # Nummern-Lesart, eine Nummer = eine Zeile
+VERIFY_ROWS = 41  # 38 Nummern + 2 Zweit-Lesarten + 1 reservierte Bereichszeile
 # 2026-10-04 (Nikinger): P9-13/V150 (das zweite Claude-Konto) von ⚠️ auf ⬜ — **zurückgestellt, wandert
 # nach P10, ist kein Blocker** (Plan §0.1a; die Regel steht auch in der Wurzel-`CLAUDE.md`
 # §Working style). V157 ist damit der einzige verbleibende ⚠️, V150 und V162 *(Lesart A)* die beiden ⬜.
@@ -227,7 +227,10 @@ def test_the_verify_balance_is_the_machine_count_under_the_stated_rule():
         f"die Marker der zweiten Lesarten haben sich geändert: gemessen {second}, "
         f"festgenagelt {SECOND_READING_MARKERS}"
     )
-    assert sum(counted.values()) == 34, "34 belegte Einträge — die Übergabezahl 40 war der Nummernbereich"
+    assert sum(counted.values()) == 38, (
+        "38 belegte Einträge (2026-10-03: 34, seit dem settings-Block +4 für V185–V188). "
+        "Die Übergabezahl 40 war der Nummernbereich, nicht die Zahl belegter Einträge."
+    )
     assert _headline_triple(MATRIX.read_text(encoding="utf-8"), "belegte Einträge —") == counted
 
 

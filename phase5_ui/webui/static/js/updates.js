@@ -8,6 +8,7 @@
 
 import { api } from "./api.js";
 import { markdownToHtml } from "./markdown.js";
+import { registerPanel, closeFrom } from "./settings.js";
 
 function markdownList(lines) {
   return lines.map(function (line) { return "- " + line; }).join("\n");
@@ -17,14 +18,14 @@ export function init() {
   var bannerEl = document.getElementById("update-banner");
   var bannerBodyEl = document.getElementById("update-banner-body");
   var bannerDismissEl = document.getElementById("update-banner-dismiss");
-  var logDialogEl = document.getElementById("update-log-dialog");
+  // P9 Block settings: Stufe 2 der Fensterkette, kein eigenes Overlay mehr. Der Container
+  // heißt weiter `#update-log-list` (unveränderte ID, die Renders hängen daran).
   var logListEl = document.getElementById("update-log-list");
   var logCloseEl = document.getElementById("update-log-close");
-  var showUpdatesEl = document.getElementById("account-show-updates");
 
   // Markup fehlt auf Seiten ohne die Shell (Login/Einladung/Enrollment, `pages.py`) — dort
   // läuft `init()` nie, wie bei jedem anderen Shell-Feature auch.
-  if (!bannerEl || !logDialogEl) return;
+  if (!bannerEl || !logListEl) return;
 
   var entries = [];
 
@@ -79,13 +80,15 @@ export function init() {
     api("/updates/seen", { method: "POST" }).catch(function () {});
   });
 
-  if (showUpdatesEl) {
-    showUpdatesEl.addEventListener("click", function () {
-      renderLog();
-      logDialogEl.hidden = false;
-    });
-  }
-  logCloseEl.addEventListener("click", function () { logDialogEl.hidden = true; });
+  // [VERIFY] V186 (2026-10-05, beantwortet): das Update-Banner öffnet das Log **nicht** — es
+  // trägt nur „Verstanden" (`#update-banner-dismiss`), keinen zweiten Knopf. Der einzige Weg
+  // ins Log ist der Menüpunkt „Update-Log" in den Einstellungen. Plan §3 Schritt 1 nannte
+  // „Alle Updates ansehen" — das war eine Annahme über ein Bedienelement, das es nicht gibt.
+  //
+  // Das Rendern ist der `prepare`-Eintrag dieses Panels (P9 Block settings): das Öffnen macht
+  // `settings.js`, und genau ein Ort soll entscheiden, wann ein Panel aufgeht.
+  registerPanel("updates", renderLog);
+  logCloseEl.addEventListener("click", function () { closeFrom("updates"); });
 
   api("/updates").then(function (body) {
     entries = body.entries || [];

@@ -10,6 +10,9 @@
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
 ## 2026-10-05
+- Die Einstellungen sind jetzt eine Fensterkette: das Menü bleibt sichtbar, während das Passwort-, das Spaces- und das Update-Log-Fenster daneben aufgehen. Aus „Spaces verwalten" öffnet ein Klick auf einen Space ein drittes Fenster.
+- Im Passwort-Fenster steht der Code aus der Authenticator-App jetzt als letztes Feld, direkt über „Ändern“ — vorher stand er zwischen altem und neuem Passwort.
+- Zwei Items, die über einen Tag oder einen Ordner verknüpft sind, zeigen jetzt **eine** Linie. Die ausdrückliche Verknüpfung gewinnt, die daraus abgeleitete entfällt.
 - Die alte Adresse funktioniert bis auf Weiteres wieder vollständig, auch zum Schreiben — für Netze, die die neue Adresse noch nicht erreichen (z. B. ein Firmen-VPN). Der Hinweis dort sagt das jetzt so und nennt keinen Abschalttermin mehr.
 
 ## 2026-10-03

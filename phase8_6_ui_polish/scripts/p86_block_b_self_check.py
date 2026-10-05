@@ -8,6 +8,14 @@ Schiesst drei Screenshots gegen die laufende Wegwerf-Instanz auf Port 18773:
 
 Die Screenshots werden nach docs/screenshots/ geschrieben und am Ende der Session mit dem
 eingebauten `read`-Tool gelesen + beschrieben. Hard Rule 9: Stop nur ueber PID-Datei.
+
+**[V187, 2026-10-05 — historische Probe, gegen `main` nicht mehr lauffähig.]** Dieses Skript
+spricht `#account-dialog` an, ein Overlay, das der P9-Block settings (Plan
+`docs/concepts/phase9_hardening_block_settings_plan.md`, P9-AG) am 2026-10-05 durch
+`#settings-overlay` mit der Kette `#settings-menu` / `#settings-password` ersetzt hat. **Es
+wird nicht umgebaut** — es ist der Beleg eines abgeschlossenen Blocks, und ein umgebauter
+historischer Beleg beweist nichts mehr über diesen Block. Wer die Fensterkette prüfen will,
+nimmt `phase9_hardening/scripts/p9_settings_chain_probe.py`.
 """
 from __future__ import annotations
 

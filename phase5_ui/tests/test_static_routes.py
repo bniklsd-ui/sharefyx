@@ -143,12 +143,19 @@ def test_app_html_has_a_live_manage_spaces_entry():
     „Phase 7" (die Fläche ist diese Phase). Sichtbarkeit zur Laufzeit folgt `state.meta.
     space_admin` (`app.js`), nicht diesem statischen Markup (P5-T, kein Templating).
 
-    Block H H2 (Plan §5.2): die Knöpfe tragen jetzt zusätzlich ein Chevron-Icon
-    (`<svg class="icon">...</svg>`); die Regex muss daher nested-Tags innerhalb des
-    Buttons erlauben, nicht nur reinen Text. Capture-Gruppe wird auf den sichtbaren
-    Text-Label-Teil eingeschränkt (erstes nicht-leeres Text-Stück vor dem ersten `<`)."""
+    **[2026-10-05, P9 Block settings P9-AE — umgeschrieben, nicht gelöscht.]** Der Knopf ist
+    vom Konto-Dialog in das **Menü der Fensterkette** gewandert (`#settings-menu`, Klasse
+    `.settings-menu__item` mit `.tree__folder`). Die alte Fassung verlangte zusätzlich ein
+    Chevron-Icon im Label — das gibt es nicht mehr, und es war auch nie Teil der Absicht: die
+    Absicht war „scharf, nicht deaktiviert, kein Phasenverweis". Die Prüfung auf
+    `disabled` und auf `Phase 7` bleibt wörtlich, weil sie den eigentlichen Zweck trägt.
+
+    Die frühere Form prüfte zusätzlich, dass der Button `.btn` **und** `.account-nav` trägt
+    (Phase 8.6 H-R.2-L). Beides ist seit dem Umbau nicht mehr die Absicht — die Menüpunkte
+    tragen die Optik einer Baumzeile, und `.account-nav` bleibt am Alte-Adresse-Dialog
+    (P9-AF). Diese Prüfung ist als `test_settings_menu_items_reuse_the_tree_row_look()`
+    in `test_settings_chain.py` neu und mit derselben Absicht aufgestellt."""
     html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
-    # non-greedy `.*?` damit das inner svg erlaubt ist, aber </button> greift
     match = re.search(
         r'<button[^>]*id="account-manage-spaces"[^>]*>(.*?)</button>',
         html,
@@ -157,7 +164,6 @@ def test_app_html_has_a_live_manage_spaces_entry():
     assert match is not None, "Menüpunkt 'Spaces verwalten' fehlt"
     button_html = match.group(0)
     assert "disabled" not in button_html
-    # Label-Text ist im ersten Text-Knoten vor dem ersten <svg> -- regex sucht "Spaces verwalten"
     assert re.search(r"Spaces verwalten", button_html), (
         "#account-manage-spaces muss 'Spaces verwalten' als Label tragen (P7 C3)."
     )
@@ -824,13 +830,9 @@ def test_shell_grid_is_240_480_1fr():
     # Anker 3 -- 1024-px-Media-Query: Rail 240 + rechte Spalte 1fr, EINE Zeile (Block H-R-3
     # H-R.6 -- Umkehr von G-R.1s Stapel-Logik, siehe test_1024_breakpoint_has_single_row_no_map
     # fuer die volle Herleitung).
-    media_1024 = re.search(
-        r"@media\s*\(max-width:\s*1024px\)\s*\{(.*?)\n\}", css, flags=re.DOTALL
-    )
-    assert media_1024 is not None, (
-        "@media (max-width: 1024px) muss in app.css existieren."
-    )
-    media_1024_body = media_1024.group(1)
+    media_1024_bodies = _media_query_bodies(css, r"\(max-width: 1024px\)")
+    assert media_1024_bodies, "@media (max-width: 1024px) muss in app.css existieren."
+    media_1024_body = "\n".join(media_1024_bodies)
     shell_in_1024 = re.search(
         r"\.shell\s*\{(.*?)\}", media_1024_body, flags=re.DOTALL
     )
@@ -1120,14 +1122,8 @@ def test_1024_breakpoint_has_single_row_no_map():
     """
     css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
 
-    media_1024 = re.search(
-        r"@media\s*\(max-width:\s*1024px\)\s*\{(.*?)\n\}", css, flags=re.DOTALL
-    )
-    assert media_1024 is not None, (
-        "@media (max-width: 1024px) muss in app.css existieren."
-    )
-    media_1024_body = media_1024.group(1)
-    media_1024_body_nc = re.sub(r"/\*.*?\*/", "", media_1024_body, flags=re.DOTALL)
+    media_1024_body_nc = "\n".join(_media_query_bodies(css, r"\(max-width: 1024px\)"))
+    assert media_1024_body_nc, "@media (max-width: 1024px) muss in app.css existieren."
 
     # 1. .shell traegt eine EINZIGE Zeile, nicht mehr zwei gleich hohe.
     shell_match = re.search(r"\.shell\s*\{([^}]*)\}", media_1024_body_nc)
@@ -1190,11 +1186,8 @@ def test_1024_editor_fullview_hides_rail_and_list():
     """
     css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
 
-    media_1024 = re.search(
-        r"@media\s*\(max-width:\s*1024px\)\s*\{(.*?)\n\}", css, flags=re.DOTALL
-    )
-    assert media_1024 is not None
-    body = re.sub(r"/\*.*?\*/", "", media_1024.group(1), flags=re.DOTALL)
+    body = "\n".join(_media_query_bodies(css, r"\(max-width: 1024px\)"))
+    assert body, "@media (max-width: 1024px) muss in app.css existieren."
 
     detail_view_match = re.search(
         r'\.shell\[data-view="detail"\]\s*\{([^}]*)\}', body
@@ -1397,6 +1390,40 @@ def test_panel_head_height_matches_a_list_row():
 # Self-Check gemessen, nicht in statischen Tests (siehe Plan §5 / §11).
 
 
+def _media_query_bodies(css: str, condition: str) -> list[str]:
+    """Die Bodies **aller** Media-Queries mit dieser Bedingung, Kommentare entfernt.
+
+    **[2026-10-05, P9 Block settings — Fund beim Bauen, mit Datum.]** Die 1024er Queries
+    wurden bis hierher mit `re.search(...)` als *erster* Treffer gelesen. Das war solange
+    richtig, solange es genau eine gab. Der settings-Block hat eine **zweite** hinzugefügt
+    (`.settings-chain`, Schmal-Modus, P9-AI) — und drei Wächter schlugen sofort rot, ohne
+    dass sich am Shell-Grid etwas geändert hätte: sie lasen den falschen Block.
+
+    Die Reparatur ist nicht „die Reihenfolge der Blöcke im Stylesheet", sondern: **alle**
+    Blöcke sammeln und in der Gesamtheit suchen. Eine Breite ist eine Bedingung, keine
+    Eigenschaft genau eines Blocks — dieselbe Lehre wie beim Tabellenkopf in
+    `test_table_shape.py` (eine Tabelle hat beliebig viele Zeilen, nicht eine).
+    """
+    bodies = []
+    # `condition` ist ein **Regex** (die Aufrufer schreiben `r"\(max-width: 1024px\)"`),
+    # weil die Bedingungen Klammern enthalten. `re.escape` waere hier falsch und lieferte
+    # still `null` Treffer — die erste Fassung dieses Helfers tat genau das, und die drei
+    # Wächter blieben rot, ohne einen Grund zu nennen.
+    for match in re.finditer(rf"@media\s*{condition}\s*\{{", css):
+        # Klammerbalance ab dem Treffer zaehlen: `.*?\n\}}` bricht bei verschachtelten
+        # Media-Queries (die Datei hat eine) am falschen Ende.
+        depth = 1
+        i = match.end()
+        while i < len(css) and depth:
+            if css[i] == "{":
+                depth += 1
+            elif css[i] == "}":
+                depth -= 1
+            i += 1
+        bodies.append(css[match.end(): i - 1])
+    return [re.sub(r"/\*.*?\*/", "", b, flags=re.DOTALL) for b in bodies]
+
+
 def _block_body(css: str, selector: str) -> str:
     """Liefert den Body des nächsten `{ ... }`-Blocks hinter dem Selector.
 
@@ -1524,22 +1551,48 @@ def test_layer3_elements_keep_surface_tone():
 
 def test_account_nav_and_standard_button_wear_the_rail_selection_look():
     """**[2026-10-01, P9, Nikinger-Entscheidung] ersetzt H-R.2-L.** `.btn` trägt die Optik des
-    aktiven Rail-Knopfs, als deckende Werte (`--btn-std-fill`/`--btn-std-line`, auf Schwarz verrechnet). Die
-    Navigationsknöpfe im Einstellungen-Dialog tragen die Klasse `.btn` **selbst** (zweite Runde
-    am selben Tag: eine eigene Kopie der Optik in `.account-nav` ergab eine dritte Variante) —
-    `.account-nav` darf deshalb keine eigene Optik mehr deklarieren, nur Layout.
+    aktiven Rail-Knopfs, als deckende Werte (`--btn-std-fill`/`--btn-std-line`, auf Schwarz verrechnet).
+
+    **[2026-10-05, P9 Block settings P9-AF — der Verwendungszweck hat sich geändert, die
+    Formregel nicht.]** Die beiden Navigationsknöpfe des Einstellungs-Dialogs sind in das
+    **Menü der Fensterkette** gewandert und tragen dort die Optik einer `.tree__folder`-Zeile
+    (der Nikinger hat per Bild die Baumzeile „Offen" gezeigt). `.account-nav` bleibt nur noch
+    am **Alte-Adresse-Dialog** — zwei Träger hätten die Formregel wertlos gemacht, weil man
+    dann nicht mehr wüsste, welche Variante man prüft.
+
+    Die Absicht ist deshalb auf **zwei** Wächter verteilt, einen je Stelle:
+    `test_account_nav_stays_layout_only_on_the_legacy_dialog()` (unten, Formregel inklusive
+    „genau ein Träger") und `test_settings_menu_items_reuse_the_tree_row_look()` in
+    `test_settings_chain.py` (Wiederverwendung statt Kopie). Hier bleibt die `.btn`-Hälfte,
+    weil sie den Alte-Adresse-Dialog weiter trägt.
     """
     css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
     body = _block_body(css, ".btn")
     assert re.search(r"background\s*:\s*var\(--btn-std-fill\)\s*;", body), body
     assert re.search(r"border\s*:\s*1px solid var\(--btn-std-line\)\s*;", body), body
+
+
+def test_account_nav_stays_layout_only_on_the_legacy_dialog():
+    """**[2026-10-05, P9 Block settings P9-AF.]** `.account-nav` hat genau **einen** Träger:
+    `#legacy-host-link` im Hinweis auf der alten Adresse (den der Nikinger am 2026-10-05
+    gesehen und abgenommen hat).
+
+    Die Formregel aus H-R.2-L bleibt unverändert und wird hier in **beiden** Richtungen
+    geprüft: `.account-nav` darf keine eigene Optik deklarieren (nur Layout), und es darf
+    keinen zweiten Träger bekommen — sonst wäre die Aussage „nur noch eine Stelle" eine
+    Behauptung, die beim nächsten Umbau stillschweigend falsch würde.
+    """
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
     nav = _block_body(css, ".account-nav")
     for prop in ("background", "border", "padding", "font-size", "font-weight", "color", "box-shadow"):
         assert not re.search(rf"(^|[;\s]){prop}\s*:", nav), (prop, nav)
     assert not re.search(r"\.account-nav\s*:\s*hover", css)
+
     html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
-    navs = re.findall(r'class="([^"]*\baccount-nav\b[^"]*)"', html)
-    assert navs and all("btn" in c.split() for c in navs), navs
+    carriers = re.findall(r'class="([^"]*\baccount-nav\b[^"]*)"[^>]*id="([^"]+)"', html)
+    assert [cid for _, cid in carriers] == ["legacy-host-link"], carriers
+    for classes, _ in carriers:
+        assert "btn" in classes.split(), carriers
 
 
 def test_primary_keeps_its_own_face_and_caution_wears_the_standard_one():

@@ -30,17 +30,29 @@ function makeCtx() {
   return {
     strokes: [],      // [x1, y1, x2, y2] je ctx.stroke()
     dashes: [],       // setLineDash()-Argumente in Aufrufreihenfolge
+    // **[2026-10-05, P9 Block settings] Frame-Grenzen statt geratenem Slice.** `draw()`
+    // ruft genau einmal `clearRect()` am Anfang — das ist die einzige Stelle, an der der
+    // echte Code einen Frame beginnt. Die V118-Messung nahm vorher `strokes.slice(-2)` und
+    // später `slice(-1)` und **raten** damit, wo der letzte Frame anfing; mit *einer* Linie
+    // (der neuen V118-Lesart) und mit *zwei* (der alten) zaehlt dieselbe Zeile unterschiedlich
+    // viel, ohne dass der Test es merkte. `frames` haelt die Striche je Frame, damit die
+    // Messung eine Grenze liest statt eine zu setzen.
+    frames: [],
     _x: 0,
     _y: 0,
     setTransform() {},
-    clearRect() {},
+    clearRect() { this.frames.push([]); },
     save() {},
     restore() {},
     translate() {},
     scale() {},
     beginPath() { this._x = 0; this._y = 0; },
     moveTo(x, y) { this._x = x; this._y = y; },
-    lineTo(x, y) { this.strokes.push([this._x, this._y, x, y]); },
+    lineTo(x, y) {
+      this.strokes.push([this._x, this._y, x, y]);
+      if (!this.frames.length) this.frames.push([]);
+      this.frames[this.frames.length - 1].push([this._x, this._y, x, y]);
+    },
     stroke() {},
     arc() {},
     fill() {},
@@ -274,6 +286,7 @@ graphPayloads = [
 ];
 setToken(overview(2, 2));      // Token wandert -> es MUSS neu geladen werden
 canvasCtx.strokes = [];
+canvasCtx.frames = [];
 const fetchesBeforeRefetch = fetchLog.length;
 await graph.loadGraph();
 flushOneFrame();                        // resize() + seed + runSimulation() stellt den Tick ein
@@ -356,7 +369,7 @@ results.p9_35_own_write_is_visible_immediately = {
 };
 
 // =============================================================================================
-// V118 — Zwillingskante: Tag-Kante UND explizite Kante zwischen denselben zwei Knoten
+// V118 — eine Linie: Tag-Kante neben expliziter Kante zwischen denselben zwei Knoten
 // =============================================================================================
 
 graphPayloads = [
@@ -367,30 +380,44 @@ graphPayloads = [
 tagsToggleEl.checked = true;
 tagsHandlers.forEach((fn) => fn({ target: tagsToggleEl }));
 canvasCtx.strokes = [];
+canvasCtx.frames = [];
 canvasCtx.dashes = [];
 await graph.loadGraph({ force: true });
 flushOneFrame();
+// **Vor** dem Zurueckschalten sichern: der Toggle-Wechsel zeichnet selbst noch einmal, und
+// dieser Frame gehoert nicht mehr zur Messung (der Tag-Zustand ist dann aus). Ohne diese
+// Sicherung las der erste Entwurf genau diesen Frame — 1 Strich, gruen, **falsch**: die
+// Zwillingskante stand zwei Frames weiter oben. Ein Messaufbau, der seinen Gegenstand
+// wegschaltet, bevor er ihn liest, misst nichts (gemessen 2026-10-05, Gegenlauf G3).
+const framesMitTags = canvasCtx.frames.slice();
+const dashesMitTags = canvasCtx.dashes.slice();
 tagsToggleEl.checked = false;
 tagsHandlers.forEach((fn) => fn({ target: tagsToggleEl }));   // wieder zurückschalten
 
-const lastFrameStart = canvasCtx.strokes.length - 1;   // genau der Strich des letzten draw()
-const drawn = canvasCtx.strokes.slice(Math.max(0, canvasCtx.strokes.length - 2));
+// **Der letzte Frame, an dem der Tag-Toggle noch an war** (siehe `frames` im Shim). Vorher
+// stand hier ein Slice mit geratener Laenge; die Laenge haengte an der Antwort, die gerade
+// gebaut wurde — ein Messaufbau, der von der erwarteten Loesung abhaengt.
+const lastFrame = framesMitTags[framesMitTags.length - 1] || [];
+const drawn = lastFrame;
 const counts = new Map();
 drawn.forEach((s) => {
   const key = s.join(",");
   counts.set(key, (counts.get(key) || 0) + 1);
 });
 const twins = Array.from(counts.values()).filter((c) => c >= 2).length;
-const dashed = canvasCtx.dashes.some((d) => d.length > 0);
 
-results.v118_tag_edge_plus_explicit_edge = {
+results.v118_tag_edge_beside_explicit_edge = {
+  frames_drawn: framesMitTags.length,
   segments_in_last_frame: drawn.length,
   duplicate_segments: twins,
-  a_dashed_line_was_drawn: dashed,
-  // Die Frage des Plans war, OB zwei Linien entstehen. Antwort: ja, zwei — und die zweite ist
-  // gestrichelt. Ob das gewollt ist, entscheidet der Nikinger (P9-36), der Code ändert es nicht.
-  ok: drawn.length === 2 && twins === 1 && dashed,
+  // Die implizite Kante fällt bei der Übernahme (`rebuildImplicitEdges()`), deshalb darf
+  // **keine** gestrichelte Linie mehr im Bild sein -- nicht nur keine doppelte.
+  a_dashed_line_was_drawn: dashesMitTags.some((d) => d.length > 0),
+  // Die durchgezogene Linie muss da sein: der Test darf nicht grün werden, indem die
+  // Kante einfach verschwindet.
+  a_solid_line_was_drawn: dashesMitTags.some((d) => d.length === 0),
+  // Gegenlauf-Messung: die implizite Kante **wird** gebaut, sie wird nur verworfen. Ohne
+  // diese Zahl wäre ein Filter grün, der `buildTagEdges()` komplett abklemmt.
+  ok: drawn.length === 1 && twins === 0 && !dashesMitTags.some((d) => d.length > 0),
 };
-
-void lastFrameStart;
 process.stdout.write(JSON.stringify(results, null, 2) + "\n");

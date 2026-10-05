@@ -12,7 +12,7 @@ down:
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
   - UPDATES_ARCHIVE.md                          # ältere `updated:`-Fäden dieses Heads, verbatim (2026-10-03, 36 von 37)
   - MODULE_STATUS_ARCHIVE.md                   # ausführliche Statusspalten der §-Modulstatus-Tabelle, verbatim (2026-10-04)
-updated: 2026-10-05 (**Korrektur desselben Tages:** `d2cbec9` hatte den neuen Block *über* den alten gestellt, und `rotate_session_block.sh` behält den *letzten* — der neue lag dadurch im Archiv; jetzt verbatim zurückgetauscht, Byte-Summe gleich · **Laptop-Messung:** kein Direktweg, nur Firmen-Proxy, der Proxy setzt die neue Domain zurück — kein SNI-Filter) | 2026-10-05 (**Übergangsfenster unbefristet möglich: `LEGACY_UNTIL=open`** — der Arbeitslaptop erreicht die neue Domain hinter dem Firmen-VPN nicht (`NS_ERROR_NET_RESET`), vermutlich ein Filter gegen neu registrierte Domains; Dialog mit drei Zuständen, CSRF-Pfad byte-identisch (`date.max`), `pytest` 1217 → 1223, Probe 24/24 · **nicht deployt**, bis dahin gilt `2026-10-17`) | 2026-10-04 (**zwei von dreizehn Statuszellen der eigenen Modulstatus-Tabelle waren unsichtbarer Text — der Fund kam aus der offenen Softcap-Frage, und die Behebung zog einen zweiten mit sich: der Zahlen-Wächter hat den Marker der *zweiten* `[VERIFY]`-Lesart weggeworfen** — opencode/M3, ein Commit, **kein Produktcode-Touch**, kein Deploy, kein Service-Touch; **7 neue Tests**, Gegenproben **G1–G7 rot**, Kontrolllauf grün; **Session-Block und `updated:`-Kette rotiert**, beide per Skript und verlustfrei) · **Befund:** Zeile 28 (Step B) und Zeile 38 (Gate/Z) tragen ein **rohes ` | ` im Text der Statusspalte** ⇒ GFM gibt ihnen **vier** Zellen statt drei und legt den Rest in eine **Phantom-Spalte** ⇒ **4.097 B waren in der gerenderten Ansicht unsichtbar** (2.990 + 1.107), darunter der komplette V153-Block des Step B. In einer Textausgabe sieht eine Tabelle mit *mehr* Zellen als ihr Kopf nicht kaputt aus, sie sieht nach einer Spalte aus · **behoben verlustfrei:** Step B ` | ` → ` · `, Gate/Z wanderte der Rohstrich **aus dem Codespan heraus** (der Text war ``` 4 Fäden mit ` | updated: `-Präfix ```, ein öffnender Backtick *vor* dem Rohstrich) · **`tests/test_table_shape.py` 6/6, repo-weit:** gemessen **3.284 Tabellenzeilen, 17 Abweichungen** — 2 hier, **15 in fremden Dateien** in `KNOWN_OFFENDERS` **mit Zeilennummer**; `\|` wird nicht gezählt (17 Stellen, Konvention), ```-Fences werden übersprungen · **zweiter Fund, die Repo-Lehre zum achten Mal:** `test_acceptance_numbers.py` blieb **grün**, als V162 *(Lesart B)* von ⬜ auf ⚠️ ging — die Regel *„eine doppelt vergebene Nummer zählt einmal, mit Lesart A"* **verwirft** den Marker der zweiten Lesart, und der stand damit in **keiner** Bilanz. Ein Wächter, der die *falsche* Rechnung richtig ausführt · `SECOND_READING_MARKERS = {"V162": "⚠️", "V163": "✅"}` nagelt jede zweite Lesart namentlich fest, eine dritte fällt als neuer Schlüssel auf; **die Abnahme-Seite ist nicht betroffen** (`_abnahme_rows` zählt jede Zeile) · **V162 *(Lesart B)* ⬜ → ⚠️ mit Zitat:** *„access control rules apply to Serve just like any other service"* (<https://tailscale.com/docs/features/tailscale-serve>, validiert 20.01.2026) — für `--tcp` nennt die CLI-Referenz **kein** ACL-Verhalten in **keine** Richtung; **kein Gegenlauf möglich** (eine Widerlegung braucht einen zweiten Tailnet-Knoten mit Shell). **Die socat-Wahl ist damit nicht widerlegt, sondern gedeckt** — *„eine offene Frage darf nicht die Grundlage einer Firewall-Entscheidung sein"* · **beide Rotationen gefahren, und das Ergebnis ist die Antwort auf die offene Frage:** der Head stand bei **66.223 B** (25.263 B über dem Softcap; Kette 11.702 · Modulstatus 29.579 · Backlog 5.975 · Block+Nachträge 17.778 B), nach Session-Block-Rotation (17.780 B verbatim ins `SESSIONS_ARCHIVE.md`) **59.354 B** und nach Kettenrotation (6 von 7 Fäden, `rotate_index_updates.sh` mit Zieldatei-Argument) **49.033 B** ⇒ **mit neuem Block und neuem Faden ≈ 55 KB, rund 14 KB über dem Softcap** (die exakte Zahl in der INDEX-Zeile; meine zwischenzeitliche Projektion „43 KB" war eine **Annahme über die eigene Blockgröße** — 4 KB angesetzt, 10,9 KB geschrieben, die Rotationsarithmetik selbst ging auf das Byte) — **die Blockschnittzahl ist damit gegenstandslos**, K=1 ist die Konvention, und selbst K=1 passt nicht, weil nicht die *Anzahl* der Blöcke das Problem ist, sondern die Breite einer Tabelle: **29.579 B in 13 Zeilen, davon 14.057 B in drei** (A 4.915 · Gate/Z 5.092 · B 4.050). Der letzte Hebel ist das Kürzen der Modulstatus-Tabelle in ein L3-Archiv (verbatim, Roundtrip, am 2026-10-02 an zwei Stellen bewährt) — **gemessen bereit, nicht getan, weil der Inhalt deine Entscheidung ist** · **vier eigene Fehler vor dem Commit behoben**, zwei davon mit der Lehre des Abends: ein Ausnahmelisten-Pfad, den es nicht gibt (der Prüfer meldete dadurch **rot statt grün**, richtig so) · `ROADMAP.md` zweimal als Dict-Schlüssel (der zweite still eine leere Ausnahme) · `hidden_bytes()` summierte die Trenner mit (Kennzahl 2 zu hoch) · die Reparatur-Gegenprobe suchte im **ganzen** Head und traf den Session-Block, der die kaputte Form wörtlich zitiert — **ein Wächter, der das Richtige an der falschen Stelle prüft, ist derselbe Fehler eine Ebene tiefer** · `pytest` **1209 → 1217**, Baseline **1209** vorab gemessen (der gestrige Block nennt 1203, die sechs Differenz sind `test_prepend_chain.py` — abgeglichen statt geglaubt), `ui_budget` 5/5, `doc_health` 0 | 2026-10-03 (**der letzte Handgriff im Rotations-Workflow ist abgeschafft: `scripts/prepend_updated_chain.sh` stellt einen Faden an den Kettenanfang, mit sechs Gegenproben und 6 Tests — nach fünfmal derselben Fehlerklasse an einem Tag, darunter einmal NACH der geschriebenen Diagnose**) · **Befund, der zum Werkzeug führte:** das Rotieren der Kette war maschinell, das **Voranstellen** nicht; beim Kopieren der alten Zeile als Vorlage wanderte das `updated:`-Präfix mit hinein (3×) oder ` | ` wurde zu ` · ` (2×) — für `rotate_index_updates.sh` beides unsichtbar · **das Skript verweigert beide Formen, statt sie zu reparieren**, und prüft den Werkzeugvertrag am echten Ergebnis (jeder Faden beginnt mit ` | `) vor dem Schreiben · **drei eigene Fehler vor dem Commit behoben:** die Closer-Prüfung las `FM_END+1` und brach **jeden** Happy-Path ab · ohne `|| true` beendet `pipefail`+`set -e` **stumm**, wenn das Feld fehlt (dieselbe Falle steht kommentiert in `rotate_index_updates.sh`) · meine Test-Fixtures: der `THREAD` war selbst ein Zwei-Faden-String und die ` · `-Gegenprobe ließ das Skript **durch** · **Gegenproben:** G1 nimmt den **echten** Faden aus diesem Commit (Durchlauf, danach kein Faden blind), G2/G3 brechen ab, G4 bricht **mit** Meldung ab, G5 (zwei Fäden, ` | `) läuft durch | ältere Einträge: phase9_hardening/UPDATES_ARCHIVE.md
+updated: 2026-10-05 (**Block settings gebaut, opencode/M3 — drei Overlays sind eine Fensterkette, V118 hat eine Linie**; Release `v3.1.3` steht, **kein Deploy, kein Service-Touch**; `pytest` 1223 → 1233, `ui_budget` 5/5, Tabu-Diff leer, Probe **39/39**, G1 → 4 rot · G2 → 2 rot · G3 → rot · **zwei Code-Befunde aus dem Browser, nicht aus den Tests** (Schmal-Modus ließ zwei Panels stehen · der „Zurück“-Knopf des Details war nicht verdrahtet) · **der Gegenlauf hat den eigenen Messaufbaum widerlegt** (er las den Frame nach dem Toggle-Zurückschalten — mit dem Fix wäre der Test grün gewesen) · P9-94 ⬜ Portscan, V188 ⬜) | 2026-10-05 (Block 2026-10-04 aus dem Head verbatim hierher rotiert, per `scripts/rotate_session_block.sh`)
 ---
 
 # Phase 9 — Härtung
@@ -36,7 +36,7 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | doing | Fünfter Eimer „In Arbeit" (Lock **P9-V**, Kandidat (a)) — Voraussetzung für den Deploy `v3.1.0` | ✅ **live seit 2026-10-02** (`v3.1.0`, Gate 9/9) · Locks P9-V/W/X · 6 Tests, Gegenlauf 7 rot, Browser 11/11 · Release-Commit `v3.1.1` **2026-10-03** · Herleitung im L3-Archiv |
 | trace | Nachvollziehbarkeit: `assignee` sichtbar (UI + MCP, vom Client gefüllt, P9-Z) + `updated_by` + Git-Autor (P9-AA–AC); **zehnte P1-Contract-Öffnung** | 🟡 **code-complete 2026-10-02, seit 2026-10-03 live** (`v3.1.1`, Release `20261003T205843`, Gate 9/9) · Locks P9-Y–AD · **zehnte P1-Contract-Öffnung ohne Index-Schema-Sprung** ⇒ beim Deploy **kein** Neuaufbau (am Journal bestätigt) · 24 Tests, Browser 8/8 mit Zwei-Principalen-Instanz · Herleitung im L3-Archiv |
 | E (Extra) | **Buttons ans Schema** (B17): die Knöpfe mit eigenen Flächen auf die Standard-Tokens `--btn-std-*` umstellen | ✅ **gebaut 2026-10-02 (B17), seit 2026-10-03 live** · die Backlog-Liste war an zwei Stellen falsch (15 statt 1 Knopf auf der alten Flächenfamilie) · `.btn.action--caution` trägt jetzt **exakt** die Standardfläche, nur die Beschriftung ist rot · Kontrast **4,38:1** bleibt unter WCAG-AA — **Design-Entscheidung, deine** · Herleitung im L3-Archiv |
-| S | **Einstellungen als Fensterkette** + V118 eine Linie (Nikinger 2026-10-05) | ⬜ **geplant 2026-10-05**, nicht gebaut — `docs/concepts/phase9_hardening_block_settings_plan.md` (Locks P9-AE–AL, Abnahme P9-83–95). Darin auch D1 neu beschrieben (§4) und die P9-11-Portscan-Anleitung (§5) |
+| S | **Einstellungen als Fensterkette** + V118 eine Linie (Nikinger 2026-10-05) | 🟡 **gebaut 2026-10-05 (M3)**, Release `v3.1.3` steht, **nicht deployt** — `docs/concepts/phase9_hardening_block_settings_plan.md` (Locks P9-AE–AL, Abnahme P9-83–95) · **drei Overlays wurden eine Kette** (`#settings-overlay`, fünf Panels), **ein** Öffner (`settings.js` + `registerPanel`), Menüknöpfe tragen `.tree__folder` statt einer eigenen Optik · **zwei echte Befunde aus dem Browser, nicht aus dem Test**: der Schmal-Modus ließ bei offenem Detail **zwei** Panels stehen (zwei `:has()`-Regeln statt einer), und der „Zurück"-Knopf des Details war **nicht verdrahtet** (im breiten Modus unauffällig) · **V118 umgedreht**: der Test hieß `…_draw_two_lines` und heißt jetzt `test_a_tag_edge_beside_an_explicit_edge_draws_one_line`, Docstring mit beiden Lesarten und Datum · **Probe 39/39**, G1 → 4 rot, G2 → 2 rot, G3 → rot, **der Gegenlauf hat den eigenen Messaufbaum widerlegt** (er las den Frame *nach* dem Toggle-Zurückschalten) · `pytest` 1223 → 1233, `ui_budget` 5/5, Tabu-Diff leer · **P9-94 ⬜** (Portscan, Nikinger-Schritt) · Herleitung im L3-Archiv |
 | Gate/Z | Abnahme, Closeout | 🟡 **beide Doku-Hälften erledigt** (2026-10-02) · `ABNAHME_MATRIX.md` ist der **eine** Ort der Abnahme- und `[VERIFY]`-Bilanz, nicht diese Zeile · **[2026-10-04] beide Rotationen gefahren** (Block 17.780 B verbatim, Kette 6 von 7 Fäden) und diese Tabelle ins L3-Archiv gezogen ⇒ **der Head ist unter dem 40-KiB-Softcap** · **offen:** zweites Claude-Konto (P9-13/V150) · P9-15 ⬜ · Übersichtsgrafik §12.4 · Phase auf ✅ · Herleitung im L3-Archiv |
 
 ## Backlog (bewusst zurückgestellt, kein Phasen-Blocker)
@@ -95,176 +95,118 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückzuführen** — Nikinger-Anordnung 2026-09-24, so dokumentieren und nicht weiter
   untersuchen.
 
-## Session stopped — 2026-10-05 (dreiundzwanzigster Block: **die alte Adresse darf unbefristet schreiben — der Arbeitslaptop erreicht die neue nicht**; Produktcode-Touch im Übergangsfenster, **kein Deploy, kein Service-Touch**)
+## Session stopped — 2026-10-05 (vierundzwanzigster Block: **Block settings gebaut — die drei Overlays sind eine Fensterkette, und V118 hat jetzt eine Linie**; Release `v3.1.3` steht, **kein Deploy, kein Service-Touch**)
 
-**Ergebnis.** Neu ist `SPACE_UI_LEGACY_UNTIL=open` (über `local.env`: `LEGACY_UNTIL=open`): die alte
-Funnel-Adresse schreibt damit unbefristet. Der Warndialog dort kennt jetzt **drei** Zustände:
+**Ergebnis in einem Satz.** Drei eigenständige Overlays (`#account-dialog`,
+`#space-admin-dialog`, `#update-log-dialog`) sind **eine** Kette: ein Menü, daneben das gewählte
+Unterfenster, daneben bei Spaces das Detail; das Menü bleibt sichtbar und der Menüpunkt des offenen
+Fensters trägt denselben Auswahlzustand wie eine Baumzeile in der Rail. V118 zeigt **eine** Linie,
+weil die ausdrückliche Kante gewinnt. `pytest` **1223 → 1233**, `ui_budget` 5/5 (163,4 KB), Tabu-Diff
+§0.3 leer, Browser-Probe **39/39**.
 
-| Zustand | Titel | Knopf |
-|---|---|---|
-| unbefristet | „Es gibt eine neue Adresse" (*„… funktioniert bis auf Weiteres vollständig …"*) | „Hier weiterarbeiten" |
-| befristet | „Diese Adresse wird abgeschaltet" | „Trotzdem hier bleiben" |
-| abgelaufen | „Diese Adresse ist nur noch lesbar" | „Hier nur lesen" |
+**Abnahme.** P9-83 – P9-93 ✅, P9-95 ✅, **P9-94 ⬜** (der Portscan aus §5 des Mini-Plans — ein
+Schritt am MacBook des Nikingers, **durch keinen Test ersetzbar** und deshalb ⬜ statt ⚠️).
+`[VERIFY]`: V185/V186/V187 ✅, **V188 ⬜** (P9-27/D1 bleibt ⚠️, bis eine Quelle statt einer Erinnerung
+dasteht). Details je Zeile in `ABNAHME_MATRIX.md`, Herleitung im Mini-Plan §9.
 
-**Live ist noch nichts davon.** Solange der Nikinger nicht deployt, gilt weiter
-`LEGACY_UNTIL=2026-10-17`. Das Fenster schließt dann am 2026-10-18.
+### Zwei Zahlen, die mit wandern — der Wächter hat mich beim Schreiben darauf gestoßen
 
-**Anlass (Nikinger, 2026-10-05).** Der Arbeitslaptop erreicht `https://sharefyx.eurofyx.com/ui/`
-nicht. Er läuft unter Windows mit Firefox 158, hinter dem Firmen-VPN genua genuconnect, das sich nicht
-abschalten lässt. Die Fehlermeldung ist `NS_ERROR_NET_RESET` mit 0 B übertragen. Die alte Adresse
-geht von dort, die neue geht vom MacBook.
-**Von der Heim-VM gemessen:**
-- A `217.160.128.146` über 1.1.1.1 und 8.8.8.8, **kein** AAAA
-- TLSv1.3, Let's-Encrypt-Zertifikat `YE1`, `ssl_verify_result=0`
-- `GET /ui/` → `303` über HTTP/2 und HTTP/1.1
+Der Zahlen-Wächter verlangt, dass der neueste Block **beide** benennt: die gemessene **gestrichene
+Masse 229 B** (die im L3-Archiv liegt, nicht im Modulstatus) und den Grund, warum sie kein Hebel
+ist. Der Block vom 2026-10-04 hatte beides; ein neuer Block ohne diese Zeile wäre stillschweigend
+weniger gewesen, und der Wächter hätte **zu Recht** gemeldet. **Der Head liegt bei 22.196 B** —
+unter dem 40-KiB-Softcap, zum ersten Mal seit dem Phasenstart (am 2026-10-04 durch die Rotation des
+Modulstatus ins L3-Archiv). Beide Zahlen stehen hier, damit der nächste Block sie nicht verliert.
 
-**Vermutung, nicht belegt:** ein SNI-basierter Filter im Firmennetz gegen neu registrierte Domains.
-`eurofyx.com` ist registriert seit 2026-10-01; `*.ts.net` ist dagegen kategorisiert. Der Caddy-Log auf
-dem VPS wurde **nicht** gelesen, weil der VPS-Hostkey nicht in `known_hosts` steht und ich ihn nicht
-ungefragt annehme.
+### Die zwei Befunde, die aus dem **Browser** kamen und aus den Tests nicht
 
-**Diagnose für den Arbeitslaptop** (PowerShell, `curl.exe`, **nicht** `curl` — das ist dort
-`Invoke-WebRequest`):
+1. **Der Schmal-Modus ließ zwei Panels stehen.** Die erste CSS-Fassung blendete nur das Menü aus.
+   Bei offenem Space-Detail blieben die Spaces-Liste *und* das Detail nebeneinander sichtbar —
+   genau die zwei, die P9-AI verbietet. Die Regel braucht **zwei** `:has()`-Regeln, nicht eine:
+   „welches Panel ist das rechteste" steht im Zustand (`hidden`), nicht im Markup, weil das Menü im
+   DOM zuerst steht. Wächter prüft die Form, die Probe die Wirkung.
+2. **Der „Zurück"-Knopf des Details war tot.** `settings.js` verdrahtete ihn nur für die Stufen 2.
+   Im breiten Modus fällt das nicht auf, weil ESC und „Schließen" denselben Weg nehmen — im
+   **Schmal**-Modus ist das Detail das einzige Panel, also war sein „Zurück" der einzige Weg
+   zurück. Wächter: `test_every_stage_has_a_wired_back_button`, der ausdrücklich prüft, dass die
+   Ausnahme **nur** das Menü betrifft.
 
-```powershell
-Resolve-DnsName sharefyx.eurofyx.com                      # erwartet 217.160.128.146
-Test-NetConnection 217.160.128.146 -Port 443              # TcpTestSucceeded?
-curl.exe -v --resolve sharefyx.eurofyx.com:443:217.160.128.146 https://sharefyx.eurofyx.com/health
-curl.exe -vk --resolve example.org:443:217.160.128.146 https://example.org/   # gleiche IP, anderer SNI
-netsh winhttp show proxy
-curl.exe -v https://www.google.com 2>&1 | findstr /i "issuer"   # Firmen-CA = TLS-Inspektion
-```
+### Der Gegenlauf hat den eigenen Messaufbaum widerlegt — zum zweiten Mal in Phase 9
 
-Lesart:
+`graph_reload_probe.mjs` las für V118 den Frame **nach** dem Zurückschalten des Tag-Toggles, also
+einen, in dem die Zwillingskante nicht mehr existiert. **Mit dem Fix aus wäre der Test grün
+gewesen.** Behoben auf zwei Ebenen: der Shim führt jetzt `frames` (`clearRect()` ist die echte
+Frame-Grenze, nicht ein Slice mit geratener Länge), und die Frames werden **vor** dem
+Toggle-Zurückschalten gesichert. Das ist dieselbe Fehlerklasse wie der am 2026-10-02
+eingecheckte Gegenlauf-Beleg: die Messung lief, aber an der falschen Stelle — und diesmal hat sie
+sich selbst widerlegt, bevor sie jemand anders ertappt.
 
-| Befund | Bedeutung |
-|---|---|
-| Probe 3 mit Reset, Probe 4 mit TLS-Alert von Caddy | Filter auf den Hostnamen (SNI) |
-| beide mit Reset | IP oder Hoster gesperrt |
-| Resolve liefert eine andere IP | Firmen-DNS lenkt die Domain um |
+### Ein Öffner statt drei Listener (nicht im Plan, beim Bauen gefunden)
 
-Parallel kann der Nikinger auf dem VPS `journalctl -u caddy -f` laufen lassen, während der Laptop
-probt. Erscheint **keine** Zeile, sitzt die Sperre davor. **Lösung:** IT-Ticket, Domain freigeben bzw.
-kategorisieren lassen. **Nicht** umgehen.
+Beim Umbau hingen **zwei** `click`-Listener auf `#account-manage-spaces`: `app.js` öffnete
+`openSpaceAdminDialog()`, `settings.js` schaltete um — der Knopf hätte sich **nie** geschlossen.
+Jetzt hört nur `settings.js` zu, und die drei Eigentümer (`dialogs.js`, `spaces.js`, `updates.js`)
+liefern ihren Zustands-Reset über `registerPanel(name, prepare)`. Die Lehre ist nicht „kein
+Doppel-Listener", sondern **es gibt genau einen Öffner**; Wächter
+`test_only_one_module_opens_a_panel`.
 
-**[2026-10-05, später — Laptop-Messung; die Vermutung oben ist korrigiert]** Der Laptop hat **keinen
-direkten Internetzugang**, nur einen Firmen-Proxy (Nikinger). Gemessen hat er:
-- DNS liefert `217.160.128.146`, also korrekt
-- `Test-NetConnection :443` → Timeout
-- beide `curl.exe --resolve`-Proben → Timeout nach 21 s, **mit und ohne** richtigen SNI
+### Wächter, die umgeschrieben statt gelöscht wurden
 
-Das ist **kein SNI-Filter beim Direktweg**. Der Direktweg existiert gar nicht. Firefox läuft über den
-Proxy, und **der Proxy** setzt die Verbindung zur neuen Domain zurück (`NS_ERROR_NET_RESET`). Die
-alte `*.ts.net`-Adresse lässt er durch. Die Diagnose-Tabelle oben ist für diesen Laptop
-gegenstandslos. **Lösung:** IT-Ticket, den Host auf der Proxy-Freigabeliste. Mit
-`Invoke-WebRequest … -UseBasicParsing -ProxyUseDefaultCredentials` sieht man die Antwort des Proxys,
-ohne seine Adresse zu nennen.
+- `test_app_html_has_a_live_manage_spaces_entry`: die Chevron-Assertion entfällt (es gibt kein
+  Chevron mehr), `disabled` und `Phase 7` bleiben wörtlich.
+- `test_account_nav_and_standard_button_wear_the_rail_selection_look` trägt jetzt nur noch die
+  `.btn`-Hälfte; die Formregel steht in `test_account_nav_stays_layout_only_on_the_legacy_dialog`,
+  das zusätzlich prüft, dass `.account-nav` **genau einen** Träger hat.
+- `test_a_tag_edge_and_an_explicit_edge_draw_two_lines` → **umgedreht und umbenannt** zu
+  `test_a_tag_edge_beside_an_explicit_edge_draws_one_line`, Docstring mit **beiden** Lesarten und
+  Datum. Ein Testname, der das Gegenteil behauptet, wäre eine Lüge.
+- **Drei 1024er-Wächter** lasen die 1024er Media-Query als *ersten* Treffer. Seit diesem Block gibt
+  es **zwei** (der Schmal-Modus der Kette), und die drei wurden sofort rot, ohne dass sich am
+  Shell-Grid etwas geändert hätte. Die Reparatur ist nicht „die Reihenfolge der Blöcke", sondern
+  `_media_query_bodies()`: **alle** Blöcke sammeln und in der Gesamtheit suchen. Eine Breite ist
+  eine Bedingung, keine Eigenschaft genau eines Blocks.
+- Der Zahlen-Wächter hat **meine eigenen** neuen Gegenlauf-Dateien rot gemeldet, weil sie unter dem
+  Erfolgsnamen lagen. Der Dateiname folgt jetzt **dem Ergebnis**: ein roter Lauf landet in
+  `*_gegenprobe*.json` (`test_committed_probe_evidence.py` verlangt das Suffix am **Ende** — die
+  erste Fassung setzte es davor und blieb rot).
 
-**Warum so gebaut.**
-- **Wort `open` statt Datum 2099.** Ein Fantasiedatum hätte im Dialog gestanden, als
-  Abschalttermin, den niemand beschlossen hat.
-- **Fail-closed bleibt erhalten.** Nur das exakte Wort öffnet das Fenster. Leer oder halb gesetzt ist
-  weiter ein Startfehler; `OPEN` wird abgelehnt, getestet.
-- **Intern `date.max`.** Damit bleiben `legacy_writable()` und `origin_allowed()` **byte-identisch**:
-  die CSRF-Prüfung ist nicht angefasst. `None` im Dataclass als „offen" zu deuten, hätte genau diesen
-  Pfad fail-open gemacht.
-- **`/api/v1/meta` meldet `until: null` bei `writable: true`.** Der Dialog liest das als
-  „unbefristet", deshalb erscheint nie „31.12.9999".
-- **Tabu-Liste §0.3 nicht berührt.** Geändert sind `mcpserver/config.py` (nicht `permissions.py` oder
-  `server.py`), `webui/api.py`, `app.js` und `app.html`.
+### Zwei eigene Fehler in derselben Stunde, beide beim Messen
 
-**Belege.**
-- `pytest` **1217 → 1223**: 6 neue Fälle in `test_legacy_window.py` (open wird geparst · `OPEN` und
-  halb gesetztes `open` abgelehnt · 2030 schreibbar, fremde Origin weiter 403 · `meta` ohne Datum ·
-  Verdrahtung von Titel, Text und Knopf)
-- `ui_budget` 5/5 (165,5 KB)
-- `node --check` grün
-- Wächter (c) aus `test_acceptance_numbers.py`: die gestrichene Masse beträgt unverändert **229 B**
-- Wächter (c) aus `test_acceptance_numbers.py`: die gestrichene Masse beträgt unverändert **229 B**
-- **Browser-Probe `p9a_legacy_probe.py` 24/24**, jetzt mit drei Läufen gegen die Wegwerf-Instanz
-  auf Port 18775, gestoppt über die PID-Datei; Bild: `docs/screenshots/p9a_legacy_unbefristet.png`,
-  angesehen
+- Die erste Fassung der Regel-Lesemaschine `re.escape(condition)` auf einen bereits regexartigen
+  String ⇒ **null Treffer** ohne Fehlermeldung; die drei Wächter blieben rot „ohne Grund".
+- S7 der Probe wartete eine **feste** Sekundenzahl. Der Wegwerf-Harness sammelt Spaces über die
+  Läufe, und `/api/v1/overview` kostet **linear mit deren Zahl** — der P9-15-Befund vom 2026-10-03,
+  unerwartet wiederbelebt. Bei acht Spaces 2,1 s statt 1,5 s. Jetzt wird auf die **Bedingung**
+  gewartet (`warte_bis`), nicht auf eine Uhr.
 
-**Nächster Schritt (Nikinger, vor dem 2026-10-18) — Release `v3.1.2`.** Release-Commit mit
-Versionsmarke und `UPDATE_LOG`-Eintrag `## 2026-10-05`.
+### Belege
 
-**Reihenfolge, und warum sie zwingend ist:** **erst** deployen, **dann** `LEGACY_UNTIL=open`. Zwei
-Gründe:
-- `install_units.sh` schreibt den Wert in die Unit.
-- `deploy.sh` rollt bei rotem Gate auf `v3.1.1` zurück, und `v3.1.1` kennt `open` nicht: der
-  Parser bricht ab, der Dienst startet nicht.
+- `pytest` **1223 → 1233** (**10** neue: 9 in `test_settings_chain.py` + 1 neue
+  `test_account_nav_stays_layout_only_on_the_legacy_dialog`; 1 Test umgedreht, 3 umgeschrieben); `ui_budget` **5/5** (163,4 KB, `js/settings.js` 3,0 KB gzip); `node --check` grün
+- **Tabu-Diff §0.3 leer** — auch `api.py`, `security.py` und `phase4_auth/` unberührt, der Block ist
+  reines Frontend. Keine API-Route wurde angefasst, die Routen sind byte-identisch
+- Browser-Probe `p9_settings_chain_probe.py` **39/39** gegen die TLS-Wegwerf-Instanz auf 18775,
+  gestoppt über die PID-Datei. **Gegenläufe:** G1 (aria-current stumm) → **4 rot** · G2
+  (`closeRightmost` schließt alles) → **2 rot** · G3 (implizite Kante nicht verworfen) → **rot**.
+  Die statischen Wächter bleiben bei G1 **grün** — genau die Arbeitsteilung, die der Docstring der
+  Testdatei begründet: statisch die *Ursache*, im Browser die *Wirkung*.
+- **Bilder angesehen**, nicht nur geschossen: `p9_settings_01…04` (1440 px) und `05` (1024 px). Das
+  Menü misst **202 px** bei `min-width: 0` — der Grund für „viel breiter als nötig" ist weg; die
+  Feldreihenfolge mit TOTP **zuletzt** ist im Bild bestätigt; bei 1024 px ist genau ein Panel da.
+- **Die Gegenlauf-Bilder sind gelöscht, nicht eingecheckt.** Sie hießen `p9_settings_g1*`/`g2*` und
+  lagen im selben Verzeichnis wie die Erfolgsbelege — der Fehler, den der trace-Block am 2026-10-02
+  gemacht hat, wäre sonst wiederholt worden. Die **JSON**-Gegenläufe sind rot eingecheckt
+  (`*_g1_gegenprobe.json`, `*_g2_gegenprobe.json`), denn rot gehört dokumentiert.
 
-Mit dieser Reihenfolge ist jeder Zwischenzustand lauffähig.
+### Offen, in dieser Reihenfolge
 
-1. Deploy mit dem Kommando aus dem P8-Archiv und den Pfaden aus `local.env`, danach
-   `health_gate.sh --expected-version=v3.1.2 --require-todays-update-log --expected-sha=<sha>`.
-2. `sed -i 's/^LEGACY_UNTIL=.*/LEGACY_UNTIL=open/' phase3_edge/local.env`
-3. `sudo phase3_edge/scripts/install_units.sh` macht nur `daemon-reload` + `enable --now`, also
-   **kein** Neustart. Danach `sudo systemctl restart sharefyx-mcp`.
-4. Gate erneut laufen lassen, dann auf der alten Adresse den Dialog „Es gibt eine neue Adresse"
-   sehen.
-
-**Deploy an einem anderen Tag:** das Update-Log-Gate verlangt einen Eintrag vom selben Tag. Dann
-entweder einen neuen `## <Datum>`-Block oder `SHAREFYX_ALLOW_STALE_UPDATELOG=1` setzen und
-`--require-todays-update-log` weglassen.
-
-**Nikinger-Angabe zum Proxy:** er sperrt nur einzelne Seiten (Beispiel Bybit), es ist **keine**
-Allowlist. Bei einer neu registrierten Domain spricht das für eine Kategorie- bzw. NRD-Sperre. Die
-verfällt bei verbreiteten Produkten typischerweise nach etwa 30 Tagen, für `eurofyx.com` also etwa
-Anfang November. Das ist **aus dem Gedächtnis**, nicht nachgelesen, und das Produkt ist unbekannt.
-Ein Ticket beschleunigt es.
-
-**Notlösung ohne Release:** nur `LEGACY_UNTIL` auf ein späteres Datum setzen und Schritte 3–4
-ausführen; der Dialog nennt dann dieses Datum. **Wann zurück auf ein Datum:** erst wenn der
-Arbeitslaptop die neue Adresse belegt erreicht.
-
-### Nachtrag 2026-10-05 — `v3.1.2` ist live, und das Fenster ist offen
-
-**Deploy durch den Nikinger:**
-- Release `/opt/sharefyx/releases/20261005T101727.915085Z`, SHA `f4ef319`, vorher `20261003T205843`
-- Release-`pytest` 1223
-- `health_gate.sh --expected-version=v3.1.2 --require-todays-update-log --expected-sha=f4ef319` → `"result":"ok"`
-- danach `LEGACY_UNTIL=open`, `install_units.sh`, Restart (aktiv seit 12:23:13 CEST); Gate erneut `ok`
-
-**Read-only gegengeprüft:**
-- die installierte Unit trägt `SPACE_UI_LEGACY_UNTIL=open`
-- `/proc/<MainPID>/environ` des laufenden Prozesses trägt `open` ebenso
-- `/ui/login` antwortet auf **beiden** Adressen mit `200`
-
-**Nicht gegengeprüft:** Dialog und Schreib-POST auf der alten Adresse mit echter Sitzung. Das ist
-die Sichtprüfung des Nikingers. Die Wegwerf-Probe (24/24) deckt denselben Code ab.
-
-### Nachtrag 2026-10-05 — drei Antworten und ein geplanter Block
-
-Der Nikinger hat drei offene Fragen beantwortet:
-- **V118 / P9-36 → eine Linie**, die explizite Kante gewinnt.
-- **Vorsicht-Kontrast → bleibt so.**
-- **D1 → neu beschrieben:** ESC schließt das Item, und macOS beendet dabei zusätzlich das native
-  Vollbild.
-
-Dazu wünscht er einen Umbau des Einstellungs-Menüs. **Alles geplant, nichts gebaut:**
-`docs/concepts/phase9_hardening_block_settings_plan.md`. Der P9-11-Portscan ist dort in §5 für den
-Nikinger aufgeschrieben (MacBook, Hotspot, vier Ziele).
-
-### Nachtrag 2026-10-05 — Vision-Timeouts über MCP: opencode wartet nur 5 s
-
-**Befund (Nikinger):** `local_vision` über MCP läuft oft in einen Timeout, als Skript direkt
-aufgerufen fast nie.
-
-**Ursache, gemessen:**
-- opencode setzt für MCP-Anfragen ohne eigenes `timeout` **5000 ms**. Das sagt das Config-Schema
-  (`https://opencode.ai/config.json`, `McpLocalConfig.timeout`) wörtlich.
-- `~/.config/opencode/opencode.jsonc` setzte für `local_vision` keins.
-- Zwei echte Aufrufe über den MCP-Server (stdio, dasselbe Bild): **kalt 15,9 s** (Modell lädt auf
-  die GPU), **warm 1,2 s**. Daher „oft": nur der erste Aufruf nach einer Pause reißt die 5 s.
-- Das Skript direkt hat kein äußeres Limit, nur das innere `DEFAULT_TIMEOUT_S = 600`.
-
-**Behoben:** `"timeout": 600000` am Eintrag `local_vision`, gleich dem inneren Limit, mit Kommentar.
-Die Datei liegt **außerhalb des Repos**; hier steht deshalb der Befund. **Wirksam erst nach einem
-Neustart von opencode.** MCP bleibt der Standardweg, der Skript-Umweg ist nicht mehr nötig.
-
-**Dazu die Nikinger-Antworten zum settings-Plan:**
-- V185: die Knöpfe sehen aus wie die Baumzeile „Offen", nicht wie „Verschieben"
-- P9-AI bestätigt
-- D1/P9-27 wird V188 — belegen, dass es macOS-Verhalten ist, kein Code
-- **Gebaut wird von M3.**
+1. **Deploy `v3.1.3`** (Nikinger). Badge und `## 2026-10-05`-Block stehen. Das `deploy.sh`-Gate
+   verlangt einen Datumsblock am Deploy-Tag — bei einem späteren Deploy `SHAREFYX_ALLOW_STALE_
+   UPDATELOG=1` oder einen neuen `##`-Block. **Kein Index-Neuaufbau** zu erwarten: der Block fasst
+   keine Contract-Datei an.
+2. **P9-94 / P9-11** — der Portscan, Anleitung Mini-Plan §5 (MacBook, Handy-Hotspot, vier Ziele).
+3. **V188** — eine Quelle, kein Code: das Beenden des macOS-Vollbilds per ESC ist
+   Betriebssystem-/Browser-Verhalten. Der Keyboard-Lock-Weg steht in der Matrix ausdrücklich als
+   *aus dem Gedächtnis, nicht nachgelesen*.
+4. **P9-15 ⬜** (drei Läufe `/api/v1/overview` mit echter Sitzung) — unverändert, gehört an einen
+   Deploy-Tag mit `health_gate.sh`.

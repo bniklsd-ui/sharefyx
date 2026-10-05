@@ -1,5 +1,5 @@
 ---
-status: live
+status: closed
 purpose: "Mini-Plan P9 Block settings + Restposten — Einstellungen als Fensterkette (Menü → Unterfenster → Space-Detail), Passwort-Reihenfolge, V118 auf eine Linie, D1 neu beschrieben, P9-11 Portscan-Anleitung, Phasenabschluss. Locks P9-AE–P9-AL, Abnahme P9-83–P9-95, [VERIFY] V185–V188"
 read-when: Bau des settings-Blocks, P9-11-Portscan, oder P9-Closeout nach dem 2026-10-05
 detail: L2
@@ -7,7 +7,7 @@ up: ../../phase9_hardening/CLAUDE.md
 down:
   - ./phase9_hardening_plan.md               # 📕 übergeordneter P9-Plan; §12.4 Übersichtsgrafik, P9-11, P9-27, P9-36
   - ./phase9_hardening_block_trace_plan.md   # 📕 Formvorlage dieses Mini-Plans
-updated: 2026-10-05 (geschrieben, Claude Code, nach dem Deploy `v3.1.2`; Wünsche und Entscheidungen des Nikingers vom selben Tag)
+updated: 2026-10-05 (**gebaut, opencode/M3 — §9 gefüllt**; Release `v3.1.3` steht, nicht deployt; Probe 39/39, G1/G2/G3 rot, `pytest` 1223 → 1233 · **zwei Code-Befunde kamen aus dem Browser, nicht aus den Tests**, vier Punkte gegen den Plan abweichend begründet) | 2026-10-05 (geschrieben, Claude Code, nach dem Deploy `v3.1.2`; Wünsche und Entscheidungen des Nikingers vom selben Tag)
 ---
 
 # Phase 9 — Block settings und die Restposten bis zum Closeout
@@ -243,4 +243,66 @@ Befund. V162 B bekommt einen Vermerk.
 
 ## §9 Ergebnis
 
-*(leer bis zum Bau)*
+**Gebaut am 2026-10-05 (opencode/M3), Release `v3.1.3` steht, nicht deployt.** P9-83 – P9-93 ✅,
+P9-95 ✅, **P9-94 ⬜** (Portscan — Nikinger-Schritt, §5). `pytest` **1223 → 1233**, `ui_budget` 5/5
+(163,4 KB), Tabu-Diff §0.3 leer, Browser-Probe **39/39** gegen die TLS-Wegwerf-Instanz auf 18775,
+Gegenläufe **G1 → 4 rot · G2 → 2 rot · G3 → rot**.
+
+### Was gegen den Plan anders gebaut wurde — vier Punkte, jeder mit Grund
+
+1. **V118 wird in `rebuildImplicitEdges()` gefiltert, nicht in `drawEdges()`** (Plan §3 Schritt 4
+   sagte es bereits so — hier bestätigt). Der Grund ist im Docstring von `graph.js` und im
+   `graph_reload_probe.mjs` festgehalten: die Gradzählung läuft über
+   `explicitEdges.concat(implicitEdges)` und `drawNodes()` skaliert den Radius danach. Ein Filter
+   erst beim Zeichnen hätte das Bild richtig und die Zählung falsch gelassen.
+2. **Ein Öffner statt drei Listener** (nicht im Plan). Beim Bauen hingen **zwei** `click`-Listener
+   auf `#account-manage-spaces`: `app.js` öffnete, `settings.js` schaltete um. Der Knopf hätte sich
+   nie geschlossen. Jetzt hört nur `settings.js` zu, und die drei Eigentümer liefern ihren
+   Zustands-Reset über `registerPanel(name, prepare)`. Wächter:
+   `test_only_one_module_opens_a_panel`.
+3. **„Zurück" ist in JEDER Stufe verdrahtet, auch in Stufe 3.** Im Plan steht der Knopf nur beim
+   Schmal-Modus; die erste Fassung nahm `space-detail` aus der Verdrahtung aus, und die Browser-Probe
+   S8 meldete ihn als **toten** Knopf — im Schmal-Modus ist das Detail das einzige Panel, also war
+   der Knopf der einzige Weg zurück. Wächter: `test_every_stage_has_a_wired_back_button`.
+4. **Der Schmal-Modus braucht Zwei `:has()`-Regeln, nicht eine** (nicht im Plan). Die erste Fassung
+   blendete nur das Menü aus; bei offenem Detail blieben Spaces-Liste **und** Detail stehen — genau
+   die zwei Panels, die P9-AI verbietet. „Welches Panel ist das rechteste" steht im Zustand
+   (`hidden`), nicht im Markup, weil das Menü im DOM zuerst steht.
+
+### V186 — die Antwort auf eine Frage, deren Antwort im Plan schon falsch stand
+
+Das Update-Banner öffnet das Log **nicht**: es trägt nur „Verstanden" (`#update-banner-dismiss`).
+Plan §3 Schritt 1 sprach von einem „Alle Updates ansehen" — eine Annahme über ein Bedienelement,
+das es nicht gibt. Der einzige Weg ins Log ist der Menüpunkt.
+
+### Zwei eigene Fehler, die die Wächter erst beim Bauen gefunden haben
+
+- **Der Gegenlauf hat den eigenen Messaufbaum widerlegt** (G3). `graph_reload_probe.mjs` las den
+  Frame **nach** dem Zurückschalten des Tag-Toggles — also einen, in dem die Zwillingskante nicht
+  mehr existiert. Der Test wäre mit dem Filter **aus** grün gewesen. Behoben durch
+  `frames` im Shim (`clearRect()` ist die echte Frame-Grenze) und durch das Sichern der Frames
+  **vor** dem Toggle-Zurückschalten. Das ist dieselbe Fehlerklasse wie der 2026-10-02 eingecheckte
+  Gegenlauf-Beleg: die Messung lief, aber an der falschen Stelle.
+- **Der Schmal-Modus-Test prüfte eine Breite, die von der Antwort abhing.** `strokes.slice(-2)` →
+  `slice(-1)`: die Schnittlänge war die *erwartete* Anzahl Linien. Jetzt wird der Frame gelesen,
+  nicht geraten.
+
+### Wächter, die umgeschrieben statt gelöscht wurden
+
+`test_app_html_has_a_live_manage_spaces_entry` (Chevron-Assertion entfällt, `disabled`/`Phase 7`
+bleiben wörtlich) · `test_account_nav_and_standard_button_wear_the_rail_selection_look` (jetzt nur
+noch die `.btn`-Hälfte) · `test_account_nav_stays_layout_only_on_the_legacy_dialog` (neu, prüft
+zusätzlich „genau ein Träger") · `test_1024_breakpoint_has_single_row_no_map` und zwei Nachbarn
+(die 1024er Media-Query wird jetzt **alle** gelesen, nicht die erste — es gibt seit diesem Block
+**zwei**).
+
+### Offen
+
+- **P9-94 / P9-11** — der Portscan (§5). Vier Läufe vom MacBook, Handy-Hotspot. **Von keinem
+  Test ersetzbar** und deshalb ⬜, nicht ⚠️.
+- **V188** — das Beenden des macOS-Vollbilds per ESC belegen. **Kein Code.** Der Keyboard-Lock-Weg
+  steht in der Matrix als *aus dem Gedächtnis, nicht nachgelesen*; P9-27/D1 bleibt ⚠️, bis eine
+  Quelle vorliegt.
+- **Deploy `v3.1.3`** — Badge und `## 2026-10-05`-Block stehen. `deploy.sh` verlangt einen
+  Datums-Block am Deploy-Tag; dieser Eintrag ist vom 2026-10-05, ein späterer Deploy braucht
+  `SHAREFYX_ALLOW_STALE_UPDATELOG=1` oder einen neuen Block.
