@@ -7,8 +7,10 @@ zeigt auf eine **andere** Adresse (die „neue"), und die Adresse, unter der der
 Instanz aufruft, ist als `SPACE_UI_LEGACY_ORIGIN` konfiguriert. Damit ist der Browser exakt in
 der Lage eines Nutzers, der nach A7 noch das alte Lesezeichen benutzt.
 
-Zwei Läufe, je ein Neustart der Wegwerf-Instanz (über die PID-Datei, Hard Rule 9):
+Drei Läufe, je ein Neustart der Wegwerf-Instanz (über die PID-Datei, Hard Rule 9):
 
+  unbefristet LEGACY_UNTIL = open         → Dialog „bis auf Weiteres", kein Datum, Schreiben 201
+                                            (2026-10-05, Firmen-VPN erreicht die neue Adresse nicht)
   offen       LEGACY_UNTIL = heute + 14   → Dialog „bis einschließlich …", Schreiben 201
   abgelaufen  LEGACY_UNTIL = gestern      → Dialog „nur noch lesbar", Schreiben 403
 
@@ -49,13 +51,13 @@ def pruefe(name: str, ok: bool, detail: str = "") -> None:
     print(f"[{'OK  ' if ok else 'FAIL'}] {name}  {detail}")
 
 
-def _run_instance(until: datetime.date) -> None:
+def _run_instance(until: str) -> None:
     """Start über das Wegwerf-Skript als Subprozess der Projekt-venv (dort liegen die
     authserver-Abhängigkeiten), mit den zwei gedrehten Variablen in der Umgebung."""
     env = os.environ.copy()
     env.update({
         "SPACE_UI_LEGACY_ORIGIN": wegwerf.BASE_URL,
-        "SPACE_UI_LEGACY_UNTIL": until.isoformat(),
+        "SPACE_UI_LEGACY_UNTIL": until,
         "P9A_PUBLIC_BASE_URL": NEW_URL,
     })
     code = (
@@ -73,7 +75,7 @@ def _stop() -> None:
                    cwd=REPO_ROOT, check=True)
 
 
-def _probe(pw, label: str, *, writable: bool, until: datetime.date) -> None:
+def _probe(pw, label: str, *, writable: bool, want: str) -> None:
     creds = json.loads(wegwerf.CREDS_FILE.read_text())
     base = wegwerf.BASE_URL
     browser = pw.chromium.launch()
@@ -84,7 +86,6 @@ def _probe(pw, label: str, *, writable: bool, until: datetime.date) -> None:
     dialog = page.locator("#legacy-host-dialog")
     pruefe(f"{label}: Dialog beim Laden sichtbar", dialog.is_visible())
     text = page.locator("#legacy-host-text").inner_text()
-    want = until.strftime("%d.%m.%Y") if writable else "nur noch lesbar"
     pruefe(f"{label}: Text passt", want in text and NEW_URL in text, repr(text))
     href = page.locator("#legacy-host-link").get_attribute("href")
     pruefe(f"{label}: Link zeigt auf die neue Adresse", href == f"{NEW_URL}/ui/", repr(href))
@@ -109,13 +110,15 @@ def _probe(pw, label: str, *, writable: bool, until: datetime.date) -> None:
 def main() -> int:
     today = datetime.date.today()
     with sync_playwright() as pw:
-        for label, writable, until in (
-            ("offen", True, today + datetime.timedelta(days=14)),
-            ("abgelaufen", False, today - datetime.timedelta(days=1)),
+        offen = today + datetime.timedelta(days=14)
+        for label, writable, until, want in (
+            ("unbefristet", True, "open", "bis auf Weiteres"),
+            ("offen", True, offen.isoformat(), offen.strftime("%d.%m.%Y")),
+            ("abgelaufen", False, (today - datetime.timedelta(days=1)).isoformat(), "nur noch über"),
         ):
             _run_instance(until)
             try:
-                _probe(pw, label, writable=writable, until=until)
+                _probe(pw, label, writable=writable, want=want)
             finally:
                 _stop()
     failed = [r for r in RESULTS if not r[1]]

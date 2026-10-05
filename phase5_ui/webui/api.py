@@ -394,7 +394,9 @@ def api_routes(
                 "canonical_url": settings.base_url,
                 "legacy": None if settings.legacy_origin is None else {
                     "origin": settings.legacy_origin,
-                    "until": settings.legacy_until.isoformat() if settings.legacy_until else None,
+                    # `date.max` = unbefristet (`LEGACY_UNTIL=open`, 2026-10-05): kein Datum.
+                    "until": settings.legacy_until.isoformat()
+                    if settings.legacy_until and settings.legacy_until != date.max else None,
                     "writable": settings.legacy_writable(),
                 },
             },

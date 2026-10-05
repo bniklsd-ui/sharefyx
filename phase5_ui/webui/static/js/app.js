@@ -208,12 +208,27 @@ function initShell() {
   function showLegacyHostDialog(meta) {
     var legacy = meta.legacy;
     if (!legacy || location.origin !== legacy.origin) return;
-    var text = legacy.writable
-      ? "Bitte ab sofort " + meta.canonical_url + " verwenden. Hier funktioniert bis einschließlich "
-        + formatGermanDate(legacy.until) + " noch alles, danach nur noch Lesen."
-      : "Diese Adresse ist nur noch lesbar — Änderungen gehen nur noch über "
-        + meta.canonical_url + ".";
+    // Drei Zustände: unbefristet (`until` null, 2026-10-05), befristet, abgelaufen.
+    var title, text, stay;
+    if (legacy.writable && !legacy.until) {
+      title = "Es gibt eine neue Adresse";
+      text = "Die neue Adresse ist " + meta.canonical_url + ". Falls dein Netz sie noch nicht "
+        + "erreicht (z. B. Firmen-VPN), arbeite einfach hier weiter: diese Adresse funktioniert "
+        + "bis auf Weiteres vollständig, Lesen und Schreiben. Ein Abschalttermin wird vorher angekündigt.";
+      stay = "Hier weiterarbeiten";
+    } else if (legacy.writable) {
+      title = "Diese Adresse wird abgeschaltet";
+      text = "Bitte ab sofort " + meta.canonical_url + " verwenden. Hier funktioniert bis einschließlich "
+        + formatGermanDate(legacy.until) + " noch alles, danach nur noch Lesen.";
+      stay = "Trotzdem hier bleiben";
+    } else {
+      title = "Diese Adresse ist nur noch lesbar";
+      text = "Änderungen gehen nur noch über " + meta.canonical_url + ".";
+      stay = "Hier nur lesen";
+    }
+    document.getElementById("legacy-host-title").textContent = title;
     document.getElementById("legacy-host-text").textContent = text;
+    document.getElementById("legacy-host-close").textContent = stay;
     document.getElementById("legacy-host-link").href = meta.canonical_url + "/ui/";
     legacyHostDialogEl.hidden = false;
   }

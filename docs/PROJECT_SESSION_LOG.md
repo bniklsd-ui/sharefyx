@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Wurzel-CLAUDE.md-Historie — der aktuelle Curr
 detail: L3
 up: ../CLAUDE.md
 down:
-updated: 2026-10-04 (**24 Blöcke der Wurzel-`CLAUDE.md` §Current state verbatim hierher**, per `scripts/rotate_root_current_state.sh` K=1; KEEP ist der **neueste** Block, weil die Wurzel newest-**first** ist — im Phase-Head ist es umgekehrt, und die erste Fassung des Skripts hat den ältesten behalten; **sechs Gegenproben**, darunter die byteweise Reassemblierung und die Nachlese jedes Blocks, **221.957 B vorher == 221.957 B nachher**) | 2026-09-10 (P8.6 Step 0 Haushalt-Block aus Wurzel-`CLAUDE.md` §Current state rotiert — Migration-Vorbereitungs-Block brauchte Platz im Wurzel-Head, deshalb der Vorgänger nach hier verschoben; Project-Pattern: jeder neue Current-state-Eintrag rotiert den bisherigen verbatim hierher)
+updated: 2026-10-05 (2 Blöcke der Wurzel verbatim hierher rotiert — der Block vom 2026-10-04 und die datierte Namenskorrektur —, per `scripts/rotate_root_current_state.sh`; die stehende Rotationsregel lebt jetzt als Präambel vor dem ersten Block, damit sie nicht mitrotiert) | 2026-10-04 (**24 Blöcke der Wurzel-`CLAUDE.md` §Current state verbatim hierher**, per `scripts/rotate_root_current_state.sh` K=1; KEEP ist der **neueste** Block, weil die Wurzel newest-**first** ist — im Phase-Head ist es umgekehrt, und die erste Fassung des Skripts hat den ältesten behalten; **sechs Gegenproben**, darunter die byteweise Reassemblierung und die Nachlese jedes Blocks, **221.957 B vorher == 221.957 B nachher**) | 2026-09-10 (P8.6 Step 0 Haushalt-Block aus Wurzel-`CLAUDE.md` §Current state rotiert — Migration-Vorbereitungs-Block brauchte Platz im Wurzel-Head, deshalb der Vorgänger nach hier verschoben; Project-Pattern: jeder neue Current-state-Eintrag rotiert den bisherigen verbatim hierher)
 ---
 
 
@@ -46,6 +46,84 @@ Newest-first, genau wie sie im Kopf standen:
 26. 2026-09-04 (Phase 8.5 Drift nachgezogen `4424310` + A1 committet `499d9be` -- Picker-Modus-Umschalter + `localStorage` `sfx:linkpicker:mode`; V99 `session` zu `local` als Eskalation wegen P8.5-G; erste `localStorage`-Nutzung des Projekts)
 27. 2026-09-03 (Phase 8.5 Step 0 -- Skelett phase8_5_picker_release/{CLAUDE.md, SESSIONS_ARCHIVE.md, scripts/} angelegt; vier Paragraph-1-Funde: INDEX 52.911 zu 40.917 B unter Cap, Bueroklammer-zu-Lupe-Drift in phase8_ui_graph/CLAUDE.md:440, Phase-8-Bilanz korrigiert; ROADMAP-Abschnitt neu; Wurzel-`down:` umgestellt)
 28. 2026-09-01 (Phase 8 Sichtpruefung 1 + Gate B zu C bestanden; **Hard Rule 9 ergaenzt** -- kein `pkill -f` mit Regex, niemals den systemd-Dienst anfassen, Lehre aus dem Prod-Vorfall 2026-09-01 Phase 8 Step A3 Nachbereitung)
+
+**[2026-10-04, datierte Namenskorrektur]** Der Ausdruck „P9-A-Umkehr" im Block vom 2026-10-03 und in
+mehreren `updated:`-Fäden war ein **Fehlname**: **P9-A** ist im Plan der **Scope-Lock** „P9 ist eine
+Härtungsphase" (§1) und ist durch eine Wurzel-Rotation **nicht berührt**. Der Fehlname entstand am
+2026-10-03 und überlebte zwei Sessions, weil beide ihn abgeschrieben statt nachgeschlagen haben:
+`grep P9-A` im Plan findet vier Stellen, und keine handelt von Blöcken in der Wurzel.
+
+**[2026-10-04, die Wurzel-Rotation ist auf K=1 umgekehrt und die drei Doku-Strukturen sind rotiert — der letzte offene
+Hebel gegen die Softcap-Überschreitungen war eine Tabelle, kein Block — opencode/M3 — zwei Commits,
+kein Produktcode-Touch, kein Deploy.]** **Umgekehrt:** die Wurzel trug **24** Session-Blöcke in
+`## Current state` (**91.123 B** von 114.771 B) und steht jetzt bei **einem** — die älteren 23
+wandern **verbatim** nach `docs/PROJECT_SESSION_LOG.md` (L3), wohin die Wurzel seit 2026-09-08
+selbst zeigt. **Das ist **keine** Umkehr von P9-A: P9-A ist der Scope-Lock „P9 ist eine
+Härtungsphase" (Plan §1) und bleibt unberührt — der Fehlname „P9-A-Umkehr" ist unten datiert
+korrigiert. Umgekehrt wurde die **Rotationsregel der Wurzel-`CLAUDE.md` auf K=1** —
+Nikinger-Entscheidung 2026-10-04, eine Entscheidung der Doc-Layers-Konvention und **kein Lock**,
+und sie steht deshalb hier und nicht im Plan. Die
+Byte-Buchhaltung geht **auf das Byte auf**: 216.221 B in beiden Dateien vorher, 216.221 B nachher.
+
+**Und die Antwort, die dabei herauskam, ist die, die zwei Sessions offen geblieben war: es sind
+nicht die Blöcke.** Der Phase-9-Head stand bei **56.860 B = 15.900 B über** dem 40-KiB-Softcap;
+nach Session-Block-Rotation (17.780 B verbatim) **und** `updated:`-Kettenrotation (6 von 7 Fäden)
+blieben **49.033 B** — und **rund 14 KB über**, weil die **§-Modulstatus-Tabelle allein 30.564 B in
+14 Zeilen** trug, davon **15.041 B in drei Zeilen** (Gate/Z 6.075 · A 4.915 · B 4.050). **K=1 ist die
+Konvention, und selbst K=1 passt nicht**, weil nicht die *Anzahl* der Blöcke das Problem ist,
+sondern die Breite einer Tabelle. Die ausführlichen Statusspalten stehen jetzt **verbatim** in
+`phase9_hardening/MODULE_STATUS_ARCHIVE.md` (L3, eine Sektion je Step), im Head steht je Step ein
+Kurzstand mit Marker, Zustand, Offenem und Zeiger — **der Phase-9-Head liegt damit zum ersten Mal
+unter dem Softcap.** Derselbe Weg, am 2026-10-02 an zwei anderen Stellen erprobt
+(`phase1_storage/CONTRACTS_ARCHIVE.md`, `phase5_ui/ABNAHME_MATRIX_ARCHIVE.md`).
+
+**Drei Doku-Befunde, die dabei auffielen, und alle drei waren live schlechter, als es aussah.**
+(1) **Zwei von dreizehn Statuszellen waren unsichtbarer Text:** ein rohes ` | ` im Text der
+Statusspalte gibt GFM **vier** statt drei Zellen und legt den Rest in eine **Phantom-Spalte** —
+**4.097 B**, darunter der komplette V153-Block des Step B. In einer Textausgabe sieht eine Tabelle
+mit mehr Zellen als ihr Kopf nicht kaputt aus, sie sieht nach einer Spalte aus. (2) Der Zahlen-Wächter
+`test_acceptance_numbers.py` **verwarf den Marker der zweiten `[VERIFY]`-Lesart** — V162 *(Lesart B)*
+konnte von ⬜ auf ⚠️ wechseln, ohne dass ein Wächter es bemerkte, weil die Zählregel „eine doppelt
+vergebene Nummer zählt einmal, mit Lesart A" die zweite Zeile wegwirft und sie damit in **keiner**
+Bilanz sichtbar war. (3) `prepend_updated_chain.sh` fand **drei verklebte Fäden** in
+`SESSIONS_ARCHIVE.md` und **einen** in `ABNAHME_MATRIX.md`, beide Dateien in dieser Phase — Fäden, die
+für den Rotations-Anker nicht existieren. Das ist die **dritte Ausprägung derselben Fehlerklasse in
+dieser Phase** (nach dem ` · `-Trenner und dem fehlenden `updated:`-Feld) und dieselbe Lehre:
+**eine maschinell gepflegte Struktur braucht einen Wächter, nicht Aufmerksamkeit** — und einen
+*passenden* Wächter: der erste Wächter, der ich schrieb, meldete **grün**, als ich genau den Defekt
+reproduzierte, den er verhindern sollte, weil er die Daten an der falschen Stelle las.
+
+**V162 *(Lesart B)* von ⬜ auf ⚠️, mit Zitat und mit der Grenze des Zitats:** die Tailscale-Doku sagt
+wörtlich *„access control rules apply to Serve just like any other service"* (validiert 20.01.2026);
+für `--tcp`/`--tls-terminated-tcp` nennt die CLI-Referenz **kein** ACL-Verhalten in **keine**
+Richtung. Ein Gegenlauf braucht eine *abgelehnte* Verbindung von einem zweiten Tailnet-Knoten — auf
+der Heim-VM kann ich auf keinem fremden Knoten Kommandos ausführen. **Die `socat`-Wahl ist damit
+nicht widerlegt, sondern gedeckt:** die elegante Alternative ist nur für den HTTP-Modus belegt, und
+eine offene Frage soll keine Firewall-Entscheidung tragen.
+
+**Stand der Phase 9:** `v3.1.1` ist **live** (Release `20261003T205843`, Health-Gate **9/9**), ohne
+Index-Neuaufbau. Abnahme **71 ✅ · 10 ⚠️ · 2 ⬜** · `[VERIFY]` **31 ✅ · 3 ⚠️ · 1 ⬜** — beide Zahlen
+stehen in `phase9_hardening/ABNAHME_MATRIX.md` und **nur** dort, weil die zweite Kopie erfahrungsgemäß
+die veraltete ist (vier Fundstellen, drei Zahlen, zwei Tage lang). **Kein ⬜ ist offene
+Code-Arbeit.** Und seit dem **2026-10-04** ist **kein offener Rest ein Personenschritt**: die beiden
+Benennungen sind entschieden und gebaut (beide Heads unter dem Softcap), und **P9-13/V150 — das zweite
+Claude-Konto — sind zurückgestellt und wandern nach P10**, weil ein Schritt, den nur ein Konto braucht,
+kein Blocker ist, sondern ein Termin (Regel in §Working style, Plan §0.1a). **Was bleibt, ist eine
+Aufgabe: P9-15** — drei Läufe `/api/v1/overview` mit echter UI-Session, **Arbeit der nächsten
+Session**; ein Cookie-Jar mit echten Zugangsdaten gehört nicht in eine Datei (Hard Rule 1), der Weg
+dafür steht im Nachtrag des Phase-9-Heads. Danach Übersichtsgrafik §12.4
+**gerendert und angesehen**, ROADMAP-Zeile, Phase auf ✅. **Fester Termin: am 2026-10-18 schließt
+das Übergangsfenster von selbst** — die alte Funnel-Adresse liest dann nur noch, schreibt nicht
+mehr. Absicht, kein Versehen.
+
+**Details, Herleitungen, Gegenproben und die dreizehn eigenen Fehler dieses Tages: der
+`## Session stopped`-Block vom 2026-10-04 in `phase9_hardening/CLAUDE.md`.** Was hier nicht steht,
+steht dort; umgekehrt gilt: **was hier steht, ist der Stand, und es ist eine Zusammenfassung.**
+
+*Neue Session-Blöcke wachsen **oben** in dieser Sektion; die älteren rotieren **verbatim** nach
+`docs/PROJECT_SESSION_LOG.md` — per `scripts/rotate_root_current_state.sh` (K=1, sechs Gegenproben,
+u. a. byteweise Reassemblierung und Nachlesen jedes Blocks), **nie von Hand**. Die vollständige
+Chronik der Phasen 1–8, der Hard-Rule-Korrekturen und der älteren Blöcke: `docs/PROJECT_SESSION_LOG.md` (L3).*
 
 **[2026-09-10, P8.6 Block A ✅ — Fundament:** Radiogruppe→`<select>`, sechs neue Tokens (`--bg-void`/`--select-fill`/`--select-line`/`--caution` u. a.), `--border-soft`→`var(--line)`, Konvention v3 um „Vorsicht". Erste echte Code-Touch-Session der Phase. Tabu-Diff §0.3 leer, `pytest` 964→966, `ui_budget.py` 5/5. Nikinger hat die P8.5-19-Radiogruppe am 2026-09-08 selbst zurückgenommen. +2 statische Tests (P8.5-Test ersetzt, `test_no_raw_accent_rgba_outside_root`, `test_every_css_var_reference_is_defined` — hätte `--border-soft`-Bug gefunden). **Abweichung von Plan §3.5/§8.2 dokumentiert:** die anderen 4 Tests gehören zu Block B/C.
 

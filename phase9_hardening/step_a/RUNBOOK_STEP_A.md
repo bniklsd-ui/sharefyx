@@ -137,6 +137,15 @@ Massen-Re-Login zu befürchten; A8 betrifft nur die Connector-Adresse in den Kon
 
 ### Befund 5 — Der Funnel bleibt danach **lesbar, aber nicht beschreibbar**
 
+**[2026-10-05, Nikinger-Entscheidung] Das Fenster ist jetzt unbefristet möglich:**
+`LEGACY_UNTIL=open`. Anlass: der Arbeitslaptop erreicht `sharefyx.eurofyx.com` hinter dem
+Firmen-VPN (genua genuconnect) nicht. Firefox meldet `NS_ERROR_NET_RESET` mit 0 B; vom MacBook und
+von der Heim-VM ist die Adresse einwandfrei erreichbar (DNS, TLS, `303` gemessen). Die Vermutung ist
+ein Filter für neu registrierte Domains (registriert am 2026-10-01); Diagnosebefehle stehen im
+Session-Block vom 2026-10-05 im Phase-Head. Die alte Adresse schreibt, **bis** die neue vom
+Arbeitslaptop aus belegt funktioniert. Erst dann wird wieder ein Datum gesetzt, und das wird
+angekündigt. Der Dialog nennt in diesem Zustand kein Datum.
+
 `phase5_ui/webui/security.py:84` — CSRF prüft `origin != settings.base_url`, **exakt**, ohne
 Liste erlaubter Origins. Nach A7 gilt für die Web-UI `settings.base_url == https://<domain>`.
 Ein Browser, der die alte Funnel-Adresse aufruft, schickt aber

@@ -542,11 +542,12 @@
 <!-- P9 Step A (Nikinger-Entscheidung 2026-10-01): Hinweis auf der ALTEN Adresse. Öffnet sich bei
      jedem Laden, solange /api/v1/meta ein `legacy` liefert und location.origin genau diese Origin
      ist -- schließbar, kommt beim nächsten Laden wieder. Bewusst die .account-nav-Form des
-     Einstellungen-Dialogs (Akzent-Fill), kein neues CSS. Der Text kommt aus app.js, weil er vom
-     Datum abhängt (kein Templating, P5-T). -->
+     Einstellungen-Dialogs (Akzent-Fill), kein neues CSS. Titel, Text und Knopf kommen aus app.js,
+     weil sie vom Datum abhängen -- oder von dessen Fehlen, `LEGACY_UNTIL=open` seit 2026-10-05
+     (kein Templating, P5-T). -->
 <div class="overlay" id="legacy-host-dialog" hidden>
   <div class="overlay__panel">
-    <h2>Diese Adresse wird abgeschaltet</h2>
+    <h2 id="legacy-host-title">Diese Adresse wird abgeschaltet</h2>
     <p class="overlay__hint" id="legacy-host-text"></p>
     <a class="btn account-nav" id="legacy-host-link" href="/ui/">Zur neuen Adresse<svg class="icon" aria-hidden="true"><use href="#i-chevron-right"></use></svg></a>
     <div class="overlay__actions">

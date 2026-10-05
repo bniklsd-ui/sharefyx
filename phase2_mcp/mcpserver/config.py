@@ -10,6 +10,7 @@ from urllib.parse import urlsplit
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
 DEFAULT_LOG_LEVEL = "INFO"
+LEGACY_UNTIL_OPEN = "open"
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -48,10 +49,17 @@ def _parse_legacy_window(
         raise ValueError(
             f"SPACE_UI_LEGACY_ORIGIN muss die Form https://host sein (ohne Pfad, ohne /), war: {origin_raw!r}"
         )
+    # Nikinger-Entscheidung 2026-10-05: unbefristet, bis die neue Adresse aus jedem Netz belegt
+    # erreichbar ist (Firmen-VPN). Nur dieses ausdrückliche Wort öffnet es, leer bleibt ein Fehler;
+    # `date.max` lässt `UiSettings.legacy_writable()` unverändert.
+    if until_raw == LEGACY_UNTIL_OPEN:
+        return origin_raw, date.max
     try:
         until = date.fromisoformat(until_raw)
     except ValueError as exc:
-        raise ValueError(f"SPACE_UI_LEGACY_UNTIL muss JJJJ-MM-TT sein, war: {until_raw!r}") from exc
+        raise ValueError(
+            f"SPACE_UI_LEGACY_UNTIL muss JJJJ-MM-TT oder {LEGACY_UNTIL_OPEN!r} sein, war: {until_raw!r}"
+        ) from exc
     return origin_raw, until
 
 

@@ -106,6 +106,21 @@ def test_settings_parse_a_complete_window():
     assert (s.ui_legacy_origin, s.ui_legacy_until) == (LEGACY, UNTIL)
 
 
+def test_settings_parse_an_open_window():
+    """`open` (2026-10-05): unbefristet, bis die neue Adresse aus jedem Netz belegt erreichbar ist.
+    Intern `date.max`, damit `legacy_writable()` dieselbe eine Vergleichszeile bleibt."""
+    s = load_settings(_env(SPACE_UI_LEGACY_ORIGIN=LEGACY, SPACE_UI_LEGACY_UNTIL="open"))
+    assert (s.ui_legacy_origin, s.ui_legacy_until) == (LEGACY, date.max)
+
+
+def test_open_window_writes_far_in_the_future_and_still_rejects_other_origins():
+    settings = UiSettings(base_url=BASE_URL, legacy_origin=LEGACY, legacy_until=date.max,
+                          clock=lambda: date(2030, 1, 1))
+    require_csrf(_post(LEGACY), _session(), settings=settings)
+    with pytest.raises(CsrfError):
+        require_csrf(_post("https://boese.example"), _session(), settings=settings)
+
+
 def test_settings_treat_empty_values_as_off():
     """Die Unit setzt die Variablen immer (`Environment=…=` mit leerem Wert, wenn `local.env`
     sie nicht kennt) — leer muss deshalb „aus" heißen, nicht „Fehler"."""
@@ -121,6 +136,8 @@ def test_settings_treat_empty_values_as_off():
     (LEGACY + "/ui", "2026-10-15"),
     ("alt.example.ts.net", "2026-10-15"),
     (LEGACY, "15.10.2026"),
+    (LEGACY, "OPEN"),                       # nur das exakte Wort öffnet
+    ("", "open"),                           # halb gesetzt, auch unbefristet
 ])
 def test_settings_reject_a_malformed_window(origin, until):
     with pytest.raises(ValueError):
@@ -161,6 +178,20 @@ async def test_meta_publishes_the_window(full_app_items, totp_code):
     assert meta["legacy"] == {"origin": LEGACY, "until": "2026-10-15", "writable": True}
 
 
+@pytest.mark.asyncio
+async def test_meta_publishes_an_open_window_without_a_date(ui_settings, full_app_items, totp_code):
+    """Der Dialog erkennt „unbefristet" an `until: null` bei `writable: true` — kein 31.12.9999."""
+    object.__setattr__(ui_settings, "legacy_until", date.max)
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=full_app_items), base_url=BASE_URL) as client:
+        response = await client.post(
+            "/ui/login",
+            data={"space": "niklas", "password": "correct horse battery staple", "totp": totp_code()},
+        )
+        assert response.status_code == 200
+        meta = (await client.get("/api/v1/meta")).json()
+    assert meta["legacy"] == {"origin": LEGACY, "until": None, "writable": True}
+
+
 def test_dialog_markup_reuses_the_settings_nav_style():
     html = (STATIC / "app.html").read_text(encoding="utf-8")
     block = re.search(r'<div class="overlay" id="legacy-host-dialog" hidden>.*?\n</div>', html, re.DOTALL)
@@ -176,3 +207,6 @@ def test_dialog_is_wired_like_every_other_overlay():
     assert "else if (!legacyHostDialogEl.hidden) legacyHostDialogEl.hidden = true;" in code  # ESC
     assert "showLegacyHostDialog(meta);" in code                       # bei jedem Laden
     assert "location.origin !== legacy.origin" in code                 # nur auf der alten Adresse
+    assert "legacy.writable && !legacy.until" in code                  # unbefristet, 2026-10-05
+    for target in ("legacy-host-title", "legacy-host-text", "legacy-host-close"):
+        assert f'document.getElementById("{target}").textContent' in code
