@@ -12,7 +12,7 @@ down:
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
   - UPDATES_ARCHIVE.md                          # ältere `updated:`-Fäden dieses Heads, verbatim (2026-10-03, 36 von 37)
   - MODULE_STATUS_ARCHIVE.md                   # ausführliche Statusspalten der §-Modulstatus-Tabelle, verbatim (2026-10-04)
-updated: 2026-10-05 (**Übergangsfenster unbefristet möglich: `LEGACY_UNTIL=open`** — der Arbeitslaptop erreicht die neue Domain hinter dem Firmen-VPN nicht (`NS_ERROR_NET_RESET`), vermutlich ein Filter gegen neu registrierte Domains; Dialog mit drei Zuständen, CSRF-Pfad byte-identisch (`date.max`), `pytest` 1217 → 1223, Probe 24/24 · **nicht deployt**, bis dahin gilt `2026-10-17`) | 2026-10-04 (**zwei von dreizehn Statuszellen der eigenen Modulstatus-Tabelle waren unsichtbarer Text — der Fund kam aus der offenen Softcap-Frage, und die Behebung zog einen zweiten mit sich: der Zahlen-Wächter hat den Marker der *zweiten* `[VERIFY]`-Lesart weggeworfen** — opencode/M3, ein Commit, **kein Produktcode-Touch**, kein Deploy, kein Service-Touch; **7 neue Tests**, Gegenproben **G1–G7 rot**, Kontrolllauf grün; **Session-Block und `updated:`-Kette rotiert**, beide per Skript und verlustfrei) · **Befund:** Zeile 28 (Step B) und Zeile 38 (Gate/Z) tragen ein **rohes ` | ` im Text der Statusspalte** ⇒ GFM gibt ihnen **vier** Zellen statt drei und legt den Rest in eine **Phantom-Spalte** ⇒ **4.097 B waren in der gerenderten Ansicht unsichtbar** (2.990 + 1.107), darunter der komplette V153-Block des Step B. In einer Textausgabe sieht eine Tabelle mit *mehr* Zellen als ihr Kopf nicht kaputt aus, sie sieht nach einer Spalte aus · **behoben verlustfrei:** Step B ` | ` → ` · `, Gate/Z wanderte der Rohstrich **aus dem Codespan heraus** (der Text war ``` 4 Fäden mit ` | updated: `-Präfix ```, ein öffnender Backtick *vor* dem Rohstrich) · **`tests/test_table_shape.py` 6/6, repo-weit:** gemessen **3.284 Tabellenzeilen, 17 Abweichungen** — 2 hier, **15 in fremden Dateien** in `KNOWN_OFFENDERS` **mit Zeilennummer**; `\|` wird nicht gezählt (17 Stellen, Konvention), ```-Fences werden übersprungen · **zweiter Fund, die Repo-Lehre zum achten Mal:** `test_acceptance_numbers.py` blieb **grün**, als V162 *(Lesart B)* von ⬜ auf ⚠️ ging — die Regel *„eine doppelt vergebene Nummer zählt einmal, mit Lesart A"* **verwirft** den Marker der zweiten Lesart, und der stand damit in **keiner** Bilanz. Ein Wächter, der die *falsche* Rechnung richtig ausführt · `SECOND_READING_MARKERS = {"V162": "⚠️", "V163": "✅"}` nagelt jede zweite Lesart namentlich fest, eine dritte fällt als neuer Schlüssel auf; **die Abnahme-Seite ist nicht betroffen** (`_abnahme_rows` zählt jede Zeile) · **V162 *(Lesart B)* ⬜ → ⚠️ mit Zitat:** *„access control rules apply to Serve just like any other service"* (<https://tailscale.com/docs/features/tailscale-serve>, validiert 20.01.2026) — für `--tcp` nennt die CLI-Referenz **kein** ACL-Verhalten in **keine** Richtung; **kein Gegenlauf möglich** (eine Widerlegung braucht einen zweiten Tailnet-Knoten mit Shell). **Die socat-Wahl ist damit nicht widerlegt, sondern gedeckt** — *„eine offene Frage darf nicht die Grundlage einer Firewall-Entscheidung sein"* · **beide Rotationen gefahren, und das Ergebnis ist die Antwort auf die offene Frage:** der Head stand bei **66.223 B** (25.263 B über dem Softcap; Kette 11.702 · Modulstatus 29.579 · Backlog 5.975 · Block+Nachträge 17.778 B), nach Session-Block-Rotation (17.780 B verbatim ins `SESSIONS_ARCHIVE.md`) **59.354 B** und nach Kettenrotation (6 von 7 Fäden, `rotate_index_updates.sh` mit Zieldatei-Argument) **49.033 B** ⇒ **mit neuem Block und neuem Faden ≈ 55 KB, rund 14 KB über dem Softcap** (die exakte Zahl in der INDEX-Zeile; meine zwischenzeitliche Projektion „43 KB" war eine **Annahme über die eigene Blockgröße** — 4 KB angesetzt, 10,9 KB geschrieben, die Rotationsarithmetik selbst ging auf das Byte) — **die Blockschnittzahl ist damit gegenstandslos**, K=1 ist die Konvention, und selbst K=1 passt nicht, weil nicht die *Anzahl* der Blöcke das Problem ist, sondern die Breite einer Tabelle: **29.579 B in 13 Zeilen, davon 14.057 B in drei** (A 4.915 · Gate/Z 5.092 · B 4.050). Der letzte Hebel ist das Kürzen der Modulstatus-Tabelle in ein L3-Archiv (verbatim, Roundtrip, am 2026-10-02 an zwei Stellen bewährt) — **gemessen bereit, nicht getan, weil der Inhalt deine Entscheidung ist** · **vier eigene Fehler vor dem Commit behoben**, zwei davon mit der Lehre des Abends: ein Ausnahmelisten-Pfad, den es nicht gibt (der Prüfer meldete dadurch **rot statt grün**, richtig so) · `ROADMAP.md` zweimal als Dict-Schlüssel (der zweite still eine leere Ausnahme) · `hidden_bytes()` summierte die Trenner mit (Kennzahl 2 zu hoch) · die Reparatur-Gegenprobe suchte im **ganzen** Head und traf den Session-Block, der die kaputte Form wörtlich zitiert — **ein Wächter, der das Richtige an der falschen Stelle prüft, ist derselbe Fehler eine Ebene tiefer** · `pytest` **1209 → 1217**, Baseline **1209** vorab gemessen (der gestrige Block nennt 1203, die sechs Differenz sind `test_prepend_chain.py` — abgeglichen statt geglaubt), `ui_budget` 5/5, `doc_health` 0 | 2026-10-03 (**der letzte Handgriff im Rotations-Workflow ist abgeschafft: `scripts/prepend_updated_chain.sh` stellt einen Faden an den Kettenanfang, mit sechs Gegenproben und 6 Tests — nach fünfmal derselben Fehlerklasse an einem Tag, darunter einmal NACH der geschriebenen Diagnose**) · **Befund, der zum Werkzeug führte:** das Rotieren der Kette war maschinell, das **Voranstellen** nicht; beim Kopieren der alten Zeile als Vorlage wanderte das `updated:`-Präfix mit hinein (3×) oder ` | ` wurde zu ` · ` (2×) — für `rotate_index_updates.sh` beides unsichtbar · **das Skript verweigert beide Formen, statt sie zu reparieren**, und prüft den Werkzeugvertrag am echten Ergebnis (jeder Faden beginnt mit ` | `) vor dem Schreiben · **drei eigene Fehler vor dem Commit behoben:** die Closer-Prüfung las `FM_END+1` und brach **jeden** Happy-Path ab · ohne `|| true` beendet `pipefail`+`set -e` **stumm**, wenn das Feld fehlt (dieselbe Falle steht kommentiert in `rotate_index_updates.sh`) · meine Test-Fixtures: der `THREAD` war selbst ein Zwei-Faden-String und die ` · `-Gegenprobe ließ das Skript **durch** · **Gegenproben:** G1 nimmt den **echten** Faden aus diesem Commit (Durchlauf, danach kein Faden blind), G2/G3 brechen ab, G4 bricht **mit** Meldung ab, G5 (zwei Fäden, ` | `) läuft durch | ältere Einträge: phase9_hardening/UPDATES_ARCHIVE.md
+updated: 2026-10-05 (**Korrektur desselben Tages:** `d2cbec9` hatte den neuen Block *über* den alten gestellt, und `rotate_session_block.sh` behält den *letzten* — der neue lag dadurch im Archiv; jetzt verbatim zurückgetauscht, Byte-Summe gleich · **Laptop-Messung:** kein Direktweg, nur Firmen-Proxy, der Proxy setzt die neue Domain zurück — kein SNI-Filter) | 2026-10-05 (**Übergangsfenster unbefristet möglich: `LEGACY_UNTIL=open`** — der Arbeitslaptop erreicht die neue Domain hinter dem Firmen-VPN nicht (`NS_ERROR_NET_RESET`), vermutlich ein Filter gegen neu registrierte Domains; Dialog mit drei Zuständen, CSRF-Pfad byte-identisch (`date.max`), `pytest` 1217 → 1223, Probe 24/24 · **nicht deployt**, bis dahin gilt `2026-10-17`) | 2026-10-04 (**zwei von dreizehn Statuszellen der eigenen Modulstatus-Tabelle waren unsichtbarer Text — der Fund kam aus der offenen Softcap-Frage, und die Behebung zog einen zweiten mit sich: der Zahlen-Wächter hat den Marker der *zweiten* `[VERIFY]`-Lesart weggeworfen** — opencode/M3, ein Commit, **kein Produktcode-Touch**, kein Deploy, kein Service-Touch; **7 neue Tests**, Gegenproben **G1–G7 rot**, Kontrolllauf grün; **Session-Block und `updated:`-Kette rotiert**, beide per Skript und verlustfrei) · **Befund:** Zeile 28 (Step B) und Zeile 38 (Gate/Z) tragen ein **rohes ` | ` im Text der Statusspalte** ⇒ GFM gibt ihnen **vier** Zellen statt drei und legt den Rest in eine **Phantom-Spalte** ⇒ **4.097 B waren in der gerenderten Ansicht unsichtbar** (2.990 + 1.107), darunter der komplette V153-Block des Step B. In einer Textausgabe sieht eine Tabelle mit *mehr* Zellen als ihr Kopf nicht kaputt aus, sie sieht nach einer Spalte aus · **behoben verlustfrei:** Step B ` | ` → ` · `, Gate/Z wanderte der Rohstrich **aus dem Codespan heraus** (der Text war ``` 4 Fäden mit ` | updated: `-Präfix ```, ein öffnender Backtick *vor* dem Rohstrich) · **`tests/test_table_shape.py` 6/6, repo-weit:** gemessen **3.284 Tabellenzeilen, 17 Abweichungen** — 2 hier, **15 in fremden Dateien** in `KNOWN_OFFENDERS` **mit Zeilennummer**; `\|` wird nicht gezählt (17 Stellen, Konvention), ```-Fences werden übersprungen · **zweiter Fund, die Repo-Lehre zum achten Mal:** `test_acceptance_numbers.py` blieb **grün**, als V162 *(Lesart B)* von ⬜ auf ⚠️ ging — die Regel *„eine doppelt vergebene Nummer zählt einmal, mit Lesart A"* **verwirft** den Marker der zweiten Lesart, und der stand damit in **keiner** Bilanz. Ein Wächter, der die *falsche* Rechnung richtig ausführt · `SECOND_READING_MARKERS = {"V162": "⚠️", "V163": "✅"}` nagelt jede zweite Lesart namentlich fest, eine dritte fällt als neuer Schlüssel auf; **die Abnahme-Seite ist nicht betroffen** (`_abnahme_rows` zählt jede Zeile) · **V162 *(Lesart B)* ⬜ → ⚠️ mit Zitat:** *„access control rules apply to Serve just like any other service"* (<https://tailscale.com/docs/features/tailscale-serve>, validiert 20.01.2026) — für `--tcp` nennt die CLI-Referenz **kein** ACL-Verhalten in **keine** Richtung; **kein Gegenlauf möglich** (eine Widerlegung braucht einen zweiten Tailnet-Knoten mit Shell). **Die socat-Wahl ist damit nicht widerlegt, sondern gedeckt** — *„eine offene Frage darf nicht die Grundlage einer Firewall-Entscheidung sein"* · **beide Rotationen gefahren, und das Ergebnis ist die Antwort auf die offene Frage:** der Head stand bei **66.223 B** (25.263 B über dem Softcap; Kette 11.702 · Modulstatus 29.579 · Backlog 5.975 · Block+Nachträge 17.778 B), nach Session-Block-Rotation (17.780 B verbatim ins `SESSIONS_ARCHIVE.md`) **59.354 B** und nach Kettenrotation (6 von 7 Fäden, `rotate_index_updates.sh` mit Zieldatei-Argument) **49.033 B** ⇒ **mit neuem Block und neuem Faden ≈ 55 KB, rund 14 KB über dem Softcap** (die exakte Zahl in der INDEX-Zeile; meine zwischenzeitliche Projektion „43 KB" war eine **Annahme über die eigene Blockgröße** — 4 KB angesetzt, 10,9 KB geschrieben, die Rotationsarithmetik selbst ging auf das Byte) — **die Blockschnittzahl ist damit gegenstandslos**, K=1 ist die Konvention, und selbst K=1 passt nicht, weil nicht die *Anzahl* der Blöcke das Problem ist, sondern die Breite einer Tabelle: **29.579 B in 13 Zeilen, davon 14.057 B in drei** (A 4.915 · Gate/Z 5.092 · B 4.050). Der letzte Hebel ist das Kürzen der Modulstatus-Tabelle in ein L3-Archiv (verbatim, Roundtrip, am 2026-10-02 an zwei Stellen bewährt) — **gemessen bereit, nicht getan, weil der Inhalt deine Entscheidung ist** · **vier eigene Fehler vor dem Commit behoben**, zwei davon mit der Lehre des Abends: ein Ausnahmelisten-Pfad, den es nicht gibt (der Prüfer meldete dadurch **rot statt grün**, richtig so) · `ROADMAP.md` zweimal als Dict-Schlüssel (der zweite still eine leere Ausnahme) · `hidden_bytes()` summierte die Trenner mit (Kennzahl 2 zu hoch) · die Reparatur-Gegenprobe suchte im **ganzen** Head und traf den Session-Block, der die kaputte Form wörtlich zitiert — **ein Wächter, der das Richtige an der falschen Stelle prüft, ist derselbe Fehler eine Ebene tiefer** · `pytest` **1209 → 1217**, Baseline **1209** vorab gemessen (der gestrige Block nennt 1203, die sechs Differenz sind `test_prepend_chain.py` — abgeglichen statt geglaubt), `ui_budget` 5/5, `doc_health` 0 | 2026-10-03 (**der letzte Handgriff im Rotations-Workflow ist abgeschafft: `scripts/prepend_updated_chain.sh` stellt einen Faden an den Kettenanfang, mit sechs Gegenproben und 6 Tests — nach fünfmal derselben Fehlerklasse an einem Tag, darunter einmal NACH der geschriebenen Diagnose**) · **Befund, der zum Werkzeug führte:** das Rotieren der Kette war maschinell, das **Voranstellen** nicht; beim Kopieren der alten Zeile als Vorlage wanderte das `updated:`-Präfix mit hinein (3×) oder ` | ` wurde zu ` · ` (2×) — für `rotate_index_updates.sh` beides unsichtbar · **das Skript verweigert beide Formen, statt sie zu reparieren**, und prüft den Werkzeugvertrag am echten Ergebnis (jeder Faden beginnt mit ` | `) vor dem Schreiben · **drei eigene Fehler vor dem Commit behoben:** die Closer-Prüfung las `FM_END+1` und brach **jeden** Happy-Path ab · ohne `|| true` beendet `pipefail`+`set -e` **stumm**, wenn das Feld fehlt (dieselbe Falle steht kommentiert in `rotate_index_updates.sh`) · meine Test-Fixtures: der `THREAD` war selbst ein Zwei-Faden-String und die ` · `-Gegenprobe ließ das Skript **durch** · **Gegenproben:** G1 nimmt den **echten** Faden aus diesem Commit (Durchlauf, danach kein Faden blind), G2/G3 brechen ab, G4 bricht **mit** Meldung ab, G5 (zwei Fäden, ` | `) läuft durch | ältere Einträge: phase9_hardening/UPDATES_ARCHIVE.md
 ---
 
 # Phase 9 — Härtung
@@ -94,215 +94,103 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückzuführen** — Nikinger-Anordnung 2026-09-24, so dokumentieren und nicht weiter
   untersuchen.
 
-## Session stopped — 2026-10-04 (zweiundzwanzigster Block: **zwei von dreizehn Statuszellen der eigenen Modulstatus-Tabelle waren unsichtbarer Text** — der Fund kam aus der offenen Softcap-Frage, und die Behebung zog einen zweiten mit sich: der Zahlen-Wächter hat den Marker der *zweiten* `[VERIFY]`-Lesart weggeworfen; dazu V162 (Lesart B) von ⬜ auf ⚠️ mit Zitat. **Kein Produktcode-Touch, kein Deploy, kein Service-Touch.** Heute rotiert: der Block vom 2026-10-03 und die `updated:`-Kette, beide per Skript, beide verlustfrei)
+## Session stopped — 2026-10-05 (dreiundzwanzigster Block: **die alte Adresse darf unbefristet schreiben — der Arbeitslaptop erreicht die neue nicht**; Produktcode-Touch im Übergangsfenster, **kein Deploy, kein Service-Touch**)
 
-**Die offene Frage war „wie viele Session-Blöcke bleiben im Head?" — und die Antwort hat einen
-Fehler gefunden, den niemand gesucht hat.** Beim Zählen der Zeilen und Bytes (die Entschiedenheit
-lag bei dir, die Zahlen nicht) fiel auf: die §-Modulstatus-Tabelle hat **13 Datenzeilen**, und
-**zwei davon sind kaputtes Markdown.** In Zeile 28 (Step B) und Zeile 38 (Gate/Z) steht ein
-**rohes ` | ` im Text der Statusspalte**. GFM trennt Zellen an `|`, also haben diese beiden Zeilen
-**vier** Zellen statt drei, und der Renderer legt alles hinter dem Rohstrich in eine
-**Phantom-Spalte**, die die Tabelle nicht hat.
+**Ergebnis.** Neu ist `SPACE_UI_LEGACY_UNTIL=open` (über `local.env`: `LEGACY_UNTIL=open`): die alte
+Funnel-Adresse schreibt damit unbefristet. Der Warndialog dort kennt jetzt **drei** Zustände:
 
-**Gemessen, nicht geschätzt: 4.097 B dieses Heads waren in der gerenderten Ansicht unsichtbar** —
-2.990 B in Step B, 1.107 B in Gate/Z. Darunter der **komplette V153-Block** des Step B (polkit
-statt `sudoers`, `NoNewPrivileges`, die JS-Regel, die Probe) und der Schluss des Gate-Z-Eintrags.
-Der Text war da, per Textsuche auffindbar, in jeder Zeilenzahl enthalten — und **unsichtbar**.
-Eine Tabelle mit *mehr* Zellen als ihr Kopf sieht in einer Textausgabe nicht kaputt aus, sie sieht
-nach einer weiteren Spalte aus. Das ist dieselbe Fehlerklasse wie der ` · `-Trenner in der
-`updated:`-Kette (`test_updated_chain.py` vom 2026-10-03) und dieselbe Lehre: **eine maschinell
-gepflegte Struktur braucht einen Wächter, nicht Aufmerksamkeit — und die dritte Ausprägung
-dieser Klasse in dieser Phase.**
+| Zustand | Titel | Knopf |
+|---|---|---|
+| unbefristet | „Es gibt eine neue Adresse" (*„… funktioniert bis auf Weiteres vollständig …"*) | „Hier weiterarbeiten" |
+| befristet | „Diese Adresse wird abgeschaltet" | „Trotzdem hier bleiben" |
+| abgelaufen | „Diese Adresse ist nur noch lesbar" | „Hier nur lesen" |
 
-**Behoben verlustfrei, zwei Bytesops.** In Step B ` | ` → ` · ` (der Trenner war nie Inhalt; das
-ist der Trenner, den dieselbe Datei 200 B weiter unten benutzt). In Gate/Z wanderte der Rohstrich
-**aus dem Codespan heraus** — der Text war `` 4 Fäden mit ` | updated: `-Präfix ``, also ein
-öffnender Backtick *vor* dem Rohstrich und der eigentliche Codespan danach; daraus ist
-`` 4 Fäden mit `updated: `-Präfix `` geworden. **Null Zeichen verloren**, und ein Test
-(`test_the_two_repaired_rows_kept_their_text`) verhindert, dass eine künftige Kürzung die
-Behebung für eine Auslassung hält. Er prüft **nur** die Tabelle: die kaputte Form steht im
-Session-Block und in der `updated:`-Kette weiterhin *wörtlich*, weil beide den Defekt beschreiben —
-als Treffer gemeldet wäre das ein Fehlalarm.
+**Live ist noch nichts davon.** Solange der Nikinger nicht deployt, gilt weiter
+`LEGACY_UNTIL=2026-10-17`. Das Fenster schließt dann am 2026-10-18.
 
-**Der Wächter `tests/test_table_shape.py` (6 Tests, repo-weit).** Jede Tabellenzeile muss so viele
-Zellen haben wie ihre Kopfzeile. **Gemessen über den ganzen Baum: 3.284 Tabellenzeilen, 17
-Abweichungen** — 2 hier behoben, **15 in fremden Dateien** (abgeschlossene Phasen, `ROADMAP.md`,
-zwei 📕-Snapshots, der P9-Plan, das Step-A-Runbook), alle in `KNOWN_OFFENDERS` **mit Zeilennummer**,
-damit die Liste nicht wachsen kann, ohne dass es auffällt. Zwei Details, ohne die der Wächter
-falsch-grün wäre: `\|` ist die **korrekte** Form und wird nicht gezählt (das Repo benutzt sie an 17
-Stellen — `initial\|reset`, `Image \| str` — sie ist Konvention), und Zeilen in einem ```-Fence
-sind Prosa über Masken (`awk '/^\| P8-/'` in einem 📕-Plan) und werden übersprungen. **Gegenproben
-G1–G4 rot** (Rohstrich zurück in Step B · neue unbekannte Datei · reparierte Fundstelle bleibt in
-der Liste · Zeilennummer falsch), Kontrolllauf 6/6 grün, danach byte-identisch wiederhergestellt.
+**Anlass (Nikinger, 2026-10-05).** Der Arbeitslaptop erreicht `https://sharefyx.eurofyx.com/ui/`
+nicht. Er läuft unter Windows mit Firefox 158, hinter dem Firmen-VPN genua genuconnect, das sich nicht
+abschalten lässt. Die Fehlermeldung ist `NS_ERROR_NET_RESET` mit 0 B übertragen. Die alte Adresse
+geht von dort, die neue geht vom MacBook.
+**Von der Heim-VM gemessen:**
+- A `217.160.128.146` über 1.1.1.1 und 8.8.8.8, **kein** AAAA
+- TLSv1.3, Let's-Encrypt-Zertifikat `YE1`, `ssl_verify_result=0`
+- `GET /ui/` → `303` über HTTP/2 und HTTP/1.1
 
-**Und der Fund, den die Behebung mit sich zog — die Repo-Lehre zum achten Mal, und diesmal mit
-der Pointe, dass der Wächter die *falsche* Rechnung richtig ausführte.** Ich habe V162 *(Lesart B)*
-von ⬜ auf ⚠️ gesetzt (unten begründet) und `test_acceptance_numbers.py` blieb **grün**. Grund: die
-Zählregel für doppelt vergebene Nummern — *„eine Nummer zählt einmal, mit ihrer Lesart A"* — wirft
-den Marker der **zweiten** Lesart **weg**, und der landet damit in **keiner** Bilanz: nicht in der
-Überschrift der Matrix, nicht in `VERIFY_BALANCE`, nirgends. Ein ⚠️ oder ✅ konnte dort
-**beliebig** stehen, ohne dass ein Wächter es bemerkte. Die Regel war am 2026-10-03 aus einem echten
-Problem geboren (V162/V163 je zweimal vergeben, eine Übergabezahl 40 gegen 34 belegte) — und sie hat
-dabei eine ganze Spalte Marker ungedeckt gelassen, ohne dass jemand die Regel ansah. **Gebaut:**
-`SECOND_READING_MARKERS = {"V162": "⚠️", "V163": "✅"}` — die Arithmetik bleibt bei 34 (das ist die
-aussagekräftige Übergabezahl, sie steht im Fließtext und in der Kopfzeile dieses Heads), aber
-**jede zweite Lesart ist namentlich festgenagelt**, und eine **dritte** fällt als neuer Schlüssel
-auf, weil der Test die Menge vergleicht. **Gegenproben G5–G7 rot**: G5 ist dieselbe Änderung, die
-vor der Reparatur grün blieb; G6 eine erfundene dritte Lesart; G7 eine falsch festgenagelte
-Konstante. **Das ist übrigens die Abnahme-Seite nicht betroffen** — `_abnahme_rows` zählt **jede**
-Zeile, dort gibt es keine Verwerfungsregel. Der Fehler war auf eine Seite.
+**Vermutung, nicht belegt:** ein SNI-basierter Filter im Firmennetz gegen neu registrierte Domains.
+`eurofyx.com` ist registriert seit 2026-10-01; `*.ts.net` ist dagegen kategorisiert. Der Caddy-Log auf
+dem VPS wurde **nicht** gelesen, weil der VPS-Hostkey nicht in `known_hosts` steht und ich ihn nicht
+ungefragt annehme.
 
-**V162 *(Lesart B)* von ⬜ auf ⚠️, mit Zitat und mit der Grenze des Zitats.** Die Tailscale-Doku sagt
-wörtlich: *„access control rules apply to Serve just like any other service … those rules will also
-apply to the services you're sharing with Serve"* (Tailscale Serve, *Get started with Serve*,
-<https://tailscale.com/docs/features/tailscale-serve>, last validated 20.01.2026). Die
-**CLI-Referenz** zu `--tcp` / `--tls-terminated-tcp`
-(<https://tailscale.com/docs/reference/tailscale-cli/serve>, last validated 26.01.2026) nennt **kein**
-ACL-Verhalten — in **keine** Richtung. Grundsatz: *„By default, all connections between devices in
-your tailnet are denied unless explicitly permitted through your tailnet policy file"*
-(<https://tailscale.com/docs/features/access-control>). **Warum kein Gegenlauf möglich ist:** eine
-Widerlegung braucht eine *abgelehnte* Verbindung von einem zweiten Tailnet-Knoten, und auf dieser VM
-kann ich auf keinem fremden Knoten Kommandos ausführen (`tailscale status` listet sieben, Shell-
-Zugang ist deine Sache). **Konsequenz für die getroffene Entscheidung: keine** — `socat` ist damit
-**nicht** widerlegt, sondern im Gegenteil gedeckt: die elegante Alternative ist nur für den
-HTTP-Modus belegt, und *„eine offene Frage darf nicht die Grundlage einer Firewall-Entscheidung
-sein"* (Runbook §3, Befund 6) war genau richtig. ⚠️ nach der Statusregel der Matrix, weil das
-Kriterium in anderer Form beantwortet ist als gefragt; **bleibt ⬜ für eine echte Messung**.
+**Diagnose für den Arbeitslaptop** (PowerShell, `curl.exe`, **nicht** `curl` — das ist dort
+`Invoke-WebRequest`):
 
-**Eine eigene Rechenfehler-Vorschrift, die derselbe Block sich selbst auferlegt:** die Zeile oben
-sagte zuerst „rund 2 KB über dem Softcap". Das war **meine** Prognose, und sie war falsch —
-gerechnet hatte ich mit einem 4-KB-Block und geschrieben habe ich 10,9 KB. Die **Rotationsarithmetik
-selbst ging auf das Byte** (17.780 B verschoben, 66.223 → 59.354 → 49.033 B), der Fehler steckt
-ausschließlich in meiner Annahme über die eigene Ausführlichkeit. **Benannt, weil es dieselbe
-Klasse ist wie die drei falschen Bilanzen vom 2026-10-03:** eine Zahl, die ich nicht gemessen habe,
-aber wie eine behandelt habe.
+```powershell
+Resolve-DnsName sharefyx.eurofyx.com                      # erwartet 217.160.128.146
+Test-NetConnection 217.160.128.146 -Port 443              # TcpTestSucceeded?
+curl.exe -v --resolve sharefyx.eurofyx.com:443:217.160.128.146 https://sharefyx.eurofyx.com/health
+curl.exe -vk --resolve example.org:443:217.160.128.146 https://example.org/   # gleiche IP, anderer SNI
+netsh winhttp show proxy
+curl.exe -v https://www.google.com 2>&1 | findstr /i "issuer"   # Firmen-CA = TLS-Inspektion
+```
 
-**Was heute rotiert und was das kostet — beide Zahlen gemessen, keine geschätzt.** Der Head stand
-bei **66.223 B**, also **25.263 B über dem 40-KiB-Softcap**, verteilt auf `updated:`-Kette
-**11.702 B** · § Modulstatus **29.579 B** *(Stand vor dem heutigen Nachtrag, der eingerechnet sind es 30.564 B)* · § Backlog **5.975 B** · § Session-Block mit drei
-Nachträgen **17.778 B**. Rotiert wird heute **beides**, was die Konvention vorschreibt und was
-gestern offen blieb: der Block vom **2026-10-03** (Hauptblock + 3 Nachträge, 213 Zeilen) **verbatim**
-nach `SESSIONS_ARCHIVE.md` per `scripts/rotate_session_block.sh`, und die **`updated:`-Kette** nach
-`UPDATES_ARCHIVE.md` per `scripts/rotate_index_updates.sh` mit Zieldatei-Argument, danach der neue
-Faden per `scripts/prepend_updated_chain.sh` — **beide Skripte, keine Hand**, alle Gegenproben des
-Rotations-Werkzeugs grün. **Das Ergebnis ist die Antwort auf die offene Frage, und sie ist ernüchternd:**
-nach beiden Rotationen **49.033 B**, mit dem neuen Block und dem neuen Faden **≈ 54 KB — damit
-rund 13 KB über dem Softcap.** (Die exakte Zahl steht in der `docs/INDEX.md`-Zeile, weil eine
-Zahl, die ihre eigene Länge mitnennt, sich beim Schreiben ändert; `doc_health` prüft sie mit einem
-Band von ±2 KB.) Kette und Block sind damit *beide* erledigt, und der Rest ist **allein** die
-§-Modulstatus-Tabelle: **30.564 B**, davon **30.520 B in 14 Zeilen** (Kopf + 13 Datenzeilen) und allein **15.041 B in drei Zeilen** (Gate/Z 6.075 · A 4.915 · B 4.051) — (die Zahlen der Tabelle **nach** dem eigenen Nachtrag von heute: 29.579 B ⇒ **30.564 B**, davon 30.520 B in 14 Zeilen = Kopf + 13 Datenzeilen, die drei größten **15.041 B** (Gate/Z 6.075 · A 4.915 · B 4.051) — eine Zahl, die ihre eigene Länge mitnimmt, altert beim Schreiben, also nachgemessen statt gerechnet)
-(A 4.915 · Gate/Z 5.092 · B 4.050). **Die Blockschnittzahl ist damit gegenstandslos** — K=1 ist die Konvention, und selbst K=1
-passt nicht, weil nicht die Anzahl der Blöcke das Problem ist, sondern die Breite einer Tabelle.
-**Kürzen ist damit keine Formfrage mehr, sondern die einzige noch offene Hebel**, und er ist
-deiner: der Inhalt dieser Zellen steht **wortgleich** in `SESSIONS_ARCHIVE.md` (280 KB), ist also
-verlustfrei in ein L3-Archiv zu ziehen — der Weg ist am 2026-10-02 an zwei anderen Stellen
-gegangen (`phase1_storage/CONTRACTS_ARCHIVE.md`, `phase5_ui/ABNAHME_MATRIX_ARCHIVE.md`, beide
-verbatim mit Roundtrip-Gegenprobe). **Gemessen bereit, nicht getan**, weil der Inhalt des
-Archivs deine Entscheidung ist.
+Lesart:
 
-**Und der Hebel, den man *nicht* ziehen darf, mit seiner Zahl, weil der Block von gestern ihn
-genannt hat und jetzt im Archiv liegt:** die **gestrichenen** Statusabsätze dieser Tabelle sind
-**229 B** — Faktor 58 gegen die rund 13 KB, die der Softcap übersteigen. Die verbreitete Geschichte
-davon war „7.467 B, und Streichen brächte den Head sicher unter den Softcap"; sie ist seit dem
-2026-10-03 widerlegt und der Wächter `test_the_lever_named_against_the_head_oversize_is_the_measured_one`
-prüft das in **drei** Richtungen (ein zu kleiner Hebel kann die Überschreitung nicht beseitigen ·
-die lebende Masse muss die tragende sein · **der neueste Session-Block nennt die gemessene Zahl,
-sonst liest der nächste Start wieder nur die alte**). Clause (c) hat mich beim Schreiben dieses
-Absatzes rot gemeldet, weil mein Block die Zahl nicht nannte — der Wächter hat seinen eigenen
-Zweck erfüllt, an dem Text, der ihn ablösen wollte.
+| Befund | Bedeutung |
+|---|---|
+| Probe 3 mit Reset, Probe 4 mit TLS-Alert von Caddy | Filter auf den Hostnamen (SNI) |
+| beide mit Reset | IP oder Hoster gesperrt |
+| Resolve liefert eine andere IP | Firmen-DNS lenkt die Domain um |
 
-**Selbstprüfung, heute gemessen, nicht aus der Doku übernommen.** `pytest` **1209 → 1217**
-(Baseline **1209** vor
-Beginn (der 2026-10-03-Block nennt 1203; die sechs Differenz sind `test_prepend_chain.py`, mit
-dessen Commit dazugekommen — abgeglichen statt geglaubt) · `ui_budget` **5/5** · `doc_health`
-**0** · Tabu-Pfade unberührt · **kein `systemctl`, kein `pkill -f`**, keine Wegwerf-Instanz, kein
-Netzzugriff, kein Deploy. **Vier eigene Fehler in diesem Block, alle vor dem Commit behoben und
-zwei davon mit derselben Lehre wie der Fund:** (1) die Ausnahmeliste nannte einen Pfad, den es
-nicht gibt (`docs/concepts/phase6_shares/…` statt `phase6_shares/…`) — der Prüfer meldete dadurch
-den Veteranen als *unbekannten* Verstoß, also **rot statt grün**, was richtig war; (2) dieselbe
-Liste hatte `ROADMAP.md` zweimal als Schlüssel, der zweite war stillschweigend eine leere
-Ausnahme; (3) `hidden_bytes()` summierte die **Trenner** mit, die Kennzahl war damit um 2 zu hoch
-— eine Zahl, die ihre eigene Form mitzählt; (4) die Reparatur-Gegenprobe suchte den reparierten
-Text in der **ganzen Datei** und traf deshalb den Session-Block, der die kaputte Form wörtlich
-zitiert — **ein Wächter, der das Richtige an der falschen Stelle prüft, ist derselbe Fehler wie der
-verworfene Marker**, nur eine Ebene tiefer.
+Parallel kann der Nikinger auf dem VPS `journalctl -u caddy -f` laufen lassen, während der Laptop
+probt. Erscheint **keine** Zeile, sitzt die Sperre davor. **Lösung:** IT-Ticket, Domain freigeben bzw.
+kategorisieren lassen. **Nicht** umgehen.
 
-**Nächster Schritt, nach Zuständigkeit — und es ist fast nichts mehr, was an mir hängt.**
-(1) **Du: die Modulstatus-Tabelle kürzen** (der einzige verbliebene Hebel, Zahlen oben, Weg
-bewährt) oder sie als Endzustand benennen. (2) **Du: das zweite Claude-Konto umstellen** — drei
-Handgriffe, kein Code; danach P9-13/V150 ✅. (3) **Du: P9-15** — drei Läufe `/api/v1/overview` mit
-echter UI-Session, ein Cookie-Jar gehört nicht in eine Datei. (4) **Die Wurzel-Rotation**: heute entschieden (K=1) und gebaut — **P9-A ist der unberührte Scope-Lock**, der Fehlname „P9-A-Umkehr" ist in der Wurzel datiert korrigiert
-Wurzel-`CLAUDE.md` (Umkehr + K=?; `K=1` ⇒ 17.515 B, liegt bereit). Danach, und **erst dann**:
-Übersichtsgrafik §12.4 gerendert **und angesehen**, ROADMAP-Zeile, Phase auf ✅. **Fester Termin:
-am 2026-10-18 schließt das Übergangsfenster von selbst** — die alte Adresse liest dann nur noch.
-Absicht, kein Versehen.
+**[2026-10-05, später — Laptop-Messung; die Vermutung oben ist korrigiert]** Der Laptop hat **keinen
+direkten Internetzugang**, nur einen Firmen-Proxy (Nikinger). Gemessen hat er:
+- DNS liefert `217.160.128.146`, also korrekt
+- `Test-NetConnection :443` → Timeout
+- beide `curl.exe --resolve`-Proben → Timeout nach 21 s, **mit und ohne** richtigen SNI
 
-**[2026-10-04, wie dieser Block überholt ist]** (1) und (4) sind **erledigt** — beide Strukturen
-rotiert, beide Heads unter dem Softcap (Nachtrag unten). **(2) ist zurückgestellt und wandert nach
-P10**: ein Schritt, der ein Konto braucht, ist kein Blocker (Plan §0.1a). **(3) P9-15 ist die Arbeit
-der nächsten Session.** Die Liste bleibt unverändert stehen, weil ein Block ein Datumszeug ist.
+Das ist **kein SNI-Filter beim Direktweg**. Der Direktweg existiert gar nicht. Firefox läuft über den
+Proxy, und **der Proxy** setzt die Verbindung zur neuen Domain zurück (`NS_ERROR_NET_RESET`). Die
+alte `*.ts.net`-Adresse lässt er durch. Die Diagnose-Tabelle oben ist für diesen Laptop
+gegenstandslos. **Lösung:** IT-Ticket, den Host auf der Proxy-Freigabeliste. Mit
+`Invoke-WebRequest … -UseBasicParsing -ProxyUseDefaultCredentials` sieht man die Antwort des Proxys,
+ohne seine Adresse zu nennen.
 
-### Nachtrag — die Wurzel-Rotation und das L3-Archiv: beide Heads jetzt unter dem Softcap
+**Warum so gebaut.**
+- **Wort `open` statt Datum 2099.** Ein Fantasiedatum hätte im Dialog gestanden, als
+  Abschalttermin, den niemand beschlossen hat.
+- **Fail-closed bleibt erhalten.** Nur das exakte Wort öffnet das Fenster. Leer oder halb gesetzt ist
+  weiter ein Startfehler; `OPEN` wird abgelehnt, getestet.
+- **Intern `date.max`.** Damit bleiben `legacy_writable()` und `origin_allowed()` **byte-identisch**:
+  die CSRF-Prüfung ist nicht angefasst. `None` im Dataclass als „offen" zu deuten, hätte genau diesen
+  Pfad fail-open gemacht.
+- **`/api/v1/meta` meldet `until: null` bei `writable: true`.** Der Dialog liest das als
+  „unbefristet", deshalb erscheint nie „31.12.9999".
+- **Tabu-Liste §0.3 nicht berührt.** Geändert sind `mcpserver/config.py` (nicht `permissions.py` oder
+  `server.py`), `webui/api.py`, `app.js` und `app.html`.
 
-**Zwei Benennungen, die zwei Sessions lang offen waren, sind entschieden und gebaut (Nikinger,
-2026-10-04), und die Antwort auf die erste war nicht die erwartete.** Die Phase hatte
-`phase9_hardening/CLAUDE.md` bei **56.860 B = 15.900 B über** dem Softcap; Session-Block und
-`updated:`-Kette waren heute Vormittag rotiert, und die Antwort auf „wie viele Blöcke bleiben im
-Head?" lautet: **das war nie der Hebel.** Nach beiden Rotationen stand der Head bei 49.033 B — noch
-**rund 14 KB drüber**, weil die **§-Modulstatus-Tabelle allein 30.564 B in 14 Zeilen** trug, davon
-**15.041 B in drei Zeilen** (Gate/Z 6.075 · A 4.915 · B 4.050). **K=1 ist die Konvention, und selbst
-K=1 passt nicht**, weil nicht die *Anzahl* der Blöcke das Problem ist, sondern die **Breite einer
-Tabelle.** Beide Wege sind derselbe: verbatim nach L3, Roundtrip-Gegenprobe, im Head ein Kurzstand.
-**Gebaut:** `phase9_hardening/MODULE_STATUS_ARCHIVE.md` — eine Sektion je Step, jeder Text
-**byte-identisch**; im Head je Step ein **Kurzstand** mit Marker, Zustand, Offenem und Zeiger. Head
-**56.860 → 31.357 B**, damit **zum ersten Mal unter dem 40-KiB-Softcap.**
+**Belege.**
+- `pytest` **1217 → 1223**: 6 neue Fälle in `test_legacy_window.py` (open wird geparst · `OPEN` und
+  halb gesetztes `open` abgelehnt · 2030 schreibbar, fremde Origin weiter 403 · `meta` ohne Datum ·
+  Verdrahtung von Titel, Text und Knopf)
+- `ui_budget` 5/5 (165,5 KB)
+- `node --check` grün
+- Wächter (c) aus `test_acceptance_numbers.py`: die gestrichene Masse beträgt unverändert **229 B**
+- Wächter (c) aus `test_acceptance_numbers.py`: die gestrichene Masse beträgt unverändert **229 B**
+- **Browser-Probe `p9a_legacy_probe.py` 24/24**, jetzt mit drei Läufen gegen die Wegwerf-Instanz
+  auf Port 18775, gestoppt über die PID-Datei; Bild: `docs/screenshots/p9a_legacy_unbefristet.png`,
+  angesehen
 
-**Und der zweite Weg, der derselbe ist: die Wurzel.** `CLAUDE.md` trug **24** Session-Blöcke in
-§Current state (91.123 B von 114.771 B); **K=1** ⇒ **32.334 B**, die älteren 23 **verbatim** nach
-`docs/PROJECT_SESSION_LOG.md` (L3, wohin die Wurzel seit 2026-09-08 selbst zeigt). **Byte-Buchhaltung
-auf das Byte: 216.221 B in beiden Dateien vorher == 216.221 B nachher.** Dafür gab es bisher **kein
-Werkzeug** — `rotate_session_block.sh` schneidet an `^## Session stopped`, und die Wurzel trägt ihre
-Blöcke als `**[YYYY-MM-DD, `-Absätze. Also **`scripts/rotate_root_current_state.sh`** (sechs
-Gegenproben) mit einer Eigenschaft, die kein Skript bisher hatte: **KEEP ist der _neueste_ Block,
-weil die Wurzel newest-first ist — im Phase-Head ist die Reihenfolge umgekehrt.**
+**Nächster Schritt (Nikinger, vor dem 2026-10-18):**
+1. `phase5_ui/scripts/deploy.sh main`
+2. in `phase3_edge/local.env` `LEGACY_UNTIL=open` setzen
+3. `phase3_edge/scripts/install_units.sh` ausführen
+4. Dienst neu starten und `health_gate.sh` laufen lassen
+5. auf der alten Adresse den Dialog „Es gibt eine neue Adresse" sehen
 
-**Drei eigene Fehler in diesem Block, zwei davon von einem Wächter gefunden und einer von einer
-Gegenprobe, die ich für eine Formkorrektur hielt.** (1) Die erste Fassung des Skripts übernahm die
-Bedingung des Vorbilds (`i < TOTAL_BLOCKS - KEEP`, „die letzten KEEP bleiben") und hat damit bei K=1
-den **ältesten** Block behalten und den neuesten archiviert. **Nicht** die Mengen-Gegenprobe hat es
-gemeldet, sondern die **Byte-Gegenprobe** — und sie meldete den Block, an dem *zwei* Blockgrenzen
-lagen, also die Reihenfolge und nicht die Zahl. (2) `block_end` gab `MARKS[i+1] - 2` und ließ damit
-**an jeder Grenze eine Leerzeile fallen**; die Reassemblierungs-Gegenprobe brach ab, zu Recht — ein
-Schnitt, der eine Zeile je Grenze verliert, ist stiller Datenverlust und kein Rundungsfehler. Erst
-danach war der Archivteil byte-identisch. (3) Ich habe den Tippfehler „Doko-Strukturen" erst beim
-Suchen bemerkt, und beim Suchen **zwei weitere Anker nicht gefunden**, weil ein Anker den Tippfehler
-enthielt — **ein Anker, der den Fehler des Textes kopiert, findet den Fehler nicht.** Und eine
-Diagnose, die ich selbst für erledigt hielt: der Ausdruck **„P9-A-Umkehr"** ist ein **Fehlname**,
-siehe die datierte Korrektur in der Wurzel.
-
-**Selbstprüfung:** `pytest` 1209 → **1218** · `ui_budget` **5/5** · `doc_health` **0** · Tabu-Pfade
-unberührt · **kein `systemctl`, kein `pkill -f`**, keine Wegwerf-Instanz, kein Deploy. **`doc_health`
-hat viermal rot gemeldet, viermal zu Recht** — nach jeder Größenänderung eine exakte INDEX-Angabe.
-
-**Nächster Schritt — es ist nichts mehr, was an mir hängt, und genau das hat sich heute geändert.**
-**Nikinger-Entscheidung 2026-10-04: Schritte, die am Fabi-Konto hängen, sind nie ein Phasen-Blocker.**
-P9-13/V150 (das zweite Claude-Konto) standen zwei Sessions auf ⚠️ „1 von 2 Konten" und wurden damit
-**faktisch zum Blocker durch eine Person**; sie sind heute auf ⬜ mit Wanderungsvermerk nach P10
-gesetzt, und die Regel steht in der Wurzel-`CLAUDE.md` §Working style wie im Plan §0.1a. **Die
-Marke wechselt dabei von ⚠️ auf ⬜, weil das zwei verschiedene Dinge sind:** ⚠️ heißt in dieser Matrix
-*erfüllt mit benannter Abweichung*, und ein Konto ist keine Abweichung, sondern ein fehlender
-Schritt. **Die Begründung, die man merken muss:** ein Schritt, den nur ein Mensch mit einem Konto tun
-kann, ist **ein Termin**. Ein echter Blocker wäre ein **Code**-Fehler oder ein **Mess**-Befund.
-
-**Und was bleibt, ist jetzt eine Aufgabe und kein Termin mehr: P9-15 ist die Arbeit der nächsten
-Session.** Drei Läufe `/api/v1/overview` mit **echter UI-Session** (Passwort + TOTP) gegen die
-Referenz 372,9 ms, die selbst falsch ist (in-process, `ui_budget.py`, nie über Funnel — gemessen am
-2026-10-03, see dort). **Der offene Weg, damit daraus kein Cookie-Jar in einer Datei wird:** der
-Browser wird von Playwright bedient und die **Anmeldung macht der Nikinger einmal im sichtbaren
-Fenster** — das Passwort und der TOTP verlassen sein Fenster nie, es steht in keiner Datei und in
-keinem Kommando, und der nächste Lauf kann die drei Läufe gegen dieselbe Session wiederholen. **Vor
-dem Bau kurz in `docs/concepts/sichtpruefung_automation_conventions.md` nachsehen**, ob das dort
-schon als Muster steht.
-
-Danach, und **erst dann**: Übersichtsgrafik §12.4 gerendert **und angesehen**, ROADMAP-Zeile, Phase
-auf ✅. Beide Benennungen von heute sind gebaut; beide Heads liegen unter dem Softcap.
+**Notlösung ohne Release:** nur `LEGACY_UNTIL` auf ein späteres Datum setzen und Schritte 3–4
+ausführen; der Dialog nennt dann dieses Datum. **Wann zurück auf ein Datum:** erst wenn der
+Arbeitslaptop die neue Adresse belegt erreicht.

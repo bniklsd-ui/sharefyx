@@ -140,7 +140,7 @@ Massen-Re-Login zu befürchten; A8 betrifft nur die Connector-Adresse in den Kon
 **[2026-10-05, Nikinger-Entscheidung] Das Fenster ist jetzt unbefristet möglich:**
 `LEGACY_UNTIL=open`. Anlass: der Arbeitslaptop erreicht `sharefyx.eurofyx.com` hinter dem
 Firmen-VPN (genua genuconnect) nicht. Firefox meldet `NS_ERROR_NET_RESET` mit 0 B; vom MacBook und
-von der Heim-VM ist die Adresse einwandfrei erreichbar (DNS, TLS, `303` gemessen). Die Vermutung ist
+von der Heim-VM ist die Adresse einwandfrei erreichbar (DNS, TLS, `303` gemessen). *[Später am selben Tag gemessen: der Laptop hat keinen Direktweg, nur einen Firmen-Proxy, und **der Proxy** setzt die neue Domain zurück; kein SNI-Filter auf einem Direktweg.]* Die erste Vermutung war
 ein Filter für neu registrierte Domains (registriert am 2026-10-01); Diagnosebefehle stehen im
 Session-Block vom 2026-10-05 im Phase-Head. Die alte Adresse schreibt, **bis** die neue vom
 Arbeitslaptop aus belegt funktioniert. Erst dann wird wieder ein Datum gesetzt, und das wird
