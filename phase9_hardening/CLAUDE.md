@@ -184,12 +184,34 @@ ohne seine Adresse zu nennen.
   auf Port 18775, gestoppt über die PID-Datei; Bild: `docs/screenshots/p9a_legacy_unbefristet.png`,
   angesehen
 
-**Nächster Schritt (Nikinger, vor dem 2026-10-18):**
-1. `phase5_ui/scripts/deploy.sh main`
-2. in `phase3_edge/local.env` `LEGACY_UNTIL=open` setzen
-3. `phase3_edge/scripts/install_units.sh` ausführen
-4. Dienst neu starten und `health_gate.sh` laufen lassen
-5. auf der alten Adresse den Dialog „Es gibt eine neue Adresse" sehen
+**Nächster Schritt (Nikinger, vor dem 2026-10-18) — Release `v3.1.2`.** Release-Commit mit
+Versionsmarke und `UPDATE_LOG`-Eintrag `## 2026-10-05`.
+
+**Reihenfolge, und warum sie zwingend ist:** **erst** deployen, **dann** `LEGACY_UNTIL=open`. Zwei
+Gründe:
+- `install_units.sh` schreibt den Wert in die Unit.
+- `deploy.sh` rollt bei rotem Gate auf `v3.1.1` zurück, und `v3.1.1` kennt `open` nicht: der
+  Parser bricht ab, der Dienst startet nicht.
+
+Mit dieser Reihenfolge ist jeder Zwischenzustand lauffähig.
+
+1. Deploy mit dem Kommando aus dem P8-Archiv und den Pfaden aus `local.env`, danach
+   `health_gate.sh --expected-version=v3.1.2 --require-todays-update-log --expected-sha=<sha>`.
+2. `sed -i 's/^LEGACY_UNTIL=.*/LEGACY_UNTIL=open/' phase3_edge/local.env`
+3. `sudo phase3_edge/scripts/install_units.sh` macht nur `daemon-reload` + `enable --now`, also
+   **kein** Neustart. Danach `sudo systemctl restart sharefyx-mcp`.
+4. Gate erneut laufen lassen, dann auf der alten Adresse den Dialog „Es gibt eine neue Adresse"
+   sehen.
+
+**Deploy an einem anderen Tag:** das Update-Log-Gate verlangt einen Eintrag vom selben Tag. Dann
+entweder einen neuen `## <Datum>`-Block oder `SHAREFYX_ALLOW_STALE_UPDATELOG=1` setzen und
+`--require-todays-update-log` weglassen.
+
+**Nikinger-Angabe zum Proxy:** er sperrt nur einzelne Seiten (Beispiel Bybit), es ist **keine**
+Allowlist. Bei einer neu registrierten Domain spricht das für eine Kategorie- bzw. NRD-Sperre. Die
+verfällt bei verbreiteten Produkten typischerweise nach etwa 30 Tagen, für `eurofyx.com` also etwa
+Anfang November. Das ist **aus dem Gedächtnis**, nicht nachgelesen, und das Produkt ist unbekannt.
+Ein Ticket beschleunigt es.
 
 **Notlösung ohne Release:** nur `LEGACY_UNTIL` auf ein späteres Datum setzen und Schritte 3–4
 ausführen; der Dialog nennt dann dieses Datum. **Wann zurück auf ein Datum:** erst wenn der

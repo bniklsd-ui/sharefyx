@@ -9,6 +9,9 @@
      (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
+## 2026-10-05
+- Die alte Adresse funktioniert bis auf Weiteres wieder vollständig, auch zum Schreiben — für Netze, die die neue Adresse noch nicht erreichen (z. B. ein Firmen-VPN). Der Hinweis dort sagt das jetzt so und nennt keinen Abschalttermin mehr.
+
 ## 2026-10-03
 - Die Kopfdaten haben ein neues Feld „Bei“: damit steht, wer eine Aufgabe übernommen hat. Setzt du den Status auf „In Arbeit“ und das Feld ist noch leer, trägt die Oberfläche deinen eigenen Space selbst ein.
 - In der Liste und in der Nur-lesen-Ansicht steht jetzt „bei <Name>“ mit drin, und im Editor darunter, von wem die Notiz zuletzt geändert wurde.
