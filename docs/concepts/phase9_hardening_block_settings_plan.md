@@ -1,0 +1,245 @@
+---
+status: live
+purpose: "Mini-Plan P9 Block settings + Restposten — Einstellungen als Fensterkette (Menü → Unterfenster → Space-Detail), Passwort-Reihenfolge, V118 auf eine Linie, D1 neu beschrieben, P9-11 Portscan-Anleitung, Phasenabschluss. Locks P9-AE–P9-AL, Abnahme P9-83–P9-95, [VERIFY] V185–V188"
+read-when: Bau des settings-Blocks, P9-11-Portscan, oder P9-Closeout nach dem 2026-10-05
+detail: L2
+up: ../../phase9_hardening/CLAUDE.md
+down:
+  - ./phase9_hardening_plan.md               # 📕 übergeordneter P9-Plan; §12.4 Übersichtsgrafik, P9-11, P9-27, P9-36
+  - ./phase9_hardening_block_trace_plan.md   # 📕 Formvorlage dieses Mini-Plans
+updated: 2026-10-05 (geschrieben, Claude Code, nach dem Deploy `v3.1.2`; Wünsche und Entscheidungen des Nikingers vom selben Tag)
+---
+
+# Phase 9 — Block settings und die Restposten bis zum Closeout
+
+> **Ein Block plus Aufräumen, kein Phasenplan.** Anlass: Nikinger am 2026-10-05, nach `v3.1.2`.
+> Er hat dabei drei Fragen der Phase beantwortet (V118, D1, Vorsicht-Kontrast) und einen
+> Umbau des Einstellungs-Menüs gewünscht. **Nicht gebaut ist noch nichts.** Der Plan ist gegen
+> `main@0639195` gelesen.
+
+## §0 Rahmen
+
+### 0.1 Auftrag
+
+1. **Einstellungen als Fensterkette.** Ein kleines Menü öffnet Unterfenster **daneben**, und das
+   Menü bleibt sichtbar. Aus „Spaces verwalten" öffnet ein Klick auf einen Space ein drittes
+   Fenster.
+2. **Drei kleine Entscheidungen umsetzen:**
+   - V118: eine Linie statt zwei
+   - D1: neu beschreiben
+   - Vorsicht-Kontrast: bleibt so
+3. **Phase 9 schließen:**
+   - P9-11-Portscan (Nikinger, Anleitung §5)
+   - Übersichtsgrafik
+   - Doku-Drift
+   - ROADMAP
+   - Phase auf ✅
+
+### 0.2 Gemessener Ausgangszustand (Code, `main@0639195`, read-only)
+
+| Stelle | Heute |
+|---|---|
+| `app.html:487` `#account-dialog` | Titel **„Passwort ändern"**, darunter Hinweis, dann zwei `.btn.account-nav` (Update-Log, Spaces) in **voller Breite** mit Chevron, dann das Passwortformular |
+| Formularreihenfolge | aktuelles Passwort → **TOTP** → neues → wiederholen |
+| `app.js:85` | „Spaces verwalten" **schließt** das Konto-Fenster und öffnet `#space-admin-dialog` |
+| `updates.js` | „Update-Log ansehen" öffnet `#update-log-dialog` als eigenes Overlay |
+| `#space-admin-dialog` | Liste (Zeilen ohne Abstand), Anlege-Zeile, `<hr>`, Detail (`#space-detail`) **im selben Fenster** |
+| `.overlay` / `.overlay__panel` (`app.css:1814`) | jedes Fenster = eigenes Vollbild-Overlay, Panel `width: 90%; max-width: 440px` |
+| `.account-nav` (`app.css:708`) | `width: 100%` — **auch** vom Alte-Adresse-Dialog benutzt (`#legacy-host-link`) |
+| `graph.js :: drawEdges()` | Tag-Kante + explizite Kante desselben Paars = **zwei** Striche; `test_graph_reload.py:182` nagelt das fest |
+
+### 0.3 Scope
+
+**Drin:**
+- `app.html` (die drei Einstellungs-Overlays)
+- `app.css` (Fensterkette, Größen)
+- `app.js`, `dialogs.js`, `spaces.js`, `updates.js` (Öffnen/Schließen)
+- `graph.js` (V118)
+- die Tests dazu
+- eine Browser-Probe
+
+**Draußen:**
+- jede API-Änderung — die Routen bleiben byte-identisch
+- der Alte-Adresse-Dialog
+- `#space-remove-dialog`: bleibt ein **modales** Bestätigungsfenster obendrauf (zerstörende Aktion, eigener Fokus)
+
+### 0.4 Tabu
+
+Plan §0.3 unverändert. Dazu kommen `phase5_ui/webui/api.py`, `security.py` und `phase4_auth/`: der
+Block ist reines Frontend.
+
+## §1 Gelockte Entscheidungen
+
+| Lock | Inhalt | Herkunft |
+|---|---|---|
+| **P9-AE** | Das Menü heißt **„Einstellungen"**. Es trägt **keinen** Hinweistext und genau drei Knöpfe in dieser Reihenfolge: **Passwort ändern · Spaces verwalten · Update-Log**. „Spaces verwalten" bleibt hinter `meta.space_admin` (P7-R). | Nikinger 2026-10-05 |
+| **P9-AF** | Die Menüknöpfe sind **Standard-`.btn`**, also dieselbe Höhe, Polster und Schrift wie „Verschieben" (`#list-selection-move`, öffnet die Ordnerwahl). Untereinander, alle so breit wie der breiteste, **nicht** volle Panelbreite. Die Klasse `.account-nav` fällt im Menü weg und bleibt nur am Alte-Adresse-Dialog. | Nikinger 2026-10-05 („exakt die Größe des Standardknopfs"); Annahme „Verschieben" = der gemeinte Knopf, siehe V185 |
+| **P9-AG** | **Fensterkette statt Overlay-Wechsel:** ein Overlay `#settings-overlay` mit **einer Reihe** von Panels nebeneinander. Stufe 1 ist das Menü, Stufe 2 das gewählte Unterfenster, Stufe 3 das Space-Detail. Ein Klick auf einen anderen Menüknopf **ersetzt** Stufe 2 und schließt Stufe 3. Der Knopf des offenen Unterfensters trägt den Auswahlzustand der Konvention (`aria-current`, `--select-fill`), damit man sieht, wozu das Fenster daneben gehört. | Nikinger 2026-10-05; Auswahl-Markierung: Konvention v3 (`phase8_ui_graph/CLAUDE.md`) |
+| **P9-AH** | **Schließen von rechts nach links:** ESC schließt das **rechteste** Panel. Jedes Unterfenster hat sein eigenes „Schließen", das nur dieses Panel und alles rechts davon schließt. Das Menü schließt die ganze Kette. Der Klick auf den Hintergrund verhält sich wie bei jedem anderen Overlay heute. | Folgerung aus P9-AG; ESC-Kette wie `app.js:258 ff.` |
+| **P9-AI** | **Schmale Fenster (< Summe der Panelbreiten, Richtwert 1024 px):** es bleibt nur das **rechteste** Panel sichtbar, mit einem „Zurück"-Knopf links oben. Kein Quetschen, kein horizontales Scrollen. | Claude Code; dieselbe Regel wie P8.6 Plan 2 (≤ 1024 px: Liste **oder** Editor, nie beides) |
+| **P9-AJ** | **Passwort-Reihenfolge:** aktuelles Passwort → neues → wiederholen → **TOTP zuletzt**. So ist der Code beim Absenden noch frisch. Der Hinweis zu Connectoren und Sitzungen wandert **in** dieses Unterfenster. Die Request-Form bleibt byte-identisch. | Nikinger 2026-10-05 |
+| **P9-AK** | **Spaces-Unterfenster:** Zeilen mit sichtbarem Abstand (`gap: var(--space)`), zwischen Liste und Anlege-Zeile eine Trennlinie, **dasselbe `<hr>`**, das heute vor dem Detail steht. Ein Klick auf einen Space öffnet Stufe 3 mit Mitgliedern, Hinzufügen, Re-Auth-Feldern und „Space entfernen". Update-Log-Unterfenster: **Inhalt identisch**, nur der Ort ändert sich. | Nikinger 2026-10-05 |
+| **P9-AL** | **Größen:** Panels nach Inhalt statt `90 % / 440 px`. Richtwerte: Menü `fit-content`, Passwort und Spaces etwa 320–360 px, Update-Log behält seine Lesebreite. Knöpfe in Panels nie `width: 100 %`. Die Werte legt der Bau gegen Bilder fest, nicht vorher. | Nikinger 2026-10-05 („viel breiter als nötig") |
+
+**Und drei Antworten des Nikingers auf offene Fragen der Phase:**
+
+- **V118 / P9-36 → eine Linie.** *„Wenn A auf B verlinkt, ist B für A automatisch relevant."*
+  Gebaut wird das so: die **explizite** Kante gewinnt und bleibt durchgezogen. Implizite Tag- und
+  Ordner-Kanten für ein Paar mit expliziter Kante entfallen **bei der Übernahme**
+  (`rebuildImplicitEdges`), nicht erst in `drawEdges()`. Grund: die Gradzählung soll stimmen,
+  dasselbe Argument wie `dedupeEdges()` (`graph.js:252`). Der Test
+  `test_a_tag_edge_and_an_explicit_edge_draw_two_lines` wird **umgedreht und umbenannt**, mit Datum.
+- **Vorsicht-Kontrast (Backlog B17 Punkt 3) → bleibt.** *„Einheitlich mit dem Rest, aber doch etwas
+  eigen."* Der Backlog-Punkt wird geschlossen, mit Datum.
+- **D1 / P9-27 → neu beschrieben.** Die Matrix-Fassung war falsch. Richtig ist: ESC schließt im
+  macOS-Vollbildfenster das Item, **und zusätzlich** beendet macOS den Vollbildmodus. Siehe §4.
+
+## §2 Verworfene Alternativen
+
+- **Drei getrennte Overlays nebeneinander positionieren.** Drei Hintergründe übereinander dunkeln
+  dreifach ab. Außerdem bräuchte jedes Overlay die Geometrie der anderen. Ein Overlay mit einer
+  Flex-Reihe hat eine einzige Stelle für Layout und ESC.
+- **Unterfenster als Akkordeon im Menü.** Das widerspricht dem Wunsch „Menü und Unterfenster
+  sichtbar, nebeneinander".
+- **`.account-nav` global umbauen.** Das träfe den Alte-Adresse-Dialog mit. Den hat der Nikinger
+  heute gesehen und abgenommen.
+- **V118 in `drawEdges()` filtern.** Das Bild wäre richtig, die Grad- und Nachbarzählung
+  (`recomputeDegrees`) falsch. Dieselbe Falle hat P8.6-N schon einmal benannt.
+
+## §3 Bauschritte (ein Commit für den Block, ein Release `v3.1.3`)
+
+1. **Markup.**
+   - `#settings-overlay` mit `.settings-chain` und vier Panels: `#settings-menu`,
+     `#settings-password`, `#settings-spaces`, `#settings-space-detail`; dazu das Update-Log-Panel.
+   - Die bestehenden IDs der Formularfelder, Listen und Knöpfe **bleiben**. JS und Tests hängen an
+     ihnen.
+   - `#account-dialog`, `#space-admin-dialog` und `#update-log-dialog` als eigene Overlays fallen weg.
+   - Das Update-Banner („Alle Updates ansehen") öffnet die Kette direkt mit dem Update-Log-Panel.
+     **[VERIFY] V186:** ob das Banner heute denselben Dialog öffnet.
+2. **JS.**
+   - Ein kleines Modul `settings.js` mit `openSettings(stage2?)`, `openPanel(name)`,
+     `closeFrom(name)` und `closeRightmost()`.
+   - `dialogs.js :: openAccountDialog`, `spaces.js :: openSpaceAdminDialog/selectSpace` und
+     `updates.js` öffnen Panels statt Overlays.
+   - `anyOverlayOpen()` und die ESC-Kette in `app.js` kennen die Kette als **ein** Overlay mit
+     `closeRightmost()`.
+3. **CSS.**
+   - `.settings-chain { display:flex; gap; align-items:flex-start }`
+   - Panels mit `width: fit-content` bzw. den Richtwerten aus P9-AL
+   - Menüknöpfe als Spalte mit `width: 100%` **des Menü-Panels**, das selbst `fit-content` ist —
+     so werden alle so breit wie der breiteste
+   - Space-Zeilen mit `gap`
+   - der Schmal-Modus aus P9-AI
+   - **Kein neuer Farbwert:** Glas, Schatten und Auswahl-Fill kommen aus bestehenden Tokens
+4. **V118.** In `rebuildImplicitEdges()` die Paare der expliziten Kanten als Set vorhalten und
+   implizite Kanten dieser Paare verwerfen. Den Test umdrehen: `segments_in_last_frame == 1`,
+   `duplicate_segments == 0`.
+5. **Tests.**
+   - `test_static_routes.py`: die Assertions auf die alten Overlay-IDs, auf `.account-nav` im Menü
+     und auf die Feldreihenfolge **umschreiben, nicht löschen**. Jede alte Assertion bekommt eine
+     neue mit derselben Absicht.
+   - Neuer `test_settings_chain.py`:
+     - Reihenfolge der drei Knöpfe
+     - kein Hinweistext im Menü
+     - TOTP-Feld nach den Passwortfeldern
+     - `.account-nav` nur noch am Alte-Adresse-Dialog
+     - ESC-Kette verdrahtet
+   - **[VERIFY] V187:** welche Skripte in `phase8_6_ui_polish/scripts/` und
+     `phase8_ui_graph/scripts/` die alten IDs ansprechen (gefunden:
+     `p86_block_b_self_check.py`, `p8_16_glass_fallback_probe.py`). Es sind historische Proben; sie
+     werden **nicht** umgebaut, bekommen aber einen datierten Kopfvermerk.
+6. **Browser-Probe** `phase9_hardening/scripts/p9_settings_chain_probe.py` gegen die Wegwerf-Instanz
+   (Port 18775, PID-Datei):
+   - S1: Menü — drei Knöpfe, Reihenfolge, Höhe gleich `#list-selection-move` (±1 px), keine volle Breite
+   - S2: Passwort daneben, Menü bleibt sichtbar, Knopf trägt `aria-current`
+   - S3: Wechsel auf Spaces ersetzt Stufe 2
+   - S4: Klick auf Space öffnet Stufe 3, drei Panels gleichzeitig sichtbar bei 1440 px
+   - S5: ESC dreimal schließt von rechts nach links, das vierte Mal ist nichts mehr offen
+   - S6: Passwortwechsel **echt** gegen die Wegwerf-Instanz (TOTP aus dem Wegwerf-Seed) → Toast, Sitzung bleibt
+   - S7: Space anlegen erscheint in der Liste, Detail zeigt Mitglieder
+   - S8: 1024 px — nur das rechteste Panel sichtbar, „Zurück" funktioniert
+   - S9: V118 — eine Linie (der bestehende Harness aus `test_graph_reload.py`)
+
+   **Bilder bei 1440 und 1024 px, angesehen.** Gegenläufe:
+   - G1 `aria-current`-Setzen raus → S2 rot
+   - G2 `closeRightmost` schließt alles → S5 rot
+   - G3 implizite Kante nicht verworfen → S9 rot
+7. **Release:**
+   - `.rail__version` `v3.1.3` (Patch)
+   - `UPDATE_LOG` mit Tagesdatum, je eine `- `-Zeile für Einstellungen, Passwort-Reihenfolge und die eine Linie
+
+## §4 D1 / P9-27 — was sich ändert
+
+Gemeldet war 2026-09-23: *„ESC im Vollbild schließt zusätzlich das Item."* Die Matrix las daraus
+„ESC soll nur das Vollbild verlassen". Laut Nikinger heute ist das Verhalten so: **ESC schließt das
+Item (gewollt), und macOS beendet dabei das native Vollbildfenster (der grüne Knopf).**
+
+- **Ursache:** das native Vollbild ist ein Fensterzustand des Betriebssystems, nicht der
+  Web-Fullscreen-API. ESC beendet es, bevor oder während die Seite das `keydown` bekommt.
+- **Was eine Seite tun könnte:** ESC per Keyboard Lock API reservieren. Die gibt es meines Wissens
+  **nur in Chromium** und nur im Web-Vollbild. **[VERIFY] V188**, aus dem Gedächtnis, nicht
+  nachgelesen.
+- **Vorschlag:** P9-27 auf ⚠️ *„Verhalten belegt (Nikinger 2026-10-05), Vollbild-Ende ist
+  OS-Verhalten und von der Seite nicht abfangbar"* setzen und D1 schließen. Bestätigt sich V188
+  anders, wird es wieder ein Backlog-Posten für P10. **Kein Code.**
+
+## §5 P9-11 — Portscan (Nikinger, MacBook, Firmen-VPN aus, Handy-Hotspot)
+
+Der Hotspot macht das MacBook zu einem Rechner **außerhalb** des Heimnetzes. Werkzeug:
+`brew install nmap`. Vier Ziele, jedes mit erwartetem Ergebnis:
+
+| # | Ziel | Netz | Kommando | Erwartet | Warum |
+|---|---|---|---|---|---|
+| 1 | Öffentliche Ausgangs-IP der Heim-VM | Hotspot, Tailscale **aus** | `nmap -Pn -T4 176.2.220.64` | alles `filtered`, **kein** `open` | Die IP ist die Carrier-NAT-Adresse (CGNAT), heute von der VM gemessen. **Sie wechselt:** am Scan-Tag auf der VM neu holen mit `curl -s https://ifconfig.me` |
+| 2 | VPS | Hotspot, Tailscale **aus** | `nmap -Pn -T4 217.160.128.146` | **nur** 80 und 443 `open`; 22 nicht `open` (SSH läuft übers Tailnet) | Der VPS ist die einzige öffentliche Fläche. Jeder dritte offene Port ist ein Befund |
+| 3 | LAN-Adresse der VM | **Heim-WLAN**, Tailscale aus | `nmap -Pn -p 8765,8000-9000 192.168.68.175` | 8765 **nicht** `open` | Die App bindet `127.0.0.1`, der Relay nur die Tailnet-IP (P3-B) |
+| 4 | Tailnet-Adresse der VM | Hotspot, Tailscale **an** | `nmap -Pn -p 8765 100.93.43.122` | `filtered` **oder** `open` — beides wird notiert | Die ACL erlaubt 8765 nur `tag:sharefyx-edge` (dem VPS). `filtered` vom MacBook wäre der fehlende **Gegenlauf zu V162 (Lesart B)** |
+
+**Ergebnis zurück** als Ausgabe der vier Läufe. Eingetragen wird es in die Matrix: P9-11 ✅ oder
+Befund. V162 B bekommt einen Vermerk.
+
+## §6 Closeout (Claude Code, nach Block und Scan)
+
+1. **Doku-Drift beheben, datiert:**
+   - Root-Block und Matrix-Kopf nennen P9-15 noch „Arbeit der nächsten Session". Die Zeile selbst
+     ist ⚠️ und am 2026-10-03 gemessen.
+   - Die Root-Zahl „71 ✅ · 10 ⚠️ · 2 ⬜" weicht von der Matrix ab („71 · 9 · 3"). **Die Matrix
+     gilt.**
+   - `ROADMAP.md`-INDEX-Zahl (P9-6) nachziehen.
+2. **Übersichtsgrafik** `docs/concepts/phase9_hardening_uebersicht.svg`, mit
+   `~/.claude-code-tools/` gerendert und **angesehen**.
+3. **ROADMAP-Zeile P9 → ✅.** Die P10-Liste übernimmt:
+   - P9-13/V150 (zweites Konto)
+   - die `/api/v1/overview`-Schleife (P9-15-Befund)
+   - den Termin „alte Adresse wieder befristen", sobald der Arbeitslaptop die neue Domain erreicht
+     (Vermutung: NRD-Sperre etwa 30 Tage, erneut testen um den 2026-11-02)
+4. **Plan §9-Ergebnis** dieses Mini-Plans füllen, dann 🔄 → 📕.
+
+## §7 Abnahme (P9-83 – P9-95)
+
+`P9-83` Menütitel „Einstellungen", kein Hinweistext ·
+`P9-84` drei Knöpfe in der Reihenfolge aus P9-AE, Standard-`.btn`-Höhe, nicht volle Breite ·
+`P9-85` Unterfenster öffnet **neben** dem Menü, Menü bleibt sichtbar, aktiver Knopf markiert ·
+`P9-86` Knopfwechsel ersetzt Stufe 2 ·
+`P9-87` Space-Klick öffnet Stufe 3, drei Panels bei 1440 px sichtbar ·
+`P9-88` ESC und „Schließen" schließen von rechts nach links ·
+`P9-89` ≤ 1024 px nur das rechteste Panel plus „Zurück" ·
+`P9-90` Passwort: alt → neu → wiederholen → TOTP, Wechsel live gegen Wegwerf grün ·
+`P9-91` Space-Zeilen mit Abstand, Trennlinie vor der Anlege-Zeile, Update-Log-Inhalt unverändert ·
+`P9-92` keine Knöpfe mit leerem Überraum (Bilder angesehen), Alte-Adresse-Dialog unverändert ·
+`P9-93` V118: eine Linie, Gradzählung ohne implizite Doppelkante, Test umgedreht ·
+`P9-94` P9-11 vier Läufe eingetragen ·
+`P9-95` `pytest` ≥ 1223 + neue, `ui_budget` 5/5, Gegenläufe G1–G3 rot, Tabu-Diff leer
+
+## §8 `[VERIFY]`
+
+| Nr. | Frage |
+|---|---|
+| V185 | Ist „Verschieben" (`#list-selection-move`) der Knopf, den der Nikinger mit „zeigt die Ordnerwahl" meint? Wenn nicht, gilt dessen Höhe |
+| V186 | Öffnet das Update-Banner heute `#update-log-dialog` (dann muss es die Kette öffnen)? |
+| V187 | Welche historischen Proben sprechen die alten Overlay-IDs an? |
+| V188 | Kann eine Seite in Safari bzw. im macOS-Vollbild ESC reservieren (Keyboard Lock API)? |
+
+## §9 Ergebnis
+
+*(leer bis zum Bau)*

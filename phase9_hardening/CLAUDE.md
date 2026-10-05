@@ -36,6 +36,7 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | doing | Fünfter Eimer „In Arbeit" (Lock **P9-V**, Kandidat (a)) — Voraussetzung für den Deploy `v3.1.0` | ✅ **live seit 2026-10-02** (`v3.1.0`, Gate 9/9) · Locks P9-V/W/X · 6 Tests, Gegenlauf 7 rot, Browser 11/11 · Release-Commit `v3.1.1` **2026-10-03** · Herleitung im L3-Archiv |
 | trace | Nachvollziehbarkeit: `assignee` sichtbar (UI + MCP, vom Client gefüllt, P9-Z) + `updated_by` + Git-Autor (P9-AA–AC); **zehnte P1-Contract-Öffnung** | 🟡 **code-complete 2026-10-02, seit 2026-10-03 live** (`v3.1.1`, Release `20261003T205843`, Gate 9/9) · Locks P9-Y–AD · **zehnte P1-Contract-Öffnung ohne Index-Schema-Sprung** ⇒ beim Deploy **kein** Neuaufbau (am Journal bestätigt) · 24 Tests, Browser 8/8 mit Zwei-Principalen-Instanz · Herleitung im L3-Archiv |
 | E (Extra) | **Buttons ans Schema** (B17): die Knöpfe mit eigenen Flächen auf die Standard-Tokens `--btn-std-*` umstellen | ✅ **gebaut 2026-10-02 (B17), seit 2026-10-03 live** · die Backlog-Liste war an zwei Stellen falsch (15 statt 1 Knopf auf der alten Flächenfamilie) · `.btn.action--caution` trägt jetzt **exakt** die Standardfläche, nur die Beschriftung ist rot · Kontrast **4,38:1** bleibt unter WCAG-AA — **Design-Entscheidung, deine** · Herleitung im L3-Archiv |
+| S | **Einstellungen als Fensterkette** + V118 eine Linie (Nikinger 2026-10-05) | ⬜ **geplant 2026-10-05**, nicht gebaut — `docs/concepts/phase9_hardening_block_settings_plan.md` (Locks P9-AE–AL, Abnahme P9-83–95). Darin auch D1 neu beschrieben (§4) und die P9-11-Portscan-Anleitung (§5) |
 | Gate/Z | Abnahme, Closeout | 🟡 **beide Doku-Hälften erledigt** (2026-10-02) · `ABNAHME_MATRIX.md` ist der **eine** Ort der Abnahme- und `[VERIFY]`-Bilanz, nicht diese Zeile · **[2026-10-04] beide Rotationen gefahren** (Block 17.780 B verbatim, Kette 6 von 7 Fäden) und diese Tabelle ins L3-Archiv gezogen ⇒ **der Head ist unter dem 40-KiB-Softcap** · **offen:** zweites Claude-Konto (P9-13/V150) · P9-15 ⬜ · Übersichtsgrafik §12.4 · Phase auf ✅ · Herleitung im L3-Archiv |
 
 ## Backlog (bewusst zurückgestellt, kein Phasen-Blocker)
@@ -232,3 +233,15 @@ Arbeitslaptop die neue Adresse belegt erreicht.
 
 **Nicht gegengeprüft:** Dialog und Schreib-POST auf der alten Adresse mit echter Sitzung. Das ist
 die Sichtprüfung des Nikingers. Die Wegwerf-Probe (24/24) deckt denselben Code ab.
+
+### Nachtrag 2026-10-05 — drei Antworten und ein geplanter Block
+
+Der Nikinger hat drei offene Fragen beantwortet:
+- **V118 / P9-36 → eine Linie**, die explizite Kante gewinnt.
+- **Vorsicht-Kontrast → bleibt so.**
+- **D1 → neu beschrieben:** ESC schließt das Item, und macOS beendet dabei zusätzlich das native
+  Vollbild.
+
+Dazu wünscht er einen Umbau des Einstellungs-Menüs. **Alles geplant, nichts gebaut:**
+`docs/concepts/phase9_hardening_block_settings_plan.md`. Der P9-11-Portscan ist dort in §5 für den
+Nikinger aufgeschrieben (MacBook, Hotspot, vier Ziele).
