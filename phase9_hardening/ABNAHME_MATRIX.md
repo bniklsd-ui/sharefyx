@@ -25,9 +25,12 @@ Archiv hineinzuschreiben hieße, das Falsche zu tun.
 
 ## Stand in einem Satz
 
-**96 Tabellenzeilen für 96 Abnahmezeilen: 83 ✅ · 9 ⚠️ · 4 ⬜** (P9-10 in zwei prüfbare Hälften
-geteilt; seit 2026-10-05 kommt der **settings-Block** P9-83–P9-95 mit 12 ✅ und **einem** ⬜
-dazu — P9-94, der Portscan, ist ein Schritt des Nikingers und durch keinen Test ersetzbar). **A7+A8 sind am 2026-10-03 gefahren** (A7a als risikoarmer Vorlauf, dann A7, dann A8):
+**103 Tabellenzeilen für 103 Abnahmezeilen: 88 ✅ · 11 ⚠️ · 4 ⬜** (P9-10 in zwei prüfbare Hälften
+geteilt; seit 2026-10-05 kommen der **settings-Block** P9-83–P9-95 mit 12 ✅ und **einem** ⬜
+dazu — P9-94, der Portscan, ist ein Schritt des Nikingers und durch keinen Test ersetzbar — und
+sein **Nachtrag** P9-96–P9-102 aus der Bildsichtung mit **5 ✅ und 2 ⚠️**. Die beiden ⚠️ sind
+**keine offenen Punkte**: P9-97 trägt die vom Nikinger entschiedene Abweichung im linken
+Polsterwert, P9-99 den gemessenen Umweg (`justify-content` statt des im Plan genannten, wirkungslosen `text-align`). **A7+A8 sind am 2026-10-03 gefahren** (A7a als risikoarmer Vorlauf, dann A7, dann A8):
 P9-10b und P9-12 sind **beide ✅**. Von den 3 offenen Zeilen ist **keine** mehr Code-Arbeit und
 **keine** hängt an A7: **P9-11** ist der `nmap`-Gegenlauf von außen, **P9-15** ist der
 authentifizierte Latenzvergleich und gehört an den **Deploy-Tag** (`health_gate.sh` macht genau
@@ -218,6 +221,45 @@ messbar war — sie sind ✅ mit dem Zusatz „live bewiesen erst mit v3.1.1". D
 | **P9-93** | V118: eine Linie, Gradzählung ohne implizite Doppelkante, Test umgedreht | ✅ | `test_a_tag_edge_beside_an_explicit_edge_draw_one_line`: 1 Segment, 0 Duplikate, **keine** gestrichelte Linie, durchgezogene vorhanden. Gefiltert bei der **Übernahme** (`rebuildImplicitEdges()`), nicht in `drawEdges()` — sonst zählte `recomputeDegrees()` die Zwillingskante weiter und `drawNodes()` skaliert danach den Radius. Gegenlauf **G3 → rot** |
 | **P9-94** | P9-11 vier Läufe eingetragen | ⬜ **Nikinger-Schritt** | Portscan auf dem MacBook mit Handy-Hotspot, Anleitung Mini-Plan §5. Kein Code, kein Test, kein Counterlauf ersetzt das — ein Scan von außen ist genau das, was nur der Nikinger tun kann |
 | **P9-95** | `pytest` ≥ 1223 + neue, `ui_budget` 5/5, Gegenläufe G1–G3 rot, Tabu-Diff leer | ✅ | `pytest` **1223 → 1233** (10 neue, 1 umgedreht, 3 umgeschrieben) · `ui_budget` **5/5** (163,4 KB; `js/settings.js` 3,0 KB gzip) · `node --check` grün · Tabu-Diff §0.3 **leer** (auch `api.py`/`security.py`/`phase4_auth/` unberührt, der Block ist reines Frontend) · G1 → 4 rot · G2 → 2 rot · G3 → rot |
+
+## Block settings, Nachtrag — die sieben Punkte aus der Bildsichtung (P9-96 … P9-102)
+
+**Anlass:** der Nikinger hat die Bilder vom 2026-10-05 angesehen und sieben Punkte notiert
+(Plan §10, Locks P9-AM–P9-AS). **Zwei der sieben sind ausdrücklich „nicht anfassen"** (P9-AT:
+Passwort- und Update-Log-Panel).
+
+| # | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| **P9-96** | Menütitel zentriert, Abstand Titel→erster Knopf == der in P9-AR gemessene Wert (±1 px) | ✅ | Browser **S11** (Titelmitte **0 px** von der Panelmitte, mit einem `Range` über den Textknoten gemessen) und **S13** (**24 px**). Der Abstand kommt aus **einem** Wert (`--settings-title-gap`, in `.settings-chain` definiert, zweimal benutzt) — Wächter `test_the_two_titles_share_one_gap_and_only_the_menu_title_is_centered` |
+| **P9-97** | Unausgewählter Menüpunkt: gleiche berechnete Fläche wie `#space-create-name-input`, **Geometrie unverändert** gegen die Baumzeile | ⚠️ **benannte Abweichung, Nikinger-Entscheidung** | **Fläche ✅ gemessen (S10):** Menüpunkt `bg=rgb(12,16,21)` / `kante=rgba(255,255,255,0.16)` — **bytegleich** zum Eingabefeld, und **nicht** die Panelfläche (`rgba(27,32,39,0.55)`). **Geometrie: die Abweichung ist der linke Polsterwert.** Als `.tree__folder` erbte der Menüpunkt `padding-left: 32px` (Einrückung der Baumzeile) und lag damit **12 px neben** der Knopfmitte; exakt mittig (P9-AP) ging nur mit symmetrischem Polster. **Nikinger 2026-10-05: beidseitig `--space`.** **S1** vergleicht Höhe, Polster oben/unten, Rundung und Schrift **unverändert** mit der Baumzeile (`h=35.69`, `6px/8px/8px`, `r=6px`, 14 px) und nennt die 32 px der Baumzeile **im Ergebnis mit** |
+| **P9-98** | Ausgewählter Menüpunkt trägt weiter `--select-fill`, byte-gleich zur heutigen Regel | ✅ | Browser **S2** (aktiver Menüpunkt = derselbe `linear-gradient` wie die aktive Baumzeile) · Wächter `test_the_selection_state_uses_aria_current_and_the_existing_fill` (Regel-Bodies **gleich**) und `test_the_unselected_menu_item_takes_the_input_surface_verbatim` (P9-AO) |
+| **P9-99** | `text-align` der Menüpunkte berechnet `center` | ⚠️ **anderer Weg, gleiche Wirkung — gemessen** | **Das Kriterium des Plans war ein No-op, und das zeigte erst die Messung.** Der Knopf ist `display: flex` mit **anonymem Flex-Item** (Textknoten); `text-align: center` zentriert darin einen Text in sich selbst. Die erste Fassung des Baus hatte das und maß die Textmitte **8,5 px neben** der Mitte (S11 rot). Gebaut ist `justify-content: center` — die **Flex-Achse**: Textmitte **0 px**, Titelmitte **0 px**. Der Wächter verbietet `text-align` in einer eigenen Menüpunkt-Regel **ausdrücklich** |
+| **P9-100** | Back-Knopf enthält `<use href="#i-chevron-left">` und **keinen** `←`-Text, Icon zentriert, `aria-label` gesetzt | ✅ | Browser **S12**, fünf Stationen: sichtbar · Icon **aufgelöst** (21,25 × 21,25 px — ein `<use>` auf ein fehlendes Symbol ergäbe 0 × 0) · `dx=0 dy=0` px · `innerText=''` · `aria-label='Zurück'` **und** `title='Zurück'`. Neues Symbol `i-chevron-left` (`d="m15 18-6-6 6-6"`), in `KNOWN` |
+| **P9-101** | Abstand Space-Titel↔erste Option == Abstand Menü-Titel↔erster Knopf | ✅ | Browser **S13**: **24 px == 24 px** (±1 px). **Operierte Fassung, weil „erste Option" zweierlei bedeuten kann:** gemessen wird der Abstand zum **ersten sichtbaren Block unter dem Titel** — im Harness `space-detail-home-hint` (steht vor der leeren Mitgliederliste). Zur ersten *Mitgliederzeile* wäre es Titel + Hinweis, eine andere Größe. Die Regel wirkt in beiden Fällen, weil 24 px größer ist als das `margin-top: 1em` der `<ul>` (16 px) |
+| **P9-102** | `.overlay__actions` **in der Kette** `justify-content: flex-end`, Boxen von „Space entfernen" und der letzten „(schreiben)"-Zeile überlappen sich nicht (≤ 0 px) | ✅ **mit benannter Messgrenze** | **S14:** Rahmenkante des Knopfes **auf** der Inhaltskante des Panels, Differenz **0,0 px** (beide Panels) · **Gegenrichtung gemessen:** der modale Entfernen-Dialog (P9-AK) richtet seine Knöpfe **nicht** aus (−155 px) · **S15:** Überlappung **−121,59 px**, also 121 px Luft. **Zwei Grenzen im Beleg:** „Space entfernen" ist im **Home-Space gesperrt** (P7-K) — gemessen wurde die `.overlay__actions`-Zeile, die ihn enthält; und ein Home-Space hat **keine Mitglieder**, die Gegenzeile war deshalb **synthetisch** in der echten Markupform aus `spaces.js :: memberRow()` (290 px breit bei 332 px Innenbreite) |
+
+### Drei Befunde aus diesem Block, die keine Abnahmezeile sind
+
+1. **Der gemeldete Überlauf war hier nicht vorhanden — und wird nicht als behoben behauptet.**
+   P9-AS sollte den Überlauf von „Space entfernen" mit den „(schreiben)"-Zeilen räumen; gemessen
+   sind **121 px Luft**, und eine rechte Ausrichtung kann einen vertikalen Abstand nicht
+   verursachen. Offen bleiben zwei Lesarten: **horizontaler** Überstand einer langen
+   Mitgliedszeile (die `<li>` hat keine eigene Regel, `word-break` fehlt — passt hier mit 290 px
+   bei 332 px) oder **nur bei vielen Mitgliedern**, weil das Panel dann scrollt. Kein Test hier
+   entscheidet das; die Sichtprüfung an den echten Spaces des Nikingers ist der fehlende Beleg.
+2. **Die Space-Liste kann leer bleiben, wenn man sie zu früh öffnet.** `renderSpaceList()`
+   rendert aus `state.spaces`, das erst nach `loadOverview()` steht. Wer „Einstellungen → Spaces
+   verwalten" vorher öffnet, bekommt eine leere Liste, und sie bleibt leer (neu gerendert wird
+   nur beim nächsten Öffnen). Die Wahrscheinlichkeit **wächst linear mit den sichtbaren Spaces**
+   (P9-15: sechs Durchgänge je Space) — im Harness mit zwölf Spaces der Normalfall: der erste
+   Lauf maß S1 gegen eine **leere** Rail. **Gemeldet, nicht gebaut** — die Reparatur ist eine
+   Zustandsentscheidung (zweiter Hook neben `registerPanel` oder ein Ereignis).
+3. **Zwei Wächter sind an korrektem Code rot geworden und im selben Commit korrigiert** — beide
+   kannten den neuen Knopf nicht: `class="btn settings-back"` mit fester Klassenreihenfolge (jetzt
+   `btn btn--icon settings-back`) und ein `hidden`-Test auf dem **ganzen** Element (das
+   `<svg aria-hidden="true">` enthält das Wort). Ein Wächter, der am Muster scheitert, sieht wie
+   ein Befund aus.
+
 
 **Zwei Zeilen, die nicht beim Umsatz liegen — sie sind benannt, weil sie jemand suchen wird:**
 

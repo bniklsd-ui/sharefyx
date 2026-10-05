@@ -1885,6 +1885,16 @@ select.input:focus {
   align-items: flex-start;
   gap: calc(var(--space) * 2);
   max-width: calc(100vw - var(--space) * 8);
+  /* P9-AM/P9-AR, 2026-10-05: der Abstand zwischen Titel und erster Zeile — **ein** Wert an
+     **zwei** Stellen (Menütitel→erster Knopf, Space-Titel→erste Option). Dieselbe Regel wie
+     P9-AF: ein kopierter Wert ist der Beginn der dritten Variante, und hier wären es zwei.
+
+     **Warum das 3× `--space` (24 px) und nicht 2×.** Im Detail-Panel steht unter dem Titel eine
+     `<ul>` **ohne** eigene Regel — sie trägt also den Browser-Standard `margin-top: 1em`
+     (16 px). Wäre der Titelabstand kleiner oder gleich, würde die Liste den Abstand bestimmen
+     und der gemessene Gleichstand aus P9-101 hinge an einem Standard, den das Projekt nie
+     notiert hat. Mit 24 px gewinnt der Titel, und beide Panels messen denselben Wert. */
+  --settings-title-gap: calc(var(--space) * 3);
 }
 
 /* Panels nach Inhalt (P9-AL) statt `width: 90%; max-width: 440px` wie die übrigen
@@ -1916,6 +1926,68 @@ select.input:focus {
    Abstand der drei Zeilen untereinander — dieselbe Forderung wie bei den Space-Zeilen
    darunter (P9-AK: Zeilen mit sichtbarem Abstand). */
 .settings-menu__item { width: 100%; }
+
+/* P9-AP (2026-10-05, Nikinger): die Beschriftung steht **mittig** in der Fläche. Die Sammelregel
+   weiter oben trägt `text-align: left` für alle Zeilenarten (Baumzeile, Rail, Knopf) — das ist
+   für eine Beschriftung mit Icon links richtig und für den Menüpunkt falsch, weil der keine
+   Beschriftung am linken Rand hat, sondern nur Text.
+
+   **`justify-content`, nicht `text-align` — gemessen, nicht gelesen.** Der Knopf ist
+   `display: flex`, sein einziges Kind ist ein **anonymer Flex-Item** (ein Textknoten).
+   `text-align: center` wirkt auf Blockcontainer; das anonyme Item schrumpft auf seinen Inhalt,
+   ein `text-align` darin zentriert also einen Text in sich selbst — **sichtbar nichts**. Die
+   erste Fassung dieser Regel hatte genau das, und die erste Browser-Probe maß die Textmitte
+   8,5 px neben der Knopfmitte (S11). Was den Text mittig stellt, ist die Ausrichtung der
+   **Flex-Achse**.
+
+   **Und das Polster, Nikinger-Entscheidung vom selben Tag (mit Messung, s. Plan §10).** Als
+   `.tree__folder` erbt der Menüpunkt `padding-left: calc(var(--space) * 4)` — das **Einzugs**-
+   Polster der Baumzeile, 32 px links gegen 8 px rechts. Damit war der Inhaltskasten um 12 px
+   nach rechts verschoben, und `justify-content: center` zentrierte **darin**: Textmitte 732 px
+   bei einer Knopfmitte von 720 px. Exakt mittig ging nur mit symmetrischem Polster, und genau
+   das war die Frage; die Antwort war „beidseitig 8px".
+
+   **Was das kostet, steht hier, weil es sonst später stillschweigend „korrigiert" wird:** der
+   Menüpunkt hat damit ein eigenes `padding-left` und ist in **diesem** Wert nicht mehr gleich
+   der Baumzeile (Höhe, Polster oben/unten, Schrift und Rundung bleiben es). P9-84s Browser-Messung
+   vergleicht deshalb Polster **oben/unten** weiter mit der Baumzeile und den linken Wert gegen
+   `--space`. Die Alternative („die Einrückung an der Quelle auf die Rail einschränken") hätte
+   zusätzlich die Space-Zeilen im Panel verschoben — eine zweite, nicht beauftragte Änderung.
+   */
+.settings-panel--menu .settings-menu__item {
+  justify-content: center;
+  padding-left: var(--space);
+}
+
+/* P9-AM: der Menütitel wird zentriert und bekommt den gemeinsamen Titelabstand. Nur **dieses**
+   Panel — der Space-Titel im Detail und die Titel der Unterfenster bleiben links (P9-AT:
+   Passwort- und Update-Log-Panel bleiben unverändert). */
+#settings-menu h2 {
+  text-align: center;
+  margin-bottom: var(--settings-title-gap);
+}
+/* P9-AR: derselbe Wert, an der zweiten Stelle. */
+#settings-space-detail h2 { margin-bottom: var(--settings-title-gap); }
+
+/* P9-AN (2026-10-05): die **unausgewählten** Menüpunkte bekommen die Fläche des Eingabefeldes
+   — "leicht abgesetzt vom Fensterhintergrund, aber keine Plastik" (Nikinger). **Nur die
+   Fläche**: Höhe, Polster, Schrift und Rundung bleiben die der `.tree__folder`-Zeile, sonst
+   wäre die Wiederverwendung aus P9-AF dahin.
+
+   **Warum die Werte hier stehen und nicht die `.input`-Regel erweitert wird:** `.input`
+   trägt `padding: 7px` und `color`, beides **Geometrie** der Baumzeile. Eine gemeinsame
+   Regel mit beiden Selektoren würde die Menüzeile auf 7 px Polster umstellen und die
+   Wiederverwendung auflösen — der Fehler, den P9-AF am 2026-10-01 bei `.account-nav` schon
+   einmal gemacht hat. Zwei Token-Nennungen sind Wiederverwendung, ein **Wert** wäre eine
+   Kopie.
+
+   **Kein Schatten.** Der Wächter `test_settings_menu_items_reuse_the_tree_row_look` verbietet
+   ihn in einer eigenen Regel, und P9-97 vergleicht ausdrücklich Hintergrund und Kante: die
+   Fläche ist die Vertiefung, der Schatten gehört zur Plastik des Feldes. */
+.settings-menu__item:not([aria-current="true"]) {
+  background: var(--sunken);
+  border-color: var(--line-strong);
+}
 #space-admin-list {
   display: flex;
   flex-direction: column;
@@ -1923,9 +1995,24 @@ select.input:focus {
 }
 .settings-space-row { width: 100%; }
 
+/* P9-AS (2026-10-05): **alle** Knöpfe in den Einstellungs-Fenstern stehen rechts. Der
+   Scoped-Selektor ist der ganze Auftrag: `.overlay__actions` ist die gemeinsame Klasse des
+   gesamten Overlays, und der modale Entfernen-Dialog (`#space-remove-dialog`) sowie die
+   anderen Fenster sollen ihre Knöpfe **nicht** mitnehmen — der Wächter
+   `test_only_the_settings_chain_aligns_its_buttons_right` prüft beide Richtungen.
+
+   Der gemeldete Überlauf lag im Detail-Panel: „Space entfernen" stand unter den
+   „(schreiben)"-Zeilen der Mitgliederliste. */
+.settings-chain .overlay__actions { justify-content: flex-end; }
+
 /* „Zurück" ist ausschließlich die Bedienung des Schmal-Modus (P9-AI). Im breiten Modus ist
    es toter Ballast und deshalb gar nicht erst im DOM-Baum (`display: none`, nicht nur
-   `hidden` — sonst stünde ein Knopf im Tab-Order-Lauf, der nichts tut). */
+   `hidden` — sonst stünde ein Knopf im Tab-Order-Lauf, der nichts tut).
+
+   P9-AQ (2026-10-05): der Knopf trägt jetzt `#i-chevron-left` statt des Textpfeils `←`, der
+   als **Glyphe** sichtbar nach unten hing. `.btn--icon` (30×30, `align-items`/`justify-content`:
+   center) zentriert das Icon in **beiden** Achsen — eine eigene Regel hierfür wäre die
+   zweite Wahrheit über dieselbe Sache. */
 .settings-back { display: none; margin-bottom: var(--space); }
 
 /* P9-AI: unterhalb der Summe der Panelbreiten bleibt **nur das rechteste** Panel. Kein

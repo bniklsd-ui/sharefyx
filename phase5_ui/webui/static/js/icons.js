@@ -23,6 +23,11 @@
 // Build-Script das mit "MISSING" ab.
 var KNOWN = Object.freeze([
   "chevron-down",
+  // P9-AQ (2026-10-05): Spiegel von chevron-right, fuer die "Zurueck"-Knoepfe der
+  // Fensterkette. Wie die uebrigen nur-statisch benutzten Namen (plus, search, settings …)
+  // steht er hier, obwohl ihn kein `iconSvg()` aufruft — die Liste ist die Spur aller
+  // benutzten Symbole, nicht nur der per JS gerenderten.
+  "chevron-left",
   "chevron-right",
   "folder",
   "folder-input",

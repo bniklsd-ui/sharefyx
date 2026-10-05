@@ -61,8 +61,13 @@ CAP_BYTES = 300  # der Cap, mit dem P9-3/V145 die Unerreichbarkeit des Kriterium
 # Abgetippt, nicht abgeleitet — der Test soll die Behauptung prüfen, nicht sie wiederholen.
 # 2026-10-03: P9-15 von ⬜ auf ⚠️ (gemessen, aber in anderer Form als im Kriterium -- die
 # dort genannte Referenz 372,9 ms ist im Code nie ueber Funnel gemessen worden).
-ABNAHME_BILANCE = {"✅": 83, "⚠️": 9, "⬜": 4}
-ABNAHME_ROWS = 96  # 96 Abnahmezeilen; seit 2026-10-05 kommt der settings-Block (P9-83–P9-95) dazu
+ABNAHME_BILANCE = {"✅": 88, "⚠️": 11, "⬜": 4}
+# 2026-10-05: +7 Zeilen aus dem settings-Nachtrag P9-96–P9-102 (die sieben Punkte aus der
+# Bildsichtung des Nikingers, §10 des Mini-Plans). Die zwei neuen ⚠️ sind **benannte
+# Abweichungen**, keine offenen Punkte: P9-97 (linker Polsterwert, Nikinger-Entscheidung vom
+# 2026-10-05) und P9-99 (`justify-content` statt des im Plan genannten und gemessen wirkungslosen
+# `text-align` — der Knopf ist ein Flexcontainer).
+ABNAHME_ROWS = 103  # 103 Abnahmezeilen; seit 2026-10-05 der settings-Nachtrag (P9-96–P9-102)
 # 2026-10-03: V164 von ⬜ auf ✅ (Deploy `v3.1.1` + Health-Gate 9/9). Die Konstante steht
 # **vor** dem Zählen, sonst wäre der Test eine Tautologie -- deshalb hat er mich beim
 # Zurueckschreiben der Bilanz in die Matrix rot gemeldet, statt sie zu bestaetigen.

@@ -12,7 +12,7 @@ down:
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
   - UPDATES_ARCHIVE.md                          # ältere `updated:`-Fäden dieses Heads, verbatim (2026-10-03, 36 von 37)
   - MODULE_STATUS_ARCHIVE.md                   # ausführliche Statusspalten der §-Modulstatus-Tabelle, verbatim (2026-10-04)
-updated: 2026-10-05 (**Block settings gebaut, opencode/M3 — drei Overlays sind eine Fensterkette, V118 hat eine Linie**; Release `v3.1.3` steht, **kein Deploy, kein Service-Touch**; `pytest` 1223 → 1233, `ui_budget` 5/5, Tabu-Diff leer, Probe **39/39**, G1 → 4 rot · G2 → 2 rot · G3 → rot · **zwei Code-Befunde aus dem Browser, nicht aus den Tests** (Schmal-Modus ließ zwei Panels stehen · der „Zurück“-Knopf des Details war nicht verdrahtet) · **der Gegenlauf hat den eigenen Messaufbaum widerlegt** (er las den Frame nach dem Toggle-Zurückschalten — mit dem Fix wäre der Test grün gewesen) · P9-94 ⬜ Portscan, V188 ⬜ · **danach: sieben UI-Punkte aus der Bildsichtung notiert, nicht gebaut — Mini-Plan §10, Locks P9-AM–P9-AS, Abnahme P9-96–P9-102**) | 2026-10-05 (Block 2026-10-04 aus dem Head verbatim hierher rotiert, per `scripts/rotate_session_block.sh`)
+updated: 2026-10-05 (**die sieben Punkte aus der Bildsichtung gebaut, opencode/M3** — Probe **56/56**, G4 → 2 rot · G5 → 2 rot · G6 → 3 rot, `pytest` 1233 → 1238, `ui_budget` 165,6 KB; **zwei Korrekturen an der Vorgabe, beide gemessen**: `text-align` ist auf dem Flex-Knopf ein No-op → `justify-content`, und das linke Polster musste vom 32-px-Wert der Baumzeile auf `--space` (Nikinger-Entscheidung); **ein Produktbefund gemeldet, nicht gebaut** (leere Space-Liste beim zu frühen Öffnen, wandert in die P10-Liste); Release `v3.1.3` unverändert, **kein Deploy**) | 2026-10-05 (**Block settings gebaut, opencode/M3 — drei Overlays sind eine Fensterkette, V118 hat eine Linie**; Release `v3.1.3` steht, **kein Deploy, kein Service-Touch**; `pytest` 1223 → 1233, `ui_budget` 5/5, Tabu-Diff leer, Probe **39/39**, G1 → 4 rot · G2 → 2 rot · G3 → rot · **zwei Code-Befunde aus dem Browser, nicht aus den Tests** (Schmal-Modus ließ zwei Panels stehen · der „Zurück“-Knopf des Details war nicht verdrahtet) · **der Gegenlauf hat den eigenen Messaufbaum widerlegt** (er las den Frame nach dem Toggle-Zurückschalten — mit dem Fix wäre der Test grün gewesen) · P9-94 ⬜ Portscan, V188 ⬜ · **danach: sieben UI-Punkte aus der Bildsichtung notiert, nicht gebaut — Mini-Plan §10, Locks P9-AM–P9-AS, Abnahme P9-96–P9-102**) | 2026-10-05 (Block 2026-10-04 aus dem Head verbatim hierher rotiert, per `scripts/rotate_session_block.sh`)
 ---
 
 # Phase 9 — Härtung
@@ -37,6 +37,7 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | trace | Nachvollziehbarkeit: `assignee` sichtbar (UI + MCP, vom Client gefüllt, P9-Z) + `updated_by` + Git-Autor (P9-AA–AC); **zehnte P1-Contract-Öffnung** | 🟡 **code-complete 2026-10-02, seit 2026-10-03 live** (`v3.1.1`, Release `20261003T205843`, Gate 9/9) · Locks P9-Y–AD · **zehnte P1-Contract-Öffnung ohne Index-Schema-Sprung** ⇒ beim Deploy **kein** Neuaufbau (am Journal bestätigt) · 24 Tests, Browser 8/8 mit Zwei-Principalen-Instanz · Herleitung im L3-Archiv |
 | E (Extra) | **Buttons ans Schema** (B17): die Knöpfe mit eigenen Flächen auf die Standard-Tokens `--btn-std-*` umstellen | ✅ **gebaut 2026-10-02 (B17), seit 2026-10-03 live** · die Backlog-Liste war an zwei Stellen falsch (15 statt 1 Knopf auf der alten Flächenfamilie) · `.btn.action--caution` trägt jetzt **exakt** die Standardfläche, nur die Beschriftung ist rot · Kontrast **4,38:1** bleibt unter WCAG-AA — **Design-Entscheidung, deine** · Herleitung im L3-Archiv |
 | S | **Einstellungen als Fensterkette** + V118 eine Linie (Nikinger 2026-10-05) | 🟡 **gebaut 2026-10-05 (M3)**, Release `v3.1.3` steht, **nicht deployt** — `docs/concepts/phase9_hardening_block_settings_plan.md` (Locks P9-AE–AL, Abnahme P9-83–95) · **drei Overlays wurden eine Kette** (`#settings-overlay`, fünf Panels), **ein** Öffner (`settings.js` + `registerPanel`), Menüknöpfe tragen `.tree__folder` statt einer eigenen Optik · **zwei echte Befunde aus dem Browser, nicht aus dem Test**: der Schmal-Modus ließ bei offenem Detail **zwei** Panels stehen (zwei `:has()`-Regeln statt einer), und der „Zurück"-Knopf des Details war **nicht verdrahtet** (im breiten Modus unauffällig) · **V118 umgedreht**: der Test hieß `…_draw_two_lines` und heißt jetzt `test_a_tag_edge_beside_an_explicit_edge_draws_one_line`, Docstring mit beiden Lesarten und Datum · **Probe 39/39**, G1 → 4 rot, G2 → 2 rot, G3 → rot, **der Gegenlauf hat den eigenen Messaufbaum widerlegt** (er las den Frame *nach* dem Toggle-Zurückschalten) · `pytest` 1223 → 1233, `ui_budget` 5/5, Tabu-Diff leer · **P9-94 ⬜** (Portscan, Nikinger-Schritt) · Herleitung im L3-Archiv |
+| R | **Rückmeldung aus der Bildsichtung** (Mini-Plan §10, Locks P9-AM–P9-AS, Abnahme P9-96–P9-102) | 🟡 **gebaut 2026-10-05 (M3)**, Release `v3.1.3` steht (unverändert derselbe, nicht deployt) — Probe **56/56**, G4 → 2 rot · G5 → 2 rot · G6 → 3 rot, `pytest` 1233 → 1238 · **zwei Korrekturen an der Vorgabe, beide gemessen**: `text-align: center` war auf dem Flex-Knopf ein **No-op** (Textmitte 8,5 px daneben) → `justify-content`, und das **linke Polster** musste vom 32-px-Wert der Baumzeile auf `--space` (Nikinger-Entscheidung), sonst bleibt die Beschriftung 12 px neben der Mitte · P9-96/98/100/101/102 ✅, **P9-97 und P9-99 ⚠️ mit benannter Abweichung** · **zwei Wächter an korrektem Code rot** (Klassenreihenfolge, `hidden` im `aria-hidden`) · **ein Produktbefund gemeldet, nicht gebaut:** die Space-Liste bleibt leer, wenn man sie vor `loadOverview()` öffnet — wandert in die P10-Liste (Plan §6) · Herleitung im L3-Archiv |
 | Gate/Z | Abnahme, Closeout | 🟡 **beide Doku-Hälften erledigt** (2026-10-02) · `ABNAHME_MATRIX.md` ist der **eine** Ort der Abnahme- und `[VERIFY]`-Bilanz, nicht diese Zeile · **[2026-10-04] beide Rotationen gefahren** (Block 17.780 B verbatim, Kette 6 von 7 Fäden) und diese Tabelle ins L3-Archiv gezogen ⇒ **der Head ist unter dem 40-KiB-Softcap** · **offen:** zweites Claude-Konto (P9-13/V150) · P9-15 ⬜ · Übersichtsgrafik §12.4 · Phase auf ✅ · Herleitung im L3-Archiv |
 
 ## Backlog (bewusst zurückgestellt, kein Phasen-Blocker)
@@ -95,169 +96,131 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückzuführen** — Nikinger-Anordnung 2026-09-24, so dokumentieren und nicht weiter
   untersuchen.
 
-## Session stopped — 2026-10-05 (vierundzwanzigster Block: **Block settings gebaut — die drei Overlays sind eine Fensterkette, und V118 hat jetzt eine Linie**; Release `v3.1.3` steht, **kein Deploy, kein Service-Touch**)
+## Session stopped — 2026-10-05 (fünfundzwanzigster Block: **die sieben Punkte aus der Bildsichtung gebaut — und zwei davon haben einen Fehler in der Vorgabe selbst gefunden**; Release `v3.1.3` unverändert, **kein Deploy, kein Service-Touch**)
 
-**Ergebnis in einem Satz.** Drei eigenständige Overlays (`#account-dialog`,
-`#space-admin-dialog`, `#update-log-dialog`) sind **eine** Kette: ein Menü, daneben das gewählte
-Unterfenster, daneben bei Spaces das Detail; das Menü bleibt sichtbar und der Menüpunkt des offenen
-Fensters trägt denselben Auswahlzustand wie eine Baumzeile in der Rail. V118 zeigt **eine** Linie,
-weil die ausdrückliche Kante gewinnt. `pytest` **1223 → 1233**, `ui_budget` 5/5 (163,4 KB), Tabu-Diff
-§0.3 leer, Browser-Probe **39/39**.
+**Ergebnis in einem Satz.** Alle sieben Punkte aus der Bildsichtung sind umgesetzt (Mini-Plan §10,
+Locks P9-AM–P9-AS, Abnahme P9-96–P9-102), und die erste Browser-Probe hat **zweimal die
+Vorgabe selbst widerlegt** statt den Bau: `text-align: center` ist auf einem Flex-Knopf ein
+**No-op**, und „Text mittig" ist mit dem geerbten 32-px-Einzugspolster der Baumzeile **nicht**
+erreichbar. `pytest` **1233 → 1238**, `ui_budget` 5/5 (**165,6 KB**), Tabu-Diff §0.3 leer,
+Browser-Probe **56/56**, Gegenläufe **G4 → 2 rot · G5 → 2 rot · G6 → 3 rot**.
 
-**Abnahme.** P9-83 – P9-93 ✅, P9-95 ✅, **P9-94 ⬜** (der Portscan aus §5 des Mini-Plans — ein
-Schritt am MacBook des Nikingers, **durch keinen Test ersetzbar** und deshalb ⬜ statt ⚠️).
-`[VERIFY]`: V185/V186/V187 ✅, **V188 ⬜** (P9-27/D1 bleibt ⚠️, bis eine Quelle statt einer Erinnerung
-dasteht). Details je Zeile in `ABNAHME_MATRIX.md`, Herleitung im Mini-Plan §9.
+**Abnahme.** P9-96 ✅ · P9-97 **⚠️** · P9-98 ✅ · P9-99 **⚠️** · P9-100 ✅ · P9-101 ✅ · P9-102 ✅.
+**Die beiden ⚠️ sind benannte Abweichungen, keine offenen Punkte** — P9-97 trägt die vom Nikinger
+entschiedene Polster-Entscheidung, P9-99 den gemessenen Umweg. Zeilen und Belege je einzeln in
+`ABNAHME_MATRIX.md`, Herleitung in §10.1–§10.3 des Mini-Plans. `[VERIFY]`-Bilanz unverändert
+(V188 ⬜).
 
-### Zwei Zahlen, die mit wandern — der Wächter hat mich beim Schreiben darauf gestoßen
+### Die zwei Stellen, an denen die Vorgabe falsch war — beide erst durch Messung
 
-Der Zahlen-Wächter verlangt, dass der neueste Block **beide** benennt: die gemessene **gestrichene
-Masse 229 B** (die im L3-Archiv liegt, nicht im Modulstatus) und den Grund, warum sie kein Hebel
-ist. Der Block vom 2026-10-04 hatte beides; ein neuer Block ohne diese Zeile wäre stillschweigend
-weniger gewesen, und der Wächter hätte **zu Recht** gemeldet. **Der Head liegt bei 22.196 B** —
-unter dem 40-KiB-Softcap, zum ersten Mal seit dem Phasenstart (am 2026-10-04 durch die Rotation des
-Modulstatus ins L3-Archiv). Beide Zahlen stehen hier, damit der nächste Block sie nicht verliert.
+1. **`text-align: center` ist auf dem Menüknopf ein No-op.** Der Knopf ist `display: flex` (die
+   Sammelregel mit `.tree__folder`) und sein einziges Kind ist ein **anonymer Flex-Item** — ein
+   Textknoten. `text-align` wirkt auf Blockcontainer; im Flex-Item zentriert es einen Text in
+   sich selbst. Die erste Fassung des Baus hatte genau das, und die erste Probe maß die Textmitte
+   **8,5 px neben** der Knopfmitte. Gebaut ist `justify-content: center` — die Flex-Achse.
+   **Sichtbarstark:** der Wächter verbietet `text-align` in einer eigenen Menüpunkt-Regel jetzt
+   ausdrücklich, und prüft zusätzlich, dass der Knopf überhaupt `display: flex` trägt — sonst
+   dürfte jemand die Sammelregel umstellen und der Wächter bliebe grün.
+2. **„Text mittig" und „Polster = Baumzeile" können nicht beide gelten.** Als `.tree__folder`
+   erbte der Menüpunkt `padding-left: 32px` — die *Einrückung* der Baumzeile — gegen 8 px rechts.
+   Der Inhaltskasten lag damit **12 px** rechts, und der breiteste Menüpunkt hatte **0 px Spiel**.
+   **Das war eine Frage an den Nikinger, Antwort: beidseitig `--space`.** Was das kostet, steht
+   am Stylesheet und in S1: der Menüpunkt ist in *diesem* Wert nicht mehr die Baumzeile (Höhe,
+   Polster oben/unten, Schrift, Rundung bleiben es), und die Messung nennt die 32 px **mit**.
+   *Nicht* gebaut: die Einrückung an der Quelle auf die Rail einzuschränken — das hätte zusätzlich
+   die Space-Zeilen verschoben, eine zweite, nicht beauftragte Änderung.
 
-### Die zwei Befunde, die aus dem **Browser** kamen und aus den Tests nicht
+### Ein echter Produktbefund, gemeldet und **nicht** gebaut
 
-1. **Der Schmal-Modus ließ zwei Panels stehen.** Die erste CSS-Fassung blendete nur das Menü aus.
-   Bei offenem Space-Detail blieben die Spaces-Liste *und* das Detail nebeneinander sichtbar —
-   genau die zwei, die P9-AI verbietet. Die Regel braucht **zwei** `:has()`-Regeln, nicht eine:
-   „welches Panel ist das rechteste" steht im Zustand (`hidden`), nicht im Markup, weil das Menü im
-   DOM zuerst steht. Wächter prüft die Form, die Probe die Wirkung.
-2. **Der „Zurück"-Knopf des Details war tot.** `settings.js` verdrahtete ihn nur für die Stufen 2.
-   Im breiten Modus fällt das nicht auf, weil ESC und „Schließen" denselben Weg nehmen — im
-   **Schmal**-Modus ist das Detail das einzige Panel, also war sein „Zurück" der einzige Weg
-   zurück. Wächter: `test_every_stage_has_a_wired_back_button`, der ausdrücklich prüft, dass die
-   Ausnahme **nur** das Menü betrifft.
+**Die Space-Liste kann leer bleiben, wenn man sie zu früh öffnet.** `renderSpaceList()` rendert aus
+`state.spaces`, und das steht erst nach `loadOverview()` fest; neu gerendert wird nur beim nächsten
+Öffnen. „Einstellungen → Spaces verwalten" in den ersten Sekunden nach dem Laden zeigt deshalb
+**nichts**. Die Wahrscheinlichkeit **wächst linear mit den sichtbaren Spaces** (P9-15 vom
+2026-10-03) — im Harness mit zwölf Spaces ist das der Normalfall: der erste Lauf dieser Session
+maß S1 gegen eine **leere** Rail und meldete die Station rot, ohne dass sich am Menü etwas
+geändert hätte. **Warum nicht gebaut:** die Reparatur ist eine *Zustandsentscheidung* (ein zweiter
+Hook neben `registerPanel` oder ein Ereignis zwischen `loadOverview()` und den Panel-Eigentümern),
+keine Zeilenänderung, und der Auftrag umfasste sie nicht. **Steht in der P10-Liste** (Plan §6, 3.).
 
-### Der Gegenlauf hat den eigenen Messaufbaum widerlegt — zum zweiten Mal in Phase 9
+### Was der Wächter-Teil dieser Session gekostet hat — fünf eigene Fehler, alle vom selben Typ
 
-`graph_reload_probe.mjs` las für V118 den Frame **nach** dem Zurückschalten des Tag-Toggles, also
-einen, in dem die Zwillingskante nicht mehr existiert. **Mit dem Fix aus wäre der Test grün
-gewesen.** Behoben auf zwei Ebenen: der Shim führt jetzt `frames` (`clearRect()` ist die echte
-Frame-Grenze, nicht ein Slice mit geratener Länge), und die Frames werden **vor** dem
-Toggle-Zurückschalten gesichert. Das ist dieselbe Fehlerklasse wie der am 2026-10-02
-eingecheckte Gegenlauf-Beleg: die Messung lief, aber an der falschen Stelle — und diesmal hat sie
-sich selbst widerlegt, bevor sie jemand anders ertappt.
+Die Fehlerklasse war durchgehend: **ein Wächter oder eine Messung, die am Muster scheitert, sieht
+wie ein Befund aus.** Konkret, alle fünf:
 
-### Ein Öffner statt drei Listener (nicht im Plan, beim Bauen gefunden)
+1. `class="btn settings-back"` mit **fester Klassenreihenfolge** — der Knopf heißt jetzt
+   `btn btn--icon settings-back`, und der Wächter meldete vier Panels *ohne* Zurück-Knopf, während
+   er sichtbar neben dem Test stand.
+2. Der `hidden`-Test lief über das **ganze** Element — das neue `<svg aria-hidden="true">`
+   enthält das Wort. Jetzt nur der öffnende Tag, mit `(?<![\w-])hidden\b`.
+3. `re.escape()` auf einen **bereits regexartigen** String (wie am 2026-10-05 in der Probe) ⇒ null
+   Treffer ohne Fehlermeldung.
+4. **Eine Zeilenannahme statt einer Regel-Lesemaschine:** `^([^{}]*text-align:…)\{` findet eine
+   Regel nicht, die über mehrere Zeilen geschrieben ist — und der Wächter meldete „nicht gebaut".
+   Der Wächter las außerdem den *Body* der `.settings-chain`-Regel als wären er ihr Selektor.
+   Ersatz: `_alle_regeln()` als **eine** Lesemaschine für das ganze Modul.
+5. **Eine Regel-Lesemaschine, die die Zustandsregel mit der eigenen Regel verwechselte:** wer nach
+   `aria-current="true"` sucht, findet auch `:not([aria-current="true"])` — P9-AO wäre als
+   „umgestellt" gemeldet worden, obwohl die Auswahlregel unverändert ist.
 
-Beim Umbau hingen **zwei** `click`-Listener auf `#account-manage-spaces`: `app.js` öffnete
-`openSpaceAdminDialog()`, `settings.js` schaltete um — der Knopf hätte sich **nie** geschlossen.
-Jetzt hört nur `settings.js` zu, und die drei Eigentümer (`dialogs.js`, `spaces.js`, `updates.js`)
-liefern ihren Zustands-Reset über `registerPanel(name, prepare)`. Die Lehre ist nicht „kein
-Doppel-Listener", sondern **es gibt genau einen Öffner**; Wächter
-`test_only_one_module_opens_a_panel`.
-
-### Wächter, die umgeschrieben statt gelöscht wurden
-
-- `test_app_html_has_a_live_manage_spaces_entry`: die Chevron-Assertion entfällt (es gibt kein
-  Chevron mehr), `disabled` und `Phase 7` bleiben wörtlich.
-- `test_account_nav_and_standard_button_wear_the_rail_selection_look` trägt jetzt nur noch die
-  `.btn`-Hälfte; die Formregel steht in `test_account_nav_stays_layout_only_on_the_legacy_dialog`,
-  das zusätzlich prüft, dass `.account-nav` **genau einen** Träger hat.
-- `test_a_tag_edge_and_an_explicit_edge_draw_two_lines` → **umgedreht und umbenannt** zu
-  `test_a_tag_edge_beside_an_explicit_edge_draws_one_line`, Docstring mit **beiden** Lesarten und
-  Datum. Ein Testname, der das Gegenteil behauptet, wäre eine Lüge.
-- **Drei 1024er-Wächter** lasen die 1024er Media-Query als *ersten* Treffer. Seit diesem Block gibt
-  es **zwei** (der Schmal-Modus der Kette), und die drei wurden sofort rot, ohne dass sich am
-  Shell-Grid etwas geändert hätte. Die Reparatur ist nicht „die Reihenfolge der Blöcke", sondern
-  `_media_query_bodies()`: **alle** Blöcke sammeln und in der Gesamtheit suchen. Eine Breite ist
-  eine Bedingung, keine Eigenschaft genau eines Blocks.
-- Der Zahlen-Wächter hat **meine eigenen** neuen Gegenlauf-Dateien rot gemeldet, weil sie unter dem
-  Erfolgsnamen lagen. Der Dateiname folgt jetzt **dem Ergebnis**: ein roter Lauf landet in
-  `*_gegenprobe*.json` (`test_committed_probe_evidence.py` verlangt das Suffix am **Ende** — die
-  erste Fassung setzte es davor und blieb rot).
-
-### Zwei eigene Fehler in derselben Stunde, beide beim Messen
-
-- Die erste Fassung der Regel-Lesemaschine `re.escape(condition)` auf einen bereits regexartigen
-  String ⇒ **null Treffer** ohne Fehlermeldung; die drei Wächter blieben rot „ohne Grund".
-- S7 der Probe wartete eine **feste** Sekundenzahl. Der Wegwerf-Harness sammelt Spaces über die
-  Läufe, und `/api/v1/overview` kostet **linear mit deren Zahl** — der P9-15-Befund vom 2026-10-03,
-  unerwartet wiederbelebt. Bei acht Spaces 2,1 s statt 1,5 s. Jetzt wird auf die **Bedingung**
-  gewartet (`warte_bis`), nicht auf eine Uhr.
+Dazu **fünf Zeilen Test, der den Wächter prüft statt ihn zu glauben**
+(`test_the_menu_item_watchdog_bites_on_built_in_violations`): zwölf eingebaute Verstöße, jeder
+muss rot werden — darunter `background: #0C1015` (Farbe statt Token) und `padding-left: 24px`
+(eigener Wert). Und **ein Gegenlauf auf der Testseite**: `background` aus der eigenen Regel
+entfernt ⇒ 2 Wächter rot, `background: #0C1015` statt Token ⇒ 2 rot.
 
 ### Belege
 
-- `pytest` **1223 → 1233** (**10** neue: 9 in `test_settings_chain.py` + 1 neue
-  `test_account_nav_stays_layout_only_on_the_legacy_dialog`; 1 Test umgedreht, 3 umgeschrieben); `ui_budget` **5/5** (163,4 KB, `js/settings.js` 3,0 KB gzip); `node --check` grün
-- **Tabu-Diff §0.3 leer** — auch `api.py`, `security.py` und `phase4_auth/` unberührt, der Block ist
-  reines Frontend. Keine API-Route wurde angefasst, die Routen sind byte-identisch
-- Browser-Probe `p9_settings_chain_probe.py` **39/39** gegen die TLS-Wegwerf-Instanz auf 18775,
-  gestoppt über die PID-Datei. **Gegenläufe:** G1 (aria-current stumm) → **4 rot** · G2
-  (`closeRightmost` schließt alles) → **2 rot** · G3 (implizite Kante nicht verworfen) → **rot**.
-  Die statischen Wächter bleiben bei G1 **grün** — genau die Arbeitsteilung, die der Docstring der
-  Testdatei begründet: statisch die *Ursache*, im Browser die *Wirkung*.
-- **Bilder angesehen**, nicht nur geschossen — **6 von 7**, und die siebte hat eine **Fehlaussage**
-  produziert (siehe unten): `01`, `02`, `03`, `04`, `07` (1440 px) und `05` (1024 px). Das Menü misst
-  **202 px** bei `min-width: 0` — der Grund für „viel breiter als nötig" ist weg; die Feldreihenfolge
-  mit TOTP **zuletzt** ist im Bild bestätigt; bei 1024 px ist genau ein Panel da.
-- **Befund am Werkzeug, nicht am Produkt: das lokale Vision-Modell ist für zustandsabhängige Fragen
-  unbrauchbar.** `p9_settings_06` (nach dem Passwortwechsel) hat es zweimal nicht beantwortet: der
-  erste Lauf riss die Token-Grenze (`done_reason: length`, leere Antwort), der zweite meldete, der
-  Menüpunkt **„alpha"** sei blau markiert — „alpha" ist **kein Menüpunkt**, sondern die Zeile in der
-  Rail, und nach dem Wechsel trägt **kein** Menüpunkt `aria-current` (gemessen:
-  `sichtbare_panels == ['settings-menu']`, alle drei `aria-current="false"`). Für **Layout**-Fragen
-  (welche Panels stehen nebeneinander, in welcher Reihenfolge, wie breit, gibt es Leerfläche) war
-  das Modell bei **sechs von sieben** Bildern richtig und nützlich. **Die Regel daraus:** das Bild
-  belegt *Wirkung*, nie *Zustand* — und die Abnahmezeile P9-92 sagt jetzt ausdrücklich „6 von 7",
-  statt eine Zahl zu behaupten, die ich nicht geprüft hatte. Das ist dieselbe Regel wie bei
-  `test_committed_probe_evidence.py`: eine Aussage über einen Beleg, den man nicht angesehen hat,
-  ist eine Behauptung.
-- **Die Gegenlauf-Bilder sind gelöscht, nicht eingecheckt.** Sie hießen `p9_settings_g1*`/`g2*` und
-  lagen im selben Verzeichnis wie die Erfolgsbelege — der Fehler, den der trace-Block am 2026-10-02
-  gemacht hat, wäre sonst wiederholt worden. Die **JSON**-Gegenläufe sind rot eingecheckt
-  (`*_g1_gegenprobe.json`, `*_g2_gegenprobe.json`), denn rot gehört dokumentiert.
+- `pytest` **1233 → 1238** (5 neue Tests in `test_settings_chain.py`, keiner umgedreht, 2 am
+  Wächter korrigiert); `ui_budget` **5/5** (165,6 KB; `app.css` 30,7 KB gzip); `node --check` grün
+- **Tabu-Diff §0.3 leer** — `api.py`, `security.py`, `phase4_auth/` unberührt, der Block ist reines
+  Frontend. Keine API-Route angefasst
+- Browser-Probe `p9_settings_chain_probe.py` **56/56** gegen die TLS-Wegwerf-Instanz auf 18775,
+  gestoppt über die PID-Datei. **Gegenläufe:** G4 (P9-AP raus) → **2 rot** · G5 (P9-AS raus) →
+  **2 rot** · G6 (P9-AN mit eigener Höhe) → **3 rot**. **Die Plan-Aussage zu G6 war falsch
+  benannt:** eine eigene Höhe trifft nicht die Flächen-Zeile (P9-97), sondern die
+  **Geometrie**-Zeile **P9-84** (S1, `h=40` gegen `h=35.69`) — im Plan §10.2 Punkt 5 korrigiert
+- **Drei Messkorrekturen in der Probe**, jede mit derselben Lehre: `compareDocumentPosition` prüfte
+  die Gegenrichtung und übersprang genau die Elemente, die gesucht waren (S13 fand nichts); S14
+  verglich die *Inhaltskante* eines Knopfes mit der Inhaltskante seines Panels (das sind zwei
+  Kästen, die 15 px waren `.btn`s eigenes Polster); S15 maß einen **gesperrten** Knopf mit
+  0 × 0 Rechteck bei (0,0) und meldete eine grüne Station **ohne Aussage**
+- **Bilder:** `p9_settings_01..08` neu aufgenommen (die sieben vom Vortag tragen den neuen Stand),
+  `screenshots_latest/` rotiert (drei Symlinks unverändert, der dritte zeigt jetzt `08` statt des
+  Duplikats `04`). **Die Gegenlauf-Bilder sind gelöscht, nicht eingecheckt** — der Fehler, den der
+  trace-Block am 2026-10-02 gemacht hätte; die JSON-Gegenläufe liegen rot im Repo
+- **Das lokale Vision-Modell hat zum zweiten Mal in Folge nicht geantwortet — diesmal mit erfundenem
+  Inhalt.** Die Frage nach dem Layout von `p9_settings_01_menue_1440.png` (ein einziges Panel,
+  drei Knöpfe) wurde beantwortet mit „drei Panels nebeneinander: Übersicht, alpha, VERKNÜPFUNGEN" —
+  **diese Inhalte stehen in keinem der acht Bilder.** Die Dateien sind gültige PNGs der
+  erwarteten Größen aus diesem Lauf (1440×900 / 1024×768, 15:46). **Es gibt also von dieser
+  Session keine Sichtaussage**, weder für noch gegen den Bau; die gemessenen Werte (0 px Textmitte,
+  24 px Titelabstand, 0,0 px Knopfkante) stammen aus der Probe, nicht aus einem Bild. **Die
+  Sichtprüfung ist der Nikinger-Schritt** — Dateinamen und Checkkriterien stehen in
+  `screenshots_latest/README.md`. Der Befund bestätigt die Regel vom 2026-10-05 (dort ein
+  Frage-abbruch, hier eine Fehlaussage): **das Bild belegt Wirkung, nie Zustand — und ein Modell,
+  das den Inhalt erfindet, belegt gar nichts**
+- **Zahlen, die mit wandern:** die gestrichene Masse bleibt **229 B** und liegt im L3-Archiv
+  (`MODULE_STATUS_ARCHIVE.md`), nicht im Modulstatus — sie ist auch heute **kein Hebel**, denn der
+  Head liegt mit ~28 KB **unter** dem 40-KiB-Softcap. `ABNAHME_MATRIX.md` ist auf **103 Zeilen /
+  88 ✅ · 11 ⚠️ · 4 ⬜** gewachsen und benennt sich damit selbst (P8-P, „benannt statt versteckt")
 
 ### Offen, in dieser Reihenfolge
 
-1. **Deploy `v3.1.3`** (Nikinger). Badge und `## 2026-10-05`-Block stehen. Das `deploy.sh`-Gate
-   verlangt einen Datumsblock am Deploy-Tag — bei einem späteren Deploy `SHAREFYX_ALLOW_STALE_
-   UPDATELOG=1` oder einen neuen `##`-Block. **Kein Index-Neuaufbau** zu erwarten: der Block fasst
-   keine Contract-Datei an.
-2. **P9-94 / P9-11** — der Portscan, Anleitung Mini-Plan §5 (MacBook, Handy-Hotspot, vier Ziele).
-3. **V188** — eine Quelle, kein Code: das Beenden des macOS-Vollbilds per ESC ist
-   Betriebssystem-/Browser-Verhalten. Der Keyboard-Lock-Weg steht in der Matrix ausdrücklich als
-   *aus dem Gedächtnis, nicht nachgelesen*.
-4. **P9-15 ⬜** (drei Läufe `/api/v1/overview` mit echter Sitzung) — unverändert, gehört an einen
-   Deploy-Tag mit `health_gate.sh`.
+1. **Deploy `v3.1.3`** (Nikinger). Badge und `## 2026-10-05`-Block stehen unverändert; dieser Block
+   hat **keine** Release-Änderung gebracht. Das `deploy.sh`-Gate verlangt einen Datumsblock am
+   Deploy-Tag — bei einem späteren Deploy `SHAREFYX_ALLOW_STALE_UPDATELOG=1` oder ein neuer
+   `##`-Block
+2. **Sichtprüfung der acht neuen Bilder** — das ist der eigentliche Abnahmeschritt dieses Blocks.
+   Die **beiden ⚠️** sind es, die die Sichtung entscheidet: steht der Text mittig (P9-99) und ist
+   die Fläche so, wie er sie im Bild meinte (P9-97)
+3. **P9-94 / P9-11** — der Portscan, Anleitung Mini-Plan §5 (MacBook, Handy-Hotspot, vier Ziele)
+4. **V188** — eine Quelle, kein Code (P9-27/D1)
+5. **P9-15 ⬜** (drei Läufe `/api/v1/overview` mit echter Sitzung) — gehört an einen Deploy-Tag mit
+   `health_gate.sh`
+6. **Doku-Drift, klein und nicht angefasst:** `docs/screenshots/README.md` und
+   `screenshots_latest/README.md` stehen in `test_updated_chain.py :: KNOWN_OFFENDERS` (fehlendes
+   `updated:`-Feld bzw. zwei Fäden mit `updated: `-Präfix). `screenshots_latest/` ist in diesem
+   Commit **repariert** (Fäden ohne Präfix, Eintrag gestrichen), `docs/screenshots/README.md`
+   nicht — dort fehlt das Feld ganz, und die Datei nennt in ihrer Kette eigene Bytes. **Kein
+   Test meldet es**; die Reparatur gehört zum Doku-Fundament, nicht zu diesem Block
 
-### Nachtrag 2026-10-05 — sieben UI-Punkte aus der Bildsichtung des Nikingers, **nicht gebaut**
-
-Der Nikinger hat die Probe-Bilder angesehen und sieben Punkte notiert. **Kein einziger ist
-umgesetzt**; der Block darüber ist abgebaut und committet. Der vollständige Auftrag mit Locks
-**P9-AM–P9-AS** und Abnahme **P9-96–P9-102** steht in
-`docs/concepts/phase9_hardening_block_settings_plan.md` **§10**. Kurz:
-
-1. Menüknöpfe unausgewählt leicht vom Fensterhintergrund absetzen · Titel **zentrieren** · Abstand
-   Titel→Knöpfe etwas größer (P9-AM)
-2. Unausgewählte Fläche = die des Eingabefeldes „Name des neuen Space", **Geometrie bleibt** die
-   der Baumzeile; ausgewählt bleibt `--select-fill` (P9-AN/AO) — *„ich würde vorschlagen"*, im Bau
-   am Bild prüfen
-3. Text in den Menüknöpfen zentrieren (P9-AP)
-4. „Zurück" mit **echtem Icon** statt `←`, horizontal zentriert — der Textpfeil hängt nach unten
-   (P9-AQ). **Das Icon existiert noch nicht:** neu `i-chevron-left` als Spiegel von
-   `i-chevron-right` (`d="m15 18-6-6 6-6"`), *nicht* `i-log-out` wiederverwenden
-5. Mehr Abstand zwischen Space-Titel und erster Option, **derselbe** Wert wie Punkt 1 (P9-AR)
-6. **Alle** Knöpfe in den Einstellungs-Fenstern **rechts ausrichten** (nicht in den anderen
-   Overlays) — das räumt den gemeldeten Überlauf von „Space entfernen" mit den „(schreiben)"-Zeilen
-   weg (P9-AS)
-7. **Passwort- und Update-Log-Panel bleiben unverändert** — wörtlich *„great, as well as the
-   update log"*. Steht als Lock P9-AT da, damit ein späterer Aufräum-Impuls sie nicht anfasst
-
-**Zwei Folgen, die vor dem Bau gelesen sein müssen** (im Plan ausgeschrieben):
-
-- **P9-84s Messung behält ihren Gegenstand, verliert aber ihre Einzigkeit.** Die Geometrie bleibt
-  gemessen richtig; neu kommt eine **zweite** Vergleichsrichtung dazu (unausgewählt ↔ Eingabefeld,
-  ausgewählt ↔ aktive Baumzeile).
-- **Der Wächter `test_settings_menu_items_reuse_the_tree_row_look` wird an korrektem Code rot.**
-  Er verbietet heute `background` in einer *eigenen* Regel — genau das fordert P9-AN. Er muss
-  **im selben Commit** wie der Bau enger gezogen werden (Geometrie weiter verboten, Fläche und
-  `text-align` erlaubt). Ein Wächter, der eine Woche zu eng war, wird weggeräumt statt korrigiert,
-  wenn man ihn nicht im selben Commit anfasst.
-
-**P9-92 bleibt ✅** — sein Kriterium ist „kein Überraum, Alte-Adresse-Dialog unverändert", und die
-Rückmeldung trifft beides nicht. Sie sind **neue** Kriterien mit neuen Nummern, kein Widerspruch
-zu einer abgenommenen Zeile.

@@ -55,12 +55,15 @@ DOT_SEPARATOR_RE = re.compile(r" · (?=\d{4}-\d{2}-\d{2}\s*\()")
 # Alle fünf sind **gemessen** am 2026-10-03, keine Schätzung; `docs/screenshots/README.md` hat
 # zusätzlich gar kein Feld. Wer eine Zeile repariert, streicht sie hier — und die Größenangabe in
 # `docs/INDEX.md` zieht mit (das hat `doc_health` am 2026-10-03 zweimal rot gemeldet).
+# **2026-10-05:** `screenshots_latest/README.md` ist repariert (zwei Fäden mit `updated: `-Präfix
+# entfernt, Fadeninhalte byte-identisch) — die Datei stand in der Liste, weil ein Ganzzahl-Eintrag
+# mit zwei Fäden nicht abnimmt, wenn man einen davon repariert; sie ist deshalb **ganz** gestrichen
+# und nicht auf 1 heruntergezählt.
 KNOWN_OFFENDERS: dict[str, tuple[bool, int, int]] = {
     "ROADMAP.md": (False, 4, 0),
     "docs/screenshots/README.md": (True, 2, 0),
     "docs/concepts/phase9_hardening_block_trace_plan.md": (False, 1, 0),  # 📕, nie editieren
     "phase8_6_ui_polish/CLAUDE.md": (False, 1, 0),  # abgeschlossene Phase
-    "screenshots_latest/README.md": (False, 2, 0),
 }
 
 

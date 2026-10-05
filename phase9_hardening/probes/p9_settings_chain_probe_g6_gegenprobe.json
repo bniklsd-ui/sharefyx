@@ -16,7 +16,7 @@
       "backgroundImage": "none"
     },
     "menuepunkt": {
-      "height": 35.69,
+      "height": 40,
       "width": 131,
       "padTop": "6px",
       "padBottom": "6px",
@@ -44,7 +44,7 @@
       "backgroundImage": "none"
     },
     "menuepunkt_ausgewaehlt": {
-      "height": 35.69,
+      "height": 40,
       "width": 131,
       "padTop": "6px",
       "padBottom": "6px",
@@ -85,18 +85,18 @@
     },
     {
       "pruefung": "S1 Menüpunkt 1 optisch = Baumzeile",
-      "ok": true,
-      "detail": "Knopf h=35.69 p=6px/8px/8px r=6px | Baum h=35.69 p=6px/32px/8px r=6px"
+      "ok": false,
+      "detail": "Knopf h=40 p=6px/8px/8px r=6px | Baum h=35.69 p=6px/32px/8px r=6px"
     },
     {
       "pruefung": "S1 Menüpunkt 2 optisch = Baumzeile",
-      "ok": true,
-      "detail": "Knopf h=35.69 p=6px/8px/8px r=6px | Baum h=35.69 p=6px/32px/8px r=6px"
+      "ok": false,
+      "detail": "Knopf h=40 p=6px/8px/8px r=6px | Baum h=35.69 p=6px/32px/8px r=6px"
     },
     {
       "pruefung": "S1 Menüpunkt 3 optisch = Baumzeile",
-      "ok": true,
-      "detail": "Knopf h=35.69 p=6px/8px/8px r=6px | Baum h=35.69 p=6px/32px/8px r=6px"
+      "ok": false,
+      "detail": "Knopf h=40 p=6px/8px/8px r=6px | Baum h=35.69 p=6px/32px/8px r=6px"
     },
     {
       "pruefung": "S2 Menü und Passwort nebeneinander",
@@ -141,12 +141,12 @@
     {
       "pruefung": "S4 Spaces als Stufe 2",
       "ok": true,
-      "detail": "sichtbar: ['settings-menu', 'settings-spaces'], Zeilen: 12"
+      "detail": "sichtbar: ['settings-menu', 'settings-spaces'], Zeilen: 15"
     },
     {
       "pruefung": "S4 Space-Liste gerendert",
       "ok": true,
-      "detail": "12 Zeilen"
+      "detail": "15 Zeilen"
     },
     {
       "pruefung": "S4 Space-Zeilen mit sichtbarem Abstand (P9-AK)",
@@ -326,17 +326,17 @@
     {
       "pruefung": "S7 Space anlegen: Zeile mehr",
       "ok": true,
-      "detail": "12 -> 13, 'settings-154634' sichtbar=True"
+      "detail": "15 -> 16, 'settings-155004' sichtbar=True"
     },
     {
       "pruefung": "S7 neue Zeile sichtbar",
       "ok": true,
-      "detail": "settings-154634"
+      "detail": "settings-155004"
     },
     {
       "pruefung": "S7 Detail zeigt den neuen Space",
       "ok": true,
-      "detail": "settings-154634"
+      "detail": "settings-155004"
     },
     {
       "pruefung": "S7 Zeilenabstand zwischen zwei echten Zeilen > 0 (P9-AK)",
@@ -344,5 +344,5 @@
       "detail": "8 px"
     }
   ],
-  "alle_ok": true
+  "alle_ok": false
 }

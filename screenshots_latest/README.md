@@ -6,7 +6,7 @@ detail: L3 (Pointer-Verzeichnis, keine eigene Inhaltsquelle)
 up: ../phase9_hardening/CLAUDE.md   # aktive Phase
 down:
   - ../docs/screenshots/                # kanonische Ablage; diese Verzeichnis ist nur Symlink-Komfort
-updated: 2026-10-05 (**Rotation auf die settings-Belege** — vier Symlinks neu, die vier B17-Links (`01_archivieren_*` … `04_editor_gesamt.png`) raus. Das ist die **offene Sichtfrage** des Blocks: die Messung ist 39/39, die Bilder sind angesehen, die Sichtprüfung des Nikingers steht aus. Bewusst **nicht** verlinkt: `p9_settings_06/07` (Passwortwechsel und Space-Anlegen sind Handgriffe ohne Aussagebild) und `03_updatelog_1440` (derselbe Inhalt wie im Fenster davor, nur an anderer Stelle) — ein Leseverzeichnis mit 7 Bildern wäre wieder ein Scrollen durch History) | 2026-10-02 (**Rotation auf die B17-Belege** — vier Symlinks neu, die sechs `p9_trace_*`-Links raus; die sind abgenommen und liegen versioniert in `docs/screenshots/`. Der Block ersetzt den Vorsichtsknopf auf die Standardfläche, und **diese Bilder sind die offene Sichtfrage**: die Messung ist 14/14, die Sichtung steht aus) | updated: 2026-10-02 (**Abnahme durch den Nikinger mit Restbefund**: die sechs Bilder sind freigegeben; als Notiz hält er fest, dass noch nicht alle Knöpfe an das Schema angepasst sind — abgelegt als **B17** im Backlog von `phase9_hardening/CLAUDE.md` mit der gemessenen Klassenliste, *kein* Code-Touch) | 2026-10-02 (**die fünf Bilder und die Probe sind neu — der alte Beleg war der Gegenlauf.** Beim erneuten Lesen fiel auf: `p9_trace_probe.json` stand auf `alle_ok: false` (S5 rot) und Bild 05 zeigte `beta` statt `alpha`, weil der Hand-Gegenlauf des trace-Blocks Skript und Ausgabepfade geteilt hat. Eigener Lauf gegen die Zwei-Principalen-Wegwerf-Instanz → **8/8**, Bilder neu (Bild 02 ist zeichengleich), Wächter `test_committed_probe_evidence.py` verhindert die Wiederholung) | 2026-10-02 (Rotation auf die `p9_trace_*`-Belege: sechs Symlinks neu, die vier `p9_doing_*`-Links raus — der doing-Block ist mit dem Deploy `v3.1.0` erledigt und abgenommen) | 2026-10-02 (Rotation auf die `p9_doing_*`-Belege: vier Symlinks neu, die drei `p9_btn2_*`-Links raus — der Knopfoptik-Fall ist erledigt und abgenommen) | 2026-10-01 (Rotation auf die `.toolbar-btn`-Belege (`p9_btn2_*`): drei Symlinks neu, die drei `p9_step_e_*`-Links raus — Step E ist als Beleg in `docs/screenshots/` erledigt und die aktuell offene Sichtfrage ist die Knopfoptik vor dem Deploy. **Vier unversionierte Tailscale-Kopien** mit Leerzeichen im Namen wandern nach `docs/screenshots/p9_step_a_01..04_*` (Infra-Beleg zu A3, ausdrücklich keine Sichtprüfung), die fünfte Datei `Machines - Tailscale.html` ist gelöscht: leere SPA-Hülle, `tailscale-api-prefetch` = `{}`, kein Bildwert) | updated: 2026-09-28 (Phase **9** — Rotation auf die ersten P9-Bilder: die sieben P8.6-Gate-Symlinks sind weg, drei `p9_step_e_*`-Links rein (P8.6-AK sagt genau das: "sie bleiben stehen, bis P9 eigene Screenshots produziert" — Step E hat als erster P9-Step welche produziert) | 2026-09-19 (Phase 8.6 abgeschlossen — Rotation auf die **Gate-Belege**: sieben Symlinks auf `p86_smoke_*` ersetzen die fünf H-R-3-Links. Das sind die Bilder, auf denen die Freigabe von `v3.0.2` beruht. Bleiben stehen, bis P9 eigene Screenshots produziert.)
+updated: 2026-10-05 (**Rotation auf die Nachtrags-Belege** — der dritte Symlink zeigt jetzt `p9_settings_08_rueckmeldung_1440.png` statt des Duplikats `04_drei_panels`; die **Tabelle ist mitgedreht** (die vier alten Zeilen standen noch auf B17, obwohl die Symlinks längst auf den settings-Block zeigten) · **die Kette ist repariert**: zwei Fäden trugen ein `updated: `-Präfix nach dem Trenner, damit war `rotate_index_updates.sh` für sie blind; `KNOWN_OFFENDERS` ist um diesen Eintrag gekürzt · **die Gegenlauf-Bilder des Blocks sind gelöscht**, rot eingecheckt sind nur die drei JSON-Gegenläufe) | 2026-10-05 (**Rotation auf die settings-Belege** — vier Symlinks neu, die vier B17-Links (`01_archivieren_*` … `04_editor_gesamt.png`) raus. Das ist die **offene Sichtfrage** des Blocks: die Messung ist 39/39, die Bilder sind angesehen, die Sichtprüfung des Nikingers steht aus. Bewusst **nicht** verlinkt: `p9_settings_06/07` (Passwortwechsel und Space-Anlegen sind Handgriffe ohne Aussagebild) und `03_updatelog_1440` (derselbe Inhalt wie im Fenster davor, nur an anderer Stelle) — ein Leseverzeichnis mit 7 Bildern wäre wieder ein Scrollen durch History) | 2026-10-02 (**Rotation auf die B17-Belege** — vier Symlinks neu, die sechs `p9_trace_*`-Links raus; die sind abgenommen und liegen versioniert in `docs/screenshots/`. Der Block ersetzt den Vorsichtsknopf auf die Standardfläche, und **diese Bilder sind die offene Sichtfrage**: die Messung ist 14/14, die Sichtung steht aus) | 2026-10-02 (**Abnahme durch den Nikinger mit Restbefund**: die sechs Bilder sind freigegeben; als Notiz hält er fest, dass noch nicht alle Knöpfe an das Schema angepasst sind — abgelegt als **B17** im Backlog von `phase9_hardening/CLAUDE.md` mit der gemessenen Klassenliste, *kein* Code-Touch) | 2026-10-02 (**die fünf Bilder und die Probe sind neu — der alte Beleg war der Gegenlauf.** Beim erneuten Lesen fiel auf: `p9_trace_probe.json` stand auf `alle_ok: false` (S5 rot) und Bild 05 zeigte `beta` statt `alpha`, weil der Hand-Gegenlauf des trace-Blocks Skript und Ausgabepfade geteilt hat. Eigener Lauf gegen die Zwei-Principalen-Wegwerf-Instanz → **8/8**, Bilder neu (Bild 02 ist zeichengleich), Wächter `test_committed_probe_evidence.py` verhindert die Wiederholung) | 2026-10-02 (Rotation auf die `p9_trace_*`-Belege: sechs Symlinks neu, die vier `p9_doing_*`-Links raus — der doing-Block ist mit dem Deploy `v3.1.0` erledigt und abgenommen) | 2026-10-02 (Rotation auf die `p9_doing_*`-Belege: vier Symlinks neu, die drei `p9_btn2_*`-Links raus — der Knopfoptik-Fall ist erledigt und abgenommen) | 2026-10-01 (Rotation auf die `.toolbar-btn`-Belege (`p9_btn2_*`): drei Symlinks neu, die drei `p9_step_e_*`-Links raus — Step E ist als Beleg in `docs/screenshots/` erledigt und die aktuell offene Sichtfrage ist die Knopfoptik vor dem Deploy. **Vier unversionierte Tailscale-Kopien** mit Leerzeichen im Namen wandern nach `docs/screenshots/p9_step_a_01..04_*` (Infra-Beleg zu A3, ausdrücklich keine Sichtprüfung), die fünfte Datei `Machines - Tailscale.html` ist gelöscht: leere SPA-Hülle, `tailscale-api-prefetch` = `{}`, kein Bildwert) | 2026-09-28 (Phase **9** — Rotation auf die ersten P9-Bilder: die sieben P8.6-Gate-Symlinks sind weg, drei `p9_step_e_*`-Links rein (P8.6-AK sagt genau das: "sie bleiben stehen, bis P9 eigene Screenshots produziert" — Step E hat als erster P9-Step welche produziert) | 2026-09-19 (Phase 8.6 abgeschlossen — Rotation auf die **Gate-Belege**: sieben Symlinks auf `p86_smoke_*` ersetzen die fünf H-R-3-Links. Das sind die Bilder, auf denen die Freigabe von `v3.0.2` beruht. Bleiben stehen, bis P9 eigene Screenshots produziert.)
 ---
 # `screenshots_latest/` — Schnellzugriff auf die Screenshots der aktuellen Phase
 
@@ -43,38 +43,42 @@ Ausnahmen, in denen M3 den Dateinamen + Checkkriterium **nicht** nennt:
 - Wenn die Verifikation programmatisch ist (Regex auf gerenderten HTML-Output
   o. ä.) und der Screenshot nur Anhang ist.
 
-## Aktueller Inhalt (Phase **9**, Block B17, Stand 2026-10-02)
+## Aktueller Inhalt (Phase **9**, Block settings-Nachtrag, Stand 2026-10-05)
 
-Vier Bilder aus `phase9_hardening/scripts/p9_btn3_caution_probe.py` gegen die eigene
-TLS-Wegwerf-Instanz (`p9_step_g_wegwerf.py`, Port 18775, Chromium 1440x900). Sie zeigen **eine
-einzige Änderung**: der Knopf „Archivieren" (`.btn.action--caution`, Kategorie „Vorsicht") trägt
-jetzt **exakt** die Standardfläche, nur seine Beschriftung bleibt rot.
+Vier Bilder aus `phase9_hardening/scripts/p9_settings_chain_probe.py` gegen die eigene
+TLS-Wegwerf-Instanz (`p9_step_g_wegwerf.py`, Port 18775, Chromium 1440×900). Sie zeigen die
+**sieben Punkte, die der Nikinger am 2026-10-05 aus der Bildsichtung notiert hat** (Mini-Plan §10,
+Locks P9-AM–P9-AS, Abnahme P9-96–P9-102). **Die Bilder vom Vortag sind durch diese ersetzt** — sie
+zeigten den alten Stand und sind im Repo versioniert überschrieben worden.
 
-**Die Behauptung, um die es geht, ist eine Gleichheit, keine Schönheit.** Vorher trug der Knopf
-die alte graue Familie `--btn-face-*` (`#2A313A`) — und die ist **heller** als die Standardfläche
-`#0C1C31`. „Vorsicht" war damit der auffälligste Knopf der Editor-Fußzeile statt des Standards.
-**Gemessen:** die berechneten `backgroundImage`-Strings sind jetzt stringgleich
-(`linear-gradient(rgb(12,28,49), rgb(5,11,19))` auf beiden), vier Pixelproben an der glyphenfreien
-Spalte x=4 px mit **max |Δ| = 1**, die Vorsichtfarbe sitzt in der Beschriftung (`rgb(229,72,77)`
-gegen `rgb(233,237,242)` beim Standard). **Gegenprobe:** alte Fläche wieder eingebaut → 6 von 13
-Stationen rot, Δ 25–28 an allen drei Höhen.
+**Zwei der sieben Punkte sind kein Umbau, sondern eine Entscheidung, die im Bild sichtbar wird:**
+der unausgewählte Menüpunkt trägt jetzt **dieselbe Fläche wie ein Eingabefeld** (`rgb(12,16,21)`
+mit der Haarlinie `rgba(255,255,255,.16)`), und seine Beschriftung steht **mittig**. Die zweite
+Hälfte davon ist die **Polster-Entscheidung** vom 2026-10-05: der Menüpunkt erbte als
+`.tree__folder` die 32-px-Einrückung der Baumzeile und lag damit 12 px neben seiner Mitte; er
+trägt jetzt beidseitig `--space` (8 px). **Das ist die einzige Stelle, an dem die Geometrie des
+Menüpunkts von der Baumzeile abweicht** — Höhe, Polster oben/unten, Schrift und Rundung sind
+ unverändert gemeinsam, und genau das misst Station S1 (im Beleg genannt, damit die Abweichung
+sichtbar bleibt).
 
 | Dateiname | Original | Checkkriterium |
 |---|---|---|
-| `01_archivieren_und_speichern.png` | `../docs/screenshots/p9_btn3_01_kopfleiste.png` | **Der eine Blick, um den es geht:** „Archivieren" und „Speichern" nebeneinander. Der Knopf darf **nicht heller** wirken als der Standard — er ist jetzt dieselbe dunkelblaue Fläche, unterschieden nur an der **roten Beschriftung**. „Speichern" bleibt bewusst die helle Akzentfläche (Hauptaktion). |
-| `02_archivieren_ruhe.png` | `../docs/screenshots/p9_btn3_02_ruhe.png` | **Derselbe Knopf isoliert, 115×41, Ruhezustand** (die Aufnahme entsteht nach dem Wegziehen des Zeigers — ein Hover-Bild hätte den Beleg verfälscht). Fläche dunkelblau mit einer hellblauen 1-px-Kante, Schrift rot. Zum Vergleich: das war vorher ein heller grauer Block. |
-| `03_archivieren_hover.png` | `../docs/screenshots/p9_btn3_04_hover.png` | **Der Hover-Zustand:** die Fläche wird **einen Tick heller** (der Standard-Hover `--btn-std-fill-hover`), die Beschriftung bleibt unverändert rot. Der Knopf darf auf Hover nicht aus der Reihe fallen. |
-| `04_editor_gesamt.png` | `../docs/screenshots/p9_btn3_03_editor.png` | **Der ganze Editor** zur Einordnung: Knopfleiste, Kopfdaten, Formatierleiste, Anhängen-Streifen — alle Standardknöpfe tragen jetzt dieselbe Fläche, und „Archivieren" ist die einzige Abweichung in der Farbe, nicht in der Form. |
+| `01_einstellungen_menue.png` | `../docs/screenshots/p9_settings_01_menue_1440.png` | **Der eine Blick, um den es geht:** das Menü „Einstellungen" allein. Drei Punkte müssen sitzen: der **Titel steht mittig**, darunter mit deutlichem Abstand (24 px statt 8 px) die drei Knöpfe, und deren **Beschriftungen stehen mittig in der Fläche** — nicht links. Die Knöpfe sollen als **eingelassene Felder** wirken (dunkel wie ein Eingabefeld, mit feiner Kante), nicht als Plastik. |
+| `02_einstellungen_kette.png` | `../docs/screenshots/p9_settings_02_passwort_1440.png` | **Der Zustandsunterschied, den man sehen muss:** links das Menü mit dem **aktiven** Punkt „Passwort ändern" (blauer Verlauf, unverändert wie eine Baumzeile in der Rail), rechts daneben das Passwort-Fenster. Die beiden **un**ausgewählten Punkte tragen die neue eingelassene Fläche — der Unterschied zwischen aktiv und inaktiv muss klar sein. **Das Passwort-Fenster selbst ist unverändert** (P9-AT, wörtlich „great"). |
+| `03_einstellungen_drei_fenster.png` | `../docs/screenshots/p9_settings_08_rueckmeldung_1440.png` | **Die Kette in voller Breite** (Menü · Spaces · Space-Detail) und der **sechste Punkt**: alle Knöpfe in den Einstellungs-Fenstern stehen **rechts** — im Spaces-Panel rechtsbündig, im Detail-Panel „Space entfernen"/„Schließen" rechtsbündig. **Das war der gemeldete Überlauf** von „Space entfernen" mit den „(schreiben)"-Zeilen. **Wichtig, ehrlich gesagt:** im Harness gibt es **keine** Mitglieder, die Zeile ist **synthetisch** (Station S15) — der gemeldete Überlauf war hier **nicht vorhanden** (121 px Luft) und wird durch diesen Block **nicht als behoben behauptet**. Bitte in den eigenen Spaces ansehen. |
+| `04_einstellungen_schmal_1024.png` | `../docs/screenshots/p9_settings_05_schmal_1024.png` | **Der vierte Punkt bei 1024 px:** im Schmal-Modus steht nur das rechteste Fenster, und der „Zurück"-Knopf oben links trägt jetzt das **echte Chevron-Icon** statt des Textpfeils `←`, der als Glyphe sichtbar nach unten hing. Er ist **mittig im Knopf** (dx/dy = 0 px gemessen) und **ohne Text** — der Name steckt in `aria-label` + `title`, ein Icon ohne Namen wäre für einen Screenreader beschriftungslos. |
 
-**Zwei Dinge, die der Sichtprüfung nicht zu Entscheidung gehören, die aber benannt sind.** Der
-**Kontrast** der roten Beschriftung liegt bei 4,38:1 (vorher 3,36:1) — besser, aber unter dem
-WCAG-AA-Wert 4,5:1 für normalgroßen Text; ob die Schrift heller wird, ist eine Design-Entscheidung.
-Und eine **eigene rote Fläche** (`--caution-std-*`) wurde bewusst **nicht** gebaut: die
-Selection/Choice-Konvention v3 schließt eine „gefüllte rote Fläche" aus.
+**Was in diesem Block nicht gebaut wurde und warum.** Die Einrückung an der Quelle
+(`.tree__folder`) auf die Rail einzuschränken wäre die sauberere Lösung gewesen, hätte aber
+**zusätzlich** die Space-Zeilen im Panel verschoben — eine zweite, nicht beauftragte Änderung.
+Und die Space-Liste kann **leer** bleiben, wenn man sie vor dem Laden der Übersicht öffnet: das ist
+ein **Produktbefund aus diesem Lauf**, in die P10-Liste gewandert und in keinem Bild zu sehen
+(siehe `phase9_hardening/ABNAHME_MATRIX.md`, Abschnitt „Drei Befunde aus diesem Block").
 
-**Nicht hier, mit Begründung.** Die sechs `p9_trace_*`-Belege sind am 2026-10-02 abgenommen
-(der Restbefund daraus ist genau dieser Block), die vier `p9_doing_*` mit dem Deploy `v3.1.0`, die
-`p9_btn2_*` mit der Standardoptik der Knöpfe. Alle liegen versioniert in `docs/screenshots/`.
+**Nicht hier, mit Begründung.** Die sechs `p9_trace_*`-Belege sind am 2026-10-02 abgenommen, die
+vier `p9_doing_*` mit dem Deploy `v3.1.0`, die `p9_btn2_*`/`p9_btn3_*` mit der Standardoptik der
+Knöpfe. Die **Gegenlauf-Bilder** dieses Blocks (`p9_settings_g4*/g5*/g6*`) sind **gelöscht, nicht
+eingecheckt** — rot gehört dokumentiert, und dafür liegen die drei JSON-Gegenläufe im Repo.
 
 ## Rotation
 

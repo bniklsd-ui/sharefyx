@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Wurzel-CLAUDE.md-Historie — der aktuelle Curr
 detail: L3
 up: ../CLAUDE.md
 down:
-updated: 2026-10-05 (2 Blöcke der Wurzel verbatim hierher rotiert — der Block vom 2026-10-04 und die datierte Namenskorrektur —, per `scripts/rotate_root_current_state.sh`; die stehende Rotationsregel lebt jetzt als Präambel vor dem ersten Block, damit sie nicht mitrotiert) | 2026-10-04 (**24 Blöcke der Wurzel-`CLAUDE.md` §Current state verbatim hierher**, per `scripts/rotate_root_current_state.sh` K=1; KEEP ist der **neueste** Block, weil die Wurzel newest-**first** ist — im Phase-Head ist es umgekehrt, und die erste Fassung des Skripts hat den ältesten behalten; **sechs Gegenproben**, darunter die byteweise Reassemblierung und die Nachlese jedes Blocks, **221.957 B vorher == 221.957 B nachher**) | 2026-09-10 (P8.6 Step 0 Haushalt-Block aus Wurzel-`CLAUDE.md` §Current state rotiert — Migration-Vorbereitungs-Block brauchte Platz im Wurzel-Head, deshalb der Vorgänger nach hier verschoben; Project-Pattern: jeder neue Current-state-Eintrag rotiert den bisherigen verbatim hierher)
+updated: 2026-10-05 (der Block „die alte Adresse darf unbefristet schreiben" verbatim hierher rotiert, per `scripts/rotate_root_current_state.sh` K=1 — der neue Block über ihm behandelt die sieben Punkte aus der Bildsichtung; **Achtung für den nächsten Faden:** ein Datum mit Leerzeichen und Klammer im Faden **Text** ist für den Anker unsichtbar, das Skript bricht dann mit exit 1 ab) | 2026-10-05 (2 Blöcke der Wurzel verbatim hierher rotiert — der Block vom 2026-10-04 und die datierte Namenskorrektur —, per `scripts/rotate_root_current_state.sh`; die stehende Rotationsregel lebt jetzt als Präambel vor dem ersten Block, damit sie nicht mitrotiert) | 2026-10-04 (**24 Blöcke der Wurzel-`CLAUDE.md` §Current state verbatim hierher**, per `scripts/rotate_root_current_state.sh` K=1; KEEP ist der **neueste** Block, weil die Wurzel newest-**first** ist — im Phase-Head ist es umgekehrt, und die erste Fassung des Skripts hat den ältesten behalten; **sechs Gegenproben**, darunter die byteweise Reassemblierung und die Nachlese jedes Blocks, **221.957 B vorher == 221.957 B nachher**) | 2026-09-10 (P8.6 Step 0 Haushalt-Block aus Wurzel-`CLAUDE.md` §Current state rotiert — Migration-Vorbereitungs-Block brauchte Platz im Wurzel-Head, deshalb der Vorgänger nach hier verschoben; Project-Pattern: jeder neue Current-state-Eintrag rotiert den bisherigen verbatim hierher)
 ---
 
 
@@ -46,6 +46,20 @@ Newest-first, genau wie sie im Kopf standen:
 26. 2026-09-04 (Phase 8.5 Drift nachgezogen `4424310` + A1 committet `499d9be` -- Picker-Modus-Umschalter + `localStorage` `sfx:linkpicker:mode`; V99 `session` zu `local` als Eskalation wegen P8.5-G; erste `localStorage`-Nutzung des Projekts)
 27. 2026-09-03 (Phase 8.5 Step 0 -- Skelett phase8_5_picker_release/{CLAUDE.md, SESSIONS_ARCHIVE.md, scripts/} angelegt; vier Paragraph-1-Funde: INDEX 52.911 zu 40.917 B unter Cap, Bueroklammer-zu-Lupe-Drift in phase8_ui_graph/CLAUDE.md:440, Phase-8-Bilanz korrigiert; ROADMAP-Abschnitt neu; Wurzel-`down:` umgestellt)
 28. 2026-09-01 (Phase 8 Sichtpruefung 1 + Gate B zu C bestanden; **Hard Rule 9 ergaenzt** -- kein `pkill -f` mit Regex, niemals den systemd-Dienst anfassen, Lehre aus dem Prod-Vorfall 2026-09-01 Phase 8 Step A3 Nachbereitung)
+
+**[2026-10-05, die alte Adresse darf unbefristet schreiben — gebaut, nicht deployt — ein Commit, Produktcode
+im Übergangsfenster, kein Service-Touch.]** Der Arbeitslaptop des Nikingers erreicht
+`sharefyx.eurofyx.com` hinter dem Firmen-VPN (genua genuconnect) nicht: `NS_ERROR_NET_RESET`, 0 B übertragen.
+Der Server ist gesund: DNS, TLS und `303` sind von der Heim-VM gemessen, und das MacBook kommt durch.
+Vermutet, nicht belegt, ist ein Filter gegen neu registrierte Domains. **Nikinger-Entscheidung
+2026-10-05:** beide Adressen schreiben parallel, bis die neue vom Arbeitslaptop aus belegt funktioniert.
+Dafür gibt es `LEGACY_UNTIL=open` (fail-closed, nur das exakte Wort; CSRF-Pfad byte-identisch). Der
+Dialog auf der alten Adresse nennt dann keinen Termin. **Damit ist der Satz „am 2026-10-18 schließt
+das Übergangsfenster von selbst" aus dem Block vom 2026-10-04 überholt.** **Live seit 2026-10-05:**
+`v3.1.2` (SHA `f4ef319`), Gate `ok`, und der laufende Prozess trägt `LEGACY_UNTIL=open`. Die Deploy-Schritte, die Notlösung ohne Release und die
+PowerShell-Diagnose für den Laptop stehen im Session-Block vom 2026-10-05 in `phase9_hardening/CLAUDE.md`.
+Der übrige Stand der Phase 9 ist unverändert: Abnahmezahlen in `phase9_hardening/ABNAHME_MATRIX.md`,
+P9-15 ist die offene Aufgabe.
 
 **[2026-10-04, datierte Namenskorrektur]** Der Ausdruck „P9-A-Umkehr" im Block vom 2026-10-03 und in
 mehreren `updated:`-Fäden war ein **Fehlname**: **P9-A** ist im Plan der **Scope-Lock** „P9 ist eine

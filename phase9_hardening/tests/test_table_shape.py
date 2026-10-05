@@ -212,13 +212,15 @@ def test_the_p9_module_status_table_shows_every_row_it_writes():
 
     Als **Anzahl der Zeilen** formuliert, nicht als Byte-Zahl — die Aussage, die er tragen soll,
     ist „kein Status verschwindet mehr in einer Phantom-Spalte", nicht „es sind genau 4.097 B".
-    15 ist Kopf + 14 Datenzeilen (0, A–H, doing, trace, E (Extra), S, Gate/Z). **[2026-10-05]**
-    `S` (Block settings, geplant) kam dazu; vorher 14 = Kopf + 13.
+    16 ist Kopf + 15 Datenzeilen (0, A–H, doing, trace, E (Extra), S, **R**, Gate/Z). **[2026-10-05]**
+    `S` (Block settings, geplant) kam dazu, später am selben Tag `R` (die sieben Punkte aus der
+    Bildsichtung — ein **eigener** Block mit eigenen Locks P9-AM–P9-AS und eigener Abnahme, deshalb
+    eine eigene Zeile und keine zweite Statuszeile in `S`); vorher 14 = Kopf + 13.
     """
     text = (REPO_ROOT / "phase9_hardening" / "CLAUDE.md").read_text(encoding="utf-8")
     head = text.split("\n## Modulstatus\n", 1)[1].split("\n## ", 1)[0]
     rows = [l for l in head.split("\n") if l.lstrip().startswith("|") and not SEPARATOR_RE.match(l.strip())]
-    assert len(rows) == 15, f"erwartet Kopf + 14 Datenzeilen, gefunden {len(rows)}"
+    assert len(rows) == 16, f"erwartet Kopf + 15 Datenzeilen, gefunden {len(rows)}"
     assert all(cell_count(r) == 3 for r in rows), [
         f"Zeile mit {cell_count(r)} Zellen: {r[:70]}" for r in rows if cell_count(r) != 3
     ]

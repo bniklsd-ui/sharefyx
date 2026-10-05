@@ -7,7 +7,7 @@ up: ../../phase9_hardening/CLAUDE.md
 down:
   - ./phase9_hardening_plan.md               # 📕 übergeordneter P9-Plan; §12.4 Übersichtsgrafik, P9-11, P9-27, P9-36
   - ./phase9_hardening_block_trace_plan.md   # 📕 Formvorlage dieses Mini-Plans
-updated: 2026-10-05 (**§10: sieben UI-Punkte aus der Bildsichtung, nicht gebaut** — Locks P9-AM–P9-AS, Abnahme P9-96–P9-102; zwei davon sind ausdrücklich „nicht anfassen"; zwei Folgen festgehalten: die zweite Vergleichsrichtung in P9-84 und der zu **eng** werdende Wächter) | 2026-10-05 (**gebaut, opencode/M3 — §9 gefüllt**; Release `v3.1.3` steht, nicht deployt; Probe 39/39, G1/G2/G3 rot, `pytest` 1223 → 1233 · **zwei Code-Befunde kamen aus dem Browser, nicht aus den Tests**, vier Punkte gegen den Plan abweichend begründet) | 2026-10-05 (geschrieben, Claude Code, nach dem Deploy `v3.1.2`; Wünsche und Entscheidungen des Nikingers vom selben Tag)
+updated: 2026-10-05 (**§10 gebaut** — die sieben Punkte aus der Bildsichtung, opencode/M3, Probe **56/56**, G4 → 2 rot · G5 → 2 rot · G6 → 3 rot; P9-96–P9-102 mit **5 ✅ · 2 ⚠️**. **Zwei Korrekturen an diesem Plan, beide gemessen:** P9-APs `text-align` war auf einem Flex-Knopf ein **No-op** (Textmitte 8,5 px daneben) → `justify-content`; und das **linke Polster** musste vom 32-px-Wert der Baumzeile auf `--space` (Nikinger-Entscheidung), sonst bleibt die Beschriftung 12 px neben der Mitte. G6 trifft **P9-84**, nicht P9-97) | 2026-10-05 (**§10: sieben UI-Punkte aus der Bildsichtung, nicht gebaut** — Locks P9-AM–P9-AS, Abnahme P9-96–P9-102; zwei davon sind ausdrücklich „nicht anfassen"; zwei Folgen festgehalten: die zweite Vergleichsrichtung in P9-84 und der zu **eng** werdende Wächter) | 2026-10-05 (**gebaut, opencode/M3 — §9 gefüllt**; Release `v3.1.3` steht, nicht deployt; Probe 39/39, G1/G2/G3 rot, `pytest` 1223 → 1233 · **zwei Code-Befunde kamen aus dem Browser, nicht aus den Tests**, vier Punkte gegen den Plan abweichend begründet) | 2026-10-05 (geschrieben, Claude Code, nach dem Deploy `v3.1.2`; Wünsche und Entscheidungen des Nikingers vom selben Tag)
 ---
 
 # Phase 9 — Block settings und die Restposten bis zum Closeout
@@ -214,6 +214,11 @@ Befund. V162 B bekommt einen Vermerk.
    - die `/api/v1/overview`-Schleife (P9-15-Befund)
    - den Termin „alte Adresse wieder befristen", sobald der Arbeitslaptop die neue Domain erreicht
      (Vermutung: NRD-Sperre etwa 30 Tage, erneut testen um den 2026-11-02)
+   - **[2026-10-05, aus dem settings-Nachtrag]** die **leere Space-Liste beim zu frühen Öffnen**
+     von „Spaces verwalten" (`renderSpaceList()` rendert aus `state.spaces`, das erst nach
+     `loadOverview()` steht; §10.3 Punkt 2). Kein Test entscheidet die Form der Reparatur, und die
+     Wahrscheinlichkeit wächst linear mit den sichtbaren Spaces — sie gehört an denselben Ort wie
+     der P9-15-Befund, mit dem sie dieselbe Ursache hat.
 4. **Plan §9-Ergebnis** dieses Mini-Plans füllen, dann 🔄 → 📕.
 
 ## §7 Abnahme (P9-83 – P9-95)
@@ -371,3 +376,71 @@ den Titel, und genau diese beiden (`title` + `aria-label`) sind zu setzen.
 
 Gegenläufe für den Bau: `G4` P9-AP raus (Text wieder links) → P9-99 rot · `G5` P9-AS raus
 (Buttons wieder links) → P9-102 rot · `G6` P9-AN **mit** einer eigenen Höhe → P9-97 rot.
+
+### §10.1 Ergebnis — **gebaut am 2026-10-05 (opencode/M3), gleiches Release `v3.1.3`**
+
+P9-96 – P9-102 stehen mit **5 ✅ und 2 ⚠️** in der Abnahmematrix. `pytest` **1233 → 1238** (5 neue
+Tests, keiner umgedreht), `ui_budget` 5/5 (**165,6 KB**), Tabu-Diff §0.3 leer, Browser-Probe
+**56/56** gegen die TLS-Wegwerf-Instanz auf 18775. Gegenläufe: **G4 → 2 rot · G5 → 2 rot ·
+G6 → 3 rot**.
+
+**Die beiden ⚠️ sind benannte Abweichungen, keine offenen Punkte** — P9-97 (linker Polsterwert,
+Nikinger-Entscheidung) und P9-99 (der andere Weg zur Mitte). Beide sind in der Matrix mit ihrem
+gemessenen Wortlaut begründet.
+
+### §10.2 Was gegen diesen Plan anders gebaut wurde — fünf Punkte
+
+1. **P9-AP ist `justify-content: center`, nicht `text-align: center` — und die Vorgabe im Plan
+   war ein No-op.** Der Menüknopf ist `display: flex` (Sammelregel mit `.tree__folder`), sein
+   einziges Kind ein **anonymer Flex-Item**. `text-align` wirkt auf Blockcontainer; im Flex-Item
+   zentriert es einen Text in sich selbst. Die erste Fassung des Baus hatte genau das, und die
+   erste Browser-Probe maß die Textmitte **8,5 px neben** der Knopfmitte. Der Wächter verbietet
+   `text-align` in einer eigenen Menüpunkt-Regel jetzt ausdrücklich — eine Deklaration, die
+   nichts bewirkt, ist die zweite Wahrheit über denselben Zustand.
+2. **Das linke Polster ist `var(--space)`, nicht das der Baumzeile (32 px) — Nikinger-Entscheidung
+   vom 2026-10-05, und der Grund steht im Lock P9-AN selbst.** Als `.tree__folder` erbte der
+   Menüpunkt die Einrückung der Baumzeile; dadurch lag sein Inhaltskasten 12 px rechts, und
+   `justify-content: center` zentrierte **darin** — Textmitte 732 px bei einer Knopfmitte von
+   720 px, und der breiteste Menüpunkt hatte 0 px Spiel. Exakt mittig ging nur mit symmetrischem
+   Polster; das war eine Frage an den Nikinger, Antwort: **beidseitig 8 px**. **Was das kostet,
+   steht am Stylesheet und in S1:** der Menüpunkt ist in *diesem* Wert nicht mehr die Baumzeile
+   (Höhe, Polster oben/unten, Schrift und Rundung bleiben es), und die Browser-Messung vergleicht
+   den linken Wert jetzt gegen `--space` und **nennt die 32 px der Baumzeile mit**.
+   *Nicht* gebaut wurde die Alternative, die Einrückung an der Quelle (`.tree__folder`) auf die
+   Rail einzuschränken: das hätte zusätzlich die Space-Zeilen im Panel verschoben, eine zweite,
+   nicht beauftragte Änderung.
+3. **`border-color` ist als erlaubte Eigenschaft dazugekommen**, obwohl der Plan in der Liste der
+   „neu zu untersagenden" Werte auch „Kante" nennt. P9-97 vergleicht aber ausdrücklich
+   „Hintergrund **und** Kante", und ohne die Haarlinie wäre die Fläche nicht die des Eingabefeldes,
+   sondern eine neue. Die **Kurzform** `border` bleibt verboten — sie trägt Breite und Stil und
+   könnte damit genau die Geometrie verändern, die P9-AF bindet. Der Wächter prüft außerdem, dass
+   der Flächenwert **derselbe Token** ist, den die `.input`-Regel nennt, und nicht bloß *irgendein*
+   Wert: der Name wird verglichen, nicht abgetippt.
+4. **„Erste Option" aus P9-101 wird als „erster sichtbarer Block unter dem Titel" operiert.** Im
+   Harness steht der Home-Space-Hinweis vor der leeren Mitgliederliste, der Abstand zur ersten
+   *Mitgliederzeile* wäre also Titel + Hinweis und damit eine andere Größe. Gemessen wird 24 px ==
+   24 px; die Regel wirkt in beiden Lesarten, weil 24 px größer ist als das `margin-top: 1em` der
+   `<ul>` (16 px) und der Titelabstand damit der einzige bestimmende Wert bleibt.
+5. **Gegenlauf G6 macht nicht P9-97 rot, sondern P9-84.** Der Plan kündigte an, eine eigene Höhe
+   treffe die Flächen-Vergleichszeile; getroffen wird die **Geometrie**-Vergleichszeile S1, weil
+   eine Höhe kein Farbwert ist. Gemessen: **3 Stationen rot** (`S1 Menüpunkt 1/2/3 optisch =
+   Baumzeile`, `h=40` gegen `h=35.69`). Die Plan-Aussage ist damit als *falsch benannt* korrigiert,
+   nicht als unerfüllt.
+
+### §10.3 Zwei Befunde aus dem Lauf, die keine Abnahmezeile sind
+
+1. **Der gemeldete Überlauf von „Space entfernen" mit den „(schreiben)"-Zeilen war im Harness
+   nicht vorhanden** (121 px Luft, gemessen), und eine rechte Ausrichtung kann einen vertikalen
+   Abstand nicht verursachen. P9-102 steht deshalb auf ✅ **mit dem ausdrücklichen Vorbehalt**, den
+   Block nicht als Behebung zu behaupten: die Sichtprüfung an den echten Spaces des Ningkers ist
+   der fehlende Beleg. Zwei Lesarten bleiben offen (horizontaler Überstand einer langen
+   Mitgliedszeile — die `<li>` hat keine eigene Regel und kein `word-break`; oder der Fall tritt
+   erst mit vielen Mitgliedern auf, weil das Panel dann scrollt).
+2. **Die Space-Liste kann leer bleiben, wenn man sie zu früh öffnet** — `renderSpaceList()` rendert
+   aus `state.spaces`, und das steht erst nach `loadOverview()` fest; neu gerendert wird nur beim
+   nächsten Öffnen. Die Wahrscheinlichkeit wächst **linear mit den sichtbaren Spaces** (P9-15). Im
+   Harness mit zwölf Spaces ist das der Normalfall: der erste Lauf dieser Session maß S1 gegen eine
+   **leere** Rail und meldete die Station rot, ohne dass sich am Menü etwas geändert hätte.
+   **Gemeldet, nicht gebaut** — die Reparatur ist eine Zustandsentscheidung, keine Zeilenänderung.
+   Die Probe wartet jetzt auf die **Bedingung** (dieselbe Lehre wie S7), nicht auf eine Uhr.
+

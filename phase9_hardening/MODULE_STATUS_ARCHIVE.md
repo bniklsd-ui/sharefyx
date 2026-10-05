@@ -7,7 +7,7 @@ up: ./CLAUDE.md
 down:
   - ./ABNAHME_MATRIX.md     # Abnahme- und [VERIFY]-Bilanz — der eine Ort, an dem die Zahlen stehen
   - ../docs/concepts/phase9_hardening_plan.md   # Locks P9-A–P9-T, Steps 0–H
-updated: 2026-10-04 (**angelegt — Nikinger-Entscheidung vom 2026-10-04**, der letzte offene Hebel gegen die Softcap-Überschreitung des Phase-9-Heads)
+updated: 2026-10-05 (**Abschnitt `R` angelegt** — die sieben Punkte aus der Bildsichtung als **eigene** Zeile, mit eigener Abnahme P9-96–P9-102; beim Abschnitt `S` ein datierter Nachtrag, weil dessen Text der Stand des Splits ist und der Head inzwischen „gebaut" trägt) | 2026-10-04 (**angelegt — Nikinger-Entscheidung vom 2026-10-04**, der letzte offene Hebel gegen die Softcap-Überschreitung des Phase-9-Heads)
 ---
 
 # Archiv der Modulstatus-Statusspalten (Phase 9)
@@ -74,6 +74,53 @@ Section-Rotationen vom 2026-10-02 (`phase1_storage/CONTRACTS_ARCHIVE.md`,
 ## `S`
 
 ⬜ **geplant 2026-10-05**, nicht gebaut — `docs/concepts/phase9_hardening_block_settings_plan.md` (Locks P9-AE–AL, Abnahme P9-83–95). Darin auch D1 neu beschrieben (§4) und die P9-11-Portscan-Anleitung (§5)
+
+**[2026-10-05, später am Tag: gebaut.]** Der Text über ist der Stand des Splits und bleibt
+unverändert; der heutige Kurzstand steht in der Zeile `S` des Heads (🟡, Release `v3.1.3`
+steht, nicht deployt), die Herleitung in §9 des Mini-Plans. Die sieben Punkte, die der Nikinger
+danach aus der Bildsichtung notiert hat, stehen in der Zeile `R` — **eigene Zeile, eigener
+Abschnitt**, weil es ein eigener Block mit eigenen Locks (P9-AM–P9-AS) und eigener Abnahme
+(P9-96–P9-102) ist.
+
+## `R`
+
+🟡 **gebaut 2026-10-05 (opencode/M3)**, Release `v3.1.3` steht unverändert, **kein Deploy, kein
+Service-Touch** — `docs/concepts/phase9_hardening_block_settings_plan.md` **§10** (Locks
+P9-AM–P9-AS, Abnahme P9-96–P9-102). Browser-Probe **56/56** gegen die TLS-Wegwerf-Instanz auf
+18775, **G4 → 2 rot · G5 → 2 rot · G6 → 3 rot**, `pytest` **1233 → 1238**, `ui_budget` 5/5
+(**165,6 KB**), Tabu-Diff §0.3 leer.
+
+**Zwei Korrekturen an der Vorgabe, beide erst durch Messung.** (a) `text-align: center` ist auf
+dem Menüknopf ein **No-op** — er ist `display: flex` mit einem anonymen Flex-Item (Textknoten),
+und `text-align` wirkt auf Blockcontainer; die erste Fassung maß die Textmitte **8,5 px neben**
+der Knopfmitte. Gebaut ist `justify-content: center`, die Flex-Achse: **0 px**. (b) „Text mittig"
+und „Polster = Baumzeile" schließen sich: als `.tree__folder` erbte der Menüpunkt
+`padding-left: 32px` (die Einrückung der Baumzeile) gegen 8 px rechts, der Inhaltskasten lag
+**12 px** rechts und der breiteste Punkt hatte **0 px** Spiel. **Nikinger-Entscheidung 2026-10-05:
+beidseitig `--space`.** Preis, benannt am Stylesheet und in S1: der Menüpunkt ist in *diesem*
+Wert nicht mehr die Baumzeile — Höhe, Polster oben/unten, Schrift und Rundung bleiben es, und die
+Messung nennt die 32 px mit.
+
+**Abnahme: 5 ✅ · 2 ⚠️** (P9-97 und P9-99 mit benannter Abweichung, Details in der Matrix).
+**Fünf eigene Fehler, alle derselben Klasse** — ein Wächter oder eine Messung, die am Muster
+scheitert, sieht wie ein Befund aus: feste Klassenreihenfolge im Back-Knopf-Muster · `hidden` im
+`<svg aria-hidden="true">` · `re.escape()` auf einem regexartigen String · eine **Zeilenannahme**
+statt einer Regel-Lesemaschine (eine über mehrere Zeilen geschriebene Regel wurde nicht
+gefunden, und der Body der `.settings-chain`-Regel wurde als ihr Selektor gelesen) · eine
+Lesemaschine, die `:not([aria-current="true"])` für die Auswahlregel hielt. Dazu **zwölf eingebaute
+Verstöße** im neuen Wächtertest (jeder muss rot werden, darunter `background: #0C1015` und
+`padding-left: 24px`) und **zwei Gegenläufe auf der Testseite** (Fläche entfernt ⇒ 2 rot, Farbe
+statt Token ⇒ 2 rot).
+
+**Ein Produktbefund, gemeldet und nicht gebaut:** die Space-Liste bleibt **leer**, wenn man sie
+vor `loadOverview()` öffnet (`renderSpaceList()` rendert aus `state.spaces`; die Wahrscheinlichkeit
+wächst linear mit den sichtbaren Spaces, P9-15). Im Harness mit zwölf Spaces ist das der
+Normalfall — der erste Lauf maß S1 gegen eine leere Rail. Die Reparatur ist eine
+Zustandsentscheidung, keine Zeilenänderung; **P10-Liste** (Plan §6, 3).
+
+**Die Plan-Aussage zu G6 war falsch benannt:** eine eigene Höhe trifft nicht die Flächenzeile
+(P9-97), sondern die Geometriezeile **P9-84** (S1, `h=40` gegen `h=35.69`) — korrigiert in §10.2
+Punkt 5.
 
 ## `Gate/Z`
 

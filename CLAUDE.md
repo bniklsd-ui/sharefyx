@@ -178,17 +178,26 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 u. a. byteweise Reassemblierung und Nachlesen jedes Blocks), **nie von Hand**. Die vollständige
 Chronik der Phasen 1–8, der Hard-Rule-Korrekturen und der älteren Blöcke: `docs/PROJECT_SESSION_LOG.md` (L3).*
 
-**[2026-10-05, die alte Adresse darf unbefristet schreiben — gebaut, nicht deployt — ein Commit, Produktcode
-im Übergangsfenster, kein Service-Touch.]** Der Arbeitslaptop des Nikingers erreicht
-`sharefyx.eurofyx.com` hinter dem Firmen-VPN (genua genuconnect) nicht: `NS_ERROR_NET_RESET`, 0 B übertragen.
-Der Server ist gesund: DNS, TLS und `303` sind von der Heim-VM gemessen, und das MacBook kommt durch.
-Vermutet, nicht belegt, ist ein Filter gegen neu registrierte Domains. **Nikinger-Entscheidung
-2026-10-05:** beide Adressen schreiben parallel, bis die neue vom Arbeitslaptop aus belegt funktioniert.
-Dafür gibt es `LEGACY_UNTIL=open` (fail-closed, nur das exakte Wort; CSRF-Pfad byte-identisch). Der
-Dialog auf der alten Adresse nennt dann keinen Termin. **Damit ist der Satz „am 2026-10-18 schließt
-das Übergangsfenster von selbst" aus dem Block vom 2026-10-04 überholt.** **Live seit 2026-10-05:**
-`v3.1.2` (SHA `f4ef319`), Gate `ok`, und der laufende Prozess trägt `LEGACY_UNTIL=open`. Die Deploy-Schritte, die Notlösung ohne Release und die
-PowerShell-Diagnose für den Laptop stehen im Session-Block vom 2026-10-05 in `phase9_hardening/CLAUDE.md`.
-Der übrige Stand der Phase 9 ist unverändert: Abnahmezahlen in `phase9_hardening/ABNAHME_MATRIX.md`,
-P9-15 ist die offene Aufgabe.
+**[2026-10-05, die sieben Punkte aus der Bildsichtung sind gebaut — und zwei davon haben die Vorgabe
+selbst widerlegt — ein Commit, reines Frontend, kein Deploy, kein Service-Touch.]** Der Nikinger hat
+am selben Tag die Probe-Bilder des settings-Blocks angesehen und sieben Punkte notiert (Mini-Plan §10,
+Locks P9-AM–P9-AS, Abnahme P9-96–P9-102). **Alle sieben sind umgesetzt**, Release `v3.1.3` steht
+**unverändert** und ist **nicht deployt**. Die erste Browser-Probe hat **zweimal nicht den Bau,
+sondern die Vorgabe** widerlegt: **`text-align: center` ist auf dem Menüknopf ein No-op** — er ist
+`display: flex` mit einem anonymen Flex-Item, und `text-align` wirkt auf Blockcontainer (gemessen:
+Textmitte **8,5 px neben** der Knopfmitte); gebaut ist `justify-content: center`, die Flex-Achse
+(**0 px**). Und **„Text mittig" ist mit „Polster = Baumzeile" nicht gleichzeitig erreichbar** — als
+`.tree__folder` erbte der Menüpunkt die 32-px-Einrückung und lag 12 px neben seiner Mitte;
+**Nikinger-Entscheidung: beidseitig `--space`**, Preis benannt am Stylesheet, in S1 und in der
+Matrix (P9-97 ⚠️). Bilanz: **P9-96/98/100/101/102 ✅, P9-99 ⚠️** (anderer Weg, gleiche Wirkung) —
+**beide ⚠️ sind benannte Abweichungen, keine offenen Punkte**. `pytest` 1233 → 1238, `ui_budget` 5/5
+(165,6 KB), Tabu-Diff leer, Probe **56/56**, G4 → 2 rot · G5 → 2 rot · G6 → 3 rot — und **die
+Plan-Aussage zu G6 war falsch benannt** (eine eigene Höhe trifft P9-84, nicht P9-97).
+**Ein Produktbefund gemeldet, nicht gebaut:** die Space-Liste bleibt **leer**, wenn man sie vor
+`loadOverview()` öffnet (Wahrscheinlichkeit wächst linear mit den sichtbaren Spaces, P9-15) —
+wandert in die **P10-Liste**. **Fünf eigene Fehler, alle derselben Klasse** (Wächter oder Messung
+scheitert am Muster und sieht wie ein Befund aus) plus **zwölf eingebaute Verstöße** im neuen
+Wächtertest, damit „erlaubt" nicht zu „alles erlaubt" wird. **Offen, in dieser Reihenfolge:**
+Sichtprüfung der acht Bilder (sie entscheidet die beiden ⚠️) · Deploy `v3.1.3` · P9-94-Portscan ·
+V188 · P9-15 ⬜.
 
