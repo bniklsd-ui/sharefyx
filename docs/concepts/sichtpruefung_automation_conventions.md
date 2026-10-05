@@ -6,7 +6,7 @@ detail: L2
 up: ../INDEX.md
 down:
   - ./sichtpruefung_automation_tooling.md   # separate concern: plugins for VIEWING screenshots (Claude Code vs. OpenCode), not for RUNNING checks
-updated: 2026-09-11 (§5 neu — Nikinger-Vorgabe: Schnellzugriff-Verzeichnis `screenshots_latest/` am Repo-Root als Symlink-Komfort auf die Originale in `docs/screenshots/<phase>_*`, dazu die Pflicht „Dateiname + Checkkriterium im Chat nennen" bei jeder Sichtprüfungs-Verifikation; volle Beschreibung in §5, README mit Tabelle + Checkkriterien liegt in `screenshots_latest/README.md` — Beispiel-Befüllung Phase 8.6 Block B mit vier Screenshots: `01_overview_logout_caution.png` / `02_list_hover_quiet_selection.png` / `03_editor_archive_caution.png` / `04_account_dialog_navigation.png`) | 2026-09-09 (P8.5-6-Folge-Smoke — Bracket-Pfad live-verifiziert per Mini-Smoke gegen v3ritt-Wegwerf mit `itm_b8b989a1` „Vercel [Hosting]" + Vorschau-Panel-Screenshot, §1-Beispiel-Absatz aktualisiert mit dem Resolution-Pfad; Phase 8.5 vollständig abgeschlossen **Bilanz 20 ✅ · 0 🟡 · 0 ⬜**) | 2026-09-09 (vier neue Konventionen für Sichtungs-Skripte + -Output: §1 Vorschau-Pflicht bei klickbaren Links, §2 Wer validiert was [Code/auto = M3 oder Claude Code, visuell = Nikinger-Auge], §3 Deploy erst nach Testauswertung, §4 Screenshots im Chat präsentieren sobald opencode-vision installiert ist; Nikinger-Feedback 2026-09-09 aus der Sichtung der 10 P8.5-🟡-Zeilen — P8.5-6 bleibt 🟡 wegen fehlendem Vorschau-Screenshot des Bracket-Pfads) | 2026-09-08 (erste Fassung, Phase-8.5-Sichtprüfungs-Sub-Session)
+updated: 2026-10-05 (**neuer Abschnitt zum lokalen Vision-Modell** — zwei gemessene Fehlaussagen an einem Tag, darunter eine **erfundene** Bildbeschreibung bei einer reinen Layout-Frage; daraus die Regel: Zustand messen, Layout ohne Gegenprobe nicht glauben, Sichtung beim Menschen. **P10-Posten:** Modell gegen eine Alternative stellen, Prüfmuster ist eine Frage mit bereits bekannter Antwort) | 2026-09-11 (§5 neu — Nikinger-Vorgabe: Schnellzugriff-Verzeichnis `screenshots_latest/` am Repo-Root als Symlink-Komfort auf die Originale in `docs/screenshots/<phase>_*`, dazu die Pflicht „Dateiname + Checkkriterium im Chat nennen" bei jeder Sichtprüfungs-Verifikation; volle Beschreibung in §5, README mit Tabelle + Checkkriterien liegt in `screenshots_latest/README.md` — Beispiel-Befüllung Phase 8.6 Block B mit vier Screenshots: `01_overview_logout_caution.png` / `02_list_hover_quiet_selection.png` / `03_editor_archive_caution.png` / `04_account_dialog_navigation.png`) | 2026-09-09 (P8.5-6-Folge-Smoke — Bracket-Pfad live-verifiziert per Mini-Smoke gegen v3ritt-Wegwerf mit `itm_b8b989a1` „Vercel [Hosting]" + Vorschau-Panel-Screenshot, §1-Beispiel-Absatz aktualisiert mit dem Resolution-Pfad; Phase 8.5 vollständig abgeschlossen **Bilanz 20 ✅ · 0 🟡 · 0 ⬜**) | 2026-09-09 (vier neue Konventionen für Sichtungs-Skripte + -Output: §1 Vorschau-Pflicht bei klickbaren Links, §2 Wer validiert was [Code/auto = M3 oder Claude Code, visuell = Nikinger-Auge], §3 Deploy erst nach Testauswertung, §4 Screenshots im Chat präsentieren sobald opencode-vision installiert ist; Nikinger-Feedback 2026-09-09 aus der Sichtung der 10 P8.5-🟡-Zeilen — P8.5-6 bleibt 🟡 wegen fehlendem Vorschau-Screenshot des Bracket-Pfads) | 2026-09-08 (erste Fassung, Phase-8.5-Sichtprüfungs-Sub-Session)
 ---
 
 # Sichtprüfungs-Automatisierung — Techniken (nicht: Werkzeuge)
@@ -236,6 +236,38 @@ Wegwerf-Instanz:
 - **Fremdes, aber lesbares Item:** `"<untrusted_content" in text and f'space="{FOREIGN}"' in text`.
 - **Verbotener Schreibzugriff:** `denial = await client.call_tool(..., raise_on_error=False);
   denial.is_error and "write_denied" in denial.content[0].text`.
+
+## Das lokale Vision-Modell: **zwei gemessene Fehlaussagen, beide im Oktober 2025 — 2026-10-05**
+
+**Hier steht kein Werkzeug, sondern eine Fehler-Signatur**, weil die Erfahrung zweimal
+kostete und beim zweiten Mal schlimmer war als beim ersten.
+
+| Datum | Frage an das Modell (`qwen3-vl:8b`, lokal) | Antwort | Warum das ein Befund ist |
+|---|---|---|---|
+| 2026-10-05 (Block settings) | „welche Panels stehen nebeneinander, ist der Titel zentriert?" | **Frage nicht beantwortet** — erst `done_reason: length` (leer), dann: der Menüpunkt „alpha" sei blau markiert | „alpha" ist die Zeile in der **Rail**, kein Menüpunkt; nach dem Wechsel trägt **kein** Menüpunkt `aria-current` (gemessen: `sichtbare_panels == ['settings-menu']`, alle drei `aria-current="false"`) |
+| 2026-10-05 später (settings-Nachtrag) | **reine Layout-Frage**: „ein Panel oder drei? Titel links oder mittig? Beschriftung links oder mittig?" | **drei Panels: „Übersicht", „alpha", „VERKNÜPFUNGEN"** | **Diese Inhalte stehen in keinem der acht Bilder**, und das Bild zeigt genau **ein** Panel. Es war keine Grenze, sondern eine erfundene Antwort |
+
+**Die Regel daraus, und sie ist strenger als „das Modell ist unzuverlässig":**
+
+1. **Eine Modellantwort über *Zustand* ist wertlos** — sie kann etwas behaupten, das im Bild
+   nicht vorkommt, und nichts im Ablauf meldet es. **Zustand wird gemessen** (`getComputedStyle`,
+   `getBoundingClientRect`, ein `Range` über den Textknoten), nie gefragt.
+2. **Eine Modellantwort über *Wirkung* (Layout) ist ohne Gegenprobe kein Beleg** — die erste
+   Fassung bekam für „welche Panels stehen nebeneinander" bei sechs von sieben Bildern die richtige
+   Antwort, und beim siebten dieselbe Frage ein erfundenes Bild. **Die Quote ist kein Kriterium.**
+3. **Wenn ein Modell nötig erscheint, ist es kein Ersatz für die Sichtprüfung des Nikingers**
+   (Regel 2 oben) — es ist höchstens ein *zweites* Augenpaar mit ungeprüfter Zuverlässigkeit.
+   Deshalb wird die Sichtprüfung nie als „von M3 angesehen" berichtet.
+
+**Offen für die nächste Phase (als zusätzlicher P10-Posten notiert, 2026-10-05):** das Modell
+im lokalen Vision-Dienst (Step C, `qwen3-vl:8b` auf der RTX 3060) gegen eine Alternative
+stellen — größeres multimodal, anderes Backend, oder **Bilder gar nicht maschinell auswerten**.
+**Vorher** ist die billigste und billigste-haltbarste Variante die, die in Phase 9 schon
+trägt: Layout und Zustand in der Probe messen, `screenshots_latest/` mit Dateiname +
+Checkkriterium füllen, und die Sichtung dem Nikinger lassen. **Wer den Wechsel prüft, misst
+an genau einem Bild mit genau einer Frage, deren Antwort man schon kennt** (z. B. „ist das Panel
+mit dem Titel *Einstellungen* linksbündig?" — bekannt: ja) — ein Modell, das das verneint, ist
+als Werkzeug gestrichen, und das ist ein Messergebnis, keine Meinung.
 
 ## Wann diese Techniken NICHT greifen
 

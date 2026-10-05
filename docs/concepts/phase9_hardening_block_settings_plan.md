@@ -219,6 +219,16 @@ Befund. V162 B bekommt einen Vermerk.
      `loadOverview()` steht; §10.3 Punkt 2). Kein Test entscheidet die Form der Reparatur, und die
      Wahrscheinlichkeit wächst linear mit den sichtbaren Spaces — sie gehört an denselben Ort wie
      der P9-15-Befund, mit dem sie dieselbe Ursache hat.
+   - **[2026-10-05, aus dem settings-Nachtrag]** das **lokale Vision-Modell** (`qwen3-vl:8b` aus
+     Step C) **gegen eine Alternative stellen** — größeres multimodal, anderes Backend oder
+     „Bilder gar nicht maschinell auswerten". Grund sind **zwei gemessene Fehlaussagen an einem
+     Tag**: einmal eine Frage nicht beantwortet und dann behauptet, ein *Menüpunkt* sei markiert
+     (es ist die Rail-Zeile), und einmal — bei einer **reinen Layout-Frage** — **drei Panels mit
+     erfundenen Inhalten** („Übersicht", „alpha", „VERKNÜPFUNGEN") gemeldet, von denen **keines** im
+     Bild steht. Die vollständige Fehler-Signatur und die Regel daraus stehen in
+     `docs/concepts/sichtpruefung_automation_conventions.md`; **das Prüf-Muster ist dort
+     festgehalten: eine Frage, deren Antwort man schon kennt.** Bis dahin gilt unverändert: Layout
+     und Zustand in der Probe messen, Sichtung beim Nikinger.
 4. **Plan §9-Ergebnis** dieses Mini-Plans füllen, dann 🔄 → 📕.
 
 ## §7 Abnahme (P9-83 – P9-95)
