@@ -1,5 +1,5 @@
 ---
-status: closed
+status: live
 purpose: "Mini-Plan P9 Block settings + Restposten — Einstellungen als Fensterkette (Menü → Unterfenster → Space-Detail), Passwort-Reihenfolge, V118 auf eine Linie, D1 neu beschrieben, P9-11 Portscan-Anleitung, Phasenabschluss. Locks P9-AE–P9-AL, Abnahme P9-83–P9-95, [VERIFY] V185–V188"
 read-when: Bau des settings-Blocks, P9-11-Portscan, oder P9-Closeout nach dem 2026-10-05
 detail: L2
@@ -7,7 +7,7 @@ up: ../../phase9_hardening/CLAUDE.md
 down:
   - ./phase9_hardening_plan.md               # 📕 übergeordneter P9-Plan; §12.4 Übersichtsgrafik, P9-11, P9-27, P9-36
   - ./phase9_hardening_block_trace_plan.md   # 📕 Formvorlage dieses Mini-Plans
-updated: 2026-10-05 (**gebaut, opencode/M3 — §9 gefüllt**; Release `v3.1.3` steht, nicht deployt; Probe 39/39, G1/G2/G3 rot, `pytest` 1223 → 1233 · **zwei Code-Befunde kamen aus dem Browser, nicht aus den Tests**, vier Punkte gegen den Plan abweichend begründet) | 2026-10-05 (geschrieben, Claude Code, nach dem Deploy `v3.1.2`; Wünsche und Entscheidungen des Nikingers vom selben Tag)
+updated: 2026-10-05 (**§10: sieben UI-Punkte aus der Bildsichtung, nicht gebaut** — Locks P9-AM–P9-AS, Abnahme P9-96–P9-102; zwei davon sind ausdrücklich „nicht anfassen"; zwei Folgen festgehalten: die zweite Vergleichsrichtung in P9-84 und der zu **eng** werdende Wächter) | 2026-10-05 (**gebaut, opencode/M3 — §9 gefüllt**; Release `v3.1.3` steht, nicht deployt; Probe 39/39, G1/G2/G3 rot, `pytest` 1223 → 1233 · **zwei Code-Befunde kamen aus dem Browser, nicht aus den Tests**, vier Punkte gegen den Plan abweichend begründet) | 2026-10-05 (geschrieben, Claude Code, nach dem Deploy `v3.1.2`; Wünsche und Entscheidungen des Nikingers vom selben Tag)
 ---
 
 # Phase 9 — Block settings und die Restposten bis zum Closeout
@@ -306,3 +306,68 @@ zusätzlich „genau ein Träger") · `test_1024_breakpoint_has_single_row_no_ma
 - **Deploy `v3.1.3`** — Badge und `## 2026-10-05`-Block stehen. `deploy.sh` verlangt einen
   Datums-Block am Deploy-Tag; dieser Eintrag ist vom 2026-10-05, ein späterer Deploy braucht
   `SHAREFYX_ALLOW_STALE_UPDATELOG=1` oder einen neuen Block.
+
+---
+
+## §10 Nachtrag 2026-10-05 — UI-Rückmeldung nach der Bildsichtung, **nicht gebaut**
+
+**Anlass.** Der Nikinger hat die sieben Probe-Bilder angesehen (der sechste war für das lokale
+Vision-Modell nicht beantwortbar, siehe §9) und sieben Punkte notiert. **Hier steht keiner davon
+umgesetzt** — der Block ist abgebaut und committet (`543f3a0`), dieser Nachtrag ist der Auftrag
+für den nächsten Block. **Zwei der sieben Punkte sind ausdrücklich „gut, nicht anfassen"**; die
+stehen hier, damit niemand sie später für verbesserlich hält.
+
+| Lock | Inhalt | Herkunft |
+|---|---|---|
+| **P9-AM** | Der Titel **„Einstellungen" wird zentriert**, und der Abstand zwischen Titel und erstem Knopf wird **etwas größer** — **ein** Wert, an **zwei** Stellen im Stylesheet, nicht zweimal notiert (dieselbe Regel wie P9-AF: ein kopierter Wert ist der Beginn der dritten Variante) | Nikinger 2026-10-05 |
+| **P9-AN** | **Unausgewählte** Menüpunkte bekommen die Fläche des Eingabefeldes (`.input`, im Panel „Name des neuen Space" genau so im Einsatz) — „leicht abgesetzt vom Fensterhintergrund, aber keine Plastik". **Nur die Fläche wechselt: Höhe, Polster, Schrift und Rundung bleiben exakt die der `.tree__folder`-Zeile** (P9-AF gilt unverändert). Gelesen als: die *Geometrie* wird weiterverwendet, die *Fläche* nicht | Nikinger 2026-10-05 („ich würde vorschlagen" — **Lesart, im Bau am Bild prüfen**) |
+| **P9-AO** | **Ausgewählte** Menüpunkte behalten den heutigen Auswahlzustand unverändert: `aria-current="true"` + `--select-fill` + Kante. Kein neuer Wert, keine Änderung an der einen Regel | Nikinger 2026-10-05 |
+| **P9-AP** | Der Text in den Menüknöpfen wird **zentriert** (heute `text-align: left` aus der Sammelregel) — die Beschriftung soll mittig in der Fläche stehen, nicht links | Nikinger 2026-10-05 |
+| **P9-AQ** | Der „Zurück"-Knopf bekommt ein **echtes Icon** statt des Textpfeils, **horizontal zentriert**. Der Textpfeil `&larr;` hängt sichtbar nach unten (Glyphe, nicht Baseline) | Nikinger 2026-10-05 |
+| **P9-AR** | Im Detail-Panel: **mehr Abstand** zwischen dem Space-Titel und der ersten Option — **derselbe** Wert wie in P9-AM. Der Titel stand bisher direkt über der ersten Zeile, ohne Trennung | Nikinger 2026-10-05 |
+| **P9-AS** | **Alle Knöpfe in den Einstellungs-Fenstern werden rechts ausgerichtet** (`justify-content: flex-end` in den `.overlay__actions` **der Kette**), nicht in den anderen Overlays. Damit ist der Überlauf von „Space entfernen" mit den „(schreiben)"-Zeilen der Mitgliederliste weg, den er gemeldet hat | Nikinger 2026-10-05 |
+| **P9-AT** | **Passwort-Panel und Update-Log-Panel bleiben unverändert.** Wörtlich seine Worte: *„great, as well as the update log"*. Der Lock existiert, damit ein späterer „aufräumen"-Impuls diese beiden Fenster nicht anfasst | Nikinger 2026-10-05 |
+
+### Zwei Folgen, die man kennen muss, bevor man anfängt
+
+1. **P9-84s Messung ändert ihren Gegenstand, nicht ihre Höhe.** Die Browser-Probe vergleicht
+   heute die Menüpunkte mit einer echten `.tree__folder`-Zeile (Höhe, Polster, Schrift, Rundung).
+   Nach P9-AN bleibt diese Messung **richtig** — die Geometrie ist unverändert. Neu ist eine
+   **zweite** Vergleichsrichtung: unausgewählt gegen die Fläche des Eingabefeldes, ausgewählt gegen
+   die aktive Baumzeile. Zwei Vergleiche, zwei Ziele; der erste darf nicht wegfallen, sonst
+   bestünde der Block die Wiederverwendung nicht mehr.
+2. **Der Wächter `test_settings_menu_items_reuse_the_tree_row_look` muss **enger** werden, sonst
+   geht er an korrektem Code rot.** Er verbietet heute u. a. `background` in einer *eigenen* Regel
+   für `.settings-menu__item` — genau das fordert P9-AN. Die Absicht des Wächters ist „keine
+   **eigene Optik** für die Geometrie"; nach P9-AN ist eine eigene *Fläche* gewollt. **Neu zu
+   untersagen** bleiben Höhe, Polster, Rundung, Schrift, Farbe des Textes, Kante, Schatten;
+   **neu erlaubt** sind `background` (nur aus den vorhandenen Tokens, kein neuer Wert) und
+   `text-align` (P9-AP). **Die Änderung gehört in denselben Commit wie der Bau** — ein Wächter,
+   der eine Woche zu eng war, meldet in der Zwischenzeit berechtigt rot und wird dann
+   weggeräumt, statt korrigiert.
+
+### Das Icon aus P9-AQ gibt es noch nicht — und genau so soll es entstehen
+
+Der Sprite (`app.html`, `<!-- ICONS:BEGIN -->`) kennt `i-chevron-right` (`<path d="m9 18 6-6-6-6" />`),
+aber **kein** `i-chevron-left`. **Neu:** `i-chevron-left` als Spiegel davon,
+`d="m15 18-6-6 6-6"`, gleiche `viewBox`. **Nicht** `i-log-out` wiederverwenden (Kreis mit Pfeil nach
+oben links — das ist Abmelden, und die Verwechslung wäre billig) und **nicht** das Chevron
+drehen (die Icons werden überall als `<use href>` eingebunden, eine `transform`-Regel müsste in
+`icons.js` und würde jeden Träger treffen). Der Knopf wird ein Icon-Knopf mit `aria-label`
+— die Beschriftung „Zurück" darf als Text weg, **die Zugänglichkeit nicht**: `.btn--icon` trägt
+den Titel, und genau diese beiden (`title` + `aria-label`) sind zu setzen.
+
+### Abnahme (P9-96 – P9-102), nicht gefahren
+
+`P9-96` Menütitel zentriert, Abstand Titel→erster Knopf == der in P9-AR gemessene Wert (±1 px) ·
+`P9-97` unausgewählter Menüpunkt: gleiche berechnete Fläche wie `#space-create-name-input`
+(`background-image`/`background-color`/Kante), **Geometrie unverändert** gegen die Baumzeile ·
+`P9-98` ausgewählter Menüpunkt trägt weiter `--select-fill`, byte-gleich zur heutigen Regel ·
+`P9-99` `text-align` der Menüpunkte berechnet `center` · `P9-100` Back-Knopf enthält
+`<use href="#i-chevron-left">` und **keinen** `←`-Text mehr, Icon zentriert, `aria-label` gesetzt ·
+`P9-101` Abstand Space-Titel↔erste Option == Abstand Menü-Titel↔erster Knopf · `P9-102`
+`.overlay__actions` **innerhalb der Kette** `justify-content: flex-end`, und die Bounding-Boxen von
+„Space entfernen" und der letzten „(schreiben)"-Zeile **überlappen sich nicht** (≤ 0 px).
+
+Gegenläufe für den Bau: `G4` P9-AP raus (Text wieder links) → P9-99 rot · `G5` P9-AS raus
+(Buttons wieder links) → P9-102 rot · `G6` P9-AN **mit** einer eigenen Höhe → P9-97 rot.

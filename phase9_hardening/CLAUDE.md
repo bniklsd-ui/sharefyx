@@ -12,7 +12,7 @@ down:
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
   - UPDATES_ARCHIVE.md                          # ältere `updated:`-Fäden dieses Heads, verbatim (2026-10-03, 36 von 37)
   - MODULE_STATUS_ARCHIVE.md                   # ausführliche Statusspalten der §-Modulstatus-Tabelle, verbatim (2026-10-04)
-updated: 2026-10-05 (**Block settings gebaut, opencode/M3 — drei Overlays sind eine Fensterkette, V118 hat eine Linie**; Release `v3.1.3` steht, **kein Deploy, kein Service-Touch**; `pytest` 1223 → 1233, `ui_budget` 5/5, Tabu-Diff leer, Probe **39/39**, G1 → 4 rot · G2 → 2 rot · G3 → rot · **zwei Code-Befunde aus dem Browser, nicht aus den Tests** (Schmal-Modus ließ zwei Panels stehen · der „Zurück“-Knopf des Details war nicht verdrahtet) · **der Gegenlauf hat den eigenen Messaufbaum widerlegt** (er las den Frame nach dem Toggle-Zurückschalten — mit dem Fix wäre der Test grün gewesen) · P9-94 ⬜ Portscan, V188 ⬜) | 2026-10-05 (Block 2026-10-04 aus dem Head verbatim hierher rotiert, per `scripts/rotate_session_block.sh`)
+updated: 2026-10-05 (**Block settings gebaut, opencode/M3 — drei Overlays sind eine Fensterkette, V118 hat eine Linie**; Release `v3.1.3` steht, **kein Deploy, kein Service-Touch**; `pytest` 1223 → 1233, `ui_budget` 5/5, Tabu-Diff leer, Probe **39/39**, G1 → 4 rot · G2 → 2 rot · G3 → rot · **zwei Code-Befunde aus dem Browser, nicht aus den Tests** (Schmal-Modus ließ zwei Panels stehen · der „Zurück“-Knopf des Details war nicht verdrahtet) · **der Gegenlauf hat den eigenen Messaufbaum widerlegt** (er las den Frame nach dem Toggle-Zurückschalten — mit dem Fix wäre der Test grün gewesen) · P9-94 ⬜ Portscan, V188 ⬜ · **danach: sieben UI-Punkte aus der Bildsichtung notiert, nicht gebaut — Mini-Plan §10, Locks P9-AM–P9-AS, Abnahme P9-96–P9-102**) | 2026-10-05 (Block 2026-10-04 aus dem Head verbatim hierher rotiert, per `scripts/rotate_session_block.sh`)
 ---
 
 # Phase 9 — Härtung
@@ -223,3 +223,41 @@ Doppel-Listener", sondern **es gibt genau einen Öffner**; Wächter
    *aus dem Gedächtnis, nicht nachgelesen*.
 4. **P9-15 ⬜** (drei Läufe `/api/v1/overview` mit echter Sitzung) — unverändert, gehört an einen
    Deploy-Tag mit `health_gate.sh`.
+
+### Nachtrag 2026-10-05 — sieben UI-Punkte aus der Bildsichtung des Nikingers, **nicht gebaut**
+
+Der Nikinger hat die Probe-Bilder angesehen und sieben Punkte notiert. **Kein einziger ist
+umgesetzt**; der Block darüber ist abgebaut und committet. Der vollständige Auftrag mit Locks
+**P9-AM–P9-AS** und Abnahme **P9-96–P9-102** steht in
+`docs/concepts/phase9_hardening_block_settings_plan.md` **§10**. Kurz:
+
+1. Menüknöpfe unausgewählt leicht vom Fensterhintergrund absetzen · Titel **zentrieren** · Abstand
+   Titel→Knöpfe etwas größer (P9-AM)
+2. Unausgewählte Fläche = die des Eingabefeldes „Name des neuen Space", **Geometrie bleibt** die
+   der Baumzeile; ausgewählt bleibt `--select-fill` (P9-AN/AO) — *„ich würde vorschlagen"*, im Bau
+   am Bild prüfen
+3. Text in den Menüknöpfen zentrieren (P9-AP)
+4. „Zurück" mit **echtem Icon** statt `←`, horizontal zentriert — der Textpfeil hängt nach unten
+   (P9-AQ). **Das Icon existiert noch nicht:** neu `i-chevron-left` als Spiegel von
+   `i-chevron-right` (`d="m15 18-6-6 6-6"`), *nicht* `i-log-out` wiederverwenden
+5. Mehr Abstand zwischen Space-Titel und erster Option, **derselbe** Wert wie Punkt 1 (P9-AR)
+6. **Alle** Knöpfe in den Einstellungs-Fenstern **rechts ausrichten** (nicht in den anderen
+   Overlays) — das räumt den gemeldeten Überlauf von „Space entfernen" mit den „(schreiben)"-Zeilen
+   weg (P9-AS)
+7. **Passwort- und Update-Log-Panel bleiben unverändert** — wörtlich *„great, as well as the
+   update log"*. Steht als Lock P9-AT da, damit ein späterer Aufräum-Impuls sie nicht anfasst
+
+**Zwei Folgen, die vor dem Bau gelesen sein müssen** (im Plan ausgeschrieben):
+
+- **P9-84s Messung behält ihren Gegenstand, verliert aber ihre Einzigkeit.** Die Geometrie bleibt
+  gemessen richtig; neu kommt eine **zweite** Vergleichsrichtung dazu (unausgewählt ↔ Eingabefeld,
+  ausgewählt ↔ aktive Baumzeile).
+- **Der Wächter `test_settings_menu_items_reuse_the_tree_row_look` wird an korrektem Code rot.**
+  Er verbietet heute `background` in einer *eigenen* Regel — genau das fordert P9-AN. Er muss
+  **im selben Commit** wie der Bau enger gezogen werden (Geometrie weiter verboten, Fläche und
+  `text-align` erlaubt). Ein Wächter, der eine Woche zu eng war, wird weggeräumt statt korrigiert,
+  wenn man ihn nicht im selben Commit anfasst.
+
+**P9-92 bleibt ✅** — sein Kriterium ist „kein Überraum, Alte-Adresse-Dialog unverändert", und die
+Rückmeldung trifft beides nicht. Sie sind **neue** Kriterien mit neuen Nummern, kein Widerspruch
+zu einer abgenommenen Zeile.
