@@ -12,7 +12,7 @@ down:
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
   - UPDATES_ARCHIVE.md                          # ältere `updated:`-Fäden dieses Heads, verbatim (2026-10-03, 36 von 37)
   - MODULE_STATUS_ARCHIVE.md                   # ausführliche Statusspalten der §-Modulstatus-Tabelle, verbatim (2026-10-04)
-updated: 2026-10-05 (**die sieben Punkte aus der Bildsichtung gebaut, opencode/M3** — Probe **56/56**, G4 → 2 rot · G5 → 2 rot · G6 → 3 rot, `pytest` 1233 → 1238, `ui_budget` 165,6 KB; **zwei Korrekturen an der Vorgabe, beide gemessen**: `text-align` ist auf dem Flex-Knopf ein No-op → `justify-content`, und das linke Polster musste vom 32-px-Wert der Baumzeile auf `--space` (Nikinger-Entscheidung); **ein Produktbefund gemeldet, nicht gebaut** (leere Space-Liste beim zu frühen Öffnen, wandert in die P10-Liste); Release `v3.1.3` unverändert, **kein Deploy**) | 2026-10-05 (**Block settings gebaut, opencode/M3 — drei Overlays sind eine Fensterkette, V118 hat eine Linie**; Release `v3.1.3` steht, **kein Deploy, kein Service-Touch**; `pytest` 1223 → 1233, `ui_budget` 5/5, Tabu-Diff leer, Probe **39/39**, G1 → 4 rot · G2 → 2 rot · G3 → rot · **zwei Code-Befunde aus dem Browser, nicht aus den Tests** (Schmal-Modus ließ zwei Panels stehen · der „Zurück“-Knopf des Details war nicht verdrahtet) · **der Gegenlauf hat den eigenen Messaufbaum widerlegt** (er las den Frame nach dem Toggle-Zurückschalten — mit dem Fix wäre der Test grün gewesen) · P9-94 ⬜ Portscan, V188 ⬜ · **danach: sieben UI-Punkte aus der Bildsichtung notiert, nicht gebaut — Mini-Plan §10, Locks P9-AM–P9-AS, Abnahme P9-96–P9-102**) | 2026-10-05 (Block 2026-10-04 aus dem Head verbatim hierher rotiert, per `scripts/rotate_session_block.sh`)
+updated: 2026-10-05 (**V188 beantwortet, opencode/M3 — vier Quellen, eine am Repo gemessen, und der Plan-§4-Wortlaut „meines Wissens nur in Chromium" ist jetzt eine Messung: `safari: false`**; daraus **P9-27 ⬜ → ⚠️**, D1 geschlossen, **kein Code gebaut** (Nikinger-Entscheidung 2026-10-05) · **drei falsche Sätze datiert korrigiert**, darunter „der Deploy `v3.1.1` schließe P9-15, denn `health_gate.sh` macht die Läufe" — **ein Health-Gate liefert Läufe ohne Kriterium**, denn P9-15 stellt gegen 372,9 ms, und der Wert ist nie über Funnel gemessen worden (V151) · **der letzte `KNOWN_OFFENDERS`-Eintrag gestrichen** (`docs/screenshots/README.md`, zwei Ausprägungen zugleich, in zwei Schritten repariert, sechs Fadeninhalte byteweise gegengeprüft) · **zwei Zeilen** in `test_acceptance_numbers.py` (Bilanz-Konstanten), **eine entfernt** in `test_updated_chain.py` · kein Test hinzugefügt, keiner umgedreht, Tabu-Diff §0.3 leer, Release `v3.1.3` unverändert, **kein Deploy**) | 2026-10-05 (**die sieben Punkte aus der Bildsichtung gebaut, opencode/M3** — Probe **56/56**, G4 → 2 rot · G5 → 2 rot · G6 → 3 rot, `pytest` 1233 → 1238, `ui_budget` 165,6 KB; **zwei Korrekturen an der Vorgabe, beide gemessen**: `text-align` ist auf dem Flex-Knopf ein No-op → `justify-content`, und das linke Polster musste vom 32-px-Wert der Baumzeile auf `--space` (Nikinger-Entscheidung); **ein Produktbefund gemeldet, nicht gebaut** (leere Space-Liste beim zu frühen Öffnen, wandert in die P10-Liste); Release `v3.1.3` unverändert, **kein Deploy**) | 2026-10-05 (**Block settings gebaut, opencode/M3 — drei Overlays sind eine Fensterkette, V118 hat eine Linie**; Release `v3.1.3` steht, **kein Deploy, kein Service-Touch**; `pytest` 1223 → 1233, `ui_budget` 5/5, Tabu-Diff leer, Probe **39/39**, G1 → 4 rot · G2 → 2 rot · G3 → rot · **zwei Code-Befunde aus dem Browser, nicht aus den Tests** (Schmal-Modus ließ zwei Panels stehen · der „Zurück“-Knopf des Details war nicht verdrahtet) · **der Gegenlauf hat den eigenen Messaufbaum widerlegt** (er las den Frame nach dem Toggle-Zurückschalten — mit dem Fix wäre der Test grün gewesen) · P9-94 ⬜ Portscan, V188 ⬜ · **danach: sieben UI-Punkte aus der Bildsichtung notiert, nicht gebaut — Mini-Plan §10, Locks P9-AM–P9-AS, Abnahme P9-96–P9-102**) | 2026-10-05 (Block 2026-10-04 aus dem Head verbatim hierher rotiert, per `scripts/rotate_session_block.sh`)
 ---
 
 # Phase 9 — Härtung
@@ -25,10 +25,10 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | Step | Inhalt | Status |
 |---|---|---|
 | 0 | Verifikations-Durchlauf, Doku-Fundament (Phasenverzeichnis, INDEX-Rotation, vier Defekte, `doc_health.py`, Baseline) | ✅ (Details im L3-Archiv) · Herleitung im L3-Archiv |
-| A | Echte Domain über eigenen VPS | 🟡 **A7a + A7 ✅ 2026-10-03; A8 für Konto *niklas* ✅** — P9-10b ✅ · P9-12 ✅ · P9-14 ✅ · **P9-13/V150 ⬜ zurückgestellt, wandert nach P10, ist kein Blocker** (Nikinger 2026-10-04: ein Schritt, der nur ein Konto braucht, ist ein Termin, kein Blocker; Plan §0.1a) · **P9-15 ⬜ = Arbeit der nächsten Session** (drei Läufe `/api/v1/overview` mit echter UI-Session). Übergangsfenster **unbefristet, live seit 2026-10-05** (`v3.1.2`, `LEGACY_UNTIL=open`, Nikinger-Entscheidung: Firmen-Proxy setzt die neue Domain zurück) · Herleitung im L3-Archiv |
+| A | Echte Domain über eigenen VPS | 🟡 **A7a + A7 ✅ 2026-10-03; A8 für Konto *niklas* ✅** — P9-10b ✅ · P9-12 ✅ · P9-14 ✅ · **P9-13/V150 ⬜ zurückgestellt, wandert nach P10, ist kein Blocker** (Nikinger 2026-10-04: ein Schritt, der nur ein Konto braucht, ist ein Termin, kein Blocker; Plan §0.1a) · **P9-15 ist ⚠️, nicht ⬜ — datierte Korrektur vom 2026-10-05**, die Zeile ist seit dem 2026-10-03 gemessen (drei Läufe `/api/v1/overview` mit echter UI-Session, beide Beine) und der Vergleich gegen 372,9 ms war nicht möglich (V151); der Deploy schließt sie **nicht**, `health_gate.sh` liefert Läufe ohne Kriterium. Übergangsfenster **unbefristet, live seit 2026-10-05** (`v3.1.2`, `LEGACY_UNTIL=open`, Nikinger-Entscheidung: Firmen-Proxy setzt die neue Domain zurück) · Herleitung im L3-Archiv |
 | B | `tailscaled-watchdog.service` | ✅ **abgeschlossen 2026-10-01**, live; P9-16–P9-20 ✅, V152/V153 ✅. `socat` 1.8.0.0 + Unit laufen unter voller Härtung, `RuntimeDirectoryPreserve=yes` (Befund 7) und Systempfad (Befund `__REPO_ROOT__`) behoben · V153: `sudoers` unbaubar, polkit greift · Herleitung im L3-Archiv |
 | C | Vision-Dienst auf der RTX 3060 | ✅ **abgeschlossen** (2026-09-26): GPU-Inferenz reboot-fest + C8 (`ollama` auf der VM `inactive`) · P9-21/-23/-26 ✅ · **P9-22 deferred** (Nikinger 2026-09-26, architektonisch belegt statt extern getestet) → Revisit Step Z oder P10 · Herleitung im L3-Archiv |
-| D | Zwei gemeldete Bugs (ESC/Vollbild, Drop-Ziel Space-Wurzel) | 🟡 **D2 am Browser belegt 2026-10-03** (P9-28/-29/-30 ✅, Probe **16/16**); **D1 bewusst zurückgestellt** (Nikinger 2026-09-23) · **P9-27 ⬜** und bleibt es: natives macOS-Vollbild ist nicht automatisierbar, der `fullscreenElement`-Guard ist dafür ein No-op · Herleitung im L3-Archiv |
+| D | Zwei gemeldete Bugs (ESC/Vollbild, Drop-Ziel Space-Wurzel) | 🟡 **D2 am Browser belegt 2026-10-03** (P9-28/-29/-30 ✅, Probe **16/16**); **D1 ist am 2026-10-05 geschlossen — P9-27 ⚠️, V188 ✅** (Nikinger-Entscheidung 2026-10-05: *kein Code*). Vier Quellen, und die Antwort ist **Betriebssystem-Verhalten**: ein immer wirkender Ausgang ist Pflicht (WHATWG Fullscreen §8, Anti-Spoofing), WICG Keyboard Lock §7 **darf** ihn nicht abschalten, §4.2 gilt nur für JS-initiiertes Vollbild, und MDN-`browser-compat-data` sagt `safari: false` — **auf dem MacBook existiert der einzige Hebel gar nicht**. Gemessen am Repo: `app.js:259` ist der einzige `fullscreen`-Bezug der App · Herleitung im L3-Archiv |
 | E | Karte: Reload-Overload, V118 | ✅ **abgeschlossen** (2026-09-28): kein zweiter `/graph`-Abruf, bekannte Knoten behalten `x`/`y`, `force` nur am Refresh-Knopf · P9-33/-34/-35 ✅ · V118 beantwortet · die Design-Frage P9-36 („eine oder zwei Linien") liegt beim Nikinger · Herleitung im L3-Archiv |
 | F | Schema-Fundament (neunte P1-Contract-Öffnung: `doing`/`assignee`) | 🟡 **code-complete 2026-09-30, live seit 2026-10-02** (`v3.1.0`) · P9-43 ✅ (≤ 1,05 s für 197 Items) · **der `doing`-Bereich ist seit 2026-10-02 geschlossen** (Lock P9-V) ⇒ **P9-P ist datiert eingeengt, nicht erledigt**: die prominente Darstellung bleibt P10 · P9-U (Space-Name, ohne Validierung) und P9-V stehen im Plan · Herleitung im L3-Archiv |
 | G | Löschen (F2) nach `_trash/` | 🟡 **code-complete 2026-09-30, deployt 2026-10-02** (`v3.1.0`); **Live-Löschung noch nicht beobachtet** ⇒ V162 *(Lesart A)* ⬜ · der Lösch-Ort aus Plan §9.3 war unbaubar, Nikinger entschied `DATA_ROOT/._trash/<space>/` mit **null** P1-Änderungen · Herleitung im L3-Archiv |
@@ -38,7 +38,7 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | E (Extra) | **Buttons ans Schema** (B17): die Knöpfe mit eigenen Flächen auf die Standard-Tokens `--btn-std-*` umstellen | ✅ **gebaut 2026-10-02 (B17), seit 2026-10-03 live** · die Backlog-Liste war an zwei Stellen falsch (15 statt 1 Knopf auf der alten Flächenfamilie) · `.btn.action--caution` trägt jetzt **exakt** die Standardfläche, nur die Beschriftung ist rot · Kontrast **4,38:1** bleibt unter WCAG-AA — **Design-Entscheidung, deine** · Herleitung im L3-Archiv |
 | S | **Einstellungen als Fensterkette** + V118 eine Linie (Nikinger 2026-10-05) | 🟡 **gebaut 2026-10-05 (M3)**, Release `v3.1.3` steht, **nicht deployt** — `docs/concepts/phase9_hardening_block_settings_plan.md` (Locks P9-AE–AL, Abnahme P9-83–95) · **drei Overlays wurden eine Kette** (`#settings-overlay`, fünf Panels), **ein** Öffner (`settings.js` + `registerPanel`), Menüknöpfe tragen `.tree__folder` statt einer eigenen Optik · **zwei echte Befunde aus dem Browser, nicht aus dem Test**: der Schmal-Modus ließ bei offenem Detail **zwei** Panels stehen (zwei `:has()`-Regeln statt einer), und der „Zurück"-Knopf des Details war **nicht verdrahtet** (im breiten Modus unauffällig) · **V118 umgedreht**: der Test hieß `…_draw_two_lines` und heißt jetzt `test_a_tag_edge_beside_an_explicit_edge_draws_one_line`, Docstring mit beiden Lesarten und Datum · **Probe 39/39**, G1 → 4 rot, G2 → 2 rot, G3 → rot, **der Gegenlauf hat den eigenen Messaufbaum widerlegt** (er las den Frame *nach* dem Toggle-Zurückschalten) · `pytest` 1223 → 1233, `ui_budget` 5/5, Tabu-Diff leer · **P9-94 ⬜** (Portscan, Nikinger-Schritt) · Herleitung im L3-Archiv |
 | R | **Rückmeldung aus der Bildsichtung** (Mini-Plan §10, Locks P9-AM–P9-AS, Abnahme P9-96–P9-102) | 🟡 **gebaut 2026-10-05 (M3)**, Release `v3.1.3` steht (unverändert derselbe, nicht deployt) — Probe **56/56**, G4 → 2 rot · G5 → 2 rot · G6 → 3 rot, `pytest` 1233 → 1238 · **zwei Korrekturen an der Vorgabe, beide gemessen**: `text-align: center` war auf dem Flex-Knopf ein **No-op** (Textmitte 8,5 px daneben) → `justify-content`, und das **linke Polster** musste vom 32-px-Wert der Baumzeile auf `--space` (Nikinger-Entscheidung), sonst bleibt die Beschriftung 12 px neben der Mitte · P9-96/98/100/101/102 ✅, **P9-97 und P9-99 ⚠️ mit benannter Abweichung** · **zwei Wächter an korrektem Code rot** (Klassenreihenfolge, `hidden` im `aria-hidden`) · **ein Produktbefund gemeldet, nicht gebaut:** die Space-Liste bleibt leer, wenn man sie vor `loadOverview()` öffnet — wandert in die P10-Liste (Plan §6) · Herleitung im L3-Archiv |
-| Gate/Z | Abnahme, Closeout | 🟡 **beide Doku-Hälften erledigt** (2026-10-02) · `ABNAHME_MATRIX.md` ist der **eine** Ort der Abnahme- und `[VERIFY]`-Bilanz, nicht diese Zeile · **[2026-10-04] beide Rotationen gefahren** (Block 17.780 B verbatim, Kette 6 von 7 Fäden) und diese Tabelle ins L3-Archiv gezogen ⇒ **der Head ist unter dem 40-KiB-Softcap** · **offen:** zweites Claude-Konto (P9-13/V150) · P9-15 ⬜ · Übersichtsgrafik §12.4 · Phase auf ✅ · Herleitung im L3-Archiv |
+| Gate/Z | Abnahme, Closeout | 🟡 **beide Doku-Hälften erledigt** (2026-10-02) · `ABNAHME_MATRIX.md` ist der **eine** Ort der Abnahme- und `[VERIFY]`-Bilanz, nicht diese Zeile · **[2026-10-04] beide Rotationen gefahren** (Block 17.780 B verbatim, Kette 6 von 7 Fäden) und diese Tabelle ins L3-Archiv gezogen ⇒ **der Head ist unter dem 40-KiB-Softcap** · **offen:** zweites Claude-Konto (P9-13/V150) · Portscan P9-94/P9-11 · Übersichtsgrafik §12.4 · Phase auf ✅ — **P9-15 steht nicht mehr hier**, es ist seit dem 2026-10-03 gemessen (⚠️, Zeile A) · Herleitung im L3-Archiv |
 
 ## Backlog (bewusst zurückgestellt, kein Phasen-Blocker)
 
@@ -83,13 +83,19 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   eine Alternative stellen — mit **einer** Frage, deren Antwort man schon kennt; ein Modell, das
   die verneint, ist gestrichen. Signatur + Prüfmuster: dieselbe Datei, neuer Abschnitt vom
   2026-10-05.
-- **D1 — ESC im Vollbild schließt zusätzlich das Item.** Diagnose geklärt (macOS Safari,
-  natives Vollbild über den grünen Knopf), Fix nicht — der gebaute
-  `document.fullscreenElement`-Guard (Session 2026-09-23) sieht diesen Fall nicht, weil die
-  Web-Fullscreen-API dort per Spezifikation nicht greift. **Nikinger-Entscheidung 2026-09-23:**
-  zurückstellen, angehen, sobald genug Zeit da ist — kein aktiver Blocker für den Rest von P9.
-  Ansatzpunkte für den nächsten Anlauf stehen im Session-Block 2026-09-23 unten (gegen echtes
-  Safari messen, keine Heuristik raten).
+- **D1 — ESC im Vollbild schließt zusätzlich das Item. ✅ GESCHLOSSEN am 2026-10-05, ohne Code.**
+  Gemeldet 2026-09-23 (macOS Safari, natives Vollbild über den grünen Knopf), zurückgestellt am
+  2026-09-23, entschieden am 2026-10-05: *kein Code*, **V188** beantworten, P9-27 auf ⚠️. Die
+  Antwort ist **Betriebssystem-Verhalten**, und die Seite kann es nicht verhindern: ein immer
+  wirkender Ausgang aus dem Vollbild ist Pflicht (WHATWG Fullscreen §8 — Anti-Spoofing), WICG
+  Keyboard Lock §7 **darf** ihn nicht abschalten, auch nicht bei allen angeforderten Tasten, und
+  der einzige Hebel verschiebt nur ESC auf „langer ESC" (> 2 s). Für den gemeldeten Fall ist er
+  doppelt unbrauchbar: §4.2 gilt nur für JS-initiiertes Vollbild, und MDN-`browser-compat-data`
+  sagt `Keyboard.lock` → **`safari: false`**. Am Repo gemessen: `app.js:259` ist der einzige
+  `fullscreen`-Bezug der App, die Web-API greift im nativen Vollbild nicht. **Beleg:** P9-27-Zeile
+  und V188-Zeile in `ABNAHME_MATRIX.md`, Kurzfassung in §9 des settings-Plans. **P9-28 bleibt ✅**
+  und ist eine andere Frage: der Guard ist im *Web*-Vollbild richtig und am Browser beider
+  Richtungen belegt.
 - **Derselbe Vormittag, separater Vorfall, jetzt geschlossen: `mcp-proxy.anthropic.com`
   (Anthropics eigenes Connector-Relay für claude.ai) lieferte ~19 Minuten lang durchgehend
   Cloudflare-502 auf jeden `Sharefyx`-Connector-Call** (`list_spaces`, viermal probiert,
@@ -110,131 +116,116 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückzuführen** — Nikinger-Anordnung 2026-09-24, so dokumentieren und nicht weiter
   untersuchen.
 
-## Session stopped — 2026-10-05 (fünfundzwanzigster Block: **die sieben Punkte aus der Bildsichtung gebaut — und zwei davon haben einen Fehler in der Vorgabe selbst gefunden**; Release `v3.1.3` unverändert, **kein Deploy, kein Service-Touch**)
+## Session stopped — 2026-10-05 (sechsundzwanzigster Block: **V188 beantwortet — die Seite kann es
+nicht verhindern, und auf dem MacBook existiert der einzige Hebel gar nicht**; dazu der
+Doku-Drift-Teil des settings-Closeouts. **Kein Code, kein Deploy, kein Service-Touch**)
 
-**Ergebnis in einem Satz.** Alle sieben Punkte aus der Bildsichtung sind umgesetzt (Mini-Plan §10,
-Locks P9-AM–P9-AS, Abnahme P9-96–P9-102), und die erste Browser-Probe hat **zweimal die
-Vorgabe selbst widerlegt** statt den Bau: `text-align: center` ist auf einem Flex-Knopf ein
-**No-op**, und „Text mittig" ist mit dem geerbten 32-px-Einzugspolster der Baumzeile **nicht**
-erreichbar. `pytest` **1233 → 1238**, `ui_budget` 5/5 (**165,6 KB**), Tabu-Diff §0.3 leer,
-Browser-Probe **56/56**, Gegenläufe **G4 → 2 rot · G5 → 2 rot · G6 → 3 rot**.
+**Ergebnis in einem Satz.** Die beiden Punkte, die M3 machen konnte, sind erledigt: **V188 ✅** mit
+vier Quellen (drei nachgelesen, eine am Repo gemessen) ⇒ **P9-27 ⚠️, D1 geschlossen, kein Code
+gebaut** — genau die Entscheidung, die das gestrige Plan-§4 unter dieser Bedingung zugelassen hat;
+und der **letzte `KNOWN_OFFENDERS`-Eintrag** ist repariert und aus der Ausnahmeliste gestrichen.
+Dabei sind **drei falsche Sätze** gefunden und datiert korrigiert, von denen einer behauptete, ein
+Deploy schließe eine Abnahmezeile, die er nachweislich nicht schließen kann.
 
-**Abnahme.** P9-96 ✅ · P9-97 **⚠️** · P9-98 ✅ · P9-99 **⚠️** · P9-100 ✅ · P9-101 ✅ · P9-102 ✅.
-**Die beiden ⚠️ sind benannte Abweichungen, keine offenen Punkte** — P9-97 trägt die vom Nikinger
-entschiedene Polster-Entscheidung, P9-99 den gemessenen Umweg. Zeilen und Belege je einzeln in
-`ABNAHME_MATRIX.md`, Herleitung in §10.1–§10.3 des Mini-Plans. `[VERIFY]`-Bilanz unverändert
-(V188 ⬜).
+### V188 — die Antwort, und die zwei Stellen, an denen sie schärfer ist als die Frage
 
-### Die zwei Stellen, an denen die Vorgabe falsch war — beide erst durch Messung
+**Betriebssystem-Verhalten; die Seite kann es nicht verhindern, nur verschieben — und die
+Verschiebung gibt es auf dem MacBook nicht.** Vier Belege, jeder mit Ort; die vollständige Kette
+mit wörtlichen Zitaten steht in der P9-27-Zeile der `ABNAHME_MATRIX.md` (dort, nicht hier, weil
+die Quelle an einer Stelle stehen soll):
 
-1. **`text-align: center` ist auf dem Menüknopf ein No-op.** Der Knopf ist `display: flex` (die
-   Sammelregel mit `.tree__folder`) und sein einziges Kind ist ein **anonymer Flex-Item** — ein
-   Textknoten. `text-align` wirkt auf Blockcontainer; im Flex-Item zentriert es einen Text in
-   sich selbst. Die erste Fassung des Baus hatte genau das, und die erste Probe maß die Textmitte
-   **8,5 px neben** der Knopfmitte. Gebaut ist `justify-content: center` — die Flex-Achse.
-   **Sichtbarstark:** der Wächter verbietet `text-align` in einer eigenen Menüpunkt-Regel jetzt
-   ausdrücklich, und prüft zusätzlich, dass der Knopf überhaupt `display: flex` trägt — sonst
-   dürfte jemand die Sammelregel umstellen und der Wächter bliebe grün.
-2. **„Text mittig" und „Polster = Baumzeile" können nicht beide gelten.** Als `.tree__folder`
-   erbte der Menüpunkt `padding-left: 32px` — die *Einrückung* der Baumzeile — gegen 8 px rechts.
-   Der Inhaltskasten lag damit **12 px** rechts, und der breiteste Menüpunkt hatte **0 px Spiel**.
-   **Das war eine Frage an den Nikinger, Antwort: beidseitig `--space`.** Was das kostet, steht
-   am Stylesheet und in S1: der Menüpunkt ist in *diesem* Wert nicht mehr die Baumzeile (Höhe,
-   Polster oben/unten, Schrift, Rundung bleiben es), und die Messung nennt die 32 px **mit**.
-   *Nicht* gebaut: die Einrückung an der Quelle auf die Rail einzuschränken — das hätte zusätzlich
-   die Space-Zeilen verschoben, eine zweite, nicht beauftragte Änderung.
+1. **Der Fall ist nicht einmal die Web-API** — und das ist **gemessen, nicht vermutet**.
+   `grep -rn fullscreen phase5_ui/webui/static/js/app.js` liefert **eine** Zeile: `app.js:259`,
+   `if (document.fullscreenElement) return;`. Die App ruft `requestFullscreen()` nirgends auf ⇒
+   der gemeldete Fall (grüner Knopf / Ctrl+Cmd+F) ist natives macOS-Vollbild, und dafür gibt es
+   keine Web-API: `fullscreenElement` bleibt `null`, kein `fullscreenchange`. Der Guard ist für
+   genau diesen Fall ein No-op — das stand in der Matrix bis heute als „mit hoher Sicherheit".
+2. **Der Ausgang ist Pflicht, und das ist Anti-Spoofing.** WHATWG Fullscreen §4: *„The user agent
+   may end any fullscreen session without a close request or call to `exitFullscreen()` whenever
+   the user agent deems it necessary."* §8: *„User agents should provide a means of exiting
+   fullscreen that always works and advertise this to the user. This is to prevent a site from
+   spoofing the end user …"*
+3. **Der einzige Hebel verschiebt nur.** WICG Keyboard Lock §7: *„the user agent MUST provide a
+   way for the user to exit from keyboard lock **even if all of the keys are requested by the
+   API**"* (+ langes ESC > 2 s, §3.2). WHATWG §6: *„User agents should reserve an additional
+   input for the purposes of exiting fullscreen"*. MDN `Element.requestFullscreen()`: *„Most
+   browsers use the Esc key to exit normal fullscreen mode, and a long-press Esc key to exit
+   keyboard lock."*
+4. **Der Hebel ist doppelt unbrauchbar — und hier wurde die Gedächtnisaussage des Plans zur
+   Messung.** **(a)** WICG §4.2: Keyboard Lock gilt nur für JS-initiiertes Vollbild, *„During F11
+   fullscreen, no Keyboard Lock processing of keyboard events will take place."* **(b)**
+   Browser-Support aus **MDNs `browser-compat-data`** (`api/Navigator.json`, `api/Keyboard.json`,
+   Branch `main`): `navigator.keyboard`, `Keyboard.lock`, `Keyboard.unlock` → Chrome/Chromium ab
+   68, Edge/Opera `mirror`, **`firefox: false`**, **`safari: false`** (damit auch iOS).
+   Das Plan-§4-Wort „**meines Wissens** nur in Chromium" ist damit nicht widerlegt, sondern
+   **gemessen** — und für den Anwendungsfall schärfer: **gar nicht vorhanden.**
 
-### Ein echter Produktbefund, gemeldet und **nicht** gebaut
+**Folge:** P9-27 ⬜ → ⚠️ (die Zeile ist nicht *erfüllt*, sondern **gegenstandslos geworden** — die
+Frage dahinter ist beantwortet, die Messung am echten Gerät bleibt für das native Vollbild offen
+und ist per Spezifikation nicht automatisierbar). **P9-28 bleibt ✅**: dessen ✅ gilt der
+Web-API-Seite des Guards, und das ist eine andere Frage. **D1 ist geschlossen, es wurde kein Code
+gebaut** — der gebaute Guard bleibt, weil er für den Web-Fullscreen-Fall genau richtig ist.
 
-**Die Space-Liste kann leer bleiben, wenn man sie zu früh öffnet.** `renderSpaceList()` rendert aus
-`state.spaces`, und das steht erst nach `loadOverview()` fest; neu gerendert wird nur beim nächsten
-Öffnen. „Einstellungen → Spaces verwalten" in den ersten Sekunden nach dem Laden zeigt deshalb
-**nichts**. Die Wahrscheinlichkeit **wächst linear mit den sichtbaren Spaces** (P9-15 vom
-2026-10-03) — im Harness mit zwölf Spaces ist das der Normalfall: der erste Lauf dieser Session
-maß S1 gegen eine **leere** Rail und meldete die Station rot, ohne dass sich am Menü etwas
-geändert hätte. **Warum nicht gebaut:** die Reparatur ist eine *Zustandsentscheidung* (ein zweiter
-Hook neben `registerPanel` oder ein Ereignis zwischen `loadOverview()` und den Panel-Eigentümern),
-keine Zeilenänderung, und der Auftrag umfasste sie nicht. **Steht in der P10-Liste** (Plan §6, 3.).
+### Drei falsche Sätze, alle aus dem settings-Closeout §6.1, alle datiert korrigiert
 
-### Was der Wächter-Teil dieser Session gekostet hat — fünf eigene Fehler, alle vom selben Typ
+1. **„Der Deploy `v3.1.1` schließt P9-15, denn `health_gate.sh` macht die
+   `/api/v1/overview`-Läufe"** — in `ABNAHME_MATRIX.md`s datiertem „Reihenfolge"-Block. **Falsch,
+   und es ist keine Formulierung, sondern ein Zustand:** P9-15 stellt gegen **372,9 ms**, und
+   dieser Wert ist **nie über Funnel gemessen worden** (V151: in-process auf synthetischem
+   Bestand, 8,3× zu niedrig). Ein Health-Gate liefert Läufe **ohne Kriterium**. Die Zeile selbst
+   stand schon am selben Tag korrekt auf ⚠️ — der Block daneben nicht.
+2. **„P9-15 ist der authentifizierte Latenzvergleich und gehört an den Deploy-Tag"** — im
+   „Stand in einem Satz" **derselben** Datei, also zwei Ebenen unter der, die schon richtig war.
+   Korrigiert und mitgezählt: die 3 offenen Zeilen sind **P9-11, P9-13/V150, P9-94**; der
+   Modulstatus-Head und der Wurzel-Block trugen denselben Fehler.
+3. **„Seit dem 2026-10-04 ist kein ⬜ ein Personenschritt"** — im selben Absatz, und mit P9-94
+   **falsch geworden**: zwei der drei ⬜ brauchen ein MacBook mit Handy-Hotspot. Richtig und
+   tragend ist der zweite Satz, und der steht jetzt allein: **kein ⬜ ist offene Code-Arbeit, und
+   keiner blockiert die Phase.** Der Satz davor war außerdem **im Repo ungrammatisch** — ein
+   angebrochener Halbsatz („… ein Konto, kein Code" / „als zurückgestelltem Backlog-Posten"),
+   sichtbar beim Lesen der Nachbarzeile.
 
-Die Fehlerklasse war durchgehend: **ein Wächter oder eine Messung, die am Muster scheitert, sieht
-wie ein Befund aus.** Konkret, alle fünf:
+**Bilanz:** die Abnahme- und die `[VERIFY]`-Tabelle haben je eine Zeile bewegt, die **Matrix ist
+die Quelle** (`test_acceptance_numbers.py` zählt nach und vergleicht mit dem Fließtext — die beiden
+Konstanten wurden **vor** dem Schreiben gesetzt, sonst wäre der Wächter eine Tautologie; er stand
+beim Zurückschreiben des Fließtexts rot und wurde danach grün).
 
-1. `class="btn settings-back"` mit **fester Klassenreihenfolge** — der Knopf heißt jetzt
-   `btn btn--icon settings-back`, und der Wächter meldete vier Panels *ohne* Zurück-Knopf, während
-   er sichtbar neben dem Test stand.
-2. Der `hidden`-Test lief über das **ganze** Element — das neue `<svg aria-hidden="true">`
-   enthält das Wort. Jetzt nur der öffnende Tag, mit `(?<![\w-])hidden\b`.
-3. `re.escape()` auf einen **bereits regexartigen** String (wie am 2026-10-05 in der Probe) ⇒ null
-   Treffer ohne Fehlermeldung.
-4. **Eine Zeilenannahme statt einer Regel-Lesemaschine:** `^([^{}]*text-align:…)\{` findet eine
-   Regel nicht, die über mehrere Zeilen geschrieben ist — und der Wächter meldete „nicht gebaut".
-   Der Wächter las außerdem den *Body* der `.settings-chain`-Regel als wären er ihr Selektor.
-   Ersatz: `_alle_regeln()` als **eine** Lesemaschine für das ganze Modul.
-5. **Eine Regel-Lesemaschine, die die Zustandsregel mit der eigenen Regel verwechselte:** wer nach
-   `aria-current="true"` sucht, findet auch `:not([aria-current="true"])` — P9-AO wäre als
-   „umgestellt" gemeldet worden, obwohl die Auswahlregel unverändert ist.
+### Der letzte `KNOWN_OFFENDERS`-Eintrag ist weg — und die Reparatur brauchte zwei Schritte
 
-Dazu **fünf Zeilen Test, der den Wächter prüft statt ihn zu glauben**
-(`test_the_menu_item_watchdog_bites_on_built_in_violations`): zwölf eingebaute Verstöße, jeder
-muss rot werden — darunter `background: #0C1015` (Farbe statt Token) und `padding-left: 24px`
-(eigener Wert). Und **ein Gegenlauf auf der Testseite**: `background` aus der eigenen Regel
-entfernt ⇒ 2 Wächter rot, `background: #0C1015` statt Token ⇒ 2 rot.
+`docs/screenshots/README.md` stand mit **beiden** Ausprägungen zugleich in der Ausnahmeliste: das
+`updated:`-Feld fehlte **ganz** (`missing=True`) **und** zwei von sechs Fäden trugen ein
+`updated: `-Präfix, für das der Rotationsanker von `rotate_index_updates.sh` blind ist. **Erst
+repariert, dann der neue Faden** — weil `scripts/prepend_updated_chain.sh` ein vorhandenes
+`^updated: ` **verlangt** und bei dieser Datei sonst mit exit 1 abbricht (Gegenprobe (e)). Die
+sechs Fadeninhalte wurden dabei **byteweise** gegen die alte Zeile gestellt, nicht nur „sieht noch
+gut aus". Der Eintrag ist **gestrichen**, nicht auf 0/0 gesetzt: mit `0, 0` wäre er eine unsichtbare
+Ausnahme, deren Verschwinden kein Test bemerkt. `ROADMAP.md` (4 Fäden hinter ` · `) und die beiden
+Dekumentationen (📕 bzw. abgeschlossene Phase) bleiben **bewusst** drin.
 
 ### Belege
 
-- `pytest` **1233 → 1238** (5 neue Tests in `test_settings_chain.py`, keiner umgedreht, 2 am
-  Wächter korrigiert); `ui_budget` **5/5** (165,6 KB; `app.css` 30,7 KB gzip); `node --check` grün
-- **Tabu-Diff §0.3 leer** — `api.py`, `security.py`, `phase4_auth/` unberührt, der Block ist reines
-  Frontend. Keine API-Route angefasst
-- Browser-Probe `p9_settings_chain_probe.py` **56/56** gegen die TLS-Wegwerf-Instanz auf 18775,
-  gestoppt über die PID-Datei. **Gegenläufe:** G4 (P9-AP raus) → **2 rot** · G5 (P9-AS raus) →
-  **2 rot** · G6 (P9-AN mit eigener Höhe) → **3 rot**. **Die Plan-Aussage zu G6 war falsch
-  benannt:** eine eigene Höhe trifft nicht die Flächen-Zeile (P9-97), sondern die
-  **Geometrie**-Zeile **P9-84** (S1, `h=40` gegen `h=35.69`) — im Plan §10.2 Punkt 5 korrigiert
-- **Drei Messkorrekturen in der Probe**, jede mit derselben Lehre: `compareDocumentPosition` prüfte
-  die Gegenrichtung und übersprang genau die Elemente, die gesucht waren (S13 fand nichts); S14
-  verglich die *Inhaltskante* eines Knopfes mit der Inhaltskante seines Panels (das sind zwei
-  Kästen, die 15 px waren `.btn`s eigenes Polster); S15 maß einen **gesperrten** Knopf mit
-  0 × 0 Rechteck bei (0,0) und meldete eine grüne Station **ohne Aussage**
-- **Bilder:** `p9_settings_01..08` neu aufgenommen (die sieben vom Vortag tragen den neuen Stand),
-  `screenshots_latest/` rotiert (drei Symlinks unverändert, der dritte zeigt jetzt `08` statt des
-  Duplikats `04`). **Die Gegenlauf-Bilder sind gelöscht, nicht eingecheckt** — der Fehler, den der
-  trace-Block am 2026-10-02 gemacht hätte; die JSON-Gegenläufe liegen rot im Repo
-- **Das lokale Vision-Modell hat zum zweiten Mal in Folge nicht geantwortet — diesmal mit erfundenem
-  Inhalt.** Die Frage nach dem Layout von `p9_settings_01_menue_1440.png` (ein einziges Panel,
-  drei Knöpfe) wurde beantwortet mit „drei Panels nebeneinander: Übersicht, alpha, VERKNÜPFUNGEN" —
-  **diese Inhalte stehen in keinem der acht Bilder.** Die Dateien sind gültige PNGs der
-  erwarteten Größen aus diesem Lauf (1440×900 / 1024×768, 15:46). **Es gibt also von dieser
-  Session keine Sichtaussage**, weder für noch gegen den Bau; die gemessenen Werte (0 px Textmitte,
-  24 px Titelabstand, 0,0 px Knopfkante) stammen aus der Probe, nicht aus einem Bild. **Die
-  Sichtprüfung ist der Nikinger-Schritt** — Dateinamen und Checkkriterien stehen in
-  `screenshots_latest/README.md`. Der Befund bestätigt die Regel vom 2026-10-05 (dort ein
-  Frage-abbruch, hier eine Fehlaussage): **das Bild belegt Wirkung, nie Zustand — und ein Modell,
-  das den Inhalt erfindet, belegt gar nichts**
-- **Zahlen, die mit wandern:** die gestrichene Masse bleibt **229 B** und liegt im L3-Archiv
-  (`MODULE_STATUS_ARCHIVE.md`), nicht im Modulstatus — sie ist auch heute **kein Hebel**, denn der
-  Head liegt mit ~28 KB **unter** dem 40-KiB-Softcap. `ABNAHME_MATRIX.md` ist auf **103 Zeilen /
-  88 ✅ · 11 ⚠️ · 4 ⬜** gewachsen und benennt sich damit selbst (P8-P, „benannt statt versteckt")
+- **`pytest`:** kein Test hinzugefügt, **keiner umgedreht** — dieser Block ändert keine Zeile
+  Produktcode. Die Wächter, die den Block betreffen, sind grün: `test_acceptance_numbers.py`
+  (7), `test_updated_chain.py` (7), `test_table_shape.py`, `test_doc_health.py`, `test_doc_rotations.py`
+- **Tabu-Diff §0.3 leer** — `api.py`, `security.py`, `phase4_auth/`, `storage/` unberührt. Reine Doku
+  plus **zwei Zeilen** in `test_acceptance_numbers.py` (zwei Bilanz-Konstanten) und **einer Zeile
+  entfernt** in `test_updated_chain.py` (der Ausnahme-Eintrag)
+- **Kein Deploy, kein `systemctl`, kein Tunnel, kein Portscan** — Release `v3.1.3` steht unverändert
+- **Zahlen, die mitwandern:** die durchgestrichene Masse im L3-Archiv bleibt **229 B** und ist
+  **kein Hebel** — der Head liegt bei ~31 KB, **unter** dem 40-KiB-Softcap. `ABNAHME_MATRIX.md` ist
+  gewachsen und benennt sich damit selbst (P8-P: *benannt statt versteckt*)
 
 ### Offen, in dieser Reihenfolge
 
-1. **Deploy `v3.1.3`** (Nikinger). Badge und `## 2026-10-05`-Block stehen unverändert; dieser Block
-   hat **keine** Release-Änderung gebracht. Das `deploy.sh`-Gate verlangt einen Datumsblock am
-   Deploy-Tag — bei einem späteren Deploy `SHAREFYX_ALLOW_STALE_UPDATELOG=1` oder ein neuer
-   `##`-Block
-2. **Sichtprüfung der acht neuen Bilder** — das ist der eigentliche Abnahmeschritt dieses Blocks.
-   Die **beiden ⚠️** sind es, die die Sichtung entscheidet: steht der Text mittig (P9-99) und ist
-   die Fläche so, wie er sie im Bild meinte (P9-97)
-3. **P9-94 / P9-11** — der Portscan, Anleitung Mini-Plan §5 (MacBook, Handy-Hotspot, vier Ziele)
-4. **V188** — eine Quelle, kein Code (P9-27/D1)
-5. **P9-15 ⬜** (drei Läufe `/api/v1/overview` mit echter Sitzung) — gehört an einen Deploy-Tag mit
-   `health_gate.sh`
-6. **Doku-Drift, klein und nicht angefasst:** `docs/screenshots/README.md` und
-   `screenshots_latest/README.md` stehen in `test_updated_chain.py :: KNOWN_OFFENDERS` (fehlendes
-   `updated:`-Feld bzw. zwei Fäden mit `updated: `-Präfix). `screenshots_latest/` ist in diesem
-   Commit **repariert** (Fäden ohne Präfix, Eintrag gestrichen), `docs/screenshots/README.md`
-   nicht — dort fehlt das Feld ganz, und die Datei nennt in ihrer Kette eigene Bytes. **Kein
-   Test meldet es**; die Reparatur gehört zum Doku-Fundament, nicht zu diesem Block
-
+1. **Sichtprüfung der acht Bilder** — der eigentliche Abnahmeschritt des Vortags, entscheidet die
+   beiden ⚠️ (P9-97 Fläche, P9-99 Textmitte). Dateinamen und Checkkriterien:
+   `screenshots_latest/README.md`
+2. **Deploy `v3.1.3`** (Nikinger). Badge und `## 2026-10-05`-Block stehen unverändert; dieser Block
+   hat **keine** Release-Änderung gebracht. `deploy.sh` verlangt einen Datumsblock am Deploy-Tag —
+   später `SHAREFYX_ALLOW_STALE_UPDATELOG=1` oder ein neuer `##`-Block
+3. **P9-94 / P9-11** — der Portscan, Anleitung Mini-Plan §5 (MacBook, Firmen-VPN aus, Handy-Hotspot,
+   vier Ziele). **Von keinem Test ersetzbar** und deshalb ⬜, nicht ⚠️
+4. **P9-13 / V150** — zweites Claude-Konto; wandert nach P10, **kein Blocker** (Plan §0.1a)
+5. **V162 *(Lesart A)*** — eine live beobachtete Löschung; kommt mit einem Deploy-Tag
+6. **Gate/Z-Rest:** Übersichtsgrafik `docs/concepts/phase9_hardening_uebersicht.svg` (gerendert **und
+   angesehen**), `ROADMAP`-Zeile P9 → ✅, Phase auf ✅

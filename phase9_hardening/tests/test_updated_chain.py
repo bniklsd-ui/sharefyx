@@ -59,9 +59,16 @@ DOT_SEPARATOR_RE = re.compile(r" · (?=\d{4}-\d{2}-\d{2}\s*\()")
 # entfernt, Fadeninhalte byte-identisch) — die Datei stand in der Liste, weil ein Ganzzahl-Eintrag
 # mit zwei Fäden nicht abnimmt, wenn man einen davon repariert; sie ist deshalb **ganz** gestrichen
 # und nicht auf 1 heruntergezählt.
+# **2026-10-05, später am Tag:** dasselbe für `docs/screenshots/README.md`, und dort waren es
+# **beide** Ausprägungen zugleich — das `updated:`-Feld fehlte ganz (deshalb `missing=True`) und
+# zwei von sechs Fäden trugen ein `updated: `-Präfix. Repariert wurde in zwei Schritten, weil
+# `scripts/prepend_updated_chain.sh` ein vorhandenes `^updated: ` **verlangt** und sonst abbricht
+# (Gegenprobe (e)): erst das Feld und die zwei Präfixe, mit einer Byte-Gegenprobe, die die sechs
+# Fadeninhalte einzeln gegen die alte Zeile stellt, dann der neue Faden mit dem Skript. Der
+# Eintrag ist **gestrichen**, nicht auf 0/0 gesetzt: mit 0-0-Präfixen und fehlendem Feld wäre er
+# eine unsichtbare Ausnahme, deren Verschwinden kein Test bemerkt.
 KNOWN_OFFENDERS: dict[str, tuple[bool, int, int]] = {
     "ROADMAP.md": (False, 4, 0),
-    "docs/screenshots/README.md": (True, 2, 0),
     "docs/concepts/phase9_hardening_block_trace_plan.md": (False, 1, 0),  # 📕, nie editieren
     "phase8_6_ui_polish/CLAUDE.md": (False, 1, 0),  # abgeschlossene Phase
 }

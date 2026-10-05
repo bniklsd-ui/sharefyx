@@ -61,7 +61,11 @@ CAP_BYTES = 300  # der Cap, mit dem P9-3/V145 die Unerreichbarkeit des Kriterium
 # Abgetippt, nicht abgeleitet — der Test soll die Behauptung prüfen, nicht sie wiederholen.
 # 2026-10-03: P9-15 von ⬜ auf ⚠️ (gemessen, aber in anderer Form als im Kriterium -- die
 # dort genannte Referenz 372,9 ms ist im Code nie ueber Funnel gemessen worden).
-ABNAHME_BILANCE = {"✅": 88, "⚠️": 11, "⬜": 4}
+# 2026-10-05: P9-27 von ⬜ auf ⚠️ (V188 beantwortet: es ist Betriebssystem-Verhalten, und die Seite
+# kann es nicht verhindern -- die Zeile ist nicht erfuellt *worden*, sie ist gegenstandslos geworden;
+# Nikinger-Entscheidung 2026-10-05: kein Code, D1 geschlossen). Die drei verbleibenden ⬜ sind
+# P9-11 und P9-94 (beide `nmap` von aussen, Mini-Plan §5) und P9-13/V150 (zweites Konto).
+ABNAHME_BILANCE = {"✅": 88, "⚠️": 12, "⬜": 3}
 # 2026-10-05: +7 Zeilen aus dem settings-Nachtrag P9-96–P9-102 (die sieben Punkte aus der
 # Bildsichtung des Nikingers, §10 des Mini-Plans). Die zwei neuen ⚠️ sind **benannte
 # Abweichungen**, keine offenen Punkte: P9-97 (linker Polsterwert, Nikinger-Entscheidung vom
@@ -72,7 +76,10 @@ ABNAHME_ROWS = 103  # 103 Abnahmezeilen; seit 2026-10-05 der settings-Nachtrag (
 # **vor** dem Zählen, sonst wäre der Test eine Tautologie -- deshalb hat er mich beim
 # Zurueckschreiben der Bilanz in die Matrix rot gemeldet, statt sie zu bestaetigen.
 # 2026-10-03: V151 von ⚠️ auf ✅ (beide Beine gemessen, VPS-Anteil 2,4-3,6 %).
-VERIFY_BILANCE = {"✅": 34, "⚠️": 1, "⬜": 3}  # Nummern-Lesart, eine Nummer = eine Zeile
+# 2026-10-05: V188 von ⬜ auf ✅ (vier Quellen, darunter MDN-`browser-compat-data` gemessen:
+# `Keyboard.lock` ist `safari: false`). Es ist der letzte der drei ⬜ aus dem settings-Block;
+# die zwei übrigen sind V150 und V162 *(Lesart A)*.
+VERIFY_BILANCE = {"✅": 35, "⚠️": 1, "⬜": 2}  # Nummern-Lesart, eine Nummer = eine Zeile
 VERIFY_ROWS = 41  # 38 Nummern + 2 Zweit-Lesarten + 1 reservierte Bereichszeile
 # 2026-10-04 (Nikinger): P9-13/V150 (das zweite Claude-Konto) von ⚠️ auf ⬜ — **zurückgestellt, wandert
 # nach P10, ist kein Blocker** (Plan §0.1a; die Regel steht auch in der Wurzel-`CLAUDE.md`

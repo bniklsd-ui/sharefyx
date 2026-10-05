@@ -16,6 +16,135 @@ Vorsatz: nichts abtippen, alles per Skript mit vier Gegenproben (Schnitt verlust
 Head trägt genau einen Block, alle bewegten Blöcke im Archiv byte-identisch, Archivbestand
 unangetastet).
 
+## Session stopped — 2026-10-05 (fünfundzwanzigster Block: **die sieben Punkte aus der Bildsichtung gebaut — und zwei davon haben einen Fehler in der Vorgabe selbst gefunden**; Release `v3.1.3` unverändert, **kein Deploy, kein Service-Touch**)
+
+**Ergebnis in einem Satz.** Alle sieben Punkte aus der Bildsichtung sind umgesetzt (Mini-Plan §10,
+Locks P9-AM–P9-AS, Abnahme P9-96–P9-102), und die erste Browser-Probe hat **zweimal die
+Vorgabe selbst widerlegt** statt den Bau: `text-align: center` ist auf einem Flex-Knopf ein
+**No-op**, und „Text mittig" ist mit dem geerbten 32-px-Einzugspolster der Baumzeile **nicht**
+erreichbar. `pytest` **1233 → 1238**, `ui_budget` 5/5 (**165,6 KB**), Tabu-Diff §0.3 leer,
+Browser-Probe **56/56**, Gegenläufe **G4 → 2 rot · G5 → 2 rot · G6 → 3 rot**.
+
+**Abnahme.** P9-96 ✅ · P9-97 **⚠️** · P9-98 ✅ · P9-99 **⚠️** · P9-100 ✅ · P9-101 ✅ · P9-102 ✅.
+**Die beiden ⚠️ sind benannte Abweichungen, keine offenen Punkte** — P9-97 trägt die vom Nikinger
+entschiedene Polster-Entscheidung, P9-99 den gemessenen Umweg. Zeilen und Belege je einzeln in
+`ABNAHME_MATRIX.md`, Herleitung in §10.1–§10.3 des Mini-Plans. `[VERIFY]`-Bilanz unverändert
+(V188 ⬜).
+
+### Die zwei Stellen, an denen die Vorgabe falsch war — beide erst durch Messung
+
+1. **`text-align: center` ist auf dem Menüknopf ein No-op.** Der Knopf ist `display: flex` (die
+   Sammelregel mit `.tree__folder`) und sein einziges Kind ist ein **anonymer Flex-Item** — ein
+   Textknoten. `text-align` wirkt auf Blockcontainer; im Flex-Item zentriert es einen Text in
+   sich selbst. Die erste Fassung des Baus hatte genau das, und die erste Probe maß die Textmitte
+   **8,5 px neben** der Knopfmitte. Gebaut ist `justify-content: center` — die Flex-Achse.
+   **Sichtbarstark:** der Wächter verbietet `text-align` in einer eigenen Menüpunkt-Regel jetzt
+   ausdrücklich, und prüft zusätzlich, dass der Knopf überhaupt `display: flex` trägt — sonst
+   dürfte jemand die Sammelregel umstellen und der Wächter bliebe grün.
+2. **„Text mittig" und „Polster = Baumzeile" können nicht beide gelten.** Als `.tree__folder`
+   erbte der Menüpunkt `padding-left: 32px` — die *Einrückung* der Baumzeile — gegen 8 px rechts.
+   Der Inhaltskasten lag damit **12 px** rechts, und der breiteste Menüpunkt hatte **0 px Spiel**.
+   **Das war eine Frage an den Nikinger, Antwort: beidseitig `--space`.** Was das kostet, steht
+   am Stylesheet und in S1: der Menüpunkt ist in *diesem* Wert nicht mehr die Baumzeile (Höhe,
+   Polster oben/unten, Schrift, Rundung bleiben es), und die Messung nennt die 32 px **mit**.
+   *Nicht* gebaut: die Einrückung an der Quelle auf die Rail einzuschränken — das hätte zusätzlich
+   die Space-Zeilen verschoben, eine zweite, nicht beauftragte Änderung.
+
+### Ein echter Produktbefund, gemeldet und **nicht** gebaut
+
+**Die Space-Liste kann leer bleiben, wenn man sie zu früh öffnet.** `renderSpaceList()` rendert aus
+`state.spaces`, und das steht erst nach `loadOverview()` fest; neu gerendert wird nur beim nächsten
+Öffnen. „Einstellungen → Spaces verwalten" in den ersten Sekunden nach dem Laden zeigt deshalb
+**nichts**. Die Wahrscheinlichkeit **wächst linear mit den sichtbaren Spaces** (P9-15 vom
+2026-10-03) — im Harness mit zwölf Spaces ist das der Normalfall: der erste Lauf dieser Session
+maß S1 gegen eine **leere** Rail und meldete die Station rot, ohne dass sich am Menü etwas
+geändert hätte. **Warum nicht gebaut:** die Reparatur ist eine *Zustandsentscheidung* (ein zweiter
+Hook neben `registerPanel` oder ein Ereignis zwischen `loadOverview()` und den Panel-Eigentümern),
+keine Zeilenänderung, und der Auftrag umfasste sie nicht. **Steht in der P10-Liste** (Plan §6, 3.).
+
+### Was der Wächter-Teil dieser Session gekostet hat — fünf eigene Fehler, alle vom selben Typ
+
+Die Fehlerklasse war durchgehend: **ein Wächter oder eine Messung, die am Muster scheitert, sieht
+wie ein Befund aus.** Konkret, alle fünf:
+
+1. `class="btn settings-back"` mit **fester Klassenreihenfolge** — der Knopf heißt jetzt
+   `btn btn--icon settings-back`, und der Wächter meldete vier Panels *ohne* Zurück-Knopf, während
+   er sichtbar neben dem Test stand.
+2. Der `hidden`-Test lief über das **ganze** Element — das neue `<svg aria-hidden="true">`
+   enthält das Wort. Jetzt nur der öffnende Tag, mit `(?<![\w-])hidden\b`.
+3. `re.escape()` auf einen **bereits regexartigen** String (wie am 2026-10-05 in der Probe) ⇒ null
+   Treffer ohne Fehlermeldung.
+4. **Eine Zeilenannahme statt einer Regel-Lesemaschine:** `^([^{}]*text-align:…)\{` findet eine
+   Regel nicht, die über mehrere Zeilen geschrieben ist — und der Wächter meldete „nicht gebaut".
+   Der Wächter las außerdem den *Body* der `.settings-chain`-Regel als wären er ihr Selektor.
+   Ersatz: `_alle_regeln()` als **eine** Lesemaschine für das ganze Modul.
+5. **Eine Regel-Lesemaschine, die die Zustandsregel mit der eigenen Regel verwechselte:** wer nach
+   `aria-current="true"` sucht, findet auch `:not([aria-current="true"])` — P9-AO wäre als
+   „umgestellt" gemeldet worden, obwohl die Auswahlregel unverändert ist.
+
+Dazu **fünf Zeilen Test, der den Wächter prüft statt ihn zu glauben**
+(`test_the_menu_item_watchdog_bites_on_built_in_violations`): zwölf eingebaute Verstöße, jeder
+muss rot werden — darunter `background: #0C1015` (Farbe statt Token) und `padding-left: 24px`
+(eigener Wert). Und **ein Gegenlauf auf der Testseite**: `background` aus der eigenen Regel
+entfernt ⇒ 2 Wächter rot, `background: #0C1015` statt Token ⇒ 2 rot.
+
+### Belege
+
+- `pytest` **1233 → 1238** (5 neue Tests in `test_settings_chain.py`, keiner umgedreht, 2 am
+  Wächter korrigiert); `ui_budget` **5/5** (165,6 KB; `app.css` 30,7 KB gzip); `node --check` grün
+- **Tabu-Diff §0.3 leer** — `api.py`, `security.py`, `phase4_auth/` unberührt, der Block ist reines
+  Frontend. Keine API-Route angefasst
+- Browser-Probe `p9_settings_chain_probe.py` **56/56** gegen die TLS-Wegwerf-Instanz auf 18775,
+  gestoppt über die PID-Datei. **Gegenläufe:** G4 (P9-AP raus) → **2 rot** · G5 (P9-AS raus) →
+  **2 rot** · G6 (P9-AN mit eigener Höhe) → **3 rot**. **Die Plan-Aussage zu G6 war falsch
+  benannt:** eine eigene Höhe trifft nicht die Flächen-Zeile (P9-97), sondern die
+  **Geometrie**-Zeile **P9-84** (S1, `h=40` gegen `h=35.69`) — im Plan §10.2 Punkt 5 korrigiert
+- **Drei Messkorrekturen in der Probe**, jede mit derselben Lehre: `compareDocumentPosition` prüfte
+  die Gegenrichtung und übersprang genau die Elemente, die gesucht waren (S13 fand nichts); S14
+  verglich die *Inhaltskante* eines Knopfes mit der Inhaltskante seines Panels (das sind zwei
+  Kästen, die 15 px waren `.btn`s eigenes Polster); S15 maß einen **gesperrten** Knopf mit
+  0 × 0 Rechteck bei (0,0) und meldete eine grüne Station **ohne Aussage**
+- **Bilder:** `p9_settings_01..08` neu aufgenommen (die sieben vom Vortag tragen den neuen Stand),
+  `screenshots_latest/` rotiert (drei Symlinks unverändert, der dritte zeigt jetzt `08` statt des
+  Duplikats `04`). **Die Gegenlauf-Bilder sind gelöscht, nicht eingecheckt** — der Fehler, den der
+  trace-Block am 2026-10-02 gemacht hätte; die JSON-Gegenläufe liegen rot im Repo
+- **Das lokale Vision-Modell hat zum zweiten Mal in Folge nicht geantwortet — diesmal mit erfundenem
+  Inhalt.** Die Frage nach dem Layout von `p9_settings_01_menue_1440.png` (ein einziges Panel,
+  drei Knöpfe) wurde beantwortet mit „drei Panels nebeneinander: Übersicht, alpha, VERKNÜPFUNGEN" —
+  **diese Inhalte stehen in keinem der acht Bilder.** Die Dateien sind gültige PNGs der
+  erwarteten Größen aus diesem Lauf (1440×900 / 1024×768, 15:46). **Es gibt also von dieser
+  Session keine Sichtaussage**, weder für noch gegen den Bau; die gemessenen Werte (0 px Textmitte,
+  24 px Titelabstand, 0,0 px Knopfkante) stammen aus der Probe, nicht aus einem Bild. **Die
+  Sichtprüfung ist der Nikinger-Schritt** — Dateinamen und Checkkriterien stehen in
+  `screenshots_latest/README.md`. Der Befund bestätigt die Regel vom 2026-10-05 (dort ein
+  Frage-abbruch, hier eine Fehlaussage): **das Bild belegt Wirkung, nie Zustand — und ein Modell,
+  das den Inhalt erfindet, belegt gar nichts**
+- **Zahlen, die mit wandern:** die gestrichene Masse bleibt **229 B** und liegt im L3-Archiv
+  (`MODULE_STATUS_ARCHIVE.md`), nicht im Modulstatus — sie ist auch heute **kein Hebel**, denn der
+  Head liegt mit ~28 KB **unter** dem 40-KiB-Softcap. `ABNAHME_MATRIX.md` ist auf **103 Zeilen /
+  88 ✅ · 11 ⚠️ · 4 ⬜** gewachsen und benennt sich damit selbst (P8-P, „benannt statt versteckt")
+
+### Offen, in dieser Reihenfolge
+
+1. **Deploy `v3.1.3`** (Nikinger). Badge und `## 2026-10-05`-Block stehen unverändert; dieser Block
+   hat **keine** Release-Änderung gebracht. Das `deploy.sh`-Gate verlangt einen Datumsblock am
+   Deploy-Tag — bei einem späteren Deploy `SHAREFYX_ALLOW_STALE_UPDATELOG=1` oder ein neuer
+   `##`-Block
+2. **Sichtprüfung der acht neuen Bilder** — das ist der eigentliche Abnahmeschritt dieses Blocks.
+   Die **beiden ⚠️** sind es, die die Sichtung entscheidet: steht der Text mittig (P9-99) und ist
+   die Fläche so, wie er sie im Bild meinte (P9-97)
+3. **P9-94 / P9-11** — der Portscan, Anleitung Mini-Plan §5 (MacBook, Handy-Hotspot, vier Ziele)
+4. **V188** — eine Quelle, kein Code (P9-27/D1)
+5. **P9-15 ⬜** (drei Läufe `/api/v1/overview` mit echter Sitzung) — gehört an einen Deploy-Tag mit
+   `health_gate.sh`
+6. **Doku-Drift, klein und nicht angefasst:** `docs/screenshots/README.md` und
+   `screenshots_latest/README.md` stehen in `test_updated_chain.py :: KNOWN_OFFENDERS` (fehlendes
+   `updated:`-Feld bzw. zwei Fäden mit `updated: `-Präfix). `screenshots_latest/` ist in diesem
+   Commit **repariert** (Fäden ohne Präfix, Eintrag gestrichen), `docs/screenshots/README.md`
+   nicht — dort fehlt das Feld ganz, und die Datei nennt in ihrer Kette eigene Bytes. **Kein
+   Test meldet es**; die Reparatur gehört zum Doku-Fundament, nicht zu diesem Block
+
+
 ## Session stopped — 2026-10-05 (vierundzwanzigster Block: **Block settings gebaut — die drei Overlays sind eine Fensterkette, und V118 hat jetzt eine Linie**; Release `v3.1.3` steht, **kein Deploy, kein Service-Touch**)
 
 **Ergebnis in einem Satz.** Drei eigenständige Overlays (`#account-dialog`,

@@ -182,7 +182,9 @@ Item (gewollt), und macOS beendet dabei das native Vollbildfenster (der grüne K
 - **Entschieden (Nikinger 2026-10-05): kein Code.** P9-27 wird zu einem `[VERIFY]`-Eintrag mit
   dieser Aufgabe: **belegen, dass das macOS-Verhalten ist, auf das die Seite keinen Einfluss hat**
   (V188). Danach geht die Phase weiter. D1 ist damit geschlossen, und P9-27 wird ⚠️ mit Verweis
-  auf V188.
+  auf V188. **[2026-10-05: ausgeführt]** — V188 ✅, Belege in §9 und in der P9-27-Zeile der
+  `ABNAHME_MATRIX.md`. Die Zeile oben („meines Wissens **nur in Chromium**") ist damit **gemessen,
+  nicht geglaubt**: MDNs `browser-compat-data` sagt `safari: false`.
 
 ## §5 P9-11 — Portscan (Nikinger, MacBook, Firmen-VPN aus, Handy-Hotspot)
 
@@ -254,7 +256,7 @@ Befund. V162 B bekommt einen Vermerk.
 | V185 | ✅ **beantwortet 2026-10-05:** gemeint ist die Baumzeile `.tree__folder` („Offen“), nicht „Verschieben“ — Bild des Nikingers. P9-AF ist danach korrigiert |
 | V186 | Öffnet das Update-Banner heute `#update-log-dialog` (dann muss es die Kette öffnen)? |
 | V187 | Welche historischen Proben sprechen die alten Overlay-IDs an? |
-| V188 | **Belegen, dass das Beenden des macOS-Vollbilds per ESC Betriebssystem- bzw. Browser-Verhalten ist und die Seite es nicht verhindern kann.** Quelle nennen (Apple/WebKit-Doku oder Spezifikation der Keyboard Lock API mit Browser-Support). Kein Code, keine Heuristik — Nikinger 2026-10-05 |
+| V188 | ✅ **beantwortet 2026-10-05, vier Quellen, eine am Repo gemessen.** Es ist **Betriebssystem-Verhalten** (macOS, bei Web-Vollbild: User-Agent), und die Seite kann es **nicht verhindern, höchstens verschieben** — und die Verschiebung existiert auf dem MacBook nicht. Die vollständige Beweiskette mit wörtlichen Zitaten steht in der P9-27-Zeile der `ABNAHME_MATRIX.md`; Kurzfassung unten (§9, „V188"). **P9-27 → ⚠️, D1 geschlossen, kein Code** (dieser Plan, §4) |
 
 ## §9 Ergebnis
 
@@ -283,6 +285,36 @@ Gegenläufe **G1 → 4 rot · G2 → 2 rot · G3 → rot**.
    blendete nur das Menü aus; bei offenem Detail blieben Spaces-Liste **und** Detail stehen — genau
    die zwei Panels, die P9-AI verbietet. „Welches Panel ist das rechteste" steht im Zustand
    (`hidden`), nicht im Markup, weil das Menü im DOM zuerst steht.
+
+### V188 — die Frage aus §4, mit Quellen beantwortet (2026-10-05)
+
+§4 („meines Wissens **nur in Chromium** und nur im Web-Vollbild") stand **aus dem Gedächtnis**.
+Nachgelesen und **an einer Stelle gemessen** — die Beweiskette steht vollständig in der
+P9-27-Zeile der `ABNAHME_MATRIX.md`, hier die Kurzfassung und die zwei Punkte, die überraschen:
+
+1. **Der Anwendungsfall ist nicht einmal die Web-API.** `app.js:259` ist der einzige
+   `fullscreen`-Bezug der ganzen App; die Web-Fullscreen-API wird nirgends aufgerufen. Der gemeldete
+   Fall — grüner Knopf, Ctrl+Cmd+F — ist natives macOS-Vollbild, und **dafür gibt es keine
+   Web-API**: `fullscreenElement` bleibt `null`, kein `fullscreenchange`. Der Guard `app.js:259`
+   ist für genau diesen Fall ein No-op. Das stand in der Matrix bisher als Vermutung.
+2. **Der Ausgang ist nicht abschaltbar, und das ist gewollt.** WHATWG Fullscreen §8 verlangt einen
+   **immer wirkenden** Ausgang (*„a means of exiting fullscreen that always works … to prevent a
+   site from spoofing the end user"*); WICG Keyboard Lock §7 (**MUST**) gilt auch dann, wenn die
+   Seite *alle* Tasten anfordert. Die einzige Wirkung von Keyboard Lock ist eine **Verschiebung**:
+   ESC-Tastendruck → langer ESC-Tastendruck (> 2 s, WICG §3.2/§7, WHATWG §6, MDN
+   `Element.requestFullscreen()`).
+
+Und die Verschiebung selbst ist im gemeldeten Fall doppelt unbrauchbar: **(a)** WICG §4.2 — Keyboard
+Lock gilt nur für **JS-initiiertes** Vollbild, *„During F11 fullscreen, no Keyboard Lock processing
+of keyboard events will take place"*; **(b)** Browser-Support **gemessen** an MDNs
+`browser-compat-data` (`api/Navigator.json`, `api/Keyboard.json`): `navigator.keyboard`,
+`Keyboard.lock` und `Keyboard.unlock` sind Chrome/Chromium ab 68, **`firefox: false`**,
+**`safari: false`**. Die Plan-Formulierung „nur in Chromium" ist damit nicht widerlegt, sondern
+**gemessen** — und für den Anwendungsfall schärfer: **gar nicht vorhanden**.
+
+**Folge:** P9-27 ⬜ → ⚠️ (gegenstandslos, nicht erfüllt), D1 geschlossen, **kein Code** — genau die
+Entscheidung aus §4, die nur unter dieser Bedingung gelten durfte. P9-28 bleibt ✅: dessen ✅ gilt
+der Web-API-Seite des Guards, und das ist eine andere Frage.
 
 ### V186 — die Antwort auf eine Frage, deren Antwort im Plan schon falsch stand
 
@@ -315,9 +347,9 @@ zusätzlich „genau ein Träger") · `test_1024_breakpoint_has_single_row_no_ma
 
 - **P9-94 / P9-11** — der Portscan (§5). Vier Läufe vom MacBook, Handy-Hotspot. **Von keinem
   Test ersetzbar** und deshalb ⬜, nicht ⚠️.
-- **V188** — das Beenden des macOS-Vollbilds per ESC belegen. **Kein Code.** Der Keyboard-Lock-Weg
-  steht in der Matrix als *aus dem Gedächtnis, nicht nachgelesen*; P9-27/D1 bleibt ⚠️, bis eine
-  Quelle vorliegt.
+- **V188** — ✅ **beantwortet 2026-10-05** (Quellen und Kurzfassung in §9). Die Seite kann das
+  Beenden des nativen macOS-Vollbilds per ESC **nicht verhindern**; P9-27 steht auf ⚠️, D1 ist
+  geschlossen, es wurde **kein Code** gebaut.
 - **Deploy `v3.1.3`** — Badge und `## 2026-10-05`-Block stehen. `deploy.sh` verlangt einen
   Datums-Block am Deploy-Tag; dieser Eintrag ist vom 2026-10-05, ein späterer Deploy braucht
   `SHAREFYX_ALLOW_STALE_UPDATELOG=1` oder einen neuen Block.

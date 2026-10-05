@@ -178,26 +178,37 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 u. a. byteweise Reassemblierung und Nachlesen jedes Blocks), **nie von Hand**. Die vollständige
 Chronik der Phasen 1–8, der Hard-Rule-Korrekturen und der älteren Blöcke: `docs/PROJECT_SESSION_LOG.md` (L3).*
 
-**[2026-10-05, die sieben Punkte aus der Bildsichtung sind gebaut — und zwei davon haben die Vorgabe
-selbst widerlegt — ein Commit, reines Frontend, kein Deploy, kein Service-Touch.]** Der Nikinger hat
-am selben Tag die Probe-Bilder des settings-Blocks angesehen und sieben Punkte notiert (Mini-Plan §10,
-Locks P9-AM–P9-AS, Abnahme P9-96–P9-102). **Alle sieben sind umgesetzt**, Release `v3.1.3` steht
-**unverändert** und ist **nicht deployt**. Die erste Browser-Probe hat **zweimal nicht den Bau,
-sondern die Vorgabe** widerlegt: **`text-align: center` ist auf dem Menüknopf ein No-op** — er ist
-`display: flex` mit einem anonymen Flex-Item, und `text-align` wirkt auf Blockcontainer (gemessen:
-Textmitte **8,5 px neben** der Knopfmitte); gebaut ist `justify-content: center`, die Flex-Achse
-(**0 px**). Und **„Text mittig" ist mit „Polster = Baumzeile" nicht gleichzeitig erreichbar** — als
-`.tree__folder` erbte der Menüpunkt die 32-px-Einrückung und lag 12 px neben seiner Mitte;
-**Nikinger-Entscheidung: beidseitig `--space`**, Preis benannt am Stylesheet, in S1 und in der
-Matrix (P9-97 ⚠️). Bilanz: **P9-96/98/100/101/102 ✅, P9-99 ⚠️** (anderer Weg, gleiche Wirkung) —
-**beide ⚠️ sind benannte Abweichungen, keine offenen Punkte**. `pytest` 1233 → 1238, `ui_budget` 5/5
-(165,6 KB), Tabu-Diff leer, Probe **56/56**, G4 → 2 rot · G5 → 2 rot · G6 → 3 rot — und **die
-Plan-Aussage zu G6 war falsch benannt** (eine eigene Höhe trifft P9-84, nicht P9-97).
-**Ein Produktbefund gemeldet, nicht gebaut:** die Space-Liste bleibt **leer**, wenn man sie vor
-`loadOverview()` öffnet (Wahrscheinlichkeit wächst linear mit den sichtbaren Spaces, P9-15) —
-wandert in die **P10-Liste**. **Fünf eigene Fehler, alle derselben Klasse** (Wächter oder Messung
-scheitert am Muster und sieht wie ein Befund aus) plus **zwölf eingebaute Verstöße** im neuen
-Wächtertest, damit „erlaubt" nicht zu „alles erlaubt" wird. **Offen, in dieser Reihenfolge:**
-Sichtprüfung der acht Bilder (sie entscheidet die beiden ⚠️) · Deploy `v3.1.3` · P9-94-Portscan ·
-V188 · P9-15 ⬜.
+**[2026-10-05, V188 ist beantwortet — die Seite **kann** das Beenden des macOS-Vollbilds per ESC
+nicht verhindern, und auf dem MacBook existiert der einzige Hebel dafür gar nicht; dazu der letzte
+`KNOWN_OFFENDERS`-Eintrag und drei datierte Korrekturen am Doku-Drift aus dem settings-Closeout —
+ein Commit, reine Doku, kein Code, kein Deploy, kein Service-Touch.]** Die beiden Sichtprüfungs-
+und Deploy-Schritte bleiben Nikinger-Arbeit; die zwei Punkte, die M3 machen konnte, sind erledigt.
+**V188 ✅ mit vier Quellen** (drei nachgelesen, eine am Repo gemessen) ⇒ **P9-27 ⬜ → ⚠️, D1
+geschlossen, kein Code gebaut** — genau die Entscheidung, die das Plan-§4 unter dieser Bedingung
+zugelassen hat. Die Kette: `app.js:259` ist der **einzige** `fullscreen`-Bezug der ganzen App, die
+Web-Fullscreen-API greift im nativen macOS-Vollbild nicht ⇒ **das Vorhandensein eines immer
+wirkenden Ausgangs ist Pflicht** (WHATWG Fullscreen §8, Anti-Spoofing) · WICG Keyboard Lock §7
+**darf** ihn nicht abschalten, auch nicht bei *allen* angeforderten Tasten, und verschiebt nur
+(„langer ESC" > 2 s) · §4.2 gilt nur für JS-initiiertes Vollbild · und MDNs `browser-compat-data`
+sagt `Keyboard.lock` → **`safari: false`**. Das Plan-Wort „*meines Wissens* nur in Chromium" ist
+damit **gemessen statt geglaubt**, und für den Anwendungsfall schärfer als die Frage. **P9-28
+bleibt ✅** — der Guard ist für das *Web*-Vollbild richtig, das ist eine andere Frage.
+**Drei falsche Sätze korrigiert, alle aus dem settings-Closeout §6.1:** (1) die Matrix behauptete im
+datierten „Reihenfolge"-Block, der Deploy `v3.1.1` schließe **P9-15**, weil `health_gate.sh` die
+`/api/v1/overview`-Läufe mache — **ein Health-Gate liefert Läufe ohne Kriterium**, denn P9-15 stellt
+gegen 372,9 ms und der Wert ist nie über Funnel gemessen worden (V151); (2) zwei Ebenen darunter
+sagte derselbe Absatz, P9-15 sei „Arbeit des Deploy-Tags" — die Zeile ist **seit dem 2026-10-03
+gemessen** (⚠️), und Modulstatus und Wurzel trugen denselben Fehler; (3) „seit dem 2026-10-04 ist
+kein ⬜ ein Personenschritt" war mit **P9-94 falsch geworden** — zwei der drei ⬜ brauchen ein
+MacBook mit Hotspot, und der Satz davor war im Repo **ungrammatisch** (angebrochener Halbsatz).
+**Der letzte `KNOWN_OFFENDERS`-Eintrag ist gestrichen:** `docs/screenshots/README.md` trug **beide**
+Ausprägungen zugleich (Feld **fehlt ganz** + zwei von sechs Fäden mit `updated: `-Präfix, für das
+der Rotationsanker blind ist); repariert in zwei Schritten, weil `prepend_updated_chain.sh` ein
+vorhandenes `^updated: ` **verlangt** — die sechs Fadeninhalte **byteweise** gegengeprüft.
+**Zwei Zeilen** in `test_acceptance_numbers.py` (Bilanz-Konstanten, **vor** dem Schreiben gesetzt,
+sonst wäre der Wächter eine Tautologie), **eine Zeile entfernt** in `test_updated_chain.py`. Kein
+Test hinzugefügt, keiner umgedreht, Tabu-Diff §0.3 leer, Release `v3.1.3` unverändert.
+**Offen, in dieser Reihenfolge:** Sichtprüfung der acht Bilder (entscheidet P9-97/P9-99) · Deploy
+`v3.1.3` · P9-94/P9-11-Portscan · P9-13/V150 (wandert nach P10, kein Blocker) · V162 *(Lesart A)* ·
+Gate/Z-Rest (Übersichtsgrafik, ROADMAP-Zeile, Phase auf ✅).
 

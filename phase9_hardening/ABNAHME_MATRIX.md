@@ -25,22 +25,24 @@ Archiv hineinzuschreiben hieße, das Falsche zu tun.
 
 ## Stand in einem Satz
 
-**103 Tabellenzeilen für 103 Abnahmezeilen: 88 ✅ · 11 ⚠️ · 4 ⬜** (P9-10 in zwei prüfbare Hälften
+**103 Tabellenzeilen für 103 Abnahmezeilen: 88 ✅ · 12 ⚠️ · 3 ⬜** (P9-10 in zwei prüfbare Hälften
 geteilt; seit 2026-10-05 kommen der **settings-Block** P9-83–P9-95 mit 12 ✅ und **einem** ⬜
 dazu — P9-94, der Portscan, ist ein Schritt des Nikingers und durch keinen Test ersetzbar — und
 sein **Nachtrag** P9-96–P9-102 aus der Bildsichtung mit **5 ✅ und 2 ⚠️**. Die beiden ⚠️ sind
 **keine offenen Punkte**: P9-97 trägt die vom Nikinger entschiedene Abweichung im linken
 Polsterwert, P9-99 den gemessenen Umweg (`justify-content` statt des im Plan genannten, wirkungslosen `text-align`). **A7+A8 sind am 2026-10-03 gefahren** (A7a als risikoarmer Vorlauf, dann A7, dann A8):
-P9-10b und P9-12 sind **beide ✅**. Von den 3 offenen Zeilen ist **keine** mehr Code-Arbeit und
-**keine** hängt an A7: **P9-11** ist der `nmap`-Gegenlauf von außen, **P9-15** ist der
-authentifizierte Latenzvergleich und gehört an den **Deploy-Tag** (`health_gate.sh` macht genau
-diese Aufrufe), **eine** hängt an D1. **P9-13/V150 standen zwei Sessions auf ⚠️ „1 von 2 Konten"** — niklas läuft
-über die neue Domain, das zweite Konto ist ein Konto, kein Code
-als zurückgestelltem Backlog-Posten (P9-27, natives macOS-Vollbild). **Kein ⬜ ist offene
-Code-Arbeit** — und seit dem **2026-10-04** ist **kein ⬜ ein Personenschritt** mehr: P9-13/V150
-(das zweite Claude-Konto) sind auf ⬜ **zurückgestellt und wandern nach P10**, weil ein Schritt, den
-nur ein Mensch mit einem Konto tun kann, kein Blocker ist, sondern ein Termin (Plan §0.1a; die
-Regel steht auch in der Wurzel-`CLAUDE.md` §Working style).** Die drei Zeilen, die am 2026-10-03 durch die Step-D-Probe von ⬜/⚠️ auf ✅ gewandert
+P9-10b und P9-12 sind **beide ✅**. Die 3 offenen Zeilen sind **P9-11, P9-13/V150 und P9-94**,
+und **keine** hängt an A7: P9-11 und P9-94 sind derselbe `nmap`-Gegenlauf von außen
+(Mini-Plan §5), P9-13/V150 ist das zweite Claude-Konto. **Kein ⬜ ist offene Code-Arbeit** — und
+**keiner blockiert die Phase**: P9-11/P9-94 brauchen ein MacBook mit Handy-Hotspot, P9-13 ein
+zweites Konto, und ein Schritt, den nur ein Mensch mit einem Konto tun kann, ist ein Termin, kein
+Blocker (Plan §0.1a; die Regel steht auch in der Wurzel-`CLAUDE.md` §Working style). *Datierte
+Korrektur 2026-10-05, zwei Sätze:* hier stand „**P9-15** ist der authentifizierte Latenzvergleich
+und gehört an den **Deploy-Tag**" — **falsch, die Zeile ist seit dem 2026-10-03 ⚠️ und gemessen**
+(die drei Läufe sind gefahren; der Vergleich gegen 372,9 ms war nicht möglich, V151), und der
+Deploy schließt sie **nicht** (`health_gate.sh` liefert Läufe, kein brauchbares Kriterium).
+Und der Halbsatz „seit dem 2026-10-04 ist **kein ⬜ ein Personenschritt**" war mit P9-94 falsch
+— zwei der drei ⬜ sind genau das. Die drei Zeilen, die am 2026-10-03 durch die Step-D-Probe von ⬜/⚠️ auf ✅ gewandert
 sind, waren vorher ausdrücklich als „strukturell erfüllt, nicht am Gerät belegt" geführt — der
 Unterschied zwischen beidem ist der ganze Gegenstand dieser Matrix.
 
@@ -112,7 +114,7 @@ messbar war — sie sind ✅ mit dem Zusatz „live bewiesen erst mit v3.1.1". D
 
 | # | Kriterium | Stand | Beleg |
 |---|---|---|---|
-| **P9-27** | ESC im Vollbild verlässt den Vollbildmodus und schließt **nichts** — am echten Gerät belegt | ⬜ **Backlog D1, zurückgestellt** | **Nikinger-Entscheidung 2026-09-23.** Der Befund ist geklärt und gegen die Hoffnung: `grep requestFullscreen` findet **nur den Guard selbst** — die App nutzt die Web-Fullscreen-API nirgends, und macOS' natives Vollbild setzt `document.fullscreenElement` per Spezifikation nicht. Für den gemeldeten Fall ist der Guard mit hoher Sicherheit ein No-op. **Kein Fehlschlag als Erfolg verbucht** |
+| **P9-27** | ESC im Vollbild verlässt den Vollbildmodus und schließt **nichts** — am echten Gerät belegt | ⚠️ **erfüllt in anderer Form, seit 2026-10-05 belegt (V188): es ist Betriebssystem-Verhalten, und die Seite kann es nicht verhindern** | **Nikinger-Entscheidung 2026-09-23 (zurückstellen) und 2026-10-05 (kein Code, D1 damit geschlossen)**. Die Zeile ist nicht erfüllt *worden*, sie ist **gegenstandslos geworden**: „am echten Gerät belegt" bleibt für das native macOS-Vollbild offen (P9-28 belegt nur die Web-API-Seite des Guards), aber die **Frage, die dahinter stand — kann die Seite etwas tun? — ist beantwortet: nein.** Vier Belege, jeder mit Ort: **(1) Der Anwendungsfall ist gar nicht die Web-API.** `grep -rn fullscreen phase5_ui/webui/static/js/app.js` liefert **eine** Zeile: `app.js:259`, `if (document.fullscreenElement) return;`. Die App ruft `requestFullscreen()` nirgends auf ⇒ der gemeldete Fall (grüner Knopf / Ctrl+Cmd+F) ist natives macOS-Vollbild, und dafür gibt es keine Web-API: `document.fullscreenElement` bleibt `null`, kein `fullscreenchange`. **Der Guard ist für genau diesen Fall ein No-op** — das stand hier bisher als Vermutung („mit hoher Sicherheit"), es ist jetzt gemessen. **(2) Der Ausgang ist absichtlich nicht in der Hand der Seite.** WHATWG *Fullscreen API* §4 UI: *„The user agent may end any fullscreen session without a close request or call to `exitFullscreen()` whenever the user agent deems it necessary."* §8 Security and Privacy: *„User agents should provide a means of exiting fullscreen that always works and advertise this to the user. This is to prevent a site from spoofing the end user by recreating the user agent or even operating system environment when fullscreen."* Der Ausgang ist die Anti-Spoofing-Garantie — **eine Seite, die ihn unterdrückt, ist per Spezifikation die Fälschung, nicht die Rettung.** **(3) Der einzige Hebel, den die Seite hätte, verschiebt nur — und er darf nie abschalten.** WICG *Keyboard Lock* §7 Security: *„the user agent MUST provide a way for the user to exit from keyboard lock **even if all of the keys are requested by the API**"* (+ langes ESC > 2 s). §3.2: *„If the key is held for 2 seconds, then exit from the keyboard handler and pass the key on to the user agent for normal processing (which will exit fullscreen (and pointer lock, if active))."* WHATWG Fullscreen §6: *„User agents should reserve an additional input for the purposes of exiting fullscreen"*, und wörtlich zum Muster: *„user agents that use the Esc key to exit fullscreen use keyboard lock to prevent immediate exit on key press, and instead require a long press to exit fullscreen."* MDN `Element.requestFullscreen()`: *„Browsers are expected to provide an alternative mechanism for exiting fullscreen mode when keyboard lock is enabled. Most browsers use the Esc key to exit normal fullscreen mode, and a long-press Esc key to exit keyboard lock."* **(4) Und dieser Hebel ist für den macOS-Fall doppelt unbrauchbar** — genau die Aussage, die im Plan §4 **aus dem Gedächtnis** stand: **(a)** Keyboard Lock gilt nur für **JS-initiiertes** Vollbild, WICG §4.2 wörtlich: *„the Keyboard Lock API is only valid when a JavaScript-initiated fullscreen is active. During F11 fullscreen, no Keyboard Lock processing of keyboard events will take place."* **(b) Browser-Support, heute gemessen** an MDNs `browser-compat-data` (`api/Navigator.json`, `api/Keyboard.json`, Branch `main`): `navigator.keyboard`, `Keyboard.lock`, `Keyboard.unlock` → Chrome ab 68, Edge/Opera/Chromium `mirror`, **`firefox: false`**, **`safari: false`** (damit auch `safari_ios`/`webview_ios` über `mirror`). **Auf dem Gerät, um das es geht, existiert die API nicht.** *Was das für P9-28 heißt:* dessen ✅ bleibt gültig — der Guard ist im Web-Vollbild genau richtig und am Browser beider Richtungen belegt; P9-27 und P9-28 sind zwei verschiedene Fragen. **Kein Fehlschlag als Erfolg verbucht** — und **kein Code gebaut** (Plan §4, Nikinger-Entscheidung 2026-10-05) |
 | **P9-28** | ESC außerhalb des Vollbilds verhält sich unverändert wie vor P9 | ✅ **am 2026-10-03 im Browser belegt** (`p9_step_d_probe.json`, Stationen 8+9) | Beide Richtungen, und das gesetzte `fullscreenElement` ist im selben Lauf **gemessen**, nicht behauptet: ohne → ESC schließt das Item (`offen=True` → `zu=True`), mit → es schließt **nichts**. War bis heute „strukturell erfüllt, nicht am Gerät belegt". **Gegenprobe G2** (Guard raus) → genau Station 9 rot. *Grenze:* der Browser verlässt im Automationslauf bei ESC **nicht** den Vollbildmodus — synthetische Tastendrücke lösen seinen Exit nicht aus; geprüft ist die App-Seite des Guards |
 | **P9-29** | Ein Item lässt sich aus einem Ordner auf die Space-Zeile zurückziehen | ✅ **am 2026-10-03 im Browser belegt** (`p9_step_d_probe.json`, 12 Stationen) | Drei Teile, weil ein Zug drei Fehler haben kann: **(a)** die Ereigniskette kam vom Browser — `dragstart=1`, `dragover=19`, `drop=1`, Item-ID im `dataTransfer` (ohne diese Station bewiesen die anderen nur den Listener); **(b)** der Serverzustand: `GET …/{id}` → `folder: ""`; **(c)** die Liste: 3 → 2 Zeilen, Toast „Verschoben nach (Space-Wurzel)". Ohne Restschaden belegt: die Gegenrichtung (Wurzel → Ordner, 1 PATCH) und der Leerlauf-Riegel `tree.js:139` (Drop kommt an, `drop=1`, aber **0** PATCH — an der Request-Zahl gemessen). **Gegenprobe G1** (Space-Bindung raus) → 5 Stationen rot, **6–9 grün** |
 | **P9-30** | Der Drop-Zustand ist sichtbar | ✅ **am 2026-10-03 im Browser belegt** (`p9_step_d_probe.json`, Stationen 3+4) | Nicht „die Klasse ist gesetzt", sondern **wie sie aussieht**: berechneter Stil am Ziel im Zug — `dashed`, `rgb(62,141,243)` = `--accent`, auf der Space-Zeile, die sonst keine gestrichelte Kante hat. Bilder `p9_step_d_04_dragover_space_zeile.png` (im Zug) gegen `…_05_nach_dem_zug.png` (Toast, Zähler 3 → 2, ohne Kante). Station 4 prüft das **Wieder-Verschwinden** und bleibt in G1 grün, weil ihre Aussage eine *Abwesenheit* ist — kein Loch, sondern die Aussage |
@@ -347,15 +349,17 @@ die Sorte Falschheit, die diese Matrix verhindern soll.
 | V185 | Welche Optik meinen die Menüknöpfe — „Verschieben" oder die Baumzeile? | ✅ | **beantwortet 2026-10-05 per Bild: die Baumzeile `.tree__folder`** („Offen"), nicht „Verschreiben". P9-AF wurde danach korrigiert, und die Umsetzung **verwendet die Klasse** statt die Optik zu kopieren — sonst wäre die dritte Variante entstanden, die P9 am 2026-10-01 bei `.account-nav` erst entfernt hat |
 | V186 | Öffnet das Update-Banner heute `#update-log-dialog`? | ✅ | **nein.** Das Banner trägt **einen** Knopf, „Verstanden" (`#update-banner-dismiss`), und keinen zweiten Weg ins Log. Plan §3 Schritt 1 sprach von einem „Alle Updates ansehen" — das war eine Annahme über ein Bedienelement, das es nicht gibt. Der einzige Weg ist der Menüpunkt |
 | V187 | Welche historischen Proben sprechen die alten Overlay-IDs an? | ✅ | **zwei Skripte, beide mit datiertem Kopfvermerk, keines umgebaut** (Plan §3 Schritt 5): `phase8_6_ui_polish/scripts/p86_block_b_self_check.py` (wartet auf `#account-dialog:not([hidden])`) und `phase8_ui_graph/scripts/p8_16_glass_fallback_probe.py` (drei Zugriffe). **Ein umgebauter historischer Beleg beweist nichts mehr über den Block, für den er steht** — dieselbe Begründung wie bei den gegen Proben. `p86_block_h_self_check.py`/`_h_r_*`/`p86_polish_smoke.py` erwähnen `.account-nav` nur im Kommentar bzw. als Klassenabfrage und laufen weiter |
-| V188 | Ist das Beenden des macOS-Vollbilds per ESC Betriebssystem- oder Browser-Verhalten, und kann die Seite es verhindern? | ⬜ **offen, kein Code** | Der Plan hat die Richtung klargestellt: *kein* Code, sondern **eine Quelle**. Der Keyboard-Lock-Ansatz (`requestPointerLock`-Zeitfenster) ist **aus dem Gedächtnis und nicht nachgelesen** — es steht in keiner Repo-Datei, dass er existiert oder dass er Chromium-only ist. **P9-27/D1 bleibt ⚠️**, bis eine belegte Quelle vorliegt; bis dahin ist die Matrix die Aussage, nicht eine Erinnerung |
+| V188 | Ist das Beenden des macOS-Vollbilds per ESC Betriebssystem- oder Browser-Verhalten, und kann die Seite es verhindern? | ✅ **beantwortet 2026-10-05, vier Quellen, eine davon am Repo gemessen** | **Betriebssystem-Verhalten; die Seite kann es nicht verhindern, nur verschieben — und die Verschiebung existiert auf dem MacBook nicht.** Die vollständige Beweiskette mit wörtlichen Zitaten und Fundstellen steht in der **P9-27-Zeile** (sie ist derselbe Sachverhalt, und die Quelle gehört nicht an zwei Stellen). In Kurzform: `app.js:259` ist der einzige `fullscreen`-Bezug der App, die Web-API greift im nativen macOS-Vollbild nicht · WHATWG Fullscreen §4/§6/§8 halten fest, dass ein **immer wirkender** Ausgang Pflicht ist (Anti-Spoofing) und dass Keyboard Lock ihn nur von „Tastendruck" auf „langer Tastendruck" verschiebt · WICG Keyboard Lock §7 **darf** den Ausgang nicht abschalten, auch nicht bei *allen* angeforderten Tasten · §4.2 schließt F11/natives Vollbild aus, und MDN-`browser-compat-data` sagt `safari: false`. **Die Plan-Aussage „nur in Chromium" ist damit nicht geglaubt, sondern gemessen — und für den Anwendungsfall schärfer: gar nicht vorhanden.** **P9-27 ist damit ⚠️, D1 ist geschlossen** (Plan §4, Nikinger-Entscheidung 2026-10-05: *kein Code*) |
 
-**Bilanz: 38 belegte Einträge — 34 ✅ · 1 ⚠️ · 3 ⬜.** *(Stand 2026-10-05, settings-Block: V185/V186/V187
-beantwortet ⬜→✅, V188 neu und offen. Die Zahl **40** von 2026-10-03 war der Nummernbereich; sie stimmt
+**Bilanz: 38 belegte Einträge — 35 ✅ · 1 ⚠️ · 2 ⬜.** *(Stand 2026-10-05, nach V188: die Matrix-Bilanz des
+settings-Blocks war 34 ✅ · 1 ⚠️ · 3 ⬜ — V185/V186/V187 ⬜→✅, V188 neu und offen; V188 ist heute
+beantwortet, die übrigen beiden ⬜ sind V150 (zweites Konto, wandert nach P10) und V162 *(Lesart
+A)* (eine live noch nicht beobachtete Löschung). Die Zahl **40** von 2026-10-03 war der Nummernbereich; sie stimmt
 jetzt zufällig wieder, weil vier belegte Nummern dazukamen und sechs weiterhin reserviert sind — eine
 Koinzidenz, keine Bestätigung. Die Regel zählt Zeilen, nicht Bereiche.)* **Zählregel, ausdrücklich:** eine doppelt
 vergebene Nummer (V162, V163) zählt **einmal**, und zwar mit ihrer **Lesart A**; die Tabelle hat
 deshalb 36 Markerzeilen plus die reservierte Bereichszeile V167–V172 = 37. Wer nach der
-Zeilen-Lesart zählt, kommt auf 30 ✅ · 3 ⚠️ · 3 ⬜. *Datierte Korrektur 2026-10-03:* hier stand
+Zeilen-Lesart zählt, kommt auf 31 ✅ · 3 ⚠️ · 2 ⬜. *Datierte Korrektur 2026-10-03:* hier stand
 **28 ✅ · 3 ⚠️ · 3 ⬜** — die Summe 34 stimmte, die beiden anderen Zahlen lagen je eins daneben
 (⚠️ und ⬜ gegeneinander vertauscht), was nach einer Symmetrie aussieht, die es nicht gibt.
 Dazu 6 reservierte, unbelegte Nummern
@@ -407,3 +411,18 @@ trace-Block kommt mit, **kein** Index-Neuaufbau) — schließt V164 und P9-15, d
 macht die authentifizierten `/api/v1/overview`-Läufe, die P9-15 gegen **372,9 ms** stellt · (3)
 Rest Gate/Z: Übersichtsgrafik §12.4 (**gerendert und angesehen**), `docs/INDEX.md` rotieren,
 ROADMAP-Zeile, Phase auf ✅. Herleitung im Phase-Head und in `SESSIONS_ARCHIVE.md`.
+
+**[2026-10-05, zwei Korrekturen an diesem datierten Block — er bleibt als Momentaufnahme stehen,
+die Sache stimmt an zwei Stellen nicht mehr:]**
+
+1. **Schritt (2) ist erledigt, aber er hat nicht geschlossen, was er schließt.** `v3.1.1` ist am
+   2026-10-03 live, **V164 ✅** — und **P9-15 bleibt ⚠️**: das dort genannte Kriterium stellt gegen
+   **372,9 ms**, und dieser Wert ist nie über Funnel gemessen worden (V151: in-process auf
+   synthetischem Bestand, 8,3× zu niedrig). `health_gate.sh` liefert also **Läufe ohne
+   Kriterium**; der Deploy vom 2026-10-03 hat P9-15 nicht geschlossen, und der Satz hier
+   behauptet es. Die Zeile selbst (oben) war schon am selben Tag korrekt auf ⚠️.
+2. **„Offen bleibt allein P9-27" ist seit heute überholt.** P9-27 ist ⚠️ (V188 beantwortet, vier
+   Quellen), und **D1 ist geschlossen** (Nikinger-Entscheidung 2026-10-05: *kein Code*). Was bleibt,
+   ist **nicht automatisierbar** und damit **kein offener Punkt**: natives macOS-Vollbild hat keine
+   Web-API, und der Guard `app.js:259` ist dafür nachweislich ein No-op — gemessen, nicht vermutet.
+
