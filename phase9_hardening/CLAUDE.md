@@ -190,9 +190,22 @@ Doppel-Listener", sondern **es gibt genau einen Öffner**; Wächter
   (`closeRightmost` schließt alles) → **2 rot** · G3 (implizite Kante nicht verworfen) → **rot**.
   Die statischen Wächter bleiben bei G1 **grün** — genau die Arbeitsteilung, die der Docstring der
   Testdatei begründet: statisch die *Ursache*, im Browser die *Wirkung*.
-- **Bilder angesehen**, nicht nur geschossen: `p9_settings_01…04` (1440 px) und `05` (1024 px). Das
-  Menü misst **202 px** bei `min-width: 0` — der Grund für „viel breiter als nötig" ist weg; die
-  Feldreihenfolge mit TOTP **zuletzt** ist im Bild bestätigt; bei 1024 px ist genau ein Panel da.
+- **Bilder angesehen**, nicht nur geschossen — **6 von 7**, und die siebte hat eine **Fehlaussage**
+  produziert (siehe unten): `01`, `02`, `03`, `04`, `07` (1440 px) und `05` (1024 px). Das Menü misst
+  **202 px** bei `min-width: 0` — der Grund für „viel breiter als nötig" ist weg; die Feldreihenfolge
+  mit TOTP **zuletzt** ist im Bild bestätigt; bei 1024 px ist genau ein Panel da.
+- **Befund am Werkzeug, nicht am Produkt: das lokale Vision-Modell ist für zustandsabhängige Fragen
+  unbrauchbar.** `p9_settings_06` (nach dem Passwortwechsel) hat es zweimal nicht beantwortet: der
+  erste Lauf riss die Token-Grenze (`done_reason: length`, leere Antwort), der zweite meldete, der
+  Menüpunkt **„alpha"** sei blau markiert — „alpha" ist **kein Menüpunkt**, sondern die Zeile in der
+  Rail, und nach dem Wechsel trägt **kein** Menüpunkt `aria-current` (gemessen:
+  `sichtbare_panels == ['settings-menu']`, alle drei `aria-current="false"`). Für **Layout**-Fragen
+  (welche Panels stehen nebeneinander, in welcher Reihenfolge, wie breit, gibt es Leerfläche) war
+  das Modell bei **sechs von sieben** Bildern richtig und nützlich. **Die Regel daraus:** das Bild
+  belegt *Wirkung*, nie *Zustand* — und die Abnahmezeile P9-92 sagt jetzt ausdrücklich „6 von 7",
+  statt eine Zahl zu behaupten, die ich nicht geprüft hatte. Das ist dieselbe Regel wie bei
+  `test_committed_probe_evidence.py`: eine Aussage über einen Beleg, den man nicht angesehen hat,
+  ist eine Behauptung.
 - **Die Gegenlauf-Bilder sind gelöscht, nicht eingecheckt.** Sie hießen `p9_settings_g1*`/`g2*` und
   lagen im selben Verzeichnis wie die Erfolgsbelege — der Fehler, den der trace-Block am 2026-10-02
   gemacht hat, wäre sonst wiederholt worden. Die **JSON**-Gegenläufe sind rot eingecheckt
