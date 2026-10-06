@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import re
 from html import unescape
+from pathlib import Path
 
 from webui.config import DEFAULT_STATIC_DIR
 
@@ -197,7 +198,22 @@ def _tokens() -> set[str]:
 # Mitte), und **nur** mit dem Wert der Sammelregel. `padding` als Kurzform sowie
 # `padding-top`/`padding-bottom`/`padding-right` bleiben verboten: sie tragen die **Höhe**,
 # und die Höhe ist das, was P9-AF an die Baumzeile bindet.
+#
+# **[2026-10-06, P9-BB: die Ausnahme von oben ist damit fällig — und die Liste wächst um vier
+# Eigenschaften, damit das nicht durch eine Lücke geht.]**
+#
+#   * `padding-block` ist **erlaubt, aber nur mit dem einen gelockten Wert**
+#     (`ERLAUBTES_PADDING_BLOCK_PRO_SELECTOR`). Der Menüpunkt ist seit P9-BB **flacher**
+#     (4 px statt 6 px oben/unten; gemessene Höhe 35,69 px → 31,69 px), und das ist die erste
+#     bewusste Abweichung von P9-AFs „Höhe aus `.tree__folder`". Das Gegenstück dazu ist der
+#     Wächter: er erlaubt nicht die Eigenschaft, sondern den **Wert**.
+#   * **`padding-block` stand vorher auf keiner Liste.** Eine Eigenschaft, die kein Wächter kennt,
+#     meldet kein Wächter — die Lücke ist hier ausdrücklich geschlossen: die Langformen
+#     `padding-block-start`/`-end` stehen jetzt auf der Verbotsliste und ebenso die logischen
+#     Längsformen `padding-inline*`, die sonst der Umweg um `padding-left` wären.
 VERBOTENE_OPTIK = ("height", "padding", "padding-top", "padding-bottom", "padding-right",
+                    "padding-block-start", "padding-block-end",
+                    "padding-inline", "padding-inline-start", "padding-inline-end",
                     "border-radius", "font", "margin", "line-height", "border")
 # **[2026-10-05, P9-AV]** Zwei Eigenschaften sind aus dieser Liste **heraus** und in je einer
 # Form wieder eingeschleust worden — nicht pauschal erlaubt:
@@ -234,6 +250,16 @@ ERLAUBTES_PADDING_LEFT = "var(--space)"
 ERLAUBTES_PADDING_LEFT_PRO_SELECTOR = {
     ".settings-menu__item": "var(--space)",
     ".settings-space-row": "0",
+}
+# **[2026-10-06, P9-BB]** Das vertikale Polster ist je Selektor **geschlossen** geregelt: der
+# Menüpunkt darf genau **einen** Wert setzen, die Space-Zeile **keinen**. `None` heißt „diese
+# Eigenschaft hat hier nichts verloren" — und das ist eine Aussage, kein Versehen: die Space-Zeile
+# ist eine Baumzeile mit Linkspolster 0, ihre Höhe kommt aus derselben Sammelregel wie beim
+# Menüpunkt **vor** P9-BB. Ein `padding-block` an der Zeile wäre eine dritte Höhenquelle, und
+# genau die hat P9-AF abgeschafft.
+ERLAUBTES_PADDING_BLOCK_PRO_SELECTOR = {
+    ".settings-menu__item": "calc(var(--space) * 0.5)",
+    ".settings-space-row": None,
 }
 
 
@@ -309,13 +335,21 @@ def _schatten_verstoss(body: str) -> list[str]:
 
 
 def _optik_verstoss(body: str, tokens: set[str], erlaubte_color: str | None = None,
-                    erlaubtes_padding_left: str = ERLAUBTES_PADDING_LEFT) -> list[str]:
-    """Alle Verstoesse eines Regel-Bodys: verbotene Eigenschaften, und erlaubte Eigenschaften
-    mit einem Wert, der **kein** vorhandenes Token ist.
+                    erlaubtes_padding_left: str = ERLAUBTES_PADDING_LEFT,
+                    erlaubtes_padding_block: str | None = None) -> list[str]:
+    """Alle Verstoesse eines Regel-Bodys: verbotene Eigenschaften, erlaubte Eigenschaften
+    mit einem Wert, der **kein** vorhandenes Token ist, und die beiden Polster-Ausnahmen mit
+    ihrem je Selektor gelockten Wert.
 
     Der zweite Teil ist der Grund, warum „erlaubt" nicht genug waere: `background: #0C1015`
     waere formal erlaubt und waere genau die dritte Variante, die P9-AF abschaffen wollte — nur
-    eben eine fuer die Farbe statt fuer die Optik."""
+    eben eine fuer die Farbe statt fuer die Optik.
+
+    **`padding-block` wird hier und nicht in `ERLAUBTE_OPTIK` behandelt:** es ist die einzige
+    erlaubte Eigenschaft, die **nur einen Token-Ausdruck** haben darf und sonst nichts — der
+    Token-Check der Sammelliste wuerde jede andere Form (etwa `4px` ohne `--space`) durchlassen
+    bzw. die richtige Form als „kein Token" melden. Deshalb steht es mit einem **eigenen**
+    Vergleich da, genau wie `padding-left` (2026-10-06, P9-BB)."""
     verstoesse: list[str] = []
     for prop in VERBOTENE_OPTIK:
         if re.search(rf"(^|[;{{\s]){prop}\s*:", body):
@@ -326,6 +360,15 @@ def _optik_verstoss(body: str, tokens: set[str], erlaubte_color: str | None = No
         wert = match.group(2).strip()
         if erlaubte_color is None or wert != erlaubte_color:
             verstoesse.append(f"color: {wert!r} (erlaubt ist nur der Wert aus .btn-primary)")
+    # `padding-block`: **nur** mit dem gelockten Wert dieses Selektors (P9-BB). `None` oder ein
+    # anderer Wert ist ein Verstoess — auch das Fehlen einer Ausnahme wird damit geprueft.
+    for match in re.finditer(r"(^|[;{\s])padding-block\s*:\s*([^;]*)", body):
+        wert = match.group(2).strip()
+        if wert != erlaubtes_padding_block:
+            verstoesse.append(
+                f"padding-block: {wert!r} (erlaubt ist hier nur "
+                f"{erlaubtes_padding_block!r})"
+            )
     for match in re.finditer(rf"(^|[;{{\s])({"|".join(ERLAUBTE_OPTIK)})\s*:\s*([^;]*)", body):
         prop, wert = match.group(2), match.group(3).strip()
         if prop == "text-align":
@@ -463,8 +506,19 @@ def test_settings_menu_items_reuse_the_tree_row_look():
     erlaubt: nur auf der Auswahlregel, nur mit dem Wert aus `.btn-primary` (gelesen, nicht
     abgetippt), und ein **äußerer** Schatten bleibt verboten.
 
-    Die Formulierung „keine eigene Optik" wäre nach diesen Änderungen eine Unwahrheit, deshalb
-    steht der alte Satz nicht mehr im Docstring, sondern wird hier ausdrücklich abgelöst."""
+    *Dritter Umbaut (P9-BB, 2026-10-06, **wieder auf Nikinger-Anordnung**):* zu *„the update-log
+    button is still bigger, I think you need to decrease its height"* hat er **(b)** gewählt —
+    *zusätzlich flacher*, also ein eigenes vertikales Polster (`padding-block`, 4 px). Damit ist
+    die Höhe des Menüpunkts zum ersten Mal **nicht mehr** die der Baumzeile (31,69 px gegen
+    35,69 px, gemessen), und „P9-AF bindet die Höhe an `.tree__folder`" ist damit **an dieser
+    einen Stelle überholt**. Der Wächter gibt der Eigenschaft nicht das Recht, sondern den
+    **Wert**: `padding-block: calc(var(--space) * 0.5)` am Menüpunkt, sonst nirgends.
+
+    **Was P9-AF weiterhin bindet** und dieser Wächter weiterhin prüft: die drei Punkte tragen
+    `.tree__folder` im Markup, und **keine eigene** Rundung, Schrift, Höhe, kein `margin`, kein
+    `border`, kein **äußerer** Schatten, keine eigene Textfarbe außer auf der Auswahlregel.
+    Die Formulierung „keine eigene Geometrie" wäre seit P9-AN eine Unwahrheit, und seit P9-BB
+    erst recht — sie steht deshalb nicht mehr im Docstring, sondern wird hier abgelöst."""
     html = _html()
     css = _css()
     for element_id, _ in MENU_ITEMS:
@@ -486,7 +540,8 @@ def test_settings_menu_items_reuse_the_tree_row_look():
             verstoesse = _optik_verstoss(
                 body, tokens,
                 erlaubte_color if ist_auswahl else None,
-                ERLAUBTES_PADDING_LEFT_PRO_SELECTOR[selector])
+                ERLAUBTES_PADDING_LEFT_PRO_SELECTOR[selector],
+                ERLAUBTES_PADDING_BLOCK_PRO_SELECTOR[selector])
             assert not verstoesse, (selector, verstoesse, body)
             flaeschen_woerter += len(re.findall(r"(^|[;{\s])background\s*:", body))
     # **Und die Flaeche, die P9-AV verlangt, ist auch da.** Ein Wächter, der nur verbietet,
@@ -502,10 +557,11 @@ def test_settings_menu_items_reuse_the_tree_row_look():
 def test_the_menu_item_watchdog_bites_on_built_in_violations():
     """**Der Wächter wird an eingebauten Verstößen geprüft, nicht an vertrauensvollem Code.**
 
-    Zehn Zeilen, die keine Phase-9-Datei enthält, deren jede aber rot werden muss. Grund: P9-AN
+    Fünfzehn Zeilen, die keine Phase-9-Datei enthält, deren jede aber rot werden muss. Grund: P9-AN
     hat diesen Wächter von einem *Verbot* auf eine *Erlaubnis mit Bedingung* umgestellt
     (`background` ist erlaubt, `background: #0C1015` nicht), und P9-AV hat `box-shadow` und
-    `color` in derselben Weise entschärft (Innenschatten erlaubt, äußerer nicht). Ein Verbot kann
+    `color` in derselben Weise entschärft (Innenschatten erlaubt, äußerer nicht), und P9-BB hat
+    mit `padding-block` eine ganze Eigenschaft dazugebracht. Ein Verbot kann
     man lesen und glauben; eine Erlaubnis mit Bedingung prüft man nur, indem man die Bedingung
     verletzt — sonst steht am Ende ein Wächter, der alles erlaubt, was niemand verboten hat.
 
@@ -515,9 +571,17 @@ def test_the_menu_item_watchdog_bites_on_built_in_violations():
     und einmal mit der Farbe aus `.btn-primary` **in einer Nicht-Auswahlregel** (muss ebenfalls
     rot werden — sonst wäre die Ausnahme so breit wie der Wächter).
 
-    Der vierte Fall ist der eigentliche Fund dieser Zeile: `:not([aria-current="true"])` ist
+Der vierte Fall ist der eigentliche Fund dieser Zeile: `:not([aria-current="true"])` ist
     **keine Zustandsregel** (sonst wäre P9-AN mit P9-AO in Konflikt), wohl aber eine **eigene**
-    (sonst umginge sie diesen Wächter). Genau das prüft `_ist_eigene_regel()`."""
+    (sonst umginge sie diesen Wächter). Genau das prüft `_ist_eigene_regel()`.
+
+    **[2026-10-06, P9-BB: vier Fälle dazu, und einer davon ist der wichtigste.]**
+    `padding-block` stand bis eben auf **keiner** Liste — weder verboten noch erlaubt, also von
+    beiden Seiten unbewacht, und genau dort hat der Bau seine erste eigene Höhe gesetzt. Drei neue
+    Verbote (`padding-block` mit anderem Wert, die Langform `padding-block-start`, und die
+    logische Längsform `padding-inline-start` als Umweg um `padding-left`) und **eine** neue
+    Erlaubnis. Der wichtigste Fall ist der letzte Absatz: der gelockte Wert ist am Menüpunkt
+    grün und an der Space-Zeile rot — eine Erlaubnis, die überall gilt, wäre keine Ausnahme."""
     tokens = _tokens()
     erlaubte_color = _farbe_von_btn_primary(_css())
     verstoesse = {
@@ -533,6 +597,10 @@ def test_the_menu_item_watchdog_bites_on_built_in_violations():
         "Farbe statt Token": "background: #0C1015;",
         "erfundenes Token": "background: var(--sunken-tiefer);",
         "falscher Text-align": "text-align: middle;",
+        # P9-BB: die neue Eigenschaft in drei Formen, in denen sie **nicht** durchlässt.
+        "polster-block mit anderem Wert": "padding-block: 10px;",
+        "polster-block als Langform": "padding-block-start: 4px;",
+        "polster-inline als Umweg um padding-left": "padding-inline-start: 40px;",
     }
     for name, body in verstoesse.items():
         assert _optik_verstoss(body, tokens), f"der Wächter meldet {name!r} ({body}) nicht"
@@ -542,6 +610,18 @@ def test_the_menu_item_watchdog_bites_on_built_in_violations():
                "box-shadow: inset 0 1px 0 rgba(255,255,255,.06);")
     for body in erlaubt:
         assert not _optik_verstoss(body, tokens), f"{body!r} wird zu Unrecht gemeldet"
+    # **P9-BB: der gelockte vertikale Polster ist am Menüpunkt grün …**
+    pb = ERLAUBTES_PADDING_BLOCK_PRO_SELECTOR[".settings-menu__item"]
+    assert not _optik_verstoss(f"padding-block: {pb};", tokens, erlaubtes_padding_block=pb), (
+        f"der gelockte Wert {pb!r} wird am Menuepunkt zu Unrecht gemeldet — P9-BB waere nicht baubar"
+    )
+    # … und an der **Space-Zeile** rot, denn dort hat die Eigenschaft nichts verloren.
+    assert _optik_verstoss(f"padding-block: {pb};", tokens,
+                           erlaubtes_padding_block=(
+                               ERLAUBTES_PADDING_BLOCK_PRO_SELECTOR[".settings-space-row"])), (
+        "dieselbe Deklaration ist an der Space-Zeile erlaubt — die Ausnahme waere so breit wie "
+        "der Wächter"
+    )
     # Und die **Auswahlregel** darf die Farbe aus `.btn-primary` tragen — sonst wäre P9-AV nicht
     # baubar, und das wäre eine Regel, die den Bau verhindert statt ihn zu prüfen.
     assert not _optik_verstoss(f"color: {erlaubte_color};", tokens, erlaubte_color), (
@@ -1208,3 +1288,191 @@ def test_the_two_input_rows_stop_being_staircases():
     # `margin: 0` ist Teil desselben Satzes: der Titelabstand (24 px, P9-AM) muss der einzige
     # bestimmende Wert bleiben, sonst haengt P9-96/P9-101 an einem Browser-Standard.
     assert _eigenschaft(mitglieder[0], "margin") == "0", mitglieder[0]
+
+
+# --- Block „Kästchen enger" (Plan §12.1, Locks P9-BB/BC/BD/BE, Abnahme P9-116 – P9-119) ---------
+
+def test_the_menu_points_are_flatter_and_keep_their_width():
+    """P9-BB (2026-10-06, Nikinger zu Bild 01: *„the update-log button is still bigger, I think
+    you need to decrease its height"*, Antwort **(b)**: *zusätzlich flacher*).
+
+    **Gemessen vorher:** alle drei Punkte **35,69 px** hoch (Polster 6 px oben/unten aus der
+    Sammelregel, Zeilenkasten 21,69 px, 2 px Rahmen) — an einem Bild, in dem **nichts**
+    ausgewählt war, und also **ohne** einen Zustand, der die Höhe erklärt. **Gemessen nachher:**
+    **31,69 px**. Die Breite ist **nicht** Teil dieses Locks: das „kästchen enger" aus Bild 08 hat
+    der Nikinger ausdrücklich **nur für „Spaces verwalten"** verlangt (P9-BA damit **widerrufen**,
+    siehe `test_only_the_spaces_panel_is_narrower()`), also behalten die Menüpunkte ihre
+    `width: 100%` und ihre mittige Beschriftung (P9-AP, P9-99).
+
+    Der Wächter prüft **beide** Richtungen: die Höhe ist kleiner (P9-BB), **und** Breite,
+    Zentrierung und linkes Polster sind unangetastet (P9-AV/P9-AP/P9-AX). „Der Menüpunkt ist
+    schmaler geworden" wäre eine stille Verletzung von P9-AF, und „er ist flacher" eine stille
+    Verletzung von P9-AP — beide Richtungen stehen deshalb hier."""
+    css = _css()
+    basis = _bare_rule_bodies(".settings-menu__item")
+    assert len(basis) == 1, f"genau eine nackte Regel fuer .settings-menu__item erwartet: {len(basis)}"
+    assert _eigenschaft(basis[0], "width") == "100%", (
+        f"die Menuepunkte sind nicht mehr auf Panelbreite gestreckt — P9-BA wurde am 2026-10-06 "
+        f"auf 'nur bei Spaces verwalten' eingeschraenkt, die Breite gehoert unveraendert: {basis[0]}"
+    )
+    menue = [b for erster, selectors, b in _alle_regeln()
+             if erster == ".settings-panel--menu .settings-menu__item"]
+    assert len(menue) == 1, f"genau eine Regel fuer den Menuepunkt im Menuepanel: {len(menue)}"
+    regel = menue[0]
+    assert _eigenschaft(regel, "padding-block") == ERLAUBTES_PADDING_BLOCK_PRO_SELECTOR[
+        ".settings-menu__item"], regel
+    # Und die beiden Nachbarn desselben Locks unveraendert:
+    assert _eigenschaft(regel, "justify-content") == "center", regel
+    assert _eigenschaft(regel, "padding-left") == "var(--space)", regel
+
+
+def test_the_space_rows_hug_their_own_label():
+    """P9-BC (2026-10-06, Nikinger zu Bild 08: *„move the button borders a little bit further to
+    the left, leave the text where it is now. Cut the not used space from the right"*).
+
+    **Gemessen vorher:** Kästchen **330 px**, Beschriftungen **84–137 px** ⇒ **192–245 px**
+    Leerraum rechts, bei bereits bündigem Text (P9-AX ✅, 1 px). Gebaut wird genau der
+    Leerraum, nicht der Text: die Zeile umklammert ihr **eigenes** Label.
+
+    # **Der Wert steht an der Liste, nicht an der Zeile** — `align-items: flex-start` auf
+    # `#space-admin-list`. Die Alternative (`width: fit-content` an jeder Zeile) wäre derselbe Wert
+    # an N Orten; und die Zeile muss trotzdem `width: auto` tragen, denn die **Sammelregel** oben
+    # (`.rail__home, …, .settings-space-row, …`) setzt `width: 100%` — das war der Fund des
+    # ersten Gegenlaufs dieses Blocks: die eigene Regel war weg, die Streckung nicht. Genau diese
+    # beiden Richtungen prüft der Wächter (Liste richtet links aus, Zeile hat **keine** 100 %).
+    # `max-width: 100%` ist die einzige Bremse (ein langer Name, P9-U legt die Länge nicht fest,
+    # darf das Panel nicht aufweiten) — und sie wird mitgeprüft, weil ein Wächter, der sie nicht
+    # kennt, sie beim nächsten Umbau verliert."""
+    css = _css()
+    listen = [b for erster, selectors, b in _alle_regeln() if erster == "#space-admin-list"]
+    assert len(listen) == 1, f"genau eine Regel fuer #space-admin-list erwartet: {len(listen)}"
+    assert _eigenschaft(listen[0], "align-items") == "flex-start", (
+        f"die Space-Zeilen stehen wieder auf der vollen Panelbreite — P9-BC waere nicht gebaut: "
+        f"{listen[0]}"
+    )
+    zeilen = [b for erster, selectors, b in _alle_regeln()
+              if erster == ".settings-space-row"]
+    assert len(zeilen) == 1, f"genau eine eigene Regel fuer die Space-Zeile erwartet: {len(zeilen)}"
+    assert _eigenschaft(zeilen[0], "width") == "auto", (
+        f"die Space-Zeile traegt keine eigene Breite — die Sammelregel setzt `width: 100%`, und "
+        f"genau das war der Fund vom 2026-10-06 (28 Kästchen auf 238 px = Panelbreite): {zeilen[0]}"
+    )
+    assert _eigenschaft(zeilen[0], "max-width") == "100%", zeilen[0]
+    # Und der Abstand von P9-AK/P9-AU steht weiter an derselben Regel:
+    assert _eigenschaft(listen[0], "gap") == "var(--space)", listen[0]
+
+
+def test_only_the_spaces_panel_is_narrower():
+    """P9-BE (2026-10-06, Nikinger zu Bild 08, wörtlich: *„nur bei Spaces verwalten, dort die
+    Buttons der einzelnen Spaces nach Links, und das Fenster rechts verkleinern, aber nur
+    dieses"*).
+
+    „**Nur dieses**" ist der Auftrag, nicht die Ausnahme — deshalb prüft der Wächter **beide**
+    Richtungen: die Klasse hängt genau **einem** Panel, und es ist genau das Spaces-Panel; die
+    Basisbreite der anderen Panels bleibt die von `.settings-panel`.
+
+    **Die Breite wird nicht abgetippt, sondern verglichen:** sie muss **kleiner** sein als das
+    `max-width` der Basisregel (gemessen vorher 380 px — das Panel stand an seinem Deckel, Inhalt
+    330 px). Verglichen wird gegen das **`max-width`**, nicht gegen das `min-width` (340 px): ein
+    Vergleich gegen 340 wäre mit 338 px grün und damit **auf der falschen Seite** — genau dieser
+    Fehler stand in der ersten Fassung dieses Tests und in der ersten Fassung der CSS-Regel, weil
+    `min-width` bei `box-sizing: border-box` die Breite **des Rahmens** ist. Die Browser-Probe
+    (S5/P9-118) misst den **Inhalt** und vergleicht ihn am geklonten Schatten.
+    Eine Zahl im Test wäre die zweite Kopie — die Zahl steht in `app.css` neben ihrer Herleitung
+    (Feld + Abstand + Knopf), und die Herleitung ändert sich mit den Beschriftungen.
+
+    **Und der Schmal-Modus (≤1024 px) muss die feste Breite zurücknehmen**, sonst gewinnt die
+    Klassenregel gegen `.settings-panel { flex: 1 }` und das Panel streckt sich nicht mehr. Das
+    ist die zweite Hälfte desselben Locks und der Fall, den die erste Fassung der Regel
+    gebrochen hätte."""
+    html = _html()
+    css = _css()
+    traeger = [re.search(r'\bid="([^"]+)"', tag).group(1) for tag in re.findall(
+        r'<div\b(?=[^>]*\bid="settings-[a-z-]+")(?=[^>]*\bsettings-panel--list\b)[^>]*>', html)]
+    assert traeger == ["settings-spaces"], (
+        f"die feste Panelbreite traegt nicht (nur) #settings-spaces: {traeger}"
+    )
+    basis = [b for erster, selectors, b in _alle_regeln() if erster == ".settings-panel"]
+    # **Zwei** Regeln mit diesem Selektor gibt es: die Basis und die des Schmal-Modus (≤1024 px),
+    # und `_alle_regeln()` unterscheidet sie nicht — es ist eine flache Liste. Unterscheiden
+    # **hier** tut man sie an `flex`: das setzt nur die Media-Query-Regel („Panel flext im
+    # Schmal-Modus"). Die Basis ist damit die ohne, und die ist die, gegen die verglichen wird.
+    basis = [b for b in basis if not _eigenschaft(b, "flex")]
+    assert len(basis) == 1, f"genau eine Basisregel fuer .settings-panel erwartet: {len(basis)}"
+    eigen = [b for erster, selectors, b in _alle_regeln()
+             if erster == ".settings-panel--list"]
+    # Auch hier zwei: die feste Breite und ihre Ruecknahme im Schmal-Modus.
+    assert len(eigen) == 2, (
+        f"genau zwei Regeln fuer .settings-panel--list erwartet (Breite + Ruecknahme im "
+        f"Schmal-Modus): {len(eigen)}"
+    )
+    fest, ruecknahme = eigen[0], eigen[1]
+    schmal, breit = (_eigenschaft(fest, "min-width"), _eigenschaft(fest, "max-width"))
+    assert schmal and schmal == breit, (
+        f"die Breite steht an zwei Werten ({schmal!r} / {breit!r}) — sie ist eine Entscheidung "
+        f"und gehoert an eine Stelle: {fest}"
+    )
+    basis_max = _eigenschaft(basis[0], "max-width")
+    assert float(schmal.removesuffix("px")) < float(basis_max.removesuffix("px")), (
+        f"das Spaces-Fenster erreicht mit {schmal} noch die alte Deckelbreite ({basis_max}) — "
+        "P9-BE waere nicht gebaut"
+    )
+    # **Und im Schmal-Modus ist die feste Breite wieder weg.** Die Media-Query liegt am Ende der
+    # Datei und gewinnt bei gleicher Spezifitaet — ohne diese Regel waere das Panel dort starr.
+    medien = re.search(r"@media \(max-width: 1024px\) \{(.*?)\n\}", _css(), flags=re.DOTALL)
+    assert medien, "die 1024-px-Media-Query fehlt — der Test prueft ins Leere"
+    assert _eigenschaft(ruecknahme, "min-width") == "0", ruecknahme
+    assert _eigenschaft(ruecknahme, "max-width") == "none", ruecknahme
+
+
+def test_the_two_sight_check_criteria_name_the_position_and_the_panel():
+    """P9-BD (2026-10-06, Abnahme **P9-119**): **das Checkkriterium ist Teil des Belegs.**
+
+    Der Befund vom 2026-10-06 war kein Defekt, sondern ein Kriteriumfehler: Bild 04 zeigte die
+    Hinzufügen-Optionen (am eingecheckten PNG nachgewiesen, y 207..231), und der Nikinger
+    fragte *„where did the space hinzufügen options go?"*, weil das Kriterium ihm **nicht sagte,
+    wo im Bild er nachsehen soll**. Ein Bild ohne Ort ist für eine Sichtprüfung wertlos — das ist
+    keine Formulierungsfrage, sondern dieselbe Fehlerklasse wie ein Wächter, der etwas anderes
+    prüft als er behauptet.
+
+    Bild 07 ist derselbe Fall von der anderen Seite: *„I honestly don't see that"* — die Zeile war
+    da, aber **unterhalb des Sichtbereichs**, weil das Panel scrollt. Der Wächter verlangt
+    darum, dass das Kriterium **das Panel** benennt und das **Aufrollen** sagt; dafür steht genau
+    ein Wort als Anker: `scrollIntoView`.
+
+    **Warum der Anker ein Wort und nicht eine Absicht:** die erste Fassung dieses Wächters suchte
+    nur nach `Liste` und `Scroll` — und wurde **an der alten, falschen Zeile grün**, weil dort
+    zufällig „nicht die **Liste**" und „unterhalb des **Sichtbereichs**" stand. Ein Wächter, der
+    an der Formulierung *des Befunds* grün wird, prüft nicht den Auftrag. Der Anker steht
+    deshalb im **Kriterium** (was der Nikinger tun soll), nicht im Urteil (was er sagte).
+
+    **Der Wächter pinnt sonst keine Wortwahl.** Wird das Kriterium umgeschrieben und `scrollIntoView`
+    fehlt, sagt die Fehlermeldung genau, was hineingehört."""
+    readme = (Path(__file__).resolve().parents[2] / "screenshots_latest" / "README.md").read_text(
+        "utf-8")
+    # **Es gibt zwei Tabellen** mit derselben Bild-Nummer: die **Checkkriterien** (was der
+    # Nikinger tun soll) und den **Stand der Sichtprüfung** (was er gesagt hat). Geprüft wird die
+    # **erste** — das ist die, die vor dem Blick auf das Bild gelesen wird. (Die erste Fassung
+    # nahm die letzte und war damit an der Urteilszeile hängen geblieben.)
+    reihen: dict[str, list[str]] = {}
+    for m in re.finditer(r"(?m)^\| `(\d\d_[^`]+)`.*$", readme):
+        reihen.setdefault(m.group(1), []).append(m.group(0))
+    for nummer in ("04_", "07_"):
+        assert [k for k in reihen if k.startswith(nummer)], (
+            f"im README steht keine Tabellenzeile fuer {nummer}: {sorted(reihen)}"
+        )
+    kriterium_04 = reihen[next(k for k in reihen if k.startswith("04_"))][0]
+    assert re.search(r"\by\s*[^0-9]{0,3}\d{3}", kriterium_04), (
+        "das Kriterium zu Bild 04 nennt keine Pixelposition — der Nikinger hat genau danach "
+        f"gesucht und es nicht gefunden: {kriterium_04}"
+    )
+    kriterium_07 = reihen[next(k for k in reihen if k.startswith("07_"))][0]
+    assert "scrollIntoView" in kriterium_07, (
+        "das Kriterium zu Bild 07 sagt nicht, dass die neue Zeile vor dem Screenshot mit "
+        f"`scrollIntoView` aufgerollt wird — genau daran ist sie im Bild vom 2026-10-06 "
+        f"unsichtbar geblieben: {kriterium_07}"
+    )
+    assert re.search(r"Liste|#space-admin-list", kriterium_07), (
+        f"das Kriterium zu Bild 07 nennt das Panel nicht, in dem die Zeile steht (die "
+        f"Space-Liste, nicht das Detail-Panel): {kriterium_07}"
+    )

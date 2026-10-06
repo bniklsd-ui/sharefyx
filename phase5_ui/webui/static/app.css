@@ -1925,6 +1925,40 @@ select.input:focus {
   width: 560px;
 }
 
+/* P9-BE (2026-10-06, Nikinger zu Bild 08, wörtlich: *„nur bei Spaces verwalten, dort die Buttons
+   der einzelnen Spaces nach Links, und das Fenster rechts verkleinern, aber nur dieses"*):
+   **nur** dieses Panel wird schmaler. Menü, Passwort, Detail und Update-Log behalten ihre Breite —
+   das „nur dieses" ist der Auftrag, nicht die Ausnahme.
+
+   **Die Breite ist hergeleitet, nicht geschätzt.** Das Panel stand am `max-width` (380 px **als
+   Ganzes**, Inhalt 330 px), und **gemessen** ist, woran das liegt: die Anlegezeile verlangt Knopf
+   142 px + 8 px Abstand, und das **Eingabefeld daneben hat seinen Default-`size`** — bei
+   `width: fit-content` zieht das Feld die Breite auf ~180 px, also hält es das Panel auf seinem
+   Deckel fest. Eine „so schmal wie der Inhalt"-Regel kann das Fenster also gar nicht verkleinern;
+   nur eine **feste** Breite kann es, und dann ist die Zahl eine Entscheidung. Hier ist sie aus der
+   **schmalsten** Anlegezeile hergeleitet, die noch trägt: Feld 138 px (≈ 11 Zeichen eines
+   14-px-Namens) + 8 px + 142 px Knopf = **288 px Inhalt**.
+
+   **Und `min-width`/`max-width` sind hier die Breite des Rahmens, nicht des Inhalts** — `app.css`
+   setzt global `box-sizing: border-box` (Zeile 149). **Das war der Fehler der ersten Fassung:**
+   dort stand 288 px, gemessen wurde ein **Inhalt von 240 px** und ein Anlegefeld von 88 px.
+   Die zweite Browser-Probe hat es gemeldet, nicht der Test — ein Test, der `min-width < min-width
+   der Basis` prüft, war mit 288 gegen 340 grün und damit auf der falschen Seite. Also **338 px**:
+   288 + 2×24 Polster + 2×1 Rahmen.
+
+   **Was das kostet, steht hier:** der Platzhalter „Name des neuen Space" ist **172 px** und wird
+   im 288-px-Inhalt **abgeschnitten**. Das ist der bewusst bezahlte Preis der Verschmalung; ein
+   Feld, das den ganzen Platzhalter zeigt, hieße wieder 330 px Inhalt und damit kein Verkleinern.
+   Der Platzhalter ist ein Hinweis, kein Wert — abgeschnitten darf er, unsichtbar darf er nicht.
+
+   **Und im Schmal-Modus (≤1024 px) ist die feste Breite zurückgenommen**, sonst gewinnt die
+   ID-Klasse `.settings-panel` und das Panel flexte nicht mehr. Dieselbe Ausnahme wie bei
+   `.settings-panel--wide` eine Zeile weiter oben. */
+.settings-panel--list {
+  min-width: 338px;
+  max-width: 338px;
+}
+
 /* Die Menüknöpfe sind `.tree__folder` und erben Höhe/Polster/Rundung; hier ist nur der
    Abstand der drei Zeilen untereinander — dieselbe Forderung wie bei den Space-Zeilen
    darunter (P9-AK: Zeilen mit sichtbarem Abstand). */
@@ -1973,10 +2007,27 @@ select.input:focus {
    vergleicht deshalb Polster **oben/unten** weiter mit der Baumzeile und den linken Wert gegen
    `--space`. Die Alternative („die Einrückung an der Quelle auf die Rail einschränken") hätte
    zusätzlich die Space-Zeilen im Panel verschoben — eine zweite, nicht beauftragte Änderung.
+
+   **[2026-10-06, P9-BB — und das ist der erste Wert, der die Höhe wirklich löst.]**
+   `padding-block: calc(var(--space) * 0.5)` (4 px statt der 6 px der Sammelregel) setzt die
+   **gemessene** Höhe von **35,69 px auf 31,69 px**; der Polster ist ein Vielfaches von `--space`,
+   und die Beschriftung bleibt mittig (die Breite ändert sich nicht, `justify-content` auch nicht).
+   **Die Baumzeile behält ihre 6 px** — der Menüpunkt ist damit der erste Ort, an dem Höhe
+   *bewusst* nicht aus `.tree__folder` kommt (P9-AF band sie dorthin). Das ist gewollt und wird
+   nicht "korrigiert"; die Browser-Probe S1 vergleicht deshalb nur noch Rand, Schrift und das
+   linke Polster mit der Baumzeile, und der Wächter erlaubt `padding-block` **nur** hier und
+   **nur** mit diesem einen Wert.
+
+   **Warum als logische Eigenschaft und nicht `padding-top`/`padding-bottom`:** zwei Deklarationen
+   wären zwei Stellen für denselben Wert. Der Preis ist, dass `padding-block` an keiner Stelle der
+   Verbotsliste stand — ein Wächter, der die Eigenschaft nicht kennt, meldet sie nicht; der
+   Gegenlauf G13 und der Wächter `test_the_menu_item_watchdog_bites_on_built_in_violations`
+   tragen beide Lesarten deshalb ausdrücklich.
    */
 .settings-panel--menu .settings-menu__item {
   justify-content: center;
   padding-left: var(--space);
+  padding-block: calc(var(--space) * 0.5);
 }
 
 /* P9-AM: der Menütitel wird zentriert und bekommt den gemeinsamen Titelabstand. Nur **dieses**
@@ -2098,8 +2149,30 @@ select.input:focus {
   display: flex;
   flex-direction: column;
   gap: var(--space);
+  /* P9-BC (2026-10-06, Nikinger zu Bild 08: *„move the button borders a little bit further to
+     the left … cut the not used space from the right"*): die Zeilen stehen **nicht** mehr auf
+     der vollen Panelbreite. **Gemessen vorher:** Kästchen 330 px, Beschriftungen 84–137 px, also
+     **192–245 px Leerraum rechts** bei bereits bündigem Text (P9-AX ✅).
+
+     `align-items: flex-start` ist die eine Stelle, an der das Nicht-Strecken steht — die
+     Alternative wäre `width: fit-content` an jeder Zeile, also derselbe Wert an N Orten, und
+     der Vorgabewert `stretch` ist genau das, was abgeschafft werden soll.
+
+     **Und das genügt allein noch nicht** — siehe die `width: auto` direkt darunter. */
+  align-items: flex-start;
 }
-.settings-space-row { width: 100%; }
+/* Und `max-width: 100%` als die einzige Bremse: ein langer Space-Name (P9-U legt die Länge
+   nicht fest) darf das Panel **nicht** aufweiten; er bricht im Kästchen um.
+
+   **`width: auto` ist der eigentliche Hebel, und es ist ein Befund vom 2026-10-06.**
+   `width: 100%` steht **nicht** nur in einer eigenen Regel, sondern in der **Sammelregel** oben
+   (`.rail__home, …, .tree__folder, …, .settings-space-row, …`). Die erste Fassung dieses Blocks
+   hat die *eigene* `width: 100%` gelöscht und war der Meinung, damit sei die Streckung weg —
+   der erste Gegenlauf maß **28 Kästchen auf 238 px**, also die volle Panelbreite. Das war die
+   dritte Fassung derselben Fehlerklasse in diesem Block (*die erste Regel ist nicht die, die ich
+   meine*). Die Sammelregel zu zerlegen wäre die Alternative; sie trägt neun Selektoren und einen
+   P9-AF-Kommentar, und die Zeile braucht von ihr alles außer der Breite. */
+.settings-space-row { width: auto; max-width: 100%; }
 
 /* P9-AS (2026-10-05): **alle** Knöpfe in den Einstellungs-Fenstern stehen rechts. Der
    Scoped-Selektor ist der ganze Auftrag: `.overlay__actions` ist die gemeinsame Klasse des
@@ -2147,6 +2220,9 @@ select.input:focus {
   .settings-back { display: inline-flex; }
   .settings-panel { min-width: 0; width: auto; flex: 1; }
   .settings-panel--wide { width: auto; }
+  /* P9-BE: siehe die Regel oben — die feste Breite des Spaces-Fensters darf den Schmal-Modus
+     nicht überstimmen, sonst flext das Panel nicht mehr mit. */
+  .settings-panel--list { min-width: 0; max-width: none; }
 }
 
 /* Passwort-Sichtbarkeit (Meldung des Nikingers): Feld + Umschalt-Knopf in einer Reihe, in

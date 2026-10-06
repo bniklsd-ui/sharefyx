@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Wurzel-CLAUDE.md-Historie — der aktuelle Curr
 detail: L3
 up: ../CLAUDE.md
 down:
-updated: 2026-10-06 (Block „V188 ist beantwortet" verbatim hierher rotiert, per `scripts/rotate_root_current_state.sh` mit K=1 — sechs Gegenproben, darunter die byteweise Reassemblierung und das Nachlesen jedes Blocks; die Byte-Buchhaltung ging auf 237.864 B vorher == 237.864 B nachher) | 2026-10-05 (Block „die sieben Punkte aus der Bildsichtung sind gebaut" verbatim hierher rotiert, per `scripts/rotate_root_current_state.sh` mit K=1 — sechs Gegenproben, darunter die byteweise Reassemblierung und das Nachlesen jedes Blocks; die Byte-Buchhaltung ging auf 234.680 B vorher == 234.680 B nachher) | 2026-10-05 (der Block „die alte Adresse darf unbefristet schreiben" verbatim hierher rotiert, per `scripts/rotate_root_current_state.sh` K=1 — der neue Block über ihm behandelt die sieben Punkte aus der Bildsichtung; **Achtung für den nächsten Faden:** ein Datum mit Leerzeichen und Klammer im Faden **Text** ist für den Anker unsichtbar, das Skript bricht dann mit exit 1 ab) | 2026-10-05 (2 Blöcke der Wurzel verbatim hierher rotiert — der Block vom 2026-10-04 und die datierte Namenskorrektur —, per `scripts/rotate_root_current_state.sh`; die stehende Rotationsregel lebt jetzt als Präambel vor dem ersten Block, damit sie nicht mitrotiert) | 2026-10-04 (**24 Blöcke der Wurzel-`CLAUDE.md` §Current state verbatim hierher**, per `scripts/rotate_root_current_state.sh` K=1; KEEP ist der **neueste** Block, weil die Wurzel newest-**first** ist — im Phase-Head ist es umgekehrt, und die erste Fassung des Skripts hat den ältesten behalten; **sechs Gegenproben**, darunter die byteweise Reassemblierung und die Nachlese jedes Blocks, **221.957 B vorher == 221.957 B nachher**) | 2026-09-10 (P8.6 Step 0 Haushalt-Block aus Wurzel-`CLAUDE.md` §Current state rotiert — Migration-Vorbereitungs-Block brauchte Platz im Wurzel-Head, deshalb der Vorgänger nach hier verschoben; Project-Pattern: jeder neue Current-state-Eintrag rotiert den bisherigen verbatim hierher)
+updated: 2026-10-06 (Block vom **2026-10-06** („Kästchen enger", Mini-Plan §12.1, Locks P9-BB/BC/BD/BE, Abnahme P9-116–P9-119) verbatim hierher rotiert, per `scripts/rotate_root_current_state.sh` (K=1); Archiv **208.146 → 212.370 B**, Wurzel-Head **31.879 → 32.107 B**) | 2026-10-06 (Block „V188 ist beantwortet" verbatim hierher rotiert, per `scripts/rotate_root_current_state.sh` mit K=1 — sechs Gegenproben, darunter die byteweise Reassemblierung und das Nachlesen jedes Blocks; die Byte-Buchhaltung ging auf 237.864 B vorher == 237.864 B nachher) | 2026-10-05 (Block „die sieben Punkte aus der Bildsichtung sind gebaut" verbatim hierher rotiert, per `scripts/rotate_root_current_state.sh` mit K=1 — sechs Gegenproben, darunter die byteweise Reassemblierung und das Nachlesen jedes Blocks; die Byte-Buchhaltung ging auf 234.680 B vorher == 234.680 B nachher) | 2026-10-05 (der Block „die alte Adresse darf unbefristet schreiben" verbatim hierher rotiert, per `scripts/rotate_root_current_state.sh` K=1 — der neue Block über ihm behandelt die sieben Punkte aus der Bildsichtung; **Achtung für den nächsten Faden:** ein Datum mit Leerzeichen und Klammer im Faden **Text** ist für den Anker unsichtbar, das Skript bricht dann mit exit 1 ab) | 2026-10-05 (2 Blöcke der Wurzel verbatim hierher rotiert — der Block vom 2026-10-04 und die datierte Namenskorrektur —, per `scripts/rotate_root_current_state.sh`; die stehende Rotationsregel lebt jetzt als Präambel vor dem ersten Block, damit sie nicht mitrotiert) | 2026-10-04 (**24 Blöcke der Wurzel-`CLAUDE.md` §Current state verbatim hierher**, per `scripts/rotate_root_current_state.sh` K=1; KEEP ist der **neueste** Block, weil die Wurzel newest-**first** ist — im Phase-Head ist es umgekehrt, und die erste Fassung des Skripts hat den ältesten behalten; **sechs Gegenproben**, darunter die byteweise Reassemblierung und die Nachlese jedes Blocks, **221.957 B vorher == 221.957 B nachher**) | 2026-09-10 (P8.6 Step 0 Haushalt-Block aus Wurzel-`CLAUDE.md` §Current state rotiert — Migration-Vorbereitungs-Block brauchte Platz im Wurzel-Head, deshalb der Vorgänger nach hier verschoben; Project-Pattern: jeder neue Current-state-Eintrag rotiert den bisherigen verbatim hierher)
 ---
 
 
@@ -46,6 +46,50 @@ Newest-first, genau wie sie im Kopf standen:
 26. 2026-09-04 (Phase 8.5 Drift nachgezogen `4424310` + A1 committet `499d9be` -- Picker-Modus-Umschalter + `localStorage` `sfx:linkpicker:mode`; V99 `session` zu `local` als Eskalation wegen P8.5-G; erste `localStorage`-Nutzung des Projekts)
 27. 2026-09-03 (Phase 8.5 Step 0 -- Skelett phase8_5_picker_release/{CLAUDE.md, SESSIONS_ARCHIVE.md, scripts/} angelegt; vier Paragraph-1-Funde: INDEX 52.911 zu 40.917 B unter Cap, Bueroklammer-zu-Lupe-Drift in phase8_ui_graph/CLAUDE.md:440, Phase-8-Bilanz korrigiert; ROADMAP-Abschnitt neu; Wurzel-`down:` umgestellt)
 28. 2026-09-01 (Phase 8 Sichtpruefung 1 + Gate B zu C bestanden; **Hard Rule 9 ergaenzt** -- kein `pkill -f` mit Regex, niemals den systemd-Dienst anfassen, Lehre aus dem Prod-Vorfall 2026-09-01 Phase 8 Step A3 Nachbereitung)
+
+**[2026-10-05, die zweite Bildsichtung ist gebaut — vier Punkte, und der Auftrag hat zwei Locks vom
+Vortag widerrufen — opencode/M3, ein Commit, reines Frontend, kein Deploy, kein Service-Touch.]**
+Der Nikinger hat die vier Bilder aus `screenshots_latest/` angesehen und vier Punkte notiert
+(Mini-Plan §11, Locks **P9-AU–P9-AZ**, Abnahme **P9-103–P9-111** mit **9 ✅**). **Der Kern des
+Blocks ist eine Umkehr:** *„since they are buttons and not fields to type something in"* — damit
+ist **P9-AN widerrufen** (die Menüpunkte trugen die Fläche des **Eingabefeldes**), und die
+ausgewählte Fläche aus **P9-AO** auch. Die unausgewählten Punkte tragen jetzt die
+**Standardknopf-Fläche** (`--btn-std-fill`), der ausgewählte die **Akzentfläche** wie ein
+Hauptknopf — **seine ausdrückliche Entscheidung aus der Rückfrage**, gegen die Alternative
+„Standard + Rail-Akzent". Weitere Punkte: **8 px Abstand** zwischen den Menüpunkten (gemessen
+vorher **0 px** — „glued to each other"), **„Ändern" rot** wie „Archivieren" (Vorsicht: teuer
+rückgängig zu machen) und **„Schließen"** statt „Abbrechen", Beschriftung der Space-Zeilen bündig
+mit dem Panel-Titel (vorher **33 px**), Namensfeld im Detail **beidseitig bündig** (vorher 12 px zu
+schmal, als **Rasterfolge** gebaut und **nicht** als Breite), Anlegezeile **eine Zeile** (vorher
+80 px Versatz). **Ein Gegenlauf fand eine Messlücke statt eines Defekts:** G11 blieb grün, weil ein
+**geschrumpfter** Knopf dieselben Kanten hält, obwohl der Lock wörtlich „Space anlegen in seiner
+Größe gleich lassen" verlangt — die Station misst jetzt die Eigenbreite an einer Kopie. **Sechs
+Wächter umgeschrieben, keiner gelöscht**, jeder mit beiden Lesarten und Datum; **zwei eigene
+Fehler** dieses Blocks, beide „die erste Regel ist nicht die, die ich meine" (ein Wächter riss
+`rgba(255,255,255,.06)` an jedem Komma auseinander, ein Helper nahm die Übergangs-Sammelregel
+statt der Flächenregel). **Zwei Softcap-Überschreitungen neu benannt statt versteckt:**
+Abnahmematrix **84.161 B**, settings-Mini-Plan **49.655 B** — **der Plan ist erst durch diesen
+Block über den Cap gekommen**, und ein Kürzen in ein L3-Archiv wäre **Nikinger-Entscheidung**,
+deshalb gemeldet statt getan. `pytest` **1238 → 1246**, Probe **29/29**, **Gegenläufe G7–G12 6 von
+6**, `ui_budget` 5/5, Tabu-Diff §0.3 leer. **Bilder:** `screenshots_latest/` auf **acht**
+Symlinks rotiert (seine Anordnung: „give me all 8"), README mit Kriterium je Bild — **offen bleibt
+der eine Punkt, den die Bilder nicht tragen können**: die Mitgliederliste, im Harness ohne Mitglieder
+also aus dem Browser-Standard abgeleitet statt gemessen. **Danach Sichtprüfung am selben Tag (Nachtrag, Phase-9-Head):** **02 · 03 · 05 · 06 freigegeben**
+(„looks fine now" ×2, „great", „yes"), **01 · 04 · 07 · 08 mit vier neuen Punkten** — als
+**P9-BA–P9-BD** (Abnahme **P9-112–P9-115**) in §12 des settings-Plans **nicht gebaut, aber mit
+allen Messwerten notiert**: alle drei Menüpunkte messen **131 × 35,69 px** bei Beschriftungen von
+**106 / 113 / 77 px**, die Space-Zeilen haben **184–239 px** Leerraum rechts bei bereits bündigem
+Text; **in Bild 04 sind die „Hinzufügen"-Optionen im eingecheckten PNG nachgewiesen**
+(Fläche y 207..231) — sie stehen nur **oben**, weil der Mitgliederbereich im Harness leer ist,
+und mein Kriterium sagte dir nicht, wo suchen; **Bild 07 zeigt die neue Zeile gar nicht**, weil
+das Spaces-Panel **scrollt** (1417 px Inhalt bei 834 px Höhe) und ein neu angehängter Eintrag
+unterhalb des Sichtbereichs landet — **die Ursache war nicht die Bündigkeit**. Aus **Bild 01**
+bleibt **ein Wort von ihm offen**: „bigger" heißt Leerraum, „decrease its height" passt nicht dazu
+(alle drei Höhen gleich). **„kürzen notieren" angeordnet** und im §Backlog mit Kandidaten
+notiert. **Offen, in dieser Reihenfolge:**
+Block „Kästchen enger" (P9-112–P9-115, **eine Klärung offen**) · Deploy `v3.1.3` ·
+P9-94/P9-11-Portscan · P9-13/V150 (wandert nach P10, kein Blocker) · Softcap-Kürzung (angeordnet,
+nicht ausgeführt) · V162 *(Lesart A)* · Gate/Z-Rest (Übersichtsgrafik, ROADMAP-Zeile, Phase auf ✅).
 
 **[2026-10-05, V188 ist beantwortet — die Seite **kann** das Beenden des macOS-Vollbilds per ESC
 nicht verhindern, und auf dem MacBook existiert der einzige Hebel dafür gar nicht; dazu der letzte

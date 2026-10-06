@@ -11,7 +11,7 @@ down:
   - ./step_a/RUNBOOK_STEP_A.md                       # Step-A-Ablauf A0b – A9, Abnahme P9-10 – P9-15
   - ./step_b/RUNBOOK_STEP_B.md                       # Step-B-Ablauf B0 – B3, Abnahme P9-16 – P9-20
   - SESSIONS_ARCHIVE.md                              # die Herleitung jeder Zeile im Wortlaut
-updated: 2026-10-03 (**A7a + A7 + A8 gefahren** — Nikinger-Schritte, von M3 vorbereitet und gemessen; P9-10b ✅ · P9-12 ✅ · P9-13/V150 ⚠️ „1 von 2 Konten") · **A7a** = der risikoarme Vorlauf nur über `ALLOWED_HOSTS` (kein `resource`-Wechsel, Token bleiben gültig): neu lokal 200 · alter Funnel lokal 200 · **extern `https://sharefyx.eurofyx.com/health` 200 mit `ssl_verify_result=0`**, JSON `{"status":"ok",…}` — vorher an derselben Stelle 400 bei gültigem TLS · **A7** = der Schnitt: `PUBLIC_BASE_URL` auf die Domain, `LEGACY_ORIGIN`/`LEGACY_UNTIL=2026-10-17` dazu; `issuer` und alle drei Endpunkte zeigen auf die neue Domain, Start ohne Traceback · **A8**: Konto niklas liefert `list_spaces` über die neue Adresse, das zweite steht aus · **P9-15 bleibt ⬜** und gehört an den Deploy-Tag (`health_gate.sh` authentifiziert) · **Befund 4 bestätigt**: der A7-Restart entwertet alte Token (`resolver.py:48`), die Neuanmeldung war zwingend | 2026-10-03 (**Step D belegt** — zweite Fassung, opencode/M3, **kein Produktcode-Touch**, kein Deploy) · **P9-28/P9-29/P9-30 von ⚠️/⬜ auf ✅**: die Browser-Probe `p9_step_d_self_check.py` (Plan-§11 GA2-Station 1, die erste von dreien, die nie lief) fährt **16/16** gegen eine eigene TLS-Wegwerf-Instanz auf Port 18781 · **echte Maus-Input-Pipeline**, nicht `dispatchEvent` — Station 2 misst den vom Browser erzeugten Ereignisstrom (`dragstart=1, dragover=19, drop=1`, Item-ID im `dataTransfer`), weil sonst nur der Listener belegt wäre · **P9-30 als berechneter Stil** (`dashed`, `rgb(62,141,243)`) plus zwei Bilder, nicht als Klassennamen · **zwei Gegenläufe liegen rot im Repo** (G1 Space-Bindung raus → 5 Stationen rot, 6–9 grün; G2 `fullscreenElement`-Guard raus → Station 9 rot), mit `--report`/`--screenshots-dir` getrennt, damit kein Gegenlauf den Erfolgsbeleg überschreibt (derselbe Fehler wie beim trace-Block 2026-10-02) · **6 Wächter** in `test_step_d_drop_target.py`, Deckung in **beiden** Richtungen (jede ✅-Zeile braucht eine Station, jede Station eine existierende Zeile) · **Bilanz an diesem Tag 68 ✅ · 9 ⚠️ · 6 ⬜** (der heutige Stand steht weiter unten, er wandert) · **P9-27 bleibt ⬜** und das ist eine Eigenschaft: kein WebKit-Binary, natives Vollbild nicht automatisierbar · **drei eigene Fehler im selben Commit behoben**: der Ereigniszähler zählte sich selbst (`start=3, over=57` für einen Zug — Listener bei jedem `evaluate` neu registriert), `store.create()` **hängt** an statt zu leeren (der zweite `start` sah jedes Item doppelt), und die erste Fassung des neuen Tests war rot, weil er `dispatchEvent` im **Docstring** verbot — Wächter läuft jetzt über `tokenize`, nicht über Rohtext | 2026-10-03 (erste Fassung, Gate/Z-Doku-Hälfte Nummer zwei, opencode/M3, **kein Code-Touch**, kein Deploy) — **82 Abnahmezeilen (83 Tabellenzeilen, P9-10 geteilt): 65 ✅ · 10 ⚠️ · 8 ⬜** und **34 belegte [VERIFY]-Einträge**, nicht 40 (V167–V172 sind nie belegt) · **P9-56/57/58 heute gemessen**: Tabu-Diff hat **einen** unangekündigten Treffer (`phase7_spaces_admin/tests/test_space_removal.py`, 17 Z.) · `pytest` 1169, `ui_budget` 5/5 (155,2 KB), `doc_health` 0/0/0/0 · **P9-14 heute geschlossen** (Funnel-Host live 200), P9-10b heute gemessen (weiter 400, erwartet bis A7) · **V146/V148/V155 heute beantwortet**, V182/V184 am Code · **zwei Nummerkollisionen gefunden** (V162, V163 je zweimal vergeben)
+updated: 2026-10-06 (**dritte Bildsichtung gebaut** — Abnahme **P9-116–P9-119** mit **4 ✅** statt der vier notierten, **nicht gebauten** Zeilen P9-112–P9-115: **P9-112 ist widerrufen** (der Nikinger hat den Auftrag auf „nur bei Spaces verwalten" eingeschränkt), die drei anderen sind abgelöst, weil ihre Nummern inzwischen etwas anderes prüfen; die Zuordnung steht als Tabelle im Abschnitt · **Bilanz 101 ✅ · 12 ⚠️ · 3 ⬜** · **sechs Befunde ohne Abnahmezeile**, darunter `box-sizing: border-box`, die Sammelregel und eine Station, die den eigenen Fehler nicht bemerkte · **datierte Korrektur:** die 1246 `pytest`-Tests des Vortages sind **1241** gemessen) | 2026-10-03 (**A7a + A7 + A8 gefahren** — Nikinger-Schritte, von M3 vorbereitet und gemessen; P9-10b ✅ · P9-12 ✅ · P9-13/V150 ⚠️ „1 von 2 Konten") · **A7a** = der risikoarme Vorlauf nur über `ALLOWED_HOSTS` (kein `resource`-Wechsel, Token bleiben gültig): neu lokal 200 · alter Funnel lokal 200 · **extern `https://sharefyx.eurofyx.com/health` 200 mit `ssl_verify_result=0`**, JSON `{"status":"ok",…}` — vorher an derselben Stelle 400 bei gültigem TLS · **A7** = der Schnitt: `PUBLIC_BASE_URL` auf die Domain, `LEGACY_ORIGIN`/`LEGACY_UNTIL=2026-10-17` dazu; `issuer` und alle drei Endpunkte zeigen auf die neue Domain, Start ohne Traceback · **A8**: Konto niklas liefert `list_spaces` über die neue Adresse, das zweite steht aus · **P9-15 bleibt ⬜** und gehört an den Deploy-Tag (`health_gate.sh` authentifiziert) · **Befund 4 bestätigt**: der A7-Restart entwertet alte Token (`resolver.py:48`), die Neuanmeldung war zwingend | 2026-10-03 (**Step D belegt** — zweite Fassung, opencode/M3, **kein Produktcode-Touch**, kein Deploy) · **P9-28/P9-29/P9-30 von ⚠️/⬜ auf ✅**: die Browser-Probe `p9_step_d_self_check.py` (Plan-§11 GA2-Station 1, die erste von dreien, die nie lief) fährt **16/16** gegen eine eigene TLS-Wegwerf-Instanz auf Port 18781 · **echte Maus-Input-Pipeline**, nicht `dispatchEvent` — Station 2 misst den vom Browser erzeugten Ereignisstrom (`dragstart=1, dragover=19, drop=1`, Item-ID im `dataTransfer`), weil sonst nur der Listener belegt wäre · **P9-30 als berechneter Stil** (`dashed`, `rgb(62,141,243)`) plus zwei Bilder, nicht als Klassennamen · **zwei Gegenläufe liegen rot im Repo** (G1 Space-Bindung raus → 5 Stationen rot, 6–9 grün; G2 `fullscreenElement`-Guard raus → Station 9 rot), mit `--report`/`--screenshots-dir` getrennt, damit kein Gegenlauf den Erfolgsbeleg überschreibt (derselbe Fehler wie beim trace-Block 2026-10-02) · **6 Wächter** in `test_step_d_drop_target.py`, Deckung in **beiden** Richtungen (jede ✅-Zeile braucht eine Station, jede Station eine existierende Zeile) · **Bilanz an diesem Tag 68 ✅ · 9 ⚠️ · 6 ⬜** (der heutige Stand steht weiter unten, er wandert) · **P9-27 bleibt ⬜** und das ist eine Eigenschaft: kein WebKit-Binary, natives Vollbild nicht automatisierbar · **drei eigene Fehler im selben Commit behoben**: der Ereigniszähler zählte sich selbst (`start=3, over=57` für einen Zug — Listener bei jedem `evaluate` neu registriert), `store.create()` **hängt** an statt zu leeren (der zweite `start` sah jedes Item doppelt), und die erste Fassung des neuen Tests war rot, weil er `dispatchEvent` im **Docstring** verbot — Wächter läuft jetzt über `tokenize`, nicht über Rohtext | 2026-10-03 (erste Fassung, Gate/Z-Doku-Hälfte Nummer zwei, opencode/M3, **kein Code-Touch**, kein Deploy) — **82 Abnahmezeilen (83 Tabellenzeilen, P9-10 geteilt): 65 ✅ · 10 ⚠️ · 8 ⬜** und **34 belegte [VERIFY]-Einträge**, nicht 40 (V167–V172 sind nie belegt) · **P9-56/57/58 heute gemessen**: Tabu-Diff hat **einen** unangekündigten Treffer (`phase7_spaces_admin/tests/test_space_removal.py`, 17 Z.) · `pytest` 1169, `ui_budget` 5/5 (155,2 KB), `doc_health` 0/0/0/0 · **P9-14 heute geschlossen** (Funnel-Host live 200), P9-10b heute gemessen (weiter 400, erwartet bis A7) · **V146/V148/V155 heute beantwortet**, V182/V184 am Code · **zwei Nummerkollisionen gefunden** (V162, V163 je zweimal vergeben)
 ---
 
 # Abnahmematrix Phase 9 — P9-1 … P9-82 und `[VERIFY]`-Bilanz V145 … V184
@@ -25,10 +25,11 @@ Archiv hineinzuschreiben hieße, das Falsche zu tun.
 
 ## Stand in einem Satz
 
-**116 Tabellenzeilen für 116 Abnahmezeilen: 97 ✅ · 12 ⚠️ · 7 ⬜** (P9-10 in zwei prüfbare Hälften
+**116 Tabellenzeilen für 116 Abnahmezeilen: 101 ✅ · 12 ⚠️ · 3 ⬜** (P9-10 in zwei prüfbare Hälften
 geteilt; seit 2026-10-05 kommen der **settings-Block** P9-83–P9-95 mit 12 ✅ und **einem** ⬜
-dazu — P9-94, der Portscan, ist ein Schritt des Nikingers und durch keinen Test ersetzbar — und
-sein **Nachtrag** P9-96–P9-102 aus der Bildsichtung mit **5 ✅ und 2 ⚠️**. Die beiden ⚠️ sind
+dazu — P9-94, der Portscan, ist ein Schritt des Nikingers und durch keinen Test ersetzbar —,
+sein **Nachtrag** P9-96–P9-102 aus der Bildsichtung mit **5 ✅ und 2 ⚠️**, und die **dritte
+Bildsichtung** P9-103–P9-111 mit **9 ✅**. Die beiden ⚠️ sind
 **keine offenen Punkte**: P9-97 trägt die vom Nikinger entschiedene Abweichung im linken
 Polsterwert, P9-99 den gemessenen Umweg (`justify-content` statt des im Plan genannten, wirkungslosen `text-align`). **A7+A8 sind am 2026-10-03 gefahren** (A7a als risikoarmer Vorlauf, dann A7, dann A8):
 P9-10b und P9-12 sind **beide ✅**. Die 3 offenen Zeilen sind **P9-11, P9-13/V150 und P9-94**,
@@ -260,27 +261,92 @@ Bündigkeit von Namensfeld und Auswahl-Knopf); zu zwei davon hat er Rückfragen 
 | **P9-110** | `#space-member-list` trägt `padding-left: 0` **und** `list-style: none` | ✅ **Deklaration, nicht Wirkung** | beide Eigenschaften sind deklariert und werden gegen die Deklaration geprüft. **Warum so und nicht gemessen:** die Liste ist im Wegwerf-Harness leer (Home-Space ohne Mitglieder); eine Wirkungsmessung wäre nur durch Erfinden eines Mitglieds möglich, und das wäre ein synthetischer Beleg für einen Zustand, den es live gibt |
 | **P9-111** | **P9-96/98/99/100/101/102 halten** | ✅ | Titelabstand **24 px** (Menü **und** Detail), Beschriftung mittig (Textmitte **720** == Knopfmitte **720,0**), genau **1** `aria-current`, Chevron-„Zurück" unverändert, `.overlay__actions` weiter `flex-end`, Schmal-Modus zeigt genau **ein** Panel |
 
-## Dritte Bildsichtung 2026-10-06 — vier Punkte freigegeben, vier neue (P9-112 – P9-115)
+## Dritte Bildsichtung 2026-10-06 — **gebaut** (P9-116 – P9-119; P9-112 **widerrufen**)
 
 **Freigegeben vom Nikinger am 2026-10-06** (wörtlich, je Bild aus `screenshots_latest/`):
 **02** *„looks fine now"* · **03** *„great"* · **05** *„looks fine now"* · **06** *„yes"*.
+**04 · 07 · 08** trugen je einen neuen Punkt; die Zeilen **P9-112 – P9-115** waren dafür am
+2026-10-06 als „nicht gebaut" notiert und sind am selben Tag **abgelöst** worden — **P9-112 durch
+seine eigene Widerrufung**, die drei anderen, weil ihre Nummern inzwischen etwas anderes bedeuten
+als das, was sie am Vormtag prüften. **Die Zuordnung steht hier vollständig, damit keine Zeile
+stillschweigend verschwindet** — und ihre Nummern stehen hier **ohne** `**`, weil der Zähl-Wächter
+`test_acceptance_numbers.py` jede Zeile mit `| **P9-` als Abnahmezeile zählt: eine Zuordnungstabelle
+im Fettdruck hätte die Bilanz um vier Zeilen verfälscht (gemessen: 120 statt 116):
+
+| vorherige Zeile | ihr Inhalt | wohin |
+|---|---|---|
+| P9-112 | Menüpunkte so breit wie ihr eigenes Label (P9-BA) | **widerrufen** — der Nikinger am 2026-10-06 auf die Rückfrage: *„nur bei Spaces verwalten … aber nur dieses"*. Die Menüpunkte behalten ihre 131 px; **P9-116** prüft jetzt das, was er stattdessen beauftragt hat |
+| P9-113 | Space-Zeilen auf ihre Beschriftung zusammenziehen (P9-BC) | **P9-117** (unverändert gebaut, neu gemessen) |
+| P9-114 | Bild 04: die Member-Zeile steht dort, wo das Bild sie zeigt, und das Kriterium nennt die Position | **P9-119** (zusammen mit Bild 07: beide Punkte sind derselbe Fehler — ein Kriterium, das nicht sagt, wo man suchen soll) |
+| P9-115 | Bild 07: die neu angelegte Zeile ist im Bild sichtbar (aufgerollt) und bündig | **P9-119** |
 
 | # | Kriterium | Stand | Beleg |
 |---|---|---|---|
-| **P9-112** | Jeder Menüpunkt ist so breit wie **sein eigenes** Label; die Beschriftung bleibt auf ihrer Kante | ⬜ **P9-BA, nicht gebaut** | **Gemessen:** alle drei Kästchen **131 × 35,69 px**, Beschriftungen **106 / 113 / 77 px** ⇒ das Update-Log hat **19 px Leerraum je Seite**. *„move the button borders a little bit further to the left, leave the text where it is now. Cut the not used space from the right"* (Bild 08) |
-| **P9-113** | Die Space-Zeilen ziehen ihr Kästchen auf die Beschriftung zusammen, **Text unverändert** | ⬜ **P9-BC, nicht gebaut** | **Gemessen:** Kästchen **330 px**, Beschriftung **1 px** links am Inhalt (P9-AX ✅), also **184–239 px Leerraum rechts**. Der **Text** steht bereits, wo er soll — offen ist nur die Kästchenbreite |
-| **P9-114** | Bild 04: die Member-Zeile steht dort, wo das Bild sie zeigt, und das Kriterium nennt die Position | ⬜ **P9-BD, nicht gebaut** | **Am eingecheckten Bild nachgewiesen, sie ist da:** Standardfläche **y 207..231, x 958..1181**, „Hinzufügen"-Text bis x 1165, „lesen" und „Hinzufügen" auf **einer** Zeile (y 218..233), „Schließen" y 264..285. Im Browser: sichtbar, im Viewport, Panel 294 px **ohne** Scroll. Der Mitgliederbereich ist **leer** (Home-Space) |
-| **P9-115** | Bild 07: die **neu angelegte** Zeile ist im Bild sichtbar (aufgerollt) und bündig | ⬜ **P9-BD, nicht gebaut** | **„I honestly don't see that" hat eine Ursache, und sie ist nicht die Bündigkeit:** das Spaces-Panel **scrollt** (`scrollHeight` 1417 / `clientHeight` 834), ein neu angehängter Eintrag landet **unterhalb des Sichtbereichs**. Bild 07 zeigt zudem nach dem Klick auf die erste Zeile das **Detail-Panel**, nicht die Liste |
+| **P9-116** | Die **Menüpunkte sind flacher**: Polster 4 px oben/unten, **gemessene Höhe 31,69 px** statt 35,69 px — und ihre **Breite bleibt 131 px** (P9-BA widerrufen) | ✅ | Probe `p9_settings_kastchen_probe.py` **48/48**, Stationen **S1/P9-116** (3): Polster `4px` bei allen dreien (vorher `6px`), Höhen **[31.69, 31.69, 31.69]** px, Breiten **[131, 131, 131]** px. Die **mittige Beschriftung** bleibt: Textmitte **720** == Knopfmitte **720,0** (S2/P9-99). Antwort des Nikingers auf die Rückfrage: **(b) zusätzlich flacher** |
+| **P9-117** | Jede **Space-Zeile umklammert ihr eigenes Label**: Kästchen = Beschriftung + Polster + Rahmen, **Text unverändert** | ✅ | **S5/P9-117** (3): 37 Zeilen, breitestes Kästchen **147 px** statt 330 px für alle; rechts **maximal 9 px** Leerraum bei 8 px Polster (vorher **192–245 px**); Beschriftung **1,0 px** bündig mit dem Titel (unverändert, P9-AX). `width: auto` an der Zeile + `align-items: flex-start` an der Liste, `max-width: 100%` als Bremse gegen lange Namen |
+| **P9-118** | **Nur** das Spaces-Fenster wird schmaler — Menü, Passwort, Detail und Update-Log behalten ihre Breite; die Anlegezeile bleibt eine Zeile | ✅ | **S5/P9-118** (4): **338 px** statt **380 px** (gemessen am **geklonten Schatten ohne die neue Klasse**, Differenz 42 px); `min` == `max` == 338 px; Feld **138 px** von **288 px** Inhalt = **48 %** (Schwelle 45 %), Knopf **142 px** == Eigenbreite. **Bei 1024 px ist die feste Breite zurückgenommen**, das Panel flext (**422 px**, S6) |
+| **P9-119** | **Bild 04** nennt die Position der Member-Zeile, **Bild 07** zeigt die neu angelegte Zeile aufgerollt und in der **Liste** | ✅ | **S5/P9-114**: Bedienzeile **16 px** unter dem Hinweistext, Mitgliederbereich **0 px**, Knopf **y 205,48..246,28** — das Kriterium nennt jetzt **y 205..246**. **S8/P9-119** (4): Ausgangszustand **gemessen** — Zeile bei y **1704** unterhalb des Folds (836 px); nach `scrollIntoView` **vollständig** im Panel (y **765**), Anlegezeile mit im Bild, Titel **nicht** (das Kriterium sagt das) |
 
-### Ein Punkt, der noch ein Wort von dir braucht (Bild 01)
+### Was die Rückfrage vom 2026-10-06 geändert hat (P9-BB)
 
 *„the update-log button is still bigger, I think you need to decrease its height"* — **gemessen ist
-die Höhe bei allen drei Punkten gleich (35,69 px), und im Bild 01 ist nichts ausgewählt** (0
-Akzentpixel). „Bigger" heißt am Bild **19 px Leerraum**, und „Höhe" passt nicht dazu: die Korrektur
-aus P9-112/P9-113 ändert die **Breite**. **Also:** dieselbe Korrektur wie in Bild 08, **oder**
-zusätzlich flachere Knöpfe (heute 6 px Polster oben/unten)? Ein drittes „beides ohne Zahl" wäre
-eine Form, die kein Messen entscheidet.
+die Höhe bei allen drei Punkten gleich (35,69 px), und im Bild war nichts ausgewählt** (0
+Akzentpixel). Die Rückfrage hatte zwei Korrekturen zur Wahl; der Nikinger antwortete **(b):
+zusätzlich flacher** — und **präzisierte dabei P9-BA**: *„nur bei Spaces verwalten, dort die Buttons
+der einzelnen Spaces nach Links, und das Fenster rechts verkleinern, aber nur dieses."*
 
+**Daraus sind zwei Dinge geworden, und das zweite gab es vorher nicht:**
+
+1. **P9-BB** — die Menüpunkte tragen ein eigenes vertikales Polster (4 px statt 6 px). Das ist die
+   **erste bewusste Abweichung von P9-AF**, das die Höhe an `.tree__folder` band. Sie ist im
+   Wächter **nicht pauschal erlaubt**, sondern an **einen** Wert gebunden (`padding-block:
+   calc(var(--space) * 0.5)`, nur am Menüpunkt, an der Space-Zeile rot).
+2. **P9-BE** — das „Fenster verkleinern, aber nur dieses" war in §12 noch gar nicht als Lock
+   vorhanden; es ist als **neuer Lock P9-BE** entstanden, mit der Herleitung der Zahl in `app.css`
+   (Feld + Abstand + Knopf = 288 px Inhalt) und **beiden** Richtungen im Wächter: die Klasse hängt
+   genau einem Panel, und im Schmal-Modus ist die feste Breite zurückgenommen.
+
+### Sieben Befunde aus diesem Block, die keine Abnahmezeile sind
+
+1. **`min-width`/`max-width` sind bei `box-sizing: border-box` die Breite des *Rahmens*.** Die erste
+   Fassung stand auf 288 px und lieferte damit **240 px Inhalt** und ein Anlegefeld von **88 px**.
+   Die Browser-Probe hat es gemeldet (S5/P9-118), der Test nicht: er verglich „schmaler als die
+   Basis" und war mit 288 gegen 340 grün — **auf der falschen Seite**. Jetzt steht 338 px (288 + 2×24
+   + 2×1) und der Wächter vergleicht gegen das **`max-width`** der Basis.
+2. **`width: 100%` stand in der Sammelregel, nicht in der eigenen Regel.** Die erste Fassung hat die
+   eigene gelöscht und war der Meinung, damit sei das Strecken weg — der Gegenlauf G15 maß **28
+   Kästchen auf 238 px**, also die volle Panelbreite. Dritte Fassung derselben Fehlerklasse in
+   diesem Block (*die erste Regel ist nicht die, die ich meine*).
+3. **Eine Station, die den eigenen Fehler nicht bemerkte.** „Schmaler als der Schatten" war mit
+   288 px **grün**. Der Wächter prüft jetzt die **Ableitung** (Feldanteil ≥ 45 % des Inhalts), und
+   **G18** ist der eigene Fehler als Mutation: 288 statt 338 ⇒ rot.
+4. **G17 blieb grün, weil der Ausgangszustand Zufall war.** Die neue Zeile landete — bei 29 Spaces
+   und unverändertem `scrollTop` — zufällig sichtbar. Die Probe stellt den Zustand jetzt **ausdrücklich
+   her** (`scrollTop = 0`, Name mit `zz-`-Präfix ⇒ **letzte** Zeile ⇒ unterhalb des Folds), misst
+   ihn als Station („der Ausgangszustand ist gemessen: die Zeile ist NICHT sichtbar") und danach das
+   Aufrollen. Erst damit beißt G17.
+5. **Eine feste Wartezeit hat die Kette an der falschen Stelle geschlossen.** Nach dem Klick auf die
+   erste Zeile wartete der Lauf 0,8 s auf das Detail-Panel; `selectSpace()` holt erst die Items, und
+   das Detail war beim ESC noch zu — der ESC schloss stattdessen die Liste. Die Lehre „auf die
+   Bedingung warten, nicht auf die Uhr" stand schon im Skript und ist zum dritten Mal in diesem Block
+   gebrochen worden.
+6. **Die Bilanz des Vortages war um 5 zu hoch.** Der Block vom 2026-10-06 notiert `pytest` 1238 →
+   **1246**; **gemessen** sammelt `HEAD` **1241** Tests ein (`pytest --collect-only`), dieser Block
+   kommt auf **1245** (+4 neue, **0 gelöscht, 0 umgedreht**). Korrigiert wird die Zahl, nicht der
+   Wächter — die Notiz ist eine Behauptung, `pytest --collect-only` ist die Messung.
+
+7. **Das Gegenlauf-Rig hat vier der sechs Mutationen nie ausgeführt — und die erste „6/6“ war eine
+   Behauptung ohne Beleg.** `returncode != 0` gilt auch für einen Lauf, der am **Login** scheitert (Exit 2),
+   und das Rig **startete die mutierte Datei statt der Probe** (`str(datei)` statt `str(PROBE)` — für die vier
+   CSS-Mutationen also `python app.css`, SyntaxError, Exit 1). Es zählte also **fünf** „wirksame“ Mutationen,
+   von denen keine eine Station durchlaufen hatte. **Jetzt** gilt: bemerkt ist eine Mutation nur, wenn die
+   **erwartete Station in der Probe-JSON rot** steht, und **fehlt** die JSON, gibt das Skript das stderr-Ende
+   aus — die Fehlerursache war zweimal die, dass sie weggeworfen wurde. **Erst damit war der grüne
+   Gegenlauf G17 überhaupt eine Aussage**: die neue Zeile war bei 29 Spaces **zufällig** sichtbar. Nach der
+   Korrektur **6 von 6**, jede mit benannter roter Station (`g13` → S1/P9-116 · `g14`/`g15` → S5/P9-117 ·
+   `g16`/`g18` → S5/P9-118 · `g17` → S8/P9-119), alle sechs JSONs im Repo. **Und:** ein abgebrochener Lauf hat
+   den Hintergrundprozess mitgenommen und `app.css` **mutiert** im Baum hinterlassen — der Wächter hat das
+   **sofort** gemeldet, die Wiederherstellung kam byteweise aus dem Snapshot des Rigs.
 
 ### Vier Befunde aus diesem Block, die keine Abnahmezeile sind
 

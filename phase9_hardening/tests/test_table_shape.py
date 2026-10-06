@@ -212,7 +212,7 @@ def test_the_p9_module_status_table_shows_every_row_it_writes():
 
     Als **Anzahl der Zeilen** formuliert, nicht als Byte-Zahl — die Aussage, die er tragen soll,
     ist „kein Status verschwindet mehr in einer Phantom-Spalte", nicht „es sind genau 4.097 B".
-    17 ist Kopf + 16 Datenzeilen (0, A–H, doing, trace, E (Extra), S, **R**, **T**, Gate/Z).
+    18 ist Kopf + 17 Datenzeilen (0, A–H, doing, trace, E (Extra), S, **R**, **T**, **U**, Gate/Z).
     **[2026-10-05]** `S` (Block settings) kam dazu, später am selben Tag `R` (die sieben Punkte aus
     der Bildsichtung); **[2026-10-06]** `T` (die **zweite** Bildsichtung, Mini-Plan §11, Locks
     P9-AU–P9-AZ, Abnahme P9-103–P9-111) — wieder eine eigene Zeile und keine zweite Statuszeile in
@@ -221,11 +221,17 @@ def test_the_p9_module_status_table_shows_every_row_it_writes():
     gemeinsame Zeile — eine Zeile, die zwei widersprüchliche Stände trägt, ist die dritte Variante,
     die P9 am 2026-10-01 bei `.account-nav` erst entfernt hat; die Aufhebung steht in beiden
     Zellen und in der `updated:`-Kette.
+    **[2026-10-06]** `U` (die **dritte** Bildsichtung, Mini-Plan §12.1, Locks P9-BB/BC/BD/**BE**,
+    Abnahme P9-116–P9-119) — wieder eine eigene Zeile und **keine** gemeinsame mit `T`, obwohl
+    beide dieselbe Klasse ändern: `U` **dreht** `T` nicht (die Breite der Menüpunkte bleibt,
+    P9-BA wird widerrufen), aber es wächst dieselbe Zeile — und eine Zeile, die einen älteren
+    Stand mitschleppt, ist genau die dritte Variante, die P9 am 2026-10-01 bei `.account-nav`
+    erst entfernt hat.
     """
     text = (REPO_ROOT / "phase9_hardening" / "CLAUDE.md").read_text(encoding="utf-8")
     head = text.split("\n## Modulstatus\n", 1)[1].split("\n## ", 1)[0]
     rows = [l for l in head.split("\n") if l.lstrip().startswith("|") and not SEPARATOR_RE.match(l.strip())]
-    assert len(rows) == 17, f"erwartet Kopf + 16 Datenzeilen, gefunden {len(rows)}"
+    assert len(rows) == 18, f"erwartet Kopf + 17 Datenzeilen, gefunden {len(rows)}"
     assert all(cell_count(r) == 3 for r in rows), [
         f"Zeile mit {cell_count(r)} Zellen: {r[:70]}" for r in rows if cell_count(r) != 3
     ]

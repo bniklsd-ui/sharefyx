@@ -7,7 +7,7 @@ up: ./CLAUDE.md
 down:
   - ./ABNAHME_MATRIX.md     # Abnahme- und [VERIFY]-Bilanz — der eine Ort, an dem die Zahlen stehen
   - ../docs/concepts/phase9_hardening_plan.md   # Locks P9-A–P9-T, Steps 0–H
-updated: 2026-10-05 (**Abschnitt `R` angelegt** — die sieben Punkte aus der Bildsichtung als **eigene** Zeile, mit eigener Abnahme P9-96–P9-102; beim Abschnitt `S` ein datierter Nachtrag, weil dessen Text der Stand des Splits ist und der Head inzwischen „gebaut" trägt) | 2026-10-04 (**angelegt — Nikinger-Entscheidung vom 2026-10-04**, der letzte offene Hebel gegen die Softcap-Überschreitung des Phase-9-Heads)
+updated: 2026-10-06 (Abschnitt **`U`** angelegt — die dritte Bildsichtung als **eigene** Zeile der §-Modulstatus-Tabelle, mit eigener Abnahme P9-116–P9-119; `U` dreht `T` nicht, ändert aber dieselbe Klasse, und eine Zeile, die einen älteren Stand mitschleppt, ist die dritte Variante, die P9 am 2026-10-01 bei `.account-nav` erst entfernt hat. Archiv **34.934 → 37.332 B**) | 2026-10-05 (**Abschnitt `R` angelegt** — die sieben Punkte aus der Bildsichtung als **eigene** Zeile, mit eigener Abnahme P9-96–P9-102; beim Abschnitt `S` ein datierter Nachtrag, weil dessen Text der Stand des Splits ist und der Head inzwischen „gebaut" trägt) | 2026-10-04 (**angelegt — Nikinger-Entscheidung vom 2026-10-04**, der letzte offene Hebel gegen die Softcap-Überschreitung des Phase-9-Heads)
 ---
 
 # Archiv der Modulstatus-Statusspalten (Phase 9)
@@ -125,6 +125,10 @@ Punkt 5.
 ## `T`
 
 🟡 **gebaut 2026-10-06 (M3)**, Release `v3.1.3` steht (unverändert), **nicht deployt** — Probe **29/29**, **Gegenläufe G7–G12 6 von 6** wirksam, `pytest` 1238 → 1246. **Der Block dreht zwei Locks des Vortags: P9-AN und die Fläche aus P9-AO sind widerrufen** — die Menüpunkte tragen die **Standardknopf-Fläche** (`--btn-std-fill`), ausgewählt die **Akzentfläche** wie `.btn-primary` (Entscheidung aus der Rückfrage), und der Abstand ist 8 px (vorher 0 px). „Ändern" ist **Vorsicht** (rot wie „Archivieren"), „Abbrechen" → **„Schließen"** · Beschriftung der Space-Zeilen bündig mit dem Titel (vorher 33 px), Namensfeld im Detail beidseitig bündig (+12 px, als **Rasterfolge**, nicht als Zahl), Anlegezeile eine Zeile (vorher 80 px Versatz) · **sechs Wächter umgeschrieben** (4 settings, 2 static_routes), **keiner gelöscht**; **Gegenlauf G11 fand eine Messlücke** (siehe Session-Block) · **zwei Softcap-Überschreitungen neu benannt** (Matrix 84.161 B, Plan 49.655 B) — Details in der `ABNAHME_MATRIX.md` unter dem Nachtrag vom 2026-10-06
+
+## `U`
+
+🟡 **gebaut 2026-10-06 (M3)**, Release `v3.1.3` steht (unverändert), **nicht deployt** — Probe **48/48**, **Gegenläufe G13–G18 6 von 6** wirksam, `pytest` 1241 → **1245**. **Der Nikinger hat den Auftrag selbst eingeschränkt:** *„nur bei Spaces verwalten … aber nur dieses“* ⇒ **P9-BA widerrufen** (die Menüpunkte behalten ihre 131 px) und **P9-BE** als **neuer** Lock entstanden (Fenster verkleinern). Menüpunkte **flacher** (b): 4 px Polster, **31,69 px** statt 35,69 px · Space-Zeilen **umklammern ihr Label** (92–147 px statt 330 px, rechts 9 statt 192–245 px, Text 1 px bündig) · **Spaces-Fenster 338 statt 380 px**, Feld 138 px von 288 px Inhalt, Knopf 142 px, im Schmal-Modus zurückgenommen (422 px) · Bild 04 nennt jetzt die **Position** (y 205..246), Bild 07 **rollt auf** (`scrollIntoView`) und nimmt die Anlegezeile mit · **vier eigene Fehler**, drei davon „eine Regel, die nicht die ist, die ich meine“ (`box-sizing: border-box`, `width: 100%` in der **Sammelregel**, eine Station, die den eigenen Fehler nicht bemerkte) · **ein Gegenlauf blieb grün** (G17) und wurde zum Anlass, den Ausgangszustand messbar zu machen · **P9-112 widerrufen**, P9-113/114/115 abgelöst (Zuordnung in der Matrix) — Details im Session-Block und in der `ABNAHME_MATRIX.md`
 
 ## `Gate/Z`
 

@@ -1,0 +1,945 @@
+{
+  "base_url": "https://127.0.0.1:18775",
+  "plan": "docs/concepts/phase9_hardening_block_settings_plan.md §12.1",
+  "messwerte": {
+    "P9-104_flaeche": {
+      "menuepunkt": {
+        "l": 654.5,
+        "r": 785.5,
+        "w": 131,
+        "t": 417.72,
+        "h": 31.69,
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))",
+        "borderColor": "rgb(29, 67, 116)",
+        "color": "rgb(196, 205, 216)",
+        "boxShadow": "rgba(255, 255, 255, 0.06) 0px 1px 0px 0px inset",
+        "justify": "center",
+        "textAlign": "left",
+        "padL": "8px",
+        "padR": "8px",
+        "text": {
+          "l": 667,
+          "r": 773,
+          "mid": 720,
+          "txt": "Passwort ändern"
+        }
+      },
+      "standard": {
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))",
+        "borderColor": "rgb(29, 67, 116)",
+        "color": "rgb(233, 237, 242)",
+        "boxShadow": "rgba(255, 255, 255, 0.06) 0px 1px 0px 0px inset"
+      }
+    },
+    "P9-105_auswahl": {
+      "menuepunkt": {
+        "l": 456.5,
+        "r": 587.5,
+        "w": 131,
+        "t": 294.58,
+        "h": 31.69,
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(rgb(92, 160, 247), rgb(44, 116, 214))",
+        "borderColor": "rgb(18, 60, 116)",
+        "color": "rgb(255, 255, 255)",
+        "boxShadow": "rgba(255, 255, 255, 0.28) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.55) 0px 1px 2px 0px, rgba(0, 0, 0, 0.3) 0px 3px 8px 0px",
+        "justify": "center",
+        "textAlign": "left",
+        "padL": "8px",
+        "padR": "8px",
+        "text": {
+          "l": 469,
+          "r": 575,
+          "mid": 522,
+          "txt": "Passwort ändern"
+        }
+      },
+      "hauptknopf": {
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(rgb(92, 160, 247), rgb(44, 116, 214))",
+        "borderColor": "rgb(18, 60, 116)",
+        "color": "rgb(255, 255, 255)",
+        "boxShadow": "rgba(255, 255, 255, 0.28) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.55) 0px 1px 2px 0px, rgba(0, 0, 0, 0.3) 0px 3px 8px 0px"
+      }
+    },
+    "P9-106_passwort": {
+      "aendern": {
+        "l": 785.5,
+        "r": 870.5,
+        "w": 85,
+        "t": 611.11,
+        "h": 40.8,
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))",
+        "borderColor": "rgb(29, 67, 116)",
+        "color": "rgb(229, 72, 77)",
+        "boxShadow": "rgba(255, 255, 255, 0.06) 0px 1px 0px 0px inset",
+        "justify": "normal",
+        "textAlign": "center",
+        "padL": "14px",
+        "padR": "14px",
+        "text": {
+          "l": 800.5,
+          "r": 855.5,
+          "mid": 828,
+          "txt": "Ändern"
+        }
+      },
+      "vorsicht": {
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))",
+        "borderColor": "rgb(29, 67, 116)",
+        "color": "rgb(229, 72, 77)",
+        "boxShadow": "rgba(255, 255, 255, 0.06) 0px 1px 0px 0px inset"
+      }
+    },
+    "P9-107_versatz_speisezilen_px": 1.0,
+    "P9-108_member_feld": {
+      "name": {
+        "l": 926.5,
+        "r": 1160.5,
+        "w": 234,
+        "t": 156.69,
+        "h": 40.8,
+        "background": "rgb(12, 16, 21)",
+        "backgroundImage": "none",
+        "borderColor": "rgba(255, 255, 255, 0.16)",
+        "color": "rgb(233, 237, 242)",
+        "boxShadow": "rgba(0, 0, 0, 0.55) 0px 2px 5px 0px inset, rgba(255, 255, 255, 0.04) 0px -1px 0px 0px inset",
+        "justify": "normal",
+        "textAlign": "start",
+        "padL": "8px",
+        "padR": "8px",
+        "text": null
+      },
+      "auswahl": {
+        "l": 926.5,
+        "r": 1035.5,
+        "w": 109,
+        "t": 205.48,
+        "h": 40.8,
+        "background": "rgb(12, 16, 21)",
+        "backgroundImage": "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A7B2BF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>\")",
+        "borderColor": "rgba(255, 255, 255, 0.16)",
+        "color": "rgb(233, 237, 242)",
+        "boxShadow": "rgba(0, 0, 0, 0.55) 0px 2px 5px 0px inset, rgba(255, 255, 255, 0.04) 0px -1px 0px 0px inset",
+        "justify": "normal",
+        "textAlign": "start",
+        "padL": "8px",
+        "padR": "28px",
+        "text": {
+          "l": 0,
+          "r": 0,
+          "mid": 0,
+          "txt": "lesen"
+        }
+      },
+      "hinzu": {
+        "l": 1043.5,
+        "r": 1160.5,
+        "w": 117,
+        "t": 205.48,
+        "h": 40.8,
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))",
+        "borderColor": "rgb(29, 67, 116)",
+        "color": "rgb(233, 237, 242)",
+        "boxShadow": "rgba(255, 255, 255, 0.06) 0px 1px 0px 0px inset",
+        "justify": "normal",
+        "textAlign": "center",
+        "padL": "14px",
+        "padR": "14px",
+        "text": {
+          "l": 1058.5,
+          "r": 1145.5,
+          "mid": 1102,
+          "txt": "Hinzufügen"
+        }
+      }
+    },
+    "P9-109_anlegezeile": {
+      "feld": {
+        "l": 674.5,
+        "r": 812.5,
+        "w": 138,
+        "t": 1721.94,
+        "h": 40.8,
+        "background": "rgb(12, 16, 21)",
+        "backgroundImage": "none",
+        "borderColor": "rgba(255, 255, 255, 0.16)",
+        "color": "rgb(233, 237, 242)",
+        "boxShadow": "rgba(0, 0, 0, 0.55) 0px 2px 5px 0px inset, rgba(255, 255, 255, 0.04) 0px -1px 0px 0px inset",
+        "justify": "normal",
+        "textAlign": "start",
+        "padL": "8px",
+        "padR": "8px",
+        "text": null
+      },
+      "knopf": {
+        "l": 820.5,
+        "r": 962.5,
+        "w": 142,
+        "t": 1721.94,
+        "h": 40.8,
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))",
+        "borderColor": "rgb(29, 67, 116)",
+        "color": "rgb(233, 237, 242)",
+        "boxShadow": "rgba(255, 255, 255, 0.06) 0px 1px 0px 0px inset",
+        "justify": "normal",
+        "textAlign": "center",
+        "padL": "14px",
+        "padR": "14px",
+        "text": {
+          "l": 835.5,
+          "r": 947.5,
+          "mid": 891.5,
+          "txt": "Space anlegen"
+        }
+      },
+      "innen_l": 673.5,
+      "innen_r": 963.5,
+      "knopf_eigenbreite": 142
+    },
+    "P9-117_zeilen": [
+      {
+        "box": 147,
+        "label": 137,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "alpha (eigener Space)"
+      },
+      {
+        "box": 92,
+        "label": 82,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "diag-140009"
+      },
+      {
+        "box": 101,
+        "label": 91,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "polish-130004"
+      },
+      {
+        "box": 101,
+        "label": 91,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "polish-130134"
+      },
+      {
+        "box": 101,
+        "label": 91,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "polish-130234"
+      },
+      {
+        "box": 101,
+        "label": 91,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "polish-130335"
+      },
+      {
+        "box": 101,
+        "label": 91,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "polish-130436"
+      },
+      {
+        "box": 101,
+        "label": 91,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "polish-130537"
+      },
+      {
+        "box": 101,
+        "label": 91,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "polish-130637"
+      },
+      {
+        "box": 101,
+        "label": 91,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "polish-130838"
+      },
+      {
+        "box": 101,
+        "label": 91,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "polish-130938"
+      },
+      {
+        "box": 101,
+        "label": 91,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "polish-131039"
+      },
+      {
+        "box": 101,
+        "label": 91,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "polish-131139"
+      },
+      {
+        "box": 101,
+        "label": 91,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "polish-140612"
+      },
+      {
+        "box": 101,
+        "label": 91,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "polish-141013"
+      },
+      {
+        "box": 101,
+        "label": 91,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "polish-141142"
+      },
+      {
+        "box": 117,
+        "label": 107,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "settings-133935"
+      },
+      {
+        "box": 117,
+        "label": 107,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "settings-134104"
+      },
+      {
+        "box": 117,
+        "label": 107,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "settings-134204"
+      },
+      {
+        "box": 117,
+        "label": 107,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "settings-134805"
+      },
+      {
+        "box": 117,
+        "label": 107,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "settings-135604"
+      },
+      {
+        "box": 117,
+        "label": 107,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "settings-135705"
+      },
+      {
+        "box": 117,
+        "label": 107,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "settings-135834"
+      },
+      {
+        "box": 117,
+        "label": 107,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "settings-140135"
+      },
+      {
+        "box": 117,
+        "label": 107,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "settings-152605"
+      },
+      {
+        "box": 117,
+        "label": 107,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "settings-153904"
+      },
+      {
+        "box": 117,
+        "label": 107,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "settings-154634"
+      },
+      {
+        "box": 117,
+        "label": 107,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "settings-154804"
+      },
+      {
+        "box": 117,
+        "label": 107,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "settings-154904"
+      },
+      {
+        "box": 117,
+        "label": 107,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "settings-155004"
+      },
+      {
+        "box": 94,
+        "label": 84,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "sicht-133318"
+      },
+      {
+        "box": 78,
+        "label": 68,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "zz-141404"
+      },
+      {
+        "box": 78,
+        "label": 68,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "zz-141604"
+      },
+      {
+        "box": 78,
+        "label": 68,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "zz-142205"
+      },
+      {
+        "box": 78,
+        "label": 68,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "zz-142405"
+      },
+      {
+        "box": 78,
+        "label": 68,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "zz-142636"
+      },
+      {
+        "box": 78,
+        "label": 68,
+        "leer": 9,
+        "text_l": 675.5,
+        "padR": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "zz-143106"
+      }
+    ],
+    "P9-118_panel": {
+      "ist": {
+        "w": 338,
+        "l": 649.5,
+        "inhalt": 288,
+        "min_w": 338,
+        "max_w": 338
+      },
+      "schatten": {
+        "w": 380,
+        "inhalt": 330
+      }
+    },
+    "P9-114_mitglieder_bedienung": {
+      "hinweis_sichtbar": true,
+      "zeile_t": 156.69,
+      "abstand_hinweis": 16,
+      "knopf_t": 205.48,
+      "knopf_b": 246.28,
+      "abstand_zeile_knopf": -40.8,
+      "mitglieder_hoehe": 0,
+      "panel_t": 32,
+      "panel_b": 328.08,
+      "im_panel": true
+    },
+    "P9-108_bei_1024": {
+      "name": {
+        "l": 443,
+        "r": 677,
+        "w": 234,
+        "t": 379.64,
+        "h": 40.8,
+        "background": "rgb(12, 16, 21)",
+        "backgroundImage": "none",
+        "borderColor": "rgba(255, 255, 255, 0.16)",
+        "color": "rgb(233, 237, 242)",
+        "boxShadow": "rgba(0, 0, 0, 0.55) 0px 2px 5px 0px inset, rgba(255, 255, 255, 0.04) 0px -1px 0px 0px inset",
+        "justify": "normal",
+        "textAlign": "start",
+        "padL": "8px",
+        "padR": "8px",
+        "text": null
+      },
+      "auswahl": {
+        "l": 443,
+        "r": 552,
+        "w": 109,
+        "t": 428.44,
+        "h": 40.8,
+        "background": "rgb(12, 16, 21)",
+        "backgroundImage": "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A7B2BF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>\")",
+        "borderColor": "rgba(255, 255, 255, 0.16)",
+        "color": "rgb(233, 237, 242)",
+        "boxShadow": "rgba(0, 0, 0, 0.55) 0px 2px 5px 0px inset, rgba(255, 255, 255, 0.04) 0px -1px 0px 0px inset",
+        "justify": "normal",
+        "textAlign": "start",
+        "padL": "8px",
+        "padR": "28px",
+        "text": {
+          "l": 0,
+          "r": 0,
+          "mid": 0,
+          "txt": "lesen"
+        }
+      },
+      "hinzu": {
+        "l": 560,
+        "r": 677,
+        "w": 117,
+        "t": 428.44,
+        "h": 40.8,
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))",
+        "borderColor": "rgb(29, 67, 116)",
+        "color": "rgb(233, 237, 242)",
+        "boxShadow": "rgba(255, 255, 255, 0.06) 0px 1px 0px 0px inset",
+        "justify": "normal",
+        "textAlign": "center",
+        "padL": "14px",
+        "padR": "14px",
+        "text": {
+          "l": 575,
+          "r": 662,
+          "mid": 618.5,
+          "txt": "Hinzufügen"
+        }
+      }
+    },
+    "P9-118_bei_1024": {
+      "w": 422,
+      "l": 301,
+      "inhalt": 372,
+      "min_w": 0,
+      "max_w": NaN
+    },
+    "P9-119_zeile07": {
+      "vorher": {
+        "gefunden": true,
+        "sichtbar": false,
+        "sichtbar_voll": false,
+        "sichtbar_px": 0,
+        "zeile_t": 1703.94,
+        "zeile_b": 1739.63,
+        "panel_t": 32,
+        "panel_b": 868,
+        "scrollTop": 0,
+        "scrollHeight": 1854,
+        "clientHeight": 834
+      },
+      "nachher": {
+        "gefunden": true,
+        "sichtbar": true,
+        "sichtbar_voll": true,
+        "sichtbar_px": 35.69,
+        "zeile_t": 764.94,
+        "zeile_b": 800.63,
+        "panel_t": 32,
+        "panel_b": 868,
+        "scrollTop": 939,
+        "scrollHeight": 1854,
+        "clientHeight": 834
+      }
+    }
+  },
+  "befunde": [
+    {
+      "pruefung": "Vorbereitung Übersicht geladen",
+      "ok": true,
+      "detail": "37 Spaces in der Rail"
+    },
+    {
+      "pruefung": "S1/P9-103 zwei Abstaende zwischen den drei Punkten",
+      "ok": true,
+      "detail": "[8.0, 8.0] px"
+    },
+    {
+      "pruefung": "S1/P9-103 Abstand == der der Space-Zeilen",
+      "ok": true,
+      "detail": "Menü [8.0, 8.0] px, Liste 8px"
+    },
+    {
+      "pruefung": "S2/P9-104 unausgewählter Menüpunkt == Standardknopf (Fläche)",
+      "ok": true,
+      "detail": "'linear-gradient(rgb(12, 28, 49), rgb(5, 11, ' vs 'linear-gradient(rgb(12, 28, 49), rgb(5, 11, '"
+    },
+    {
+      "pruefung": "S2/P9-104 auch der Innenschatten ist derselbe",
+      "ok": true,
+      "detail": "'rgba(255, 255, 255, 0.06) 0px 1px 0px 0px in'"
+    },
+    {
+      "pruefung": "S2/P9-99 Beschriftung weiterhin mittig",
+      "ok": true,
+      "detail": "Textmitte 720, Knopfmitte 720.0"
+    },
+    {
+      "pruefung": "S1/P9-96 Titelabstand unverändert 24 px",
+      "ok": true,
+      "detail": "24.0 px"
+    },
+    {
+      "pruefung": "S1/P9-116 alle drei Punkte tragen 4 px Polster oben/unten",
+      "ok": true,
+      "detail": "oben ['4px', '4px', '4px'], unten ['4px', '4px', '4px'] (vorher 6px/6px)"
+    },
+    {
+      "pruefung": "S1/P9-116 die Höhe ist bei allen drei gleich und kleiner als 35,69 px",
+      "ok": true,
+      "detail": "[31.69, 31.69, 31.69] px"
+    },
+    {
+      "pruefung": "S1/P9-116 die Breite ist unverändert gestreckt (P9-BA eingeschränkt)",
+      "ok": true,
+      "detail": "[131, 131, 131] px (Beschriftungen 106/113/77 px — gleiche Fläche für alle drei)"
+    },
+    {
+      "pruefung": "S3/P9-105 ausgewählter Menüpunkt == Akzentfläche wie .btn-primary",
+      "ok": true,
+      "detail": "'linear-gradient(rgb(92, 160, 247), rgb(44, 116, 214)' vs 'linear-gradient(rgb(92, 160, 247), rgb(44, 116, 214)'"
+    },
+    {
+      "pruefung": "S3/P9-105 die Kante auch",
+      "ok": true,
+      "detail": "rgb(18, 60, 116) vs rgb(18, 60, 116)"
+    },
+    {
+      "pruefung": "S4/P9-106 der Knopf Ändern trägt die Vorsichtsfarbe",
+      "ok": true,
+      "detail": "rgb(229, 72, 77) vs rgb(229, 72, 77)"
+    },
+    {
+      "pruefung": "S4/P9-106 und die Standardfläche, keine gefüllte rote",
+      "ok": true,
+      "detail": "'linear-gradient(rgb(12, 28, 49), rgb(5, 11, '"
+    },
+    {
+      "pruefung": "S4/P9-106 Abbrechen ist weg, Schließen da",
+      "ok": true,
+      "detail": "'Passwort ändern' …"
+    },
+    {
+      "pruefung": "S3/P9-105 genau ein Punkt trägt aria-current=true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "pruefung": "S5 Spaces als Stufe 2",
+      "ok": true,
+      "detail": "37 Zeilen"
+    },
+    {
+      "pruefung": "S5/P9-107 Space-Zeilen-Beschriftung == Titel (links)",
+      "ok": true,
+      "detail": "1.0 px Versatz"
+    },
+    {
+      "pruefung": "S5/P9-109 Feld und Knopf auf einer Zeile",
+      "ok": true,
+      "detail": "Feld top 1721.94, Knopf top 1721.94"
+    },
+    {
+      "pruefung": "S5/P9-109 Feld bündig links mit dem Panelinhalt",
+      "ok": true,
+      "detail": "Feld 674.5, Inhalt 673.5"
+    },
+    {
+      "pruefung": "S5/P9-109 Knopf bündig rechts mit dem Panelinhalt",
+      "ok": true,
+      "detail": "Knopf 962.5, Inhalt 963.5"
+    },
+    {
+      "pruefung": "S5/P9-109 der Knopf Space anlegen behält seine eigene Größe",
+      "ok": true,
+      "detail": "in der Zeile 142 px, an einer Kopie außerhalb 142 px"
+    },
+    {
+      "pruefung": "S5/P9-117 jedes Kästchen ist Label + rechtes Polster + 2 px Rahmen",
+      "ok": true,
+      "detail": "37 Zeilen, breiteste 147 px (vorher 330 px für alle)"
+    },
+    {
+      "pruefung": "S5/P9-117 rechts ist nur noch das Polster frei",
+      "ok": true,
+      "detail": "max 9 px bei Polster 8 px (vorher 192–245 px)"
+    },
+    {
+      "pruefung": "S5/P9-117 die Beschriftung steht unverändert bündig mit dem Titel",
+      "ok": true,
+      "detail": "[1.0] px Versatz"
+    },
+    {
+      "pruefung": "S5/P9-118 das Spaces-Fenster ist schmaler als dasselbe Fenster ohne P9-BE",
+      "ok": true,
+      "detail": "ist 338 px, ohne die Klasse 380 px (Differenz 42 px)"
+    },
+    {
+      "pruefung": "S5/P9-118 min und max stehen auf demselben Wert (eine Entscheidung, eine Stelle)",
+      "ok": true,
+      "detail": "min 338, max 338"
+    },
+    {
+      "pruefung": "S5/P9-118 die Anlegezeile bleibt auf einer Zeile und der Knopf behält seine Größe",
+      "ok": true,
+      "detail": "Feld 138 px (vorher 180 px), Knopf 142 px == Eigenbreite"
+    },
+    {
+      "pruefung": "S5/P9-118 das Anlegefeld behält mindestens 45 % des Panelinhalts",
+      "ok": true,
+      "detail": "Feld 138 px von 288 px Inhalt = 48 % (bei 288 px Inhalt waeren es 37 %)"
+    },
+    {
+      "pruefung": "S5 Detail offen",
+      "ok": true,
+      "detail": "sichtbar: ['settings-menu', 'settings-spaces', 'settings-space-detail']"
+    },
+    {
+      "pruefung": "S5/P9-108 Namensfeld == Auswahl-Knopf (links)",
+      "ok": true,
+      "detail": "Feld 926.5, Auswahl 926.5 (Differenz 0.0 px)"
+    },
+    {
+      "pruefung": "S5/P9-108 Namensfeld == Aktion rechts",
+      "ok": true,
+      "detail": "Feld 1160.5, Knopf 1160.5"
+    },
+    {
+      "pruefung": "S5/P9-AY das Feld ist NICHT über die Panelbreite hinaus gewachsen",
+      "ok": true,
+      "detail": "234 px breit"
+    },
+    {
+      "pruefung": "S5/P9-101 Detail-Titelabstand == Menü-Titelabstand",
+      "ok": true,
+      "detail": "24.0 px"
+    },
+    {
+      "pruefung": "S5/P9-114 die Bedienzeile steht im Panel, im Sichtbereich",
+      "ok": true,
+      "detail": "Aktionszeile y 156.69, Panel y 32..328.08"
+    },
+    {
+      "pruefung": "S5/P9-114 sie steht **oben**, direkt unter dem Hinweistext",
+      "ok": true,
+      "detail": "Aktionszeile 16 px unter dem Hinweis, Mitgliederbereich 0 px hoch; Knopf y 205.48..246.28 (-40.8 px unter der Zeile — das ist die zweite Rasterzeile aus P9-AY, kein Abstand zum Hinweis)"
+    },
+    {
+      "pruefung": "S6/P9-AI genau ein Panel sichtbar",
+      "ok": true,
+      "detail": "['settings-space-detail']"
+    },
+    {
+      "pruefung": "S6/P9-108 auch bei 1024 beidseitig bündig",
+      "ok": true,
+      "detail": "links 0 px, rechts 0 px"
+    },
+    {
+      "pruefung": "S6/P9-118 bei 1024 ist die feste Breite zurückgenommen (das Panel flext)",
+      "ok": true,
+      "detail": "422 px statt 338 px im breiten Modus (min/max 0/nan)"
+    },
+    {
+      "pruefung": "S7 Passwortwechsel HTTP 200",
+      "ok": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "pruefung": "S8 Space anlegen: eine Zeile mehr",
+      "ok": true,
+      "detail": "37 -> 38"
+    },
+    {
+      "pruefung": "S8/P9-119 die neue Zeile steht als letzte in der Liste",
+      "ok": true,
+      "detail": "Position 38 von 38"
+    },
+    {
+      "pruefung": "S8/P9-107 auch die neue Zeile bündig",
+      "ok": true,
+      "detail": "neu 675.5, Titel 674.5"
+    },
+    {
+      "pruefung": "S8/P9-119 die Anlegezeile ist mit im Bild (Feld und Knopf auf einer Zeile)",
+      "ok": true,
+      "detail": "y 826.63..867.42, Feld 138 px, Knopf 142 px"
+    },
+    {
+      "pruefung": "S8/P9-119 der Ausgangszustand ist gemessen: die neue Zeile ist NICHT sichtbar",
+      "ok": true,
+      "detail": "Zeile y 1703.94..1739.63 bei scrollTop 0 (1854 px Inhalt bei 834 px Höhe)"
+    },
+    {
+      "pruefung": "S8/P9-119 nach dem Aufrollen liegt die neue Zeile vollständig im Panel",
+      "ok": true,
+      "detail": "nachher 35.69 px sichtbar bei scrollTop 939 (Zeile y 764.94..800.63, Panel y 32..868)"
+    },
+    {
+      "pruefung": "S8/P9-119 Bild 07 zeigt die neue Zeile **und nicht** den Titel",
+      "ok": true,
+      "detail": "Titel y -882 bei Panel-Oberkante 32 — die Bündigkeit mit dem Titel zeigen Bild 04 und 08"
+    },
+    {
+      "pruefung": "S8 ESC schließt das Detail, die Liste bleibt offen",
+      "ok": true,
+      "detail": "Detail offen: True, sichtbar danach: ['settings-menu', 'settings-spaces']"
+    }
+  ],
+  "alle_ok": true
+}

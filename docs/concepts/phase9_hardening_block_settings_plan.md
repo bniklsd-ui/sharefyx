@@ -7,7 +7,7 @@ up: ../../phase9_hardening/CLAUDE.md
 down:
   - ./phase9_hardening_plan.md               # 📕 übergeordneter P9-Plan; §12.4 Übersichtsgrafik, P9-11, P9-27, P9-36
   - ./phase9_hardening_block_trace_plan.md   # 📕 Formvorlage dieses Mini-Plans
-updated: 2026-10-05 (**§10 gebaut** — die sieben Punkte aus der Bildsichtung, opencode/M3, Probe **56/56**, G4 → 2 rot · G5 → 2 rot · G6 → 3 rot; P9-96–P9-102 mit **5 ✅ · 2 ⚠️**. **Zwei Korrekturen an diesem Plan, beide gemessen:** P9-APs `text-align` war auf einem Flex-Knopf ein **No-op** (Textmitte 8,5 px daneben) → `justify-content`; und das **linke Polster** musste vom 32-px-Wert der Baumzeile auf `--space` (Nikinger-Entscheidung), sonst bleibt die Beschriftung 12 px neben der Mitte. G6 trifft **P9-84**, nicht P9-97) | 2026-10-05 (**§10: sieben UI-Punkte aus der Bildsichtung, nicht gebaut** — Locks P9-AM–P9-AS, Abnahme P9-96–P9-102; zwei davon sind ausdrücklich „nicht anfassen"; zwei Folgen festgehalten: die zweite Vergleichsrichtung in P9-84 und der zu **eng** werdende Wächter) | 2026-10-05 (**gebaut, opencode/M3 — §9 gefüllt**; Release `v3.1.3` steht, nicht deployt; Probe 39/39, G1/G2/G3 rot, `pytest` 1223 → 1233 · **zwei Code-Befunde kamen aus dem Browser, nicht aus den Tests**, vier Punkte gegen den Plan abweichend begründet) | 2026-10-05 (geschrieben, Claude Code, nach dem Deploy `v3.1.2`; Wünsche und Entscheidungen des Nikingers vom selben Tag)
+updated: 2026-10-06 (**§12.1 — der Block „Kästchen enger" ist gebaut**: Abnahme **P9-116–P9-119**, Probe **48/48**, **Gegenläufe G13–G18 6 von 6** wirksam; **P9-BA widerrufen** (der Nikinger: „nur bei Spaces verwalten … aber nur dieses"), **P9-BB (b)** = zusätzlich flachere Menüpunkte (31,69 px statt 35,69 px), **P9-BC** = Zeilen umklammern ihr Label, **P9-BE neu** = nur das Spaces-Fenster schmaler (338 statt 380 px); Bild 04 nennt die Position, Bild 07 rollt auf. **P9-112 – P9-115 sind abgelöst**, die Zuordnung steht in der Matrix. **Vier eigene Fehler**, drei davon „eine Regel, die nicht die ist, die ich meine") | 2026-10-05 (**§10 gebaut** — die sieben Punkte aus der Bildsichtung, opencode/M3, Probe **56/56**, G4 → 2 rot · G5 → 2 rot · G6 → 3 rot; P9-96–P9-102 mit **5 ✅ · 2 ⚠️**. **Zwei Korrekturen an diesem Plan, beide gemessen:** P9-APs `text-align` war auf einem Flex-Knopf ein **No-op** (Textmitte 8,5 px daneben) → `justify-content`; und das **linke Polster** musste vom 32-px-Wert der Baumzeile auf `--space` (Nikinger-Entscheidung), sonst bleibt die Beschriftung 12 px neben der Mitte. G6 trifft **P9-84**, nicht P9-97) | 2026-10-05 (**§10: sieben UI-Punkte aus der Bildsichtung, nicht gebaut** — Locks P9-AM–P9-AS, Abnahme P9-96–P9-102; zwei davon sind ausdrücklich „nicht anfassen"; zwei Folgen festgehalten: die zweite Vergleichsrichtung in P9-84 und der zu **eng** werdende Wächter) | 2026-10-05 (**gebaut, opencode/M3 — §9 gefüllt**; Release `v3.1.3` steht, nicht deployt; Probe 39/39, G1/G2/G3 rot, `pytest` 1223 → 1233 · **zwei Code-Befunde kamen aus dem Browser, nicht aus den Tests**, vier Punkte gegen den Plan abweichend begründet) | 2026-10-05 (geschrieben, Claude Code, nach dem Deploy `v3.1.2`; Wünsche und Entscheidungen des Nikingers vom selben Tag)
 ---
 
 # Phase 9 — Block settings und die Restposten bis zum Closeout
@@ -629,7 +629,7 @@ Sichtbereichs** — das Bild kann die Zeile also gar nicht zeigen, egal wie bün
 (`scrollIntoView`), und das Checkkriterium nennt das Panel, in dem die Aussage steht — Bild 07
 zeigt nach dem Klick auf die erste Zeile das **Detail-Panel**, nicht die Liste.
 
-### Abnahme (P9-112 – P9-115), nicht gefahren
+### Abnahme (P9-112 – P9-115), nicht gefahren — **überholt am selben Tag, siehe §12.1**
 
 `P9-112` Jeder Menüpunkt ist **so breit wie sein eigenes Label plus Polster** (keine Streckung auf
 den längsten Nachbarn), die Beschriftung bleibt auf ihrer Kante · `P9-113` Jede Space-Zeile zieht
@@ -637,3 +637,83 @@ ihr Kästchen auf die Beschriftung plus Polster zusammen, **Text unverändert** 
 die Member-Zeile steht dort, wo das Bild sie zeigt (y 157..246 im 1440er Bild), und das Check-
 kriterium nennt die Position · `P9-115` Bild 07: die neu angelegte Zeile ist **im Bild sichtbar**
 (aufgerollt) und bündig mit dem Titel.
+
+> **[2026-10-06, dieselbe Sitzung, §12.1: `P9-112` ist widerrufen, die anderen drei sind
+> abgelöst.** Der Nikinger hat auf die Rückfrage zu Bild 01 *(b)* gewählt und dabei den Auftrag aus
+> Bild 08 präzisiert: *„nur bei Spaces verwalten, dort die Buttons der einzelnen Spaces nach Links,
+> und das Fenster rechts verkleinern, aber nur dieses."* Damit fällt die Breitenkorrektur **der
+> Menüpunkte** (P9-BA) — sie gilt nur noch den Space-Zeilen — und das „Fenster verkleinern" kommt
+> als **neuer Lock P9-BE** hinzu, den §12 noch nicht kannte. Die vier Zeilen oben bleiben stehen,
+> weil die Matrix die Zuordnung vollständig führt; gebaut und gefahren wurde **P9-116 – P9-119**.
+
+## §12.1 Dritte Bildsichtung, **gebaut** — drei Korrekturen, eine davon eine neue Frage
+
+**Stand 2026-10-06, opencode/M3.** Alles aus §12 ist gebaut, **außer** der Breitenkorrektur an den
+Menüpunkten — die hat der Nikinger selbst eingeschränkt. Release `v3.1.3` **unverändert**, kein
+Deploy, kein Service-Touch. Reines Frontend (eine `.css`-Regelgruppe, eine `.html`-Zeile) plus die
+Belegwerkzeuge.
+
+### Die Rückfrage und ihre Antwort
+
+| | Seine Worte | Gebaut | Gemessen |
+|---|---|---|---|
+| Bild 01 | *„the update-log button is still bigger, I think you need to decrease its height"* — Antwort **(b)**: **zusätzlich flacher** | `padding-block: calc(var(--space) * 0.5)` am Menüpunkt (4 px statt 6 px) | Höhe **31,69 px** statt 35,69 px, bei allen dreien gleich; **Breite unverändert 131 px**; Beschriftung weiter mittig (Textmitte 720 == Knopfmitte 720,0) |
+| Bild 08 | *„nur bei Spaces verwalten, dort die Buttons der einzelnen Spaces nach Links, und das Fenster rechts verkleinern, aber nur dieses"* | Zeilen: `width: auto` + `align-items: flex-start` an der Liste, `max-width: 100%` als Bremse. Fenster: neue Klasse `settings-panel--list` (**nur** `#settings-spaces`), im Schmal-Modus zurückgenommen | Kästchen **92–147 px** statt 330 px für alle, rechts **9 px** statt 192–245 px Leerraum, Text **1,0 px** bündig mit dem Titel; Fenster **338 px** statt 380 px, Feld **138 px** von 288 px Inhalt (**48 %**), Knopf 142 px == Eigenbreite; bei 1024 px **422 px** (die feste Breite ist zurückgenommen) |
+| Bild 04 | *„where did the space hinzufügen options go?"* | **Kriterium korrigiert**, kein Code: die Zeile nennt jetzt die Position | Bedienzeile **16 px** unter dem Hinweistext, Knopf **y 205,48..246,28**, Mitgliederbereich 0 px |
+| Bild 07 | *„I honestly don't see that"* | Probe rollt die Zeile mit `scrollIntoView` auf und nimmt **zusätzlich die Anlegezeile** mit ins Bild | Ausgangszustand **gemessen**: Zeile y **1704** bei `scrollTop` 0, Panelhöhe 836 px ⇒ **unterhalb** des Sichtbereichs; nach dem Aufrollen vollständig im Panel (y 765) |
+
+### Vier eigene Fehler, und drei davon waren derselbe Typ
+
+1. **`min-width`/`max-width` sind bei `box-sizing: border-box` die Breite des Rahmens.** Erste
+   Fassung: 288 px ⇒ **240 px Inhalt**, Anlegefeld **88 px**. Gefunden hat es die Browser-Probe, nicht
+   der Test — der verglich „schmaler als die Basis" und war mit 288 gegen 340 **auf der falschen
+   Seite**. Jetzt 338 px (288 + 2×24 + 2×1) und der Wächter vergleicht gegen das `max-width`.
+2. **`width: 100%` stand in der Sammelregel** (`.rail__home, …, .settings-space-row, …`), nicht in
+   der eigenen Regel. Die eigene Regel zu löschen ließ alle 28 Kästchen auf 238 px stehen —
+   der Gegenlauf **G15** hat es gemeldet. **Dritte Fassung derselben Fehlerklasse in diesem Block**:
+   *die erste Regel ist nicht die, die ich meine*.
+3. **Eine Station, die den eigenen Fehler nicht bemerkte.** „Schmaler als der Schatten" war mit
+   288 px grün. Der Wächter prüft jetzt die **Ableitung** (Feld ≥ 45 % des Inhalts); **G18** ist der
+   eigene Fehler als Mutation und wird rot.
+4. **Das Gegenlauf-Rig hat vier der sechs Mutationen nie ausgeführt** (Exit-Code statt Station, und
+   die mutierte Datei statt der Probe gestartet) — die erste „6/6“ war eine Behauptung ohne Beleg. Das
+   Skript prüft jetzt die **erwartete Station in der JSON** und gibt bei fehlender JSON das stderr-Ende aus.
+   **Erst damit war G17’s Grün von vorhin überhaupt eine Aussage** (die neue Zeile war bei 29 Spaces
+   zufällig sichtbar); nach der Korrektur **6 von 6**, jede mit benannter roter Station.
+5. **Eine feste Wartezeit hat die Kette an der falschen Stelle geschlossen** (ESC schloss die Liste
+   statt des Details, weil `selectSpace()` erst die Items holt). Zum dritten Mal in diesem Block
+   gegen „auf die Bedingung warten, nicht auf die Uhr".
+
+### Wächter
+
+**Vier neue Tests** in `test_settings_chain.py`, **zwei umgeschrieben, keiner gelöscht**:
+
+* `test_the_menu_points_are_flatter_and_keep_their_width()` — prüft **beide** Richtungen: 4 px
+  Polster (P9-BB) **und** `width: 100%` weiterhin vorhanden (P9-BA eingeschränkt).
+* `test_the_space_rows_hug_their_own_label()` — Liste richtet auf `flex-start` aus **und** die Zeile
+  trägt `width: auto` (die Sammelregel!) **und** `max-width: 100%`.
+* `test_only_the_spaces_panel_is_narrower()` — die Klasse hängt **genau einem** Panel, die Breite ist
+  **kleiner als das `max-width`** der Basis, min == max, und im Schmal-Modus ist sie zurückgenommen.
+* `test_the_two_sight_check_criteria_name_the_position_and_the_panel()` — der **Kriterium-Text**
+  trägt zu Bild 04 eine Pixelposition und zu Bild 07 `scrollIntoView`. Die erste Fassung dieses
+  Wächters war an der **alten** Zeile grün, weil dort zufällig „nicht die Liste" und „Sichtbereich"
+  standen: ein Anker aus der Formulierung des *Befunds* prüft nicht den *Auftrag*.
+* **`padding-block` stand auf keiner Liste** — weder verboten noch erlaubt. Die Liste ist um vier
+  Eigenschaften gewachsen (`padding-block-start/-end`, `padding-inline*`), der erlaubte Wert ist an
+  **einen** Wert am Menüpunkt gebunden und an der Space-Zeile **rot** (dieselbe Technik wie bei
+  `padding-left`).
+
+### Abnahme (P9-116 – P9-119), gefahren 2026-10-06
+
+`P9-116` Die drei Menüpunkte sind **flacher** (Polster 4 px, Höhe 31,69 px) und behalten ihre
+**Breite** (131 px, Beschriftung mittig) · `P9-117` Jede Space-Zeile umklammert ihr **eigenes**
+Label, **Text unverändert** · `P9-118` **Nur** das Spaces-Fenster ist schmaler (338 statt 380 px),
+die Anlegezeile bleibt eine Zeile mit unvermindertem Knopf, im Schmal-Modus flext das Panel ·
+`P9-119` Bild 04 **nennt die Position** der Member-Zeile, Bild 07 zeigt die neue Zeile
+**aufgerollt** in der **Liste**.
+
+**Belege:** Probe `p9_settings_kastchen_probe.py` **48/48** (ein **eigenes** Skript, V187: der Lauf
+vom 2026-10-06 ist der Beleg für die **widerrufene** Breitenlesart), **Gegenläufe G13–G18 6 von 6
+wirksam** (`p9_settings_kastchen_gegenlaeufe.py`), `pytest` **1241 → 1245** (+4, 0 gelöscht), `ui_budget`
+5/5, Tabu-Diff §0.3 leer, Release `v3.1.3` unverändert, **kein Deploy**.
+

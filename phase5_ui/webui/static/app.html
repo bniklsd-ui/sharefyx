@@ -451,8 +451,10 @@
     </div>
 
     <!-- Stufe 2b: Spaces verwalten. Zeilen mit sichtbarem Abstand und dieselbe Trennlinie
-         (`<hr>`) zwischen Liste und Anlege-Zeile, die heute vor dem Detail steht (P9-AK). -->
-    <div class="overlay__panel settings-panel" id="settings-spaces" hidden>
+         (`<hr>`) zwischen Liste und Anlege-Zeile, die heute vor dem Detail steht (P9-AK).
+         P9-BE (2026-10-06): `--list` ist die **einzige** Panelbreite, die feststeht — er trägt
+         das „das Fenster verkleinern, aber nur dieses" aus Bild 08 (app.css, dieselbe Regel). -->
+    <div class="overlay__panel settings-panel settings-panel--list" id="settings-spaces" hidden>
       <button type="button" class="btn btn--icon settings-back" id="settings-back-spaces" title="Zur&uuml;ck" aria-label="Zur&uuml;ck"><svg class="icon" aria-hidden="true"><use href="#i-chevron-left"></use></svg></button>
       <h2>Spaces verwalten</h2>
       <p class="form-error" id="space-admin-error" hidden></p>
