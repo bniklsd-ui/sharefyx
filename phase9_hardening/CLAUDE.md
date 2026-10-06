@@ -43,6 +43,21 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 
 ## Backlog (bewusst zurückgestellt, kein Phasen-Blocker)
 
+- **„Kürzen notieren" — Nikinger-Anordnung vom 2026-10-06, nach der Sichtprüfung.** Zwei Dokumente
+  stehen **über** dem 40-KiB-Softcap, und **beides ist neu**: der settings-Mini-Plan ist erst
+  **durch** den Block vom 2026-10-06 darüber gekommen (§11 + §11.1 sind **10.679 B**, die
+  `updated:`-Kette nur 1.205 B), die Abnahmematrix durch die neun Zeilen der zweiten Bildsichtung.
+  **Gemessen, nicht geschätzt:** Plan **49.655 B** (+8.695 B), Matrix **84.161 B** (+43.201 B).
+  **Nicht** gekürzt, weil ein Kürzen in ein L3-Archiv eine **Nikinger-Entscheidung** ist (P8-P) —
+  und weil die beiden Dateien verschiedene Rollen haben: die **Matrix** ist der *eine* Ort der
+  Abnahme- und der `[VERIFY]`-Bilanz (dorthin darf sie nicht wandern), der **Plan** trägt drei
+  ausgeführte Blöcke. **Die Kandidaten, wenn er entscheidet:** (a) die §-Ergebnisabschnitte
+  (§10.1–§10.3, §11.1) des Plans wandern **verbatim** in ein L3-Archiv — dieselbe Roundtrip-
+  Gegenprobe wie beim Modulstatus-Split vom 2026-10-04; (b) die `updated:`-Kette des Plans rotieren
+  (1.205 B, also **kein** ausreichender Hebel); (c) die **Abnahmematrix** braucht eine andere Form
+  als „Zeilen", denn jede Zeile ist ein Beleg mit Ort — das ist der eigentliche Befund, und er
+  gehört nicht diesem Block, sondern einer Matrix, die 116 Zeilen mit Belegen trägt.
+
 - **B17 — ✅ GESCHLOSSEN am 2026-10-02** (war: „potentieller Extra-Schritt", in der Modulstatus-Tabelle
   als „E (Extra)" geführt). **Alle Knöpfe tragen jetzt eine Fläche aus einem Schema, und die zwei
   verbleibenden Ausnahmen sind je eine Klasse mit eigener Bedeutung.** Die Details, die Messungen und
@@ -193,13 +208,44 @@ Lock falsch oder die Messung — hier die zweite.**
   bei ~31 KB und bleibt **unter** dem Cap; die durchgestrichene Masse im L3-Archiv bleibt **229 B**
   und ist weiterhin kein Hebel
 
+### Nachtrag vom 2026-10-06 — die Sichtprüfung: **4 ✅, 4 neue Punkte, und alle vier sind gemessen**
+
+Der Nikinger hat die acht Bilder angesehen: **02 · 03 · 05 · 06 freigegeben** (*„looks fine now"*
+×2, *„great"*, *„yes"*), **01 · 04 · 07 · 08 mit neuen Punkten**. Diese vier sind in **§12** des
+settings-Plans als Locks **P9-BA–P9-BD** mit Abnahme **P9-112–P9-115** notiert, **nicht gebaut** —
+die Grundlage ist jede Zahl, die heute gemessen wurde:
+
+- **01** *„the update-log button is still bigger … decrease its height"* — **die Höhe ist bei allen
+  dreien gleich (35,69 px)** und im Bild ist **nichts ausgewählt** (0 Akzentpixel). „Bigger" heißt am
+  Bild **19 px Leerraum je Seite** (Kästchen 131 px, Beschriftung 77 px). **P9-BB braucht ein Wort
+  von ihm:** dieselbe Korrektur wie in 08 (Kästchen enger) oder zusätzlich flachere Knöpfe?
+- **04** *„where did the space hinzufügen options go?"* — **die Optionen sind im Bild**, am
+  eingecheckten PNG nachgewiesen: Standardfläche **y 207..231, x 958..1181**, „Hinzufügen"-Text
+  bis x 1165, „lesen" und „Hinzufügen" auf **einer** Zeile. Sie stehen im Detail-Panel **oben**,
+  weil der Mitgliederbereich leer ist (Home-Space). **Kein Defekt, ein Kriteriumfehler:** das
+  Kriterium sagte nicht, wo im Bild man nachsehen soll.
+- **07** *„I honestly don't see that"* — **die Ursache ist nicht die Bündigkeit, sondern das
+  Scrollen:** `scrollHeight` 1417 gegen `clientHeight` 834, ein neu angehängter Eintrag landet
+  **unterhalb des Sichtbereichs**. Das Bild *kann* die Zeile nicht zeigen. Bild 07 zeigt zudem nach
+  dem Klick auf die erste Zeile das **Detail-Panel**, nicht die Liste — mein Checkkriterium war
+  ungenau.
+- **08** *„move the button borders a little bit further to the left, leave the text where it is now.
+  Cut the not used space from the right"* — **gemessen:** die Menüpunkte haben 19 px, die
+  **Space-Zeilen 184–239 px** Leerraum rechts bei bereits bündigem Text (P9-AX ✅). Die Korrektur
+  ist damit an **beiden** Stellen dieselbe und **Text und Höhe bleiben unangetastet**.
+
+**Und der Softcap-Posten, von ihm angeordnet: „kürzen notieren"** — siehe §Backlog.
+
+
 ### Offen, in dieser Reihenfolge
 
-1. **Sichtprüfung der acht Bilder** — `screenshots_latest/README.md`, je Bild ein Kriterium. Offen
-   bleibt der eine Punkt, den die Bilder nicht tragen: die Mitgliederliste an echten Spaces
-2. **Deploy `v3.1.3`** (Nikinger) — Badge und `## 2026-10-05`-Block stehen unverändert, dieser Block
-   hat **keine** Release-Änderung gebracht; später `SHAREFYX_ALLOW_STALE_UPDATELOG=1`
+1. **Block „Kästchen enger" (Plan §12, Locks P9-BA–P9-BD, Abnahme P9-112–P9-115)** — vier Punkte aus
+   der Sichtprüfung, **alle vier gemessen**, nichts davon gebaut. **Braucht vorher eine Antwort
+   in einem Wort:** Bild 01, „bigger" heißt Leerraum, „decrease its height" passt nicht dazu
+2. **Deploy `v3.1.3`** (Nikinger) — Badge und `## 2026-10-05`-Block stehen unverändert; später
+   `SHAREFYX_ALLOW_STALE_UPDATELOG=1` oder ein neuer `##`-Block
 3. **P9-94 / P9-11** — der Portscan, Anleitung Mini-Plan §5 (MacBook, Handy-Hotspot, vier Ziele)
 4. **P9-13 / V150** — zweites Claude-Konto; wandert nach P10, **kein Blocker**
-5. **Der Softcap des settings-Plans** — 8.695 B über; Kürzen oder Rotation ist Nikinger-Entscheidung
+5. **Softcap: settings-Plan 49.655 B und Abnahmematrix 84.161 B** — **„kürzen notieren" ist
+   angeordnet und im §Backlog notiert**; das Kürzen selbst ist Nikinger-Entscheidung
 6. **Gate/Z-Rest:** Übersichtsgrafik §12.4, `ROADMAP`-Zeile P9 → ✅, Phase auf ✅

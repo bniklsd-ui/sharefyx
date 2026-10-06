@@ -599,3 +599,41 @@ gelöscht und nicht erst in einer späteren Session weggeräumt:
 | `test_the_selection_state_uses_aria_current_and_the_existing_fill` | **umgedreht**: `aria-current="true"` bleibt (Zustand), die **Fläche** ist jetzt bewusst eine andere als die der Baumzeile — mit Begründung, sonst wäre der Wächter eine Lüge |
 | `test_settings_menu_items_reuse_the_tree_row_look` | **gelockert**: Höhe/Polster/Rundung/Schrift bleiben verboten (P9-AF gilt), `background`/`border-color` sind jetzt erlaubt (bis auf den Wert), und der bislang verbotene **Innenschatten** ist erlaubt, ein **äußerer** bleibt verboten |
 | `test_only_the_settings_chain_aligns_its_buttons_right` | **unverändert gültig** — P9-AZ nimmt der Anlegezeile die Zweizeiligkeit, nicht ihre Rechtsausrichtung |
+
+
+---
+
+## §12 Dritte Bildsichtung 2026-10-06 — vier neue Punkte, **nicht gebaut**
+
+**Anlass.** Der Nikinger hat die acht Bilder aus `screenshots_latest/` angesehen und **vier Punkte
+freigegeben** (02, 03, 05, 06) und **vier neue notiert**. Dieser Abschnitt ist die Messgrundlage
+des nächsten Blocks: jede Zahl ist heute gemessen, damit er nicht neu messen muss.
+
+**Freigegeben:** `02 looks fine now` · `03 great` · `05 looks fine now` · `06 yes`.
+
+| Lock | Inhalt | Herkunft | **Gemessen am 2026-10-06** |
+|---|---|---|---|
+| **P9-BA** | Die **Menüpunkte umklammern ihr Kästchen enger**: der Kasten folgt dem **eigenen** Label, nicht dem längsten der drei. Der Text bleibt, wo er ist; nur die rechte Kante rückt nach links | *„move the button borders a little bit further to the left, leave the text where it is now. Cut the not used space from the right"* (Bild 08) | **Alle drei Kästchen sind heute 131 × 35,69 px** (im Bild: Flächenläufe y 414–434, 457–479, 501–523, je x 655..785). Die **Beschriftungen** sind 106 / 113 / **77 px** ⇒ das Update-Log-Kästchen hat **19 px Leerraum je Seite**. Die **Höhe ist bei allen dreien gleich** (35,69 px), und im Bild 01 ist **nichts ausgewählt** (0 Akzentpixel) |
+| **P9-BB** | Zu P9-BA gehört die Klärung von Bild 01: *„the update-log button is still bigger, I think you need to decrease its height"*. **Die Höhe ist nicht größer** (35,69 px wie die anderen) — „bigger" heißt am Bild **19 px Leerraum**, und „decrease its height" passt **nicht** zur Korrektur aus P9-BA (die ändert die Breite, nicht die Höhe) | Bild 01 | **Braucht eine Antwort in einem Wort:** (a) dieselbe Korrektur wie 08 (Kästchen enger), oder (b) die Knöpfe werden auch **flacher** (weniger Polster oben/unten, heute 6 px)? Ein „b" ohne Zahlen wäre eine dritte, nicht messbare Form |
+| **P9-BC** | **Die Space-Zeilen dürfen ihr Kästchen ebenfalls enger ziehen** — im Bild 08 haben sie **184–239 px Leerraum rechts** (Kästchen 330 px, Beschriftung 1 px links am Inhalt) | *„cut the not used space from the right on that picture"* | Der **Text steht bereits bündig links** (1 px, P9-AX ✅); offen ist **nur die Kästchenbreite**. **Nicht** gebaut: `justify-content` rechts würde die Beschriftung verschieben, und genau das soll er **nicht** |
+| **P9-BD** | **Bild 04: der Hinweis, wo die Member-Zeile steht.** Die „Hinzufügen"-Optionen **sind im Bild** — sie stehen im Detail-Panel **oben**, nicht unten | *„where did the space hinzufügen options go?"* | **Am eingecheckten Bild nachgewiesen:** Standardfläche bei **y 207..231, x 958..1181** (Auswahl + „Hinzufügen"), Beschriftung „lesen" bei y 218..233, „Hinzufügen" bis x 1165; das **Name-Feld** darüber (y 157..197, Platzhalter y 171..182); „Schließen" bei y 264..285. Im Browser: alle drei **sichtbar, im Viewport**, Panel **294 px** mit `scrollHeight == clientHeight` (kein Scroll). **Der Mitglieder-Bereich ist leer** (Home-Space, Höhe 0) — die Bedienung klebt deshalb direkt unter dem Hinweistext |
+
+### Ein Punkt, an dem das Bild etwas zeigte, das die Messung nicht prüfte (07)
+
+`I honestly don't see that` — die neue Space-Zeile war in der Messung **sichtbar** (Top 808,
+Panel 32..868, `sichtbarImPanel: true`), aber das Panel **scrollt** (`scrollHeight` 1417 gegen
+`clientHeight` 834, `scrollTop` 459 im Messlauf mit 27 Zeilen). **Im Probelauf mit 17 Zeilen ist
+der Anlegepunkt der letzte**, und ein neu angehängter Eintrag landet damit **unterhalb des
+Sichtbereichs** — das Bild kann die Zeile also gar nicht zeigen, egal wie bündig sie steht.
+**Für den nächsten Block:** vor dem Screenshot **die neue Zeile in den Sichtbereich rollen**
+(`scrollIntoView`), und das Checkkriterium nennt das Panel, in dem die Aussage steht — Bild 07
+zeigt nach dem Klick auf die erste Zeile das **Detail-Panel**, nicht die Liste.
+
+### Abnahme (P9-112 – P9-115), nicht gefahren
+
+`P9-112` Jeder Menüpunkt ist **so breit wie sein eigenes Label plus Polster** (keine Streckung auf
+den längsten Nachbarn), die Beschriftung bleibt auf ihrer Kante · `P9-113` Jede Space-Zeile zieht
+ihr Kästchen auf die Beschriftung plus Polster zusammen, **Text unverändert** · `P9-114` Bild 04:
+die Member-Zeile steht dort, wo das Bild sie zeigt (y 157..246 im 1440er Bild), und das Check-
+kriterium nennt die Position · `P9-115` Bild 07: die neu angelegte Zeile ist **im Bild sichtbar**
+(aufgerollt) und bündig mit dem Titel.

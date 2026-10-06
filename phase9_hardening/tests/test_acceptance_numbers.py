@@ -71,13 +71,17 @@ CAP_BYTES = 300  # der Cap, mit dem P9-3/V145 die Unerreichbarkeit des Kriterium
 # ist im Harness nicht darstellbar) und P9-110 (nur Deklaration, keine Wirkungsmessung). Beide
 # Grenzen sind in der Zeile genannt — eine Abnahmezeile ohne ihre Grenze wäre die Behauptung,
 # die §10.3 der Matrix für unzulässig hält.
-ABNAHME_BILANCE = {"✅": 97, "⚠️": 12, "⬜": 3}
+# 2026-10-06, **dritte** Bildsichtung: +4 Zeilen (P9-112–P9-115), alle vier ⬜ — sie sind
+# **nicht gebaut**, sondern die neue Vorgabe des Nikingers mit gemessener Grundlage (Plan §12).
+# Ein ⬜ mit Begründung und Zuständigkeit ist genau die Bedeutung der Marke; die vier Zeilen wären
+# ohne sie der Block "Abnahme 97 ✅ · 12 ⚠️ · 3 ⬜" als vollendet erschienen.
+ABNAHME_BILANCE = {"✅": 97, "⚠️": 12, "⬜": 7}
 # 2026-10-05: +7 Zeilen aus dem settings-Nachtrag P9-96–P9-102 (die sieben Punkte aus der
 # Bildsichtung des Nikingers, §10 des Mini-Plans). Die zwei neuen ⚠️ sind **benannte
 # Abweichungen**, keine offenen Punkte: P9-97 (linker Polsterwert, Nikinger-Entscheidung vom
 # 2026-10-05) und P9-99 (`justify-content` statt des im Plan genannten und gemessen wirkungslosen
 # `text-align` — der Knopf ist ein Flexcontainer).
-ABNAHME_ROWS = 112  # 112 Abnahmezeilen; seit 2026-10-06 die zweite Bildsichtung (P9-103–P9-111)
+ABNAHME_ROWS = 116  # 116 Abnahmezeilen; zuletzt die dritte Bildsichtung (P9-112–P9-115)
 # 2026-10-03: V164 von ⬜ auf ✅ (Deploy `v3.1.1` + Health-Gate 9/9). Die Konstante steht
 # **vor** dem Zählen, sonst wäre der Test eine Tautologie -- deshalb hat er mich beim
 # Zurueckschreiben der Bilanz in die Matrix rot gemeldet, statt sie zu bestaetigen.

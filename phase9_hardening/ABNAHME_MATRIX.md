@@ -25,7 +25,7 @@ Archiv hineinzuschreiben hieße, das Falsche zu tun.
 
 ## Stand in einem Satz
 
-**112 Tabellenzeilen für 112 Abnahmezeilen: 97 ✅ · 12 ⚠️ · 3 ⬜** (P9-10 in zwei prüfbare Hälften
+**116 Tabellenzeilen für 116 Abnahmezeilen: 97 ✅ · 12 ⚠️ · 7 ⬜** (P9-10 in zwei prüfbare Hälften
 geteilt; seit 2026-10-05 kommen der **settings-Block** P9-83–P9-95 mit 12 ✅ und **einem** ⬜
 dazu — P9-94, der Portscan, ist ein Schritt des Nikingers und durch keinen Test ersetzbar — und
 sein **Nachtrag** P9-96–P9-102 aus der Bildsichtung mit **5 ✅ und 2 ⚠️**. Die beiden ⚠️ sind
@@ -259,6 +259,28 @@ Bündigkeit von Namensfeld und Auswahl-Knopf); zu zwei davon hat er Rückfragen 
 | **P9-109** | Spaces-Panel: Feld und „Space anlegen" auf **einer** Zeile, Feld links == Inhaltskante, Knopf rechts == Inhaltskante, **und der Knopf behält seine Größe** | ✅ | gleiche `top` (804,5 px), links **1,0 px** / rechts **1,0 px** (je Rahmen), Knopf **142 px** in der Zeile == **142 px** an einer Kopie außerhalb der Zeile. **Vorher: 80 px Versatz** und zwei Zeilen. **Die letzte Hälfte dieser Zeile ist ein Fund des Gegenlaufs** — siehe Befund 4 |
 | **P9-110** | `#space-member-list` trägt `padding-left: 0` **und** `list-style: none` | ✅ **Deklaration, nicht Wirkung** | beide Eigenschaften sind deklariert und werden gegen die Deklaration geprüft. **Warum so und nicht gemessen:** die Liste ist im Wegwerf-Harness leer (Home-Space ohne Mitglieder); eine Wirkungsmessung wäre nur durch Erfinden eines Mitglieds möglich, und das wäre ein synthetischer Beleg für einen Zustand, den es live gibt |
 | **P9-111** | **P9-96/98/99/100/101/102 halten** | ✅ | Titelabstand **24 px** (Menü **und** Detail), Beschriftung mittig (Textmitte **720** == Knopfmitte **720,0**), genau **1** `aria-current`, Chevron-„Zurück" unverändert, `.overlay__actions` weiter `flex-end`, Schmal-Modus zeigt genau **ein** Panel |
+
+## Dritte Bildsichtung 2026-10-06 — vier Punkte freigegeben, vier neue (P9-112 – P9-115)
+
+**Freigegeben vom Nikinger am 2026-10-06** (wörtlich, je Bild aus `screenshots_latest/`):
+**02** *„looks fine now"* · **03** *„great"* · **05** *„looks fine now"* · **06** *„yes"*.
+
+| # | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| **P9-112** | Jeder Menüpunkt ist so breit wie **sein eigenes** Label; die Beschriftung bleibt auf ihrer Kante | ⬜ **P9-BA, nicht gebaut** | **Gemessen:** alle drei Kästchen **131 × 35,69 px**, Beschriftungen **106 / 113 / 77 px** ⇒ das Update-Log hat **19 px Leerraum je Seite**. *„move the button borders a little bit further to the left, leave the text where it is now. Cut the not used space from the right"* (Bild 08) |
+| **P9-113** | Die Space-Zeilen ziehen ihr Kästchen auf die Beschriftung zusammen, **Text unverändert** | ⬜ **P9-BC, nicht gebaut** | **Gemessen:** Kästchen **330 px**, Beschriftung **1 px** links am Inhalt (P9-AX ✅), also **184–239 px Leerraum rechts**. Der **Text** steht bereits, wo er soll — offen ist nur die Kästchenbreite |
+| **P9-114** | Bild 04: die Member-Zeile steht dort, wo das Bild sie zeigt, und das Kriterium nennt die Position | ⬜ **P9-BD, nicht gebaut** | **Am eingecheckten Bild nachgewiesen, sie ist da:** Standardfläche **y 207..231, x 958..1181**, „Hinzufügen"-Text bis x 1165, „lesen" und „Hinzufügen" auf **einer** Zeile (y 218..233), „Schließen" y 264..285. Im Browser: sichtbar, im Viewport, Panel 294 px **ohne** Scroll. Der Mitgliederbereich ist **leer** (Home-Space) |
+| **P9-115** | Bild 07: die **neu angelegte** Zeile ist im Bild sichtbar (aufgerollt) und bündig | ⬜ **P9-BD, nicht gebaut** | **„I honestly don't see that" hat eine Ursache, und sie ist nicht die Bündigkeit:** das Spaces-Panel **scrollt** (`scrollHeight` 1417 / `clientHeight` 834), ein neu angehängter Eintrag landet **unterhalb des Sichtbereichs**. Bild 07 zeigt zudem nach dem Klick auf die erste Zeile das **Detail-Panel**, nicht die Liste |
+
+### Ein Punkt, der noch ein Wort von dir braucht (Bild 01)
+
+*„the update-log button is still bigger, I think you need to decrease its height"* — **gemessen ist
+die Höhe bei allen drei Punkten gleich (35,69 px), und im Bild 01 ist nichts ausgewählt** (0
+Akzentpixel). „Bigger" heißt am Bild **19 px Leerraum**, und „Höhe" passt nicht dazu: die Korrektur
+aus P9-112/P9-113 ändert die **Breite**. **Also:** dieselbe Korrektur wie in Bild 08, **oder**
+zusätzlich flachere Knöpfe (heute 6 px Polster oben/unten)? Ein drittes „beides ohne Zahl" wäre
+eine Form, die kein Messen entscheidet.
+
 
 ### Vier Befunde aus diesem Block, die keine Abnahmezeile sind
 
