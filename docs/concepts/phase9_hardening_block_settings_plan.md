@@ -7,7 +7,7 @@ up: ../../phase9_hardening/CLAUDE.md
 down:
   - ./phase9_hardening_plan.md               # 📕 übergeordneter P9-Plan; §12.4 Übersichtsgrafik, P9-11, P9-27, P9-36
   - ./phase9_hardening_block_trace_plan.md   # 📕 Formvorlage dieses Mini-Plans
-updated: 2026-10-06 (**§12.1 — der Block „Kästchen enger" ist gebaut**: Abnahme **P9-116–P9-119**, Probe **48/48**, **Gegenläufe G13–G18 6 von 6** wirksam; **P9-BA widerrufen** (der Nikinger: „nur bei Spaces verwalten … aber nur dieses"), **P9-BB (b)** = zusätzlich flachere Menüpunkte (31,69 px statt 35,69 px), **P9-BC** = Zeilen umklammern ihr Label, **P9-BE neu** = nur das Spaces-Fenster schmaler (338 statt 380 px); Bild 04 nennt die Position, Bild 07 rollt auf. **P9-112 – P9-115 sind abgelöst**, die Zuordnung steht in der Matrix. **Vier eigene Fehler**, drei davon „eine Regel, die nicht die ist, die ich meine") | 2026-10-05 (**§10 gebaut** — die sieben Punkte aus der Bildsichtung, opencode/M3, Probe **56/56**, G4 → 2 rot · G5 → 2 rot · G6 → 3 rot; P9-96–P9-102 mit **5 ✅ · 2 ⚠️**. **Zwei Korrekturen an diesem Plan, beide gemessen:** P9-APs `text-align` war auf einem Flex-Knopf ein **No-op** (Textmitte 8,5 px daneben) → `justify-content`; und das **linke Polster** musste vom 32-px-Wert der Baumzeile auf `--space` (Nikinger-Entscheidung), sonst bleibt die Beschriftung 12 px neben der Mitte. G6 trifft **P9-84**, nicht P9-97) | 2026-10-05 (**§10: sieben UI-Punkte aus der Bildsichtung, nicht gebaut** — Locks P9-AM–P9-AS, Abnahme P9-96–P9-102; zwei davon sind ausdrücklich „nicht anfassen"; zwei Folgen festgehalten: die zweite Vergleichsrichtung in P9-84 und der zu **eng** werdende Wächter) | 2026-10-05 (**gebaut, opencode/M3 — §9 gefüllt**; Release `v3.1.3` steht, nicht deployt; Probe 39/39, G1/G2/G3 rot, `pytest` 1223 → 1233 · **zwei Code-Befunde kamen aus dem Browser, nicht aus den Tests**, vier Punkte gegen den Plan abweichend begründet) | 2026-10-05 (geschrieben, Claude Code, nach dem Deploy `v3.1.2`; Wünsche und Entscheidungen des Nikingers vom selben Tag)
+updated: 2026-10-06 (**§12.2 — Nachsatz aus Bild 08, Lock P9-BF, Abnahme P9-120 ✅**): die Space-Zeile trug `padding-left: 0` (P9-AX) und damit **innen 1 px links gegen 9 px rechts** — die Folge von P9-BC, seit das Kästchen sein Label umklammert. Gebaut: `padding-left: var(--space)` **plus** `margin-left: calc(var(--space) * -1)` an derselben Kante — nur zusammen halten beide Locks (allein Polster bricht P9-AX, allein `0` ist sein Befund). Gemessen innen **9/9**, Kästchen **−8 px**, Beschriftung **1 px** bündig; Probe **50/50**, **G13–G16/G18/G19 7 von 7**, `pytest` 1245 → **1246**) | 2026-10-06 (**§12.1 — der Block „Kästchen enger" ist gebaut**: Abnahme **P9-116–P9-119**, Probe **48/48**, **Gegenläufe G13–G18 6 von 6** wirksam; **P9-BA widerrufen** (der Nikinger: „nur bei Spaces verwalten … aber nur dieses"), **P9-BB (b)** = zusätzlich flachere Menüpunkte (31,69 px statt 35,69 px), **P9-BC** = Zeilen umklammern ihr Label, **P9-BE neu** = nur das Spaces-Fenster schmaler (338 statt 380 px); Bild 04 nennt die Position, Bild 07 rollt auf. **P9-112 – P9-115 sind abgelöst**, die Zuordnung steht in der Matrix. **Vier eigene Fehler**, drei davon „eine Regel, die nicht die ist, die ich meine") | 2026-10-05 (**§10 gebaut** — die sieben Punkte aus der Bildsichtung, opencode/M3, Probe **56/56**, G4 → 2 rot · G5 → 2 rot · G6 → 3 rot; P9-96–P9-102 mit **5 ✅ · 2 ⚠️**. **Zwei Korrekturen an diesem Plan, beide gemessen:** P9-APs `text-align` war auf einem Flex-Knopf ein **No-op** (Textmitte 8,5 px daneben) → `justify-content`; und das **linke Polster** musste vom 32-px-Wert der Baumzeile auf `--space` (Nikinger-Entscheidung), sonst bleibt die Beschriftung 12 px neben der Mitte. G6 trifft **P9-84**, nicht P9-97) | 2026-10-05 (**§10: sieben UI-Punkte aus der Bildsichtung, nicht gebaut** — Locks P9-AM–P9-AS, Abnahme P9-96–P9-102; zwei davon sind ausdrücklich „nicht anfassen"; zwei Folgen festgehalten: die zweite Vergleichsrichtung in P9-84 und der zu **eng** werdende Wächter) | 2026-10-05 (**gebaut, opencode/M3 — §9 gefüllt**; Release `v3.1.3` steht, nicht deployt; Probe 39/39, G1/G2/G3 rot, `pytest` 1223 → 1233 · **zwei Code-Befunde kamen aus dem Browser, nicht aus den Tests**, vier Punkte gegen den Plan abweichend begründet) | 2026-10-05 (geschrieben, Claude Code, nach dem Deploy `v3.1.2`; Wünsche und Entscheidungen des Nikingers vom selben Tag)
 ---
 
 # Phase 9 — Block settings und die Restposten bis zum Closeout
@@ -717,3 +717,36 @@ vom 2026-10-06 ist der Beleg für die **widerrufene** Breitenlesart), **Gegenlä
 wirksam** (`p9_settings_kastchen_gegenlaeufe.py`), `pytest` **1241 → 1245** (+4, 0 gelöscht), `ui_budget`
 5/5, Tabu-Diff §0.3 leer, Release `v3.1.3` unverändert, **kein Deploy**.
 
+### §12.2 Nachsatz vom selben Tag — Bild 08, ein Punkt (Lock **P9-BF**, Abnahme **P9-120**)
+
+**Anlass.** Die Sichtprüfung der acht neuen Bilder: **01 · 02 · 03 · 05 · 06 · 07 · 08 freigegeben**
+(06 *„identisch zu 1, passt"*), **08 mit einem Punkt**, und der Einwand zu 04 **am selben Tag
+zurückgenommen** (*„ah, nehme 04 zurück, man muss scrollen. Passt so"*). Der Punkt aus 08:
+
+> *„den Auswahl buttons der einzelnen Spaces bitte ein paar Px nach links erweitern, sodass
+> innerliegender Text und Button Grenze den Standard Abstand einhalten."*
+
+**Gemessen vorher:** die Space-Zeile trug `padding-left: 0` (P9-AX, damit die Beschriftung bündig
+mit dem Panel-Titel steht) und deshalb **innen 1 px links gegen 9 px rechts** — der Text klebte an
+der linken Kästchenkante, während rechts der Standardabstand stand. **Das ist die Folge von P9-BC**:
+vorher war das Kästchen 330 px breit und der linke Rand fiel nie auf; seit es sein Label umklammert
+(92–155 px), **ist** die linke Innenkante sichtbar.
+
+| | Gebaut | Gemessen |
+|---|---|---|
+| **P9-BF** | `padding-left: var(--space)` **plus** `margin-left: calc(var(--space) * -1)` an derselben Kante | innen **9 px links wie rechts** (vorher 1 gegen 9); das Kästchen ragt **−8 px** in das 24-px-Panelpolster, ohne abgeschnitten zu werden; die Beschriftung bleibt **1 px** bündig mit dem Titel |
+
+**Und warum beides nötig ist — zwei Locks, die einzeln einander töten:** `padding-left: 0` allein ist
+sein Befund (innen 1 px); `padding-left: var(--space)` allein schiebt die Beschriftung **8 px nach
+rechts** und bricht **P9-AX**. Nur **Polster und negativer Außenabstand in derselben Höhe** bewegen
+das **Kästchen**, nicht den Text. **Die Kopplung ist der Lock**, und der Wächter prüft sie als
+Formel (`margin-left == -(padding-left)`), nicht als zwei Zahlen.
+
+**Wächter.** Ein neuer Test (die Kopplung), **drei umgeschrieben, keiner gelöscht**: `padding-left`
+der Zeile ist jetzt `var(--space)`; der Abstand-Wächter prüft **namensgenau** statt per Substring —
+`margin-bottom` stand vorher auf **keiner** Verbotsliste, obwohl der Test behauptete, er würde es
+melden (dieselbe Lücke wie bei `padding-block` und `border-box`, zum dritten Mal in diesem Projekt);
+und die Station P9-117 rechnet jetzt **beide** Polster, weil links nicht mehr `0` steht — dieselbe
+Lücke ein drittes Mal an derselben Formel. Probe **50/50**, **Gegenläufe G13–G16, G18, G19 7 von 7
+wirksam** (`g19` ist P9-BF als Mutation: `padding-left` zurück auf `0`), `pytest` 1245 → **1246**,
+`ui_budget` 5/5, Tabu-Diff §0.3 leer, Release `v3.1.3` unverändert, **kein Deploy**.

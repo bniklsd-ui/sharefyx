@@ -12,7 +12,7 @@ down:
   - SESSIONS_ARCHIVE.md                          # ältere Session-Blöcke, newest-first
   - UPDATES_ARCHIVE.md                          # ältere `updated:`-Fäden dieses Heads, verbatim (2026-10-03, 36 von 37)
   - MODULE_STATUS_ARCHIVE.md                   # ausführliche Statusspalten der §-Modulstatus-Tabelle, verbatim (2026-10-04)
-updated: 2026-10-06 (**der Block „Kästchen enger" gebaut, opencode/M3** — Abnahme **P9-116–P9-119** mit **4 ✅**, Probe **48/48**, **Gegenläufe G13–G18 6 von 6** wirksam, `pytest` 1241 → **1245**, `ui_budget` 5/5, Tabu-Diff leer; Release `v3.1.3` unverändert, **kein Deploy**) · **der Nikinger hat den Auftrag selbst eingeschränkt** — *„nur bei Spaces verwalten, dort die Buttons der einzelnen Spaces nach Links, und das Fenster rechts verkleinern, aber nur dieses"* ⇒ **P9-BA widerrufen** (die Menüpunkte behalten 131 px) und **P9-BE** als **neuer Lock** (Fenster 338 statt 380 px, nur dieses, im Schmal-Modus zurückgenommen) · **P9-BB (b)**: Menüpunkte **flacher**, 4 px Polster, **31,69 px** statt 35,69 px · **P9-BC**: Space-Zeilen umklammern ihr Label (92–147 statt 330 px, rechts 9 statt 192–245 px, Text unverändert 1 px bündig) · **Bild 04** nennt jetzt die Position (y 205..246), **Bild 07** rollt auf (`scrollIntoView`) und nimmt die Anlegezeile mit · **vier eigene Fehler**, drei davon „eine Regel, die nicht die ist, die ich meine": `box-sizing: border-box` (min/max gelten dem **Rahmen**), `width: 100%` in der **Sammelregel**, und eine Station, die den eigenen Fehler nicht bemerkte (jetzt Feldanteil ≥ 45 %, **G18** ist er als Mutation rot) · **ein Gegenlauf blieb grün** (G17) und wurde zum Anlass, den Ausgangszustand messbar zu machen · **datierte Korrektur:** die 1246 des Vortages sind **1241** gemessen (`pytest --collect-only`) | 2026-10-06 (**die zweite Bildsichtung gebaut, opencode/M3** — Abnahme **P9-103–P9-111** mit **9 ✅**, Probe **29/29**, **Gegenläufe G7–G12 6 von 6** wirksam; **der Auftrag widerruft P9-AN und die Fläche aus P9-AO**: die Menüpunkte tragen die **Standardknopf-Fläche** statt der des Eingabefeldes (sein Wort: „they are buttons and not fields to type something in"), ausgewählt die Akzentfläche · **G11 fand eine Messlücke** (ein geschrumpfter Knopf hält dieselben Kanten) und die Station misst jetzt die Eigenbreite an einer Kopie · **sechs Wächter umgeschrieben, keiner gelöscht** · **zwei eigene Fehler, beide „die erste Regel ist nicht die, die ich meine"** · **zwei Softcap-Überschreitungen neu benannt** (Matrix **84.161 B**, settings-Plan **49.655 B** — ein Kürzen wäre Nikinger-Entscheidung); Release `v3.1.3` unverändert, **kein Deploy**) | 2026-10-05 (**V188 beantwortet, opencode/M3 — vier Quellen, eine am Repo gemessen, und der Plan-§4-Wortlaut „meines Wissens nur in Chromium" ist jetzt eine Messung: `safari: false`**; daraus **P9-27 ⬜ → ⚠️**, D1 geschlossen, **kein Code gebaut** (Nikinger-Entscheidung 2026-10-05) · **drei falsche Sätze datiert korrigiert**, darunter „der Deploy `v3.1.1` schließe P9-15, denn `health_gate.sh` macht die Läufe" — **ein Health-Gate liefert Läufe ohne Kriterium**, denn P9-15 stellt gegen 372,9 ms, und der Wert ist nie über Funnel gemessen worden (V151) · **der letzte `KNOWN_OFFENDERS`-Eintrag gestrichen** (`docs/screenshots/README.md`, zwei Ausprägungen zugleich, in zwei Schritten repariert, sechs Fadeninhalte byteweise gegengeprüft) · **zwei Zeilen** in `test_acceptance_numbers.py` (Bilanz-Konstanten), **eine entfernt** in `test_updated_chain.py` · kein Test hinzugefügt, keiner umgedreht, Tabu-Diff §0.3 leer, Release `v3.1.3` unverändert, **kein Deploy**) | 2026-10-05 (**die sieben Punkte aus der Bildsichtung gebaut, opencode/M3** — Probe **56/56**, G4 → 2 rot · G5 → 2 rot · G6 → 3 rot, `pytest` 1233 → 1238, `ui_budget` 165,6 KB; **zwei Korrekturen an der Vorgabe, beide gemessen**: `text-align` ist auf dem Flex-Knopf ein No-op → `justify-content`, und das linke Polster musste vom 32-px-Wert der Baumzeile auf `--space` (Nikinger-Entscheidung); **ein Produktbefund gemeldet, nicht gebaut** (leere Space-Liste beim zu frühen Öffnen, wandert in die P10-Liste); Release `v3.1.3` unverändert, **kein Deploy**) | 2026-10-05 (**Block settings gebaut, opencode/M3 — drei Overlays sind eine Fensterkette, V118 hat eine Linie**; Release `v3.1.3` steht, **kein Deploy, kein Service-Touch**; `pytest` 1223 → 1233, `ui_budget` 5/5, Tabu-Diff leer, Probe **39/39**, G1 → 4 rot · G2 → 2 rot · G3 → rot · **zwei Code-Befunde aus dem Browser, nicht aus den Tests** (Schmal-Modus ließ zwei Panels stehen · der „Zurück“-Knopf des Details war nicht verdrahtet) · **der Gegenlauf hat den eigenen Messaufbaum widerlegt** (er las den Frame nach dem Toggle-Zurückschalten — mit dem Fix wäre der Test grün gewesen) · P9-94 ⬜ Portscan, V188 ⬜ · **danach: sieben UI-Punkte aus der Bildsichtung notiert, nicht gebaut — Mini-Plan §10, Locks P9-AM–P9-AS, Abnahme P9-96–P9-102**) | 2026-10-05 (Block 2026-10-04 aus dem Head verbatim hierher rotiert, per `scripts/rotate_session_block.sh`)
+updated: 2026-10-06 (**die dritte Sichtprüfung — siebenmal ✅, ein Punkt aus Bild 08**, opencode/M3 — Abnahme **P9-120** mit **1 ✅**, Probe **50/50**, **Gegenläufe G13–G16/G18/G19 7 von 7** wirksam, `pytest` 1245 → **1246**, Release `v3.1.3` unverändert, **kein Deploy**) · **P9-BF**: die Space-Zeile trug `padding-left: 0` (P9-AX) und damit **innen 1 px links gegen 9 px rechts** — die **Folge von P9-BC**, seit das Kästchen sein Label umklammert. Gebaut `padding-left: var(--space)` **plus** `margin-left: calc(var(--space) * -1)`: allein `0` ist sein Befund, allein das Polster bricht P9-AX. Innen jetzt **9/9**, Kästchen **−8 px**, Beschriftung **1 px** bündig · **04 zurückgenommen** (*„man muss scrollen, passt so"*) · **ein Wächter neu, drei umgeschrieben**: die Kopplung wird als Formel geprüft, der Abstand-Wächter **namensgenau** statt per Substring, und **`margin-bottom` stand auf keiner Verbotsliste** — dieselbe Lücke wie `padding-block` (Vortag) und `border-box` (heute), zum dritten Mal · **alle acht Bilder neu**, **08** ist die einzige verlangte Neuerstellung | 2026-10-06 (**der Block „Kästchen enger" gebaut, opencode/M3** — Abnahme **P9-116–P9-119** mit **4 ✅**, Probe **48/48**, **Gegenläufe G13–G18 6 von 6** wirksam, `pytest` 1241 → **1245**, `ui_budget` 5/5, Tabu-Diff leer; Release `v3.1.3` unverändert, **kein Deploy**) · **der Nikinger hat den Auftrag selbst eingeschränkt** — *„nur bei Spaces verwalten, dort die Buttons der einzelnen Spaces nach Links, und das Fenster rechts verkleinern, aber nur dieses"* ⇒ **P9-BA widerrufen** (die Menüpunkte behalten 131 px) und **P9-BE** als **neuer Lock** (Fenster 338 statt 380 px, nur dieses, im Schmal-Modus zurückgenommen) · **P9-BB (b)**: Menüpunkte **flacher**, 4 px Polster, **31,69 px** statt 35,69 px · **P9-BC**: Space-Zeilen umklammern ihr Label (92–147 statt 330 px, rechts 9 statt 192–245 px, Text unverändert 1 px bündig) · **Bild 04** nennt jetzt die Position (y 205..246), **Bild 07** rollt auf (`scrollIntoView`) und nimmt die Anlegezeile mit · **vier eigene Fehler**, drei davon „eine Regel, die nicht die ist, die ich meine": `box-sizing: border-box` (min/max gelten dem **Rahmen**), `width: 100%` in der **Sammelregel**, und eine Station, die den eigenen Fehler nicht bemerkte (jetzt Feldanteil ≥ 45 %, **G18** ist er als Mutation rot) · **ein Gegenlauf blieb grün** (G17) und wurde zum Anlass, den Ausgangszustand messbar zu machen · **datierte Korrektur:** die 1246 des Vortages sind **1241** gemessen (`pytest --collect-only`) | 2026-10-06 (**die zweite Bildsichtung gebaut, opencode/M3** — Abnahme **P9-103–P9-111** mit **9 ✅**, Probe **29/29**, **Gegenläufe G7–G12 6 von 6** wirksam; **der Auftrag widerruft P9-AN und die Fläche aus P9-AO**: die Menüpunkte tragen die **Standardknopf-Fläche** statt der des Eingabefeldes (sein Wort: „they are buttons and not fields to type something in"), ausgewählt die Akzentfläche · **G11 fand eine Messlücke** (ein geschrumpfter Knopf hält dieselben Kanten) und die Station misst jetzt die Eigenbreite an einer Kopie · **sechs Wächter umgeschrieben, keiner gelöscht** · **zwei eigene Fehler, beide „die erste Regel ist nicht die, die ich meine"** · **zwei Softcap-Überschreitungen neu benannt** (Matrix **84.161 B**, settings-Plan **49.655 B** — ein Kürzen wäre Nikinger-Entscheidung); Release `v3.1.3` unverändert, **kein Deploy**) | 2026-10-05 (**V188 beantwortet, opencode/M3 — vier Quellen, eine am Repo gemessen, und der Plan-§4-Wortlaut „meines Wissens nur in Chromium" ist jetzt eine Messung: `safari: false`**; daraus **P9-27 ⬜ → ⚠️**, D1 geschlossen, **kein Code gebaut** (Nikinger-Entscheidung 2026-10-05) · **drei falsche Sätze datiert korrigiert**, darunter „der Deploy `v3.1.1` schließe P9-15, denn `health_gate.sh` macht die Läufe" — **ein Health-Gate liefert Läufe ohne Kriterium**, denn P9-15 stellt gegen 372,9 ms, und der Wert ist nie über Funnel gemessen worden (V151) · **der letzte `KNOWN_OFFENDERS`-Eintrag gestrichen** (`docs/screenshots/README.md`, zwei Ausprägungen zugleich, in zwei Schritten repariert, sechs Fadeninhalte byteweise gegengeprüft) · **zwei Zeilen** in `test_acceptance_numbers.py` (Bilanz-Konstanten), **eine entfernt** in `test_updated_chain.py` · kein Test hinzugefügt, keiner umgedreht, Tabu-Diff §0.3 leer, Release `v3.1.3` unverändert, **kein Deploy**) | 2026-10-05 (**die sieben Punkte aus der Bildsichtung gebaut, opencode/M3** — Probe **56/56**, G4 → 2 rot · G5 → 2 rot · G6 → 3 rot, `pytest` 1233 → 1238, `ui_budget` 165,6 KB; **zwei Korrekturen an der Vorgabe, beide gemessen**: `text-align` ist auf dem Flex-Knopf ein No-op → `justify-content`, und das linke Polster musste vom 32-px-Wert der Baumzeile auf `--space` (Nikinger-Entscheidung); **ein Produktbefund gemeldet, nicht gebaut** (leere Space-Liste beim zu frühen Öffnen, wandert in die P10-Liste); Release `v3.1.3` unverändert, **kein Deploy**) | 2026-10-05 (**Block settings gebaut, opencode/M3 — drei Overlays sind eine Fensterkette, V118 hat eine Linie**; Release `v3.1.3` steht, **kein Deploy, kein Service-Touch**; `pytest` 1223 → 1233, `ui_budget` 5/5, Tabu-Diff leer, Probe **39/39**, G1 → 4 rot · G2 → 2 rot · G3 → rot · **zwei Code-Befunde aus dem Browser, nicht aus den Tests** (Schmal-Modus ließ zwei Panels stehen · der „Zurück“-Knopf des Details war nicht verdrahtet) · **der Gegenlauf hat den eigenen Messaufbaum widerlegt** (er las den Frame nach dem Toggle-Zurückschalten — mit dem Fix wäre der Test grün gewesen) · P9-94 ⬜ Portscan, V188 ⬜ · **danach: sieben UI-Punkte aus der Bildsichtung notiert, nicht gebaut — Mini-Plan §10, Locks P9-AM–P9-AS, Abnahme P9-96–P9-102**) | 2026-10-05 (Block 2026-10-04 aus dem Head verbatim hierher rotiert, per `scripts/rotate_session_block.sh`)
 ---
 
 # Phase 9 — Härtung
@@ -39,7 +39,7 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | S | **Einstellungen als Fensterkette** + V118 eine Linie (Nikinger 2026-10-05) | 🟡 **gebaut 2026-10-05 (M3)**, Release `v3.1.3` steht, **nicht deployt** — `docs/concepts/phase9_hardening_block_settings_plan.md` (Locks P9-AE–AL, Abnahme P9-83–95) · **drei Overlays wurden eine Kette** (`#settings-overlay`, fünf Panels), **ein** Öffner (`settings.js` + `registerPanel`), Menüknöpfe tragen `.tree__folder` statt einer eigenen Optik · **zwei echte Befunde aus dem Browser, nicht aus dem Test**: der Schmal-Modus ließ bei offenem Detail **zwei** Panels stehen (zwei `:has()`-Regeln statt einer), und der „Zurück"-Knopf des Details war **nicht verdrahtet** (im breiten Modus unauffällig) · **V118 umgedreht**: der Test hieß `…_draw_two_lines` und heißt jetzt `test_a_tag_edge_beside_an_explicit_edge_draws_one_line`, Docstring mit beiden Lesarten und Datum · **Probe 39/39**, G1 → 4 rot, G2 → 2 rot, G3 → rot, **der Gegenlauf hat den eigenen Messaufbaum widerlegt** (er las den Frame *nach* dem Toggle-Zurückschalten) · `pytest` 1223 → 1233, `ui_budget` 5/5, Tabu-Diff leer · **P9-94 ⬜** (Portscan, Nikinger-Schritt) · Herleitung im L3-Archiv |
 | T | **Zweite Bildsichtung** (Mini-Plan §11, Locks P9-AU–P9-AZ, Abnahme P9-103–P9-111) | 🟡 **gebaut 2026-10-06 (M3)**, Release `v3.1.3` steht (unverändert), **nicht deployt** — Probe **29/29**, **Gegenläufe G7–G12 6 von 6** wirksam, `pytest` 1238 → 1246. **Der Block dreht zwei Locks des Vortags: P9-AN und die Fläche aus P9-AO sind widerrufen** — die Menüpunkte tragen die **Standardknopf-Fläche** (`--btn-std-fill`), ausgewählt die **Akzentfläche** wie `.btn-primary` (Entscheidung aus der Rückfrage), und der Abstand ist 8 px (vorher 0 px). „Ändern" ist **Vorsicht** (rot wie „Archivieren"), „Abbrechen" → **„Schließen"** · Beschriftung der Space-Zeilen bündig mit dem Titel (vorher 33 px), Namensfeld im Detail beidseitig bündig (+12 px, als **Rasterfolge**, nicht als Zahl), Anlegezeile eine Zeile (vorher 80 px Versatz) · **sechs Wächter umgeschrieben** (4 settings, 2 static_routes), **keiner gelöscht**; **Gegenlauf G11 fand eine Messlücke** (siehe Session-Block) · **zwei Softcap-Überschreitungen neu benannt** (Matrix 84.161 B, Plan 49.655 B) — Details in der `ABNAHME_MATRIX.md` unter dem Nachtrag vom 2026-10-06 |
 | R | **Rückmeldung aus der Bildsichtung** (Mini-Plan §10, Locks P9-AM–P9-AS, Abnahme P9-96–P9-102) | 🟡 **gebaut 2026-10-05 (M3)**, Release `v3.1.3` steht (unverändert derselbe, nicht deployt) — Probe **56/56**, G4 → 2 rot · G5 → 2 rot · G6 → 3 rot, `pytest` 1233 → 1238 · **zwei Korrekturen an der Vorgabe, beide gemessen**: `text-align: center` war auf dem Flex-Knopf ein **No-op** (Textmitte 8,5 px daneben) → `justify-content`, und das **linke Polster** musste vom 32-px-Wert der Baumzeile auf `--space` (Nikinger-Entscheidung), sonst bleibt die Beschriftung 12 px neben der Mitte · P9-96/98/100/101/102 ✅, **P9-97 und P9-99 ⚠️ mit benannter Abweichung** · **zwei Wächter an korrektem Code rot** (Klassenreihenfolge, `hidden` im `aria-hidden`) · **ein Produktbefund gemeldet, nicht gebaut:** die Space-Liste bleibt leer, wenn man sie vor `loadOverview()` öffnet — wandert in die P10-Liste (Plan §6) · Herleitung im L3-Archiv |
-| U | **„Kästchen enger“ — die dritte Bildsichtung** (Mini-Plan §12.1, Locks P9-BB/BC/BD/**BE**, Abnahme **P9-116–P9-119**) | 🟡 **gebaut 2026-10-06 (M3)**, Release `v3.1.3` steht (unverändert), **nicht deployt** — Probe **48/48**, **Gegenläufe G13–G18 6 von 6** wirksam, `pytest` 1241 → **1245**. **Der Nikinger hat den Auftrag selbst eingeschränkt:** *„nur bei Spaces verwalten … aber nur dieses“* ⇒ **P9-BA widerrufen** (die Menüpunkte behalten ihre 131 px) und **P9-BE** als **neuer** Lock entstanden (Fenster verkleinern). Menüpunkte **flacher** (b): 4 px Polster, **31,69 px** statt 35,69 px · Space-Zeilen **umklammern ihr Label** (92–147 px statt 330 px, rechts 9 statt 192–245 px, Text 1 px bündig) · **Spaces-Fenster 338 statt 380 px**, Feld 138 px von 288 px Inhalt, Knopf 142 px, im Schmal-Modus zurückgenommen (422 px) · Bild 04 nennt jetzt die **Position** (y 205..246), Bild 07 **rollt auf** (`scrollIntoView`) und nimmt die Anlegezeile mit · **vier eigene Fehler**, drei davon „eine Regel, die nicht die ist, die ich meine“ (`box-sizing: border-box`, `width: 100%` in der **Sammelregel**, eine Station, die den eigenen Fehler nicht bemerkte) · **ein Gegenlauf blieb grün** (G17) und wurde zum Anlass, den Ausgangszustand messbar zu machen · **P9-112 widerrufen**, P9-113/114/115 abgelöst (Zuordnung in der Matrix) — Details im Session-Block und in der `ABNAHME_MATRIX.md` |
+| U | **„Kästchen enger“ — die dritte Bildsichtung** (Mini-Plan §12.1, Locks P9-BB/BC/BD/**BE**, Abnahme **P9-116–P9-119**) | 🟡 **gebaut 2026-10-06 (M3)**, Release `v3.1.3` steht (unverändert), **nicht deployt** — Probe **48/48**, **Gegenläufe G13–G18 6 von 6** wirksam, `pytest` 1241 → **1245**. **Der Nikinger hat den Auftrag selbst eingeschränkt:** *„nur bei Spaces verwalten … aber nur dieses“* ⇒ **P9-BA widerrufen** (die Menüpunkte behalten ihre 131 px) und **P9-BE** als **neuer** Lock entstanden (Fenster verkleinern). Menüpunkte **flacher** (b): 4 px Polster, **31,69 px** statt 35,69 px · Space-Zeilen **umklammern ihr Label** (92–147 px statt 330 px, rechts 9 statt 192–245 px, Text 1 px bündig) · **Spaces-Fenster 338 statt 380 px**, Feld 138 px von 288 px Inhalt, Knopf 142 px, im Schmal-Modus zurückgenommen (422 px) · Bild 04 nennt jetzt die **Position** (y 205..246), Bild 07 **rollt auf** (`scrollIntoView`) und nimmt die Anlegezeile mit · **vier eigene Fehler**, drei davon „eine Regel, die nicht die ist, die ich meine“ (`box-sizing: border-box`, `width: 100%` in der **Sammelregel**, eine Station, die den eigenen Fehler nicht bemerkte) · **ein Gegenlauf blieb grün** (G17) und wurde zum Anlass, den Ausgangszustand messbar zu machen · **P9-112 widerrufen**, P9-113/114/115 abgelöst (Zuordnung in der Matrix) · **[2026-10-06 Nachsatz, Lock P9-BF, Abnahme P9-120 ✅]:** **dritte Sichtprüfung — siebenmal ✅, ein Punkt aus Bild 08**: die Space-Zeile hält innen wieder den Standardabstand (**9 px links wie rechts**, vorher 1 gegen 9), gebaut als `padding-left: var(--space)` **plus** `margin-left: calc(var(--space) * -1)` — beide Locks halten nur zusammen; der Einwand zu Bild 04 ist am selben Tag zurückgenommen („man muss scrollen“). Probe **50/50**, **Gegenläufe 7 von 7**, `pytest` 1246 — Details im Session-Block und in der `ABNAHME_MATRIX.md` |
 | Gate/Z | Abnahme, Closeout | 🟡 **beide Doku-Hälften erledigt** (2026-10-02) · `ABNAHME_MATRIX.md` ist der **eine** Ort der Abnahme- und `[VERIFY]`-Bilanz, nicht diese Zeile · **[2026-10-04] beide Rotationen gefahren** (Block 17.780 B verbatim, Kette 6 von 7 Fäden) und diese Tabelle ins L3-Archiv gezogen ⇒ **der Head ist unter dem 40-KiB-Softcap** · **offen:** zweites Claude-Konto (P9-13/V150) · Portscan P9-94/P9-11 · Übersichtsgrafik §12.4 · Phase auf ✅ — **P9-15 steht nicht mehr hier**, es ist seit dem 2026-10-03 gemessen (⚠️, Zeile A) · Herleitung im L3-Archiv |
 
 ## Backlog (bewusst zurückgestellt, kein Phasen-Blocker)
@@ -135,112 +135,69 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückzuführen** — Nikinger-Anordnung 2026-09-24, so dokumentieren und nicht weiter
   untersuchen.
 
-## Session stopped — 2026-10-06 (siebenundzwanzigster Block: **„Kästchen enger" gebaut — drei Korrekturen, und der Auftrag hat sich selbst eingeschränkt**; Probe **48/48**, Gegenläufe **G13–G18 6 von 6** wirksam. Kein Deploy, kein Service-Touch)
+## Session stopped — 2026-10-06 (achtundzwanzigster Block: **die dritte Sichtprüfung — siebenmal ✅, ein Punkt aus Bild 08 (Lock P9-BF)**; Probe **50/50**, **Gegenläufe 7 von 7**. Kein Deploy, kein Service-Touch)
 
-**Ergebnis in einem Satz.** Der Nikinger hat auf **zwei** Rückfragen mit **je einem Wort** geantwortet
-und dabei den Auftrag aus Bild 08 **selbst eingegrenzt**: *„nur bei Spaces verwalten, dort die Buttons
-der einzelnen Spaces nach Links, und das Fenster rechts verkleinern, aber nur dieses"* — damit ist
-**P9-BA (die Breite der Menüpunkte) widerrufen**, und das „Fenster verkleinern" ist ein **neuer Lock
-(P9-BE)**. Gebaut wurde: Menüpunkte **flacher** (b), Space-Zeilen **umklammern ihr Label**, das
-**Spaces-Fenster schmaler** (338 statt 380 px, nur dieses), Bild 04 mit **genannter Position**,
-Bild 07 **aufgerollt**. **Vier eigene Fehler**, drei davon vom selben Typ.
+**Ergebnis in einem Satz.** Der Nikinger hat die acht Bilder angesehen: **01 · 02 · 03 · 05 · 06 · 07
+freigegeben**, **04 mit einem Einwand, den er am selben Tag zurücknahm** (*„ah, nehme 04 zurück,
+man muss scrollen. Passt so"*), und **08 mit genau einem Punkt** — daraus ein **neuer Lock P9-BF**
+und die Abnahme **P9-120**.
 
-### Die zwei Rückfragen, und was daraus wurde
+| Bild | Urteil |
+|---|---|
+| 01 | ✅ *„passt"* — die Menüpunkte sind **31,69 px** hoch statt 35,69 px |
+| 02 | ✅ *„sieht für mich passend aus"* |
+| 03 | ✅ *„sieht gut aus"* |
+| 04 | ✅ *„ja"* — der erste Einwand zurückgenommen (die Bedienzeile der Members liegt unterhalb, man scrollt) |
+| 05 | ✅ *„yo, passt"* |
+| 06 | ✅ *„identisch zu 1, passt"* |
+| 07 | ✅ *„passt so"* — das **aufgerollte** Bild mit der neuen Zeile **und** der Anlegezeile |
+| 08 | **ein Punkt → gebaut** (siehe unten); dieses Bild ist die **einzige** verlangte Neuerstellung |
 
-| Frage | Antwort | Gebaut | Gemessen |
-|---|---|---|---|
-| Bild 01: *„bigger … decrease its height"* — Höhe ist bei allen drei **gleich** (35,69 px), im Bild war **nichts ausgewählt** | **(b) zusätzlich flacher** (Polster 6 → 4 px) | `padding-block: calc(var(--space) * 0.5)` am Menüpunkt | **31,69 px** bei allen dreien; **Breite unverändert 131 px**, Beschriftung weiter mittig (720 == 720) |
-| Bild 08: *„move the button borders a little bit further to the left … cut the not used space from the right"* — bei den Menüpunkten zieht das **beide** Kanten in entgegengesetzte Richtungen | *„**nur bei Spaces verwalten** … und das Fenster rechts verkleinern, **aber nur dieses**"* | Zeilen `width: auto` + `align-items: flex-start`; neue Klasse `settings-panel--list` **nur** auf `#settings-spaces`, im Schmal-Modus zurückgenommen | Kästchen **92–147 px** statt 330 px, rechts **9 px** statt 192–245 px; Fenster **338 px** statt 380 px, Feld **138 px** von 288 px Inhalt (**48 %**), Knopf 142 px == Eigenbreite; bei 1024 px **422 px** |
+### P9-BF: „ein paar Px nach links erweitern, damit der Text innen wieder den Standardabstand hält"
 
-### Vier eigene Fehler — **drei davon derselbe Typ: eine Regel, die nicht die ist, die ich meine**
+**Gemessen vorher:** innen **1 px links** gegen **9 px rechts** — die Beschriftung klebte an der
+linken Kästchenkante. **Das ist die Folge von P9-BC**: bei 330 px Breite fiel der linke Rand nie auf,
+und seit das Kästchen sein Label umklammert (92–155 px), **ist** die linke Innenkante sichtbar. Der
+Befund ist damit **genau die Kehrseite des Locks vom Vortag** — und er wäre nur sichtbar geworden,
+weil die Bilder neu aufgenommen wurden.
 
-1. **`min-width`/`max-width` sind bei `box-sizing: border-box` die Breite des *Rahmens*.** Erste
-   Fassung 288 px ⇒ **240 px Inhalt** und ein Anlegefeld von **88 px**. **Die Browser-Probe hat es
-   gemeldet, der Wächter nicht** — er verglich „schmaler als die Basis" und war mit 288 gegen 340
-   **auf der falschen Seite**. Jetzt 338 px (288 + 2×24 + 2×1), und der Wächter vergleicht gegen das
-   **`max-width`**.
-2. **`width: 100%` steht in der Sammelregel**, nicht in der eigenen Regel: `.rail__home, …,
-   .tree__folder, …, .settings-space-row, …`. Die eigene Regel zu löschen ließ **alle 28 Kästchen auf
-   238 px** stehen — **G15** hat es gemeldet.
-3. **Eine Station, die den eigenen Fehler nicht bemerkte:** „schmaler als der Schatten" war mit 288 px
-   grün. Jetzt prüft der Wächter die **Ableitung** (Feldanteil ≥ 45 %), und **G18 ist der eigene
-   Fehler als Mutation**.
-4. **Eine feste Wartezeit schloss die Kette an der falschen Stelle** (ESC schloss die Liste statt des
-   Details, weil `selectSpace()` erst die Items holt). Zum dritten Mal in diesem Block gegen „auf die
-   Bedingung warten, nicht auf die Uhr" — die Lehre stand schon im Skript.
+**Gebaut:** `padding-left: var(--space)` **plus** `margin-left: calc(var(--space) * -1)` an
+**derselben** Kante. **Warum beides, und nicht eines:** `padding-left: 0` allein ist sein Befund;
+`padding-left: var(--space)` allein schiebt die Beschriftung **8 px nach rechts** und bricht **P9-AX**
+(die Beschriftung gehört auf dieselbe Kante wie der Panel-Titel). Nur Polster **und** negativer
+Außenabstand in derselben Höhe bewegen das **Kästchen**, nicht den Text.
 
-**Und ein Gegenlauf, der grün blieb (G17), mit derselben Folge wie G11 vom Vortag:** Die neue Zeile
-landete bei 29 Spaces **zufällig** sichtbar, die Station also grün, ohne dass ihr Gegenstand gebaut
-wäre. Die Probe stellt den Zustand jetzt **ausdrücklich** her (`scrollTop = 0`, Name `zz-…` ⇒ **letzte**
-Zeile ⇒ unterhalb des Folds), **misst ihn als Station** und rollt dann auf. Danach: rot.
+**Gemessen nachher:** innen **9 px links wie rechts**, das Kästchen ragt **−8 px** in das 24-px-
+Panelpolster (ohne abgeschnitten zu werden), die Beschriftung bleibt **1,0 px** bündig mit dem Titel.
 
-### Der fünfte Fehler: das **Gegenlauf-Rig** hat vier der sechs Mutationen nie ausgeführt
+### Wächter: einer neu, drei umgeschrieben, keiner gelöscht — **und dieselbe Lücke zum dritten Mal**
 
-**Die erste Bilanz „6/6 wirksam“ war falsch — und beides steht jetzt im Skript, nicht nur im Commit.**
+1. **Neu:** `test_the_space_rows_keep_the_standard_gap_inside_on_both_sides()` prüft die **Kopplung**
+   als Formel (`margin-left == -(padding-left)`), nicht als zwei Zahlen. Zwei unabhängige Werte wären
+   zwei Locks — die Kombination ist der Punkt.
+2. **Der Abstand-Wächter prüft jetzt namensgenau.** Vorher stand dort `assert "margin" not in body` —
+   und die Zeile trägt seit P9-BF einen **negativen** `margin-left`. Ein Substring-Test hätte den
+   Lock **verboten statt geprüft**: er kannte „irgendwo ein margin", nicht **welches** und nicht
+   **mit welchem Wert**.
+3. **`margin-bottom` stand auf keiner Verbotsliste**, obwohl der Test behauptete, er würde es melden —
+   die Liste wird namensgenau geprüft, und `margin\s*:` matcht `margin-bottom` nicht. **Dieselbe
+   Lücke wie `padding-block` (Vortag) und `border-box` (heute früh)**: eine Eigenschaft, die kein
+   Wächter kennt, meldet kein Wächter. Die drei `margin`-Langformen stehen jetzt auf der Liste.
+4. **Die Station P9-117 rechnet jetzt beide Polster** — sie kannte nur `padR`, weil links `0` stand.
+   Dieselbe Lücke ein drittes Mal, diesmal an der Formel statt an der Regel.
 
-1. **Das Rig zählte den Exit-Code statt der Station.** `returncode != 0` gilt auch für einen Lauf, der am
-   **Login** scheitert (Exit 2) — und für einen, der eine **falsche Datei** startet. Fünf der sechs Mutationen
-   galten so als „wirksam“, ohne dass **eine einzige Station** gelaufen war. Jetzt gilt: bemerkt ist eine Mutation
-   nur, wenn die **erwartete Station in der Probe-JSON rot** steht; fehlt die JSON, gibt das Skript das
-   stderr-Ende aus — vorher hat es die Fehlerursache weggeworfen und damit die Diagnose mit.
-2. **Es hat die mutierte Datei ausgeführt statt der Probe** (`str(datei)` statt `str(PROBE)`): für die vier
-   CSS-Mutationen hieß das `python app.css` — SyntaxError, Exit 1. **Dasselbe Muster wie „die erste Regel ist
-   nicht die, die ich meine“**, diesmal im eigenen Werkzeug.
-
-**Und ein Befund, den erst die Korrektur sichtbar machte:** Beim allerersten Lauf (mit dem
-Exit-Code-Zähler) blieb **G17 grün**, weil die neue Zeile bei 29 Spaces **zufällig** sichtbar war — eine
-Aussage über die Station, die es ohne die Korrektur gar nicht gab. Der Ausgangszustand wird jetzt
-hergestellt und **gemessen** (Name mit `zz-`-Präfix ⇒ **letzte** Zeile, `scrollTop = 0`, also unterhalb des
-Folds: y **1704** bei 836 px Panelshöhe). **Nach der Korrektur: 6 von 6**, jede mit **benannter** roter Station
-(`g13` → S1/P9-116 · `g14`/`g15` → S5/P9-117 · `g16`/`g18` → S5/P9-118 · `g17` → S8/P9-119), alle sechs JSONs
-liegen im Repo, der Arbeitsbaum ist am Ende **byteweise** auf dem Ausgangsstand.
-
-**Ein Nebeneffekt, der auch passt:** G17’s rote Station ist nicht die Sichtbarkeits-, sondern die
-**Anlegezeilen**-Station — ohne das zweite `scrollIntoView` bleibt die neue Zeile knapp sichtbar, die
-Anlegezeile rutscht heraus. Zwei Stationen, ein Lock: die Mutation wird trotzdem bemerkt.
-
-**Und ein Werkzeug-Detail, das denselben Fehler begünstigt hat:** der Abbruch dieses Laufs hat den
-Hintergrundprozess mitgenommen, und das Rig hinterließ `app.css` **mutiert** im Baum. Der Wächter
-(`test_the_menu_points_are_flatter_and_keep_their_width`) hat das **sofort** gemeldet, die
-Wiederherstellung kam byteweise aus dem Snapshot des Rigs.
-
-### Wächter, Belege, Bilder
-
-- **Vier neue Tests**, **zwei umgeschrieben, keiner gelöscht**: „Menüpunkte flacher **und** Breite
-  unverändert" (beide Richtungen), „Zeilen umklammern ihr Label" (`width: auto` **plus** Liste **plus**
-  `max-width`), „**nur** das Spaces-Fenster schmaler" (genau ein Träger, kleiner als das `max-width`
-  der Basis, min == max, im Schmal-Modus zurückgenommen) und „**die Kriterien nennen Position und
-  Panel**" — der letzte ist der direkte Wächter zum Kriteriumfehler vom Vortag. **`padding-block`
-  stand auf keiner Liste** (weder verboten noch erlaubt): die Verbotsliste ist um vier logische
-  Langformen gewachsen, der erlaubte Wert ist an **einen** Wert am Menüpunkt gebunden und an der
-  Space-Zeile **rot**.
-- `pytest` **1241 → 1245** (voller Lauf grün, **+4**, keiner gelöscht, keiner umgedreht) · `ui_budget`
-  **5/5** · Tabu-Diff §0.3 leer · **reines Frontend** (`app.css` + **eine** `app.html`-Zeile) ·
-  Release `v3.1.3` **unverändert**, **kein Deploy**, kein Service-Touch
-- **Datierte Korrektur:** der Block vom 2026-10-06 notiert `pytest` **1246**; **gemessen** sammelt
-  `HEAD` **1241** Tests ein (`pytest --collect-only`). Korrigiert wird die Zahl, nicht der Wächter
-- Browser-Probe **`p9_settings_kastchen_probe.py` 48/48** gegen die TLS-Wegwerf-Instanz auf 18775
-  (PID-Datei), **Gegenläufe G13–G18 6 von 6** wirksam, die roten JSONs im Repo, die **Gegenlauf-Bilder
-  gelöscht**. Ein **eigenes** Skript statt eines Umbaus (V187): der Lauf vom Vortag ist der Beleg für
-  die **widerrufene** Breitenlesart
-- **Bilder:** alle acht neu aufgenommen, `screenshots_latest/` unverändert verlinkt, README mit
-  Kriterium und **Zahl** je Bild. **Bild 07** zeigt jetzt die neue Zeile **aufgerollt** *und* die
-  Anlegezeile (die vorher aus **keinem** Bild sichtbar war) — und der Titel ist dort **nicht** im Bild,
-  was das Kriterium jetzt sagt. **Bild 08** zeigt wieder **Menü + Spaces verwalten** (der erste Lauf
-  zeigte nur das Menü), weil das die Ansicht ist, aus der seine Worte kamen
-- **Zwei Softcap-Überschreitungen wachsen weiter** (beide vom 2026-10-06 angeordnet, beide **nicht**
-  ausgeführt, weil ein Kürzen Nikinger-Entscheidung ist): settings-Mini-Plan **61.237 B**, Matrix
-  **92.601 B**. Die durchgestrichene Masse im L3-Archiv bleibt **229 B** und ist weiterhin kein Hebel;
-  der Phase-9-Head liegt bei ~33 KB und bleibt **unter** dem Cap
+**Belege:** Probe `p9_settings_kastchen_probe.py` **50/50**, **Gegenläufe G13–G16, G18, G19 7 von 7
+wirksam** (`g19` ist P9-BF als Mutation: `padding-left` zurück auf `0`), `pytest` 1245 → **1246**
+(+1), `ui_budget` 5/5, Tabu-Diff §0.3 leer, Release `v3.1.3` **unverändert**, **kein Deploy**.
+**Die durchgestrichene Masse im L3-Archiv bleibt 229 B** und ist weiterhin kein Hebel; der Head liegt bei ~32 KB und bleibt **unter** dem Cap. **Acht Bilder neu aufgenommen**, davon ist **08** die verlangte.
 
 ### Offen, in dieser Reihenfolge
 
-1. **Deploy `v3.1.3`** (Nikinger) — Badge und `## 2026-10-05`-Block stehen unverändert, dieser Block
-   hat nichts am Release geändert; später `SHAREFYX_ALLOW_STALE_UPDATELOG=1` oder ein neuer `##`-Block
-2. **P9-94 / P9-11** — der Portscan, Anleitung Mini-Plan §5 (MacBook, Handy-Hotspot, vier Ziele)
-3. **P9-13 / V150** — zweites Claude-Konto; wandert nach P10, **kein Blocker**
-4. **Softcap: settings-Plan 61.237 B und Abnahmematrix 92.601 B** — „kürzen notieren" ist angeordnet
+1. **Sichtprüfung des neuen Bildes 08** (ein Bild — wenn es passt, ist der Block nach Aussage des
+   Nikingers erledigt)
+2. **Deploy `v3.1.3`** (Nikinger) — Badge und `## 2026-10-05`-Block stehen unverändert
+3. **P9-94 / P9-11** — der Portscan (MacBook, Handy-Hotspot, vier Ziele, Mini-Plan §5)
+4. **P9-13 / V150** — zweites Claude-Konto; wandert nach P10, **kein Blocker**
+5. **Softcap: settings-Plan 64.996 B und Abnahmematrix 95.152 B** — „kürzen notieren" ist angeordnet
    und im §Backlog notiert; das Kürzen selbst ist Nikinger-Entscheidung
-5. **Gate/Z-Rest:** Übersichtsgrafik §12.4, `ROADMAP`-Zeile P9 → ✅, Phase auf ✅
-6. **Sichtprüfung der acht neuen Bilder** (offen — die Bilder tragen die Korrekturen, das Urteil ist
-   beim Nikinger; siehe `screenshots_latest/README.md`)
+6. **Gate/Z-Rest:** Übersichtsgrafik §12.4, `ROADMAP`-Zeile P9 → ✅, Phase auf ✅

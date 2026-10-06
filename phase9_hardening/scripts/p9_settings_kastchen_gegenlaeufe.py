@@ -73,6 +73,17 @@ MUTATIONEN = [
     ("g15", CSS, "P9-BC: `width: auto` an der Space-Zeile raus (die Sammelregel streckt wieder)",
      """.settings-space-row { width: auto; max-width: 100%; }""",
      """.settings-space-row { max-width: 100%; }""", "S5/P9-117"),
+    # **G19 ist der neue Lock P9-BF als Mutation**: `padding-left` zurueck auf `0` laesst die
+    # Beschriftung wieder an der linken Kastenkante kleben (innen 1 px gegen 9 px) — und **nur** das
+    # Polster zu aendern reicht als Gegenprobe, weil die Kopplung an den negativen Aussenabstand
+    # im Wächter (`test_the_space_rows_keep_the_standard_gap_inside_on_both_sides`) haengt: die
+    # Formel `margin-left == -(padding-left)` ist beim Bauen dieser Regel entstanden und wird
+    # dadurch von beiden Seiten geprueft.
+    ("g19", CSS, "P9-BF: das linke Polster der Space-Zeile zurueck auf 0 (Kasten klebt wieder)",
+     """  padding-left: var(--space);
+  margin-left: calc(var(--space) * -1);""",
+     """  padding-left: 0;
+  margin-left: calc(var(--space) * -1);""", "S5/P9-120"),
     ("g16", CSS, "P9-BE: das Spaces-Fenster auf die alte Breite zurueck",
      """  min-width: 338px;
   max-width: 338px;""",

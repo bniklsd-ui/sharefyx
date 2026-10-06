@@ -76,13 +76,15 @@ CAP_BYTES = 300  # der Cap, mit dem P9-3/V145 die Unerreichbarkeit des Kriterium
 # auf „nur bei Spaces verwalten" ein), die anderen drei durch P9-116–P9-119, weil ihre Nummern
 # inzwischen etwas anderes prüfen als am Vortag. **Die Zeilenzahl bleibt deshalb 116**, und die
 # Zuordnung steht vollständig in der Matrix, damit keine Zeile stillschweigend verschwindet.
-ABNAHME_BILANCE = {"✅": 101, "⚠️": 12, "⬜": 3}
+# 2026-10-06, Nachsatz aus der **Sichtpruefung**: +1 Zeile (P9-120, Lock P9-BF) aus Bild 08 —
+# der negative `margin-left`, ohne den die linke Innenkante der Space-Zeile wieder am Text klebt.
+ABNAHME_BILANCE = {"✅": 102, "⚠️": 12, "⬜": 3}
 # 2026-10-05: +7 Zeilen aus dem settings-Nachtrag P9-96–P9-102 (die sieben Punkte aus der
 # Bildsichtung des Nikingers, §10 des Mini-Plans). Die zwei neuen ⚠️ sind **benannte
 # Abweichungen**, keine offenen Punkte: P9-97 (linker Polsterwert, Nikinger-Entscheidung vom
 # 2026-10-05) und P9-99 (`justify-content` statt des im Plan genannten und gemessen wirkungslosen
 # `text-align` — der Knopf ist ein Flexcontainer).
-ABNAHME_ROWS = 116  # 116 Abnahmezeilen; zuletzt P9-116–P9-119 (die dritte Bildsichtung, gebaut)
+ABNAHME_ROWS = 117  # 117 Abnahmezeilen; zuletzt P9-120 (Nachsatz aus Bild 08, Lock P9-BF)
 # 2026-10-03: V164 von ⬜ auf ✅ (Deploy `v3.1.1` + Health-Gate 9/9). Die Konstante steht
 # **vor** dem Zählen, sonst wäre der Test eine Tautologie -- deshalb hat er mich beim
 # Zurueckschreiben der Bilanz in die Matrix rot gemeldet, statt sie zu bestaetigen.

@@ -207,6 +207,10 @@ def _tokens() -> set[str]:
 #     (4 px statt 6 px oben/unten; gemessene Höhe 35,69 px → 31,69 px), und das ist die erste
 #     bewusste Abweichung von P9-AFs „Höhe aus `.tree__folder`". Das Gegenstück dazu ist der
 #     Wächter: er erlaubt nicht die Eigenschaft, sondern den **Wert**.
+#   * **`margin` stand nur als Kurzform auf der Liste** — `margin-bottom: …` fiel am Wächter
+#     vorbei, denn die Verbotsliste wird **namensgenau** geprüft (`margin\s*:` matcht `margin-bottom`
+#     nicht). Das war am 2026-10-06 an einer eingebauten Zeile aufgefallen: der Test behauptete
+#     „diese Form wird rot" und die Form war grün. Die drei Langformen stehen jetzt **auch** dort.
 #   * **`padding-block` stand vorher auf keiner Liste.** Eine Eigenschaft, die kein Wächter kennt,
 #     meldet kein Wächter — die Lücke ist hier ausdrücklich geschlossen: die Langformen
 #     `padding-block-start`/`-end` stehen jetzt auf der Verbotsliste und ebenso die logischen
@@ -214,7 +218,9 @@ def _tokens() -> set[str]:
 VERBOTENE_OPTIK = ("height", "padding", "padding-top", "padding-bottom", "padding-right",
                     "padding-block-start", "padding-block-end",
                     "padding-inline", "padding-inline-start", "padding-inline-end",
-                    "border-radius", "font", "margin", "line-height", "border")
+                    "border-radius", "font", "margin", "margin-top", "margin-right",
+                    "margin-bottom",
+                    "line-height", "border")
 # **[2026-10-05, P9-AV]** Zwei Eigenschaften sind aus dieser Liste **heraus** und in je einer
 # Form wieder eingeschleust worden — nicht pauschal erlaubt:
 #
@@ -247,9 +253,20 @@ ERLAUBTES_PADDING_LEFT = "var(--space)"
 # `0` — ihre Beschriftung soll auf der Inhaltskante des Panels stehen, also buendig mit dem
 # Panel-Titel, und nicht 32 px daneben (das geerbte Einzugs-Polster der Baumzeile). Ein
 # einziger全局 erlaubter Wert koennte nicht beides sein.
+# **[2026-10-06, P9-BF]** Die Space-Zeile traegt jetzt `var(--space)` statt `0`, **und** einen
+# negativen `margin-left` in genau derselben Hoehe (siehe `_optik_verstoss`). Zusammen wandert das
+# **Kaestchen** 8 px nach links, die **Beschriftung bleibt buntig mit dem Titel** (P9-AX) — vorher
+# standen innen 1 px links gegen 9 px rechts, und genau die linke Kante war sein Punkt.
 ERLAUBTES_PADDING_LEFT_PRO_SELECTOR = {
     ".settings-menu__item": "var(--space)",
-    ".settings-space-row": "0",
+    ".settings-space-row": "var(--space)",
+}
+# **Und derselbe Wert als Aussenabstand, negativ** — ein Whitelist-Eintrag pro Selektor, wie beim
+# Polster. `None` heißt: die Eigenschaft hat hier nichts verloren (die Menuepunkte duerfen keinen
+# negativen Aussenabstand tragen; das waere eine zweite Wahrheit ueber dieselbe Kante).
+ERLAUBTES_MARGIN_LEFT_PRO_SELECTOR = {
+    ".settings-menu__item": None,
+    ".settings-space-row": "calc(var(--space) * -1)",
 }
 # **[2026-10-06, P9-BB]** Das vertikale Polster ist je Selektor **geschlossen** geregelt: der
 # Menüpunkt darf genau **einen** Wert setzen, die Space-Zeile **keinen**. `None` heißt „diese
@@ -336,7 +353,8 @@ def _schatten_verstoss(body: str) -> list[str]:
 
 def _optik_verstoss(body: str, tokens: set[str], erlaubte_color: str | None = None,
                     erlaubtes_padding_left: str = ERLAUBTES_PADDING_LEFT,
-                    erlaubtes_padding_block: str | None = None) -> list[str]:
+                    erlaubtes_padding_block: str | None = None,
+                    erlaubtes_margin_left: str | None = None) -> list[str]:
     """Alle Verstoesse eines Regel-Bodys: verbotene Eigenschaften, erlaubte Eigenschaften
     mit einem Wert, der **kein** vorhandenes Token ist, und die beiden Polster-Ausnahmen mit
     ihrem je Selektor gelockten Wert.
@@ -368,6 +386,17 @@ def _optik_verstoss(body: str, tokens: set[str], erlaubte_color: str | None = No
             verstoesse.append(
                 f"padding-block: {wert!r} (erlaubt ist hier nur "
                 f"{erlaubtes_padding_block!r})"
+            )
+    # **`margin-left` ist derselbe Fall wie `padding-block` (P9-BF)** und war vorher auf **keiner**
+    # Liste: die Kurzform `margin` steht auf der Verbotsliste, `margin-left` ist davon nicht
+    # erfasst -- es fiel also durch, ohne dass jemand es verboten hatte. Erlaubt ist **nur** der
+    # gelockte negative Wert dieses Selektors, und an den Menuepunkten gar keiner.
+    for match in re.finditer(r"(^|[;{\s])margin-left\s*:\s*([^;]*)", body):
+        wert = match.group(2).strip()
+        if wert != erlaubtes_margin_left:
+            verstoesse.append(
+                f"margin-left: {wert!r} (erlaubt ist hier nur "
+                f"{erlaubtes_margin_left!r})"
             )
     for match in re.finditer(rf"(^|[;{{\s])({"|".join(ERLAUBTE_OPTIK)})\s*:\s*([^;]*)", body):
         prop, wert = match.group(2), match.group(3).strip()
@@ -541,7 +570,8 @@ def test_settings_menu_items_reuse_the_tree_row_look():
                 body, tokens,
                 erlaubte_color if ist_auswahl else None,
                 ERLAUBTES_PADDING_LEFT_PRO_SELECTOR[selector],
-                ERLAUBTES_PADDING_BLOCK_PRO_SELECTOR[selector])
+                ERLAUBTES_PADDING_BLOCK_PRO_SELECTOR[selector],
+                ERLAUBTES_MARGIN_LEFT_PRO_SELECTOR[selector])
             assert not verstoesse, (selector, verstoesse, body)
             flaeschen_woerter += len(re.findall(r"(^|[;{\s])background\s*:", body))
     # **Und die Flaeche, die P9-AV verlangt, ist auch da.** Ein Wächter, der nur verbietet,
@@ -601,6 +631,11 @@ Der vierte Fall ist der eigentliche Fund dieser Zeile: `:not([aria-current="true
         "polster-block mit anderem Wert": "padding-block: 10px;",
         "polster-block als Langform": "padding-block-start: 4px;",
         "polster-inline als Umweg um padding-left": "padding-inline-start: 40px;",
+        # P9-BF: `margin-left` in drei Formen, in denen es **nicht** durchlässt. Ohne diese drei
+        # Zeilen wäre die Erlaubnis ungetestet -- und `margin-left` stand bis eben auf keiner Liste.
+        "aussenabstand links mit anderem Wert": "margin-left: 4px;",
+        "aussenabstand links positiv": "margin-left: var(--space);",
+        "aussenabstand als Langform unten": "margin-bottom: calc(var(--space) * -1);",
     }
     for name, body in verstoesse.items():
         assert _optik_verstoss(body, tokens), f"der Wächter meldet {name!r} ({body}) nicht"
@@ -621,6 +656,19 @@ Der vierte Fall ist der eigentliche Fund dieser Zeile: `:not([aria-current="true
                                ERLAUBTES_PADDING_BLOCK_PRO_SELECTOR[".settings-space-row"])), (
         "dieselbe Deklaration ist an der Space-Zeile erlaubt — die Ausnahme waere so breit wie "
         "der Wächter"
+    )
+    # **Und P9-BF in derselben Form:** der negative Aussenabstand ist an der Space-Zeile gruen …
+    ml = ERLAUBTES_MARGIN_LEFT_PRO_SELECTOR[".settings-space-row"]
+    assert not _optik_verstoss(f"margin-left: {ml};", tokens, erlaubtes_margin_left=ml), (
+        f"der gelockte Aussenabstand {ml!r} wird an der Space-Zeile zu Unrecht gemeldet — "
+        "P9-BF waere nicht baubar"
+    )
+    # … und am Menuepunkt **rot**, denn dort gibt es keine zweite Kante zu verlegen.
+    assert _optik_verstoss(f"margin-left: {ml};", tokens,
+                           erlaubtes_margin_left=ERLAUBTES_MARGIN_LEFT_PRO_SELECTOR[
+                               ".settings-menu__item"]), (
+        "derselbe Aussenabstand ist am Menuepunkt erlaubt — die Ausnahme waere so breit wie der "
+        "Wächter"
     )
     # Und die **Auswahlregel** darf die Farbe aus `.btn-primary` tragen — sonst wäre P9-AV nicht
     # baubar, und das wäre eine Regel, die den Bau verhindert statt ihn zu prüfen.
@@ -1159,9 +1207,18 @@ def test_the_menu_points_have_the_gap_the_space_rows_have():
     )
     # Kein Knopf traegt einen eigenen unteren Aussenabstand — das waere der zweite Ort.
     assert "margin-bottom" not in liste, liste
+    # **[2026-10-06, P9-BF]** Die Pruefung ist **namensgenau** geworden. Vorher stand hier
+    # `assert "margin" not in body` — und die Space-Zeile traegt seit P9-BF einen **negativen**
+    # `margin-left`, mit dem das Kaestchen 8 px nach links wandert, ohne dass die Beschriftung
+    # wandert. Ein Substring-Test haette den Lock verboten statt zu pruefen: er kannte nur
+    # "irgendwo ein margin", nicht **welches** und nicht **mit welchem Wert**.
     for selektor in (".settings-menu__item", ".settings-space-row"):
         for body in _rule_bodies(css, selektor, own_only=True):
-            assert "margin" not in body, (selektor, body)
+            for prop in ("margin", "margin-top", "margin-right", "margin-bottom"):
+                assert not re.search(rf"(^|[;{{\s]){prop}\s*:", body), (selektor, prop, body)
+            if "margin-left" in body:
+                assert _eigenschaft(body, "margin-left") == (
+                    ERLAUBTES_MARGIN_LEFT_PRO_SELECTOR[selektor]), (selektor, body)
 
 
 def test_the_password_buttons_are_caution_and_close():
@@ -1278,7 +1335,20 @@ def test_the_two_input_rows_stop_being_staircases():
     zeilen = [b for erster, selectors, b in _alle_regeln()
               if erster == ".settings-panel .settings-space-row"]
     assert len(zeilen) == 1, f"genau eine eigene Regel fuer die Space-Zilen im Panel: {len(zeilen)}"
-    assert _eigenschaft(zeilen[0], "padding-left") == "0", zeilen[0]
+    # **[2026-10-06, P9-BF — die Umkehr, mit beiden Lesarten im Repo.]** Bis eben stand hier
+    # `padding-left == "0"`, und das war **P9-AX**: die Beschriftung gehört auf dieselbe Kante wie
+    # der Panel-Titel. Der Nikinger hat am Bild 08 darum gebeten, das **Kaestchen** ein paar Pixel
+    # nach links zu erweitern, damit der Text **innen** wieder den Standardabstand haelt — gemessen
+    # waren vorher innen **1 px links** gegen **9 px rechts**. Beide Locks zugleich haelt nur
+    # **Polster und negativer Aussenabstand in derselben Hoehe**: `0` allein liess die Beschriftung
+    # am Kasten kleben, `var(--space)` allein schob sie 8 px nach rechts und brach P9-AX.
+    assert _eigenschaft(zeilen[0], "padding-left") == ERLAUBTES_PADDING_LEFT_PRO_SELECTOR[
+        ".settings-space-row"], zeilen[0]
+    assert _eigenschaft(zeilen[0], "margin-left") == ERLAUBTES_MARGIN_LEFT_PRO_SELECTOR[
+        ".settings-space-row"], (
+        "ohne den negativen Aussenabstand wandert die Beschriftung mit dem Polster nach rechts "
+        "und P9-AX ist gebrochen: " + str(zeilen[0])
+    )
     # Und die Mitgliederliste: Browser-Standard waere Aufzaehlungspunkt und 40 px Einzug.
     mitglieder = [b for erster, selectors, b in _alle_regeln()
                   if erster == "#space-member-list"]
@@ -1476,3 +1546,48 @@ def test_the_two_sight_check_criteria_name_the_position_and_the_panel():
         f"das Kriterium zu Bild 07 nennt das Panel nicht, in dem die Zeile steht (die "
         f"Space-Liste, nicht das Detail-Panel): {kriterium_07}"
     )
+
+
+def test_the_space_rows_keep_the_standard_gap_inside_on_both_sides():
+    """P9-BF (2026-10-06, Nikinger zu Bild 08: *„den Auswahl buttons der einzelnen Spaces bitte ein
+    paar Px nach links erweitern, sodass innerliegender Text und Button Grenze den Standard Abstand
+    einhalten"*).
+
+    **Gemessen vorher:** innen **1 px** links (nur der Rahmen) gegen **9 px** rechts (8 px Polster
+    + 1 px Rahmen) — die Beschriftung klebte an der linken Kästchenkante. **Gebaut:** Polster
+    `var(--space)` **plus** ein negativer `margin-left` in derselben Höhe, damit das **Kästchen**
+    wandert und die **Beschriftung** nicht.
+
+    **Der Wächter prüft die Kopplung, nicht die beiden Werte einzeln.** Zwei Zahlen, die nicht
+    miteinander verrechnet werden, sind zwei unabhängige Locks — und die Kombination ist der ganze
+    Punkt: `padding-left: 0` allein klebt (sein Befund), `padding-left: var(--space)` allein schiebt
+    die Beschriftung **8 px nach rechts** und bricht **P9-AX** (die Beschriftung gehört auf dieselbe
+    Kante wie der Panel-Titel). Also: **beide Werte müssen aus derselben Quelle kommen**, und das
+    ist an den beiden Werten des Selektor-Index geprüft — nicht an einer Zahl im Test.
+    """
+    css = _css()
+    zeilen = [b for erster, selectors, b in _alle_regeln()
+              if erster == ".settings-panel .settings-space-row"]
+    assert len(zeilen) == 1, f"genau eine eigene Regel fuer die Space-Zilen im Panel: {len(zeilen)}"
+    regel = zeilen[0]
+    # **Die Kopplung: der Aussenabstand ist genau die Negation des Polsters**, als Ausdruck und
+    # nicht als Zahl. Sonst wuerde ein spaeterer Umbau `margin-left: -4px` neben einem 8-px-Polster
+    # durchgehen und die Beschriftung 4 px nach rechts schieben.
+    polster = _eigenschaft(regel, "padding-left")
+    aussen = _eigenschaft(regel, "margin-left")
+    assert aussen == f"calc({polster} * -1)", (
+        f"der Aussenabstand {aussen!r} ist nicht die Negation des Polsters {polster!r} — das "
+        "Kaestchen wandert dann nicht um genau die Strecke, die das Polster oeffnet"
+    )
+    # Und die **beiden** Werte stehen an **einer** Stelle, nicht auf zwei Regeln verteilt.
+    # (`any(... in s for s in selectors)`, nicht `in selectors` — die Selektorliste ist eine Liste
+    # von Strings, und `in` auf einer Liste prüft Gleichheit, nicht Teilstring. Die erste Fassung
+    # stand auf `in selectors` und zählte deshalb **null**.)
+    assert len([b for erster, selectors, b in _alle_regeln()
+                if any(".settings-space-row" in s for s in selectors) and "padding-left" in b]) == 1, (
+        "die Space-Zile traegt ihr linkes Polster an mehreren Stellen — eine Kante, eine Quelle"
+    )
+    # **P9-AX gilt weiter**: die Beschriftung bleibt buntig mit dem Titel. Das ist der zweite Teil
+    # des Locks und der Grund fuer den negativen Aussenabstand; die Wirkung misst die Browser-Probe
+    # (S5/P9-120), weil sie im Test nicht existiert.
+    assert polster == ERLAUBTES_PADDING_LEFT_PRO_SELECTOR[".settings-space-row"]

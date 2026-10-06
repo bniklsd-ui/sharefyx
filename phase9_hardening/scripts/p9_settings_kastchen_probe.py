@@ -165,6 +165,11 @@ ZEILEN = r"""
     const cs = getComputedStyle(z);
     return { box: r2(b.width), label: r2(tb.width), leer: r2(b.right - tb.right),
              text_l: r2(tb.left), padR: parseFloat(cs.paddingRight),
+             // **[2026-10-06, P9-BF]** `padL` kam dazu: das Kästchen trägt jetzt **beide** Polster
+             // (8 px links, 8 px rechts), und die Formel der Station P9-117 braucht beide Hälften.
+             // Vorher stand hier nur `padR`, weil links `0` stand — dieselbe Lücke wie bei
+             // `min-width` und `border-box`: wer eine Seite für null hält, kennt die andere nicht.
+             padL: parseFloat(cs.paddingLeft),
              alignSelf: cs.alignSelf, maxWidth: cs.maxWidth,
              txt: n.nodeValue.trim().slice(0, 24) };
   });
@@ -433,8 +438,8 @@ def main() -> int:
             #     330 px, Beschriftungen 84–137 px, also 192–245 px Leerraum rechts.
             zeilen = page.evaluate(ZEILEN)
             zu_fett = [z for z in zeilen
-                       if abs((z["box"] - z["label"]) - (z["padR"] + 2)) > 1]
-            pruefe("S5/P9-117 jedes Kästchen ist Label + rechtes Polster + 2 px Rahmen",
+                       if abs((z["box"] - z["label"]) - (z["padL"] + z["padR"] + 2)) > 1]
+            pruefe("S5/P9-117 jedes Kästchen ist Label + beide Polster + 2 px Rahmen",
                    zeilen and not zu_fett,
                    f"{len(zeilen)} Zeilen, breiteste {max((z['box'] for z in zeilen), default=0)} px "
                    f"(vorher 330 px für alle)"
@@ -444,6 +449,41 @@ def main() -> int:
                    zeilen and max(leer_rechts) <= zeilen[0]["padR"] + 2,
                    f"max {max(leer_rechts, default=0)} px bei Polster "
                    f"{zeilen[0]['padR'] if zeilen else '?'} px (vorher 192–245 px)")
+            # --- P9-120 (2026-10-06, Bild 08): das **Kaestchen** wandert 8 px nach links, damit der
+            #     Text **innen** wieder den Standardabstand haelt — vorher innen 1 px links gegen 9 px
+            #     rechts. Gemessen werden **beide** Innenkanten und die Lage der Beschriftung.
+            innen = page.evaluate(
+                r"""() => {
+                  const r2 = (v) => Math.round(v * 100) / 100;
+                  const panel = document.getElementById('settings-spaces');
+                  const pb = panel.getBoundingClientRect();
+                  const cs = getComputedStyle(panel);
+                  const inhalt_l = pb.left + parseFloat(cs.paddingLeft)
+                                   + parseFloat(cs.borderLeftWidth);
+                  const z = document.querySelector('#space-admin-list .settings-space-row');
+                  const zb = z.getBoundingClientRect();
+                  const w = document.createTreeWalker(z, NodeFilter.SHOW_TEXT);
+                  let n = null; while ((n = w.nextNode())) { if (n.nodeValue.trim()) break; }
+                  const rg = document.createRange(); rg.selectNodeContents(n);
+                  const tb = rg.getBoundingClientRect();
+                  const zcs = getComputedStyle(z);
+                  return { innen_links: r2(tb.left - zb.left), innen_rechts: r2(zb.right - tb.right),
+                           ragt_links: r2(zb.left - inhalt_l), text_l: r2(tb.left),
+                           polster_l: zcs.paddingLeft, panelpolster: parseFloat(cs.paddingLeft),
+                           txt: n.nodeValue.trim().slice(0, 24) };
+                }""")
+            pruefe("S5/P9-120 innen derselbe Abstand auf beiden Seiten",
+                   abs(innen["innen_links"] - innen["innen_rechts"]) <= 1
+                   and 8 <= innen["innen_links"] <= 10,
+                   f"innen {innen['innen_links']} px links gegen {innen['innen_rechts']} px rechts "
+                   f"(vorher 1 gegen 9), Polster {innen['polster_l']}")
+            pruefe("S5/P9-120 das Kästchen ragt um 8 px in das Panelpolster nach links",
+                   -8.5 <= innen["ragt_links"] <= -7.5,
+                   f"{innen['ragt_links']} px gegen die Inhaltskante (negativ = ragt hinein), "
+                   f"Panelpolster {innen['panelpolster']} px — es ragt hinein und wird nicht "
+                   "abgeschnitten")
+            messwerte["P9-120_innenabstand"] = innen
+
             # Und die Beschriftung steht **unverändert** links (P9-AX) — sonst hätte das Kästchen
             # seinen Text mitverschoben, und genau das wollte er nicht.
             versatz2 = [round(z["text_l"] - titel_box["text"]["l"], 2) for z in zeilen]

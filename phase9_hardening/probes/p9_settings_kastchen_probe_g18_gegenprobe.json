@@ -2,6 +2,15 @@
   "base_url": "https://127.0.0.1:18775",
   "plan": "docs/concepts/phase9_hardening_block_settings_plan.md §12.1",
   "messwerte": {
+    "P9-120_innenabstand": {
+      "innen_links": 9,
+      "innen_rechts": 9,
+      "ragt_links": -8,
+      "text_l": 700.5,
+      "polster_l": "8px",
+      "panelpolster": 24,
+      "txt": "alpha (eigener Space)"
+    },
     "P9-104_flaeche": {
       "menuepunkt": {
         "l": 654.5,
@@ -164,7 +173,7 @@
         "l": 699.5,
         "r": 787.5,
         "w": 88,
-        "t": 2071.44,
+        "t": 2464.63,
         "h": 40.8,
         "background": "rgb(12, 16, 21)",
         "backgroundImage": "none",
@@ -181,7 +190,7 @@
         "l": 795.5,
         "r": 937.5,
         "w": 142,
-        "t": 2071.44,
+        "t": 2464.63,
         "h": 40.8,
         "background": "rgba(0, 0, 0, 0)",
         "backgroundImage": "linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))",
@@ -205,454 +214,598 @@
     },
     "P9-117_zeilen": [
       {
-        "box": 147,
+        "box": 155,
         "label": 137,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "alpha (eigener Space)"
       },
       {
-        "box": 92,
+        "box": 100,
         "label": 82,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "diag-140009"
       },
       {
-        "box": 101,
+        "box": 109,
         "label": 91,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "polish-130004"
       },
       {
-        "box": 101,
+        "box": 109,
         "label": 91,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "polish-130134"
       },
       {
-        "box": 101,
+        "box": 109,
         "label": 91,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "polish-130234"
       },
       {
-        "box": 101,
+        "box": 109,
         "label": 91,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "polish-130335"
       },
       {
-        "box": 101,
+        "box": 109,
         "label": 91,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "polish-130436"
       },
       {
-        "box": 101,
+        "box": 109,
         "label": 91,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "polish-130537"
       },
       {
-        "box": 101,
+        "box": 109,
         "label": 91,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "polish-130637"
       },
       {
-        "box": 101,
+        "box": 109,
         "label": 91,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "polish-130838"
       },
       {
-        "box": 101,
+        "box": 109,
         "label": 91,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "polish-130938"
       },
       {
-        "box": 101,
+        "box": 109,
         "label": 91,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "polish-131039"
       },
       {
-        "box": 101,
+        "box": 109,
         "label": 91,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "polish-131139"
       },
       {
-        "box": 101,
+        "box": 109,
         "label": 91,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "polish-140612"
       },
       {
-        "box": 101,
+        "box": 109,
         "label": 91,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "polish-141013"
       },
       {
-        "box": 101,
+        "box": 109,
         "label": 91,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "polish-141142"
       },
       {
-        "box": 117,
+        "box": 125,
         "label": 107,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "settings-133935"
       },
       {
-        "box": 117,
+        "box": 125,
         "label": 107,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "settings-134104"
       },
       {
-        "box": 117,
+        "box": 125,
         "label": 107,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "settings-134204"
       },
       {
-        "box": 117,
+        "box": 125,
         "label": 107,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "settings-134805"
       },
       {
-        "box": 117,
+        "box": 125,
         "label": 107,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "settings-135604"
       },
       {
-        "box": 117,
+        "box": 125,
         "label": 107,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "settings-135705"
       },
       {
-        "box": 117,
+        "box": 125,
         "label": 107,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "settings-135834"
       },
       {
-        "box": 117,
+        "box": 125,
         "label": 107,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "settings-140135"
       },
       {
-        "box": 117,
+        "box": 125,
         "label": 107,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "settings-152605"
       },
       {
-        "box": 117,
+        "box": 125,
         "label": 107,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "settings-153904"
       },
       {
-        "box": 117,
+        "box": 125,
         "label": 107,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "settings-154634"
       },
       {
-        "box": 117,
+        "box": 125,
         "label": 107,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "settings-154804"
       },
       {
-        "box": 117,
+        "box": 125,
         "label": 107,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "settings-154904"
       },
       {
-        "box": 117,
+        "box": 125,
         "label": 107,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "settings-155004"
       },
       {
-        "box": 94,
+        "box": 102,
         "label": 84,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "sicht-133318"
       },
       {
-        "box": 78,
+        "box": 86,
         "label": 68,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "zz-141404"
       },
       {
-        "box": 78,
+        "box": 86,
         "label": 68,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "zz-141604"
       },
       {
-        "box": 78,
+        "box": 86,
         "label": 68,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "zz-142205"
       },
       {
-        "box": 78,
+        "box": 86,
         "label": 68,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "zz-142405"
       },
       {
-        "box": 78,
+        "box": 86,
         "label": 68,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "zz-142636"
       },
       {
-        "box": 78,
+        "box": 86,
         "label": 68,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "zz-143106"
       },
       {
-        "box": 78,
+        "box": 86,
         "label": 68,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "zz-143407"
       },
       {
-        "box": 78,
+        "box": 86,
         "label": 68,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "zz-143608"
       },
       {
-        "box": 78,
+        "box": 86,
         "label": 68,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "zz-145939"
       },
       {
-        "box": 78,
+        "box": 86,
         "label": 68,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "zz-150610"
       },
       {
-        "box": 78,
+        "box": 86,
         "label": 68,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "zz-152011"
       },
       {
-        "box": 78,
+        "box": 86,
         "label": 68,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "zz-152212"
       },
       {
-        "box": 78,
+        "box": 86,
         "label": 68,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "zz-152412"
       },
       {
-        "box": 78,
+        "box": 86,
         "label": 68,
         "leer": 9,
         "text_l": 700.5,
         "padR": 8,
+        "padL": 8,
         "alignSelf": "auto",
         "maxWidth": "100%",
         "txt": "zz-152613"
+      },
+      {
+        "box": 86,
+        "label": 68,
+        "leer": 9,
+        "text_l": 700.5,
+        "padR": 8,
+        "padL": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "zz-152814"
+      },
+      {
+        "box": 86,
+        "label": 68,
+        "leer": 9,
+        "text_l": 700.5,
+        "padR": 8,
+        "padL": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "zz-153014"
+      },
+      {
+        "box": 86,
+        "label": 68,
+        "leer": 9,
+        "text_l": 700.5,
+        "padR": 8,
+        "padL": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "zz-174844"
+      },
+      {
+        "box": 86,
+        "label": 68,
+        "leer": 9,
+        "text_l": 700.5,
+        "padR": 8,
+        "padL": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "zz-175115"
+      },
+      {
+        "box": 86,
+        "label": 68,
+        "leer": 9,
+        "text_l": 700.5,
+        "padR": 8,
+        "padL": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "zz-175346"
+      },
+      {
+        "box": 86,
+        "label": 68,
+        "leer": 9,
+        "text_l": 700.5,
+        "padR": 8,
+        "padL": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "zz-175617"
+      },
+      {
+        "box": 86,
+        "label": 68,
+        "leer": 9,
+        "text_l": 700.5,
+        "padR": 8,
+        "padL": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "zz-175847"
+      },
+      {
+        "box": 86,
+        "label": 68,
+        "leer": 9,
+        "text_l": 700.5,
+        "padR": 8,
+        "padL": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "zz-180138"
+      },
+      {
+        "box": 86,
+        "label": 68,
+        "leer": 9,
+        "text_l": 700.5,
+        "padR": 8,
+        "padL": 8,
+        "alignSelf": "auto",
+        "maxWidth": "100%",
+        "txt": "zz-180438"
       }
     ],
     "P9-118_panel": {
@@ -756,12 +909,12 @@
         "sichtbar": false,
         "sichtbar_voll": false,
         "sichtbar_px": 0,
-        "zeile_t": 2053.44,
-        "zeile_b": 2089.13,
+        "zeile_t": 2446.63,
+        "zeile_b": 2482.31,
         "panel_t": 32,
         "panel_b": 868,
         "scrollTop": 0,
-        "scrollHeight": 2204,
+        "scrollHeight": 2597,
         "clientHeight": 834
       },
       "nachher": {
@@ -769,12 +922,12 @@
         "sichtbar": true,
         "sichtbar_voll": true,
         "sichtbar_px": 35.69,
-        "zeile_t": 764.44,
-        "zeile_b": 800.13,
+        "zeile_t": 764.63,
+        "zeile_b": 800.31,
         "panel_t": 32,
         "panel_b": 868,
-        "scrollTop": 1289,
-        "scrollHeight": 2204,
+        "scrollTop": 1682,
+        "scrollHeight": 2597,
         "clientHeight": 834
       }
     }
@@ -783,7 +936,7 @@
     {
       "pruefung": "Vorbereitung Übersicht geladen",
       "ok": true,
-      "detail": "45 Spaces in der Rail"
+      "detail": "54 Spaces in der Rail"
     },
     {
       "pruefung": "S1/P9-103 zwei Abstaende zwischen den drei Punkten",
@@ -863,7 +1016,7 @@
     {
       "pruefung": "S5 Spaces als Stufe 2",
       "ok": true,
-      "detail": "45 Zeilen"
+      "detail": "54 Zeilen"
     },
     {
       "pruefung": "S5/P9-107 Space-Zeilen-Beschriftung == Titel (links)",
@@ -873,7 +1026,7 @@
     {
       "pruefung": "S5/P9-109 Feld und Knopf auf einer Zeile",
       "ok": true,
-      "detail": "Feld top 2071.44, Knopf top 2071.44"
+      "detail": "Feld top 2464.63, Knopf top 2464.63"
     },
     {
       "pruefung": "S5/P9-109 Feld bündig links mit dem Panelinhalt",
@@ -891,14 +1044,24 @@
       "detail": "in der Zeile 142 px, an einer Kopie außerhalb 142 px"
     },
     {
-      "pruefung": "S5/P9-117 jedes Kästchen ist Label + rechtes Polster + 2 px Rahmen",
+      "pruefung": "S5/P9-117 jedes Kästchen ist Label + beide Polster + 2 px Rahmen",
       "ok": true,
-      "detail": "45 Zeilen, breiteste 147 px (vorher 330 px für alle)"
+      "detail": "54 Zeilen, breiteste 155 px (vorher 330 px für alle)"
     },
     {
       "pruefung": "S5/P9-117 rechts ist nur noch das Polster frei",
       "ok": true,
       "detail": "max 9 px bei Polster 8 px (vorher 192–245 px)"
+    },
+    {
+      "pruefung": "S5/P9-120 innen derselbe Abstand auf beiden Seiten",
+      "ok": true,
+      "detail": "innen 9 px links gegen 9 px rechts (vorher 1 gegen 9), Polster 8px"
+    },
+    {
+      "pruefung": "S5/P9-120 das Kästchen ragt um 8 px in das Panelpolster nach links",
+      "ok": true,
+      "detail": "-8 px gegen die Inhaltskante (negativ = ragt hinein), Panelpolster 24 px — es ragt hinein und wird nicht abgeschnitten"
     },
     {
       "pruefung": "S5/P9-117 die Beschriftung steht unverändert bündig mit dem Titel",
@@ -983,12 +1146,12 @@
     {
       "pruefung": "S8 Space anlegen: eine Zeile mehr",
       "ok": true,
-      "detail": "45 -> 46"
+      "detail": "54 -> 55"
     },
     {
       "pruefung": "S8/P9-119 die neue Zeile steht als letzte in der Liste",
       "ok": true,
-      "detail": "Position 46 von 46"
+      "detail": "Position 55 von 55"
     },
     {
       "pruefung": "S8/P9-107 auch die neue Zeile bündig",
@@ -998,22 +1161,22 @@
     {
       "pruefung": "S8/P9-119 die Anlegezeile ist mit im Bild (Feld und Knopf auf einer Zeile)",
       "ok": true,
-      "detail": "y 826.13..866.92, Feld 88 px, Knopf 142 px"
+      "detail": "y 826.31..867.11, Feld 88 px, Knopf 142 px"
     },
     {
       "pruefung": "S8/P9-119 der Ausgangszustand ist gemessen: die neue Zeile ist NICHT sichtbar",
       "ok": true,
-      "detail": "Zeile y 2053.44..2089.13 bei scrollTop 0 (2204 px Inhalt bei 834 px Höhe)"
+      "detail": "Zeile y 2446.63..2482.31 bei scrollTop 0 (2597 px Inhalt bei 834 px Höhe)"
     },
     {
       "pruefung": "S8/P9-119 nach dem Aufrollen liegt die neue Zeile vollständig im Panel",
       "ok": true,
-      "detail": "nachher 35.69 px sichtbar bei scrollTop 1289 (Zeile y 764.44..800.13, Panel y 32..868)"
+      "detail": "nachher 35.69 px sichtbar bei scrollTop 1682 (Zeile y 764.63..800.31, Panel y 32..868)"
     },
     {
       "pruefung": "S8/P9-119 Bild 07 zeigt die neue Zeile **und nicht** den Titel",
       "ok": true,
-      "detail": "Titel y -1232 bei Panel-Oberkante 32 — die Bündigkeit mit dem Titel zeigen Bild 04 und 08"
+      "detail": "Titel y -1625 bei Panel-Oberkante 32 — die Bündigkeit mit dem Titel zeigen Bild 04 und 08"
     },
     {
       "pruefung": "S8 ESC schließt das Detail, die Liste bleibt offen",

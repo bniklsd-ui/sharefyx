@@ -2095,8 +2095,25 @@ select.input:focus {
    **Der Scoped-Selektor ist der ganze Auftrag:** `.tree__folder` in der **Rail** behält seine
    Einrückung — dort ist sie Hierarchie, und dort gibt es über der Zeile etwas zum Einrücken unter.
    In der Kette ist der Panel-Titel die Zeile darüber, und die Beschriftung gehört auf dieselbe
-   Kante. */
-.settings-panel .settings-space-row { padding-left: 0; }
+   Kante.
+
+   **[2026-10-06, P9-BF — dieselbe Kante, von der anderen Seite]** *„den Auswahl buttons der
+   einzelnen Spaces bitte ein paar Px nach links erweitern, sodass innerliegender Text und Button
+   Grenze den Standard Abstand einhalten"* (Bild 08). **Gemessen vorher:** innen **1 px** links gegen
+   **9 px** rechts (8 px Polster + 1 px Rahmen) — die Beschriftung klebte an der linken Kästchenkante,
+   während rechts der Standardabstand stand.
+
+   **Der Trick ist der negative Außenabstand, und er ist der einzige, der beide Locks hält:**
+   `padding-left: var(--space)` allein würde die Beschriftung **8 px** nach rechts schieben und
+   P9-AX brechen (die Beschriftung muss bündig mit dem Titel bleiben). Mit `margin-left` um genau
+   diesen Betrag **negativ** wandert das **Kästchen** 8 px nach links in das Panelpolster (das ist
+   24 px breit, es passt) und die **Beschriftung bleibt exakt, wo sie war** — gemessen 1 px Versatz
+   zum Titel, vorher wie nachher. Innen stehen danach **9 px links wie rechts**, also derselbe
+   Standardabstand, und das Kästchen ist gewachsen statt gewandert. */
+.settings-panel .settings-space-row {
+  padding-left: var(--space);
+  margin-left: calc(var(--space) * -1);
+}
 
 /* P9-AX, dieselbe Klasse für die Mitgliederliste. `#space-member-list` hatte **überhaupt keine
    Regel** — der Browser lieferte Aufzählungspunkte (`list-style: disc`) und 40 px Einzug
