@@ -404,7 +404,7 @@ drehen (die Icons werden überall als `<use href>` eingebunden, eine `transform`
 — die Beschriftung „Zurück" darf als Text weg, **die Zugänglichkeit nicht**: `.btn--icon` trägt
 den Titel, und genau diese beiden (`title` + `aria-label`) sind zu setzen.
 
-### Abnahme (P9-96 – P9-102), nicht gefahren
+### Abnahme (P9-96 – P9-102), gefahren 2026-10-05 (§10.1)
 
 `P9-96` Menütitel zentriert, Abstand Titel→erster Knopf == der in P9-AR gemessene Wert (±1 px) ·
 `P9-97` unausgewählter Menüpunkt: gleiche berechnete Fläche wie `#space-create-name-input`
@@ -486,3 +486,116 @@ gemessenen Wortlaut begründet.
    **Gemeldet, nicht gebaut** — die Reparatur ist eine Zustandsentscheidung, keine Zeilenänderung.
    Die Probe wartet jetzt auf die **Bedingung** (dieselbe Lehre wie S7), nicht auf eine Uhr.
 
+
+---
+
+## §11 Zweite Bildsichtung 2026-10-05 — vier Punkte, **nicht gebaut**
+
+**Anlass.** Der Nikinger hat die vier Bilder aus `screenshots_latest/` angesehen und vier Punkte
+notiert; zu 02 und 03/04 kam eine Rückfrage mit gemessenen Alternativen, beide beantwortet. **Hier
+steht nichts umgesetzt** — das ist der Auftrag. **Er dreht zwei Locks des §10 um**, und das ist der
+wichtigste Satz in diesem Abschnitt.
+
+| Lock | Inhalt | Herkunft |
+|---|---|---|
+| **P9-AU** | **Abstand zwischen den drei Menüpunkten**: `var(--space)` (8 px), derselbe Wert wie `#space-admin-list` (P9-AK). **Gemessen heute: 0 px** — „die shouldn't be glued to each other" | Nikinger 2026-10-05, Punkt 01 |
+| **P9-AV** | **Die Fläche der Menüpunkte ist die des Standardknopfes, nicht die des Eingabefeldes.** Unausgewählt exakt `.btn` (`--btn-std-fill` + `--btn-std-line` + der 1-px-Innenschatten), ausgewählt die **Akzentfläche** wie `.btn-primary` (`--accent-face-*` + `--accent-edge`). Damit **widerrufen**: P9-AN (Eingabefeld-Fläche) und die Auswahl-Regel aus P9-AO | Nikinger 2026-10-05, Punkt 01 + Rückfrage; **Entscheidung ausdrücklich: „Standard-Knopf + Akzentfläche für ausgewählt"** |
+| **P9-AW** | **„Ändern" wird Vorsicht** (`.btn.action--caution`, Standardfläche + rote Beschriftung — wortgleich „Archivieren"), weil ein Passwortwechsel Rückweg-Kosten hat (alle Connectoren neu autorisieren, andere Sitzungen abgemeldet — der Panel-Text sagt es selbst). **„Abbrechen" → „Schließen"**, wie in allen anderen Fenstern. **P9-AT („Passwort-Panel bleibt unverändert") ist damit für diese zwei Knöpfe aufgehoben** und für den Rest (Felder, Reihenfolge, Hinweistext) ausdrücklich **nicht** | Nikinger 2026-10-05, Punkt 02 |
+| **P9-AX** | **Die Beschriftung der Space-Zeilen bündig mit dem Panel-Titel.** Gemessen: der Titel steht auf der Inhaltskante, die Zeilenbeschriftung **33 px** daneben (32 px geerbtes Einzugs-Polster der Baumzeile + 1 px Rahmen) — die Zeile hat **kein** Icon, die Einrückung ist also leer. **Dazu** `#space-member-list`: `list-style: none; padding: 0` (Browser-Standard sind Aufzählungspunkte **und** 40 px Einzug) | Nikinger 2026-10-05, Punkt 03 („align … I suggest actually moving them to the left too") |
+| **P9-AY** | **Das Namensfeld im Detail-Panel steht beidseitig bündig mit der Zeile darunter** (Auswahl-Knopf links, „Hinzufügen" rechts). Gemessen: **222 → 234 px, also +12 px** (Rundwert des Nikingers: „+10px"). **Nicht als Zahl notiert**, sondern als Folge der Spaltenbreiten (siehe unten) | Nikinger 2026-10-05, Punkte 03/04 („by adding a few pixels on the left") |
+| **P9-AZ** | **Die Anlege-Zeile im Spaces-Panel wird eine Zeile**: „Name des neuen Space" **und** „Space anlegen" nebeneinander, das Feld links **und** rechts bündig mit der Linie darüber, Standard-Abstand zwischen den Knöpfen. **„Schließen" bleibt allein darunter, rechtsbündig. „Space anlegen" behält seine Größe** — nur das Feld ändert seine | Nikinger 2026-10-05, Rückfrage, wörtlich |
+
+### Warum P9-AY keine Zahl bekommt (und P9-AZ doch)
+
+`#settings-space-detail` trägt **drei** Elemente in einer `flex`-Zeile, die umbricht: das Namensfeld
+allein, darunter Auswahl-Knopf und „Hinzufügen". „Beidseitig bündig mit der Zeile darunter" heißt in
+einem Flex-Umbruch: **das Feld so breit wie der Inhalt der Folgezeile**. Als Zahl notiert wäre
+`width: 234px` eine Kopie von zwei Knopfbreiten, die sich bei jeder Beschriftungsänderung still
+verschiebt. Als Raster ist es eine **Folge**: `grid-template-columns: repeat(2, max-content)` lässt
+die beiden Spalten von den Knöpfen messen, und das Feld überspannt beide
+(`grid-column: 1 / -1`). Der plus 12 px ist damit **gemessen und gerechnet**, nicht getippt.
+
+P9-AZ ist der Fall, in dem die Folge **nicht** greift: dort ist die Folgezeile *ein* Knopf (142 px),
+und das Feld daran zu binden hieße, ein Eingabefeld auf 142 px zu verengen. Deshalb dort
+`flex: 1` auf dem Feld — eine Zeile, volle Inhaltsbreite, Feld und Knopf an den beiden Kanten.
+
+### §11.1 Ergebnis — **gebaut am 2026-10-06 (opencode/M3), Release `v3.1.3` unverändert**
+
+P9-103 – P9-111 stehen mit **9 ✅** in der Abnahmematrix, zwei davon mit benannter Grenze im Text.
+Browser-Probe **`p9_settings_polish_probe.py` 29/29** gegen die TLS-Wegwerf-Instanz auf 18775,
+**sechs Gegenläufe G7–G12, 6 von 6 wirksam**. `pytest` **1238 → 1246** (8 neue Tests, 5
+umgeschrieben, keiner gelöscht), `ui_budget` 5/5, Tabu-Diff §0.3 leer. **Kein Deploy** — das
+`deploy.sh`-Gate verlangt einen Datumsblock am Deploy-Tag.
+
+**Ein eigenes Probe-Skript statt eines Umbaus von `p9_settings_chain_probe.py`, aus V187:**
+*ein umgebauter historischer Beleg beweist nichts mehr über den Block, für den er steht*. Der
+§10-Lauf ist der Beleg für P9-AN — die Fläche, die P9-AV am Folgetag widerrufen hat. Ein
+umbauter Lauf hätte beides beweisen wollen.
+
+#### Was gegen diesen Plan anders gebaut wurde — drei Punkte
+
+1. **P9-AV brauchte zwei Flächen, nicht eine.** Der Plan-Entwurf (und die Rückfrage) sagten
+   „Standard-Knopf **oder** Standard + Rail-Akzent"; die Antwort war *„Standard-Knopf +
+   Akzentfläche für ausgewählt"*. Damit ist die Menüpunkt-Kette eine **eigene** Auswahlregel, und
+   die Menüpunkte stehen **nicht mehr** in der Sammelregel mit der Baumzeile. Das ist mehr als
+   „die Fläche tauschen": ein Träger in beiden Regeln hätte zwei Flächen an einem Zustand, und
+   die spätere gewinnt still. Der Wächter `test_the_selection_state_uses_aria_current_and_the_
+   existing_fill` prüft heute beides — dass die Menüpunkte **nicht** mehr den Rail-Fill tragen
+   **und** dass die Baumzeile ihn behält.
+2. **`box-shadow` und `color` waren im Wächter verboten und sind es heute in je einer Form.**
+   Der 1-px-Innenschatten gehört zur Fläche des Standardknopfes — ohne ihn sähe der Menüpunkt
+   flacher aus als „Schließen" im Nachbarpanel, und genau dieser Vergleich war der Auftrag. Die
+   Schriftfarbe der Auswahlregel kommt aus `.btn-primary`, **gelesen** und nicht abgetippt; ein
+   **äußerer** Schatten und eine eigene Schriftfarbe in jeder anderen Regel bleiben verboten,
+   und die neue Ausnahme wird **zwei** Mal negativ geprüft (`_schatten_verstoss`,
+   `test_the_menu_item_watchdog_bites_on_built_in_violations`).
+3. **Der erlaubte linke Polsterwert ist je Selektor verschieden.** Der Menüpunkt trägt
+   `var(--space)` (Nikinger-Entscheidung vom 2026-10-05, damit die mittige Beschriftung echt
+   mittig liegt), die **Space-Zeile** `0` (P9-AX: bündig mit dem Panel-Titel). Ein **einziger**
+   erlaubter Wert könnte nicht beides sein — die Liste `ERLAUBTES_PADDING_LEFT_PRO_SELECTOR`
+   ist die kleinste Form davon.
+
+#### Der Gegenlauf, der eine Messlücke fand (G11)
+
+**Ohne `flex: 1` auf dem Anlege-Feld nimmt das Feld seine Eigenbreite (194,89 px), der Knopf
+schrumpft auf 127,11 px** — und die Paarbreite ist wieder exakt die Inhaltsbreite, also sind
+**beide** Bündigkeits-Stationen weiterhin grün. Der Lock verlangt aber zusätzlich wörtlich
+*„Space anlegen in seiner Größe gleich lassen und nur das Eingabefeld in seiner Größe ändern"*,
+und **das war nicht gemessen**. Die Station misst jetzt die Eigenbreite an einer Kopie
+desselben Knopfes **außerhalb** der Flex-Zeile (`inline-block`, also Inhaltsbreite) — dieselbe
+Technik wie der eingefügte Vergleichspunkt bei den Flächen. Danach ist G11 rot. **Ein
+Gegenlauf, der grün bleibt, ist ein Befund: entweder ist der Lock falsch oder die Messung — hier
+die zweite.**
+
+### Abnahme (P9-103 – P9-111), gefahren 2026-10-06 (§11.1)
+
+`P9-103` Abstand der drei Menüpunkte == `rowGap` von `#space-admin-list` (8 px), an **beiden**
+Übergängen · `P9-104` unausgewählter Menüpunkt: berechneter Hintergrund **== der `.btn`-Regel**
+(Token-Namen verglichen, nicht abgetippt) und Schatten == deren 1-px-Innenschatten · `P9-105`
+ausgewählter Menüpunkt: berechneter Verlauf **== der `.btn-primary`-Regel**, Kante == `--accent-edge`
+· `P9-106` `#account-submit` trägt `action--caution`, Farbe == die Vorsichtsfarbe, Fläche == die des
+Standardknopfes (keine gefüllte rote Fläche), und im Passwort-Panel steht **kein** „Abbrechen" mehr ·
+`P9-107` Beschriftung der Space-Zeile == linke Kante des Panel-Titels (±1 px, mit `Range` gemessen) ·
+`P9-108` Detail-Panel: linke Kante des Namensfeldes == linke Kante des Auswahlknopfes **und** seine
+rechte Kante == rechte Kante der Aktionszeile (±1 px) · `P9-109` Spaces-Panel: Feld und „Space
+anlegen" auf **einer** Zeile (±1 px `top`), Feld links == Inhaltskante, Knopf rechts == Inhaltskante ·
+`P9-110` `#space-member-list` trägt `padding-left: 0` **und** `list-style: none` · `P9-111`
+**P9-96/98/99/100/101/102 halten**: Titelabstand 24 px, Auswahlzustand an `aria-current`, mittige
+Beschriftung (0 px), Chevron-„Zurück", gemeinsamer Titelabstand, Knöpfe rechts.
+
+Gegenläufe: `G7` P9-AU raus → P9-103 rot · `G8` Fläche zurück auf `--sunken` → P9-104 rot ·
+`G9` „Schließen" zurück auf „Abbrechen" → P9-106 rot · `G10` `grid-column: 1 / -1` raus → P9-108 rot ·
+`G11` `flex: 1` raus → P9-109 rot · `G12` `padding-left: 0` raus → P9-107 rot.
+
+### Was an den Wächtern des §10 gekippt ist — und warum das kein Rot im Repo heißt
+
+Vier Wächter aus `test_settings_chain.py` beziehen sich auf Locks, die dieser Block umdreht. Sie
+werden **im selben Commit** umgeschrieben, mit beiden Lesarten und Datum im Docstring — nicht
+gelöscht und nicht erst in einer späteren Session weggeräumt:
+
+| Wächter | Wirkung |
+|---|---|
+| `test_the_unselected_menu_item_takes_the_input_surface_verbatim` | **umgedreht**: prüft jetzt den Standard-Knopf (`--btn-std-fill`/`--btn-std-line`, Token **aus der `.btn`-Regel gelesen**) und dass die Auswahlfläche die Akzent-Familie ist. Der Name wird nicht angefasst, der Docstring nennt P9-AN als die widerrufene Lesart |
+| `test_the_selection_state_uses_aria_current_and_the_existing_fill` | **umgedreht**: `aria-current="true"` bleibt (Zustand), die **Fläche** ist jetzt bewusst eine andere als die der Baumzeile — mit Begründung, sonst wäre der Wächter eine Lüge |
+| `test_settings_menu_items_reuse_the_tree_row_look` | **gelockert**: Höhe/Polster/Rundung/Schrift bleiben verboten (P9-AF gilt), `background`/`border-color` sind jetzt erlaubt (bis auf den Wert), und der bislang verbotene **Innenschatten** ist erlaubt, ein **äußerer** bleibt verboten |
+| `test_only_the_settings_chain_aligns_its_buttons_right` | **unverändert gültig** — P9-AZ nimmt der Anlegezeile die Zweizeiligkeit, nicht ihre Rechtsausrichtung |

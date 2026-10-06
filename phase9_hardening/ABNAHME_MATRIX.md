@@ -25,7 +25,7 @@ Archiv hineinzuschreiben hieße, das Falsche zu tun.
 
 ## Stand in einem Satz
 
-**103 Tabellenzeilen für 103 Abnahmezeilen: 88 ✅ · 12 ⚠️ · 3 ⬜** (P9-10 in zwei prüfbare Hälften
+**112 Tabellenzeilen für 112 Abnahmezeilen: 97 ✅ · 12 ⚠️ · 3 ⬜** (P9-10 in zwei prüfbare Hälften
 geteilt; seit 2026-10-05 kommen der **settings-Block** P9-83–P9-95 mit 12 ✅ und **einem** ⬜
 dazu — P9-94, der Portscan, ist ein Schritt des Nikingers und durch keinen Test ersetzbar — und
 sein **Nachtrag** P9-96–P9-102 aus der Bildsichtung mit **5 ✅ und 2 ⚠️**. Die beiden ⚠️ sind
@@ -239,6 +239,54 @@ Passwort- und Update-Log-Panel).
 | **P9-100** | Back-Knopf enthält `<use href="#i-chevron-left">` und **keinen** `←`-Text, Icon zentriert, `aria-label` gesetzt | ✅ | Browser **S12**, fünf Stationen: sichtbar · Icon **aufgelöst** (21,25 × 21,25 px — ein `<use>` auf ein fehlendes Symbol ergäbe 0 × 0) · `dx=0 dy=0` px · `innerText=''` · `aria-label='Zurück'` **und** `title='Zurück'`. Neues Symbol `i-chevron-left` (`d="m15 18-6-6 6-6"`), in `KNOWN` |
 | **P9-101** | Abstand Space-Titel↔erste Option == Abstand Menü-Titel↔erster Knopf | ✅ | Browser **S13**: **24 px == 24 px** (±1 px). **Operierte Fassung, weil „erste Option" zweierlei bedeuten kann:** gemessen wird der Abstand zum **ersten sichtbaren Block unter dem Titel** — im Harness `space-detail-home-hint` (steht vor der leeren Mitgliederliste). Zur ersten *Mitgliederzeile* wäre es Titel + Hinweis, eine andere Größe. Die Regel wirkt in beiden Fällen, weil 24 px größer ist als das `margin-top: 1em` der `<ul>` (16 px) |
 | **P9-102** | `.overlay__actions` **in der Kette** `justify-content: flex-end`, Boxen von „Space entfernen" und der letzten „(schreiben)"-Zeile überlappen sich nicht (≤ 0 px) | ✅ **mit benannter Messgrenze** | **S14:** Rahmenkante des Knopfes **auf** der Inhaltskante des Panels, Differenz **0,0 px** (beide Panels) · **Gegenrichtung gemessen:** der modale Entfernen-Dialog (P9-AK) richtet seine Knöpfe **nicht** aus (−155 px) · **S15:** Überlappung **−121,59 px**, also 121 px Luft. **Zwei Grenzen im Beleg:** „Space entfernen" ist im **Home-Space gesperrt** (P7-K) — gemessen wurde die `.overlay__actions`-Zeile, die ihn enthält; und ein Home-Space hat **keine Mitglieder**, die Gegenzeile war deshalb **synthetisch** in der echten Markupform aus `spaces.js :: memberRow()` (290 px breit bei 332 px Innenbreite) |
+
+## Nachtrag 2026-10-06 — zweite Bildsichtung des Nikingers (P9-103 – P9-111)
+
+**Anlass.** Der Nikinger hat die vier Bilder aus `screenshots_latest/` angesehen und vier Punkte
+notiert (Abstand der Menüpunkte, Fläche der Menüpunkte, rote „Ändern"-Taste + „Schließen",
+Bündigkeit von Namensfeld und Auswahl-Knopf); zu zwei davon hat er Rückfragen beantwortet.
+**Mini-Plan §11**, Locks **P9-AU–P9-AZ**, Browser-Probe **29/29** gegen die TLS-Wegwerf-Instanz
+(Port 18775), **sechs Gegenläufe** G7–G12, alle sechs wirksam.
+
+| # | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| **P9-103** | Abstand zwischen den drei Menüpunkten == der der Space-Zeilen, **an beiden Übergängen** | ✅ | **8,0 px / 8,0 px**, und `rowGap` von `#space-admin-list` ist **8px** — **verglichen, nicht abgetippt**. Vorher gemessen: **0,0 px** („glued to each other"). Der Abstand hängt an einem **Wrapper** (`.settings-menu__list`), nicht an `margin-bottom` am letzten Knopf |
+| **P9-104** | unausgewählter Menüpunkt: berechnete Fläche und Kante == der **`.btn`**-Regel, dazu derselbe Innenschatten | ✅ | **berechnet** gegen einen eingefügten Vergleichspunkt derselben Klasse: `linear-gradient(rgb(12,28,49), rgb(5,11,19))` auf beiden, Kante gleich, `box-shadow` gleich. **Vorher** `rgb(12,16,21)` = `--sunken` (die Fläche des Eingabefeldes — „they are buttons and not fields to type something in") |
+| **P9-105** | ausgewählter Menüpunkt: berechneter Verlauf == der **`.btn-primary`**-Regel, Kante == `--accent-edge`, **genau ein** `aria-current="true"` | ✅ | `linear-gradient(rgb(92,160,247), rgb(44,116,214))` == `.btn-primary`, Kante `rgb(18,60,116)` ==, **1** Träger. **Die Kette der Regeln ist umgedreht:** die Menüpunkte stehen **nicht mehr** in der Sammelregel mit der Baumzeile (`--select-fill`), die Baumzeile behält ihn |
+| **P9-106** | `#account-submit` trägt die Vorsicht: Farbe == die Vorsichtsfarbe, Fläche == der Standardknopf, **keine** gefüllte rote Fläche; im Panel steht **kein** „Abbrechen" mehr | ✅ | Farbe `rgb(229,72,77)` == die Vorsichtsfarbe, Fläche == die von `.btn action--caution`. **Die Zählung der Trägerklasse ist von 2 auf 3 gewachsen** (`#logout-button`, `#archive-button`, `#account-submit`) — der Wächter wurde umgeschrieben, mit beiden Lesarten im Docstring. **„Abbrechen" → „Schließen"**, und die drei anderen Fenster tragen dasselbe Wort |
+| **P9-107** | Beschriftung der Space-Zeilen == linke Kante des Panel-Titels (mit `Range` gemessen) | ✅ **mit einer benannten Grenze** | **1,0 px** Versatz — das ist der 1-px-Rahmen, nicht die Einrückung; vorher **33 px** (32 px geerbtes Einzugs-Polster + Rahmen). **Die Grenze:** die `<li>`-Mitgliederliste ist im Harness **nicht darstellbar** (der einzige eigene Space ist ein Home-Space und hat keine Mitglieder) — `#space-member-list` bekommt `list-style: none; padding: 0; margin: 0` **aus dem Browser-Standard abgeleitet** (Disc + 40 px Einzug) und **gegen die Deklaration** geprüft; die Wirkung an echten Spaces ist die Sichtprüfung |
+| **P9-108** | Detail-Panel: linke Kante des Namensfeldes == linke Kante des Auswahlknopfes **und** rechte Kante == rechte Kante der Aktionszeile | ✅ | **0,0 px** auf **beiden** Kanten, bei 1440 **und** bei 1024. Vorher: Feld **222 px** gegen **234 px** der Folgezeile, also **12 px zu wenig** (Rundwert des Nikingers: „+10px"). Als **Rasterfolge** gebaut (`repeat(2, max-content)` + `grid-column: 1 / -1`), **nicht** als Breite — und der Wächter verbietet `width`/`flex`/`flex-basis` an dieser Regel ausdrücklich |
+| **P9-109** | Spaces-Panel: Feld und „Space anlegen" auf **einer** Zeile, Feld links == Inhaltskante, Knopf rechts == Inhaltskante, **und der Knopf behält seine Größe** | ✅ | gleiche `top` (804,5 px), links **1,0 px** / rechts **1,0 px** (je Rahmen), Knopf **142 px** in der Zeile == **142 px** an einer Kopie außerhalb der Zeile. **Vorher: 80 px Versatz** und zwei Zeilen. **Die letzte Hälfte dieser Zeile ist ein Fund des Gegenlaufs** — siehe Befund 4 |
+| **P9-110** | `#space-member-list` trägt `padding-left: 0` **und** `list-style: none` | ✅ **Deklaration, nicht Wirkung** | beide Eigenschaften sind deklariert und werden gegen die Deklaration geprüft. **Warum so und nicht gemessen:** die Liste ist im Wegwerf-Harness leer (Home-Space ohne Mitglieder); eine Wirkungsmessung wäre nur durch Erfinden eines Mitglieds möglich, und das wäre ein synthetischer Beleg für einen Zustand, den es live gibt |
+| **P9-111** | **P9-96/98/99/100/101/102 halten** | ✅ | Titelabstand **24 px** (Menü **und** Detail), Beschriftung mittig (Textmitte **720** == Knopfmitte **720,0**), genau **1** `aria-current`, Chevron-„Zurück" unverändert, `.overlay__actions` weiter `flex-end`, Schmal-Modus zeigt genau **ein** Panel |
+
+### Vier Befunde aus diesem Block, die keine Abnahmezeile sind
+
+1. **Der Auftrag dreht zwei Locks des Vortags — und das ist der eigentliche Punkt.** P9-AN
+   verlangte die **Eingabefeld**-Fläche für die unausgewählten Menüpunkte, P9-AO den
+   **Rail-Auswahl-Fill**; der Nikinger hat am selben Tag beides umgedreht (P9-AV). Vier Wächter
+   aus `test_settings_chain.py` und **zwei** aus `test_static_routes.py` waren damit an korrektem
+   Code rot und wurden **im selben Commit** umgeschrieben — mit beiden Lesarten und Datum im
+   Docstring, nicht gelöscht. Der Satz „P9-AN verlangt die Eingabefeld-Fläche" bleibt im Repo
+   stehen, damit die Umkehr nachlesbar bleibt und niemand sie zurücksetzt.
+2. **`#space-member-list` hatte überhaupt keine Regel.** Der Browser lieferte Aufzählungspunkte
+   (`list-style: disc`) **und** 40 px Einzug — dieselbe Fehlerklasse wie P9-AX, nur **40 px**
+   statt 33, und **an einem Element, das im Harness nicht darstellbar ist**. Gebaut wird es aus
+   dem Standard abgeleitet, nicht aus einer Messung; das steht so in der Zeile.
+3. **Der Menüpunkt ist damit optisch kein Baum-Eintrag mehr, obwohl er `.tree__folder` trägt.**
+   P9-AF wollte die Wiederverwendung der Baumzeile; die Fläche kommt jetzt aus der
+   Standardknopf-Familie. Die **Geometrie** (Höhe, Polster oben/unten, Schrift, Rundung) bleibt
+   die der Baumzeile, und genau das ist getrennt geprüft und getrennt gemessen — aber eine
+   Änderung, die aussieht wie „die Menüpunkte sind jetzt Knöpfe", wäre eine stille Abweichung von
+   P9-AF und wird hier benannt.
+4. **Der Gegenlauf G11 hat eine Lücke in der Messung gefunden, nicht im Build.** Ohne `flex: 1`
+   auf dem Anlege-Feld nimmt das Feld seine Eigenbreite (194,89 px), der Knopf **schrumpft** auf
+   127,11 px — und die Paarbreite ist wieder exakt die Inhaltsbreite, also sind **beide
+   Bündigkeits-Stationen weiterhin grün**. Die Station prüfte nur die Kanten, der Lock aber
+   verlangt zusätzlich „Space anlegen in seiner Größe gleich lassen" (wörtlich so). Die Station
+   misst jetzt die **Eigenbreite** an einer Kopie desselben Knopfes außerhalb der Flex-Zeile;
+   damit ist G11 rot. **Ein Gegenlauf, der grün bleibt, ist entweder ein Fehler im Lock oder ein
+   Fehler in der Messung — hier der zweiten.**
 
 ### Drei Befunde aus diesem Block, die keine Abnahmezeile sind
 

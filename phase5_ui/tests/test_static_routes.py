@@ -462,30 +462,45 @@ def test_every_css_var_reference_is_defined():
     )
 
 
-def test_caution_class_only_on_logout_and_archive():
+def test_caution_class_only_on_logout_archive_and_the_password_change():
     """P8.6 B4 (Plan §4.4 P8.6-G): Kategorie "Vorsicht" (Konvention v3, fünfte Kategorie in
     `phase8_ui_graph/CLAUDE.md` Selection/Choice-Konvention v3) wird über die Trägerklasse
-    `action--caution` markiert. Genau zwei Elemente tragen sie:
+    `action--caution` markiert. **Drei** Elemente tragen sie:
 
       - `#logout-button`  -- einziges Rail-Mitglied (Session beenden)
       - `#archive-button` -- einziges Editor-Mitglied (Item ins Archiv verschieben)
+      - `#account-submit` -- Passwortwechsel (Nikinger 2026-10-05, P9-AW)
 
-    Beide Aktionen haben Rückweg-Kosten: Logout invalidiert UI-Session + aktive Connector-
-    Token-Familien, Archivieren entfernt das Item aus der Standardansicht. "Verschieben",
-    "Abwählen", "Erste Notiz anlegen", "Space verwalten" sind alle folgenlos oder trivial
-    umkehrbar -- deshalb KEIN drittes Mitglied.
+    Alle drei Aktionen haben Rückweg-Kosten: Logout invalidiert UI-Session + aktive Connector-
+    Token-Familien, Archivieren entfernt das Item aus der Standardansicht, und der
+    Passwortwechsel erzwingt für **jeden** Connector eine neue Autorisierung und meldet alle
+    anderen Browser ab — der Panel-Hinweistext sagt genau das. "Verschieben", "Abwählen",
+    "Erste Notiz anlegen", "Space verwalten" sind alle folgenlos oder trivial umkehrbar --
+    deshalb weiterhin **kein** viertes Mitglied.
 
-    Der Test zählt die Vorkommen im Markup UND prüft, dass die zwei Elemente die richtigen
-    sind. Wer ein drittes Element mit der Klasse versieht (oder die alte ID-Selektor-Form
-    `#logout-button { color: var(--caution) }` wieder einführt), fällt hier auf statt erst in
-    der nächsten Sichtprüfung.
+    **[2026-10-05, P9-AW, datierte Umkehr dieser Zeile.]** Bis heute stand hier „genau **zwei**
+    Elemente" mit der Begründung *"Verschieben … deshalb KEIN drittes Mitglied"* — und der
+    Nikinger hat den dritten Fall selbst benannt, mit einem Bild: *„I'd lean towards copying the
+    'archivieren' Buttons style (so 'Ändern' Becomes red) … a password change is"*. Vorher trug
+    `#account-submit` `.btn-primary`, und `.btn-primary` heißt **Hauptaktion** — die Aussage war
+    „die wichtigste Taste im Fenster", die Aussage ist „nicht einfach rückgängig zu machen".
+    Der Wächter musste deshalb umgeschrieben werden, nicht gelöscht: die alte Zählung stand als
+    Begründung im Repo und wird sonst zur Grundlage der nächsten Änderung. `account-submit` trug
+    **vorher** `.btn-primary` — das ist die widerrufene Lesart, sie steht hier, damit niemand sie
+    wiederherstellt.
+
+    Der Test zählt die Vorkommen im Markup UND prüft, dass die Elemente die richtigen sind. Wer ein
+    viertes Element mit der Klasse versieht (oder die alte ID-Selektor-Form
+    `#logout-button { color: var(--caution) }` wieder einführt), fällt hier auf statt erst in der
+    nächsten Sichtprüfung.
     """
     html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
 
-    # Genau zwei Vorkommen der Trägerklasse im Markup.
-    assert html.count("action--caution") == 2, (
-        "Trägerklasse `action--caution` muss genau zweimal in app.html vorkommen "
-        "(P8.6 B4: Vorsicht-Kategorie mit genau zwei Mitgliedern). "
+    # Genau drei Vorkommen der Trägerklasse im Markup.
+    assert html.count("action--caution") == 3, (
+        "Trägerklasse `action--caution` muss genau dreimal in app.html vorkommen "
+        "(P8.6 B4: Vorsicht-Kategorie mit zwei Mitgliedern; seit P9-AW/2026-10-05 mit drei — "
+        "Passwortwechsel). "
         f"Aktuelle Anzahl: {html.count('action--caution')}."
     )
 
@@ -508,6 +523,23 @@ def test_caution_class_only_on_logout_and_archive():
     assert "action--caution" in archive_match.group(0), (
         "#archive-button muss Trägerklasse `action--caution` tragen "
         "(P8.6 B4: einziges Editor-Mitglied der Vorsicht-Kategorie)."
+    )
+
+    # **[2026-10-05, P9-AW]** Das dritte Mitglied, mit beiden Anforderungen: die Klasse sitzt
+    # **zusammen mit `.btn`** (eine Fläche), und `btn-primary` ist **weg** — die Hauptaktion-Fläche
+    # wäre die Behauptung „wichtigste Taste", die der Nikinger ausdrücklich nicht wollte.
+    submit_match = re.search(r'<button[^>]*id="account-submit"[^>]*>', html)
+    assert submit_match is not None, "#account-submit fehlt im Markup"
+    submit_tag = submit_match.group(0)
+    assert "action--caution" in submit_tag, (
+        "#account-submit muss Trägerklasse `action--caution` tragen (P9-AW, 2026-10-05)."
+    )
+    assert re.search(r'class="[^"]*\bbtn\b', submit_tag), (
+        f"#account-submit muss `.btn` tragen, damit er die Standardfläche erbt: {submit_tag!r}"
+    )
+    assert "btn-primary" not in submit_tag, (
+        f"#account-submit trägt wieder `.btn-primary` — das war die widerrufene Lesart vor "
+        f"P9-AW (2026-10-05): {submit_tag!r}"
     )
 
     # Die CSS-Regel existiert und referenziert --caution (statt z. B. var(--danger) direkt
@@ -1634,29 +1666,40 @@ def test_primary_keeps_its_own_face_and_caution_wears_the_standard_one():
     )
 
 
-def test_caution_class_is_carried_by_exactly_one_button_with_a_face():
+def test_caution_class_is_carried_by_exactly_two_buttons_with_a_face():
     """**Vorbedingung zu Obigem, und der Grund, warum Obiges nicht vakuös ist.** Ein Wächter, der
     prüft „`.btn.action--caution` deklariert keine Fläche", ist grün, wenn die Klasse aus dem
     Markup verschwindet — dann gäbe es schlicht nichts mehr zu erben. Gezählt wird deshalb das
     Markup, nicht der CSS-Text.
 
-    **Die Zahl ist 1, nicht 2, und das ist der korrigierte Befund vom 2026-10-02.** Von den beiden
+    **Die Zahl war 1, nicht 2, und das ist der korrigierte Befund vom 2026-10-02.** Von den beiden
     Trägern der Klasse ist `#logout-button` ein `.rail__action` (Rail-Knopf, `background: none`)
     und trägt die Vorsicht nur an der **Farbe**; **nur `#archive-button` (`class="btn
     action--caution"`) hatte je eine Fläche.** Der Backlog-Eintrag B17 zählte beide als
     „`.btn.action--caution`" — der Selektor matcht aber nur eines, und genau dieses Zählen über
     Klassen-Präsenz statt über den Selektor ist dieselbe Sorte Fehler, die im btn2-Lauf als
     `count() == 1` für `[aria-current]` aufgetaucht ist.
+
+    **[2026-10-05, P9-AW: 2, nicht 1.]** `#account-submit` (Passwortwechsel) trägt jetzt ebenfalls
+    `.btn action--caution`, und damit haben **zwei** Knöpfe eine Fläche. Der Test ist deshalb
+    **umgeschrieben und nicht gelöscht**: die Zahl 1 stand hier mit derselben Begründung wie die
+    Zählung oben, und eine Zählung, die man beim Widerspruch einfach anpasst, prüft nichts mehr.
+    Die neue Form prüft **beide** Knöpfe namentlich — ein dritter `.btn`-Träger fällt auf, und ein
+    Element, das die Klasse verliert, fällt ebenso auf.
     """
     html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
     css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
-    # Genau EIN Element traegt beide Klassen zusammen.
+    # Genau ZWEI Elemente tragen beide Klassen zusammen.
     beide = re.findall(r'class="([^"]*\bbtn\b[^"]*\baction--caution\b[^"]*)"', html)
-    assert len(beide) == 1, f"genau ein .btn.action--caution erwartet, gefunden: {beide!r}"
-    assert 'id="archive-button"' in html and "action--caution" in beide[0], beide[0]
-    # Und es ist genau der Editor-Knopf, der die Fläche erbt.
-    archiv = re.search(r'<button[^>]*id="archive-button"[^>]*>', html)
-    assert archiv and "btn action--caution" in archiv.group(0), archiv.group(0) if archiv else None
+    assert len(beide) == 2, f"genau zwei .btn.action--caution erwartet, gefunden: {beide!r}"
+    # Und es sind genau die beiden, die die Fläche erben — **namentlich**, nicht als Zahl.
+    for knopf_id in ("archive-button", "account-submit"):
+        treffer = re.search(rf'<button[^>]*id="{knopf_id}"[^>]*>', html)
+        assert treffer, f"#{knopf_id} fehlt im Markup"
+        assert re.search(r'class="[^"]*\bbtn\b[^"]*\baction--caution\b', treffer.group(0)), (
+            f"#{knopf_id} muss `.btn action--caution` tragen (es erbt sonst keine Fläche): "
+            f"{treffer.group(0)!r}"
+        )
     # Die Vorsichtfarbe ist weiterhin deklariert -- ohne sie waere die Kategorie unsichtbar und
     # "exakt die Standardflaeche" waere eine stille Abschaffung der Kategorie. **Kommentare
     # werden vorher entfernt**, sonst waere genau dieser Wächter der naechste Fund dieser Repo-Lehre:

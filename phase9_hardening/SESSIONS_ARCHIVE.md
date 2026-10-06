@@ -16,6 +16,120 @@ Vorsatz: nichts abtippen, alles per Skript mit vier Gegenproben (Schnitt verlust
 Head trägt genau einen Block, alle bewegten Blöcke im Archiv byte-identisch, Archivbestand
 unangetastet).
 
+## Session stopped — 2026-10-05 (sechsundzwanzigster Block: **V188 beantwortet — die Seite kann es
+nicht verhindern, und auf dem MacBook existiert der einzige Hebel gar nicht**; dazu der
+Doku-Drift-Teil des settings-Closeouts. **Kein Code, kein Deploy, kein Service-Touch**)
+
+**Ergebnis in einem Satz.** Die beiden Punkte, die M3 machen konnte, sind erledigt: **V188 ✅** mit
+vier Quellen (drei nachgelesen, eine am Repo gemessen) ⇒ **P9-27 ⚠️, D1 geschlossen, kein Code
+gebaut** — genau die Entscheidung, die das gestrige Plan-§4 unter dieser Bedingung zugelassen hat;
+und der **letzte `KNOWN_OFFENDERS`-Eintrag** ist repariert und aus der Ausnahmeliste gestrichen.
+Dabei sind **drei falsche Sätze** gefunden und datiert korrigiert, von denen einer behauptete, ein
+Deploy schließe eine Abnahmezeile, die er nachweislich nicht schließen kann.
+
+### V188 — die Antwort, und die zwei Stellen, an denen sie schärfer ist als die Frage
+
+**Betriebssystem-Verhalten; die Seite kann es nicht verhindern, nur verschieben — und die
+Verschiebung gibt es auf dem MacBook nicht.** Vier Belege, jeder mit Ort; die vollständige Kette
+mit wörtlichen Zitaten steht in der P9-27-Zeile der `ABNAHME_MATRIX.md` (dort, nicht hier, weil
+die Quelle an einer Stelle stehen soll):
+
+1. **Der Fall ist nicht einmal die Web-API** — und das ist **gemessen, nicht vermutet**.
+   `grep -rn fullscreen phase5_ui/webui/static/js/app.js` liefert **eine** Zeile: `app.js:259`,
+   `if (document.fullscreenElement) return;`. Die App ruft `requestFullscreen()` nirgends auf ⇒
+   der gemeldete Fall (grüner Knopf / Ctrl+Cmd+F) ist natives macOS-Vollbild, und dafür gibt es
+   keine Web-API: `fullscreenElement` bleibt `null`, kein `fullscreenchange`. Der Guard ist für
+   genau diesen Fall ein No-op — das stand in der Matrix bis heute als „mit hoher Sicherheit".
+2. **Der Ausgang ist Pflicht, und das ist Anti-Spoofing.** WHATWG Fullscreen §4: *„The user agent
+   may end any fullscreen session without a close request or call to `exitFullscreen()` whenever
+   the user agent deems it necessary."* §8: *„User agents should provide a means of exiting
+   fullscreen that always works and advertise this to the user. This is to prevent a site from
+   spoofing the end user …"*
+3. **Der einzige Hebel verschiebt nur.** WICG Keyboard Lock §7: *„the user agent MUST provide a
+   way for the user to exit from keyboard lock **even if all of the keys are requested by the
+   API**"* (+ langes ESC > 2 s, §3.2). WHATWG §6: *„User agents should reserve an additional
+   input for the purposes of exiting fullscreen"*. MDN `Element.requestFullscreen()`: *„Most
+   browsers use the Esc key to exit normal fullscreen mode, and a long-press Esc key to exit
+   keyboard lock."*
+4. **Der Hebel ist doppelt unbrauchbar — und hier wurde die Gedächtnisaussage des Plans zur
+   Messung.** **(a)** WICG §4.2: Keyboard Lock gilt nur für JS-initiiertes Vollbild, *„During F11
+   fullscreen, no Keyboard Lock processing of keyboard events will take place."* **(b)**
+   Browser-Support aus **MDNs `browser-compat-data`** (`api/Navigator.json`, `api/Keyboard.json`,
+   Branch `main`): `navigator.keyboard`, `Keyboard.lock`, `Keyboard.unlock` → Chrome/Chromium ab
+   68, Edge/Opera `mirror`, **`firefox: false`**, **`safari: false`** (damit auch iOS).
+   Das Plan-§4-Wort „**meines Wissens** nur in Chromium" ist damit nicht widerlegt, sondern
+   **gemessen** — und für den Anwendungsfall schärfer: **gar nicht vorhanden.**
+
+**Folge:** P9-27 ⬜ → ⚠️ (die Zeile ist nicht *erfüllt*, sondern **gegenstandslos geworden** — die
+Frage dahinter ist beantwortet, die Messung am echten Gerät bleibt für das native Vollbild offen
+und ist per Spezifikation nicht automatisierbar). **P9-28 bleibt ✅**: dessen ✅ gilt der
+Web-API-Seite des Guards, und das ist eine andere Frage. **D1 ist geschlossen, es wurde kein Code
+gebaut** — der gebaute Guard bleibt, weil er für den Web-Fullscreen-Fall genau richtig ist.
+
+### Drei falsche Sätze, alle aus dem settings-Closeout §6.1, alle datiert korrigiert
+
+1. **„Der Deploy `v3.1.1` schließt P9-15, denn `health_gate.sh` macht die
+   `/api/v1/overview`-Läufe"** — in `ABNAHME_MATRIX.md`s datiertem „Reihenfolge"-Block. **Falsch,
+   und es ist keine Formulierung, sondern ein Zustand:** P9-15 stellt gegen **372,9 ms**, und
+   dieser Wert ist **nie über Funnel gemessen worden** (V151: in-process auf synthetischem
+   Bestand, 8,3× zu niedrig). Ein Health-Gate liefert Läufe **ohne Kriterium**. Die Zeile selbst
+   stand schon am selben Tag korrekt auf ⚠️ — der Block daneben nicht.
+2. **„P9-15 ist der authentifizierte Latenzvergleich und gehört an den Deploy-Tag"** — im
+   „Stand in einem Satz" **derselben** Datei, also zwei Ebenen unter der, die schon richtig war.
+   Korrigiert und mitgezählt: die 3 offenen Zeilen sind **P9-11, P9-13/V150, P9-94**; der
+   Modulstatus-Head und der Wurzel-Block trugen denselben Fehler.
+3. **„Seit dem 2026-10-04 ist kein ⬜ ein Personenschritt"** — im selben Absatz, und mit P9-94
+   **falsch geworden**: zwei der drei ⬜ brauchen ein MacBook mit Handy-Hotspot. Richtig und
+   tragend ist der zweite Satz, und der steht jetzt allein: **kein ⬜ ist offene Code-Arbeit, und
+   keiner blockiert die Phase.** Der Satz davor war außerdem **im Repo ungrammatisch** — ein
+   angebrochener Halbsatz („… ein Konto, kein Code" / „als zurückgestelltem Backlog-Posten"),
+   sichtbar beim Lesen der Nachbarzeile.
+
+**Bilanz:** die Abnahme- und die `[VERIFY]`-Tabelle haben je eine Zeile bewegt, die **Matrix ist
+die Quelle** (`test_acceptance_numbers.py` zählt nach und vergleicht mit dem Fließtext — die beiden
+Konstanten wurden **vor** dem Schreiben gesetzt, sonst wäre der Wächter eine Tautologie; er stand
+beim Zurückschreiben des Fließtexts rot und wurde danach grün).
+
+### Der letzte `KNOWN_OFFENDERS`-Eintrag ist weg — und die Reparatur brauchte zwei Schritte
+
+`docs/screenshots/README.md` stand mit **beiden** Ausprägungen zugleich in der Ausnahmeliste: das
+`updated:`-Feld fehlte **ganz** (`missing=True`) **und** zwei von sechs Fäden trugen ein
+`updated: `-Präfix, für das der Rotationsanker von `rotate_index_updates.sh` blind ist. **Erst
+repariert, dann der neue Faden** — weil `scripts/prepend_updated_chain.sh` ein vorhandenes
+`^updated: ` **verlangt** und bei dieser Datei sonst mit exit 1 abbricht (Gegenprobe (e)). Die
+sechs Fadeninhalte wurden dabei **byteweise** gegen die alte Zeile gestellt, nicht nur „sieht noch
+gut aus". Der Eintrag ist **gestrichen**, nicht auf 0/0 gesetzt: mit `0, 0` wäre er eine unsichtbare
+Ausnahme, deren Verschwinden kein Test bemerkt. `ROADMAP.md` (4 Fäden hinter ` · `) und die beiden
+Dekumentationen (📕 bzw. abgeschlossene Phase) bleiben **bewusst** drin.
+
+### Belege
+
+- **`pytest`:** kein Test hinzugefügt, **keiner umgedreht** — dieser Block ändert keine Zeile
+  Produktcode. Die Wächter, die den Block betreffen, sind grün: `test_acceptance_numbers.py`
+  (7), `test_updated_chain.py` (7), `test_table_shape.py`, `test_doc_health.py`, `test_doc_rotations.py`
+- **Tabu-Diff §0.3 leer** — `api.py`, `security.py`, `phase4_auth/`, `storage/` unberührt. Reine Doku
+  plus **zwei Zeilen** in `test_acceptance_numbers.py` (zwei Bilanz-Konstanten) und **einer Zeile
+  entfernt** in `test_updated_chain.py` (der Ausnahme-Eintrag)
+- **Kein Deploy, kein `systemctl`, kein Tunnel, kein Portscan** — Release `v3.1.3` steht unverändert
+- **Zahlen, die mitwandern:** die durchgestrichene Masse im L3-Archiv bleibt **229 B** und ist
+  **kein Hebel** — der Head liegt bei ~31 KB, **unter** dem 40-KiB-Softcap. `ABNAHME_MATRIX.md` ist
+  gewachsen und benennt sich damit selbst (P8-P: *benannt statt versteckt*)
+
+### Offen, in dieser Reihenfolge
+
+1. **Sichtprüfung der acht Bilder** — der eigentliche Abnahmeschritt des Vortags, entscheidet die
+   beiden ⚠️ (P9-97 Fläche, P9-99 Textmitte). Dateinamen und Checkkriterien:
+   `screenshots_latest/README.md`
+2. **Deploy `v3.1.3`** (Nikinger). Badge und `## 2026-10-05`-Block stehen unverändert; dieser Block
+   hat **keine** Release-Änderung gebracht. `deploy.sh` verlangt einen Datumsblock am Deploy-Tag —
+   später `SHAREFYX_ALLOW_STALE_UPDATELOG=1` oder ein neuer `##`-Block
+3. **P9-94 / P9-11** — der Portscan, Anleitung Mini-Plan §5 (MacBook, Firmen-VPN aus, Handy-Hotspot,
+   vier Ziele). **Von keinem Test ersetzbar** und deshalb ⬜, nicht ⚠️
+4. **P9-13 / V150** — zweites Claude-Konto; wandert nach P10, **kein Blocker** (Plan §0.1a)
+5. **V162 *(Lesart A)*** — eine live beobachtete Löschung; kommt mit einem Deploy-Tag
+6. **Gate/Z-Rest:** Übersichtsgrafik `docs/concepts/phase9_hardening_uebersicht.svg` (gerendert **und
+   angesehen**), `ROADMAP`-Zeile P9 → ✅, Phase auf ✅
+
 ## Session stopped — 2026-10-05 (fünfundzwanzigster Block: **die sieben Punkte aus der Bildsichtung gebaut — und zwei davon haben einen Fehler in der Vorgabe selbst gefunden**; Release `v3.1.3` unverändert, **kein Deploy, kein Service-Touch**)
 
 **Ergebnis in einem Satz.** Alle sieben Punkte aus der Bildsichtung sind umgesetzt (Mini-Plan §10,

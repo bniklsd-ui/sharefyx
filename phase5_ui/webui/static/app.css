@@ -546,9 +546,12 @@ select.input:focus {
 }
 
 .rail__home[aria-current="true"], .tree__folder[aria-current="true"], .tree__scope[aria-current="true"],
-/* P9-AF/P9-AG: der Menüpunkt des offenen Unterfensters trägt exakt denselben Auswahl-
-   zustand wie die aktive Baumzeile — dieselbe eine Regel, keine zweite Fläche. */
-.settings-menu__item[aria-current="true"], .settings-space-row[aria-current="true"] {
+/* P9-AF/P9-AG und **P9-AX (2026-10-05)**: die Space-Zeilen im Einstellungs-Panel teilen sich
+   weiter den Auswahlzustand mit der Baumzeile — sie *sind* Baumzeilen, nur an anderer Stelle im
+   Fenster. Die **Menüpunkte** stehen seit P9-AV **nicht** mehr in dieser Sammelregel: sie tragen
+   die Akzentfläche eines Hauptknopfes und haben dafür unten eine eigene Regel. Ein Träger in
+   beiden Regeln wäre zwei Flächen an einem Zustand, und die spätere gewinnt still. */
+.settings-space-row[aria-current="true"] {
   background: var(--select-fill);
   border-color: var(--select-line);
   color: var(--text);
@@ -1925,6 +1928,23 @@ select.input:focus {
 /* Die Menüknöpfe sind `.tree__folder` und erben Höhe/Polster/Rundung; hier ist nur der
    Abstand der drei Zeilen untereinander — dieselbe Forderung wie bei den Space-Zeilen
    darunter (P9-AK: Zeilen mit sichtbarem Abstand). */
+
+/* P9-AU (2026-10-05, Nikinger, aus der Bildsichtung: „die shouldn't be glued to each other").
+   **Gemessen vorher: 0 px** — die drei Punkte standen ohne jede Lücke untereinander, weil sie
+   Geschwister im Panel sind und das Panel keinen Abstand zwischen ihnen kennt.
+
+   Der Wrapper trägt den Abstand, damit er an **einer** Stelle steht. Die Alternative —
+   `margin-bottom` an jedem Knopf außer dem letzten — hätte eine Sonderbehandlung für den letzten
+   Knopf und damit eine zweite Wahrheit über dieselbe Sache; dieselbe Begründung wie bei P9-AF.
+
+   **Gleicher Wert wie `#space-admin-list` (P9-AK), und der Wächter vergleicht die beiden
+   Zeilenabstände miteinander** — zwei Stellen mit derselben Absicht, die auseinanderlaufen
+   dürfen, sind derselbe Fehler zwei Ebenen tiefer. */
+.settings-menu__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space);
+}
 .settings-menu__item { width: 100%; }
 
 /* P9-AP (2026-10-05, Nikinger): die Beschriftung steht **mittig** in der Fläche. Die Sammelregel
@@ -1969,24 +1989,110 @@ select.input:focus {
 /* P9-AR: derselbe Wert, an der zweiten Stelle. */
 #settings-space-detail h2 { margin-bottom: var(--settings-title-gap); }
 
-/* P9-AN (2026-10-05): die **unausgewählten** Menüpunkte bekommen die Fläche des Eingabefeldes
-   — "leicht abgesetzt vom Fensterhintergrund, aber keine Plastik" (Nikinger). **Nur die
-   Fläche**: Höhe, Polster, Schrift und Rundung bleiben die der `.tree__folder`-Zeile, sonst
-   wäre die Wiederverwendung aus P9-AF dahin.
+/* P9-AV (2026-10-05, Nikinger, **widerruft P9-AN und die Fläche aus P9-AO**): die Menüpunkte
+   tragen die Fläche des **Standardknopfes** — derselben, die „Schließen" und „Space anlegen"
+   tragen — und im ausgewählten Zustand die Akzentfläche eines Hauptknopfes.
 
-   **Warum die Werte hier stehen und nicht die `.input`-Regel erweitert wird:** `.input`
-   trägt `padding: 7px` und `color`, beides **Geometrie** der Baumzeile. Eine gemeinsame
-   Regel mit beiden Selektoren würde die Menüzeile auf 7 px Polster umstellen und die
-   Wiederverwendung auflösen — der Fehler, den P9-AF am 2026-10-01 bei `.account-nav` schon
-   einmal gemacht hat. Zwei Token-Nennungen sind Wiederverwendung, ein **Wert** wäre eine
-   Kopie.
+   **Warum P9-AN falsch war, wörtlich seine Beobachtung:** *„since they are buttons and not fields
+   to type something in"*. Die Fläche von P9-AN war die des Eingabefeldes (`--sunken` +
+   `--line-strong`, gemessen `rgb(12,16,21)`), und die gehört laut Selection/Choice-Konvention v3
+   zur Kategorie **Choice** (`<select class="input">`). Die Menüpunkte sind aber **Navigation**
+   (P9-AF, `.tree__folder`) — ein Knopf, der aussieht wie ein Eingabefeld, behauptet das Gegenteil.
 
-   **Kein Schatten.** Der Wächter `test_settings_menu_items_reuse_the_tree_row_look` verbietet
-   ihn in einer eigenen Regel, und P9-97 vergleicht ausdrücklich Hintergrund und Kante: die
-   Fläche ist die Vertiefung, der Schatten gehört zur Plastik des Feldes. */
+   **Deshalb sind es zwei Flächen und nicht eine, obwohl das Stylesheet zwei Regeln hat:** die
+   unausgewählten Punkte sind ein Standardknopf (wie „Schließen"), der ausgewählte ist die
+   Akzentfläche (wie `.btn-primary`) — seine Entscheidung aus der Rückfrage, ausdrücklich gegen die
+   Alternative „Standardfläche + Rail-Akzent". Beide Familien werden **benannt, nicht kopiert**:
+   die Token-Namen stehen hier, die Werte stehen in `:root` und in den `.btn`/`.btn-primary`-Regeln.
+   Ein abgetippter Verlauf (`#5CA0F7`) wäre die zweite Kopie und würde bei einer Token-Änderung
+   stillschweigend falsch.
+
+   **Was P9-AF bindet, bleibt gebunden:** Höhe, Polster oben/unten, Schrift und Rundung kommen
+   weiter aus `.tree__folder`. Diese Regeln tragen ausschließlich Fläche und Kante. */
 .settings-menu__item:not([aria-current="true"]) {
-  background: var(--sunken);
-  border-color: var(--line-strong);
+  background: var(--btn-std-fill);
+  border-color: var(--btn-std-line);
+  /* Der 1-px-Innenschatten gehört zur Fläche des Standardknopfes (`.btn`); ohne ihn sähe der
+     Menüpunkt flacher aus als „Schließen" im Nachbarpanel — und genau der Vergleich ist der
+     Auftrag. Ein **äußerer** Schatten bleibt verboten: der wäre die Plastik des Feldes. */
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+/* Hover wie der Standardknopf, damit die Kette nicht beim Überfahren die Fläche wechselt. */
+.settings-menu__item:not([aria-current="true"]):hover {
+  background: var(--btn-std-fill-hover);
+}
+
+/* Der ausgewählte Punkt: die Akzentfamilie wie `.btn-primary`, aus **denselben** Token. */
+.settings-menu__item[aria-current="true"] {
+  background: linear-gradient(180deg, var(--accent-face-top), var(--accent-face-bottom));
+  border-color: var(--accent-edge);
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.28), var(--btn-lift);
+}
+.settings-menu__item[aria-current="true"]:hover {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent-face-top), white 12%),
+    color-mix(in srgb, var(--accent-face-bottom), white 12%));
+}
+
+/* P9-AX (2026-10-05, Nikinger: „make the text from the space buttons and the menu title align.
+   I suggest actually moving them to the left too"): die Beschriftung der Space-Zeilen stand
+   **33 px** rechts vom Panel-Titel — 32 px geerbtes Einzugs-Polster der Baumzeile plus 1 px
+   Rahmen. Die Zeile hat **kein** Icon (`<button class="tree__folder settings-space-row">alpha
+   (eigener Space)</button>`, im Repo-Markup nachgelesen), die Einrückung ist also leerer Raum.
+
+   **Der Scoped-Selektor ist der ganze Auftrag:** `.tree__folder` in der **Rail** behält seine
+   Einrückung — dort ist sie Hierarchie, und dort gibt es über der Zeile etwas zum Einrücken unter.
+   In der Kette ist der Panel-Titel die Zeile darüber, und die Beschriftung gehört auf dieselbe
+   Kante. */
+.settings-panel .settings-space-row { padding-left: 0; }
+
+/* P9-AX, dieselbe Klasse für die Mitgliederliste. `#space-member-list` hatte **überhaupt keine
+   Regel** — der Browser lieferte Aufzählungspunkte (`list-style: disc`) und 40 px Einzug
+   (`padding-inline-start`), also **40 px** Versatz gegen den Panel-Titel. Im Wegwerf-Harness ist
+   das **nicht darstellbar** (der einzige eigene Space ist ein Home-Space und hat keine
+   Mitglieder), die Zeile wird also gegen die Deklaration geprüft und die Wirkung bleibt der
+   Sichtprüfung. `margin: 0` ist Teil desselben Satzes: der Titelabstand ist `24 px` (P9-AM) und
+   war bisher der *größere* der beiden Margins (Browser-Standard 16 px); mit `margin: 0` ist er der
+   einzige, und beide Panels messen denselben Wert. */
+#space-member-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* P9-AZ (2026-10-05, Nikinger, wörtlich): „Name des Spaces"-Feld und „Space anlegen" **in eine
+   Zeile**, links und rechts bündig mit der Linie darüber, Standard-Abstand zwischen den Knöpfen;
+   „Schließen" bleibt allein darunter rechtsbündig.
+
+   **Gemessen vorher:** Feld 222 px allein auf seiner Zeile, „Space anlegen" 142 px darunter — beide
+   rechts bündig, aber **80 px** Versatz links. Das Feld wird `flex: 1` und füllt damit die
+   Inhaltsbreite; `flex-wrap: nowrap` verhindert, dass es wieder umbricht. Die Alternative, das
+   Feld an die Zeile darunter zu binden (wie P9-AY es im Detail-Panel tut), hieße hier, ein
+   Eingabefeld auf 142 px zu verengen — der Unterschied zu P9-AY ist die Zahl der Elemente, nicht
+   die Absicht. */
+#settings-spaces .overlay__actions { flex-wrap: nowrap; }
+#space-create-name-input { flex: 1; min-width: 0; }
+
+/* P9-AY (2026-10-05, Nikinger, Punkte 03/04): das Namensfeld steht beidseitig bündig mit der Zeile
+   darunter — links mit dem Auswahlknopf, rechts mit „Hinzufügen". **Gemessen vorher: 222 px gegen
+   die 234 px der Folgezeile, also 12 px zu wenig** (Rundwert des Nikingers: „+10px").
+
+   **Als Folge, nicht als Zahl.** Der Umbruch entsteht, weil Feld + Auswahl + Knopf zusammen
+   breiter sind als der Panel-Inhalt (222 + 8 + 109 + 8 + 117 = 464 px gegen 332 px). Ein Raster
+   mit zwei `max-content`-Spalten lässt die Spalten von den beiden Knöpfen messen, und das Feld
+   überspannt beide — es ist damit so breit wie die Folgezeile, ohne dass eine Knopfbreite
+   abgetippt ist. `grid-column: 1 / -1` **ohne** `justify-self` würde die Felder defaultmäßig
+   *start*-ausrichten und das Feld auf seine Inhaltsbreite schrumpfen lassen; `stretch` ist
+   deshalb ausdrücklich gesetzt. `justify-content: end` hält die Zeile rechtsbündig (P9-AS). */
+#settings-space-detail .overlay__actions:has(#space-member-name-input) {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  justify-content: end;
+}
+#space-member-name-input {
+  grid-column: 1 / -1;
+  justify-self: stretch;
 }
 #space-admin-list {
   display: flex;

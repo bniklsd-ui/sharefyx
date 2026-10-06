@@ -89,6 +89,23 @@ def _element_by_id(html: str, element_id: str) -> str:
     return unescape(match.group(0))
 
 
+def _element_by_class(html: str, klasse: str) -> str:
+    """Der Tag mit dieser Klasse, samt Inhalt, oder Fehler — Gegenstück zu `_element_by_id`.
+
+    Gebraucht für P9-AU (der Wrapper `.settings-menu__list`): der Test will **beide** Hälften
+    desselben Tags lesen — dass die drei Punkte darin stehen *und* dass kein Knopf einen eigenen
+    unteren Außenabstand trägt — und das ergibt erst der Elementinhalt, nicht der Tag allein.
+    """
+    match = re.search(
+        rf'<(?P<tag>[a-zA-Z0-9]+)\b[^>]*\bclass="{re.escape(klasse)}"[^>]*>'
+        rf'(?P<body>.*?)</(?P=tag)>',
+        html,
+        flags=re.DOTALL,
+    )
+    assert match is not None, f'Element mit class="{klasse}" nicht gefunden'
+    return unescape(match.group(0))
+
+
 # `:not([…])` erst wegrechnen, bevor nach einem **Zustands**-Attribut gesucht wird: P9-AN
 # schreibt die Flaeche gerade fuer die *nicht* ausgewaehlten Punkte, und genau dieses
 # `:not([aria-current="true"])` darf den Wächter nicht dazu bringen, die eigene Regel wie
@@ -181,23 +198,118 @@ def _tokens() -> set[str]:
 # `padding-top`/`padding-bottom`/`padding-right` bleiben verboten: sie tragen die **Höhe**,
 # und die Höhe ist das, was P9-AF an die Baumzeile bindet.
 VERBOTENE_OPTIK = ("height", "padding", "padding-top", "padding-bottom", "padding-right",
-                    "border-radius", "font", "color", "box-shadow",
-                    "border", "margin", "line-height")
+                    "border-radius", "font", "margin", "line-height", "border")
+# **[2026-10-05, P9-AV]** Zwei Eigenschaften sind aus dieser Liste **heraus** und in je einer
+# Form wieder eingeschleust worden — nicht pauschal erlaubt:
+#
+#   * `box-shadow` — erlaubt ist **nur** der 1-px-Innenschatten der Standardfläche (derselbe
+#     wie in `.btn`). Ein **äußerer** Schatten bleibt verboten: der wäre die Plastik, die der
+#     Nikinger am 2026-10-05 mit „they are buttons and not fields to type something in" abgelehnt
+#     hat — und die Feld-Fläche hatte ihn vorher ausdrücklich nicht.
+#   * `color` — erlaubt ist **nur auf der Auswahlregel** und **nur** der Wert, den `.btn-primary`
+#     selbst trägt. Ohne das wäre die Akzentfläche mit `--text-muted` beschriftet, also mit der
+#     gedämpften Rail-Farbe auf blauem Grund.
+#
+# Die Formulierung „keine eigene Optik" wäre nach dieser Änderung eine Unwahrheit; die alte
+# Verbotsliste steht deshalb nicht mehr als geltende Fassung im Docstring, sondern wird hier
+# abgelöst.
+ERLAUBTE_INNENSCHATTEN = ("inset", "rgba(255,255,255,", "var(--btn-lift)")
 # Erlaubt sind ausschliesslich Flaeche, Ausrichtung, die linke Polsterkante (s. o.) und die
-# **Haarlinie** des Eingabefeldes. `border-color` ist bewusst erlaubt und `border` (die
+# **Haarlinie** des Standardknopfes. `border-color` ist bewusst erlaubt und `border` (die
 # Kurzform) bewusst nicht: die Kurzform traegt Breite und Stil und koennte damit genau die
 # Geometrie veraendern, die P9-AF an die Baumzeile bindet. Die Flaeche **ohne** Haarlinie
-# waere zudem nicht die des Eingabefeldes, sondern eine neue — P9-97 vergleicht Hintergrund
-# **und** Kante.
+# waere zudem nicht die des Standardknopfes, sondern eine neue.
 ERLAUBTE_OPTIK = ("background", "background-color", "background-image", "border-color",
                   "text-align", "padding-left")
 TEXT_ALIGN_WERTE = ("left", "center", "right", "start", "end")
 # Der einzige erlaubte Wert fuer `padding-left` — der der Sammelregel, mit der die Kette
 # anfaengt. Alles andere waere eine eigene Polsterkante und damit Geometrie unter neuem Namen.
 ERLAUBTES_PADDING_LEFT = "var(--space)"
+# **[2026-10-05, P9-AX]** Der erlaubte linke Polsterwert ist **je Selektor verschieden**, und das
+# ist der Punkt: der Menuepunkt traegt `var(--space)` (Nikinger-Entscheidung vom 2026-10-05,
+# beidseitiges Polster, damit die mittige Beschriftung echt mittig liegt), die **Space-Zeile**
+# `0` — ihre Beschriftung soll auf der Inhaltskante des Panels stehen, also buendig mit dem
+# Panel-Titel, und nicht 32 px daneben (das geerbte Einzugs-Polster der Baumzeile). Ein
+# einziger全局 erlaubter Wert koennte nicht beides sein.
+ERLAUBTES_PADDING_LEFT_PRO_SELECTOR = {
+    ".settings-menu__item": "var(--space)",
+    ".settings-space-row": "0",
+}
 
 
-def _optik_verstoss(body: str, tokens: set[str]) -> list[str]:
+def _koerper_mit(bodies: list[str], eigenschaft: str) -> str | None:
+    """Der **erste** Regel-Body, der die Eigenschaft überhaupt nennt.
+
+    **Der Grund ist derselbe wie bei `_farbe_von_btn_primary`:** `.btn` steht in der
+    Übergangs-Sammelregel, und `_bare_rule_bodies(".btn")[0]` ist deshalb der `transition`-Body
+    — ohne `background`, ohne `border`, ohne `box-shadow`. Ein Wächter, der `[0]` nimmt, prüft
+    die falsche Regel und ist an korrektem Code rot; die erste Fassung dieses Tests war genau so
+    gebaut und hat 14 Wächtergrün gegen eine leere Aussage eingetauscht.
+    """
+    for body in bodies:
+        if _eigenschaft(body, eigenschaft):
+            return body
+    return None
+
+
+def _farbe_von_btn_primary(css: str) -> str | None:
+    """Die `color`-Deklaration der `.btn-primary`-Regel — **gelesen**, nicht abgetippt.
+
+    Grund: `#fff` steht hier als erlaubter Wert, und ein abgetipptes `color` wäre die zweite Kopie
+    der Aussage. Änderte `.btn-primary` seine Schriftfarbe, bliebe der Wächter grün und die
+    Menüpunkte behielten eine andere. Dasselbe Muster wie beim Flächen-Vergleich — dort wird der
+    Name verglichen, nicht der Wert.
+
+    **Über alle eigenen Regeln des Selektors iterieren, nicht über die erste:** `.btn-primary`
+    steht auch in der Übergangs-Sammelregel (`transition`), und die *erste* eigene Regel ist
+    deshalb die mit `transition` — ohne `color`. Die erste Fassung dieses Helpers nahm `[0]` und
+    gab `None` zurück; der Wächter, der es braucht, wäre dann an korrekter Welt rot.
+    """
+    for body in _rule_bodies(css, ".btn-primary", own_only=True):
+        farbe = _eigenschaft(body, "color")
+        if farbe:
+            return farbe
+    return None
+
+
+def _ebenen(value: str) -> list[str]:
+    """Die Schatten-Ebenen eines `box-shadow`-Werts — **mit Klammer-Tiefe**.
+
+    Der erste Entwurf hat an jedem Komma getrennt und damit `rgba(255,255,255,.06)` in drei
+    Stücke gerissen; der Wächter meldete daraufhin **korrekten** Code als Verstoß. Ein Mess- oder
+    Wächterfehler, der aussieht wie ein Befund — die Fehlerklasse, die in diesem Block fünfmal
+    vorkam.
+    """
+    ebene, tiefe, gefunden = "", 0, []
+    for zeichen in value:
+        if zeichen == "(":
+            tiefe += 1
+        elif zeichen == ")":
+            tiefe -= 1
+        if zeichen == "," and tiefe == 0:
+            gefunden.append(ebene.strip())
+            ebene = ""
+        else:
+            ebene += zeichen
+    if ebene.strip():
+        gefunden.append(ebene.strip())
+    return gefunden
+
+
+def _schatten_verstoss(body: str) -> list[str]:
+    """Alle Schatten-Deklarationen, die **kein** Innenschatten der Standardfläche sind."""
+    verstoesse: list[str] = []
+    for match in re.finditer(r"(^|[;{\s])box-shadow\s*:\s*([^;]*)", body):
+        wert = match.group(2).strip()
+        for ebene in _ebenen(wert):
+            if any(teil in ebene for teil in ERLAUBTE_INNENSCHATTEN):
+                continue
+            verstoesse.append(f"box-shadow: {ebene!r} (erlaubt ist nur der Innenschatten)")
+    return verstoesse
+
+
+def _optik_verstoss(body: str, tokens: set[str], erlaubte_color: str | None = None,
+                    erlaubtes_padding_left: str = ERLAUBTES_PADDING_LEFT) -> list[str]:
     """Alle Verstoesse eines Regel-Bodys: verbotene Eigenschaften, und erlaubte Eigenschaften
     mit einem Wert, der **kein** vorhandenes Token ist.
 
@@ -208,6 +320,12 @@ def _optik_verstoss(body: str, tokens: set[str]) -> list[str]:
     for prop in VERBOTENE_OPTIK:
         if re.search(rf"(^|[;{{\s]){prop}\s*:", body):
             verstoesse.append(f"verboten: {prop}")
+    verstoesse += _schatten_verstoss(body)
+    # `color` ist nur auf der Auswahlregel erlaubt, und nur als der Wert aus `.btn-primary`.
+    for match in re.finditer(r"(^|[;{\s])color\s*:\s*([^;]*)", body):
+        wert = match.group(2).strip()
+        if erlaubte_color is None or wert != erlaubte_color:
+            verstoesse.append(f"color: {wert!r} (erlaubt ist nur der Wert aus .btn-primary)")
     for match in re.finditer(rf"(^|[;{{\s])({"|".join(ERLAUBTE_OPTIK)})\s*:\s*([^;]*)", body):
         prop, wert = match.group(2), match.group(3).strip()
         if prop == "text-align":
@@ -215,10 +333,10 @@ def _optik_verstoss(body: str, tokens: set[str]) -> list[str]:
                 verstoesse.append(f"text-align: {wert!r}")
             continue
         if prop == "padding-left":
-            if wert != ERLAUBTES_PADDING_LEFT:
+            if wert != erlaubtes_padding_left:
                 verstoesse.append(
-                    f"padding-left: {wert!r} (erlaubt ist nur {ERLAUBTES_PADDING_LEFT}, der "
-                    f"Wert der Sammelregel)")
+                    f"padding-left: {wert!r} (erlaubt ist nur {erlaubtes_padding_left})"
+                )
             continue
         for token in re.findall(r"var\((--[\w-]+)\)", wert):
             if token not in tokens:
@@ -331,15 +449,22 @@ def test_settings_menu_items_reuse_the_tree_row_look():
     `.btn` umstellen) löste das Problem nur durch eine weitere Kopie. Wiederverwendung ist
     die einzige Form, die sich nicht auflösen lässt.
 
-    **Beide Lesarten, mit Datum — der Wächter wurde am 2026-10-05 (P9-AN) enger gezogen, und
-    zwar im selben Commit wie der Bau.** Vorher stand `background` auf der Verbotsliste: der
-    Wächter wäre an **korrektem** Code rot geworden, denn P9-AN verlangt für die unausgewählten
-    Menüpunkte die Fläche des Eingabefeldes. Neu verboten sind nur noch **Geometrie,
-    Textfarbe, Kanten-Kurzform und Schatten**; erlaubt sind Fläche, Haarlinie und
-    `text-align` — und eine Fläche **nur** aus einem Token, das `app.css` in `:root` auch
-    wirklich definiert. Die Formulierung „keine eigene Optik" wäre nach dieser Änderung eine
-    Unwahrheit, deshalb steht der alte Satz nicht mehr im Docstring, sondern wird hier
-    ausdrücklich abgelöst."""
+    **Beide Lesarten, mit Datum — der Wächter wurde am 2026-10-05 zweimal umgebaut, und
+    zwar jeweils im selben Commit wie der Bau.**
+
+    *Erster Umbaut (P9-AN, gleicher Tag):* vorher stand `background` auf der Verbotsliste. Neu
+    verboten sind nur noch **Geometrie, Textfarbe, Kanten-Kurzform und äußerer Schatten**;
+    erlaubt sind Fläche, Haarlinie und `text-align` — und eine Fläche **nur** aus einem Token,
+    das `app.css` in `:root` auch wirklich definiert.
+
+    *Zweiter Umbaut (P9-AV, derselber Tag, **wieder auf Nikinger-Anordnung**):* P9-AV hat P9-AN
+    umgedreht — die Fläche ist nicht mehr die des Eingabefeldes, sondern die des **Standardknopfes**,
+    und die **Auswahl** trägt die Akzentfläche. Deshalb ist auch `color` in einer Form wieder
+    erlaubt: nur auf der Auswahlregel, nur mit dem Wert aus `.btn-primary` (gelesen, nicht
+    abgetippt), und ein **äußerer** Schatten bleibt verboten.
+
+    Die Formulierung „keine eigene Optik" wäre nach diesen Änderungen eine Unwahrheit, deshalb
+    steht der alte Satz nicht mehr im Docstring, sondern wird hier ausdrücklich abgelöst."""
     html = _html()
     css = _css()
     for element_id, _ in MENU_ITEMS:
@@ -347,37 +472,54 @@ def test_settings_menu_items_reuse_the_tree_row_look():
         assert "tree__folder" in block, f"{element_id} traegt nicht .tree__folder: {block}"
         assert "settings-menu__item" in block, element_id
     tokens = _tokens()
+    erlaubte_color = _farbe_von_btn_primary(_css())
+    assert erlaubte_color, "die .btn-primary-Regel nennt keine color — der Wächter kann nichts erlauben"
     flaeschen_woerter = 0
     for selector in (".settings-menu__item", ".settings-space-row"):
         rules = _rule_bodies(css, selector, own_only=True)
         assert rules, f"{selector} hat keine eigene Regel im Stylesheet"
         for body in rules:
-            verstoesse = _optik_verstoss(body, tokens)
+            # **Nur die Auswahlregel** darf eine eigene Schriftfarbe tragen (P9-AV): sie legt
+            # die Akzentfläche und braucht darum eine helle Beschriftung. Jede andere eigene
+            # Regel der Kette erbt die Farbrolle der Sammelregel.
+            ist_auswahl = "aria-current" in selector and ":not(" not in selector
+            verstoesse = _optik_verstoss(
+                body, tokens,
+                erlaubte_color if ist_auswahl else None,
+                ERLAUBTES_PADDING_LEFT_PRO_SELECTOR[selector])
             assert not verstoesse, (selector, verstoesse, body)
             flaeschen_woerter += len(re.findall(r"(^|[;{\s])background\s*:", body))
-    # **Und die Flaeche, die P9-AN verlangt, ist auch da.** Ein Wächter, der nur verbietet,
+    # **Und die Flaeche, die P9-AV verlangt, ist auch da.** Ein Wächter, der nur verbietet,
     # waere nach einem Revert des Baus immer noch gruen — er wuerde dann die *Abwesenheit*
-    # des Verstoßes melden und die Abwesenheit der Loesung verschweigen. Fuer die
-    # Space-Zeilen ist das nicht verlangt (P9-AN nennt nur die Menuepunkte), also genau eine.
+    # des Verstosses melden und die Abwesenheit der Loesung verschweigen. Fuer die
+    # Space-Zeilen ist das nicht verlangt (P9-AV nennt nur die Menuepunkte), also mindestens eine.
     assert flaeschen_woerter >= 1, (
-        "keine eigene Regel setzt eine Hintergrundflaeche — P9-AN (unausgewaehlter "
-        "Menuepunkt traegt die Flaeche des Eingabefeldes) waere nicht gebaut"
+        "keine eigene Regel setzt eine Hintergrundflaeche — P9-AV (unausgewaehlter "
+        "Menuepunkt traegt die Flaeche des Standardknopfes) waere nicht gebaut"
     )
 
 
 def test_the_menu_item_watchdog_bites_on_built_in_violations():
     """**Der Wächter wird an eingebauten Verstößen geprüft, nicht an vertrauensvollem Code.**
 
-    Vier Zeilen, die keine Phase-9-Datei enthält, deren jede aber rot werden muss. Grund: P9-AN
+    Zehn Zeilen, die keine Phase-9-Datei enthält, deren jede aber rot werden muss. Grund: P9-AN
     hat diesen Wächter von einem *Verbot* auf eine *Erlaubnis mit Bedingung* umgestellt
-    (`background` ist erlaubt, `background: #0C1015` nicht). Ein Verbot kann man lesen und
-    glauben; eine Erlaubnis mit Bedingung prüft man nur, indem man die Bedingung verletzt —
-    sonst steht am Ende ein Wächter, der alles erlaubt, was niemand verboten hat.
+    (`background` ist erlaubt, `background: #0C1015` nicht), und P9-AV hat `box-shadow` und
+    `color` in derselben Weise entschärft (Innenschatten erlaubt, äußerer nicht). Ein Verbot kann
+    man lesen und glauben; eine Erlaubnis mit Bedingung prüft man nur, indem man die Bedingung
+    verletzt — sonst steht am Ende ein Wächter, der alles erlaubt, was niemand verboten hat.
+
+    **[2026-10-05, P9-AV: zwei Fälle geändert, weil die alte Verbotsliste sie für erlaubt hielt]** —
+    `eigener Schatten` ist jetzt ein **äußerer** (`box-shadow: 0 1px 0 rgba(0,0,0,.5)`), und
+    `eigene Textfarbe` wird **zwei** Mal geprüft: einmal mit einer fremden Farbe (muss rot werden)
+    und einmal mit der Farbe aus `.btn-primary` **in einer Nicht-Auswahlregel** (muss ebenfalls
+    rot werden — sonst wäre die Ausnahme so breit wie der Wächter).
 
     Der vierte Fall ist der eigentliche Fund dieser Zeile: `:not([aria-current="true"])` ist
     **keine Zustandsregel** (sonst wäre P9-AN mit P9-AO in Konflikt), wohl aber eine **eigene**
     (sonst umginge sie diesen Wächter). Genau das prüft `_ist_eigene_regel()`."""
     tokens = _tokens()
+    erlaubte_color = _farbe_von_btn_primary(_css())
     verstoesse = {
         "eigene Hoehe": "height: 36px;",
         "eigenes Polster oben": "padding-top: 10px;",
@@ -387,7 +529,7 @@ def test_the_menu_item_watchdog_bites_on_built_in_violations():
         "eigene Rundung": "border-radius: 10px;",
         "eigene Textfarbe": "color: var(--text);",
         "Kanten-Kurzform": "border: 1px solid var(--line-strong);",
-        "eigener Schatten": "box-shadow: 0 1px 0 rgba(0,0,0,.5);",
+        "aeusserer Schatten": "box-shadow: 0 1px 0 rgba(0,0,0,.5);",
         "Farbe statt Token": "background: #0C1015;",
         "erfundenes Token": "background: var(--sunken-tiefer);",
         "falscher Text-align": "text-align: middle;",
@@ -395,10 +537,21 @@ def test_the_menu_item_watchdog_bites_on_built_in_violations():
     for name, body in verstoesse.items():
         assert _optik_verstoss(body, tokens), f"der Wächter meldet {name!r} ({body}) nicht"
     # Und die dreiköpfige Erlaubnis meldet **nichts**:
-    erlaubt = ("background: var(--sunken);", "border-color: var(--line-strong);",
-               "text-align: center;", f"padding-left: {ERLAUBTES_PADDING_LEFT};")
+    erlaubt = (f"background: var(--btn-std-fill);", "border-color: var(--btn-std-line);",
+               "text-align: center;", f"padding-left: {ERLAUBTES_PADDING_LEFT};",
+               "box-shadow: inset 0 1px 0 rgba(255,255,255,.06);")
     for body in erlaubt:
         assert not _optik_verstoss(body, tokens), f"{body!r} wird zu Unrecht gemeldet"
+    # Und die **Auswahlregel** darf die Farbe aus `.btn-primary` tragen — sonst wäre P9-AV nicht
+    # baubar, und das wäre eine Regel, die den Bau verhindert statt ihn zu prüfen.
+    assert not _optik_verstoss(f"color: {erlaubte_color};", tokens, erlaubte_color), (
+        "die Auswahlregel meldet die Farbe aus .btn-primary zu Unrecht"
+    )
+    # …und **nur** dort. Dieselbe Farbe in einer eigenen Nicht-Auswahlregel muss rot werden.
+    assert _optik_verstoss(f"color: {erlaubte_color};", tokens), (
+        "eine Nicht-Auswahlregel darf keine eigene Schriftfarbe tragen — die Ausnahme wäre "
+        "sonst so breit wie der Wächter"
+    )
     # `:not([aria-current="true"])` ist eine **eigene** Regel und **keine** Zustandsregel.
     assert _ist_eigene_regel('.settings-menu__item:not([aria-current="true"])',
                              ".settings-menu__item")
@@ -409,29 +562,48 @@ def test_the_menu_item_watchdog_bites_on_built_in_violations():
     assert not _ist_eigene_regel(".settings-menu__item__klein", ".settings-menu__item")
 
 
-def test_the_selection_state_uses_aria_current_and_the_existing_fill():
-    """P9-AG: der Knopf des offenen Unterfensters trägt den Auswahlzustand **der Konvention** —
-    `aria-current="true"` und `--select-fill`, dieselben zwei Werte wie eine aktive
-    `.tree__folder`-Zeile. Kein neuer Füll-Farbwert, kein zweiter Zustand.
+def test_the_selection_state_uses_aria_current_and_the_accent_surface():
+    """P9-AG/P9-AO: der Knopf des offenen Unterfensters trägt `aria-current="true"` — **das
+    Zustands-Attribut bleibt unverändert**.
 
-    Beide Hälften werden geprüft, weil jede für sich allein nichts bedeutet: `aria-current`
-    ohne CSS-Regel ist ein Attribut, eine CSS-Regel ohne Attribut ist toter Ballast. Die
-    Probe S1 vergleicht dann die *gemessenen* Werte der beiden Zustände."""
+    **[2026-10-05, P9-AV: die Fläche ist bewusst eine andere geworden, und dieser Wächter
+    musste umgedreht werden — mit beiden Lesarten im Repo, weil die alte hier nicht falsch war,
+    sondern widerrufen.]**
+
+    *Die widerrufene Lesart (P9-AO):* der ausgewählte Menüpunkt trug `--select-fill`, denselben
+    Wert wie eine aktive `.tree__folder`-Zeile in der Rail — „kein neuer Füll-Farbwert". Der
+    Nikinger hat die Bilder angesehen und entschieden: ausgewählt bekommt die **Akzentfläche**
+    eines Hauptknopfes (`--accent-face-*` + `--accent-edge`), damit der offene Zustand sich neben
+    den Nachbarpanels wie ein Knopf zeigt und nicht wie eine Baumzeile.
+
+    **Warum das keine dritte Variante ist (der Kern des alten Wächters):** die Fläche wird nicht
+    abgetippt, sondern gegen die `.btn-primary`-Regel **verglichen** — dieselbe Technik wie beim
+    Standardknopf. Zwei eigene Werte wären die dritte Variante; ein Wert, den die Hauptknopf-Regel
+    selbst vorgibt, ist eine Nennung.
+
+    Beide Hälften werden geprüft, weil jede für sich allein nichts bedeutet: `aria-current` ohne
+    CSS-Regel ist ein Attribut, eine CSS-Regel ohne Attribut ist toter Ballast. Die Probe misst
+    dann die *berechneten* Werte der beiden Zustände (S1)."""
     css = _css()
     assert re.search(r"\.settings-menu__item\[aria-current=\"true\"\]", css), (
         "keine Auswahlregel für die Menüpunkte"
     )
-    for selector in ('.settings-menu__item[aria-current="true"]', '.tree__folder[aria-current="true"]'):
-        bodies = _rule_bodies(css, selector)
-        assert bodies, f"keine Regel fuer {selector}"
-        assert all("var(--select-fill)" in body for body in bodies), (
-            f"{selector} nutzt nicht --select-fill: {bodies}"
+    eigene = _rule_bodies(css, '.settings-menu__item[aria-current="true"]')
+    assert eigene, "keine eigene Auswahlregel für die Menüpunkte"
+    assert all("var(--accent-face-top)" in body for body in eigene), (
+        f"die Auswahl der Menüpunkte nutzt nicht die Akzentfamilie: {eigene}"
+    )
+    # Und **genau eine** eigene Regel mit der Fläche (die Hover-Regel daneben hat `:hover` im
+    # Selektor). Zwei Flächenregeln wären der Beginn der dritten Variante.
+    mit_flaeche = [b for b in eigene if re.search(r"(^|[;{\s])background\s*:", b)]
+    assert len(mit_flaeche) == 1, f"genau eine Flächenregel erwartet, gefunden {len(mit_flaeche)}"
+    # **Die Baumzeile behält `--select-fill`** — sie ist eine Zeile in einem Baum, kein Knopf.
+    # Der Wächter prüft das mit, weil die Formulierung „derselbe Auswahlzustand wie die Baumzeile"
+    # sonst als Überprüfung beider gelesen würde.
+    for body in _rule_bodies(css, '.tree__folder[aria-current="true"]'):
+        assert "var(--select-fill)" in body, (
+            f"die Baumzeile verliert ihren Auswahl-Fill: {body}"
         )
-    # Und dieselbe **eine** Auswahlregel wie die Baumzeile — nicht eine daneben. Zwei
-    # Regeln mit demselben Wert wären der Beginn der dritten Variante.
-    assert _rule_bodies(css, '.settings-menu__item[aria-current="true"]') == _rule_bodies(
-        css, '.tree__folder[aria-current="true"]'
-    ), "die Auswahlregel der Menüpunkte weicht von der der Baumzeile ab"
 
 
 def test_the_narrow_mode_hides_the_menu_and_shows_a_back_button():
@@ -572,64 +744,114 @@ def test_the_two_titles_share_one_gap_and_only_the_menu_title_is_centered():
         )
 
 
-def test_the_unselected_menu_item_takes_the_input_surface_verbatim():
-    """P9-AN + P9-AO (2026-10-05, Nikinger): die unausgewählten Menüpunkte bekommen **die
-    Fläche des Eingabefeldes**, die ausgewählten behalten den Auswahlzustand.
+def test_the_unselected_menu_item_takes_the_standard_button_surface():
+    """**P9-AV (2026-10-05, Nikinger) — und das ist eine Umkehr, mit Datum.**
 
-    **Der Token-Name wird nicht abgetippt, sondern verglichen.** Der Wächter liest den
-    Hintergrund der `.input`-Regel aus dem Stylesheet und verlangt, dass die Menüregel
-    *denselben* Wert nennt. Ein abgetippter Name (`var(--sunken)`) wäre eine zweite Kopie
-    der Aussage: änderte die `.input`-Regel ihren Wert, bliebe der Wächter grün und die
-    Menüpunkte hätten eine Fläche, die es im Panel nicht mehr gibt.
+    *Die widerrufene Lesart:* P9-AN (gleicher Tag, gleicher Block) verlangte die **Fläche des
+    Eingabefeldes** (`--sunken` + `--line-strong`), und dieser Wächter hieß entsprechend
+    `…_takes_the_input_surface_verbatim`. Der Nikinger hat die Bilder angesehen und geschrieben:
+    *„since they are buttons and not fields to type something in"*. Damit war P9-AN **an der
+    falschen Stelle**: die Fläche des Eingabefeldes gehört laut Selection/Choice-Konvention v3 zur
+    Kategorie **Choice**, und die Menüpunkte sind **Navigation** (P9-AF, `.tree__folder`).
 
-    Ebenso die Kante — und zwar aus demselben Grund, mit dem die Kurzform `border` verboten
-    bleibt: `--line-strong` kommt aus der `.input`-Regel, `border` (die Kurzform) würde
-    Breite und Stil mittragen und damit die an die Baumzeile gebundene Geometrie verändern.
-    Das ist die einzige **Abweichung** vom Plantext (§10 führte `border-color` nicht als
-    erlaubt auf, P9-97 vergleicht aber ausdrücklich „Hintergrund **und** Kante") und sie ist
-    dort mit Grund notiert.
+    *Was jetzt gilt:* unausgewählt exakt die Fläche des **Standardknopfes** (`--btn-std-fill` +
+    `--btn-std-line` + derselbe 1-px-Innenschatten), ausgewählt die **Akzentfläche** wie
+    `.btn-primary` (`--accent-face-*` + `--accent-edge`).
 
-    Die **Geometrie** prüft `test_settings_menu_items_reuse_the_tree_row_look()`, die
-    **Wirkung** misst die Browser-Probe (S10, S12)."""
+    **Der Token-Name wird nicht abgetippt, sondern verglichen** — und jetzt gegen die `.btn`-Regel
+    statt gegen die `.input`-Regel. Ein abgetipptes `var(--btn-std-fill)` wäre eine zweite Kopie
+    der Aussage: änderte die `.btn`-Regel ihren Wert, bliebe der Wächter grün und die Menüpunkte
+    hätten eine Fläche, die es im Panel nicht mehr gibt. Dasselbe Muster wie in der Fassung von
+    P9-AN, nur mit der anderen Vorlage.
+
+    **Der Schatten wird jetzt verlangt, nicht verboten** (`inset 0 1px 0 rgba(255,255,255,.06)`,
+    ebenfalls aus der `.btn`-Regel gelesen): ohne ihn sähe der Menüpunkt flacher aus als
+    „Schließen" im Nachbarpanel, und genau dieser Vergleich war der Auftrag. Ein **äußerer**
+    Schatten bleibt verboten (`_schatten_verstoss`).
+
+    Die **Geometrie** prüft `test_settings_menu_items_reuse_the_tree_row_look()`, die **Wirkung**
+    misst die Browser-Probe."""
     css = _css_code()
-    input_bodies = _bare_rule_bodies(".input")
-    assert input_bodies, "keine Basis-Regel für .input"
-    eingabeflaeche = _eigenschaft(input_bodies[0], "background")
-    eingabekante = _eigenschaft(input_bodies[0], "border")
-    assert eingabeflaeche and eingabekante, (eingabeflaeche, eingabekante)
-    # Die Kante der `.input` ist die **Kurzform** — der Wert, den die Menüregel als
-    # `border-color` übernimmt, ist deren Farbanteil.
-    farbanteil = eingabekante.split()[-1]
-    assert farbanteil.startswith("var("), eingabekante
+    btn_bodies = _bare_rule_bodies(".btn")
+    assert btn_bodies, "keine Basis-Regel für .btn"
+    # Die **Übergangs-Sammelregel** steht in dieser Liste mit drin (sie nennt `.btn` als ersten
+    # Selektor); die gesuchte Regel ist die, die `background` überhaupt nennt.
+    btn = _koerper_mit(btn_bodies, "background")
+    assert btn, f"keine .btn-Regel mit einer Fläche: {btn_bodies}"
+    knopf_flaeche = _eigenschaft(btn, "background")
+    knopf_kante = _eigenschaft(btn, "border")
+    knopf_schatten = _eigenschaft(btn, "box-shadow")
+    assert knopf_flaeche and knopf_kante and knopf_schatten, (
+        knopf_flaeche, knopf_kante, knopf_schatten)
+    # Die Kante der `.btn` ist die **Kurzform** — der Wert, den die Menüregel als `border-color`
+    # übernimmt, ist deren Farbanteil. (`border` selbst bleibt verboten: die Kurzform trägt Breite
+    # und Stil und könnte damit genau die Geometrie verändern, die P9-AF bindet.)
+    farbanteil = knopf_kante.split()[-1]
+    assert farbanteil.startswith("var("), knopf_kante
 
-    eigene = _rule_bodies(css, '.settings-menu__item:not([aria-current="true"])', own_only=True)
+    # **Ueber den Selektor filtern, nicht ueber den Body.** Fuer den unausgewaehlten Zustand
+    # gibt es eine Flaechenregel und eine Hoverregel, und **beide nennen ein `background`** --
+    # die erste Fassung dieses Tests hat ueber `_eigenschaft(body, "background")` gefiltert und
+    # damit den Hover mitgezaehlt (gemessen 2, erwartet 1, Aussage wertlos). Der Selektor ist
+    # das, was Flaeche und Hover unterscheidet.
+    eigene = [body for erster, selectors, body in _alle_regeln()
+              if erster == '.settings-menu__item:not([aria-current="true"])']
     assert len(eigene) == 1, (
-        f"genau eine eigene Regel für die unausgewählten Menüpunkte erwartet, gefunden {len(eigene)}"
+        f"genau eine eigene Flaechenregel fuer die unausgewaehlten Menuepunkte erwartet, "
+        f"gefunden {len(eigene)}"
     )
     body = eigene[0]
-    assert _eigenschaft(body, "background") == eingabeflaeche, (
-        f"die Fläche der Menüpunkte ({_eigenschaft(body, 'background')!r}) ist nicht die des "
-        f"Eingabefeldes ({eingabeflaeche!r})"
+    # Und der Hover existiert als **eigene** Regel mit der Hover-Flaeche des Standardknopfes --
+    # sonst wuerde die Kette beim Ueberfahren in eine andere Optik kippen, die es sonst nirgends
+    # gibt. Der Token wird verglichen, nicht die Farbe.
+    hover = [b for erster, selectors, b in _alle_regeln()
+             if erster == '.settings-menu__item:not([aria-current="true"]):hover']
+    assert len(hover) == 1, f"genau eine eigene Hoverregel erwartet, gefunden {len(hover)}"
+    btn_hover = [b for erster, selectors, b in _alle_regeln() if erster == ".btn:hover"]
+    assert btn_hover, "die .btn-Regel traegt keine eigene :hover-Regel -- der Vergleich hat nichts"
+    assert _eigenschaft(hover[0], "background") == _eigenschaft(btn_hover[0], "background"), (
+        f"der Hover der Menuepunkte ({_eigenschaft(hover[0], 'background')!r}) weicht vom Hover "
+        f"des Standardknopfes ({_eigenschaft(btn_hover[0], 'background')!r}) ab"
+    )
+    assert _eigenschaft(body, "background") == knopf_flaeche, (
+        f"die Flaeche der Menuepunkte ({_eigenschaft(body, 'background')!r}) ist nicht die des "
+        f"Standardknopfes ({knopf_flaeche!r})"
     )
     assert _eigenschaft(body, "border-color") == farbanteil, (
-        f"die Haarlinie der Menüpunkte ({_eigenschaft(body, 'border-color')!r}) ist nicht die des "
-        f"Eingabefeldes ({farbanteil!r})"
+        f"die Haarlinie der Menuepunkte ({_eigenschaft(body, 'border-color')!r}) ist nicht die des "
+        f"Standardknopfes ({farbanteil!r})"
     )
-    # Und **kein** Schatten: die Vertiefung ist die Fläche, der Schatten wäre die Plastik
-    # des Feldes, und P9-97 vergleicht Hintergrund und Kante.
-    assert _eigenschaft(body, "box-shadow") is None, body
-    # P9-AO: der Auswahlzustand ist **unberührt** — dieselbe eine Regel wie die Baumzeile, und
-    # ohne `:not(…)`: die Auswahlregel ist nicht „die Menüregel minus ausgewählt", sondern die
-    # Baumzeilenregel. (Die `:not`-Ausschluss-Form taucht im Stylesheet an anderer Stelle auf —
-    # in P9-ANs *un*ausgewählten Menüpunkten — und würde hier sonst fälschlich als Umstellung
-    # der Auswahlregel gemeldet.)
+    assert _eigenschaft(body, "box-shadow") == knopf_schatten, (
+        f"der Innenschatten der Menuepunkte ({_eigenschaft(body, 'box-shadow')!r}) weicht von dem "
+        f"des Standardknopfes ({knopf_schatten!r}) ab -- ohne ihn waere die Flaeche eine andere"
+    )
+
+    # Und P9-AV's zweite Haelfte: die **Auswahl** traegt die Akzentfamilie, nicht den
+    # Rail-Auswahl-Fill. Auch hier werden die Namen verglichen, nicht die Werte abgetippt.
     auswahl = [(erster, body) for erster, selectors, body in _alle_regeln()
                if '.settings-menu__item[aria-current="true"]' in selectors]
     assert len(auswahl) == 1, auswahl
-    assert ":not" not in auswahl[0][0], auswahl[0][0]
-    assert auswahl[0][1] == _rule_bodies(css, '.tree__folder[aria-current="true"]')[0], (
-        "die Auswahlregel der Menüpunkte weicht von der der Baumzeile ab"
+    regel = auswahl[0][1]
+    haupt = _koerper_mit(_bare_rule_bodies(".btn-primary"), "background")
+    assert haupt, "keine .btn-primary-Regel mit einer Akzentflaeche"
+    assert _eigenschaft(regel, "background") == _eigenschaft(haupt, "background"), (
+        f"die Auswahlflaeche ({_eigenschaft(regel, 'background')!r}) ist nicht die Akzentflaeche "
+        "von .btn-primary"
     )
+    # Die Haarlinie des Hauptknopfes ist die **Kurzform** -- der Vergleichswerte ist ihr
+    # Farbanteil, genau wie bei `.btn` oben.
+    assert _eigenschaft(regel, "border-color") == _eigenschaft(haupt, "border").split()[-1], (
+        "die Kante der Auswahl weicht vom Farbanteil der Kante des Hauptknopfes ab"
+    )
+    # Der **Zustand** bleibt `aria-current` (P9-AG/P9-AO unberührt) — nur die Fläche ist eine
+    # andere als die der Baumzeile. Die Auswahlregel darf deshalb NICHT mehr mit der Baumzeile
+    # übereinstimmen: die Formulierung „derselbe Auswahlzustand wie die Baumzeile" aus P9-AO ist
+    # mit P9-AV **an der Fläche** widerrufen, am Zustand nicht.
+    assert regel != _rule_bodies(css, '.tree__folder[aria-current="true"]')[0], (
+        "die Auswahlregel der Menuepunkte ist wieder wortgleich die der Baumzeile -- das waere "
+        "eine stille Rueckkehr zu P9-AO und widerspraeche P9-AV"
+    )
+    assert ":not" not in auswahl[0][0], auswahl[0][0]
 
 
 def test_the_menu_label_is_centered_and_the_icon_button_is_named():
@@ -818,3 +1040,171 @@ def test_only_one_module_opens_a_panel():
         assert f'registerPanel("{panel}"' in source, (
             f"{name} meldet seinen Reset für '{panel}' nicht an"
         )
+
+
+def test_the_menu_points_have_the_gap_the_space_rows_have():
+    """P9-AU (2026-10-05, Nikinger: *„the buttons shouldn't be glued to each other"*) — und
+    gemessen war **0 px**.
+
+    **Der Abstand wird nicht abgetippt, sondern verglichen**, und zwar gegen
+    `#space-admin-list`: das ist die **zweite** Liste derselben Kette, und beide tragen seit
+    P9-AK denselben Wunsch („Zeilen mit sichtbarem Abstand"). Zwei notierte Werte wären zwei
+    Stellen, an denen derselbe Abstand auseinanderlaufen darf — dieselbe Begründung wie bei
+    P9-AMs `--settings-title-gap`.
+
+    **Und der Abstand hängt an einem Wrapper, nicht an jedem Knopf.** Die Alternative wäre
+    `margin-bottom` an jedem der drei Punkte außer dem letzten: eine Sonderbehandlung für den
+    letzten Knopf, also eine zweite Wahrheit über dieselbe Sache. Der Wächter prüft deshalb
+    beides — den Wrapper im Markup **und** dass kein Knopf einen eigenen unteren Außenabstand
+    trägt.
+    """
+    html = _html()
+    css = _css()
+    # Der Wrapper existiert und traegt die drei Punkte.
+    assert 'class="settings-menu__list"' in html, "der Wrapper .settings-menu__list fehlt im Markup"
+    liste = _element_by_class(html, "settings-menu__list")
+    assert liste.count("settings-menu__item") == 3, liste
+    assert "<h2>" not in liste, "der Titel gehoert nicht in den Wrapper (er traegt seinen eigenen Abstand)"
+    # Er traegt den Abstand — und derselbe wie die Space-Liste darunter.
+    wrapper = _koerper_mit(_rule_bodies(css, ".settings-menu__list", own_only=True), "gap")
+    assert wrapper, "keine eigene Regel fuer .settings-menu__list"
+    assert _eigenschaft(wrapper, "display") == "flex", wrapper
+    assert _eigenschaft(wrapper, "flex-direction") == "column", wrapper
+    space_liste = [b for erster, selectors, b in _alle_regeln()
+                   if erster == "#space-admin-list"]
+    assert space_liste, "die Regel fuer #space-admin-list fehlt — der Vergleich hat nichts"
+    assert _eigenschaft(wrapper, "gap") == _eigenschaft(space_liste[0], "gap"), (
+        f"der Abstand der Menuepunkte ({_eigenschaft(wrapper, 'gap')!r}) weicht vom Abstand der "
+        f"Space-Zeilen ({_eigenschaft(space_liste[0], 'gap')!r}) ab"
+    )
+    # Kein Knopf traegt einen eigenen unteren Aussenabstand — das waere der zweite Ort.
+    assert "margin-bottom" not in liste, liste
+    for selektor in (".settings-menu__item", ".settings-space-row"):
+        for body in _rule_bodies(css, selektor, own_only=True):
+            assert "margin" not in body, (selektor, body)
+
+
+def test_the_password_buttons_are_caution_and_close():
+    """P9-AW (2026-10-05, Nikinger, wörtlich): *„copying the 'archivieren' Buttons style (so
+    'Ändern' Becomes red) … a password change is [irreversible]"* und *„change 'abbrechen' to
+    'schließen' since all other menus use 'schließen'"*.
+
+    **Zwei Wörter, zwei Begründungen.** „Ändern" war `.btn-primary` — die *Hauptaktion* — und die
+    Hauptaussage eines roten Knopfes in diesem Repo ist *nicht rückgängig zu machen*; der
+    Passwortwechsel erzwingt für jeden Connector eine neue Autorisierung und meldet alle anderen
+    Browser ab (der Panel-Hinweistext sagt genau das). Und „Abbrechen" beschrieb eine Absicht,
+    die es hier nicht gibt: es gibt nur das Fenster, das man schließt — alle anderen Knöpfe der
+    Kette heißen „Schließen".
+
+    **Die Fläche wird nicht abgetippt, sondern verglichen** — gegen `.btn`, denn genau das ist
+    die Kategorie „Vorsicht": Standard-Knopfplastik mit roter Beschriftung und **ohne** gefüllte
+    rote Fläche (Selection/Choice-Konvention v3). Der Knopf trägt die Klasse selbst; wir prüfen
+    das **Markup**, weil eine Prüfung des CSS-Texts grün bliebe, wenn die Klasse aus dem HTML
+    verschwände.
+    """
+    html = _html()
+    css = _css()
+    knopf = _element_by_id(html, "account-submit")
+    assert "action--caution" in knopf, knopf
+    assert re.search(r'class="[^"]*\bbtn\b', knopf), knopf
+    assert "btn-primary" not in knopf, (
+        f"#account-submit traegt wieder die Hauptaktionsflaeche (widerrufene Lesart vor P9-AW): {knopf}"
+    )
+    # Keine eigene Regel fuer den Knopf: die Flaeche erbt er von `.btn`, die Farbe von
+    # `.action--caution`. Eine eigene Regel waere eine dritte Variante.
+    assert not re.search(r"#account-submit", css), (
+        "app.css hat eine eigene Regel fuer #account-submit — die Vorsicht erbt ihre Flaeche"
+    )
+    assert "var(--caution)" in _rule_bodies(css, ".action--caution")[0]
+    # Und das Wort.
+    knopf_text = _element_by_id(html, "account-cancel")
+    # `_element_by_id` loest die Entities auf (`&szlig;` -> `\u00df`), deshalb wird die
+    # **aufgeloeste** Form geprueft — die geschriebene Form zu vergleichen hiesse, den Test beim
+    # ersten Umlaut-Umstieg rot werden zu lassen, ohne dass sich etwas geaendert haette.
+    assert "Schlie\u00dfen" in knopf_text, knopf_text
+    # **HTML-Kommentare vor der Wortsuche entfernen.** Sonst ist der *Kommentar*, der die
+    # Umbenennung erklaert, der Befund — genau die Umkehrung, die in diesem Block schon einmal
+    # eine Zaehlung verschoben hat (die `action--caution`-Zaehlung in `test_static_routes.py`).
+    ohne_kommentare = re.sub(r"<!--.*?-->", "", html, flags=re.DOTALL)
+    assert "Abbrechen" not in _element_by_id(ohne_kommentare, "settings-password"), (
+        "im Passwort-Panel steht noch 'Abbrechen'"
+    )
+    # Und die anderen Fenster der Kette tragen dasselbe Wort — sonst waere die
+    # Vereinheitlichung an zwei von vier Stellen. **Ueber die Knopf-IDs, nicht ueber das
+    # Panel:** `_element_by_id` schneidet beim ersten `</div>` ab (siehe dessen Docstring), und
+    # die Panels enthalten verschachtelte `div`s — die erste Fassung dieses Tests hat genau
+    # daran gescheitert und „traegt kein Schlie&szlig;en" gemeldet, drei Zeichen vor dem Wort.
+    for knopf_id in ("space-admin-close", "space-detail-close", "update-log-close"):
+        assert "Schlie\u00dfen" in _element_by_id(html, knopf_id), knopf_id
+
+
+def test_the_two_input_rows_stop_being_staircases():
+    """P9-AX + P9-AY + P9-AZ (2026-10-05) — **drei Versätze, zwei Regeln**.
+
+    Der gemessene Befund, alle drei aus derselben Messung: die Beschriftung der Space-Zeilen stand
+    **33 px** rechts vom Panel-Titel (32 px geerbtes Einzugs-Polster der Baumzeile + 1 px Rahmen),
+    das Namensfeld im Detail-Panel war **12 px** schmaler als die Zeile darunter, und die Anlege-Zeile
+    im Spaces-Panel war **80 px** versetzt.
+
+    **P9-AY wird nicht als Zahl geprüft, sondern als Folge.** Der Test verlangt das Raster und
+    die Spaltenüberspannung — nicht `width: 234px`. Eine getippte Breite wäre zwei Kopien
+    (der Knopfbreiten), die bei jeder Beschriftungsänderung still auseinanderlaufen; das Raster
+    misst die Knöpfe selbst.
+
+    **P9-AZ ist der Fall, in dem dieselbe Technik nicht greift** — dort ist die Folgezeile *ein*
+    Knopf (142 px), und das Feld daran zu binden hieße, ein Eingabefeld auf 142 px zu verengen.
+    Der Test verlangt deshalb `flex: 1` **und** `nowrap`: ohne das zweite Umbricht das Feld wieder
+    auf seine eigene Zeile, und die Wirkung wäre die vorherige.
+    """
+    css = _css()
+    # P9-AY: Raster mit zwei `max-content`-Spalten, Feld ueberspannt, Zeile rechtsbuendig.
+    raster = [body for erster, selectors, body in _alle_regeln()
+              if "#space-member-name-input" in erster and ":has(" in erster]
+    assert len(raster) == 1, f"genau eine Rasterregel fuer die Member-Aktionszeile erwartet: {len(raster)}"
+    regel = raster[0]
+    assert _eigenschaft(regel, "display") == "grid", regel
+    assert _eigenschaft(regel, "grid-template-columns") == "repeat(2, max-content)", regel
+    assert _eigenschaft(regel, "justify-content") == "end", regel
+    # Das Feld ueberspannt beide Spalten **und** streckt sich: `grid-column` allein laesst es
+    # defaultmaessig start-ausgerichtet, also auf seine Inhaltsbreite schrumpfen.
+    feld_regeln = [b for erster, selectors, b in _alle_regeln()
+                   if erster == "#space-member-name-input"]
+    assert len(feld_regeln) == 1, f"genau eine eigene Regel fuer das Member-Namensfeld: {len(feld_regeln)}"
+    assert _eigenschaft(feld_regeln[0], "grid-column") == "1 / -1", feld_regeln[0]
+    assert _eigenschaft(feld_regeln[0], "justify-self") == "stretch", feld_regeln[0]
+    # **Und keine Breite notiert** — das ist der Punkt der ganzen Regel.
+    for eigenschaft in ("width", "flex-basis", "flex"):
+        assert _eigenschaft(feld_regeln[0], eigenschaft) is None, (
+            f"das Member-Namensfeld traegt eine eigene {eigenschaft} — die Breite soll aus den "
+            "Knopfbreiten folgen, nicht aus einer Zahl im Stylesheet"
+        )
+    # P9-AZ: eine Zeile, Feld fuellt den Rest.
+    anlegen = [body for erster, selectors, body in _alle_regeln()
+               if "#space-create-name-input" in erster and ":has(" not in erster]
+    assert len(anlegen) == 1, f"genau eine eigene Regel fuer das Anlege-Feld erwartet: {len(anlegen)}"
+    assert _eigenschaft(anlegen[0], "flex") == "1", anlegen[0]
+    assert _eigenschaft(anlegen[0], "min-width") == "0", anlegen[0]
+    nowrap = [b for erster, selectors, b in _alle_regeln()
+              if erster == "#settings-spaces .overlay__actions"]
+    assert len(nowrap) == 1, f"die Zeile der Anlege-Aktionen braucht ihre eigene nowrap-Regel: {len(nowrap)}"
+    assert _eigenschaft(nowrap[0], "flex-wrap") == "nowrap", nowrap[0]
+    # P9-AX: die Space-Zeilen bündig mit dem Panel-Titel. **Kein Icon**, deshalb ist die
+    # Einrueckung leerer Raum — das prueft der Test am Markup mit.
+    html = _html()
+    assert not re.search(r'class="[^"]*settings-space-row[^"]*"[^>]*>\s*<', html), (
+        "die Space-Zeile hat jetzt ein erstes Kind-Element — die Annahme 'kein Icon' von P9-AX "
+        "waere damit falsch und der Padding-Wert neu zu messen"
+    )
+    zeilen = [b for erster, selectors, b in _alle_regeln()
+              if erster == ".settings-panel .settings-space-row"]
+    assert len(zeilen) == 1, f"genau eine eigene Regel fuer die Space-Zilen im Panel: {len(zeilen)}"
+    assert _eigenschaft(zeilen[0], "padding-left") == "0", zeilen[0]
+    # Und die Mitgliederliste: Browser-Standard waere Aufzaehlungspunkt und 40 px Einzug.
+    mitglieder = [b for erster, selectors, b in _alle_regeln()
+                  if erster == "#space-member-list"]
+    assert len(mitglieder) == 1, f"genau eine Regel fuer #space-member-list erwartet: {len(mitglieder)}"
+    assert _eigenschaft(mitglieder[0], "list-style") == "none", mitglieder[0]
+    assert _eigenschaft(mitglieder[0], "padding") == "0", mitglieder[0]
+    # `margin: 0` ist Teil desselben Satzes: der Titelabstand (24 px, P9-AM) muss der einzige
+    # bestimmende Wert bleiben, sonst haengt P9-96/P9-101 an einem Browser-Standard.
+    assert _eigenschaft(mitglieder[0], "margin") == "0", mitglieder[0]

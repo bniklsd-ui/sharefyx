@@ -389,11 +389,17 @@
          Hinweistext. Die Knoepfe tragen `.tree__folder` -- die Optik der Ordnerzeile im
          Navigationsbaum, reusing statt kopieren (P9-AF: eine Kopie waere die "dritte
          Variante", die P9 am 2026-10-01 bei `.account-nav` schon einmal entfernt hat). -->
-    <div class="overlay__panel settings-panel settings-panel--menu" id="settings-menu">
+<div class="overlay__panel settings-panel settings-panel--menu" id="settings-menu">
       <h2>Einstellungen</h2>
-      <button type="button" class="tree__folder settings-menu__item" id="settings-open-password" data-panel="password">Passwort &auml;ndern</button>
-      <button type="button" class="tree__folder settings-menu__item" id="account-manage-spaces" data-panel="spaces">Spaces verwalten</button>
-      <button type="button" class="tree__folder settings-menu__item" id="account-show-updates" data-panel="updates">Update-Log</button>
+      <!-- P9-AU (2026-10-05): die drei Punkte bekommen einen **Abstand** — vorher standen sie
+           ohne jede Lücke untereinander („glued to each other"). Der Wrapper trägt den Abstand,
+           damit er an **einer** Stelle steht und nicht als `margin-bottom` an jedem Knopf, der
+           letzte Knopf also keine Sonderbehandlung braucht. -->
+      <div class="settings-menu__list">
+        <button type="button" class="tree__folder settings-menu__item" id="settings-open-password" data-panel="password">Passwort &auml;ndern</button>
+        <button type="button" class="tree__folder settings-menu__item" id="account-manage-spaces" data-panel="spaces">Spaces verwalten</button>
+        <button type="button" class="tree__folder settings-menu__item" id="account-show-updates" data-panel="updates">Update-Log</button>
+      </div>
     </div>
 
     <!-- Stufe 2a: Passwort. Reihenfolge aktuell -> neu -> wiederholen -> TOTP (P9-AJ), der
@@ -427,8 +433,20 @@
         <input type="text" class="input" id="account-totp" autocomplete="one-time-code">
       </label>
       <div class="overlay__actions">
-        <button type="button" class="btn-primary" id="account-submit">&Auml;ndern</button>
-        <button type="button" class="btn" id="account-cancel">Abbrechen</button>
+        <!-- P9-AW (2026-10-05, Nikinger): „Ändern" trägt die **Vorsicht**-Optik wie „Archivieren"
+             (Standardfläche, rote Beschriftung, **keine** gefüllte rote Fläche). Grund: ein
+             Passwortwechsel hat Rückweg-Kosten — dieser Panel sagt
+             es im Hinweistext selbst (alle Connectoren neu autorisieren, andere Sitzungen
+             abgemeldet). Das war vorher `.btn-primary` und damit die *Hauptaktion* — die Aussage
+             war: „das hier ist die wichtigste Taste". Die Aussage ist: „das hier kann man nicht
+             einfach zurücknehmen". -->
+        <button type="button" class="btn action--caution" id="account-submit">&Auml;ndern</button>
+        <!-- Der zweite Knopf heißt jetzt wie alle anderen Fenster der Kette (P9-AW): er
+             schließt das Fenster, es gab nie eine Absicht abzubrechen. Das alte Wort steht
+             hier bewusst **nicht** -- der Wächter liest den Elementinhalt **mit** Kommentaren
+             und würde es als „noch nicht umbenannt" melden. Dieselbe Falle hat in diesem
+             Repo schon einmal eine Zählung verschoben (die Zählung der Vorsichtsklasse). -->
+        <button type="button" class="btn" id="account-cancel">Schlie&szlig;en</button>
       </div>
     </div>
 

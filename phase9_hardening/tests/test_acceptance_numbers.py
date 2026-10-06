@@ -65,13 +65,19 @@ CAP_BYTES = 300  # der Cap, mit dem P9-3/V145 die Unerreichbarkeit des Kriterium
 # kann es nicht verhindern -- die Zeile ist nicht erfuellt *worden*, sie ist gegenstandslos geworden;
 # Nikinger-Entscheidung 2026-10-05: kein Code, D1 geschlossen). Die drei verbleibenden ⬜ sind
 # P9-11 und P9-94 (beide `nmap` von aussen, Mini-Plan §5) und P9-13/V150 (zweites Konto).
-ABNAHME_BILANCE = {"✅": 88, "⚠️": 12, "⬜": 3}
+# 2026-10-06: +9 Zeilen aus der **zweiten** Bildsichtung des Nikingers (Mini-Plan §11,
+# Locks P9-AU–P9-AZ, Abnahme P9-103–P9-111). Alle neun ✅. Zwei davon tragen eine **benannte
+# Grenze** im Text und bleiben deshalb ✅ mit Grenze statt ⚠️: P9-107 (die `<li>`-Mitgliederliste
+# ist im Harness nicht darstellbar) und P9-110 (nur Deklaration, keine Wirkungsmessung). Beide
+# Grenzen sind in der Zeile genannt — eine Abnahmezeile ohne ihre Grenze wäre die Behauptung,
+# die §10.3 der Matrix für unzulässig hält.
+ABNAHME_BILANCE = {"✅": 97, "⚠️": 12, "⬜": 3}
 # 2026-10-05: +7 Zeilen aus dem settings-Nachtrag P9-96–P9-102 (die sieben Punkte aus der
 # Bildsichtung des Nikingers, §10 des Mini-Plans). Die zwei neuen ⚠️ sind **benannte
 # Abweichungen**, keine offenen Punkte: P9-97 (linker Polsterwert, Nikinger-Entscheidung vom
 # 2026-10-05) und P9-99 (`justify-content` statt des im Plan genannten und gemessen wirkungslosen
 # `text-align` — der Knopf ist ein Flexcontainer).
-ABNAHME_ROWS = 103  # 103 Abnahmezeilen; seit 2026-10-05 der settings-Nachtrag (P9-96–P9-102)
+ABNAHME_ROWS = 112  # 112 Abnahmezeilen; seit 2026-10-06 die zweite Bildsichtung (P9-103–P9-111)
 # 2026-10-03: V164 von ⬜ auf ✅ (Deploy `v3.1.1` + Health-Gate 9/9). Die Konstante steht
 # **vor** dem Zählen, sonst wäre der Test eine Tautologie -- deshalb hat er mich beim
 # Zurueckschreiben der Bilanz in die Matrix rot gemeldet, statt sie zu bestaetigen.

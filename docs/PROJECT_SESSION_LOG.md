@@ -5,7 +5,7 @@ read-when: Auditieren der vollen Wurzel-CLAUDE.md-Historie — der aktuelle Curr
 detail: L3
 up: ../CLAUDE.md
 down:
-updated: 2026-10-05 (Block „die sieben Punkte aus der Bildsichtung sind gebaut" verbatim hierher rotiert, per `scripts/rotate_root_current_state.sh` mit K=1 — sechs Gegenproben, darunter die byteweise Reassemblierung und das Nachlesen jedes Blocks; die Byte-Buchhaltung ging auf 234.680 B vorher == 234.680 B nachher) | 2026-10-05 (der Block „die alte Adresse darf unbefristet schreiben" verbatim hierher rotiert, per `scripts/rotate_root_current_state.sh` K=1 — der neue Block über ihm behandelt die sieben Punkte aus der Bildsichtung; **Achtung für den nächsten Faden:** ein Datum mit Leerzeichen und Klammer im Faden **Text** ist für den Anker unsichtbar, das Skript bricht dann mit exit 1 ab) | 2026-10-05 (2 Blöcke der Wurzel verbatim hierher rotiert — der Block vom 2026-10-04 und die datierte Namenskorrektur —, per `scripts/rotate_root_current_state.sh`; die stehende Rotationsregel lebt jetzt als Präambel vor dem ersten Block, damit sie nicht mitrotiert) | 2026-10-04 (**24 Blöcke der Wurzel-`CLAUDE.md` §Current state verbatim hierher**, per `scripts/rotate_root_current_state.sh` K=1; KEEP ist der **neueste** Block, weil die Wurzel newest-**first** ist — im Phase-Head ist es umgekehrt, und die erste Fassung des Skripts hat den ältesten behalten; **sechs Gegenproben**, darunter die byteweise Reassemblierung und die Nachlese jedes Blocks, **221.957 B vorher == 221.957 B nachher**) | 2026-09-10 (P8.6 Step 0 Haushalt-Block aus Wurzel-`CLAUDE.md` §Current state rotiert — Migration-Vorbereitungs-Block brauchte Platz im Wurzel-Head, deshalb der Vorgänger nach hier verschoben; Project-Pattern: jeder neue Current-state-Eintrag rotiert den bisherigen verbatim hierher)
+updated: 2026-10-06 (Block „V188 ist beantwortet" verbatim hierher rotiert, per `scripts/rotate_root_current_state.sh` mit K=1 — sechs Gegenproben, darunter die byteweise Reassemblierung und das Nachlesen jedes Blocks; die Byte-Buchhaltung ging auf 237.864 B vorher == 237.864 B nachher) | 2026-10-05 (Block „die sieben Punkte aus der Bildsichtung sind gebaut" verbatim hierher rotiert, per `scripts/rotate_root_current_state.sh` mit K=1 — sechs Gegenproben, darunter die byteweise Reassemblierung und das Nachlesen jedes Blocks; die Byte-Buchhaltung ging auf 234.680 B vorher == 234.680 B nachher) | 2026-10-05 (der Block „die alte Adresse darf unbefristet schreiben" verbatim hierher rotiert, per `scripts/rotate_root_current_state.sh` K=1 — der neue Block über ihm behandelt die sieben Punkte aus der Bildsichtung; **Achtung für den nächsten Faden:** ein Datum mit Leerzeichen und Klammer im Faden **Text** ist für den Anker unsichtbar, das Skript bricht dann mit exit 1 ab) | 2026-10-05 (2 Blöcke der Wurzel verbatim hierher rotiert — der Block vom 2026-10-04 und die datierte Namenskorrektur —, per `scripts/rotate_root_current_state.sh`; die stehende Rotationsregel lebt jetzt als Präambel vor dem ersten Block, damit sie nicht mitrotiert) | 2026-10-04 (**24 Blöcke der Wurzel-`CLAUDE.md` §Current state verbatim hierher**, per `scripts/rotate_root_current_state.sh` K=1; KEEP ist der **neueste** Block, weil die Wurzel newest-**first** ist — im Phase-Head ist es umgekehrt, und die erste Fassung des Skripts hat den ältesten behalten; **sechs Gegenproben**, darunter die byteweise Reassemblierung und die Nachlese jedes Blocks, **221.957 B vorher == 221.957 B nachher**) | 2026-09-10 (P8.6 Step 0 Haushalt-Block aus Wurzel-`CLAUDE.md` §Current state rotiert — Migration-Vorbereitungs-Block brauchte Platz im Wurzel-Head, deshalb der Vorgänger nach hier verschoben; Project-Pattern: jeder neue Current-state-Eintrag rotiert den bisherigen verbatim hierher)
 ---
 
 
@@ -46,6 +46,40 @@ Newest-first, genau wie sie im Kopf standen:
 26. 2026-09-04 (Phase 8.5 Drift nachgezogen `4424310` + A1 committet `499d9be` -- Picker-Modus-Umschalter + `localStorage` `sfx:linkpicker:mode`; V99 `session` zu `local` als Eskalation wegen P8.5-G; erste `localStorage`-Nutzung des Projekts)
 27. 2026-09-03 (Phase 8.5 Step 0 -- Skelett phase8_5_picker_release/{CLAUDE.md, SESSIONS_ARCHIVE.md, scripts/} angelegt; vier Paragraph-1-Funde: INDEX 52.911 zu 40.917 B unter Cap, Bueroklammer-zu-Lupe-Drift in phase8_ui_graph/CLAUDE.md:440, Phase-8-Bilanz korrigiert; ROADMAP-Abschnitt neu; Wurzel-`down:` umgestellt)
 28. 2026-09-01 (Phase 8 Sichtpruefung 1 + Gate B zu C bestanden; **Hard Rule 9 ergaenzt** -- kein `pkill -f` mit Regex, niemals den systemd-Dienst anfassen, Lehre aus dem Prod-Vorfall 2026-09-01 Phase 8 Step A3 Nachbereitung)
+
+**[2026-10-05, V188 ist beantwortet — die Seite **kann** das Beenden des macOS-Vollbilds per ESC
+nicht verhindern, und auf dem MacBook existiert der einzige Hebel dafür gar nicht; dazu der letzte
+`KNOWN_OFFENDERS`-Eintrag und drei datierte Korrekturen am Doku-Drift aus dem settings-Closeout —
+ein Commit, reine Doku, kein Code, kein Deploy, kein Service-Touch.]** Die beiden Sichtprüfungs-
+und Deploy-Schritte bleiben Nikinger-Arbeit; die zwei Punkte, die M3 machen konnte, sind erledigt.
+**V188 ✅ mit vier Quellen** (drei nachgelesen, eine am Repo gemessen) ⇒ **P9-27 ⬜ → ⚠️, D1
+geschlossen, kein Code gebaut** — genau die Entscheidung, die das Plan-§4 unter dieser Bedingung
+zugelassen hat. Die Kette: `app.js:259` ist der **einzige** `fullscreen`-Bezug der ganzen App, die
+Web-Fullscreen-API greift im nativen macOS-Vollbild nicht ⇒ **das Vorhandensein eines immer
+wirkenden Ausgangs ist Pflicht** (WHATWG Fullscreen §8, Anti-Spoofing) · WICG Keyboard Lock §7
+**darf** ihn nicht abschalten, auch nicht bei *allen* angeforderten Tasten, und verschiebt nur
+(„langer ESC" > 2 s) · §4.2 gilt nur für JS-initiiertes Vollbild · und MDNs `browser-compat-data`
+sagt `Keyboard.lock` → **`safari: false`**. Das Plan-Wort „*meines Wissens* nur in Chromium" ist
+damit **gemessen statt geglaubt**, und für den Anwendungsfall schärfer als die Frage. **P9-28
+bleibt ✅** — der Guard ist für das *Web*-Vollbild richtig, das ist eine andere Frage.
+**Drei falsche Sätze korrigiert, alle aus dem settings-Closeout §6.1:** (1) die Matrix behauptete im
+datierten „Reihenfolge"-Block, der Deploy `v3.1.1` schließe **P9-15**, weil `health_gate.sh` die
+`/api/v1/overview`-Läufe mache — **ein Health-Gate liefert Läufe ohne Kriterium**, denn P9-15 stellt
+gegen 372,9 ms und der Wert ist nie über Funnel gemessen worden (V151); (2) zwei Ebenen darunter
+sagte derselbe Absatz, P9-15 sei „Arbeit des Deploy-Tags" — die Zeile ist **seit dem 2026-10-03
+gemessen** (⚠️), und Modulstatus und Wurzel trugen denselben Fehler; (3) „seit dem 2026-10-04 ist
+kein ⬜ ein Personenschritt" war mit **P9-94 falsch geworden** — zwei der drei ⬜ brauchen ein
+MacBook mit Hotspot, und der Satz davor war im Repo **ungrammatisch** (angebrochener Halbsatz).
+**Der letzte `KNOWN_OFFENDERS`-Eintrag ist gestrichen:** `docs/screenshots/README.md` trug **beide**
+Ausprägungen zugleich (Feld **fehlt ganz** + zwei von sechs Fäden mit `updated: `-Präfix, für das
+der Rotationsanker blind ist); repariert in zwei Schritten, weil `prepend_updated_chain.sh` ein
+vorhandenes `^updated: ` **verlangt** — die sechs Fadeninhalte **byteweise** gegengeprüft.
+**Zwei Zeilen** in `test_acceptance_numbers.py` (Bilanz-Konstanten, **vor** dem Schreiben gesetzt,
+sonst wäre der Wächter eine Tautologie), **eine Zeile entfernt** in `test_updated_chain.py`. Kein
+Test hinzugefügt, keiner umgedreht, Tabu-Diff §0.3 leer, Release `v3.1.3` unverändert.
+**Offen, in dieser Reihenfolge:** Sichtprüfung der acht Bilder (entscheidet P9-97/P9-99) · Deploy
+`v3.1.3` · P9-94/P9-11-Portscan · P9-13/V150 (wandert nach P10, kein Blocker) · V162 *(Lesart A)* ·
+Gate/Z-Rest (Übersichtsgrafik, ROADMAP-Zeile, Phase auf ✅).
 
 **[2026-10-05, die sieben Punkte aus der Bildsichtung sind gebaut — und zwei davon haben die Vorgabe
 selbst widerlegt — ein Commit, reines Frontend, kein Deploy, kein Service-Touch.]** Der Nikinger hat

@@ -1,0 +1,412 @@
+{
+  "base_url": "https://127.0.0.1:18775",
+  "plan": "docs/concepts/phase9_hardening_block_settings_plan.md §11",
+  "messwerte": {
+    "P9-104_flaeche": {
+      "menuepunkt": {
+        "l": 654.5,
+        "r": 785.5,
+        "w": 131,
+        "t": 419.72,
+        "h": 35.69,
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))",
+        "borderColor": "rgb(29, 67, 116)",
+        "color": "rgb(196, 205, 216)",
+        "boxShadow": "rgba(255, 255, 255, 0.06) 0px 1px 0px 0px inset",
+        "justify": "center",
+        "textAlign": "left",
+        "padL": "8px",
+        "padR": "8px",
+        "text": {
+          "l": 667,
+          "r": 773,
+          "mid": 720,
+          "txt": "Passwort ändern"
+        }
+      },
+      "standard": {
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))",
+        "borderColor": "rgb(29, 67, 116)",
+        "color": "rgb(233, 237, 242)",
+        "boxShadow": "rgba(255, 255, 255, 0.06) 0px 1px 0px 0px inset"
+      }
+    },
+    "P9-105_auswahl": {
+      "menuepunkt": {
+        "l": 456.5,
+        "r": 587.5,
+        "w": 131,
+        "t": 294.58,
+        "h": 35.69,
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(rgb(92, 160, 247), rgb(44, 116, 214))",
+        "borderColor": "rgb(18, 60, 116)",
+        "color": "rgb(255, 255, 255)",
+        "boxShadow": "rgba(255, 255, 255, 0.28) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.55) 0px 1px 2px 0px, rgba(0, 0, 0, 0.3) 0px 3px 8px 0px",
+        "justify": "center",
+        "textAlign": "left",
+        "padL": "8px",
+        "padR": "8px",
+        "text": {
+          "l": 469,
+          "r": 575,
+          "mid": 522,
+          "txt": "Passwort ändern"
+        }
+      },
+      "hauptknopf": {
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(rgb(92, 160, 247), rgb(44, 116, 214))",
+        "borderColor": "rgb(18, 60, 116)",
+        "color": "rgb(255, 255, 255)",
+        "boxShadow": "rgba(255, 255, 255, 0.28) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.55) 0px 1px 2px 0px, rgba(0, 0, 0, 0.3) 0px 3px 8px 0px"
+      }
+    },
+    "P9-106_passwort": {
+      "aendern": {
+        "l": 785.5,
+        "r": 870.5,
+        "w": 85,
+        "t": 611.11,
+        "h": 40.8,
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))",
+        "borderColor": "rgb(29, 67, 116)",
+        "color": "rgb(229, 72, 77)",
+        "boxShadow": "rgba(255, 255, 255, 0.06) 0px 1px 0px 0px inset",
+        "justify": "normal",
+        "textAlign": "center",
+        "padL": "14px",
+        "padR": "14px",
+        "text": {
+          "l": 800.5,
+          "r": 855.5,
+          "mid": 828,
+          "txt": "Ändern"
+        }
+      },
+      "vorsicht": {
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))",
+        "borderColor": "rgb(29, 67, 116)",
+        "color": "rgb(229, 72, 77)",
+        "boxShadow": "rgba(255, 255, 255, 0.06) 0px 1px 0px 0px inset"
+      }
+    },
+    "P9-107_versatz_speisezilen_px": 1.0,
+    "P9-108_member_feld": {
+      "name": {
+        "l": 947.5,
+        "r": 1181.5,
+        "w": 234,
+        "t": 156.69,
+        "h": 40.8,
+        "background": "rgb(12, 16, 21)",
+        "backgroundImage": "none",
+        "borderColor": "rgba(255, 255, 255, 0.16)",
+        "color": "rgb(233, 237, 242)",
+        "boxShadow": "rgba(0, 0, 0, 0.55) 0px 2px 5px 0px inset, rgba(255, 255, 255, 0.04) 0px -1px 0px 0px inset",
+        "justify": "normal",
+        "textAlign": "start",
+        "padL": "8px",
+        "padR": "8px",
+        "text": null
+      },
+      "auswahl": {
+        "l": 947.5,
+        "r": 1056.5,
+        "w": 109,
+        "t": 205.48,
+        "h": 40.8,
+        "background": "rgb(12, 16, 21)",
+        "backgroundImage": "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A7B2BF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>\")",
+        "borderColor": "rgba(255, 255, 255, 0.16)",
+        "color": "rgb(233, 237, 242)",
+        "boxShadow": "rgba(0, 0, 0, 0.55) 0px 2px 5px 0px inset, rgba(255, 255, 255, 0.04) 0px -1px 0px 0px inset",
+        "justify": "normal",
+        "textAlign": "start",
+        "padL": "8px",
+        "padR": "28px",
+        "text": {
+          "l": 0,
+          "r": 0,
+          "mid": 0,
+          "txt": "lesen"
+        }
+      },
+      "hinzu": {
+        "l": 1064.5,
+        "r": 1181.5,
+        "w": 117,
+        "t": 205.48,
+        "h": 40.8,
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))",
+        "borderColor": "rgb(29, 67, 116)",
+        "color": "rgb(233, 237, 242)",
+        "boxShadow": "rgba(255, 255, 255, 0.06) 0px 1px 0px 0px inset",
+        "justify": "normal",
+        "textAlign": "center",
+        "padL": "14px",
+        "padR": "14px",
+        "text": {
+          "l": 1079.5,
+          "r": 1166.5,
+          "mid": 1123,
+          "txt": "Hinzufügen"
+        }
+      }
+    },
+    "P9-109_anlegezeile": {
+      "feld": {
+        "l": 653.5,
+        "r": 833.5,
+        "w": 180,
+        "t": 848.19,
+        "h": 40.8,
+        "background": "rgb(12, 16, 21)",
+        "backgroundImage": "none",
+        "borderColor": "rgba(255, 255, 255, 0.16)",
+        "color": "rgb(233, 237, 242)",
+        "boxShadow": "rgba(0, 0, 0, 0.55) 0px 2px 5px 0px inset, rgba(255, 255, 255, 0.04) 0px -1px 0px 0px inset",
+        "justify": "normal",
+        "textAlign": "start",
+        "padL": "8px",
+        "padR": "8px",
+        "text": null
+      },
+      "knopf": {
+        "l": 841.5,
+        "r": 983.5,
+        "w": 142,
+        "t": 848.19,
+        "h": 40.8,
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))",
+        "borderColor": "rgb(29, 67, 116)",
+        "color": "rgb(233, 237, 242)",
+        "boxShadow": "rgba(255, 255, 255, 0.06) 0px 1px 0px 0px inset",
+        "justify": "normal",
+        "textAlign": "center",
+        "padL": "14px",
+        "padR": "14px",
+        "text": {
+          "l": 856.5,
+          "r": 968.5,
+          "mid": 912.5,
+          "txt": "Space anlegen"
+        }
+      },
+      "innen_l": 652.5,
+      "innen_r": 984.5
+    },
+    "P9-108_bei_1024": {
+      "name": {
+        "l": 443,
+        "r": 677,
+        "w": 234,
+        "t": 379.64,
+        "h": 40.8,
+        "background": "rgb(12, 16, 21)",
+        "backgroundImage": "none",
+        "borderColor": "rgba(255, 255, 255, 0.16)",
+        "color": "rgb(233, 237, 242)",
+        "boxShadow": "rgba(0, 0, 0, 0.55) 0px 2px 5px 0px inset, rgba(255, 255, 255, 0.04) 0px -1px 0px 0px inset",
+        "justify": "normal",
+        "textAlign": "start",
+        "padL": "8px",
+        "padR": "8px",
+        "text": null
+      },
+      "auswahl": {
+        "l": 443,
+        "r": 552,
+        "w": 109,
+        "t": 428.44,
+        "h": 40.8,
+        "background": "rgb(12, 16, 21)",
+        "backgroundImage": "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A7B2BF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>\")",
+        "borderColor": "rgba(255, 255, 255, 0.16)",
+        "color": "rgb(233, 237, 242)",
+        "boxShadow": "rgba(0, 0, 0, 0.55) 0px 2px 5px 0px inset, rgba(255, 255, 255, 0.04) 0px -1px 0px 0px inset",
+        "justify": "normal",
+        "textAlign": "start",
+        "padL": "8px",
+        "padR": "28px",
+        "text": {
+          "l": 0,
+          "r": 0,
+          "mid": 0,
+          "txt": "lesen"
+        }
+      },
+      "hinzu": {
+        "l": 560,
+        "r": 677,
+        "w": 117,
+        "t": 428.44,
+        "h": 40.8,
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(rgb(12, 28, 49), rgb(5, 11, 19))",
+        "borderColor": "rgb(29, 67, 116)",
+        "color": "rgb(233, 237, 242)",
+        "boxShadow": "rgba(255, 255, 255, 0.06) 0px 1px 0px 0px inset",
+        "justify": "normal",
+        "textAlign": "center",
+        "padL": "14px",
+        "padR": "14px",
+        "text": {
+          "l": 575,
+          "r": 662,
+          "mid": 618.5,
+          "txt": "Hinzufügen"
+        }
+      }
+    }
+  },
+  "befunde": [
+    {
+      "pruefung": "Vorbereitung Übersicht geladen",
+      "ok": true,
+      "detail": "17 Spaces in der Rail"
+    },
+    {
+      "pruefung": "S1/P9-103 zwei Abstaende zwischen den drei Punkten",
+      "ok": false,
+      "detail": "[0.0, 0.0] px"
+    },
+    {
+      "pruefung": "S1/P9-103 Abstand == der der Space-Zeilen",
+      "ok": false,
+      "detail": "Menü [0.0, 0.0] px, Liste 8px"
+    },
+    {
+      "pruefung": "S2/P9-104 unausgewählter Menüpunkt == Standardknopf (Fläche)",
+      "ok": true,
+      "detail": "'linear-gradient(rgb(12, 28, 49), rgb(5, 11, ' vs 'linear-gradient(rgb(12, 28, 49), rgb(5, 11, '"
+    },
+    {
+      "pruefung": "S2/P9-104 auch der Innenschatten ist derselbe",
+      "ok": true,
+      "detail": "'rgba(255, 255, 255, 0.06) 0px 1px 0px 0px in'"
+    },
+    {
+      "pruefung": "S2/P9-99 Beschriftung weiterhin mittig",
+      "ok": true,
+      "detail": "Textmitte 720, Knopfmitte 720.0"
+    },
+    {
+      "pruefung": "S1/P9-96 Titelabstand unverändert 24 px",
+      "ok": true,
+      "detail": "24.0 px"
+    },
+    {
+      "pruefung": "S3/P9-105 ausgewählter Menüpunkt == Akzentfläche wie .btn-primary",
+      "ok": true,
+      "detail": "'linear-gradient(rgb(92, 160, 247), rgb(44, 116, 214)' vs 'linear-gradient(rgb(92, 160, 247), rgb(44, 116, 214)'"
+    },
+    {
+      "pruefung": "S3/P9-105 die Kante auch",
+      "ok": true,
+      "detail": "rgb(18, 60, 116) vs rgb(18, 60, 116)"
+    },
+    {
+      "pruefung": "S4/P9-106 der Knopf Ändern trägt die Vorsichtsfarbe",
+      "ok": true,
+      "detail": "rgb(229, 72, 77) vs rgb(229, 72, 77)"
+    },
+    {
+      "pruefung": "S4/P9-106 und die Standardfläche, keine gefüllte rote",
+      "ok": true,
+      "detail": "'linear-gradient(rgb(12, 28, 49), rgb(5, 11, '"
+    },
+    {
+      "pruefung": "S4/P9-106 Abbrechen ist weg, Schließen da",
+      "ok": true,
+      "detail": "'Passwort ändern' …"
+    },
+    {
+      "pruefung": "S3/P9-105 genau ein Punkt trägt aria-current=true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "pruefung": "S5 Spaces als Stufe 2",
+      "ok": true,
+      "detail": "17 Zeilen"
+    },
+    {
+      "pruefung": "S5/P9-107 Space-Zeilen-Beschriftung == Titel (links)",
+      "ok": true,
+      "detail": "1.0 px Versatz"
+    },
+    {
+      "pruefung": "S5/P9-109 Feld und Knopf auf einer Zeile",
+      "ok": true,
+      "detail": "Feld top 848.19, Knopf top 848.19"
+    },
+    {
+      "pruefung": "S5/P9-109 Feld bündig links mit dem Panelinhalt",
+      "ok": true,
+      "detail": "Feld 653.5, Inhalt 652.5"
+    },
+    {
+      "pruefung": "S5/P9-109 Knopf bündig rechts mit dem Panelinhalt",
+      "ok": true,
+      "detail": "Knopf 983.5, Inhalt 984.5"
+    },
+    {
+      "pruefung": "S5 Detail offen",
+      "ok": true,
+      "detail": "sichtbar: ['settings-menu', 'settings-spaces', 'settings-space-detail']"
+    },
+    {
+      "pruefung": "S5/P9-108 Namensfeld == Auswahl-Knopf (links)",
+      "ok": true,
+      "detail": "Feld 947.5, Auswahl 947.5 (Differenz 0.0 px)"
+    },
+    {
+      "pruefung": "S5/P9-108 Namensfeld == Aktion rechts",
+      "ok": true,
+      "detail": "Feld 1181.5, Knopf 1181.5"
+    },
+    {
+      "pruefung": "S5/P9-AY das Feld ist NICHT über die Panelbreite hinaus gewachsen",
+      "ok": true,
+      "detail": "234 px breit"
+    },
+    {
+      "pruefung": "S5/P9-101 Detail-Titelabstand == Menü-Titelabstand",
+      "ok": true,
+      "detail": "24.0 px"
+    },
+    {
+      "pruefung": "S6/P9-AI genau ein Panel sichtbar",
+      "ok": true,
+      "detail": "['settings-space-detail']"
+    },
+    {
+      "pruefung": "S6/P9-108 auch bei 1024 beidseitig bündig",
+      "ok": true,
+      "detail": "links 0 px, rechts 0 px"
+    },
+    {
+      "pruefung": "S7 Passwortwechsel HTTP 200",
+      "ok": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "pruefung": "S8 Space anlegen: eine Zeile mehr",
+      "ok": true,
+      "detail": "17 -> 18"
+    },
+    {
+      "pruefung": "S8/P9-107 auch die neue Zeile bündig",
+      "ok": true,
+      "detail": "neu 654.5, Titel 653.5"
+    }
+  ],
+  "alle_ok": false
+}

@@ -178,37 +178,34 @@ Durchführung über `scripts/rotate_session_block.sh <phase_verzeichnis>`, nie v
 u. a. byteweise Reassemblierung und Nachlesen jedes Blocks), **nie von Hand**. Die vollständige
 Chronik der Phasen 1–8, der Hard-Rule-Korrekturen und der älteren Blöcke: `docs/PROJECT_SESSION_LOG.md` (L3).*
 
-**[2026-10-05, V188 ist beantwortet — die Seite **kann** das Beenden des macOS-Vollbilds per ESC
-nicht verhindern, und auf dem MacBook existiert der einzige Hebel dafür gar nicht; dazu der letzte
-`KNOWN_OFFENDERS`-Eintrag und drei datierte Korrekturen am Doku-Drift aus dem settings-Closeout —
-ein Commit, reine Doku, kein Code, kein Deploy, kein Service-Touch.]** Die beiden Sichtprüfungs-
-und Deploy-Schritte bleiben Nikinger-Arbeit; die zwei Punkte, die M3 machen konnte, sind erledigt.
-**V188 ✅ mit vier Quellen** (drei nachgelesen, eine am Repo gemessen) ⇒ **P9-27 ⬜ → ⚠️, D1
-geschlossen, kein Code gebaut** — genau die Entscheidung, die das Plan-§4 unter dieser Bedingung
-zugelassen hat. Die Kette: `app.js:259` ist der **einzige** `fullscreen`-Bezug der ganzen App, die
-Web-Fullscreen-API greift im nativen macOS-Vollbild nicht ⇒ **das Vorhandensein eines immer
-wirkenden Ausgangs ist Pflicht** (WHATWG Fullscreen §8, Anti-Spoofing) · WICG Keyboard Lock §7
-**darf** ihn nicht abschalten, auch nicht bei *allen* angeforderten Tasten, und verschiebt nur
-(„langer ESC" > 2 s) · §4.2 gilt nur für JS-initiiertes Vollbild · und MDNs `browser-compat-data`
-sagt `Keyboard.lock` → **`safari: false`**. Das Plan-Wort „*meines Wissens* nur in Chromium" ist
-damit **gemessen statt geglaubt**, und für den Anwendungsfall schärfer als die Frage. **P9-28
-bleibt ✅** — der Guard ist für das *Web*-Vollbild richtig, das ist eine andere Frage.
-**Drei falsche Sätze korrigiert, alle aus dem settings-Closeout §6.1:** (1) die Matrix behauptete im
-datierten „Reihenfolge"-Block, der Deploy `v3.1.1` schließe **P9-15**, weil `health_gate.sh` die
-`/api/v1/overview`-Läufe mache — **ein Health-Gate liefert Läufe ohne Kriterium**, denn P9-15 stellt
-gegen 372,9 ms und der Wert ist nie über Funnel gemessen worden (V151); (2) zwei Ebenen darunter
-sagte derselbe Absatz, P9-15 sei „Arbeit des Deploy-Tags" — die Zeile ist **seit dem 2026-10-03
-gemessen** (⚠️), und Modulstatus und Wurzel trugen denselben Fehler; (3) „seit dem 2026-10-04 ist
-kein ⬜ ein Personenschritt" war mit **P9-94 falsch geworden** — zwei der drei ⬜ brauchen ein
-MacBook mit Hotspot, und der Satz davor war im Repo **ungrammatisch** (angebrochener Halbsatz).
-**Der letzte `KNOWN_OFFENDERS`-Eintrag ist gestrichen:** `docs/screenshots/README.md` trug **beide**
-Ausprägungen zugleich (Feld **fehlt ganz** + zwei von sechs Fäden mit `updated: `-Präfix, für das
-der Rotationsanker blind ist); repariert in zwei Schritten, weil `prepend_updated_chain.sh` ein
-vorhandenes `^updated: ` **verlangt** — die sechs Fadeninhalte **byteweise** gegengeprüft.
-**Zwei Zeilen** in `test_acceptance_numbers.py` (Bilanz-Konstanten, **vor** dem Schreiben gesetzt,
-sonst wäre der Wächter eine Tautologie), **eine Zeile entfernt** in `test_updated_chain.py`. Kein
-Test hinzugefügt, keiner umgedreht, Tabu-Diff §0.3 leer, Release `v3.1.3` unverändert.
-**Offen, in dieser Reihenfolge:** Sichtprüfung der acht Bilder (entscheidet P9-97/P9-99) · Deploy
-`v3.1.3` · P9-94/P9-11-Portscan · P9-13/V150 (wandert nach P10, kein Blocker) · V162 *(Lesart A)* ·
-Gate/Z-Rest (Übersichtsgrafik, ROADMAP-Zeile, Phase auf ✅).
+**[2026-10-05, die zweite Bildsichtung ist gebaut — vier Punkte, und der Auftrag hat zwei Locks vom
+Vortag widerrufen — opencode/M3, ein Commit, reines Frontend, kein Deploy, kein Service-Touch.]**
+Der Nikinger hat die vier Bilder aus `screenshots_latest/` angesehen und vier Punkte notiert
+(Mini-Plan §11, Locks **P9-AU–P9-AZ**, Abnahme **P9-103–P9-111** mit **9 ✅**). **Der Kern des
+Blocks ist eine Umkehr:** *„since they are buttons and not fields to type something in"* — damit
+ist **P9-AN widerrufen** (die Menüpunkte trugen die Fläche des **Eingabefeldes**), und die
+ausgewählte Fläche aus **P9-AO** auch. Die unausgewählten Punkte tragen jetzt die
+**Standardknopf-Fläche** (`--btn-std-fill`), der ausgewählte die **Akzentfläche** wie ein
+Hauptknopf — **seine ausdrückliche Entscheidung aus der Rückfrage**, gegen die Alternative
+„Standard + Rail-Akzent". Weitere Punkte: **8 px Abstand** zwischen den Menüpunkten (gemessen
+vorher **0 px** — „glued to each other"), **„Ändern" rot** wie „Archivieren" (Vorsicht: teuer
+rückgängig zu machen) und **„Schließen"** statt „Abbrechen", Beschriftung der Space-Zeilen bündig
+mit dem Panel-Titel (vorher **33 px**), Namensfeld im Detail **beidseitig bündig** (vorher 12 px zu
+schmal, als **Rasterfolge** gebaut und **nicht** als Breite), Anlegezeile **eine Zeile** (vorher
+80 px Versatz). **Ein Gegenlauf fand eine Messlücke statt eines Defekts:** G11 blieb grün, weil ein
+**geschrumpfter** Knopf dieselben Kanten hält, obwohl der Lock wörtlich „Space anlegen in seiner
+Größe gleich lassen" verlangt — die Station misst jetzt die Eigenbreite an einer Kopie. **Sechs
+Wächter umgeschrieben, keiner gelöscht**, jeder mit beiden Lesarten und Datum; **zwei eigene
+Fehler** dieses Blocks, beide „die erste Regel ist nicht die, die ich meine" (ein Wächter riss
+`rgba(255,255,255,.06)` an jedem Komma auseinander, ein Helper nahm die Übergangs-Sammelregel
+statt der Flächenregel). **Zwei Softcap-Überschreitungen neu benannt statt versteckt:**
+Abnahmematrix **84.161 B**, settings-Mini-Plan **49.655 B** — **der Plan ist erst durch diesen
+Block über den Cap gekommen**, und ein Kürzen in ein L3-Archiv wäre **Nikinger-Entscheidung**,
+deshalb gemeldet statt getan. `pytest` **1238 → 1246**, Probe **29/29**, **Gegenläufe G7–G12 6 von
+6**, `ui_budget` 5/5, Tabu-Diff §0.3 leer. **Bilder:** `screenshots_latest/` auf **acht**
+Symlinks rotiert (seine Anordnung: „give me all 8"), README mit Kriterium je Bild — **offen bleibt
+der eine Punkt, den die Bilder nicht tragen können**: die Mitgliederliste, im Harness ohne Mitglieder
+also aus dem Browser-Standard abgeleitet statt gemessen. **Offen, in dieser Reihenfolge:**
+Sichtprüfung der acht Bilder · Deploy `v3.1.3` · P9-94/P9-11-Portscan · P9-13/V150 · Softcap des
+settings-Plans · Gate/Z-Rest.
 
