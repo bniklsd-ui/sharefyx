@@ -193,11 +193,10 @@ wirksam** (`g19` ist P9-BF als Mutation: `padding-left` zurück auf `0`), `pytes
 
 ### Offen, in dieser Reihenfolge
 
-1. **Sichtprüfung des neuen Bildes 08** (ein Bild — wenn es passt, ist der Block nach Aussage des
-   Nikingers erledigt)
-2. **Deploy `v3.1.3`** (Nikinger) — Badge und `## 2026-10-05`-Block stehen unverändert
-3. **P9-94 / P9-11** — der Portscan (MacBook, Handy-Hotspot, vier Ziele, Mini-Plan §5)
-4. **P9-13 / V150** — zweites Claude-Konto; wandert nach P10, **kein Blocker**
-5. **Softcap: settings-Plan 64.996 B und Abnahmematrix 95.152 B** — „kürzen notieren" ist angeordnet
+1. **Deploy `v3.1.3`** (Nikinger) — Badge und `## 2026-10-05`-Block stehen unverändert; dieser Block hat
+   nichts am Release geändert, später `SHAREFYX_ALLOW_STALE_UPDATELOG=1` oder ein neuer `##`-Block
+2. **P9-94 / P9-11** — der Portscan (MacBook, Handy-Hotspot, vier Ziele, Mini-Plan §5)
+3. **P9-13 / V150** — zweites Claude-Konto; wandert nach P10, **kein Blocker**
+4. **Softcap: settings-Plan 64.996 B und Abnahmematrix 95.152 B** — „kürzen notieren" ist angeordnet
    und im §Backlog notiert; das Kürzen selbst ist Nikinger-Entscheidung
-6. **Gate/Z-Rest:** Übersichtsgrafik §12.4, `ROADMAP`-Zeile P9 → ✅, Phase auf ✅
+5. **Gate/Z-Rest:** Übersichtsgrafik §12.4, `ROADMAP`-Zeile P9 → ✅, Phase auf ✅

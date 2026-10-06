@@ -306,7 +306,7 @@ der einzelnen Spaces nach Links, und das Fenster rechts verkleinern, aber nur di
    (Feld + Abstand + Knopf = 288 px Inhalt) und **beiden** Richtungen im Wächter: die Klasse hängt
    genau einem Panel, und im Schmal-Modus ist die feste Breite zurückgenommen.
 
-| **P9-120** | Die **Space-Zeile hält innen den Standardabstand auf beiden Seiten** und ihre Beschriftung bleibt bündig mit dem Panel-Titel; das Kästchen ragt 8 px in das Panelpolster | ✅ | **P9-BF** (Bild 08, 2026-10-06): innen **9 px links wie rechts** (vorher **1 gegen 9**), Kästchen **−8 px** gegen die Inhaltskante bei 24 px Panelpolster, Beschriftung **1,0 px** bündig mit dem Titel. Gebaut als `padding-left: var(--space)` **plus** `margin-left: calc(var(--space) * -1)` — beide Locks (P9-AX und P9-BF) halten nur zusammen; `pytest` **1246**, Probe **50/50**, **G19** als Gegenlauf |
+| **P9-120** | Die **Space-Zeile hält innen den Standardabstand auf beiden Seiten** und ihre Beschriftung bleibt bündig mit dem Panel-Titel; das Kästchen ragt 8 px in das Panelpolster | ✅ | **P9-BF** (Bild 08, 2026-10-06): innen **9 px links wie rechts** (vorher **1 gegen 9**), Kästchen **−8 px** gegen die Inhaltskante bei 24 px Panelpolster, Beschriftung **1,0 px** bündig mit dem Titel. Gebaut als `padding-left: var(--space)` **plus** `margin-left: calc(var(--space) * -1)` — beide Locks (P9-AX und P9-BF) halten nur zusammen; `pytest` **1246**, Probe **50/50**, **G19** als Gegenlauf · **Sichtprüfung: *‚perfekt, passt'*** — Bild 08, 2026-10-06 |
 
 ### Sieben Befunde aus diesem Block, die keine Abnahmezeile sind
 

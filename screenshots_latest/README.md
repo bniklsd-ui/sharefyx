@@ -79,7 +79,7 @@ Menü, Passwort, Detail und Update-Log behalten ihre Breite).
 | `05_einstellungen_schmal_1024.png` | ✅ *„yo, passt"* |
 | `06_einstellungen_passwort_gewechselt.png` | ✅ *„identisch zu 1, passt"* |
 | `07_einstellungen_space_angelegt.png` | ✅ *„passt so"* |
-| `08_einstellungen_rueckmeldung.png` | **ein Punkt → P9-BF gebaut**, dieses Bild ist die einzige verlangte Neuerstellung: *„den Auswahl buttons der einzelnen Spaces bitte ein paar Px nach links erweitern, sodass innerliegender Text und Button Grenze den Standard Abstand einhalten"* |
+| `08_einstellungen_rueckmeldung.png` | ✅ *„perfekt, passt"* — **ein Punkt → P9-BF gebaut**, dieses Bild war die einzige verlangte Neuerstellung: *„den Auswahl buttons der einzelnen Spaces bitte ein paar Px nach links erweitern, sodass innerliegender Text und Button Grenze den Standard Abstand einhalten"* |
 
 ### Stand der Sichtprüfung, zweite Runde (2026-10-06 — vier Punkte, vier neue)
 
