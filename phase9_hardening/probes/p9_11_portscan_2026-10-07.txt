@@ -1,0 +1,92 @@
+# P9-11 / P9-94 -- Portscan von aussen, 2026-10-07, MacBook des Nikingers
+# Verbatim aus dem Chat der Session 31ea0b89 (Claude Code), vom Nikinger eingefuegt.
+# Netzwechsel nach der Anleitung jener Session (Reihenfolge A -> B -> C, die Ausgabe folgt ihr):
+#   A  Handy-Hotspot, Tailscale aus : curl ifconfig.me, Lauf 1 (Heim-IP), Lauf 2 (VPS)
+#   B  Handy-Hotspot, Tailscale an  : Lauf 4 (Tailnet-IP, nur 8765)
+#   C  Heim-WLAN,     Tailscale aus : Lauf 3 (LAN, 8765 + 8000-9000), Lauf 3b (LAN, alle Ports, nicht im Plan)
+#   5  Handy-Hotspot, Tailscale aus : Kontrolllauf gegen 1.1.1.1 / 9.9.9.9 (vom Nikinger so bezeichnet)
+# Der Nikinger 2026-10-07 auf die Netzfrage: "exactly as Sonnet 5.5 ordered in the Session, i cant
+# remember exactly but i followed the instructions".
+# Die Heim-IP 176.2.194.125 ist am 2026-10-07 auf der VM per `curl -s -4 https://ifconfig.me` bestaetigt;
+# die VM hat ausser der Tailscale-ULA (fd7a:...) keine globale IPv6 (`ip -6 addr show scope global`).
+
+## Chat-Eingang 2026-10-07T14:30:43.147Z
+here you go: 
+niklasbusch@MacBook-Air-von-Niklas-2 portscan % curl -s https://ifconfig.me; echo
+2a02:3033:272:8ec8:dd63:7eda:90cc:dfc7
+niklasbusch@MacBook-Air-von-Niklas-2 portscan % nmap -Pn -T4 -oN 1_home_ip.txt 176.2.194.125 
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-07 16:25 +0200
+Nmap scan report for dynamic-176-002-194-125.176.2.pool.telefonica.de (176.2.194.125)
+Host is up (0.0036s latency).
+Not shown: 999 filtered tcp ports (no-response)
+PORT   STATE SERVICE
+21/tcp open  ftp
+
+Nmap done: 1 IP address (1 host up) scanned in 46.12 seconds
+niklasbusch@MacBook-Air-von-Niklas-2 portscan % nmap -Pn -T4 -oN 2_vps.txt 217.160.128.146
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-07 16:26 +0200
+Nmap scan report for ip217-160-128-146.pbiaas.com (217.160.128.146)
+Host is up (0.0038s latency).
+Not shown: 997 filtered tcp ports (no-response)
+PORT    STATE SERVICE
+21/tcp  open  ftp
+80/tcp  open  http
+443/tcp open  https
+
+Nmap done: 1 IP address (1 host up) scanned in 43.93 seconds
+niklasbusch@MacBook-Air-von-Niklas-2 portscan % nmap -Pn -p 8765 -oN 4_tailnet.txt 100.93.43.122
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-07 16:28 +0200
+Nmap scan report for savefyx-vmware-virtual-platform.tail4a8b49.ts.net (100.93.43.122)
+Host is up (0.17s latency).
+
+PORT     STATE SERVICE
+8765/tcp open  ultraseek-http
+
+Nmap done: 1 IP address (1 host up) scanned in 0.20 seconds
+niklasbusch@MacBook-Air-von-Niklas-2 portscan % nmap -Pn -p 8765,8000-9000 -oN 3_lan.txt 192.168.68.175
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-07 16:28 +0200
+WARNING: Duplicate port number(s) specified.  Are you alert enough to be using Nmap?  Have some coffee or Jolt(tm).
+Nmap scan report for 192.168.68.175
+Host is up (0.0057s latency).
+All 1001 scanned ports on 192.168.68.175 are in ignored states.
+Not shown: 1001 closed tcp ports (conn-refused)
+
+Nmap done: 1 IP address (1 host up) scanned in 5.84 seconds
+niklasbusch@MacBook-Air-von-Niklas-2 portscan % nmap -Pn -T4 -p- -oN 3b_lan_full.txt 192.168.68.175
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-07 16:29 +0200
+Nmap scan report for 192.168.68.175
+Host is up (0.0044s latency).
+Not shown: 65529 closed tcp ports (conn-refused)
+PORT      STATE SERVICE
+7070/tcp  open  realserver
+7777/tcp  open  cbt
+47984/tcp open  unknown
+47989/tcp open  unknown
+47990/tcp open  unknown
+48010/tcp open  unknown
+
+Nmap done: 1 IP address (1 host up) scanned in 68.82 seconds
+niklasbusch@MacBook-Air-von-Niklas-2 portscan %
+
+## Chat-Eingang 2026-10-07T14:34:16.137Z
+tailscale off, hotspot: 
+niklasbusch@MacBook-Air-von-Niklas-2 portscan % nmap -Pn -p 21,80,443 --reason -oN 5_control.txt 1.1.1.1 9.9.9.9
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-07 16:33 +0200
+Nmap scan report for 1.1.1.1
+Host is up, received user-set (0.012s latency).
+
+PORT    STATE SERVICE REASON
+21/tcp  open  ftp     syn-ack
+80/tcp  open  http    syn-ack
+443/tcp open  https   syn-ack
+
+Nmap scan report for dns9.quad9.net (9.9.9.9)
+Host is up, received user-set (0.0093s latency).
+
+PORT    STATE    SERVICE REASON
+21/tcp  open     ftp     syn-ack
+80/tcp  filtered http    no-response
+443/tcp open     https   syn-ack
+
+Nmap done: 2 IP addresses (2 hosts up) scanned in 1.74 seconds
+niklasbusch@MacBook-Air-von-Niklas-2 portscan %
