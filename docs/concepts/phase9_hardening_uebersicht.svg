@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="740" viewBox="0 0 1080 740" font-family="'DejaVu Sans','Segoe UI',Helvetica,Arial,sans-serif">
+
+  <rect width="1080" height="740" fill="#f7f8fa"/>
+
+  <!-- Kopf -->
+  <rect x="0" y="0" width="1080" height="86" fill="#1d2b3a"/>
+  <text x="36" y="36" font-size="19" font-weight="700" fill="#ffffff">Phase 9 — Härtung: Domain, Watchdog, Löschen, Nachvollziehbarkeit</text>
+  <text x="36" y="62" font-size="12.5" fill="#9db2c6">Sharefyx · phase9_hardening/ · live als v3.1.1 · v3.1.3 gebaut, nicht deployt · Stand 2026-10-07</text>
+  <rect x="794" y="18" width="250" height="50" rx="10" fill="#b8860b"/>
+  <text x="919" y="38" font-size="14.5" font-weight="700" fill="#ffffff" text-anchor="middle">102 ✅ · 12 ⚠️ · 3 ⬜</text>
+  <text x="919" y="57" font-size="11" fill="#fff3d0" text-anchor="middle">von 117 Abnahmezeilen (P9-120 zuletzt)</text>
+
+  <!-- Mission -->
+  <rect x="36" y="102" width="1008" height="74" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="126" font-size="13.5" font-weight="700" fill="#1d2b3a">Mission: den Server belastbar machen, bevor jemand Neues darauf baut — kein UI-Umbau, keine neue Intelligenz im Server.</text>
+  <text x="56" y="148" font-size="12" fill="#4a5a6b">Der Server bleibt <tspan font-weight="700" fill="#1d2b3a">dumm</tspan>: Aktenschrank mit Schloss. Neu sind Adresse, Wächter, Schema-Felder und ein Papierkorb — kein LLM-Call.</text>
+  <text x="56" y="167" font-size="12" fill="#4a5a6b">Zwei P1-Contract-Öffnungen (<tspan font-weight="700" fill="#1d2b3a">neunte</tspan>: doing/assignee, <tspan font-weight="700" fill="#1d2b3a">zehnte</tspan>: updated_by) — beide angekündigt, beide ohne Index-Neuaufbau.</text>
+
+  <!-- Schritte -->
+  <rect x="36" y="190" width="1008" height="430" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="214" font-size="15" font-weight="700" fill="#1d2b3a">Blöcke und Stand</text>
+
+  <g font-size="11.5" fill="#1d2b3a">
+    <rect x="56" y="228" width="300" height="52" rx="6" fill="#eaf4ee" stroke="#2f7a4d"/>
+    <text x="68" y="248" font-weight="700">0 Fundament</text><text x="68" y="266" fill="#4a5a6b">Doku-Rotation, doc_health, Baseline  ✅</text>
+
+    <rect x="370" y="228" width="300" height="52" rx="6" fill="#fdf6e3" stroke="#b8860b"/>
+    <text x="382" y="248" font-weight="700">A Domain über eigenen VPS</text><text x="382" y="266" fill="#4a5a6b">niklas ✅ · zweites Konto → P10  🟡</text>
+
+    <rect x="684" y="228" width="340" height="52" rx="6" fill="#eaf4ee" stroke="#2f7a4d"/>
+    <text x="696" y="248" font-weight="700">B tailscaled-Watchdog</text><text x="696" y="266" fill="#4a5a6b">P9-16–20, unter voller Härtung live  ✅</text>
+
+    <rect x="56" y="292" width="300" height="52" rx="6" fill="#eaf4ee" stroke="#2f7a4d"/>
+    <text x="68" y="312" font-weight="700">C Vision-Dienst RTX 3060</text><text x="68" y="330" fill="#4a5a6b">reboot-fest, ollama aus  ✅ (P9-22 deferred)</text>
+
+    <rect x="370" y="292" width="300" height="52" rx="6" fill="#fdf6e3" stroke="#b8860b"/>
+    <text x="382" y="312" font-weight="700">D ESC/Vollbild + Drop-Ziel</text><text x="382" y="330" fill="#4a5a6b">D2 belegt; D1 = Betriebssystem, kein Code  🟡</text>
+
+    <rect x="684" y="292" width="340" height="52" rx="6" fill="#eaf4ee" stroke="#2f7a4d"/>
+    <text x="696" y="312" font-weight="700">E Karten-Reload</text><text x="696" y="330" fill="#4a5a6b">kein zweiter /graph-Abruf, V118  ✅</text>
+
+    <rect x="56" y="356" width="300" height="52" rx="6" fill="#fdf6e3" stroke="#b8860b"/>
+    <text x="68" y="376" font-weight="700">F Schema doing/assignee · G Löschen</text><text x="68" y="394" fill="#4a5a6b">live seit v3.1.0; Live-Löschung offen (V162)  🟡</text>
+
+    <rect x="370" y="356" width="300" height="52" rx="6" fill="#fdf6e3" stroke="#b8860b"/>
+    <text x="382" y="376" font-weight="700">H Abhängigkeiten</text><text x="382" y="394" fill="#4a5a6b">fastmcp==3.4.7 exakt gepinnt  🟡</text>
+
+    <rect x="684" y="356" width="340" height="52" rx="6" fill="#eaf4ee" stroke="#2f7a4d"/>
+    <text x="696" y="376" font-weight="700">doing · trace · Extra (Buttons)</text><text x="696" y="394" fill="#4a5a6b">v3.1.0 / v3.1.1 live, Gate 9/9  ✅</text>
+
+    <rect x="56" y="420" width="968" height="52" rx="6" fill="#fdf6e3" stroke="#b8860b"/>
+    <text x="68" y="440" font-weight="700">S · T · R · U Einstellungen als Fensterkette und drei Bildsichtungen</text>
+    <text x="68" y="458" fill="#4a5a6b">v3.1.3 gebaut, nicht deployt · dritte Sichtprüfung: sieben von acht Bildern frei, Bild 08 → P9-BF gebaut und bestätigt  🟡</text>
+  </g>
+
+  <!-- offen -->
+  <text x="56" y="500" font-size="15" font-weight="700" fill="#1d2b3a">Was bis ✅ fehlt — und wer es tut</text>
+  <g font-size="11.5">
+    <rect x="56" y="512" width="470" height="92" rx="6" fill="#fbeaea" stroke="#b03030"/>
+    <text x="68" y="532" font-weight="700" fill="#1d2b3a">Nikinger-Schritte (nicht Code)</text>
+    <text x="68" y="551" fill="#4a5a6b">1. Deploy v3.1.3 (Updatelog-Block oder ALLOW_STALE)</text>
+    <text x="68" y="568" fill="#4a5a6b">2. Portscan P9-94 / P9-11 (MacBook, Hotspot, 4 Ziele)</text>
+    <text x="68" y="585" fill="#4a5a6b">3. Softcap-Kürzung: Plan 65 KB, Matrix 95 KB</text>
+
+    <rect x="540" y="512" width="484" height="92" rx="6" fill="#f2f5f8" stroke="#a8b8c8"/>
+    <text x="552" y="532" font-weight="700" fill="#1d2b3a">Kein Blocker, wandert nach P10</text>
+    <text x="552" y="551" fill="#4a5a6b">P9-13 / V150 — zweites Claude-Konto (Nikinger 2026-10-04)</text>
+    <text x="552" y="568" fill="#4a5a6b">P9-36 — V118: eine oder zwei Linien (Design-Frage)</text>
+    <text x="552" y="585" fill="#4a5a6b">V120 Tab-Titel, „doing“ prominent (P9-P)</text>
+  </g>
+
+  <!-- Fuß -->
+  <rect x="36" y="640" width="1008" height="76" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="664" font-size="12.5" font-weight="700" fill="#1d2b3a">Lehre der Phase</text>
+  <text x="56" y="684" font-size="11.5" fill="#4a5a6b">Eine Eigenschaft, die auf keiner Verbotsliste steht, meldet kein Wächter (padding-block, border-box, margin-bottom — dreimal).</text>
+  <text x="56" y="702" font-size="11.5" fill="#4a5a6b">Ein Gegenlauf zählt nur, wenn er die Station in der JSON prüft, nicht den Exit-Code.</text>
+</svg>
