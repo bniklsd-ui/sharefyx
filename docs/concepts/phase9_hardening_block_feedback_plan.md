@@ -7,7 +7,7 @@ up: ../../phase9_hardening/CLAUDE.md
 down:
   - ./phase9_hardening_plan.md                 # 📕 P9-Plan; Lock P9-A (kein UI-Umbau), P9-K (Löschen nur eigene), §15 P10-Liste
   - ./phase9_hardening_block_settings_plan.md  # Formvorlage; Einstellungs-Kette P9-AE–P9-AL, auf der B4/B5 aufsetzen
-updated: 2026-10-07 (angelegt — Rückmeldung des Nikingers vom selben Tag, gegen `main@497c5bd` am Code gelesen; **nichts gebaut**)
+updated: 2026-10-07 (**Nikinger-Entscheidungen E1–E3 eingetragen**: E1 freigegeben — Lock P9-BP, fremde Items im Team-Space löschbar, Eigentum über den Git-Autor nachverfolgt (P9-BQ); E2 und E3 wandern als offene Punkte in den Closeout/P10; Closeout erst nach B1–B8 + E1a) | 2026-10-07 (angelegt — Rückmeldung des Nikingers vom selben Tag, gegen `main@497c5bd` am Code gelesen; **nichts gebaut**)
 ---
 
 # Phase 9 — Block feedback: die Rückmeldung vom 2026-10-07
@@ -122,7 +122,28 @@ Dann wird `phase5_ui/webui/api.py` angefasst, nicht die Permissions-Schicht. Erl
 | **P9-BN** | **Das Einstellungsmenü bekommt „Schließen"** als `.btn` in `.overlay__actions`. Der Knopf schließt die **ganze** Kette, nicht nur das Menü | Ein Menü, das die Kette offen ließe, wäre ein Zustand, den ESC nie erzeugt |
 | **P9-BO** | **Ladezeit: erst messen, dann bauen.** Kein Cache und kein Prefetch ohne V190. Ein Cache darf **nie** eine veraltete `version` zum Schreiben anbieten (Hard Rule 3). Er zeigt höchstens und lädt nach | Der einzige gemessene Wert (P9-15) betrifft `/overview`, nicht den Space-Wechsel. Raten wäre hier am teuersten |
 
-## §3 Scope-Entscheidungen für den Nikinger (**nicht** gebaut, bis entschieden)
+## §3 Scope-Entscheidungen — **entschieden 2026-10-07**
+
+| Frage | Entscheidung des Nikingers (wörtlich) | Folge |
+|---|---|---|
+| E1 | *„yes, that's thesable. But still track ownership if possible."* | **P9-BP gelockt** (Vorschlag unten, mit „alle Items"), dazu **P9-BQ**; Bauschritt **E1a** |
+| E2 | *„fair, move it into the closeout as open items."* | **Nicht in P9 gebaut.** Ordner- und Space-Umbenennen stehen als offene Punkte im Closeout (P10-Liste), V193/V194 gehen mit |
+| E3 | *„also fair, in my opinion."* | **P10**, Leitprojekt neben dem Karten-Umbau; in die P10-Liste des Closeouts |
+| Closeout | *„closeout after these changes are wired."* | Closeout P9 **nach** B1–B8 und E1a |
+
+**P9-BQ — Eigentum nachverfolgen, ohne neues Feld.**
+- Seit Block trace (P9-AC, 2026-10-02) trägt jeder Git-Commit im Datenverzeichnis den Handelnden als
+  Autor (`phase1_storage/storage/history.py:68`).
+- Der Anlege-Commit nennt also, wer angelegt hat. Der Papierkorb-Commit nennt, wer gelöscht hat.
+- `updated_by` (Frontmatter) nennt, wer zuletzt geändert hat.
+- **Ein `created_by`-Feld wäre die elfte P1-Contract-Öffnung.** Es wird deshalb in P9 nicht gebaut.
+  Es steht als P10-Option im Closeout, falls die Git-Spur im UI sichtbar werden soll.
+- **Was E1a zeigt:** der Löschdialog im Team-Space nennt „zuletzt geändert von *X*" (`updated_by`),
+  wenn das Feld da ist. Wer löscht, sieht dann, ob es das eigene Item ist.
+- **Grenze, benannt:** Items vor dem 2026-10-02 tragen im Anlege-Commit die Default-Identität
+  (`Space Server`). Ihr Anleger ist nur aus dem Kontext zu erschließen.
+
+*Der Vorschlagstext von E1–E3 bleibt unten unverändert stehen, als Herleitung.*
 
 **E1 — R5: Verschieben, Archivieren, Löschen, Drag & Drop in Team-Spaces.**
 - **Vorschlag als Lock P9-BP:** in einem Space, der **nicht** der Home-Space eines Nutzers ist
@@ -176,8 +197,10 @@ Dann wird `phase5_ui/webui/api.py` angefasst, nicht die Permissions-Schicht. Erl
 | **B7** | Übersicht: Name vor Chips | P9-BJ | Probe bei 1440/1024/390 px mit einem Space mit **allen** Eimern gefüllt: Name voll lesbar (`scrollWidth <= clientWidth`) bis 16 Zeichen, Chips in ≤ 2 Zeilen. Gegenlauf: alte Regel → rot |
 | **B8** | Ladezeit: erst V190 messen, dann **ein** gezielter Fix oder der Befund nach P10 | P9-BO | Messung vorher/nachher, drei Läufe, aus dem Browser (Muster P9-15) |
 
+| **E1a** | Team-Spaces: verschieben, archivieren, löschen, Drag & Drop. Der Server liefert `team: true` je Space (V192). `api.py:1067` und `api.py:956` bekommen die Team-Ausnahme, `list.js:426` `movable` übernimmt sie. Der Löschdialog nennt `updated_by` | P9-BP, P9-BQ | Unit-Tests: Team-Space verschieben/löschen ✓ (auch ein fremdes Item); fremder Home-Space mit `share_write` löschen → 403 (**Gegenlauf, P9-K bleibt dort**); Git-Autor des Papierkorb-Commits == Handelnder. Zwei-Principal-Browserprobe mit Drag & Drop |
+
 **Reihenfolge:** B1 zuerst, denn das ist der einzige Bug mit falsch abgelegten Daten. Danach die kleinen
-(B3, B4, B5), dann B6/B7, B8 zuletzt. **E1/E2 erst nach der Entscheidung**, als eigene Schritte E1a/E2a.
+(B3, B4, B5), dann B6/B7, B8 zuletzt. **E1a nach B1**, weil beide `api.py` anfassen und B1 der Bug ist. E2 wird nicht gebaut (§3).
 
 **Sichtprüfung:** acht Bilder nach dem bekannten Muster, Abnahme beim Nikinger.
 
@@ -200,7 +223,7 @@ Dann wird `phase5_ui/webui/api.py` angefasst, nicht die Permissions-Schicht. Erl
 | `trash-dialog` | Löschen | nur wenn Titel exakt passt (`disabled` sonst) |
 | `legacy-host-dialog` | Schließen | — |
 
-## §6 Abnahme (P9-121 – P9-134)
+## §6 Abnahme (P9-121 – P9-137)
 
 `P9-121` Anlegen im Team-Space legt **dort** an, und man landet dort ·
 `P9-122` Anlegen ohne `space` → Home-Space (unverändert) ·
@@ -215,7 +238,10 @@ Dann wird `phase5_ui/webui/api.py` angefasst, nicht die Permissions-Schicht. Erl
 `P9-131` Einstellungsmenü hat „Schließen", der Knopf schließt die ganze Kette ·
 `P9-132` V190 gemessen; Fix mit Vorher/Nachher **oder** Befund mit Begründung auf der P10-Liste ·
 `P9-133` `pytest` grün (≥ 1250 + neue), `ui_budget` 5/5, Tabu-Diff §0.3 leer, Gegenläufe rot ·
-`P9-134` Sichtprüfung des Nikingers, acht Bilder
+`P9-134` Sichtprüfung des Nikingers, acht Bilder ·
+`P9-135` Team-Space: jedes Mitglied mit Schreibrecht verschiebt, archiviert und löscht, auch fremde Items, auch per Drag & Drop ·
+`P9-136` Home-Space eines anderen: Löschen bleibt mit `share_write` verboten (403, Gegenlauf) ·
+`P9-137` Der Papierkorb-Commit trägt den Löschenden als Git-Autor, der Löschdialog nennt `updated_by`
 
 Die Zeilen kommen beim Bau in einen **neuen** Matrix-Teil (`ABNAHME_MATRIX_BLOECKE.md` hat 36,7 KB,
 Regel seit dem Oversize-Fix: neuer Block → neuer Teil, `scripts/move_sections.py`).

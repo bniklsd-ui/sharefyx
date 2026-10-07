@@ -222,8 +222,12 @@ E3 Editor-Umbau à la Word/Excel → P10 (Lock P9-A).
 
 ### Offen, in dieser Reihenfolge
 
-0. **Block feedback** — erst die Entscheidungen E1/E2/E3, dann B1 (der Bug) zuerst
-1. **Closeout P9 (Nikinger-Entscheidung, nichts blockiert mehr):** `ROADMAP`-Zeile P9 → ✅, Phase → ✅,
+0. **Block feedback bauen** — Entscheidungen am 2026-10-07 gefallen: E1 frei (P9-BP + Eigentum über den
+   Git-Autor, P9-BQ), E2 und E3 als offene Punkte in den Closeout/P10. Reihenfolge B1 (der Bug) → E1a →
+   B3/B4/B5 → B6/B7 → B8. **Closeout erst danach** (Nikinger)
+1. **Closeout P9, nach Punkt 0** — die P10-Liste übernimmt zusätzlich: Ordner- und Space-Umbenennen
+   (E2, V193/V194), den Editor-Umbau à la Word/Excel (E3), `created_by` als Option (P9-BQ).
+   Bisheriger Wortlaut: `ROADMAP`-Zeile P9 → ✅, Phase → ✅,
    Mini-Plan §9 füllen und 🔄 → 📕, P10-Liste nach Mini-Plan §6.3 — **plus die zwei neuen Punkte von
    heute**: Tailnet-ACL für 8765 (Lauf 4) und die sechs LAN-Ports auf `0.0.0.0` (Lauf 3b)
 2. ~~**Softcap: settings-Plan 64.996 B und Abnahmematrix 98.782 B**~~ ✅ **2026-10-07 gelöst** (Nachtrag oben)
