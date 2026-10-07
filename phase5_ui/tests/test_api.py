@@ -276,10 +276,12 @@ async def test_id_lookup_with_unknown_id_returns_empty_list(full_app_items, totp
 
 
 @pytest.mark.asyncio
-async def test_create_item_has_no_space_parameter(full_app_items, totp_code):
-    """Ein mitgeschicktes `space`-Feld wird stillschweigend ignoriert — Rule 4 architektonisch
-    (P5-A): der Ziel-Space ist immer die Sitzung, es gibt keinen Codepfad, der `body["space"]`
-    je liest."""
+async def test_create_item_foreign_space_without_write_grant_is_forbidden(
+    full_app_items, item_store, totp_code
+):
+    """P9-BG (2026-10-07, ersetzt P5-A fuer den Web-Pfad; vorher `..._has_no_space_parameter`,
+    das ein mitgeschicktes `space` still ignorierte): ohne `write:`-Grant ist ein fremder
+    Ziel-Space 403, und es wird nichts geschrieben."""
     async with _client(full_app_items) as client:
         csrf = await _login(client, totp_code)
         response = await client.post(
@@ -287,8 +289,41 @@ async def test_create_item_has_no_space_parameter(full_app_items, totp_code):
             json={"type": "note", "title": "Test", "space": FOREIGN_SPACE},
             headers=_headers(csrf),
         )
+    assert response.status_code == 403
+    assert not any(i.title == "Test" for i in item_store.search(space=FOREIGN_SPACE).items)
+
+
+@pytest.mark.asyncio
+async def test_create_item_in_write_shared_space_lands_there(
+    full_app_items, item_store, tmp_path, totp_code
+):
+    """P9-BG: mit `write:`-Grant landet das Item im Ziel-Space, nicht im Home-Space."""
+    item_store.create(FOREIGN_SPACE, type="note", title="Fremd")
+    (tmp_path / "data" / FOREIGN_SPACE / ".share.yml").write_text(
+        f"write: [{SPACE}]\n", encoding="utf-8"
+    )
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.post(
+            "/api/v1/items",
+            json={"type": "note", "title": "Im Team", "space": FOREIGN_SPACE},
+            headers=_headers(csrf),
+        )
     assert response.status_code == 201
-    assert response.json()["space"] == SPACE
+    assert response.json()["space"] == FOREIGN_SPACE
+    assert item_store.get(response.json()["id"]).space == FOREIGN_SPACE
+
+
+@pytest.mark.asyncio
+async def test_create_item_rejects_non_string_space(full_app_items, totp_code):
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.post(
+            "/api/v1/items",
+            json={"type": "note", "title": "Test", "space": 5},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 422
 
 
 @pytest.mark.asyncio

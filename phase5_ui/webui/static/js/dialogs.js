@@ -1045,7 +1045,9 @@ export function init() {
 
   conflictSaveAsNewButtonEl.addEventListener("click", function () {
     var values = currentFormValues();
+    // P9-BI: die Kopie landet im Space des Konflikt-Items (nicht still im Home-Space).
     var payload = Object.assign({ type: state.editingSnapshot.type, format: "markdown" }, values);
+    if (state.conflictCurrent && state.conflictCurrent.space) payload.space = state.conflictCurrent.space;
     var previousId = state.editingSnapshot.id;   // siehe F7-Kommentar in editor.js über saveItem()
     hideConflictDialog();
     api("/items", { method: "POST", body: JSON.stringify(payload) }).then(function (item) {
@@ -1066,7 +1068,9 @@ export function init() {
     var title = createTitleInputEl.value.trim();
     if (!title) { createTitleInputEl.focus(); return; }
     api("/items", {
-      method: "POST", body: JSON.stringify({ type: createTypeEl.value, title: title, body: "" }),
+      // P9-BG: der aktive (schreibbare) Space ist das Ziel, nicht still der Home-Space.
+      method: "POST",
+      body: JSON.stringify({ type: createTypeEl.value, title: title, body: "", space: state.activeSpace }),
     }).then(function (item) {
       closeCreateDialog();
       // Meldung des Nikingers: eine angelegte Notiz "landete in Notizen", war im gerade
@@ -1074,7 +1078,7 @@ export function init() {
       // das neue Item tatsächlich liegt.
       state.query = "";
       searchInputEl.value = "";
-      return navigate(state.ownSpace, bucketFor(item) || state.filter)
+      return navigate(item.space || state.ownSpace, bucketFor(item) || state.filter)
         .then(loadOverview)
         .then(function () {
           // Trap beim Vorschau-Default (Advisor-Fund): ein frisch angelegtes Item hat einen

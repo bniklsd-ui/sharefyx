@@ -864,9 +864,16 @@ def api_routes(
         if not isinstance(item_body, str):
             raise ApiError("validation_failed", "'body' muss ein String sein.")
 
-        # Kein `space`-Feld gelesen — Rule 4 architektonisch (P5-A): der Ziel-Space ist immer die
-        # Sitzung, ein evtl. mitgeschicktes `space` im Body wird stillschweigend ignoriert,
-        # niemals ausgewertet.
+        # P9-BG (2026-10-07, Hard Rule 4 Fassung 2026-08-09): der Ziel-Space ist Default der eigene,
+        # ein anderer nur mit space-level Schreibrecht (`.share.yml` `write:`) -- dieselbe Regel
+        # wie `mcpserver/tools.py::create_item`. Ersetzt P5-A fuer den Web-Pfad.
+        target_space = body.get("space")
+        if target_space is None:
+            target_space = session.space
+        elif not isinstance(target_space, str):
+            raise ApiError("validation_failed", "'space' muss ein String sein.")
+        elif target_space != session.space and not permissions.can_write(session.space, target_space):
+            raise ApiError("forbidden", "Kein Schreibzugriff auf diesen Space.")
         # "folder" seit Step 7 Commit 3 (K4-Fix) dabei — `store.create()` validiert/slugifiziert
         # ihn selbst (`files.validate_folder()`), kein Zusatzcheck hier nötig.
         kwargs: dict[str, Any] = {
@@ -881,7 +888,7 @@ def api_routes(
         }
         try:
             item = store.create(
-                session.space, type=item_type, title=title, body=item_body,
+                target_space, type=item_type, title=title, body=item_body,
                 actor=session.space, **kwargs,
             )
         except (ValidationError, ValueError) as exc:

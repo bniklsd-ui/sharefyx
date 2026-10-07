@@ -259,4 +259,16 @@ Regel seit dem Oversize-Fix: neuer Block → neuer Teil, `scripts/move_sections.
 
 ## §8 Ergebnis
 
-*(leer — wird beim Bau gefüllt)*
+### B1 — Anlegen im aktiven schreibbaren Space (gebaut 2026-10-07, nicht deployt)
+
+- **Server:** `_items_post` (`phase5_ui/webui/api.py`) liest `space` und prüft mit `can_write(actor, target)` — dieselbe
+  Prüfung wie `tools.py:641`. Ohne `space` bleibt der Home-Space; ohne `write:` → 403, nichts geschrieben.
+- **Client:** der Anlegen-Dialog sendet `space: state.activeSpace` und navigiert nach `item.space`.
+- **Datierte Korrektur 2026-10-07 (Code gewinnt):** B1 sagt, die Konfliktkopie nehme den Space aus dem
+  Editier-Snapshot. Der Snapshot (`state.editingSnapshot`) trägt **kein** `space`; die Quelle ist
+  `state.conflictCurrent.space`. Der Code nutzt sie.
+- **Tests:** `test_create_item_has_no_space_parameter` (Lock P5-A) ist durch drei Tests ersetzt, `pytest` **1252**.
+- **Browser:** Zwei-Principalen-Probe `phase9_hardening/scripts/p9_feedback_self_check.py` **4/4**; Gegenlauf gegen den alten
+  Client **2/4 rot** (S1, S2). S1b (Item steht in der Liste) bleibt auch gegen den alten Code grün und
+  trägt nichts. Rohdaten: `phase9_hardening/probes/p9_feedback_b1_probe*.json`.
+- **Offene Lücke:** die Konfliktkopie (P9-BI) ist rein clientseitig und im Browser nicht gefahren ⇒ P9-124 ⚠️.

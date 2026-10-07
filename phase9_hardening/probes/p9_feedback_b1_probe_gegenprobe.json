@@ -1,0 +1,26 @@
+{
+  "base_url": "https://127.0.0.1:18778",
+  "befunde": [
+    {
+      "pruefung": "S1 Anlegen im Team-Space landet im Team-Space",
+      "ok": false,
+      "detail": "HTTP 200 Treffer=0 Git-Autor='alpha'"
+    },
+    {
+      "pruefung": "S1b danach steht die UI im Team-Space (Item in der Liste)",
+      "ok": true,
+      "detail": "Zeilen mit Titel=1 Kopf=''"
+    },
+    {
+      "pruefung": "S2 Gegenlauf: das Team-Item steht nicht im Home-Space",
+      "ok": false,
+      "detail": "HTTP 200 Treffer im Home=1"
+    },
+    {
+      "pruefung": "S3 Anlegen im Home-Space bleibt im Home-Space",
+      "ok": true,
+      "detail": "HTTP 200 Treffer=1"
+    }
+  ],
+  "alle_ok": false
+}

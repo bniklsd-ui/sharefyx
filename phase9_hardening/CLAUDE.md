@@ -40,6 +40,7 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | T | **Zweite Bildsichtung** (Mini-Plan §11, Locks P9-AU–P9-AZ, Abnahme P9-103–P9-111) | 🟡 **gebaut 2026-10-06 (M3)**, Release `v3.1.3` **live seit 2026-10-07** (Gate 9/9; Zeile am 2026-10-07 nachgezogen, stand bis dahin „nicht deployt“) — Probe **29/29**, **Gegenläufe G7–G12 6 von 6** wirksam, `pytest` 1238 → 1246. **Der Block dreht zwei Locks des Vortags: P9-AN und die Fläche aus P9-AO sind widerrufen** — die Menüpunkte tragen die **Standardknopf-Fläche** (`--btn-std-fill`), ausgewählt die **Akzentfläche** wie `.btn-primary` (Entscheidung aus der Rückfrage), und der Abstand ist 8 px (vorher 0 px). „Ändern" ist **Vorsicht** (rot wie „Archivieren"), „Abbrechen" → **„Schließen"** · Beschriftung der Space-Zeilen bündig mit dem Titel (vorher 33 px), Namensfeld im Detail beidseitig bündig (+12 px, als **Rasterfolge**, nicht als Zahl), Anlegezeile eine Zeile (vorher 80 px Versatz) · **sechs Wächter umgeschrieben** (4 settings, 2 static_routes), **keiner gelöscht**; **Gegenlauf G11 fand eine Messlücke** (siehe Session-Block) · **zwei Softcap-Überschreitungen neu benannt** (Matrix 84.161 B, Plan 49.655 B) — Details in der `ABNAHME_MATRIX.md` unter dem Nachtrag vom 2026-10-06 |
 | R | **Rückmeldung aus der Bildsichtung** (Mini-Plan §10, Locks P9-AM–P9-AS, Abnahme P9-96–P9-102) | 🟡 **gebaut 2026-10-05 (M3)**, Release `v3.1.3` **live seit 2026-10-07** (Gate 9/9; Zeile am 2026-10-07 nachgezogen, stand bis dahin „nicht deployt“) — Probe **56/56**, G4 → 2 rot · G5 → 2 rot · G6 → 3 rot, `pytest` 1233 → 1238 · **zwei Korrekturen an der Vorgabe, beide gemessen**: `text-align: center` war auf dem Flex-Knopf ein **No-op** (Textmitte 8,5 px daneben) → `justify-content`, und das **linke Polster** musste vom 32-px-Wert der Baumzeile auf `--space` (Nikinger-Entscheidung), sonst bleibt die Beschriftung 12 px neben der Mitte · P9-96/98/100/101/102 ✅, **P9-97 und P9-99 ⚠️ mit benannter Abweichung** · **zwei Wächter an korrektem Code rot** (Klassenreihenfolge, `hidden` im `aria-hidden`) · **ein Produktbefund gemeldet, nicht gebaut:** die Space-Liste bleibt leer, wenn man sie vor `loadOverview()` öffnet — wandert in die P10-Liste (Plan §6) · Herleitung im L3-Archiv |
 | U | **„Kästchen enger“ — die dritte Bildsichtung** (Mini-Plan §12.1, Locks P9-BB/BC/BD/**BE**, Abnahme **P9-116–P9-119**) | 🟡 **gebaut 2026-10-06 (M3)**, Release `v3.1.3` **live seit 2026-10-07** (Gate 9/9; Zeile am 2026-10-07 nachgezogen, stand bis dahin „nicht deployt“) — Probe **48/48**, **Gegenläufe G13–G18 6 von 6** wirksam, `pytest` 1241 → **1245**. **Der Nikinger hat den Auftrag selbst eingeschränkt:** *„nur bei Spaces verwalten … aber nur dieses“* ⇒ **P9-BA widerrufen** (die Menüpunkte behalten ihre 131 px) und **P9-BE** als **neuer** Lock entstanden (Fenster verkleinern). Menüpunkte **flacher** (b): 4 px Polster, **31,69 px** statt 35,69 px · Space-Zeilen **umklammern ihr Label** (92–147 px statt 330 px, rechts 9 statt 192–245 px, Text 1 px bündig) · **Spaces-Fenster 338 statt 380 px**, Feld 138 px von 288 px Inhalt, Knopf 142 px, im Schmal-Modus zurückgenommen (422 px) · Bild 04 nennt jetzt die **Position** (y 205..246), Bild 07 **rollt auf** (`scrollIntoView`) und nimmt die Anlegezeile mit · **vier eigene Fehler**, drei davon „eine Regel, die nicht die ist, die ich meine“ (`box-sizing: border-box`, `width: 100%` in der **Sammelregel**, eine Station, die den eigenen Fehler nicht bemerkte) · **ein Gegenlauf blieb grün** (G17) und wurde zum Anlass, den Ausgangszustand messbar zu machen · **P9-112 widerrufen**, P9-113/114/115 abgelöst (Zuordnung in der Matrix) · **[2026-10-06 Nachsatz, Lock P9-BF, Abnahme P9-120 ✅]:** **dritte Sichtprüfung — siebenmal ✅, ein Punkt aus Bild 08**: die Space-Zeile hält innen wieder den Standardabstand (**9 px links wie rechts**, vorher 1 gegen 9), gebaut als `padding-left: var(--space)` **plus** `margin-left: calc(var(--space) * -1)` — beide Locks halten nur zusammen; der Einwand zu Bild 04 ist am selben Tag zurückgenommen („man muss scrollen“). Probe **50/50**, **Gegenläufe 7 von 7**, `pytest` 1246 — Details im Session-Block und in der `ABNAHME_MATRIX.md` |
+| feedback | **Nutzer-Rückmeldung vom 2026-10-07** (Plan `phase9_hardening_block_feedback_plan.md`, Locks P9-BG–P9-BO, Abnahme P9-121–P9-137) | 🟡 **B1 gebaut 2026-10-07, nicht deployt** — Anlegen im aktiven schreibbaren Space (R2); P9-121–123 ✅, **P9-124 ⚠️**; B2–B8 und E1a offen · Herleitung im L3-Archiv |
 | Gate/Z | Abnahme, Closeout | 🟡 **beide Doku-Hälften erledigt** (2026-10-02) · `ABNAHME_MATRIX.md` ist der **eine** Ort der Abnahme- und `[VERIFY]`-Bilanz, nicht diese Zeile · **[2026-10-04] beide Rotationen gefahren** (Block 17.780 B verbatim, Kette 6 von 7 Fäden) und diese Tabelle ins L3-Archiv gezogen ⇒ **der Head ist unter dem 40-KiB-Softcap** · **offen:** zweites Claude-Konto (P9-13/V150) · ~~Portscan P9-94/P9-11~~ ✅ **2026-10-07** (vier Läufe plus Kontrolllauf, Matrix P9-11) · ~~Übersichtsgrafik §12.4~~ ✅ **2026-10-07** (`docs/concepts/phase9_hardening_uebersicht.svg`, gerendert und angesehen, Sonnet 5.5/Claude Code) · Phase auf ✅ (**wartet seit dem 2026-10-07 auf nichts mehr außer der Closeout-Entscheidung des Nikingers**; **`v3.1.3` live seit 2026-10-07, Gate 9/9**; **2026-10-07:** `## 2026-10-05` im `UPDATE_LOG` auf `## 2026-10-07` datiert, damit das Update-Log-Gate ohne `ALLOW_STALE` greift) — **P9-15 steht nicht mehr hier**, es ist seit dem 2026-10-03 gemessen (⚠️, Zeile A) · Herleitung im L3-Archiv |
 
 ## Backlog (bewusst zurückgestellt, kein Phasen-Blocker)
@@ -141,114 +142,28 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückzuführen** — Nikinger-Anordnung 2026-09-24, so dokumentieren und nicht weiter
   untersuchen.
 
-## Session stopped — 2026-10-07 (neunundzwanzigster Block: **der Portscan von außen ist gelaufen — P9-11 und P9-94 ✅**; kein Code, kein Deploy, kein Service-Touch)
+## Session stopped — 2026-10-07 (dreißigster Block: **B1 des feedback-Blocks gebaut — Anlegen landet im aktiven Space**; kein Deploy, kein Service-Touch)
 
-**Ergebnis in einem Satz.** Der Nikinger hat die vier Läufe aus Mini-Plan §5 vom MacBook gefahren,
-plus einen Kontrolllauf, der den einzigen Ausreißer (`21/tcp open`) als **Artefakt des
-Mobilfunkpfads** entlarvt. **P9-11 und P9-94 sind ✅**, die Matrix trägt danach **einen** offenen
-⬜ (P9-13/V150, zweites Konto, wandert nach P10). Rohausgabe verbatim:
-`probes/p9_11_portscan_2026-10-07.txt`.
+**Ergebnis in einem Satz.** Der Bug R2 ist behoben: Anlegen in einem schreibbaren Team-Space legt die
+Datei **dort** an, statt im Home-Space. Drei Abnahmezeilen ✅ (P9-121–123), eine ⚠️ (P9-124, Konfliktkopie
+nur serverseitig belegt). Matrix: 108 ✅ · 12 ⚠️ · 1 ⬜ (Zählung steht im Hub).
 
-| Lauf | Netz | Ziel | Erwartet (§5) | Gemessen | Urteil |
-|---|---|---|---|---|---|
-| 1 | Hotspot, TS aus | Heim-IP `176.2.194.125` | kein `open` | 999 `filtered`, `21 open` | ✅, 21 ist Pfad-Artefakt |
-| 2 | Hotspot, TS aus | VPS `217.160.128.146` | nur 80/443, 22 zu | 80/443 `open`, 22 `filtered`, `21 open` | ✅, 21 dito |
-| 3 | Heim-WLAN | LAN `192.168.68.175`, 8765 + 8000–9000 | 8765 nicht `open` | alle 1001 `closed` (RST) | ✅ |
-| 3b | Heim-WLAN | LAN, alle Ports (nicht im Plan) | — | 7070, 7777, 47984/89/90, 48010 `open` | Hygiene-Punkt P10 |
-| 4 | Hotspot, TS an | Tailnet `100.93.43.122:8765` | `filtered` oder `open` | **`open`** | notiert, Befund unten |
-| K | Hotspot, TS aus | `1.1.1.1`, `9.9.9.9` | — | `21 open … syn-ack` **auf beiden** | belegt das Artefakt |
+| Prüfung | Ergebnis |
+|---|---|
+| `pytest` gesamt | **1252 grün** (drei neue Tests ersetzen `test_create_item_has_no_space_parameter`) |
+| Browser-Probe, zwei Principals, Team-Space | **4/4** (S1 Datei unter `team/`, S1b Liste, S2 Navigation, S3 ohne `space` → Home) |
+| Gegenlauf gegen den alten Client | **2/4 rot** (S1, S2) — **S1b bleibt grün** und trägt nichts |
+| Konfliktkopie (P9-BI) im Browser | **nicht gefahren** ⇒ P9-124 ⚠️ |
 
-**Warum ✅ und nicht ⚠️:** Port 21 ist auf dem Mobilfunkpfad **nicht beobachtbar** — etwas zwischen
-MacBook und Internet beantwortet 21 für jedes Ziel. Das ist eine **benannte Grenze** (wie P9-107/
-P9-110), keine offene Frage: auf der VM lauscht nichts auf 21 (`ss -tln`), die VM hat **keine
-globale IPv6** (nur die Tailscale-ULA), und die Heim-IP ist am Scan-Tag auf der VM per `ifconfig.me`
-bestätigt. **Netzzuordnung:** die Anleitung der Session vom 2026-10-07 (A Hotspot ohne TS → B Hotspot
-mit TS → C Heim-WLAN); die Reihenfolge der eingefügten Ausgabe folgt ihr, und der Nikinger bestätigt,
-danach gescannt zu haben.
+**Warum so gebaut.** Der Server prüft mit `can_write(actor, target)` dieselbe Regel wie `tools.py:641` —
+eine Quelle für „wer darf wohin schreiben", die Liste liegt als `write:` auf der Platte (Hard Rule 4,
+Fassung vom 2026-08-09). **Datierte Planabweichung:** der Plan nennt den Editier-Snapshot als Quelle
+für den Space der Konfliktkopie; der trägt kein `space`, die Quelle ist `state.conflictCurrent.space`
+(Plan §8). **Matrix:** die vier Zeilen stehen in `ABNAHME_MATRIX_BLOECKE.md` (38.594 B, unter dem Cap),
+**keine neue Datei**, weil `docs/INDEX.md` nur ~170 B Spielraum hat.
 
-**Datierte Korrektur in der P9-11-Zeile:** ihre alte Gegenprobe („LAN alles `filtered`, Tailnet genau
-8765") ist **nicht gemessen und gilt nicht** — das LAN antwortet `closed`, Lauf 3b zeigt sechs offene
-LAN-Ports auf `0.0.0.0`, Lauf 4 prüfte nur 8765. Es gilt das engere Kriterium aus Mini-Plan §5.
+**Nächster Schritt.** B2 (Zielangabe im Anlegen-Dialog, P9-BH), dann E1a (nach B1, berührt `api.py`
+beim Verschieben/Löschen), B3–B7, B8 zuerst messen (V190). Sichtprüfung mit acht Bildern beim Nikinger,
+Deploy `v3.1.4` ebenfalls. **Closeout P9 erst nach B1–B8 und E1a.**
 
-**Befund für den Nikinger (P10, kein P9-Blocker):** Lauf 4 `open` ist **kein** Gegenlauf zu V162
-*(Lesart B)* — der Listener ist `socat`, nicht `tailscale serve --tcp` —, widerlegt aber die
-Prämisse „die ACL erlaubt 8765 nur `tag:sharefyx-edge`". Das ACL-Fragment ist additiv, die
-bestehenden Tailnet-Regeln lassen das MacBook durch (Schluss, die Live-ACL ist nicht gelesen). Im
-Tailnet sind damit **Auth und Host-Prüfung der App** die einzige Sperre vor 8765.
-
-**Belege:** `phase9_hardening/tests` grün (Wächter `ABNAHME_BILANCE` auf 104/12/1 gezogen, Matrix-
-Fließtext und `updated:`-Kette nachgezogen), Übersichtsgrafik neu gerendert und angesehen (Zähler,
-Untertitel „live als v3.1.3", beide ✓-Zeilen), Matrix **98.782 B** in der INDEX-Zeile. Die durchgestrichene Masse im L3-Archiv bleibt **229 B** und ist kein Hebel; der Head liegt nach der Rotation bei ~32 KB, **unter** dem Cap.
-
-### Nachtrag am selben Tag: der Oversize-Fix (Nikinger: „let's find a fix for the oversize docs (do that now)")
-
-**Ergebnis:** die drei lebenden Phase-9-Dokumente über dem Cap sind darunter, **ohne ein Wort zu
-kürzen** — Abschnitte wandern verbatim, die Überschrift bleibt mit Zeiger stehen.
-
-| Dokument | vorher | nachher | Form |
-|---|---|---|---|
-| `ABNAHME_MATRIX.md` | 98.782 B | Hub ~20 KB + Teile 30 / 37 / 19 KB | **Teilung, 📗** — Zeilen leben weiter |
-| settings-Mini-Plan | 64.996 B | 29.504 B | §10–§12.1 → `…_ARCHIVE.md` 📦 |
-| `RUNBOOK_STEP_A.md` | 62.021 B | 17.476 B | §0 + A1–A7 → `RUNBOOK_STEP_A_ARCHIVE.md` 📦 (A8 bleibt, offen für P10) |
-
-**Warum die Matrix geteilt und nicht archiviert ist:** ihre Zeilen ändern sich noch (P9-11 heute),
-und P9-3/P9-6/V145 tragen Bytezahlen, die `test_acceptance_numbers.py` bei jedem Lauf nachmisst — ein
-Archiv, das ein Test aktuell halten muss, ist keins. Die Tests lesen jetzt Hub + Teile, die
-Bilanz-Überschrift steht nur im Hub. **Werkzeug:** `scripts/move_sections.py` (Gegenproben wie
-`rotate_session_block.sh`: Reassemblierung == Original, jeder Abschnitt byte-gleich im Ziel,
-Altbestand des Ziels unverändert; Code-Blöcke zählen nie als Überschrift). **Wächter:**
-`tests/test_section_moves.py` — **harte** Größe je lebendem Teil, kein Benennungs-Ausweg.
-**`docs/INDEX.md` liegt danach bei 40.477 B — 483 B unter dem Cap**; fünf neue Zeilen kosteten fast
-den ganzen Spielraum, die `updated:`-Kette ist rotiert. Das ist der nächste Engpass.
-**Zweiter Commit, `ROADMAP.md`:** 48.498 → **35.677 B**. Der Hebel war die `updated:`-Kette (13.174 B), und
-sie trug vier eingebettete `updated: `-Präfixe — der bekannte Defekt, an dem `rotate_index_updates.sh`
-bewusst abbricht. Präfixe entfernt (Byte-Gegenprobe: exakt 4 × 9 B), Kette nach
-`docs/ROADMAP_UPDATES_ARCHIVE.md` rotiert, ROADMAP aus der Ausnahmeliste von `test_updated_chain.py`
-gestrichen. Damit ist **P9-6 ⚠️ → ✅** (die Zeile wartete genau auf diese Straffung).
-**Nicht angefasst, bewusst:** die Heads von **P8.6 (109 KB), P8 (48 KB), P6 (41 KB)** — abgeschlossene
-Phasen, alle drei **benannt** (P8-P). Bei P8.6 ist die `updated:`-Kette über **zwölf physische Zeilen**
-umbrochen (Zeile 23 allein 33 KB), das Rotationsskript kann sie nicht sicher schneiden; und jede neue
-Archivdatei kostet eine INDEX-Zeile, wo **INDEX nur noch ~400 B unter dem Cap** liegt.
-
-### Nachtrag am selben Tag: Plan für die Nutzer-Rückmeldung
-
-`docs/concepts/phase9_hardening_block_feedback_plan.md`, **nicht gebaut**: Locks P9-BG–P9-BO,
-Abnahme P9-121–P9-134, `[VERIFY]` V189–V194. **Ein echter Bug:** Anlegen in einem schreibbaren
-Team-Space landet im Home-Space, weil `_items_post` jedes `space` ignoriert (Lock P5-A,
-`api.py:867`), obwohl MCP seit P6 dorthin schreiben darf (`tools.py:641`). **Drei Scope-Fragen an
-den Nikinger:** E1 Verschieben/Löschen in Team-Spaces (kehrt P9-K teilweise um; heute kann dort
-**niemand** verschieben, `api.py:956`), E2 Umbenennen (Ordner in P9 möglich, Space-Name → P10),
-E3 Editor-Umbau à la Word/Excel → P10 (Lock P9-A).
-
-### Sessionende 2026-10-07 — Übergabe für einen kalten Leser
-
-- **Repo:** sauber, alles gepusht. Sechs Commits heute: Portscan, Oversize-Fix, ROADMAP-Kette,
-  Feedback-Plan, Entscheidungen E1–E3, diese Übergabe.
-- **Nächster Schritt:** Block feedback bauen, Plan `docs/concepts/phase9_hardening_block_feedback_plan.md`
-  §4. **Mit B1 beginnen:** `_items_post` liest `space` und prüft wie `tools.py:641`.
-- **Wer baut:** der Nikinger will wegen der MiniMax-Störung mit Sonnet 5.5 in Claude Code ausführen.
-  Dafür ist am 2026-10-07 `~/.claude/settings.json` umgestellt: `"model": "claude-sonnet-5-5[1m]"`,
-  `"autoCompactEnabled": true`.
-  - **Warum:** Claude Code 2.1.280 gibt `claude-sonnet-5-5` ohne Suffix nur 200k. Gemessen mit `/context`.
-  - **Daran ist die Session davor gestorben**, bei 176.181 Tokens.
-  - Beim Start mit `/context` prüfen: dort muss `/ 1m` stehen.
-- **Erste Falle beim Bau:** `docs/INDEX.md` liegt ~170 B unter dem Cap. Jede neue Doku-Zeile reißt ihn.
-  Erst kürzen: Kandidat ist die Phase-9-Sektionszeile mit 3,2 KB, Nachträge per
-  `scripts/archive_index_entries.sh`.
-- **Benannt, nicht behoben:** Heads P8.6 (109 KB), P8 (48 KB), P6 (41 KB). Abgeschlossene Phasen; bei
-  P8.6 ist die `updated:`-Kette über zwölf physische Zeilen umbrochen.
-- **Außerhalb des Repos:** Sharefyx-Aufgabe „Trading-Bot-VM: Claude Code auf Sonnet 5.5 mit
-  1M-Kontext umstellen" im Space Home-Server.
-
-### Offen, in dieser Reihenfolge
-
-0. **Block feedback bauen** — Entscheidungen am 2026-10-07 gefallen: E1 frei (P9-BP + Eigentum über den
-   Git-Autor, P9-BQ), E2 und E3 als offene Punkte in den Closeout/P10. Reihenfolge B1 (der Bug) → E1a →
-   B3/B4/B5 → B6/B7 → B8. **Closeout erst danach** (Nikinger)
-1. **Closeout P9, nach Punkt 0** — die P10-Liste übernimmt zusätzlich: Ordner- und Space-Umbenennen
-   (E2, V193/V194), den Editor-Umbau à la Word/Excel (E3), `created_by` als Option (P9-BQ).
-   Bisheriger Wortlaut: `ROADMAP`-Zeile P9 → ✅, Phase → ✅,
-   Mini-Plan §9 füllen und 🔄 → 📕, P10-Liste nach Mini-Plan §6.3 — **plus die zwei neuen Punkte von
-   heute**: Tailnet-ACL für 8765 (Lauf 4) und die sechs LAN-Ports auf `0.0.0.0` (Lauf 3b)
-2. ~~**Softcap: settings-Plan 64.996 B und Abnahmematrix 98.782 B**~~ ✅ **2026-10-07 gelöst** (Nachtrag oben)
-3. **P9-13 / V150** — zweites Claude-Konto; wandert nach P10, **kein Blocker**
+**Messung (Softcap-Wächter).** Die durchgestrichene Masse im L3-Archiv bleibt **229 B** und ist kein Hebel; der Head bleibt unter dem Softcap.

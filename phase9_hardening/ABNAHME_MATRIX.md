@@ -6,7 +6,7 @@ detail: L2
 up: ./CLAUDE.md
 down:
   - ABNAHME_MATRIX_STEPS.md     # Teil: Step 0–H, Phasenweit (P9-1 – P9-58)
-  - ABNAHME_MATRIX_BLOECKE.md   # Teil: Blöcke und Bildsichtungen (P9-59 – P9-120)
+  - ABNAHME_MATRIX_BLOECKE.md   # Teil: Blöcke und Bildsichtungen (P9-59 – P9-124)
   - ABNAHME_MATRIX_VERIFY.md    # Teil: [VERIFY] je Eintrag (V145 – V188)
   - ../docs/concepts/phase9_hardening_plan.md        # P9-1 – P9-58, §13-Register, §15 P10-Liste
   - SESSIONS_ARCHIVE.md                              # die Herleitung jeder Zeile im Wortlaut
@@ -31,7 +31,7 @@ nur hier.
 
 ## Stand in einem Satz
 
-**117 Tabellenzeilen für 117 Abnahmezeilen: 105 ✅ · 11 ⚠️ · 1 ⬜** (P9-10 in zwei prüfbare Hälften
+**121 Tabellenzeilen für 121 Abnahmezeilen: 108 ✅ · 12 ⚠️ · 1 ⬜** (P9-10 in zwei prüfbare Hälften
 geteilt; seit 2026-10-05 kommen der **settings-Block** P9-83–P9-95 mit 12 ✅ und **einem** ⬜
 dazu — P9-94, der Portscan, ist ein Schritt des Nikingers und durch keinen Test ersetzbar —,
 sein **Nachtrag** P9-96–P9-102 aus der Bildsichtung mit **5 ✅ und 2 ⚠️**, und die **dritte
