@@ -48,6 +48,18 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 MATRIX = REPO_ROOT / "phase9_hardening" / "ABNAHME_MATRIX.md"
+# 2026-10-07 (Nikinger-Auftrag „find a fix for the oversize docs"): die Matrix ist ein **Hub** plus drei
+# **lebende** Teile (📗, kein Archiv) — jeder unter dem Softcap. Der „eine Ort" ist seitdem die Menge
+# Hub + Teile in dieser Reihenfolge; die Bilanz-Überschrift bleibt im Hub. Zeilen nach L3 zu schieben
+# wäre falsch gewesen: P9-3/P9-6/V145 tragen Bytezahlen, die dieser Test bei jedem Lauf nachmisst.
+MATRIX_STEPS = REPO_ROOT / "phase9_hardening" / "ABNAHME_MATRIX_STEPS.md"
+MATRIX_BLOECKE = REPO_ROOT / "phase9_hardening" / "ABNAHME_MATRIX_BLOECKE.md"
+MATRIX_VERIFY = REPO_ROOT / "phase9_hardening" / "ABNAHME_MATRIX_VERIFY.md"
+MATRIX_PARTS = (MATRIX, MATRIX_STEPS, MATRIX_BLOECKE, MATRIX_VERIFY)
+
+
+def _matrix_text() -> str:
+    return "\n".join(p.read_text(encoding="utf-8") for p in MATRIX_PARTS)
 HEAD = REPO_ROOT / "phase9_hardening" / "CLAUDE.md"
 INDEX = REPO_ROOT / "docs" / "INDEX.md"
 # Die gestrichene Masse wird seit dem Split vom 2026-10-04 im **L3-Archiv** gemessen, nicht im
@@ -137,11 +149,11 @@ def _cells(line: str) -> list[str]:
 
 
 def _abnahme_rows() -> list[list[str]]:
-    return [_cells(l) for l in MATRIX.read_text(encoding="utf-8").splitlines() if l.startswith("| **P9-")]
+    return [_cells(l) for l in _matrix_text().splitlines() if l.startswith("| **P9-")]
 
 
 def _verify_rows() -> list[list[str]]:
-    text = MATRIX.read_text(encoding="utf-8").splitlines()
+    text = MATRIX_VERIFY.read_text(encoding="utf-8").splitlines()
     start = next(i for i, l in enumerate(text) if l.startswith("## Stand je Eintrag"))
     return [_cells(l) for l in text[start:] if l.startswith("| V")]
 
@@ -149,7 +161,7 @@ def _verify_rows() -> list[list[str]]:
 def _row(prefix: str) -> str:
     """Die Tabellenzeile, die die Aussage macht — strukturell über ihre Nummer gefunden, damit
     der Test die Zahl nicht ein zweites Mal im Anker festschreibt."""
-    lines = [l for l in MATRIX.read_text(encoding="utf-8").splitlines() if l.startswith(prefix)]
+    lines = [l for l in _matrix_text().splitlines() if l.startswith(prefix)]
     assert len(lines) == 1, f"genau eine Zeile mit {prefix!r} erwartet, gefunden {len(lines)}"
     return lines[0]
 
@@ -259,7 +271,7 @@ def test_the_verify_balance_is_the_machine_count_under_the_stated_rule():
         "38 belegte Einträge (2026-10-03: 34, seit dem settings-Block +4 für V185–V188). "
         "Die Übergabezahl 40 war der Nummernbereich, nicht die Zahl belegter Einträge."
     )
-    assert _headline_triple(MATRIX.read_text(encoding="utf-8"), "belegte Einträge —") == counted
+    assert _headline_triple(_matrix_text(), "belegte Einträge —") == counted
 
 
 def test_only_the_matrix_carries_the_balance_not_the_head_and_not_the_index():
@@ -286,7 +298,7 @@ def test_no_living_phase9_file_calls_a_dated_balance_the_present_one():
     bewusst **nicht** wörtlich: ein Wächter, der das Wort verbietet, darf es nicht selbst im
     Docstring tragen (dieselbe Falle wie der Step-D-Wächter vom 2026-10-03, der daran rot war).
     """
-    for path in (HEAD, MATRIX):
+    for path in (HEAD, *MATRIX_PARTS):
         found = PRESENT_TENSE_RE.search(path.read_text(encoding="utf-8"))
         assert found is None, f"{path.name}: eine Bilanz in der Gegenwartsform — {found.group(0)!r}"
 

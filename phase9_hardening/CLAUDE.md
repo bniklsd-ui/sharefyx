@@ -44,6 +44,12 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 
 ## Backlog (bewusst zurückgestellt, kein Phasen-Blocker)
 
+- ✅ **ERLEDIGT 2026-10-07 — Nikinger-Auftrag „let's find a fix for the oversize docs (do that now)".**
+  Kandidat (a) gefahren (settings-Plan §10–§12.1 nach L3, 64.996 → 29.504 B), (c) als **Teilung**
+  statt Archiv (Matrix = Hub + drei lebende Teile, 98.782 B → 19–37 KB je Datei), dazu das Runbook
+  (§0 + A1–A7 nach L3, 62.021 → 17.476 B). Werkzeug `scripts/move_sections.py`, Wächter
+  `tests/test_section_moves.py` (harte Größe je lebendem Teil, Zeiger an jeder Überschrift).
+  Ursprünglicher Eintrag, unverändert:
 - **„Kürzen notieren" — Nikinger-Anordnung vom 2026-10-06, nach der Sichtprüfung.** Zwei Dokumente
   stehen **über** dem 40-KiB-Softcap, und **beides ist neu**: der settings-Mini-Plan ist erst
   **durch** den Block vom 2026-10-06 darüber gekommen (§11 + §11.1 sind **10.679 B**, die
@@ -174,10 +180,33 @@ Tailnet sind damit **Auth und Host-Prüfung der App** die einzige Sperre vor 876
 Fließtext und `updated:`-Kette nachgezogen), Übersichtsgrafik neu gerendert und angesehen (Zähler,
 Untertitel „live als v3.1.3", beide ✓-Zeilen), Matrix **98.782 B** in der INDEX-Zeile. Die durchgestrichene Masse im L3-Archiv bleibt **229 B** und ist kein Hebel; der Head liegt nach der Rotation bei ~32 KB, **unter** dem Cap.
 
+### Nachtrag am selben Tag: der Oversize-Fix (Nikinger: „let's find a fix for the oversize docs (do that now)")
+
+**Ergebnis:** die drei lebenden Phase-9-Dokumente über dem Cap sind darunter, **ohne ein Wort zu
+kürzen** — Abschnitte wandern verbatim, die Überschrift bleibt mit Zeiger stehen.
+
+| Dokument | vorher | nachher | Form |
+|---|---|---|---|
+| `ABNAHME_MATRIX.md` | 98.782 B | Hub ~20 KB + Teile 30 / 37 / 19 KB | **Teilung, 📗** — Zeilen leben weiter |
+| settings-Mini-Plan | 64.996 B | 29.504 B | §10–§12.1 → `…_ARCHIVE.md` 📦 |
+| `RUNBOOK_STEP_A.md` | 62.021 B | 17.476 B | §0 + A1–A7 → `RUNBOOK_STEP_A_ARCHIVE.md` 📦 (A8 bleibt, offen für P10) |
+
+**Warum die Matrix geteilt und nicht archiviert ist:** ihre Zeilen ändern sich noch (P9-11 heute),
+und P9-3/P9-6/V145 tragen Bytezahlen, die `test_acceptance_numbers.py` bei jedem Lauf nachmisst — ein
+Archiv, das ein Test aktuell halten muss, ist keins. Die Tests lesen jetzt Hub + Teile, die
+Bilanz-Überschrift steht nur im Hub. **Werkzeug:** `scripts/move_sections.py` (Gegenproben wie
+`rotate_session_block.sh`: Reassemblierung == Original, jeder Abschnitt byte-gleich im Ziel,
+Altbestand des Ziels unverändert; Code-Blöcke zählen nie als Überschrift). **Wächter:**
+`tests/test_section_moves.py` — **harte** Größe je lebendem Teil, kein Benennungs-Ausweg.
+**`docs/INDEX.md` liegt danach bei 40.477 B — 483 B unter dem Cap**; fünf neue Zeilen kosteten fast
+den ganzen Spielraum, die `updated:`-Kette ist rotiert. Das ist der nächste Engpass.
+**Nicht angefasst, bewusst (eigener Commit):** `ROADMAP.md`, die Heads von P8.6, P8, P6 — außerhalb
+der Phase, jeder mit eigenen Test-Lesern.
+
 ### Offen, in dieser Reihenfolge
 
 1. **Closeout P9 (Nikinger-Entscheidung, nichts blockiert mehr):** `ROADMAP`-Zeile P9 → ✅, Phase → ✅,
    Mini-Plan §9 füllen und 🔄 → 📕, P10-Liste nach Mini-Plan §6.3 — **plus die zwei neuen Punkte von
    heute**: Tailnet-ACL für 8765 (Lauf 4) und die sechs LAN-Ports auf `0.0.0.0` (Lauf 3b)
-2. **Softcap: settings-Plan 64.996 B und Abnahmematrix 98.782 B** — Kürzen ist Nikinger-Entscheidung
+2. ~~**Softcap: settings-Plan 64.996 B und Abnahmematrix 98.782 B**~~ ✅ **2026-10-07 gelöst** (Nachtrag oben)
 3. **P9-13 / V150** — zweites Claude-Konto; wandert nach P10, **kein Blocker**

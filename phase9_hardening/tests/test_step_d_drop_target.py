@@ -49,6 +49,12 @@ GEGENPROBEN = (
     REPO_ROOT / "phase9_hardening" / "probes" / "p9_step_d_g2_gegenprobe.json",
 )
 MATRIX = REPO_ROOT / "phase9_hardening" / "ABNAHME_MATRIX.md"
+# 2026-10-07: die Matrix ist Hub + drei lebende Teile; gesucht wird in allen (Reihenfolge wie im Hub).
+MATRIX_PARTS = [MATRIX] + [MATRIX.with_name(f"ABNAHME_MATRIX_{t}.md") for t in ("STEPS", "BLOECKE", "VERIFY")]
+
+
+def _matrix_text() -> str:
+    return "\n".join(p.read_text(encoding="utf-8") for p in MATRIX_PARTS)
 SCRIPT = REPO_ROOT / "phase9_hardening" / "scripts" / "p9_step_d_self_check.py"
 
 # Die Zeilen, die dieser Test pflegt. Fest verdrahtet statt aus der Matrix gelesen: die Liste ist
@@ -63,7 +69,7 @@ def _probe() -> dict:
 def _matrix_zeile(zeile_id: str) -> str:
     """Die Tabellenzeile zu einer Abnahme-ID. `P9-10` muss `P9-10a`/`P9-10b` **nicht** treffen —
     die sind eigene Zeilen, und ein Präfix-Treffer würde die falsche Zeile lesen."""
-    for line in MATRIX.read_text(encoding="utf-8").splitlines():
+    for line in _matrix_text().splitlines():
         m = re.match(r"\|\s*\*\*(" + re.escape(zeile_id) + r")\*\*\s*\|", line)
         if m:
             return line
@@ -91,7 +97,7 @@ def test_jede_als_belegt_gefuehrte_zeile_hat_mindestens_eine_gruene_station():
 
 def test_jede_station_nennt_eine_zeile_die_es_in_der_matrix_gibt():
     report = _probe()
-    bekannt = {z for z in re.findall(r"\*\*(P9-\d+[a-z]?)\*\*", MATRIX.read_text(encoding="utf-8"))}
+    bekannt = {z for z in re.findall(r"\*\*(P9-\d+[a-z]?)\*\*", _matrix_text())}
     fremd = sorted({b["zeile"] for b in report["befunde"]} - bekannt)
     assert not fremd, f"Stationen nennen Zeilen, die es in der Matrix nicht gibt: {fremd}"
 
