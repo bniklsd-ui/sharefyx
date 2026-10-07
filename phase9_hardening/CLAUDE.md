@@ -220,6 +220,26 @@ den Nikinger:** E1 Verschieben/Löschen in Team-Spaces (kehrt P9-K teilweise um;
 **niemand** verschieben, `api.py:956`), E2 Umbenennen (Ordner in P9 möglich, Space-Name → P10),
 E3 Editor-Umbau à la Word/Excel → P10 (Lock P9-A).
 
+### Sessionende 2026-10-07 — Übergabe für einen kalten Leser
+
+- **Repo:** sauber, alles gepusht. Sechs Commits heute: Portscan, Oversize-Fix, ROADMAP-Kette,
+  Feedback-Plan, Entscheidungen E1–E3, diese Übergabe.
+- **Nächster Schritt:** Block feedback bauen, Plan `docs/concepts/phase9_hardening_block_feedback_plan.md`
+  §4. **Mit B1 beginnen:** `_items_post` liest `space` und prüft wie `tools.py:641`.
+- **Wer baut:** der Nikinger will wegen der MiniMax-Störung mit Sonnet 5.5 in Claude Code ausführen.
+  Dafür ist am 2026-10-07 `~/.claude/settings.json` umgestellt: `"model": "claude-sonnet-5-5[1m]"`,
+  `"autoCompactEnabled": true`.
+  - **Warum:** Claude Code 2.1.280 gibt `claude-sonnet-5-5` ohne Suffix nur 200k. Gemessen mit `/context`.
+  - **Daran ist die Session davor gestorben**, bei 176.181 Tokens.
+  - Beim Start mit `/context` prüfen: dort muss `/ 1m` stehen.
+- **Erste Falle beim Bau:** `docs/INDEX.md` liegt ~170 B unter dem Cap. Jede neue Doku-Zeile reißt ihn.
+  Erst kürzen: Kandidat ist die Phase-9-Sektionszeile mit 3,2 KB, Nachträge per
+  `scripts/archive_index_entries.sh`.
+- **Benannt, nicht behoben:** Heads P8.6 (109 KB), P8 (48 KB), P6 (41 KB). Abgeschlossene Phasen; bei
+  P8.6 ist die `updated:`-Kette über zwölf physische Zeilen umbrochen.
+- **Außerhalb des Repos:** Sharefyx-Aufgabe „Trading-Bot-VM: Claude Code auf Sonnet 5.5 mit
+  1M-Kontext umstellen" im Space Home-Server.
+
 ### Offen, in dieser Reihenfolge
 
 0. **Block feedback bauen** — Entscheidungen am 2026-10-07 gefallen: E1 frei (P9-BP + Eigentum über den
