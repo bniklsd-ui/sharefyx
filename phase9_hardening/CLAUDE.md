@@ -210,8 +210,19 @@ Phasen, alle drei **benannt** (P8-P). Bei P8.6 ist die `updated:`-Kette über **
 umbrochen (Zeile 23 allein 33 KB), das Rotationsskript kann sie nicht sicher schneiden; und jede neue
 Archivdatei kostet eine INDEX-Zeile, wo **INDEX nur noch ~400 B unter dem Cap** liegt.
 
+### Nachtrag am selben Tag: Plan für die Nutzer-Rückmeldung
+
+`docs/concepts/phase9_hardening_block_feedback_plan.md`, **nicht gebaut**: Locks P9-BG–P9-BO,
+Abnahme P9-121–P9-134, `[VERIFY]` V189–V194. **Ein echter Bug:** Anlegen in einem schreibbaren
+Team-Space landet im Home-Space, weil `_items_post` jedes `space` ignoriert (Lock P5-A,
+`api.py:867`), obwohl MCP seit P6 dorthin schreiben darf (`tools.py:641`). **Drei Scope-Fragen an
+den Nikinger:** E1 Verschieben/Löschen in Team-Spaces (kehrt P9-K teilweise um; heute kann dort
+**niemand** verschieben, `api.py:956`), E2 Umbenennen (Ordner in P9 möglich, Space-Name → P10),
+E3 Editor-Umbau à la Word/Excel → P10 (Lock P9-A).
+
 ### Offen, in dieser Reihenfolge
 
+0. **Block feedback** — erst die Entscheidungen E1/E2/E3, dann B1 (der Bug) zuerst
 1. **Closeout P9 (Nikinger-Entscheidung, nichts blockiert mehr):** `ROADMAP`-Zeile P9 → ✅, Phase → ✅,
    Mini-Plan §9 füllen und 🔄 → 📕, P10-Liste nach Mini-Plan §6.3 — **plus die zwei neuen Punkte von
    heute**: Tailnet-ACL für 8765 (Lauf 4) und die sechs LAN-Ports auf `0.0.0.0` (Lauf 3b)
