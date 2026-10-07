@@ -200,8 +200,15 @@ Altbestand des Ziels unverändert; Code-Blöcke zählen nie als Überschrift). *
 `tests/test_section_moves.py` — **harte** Größe je lebendem Teil, kein Benennungs-Ausweg.
 **`docs/INDEX.md` liegt danach bei 40.477 B — 483 B unter dem Cap**; fünf neue Zeilen kosteten fast
 den ganzen Spielraum, die `updated:`-Kette ist rotiert. Das ist der nächste Engpass.
-**Nicht angefasst, bewusst (eigener Commit):** `ROADMAP.md`, die Heads von P8.6, P8, P6 — außerhalb
-der Phase, jeder mit eigenen Test-Lesern.
+**Zweiter Commit, `ROADMAP.md`:** 48.498 → **35.677 B**. Der Hebel war die `updated:`-Kette (13.174 B), und
+sie trug vier eingebettete `updated: `-Präfixe — der bekannte Defekt, an dem `rotate_index_updates.sh`
+bewusst abbricht. Präfixe entfernt (Byte-Gegenprobe: exakt 4 × 9 B), Kette nach
+`docs/ROADMAP_UPDATES_ARCHIVE.md` rotiert, ROADMAP aus der Ausnahmeliste von `test_updated_chain.py`
+gestrichen. Damit ist **P9-6 ⚠️ → ✅** (die Zeile wartete genau auf diese Straffung).
+**Nicht angefasst, bewusst:** die Heads von **P8.6 (109 KB), P8 (48 KB), P6 (41 KB)** — abgeschlossene
+Phasen, alle drei **benannt** (P8-P). Bei P8.6 ist die `updated:`-Kette über **zwölf physische Zeilen**
+umbrochen (Zeile 23 allein 33 KB), das Rotationsskript kann sie nicht sicher schneiden; und jede neue
+Archivdatei kostet eine INDEX-Zeile, wo **INDEX nur noch ~400 B unter dem Cap** liegt.
 
 ### Offen, in dieser Reihenfolge
 

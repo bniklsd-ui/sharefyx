@@ -67,8 +67,10 @@ DOT_SEPARATOR_RE = re.compile(r" · (?=\d{4}-\d{2}-\d{2}\s*\()")
 # Fadeninhalte einzeln gegen die alte Zeile stellt, dann der neue Faden mit dem Skript. Der
 # Eintrag ist **gestrichen**, nicht auf 0/0 gesetzt: mit 0-0-Präfixen und fehlendem Feld wäre er
 # eine unsichtbare Ausnahme, deren Verschwinden kein Test bemerkt.
+# **2026-10-07 (Oversize-Fix):** `ROADMAP.md` repariert — die vier `updated: `-Präfixe aus der Kette
+# entfernt (Byte-Gegenprobe: die Zeile ist exakt 4 × 9 B kürzer, sonst unverändert), danach die Kette
+# per `scripts/rotate_index_updates.sh` nach `docs/ROADMAP_UPDATES_ARCHIVE.md` rotiert. Gestrichen.
 KNOWN_OFFENDERS: dict[str, tuple[bool, int, int]] = {
-    "ROADMAP.md": (False, 4, 0),
     "docs/concepts/phase9_hardening_block_trace_plan.md": (False, 1, 0),  # 📕, nie editieren
     "phase8_6_ui_polish/CLAUDE.md": (False, 1, 0),  # abgeschlossene Phase
 }

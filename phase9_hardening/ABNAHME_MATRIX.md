@@ -31,7 +31,7 @@ nur hier.
 
 ## Stand in einem Satz
 
-**117 Tabellenzeilen für 117 Abnahmezeilen: 104 ✅ · 12 ⚠️ · 1 ⬜** (P9-10 in zwei prüfbare Hälften
+**117 Tabellenzeilen für 117 Abnahmezeilen: 105 ✅ · 11 ⚠️ · 1 ⬜** (P9-10 in zwei prüfbare Hälften
 geteilt; seit 2026-10-05 kommen der **settings-Block** P9-83–P9-95 mit 12 ✅ und **einem** ⬜
 dazu — P9-94, der Portscan, ist ein Schritt des Nikingers und durch keinen Test ersetzbar —,
 sein **Nachtrag** P9-96–P9-102 aus der Bildsichtung mit **5 ✅ und 2 ⚠️**, und die **dritte
@@ -41,7 +41,7 @@ Polsterwert, P9-99 den gemessenen Umweg (`justify-content` statt des im Plan gen
 P9-10b und P9-12 sind **beide ✅**. *Datierte Korrektur 2026-10-07:* hier standen **3** offene
 Zeilen (P9-11, P9-13/V150, P9-94). **P9-11 und P9-94 sind seit dem 2026-10-07 ✅** — der
 `nmap`-Gegenlauf von außen ist gelaufen (Mini-Plan §5, vier Läufe plus ein Kontrolllauf, Grenze in der
-P9-11-Zeile). Die **eine** offene Zeile ist P9-13/V150, das zweite Claude-Konto. **Kein ⬜ ist offene Code-Arbeit** — und
+P9-11-Zeile). *Am selben Tag:* **P9-6** ⚠️ → ✅ (ROADMAP unter dem Cap, Oversize-Fix). Die **eine** offene Zeile ist P9-13/V150, das zweite Claude-Konto. **Kein ⬜ ist offene Code-Arbeit** — und
 **er blockiert die Phase nicht**: P9-13 braucht ein
 zweites Konto, und ein Schritt, den nur ein Mensch mit einem Konto tun kann, ist ein Termin, kein
 Blocker (Plan §0.1a; die Regel steht auch in der Wurzel-`CLAUDE.md` §Working style). *Datierte
