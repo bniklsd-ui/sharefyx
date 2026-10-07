@@ -1457,7 +1457,7 @@ def _media_query_bodies(css: str, condition: str) -> list[str]:
 
 
 def _block_body(css: str, selector: str) -> str:
-    """Liefert den Body des nächsten `{ ... }`-Blocks hinter dem Selector.
+    r"""Liefert den Body des nächsten `{ ... }`-Blocks hinter dem Selector.
 
     Drei Fixes ggü. der ersten H-R.0-Fassung:
       1. `^`-Anker + `re.MULTILINE`: `body` matcht nur das Top-Level-`body`-Element
