@@ -44,7 +44,7 @@
   <line x1="284" y1="277" x2="303" y2="277" stroke="#5a6b7d" stroke-width="1.8" marker-end="url(#ar)"/>
   <rect x="308" y="238" width="220" height="78" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
   <text x="418" y="257" font-size="12.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">C Vision · E Karte</text>
-  <text x="322" y="276" font-size="10" fill="#4a5a6b">RTX 3060 im LXC, 26,8 s statt 46–180</text>
+  <text x="322" y="276" font-size="10" fill="#4a5a6b">RTX 3060 im LXC, 19,9 s statt 46–180</text>
   <text x="322" y="291" font-size="10" fill="#4a5a6b">kein zweiter /graph-Abruf</text>
   <text x="418" y="308" font-size="10" fill="#b03030" text-anchor="middle" font-weight="700">ohne nvidia-uvm lief nie CUDA</text>
 

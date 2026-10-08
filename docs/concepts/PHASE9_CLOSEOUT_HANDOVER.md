@@ -12,7 +12,7 @@ down:
   - ../../phase9_hardening/CLAUDE.md                 # Phase-Head, Modulstatus
   - ../../phase9_hardening/SESSIONS_ARCHIVE.md       # volle Phasenhistorie, verbatim, newest-first
   - ./phase9_hardening_uebersicht.svg                # Übersichtsgrafik
-updated: 2026-10-08 (Abschluss-Handover P9 → P10, nach dem Deploy v3.1.4; mit Auswertung des Open-Tests MiniMax/Spacebunny auf Wunsch des Nikingers)
+updated: 2026-10-08 (Nachtrag: §5 nennt jetzt alle 40 aufgelösten [VERIFY]-Nummern, Cold-Start auf den P9-23-Wert 19,9 s korrigiert) | 2026-10-08 (Abschluss-Handover P9 → P10, nach dem Deploy v3.1.4; mit Auswertung des Open-Tests MiniMax/Spacebunny auf Wunsch des Nikingers)
 ---
 # Phase 9 — Closeout-Handover (P9 → P10)
 
@@ -25,7 +25,7 @@ updated: 2026-10-08 (Abschluss-Handover P9 → P10, nach dem Deploy v3.1.4; mit 
 1. Geplant war eine **Härtungsphase in acht Steps** (Plan 2026-09-19, Lock P9-A); gebaut wurden die acht Steps **plus sieben Blöcke**, die
    unterwegs aus Befunden und Sichtprüfungen entstanden (doing, trace, Buttons-Extra, settings, drei Bildsichtungen, feedback).
 2. Der Betrieb ist härter: **eigene Domain** `sharefyx.eurofyx.com` über einen VPS (Funnel bleibt Fallback, alte Adresse schreibt
-   unbefristet), **Watchdog** live und am echten Ausfall belegt, **Vision-Dienst** auf der RTX 3060 (26,8 s statt 46–180 s Cold-Start).
+   unbefristet), **Watchdog** live und am echten Ausfall belegt, **Vision-Dienst** auf der RTX 3060 (Cold-Start 19,9 s statt 46–180 s, P9-23).
 3. Das Schema ist zweimal angekündigt geöffnet worden (`doing`/`assignee`, `updated_by` + Git-Autor) — **ohne Migration**, beim zweiten
    Mal ohne Index-Neuaufbau; Löschen existiert jetzt, **human-only**, nach `DATA_ROOT/._trash/`.
 4. Fünf Deploys in der Phase (`v3.1.0` 10-02 · `v3.1.1` 10-03 · `v3.1.2` 10-05 · `v3.1.3` 10-07 · `v3.1.4` 10-08), jeder mit echter
@@ -85,7 +85,9 @@ Die Sammelstelle ist der Einstieg (§2 Wünsche, §3 Erbe, §4 Lieferumfang). **
   Space-Namen?) · **V120** (geerbt, Tab-Titel — jetzt intake §2.2).
 - **Teilweise:** **V157** ⚠️ (WebKit ungemessen; für den gemeldeten Fall gegenstandslos) · **V162 Lesart B** ⚠️ (`tailscale serve --tcp`
   und ACLs: Docs schweigen; siehe 4.1).
-- **Aufgelöst (Auswahl mit Folgen):** V148 Funnel kann keine eigene Domain · V149 alle Metadaten aus der Basis-URL · V151 VPS-Anteil
+- **Aufgelöst, vollständig (40 ✅, Nummern-Lesart):** V145–V149 · V151–V156 · V158–V161 · V162 A · V163 A · V164–V166 · V173–V188 ·
+  V189–V192. Zweite Lesarten: V162 B ⚠️, V163 B ✅. Geerbt: V118 ✅, V136 ✅, V120 ⬜. Reserviert, unbelegt: V167–V172.
+- **Davon mit Folgen für P10:** V148 Funnel kann keine eigene Domain · V149 alle Metadaten aus der Basis-URL · V151 VPS-Anteil
   2,4–3,6 % · V153 polkit statt sudoers · V160 `assignee` = Space-Name ohne Validierung · V161 ≤ 1,05 s Neuaufbau · V163 3.4.7-Fix inert ·
   V188 macOS-Vollbild ist OS-Verhalten · V189–V192 (feedback) · **V118** eine Linie · **V136** gegenstandslos am Anker.
 

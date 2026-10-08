@@ -6,7 +6,7 @@ detail: L2
 up: ./ABNAHME_MATRIX.md
 down:
   - ../docs/concepts/phase9_hardening_block_feedback_plan.md   # P9-121 – P9-137, Locks P9-BG–P9-BQ
-updated: 2026-10-08 (Closeout: P9-133/P9-134 eingetragen, beide ✅; Block live als `v3.1.4`) | 2026-10-08 (**B8 gemessen, kein Fix** — V190 beantwortet: ein Space-Wechsel = eine Anfrage; P9-132 ✅ Befundzweig, P9-126 ✅ (390 px gestrichen, Nikinger), Bilanz 118 ✅ · 13 ⚠️ · 1 ⬜) | 2026-10-08 (+1 Zeile P9-126, Block feedback B7; Bilanz 116 ✅ · 14 ⚠️ · 1 ⬜) | 2026-10-08 (angelegt — `ABNAHME_MATRIX_BLOECKE.md` stand bei 39.667 B, die drei E1a-Zeilen hätten den Softcap gerissen; der Abschnitt B1/B2 per `scripts/move_sections.py` verbatim hierher)
+updated: 2026-10-08 (P9-133: `pytest` 1265 auf dem Closeout-Commit `926daa6` bestätigt) | 2026-10-08 (Closeout: P9-133/P9-134 eingetragen, beide ✅; Block live als `v3.1.4`) | 2026-10-08 (**B8 gemessen, kein Fix** — V190 beantwortet: ein Space-Wechsel = eine Anfrage; P9-132 ✅ Befundzweig, P9-126 ✅ (390 px gestrichen, Nikinger), Bilanz 118 ✅ · 13 ⚠️ · 1 ⬜) | 2026-10-08 (+1 Zeile P9-126, Block feedback B7; Bilanz 116 ✅ · 14 ⚠️ · 1 ⬜) | 2026-10-08 (angelegt — `ABNAHME_MATRIX_BLOECKE.md` stand bei 39.667 B, die drei E1a-Zeilen hätten den Softcap gerissen; der Abschnitt B1/B2 per `scripts/move_sections.py` verbatim hierher)
 ---
 # Abnahmematrix Phase 9 — Teil: Block feedback (P9-121 – P9-137)
 
@@ -107,5 +107,5 @@ Wächter `test_the_trash_dialog_cleans_up_its_listeners_when_it_closes`.
 
 | Nr | Kriterium | Stand | Beleg |
 |---|---|---|---|
-| **P9-133** | `pytest` grün (≥ 1250 + neue), `ui_budget` 5/5, Tabu-Diff §0.3 leer, Gegenläufe rot | ✅ | **`pytest` 1265 passed** im frischen Release-venv des Deploys `v3.1.4` (`deploy.sh`, 234,91 s, Ausgabe im Closeout-Commit) und im Dev-venv beim Closeout nachgemessen · `ui_budget` **5/5** (173,1 KB von 250 KB) · Tabu-Diff `302b8c1..HEAD -- phase1_storage phase4_auth phase2_mcp` **leer** (E1a fasste nur `phase5_ui/webui/api.py` an, wie §0.3 es für E1 vorsieht) · Gegenläufe je Schritt rot, belegt in den Zeilen P9-121 – P9-137 und in `probes/p9_feedback_*_gegenprobe.json` |
+| **P9-133** | `pytest` grün (≥ 1250 + neue), `ui_budget` 5/5, Tabu-Diff §0.3 leer, Gegenläufe rot | ✅ | **`pytest` 1265 passed** im frischen Release-venv des Deploys `v3.1.4` (`deploy.sh`, 234,91 s, Ausgabe im Closeout-Commit) und im Dev-venv auf dem Closeout-Commit `926daa6` nachgemessen (223,84 s) · `ui_budget` **5/5** (173,1 KB von 250 KB) · Tabu-Diff `302b8c1..HEAD -- phase1_storage phase4_auth phase2_mcp` **leer** (E1a fasste nur `phase5_ui/webui/api.py` an, wie §0.3 es für E1 vorsieht) · Gegenläufe je Schritt rot, belegt in den Zeilen P9-121 – P9-137 und in `probes/p9_feedback_*_gegenprobe.json` |
 | **P9-134** | Sichtprüfung des Nikingers, acht Bilder | ✅ | **Nikinger-Aussage beim Closeout 2026-10-08: abgenommen.** Bilder `docs/screenshots/p9_feedback_*.png` (neun Dateien: B1, B2, B3, B4, B5, E1a, B7 bei 1440/1024/390); die eine Nachbesserung aus der Sichtung (B4: „Entfernen" rechtsbündig) steht in P9-130 |
