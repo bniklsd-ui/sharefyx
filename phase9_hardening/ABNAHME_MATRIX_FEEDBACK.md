@@ -47,3 +47,11 @@ updated: 2026-10-08 (angelegt — `ABNAHME_MATRIX_BLOECKE.md` stand bei 39.667 B
 | Nr | Kriterium | Stand | Beleg |
 |---|---|---|---|
 | **P9-131** | Einstellungsmenü hat „Schließen", der Knopf schließt die ganze Kette | ✅ | `#settings-menu-close` in `.overlay__actions` des Menü-Panels, verdrahtet auf `closeSettings` · Probe S9 (`probes/p9_feedback_b3_probe.json`, **12/12**): Menü + Update-Log offen (**2** Panels) → Klick → Overlay `hidden`, **0** Panels offen · **Gegenlauf gegen den alten Client: S9 rot** (11/12) · Wächter `test_the_settings_menu_has_a_close_button_that_closes_the_whole_chain`, ohne Fix rot · Bild `docs/screenshots/p9_feedback_b3_menue.png` (Knopf in Standardhöhe, höher als die Menüpunkte — Sichtprüfung) · `pytest` **1261** |
+
+## Block feedback — B4: Abstand der Mitgliederzeilen (P9-130)
+
+> Lock **P9-BM**. Stand **gebaut 2026-10-08, nicht deployt.**
+
+| Nr | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| **P9-130** | Mitgliederzeilen mit Standardabstand, **gemessen mit gefüllter Liste** | ✅ | `#space-member-list` als Flex-Spalte mit `gap: var(--space)` (`app.css`), kein `margin` an den Zeilen · Probe S10 (`probes/p9_feedback_b4_probe.json`, **13/13**): `team` → **4** Zeilen (alpha/beta je schreiben + lesen), Abstände **[8, 8, 8]** px gegen `--space` = 8 px · **Gegenlauf `gap: 0` (CSS temporär, danach zurückgesetzt): S10 rot**, Abstände [0, 0] (`probes/p9_feedback_b4_probe_gegenprobe.json`; die übrigen sechs roten Stationen dort sind Folgen der verbrauchten Wegwerf-Instanz, nicht des CSS) · Wächter `test_the_settings_chain_…` (Mitgliederliste: `display`, `flex-direction`, `gap`) · **Abweichung vom Plan, benannt:** die Probe *legt kein Mitglied an* — der Seed von `team` trägt bereits alpha **und** beta, die Liste ist damit im Harness erstmals gefüllt; das schließt die Grenze aus P9-107/P9-110 ebenso, und ein Anlegen bräuchte einen dritten Principal samt Re-Auth. Bild `docs/screenshots/p9_feedback_b4_mitglieder.png` |

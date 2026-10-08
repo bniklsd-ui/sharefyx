@@ -1358,6 +1358,11 @@ def test_the_two_input_rows_stop_being_staircases():
     # `margin: 0` ist Teil desselben Satzes: der Titelabstand (24 px, P9-AM) muss der einzige
     # bestimmende Wert bleiben, sonst haengt P9-96/P9-101 an einem Browser-Standard.
     assert _eigenschaft(mitglieder[0], "margin") == "0", mitglieder[0]
+    # P9-BM (B4, 2026-10-08): der Standardabstand zwischen den Zeilen sitzt am Wrapper. Ein
+    # `margin` an den Zeilen waere die zweite Quelle desselben Abstands (P9-AU-Muster).
+    assert _eigenschaft(mitglieder[0], "display") == "flex", mitglieder[0]
+    assert _eigenschaft(mitglieder[0], "flex-direction") == "column", mitglieder[0]
+    assert _eigenschaft(mitglieder[0], "gap") == "var(--space)", mitglieder[0]
 
 
 # --- Block „Kästchen enger" (Plan §12.1, Locks P9-BB/BC/BD/BE, Abnahme P9-116 – P9-119) ---------

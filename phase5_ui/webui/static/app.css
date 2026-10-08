@@ -2122,11 +2122,18 @@ select.input:focus {
    Mitglieder), die Zeile wird also gegen die Deklaration geprüft und die Wirkung bleibt der
    Sichtprüfung. `margin: 0` ist Teil desselben Satzes: der Titelabstand ist `24 px` (P9-AM) und
    war bisher der *größere* der beiden Margins (Browser-Standard 16 px); mit `margin: 0` ist er der
-   einzige, und beide Panels messen denselben Wert. */
+   einzige, und beide Panels messen denselben Wert.
+
+   P9-BM (2026-10-08, B4): die Zeilen bekommen den Standardabstand **am Wrapper**, als Flex-Spalte
+   mit `gap` — nicht als `margin` an den Zeilen. Dasselbe Muster wie P9-AU (Menüpunkte): der
+   letzte Eintrag braucht keine Sonderbehandlung, und der Abstand hängt an **einer** Stelle. */
 #space-member-list {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space);
 }
 
 /* P9-AZ (2026-10-05, Nikinger, wörtlich): „Name des Spaces"-Feld und „Space anlegen" **in eine

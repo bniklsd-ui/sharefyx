@@ -7,7 +7,7 @@ up: ../../phase9_hardening/CLAUDE.md
 down:
   - ./phase9_hardening_plan.md                 # 📕 P9-Plan; Lock P9-A (kein UI-Umbau), P9-K (Löschen nur eigene), §15 P10-Liste
   - ./phase9_hardening_block_settings_plan.md  # Formvorlage; Einstellungs-Kette P9-AE–P9-AL, auf der B4/B5 aufsetzen
-updated: 2026-10-08 (**B3 gebaut** — Schließen im Einstellungsmenü, §8) | 2026-10-08 (**E1a gebaut** — Team-Spaces verschieben/löschen, V191/V192 beantwortet, §8; drei datierte Abweichungen) | 2026-10-08 (**B2 gebaut** — Zielangabe im Anlegen-Dialog, §8; datierte Korrektur: der Home-Fall von P9-BH ist unerreichbar) | 2026-10-07 (**Nikinger-Entscheidungen E1–E3 eingetragen**: E1 freigegeben — Lock P9-BP, fremde Items im Team-Space löschbar, Eigentum über den Git-Autor nachverfolgt (P9-BQ); E2 und E3 wandern als offene Punkte in den Closeout/P10; Closeout erst nach B1–B8 + E1a) | 2026-10-07 (angelegt — Rückmeldung des Nikingers vom selben Tag, gegen `main@497c5bd` am Code gelesen; **nichts gebaut**)
+updated: 2026-10-08 (**B4 gebaut** — Abstand der Mitgliederzeilen, §8) | 2026-10-08 (**B3 gebaut** — Schließen im Einstellungsmenü, §8) | 2026-10-08 (**E1a gebaut** — Team-Spaces verschieben/löschen, V191/V192 beantwortet, §8; drei datierte Abweichungen) | 2026-10-08 (**B2 gebaut** — Zielangabe im Anlegen-Dialog, §8; datierte Korrektur: der Home-Fall von P9-BH ist unerreichbar) | 2026-10-07 (**Nikinger-Entscheidungen E1–E3 eingetragen**: E1 freigegeben — Lock P9-BP, fremde Items im Team-Space löschbar, Eigentum über den Git-Autor nachverfolgt (P9-BQ); E2 und E3 wandern als offene Punkte in den Closeout/P10; Closeout erst nach B1–B8 + E1a) | 2026-10-07 (angelegt — Rückmeldung des Nikingers vom selben Tag, gegen `main@497c5bd` am Code gelesen; **nichts gebaut**)
 ---
 
 # Phase 9 — Block feedback: die Rückmeldung vom 2026-10-07
@@ -338,3 +338,12 @@ Regel seit dem Oversize-Fix: neuer Block → neuer Teil, `scripts/move_sections.
   richtet `.overlay__actions` schon rechtsbündig aus (`.settings-chain .overlay__actions`).
 - Belege: Wächter (ohne Fix rot), Probe S9 **12/12**, Gegenlauf alter Client S9 rot, `pytest` **1261**, `ui_budget` 5/5.
 - **Für die Sichtprüfung:** der Knopf hat Standardhöhe und ist damit höher als die flachen Menüpunkte (P9-BB, 31,69 px).
+
+### B4 — Abstand der Mitgliederzeilen (gebaut 2026-10-08, nicht deployt)
+
+- `#space-member-list` ist eine Flex-Spalte mit `gap: var(--space)` (P9-BM); die bestehende Regel aus P9-AX
+  trägt drei Zeilen mehr, es gibt weiterhin **genau eine** Regel für den Selektor.
+- **Datierte Abweichung:** die Probe *legt kein Mitglied an*. Der Seed der Wegwerf-Instanz schreibt `team`
+  mit `read`/`write: [alpha, beta]`, die Liste hat also vier Zeilen (beide Rollen je Principal) — das genügt, um
+  die Grenze aus P9-107/P9-110 („Liste im Harness leer") zu schließen. Ein Anlegen bräuchte einen dritten Principal.
+- Belege: Probe S10 **13/13**, Abstände [8, 8, 8] px; Gegenlauf `gap: 0` → S10 rot (Abstände [0, 0]); `pytest` **1261**.

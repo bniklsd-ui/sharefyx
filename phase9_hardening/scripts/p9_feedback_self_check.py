@@ -20,6 +20,9 @@ Stationen:
   8  (E1a) Freigeben bleibt beim eigenen Space: Team-Zeilen haben keinen Freigeben-Knopf
   9  (B3, P9-BN) Einstellungen + Update-Log offen -> „Schliessen" im Menue -> Overlay und alle
      Panels `hidden`
+ 10  (B4, P9-BM) Spaces verwalten -> `team` -> der gemessene Abstand zwischen zwei Mitgliederzeilen
+     ist `--space`. `team` traegt aus dem Seed zwei Mitglieder (alpha, beta), die Liste ist also
+     im Harness erstmals **gefuellt** — das ist die Grenze aus P9-107/P9-110, jetzt geschlossen
 
 Aufruf (Stopp nur ueber die PID-Datei, Hard Rule 9):
     python phase9_hardening/scripts/p9_feedback_wegwerf.py start
@@ -294,6 +297,37 @@ def _b3(page: Page) -> None:
            f"vorher offene Panels={offen} danach Overlay hidden={zu['overlay']} offene Panels={zu['offen']}")
 
 
+def _b4(page: Page) -> None:
+    page.locator("#account-button").click()
+    time.sleep(0.6)
+    page.locator("#account-manage-spaces").click()
+    time.sleep(0.8)
+    zeile = page.locator(".settings-space-row").filter(has_text="team")
+    if zeile.count() == 0:
+        pruefe("S10 Mitgliederzeilen haben den Standardabstand", False, "keine Space-Zeile `team`")
+        return
+    zeile.first.click()
+    time.sleep(1.2)
+    m = page.evaluate("""() => {
+        const r2 = (v) => Math.round(v * 100) / 100;
+        const liste = document.getElementById('space-member-list');
+        const zeilen = [...liste.querySelectorAll(':scope > li')].map(li => li.getBoundingClientRect());
+        const probe = document.createElement('div');
+        probe.style.cssText = 'position:absolute;visibility:hidden;width:var(--space)';
+        document.body.appendChild(probe);
+        const space = probe.getBoundingClientRect().width;
+        probe.remove();
+        return {n: zeilen.length, space: r2(space),
+                abstaende: zeilen.slice(1).map((b, i) => r2(b.top - zeilen[i].bottom))};
+    }""")
+    page.locator("#settings-space-detail").screenshot(path=str(OUT_DIR / "p9_feedback_b4_mitglieder.png"))
+    pruefe("S10 Mitgliederzeilen haben den Standardabstand (--space)",
+           m["n"] >= 2 and m["space"] > 0 and all(abs(a - m["space"]) <= 0.5 for a in m["abstaende"]),
+           f"Zeilen={m['n']} --space={m['space']} px Abstaende={m['abstaende']}")
+    page.locator("#settings-menu-close").click()
+    time.sleep(0.6)
+
+
 def main() -> int:
     global OUT_DIR
     ap = argparse.ArgumentParser()
@@ -302,7 +336,7 @@ def main() -> int:
     ap.add_argument("--data-root", type=Path, default=DEFAULT_DATA_ROOT)
     # Getrennter Bericht fuer Gegenlaeufe, damit kein Gegenlauf den Erfolgsbeleg ueberschreibt
     # (derselbe Fehler wie im trace-Block 2026-10-02). Die B1-Belege bleiben als Stand von B1 liegen.
-    ap.add_argument("--report", type=Path, default=PROBE_DIR / "p9_feedback_b3_probe.json")
+    ap.add_argument("--report", type=Path, default=PROBE_DIR / "p9_feedback_b4_probe.json")
     ap.add_argument("--screenshots-dir", type=Path, default=OUT_DIR)
     args = ap.parse_args()
     OUT_DIR = args.screenshots_dir
@@ -379,6 +413,9 @@ def main() -> int:
 
         # --- S9: Schliessen im Einstellungsmenue (B3) ------------------------------------------
         _b3(alpha)
+
+        # --- S10: Abstand der Mitgliederzeilen (B4) ------------------------------------------
+        _b4(alpha)
 
         # --- S3: Anlegen im Home-Space bleibt im Home-Space ----------------------------------
         alpha.locator("#home-button").click()
