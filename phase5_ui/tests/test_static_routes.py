@@ -2255,3 +2255,36 @@ def test_the_delete_dialog_shows_the_title_as_its_own_line_above_the_field():
     assert "trashTitleEl.innerHTML" not in js
     assert 'trashConfirmInputEl.value.trim() !== ziel.title' in js
 
+
+def test_enter_triggers_the_primary_action_in_every_overlay_except_the_two_exceptions():
+    """P9-BK (Block feedback B6, 2026-10-08, Plan §5): eine Tabelle in `app.js`, Overlay -> Primaerknopf.
+    **Ausgenommen:** `conflict-dialog` (zwei gleichrangige Wege) und `link-picker-dialog` (eigener
+    Enter-Weg). Ein gesperrter Knopf bleibt folgenlos, `<textarea>`/`<select>` behalten ihr Enter."""
+    js = _js_ohne_kommentare((DEFAULT_STATIC_DIR / "js" / "app.js").read_text("utf-8"))
+    html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
+    for dialog, knopf in [("createDialogEl", "create-submit"), ("newFolderDialogEl", "new-folder-submit"),
+                          ("moveDialogEl", "move-submit"), ("shareDialogEl", "share-submit"),
+                          ("trashDialogEl", "trash-submit"), ("spaceRemoveDialogEl", "space-remove-submit"),
+                          ("confirmDialogEl", "confirm-ok"), ("legacyHostDialogEl", "legacy-host-close")]:
+        assert f'[{dialog}, "{knopf}",' in js, (dialog, knopf)
+        assert f'id="{knopf}"' in html, knopf
+    assert "[conflictDialogEl, null, null]" in js
+    assert "[linkPickerDialogEl, null, null]" in js
+    assert "button.hidden || button.disabled" in js
+    assert 'tag === "TEXTAREA" || tag === "SELECT" || tag === "BUTTON"' in js
+
+
+def test_the_trash_dialog_cleans_up_its_listeners_when_it_closes():
+    """P9-BK-Fund (B6, 2026-10-08): `{ once: true }` liess nach „Abbrechen" den Absenden-Listener am
+    Knopf stehen — der naechste Loeschdialog schickte zwei DELETEs. Ein `AbortController` raeumt beide
+    in `finish()`; ein Fehlversuch verbraucht den Listener nicht mehr."""
+    js = _js_ohne_kommentare((DEFAULT_STATIC_DIR / "js" / "dialogs.js").read_text("utf-8"))
+    start = js.index("export function openTrashTitleDialog") if "export function openTrashTitleDialog" in js \
+        else js.index("function openTrashTitleDialog")
+    ende = js.index("// -- Speichern / Konflikt", start) if "// -- Speichern / Konflikt" in js else len(js)
+    block = js[start:ende]
+    assert "new AbortController()" in block and "listeners.abort();" in block
+    assert block.count("{ signal: listeners.signal }") == 2
+    assert "once: true" not in block
+    assert "unterwegs" in block
+

@@ -243,6 +243,62 @@ function initShell() {
       || !spaceRemoveDialogEl.hidden || !linkPickerDialogEl.hidden || !legacyHostDialogEl.hidden;
   }
 
+  // P9-BK (Block feedback B6): Enter löst in jedem Overlay die Primäraktion aus (Plan §5). Eine
+  // Tabelle statt elf Einzelhandlern: Overlay -> Primärknopf -> erlaubte Felder (`null` = jedes
+  // Textfeld). Reihenfolge wie bei ESC. **Ausgenommen:** `conflict-dialog` (zwei gleichrangige
+  // Wege, Enter wäre Raten) und `link-picker-dialog` (eigener Enter-Weg in `dialogs.js`, sonst
+  // doppelt). `<textarea>`/`<select>`/`<button>` behalten ihr natives Enter. Ein gesperrter Knopf
+  // (`disabled`, z. B. Löschen ohne passenden Titel) bleibt folgenlos — das Gate wird nicht umgangen.
+  function enterTable() {
+    return [
+      [confirmDialogEl, "confirm-ok", "none"],
+      [conflictDialogEl, null, null],
+      [createDialogEl, "create-submit", null],
+      [newFolderDialogEl, "new-folder-submit", null],
+      [moveDialogEl, "move-submit", ["move-reauth-totp"]],
+      [shareDialogEl, "share-submit", ["share-reauth-totp"]],
+      [trashDialogEl, "trash-submit", null],
+      [spaceRemoveDialogEl, "space-remove-submit", ["space-remove-confirm-input", "space-remove-reauth-totp"]],
+      [settingsOverlayEl, "settings", null],
+      [linkPickerDialogEl, null, null],
+      [legacyHostDialogEl, "legacy-host-close", "none"],
+    ];
+  }
+  var SETTINGS_ENTER = {
+    "settings-password": { button: "account-submit", fields: ["account-totp"] },
+    "settings-spaces": { button: "space-create-submit", fields: ["space-create-name-input"] },
+    "settings-space-detail": { button: "space-member-add-submit",
+      fields: ["space-member-name-input", "space-member-reauth-totp"] },
+  };
+
+  function enterPrimaryAction(event, tag) {
+    if (tag === "TEXTAREA" || tag === "SELECT" || tag === "BUTTON" || tag === "A") return false;
+    var target = document.activeElement;
+    var rows = enterTable();
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i][0].hidden) continue;
+      var buttonId = rows[i][1];
+      var fields = rows[i][2];
+      if (!buttonId) return false;
+      if (buttonId === "settings") {
+        var panel = target && target.closest && target.closest(".settings-panel");
+        var rule = panel && SETTINGS_ENTER[panel.id];
+        if (!rule || rule.fields.indexOf(target.id) === -1) return false;
+        buttonId = rule.button;
+      } else if (fields === "none") {
+        if (tag === "INPUT") return false;
+      } else if (tag !== "INPUT" || !rows[i][0].contains(target)
+          || (fields && fields.indexOf(target.id) === -1)) {
+        return false;
+      }
+      var button = document.getElementById(buttonId);
+      if (!button || button.hidden || button.disabled) return false;
+      button.click();
+      return true;
+    }
+    return false;
+  }
+
   document.addEventListener("keydown", function (event) {
     var tag = document.activeElement && document.activeElement.tagName;
     var inField = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
@@ -273,6 +329,11 @@ function initShell() {
       else if (!linkPickerDialogEl.hidden) closeLinkPicker();
       else if (!legacyHostDialogEl.hidden) legacyHostDialogEl.hidden = true;
       else if (state.selectedId !== null) Editor.closeEditor();
+      return;
+    }
+    if (event.key === "Enter" && !event.shiftKey && !event.altKey && !event.metaKey
+        && !event.ctrlKey && !event.isComposing) {
+      if (enterPrimaryAction(event, tag)) event.preventDefault();
       return;
     }
     if (event.key === "/" && !inField) {

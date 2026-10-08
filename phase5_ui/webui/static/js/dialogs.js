@@ -392,9 +392,16 @@ function openTrashTitleDialog(item) {
 
   return new Promise(function (resolve) {
     var fertig = false;
+    // P9-BK-Fund (B6): `{ once: true }` an beiden Knöpfen reichte nicht — **Abbrechen ließ den
+    // Absenden-Listener am Knopf stehen**, und der nächste Dialog löste beim Absenden **zwei**
+    // DELETEs aus (der zweite: „Item nicht gefunden"). Umgekehrt war der Listener nach einem
+    // Fehlversuch (Konflikt) verbraucht, ein zweiter Klick tat nichts. Ein `AbortController`
+    // räumt beide in `finish()` ab, und der Absenden-Listener darf nach einem Fehler wieder feuern.
+    var listeners = new AbortController();
     function finish(value) {
       if (fertig) return;
       fertig = true;
+      listeners.abort();
       trashDialogEl.hidden = true;
       trashConfirmInputEl.value = "";
       trashTargetItem = null;
@@ -403,12 +410,12 @@ function openTrashTitleDialog(item) {
       resolve(value);
     }
     pendingTrashCancel = function () { finish(false); };
-    // `{ once: true }` an beiden: `openTrashDialog()` darf mehrfach laufen (zwei Klicks auf zwei
-    // Zeilen), und ein Listener, der überlebt, hinge beim zweiten Mal noch am alten Dialog.
-    trashCancelEl.addEventListener("click", function () { finish(false); }, { once: true });
+    trashCancelEl.addEventListener("click", function () { finish(false); }, { signal: listeners.signal });
+    var unterwegs = false;   // ein zweiter Klick/Enter während der Anfrage löst keinen zweiten DELETE aus
     trashSubmitEl.addEventListener("click", function () {
       var ziel = trashTargetItem;
-      if (!ziel) return;
+      if (!ziel || unterwegs) return;
+      unterwegs = true;
       // Der eingetippte Titel wandert als `confirm` mit — verglichen wird vom Server, nicht hier.
       api("/items/" + encodeURIComponent(ziel.id), {
         method: "DELETE",
@@ -416,6 +423,7 @@ function openTrashTitleDialog(item) {
       }).then(function () {
         finish(true);
       }).catch(function (err) {
+        unterwegs = false;
         if (err.message === "unauthenticated") return;
         if (err.code === "conflict") {
           trashError("Ein anderer Client hat dieses Item zwischenzeitlich geändert — es wurde "
@@ -424,7 +432,7 @@ function openTrashTitleDialog(item) {
         }
         trashError(err.message || "Löschen fehlgeschlagen.");
       });
-    }, { once: true });
+    }, { signal: listeners.signal });
   });
 }
 

@@ -18,6 +18,8 @@ Stationen:
      echten Zwei-Schritt-Dialog; der Dialog nennt `beta`, der Papierkorb-Commit traegt `alpha`
   7  (E1a) alpha zieht ein beta-Item per **echter Maus** auf den Team-Ordner `ablage`
   8  (E1a) Freigeben bleibt beim eigenen Space: Team-Zeilen haben keinen Freigeben-Knopf
+  12 (B6, P9-BK) Enter: Anlegen-Dialog legt an, <select> und gesperrter Loeschknopf folgenlos,
+     Enter mit passendem Titel loescht, Enter im TOTP-Feld des Passwort-Panels loest „Aendern“ aus
   11 (B5, P9-BL) Loeschdialog: der Titel steht als eigene, fette Zeile direkt ueber dem Feld;
      ein Titel mit HTML bleibt Text; der Loeschknopf bleibt gesperrt (Gate unveraendert)
   9  (B3, P9-BN) Einstellungen + Update-Log offen -> „Schliessen" im Menue -> Overlay und alle
@@ -299,6 +301,74 @@ def _b3(page: Page) -> None:
            f"vorher offene Panels={offen} danach Overlay hidden={zu['overlay']} offene Panels={zu['offen']}")
 
 
+def _b6(page: Page, args) -> None:
+    """(B6, P9-BK) Enter loest die Primaeraktion aus; gesperrter Knopf, <select> und Konflikt-Ausnahme folgenlos."""
+    titel = "B6 Enter"
+    # 1. Anlegen-Dialog: Enter im Titelfeld legt an
+    page.locator("#create-button:visible, #new-item-button:visible").first.click()
+    page.locator("#create-title-input").fill(titel)
+    page.keyboard.press("Enter")
+    time.sleep(2.5)
+    angelegt = _team_item(args.base_url, page, titel)
+    pruefe("S12a Enter im Anlegen-Dialog legt an",
+           angelegt is not None, f"Item vorhanden={angelegt is not None}")
+    # 2. <select> behaelt sein natives Enter: der Dialog bleibt offen, nichts wird angelegt
+    _in_den_shared_space(page, args.base_url)
+    page.locator("#create-button:visible, #new-item-button:visible").first.click()
+    page.locator("#create-title-input").fill("B6 Select")
+    page.locator("#create-type").focus()
+    page.keyboard.press("Enter")
+    time.sleep(1.0)
+    offen = not page.locator("#create-dialog").evaluate("e => e.hidden")
+    ohne = _team_item(args.base_url, page, "B6 Select") is None
+    page.locator("#create-cancel").click()
+    pruefe("S12b Enter im <select> loest nichts aus (Dialog offen, nichts angelegt)",
+           offen and ohne, f"Dialog offen={offen} nichts angelegt={ohne}")
+    # 3. Loeschdialog: Enter ohne passenden Titel folgenlos (Gegenlauf), mit Titel loescht
+    _in_den_shared_space(page, args.base_url)
+    zeile = page.locator(".list__rows > li").filter(has_text=titel)
+    zeile.first.locator(".list__row-trash").click()
+    page.locator("#confirm-ok").click()
+    time.sleep(0.4)
+    page.keyboard.press("Enter")
+    time.sleep(1.0)
+    noch_offen = not page.locator("#trash-dialog").evaluate("e => e.hidden")
+    noch_da = _team_item(args.base_url, page, titel) is not None
+    pruefe("S12c Enter am gesperrten Loeschknopf ist folgenlos (Gegenlauf)",
+           noch_offen and noch_da, f"Dialog offen={noch_offen} Item da={noch_da}")
+    page.locator("#trash-confirm-input").fill(titel)
+    page.keyboard.press("Enter")
+    time.sleep(2.0)
+    weg = _team_item(args.base_url, page, titel) is None
+    zu = page.locator("#trash-dialog").evaluate("e => e.hidden")
+    pruefe("S12d Enter mit passendem Titel loescht — genau einmal (nach einem abgebrochenen Dialog davor)",
+           weg and zu, f"Item geloescht={weg} Dialog zu={zu} (offen mit Fehler = zweiter DELETE durch stehengebliebenen Listener)")
+    # 4. Einstellungen: Enter im TOTP-Feld des Passwort-Panels und im Namensfeld der Anlegezeile
+    #    loesen den Primaerknopf aus (Klicks werden gezaehlt und abgefangen, nichts wird abgeschickt)
+    page.locator("#home-button").click()
+    time.sleep(1.0)
+    page.locator("#account-button").click()
+    time.sleep(0.5)
+    page.locator("#settings-open-password").click()
+    time.sleep(0.6)
+    page.evaluate("""() => { window.__klicks = {};
+        for (const id of ['account-submit', 'space-create-submit']) {
+          document.getElementById(id).addEventListener('click', (e) => {
+            window.__klicks[id] = (window.__klicks[id] || 0) + 1; e.stopImmediatePropagation(); }, true); } }""")
+    page.locator("#account-current").focus()
+    page.keyboard.press("Enter")           # Passwortfeld: bewusst folgenlos
+    page.locator("#account-totp").focus()
+    page.keyboard.press("Enter")           # TOTP-Feld: Absenden
+    pw = page.evaluate("window.__klicks['account-submit'] || 0")
+    time.sleep(0.4)
+    pruefe("S12e Enter im TOTP-Feld des Passwort-Panels loest „Aendern“ genau einmal aus, im Passwortfeld nicht",
+           pw == 1, f"Klicks auf account-submit={pw}")
+    page.keyboard.press("Escape")
+    time.sleep(0.3)
+    page.keyboard.press("Escape")
+    time.sleep(0.4)
+
+
 def _b5(page: Page, args) -> None:
     """(B5, P9-BL) Titelzeile im Loeschdialog: Text == Titel, direkt ueber dem Feld, HTML bleibt Text."""
     titel = "<i>B5</i> Titel"
@@ -384,7 +454,7 @@ def main() -> int:
     ap.add_argument("--data-root", type=Path, default=DEFAULT_DATA_ROOT)
     # Getrennter Bericht fuer Gegenlaeufe, damit kein Gegenlauf den Erfolgsbeleg ueberschreibt
     # (derselbe Fehler wie im trace-Block 2026-10-02). Die B1-Belege bleiben als Stand von B1 liegen.
-    ap.add_argument("--report", type=Path, default=PROBE_DIR / "p9_feedback_b5_probe.json")
+    ap.add_argument("--report", type=Path, default=PROBE_DIR / "p9_feedback_b6_probe.json")
     ap.add_argument("--screenshots-dir", type=Path, default=OUT_DIR)
     args = ap.parse_args()
     OUT_DIR = args.screenshots_dir
@@ -442,6 +512,7 @@ def main() -> int:
         if _in_den_shared_space(alpha, args.base_url):
             _e1a(alpha, args)
             _b5(alpha, args)
+            _b6(alpha, args)
 
         # --- S5: Uebersicht nach team — Messung, kein Urteil ---------------------------------
         if _in_den_shared_space(alpha, args.base_url):

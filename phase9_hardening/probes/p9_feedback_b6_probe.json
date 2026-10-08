@@ -1,0 +1,107 @@
+{
+  "base_url": "https://127.0.0.1:18778",
+  "befunde": [
+    {
+      "pruefung": "S4 der Anlegen-Dialog nennt den Team-Space als Ziel",
+      "ok": true,
+      "detail": "Zielzeile='Anlegen in: team'"
+    },
+    {
+      "pruefung": "S1 Anlegen im Team-Space landet im Team-Space",
+      "ok": true,
+      "detail": "HTTP 200 Treffer=1 Git-Autor='alpha'"
+    },
+    {
+      "pruefung": "S1b danach steht die UI im Team-Space (Item in der Liste)",
+      "ok": true,
+      "detail": "Zeilen mit Titel=1 Kopf=''"
+    },
+    {
+      "pruefung": "S2 Gegenlauf: das Team-Item steht nicht im Home-Space",
+      "ok": true,
+      "detail": "HTTP 200 Treffer im Home=0"
+    },
+    {
+      "pruefung": "S8 Team-Zeilen: Loeschen ja, Freigeben nein",
+      "ok": true,
+      "detail": "Zeilen=2 Loeschknoepfe=2 Freigabeknoepfe=0"
+    },
+    {
+      "pruefung": "S6 alpha loescht im Team-Space ein Item von beta",
+      "ok": true,
+      "detail": "vorher updated_by='beta' danach vorhanden=False"
+    },
+    {
+      "pruefung": "S6b der Loeschdialog nennt beta, der Papierkorb-Commit traegt alpha",
+      "ok": true,
+      "detail": "Hinweis='Zur Sicherheit den Titel eintippen. Zurückholen kannst du es danach nur über Git. Zuletzt geändert von beta.' Git-Autor='alpha'"
+    },
+    {
+      "pruefung": "S7 alpha zieht ein beta-Item per Maus in den Team-Ordner",
+      "ok": true,
+      "detail": "Quelle=1 Ziel=1 folder='ablage'"
+    },
+    {
+      "pruefung": "S11 Loeschdialog zeigt den Titel als eigene Zeile direkt ueber dem Feld, HTML bleibt Text",
+      "ok": true,
+      "detail": "Messung={'text': '<i>B5</i> Titel', 'kinder': 0, 'abstand': 4, 'sichtbar': True, 'gewicht': '600'} Loeschknopf gesperrt=True"
+    },
+    {
+      "pruefung": "S12a Enter im Anlegen-Dialog legt an",
+      "ok": true,
+      "detail": "Item vorhanden=True"
+    },
+    {
+      "pruefung": "S12b Enter im <select> loest nichts aus (Dialog offen, nichts angelegt)",
+      "ok": true,
+      "detail": "Dialog offen=True nichts angelegt=True"
+    },
+    {
+      "pruefung": "S12c Enter am gesperrten Loeschknopf ist folgenlos (Gegenlauf)",
+      "ok": true,
+      "detail": "Dialog offen=True Item da=True"
+    },
+    {
+      "pruefung": "S12d Enter mit passendem Titel loescht — genau einmal (nach einem abgebrochenen Dialog davor)",
+      "ok": true,
+      "detail": "Item geloescht=True Dialog zu=True (offen mit Fehler = zweiter DELETE durch stehengebliebenen Listener)"
+    },
+    {
+      "pruefung": "S12e Enter im TOTP-Feld des Passwort-Panels loest „Aendern“ genau einmal aus, im Passwortfeld nicht",
+      "ok": true,
+      "detail": "Klicks auf account-submit=1"
+    },
+    {
+      "pruefung": "S5 Messung: Anlegen-Knopf in der Uebersicht nach team",
+      "ok": true,
+      "messung": true,
+      "detail": "sichtbare Knoepfe=0 Zielzeile=None"
+    },
+    {
+      "pruefung": "S9 Schliessen im Einstellungsmenue schliesst die ganze Kette",
+      "ok": true,
+      "detail": "vorher offene Panels=2 danach Overlay hidden=True offene Panels=0"
+    },
+    {
+      "pruefung": "S10b Entfernen-Knoepfe sitzen rechtsbuendig auf der Kante von „Hinzufuegen“, Abstand zum Text >= --space",
+      "ok": true,
+      "detail": "Hinzufuegen rechts=1154 Zeilen=[{'rechts': 1154, 'abstand': 83}, {'rechts': 1154, 'abstand': 91}]"
+    },
+    {
+      "pruefung": "S10 Mitgliederzeilen haben den Standardabstand (--space)",
+      "ok": true,
+      "detail": "Zeilen=4 --space=8 px Abstaende=[8, 8, 8]"
+    },
+    {
+      "pruefung": "S4b der Anlegen-Dialog nennt im Home-Space den Home-Space als Ziel",
+      "ok": true,
+      "detail": "Zielzeile='Anlegen in: alpha (dein Home-Space)'"
+    },
+    {
+      "pruefung": "S3 Anlegen im Home-Space bleibt im Home-Space",
+      "ok": true,
+      "detail": "HTTP 200 Treffer=1"
+    }
+  ],
+  "alle_ok": true
+}

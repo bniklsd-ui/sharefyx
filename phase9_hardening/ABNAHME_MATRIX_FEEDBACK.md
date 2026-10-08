@@ -64,3 +64,19 @@ updated: 2026-10-08 (angelegt — `ABNAHME_MATRIX_BLOECKE.md` stand bei 39.667 B
 |---|---|---|---|
 | **P9-129** | Löschdialog zeigt den Titel als eigene Zeile direkt über dem Feld (Text, kein HTML) | ✅ | `<span id="trash-title">` im `<label>` zwischen Beschriftung und `#trash-confirm-input`, gefüllt per `textContent` in `openTrashTitleDialog` (`dialogs.js`), fett (600), umbrechend · Probe S11 (`probes/p9_feedback_b5_probe.json`, **15/15**): Text == `<i>B5</i> Titel` (ein HTML-Titel, als Text gezeigt, **0** Kindelemente), Abstand zum Feld **4 px**, Löschknopf **gesperrt** (Gate unverändert, P9-K) · **Gegenlauf gegen den alten Client: S11 rot** (14/15, kein `#trash-title`; `probes/p9_feedback_b5_probe_gegenprobe.json`) · Wächter `test_the_delete_dialog_shows_the_title_as_its_own_line_above_the_field` · Bild `docs/screenshots/p9_feedback_b5_titelzeile.png` |
 
+## Block feedback — B6: Enter löst die Primäraktion aus (P9-127, P9-128)
+
+> Lock **P9-BK**. Stand **gebaut 2026-10-08, nicht deployt.**
+
+| Nr | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| **P9-127** | Enter löst in jedem Overlay aus Plan §5 die Primäraktion aus, die Ausnahmen bleiben folgenlos | ⚠️ | Eine Tabelle `enterTable()` + `SETTINGS_ENTER` in `app.js` (Overlay → Primärknopf → erlaubte Felder), Reihenfolge wie bei ESC; `conflict-dialog` und `link-picker-dialog` mit `null` ausgenommen · Probe S12 (`probes/p9_feedback_b6_probe.json`, **20/20**): Anlegen-Dialog legt per Enter an (S12a), `<select>` behält sein Enter (S12b), Enter im TOTP-Feld des Passwort-Panels klickt „Ändern" **genau einmal**, im Passwortfeld nicht (S12e) · **Gegenlauf alter `app.js`: S12a rot** (Item nicht angelegt) · Wächter `test_enter_triggers_the_primary_action_in_every_overlay_except_the_two_exceptions` · **⚠️, nicht ✅:** im Browser belegt sind Anlegen, Löschen, `<select>` und das Passwort-Panel; Neuer-Ordner, Verschieben, Teilen, Space-Entfernen, Bestätigen, Legacy-Host und die beiden anderen Einstellungs-Panels stehen **nur in der Tabelle und im Wächter**, nicht in der Probe |
+| **P9-128** | Enter am gesperrten Löschknopf ist folgenlos (Gegenlauf) | ✅ | Probe S12c: Enter bei leerem Titelfeld → Dialog bleibt offen, Item da; S12d: Enter mit exaktem Titel löscht · Die Tabelle prüft `button.hidden \|\| button.disabled` vor dem Klick (Gate P9-K unberührt) |
+
+**Fund aus B6, kein Plan-Punkt (datiert 2026-10-08):** `dialogs.js :: openTrashTitleDialog` hängte
+`{ once: true }`-Listener an Absenden **und** Abbrechen. **Abbrechen ließ den Absenden-Listener stehen**, der nächste Löschdialog
+schickte beim Absenden **zwei** DELETEs (der zweite: „Item nicht gefunden", Dialog blieb offen) — und ein Fehlversuch
+(Konflikt) verbrauchte den Listener, ein zweiter Klick tat nichts. Gefunden, weil die B5-Probe einen Dialog abbricht und B6 danach
+löscht. Behoben mit `AbortController` plus Unterwegs-Flag; **Gegenlauf alter `dialogs.js`: S12d rot** (Dialog offen mit Fehler);
+Wächter `test_the_trash_dialog_cleans_up_its_listeners_when_it_closes`.
+
