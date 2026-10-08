@@ -1860,6 +1860,16 @@ select.input:focus {
   color: var(--text-muted);
   margin-bottom: var(--space);
 }
+/* P9-BL (B5): der Titel des zu löschenden Items als eigene, hervorgehobene Zeile zwischen
+   Beschriftung und Feld. Lange Titel brechen um, statt das Fenster aufzuziehen. */
+.overlay__panel label .trash-title {
+  display: block;
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
 .overlay__panel label .input {
   display: block;
   width: 100%;

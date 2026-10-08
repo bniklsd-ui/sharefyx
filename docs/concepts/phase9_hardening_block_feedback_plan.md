@@ -7,7 +7,7 @@ up: ../../phase9_hardening/CLAUDE.md
 down:
   - ./phase9_hardening_plan.md                 # 📕 P9-Plan; Lock P9-A (kein UI-Umbau), P9-K (Löschen nur eigene), §15 P10-Liste
   - ./phase9_hardening_block_settings_plan.md  # Formvorlage; Einstellungs-Kette P9-AE–P9-AL, auf der B4/B5 aufsetzen
-updated: 2026-10-08 (**B4 gebaut** — Abstand der Mitgliederzeilen, §8) | 2026-10-08 (**B3 gebaut** — Schließen im Einstellungsmenü, §8) | 2026-10-08 (**E1a gebaut** — Team-Spaces verschieben/löschen, V191/V192 beantwortet, §8; drei datierte Abweichungen) | 2026-10-08 (**B2 gebaut** — Zielangabe im Anlegen-Dialog, §8; datierte Korrektur: der Home-Fall von P9-BH ist unerreichbar) | 2026-10-07 (**Nikinger-Entscheidungen E1–E3 eingetragen**: E1 freigegeben — Lock P9-BP, fremde Items im Team-Space löschbar, Eigentum über den Git-Autor nachverfolgt (P9-BQ); E2 und E3 wandern als offene Punkte in den Closeout/P10; Closeout erst nach B1–B8 + E1a) | 2026-10-07 (angelegt — Rückmeldung des Nikingers vom selben Tag, gegen `main@497c5bd` am Code gelesen; **nichts gebaut**)
+updated: 2026-10-08 (**B5 gebaut** — Titelzeile im Löschdialog, §8) | 2026-10-08 (**B4 gebaut** — Abstand der Mitgliederzeilen, §8) | 2026-10-08 (**B3 gebaut** — Schließen im Einstellungsmenü, §8) | 2026-10-08 (**E1a gebaut** — Team-Spaces verschieben/löschen, V191/V192 beantwortet, §8; drei datierte Abweichungen) | 2026-10-08 (**B2 gebaut** — Zielangabe im Anlegen-Dialog, §8; datierte Korrektur: der Home-Fall von P9-BH ist unerreichbar) | 2026-10-07 (**Nikinger-Entscheidungen E1–E3 eingetragen**: E1 freigegeben — Lock P9-BP, fremde Items im Team-Space löschbar, Eigentum über den Git-Autor nachverfolgt (P9-BQ); E2 und E3 wandern als offene Punkte in den Closeout/P10; Closeout erst nach B1–B8 + E1a) | 2026-10-07 (angelegt — Rückmeldung des Nikingers vom selben Tag, gegen `main@497c5bd` am Code gelesen; **nichts gebaut**)
 ---
 
 # Phase 9 — Block feedback: die Rückmeldung vom 2026-10-07
@@ -350,3 +350,12 @@ Regel seit dem Oversize-Fix: neuer Block → neuer Teil, `scripts/move_sections.
 - **Nachsatz 2026-10-08 (Sichtprüfung des Nikingers zu Bild B4):** „Entfernen" nahe am Text → rechtsbündig auf die Kante
   der Knöpfe darunter (`.space-member-row`: Flex, `space-between`, `gap`). Das hält auch das Fenster bei mittellangen
   Space-Namen stabil. Probe S10b 14/14, Gegenlauf rot.
+
+### B5 — Titelzeile im Löschdialog (gebaut 2026-10-08, nicht deployt)
+
+- `#trash-title` (`<span>`, im `<label>` direkt über `#trash-confirm-input`), `textContent` = `item.title`; fett, bricht um.
+  Das Gate `trashRefreshSubmit()` bleibt unberührt (P9-K): sichtbar machen ist nicht lockern.
+- Belege: Probe S11 **15/15** (HTML-Titel bleibt Text, Abstand 4 px, Knopf gesperrt), Gegenlauf alter Client rot, Wächter.
+- **Probe-Fund:** nach dem Anlegen steht der Editor offen und die Listenzeile ist nicht klickbar — die Station geht dafür
+  frisch in die Liste (`_in_den_shared_space`).
+

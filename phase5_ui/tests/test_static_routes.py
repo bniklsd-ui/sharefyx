@@ -2243,3 +2243,15 @@ def test_the_settings_menu_has_a_close_button_that_closes_the_whole_chain():
     assert 'id="settings-menu-close"' in menu.group(1)
     js = _js_ohne_kommentare((DEFAULT_STATIC_DIR / "js" / "settings.js").read_text("utf-8"))
     assert 'getElementById("settings-menu-close").addEventListener("click", closeSettings)' in js
+
+
+def test_the_delete_dialog_shows_the_title_as_its_own_line_above_the_field():
+    """P9-BL (Block feedback B5, 2026-10-08, R4): der Titel steht als eigene Zeile direkt über dem
+    Eingabefeld, per `textContent` (Nutzerdaten, Hard Rule 4). Das Gate bleibt exakt (P9-K)."""
+    html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
+    assert re.search(r'id="trash-title"></span>\s*<input[^>]*id="trash-confirm-input"', html)
+    js = _js_ohne_kommentare((DEFAULT_STATIC_DIR / "js" / "dialogs.js").read_text("utf-8"))
+    assert "trashTitleEl.textContent = item.title;" in js
+    assert "trashTitleEl.innerHTML" not in js
+    assert 'trashConfirmInputEl.value.trim() !== ziel.title' in js
+

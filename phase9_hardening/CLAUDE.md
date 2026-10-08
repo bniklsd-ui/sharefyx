@@ -40,7 +40,7 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | T | **Zweite Bildsichtung** (Mini-Plan §11, Locks P9-AU–P9-AZ, Abnahme P9-103–P9-111) | 🟡 **gebaut 2026-10-06 (M3)**, Release `v3.1.3` **live seit 2026-10-07** (Gate 9/9; Zeile am 2026-10-07 nachgezogen, stand bis dahin „nicht deployt“) — Probe **29/29**, **Gegenläufe G7–G12 6 von 6** wirksam, `pytest` 1238 → 1246. **Der Block dreht zwei Locks des Vortags: P9-AN und die Fläche aus P9-AO sind widerrufen** — die Menüpunkte tragen die **Standardknopf-Fläche** (`--btn-std-fill`), ausgewählt die **Akzentfläche** wie `.btn-primary` (Entscheidung aus der Rückfrage), und der Abstand ist 8 px (vorher 0 px). „Ändern" ist **Vorsicht** (rot wie „Archivieren"), „Abbrechen" → **„Schließen"** · Beschriftung der Space-Zeilen bündig mit dem Titel (vorher 33 px), Namensfeld im Detail beidseitig bündig (+12 px, als **Rasterfolge**, nicht als Zahl), Anlegezeile eine Zeile (vorher 80 px Versatz) · **sechs Wächter umgeschrieben** (4 settings, 2 static_routes), **keiner gelöscht**; **Gegenlauf G11 fand eine Messlücke** (siehe Session-Block) · **zwei Softcap-Überschreitungen neu benannt** (Matrix 84.161 B, Plan 49.655 B) — Details in der `ABNAHME_MATRIX.md` unter dem Nachtrag vom 2026-10-06 |
 | R | **Rückmeldung aus der Bildsichtung** (Mini-Plan §10, Locks P9-AM–P9-AS, Abnahme P9-96–P9-102) | 🟡 **gebaut 2026-10-05 (M3)**, Release `v3.1.3` **live seit 2026-10-07** (Gate 9/9; Zeile am 2026-10-07 nachgezogen, stand bis dahin „nicht deployt“) — Probe **56/56**, G4 → 2 rot · G5 → 2 rot · G6 → 3 rot, `pytest` 1233 → 1238 · **zwei Korrekturen an der Vorgabe, beide gemessen**: `text-align: center` war auf dem Flex-Knopf ein **No-op** (Textmitte 8,5 px daneben) → `justify-content`, und das **linke Polster** musste vom 32-px-Wert der Baumzeile auf `--space` (Nikinger-Entscheidung), sonst bleibt die Beschriftung 12 px neben der Mitte · P9-96/98/100/101/102 ✅, **P9-97 und P9-99 ⚠️ mit benannter Abweichung** · **zwei Wächter an korrektem Code rot** (Klassenreihenfolge, `hidden` im `aria-hidden`) · **ein Produktbefund gemeldet, nicht gebaut:** die Space-Liste bleibt leer, wenn man sie vor `loadOverview()` öffnet — wandert in die P10-Liste (Plan §6) · Herleitung im L3-Archiv |
 | U | **„Kästchen enger“ — die dritte Bildsichtung** (Mini-Plan §12.1, Locks P9-BB/BC/BD/**BE**, Abnahme **P9-116–P9-119**) | 🟡 **gebaut 2026-10-06 (M3)**, Release `v3.1.3` **live seit 2026-10-07** (Gate 9/9; Zeile am 2026-10-07 nachgezogen, stand bis dahin „nicht deployt“) — Probe **48/48**, **Gegenläufe G13–G18 6 von 6** wirksam, `pytest` 1241 → **1245**. **Der Nikinger hat den Auftrag selbst eingeschränkt:** *„nur bei Spaces verwalten … aber nur dieses“* ⇒ **P9-BA widerrufen** (die Menüpunkte behalten ihre 131 px) und **P9-BE** als **neuer** Lock entstanden (Fenster verkleinern). Menüpunkte **flacher** (b): 4 px Polster, **31,69 px** statt 35,69 px · Space-Zeilen **umklammern ihr Label** (92–147 px statt 330 px, rechts 9 statt 192–245 px, Text 1 px bündig) · **Spaces-Fenster 338 statt 380 px**, Feld 138 px von 288 px Inhalt, Knopf 142 px, im Schmal-Modus zurückgenommen (422 px) · Bild 04 nennt jetzt die **Position** (y 205..246), Bild 07 **rollt auf** (`scrollIntoView`) und nimmt die Anlegezeile mit · **vier eigene Fehler**, drei davon „eine Regel, die nicht die ist, die ich meine“ (`box-sizing: border-box`, `width: 100%` in der **Sammelregel**, eine Station, die den eigenen Fehler nicht bemerkte) · **ein Gegenlauf blieb grün** (G17) und wurde zum Anlass, den Ausgangszustand messbar zu machen · **P9-112 widerrufen**, P9-113/114/115 abgelöst (Zuordnung in der Matrix) · **[2026-10-06 Nachsatz, Lock P9-BF, Abnahme P9-120 ✅]:** **dritte Sichtprüfung — siebenmal ✅, ein Punkt aus Bild 08**: die Space-Zeile hält innen wieder den Standardabstand (**9 px links wie rechts**, vorher 1 gegen 9), gebaut als `padding-left: var(--space)` **plus** `margin-left: calc(var(--space) * -1)` — beide Locks halten nur zusammen; der Einwand zu Bild 04 ist am selben Tag zurückgenommen („man muss scrollen“). Probe **50/50**, **Gegenläufe 7 von 7**, `pytest` 1246 — Details im Session-Block und in der `ABNAHME_MATRIX.md` |
-| feedback | **Nutzer-Rückmeldung vom 2026-10-07** (Plan `phase9_hardening_block_feedback_plan.md`, Locks P9-BG–P9-BO, Abnahme P9-121–P9-137) | 🟡 **B1 (2026-10-07), B2, E1a, B3 und B4 (2026-10-08) gebaut, nicht deployt** — Anlegen im aktiven schreibbaren Space (R2); P9-121–123 ✅, **P9-124 ⚠️**; Dialog nennt sein Ziel, P9-125 ✅; Team-Spaces verschieben/archivieren/löschen, P9-135–137 ✅; B3 Schließen im Menü, P9-131 ✅; B4 Abstand der Mitgliederzeilen, P9-130 ✅; B5–B8 offen · Matrix-Teil `ABNAHME_MATRIX_FEEDBACK.md` · Herleitung im L3-Archiv |
+| feedback | **Nutzer-Rückmeldung vom 2026-10-07** (Plan `phase9_hardening_block_feedback_plan.md`, Locks P9-BG–P9-BO, Abnahme P9-121–P9-137) | 🟡 **B1 (2026-10-07), B2, E1a, B3, B4 und B5 (2026-10-08) gebaut, nicht deployt** — Anlegen im aktiven schreibbaren Space (R2); P9-121–123 ✅, **P9-124 ⚠️**; Dialog nennt sein Ziel, P9-125 ✅; Team-Spaces verschieben/archivieren/löschen, P9-135–137 ✅; B3 Schließen im Menü, P9-131 ✅; B4 Abstand der Mitgliederzeilen, P9-130 ✅; B5 Titelzeile im Löschdialog, P9-129 ✅; B6–B8 offen · Matrix-Teil `ABNAHME_MATRIX_FEEDBACK.md` · Herleitung im L3-Archiv |
 | Gate/Z | Abnahme, Closeout | 🟡 **beide Doku-Hälften erledigt** (2026-10-02) · `ABNAHME_MATRIX.md` ist der **eine** Ort der Abnahme- und `[VERIFY]`-Bilanz, nicht diese Zeile · **[2026-10-04] beide Rotationen gefahren** (Block 17.780 B verbatim, Kette 6 von 7 Fäden) und diese Tabelle ins L3-Archiv gezogen ⇒ **der Head ist unter dem 40-KiB-Softcap** · **offen:** zweites Claude-Konto (P9-13/V150) · ~~Portscan P9-94/P9-11~~ ✅ **2026-10-07** (vier Läufe plus Kontrolllauf, Matrix P9-11) · ~~Übersichtsgrafik §12.4~~ ✅ **2026-10-07** (`docs/concepts/phase9_hardening_uebersicht.svg`, gerendert und angesehen, Sonnet 5.5/Claude Code) · Phase auf ✅ (**wartet seit dem 2026-10-07 auf nichts mehr außer der Closeout-Entscheidung des Nikingers**; **`v3.1.3` live seit 2026-10-07, Gate 9/9**; **2026-10-07:** `## 2026-10-05` im `UPDATE_LOG` auf `## 2026-10-07` datiert, damit das Update-Log-Gate ohne `ALLOW_STALE` greift) — **P9-15 steht nicht mehr hier**, es ist seit dem 2026-10-03 gemessen (⚠️, Zeile A) · Herleitung im L3-Archiv |
 
 ## Backlog (bewusst zurückgestellt, kein Phasen-Blocker)
@@ -142,31 +142,24 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückzuführen** — Nikinger-Anordnung 2026-09-24, so dokumentieren und nicht weiter
   untersuchen.
 
-## Session stopped — 2026-10-08 (vierunddreißigster Block: **B4 gebaut — Übergabe für B5**; kein Deploy, kein Service-Touch)
+## Session stopped — 2026-10-08 (fünfunddreißigster Block: **B5 gebaut — Übergabe für B6**; kein Deploy, kein Service-Touch)
 
-**Ergebnis der Session.** B4 (P9-BM, Abnahme P9-130 ✅): `#space-member-list` ist eine Flex-Spalte mit
-`gap: var(--space)`. Probe S10 misst im Wegwerf-`team` **vier** Mitgliederzeilen mit Abständen **[8, 8, 8] px**
-gegen `--space` = 8 px; Gegenlauf `gap: 0` → S10 rot ([0, 0]). Matrix **114 ✅ · 12 ⚠️ · 1 ⬜**, `pytest` **1261**
-(kein neuer Test — der bestehende Wächter der Mitgliederliste prüft jetzt auch `display`/`flex-direction`/`gap`).
-Probe **14/14**. **Nichts deployt.**
-
-**Nachsatz nach der Sichtprüfung.** Der Nikinger sah „Entfernen" am Text kleben und wollte es rechtsbündig:
-`.space-member-row` ist jetzt Flex mit `space-between` (Knopf auf der Kante von „Hinzufügen“, Probe S10b, Gegenlauf rot).
-
-**Abweichung vom Plan, benannt.** Die Probe legt kein Mitglied an: der Seed schreibt `team` mit alpha **und** beta,
-die Liste ist damit schon gefüllt, und das schließt die Grenze aus P9-107/P9-110. Ein Anlegen bräuchte einen
-dritten Principal samt Re-Auth (Plan §8, B4).
+**Ergebnis der Session.** B4 nach der Sichtprüfung nachgebessert (**„Entfernen" rechtsbündig**, `.space-member-row` Flex mit
+`space-between`, Probe S10b, Gegenlauf rot) und **B5** gebaut (P9-BL, Abnahme P9-129 ✅): der Löschdialog zeigt den Titel als
+eigene, fette Zeile direkt über dem Feld (`#trash-title`, `textContent`, Gate unverändert). Probe **15/15**, Gegenlauf alter
+Client S11 rot. Matrix **115 ✅ · 12 ⚠️ · 1 ⬜**, `pytest` **1262**. **Nichts deployt.**
 
 **Nächster Schritt (Reihenfolge aus Plan §4).**
-1. **B5** Titelzeile im Löschdialog (P9-BL), per `textContent`, direkt über `#trash-confirm-input`.
-2. **B6** Enter-Handler (P9-BK, Tabelle §5), **B7** Übersicht Name vor Chips (P9-BJ), **B8** zuerst messen (V190).
+1. **B6** Enter-Handler (P9-BK, Tabelle §5; Abnahme P9-127/P9-128, Gegenlauf: Enter am gesperrten Löschknopf folgenlos).
+2. **B7** Übersicht Name vor Chips (P9-BJ), **B8** zuerst messen (V190).
 3. Offen für den Closeout: V189–V194 in `ABNAHME_MATRIX_VERIFY.md`; Ordner anlegen in Team-Spaces; MCP
    `update_item` ohne Team-Ausnahme.
 
-**Werkzeug.** Unverändert: `p9_feedback_wegwerf.py start|stop` (Port 18778, Stopp nur über die PID-Datei),
-Probe mit `--report`/`--screenshots-dir` je Schritt. Ein Gegenlauf auf einer **verbrauchten** Instanz färbt auch
-fremde Stationen rot (hier sechs) — nur die Station des Gegenlaufs zählt, sonst frische Instanz starten.
+**Werkzeug.** `scripts/rotate_session_block.sh` **behält den unteren Block** — den neuen Block deshalb **unter** den alten
+setzen, rotieren, danach `grep -c` und den Kopf ansehen (ich habe das in dieser Session einmal falsch herum gemacht, der Fehler
+steht im Commit `c2835af`). Gegenläufe brauchen eine **frische** Wegwerf-Instanz (stop/start), sonst färben verbrauchte
+Stationen fremde Zeilen rot.
 
-**Beim Nikinger:** Sichtprüfung (neu: `docs/screenshots/p9_feedback_b4_mitglieder.png`), Deploy `v3.1.4`.
+**Beim Nikinger:** Sichtprüfung (neu: `p9_feedback_b4_mitglieder.png` nachgebessert, `p9_feedback_b5_titelzeile.png`), Deploy `v3.1.4`.
 
 **Messung (Softcap-Wächter).** Die durchgestrichene Masse im L3-Archiv bleibt **229 B** und ist kein Hebel; der Head bleibt unter dem Softcap.

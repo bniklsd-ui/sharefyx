@@ -18,6 +18,8 @@ Stationen:
      echten Zwei-Schritt-Dialog; der Dialog nennt `beta`, der Papierkorb-Commit traegt `alpha`
   7  (E1a) alpha zieht ein beta-Item per **echter Maus** auf den Team-Ordner `ablage`
   8  (E1a) Freigeben bleibt beim eigenen Space: Team-Zeilen haben keinen Freigeben-Knopf
+  11 (B5, P9-BL) Loeschdialog: der Titel steht als eigene, fette Zeile direkt ueber dem Feld;
+     ein Titel mit HTML bleibt Text; der Loeschknopf bleibt gesperrt (Gate unveraendert)
   9  (B3, P9-BN) Einstellungen + Update-Log offen -> „Schliessen" im Menue -> Overlay und alle
      Panels `hidden`
  10  (B4, P9-BM) Spaces verwalten -> `team` -> der gemessene Abstand zwischen zwei Mitgliederzeilen
@@ -297,6 +299,38 @@ def _b3(page: Page) -> None:
            f"vorher offene Panels={offen} danach Overlay hidden={zu['overlay']} offene Panels={zu['offen']}")
 
 
+def _b5(page: Page, args) -> None:
+    """(B5, P9-BL) Titelzeile im Loeschdialog: Text == Titel, direkt ueber dem Feld, HTML bleibt Text."""
+    titel = "<i>B5</i> Titel"
+    _anlegen(page, titel)
+    # Nach dem Anlegen steht der Editor offen und die Zeile ist nicht klickbar -> frisch in die Liste.
+    _in_den_shared_space(page, args.base_url)
+    zeile = page.locator(".list__rows > li").filter(has_text="B5")
+    if zeile.count() == 0 or zeile.locator(".list__row-trash").count() == 0:
+        pruefe("S11 Loeschdialog zeigt den Titel als eigene Zeile", False, "Zeile/Loeschknopf fehlt")
+        return
+    zeile.first.locator(".list__row-trash").click()
+    page.locator("#confirm-ok").click()
+    time.sleep(0.5)
+    m = page.evaluate("""() => {
+        const r2 = (v) => Math.round(v * 100) / 100;
+        const t = document.getElementById('trash-title');
+        const i = document.getElementById('trash-confirm-input');
+        if (!t) return null;
+        const tb = t.getBoundingClientRect(), ib = i.getBoundingClientRect();
+        return {text: t.textContent, kinder: t.children.length, abstand: r2(ib.top - tb.bottom),
+                sichtbar: tb.width > 0 && tb.height > 0, gewicht: getComputedStyle(t).fontWeight};
+    }""")
+    gesperrt = page.locator("#trash-submit").is_disabled()
+    page.locator("#trash-dialog .overlay__panel").screenshot(path=str(OUT_DIR / "p9_feedback_b5_titelzeile.png"))
+    page.locator("#trash-cancel").click()
+    time.sleep(0.4)
+    pruefe("S11 Loeschdialog zeigt den Titel als eigene Zeile direkt ueber dem Feld, HTML bleibt Text",
+           bool(m) and m["text"] == titel and m["kinder"] == 0 and m["sichtbar"]
+           and 0 <= m["abstand"] <= 8 and int(m["gewicht"]) >= 600 and gesperrt,
+           f"Messung={m} Loeschknopf gesperrt={gesperrt}")
+
+
 def _b4(page: Page) -> None:
     page.locator("#account-button").click()
     time.sleep(0.6)
@@ -350,7 +384,7 @@ def main() -> int:
     ap.add_argument("--data-root", type=Path, default=DEFAULT_DATA_ROOT)
     # Getrennter Bericht fuer Gegenlaeufe, damit kein Gegenlauf den Erfolgsbeleg ueberschreibt
     # (derselbe Fehler wie im trace-Block 2026-10-02). Die B1-Belege bleiben als Stand von B1 liegen.
-    ap.add_argument("--report", type=Path, default=PROBE_DIR / "p9_feedback_b4_probe.json")
+    ap.add_argument("--report", type=Path, default=PROBE_DIR / "p9_feedback_b5_probe.json")
     ap.add_argument("--screenshots-dir", type=Path, default=OUT_DIR)
     args = ap.parse_args()
     OUT_DIR = args.screenshots_dir
@@ -407,6 +441,7 @@ def main() -> int:
         # --- S6–S8: E1a im Team-Space --------------------------------------------------------
         if _in_den_shared_space(alpha, args.base_url):
             _e1a(alpha, args)
+            _b5(alpha, args)
 
         # --- S5: Uebersicht nach team — Messung, kein Urteil ---------------------------------
         if _in_den_shared_space(alpha, args.base_url):

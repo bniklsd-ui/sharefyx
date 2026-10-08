@@ -313,6 +313,7 @@ export function confirmDialog(options) {
 
 var trashDialogEl;
 var trashConsequenceEl;
+var trashTitleEl;
 var trashErrorEl;
 var trashConfirmInputEl;
 var trashSubmitEl;
@@ -380,6 +381,11 @@ function openTrashTitleDialog(item) {
     ? " Zuletzt geändert von " + item.updated_by + "." : "";
   trashConsequenceEl.textContent =
     "Zur Sicherheit den Titel eintippen. Zurückholen kannst du es danach nur über Git." + spur;
+  // P9-BL (Block feedback B5): der Titel steht als eigene Zeile direkt über dem Feld. Per
+  // `textContent`, nie `innerHTML` — der Titel ist Nutzerdaten (Hard Rule 4), auch ein Titel wie
+  // `<b>x</b>` bleibt Text. Das Gate (`trashRefreshSubmit`) ist unverändert: sichtbar machen ist
+  // nicht lockern (P9-K).
+  trashTitleEl.textContent = item.title;
   trashDialogEl.hidden = false;
   trashConfirmInputEl.focus();
 
@@ -725,6 +731,7 @@ export function init() {
   // Stufe 2, sondern nur einen Text.
   trashDialogEl = document.getElementById("trash-dialog");
   trashConsequenceEl = document.getElementById("trash-consequence");
+  trashTitleEl = document.getElementById("trash-title");
   trashErrorEl = document.getElementById("trash-error");
   trashConfirmInputEl = document.getElementById("trash-confirm-input");
   trashSubmitEl = document.getElementById("trash-submit");
