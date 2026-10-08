@@ -1,0 +1,86 @@
+{
+  "laeufe": [
+    {
+      "lauf": 1,
+      "ziel": "team",
+      "bis_liste_ms": 45,
+      "anfragen": [
+        {
+          "url": "/items?type=task&status=open&space=team",
+          "t": 35,
+          "dauer_ms": 16.2
+        }
+      ]
+    },
+    {
+      "lauf": 1,
+      "ziel": "alpha",
+      "bis_liste_ms": 45,
+      "anfragen": [
+        {
+          "url": "/items?type=task&status=open&space=alpha",
+          "t": 32,
+          "dauer_ms": 16.7
+        }
+      ]
+    },
+    {
+      "lauf": 2,
+      "ziel": "team",
+      "bis_liste_ms": 46,
+      "anfragen": [
+        {
+          "url": "/items?type=task&status=open&space=team",
+          "t": 33,
+          "dauer_ms": 14.1
+        }
+      ]
+    },
+    {
+      "lauf": 2,
+      "ziel": "alpha",
+      "bis_liste_ms": 45,
+      "anfragen": [
+        {
+          "url": "/items?type=task&status=open&space=alpha",
+          "t": 39,
+          "dauer_ms": 20.0
+        }
+      ]
+    },
+    {
+      "lauf": 3,
+      "ziel": "team",
+      "bis_liste_ms": 44,
+      "anfragen": [
+        {
+          "url": "/overview",
+          "t": 1,
+          "dauer_ms": 41.6
+        },
+        {
+          "url": "/spaces",
+          "t": 1,
+          "dauer_ms": 2.9
+        },
+        {
+          "url": "/items?type=task&status=open&space=team",
+          "t": 33,
+          "dauer_ms": 15.1
+        }
+      ]
+    },
+    {
+      "lauf": 3,
+      "ziel": "alpha",
+      "bis_liste_ms": 46,
+      "anfragen": [
+        {
+          "url": "/items?type=task&status=open&space=alpha",
+          "t": 31,
+          "dauer_ms": 11.6
+        }
+      ]
+    }
+  ]
+}
