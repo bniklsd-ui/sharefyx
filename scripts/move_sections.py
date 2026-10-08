@@ -119,7 +119,10 @@ def main(argv: list[str]) -> int:
     if not new_dst.startswith(dst_old):
         die("Altbestand des Ziels verändert")
     for b in blocks:
-        if b not in new_dst:
+        # rstrip: ein Abschnitt am Dateiende traegt die abschliessenden Leerzeilen der Quelle mit,
+        # die beim Anhaengen (oben) bewusst abgeschnitten werden — gefunden 2026-10-08 (E1a-Vorlauf),
+        # da brach das Skript bei genau diesem Fall ab, ohne etwas geschrieben zu haben.
+        if b.rstrip("\n") not in new_dst:
             die("ein bewegter Abschnitt steht nicht byte-gleich im Ziel")
 
     atomic_write(dst, new_dst)

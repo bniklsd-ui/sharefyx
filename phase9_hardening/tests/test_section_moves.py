@@ -30,6 +30,7 @@ LIVE_UNDER_CAP = (
     P9 / "ABNAHME_MATRIX_STEPS.md",
     P9 / "ABNAHME_MATRIX_BLOECKE.md",
     P9 / "ABNAHME_MATRIX_VERIFY.md",
+    P9 / "ABNAHME_MATRIX_FEEDBACK.md",   # 2026-10-08, vierter Teil (E1a-Vorlauf)
     PLAN,
     P9 / "step_a" / "RUNBOOK_STEP_A.md",
 )
@@ -46,6 +47,7 @@ MOVES = (
     (P9 / "ABNAHME_MATRIX.md", P9 / "ABNAHME_MATRIX_BLOECKE.md",
      ("## Block doing", "## Block trace", "## Dritte Bildsichtung")),
     (P9 / "ABNAHME_MATRIX.md", P9 / "ABNAHME_MATRIX_VERIFY.md", ("## Stand je Eintrag",)),
+    (P9 / "ABNAHME_MATRIX_BLOECKE.md", P9 / "ABNAHME_MATRIX_FEEDBACK.md", ("## Block feedback — B1",)),
 )
 
 
@@ -83,5 +85,22 @@ def test_the_runbook_pointer_still_names_the_ten_findings():
 
 def test_the_matrix_parts_do_not_carry_the_abnahme_balance():
     """Die Bilanz-Überschrift gehört dem Hub. Ein Teil, der sie wiederholt, wäre die zweite Kopie."""
-    for name in ("ABNAHME_MATRIX_STEPS.md", "ABNAHME_MATRIX_BLOECKE.md", "ABNAHME_MATRIX_VERIFY.md"):
+    for name in ("ABNAHME_MATRIX_STEPS.md", "ABNAHME_MATRIX_BLOECKE.md", "ABNAHME_MATRIX_VERIFY.md",
+                 "ABNAHME_MATRIX_FEEDBACK.md"):
         assert "Tabellenzeilen für" not in (P9 / name).read_text(encoding="utf-8"), name
+
+
+def test_a_section_at_the_end_of_the_file_moves(tmp_path):
+    """2026-10-08: der letzte Abschnitt einer Datei traegt deren abschliessende Leerzeilen mit. Das
+    Anhaengen schneidet sie ab, Gegenprobe (b) verglich aber mit ihnen — das Skript brach also bei
+    jedem Abschnitt am Dateiende ab (beim Abtrennen des feedback-Teils der Matrix gefunden)."""
+    import subprocess
+    import sys
+    src, dst = tmp_path / "a.md", tmp_path / "b.md"
+    src.write_text("# A\n\n## eins\n\nx\n\n## zwei\n\n| y |\n\n", encoding="utf-8")
+    dst.write_text("# B\n", encoding="utf-8")
+    run = subprocess.run([sys.executable, str(REPO_ROOT / "scripts" / "move_sections.py"),
+                          str(src), str(dst), "## zwei"], capture_output=True, text=True)
+    assert run.returncode == 0, run.stderr
+    assert dst.read_text(encoding="utf-8").endswith("## zwei\n\n| y |\n")
+    assert src.read_text(encoding="utf-8").startswith("# A\n\n## eins\n\nx\n\n## zwei\n" + POINTER)

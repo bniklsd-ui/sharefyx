@@ -6,7 +6,8 @@ detail: L2
 up: ./CLAUDE.md
 down:
   - ABNAHME_MATRIX_STEPS.md     # Teil: Step 0–H, Phasenweit (P9-1 – P9-58)
-  - ABNAHME_MATRIX_BLOECKE.md   # Teil: Blöcke und Bildsichtungen (P9-59 – P9-125)
+  - ABNAHME_MATRIX_BLOECKE.md   # Teil: Blöcke und Bildsichtungen (P9-59 – P9-120)
+  - ABNAHME_MATRIX_FEEDBACK.md  # Teil: Block feedback (P9-121 – P9-137), seit 2026-10-08
   - ABNAHME_MATRIX_VERIFY.md    # Teil: [VERIFY] je Eintrag (V145 – V188)
   - ../docs/concepts/phase9_hardening_plan.md        # P9-1 – P9-58, §13-Register, §15 P10-Liste
   - SESSIONS_ARCHIVE.md                              # die Herleitung jeder Zeile im Wortlaut
