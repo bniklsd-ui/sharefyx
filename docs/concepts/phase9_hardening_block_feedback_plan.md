@@ -7,7 +7,7 @@ up: ../../phase9_hardening/CLAUDE.md
 down:
   - ./phase9_hardening_plan.md                 # 📕 P9-Plan; Lock P9-A (kein UI-Umbau), P9-K (Löschen nur eigene), §15 P10-Liste
   - ./phase9_hardening_block_settings_plan.md  # Formvorlage; Einstellungs-Kette P9-AE–P9-AL, auf der B4/B5 aufsetzen
-updated: 2026-10-08 (**B6 gebaut** — Enter-Handler + ein Fund im Löschdialog, §8) | 2026-10-08 (**B5 gebaut** — Titelzeile im Löschdialog, §8) | 2026-10-08 (**B4 gebaut** — Abstand der Mitgliederzeilen, §8) | 2026-10-08 (**B3 gebaut** — Schließen im Einstellungsmenü, §8) | 2026-10-08 (**E1a gebaut** — Team-Spaces verschieben/löschen, V191/V192 beantwortet, §8; drei datierte Abweichungen) | 2026-10-08 (**B2 gebaut** — Zielangabe im Anlegen-Dialog, §8; datierte Korrektur: der Home-Fall von P9-BH ist unerreichbar) | 2026-10-07 (**Nikinger-Entscheidungen E1–E3 eingetragen**: E1 freigegeben — Lock P9-BP, fremde Items im Team-Space löschbar, Eigentum über den Git-Autor nachverfolgt (P9-BQ); E2 und E3 wandern als offene Punkte in den Closeout/P10; Closeout erst nach B1–B8 + E1a) | 2026-10-07 (angelegt — Rückmeldung des Nikingers vom selben Tag, gegen `main@497c5bd` am Code gelesen; **nichts gebaut**)
+updated: 2026-10-08 (**B7 gebaut** — Übersicht: Name vor den Zählern, P9-126 ⚠️ (390 px unerreichbar), V189 gemessen, §8) | 2026-10-08 (**B6 gebaut** — Enter-Handler + ein Fund im Löschdialog, §8) | 2026-10-08 (**B5 gebaut** — Titelzeile im Löschdialog, §8) | 2026-10-08 (**B4 gebaut** — Abstand der Mitgliederzeilen, §8) | 2026-10-08 (**B3 gebaut** — Schließen im Einstellungsmenü, §8) | 2026-10-08 (**E1a gebaut** — Team-Spaces verschieben/löschen, V191/V192 beantwortet, §8; drei datierte Abweichungen) | 2026-10-08 (**B2 gebaut** — Zielangabe im Anlegen-Dialog, §8; datierte Korrektur: der Home-Fall von P9-BH ist unerreichbar) | 2026-10-07 (**Nikinger-Entscheidungen E1–E3 eingetragen**: E1 freigegeben — Lock P9-BP, fremde Items im Team-Space löschbar, Eigentum über den Git-Autor nachverfolgt (P9-BQ); E2 und E3 wandern als offene Punkte in den Closeout/P10; Closeout erst nach B1–B8 + E1a) | 2026-10-07 (angelegt — Rückmeldung des Nikingers vom selben Tag, gegen `main@497c5bd` am Code gelesen; **nichts gebaut**)
 ---
 
 # Phase 9 — Block feedback: die Rückmeldung vom 2026-10-07
@@ -369,4 +369,19 @@ Regel seit dem Oversize-Fix: neuer Block → neuer Teil, `scripts/move_sections.
 - **Fund, kein Plan-Punkt:** der Löschdialog ließ nach „Abbrechen" den Absenden-Listener stehen ⇒ beim nächsten Löschen **zwei**
   DELETEs („Item nicht gefunden"). `AbortController` + Unterwegs-Flag; Gegenlauf alter Client rot.
 - Belege: Probe S12 **20/20**, Gegenläufe (alter `app.js` → S12a rot, alter `dialogs.js` → S12d rot), `pytest` **1264**.
+
+### B7 — Übersicht: Name vor den Zählern (gebaut 2026-10-08, nicht deployt)
+
+- **V189 (vorher gemessen):** mit fünf gefüllten Eimern und 16 Zeichen Name ist die Namensbox bei 1440 px **0 px breit** (Text 136 px);
+  bei 1024 px 167 px. Ursache wie in §1 B-2 gelesen: Basis 0 am Namen, `auto` an den Chips.
+- `.overview__space-name-label` `flex: 0 1 auto; min-width: 0`; `.overview__space-counts` `flex: 1 1 calc(var(--space) * 33)`;
+  `.overview__space-open` `flex-wrap: wrap` — passt Name + Chip-Basis nicht in eine Zeile, rutscht die Leiste unter den Namen;
+  `title` mit dem vollen Namen (`list.js`, P9-BJ).
+- **Datierte Abweichung 1:** der Kandidat `min-width: min(16ch, 40%)` entfällt. Gemessen: er reserviert auch für „team" 136 px und
+  schob dessen Chips in eine zweite Zeile. Mit dem Umbruch braucht der Name keine Untergrenze.
+- **Datierte Abweichung 2 (390 px):** die Shell ist bei ≤ 1024 px `Rail 240 px + Liste 1fr`, die Übersichtszeile bei 390 px **85 px** breit.
+  Kein 16-Zeichen-Name passt in 85 px — P9-126 steht deshalb **⚠️**. Ein Mobil-Layout ist Lock P9-A (kein UI-Umbau) und gehört nach P10.
+- Belege: Probe S13 **23/23** (1440/1024: Name 136/136, Chips 1 Zeile; 390 nur gemessen, S13b), Gegenlauf alte Regel + altes `list.js`:
+  S13 rot bei 1440 und 1024 (21/23); Wächter `test_the_overview_name_has_priority_over_the_count_chips` (Gegenlauf alte CSS rot); `pytest` **1265**.
+- Grenze der Probe: die Zeile ist ein **geklonter** Eintrag (`secus-space-test`, fünf Chips); der Seed hat nur kurze Namen.
 

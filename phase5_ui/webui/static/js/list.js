@@ -87,11 +87,13 @@ export function renderOverview() {
       "span", "rail__glyph rail__glyph--" + spaceCategory(space),
       space.name.charAt(0).toUpperCase(),
     ));
-    openButton.appendChild(el(
+    var nameLabel = el(
       "span",
       "overview__space-name-label" + (space.writable ? "" : " overview__space-name-label--readonly"),
       space.name,
-    ));
+    );
+    nameLabel.title = space.name;   // P9-BJ: der volle Name steht immer im title
+    openButton.appendChild(nameLabel);
     openButton.addEventListener("click", function () {
       // Dieselbe Rückfrage-vor-Navigation-Disziplin wie die Ordner-/Eimer-Buttons in tree.js:
       // ein offener, ungespeicherter Editor darf auch durch die Übersichts-Navigation nicht

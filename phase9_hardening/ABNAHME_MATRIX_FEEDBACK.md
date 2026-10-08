@@ -6,7 +6,7 @@ detail: L2
 up: ./ABNAHME_MATRIX.md
 down:
   - ../docs/concepts/phase9_hardening_block_feedback_plan.md   # P9-121 – P9-137, Locks P9-BG–P9-BQ
-updated: 2026-10-08 (angelegt — `ABNAHME_MATRIX_BLOECKE.md` stand bei 39.667 B, die drei E1a-Zeilen hätten den Softcap gerissen; der Abschnitt B1/B2 per `scripts/move_sections.py` verbatim hierher)
+updated: 2026-10-08 (+1 Zeile P9-126, Block feedback B7; Bilanz 116 ✅ · 14 ⚠️ · 1 ⬜) | 2026-10-08 (angelegt — `ABNAHME_MATRIX_BLOECKE.md` stand bei 39.667 B, die drei E1a-Zeilen hätten den Softcap gerissen; der Abschnitt B1/B2 per `scripts/move_sections.py` verbatim hierher)
 ---
 # Abnahmematrix Phase 9 — Teil: Block feedback (P9-121 – P9-137)
 
@@ -80,3 +80,10 @@ schickte beim Absenden **zwei** DELETEs (der zweite: „Item nicht gefunden", Di
 löscht. Behoben mit `AbortController` plus Unterwegs-Flag; **Gegenlauf alter `dialogs.js`: S12d rot** (Dialog offen mit Fehler);
 Wächter `test_the_trash_dialog_cleans_up_its_listeners_when_it_closes`.
 
+## Block feedback — B7: Übersicht, Name vor den Zählern (P9-126)
+
+> Lock **P9-BJ**. Stand **gebaut 2026-10-08, nicht deployt.**
+
+| Nr | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| **P9-126** | Übersicht: Name bis 16 Zeichen voll lesbar bei 1440/1024/390 px, Chips ≤ 2 Zeilen | ⚠️ | **V189 gemessen (vorher):** bei allen fünf Eimern gefüllt und 16 Zeichen Name ist die Namensbox bei 1440 px **0 px breit** (`clientWidth 0`, Text 136 px) — der Name sitzt auf Flex-Basis 0, die Chips auf `auto`. **Gebaut:** `.overview__space-name-label` `flex: 0 1 auto`, `.overview__space-counts` `flex: 1 1 calc(var(--space) * 33)`, `.overview__space-open` `flex-wrap: wrap` (die Leiste rutscht unter den Namen, wenn beides nicht in eine Zeile passt), `title` am Namen (`list.js`). **Probe S13** (`scripts/p9_feedback_self_check.py`, `probes/p9_feedback_b7_probe.json`, **23/23**): 1440 und 1024 px Name voll (136/136), Chips **1 Zeile**, `title` an jeder echten Zeile; **Gegenlauf alte Regel + altes `list.js`** (`p9_feedback_b7_probe_gegenprobe.json`): S13 **rot bei 1440** (Name 0 px) **und 1024** (Titel fehlt), 21/23. **Grenze, datiert (Abweichung vom Kriterium):** bei **390 px** ist die Shell `Rail 240 px + Liste 1fr` (`app.css`, `@media (max-width: 1024px)`), die Zeile **85 px** breit — kein 16-Zeichen-Name passt, egal welche Regel; S13b misst das nur (Name 85 von 136 px, Chips 5 Zeilen). Ein Mobil-Layout ist Lock P9-A (kein UI-Umbau) und P10. **Zweite Abweichung:** der Kandidat `min-width: min(16ch, 40%)` aus P9-BJ entfällt — er reservierte auch für „team" 136 px und schob dessen Chips in eine zweite Zeile; mit dem Umbruch braucht der Name keine Untergrenze. Die Zeile der Probe ist ein **geklonter** Eintrag mit Namen `secus-space-test` und fünf Chips (der Seed hat nur kurze Namen), gemessen wird also die CSS-Regel, nicht Daten. |

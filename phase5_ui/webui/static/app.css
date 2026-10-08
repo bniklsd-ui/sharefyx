@@ -1105,6 +1105,10 @@ select.input:focus {
    ist genau, dass der Fill nur den Namen traf, nicht die Chips. */
 .overview__space-open {
   display: flex;
+  /* P9-BJ (B7): ist die Zeile zu schmal fuer Name + Chip-Basis, rutscht die Chip-Leiste in eine
+     zweite Zeile -- der Name bleibt vorne und voll. */
+  flex-wrap: wrap;
+  row-gap: var(--space);
   align-items: center;
   gap: calc(var(--space) * 2);
   width: 100%;
@@ -1126,7 +1130,11 @@ select.input:focus {
    (vorher war `.overview__space-name` ein Flex-Container um den inneren Knopf; G7
    hat den Knopf zur Zeile gemacht, der Wrapper faellt weg). */
 .overview__space-name-label {
-  flex: 1;
+  /* P9-BJ (B7): der Name hat Vorrang vor den Chips -- Basis = Inhalt statt 0; die Chip-Leiste
+     (unten) bricht unter den Namen um, statt ihn zu quetschen. Kein `min-width` (der Kandidat
+     `min(16ch, 40%)` aus dem Plan reservierte auch fuer „team" 136 px und schob dessen Chips
+     in eine zweite Zeile). */
+  flex: 0 1 auto;
   min-width: 0;
   font-weight: 500;
   overflow: hidden;
@@ -1140,6 +1148,10 @@ select.input:focus {
   gap: calc(var(--space) * 0.5);
   flex-wrap: wrap;
   justify-content: flex-end;
+  /* P9-BJ (B7): Basis = Platz fuer drei Chips je Zeile; passt Name + Basis nicht in eine
+     Zeile, bricht die Leiste unter den Namen um (siehe `.overview__space-open`). */
+  flex: 1 1 calc(var(--space) * 33);
+  min-width: 0;
   /* G7: Chips sitzen jetzt INNERHALB des Zeilen-Buttons. `margin-left: auto` schiebt
      sie an das Ende der Flex-Reihe, ohne dass ein separates `.overview__space-name`-
      Wrapper noetig waere. */

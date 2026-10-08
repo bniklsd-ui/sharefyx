@@ -101,13 +101,14 @@ CAP_BYTES = 300  # der Cap, mit dem P9-3/V145 die Unerreichbarkeit des Kriterium
 # 2026-10-08: +1 Zeile P9-130 (Block feedback B4, Lock P9-BM) mit ✅.
 # 2026-10-08: +1 Zeile P9-129 (Block feedback B5, Lock P9-BL) mit ✅.
 # 2026-10-08: +2 Zeilen P9-127 (⚠️, nur Teile im Browser) und P9-128 (✅), Block feedback B6, Lock P9-BK.
-ABNAHME_BILANCE = {"✅": 116, "⚠️": 13, "⬜": 1}
+# 2026-10-08: +1 Zeile P9-126 (⚠️: 390 px physisch unerreichbar), Block feedback B7, Lock P9-BJ.
+ABNAHME_BILANCE = {"✅": 116, "⚠️": 14, "⬜": 1}
 # 2026-10-05: +7 Zeilen aus dem settings-Nachtrag P9-96–P9-102 (die sieben Punkte aus der
 # Bildsichtung des Nikingers, §10 des Mini-Plans). Die zwei neuen ⚠️ sind **benannte
 # Abweichungen**, keine offenen Punkte: P9-97 (linker Polsterwert, Nikinger-Entscheidung vom
 # 2026-10-05) und P9-99 (`justify-content` statt des im Plan genannten und gemessen wirkungslosen
 # `text-align` — der Knopf ist ein Flexcontainer).
-ABNAHME_ROWS = 130  # 130 Abnahmezeilen; zuletzt P9-127/P9-128 (Block feedback B6, Lock P9-BK)
+ABNAHME_ROWS = 131  # 131 Abnahmezeilen; zuletzt P9-126 (Block feedback B7, Lock P9-BJ)
 # 2026-10-03: V164 von ⬜ auf ✅ (Deploy `v3.1.1` + Health-Gate 9/9). Die Konstante steht
 # **vor** dem Zählen, sonst wäre der Test eine Tautologie -- deshalb hat er mich beim
 # Zurueckschreiben der Bilanz in die Matrix rot gemeldet, statt sie zu bestaetigen.

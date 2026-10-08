@@ -16,6 +16,32 @@ Vorsatz: nichts abtippen, alles per Skript mit vier Gegenproben (Schnitt verlust
 Head trägt genau einen Block, alle bewegten Blöcke im Archiv byte-identisch, Archivbestand
 unangetastet).
 
+## Session stopped — 2026-10-08 (sechsunddreißigster Block: **B6 gebaut, Sessionende — Übergabe für B7**; kein Deploy, kein Service-Touch)
+
+**Ergebnis der Session.** B4 (Abstand der Mitgliederzeilen, danach „Entfernen" rechtsbündig nach der Sichtprüfung), B5 (Titelzeile
+im Löschdialog) und **B6** (Enter löst die Primäraktion aus, P9-BK) gebaut. Matrix **116 ✅ · 13 ⚠️ · 1 ⬜** (P9-127 ⚠️: im Browser
+belegt sind Anlegen, Löschen, `<select>`, Passwort-Panel; die übrigen Overlays stehen nur in Tabelle und Wächter), `pytest` **1264**,
+Probe `p9_feedback_self_check.py` **20/20**. **Nichts deployt.**
+
+**Fund aus B6.** Der Löschdialog ließ nach „Abbrechen" den Absenden-Listener stehen — der nächste Löschvorgang schickte **zwei**
+DELETEs (zweiter: „Item nicht gefunden", Dialog blieb offen), ein Konflikt verbrauchte den Listener. Behoben (`AbortController`,
+Unterwegs-Flag), Gegenlauf alter Client rot. Das war vor B5/B6 live erreichbar.
+
+**Nächster Schritt (kurz).**
+1. **B7** Übersicht: Space-Name bekommt Platz vor den Zählern (P9-BJ, R1: „secus space" nicht lesbar, Abnahme P9-126: Name bis 16 Zeichen
+   bei 1440/1024/390 px voll lesbar, Chips ≤ 2 Zeilen) — Messung zuerst, dann CSS (Text-Anti-Overflow).
+2. **B8** zuerst **messen** (V190, Ladezeit); Fix mit Vorher/Nachher **oder** Befund auf die P10-Liste (P9-132).
+3. **Closeout:** V189–V194 in `ABNAHME_MATRIX_VERIFY.md`; P9-127 mit Probenstationen für die übrigen Overlays auf ✅ heben (optional);
+   offen für P10: Ordner anlegen in Team-Spaces, MCP `update_item` ohne Team-Ausnahme.
+
+**Werkzeug.** `rotate_session_block.sh` **behält den unteren Block** — neuen Block **unter** den alten setzen, rotieren, Kopf ansehen.
+Gegenläufe brauchen eine **frische** Wegwerf-Instanz. Gegenläufe, die vor dem JSON-Report abstürzen, schreiben keinen Report — die
+Ausgabe steht dann in der Matrixzeile.
+
+**Beim Nikinger:** Sichtprüfung (B4 nachgebessert, B5; B6 hat kein Bild), Deploy `v3.1.4`.
+
+**Messung (Softcap-Wächter).** Die durchgestrichene Masse im L3-Archiv bleibt **229 B** und ist kein Hebel; der Head bleibt unter dem Softcap.
+
 ## Session stopped — 2026-10-08 (fünfunddreißigster Block: **B5 gebaut — Übergabe für B6**; kein Deploy, kein Service-Touch)
 
 **Ergebnis der Session.** B4 nach der Sichtprüfung nachgebessert (**„Entfernen" rechtsbündig**, `.space-member-row` Flex mit

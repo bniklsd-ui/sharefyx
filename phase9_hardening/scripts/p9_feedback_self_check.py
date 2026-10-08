@@ -446,6 +446,55 @@ def _b4(page: Page) -> None:
     time.sleep(0.6)
 
 
+def _b7(page: Page) -> None:
+    """B7 (P9-BJ): ein Space mit 16 Zeichen Namen und allen Eimern gefuellt. Die Zeile wird aus der
+    echten Zeile geklont (gleiche Klassen), weil der Seed nur kurze Namen hat; gemessen wird die CSS-Regel,
+    nicht der Seed."""
+    page.set_viewport_size({"width": 1440, "height": 900})
+    page.locator("#home-button").click()
+    time.sleep(1.2)
+    mess = {}
+    for breite in (1440, 1024, 390):
+        page.set_viewport_size({"width": breite, "height": 900})
+        time.sleep(0.5)
+        mess[breite] = page.evaluate("""() => {
+            const r2 = (v) => Math.round(v * 100) / 100;
+            const liste = document.querySelector('.overview__spaces');
+            const vorlage = liste.querySelector('.overview__space-row');
+            const row = vorlage.cloneNode(true);
+            row.dataset.b7 = '1';
+            const name = row.querySelector('.overview__space-name-label');
+            const titelOk = [...liste.querySelectorAll('.overview__space-name-label')]
+                .every(l => l.title === l.textContent);   // echte Zeilen: voller Name im title
+            name.textContent = 'secus-space-test';
+            const zaehler = row.querySelector('.overview__space-counts');
+            zaehler.textContent = '';
+            ['12 Offen', '3 In Arbeit', '9 Erledigt', '40 Notizen', '5 Archiv'].forEach(t => {
+                const c = document.createElement('span'); c.className = 'overview__space-count';
+                c.setAttribute('role', 'button'); c.textContent = t; zaehler.appendChild(c); });
+            liste.appendChild(row);
+            const n = row.querySelector('.overview__space-name-label');
+            const chips = [...zaehler.querySelectorAll('.overview__space-count')];
+            const zeilen = new Set(chips.map(c => Math.round(c.getBoundingClientRect().top))).size;
+            const out = {scrollWidth: n.scrollWidth, clientWidth: n.clientWidth,
+                         abgeschnitten: n.scrollWidth > n.clientWidth + 0.5,
+                         chipzeilen: zeilen, chips: chips.length, titel_ok: titelOk,
+                         zeile: r2(row.getBoundingClientRect().width)};
+            return out;
+        }""")
+        page.locator('.overview__spaces').screenshot(path=str(OUT_DIR / f'p9_feedback_b7_uebersicht_{breite}.png'))
+        page.evaluate("document.querySelectorAll('[data-b7]').forEach(r => r.remove())")
+    m390 = mess.pop(390)
+    befunde.append({"pruefung": "S13b Messung 390px (kein Urteil): Shell = Rail 240 + Liste ~150 px, kein Mobil-Layout",
+                    "ok": True, "messung": True, "detail": json.dumps(m390, ensure_ascii=False)})
+    print(f"  [MESS] S13b 390px: {m390}", file=sys.stderr)
+    for breite, m in mess.items():
+        pruefe(f"S13 Uebersicht {breite}px: Name (16 Zeichen) voll lesbar, Chips <= 2 Zeilen, voller Name im title",
+               "fehler" not in m and not m["abgeschnitten"] and m["chipzeilen"] <= 2 and m["titel_ok"],
+               json.dumps(m, ensure_ascii=False))
+    page.set_viewport_size({"width": 1440, "height": 900})
+
+
 def main() -> int:
     global OUT_DIR
     ap = argparse.ArgumentParser()
@@ -513,6 +562,9 @@ def main() -> int:
             _e1a(alpha, args)
             _b5(alpha, args)
             _b6(alpha, args)
+
+        # --- S13: Uebersicht, Name vor den Chips (B7) -----------------------------------------
+        _b7(alpha)
 
         # --- S5: Uebersicht nach team — Messung, kein Urteil ---------------------------------
         if _in_den_shared_space(alpha, args.base_url):

@@ -2288,3 +2288,26 @@ def test_the_trash_dialog_cleans_up_its_listeners_when_it_closes():
     assert "once: true" not in block
     assert "unterwegs" in block
 
+
+
+def test_the_overview_name_has_priority_over_the_count_chips():
+    """P9-BJ (B7, 2026-10-08): der Name stand auf Flex-Basis 0 und wurde bei gefuellten Eimern zu
+    0 px zusammengedrueckt. Jetzt: Name `0 1 auto`, Chip-Leiste mit eigener Basis und `min-width: 0`,
+    Zeilenknopf `flex-wrap: wrap`, voller Name im `title`."""
+    import re
+
+    css = (DEFAULT_STATIC_DIR / "app.css").read_text("utf-8")
+
+    def regel(selektor: str) -> str:
+        treffer = re.findall(r"(?m)^" + re.escape(selektor) + r"\s*\{(.*?)\}", css, re.S)
+        assert len(treffer) == 1, f"genau eine Regel fuer {selektor} erwartet: {len(treffer)}"
+        return re.sub(r"/\*.*?\*/", "", treffer[0], flags=re.S)
+
+    name = regel(".overview__space-name-label")
+    assert "flex: 0 1 auto" in name and "min-width: 0" in name
+    zaehler = regel(".overview__space-counts")
+    assert re.search(r"flex:\s*1 1 calc\(var\(--space\) \* 33\)", zaehler)
+    assert "min-width: 0" in zaehler
+    assert "flex-wrap: wrap" in regel(".overview__space-open")
+    js = (DEFAULT_STATIC_DIR / "js" / "list.js").read_text("utf-8")
+    assert "nameLabel.title = space.name" in js
