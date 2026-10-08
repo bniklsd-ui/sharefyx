@@ -2,7 +2,7 @@
 
 // -- Navigationsbaum (Step 7b) --------------------------------------------------------------
 
-import { state, BUCKET_LABELS, activeSpaceWritable, setCreateControlsPresent, isGlobalScope, spaceCategory } from "./state.js";
+import { state, BUCKET_LABELS, activeSpaceWritable, setCreateControlsPresent, isGlobalScope, spaceCategory, spaceAllowsMove } from "./state.js";
 import { el, toast } from "./toasts.js";
 import { reportUnexpectedError } from "./api.js";
 import { closeEditor } from "./editor.js";
@@ -116,7 +116,7 @@ export function buildFolderTree(folders) {
 // eigene Sicherheitsgrenze). Teilt sich `moveItemToFolder()` mit dem Menü-Pfad (list.js),
 // duplizierte Erfolgs-/Fehlermeldung ist bewusst — zu wenig gemeinsam mit dem dialoggebundenen
 // Menü-Pfad, um das noch zu teilen (dort muss ein Dialog offen bleiben, hier gibt es keinen).
-function bindFolderDropTarget(button, folderPath) {
+function bindFolderDropTarget(button, spaceName, folderPath) {
   button.addEventListener("dragover", function (event) {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
@@ -131,6 +131,14 @@ function bindFolderDropTarget(button, folderPath) {
     var itemId = event.dataTransfer.getData("text/plain");
     var item = itemId && state.items.filter(function (i) { return i.id === itemId; })[0];
     if (!item) return;
+    // **[2026-10-08, P9-BP]** Space-Bindung ausdrücklich: bis E1a war sie implizit (nur eigene
+    // Items waren ziehbar, nur der eigene Space war Ziel). Seit Team-Spaces beides sind, landete
+    // ein Team-Item auf einem Ordner des Home-Space sonst als `folder`-PATCH **im Team-Space**
+    // (`moveItemToFolder` sendet kein `space`). Ein Space-Wechsel bleibt dem Verschieben-Dialog.
+    if (item.space !== spaceName) {
+      toast("Ziehen verschiebt nur innerhalb eines Spaces — für einen anderen Space den Verschieben-Knopf nehmen.", "error");
+      return;
+    }
     // Ablegen auf dem eigenen Ausgangsordner ist mit Drag & Drop trivial auszulösen (kurz
     // anheben, direkt wieder loslassen) — ohne diesen Guard verursacht das einen leeren
     // `PATCH` mit Versionssprung + Git-Commit für keine tatsächliche Änderung (Advisor-Fund
@@ -205,7 +213,7 @@ function folderButton(space, node, isChild) {
       return navigateFolder(space.name, node.path);
     }).catch(reportUnexpectedError);
   });
-  if (space.own) bindFolderDropTarget(button, node.path);
+  if (spaceAllowsMove(space)) bindFolderDropTarget(button, space.name, node.path);   // P9-BP: auch Team-Spaces
   return button;
 }
 
@@ -252,7 +260,7 @@ export function renderSpaceNode(space) {
   // P9 Step D2: Drop-Ziel zurueck auf die Space-Wurzel -- bindFolderDropTarget() hatte bisher
   // nur eine Aufrufstelle (Ordner-Buttons), es gab also ein Ziel HINEIN in einen Ordner, aber
   // keines HERAUS. Gleicher Eigentuemer-Riegel wie dort (space.own), leerer folderPath = Wurzel.
-  if (space.own) bindFolderDropTarget(row, "");
+  if (spaceAllowsMove(space)) bindFolderDropTarget(row, space.name, "");
   railTreeEl.appendChild(row);
   if (open) {
     railTreeEl.appendChild(renderFolders(space));

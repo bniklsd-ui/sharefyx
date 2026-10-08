@@ -2049,15 +2049,17 @@ def test_space_row_is_a_drop_target_for_the_space_root():
     # gefolgt von einem Argument, nie von einem weiteren Parameternamen wie `button, f`.
     calls = [
         m.start() for m in __import__("re").finditer(
-            r"(?<!function )bindFolderDropTarget\((button|row), ", js,
+            r"(?<!function )bindFolderDropTarget\((button|row), space\.name, ", js,
         )
     ]
     assert len(calls) == 2, (
         f"bindFolderDropTarget() muss genau zwei Aufrufstellen haben (Ordner + Space-Wurzel), "
         f"gefunden: {len(calls)}."
     )
-    assert 'bindFolderDropTarget(row, "")' in js, (
-        "renderSpaceNode() muss bindFolderDropTarget(row, \"\") für space.own aufrufen (P9 "
+    # **[2026-10-08, P9-BP]** die Aufrufe tragen jetzt den Space-Namen (explizite Space-Bindung,
+    # seit Team-Items ziehbar sind) — das Muster oben und hier ist entsprechend erweitert.
+    assert 'bindFolderDropTarget(row, space.name, "")' in js, (
+        "renderSpaceNode() muss bindFolderDropTarget(row, space.name, \"\") aufrufen (P9 "
         "Step D2 -- die Space-Zeile selbst wird zum Drop-Ziel für die Wurzel)."
     )
 
@@ -2068,9 +2070,13 @@ def test_space_drop_target_uses_the_same_owner_guard_as_folders():
     werden (derselbe Eigentümer-Riegel gilt serverseitig ohnehin, das ist nur die UX-Vorstufe).
     """
     js = (DEFAULT_STATIC_DIR / "js" / "tree.js").read_text("utf-8")
-    anchor = js.index('bindFolderDropTarget(row, "")')
+    # **[2026-10-08, P9-BP] umgeschrieben, nicht gelöscht:** der Riegel ist nicht mehr `space.own`,
+    # sondern `spaceAllowsMove(space)` (eigener Space **oder** Team-Space mit Schreibrecht). Die
+    # Aussage des Tests bleibt: beide Aufrufe stehen hinter **demselben** Riegel, und ein fremder,
+    # nur lesbarer Space wird kein Drop-Ziel (`spaceAllowsMove` verlangt `writable`).
+    anchor = js.index('bindFolderDropTarget(row, space.name, "")')
     preceding = js[max(0, anchor - 80):anchor]
-    assert "if (space.own)" in preceding, (
+    assert "if (spaceAllowsMove(space))" in preceding, (
         "bindFolderDropTarget(row, \"\") muss hinter einem if (space.own)-Riegel stehen, "
         "genau wie der bestehende Ordner-Aufruf (P9 Step D2)."
     )
@@ -2196,3 +2202,32 @@ def test_the_create_dialog_names_its_target_space():
     assert re.search(r"createTargetEl\.textContent = [^;]*state\.activeSpace", koerper)
     assert "space: state.activeSpace" in js, "der POST nimmt nicht mehr dieselbe Quelle"
     assert "createTargetEl.innerHTML" not in js
+
+
+def test_team_spaces_unlock_move_drag_and_delete_but_not_share():
+    """P9-BP/BQ (Block feedback E1a, 2026-10-08). Vier Dinge am Text, weil JS hier keinen
+    Unit-Test hat (P5-T) — das Verhalten fährt die Zwei-Principalen-Probe:
+
+    1. `movable` hängt an `spaceAllowsMove()` und das an `space.team` **und** `writable` — das
+       Feld kommt vom Server, ein fremder Home-Space mit `write:` bleibt außen vor;
+    2. Freigeben bleibt beim eigenen Space (E1a gibt Wegnehmen frei, nicht Sichtbarkeit ändern);
+    3. die Drop-Ziele binden den Space ausdrücklich — seit Team-Items ziehbar sind, landete ein
+       Team-Item auf einem Home-Ordner sonst als `folder`-PATCH im Team-Space;
+    4. der Löschdialog nennt `updated_by` per `textContent` (Nutzerdaten, Hard Rule 4)."""
+    state_js = _js_ohne_kommentare((DEFAULT_STATIC_DIR / "js" / "state.js").read_text("utf-8"))
+    helper = re.search(r"export function spaceAllowsMove\(space\) \{(.*?)\n\}", state_js, re.DOTALL)
+    assert helper and "space.team && space.writable" in helper.group(1)
+
+    list_js = _js_ohne_kommentare((DEFAULT_STATIC_DIR / "js" / "list.js").read_text("utf-8"))
+    assert "var movable = !item.readonly && spaceAllowsMove(spaceByName(item.space));" in list_js
+    share_pos = list_js.index('el("button", "list__row-share")')
+    assert "if (item.space === state.ownSpace) {" in list_js[share_pos - 200:share_pos]
+
+    tree_js = _js_ohne_kommentare((DEFAULT_STATIC_DIR / "js" / "tree.js").read_text("utf-8"))
+    drop = re.search(r"function bindFolderDropTarget\(button, spaceName, folderPath\) \{(.*?)\n\}",
+                     tree_js, re.DOTALL)
+    assert drop and "if (item.space !== spaceName)" in drop.group(1)
+
+    dialogs = (DEFAULT_STATIC_DIR / "js" / "dialogs.js").read_text("utf-8")
+    assert '" Zuletzt geändert von " + item.updated_by' in dialogs
+    assert "trashConsequenceEl.innerHTML" not in dialogs

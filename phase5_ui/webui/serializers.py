@@ -134,12 +134,18 @@ def search_to_json(items: list[dict[str, Any]], *, total: int, limit: int, offse
     return {"items": items, "total": total, "limit": limit, "offset": offset}
 
 
-def space_to_json(s: SpaceInfo, *, own_space: str, writable: bool) -> dict[str, Any]:
+def space_to_json(
+    s: SpaceInfo, *, own_space: str, writable: bool, team: bool = False
+) -> dict[str, Any]:
     return {
         "name": s.name,
         "item_count": s.item_count,
         "own": s.name == own_space,
         "writable": writable,
+        # P9-BP (Block feedback E1a): kein Home-Space eines Nutzers. Der Server sagt es, das UI
+        # raet es nicht — ein Team-Space und ein fremder Home-Space mit `write:` sehen fuer den
+        # Client sonst gleich aus (beide `own: false, writable: true`).
+        "team": team,
         "members": list(s.members),
         "folders": list(s.folders),
     }

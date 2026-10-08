@@ -7,7 +7,7 @@ up: ../../phase9_hardening/CLAUDE.md
 down:
   - ./phase9_hardening_plan.md                 # 📕 P9-Plan; Lock P9-A (kein UI-Umbau), P9-K (Löschen nur eigene), §15 P10-Liste
   - ./phase9_hardening_block_settings_plan.md  # Formvorlage; Einstellungs-Kette P9-AE–P9-AL, auf der B4/B5 aufsetzen
-updated: 2026-10-08 (**B2 gebaut** — Zielangabe im Anlegen-Dialog, §8; datierte Korrektur: der Home-Fall von P9-BH ist unerreichbar) | 2026-10-07 (**Nikinger-Entscheidungen E1–E3 eingetragen**: E1 freigegeben — Lock P9-BP, fremde Items im Team-Space löschbar, Eigentum über den Git-Autor nachverfolgt (P9-BQ); E2 und E3 wandern als offene Punkte in den Closeout/P10; Closeout erst nach B1–B8 + E1a) | 2026-10-07 (angelegt — Rückmeldung des Nikingers vom selben Tag, gegen `main@497c5bd` am Code gelesen; **nichts gebaut**)
+updated: 2026-10-08 (**E1a gebaut** — Team-Spaces verschieben/löschen, V191/V192 beantwortet, §8; drei datierte Abweichungen) | 2026-10-08 (**B2 gebaut** — Zielangabe im Anlegen-Dialog, §8; datierte Korrektur: der Home-Fall von P9-BH ist unerreichbar) | 2026-10-07 (**Nikinger-Entscheidungen E1–E3 eingetragen**: E1 freigegeben — Lock P9-BP, fremde Items im Team-Space löschbar, Eigentum über den Git-Autor nachverfolgt (P9-BQ); E2 und E3 wandern als offene Punkte in den Closeout/P10; Closeout erst nach B1–B8 + E1a) | 2026-10-07 (angelegt — Rückmeldung des Nikingers vom selben Tag, gegen `main@497c5bd` am Code gelesen; **nichts gebaut**)
 ---
 
 # Phase 9 — Block feedback: die Rückmeldung vom 2026-10-07
@@ -288,3 +288,45 @@ Regel seit dem Oversize-Fix: neuer Block → neuer Teil, `scripts/move_sections.
   trotzdem **0** sichtbare Anlegen-Knöpfe.
 - **Belege:** Wächter `test_the_create_dialog_names_its_target_space` (gegen den alten Client rot), Probe
   **6/6 plus Messung S5** (S4/S4b neu, `probes/p9_feedback_b2_probe.json`), Gegenlauf **4/6 rot**, `pytest` **1253**, `ui_budget` 5/5, Tabu-Diff leer.
+
+### E1a — Team-Spaces: verschieben, archivieren, löschen (gebaut 2026-10-08, nicht deployt)
+
+- **Server (`api.py`):** `_is_team_space(space)` = keine Nutzerzeile (`auth_store.get_user(space) is None`) — dieselbe
+  Nutzerverwaltung wie `_spaces_delete` (**V192 beantwortet**: die Nutzerverwaltung im Web-Prozess ist die Quelle, kein eigenes Feld
+  auf der Platte). `_team_writer(actor, space)` verlangt zusätzlich **space-level** `can_write`. Die zwei
+  Riegel (Ordner-PATCH und P9-K beim Löschen) bekommen diese Ausnahme. `team` steht in `/spaces` **und** `/overview`.
+- **Client:** `spaceAllowsMove(space)` (`state.js`) = `own` oder (`team` und `writable`). Daran hängen `movable`
+  (Strg+Klick, Long-Press, Verschieben, Löschen, Ziehen) und die Drop-Ziele im Baum. Der Löschdialog nennt
+  „Zuletzt geändert von *X*" für Items außerhalb des eigenen Space (P9-BQ).
+- **V191 beantwortet (am Code, in der Probe bestätigt):** Archivieren war in Team-Spaces schon frei — der
+  Editor ist bei schreibbarem Item eingehängt, und `_items_archive` prüft nur `can_write_item_as_human`.
+- **Befund aus der Browser-Probe, nicht aus dem Unit-Test:** das UI liest `state.spaces` aus `/overview`, nicht
+  aus `/spaces`. Mit `team` nur in `/spaces` war der Unit-Test grün und die Probe rot (S8: 0 Löschknöpfe). Der
+  Test prüft jetzt beide Antworten.
+- **Datierte Abweichungen vom Plan (2026-10-08):**
+  - **Space-Bindung beim Ziehen jetzt ausdrücklich** (`bindFolderDropTarget(button, spaceName, folderPath)`). Bis
+    E1a war sie implizit: nur eigene Items waren ziehbar, nur der eigene Space war Ziel. Ohne die Prüfung
+    landete ein Team-Item, auf einen Home-Ordner gezogen, als `folder`-PATCH **im Team-Space**. Jetzt: Toast,
+    kein Schreibvorgang; ein Space-Wechsel bleibt dem Verschieben-Dialog.
+  - **Freigeben bleibt beim eigenen Space.** E1 gibt Wegnehmen frei, nicht das Ändern fremder Sichtbarkeit.
+  - **Ordner anlegen in Team-Spaces bleibt gesperrt** (`_spaces_create_folder`, `openNewFolderDialog` ist an
+    `state.ownSpace` gebunden). Nicht im Plan genannt, also nicht gebaut — **offener Punkt für den
+    Closeout/P10**. Ziehen und Verschieben in **vorhandene** Team-Ordner geht.
+  - Zwei Step-D-Wächter in `test_static_routes.py` auf `spaceAllowsMove` und den Space-Namen umgeschrieben,
+    **nicht gelöscht**; ihre Aussage (beide Drop-Aufrufe hinter **demselben** Riegel) bleibt.
+- **Belege:** `pytest` **1260** (+7), Probe **11/11**, Gegenlauf gegen den Code vor E1a **4/4 rot**, Mutation
+  ohne Home-Prüfung ⇒ P9-136-Test rot, `ui_budget` 5/5, Tabu-Diff §0.3 leer (nur `phase5_ui/webui/api.py`, wie
+  §0.3 für E1 vorsieht).
+- **Befund beim Abschluss (Advisor, gemessen, behoben):** ein `PATCH` mit `space` gleich dem **eigenen** Space des
+  Items plus `folder` lief an beiden Prüfungen vorbei — P6-AE läuft nur bei echtem Wechsel, der Ordner-Riegel nur
+  ohne `space`. Ein `share_write`-Halter konnte damit ein fremdes Home-Item umräumen (Test: **200**). Seit Step 7b
+  (2026-08-17), nicht durch E1a. Fix: `space_change = target_space is not None and target_space != acl.space`, der
+  Riegel greift bei `not space_change`. Stellt die fail-closed-Entscheidung vom 2026-08-12 wieder her.
+- **`_is_team_space` liest die Nutzerzeile (`auth_store.get_user`), nicht `users.get()`:** Letzteres
+  entschlüsselt den TOTP-Seed, und `/overview` läuft bei jedem Seitenaufruf (Hard Rule 1, Nachtrag 2026-07-30).
+- **Step-D-Probe neu gefahren** (`bindFolderDropTarget` hat eine neue Signatur): **16/16** gegen den heutigen Code.
+- **Offen für den Closeout, benannt:** MCP `update_item` behält den Ordner-Riegel ohne Team-Ausnahme
+  (`phase2_mcp/` ist tabu) — Web und MCP folgen in Team-Spaces beim Ordnerwechsel **nicht** derselben Regel,
+  anders als P9-BG beim Anlegen. Zusammen mit „Ordner anlegen in Team-Spaces" in die P10-Liste.
+- **Nicht eingetragen:** V189–V194 stehen noch nicht in `ABNAHME_MATRIX_VERIFY.md` (B1/B2 haben sie dort auch
+  nicht geführt). Nachtrag gehört in den Closeout.

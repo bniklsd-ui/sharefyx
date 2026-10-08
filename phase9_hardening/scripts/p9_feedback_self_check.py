@@ -14,6 +14,10 @@ Stationen:
   5  (B2) Messung, kein Urteil: nach team -> Uebersicht (`#home-button`) — ist ein Anlegen-Knopf
      sichtbar, und wenn ja, welches Ziel nennt der Dialog? (`state.activeSpace` bleibt in der
      Uebersicht absichtlich stehen, `tree.js:66`.) Die Station meldet den Befund nur.
+  6  (E1a, P9-BP/BQ) im Team-Space loescht alpha ein Item, das **beta** angelegt hat, ueber den
+     echten Zwei-Schritt-Dialog; der Dialog nennt `beta`, der Papierkorb-Commit traegt `alpha`
+  7  (E1a) alpha zieht ein beta-Item per **echter Maus** auf den Team-Ordner `ablage`
+  8  (E1a) Freigeben bleibt beim eigenen Space: Team-Zeilen haben keinen Freigeben-Knopf
 
 Aufruf (Stopp nur ueber die PID-Datei, Hard Rule 9):
     python phase9_hardening/scripts/p9_feedback_wegwerf.py start
@@ -209,6 +213,61 @@ def _anlegen(page: Page, titel: str, bild: str | None = None) -> str | None:
     return ziel_text
 
 
+def _git_autor(data_root: Path) -> str:
+    return subprocess.run(["git", "-C", str(data_root), "log", "--format=%an", "-1"],
+                          capture_output=True, text=True, check=False).stdout.strip()
+
+
+def _team_item(base_url: str, page: Page, titel: str) -> dict | None:
+    status, raw = _api(base_url, "/api/v1/items?space=team", cookie=_cookie_header(page))
+    treffer = [i for i in json.loads(raw).get("items", []) if i["title"] == titel] \
+        if status == 200 else []
+    return treffer[0] if treffer else None
+
+
+def _e1a(page: Page, args) -> None:
+    # S8 zuerst: es braucht nur die Liste, und ein Loeschen danach aendert sie.
+    zeilen = page.locator(".list__rows > li").filter(has_text="E1a ")
+    teilen = page.locator(".list__rows > li").filter(has_text="E1a ").locator(".list__row-share").count()
+    loeschen = zeilen.locator(".list__row-trash").count()
+    pruefe("S8 Team-Zeilen: Loeschen ja, Freigeben nein",
+           zeilen.count() == 2 and loeschen == 2 and teilen == 0,
+           f"Zeilen={zeilen.count()} Loeschknoepfe={loeschen} Freigabeknoepfe={teilen}")
+
+    # S6: Loeschen eines beta-Items durch alpha
+    vorher = _team_item(args.base_url, page, "E1a Loeschen")
+    zeile = page.locator(".list__rows > li").filter(has_text="E1a Loeschen")
+    hinweis = None
+    if zeile.locator(".list__row-trash").count():
+        zeile.locator(".list__row-trash").click()
+        page.locator("#confirm-ok").click()
+        hinweis = page.locator("#trash-consequence").text_content()
+        page.locator("#trash-dialog .overlay__panel").screenshot(
+            path=str(OUT_DIR / "p9_feedback_e1a_loeschen.png"))
+        page.locator("#trash-confirm-input").fill("E1a Loeschen")
+        page.locator("#trash-submit").click()
+        time.sleep(2.0)
+    nachher = _team_item(args.base_url, page, "E1a Loeschen")
+    autor = _git_autor(args.data_root)
+    pruefe("S6 alpha loescht im Team-Space ein Item von beta",
+           vorher is not None and vorher.get("updated_by") == "beta" and nachher is None,
+           f"vorher updated_by={vorher and vorher.get('updated_by')!r} danach vorhanden={nachher is not None}")
+    pruefe("S6b der Loeschdialog nennt beta, der Papierkorb-Commit traegt alpha",
+           bool(hinweis) and "Zuletzt geändert von beta" in hinweis and autor == "alpha",
+           f"Hinweis={hinweis!r} Git-Autor={autor!r}")
+
+    # S7: Drag & Drop eines beta-Items auf den Team-Ordner
+    quelle = page.locator(".list__rows > li").filter(has_text="E1a Ziehen")
+    ziel = page.locator('.tree__realfolder[data-space="team"][data-folder="ablage"]')
+    if quelle.count() and ziel.count():
+        quelle.first.drag_to(ziel.first)
+        time.sleep(2.0)
+    item = _team_item(args.base_url, page, "E1a Ziehen")
+    pruefe("S7 alpha zieht ein beta-Item per Maus in den Team-Ordner",
+           item is not None and item.get("folder") == "ablage",
+           f"Quelle={quelle.count()} Ziel={ziel.count()} folder={item and item.get('folder')!r}")
+
+
 def main() -> int:
     global OUT_DIR
     ap = argparse.ArgumentParser()
@@ -217,7 +276,7 @@ def main() -> int:
     ap.add_argument("--data-root", type=Path, default=DEFAULT_DATA_ROOT)
     # Getrennter Bericht fuer Gegenlaeufe, damit kein Gegenlauf den Erfolgsbeleg ueberschreibt
     # (derselbe Fehler wie im trace-Block 2026-10-02). Die B1-Belege bleiben als Stand von B1 liegen.
-    ap.add_argument("--report", type=Path, default=PROBE_DIR / "p9_feedback_b2_probe.json")
+    ap.add_argument("--report", type=Path, default=PROBE_DIR / "p9_feedback_e1a_probe.json")
     ap.add_argument("--screenshots-dir", type=Path, default=OUT_DIR)
     args = ap.parse_args()
     OUT_DIR = args.screenshots_dir
@@ -270,6 +329,10 @@ def main() -> int:
                 if status == 200 else ["?"]
             pruefe("S2 Gegenlauf: das Team-Item steht nicht im Home-Space",
                    status == 200 and home == [], f"HTTP {status} Treffer im Home={len(home)}")
+
+        # --- S6–S8: E1a im Team-Space --------------------------------------------------------
+        if _in_den_shared_space(alpha, args.base_url):
+            _e1a(alpha, args)
 
         # --- S5: Uebersicht nach team — Messung, kein Urteil ---------------------------------
         if _in_den_shared_space(alpha, args.base_url):

@@ -372,8 +372,14 @@ function openTrashTitleDialog(item) {
   trashErrorEl.hidden = true;
   trashConfirmInputEl.value = "";
   trashRefreshSubmit();
+  // P9-BQ (Block feedback E1a): im Team-Space darf man auch fremde Items löschen. Wer löscht, soll
+  // sehen, ob es das eigene ist — `updated_by` ist die einzige Eigentumsspur im Item (ein
+  // `created_by` wäre die elfte P1-Contract-Öffnung). Altbestand ohne Feld: kein Satz statt
+  // „zuletzt geändert von undefined".
+  var spur = (item.space !== state.ownSpace && item.updated_by)
+    ? " Zuletzt geändert von " + item.updated_by + "." : "";
   trashConsequenceEl.textContent =
-    "Zur Sicherheit den Titel eintippen. Zurückholen kannst du es danach nur über Git.";
+    "Zur Sicherheit den Titel eintippen. Zurückholen kannst du es danach nur über Git." + spur;
   trashDialogEl.hidden = false;
   trashConfirmInputEl.focus();
 

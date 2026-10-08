@@ -104,6 +104,10 @@ PROBE_ITEMS = (
     {"type": "note", "title": "Legacy-Notiz", "status": "active", "actor": "alpha"},
 )
 LEGACY_TITLE = "Legacy-Notiz"
+E1A_ITEMS = (
+    {"type": "task", "title": "E1a Loeschen", "status": "open", "actor": "beta"},
+    {"type": "task", "title": "E1a Ziehen", "status": "open", "actor": "beta"},
+)
 
 TLS_KEY = ROOT / "key.pem"
 TLS_CERT = ROOT / "cert.pem"
@@ -167,6 +171,11 @@ def _seed() -> None:
     store = Store(DATA_ROOT, git=True)
     for eintrag in PROBE_ITEMS:
         store.create(TEAM_SPACE, body="Probe-Item fuer den trace-Block.", **eintrag)
+    # E1a (P9-BP/BQ, 2026-10-08): zwei Items, die **beta** angelegt hat — alpha loescht und zieht
+    # sie in der Probe. Ein Item von alpha selbst wuerde „auch fremde Items" nicht pruefen.
+    store.ensure_folder(TEAM_SPACE, "ablage")
+    for eintrag in E1A_ITEMS:
+        store.create(TEAM_SPACE, body="Probe-Item fuer E1a.", **eintrag)
     store.rebuild_index()
 
     dek = decode_data_encryption_key(DEK_FILE.read_text().strip(), origin=str(DEK_FILE))

@@ -419,12 +419,31 @@ def api_routes(
         visible = _visible_spaces(own_space, [s.name for s in spaces])
         return [s for s in spaces if s.name in visible]
 
+    def _is_team_space(space: str) -> bool:
+        """P9-BP (Block feedback E1a): ein Space, der **nicht** der Home-Space eines Nutzers ist.
+        Dieselbe Quelle wie `_spaces_delete` („Ein Home-Space kann nicht entfernt werden"): die
+        Nutzerverwaltung, nicht ein Feld auf der Platte — ein Home-Space ist, wer ihn bewohnt (V192).
+
+        **`auth_store.get_user()`, nicht `users.get()`** (2026-10-08, Advisor-Fund): `users.get()`
+        entschlüsselt den TOTP-Seed jedes Nutzers — hier liefe das bei **jedem** `/overview` für jeden
+        sichtbaren Space, nur um „gibt es den Nutzer?" zu beantworten. Ein Seed ist das schärfere
+        Geheimnis (Hard Rule 1, Nachtrag 2026-07-30); die Zeilenabfrage beantwortet dieselbe Frage
+        ohne Klartext im Speicher."""
+        return auth_store.get_user(space) is None
+
+    def _team_writer(actor: str, space: str) -> bool:
+        """Darf `actor` in `space` wie ein Eigentümer verschieben und löschen? Nur in Team-Spaces
+        und nur mit **space-level** Schreibrecht (`write:` in `.share.yml`) — ein `share_write`
+        auf einem einzelnen Item reicht nicht. Fremde Home-Spaces bleiben bei P9-K (P9-136)."""
+        return _is_team_space(space) and permissions.can_write(actor, space)
+
     async def _spaces(request: Request) -> Response:
         session = await _require_session(request)
         payload = [
             space_to_json(
                 s, own_space=session.space,
                 writable=permissions.can_write(session.space, s.name),
+                team=_is_team_space(s.name),
             )
             for s in _visible_space_infos(session.space)
         ]
@@ -688,6 +707,10 @@ def api_routes(
                 "name": space.name,
                 "own": space.name == session.space,
                 "writable": permissions.can_write(session.space, space.name),
+                # P9-BP: auch hier — das UI liest `state.spaces` aus **dieser** Antwort, nicht aus
+                # `/spaces` (`list.js :: loadOverview()`). Gefunden 2026-10-08 von der Browser-Probe,
+                # nachdem der Unit-Test nur `/spaces` geprüft hatte und grün war.
+                "team": _is_team_space(space.name),
                 "item_count": space.item_count,
                 "counts": counts,
                 "recent": [overview_row_to_json(i, own_space=session.space) for i in newest],
@@ -960,7 +983,17 @@ def api_routes(
         # Ordner-Move (`target_space is None`) — bei einem Space-Wechsel ersetzt ihn die
         # strengere P6-AE-Prüfung oben, sonst hätte dieser Riegel praktisch jeden legitimen
         # Cross-Space-Move mit gleichzeitig gesetztem `folder` blockiert.
-        if "folder" in body and target_space is None and acl.space != session.space:
+        # **[2026-10-08, P9-BP]:** Ausnahme Team-Space — dort ist niemand Eigentümer, also hätte
+        # sonst **niemand** verschieben können (Plan feedback §1 B-8). Ein space-level Schreiber ist
+        # dort der Eigentümer im Sinne dieses Riegels; die Ordner-`.share.yml` gehört dem Space.
+        # **[2026-10-08, Advisor-Fund beim E1a-Abschluss]:** „kein Space-Wechsel" heißt nicht
+        # `target_space is None`, sondern „Ziel == Quelle". Ein PATCH, der den **eigenen** Space des
+        # Items wiederholt, lief bis hier an beiden Prüfungen vorbei (P6-AE oben nur bei echtem
+        # Wechsel, dieser Riegel nur ohne `space`) — seit Step 7b (2026-08-17). Wiederhergestellt
+        # ist damit die fail-closed-Entscheidung vom 2026-08-12, keine neue Regel.
+        space_change = target_space is not None and target_space != acl.space
+        if ("folder" in body and not space_change and acl.space != session.space
+                and not _team_writer(session.space, acl.space)):
             raise ApiError(
                 "forbidden",
                 "folder ist nur vom Eigentümer-Space änderbar — ein geteilter Schreibzugriff "
@@ -1092,7 +1125,10 @@ def api_routes(
 
         if not permissions.can_write_item_as_human(session.space, acl):
             raise ApiError("forbidden", "Kein Schreibzugriff auf dieses Item.")
-        if acl.space != session.space:
+        # **[2026-10-08, P9-BP]:** Team-Spaces sind ausgenommen — jedes Mitglied mit `write:` löscht
+        # dort, auch fremde Items (Nikinger 2026-10-07: „yes … but still track ownership"; das
+        # Eigentum steht im Git-Autor, P9-BQ). Fremde Home-Spaces bleiben gesperrt (P9-K).
+        if acl.space != session.space and not _team_writer(session.space, acl.space):
             raise ApiError(
                 "forbidden",
                 "Löschen ist nur im eigenen Space möglich — ein geteilter Schreibzugriff erlaubt "

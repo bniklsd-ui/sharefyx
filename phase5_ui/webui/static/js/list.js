@@ -2,7 +2,7 @@
 
 // -- Übersichtsseite + Liste ------------------------------------------------------------------
 
-import { state, BUCKET_LABELS, TYPE_LABELS, activeSpaceWritable, spaceByName, setCreateControlsPresent, isGlobalScope, spaceCategory, overviewToken } from "./state.js";
+import { state, BUCKET_LABELS, TYPE_LABELS, activeSpaceWritable, spaceByName, setCreateControlsPresent, isGlobalScope, spaceCategory, overviewToken, spaceAllowsMove } from "./state.js";
 import { el } from "./toasts.js";
 import { api, reportUnexpectedError } from "./api.js";
 import { navigate, renderRail, bucketNames, activateView } from "./tree.js";
@@ -423,7 +423,8 @@ export function renderList() {
     metaEl.appendChild(el("span", null, itemMetaLine(item)));
     metaEl.appendChild(visibilityChip(item));
     button.appendChild(metaEl);
-    var movable = !item.readonly && item.space === state.ownSpace;
+    // P9-BP: eigener Space oder Team-Space mit Schreibrecht (vorher nur `space === ownSpace`).
+    var movable = !item.readonly && spaceAllowsMove(spaceByName(item.space));
     button.addEventListener("click", function (event) {
       // Strg+Klick (Nikinger-Vorgabe, §9.3 Punkt 1) togglet statt zu öffnen — nur für Items, die
       // sich überhaupt in einem Batch verschieben ließen (dieselbe `movable`-Bedingung wie der
@@ -475,6 +476,9 @@ export function renderList() {
       // selbst prüft `share_read`/`share_write`-Änderungen nicht auf Eigentümerschaft, siehe
       // `api.py`s `folder`-Riegel-Kommentar; dieser Knopf zeigt bewusst nur den einfachsten,
       // erwarteten Fall).
+      // **[2026-10-08, P9-BP]** Freigeben bleibt beim eigenen Space: E1a gibt Verschieben,
+      // Archivieren und Löschen frei, nicht das Ändern der Sichtbarkeit fremder Items.
+      if (item.space === state.ownSpace) {
       var shareButton = el("button", "list__row-share");
       shareButton.type = "button";
       shareButton.title = "Freigeben";
@@ -485,6 +489,7 @@ export function renderList() {
         openShareDialog(item);
       });
       li.appendChild(shareButton);
+      }
 
       // Löschknopf (P9 Step G, P9-K) — dieselbe Geschwister-Regel und dieselbe `movable`-
       // Bedingung wie die beiden Knöpfe darüber, aus demselben Grund: zwei `<button>` ineinander

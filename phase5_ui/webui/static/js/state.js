@@ -167,6 +167,14 @@ export function spaceCategory(space) {
   return "foreign";
 }
 
+// P9-BP (Block feedback E1a): darf man in diesem Space verschieben, ziehen und löschen? Im eigenen
+// Space immer, in einem Team-Space mit Schreibrecht ebenfalls — `team` kommt vom Server
+// (`space_to_json`), nicht aus einer Vermutung hier. Ein fremder Home-Space mit `write:` bleibt
+// außen vor (P9-K). Spiegelt `api.py :: _team_writer()`; der Server prüft trotzdem selbst.
+export function spaceAllowsMove(space) {
+  return !!(space && (space.own || (space.team && space.writable)));
+}
+
 export function isGlobalScope() {
   return state.scope === "all";
 }

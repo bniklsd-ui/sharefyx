@@ -40,7 +40,7 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
 | T | **Zweite Bildsichtung** (Mini-Plan §11, Locks P9-AU–P9-AZ, Abnahme P9-103–P9-111) | 🟡 **gebaut 2026-10-06 (M3)**, Release `v3.1.3` **live seit 2026-10-07** (Gate 9/9; Zeile am 2026-10-07 nachgezogen, stand bis dahin „nicht deployt“) — Probe **29/29**, **Gegenläufe G7–G12 6 von 6** wirksam, `pytest` 1238 → 1246. **Der Block dreht zwei Locks des Vortags: P9-AN und die Fläche aus P9-AO sind widerrufen** — die Menüpunkte tragen die **Standardknopf-Fläche** (`--btn-std-fill`), ausgewählt die **Akzentfläche** wie `.btn-primary` (Entscheidung aus der Rückfrage), und der Abstand ist 8 px (vorher 0 px). „Ändern" ist **Vorsicht** (rot wie „Archivieren"), „Abbrechen" → **„Schließen"** · Beschriftung der Space-Zeilen bündig mit dem Titel (vorher 33 px), Namensfeld im Detail beidseitig bündig (+12 px, als **Rasterfolge**, nicht als Zahl), Anlegezeile eine Zeile (vorher 80 px Versatz) · **sechs Wächter umgeschrieben** (4 settings, 2 static_routes), **keiner gelöscht**; **Gegenlauf G11 fand eine Messlücke** (siehe Session-Block) · **zwei Softcap-Überschreitungen neu benannt** (Matrix 84.161 B, Plan 49.655 B) — Details in der `ABNAHME_MATRIX.md` unter dem Nachtrag vom 2026-10-06 |
 | R | **Rückmeldung aus der Bildsichtung** (Mini-Plan §10, Locks P9-AM–P9-AS, Abnahme P9-96–P9-102) | 🟡 **gebaut 2026-10-05 (M3)**, Release `v3.1.3` **live seit 2026-10-07** (Gate 9/9; Zeile am 2026-10-07 nachgezogen, stand bis dahin „nicht deployt“) — Probe **56/56**, G4 → 2 rot · G5 → 2 rot · G6 → 3 rot, `pytest` 1233 → 1238 · **zwei Korrekturen an der Vorgabe, beide gemessen**: `text-align: center` war auf dem Flex-Knopf ein **No-op** (Textmitte 8,5 px daneben) → `justify-content`, und das **linke Polster** musste vom 32-px-Wert der Baumzeile auf `--space` (Nikinger-Entscheidung), sonst bleibt die Beschriftung 12 px neben der Mitte · P9-96/98/100/101/102 ✅, **P9-97 und P9-99 ⚠️ mit benannter Abweichung** · **zwei Wächter an korrektem Code rot** (Klassenreihenfolge, `hidden` im `aria-hidden`) · **ein Produktbefund gemeldet, nicht gebaut:** die Space-Liste bleibt leer, wenn man sie vor `loadOverview()` öffnet — wandert in die P10-Liste (Plan §6) · Herleitung im L3-Archiv |
 | U | **„Kästchen enger“ — die dritte Bildsichtung** (Mini-Plan §12.1, Locks P9-BB/BC/BD/**BE**, Abnahme **P9-116–P9-119**) | 🟡 **gebaut 2026-10-06 (M3)**, Release `v3.1.3` **live seit 2026-10-07** (Gate 9/9; Zeile am 2026-10-07 nachgezogen, stand bis dahin „nicht deployt“) — Probe **48/48**, **Gegenläufe G13–G18 6 von 6** wirksam, `pytest` 1241 → **1245**. **Der Nikinger hat den Auftrag selbst eingeschränkt:** *„nur bei Spaces verwalten … aber nur dieses“* ⇒ **P9-BA widerrufen** (die Menüpunkte behalten ihre 131 px) und **P9-BE** als **neuer** Lock entstanden (Fenster verkleinern). Menüpunkte **flacher** (b): 4 px Polster, **31,69 px** statt 35,69 px · Space-Zeilen **umklammern ihr Label** (92–147 px statt 330 px, rechts 9 statt 192–245 px, Text 1 px bündig) · **Spaces-Fenster 338 statt 380 px**, Feld 138 px von 288 px Inhalt, Knopf 142 px, im Schmal-Modus zurückgenommen (422 px) · Bild 04 nennt jetzt die **Position** (y 205..246), Bild 07 **rollt auf** (`scrollIntoView`) und nimmt die Anlegezeile mit · **vier eigene Fehler**, drei davon „eine Regel, die nicht die ist, die ich meine“ (`box-sizing: border-box`, `width: 100%` in der **Sammelregel**, eine Station, die den eigenen Fehler nicht bemerkte) · **ein Gegenlauf blieb grün** (G17) und wurde zum Anlass, den Ausgangszustand messbar zu machen · **P9-112 widerrufen**, P9-113/114/115 abgelöst (Zuordnung in der Matrix) · **[2026-10-06 Nachsatz, Lock P9-BF, Abnahme P9-120 ✅]:** **dritte Sichtprüfung — siebenmal ✅, ein Punkt aus Bild 08**: die Space-Zeile hält innen wieder den Standardabstand (**9 px links wie rechts**, vorher 1 gegen 9), gebaut als `padding-left: var(--space)` **plus** `margin-left: calc(var(--space) * -1)` — beide Locks halten nur zusammen; der Einwand zu Bild 04 ist am selben Tag zurückgenommen („man muss scrollen“). Probe **50/50**, **Gegenläufe 7 von 7**, `pytest` 1246 — Details im Session-Block und in der `ABNAHME_MATRIX.md` |
-| feedback | **Nutzer-Rückmeldung vom 2026-10-07** (Plan `phase9_hardening_block_feedback_plan.md`, Locks P9-BG–P9-BO, Abnahme P9-121–P9-137) | 🟡 **B1 gebaut 2026-10-07, B2 gebaut 2026-10-08, beide nicht deployt** — Anlegen im aktiven schreibbaren Space (R2); P9-121–123 ✅, **P9-124 ⚠️**; Dialog nennt sein Ziel, P9-125 ✅; E1a und B3–B8 offen · Herleitung im L3-Archiv |
+| feedback | **Nutzer-Rückmeldung vom 2026-10-07** (Plan `phase9_hardening_block_feedback_plan.md`, Locks P9-BG–P9-BO, Abnahme P9-121–P9-137) | 🟡 **B1 (2026-10-07), B2 und E1a (2026-10-08) gebaut, nicht deployt** — Anlegen im aktiven schreibbaren Space (R2); P9-121–123 ✅, **P9-124 ⚠️**; Dialog nennt sein Ziel, P9-125 ✅; Team-Spaces verschieben/archivieren/löschen, P9-135–137 ✅; B3–B8 offen · Matrix-Teil `ABNAHME_MATRIX_FEEDBACK.md` · Herleitung im L3-Archiv |
 | Gate/Z | Abnahme, Closeout | 🟡 **beide Doku-Hälften erledigt** (2026-10-02) · `ABNAHME_MATRIX.md` ist der **eine** Ort der Abnahme- und `[VERIFY]`-Bilanz, nicht diese Zeile · **[2026-10-04] beide Rotationen gefahren** (Block 17.780 B verbatim, Kette 6 von 7 Fäden) und diese Tabelle ins L3-Archiv gezogen ⇒ **der Head ist unter dem 40-KiB-Softcap** · **offen:** zweites Claude-Konto (P9-13/V150) · ~~Portscan P9-94/P9-11~~ ✅ **2026-10-07** (vier Läufe plus Kontrolllauf, Matrix P9-11) · ~~Übersichtsgrafik §12.4~~ ✅ **2026-10-07** (`docs/concepts/phase9_hardening_uebersicht.svg`, gerendert und angesehen, Sonnet 5.5/Claude Code) · Phase auf ✅ (**wartet seit dem 2026-10-07 auf nichts mehr außer der Closeout-Entscheidung des Nikingers**; **`v3.1.3` live seit 2026-10-07, Gate 9/9**; **2026-10-07:** `## 2026-10-05` im `UPDATE_LOG` auf `## 2026-10-07` datiert, damit das Update-Log-Gate ohne `ALLOW_STALE` greift) — **P9-15 steht nicht mehr hier**, es ist seit dem 2026-10-03 gemessen (⚠️, Zeile A) · Herleitung im L3-Archiv |
 
 ## Backlog (bewusst zurückgestellt, kein Phasen-Blocker)
@@ -142,36 +142,38 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückzuführen** — Nikinger-Anordnung 2026-09-24, so dokumentieren und nicht weiter
   untersuchen.
 
-## Session stopped — 2026-10-08 (einunddreißigster Block: **B2 des feedback-Blocks gebaut — der Anlegen-Dialog nennt sein Ziel**; kein Deploy, kein Service-Touch)
+## Session stopped — 2026-10-08 (zweiunddreißigster Block: **E1a gebaut — in Team-Spaces darf jedes Mitglied verschieben, archivieren und löschen**; kein Deploy, kein Service-Touch)
 
-**Ergebnis in einem Satz.** Der Anlegen-Dialog zeigt jetzt „Anlegen in: *Space*" (im eigenen Home-Space
-mit „(dein Home-Space)"), gefüllt aus derselben Quelle wie der POST aus B1. P9-125 ✅. Matrix:
-109 ✅ · 12 ⚠️ · 1 ⬜ (Zählung steht im Hub).
+**Ergebnis in einem Satz.** In einem Team-Space (kein Home-Space eines Nutzers) verschiebt, zieht und löscht
+jedes Mitglied mit `write:` auch fremde Items; fremde Home-Spaces bleiben bei P9-K. P9-135–137 ✅. Matrix:
+112 ✅ · 12 ⚠️ · 1 ⬜ (Zählung im Hub, die feedback-Zeilen in `ABNAHME_MATRIX_FEEDBACK.md`).
 
 | Prüfung | Ergebnis |
 |---|---|
-| `pytest` gesamt | **1253 grün** (+1: `test_the_create_dialog_names_its_target_space`, gegen den alten Client rot) |
-| Browser-Probe, zwei Principals | **6/6** (S4 `Anlegen in: team`, S4b `Anlegen in: alpha (dein Home-Space)`, S1–S3 aus B1 weiter grün) plus **Messung S5**: Übersicht nach `team` → **0** Anlegen-Knöpfe |
-| Gegenlauf gegen den alten Client | **4/6 rot** (S4, S4b: Zielzeile fehlt) — `probes/p9_feedback_b2_probe_gegenprobe.json` |
-| `ui_budget` / Tabu-Diff | **5/5** (170,3 KB) / leer |
+| `pytest` gesamt | **1260 grün** (+7: fünf API-Tests, ein UI-Wächter, ein `move_sections`-Regressionstest) |
+| Zwei-Principalen-Probe | **11/11** — S6 alpha löscht ein beta-Item (Dialog nennt beta, Git-Autor alpha), S7 echte Maus auf `ablage`, S8 Löschknopf ja, Freigeben nein |
+| Gegenlauf gegen den Code vor E1a | **4/4 E1a-Stationen rot** (S6, S6b, S7, S8) |
+| Mutation: `_team_writer` ohne Home-Prüfung | genau `test_foreign_home_space_keeps_p9_k_even_with_write` rot |
+| `ui_budget` / Tabu-Diff | **5/5** (171,1 KB) / leer |
+| Step-D-Probe (neue Drop-Signatur) | **16/16** |
 
-**Warum so gebaut.** Eine `overlay__hint`-Zeile wie `#share-item-title` im Freigabe-Dialog, kein neues
-Bedienelement. Die Anzeige liest `state.activeSpace` — dieselbe Variable, die `_items_post` als `space`
-bekommt; zwei Quellen könnten auseinanderlaufen, und dann löge die Anzeige wie vor B1. `textContent`,
-weil der Space-Name Nutzerdaten ist.
-**Datierte Planabweichung:** P9-BH nennt einen Home-Fall für globale Sicht und nur lesbare Spaces. Der ist
-unerreichbar, denn dort ist der Dialog ausgehängt (Plan §8 B2). Für die Übersicht gemessen, nicht nur gelesen:
-`state.activeSpace` bleibt dort `team`, trotzdem ist kein Anlegen-Knopf sichtbar (S5).
-**Probe:** `p9_feedback_self_check.py` kennt jetzt `--report` und `--screenshots-dir` (Muster Step D/trace),
-weil mein erster Gegenlauf die Bilder überschrieben hat — das B1-Bild ist aus Git zurückgeholt. Spätere
-Schritte geben beides je Lauf an; die B1-Belege bleiben als Stand von B1 liegen.
+**Befund beim Abschluss, behoben:** ein PATCH, der den **eigenen** Space des Items als `space` wiederholt, lief
+seit Step 7b (2026-08-17) an beiden Ordner-Riegeln vorbei — gemessen **200**, jetzt 403, Test ohne Fix rot.
 
-**Nächster Schritt.** E1a (Team-Spaces: verschieben, archivieren, löschen; berührt `api.py:956/1067`
-und `list.js:426`), danach B3–B7, B8 zuerst messen (V190). Sichtprüfung (acht Bilder) und Deploy `v3.1.4`
-beim Nikinger. **Closeout P9 erst nach B1–B8 und E1a.**
-**Vorsicht vor E1a:** `ABNAHME_MATRIX_BLOECKE.md` hat **39.667 B**, also ~1,3 KB Luft. Drei E1a-Zeilen
-(P9-135–137) reißen den Cap ⇒ zuerst ein neuer Matrix-Teil per `scripts/move_sections.py`, und dessen
-INDEX-Zeile braucht vorher eine INDEX-Rotation (`scripts/archive_index_entries.sh`), denn `docs/INDEX.md`
-hat nur ~170 B Platz.
+**Warum so gebaut.** „Team-Space" ist „keine Nutzerzeile" (`auth_store.get_user`, ohne TOTP-Entschlüsselung) — dieselbe Quelle, mit der `_spaces_delete`
+schon heute Home-Spaces erkennt (V192). Das UI rät es nicht, der Server liefert `team`. Der Gegenlauf zu P9-136
+nutzt **dieselbe** `.share.yml` und ändert nur die Nutzerverwaltung — die eine Größe, an der die Regel hängt.
+**Ein Befund, den nur der Browser fand:** `state.spaces` kommt aus `/overview`, nicht aus `/spaces`; mit `team`
+nur in `/spaces` war der Unit-Test grün und S8 rot. **Datierte Abweichungen** (Plan §8 E1a): Space-Bindung beim
+Ziehen jetzt ausdrücklich (sonst landete ein Team-Item auf einem Home-Ordner als PATCH **im Team-Space**),
+Freigeben bleibt beim eigenen Space, **Ordner anlegen in Team-Spaces bleibt gesperrt** (offener Punkt für den
+Closeout), ebenso **MCP `update_item` ohne Team-Ausnahme** (`phase2_mcp/` tabu). Zwei Step-D-Wächter umgeschrieben, keiner gelöscht.
+**Vorlauf, eigener Commit:** vierter Matrix-Teil `ABNAHME_MATRIX_FEEDBACK.md`; für seine INDEX-Zeile wanderte der
+überholte Nachsatz der CLAUDE.md-Kartenzeile verbatim ins Nachtrags-Archiv; `move_sections.py` brach bei jedem
+Abschnitt am Dateiende ab — behoben, mit Regressionstest.
+
+**Nächster Schritt.** B3 (Schließen im Einstellungsmenü), B4, B5 (Löschdialog-Titel), dann B6/B7, B8 zuerst
+messen (V190). V189–V194 in `ABNAHME_MATRIX_VERIFY.md` nachtragen. Sichtprüfung (acht Bilder) und Deploy
+`v3.1.4` beim Nikinger. **Closeout P9 erst nach B1–B8 und E1a.** `docs/INDEX.md` hat ~500 B Luft.
 
 **Messung (Softcap-Wächter).** Die durchgestrichene Masse im L3-Archiv bleibt **229 B** und ist kein Hebel; der Head bleibt unter dem Softcap.

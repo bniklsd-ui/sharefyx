@@ -1455,3 +1455,145 @@ async def test_updated_by_is_recorded_from_the_session_and_cannot_be_written(
         listed = await client.get("/api/v1/items?space=" + SPACE, headers=_headers(csrf))
         row = next(r for r in listed.json()["items"] if r["id"] == created_body["id"])
         assert row["updated_by"] == SPACE
+
+
+# -- P9 Block feedback E1a (Locks P9-BP/BQ): Team-Spaces ---------------------------------------
+#
+# Ein **Team-Space** ist ein Space, der nicht der Home-Space eines Nutzers ist (`users.get()` ist
+# `None`, dieselbe Quelle wie `_spaces_delete`). In der Fixture ist `FOREIGN_SPACE` kein Nutzer —
+# mit `write:` ist er also ein Team-Space. Für den **Gegenlauf** (P9-136) wird er per
+# `upsert_user` zum Home-Space eines zweiten Menschen gemacht: dieselben Dateien, dieselbe
+# `.share.yml`, nur die Nutzerverwaltung unterscheidet die beiden Fälle — genau die eine Größe,
+# an der die Regel hängt.
+
+
+def _team(tmp_path) -> None:
+    (tmp_path / "data" / FOREIGN_SPACE / ".share.yml").write_text(
+        f"read: [{SPACE}]\nwrite: [{SPACE}]\n", encoding="utf-8"
+    )
+
+
+def _make_home(store) -> None:
+    store.upsert_user(
+        FOREIGN_SPACE, password_hash="x", totp_secret_enc=None, totp_alg="SHA1",
+        totp_confirmed_at=None, status="active",
+    )
+
+
+@pytest.mark.asyncio
+async def test_spaces_list_marks_team_spaces(full_app_items, item_store, tmp_path, totp_code):
+    """V192/P9-BP: der Server sagt, was ein Team-Space ist — das UI rät es nicht."""
+    item_store.create(FOREIGN_SPACE, type="note", title="Team")
+    _team(tmp_path)
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        spaces = {s["name"]: s for s in (await client.get("/api/v1/spaces")).json()}
+        # Das UI füllt `state.spaces` aus `/overview` (`list.js :: loadOverview()`) — der ersten
+        # Fassung dieses Tests fehlte genau diese Hälfte, und die Browser-Probe fand es (S8 rot).
+        overview = {s["name"]: s for s in (await client.get("/api/v1/overview")).json()}
+    assert spaces[FOREIGN_SPACE]["team"] is True
+    assert spaces[SPACE]["team"] is False
+    assert overview[FOREIGN_SPACE]["team"] is True
+    assert overview[SPACE]["team"] is False
+
+
+@pytest.mark.asyncio
+async def test_team_member_deletes_and_moves_a_foreign_item(
+    full_app_items, item_store, tmp_path, totp_code
+):
+    """P9-135: im Team-Space löscht und verschiebt jedes Mitglied mit `write:` — auch ein Item,
+    das ein **anderer** angelegt hat (Nikinger 2026-10-07: alle Items, nicht nur eigene)."""
+    item_store.ensure_folder(FOREIGN_SPACE, "ablage")
+    moved = item_store.create(FOREIGN_SPACE, type="note", title="Wandert", actor=FOREIGN_SPACE)
+    gone = item_store.create(FOREIGN_SPACE, type="task", title="Weg damit", actor=FOREIGN_SPACE)
+    _team(tmp_path)
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        patch = await client.patch(
+            f"/api/v1/items/{moved.id}",
+            json={"version": moved.version, "folder": "ablage"}, headers=_headers(csrf),
+        )
+        delete = await client.request(
+            "DELETE", f"/api/v1/items/{gone.id}",
+            json={"version": gone.version, "confirm": "Weg damit"}, headers=_headers(csrf),
+        )
+    assert patch.status_code == 200, patch.text
+    assert item_store.get(moved.id).folder == "ablage"
+    assert delete.status_code == 204, delete.text
+    assert (tmp_path / "data" / "._trash" / FOREIGN_SPACE).exists()
+    with pytest.raises(Exception):
+        item_store.get(gone.id)
+
+
+@pytest.mark.asyncio
+async def test_foreign_home_space_keeps_p9_k_even_with_write(
+    full_app_items, item_store, store, tmp_path, totp_code
+):
+    """P9-136, **Gegenlauf**: dieselbe `.share.yml`, aber `FOREIGN_SPACE` ist jetzt der Home-Space
+    eines Menschen. `write:` erlaubt dort Ändern, nicht Wegnehmen und nicht Umräumen — 403, und
+    beide Items stehen unverändert da."""
+    item_store.ensure_folder(FOREIGN_SPACE, "ablage")
+    moved = item_store.create(FOREIGN_SPACE, type="note", title="Bleibt", actor=FOREIGN_SPACE)
+    kept = item_store.create(FOREIGN_SPACE, type="task", title="Auch", actor=FOREIGN_SPACE)
+    _team(tmp_path)
+    _make_home(store)
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        spaces = {s["name"]: s for s in (await client.get("/api/v1/spaces")).json()}
+        patch = await client.patch(
+            f"/api/v1/items/{moved.id}",
+            json={"version": moved.version, "folder": "ablage"}, headers=_headers(csrf),
+        )
+        delete = await client.request(
+            "DELETE", f"/api/v1/items/{kept.id}",
+            json={"version": kept.version, "confirm": "Auch"}, headers=_headers(csrf),
+        )
+    assert spaces[FOREIGN_SPACE]["team"] is False
+    assert patch.status_code == 403
+    assert delete.status_code == 403
+    assert item_store.get(moved.id).folder == ""
+    assert item_store.get(kept.id).id == kept.id
+
+
+@pytest.mark.asyncio
+async def test_team_space_without_write_still_cannot_delete(
+    full_app_items, item_store, tmp_path, totp_code
+):
+    """P9-BP verlangt **space-level** `write:` — nur lesen reicht im Team-Space nicht."""
+    item = item_store.create(FOREIGN_SPACE, type="task", title="Nur lesen")
+    (tmp_path / "data" / FOREIGN_SPACE / ".share.yml").write_text(
+        f"read: [{SPACE}]\n", encoding="utf-8"
+    )
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        delete = await client.request(
+            "DELETE", f"/api/v1/items/{item.id}",
+            json={"version": item.version, "confirm": "Nur lesen"}, headers=_headers(csrf),
+        )
+    assert delete.status_code == 403
+    assert item_store.get(item.id).id == item.id
+
+
+@pytest.mark.asyncio
+async def test_repeating_the_own_space_does_not_skip_the_folder_lock(
+    full_app_items, item_store, store, tmp_path, totp_code
+):
+    """2026-10-08 (Advisor-Fund beim E1a-Abschluss): ein PATCH mit `space` gleich dem **eigenen**
+    Space des Items ist kein Space-Wechsel. Er darf deshalb weder die P6-AE-Prüfung (die nur bei
+    einem echten Wechsel läuft) noch den Ordner-Riegel (der nur ohne `space` lief) umgehen —
+    sonst räumt ein `share_write`-Halter ein fremdes Home-Item doch um. P9-136 über diesen Weg."""
+    item_store.ensure_folder(FOREIGN_SPACE, "ablage")
+    item = item_store.create(FOREIGN_SPACE, type="note", title="Bleibt", actor=FOREIGN_SPACE)
+    item_store.update(item.id, version=item.version, share_write=[SPACE])
+    item = item_store.get(item.id)
+    _team(tmp_path)
+    _make_home(store)
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        patch = await client.patch(
+            f"/api/v1/items/{item.id}",
+            json={"version": item.version, "space": FOREIGN_SPACE, "folder": "ablage"},
+            headers=_headers(csrf),
+        )
+    assert patch.status_code == 403, patch.text
+    assert item_store.get(item.id).folder == ""
