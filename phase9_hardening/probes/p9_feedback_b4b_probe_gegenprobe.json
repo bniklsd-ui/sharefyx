@@ -54,8 +54,8 @@
     },
     {
       "pruefung": "S10b Entfernen-Knoepfe sitzen rechtsbuendig auf der Kante von „Hinzufuegen“, Abstand zum Text >= --space",
-      "ok": true,
-      "detail": "Hinzufuegen rechts=1154 Zeilen=[{'rechts': 1154, 'abstand': 83}, {'rechts': 1154, 'abstand': 91}]"
+      "ok": false,
+      "detail": "Hinzufuegen rechts=1154 Zeilen=[{'rechts': 1071, 'abstand': 0}, {'rechts': 1063, 'abstand': 0}]"
     },
     {
       "pruefung": "S10 Mitgliederzeilen haben den Standardabstand (--space)",
@@ -73,5 +73,5 @@
       "detail": "HTTP 200 Treffer=1"
     }
   ],
-  "alle_ok": true
+  "alle_ok": false
 }

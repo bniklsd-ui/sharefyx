@@ -1363,6 +1363,12 @@ def test_the_two_input_rows_stop_being_staircases():
     assert _eigenschaft(mitglieder[0], "display") == "flex", mitglieder[0]
     assert _eigenschaft(mitglieder[0], "flex-direction") == "column", mitglieder[0]
     assert _eigenschaft(mitglieder[0], "gap") == "var(--space)", mitglieder[0]
+    # Nachsatz B4 (Sichtpruefung): der Entfernen-Knopf sitzt rechtsbuendig, mit Mindestabstand zum Text.
+    zeilen_regel = [b for erster, selectors, b in _alle_regeln() if erster == ".space-member-row"]
+    assert len(zeilen_regel) == 1, f"genau eine Regel fuer .space-member-row erwartet: {len(zeilen_regel)}"
+    assert _eigenschaft(zeilen_regel[0], "display") == "flex", zeilen_regel[0]
+    assert _eigenschaft(zeilen_regel[0], "justify-content") == "space-between", zeilen_regel[0]
+    assert _eigenschaft(zeilen_regel[0], "gap") == "var(--space)", zeilen_regel[0]
 
 
 # --- Block „Kästchen enger" (Plan §12.1, Locks P9-BB/BC/BD/BE, Abnahme P9-116 – P9-119) ---------

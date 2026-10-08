@@ -320,6 +320,20 @@ def _b4(page: Page) -> None:
         return {n: zeilen.length, space: r2(space),
                 abstaende: zeilen.slice(1).map((b, i) => r2(b.top - zeilen[i].bottom))};
     }""")
+    k = page.evaluate("""() => {
+        const r2 = (v) => Math.round(v * 100) / 100;
+        const hinzu = document.getElementById('space-member-add-submit').getBoundingClientRect();
+        const zeilen = [...document.querySelectorAll('#space-member-list > li')]
+          .filter(li => li.querySelector('button'));
+        return {rechts_hinzu: r2(hinzu.right), zeilen: zeilen.map(li => {
+          const t = li.querySelector('span').getBoundingClientRect();
+          const b = li.querySelector('button').getBoundingClientRect();
+          return {rechts: r2(b.right), abstand: r2(b.left - t.right)}; })};
+    }""")
+    pruefe("S10b Entfernen-Knoepfe sitzen rechtsbuendig auf der Kante von „Hinzufuegen“, Abstand zum Text >= --space",
+           len(k["zeilen"]) >= 2 and all(abs(z["rechts"] - k["rechts_hinzu"]) <= 1 and z["abstand"] >= m["space"]
+                                         for z in k["zeilen"]),
+           f"Hinzufuegen rechts={k['rechts_hinzu']} Zeilen={k['zeilen']}")
     page.locator("#settings-space-detail").screenshot(path=str(OUT_DIR / "p9_feedback_b4_mitglieder.png"))
     pruefe("S10 Mitgliederzeilen haben den Standardabstand (--space)",
            m["n"] >= 2 and m["space"] > 0 and all(abs(a - m["space"]) <= 0.5 for a in m["abstaende"]),

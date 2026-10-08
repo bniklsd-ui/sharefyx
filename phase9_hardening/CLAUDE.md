@@ -142,28 +142,31 @@ den aktuellen Session-Block; die Entscheidungen (P9-A–P9-T) und Step-Details s
   zurückzuführen** — Nikinger-Anordnung 2026-09-24, so dokumentieren und nicht weiter
   untersuchen.
 
-## Session stopped — 2026-10-08 (dreiunddreißigster Block: **B3 gebaut, Sessionende — Übergabe für B4**; kein Deploy, kein Service-Touch)
+## Session stopped — 2026-10-08 (vierunddreißigster Block: **B4 gebaut — Übergabe für B5**; kein Deploy, kein Service-Touch)
 
-**Ergebnis der Session.** Vier Commits: B2 (Zielangabe im Anlegen-Dialog, P9-125), E1a-Vorlauf (vierter
-Matrix-Teil), E1a (Team-Spaces verschieben/archivieren/löschen, P9-135–137, dazu ein behobenes Loch seit Step 7b),
-B3 (Schließen im Einstellungsmenü, P9-131). Matrix **113 ✅ · 12 ⚠️ · 1 ⬜**, `pytest` **1261**, `ui_budget` 5/5,
-Probe `p9_feedback_self_check.py` **12/12**. **Nichts deployt**, alles auf `main` gepusht.
+**Ergebnis der Session.** B4 (P9-BM, Abnahme P9-130 ✅): `#space-member-list` ist eine Flex-Spalte mit
+`gap: var(--space)`. Probe S10 misst im Wegwerf-`team` **vier** Mitgliederzeilen mit Abständen **[8, 8, 8] px**
+gegen `--space` = 8 px; Gegenlauf `gap: 0` → S10 rot ([0, 0]). Matrix **114 ✅ · 12 ⚠️ · 1 ⬜**, `pytest` **1261**
+(kein neuer Test — der bestehende Wächter der Mitgliederliste prüft jetzt auch `display`/`flex-direction`/`gap`).
+Probe **14/14**. **Nichts deployt.**
 
-**B3 in einem Satz.** `#settings-menu-close` schließt die ganze Kette (`closeSettings`); Probe S9 öffnet Menü +
-Update-Log und misst danach Overlay `hidden` und 0 offene Panels; gegen den alten Client rot.
+**Nachsatz nach der Sichtprüfung.** Der Nikinger sah „Entfernen" am Text kleben und wollte es rechtsbündig:
+`.space-member-row` ist jetzt Flex mit `space-between` (Knopf auf der Kante von „Hinzufügen“, Probe S10b, Gegenlauf rot).
+
+**Abweichung vom Plan, benannt.** Die Probe legt kein Mitglied an: der Seed schreibt `team` mit alpha **und** beta,
+die Liste ist damit schon gefüllt, und das schließt die Grenze aus P9-107/P9-110. Ein Anlegen bräuchte einen
+dritten Principal samt Re-Auth (Plan §8, B4).
 
 **Nächster Schritt (Reihenfolge aus Plan §4).**
-1. **B4** Abstand der Mitgliederzeilen (P9-BM): `#space-member-list` als Flex-Spalte mit `gap: var(--space)`.
-   Die Probe muss ein **Mitglied anlegen** (`team` hat alpha/beta) und den Abstand messen; Gegenlauf `gap: 0` → rot.
-2. **B5** Titelzeile im Löschdialog (P9-BL), per `textContent`, direkt über `#trash-confirm-input`.
-3. **B6** Enter-Handler (P9-BK, Tabelle §5), **B7** Übersicht Name vor Chips (P9-BJ), **B8** zuerst messen (V190).
-4. Offen für den Closeout: V189–V194 in `ABNAHME_MATRIX_VERIFY.md`; Ordner anlegen in Team-Spaces; MCP
+1. **B5** Titelzeile im Löschdialog (P9-BL), per `textContent`, direkt über `#trash-confirm-input`.
+2. **B6** Enter-Handler (P9-BK, Tabelle §5), **B7** Übersicht Name vor Chips (P9-BJ), **B8** zuerst messen (V190).
+3. Offen für den Closeout: V189–V194 in `ABNAHME_MATRIX_VERIFY.md`; Ordner anlegen in Team-Spaces; MCP
    `update_item` ohne Team-Ausnahme.
 
-**Werkzeug.** Probe läuft mit `--report`/`--screenshots-dir` je Schritt (Gegenläufe nach `/tmp`). Wegwerf:
-`python phase9_hardening/scripts/p9_feedback_wegwerf.py start|stop` (Port 18778, Stopp nur über die PID-Datei).
-`docs/INDEX.md` hat ~500 B Luft, `ABNAHME_MATRIX_FEEDBACK.md` ist der Ort für neue feedback-Zeilen.
+**Werkzeug.** Unverändert: `p9_feedback_wegwerf.py start|stop` (Port 18778, Stopp nur über die PID-Datei),
+Probe mit `--report`/`--screenshots-dir` je Schritt. Ein Gegenlauf auf einer **verbrauchten** Instanz färbt auch
+fremde Stationen rot (hier sechs) — nur die Station des Gegenlaufs zählt, sonst frische Instanz starten.
 
-**Beim Nikinger:** Sichtprüfung (acht Bilder, u. a. Knopfhöhe in `p9_feedback_b3_menue.png`), Deploy `v3.1.4`.
+**Beim Nikinger:** Sichtprüfung (neu: `docs/screenshots/p9_feedback_b4_mitglieder.png`), Deploy `v3.1.4`.
 
 **Messung (Softcap-Wächter).** Die durchgestrichene Masse im L3-Archiv bleibt **229 B** und ist kein Hebel; der Head bleibt unter dem Softcap.

@@ -2136,6 +2136,18 @@ select.input:focus {
   gap: var(--space);
 }
 
+/* P9-BM, Nachsatz (2026-10-08, Sichtprüfung zu Bild B4): der „Entfernen"-Knopf klebte am Text
+   (Abstand 0–4 px) und wanderte mit der Namenslänge. Die Zeile ist jetzt eine Flex-Zeile mit
+   `justify-content: space-between`: der Knopf sitzt **rechtsbündig** auf derselben Kante wie
+   „Hinzufügen" darunter, die Zeilenbreite hängt nicht mehr am Namen, und `gap` hält den
+   Mindestabstand zum Text. */
+.space-member-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space);
+}
+
 /* P9-AZ (2026-10-05, Nikinger, wörtlich): „Name des Spaces"-Feld und „Space anlegen" **in eine
    Zeile**, links und rechts bündig mit der Linie darüber, Standard-Abstand zwischen den Knöpfen;
    „Schließen" bleibt allein darunter rechtsbündig.

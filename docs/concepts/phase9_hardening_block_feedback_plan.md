@@ -347,3 +347,6 @@ Regel seit dem Oversize-Fix: neuer Block → neuer Teil, `scripts/move_sections.
   mit `read`/`write: [alpha, beta]`, die Liste hat also vier Zeilen (beide Rollen je Principal) — das genügt, um
   die Grenze aus P9-107/P9-110 („Liste im Harness leer") zu schließen. Ein Anlegen bräuchte einen dritten Principal.
 - Belege: Probe S10 **13/13**, Abstände [8, 8, 8] px; Gegenlauf `gap: 0` → S10 rot (Abstände [0, 0]); `pytest` **1261**.
+- **Nachsatz 2026-10-08 (Sichtprüfung des Nikingers zu Bild B4):** „Entfernen" nahe am Text → rechtsbündig auf die Kante
+  der Knöpfe darunter (`.space-member-row`: Flex, `space-between`, `gap`). Das hält auch das Fenster bei mittellangen
+  Space-Namen stabil. Probe S10b 14/14, Gegenlauf rot.
