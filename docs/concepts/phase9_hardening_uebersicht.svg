@@ -1,77 +1,179 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="740" viewBox="0 0 1080 740" font-family="'DejaVu Sans','Segoe UI',Helvetica,Arial,sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080" font-family="'DejaVu Sans','Segoe UI',Helvetica,Arial,sans-serif">
 
-  <rect width="1080" height="740" fill="#f7f8fa"/>
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a6b7d"/>
+    </marker>
+    <marker id="arG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2f7a4d"/>
+    </marker>
+    <marker id="arR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b03030"/>
+    </marker>
+  </defs>
 
-  <!-- Kopf -->
+  <rect width="1080" height="1080" fill="#f7f8fa"/>
+
+  <!-- ================= Kopf ================= -->
   <rect x="0" y="0" width="1080" height="86" fill="#1d2b3a"/>
   <text x="36" y="36" font-size="19" font-weight="700" fill="#ffffff">Phase 9 — Härtung: Domain, Watchdog, Löschen, Nachvollziehbarkeit</text>
-  <text x="36" y="62" font-size="12.5" fill="#9db2c6">Sharefyx · phase9_hardening/ · live als v3.1.3 seit 2026-10-07 · Stand 2026-10-07</text>
-  <rect x="794" y="18" width="250" height="50" rx="10" fill="#b8860b"/>
-  <text x="919" y="38" font-size="14.5" font-weight="700" fill="#ffffff" text-anchor="middle">105 ✅ · 11 ⚠️ · 1 ⬜</text>
-  <text x="919" y="57" font-size="11" fill="#fff3d0" text-anchor="middle">von 117 Abnahmezeilen (P9-120 zuletzt)</text>
+  <text x="36" y="62" font-size="12" fill="#9db2c6">Sharefyx · phase9_hardening/ · live als v3.1.4 seit 2026-10-08 (SHA d04c0ec) · health_gate 9/9 · Stand 2026-10-08</text>
+  <rect x="794" y="18" width="250" height="50" rx="10" fill="#2f7a4d"/>
+  <text x="919" y="38" font-size="14.5" font-weight="700" fill="#ffffff" text-anchor="middle">121 ✅ · 12 ⚠️ · 1 ⬜</text>
+  <text x="919" y="57" font-size="11" fill="#cfe6d8" text-anchor="middle">von 134 Abnahmezeilen, 0 ersetzt</text>
 
-  <!-- Mission -->
-  <rect x="36" y="102" width="1008" height="74" rx="8" fill="#ffffff" stroke="#d5dce4"/>
-  <text x="56" y="126" font-size="13.5" font-weight="700" fill="#1d2b3a">Mission: den Server belastbar machen, bevor jemand Neues darauf baut — kein UI-Umbau, keine neue Intelligenz im Server.</text>
-  <text x="56" y="148" font-size="12" fill="#4a5a6b">Der Server bleibt <tspan font-weight="700" fill="#1d2b3a">dumm</tspan>: Aktenschrank mit Schloss. Neu sind Adresse, Wächter, Schema-Felder und ein Papierkorb — kein LLM-Call.</text>
-  <text x="56" y="167" font-size="12" fill="#4a5a6b">Zwei P1-Contract-Öffnungen (<tspan font-weight="700" fill="#1d2b3a">neunte</tspan>: doing/assignee, <tspan font-weight="700" fill="#1d2b3a">zehnte</tspan>: updated_by) — beide angekündigt, beide ohne Index-Neuaufbau.</text>
+  <!-- ================= Mission ================= -->
+  <rect x="36" y="100" width="1008" height="74" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="124" font-size="13.5" font-weight="700" fill="#1d2b3a">Mission: die letzten Schwächen beseitigen, damit P10 Features baut statt Grundlagen — kein UI-Umbau (Lock P9-A).</text>
+  <text x="56" y="146" font-size="12" fill="#4a5a6b">Der Server bleibt <tspan font-weight="700" fill="#1d2b3a">dumm</tspan>: neu sind eine Adresse, ein Wächter, zwei Schema-Felder und ein Papierkorb — kein LLM-Call im Serverpfad.</text>
+  <text x="56" y="165" font-size="12" fill="#4a5a6b">Acht geplante Steps, <tspan font-weight="700" fill="#1d2b3a">sieben Blöcke</tspan> aus Befunden, <tspan font-weight="700" fill="#1d2b3a">126 Commits</tspan>, fünf Deploys, pytest 995 → 1265 — und <tspan font-weight="700" fill="#2f7a4d">null</tspan> Service-Touch durch einen Agenten.</text>
 
-  <!-- Schritte -->
-  <rect x="36" y="190" width="1008" height="430" rx="8" fill="#ffffff" stroke="#d5dce4"/>
-  <text x="56" y="214" font-size="15" font-weight="700" fill="#1d2b3a">Blöcke und Stand</text>
+  <!-- ================= Flussdiagramm ================= -->
+  <rect x="36" y="186" width="1008" height="430" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="209" font-size="14.5" font-weight="700" fill="#1d2b3a">Reihenfolge 0 → D → C → E → F → G → H → B → A ↯ doing → trace → settings → 3 Sichtungen → feedback → Z</text>
 
-  <g font-size="11.5" fill="#1d2b3a">
-    <rect x="56" y="228" width="300" height="52" rx="6" fill="#eaf4ee" stroke="#2f7a4d"/>
-    <text x="68" y="248" font-weight="700">0 Fundament</text><text x="68" y="266" fill="#4a5a6b">Doku-Rotation, doc_health, Baseline  ✅</text>
+  <!-- Lane 1 -->
+  <text x="56" y="230" font-size="11" font-weight="700" fill="#6b7b8c">PLAN (2026-09-19) — acht Steps; Infra A/B/C als Coarbeit: M3 leitet an, der Nikinger tippt (P9-Q)</text>
 
-    <rect x="370" y="228" width="300" height="52" rx="6" fill="#fdf6e3" stroke="#b8860b"/>
-    <text x="382" y="248" font-weight="700">A Domain über eigenen VPS</text><text x="382" y="266" fill="#4a5a6b">niklas ✅ · zweites Konto → P10  🟡</text>
+  <rect x="60" y="238" width="220" height="78" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="170" y="257" font-size="12.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">0 Fundament · D Bugs</text>
+  <text x="74" y="276" font-size="10" fill="#4a5a6b">INDEX-Rotation, doc_health</text>
+  <text x="74" y="291" font-size="10" fill="#4a5a6b">Drop-Ziel Space-Wurzel</text>
+  <text x="170" y="308" font-size="10" fill="#b03030" text-anchor="middle" font-weight="700">ESC/Vollbild = macOS, kein Code</text>
 
-    <rect x="684" y="228" width="340" height="52" rx="6" fill="#eaf4ee" stroke="#2f7a4d"/>
-    <text x="696" y="248" font-weight="700">B tailscaled-Watchdog</text><text x="696" y="266" fill="#4a5a6b">P9-16–20, unter voller Härtung live  ✅</text>
+  <line x1="284" y1="277" x2="303" y2="277" stroke="#5a6b7d" stroke-width="1.8" marker-end="url(#ar)"/>
+  <rect x="308" y="238" width="220" height="78" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="418" y="257" font-size="12.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">C Vision · E Karte</text>
+  <text x="322" y="276" font-size="10" fill="#4a5a6b">RTX 3060 im LXC, 26,8 s statt 46–180</text>
+  <text x="322" y="291" font-size="10" fill="#4a5a6b">kein zweiter /graph-Abruf</text>
+  <text x="418" y="308" font-size="10" fill="#b03030" text-anchor="middle" font-weight="700">ohne nvidia-uvm lief nie CUDA</text>
 
-    <rect x="56" y="292" width="300" height="52" rx="6" fill="#eaf4ee" stroke="#2f7a4d"/>
-    <text x="68" y="312" font-weight="700">C Vision-Dienst RTX 3060</text><text x="68" y="330" fill="#4a5a6b">reboot-fest, ollama aus  ✅ (P9-22 deferred)</text>
+  <line x1="532" y1="277" x2="551" y2="277" stroke="#5a6b7d" stroke-width="1.8" marker-end="url(#ar)"/>
+  <rect x="556" y="238" width="220" height="78" rx="8" fill="#e8eef5" stroke="#7f9ab5" stroke-width="1.6"/>
+  <text x="666" y="257" font-size="12.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">F Schema · G · H</text>
+  <text x="570" y="276" font-size="10" fill="#4a5a6b">doing/assignee (9. Öffnung)</text>
+  <text x="570" y="291" font-size="10" fill="#4a5a6b">Löschen → ._trash · fastmcp==3.4.7</text>
+  <text x="666" y="308" font-size="10" fill="#b03030" text-anchor="middle" font-weight="700">Plan-Ort für _trash unbaubar</text>
 
-    <rect x="370" y="292" width="300" height="52" rx="6" fill="#fdf6e3" stroke="#b8860b"/>
-    <text x="382" y="312" font-weight="700">D ESC/Vollbild + Drop-Ziel</text><text x="382" y="330" fill="#4a5a6b">D2 belegt; D1 = Betriebssystem, kein Code  🟡</text>
+  <line x1="780" y1="277" x2="799" y2="277" stroke="#5a6b7d" stroke-width="1.8" marker-end="url(#ar)"/>
+  <rect x="804" y="238" width="220" height="78" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="914" y="257" font-size="12.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">B Watchdog · A Domain</text>
+  <text x="818" y="276" font-size="10" fill="#4a5a6b">polkit-Regel, Rate-Limit live</text>
+  <text x="818" y="291" font-size="10" fill="#4a5a6b">VPS + Caddy + socat-Relay</text>
+  <text x="914" y="308" font-size="10" fill="#2f7a4d" text-anchor="middle" font-weight="700">sharefyx.eurofyx.com live</text>
 
-    <rect x="684" y="292" width="340" height="52" rx="6" fill="#eaf4ee" stroke="#2f7a4d"/>
-    <text x="696" y="312" font-weight="700">E Karten-Reload</text><text x="696" y="330" fill="#4a5a6b">kein zweiter /graph-Abruf, V118  ✅</text>
+  <!-- Bruchstelle -->
+  <line x1="914" y1="318" x2="914" y2="327" stroke="#b03030" stroke-width="2.2" marker-end="url(#arR)"/>
+  <rect x="60" y="328" width="964" height="30" rx="6" fill="#fbecec" stroke="#d99b9b"/>
+  <text x="76" y="348" font-size="11.5" fill="#4a5a6b"><tspan font-weight="700" fill="#b03030">Befund 11 (2026-10-01): „doing“ wäre im Editor wählbar und in keinem Zähler sichtbar</tspan> → Deploy v3.1.0 verschoben, Block doing gebaut.</text>
 
-    <rect x="56" y="356" width="300" height="52" rx="6" fill="#fdf6e3" stroke="#b8860b"/>
-    <text x="68" y="376" font-weight="700">F Schema doing/assignee · G Löschen</text><text x="68" y="394" fill="#4a5a6b">live seit v3.1.0; Live-Löschung offen (V162)  🟡</text>
+  <!-- Lane 2 -->
+  <text x="56" y="378" font-size="11" font-weight="700" fill="#6b7b8c">BLÖCKE — aus Befunden, Rückfragen und drei Bildsichtungen; jeder mit Probe und Gegenlauf</text>
 
-    <rect x="370" y="356" width="300" height="52" rx="6" fill="#fdf6e3" stroke="#b8860b"/>
-    <text x="382" y="376" font-weight="700">H Abhängigkeiten</text><text x="382" y="394" fill="#4a5a6b">fastmcp==3.4.7 exakt gepinnt  🟡</text>
+  <rect x="60" y="386" width="220" height="78" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="170" y="405" font-size="12.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">doing · trace</text>
+  <text x="74" y="424" font-size="10" fill="#4a5a6b">fünfter Eimer „In Arbeit“</text>
+  <text x="74" y="439" font-size="10" fill="#4a5a6b">updated_by + Git-Autor (10.)</text>
+  <text x="170" y="456" font-size="10" fill="#2f7a4d" text-anchor="middle" font-weight="700">v3.1.0 · v3.1.1 live</text>
 
-    <rect x="684" y="356" width="340" height="52" rx="6" fill="#eaf4ee" stroke="#2f7a4d"/>
-    <text x="696" y="376" font-weight="700">doing · trace · Extra (Buttons)</text><text x="696" y="394" fill="#4a5a6b">v3.1.0 / v3.1.1 live, Gate 9/9  ✅</text>
+  <line x1="284" y1="425" x2="303" y2="425" stroke="#5a6b7d" stroke-width="1.8" marker-end="url(#ar)"/>
+  <rect x="308" y="386" width="220" height="78" rx="8" fill="#f7f0e4" stroke="#c9ab74" stroke-width="1.6"/>
+  <text x="418" y="405" font-size="12.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">Übergang alte Adresse</text>
+  <text x="322" y="424" font-size="10" fill="#4a5a6b">Firmen-Proxy sperrt neue Domain</text>
+  <text x="322" y="439" font-size="10" fill="#4a5a6b">LEGACY_UNTIL=open</text>
+  <text x="418" y="456" font-size="10" fill="#8a6d2f" text-anchor="middle" font-weight="700">v3.1.2 — Notfall-Release</text>
 
-    <rect x="56" y="420" width="968" height="52" rx="6" fill="#fdf6e3" stroke="#b8860b"/>
-    <text x="68" y="440" font-weight="700">S · T · R · U Einstellungen als Fensterkette und drei Bildsichtungen</text>
-    <text x="68" y="458" fill="#4a5a6b">v3.1.3 live seit 2026-10-07 · dritte Sichtprüfung: sieben von acht Bildern frei, Bild 08 → P9-BF gebaut und bestätigt  🟡</text>
-  </g>
+  <line x1="532" y1="425" x2="551" y2="425" stroke="#5a6b7d" stroke-width="1.8" marker-end="url(#ar)"/>
+  <rect x="556" y="386" width="220" height="78" rx="8" fill="#f7f0e4" stroke="#c9ab74" stroke-width="1.6"/>
+  <text x="666" y="405" font-size="12.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">settings + 3 Sichtungen</text>
+  <text x="570" y="424" font-size="10" fill="#4a5a6b">drei Overlays → eine Fensterkette</text>
+  <text x="570" y="439" font-size="10" fill="#4a5a6b">V118: eine Linie</text>
+  <text x="666" y="456" font-size="10" fill="#8a6d2f" text-anchor="middle" font-weight="700">zwei Locks am Folgetag widerrufen</text>
 
-  <!-- offen -->
-  <text x="56" y="500" font-size="15" font-weight="700" fill="#1d2b3a">Was bis ✅ fehlt — und wer es tut</text>
-  <g font-size="11.5">
-    <rect x="56" y="512" width="470" height="92" rx="6" fill="#fbeaea" stroke="#b03030"/>
-    <text x="68" y="532" font-weight="700" fill="#1d2b3a">Nikinger-Schritte (nicht Code)</text>
-    <text x="68" y="551" fill="#4a5a6b">✓ Deploy v3.1.3 — live seit 2026-10-07, Gate 9/9</text>
-    <text x="68" y="568" fill="#4a5a6b">✓ Portscan P9-11 / P9-94 — 2026-10-07, Heim-IP ohne offenen Port</text>
-    <text x="68" y="585" fill="#4a5a6b">✓ Oversize-Fix — Matrix geteilt, Plan/Runbook/ROADMAP unter 40 KB</text>
+  <line x1="780" y1="425" x2="799" y2="425" stroke="#5a6b7d" stroke-width="1.8" marker-end="url(#ar)"/>
+  <rect x="804" y="386" width="220" height="78" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="914" y="405" font-size="12.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">feedback B1–B8 · E1a</text>
+  <text x="818" y="424" font-size="10" fill="#4a5a6b">Anlegen landete im Home-Space</text>
+  <text x="818" y="439" font-size="10" fill="#4a5a6b">Team-Spaces: verschieben, löschen</text>
+  <text x="914" y="456" font-size="10" fill="#b03030" text-anchor="middle" font-weight="700">PATCH-Lücke seit 2026-08-17 zu</text>
 
-    <rect x="540" y="512" width="484" height="92" rx="6" fill="#f2f5f8" stroke="#a8b8c8"/>
-    <text x="552" y="532" font-weight="700" fill="#1d2b3a">Kein Blocker, wandert nach P10</text>
-    <text x="552" y="551" fill="#4a5a6b">P9-13 / V150 — zweites Claude-Konto (Nikinger 2026-10-04)</text>
-    <text x="552" y="568" fill="#4a5a6b">P9-36 — V118: eine oder zwei Linien (Design-Frage)</text>
-    <text x="552" y="585" fill="#4a5a6b">V120 Tab-Titel, „doing“ prominent (P9-P)</text>
-  </g>
+  <!-- Messbefunde -->
+  <rect x="60" y="476" width="964" height="54" rx="6" fill="#f2f5f8" stroke="#a8b8c8"/>
+  <text x="76" y="496" font-size="11" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">Gemessen statt geglaubt:</tspan> /overview kostet live ~3,1 s — 6 Durchgänge je sichtbarem Space, der VPS-Weg nur 2,4–3,6 %.</text>
+  <text x="76" y="516" font-size="11" fill="#4a5a6b">Die Referenz 372,9 ms war nie über Funnel gemessen (in-process, synthetisch). Ein Space-Wechsel ist eine Anfrage, 12–20 ms lokal.</text>
 
-  <!-- Fuß -->
-  <rect x="36" y="640" width="1008" height="76" rx="8" fill="#ffffff" stroke="#d5dce4"/>
-  <text x="56" y="664" font-size="12.5" font-weight="700" fill="#1d2b3a">Lehre der Phase</text>
-  <text x="56" y="684" font-size="11.5" fill="#4a5a6b">Eine Eigenschaft, die auf keiner Verbotsliste steht, meldet kein Wächter (padding-block, border-box, margin-bottom — dreimal).</text>
-  <text x="56" y="702" font-size="11.5" fill="#4a5a6b">Ein Gegenlauf zählt nur, wenn er die Station in der JSON prüft, nicht den Exit-Code.</text>
+  <line x1="540" y1="532" x2="540" y2="541" stroke="#2f7a4d" stroke-width="2.2" marker-end="url(#arG)"/>
+  <rect x="60" y="542" width="964" height="62" rx="8" fill="#eaf4ee" stroke="#2f7a4d" stroke-width="2"/>
+  <text x="76" y="563" font-size="12.5" font-weight="700" fill="#1d2b3a">Gate/Z — fünf Deploys v3.1.0 → v3.1.4, jeder mit health_gate 9/9 im Commit · Matrix 134 Zeilen · Handover</text>
+  <text x="76" y="582" font-size="10.5" fill="#4a5a6b">Der erste v3.1.0-Deploy brach ab: <tspan font-weight="700" fill="#1d2b3a">requests</tspan> stand in keinem pyproject und lief nur im Dev-venv. Ein Test ist grün in der</text>
+  <text x="76" y="596" font-size="10.5" fill="#4a5a6b">Umgebung, in der er läuft — das Release-venv ist frisch. Seither steht die echte Gate-Ausgabe im Commit, nicht der Satz.</text>
+
+  <!-- ================= Ausführer-Band ================= -->
+  <rect x="36" y="626" width="1008" height="96" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="648" font-size="14" font-weight="700" fill="#1d2b3a">Wer gebaut hat — und der Open-Test MiniMax M3 / M3.1 („Spacebunny“)</text>
+  <!-- Zeitachse 09-20 .. 10-08 : x 60..1020, 19 Tage -> ~50.5 px/Tag -->
+  <rect x="60" y="658" width="404" height="22" fill="#e8eef5" stroke="#7f9ab5"/>
+  <text x="262" y="673" font-size="10" fill="#1d2b3a" text-anchor="middle">09-20 → 09-30 17:24 · Claude Code (0, D) · opencode/M3 (C, E, A, F, G)</text>
+  <rect x="464" y="658" width="394" height="22" fill="#f7f0e4" stroke="#c9ab74"/>
+  <text x="661" y="673" font-size="10" fill="#1d2b3a" text-anchor="middle">→ 10-06 · opencode/MiniMax M3.1 Preview, Effort max</text>
+  <rect x="858" y="658" width="162" height="22" fill="#eaf4ee" stroke="#8fb59a"/>
+  <text x="939" y="673" font-size="10" fill="#1d2b3a" text-anchor="middle">10-07 → · Claude Code</text>
+  <!-- Opus-Einschuebe -->
+  <rect x="526" y="680" width="10" height="6" fill="#2f7a4d"/>
+  <rect x="566" y="680" width="10" height="6" fill="#2f7a4d"/>
+  <rect x="754" y="680" width="10" height="6" fill="#2f7a4d"/>
+  <text x="60" y="700" font-size="10.5" fill="#4a5a6b">Test-Fenster 037d9ed (09-28) → ed13127 (10-06): <tspan font-weight="700" fill="#1d2b3a">83 Commits</tspan> — 18 M3 · 1 Grenzfall · 48 M3.1 · <tspan fill="#2f7a4d" font-weight="700">16 Claude Opus</tspan> (grüne Marken).</text>
+  <text x="60" y="715" font-size="10.5" fill="#4a5a6b">Offene Rubrik, N = 1, <tspan font-weight="700" fill="#b03030">nicht blind</tspan>: Plan-Treue 5 · Korrektheit 4 · Testqualität 3 · Commit-Hygiene 2. Details: Handover §7.</text>
+
+  <!-- ================= Drei Mechanismen ================= -->
+  <rect x="36" y="732" width="1008" height="122" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="754" font-size="14" font-weight="700" fill="#1d2b3a">Drei Dinge, die man aus dem Code nicht abliest</text>
+
+  <rect x="56" y="762" width="310" height="82" rx="6" fill="#f2f5f8" stroke="#a8b8c8"/>
+  <text x="72" y="780" font-size="11.5" font-weight="700" fill="#1d2b3a">Warum DATA_ROOT/._trash/</text>
+  <text x="72" y="797" font-size="10" fill="#4a5a6b">Im Space-Ordner kam das gelöschte Item nach</text>
+  <text x="72" y="811" font-size="10" fill="#4a5a6b">rebuild_index() zurück, und _trash wurde ein</text>
+  <text x="72" y="825" font-size="10" fill="#4a5a6b">Phantom-Space. Der Punkt davor kostet null</text>
+  <text x="72" y="839" font-size="10" fill="#4a5a6b">P1-Änderungen — beide Scanner kennen ihn.</text>
+
+  <rect x="384" y="762" width="310" height="82" rx="6" fill="#f2f5f8" stroke="#a8b8c8"/>
+  <text x="400" y="780" font-size="11.5" font-weight="700" fill="#1d2b3a">Warum polkit statt sudoers</text>
+  <text x="400" y="797" font-size="10" fill="#4a5a6b">Die Unit setzt NoNewPrivileges — sudo lebt vom</text>
+  <text x="400" y="811" font-size="10" fill="#4a5a6b">setuid-Bit und startet darunter nicht. Die JS-</text>
+  <text x="400" y="825" font-size="10" fill="#4a5a6b">Regel prüft Unit und User; ohne das dürfte</text>
+  <text x="400" y="839" font-size="10" fill="#4a5a6b">savefyx jede Unit neu starten.</text>
+
+  <rect x="712" y="762" width="312" height="82" rx="6" fill="#fbecec" stroke="#d99b9b"/>
+  <text x="728" y="780" font-size="11.5" font-weight="700" fill="#b03030">Warum ein Relay statt 0.0.0.0</text>
+  <text x="728" y="797" font-size="10" fill="#4a5a6b">Die App bindet 127.0.0.1 (Lock P3-B). Der VPS</text>
+  <text x="728" y="811" font-size="10" fill="#4a5a6b">erreicht sie über socat auf der Tailnet-IP. Lauf 4</text>
+  <text x="728" y="825" font-size="10" fill="#4a5a6b">zeigt: das Tailnet lässt auch das MacBook an</text>
+  <text x="728" y="839" font-size="10" fill="#4a5a6b">8765 — dort schützt nur die App selbst (P10).</text>
+
+  <!-- ================= VERIFY-Bilanz ================= -->
+  <rect x="36" y="864" width="1008" height="92" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="886" font-size="14" font-weight="700" fill="#1d2b3a">[VERIFY]-Bilanz V145–V194 — 40 ✅ · 1 ⚠️ · 3 ⬜, sechs Nummern reserviert (V167–V172)</text>
+  <rect x="56" y="894" width="310" height="54" rx="6" fill="#eaf4ee" stroke="#8fb59a"/>
+  <text x="72" y="912" font-size="11" font-weight="700" fill="#1d2b3a">40 geschlossen, V118/V136 geerbt zu</text>
+  <text x="72" y="928" font-size="10" fill="#4a5a6b">Funnel kann keine eigene Domain (V148),</text>
+  <text x="72" y="941" font-size="10" fill="#4a5a6b">erste Live-Löschung beobachtet (V162 A)</text>
+  <rect x="384" y="894" width="310" height="54" rx="6" fill="#fbecec" stroke="#d99b9b"/>
+  <text x="400" y="912" font-size="11" font-weight="700" fill="#b03030">3 offen, alle nach P10</text>
+  <text x="400" y="928" font-size="10" fill="#4a5a6b">V150 zweites Konto (ein Termin) ·</text>
+  <text x="400" y="941" font-size="10" fill="#4a5a6b">V193/V194 Umbenennen (E2)</text>
+  <rect x="712" y="894" width="312" height="54" rx="6" fill="#e8eef5" stroke="#7f9ab5"/>
+  <text x="728" y="912" font-size="11" font-weight="700" fill="#1d2b3a">Zwei P1-Öffnungen, angekündigt</text>
+  <text x="728" y="928" font-size="10" fill="#4a5a6b">9.: doing/assignee · 10.: updated_by</text>
+  <text x="728" y="941" font-size="10" fill="#4a5a6b">beide ohne Migration, je genau drei Dateien</text>
+
+  <!-- ================= Was P10 erbt ================= -->
+  <rect x="36" y="966" width="1008" height="66" rx="8" fill="#ffffff" stroke="#d99b9b"/>
+  <text x="56" y="987" font-size="13.5" font-weight="700" fill="#b03030">Was P10 erbt — Register zuerst, dann Bau (P10 / P10.5)</text>
+  <text x="56" y="1005" font-size="10.5" fill="#4a5a6b"><tspan font-weight="700" fill="#1d2b3a">Wünsche:</tspan> Ladezeiten, 404/Logo/Tab-Titel, Editor ohne Vorschau-Modus. <tspan font-weight="700" fill="#1d2b3a">Erbe:</tspan> /overview-Schleife, Tailnet-ACL, Ordner in Team-Spaces,</text>
+  <text x="56" y="1020" font-size="10.5" fill="#4a5a6b">Space umbenennen, Vision-Ersatz, Ausführer-Wahl. Quelle: phase10_intake.md + PHASE9_CLOSEOUT_HANDOVER.md §4.</text>
+
+  <!-- ================= Fuss ================= -->
+  <text x="36" y="1050" font-size="10.5" fill="#6b7b8c">pytest 1265 (995 → 1265) · ui_budget 5/5, 173,1 KB von 250 KB · Tabu-Diff: ein Treffer (P9-56, Testattrappe) · doc_health 0 · Service-Touch 0</text>
+  <text x="36" y="1067" font-size="10.5" fill="#6b7b8c">Kanonischer Closeout: phase9_hardening/ABNAHME_MATRIX.md · Handover: PHASE9_CLOSEOUT_HANDOVER.md · Head: phase9_hardening/CLAUDE.md</text>
+
 </svg>

@@ -8,8 +8,8 @@ down:
   - ./phase9_hardening_plan.md                  # 📕 §15 „Was P9 benennt und nicht baut — die P10-Liste" (Herkunft des Erbes)
   - ./phase9_hardening_block_feedback_plan.md   # §3 E2/E3, §8 B8 — Befunde, die nach P10 gehen
   - ./p8x_ui_polish_notes.md                    # §2 Karte, §10 Auswahl-Konvention, §10.9 Hochkant
-  - ../../phase9_hardening/ABNAHME_MATRIX.md    # die 13 ⚠️ und der eine ⬜ — jede Zeile braucht in P10 ein Urteil
-updated: 2026-10-08 (angelegt — Nikinger-Auftrag nach dem Block feedback: P10 beendet **alle** Baustellen, damit P11 auf einem gehärteten Fundament neue Funktionen denken kann; Zweiteilung P10/P10.5; drei neue Themen: Responsivität/Performance, visuelle Kleinigkeiten, Editor ohne Vorschau/Bearbeiten-Modus)
+  - ../../phase9_hardening/ABNAHME_MATRIX.md    # die 12 ⚠️ und der eine ⬜ (Stand Closeout 2026-10-08) — jede Zeile braucht in P10 ein Urteil
+updated: 2026-10-08 (Closeout P9: Zeiger auf `PHASE9_CLOSEOUT_HANDOVER.md` §4 in §3, Matrix-Stand 12 ⚠️ · 1 ⬜) | 2026-10-08 (angelegt — Nikinger-Auftrag nach dem Block feedback: P10 beendet **alle** Baustellen, damit P11 auf einem gehärteten Fundament neue Funktionen denken kann; Zweiteilung P10/P10.5; drei neue Themen: Responsivität/Performance, visuelle Kleinigkeiten, Editor ohne Vorschau/Bearbeiten-Modus)
 ---
 
 # Phase 10 — Sammelstelle (kein Plan)
@@ -82,7 +82,8 @@ Entscheidung stehen muss. P10 zieht beides vor den Bau. **Tor:** P10.5 startet e
 | P9-Plan §15 | Verschieben in fremde Spaces | Rechte-Thema |
 | P9-Plan §15 | Body-Volltextsuche (Q1) · Rechteverwaltung über MCP (P6-M) · **FastMCP 4 / V79** · Realtime · Light-Mode (P5-X) · Bulk-Append-Werkzeug · Ordner umbenennen · `_trash/` räumen · ROADMAP-Straffung | Ledger, unverändert offen — jeder braucht ein Urteil: bauen / verwerfen / **P11** |
 | `p8x_ui_polish_notes.md` | Karten-Stilumbau §2.2, Karte einklappen §2.5, verbundene AI-Sessions §10.8, Radien-/Auswahl-Vereinheitlichung §10.1–§10.7 | |
-| Matrix | **13 ⚠️ und 1 ⬜** (P9-13/V150, zweites Konto — ein *Termin*, kein Blocker) · P9-22 deferred · P9-127 (Enter-Stationen für die übrigen Overlays) | jede Zeile → ✅ / gegenstandslos / ausdrücklich verschoben |
+| **Closeout P9 (2026-10-08)** | zehn Posten, die hier noch fehlten (Tailnet-ACL 8765, LAN-Ports, `/overview`-Schleife, leere Space-Liste, `mcp`-Pin, Vision-Ersatz, Legacy-Fenster, Kontrast, Ausführer, `created_by`) | `PHASE9_CLOSEOUT_HANDOVER.md` §4 |
+| Matrix | **12 ⚠️ und 1 ⬜** (Stand Closeout; vorher 13 ⚠️) (P9-13/V150, zweites Konto — ein *Termin*, kein Blocker) · P9-22 deferred · P9-127 (Enter-Stationen für die übrigen Overlays) | jede Zeile → ✅ / gegenstandslos / ausdrücklich verschoben |
 | **Nikinger-Entscheidung 2026-10-08** | **Mobil ist keine Aufgabe dieser Oberfläche.** Desktop-Untergrenze **1024 px**; eine Handy-App wird ein eigenes Design (Zusatz, kein Ersatz). | streicht §10.9 „Hochkant-/Handy-UI" aus der Liste; P9-126 ist darauf eingeengt |
 
 ## 4. Was P10 (Bestandsaufnahme) liefert

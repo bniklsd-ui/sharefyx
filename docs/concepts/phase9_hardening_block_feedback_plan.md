@@ -1,5 +1,5 @@
 ---
-status: live
+status: snapshot
 purpose: "Mini-Plan P9 Block feedback — die Nutzer-Rückmeldung vom 2026-10-07 (Übersicht unlesbar, Anlegen im fremden Space landet zu Hause, Enter/ESC, Löschdialog, Ladezeiten, Schließen-Knopf, Mitglieder-Knöpfe) plus drei Scope-Entscheidungen (Verschieben/Löschen in Team-Spaces, Umbenennen, Editor-Umbau). Locks P9-BG–P9-BO (P9-BP vorgeschlagen), Abnahme P9-121–P9-134, [VERIFY] V189–V194"
 read-when: Bau des feedback-Blocks, oder wenn der Nikinger eine der drei Scope-Entscheidungen §3 trifft
 detail: L2
@@ -7,7 +7,7 @@ up: ../../phase9_hardening/CLAUDE.md
 down:
   - ./phase9_hardening_plan.md                 # 📕 P9-Plan; Lock P9-A (kein UI-Umbau), P9-K (Löschen nur eigene), §15 P10-Liste
   - ./phase9_hardening_block_settings_plan.md  # Formvorlage; Einstellungs-Kette P9-AE–P9-AL, auf der B4/B5 aufsetzen
-updated: 2026-10-08 (**B8 gemessen, kein Fix** — V190 beantwortet: ein Space-Wechsel = eine Anfrage; P9-132 ✅ Befundzweig, P9-126 ✅ (390 px gestrichen, Nikinger), Bilanz 118 ✅ · 13 ⚠️ · 1 ⬜) | 2026-10-08 (**B7 gebaut** — Übersicht: Name vor den Zählern, P9-126 ⚠️ (390 px unerreichbar), V189 gemessen, §8) | 2026-10-08 (**B6 gebaut** — Enter-Handler + ein Fund im Löschdialog, §8) | 2026-10-08 (**B5 gebaut** — Titelzeile im Löschdialog, §8) | 2026-10-08 (**B4 gebaut** — Abstand der Mitgliederzeilen, §8) | 2026-10-08 (**B3 gebaut** — Schließen im Einstellungsmenü, §8) | 2026-10-08 (**E1a gebaut** — Team-Spaces verschieben/löschen, V191/V192 beantwortet, §8; drei datierte Abweichungen) | 2026-10-08 (**B2 gebaut** — Zielangabe im Anlegen-Dialog, §8; datierte Korrektur: der Home-Fall von P9-BH ist unerreichbar) | 2026-10-07 (**Nikinger-Entscheidungen E1–E3 eingetragen**: E1 freigegeben — Lock P9-BP, fremde Items im Team-Space löschbar, Eigentum über den Git-Autor nachverfolgt (P9-BQ); E2 und E3 wandern als offene Punkte in den Closeout/P10; Closeout erst nach B1–B8 + E1a) | 2026-10-07 (angelegt — Rückmeldung des Nikingers vom selben Tag, gegen `main@497c5bd` am Code gelesen; **nichts gebaut**)
+updated: 2026-10-08 (**Closeout** — live als `v3.1.4`, P9-133/134 ✅, Status 🔄 → 📕) | 2026-10-08 (**B8 gemessen, kein Fix** — V190 beantwortet: ein Space-Wechsel = eine Anfrage; P9-132 ✅ Befundzweig, P9-126 ✅ (390 px gestrichen, Nikinger), Bilanz 118 ✅ · 13 ⚠️ · 1 ⬜) | 2026-10-08 (**B7 gebaut** — Übersicht: Name vor den Zählern, P9-126 ⚠️ (390 px unerreichbar), V189 gemessen, §8) | 2026-10-08 (**B6 gebaut** — Enter-Handler + ein Fund im Löschdialog, §8) | 2026-10-08 (**B5 gebaut** — Titelzeile im Löschdialog, §8) | 2026-10-08 (**B4 gebaut** — Abstand der Mitgliederzeilen, §8) | 2026-10-08 (**B3 gebaut** — Schließen im Einstellungsmenü, §8) | 2026-10-08 (**E1a gebaut** — Team-Spaces verschieben/löschen, V191/V192 beantwortet, §8; drei datierte Abweichungen) | 2026-10-08 (**B2 gebaut** — Zielangabe im Anlegen-Dialog, §8; datierte Korrektur: der Home-Fall von P9-BH ist unerreichbar) | 2026-10-07 (**Nikinger-Entscheidungen E1–E3 eingetragen**: E1 freigegeben — Lock P9-BP, fremde Items im Team-Space löschbar, Eigentum über den Git-Autor nachverfolgt (P9-BQ); E2 und E3 wandern als offene Punkte in den Closeout/P10; Closeout erst nach B1–B8 + E1a) | 2026-10-07 (angelegt — Rückmeldung des Nikingers vom selben Tag, gegen `main@497c5bd` am Code gelesen; **nichts gebaut**)
 ---
 
 # Phase 9 — Block feedback: die Rückmeldung vom 2026-10-07
@@ -395,3 +395,9 @@ Regel seit dem Oversize-Fix: neuer Block → neuer Teil, `scripts/move_sections.
   messbar ohne die echte Instanz. Der Client-Hebel (Zwischenspeicher je Space, stale-while-revalidate) berührt Auswahl, offenen Editor und
   Konfliktpfad — Designänderung, nicht „ein gezielter Fix". **P10:** erst `/items` über Funnel im Browser des Nikingers messen, dann entscheiden.
 
+### Closeout (2026-10-08)
+
+- **Ausgeliefert als `v3.1.4`** (Release `20261008T201607.460757Z`, SHA `d04c0ec`, `health_gate.sh` 9/9). P9-133 (`pytest` 1265, `ui_budget` 5/5,
+  Tabu-Diff leer) und P9-134 (Sichtprüfung, Nikinger) ✅ — Matrix-Teil `ABNAHME_MATRIX_FEEDBACK.md`. V189–V194 stehen in `ABNAHME_MATRIX_VERIFY.md`.
+- Dieser Plan ist damit 📕. Was offen bleibt (E2/V193/V194, Ordner in Team-Spaces, MCP `update_item`, Latenz über Funnel), steht in
+  `phase10_intake.md` §3.

@@ -6,13 +6,17 @@ detail: L2
 up: ./ABNAHME_MATRIX.md
 down:
   - ../docs/concepts/phase9_hardening_block_feedback_plan.md   # P9-121 – P9-137, Locks P9-BG–P9-BQ
-updated: 2026-10-08 (**B8 gemessen, kein Fix** — V190 beantwortet: ein Space-Wechsel = eine Anfrage; P9-132 ✅ Befundzweig, P9-126 ✅ (390 px gestrichen, Nikinger), Bilanz 118 ✅ · 13 ⚠️ · 1 ⬜) | 2026-10-08 (+1 Zeile P9-126, Block feedback B7; Bilanz 116 ✅ · 14 ⚠️ · 1 ⬜) | 2026-10-08 (angelegt — `ABNAHME_MATRIX_BLOECKE.md` stand bei 39.667 B, die drei E1a-Zeilen hätten den Softcap gerissen; der Abschnitt B1/B2 per `scripts/move_sections.py` verbatim hierher)
+updated: 2026-10-08 (Closeout: P9-133/P9-134 eingetragen, beide ✅; Block live als `v3.1.4`) | 2026-10-08 (**B8 gemessen, kein Fix** — V190 beantwortet: ein Space-Wechsel = eine Anfrage; P9-132 ✅ Befundzweig, P9-126 ✅ (390 px gestrichen, Nikinger), Bilanz 118 ✅ · 13 ⚠️ · 1 ⬜) | 2026-10-08 (+1 Zeile P9-126, Block feedback B7; Bilanz 116 ✅ · 14 ⚠️ · 1 ⬜) | 2026-10-08 (angelegt — `ABNAHME_MATRIX_BLOECKE.md` stand bei 39.667 B, die drei E1a-Zeilen hätten den Softcap gerissen; der Abschnitt B1/B2 per `scripts/move_sections.py` verbatim hierher)
 ---
 # Abnahmematrix Phase 9 — Teil: Block feedback (P9-121 – P9-137)
 
 > Lebender Teil (📗), **kein** Archiv: die Zeilen hier zählen in die Bilanz im Hub
 > `ABNAHME_MATRIX.md`, und ihr Marker darf sich ändern. Der Abschnitt B1/B2 ist **wortgleich** aus
 > `ABNAHME_MATRIX_BLOECKE.md` verschoben worden.
+>
+> **[2026-10-08, Closeout]** Alle Abschnitte unten sagen „gebaut, nicht deployt" — das ist ihr Stand beim
+> Bau. Seit dem 2026-10-08 ist der ganze Block **live als `v3.1.4`** (Release `20261008T201607.460757Z`,
+> SHA `d04c0ec`, `health_gate.sh` **9/9 OK**, Ausgabe im Closeout-Commit).
 
 ## Block feedback — B1: Anlegen im aktiven schreibbaren Space (P9-121 – P9-124)
 
@@ -95,3 +99,13 @@ Wächter `test_the_trash_dialog_cleans_up_its_listeners_when_it_closes`.
 | Nr | Kriterium | Stand | Beleg |
 |---|---|---|---|
 | **P9-132** | V190 gemessen; Fix mit Vorher/Nachher **oder** Befund mit Begründung auf der P10-Liste | ✅ | **V190 beantwortet (Befundzweig).** `scripts/p9_feedback_b8_messung.py` (`probes/p9_feedback_b8_messung.json`), drei Läufe je Richtung, echter Browser: ein Space-Wechsel fordert **genau eine** Anfrage, `/items?space=…`, **12–20 ms** (Liste nach 44–46 ms); `/overview` + `/spaces` laufen **nicht** mit — in einem von sechs Läufen erschienen sie, weil der 20-s-Poll zufällig feuerte, und sie laufen parallel. **Begründung gegen einen Fix:** gegen die Wegwerf-Instanz ist der Wechsel eine lokale Anfrage; die gefühlte Wartezeit ist die **Netzstrecke** (P9-15: `/overview` ~3,1 s über Funnel), und die ist vom Entwicklungsrechner aus nicht zu messen, ohne die echte Instanz zu berühren (Nikinger). Der einzige Hebel am Client wäre ein Zwischenspeicher je Space (alte Liste sofort zeigen, im Hintergrund auffrischen) — das ist eine Designänderung mit Berührung von Auswahl, offenem Editor und Konfliktpfad, kein gezielter Fix. **P10-Liste:** (1) `/items`-Latenz über Funnel **am echten Browser des Nikingers** messen (Netzwerk-Tab, drei Wechsel), (2) erst danach Zwischenspeicher je Space entscheiden. |
+
+## Block feedback — Abschluss: Bestand und Sichtprüfung (P9-133, P9-134)
+
+> Plan §6. Stand **gemessen 2026-10-08 beim Closeout**, nach dem Deploy `v3.1.4`. Beide Zeilen standen bis
+> zum Closeout in **keiner** Tabelle — die Bilanz zählte 132 statt 134 Abnahmezeilen.
+
+| Nr | Kriterium | Stand | Beleg |
+|---|---|---|---|
+| **P9-133** | `pytest` grün (≥ 1250 + neue), `ui_budget` 5/5, Tabu-Diff §0.3 leer, Gegenläufe rot | ✅ | **`pytest` 1265 passed** im frischen Release-venv des Deploys `v3.1.4` (`deploy.sh`, 234,91 s, Ausgabe im Closeout-Commit) und im Dev-venv beim Closeout nachgemessen · `ui_budget` **5/5** (173,1 KB von 250 KB) · Tabu-Diff `302b8c1..HEAD -- phase1_storage phase4_auth phase2_mcp` **leer** (E1a fasste nur `phase5_ui/webui/api.py` an, wie §0.3 es für E1 vorsieht) · Gegenläufe je Schritt rot, belegt in den Zeilen P9-121 – P9-137 und in `probes/p9_feedback_*_gegenprobe.json` |
+| **P9-134** | Sichtprüfung des Nikingers, acht Bilder | ✅ | **Nikinger-Aussage beim Closeout 2026-10-08: abgenommen.** Bilder `docs/screenshots/p9_feedback_*.png` (neun Dateien: B1, B2, B3, B4, B5, E1a, B7 bei 1440/1024/390); die eine Nachbesserung aus der Sichtung (B4: „Entfernen" rechtsbündig) steht in P9-130 |

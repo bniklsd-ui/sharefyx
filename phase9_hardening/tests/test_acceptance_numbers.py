@@ -103,13 +103,13 @@ CAP_BYTES = 300  # der Cap, mit dem P9-3/V145 die Unerreichbarkeit des Kriterium
 # 2026-10-08: +2 Zeilen P9-127 (⚠️, nur Teile im Browser) und P9-128 (✅), Block feedback B6, Lock P9-BK.
 # 2026-10-08: +1 Zeile P9-126 (⚠️: 390 px physisch unerreichbar), Block feedback B7, Lock P9-BJ.
 # 2026-10-08: P9-126 ⚠️ → ✅ (Nikinger: 390 px kein Ziel); +1 Zeile P9-132 (✅, B8, Befundzweig).
-ABNAHME_BILANCE = {"✅": 118, "⚠️": 13, "⬜": 1}
+ABNAHME_BILANCE = {"✅": 121, "⚠️": 12, "⬜": 1}
 # 2026-10-05: +7 Zeilen aus dem settings-Nachtrag P9-96–P9-102 (die sieben Punkte aus der
 # Bildsichtung des Nikingers, §10 des Mini-Plans). Die zwei neuen ⚠️ sind **benannte
 # Abweichungen**, keine offenen Punkte: P9-97 (linker Polsterwert, Nikinger-Entscheidung vom
 # 2026-10-05) und P9-99 (`justify-content` statt des im Plan genannten und gemessen wirkungslosen
 # `text-align` — der Knopf ist ein Flexcontainer).
-ABNAHME_ROWS = 132  # 132 Abnahmezeilen; zuletzt P9-132 (Block feedback B8, Lock P9-BO)
+ABNAHME_ROWS = 134  # 134 Abnahmezeilen; zuletzt P9-133/P9-134 (Closeout 2026-10-08)
 # 2026-10-03: V164 von ⬜ auf ✅ (Deploy `v3.1.1` + Health-Gate 9/9). Die Konstante steht
 # **vor** dem Zählen, sonst wäre der Test eine Tautologie -- deshalb hat er mich beim
 # Zurueckschreiben der Bilanz in die Matrix rot gemeldet, statt sie zu bestaetigen.
@@ -117,8 +117,8 @@ ABNAHME_ROWS = 132  # 132 Abnahmezeilen; zuletzt P9-132 (Block feedback B8, Lock
 # 2026-10-05: V188 von ⬜ auf ✅ (vier Quellen, darunter MDN-`browser-compat-data` gemessen:
 # `Keyboard.lock` ist `safari: false`). Es ist der letzte der drei ⬜ aus dem settings-Block;
 # die zwei übrigen sind V150 und V162 *(Lesart A)*.
-VERIFY_BILANCE = {"✅": 35, "⚠️": 1, "⬜": 2}  # Nummern-Lesart, eine Nummer = eine Zeile
-VERIFY_ROWS = 41  # 38 Nummern + 2 Zweit-Lesarten + 1 reservierte Bereichszeile
+VERIFY_BILANCE = {"✅": 40, "⚠️": 1, "⬜": 3}  # Nummern-Lesart, eine Nummer = eine Zeile
+VERIFY_ROWS = 47  # 44 Nummern + 2 Zweit-Lesarten + 1 reservierte Bereichszeile
 # 2026-10-04 (Nikinger): P9-13/V150 (das zweite Claude-Konto) von ⚠️ auf ⬜ — **zurückgestellt, wandert
 # nach P10, ist kein Blocker** (Plan §0.1a; die Regel steht auch in der Wurzel-`CLAUDE.md`
 # §Working style). V157 ist damit der einzige verbleibende ⚠️, V150 und V162 *(Lesart A)* die beiden ⬜.
@@ -277,8 +277,8 @@ def test_the_verify_balance_is_the_machine_count_under_the_stated_rule():
         f"die Marker der zweiten Lesarten haben sich geändert: gemessen {second}, "
         f"festgenagelt {SECOND_READING_MARKERS}"
     )
-    assert sum(counted.values()) == 38, (
-        "38 belegte Einträge (2026-10-03: 34, seit dem settings-Block +4 für V185–V188). "
+    assert sum(counted.values()) == 44, (
+        "44 belegte Einträge (2026-10-03: 34, settings-Block +4 für V185–V188, Closeout 2026-10-08 +6 für V189–V194). "
         "Die Übergabezahl 40 war der Nummernbereich, nicht die Zahl belegter Einträge."
     )
     assert _headline_triple(_matrix_text(), "belegte Einträge —") == counted

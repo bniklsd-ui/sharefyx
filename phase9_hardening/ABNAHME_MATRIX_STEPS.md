@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase9_hardening_plan.md   # P9-1 – P9-58
   - ./step_a/RUNBOOK_STEP_A.md                  # Abnahme P9-10 – P9-15
   - ./step_b/RUNBOOK_STEP_B.md                  # Abnahme P9-16 – P9-20
-updated: 2026-10-07 (angelegt — die Matrix ist in einen Hub und drei lebende Teile geteilt, jeder unter dem 40-KiB-Softcap; Abschnitte per `scripts/move_sections.py` verbatim aus dem Hub hierher)
+updated: 2026-10-08 (Closeout: P9-36 ⚠️ → ✅, die V118-Entscheidung vom 2026-10-05 war nie nachgezogen) | 2026-10-07 (angelegt — die Matrix ist in einen Hub und drei lebende Teile geteilt, jeder unter dem 40-KiB-Softcap; Abschnitte per `scripts/move_sections.py` verbatim aus dem Hub hierher)
 ---
 # Abnahmematrix Phase 9 — Teil: Step 0 – H und Phasenweit (P9-1 – P9-58)
 
@@ -91,7 +91,7 @@ updated: 2026-10-07 (angelegt — die Matrix ist in einen Hub und drei lebende T
 | **P9-33** | Zweiter Eintritt ohne Datenänderung erzeugt **keinen** zweiten `/graph`-Abruf | ✅ | Signatur aus dem `/overview`-Payload — **Plan-Korrektur:** der Graph-Knoten hat kein `updated`. Node-Harness und Browser-Probe (Port 18768): **0** Abrufe, auf `HEAD` **1** |
 | **P9-34** | Die Karte springt beim Wiedereintritt nicht — im Screenshot-Paar belegt | ✅ | **1 von 10** verschiedenen Bildern in 1,5 s (auf `HEAD` 10 von 10, 467,6 px Sprung). Der Plan-Test hätte das **durchgelassen** — deshalb trägt die Zeile den Bildvergleich |
 | **P9-35** | Datenänderung führt weiterhin zum Neuladen | ✅ | Refresh-Knopf erzwingt 1 · fremde Änderung wird aufgenommen (Knoten 14 → 15) 1 |
-| **P9-36** | V118 beantwortet, **mit Nikinger-Entscheidung, falls es zwei Linien sind** | ⚠️ **beantwortet, die Entscheidung steht aus** | im Harness an einem echten Frame gemessen: `segments_in_last_frame: 2`, `duplicate_segments: 1`, gestrichelte Linie gezeichnet — `dedupeEdges()` und `buildTagEdges()` deduplizieren getrennt, erst `drawEdges()` führt zusammen. **Ob zwei Linien gewollt sind, ist deine Design-Frage**; ein Umstieg wäre samt Umkehr des Tests eine bewusste Änderung |
+| **P9-36** | V118 beantwortet, **mit Nikinger-Entscheidung, falls es zwei Linien sind** | ✅ **entschieden 2026-10-05: eine Linie** (datierte Korrektur beim Closeout 2026-10-08 — die Zeile stand drei Tage lang auf ⚠️ „Entscheidung steht aus“, obwohl die Entscheidung gefallen und als P9-93 gebaut war; Beleg dort und bei V118) | im Harness an einem echten Frame gemessen: `segments_in_last_frame: 2`, `duplicate_segments: 1`, gestrichelte Linie gezeichnet — `dedupeEdges()` und `buildTagEdges()` deduplizieren getrennt, erst `drawEdges()` führt zusammen. **Ob zwei Linien gewollt sind, ist deine Design-Frage**; ein Umstieg wäre samt Umkehr des Tests eine bewusste Änderung |
 | **P9-37** | Tabu-Diff leer, `ui_budget` 5/5 | ✅ | Tabu-Bereichs-Diff `2f752f9^..HEAD` leer (Zusatzprobe `phase1_storage` ebenfalls leer, `space_cli.py` wurde nur **ausgeführt**, nicht angefasst); `ui_budget` 5/5, 149,0 KB |
 
 
