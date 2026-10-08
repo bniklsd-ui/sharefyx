@@ -9,6 +9,15 @@
      (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
+## 2026-10-08
+- Neue Notizen und Aufgaben landen jetzt in dem Space, in dem du gerade arbeitest — vorher wanderten sie aus einem Team-Space still in deinen eigenen. Der Anlegen-Dialog nennt oben das Ziel.
+- In Team-Spaces kann jedes Mitglied mit Schreibrecht Items verschieben, archivieren und löschen, auch solche, die jemand anderes angelegt hat. Der Löschdialog nennt, von wem das Item zuletzt geändert wurde.
+- Enter bestätigt jetzt in den Dialogen die Hauptaktion. Im Passwortfeld und bei gesperrten Knöpfen passiert nichts.
+- Der Löschdialog zeigt den Titel des Items als eigene Zeile über dem Feld, in das du ihn eintippen musst.
+- Behoben: Nach „Abbrechen" im Löschdialog schickte der nächste Löschvorgang zwei Anfragen ab, und die zweite meldete „Item nicht gefunden".
+- Das Einstellungsmenü hat einen „Schließen"-Knopf. In „Spaces verwalten" haben die Mitgliederzeilen Abstand, „Entfernen" steht rechts.
+- In der Übersicht bleibt der Space-Name lesbar, auch wenn der Space viele Zähler hat — die Zähler rutschen bei Platzmangel in eine zweite Zeile.
+
 ## 2026-10-07
 - Die Einstellungen sind jetzt eine Fensterkette: das Menü bleibt sichtbar, während das Passwort-, das Spaces- und das Update-Log-Fenster daneben aufgehen. Aus „Spaces verwalten" öffnet ein Klick auf einen Space ein drittes Fenster.
 - Im Passwort-Fenster steht der Code aus der Authenticator-App jetzt als letztes Feld, direkt über „Ändern“ — vorher stand er zwischen altem und neuem Passwort.
