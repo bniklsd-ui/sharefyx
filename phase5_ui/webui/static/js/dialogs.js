@@ -17,6 +17,7 @@ import { loadOverview, loadItems, bucketFor, moveSelectedItems } from "./list.js
 import { registerPanel, openSettings, closeFrom } from "./settings.js";
 
 var createDialogEl;
+var createTargetEl;
 var createTypeEl;
 var createTitleInputEl;
 var createSubmitButtonEl;
@@ -451,6 +452,12 @@ function openCreateDialog() {
     var bucket = state.meta.buckets[state.filter];
     if (bucket && bucket.type) createTypeEl.value = bucket.type;
   }
+  // P9-BH: Ziel sichtbar machen. Nur ein schreibbarer aktiver Space kommt hier an (Guard oben),
+  // also ist `state.activeSpace` das Ziel, das `_items_post` bekommt -- dieselbe Quelle wie der
+  // POST unten, damit Anzeige und Wirkung nicht auseinanderlaufen koennen.
+  var target = spaceByName(state.activeSpace);
+  createTargetEl.textContent = "Anlegen in: " + state.activeSpace
+    + (target && target.own ? " (dein Home-Space)" : "");
   createTitleInputEl.value = "";
   createDialogEl.hidden = false;
   createTitleInputEl.focus();
@@ -686,6 +693,7 @@ function accountError(message) {
 
 export function init() {
   createDialogEl = document.getElementById("create-dialog");
+  createTargetEl = document.getElementById("create-target");
   createTypeEl = document.getElementById("create-type");
   createTitleInputEl = document.getElementById("create-title-input");
   createSubmitButtonEl = document.getElementById("create-submit");

@@ -94,13 +94,14 @@ CAP_BYTES = 300  # der Cap, mit dem P9-3/V145 die Unerreichbarkeit des Kriterium
 # Kontrolllauf, Rohausgabe `probes/p9_11_portscan_2026-10-07.txt`). Der Satz oben „die drei verbleibenden ⬜
 # sind P9-11 und P9-94 … und P9-13/V150" gilt damit nicht mehr: der **eine** verbleibende ⬜ ist P9-13/V150.
 # 2026-10-07, später: P9-6 von ⚠️ auf ✅ -- ROADMAP.md per Ketten-Rotation unter dem Softcap (35.677 B).
-ABNAHME_BILANCE = {"✅": 108, "⚠️": 12, "⬜": 1}
+# 2026-10-08: +1 Zeile P9-125 (Block feedback B2, Lock P9-BH) mit ✅.
+ABNAHME_BILANCE = {"✅": 109, "⚠️": 12, "⬜": 1}
 # 2026-10-05: +7 Zeilen aus dem settings-Nachtrag P9-96–P9-102 (die sieben Punkte aus der
 # Bildsichtung des Nikingers, §10 des Mini-Plans). Die zwei neuen ⚠️ sind **benannte
 # Abweichungen**, keine offenen Punkte: P9-97 (linker Polsterwert, Nikinger-Entscheidung vom
 # 2026-10-05) und P9-99 (`justify-content` statt des im Plan genannten und gemessen wirkungslosen
 # `text-align` — der Knopf ist ein Flexcontainer).
-ABNAHME_ROWS = 121  # 121 Abnahmezeilen; zuletzt P9-124 (Block feedback B1, Locks P9-BG/BI)
+ABNAHME_ROWS = 122  # 122 Abnahmezeilen; zuletzt P9-125 (Block feedback B2, Lock P9-BH)
 # 2026-10-03: V164 von ⬜ auf ✅ (Deploy `v3.1.1` + Health-Gate 9/9). Die Konstante steht
 # **vor** dem Zählen, sonst wäre der Test eine Tautologie -- deshalb hat er mich beim
 # Zurueckschreiben der Bilanz in die Matrix rot gemeldet, statt sie zu bestaetigen.

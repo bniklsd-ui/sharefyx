@@ -256,6 +256,9 @@
 <div class="overlay" id="create-dialog" hidden>
   <div class="overlay__panel">
     <h2>Neu anlegen</h2>
+    <!-- P9-BH (Block feedback B2): der Dialog nennt sein Ziel -- der Bug R2 war, dass es
+         unsichtbar war. Text per `textContent` (Space-Name ist Nutzerdaten). -->
+    <p class="overlay__hint" id="create-target"></p>
     <label>Typ
       <select class="input" id="create-type"></select>
     </label>

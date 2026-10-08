@@ -2174,3 +2174,25 @@ def test_the_list_meta_line_shows_the_assignee():
     # (um genau das hier zu begruenden), und ein Wächter, der sich selbst zaehlt, muss
     # abgeschaltet werden, sobald jemand die Zeile laesst.
     assert "updated_by" not in _js_ohne_kommentare(koerper)
+
+
+def test_the_create_dialog_names_its_target_space():
+    """P9-BH (Block feedback B2, 2026-10-08): der Anlegen-Dialog nennt sein Ziel. Der Bug R2 war,
+    dass das Ziel unsichtbar war — der Dialog legte im Home-Space an, waehrend man im Team-Space
+    stand. Drei Dinge halten die Zielangabe ehrlich:
+
+    1. die Zeile sitzt **im** `#create-dialog` (sonst haengt sie nicht mit ihm aus),
+    2. sie wird aus **derselben** Quelle wie der POST gefuellt (`state.activeSpace`) — zwei
+       Quellen koennten auseinanderlaufen, und die Anzeige luege dann genau so wie vor B1,
+    3. per `textContent`, nie `innerHTML`: der Space-Name ist Nutzerdaten (Hard Rule 4)."""
+    html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
+    dialog = re.search(r'<div class="overlay" id="create-dialog" hidden>(.*?)\n</div>', html, re.DOTALL)
+    assert dialog and 'id="create-target"' in dialog.group(1)
+
+    js = _js_ohne_kommentare((DEFAULT_STATIC_DIR / "js" / "dialogs.js").read_text("utf-8"))
+    oeffnen = re.search(r"function openCreateDialog\(\) \{(.*?)\n\}", js, re.DOTALL)
+    assert oeffnen, "openCreateDialog() nicht gefunden"
+    koerper = oeffnen.group(1)
+    assert re.search(r"createTargetEl\.textContent = [^;]*state\.activeSpace", koerper)
+    assert "space: state.activeSpace" in js, "der POST nimmt nicht mehr dieselbe Quelle"
+    assert "createTargetEl.innerHTML" not in js

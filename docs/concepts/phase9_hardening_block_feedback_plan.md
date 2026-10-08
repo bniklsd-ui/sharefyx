@@ -7,7 +7,7 @@ up: ../../phase9_hardening/CLAUDE.md
 down:
   - ./phase9_hardening_plan.md                 # 📕 P9-Plan; Lock P9-A (kein UI-Umbau), P9-K (Löschen nur eigene), §15 P10-Liste
   - ./phase9_hardening_block_settings_plan.md  # Formvorlage; Einstellungs-Kette P9-AE–P9-AL, auf der B4/B5 aufsetzen
-updated: 2026-10-07 (**Nikinger-Entscheidungen E1–E3 eingetragen**: E1 freigegeben — Lock P9-BP, fremde Items im Team-Space löschbar, Eigentum über den Git-Autor nachverfolgt (P9-BQ); E2 und E3 wandern als offene Punkte in den Closeout/P10; Closeout erst nach B1–B8 + E1a) | 2026-10-07 (angelegt — Rückmeldung des Nikingers vom selben Tag, gegen `main@497c5bd` am Code gelesen; **nichts gebaut**)
+updated: 2026-10-08 (**B2 gebaut** — Zielangabe im Anlegen-Dialog, §8; datierte Korrektur: der Home-Fall von P9-BH ist unerreichbar) | 2026-10-07 (**Nikinger-Entscheidungen E1–E3 eingetragen**: E1 freigegeben — Lock P9-BP, fremde Items im Team-Space löschbar, Eigentum über den Git-Autor nachverfolgt (P9-BQ); E2 und E3 wandern als offene Punkte in den Closeout/P10; Closeout erst nach B1–B8 + E1a) | 2026-10-07 (angelegt — Rückmeldung des Nikingers vom selben Tag, gegen `main@497c5bd` am Code gelesen; **nichts gebaut**)
 ---
 
 # Phase 9 — Block feedback: die Rückmeldung vom 2026-10-07
@@ -272,3 +272,19 @@ Regel seit dem Oversize-Fix: neuer Block → neuer Teil, `scripts/move_sections.
   Client **2/4 rot** (S1, S2). S1b (Item steht in der Liste) bleibt auch gegen den alten Code grün und
   trägt nichts. Rohdaten: `phase9_hardening/probes/p9_feedback_b1_probe*.json`.
 - **Offene Lücke:** die Konfliktkopie (P9-BI) ist rein clientseitig und im Browser nicht gefahren ⇒ P9-124 ⚠️.
+
+### B2 — Zielangabe im Anlegen-Dialog (gebaut 2026-10-08, nicht deployt)
+
+- **Client:** `#create-target` (`app.html`, im `#create-dialog`) zeigt „Anlegen in: *Space*", im eigenen
+  Home-Space mit dem Zusatz „(dein Home-Space)". Gefüllt in `openCreateDialog()` per `textContent` aus
+  `state.activeSpace` — **dieselbe** Quelle, die der POST aus B1 als `space` sendet. Kein Server-Touch.
+- **Datierte Korrektur 2026-10-08 (Code gewinnt):** P9-BH sagt, in der globalen Sicht oder in einem nur
+  lesbaren Space stehe der Home-Space als Ziel da. Dieser Fall ist **unerreichbar**: dort ist der Dialog
+  samt Knöpfen aus dem DOM ausgehängt (`setCreateControlsPresent(activeSpaceWritable())`), und
+  `openCreateDialog()` bricht ohne Schreibrecht ab. Es gibt also keinen Dialog, der das Home-Ziel dort
+  nennen könnte; die Zusage reduziert sich auf „der Dialog nennt das Ziel, wo er sich öffnen lässt".
+  Für die **Übersicht** ist das nicht nur gelesen, sondern **gemessen**: dort bleibt `state.activeSpace`
+  absichtlich stehen (`tree.js:66`), nach `team` → Übersicht ist er also `team` — Probe-Station S5 zählt
+  trotzdem **0** sichtbare Anlegen-Knöpfe.
+- **Belege:** Wächter `test_the_create_dialog_names_its_target_space` (gegen den alten Client rot), Probe
+  **6/6 plus Messung S5** (S4/S4b neu, `probes/p9_feedback_b2_probe.json`), Gegenlauf **4/6 rot**, `pytest` **1253**, `ui_budget` 5/5, Tabu-Diff leer.

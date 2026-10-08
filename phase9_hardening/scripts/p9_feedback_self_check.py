@@ -9,6 +9,11 @@ Stationen:
      danach **im Team-Space** (`state.activeSpace`), das Item steht in dessen Liste
   2  Gegenlauf: dasselbe Item steht **nicht** im Home-Space von A
   3  Home-Space: Anlegen dort bleibt im Home-Space (unveraendertes Verhalten, P9-122)
+  4  (B2, P9-BH) der offene Anlegen-Dialog nennt sein Ziel: im Team-Space ``team``, im
+     Home-Space ``alpha`` mit Home-Vermerk — gelesen **vor** dem Absenden, im echten Dialog
+  5  (B2) Messung, kein Urteil: nach team -> Uebersicht (`#home-button`) — ist ein Anlegen-Knopf
+     sichtbar, und wenn ja, welches Ziel nennt der Dialog? (`state.activeSpace` bleibt in der
+     Uebersicht absichtlich stehen, `tree.js:66`.) Die Station meldet den Befund nur.
 
 Aufruf (Stopp nur ueber die PID-Datei, Hard Rule 9):
     python phase9_hardening/scripts/p9_feedback_wegwerf.py start
@@ -190,19 +195,32 @@ def _item_oeffnen(page: Page, titel: str) -> str | None:
     return item_id
 
 
-def _anlegen(page: Page, titel: str) -> None:
+def _anlegen(page: Page, titel: str, bild: str | None = None) -> str | None:
+    """Legt an und liefert die Zielzeile des offenen Dialogs (B2), gelesen **vor** dem Absenden.
+    `None`, wenn es die Zeile nicht gibt — der alte Client hat keine."""
     page.locator("#create-button:visible, #new-item-button:visible").first.click()
+    ziel = page.locator("#create-target")
+    ziel_text = ziel.text_content() if ziel.count() else None
+    if bild:
+        page.locator("#create-dialog .overlay__panel").screenshot(path=str(OUT_DIR / bild))
     page.locator("#create-title-input").fill(titel)
     page.locator("#create-submit").click()
     time.sleep(2.5)
+    return ziel_text
 
 
 def main() -> int:
+    global OUT_DIR
     ap = argparse.ArgumentParser()
     ap.add_argument("--base-url", default=DEFAULT_BASE_URL)
     ap.add_argument("--creds", type=Path, default=DEFAULT_CREDS)
     ap.add_argument("--data-root", type=Path, default=DEFAULT_DATA_ROOT)
+    # Getrennter Bericht fuer Gegenlaeufe, damit kein Gegenlauf den Erfolgsbeleg ueberschreibt
+    # (derselbe Fehler wie im trace-Block 2026-10-02). Die B1-Belege bleiben als Stand von B1 liegen.
+    ap.add_argument("--report", type=Path, default=PROBE_DIR / "p9_feedback_b2_probe.json")
+    ap.add_argument("--screenshots-dir", type=Path, default=OUT_DIR)
     args = ap.parse_args()
+    OUT_DIR = args.screenshots_dir
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     PROBE_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -228,7 +246,9 @@ def main() -> int:
             pruefe("S1 Anlegen im Team-Space landet im Team-Space", False,
                    "der geteilte Space ist nicht erreichbar")
         else:
-            _anlegen(alpha, TEAM_TITEL)
+            ziel = _anlegen(alpha, TEAM_TITEL, bild="p9_feedback_b2_ziel_team.png")
+            pruefe("S4 der Anlegen-Dialog nennt den Team-Space als Ziel",
+                   ziel == "Anlegen in: team", f"Zielzeile={ziel!r}")
             aktiv = alpha.evaluate("document.querySelector('#list-title, .list__title')?.textContent || ''")
             status, raw = _api(args.base_url, "/api/v1/items?space=team", cookie=_cookie_header(alpha))
             team = [i for i in json.loads(raw).get("items", []) if i["title"] == TEAM_TITEL] \
@@ -251,6 +271,23 @@ def main() -> int:
             pruefe("S2 Gegenlauf: das Team-Item steht nicht im Home-Space",
                    status == 200 and home == [], f"HTTP {status} Treffer im Home={len(home)}")
 
+        # --- S5: Uebersicht nach team — Messung, kein Urteil ---------------------------------
+        if _in_den_shared_space(alpha, args.base_url):
+            alpha.locator("#home-button").click()
+            time.sleep(1.2)
+            knoepfe = alpha.locator("#create-button:visible, #new-item-button:visible").count()
+            ziel = None
+            if knoepfe:
+                alpha.locator("#create-button:visible, #new-item-button:visible").first.click()
+                ziel = alpha.locator("#create-target").text_content() \
+                    if alpha.locator("#create-target").count() else None
+                alpha.locator("#create-cancel").click()
+            befunde.append({"pruefung": "S5 Messung: Anlegen-Knopf in der Uebersicht nach team",
+                            "ok": True, "messung": True,
+                            "detail": f"sichtbare Knoepfe={knoepfe} Zielzeile={ziel!r}"})
+            print(f"  [MESS] S5 Uebersicht nach team: Knoepfe={knoepfe} Zielzeile={ziel!r}",
+                  file=sys.stderr)
+
         # --- S3: Anlegen im Home-Space bleibt im Home-Space ----------------------------------
         alpha.locator("#home-button").click()
         time.sleep(1.2)
@@ -261,7 +298,9 @@ def main() -> int:
         else:
             eigen.first.click()
             time.sleep(2.0)
-            _anlegen(alpha, HOME_TITEL)
+            ziel = _anlegen(alpha, HOME_TITEL)
+            pruefe("S4b der Anlegen-Dialog nennt im Home-Space den Home-Space als Ziel",
+                   ziel == "Anlegen in: alpha (dein Home-Space)", f"Zielzeile={ziel!r}")
             status, raw = _api(args.base_url, "/api/v1/items?space=alpha", cookie=_cookie_header(alpha))
             home = [i for i in json.loads(raw).get("items", []) if i["title"] == HOME_TITEL] \
                 if status == 200 else []
@@ -273,7 +312,7 @@ def main() -> int:
 
     report = {"base_url": args.base_url, "befunde": befunde,
               "alle_ok": all(b["ok"] for b in befunde)}
-    (PROBE_DIR / "p9_feedback_b1_probe.json").write_text(
+    args.report.write_text(
         json.dumps(report, indent=2, ensure_ascii=False))
     print(f"\n{sum(b['ok'] for b in befunde)}/{len(befunde)} Pruefungen gruen", file=sys.stderr)
     return 0 if report["alle_ok"] else 1
