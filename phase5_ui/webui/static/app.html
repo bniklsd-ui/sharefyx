@@ -403,6 +403,12 @@
         <button type="button" class="tree__folder settings-menu__item" id="account-manage-spaces" data-panel="spaces">Spaces verwalten</button>
         <button type="button" class="tree__folder settings-menu__item" id="account-show-updates" data-panel="updates">Update-Log</button>
       </div>
+      <!-- P9-BN (Block feedback B3, 2026-10-08): das Menü hatte keinen Schließen-Weg außer ESC und
+           Klick daneben. Der Knopf schließt die **ganze** Kette (`closeSettings`), nicht nur das
+           Menü — ein Menü, das die Kette offen ließe, wäre ein Zustand, den ESC nie erzeugt. -->
+      <div class="overlay__actions">
+        <button type="button" class="btn" id="settings-menu-close">Schlie&szlig;en</button>
+      </div>
     </div>
 
     <!-- Stufe 2a: Passwort. Reihenfolge aktuell -> neu -> wiederholen -> TOTP (P9-AJ), der

@@ -32,7 +32,7 @@ nur hier.
 
 ## Stand in einem Satz
 
-**125 Tabellenzeilen für 125 Abnahmezeilen: 112 ✅ · 12 ⚠️ · 1 ⬜** (P9-10 in zwei prüfbare Hälften
+**126 Tabellenzeilen für 126 Abnahmezeilen: 113 ✅ · 12 ⚠️ · 1 ⬜** (P9-10 in zwei prüfbare Hälften
 geteilt; seit 2026-10-05 kommen der **settings-Block** P9-83–P9-95 mit 12 ✅ und **einem** ⬜
 dazu — P9-94, der Portscan, ist ein Schritt des Nikingers und durch keinen Test ersetzbar —,
 sein **Nachtrag** P9-96–P9-102 aus der Bildsichtung mit **5 ✅ und 2 ⚠️**, und die **dritte

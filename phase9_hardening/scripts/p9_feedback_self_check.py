@@ -18,6 +18,8 @@ Stationen:
      echten Zwei-Schritt-Dialog; der Dialog nennt `beta`, der Papierkorb-Commit traegt `alpha`
   7  (E1a) alpha zieht ein beta-Item per **echter Maus** auf den Team-Ordner `ablage`
   8  (E1a) Freigeben bleibt beim eigenen Space: Team-Zeilen haben keinen Freigeben-Knopf
+  9  (B3, P9-BN) Einstellungen + Update-Log offen -> „Schliessen" im Menue -> Overlay und alle
+     Panels `hidden`
 
 Aufruf (Stopp nur ueber die PID-Datei, Hard Rule 9):
     python phase9_hardening/scripts/p9_feedback_wegwerf.py start
@@ -268,6 +270,30 @@ def _e1a(page: Page, args) -> None:
            f"Quelle={quelle.count()} Ziel={ziel.count()} folder={item and item.get('folder')!r}")
 
 
+def _b3(page: Page) -> None:
+    knopf = page.locator("#settings-menu-close")
+    if knopf.count() == 0:
+        pruefe("S9 Schliessen im Einstellungsmenue schliesst die ganze Kette", False,
+               "kein Schliessen-Knopf im Menue")
+        return
+    page.locator("#account-button").click()
+    time.sleep(0.6)
+    page.locator("#account-show-updates").click()
+    time.sleep(0.8)
+    offen = page.evaluate("""[...document.querySelectorAll('#settings-overlay .settings-panel')]
+        .filter(p => !p.hidden).length""")
+    page.locator("#settings-menu .overlay__panel, #settings-menu").first.screenshot(
+        path=str(OUT_DIR / "p9_feedback_b3_menue.png"))
+    knopf.click()
+    time.sleep(0.6)
+    zu = page.evaluate("""({overlay: document.getElementById('settings-overlay').hidden,
+        offen: [...document.querySelectorAll('#settings-overlay .settings-panel')]
+        .filter(p => !p.hidden).length})""")
+    pruefe("S9 Schliessen im Einstellungsmenue schliesst die ganze Kette",
+           offen >= 2 and zu["overlay"] is True,
+           f"vorher offene Panels={offen} danach Overlay hidden={zu['overlay']} offene Panels={zu['offen']}")
+
+
 def main() -> int:
     global OUT_DIR
     ap = argparse.ArgumentParser()
@@ -276,7 +302,7 @@ def main() -> int:
     ap.add_argument("--data-root", type=Path, default=DEFAULT_DATA_ROOT)
     # Getrennter Bericht fuer Gegenlaeufe, damit kein Gegenlauf den Erfolgsbeleg ueberschreibt
     # (derselbe Fehler wie im trace-Block 2026-10-02). Die B1-Belege bleiben als Stand von B1 liegen.
-    ap.add_argument("--report", type=Path, default=PROBE_DIR / "p9_feedback_e1a_probe.json")
+    ap.add_argument("--report", type=Path, default=PROBE_DIR / "p9_feedback_b3_probe.json")
     ap.add_argument("--screenshots-dir", type=Path, default=OUT_DIR)
     args = ap.parse_args()
     OUT_DIR = args.screenshots_dir
@@ -350,6 +376,9 @@ def main() -> int:
                             "detail": f"sichtbare Knoepfe={knoepfe} Zielzeile={ziel!r}"})
             print(f"  [MESS] S5 Uebersicht nach team: Knoepfe={knoepfe} Zielzeile={ziel!r}",
                   file=sys.stderr)
+
+        # --- S9: Schliessen im Einstellungsmenue (B3) ------------------------------------------
+        _b3(alpha)
 
         # --- S3: Anlegen im Home-Space bleibt im Home-Space ----------------------------------
         alpha.locator("#home-button").click()

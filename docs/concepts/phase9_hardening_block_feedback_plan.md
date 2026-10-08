@@ -7,7 +7,7 @@ up: ../../phase9_hardening/CLAUDE.md
 down:
   - ./phase9_hardening_plan.md                 # 📕 P9-Plan; Lock P9-A (kein UI-Umbau), P9-K (Löschen nur eigene), §15 P10-Liste
   - ./phase9_hardening_block_settings_plan.md  # Formvorlage; Einstellungs-Kette P9-AE–P9-AL, auf der B4/B5 aufsetzen
-updated: 2026-10-08 (**E1a gebaut** — Team-Spaces verschieben/löschen, V191/V192 beantwortet, §8; drei datierte Abweichungen) | 2026-10-08 (**B2 gebaut** — Zielangabe im Anlegen-Dialog, §8; datierte Korrektur: der Home-Fall von P9-BH ist unerreichbar) | 2026-10-07 (**Nikinger-Entscheidungen E1–E3 eingetragen**: E1 freigegeben — Lock P9-BP, fremde Items im Team-Space löschbar, Eigentum über den Git-Autor nachverfolgt (P9-BQ); E2 und E3 wandern als offene Punkte in den Closeout/P10; Closeout erst nach B1–B8 + E1a) | 2026-10-07 (angelegt — Rückmeldung des Nikingers vom selben Tag, gegen `main@497c5bd` am Code gelesen; **nichts gebaut**)
+updated: 2026-10-08 (**B3 gebaut** — Schließen im Einstellungsmenü, §8) | 2026-10-08 (**E1a gebaut** — Team-Spaces verschieben/löschen, V191/V192 beantwortet, §8; drei datierte Abweichungen) | 2026-10-08 (**B2 gebaut** — Zielangabe im Anlegen-Dialog, §8; datierte Korrektur: der Home-Fall von P9-BH ist unerreichbar) | 2026-10-07 (**Nikinger-Entscheidungen E1–E3 eingetragen**: E1 freigegeben — Lock P9-BP, fremde Items im Team-Space löschbar, Eigentum über den Git-Autor nachverfolgt (P9-BQ); E2 und E3 wandern als offene Punkte in den Closeout/P10; Closeout erst nach B1–B8 + E1a) | 2026-10-07 (angelegt — Rückmeldung des Nikingers vom selben Tag, gegen `main@497c5bd` am Code gelesen; **nichts gebaut**)
 ---
 
 # Phase 9 — Block feedback: die Rückmeldung vom 2026-10-07
@@ -330,3 +330,11 @@ Regel seit dem Oversize-Fix: neuer Block → neuer Teil, `scripts/move_sections.
   anders als P9-BG beim Anlegen. Zusammen mit „Ordner anlegen in Team-Spaces" in die P10-Liste.
 - **Nicht eingetragen:** V189–V194 stehen noch nicht in `ABNAHME_MATRIX_VERIFY.md` (B1/B2 haben sie dort auch
   nicht geführt). Nachtrag gehört in den Closeout.
+
+### B3 — Schließen im Einstellungsmenü (gebaut 2026-10-08, nicht deployt)
+
+- `#settings-menu-close` (`.btn`) in einer `.overlay__actions` unter den drei Menüpunkten; `settings.js :: init()`
+  verdrahtet ihn auf `closeSettings` — die **ganze** Kette, wie P9-BN verlangt. Kein neuer CSS-Code: die Kette
+  richtet `.overlay__actions` schon rechtsbündig aus (`.settings-chain .overlay__actions`).
+- Belege: Wächter (ohne Fix rot), Probe S9 **12/12**, Gegenlauf alter Client S9 rot, `pytest` **1261**, `ui_budget` 5/5.
+- **Für die Sichtprüfung:** der Knopf hat Standardhöhe und ist damit höher als die flachen Menüpunkte (P9-BB, 31,69 px).

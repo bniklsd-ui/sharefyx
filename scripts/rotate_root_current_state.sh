@@ -130,8 +130,12 @@ for i in "${!PIECES[@]}"; do
   [[ "${KINDS[$i]}" == "keep" ]] && KEEP_FILES+=("${PIECES[$i]}")
 done
 cat "${KEEP_FILES[@]}" > "$WORK/head.new"
-grep -c '^\*\*\[[0-9]\{4\}-' "$WORK/head.new" | grep -qx "$KEEP" \
-  || die "der neue Head trägt $(grep -c '^\*\*\[[0-9]\{4\}-' "$WORK/head.new") Blöcke, erwartet ${KEEP} — Abbruch."
+# **[2026-10-08]** nur ab `## Current state` zählen — dieselbe Grenze wie die Blocksuche oben. Seit
+# 2026-10-07 steht in §Doku-Hygiene ein datierter Absatz mit derselben Marke; der Ganzdatei-Zähler
+# sah ihn als zweiten Block und brach jede Rotation ab (zum Glück, ohne zu schreiben).
+count_new() { awk '/^## Current state/{cs=1} cs && /^\*\*\[[0-9][0-9][0-9][0-9]-/{n++} END{print n+0}' "$WORK/head.new"; }
+count_new | grep -qx "$KEEP" \
+  || die "der neue Head trägt $(count_new) Blöcke, erwartet ${KEEP} — Abbruch."
 echo "OK  Neuer Head trägt genau ${KEEP} Block"
 
 # ---------------------------------------------------------------- Archiv: newest-first

@@ -175,6 +175,9 @@ export function init() {
     });
   });
 
+  // P9-BN: „Schließen" im Menü schließt die ganze Kette, wie ESC auf der letzten Stufe.
+  document.getElementById("settings-menu-close").addEventListener("click", closeSettings);
+
   overlayEl.addEventListener("click", function (event) {
     // Hintergrund-Klick schließt die ganze Kette — dieselbe Form wie bei jedem anderen
     // Overlay hier (P9-AH). Der Trick ist `closest(".settings-chain")`: ein Klick auf ein

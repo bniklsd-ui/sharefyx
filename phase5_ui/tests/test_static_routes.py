@@ -2231,3 +2231,15 @@ def test_team_spaces_unlock_move_drag_and_delete_but_not_share():
     dialogs = (DEFAULT_STATIC_DIR / "js" / "dialogs.js").read_text("utf-8")
     assert '" Zuletzt geändert von " + item.updated_by' in dialogs
     assert "trashConsequenceEl.innerHTML" not in dialogs
+
+
+def test_the_settings_menu_has_a_close_button_that_closes_the_whole_chain():
+    """P9-BN (Block feedback B3, 2026-10-08): das Menü-Panel hatte keine `.overlay__actions` —
+    Schließen ging nur mit ESC oder Klick daneben (R10). Der Knopf sitzt **im** Menü-Panel und
+    ruft `closeSettings` (ganze Kette), nicht `closeFrom` eines einzelnen Panels."""
+    html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
+    menu = re.search(r'id="settings-menu">(.*?)\n    </div>\n', html, re.DOTALL)
+    assert menu and 'class="overlay__actions"' in menu.group(1)
+    assert 'id="settings-menu-close"' in menu.group(1)
+    js = _js_ohne_kommentare((DEFAULT_STATIC_DIR / "js" / "settings.js").read_text("utf-8"))
+    assert 'getElementById("settings-menu-close").addEventListener("click", closeSettings)' in js
