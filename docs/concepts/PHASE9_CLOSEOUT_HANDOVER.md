@@ -12,7 +12,7 @@ down:
   - ../../phase9_hardening/CLAUDE.md                 # Phase-Head, Modulstatus
   - ../../phase9_hardening/SESSIONS_ARCHIVE.md       # volle Phasenhistorie, verbatim, newest-first
   - ./phase9_hardening_uebersicht.svg                # Übersichtsgrafik
-updated: 2026-10-08 (Nachtrag: §5 nennt jetzt alle 40 aufgelösten [VERIFY]-Nummern, Cold-Start auf den P9-23-Wert 19,9 s korrigiert) | 2026-10-08 (Abschluss-Handover P9 → P10, nach dem Deploy v3.1.4; mit Auswertung des Open-Tests MiniMax/Spacebunny auf Wunsch des Nikingers)
+updated: 2026-10-09 (Nachtrag: Empfehlung Ausführer P10.5 — M3 Thinking als Standard, M3.1 nur gezielt; §4.9 und §7) | 2026-10-08 (Nachtrag: §5 nennt jetzt alle 40 aufgelösten [VERIFY]-Nummern, Cold-Start auf den P9-23-Wert 19,9 s korrigiert) | 2026-10-08 (Abschluss-Handover P9 → P10, nach dem Deploy v3.1.4; mit Auswertung des Open-Tests MiniMax/Spacebunny auf Wunsch des Nikingers)
 ---
 # Phase 9 — Closeout-Handover (P9 → P10)
 
@@ -72,7 +72,7 @@ Die Sammelstelle ist der Einstieg (§2 Wünsche, §3 Erbe, §4 Lieferumfang). **
 | 4.6 | Vision-Modell `qwen3-vl:8b` als Prüfwerkzeug gestrichen — Ersatz testen mit **einer** Frage bekannter Antwort, oder CT 111 stilllegen | Head §Backlog | Werkzeug |
 | 4.7 | Übergangsfenster alte Adresse: `LEGACY_UNTIL=open` ist unbefristet — wieder befristen, sobald der Arbeitslaptop die neue Domain erreicht (Vermutung NRD-Sperre ~30 Tage, erneut testen um den **2026-11-02**) | settings-Plan §6 | Termin + Entscheidung |
 | 4.8 | Kontrast der Vorsicht-Beschriftung **4,38:1** (unter AA) — „bleibt so“ (10-05), für P10 erneut bestätigen oder schließen | B17 | Design |
-| 4.9 | **Ausführer für P10/P10.5** — der Open-Test ist beendet (§7), der Rest von P9 lief in Claude Code (Opus/Sonnet 5.5) | §7 | Entscheidung |
+| 4.9 | **Ausführer für P10.5** — Empfehlung 2026-10-09 (Nikinger-Frage M3 vs. M3.1): **M3 Thinking als Standard**, M3.1 Preview (max) nur gezielt für CSS-/Darstellungs-Blöcke; Begründung in §7 und im Sharefyx-Test-Item. P10 selbst (Register) braucht keinen Ausführer | §7 | Empfehlung, Entscheidung beim Nikinger |
 | 4.10 | `created_by` als P10-Option, falls die Git-Spur im UI sichtbar werden soll — wäre die **elfte** Öffnung | P9-BQ | Entscheidung |
 
 **Zu bestätigen:** die Zweiteilung P10 (Register, kein Code) / P10.5 (Ausführung) aus intake §1 ist ein Vorschlag, kein Lock.
@@ -140,6 +140,7 @@ Fehlerklassen in beiden Hälften):
 
 **Was die Tabelle nicht zeigt und P10 wissen sollte:** die **Ausführlichkeit** — Session-Blöcke von 10–17 KB, ein Archiv von 393 KB und vier
 Softcap-Krisen in einer Phase. Das ist ein Kostenfaktor für jede spätere Lesesitzung. Und **M3.1 lief langsam** (Item, 10-07) — nicht gemessen.
+**M3 → M3.1, die eigentliche Testfrage (Nachtrag 2026-10-09):** nicht trennbar — vorher nur zwei Tage, und die Blöcke schreiben auch nach dem Wechsel „opencode/M3“. Einziges Signal: die seit P8 dokumentierte CSS-Ursachen-Schwäche von M3 trat bei M3.1 nicht auf, aber die P9-Pläne verlangten erstmals Browser-Messpunkte (Plan und Modell vermischt, Konfidenz niedrig). Gegen M3.1 als Standard: Preview ohne Model Card, Ausfall 10-07, langsame TPS. Ein trennbarer Vergleich: 1–2 CSS-lastige P10.5-Blöcke mit M3.1, Modell-Trailer je Commit, Kosten und Zeit mitschreiben.
 **Für einen belastbaren Vergleich** bräuchte es den Bake-off aus dem verlinkten Item (Vorregistrierung, N ≥ 5, Wiederholung, blinder Judge).
 
 ## 8 Arbeitsweise — was getragen hat und bleibt
