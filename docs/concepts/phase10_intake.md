@@ -9,7 +9,8 @@ down:
   - ./phase9_hardening_block_feedback_plan.md   # §3 E2/E3, §8 B8 — Befunde, die nach P10 gehen
   - ./p8x_ui_polish_notes.md                    # §2 Karte, §10 Auswahl-Konvention, §10.9 Hochkant
   - ../../phase9_hardening/ABNAHME_MATRIX.md    # die 12 ⚠️ und der eine ⬜ (Stand Closeout 2026-10-08) — jede Zeile braucht in P10 ein Urteil
-updated: 2026-10-13 (Note from other project: eurofyx-fleet S9, neuer Abschnitt 7: Caddy dial_timeout/lb_try live, Quelle nachziehen) | 2026-10-11 (Note from other project: eurofyx-fleet S6, neuer Abschnitt 6: tail-proxy Exit 143) | 2026-10-11 (Note from other project: eurofyx-fleet Block 1 abgeschlossen, neuer Abschnitt 5) | 2026-10-08 (Closeout P9: Zeiger auf `PHASE9_CLOSEOUT_HANDOVER.md` §4 in §3, Matrix-Stand 12 ⚠️ · 1 ⬜) | 2026-10-08 (angelegt — Nikinger-Auftrag nach dem Block feedback: P10 beendet **alle** Baustellen, damit P11 auf einem gehärteten Fundament neue Funktionen denken kann; Zweiteilung P10/P10.5; drei neue Themen: Responsivität/Performance, visuelle Kleinigkeiten, Editor ohne Vorschau/Bearbeiten-Modus)
+  - ../../phase10_inventory/BAUSTELLENREGISTER.md   # seit 2026-10-16 der Stand: das Register, das aus dieser Sammelstelle entstand
+updated: 2026-10-16 (Phase 10 begonnen: Zeiger aufs Register oben, §1 bestätigt (P10-A), §2.3 P5-U-Konflikt, neu §2.4 Anbieter-unabhängig und §2.5 Karten-Umbau, §7 Korrektur Caddyfile.template) | 2026-10-13 (Note from other project: eurofyx-fleet S9, neuer Abschnitt 7: Caddy dial_timeout/lb_try live, Quelle nachziehen) | 2026-10-11 (Note from other project: eurofyx-fleet S6, neuer Abschnitt 6: tail-proxy Exit 143) | 2026-10-11 (Note from other project: eurofyx-fleet Block 1 abgeschlossen, neuer Abschnitt 5) | 2026-10-08 (Closeout P9: Zeiger auf `PHASE9_CLOSEOUT_HANDOVER.md` §4 in §3, Matrix-Stand 12 ⚠️ · 1 ⬜) | 2026-10-08 (angelegt — Nikinger-Auftrag nach dem Block feedback: P10 beendet **alle** Baustellen, damit P11 auf einem gehärteten Fundament neue Funktionen denken kann; Zweiteilung P10/P10.5; drei neue Themen: Responsivität/Performance, visuelle Kleinigkeiten, Editor ohne Vorschau/Bearbeiten-Modus)
 ---
 
 # Phase 10 — Sammelstelle (kein Plan)
@@ -18,7 +19,13 @@ updated: 2026-10-13 (Note from other project: eurofyx-fleet S9, neuer Abschnitt 
 > damit P11 überhaupt erst über eine Garage nachdenken darf. Regel daraus: **Phase 10 endet erst, wenn es keine
 > offene „Baustelle" mehr gibt.** Neue Funktionen (P11) sind in P10 ausdrücklich nicht Teil des Auftrags.
 
+> **Seit 2026-10-16 ist das Register der Stand:** `phase10_inventory/BAUSTELLENREGISTER.md` (76 Zeilen, Entscheidungsliste D-1–D-18),
+> Plan `docs/concepts/phase10_inventory_plan.md`. Diese Sammelstelle bleibt die Herkunft. Notizen anderer Projekte dürfen weiter hier
+> landen (Muster §5–§7); Claude Code überträgt sie ins Register.
+
 ## 1. Zweiteilung (Vorschlag, Nikinger-Gedanke 2026-10-08)
+
+**[2026-10-16] Bestätigt** (Nikinger, Lock P10-A): erst das Register, dann der P10.5-Plan; die Freigabe des Registers ist das Tor.
 
 | Teil | Auftrag | Ergebnis | Code? |
 |---|---|---|---|
@@ -67,6 +74,17 @@ Entscheidung stehen muss. P10 zieht beides vor den Bau. **Tor:** P10.5 startet e
   gleichzeitiges Bearbeiten durch zwei Personen bleibt `ConflictError` (kein Zusammenführen in P10) · Tastaturführung und Barrierefreiheit ·
   was passiert mit Items, die der Editor nicht verlustfrei darstellen kann (Rohmodus als Notausgang).
 - **Empfehlung:** Stufe 1 in P10.5, Stufe 2 und 3 als **benannte Entscheidung** des Nikingers im Register, nicht stillschweigend.
+- **[2026-10-16, Step 0]:** Stufe 1 hebt das gelockte **P5-U** auf („Markdown-Textarea + Formatierhilfen, kein WYSIWYG") — nur als
+  datierte Nikinger-Entscheidung (Register ED-1, D-4).
+
+### 2.4 Anbieter-unabhängig (Nikinger 2026-10-16, „provider agnostic")
+- **Ziel:** jeder standardkonforme MCP-Client kann sich verbinden, nicht nur claude.ai — auf Server-/Connector-Ebene. Es blockiert
+  keinen Schritt, nur den Abschluss von P10.5; Abnahme: ein Nicht-Claude-Client führt `list_spaces` live aus (Lock P10-C).
+- Modell-Routing aus der Endvision bleibt Client-Seite (frühestens P11), nie im Server — Kernprinzip. Register PA-1–PA-7.
+
+### 2.5 Karten-Umbau (Nikinger 2026-10-16)
+- Stil (p8x §2.2), Layout über den Reload merken, Interaktion (Suche, Filter, Titel), „etwas gehirnartiger"; Einklappen (§2.5) nicht
+  gewählt. Aus drei Entwürfen **C Gehirnkarte** gewählt, drei Stile C1–C3 zur Wahl (Register KA-1–KA-5, D-1b).
 
 ## 3. Bekannte Baustellen aus Phase 9 (Erbe, nach Herkunft)
 
@@ -173,3 +191,6 @@ Hinweise dazu:
 - Gegenlauf-Idee für Sharefyx: nach dem Einspielen aus der Quelle `curl localhost:2019/config/` und prüfen, dass `dial_timeout`/`try_duration` gesetzt sind.
 
 **Nur zur Info, kein Sharefyx-Thema:** Der Fleet-Wächter meldet jetzt erst nach einem zweiten Fehlversuch 30 s später, damit einzelne Relay-Hänger keinen Alarm auslösen. Die eigentliche Ursache (kein direkter Pfad) liegt am Heimrouter bzw. an der Mobilfunkleitung.
+
+**[2026-10-16 Korrektur, Sharefyx-Session]:** Die Quelle heißt `phase9_hardening/step_a/Caddyfile.template`, nicht `…/Caddyfile`; ihre
+Zeile 65 trägt noch die einzeilige `reverse_proxy`-Direktive. Register BT-1 (dringend), V199.
