@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-10-08 (**Closeout Phase 9** — Sektionskopf neu geschrieben (der alte, 3,2 KB, war ein überholter Zwischenstand, Wortlaut in `d04c0ec:docs/INDEX.md`), Handover-Zeile neu, Grafik 1080×1080, feedback- und settings-Plan 📕, Größen nachgezogen) | 2026-10-07 (Oversize-Fix: Matrix in Hub + drei lebende Teile geteilt, settings-Plan §10–§12.1 und Runbook §0/A1–A7 verbatim nach L3, `scripts/move_sections.py`; fünf neue Zeilen; Portscan P9-11/P9-94 eingetragen) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
+updated: 2026-10-16 (PROMPTS-Zeile: der Phasen-Kickoff läuft seit P9 in Claude Code, Größe nachgezogen) | 2026-10-08 (**Closeout Phase 9** — Sektionskopf neu geschrieben (der alte, 3,2 KB, war ein überholter Zwischenstand, Wortlaut in `d04c0ec:docs/INDEX.md`), Handover-Zeile neu, Grafik 1080×1080, feedback- und settings-Plan 📕, Größen nachgezogen) | 2026-10-07 (Oversize-Fix: Matrix in Hub + drei lebende Teile geteilt, settings-Plan §10–§12.1 und Runbook §0/A1–A7 verbatim nach L3, `scripts/move_sections.py`; fünf neue Zeilen; Portscan P9-11/P9-94 eingetragen) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 ---
 # Doc Index (L0)
 
@@ -36,7 +36,7 @@ updated: 2026-10-08 (**Closeout Phase 9** — Sektionskopf neu geschrieben (der 
 - [docs/DOC_LAYERS_CONVENTION.md](./DOC_LAYERS_CONVENTION.md) — 📗 ~5KB · Doc-Layers-Spec (v1, 2026-07-06) · **byte-identische Kopie aus dem Trading-Bot-Repo — nicht projektspezifisch anpassen, sonst divergieren zwei Kopien derselben Regel**
 - [docs/concepts/sichtpruefung_automation_conventions.md](./concepts/sichtpruefung_automation_conventions.md) — 📗 **21.230 B** (die Kartenzeile nannte bis 2026-10-05 `~8KB` für eine seit dem 2026-09-11 ~18 KB große Datei — zwei Appends ohne Nachzug, und `doc_health` liest keine KB-Angaben, also meldete es niemand) · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/concepts/sichtpruefung_automation_tooling.md](./concepts/sichtpruefung_automation_tooling.md) — 📗 ~26KB · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
-- [docs/PROMPTS.md](./PROMPTS.md) — 📗 ~18KB · die drei Workflow-Prompts (Claude-Code-Session-Start, Phasen-Kickoff im Browser, Phasen-Abschluss); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+- [docs/PROMPTS.md](./PROMPTS.md) — 📗 ~20KB · die drei Workflow-Prompts (Claude-Code-Session-Start, Phasen-Kickoff — seit P9 in Claude Code, Phasen-Abschluss); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 
 ## Phase 8.6 — ✅ abgeschlossen 2026-09-19, Step Z inklusive; live als `v3.0.2` seit 2026-09-18 (SHA `1ad2665`, `health_gate` 9/9). UI-Politur mit **zwei Plaenen und drei Sichtungs-Revisionen**: Plan 1 (Step 0/V/A/B/C/D) wurde am 2026-09-12 nicht abgenommen — neun UX-Befunde statt Freigabe —, Plan 2 (E/F/G/**G-R**/H/**H-R**/**H-R-3**/J) hat sie abgearbeitet. Bilanz **45 ✅ · 5 ⚠️ · 0 ⬜ · 4 ersetzt** von 54 Zeilen; `pytest` **995**, `ui_budget` 5/5 (144,7 KB); **keine neunte P1-Contract-Oeffnung**, eine angekuendigte Tabu-Ausnahme (P8.6-AJ). Zwei `[VERIFY]` gehen offen an P9: **V118**, **V136**
 

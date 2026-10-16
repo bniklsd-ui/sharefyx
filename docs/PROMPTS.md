@@ -7,7 +7,7 @@ up: ../CLAUDE.md
 down:
   - DOC_LAYERS_CONVENTION.md   # Navigationsregeln, auf die Prompt 1 verweist
   - ../ROADMAP.md              # Phasenübersicht
-updated: 2026-08-09
+updated: 2026-10-16 (Korrektur unter Prompt 2: der Phasen-Kickoff läuft seit spätestens P9 in Claude Code; Beleg und die drei Abweichungen des P9-Wortlauts) | 2026-08-09
 ---
 # Workflow-Prompts
 
@@ -121,6 +121,16 @@ Der Nikinger wishes you a happy coding session!
 ---
 
 ## Prompt 2 — Phasen-Kickoff im Browser-Chat (neuer Chat)
+
+**[2026-10-16 Korrektur, P10-Planungsstart]:** Prompt 2 läuft seit spätestens P9 **in Claude Code**,
+nicht mehr im Browser. Beleg: die P9-Planungssession vom 2026-09-19 ist eine Claude-Code-Session
+(Transkript `c6b34750-6fd6-5019-a86e-6795baeff10e.jsonl` unter
+`~/.claude/projects/-home-savefyx-dev-savefxy/`, erste Nutzernachricht 10:51 UTC). Ihr Wortlaut ist
+**dieser** Text mit drei Abweichungen: Kopfzeile „du bist der Phase-9-Chat des Space-Server-Projekts
+„Sharefyx"", die Modellnamen „Sonnet 5"/„Opus 5" statt „Sonnet"/„Opus", und die Besondere Notiz
+(„p9 soll die letzten Schwächen vom aktuellen Sharefyx schaffen …"). Der Prompt war also nie verloren —
+die Vorlage ist der Block unten; ein zweites Exemplar daneben wäre eine zweite Kopie derselben Regel.
+„Phase-X-Chat" und „Google Drive" sind Reste der Browser-Zeit und dürfen beim Einsatz stehen bleiben.
 
 ```text
 Hallo Claude, du bist der Phase-X-Chat des Space-Server-Projekts.

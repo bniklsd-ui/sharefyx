@@ -9,7 +9,7 @@ down:
   - ./phase9_hardening_block_feedback_plan.md   # §3 E2/E3, §8 B8 — Befunde, die nach P10 gehen
   - ./p8x_ui_polish_notes.md                    # §2 Karte, §10 Auswahl-Konvention, §10.9 Hochkant
   - ../../phase9_hardening/ABNAHME_MATRIX.md    # die 12 ⚠️ und der eine ⬜ (Stand Closeout 2026-10-08) — jede Zeile braucht in P10 ein Urteil
-updated: 2026-10-08 (Closeout P9: Zeiger auf `PHASE9_CLOSEOUT_HANDOVER.md` §4 in §3, Matrix-Stand 12 ⚠️ · 1 ⬜) | 2026-10-08 (angelegt — Nikinger-Auftrag nach dem Block feedback: P10 beendet **alle** Baustellen, damit P11 auf einem gehärteten Fundament neue Funktionen denken kann; Zweiteilung P10/P10.5; drei neue Themen: Responsivität/Performance, visuelle Kleinigkeiten, Editor ohne Vorschau/Bearbeiten-Modus)
+updated: 2026-10-13 (Note from other project: eurofyx-fleet S9, neuer Abschnitt 7: Caddy dial_timeout/lb_try live, Quelle nachziehen) | 2026-10-11 (Note from other project: eurofyx-fleet S6, neuer Abschnitt 6: tail-proxy Exit 143) | 2026-10-11 (Note from other project: eurofyx-fleet Block 1 abgeschlossen, neuer Abschnitt 5) | 2026-10-08 (Closeout P9: Zeiger auf `PHASE9_CLOSEOUT_HANDOVER.md` §4 in §3, Matrix-Stand 12 ⚠️ · 1 ⬜) | 2026-10-08 (angelegt — Nikinger-Auftrag nach dem Block feedback: P10 beendet **alle** Baustellen, damit P11 auf einem gehärteten Fundament neue Funktionen denken kann; Zweiteilung P10/P10.5; drei neue Themen: Responsivität/Performance, visuelle Kleinigkeiten, Editor ohne Vorschau/Bearbeiten-Modus)
 ---
 
 # Phase 10 — Sammelstelle (kein Plan)
@@ -97,3 +97,79 @@ Entscheidung stehen muss. P10 zieht beides vor den Bau. **Tor:** P10.5 startet e
 
 **Abgrenzung zu P11:** ein Posten, der eine **neue Fähigkeit** schafft (neuer Item-Typ, Tabellenkalkulation, Echtzeit-Zusammenarbeit), ist P11 —
 auch wenn er auf dieser Liste landet. P10.5 schließt nur, was heute **angefangen, kaputt, unmessbar oder ungeklärt** ist.
+
+## 5. Note from other project — `eurofyx-fleet` (2026-10-11)
+
+> **Absender:** Claude Code im Repo `eurofyx-fleet` (privates Zentral-Infra-Repo des Nikingers), Session S3.
+> **Einzige Änderung an diesem Repo:** genau dieser Abschnitt plus die `updated:`-Zeile der Card. Ausdrücklich freigegeben vom Nikinger (2026-10-11), sonst gilt dort die Regel „nie in Projekt-Repos schreiben". **Nicht committet** — der Commit gehört in die Sharefyx-Session.
+> **Kein Auftrag an P10.** Nur Befunde und zwei Entscheidungen, die bei Sharefyx liegen.
+
+**Was geschlossen ist:** P9-Closeout §4.1 (VPS im Tailnet) ist durch **Fleet Block 1** geschlossen. Die Tailnet-Policy erlaubt der VPS (`tag:sharefyx-edge`) jetzt **nur** `VM 200 : tcp 8765`. Vorher war der P9-Grant wirkungslos, weil ein allow-all-Grant mit `src: "*"` auch die VPS einschloss. Die Policy-Datei liegt im Repo `eurofyx-fleet` (`tailnet/policy.hujson`) und wird von dort in der Admin-Konsole eingespielt.
+
+**Gemessen am 2026-10-11:**
+- Von der VPS aus sind SSH auf die anderen Tailnet-Knoten, RDP auf den Windows-Rechner sowie die Weboberflächen von Router und Proxmox im LAN **gesperrt**; die Relay-Strecke zu VM 200 läuft (`/health` 200).
+- `https://sharefyx.eurofyx.com` und der Tailscale-Funnel liefern von außen `/health` 200, `/ui/login` 200, `/mcp/` 401 — unverändert gegenüber dem Deploy-Smoke.
+- Gegenlauf: Ohne den VPS-Grant lehnt die Konsole die Policy ab (`want: Accept, got: Drop`). Es gab keine Betriebsunterbrechung.
+
+**Was P10 wissen sollte:**
+1. **Zwei öffentliche Eingänge** (VPS/nginx und Tailscale Funnel). Härtung auf nginx/VPS (Rate-Limit, TLS-Policy) schützt den Funnel-Pfad **nicht**. Der Funnel bleibt bewusst aktiv: Der Firmen-Proxy des Nikingers blockt die Sharefyx-Domain, `*.ts.net` aber nicht.
+2. **Offen bei Sharefyx, nicht bei Fleet:** ob das MacBook den Relay-Port erreichen darf. Nutzergeräte behalten heute weiterhin vollen Zugriff auf VM 200.
+3. **Host-Header:** Der Relay antwortet auf `/health` mit **400 „Invalid host header"**, wenn man ihn über die Tailnet-IP anspricht. 200 gibt es nur mit `Host: 127.0.0.1:8765`. Das ist Anwendungsverhalten und kein Netzfehler. Fleet-Healthchecks setzen den Header; wer von außen misst, sollte das wissen.
+4. **Funnel-Regel:** Sollte VM 200 jemals mit einem Tag versehen werden, verliert sie den User-Owner. Dann muss das Ziel der Funnel-`nodeAttrs` auf diesen Tag zeigen, sonst fällt der Funnel weg. Fleet taggt VM 200 derzeit **nicht**.
+5. **Nur zur Info:** Fleet plant ein Backup-Ziel außerhalb von Proxmox (Block „2b"). An Sharefyx und an dessen Backup (`sharefyx-backup.service`) ändert sich dadurch nichts; Entscheidungen dazu stehen noch aus.
+
+## 6. Note from other project — `eurofyx-fleet` (2026-10-11, S6)
+
+> **Absender:** Claude Code im Repo `eurofyx-fleet`, Session S6.
+> **Einzige Änderung an diesem Repo:** genau dieser Abschnitt plus die `updated:`-Zeile der Card. Ausdrücklich freigegeben vom Nikinger (2026-10-11, nach dem Präzedenzfall aus §5). **Nicht committet**, der Commit gehört in die Sharefyx-Session.
+> **Kein Auftrag an P10.** Ein Befund mit Vorschlag, die Entscheidung liegt bei Sharefyx.
+
+**Befund: `sharefyx-tail-proxy` landet bei jedem geordneten Stopp in `failed`.**
+- Gemessen am 2026-10-11 beim Gegenlauf des Fleet-Healthchecks (`systemctl stop sharefyx-tail-proxy`, danach `start`): `socat` beendet sich auf SIGTERM mit **Exit-Code 143**. systemd wertet das als Fehler (`Failed with result 'exit-code'`), die Unit steht danach auf `failed`, obwohl der Stopp gewollt war.
+- Folge: Jeder Reboot, jedes Deploy mit Neustart und jeder manuelle Stopp hinterlässt eine `failed`-Unit. Wer `systemctl --failed` als Gesundheitssignal nutzt (Fleet tut das in `vm-dev.sh`: „0 failed units“), sieht einen Fehlalarm. Echte Ausfälle des Relays sind davon nicht mehr zu unterscheiden.
+- Der Dienst selbst lief nach `start` wieder normal, `/health` über das Relay war 200, `sharefyx-mcp` blieb unberührt.
+
+**Vorschlag (Sharefyx-Entscheidung):** In `phase3_edge/systemd/sharefyx-tail-proxy.service` im Abschnitt `[Service]` ergänzen:
+
+```ini
+SuccessExitStatus=143
+```
+
+Hinweise dazu:
+- Die installierte Unit unter `/etc/systemd/system/` ist eine Kopie, also braucht es danach den üblichen Deploy-Weg (Kopie + `systemctl daemon-reload`). Ein Neustart des Relays ist dafür nicht nötig, die Direktive wirkt beim nächsten Stopp.
+- `phase9_hardening/tests/test_tail_proxy.py` vergleicht die Härtung mit der MCP-Unit. Falls der Test die `[Service]`-Direktiven vollständig vergleicht, muss er diese Zeile kennen.
+- Gegenlauf-Idee: nach dem Deploy `systemctl stop` + `start`, danach darf `systemctl is-failed sharefyx-tail-proxy` **nicht** `failed` melden.
+
+**Korrektur zu §5, Punkt 1:** Auf der VPS läuft **Caddy**, nicht nginx (Fleet hat das am 2026-10-11 gemessen). Die Aussage bleibt gleich: Härtung auf dem VPS-Reverse-Proxy schützt den Funnel-Pfad nicht.
+
+## 7. Note from other project — `eurofyx-fleet` (2026-10-13, S9)
+
+> **Absender:** Claude Code im Repo `eurofyx-fleet`, Session S9.
+> **Einzige Änderung an diesem Repo:** genau dieser Abschnitt plus die `updated:`-Zeile der Card. Ausdrücklich freigegeben vom Nikinger (2026-10-13, nach dem Präzedenzfall aus §5/§6). **Nicht committet**, der Commit gehört in die Sharefyx-Session.
+> **Handlungsbedarf:** Die Live-Datei auf der VPS weicht jetzt von `phase9_hardening/step_a/Caddyfile` ab. Sharefyx entscheidet, ob die Quelle nachzieht. Sonst geht die Änderung beim nächsten Einspielen verloren.
+
+**Befund: kurze Ausfälle der öffentlichen Domain durch Caddys Standard-Wartezeit.**
+- Der Fleet-Wächter auf der VPS (alle 5 min `/health` über Caddy → Tailnet → Heim-VM) meldete am 2026-10-13 um 04:30 Berlin DOWN, um 04:40 wieder UP. Im Caddy-Log stehen um 04:30:04 und 04:35:04 `dial tcp <Heim-VM>:8765: i/o timeout`.
+- Ursache: VPS und Heim-VM erreichen sich **nie direkt**, nur über Tailscale-DERP-Relays (`tailscale ping`: „direct connection not established“, vermutlich CGNAT am Heimrouter). Nachts lagen beide auf verschiedenen Relays, und die Heim-VM hatte ca. 2 s Relay-Latenz. Der Verbindungsaufbau dauerte länger als Caddys **Standard-`dial_timeout` von 3 s** → Fehler an den Aufrufer. Um 04:35 wechselte die Heim-VM auf dasselbe Relay, danach lief es wieder.
+- Dieselben Timeouts stehen schon früher im Caddy-Log (06.10. 18:31 und 19:02, 11.10. 18:58), also vor dem Wächter. Wer in diesen Momenten die Domain aufrief, bekam einen Fehler.
+- Die App selbst war gesund: `/health` lokal auf der Heim-VM durchgehend 200. Kein Zusammenhang mit Backups oder Fleet-Läufen.
+
+**Live auf der VPS geändert (Fleet, 2026-10-13, Entscheidung Nikinger):** im Site-Block statt der einzeiligen `reverse_proxy`-Direktive:
+
+```caddyfile
+reverse_proxy <Heim-VM>:8765 {
+	transport http {
+		dial_timeout 10s
+	}
+	lb_try_duration 15s
+	lb_try_interval 1s
+}
+```
+
+Hinweise dazu:
+- `dial_timeout 10s` gibt dem Aufbau über das Relay Zeit. Mit `lb_try_duration` und `lb_try_interval` versucht Caddy es bei einem Hänger bis 15 s lang erneut, im Abstand von 1 s (bei einem einzigen Upstream wird derselbe wieder gewählt).
+- `caddy validate` ok, danach `systemctl reload caddy` (kein Neustart). Die aktive Config per Admin-API zeigt 10 s / 15 s / 1 s, `/health` ist lokal und öffentlich 200. Sicherung der alten Datei liegt auf der VPS neben dem Caddyfile (`.fleet-bak-20261013`).
+- Der Rest des Caddyfile (Kopf-Kommentar, Logging, kein HSTS, kein `admin off`) ist unverändert.
+- Gegenlauf-Idee für Sharefyx: nach dem Einspielen aus der Quelle `curl localhost:2019/config/` und prüfen, dass `dial_timeout`/`try_duration` gesetzt sind.
+
+**Nur zur Info, kein Sharefyx-Thema:** Der Fleet-Wächter meldet jetzt erst nach einem zweiten Fehlversuch 30 s später, damit einzelne Relay-Hänger keinen Alarm auslösen. Die eigentliche Ursache (kein direkter Pfad) liegt am Heimrouter bzw. an der Mobilfunkleitung.
