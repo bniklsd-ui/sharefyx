@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase10_inventory_plan.md    # Plan P10: Locks, Steps, Messungen M1–M7, Abnahme, [VERIFY]
   - ../docs/concepts/phase10_intake.md            # Sammelstelle — Herkunft von §2/§3/§5–§7
   - ../docs/concepts/PHASE9_CLOSEOUT_HANDOVER.md  # Herkunft §4.1–§4.10
-updated: 2026-10-16 (angelegt — Entwurf aus allen Quellen, jede Zeile am Code verankert; Stand vor der Freigabe durch den Nikinger)
+updated: 2026-10-16 (finalisiert mit den Antworten des Nikingers: D-1b = C2 Nervenbahnen, BT-13 beantwortet, V199 in die Exec-Session; Bilanz per Skript nachgezählt) | 2026-10-16 (angelegt — Entwurf aus allen Quellen, jede Zeile am Code verankert; Stand vor der Freigabe durch den Nikinger)
 ---
 # Phase 10 — Baustellenregister
 
@@ -24,7 +24,7 @@ P10 Step 2) · Wissen (kein Bau, nur festgehalten) · erledigt (mit Beleg). „E
 
 | ID | Posten | Herkunft | Befund am Code / Stand | Gr. | Risiko | Entsch. | Ziel |
 |---|---|---|---|---|---|---|---|
-| BT-1 | **Caddy-Quelle zieht nicht nach** — live `dial_timeout 10s`, `lb_try_duration 15s`, `lb_try_interval 1s` | intake §7 (Fleet S9) | Quelle `phase9_hardening/step_a/Caddyfile.template:65` trägt noch die einzeilige `reverse_proxy <heimvm-tailnet>:8765`. **Dringend:** wer aus der Quelle einspielt, nimmt den Fix zurück. Fleet nannte `step_a/Caddyfile` — die Datei heißt `Caddyfile.template` · V199 | S | B | D-10 | P10.5, erster Block |
+| BT-1 | **Caddy-Quelle zieht nicht nach** — live `dial_timeout 10s`, `lb_try_duration 15s`, `lb_try_interval 1s` | intake §7 (Fleet S9) | Quelle `phase9_hardening/step_a/Caddyfile.template:65` trägt noch die einzeilige `reverse_proxy <heimvm-tailnet>:8765`. **Dringend:** wer aus der Quelle einspielt, nimmt den Fix zurück. Fleet nannte `step_a/Caddyfile` — die Datei heißt `Caddyfile.template` · V199 liest der Nikinger in der Exec-Session unmittelbar vor der Änderung | S | B | D-10 | P10.5, erster Block |
 | BT-2 | `sharefyx-tail-proxy` endet bei SIGTERM mit Exit 143 → Unit `failed` | intake §6 (Fleet S6) | `phase3_edge/systemd/sharefyx-tail-proxy.service`, `[Service]` ohne `SuccessExitStatus`. `phase9_hardening/tests/test_tail_proxy.py :: test_hardening_matches_the_mcp_service` vergleicht Direktiven mit der MCP-Unit — die neue Zeile muss dort bekannt sein · V200 | S | B | D-11 | P10.5 |
 | BT-3 | Tailnet-ACL: Nutzergeräte (MacBook) erreichen VM 200 voll, auch den Relay-Port 8765 | Handover §4.1, intake §5.2 | VPS-Seite ist durch Fleet Block 1 geschlossen (`tag:sharefyx-edge` → nur VM 200:8765). Die Policy lebt in `eurofyx-fleet/tailnet/policy.hujson`, nicht in diesem Repo | S | A, B | D-9 | Termin (Fleet-Repo) |
 | BT-4 | Sechs LAN-Ports auf `0.0.0.0` (7070, 7777, 47984/89/90, 48010 — Sunshine u. a.) | Handover §4.2 | kein Sharefyx-Code, Dienste der VM außerhalb des Repos | S | A | D-12 | verworfen hier, an Fleet (Empfehlung) |
@@ -36,7 +36,7 @@ P10 Step 2) · Wissen (kein Bau, nur festgehalten) · erledigt (mit Beleg). „E
 | BT-10 | Funnel-Watchdog (geerbtes Ledger, fiel beim Übergang P8.6 → P9 aus der Kette) | P8.5-Handover §4.7 | `phase3_edge/scripts/tailscaled_watchdog.sh:93` prüft nur `Self.Online`; der Fleet-Wächter prüft alle 5 min den **Domain**-Pfad. Den **Funnel**-Pfad prüft von außen niemand · V203 | S | B | D-17 | P10.5 oder Fleet |
 | BT-11 | Vision-Dienst (CT 111): `qwen3-vl:8b` als Prüfwerkzeug gestrichen | Handover §4.6 | Ersatz mit **einer** Frage bekannter Antwort testen, oder CT 111 stilllegen | S | — | D-14 | P10.5 (Werkzeug) |
 | BT-12 | Fleet plant ein Backup-Ziel außerhalb von Proxmox | intake §5.5 | `sharefyx-backup.service` bleibt unverändert | — | — | nein | Wissen |
-| BT-13 | opencode-Projektmarker im echten Datenverzeichnis (`savefyx-data/.git/opencode`, 40 B, 2026-09-04) | Step 0 (2026-10-16) | deutet darauf hin, dass die Projekterkennung von opencode dort mindestens einmal mit diesem Repo als Arbeitsverzeichnis lief. Kein Datenbefund, nur Metadaten gelesen. Regel bestätigen: Agenten starten nie im `DATA_ROOT` | — | B | D-17 | Frage an den Nikinger |
+| BT-13 | opencode-Projektmarker im echten Datenverzeichnis (`savefyx-data/.git/opencode`, 40 B, 2026-09-04) | Step 0 (2026-10-16) | **beantwortet 2026-10-16 (Nikinger): ja, versehentlich** — bei der Repo-Auswahl in opencode laggt die Oberfläche, Klicks landen auf dem falschen Eintrag. Kein Datenbefund, nur Metadaten gelesen. Regel: Agenten arbeiten nie im `DATA_ROOT`; vor dem ersten Schreibschritt das Arbeitsverzeichnis prüfen | — | B | nein | Wissen |
 
 ## 2 Performance (PF)
 
@@ -72,11 +72,11 @@ P10 Step 2) · Wissen (kein Bau, nur festgehalten) · erledigt (mit Beleg). „E
 > Gewählt: Stil (p8x §2.2), Layout merken, Interaktion; dazu „etwas gehirnartiger". Erste Runde:
 > `docs/concepts/phase10_karte_entwurf_{a,b,c}.svg` (A Landkarte · B Gehirn · C Gehirnkarte) — **entschieden: C** (D-1, 2026-10-16).
 > Zweite Runde, drei Stile innerhalb C: `docs/concepts/phase10_karte_c_stil_{1,2,3}.svg` (C1 Flächen · C2 Nervenbahnen · C3 Höhenlinien),
-> Wahl offen (D-1b). Nicht gewählt: Einklappen (§2.5).
+> **gewählt: C2 Nervenbahnen** (D-1b, 2026-10-16). Nicht gewählt: Einklappen (§2.5).
 
 | ID | Posten | Herkunft | Befund am Code / Stand | Gr. | Risiko | Entsch. | Ziel |
 |---|---|---|---|---|---|---|---|
-| KA-1 | Stil: **Gehirnkarte** (C, entschieden 2026-10-16) — Spaces als Lappen eines Körpers, Furchen als Space-Grenzen; Stilvariante C1/C2/C3 offen | p8x §2.2, Nikinger 2026-10-16 | `phase5_ui/webui/static/js/graph.js` (33 KB, handgerollt, `draw()`/`drawEdges()`/`drawNodes()`, keine Bibliothek). Die Lappen entstehen im Browser: Raster, nächster Knoten, Erosion als Furche, Konturverfahren — keine festen Formen, kein Server. Farbe nur mit Bedeutung, keine Transparenz-Abhängigkeit (P8 §0.3 Nr. 4/6) | M | — | D-1b | P10.5 |
+| KA-1 | Stil: **Gehirnkarte im Stil C2 Nervenbahnen** (D-1 + D-1b, 2026-10-16) — Spaces als Lappen eines Körpers mit leiser Innenlinie, Furchen als Space-Grenzen, Bahnen stärker geschwungen, Knoten als Zellen mit Membran-Ring und Fortsätzen, ein Fokus aktiviert erste und zweite Nachbarn | p8x §2.2, Nikinger 2026-10-16 | `phase5_ui/webui/static/js/graph.js` (33 KB, handgerollt, `draw()`/`drawEdges()`/`drawNodes()`, keine Bibliothek). Die Lappen entstehen im Browser: Raster, nächster Knoten, Erosion als Furche, Konturverfahren — keine festen Formen, kein Server. Farbe nur mit Bedeutung, keine Transparenz-Abhängigkeit (P8 §0.3 Nr. 4/6). Ruhezustand ohne Fokus: alle Knoten voll deckend; Abdunkeln (0,45) nur bei Hover oder Treffer — Form und Farbe tragen die Bedeutung | M–L | — | D-1b | P10.5 |
 | KA-2 | Layout über den Reload merken | p8x §2.4 (Rest), Nikinger 2026-10-16 | heute nur innerhalb einer Sitzung (P9 Step E), Seed deterministisch (P8.6-D2). Ablage im Browser (`localStorage`), kein Serverzustand | S | — | nein | P10.5 |
 | KA-3 | Interaktion: Suche mit Treffer, Filter nach Typ/Status, Titel ohne Zoom | Nikinger 2026-10-16 | der Graph-Knoten trägt neun Felder (`api.py :: _graph_get`, ab `:720`): `id, title, space, own, writable, type, status, folder, tags` — Suche und Filter brauchen **kein** neues Feld. „Kürzlich geändert" (Entwurf B) bräuchte ein zehntes (`updated`) = API-Öffnung | M | — | D-1 | P10.5 |
 | KA-4 | Einklappen mit Abhängigkeiten | p8x §2.5 | am 2026-10-16 nicht gewählt | — | — | D-2 | verworfen (Empfehlung) oder P11 |
@@ -169,7 +169,7 @@ Antworten werden hier **mit Datum** eingetragen; erst dann wird das „Ziel" der
 | D | Frage | Zeilen | Empfehlung | Antwort |
 |---|---|---|---|---|
 | D-1 | Welcher Karten-Entwurf (A Landkarte · B Gehirn · C Gehirnkarte) oder welche Mischung? | KA-1, KA-3 | C mit der Aktivierung aus B, ohne „kürzlich geändert" (kein zehntes Feld) | **C** — Nikinger 2026-10-16 („Option C finde ich mega") |
-| D-1b | Welcher Stil innerhalb C (C1 Flächen · C2 Nervenbahnen · C3 Höhenlinien) oder welche Mischung? | KA-1 | C1 als Grundbild, Aktivierung aus C2 nur beim Hover | offen |
+| D-1b | Welcher Stil innerhalb C (C1 Flächen · C2 Nervenbahnen · C3 Höhenlinien) oder welche Mischung? | KA-1 | C1 als Grundbild, Aktivierung aus C2 nur beim Hover | **C2 Nervenbahnen** — Nikinger 2026-10-16 |
 | D-2 | Einklappen der Karte (§2.5): verwerfen oder P11? | KA-4 | verwerfen | offen |
 | D-3 | Zielwerte Performance und welcher Weg für `/overview` | PF-1–PF-3, PF-5 | Ziele nach M1/M2 festlegen; Vorschlag zum Start: `/overview` serverseitig ≤ 300 ms bei Live-Last, Space-Wechsel gefühlt ≤ 1 s über die Domain | offen |
 | D-4 | Editor: Stufe 1 bauen (hebt P5-U auf)? Stufe 2 (elfte Öffnung)? | ED-1–ED-3 | Stufe 1 ja, mit Rohmodus; Stufe 2 nein | offen |
@@ -185,13 +185,13 @@ Antworten werden hier **mit Datum** eingetragen; erst dann wird das „Ziel" der
 | D-14 | Vision-Modell: Ersatz testen oder CT 111 stilllegen? | BT-11 | eine Frage bekannter Antwort an einen Kandidaten; fällt sie, stilllegen | offen |
 | D-15 | Übergangsfenster wieder befristen — wann? | BT-5 | Test am 2026-11-02, danach Datum setzen | offen |
 | D-16 | `created_by` (elfte Öffnung)? | RE-7 | nein | offen |
-| D-17 | Ledger-Urteile: BT-10, BT-13, PA-5, UI-4, RE-1, RE-3–RE-6, LG-1–LG-5, LG-7–LG-9, DO-2, DO-3 | s. Zeilen | je Zeile in der Spalte „Ziel" | offen |
+| D-17 | Ledger-Urteile: BT-10, PA-5, UI-4, RE-1, RE-3–RE-6, LG-1–LG-5, LG-7–LG-9, DO-2, DO-3 | s. Zeilen | je Zeile in der Spalte „Ziel" | offen |
 | D-18 | Altlasten: P6/P6.5 mit späteren Belegen schließen, Rest als Termin führen, P9-⚠️ als ausreichend bestätigen? | AL-1, AL-2, AL-4, AL-5 | ja | offen |
 
 ## Bilanz (Entwurf, 2026-10-16)
 
 **76 Zeilen** in elf Themen (BT 13 · PF 6 · PA 7 · KA 5 · ED 5 · UI 7 · RE 7 · BG 3 · LG 11 · AL 7 · DO 5). Nach dem **ersten** Ziel
 der Spalte: **P10.5 37** (davon 3 mit Alternative „oder P11"/„oder Fleet") · **P10 11** (Messung, Probe oder Prüfung) · **P11 7** ·
-**verworfen 7** (alles Empfehlungen) · **Termin 4** · **Wissen 4** · **erledigt 2** · **ohne Ziel 4** (RE-5 und AL-4 warten auf eine
-Entscheidung, BT-13 auf eine Antwort, AL-7 hängt an BT-3). Gezählt per Skript über die Ziel-Spalte, nicht von Hand; die verbindliche
+**verworfen 7** (alles Empfehlungen) · **Termin 4** · **Wissen 5** · **erledigt 2** · **ohne Ziel 3** (RE-5 und AL-4 warten auf eine
+Entscheidung, AL-7 hängt an BT-3). Gezählt per Skript über die Ziel-Spalte, nicht von Hand; die verbindliche
 Bilanz entsteht erst nach §12.

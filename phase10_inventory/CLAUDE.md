@@ -9,7 +9,7 @@ down:
   - ../docs/concepts/phase10_inventory_plan.md    # Plan: Locks P10-A–H, Steps, Messungen M1–M7, Abnahme P10-1–12, V195–V206
   - ../docs/concepts/phase10_intake.md            # Sammelstelle (Herkunft), Fleet-Notizen §5–§7
   - ../docs/concepts/PHASE9_CLOSEOUT_HANDOVER.md  # Vorphase, §4 Posten, [VERIFY]-Erbe
-updated: 2026-10-16 (angelegt — Phase 10 begonnen; Step 0 ✅, Step 1 Register-Entwurf ✅, Karten-Entwurf C gewählt)
+updated: 2026-10-16 (Plan finalisiert: D-1b = C2, V199 in die Exec-Session, BT-13 beantwortet; Nachtrag im Session-Block) | 2026-10-16 (angelegt — Phase 10 begonnen; Step 0 ✅, Step 1 Register-Entwurf ✅, Karten-Entwurf C gewählt)
 ---
 # Phase 10 — Bestandsaufnahme
 
@@ -25,16 +25,14 @@ updated: 2026-10-16 (angelegt — Phase 10 begonnen; Step 0 ✅, Step 1 Register
 | 0 | Verifikations-Durchlauf (Doku ↔ Code, Links, INDEX, Oversize) | ✅ 2026-10-16 — `doc_health` 0; drei Heads über dem Softcap benannt (DO-1); Drift ins Register (Plan §1) |
 | 1 | Register-Entwurf, je Zeile ein Anker am Code | ✅ Entwurf 2026-10-16 — 76 Zeilen in elf Themen, D-1–D-18; bleibt offen für die `[VERIFY]` aus Step 2 |
 | 2 | Messungen und Proben M1–M7 (Plan §4) | ⬜ — M1 braucht den Browser des Nikingers (beide Eingänge), M2–M7 Claude Code gegen eine Wegwerf-Instanz |
-| 3 | Entscheidungen D-1–D-18 (Register §12) | 🟡 — **D-1 entschieden: C (Gehirnkarte)**; D-1b (Stil C1/C2/C3) und der Rest offen |
-| 4 | Plan P10.5 | ⬜ — beginnt, wenn D-1b, D-3, D-4, D-8 stehen |
+| 3 | Entscheidungen D-1–D-18 (Register §12) | 🟡 — **D-1 = C (Gehirnkarte), D-1b = C2 Nervenbahnen** (2026-10-16); D-2–D-18 offen |
+| 4 | Plan P10.5 | ⬜ — beginnt, wenn D-3, D-4, D-8 stehen |
 | Z | Closeout P10: Register-Freigabe (Tor), Bilanz | ⬜ |
 
 ## Offen beim Nikinger
 
-- **D-1b** — Stil der Gehirnkarte: C1 Flächen · C2 Nervenbahnen · C3 Höhenlinien (`docs/concepts/phase10_karte_c_stil_{1,2,3}.svg`).
-- **M1** — Ladezeiten im eigenen Browser über Domain **und** Funnel (Anleitung: Plan §4, M1); kein HAR ins Repo.
-- **V199** — `curl localhost:2019/config/` auf der VPS, bevor die Caddy-Vorlage nachzieht (BT-1, dringend).
-- **BT-13** — wurde am 2026-09-04 ein Agent im echten Datenverzeichnis gestartet (`savefyx-data/.git/opencode`)?
+- **M1** — Ladezeiten im eigenen Browser über Domain **und** Funnel, wie in Plan §4 (M1) beschrieben (bestätigt 2026-10-16); kein HAR ins Repo.
+- **V199** — in der Exec-Session (P10.5 Block 1): `curl localhost:2019/config/` auf der VPS, unmittelbar bevor die Caddy-Vorlage nachzieht (BT-1).
 - Die übrigen Entscheidungen D-2–D-18 mit Empfehlung: Register §12.
 
 ## Session stopped — 2026-10-16 (erster Block: Phase 10 begonnen — Register-Entwurf, Plan, Karten-Entwürfe; kein Produktcode)
@@ -54,5 +52,9 @@ Loopback-Redirect ab (PA-1). Root-`CLAUDE.md` nannte im `down:` noch P8.6 als ak
 Produktcode-Diff (P10-11). Karten-SVGs mit headless Chromium gerendert und angesehen; Vorschau-Seite (privat):
 `https://claude.ai/artifact/Grr7UELUVeh5BecbU239cQ`.
 
-**Nächster Schritt.** Step 2 und 3 parallel: M2–M7 baut und fährt Claude Code (Wegwerf-Instanz, Port 8799); der Nikinger misst M1,
-liest V199 und beantwortet D-1b. Danach Step 4 (Plan P10.5).
+**Nachtrag 2026-10-16 — Plan finalisiert** (Auftrag „only finalize the plan", kein Step 2 in dieser Session). Antworten des
+Nikingers: D-1b = **C2 Nervenbahnen**; M1 wie vorgeschlagen; V199 erst in der Exec-Session; BT-13 beantwortet (ja, versehentlich — die
+Repo-Auswahl in opencode laggt, Klicks landen daneben); Push freigegeben.
+
+**Nächster Schritt.** Step 2 und 3 parallel: M2–M7 baut und fährt Claude Code (Wegwerf-Instanz, Port 8799); der Nikinger misst M1
+nach Plan §4. V199 wandert in die Exec-Session (P10.5 Block 1). Danach Step 4 (Plan P10.5).

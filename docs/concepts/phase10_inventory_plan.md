@@ -9,10 +9,13 @@ down:
   - ../../phase10_inventory/CLAUDE.md               # Phase-Head, Modulstatus, Session-Block
   - ./phase10_intake.md                             # Sammelstelle, Herkunft
   - ./PHASE9_CLOSEOUT_HANDOVER.md                   # Herkunft §4, [VERIFY]-Erbe
-  - ./phase10_karte_c_stil_1.svg                    # Karte: Stile C1–C3 der gewählten Gehirnkarte (D-1b); erste Runde phase10_karte_entwurf_{a,b,c}.svg
-updated: 2026-10-16 (angelegt — Planungssession Claude Code/Opus nach den vier Grundsatzantworten des Nikingers)
+  - ./phase10_karte_c_stil_2.svg                    # Karte: der gewählte Stil C2 (D-1b); Geschwister c_stil_{1,3}, erste Runde phase10_karte_entwurf_{a,b,c}.svg
+updated: 2026-10-16 (final: Status-Zeile; P10-D trägt den Stil C2 Nervenbahnen (D-1b); V199 in P10.5 Block 1; Step-4-Bedingung ohne D-1b; M6 auf M–L) | 2026-10-16 (angelegt — Planungssession Claude Code/Opus nach den vier Grundsatzantworten des Nikingers)
 ---
 # Phase 10 — Bestandsaufnahme (Plan)
+
+> **Status: final** (2026-10-16, Nikinger-Auftrag „only finalize the plan"): keine weiteren Planänderungen, P10 setzt mit Step 2 fort.
+> Das Register-Tor (P10-8) ist davon getrennt und bleibt offen.
 
 > **Auftrag in einem Satz:** P10 sammelt jede offene Baustelle, misst, was gemessen werden muss, holt die Entscheidungen des Nikingers
 > ein und schreibt daraus den ausführungsreifen Plan für **P10.5** — **ohne eine Zeile Produktcode**. Das Bild des Nikingers (2026-10-08):
@@ -28,7 +31,7 @@ updated: 2026-10-16 (angelegt — Planungssession Claude Code/Opus nach den vier
 | **P10-A** | **Zweiteilung bestätigt.** P10 = Bestandsaufnahme (Register, Messungen, Entscheidungen, Plan P10.5), **kein Produktcode**. P10.5 = Ausführung. **Tor:** P10.5 beginnt erst, wenn der Nikinger das Register freigegeben hat (P10-8). | Nikinger 2026-10-16 (Rückfrage), intake §1 |
 | **P10-B** | **Das Register lebt, der Plan nicht.** `phase10_inventory/BAUSTELLENREGISTER.md` ist 📗 und trägt Register **und** Entscheidungsliste (§12 dort); dieser Plan ist ein 📕-Snapshot und verweist nur. Jede Baustelle steht genau einmal im Register, mit stabiler ID (Themenkürzel + Nummer, z. B. `PA-1`). | Konvention 📕 „never edit" |
 | **P10-C** | **Anbieter-Unabhängigkeit ist Phasenziel**, auf Server-/Connector-Ebene: jeder standardkonforme MCP-Client kann sich verbinden. Es blockiert keinen Step, nur den **Abschluss von P10.5**; Abnahme: ein Nicht-Claude-Client führt `list_spaces` live über die echte Adresse aus. Modell-Routing bleibt Client-Seite (frühestens P11), nie im Server (Kernprinzip). **Bestätigt ist der Umfang, nicht der Eingriff:** der konkrete Eingriff in `phase4_auth/` (Sicherheitscode außerhalb der Phase) wird dem Nikinger mit dem P10.5-Plan vorgelegt; erst dessen Freigabe gilt als OK. In P10 wird nichts gebaut. | Nikinger 2026-10-16 |
-| **P10-D** | **Karten-Umbau:** Stil (p8x §2.2), Layout über den Reload merken, Interaktion (Suche, Filter, Titel), „etwas gehirnartiger". **Form: C, die Gehirnkarte** (D-1, entschieden 2026-10-16 aus drei Entwürfen); den Stil innerhalb C wählt der Nikinger aus C1 Flächen, C2 Nervenbahnen, C3 Höhenlinien (D-1b). Einklappen (§2.5) ist **nicht** gewählt. Datenquelle bleibt `GET /api/v1/graph` mit seinen neun Feldern; ein zehntes wäre eine eigene Entscheidung. | Nikinger 2026-10-16 |
+| **P10-D** | **Karten-Umbau:** Stil (p8x §2.2), Layout über den Reload merken, Interaktion (Suche, Filter, Titel), „etwas gehirnartiger". **Form: C, die Gehirnkarte** (D-1, entschieden 2026-10-16 aus drei Entwürfen); **Stil: C2 Nervenbahnen** (D-1b, 2026-10-16) — Lappen als Kontur mit leiser Innenlinie, Bahnen geschwungen, Knoten als Zellen, ein Fokus aktiviert erste und zweite Nachbarn; Ruhezustand voll deckend, Abdunkeln nur bei Hover oder Treffer (P8 §0.3 Nr. 6). Einklappen (§2.5) ist **nicht** gewählt. Datenquelle bleibt `GET /api/v1/graph` mit seinen neun Feldern; ein zehntes wäre eine eigene Entscheidung. | Nikinger 2026-10-16 |
 | **P10-E** | **Ausführer P10.5 = M3 Thinking über opencode**; M3.1 Preview (max) nur gezielt für CSS-/Darstellungsblöcke; ein Modell-Trailer je Commit. Der P10.5-Plan wird für einen Ausführer geschrieben, der nicht geplant hat: exakte Namen, Anker, Testlisten, Rückgabe-Auslöser (P8.5-O). | Nikinger 2026-10-16, Handover §4.9 |
 | **P10-F** | **Messen vor Bauen.** Messanordnung und Zielwerte entstehen in P10 (Step 2/3), nicht nach dem Bau. Kein HAR-Export ins Repo — er trägt Cookie und CSRF-Token (Hard Rule 1); Messwerte stehen als Tabelle. | intake §2.1 |
 | **P10-G** | **Nummerierung.** Locks `P10-A…`, Abnahme `P10-1…`, `[VERIFY]` ab **V195**; V167–V172 bleiben reserviert und unbelegt. Steps tragen Ziffern (0–4, Z), damit kein Lock-Buchstabe mit einem Step kollidiert. P10.5 setzt fort: `P10.5-A…`, `P10.5-1…`, nächstes freies V. | Memory „second-pass plan", P8.6-W |
@@ -89,7 +92,7 @@ neue Fähigkeit vordenken (P11) · nicht in Sharefyx-Items schreiben.
 | **Z** | Closeout P10: Register-Freigabe (Tor), Bilanz, ROADMAP | Nikinger + Claude Code | P10-1–P10-12 erfüllt, §8 dieses Plans gefüllt |
 
 **Reihenfolge:** Step 3 darf parallel zu Step 2 laufen; nur D-3 (Zielwerte) wartet auf M1/M2 und D-4 (Editor) auf M7. Step 4 beginnt erst,
-wenn D-1b, D-3, D-4 und D-8 entschieden sind — sie bestimmen den Blockschnitt (D-1 ist seit 2026-10-16 entschieden: C).
+wenn D-3, D-4 und D-8 entschieden sind — sie bestimmen den Blockschnitt (D-1 = C und D-1b = C2 sind seit 2026-10-16 entschieden).
 
 ## §4 Messungen und Proben (Step 2)
 
@@ -104,7 +107,7 @@ Repos in `~/.claude-code-tools/` (Playwright: `e2e-venv`).
 | **M3** | Was schickt ein Nicht-Claude-Client, und woran scheitert er heute? | opencode isoliert installieren, gegen die Wegwerf-Instanz `opencode mcp auth` / `opencode mcp debug`; ein kleiner protokollierender Proxy davor hält den DCR-Request fest (`application_type`, `redirect_uris`, `token_endpoint_auth_method`). **Erwartet: rot** (`invalid_client_metadata` oder `invalid_redirect_uri`). Optional M3b: einen Client mit Loopback-Redirect direkt in die Wegwerf-`auth.sqlite3` schreiben und mit `oauth.clientId` bis `initialize` kommen — liefert die ausgehandelte Protokollversion | Register PA-1/PA-7, V195, V198 | PA-1, PA-5, PA-7 |
 | **M4** | Reproduziert BG-1 in `v3.1.4`? | Playwright: `/api/v1/overview` per Route verzögern, „Spaces verwalten" sofort öffnen, Liste zählen | Register BG-1, V202 | BG-1 |
 | **M5** | Halten P9-124 und P9-127 im Browser? | Playwright mit zwei Principalen (Muster aus `docs/concepts/sichtpruefung_automation_conventions.md`): Konfliktkopie landet im Space des Konflikt-Items; Enter in den sieben unbelegten Overlays. Jede Station mit Gegenlauf | `phase10_inventory/probes/` + Matrix-Nachtrag im Register | BG-2, BG-3 |
-| **M6** | Wo liegt die Karte heute (Regressionsgrenze für KA-1), und was kostet die Gehirnkarte? | vorhandener `p8_22_smoke.py` gegen 200 Knoten: Settle-Ticks, Settle-Zeit, Zeichenzeit je Frame. Dazu ein Prototyp der Lappen-Berechnung (Raster × nächster Knoten, Erosion, Kontur) bei 200 Knoten: einmal nach dem Einschwingen gegen je Frame — davon hängt die Größe „M" von KA-1 ab | Register KA-1 | KA-1 |
+| **M6** | Wo liegt die Karte heute (Regressionsgrenze für KA-1), und was kostet die Gehirnkarte? | vorhandener `p8_22_smoke.py` gegen 200 Knoten: Settle-Ticks, Settle-Zeit, Zeichenzeit je Frame. Dazu ein Prototyp der Lappen-Berechnung (Raster × nächster Knoten, Erosion, Kontur) bei 200 Knoten: einmal nach dem Einschwingen gegen je Frame — davon hängt die Größe „M–L" von KA-1 ab (Stil C2) | Register KA-1 | KA-1 |
 | **M7** | Welche Editor-Bibliothek trägt Stufe 1 ohne Build-Schritt? | zwei bis drei Kandidaten in einer Scratchpad-Seite: Größe (minifiziert), Laden als einzelne vendorte Datei ohne Bundler (P5-T), Markdown-Roundtrip verlustfrei über 10 synthetische Fixtures (Listen, Tabellen, Code, Links, `itm_…`-Referenzen, Frontmatter unberührt), Tastatur | `phase10_inventory/messung/M7_editor.md` | ED-1, V201 |
 
 ## §5 Abnahme P10
@@ -134,7 +137,7 @@ Repos in `~/.claude-code-tools/` (Playwright: `e2e-venv`).
 | **V196** | Laut OpenAI-Doku (primär) unterstützt ChatGPT `none` mit PKCE und `private_key_jwt` und bevorzugt CIMD; Callback `https://chatgpt.com/connector_platform_oauth_redirect` oder `…/connector/oauth/{callback_id}`. Offen: was ChatGPT per DCR anfragt, wenn der AS nur `none` anbietet | nur wenn D-8 ChatGPT einschließt |
 | **V197** | Blockiert Chromium den Loopback-Redirect nach dem Login, solange `form-action` ihn nicht nennt (Klasse des P4-Live-Funds 8c)? | P10.5, Gegenlauf im Browser |
 | **V198** | Welche Protokollversion handelt live `mcp 1.30.0` aus, und greift beim Abnahme-Client die Rückwärtskompatibilität zu handshake-basierten Servern (`2025-11-25`), die die Spec 2026-07-28 beschreibt? | M3b |
-| **V199** | Trägt die Live-Config auf der VPS genau die Fleet-Werte (`dial_timeout 10s`, `lb_try_duration 15s`, `lb_try_interval 1s`)? Der Nikinger liest `curl localhost:2019/config/` auf der VPS, bevor die Vorlage nachzieht | Step 2 (Nikinger) |
+| **V199** | Trägt die Live-Config auf der VPS genau die Fleet-Werte (`dial_timeout 10s`, `lb_try_duration 15s`, `lb_try_interval 1s`)? Der Nikinger liest `curl localhost:2019/config/` auf der VPS, bevor die Vorlage nachzieht | P10.5 Block 1, unmittelbar vor der Vorlagen-Änderung (Nikinger, Exec-Session — Entscheidung 2026-10-16) |
 | **V200** | Endet `socat` bei SIGTERM reproduzierbar mit 143, und wirkt `SuccessExitStatus=143` ohne Relay-Neustart? (Fleet hat es gemessen, hier nicht nachgemessen) | P10.5, Wegwerf-Unit oder Nikinger |
 | **V201** | Läuft eine Editor-Bibliothek ohne Build-Schritt, passt sie ins `ui_budget` (≤ 250 KB gesamt), und ist der Markdown-Roundtrip verlustfrei? | M7 |
 | **V202** | Reproduziert BG-1 (leere Space-Liste) in `v3.1.4`? | M4 |
@@ -152,12 +155,12 @@ Reihenfolge nach Risiko, das Dringende zuerst, das Größte zuletzt:
 
 | Block | Inhalt (Register) | Größe | Notiz |
 |---|---|---|---|
-| 1 Betrieb | BT-1, BT-2, BT-6, BT-11, LG-5 | S | BT-1 ist der einzige dringende Posten |
+| 1 Betrieb | BT-1, BT-2, BT-6, BT-11, LG-5 | S | BT-1 ist der einzige dringende Posten; V199 liest der Nikinger direkt davor |
 | 2 Fehler + Parität | BG-1, RE-1, RE-2 | S | nach den Proben aus M4/M5 |
 | 3 Performance | PF-1, PF-4, ggf. PF-3 | M | Abnahme mit dem M2-Instrument und gegen die Zielwerte aus D-3 |
 | 4 Anbieter | PA-1, PA-2, ggf. PA-3, PA-6 | M | `phase4_auth/` — Sicherheitscode; Live-Abnahme PA-7 durch den Nikinger am Phasenende |
 | 5 Darstellung | UI-1, UI-2, UI-3, UI-5, UI-6, KA-5 | M | M3.1 gezielt (P10-E) |
-| 6 Karte | KA-1, KA-2, KA-3 | M–L | gegen die M6-Baseline |
+| 6 Karte | KA-1, KA-2, KA-3 | M–L | Stil C2; gegen die M6-Baseline |
 | 7 Editor | ED-1, ED-2, ED-5 | L | eigener Mini-Plan, wenn D-4 „ja" sagt |
 | 8 Doku + Altlasten | DO-1, DO-2, DO-3, LG-6, AL-* | S | zuletzt, damit die Doku den Endstand zeigt |
 
