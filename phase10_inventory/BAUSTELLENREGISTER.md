@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase10_inventory_plan.md    # Plan P10: Locks, Steps, Messungen M1–M8, Abnahme, [VERIFY]
   - ../docs/concepts/phase10_intake.md            # Sammelstelle — Herkunft von §2/§3/§5–§7
   - ../docs/concepts/PHASE9_CLOSEOUT_HANDOVER.md  # Herkunft §4.1–§4.10
-updated: 2026-10-18 (M2 gemessen — PF-1/PF-2 tragen die Grundlinie, Instrument + 3 Wächter im Repo) | 2026-10-18 (alle Entscheidungen D-1–D-18 eingetragen, Ziel-Spalte gesetzt, Bilanz per Skript neu gezählt) | 2026-10-16 (finalisiert mit den Antworten des Nikingers: D-1b = C2 Nervenbahnen, BT-13 beantwortet, V199 in die Exec-Session; Bilanz per Skript nachgezählt) | 2026-10-16 (angelegt — Entwurf aus allen Quellen, jede Zeile am Code verankert; Stand vor der Freigabe durch den Nikinger)
+updated: 2026-10-18 (M4 gefahren — BG-1 reproduziert, Gegenlauf 2/2; M2 gemessen — PF-1/PF-2 tragen die Grundlinie, Instrument + 3 Wächter im Repo) | 2026-10-18 (alle Entscheidungen D-1–D-18 eingetragen, Ziel-Spalte gesetzt, Bilanz per Skript neu gezählt) | 2026-10-16 (finalisiert mit den Antworten des Nikingers: D-1b = C2 Nervenbahnen, BT-13 beantwortet, V199 in die Exec-Session; Bilanz per Skript nachgezählt) | 2026-10-16 (angelegt — Entwurf aus allen Quellen, jede Zeile am Code verankert; Stand vor der Freigabe durch den Nikinger)
 ---
 # Phase 10 — Baustellenregister
 
@@ -120,7 +120,7 @@ P10 Step 2) · Wissen (kein Bau, nur festgehalten) · erledigt (mit Beleg). „E
 
 | ID | Posten | Herkunft | Befund am Code / Stand | Gr. | Risiko | Entsch. | Ziel |
 |---|---|---|---|---|---|---|---|
-| BG-1 | Space-Liste bleibt leer, wenn „Spaces verwalten" vor `loadOverview()` geöffnet wird | P9 Block R | `spaces.js` liest `state.spaces`, das erst `list.js :: loadOverview()` füllt; `spaces.js:214` lädt nur in einem Pfad nach · V202 | S | — | nein | P10 (M4) → P10.5 |
+| BG-1 | Space-Liste bleibt leer, wenn „Spaces verwalten" vor `loadOverview()` geöffnet wird | P9 Block R | `spaces.js` liest `state.spaces`, das erst `list.js :: loadOverview()` füllt; `spaces.js:214` lädt nur in einem Pfad nach · V202 · **[2026-10-18, M4] reproduziert** (Wegwerf 8799, `probes/p10_m4_bg1_probe.py` + `p10_m4_bg1.json`): `/overview` um 4 s verzögert, Panel sofort geöffnet → **0 Zeilen**; nachdem die verzögerte Antwort geliefert hat → **weiterhin 0** (kein Nachziehen); Panel zu/auf → **2** (alpha + gamma). Gegenlauf ohne Verzögerung → **2**. Befund trägt damit in `v3.1.4`-Code; Fix in P10.5 Block 2 | S | — | nein | P10 (M4 ✅) → P10.5 |
 | BG-2 | P9-124 ⚠️ — Konfliktkopie im Browser nie gefahren | Matrix | `dialogs.js` setzt `payload.space` aus `state.conflictCurrent.space` | S | S | nein | P10 (M5) |
 | BG-3 | P9-127 ⚠️ — Enter nur für vier von elf Overlays im Browser belegt | Matrix | `app.js :: enterTable()` + `SETTINGS_ENTER` | S | — | nein | P10 (M5) |
 

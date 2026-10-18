@@ -1,0 +1,13 @@
+{
+  "probe": "p10_m4_bg1",
+  "expected_writable_spaces": 2,
+  "delayed_path": {
+    "count_on_open": 0,
+    "count_after_delay_resolved": 0,
+    "count_after_reopen": 2
+  },
+  "immediate_path": {
+    "count_on_open": 2
+  },
+  "bg1_reproduced": true
+}
