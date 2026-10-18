@@ -1,6 +1,6 @@
 ---
 status: snapshot
-purpose: Plan Phase 10 (Bestandsaufnahme) gegen main@0a7aaf4 — gelockte Entscheidungen P10-A–P10-H, Steps 0–4/Z, Messanordnung M1–M7, Abnahme P10-1–P10-12, [VERIFY] V195–V206, unverbindliche Vorschau auf den Blockschnitt von P10.5. Das Register selbst steht nicht hier, sondern lebend in phase10_inventory/BAUSTELLENREGISTER.md.
+purpose: Plan Phase 10 (Bestandsaufnahme) gegen main@0a7aaf4 — gelockte Entscheidungen P10-A–P10-J, Steps 0–4/Z, Messanordnung M1–M8, Abnahme P10-1–P10-12, [VERIFY] V195–V206, Entscheidungen 2026-10-18 (§0.2), unverbindliche Vorschau auf den Blockschnitt von P10.5. Das Register selbst steht nicht hier, sondern lebend in phase10_inventory/BAUSTELLENREGISTER.md.
 read-when: vor jeder P10-Arbeit; vor dem Entwurf des P10.5-Plans (Step 4)
 detail: L2
 up: ../../ROADMAP.md
@@ -10,7 +10,7 @@ down:
   - ./phase10_intake.md                             # Sammelstelle, Herkunft
   - ./PHASE9_CLOSEOUT_HANDOVER.md                   # Herkunft §4, [VERIFY]-Erbe
   - ./phase10_karte_c_stil_2.svg                    # Karte: der gewählte Stil C2 (D-1b); Geschwister c_stil_{1,3}, erste Runde phase10_karte_entwurf_{a,b,c}.svg
-updated: 2026-10-16 (final: Status-Zeile; P10-D trägt den Stil C2 Nervenbahnen (D-1b); V199 in P10.5 Block 1; Step-4-Bedingung ohne D-1b; M6 auf M–L) | 2026-10-16 (angelegt — Planungssession Claude Code/Opus nach den vier Grundsatzantworten des Nikingers)
+updated: 2026-10-18 (Nachtrag §0.2: Entscheidungen, Locks P10-I/P10-J, M8, V206 beantwortet, §7 neu geschnitten) | 2026-10-16 (final: Status-Zeile; P10-D trägt den Stil C2 Nervenbahnen (D-1b); V199 in P10.5 Block 1; Step-4-Bedingung ohne D-1b; M6 auf M–L) | 2026-10-16 (angelegt — Planungssession Claude Code/Opus nach den vier Grundsatzantworten des Nikingers)
 ---
 # Phase 10 — Bestandsaufnahme (Plan)
 
@@ -36,6 +36,20 @@ updated: 2026-10-16 (final: Status-Zeile; P10-D trägt den Stil C2 Nervenbahnen 
 | **P10-F** | **Messen vor Bauen.** Messanordnung und Zielwerte entstehen in P10 (Step 2/3), nicht nach dem Bau. Kein HAR-Export ins Repo — er trägt Cookie und CSRF-Token (Hard Rule 1); Messwerte stehen als Tabelle. | intake §2.1 |
 | **P10-G** | **Nummerierung.** Locks `P10-A…`, Abnahme `P10-1…`, `[VERIFY]` ab **V195**; V167–V172 bleiben reserviert und unbelegt. Steps tragen Ziffern (0–4, Z), damit kein Lock-Buchstabe mit einem Step kollidiert. P10.5 setzt fort: `P10.5-A…`, `P10.5-1…`, nächstes freies V. | Memory „second-pass plan", P8.6-W |
 | **P10-H** | **Tabu in P10:** Produktcode aller Phasen (`phase1_storage/` bis `phase9_hardening/`, ohne deren `.md`) und die Units bleiben unverändert. Erlaubt: Doku, Proben und Messskripte unter `phase10_inventory/` samt Tests dafür, Werkzeuge außerhalb des Repos (`~/.claude-code-tools/`). Prüfkommando: P10-11. | intake §1 |
+
+### §0.2 Entscheidungen vom 2026-10-18 (Nachtrag auf Nikinger-Auftrag „work them into the plan")
+
+Alle D-1–D-18 sind beantwortet; die Antworten stehen je Zeile im Register §12. Zwei davon werden hier zu Locks:
+
+| Lock | Entscheidung | Herkunft |
+|---|---|---|
+| **P10-I** | **Niemand verschiebt je ein Item in den Home-Space eines anderen** — das zählt wie Löschen dort als destruktive Aktion. Verschieben in Team-Spaces mit `write:` bleibt erlaubt (P6-AE, P9-BP). P10.5 belegt per Probe, dass Web **und** MCP es durchsetzen. | Nikinger 2026-10-18 (RE-5) |
+| **P10-J** | **Abnahme des Phasenziels P10-C:** opencode verbindet sich live und führt `list_spaces` aus — einmal mit M3, einmal mit einem zweiten Modellanbieter (Kandidat z.ai GLM Free Tier, `[VERIFY]` in M3). Der MCP-Server sieht in beiden Läufen denselben Client; der Modellanbieter ist Client-Seite. ChatGPT wird nicht geplant (kein eigenes Abo, keine Planung auf andere Nutzer); CIMD → P11. | Nikinger 2026-10-18 (D-8) |
+
+**Umfang von P10.5 nach den Antworten** (größer als die Sammelstelle vorsah — Befund, keine Abweichung): zusätzlich **FastMCP 4 /
+MCP 2026-07-28** (PA-5), **Realtime** (LG-2), **Bulk-Append-Werkzeug** (LG-4), **Space umbenennen** (RE-3), **Editor Stufe 2** (ED-3,
+P1-Öffnung Dateiformat) und **`created_by`** (RE-7, P1-Öffnung). P5-U ist datiert aufgehoben (D-4). Die Grenze „neue Fähigkeit = P11"
+aus intake §4 war ein Vorschlag; der Nikinger hat diese Posten bewusst nach P10.5 gezogen.
 
 ### §0.1 Was P10 ausdrücklich nicht tut
 
@@ -108,6 +122,7 @@ Repos in `~/.claude-code-tools/` (Playwright: `e2e-venv`).
 | **M4** | Reproduziert BG-1 in `v3.1.4`? | Playwright: `/api/v1/overview` per Route verzögern, „Spaces verwalten" sofort öffnen, Liste zählen | Register BG-1, V202 | BG-1 |
 | **M5** | Halten P9-124 und P9-127 im Browser? | Playwright mit zwei Principalen (Muster aus `docs/concepts/sichtpruefung_automation_conventions.md`): Konfliktkopie landet im Space des Konflikt-Items; Enter in den sieben unbelegten Overlays. Jede Station mit Gegenlauf | `phase10_inventory/probes/` + Matrix-Nachtrag im Register | BG-2, BG-3 |
 | **M6** | Wo liegt die Karte heute (Regressionsgrenze für KA-1), und was kostet die Gehirnkarte? | vorhandener `p8_22_smoke.py` gegen 200 Knoten: Settle-Ticks, Settle-Zeit, Zeichenzeit je Frame. Dazu ein Prototyp der Lappen-Berechnung (Raster × nächster Knoten, Erosion, Kontur) bei 200 Knoten: einmal nach dem Einschwingen gegen je Frame — davon hängt die Größe „M–L" von KA-1 ab (Stil C2) | Register KA-1 | KA-1 |
+| **M8** | Gibt es ein lokales Vision-Modell, das Sichtprüfungen trägt (BT-11, D-14)? | Recherche in Claude Code: Liste von **4** Kandidaten, die auf der RTX 3060 (12 GB) laufen; Test gegen **5** sehr verschiedene, gemeine Screenshots (echte UI-Bilder aus `docs/screenshots/` und gebaute Fallen: Beinahe-Duplikate, Farbnuancen, leere Flächen, überlappende Panels, falsche Markierung), je **eine** Frage mit bekannter Antwort. Ein Modell, das eine bekannte Antwort verneint, fällt. Fällt jedes → CT 111 stilllegen | `phase10_inventory/messung/M8_vision.md` | BT-11 |
 | **M7** | Welche Editor-Bibliothek trägt Stufe 1 ohne Build-Schritt? | zwei bis drei Kandidaten in einer Scratchpad-Seite: Größe (minifiziert), Laden als einzelne vendorte Datei ohne Bundler (P5-T), Markdown-Roundtrip verlustfrei über 10 synthetische Fixtures (Listen, Tabellen, Code, Links, `itm_…`-Referenzen, Frontmatter unberührt), Tastatur | `phase10_inventory/messung/M7_editor.md` | ED-1, V201 |
 
 ## §5 Abnahme P10
@@ -122,7 +137,7 @@ Repos in `~/.claude-code-tools/` (Playwright: `e2e-venv`).
 | **P10-4** | M1 gemessen (beide Eingänge, je 3 Läufe, 4 Szenarien) und Zielwerte entschieden (D-3) | `messung/M1_browser.md`, Register §12 |
 | **P10-5** | M2 als Instrument im Repo; drei Aufrufe nacheinander liegen im Median innerhalb ±10 % | `probes/p10_overview_bench.py` + JSON |
 | **P10-6** | M3: der echte Registrierungs-Request eines Nicht-Claude-Clients ist festgehalten, die Ablehnung reproduziert | Register PA-1, V195 |
-| **P10-7** | M4–M7 gefahren; ein Ergebnis darf auch „reproduziert nicht" oder „Kandidat fällt" heißen | Register BG-*, KA-1, ED-1 |
+| **P10-7** | M4–M8 gefahren; ein Ergebnis darf auch „reproduziert nicht" oder „Kandidat fällt" heißen | Register BG-*, KA-1, ED-1 |
 | **P10-8** | **Tor:** der Nikinger hat das Register freigegeben (Datum im Register-Kopf) | Register |
 | **P10-9** | D-1–D-18 tragen eine datierte Antwort oder „vertagt bis …" | Register §12 |
 | **P10-10** | Plan P10.5 geschrieben: Locks, Blöcke, Abnahme je Block mit Probe und Gegenlauf, Rückgabe-Auslöser für M3, INDEX-Zeile | neuer Plan |
@@ -144,27 +159,31 @@ Repos in `~/.claude-code-tools/` (Playwright: `e2e-venv`).
 | **V203** | Prüft irgendein Wächter den **Funnel**-Pfad von außen? | Step 2 (Fleet-Repo lesen oder fragen) |
 | **V204** | Sind die Glyph-Entscheidungen P6/P6.5 durch P8 (nur Lucide-Sprite) gegenstandslos? | Step 2, `git log -S` über die betroffenen Glyphen |
 | **V205** | Welche der P6-Zeilen 7, 9, 14–17, 23, 25, 29, 30 lassen sich mit Belegen aus P7–P9 schließen? | Step 2, Abgleich mit P7/P9-Matrix |
-| **V206** | Sind O7 („leere Ordner überleben einen Move") und P6-Zeile 30 („leergewordener Ordner verschwindet aus dem Baum") dieselbe Frage? | Step 2, Code `store.move()` |
+| **V206** | ~~Sind O7 und P6-Zeile 30 dieselbe Frage?~~ **Beantwortet 2026-10-18: ja.** Seit P6-AF räumt `store.py:909 _cleanup_emptied_folders()` geleerte Quellordner ab (Ausnahme mit Absicht: Ordner mit `.share.yml`); offen ist nur der Nachweis von Zeile 30 | AL-1 |
 
 **Geerbt, offen:** V150 (zweites Konto, Termin) · V193 (Ordner umbenennen atomar) · V194 (Verweise auf einen Space-Namen) · V120
 (Tab-Titel). **Teilweise:** V157 (WebKit) · V162 B (ACL).
 
-## §7 Vorschau auf P10.5 (unverbindlich — der Schnitt entsteht in Step 4)
+## §7 Vorschau auf P10.5 (unverbindlich — der Schnitt entsteht in Step 4; Stand nach den Entscheidungen 2026-10-18)
 
-Reihenfolge nach Risiko, das Dringende zuerst, das Größte zuletzt:
+Reihenfolge nach Risiko, das Dringende zuerst, das Größte zuletzt. Blöcke mit „L" bekommen im P10.5-Plan je einen eigenen Mini-Plan.
 
 | Block | Inhalt (Register) | Größe | Notiz |
 |---|---|---|---|
-| 1 Betrieb | BT-1, BT-2, BT-6, BT-11, LG-5 | S | BT-1 ist der einzige dringende Posten; V199 liest der Nikinger direkt davor |
-| 2 Fehler + Parität | BG-1, RE-1, RE-2 | S | nach den Proben aus M4/M5 |
-| 3 Performance | PF-1, PF-4, ggf. PF-3 | M | Abnahme mit dem M2-Instrument und gegen die Zielwerte aus D-3 |
-| 4 Anbieter | PA-1, PA-2, ggf. PA-3, PA-6 | M | `phase4_auth/` — Sicherheitscode; Live-Abnahme PA-7 durch den Nikinger am Phasenende |
-| 5 Darstellung | UI-1, UI-2, UI-3, UI-5, UI-6, KA-5 | M | M3.1 gezielt (P10-E) |
-| 6 Karte | KA-1, KA-2, KA-3 | M–L | Stil C2; gegen die M6-Baseline |
-| 7 Editor | ED-1, ED-2, ED-5 | L | eigener Mini-Plan, wenn D-4 „ja" sagt |
-| 8 Doku + Altlasten | DO-1, DO-2, DO-3, LG-6, AL-* | S | zuletzt, damit die Doku den Endstand zeigt |
+| 1 Betrieb | BT-1, BT-2, BT-6 | S | BT-1 dringend; V199 liest der Nikinger direkt davor; nichts darf eurofyx-fleet stören |
+| 2 Fehler, Parität, Regel | BG-1, RE-1, RE-2, Probe zu P10-I | S | nach den Proben aus M4/M5 |
+| 3 Hygiene | LG-7, LG-8 | S | verwaiste Assets, EXIF entfernen |
+| 4 Performance | PF-1, PF-4, ggf. PF-3 | M | gegen das M2-Instrument und die Zielwerte aus D-3 |
+| 5 MCP-Schicht | PA-5 (FastMCP 4 / Spec 2026-07-28), LG-4 | L | zuerst, damit PA-1 auf der neuen Schicht gebaut wird |
+| 6 Anbieter | PA-1, PA-2, PA-6 | M | `phase4_auth/`; Live-Abnahme P10-J am Phasenende |
+| 7 Darstellung | UI-1–UI-6, KA-5 | M | Logo nach D-6-Entwurf; M3.1 gezielt (P10-E) |
+| 8 Karte | KA-1, KA-2, KA-3 | M–L | Stil C2; gegen die M6-Baseline |
+| 9 Rechte und Namen | RE-3, RE-4, RE-7 | L | Space/Ordner umbenennen (V193/V194), `created_by` (P1-Öffnung) |
+| 10 Suche und Realtime | LG-1, LG-2 | L | Body-Suche in der UI; Realtime ersetzt den 20-s-Poll |
+| 11 Editor | ED-1, ED-2, ED-3, ED-5 | L | Stufe 1 + 2 (P1-Öffnung Dateiformat); nach M7 |
+| 12 Doku + Altlasten | DO-1–DO-3, LG-6, AL-* | S | zuletzt, damit die Doku den Endstand zeigt |
 
-**Phasenabschluss P10.5** verlangt zusätzlich das Phasenziel aus P10-C (PA-7 live) — es blockiert keinen der Blöcke.
+**Phasenabschluss P10.5** verlangt zusätzlich P10-J (live) — es blockiert keinen der Blöcke.
 
 ## §8 Closeout P10 (wird in Step Z gefüllt)
 

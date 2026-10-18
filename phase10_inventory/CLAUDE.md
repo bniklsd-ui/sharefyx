@@ -9,7 +9,7 @@ down:
   - ../docs/concepts/phase10_inventory_plan.md    # Plan: Locks P10-A–H, Steps, Messungen M1–M7, Abnahme P10-1–12, V195–V206
   - ../docs/concepts/phase10_intake.md            # Sammelstelle (Herkunft), Fleet-Notizen §5–§7
   - ../docs/concepts/PHASE9_CLOSEOUT_HANDOVER.md  # Vorphase, §4 Posten, [VERIFY]-Erbe
-updated: 2026-10-16 (Plan finalisiert: D-1b = C2, V199 in die Exec-Session, BT-13 beantwortet; Nachtrag im Session-Block) | 2026-10-16 (angelegt — Phase 10 begonnen; Step 0 ✅, Step 1 Register-Entwurf ✅, Karten-Entwurf C gewählt)
+updated: 2026-10-18 (Step 3 ✅; zweiter Session-Block, erster nach SESSIONS_ARCHIVE rotiert) | 2026-10-16 (Plan finalisiert: D-1b = C2, V199 in die Exec-Session, BT-13 beantwortet; Nachtrag im Session-Block) | 2026-10-16 (angelegt — Phase 10 begonnen; Step 0 ✅, Step 1 Register-Entwurf ✅, Karten-Entwurf C gewählt)
 ---
 # Phase 10 — Bestandsaufnahme
 
@@ -24,8 +24,8 @@ updated: 2026-10-16 (Plan finalisiert: D-1b = C2, V199 in die Exec-Session, BT-1
 |---|---|---|
 | 0 | Verifikations-Durchlauf (Doku ↔ Code, Links, INDEX, Oversize) | ✅ 2026-10-16 — `doc_health` 0; drei Heads über dem Softcap benannt (DO-1); Drift ins Register (Plan §1) |
 | 1 | Register-Entwurf, je Zeile ein Anker am Code | ✅ Entwurf 2026-10-16 — 76 Zeilen in elf Themen, D-1–D-18; bleibt offen für die `[VERIFY]` aus Step 2 |
-| 2 | Messungen und Proben M1–M7 (Plan §4) | ⬜ — M1 braucht den Browser des Nikingers (beide Eingänge), M2–M7 Claude Code gegen eine Wegwerf-Instanz |
-| 3 | Entscheidungen D-1–D-18 (Register §12) | 🟡 — **D-1 = C (Gehirnkarte), D-1b = C2 Nervenbahnen** (2026-10-16); D-2–D-18 offen |
+| 2 | Messungen und Proben M1–M8 (Plan §4) | ⬜ — M1 braucht den Browser des Nikingers (beide Eingänge), M2–M8 Claude Code (Wegwerf-Instanz; M8 = Vision-Modelle, D-14) |
+| 3 | Entscheidungen D-1–D-18 (Register §12) | ✅ 2026-10-18 — **alle D-1–D-18 beantwortet** (Register §12); an Messungen hängen nur die Zielwerte (D-3 ← M1/M2) und das Vision-Modell (D-14 ← M8) |
 | 4 | Plan P10.5 | ⬜ — beginnt, wenn D-3, D-4, D-8 stehen |
 | Z | Closeout P10: Register-Freigabe (Tor), Bilanz | ⬜ |
 
@@ -33,28 +33,19 @@ updated: 2026-10-16 (Plan finalisiert: D-1b = C2, V199 in die Exec-Session, BT-1
 
 - **M1** — Ladezeiten im eigenen Browser über Domain **und** Funnel, wie in Plan §4 (M1) beschrieben (bestätigt 2026-10-16); kein HAR ins Repo.
 - **V199** — in der Exec-Session (P10.5 Block 1): `curl localhost:2019/config/` auf der VPS, unmittelbar bevor die Caddy-Vorlage nachzieht (BT-1).
-- Die übrigen Entscheidungen D-2–D-18 mit Empfehlung: Register §12.
+- **D-6** — Logo-Entwürfe („S" + Teilen-Zeichen) ansehen und wählen.
 
-## Session stopped — 2026-10-16 (erster Block: Phase 10 begonnen — Register-Entwurf, Plan, Karten-Entwürfe; kein Produktcode)
+## Session stopped — 2026-10-18 (zweiter Block: alle Entscheidungen D-1–D-18 eingeholt und eingearbeitet; kein Produktcode)
 
-**Ergebnis.** Vier Grundsatzantworten des Nikingers vorab eingeholt: Zweiteilung P10/P10.5 bestätigt (Register zuerst, P10.5-Plan
-danach), Anbieter-Unabhängigkeit auf Server-/Connector-Ebene, Karten-Umbau mit Stil + Layout merken + Interaktion („gehirnartiger"),
-Ausführer M3 Thinking. Geschrieben: das Register (76 Zeilen, jede mit Anker am Code), der P10-Plan, sechs Karten-SVGs (erste Runde A/B/C →
-**C gewählt**, zweite Runde C1–C3). Der „verlorene" Planungsprompt ist `docs/PROMPTS.md` Prompt 2 (Commit `0a7aaf4`, mit den drei
-Fleet-Notizen aus intake §5–§7).
+**Ergebnis.** Der Nikinger hat in fünf Fragerunden alle offenen Entscheidungen beantwortet; sie stehen je Zeile im Register §12 und
+haben die Ziel-Spalte gesetzt: **P10.5 39** · P10 9 · P11 4 · verworfen 6 · Wissen 6 · Termin 3 · erledigt 3 · an Fleet 2 · 4 ohne Bau
+(per Skript gezählt). Zwei neue Locks im Plan §0.2: **P10-I** (niemand verschiebt in den Home-Space eines anderen — destruktiv wie
+Löschen) und **P10-J** (Abnahme Anbieter-Ziel: opencode mit M3 **und** mit einem zweiten Modellanbieter). Neue Messung **M8**
+(4 Vision-Modelle × 5 gemeine Screenshots, D-14). V206 beantwortet: O7 = P6-Zeile 30, seit P6-AF gebaut.
 
-**Funde (alle im Register).** Die Caddy-Quelle `Caddyfile.template:65` hinkt dem Live-Fix nach (BT-1, dringend). Sieben Ledger-Posten
-fielen beim Übergang P8.6 → P9 ohne Schließvermerk aus der Kette (AL-1, AL-4, LG-7–LG-10, BT-10). Der Editor-Wunsch widerspricht dem
-gelockten P5-U (ED-1). MCP 2026-07-28 ist die aktuelle Spec-Version (nicht mehr RC wie in P8 §0.5 notiert) und führt DCR als *deprecated*; Sharefyx lehnt native Clients mit
-Loopback-Redirect ab (PA-1). Root-`CLAUDE.md` nannte im `down:` noch P8.6 als aktive Phase — korrigiert. Ein P9-Wächter koppelt die geschlossene Zeile P9-6 an die lebende ROADMAP-Größe und lief im Commit rot: eigene ROADMAP-Zeilen gekürzt statt P9-Testcode anzufassen (DO-2).
+**Befund für P10.5.** Der Umfang ist deutlich gewachsen: FastMCP 4 / MCP 2026-07-28, Realtime, Bulk-Append-Werkzeug, Space
+umbenennen, Editor Stufe 1 + 2 (P5-U aufgehoben) und `created_by` — zwei P1-Öffnungen (elfte, zwölfte). Plan §7 schneidet daraus
+zwölf Blöcke; fünf davon sind „L" und brauchen je einen Mini-Plan.
 
-**Belege.** `doc_health` 0 Befunde; `test_index_archive` + `test_updated_chain` + `test_doc_health` grün (Commit-Ausgabe); kein
-Produktcode-Diff (P10-11). Karten-SVGs mit headless Chromium gerendert und angesehen; Vorschau-Seite (privat):
-`https://claude.ai/artifact/Grr7UELUVeh5BecbU239cQ`.
-
-**Nachtrag 2026-10-16 — Plan finalisiert** (Auftrag „only finalize the plan", kein Step 2 in dieser Session). Antworten des
-Nikingers: D-1b = **C2 Nervenbahnen**; M1 wie vorgeschlagen; V199 erst in der Exec-Session; BT-13 beantwortet (ja, versehentlich — die
-Repo-Auswahl in opencode laggt, Klicks landen daneben); Push freigegeben.
-
-**Nächster Schritt.** Step 2 und 3 parallel: M2–M7 baut und fährt Claude Code (Wegwerf-Instanz, Port 8799); der Nikinger misst M1
-nach Plan §4. V199 wandert in die Exec-Session (P10.5 Block 1). Danach Step 4 (Plan P10.5).
+**Nächster Schritt.** Logo-Entwürfe zu D-6 (in Arbeit), danach Step 2: M2–M8 in Claude Code gegen die Wegwerf-Instanz, M1 im Browser
+des Nikingers. Dann Step 4 (Plan P10.5).
