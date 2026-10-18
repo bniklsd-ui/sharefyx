@@ -1,0 +1,97 @@
+{
+  "probe": "p10_m5_enter_conflict",
+  "stations": {
+    "bg2_conflict_copy": {
+      "copy_request_space": "gamma",
+      "copy_response_space": "gamma",
+      "copy_status": 201,
+      "copy_no_stray_posts": true,
+      "load_current_posts": 0,
+      "dialog_closed_after_load": true,
+      "enter_in_conflict_posts": 0,
+      "enter_in_conflict_dialog_stays_open": true
+    },
+    "create": {
+      "counter_posts_with_empty_title": 0,
+      "positive_posts": 1,
+      "positive_status_ok": true
+    },
+    "new_folder": {
+      "counter_posts_with_empty_name": 0,
+      "positive_posts": 1,
+      "dialog_closed": true
+    },
+    "move": {
+      "counter_patches_from_select": 0,
+      "reauth_appeared": true,
+      "positive_patches": 1,
+      "positive_patch_space": "gamma",
+      "dialog_closed": true
+    },
+    "share": {
+      "counter_patches_from_select": 0,
+      "reauth_appeared": true,
+      "positive_patches": 1,
+      "positive_patch_share_write": [
+        "gamma"
+      ],
+      "dialog_closed": true
+    },
+    "trash": {
+      "submit_disabled_on_wrong_title": true,
+      "counter_deletes": 0,
+      "positive_deletes": 1,
+      "dialog_closed": true
+    },
+    "confirm_archive": {
+      "positive_archive_posts": 1,
+      "counter_archive_posts_after_cancel": 0
+    },
+    "settings_spaces": {
+      "counter_posts_with_empty_name": 0,
+      "positive_posts": 1,
+      "delta_row_present": true
+    },
+    "space_detail_member": {
+      "detail_open": true,
+      "counter_posts_with_empty_name": 0,
+      "first_submit_posts": 1,
+      "reauth_appeared": true,
+      "positive_member_posts": 1,
+      "alpha_listed_as_member": true
+    },
+    "space_remove": {
+      "counter_delete_attempts": 1,
+      "gamma_survives_counter_enter": true,
+      "first_submit_deletes_or_reauth": 1,
+      "reauth_appeared": true,
+      "positive_deletes": 1
+    },
+    "settings_password": {
+      "counter_posts_from_wrong_field": 0,
+      "positive_posts": 1,
+      "toast_or_error_visible": false
+    },
+    "legacy_host": {
+      "reachable_in_wegwerf": false,
+      "reason": "SPACE_UI_LEGACY_ORIGIN verlangt laut Fail-closed-Parser (mcpserver/config.py:48) https://-Form; ein http-Wegwerf hat nie eine passende Legacy-Origin — der Dialog kann nie erscheinen."
+    }
+  },
+  "checks": {
+    "bg2_copy_space_is_item_space": true,
+    "bg2_copy_single_post": true,
+    "bg2_load_current_no_post": true,
+    "bg2_enter_in_conflict_inert": true,
+    "enter_create": true,
+    "enter_new_folder": true,
+    "enter_move": true,
+    "enter_share": true,
+    "enter_trash": true,
+    "enter_confirm": true,
+    "enter_settings_spaces": true,
+    "enter_space_detail": true,
+    "enter_space_remove": true,
+    "enter_settings_password": true
+  },
+  "all_passed": true
+}

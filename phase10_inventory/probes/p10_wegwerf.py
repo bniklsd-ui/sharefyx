@@ -52,7 +52,46 @@ DEK_FILE = WEGWERF_ROOT / "auth-dek"
 CREDS_FILE = WEGWERF_ROOT / "credentials.json"
 SERVE_PID = WEGWERF_ROOT / "serve.pid"
 SERVE_LOG = WEGWERF_ROOT / "serve.log"
+TLS_KEY = WEGWERF_ROOT / "key.pem"
+TLS_CERT = WEGWERF_ROOT / "cert.pem"
 PORT = 8799  # Plan §4: P10-Wegwerf-Port
+BASE_URL = f"https://127.0.0.1:{PORT}"
+
+# TLS statt http — kein Kosmetikposten: `require_csrf()` vergleicht den Origin-Header des
+# Browsers gegen `SPACE_PUBLIC_BASE_URL` (`webui/security.py:82-92`), und
+# `_validate_base_url()` erzwingt https (`authserver/config.py:86`). Mit
+# `SPACE_PUBLIC_BASE_URL=https://127.0.0.1:8799` + selbstsigniertem Zertifikat (CN/SAN
+# 127.0.0.1, `ignore_https_errors` im Playwright-Context) stimmen alle drei Seiten überein —
+# sonst wäre kein einziger Schreibvorgang aus dem Browser möglich (derselbe CSRF-Origin-
+# Mismatch, den P8.5 als Wegwerf-Befund dokumentiert hat; Lösung übernommen aus
+# `phase9_hardening/scripts/p9_trace_wegwerf.py :: SERVE_TLS_LAUNCHER`).
+SERVE_TLS_LAUNCHER = '''"""Dieselbe App wie phase2_mcp/scripts/serve.py, plus TLS."""
+import os, sys
+sys.path.insert(0, os.environ["REPO_ROOT"])
+from datetime import datetime, timezone
+import uvicorn
+from authserver.config import load_auth_settings, load_data_encryption_key
+from authserver.store import AuthStore
+from authserver.userdir import UserDirectory
+from storage.store import Store
+from mcpserver.app import OAuthConfig, create_app
+from mcpserver.config import load_settings
+from mcpserver.logging_setup import configure_logging
+from mcpserver.request_log import AccessLogASGI, OAuthLogASGI
+
+settings = load_settings()
+configure_logging(settings.log_level)
+auth_settings = load_auth_settings()
+auth_store = AuthStore(auth_settings.db_path, now_fn=lambda: datetime.now(timezone.utc))
+users = UserDirectory(auth_store, dek=load_data_encryption_key())
+oauth = OAuthConfig(settings=auth_settings, store=auth_store, users=users)
+app = create_app(settings=settings, store=Store(settings.data_root),
+                 allowed_hosts=["127.0.0.1"], oauth=oauth)
+app = AccessLogASGI(OAuthLogASGI(app))
+uvicorn.run(app, host=settings.host, port=settings.port, access_log=False,
+            log_level=settings.log_level.lower(),
+            ssl_keyfile=os.environ["TLS_KEY"], ssl_certfile=os.environ["TLS_CERT"])
+'''
 
 SPACE_A = "alpha"
 SPACE_B = "beta"
@@ -175,7 +214,9 @@ def _seed_items() -> dict[str, object]:
     store.rebuild_index()
     meta = {
         "ids": ids,
-        "conflict_item": ids[f"{SPACE_A}:{CONFLICT_TITLE}"],
+        # Der Konflikt-Kandidat liegt im TEAM-SPACE: genau dort trägt P9-BI (payload.space
+        # aus state.conflictCurrent.space) — eine Kopie nach alpha (Home) wäre der Befund.
+        "conflict_item": ids[f"{SPACE_TEAM}:Team Aufgabe"],
         "spaces": [SPACE_A, SPACE_B, SPACE_TEAM],
     }
     (WEGWERF_ROOT / "ids.json").write_text(json.dumps(meta, indent=2))
@@ -217,16 +258,30 @@ def cmd_start(_args: argparse.Namespace) -> int:
     env = _clean_env()
     env["SPACE_DATA_ROOT"] = str(DATA_ROOT)
     env["SPACE_AUTH_DB"] = str(AUTH_DB)
-    env["SPACE_PUBLIC_BASE_URL"] = "https://wegwerf-p10.invalid"
+    # Der Wert, gegen den `require_csrf` den Browser-Origin vergleicht — exakt die URL,
+    # die der Browser aufruft (siehe SERVE_TLS_LAUNCHER-Kommentar oben).
+    env["SPACE_PUBLIC_BASE_URL"] = BASE_URL
     env["SPACE_PORT"] = str(PORT)
     env["CREDENTIALS_DIRECTORY"] = str(WEGWERF_ROOT)
     env["PYTHONPATH"] = str(REPO_ROOT)
+    env["REPO_ROOT"] = str(REPO_ROOT)
+    env["TLS_KEY"] = str(TLS_KEY)
+    env["TLS_CERT"] = str(TLS_CERT)
+
+    if not (TLS_KEY.exists() and TLS_CERT.exists()):
+        subprocess.run(
+            ["openssl", "req", "-x509", "-newkey", "rsa:2048", "-keyout", str(TLS_KEY),
+             "-out", str(TLS_CERT), "-days", "2", "-nodes", "-subj", "/CN=127.0.0.1",
+             "-addext", "subjectAltName=IP:127.0.0.1"],
+            check=True, capture_output=True,
+        )
+    launcher = WEGWERF_ROOT / "serve_tls.py"
+    if not launcher.exists():
+        launcher.write_text(SERVE_TLS_LAUNCHER, encoding="utf-8")
 
     log = SERVE_LOG.open("ab")
     proc = subprocess.Popen(
-        [".venv/bin/python", "phase2_mcp/scripts/serve.py",
-         "--allowed-host", "127.0.0.1",
-         "--allowed-host", "wegwerf-p10.invalid"],
+        [".venv/bin/python", str(launcher)],
         env=env, cwd=str(REPO_ROOT),
         stdout=log, stderr=subprocess.STDOUT,
         start_new_session=True,
@@ -234,11 +289,12 @@ def cmd_start(_args: argparse.Namespace) -> int:
     SERVE_PID.write_text(str(proc.pid))
     print(f"PID {proc.pid} -> {SERVE_PID}")
 
-    base = f"http://127.0.0.1:{PORT}"
+    import ssl
+    ctx = ssl._create_unverified_context()
     for i in range(40):
         try:
-            urllib.request.urlopen(f"{base}/health", timeout=1).read()
-            print(f"Wegwerf-Server gesund nach {i * 0.25:.1f}s.")
+            urllib.request.urlopen(f"{BASE_URL}/health", timeout=1, context=ctx).read()
+            print(f"Wegwerf-Server gesund nach {i * 0.25:.1f}s ({BASE_URL}).")
             return 0
         except Exception:
             time.sleep(0.25)
@@ -276,9 +332,10 @@ def cmd_cleanup(_args: argparse.Namespace) -> int:
 
 
 def cmd_health(_args: argparse.Namespace) -> int:
-    base = f"http://127.0.0.1:{PORT}"
+    import ssl
     try:
-        body = urllib.request.urlopen(f"{base}/health", timeout=2).read().decode()
+        ctx = ssl._create_unverified_context()
+        body = urllib.request.urlopen(f"{BASE_URL}/health", timeout=2, context=ctx).read().decode()
         print(f"OK: {body}")
         return 0
     except Exception as e:
