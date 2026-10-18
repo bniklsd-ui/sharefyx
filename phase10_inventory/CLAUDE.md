@@ -9,7 +9,7 @@ down:
   - ../docs/concepts/phase10_inventory_plan.md    # Plan: Locks P10-A–H, Steps, Messungen M1–M7, Abnahme P10-1–12, V195–V206
   - ../docs/concepts/phase10_intake.md            # Sammelstelle (Herkunft), Fleet-Notizen §5–§7
   - ../docs/concepts/PHASE9_CLOSEOUT_HANDOVER.md  # Vorphase, §4 Posten, [VERIFY]-Erbe
-updated: 2026-10-18 (Step 3 ✅; zweiter Session-Block, erster nach SESSIONS_ARCHIVE rotiert) | 2026-10-16 (Plan finalisiert: D-1b = C2, V199 in die Exec-Session, BT-13 beantwortet; Nachtrag im Session-Block) | 2026-10-16 (angelegt — Phase 10 begonnen; Step 0 ✅, Step 1 Register-Entwurf ✅, Karten-Entwurf C gewählt)
+updated: 2026-10-18 (Sessionende: Logo D-6 = Leuchtbahn B, Ausführer Open-Test GLM 5.3 Flash; Integration über eurofyx-fleet) | 2026-10-18 (Step 3 ✅; zweiter Session-Block, erster nach SESSIONS_ARCHIVE rotiert) | 2026-10-16 (Plan finalisiert: D-1b = C2, V199 in die Exec-Session, BT-13 beantwortet; Nachtrag im Session-Block) | 2026-10-16 (angelegt — Phase 10 begonnen; Step 0 ✅, Step 1 Register-Entwurf ✅, Karten-Entwurf C gewählt)
 ---
 # Phase 10 — Bestandsaufnahme
 
@@ -47,5 +47,10 @@ Löschen) und **P10-J** (Abnahme Anbieter-Ziel: opencode mit M3 **und** mit eine
 umbenennen, Editor Stufe 1 + 2 (P5-U aufgehoben) und `created_by` — zwei P1-Öffnungen (elfte, zwölfte). Plan §7 schneidet daraus
 zwölf Blöcke; fünf davon sind „L" und brauchen je einen Mini-Plan.
 
-**Nächster Schritt.** Logo-Entwürfe zu D-6 (in Arbeit), danach Step 2: M2–M8 in Claude Code gegen die Wegwerf-Instanz, M1 im Browser
+**Nachtrag 2026-10-18 (Sessionende).** Logo D-6 in vier Runden entschieden: **Leuchtbahn, Variante B** (Eselsohr überlagert,
+ohne den Fortsatz, der hinausragte) — `docs/concepts/phase10_logo_entwuerfe_final.svg`. Ausführer P10.5 geändert: **Open-Test
+GLM 5.3 Flash** (Lock P10-K, ersetzt P10-E; M3-Rückfall bis 2026-11-15). **Die Integration von z.ai/GLM in opencode läuft über
+`eurofyx-fleet`, getrennt von diesem Plan** — Sharefyx setzt nur voraus, dass opencode den Ausführer stellt.
+
+**Nächster Schritt.** Step 2: M2–M8 in Claude Code gegen die Wegwerf-Instanz, M1 im Browser
 des Nikingers. Dann Step 4 (Plan P10.5).
