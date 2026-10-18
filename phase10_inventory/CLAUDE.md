@@ -16,7 +16,7 @@ updated: 2026-10-18 (Step 3 ✅; zweiter Session-Block, erster nach SESSIONS_ARC
 > **Auftrag:** jede offene Baustelle einsammeln, messen, entscheiden lassen und daraus den Plan für **P10.5** schreiben —
 > ohne Produktcode (Lock P10-H). **Tor zu P10.5:** die Freigabe des Registers durch den Nikinger (P10-A, Abnahme P10-8).
 > Zwei Phasenziele des Nikingers vom 2026-10-16: **Anbieter-Unabhängigkeit** (Server/Connector, Abnahme am Ende von P10.5)
-> und der **Karten-Umbau** (Gehirnkarte). Ausführer P10.5: M3 Thinking über opencode (P10-E).
+> und der **Karten-Umbau** (Gehirnkarte). Ausführer P10.5: **GLM 5.3 Flash als Open-Test** über opencode (P10-K, ersetzt P10-E; M3-Rückfall bis 2026-11-15).
 
 ## Modulstatus
 
