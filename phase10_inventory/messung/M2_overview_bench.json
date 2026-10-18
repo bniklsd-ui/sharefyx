@@ -1,0 +1,1 @@
+{"probe": "p10_overview_bench", "path": "/api/v1/overview", "spaces": ["alpha", "bravo", "charlie", "delta"], "items_per_space": 50, "items_total": 200, "spaces_seen": 4, "warmup_runs": 1, "measured_runs": 5, "runs_ms": [2405.9, 2415.0, 2447.2, 2445.2, 2448.1], "median_ms": 2445.2, "min_ms": 2405.9, "max_ms": 2448.1, "spread_pct": 1.7, "response_bytes": 8338}

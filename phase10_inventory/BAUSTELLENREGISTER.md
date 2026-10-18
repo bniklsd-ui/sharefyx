@@ -5,10 +5,10 @@ read-when: vor jeder P10-/P10.5-Planung oder -Entscheidung; wenn jemand fragt �
 detail: L2
 up: ./CLAUDE.md
 down:
-  - ../docs/concepts/phase10_inventory_plan.md    # Plan P10: Locks, Steps, Messungen M1–M7, Abnahme, [VERIFY]
+  - ../docs/concepts/phase10_inventory_plan.md    # Plan P10: Locks, Steps, Messungen M1–M8, Abnahme, [VERIFY]
   - ../docs/concepts/phase10_intake.md            # Sammelstelle — Herkunft von §2/§3/§5–§7
   - ../docs/concepts/PHASE9_CLOSEOUT_HANDOVER.md  # Herkunft §4.1–§4.10
-updated: 2026-10-18 (alle Entscheidungen D-1–D-18 eingetragen, Ziel-Spalte gesetzt, Bilanz per Skript neu gezählt) | 2026-10-16 (finalisiert mit den Antworten des Nikingers: D-1b = C2 Nervenbahnen, BT-13 beantwortet, V199 in die Exec-Session; Bilanz per Skript nachgezählt) | 2026-10-16 (angelegt — Entwurf aus allen Quellen, jede Zeile am Code verankert; Stand vor der Freigabe durch den Nikinger)
+updated: 2026-10-18 (M2 gemessen — PF-1/PF-2 tragen die Grundlinie, Instrument + 3 Wächter im Repo) | 2026-10-18 (alle Entscheidungen D-1–D-18 eingetragen, Ziel-Spalte gesetzt, Bilanz per Skript neu gezählt) | 2026-10-16 (finalisiert mit den Antworten des Nikingers: D-1b = C2 Nervenbahnen, BT-13 beantwortet, V199 in die Exec-Session; Bilanz per Skript nachgezählt) | 2026-10-16 (angelegt — Entwurf aus allen Quellen, jede Zeile am Code verankert; Stand vor der Freigabe durch den Nikinger)
 ---
 # Phase 10 — Baustellenregister
 
@@ -42,8 +42,8 @@ P10 Step 2) · Wissen (kein Bau, nur festgehalten) · erledigt (mit Beleg). „E
 
 | ID | Posten | Herkunft | Befund am Code / Stand | Gr. | Risiko | Entsch. | Ziel |
 |---|---|---|---|---|---|---|---|
-| PF-1 | `/api/v1/overview` = 6 Durchgänge × sichtbare Spaces (~2,4 s Serverarbeit live, 4 Spaces / 197 Items) | Handover §4.3, P9-15, V151 | `phase5_ui/webui/api.py:685 _overview()`: je Space ein `store.search(…, limit=1)` pro Eimer (`:695`) plus die Liste (`:702`), und jeder Aufruf liest jede indizierte Datei (`Store.search()`, P6-S). Zwei Wege: Zählen über den Index (P1-Kern `storage/`, Hard Rule 2 bleibt gewahrt) oder ein Durchgang je Space mit Zählung im Adapter | M | F? | D-3 | P10.5 |
-| PF-2 | Messanordnung und Zielwerte fehlen | intake §2.1 | P10 Step 2: M1 (Browser des Nikingers, beide Eingänge) und M2 (Wegwerf-Instrument). Die Messlatte 372,9 ms ist falsch (anderes Instrument, P9-15) | S | — | D-3 | P10 |
+| PF-1 | `/api/v1/overview` = 6 Durchgänge × sichtbare Spaces (~2,4 s Serverarbeit live, 4 Spaces / 197 Items) | Handover §4.3, P9-15, V151 | `phase5_ui/webui/api.py:685 _overview()`: je Space ein `store.search(…, limit=1)` pro Eimer (`:695`) plus die Liste (`:702`), und jeder Aufruf liest jede indizierte Datei (`Store.search()`, P6-S). Zwei Wege: Zählen über den Index (P1-Kern `storage/`, Hard Rule 2 bleibt gewahrt) oder ein Durchgang je Space mit Zählung im Adapter · **[2026-10-18, M2]** Grundlinie gemessen: **Median 2405,6 / 2438,4 / 2414,3 ms** über drei Instrument-Läufe in-process gegen `create_app()` (4 Spaces × 50 Items, alle fünf Buckets besetzt, 1+5 Läufe, Streuung je Lauf ≤ 2,3 %; `messung/M2_overview_bench.json`, P10-5 ✅) — deckungsgleich mit V151s 2,4 s am echten Formfaktor, also Instrument und Live-Bild im Einklang | M | F? | D-3 | P10.5 |
+| PF-2 | Messanordnung und Zielwerte fehlen | intake §2.1 | P10 Step 2: M1 (Browser des Nikingers, beide Eingänge) und M2 (Wegwerf-Instrument). Die Messlatte 372,9 ms ist falsch (anderes Instrument, P9-15) · **[2026-10-18, M2]** M2-Anteil erledigt: Instrument `phase10_inventory/probes/p10_overview_bench.py` im Repo (4 Spaces × 50 Items, ein Principal sieht alle vier — die Verzerrung des Ein-Space-Bilds ist als Assertion im Instrument und im Wächter verriegelt) + 3 Tests; **Zielwerte (D-3) stehen erst mit M1** | S | — | D-3 | P10 |
 | PF-3 | Client-Zwischenspeicher je Space, optimistische Anzeige, Vorabladen | intake §2.1 | ungeprüfte Kandidaten. Bruchstelle Hard Rule 3: kein Cache darf eine alte `version` in einen Write tragen | M | S | D-3 | P10.5, nur wenn M1 es nach PF-1 noch verlangt |
 | PF-4 | 20-s-Poll holt `/overview` und `/spaces` getrennt | intake §2.1 | `phase5_ui/webui/static/js/app.js:402–417 pollCounters()` (20 s + Fokus + Sichtbarkeit) | S | — | nein | P10.5, mit PF-1 |
 | PF-5 | Listen-Virtualisierung bei großen Spaces | intake §2.1 | live 197 Items, kein Messbefund | M | — | D-3 | verworfen, bis eine Messung es verlangt (Empfehlung) |
