@@ -10,7 +10,7 @@ down:
   - ./p8x_ui_polish_notes.md                    # §2 Karte, §10 Auswahl-Konvention, §10.9 Hochkant
   - ../../phase9_hardening/ABNAHME_MATRIX.md    # die 12 ⚠️ und der eine ⬜ (Stand Closeout 2026-10-08) — jede Zeile braucht in P10 ein Urteil
   - ../../phase10_inventory/BAUSTELLENREGISTER.md   # seit 2026-10-16 der Stand: das Register, das aus dieser Sammelstelle entstand
-updated: 2026-10-19 (neu §8: Note **an** `eurofyx-fleet` — GLM-Ausführer-Befunde für die Fleet-Integration Claude Code + GLM) | 2026-10-16 (Phase 10 begonnen: Zeiger aufs Register oben, §1 bestätigt (P10-A), §2.3 P5-U-Konflikt, neu §2.4 Anbieter-unabhängig und §2.5 Karten-Umbau, §7 Korrektur Caddyfile.template) | 2026-10-13 (Note from other project: eurofyx-fleet S9, neuer Abschnitt 7: Caddy dial_timeout/lb_try live, Quelle nachziehen) | 2026-10-11 (Note from other project: eurofyx-fleet S6, neuer Abschnitt 6: tail-proxy Exit 143) | 2026-10-11 (Note from other project: eurofyx-fleet Block 1 abgeschlossen, neuer Abschnitt 5) | 2026-10-08 (Closeout P9: Zeiger auf `PHASE9_CLOSEOUT_HANDOVER.md` §4 in §3, Matrix-Stand 12 ⚠️ · 1 ⬜) | 2026-10-08 (angelegt — Nikinger-Auftrag nach dem Block feedback: P10 beendet **alle** Baustellen, damit P11 auf einem gehärteten Fundament neue Funktionen denken kann; Zweiteilung P10/P10.5; drei neue Themen: Responsivität/Performance, visuelle Kleinigkeiten, Editor ohne Vorschau/Bearbeiten-Modus)
+updated: 2026-10-19 (§8 Rückmeldung vom ersten Lauf: `CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000` im Session-Env — 200-K-Annahme widerlegt, Launcher anpassen; Remote Control ohne Kanal) | 2026-10-19 (neu §8: Note **an** `eurofyx-fleet` — GLM-Ausführer-Befunde für die Fleet-Integration Claude Code + GLM) | 2026-10-16 (Phase 10 begonnen: Zeiger aufs Register oben, §1 bestätigt (P10-A), §2.3 P5-U-Konflikt, neu §2.4 Anbieter-unabhängig und §2.5 Karten-Umbau, §7 Korrektur Caddyfile.template) | 2026-10-13 (Note from other project: eurofyx-fleet S9, neuer Abschnitt 7: Caddy dial_timeout/lb_try live, Quelle nachziehen) | 2026-10-11 (Note from other project: eurofyx-fleet S6, neuer Abschnitt 6: tail-proxy Exit 143) | 2026-10-11 (Note from other project: eurofyx-fleet Block 1 abgeschlossen, neuer Abschnitt 5) | 2026-10-08 (Closeout P9: Zeiger auf `PHASE9_CLOSEOUT_HANDOVER.md` §4 in §3, Matrix-Stand 12 ⚠️ · 1 ⬜) | 2026-10-08 (angelegt — Nikinger-Auftrag nach dem Block feedback: P10 beendet **alle** Baustellen, damit P11 auf einem gehärteten Fundament neue Funktionen denken kann; Zweiteilung P10/P10.5; drei neue Themen: Responsivität/Performance, visuelle Kleinigkeiten, Editor ohne Vorschau/Bearbeiten-Modus)
 ---
 
 # Phase 10 — Sammelstelle (kein Plan)
@@ -227,6 +227,13 @@ Kontext-Median **326 K** je Aufruf (278 Aufrufe, 86,1 M Tokens). Für die Integr
 - **Remote Control** (claude.ai ↔ lokale Claude-Code-Session) hängt nach unserem Verständnis an einem claude.ai-Login; ein
   gesetztes `ANTHROPIC_AUTH_TOKEN` hat Vorrang vor dem Login. Ob Remote Control mit Z.ai-Endpunkt geht, ist **ungeprüft**
   `[VERIFY]` — Erwartung: eher nein; dann bleibt für Fernbedienung Tailscale + SSH/tmux.
+
+**Rückmeldung vom ersten Lauf (2026-10-19, Nachmittag, gleiche Stelle):** die `/context`-Erwartung ist **widerlegt** —
+im Session-Env steht `CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000` (Auto-Kompaktierung greift erst bei ~1 M; Quelle: kein
+Config-File, also Launcher/Startshell). **Bitte beim Integrations-Launcher entfernen oder auf ≤ 200 000 senken und die
+Session neu starten.** Remote Control: **geht nicht** — kein Remote-Kanal sichtbar, nur lokale Peers. Memory kommt
+automatisch mit. Endpunkt/Modell-Mapping bestätigt: `ANTHROPIC_BASE_URL=https://api.z.ai/api/anthropic`, alle drei
+Slots auf `glm-5.3`. Details: `phase10_executor_review_glm.md` §3.1.
 
 **Handlungsbedarf Fleet:** keiner an Sharefyx. Sharefyx fährt den ersten Lauf unter Claude Code + GLM als gedeckelten
 Vergleich (Phase-10-Head, Session-Block 2026-10-19 „Nächster Schritt") und meldet `/context`- und Remote-Control-Befund zurück.

@@ -6,7 +6,7 @@ detail: L2
 up: ../INDEX.md
 down:
   - ../../phase10_inventory/CLAUDE.md   # Phase-Head, Session-Block mit dem Kontext
-updated: 2026-10-19 (angelegt — Claude Code, Auswertung aus `~/.local/share/opencode/opencode.db`, read-only)
+updated: 2026-10-19 (§3.1: erster Lauf unter Claude Code + GLM — `CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000` im Session-Env widerlegt die 200-K-Annahme; Remote Control ohne Kanal; Lauf gemäß Session-Block gestoppt) | 2026-10-19 (angelegt — Claude Code, Auswertung aus `~/.local/share/opencode/opencode.db`, read-only)
 ---
 # P10-K Open-Test — Auswertung GLM/opencode (2026-10-19)
 
@@ -108,6 +108,31 @@ Modellnamen `[VERIFY]` auf der Seite, nicht aus Drittquellen).
 Claude Code + GLM 5.3 auf einer abgeschlossenen Aufgabe (Vorschlag: M8 Frage 7) — erst nach Reset des
 Fensters, eine Session, Ziel ≤ 150 K. Flash nicht weiter als Ausführer; falls opencode bleibt: Kontextgrenze
 je Modell auf 200 K senken und eine Session je Step.
+
+### 3.1 Erster Lauf — Harness-Check (2026-10-19, Nachmittag; Arbeitsliste nach der Meldung gestoppt)
+
+**Befund: die 200-K-Annahme aus der Tabelle oben ist für dieses Setup widerlegt.** Die Session-Umgebung trägt
+`CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000` — Claude Code kompaktiert bei diesem Wert erst kurz vor 1 M. Damit steht
+der opencode-Fehler (§1.1 Treiber 1) auch hier: **die Auto-Kompaktierung greift praktisch nie.** Quelle der Variable:
+keine der durchsuchten Dateien (`~/.bashrc`, `~/.profile`, `~/.bash_aliases`, `/etc/environment`,
+`~/.claude/settings*.json`, `~/.claude.json`, Projekt-`.claude/settings*.json`) — sie kommt aus dem startenden
+Shell- bzw. Launcher-Kontext (Prozess: direkt `claude`). Hebel: im Launcher entfernen oder auf ≤ 200 000 senken,
+dann Session neu starten.
+
+Weiterer Env-Befund: `ANTHROPIC_BASE_URL=https://api.z.ai/api/anthropic`, alle drei Modell-Slots
+(`ANTHROPIC_DEFAULT_{SONNET,OPUS,HAIKU}_MODEL`) auf `glm-5.3` gemappt, `settings.json model = "sonnet"` — der
+`[VERIFY]` „exakte Variablen und Modellnamen" ist damit **bestätigt**; `/status` (Server-seitiges Mapping) bleibt
+beim Nikinger. Der Harness meldete zudem „~15 M Tokens übrig", abnehmend je Aufruf — eher ein Plan-Kontingent-Budget
+als ein Fenster; von innen nicht abschließbar, `/context` klärt es.
+
+**Remote Control: geht nicht.** `ListAgents` zeigt keinen Remote-Kanal, nur zwei lokale Peer-Sessions — keine
+Fehlermeldung, es existiert schlicht kein Kanal. Die Erwartung aus Intake §8 („eher nein") ist damit soweit von
+innen beobachtbar bestätigt; `/remote-control` selbst ist ein User-Kommando.
+
+**Memory ✅** (`MEMORY.md` automatisch geladen, 17 Einträge — CT 111 und env-Strip dabei). `/status` und `/context`
+kann der Agent nicht selbst tippen; `/context` wird 1 M zeigen, die Env-Variable beweist es vorab. Die Arbeitsliste
+(Register-Rotation, M8 Frage 7, M7) ist gemäß Session-Block gestoppt („zeigt es 1 M, sofort stoppen und dem
+Nikinger melden") und wartet auf die Fenster-Entscheidung.
 
 ## 4. Was dauerhaft festgehalten werden musste
 
