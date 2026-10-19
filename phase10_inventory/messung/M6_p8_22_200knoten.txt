@@ -1,0 +1,12 @@
+[OK  ] Simulation kommt < 3 s zur Ruhe: sichtbare Ruhe 2694.6 ms nach dem ersten Animationsframe (Budget 3000 ms, 1342 gezeichnete Stichproben-Pixel)
+[i   ] Animationsschleife: 153 Ticks in 2517.6 ms, Frame-Abstand p50 16.7 ms / max 17.7 ms
+[OK ] /api/v1/graph: 200 Knoten (120 own / 50 shared / 30 foreign, Spaces ['alpha', 'beta', 'gamma']), 206 explizite Kanten, kinds=['body', 'frontmatter']
+[OK ] Screenshot -> /home/savefyx/dev/savefxy/docs/screenshots/p8_22_01_200_knoten.png
+[OK  ] Interaktion ohne Hakeln: 66 sichtbare Knoten, Schwelle p95 < 16.7 ms -- hover p95 0.3 ms (mean 0.14, max 5.4), drag p95 0.3 ms (mean 0.13, max 0.3), wheel p95 0.2 ms (mean 0.1, max 0.2)
+[OK  ] Tag-Toggle wirkt (>15-Knoten-Riegel, P8-21): Bild aendert sich nach dem Toggle -- die 10 `spitze`-Paare (5 Knoten) kommen hinzu, `last-200` (200 Knoten) und `gruppe-NN` (~17 Knoten) bleiben ausgeschlossen; ohne Riegel waeren es 19 900 + ~1 600 Kanten
+[OK  ] Interaktion ohne Hakeln mit Tag-Kanten: 65 sichtbare Knoten, Schwelle p95 < 16.7 ms -- hover p95 0.2 ms (mean 0.04, max 0.3), drag p95 0.1 ms (mean 0.06, max 0.2), wheel p95 0.3 ms (mean 0.1, max 0.3)
+[FAIL] prefers-reduced-motion rendert statisch: matchMedia=True, 1 Animationsframes aus graph.js (erwartet 0; 132 fremde Frames = Playwright-Polling, nicht die App), Canvas bebildert (1342 Stichproben-Pixel), Hash ueber 600 ms unveraendert
+[OK ] Screenshot -> /home/savefyx/dev/savefxy/docs/screenshots/p8_22_02_reduced_motion.png
+
+P8-22-Bilanz: 4/5 Kriterien erfuellt.
+  [FAIL] prefers-reduced-motion rendert statisch -- matchMedia=True, 1 Animationsframes aus graph.js (erwartet 0; 132 fremde Frames = Playwright-Polling, nicht die App), Canvas bebildert (1342 Stichproben-Pixel), Hash ueber 600 ms unveraendert
