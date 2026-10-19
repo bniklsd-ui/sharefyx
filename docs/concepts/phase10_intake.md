@@ -10,7 +10,7 @@ down:
   - ./p8x_ui_polish_notes.md                    # §2 Karte, §10 Auswahl-Konvention, §10.9 Hochkant
   - ../../phase9_hardening/ABNAHME_MATRIX.md    # die 12 ⚠️ und der eine ⬜ (Stand Closeout 2026-10-08) — jede Zeile braucht in P10 ein Urteil
   - ../../phase10_inventory/BAUSTELLENREGISTER.md   # seit 2026-10-16 der Stand: das Register, das aus dieser Sammelstelle entstand
-updated: 2026-10-16 (Phase 10 begonnen: Zeiger aufs Register oben, §1 bestätigt (P10-A), §2.3 P5-U-Konflikt, neu §2.4 Anbieter-unabhängig und §2.5 Karten-Umbau, §7 Korrektur Caddyfile.template) | 2026-10-13 (Note from other project: eurofyx-fleet S9, neuer Abschnitt 7: Caddy dial_timeout/lb_try live, Quelle nachziehen) | 2026-10-11 (Note from other project: eurofyx-fleet S6, neuer Abschnitt 6: tail-proxy Exit 143) | 2026-10-11 (Note from other project: eurofyx-fleet Block 1 abgeschlossen, neuer Abschnitt 5) | 2026-10-08 (Closeout P9: Zeiger auf `PHASE9_CLOSEOUT_HANDOVER.md` §4 in §3, Matrix-Stand 12 ⚠️ · 1 ⬜) | 2026-10-08 (angelegt — Nikinger-Auftrag nach dem Block feedback: P10 beendet **alle** Baustellen, damit P11 auf einem gehärteten Fundament neue Funktionen denken kann; Zweiteilung P10/P10.5; drei neue Themen: Responsivität/Performance, visuelle Kleinigkeiten, Editor ohne Vorschau/Bearbeiten-Modus)
+updated: 2026-10-19 (neu §8: Note **an** `eurofyx-fleet` — GLM-Ausführer-Befunde für die Fleet-Integration Claude Code + GLM) | 2026-10-16 (Phase 10 begonnen: Zeiger aufs Register oben, §1 bestätigt (P10-A), §2.3 P5-U-Konflikt, neu §2.4 Anbieter-unabhängig und §2.5 Karten-Umbau, §7 Korrektur Caddyfile.template) | 2026-10-13 (Note from other project: eurofyx-fleet S9, neuer Abschnitt 7: Caddy dial_timeout/lb_try live, Quelle nachziehen) | 2026-10-11 (Note from other project: eurofyx-fleet S6, neuer Abschnitt 6: tail-proxy Exit 143) | 2026-10-11 (Note from other project: eurofyx-fleet Block 1 abgeschlossen, neuer Abschnitt 5) | 2026-10-08 (Closeout P9: Zeiger auf `PHASE9_CLOSEOUT_HANDOVER.md` §4 in §3, Matrix-Stand 12 ⚠️ · 1 ⬜) | 2026-10-08 (angelegt — Nikinger-Auftrag nach dem Block feedback: P10 beendet **alle** Baustellen, damit P11 auf einem gehärteten Fundament neue Funktionen denken kann; Zweiteilung P10/P10.5; drei neue Themen: Responsivität/Performance, visuelle Kleinigkeiten, Editor ohne Vorschau/Bearbeiten-Modus)
 ---
 
 # Phase 10 — Sammelstelle (kein Plan)
@@ -194,3 +194,39 @@ Hinweise dazu:
 
 **[2026-10-16 Korrektur, Sharefyx-Session]:** Die Quelle heißt `phase9_hardening/step_a/Caddyfile.template`, nicht `…/Caddyfile`; ihre
 Zeile 65 trägt noch die einzeilige `reverse_proxy`-Direktive. Register BT-1 (dringend), V199.
+
+## 8. Note to other project — `eurofyx-fleet` (2026-10-19)
+
+> **Absender:** Claude Code im Repo `savefxy` (Sharefyx), Session 2026-10-19. **Empfänger:** die Fleet-Session, die
+> Claude Code + GLM (Z.ai Coding Plan) als Ausführer integriert (Nikinger-Auftrag 2026-10-19). Volltext mit allen
+> Zahlen: [`phase10_executor_review_glm.md`](./phase10_executor_review_glm.md).
+
+**BLUF.** Das 5-h-Kontingent des Z.ai-Plans starb an **fehlender Kompaktierung**, nicht am Modell: opencode deklariert
+`glm-5.3`/`glm-5.3-flash` mit **1 M Kontext** und kompaktiert deshalb praktisch nie — eine Session lief 12 h mit
+Kontext-Median **326 K** je Aufruf (278 Aufrufe, 86,1 M Tokens). Für die Integration heißt das: **Kontext deckeln
+(~200 K), eine Session je Arbeitsschritt, GLM-Text gegenlesen.** Flash taugt nicht für mehrstündige Arbeit; GLM 5.3
+(Default) ist brauchbar.
+
+**Befunde, die die Integration betreffen:**
+- **Kompaktierung.** Claude Code budgetiert ein unbekanntes Modell hinter fremder `ANTHROPIC_BASE_URL` laut Berichten mit
+  200 K und kompaktiert dort — das wäre der gewünschte Deckel. `[VERIFY]` per `/context` im ersten Lauf; falls Claude Code
+  dem Modell 1 M glaubt (`[1m]`-Suffix im Modellnamen), ist man wieder beim opencode-Fehler.
+- **Memory/Kontext.** opencode sah die Claude-Code-Memory (`~/.claude/projects/…/memory/`) **nicht** (0 Treffer in beiden
+  Sessions). Mit Claude Code als Harness kommt sie automatisch mit — das war der größte Qualitätshebel (u. a. „Vision
+  läuft auf CT 111", „Testumgebung ohne `SHAREFYX_*`").
+- **Endpunkt.** Anthropic-kompatibel `https://api.z.ai/api/anthropic` + `ANTHROPIC_AUTH_TOKEN`; Modell-Slots
+  (Opus/Sonnet/Haiku) auf GLM mappen. Exakte Variablen `[VERIFY]` an docs.z.ai/devpack/tool/claude. Token gehört in den
+  Keyring bzw. eine Shell-Funktion, **nicht** in eine Datei im Repo (Sharefyx Hard Rule 1).
+- **Abrechnung (Inferenz).** Z.ai zählt „Prompts" ≈ 15–20 Modellaufrufe und gewichtet GLM-5.x mit Token-Multiplikatoren;
+  Flash machte ~93 Aufrufe je Nutzer-Nachricht. Aufrufe × Kontext ist die Größe, die man begrenzen muss.
+- **Langzeilen-Falle (Sharefyx-spezifisch).** Die Sharefyx-Doku hat Absätze als Einzelzeilen: `head -60` lieferte 41 K
+  Zeichen. Ausgaben dort mit `| cut -c1-200` oder `head -c` begrenzen.
+- **Qualität.** Flash: Vision-Container trotz Plan + MCP-Konfiguration übersehen, falsche Statusaussage, kaputte
+  Doku-Rotation. Beide GLM-Varianten: Token-Glitches in committetem Text (`ROTETING`, `tirelessly窗外`) — ein Gegenlese-
+  Schritt vor jedem Commit gehört in den Ablauf.
+- **Remote Control** (claude.ai ↔ lokale Claude-Code-Session) hängt nach unserem Verständnis an einem claude.ai-Login; ein
+  gesetztes `ANTHROPIC_AUTH_TOKEN` hat Vorrang vor dem Login. Ob Remote Control mit Z.ai-Endpunkt geht, ist **ungeprüft**
+  `[VERIFY]` — Erwartung: eher nein; dann bleibt für Fernbedienung Tailscale + SSH/tmux.
+
+**Handlungsbedarf Fleet:** keiner an Sharefyx. Sharefyx fährt den ersten Lauf unter Claude Code + GLM als gedeckelten
+Vergleich (Phase-10-Head, Session-Block 2026-10-19 „Nächster Schritt") und meldet `/context`- und Remote-Control-Befund zurück.

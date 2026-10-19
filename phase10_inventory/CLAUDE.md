@@ -47,4 +47,12 @@ updated: 2026-10-19 (Claude Code: GLM-Open-Test ausgewertet → `docs/concepts/p
 
 **Verifiziert:** `pytest` **1268** grün (Umgebung ohne `SHAREFYX_*`/`SFX_*`), `doc_health` 0, beide Rotationen per Skript (alle Gegenproben OK); kein Service-Touch, kein `pkill`, kein Produktcode; Register (39,4 KB) nicht angefasst.
 
-**Nächster Schritt.** (1) Nikinger: P10-K — Flash raus; Vergleichslauf Claude Code + GLM 5.3 ja/nein. (2) M8 Frage 7 bauen (bekannte Antwort aus dem Bild selbst festhalten), dann die zwei fehlenden Modelle auf CT 111 sequenziell. (3) M7. (4) M1 beim Nikinger → D-3 → Step 4. Vorher Register rotieren (39,4 KB).
+**Nachtrag (Nikinger, Sessionende):** P10-K entschieden in der Richtung „Claude Code + GLM" — die Integration baut **eurofyx-fleet**; Sharefyx hat die Befunde dorthin als Note abgelegt (`docs/concepts/phase10_intake.md` §8).
+
+**Nächster Schritt — erste Session unter Claude Code + GLM 5.3** (Annahme: die Fleet-Integration steht; Einstieg wie immer `docs/INDEX.md` → dieser Head → dieser Block).
+0. **Harness prüfen, bevor gearbeitet wird (≤ 5 Aufrufe):** `/status` (welches Modell antwortet wirklich — Server-Mapping kann still tauschen), `/context` (Fenster **200 K** erwartet; zeigt es 1 M, sofort stoppen und dem Nikinger melden — das ist der opencode-Fehler von 2026-10-18), Memory sichtbar (`MEMORY.md` nennt CT 111 und den env-Strip). **Remote Control** einmal versuchen (`/remote-control`); Ergebnis — geht/geht nicht + Fehlermeldung — in `phase10_executor_review_glm.md` §3 nachtragen, `[VERIFY]` dort schließen, Rückmeldung an Fleet über eine Zeile in Intake §8.
+1. **Budget-Regeln für die Session:** eine Session je Step; Kontext ≤ 150 K anpeilen; keine Ganz-Datei-Reads alter Phasen-Skripte (Kopf + `grep -n`); jede zeilenbasierte Ausgabe auf Doku mit `| cut -c1-200`; vor jedem Commit den Diff auf Token-Glitches gegenlesen (Review §2 Q4/Q5).
+2. **Register rotieren** (39,4 KB) per `scripts/move_sections.py` — M2–M6-Nachträge verbatim nach L3 (`phase10_inventory/messung/`), bevor eine Zeile dazukommt.
+3. **M8 Frage 7:** die echte Falle vom 2026-10-05 aus `docs/screenshots/p9_settings_0*` (Wortlaut: Vision-Abschnitt der Sichtprüfungs-Konventionen). Bekannte Antwort **vorher** aus dem Bild selbst festhalten, dann `p10_m8_vision_probe.py` gegen beide Modelle auf CT 111. Danach `minicpm-v:8b`, `llama3.2-vision:11b` sequenziell auf CT 111 (`/api/pull`, `/api/delete` dazwischen) — **nie auf dieser VM**. Ergebnis → D-14.
+4. **M7** (Editor-Bibliothek ohne Build-Schritt, ED-1/V201).
+5. Beim Nikinger: **M1** → D-3 → **Step 4 (Plan P10.5)**.
