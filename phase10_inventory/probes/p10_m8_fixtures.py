@@ -150,6 +150,28 @@ def real_screenshot() -> None:
     }
 
 
+def real_ein_panel() -> None:
+    """Frage 7 — die echte Falle vom 2026-10-05 (Konventionen, Vision-Abschnitt): reine
+    Layout-Frage ans Einstellungen-Menü. Das Bild zeigt genau EIN Panel; qwen3-vl:8b erfand
+    damals „drei Panels: Übersicht, alpha, VERKNÜPFUNGEN". Bekannt, aus Messung/Code, nicht
+    Augenmaß: sichtbare_panels == ['settings-menu'] (2026-10-05); Titel „Einstellungen“
+    **zentriert** — P9-AM, `app.css` `#settings-menu h2 { text-align: center }` (nur dieses
+    Panel; Unterfenster-Titel bleiben links, P9-AT). Korrektur 2026-10-19: die erste Fassung
+    dieser Frage urteilte „linksbündig“ nach dem z. B.-Beispiel der Konventionen — der Code
+    widerlegte es. Das Bild ist p9_settings_01_menue_1440.png (Bild 04 heißt explizit
+    drei_panels)."""
+    QUESTIONS["real_ein_panel"] = {
+        "images": [str(REPO_ROOT / "docs/screenshots/p9_settings_01_menue_1440.png")],
+        "q": "Ein Panel oder drei? Wie viele Panels/Fenster zeigt das Bild, welchen Titel trägt das Panel, und ist der Titel links oder mittig ausgerichtet?",
+        "known": "Genau EIN Panel (Einstellungen-Menü), Titel „Einstellungen“, mittig (zentriert, P9-AM).",
+        "judge_contains": [
+            ["genau ein", "nur ein", "ein panel", "ein fenster", "ein einzel", "einzelnes", "one panel", "1 panel", "eins", "einzigen"],
+            ["einstellungen"],
+            ["mittig", "zentriert", "centered", "center"],
+        ],
+    }
+
+
 def main() -> int:
     near_duplicate()
     color_nuance()
@@ -157,6 +179,7 @@ def main() -> int:
     overlapping()
     wrong_marking()
     real_screenshot()
+    real_ein_panel()
     (DIR / "questions.json").write_text(
         json.dumps(QUESTIONS, ensure_ascii=False, indent=2) + "\n"
     )

@@ -82,5 +82,35 @@
         "text-link"
       ]
     ]
+  },
+  "real_ein_panel": {
+    "images": [
+      "/home/savefyx/dev/savefxy/docs/screenshots/p9_settings_01_menue_1440.png"
+    ],
+    "q": "Ein Panel oder drei? Wie viele Panels/Fenster zeigt das Bild, welchen Titel trägt das Panel, und ist der Titel links oder mittig ausgerichtet?",
+    "known": "Genau EIN Panel (Einstellungen-Menü), Titel „Einstellungen“, mittig (zentriert, P9-AM).",
+    "judge_contains": [
+      [
+        "genau ein",
+        "nur ein",
+        "ein panel",
+        "ein fenster",
+        "ein einzel",
+        "einzelnes",
+        "one panel",
+        "1 panel",
+        "eins",
+        "einzigen"
+      ],
+      [
+        "einstellungen"
+      ],
+      [
+        "mittig",
+        "zentriert",
+        "centered",
+        "center"
+      ]
+    ]
   }
 }

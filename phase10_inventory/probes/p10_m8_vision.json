@@ -13,7 +13,7 @@
     "known": "Referenz-Zeile: AKTIE-7 (Bild 1) vs. AKTIE-1 (Bild 2); Menge/Status identisch.",
     "raw_chars": 39,
     "answer": "Referenz: AKTIE-7 vs. Referenz: AKTIE-1",
-    "duration_s": 21.3,
+    "duration_s": 27.9,
     "passed": true,
     "group_hits": [
      [
@@ -33,7 +33,7 @@
     "known": "alpha-dienst trägt den roten Punkt, beta-dienst den grünen.",
     "raw_chars": 12,
     "answer": "alpha-dienst",
-    "duration_s": 2.7,
+    "duration_s": 2.8,
     "passed": true,
     "group_hits": [
      [
@@ -50,7 +50,7 @@
     "known": "Genau EIN Panel mit dem Titel „Archivieren“; der Rest ist leer.",
     "raw_chars": 29,
     "answer": "Ein Panel, Titel: Archivieren",
-    "duration_s": 2.7,
+    "duration_s": 2.8,
     "passed": true,
     "group_hits": [
      [
@@ -70,7 +70,7 @@
     "known": "„Gegenansicht“ liegt oben und ist voll lesbar; „Grundplan“ wird überdeckt.",
     "raw_chars": 81,
     "answer": "Der Titel \"Gegenansicht\" ist voll lesbar und das Panel \"Gegenansicht\" liegt oben.",
-    "duration_s": 22.9,
+    "duration_s": 23.0,
     "passed": true,
     "group_hits": [
      [
@@ -87,7 +87,7 @@
     "known": "Die DRITTE Aufgabe (Dritte Aufgabe) ist markiert.",
     "raw_chars": 14,
     "answer": "Dritte Aufgabe",
-    "duration_s": 3.0,
+    "duration_s": 2.9,
     "passed": true,
     "group_hits": [
      [
@@ -105,7 +105,7 @@
     "known": "„als Text-Link im Text“ ist markiert (V119-Beleg aus P8.6).",
     "raw_chars": 21,
     "answer": "als Text-Link im Text",
-    "duration_s": 4.1,
+    "duration_s": 4.2,
     "passed": true,
     "group_hits": [
      [
@@ -113,10 +113,27 @@
       "text-link"
      ]
     ]
+   },
+   {
+    "id": "real_ein_panel",
+    "images": [
+     "/home/savefyx/dev/savefxy/docs/screenshots/p9_settings_01_menue_1440.png"
+    ],
+    "question": "Ein Panel oder drei? Wie viele Panels/Fenster zeigt das Bild, welchen Titel trägt das Panel, und ist der Titel links oder mittig ausgerichtet?",
+    "known": "Genau EIN Panel (Einstellungen-Menü), Titel „Einstellungen“, mittig (zentriert, P9-AM).",
+    "raw_chars": 46,
+    "answer": "Drei Panels. Titel: alpha. Links ausgerichtet.",
+    "duration_s": 7.9,
+    "passed": false,
+    "group_hits": [
+     [],
+     [],
+     []
+    ]
    }
   ],
   "passed": 6,
-  "total": 6
+  "total": 7
  },
  "qwen2.5vl:7b": {
   "model": "qwen2.5vl:7b",
@@ -132,7 +149,7 @@
     "known": "Referenz-Zeile: AKTIE-7 (Bild 1) vs. AKTIE-1 (Bild 2); Menge/Status identisch.",
     "raw_chars": 140,
     "answer": "Die beiden Bilder unterscheiden sich in der Zeile \"Referenz\". In dem ersten Bild ist es \"AKTIE-7\", während im zweiten Bild es \"AKTIE-1\" ist.",
-    "duration_s": 48.8,
+    "duration_s": 25.4,
     "passed": true,
     "group_hits": [
      [
@@ -230,9 +247,165 @@
       "text-link"
      ]
     ]
+   },
+   {
+    "id": "real_ein_panel",
+    "images": [
+     "/home/savefyx/dev/savefxy/docs/screenshots/p9_settings_01_menue_1440.png"
+    ],
+    "question": "Ein Panel oder drei? Wie viele Panels/Fenster zeigt das Bild, welchen Titel trägt das Panel, und ist der Titel links oder mittig ausgerichtet?",
+    "known": "Genau EIN Panel (Einstellungen-Menü), Titel „Einstellungen“, mittig (zentriert, P9-AM).",
+    "raw_chars": 90,
+    "answer": "Das Bild zeigt ein Panel mit dem Titel \"Einstellungen\". Der Titel ist mittig ausgerichtet.",
+    "duration_s": 2.6,
+    "passed": true,
+    "group_hits": [
+     [
+      "ein panel",
+      "eins"
+     ],
+     [
+      "einstellungen"
+     ],
+     [
+      "mittig"
+     ]
+    ]
    }
   ],
-  "passed": 5,
-  "total": 6
+  "passed": 6,
+  "total": 7
+ },
+ "minicpm-v:8b": {
+  "model": "minicpm-v:8b",
+  "endpoint": "http://192.168.68.140:11434",
+  "results": [
+   {
+    "id": "near_duplicate",
+    "images": [
+     "m8_near_duplicate_a.png",
+     "m8_near_duplicate_b.png"
+    ],
+    "question": "Diese beiden Bilder sehen fast gleich aus. Nenne die EINE Zeile, in der sie sich unterscheiden (Wortlaut beider Werte).",
+    "known": "Referenz-Zeile: AKTIE-7 (Bild 1) vs. AKTIE-1 (Bild 2); Menge/Status identisch.",
+    "raw_chars": 30,
+    "answer": "Die Referenznummer ist anders.",
+    "duration_s": 25.8,
+    "passed": false,
+    "group_hits": [
+     []
+    ]
+   },
+   {
+    "id": "color_nuance",
+    "images": [
+     "m8_color_nuance.png"
+    ],
+    "question": "Welcher der beiden Dienste (alpha-dienst / beta-dienst) trägt den ROTEN Punkt?",
+    "known": "alpha-dienst trägt den roten Punkt, beta-dienst den grünen.",
+    "raw_chars": 12,
+    "answer": "alpha-dienst",
+    "duration_s": 0.7,
+    "passed": true,
+    "group_hits": [
+     [
+      "alpha"
+     ]
+    ]
+   },
+   {
+    "id": "empty_area",
+    "images": [
+     "m8_empty_area.png"
+    ],
+    "question": "Wie viele Panels/Fenster stehen im Bild, und was ist der Titel des Panels?",
+    "known": "Genau EIN Panel mit dem Titel „Archivieren“; der Rest ist leer.",
+    "raw_chars": 77,
+    "answer": "Es gibt ein Panel/Fenster im Bild. Der Titel des Panels lautet 'Archivieren'.",
+    "duration_s": 0.8,
+    "passed": true,
+    "group_hits": [
+     [
+      "ein"
+     ],
+     [
+      "Archivieren"
+     ]
+    ]
+   },
+   {
+    "id": "overlapping",
+    "images": [
+     "m8_overlapping.png"
+    ],
+    "question": "Zwei Panels überlappen. Welcher Titel ist VOLL lesbar und welches Panel liegt oben?",
+    "known": "„Gegenansicht“ liegt oben und ist voll lesbar; „Grundplan“ wird überdeckt.",
+    "raw_chars": 73,
+    "answer": "Der Titel \"Gegenansicht\" ist vollständig lesbar und das Panel liegt oben.",
+    "duration_s": 0.8,
+    "passed": true,
+    "group_hits": [
+     [
+      "Gegenansicht"
+     ]
+    ]
+   },
+   {
+    "id": "wrong_marking",
+    "images": [
+     "m8_wrong_marking.png"
+    ],
+    "question": "Welche der vier Aufgaben ist markiert (hervorgehobene Zeile)?",
+    "known": "Die DRITTE Aufgabe (Dritte Aufgabe) ist markiert.",
+    "raw_chars": 14,
+    "answer": "Dritte Aufgabe",
+    "duration_s": 0.6,
+    "passed": true,
+    "group_hits": [
+     [
+      "dritte",
+      "Dritte"
+     ]
+    ]
+   },
+   {
+    "id": "real_radiogruppe",
+    "images": [
+     "/home/savefyx/dev/savefxy/docs/screenshots/c4_p8519_01_radiogruppe_im_dialog.png"
+    ],
+    "question": "Welcher Radio-Button in diesem Dialog ist markiert?",
+    "known": "„als Text-Link im Text“ ist markiert (V119-Beleg aus P8.6).",
+    "raw_chars": 14,
+    "answer": "Titel oder Tag",
+    "duration_s": 1.2,
+    "passed": false,
+    "group_hits": [
+     []
+    ]
+   },
+   {
+    "id": "real_ein_panel",
+    "images": [
+     "/home/savefyx/dev/savefxy/docs/screenshots/p9_settings_01_menue_1440.png"
+    ],
+    "question": "Ein Panel oder drei? Wie viele Panels/Fenster zeigt das Bild, welchen Titel trägt das Panel, und ist der Titel links oder mittig ausgerichtet?",
+    "known": "Genau EIN Panel (Einstellungen-Menü), Titel „Einstellungen“, mittig (zentriert, P9-AM).",
+    "raw_chars": 212,
+    "answer": "Das Bild zeigt drei Fenster. Das erste Fenster trägt den Titel \"Einstellungen\", das zweite Fenster \"Verkäuferinformationen\" und das dritte Fenster \"Alle Artikel\". Der Titel \"Einstellungen\" ist links ausgerichtet.",
+    "duration_s": 1.9,
+    "passed": false,
+    "group_hits": [
+     [
+      "eins"
+     ],
+     [
+      "einstellungen"
+     ],
+     []
+    ]
+   }
+  ],
+  "passed": 4,
+  "total": 7
  }
 }
