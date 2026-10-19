@@ -1,0 +1,86 @@
+{
+  "near_duplicate": {
+    "images": [
+      "m8_near_duplicate_a.png",
+      "m8_near_duplicate_b.png"
+    ],
+    "q": "Diese beiden Bilder sehen fast gleich aus. Nenne die EINE Zeile, in der sie sich unterscheiden (Wortlaut beider Werte).",
+    "known": "Referenz-Zeile: AKTIE-7 (Bild 1) vs. AKTIE-1 (Bild 2); Menge/Status identisch.",
+    "judge_contains": [
+      [
+        "AKTIE-7",
+        "AKTIE-1",
+        "7",
+        "1"
+      ]
+    ]
+  },
+  "color_nuance": {
+    "images": [
+      "m8_color_nuance.png"
+    ],
+    "q": "Welcher der beiden Dienste (alpha-dienst / beta-dienst) trägt den ROTETING-Punkt?",
+    "known": "alpha-dienst trägt den roten Punkt, beta-dienst den grünen.",
+    "judge_contains": [
+      [
+        "alpha"
+      ]
+    ]
+  },
+  "empty_area": {
+    "images": [
+      "m8_empty_area.png"
+    ],
+    "q": "Wie viele Panels/Fenster stehen im Bild, und was ist der Titel des Panels?",
+    "known": "Genau EIN Panel mit dem Titel „Archivieren“; der Rest ist leer.",
+    "judge_contains": [
+      [
+        "ein",
+        "1",
+        "eine"
+      ],
+      [
+        "Archivieren"
+      ]
+    ]
+  },
+  "overlapping": {
+    "images": [
+      "m8_overlapping.png"
+    ],
+    "q": "Zwei Panels überlappen. Welcher Titel ist VOLL lesbar und welches Panel liegt oben?",
+    "known": "„Gegenansicht“ liegt oben und ist voll lesbar; „Grundplan“ wird überdeckt.",
+    "judge_contains": [
+      [
+        "Gegenansicht"
+      ]
+    ]
+  },
+  "wrong_marking": {
+    "images": [
+      "m8_wrong_marking.png"
+    ],
+    "q": "Welche der vier Aufgaben ist markiert (hervorgehobene Zeile)?",
+    "known": "Die DRITTE Aufgabe (Dritte Aufgabe) ist markiert.",
+    "judge_contains": [
+      [
+        "dritte",
+        "Dritte",
+        "3."
+      ]
+    ]
+  },
+  "real_radiogruppe": {
+    "images": [
+      "/home/savefyx/dev/savefxy/docs/screenshots/c4_p8519_01_radiogruppe_im_dialog.png"
+    ],
+    "q": "Welcher Radio-Button in diesem Dialog ist markiert?",
+    "known": "„als Text-Link im Text“ ist markiert (V119-Beleg aus P8.6).",
+    "judge_contains": [
+      [
+        "Text-Link",
+        "text-link"
+      ]
+    ]
+  }
+}

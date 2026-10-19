@@ -5,9 +5,29 @@ read-when: nur beim Nachvollziehen der Phasenhistorie; der aktuelle Stand steht 
 detail: L3
 up: ./CLAUDE.md
 down: []
-updated: 2026-10-18 (angelegt für die erste Rotation)
+updated: 2026-10-19 (Block 2026-10-18 zweiter Block verbatim rotiert — GLM/opencode Step-2-Session) | 2026-10-18 (angelegt für die erste Rotation)
 ---
 # Phase 10 — Session-Archiv
+## Session stopped — 2026-10-18 (zweiter Block: alle Entscheidungen D-1–D-18 eingeholt und eingearbeitet; kein Produktcode)
+
+**Ergebnis.** Der Nikinger hat in fünf Fragerunden alle offenen Entscheidungen beantwortet; sie stehen je Zeile im Register §12 und
+haben die Ziel-Spalte gesetzt: **P10.5 39** · P10 9 · P11 4 · verworfen 6 · Wissen 6 · Termin 3 · erledigt 3 · an Fleet 2 · 4 ohne Bau
+(per Skript gezählt). Zwei neue Locks im Plan §0.2: **P10-I** (niemand verschiebt in den Home-Space eines anderen — destruktiv wie
+Löschen) und **P10-J** (Abnahme Anbieter-Ziel: opencode mit M3 **und** mit einem zweiten Modellanbieter). Neue Messung **M8**
+(4 Vision-Modelle × 5 gemeine Screenshots, D-14). V206 beantwortet: O7 = P6-Zeile 30, seit P6-AF gebaut.
+
+**Befund für P10.5.** Der Umfang ist deutlich gewachsen: FastMCP 4 / MCP 2026-07-28, Realtime, Bulk-Append-Werkzeug, Space
+umbenennen, Editor Stufe 1 + 2 (P5-U aufgehoben) und `created_by` — zwei P1-Öffnungen (elfte, zwölfte). Plan §7 schneidet daraus
+zwölf Blöcke; fünf davon sind „L" und brauchen je einen Mini-Plan.
+
+**Nachtrag 2026-10-18 (Sessionende).** Logo D-6 in vier Runden entschieden: **Leuchtbahn, Variante B** (Eselsohr überlagert,
+ohne den Fortsatz, der hinausragte) — `docs/concepts/phase10_logo_entwuerfe_final.svg`. Ausführer P10.5 geändert: **Open-Test
+GLM 5.3 Flash** (Lock P10-K, ersetzt P10-E; M3-Rückfall bis 2026-11-15). **Die Integration von z.ai/GLM in opencode läuft über
+`eurofyx-fleet`, getrennt von diesem Plan** — Sharefyx setzt nur voraus, dass opencode den Ausführer stellt.
+
+**Nächster Schritt.** Step 2: M2–M8 in Claude Code gegen die Wegwerf-Instanz, M1 im Browser
+des Nikingers. Dann Step 4 (Plan P10.5).
+
 ## Session stopped — 2026-10-16 (erster Block: Phase 10 begonnen — Register-Entwurf, Plan, Karten-Entwürfe; kein Produktcode)
 
 **Ergebnis.** Vier Grundsatzantworten des Nikingers vorab eingeholt: Zweiteilung P10/P10.5 bestätigt (Register zuerst, P10.5-Plan

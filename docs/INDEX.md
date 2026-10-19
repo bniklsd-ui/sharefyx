@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-10-18 (P10: Archiv-Zeile, Register/Plan-Zeilen und Größen nachgezogen) | 2026-10-16 (Phase 10 begonnen: neuer Abschnitt mit Head, Register, Plan, Karten-Entwürfen; Intake-Zeile aus dem P9-Abschnitt hierher) | 2026-10-16 (PROMPTS-Zeile: der Phasen-Kickoff läuft seit P9 in Claude Code, Größe nachgezogen) | 2026-10-08 (**Closeout Phase 9** — Sektionskopf neu geschrieben (der alte, 3,2 KB, war ein überholter Zwischenstand, Wortlaut in `d04c0ec:docs/INDEX.md`), Handover-Zeile neu, Grafik 1080×1080, feedback- und settings-Plan 📕, Größen nachgezogen) | 2026-10-07 (Oversize-Fix: Matrix in Hub + drei lebende Teile geteilt, settings-Plan §10–§12.1 und Runbook §0/A1–A7 verbatim nach L3, `scripts/move_sections.py`; fünf neue Zeilen; Portscan P9-11/P9-94 eingetragen) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
+updated: 2026-10-19 (P10 Step 2 🟡 6/8 durch GLM/opencode — Head/Archiv/Register-Größen nachgezogen) | 2026-10-18 (P10: Archiv-Zeile, Register/Plan-Zeilen und Größen nachgezogen) | 2026-10-16 (Phase 10 begonnen: neuer Abschnitt mit Head, Register, Plan, Karten-Entwürfen; Intake-Zeile aus dem P9-Abschnitt hierher) | 2026-10-16 (PROMPTS-Zeile: der Phasen-Kickoff läuft seit P9 in Claude Code, Größe nachgezogen) | 2026-10-08 (**Closeout Phase 9** — Sektionskopf neu geschrieben (der alte, 3,2 KB, war ein überholter Zwischenstand, Wortlaut in `d04c0ec:docs/INDEX.md`), Handover-Zeile neu, Grafik 1080×1080, feedback- und settings-Plan 📕, Größen nachgezogen) | 2026-10-07 (Oversize-Fix: Matrix in Hub + drei lebende Teile geteilt, settings-Plan §10–§12.1 und Runbook §0/A1–A7 verbatim nach L3, `scripts/move_sections.py`; fünf neue Zeilen; Portscan P9-11/P9-94 eingetragen) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 ---
 # Doc Index (L0)
 
@@ -40,9 +40,9 @@ updated: 2026-10-18 (P10: Archiv-Zeile, Register/Plan-Zeilen und Größen nachge
 
 ## Phase 10 — 🔄 Bestandsaufnahme seit 2026-10-16, kein Produktcode; Tor zu P10.5 = Freigabe des Registers. Phasenziele: Anbieter-Unabhängigkeit, Karten-Umbau (Gehirnkarte)
 
-- [phase10_inventory/CLAUDE.md](../phase10_inventory/CLAUDE.md) — 🔄 ~5KB · Phase-10-Head: Modulstatus Steps 0–4/Z, offene Fragen an den Nikinger, ein Session-Block
-- [phase10_inventory/SESSIONS_ARCHIVE.md](../phase10_inventory/SESSIONS_ARCHIVE.md) — 📦 ~3KB · ältere Session-Blöcke des Phase-10-Heads, verbatim
-- [phase10_inventory/BAUSTELLENREGISTER.md](../phase10_inventory/BAUSTELLENREGISTER.md) — 📗 ~31KB · 76 Baustellen in elf Themen, Entscheidungen D-1–D-18 alle beantwortet (2026-10-18); die Arbeitsliste für P10.5
+- [phase10_inventory/CLAUDE.md](../phase10_inventory/CLAUDE.md) — 🔄 ~8KB · Phase-10-Head: Modulstatus Steps 0–4/Z (Step 2 🟡 6/8), offene Fragen an den Nikinger, ein Session-Block
+- [phase10_inventory/SESSIONS_ARCHIVE.md](../phase10_inventory/SESSIONS_ARCHIVE.md) — 📦 ~4KB · ältere Session-Blöcke des Phase-10-Heads, verbatim
+- [phase10_inventory/BAUSTELLENREGISTER.md](../phase10_inventory/BAUSTELLENREGISTER.md) — 📗 ~34KB · 76 Baustellen in elf Themen, Entscheidungen D-1–D-18 alle beantwortet (2026-10-18); die Arbeitsliste für P10.5 — seit 2026-10-18 mit M2–M6-/V204/V205-Befunden am Zeilenort
 - [docs/concepts/phase10_inventory_plan.md](./concepts/phase10_inventory_plan.md) — 📕 ~23KB · Plan P10 gegen `main@0a7aaf4`: Locks P10-A–J, Messungen M1–M8, Abnahme P10-1–12, V195–V206, P10.5-Schnitt §7
 - [docs/concepts/phase10_intake.md](./concepts/phase10_intake.md) — 📗 ~20KB · Sammelstelle, Herkunft des Registers: Wünsche 2026-10-08/-16, Erbe P9, Fleet-Notizen §5–§7
 - [docs/concepts/phase10_karte_c_stil_1.svg](./concepts/phase10_karte_c_stil_1.svg) — 📕 Karten-Entwürfe: `phase10_karte_entwurf_{a,b,c}.svg` (erste Runde, Wahl C) und `phase10_karte_c_stil_{1,2,3}.svg` (Stile der Gehirnkarte, gewählt C2); `phase10_logo_entwuerfe{,_c,_mix,_final}.svg` (Logo D-6, vier Runden)
