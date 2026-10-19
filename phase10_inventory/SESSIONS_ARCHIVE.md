@@ -8,6 +8,64 @@ down: []
 updated: 2026-10-19 (vierter Block verbatim rotiert, fuenfter Block neu im Head: erste Claude-Code+GLM-Session, M8+M7) | 2026-10-19 (dritter Block „GLM 5.3 Flash Step 2" verbatim rotiert — Claude-Code-Auswertungssession) | 2026-10-19 (Block 2026-10-18 zweiter Block verbatim rotiert — GLM/opencode Step-2-Session) | 2026-10-18 (angelegt für die erste Rotation)
 ---
 # Phase 10 — Session-Archiv
+## Session stopped — 2026-10-19 (fünfter Block: erste Session unter Claude Code + GLM 5.3 — Harness geprüft, M8 + M7 gefahren)
+
+**Auftrag:** erste Ausführungssession unter Claude Code + GLM 5.3 laut viertem Block: Schritt 0
+Harness-Prüfung, dann Register-Rotation → M8 Frage 7 → M7. Budgetregeln eingehalten (kleine Reads,
+`grep -n`, `cut -c1-200`, diff-Gegenlesen vor jedem Commit).
+
+**Harness (Schritt 0).** Memory ✅, Endpunkt/Modell-Mapping ✅ (`api.z.ai/api/anthropic`, alle drei
+Slots `glm-5.3`), Remote Control ❌ (kein Kanal, nur lokale Peers). **Fehlalarm mit Lehrwert:** im
+Session-Env steht `CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000` — ich stoppte die Arbeitsliste und
+meldete (gemäß Regel „zeigt es 1 M, sofort stoppen"); der Nikingers `/context` zeigte dann **200 K**
+(`glm-5.3`, „Auto-compact window: 200k"): die Variable wirkt in diesem Build **nicht**, Stopp
+aufgehoben, datiert korrigiert in `phase10_executor_review_glm.md` §3.1 + Intake §8-Rückmeldung.
+Die „~15 M Tokens übrig"-Anzeige ist Plan-Kontingent, kein Fenster.
+
+**Register-Rotation unterlassen (bewusste Abweichung vom vierten Block, mit Begründung):** die
+M2–M6-Nachträge liegen als **Tabellenzellen** in elf lebenden Themenabschnitten — `move_sections.py`
+verschiebt nur Überschrifts-Abschnitte, es gibt keinen Hebel. Masse der Zellen ≤ 735 B; Register
+39,4 KB < 40,96-KiB-Softcap (1,6 KB Luft); Plan §3 erlaubt Messergebnisse unter `messung/` statt im
+Register. Regel dafür: neue Registerzeilen kurz halten, Belege nach `messung/`.
+
+**M8 messfertig.** Frage 7 = die echte Falle vom 2026-10-05, Bild `p9_settings_01_menue_1440.png`.
+Bekannte Antwort aus **Code/Messung**, nicht aus dem Bild (dieser Harness lädt `Read` auf PNGs zu
+einem CDN hoch statt sie anzuzeigen): genau ein Panel, Titel „Einstellungen", **mittig** (P9-AM,
+`app.css` `#settings-menu h2 { text-align: center }`; Bild 04 heißt explizit `drei_panels`).
+**Dabei datiert korrigiert:** das „z. B."-Beispiel der Sichtprüfungs-Konventionen („linksbündig —
+bekannt: ja") war falsch und hatte die erste Fragefassung korrumpiert — die Korrektur steht am
+Zeilenort der Konventionen. Ergebnisse (`probes/p10_m8_vision.json`, je 7 Fragen):
+`qwen3-vl:8b` **6/7** — reproduziert die Falle exakt („Drei Panels. Titel: alpha."), damit ist der
+Streich von 2026-10-05 an echten Daten bestätigt; `qwen2.5vl:7b` **6/7** — besteht die echte Falle
+(vollständig korrekt), fällt synthetisch an `overlapping`; `minicpm-v:8b` **4/7** (erfindet „drei
+Fenster" mit frei erfundenen Titeln, +2 weitere Fälle); `llama3.2-vision:11b` **unlauffähig** —
+CT-111-ollama 0.34.4 meldet `unknown model architecture: 'mllama'` (Infra-Befund, kein Modellurteil;
+Modell danach per `/api/delete` wieder entfernt, CT 111 trägt wieder nur die zwei Qwen-Modelle).
+**Empfehlung an D-14: `qwen2.5vl:7b`** — Entscheidung beim Nikinger.
+
+**M7 ✅** — `messung/M7_editor.md` (neu, INDEX-Zeile im selben Commit): **CodeMirror 5.65.16**
+63,1 KB gz JS (+2,5 CSS), Roundtrip über 10 Fixtures byte-verlustfrei, 239,0 KB < 250-KB-Korridor
+(Ist-Stand der UI nachgemessen: 175,0 KB gz; der dokumentierte 144,7 KB war v3.0.2-Single-File-Ära);
+**EasyMDE** Roundtrip ok, aber 282,1 KB — reißt V201; **markdown-it** redundant zum vorhandenen
+`js/markdown.js`. bytemd vorab aussortiert (kein UMD-Dist, Peer-Deps). Messung im jsdom-Scratchpad
+`~/.claude-code-tools/m7` (nicht im Repo, Kategorie jsdom-Scratchpad seit P5 Step 10; zwei
+jsdom-Geometrie-Stubs nötig — Harness-, kein Bibliotheksbefund).
+
+**Verifiziert:** `pytest` **1268** grün, `doc_health` 0, Rotation per Skript (automatische
+Gegenproben), kein Service-Touch, kein `pkill`, kein Produktcode; CT 111 nur über die HTTP-API
+(pull/generate/delete).
+
+**Eigener Fund (Q4/Q5-Klasse, diesmal ich):** mein erster Commit-Betreff trug „das
+links**buergerliche**-Beispiel" statt „linksbündige" — der Glitch-Scan lief nur über den Diff, nicht
+den Betreff. Vor dem Push per Amendment korrigiert (`dd5acc1`). Lehre: der Scan gehört **auch** über
+die Commit-Betreffzeile. *(Nachtrag zur Rotation: der erste Rotationslauf verschob versehentlich
+diesen neuen Block statt des alten ins Archiv — neuer Block gehörte unter den alten gesetzt; über
+`git checkout` zurückgesetzt und korrekt wiederholt.)*
+
+**Nächster Schritt:** **M1** (Nikinger-Browser, beide Eingänge) → **D-3** → **Step 4 (Plan P10.5)**;
+parallel entscheiden: **D-14** (Empfehlung qwen2.5vl:7b oder CT 111 stilllegen), **V203** (Fleet),
+V199 (P10.5 Block 1). Einstieg bleibt dieser Head + dieser Block.
+
 ## Session stopped — 2026-10-19 (vierter Block: GLM-Open-Test ausgewertet, unvollendete GLM-5.3-Session geschlossen — Ausführer Claude Code)
 
 **Auftragstellung (Nikinger, Sessionbeginn):** GLM 5.3 Flash „deutlich unterdimensioniert", Kontingent gesprengt; GLM 5.3 (Default) besser, aber unter Haiku-Niveau, musste auf den Vision-Container gestoßen werden; die GLM-5.3-Session endete am 5-h-Limit. Auftrag: herausfinden, was so viel kostet, ob Claude Code + GLM besser passt, und die Qualität ansehen.

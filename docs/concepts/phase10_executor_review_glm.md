@@ -147,3 +147,22 @@ Fenster — Plan-Kontingent (Inferenz, Zahlen stehen auf der Z.ai-Usage-Seite).
 Die CT-111-Adresse stand nur in einem Session-Block, der rotiert, und in einer opencode-Konfiguration. Ab
 2026-10-19 steht sie hier und in `sichtpruefung_automation_conventions.md` (Abschnitt lokales Vision-Modell):
 **Vision-Inferenz läuft auf CT 111, `http://192.168.68.140:11434` (RTX 3060), nie auf der sharefyx-VM.**
+
+## 5. Entscheidung des Nikingers (2026-10-19, Abend) — GLM verworfen
+
+**GLM (5.3 Flash und 5.3) ist als Ausführer von P10.5 gestrichen; Lock P10-K damit erledigt, Rückfall MiniMax M3
+(opencode) bis mindestens 2026-11-15.** Z.ai-Auto-Verlängerung gekündigt. Begründung: Gegenlese-Aufwand (§2, plus der
+Commit-Betreff-Glitch aus Block 5), kein spürbarer Qualitätsgewinn, nicht planbares Prompt-Kontingent (der Lauf mit
+98 Aufrufen / 10,8 M Tokens, Kontext p50 108 K / max 165 K, kostete nach Angabe des Nikingers ~70 % des 5-h-Fensters;
+lokal nicht reproduzierbar: 98 Aufrufe ≈ 5–6 Prompts × 2–3 ≈ 15–22 % einer Lite-Rechnung — Abrechnungsmodell
+unbestätigt, Zahl steht auf der Z.ai-Usage-Seite). Dass das Modell auf Benchmarks hin getrimmt sei, ist ein
+Eindruck, kein Befund.
+
+**Neubewertung ~2026-11-10 = Marktblick.** Nicht „GLM nochmal", sondern: was ist bis dahin am Markt, wie wird es
+abgerechnet (Tokens mit Cache vs. Prompts — unser Profil hat ~99 % Cache-Treffer, das begünstigt Token-Abrechnung)?
+Kandidaten: M3.1 Flash (derzeit nicht weiter getestet), ein DeepSeek-Flash-Tokenplan, was sonst auftaucht — alles
+`[VERIFY]`. **Messlatte (vorab festgeschrieben):** dieselbe begrenzte Aufgabe je Kandidat (z. B. ein P10.5-Block),
+gezählt werden (a) Modellaufrufe, (b) beim Gegenlesen gefundene Fehler/Glitches **auch in Commit-Betreffzeilen**,
+(c) verbrauchtes Kontingent laut Anbieter-Anzeige, (d) Eingriffe des Nikingers. Kontext je Lauf ≤ 200 K, eine Session
+je Step.
+

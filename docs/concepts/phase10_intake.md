@@ -241,3 +241,14 @@ Claude-Code-Build **nicht**; **kein Handlungsbedarf mehr beim Launcher.** Remote
 
 **Handlungsbedarf Fleet:** keiner an Sharefyx. Sharefyx fährt den ersten Lauf unter Claude Code + GLM als gedeckelten
 Vergleich (Phase-10-Head, Session-Block 2026-10-19 „Nächster Schritt") und meldet `/context`- und Remote-Control-Befund zurück.
+
+**Nachtrag (2026-10-19, Abend) — GLM als Ausführer verworfen, bitte in der Fleet nicht weiter integrieren.** Entscheidung
+des Nikingers nach dem ersten Lauf unter Claude Code + GLM 5.3. Gründe, kurz: (1) **zu viel Gegenlesen** — Token-Glitches
+in committetem Text bei Flash *und* 5.3 (`ROTETING`, `tirelessly窗外`, „links**buergerliche**" im Commit-Betreff), dazu ein
+selbst ausgelöster Fehlalarm, der die Arbeitsliste stoppte; (2) **kein erkennbarer Qualitätsgewinn** gegenüber M3, im
+Eindruck des Nikingers gleich oder schlechter — der Verdacht ist ein auf Benchmarks optimiertes Modell, **nicht belegt**;
+(3) **Kontingent nicht planbar** — Abrechnung in Prompts mit Multiplikatoren, die Sitzung (98 Aufrufe, 10,8 M Tokens)
+kostete laut Nikinger ~70 % des 5-h-Fensters, lokal nicht herleitbar. Auto-Verlängerung des Z.ai-Plans gekündigt.
+**Rückfall:** MiniMax M3 über opencode (Endpunkt live bis 2026-11-15). **Neubewertung ~2026-11-10 als Marktblick**, nicht
+nur als GLM-Wiederholung — Kandidaten offen (M3.1 Flash, DeepSeek-Flash-Tokenplan u. a., alles `[VERIFY]`). Die
+Befunde zu Kompaktierung/200 K, Memory und Langzeilen-Falle oben gelten für **jeden** Ausführer weiter.
