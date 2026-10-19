@@ -1,0 +1,179 @@
+{
+  "probe": "p10_m3_dcr",
+  "public_url": "https://127.0.0.1:8799",
+  "opencode_version": "1.18.33",
+  "mcp_auth": {
+    "exit": 0,
+    "stdout": "┌  MCP OAuth Authentication\n\u001b[?25l│\n◒  Starting OAuth flow\u001b[999D\u001b[J■  Authentication failed\n\u001b[?25h│\n■\n│\n└  Done\n\n",
+    "stderr": "timestamp=2026-10-19T04:44:40.441Z level=INFO run=bfba9a98 message=\"creating instance\" directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-19T04:44:40.443Z level=INFO run=bfba9a98 message=fromDirectory directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-19T04:44:40.536Z level=INFO run=bfba9a98 message=bootstrapping directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-19T04:44:40.540Z level=INFO run=bfba9a98 message=loading path=/tmp/opencode/p10-m3-opencode/config/opencode/config.json\ntimestamp=2026-10-19T04:44:40.541Z level=INFO run=bfba9a98 message=loading path=/tmp/opencode/p10-m3-opencode/config/opencode/opencode.json\ntimestamp=2026-10-19T04:44:40.544Z level=INFO run=bfba9a98 message=loading path=/tmp/opencode/p10-m3-opencode/config/opencode/opencode.jsonc\ntimestamp=2026-10-19T04:44:40.611Z level=INFO run=bfba9a98 message=\"all LSPs are disabled\"\ntimestamp=2026-10-19T04:44:40.612Z level=INFO run=bfba9a98 message=\"all formatters are disabled\"\ntimestamp=2026-10-19T04:44:40.612Z level=INFO run=bfba9a98 message=init\n\u001b[0m\ntimestamp=2026-10-19T04:44:40.713Z level=WARN run=bfba9a98 message=\"server unavailable\" key=sharefyx type=remote status=failed\ntimestamp=2026-10-19T04:44:40.739Z level=INFO run=bfba9a98 message=\"disposing instance\" directory=/home/savefyx/dev/savefxy\n"
+  },
+  "mcp_debug": {
+    "exit": 0,
+    "stdout": "┌  MCP OAuth Debug\n│\n●  Server: sharefyx\n│\n●  URL: http://127.0.0.1:8799/mcp\n│\n●  Auth status: ✗ not authenticated\n\u001b[?25l│\n◇  HTTP response: 401 Unauthorized\n\u001b[?25h│\n●  WWW-Authenticate: Bearer error=\"invalid_token\", error_description=\"Authentication required\", resource_metadata=\"http://127.0.0.1:8799/.well-known/oauth-protected-resource/mcp\", scope=\"space\"\n│\n●  Initial unauthenticated check returned 401, so this server requires OAuth\n│\n●  Testing OAuth flow (without completing authorization)...\n│\n■  Connection error: \n│\n└  Debug complete\n\n",
+    "stderr": "timestamp=2026-10-19T04:44:41.434Z level=INFO run=3db9206a message=\"creating instance\" directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-19T04:44:41.440Z level=INFO run=3db9206a message=fromDirectory directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-19T04:44:41.490Z level=INFO run=3db9206a message=bootstrapping directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-19T04:44:41.495Z level=INFO run=3db9206a message=loading path=/tmp/opencode/p10-m3-opencode/config/opencode/config.json\ntimestamp=2026-10-19T04:44:41.495Z level=INFO run=3db9206a message=loading path=/tmp/opencode/p10-m3-opencode/config/opencode/opencode.json\ntimestamp=2026-10-19T04:44:41.499Z level=INFO run=3db9206a message=loading path=/tmp/opencode/p10-m3-opencode/config/opencode/opencode.jsonc\ntimestamp=2026-10-19T04:44:41.567Z level=INFO run=3db9206a message=\"all LSPs are disabled\"\ntimestamp=2026-10-19T04:44:41.569Z level=INFO run=3db9206a message=\"all formatters are disabled\"\ntimestamp=2026-10-19T04:44:41.569Z level=INFO run=3db9206a message=init\n\u001b[0m\ntimestamp=2026-10-19T04:44:41.633Z level=INFO run=3db9206a message=\"disposing instance\" directory=/home/savefyx/dev/savefxy\n"
+  },
+  "dcr_requests_seen": 4,
+  "dcr_request": "{\"redirect_uris\":[\"http://127.0.0.1:19876/mcp/oauth/callback\"],\"client_name\":\"OpenCode\",\"client_uri\":\"https://opencode.ai\",\"grant_types\":[\"authorization_code\",\"refresh_token\"],\"response_types\":[\"code\"],\"token_endpoint_auth_method\":\"none\",\"scope\":\"space offline_access\"}",
+  "dcr_response_line": "HTTP/1.1 400 Bad Request",
+  "dcr_response_body": "{\"error\":\"invalid_redirect_uri\"}",
+  "all_proxy_traffic": [
+    {
+      "dir": "conn",
+      "first_line": "POST /mcp HTTP/1.1"
+    },
+    {
+      "dir": "conn",
+      "first_line": "POST /mcp/ HTTP/1.1"
+    },
+    {
+      "dir": "conn",
+      "first_line": "GET /.well-known/oauth-protected-resource/mcp HTTP/1.1"
+    },
+    {
+      "dir": "conn",
+      "first_line": "GET /.well-known/oauth-authorization-server HTTP/1.1"
+    },
+    {
+      "dir": "conn",
+      "first_line": "POST /oauth/register HTTP/1.1"
+    },
+    {
+      "dir": "request",
+      "first_line": "POST /oauth/register HTTP/1.1",
+      "body": "{\"redirect_uris\":[\"http://127.0.0.1:19876/mcp/oauth/callback\"],\"client_name\":\"OpenCode\",\"client_uri\":\"https://opencode.ai\",\"grant_types\":[\"authorization_code\",\"refresh_token\"],\"response_types\":[\"code\"],\"token_endpoint_auth_method\":\"none\",\"scope\":\"space offline_access\"}"
+    },
+    {
+      "dir": "response",
+      "first_line": "HTTP/1.1 400 Bad Request",
+      "body": "{\"error\":\"invalid_redirect_uri\"}"
+    },
+    {
+      "dir": "conn",
+      "first_line": "GET /mcp HTTP/1.1"
+    },
+    {
+      "dir": "conn",
+      "first_line": "GET /mcp/ HTTP/1.1"
+    },
+    {
+      "dir": "conn",
+      "first_line": "GET /.well-known/oauth-protected-resource/mcp HTTP/1.1"
+    },
+    {
+      "dir": "conn",
+      "first_line": "GET /.well-known/oauth-authorization-server HTTP/1.1"
+    },
+    {
+      "dir": "conn",
+      "first_line": "POST /oauth/register HTTP/1.1"
+    },
+    {
+      "dir": "request",
+      "first_line": "POST /oauth/register HTTP/1.1",
+      "body": "{\"redirect_uris\":[\"http://127.0.0.1:19876/mcp/oauth/callback\"],\"client_name\":\"OpenCode\",\"client_uri\":\"https://opencode.ai\",\"grant_types\":[\"authorization_code\",\"refresh_token\"],\"response_types\":[\"code\"],\"token_endpoint_auth_method\":\"none\",\"scope\":\"space offline_access\"}"
+    },
+    {
+      "dir": "response",
+      "first_line": "HTTP/1.1 400 Bad Request",
+      "body": "{\"error\":\"invalid_redirect_uri\"}"
+    },
+    {
+      "dir": "conn",
+      "first_line": "POST /mcp HTTP/1.1"
+    },
+    {
+      "dir": "conn",
+      "first_line": "POST /mcp/ HTTP/1.1"
+    },
+    {
+      "dir": "conn",
+      "first_line": "GET /.well-known/oauth-protected-resource/mcp HTTP/1.1"
+    },
+    {
+      "dir": "conn",
+      "first_line": "GET /.well-known/oauth-authorization-server HTTP/1.1"
+    },
+    {
+      "dir": "conn",
+      "first_line": "POST /oauth/register HTTP/1.1"
+    },
+    {
+      "dir": "request",
+      "first_line": "POST /oauth/register HTTP/1.1",
+      "body": "{\"redirect_uris\":[\"http://127.0.0.1:19876/mcp/oauth/callback\"],\"client_name\":\"OpenCode\",\"client_uri\":\"https://opencode.ai\",\"grant_types\":[\"authorization_code\",\"refresh_token\"],\"response_types\":[\"code\"],\"token_endpoint_auth_method\":\"none\",\"scope\":\"space offline_access\"}"
+    },
+    {
+      "dir": "response",
+      "first_line": "HTTP/1.1 400 Bad Request",
+      "body": "{\"error\":\"invalid_redirect_uri\"}"
+    },
+    {
+      "dir": "conn",
+      "first_line": "POST /mcp HTTP/1.1"
+    },
+    {
+      "dir": "conn",
+      "first_line": "POST /mcp/ HTTP/1.1"
+    },
+    {
+      "dir": "conn",
+      "first_line": "POST /mcp HTTP/1.1"
+    },
+    {
+      "dir": "conn",
+      "first_line": "POST /mcp/ HTTP/1.1"
+    },
+    {
+      "dir": "conn",
+      "first_line": "GET /.well-known/oauth-protected-resource/mcp HTTP/1.1"
+    },
+    {
+      "dir": "conn",
+      "first_line": "GET /.well-known/oauth-authorization-server HTTP/1.1"
+    },
+    {
+      "dir": "conn",
+      "first_line": "POST /oauth/register HTTP/1.1"
+    },
+    {
+      "dir": "request",
+      "first_line": "POST /oauth/register HTTP/1.1",
+      "body": "{\"redirect_uris\":[\"http://127.0.0.1:19876/mcp/oauth/callback\"],\"client_name\":\"OpenCode\",\"client_uri\":\"https://opencode.ai\",\"grant_types\":[\"authorization_code\",\"refresh_token\"],\"response_types\":[\"code\"],\"token_endpoint_auth_method\":\"none\",\"scope\":\"space offline_access\"}"
+    },
+    {
+      "dir": "response",
+      "first_line": "HTTP/1.1 400 Bad Request",
+      "body": "{\"error\":\"invalid_redirect_uri\"}"
+    }
+  ],
+  "dcr_parsed": {
+    "client_name": "OpenCode",
+    "application_type": null,
+    "redirect_uris": [
+      "http://127.0.0.1:19876/mcp/oauth/callback"
+    ],
+    "token_endpoint_auth_method": "none",
+    "grant_types": [
+      "authorization_code",
+      "refresh_token"
+    ],
+    "response_types": [
+      "code"
+    ],
+    "client_uri": "https://opencode.ai",
+    "scope": "space offline_access"
+  },
+  "m3b_client_id": "OKhRIgQSVUwOGqvjn2rxsA",
+  "m3b": {
+    "stage": "initialize",
+    "initialize_status": 200,
+    "content_type": "text/event-stream",
+    "requested_protocol_version": "2025-03-26",
+    "negotiated_protocol_version": "2025-03-26",
+    "server_info": {
+      "name": "sharefyx-spaces",
+      "version": "3.4.7"
+    }
+  },
+  "dcr_rejected_as_expected": true
+}

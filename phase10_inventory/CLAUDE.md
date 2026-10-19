@@ -9,7 +9,7 @@ down:
   - ../docs/concepts/phase10_inventory_plan.md    # Plan: Locks P10-A–K, Steps, Messungen M1–M8, Abnahme P10-1–12, V195–V206
   - ../docs/concepts/phase10_intake.md            # Sammelstelle (Herkunft), Fleet-Notizen §5–§7
   - ../docs/concepts/PHASE9_CLOSEOUT_HANDOVER.md  # Vorphase, §4 Posten, [VERIFY]-Erbe
-updated: 2026-10-18 (M5 gefahren: BG-2/BG-3 im Browser gehalten, 14/14 Checks, TLS-Wegwerf nötig) | 2026-10-18 (M4 gefahren: BG-1 reproduziert, Wegwerf 8799 mit zwei Principals steht) | 2026-10-18 (M2 gemessen: Instrument + Grundlinie 2,4 s, P10-5 ✅ — Step 2 🟡) | 2026-10-18 (Sessionende: Logo D-6 = Leuchtbahn B, Ausführer Open-Test GLM 5.3 Flash; Integration über eurofyx-fleet) | 2026-10-18 (Step 3 ✅; zweiter Session-Block, erster nach SESSIONS_ARCHIVE rotiert) | 2026-10-16 (Plan finalisiert: D-1b = C2, V199 in die Exec-Session, BT-13 beantwortet; Nachtrag im Session-Block) | 2026-10-16 (angelegt — Phase 10 begonnen; Step 0 ✅, Step 1 Register-Entwurf ✅, Karten-Entwurf C gewählt)
+updated: 2026-10-18 (M3 gefahren: DCR festgehalten + 400 invalid_redirect_uri, M3b negotiate 2025-03-26) | 2026-10-18 (M5 gefahren: BG-2/BG-3 im Browser gehalten, 14/14 Checks, TLS-Wegwerf nötig) | 2026-10-18 (M4 gefahren: BG-1 reproduziert, Wegwerf 8799 mit zwei Principals steht) | 2026-10-18 (M2 gemessen: Instrument + Grundlinie 2,4 s, P10-5 ✅ — Step 2 🟡) | 2026-10-18 (Sessionende: Logo D-6 = Leuchtbahn B, Ausführer Open-Test GLM 5.3 Flash; Integration über eurofyx-fleet) | 2026-10-18 (Step 3 ✅; zweiter Session-Block, erster nach SESSIONS_ARCHIVE rotiert) | 2026-10-16 (Plan finalisiert: D-1b = C2, V199 in die Exec-Session, BT-13 beantwortet; Nachtrag im Session-Block) | 2026-10-16 (angelegt — Phase 10 begonnen; Step 0 ✅, Step 1 Register-Entwurf ✅, Karten-Entwurf C gewählt)
 ---
 # Phase 10 — Bestandsaufnahme
 
@@ -24,7 +24,7 @@ updated: 2026-10-18 (M5 gefahren: BG-2/BG-3 im Browser gehalten, 14/14 Checks, T
 |---|---|---|
 | 0 | Verifikations-Durchlauf (Doku ↔ Code, Links, INDEX, Oversize) | ✅ 2026-10-16 — `doc_health` 0; drei Heads über dem Softcap benannt (DO-1); Drift ins Register (Plan §1) |
 | 1 | Register-Entwurf, je Zeile ein Anker am Code | ✅ Entwurf 2026-10-16 — 76 Zeilen in elf Themen, D-1–D-18; bleibt offen für die `[VERIFY]` aus Step 2 |
-| 2 | Messungen und Proben M1–M8 (Plan §4) | 🟡 — **M2 ✅** (Instrument + Grundlinie 2,4 s, P10-5 ✅) · **M4 ✅** (BG-1 reproduziert) · **M5 ✅** (BG-2/BG-3 im Browser, 14/14 Checks; TLS-Wegwerf wegen CSRF-Origin-Gleichheit) — je `probes/` + Register. Offen: M1 (Browser des Nikingers), M3, M6, M7, M8 |
+| 2 | Messungen und Proben M1–M8 (Plan §4) | 🟡 — **M2 ✅** (Instrument + Grundlinie 2,4 s, P10-5 ✅) · **M3 ✅** (opencode-DCR festgehalten, 400 invalid_redirect_uri; M3b: authorize-Gate + Negotiation 2025-03-26) · **M4 ✅** (BG-1 reproduziert) · **M5 ✅** (BG-2/BG-3 im Browser, 14/14 Checks) — je `probes/` + Register. Offen: M1 (Browser des Nikingers), M6, M7, M8 |
 | 3 | Entscheidungen D-1–D-18 (Register §12) | ✅ 2026-10-18 — **alle D-1–D-18 beantwortet** (Register §12); an Messungen hängen nur die Zielwerte (D-3 ← M1/M2) und das Vision-Modell (D-14 ← M8) |
 | 4 | Plan P10.5 | ⬜ — beginnt, wenn D-3, D-4, D-8 stehen |
 | Z | Closeout P10: Register-Freigabe (Tor), Bilanz | ⬜ |
