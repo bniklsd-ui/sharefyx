@@ -1,0 +1,238 @@
+{
+ "qwen3-vl:8b": {
+  "model": "qwen3-vl:8b",
+  "endpoint": "http://192.168.68.140:11434",
+  "results": [
+   {
+    "id": "near_duplicate",
+    "images": [
+     "m8_near_duplicate_a.png",
+     "m8_near_duplicate_b.png"
+    ],
+    "question": "Diese beiden Bilder sehen fast gleich aus. Nenne die EINE Zeile, in der sie sich unterscheiden (Wortlaut beider Werte).",
+    "known": "Referenz-Zeile: AKTIE-7 (Bild 1) vs. AKTIE-1 (Bild 2); Menge/Status identisch.",
+    "raw_chars": 39,
+    "answer": "Referenz: AKTIE-7 vs. Referenz: AKTIE-1",
+    "duration_s": 21.3,
+    "passed": true,
+    "group_hits": [
+     [
+      "AKTIE-7",
+      "AKTIE-1",
+      "7",
+      "1"
+     ]
+    ]
+   },
+   {
+    "id": "color_nuance",
+    "images": [
+     "m8_color_nuance.png"
+    ],
+    "question": "Welcher der beiden Dienste (alpha-dienst / beta-dienst) trägt den ROTEN Punkt?",
+    "known": "alpha-dienst trägt den roten Punkt, beta-dienst den grünen.",
+    "raw_chars": 12,
+    "answer": "alpha-dienst",
+    "duration_s": 2.7,
+    "passed": true,
+    "group_hits": [
+     [
+      "alpha"
+     ]
+    ]
+   },
+   {
+    "id": "empty_area",
+    "images": [
+     "m8_empty_area.png"
+    ],
+    "question": "Wie viele Panels/Fenster stehen im Bild, und was ist der Titel des Panels?",
+    "known": "Genau EIN Panel mit dem Titel „Archivieren“; der Rest ist leer.",
+    "raw_chars": 29,
+    "answer": "Ein Panel, Titel: Archivieren",
+    "duration_s": 2.7,
+    "passed": true,
+    "group_hits": [
+     [
+      "ein"
+     ],
+     [
+      "Archivieren"
+     ]
+    ]
+   },
+   {
+    "id": "overlapping",
+    "images": [
+     "m8_overlapping.png"
+    ],
+    "question": "Zwei Panels überlappen. Welcher Titel ist VOLL lesbar und welches Panel liegt oben?",
+    "known": "„Gegenansicht“ liegt oben und ist voll lesbar; „Grundplan“ wird überdeckt.",
+    "raw_chars": 81,
+    "answer": "Der Titel \"Gegenansicht\" ist voll lesbar und das Panel \"Gegenansicht\" liegt oben.",
+    "duration_s": 22.9,
+    "passed": true,
+    "group_hits": [
+     [
+      "Gegenansicht"
+     ]
+    ]
+   },
+   {
+    "id": "wrong_marking",
+    "images": [
+     "m8_wrong_marking.png"
+    ],
+    "question": "Welche der vier Aufgaben ist markiert (hervorgehobene Zeile)?",
+    "known": "Die DRITTE Aufgabe (Dritte Aufgabe) ist markiert.",
+    "raw_chars": 14,
+    "answer": "Dritte Aufgabe",
+    "duration_s": 3.0,
+    "passed": true,
+    "group_hits": [
+     [
+      "dritte",
+      "Dritte"
+     ]
+    ]
+   },
+   {
+    "id": "real_radiogruppe",
+    "images": [
+     "/home/savefyx/dev/savefxy/docs/screenshots/c4_p8519_01_radiogruppe_im_dialog.png"
+    ],
+    "question": "Welcher Radio-Button in diesem Dialog ist markiert?",
+    "known": "„als Text-Link im Text“ ist markiert (V119-Beleg aus P8.6).",
+    "raw_chars": 21,
+    "answer": "als Text-Link im Text",
+    "duration_s": 4.1,
+    "passed": true,
+    "group_hits": [
+     [
+      "Text-Link",
+      "text-link"
+     ]
+    ]
+   }
+  ],
+  "passed": 6,
+  "total": 6
+ },
+ "qwen2.5vl:7b": {
+  "model": "qwen2.5vl:7b",
+  "endpoint": "http://192.168.68.140:11434",
+  "results": [
+   {
+    "id": "near_duplicate",
+    "images": [
+     "m8_near_duplicate_a.png",
+     "m8_near_duplicate_b.png"
+    ],
+    "question": "Diese beiden Bilder sehen fast gleich aus. Nenne die EINE Zeile, in der sie sich unterscheiden (Wortlaut beider Werte).",
+    "known": "Referenz-Zeile: AKTIE-7 (Bild 1) vs. AKTIE-1 (Bild 2); Menge/Status identisch.",
+    "raw_chars": 140,
+    "answer": "Die beiden Bilder unterscheiden sich in der Zeile \"Referenz\". In dem ersten Bild ist es \"AKTIE-7\", während im zweiten Bild es \"AKTIE-1\" ist.",
+    "duration_s": 48.8,
+    "passed": true,
+    "group_hits": [
+     [
+      "AKTIE-7",
+      "AKTIE-1",
+      "7",
+      "1"
+     ]
+    ]
+   },
+   {
+    "id": "color_nuance",
+    "images": [
+     "m8_color_nuance.png"
+    ],
+    "question": "Welcher der beiden Dienste (alpha-dienst / beta-dienst) trägt den ROTEN Punkt?",
+    "known": "alpha-dienst trägt den roten Punkt, beta-dienst den grünen.",
+    "raw_chars": 39,
+    "answer": "Der alpha-dienst trägt den roten Punkt.",
+    "duration_s": 1.5,
+    "passed": true,
+    "group_hits": [
+     [
+      "alpha"
+     ]
+    ]
+   },
+   {
+    "id": "empty_area",
+    "images": [
+     "m8_empty_area.png"
+    ],
+    "question": "Wie viele Panels/Fenster stehen im Bild, und was ist der Titel des Panels?",
+    "known": "Genau EIN Panel mit dem Titel „Archivieren“; der Rest ist leer.",
+    "raw_chars": 86,
+    "answer": "Im Bild gibt es ein einziges Panel/Fenster. Der Titel des Panels lautet \"Archivieren\".",
+    "duration_s": 1.6,
+    "passed": true,
+    "group_hits": [
+     [
+      "ein"
+     ],
+     [
+      "Archivieren"
+     ]
+    ]
+   },
+   {
+    "id": "overlapping",
+    "images": [
+     "m8_overlapping.png"
+    ],
+    "question": "Zwei Panels überlappen. Welcher Titel ist VOLL lesbar und welches Panel liegt oben?",
+    "known": "„Gegenansicht“ liegt oben und ist voll lesbar; „Grundplan“ wird überdeckt.",
+    "raw_chars": 97,
+    "answer": "Der Titel \"Grundplan\" ist vollständig lesbar, und das Panel mit dem Titel \"Grundplan\" liegt oben.",
+    "duration_s": 1.6,
+    "passed": false,
+    "group_hits": [
+     []
+    ]
+   },
+   {
+    "id": "wrong_marking",
+    "images": [
+     "m8_wrong_marking.png"
+    ],
+    "question": "Welche der vier Aufgaben ist markiert (hervorgehobene Zeile)?",
+    "known": "Die DRITTE Aufgabe (Dritte Aufgabe) ist markiert.",
+    "raw_chars": 32,
+    "answer": "Die dritte Aufgabe ist markiert.",
+    "duration_s": 1.4,
+    "passed": true,
+    "group_hits": [
+     [
+      "dritte",
+      "Dritte"
+     ]
+    ]
+   },
+   {
+    "id": "real_radiogruppe",
+    "images": [
+     "/home/savefyx/dev/savefxy/docs/screenshots/c4_p8519_01_radiogruppe_im_dialog.png"
+    ],
+    "question": "Welcher Radio-Button in diesem Dialog ist markiert?",
+    "known": "„als Text-Link im Text“ ist markiert (V119-Beleg aus P8.6).",
+    "raw_chars": 54,
+    "answer": "Der Radio-Button \"als Text-Link im Text\" ist markiert.",
+    "duration_s": 2.4,
+    "passed": true,
+    "group_hits": [
+     [
+      "Text-Link",
+      "text-link"
+     ]
+    ]
+   }
+  ],
+  "passed": 5,
+  "total": 6
+ }
+}

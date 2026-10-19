@@ -74,7 +74,7 @@ def color_nuance() -> None:
     img.save(DIR / "m8_color_nuance.png")
     QUESTIONS["color_nuance"] = {
         "images": ["m8_color_nuance.png"],
-        "q": "Welcher der beiden Dienste (alpha-dienst / beta-dienst) trägt den ROTETING-Punkt?",
+        "q": "Welcher der beiden Dienste (alpha-dienst / beta-dienst) trägt den ROTEN Punkt?",
         "known": "alpha-dienst trägt den roten Punkt, beta-dienst den grünen.",
         "judge_contains": [["alpha"]],
     }
