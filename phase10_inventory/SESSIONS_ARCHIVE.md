@@ -5,9 +5,31 @@ read-when: nur beim Nachvollziehen der Phasenhistorie; der aktuelle Stand steht 
 detail: L3
 up: ./CLAUDE.md
 down: []
-updated: 2026-10-19 (dritter Block „GLM 5.3 Flash Step 2" verbatim rotiert — Claude-Code-Auswertungssession) | 2026-10-19 (Block 2026-10-18 zweiter Block verbatim rotiert — GLM/opencode Step-2-Session) | 2026-10-18 (angelegt für die erste Rotation)
+updated: 2026-10-19 (vierter Block verbatim rotiert, fuenfter Block neu im Head: erste Claude-Code+GLM-Session, M8+M7) | 2026-10-19 (dritter Block „GLM 5.3 Flash Step 2" verbatim rotiert — Claude-Code-Auswertungssession) | 2026-10-19 (Block 2026-10-18 zweiter Block verbatim rotiert — GLM/opencode Step-2-Session) | 2026-10-18 (angelegt für die erste Rotation)
 ---
 # Phase 10 — Session-Archiv
+## Session stopped — 2026-10-19 (vierter Block: GLM-Open-Test ausgewertet, unvollendete GLM-5.3-Session geschlossen — Ausführer Claude Code)
+
+**Auftragstellung (Nikinger, Sessionbeginn):** GLM 5.3 Flash „deutlich unterdimensioniert", Kontingent gesprengt; GLM 5.3 (Default) besser, aber unter Haiku-Niveau, musste auf den Vision-Container gestoßen werden; die GLM-5.3-Session endete am 5-h-Limit. Auftrag: herausfinden, was so viel kostet, ob Claude Code + GLM besser passt, und die Qualität ansehen.
+
+**Ergebnis.** Auswertung in **`docs/concepts/phase10_executor_review_glm.md`** (neu, aus `~/.local/share/opencode/opencode.db` read-only): **eine** Flash-Session, 278 Aufrufe, Kontext p50 **326 K**, max **567 K**, Summe **86,1 M** Tokens, **nie kompaktiert** — opencode deklariert `glm-5.3(-flash)` mit 1 M Kontext. Deckel 250 K hätte −28 %, 150 K −54 % gespart. GLM 5.3 war kein Kostenfall (32 Aufrufe, max 129 K), es erbte das von Flash geleerte Fenster. Qualität Q1–Q6 (Review §2): CT 111 trotz Plan + MCP-Konfiguration übersehen, falsche Statusaussage, kaputte Rotation (Flash); Token-Glitches in committetem Text (`ROTETING`, `tirelessly窗外`). Claude Code + GLM: Memory und 200-K-Kompaktierung kämen mit — Vergleichslauf empfohlen, **Entscheidung Nikinger (P10-K)**.
+
+**M8 weitergeführt.** GLM-5.3-Runner `probes/p10_m8_vision_probe.py` committet (Docstring-Glitches korrigiert), Fixture-Frage `color_nuance` von „ROTETING-Punkt" auf „ROTEN Punkt" korrigiert, beide auf CT 111 vorhandenen Modelle neu gefahren → `probes/p10_m8_vision.json`: **`qwen3-vl:8b` 6/6**, **`qwen2.5vl:7b` 5/6** (fällt `overlapping`). Befund: die synthetischen Fixtures reproduzieren den Fehler vom 2026-10-05 **nicht** — M8 ist erst aussagekräftig mit der echten Frage 7 (`docs/screenshots/p9_settings_0*`, Wortlaut der damaligen Frage: `sichtpruefung_automation_conventions.md` Vision-Abschnitt). `minicpm-v:8b`, `llama3.2-vision:11b` nicht gezogen.
+
+**Dauerhaft festgehalten:** CT-111-Adresse `192.168.68.140:11434` im Vision-Abschnitt der Sichtprüfungs-Konventionen (stand nur in einem rotierenden Block).
+
+**Verifiziert:** `pytest` **1268** grün (Umgebung ohne `SHAREFYX_*`/`SFX_*`), `doc_health` 0, beide Rotationen per Skript (alle Gegenproben OK); kein Service-Touch, kein `pkill`, kein Produktcode; Register (39,4 KB) nicht angefasst.
+
+**Nachtrag (Nikinger, Sessionende):** P10-K entschieden in der Richtung „Claude Code + GLM" — die Integration baut **eurofyx-fleet**; Sharefyx hat die Befunde dorthin als Note abgelegt (`docs/concepts/phase10_intake.md` §8).
+
+**Nächster Schritt — erste Session unter Claude Code + GLM 5.3** (Annahme: die Fleet-Integration steht; Einstieg wie immer `docs/INDEX.md` → dieser Head → dieser Block).
+0. **Harness prüfen, bevor gearbeitet wird (≤ 5 Aufrufe):** `/status` (welches Modell antwortet wirklich — Server-Mapping kann still tauschen), `/context` (Fenster **200 K** erwartet; zeigt es 1 M, sofort stoppen und dem Nikinger melden — das ist der opencode-Fehler von 2026-10-18), Memory sichtbar (`MEMORY.md` nennt CT 111 und den env-Strip). **Remote Control** einmal versuchen (`/remote-control`); Ergebnis — geht/geht nicht + Fehlermeldung — in `phase10_executor_review_glm.md` §3 nachtragen, `[VERIFY]` dort schließen, Rückmeldung an Fleet über eine Zeile in Intake §8.
+1. **Budget-Regeln für die Session:** eine Session je Step; Kontext ≤ 150 K anpeilen; keine Ganz-Datei-Reads alter Phasen-Skripte (Kopf + `grep -n`); jede zeilenbasierte Ausgabe auf Doku mit `| cut -c1-200`; vor jedem Commit den Diff auf Token-Glitches gegenlesen (Review §2 Q4/Q5).
+2. **Register rotieren** (39,4 KB) per `scripts/move_sections.py` — M2–M6-Nachträge verbatim nach L3 (`phase10_inventory/messung/`), bevor eine Zeile dazukommt.
+3. **M8 Frage 7:** die echte Falle vom 2026-10-05 aus `docs/screenshots/p9_settings_0*` (Wortlaut: Vision-Abschnitt der Sichtprüfungs-Konventionen). Bekannte Antwort **vorher** aus dem Bild selbst festhalten, dann `p10_m8_vision_probe.py` gegen beide Modelle auf CT 111. Danach `minicpm-v:8b`, `llama3.2-vision:11b` sequenziell auf CT 111 (`/api/pull`, `/api/delete` dazwischen) — **nie auf dieser VM**. Ergebnis → D-14.
+4. **M7** (Editor-Bibliothek ohne Build-Schritt, ED-1/V201).
+5. Beim Nikinger: **M1** → D-3 → **Step 4 (Plan P10.5)**.
+
 ## Session stopped — 2026-10-18/-19 (dritter Block: Step 2 auf 6 von 8 Messungen gebracht — Ausführer erstmals GLM 5.3 Flash via opencode, P10-K Open-Test)
 
 **Auftragstellung (Nikinger, Sessionbeginn):** Plan §3 nannte Claude Code als Step-2-Ausführer; der Nikinger entschied in der Session: M2–M8 **hier** fahren. Kein Produktcode (P10-H); Wegwerf-Arbeit auf Port 8799 (`probes/p10_wegwerf.py`, zwei Principals nach Technik 4).

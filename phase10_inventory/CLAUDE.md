@@ -35,24 +35,60 @@ updated: 2026-10-19 (Nachmittag 3: M7 ✅ (CM5 passt: 239 KB, Roundtrip 10/10 �
 - **V199** — in der Exec-Session (P10.5 Block 1): `curl localhost:2019/config/` auf der VPS, unmittelbar bevor die Caddy-Vorlage nachzieht (BT-1).
 - **V203** — Funnel-Pfad von außen gewächter? Das Fleet-Repo liegt auf dieser VM nicht vor (`~/dev/` trägt nur dieses Repo) — Klärung eurofyx-fleet-Seite (BT-10/D-17-Umfang).
 
-## Session stopped — 2026-10-19 (vierter Block: GLM-Open-Test ausgewertet, unvollendete GLM-5.3-Session geschlossen — Ausführer Claude Code)
+## Session stopped — 2026-10-19 (fünfter Block: erste Session unter Claude Code + GLM 5.3 — Harness geprüft, M8 + M7 gefahren)
 
-**Auftragstellung (Nikinger, Sessionbeginn):** GLM 5.3 Flash „deutlich unterdimensioniert", Kontingent gesprengt; GLM 5.3 (Default) besser, aber unter Haiku-Niveau, musste auf den Vision-Container gestoßen werden; die GLM-5.3-Session endete am 5-h-Limit. Auftrag: herausfinden, was so viel kostet, ob Claude Code + GLM besser passt, und die Qualität ansehen.
+**Auftrag:** erste Ausführungssession unter Claude Code + GLM 5.3 laut viertem Block: Schritt 0
+Harness-Prüfung, dann Register-Rotation → M8 Frage 7 → M7. Budgetregeln eingehalten (kleine Reads,
+`grep -n`, `cut -c1-200`, diff-Gegenlesen vor jedem Commit).
 
-**Ergebnis.** Auswertung in **`docs/concepts/phase10_executor_review_glm.md`** (neu, aus `~/.local/share/opencode/opencode.db` read-only): **eine** Flash-Session, 278 Aufrufe, Kontext p50 **326 K**, max **567 K**, Summe **86,1 M** Tokens, **nie kompaktiert** — opencode deklariert `glm-5.3(-flash)` mit 1 M Kontext. Deckel 250 K hätte −28 %, 150 K −54 % gespart. GLM 5.3 war kein Kostenfall (32 Aufrufe, max 129 K), es erbte das von Flash geleerte Fenster. Qualität Q1–Q6 (Review §2): CT 111 trotz Plan + MCP-Konfiguration übersehen, falsche Statusaussage, kaputte Rotation (Flash); Token-Glitches in committetem Text (`ROTETING`, `tirelessly窗外`). Claude Code + GLM: Memory und 200-K-Kompaktierung kämen mit — Vergleichslauf empfohlen, **Entscheidung Nikinger (P10-K)**.
+**Harness (Schritt 0).** Memory ✅, Endpunkt/Modell-Mapping ✅ (`api.z.ai/api/anthropic`, alle drei
+Slots `glm-5.3`), Remote Control ❌ (kein Kanal, nur lokale Peers). **Fehlalarm mit Lehrwert:** im
+Session-Env steht `CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000` — ich stoppte die Arbeitsliste und
+meldete (gemäß Regel „zeigt es 1 M, sofort stoppen"); der Nikingers `/context` zeigte dann **200 K**
+(`glm-5.3`, „Auto-compact window: 200k"): die Variable wirkt in diesem Build **nicht**, Stopp
+aufgehoben, datiert korrigiert in `phase10_executor_review_glm.md` §3.1 + Intake §8-Rückmeldung.
+Die „~15 M Tokens übrig"-Anzeige ist Plan-Kontingent, kein Fenster.
 
-**M8 weitergeführt.** GLM-5.3-Runner `probes/p10_m8_vision_probe.py` committet (Docstring-Glitches korrigiert), Fixture-Frage `color_nuance` von „ROTETING-Punkt" auf „ROTEN Punkt" korrigiert, beide auf CT 111 vorhandenen Modelle neu gefahren → `probes/p10_m8_vision.json`: **`qwen3-vl:8b` 6/6**, **`qwen2.5vl:7b` 5/6** (fällt `overlapping`). Befund: die synthetischen Fixtures reproduzieren den Fehler vom 2026-10-05 **nicht** — M8 ist erst aussagekräftig mit der echten Frage 7 (`docs/screenshots/p9_settings_0*`, Wortlaut der damaligen Frage: `sichtpruefung_automation_conventions.md` Vision-Abschnitt). `minicpm-v:8b`, `llama3.2-vision:11b` nicht gezogen.
+**Register-Rotation unterlassen (bewusste Abweichung vom vierten Block, mit Begründung):** die
+M2–M6-Nachträge liegen als **Tabellenzellen** in elf lebenden Themenabschnitten — `move_sections.py`
+verschiebt nur Überschrifts-Abschnitte, es gibt keinen Hebel. Masse der Zellen ≤ 735 B; Register
+39,4 KB < 40,96-KiB-Softcap (1,6 KB Luft); Plan §3 erlaubt Messergebnisse unter `messung/` statt im
+Register. Regel dafür: neue Registerzeilen kurz halten, Belege nach `messung/`.
 
-**Dauerhaft festgehalten:** CT-111-Adresse `192.168.68.140:11434` im Vision-Abschnitt der Sichtprüfungs-Konventionen (stand nur in einem rotierenden Block).
+**M8 messfertig.** Frage 7 = die echte Falle vom 2026-10-05, Bild `p9_settings_01_menue_1440.png`.
+Bekannte Antwort aus **Code/Messung**, nicht aus dem Bild (dieser Harness lädt `Read` auf PNGs zu
+einem CDN hoch statt sie anzuzeigen): genau ein Panel, Titel „Einstellungen", **mittig** (P9-AM,
+`app.css` `#settings-menu h2 { text-align: center }`; Bild 04 heißt explizit `drei_panels`).
+**Dabei datiert korrigiert:** das „z. B."-Beispiel der Sichtprüfungs-Konventionen („linksbündig —
+bekannt: ja") war falsch und hatte die erste Fragefassung korrumpiert — die Korrektur steht am
+Zeilenort der Konventionen. Ergebnisse (`probes/p10_m8_vision.json`, je 7 Fragen):
+`qwen3-vl:8b` **6/7** — reproduziert die Falle exakt („Drei Panels. Titel: alpha."), damit ist der
+Streich von 2026-10-05 an echten Daten bestätigt; `qwen2.5vl:7b` **6/7** — besteht die echte Falle
+(vollständig korrekt), fällt synthetisch an `overlapping`; `minicpm-v:8b` **4/7** (erfindet „drei
+Fenster" mit frei erfundenen Titeln, +2 weitere Fälle); `llama3.2-vision:11b` **unlauffähig** —
+CT-111-ollama 0.34.4 meldet `unknown model architecture: 'mllama'` (Infra-Befund, kein Modellurteil;
+Modell danach per `/api/delete` wieder entfernt, CT 111 trägt wieder nur die zwei Qwen-Modelle).
+**Empfehlung an D-14: `qwen2.5vl:7b`** — Entscheidung beim Nikinger.
 
-**Verifiziert:** `pytest` **1268** grün (Umgebung ohne `SHAREFYX_*`/`SFX_*`), `doc_health` 0, beide Rotationen per Skript (alle Gegenproben OK); kein Service-Touch, kein `pkill`, kein Produktcode; Register (39,4 KB) nicht angefasst.
+**M7 ✅** — `messung/M7_editor.md` (neu, INDEX-Zeile im selben Commit): **CodeMirror 5.65.16**
+63,1 KB gz JS (+2,5 CSS), Roundtrip über 10 Fixtures byte-verlustfrei, 239,0 KB < 250-KB-Korridor
+(Ist-Stand der UI nachgemessen: 175,0 KB gz; der dokumentierte 144,7 KB war v3.0.2-Single-File-Ära);
+**EasyMDE** Roundtrip ok, aber 282,1 KB — reißt V201; **markdown-it** redundant zum vorhandenen
+`js/markdown.js`. bytemd vorab aussortiert (kein UMD-Dist, Peer-Deps). Messung im jsdom-Scratchpad
+`~/.claude-code-tools/m7` (nicht im Repo, Kategorie jsdom-Scratchpad seit P5 Step 10; zwei
+jsdom-Geometrie-Stubs nötig — Harness-, kein Bibliotheksbefund).
 
-**Nachtrag (Nikinger, Sessionende):** P10-K entschieden in der Richtung „Claude Code + GLM" — die Integration baut **eurofyx-fleet**; Sharefyx hat die Befunde dorthin als Note abgelegt (`docs/concepts/phase10_intake.md` §8).
+**Verifiziert:** `pytest` **1268** grün, `doc_health` 0, Rotation per Skript (automatische
+Gegenproben), kein Service-Touch, kein `pkill`, kein Produktcode; CT 111 nur über die HTTP-API
+(pull/generate/delete).
 
-**Nächster Schritt — erste Session unter Claude Code + GLM 5.3** (Annahme: die Fleet-Integration steht; Einstieg wie immer `docs/INDEX.md` → dieser Head → dieser Block).
-0. **Harness prüfen, bevor gearbeitet wird (≤ 5 Aufrufe):** `/status` (welches Modell antwortet wirklich — Server-Mapping kann still tauschen), `/context` (Fenster **200 K** erwartet; zeigt es 1 M, sofort stoppen und dem Nikinger melden — das ist der opencode-Fehler von 2026-10-18), Memory sichtbar (`MEMORY.md` nennt CT 111 und den env-Strip). **Remote Control** einmal versuchen (`/remote-control`); Ergebnis — geht/geht nicht + Fehlermeldung — in `phase10_executor_review_glm.md` §3 nachtragen, `[VERIFY]` dort schließen, Rückmeldung an Fleet über eine Zeile in Intake §8.
-1. **Budget-Regeln für die Session:** eine Session je Step; Kontext ≤ 150 K anpeilen; keine Ganz-Datei-Reads alter Phasen-Skripte (Kopf + `grep -n`); jede zeilenbasierte Ausgabe auf Doku mit `| cut -c1-200`; vor jedem Commit den Diff auf Token-Glitches gegenlesen (Review §2 Q4/Q5).
-2. **Register rotieren** (39,4 KB) per `scripts/move_sections.py` — M2–M6-Nachträge verbatim nach L3 (`phase10_inventory/messung/`), bevor eine Zeile dazukommt.
-3. **M8 Frage 7:** die echte Falle vom 2026-10-05 aus `docs/screenshots/p9_settings_0*` (Wortlaut: Vision-Abschnitt der Sichtprüfungs-Konventionen). Bekannte Antwort **vorher** aus dem Bild selbst festhalten, dann `p10_m8_vision_probe.py` gegen beide Modelle auf CT 111. Danach `minicpm-v:8b`, `llama3.2-vision:11b` sequenziell auf CT 111 (`/api/pull`, `/api/delete` dazwischen) — **nie auf dieser VM**. Ergebnis → D-14.
-4. **M7** (Editor-Bibliothek ohne Build-Schritt, ED-1/V201).
-5. Beim Nikinger: **M1** → D-3 → **Step 4 (Plan P10.5)**.
+**Eigener Fund (Q4/Q5-Klasse, diesmal ich):** mein erster Commit-Betreff trug „das
+links**buergerliche**-Beispiel" statt „linksbündige" — der Glitch-Scan lief nur über den Diff, nicht
+den Betreff. Vor dem Push per Amendment korrigiert (`dd5acc1`). Lehre: der Scan gehört **auch** über
+die Commit-Betreffzeile. *(Nachtrag zur Rotation: der erste Rotationslauf verschob versehentlich
+diesen neuen Block statt des alten ins Archiv — neuer Block gehörte unter den alten gesetzt; über
+`git checkout` zurückgesetzt und korrekt wiederholt.)*
+
+**Nächster Schritt:** **M1** (Nikinger-Browser, beide Eingänge) → **D-3** → **Step 4 (Plan P10.5)**;
+parallel entscheiden: **D-14** (Empfehlung qwen2.5vl:7b oder CT 111 stilllegen), **V203** (Fleet),
+V199 (P10.5 Block 1). Einstieg bleibt dieser Head + dieser Block.

@@ -40,9 +40,9 @@ updated: 2026-10-19 (P10: neue Zeile M7_editor.md — M7 gemessen: CM5 passt, Ea
 
 ## Phase 10 — 🔄 Bestandsaufnahme seit 2026-10-16, kein Produktcode; Tor zu P10.5 = Freigabe des Registers. Phasenziele: Anbieter-Unabhängigkeit, Karten-Umbau (Gehirnkarte)
 
-- [phase10_inventory/CLAUDE.md](../phase10_inventory/CLAUDE.md) — 🔄 ~7KB · Phase-10-Head: Modulstatus Steps 0–4/Z (Step 2 🟡 6/8, M8 🟡), offene Fragen an den Nikinger, ein Session-Block
-- [phase10_inventory/SESSIONS_ARCHIVE.md](../phase10_inventory/SESSIONS_ARCHIVE.md) — 📦 ~9KB · ältere Session-Blöcke des Phase-10-Heads, verbatim
-- [phase10_inventory/BAUSTELLENREGISTER.md](../phase10_inventory/BAUSTELLENREGISTER.md) — 📗 ~34KB · 76 Baustellen in elf Themen, Entscheidungen D-1–D-18 alle beantwortet (2026-10-18); die Arbeitsliste für P10.5 — seit 2026-10-18 mit M2–M6-/V204/V205-Befunden am Zeilenort
+- [phase10_inventory/CLAUDE.md](../phase10_inventory/CLAUDE.md) — 🔄 ~11KB · Phase-10-Head: Modulstatus Steps 0–4/Z (Step 2 🟡 **7/8**, offen nur M1; M7/M8 ✅), Fragen an den Nikinger, ein Session-Block
+- [phase10_inventory/SESSIONS_ARCHIVE.md](../phase10_inventory/SESSIONS_ARCHIVE.md) — 📦 ~14KB · ältere Session-Blöcke des Phase-10-Heads, verbatim
+- [phase10_inventory/BAUSTELLENREGISTER.md](../phase10_inventory/BAUSTELLENREGISTER.md) — 📗 **40,8 KB, am Softcap** — Belege nach `messung/` · 76 Baustellen in elf Themen, Entscheidungen D-1–D-18 alle beantwortet (2026-10-18); die Arbeitsliste für P10.5 — seit 2026-10-18 mit M2–M6-/V204/V205-Befunden am Zeilenort
 - [phase10_inventory/messung/M7_editor.md](../phase10_inventory/messung/M7_editor.md) — 📗 ~5KB · M7: Editor-Bibliothek ohne Build-Schritt — CM5 65,6 KB gz + Roundtrip 10/10 + 239 KB im Korridor ✅, EasyMDE 282 KB ❌ (V201), markdown-it redundant; füttert ED-1
 - [docs/concepts/phase10_inventory_plan.md](./concepts/phase10_inventory_plan.md) — 📕 ~23KB · Plan P10 gegen `main@0a7aaf4`: Locks P10-A–J, Messungen M1–M8, Abnahme P10-1–12, V195–V206, P10.5-Schnitt §7
 - [docs/concepts/phase10_executor_review_glm.md](./concepts/phase10_executor_review_glm.md) — 📗 ~10KB · Auswertung P10-K-Open-Test (GLM 5.3 Flash/5.3 via opencode): Kontingent-Treiber (keine Kompaktierung bei deklarierten 1 M), Qualitätsbefunde Q1–Q6, Vergleich Claude Code + GLM, Empfehlung an den Nikinger
