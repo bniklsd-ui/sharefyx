@@ -235,5 +235,9 @@ Session neu starten.** Remote Control: **geht nicht** — kein Remote-Kanal sich
 automatisch mit. Endpunkt/Modell-Mapping bestätigt: `ANTHROPIC_BASE_URL=https://api.z.ai/api/anthropic`, alle drei
 Slots auf `glm-5.3`. Details: `phase10_executor_review_glm.md` §3.1.
 
+**Korrektur dazu (2026-10-19, `/context` vom Nikinger):** entgegen der Rückmeldung oben zeigt `/context` **200 K**
+(„Auto-compact window: 200k tokens", Modell `glm-5.3`) — `CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000` wirkt in diesem
+Claude-Code-Build **nicht**; **kein Handlungsbedarf mehr beim Launcher.** Remote Control ❌ bleibt.
+
 **Handlungsbedarf Fleet:** keiner an Sharefyx. Sharefyx fährt den ersten Lauf unter Claude Code + GLM als gedeckelten
 Vergleich (Phase-10-Head, Session-Block 2026-10-19 „Nächster Schritt") und meldet `/context`- und Remote-Control-Befund zurück.

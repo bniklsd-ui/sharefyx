@@ -6,7 +6,7 @@ detail: L2
 up: ../INDEX.md
 down:
   - ../../phase10_inventory/CLAUDE.md   # Phase-Head, Session-Block mit dem Kontext
-updated: 2026-10-19 (§3.1: erster Lauf unter Claude Code + GLM — `CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000` im Session-Env widerlegt die 200-K-Annahme; Remote Control ohne Kanal; Lauf gemäß Session-Block gestoppt) | 2026-10-19 (angelegt — Claude Code, Auswertung aus `~/.local/share/opencode/opencode.db`, read-only)
+updated: 2026-10-19 (§3.1-Korrektur: `/context` (Nikinger) zeigt 200 K — die Env-Variable wirkt nicht, Stopp aufgehoben) | 2026-10-19 (§3.1: erster Lauf unter Claude Code + GLM — `CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000` im Session-Env widerlegt die 200-K-Annahme; Remote Control ohne Kanal; Lauf gemäß Session-Block gestoppt) | 2026-10-19 (angelegt — Claude Code, Auswertung aus `~/.local/share/opencode/opencode.db`, read-only)
 ---
 # P10-K Open-Test — Auswertung GLM/opencode (2026-10-19)
 
@@ -133,6 +133,14 @@ innen beobachtbar bestätigt; `/remote-control` selbst ist ein User-Kommando.
 kann der Agent nicht selbst tippen; `/context` wird 1 M zeigen, die Env-Variable beweist es vorab. Die Arbeitsliste
 (Register-Rotation, M8 Frage 7, M7) ist gemäß Session-Block gestoppt („zeigt es 1 M, sofort stoppen und dem
 Nikinger melden") und wartet auf die Fenster-Entscheidung.
+
+**Korrektur (2026-10-19, später Nachmittag — Nikinger hat `/context` getippt): die Env-Variable wirkt nicht.**
+`/context` zeigt **200 K** (67,3 K belegt, „Auto-compact window: 200k tokens", Modell `glm-5.3`) — die 200-K-Zeile
+der Tabelle oben steht damit doch, der Stopp war gegenstandslos, die Arbeitsliste läuft wieder.
+`CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000` war ein Versehen ohne Wirkung (dieser Claude-Code-Build deckelt auf 200 K);
+die Variable kann aus dem Launcher entfernt werden, muss es aber nicht. Remote Control ❌, Memory ✅ und die
+Endpunkt-/Modell-Bestätigung bleiben unverändert gültig. Die „~15 M Tokens übrig"-Anzeige ist damit endgültig kein
+Fenster — Plan-Kontingent (Inferenz, Zahlen stehen auf der Z.ai-Usage-Seite).
 
 ## 4. Was dauerhaft festgehalten werden musste
 
