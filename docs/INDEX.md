@@ -40,10 +40,10 @@ updated: 2026-10-20 (P10: M1 gemessen, D-3/D-14 entschieden, neue Zeile M1_brows
 
 ## Phase 10 — 🔄 Bestandsaufnahme seit 2026-10-16, kein Produktcode; Tor zu P10.5 = Freigabe des Registers. Phasenziele: Anbieter-Unabhängigkeit, Karten-Umbau (Gehirnkarte)
 
-- [phase10_inventory/CLAUDE.md](../phase10_inventory/CLAUDE.md) — 🔄 ~8KB · Phase-10-Head: Modulstatus Steps 0–4/Z (Step 2 ✅ **8/8**, D-3/D-14 entschieden, Step 4 frei), GLM verworfen, ein Session-Block
-- [phase10_inventory/SESSIONS_ARCHIVE.md](../phase10_inventory/SESSIONS_ARCHIVE.md) — 📦 ~21KB · ältere Session-Blöcke, verbatim
+- [phase10_inventory/CLAUDE.md](../phase10_inventory/CLAUDE.md) — 🔄 ~9KB · Phase-10-Head: Modulstatus Steps 0–4/Z (Step 2 ✅ **8/8**, D-3/D-14 entschieden, Step 4 frei), GLM verworfen, ein Session-Block
+- [phase10_inventory/SESSIONS_ARCHIVE.md](../phase10_inventory/SESSIONS_ARCHIVE.md) — 📦 ~24KB · ältere Session-Blöcke, verbatim
 - [phase10_inventory/BAUSTELLENREGISTER.md](../phase10_inventory/BAUSTELLENREGISTER.md) — 📗 **40,9 KB, am Softcap** — Belege nach `messung/` · 76 Baustellen in elf Themen, Entscheidungen D-1–D-18 alle beantwortet (2026-10-18); die Arbeitsliste für P10.5 — seit 2026-10-18 mit M2–M6-/V204/V205-Befunden am Zeilenort
-- [phase10_inventory/messung/M1_browser.md](../phase10_inventory/messung/M1_browser.md) — 📗 ~12KB · M1: Browser-Messung (Firefox/Safari, Funnel/Domain): `/overview` 4,8–5,2 s auf allen Wegen, Stau hinter `overview`; D-3-Ziele Z1–Z4 (> 200 ms Ladeanimation)
+- [phase10_inventory/messung/M1_browser.md](../phase10_inventory/messung/M1_browser.md) — 📗 ~13KB · M1: Browser-Messung (Firefox/Safari, Funnel/Domain): `/overview` 4,8–5,2 s auf allen Wegen, Stau hinter `overview`; D-3-Ziele Z1–Z4 (> 200 ms Ladeanimation)
 - [phase10_inventory/messung/M7_editor.md](../phase10_inventory/messung/M7_editor.md) — 📗 ~5KB · M7: Editor-Bibliothek ohne Build-Schritt — CM5 65,6 KB gz + Roundtrip 10/10 + 239 KB im Korridor ✅, EasyMDE 282 KB ❌ (V201), markdown-it redundant; füttert ED-1
 - [docs/concepts/phase10_inventory_plan.md](./concepts/phase10_inventory_plan.md) — 📕 ~23KB · Plan P10 gegen `main@0a7aaf4`: Locks P10-A–J, Messungen M1–M8, Abnahme P10-1–12, V195–V206, P10.5-Schnitt §7
 - [docs/concepts/phase10_executor_review_glm.md](./concepts/phase10_executor_review_glm.md) — 📗 ~14KB · Auswertung P10-K-Open-Test (GLM via opencode): Kontingent-Treiber, Qualität Q1–Q6, Claude Code + GLM, §5 Entscheidung: GLM verworfen, Marktblick ~2026-11-10

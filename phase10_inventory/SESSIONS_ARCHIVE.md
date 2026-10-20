@@ -5,9 +5,41 @@ read-when: nur beim Nachvollziehen der Phasenhistorie; der aktuelle Stand steht 
 detail: L3
 up: ./CLAUDE.md
 down: []
-updated: 2026-10-20 (sechster Block verbatim rotiert, siebter im Head) | 2026-10-19 (vierter Block verbatim rotiert, fuenfter Block neu im Head: erste Claude-Code+GLM-Session, M8+M7) | 2026-10-19 (dritter Block „GLM 5.3 Flash Step 2" verbatim rotiert — Claude-Code-Auswertungssession) | 2026-10-19 (Block 2026-10-18 zweiter Block verbatim rotiert — GLM/opencode Step-2-Session) | 2026-10-18 (angelegt für die erste Rotation)
+updated: 2026-10-20 (siebter Block verbatim rotiert, achter im Head) | 2026-10-20 (sechster Block verbatim rotiert, siebter im Head) | 2026-10-19 (vierter Block verbatim rotiert, fuenfter Block neu im Head: erste Claude-Code+GLM-Session, M8+M7) | 2026-10-19 (dritter Block „GLM 5.3 Flash Step 2" verbatim rotiert — Claude-Code-Auswertungssession) | 2026-10-19 (Block 2026-10-18 zweiter Block verbatim rotiert — GLM/opencode Step-2-Session) | 2026-10-18 (angelegt für die erste Rotation)
 ---
 # Phase 10 — Session-Archiv
+
+## Session stopped — 2026-10-20 (siebter Block: M1 im Browser des Nikingers gemessen, D-3 und D-14 beantwortet, Step 2 ✅)
+
+**Ergebnis:** **Step 2 ist 8 von 8** und **Step 4 (Plan P10.5) hat freie Bahn**. Claude Code, mit dem Nikinger
+live im Netzwerk-Tab (Firefox Dev Edition Arbeitsnetz, Safari MacBook mobil; Screenshots, kein HAR). Kein
+Produktcode, kein Service-Touch.
+
+**Befund (`messung/M1_browser.md`, drei Reihen):** `/api/v1/overview` kostet **4,8–5,2 s auf allen drei Wegen** (Funnel
+Arbeit, Funnel mobil, Domain mobil) — der Eingang ändert den Server-Boden nicht, nur `/ui/` (mobil 0,25 s warm bis
+6,3 s kalt). `spaces`, `items` und Item-Anfragen **warten hinter `overview`**: frei 0,2–0,3 s, gestaut 4–14 s; ein
+freier Item-Wert 95,8 ms. Der Code passt dazu (`api.py:685 _overview` ist `async def` mit synchronem `store.search()`,
+kein `to_thread`) — **als Ursache noch nicht bewiesen**. Der 20-s-Poll belegt rund ein Viertel der Zeit.
+
+**Entschieden (Nikinger):** **D-3** = Z1–Z4 (`/overview` ≤ 300 ms live · kein Request hinter `/overview` · Gerüst ≤ 1 s ·
+Ladeanimation-Regel: **> 200 ms bekommt einen Ladezustand, < 200 ms geht sofort durch**) — Wortlaut und Abnahme in
+`messung/M1_browser.md` §D-3. **D-14** = `qwen2.5vl:7b`.
+
+**Korrigiert:** meine Vermutung, der zweite `overview` nach dem Laden sei der Fokus-Handler, war für die
+Dauerläufe falsch (es war der Poll). **Offen bleibt** ein Mitlauf-`overview` bei jedem Item-Öffnen (4 von 4 im
+Arbeitsnetz, 3 von 3 Domain) — Hypothese Fokus-Handler (Rückkehr aus dem Inspektor), ungeprüft.
+
+**Nächste Session — Step 4 (Plan P10.5), Claude Code:**
+1. Wurzel-`CLAUDE.md`, diesen Head und diesen Block, dann `messung/M1_browser.md` und Register §12 lesen.
+2. **Vorab eine Probe** (Wegwerf-Instanz, eigener Port, tmp-`DATA_ROOT`, Hard Rule 9): (a) zwei parallele Anfragen
+   gegen `/overview` beweisen oder widerlegen die Event-Loop-Blockade; (b) Item öffnen mit/ohne Fokuswechsel zählt die
+   `overview`-Aufrufe. Ergebnis nach `probes/` und Register PF-1/PF-4.
+3. **Plan P10.5 schreiben** nach Plan §7 (unverbindliche Vorschau): Blockschnitt mit D-3 (Z1–Z4) als Abnahmezeilen;
+   Ladeanimation als UI-Block (Skeleton, Hard Rule 3 beachten); Anbieter-Unabhängigkeit, Karten-Umbau, Editor Stufe 1+2.
+4. **Offen beim Nikinger:** V203 (Fleet), V199 (P10.5 Block 1), Freigabe des Registers (Tor P10-A), Zeitfenster der M1-Reihe 3 (fehlt in `M1_browser.md`); Marktblick ~2026-11-10.
+5. **Nicht gefahren, bewusst:** die Wegwerf-Probe (Event-Loop, Mitlauf-`overview`) — Schritt 2 oben. Die Wurzel-`CLAUDE.md` „Current state" nennt noch „Richtung Claude Code + GLM" (seit `c80fdbd` überholt): neuen Block per `scripts/rotate_root_current_state.sh` anlegen, wenn der Nikinger es will.
+6. **Regeln:** Register ≤ 40.960 B (steht bei 40.874 B) — neue Zeilen kurz, Belege nach `messung/`; INDEX-Kette nur per `prepend_updated_chain.sh` + `rotate_index_updates.sh`; ein Advisor-Aufruf je Commit.
+
 ## Session stopped — 2026-10-19 (sechster Block: Kosten-Analyse der GLM-Session, GLM verworfen, Übergabe an M3/opencode)
 
 **Ergebnis:** **GLM ist als Ausführer gestrichen** (Nikinger-Entscheidung, Review §5; Z.ai-Auto-Verlängerung gekündigt).

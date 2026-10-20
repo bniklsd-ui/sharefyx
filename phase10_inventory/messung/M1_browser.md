@@ -7,7 +7,7 @@ up: ../CLAUDE.md
 down:
   - ../../docs/concepts/phase10_inventory_plan.md   # §4 M1: Anordnung
   - ../BAUSTELLENREGISTER.md                         # PF-1–PF-3, PF-5, D-3
-updated: 2026-10-20 (M1 gemessen: drei Reihen, D-3 festgelegt)
+updated: 2026-10-20 (Abschnitt Probe: Event-Loop + Mitlauf-overview) | 2026-10-20 (M1 gemessen: drei Reihen, D-3 festgelegt)
 ---
 # M1 — Browser-Messung
 
@@ -98,3 +98,19 @@ Festgelegt nach den drei Reihen oben; Abnahme in P10.5 mit dem Instrument `probe
 - **Realismus von Z1:** ungeprüft. Zählen über den Index statt sechs Durchläufe je Space (PF-1) soll es erreichen; fällt der Bench darüber, entscheidet der Nikinger neu (Z1 ist dann ein Messbefund, kein Fehler).
 - **PF-3 (Cache) / PF-5 (Virtualisierung):** erst bauen, wenn Z1–Z3 gemessen offen bleiben.
 - **Offene Prüfungen (P10.5 oder eigene Probe):** (a) Auslöser des `overview`, das bei jedem Item-Öffnen mitläuft (Hypothese: `focus`-Handler); (b) Event-Loop-Blockade `_overview` (`to_thread`) mit zwei parallelen Anfragen belegen; (c) freier S4-Wert im Arbeitsnetz.
+
+## Probe — Event-Loop und Mitlauf-`overview` (Wegwerf, Claude Code, 2026-10-20)
+
+Wegwerf-Instanz Port 8799 (`probes/p10_wegwerf.py`, tmp-`DATA_ROOT`, tmp-`auth.sqlite3`), alpha mit 500 Zusatz-Items, damit
+`/overview` die Live-Größenordnung trifft (**4,4–4,9 s** frei; Live 4,8–5,2 s). Skripte `probes/p10_pf_eventloop_probe.py`
+(Rohwerte `p10_pf_eventloop.json`), `probes/p10_pf_focus_control.py` (`.json`) und `probes/p10_pf_bulk_seed.py` (Seed). Erster Versuch mit 3000 Items: 27 s — zu groß, verworfen.
+
+**(a) Blockade bewiesen (PF-1).** Je `/overview` + 100 ms später `/health`, `/api/v1/spaces`, zweites `/overview`; drei Läufe:
+`/health` 4,3–4,8 s (frei ms laut `serve.log`; der Client-Basiswert `health_frei` 3,2 s in der JSON überlappt mit dem Lade-`/overview` des Browsers), `/spaces` 4,8 s (einmal 8,9 s; frei 9 ms), zweites `/overview` 8,9–9,3 s (statt ~4,7 s).
+Ein **sync-`store.search()` in `async def _overview`** (`api.py:685`) hält den ganzen Loop — auch `/health`. Das erklärt
+„`spaces`/`items` warten hinter `overview`" (oben). Naheliegender Fix: Aufruf in `asyncio.to_thread` (nicht gebaut) — **das löst Z2 (kein Request dahinter), nicht Z1**: `/overview` allein bleibt 4,4–4,9 s, Z1 (≤ 300 ms) braucht den PF-1-Zählumbau; und `search()` kann CPU-gebunden sein (GIL), die Wirkung ist unverifiziert.
+
+**(b) Mitlauf-`overview` (PF-4).** Browser, `/overview`-Requests gezählt: Laden 1 · Liste öffnen 0 · **Item öffnen ohne
+Fokuswechsel 0 (8 s)** · Kontrolle Ruhe 0 (4 s) · **`focus`-Event genau 1** (Kontrolle: 3,4 s Laden, 18,2 s Fokus). Das
+Mitlauf-`overview` kommt also vom Fokus-Handler (`app.js:417`), nicht vom Öffnen; im ersten Lauf waren die „2" Fokus + 20-s-Poll.
+**Grenze:** Chromium per `dispatchEvent`, nicht die echte Rückkehr aus dem Inspektor in Firefox/Safari.

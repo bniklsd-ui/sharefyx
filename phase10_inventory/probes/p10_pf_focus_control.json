@@ -1,0 +1,12 @@
+{
+  "probe": "p10_pf_focus_control",
+  "datum": "2026-10-20",
+  "nach_laden": 1,
+  "kontrolle_ruhe_4s": 0,
+  "focus_event_4s": 1,
+  "request_zeiten_s": [
+    3.4,
+    18.2
+  ],
+  "hinweis": "Stdout des Laufs, von Hand uebernommen (das Skript schrieb damals nur auf stdout)"
+}

@@ -1,0 +1,100 @@
+{
+  "probe": "p10_pf_eventloop",
+  "datum": "2026-10-20",
+  "a_eventloop": {
+    "health_frei": {
+      "status": 200,
+      "start_s": 0.0,
+      "dauer_s": 3.04
+    },
+    "spaces_frei": {
+      "status": 200,
+      "start_s": 0.0,
+      "dauer_s": 0.008
+    },
+    "overview_frei": {
+      "status": 200,
+      "start_s": 0.0,
+      "dauer_s": 4.733
+    },
+    "parallel_runs": [
+      {
+        "overview_1": {
+          "status": 200,
+          "start_s": 0.0,
+          "dauer_s": 4.858
+        },
+        "health": {
+          "status": 200,
+          "start_s": 0.101,
+          "dauer_s": 4.757
+        },
+        "overview_2": {
+          "status": 200,
+          "start_s": 0.102,
+          "dauer_s": 9.218
+        },
+        "spaces": {
+          "status": 200,
+          "start_s": 0.101,
+          "dauer_s": 9.233
+        }
+      },
+      {
+        "overview_1": {
+          "status": 200,
+          "start_s": 0.0,
+          "dauer_s": 4.438
+        },
+        "health": {
+          "status": 200,
+          "start_s": 0.101,
+          "dauer_s": 4.342
+        },
+        "spaces": {
+          "status": 200,
+          "start_s": 0.101,
+          "dauer_s": 4.356
+        },
+        "overview_2": {
+          "status": 200,
+          "start_s": 0.102,
+          "dauer_s": 8.801
+        }
+      },
+      {
+        "overview_1": {
+          "status": 200,
+          "start_s": 0.0,
+          "dauer_s": 9.38
+        },
+        "health": {
+          "status": 200,
+          "start_s": 0.101,
+          "dauer_s": 9.283
+        },
+        "spaces": {
+          "status": 200,
+          "start_s": 0.101,
+          "dauer_s": 9.298
+        },
+        "overview_2": {
+          "status": 200,
+          "start_s": 0.102,
+          "dauer_s": 13.73
+        }
+      }
+    ],
+    "T_overview_s": 4.733,
+    "blockade_health": true,
+    "overview_2_serialisiert": true
+  },
+  "b_mitlauf": {
+    "laden_und_ruhen_3s": 1,
+    "liste_oeffnen_6s": 0,
+    "zeilen_selektor": "button.list__row[data-id]",
+    "zeilen": 50,
+    "item_oeffnen_ohne_fokus_8s": 0,
+    "item_oeffnen_mit_focus_event_9s": 2
+  }
+}
