@@ -7,7 +7,7 @@ up: ../CLAUDE.md
 down:
   - DOC_LAYERS_CONVENTION.md   # Navigationsregeln, auf die Prompt 1 verweist
   - ../ROADMAP.md              # Phasenübersicht
-updated: 2026-10-16 (Korrektur unter Prompt 2: der Phasen-Kickoff läuft seit spätestens P9 in Claude Code; Beleg und die drei Abweichungen des P9-Wortlauts) | 2026-08-09
+updated: 2026-10-20 (Notiz unter Prompt 2: P9-Transkript bereinigt, P10-Kickoff lief als Prompt 1 — der Block ist die einzige Vorlage) | 2026-10-16 (Korrektur unter Prompt 2: der Phasen-Kickoff läuft seit spätestens P9 in Claude Code; Beleg und die drei Abweichungen des P9-Wortlauts) | 2026-08-09
 ---
 # Workflow-Prompts
 
@@ -131,6 +131,9 @@ nicht mehr im Browser. Beleg: die P9-Planungssession vom 2026-09-19 ist eine Cla
 („p9 soll die letzten Schwächen vom aktuellen Sharefyx schaffen …"). Der Prompt war also nie verloren —
 die Vorlage ist der Block unten; ein zweites Exemplar daneben wäre eine zweite Kopie derselben Regel.
 „Phase-X-Chat" und „Google Drive" sind Reste der Browser-Zeit und dürfen beim Einsatz stehen bleiben.
+**[2026-10-20, Closeout P10]:** Das P9-Transkript existiert lokal nicht mehr, weil Claude Code alte Sitzungen bereinigt. Der P10-Kickoff
+vom 2026-10-16 lief als Prompt 1 mit Sondervermerk, nicht als Prompt 2. Die einzige Vorlage ist also der Block unten. Für P10.5 wird er
+mit „Phase-10.5-Chat" und dem Einstieg `PHASE10_CLOSEOUT_HANDOVER.md` gefüllt.
 
 ```text
 Hallo Claude, du bist der Phase-X-Chat des Space-Server-Projekts.

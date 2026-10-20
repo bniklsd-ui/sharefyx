@@ -7,6 +7,10 @@ up: ../ROADMAP.md
 down:
 updated: 2026-10-07 (angelegt — Oversize-Fix: die ROADMAP-Kette (13.174 B) per `scripts/rotate_index_updates.sh` hierher rotiert)
 ---
+- 2026-10-16 (**P10 🔄** — Bestandsaufnahme begonnen, `phase10_inventory/`; P10.5-Zeile neu)
+- 2026-10-08 (**P9 ✅** — abgeschlossen, live als `v3.1.4`, Gate 9/9; Bilanz 121 ✅ · 12 ⚠️ · 1 ⬜; Handover `PHASE9_CLOSEOUT_HANDOVER.md`)
+- 2026-10-08 (**P10-Sammelstelle** `docs/concepts/phase10_intake.md` angelegt, P10-Zeile in der Tabelle; Release `v3.1.4` vorbereitet, Deploy beim Nikinger)
+- 2026-09-30 (**P9 Step G gebaut** — Löschen nach `._trash/`; **Plan-§9.3-Ort unbaubar, gemessen** (Item nach `rebuild_index()` wieder da, `_trash` = Phantom-Space) ⇒ Nikinger-Entscheidung `DATA_ROOT/._trash/<space>/`, null P1-Änderungen; Browser 14/14 gegen eigene TLS-Wegwerf-Instanz) | ältere Einträge: docs/ROADMAP_UPDATES_ARCHIVE.md
 - 2026-09-30 (**P9 Step F gebaut** — neunte P1-Contract-Öffnung, code-complete: `doing` + `assignee`, **V160 beantwortet** (Space-Name, ohne Validierung, Lock P9-U), Plan-Umfang am Diff korrigiert (9 → 18 Hunks, genau 3 Dateien), `pytest` 1039 → 1062; ein Befund bewusst nicht behoben — `_BUCKETS` kennt `doing` nicht, beide Kandidaten sind P10)
 - 2026-09-24 (**P9 Step C Teil 1 — NVIDIA-Host-Treiber 580.126.09 installiert mit `--no-unified-memory`** auf dem Ryzen-7-5800X-Proxmox-Node; `pve-no-subscription`-Repo ergänzt; drei dokumentierte Fehlbarkeiten auf dem Weg [Header-Paket fehlte, Backports führten denselben 550er-Upstream, Nouveau-Konflikt, `uvm_hmm.c` gegen 7.0.2-6-pve-Mai-Patch]; eigener `apt autoremove --purge`-Vorfall mit sudo/dkms-Verlust sauber von der Root-Shell wieder hergestellt, Hard Rule 9 durchgehend eingehalten; UVM-Trade-off akzeptiert und reversibel; LXC + Ollama + Cold-Start-Messung stehen aus)
 - 2026-09-19 (**P9 geplant** — `docs/concepts/phase9_hardening_plan.md`, Haertungsphase statt UI-Umbau [Lock P9-A], Domain ueber eigenen VPS [P9-C/P9-D/P9-E], neunte P1-Contract-Oeffnung angekuendigt [P9-G/P9-H], Loeschen nach `_trash/` unsichtbar [P9-I/P9-J/P9-K]. P9-Tabellenzeile neu geschrieben, Phase-8.X-Sektion mit datierter Korrekturnotiz versehen)

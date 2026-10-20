@@ -5,9 +5,31 @@ read-when: nur beim Nachvollziehen der Phasenhistorie; der aktuelle Stand steht 
 detail: L3
 up: ./CLAUDE.md
 down: []
-updated: 2026-10-20 (siebter Block verbatim rotiert, achter im Head) | 2026-10-20 (sechster Block verbatim rotiert, siebter im Head) | 2026-10-19 (vierter Block verbatim rotiert, fuenfter Block neu im Head: erste Claude-Code+GLM-Session, M8+M7) | 2026-10-19 (dritter Block „GLM 5.3 Flash Step 2" verbatim rotiert — Claude-Code-Auswertungssession) | 2026-10-19 (Block 2026-10-18 zweiter Block verbatim rotiert — GLM/opencode Step-2-Session) | 2026-10-18 (angelegt für die erste Rotation)
+updated: 2026-10-20 (achter Block verbatim rotiert, neunter = Closeout im Head) | 2026-10-20 (siebter Block verbatim rotiert, achter im Head) | 2026-10-20 (sechster Block verbatim rotiert, siebter im Head) | 2026-10-19 (vierter Block verbatim rotiert, fuenfter Block neu im Head: erste Claude-Code+GLM-Session, M8+M7) | 2026-10-19 (dritter Block „GLM 5.3 Flash Step 2" verbatim rotiert — Claude-Code-Auswertungssession) | 2026-10-19 (Block 2026-10-18 zweiter Block verbatim rotiert — GLM/opencode Step-2-Session) | 2026-10-18 (angelegt für die erste Rotation)
 ---
 # Phase 10 — Session-Archiv
+
+## Session stopped — 2026-10-20 (achter Block: Wegwerf-Probe gefahren — Event-Loop-Blockade bewiesen, Mitlauf-`overview` = Fokus-Handler)
+
+**Ergebnis:** Beide vorab-Proben aus der Übergabe sind gefahren; **Step 4 (Plan P10.5) ist unverändert frei, der Plan ist bewusst
+nicht geschrieben** (Opus-Arbeit, Auftrag des Nikingers). Claude Code, Wegwerf-Instanz Port 8799 (tmp-`DATA_ROOT`, Hard Rule 9;
+per PID-Datei gestoppt, `sharefyx-mcp.service` unberührt). Kein Produktcode.
+
+**Befund (`messung/M1_browser.md` §Probe, `probes/p10_pf_*`):** (a) `/overview` hält den **ganzen Event-Loop** — `/health` 4,3–4,8 s
+dahinter, `/spaces` 4,8 s (frei 9 ms), zweites `/overview` serialisiert (8,9–9,3 s); Ursache `api.py:685` (`async def` + sync
+`store.search()`), naheliegender Fix `asyncio.to_thread` — **nicht gebaut, Wirkung unverifiziert** (GIL/CPU-gebundenes `search()`, SQLite/Index); er löst
+**Z2, nicht Z1** (`/overview` allein bleibt ~4,5 s, Z1 ≤ 300 ms braucht den PF-1-Zählumbau). (b) Das Mitlauf-`overview` kommt vom `focus`-Handler (`app.js:417`): Item öffnen 0, `focus`-Event +1, Ruhe 0.
+**Achtung:** das Wegwerf-Root `/tmp/opencode/sharefyx-wegwerf-p10` trägt jetzt 500 Bulk-Items in alpha (M4/M5 sähen andere Daten). **Grenze:** Chromium-`dispatchEvent`, nicht die echte Rückkehr aus dem Inspektor in Firefox/Safari. Register PF-1/PF-4 tragen den Befund
+(Register 40.956 B, 4 B unter dem Softcap).
+
+**Nächste Session — Step 4 (Plan P10.5), Claude Code/Opus:**
+1. Wurzel-`CLAUDE.md`, diesen Head und Block, `messung/M1_browser.md` (inkl. §Probe) und Register §12 lesen.
+2. **Plan P10.5 schreiben** nach Plan §7: Blockschnitt mit D-3 (Z1–Z4) als Abnahmezeilen; PF-1 mit `to_thread`-Variante **und**
+   Messung danach (Z1/Z2 prüfen, ob die Blockade die ganze Ursache ist); PF-4: Fokus-Handler drosseln/entkoppeln;
+   Ladeanimation als UI-Block (Hard Rule 3 beachten); Anbieter-Unabhängigkeit, Karten-Umbau, Editor Stufe 1+2.
+3. **Offen beim Nikinger:** V203 (Fleet), V199 (P10.5 Block 1), Freigabe des Registers (Tor P10-A), Zeitfenster der M1-Reihe 3; Marktblick ~2026-11-10.
+4. Die Wurzel-`CLAUDE.md` „Current state" nennt noch „Richtung Claude Code + GLM" (seit `c80fdbd` überholt): neuen Block per `scripts/rotate_root_current_state.sh`, wenn der Nikinger es will.
+5. **Regeln:** Register ≤ 40.960 B (steht bei 40.956 B — jede neue Zeile braucht Platz, Belege nach `messung/`); INDEX-Kette nur per `prepend_updated_chain.sh` + `rotate_index_updates.sh`; ein Advisor-Aufruf je Commit.
 
 ## Session stopped — 2026-10-20 (siebter Block: M1 im Browser des Nikingers gemessen, D-3 und D-14 beantwortet, Step 2 ✅)
 

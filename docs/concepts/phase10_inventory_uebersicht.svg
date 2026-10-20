@@ -1,0 +1,179 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080" font-family="'DejaVu Sans','Segoe UI',Helvetica,Arial,sans-serif">
+
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a6b7d"/>
+    </marker>
+    <marker id="arG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2f7a4d"/>
+    </marker>
+    <marker id="arR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b03030"/>
+    </marker>
+  </defs>
+
+  <rect width="1080" height="1080" fill="#f7f8fa"/>
+
+  <!-- ================= Kopf ================= -->
+  <rect x="0" y="0" width="1080" height="86" fill="#1d2b3a"/>
+  <text x="36" y="36" font-size="19" font-weight="700" fill="#ffffff">Phase 10 — Bestandsaufnahme vor dem Bau</text>
+  <text x="36" y="62" font-size="12" fill="#9db2c6">Sharefyx · phase10_inventory/ · kein Produktcode (P10-H) · live bleibt v3.1.4 · 16.–20.10.2026</text>
+  <rect x="774" y="18" width="270" height="50" rx="10" fill="#2f7a4d"/>
+  <text x="909" y="38" font-size="14.5" font-weight="700" fill="#ffffff" text-anchor="middle">9 ✅ · 1 ⚠️ · 2 ⬜</text>
+  <text x="909" y="57" font-size="11" fill="#cfe6d8" text-anchor="middle">12 Zeilen · beide ⬜ wandern nach P10.5</text>
+
+  <!-- ================= Mission ================= -->
+  <rect x="36" y="100" width="1008" height="74" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="124" font-size="13.5" font-weight="700" fill="#1d2b3a">Mission: jede offene Baustelle einsammeln, messen, entscheiden lassen — ohne eine Zeile Produktcode.</text>
+  <text x="56" y="146" font-size="12" fill="#4a5a6b">P10 und P10.5 sind <tspan font-weight="700" fill="#1d2b3a">eine Mission in zwei Hälften</tspan>: P9 war das Fundament, jetzt wird das Haus fertig gebaut und gedämmt.</text>
+  <text x="56" y="165" font-size="12" fill="#4a5a6b">Messen vor Bauen (P10-F) · <tspan font-weight="700" fill="#1d2b3a">27 Commits</tspan> in fünf Tagen · pytest 1265 → 1268 (nur Messinstrument) · Tabu-Diff <tspan font-weight="700" fill="#2f7a4d">leer</tspan> · Service-Touch <tspan font-weight="700" fill="#2f7a4d">0</tspan></text>
+
+  <!-- ================= Flussdiagramm ================= -->
+  <rect x="36" y="186" width="1008" height="412" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="209" font-size="14.5" font-weight="700" fill="#1d2b3a">Reihenfolge 0 → 1 → 3 ∥ 2 → Z · Step 4 (Plan P10.5) wandert in den Planungschat</text>
+
+  <!-- Lane 1 -->
+  <text x="56" y="230" font-size="11" font-weight="700" fill="#6b7b8c">STEPS — Claude Code mit dem Nikinger; Step 3 lief parallel zu Step 2 (nur D-3 wartete auf M1, D-4 auf M7)</text>
+
+  <rect x="60" y="238" width="220" height="78" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="170" y="257" font-size="12.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">0 Verifikation</text>
+  <text x="170" y="276" font-size="10" fill="#4a5a6b" text-anchor="middle">doc_health 0 · 3 Heads benannt</text>
+  <text x="170" y="291" font-size="10" fill="#4a5a6b" text-anchor="middle">Caddy-Quelle hinkt nach (BT-1)</text>
+  <text x="170" y="308" font-size="10" fill="#b03030" text-anchor="middle" font-weight="700">7 Ledger-Posten ohne Vermerk</text>
+
+  <line x1="284" y1="277" x2="303" y2="277" stroke="#5a6b7d" stroke-width="1.8" marker-end="url(#ar)"/>
+  <rect x="308" y="238" width="220" height="78" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="418" y="257" font-size="12.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">1 Register</text>
+  <text x="418" y="276" font-size="10" fill="#4a5a6b" text-anchor="middle">76 Zeilen in elf Themen</text>
+  <text x="418" y="291" font-size="10" fill="#4a5a6b" text-anchor="middle">je Zeile ein Anker am Code</text>
+  <text x="418" y="308" font-size="10" fill="#2f7a4d" text-anchor="middle" font-weight="700">39 Zeilen → P10.5</text>
+
+  <line x1="532" y1="277" x2="551" y2="277" stroke="#5a6b7d" stroke-width="1.8" marker-end="url(#ar)"/>
+  <rect x="556" y="238" width="220" height="78" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="666" y="257" font-size="12.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">3 Entscheidungen</text>
+  <text x="666" y="276" font-size="10" fill="#4a5a6b" text-anchor="middle">D-1–D-18 in fünf Runden</text>
+  <text x="666" y="291" font-size="10" fill="#4a5a6b" text-anchor="middle">Karte C2 · Editor 1+2 · Logo B</text>
+  <text x="666" y="308" font-size="10" fill="#2f7a4d" text-anchor="middle" font-weight="700">zwei P1-Öffnungen (11., 12.)</text>
+
+  <line x1="780" y1="277" x2="799" y2="277" stroke="#5a6b7d" stroke-width="1.8" marker-end="url(#ar)"/>
+  <rect x="804" y="238" width="220" height="78" rx="8" fill="#e8eef5" stroke="#7f9ab5" stroke-width="1.6"/>
+  <text x="914" y="257" font-size="12.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">2 Messungen M1–M8</text>
+  <text x="914" y="276" font-size="10" fill="#4a5a6b" text-anchor="middle">Wegwerf 8799, zwei Principals</text>
+  <text x="914" y="291" font-size="10" fill="#4a5a6b" text-anchor="middle">M1 im Browser des Nikingers</text>
+  <text x="914" y="308" font-size="10" fill="#2f7a4d" text-anchor="middle" font-weight="700">8 von 8 · P10-5 ✅</text>
+
+  <!-- Lane 2: Messungen -->
+  <text x="56" y="336" font-size="11" font-weight="700" fill="#6b7b8c">MESSUNGEN — grün gehalten, rot = Defekt oder Ablehnung reproduziert, blau = Grundlinie; jede Station mit Gegenlauf</text>
+
+  <rect x="60" y="344" width="220" height="50" rx="7" fill="#e8eef5" stroke="#7f9ab5" stroke-width="1.4"/>
+  <text x="170" y="363" font-size="11.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">M1 Browser (Nikinger)</text>
+  <text x="170" y="382" font-size="10" fill="#4a5a6b" text-anchor="middle">/overview 4,8–5,2 s auf jedem Weg</text>
+
+  <rect x="308" y="344" width="220" height="50" rx="7" fill="#e8eef5" stroke="#7f9ab5" stroke-width="1.4"/>
+  <text x="418" y="363" font-size="11.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">M2 Bench-Instrument</text>
+  <text x="418" y="382" font-size="10" fill="#4a5a6b" text-anchor="middle">Median 2,4 s · drei Läufe ±1 %</text>
+
+  <rect x="556" y="344" width="220" height="50" rx="7" fill="#fbecec" stroke="#d99a9a" stroke-width="1.4"/>
+  <text x="666" y="363" font-size="11.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">M3 opencode-Registrierung</text>
+  <text x="666" y="382" font-size="10" fill="#b03030" text-anchor="middle" font-weight="700">400 invalid_redirect_uri</text>
+
+  <rect x="804" y="344" width="220" height="50" rx="7" fill="#fbecec" stroke="#d99a9a" stroke-width="1.4"/>
+  <text x="914" y="363" font-size="11.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">M4 BG-1</text>
+  <text x="914" y="382" font-size="10" fill="#b03030" text-anchor="middle" font-weight="700">leere Space-Liste reproduziert</text>
+
+  <rect x="60" y="400" width="220" height="50" rx="7" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.4"/>
+  <text x="170" y="419" font-size="11.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">M5 BG-2 · BG-3</text>
+  <text x="170" y="438" font-size="10" fill="#2f7a4d" text-anchor="middle" font-weight="700">im Browser gehalten, 14/14</text>
+
+  <rect x="308" y="400" width="220" height="50" rx="7" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.4"/>
+  <text x="418" y="419" font-size="11.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">M6 Karte (200 Knoten)</text>
+  <text x="418" y="438" font-size="10" fill="#4a5a6b" text-anchor="middle">Ruhe 2,7 s · Lappen ≤ 1,9 ms</text>
+
+  <rect x="556" y="400" width="220" height="50" rx="7" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.4"/>
+  <text x="666" y="419" font-size="11.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">M7 Editor-Bibliothek</text>
+  <text x="666" y="438" font-size="10" fill="#4a5a6b" text-anchor="middle">CodeMirror 5: 239 KB &lt; 250 KB</text>
+
+  <rect x="804" y="400" width="220" height="50" rx="7" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.4"/>
+  <text x="914" y="419" font-size="11.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">M8 Vision auf CT 111</text>
+  <text x="914" y="438" font-size="10" fill="#4a5a6b" text-anchor="middle">qwen2.5vl:7b besteht die Falle</text>
+
+  <!-- Befund -->
+  <rect x="60" y="462" width="964" height="50" rx="7" fill="#fbecec" stroke="#d99a9a" stroke-width="1.4"/>
+  <text x="76" y="482" font-size="12" font-weight="700" fill="#b03030">Probe 2026-10-20: /overview hält den ganzen Event-Loop — sogar /health wartet 4,3–4,8 s dahinter.</text>
+  <text x="76" y="501" font-size="11" fill="#4a5a6b">Ursache: synchrones store.search() in async def _overview (api.py:685). Ein to_thread löst Z2, nicht Z1 — Wirkung unverifiziert.</text>
+
+  <line x1="542" y1="514" x2="542" y2="523" stroke="#2f7a4d" stroke-width="1.8" marker-end="url(#arG)"/>
+
+  <!-- D-3 -->
+  <rect x="60" y="528" width="964" height="58" rx="8" fill="#eaf4ee" stroke="#2f7a4d" stroke-width="2"/>
+  <text x="76" y="549" font-size="12.5" font-weight="700" fill="#1d2b3a">D-3 Zielwerte des Nikingers (2026-10-20) — die Abnahmezeilen für den Performance-Block von P10.5</text>
+  <text x="76" y="570" font-size="11" fill="#4a5a6b">Z1 /overview ≤ 300 ms (unter Vorbehalt) · Z2 kein Request wartet dahinter · Z3 Gerüst ≤ 1 s · Z4 über 200 ms ⇒ Ladezustand, darunter sofort</text>
+
+  <!-- ================= Ausführer ================= -->
+  <rect x="36" y="610" width="1008" height="102" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="632" font-size="14.5" font-weight="700" fill="#1d2b3a">Wer gearbeitet hat — und der zweite Ausführer-Test (P10-K)</text>
+
+  <rect x="60" y="642" width="196" height="26" fill="#e8eef5" stroke="#7f9ab5"/>
+  <text x="158" y="659" font-size="9.5" fill="#1d2b3a" text-anchor="middle">10-16 Claude Code · 0 / 1 / 3</text>
+  <rect x="256" y="642" width="220" height="26" fill="#f6efe0" stroke="#c9a46a"/>
+  <text x="366" y="659" font-size="9.5" fill="#1d2b3a" text-anchor="middle">10-18 opencode + GLM-Flash · M2–M6</text>
+  <rect x="476" y="642" width="200" height="26" fill="#f6efe0" stroke="#c9a46a"/>
+  <text x="576" y="659" font-size="9.5" fill="#1d2b3a" text-anchor="middle">10-19 Claude Code + GLM · M7, M8</text>
+  <rect x="676" y="642" width="124" height="26" fill="#fbecec" stroke="#d99a9a"/>
+  <text x="738" y="659" font-size="9.5" fill="#b03030" text-anchor="middle" font-weight="700">GLM verworfen</text>
+  <rect x="800" y="642" width="224" height="26" fill="#e8eef5" stroke="#7f9ab5"/>
+  <text x="912" y="659" font-size="9.5" fill="#1d2b3a" text-anchor="middle">10-20 Claude Code · M1, Probe</text>
+
+  <text x="60" y="688" font-size="10.5" fill="#4a5a6b">Kosten-Treiber: opencode gab GLM 1 M Kontext an und kompaktierte nie — 278 Aufrufe, Kontext p50 326 K, <tspan font-weight="700" fill="#b03030">86,1 M Tokens</tspan> in einer Session.</text>
+  <text x="60" y="704" font-size="10.5" fill="#4a5a6b">Dazu Token-Glitches in committetem Text. Ausführer P10.5: <tspan font-weight="700" fill="#1d2b3a">MiniMax M3 über opencode</tspan> (Endpunkt bis 2026-11-15), Marktblick ~2026-11-10.</text>
+
+  <!-- ================= Brücke P10 → P10.5 ================= -->
+  <rect x="36" y="724" width="1008" height="118" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="746" font-size="14.5" font-weight="700" fill="#1d2b3a">P10 → P10.5: der Handover ist das Planungsdossier, nicht das Ende der Mission</text>
+
+  <rect x="60" y="756" width="384" height="76" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="76" y="776" font-size="12" font-weight="700" fill="#1d2b3a">P10 liefert (ohne Produktcode)</text>
+  <text x="76" y="793" font-size="10.5" fill="#4a5a6b">Register: 76 Zeilen, bleibt die Arbeitsliste</text>
+  <text x="76" y="808" font-size="10.5" fill="#4a5a6b">D-1–D-18 beantwortet · Locks P10-A–K</text>
+  <text x="76" y="823" font-size="10.5" fill="#4a5a6b">M1–M8 und die Probe als Werkzeuge im Repo</text>
+
+  <line x1="450" y1="794" x2="542" y2="794" stroke="#2f7a4d" stroke-width="2.2" marker-end="url(#arG)"/>
+  <text x="494" y="786" font-size="10" font-weight="700" fill="#2f7a4d" text-anchor="middle">Handover</text>
+
+  <rect x="548" y="756" width="476" height="76" rx="8" fill="#e8eef5" stroke="#7f9ab5" stroke-width="1.6"/>
+  <text x="564" y="776" font-size="12" font-weight="700" fill="#1d2b3a">Planungschat P10.5 (Opus) übernimmt Step 4 und das Tor</text>
+  <text x="564" y="793" font-size="10.5" fill="#4a5a6b">1. Register freigeben (P10-8, der Nikinger)</text>
+  <text x="564" y="808" font-size="10.5" fill="#4a5a6b">2. Plan schreiben: zwölf Blöcke, fünf davon groß mit Mini-Plan</text>
+  <text x="564" y="823" font-size="10.5" fill="#4a5a6b">Abschluss P10.5: Nicht-Claude-Client führt list_spaces live aus</text>
+
+  <!-- ================= Register-Bilanz ================= -->
+  <rect x="36" y="854" width="500" height="108" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="876" font-size="13.5" font-weight="700" fill="#1d2b3a">Register — 76 Zeilen nach Ziel</text>
+  <!-- 6 px je Zeile, Summe 456 px -->
+  <rect x="58" y="888" width="234" height="22" fill="#2f7a4d"/>
+  <text x="175" y="903" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">P10.5 · 39</text>
+  <rect x="292" y="888" width="54" height="22" fill="#7f9ab5"/>
+  <text x="319" y="903" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle">P10 9</text>
+  <rect x="346" y="888" width="24" height="22" fill="#c9a227"/>
+  <rect x="370" y="888" width="36" height="22" fill="#b03030"/>
+  <rect x="406" y="888" width="36" height="22" fill="#9db2c6"/>
+  <rect x="442" y="888" width="18" height="22" fill="#d9a066"/>
+  <rect x="460" y="888" width="18" height="22" fill="#8fb59a"/>
+  <rect x="478" y="888" width="12" height="22" fill="#6b7b8c"/>
+  <rect x="490" y="888" width="24" height="22" fill="#d5dce4"/>
+  <text x="58" y="928" font-size="10" fill="#4a5a6b"><tspan fill="#2f7a4d" font-weight="700">P10.5 39</tspan> · <tspan fill="#7f9ab5" font-weight="700">P10 9</tspan> · <tspan fill="#a8861f" font-weight="700">P11 4</tspan> · <tspan fill="#b03030" font-weight="700">verworfen 6</tspan> · <tspan fill="#6f8aa3" font-weight="700">Wissen 6</tspan> · <tspan fill="#b97a3a" font-weight="700">Termin 3</tspan></text>
+  <text x="58" y="944" font-size="10" fill="#4a5a6b"><tspan fill="#5f9a6c" font-weight="700">erledigt 3</tspan> · <tspan fill="#6b7b8c" font-weight="700">an Fleet 2</tspan> · <tspan fill="#8a97a5" font-weight="700">ohne Bau 4</tspan> — dringendste Zeile: BT-1 (Caddy-Quelle)</text>
+
+  <!-- ================= VERIFY ================= -->
+  <rect x="548" y="854" width="496" height="108" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="566" y="876" font-size="13.5" font-weight="700" fill="#1d2b3a">[VERIFY] V195–V206 — 6 ✅ · 1 ⚠️ · 4 ⬜ · 1 entfällt</text>
+  <text x="566" y="896" font-size="10.5" fill="#2f7a4d">✅ V195 Registrierung · V201 Editor · V202 BG-1 · V204–V206</text>
+  <text x="566" y="912" font-size="10.5" fill="#a8861f">⚠️ V198 — Wegwerf handelt 2025-03-26 aus, live offen</text>
+  <text x="566" y="928" font-size="10.5" fill="#b03030">⬜ V197 · V199 · V200 → P10.5 · V203 → Fleet</text>
+  <text x="566" y="944" font-size="10.5" fill="#4a5a6b">V196 entfällt (D-8: kein ChatGPT) · nächste freie Nummer V207</text>
+
+  <!-- ================= Fuß ================= -->
+  <text x="36" y="990" font-size="11" fill="#4a5a6b">pytest 1268 · doc_health 0 · Tabu-Diff 0a7aaf4..HEAD leer · Service-Touch 0 · live unverändert v3.1.4 (d04c0ec) · Register 40.956 B am Softcap</text>
+  <text x="36" y="1008" font-size="11" fill="#4a5a6b">Kanonischer Closeout: phase10_inventory_plan.md §8 · Handover: PHASE10_CLOSEOUT_HANDOVER.md · Head: phase10_inventory/CLAUDE.md</text>
+  <text x="36" y="1026" font-size="11" fill="#4a5a6b">Messungen: phase10_inventory/messung/ und probes/ · Entscheidungen: Register §12 · Ausführer-Auswertung: phase10_executor_review_glm.md</text>
+</svg>

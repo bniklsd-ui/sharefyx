@@ -10,7 +10,7 @@ down:
   - ./phase10_intake.md                             # Sammelstelle, Herkunft
   - ./PHASE9_CLOSEOUT_HANDOVER.md                   # Herkunft §4, [VERIFY]-Erbe
   - ./phase10_karte_c_stil_2.svg                    # Karte: der gewählte Stil C2 (D-1b); Geschwister c_stil_{1,3}, erste Runde phase10_karte_entwurf_{a,b,c}.svg
-updated: 2026-10-18 (P10-K: Ausführer GLM 5.3 Flash, Integration über eurofyx-fleet außerhalb des Plans) | 2026-10-18 (Nachtrag §0.2: Entscheidungen, Locks P10-I/P10-J, M8, V206 beantwortet, §7 neu geschnitten) | 2026-10-16 (final: Status-Zeile; P10-D trägt den Stil C2 Nervenbahnen (D-1b); V199 in P10.5 Block 1; Step-4-Bedingung ohne D-1b; M6 auf M–L) | 2026-10-16 (angelegt — Planungssession Claude Code/Opus nach den vier Grundsatzantworten des Nikingers)
+updated: 2026-10-20 (§8 Closeout gefüllt: 9 ✅ · 1 ⚠️ · 2 ⬜, P10-8/P10-10 wandern in den P10.5-Planungschat) | 2026-10-18 (P10-K: Ausführer GLM 5.3 Flash, Integration über eurofyx-fleet außerhalb des Plans) | 2026-10-18 (Nachtrag §0.2: Entscheidungen, Locks P10-I/P10-J, M8, V206 beantwortet, §7 neu geschnitten) | 2026-10-16 (final: Status-Zeile; P10-D trägt den Stil C2 Nervenbahnen (D-1b); V199 in P10.5 Block 1; Step-4-Bedingung ohne D-1b; M6 auf M–L) | 2026-10-16 (angelegt — Planungssession Claude Code/Opus nach den vier Grundsatzantworten des Nikingers)
 ---
 # Phase 10 — Bestandsaufnahme (Plan)
 
@@ -186,6 +186,26 @@ Reihenfolge nach Risiko, das Dringende zuerst, das Größte zuletzt. Blöcke mit
 
 **Phasenabschluss P10.5** verlangt zusätzlich P10-J (live) — es blockiert keinen der Blöcke.
 
-## §8 Closeout P10 (wird in Step Z gefüllt)
+## §8 Closeout P10 (Step Z, 2026-10-20)
 
-*leer bis Step Z*
+**P10 ist abgeschlossen** (Nikinger, 2026-10-20): **9 ✅ · 1 ⚠️ · 2 ⬜** von 12. Die zwei ⬜ sind keine Blocker. Sie **wandern in den
+P10.5-Planungschat**, weil P10 und P10.5 eine Mission sind: Step 4 ist Opus-Arbeit (Sondervermerk des Nikingers), und das Tor wird erst
+nach dem Blockschnitt geöffnet. Einstieg: `PHASE10_CLOSEOUT_HANDOVER.md`. Gemessen am 2026-10-20 auf `6dc77a0`.
+
+| # | Stand | Beleg |
+|---|---|---|
+| P10-1 | ✅ | §1; `doc_health` 0 am Closeout |
+| P10-2 | ✅ | `grep`-Gegenprobe 2026-10-20: alle 13 Matrixzeilen (P9-22…99 gebündelt in AL-5), 6 `[VERIFY]`, intake §2/§5–§7. Handover §4.4 ist BG-1 (inhaltlich), §4.9 ist Lock P10-E/P10-K. intake §3 ist über die Ursprungsquellen zitiert |
+| P10-3 | ✅ | 76/76 Zeilen tragen Gr., Risiko, Entsch. und Ziel (Skript-Prüfung 2026-10-20) |
+| P10-4 | ⚠️ | M1 in drei Reihen gemessen, D-3 = Z1–Z4 entschieden. Abweichungen von §4 M1 (S2 nur Arbeitsnetz, Domain nur mobil, Zeitfenster Reihe 3 fehlt) sind in `messung/M1_browser.md` benannt |
+| P10-5 | ✅ | `probes/p10_overview_bench.py`, Median 2405,6 / 2438,4 / 2414,3 ms |
+| P10-6 | ✅ | Register PA-1: opencode-DCR festgehalten, `400 invalid_redirect_uri` reproduziert |
+| P10-7 | ✅ | M4 reproduziert, M5 gehalten, M6 Baseline, M7 CM5, M8 `qwen2.5vl:7b` |
+| P10-8 | ⬜ → P10.5-Planung | **Tor bewusst offen** (Nikinger 2026-10-20): Freigabe im Planungschat, nach dem Blockschnitt |
+| P10-9 | ✅ | Register §12, alle D-1–D-18 datiert |
+| P10-10 | ⬜ → P10.5-Planung | Plan P10.5 nicht geschrieben, mit Absicht (Opus-Arbeit, Sondervermerk des Nikingers 2026-10-20) |
+| P10-11 | ✅ | `git diff --stat 0a7aaf4..HEAD -- <Tabu-Pfade>` leer (2026-10-20) |
+| P10-12 | ✅ | `doc_health` 0, `pytest` 1268 grün, ein Session-Block je Head (Rotation per Skript) |
+
+**`[VERIFY]` V195–V206:** 6 ✅ (V195, V201, V202, V204, V205, V206) · 1 ⚠️ (V198, live offen) · 4 ⬜ (V197, V199, V200 → P10.5;
+V203 → Fleet) · V196 entfällt (D-8). Der vollständige Stand mit den geerbten Markern steht im Handover §5.
