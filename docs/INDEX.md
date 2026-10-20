@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-10-19 (P10: GLM verworfen) | 2026-10-19 (P10: neue Zeile M7_editor.md — M7 gemessen: CM5 passt, EasyMDE reißt V201) | 2026-10-19 (P10: Intake §8 Note an eurofyx-fleet, Größe nachgezogen) | 2026-10-19 (P10: neue Zeile GLM-Executor-Review, Head/Archiv/Konventionen/Session-Log-Größen nachgezogen) | 2026-10-19 (P10 Step 2 🟡 6/8 durch GLM/opencode — Head/Archiv/Register-Größen nachgezogen) | 2026-10-18 (P10: Archiv-Zeile, Register/Plan-Zeilen und Größen nachgezogen) | 2026-10-16 (Phase 10 begonnen: neuer Abschnitt mit Head, Register, Plan, Karten-Entwürfen; Intake-Zeile aus dem P9-Abschnitt hierher) | 2026-10-16 (PROMPTS-Zeile: der Phasen-Kickoff läuft seit P9 in Claude Code, Größe nachgezogen) | 2026-10-08 (**Closeout Phase 9** — Sektionskopf neu geschrieben (der alte, 3,2 KB, war ein überholter Zwischenstand, Wortlaut in `d04c0ec:docs/INDEX.md`), Handover-Zeile neu, Grafik 1080×1080, feedback- und settings-Plan 📕, Größen nachgezogen) | 2026-10-07 (Oversize-Fix: Matrix in Hub + drei lebende Teile geteilt, settings-Plan §10–§12.1 und Runbook §0/A1–A7 verbatim nach L3, `scripts/move_sections.py`; fünf neue Zeilen; Portscan P9-11/P9-94 eingetragen) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
+updated: 2026-10-20 (P10: M1 gemessen, D-3/D-14 entschieden, neue Zeile M1_browser.md, Größen nachgezogen) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 ---
 # Doc Index (L0)
 
@@ -40,9 +40,10 @@ updated: 2026-10-19 (P10: GLM verworfen) | 2026-10-19 (P10: neue Zeile M7_editor
 
 ## Phase 10 — 🔄 Bestandsaufnahme seit 2026-10-16, kein Produktcode; Tor zu P10.5 = Freigabe des Registers. Phasenziele: Anbieter-Unabhängigkeit, Karten-Umbau (Gehirnkarte)
 
-- [phase10_inventory/CLAUDE.md](../phase10_inventory/CLAUDE.md) — 🔄 ~11KB · Phase-10-Head: Modulstatus Steps 0–4/Z (Step 2 🟡 **7/8**, offen nur M1), GLM verworfen, Übergabe an M3/opencode, ein Session-Block
-- [phase10_inventory/SESSIONS_ARCHIVE.md](../phase10_inventory/SESSIONS_ARCHIVE.md) — 📦 ~18KB · ältere Session-Blöcke, verbatim
-- [phase10_inventory/BAUSTELLENREGISTER.md](../phase10_inventory/BAUSTELLENREGISTER.md) — 📗 **40,8 KB, am Softcap** — Belege nach `messung/` · 76 Baustellen in elf Themen, Entscheidungen D-1–D-18 alle beantwortet (2026-10-18); die Arbeitsliste für P10.5 — seit 2026-10-18 mit M2–M6-/V204/V205-Befunden am Zeilenort
+- [phase10_inventory/CLAUDE.md](../phase10_inventory/CLAUDE.md) — 🔄 ~8KB · Phase-10-Head: Modulstatus Steps 0–4/Z (Step 2 ✅ **8/8**, D-3/D-14 entschieden, Step 4 frei), GLM verworfen, ein Session-Block
+- [phase10_inventory/SESSIONS_ARCHIVE.md](../phase10_inventory/SESSIONS_ARCHIVE.md) — 📦 ~21KB · ältere Session-Blöcke, verbatim
+- [phase10_inventory/BAUSTELLENREGISTER.md](../phase10_inventory/BAUSTELLENREGISTER.md) — 📗 **40,9 KB, am Softcap** — Belege nach `messung/` · 76 Baustellen in elf Themen, Entscheidungen D-1–D-18 alle beantwortet (2026-10-18); die Arbeitsliste für P10.5 — seit 2026-10-18 mit M2–M6-/V204/V205-Befunden am Zeilenort
+- [phase10_inventory/messung/M1_browser.md](../phase10_inventory/messung/M1_browser.md) — 📗 ~12KB · M1: Browser-Messung (Firefox/Safari, Funnel/Domain): `/overview` 4,8–5,2 s auf allen Wegen, Stau hinter `overview`; D-3-Ziele Z1–Z4 (> 200 ms Ladeanimation)
 - [phase10_inventory/messung/M7_editor.md](../phase10_inventory/messung/M7_editor.md) — 📗 ~5KB · M7: Editor-Bibliothek ohne Build-Schritt — CM5 65,6 KB gz + Roundtrip 10/10 + 239 KB im Korridor ✅, EasyMDE 282 KB ❌ (V201), markdown-it redundant; füttert ED-1
 - [docs/concepts/phase10_inventory_plan.md](./concepts/phase10_inventory_plan.md) — 📕 ~23KB · Plan P10 gegen `main@0a7aaf4`: Locks P10-A–J, Messungen M1–M8, Abnahme P10-1–12, V195–V206, P10.5-Schnitt §7
 - [docs/concepts/phase10_executor_review_glm.md](./concepts/phase10_executor_review_glm.md) — 📗 ~14KB · Auswertung P10-K-Open-Test (GLM via opencode): Kontingent-Treiber, Qualität Q1–Q6, Claude Code + GLM, §5 Entscheidung: GLM verworfen, Marktblick ~2026-11-10

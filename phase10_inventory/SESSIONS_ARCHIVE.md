@@ -5,9 +5,36 @@ read-when: nur beim Nachvollziehen der Phasenhistorie; der aktuelle Stand steht 
 detail: L3
 up: ./CLAUDE.md
 down: []
-updated: 2026-10-19 (vierter Block verbatim rotiert, fuenfter Block neu im Head: erste Claude-Code+GLM-Session, M8+M7) | 2026-10-19 (dritter Block „GLM 5.3 Flash Step 2" verbatim rotiert — Claude-Code-Auswertungssession) | 2026-10-19 (Block 2026-10-18 zweiter Block verbatim rotiert — GLM/opencode Step-2-Session) | 2026-10-18 (angelegt für die erste Rotation)
+updated: 2026-10-20 (sechster Block verbatim rotiert, siebter im Head) | 2026-10-19 (vierter Block verbatim rotiert, fuenfter Block neu im Head: erste Claude-Code+GLM-Session, M8+M7) | 2026-10-19 (dritter Block „GLM 5.3 Flash Step 2" verbatim rotiert — Claude-Code-Auswertungssession) | 2026-10-19 (Block 2026-10-18 zweiter Block verbatim rotiert — GLM/opencode Step-2-Session) | 2026-10-18 (angelegt für die erste Rotation)
 ---
 # Phase 10 — Session-Archiv
+## Session stopped — 2026-10-19 (sechster Block: Kosten-Analyse der GLM-Session, GLM verworfen, Übergabe an M3/opencode)
+
+**Ergebnis:** **GLM ist als Ausführer gestrichen** (Nikinger-Entscheidung, Review §5; Z.ai-Auto-Verlängerung gekündigt).
+Ausführer P10.5 = **MiniMax M3 über opencode**; Neubewertung des Marktes ~**2026-11-10** (M3.1 Flash, DeepSeek-
+Flash-Tokenplan u. a. — alles `[VERIFY]`), Messlatte in Review §5 vorab festgeschrieben. Note an Fleet: Intake §8
+(Nachtrag „GLM verworfen"). Kein Produktcode, kein Service-Touch.
+
+**Kosten-Analyse (Claude Code, `~/.claude/projects/…/7ad1d9ad….jsonl`):** der fünfte Block lief mit 98 Aufrufen,
+Kontext p50 108 K / max 165 K, Summe 10,8 M, 99 % Cache-Treffer; ~45 K Grundlast je Aufruf; ein PNG-`Read`
+lieferte 139 K Zeichen Base64. Der Nikinger meldet ~70 % des 5-h-Fensters — **lokal nicht herleitbar** (Prompt-
+Abrechnung mit 2–3-fach-Multiplikator ergäbe ~15–22 % einer Lite-Rechnung); maßgeblich ist die Z.ai-Usage-Seite.
+
+**Nächste Session — Ausführer MiniMax M3 in opencode (Übergabe):**
+1. **Harness zuerst prüfen**, bevor Arbeit beginnt: in `~/.cache/opencode/models.json` das deklarierte
+   `limit.context` des M3-Eintrags lesen. Steht dort ≥ 500 K, die Kompaktierung also praktisch nie greift, **stoppen und
+   den Nikinger fragen** (das war der 86-M-Fehler des Open-Tests; Review §1.1). Ziel: Kontext ≤ 200 K, eine Session je Step.
+2. **Lesen** (kleine Reads, immer `| cut -c1-200` oder `head -c 4000` — Langzeilen-Falle): Wurzel-`CLAUDE.md`,
+   diesen Head, diesen Block, danach `BAUSTELLENREGISTER.md` §12 (D-1–D-18). Kein Ganz-Datei-Read alter Phasen-Skripte.
+3. **Was zu tun ist:** Step 2 hängt allein an **M1** (Browser des Nikingers, beide Eingänge, Plan §4) → **D-3** → Step 4
+   (Plan P10.5). Liefert der Nikinger die M1-Zahlen im Prompt: D-3 im Register §12 festhalten, Step 2 auf ✅, Head
+   nachziehen, `doc_health`. **Ohne M1-Zahlen gibt es keine Pflichtarbeit** — dann nur D-14 (Empfehlung `qwen2.5vl:7b`,
+   Messung `probes/p10_m8_vision.json`) beim Nikinger abholen und eintragen. **Step 4 (Plan P10.5) schreibt Claude
+   Code**, nicht M3 (Planen = Claude Code, Ausführen = M3).
+4. **Regeln:** ein Modell-Trailer je Commit; vor **jedem** Commit Glitch-Scan über Diff **und Betreffzeile**; kein
+   `pkill -f`, kein Service-Touch, Tests ohne `SHAREFYX_*`/`SFX_*`-Env; Rotation nur per `scripts/rotate_session_block.sh`.
+5. **Offen beim Nikinger bleibt:** M1, D-14, V203 (Fleet), V199 (P10.5 Block 1); Marktblick ~2026-11-10.
+
 ## Session stopped — 2026-10-19 (fünfter Block: erste Session unter Claude Code + GLM 5.3 — Harness geprüft, M8 + M7 gefahren)
 
 **Auftrag:** erste Ausführungssession unter Claude Code + GLM 5.3 laut viertem Block: Schritt 0
