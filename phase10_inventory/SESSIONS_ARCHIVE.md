@@ -5,9 +5,29 @@ read-when: nur beim Nachvollziehen der Phasenhistorie; der aktuelle Stand steht 
 detail: L3
 up: ./CLAUDE.md
 down: []
-updated: 2026-10-20 (achter Block verbatim rotiert, neunter = Closeout im Head) | 2026-10-20 (siebter Block verbatim rotiert, achter im Head) | 2026-10-20 (sechster Block verbatim rotiert, siebter im Head) | 2026-10-19 (vierter Block verbatim rotiert, fuenfter Block neu im Head: erste Claude-Code+GLM-Session, M8+M7) | 2026-10-19 (dritter Block „GLM 5.3 Flash Step 2" verbatim rotiert — Claude-Code-Auswertungssession) | 2026-10-19 (Block 2026-10-18 zweiter Block verbatim rotiert — GLM/opencode Step-2-Session) | 2026-10-18 (angelegt für die erste Rotation)
+updated: 2026-10-21 (neunter Block „Closeout P10" verbatim hierher rotiert) | 2026-10-20 (achter Block verbatim rotiert, neunter = Closeout im Head) | 2026-10-20 (siebter Block verbatim rotiert, achter im Head) | 2026-10-20 (sechster Block verbatim rotiert, siebter im Head) | 2026-10-19 (vierter Block verbatim rotiert, fuenfter Block neu im Head: erste Claude-Code+GLM-Session, M8+M7) | 2026-10-19 (dritter Block „GLM 5.3 Flash Step 2" verbatim rotiert — Claude-Code-Auswertungssession) | 2026-10-19 (Block 2026-10-18 zweiter Block verbatim rotiert — GLM/opencode Step-2-Session) | 2026-10-18 (angelegt für die erste Rotation)
 ---
 # Phase 10 — Session-Archiv
+
+## Session stopped — 2026-10-20 (neunter Block: Closeout P10 — Phase abgeschlossen, Step 4 und Tor wandern in den P10.5-Planungschat)
+
+**Ergebnis:** **P10 ✅** (Nikinger, 2026-10-20), Bilanz **9 ✅ · 1 ⚠️ · 2 ⬜** in Plan §8. Die zwei ⬜ (P10-10 Plan P10.5, P10-8
+Register-Freigabe) sind keine Blocker. P10 und P10.5 sind eine Mission, darum übernimmt sie der Planungschat (Opus, `docs/PROMPTS.md`
+Prompt 2). Claude Code, Closeout nach Prompt 3. Kein Produktcode, kein Service-Touch.
+
+**Geliefert:** `docs/concepts/PHASE10_CLOSEOUT_HANDOVER.md` (Planungsdossier: Lesereihenfolge, Befunde für den Blockschnitt, sieben
+offene Entscheidungen, `[VERIFY]`-Bilanz) · `docs/concepts/phase10_inventory_uebersicht.svg` (gerendert und angesehen) · Plan §8 gefüllt ·
+ROADMAP P10 ✅ und P10.5-Zeile auf M3 korrigiert (stand noch auf GLM) · Wurzel-„Current state" neu (der alte Block nannte GLM, rotiert per
+Skript) · INDEX-Zeilen.
+
+**Gemessen am Closeout:** `pytest` **1268** grün (Umgebung ohne `SHAREFYX_*`/`SFX_*`), `doc_health` 0, Tabu-Diff `0a7aaf4..HEAD` leer,
+P10-2-Gegenprobe (alle Quell-IDs im Register) und P10-3 (76/76 Zeilen vollständig) per Skript. Das Register ist **nicht angefasst**
+(40.956 B).
+
+**Nächste Session — P10.5-Planungschat (Opus):**
+1. `PHASE10_CLOSEOUT_HANDOVER.md` ganz lesen, dann Register §12 und Plan P10 §0/§0.2/§7.
+2. Blockschnitt schreiben nach Plan §3 Step 4 (Locks `P10.5-A…`, Abnahme `P10.5-1…`, ab V207), D-3 Z1–Z4 als Abnahmezeilen.
+3. Register-Freigabe beim Nikinger einholen (vorher Platz schaffen, Handover §4.4); Entscheidungen aus Handover §5 vorlegen.
 
 ## Session stopped — 2026-10-20 (achter Block: Wegwerf-Probe gefahren — Event-Loop-Blockade bewiesen, Mitlauf-`overview` = Fokus-Handler)
 

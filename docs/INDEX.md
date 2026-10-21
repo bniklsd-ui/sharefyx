@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-10-20 (Closeout P10: Phase ✅, Handover + Grafik neu, P10-Zeilen und Größen nachgezogen) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
+updated: 2026-10-21 (Plan P10.5 freigegeben: neue Zeile phase10_5_finishing_plan.md; Tor P10-8 offen; P10-Zeilen und Intake-Größe nachgezogen) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 ---
 # Doc Index (L0)
 
@@ -38,18 +38,19 @@ updated: 2026-10-20 (Closeout P10: Phase ✅, Handover + Grafik neu, P10-Zeilen 
 - [docs/concepts/sichtpruefung_automation_tooling.md](./concepts/sichtpruefung_automation_tooling.md) — 📗 ~26KB · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/PROMPTS.md](./PROMPTS.md) — 📗 ~20KB · die drei Workflow-Prompts (Claude-Code-Session-Start, Phasen-Kickoff — seit P9 in Claude Code, Phasen-Abschluss); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 
-## Phase 10 — ✅ abgeschlossen 2026-10-20 (Bestandsaufnahme, kein Produktcode). P10 und P10.5 sind eine Mission: Plan P10.5 und Register-Tor im Planungschat. Phasenziele: Anbieter-Unabhängigkeit, Karten-Umbau (Gehirnkarte)
+## Phase 10 — ✅ abgeschlossen 2026-10-20 (Bestandsaufnahme, kein Produktcode). P10 und P10.5 sind eine Mission: Plan P10.5 freigegeben, Tor P10-8 offen (2026-10-21). Phasenziele: Anbieter-Unabhängigkeit, Karten-Umbau (Gehirnkarte)
 
-- [phase10_inventory/CLAUDE.md](../phase10_inventory/CLAUDE.md) — 📗 ~8KB · Phase-10-Head: Modulstatus Steps 0–4/Z (✅ 2026-10-20, Step 4 → Planungschat), ein Session-Block (Closeout)
+- [phase10_inventory/CLAUDE.md](../phase10_inventory/CLAUDE.md) — 📗 ~8KB · Phase-10-Head: Modulstatus Steps 0–4/Z (✅; Step 4 = Plan P10.5, 2026-10-21), ein Session-Block (Planungschat)
 - [phase10_inventory/SESSIONS_ARCHIVE.md](../phase10_inventory/SESSIONS_ARCHIVE.md) — 📦 ~27KB · ältere Session-Blöcke, verbatim
-- [phase10_inventory/BAUSTELLENREGISTER.md](../phase10_inventory/BAUSTELLENREGISTER.md) — 📗 **40,9 KB, am Softcap** — Belege nach `messung/` · 76 Baustellen, D-1–D-18 beantwortet; die Arbeitsliste für P10.5 (Freigabe = Tor P10-8)
+- [phase10_inventory/BAUSTELLENREGISTER.md](../phase10_inventory/BAUSTELLENREGISTER.md) — 📗 **40,9 KB, am Softcap** — Belege nach `messung/` · 76 Baustellen, D-1–D-18 beantwortet; die Arbeitsliste für P10.5 (Tor P10-8 offen seit 2026-10-21)
 - [phase10_inventory/messung/M1_browser.md](../phase10_inventory/messung/M1_browser.md) — 📗 ~13KB · M1: Browser-Messung (Firefox/Safari, Funnel/Domain): `/overview` 4,8–5,2 s auf allen Wegen, Stau hinter `overview`; D-3-Ziele Z1–Z4 (> 200 ms Ladeanimation)
 - [phase10_inventory/messung/M7_editor.md](../phase10_inventory/messung/M7_editor.md) — 📗 ~5KB · M7: Editor-Bibliothek ohne Build-Schritt — CM5 65,6 KB gz + Roundtrip 10/10 + 239 KB im Korridor ✅, EasyMDE 282 KB ❌ (V201), markdown-it redundant; füttert ED-1
 - [docs/concepts/phase10_inventory_plan.md](./concepts/phase10_inventory_plan.md) — 📕 ~26KB · Plan P10 gegen `main@0a7aaf4`: Locks P10-A–K, M1–M8, Abnahme P10-1–12, V195–V206, P10.5-Schnitt §7, Closeout §8
 - [docs/concepts/phase10_executor_review_glm.md](./concepts/phase10_executor_review_glm.md) — 📗 ~14KB · Auswertung P10-K-Open-Test (GLM via opencode): Kontingent-Treiber, Qualität Q1–Q6, Claude Code + GLM, §5 Entscheidung: GLM verworfen, Marktblick ~2026-11-10
-- [docs/concepts/phase10_intake.md](./concepts/phase10_intake.md) — 📗 ~26KB · Sammelstelle, Herkunft des Registers: Wünsche 2026-10-08/-16, Erbe P9, Fleet-Notizen §5–§7, §8 Note **an** Fleet (GLM-Befunde, Nachtrag: GLM verworfen)
+- [docs/concepts/phase10_intake.md](./concepts/phase10_intake.md) — 📗 ~28KB · Sammelstelle, Herkunft des Registers: Wünsche 2026-10-08/-16, Erbe P9, Fleet-Notizen §5–§7, Notes **an** Fleet §8 (GLM verworfen) und §9 (P10.5: Kontextgrenze 400 K)
 - [docs/concepts/phase10_karte_c_stil_1.svg](./concepts/phase10_karte_c_stil_1.svg) — 📕 Karten-Entwürfe: `phase10_karte_entwurf_{a,b,c}.svg` (erste Runde, Wahl C) und `phase10_karte_c_stil_{1,2,3}.svg` (Stile der Gehirnkarte, gewählt C2); `phase10_logo_entwuerfe{,_c,_mix,_final}.svg` (Logo D-6, vier Runden)
 - [docs/concepts/PHASE10_CLOSEOUT_HANDOVER.md](./concepts/PHASE10_CLOSEOUT_HANDOVER.md) — 📕 ~14KB · Abschluss-Handover P10 → P10.5: Planungsdossier (Step 4 + Tor wandern), offene Entscheidungen, [VERIFY]-Bilanz
+- [docs/concepts/phase10_5_finishing_plan.md](./concepts/phase10_5_finishing_plan.md) — 📕 ~89KB · Plan P10.5 gegen `main@e5a1879`, freigegeben 2026-10-21: Locks P10.5-A–W, Blöcke 0–12/Z, Deploys A–D, Abnahme P10.5-1–61, V207–V219
 - [docs/concepts/phase10_inventory_uebersicht.svg](./concepts/phase10_inventory_uebersicht.svg) — 📕 ~16KB · Phase-10-Übersichtsgrafik 1080×1080 (Closeout 2026-10-20, gerendert und angesehen)
 
 ## Phase 8.6 — ✅ abgeschlossen 2026-09-19, Step Z inklusive; live als `v3.0.2` seit 2026-09-18 (SHA `1ad2665`, `health_gate` 9/9). UI-Politur mit **zwei Plaenen und drei Sichtungs-Revisionen**: Plan 1 (Step 0/V/A/B/C/D) wurde am 2026-09-12 nicht abgenommen — neun UX-Befunde statt Freigabe —, Plan 2 (E/F/G/**G-R**/H/**H-R**/**H-R-3**/J) hat sie abgearbeitet. Bilanz **45 ✅ · 5 ⚠️ · 0 ⬜ · 4 ersetzt** von 54 Zeilen; `pytest` **995**, `ui_budget` 5/5 (144,7 KB); **keine neunte P1-Contract-Oeffnung**, eine angekuendigte Tabu-Ausnahme (P8.6-AJ). Zwei `[VERIFY]` gehen offen an P9: **V118**, **V136**

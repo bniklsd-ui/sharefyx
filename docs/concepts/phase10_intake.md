@@ -10,7 +10,7 @@ down:
   - ./p8x_ui_polish_notes.md                    # §2 Karte, §10 Auswahl-Konvention, §10.9 Hochkant
   - ../../phase9_hardening/ABNAHME_MATRIX.md    # die 12 ⚠️ und der eine ⬜ (Stand Closeout 2026-10-08) — jede Zeile braucht in P10 ein Urteil
   - ../../phase10_inventory/BAUSTELLENREGISTER.md   # seit 2026-10-16 der Stand: das Register, das aus dieser Sammelstelle entstand
-updated: 2026-10-19 (§8 Rückmeldung vom ersten Lauf: `CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000` im Session-Env — 200-K-Annahme widerlegt, Launcher anpassen; Remote Control ohne Kanal) | 2026-10-19 (neu §8: Note **an** `eurofyx-fleet` — GLM-Ausführer-Befunde für die Fleet-Integration Claude Code + GLM) | 2026-10-16 (Phase 10 begonnen: Zeiger aufs Register oben, §1 bestätigt (P10-A), §2.3 P5-U-Konflikt, neu §2.4 Anbieter-unabhängig und §2.5 Karten-Umbau, §7 Korrektur Caddyfile.template) | 2026-10-13 (Note from other project: eurofyx-fleet S9, neuer Abschnitt 7: Caddy dial_timeout/lb_try live, Quelle nachziehen) | 2026-10-11 (Note from other project: eurofyx-fleet S6, neuer Abschnitt 6: tail-proxy Exit 143) | 2026-10-11 (Note from other project: eurofyx-fleet Block 1 abgeschlossen, neuer Abschnitt 5) | 2026-10-08 (Closeout P9: Zeiger auf `PHASE9_CLOSEOUT_HANDOVER.md` §4 in §3, Matrix-Stand 12 ⚠️ · 1 ⬜) | 2026-10-08 (angelegt — Nikinger-Auftrag nach dem Block feedback: P10 beendet **alle** Baustellen, damit P11 auf einem gehärteten Fundament neue Funktionen denken kann; Zweiteilung P10/P10.5; drei neue Themen: Responsivität/Performance, visuelle Kleinigkeiten, Editor ohne Vorschau/Bearbeiten-Modus)
+updated: 2026-10-20 (neu §9: Note **an** `eurofyx-fleet` — P10.5-Ausführer M3.1 Flash als Open-Test, Kontextgrenze 400 K in opencode bitte durch Fleet setzen; P10-J zweiter Anbieter lokal über CT 111) | 2026-10-19 (§8 Rückmeldung vom ersten Lauf: `CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000` im Session-Env — 200-K-Annahme widerlegt, Launcher anpassen; Remote Control ohne Kanal) | 2026-10-19 (neu §8: Note **an** `eurofyx-fleet` — GLM-Ausführer-Befunde für die Fleet-Integration Claude Code + GLM) | 2026-10-16 (Phase 10 begonnen: Zeiger aufs Register oben, §1 bestätigt (P10-A), §2.3 P5-U-Konflikt, neu §2.4 Anbieter-unabhängig und §2.5 Karten-Umbau, §7 Korrektur Caddyfile.template) | 2026-10-13 (Note from other project: eurofyx-fleet S9, neuer Abschnitt 7: Caddy dial_timeout/lb_try live, Quelle nachziehen) | 2026-10-11 (Note from other project: eurofyx-fleet S6, neuer Abschnitt 6: tail-proxy Exit 143) | 2026-10-11 (Note from other project: eurofyx-fleet Block 1 abgeschlossen, neuer Abschnitt 5) | 2026-10-08 (Closeout P9: Zeiger auf `PHASE9_CLOSEOUT_HANDOVER.md` §4 in §3, Matrix-Stand 12 ⚠️ · 1 ⬜) | 2026-10-08 (angelegt — Nikinger-Auftrag nach dem Block feedback: P10 beendet **alle** Baustellen, damit P11 auf einem gehärteten Fundament neue Funktionen denken kann; Zweiteilung P10/P10.5; drei neue Themen: Responsivität/Performance, visuelle Kleinigkeiten, Editor ohne Vorschau/Bearbeiten-Modus)
 ---
 
 # Phase 10 — Sammelstelle (kein Plan)
@@ -252,3 +252,31 @@ kostete laut Nikinger ~70 % des 5-h-Fensters, lokal nicht herleitbar. Auto-Verl�
 **Rückfall:** MiniMax M3 über opencode (Endpunkt live bis 2026-11-15). **Neubewertung ~2026-11-10 als Marktblick**, nicht
 nur als GLM-Wiederholung — Kandidaten offen (M3.1 Flash, DeepSeek-Flash-Tokenplan u. a., alles `[VERIFY]`). Die
 Befunde zu Kompaktierung/200 K, Memory und Langzeilen-Falle oben gelten für **jeden** Ausführer weiter.
+
+## 9. Note to other project — `eurofyx-fleet` (2026-10-20)
+
+> **Absender:** Claude Code im Repo `savefxy` (Sharefyx), P10.5-Planungssession 2026-10-20. **Empfänger:** die Fleet-Session, die
+> opencode und den Ausführer für Sharefyx konfiguriert. Plan: [`phase10_5_finishing_plan.md`](./phase10_5_finishing_plan.md) (Locks P10.5-B/C/K).
+
+**BLUF.** Sharefyx P10.5 läuft als **Open-Test von MiniMax M3.1 Flash (offiziell)** über opencode, Rückfall M3 (Nikinger 2026-10-20). Bitte
+die **Kontextgrenze in opencode auf 400.000** setzen — Nikinger-Entscheidung „konservativ: erst mit 400 K statt 1 M testen, per Note an Fleet".
+Sharefyx fasst die opencode-Konfiguration nicht an und **startet keinen Block, solange der wirksame Wert > 400.000** ist.
+
+**Befund (gelesen 2026-10-20 auf der Sharefyx-VM):**
+- `~/.config/opencode/opencode.json` überschreibt nur `provider.minimax.models."MiniMax-M3.1-Flash-Preview".limit` = `{context: 1000000, output: 131072}`.
+- Für das **offizielle** `MiniMax-M3.1-Flash` und für `MiniMax-M3` gibt es keine Überschreibung; `~/.cache/opencode/models.json` deklariert
+  beide mit `context: 1000000` (je Provider `minimax`, `minimax-coding-plan`, `-cn`). Das ist die Falle aus §8: Kompaktierung erst bei ~1 M.
+- Ob opencode für Sharefyx auf dieser VM oder auf einem anderen Host läuft, ist hier nicht sichtbar (kein `opencode` im `PATH` der VM). Die
+  Grenze gehört auf den Host, auf dem der Ausführer tatsächlich läuft.
+
+**Bitte (Handlungsbedarf Fleet):**
+1. `limit.context = 400000` für `MiniMax-M3.1-Flash` und `MiniMax-M3` (Schlüsselpfad `[VERIFY]` gegen `opencode.ai/config.json` der
+   installierten Version), auf dem Host des Sharefyx-Ausführers.
+2. Falls die **Trading-Bot-Baseline** (M3/M3.1 Flash) mit anderer Grenze läuft: dieselbe Grenze für beide Projekte wählen oder die Abweichung
+   in der Bewertung vermerken — sonst vergleicht die Bewertung zwei verschiedene Dinge.
+3. Rückmeldung (Wert + Host) an den Nikinger; Sharefyx protokolliert den wirksamen Wert vor jedem Block im Session-Block (P10.5-C).
+
+**Zur Kenntnis:** Die Sharefyx-Abnahme P10-J (Anbieter-Unabhängigkeit) nutzt als zweiten Modellanbieter ein **lokales Modell über Ollama
+auf CT 111** (`192.168.68.140:11434`). Ein ggf. nötiges Textmodell mit Tool-Aufrufen zieht der Nikinger auf CT 111 — nie auf der Sharefyx-VM.
+Die Bewertung des Open-Tests (Rubrik, Vergleich mit der Baseline) liegt bei Trading-Bot/eurofyx-fleet; Sharefyx liefert die Rohdaten
+(Modell-Trailer je Commit, Zeit/Kontingent/Eingriffe je Block im Session-Block).
