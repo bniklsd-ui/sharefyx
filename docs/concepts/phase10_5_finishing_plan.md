@@ -11,13 +11,16 @@ down:
   - ../../phase10_inventory/messung/M1_browser.md   # D-3 = Z1–Z4, Probe Event-Loop/Fokus
   - ../../phase10_inventory/messung/M7_editor.md    # CM5-Messung (Editor Stufe 1)
   - ./phase10_intake.md                             # §9 Note an eurofyx-fleet (Kontextgrenze 400 K)
-updated: 2026-10-21 (freigegeben: Plan, P10-C/P10.5-O, P10.5-N beide Richtungen, Tor P10-8) | 2026-10-20 (angelegt — P10.5-Planungschat, Claude Code/Opus; Fragen R1/R2 vom Nikinger beantwortet)
+updated: 2026-10-21 (Nachtrag: Block-0-Reihenfolge, 0.8 Register-Luft, /mcp gemessen, Proben-Quelle) | 2026-10-21 (freigegeben: Plan, P10-C/P10.5-O, P10.5-N beide Richtungen, Tor P10-8) | 2026-10-20 (angelegt — P10.5-Planungschat, Claude Code/Opus; Fragen R1/R2 vom Nikinger beantwortet)
 ---
 # Phase 10.5 — Finishing (Plan)
 
 > **Status: freigegeben 2026-10-21 (Nikinger), ab jetzt 📕** — Änderungen nur als datierte Nachträge. Am selben Tag freigegeben:
 > der `phase4_auth/`-Eingriff (P10-C, Lock P10.5-O), P10.5-N in **beiden** Richtungen und das Register-Tor P10-8 (Register-Kopf).
 > Block 0 überträgt die Freigaben in den Phase-Head `phase10_5_finishing/CLAUDE.md`.
+> **[Nachtrag 2026-10-21, Planungschat]** Vier Korrekturen nach der Freigabe, inline als `[Nachtrag 2026-10-21]` markiert, keine
+> Design-Änderung: Block-0-Reihenfolge (INDEX-Luft zuerst), neuer Schritt 0.8 (Register-Luft), `/mcp`-Begründung gemessen (6.3), Quelle der
+> Protokoll-Probe (5.6).
 
 > **Auftrag in einem Satz:** P10.5 schließt jede Registerzeile mit Ziel P10.5 — Betrieb, Fehler, Performance, MCP-Schicht
 > (FastMCP 4), Anbieter-Unabhängigkeit, Darstellung, Gehirnkarte, Umbenennen, Suche, Realtime, Editor Stufe 1+2, Doku —
@@ -122,8 +125,8 @@ Deploy A ist Teil der Abnahme.
 
 | Datei | Stand | Grenze | Luft |
 |---|---|---|---|
-| `docs/INDEX.md` | 40.450 B (vor dem Plan-Commit) | 40.960 B (Test) | 510 B → Block 0 |
-| `BAUSTELLENREGISTER.md` | 40.956 B | 40.960 B | 4 B → jede Zeile nur durch Ersetzen kürzer/gleich lang abhaken |
+| `docs/INDEX.md` | 40.772 B (nach dem Plan-Commit) | 40.960 B (Test) | 188 B → **[Nachtrag 2026-10-21]** Block 0.5 ist der erste Schreibschritt |
+| `BAUSTELLENREGISTER.md` | 40.954 B (nach dem Tor) | 40.960 B | 6 B → **[Nachtrag 2026-10-21]** Block 0.8 schafft ≥ 3 KB; vorher wird nicht abgehakt |
 | `ROADMAP.md` | 37.055 B | 37.725 B (P9-6-Band ±2.048 B um 35.677 B, `test_acceptance_numbers.py:332`) | 670 B → Block 0 (DO-2) |
 | UI-Budget (`ui_budget.py`, Zeile 3) | 177.264 B gz | 256.000 B | 78.736 B; CM5 (65,6 KB) würde ~11 KB übrig lassen → P10.5-H |
 
@@ -165,7 +168,7 @@ Deploy A ist Teil der Abnahme.
 - **Hard Rule 8:** Jeder Schritt-Abschluss-Commit zieht im **selben** Commit die Modulstatus-Tabelle des Heads und den Session-Block nach.
   Eine neue `.md` bekommt im selben Commit eine L1-Card und eine INDEX-Zeile.
 - **Register abhaken:** In `BAUSTELLENREGISTER.md` wird die Ziel-Spalte der Zeile ersetzt, nicht ergänzt, etwa `P10.5` → `✅ 10-2x (B4)`
-  (die Datei hat 4 B Luft). Belege stehen im Head bzw. im Commit, nicht im Register.
+  (**[Nachtrag 2026-10-21]** die Luft dafür schafft Block 0.8; vorher wird nicht abgehakt). Belege stehen im Head bzw. im Commit, nicht im Register.
 - **Session-Block (≤ 4 KiB, P10.5-T),** fest gegliedert: *Ergebnis* · *Geliefert (Commits)* · *Gemessen* (pytest, Proben) ·
   *Ausführer-Daten* (Modell, Wanduhrzeit, Aufrufe/Kontingent, Eingriffe Nikinger/Claude Code, Gegenlese-Funde) · *Offen/Nächster Schritt*.
   Der vorige Block rotiert **per Skript**: `scripts/rotate_session_block.sh phase10_5_finishing`.
@@ -208,7 +211,7 @@ oder den Keyring.
 
 | Block | Inhalt (Register) | Wer | Gr. | Deploy | Erlaubte Pfade (Code) |
 |---|---|---|---|---|---|
-| 0 | Haushalt: Verifikation, Phase-Head, INDEX-Luft, DO-2, DO-3, Ausführer-Vorbedingung | Claude Code | S | — | `phase10_5_finishing/`, `docs/`, `ROADMAP.md`, `pytest.ini`, `phase9_hardening/tests/test_acceptance_numbers.py` |
+| 0 | Haushalt: Verifikation, Phase-Head, INDEX-Luft, Register-Luft, DO-2, DO-3, Ausführer-Vorbedingung | Claude Code | S | — | `phase10_5_finishing/`, `docs/`, `ROADMAP.md`, `pytest.ini`, `phase9_hardening/tests/test_acceptance_numbers.py`, `phase10_inventory/*.md` (0.8, Nachtrag 2026-10-21) |
 | 1 | Betrieb: BT-1, BT-2, BT-6 (+ `constraints.txt`) | Ausführer + Nikinger | S | A | `phase9_hardening/step_a/`, `phase9_hardening/tests/`, `phase3_edge/systemd/`, `scripts/dev_install.sh`, `constraints.txt` |
 | 2 | Fehler, Parität, Regel: BG-1, RE-1, RE-2, P10-I, AL-1 | Ausführer (+ Claude Code Proben) | S–M | A | `phase2_mcp/mcpserver/{permissions,app,tools}.py`, `phase5_ui/webui/{api.py,static/js/{list,spaces}.js}`, Tests, `phase10_5_finishing/probes/` |
 | 3 | Hygiene: LG-8 (P1-15), LG-7 | Ausführer | S | A | `phase1_storage/storage/{files,store}.py`, `phase1_storage/tests/`, `phase10_5_finishing/scripts/` |
@@ -233,6 +236,10 @@ Die drei L-Blöcke kommen zuletzt, und Realtime geht dem Editor voran, weil der 
 
 **Register:** DO-2, DO-3 (+ Step-0-Platzhalter). **Ziel:** Jede spätere Datei findet Platz, die Wächter halten, der Ausführer startet
 unter den richtigen Bedingungen. **Erlaubte Pfade:** siehe §3.
+
+**[Nachtrag 2026-10-21] Reihenfolge:** 0.1 → **0.5** (INDEX-Luft, samt der INDEX-Zeile des neuen Archivs) → **0.8** (Register-Luft) → 0.4 →
+0.2/0.3 → 0.6 → 0.7. Grund: Nach dem Plan-Commit hat `docs/INDEX.md` nur 188 B Luft, und 0.2 braucht zwei INDEX-Zeilen (~400 B) im
+selben Commit (Hard Rule 8). Die Register-Luft muss vor dem ersten Abhaken stehen (§2.2).
 
 **0.1 Verifikations-Durchlauf wiederholen.** `doc_health.py` → 0; Oversize-`find` (Kopf `docs/INDEX.md`); jeder Treffer muss 📕/📦 oder
 einer der drei benannten Heads sein. Der Befund von §1.1 gilt, falls sich nichts geändert hat: „nichts zu tun außer INDEX-Luft".
@@ -271,12 +278,19 @@ Plan-Zeiger. Netto ≤ 300 B. Die `updated:`-Kette läuft per `scripts/prepend_u
 **0.7 Ausführer-Vorbedingung dokumentieren.** Das Ergebnis der §2.1-Prüfung (wirksamer `limit.context` für M3.1 Flash und M3) gehört in
 den Session-Block, ebenso die Trailer-Zeichenkette aus P10.5-B. Ist der Wert > 400.000 → Block 1 startet nicht; der Nikinger stößt Fleet an.
 
+**0.8 [Nachtrag 2026-10-21] Register-Luft ≥ 3 KB.** `phase10_inventory/BAUSTELLENREGISTER.md` steht nach dem Tor bei 40.954 B (6 B Luft),
+und jedes Abhaken nach §2.2 macht eine Zelle länger. Zuerst wird ein 📦 `phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md` mit L1-Card angelegt
+(das Ziel muss existieren; `scripts/move_sections.py` legt keines an). Dann:
+`scripts/move_sections.py phase10_inventory/BAUSTELLENREGISTER.md phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md "## 12 Entscheidungsliste (für P10 Step 3)"`.
+§12 (3.904 B, alle D-1–D-18 beantwortet, also abgeschlossen) wandert verbatim, die Überschrift bleibt mit Zeiger stehen. Dazu die
+INDEX-Zeile für das Archiv und `down:` in der Register-Card um das Archiv ergänzen. Kriterium: Register ≤ 37.900 B.
+
 **Abnahme Block 0**
 
 | # | Kriterium | Probe | Gegenlauf |
 |---|---|---|---|
 | **P10.5-1** | Step-0-Bericht steht im Session-Block, `doc_health` 0 | Skriptausgabe | — |
-| **P10.5-2** | DO-2: INDEX ≥ 3.000 B unter der Grenze; ROADMAP-Wächter eingefroren; Suite grün | `wc -c`, `pytest` | eine absichtlich falsche P9-6-Zahl in einer Kopie macht den neuen Test rot |
+| **P10.5-2** | DO-2: INDEX ≥ 3.000 B unter der Grenze; ROADMAP-Wächter eingefroren; **[Nachtrag 2026-10-21]** Register ≥ 3.000 B unter der Grenze (0.8); Suite grün | `wc -c`, `pytest` | eine absichtlich falsche P9-6-Zahl in einer Kopie macht den neuen Test rot |
 | **P10.5-3** | DO-3: Wächter grün auf dem echten Head | `pytest phase10_5_finishing/tests` | ein 5-KiB-Block (Fixture) macht ihn rot |
 | **P10.5-4** | Ausführer-Vorbedingung erfüllt und protokolliert (≤ 400 K) | Session-Block | ein Wert > 400 K stoppt (dokumentierte Regel) |
 
@@ -544,7 +558,8 @@ loggt den Werkzeugnamen; die Fehlerklasse ist `"partial"`, wenn `failed > 0`.
 der die Zahl festhält). `phase2_mcp/scripts/mcp_smoke.py`: Check 17 `append_to_items` (zwei Einträge, einer mit falscher Version →
 `ok:1, failed:1`).
 
-**5.6 Protokoll-Probe ins Repo:** `phase10_5_finishing/probes/p105_b5_protocol_probe.py` (aus der Planungssession; in-process, beide Ären,
+**5.6 Protokoll-Probe ins Repo:** `phase10_5_finishing/probes/p105_b5_protocol_probe.py` (**[Nachtrag 2026-10-21]** Vorlage: `~/.claude-code-tools/p105/proto_probe.py` auf der
+Sharefyx-VM, außerhalb des Repos; läuft der Ausführer auf einem anderen Host, wird sie nach der Tabelle in §1.2 neu geschrieben; in-process, beide Ären,
 `list_spaces` + `tools/list`-Annotations) mit JSON-Ausgabe; Wächter `phase10_5_finishing/tests/test_protocol_probe.py` ruft sie auf.
 
 **5.7 Vor Deploy B:** Der Nikinger sagt Fabian Bescheid („kurzer Neustart; der Connector sollte ohne neue Anmeldung weiterlaufen"). Die
@@ -599,8 +614,10 @@ class _ExactMount:
         await self._app(scope, receive, send)
 ```
 `[VERIFY]` gegen das, was `Mount` in der installierten Starlette-Version in `scope` schreibt (`raw_path` bleibt). Danach ist
-`https://sharefyx.eurofyx.com/mcp`, die URL aus P10-C, ohne Umleitung erreichbar. Bisher landete die Umleitung hinter dem Proxy bei
-`http://` (Schema aus uvicorn), und auf `http://` verwirft ein Client den Bearer.
+`https://sharefyx.eurofyx.com/mcp`, die URL aus P10-C, ohne Umleitung erreichbar. **[Nachtrag 2026-10-21, gemessen]** Die heutige 307
+zeigt live auf `https://…/mcp/` (Domain und Funnel, `curl -X POST`); wer ihr folgt, kommt an. Die Route bleibt trotzdem: Ein Client, der
+einer 307 bei POST nicht folgt (etwa `httpx` mit dem Default `follow_redirects=False`), scheitert heute, und die Abnahme-URL aus P10-C
+steht ohne Slash.
 
 **6.4 PA-6.** Wurzel-`CLAUDE.md` §What this project is: „und deren Claude-Instanzen" → „und deren MCP-Clients (Claude und andere)". Datierte
 Notiz, eine Zeile.
