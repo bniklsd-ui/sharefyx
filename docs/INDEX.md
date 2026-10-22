@@ -56,7 +56,7 @@ updated: 2026-10-21 (Plan P10.5 freigegeben: neue Zeile phase10_5_finishing_plan
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing — alle Baustellen schließen; Plan `docs/concepts/phase10_5_finishing_plan.md`, Ausführer M3.1 Flash als Open-Test)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **15.055 B** · Phase-10.5-Head: Modulstatus der Blöcke 0–12/Z, Deploy-Tabelle A–D, Abnahmestand P10.5-1–61 (4 ✅ · 0 ⚠️ · 57 ⬜), offene Punkte beim Nikinger, genau ein Session-Block (≤ 4 KiB, DO-3)
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **15.098 B** · Phase-10.5-Head: Modulstatus der Blöcke 0–12/Z, Deploy-Tabelle A–D, Abnahmestand P10.5-1–61 (4 ✅ · 0 ⚠️ · 57 ⬜), offene Punkte beim Nikinger, genau ein Session-Block (≤ 4 KiB, DO-3)
 - [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **1.134 B** · L3-Archiv der älteren Session-Blöcke dieser Phase, verbatim, newest-first
 
 ## Phase 8.6 — ✅ abgeschlossen 2026-09-19 (UI-Politur, live `v3.0.2`; zwei Pläne)
