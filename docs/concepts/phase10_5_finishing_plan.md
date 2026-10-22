@@ -11,7 +11,7 @@ down:
   - ../../phase10_inventory/messung/M1_browser.md   # D-3 = Z1–Z4, Probe Event-Loop/Fokus
   - ../../phase10_inventory/messung/M7_editor.md    # CM5-Messung (Editor Stufe 1)
   - ./phase10_intake.md                             # §9 Note an eurofyx-fleet (Kontextgrenze 400 K)
-updated: 2026-10-21 (Nachtrag: Block-0-Reihenfolge, 0.8 Register-Luft, /mcp gemessen, Proben-Quelle) | 2026-10-21 (freigegeben: Plan, P10-C/P10.5-O, P10.5-N beide Richtungen, Tor P10-8) | 2026-10-20 (angelegt — P10.5-Planungschat, Claude Code/Opus; Fragen R1/R2 vom Nikinger beantwortet)
+updated: 2026-10-22 (Block 0 Schritt 0.5 gebaut: INDEX gekürzt 40.772 → 36.889 B, Archiv docs/INDEX_KURZUNG_ARCHIVE.md, Plan-Hebel gemessen zu klein) | 2026-10-21 (Nachtrag: Block-0-Reihenfolge, 0.8 Register-Luft, /mcp gemessen, Proben-Quelle) | 2026-10-21 (freigegeben: Plan, P10-C/P10.5-O, P10.5-N beide Richtungen, Tor P10-8) | 2026-10-20 (angelegt — P10.5-Planungschat, Claude Code/Opus; Fragen R1/R2 vom Nikinger beantwortet)
 ---
 # Phase 10.5 — Finishing (Plan)
 
@@ -21,6 +21,21 @@ updated: 2026-10-21 (Nachtrag: Block-0-Reihenfolge, 0.8 Register-Luft, /mcp geme
 > **[Nachtrag 2026-10-21, Planungschat]** Vier Korrekturen nach der Freigabe, inline als `[Nachtrag 2026-10-21]` markiert, keine
 > Design-Änderung: Block-0-Reihenfolge (INDEX-Luft zuerst), neuer Schritt 0.8 (Register-Luft), `/mcp`-Begründung gemessen (6.3), Quelle der
 > Protokoll-Probe (5.6).
+>
+> **[Nachtrag 2026-10-22, Block 0 — Ausführer MiniMax M3.1 Flash]** Schritt **0.5** ist gebaut, und der Plan-Hebel
+> hat **nicht** gereicht: **gemessen** tragen die acht `## Phase …`-Zeilen zusammen **2.478 B**, und mit einer neuen Zeile
+> von ≤ 120 B ist die Ersparnis **höchstens ~1,7 B** — die geforderten 3.000 B sind aus den Köpfen **nicht erreichbar**
+> (der Plan nennt „P8.6 allein ~600 B" — das stimmt: 617 B; nur die Summe fehlte). **Der Zielwert bleibt, der Hebel
+> wurde erweitert:** zusätzlich wandern drei Kartenzeilen-Chroniken und die Chronik der Karte selbst in das Archiv.
+> **Zwei Abweichungen, beide datiert und begründet:**
+> **(1)** Das Archiv heißt `docs/INDEX_KURZUNG_ARCHIVE.md` statt `docs/INDEX_HEADINGS_ARCHIVE.md` — es trägt mehr als
+> Überschriften, und ein Name, der lügt, ist schlimmer als eine Umbenennung.
+> **(2)** Der Plan nannte **eine** neue INDEX-Zeile; es werden **vier** (dieses Archiv, `ENTSCHEIDUNGEN_ARCHIVE.md`,
+> der Phase-Head und sein `SESSIONS_ARCHIVE.md`) — dafür war die zusätzliche Kürzung nötig.
+> **Gemessen:** Karte **40.772 B → 36.889 B** (Ersparnis **4.171 B**, Luft **4.071 B** unter 40.960 B), `doc_health` **0**,
+> `test_index_archive.py` grün, neue Wächter `phase10_5_finishing/tests/test_index_shortening.py` **5/5**
+> (Rundeweg byteweise, Abbruch ohne Zielberührung, das Skript legt das Archiv nicht an).
+> **Keine Design-Änderung**, keine Lock-Verletzung: DO-2 bleibt DO-2, nur der Hebel ist der gemessene.
 
 > **Auftrag in einem Satz:** P10.5 schließt jede Registerzeile mit Ziel P10.5 — Betrieb, Fehler, Performance, MCP-Schicht
 > (FastMCP 4), Anbieter-Unabhängigkeit, Darstellung, Gehirnkarte, Umbenennen, Suche, Realtime, Editor Stufe 1+2, Doku —
@@ -259,7 +274,7 @@ Live-Schleife nehmen. Ersatz ist eine eingefrorene Assertion: `assert "35.677 B"
 geschlossen; seine Zahl ist eine Momentaufnahme vom 2026-10-07, keine Live-Größe — eingefroren in P10.5 Block 0 (D-17, DO-2)". P9-3 und
 V145 bleiben in der Schleife: Sie messen `docs/INDEX.md`, und der Softcap-Test hält die Datei ohnehin unter 40.960 B.
 
-**0.5 DO-2 (b) — INDEX-Luft ≥ 3.000 B.** Die längsten Texte im INDEX sind die Abschnittsköpfe der abgeschlossenen Phasen (P6, P6.5, P7,
+**0.5 DO-2 (b) — INDEX-Luft ≥ 3.000 B.** **[Nachtrag 2026-10-22: gebaut — der Plan-Hebel reichte nicht (2.478 B Überschriften), der Hebel wurde auf Kartenzeilen-Chroniken erweitert, Karte 40.772 → 36.889 B; Details im Kopfnachtrag.]** Die längsten Texte im INDEX sind die Abschnittsköpfe der abgeschlossenen Phasen (P6, P6.5, P7,
 P8, P8.5, P8.6, P9; P8.6 allein ~600 B). Neues Skript `phase10_5_finishing/scripts/shorten_index_headings.py`:
 - Eingabe ist eine explizite Abbildung `{alte Kopfzeile: neue Kopfzeile}` im Skript, je Kopf ≤ 120 Zeichen, zum Beispiel
   `## Phase 8.6 — ✅ abgeschlossen 2026-09-19 (UI-Politur, live v3.0.2)`.
