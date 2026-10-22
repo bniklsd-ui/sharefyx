@@ -1,0 +1,107 @@
+{
+  "probe": "p105_b4_eventloop",
+  "datum": "2026-10-22",
+  "basis": "phase10_inventory/probes/p10_pf_eventloop_probe.py :: probe_a (Logik uebernommen)",
+  "vergleich_p10": {
+    "quelle": "phase10_inventory/probes/p10_pf_eventloop.json",
+    "health_dauer_s": 4.757,
+    "T_overview_s": 4.733,
+    "blockade_health": true
+  },
+  "a_eventloop": {
+    "health_frei": {
+      "status": 200,
+      "start_s": 0.0,
+      "dauer_s": 0.004
+    },
+    "spaces_frei": {
+      "status": 200,
+      "start_s": 0.0,
+      "dauer_s": 0.015
+    },
+    "overview_frei": {
+      "status": 200,
+      "start_s": 0.0,
+      "dauer_s": 0.259
+    },
+    "parallel_runs": [
+      {
+        "health": {
+          "status": 200,
+          "start_s": 0.101,
+          "dauer_s": 0.023
+        },
+        "spaces": {
+          "status": 200,
+          "start_s": 0.101,
+          "dauer_s": 0.449
+        },
+        "overview_1": {
+          "status": 200,
+          "start_s": 0.0,
+          "dauer_s": 0.552
+        },
+        "overview_2": {
+          "status": 200,
+          "start_s": 0.102,
+          "dauer_s": 0.452
+        }
+      },
+      {
+        "health": {
+          "status": 200,
+          "start_s": 0.101,
+          "dauer_s": 0.017
+        },
+        "spaces": {
+          "status": 200,
+          "start_s": 0.101,
+          "dauer_s": 0.451
+        },
+        "overview_1": {
+          "status": 200,
+          "start_s": 0.0,
+          "dauer_s": 0.554
+        },
+        "overview_2": {
+          "status": 200,
+          "start_s": 0.102,
+          "dauer_s": 0.454
+        }
+      },
+      {
+        "health": {
+          "status": 200,
+          "start_s": 0.101,
+          "dauer_s": 0.014
+        },
+        "spaces": {
+          "status": 200,
+          "start_s": 0.101,
+          "dauer_s": 0.451
+        },
+        "overview_1": {
+          "status": 200,
+          "start_s": 0.0,
+          "dauer_s": 0.554
+        },
+        "overview_2": {
+          "status": 200,
+          "start_s": 0.102,
+          "dauer_s": 0.454
+        }
+      }
+    ],
+    "T_overview_s": 0.259,
+    "blockade_health": false,
+    "overview_2_serialisiert": true,
+    "health_wartezeit_ms": [
+      23.0,
+      17.0,
+      14.0
+    ],
+    "health_wartezeit_max_ms": 23.0,
+    "grenze_ms": 200,
+    "p10_5_16_erfuellt": true
+  }
+}

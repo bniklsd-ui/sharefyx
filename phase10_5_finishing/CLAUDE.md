@@ -9,7 +9,7 @@ down:
   - ../phase10_inventory/BAUSTELLENREGISTER.md      # 📗 die Arbeitsliste — hier wird abgehakt (P10-B)
   - ../phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md  # 📦 §12 Entscheidungsliste D-1–D-18, verbatim
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
-updated: 2026-10-22 (Block 4 Schritte 4.3/4.4: der Client holt nur noch `/overview`, `focus`/`visibilitychange` bekommen 10 s Mindestpause (PF-4) · neu `static/js/loading.js` (`withLoading`, 200 ms) + `.is-loading`-Gerüst in `app.css`, statisch unter `prefers-reduced-motion` (Z3/Z4) · 7 Wächter in `phase5_ui/tests/test_loading_state.py`) | 2026-10-22 (Block 4 Schritte 4.1/4.2: `_overview()` in **einem** `store.search()`-Durchgang (P10.5-G) + `asyncio.to_thread` in `_overview`/`_items_get`/`_graph_get` (Z2); 4 neue Tests (Parität, Rückfall, folders/members, Event-Loop) + 5 Gegenläufe; Suite 1334 grün) | 2026-10-22 (Block 3 Schritte 3.3–3.4: `scripts/asset_orphans.py` (LG-7) + 7 Tests + Wegwerf-Probe `p105_b3_assets_probe.py` **14/14 Zellen** — Abnahme 10-12/10-13 ✅) | 2026-10-22 (Block 3 Schritt 3.2: `Store.put_asset()` ruft den Stripper — **eine** Stelle für Web und MCP; die Dummy-PNG-Fixtures mussten zu echten Bytes werden) | 2026-10-22 (Block 3 Schritt 3.1: `files.strip_image_metadata()` — JPEG/PNG/WebP, GIF unverändert, fail-closed; 8 neue Tests) | 2026-10-22 (Block-2-Nachzug: Item mit **neuem Ordner** im fremden Home-Space ist jetzt auf Web **und** MCP gesperrt (Nikinger-Entscheidung 2026-10-22) — P10.5-9 ⚠️ → ✅; `ui_budget.py`/`ui_smoke.py` haben das Home-Space-Prädikat, die `team`-Flags stimmen) | 2026-10-22 (Block 2.5 — Proben Web × MCP 28/28, M4 BG-1 behoben; Block 2 ✅, Abnahme 10-8/10/9 ✅, 10-9 ⚠️ (Befund: neuer Ordner per Item-Anlage im fremden Home-Space)) | 2026-10-22 (Block 2 Schritte 2.1–2.4 gebaut — eine Regel für Web und MCP (RE-1/RE-2/P10-I/P10.5-N) und BG-1; **2.5 Proben offen, Claude Code**; Suite 1299 grün) | 2026-10-22 (Block 2 Schritte 2.1–2.2: eine Regel für Web und MCP — SharePolicy mit Home-Space-Prädikat, RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N beide Richtungen; Suite 1296 grün) | 2026-10-22 (Block 2 Schritt 2.1: SharePolicy kennt Home-Spaces und Team-Spaces, Prädikat aus der Auth-DB, eine Regel für Web und MCP) | 2026-10-22 (Block 1 **abgeschlossen**: V200 vom Fleet-Lauf belegt — Unit installiert, `Result=success`, 0 failed units; Abnahme 10-5/6/7 ✅) | 2026-10-22 (Block 1 Schritte 1.1/1.2: BT-1 — Caddy-Vorlage in Blockform mit den V199-Live-Werten (10s/15s/1s) + neuer Waechter; Abnahme 10-5 auf ✅) | 2026-10-22 (Block 1 Schritt 1.4: BT-6 — `constraints.txt` aus dem Live-Freeze, `scripts/dev_install.sh` mit `-c`, zwei Wächter, Dev-venv neu; Suite 1282 gruen auf den Live-Versionen) | 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in der Relay-Unit, Wächter 13/13, vier Gegenläufe; Block-0-Block rotiert) | 2026-10-22 (Block 0 **abgeschlossen**: 0.6 ROADMAP-Zeile P10.5 auf 🔄, 0.7 Ausführer-Vorbedingung protokolliert — Abnahme P10.5-1–4 ✅) | 2026-10-22 (Block 0: 0.2/0.3 — Phase-Head angelegt (Modulstatus, Deploy-Tabelle, Abnahmestand 61 Zeilen), DO-3-Wächter, `pytest.ini` ergänzt; davor 0.4 (ROADMAP-Wächter eingefroren), 0.5 (INDEX-Luft) und 0.8 (Register-Luft) gebaut — DO-2 vollständig; erster Block)
+updated: 2026-10-22 (Block 4 **abgeschlossen** — Schritt 4.6: M2-Bench **Median 107,3 ms** (Z1 ≤ 300 ms), Event-Loop-Probe `/health` hinter `/overview` **23 ms** (P10: 4757 ms), Browser-Probe Z2/Z3/Z4 (150 ms → kein Platzhalter, 400 ms → Platzhalter); Abnahme 10-14/15/16/17 ✅, 10-18 bleibt beim Nikinger nach Deploy A) | 2026-10-22 (Block 4 Schritte 4.3/4.4: der Client holt nur noch `/overview`, `focus`/`visibilitychange` bekommen 10 s Mindestpause (PF-4) · neu `static/js/loading.js` (`withLoading`, 200 ms) + `.is-loading`-Gerüst in `app.css`, statisch unter `prefers-reduced-motion` (Z3/Z4) · 7 Wächter in `phase5_ui/tests/test_loading_state.py`) | 2026-10-22 (Block 4 Schritte 4.1/4.2: `_overview()` in **einem** `store.search()`-Durchgang (P10.5-G) + `asyncio.to_thread` in `_overview`/`_items_get`/`_graph_get` (Z2); 4 neue Tests (Parität, Rückfall, folders/members, Event-Loop) + 5 Gegenläufe; Suite 1334 grün) | 2026-10-22 (Block 3 Schritte 3.3–3.4: `scripts/asset_orphans.py` (LG-7) + 7 Tests + Wegwerf-Probe `p105_b3_assets_probe.py` **14/14 Zellen** — Abnahme 10-12/10-13 ✅) | 2026-10-22 (Block 3 Schritt 3.2: `Store.put_asset()` ruft den Stripper — **eine** Stelle für Web und MCP; die Dummy-PNG-Fixtures mussten zu echten Bytes werden) | 2026-10-22 (Block 3 Schritt 3.1: `files.strip_image_metadata()` — JPEG/PNG/WebP, GIF unverändert, fail-closed; 8 neue Tests) | 2026-10-22 (Block-2-Nachzug: Item mit **neuem Ordner** im fremden Home-Space ist jetzt auf Web **und** MCP gesperrt (Nikinger-Entscheidung 2026-10-22) — P10.5-9 ⚠️ → ✅; `ui_budget.py`/`ui_smoke.py` haben das Home-Space-Prädikat, die `team`-Flags stimmen) | 2026-10-22 (Block 2.5 — Proben Web × MCP 28/28, M4 BG-1 behoben; Block 2 ✅, Abnahme 10-8/10/9 ✅, 10-9 ⚠️ (Befund: neuer Ordner per Item-Anlage im fremden Home-Space)) | 2026-10-22 (Block 2 Schritte 2.1–2.4 gebaut — eine Regel für Web und MCP (RE-1/RE-2/P10-I/P10.5-N) und BG-1; **2.5 Proben offen, Claude Code**; Suite 1299 grün) | 2026-10-22 (Block 2 Schritte 2.1–2.2: eine Regel für Web und MCP — SharePolicy mit Home-Space-Prädikat, RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N beide Richtungen; Suite 1296 grün) | 2026-10-22 (Block 2 Schritt 2.1: SharePolicy kennt Home-Spaces und Team-Spaces, Prädikat aus der Auth-DB, eine Regel für Web und MCP) | 2026-10-22 (Block 1 **abgeschlossen**: V200 vom Fleet-Lauf belegt — Unit installiert, `Result=success`, 0 failed units; Abnahme 10-5/6/7 ✅) | 2026-10-22 (Block 1 Schritte 1.1/1.2: BT-1 — Caddy-Vorlage in Blockform mit den V199-Live-Werten (10s/15s/1s) + neuer Waechter; Abnahme 10-5 auf ✅) | 2026-10-22 (Block 1 Schritt 1.4: BT-6 — `constraints.txt` aus dem Live-Freeze, `scripts/dev_install.sh` mit `-c`, zwei Wächter, Dev-venv neu; Suite 1282 gruen auf den Live-Versionen) | 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in der Relay-Unit, Wächter 13/13, vier Gegenläufe; Block-0-Block rotiert) | 2026-10-22 (Block 0 **abgeschlossen**: 0.6 ROADMAP-Zeile P10.5 auf 🔄, 0.7 Ausführer-Vorbedingung protokolliert — Abnahme P10.5-1–4 ✅) | 2026-10-22 (Block 0: 0.2/0.3 — Phase-Head angelegt (Modulstatus, Deploy-Tabelle, Abnahmestand 61 Zeilen), DO-3-Wächter, `pytest.ini` ergänzt; davor 0.4 (ROADMAP-Wächter eingefroren), 0.5 (INDEX-Luft) und 0.8 (Register-Luft) gebaut — DO-2 vollständig; erster Block)
 ---
 # Phase 10.5 — Finishing
 
@@ -33,7 +33,7 @@ updated: 2026-10-22 (Block 4 Schritte 4.3/4.4: der Client holt nur noch `/overvi
 | 1 | Betrieb: BT-1, BT-2, BT-6 (+ `constraints.txt`) | Ausführer + Nikinger | A | ✅ 2026-10-22 — **1.1–1.4 gebaut und abgenommen** (V199 gelesen · BT-1 Caddy-Blockform · BT-2 `SuccessExitStatus=143`, live V200 ✅ · BT-6 `constraints.txt`); Abnahme 10-5/6/7 ✅, Suite 1283 grün |
 | 2 | Fehler, Parität, Regel: BG-1, RE-1, RE-2, P10-I, AL-1 | Ausführer (+ Claude Code Proben) | A | ✅ 2026-10-22 — **2.1–2.5 gebaut und geprobt** (Probe 2.5: 28/28 Zellen Web × MCP, M4 0 → 3 Zeilen ohne neues Öffnen) · **Nachzug 2026-10-22 (Nikinger):** ein Item mit **neuem Ordner** im fremden Home-Space ist jetzt auf beiden Flächen gesperrt (RE-1-Parität) — P10.5-9 damit ✅ statt ⚠️ — eine Regel für Web und MCP: RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N kein Verschieben in **oder aus** einem fremden Home-Space; BG-1: die Space-Liste füllt sich nach, wenn `/overview` spät kommt) |
 | 3 | Hygiene: LG-8 (P1-15), LG-7 | Ausführer | A | ✅ 2026-10-22 — **3.1–3.4 gebaut und geprobt**: `files.strip_image_metadata()` (JPEG/PNG/WebP, GIF unverändert, fail-closed `ValidationError`) + Aufruf in `Store.put_asset()` (**eine** Stelle für Web und MCP) · `scripts/asset_orphans.py` (LG-7, `--report`/`--move`, ein Commit) · 16 neue Tests · **Wegwerf 14/14 Zellen** (`probes/p105_b3_assets_probe.py`): GPS weg auf Web **und** MCP, Orientation bleibt, sauberes Bild byte-identisch, Waise gefunden und in den Papierkorb verschoben; Abnahme 10-12/10-13 ✅ |
-| 4 | Performance: PF-1, PF-4, Z1–Z4 | Ausführer (+ Claude Code Proben) | A | 🔄 2026-10-22 — **4.1–4.4 gebaut**: `_overview()` zählt alle Eimer aus **einem** `store.search()`-Durchgang (P10.5-G, Rückfall über `_STORE_FETCH_LIMIT`), `folders`/`members` wandern in die Antwort · `asyncio.to_thread` für `_overview`/`_items_get`/`_graph_get` (Z2) · Client: nur noch `/overview`, 10 s Mindestpause für `focus`/`visibilitychange` (PF-4) · neu `static/js/loading.js` + `.is-loading`-Gerüst (Z3/Z4); Abnahme 10-15 ✅ |
+| 4 | Performance: PF-1, PF-4, Z1–Z4 | Ausführer (+ Claude Code Proben) | A | ✅ 2026-10-22 — **4.1–4.6 gebaut und geprobt**: `_overview()` zählt alle Eimer aus **einem** `store.search()`-Durchgang (P10.5-G, Rückfall über `_STORE_FETCH_LIMIT`), `folders`/`members` wandern in die Antwort · `asyncio.to_thread` für `_overview`/`_items_get`/`_graph_get` (Z2) · Client: nur noch `/overview`, 10 s Mindestpause für `focus`/`visibilitychange` (PF-4) · neu `static/js/loading.js` + `.is-loading`-Gerüst (Z3/Z4) · **M2-Bench Median 107,3 ms** (vorher 2405,6) · **`/health` hinter `/overview` 23 ms** (P10: 4757 ms) · Browser: 150 ms → kein Platzhalter, 400 ms → Platzhalter; Abnahme 10-14/15/16/17 ✅, 10-18 beim Nikinger nach Deploy A |
 | 5 | MCP-Schicht: PA-5 (FastMCP 4), LG-4 | Ausführer | B | ⬜ |
 | 6 | Anbieter: PA-1, PA-2, `/mcp`, PA-6, P10-J | Ausführer + Claude Code + Nikinger | B | ⬜ |
 | 7 | Darstellung: UI-1–UI-6, KA-5 | Ausführer (+ Claude Code Sichtung) | C | ⬜ |
@@ -74,10 +74,10 @@ updated: 2026-10-22 (Block 4 Schritte 4.3/4.4: der Client holt nur noch `/overvi
 | P10.5-11 | AL-1: Zeilen 14 und 29 geschlossen; Zeile 15 mit Weg beim Nikinger (Migration + Live-Check) | ✅ | 2.5 · Zeile 29: MCP-Move alpha→gamma ✅ · Zeile 14: fremder Body im geteilten read-Space gewrappt, Schreiben ❌ · Zeile 15 beim Nikinger |
 | P10.5-12 | EXIF weg nach Upload über Web **und** MCP; Orientierung bleibt | ✅ | 3.1–3.2 + Wegwerf `probes/p105_b3_assets.json` (14/14): Web-Upload 148 B → 94 B, GPS-Marker **weg**, Orientation 6 **bleibt**, ICC bleibt · MCP-Upload 94 B, GPS weg, Orientation 6 · Gegenlauf: Bild ohne Metadaten byte-identisch (45 B = 45 B) |
 | P10.5-13 | Verwaiste Asset-Ordner werden gefunden und nur auf Wunsch in den Papierkorb verschoben | ✅ | 3.3/3.4 + Wegwerf `probes/p105_b3_assets.json`: Item mit Bild → `DELETE` (Web) → `store.trash()` → `--report` findet **genau** die Waise (die lebenden Assets nicht) → `--move` verschiebt sie nach `._trash/<space>/_assets/<id>/` (nie gelöscht) mit **einem** Commit (5 → 6) · 7 neue Tests in `phase10_5_finishing/tests/test_asset_orphans.py` |
-| P10.5-14 | Z1 im Bench: Median ≤ 300 ms (heute 2.405 ms) | ⬜ | — |
+| P10.5-14 | Z1 im Bench: Median ≤ 300 ms (heute 2.405 ms) | ✅ | 4.6 · M2-Bench `p10_overview_bench.py` (4 Spaces × 50 Items, alle sichtbar): **Median 107,3 ms** (Läufe 106,2–109,7 ms, Streuung 3,2 %) — **22×** unter dem Ziel, **22,4×** schneller als die Grundlinie 2405,6 ms |
 | P10.5-15 | Parität: neue Zähler = alte `search().total` je Eimer | ✅ | 4.1 — `test_one_pass_counts_equal_per_bucket_search_totals` (3 Spaces, alle fünf Eimer, leer) + `test_overview_falls_back_beyond_fetch_limit` (Grenze per Monkeypatch auf 2) · **fünf Gegenläufe**: Eimer `archived` ausgelassen → rot · kein Rückfall → rot · `folders`/`members` entfernt → rot · `to_thread` entfernt → rot · zweiter Durchgang → rot |
-| P10.5-16 | Z2: kein Request wartet hinter `/overview` | ⬜ | — |
-| P10.5-17 | Z3/Z4: Gerüst ≤ 1 s; Ladezustand genau ab 200 ms | ⬜ | — |
+| P10.5-16 | Z2: kein Request wartet hinter `/overview` | ✅ | 4.6 · Event-Loop-Probe `probes/p105_b4_eventloop_probe.py`: `/health` hinter `/overview` **23 ms** (P10: 4757 ms), `blockade_health` **false** (P10: true) · Browser-Probe `probes/p105_b4_loading_probe.py`: `/overview` 2 s verzögert → Space-Wechsel **0,315 s**, Item-Öffnen **0,053 s** (Grenze 1 s) |
+| P10.5-17 | Z3/Z4: Gerüst ≤ 1 s; Ladezustand genau ab 200 ms | ✅ | 4.6 · Browser-Probe: `DOMContentLoaded` **142,2 ms** (Grenze 1000 ms) · Z4 **beide Seiten der Grenze**: 150 ms → **kein** `is-loading` (0 Elemente), 400 ms → `is-loading` an `#list-overview`, sichtbar · **zwei Gegenläufe**: `delayMs` 0 → 150-ms-Fall rot · `delayMs` 1000 → 400-ms-Fall rot |
 | P10.5-18 | Live nach Deploy A: `/overview` Waiting ≤ 300 ms, Space-Wechsel während des Polls ≤ 1 s (Nikinger, DevTools, beide Eingänge) | ⬜ | — |
 | P10.5-19 | Suite grün mit Compat aus; Pin = installiert; `constraints.txt` neu erzeugt und Wächter grün | ⬜ | — |
 | P10.5-20 | Beide Ären in-process: `legacy` → `2025-11-25`, `auto` → `2026-07-28`, `list_spaces` ok | ⬜ | — |
@@ -123,7 +123,7 @@ updated: 2026-10-22 (Block 4 Schritte 4.3/4.4: der Client holt nur noch `/overvi
 | P10.5-60 | P10-J zweimal live belegt | ⬜ | — |
 | P10.5-61 | Closeout-Dokumente + Rotationen per Skript | ⬜ | — |
 
-**Summe:** 14 ✅ · 0 ⚠️ · 47 ⬜ (von 61).
+**Summe:** 18 ✅ · 0 ⚠️ · 43 ⬜ (von 61).
 
 ## Offen beim Nikinger
 
@@ -134,29 +134,43 @@ updated: 2026-10-22 (Block 4 Schritte 4.3/4.4: der Client holt nur noch `/overvi
 - **Block 2, Zeile 15 (AL-1)** — Migration + Live-Check beim Nikinger.
 - ~~**Befund 2.5 (P10.5-9 ⚠️)**~~ ✅ 2026-10-22 (Block-2-Nachzug, Nikinger-Entscheidung „ja") — `create_item(space=, folder=<neu>)` und `POST /api/v1/items` legen im fremden Home-Space mit `write:` **keinen** neuen Ordner mehr an; die Regel ist `permissions.manages_space()` (eigener Space oder Team-Space mit Schreibrecht), auf beiden Flächen. Ohne `folder` bleibt das Anlegen an der Space-Wurzel erlaubt (P6-U).
 
-## Session stopped — 2026-10-22 (Block 4 — Performance: PF-1, PF-4, Z1–Z4)
+## Session stopped — 2026-10-22 (Block 4 ✅ — Performance: PF-1, PF-4, Z1–Z4)
 
-**Ergebnis (4.1/4.2).** `_overview()` zählt alle fünf Eimer aus **einem** `store.search()`-Durchgang
-(P10.5-G) statt aus einem Aufruf je Eimer **und** je Space; `folders`/`members` wandern in dieselbe
-Antwort. `asyncio.to_thread` für `_overview`, `_items_get` und `_graph_get` (Z2). Der Client holt nur
-noch `/overview`, `focus`/`visibilitychange` bekommen 10 s Mindestpause (PF-4). Neu:
-`static/js/loading.js` (`withLoading(el, promise, {delayMs: 200})`) + `.is-loading`-Gerüst in
-`app.css` (statisch unter `prefers-reduced-motion`).
+**Ergebnis.** `_overview()` zählt alle fünf Eimer aus **einem** `store.search()`-Durchgang
+(P10.5-G) statt aus einem Aufruf je Eimer **und** je Space; `folders`/`members` wandern in
+dieselbe Antwort. `asyncio.to_thread` für `_overview`, `_items_get` und `_graph_get` (Z2). Der
+Client holt nur noch `/overview`; `focus`/`visibilitychange` bekommen 10 s Mindestpause (PF-4).
+Neu: `static/js/loading.js` (`withLoading(el, promise, {delayMs: 200})`) + `.is-loading`-Gerüst
+in `app.css` — statisch unter `prefers-reduced-motion`.
 
-**Geliefert (Commits).** 4.1/4.2 `webui/api.py` (ein Durchgang + Rückfall über `_STORE_FETCH_LIMIT`
-+ `to_thread`) + 4 Tests in `phase5_ui/tests/test_overview.py` · 4.3/4.4 `static/js/{list,app,editor,
-graph}.js`, `static/js/loading.js` (neu), `static/app.css` + 7 Wächter in
-`phase5_ui/tests/test_loading_state.py`. **Vier Gegenläufe zusätzlich** (G6–G9): `/spaces` wieder
-im Client → rot · Mindestpause weg → rot · Platzhalter schreibt Text → rot · Reduced-Motion
-weg → rot.
+**Geliefert (Commits).** 4.1/4.2 `webui/api.py` (ein Durchgang + Rückfall über
+`_STORE_FETCH_LIMIT` + `to_thread`) + 4 Tests in `phase5_ui/tests/test_overview.py` · 4.3/4.4
+`static/js/{list,app,editor,graph}.js`, `static/js/loading.js` (neu), `static/app.css` +
+8 Wächter in `phase5_ui/tests/test_loading_state.py` · 4.6 drei Proben unter
+`phase10_5_finishing/probes/` (M2-Bench, Event-Loop, Browser).
 
-**Gemessen** (Basis `37186d5`): `pytest` **1334 grün** (271 s) · `doc_health` 0 · `ui_budget` 5/5
-(176,6 KB gzip, `js/loading.js` 1,3 KB) · `ui_budget`-Latenz `/overview` **118 ms** (P6-Maß: 438–453 ms) ·
-**neun Gegenläufe**, alle wirksam.
+**Gemessen** (Basis `37186d5`): `pytest` **1335 grün** · `doc_health` 0 · `ui_budget` 5/5
+(176,6 KB gzip) · **M2-Bench Median 107,3 ms** (Grundlinie 2405,6 ms — 22,4×) · **Event-Loop:
+`/health` hinter `/overview` 23 ms** (P10: 4757 ms), `blockade_health` false (P10: true) ·
+**Browser:** `DOMContentLoaded` 142,2 ms · 150 ms → **kein** Platzhalter, 400 ms → Platzhalter
+sichtbar · `/overview` 2 s verzögert: Space-Wechsel 0,315 s, Item-Öffnen 0,053 s · **dreizehn
+Gegenläufe**, alle wirksam (davon zwei an der 200-ms-Grenze selbst).
+
+**Zwei eigene Befunde.** (1) Der erste Entwurf von `withLoading()` nahm die Klasse im
+`done()`-Zweig **immer** ab — bei zwei gleichzeitigen Abrufen (Poll + Schreibvorgang) hätte
+der schnellere den Ladezustand des langsameren gelöscht. Jetzt läuft ein Zähler je Element
+(`WeakMap`), die Klasse fällt erst beim letzten Abruf. (2) Die erste Fassung der Browser-Probe
+maß **Route-Verzögerung plus Serverzeit** — die 200-ms-Grenze war damit nicht prüfbar; die
+Route liefert jetzt eine **kontrollierte** Antwort (`route.fulfill`), die Serverzeit ist
+ausgeschlossen.
 
 **Ausführer-Daten.** opencode/MiniMax-M3.1-Flash · Kontextgrenze 400.000 (P10.5-C erfüllt) ·
-keine Advisor-Runde · Eingriffe Nikinger/Claude Code: 0 · kein `systemctl`, kein `sudo`, kein echter
-`DATA_ROOT` · Wegwerf-Instanz nur über die PID-Datei gestoppt (Hard Rule 9).
+keine Advisor-Runde · Eingriffe Nikinger/Claude Code: 0 · kein `systemctl`, kein `sudo`, kein
+echter `DATA_ROOT` · Wegwerf-Instanz nur über die PID-Datei gestoppt (Hard Rule 9), Port 8799
+danach frei.
 
-**Offen / nächster Schritt.** 4.6: M2-Bench (Median ≤ 300 ms), Event-Loop-Probe, Playwright
-`p105_b4_loading_probe.py` → Abnahme 10-14/16/17. Danach Deploy A (`v3.1.5`).
+**Offen / nächster Schritt.** Deploy A (`v3.1.5`) nach Block 1–4 — Badge + `UPDATE_LOG` +
+`health_gate.sh` sind Nikinger-/Claude-Code-Arbeit. **Beim Nikinger offen:** P10.5-18 (Live-Messung
+nach Deploy A: `/overview` Waiting ≤ 300 ms, Space-Wechsel während des Polls ≤ 1 s, beide
+Eingänge), AL-1 Zeile 15 (Migration + Live-Check), V203, P10.5-27/28. Nächster Block: 5
+(MCP-Schicht: PA-5 FastMCP 4, LG-4).

@@ -120,6 +120,26 @@ def test_the_loading_state_is_wired_at_the_four_places():
     assert 'withLoading(graphEl, api("/graph"))' in _read("graph.js")
 
 
+def test_overlapping_requests_do_not_cancel_each_others_loading_state():
+    """Zwei Abrufe können **gleichzeitig** an einem Element hängen: der 20-s-Poll und ein
+    Schreibvorgang, oder der Poll und der Aktualisieren-Knopf. Ohne Zähler nähme der
+    **schnellere** Abruf die Klasse ab, während der langsamere noch läuft — der Ladezustand
+    verschwände, obwohl noch etwas kommt. Der Fund kam aus der Browser-Probe (4.6): der erste
+    Entwurf nahm die Klasse im `done()`-Zweig immer ab.
+
+    Verdrahtungswaechter: der Zaehler muss je Element laufen und die Klasse erst beim
+    **letzten** Abruf abnehmen."""
+    source = _read("loading.js")
+    assert "offeneLadezustaende" in source, "der Zaehler je Element fehlt"
+    assert "WeakMap" in source, "der Zaehler muss je Element laufen, nicht global"
+    code = _code_only(source)
+    # Die Klasse darf **nur** im Zweig "kein Abruf mehr offen" abgenommen werden.
+    assert code.count('classList.remove("is-loading")') == 1
+    assert "if (offen <= 0)" in code, (
+        "die Klasse muss an die Zahl der offenen Abrufe gebunden sein"
+    )
+
+
 def test_the_skeleton_is_static_under_reduced_motion():
     """Bei `prefers-reduced-motion: reduce` ist das Gerüst **statisch**, ohne Schimmer —
     dieselbe Rücksicht wie beim Graphen (Plan §5 D2, `MAX_TICKS_REDUCED`)."""

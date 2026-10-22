@@ -16,6 +16,13 @@
 // dieselbe Logik. Eine Datei statt vier Kopien — dieselbe Begründung wie bei `state.js` und
 // `api.js` in diesem Projekt.
 
+// Wie viele Abrufe hängen **gerade** an einem Element? Zwei können es gleichzeitig geben:
+// der 20-s-Poll und ein Schreibvorgang, oder der Poll und der Aktualisieren-Knopf. Ohne
+// Zähler würde der **schnellere** Abruf die Klasse abnehmen, während der langsamere noch
+// läuft — der Ladezustand verschwände, obwohl noch etwas kommt. Der Zähler läuft je Element
+// und die Klasse fällt erst, wenn der **letzte** Abruf fertig ist.
+var offeneLadezustaende = new WeakMap();
+
 // Setzt die Klasse `is-loading` auf `el`, solange `promise` nach `delayMs` noch offen ist.
 // Gibt das Promise **unverändert** zurück: der Aufrufer hängt seine eigenen `.then()` an
 // dasselbe Promise, und die Reihenfolge bleibt: der Abruf löst auf, die Klasse fällt, der
@@ -25,13 +32,20 @@ export function withLoading(el, promise, { delayMs = 200 } = {}) {
   var finished = false;
   var timer = null;
 
+  offeneLadezustaende.set(el, (offeneLadezustaende.get(el) || 0) + 1);
+
   function done() {
     finished = true;
     if (timer !== null) {
       window.clearTimeout(timer);
       timer = null;
     }
-    el.classList.remove("is-loading");
+    var offen = (offeneLadezustaende.get(el) || 1) - 1;
+    offeneLadezustaende.set(el, offen);
+    if (offen <= 0) {
+      offeneLadezustaende.delete(el);
+      el.classList.remove("is-loading");
+    }
   }
 
   // Zwei Zweige, **ein** Handler: ein Fehler muss den Ladezustand genauso beenden wie ein

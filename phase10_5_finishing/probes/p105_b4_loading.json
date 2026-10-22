@@ -1,0 +1,42 @@
+{
+  "probe": "p105_b4_loading",
+  "datum": "2026-10-22",
+  "grenzen": {
+    "z2_verzoegerung_s": 2.0,
+    "z2_grenze_s": 1.0,
+    "z4_schnell_ms": 150,
+    "z4_langsam_ms": 400,
+    "z3_grenze_ms": 1000
+  },
+  "z3_domcontentloaded_ms": 142.2,
+  "z3_erfuellt": true,
+  "z4": {
+    "schnell": {
+      "verzoegerung_ms": 150,
+      "is_loading_erschienen": false,
+      "is_loading": [],
+      "sichtbar": false,
+      "erwartet_sichtbar": false,
+      "erfuellt": true
+    },
+    "langsam": {
+      "verzoegerung_ms": 400,
+      "is_loading_erschienen": true,
+      "is_loading": [
+        {
+          "id": "list-overview",
+          "sichtbar": true
+        }
+      ],
+      "sichtbar": true,
+      "erwartet_sichtbar": true,
+      "erfuellt": true
+    }
+  },
+  "z4_grenze_erfuellt": true,
+  "z2_raumwechsel_s": 0.813,
+  "z2_raumwechsel_erfuellt": true,
+  "z2_item_oeffnen_s": 0.053,
+  "z2_item_oeffnen_erfuellt": true,
+  "z2_erfuellt": true
+}
