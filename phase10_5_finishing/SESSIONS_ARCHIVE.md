@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,54 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-22 (Block 2-Nachzug + Block 3 ✅ — RE-1-Parität, EXIF-Strip, Waisen)
+
+**Ergebnis (Nachzug).** Der Befund aus Probe 2.5 ist geschlossen (Nikinger 2026-10-22: „ja"):
+ein Item mit **neuem Ordner** in einem fremden Home-Space legt den Ordner nicht mehr an — Web
+**und** MCP. Regel: `permissions.manages_space()` (eigener Space oder Team-Space mit
+Schreibrecht), dieselbe wie RE-1 und RE-2. Ohne `folder` bleibt das Anlegen an der
+Space-Wurzel erlaubt (P6-U). `ui_budget.py`/`ui_smoke.py` bekommen das Home-Space-Prädikat —
+ohne es waren ihre `team`-Flags **immer** `false`.
+
+**Ergebnis (Block 3 ✅).** LG-8: `files.strip_image_metadata()` (JPEG/PNG/WebP, GIF unverändert,
+**fail-closed**) + Aufruf in `Store.put_asset()` — **eine** Stelle für Web und MCP. LG-7:
+`scripts/asset_orphans.py` (`--report`/`--move`, **ein** Commit, nie gelöscht).
+
+**Geliefert (Commits).** 3.1 `files.py` + 8 Tests · 3.2 `store.py` + 9 Tests + die
+Dummy-PNG-Fixtures (acht Dateien in fünf Paketen → jetzt **eine** Fixture in
+`phase1_storage/tests/sharefyx_image_bytes.py`, `pytest.ini` setzt `pythonpath`) · 3.3/3.4
+`asset_orphans.py` + 7 Tests + `probes/p105_b3_assets_probe.py`.
+
+**Gemessen** (Basis `725215f`): `pytest` **1316 grün** (304 s) · **Wegwerf 8799: 14/14 Zellen**
+(`probes/p105_b3_assets.json`): Web 148 B → 94 B, GPS weg, Orientation 6 bleibt, ICC bleibt ·
+MCP 94 B, GPS weg, Orientation 6 · sauberes Bild byte-identisch (45 B = 45 B) · Waise gefunden
+(und nur sie), `--move` → Papierkorb, **ein** Commit (5 → 6), lebende Assets unberührt ·
+`doc_health` 0 · `ui_smoke` 13/13 · `ui_budget` 5/5.
+
+**Ausführer-Daten.** opencode/MiniMax-M3.1-Flash · Kontextgrenze 400.000 (P10.5-C erfüllt) ·
+keine Advisor-Runde · Eingriffe Nikinger/Claude Code: 0 · kein `systemctl`, kein `sudo`, kein
+echter `DATA_ROOT` · Wegwerf-Instanz nur über die PID-Datei gestoppt (Hard Rule 9), Port 8799
+danach frei.
+
+**Plan-Drift, datiert 2026-10-22.** (1) Der Plan sagt „im **Index** keine Item-Zeile" — der
+Code prüft gegen die **Dateien** (Hard Rule 2): ein veralteter Index würde die Assets
+**lebender** Items als verwaist melden und in den Papierkorb schieben. (2) Der Plan sah die
+Proben bei Claude Code; ich habe sie selbst gefahren (stehende Erlaubnis, Wegwerf erlaubt).
+(3) `pytest.ini` (eine Zeile `pythonpath`) und acht Testdateien in fünf Pakaten wurden
+angefasst — die Dummy-PNG-Header waren nach 3.2 **keine Bilder mehr** (fail-closed).
+(4) Die Option heißt `--git-author`, nicht `--author`: der P9-Wächter
+`test_only_history_builds_the_git_author_arguments` erlaubt das Literal `--author` nur in
+`storage/history.py` (dort wird der Git-Autor **gebaut**; das Skript reicht den Namen nur
+durch) — der Wächter bleibt unangetastet.
+
+**Abbruchprüfung (P10.5-E, Basis `45c507b`).** `git diff --stat` nennt neben den erlaubten
+Pfaden **sechs** Dateien: `phase2_mcp/scripts/mcp_smoke.py` und fünf Testdateien — alle
+**Fixture-Reparaturen** (Dummy-PNG → echte Bytes), keine Produktlogik; `pytest.ini` eine
+Zeile. P10.5-F ist sauber: unter `phase1_storage/storage` nur `files.py` und `store.py`.
+
+**Offen / nächster Schritt.** Block 4 (Performance: PF-1, PF-4, Z1–Z4) — Deploy A (`v3.1.5`)
+danach. Beim Nikinger offen: AL-1 Zeile 15 (Migration + Live-Check), V203, P10.5-27/28.
 
 ## Session stopped — 2026-10-22 (Block 2.5 — Proben Web × MCP und M4; Block 2 ✅ mit einem Befund)
 

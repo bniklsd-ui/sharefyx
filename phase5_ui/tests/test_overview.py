@@ -5,9 +5,17 @@ Die Zähler sind hier bewusst prüfbar: der Plan lässt JavaScript ungetestet, d
 Zählung serverseitig und nicht in `app.js`. Die zentrale Aussage der Datei ist, dass ein Zähler
 exakt so viele Items meint, wie die Liste beim Klick auf denselben Ordner zeigt — jede andere
 Zahl wäre schlimmer als gar keine.
+
+**[P10.5, Block 4, 2026-10-22]** Die Zählung ist auf **einen** `store.search()`-Durchgang
+umgestellt (Lock P10.5-G) — vorher kostete sie je sichtbarem Space fünf Bucket-Zählungen
+plus eine Liste, bei 4 Spaces/197 Items 2,4 s (P10 §1.3). Die Zusage bleibt dieselbe: die
+Zähler sind **paritätisch** zu dem, was `store.search(**filters).total` je Eimer liefert.
+Diese Datei trägt den Beweis dafür; der Tempogewinn ist die Aufgabe des M2-Benchs
+(Abnahme P10.5-14).
 """
 from __future__ import annotations
 
+import asyncio
 import re
 from datetime import datetime, timedelta, timezone
 
@@ -322,3 +330,136 @@ async def test_overview_ignores_a_bearer_token(overview_app):
             "/api/v1/overview", headers={"Authorization": "Bearer irgendein-token"},
         )
     assert response.status_code == 401
+
+
+# -- P10.5, Block 4 (2026-10-22): der Ein-Durchgang-Weg -------------------------------------
+#
+# Vier Tests für Lock P10.5-G. Die Zusage des Locks ist **Parität**, kein Fix: die neuen
+# Zähler müssen genau das liefern, was `store.search(**filters).total` je Eimer liefert —
+# der alte Weg war genau das, und der Zähler soll weiterhin mit der Liste übereinstimmen
+# (das ist die Zusage der ganzen Datei seit Step 7b).
+
+
+@pytest.mark.asyncio
+async def test_one_pass_counts_equal_per_bucket_search_totals(
+    overview_app, seeded, tmp_path, totp_code
+):
+    """P10.5-15: die Zähler des Ein-Durchgang-Wegs sind **identisch** mit den Zählern des
+    alten Wegs (`store.search(**filters).total` je Eimer und Space).
+
+    Geprüft wird gegen den **Store**, nicht gegen fest verdrahtete Zahlen: der Store ist die
+    Quelle, und die Gleichheit ist die eigentliche Zusage. Eine Zahl, die nur „plausibel"
+    aussieht, würde hier durchgehen und genau die Eigenschaft zerstören, die die Datei seit
+    Step 7b hält (Zähler == Liste).
+
+    Der Bestand deckt alle fünf Eimer ab (offen, in Arbeit, erledigt, Notiz, Archiv), zwei
+    Spaces (der eigene und ein geteilter) und einen Space **ohne** Item — der Sonderfall B1,
+    der sonst in `list_spaces()` gar nicht auftaucht und in der Übersicht mit lauter Nullen
+    erscheinen muss."""
+    # Ein Space ohne Item: `store.list_spaces()` zählt Verzeichnisse mit, nicht nur Indexzeilen
+    # (B1) — ohne `.share.yml` wäre er für den Principal unsichtbar.
+    (tmp_path / "data" / "leerer-space").mkdir()
+    (tmp_path / "data" / "leerer-space" / ".share.yml").write_text(
+        f"read: [{SPACE}]\n", encoding="utf-8"
+    )
+
+    async with _client(overview_app) as client:
+        await _login(client, totp_code)
+        payload = (await client.get("/api/v1/overview")).json()
+
+    assert len(payload) == 3, "drei sichtbare Spaces: eigener, geteilter, leerer"
+    for entry in payload:
+        for bucket, filters in _BUCKETS.items():
+            expected = seeded.search(
+                space=entry["name"], limit=1, offset=0, **filters,
+            ).total
+            assert entry["counts"][bucket] == expected, (entry["name"], bucket)
+
+    leer = _space(payload, "leerer-space")
+    assert all(count == 0 for count in leer["counts"].values())
+    assert leer["recent"] == []
+
+
+@pytest.mark.asyncio
+async def test_overview_falls_back_beyond_fetch_limit(overview_app, seeded, monkeypatch, totp_code):
+    """P10.5-G, Rückfall: ist der Store größer als die Fetch-Grenze, ist die **eine** Liste
+    unvollständig — ein Zähler aus einer unvollständigen Liste wäre eine Lüge. `_overview()`
+    fällt dann auf den alten Weg zurück (je Bucket ein eigener `store.search()`-Aufruf), und
+    die Zähler bleiben dieselben.
+
+    Die Grenze wird **klein gemacht** (hier 2 Items statt 5000), damit der Fall ohne
+    5001-Testitems eintritt. Geprüft wird nicht, dass der Rückfall *benutzt* wird — dafür
+    wäre ein Blick in die Implementierung nötig —, sondern dass die **Zahlen** stimmen, obwohl
+    der Weg ein anderer ist. Genau das ist die Zusage, die ein Benutzer merkt."""
+    import webui.api as api_module
+
+    monkeypatch.setattr(api_module, "_STORE_FETCH_LIMIT", 2)
+    assert seeded.search(space=SPACE, limit=1, offset=0).total > 2, (
+        "der Bestand muss größer sein als die künstlich verkleinerte Grenze"
+    )
+
+    async with _client(overview_app) as client:
+        await _login(client, totp_code)
+        payload = (await client.get("/api/v1/overview")).json()
+
+    for entry in payload:
+        for bucket, filters in _BUCKETS.items():
+            expected = seeded.search(
+                space=entry["name"], limit=1, offset=0, **filters,
+            ).total
+            assert entry["counts"][bucket] == expected, (entry["name"], bucket)
+
+
+@pytest.mark.asyncio
+async def test_overview_entries_carry_folders_and_members(overview_app, seeded, totp_code):
+    """PF-4 (Schritt 4.3): der Client holt nur noch `/overview` — deshalb müssen `folders` und
+    `members` **in** dieser Antwort stehen. Vorher kamen sie aus `/spaces` und wurden im
+    Client zusammengeführt (ein zweiter Vollabruf).
+
+    Der Vergleich läuft gegen `/api/v1/spaces`: das ist die Quelle, aus der auch der
+    Zusammenbau im alten Client stammte. Ein Space ohne Ordner und ohne Mitglieder trägt
+    zwei leere Listen — keine fehlenden Felder."""
+    async with _client(overview_app) as client:
+        await _login(client, totp_code)
+        overview = (await client.get("/api/v1/overview")).json()
+        spaces = (await client.get("/api/v1/spaces")).json()
+
+    by_name = {entry["name"]: entry for entry in spaces}
+    assert by_name, "die Spaces-Liste ist nicht leer — sonst prüft der Test nichts"
+    for entry in overview:
+        assert "folders" in entry and "members" in entry, entry["name"]
+        assert isinstance(entry["folders"], list)
+        assert isinstance(entry["members"], list)
+        assert entry["folders"] == by_name[entry["name"]]["folders"], entry["name"]
+        assert entry["members"] == by_name[entry["name"]]["members"], entry["name"]
+
+
+@pytest.mark.asyncio
+async def test_overview_runs_search_off_the_event_loop(overview_app, seeded, monkeypatch, totp_code):
+    """Z2 (P10.5-16): der Store liest Dateien — der Zugriff darf den Event-Loop nicht
+    blockieren, sonst wartet `/health` hinter `/overview` (M1: 4,8 s).
+
+    Geprüft wird **beides**: dass der Zugriff über `asyncio.to_thread` läuft (sonst blockiert
+    er) und dass es **genau ein** Store-Aufruf ist (sonst ist der Ein-Durchgang-Weg nicht
+    gebaut, sondern nur schneller geworden — das wäre die halbe Wahrheit).
+
+    `asyncio.to_thread` wird gezählt, nicht `store.search` selbst: der Test soll die
+    Verdrahtung beweisen (die Suchfunktion *im* Thread), nicht eine bestimmte
+    Implementierung des Ladens."""
+    calls: list[str] = []
+    real_to_thread = asyncio.to_thread
+
+    async def counting_to_thread(func, /, *args, **kwargs):
+        calls.append(getattr(func, "__name__", repr(func)))
+        return await real_to_thread(func, *args, **kwargs)
+
+    monkeypatch.setattr(asyncio, "to_thread", counting_to_thread)
+
+    async with _client(overview_app) as client:
+        await _login(client, totp_code)
+        payload = (await client.get("/api/v1/overview")).json()
+
+    assert calls == ["search"], (
+        f"erwartet: genau ein Store-Aufruf im Thread — gesehen: {calls}"
+    )
+    assert payload, "die Übersicht ist leer — der Test hat nichts geprüft"

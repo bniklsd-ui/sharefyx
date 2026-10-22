@@ -73,7 +73,9 @@ als sechstes Argument).
 """
 from __future__ import annotations
 
+import asyncio
 import json
+import logging
 from datetime import date
 from typing import Any
 
@@ -88,7 +90,7 @@ from mcpserver.permissions import SharePolicy
 from storage import acl
 from storage.errors import ConflictError, ItemNotFound, ValidationError
 from storage.files import ITEM_ID_RE, validate_folder
-from storage.models import STATUS_VALUES, SpaceInfo
+from storage.models import STATUS_VALUES, ItemSummary, SpaceInfo
 from storage.store import Store
 
 from .config import UiSettings
@@ -102,6 +104,8 @@ from .reauth import REAUTH_GRANT_TTL_S, ReauthGrantStore, verify_reauth
 from .sessions import SessionManager
 from .shares import ShareState, require_share_reauth, require_space_reauth
 from .updates import load_update_log
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_LIMIT = 50
 MAX_LIMIT = 200
@@ -169,6 +173,41 @@ _BUCKETS: dict[str, dict[str, str]] = {
     "note": {"type": "note", "status": "active"},
     "archived": {"status": "archived"},
 }
+
+
+def _bucket_counts(items: list[ItemSummary]) -> dict[str, int]:
+    """Zählt die Eimer aus **einer** Item-Liste (P10.5, Block 4, 2026-10-22, Lock P10.5-G).
+
+    Der Zähler ist per Konstruktion dasselbe wie der alte Weg: `store.search(**filters)`
+    vergleicht je Filterfeld exakt (`type`, `status` — die beiden Felder, die `_BUCKETS`
+    überhaupt benutzt), und genau diese Gleichheiten wendet diese Funktion an. Ein Filterfeld,
+    das `_BUCKETS` einmal bekäme, wäre hier automatisch mitgezählt — die Liste der Felder
+    steht nicht an zwei Stellen.
+
+    **Kein ACL-Filter.** Der alte Weg zählte über `store.search()` ebenfalls **alle** Items
+    des Space, auch die, die der Mensch nicht lesen darf. Das bleibt so — das ist Parität,
+    kein Fix; ein ACL-gefilterter Zähler wäre eine andere Zahl als die, die die Liste zeigt,
+    und genau das ist die Eigenschaft, die `test_overview.py` seit Step 7b hält.
+
+    Ein unbekanntes Feld in `_BUCKETS` wirft einen `AttributeError` statt still zu zählen —
+    ein Zähler, der einen Eimer stillschweigend leer lässt, wäre die schlimmere Hälfte.
+    """
+    counts = {bucket: 0 for bucket in _BUCKETS}
+    for item in items:
+        for bucket, filters in _BUCKETS.items():
+            if all(getattr(item, field) == value for field, value in filters.items()):
+                counts[bucket] += 1
+    return counts
+
+
+def _group_by_space(items: list[ItemSummary]) -> dict[str, list[ItemSummary]]:
+    """Gruppiert eine Item-Liste nach `item.space` — der zweite Schritt des Ein-Durchgang-Wegs
+    (P10.5-G). Die Reihenfolge innerhalb einer Gruppe bleibt die des Eingangs (der
+    `search()`-Sortierung); die „zuletzt benutzt"-Zeilen werden danach ohnehin neu sortiert."""
+    grouped: dict[str, list[ItemSummary]] = {}
+    for item in items:
+        grouped.setdefault(item.space, []).append(item)
+    return grouped
 
 # Zeilen unter „Zuletzt benutzt" je Space. Bewusst klein: die Übersicht soll orientieren, nicht
 # die Liste ersetzen.
@@ -697,25 +736,41 @@ def api_routes(
 
     async def _overview(request: Request) -> Response:
         session = await _require_session(request)
-        payload = []
-        for space in _visible_space_infos(session.space):
-            # Je Bucket ein eigener `store.search()`-Aufruf statt einer selbst geschriebenen
-            # Zählschleife: die Zähler sind dadurch per Konstruktion identisch mit dem, was die
-            # Liste beim Klick auf denselben Ordner zeigt. Das kostet einen Indexdurchlauf je
-            # Bucket — bei einem Zwei-Personen-Space-Server irrelevant, und eine nachgebaute
-            # Filterlogik, die von `search()` abdriftet, wäre teurer als jeder Scan.
-            counts = {
-                bucket: store.search(space=space.name, limit=1, offset=0, **filters).total
-                for bucket, filters in _BUCKETS.items()
+        spaces = _visible_space_infos(session.space)
+
+        # P10.5, Block 4 (2026-10-22), Lock P10.5-G: **ein** Durchgang statt sechs je Space.
+        # `Store.search()` liest bei jedem Aufruf jede indizierte Datei (`store.py:552`) — der
+        # alte Weg kostete darum je sichtbarem Space fünf Bucket-Zählungen plus eine Liste, bei
+        # 4 Spaces / 197 Items 2,4 s (P10 §1.3). Ein Durchgang über alle Items kostete 109 ms
+        # (derselbe Fund) und liefert dieselben Zahlen (P10.5-15, Parität).
+        #
+        # `asyncio.to_thread` (Plan §4.2): der Store liest Dateien — das darf den Event-Loop
+        # nicht blockieren, sonst wartet `/health` hinter `/overview` (P10.5-16, Z2).
+        result = await asyncio.to_thread(store.search, None, limit=_STORE_FETCH_LIMIT, offset=0)
+
+        if result.total > len(result.items):
+            # Korrektheit vor Tempo (P10.5-G): über der Grenze ist die eine Liste unvollständig,
+            # und ein Zähler aus einer unvollständigen Liste wäre eine Lüge. Der Rückfall nimmt
+            # den alten Weg — je Bucket ein eigener `store.search()`-Aufruf.
+            logger.warning(
+                "Übersicht: %d Items im Store, nur %d geholt — Rückfall auf den alten Weg.",
+                result.total, len(result.items),
+            )
+            counts_by_space, recent_by_space = await _overview_per_bucket(spaces)
+        else:
+            by_space = _group_by_space(result.items)
+            counts_by_space = {
+                space.name: _bucket_counts(by_space.get(space.name, [])) for space in spaces
             }
-            # `search()` sortiert nach (offen zuerst, Fälligkeit, zuletzt geändert) — für „zuletzt
-            # benutzt" ist nur das dritte Kriterium gemeint, deshalb hier nachsortieren statt
-            # `storage/` anzufassen (P5-B: tabu).
-            newest = sorted(
-                store.search(space=space.name, limit=_STORE_FETCH_LIMIT, offset=0).items,
-                key=lambda i: i.updated,
-                reverse=True,
-            )[:_RECENT_LIMIT]
+            recent_by_space = {
+                space.name: sorted(
+                    by_space.get(space.name, []), key=lambda i: i.updated, reverse=True,
+                )[:_RECENT_LIMIT]
+                for space in spaces
+            }
+
+        payload = []
+        for space in spaces:
             payload.append({
                 "name": space.name,
                 "own": space.name == session.space,
@@ -725,10 +780,50 @@ def api_routes(
                 # nachdem der Unit-Test nur `/spaces` geprüft hatte und grün war.
                 "team": _is_team_space(space.name),
                 "item_count": space.item_count,
-                "counts": counts,
-                "recent": [overview_row_to_json(i, own_space=session.space) for i in newest],
+                "counts": counts_by_space[space.name],
+                "recent": [
+                    overview_row_to_json(i, own_space=session.space)
+                    for i in recent_by_space[space.name]
+                ],
+                # P10.5, Block 4 (4.1): `folders`/`members` wandern in **diese** Antwort, damit
+                # der Client nur noch `/overview` braucht (PF-4, Schritt 4.3) — derselbe Stand
+                # und dieselben Felder wie `serializers.py :: space_to_json()`.
+                "folders": list(space.folders),
+                "members": list(space.members),
             })
         return JSONResponse(payload, headers={"Cache-Control": "no-store"})
+
+    async def _overview_per_bucket(
+        spaces: list[SpaceInfo],
+    ) -> tuple[dict[str, dict[str, int]], dict[str, list[ItemSummary]]]:
+        """Der **alte** Weg, unverändert, aber nur als Rückfall (P10.5-G): je Bucket ein eigener
+        `store.search()`-Aufruf statt einer selbst geschriebenen Zählschleife. Die Zähler sind
+        dadurch per Konstruktion identisch mit dem, was die Liste beim Klick auf denselben Ordner
+        zeigt — dieselbe Begründung wie im Block 4.2 des Plans.
+
+        Auch hier läuft der Store-Aufruf über `asyncio.to_thread`: der Rückfall ist der rare
+        Pfad, aber gerade dort darf der Event-Loop nicht für Sekunden stehen (Z2)."""
+        counts_by_space: dict[str, dict[str, int]] = {}
+        recent_by_space: dict[str, list[ItemSummary]] = {}
+        for space in spaces:
+            counts = {}
+            for bucket, filters in _BUCKETS.items():
+                page = await asyncio.to_thread(
+                    store.search, space=space.name, limit=1, offset=0, **filters,
+                )
+                counts[bucket] = page.total
+            # `search()` sortiert nach (offen zuerst, Fälligkeit, zuletzt geändert) — für „zuletzt
+            # benutzt" ist nur das dritte Kriterium gemeint, deshalb hier nachsortieren statt
+            # `storage/` anzufassen (P5-B: tabu).
+            page = await asyncio.to_thread(
+                store.search, space=space.name, limit=_STORE_FETCH_LIMIT, offset=0,
+            )
+            counts_by_space[space.name] = counts
+            recent_by_space[space.name] = sorted(
+                page.items, key=lambda i: i.updated, reverse=True,
+            )[:_RECENT_LIMIT]
+        return counts_by_space, recent_by_space
+
 
     async def _graph_get(request: Request) -> Response:
         """Phase 8 Block B Step B3 (Plan §3 P8-M, P8-7/P8-8): liefert die Knoten + Kanten
@@ -773,7 +868,10 @@ def api_routes(
             # `status != "archived"` selbst in Python (analog zu `_items_get`s Architektur,
             # die ebenfalls keine eigene Status-Semantik erfunden hat, sondern den Store-
             # Filter exposed). Eine einzige `store.search`-Iteration reicht.
-            result = store.search(
+            # P10.5, Block 4 (2026-10-22, Schritt 4.2): über `asyncio.to_thread` — der
+            # Graph liest jede indizierte Datei und darf den Event-Loop dabei nicht blockieren.
+            result = await asyncio.to_thread(
+                store.search,
                 None, space=None, folder=None, type=None, status=None, tag=None,
                 due_before=None, limit=_STORE_FETCH_LIMIT, offset=0,
             )
@@ -848,7 +946,12 @@ def api_routes(
         global_scope = q.get("space") is None or id_lookup
 
         try:
-            result = store.search(
+            # P10.5, Block 4 (2026-10-22, Schritt 4.2): der Store liest Dateien — der Aufruf
+            # läuft über `asyncio.to_thread`, damit `/health` nicht hinter `/items` wartet
+            # (P10.5-16, Z2). `Store` ist threadsicher (`index.py:131 check_same_thread=False`,
+            # `store.py:252 RLock`).
+            result = await asyncio.to_thread(
+                store.search,
                 None if id_lookup else query,
                 space=None if id_lookup else q.get("space"),
                 folder=None if id_lookup else q.get("folder"),
