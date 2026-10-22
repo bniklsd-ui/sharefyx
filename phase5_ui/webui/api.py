@@ -910,6 +910,27 @@ def api_routes(
             raise ApiError("validation_failed", "'space' muss ein String sein.")
         elif target_space != session.space and not permissions.can_write(session.space, target_space):
             raise ApiError("forbidden", "Kein Schreibzugriff auf diesen Space.")
+        # **RE-1-Parität, Nikinger-Entscheidung 2026-10-22 (Befund aus der Probe 2.5):** ein
+        # Item mit **Ordner** in einem fremden **Home-Space** legt diesen Ordner beim Anlegen an
+        # — damit war RE-1 (Ordner anlegen) dort eine Hintertür, obwohl der Space-Wurzel ein
+        # `write:`-Grant galt. Dieselbe Regel wie RE-2 (Ordner wechseln) und wie auf der
+        # Agentenfläche (`mcpserver/tools.py :: create_item()`): in einen Ordner schreiben darf
+        # nur, wer den Space **verwaltet** — der eigene Space und Team-Spaces mit Schreibrecht.
+        # Ein fremder Home-Space bleibt gesperrt, auch mit `write:`-Grant (P10-I). Ohne `folder`
+        # bleibt das Anlegen an der Space-Wurzel erlaubt (P6-U) — die Regel betrifft den
+        # **Ordner**, nicht das Item.
+        raw_folder = body.get("folder")
+        if raw_folder is not None and not isinstance(raw_folder, str):
+            # Vorher ungeprüft: ein nicht-String erreichte `files.validate_folder()` und
+            # scheiterte dort mit einem `AttributeError` (500) statt mit 422. Gefunden beim
+            # Bauen dieser Regel, gleiche Zeile, gleicher Feldname.
+            raise ApiError("validation_failed", "'folder' muss ein String sein.")
+        if raw_folder and not permissions.manages_space(session.space, target_space):
+            raise ApiError(
+                "forbidden",
+                "Items mit Ordner können nur im eigenen Space oder in einem Team-Space "
+                "mit Schreibrecht angelegt werden.",
+            )
         # "folder" seit Step 7 Commit 3 (K4-Fix) dabei — `store.create()` validiert/slugifiziert
         # ihn selbst (`files.validate_folder()`), kein Zusatzcheck hier nötig.
         kwargs: dict[str, Any] = {

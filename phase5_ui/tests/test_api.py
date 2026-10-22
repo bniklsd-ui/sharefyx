@@ -357,6 +357,99 @@ async def test_create_item_accepts_folder(full_app_items, totp_code, item_store)
     assert item_store.get(item_id).folder == "projekte"
 
 
+@pytest.mark.asyncio
+async def test_create_item_with_folder_in_foreign_home_space_is_forbidden(
+    full_app_items, item_store, store, tmp_path, totp_code
+):
+    """**RE-1-Parität (Befund aus der Probe 2.5, Nikinger-Entscheidung 2026-10-22):** ein Item
+    mit **Ordner** in einem fremden **Home-Space** legt diesen Ordner beim Anlegen an — damit
+    war RE-1 (Ordner anlegen) dort eine Hintertür, obwohl der Actor space-level `write:` hat.
+    Dieselbe Regel wie RE-2 (Ordner wechseln) und wie auf der Agentenfläche
+    (`mcpserver/tools.py :: create_item()`): in einen Ordner schreiben darf nur, wer den Space
+    **verwaltet** — der eigene Space und Team-Spaces mit Schreibrecht.
+
+    Der Gegenlauf ist `test_create_item_with_folder_in_team_space_allowed`: dieselbe
+    `.share.yml`, aber der Space gehört niemandem."""
+    item_store.create(FOREIGN_SPACE, type="note", title="Fremd")
+    _team(tmp_path)
+    _make_home(store)
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.post(
+            "/api/v1/items",
+            json={
+                "type": "note", "title": "Ordner im fremden Home-Space",
+                "space": FOREIGN_SPACE, "folder": "Projekte",
+            },
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 403, response.text
+    assert response.json()["error"] == "forbidden"
+    # Fail-closed: **nichts** angelegt — kein Ordner, kein Item.
+    assert not (tmp_path / "data" / FOREIGN_SPACE / "projekte").exists()
+
+
+@pytest.mark.asyncio
+async def test_create_item_with_folder_in_team_space_allowed(
+    full_app_items, item_store, tmp_path, totp_code
+):
+    """**Gegenlauf** zu `test_create_item_with_folder_in_foreign_home_space_is_forbidden`:
+    dieselbe `.share.yml` mit `write:`, aber `FOREIGN_SPACE` ist ein **Team-Space** — dort darf
+    der Ordner angelegt werden (Team-Spaces gehören niemandem, P10-I greift nicht)."""
+    item_store.create(FOREIGN_SPACE, type="note", title="Fremd")
+    _team(tmp_path)
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.post(
+            "/api/v1/items",
+            json={
+                "type": "note", "title": "Ordner im Team-Space",
+                "space": FOREIGN_SPACE, "folder": "Projekte",
+            },
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 201, response.text
+    assert response.json()["folder"] == "projekte"
+    assert item_store.get(response.json()["id"]).folder == "projekte"
+
+
+@pytest.mark.asyncio
+async def test_create_item_without_folder_in_foreign_home_space_still_allowed(
+    full_app_items, item_store, store, tmp_path, totp_code
+):
+    """**Gegenlauf** zu `test_create_item_with_folder_in_foreign_home_space_is_forbidden`:
+    **ohne** Ordner bleibt das Anlegen an der Space-Wurzel erlaubt (P6-U, Hard Rule 4
+    Neufassung). Die Regel betrifft den **Ordner**, nicht das Item."""
+    item_store.create(FOREIGN_SPACE, type="note", title="Fremd")
+    _team(tmp_path)
+    _make_home(store)
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.post(
+            "/api/v1/items",
+            json={"type": "note", "title": "Ohne Ordner", "space": FOREIGN_SPACE},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 201, response.text
+    assert response.json()["folder"] == ""
+    assert item_store.get(response.json()["id"]).space == FOREIGN_SPACE
+
+
+@pytest.mark.asyncio
+async def test_create_item_rejects_non_string_folder(full_app_items, totp_code):
+    """**Befund beim Bauen der Ordner-Regel (2026-10-22):** `folder` aus dem Body erreichte
+    ungeprüft `files.validate_folder()` und scheiterte dort mit einem `AttributeError` (500)
+    statt mit 422 — derselbe Feldname, dieselbe Zeile, dieselbe Prüfung, die jetzt davorsteht."""
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.post(
+            "/api/v1/items",
+            json={"type": "note", "title": "Test", "folder": 5},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 422, response.text
+
+
 # -- Items: PATCH, Rechte und Reihenfolge -----------------------------------------------------
 
 

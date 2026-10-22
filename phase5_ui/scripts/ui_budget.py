@@ -171,7 +171,20 @@ async def _measure(data_root: Path) -> list[Metric]:
     routes = (
         ui_auth_routes(ui_settings, auth_store, users, sessions)
         + account_routes(ui_settings, auth_store, users, sessions)
-        + api_routes(ui_settings, item_store, sessions, SharePolicy(item_store.acl_reader), auth_store, users)
+        # **P10.5, Block 2, Nachzug (2026-10-22):** die Policy bekommt das Home-Space-Prädikat,
+        # **dieselbe Zeile wie im Produktivpfad** (`mcpserver/app.py :: create_app()`):
+        # `is_home_space=lambda space: oauth.store.get_user(space) is not None`. Ohne Prädikat
+        # kennt die Policy fail-closed **keinen** Home-Space — und damit ist *jeder* Space ein
+        # Team-Space-Fall `false`: die `team`-Flags im gemessenen `/overview` waren immer
+        # `false`. Die Auth-DB ist hier die Quelle (derselbe Handle wie in `api_routes()`).
+        + api_routes(
+            ui_settings, item_store, sessions,
+            SharePolicy(
+                item_store.acl_reader,
+                is_home_space=lambda space: auth_store.get_user(space) is not None,
+            ),
+            auth_store, users,
+        )
         + static_routes(ui_settings, sessions)
     )
     app = Starlette(routes=routes)
@@ -344,20 +357,40 @@ async def _measure_latency(data_root: Path) -> list[LatencyMetric]:
     )
     ui_auth_store = AuthStore(ui_auth_settings.db_path, now_fn=lambda: datetime.now(timezone.utc))
     ui_settings = UiSettings(base_url=ui_auth_settings.base_url)
+    # **P10.5, Block 2, Nachzug (2026-10-22):** `SPACE` ist live der **Home-Space** eines
+    # Menschen — das Home-Space-Prädikat liest genau das aus der Auth-DB
+    # (`get_user(space) is not None`, dieselbe Zeilenabfrage wie im Produktivpfad). Damit die
+    # gemessene Antwort die echte ist, braucht diese Mess-DB die `users`-Zeile für `SPACE`;
+    # ohne sie wäre der Space ein „gehört niemandem" und trüge im `/overview` ein falsches
+    # `team: true`. Die Zeile ist eine Mess-Bedingung, kein Login: `create_session()` mintet
+    # weiterhin direkt, ohne Einladung/Enrollment/ Login-Umweg.
+    ui_auth_store.upsert_user(
+        SPACE,
+        password_hash="x", totp_secret_enc=None, totp_alg="SHA1",
+        totp_confirmed_at=None, status="active",
+    )
     session_id, _csrf = ui_auth_store.create_session(
         space=SPACE, idle_ttl_s=ui_settings.idle_ttl_s, absolute_ttl_s=ui_settings.absolute_ttl_s,
     )
     sessions = SessionManager(ui_auth_store, settings=ui_settings)
-    # `dek=None` ist sicher: `ui_auth_store` ist frisch, seine `users`-Tabelle bleibt in diesem
-    # Messlauf leer (`create_session()` mintet direkt, kein `upsert_user()`) — dieselbe
-    # Begründung wie `mcp_oauth`s `UserDirectory(mcp_auth_store, dek=None)` oben. Nur für
-    # `api_routes()`s Pflichtparameter gebraucht (Step 7 Commit 5a); `GET /overview` allein
-    # löst nie das Re-Auth-Gate aus, das ihn tatsächlich läse.
-    ui_users = UserDirectory(ui_auth_store, dek=None)
+    # `dek` ist ein **Wegwerf-Schlüssel** für diese Wegwerf-DB (32 Null-Bytes-ish, derselbe
+    # Dummy wie in `ui_smoke.py`): die Zeile von oben trägt **keinen** TOTP-Seed
+    # (`totp_secret_enc=None`), es gibt also nichts zu entschlüsseln — aber `UserDirectory`
+    # verweigert `dek=None`, sobald die `users`-Tabelle nicht leer ist (Plan §2.4, „kein stiller
+    # Klartextbetrieb"). Der Schlüssel schützt hier nichts: die Datei liegt in einem
+    # `TemporaryDirectory` und wird beim Laufende gelöscht.
+    ui_users = UserDirectory(ui_auth_store, dek=bytes([0x5A]) * 32)
     rest_app = Starlette(
         routes=api_routes(
-            ui_settings, item_store, sessions, SharePolicy(item_store.acl_reader), ui_auth_store,
-            ui_users,
+            ui_settings, item_store, sessions,
+            # **Dieselbe Prädikat-Zeile wie im Produktivpfad** (`mcpserver/app.py ::
+            # create_app()`) — ohne sie kennt die Policy fail-closed keinen Home-Space und die
+            # `team`-Flags im gemessenen `/overview` wären immer `false`.
+            SharePolicy(
+                item_store.acl_reader,
+                is_home_space=lambda space: ui_auth_store.get_user(space) is not None,
+            ),
+            ui_auth_store, ui_users,
         )
     )
 

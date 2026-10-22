@@ -88,7 +88,21 @@ async def _run(data_root: Path, checks: list[Check]) -> None:
     routes = (
         ui_auth_routes(ui_settings, auth_store, users, sessions)
         + account_routes(ui_settings, auth_store, users, sessions)
-        + api_routes(ui_settings, item_store, sessions, SharePolicy(item_store.acl_reader), auth_store, users)
+        # **P10.5, Block 2, Nachzug (2026-10-22):** die Policy bekommt das Home-Space-Prädikat,
+        # **dieselbe Zeile wie im Produktivpfad** (`mcpserver/app.py :: create_app()`):
+        # `is_home_space=lambda space: oauth.store.get_user(space) is not None`. Ohne Prädikat
+        # kennt die Policy fail-closed **keinen** Home-Space — und damit ist *jeder* Space ein
+        # Team-Space-Fall `False`: die `team`-Flags waren immer `false`, und Team-Rechte (Ordner
+        # anlegen, verschieben, löschen) konnten in diesem Lauf nie greifen. Die Auth-DB ist
+        # hier die Quelle, dieselbe Zeilenabfrage ohne TOTP-Entschlüsselung.
+        + api_routes(
+            ui_settings, item_store, sessions,
+            SharePolicy(
+                item_store.acl_reader,
+                is_home_space=lambda space: auth_store.get_user(space) is not None,
+            ),
+            auth_store, users,
+        )
     )
     app = Starlette(routes=routes)
 
@@ -163,6 +177,18 @@ async def _run(data_root: Path, checks: list[Check]) -> None:
                 by_name.get(SPACE_OWN, {}).get("own") is True
                 and by_name.get(SPACE_FOREIGN, {}).get("own") is False,
                 f"spaces={sorted(by_name)}",
+            )
+        )
+        # **P10.5, Block 2, Nachzug (2026-10-22):** die `team`-Flags müssen stimmen — der eigene
+        # Space gehört dem eingeladenen Menschen (Home-Space), der fremde Space gehört niemandem
+        # (Team-Space). Ohne Home-Space-Prädikat in der Policy war **beides** `false`, und der
+        # Lauf prüfte es nicht — die Flags fielen stillschweigend auf „immer nein".
+        checks.append(
+            Check(
+                "/api/v1/spaces (team-Flags)",
+                by_name.get(SPACE_OWN, {}).get("team") is False
+                and by_name.get(SPACE_FOREIGN, {}).get("team") is True,
+                f"team={ {n: s.get('team') for n, s in by_name.items()} }",
             )
         )
 

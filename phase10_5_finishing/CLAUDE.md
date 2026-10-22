@@ -9,7 +9,7 @@ down:
   - ../phase10_inventory/BAUSTELLENREGISTER.md      # 📗 die Arbeitsliste — hier wird abgehakt (P10-B)
   - ../phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md  # 📦 §12 Entscheidungsliste D-1–D-18, verbatim
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
-updated: 2026-10-22 (Block 2.5 — Proben Web × MCP 28/28, M4 BG-1 behoben; Block 2 ✅, Abnahme 10-8/10/11 ✅, 10-9 ⚠️ (Befund: neuer Ordner per Item-Anlage im fremden Home-Space)) | 2026-10-22 (Block 2 Schritte 2.1–2.4 gebaut — eine Regel für Web und MCP (RE-1/RE-2/P10-I/P10.5-N) und BG-1; **2.5 Proben offen, Claude Code**; Suite 1299 grün) | 2026-10-22 (Block 2 Schritte 2.1–2.2: eine Regel für Web und MCP — SharePolicy mit Home-Space-Prädikat, RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N beide Richtungen; Suite 1296 grün) | 2026-10-22 (Block 2 Schritt 2.1: SharePolicy kennt Home-Spaces und Team-Spaces, Prädikat aus der Auth-DB, eine Regel für Web und MCP) | 2026-10-22 (Block 1 **abgeschlossen**: V200 vom Fleet-Lauf belegt — Unit installiert, `Result=success`, 0 failed units; Abnahme 10-5/6/7 ✅) | 2026-10-22 (Block 1 Schritte 1.1/1.2: BT-1 — Caddy-Vorlage in Blockform mit den V199-Live-Werten (10s/15s/1s) + neuer Waechter; Abnahme 10-5 auf ✅) | 2026-10-22 (Block 1 Schritt 1.4: BT-6 — `constraints.txt` aus dem Live-Freeze, `scripts/dev_install.sh` mit `-c`, zwei Wächter, Dev-venv neu; Suite 1282 gruen auf den Live-Versionen) | 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in der Relay-Unit, Wächter 13/13, vier Gegenläufe; Block-0-Block rotiert) | 2026-10-22 (Block 0 **abgeschlossen**: 0.6 ROADMAP-Zeile P10.5 auf 🔄, 0.7 Ausführer-Vorbedingung protokolliert — Abnahme P10.5-1–4 ✅) | 2026-10-22 (Block 0: 0.2/0.3 — Phase-Head angelegt (Modulstatus, Deploy-Tabelle, Abnahmestand 61 Zeilen), DO-3-Wächter, `pytest.ini` ergänzt; davor 0.4 (ROADMAP-Wächter eingefroren), 0.5 (INDEX-Luft) und 0.8 (Register-Luft) gebaut — DO-2 vollständig; erster Block)
+updated: 2026-10-22 (Block-2-Nachzug: Item mit **neuem Ordner** im fremden Home-Space ist jetzt auf Web **und** MCP gesperrt (Nikinger-Entscheidung 2026-10-22) — P10.5-9 ⚠️ → ✅; `ui_budget.py`/`ui_smoke.py` haben das Home-Space-Prädikat, die `team`-Flags stimmen) | 2026-10-22 (Block 2.5 — Proben Web × MCP 28/28, M4 BG-1 behoben; Block 2 ✅, Abnahme 10-8/10/9 ✅, 10-9 ⚠️ (Befund: neuer Ordner per Item-Anlage im fremden Home-Space)) | 2026-10-22 (Block 2 Schritte 2.1–2.4 gebaut — eine Regel für Web und MCP (RE-1/RE-2/P10-I/P10.5-N) und BG-1; **2.5 Proben offen, Claude Code**; Suite 1299 grün) | 2026-10-22 (Block 2 Schritte 2.1–2.2: eine Regel für Web und MCP — SharePolicy mit Home-Space-Prädikat, RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N beide Richtungen; Suite 1296 grün) | 2026-10-22 (Block 2 Schritt 2.1: SharePolicy kennt Home-Spaces und Team-Spaces, Prädikat aus der Auth-DB, eine Regel für Web und MCP) | 2026-10-22 (Block 1 **abgeschlossen**: V200 vom Fleet-Lauf belegt — Unit installiert, `Result=success`, 0 failed units; Abnahme 10-5/6/7 ✅) | 2026-10-22 (Block 1 Schritte 1.1/1.2: BT-1 — Caddy-Vorlage in Blockform mit den V199-Live-Werten (10s/15s/1s) + neuer Waechter; Abnahme 10-5 auf ✅) | 2026-10-22 (Block 1 Schritt 1.4: BT-6 — `constraints.txt` aus dem Live-Freeze, `scripts/dev_install.sh` mit `-c`, zwei Wächter, Dev-venv neu; Suite 1282 gruen auf den Live-Versionen) | 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in der Relay-Unit, Wächter 13/13, vier Gegenläufe; Block-0-Block rotiert) | 2026-10-22 (Block 0 **abgeschlossen**: 0.6 ROADMAP-Zeile P10.5 auf 🔄, 0.7 Ausführer-Vorbedingung protokolliert — Abnahme P10.5-1–4 ✅) | 2026-10-22 (Block 0: 0.2/0.3 — Phase-Head angelegt (Modulstatus, Deploy-Tabelle, Abnahmestand 61 Zeilen), DO-3-Wächter, `pytest.ini` ergänzt; davor 0.4 (ROADMAP-Wächter eingefroren), 0.5 (INDEX-Luft) und 0.8 (Register-Luft) gebaut — DO-2 vollständig; erster Block)
 ---
 # Phase 10.5 — Finishing
 
@@ -31,7 +31,7 @@ updated: 2026-10-22 (Block 2.5 — Proben Web × MCP 28/28, M4 BG-1 behoben; Blo
 |---|---|---|---|---|
 | 0 | Haushalt: Verifikation, Phase-Head, INDEX-Luft, Register-Luft, DO-2, DO-3, Ausführer-Vorbedingung | Claude Code | — | ✅ 2026-10-22 — 0.1–0.8 gebaut, Abnahme P10.5-1–4 ✅ |
 | 1 | Betrieb: BT-1, BT-2, BT-6 (+ `constraints.txt`) | Ausführer + Nikinger | A | ✅ 2026-10-22 — **1.1–1.4 gebaut und abgenommen** (V199 gelesen · BT-1 Caddy-Blockform · BT-2 `SuccessExitStatus=143`, live V200 ✅ · BT-6 `constraints.txt`); Abnahme 10-5/6/7 ✅, Suite 1283 grün |
-| 2 | Fehler, Parität, Regel: BG-1, RE-1, RE-2, P10-I, AL-1 | Ausführer (+ Claude Code Proben) | A | ✅ 2026-10-22 — **2.1–2.5 gebaut und geprobt** (Probe 2.5: 28/28 Zellen Web × MCP, M4 0 → 3 Zeilen ohne neues Öffnen; **ein Befund**: neuer Ordner per Item-Anlage im fremden Home-Space mit `write:` auf beiden Flächen → P10.5-9 ⚠️, beim Nikinger) — eine Regel für Web und MCP: RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N kein Verschieben in **oder aus** einem fremden Home-Space; BG-1: die Space-Liste füllt sich nach, wenn `/overview` spät kommt) |
+| 2 | Fehler, Parität, Regel: BG-1, RE-1, RE-2, P10-I, AL-1 | Ausführer (+ Claude Code Proben) | A | ✅ 2026-10-22 — **2.1–2.5 gebaut und geprobt** (Probe 2.5: 28/28 Zellen Web × MCP, M4 0 → 3 Zeilen ohne neues Öffnen) · **Nachzug 2026-10-22 (Nikinger):** ein Item mit **neuem Ordner** im fremden Home-Space ist jetzt auf beiden Flächen gesperrt (RE-1-Parität) — P10.5-9 damit ✅ statt ⚠️ — eine Regel für Web und MCP: RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N kein Verschieben in **oder aus** einem fremden Home-Space; BG-1: die Space-Liste füllt sich nach, wenn `/overview` spät kommt) |
 | 3 | Hygiene: LG-8 (P1-15), LG-7 | Ausführer | A | ⬜ |
 | 4 | Performance: PF-1, PF-4, Z1–Z4 | Ausführer (+ Claude Code Proben) | A | ⬜ |
 | 5 | MCP-Schicht: PA-5 (FastMCP 4), LG-4 | Ausführer | B | ⬜ |
@@ -69,7 +69,7 @@ updated: 2026-10-22 (Block 2.5 — Proben Web × MCP 28/28, M4 BG-1 behoben; Blo
 | P10.5-6 | BT-2: Unit installiert, `Result=success` bei Exit 143 (V200 ✅) | ✅ | 1.3 · Fleet-Lauf 2026-10-22: `Result=success`, 0 failed units, active |
 | P10.5-7 | `constraints.txt` = Live-Stand; Dev-venv daraus grün; Wächter grün | ✅ | 1.4 · this commit · Freeze byte-identisch zur Datei, Suite 1282 grün auf `mcp 1.30.0` / `starlette 1.7.0` |
 | P10.5-8 | BG-1: Die Liste füllt sich, sobald das verzögerte `/overview` ankommt, ohne Panel neu zu öffnen | ✅ | 2.5 · `probes/p105_m4_bg1.json`: 0 beim Öffnen → 3 nach 4 s, ohne neu zu öffnen; Gegenlauf 3; ohne Ereignis 0 |
-| P10.5-9 | RE-1/RE-2: dieselbe Matrix auf Web und MCP | ⚠️ | 2.5 · `probes/p105_b2_rights.json`: Matrix gleich auf beiden Flächen, fremder Home mit `write:` ❌ für Ordner-Endpunkt und Ordnerwechsel. **Abweichung:** ein Item mit **neuem** Ordner im fremden Home-Space legt den Ordner an (Web und MCP) — Befund beim Nikinger |
+| P10.5-9 | RE-1/RE-2: dieselbe Matrix auf Web und MCP | ✅ | 2.5 · `probes/p105_b2_rights.json`: Matrix gleich auf beiden Flächen, fremder Home mit `write:` ❌ für Ordner-Endpunkt und Ordnerwechsel · **Nachzug 2026-10-22 (Nikinger):** auch ein Item mit **neuem Ordner** im fremden Home-Space legt den Ordner nicht mehr an (Web 403 `forbidden`, MCP `write_denied`) — 3 neue MCP-Tests + 4 neue Web-Tests, Suite 1306 grün |
 | P10.5-10 | P10-I auf beiden Flächen durchgesetzt | ✅ | 2.5 · `probes/p105_b2_rights.json`: in/aus fremdem Home ❌ (Web + MCP, Item bleibt an der Quelle), Team-Ziel ✅ |
 | P10.5-11 | AL-1: Zeilen 14 und 29 geschlossen; Zeile 15 mit Weg beim Nikinger (Migration + Live-Check) | ✅ | 2.5 · Zeile 29: MCP-Move alpha→gamma ✅ · Zeile 14: fremder Body im geteilten read-Space gewrappt, Schreiben ❌ · Zeile 15 beim Nikinger |
 | P10.5-12 | EXIF weg nach Upload über Web **und** MCP; Orientierung bleibt | ⬜ | — |
@@ -123,7 +123,7 @@ updated: 2026-10-22 (Block 2.5 — Proben Web × MCP 28/28, M4 BG-1 behoben; Blo
 | P10.5-60 | P10-J zweimal live belegt | ⬜ | — |
 | P10.5-61 | Closeout-Dokumente + Rotationen per Skript | ⬜ | — |
 
-**Summe:** 10 ✅ · 1 ⚠️ · 50 ⬜ (von 61).
+**Summe:** 11 ✅ · 0 ⚠️ · 50 ⬜ (von 61).
 
 ## Offen beim Nikinger
 
@@ -132,59 +132,34 @@ updated: 2026-10-22 (Block 2.5 — Proben Web × MCP 28/28, M4 BG-1 behoben; Blo
 - **V203** — Funnel-Pfad von außen gewacht? (BT-10, Klärung eurofyx-fleet).
 - **P10.5-27/28** — Live-Abnahme P10-J: zwei Modellanbieter, ein Server, ein Werkzeug (`list_spaces`) — Block 6 und Z.
 - **Block 2, Zeile 15 (AL-1)** — Migration + Live-Check beim Nikinger.
-- **Befund 2.5 (P10.5-9 ⚠️)** — `create_item(space=, folder=<neu>)` und `POST /api/v1/items` legen im fremden Home-Space mit `write:` einen neuen Ordner an; schließen (Code in `tools.py`/`api.py`) oder als gewollt festhalten?
+- ~~**Befund 2.5 (P10.5-9 ⚠️)**~~ ✅ 2026-10-22 (Block-2-Nachzug, Nikinger-Entscheidung „ja") — `create_item(space=, folder=<neu>)` und `POST /api/v1/items` legen im fremden Home-Space mit `write:` **keinen** neuen Ordner mehr an; die Regel ist `permissions.manages_space()` (eigener Space oder Team-Space mit Schreibrecht), auf beiden Flächen. Ohne `folder` bleibt das Anlegen an der Space-Wurzel erlaubt (P6-U).
 
-## Session stopped — 2026-10-22 (Block 2.5 — Proben Web × MCP und M4; Block 2 ✅ mit einem Befund)
+## Session stopped — 2026-10-22 (Block-2-Nachzug: RE-1-Parität beim Anlegen mit Ordner; P10.5-9 ✅)
 
-**Ergebnis.** Die Regel aus 2.1–2.4 hält auf einer Wegwerf-Instanz. **28 von 28** bewerteten
-Zellen bestehen, und jedes ❌ scheitert mit dem **erwarteten Text** (nicht an einer älteren
-Prüfung). BG-1 ist behoben. **Ein Befund:** Ein Item mit **neuem** Ordner in einem fremden
-Home-Space mit `write:` anzulegen (`create_item(space=, folder=)`, Web `POST /api/v1/items`)
-legt den Ordner an — auf **beiden** Flächen. Damit ist die Parität gewahrt, aber RE-1 hat eine
-Hintertür. Deshalb steht P10.5-9 auf ⚠️.
+**Ergebnis.** Der Befund aus Probe 2.5 ist geschlossen (Nikinger 2026-10-22: „ja"): ein Item mit
+**neuem Ordner** in einem fremden Home-Space legt den Ordner nicht mehr an — Web **und** MCP.
+Die Regel ist `permissions.manages_space()` (eigener Space oder Team-Space mit Schreibrecht),
+dieselbe wie RE-1 (Ordner anlegen) und RE-2 (Ordner wechseln). **Ohne** `folder` bleibt das
+Anlegen an der Space-Wurzel erlaubt (P6-U). Zweite Entscheidung desselben Tages: `ui_budget.py`
+und `ui_smoke.py` bekommen das Home-Space-Prädikat — ohne es waren ihre `team`-Flags **immer**
+`false` und Team-Rechte nie greifbar.
 
 **Geliefert (Commits).** Dieser Commit:
-- `probes/p105_b2_rights_probe.py`: Wegwerf 8799, eigene Wurzel, Maschinerie aus
-  `p10_wegwerf.py`. Seed: alpha · beta (Home B, `write: [alpha]`) · gamma (Team, write) ·
-  delta (Team, nur read).
-- `probes/p105_m4_bg1_probe.py`: M4 über TLS, Bestehensregel umgedreht.
-- Rohwerte in den beiden `.json` daneben.
+- `mcpserver/tools.py :: create_item()` — Riegel vor `store.create()`; `PermissionDenied(reason=…)`,
+  damit die Meldung nicht „kein Schreibrecht" sagt (der Actor hat eines).
+- `webui/api.py :: _items_post()` — derselbe Riegel; zusätzlich `folder` auf String geprüft
+  (vorher 500 statt 422 — derselbe Feldname, dieselbe Zeile).
+- `scripts/ui_budget.py` + `scripts/ui_smoke.py` — Home-Space-Prädikat aus der Auth-DB,
+  dieselbe Zeile wie im Produktivpfad (`mcpserver/app.py :: create_app()`).
 
-**Gemessen** (HEAD `b299968`):
+**Gemessen** (Basis `725215f`): `pytest` **1306 grün** (287 s, +7) · `ui_smoke` **13/13** (neu:
+`/api/v1/spaces (team-Flags)` — `alpha: false`, `beta: true`) · **Gegenlauf:** ohne Prädikat
+`team={'alpha': False, 'beta': False}` → der neue Smoke-Check **rot** · `ui_budget` 5/5 (173,8 KB).
 
-| Matrix | Web | MCP |
-|---|---|---|
-| Ordner anlegen: eigen/Team ✅ · fremder Home mit `write:` ❌ · read-Team ❌ | ✅ | (kein Werkzeug) |
-| Ordner wechseln: eigen/Team ✅ · fremder Home ❌ | ✅ | ✅ |
-| Verschieben alpha→gamma ✅ (AL-1 Z. 29) · alpha→beta ❌ · beta→alpha ❌ · beta→gamma ❌ | ✅ | ✅ |
-| delta schreiben ❌ · fremder Body gewrappt, eigener nicht (AL-1 Z. 14) | ✅ | ✅ |
+**Ausführer-Daten.** opencode/MiniMax-M3.1-Flash · Kontextgrenze 400.000 (P10.5-C erfüllt) ·
+keine Advisor-Runde · Eingriffe Nikinger/Claude Code: 0 · kein `systemctl`, kein `sudo`, kein
+echter `DATA_ROOT`.
 
-- Jede ✅-Zelle ist von der Platte zurückgelesen (`<space>/<ordner>/<id>__*.md`).
-- Jedes ❌ hat das Item an der Quelle belassen.
-- **M4:** 4 s verzögert → 0 Zeilen beim Öffnen, **3 Zeilen** nach der Antwort, ohne neu zu
-  öffnen. Gegenlauf ohne Verzögerung: 3.
-- **Gegenlauf der Probe:** ohne `dispatchEvent` → 0 nach der Verzögerung. `list.js` ist
-  danach per `git checkout` zurück.
-- Prod (8765, PID 1069) unberührt; 8799 nach dem Stopp frei.
-
-**Plan-Drift, datiert 2026-10-22** (der Plan ist 📕, deshalb steht die Drift hier):
-1. P6-Zeile 14 heißt im Original „fremder Body auch im geteilten Space gewrappt"
-   (`phase6_shares_plan.md:919`), nicht „Schreiben ❌". Beides ist geprüft.
-2. M4 erwartet 3 statt 2 Zeilen: beta ist hier beschreibbar.
-3. Die MCP-Fläche hat kein Werkzeug „Ordner anlegen".
-
-**Ausführer-Daten.** Claude Code (Proben). Eine Advisor-Runde vor dem Bau. Eingriffe: 0.
-
-**Offen / nächster Schritt.**
-- **Nikinger:** Den Befund schließen (`create_item`/`POST /items` mit neuem Ordner nur, wenn
-  `manages_space()`)? Das ist Code in `tools.py`/`api.py`. Bremst Block 3 nicht.
-- **Nikinger:** Die offene Frage zu `ui_budget.py`/`ui_smoke.py` ohne Home-Space-Prädikat.
-- **Ausführer (opencode) — Block 3, Startauftrag** (Plan „Block 3", §2.1–§2.2):
-  - Vorher: `limit.context` ≤ 400.000 prüfen · `git status` sauber · Blockbasis = HEAD.
-  - **Angekündigt hiermit (2026-10-22): P1-Öffnung 15:** `files.strip_image_metadata()` + Aufruf in
-    `Store.put_asset()`. Keine weitere Datei unter `phase1_storage/storage/`.
-  - 3.1 `strip_image_metadata(data, mime)` in `files.py` (JPEG/PNG/WebP, GIF unverändert,
-    fail-closed `ValidationError`) · 3.2 Aufruf in `put_asset()` nach `sniff_image_mime()`
-    (heute **`store.py:943`**, Plan sagt 944) · 3.3 `scripts/asset_orphans.py`
-    (Docstring V162 heute `store.py:1045`) · Tests nach Plan 3.4, Fixtures als Bytes.
-  - Proben P10.5-12/13 (Wegwerf) macht danach Claude Code.
+**Offen / nächster Schritt.** Block 3 (Hygiene): LG-8 = P1-Öffnung 15 (EXIF-Bereinigung in
+`Store.put_asset()`), LG-7 = `scripts/asset_orphans.py`. P1-Öffnung 15 ist angekündigt
+(Phase-Head, 2026-10-22); keine weitere Datei unter `phase1_storage/storage/`.

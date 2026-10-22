@@ -953,6 +953,61 @@ def test_update_item_move_into_team_space_still_allowed(tools_map, store, tmp_pa
     assert store.get(item.id).space == SPACE_B
 
 
+# -- P10.5, Block 2, Nachzug (2026-10-22): RE-1-Parität beim Anlegen mit Ordner ---------------
+
+
+def test_create_item_with_folder_in_foreign_home_space_denied(tools_map, store, tmp_path):
+    """**RE-1-Parität (Befund aus der Probe 2.5, Nikinger-Entscheidung 2026-10-22):** ein Item
+    mit **Ordner** in einem fremden **Home-Space** legt diesen Ordner beim Anlegen an — damit
+    war RE-1 (Ordner anlegen) dort eine Hintertür, obwohl der Actor space-level `write:` hat.
+    Dieselbe Regel wie RE-2 (Ordner wechseln): in einen Ordner schreiben darf nur, wer den
+    Space **verwaltet** — der eigene Space und Team-Spaces mit Schreibrecht."""
+    _write_share_yml(tmp_path / SPACE_C, f"write: [{SPACE_A}]\n")
+
+    with _as(SPACE_A), pytest.raises(ToolError, match="write_denied"):
+        tools_map["create_item"](
+            type="note", title="Ordner im fremden Home-Space", space=SPACE_C, folder="neu",
+        )
+
+    # Fail-closed: **nichts** angelegt — kein Ordner, kein Item.
+    assert not (tmp_path / SPACE_C / "neu").exists()
+    assert store.search(space=SPACE_C).items == []
+
+
+def test_create_item_with_folder_in_team_space_allowed(tools_map, store, tmp_path):
+    """**Gegenlauf** zu `test_create_item_with_folder_in_foreign_home_space_denied`: dieselbe
+    `.share.yml` mit `write:`, aber das Ziel ist ein **Team-Space** — dort darf der Ordner
+    angelegt werden (Team-Spaces gehören niemandem, P10-I greift nicht)."""
+    _write_share_yml(tmp_path / SPACE_B, f"write: [{SPACE_A}]\n")
+
+    with _as(SPACE_A):
+        receipt = json.loads(
+            tools_map["create_item"](
+                type="note", title="Ordner im Team-Space", space=SPACE_B, folder="neu",
+            )
+        )
+
+    assert receipt["space"] == SPACE_B
+    assert store.get(receipt["id"]).folder == "neu"
+    assert (tmp_path / SPACE_B / "neu").is_dir()
+
+
+def test_create_item_without_folder_in_foreign_home_space_still_allowed(tools_map, store, tmp_path):
+    """**Gegenlauf** zu `test_create_item_with_folder_in_foreign_home_space_denied`: **ohne**
+    Ordner bleibt das Anlegen an der Space-Wurzel erlaubt (P6-U, Hard Rule 4 Neufassung: der
+    Ziel-Space ist ein anderer nur, wenn `.share.yml` dort `write:` gewährt). Die Regel
+    betrifft den **Ordner**, nicht das Item."""
+    _write_share_yml(tmp_path / SPACE_C, f"write: [{SPACE_A}]\n")
+
+    with _as(SPACE_A):
+        receipt = json.loads(
+            tools_map["create_item"](type="note", title="Ohne Ordner", space=SPACE_C)
+        )
+
+    assert receipt["space"] == SPACE_C
+    assert store.get(receipt["id"]).folder == ""
+
+
 def test_update_item_with_space_rejects_combined_content_changes(tools_map, store):
     item = store.create(SPACE_A, type="note", title="Umzug")
 

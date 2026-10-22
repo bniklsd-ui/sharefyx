@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,62 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-22 (Block 2.5 — Proben Web × MCP und M4; Block 2 ✅ mit einem Befund)
+
+**Ergebnis.** Die Regel aus 2.1–2.4 hält auf einer Wegwerf-Instanz. **28 von 28** bewerteten
+Zellen bestehen, und jedes ❌ scheitert mit dem **erwarteten Text** (nicht an einer älteren
+Prüfung). BG-1 ist behoben. **Ein Befund:** Ein Item mit **neuem** Ordner in einem fremden
+Home-Space mit `write:` anzulegen (`create_item(space=, folder=)`, Web `POST /api/v1/items`)
+legt den Ordner an — auf **beiden** Flächen. Damit ist die Parität gewahrt, aber RE-1 hat eine
+Hintertür. Deshalb steht P10.5-9 auf ⚠️.
+
+**Geliefert (Commits).** Dieser Commit:
+- `probes/p105_b2_rights_probe.py`: Wegwerf 8799, eigene Wurzel, Maschinerie aus
+  `p10_wegwerf.py`. Seed: alpha · beta (Home B, `write: [alpha]`) · gamma (Team, write) ·
+  delta (Team, nur read).
+- `probes/p105_m4_bg1_probe.py`: M4 über TLS, Bestehensregel umgedreht.
+- Rohwerte in den beiden `.json` daneben.
+
+**Gemessen** (HEAD `b299968`):
+
+| Matrix | Web | MCP |
+|---|---|---|
+| Ordner anlegen: eigen/Team ✅ · fremder Home mit `write:` ❌ · read-Team ❌ | ✅ | (kein Werkzeug) |
+| Ordner wechseln: eigen/Team ✅ · fremder Home ❌ | ✅ | ✅ |
+| Verschieben alpha→gamma ✅ (AL-1 Z. 29) · alpha→beta ❌ · beta→alpha ❌ · beta→gamma ❌ | ✅ | ✅ |
+| delta schreiben ❌ · fremder Body gewrappt, eigener nicht (AL-1 Z. 14) | ✅ | ✅ |
+
+- Jede ✅-Zelle ist von der Platte zurückgelesen (`<space>/<ordner>/<id>__*.md`).
+- Jedes ❌ hat das Item an der Quelle belassen.
+- **M4:** 4 s verzögert → 0 Zeilen beim Öffnen, **3 Zeilen** nach der Antwort, ohne neu zu
+  öffnen. Gegenlauf ohne Verzögerung: 3.
+- **Gegenlauf der Probe:** ohne `dispatchEvent` → 0 nach der Verzögerung. `list.js` ist
+  danach per `git checkout` zurück.
+- Prod (8765, PID 1069) unberührt; 8799 nach dem Stopp frei.
+
+**Plan-Drift, datiert 2026-10-22** (der Plan ist 📕, deshalb steht die Drift hier):
+1. P6-Zeile 14 heißt im Original „fremder Body auch im geteilten Space gewrappt"
+   (`phase6_shares_plan.md:919`), nicht „Schreiben ❌". Beides ist geprüft.
+2. M4 erwartet 3 statt 2 Zeilen: beta ist hier beschreibbar.
+3. Die MCP-Fläche hat kein Werkzeug „Ordner anlegen".
+
+**Ausführer-Daten.** Claude Code (Proben). Eine Advisor-Runde vor dem Bau. Eingriffe: 0.
+
+**Offen / nächster Schritt.**
+- **Nikinger:** Den Befund schließen (`create_item`/`POST /items` mit neuem Ordner nur, wenn
+  `manages_space()`)? Das ist Code in `tools.py`/`api.py`. Bremst Block 3 nicht.
+- **Nikinger:** Die offene Frage zu `ui_budget.py`/`ui_smoke.py` ohne Home-Space-Prädikat.
+- **Ausführer (opencode) — Block 3, Startauftrag** (Plan „Block 3", §2.1–§2.2):
+  - Vorher: `limit.context` ≤ 400.000 prüfen · `git status` sauber · Blockbasis = HEAD.
+  - **Angekündigt hiermit (2026-10-22): P1-Öffnung 15:** `files.strip_image_metadata()` + Aufruf in
+    `Store.put_asset()`. Keine weitere Datei unter `phase1_storage/storage/`.
+  - 3.1 `strip_image_metadata(data, mime)` in `files.py` (JPEG/PNG/WebP, GIF unverändert,
+    fail-closed `ValidationError`) · 3.2 Aufruf in `put_asset()` nach `sniff_image_mime()`
+    (heute **`store.py:943`**, Plan sagt 944) · 3.3 `scripts/asset_orphans.py`
+    (Docstring V162 heute `store.py:1045`) · Tests nach Plan 3.4, Fixtures als Bytes.
+  - Proben P10.5-12/13 (Wegwerf) macht danach Claude Code.
+
 ## Session stopped — 2026-10-22 (Block 2 — Fehler, Parität, Regel: BG-1, RE-1, RE-2, P10-I; **2.1–2.4 gebaut**, 2.5 Proben offen)
 
 **Ergebnis.** Die Schritte 2.1–2.4 stehen — **eine** Regel für Web und MCP, und die

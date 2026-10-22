@@ -654,6 +654,26 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         target_space = space if space is not None else principal.space
         if target_space != principal.space and not permissions.can_write(principal.space, target_space):
             raise map_storage_error(PermissionDenied(target_space)) from None
+        # **RE-1-Parität, Nikinger-Entscheidung 2026-10-22 (Befund aus Probe 2.5):** ein Item
+        # mit **Ordner** in einem fremden **Home-Space** legt diesen Ordner beim Anlegen an —
+        # damit war RE-1 (Ordner anlegen) dort eine Hintertür, obwohl `create_item` das
+        # Schreibrecht (`write:`) hat. Dieselbe Regel wie RE-2 (Ordner wechseln) und wie auf
+        # der Web-Fläche (`webui/api.py :: _items_post()`): in einen Ordner schreiben darf nur,
+        # wer den Space **verwaltet** — der eigene Space und Team-Spaces mit Schreibrecht.
+        # Ein fremder Home-Space bleibt gesperrt, auch mit `write:`-Grant (P10-I).
+        # Ohne `folder` bleibt das Anlegen an der Space-Wurzel erlaubt (P6-U) — die Regel
+        # betrifft den **Ordner**, nicht das Item.
+        if folder and not permissions.manages_space(principal.space, target_space):
+            raise map_storage_error(
+                PermissionDenied(
+                    target_space,
+                    reason=(
+                        "Items mit Ordner können nur im eigenen Space oder in einem "
+                        "Team-Space mit Schreibrecht angelegt werden — im Home-Space eines "
+                        "anderen legt das den Ordner an (RE-1)"
+                    ),
+                )
+            ) from None
         kwargs: dict[str, Any] = {"tags": tags or [], "links": links or []}
         if due is not None:
             kwargs["due"] = due
