@@ -7,6 +7,7 @@ up: ../ROADMAP.md
 down:
 updated: 2026-10-07 (angelegt — Oversize-Fix: die ROADMAP-Kette (13.174 B) per `scripts/rotate_index_updates.sh` hierher rotiert)
 ---
+- 2026-10-21 (P10.5-Zeile: Plan phase10_5_finishing_plan.md freigegeben, Tor P10-8 offen; Ausführer M3.1 Flash als Open-Test, Rückfall M3) | ältere Einträge: docs/ROADMAP_UPDATES_ARCHIVE.md
 - 2026-10-20 (**P10 ✅** — Closeout: 9 ✅ · 1 ⚠️ · 2 ⬜, Handover `PHASE10_CLOSEOUT_HANDOVER.md`; P10.5-Zeile: Ausführer M3, GLM verworfen) | ältere Einträge: docs/ROADMAP_UPDATES_ARCHIVE.md
 - 2026-10-16 (**P10 🔄** — Bestandsaufnahme begonnen, `phase10_inventory/`; P10.5-Zeile neu)
 - 2026-10-08 (**P9 ✅** — abgeschlossen, live als `v3.1.4`, Gate 9/9; Bilanz 121 ✅ · 12 ⚠️ · 1 ⬜; Handover `PHASE9_CLOSEOUT_HANDOVER.md`)
