@@ -187,7 +187,17 @@ def create_app(
     # P6 Step 5: `SharePolicy` statt `OwnSpaceWritable` — gebaut aus `store.acl_reader`, damit
     # `Store` und die Rechteprüfung sich denselben `AclReader`-Cache teilen (ein Handle, kein
     # zweiter, siehe `permissions.py`s Moduldocstring).
-    permissions = SharePolicy(store.acl_reader)
+    #
+    # **P10.5, Block 2 (2026-10-22):** das Home-Space-Prädikat kommt dazu — nur die Auth-DB
+    # weiß, ob ein Space einem Nutzer gehört (ein Team-Space gehört niemandem). `get_user()`
+    # ist die **Zeilenabfrage ohne TOTP-Entschlüsselung** (`authserver/store.py :: get_user()`),
+    # dieselbe Begründung wie in `webui/api.py :: _is_team_space()` (2026-10-08, Advisor-Fund):
+    # ein Seed ist das schärfere Geheimnis (Hard Rule 1, Nachtrag 2026-07-30), und hier wird
+    # nur gefragt „gibt es einen Nutzer mit diesem Space?".
+    permissions = SharePolicy(
+        store.acl_reader,
+        is_home_space=lambda space: oauth.store.get_user(space) is not None,
+    )
     mcp = build_mcp(store, permissions)
     mcp.add_middleware(ToolCallLogMiddleware())
     hosts = list(allowed_hosts) if allowed_hosts else (list(settings.allowed_hosts) or None)

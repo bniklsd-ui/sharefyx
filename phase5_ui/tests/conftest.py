@@ -120,8 +120,17 @@ def item_store(tmp_path) -> Store:
 
 
 @pytest.fixture
-def permissions(item_store) -> SharePolicy:
-    return SharePolicy(item_store.acl_reader)
+def permissions(item_store, store) -> SharePolicy:
+    """**P10.5, Block 2 (2026-10-22):** die Policy kennt jetzt Home-Spaces und Team-Spaces —
+    dafür braucht sie das Prädikat, und die Quelle ist dieselbe wie live
+    (`mcpserver/app.py :: create_app()`): `auth_store.get_user(space) is not None`, also die
+    **Zeilenabfrage ohne TOTP-Entschlüsselung**. Im Test ist `SPACE` („niklas") der einzige
+    Nutzer, `FOREIGN_SPACE` („fabian") also ein Team-Space — genau wie vor der Umstellung, weil
+    `webui/api.py :: _is_team_space()` dieselbe Abfrage selbst gemacht hat."""
+    return SharePolicy(
+        item_store.acl_reader,
+        is_home_space=lambda space: store.get_user(space) is not None,
+    )
 
 
 @pytest.fixture

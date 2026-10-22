@@ -118,8 +118,15 @@ def item_store(tmp_path) -> Store:
 
 
 @pytest.fixture
-def permissions(item_store) -> SharePolicy:
-    return SharePolicy(item_store.acl_reader)
+def permissions(item_store, auth_store) -> SharePolicy:
+    """**P10.5, Block 2 (2026-10-22):** mit Home-Space-Prädikat \u2014 dieselbe Quelle wie live
+    (`mcpserver/app.py :: create_app()`): `auth_store.get_user(space) is not None` (Zeilenabfrage
+    ohne TOTP-Entschl\u00fcsselung). `"niklas"` ist der einzige Nutzer, alles andere ist ein
+    Team-Space."""
+    return SharePolicy(
+        item_store.acl_reader,
+        is_home_space=lambda space: auth_store.get_user(space) is not None,
+    )
 
 
 @pytest.fixture

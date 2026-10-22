@@ -62,7 +62,16 @@ def overview_app(ui_settings, store, confirmed_users, sessions, ticking_store) -
         ui_auth_routes(ui_settings, store, confirmed_users, sessions)
         + account_routes(ui_settings, store, confirmed_users, sessions)
         + api_routes(
-            ui_settings, ticking_store, sessions, SharePolicy(ticking_store.acl_reader), store,
+            ui_settings,
+            ticking_store,
+            sessions,
+            # P10.5, Block 2 (2026-10-22): Home-Space-Prädikat, dieselbe Quelle wie live
+            # (`mcpserver/app.py :: create_app()`) — `store` ist hier der `AuthStore`.
+            SharePolicy(
+                ticking_store.acl_reader,
+                is_home_space=lambda space: store.get_user(space) is not None,
+            ),
+            store,
             confirmed_users,
         )
     )

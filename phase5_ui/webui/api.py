@@ -420,22 +420,25 @@ def api_routes(
         return [s for s in spaces if s.name in visible]
 
     def _is_team_space(space: str) -> bool:
-        """P9-BP (Block feedback E1a): ein Space, der **nicht** der Home-Space eines Nutzers ist.
-        Dieselbe Quelle wie `_spaces_delete` („Ein Home-Space kann nicht entfernt werden"): die
-        Nutzerverwaltung, nicht ein Feld auf der Platte — ein Home-Space ist, wer ihn bewohnt (V192).
+        """P10.5, Block 2 (2026-10-22): **Einzeiler** auf `permissions.is_team_space()` — die
+        Web-Oberfläche und die Agentenfläche kennen jetzt dieselbe Regel (RE-1/RE-2, D-17).
 
-        **`auth_store.get_user()`, nicht `users.get()`** (2026-10-08, Advisor-Fund): `users.get()`
-        entschlüsselt den TOTP-Seed jedes Nutzers — hier liefe das bei **jedem** `/overview` für jeden
-        sichtbaren Space, nur um „gibt es den Nutzer?" zu beantworten. Ein Seed ist das schärfere
-        Geheimnis (Hard Rule 1, Nachtrag 2026-07-30); die Zeilenabfrage beantwortet dieselbe Frage
-        ohne Klartext im Speicher."""
-        return auth_store.get_user(space) is None
+        Vorher stand hier die Auth-DB-Abfrage selbst („`auth_store.get_user()`, nicht
+        `users.get()`", 2026-10-08, Advisor-Fund: `users.get()` entschlüsselt den TOTP-Seed
+        jedes Nutzers — hier liefe das bei **jedem** `/overview` für jeden sichtbaren Space).
+        Diese Abfrage lebt jetzt im Prädikat, das `mcpserver/app.py :: create_app()` beim Bauen
+        der Policy setzt (`oauth.store.get_user(space) is not None`) — dieselbe Zeilenabfrage
+        ohne Entschlüsselung, nur an **einer** Stelle im Code.
+
+        **Ohne Prädikat** (eine Policy ohne Home-Space-Kenntnis) ist die Antwort `False` —
+        fail-closed: kein belegter Team-Space, keine Team-Rechte (`permissions.py`)."""
+        return permissions.is_team_space(space)
 
     def _team_writer(actor: str, space: str) -> bool:
         """Darf `actor` in `space` wie ein Eigentümer verschieben und löschen? Nur in Team-Spaces
         und nur mit **space-level** Schreibrecht (`write:` in `.share.yml`) — ein `share_write`
         auf einem einzelnen Item reicht nicht. Fremde Home-Spaces bleiben bei P9-K (P9-136)."""
-        return _is_team_space(space) and permissions.can_write(actor, space)
+        return permissions.manages_space(actor, space)
 
     async def _spaces(request: Request) -> Response:
         session = await _require_session(request)

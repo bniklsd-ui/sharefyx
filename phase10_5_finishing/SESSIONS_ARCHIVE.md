@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,53 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+## Session stopped — 2026-10-22 (Block 1 — Betrieb: BT-1, BT-2, BT-6; **✅ abgeschlossen**)
+
+**Ergebnis.** Block 1 ist fertig: 1.1 (V199) · 1.2 (BT-1, Caddy-Blockform) · 1.3 (BT-2,
+`SuccessExitStatus=143`) · 1.4 (BT-6, `constraints.txt`). Abnahme **P10.5-5 ✅ · 10-6 ✅ · 10-7 ✅**.
+**Ein Plan-Befund, datiert:** die Schritte stehen als 1.1 → 1.2 → 1.3 → 1.4, aber 1.1/1.2 hängen an
+Ausgaben des Nikingers, 1.3/1.4 nicht — deshalb liefen 1.3/1.4 zuerst. **Deploy A ist laut Plan „nach
+Block 1–4" fällig, also nicht jetzt.**
+
+**Geliefert (Commits).** `4fc8d9a` — 1.3 (BT-2). `52b4eec` — 1.4 (BT-6). `f3846e8` + `71e904e` — 1.1/1.2
+(BT-1). `60a191a` — INDEX-Größe. (dieser Commit) — V200 abgehakt.
+
+**V199 (1.1), Ausgabe des Nikingers auf der VPS:** `dial_timeout` 10000000000 ns (10 s) ·
+`try_duration` 15000000000 ns (15 s) · `try_interval` 1000000000 ns (1 s) · `upstreams[0].dial` =
+`100.93.43.122:8765` — die Plan-Annahme, und der Upstream passt zu `<heimvm-tailnet>:8765`.
+
+**V200 (1.3), Lauf vom 2026-10-22 (Fleet-Playbook auf VM 200, `ok=11 changed=3 failed=0`):**
+`sharefyx-tail-proxy` **active**, trägt `SuccessExitStatus=143`, nach dem Stopp **`Result=success`**,
+**0 failed units** — genau das, was der Fleet-Healthcheck liest. Relay auf `100.93.43.122:8765`, App auf
+`127.0.0.1:8765`. **Idempotenz: der zweite `--check` meldet `changed=0`.** Die alte Unit liegt als
+Kopie mit Suffix `~` in `/etc/systemd/system/` (systemd liest sie nicht). **Nicht gemessen:** der
+Domain-Weg während des Stopps — der Stopp-Start dauerte laut Ansible nur Sekunden, und der öffentliche
+Pfad war in den Prüfschritten nicht beteiligt.
+
+**Gemessen.** Suite **1283 grün** (308 s) auf `mcp 1.30.0` / `starlette 1.7.0`. `pip check` grün,
+`doc_health` 0. **Gegenläufe, alle wirksam (Details in den Commits):** BT-1 — alte Einzeilenform ·
+`dial_timeout 3s` · Direktive außerhalb des Blocks. BT-2 — Zeile fehlt · Zahl 144 · Zeile nicht unter
+`Restart=on-failure` · Zeile in der MCP-Unit. BT-6 — Wegwerf-venv mit `starlette 1.3.1` · `-c`
+entfernt · Abbruchblock entfernt. Die neuen Wächter laufen im **Release-venv** grün (deploy.sh:169) —
+sonst bricht Deploy A.
+
+**Ausführer-Daten.** **MiniMax M3.1 Flash** über opencode (P10.5-B), `limit.context` **400.000**
+(P10.5-C ✅). Wanduhrzeit: rund **1 h 40 min** für 1.1–1.4 (10:05 → 11:45), davon vier volle
+Suitenläufe (je ≈ 5 min). Aufrufe/Kontingent: **nicht sichtbar**. Eingriffe: **2** vom Nikinger
+(V199-Ausgabe, V200-Lauf über Fleet), **0** von Claude Code. Trailer je Commit:
+`Co-Authored-By: opencode/MiniMax-M3.1-Flash <noreply@minimax.io>`.
+
+**Gegenlese-Funde — zwei eigene Fehler dieser Session.** (1) `cp -a .venv` kopiert die Skriptshebangs
+mit — der erste Gegenlauf traf dadurch das **echte** Dev-venv (dort wurde `starlette` auf 1.3.1
+heruntergesetzt). Lehre: eine venv-Kopie nur über `venv/bin/python -m pip` anfassen. (2) Die
+Verhaltensprobe war grün, ohne den Abbruch zu prüfen — im PATH der Testumgebung gibt es kein
+`python`, das Skript endete vorher mit „command not found"; jetzt hat die Probe einen `python`-Stub.
+
+**Offen / nächster Schritt.** **Block 2** (Fehler, Parität, Regel: BG-1, RE-1, RE-2, P10-I, AL-1) —
+Zeile 15 (AL-1) bleibt Nikinger-Arbeit. Beim Nikinger offen: der Caddy-Befehl auf der VPS (Fleet
+wartet auf eine Einzelfreigabe) — **von Sharefyx wird dort nichts gebraucht**: die Live-Config trägt
+die Werte bereits, und die Quelle zieht jetzt nach.
+
 ## Session stopped — 2026-10-22 (erster Block: Block 0 — Haushalt und Vorbereitung, **abgeschlossen**)
 
 **Ergebnis.** Block 0 abgeschlossen, **DO-2 vollständig erledigt:** Karte `docs/INDEX.md` 37.946 B (3.014 B Luft gegen 40.960 B, vorher 188 B), Register 37.574 B (3.386 B Luft, vorher 6 B), ROADMAP-Wächter P9-6 eingefroren. **Ein Plan-Befund:** der Hebel des Plans (die acht Abschnittsköpfe, zusammen 2.478 B) hätte allein **nicht** gereicht — die geforderten 3.000 B waren daraus nicht erreichbar; der Zielwert blieb, der Hebel wurde erweitert (zwei Abweichungen im Plan-Nachtrag).
