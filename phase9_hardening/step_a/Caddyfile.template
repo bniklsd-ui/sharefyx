@@ -62,7 +62,32 @@
 	# 127.0.0.1). Die IP ist hier der eindeutigere Wert als der Name: sie ist die, auf die das
 	# Relay bindet (TAILNET_ADDR, Wächter test_tail_proxy.py), und nach einem Tailnet-Wechsel
 	# wandert genau sie, nicht der Name.
-	reverse_proxy <heimvm-tailnet>:8765
+	#
+	# [2026-10-22, P10.5 Block 1, Schritt 1.2 — BT-1, D-10] Der Upstream trägt jetzt einen
+	# **Block** mit den drei Wartezeiten. Grund, gemessen am 2026-10-13 von eurofyx-fleet
+	# (Session S9, `intake.md` §7): der Fleet-Wächter auf der VPS meldete um 04:30 DOWN und um
+	# 04:40 wieder UP, im Caddy-Log standen `dial tcp <Heim-VM>:8765: i/o timeout`. Ursache:
+	# VPS und Heim-VM erreichen sich **nie direkt**, nur über Tailscale-DERP-Relays, und der
+	# Verbindungsaufbau brauchte länger als Caddys Standard-`dial_timeout` von 3 s. Fleet hat
+	# die Live-Config am selben Tag umgestellt — die **Quelle hier im Repo trug aber weiter die
+	# Einzeilenform**, also wäre der Fix beim nächsten Einspielen zurückgenommen worden.
+	#
+	# Die Werte sind **V199**, am 2026-10-22 auf der VPS live gemessen (Block 1.1) und nicht
+	# aus dem Plan übernommen: `dial_timeout` 10000000000 ns (10 s), `try_duration`
+	# 15000000000 ns (15 s), `try_interval` 1000000000 ns (1 s). Weicht die Live-Config später
+	# ab, zieht **sie** nach, nicht diese Datei.
+	#
+	# **Nicht** mit `caddy validate` geprüft: Caddy ist auf der VM nicht installiert, und die
+	# Einzeilenform oben wurde am 2026-10-01 gegen 2.6.2 validiert, die **Blockform nicht**.
+	# Geprüft ist sie gegen die Live-Konfiguration der VPS (V199) und durch den Wächter
+	# `test_the_upstream_block_carries_the_fleet_timeouts` (Struktur und Werte).
+	reverse_proxy <heimvm-tailnet>:8765 {
+		transport http {
+			dial_timeout 10s
+		}
+		lb_try_duration 15s
+		lb_try_interval 1s
+	}
 
 	# Innerhalb des WireGuard-Tunnels ist Klartexttransport unkritisch — die Uebertragung
 	# ist bereits durch das Tailnet verschluesselt. Bewusst kein mTLS und kein

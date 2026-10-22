@@ -27,6 +27,13 @@ einsetzt, proxt Caddy auf sich selbst und der Fehler sieht in A4 wie ein totes R
  10. test_the_upstream_port_is_the_relay_port
  11. test_no_second_hsts_header_and_no_admin_off
 
+Dazu ein Wächter für die Wartezeiten (2026-10-22, P10.5 Block 1, Schritt 1.2 — BT-1). Die
+Vorlage trug die Einzeilenform, während die Live-Konfiguration seit dem 2026-10-13 einen Block
+mit `dial_timeout 10s`, `lb_try_duration 15s` und `lb_try_interval 1s` trug — wer die Quelle
+einspielte, hätte den Fix zurückgenommen. Der Wächter macht genau das rot.
+
+ 12. test_the_upstream_block_carries_the_fleet_timeouts
+
 Kein Netz, kein Dienst, kein root — alles statisch gegen die Dateien im Repo. Die
 VPS-seitigen Artefakte (Caddyfile-Vorlage, ACL-Entwurf) haben je einen Wächter, weil ein
 Fehler dort still ist: ein zu weit gefasster ACL-Entwurf scheitert erst am Deploy.
@@ -347,8 +354,8 @@ def test_the_upstream_placeholder_names_the_home_vm():
         "reverse_proxy benutzt den alten Platzhalter nicht (Ziel ist die Heim-VM, nicht der VPS)"
     assert "<heimvm-tailnet>" in announced, \
         "der Kopf kündigt <heimvm-tailnet> nicht als Wert an — das war der Fund vom 2026-10-01"
-    assert re.search(r"^\s*reverse_proxy\s+<heimvm-tailnet>:(\d+)\s*$", config, re.MULTILINE), \
-        "reverse_proxy muss auf <heimvm-tailnet>:<port> zeigen"
+    assert re.search(r"^\s*reverse_proxy\s+<heimvm-tailnet>:(\d+)\s*\{?\s*$", config, re.MULTILINE), \
+        "reverse_proxy muss auf <heimvm-tailnet>:<port> zeigen (mit oder ohne Block)"
 
 
 def test_the_template_and_its_header_name_the_same_placeholders():
@@ -378,7 +385,7 @@ def test_the_upstream_port_is_the_relay_port():
     """
     _, body = _caddy_split()
     port = re.search(
-        r"^\s*reverse_proxy\s+<heimvm-tailnet>:(\d+)\s*$",
+        r"^\s*reverse_proxy\s+<heimvm-tailnet>:(\d+)\s*\{?\s*$",
         _directives_only(body),
         re.MULTILINE,
     )
@@ -442,8 +449,91 @@ def test_the_substituted_template_has_no_placeholder_left():
     config = _directives_only(substituted.partition("\n{\n")[2])
     assert "<" not in config, \
         "nach dem Einsetzen steht noch ein Platzhalter in der Anweisung — welche Angabe fehlt?"
-    assert "reverse_proxy 100.93.43.122:8765" in config, \
-        "nach dem Einsetzen muss `reverse_proxy 100.93.43.122:8765` dastehen"
+    upstream = [
+        line.strip() for line in config.splitlines()
+        if line.strip().startswith("reverse_proxy ")
+    ]
+    assert upstream, "nach dem Einsetzen gibt es keine reverse_proxy-Zeile"
+    # [2026-10-22, P10.5 Block 1, Schritt 1.2] Die Zeile trägt jetzt einen Block, also ist
+    # `reverse_proxy 100.93.43.122:8765` der **Präfix** der Zeile, nicht die ganze Zeile.
+    assert upstream[0].startswith("reverse_proxy 100.93.43.122:8765"), \
+        f"nach dem Einsetzen muss die Zeile mit `reverse_proxy 100.93.43.122:8765` beginnen, ist {upstream[0]!r}"
     assert "/healthz" not in config, \
         "/healthz gibt es nicht (app.py:220) — Befund 2; hier wird der Pfad konfiguriert, " \
         "nicht im Kommentar erklärt"
+
+
+# --- Wächter für die Wartezeiten (2026-10-22, P10.5 Block 1, Schritt 1.2 — BT-1) ----
+
+def _caddy_directives() -> list[str]:
+    """Die Anweisungen der Vorlage als Zeilen — ohne Kommentare, ohne Leerzeilen."""
+    _, body = _caddy_split()
+    return [line for line in _directives_only(body).splitlines() if line.strip()]
+
+
+def _block_opening_at(lines: list[str], index: int) -> list[str]:
+    """Der Block, den `lines[index]` oeffnet — per Klammerzaehlung.
+
+    Zeilenweise zu zaehlen waere falsch: der `transport http`-Block liegt **innerhalb** des
+    `reverse_proxy`-Blocks. Die Klammerzaehlung ist die Form, die Caddy selbst parst.
+    """
+    depth = 0
+    block: list[str] = []
+    for line in lines[index:]:
+        depth += line.count("{") - line.count("}")
+        block.append(line)
+        if depth <= 0:
+            break
+    return block
+
+
+def test_the_upstream_block_carries_the_fleet_timeouts():
+    """Der Upstream-Block traegt die drei Wartezeiten (BT-1, D-10).
+
+    [2026-10-13, gemessen von eurofyx-fleet, Session S9 — `intake.md` §7] Der Fleet-Waechter
+    auf der VPS meldete um 04:30 DOWN und um 04:40 wieder UP; im Caddy-Log standen
+    `dial tcp <Heim-VM>:8765: i/o timeout`. Ursache: VPS und Heim-VM erreichen sich **nie
+    direkt**, nur ueber Tailscale-DERP-Relays, und der Verbindungsaufbau brauchte laenger als
+    Caddys Standard-`dial_timeout` von 3 s. Fleet hat die Live-Config am selben Tag umgestellt.
+
+    Die **Quelle** im Repo trug aber weiter die Einzeilenform — wer sie einspielte, haette den
+    Fix zurueckgenommen. Dieser Waechter verhindert genau das: die alte Einzeilenform macht ihn
+    rot.
+
+    Die Werte sind **V199** (Block 1.1): am 2026-10-22 auf der VPS live gemessen —
+    `dial_timeout` 10000000000 ns, `try_duration` 15000000000 ns, `try_interval` 1000000000 ns.
+    """
+    lines = _caddy_directives()
+    start = next(
+        (i for i, line in enumerate(lines) if re.match(r"^\s*reverse_proxy\s", line)),
+        None,
+    )
+    assert start is not None, "keine reverse_proxy-Anweisung in der Vorlage"
+    block = _block_opening_at(lines, start)
+    text = "\n".join(block)
+
+    assert block[0].rstrip().endswith("{"), \
+        "reverse_proxy muss einen Block oeffnen — die Einzeilenform traegt keine Wartezeiten"
+
+    transport = next(
+        (i for i, line in enumerate(block) if re.match(r"^\s*transport\s+http\s*\{\s*$", line)),
+        None,
+    )
+    assert transport is not None, \
+        "der Block braucht den `transport http`-Unterblock — `dial_timeout` gehoert dort hinein"
+    inner = _block_opening_at(block, transport)
+
+    assert any(re.match(r"^\s*dial_timeout\s+10s\s*$", line) for line in inner), \
+        "dial_timeout 10s (V199) fehlt im transport-Block"
+    assert any(re.match(r"^\s*lb_try_duration\s+15s\s*$", line) for line in block), \
+        "lb_try_duration 15s (V199) fehlt im reverse_proxy-Block"
+    assert any(re.match(r"^\s*lb_try_interval\s+1s\s*$", line) for line in block), \
+        "lb_try_interval 1s (V199) fehlt im reverse_proxy-Block"
+
+    # Und jede der drei Direktiven genau einmal in der ganzen Vorlage: ein zweiter Satz
+    # ausserhalb des Blocks waere eine zweite Wahrheit an derselben Stelle.
+    for directive in ("dial_timeout", "lb_try_duration", "lb_try_interval"):
+        occurrences = [line for line in lines if directive in line]
+        assert len(occurrences) == 1, \
+            f"{directive} steht {len(occurrences)}-mal in der Vorlage — erwartet genau einmal, " \
+            f"im Upstream-Block: {occurrences}"
