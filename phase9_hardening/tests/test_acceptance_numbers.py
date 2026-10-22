@@ -42,8 +42,11 @@ schnellsten altert.
 """
 import importlib.util
 import re
+import shutil
 import sys
 from pathlib import Path
+
+import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -329,7 +332,10 @@ def test_the_live_byte_figures_in_the_matrix_are_the_real_sizes():
     Matrix soll nicht strenger sein als die Regel, die ohnehin für dieselbe Zahl gilt. Der Fehler,
     um den es geht, lag bei 8.249 B und bleibt darin rot.
     """
-    for prefix, path in (("| **P9-3**", INDEX), ("| V145 |", INDEX), ("| **P9-6**", REPO_ROOT / "ROADMAP.md")):
+    # **P9-6 ist seit 2026-10-22 aus dieser Schleife** (P10.5 Block 0, Schritt 0.4; D-17, DO-2):
+    # die Zeile ist **geschlossen** und koppelt eine Momentaufnahme an eine **lebende** Groesse —
+    # siehe `test_the_closed_p9_6_row_keeps_its_frozen_figure`.
+    for prefix, path in (("| **P9-3**", INDEX), ("| V145 |", INDEX)):
         size = path.stat().st_size
         assert _has_figure_near(_row(prefix), size, SIZE_TOLERANCE_BYTES), (
             f"die Zeile {prefix!r} nennt keine Bytezahl im ±{SIZE_TOLERANCE_BYTES}-B-Band zur heutigen "
@@ -355,6 +361,44 @@ def test_the_live_byte_figures_in_the_matrix_are_the_real_sizes():
         "Nachtraege gehoeren nach docs/INDEX_ENTRIES_ARCHIVE.md (scripts/archive_index_entries.sh), "
         "nicht in die Kartenzeilen."
     )
+
+
+def test_the_closed_p9_6_row_keeps_its_frozen_figure():
+    """P9-6 ist geschlossen; seine Zahl ist eine Momentaufnahme vom 2026-10-07, keine Live-Groesse --
+    eingefroren in P10.5 Block 0 (D-17, DO-2).
+
+    **Was hier passiert ist.** Die Zeile P9-6 ("Die `ROADMAP.md`-INDEX-Zeile nennt die reale Groesse")
+    koppelt eine **geschlossene** Abnahme an die **lebende** Groesse von `ROADMAP.md` -- im Band
+    +-2.048 B um die am 2026-10-07 gemessenen 35.677 B, also bis 37.725 B. `ROADMAP.md` waechst aber
+    mit jeder Phase: die P10.5-Zeile hat den Reigen am 2026-10-21 bis auf 37.055 B getrieben
+    (DO-2), und die naechste Zeile haette das Band gerissen. Ein Waechter, der eine geschlossene
+    Zeile an eine lebende Dateigroesse koppelt, misst danach nicht mehr die Abnahme, sondern den
+    Zufall -- und wird beim ersten Drift rot, ohne dass jemand etwas kaputt gemacht haette.
+
+    **Deshalb:** die Zahl bleibt, wie sie am 2026-10-07 gemessen war. Wer sie "pflegt", pflegt eine
+    Momentaufnahme und nennt sie den Stand; genau das ist der P9-6-Fall. **P9-3 und V145 bleiben in
+    der Live-Schleife** -- sie messen `docs/INDEX.md`, und die Karte steht jetzt weit genug unter dem
+    Softcap, dass ihr Band haelt (40.960 B Kriterium, `test_index_archive.py`).
+    """
+    assert "35.677 B" in _row("| **P9-6**")
+
+
+def test_the_frozen_p9_6_figure_rejects_a_wrong_number(tmp_path, monkeypatch):
+    """Gegenprobe (Abnahme P10.5-2): eine absichtlich falsche P9-6-Zahl in einer Kopie macht den
+    eingefrorenen Test **rot**. Ein eingefrorener Wert, der bei jeder falschen Zahl gruen bleibt,
+    prueft nichts -- und das ist der Unterschied zwischen "eingefroren" und "vergessen"."""
+    parts = []
+    for part in MATRIX_PARTS:
+        copy = tmp_path / part.name
+        shutil.copy(part, copy)
+        parts.append(copy)
+    target = next(p for p in parts if "| **P9-6**" in p.read_text(encoding="utf-8"))
+    text = target.read_text(encoding="utf-8")
+    assert text.count("35.677 B") == 1, "die P9-6-Zahl kommt nicht genau einmal vor"
+    target.write_text(text.replace("35.677 B", "35.678 B"), encoding="utf-8")
+    monkeypatch.setattr(sys.modules[__name__], "MATRIX_PARTS", tuple(parts))
+    with pytest.raises(AssertionError):
+        test_the_closed_p9_6_row_keeps_its_frozen_figure()
 
 
 def test_the_nightrags_stay_archived_and_the_row_keeps_its_derivation():
