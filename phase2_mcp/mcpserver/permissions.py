@@ -83,8 +83,7 @@ class SharePolicy:
     #
     # Diese vier Methoden sind die **eine** Regel für Web und MCP (D-17, Lock P10.5-N): vorher
     # kannte die Web-Oberfläche „Team-Space" über die Auth-DB (REST-Adapter, `api.py ::
-    # _is_team_space`)
-    # und die Agentenfläche gar nicht — zwei Wege, zwei Regeln.
+    # _is_team_space`) und die Agentenfläche gar nicht — zwei Wege, zwei Regeln.
 
     def is_home_space(self, space: str) -> bool:
         """Gehört `space` einem Nutzer? Ohne Prädikat **immer `False`** — die Policy kennt
