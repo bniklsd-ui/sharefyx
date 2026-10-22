@@ -2561,3 +2561,52 @@ body.has-update-banner .shell { height: calc(100vh - var(--banner-h)); margin-to
     background: var(--surface-raised);
   }
 }
+
+/* -- Ladezustand (P10.5, Block 4, 2026-10-22, Z3/Z4) ---------------------------------------
+   Das Gerüst entsteht rein aus CSS: `loading.js` setzt nur die Klasse `is-loading`, es
+   schreibt **keinen Text** in die Oberflaeche. Damit kann der Platzhalter per Bauart keine
+   Versionsangabe tragen (P10.5-S) — die Versionsleiste des Editors bleibt unberuehrt, und
+   aus einem Ladezustand kann nie eine `version` in einen Write geraten.
+
+   Zwei Regeln:
+     1. Unterhalb von 200 ms gibt es **kein** Flackern — die Klasse wird erst nach der
+        Wartezeit gesetzt (Plan Block 4, Schritt 4.4).
+     2. Bei `prefers-reduced-motion: reduce` ist das Geruest **statisch**: keine Animation,
+        kein Schimmer. Dasselbe Prinzip wie beim Graphen (Plan §5 D2, `MAX_TICKS_REDUCED`).
+
+   Das Geruest liegt als `::after` ueber dem Container und faellt nicht in den Fluss: der
+   alte Inhalt bleibt sichtbar (abgeblendet) und die Hoehe springt nicht. */
+.is-loading {
+  position: relative;
+}
+.is-loading::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  min-height: 96px;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(180deg,
+      rgba(255, 255, 255, .05) 0 10px,
+      transparent 10px 22px),
+    linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, .06) 50%,
+      transparent 100%);
+  background-size: 100% 100%, 300% 100%;
+  animation: sfx-shimmer 1.6s linear infinite;
+}
+@keyframes sfx-shimmer {
+  from { background-position: 0 0, 150% 0; }
+  to   { background-position: 0 0, -150% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-loading::after {
+    animation: none;
+    background-image: repeating-linear-gradient(180deg,
+      rgba(255, 255, 255, .05) 0 10px,
+      transparent 10px 22px);
+  }
+}

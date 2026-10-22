@@ -399,10 +399,25 @@ function initShell() {
   // vorgeschlagenen 5s: jeder Aufruf kostet einen `search()` je Bucket UND sichtbarem Space
   // (`api.py :: _overview()`), 5s wäre für einen Zwei-Personen-Server unnötig oft. Pausiert,
   // solange der Tab nicht sichtbar ist, holt dafür sofort bei Rückkehr/Fokus nach.
+  //
+  // P10.5, Block 4 (2026-10-22, PF-4): der Intervall bleibt bei 20 s, aber `focus` und
+  // `visibilitychange` bekommen eine **Mindestpause von 10 s**. Vorher feuerte jeder
+  // Tab-Wechsel sofort einen `/overview` — auf der langsamen Strecke (M1: 4,8 s) stapelten
+  // sich die Anfragen, und ein Space-Wechsel wartete dann hinter dem eigenen Poll (Z2).
   var COUNTER_POLL_MS = 20000;
+  var COUNTER_MIN_PAUSE_MS = 10000;
+  var lastPollAt = 0;
 
-  function pollCounters() {
+  function pollCounters(options) {
     if (document.hidden) return;
+    var now = Date.now();
+    // Nur die Auslöser `focus`/`visibilitychange` werden gedrosselt; der Intervall (20 s)
+    // hält die Mindestpause von 10 s ohnehin ein. `lastPollAt` wird bei **jedem** Poll
+    // gesetzt — auch beim Intervall —, sonst würde die Pause seit dem letzten echten Poll
+    // gemessen und nicht seit dem letzten Abruf.
+    var throttled = options && options.throttle;
+    if (throttled && now - lastPollAt < COUNTER_MIN_PAUSE_MS) return;
+    lastPollAt = now;
     // P9 Step E (Plan §7.2a): dieses `/overview` ist zugleich die Signatur für den Graphen
     // (`state.graphToken`, gesetzt in `list.js`). Der Poll läuft alle 20 s, bei Fokus und bei
     // Rückkehr in den Tab — der Home-Knopf weiß dadurch ohne eigenen Abruf, ob sich seit dem
@@ -410,11 +425,11 @@ function initShell() {
     List.loadOverview().catch(reportUnexpectedError);
   }
 
-  window.setInterval(pollCounters, COUNTER_POLL_MS);
+  window.setInterval(function () { pollCounters(); }, COUNTER_POLL_MS);
   document.addEventListener("visibilitychange", function () {
-    if (!document.hidden) pollCounters();
+    if (!document.hidden) pollCounters({ throttle: true });
   });
-  window.addEventListener("focus", pollCounters);
+  window.addEventListener("focus", function () { pollCounters({ throttle: true }); });
 
   // -- Update-Banner (P6 Step 3) -----------------------------------------------------------
   initUpdates();

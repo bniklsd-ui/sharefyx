@@ -33,6 +33,7 @@
 import { api, reportUnexpectedError } from "./api.js";
 import { spaceCategory, state } from "./state.js";
 import { selectItem } from "./editor.js";
+import { withLoading } from "./loading.js";
 
 var nodes = [];
 var explicitEdges = [];   // {src, dst, kind} -- vom Server (frontmatter|body)
@@ -41,6 +42,8 @@ var nodeById = Object.create(null);
 
 var canvasEl = null;
 var ctx = null;
+// P10.5, Block 4 (2026-10-22, Z4): der Container der Karte traegt den Ladezustand.
+var graphEl = null;
 var cssWidth = 0;
 var cssHeight = 0;
 var dpr = 1;
@@ -130,6 +133,7 @@ const COLORS = Object.freeze({
 });
 
 export function init() {
+  graphEl = document.getElementById("overview-graph");
   canvasEl = document.getElementById("overview-graph-canvas");
   if (!canvasEl) return;        // /ui/ ist session-gated -- /ui/login rendert ohne #detail-graph
   ctx = canvasEl.getContext("2d");
@@ -190,7 +194,9 @@ export function loadGraph(opts) {
     redrawAfterReentry();
     return Promise.resolve();
   }
-  return api("/graph").then(function (data) {
+  // P10.5, Block 4 (2026-10-22, Z4): der Ladezustand ab 200 ms — die Karte holt ihre
+  // Knoten in einem Abruf, der auf der langsamen Strecke (M1) Sekunden braucht.
+  return withLoading(graphEl, api("/graph")).then(function (data) {
     var previousById = nodeById;
     nodes = (data.nodes || []).map(function (n) {
       // (b) P9-34: eine bekannte ID behält x/y. Vorher bekam **jeder** Knoten `x: 0, y: 0`, und

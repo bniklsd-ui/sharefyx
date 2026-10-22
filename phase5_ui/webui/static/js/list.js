@@ -9,6 +9,7 @@ import { navigate, renderRail, bucketNames, activateView } from "./tree.js";
 import { selectItem, closeEditor } from "./editor.js";
 import { openMoveDialog, openShareDialog, openTrashDialog } from "./dialogs.js";
 import { iconSvg } from "./icons.js";
+import { withLoading } from "./loading.js";
 
 var listCrumbEl;
 var listReadonlyEl;
@@ -175,19 +176,12 @@ export function openFromOverview(spaceName, item) {
 }
 
 export function loadOverview() {
-  // `/overview` trägt die Zähler/„Zuletzt benutzt"; `/spaces` trägt `folders`/`members` (Step 7
-  // Commit 1) — kein neuer Endpunkt, nur ein zweiter, paralleler Aufruf und ein Merge nach Name.
-  // Beide Routen filtern über dieselbe `_visible_space_infos()`, jeder Eintrag aus `/overview`
-  // hat also eine passende `/spaces`-Zeile; der Fallback greift nur defensiv.
-  return Promise.all([api("/overview"), api("/spaces")]).then(function (results) {
-    var overview = results[0];
-    var byName = {};
-    results[1].forEach(function (s) { byName[s.name] = s; });
-    overview.forEach(function (s) {
-      var extra = byName[s.name];
-      s.folders = extra ? extra.folders : [];
-      s.members = extra ? extra.members : [];
-    });
+  // P10.5, Block 4 (2026-10-22, PF-4): **ein** Request statt zweier. `/overview` trägt jetzt
+  // auch `folders`/`members` (Schritt 4.1 im Server), der parallele Aufruf auf `/spaces` und
+  // der Merge nach Name entfallen. Vorher stand hier
+  // `Promise.all([api("/overview"), api("/spaces")])` — das war ein zweiter Vollabruf, und auf
+  // der langsamen Strecke (M1: 4,8 s) die doppelte Arbeit.
+  return withLoading(listOverviewEl, api("/overview")).then(function (overview) {
     state.spaces = overview;
     // **BG-1 (P10.5, Block 2, 2026-10-22):** der Weg über ein **Ereignis**, nicht über einen
     // Import — `spaces.js` importiert `loadOverview()` aus dieser Datei, ein Import zurück wäre
@@ -576,7 +570,7 @@ export function loadItems() {
   var params = new URLSearchParams(filterParams());
   if (state.activeSpace && !isGlobalScope()) params.set("space", state.activeSpace);
   if (state.query) params.set("query", state.query);
-  return api("/items?" + params.toString()).then(function (result) {
+  return withLoading(listRowsEl, api("/items?" + params.toString())).then(function (result) {
     state.items = result.items;
     // Phase 8.6 Block C C5 (Plan §5.5 V117): nach jedem loadItems wird das Rail neu gerendert,
     // damit die Folder-Zähler (`tree.js :: folderButton()`) die frischen Items sehen.
@@ -642,4 +636,14 @@ export function init() {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(function () { loadItems().catch(reportUnexpectedError); }, 200);
   });
+
+  // P10.5, Block 4 (2026-10-22, Z3): der Listen-Slot **vor** dem ersten Abruf in den
+  // Übersichts-Zustand setzen. Vorher stand `#list-overview` bis zum ersten
+  // `renderListSlot()` auf `hidden` — der Ladezustand (`loading.js`) hätte in diesem Zustand
+  // nichts anzuzeigen, und die Shell wäre bis zum ersten Durchlauf leer (Z3: das Gerüst steht
+  // in ≤ 1 s). `state.overview` ist Default `true`, `state.scope` Default `"space"` —
+  // `renderListSlot()` schaltet also genau den Zustand, der ohnehin kommt. `renderOverview()`
+  // läuft mit leerem `state.spaces` ins Leere und kehrt früh zurück (es braucht `state.meta`
+  // erst weiter unten).
+  renderListSlot();
 }

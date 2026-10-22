@@ -10,8 +10,11 @@ import { loadItems, loadOverview, renderList, renderListSlot } from "./list.js";
 import { renderRail } from "./tree.js";
 import { confirmDialog, showConflictDialog, openLinkPicker } from "./dialogs.js";
 import { iconSvg } from "./icons.js";
+import { withLoading } from "./loading.js";
 
 var shellEl;
+// P10.5, Block 4 (2026-10-22, Z4): der Detail-Slot traegt den Ladezustand beim Oeffnen.
+var detailEl;
 // Phase 8.6 Plan 2 Block G G5: das, was in Block C `overviewEl` hieß (#detail-overview, der
 // Wrapper um Spaces + Graph), ist nach dem Umzug nur noch die Karte. Das DOM-Element heißt
 // jetzt `#detail-graph`; die Spaces-Übersicht lebt in `#list-overview` und wird von
@@ -485,7 +488,9 @@ export function selectItem(id) {
   state.selectedId = id;
   // Phase 8.6 Plan 2 Block G G4 (V128): Slot-schaltend rendern.
   renderListSlot();
-  return api("/items/" + encodeURIComponent(id)).then(function (item) {
+  // P10.5, Block 4 (2026-10-22, Z4): der Ladezustand ab 200 ms. Der Abruf holt das Item,
+  // der Slot zeigt bis dahin den vorigen Stand — ohne Geruest sieht das aus wie ein Hanger.
+  return withLoading(detailEl, api("/items/" + encodeURIComponent(id))).then(function (item) {
     return loadEditorFromItem(item);
   });
 }
@@ -560,6 +565,7 @@ export function saveItem() {
 
 export function init() {
   shellEl = document.getElementById("shell");
+  detailEl = document.getElementById("detail");
   // Phase 8.6 Plan 2 Block G G5: `#detail-overview` (Block-C-Name) wurde in G2 zu
   // `#list-overview` (im Listen-Slot) und `#detail-graph` (im Detail-Slot, die Karte).
   // `graphPaneEl` ist die Karte, weil das, was `showOverviewPane()` zeigt, seit G5
