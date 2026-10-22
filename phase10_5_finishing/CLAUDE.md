@@ -177,6 +177,14 @@ Hintertür. Deshalb steht P10.5-9 auf ⚠️.
 
 **Offen / nächster Schritt.**
 - **Nikinger:** Den Befund schließen (`create_item`/`POST /items` mit neuem Ordner nur, wenn
-  `manages_space()`)? Das ist Code in `tools.py`/`api.py`.
+  `manages_space()`)? Das ist Code in `tools.py`/`api.py`. Bremst Block 3 nicht.
 - **Nikinger:** Die offene Frage zu `ui_budget.py`/`ui_smoke.py` ohne Home-Space-Prädikat.
-- **Ausführer:** Block 3 (LG-8/P1-15, LG-7), danach Block 4.
+- **Ausführer (opencode) — Block 3, Startauftrag** (Plan „Block 3", §2.1–§2.2):
+  - Vorher: `limit.context` ≤ 400.000 prüfen · `git status` sauber · Blockbasis = HEAD.
+  - **Angekündigt hiermit (2026-10-22): P1-Öffnung 15:** `files.strip_image_metadata()` + Aufruf in
+    `Store.put_asset()`. Keine weitere Datei unter `phase1_storage/storage/`.
+  - 3.1 `strip_image_metadata(data, mime)` in `files.py` (JPEG/PNG/WebP, GIF unverändert,
+    fail-closed `ValidationError`) · 3.2 Aufruf in `put_asset()` nach `sniff_image_mime()`
+    (heute **`store.py:943`**, Plan sagt 944) · 3.3 `scripts/asset_orphans.py`
+    (Docstring V162 heute `store.py:1045`) · Tests nach Plan 3.4, Fixtures als Bytes.
+  - Proben P10.5-12/13 (Wegwerf) macht danach Claude Code.
