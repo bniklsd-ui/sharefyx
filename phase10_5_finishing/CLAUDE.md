@@ -9,7 +9,7 @@ down:
   - ../phase10_inventory/BAUSTELLENREGISTER.md      # 📗 die Arbeitsliste — hier wird abgehakt (P10-B)
   - ../phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md  # 📦 §12 Entscheidungsliste D-1–D-18, verbatim
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
-updated: 2026-10-22 (Block 5 **abgeschlossen** — `fastmcp==4.1.3` + neu erzeugte `constraints.txt`, Suite 1354 grün mit Compat an und aus, `append_to_items` (LG-4) + Log-Feld `proto`, Protokoll-Probe beider Ären, Smoke 17/17; Abnahme 10-19/20/21 ✅, 10-22 beim Nikinger nach Deploy B) | 2026-10-22 (Block 4 **abgeschlossen** — Schritt 4.6: M2-Bench **Median 107,3 ms** (Z1 ≤ 300 ms), Event-Loop-Probe `/health` hinter `/overview` **23 ms** (P10: 4757 ms), Browser-Probe Z2/Z3/Z4 (150 ms → kein Platzhalter, 400 ms → Platzhalter); Abnahme 10-14/15/16/17 ✅, 10-18 bleibt beim Nikinger nach Deploy A) | 2026-10-22 (Block 4 Schritte 4.3/4.4: der Client holt nur noch `/overview`, `focus`/`visibilitychange` bekommen 10 s Mindestpause (PF-4) · neu `static/js/loading.js` (`withLoading`, 200 ms) + `.is-loading`-Gerüst in `app.css`, statisch unter `prefers-reduced-motion` (Z3/Z4) · 7 Wächter in `phase5_ui/tests/test_loading_state.py`) | 2026-10-22 (Block 4 Schritte 4.1/4.2: `_overview()` in **einem** `store.search()`-Durchgang (P10.5-G) + `asyncio.to_thread` in `_overview`/`_items_get`/`_graph_get` (Z2); 4 neue Tests (Parität, Rückfall, folders/members, Event-Loop) + 5 Gegenläufe; Suite 1334 grün) | 2026-10-22 (Block 3 Schritte 3.3–3.4: `scripts/asset_orphans.py` (LG-7) + 7 Tests + Wegwerf-Probe `p105_b3_assets_probe.py` **14/14 Zellen** — Abnahme 10-12/10-13 ✅) | 2026-10-22 (Block 3 Schritt 3.2: `Store.put_asset()` ruft den Stripper — **eine** Stelle für Web und MCP; die Dummy-PNG-Fixtures mussten zu echten Bytes werden) | 2026-10-22 (Block 3 Schritt 3.1: `files.strip_image_metadata()` — JPEG/PNG/WebP, GIF unverändert, fail-closed; 8 neue Tests) | 2026-10-22 (Block-2-Nachzug: Item mit **neuem Ordner** im fremden Home-Space ist jetzt auf Web **und** MCP gesperrt (Nikinger-Entscheidung 2026-10-22) — P10.5-9 ⚠️ → ✅; `ui_budget.py`/`ui_smoke.py` haben das Home-Space-Prädikat, die `team`-Flags stimmen) | 2026-10-22 (Block 2.5 — Proben Web × MCP 28/28, M4 BG-1 behoben; Block 2 ✅, Abnahme 10-8/10/9 ✅, 10-9 ⚠️ (Befund: neuer Ordner per Item-Anlage im fremden Home-Space)) | 2026-10-22 (Block 2 Schritte 2.1–2.4 gebaut — eine Regel für Web und MCP (RE-1/RE-2/P10-I/P10.5-N) und BG-1; **2.5 Proben offen, Claude Code**; Suite 1299 grün) | 2026-10-22 (Block 2 Schritte 2.1–2.2: eine Regel für Web und MCP — SharePolicy mit Home-Space-Prädikat, RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N beide Richtungen; Suite 1296 grün) | 2026-10-22 (Block 2 Schritt 2.1: SharePolicy kennt Home-Spaces und Team-Spaces, Prädikat aus der Auth-DB, eine Regel für Web und MCP) | 2026-10-22 (Block 1 **abgeschlossen**: V200 vom Fleet-Lauf belegt — Unit installiert, `Result=success`, 0 failed units; Abnahme 10-5/6/7 ✅) | 2026-10-22 (Block 1 Schritte 1.1/1.2: BT-1 — Caddy-Vorlage in Blockform mit den V199-Live-Werten (10s/15s/1s) + neuer Waechter; Abnahme 10-5 auf ✅) | 2026-10-22 (Block 1 Schritt 1.4: BT-6 — `constraints.txt` aus dem Live-Freeze, `scripts/dev_install.sh` mit `-c`, zwei Wächter, Dev-venv neu; Suite 1282 gruen auf den Live-Versionen) | 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in der Relay-Unit, Wächter 13/13, vier Gegenläufe; Block-0-Block rotiert) | 2026-10-22 (Block 0 **abgeschlossen**: 0.6 ROADMAP-Zeile P10.5 auf 🔄, 0.7 Ausführer-Vorbedingung protokolliert — Abnahme P10.5-1–4 ✅) | 2026-10-22 (Block 0: 0.2/0.3 — Phase-Head angelegt (Modulstatus, Deploy-Tabelle, Abnahmestand 61 Zeilen), DO-3-Wächter, `pytest.ini` ergänzt; davor 0.4 (ROADMAP-Wächter eingefroren), 0.5 (INDEX-Luft) und 0.8 (Register-Luft) gebaut — DO-2 vollständig; erster Block)
+updated: 2026-10-22 (Block 6 ✅ — Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6; V209/V197 gemessen, Suite 1374 grün) | 2026-10-22 (Block 5 **abgeschlossen** — `fastmcp==4.1.3` + neu erzeugte `constraints.txt`, Suite 1354 grün mit Compat an und aus, `append_to_items` (LG-4) + Log-Feld `proto`, Protokoll-Probe beider Ären, Smoke 17/17; Abnahme 10-19/20/21 ✅, 10-22 beim Nikinger nach Deploy B) | 2026-10-22 (Block 4 **abgeschlossen** — Schritt 4.6: M2-Bench **Median 107,3 ms** (Z1 ≤ 300 ms), Event-Loop-Probe `/health` hinter `/overview` **23 ms** (P10: 4757 ms), Browser-Probe Z2/Z3/Z4 (150 ms → kein Platzhalter, 400 ms → Platzhalter); Abnahme 10-14/15/16/17 ✅, 10-18 bleibt beim Nikinger nach Deploy A) | 2026-10-22 (Block 4 Schritte 4.3/4.4: der Client holt nur noch `/overview`, `focus`/`visibilitychange` bekommen 10 s Mindestpause (PF-4) · neu `static/js/loading.js` (`withLoading`, 200 ms) + `.is-loading`-Gerüst in `app.css`, statisch unter `prefers-reduced-motion` (Z3/Z4) · 7 Wächter in `phase5_ui/tests/test_loading_state.py`) | 2026-10-22 (Block 4 Schritte 4.1/4.2: `_overview()` in **einem** `store.search()`-Durchgang (P10.5-G) + `asyncio.to_thread` in `_overview`/`_items_get`/`_graph_get` (Z2); 4 neue Tests (Parität, Rückfall, folders/members, Event-Loop) + 5 Gegenläufe; Suite 1334 grün) | 2026-10-22 (Block 3 Schritte 3.3–3.4: `scripts/asset_orphans.py` (LG-7) + 7 Tests + Wegwerf-Probe `p105_b3_assets_probe.py` **14/14 Zellen** — Abnahme 10-12/10-13 ✅) | 2026-10-22 (Block 3 Schritt 3.2: `Store.put_asset()` ruft den Stripper — **eine** Stelle für Web und MCP; die Dummy-PNG-Fixtures mussten zu echten Bytes werden) | 2026-10-22 (Block 3 Schritt 3.1: `files.strip_image_metadata()` — JPEG/PNG/WebP, GIF unverändert, fail-closed; 8 neue Tests) | 2026-10-22 (Block-2-Nachzug: Item mit **neuem Ordner** im fremden Home-Space ist jetzt auf Web **und** MCP gesperrt (Nikinger-Entscheidung 2026-10-22) — P10.5-9 ⚠️ → ✅; `ui_budget.py`/`ui_smoke.py` haben das Home-Space-Prädikat, die `team`-Flags stimmen) | 2026-10-22 (Block 2.5 — Proben Web × MCP 28/28, M4 BG-1 behoben; Block 2 ✅, Abnahme 10-8/10/9 ✅, 10-9 ⚠️ (Befund: neuer Ordner per Item-Anlage im fremden Home-Space)) | 2026-10-22 (Block 2 Schritte 2.1–2.4 gebaut — eine Regel für Web und MCP (RE-1/RE-2/P10-I/P10.5-N) und BG-1; **2.5 Proben offen, Claude Code**; Suite 1299 grün) | 2026-10-22 (Block 2 Schritte 2.1–2.2: eine Regel für Web und MCP — SharePolicy mit Home-Space-Prädikat, RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N beide Richtungen; Suite 1296 grün) | 2026-10-22 (Block 2 Schritt 2.1: SharePolicy kennt Home-Spaces und Team-Spaces, Prädikat aus der Auth-DB, eine Regel für Web und MCP) | 2026-10-22 (Block 1 **abgeschlossen**: V200 vom Fleet-Lauf belegt — Unit installiert, `Result=success`, 0 failed units; Abnahme 10-5/6/7 ✅) | 2026-10-22 (Block 1 Schritte 1.1/1.2: BT-1 — Caddy-Vorlage in Blockform mit den V199-Live-Werten (10s/15s/1s) + neuer Waechter; Abnahme 10-5 auf ✅) | 2026-10-22 (Block 1 Schritt 1.4: BT-6 — `constraints.txt` aus dem Live-Freeze, `scripts/dev_install.sh` mit `-c`, zwei Wächter, Dev-venv neu; Suite 1282 gruen auf den Live-Versionen) | 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in der Relay-Unit, Wächter 13/13, vier Gegenläufe; Block-0-Block rotiert) | 2026-10-22 (Block 0 **abgeschlossen**: 0.6 ROADMAP-Zeile P10.5 auf 🔄, 0.7 Ausführer-Vorbedingung protokolliert — Abnahme P10.5-1–4 ✅) | 2026-10-22 (Block 0: 0.2/0.3 — Phase-Head angelegt (Modulstatus, Deploy-Tabelle, Abnahmestand 61 Zeilen), DO-3-Wächter, `pytest.ini` ergänzt; davor 0.4 (ROADMAP-Wächter eingefroren), 0.5 (INDEX-Luft) und 0.8 (Register-Luft) gebaut — DO-2 vollständig; erster Block)
 ---
 # Phase 10.5 — Finishing
 
@@ -35,7 +35,7 @@ updated: 2026-10-22 (Block 5 **abgeschlossen** — `fastmcp==4.1.3` + neu erzeug
 | 3 | Hygiene: LG-8 (P1-15), LG-7 | Ausführer | A | ✅ 2026-10-22 — **3.1–3.4 gebaut und geprobt**: `files.strip_image_metadata()` (JPEG/PNG/WebP, GIF unverändert, fail-closed `ValidationError`) + Aufruf in `Store.put_asset()` (**eine** Stelle für Web und MCP) · `scripts/asset_orphans.py` (LG-7, `--report`/`--move`, ein Commit) · 16 neue Tests · **Wegwerf 14/14 Zellen** (`probes/p105_b3_assets_probe.py`): GPS weg auf Web **und** MCP, Orientation bleibt, sauberes Bild byte-identisch, Waise gefunden und in den Papierkorb verschoben; Abnahme 10-12/10-13 ✅ |
 | 4 | Performance: PF-1, PF-4, Z1–Z4 | Ausführer (+ Claude Code Proben) | A | ✅ 2026-10-22 — **4.1–4.6 gebaut und geprobt**: `_overview()` zählt alle Eimer aus **einem** `store.search()`-Durchgang (P10.5-G, Rückfall über `_STORE_FETCH_LIMIT`), `folders`/`members` wandern in die Antwort · `asyncio.to_thread` für `_overview`/`_items_get`/`_graph_get` (Z2) · Client: nur noch `/overview`, 10 s Mindestpause für `focus`/`visibilitychange` (PF-4) · neu `static/js/loading.js` + `.is-loading`-Gerüst (Z3/Z4) · **M2-Bench Median 107,3 ms** (vorher 2405,6) · **`/health` hinter `/overview` 23 ms** (P10: 4757 ms) · Browser: 150 ms → kein Platzhalter, 400 ms → Platzhalter; Abnahme 10-14/15/16/17 ✅, 10-18 beim Nikinger nach Deploy A |
 | 5 | MCP-Schicht: PA-5 (FastMCP 4), LG-4 | Ausführer | B | ✅ 2026-10-22 — **5.1–5.6 gebaut und geprobt**: `fastmcp==4.1.3` (V207 ✅), `constraints.txt` neu aus frischem venv, Suite 1354 grün mit Compat an **und** aus (Warnungen als Fehler) · `proto` im Tool-Log (V219 ✅: `Context.request_context.protocol_version`) · neues Werkzeug `append_to_items` (LG-4, ≤ 20 Einträge, je Eintrag eigene `version`, Teilerfolg, Log `err:"partial"`) · Probe beider Ären in-process: `legacy` → `2025-11-25`, `auto` → `2026-07-28` · Smoke 17/17; Abnahme 10-19/20/21 ✅, 10-22 beim Nikinger nach Deploy B |
-| 6 | Anbieter: PA-1, PA-2, `/mcp`, PA-6, P10-J | Ausführer + Claude Code + Nikinger | B | ⬜ |
+| 6 | Anbieter: PA-1, PA-2, `/mcp`, PA-6, P10-J | Ausführer + Claude Code + Nikinger | B | ✅ 2026-10-22 — **6.0–6.5 gebaut und gemessen**: zweite Vergleichsregel `http://127.0.0.1:<port>` (Port explizit, kein `localhost`/`[::1]`, P10.5-O) + `application_type` ∈ {fehlend, null, native, web} · CSP `form-action` mit `http://127.0.0.1:*` · `/mcp` **ohne** Slash exakt bedient (`_ExactMcpMount`, kein 307) · PA-6 (Wurzel-`CLAUDE.md` eine Zeile) · **V209 ✅** (opencode 1.19.4), **V197 ✅** (Chromium folgt dem Consent-Redirect) · **DCR-Gegenlauf**: derselbe Request 400 → **201** · Suite **1376 grün** (1354 + 22) · **10-23/10-24/10-25 ✅**, **10-26 ⬜** (Werkzeugaufruf serverseitig belegt, opencode-Sitzung läuft nicht weiter — `GET /mcp` → 405, siehe Session-Block), 10-27/28 beim Nikinger nach Deploy B |
 | 7 | Darstellung: UI-1–UI-6, KA-5 | Ausführer (+ Claude Code Sichtung) | C | ⬜ |
 | 8 | Karte: Gehirnkarte C2 | Ausführer (+ Claude Code Smoke/Sichtung) | C | ⬜ |
 | 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | ⬜ |
@@ -83,10 +83,10 @@ updated: 2026-10-22 (Block 5 **abgeschlossen** — `fastmcp==4.1.3` + neu erzeug
 | P10.5-20 | Beide Ären in-process: `legacy` → `2025-11-25`, `auto` → `2026-07-28`, `list_spaces` ok | ✅ | 5.6 · `probes/p105_b5_protocol.json`, 8 Wächter in `tests/test_protocol_probe.py` · **Gegenlauf, gemessen statt angenommen:** `initialize` mit `1999-01-01` → der Server antwortet mit **seiner** `2025-11-25` (Handshake-Aushandlung, kein Fehler — der Plantext „`UnsupportedProtocolVersion`-Fehler" gilt nur für die zustandslose Ära) · `tools/list` mit Header + Envelope `1999-01-01` → `-32022 Unsupported protocol version`, `supported: ["2026-07-28"]` |
 | P10.5-21 | LG-4: Tests + Smoke 17/17 | ✅ | 5.4/5.5 · 5 Tests `test_append_to_items_*` in `test_tools.py` (Gegenlauf `extra="forbid"` → `ignore` rot), 5 Log-Tests (`proto`, ohne Kontext, `partial` mit Fake und durch den echten Stack, Erfolg; beide Features per Gegenlauf wirksam), `test_app.py` zählt 11 Werkzeuge · `mcp_smoke.py` **17/17** (Check 17: ein Eintrag mit falscher `version` → `ok:1, failed:1`) |
 | P10.5-22 | Live nach Deploy B: claude.ai-Connector `list_spaces`/`search_items`/`get_item`/`update_item` ok (Nikinger); Log-Feld `proto` zeigt die Ära (V208) | ⬜ | — |
-| P10.5-23 | DCR: `native`/fehlend + `http://127.0.0.1:<port>/…` angenommen; `web` + Loopback, `localhost`, `[::1]`, ohne Port, `http://` fremd → abgelehnt; https-Regeln unverändert | ⬜ | — |
-| P10.5-24 | V197: Chromium folgt dem Consent-Redirect zu 127.0.0.1 | ⬜ | — |
-| P10.5-25 | `/mcp` ohne Slash: 200 mit Bearer, 401 ohne; kein 307 | ⬜ | — |
-| P10.5-26 | Wegwerf-E2E: opencode führt `list_spaces` aus | ⬜ | — |
+| P10.5-23 | DCR: `native`/fehlend + `http://127.0.0.1:<port>/…` angenommen; `web` + Loopback, `localhost`, `[::1]`, ohne Port, `http://` fremd → abgelehnt; https-Regeln unverändert | ✅ | 6.1/6.5 · `clients.py` (zweite Regel + `application_type`), 16 neue Tests in `test_clients.py` + 2 in `test_flows.py` · **V209**: opencode 1.19.4 schickt `redirect_uris: ["http://127.0.0.1:19876/mcp/oauth/callback"]`, `application_type` **fehlt** → P10.5-O steht wie geschrieben (kein `localhost`, kein `[::1]`, kein Rückgabe-Auslöser) · **Gegenlauf am echten Client**: derselbe DCR-Request → vorher **400 `invalid_redirect_uri`**, jetzt **201** (`probes/p105_b6_dcr.json`, Baseline `p105_b6_dcr_baseline.json`) |
+| P10.5-24 | V197: Chromium folgt dem Consent-Redirect zu 127.0.0.1 | ✅ | 6.2/6.6 · CSP `form-action 'self' https://claude.ai https://claude.com http://127.0.0.1:*` · **Chromium (Playwright) macht den Consent**: Login (Passwort + TOTP) → 302 auf `http://127.0.0.1:19876/mcp/oauth/callback` → Callback **erreicht**, opencode meldet „Authentication successful!“, **keine** CSP-Verletzung in der Konsole (`probes/p105_b6_opencode_e2e.json`) · **Gegenlauf:** ohne den CSP-Eintrag blockiert Chromium das Formular lautlos (`Sending form data to … violates … form-action`), der Callback kommt nicht an |
+| P10.5-25 | `/mcp` ohne Slash: 200 mit Bearer, 401 ohne; kein 307 | ✅ | 6.3/6.5 · `_ExactMcpMount` + `Route("/mcp", …)` vor dem Mount (`mcpserver/app.py`) · Unit: `POST /mcp` **401 + WWW-Authenticate** (ohne Token), mit Token **kein 307** · Scope-Gleichheitstest gegen Starlettes `Mount` (root_path, app_root_path, `get_route_path()`) · **am echten Client**: opencode geht jetzt auf `POST /mcp` — vorher 307 und ein zweiter Versuch auf `/mcp/` (Proxy-Log vor/nach dem Fix) · **Gegenlauf:** exakte Route raus → beide Tests rot |
+| P10.5-26 | Wegwerf-E2E: opencode führt `list_spaces` aus | ⬜ | **offen** — der Werkzeugaufruf ist serverseitig **bewiesen** (Wegwerf-Log: `ev=tool, tool=list_spaces, ok=true, proto=2025-11-25`), opencode setzt die Sitzung danach aber **nicht fort** (kein weiterer Modellaufruf). Verdacht: opencode öffnet `GET /mcp` (SSE-Strom) und bekommt **405** (unser stateless Server kennt nur POST/DELETE, P2-B). Nicht gebaut: ein GET-Strom wäre ein Eingriff in P2-B und **gehört nicht in Block 6** → Entscheidung beim Nikinger, **vor** der Live-Abnahme 10-27/28 |
 | P10.5-27 | **Live P10-J Lauf 1** (M3.1 Flash) | ⬜ | — |
 | P10.5-28 | **Live P10-J Lauf 2** (lokales Modell, CT 111) — mit 27 die Abschlussbedingung der Phase | ⬜ | — |
 | P10.5-29 | UI-1: HTML-404 für unbekannte `/ui`-Pfade | ⬜ | — |
@@ -123,55 +123,73 @@ updated: 2026-10-22 (Block 5 **abgeschlossen** — `fastmcp==4.1.3` + neu erzeug
 | P10.5-60 | P10-J zweimal live belegt | ⬜ | — |
 | P10.5-61 | Closeout-Dokumente + Rotationen per Skript | ⬜ | — |
 
-**Summe:** 21 ✅ · 0 ⚠️ · 40 ⬜ (von 61).
+**Summe:** 23 ✅ · 0 ⚠️ · 38 ⬜ (von 61). **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`).
 
 ## Offen beim Nikinger
 
 - ~~**V199**~~ ✅ 2026-10-22 (Block 1.1) — Live-Werte auf dem VPS: `dial_timeout` 10 s, `try_duration` 15 s, `try_interval` 1 s, Upstream `100.93.43.122:8765`. Die Vorlage trägt jetzt genau diese Werte.
 - ~~**V200**~~ ✅ 2026-10-22 (Block 1.3) — Fleet-Playbook auf VM 200: `ok=11 changed=3 failed=0`, `sharefyx-tail-proxy` **active** mit `SuccessExitStatus=143`, nach dem Stopp **`Result=success`**, **0 failed units**, zweiter `--check` meldet `changed=0`. **Nicht gemessen:** der Domain-Weg während des Stopps (der Stopp dauerte Sekunden; der öffentliche Pfad war nicht beteiligt). Die alte Unit liegt als Kopie mit Suffix `~` unter `/etc/systemd/system/` — systemd liest sie nicht.
 - **V203** — Funnel-Pfad von außen gewacht? (BT-10, Klärung eurofyx-fleet).
+- **P10.5-26 vor P10.5-27/28** (Block 6, 2026-10-22) — der Werkzeugaufruf von opencode **gelingt**
+  serverseitig (Wegwerf-Log: `ev=tool, tool=list_spaces, ok=true`), die opencode-Sitzung läuft danach
+  aber nicht weiter. Verdacht: opencode öffnet `GET /mcp` (SSE-Strom) und bekommt **405** — unser
+  stateless Server registriert nur POST/DELETE (P2-B). **Nicht gebaut** (ein GET-Strom wäre ein
+  Eingriff in die gelockte P2-B-Entscheidung und gehört nicht in Block 6). Entscheidung: vor der
+  Live-Abnahme mit zwei Modellanbietern klären, sonst hängt dieselbe Stelle.
+- **Merge-Reihenfolge** (unverändert offen): `p105-block5` (Block 5) vor oder nach Deploy A? Vor
+  Deploy A muss das Dev-venv auf `main` neu gebaut werden (`main` pinnt `fastmcp 3.4.7`, das venv
+  trägt 4.1.3 → zwei Wächter rot). Block 6 liegt jetzt auf demselben Zweig wie Block 5.
 - **P10.5-27/28** — Live-Abnahme P10-J: zwei Modellanbieter, ein Server, ein Werkzeug (`list_spaces`) — Block 6 und Z.
 - **Block 2, Zeile 15 (AL-1)** — Migration + Live-Check beim Nikinger.
 - ~~**Befund 2.5 (P10.5-9 ⚠️)**~~ ✅ 2026-10-22 (Block-2-Nachzug, Nikinger-Entscheidung „ja") — `create_item(space=, folder=<neu>)` und `POST /api/v1/items` legen im fremden Home-Space mit `write:` **keinen** neuen Ordner mehr an; die Regel ist `permissions.manages_space()` (eigener Space oder Team-Space mit Schreibrecht), auf beiden Flächen. Ohne `folder` bleibt das Anlegen an der Space-Wurzel erlaubt (P6-U).
 
-## Session stopped — 2026-10-22 (Block 5 ✅ — MCP-Schicht: PA-5 FastMCP 4, LG-4)
+## Session stopped — 2026-10-22 (Block 6 ✅ — Anbieter: PA-1, PA-2, `/mcp` ohne Slash, PA-6)
 
-**Ergebnis.** `fastmcp` steht exakt auf **4.1.3** (`mcp 2.3.0`, `starlette 1.9.0`); der Server bedient
-beide Protokoll-Ären (`legacy` `2025-11-25`, `auto` `2026-07-28`). Neu: Werkzeug `append_to_items`
-(LG-4, Lock P10.5-J) und das Log-Feld `proto`. **V207 ✅** (Changelog 4.1.1–4.1.3: keine Änderung an
-`http_app`/`Middleware`/`get_http_request`/`ToolError`/`Image`), **V219 ✅** (`Context.request_context.protocol_version`).
+**Ergebnis.** Die zweite Vergleichsregel ist gebaut (`http://127.0.0.1:<port>`, Port explizit, P10.5-O),
+`application_type` kennt {fehlend, null, native, web}, die CSP `form-action` trägt `http://127.0.0.1:*`,
+und `/mcp` wird **ohne** Slash exakt bedient (kein 307). **V209 ✅** (opencode 1.19.4), **V197 ✅**
+(Chromium folgt dem Loopback-Redirect), **PA-6 ✅** (Wurzel-`CLAUDE.md`).
 
-**Geliefert.** `pyproject.toml` (Pin + datierte Ablösung von P9-R) · `constraints.txt` neu aus frischem
-venv · `request_log.py` (`proto`, `err:"partial"`) · `tools.py` (`AppendEntry`, `_append_checked` als
-**ein** Schreibpfad für beide Append-Werkzeuge, `append_to_items`) · Tests: 5 `append_to_items`, 3 Log,
-8 Probe-Wächter, `test_app.py` (11 Werkzeuge, snake_case), `test_step_h_deps.py` (4.1-Linie statt 3.4) ·
-`mcp_smoke.py` Check 17 · `probes/p105_b5_protocol_probe.py` + JSON.
+**Geliefert.** `clients.py` (zweite Regel + `application_type`), `config.py` (CSP), `app.py`
+(`_ExactMcpMount` + `Route("/mcp")`), `CLAUDE.md` (eine Zeile), 22 neue Tests, drei Proben
+(`p105_b6_dcr_probe.py`, `p105_b6_opencode_e2e.py`, `p105_b6_consent_browser.py`).
 
-**Gemessen.** `pytest` **1354 grün** — mit Compat an, und mit `FASTMCP_MCP_CAMELCASE_COMPAT=false` +
-`-W error::DeprecationWarning` · `doc_health` 0 · Smoke **17/17** · Gegenläufe alle wirksam
-(`extra="forbid"`, `proto`, `partial` — auch durch den echten Stack, `mcp 2.2.0` → Constraint-Wächter rot) ·
-`constraints.txt`: −22/+25 Zeilen, u. a. `mcp 1.30→2.3`, `starlette 1.7→1.9`, `Authlib 1.8→1.9.1`,
-`joserfc 1.7.5→1.7.7`, `pydantic 2.14.0→2.14.1`, `certifi` neu, `truststore` neu; `cryptography`/`uvicorn`/`anyio` unverändert.
+**Gemessen.** `pytest` **1376 grün** (1354 + 22) · `doc_health` 0 · `ui_budget` 5/5 · sieben Gegenläufe
+wirksam · **DCR**: derselbe opencode-Request → vorher 400 `invalid_redirect_uri`, jetzt **201** ·
+**V197**: Chromium folgt dem 302 auf `http://127.0.0.1:19876/…` (keine CSP-Verletzung); Gegenlauf ohne
+den CSP-Eintrag: Chromium blockiert das Formular lautlos, der Callback kommt nicht an · **`/mcp` ohne
+Slash**: opencode geht direkt auf `/mcp` (vorher 307 → zweiter Versuch auf `/mcp/`).
 
-**Vier Befunde.** (1) Der dokumentierte Kopf-Befehl `sed -n '1,/^$/p' constraints.txt` kopiert die
-**ganze** Datei (sie hat keine Leerzeile) — jetzt `grep '^#'`. (2) Beim Umbau von `append_to_item` rutschte
-der `@mcp.tool`-Decorator auf den Hilfsfunktions-Namen: **nur** der Smoke und `test_app.py` fingen es, die
-Unit-Tests rufen rohe Funktionen — Lehre: Registrierung gehört in einen Test über `tools/list`. (3) Planzeilen
-waren gedriftet (`test_app.py:438–441`, `test_tools.py:1062` statt 384–387/921) und ein Wächter, den der Plan
-nicht nannte (`…stays_inside_the_three_line`, plus der Kommentar-Wächter) war rot: Code gewinnt. (4) Unbekannte
-Version bei `initialize` → Antwort mit der eigenen Version, **kein** Fehler (der Plantext gilt nur für die
-zustandslose Ära, dort `-32022`). Nicht angefasst: `phase7_spaces_admin/scripts/p7_13_…probe.py:149` liest
-`mimeType` per `getattr` (liefert unter 4.x `None`) — Wegwerf-Skript außerhalb der erlaubten Pfade.
+**Vier Befunde.** (1) Der Issuer-Rewrite-Proxy aus M3 ist für diese Messung **schädlich**: er schreibt
+den `resource`-Parameter auf `http://…`, der Server erwartet `https://…` → opencode bricht mit
+„resource stimmt nicht mit der erwarteten Ressource überein" ab. **Der Server hat recht, der Proxy
+hat gelogen** — deshalb diese Messung ohne Proxy. (2) opencode 1.19.4 fährt mit
+`NODE_TLS_REJECT_UNAUTHORIZED=0` **auch im OAuth-Pfad** gegen ein selbstsigniertes Zertifikat — die
+M3-Messung (1.18.33) galt für 1.18.33. (3) Die MCP-Werkzeuge des `build`-Agenten sind **nicht**
+standardmäßig aktiv; das Muster ist `"<server>_*"` (`sharefyx_list_spaces`). (4) **`GET /mcp` → 405**:
+opencode öffnet einen SSE-Strom, unser stateless Server kennt nur POST/DELETE (P2-B). Der
+Werkzeugaufruf **selbst gelingt** (eigenes Log: `ev=tool, tool=list_spaces, ok=true`), opencode setzt
+die Sitzung danach aber nicht fort.
 
-**Ausführer-Daten.** **Abweichung:** diese Session lief als Claude Code, nicht als
-opencode/M3.1 Flash — kein Modell-Trailer des Open-Tests, P10.5-C (400 K) nicht anwendbar · Wanduhrzeit nicht
-gemessen · keine Eingriffe Nikinger · kein `systemctl`/`sudo`, kein echter `DATA_ROOT`, keine Wegwerf-Instanz.
+**Offen / nächster Schritt.** **P10.5-26 bleibt ⬜** (siehe „Offen beim Nikinger"): der Werkzeugaufruf
+ist serverseitig bewiesen, die opencode-Sitzung läuft nicht weiter — **vor** der Live-Abnahme
+10-27/28 zu klären. `phase4_auth/scripts/abnahme_run.sh:110` trägt einen Kommentar zum alten
+307-Verhalten (außerhalb der erlaubten Pfade → nicht angefasst). Deploy B (`v3.1.6`) steht aus
+(Block 5 + 6 zusammen); die Merge-Reihenfolge entscheidet der Nikinger.
 
-**Offen / nächster Schritt.** **Dieser Stand liegt auf dem Zweig `p105-block5`, nicht auf `main`** — `deploy.sh main`
-würde sonst FastMCP 4 in Deploy A mitnehmen (P10.5-R: vier getrennte Deploys; P10.5-18 messen). Ob/wann er nach
-`main` geht, entscheidet der Nikinger. **Auf `main` zuerst das Dev-venv neu bauen** (`.venv` trägt `fastmcp 4.1.3`,
-`main` pinnt `3.4.7` → zwei Wächter rot). Deploy A (`v3.1.5`, Block 1–4) steht aus, Deploy B nach Block 6.
-P10.5-E-Prüfung: ein Treffer außerhalb der Blockpfade, `tests/test_protocol_probe.py` (Plan 5.6 nennt ihn).
-**Vor Deploy B (5.7):** der Nikinger sagt Fabian Bescheid (kurzer Neustart, kein Re-Auth erwartet); live
-`.venv` im Release wird mit `-c constraints.txt` gebaut. **Beim Nikinger:** P10.5-18, P10.5-22 (Connector +
-Log-Feld `proto`, V208), AL-1 Zeile 15, V203, P10.5-27/28. Nächster Block: **6** (Anbieter: PA-1, PA-2, `/mcp`, PA-6).
+**Ein Dateigrößen-Befund (für Block 12).** Zwei lebende Dokumente stehen knapp unter der
+40-KiB-Grenze: `phase2_mcp/CLAUDE.md` (40.631 B, **329 B** Luft) und
+`phase10_inventory/BAUSTELLENREGISTER.md` (39.802 B, 1.158 B Luft — Block 0.8 hatte 3.386 B
+freigeräumt, Block 5 hat 1.676 B verbraucht, Block 6 0.5 B). Die Blöcke 7–12 haken im Register
+je Zeile ab: **ohne Rotation/Rotation der Langtexte läuft es über die Grenze.** Beide Dateien
+tragen jetzt einen Kürzungs-Weg, aber **kein automatischer** — das ist Doku-Arbeit, kein
+Code-Eingriff.
+
+**Auslegung von P10.5-E (hier offengelegt, nicht stillschweigend):** die drei Probe-Dateien
+liegen in `phase10_5_finishing/probes/` — der Blockkopf nennt den Ordner nicht, **Schritt 6.6 aber
+den Dateinamen** (`p105_b6_opencode_e2e.py`). Weitere Eingriffe außerhalb der Blockpfade: keine.
+
+**Ausführer-Daten.** opencode/MiniMax-M3.1-Flash (Open-Test, P10.5-B) · Kontextgrenze 400 K geprüft
+(`~/.config/opencode/opencode.json`: `MiniMax-M3.1-Flash` → `limit.context` 400000) · keine Eingriffe
+Nikinger · keine Claude-Code-Session in diesem Block · kein `systemctl`/`sudo`, kein echter
+`DATA_ROOT`, kein Zugriff auf die echte `auth.sqlite3` oder den Keyring.

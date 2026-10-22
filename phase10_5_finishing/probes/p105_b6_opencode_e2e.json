@@ -1,0 +1,60 @@
+{
+  "probe": "p105_b6_opencode_e2e",
+  "opencode_binary": "/tmp/opencode/p105-b6-oc/node_modules/.bin/opencode",
+  "base_url": "https://127.0.0.1:8799",
+  "opencode_config": {
+    "$schema": "https://opencode.ai/config.json",
+    "provider": {
+      "stub": {
+        "npm": "@ai-sdk/openai-compatible",
+        "name": "Stub",
+        "options": {
+          "baseURL": "http://127.0.0.1:18123/v1",
+          "apiKey": "stub"
+        },
+        "models": {
+          "stub-1": {
+            "name": "Stub 1",
+            "tool_call": true
+          }
+        }
+      }
+    },
+    "model": "stub/stub-1",
+    "agent": {
+      "build": {
+        "tools": {
+          "sharefyx_*": true,
+          "glob": true
+        }
+      }
+    },
+    "mcp": {
+      "sharefyx": {
+        "type": "remote",
+        "url": "https://127.0.0.1:8799/mcp",
+        "enabled": true
+      }
+    }
+  },
+  "authorize_url": "https://127.0.0.1:8799/oauth/authorize?response_type=code&client_id=aBrhU7fuIcR2sqvtu2mCTw&code_challenge=dxZbsQpMq9xDVw9b1HFHJ2ESo86fwY9-RYNDirw5svE&code_challenge_method=S256&redirect_uri=http%3A%2F%2F127.0.0.1%3A19876%2Fmcp%2Foauth%2Fcallback&state=8fdbbdd80ee442bab1568e25eb57f4f87a0742b3ec78f64572f7f70fb6eaafa6&scope=space+offline_access&prompt=consent&resource=https%3A%2F%2F127.0.0.1%3A8799%2Fmcp",
+  "browser_exit": 0,
+  "browser_stderr_tail": "",
+  "browser": {
+    "authorize_url": "https://127.0.0.1:8799/oauth/authorize?response_type=code&client_id=aBrhU7fuIcR2sqvtu2mCTw&code_challenge=dxZbsQpMq9xDVw9b1HFHJ2ESo86fwY9-RYNDirw5svE&code_challenge_method=S256&redirect_uri=http%3A%2F%2F127.0.0.1%3A19876%2Fmcp%2Foauth%2Fcallback&state=8fdbbdd80ee442bab1568e25eb57f4f87a0742b3ec78f64572f7f70fb6eaafa6&scope=space+offline_access&prompt=consent&resource=https%3A%2F%2F127.0.0.1%3A8799%2Fmcp",
+    "authorize_status": 200,
+    "has_login_form": true,
+    "final_url": "http://127.0.0.1:19876/mcp/oauth/callback?state=8fdbbdd80ee442bab1568e25eb57f4f87a0742b3ec78f64572f7f70fb6eaafa6&iss=https%3A%2F%2F127.0.0.1%3A8799&code=VWWk_dxLulCq-roK4ZGVhg-DuSHlqw_yI1mbGAylj4Y",
+    "page_text": "Authorization successful\n\nOpenCode is now connected to MCP.\n\nYou can close this window.",
+    "console": [],
+    "csp_violations": [],
+    "callback_reached": true
+  },
+  "auth_exit": 0,
+  "auth_log_tail": "timestamp=2026-10-22T18:49:47.465Z level=INFO run=e05f63f5 message=\"creating instance\" directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-22T18:49:47.466Z level=INFO run=e05f63f5 message=fromDirectory directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-22T18:49:47.497Z level=INFO run=e05f63f5 message=bootstrapping directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-22T18:49:47.501Z level=INFO run=e05f63f5 message=loading path=/tmp/opencode/p105-b6-opencode/config/opencode/config.json\ntimestamp=2026-10-22T18:49:47.501Z level=INFO run=e05f63f5 message=loading path=/tmp/opencode/p105-b6-opencode/config/opencode/opencode.json\ntimestamp=2026-10-22T18:49:47.506Z level=INFO run=e05f63f5 message=loading path=/tmp/opencode/p105-b6-opencode/config/opencode/opencode.jsonc\ntimestamp=2026-10-22T18:49:47.568Z level=INFO run=e05f63f5 message=\"all LSPs are disabled\"\ntimestamp=2026-10-22T18:49:47.568Z level=INFO run=e05f63f5 message=\"all formatters are disabled\"\ntimestamp=2026-10-22T18:49:47.568Z level=INFO run=e05f63f5 message=init\n\u001b[0m\n┌  MCP OAuth Authentication\n\u001b[?25l│\ntimestamp=2026-10-22T18:49:47.624Z level=WARN run=e05f63f5 message=\"server unavailable\" key=sharefyx type=remote status=needs_auth\n◒  Starting OAuth flow\u001b[999D\u001b[J◇  Authorize in your browser:\n\u001b[?25h│\n●  https://127.0.0.1:8799/oauth/authorize?response_type=code&client_id=aBrhU7fuIcR2sqvtu2mCTw&code_challenge=dxZbsQpMq9xDVw9b1HFHJ2ESo86fwY9-RYNDirw5svE&code_challenge_method=S256&redirect_uri=http%3A%2F%2F127.0.0.1%3A19876%2Fmcp%2Foauth%2Fcallback&state=8fdbbdd80ee442bab1568e25eb57f4f87a0742b3ec78f64572f7f70fb6eaafa6&scope=space+offline_access&prompt=consent&resource=https%3A%2F%2F127.0.0.1%3A8799%2Fmcp\n\u001b[?25l│\n\u001b[999D\u001b[J◒  Waiting for authorization\u001b[999D\u001b[J◐  Waiting for authorization\u001b[999D\u001b[J◓  Waiting for authorization\u001b[999D\u001b[J◑  Waiting for authorization\u001b[999D\u001b[J◒  Waiting for authorization\u001b[999D\u001b[J◐  Waiting for authorization\u001b[999D\u001b[J◓  Waiting for authorization\u001b[999D\u001b[J◑  Waiting for authorization\u001b[999D\u001b[J◒  Waiting for authorization.\u001b[999D\u001b[J◐  Waiting for authorization.\u001b[999D\u001b[J◓  Waiting for authorization.\u001b[999D\u001b[J◑  Waiting for authorization.\u001b[999D\u001b[J◒  Waiting for authorization.\u001b[999D\u001b[J◐  Waiting for authorization.\u001b[999D\u001b[J◇  Authentication successful!\n\u001b[?25h│\n└  Done\n\ntimestamp=2026-10-22T18:49:48.882Z level=INFO run=e05f63f5 message=\"disposing instance\" directory=/home/savefyx/dev/savefxy\n",
+  "auth_ok": true,
+  "debug_exit": 0,
+  "debug_stdout_tail": "┌  MCP OAuth Debug\n│\n●  Server: sharefyx\n│\n●  URL: https://127.0.0.1:8799/mcp\n│\n●  Auth status: ✓ authenticated\n│\n●    Access token: Uis9***ehKA\n│\n●    Expires: 2026-10-22T19:49:48.608Z \n│\n●    Refresh token: present\n│\n●    Client ID: aBrhU7fuIcR2sqvtu2mCTw\n\u001b[?25l│\n◇  HTTP response: 401 Unauthorized\n\u001b[?25h│\n●  WWW-Authenticate: Bearer error=\"invalid_token\", error_description=\"Authentication required\", resource_metadata=\"https://127.0.0.1:8799/.well-known/oauth-protected-resource/mcp\", scope=\"space\"\n│\n●  Initial unauthenticated check returned 401, so this server requires OAuth\n│\n●  Testing OAuth flow (without completing authorization)...\n│\n◆  Connection successful (already authenticated)\n│\n└  Debug complete\n\n",
+  "debug_stderr_tail": "timestamp=2026-10-22T18:49:49.783Z level=INFO run=9b4c9556 message=\"creating instance\" directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-22T18:49:49.785Z level=INFO run=9b4c9556 message=fromDirectory directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-22T18:49:49.819Z level=INFO run=9b4c9556 message=bootstrapping directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-22T18:49:49.824Z level=INFO run=9b4c9556 message=loading path=/tmp/opencode/p105-b6-opencode/config/opencode/config.json\ntimestamp=2026-10-22T18:49:49.824Z level=INFO run=9b4c9556 message=loading path=/tmp/opencode/p105-b6-opencode/config/opencode/opencode.json\ntimestamp=2026-10-22T18:49:49.829Z level=INFO run=9b4c9556 message=loading path=/tmp/opencode/p105-b6-opencode/config/opencode/opencode.jsonc\ntimestamp=2026-10-22T18:49:49.902Z level=INFO run=9b4c9556 message=\"all LSPs are disabled\"\ntimestamp=2026-10-22T18:49:49.903Z level=INFO run=9b4c9556 message=\"all formatters are disabled\"\ntimestamp=2026-10-22T18:49:49.903Z level=INFO run=9b4c9556 message=init\n\u001b[0m\ntimestamp=2026-10-22T18:49:49.935Z level=INFO run=9b4c9556 message=\"disposing instance\" directory=/home/savefyx/dev/savefxy\n",
+  "error": "TimeoutExpired(['/tmp/opencode/p105-b6-oc/node_modules/.bin/opencode', 'run', 'Rufe list_spaces auf.', '--model', 'stub/stub-1', '--format', 'json', '--print-logs', '--log-level', 'INFO'], 120)"
+}

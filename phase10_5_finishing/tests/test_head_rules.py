@@ -79,3 +79,28 @@ def test_the_block_measurement_ends_at_the_next_heading():
     Text unter dem Block mit, und die Obergrenze würde die falsche Größe prüfen."""
     text = "## Session stopped — 2026-10-22\n\nkurz\n\n## Nächster Abschnitt\n\nviel Text\n"
     assert _session_block_bytes(text) == len("## Session stopped — 2026-10-22\n\nkurz\n\n".encode("utf-8"))
+
+def test_the_acceptance_sum_matches_the_table():
+    """Die **Summe-Zeile** muss zur Abnahmetabelle gehören — und wird sonst von Hand gepflegt.
+
+    **Warum es diesen Wächter gibt (2026-10-22, Block 6):** die Zeile stand auf „21 ✅ · 0 ⚠️ ·
+    40 ⬜", die Tabelle trug **20** ✅ — der Zähler war schon vor diesem Block falsch (Block 5 hat
+    eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Wer die Summe im Kopf pflegt,
+    pflegt zwei Zahlen an zwei Orten; das ist die Fehlerklasse, die dieser Wächter beendet.
+    """
+    head = HEAD.read_text(encoding="utf-8")
+    rows = [line for line in head.split("\n") if re.match(r"^\| P10\.5-\d+ \|", line)]
+    assert len(rows) == 61, f"die Abnahmetabelle hat {len(rows)} Zeilen, erwartet 61"
+    counted = {
+        "✅": sum(1 for line in rows if "| ✅ |" in line),
+        "⚠️": sum(1 for line in rows if "| ⚠️ |" in line),
+        "⬜": sum(1 for line in rows if "| ⬜ |" in line),
+    }
+    match = re.search(r"\*\*Summe:\*\* (\d+) ✅ · (\d+) ⚠️ · (\d+) ⬜", head)
+    assert match, "der Head trägt keine '**Summe:** … ✅ · … ⚠️ · … ⬜'-Zeile"
+    claimed = tuple(int(value) for value in match.groups())
+    assert claimed == (counted["✅"], counted["⚠️"], counted["⬜"]), (
+        f"die Summe-Zeile behauptet {claimed}, die Tabelle trägt "
+        f"({counted['✅']}, {counted['⚠️']}, {counted['⬜']}) — eine Zeile abhaken heißt auch, "
+        f"die Summe nachzuziehen"
+    )

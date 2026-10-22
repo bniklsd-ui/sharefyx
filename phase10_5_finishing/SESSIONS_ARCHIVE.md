@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,48 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-22 (Block 5 ✅ — MCP-Schicht: PA-5 FastMCP 4, LG-4)
+
+**Ergebnis.** `fastmcp` steht exakt auf **4.1.3** (`mcp 2.3.0`, `starlette 1.9.0`); der Server bedient
+beide Protokoll-Ären (`legacy` `2025-11-25`, `auto` `2026-07-28`). Neu: Werkzeug `append_to_items`
+(LG-4, Lock P10.5-J) und das Log-Feld `proto`. **V207 ✅** (Changelog 4.1.1–4.1.3: keine Änderung an
+`http_app`/`Middleware`/`get_http_request`/`ToolError`/`Image`), **V219 ✅** (`Context.request_context.protocol_version`).
+
+**Geliefert.** `pyproject.toml` (Pin + datierte Ablösung von P9-R) · `constraints.txt` neu aus frischem
+venv · `request_log.py` (`proto`, `err:"partial"`) · `tools.py` (`AppendEntry`, `_append_checked` als
+**ein** Schreibpfad für beide Append-Werkzeuge, `append_to_items`) · Tests: 5 `append_to_items`, 3 Log,
+8 Probe-Wächter, `test_app.py` (11 Werkzeuge, snake_case), `test_step_h_deps.py` (4.1-Linie statt 3.4) ·
+`mcp_smoke.py` Check 17 · `probes/p105_b5_protocol_probe.py` + JSON.
+
+**Gemessen.** `pytest` **1354 grün** — mit Compat an, und mit `FASTMCP_MCP_CAMELCASE_COMPAT=false` +
+`-W error::DeprecationWarning` · `doc_health` 0 · Smoke **17/17** · Gegenläufe alle wirksam
+(`extra="forbid"`, `proto`, `partial` — auch durch den echten Stack, `mcp 2.2.0` → Constraint-Wächter rot) ·
+`constraints.txt`: −22/+25 Zeilen, u. a. `mcp 1.30→2.3`, `starlette 1.7→1.9`, `Authlib 1.8→1.9.1`,
+`joserfc 1.7.5→1.7.7`, `pydantic 2.14.0→2.14.1`, `certifi` neu, `truststore` neu; `cryptography`/`uvicorn`/`anyio` unverändert.
+
+**Vier Befunde.** (1) Der dokumentierte Kopf-Befehl `sed -n '1,/^$/p' constraints.txt` kopiert die
+**ganze** Datei (sie hat keine Leerzeile) — jetzt `grep '^#'`. (2) Beim Umbau von `append_to_item` rutschte
+der `@mcp.tool`-Decorator auf den Hilfsfunktions-Namen: **nur** der Smoke und `test_app.py` fingen es, die
+Unit-Tests rufen rohe Funktionen — Lehre: Registrierung gehört in einen Test über `tools/list`. (3) Planzeilen
+waren gedriftet (`test_app.py:438–441`, `test_tools.py:1062` statt 384–387/921) und ein Wächter, den der Plan
+nicht nannte (`…stays_inside_the_three_line`, plus der Kommentar-Wächter) war rot: Code gewinnt. (4) Unbekannte
+Version bei `initialize` → Antwort mit der eigenen Version, **kein** Fehler (der Plantext gilt nur für die
+zustandslose Ära, dort `-32022`). Nicht angefasst: `phase7_spaces_admin/scripts/p7_13_…probe.py:149` liest
+`mimeType` per `getattr` (liefert unter 4.x `None`) — Wegwerf-Skript außerhalb der erlaubten Pfade.
+
+**Ausführer-Daten.** **Abweichung:** diese Session lief als Claude Code, nicht als
+opencode/M3.1 Flash — kein Modell-Trailer des Open-Tests, P10.5-C (400 K) nicht anwendbar · Wanduhrzeit nicht
+gemessen · keine Eingriffe Nikinger · kein `systemctl`/`sudo`, kein echter `DATA_ROOT`, keine Wegwerf-Instanz.
+
+**Offen / nächster Schritt.** **Dieser Stand liegt auf dem Zweig `p105-block5`, nicht auf `main`** — `deploy.sh main`
+würde sonst FastMCP 4 in Deploy A mitnehmen (P10.5-R: vier getrennte Deploys; P10.5-18 messen). Ob/wann er nach
+`main` geht, entscheidet der Nikinger. **Auf `main` zuerst das Dev-venv neu bauen** (`.venv` trägt `fastmcp 4.1.3`,
+`main` pinnt `3.4.7` → zwei Wächter rot). Deploy A (`v3.1.5`, Block 1–4) steht aus, Deploy B nach Block 6.
+P10.5-E-Prüfung: ein Treffer außerhalb der Blockpfade, `tests/test_protocol_probe.py` (Plan 5.6 nennt ihn).
+**Vor Deploy B (5.7):** der Nikinger sagt Fabian Bescheid (kurzer Neustart, kein Re-Auth erwartet); live
+`.venv` im Release wird mit `-c constraints.txt` gebaut. **Beim Nikinger:** P10.5-18, P10.5-22 (Connector +
+Log-Feld `proto`, V208), AL-1 Zeile 15, V203, P10.5-27/28. Nächster Block: **6** (Anbieter: PA-1, PA-2, `/mcp`, PA-6).
 
 ## Session stopped — 2026-10-22 (Block 4 ✅ — Performance: PF-1, PF-4, Z1–Z4)
 

@@ -233,6 +233,10 @@ async def test_csp_form_action_allows_the_oauth_redirect_target(client_factory, 
         resp = await client.get("/oauth/authorize", params=_authorize_query(client_record.client_id))
     csp = resp.headers["content-security-policy"]
     assert "form-action 'self' https://claude.ai https://claude.com" in csp
+    # [2026-10-22, P10.5 Block 6, Lock P10.5-O] Dazu kommt der Loopback-Eintrag: der Consent-POST
+    # eines nativen Clients endet mit einem Rumpsprung auf `http://127.0.0.1:<port>/...`, und
+    # Chromium prueft `form-action` auch dagegen (V197).
+    assert "http://127.0.0.1:*" in csp
 
 
 @pytest.mark.asyncio
