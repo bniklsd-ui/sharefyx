@@ -54,6 +54,8 @@ updated: 2026-10-22 (Block 6 ✅ — Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6
 | C | `v3.1.7` | — | — | nach Block 7–8 |
 | D | `v3.1.8` | — | — | nach Block 9–11 |
 
+**Stand 2026-10-22:** `main` (`a1cc523`) und der Branch `p105-block5` (`71be3cf`) sind **gepusht** — Deploy A kann aus `main` starten (Dev-venv auf `main` neu bauen, `main` pinnt `fastmcp 3.4.7`); Deploy B folgt nach dem Merge des Branches.
+
 **Ein Deploy ist vier Schritte, kein Commit** (Plan §2.5): volle Suite + `doc_health` + `ui_budget` grün · Badge und `docs/UPDATE_LOG.md` · Commit + Push · **`deploy.sh` durch den Nikinger** (Hard Rule 9) · `health_gate.sh` mit **echter Ausgabe** in den Commit — nie die Behauptung.
 
 ## Abnahmestand
