@@ -9,7 +9,7 @@ down:
   - ../phase10_inventory/BAUSTELLENREGISTER.md      # 📗 die Arbeitsliste — hier wird abgehakt (P10-B)
   - ../phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md  # 📦 §12 Entscheidungsliste D-1–D-18, verbatim
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
-updated: 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in der Relay-Unit, Wächter 13/13, vier Gegenläufe; Block-0-Block rotiert) | 2026-10-22 (Block 0 **abgeschlossen**: 0.6 ROADMAP-Zeile P10.5 auf 🔄, 0.7 Ausführer-Vorbedingung protokolliert — Abnahme P10.5-1–4 ✅) | 2026-10-22 (Block 0: 0.2/0.3 — Phase-Head angelegt (Modulstatus, Deploy-Tabelle, Abnahmestand 61 Zeilen), DO-3-Wächter, `pytest.ini` ergänzt; davor 0.4 (ROADMAP-Wächter eingefroren), 0.5 (INDEX-Luft) und 0.8 (Register-Luft) gebaut — DO-2 vollständig; erster Block)
+updated: 2026-10-22 (Block 1 Schritt 1.4: BT-6 — `constraints.txt` aus dem Live-Freeze, `scripts/dev_install.sh` mit `-c`, zwei Wächter, Dev-venv neu; Suite 1282 gruen auf den Live-Versionen) | 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in der Relay-Unit, Wächter 13/13, vier Gegenläufe; Block-0-Block rotiert) | 2026-10-22 (Block 0 **abgeschlossen**: 0.6 ROADMAP-Zeile P10.5 auf 🔄, 0.7 Ausführer-Vorbedingung protokolliert — Abnahme P10.5-1–4 ✅) | 2026-10-22 (Block 0: 0.2/0.3 — Phase-Head angelegt (Modulstatus, Deploy-Tabelle, Abnahmestand 61 Zeilen), DO-3-Wächter, `pytest.ini` ergänzt; davor 0.4 (ROADMAP-Wächter eingefroren), 0.5 (INDEX-Luft) und 0.8 (Register-Luft) gebaut — DO-2 vollständig; erster Block)
 ---
 # Phase 10.5 — Finishing
 
@@ -30,7 +30,7 @@ updated: 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in de
 | Block | Inhalt (Register) | Wer | Deploy | Status |
 |---|---|---|---|---|
 | 0 | Haushalt: Verifikation, Phase-Head, INDEX-Luft, Register-Luft, DO-2, DO-3, Ausführer-Vorbedingung | Claude Code | — | ✅ 2026-10-22 — 0.1–0.8 gebaut, Abnahme P10.5-1–4 ✅ |
-| 1 | Betrieb: BT-1, BT-2, BT-6 (+ `constraints.txt`) | Ausführer + Nikinger | A | 🔄 2026-10-22 — **1.3 gebaut** (BT-2: `SuccessExitStatus=143` + Wächter 13/13); 1.1 (V199) beim Nikinger, 1.2 und 1.4 offen |
+| 1 | Betrieb: BT-1, BT-2, BT-6 (+ `constraints.txt`) | Ausführer + Nikinger | A | 🔄 2026-10-22 — **1.3 gebaut** (BT-2: `SuccessExitStatus=143` + Wächter 13/13), **1.4 gebaut** (BT-6: `constraints.txt` + `-c` + zwei Wächter, Suite 1282 grün auf den Live-Versionen); 1.1 (V199) beim Nikinger, 1.2 offen |
 | 2 | Fehler, Parität, Regel: BG-1, RE-1, RE-2, P10-I, AL-1 | Ausführer (+ Claude Code Proben) | A | ⬜ |
 | 3 | Hygiene: LG-8 (P1-15), LG-7 | Ausführer | A | ⬜ |
 | 4 | Performance: PF-1, PF-4, Z1–Z4 | Ausführer (+ Claude Code Proben) | A | ⬜ |
@@ -67,7 +67,7 @@ updated: 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in de
 | P10.5-4 | Ausführer-Vorbedingung erfüllt und protokolliert (≤ 400 K) | ✅ | dieser Commit |
 | P10.5-5 | BT-1: Vorlage trägt die Live-Werte (V199 ✅) | ⬜ | — |
 | P10.5-6 | BT-2: Unit installiert, `Result=success` bei Exit 143 (V200 ✅) | ⬜ | 1.3 gebaut · V200 offen |
-| P10.5-7 | `constraints.txt` = Live-Stand; Dev-venv daraus grün; Wächter grün | ⬜ | — |
+| P10.5-7 | `constraints.txt` = Live-Stand; Dev-venv daraus grün; Wächter grün | ✅ | 1.4 · this commit · Freeze byte-identisch zur Datei, Suite 1282 grün auf `mcp 1.30.0` / `starlette 1.7.0` |
 | P10.5-8 | BG-1: Die Liste füllt sich, sobald das verzögerte `/overview` ankommt, ohne Panel neu zu öffnen | ⬜ | — |
 | P10.5-9 | RE-1/RE-2: dieselbe Matrix auf Web und MCP | ⬜ | — |
 | P10.5-10 | P10-I auf beiden Flächen durchgesetzt | ⬜ | — |
@@ -147,30 +147,41 @@ updated: 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in de
 - **P10.5-27/28** — Live-Abnahme P10-J: zwei Modellanbieter, ein Server, ein Werkzeug (`list_spaces`) — Block 6 und Z.
 - **Block 2, Zeile 15 (AL-1)** — Migration + Live-Check beim Nikinger.
 
-## Session stopped — 2026-10-22 (Block 1 — Betrieb: BT-1, BT-2, BT-6; **in Arbeit**, Schritt 1.3 gebaut)
+## Session stopped — 2026-10-22 (Block 1 — Betrieb: BT-1, BT-2, BT-6; **in Arbeit**, Schritte 1.3 und 1.4 gebaut)
 
-**Ergebnis.** Schritt **1.3 (BT-2)** gebaut: die Relay-Unit trägt `SuccessExitStatus=143` direkt unter
-`Restart=on-failure`, und ein Wächter rechnet die Zahl aus dem Signal (`128 + SIGTERM = 143`), statt sie zu behaupten.
-**Ein Plan-Befund, datiert:** die Schritte stehen im Plan als 1.1 → 1.2 → 1.3 → 1.4, aber **1.1 (V199) und 1.2 hängen
-an einer Ausgabe des Nikingers** und 1.3 nicht. Deshalb läuft 1.3 zuerst — es macht dem Nikinger die installierbare
-Unit für V200 fertig, während 1.4 (Constraints, der lange Schritt) danebenläuft. Die Abnahme-Zählung ändert sich
-dadurch nicht: P10.5-6 bleibt ⬜, bis V200 vorliegt.
+**Ergebnis.** Schritt **1.3 (BT-2)**: die Relay-Unit trägt `SuccessExitStatus=143` direkt unter
+`Restart=on-failure`; der Wächter rechnet die Zahl aus dem Signal (`128 + SIGTERM = 143`), statt sie zu behaupten.
+Schritt **1.4 (BT-6)**: `constraints.txt` ist die eine Quelle aller transitiven Versionen — aus dem **Live**-Freeze
+erzeugt, `scripts/dev_install.sh` installiert mit `-c`, und das Dev-venv wurde neu aufgesetzt: sein
+`pip freeze --exclude-editable` ist **byte-identisch** zur Datei, und die volle Suite läuft jetzt auf den
+Live-Versionen (`mcp 1.30.0`, `starlette 1.7.0`) — grün.
+**Ein Plan-Befund, datiert:** die Schritte stehen als 1.1 → 1.2 → 1.3 → 1.4, aber **1.1 (V199) und 1.2 hängen
+an einer Ausgabe des Nikingers**, 1.3 und 1.4 nicht. Deshalb laufen 1.3 und 1.4 zuerst — sie machen dem
+Nikinger die installierbare Unit für V200 fertig. P10.5-6 bleibt ⬜, bis V200 vorliegt.
 
-**Geliefert (Commits).** (dieser Commit) — 1.3: `phase3_edge/systemd/sharefyx-tail-proxy.service` +
-`phase9_hardening/tests/test_tail_proxy.py :: test_sigterm_exit_143_counts_as_success()`.
+**Geliefert (Commits).** `4fc8d9a` — 1.3: Unit + Wächter `test_sigterm_exit_143_counts_as_success()` (13/13).
+(dieser Commit) — 1.4: `constraints.txt`, `scripts/dev_install.sh` mit `-c`, zwei Wächter in
+`test_step_h_deps.py` (7/7), Dev-venv neu aufgesetzt.
 
-**Gemessen.** `test_tail_proxy.py` **13/13** (vorher 12). **Vier Gegenläufe, alle wirksam** (je 1 rot, Rest grün):
-Zeile fehlt · Zahl 144 statt 143 · Zeile nicht direkt unter `Restart=on-failure` · Zeile in die MCP-Unit kopiert.
-Volle Suite **1280 grün** (269 s; vorher 1279). `doc_health` **0**.
-Die Abweichung ist datiert festgehalten: die MCP-Unit (`sharefyx-mcp.service`) bekommt die Zeile **nicht** — dort
-beendet uvicorn ein SIGTERM mit Exit-Code 0; ein Wächter hält das fest.
+**Gemessen.** Suite **1282 grün** (288 s) auf `mcp 1.30.0` / `starlette 1.7.0` — vorher 1280 auf `mcp 1.28.1` /
+`starlette 1.3.1`. `pip check` grün. **Gegenläufe, alle wirksam.** BT-2: Zeile fehlt · Zahl 144 · Zeile nicht
+unter `Restart=on-failure` · Zeile in die MCP-Unit kopiert (je 1 rot). BT-6: Wegwerf-venv mit `starlette 1.3.1`
+→ Wächter rot („Version weicht ab: 1.3.1 gegen 1.7.0") · `-c` entfernt → rot · Abbruchblock entfernt → rot.
+**Die beiden neuen Wächter laufen im Release-venv grün** (deploy.sh:169) — sonst bricht der Deploy A.
 
 **Ausführer-Daten.** Modell **MiniMax M3.1 Flash** über opencode (P10.5-B), wirksamer `limit.context` **400.000**
-(`~/.config/opencode/opencode.json`) — **P10.5-C erneut geprüft und erfüllt**, Block 1 durfte starten. Aufrufe/
-Kontingent: **nicht sichtbar**. Eingriffe: **0** vom Nikinger, **0** von Claude Code. Trailer je Commit:
+(`~/.config/opencode/opencode.json`) — **P10.5-C erneut geprüft und erfüllt**. Aufrufe/Kontingent: **nicht
+sichtbar**. Eingriffe: **0** vom Nikinger, **0** von Claude Code. Trailer je Commit:
 `Co-Authored-By: opencode/MiniMax-M3.1-Flash <noreply@minimax.io>`.
 
-**Offen / nächster Schritt.** **1.4 (BT-6)** — `constraints.txt` aus dem Live-Freeze (`/opt/sharefyx/current/.venv`,
-lesbar), `scripts/dev_install.sh` mit `-c`, zwei Wächter in `test_step_h_deps.py`, Dev-venv neu aufgesetzt, volle
-Suite grün. **1.1 V199 + V200 beim Nikinger** — die Befehle stehen wortgleich unter „Offen beim Nikinger" im Kopf.
-**1.2 (BT-1)** — Caddy-Vorlage in Blockform, mit den **Live**-Werten aus V199.
+**Gegenlese-Funde — beide eigene Fehler dieser Session.** (1) **Die erste Gegenlauf-Variante traf das falsche
+venv:** `cp -a .venv` kopiert die Skriptshebangs mit — `venv/bin/pip` zeigte weiter auf das Original und hat
+dort `starlette` auf 1.3.1 heruntergesetzt. Lehre: eine venv-Kopie nur über `venv/bin/python -m pip` anfassen,
+nie über `venv/bin/pip`. (2) **Die Verhaltensprobe war grün, ohne den Abbruch zu prüfen:** im PATH der
+Testumgebung gibt es kein `python`, also endete das Skript vorher mit „command not found". Der Probe fehlte ein
+`python`-Stub; jetzt ist das Fehlen des Abbruchs der einzige Grund für einen erfolgreichen Lauf.
+
+**Offen / nächster Schritt.** **1.1 V199 + V200 beim Nikinger** (die Befehle stehen wortgleich unter „Offen beim
+Nikinger" im Kopf). **1.2 (BT-1)** — Caddy-Vorlage in Blockform mit den **Live**-Werten aus V199. Danach Deploy A
+(`v3.1.5`): Badge + `docs/UPDATE_LOG.md` + Commit, `deploy.sh` **durch den Nikinger**, `health_gate.sh` mit echter
+Ausgabe (Plan §2.5).
