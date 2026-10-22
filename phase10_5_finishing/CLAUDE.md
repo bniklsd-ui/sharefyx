@@ -169,6 +169,15 @@ Code prüft gegen die **Dateien** (Hard Rule 2): ein veralteter Index würde die
 Proben bei Claude Code; ich habe sie selbst gefahren (stehende Erlaubnis, Wegwerf erlaubt).
 (3) `pytest.ini` (eine Zeile `pythonpath`) und acht Testdateien in fünf Pakaten wurden
 angefasst — die Dummy-PNG-Header waren nach 3.2 **keine Bilder mehr** (fail-closed).
+(4) Die Option heißt `--git-author`, nicht `--author`: der P9-Wächter
+`test_only_history_builds_the_git_author_arguments` erlaubt das Literal `--author` nur in
+`storage/history.py` (dort wird der Git-Autor **gebaut**; das Skript reicht den Namen nur
+durch) — der Wächter bleibt unangetastet.
+
+**Abbruchprüfung (P10.5-E, Basis `45c507b`).** `git diff --stat` nennt neben den erlaubten
+Pfaden **sechs** Dateien: `phase2_mcp/scripts/mcp_smoke.py` und fünf Testdateien — alle
+**Fixture-Reparaturen** (Dummy-PNG → echte Bytes), keine Produktlogik; `pytest.ini` eine
+Zeile. P10.5-F ist sauber: unter `phase1_storage/storage` nur `files.py` und `store.py`.
 
 **Offen / nächster Schritt.** Block 4 (Performance: PF-1, PF-4, Z1–Z4) — Deploy A (`v3.1.5`)
 danach. Beim Nikinger offen: AL-1 Zeile 15 (Migration + Live-Check), V203, P10.5-27/28.

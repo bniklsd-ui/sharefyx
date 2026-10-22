@@ -32,7 +32,7 @@ Daten und schreibt in fremde Daten — der Pfad muss ausdrücklich genannt sein.
 den echten `DATA_ROOT` nur, wenn der Pfad ausdrücklich übergeben wird.
 
 Aufruf:  phase10_5_finishing/scripts/asset_orphans.py --data-root <pfad> [--report | --move]
-                [--author <name>]
+                [--git-author <name>]
 Exit:   0 = ok (Report erzeugt bzw. Ordner verschoben) · 1 = Fehler (nichts verschoben)
 """
 from __future__ import annotations
@@ -188,7 +188,14 @@ def main(argv: list[str] | None = None) -> int:
         help="die gefundenen Ordner in den Papierkorb verschieben (ein Commit).",
     )
     parser.add_argument(
-        "--author", default="",
+        # **Der Name der Option ist `--git-author`, nicht `--author`** — und das ist Absicht:
+        # der Wächter `phase9_hardening/tests/test_trace_block.py ::
+        # test_only_history_builds_the_git_author_arguments` (P9-AC) verlangt, dass das Literal
+        # `--author` **nur** in `storage/history.py` vorkommt — dort wird der Git-Autor
+        # gebaut. Dieses Skript **baut** ihn nicht, es reicht den Namen an
+        # `history.commit(author=…)` durch. Damit der Wächter die Regel weiterhin prüfen kann
+        # (und nicht verbreitert werden muss), heißt die Option `--git-author`.
+        "--git-author", default="", dest="author",
         help="Git-Autor des Move-Commits (leer = Default-Identität des Datenverzeichnisses).",
     )
     args = parser.parse_args(argv)
