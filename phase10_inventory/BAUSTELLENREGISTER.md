@@ -8,7 +8,8 @@ down:
   - ../docs/concepts/phase10_inventory_plan.md    # Plan P10: Locks, Steps, Messungen M1–M8, Abnahme, [VERIFY]
   - ../docs/concepts/phase10_intake.md            # Sammelstelle — Herkunft von §2/§3/§5–§7
   - ../docs/concepts/PHASE9_CLOSEOUT_HANDOVER.md  # Herkunft §4.1–§4.10
-updated: 2026-10-21 (Tor P10-8 offen) | 2026-10-20 (D-3, D-14 beantwortet) | 2026-10-18 (V204/V205 beantwortet — LG-10 gegenstandslos, AL-1: 7 schliessbar, 3 offen mit Weg) | 2026-10-18 (M6 gefahren — KA-1-Baseline + Lappenkosten, je Frame im Budget; Nebenbefund reduced-motion 1 Tick) | 2026-10-18 (M3 gefahren — DCR von opencode festgehalten, 400 invalid_redirect_uri; M3b bis initialize, 2025-03-26) | 2026-10-18 (M5 gefahren — BG-2 und BG-3 im Browser gehalten, 14/14 Checks; M4 gefahren — BG-1 reproduziert, Gegenlauf 2/2; M2 gemessen — PF-1/PF-2 tragen die Grundlinie, Instrument + 3 Wächter im Repo) | 2026-10-18 (alle Entscheidungen D-1–D-18 eingetragen, Ziel-Spalte gesetzt, Bilanz per Skript neu gezählt) | 2026-10-16 (finalisiert mit den Antworten des Nikingers: D-1b = C2 Nervenbahnen, BT-13 beantwortet, V199 in die Exec-Session; Bilanz per Skript nachgezählt) | 2026-10-16 (angelegt — Entwurf aus allen Quellen, jede Zeile am Code verankert; Stand vor der Freigabe durch den Nikinger)
+  - ENTSCHEIDUNGEN_ARCHIVE.md               # 📦 §12 Entscheidungsliste D-1–D-18, verbatim (2026-10-22 gewandert)
+updated: 2026-10-22 (§12 Entscheidungsliste D-1–D-18 nach `ENTSCHEIDUNGEN_ARCHIVE.md` gewandert, verbatim; Register 40.954 -> 37.221 B, 3.739 B Luft unter der 40.960-B-Grenze — P10.5 Block 0, Schritt 0.8) | 2026-10-21 (Tor P10-8 offen) | 2026-10-20 (D-3, D-14 beantwortet) | 2026-10-18 (V204/V205 beantwortet — LG-10 gegenstandslos, AL-1: 7 schliessbar, 3 offen mit Weg) | 2026-10-18 (M6 gefahren — KA-1-Baseline + Lappenkosten, je Frame im Budget; Nebenbefund reduced-motion 1 Tick) | 2026-10-18 (M3 gefahren — DCR von opencode festgehalten, 400 invalid_redirect_uri; M3b bis initialize, 2025-03-26) | 2026-10-18 (M5 gefahren — BG-2 und BG-3 im Browser gehalten, 14/14 Checks; M4 gefahren — BG-1 reproduziert, Gegenlauf 2/2; M2 gemessen — PF-1/PF-2 tragen die Grundlinie, Instrument + 3 Wächter im Repo) | 2026-10-18 (alle Entscheidungen D-1–D-18 eingetragen, Ziel-Spalte gesetzt, Bilanz per Skript neu gezählt) | 2026-10-16 (finalisiert mit den Antworten des Nikingers: D-1b = C2 Nervenbahnen, BT-13 beantwortet, V199 in die Exec-Session; Bilanz per Skript nachgezählt) | 2026-10-16 (angelegt — Entwurf aus allen Quellen, jede Zeile am Code verankert; Stand vor der Freigabe durch den Nikinger)
 ---
 # Phase 10 — Baustellenregister
 
@@ -17,7 +18,7 @@ updated: 2026-10-21 (Tor P10-8 offen) | 2026-10-20 (D-3, D-14 beantwortet) | 202
 
 **Lesart.** **Größe:** S ≤ ein halber Block · M ein Block · L mehrere Blöcke. **Risiko:** S Schreibpfad (Hard Rule 3) · F Dateiformat oder
 P1-Contract · R Rechte (Hard Rule 4) · A Auth/Sicherheit · B Betrieb (Handgriff des Nikingers) · — keines. **Entsch.:** `D-n` = steht in der
-Entscheidungsliste §12. **Ziel:** P10.5 · P11 · verworfen · Termin (wartet auf Kalender oder Person, kein Blocker) · P10 (Messung oder Probe in
+Entscheidungsliste §12 (seit 2026-10-22 verbatim in `ENTSCHEIDUNGEN_ARCHIVE.md`). **Ziel:** P10.5 · P11 · verworfen · Termin (wartet auf Kalender oder Person, kein Blocker) · P10 (Messung oder Probe in
 P10 Step 2) · Wissen (kein Bau, nur festgehalten) · erledigt (mit Beleg). „Empfehlung" heißt: mein Vorschlag, nicht entschieden.
 
 ## 1 Betrieb und Infrastruktur (BT)
@@ -163,30 +164,7 @@ P10 Step 2) · Wissen (kein Bau, nur festgehalten) · erledigt (mit Beleg). „E
 | DO-5 | Fleet-Notiz §7 nennt `step_a/Caddyfile` | Step 0 | die Datei heißt `Caddyfile.template`; datierte Korrektur in intake §7 | — | — | nein | erledigt (Plan-Commit) |
 
 ## 12 Entscheidungsliste (für P10 Step 3)
-
-Antworten werden hier **mit Datum** eingetragen; erst dann wird das „Ziel" der Registerzeile verbindlich. **Stand 2026-10-20: alle D beantwortet** (D-3 nach M1, D-14 nach M8).
-
-| D | Frage | Zeilen | Empfehlung | Antwort |
-|---|---|---|---|---|
-| D-1 | Welcher Karten-Entwurf (A Landkarte · B Gehirn · C Gehirnkarte) oder welche Mischung? | KA-1, KA-3 | C mit der Aktivierung aus B, ohne „kürzlich geändert" (kein zehntes Feld) | **C** — Nikinger 2026-10-16 („Option C finde ich mega") |
-| D-1b | Welcher Stil innerhalb C (C1 Flächen · C2 Nervenbahnen · C3 Höhenlinien) oder welche Mischung? | KA-1 | C1 als Grundbild, Aktivierung aus C2 nur beim Hover | **C2 Nervenbahnen** — Nikinger 2026-10-16 |
-| D-2 | Einklappen der Karte (§2.5): verwerfen oder P11? | KA-4 | verwerfen | **verwerfen** — Nikinger 2026-10-18 |
-| D-3 | Zielwerte Performance und welcher Weg für `/overview` | PF-1–PF-3, PF-5 | Ziele nach M1/M2 festlegen; Vorschlag zum Start: `/overview` serverseitig ≤ 300 ms bei Live-Last, Space-Wechsel gefühlt ≤ 1 s über die Domain | **Z1–Z4** (`messung/M1_browser.md` §D-3; Z1 unter Vorbehalt der Machbarkeit) — Nikinger 2026-10-20 |
-| D-4 | Editor: Stufe 1 bauen (hebt P5-U auf)? Stufe 2 (elfte Öffnung)? | ED-1–ED-3 | Stufe 1 ja, mit Rohmodus; Stufe 2 nein | **Stufe 1 und Stufe 2** — Nikinger 2026-10-18 |
-| D-5 | Tab-Titel deutsch oder englisch? | UI-3 | deutsch, wie die Oberfläche | **deutsch** — Nikinger 2026-10-18 |
-| D-6 | Logo-Platzhalter: Wortmarke als SVG oder ein schlichtes Zeichen? | UI-2 | Wortmarke „sharefyx" als SVG, ein Austauschpunkt | **„S" + Teilen-Zeichen als Wortmarke** — Nikinger 2026-10-18 |
-| D-7 | Kontrast 4,38:1 schließen? | UI-5 | ja: hellere Vorsichtfarbe nur für Text | **ja** — Nikinger 2026-10-18 |
-| D-8 | Anbieter: welcher Abnahme-Client, gehören Web-Clients und CIMD dazu? | PA-1, PA-3, PA-4, PA-7 | opencode als Abnahme-Client; DCR für native Clients + Loopback; ChatGPT nur per Konfiguration, falls gewollt; CIMD → P11 | **native + Loopback; Abnahme opencode mit zwei Modellanbietern; kein ChatGPT; CIMD P11** — Nikinger 2026-10-18 |
-| D-9 | Darf das MacBook den Relay-Port 8765 erreichen? | BT-3 | nein — nur `tag:sharefyx-edge` | **MacBook behält Zugriff** — Nikinger 2026-10-18 |
-| D-10 | Caddy-Vorlage auf die Live-Werte nachziehen? | BT-1 | ja, nach V199 | **ja, ohne Fleet zu stören** — Nikinger 2026-10-18 |
-| D-11 | `SuccessExitStatus=143` in die Relay-Unit? | BT-2 | ja | **ja** — Nikinger 2026-10-18 |
-| D-12 | LAN-Ports: Sharefyx-Posten oder Fleet? | BT-4 | Fleet | **an Fleet** — Nikinger 2026-10-18 |
-| D-13 | `mcp` exakt pinnen (auf den Live-Stand)? | BT-6 | ja, `mcp==1.30.0` nach Messung | **ja** — Nikinger 2026-10-18 |
-| D-14 | Vision-Modell: Ersatz testen oder CT 111 stilllegen? | BT-11 | eine Frage bekannter Antwort an einen Kandidaten; fällt sie, stilllegen | **Recherche + Test (M8)** — Nikinger 2026-10-18 · **[2026-10-19, M8 gemessen]** Incumbent bestätigt gestrichen (echte Falle reproduziert); **Empfehlung: `qwen2.5vl:7b`** (besteht die echte Falle; Schwäche: `overlapping` synthetisch) oder CT 111 stilllegen — **ja, `qwen2.5vl:7b`** — Nikinger 2026-10-20 |
-| D-15 | Übergangsfenster wieder befristen — wann? | BT-5 | Test am 2026-11-02, danach Datum setzen | **Test um den 2026-11-02** — Nikinger 2026-10-18 |
-| D-16 | `created_by` (elfte Öffnung)? | RE-7 | nein | **ja** — Nikinger 2026-10-18 |
-| D-17 | Ledger-Urteile: BT-10, PA-5, UI-4, RE-1, RE-3–RE-6, LG-1–LG-5, LG-7–LG-9, DO-2, DO-3 | s. Zeilen | je Zeile in der Spalte „Ziel" | **je Zeile eingetragen** — Nikinger 2026-10-18 |
-| D-18 | Altlasten: P6/P6.5 mit späteren Belegen schließen, Rest als Termin führen, P9-⚠️ als ausreichend bestätigen? | AL-1, AL-2, AL-4, AL-5 | ja | **ja** — Nikinger 2026-10-18 |
+> **Verbatim verschoben** nach `ENTSCHEIDUNGEN_ARCHIVE.md` (`scripts/move_sections.py`) — dort unter derselben Überschrift.
 
 ## Bilanz (nach den Entscheidungen, 2026-10-18)
 
