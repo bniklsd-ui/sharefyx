@@ -160,7 +160,8 @@ mit ihrer Regel (2.1–2.3), sonst gäbe es einen Commit mit Code ohne Beweis. U
 Test-Fixtures brauchten das Prädikat **auch** dort, wo es die Regel noch nicht prüft (webui,
 P7) — ohne Prädikat hätten die Web-Tests nach der Umstellung **keine** Team-Spaces mehr.
 
-**Geliefert (Commits).** `4f6e878` — 2.1. `f4c63b6` — 2.2. (dieser Commit) — 2.3 (BG-1).
+**Geliefert (Commits).** `4f6e878` — 2.1. `f4c63b6` — 2.2. `486acda` — 2.3 (BG-1). `da92731` —
+Wurzel-Current-state (Block-2-Block oben, Block-1-Block per Skript rotiert).
 
 **Gemessen.** Suite **1299 grün** (280 s). `doc_health` 0 · `ui_budget` 5/5 (173,8 KB gzip).
 **Sieben Gegenläufe, alle wirksam:** alte Web-Regel → Ordner-Test rot · P10-I-Prüfung
@@ -176,7 +177,8 @@ Eigentümer-Riegel darf einen legitimen Cross-Space-Move mit `folder=` nicht blo
 die Quelle ist jetzt ein Team-Space.
 
 **Ausführer-Daten.** **MiniMax M3.1 Flash** über opencode (P10.5-B), `limit.context`
-**400.000** (P10.5-C ✅). Wanduhrzeit: rund **1 h 40 min** für 2.1–2.4. Aufrufe/Kontingent:
+**400.000** (P10.5-C ✅). Wanduhrzeit: rund **55 min** für 2.1–2.4 (11:44 → 12:39), davon
+drei volle Suitenläufe (je ≈ 5 min) und sieben Gegenläufe. Aufrufe/Kontingent:
 **nicht sichtbar**. Eingriffe: **0** vom Nikinger, **0** von Claude Code. Trailer je Commit:
 `Co-Authored-By: opencode/MiniMax-M3.1-Flash <noreply@minimax.io>`.
 
