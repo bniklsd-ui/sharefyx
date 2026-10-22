@@ -405,7 +405,7 @@ async def test_mcp_bare_mount_redirects_without_leaking(app):
 
 
 @pytest.mark.asyncio
-async def test_tools_list_returns_ten_tools(app, token_alpha):
+async def test_tools_list_returns_eleven_tools(app, token_alpha):
     async with app.router.lifespan_context(app):
         async with _mcp_client(app, token_alpha) as client:
             tools = await client.list_tools()
@@ -419,6 +419,7 @@ async def test_tools_list_returns_ten_tools(app, token_alpha):
         "create_item",
         "update_item",
         "append_to_item",
+        "append_to_items",
         "patch_item",
         "get_item_asset",
         "put_item_asset",
@@ -435,10 +436,10 @@ async def test_tools_list_annotations_present(app, token_alpha):
         assert tool.title, f"{tool.name} hat keinen Titel"
         assert tool.description, f"{tool.name} hat keine Beschreibung"
         assert tool.annotations is not None, f"{tool.name} hat keine Annotations"
-        assert tool.annotations.readOnlyHint is not None
-        assert tool.annotations.destructiveHint is not None
-        assert tool.annotations.idempotentHint is not None
-        assert tool.annotations.openWorldHint is not None
+        assert tool.annotations.read_only_hint is not None
+        assert tool.annotations.destructive_hint is not None
+        assert tool.annotations.idempotent_hint is not None
+        assert tool.annotations.open_world_hint is not None
 
 
 @pytest.mark.asyncio

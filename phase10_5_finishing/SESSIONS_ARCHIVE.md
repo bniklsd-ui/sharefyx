@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,47 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-22 (Block 4 ✅ — Performance: PF-1, PF-4, Z1–Z4)
+
+**Ergebnis.** `_overview()` zählt alle fünf Eimer aus **einem** `store.search()`-Durchgang
+(P10.5-G) statt aus einem Aufruf je Eimer **und** je Space; `folders`/`members` wandern in
+dieselbe Antwort. `asyncio.to_thread` für `_overview`, `_items_get` und `_graph_get` (Z2). Der
+Client holt nur noch `/overview`; `focus`/`visibilitychange` bekommen 10 s Mindestpause (PF-4).
+Neu: `static/js/loading.js` (`withLoading(el, promise, {delayMs: 200})`) + `.is-loading`-Gerüst
+in `app.css` — statisch unter `prefers-reduced-motion`.
+
+**Geliefert (Commits).** 4.1/4.2 `webui/api.py` (ein Durchgang + Rückfall über
+`_STORE_FETCH_LIMIT` + `to_thread`) + 4 Tests in `phase5_ui/tests/test_overview.py` · 4.3/4.4
+`static/js/{list,app,editor,graph}.js`, `static/js/loading.js` (neu), `static/app.css` +
+8 Wächter in `phase5_ui/tests/test_loading_state.py` · 4.6 drei Proben unter
+`phase10_5_finishing/probes/` (M2-Bench, Event-Loop, Browser).
+
+**Gemessen** (Basis `37186d5`): `pytest` **1335 grün** · `doc_health` 0 · `ui_budget` 5/5
+(176,6 KB gzip) · **M2-Bench Median 107,3 ms** (Grundlinie 2405,6 ms — 22,4×) · **Event-Loop:
+`/health` hinter `/overview` 23 ms** (P10: 4757 ms), `blockade_health` false (P10: true) ·
+**Browser:** `DOMContentLoaded` 142,2 ms · 150 ms → **kein** Platzhalter, 400 ms → Platzhalter
+sichtbar · `/overview` 2 s verzögert: Space-Wechsel 0,315 s, Item-Öffnen 0,053 s · **dreizehn
+Gegenläufe**, alle wirksam (davon zwei an der 200-ms-Grenze selbst).
+
+**Zwei eigene Befunde.** (1) Der erste Entwurf von `withLoading()` nahm die Klasse im
+`done()`-Zweig **immer** ab — bei zwei gleichzeitigen Abrufen (Poll + Schreibvorgang) hätte
+der schnellere den Ladezustand des langsameren gelöscht. Jetzt läuft ein Zähler je Element
+(`WeakMap`), die Klasse fällt erst beim letzten Abruf. (2) Die erste Fassung der Browser-Probe
+maß **Route-Verzögerung plus Serverzeit** — die 200-ms-Grenze war damit nicht prüfbar; die
+Route liefert jetzt eine **kontrollierte** Antwort (`route.fulfill`), die Serverzeit ist
+ausgeschlossen.
+
+**Ausführer-Daten.** opencode/MiniMax-M3.1-Flash · Kontextgrenze 400.000 (P10.5-C erfüllt) ·
+keine Advisor-Runde · Eingriffe Nikinger/Claude Code: 0 · kein `systemctl`, kein `sudo`, kein
+echter `DATA_ROOT` · Wegwerf-Instanz nur über die PID-Datei gestoppt (Hard Rule 9), Port 8799
+danach frei.
+
+**Offen / nächster Schritt.** Deploy A (`v3.1.5`) nach Block 1–4 — Badge + `UPDATE_LOG` +
+`health_gate.sh` sind Nikinger-/Claude-Code-Arbeit. **Beim Nikinger offen:** P10.5-18 (Live-Messung
+nach Deploy A: `/overview` Waiting ≤ 300 ms, Space-Wechsel während des Polls ≤ 1 s, beide
+Eingänge), AL-1 Zeile 15 (Migration + Live-Check), V203, P10.5-27/28. Nächster Block: 5
+(MCP-Schicht: PA-5 FastMCP 4, LG-4).
 
 ## Session stopped — 2026-10-22 (Block 2-Nachzug + Block 3 ✅ — RE-1-Parität, EXIF-Strip, Waisen)
 

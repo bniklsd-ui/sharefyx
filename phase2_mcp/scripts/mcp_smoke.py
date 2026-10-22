@@ -2,10 +2,10 @@
 """mcp_smoke.py — Gegenstück zu `space_cli.py` aus P1 (Plan §4 Step 7). Baut ein **temporäres**
 `DATA_ROOT` (nie das echte), zwei Fixture-Spaces, startet `create_app()` in-process (kein
 echter Port, kein Netz — `httpx.ASGITransport`, dasselbe Muster wie `test_app.py`) und fährt
-die zehn Tools einmal vollständig durch: `list_spaces`, `create_item` ×3, `search_items`,
+die elf Tools einmal vollständig durch: `list_spaces`, `create_item` ×3, `search_items`,
 `get_item` eigen/fremd, `get_item_meta`, ein `update_item`-Konflikt, `append_to_item`,
 `patch_item`, `update_item(status=archived)`, ein `update_item` auf einen fremden Space,
-`put_item_asset`, `get_item_asset`. Am Ende eine Größenmessung (Bytes je Antwort) als Tabelle.
+`put_item_asset`, `get_item_asset`, `append_to_items`. Am Ende eine Größenmessung (Bytes je Antwort) als Tabelle.
 
 **Phase 6.5 Step A2:** `get_item_meta` dazugekommen — reine Metadaten-Prüfung nach `get_item`
 (eigen), 13→14 Checks.
@@ -13,6 +13,9 @@ die zehn Tools einmal vollständig durch: `list_spaces`, `create_item` ×3, `sea
 **Phase 6.5 Step B4:** `put_item_asset`/`get_item_asset` dazugekommen — Bild-Upload auf
 `created_ids[1]` (nicht `[0]`, das ist seit Check 7 archiviert), Roundtrip base64-dekodiert
 byte-identisch geprüft, 14→16 Checks.
+
+**P10.5 Block 5 (LG-4):** `append_to_items` dazugekommen — Check 17, Teilerfolg (ein Eintrag mit
+falscher `version` → `ok:1, failed:1`), 16→17 Checks.
 
 **P6 Step 1:** `create_item`/`append_to_item`/`update_item`/`patch_item` liefern seither per
 Default eine Quittung statt Dateitext (P6-H) — die betroffenen Prüfungen unten lesen die
@@ -444,6 +447,39 @@ async def _run(data_root: Path, checks: list[Check]) -> None:
                     image_bytes == png,
                     f"{len(image_bytes)} Bytes zurück, erwartet {len(png)}",
                     len(image_bytes),
+                )
+            )
+
+            # 11. append_to_items -- LG-4 (P10.5 Block 5). Zwei frische Items; der zweite Eintrag
+            # trägt eine falsche version -> ok:1, failed:1 (Teilerfolg, der Konflikt stoppt den
+            # ersten Eintrag nicht und schreibt nichts).
+            fresh = [
+                json.loads(
+                    (await own.call_tool("create_item", {"type": "note", "title": f"Sammel {n}"})).data
+                )
+                for n in (1, 2)
+            ]
+            many_text = (
+                await own.call_tool(
+                    "append_to_items",
+                    {
+                        "entries": [
+                            {"item_id": fresh[0]["id"], "version": fresh[0]["version"], "text": "a"},
+                            {"item_id": fresh[1]["id"], "version": fresh[1]["version"] + 99, "text": "b"},
+                        ]
+                    },
+                )
+            ).data
+            many = json.loads(many_text)
+            checks.append(
+                Check(
+                    "append_to_items (Teilerfolg)",
+                    many.get("ok") == 1
+                    and many.get("failed") == 1
+                    and many["results"][0]["ok"] is True
+                    and many["results"][1].get("error") == "conflict",
+                    f"ok={many.get('ok')} failed={many.get('failed')}",
+                    len(many_text.encode("utf-8")),
                 )
             )
 

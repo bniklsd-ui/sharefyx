@@ -20,7 +20,7 @@ der Code bis heute nie hatte — dieser Test ist die Einloesung dieses Anspruchs
 neue Erfindung.
 
   1. test_the_pin_is_an_exact_version              # kein Range, dreiteilige Version
-  2. test_the_pin_stays_inside_the_three_line      # P9-R: 3.4.x, 4.x bleibt V79
+  2. test_the_pin_stays_inside_the_four_one_line   # P10.5-P (2026-10-22): 4.1.x; loest P9-R (3.4.x) ab
   3. test_only_one_pyproject_declares_fastmcp      # ein zweiter Pin koennte dem Deploy widersprechen
   4. test_the_installed_fastmcp_matches_the_pin    # der eigentliche Riegel
   5. test_the_pin_comment_points_at_p9_r_and_v79   # Sperrverweis und Nachfolger bleiben sichtbar
@@ -130,12 +130,12 @@ def test_the_pin_is_an_exact_version() -> None:
     Version(pinned)
 
 
-def test_the_pin_stays_inside_the_three_line() -> None:
-    """P9-R: `fastmcp` bleibt auf 3.4.x. FastMCP 4 / MCP-Revision 2026-07-28 ist V79,
-    eine eigene Mini-Phase seit P5-C — kein Nebenbei-Update dieser Zeile."""
+def test_the_pin_stays_inside_the_four_one_line() -> None:
+    """P10.5-P (Block 5, 2026-10-22): `fastmcp` steht auf 4.1.x. Das loest P9-R (Obergrenze 3.4.x)
+    datiert ab. Ein Sprung auf 4.2/5.x ist wieder eine eigene Entscheidung, kein Nebenbei-Update."""
     pinned = _pinned_version()
-    assert Version(pinned).major == 3, f"Pin muss in der 3.x-Linie bleiben, ist {pinned}"
-    assert Version(pinned).minor == 4, f"Pin muss in der 3.4-Linie bleiben, ist {pinned}"
+    assert Version(pinned).major == 4, f"Pin muss in der 4.x-Linie bleiben, ist {pinned}"
+    assert Version(pinned).minor == 1, f"Pin muss in der 4.1-Linie bleiben, ist {pinned}"
 
 
 def test_only_one_pyproject_declares_fastmcp() -> None:
