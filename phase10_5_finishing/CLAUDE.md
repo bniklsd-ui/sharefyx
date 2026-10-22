@@ -164,8 +164,9 @@ entfernt · Abbruchblock entfernt. Die neuen Wächter laufen im **Release-venv**
 sonst bricht Deploy A.
 
 **Ausführer-Daten.** **MiniMax M3.1 Flash** über opencode (P10.5-B), `limit.context` **400.000**
-(P10.5-C ✅). Aufrufe/Kontingent: **nicht sichtbar**. Eingriffe: **2** vom Nikinger (V199-Ausgabe,
-V200-Lauf), **0** von Claude Code. Trailer je Commit:
+(P10.5-C ✅). Wanduhrzeit: rund **1 h 40 min** für 1.1–1.4 (10:05 → 11:45), davon vier volle
+Suitenläufe (je ≈ 5 min). Aufrufe/Kontingent: **nicht sichtbar**. Eingriffe: **2** vom Nikinger
+(V199-Ausgabe, V200-Lauf über Fleet), **0** von Claude Code. Trailer je Commit:
 `Co-Authored-By: opencode/MiniMax-M3.1-Flash <noreply@minimax.io>`.
 
 **Gegenlese-Funde — zwei eigene Fehler dieser Session.** (1) `cp -a .venv` kopiert die Skriptshebangs
