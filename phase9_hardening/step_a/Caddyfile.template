@@ -77,8 +77,8 @@
 	# 15000000000 ns (15 s), `try_interval` 1000000000 ns (1 s). Weicht die Live-Config später
 	# ab, zieht **sie** nach, nicht diese Datei.
 	#
-	# **Nicht** mit `caddy validate` geprüft: Caddy ist auf der VM nicht installiert, und die
-	# Einzeilenform oben wurde am 2026-10-01 gegen 2.6.2 validiert, die **Blockform nicht**.
+	# **Nicht** mit `caddy validate` geprüft: Caddy ist auf der VM nicht installiert. Die
+	# frühere Einzeilenform wurde am 2026-10-01 gegen 2.6.2 validiert, die **Blockform nicht**.
 	# Geprüft ist sie gegen die Live-Konfiguration der VPS (V199) und durch den Wächter
 	# `test_the_upstream_block_carries_the_fleet_timeouts` (Struktur und Werte).
 	reverse_proxy <heimvm-tailnet>:8765 {
