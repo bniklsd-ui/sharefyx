@@ -9,7 +9,7 @@ down:
   - ../phase10_inventory/BAUSTELLENREGISTER.md      # 📗 die Arbeitsliste — hier wird abgehakt (P10-B)
   - ../phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md  # 📦 §12 Entscheidungsliste D-1–D-18, verbatim
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
-updated: 2026-10-22 (Block-2-Nachzug: Item mit **neuem Ordner** im fremden Home-Space ist jetzt auf Web **und** MCP gesperrt (Nikinger-Entscheidung 2026-10-22) — P10.5-9 ⚠️ → ✅; `ui_budget.py`/`ui_smoke.py` haben das Home-Space-Prädikat, die `team`-Flags stimmen) | 2026-10-22 (Block 2.5 — Proben Web × MCP 28/28, M4 BG-1 behoben; Block 2 ✅, Abnahme 10-8/10/9 ✅, 10-9 ⚠️ (Befund: neuer Ordner per Item-Anlage im fremden Home-Space)) | 2026-10-22 (Block 2 Schritte 2.1–2.4 gebaut — eine Regel für Web und MCP (RE-1/RE-2/P10-I/P10.5-N) und BG-1; **2.5 Proben offen, Claude Code**; Suite 1299 grün) | 2026-10-22 (Block 2 Schritte 2.1–2.2: eine Regel für Web und MCP — SharePolicy mit Home-Space-Prädikat, RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N beide Richtungen; Suite 1296 grün) | 2026-10-22 (Block 2 Schritt 2.1: SharePolicy kennt Home-Spaces und Team-Spaces, Prädikat aus der Auth-DB, eine Regel für Web und MCP) | 2026-10-22 (Block 1 **abgeschlossen**: V200 vom Fleet-Lauf belegt — Unit installiert, `Result=success`, 0 failed units; Abnahme 10-5/6/7 ✅) | 2026-10-22 (Block 1 Schritte 1.1/1.2: BT-1 — Caddy-Vorlage in Blockform mit den V199-Live-Werten (10s/15s/1s) + neuer Waechter; Abnahme 10-5 auf ✅) | 2026-10-22 (Block 1 Schritt 1.4: BT-6 — `constraints.txt` aus dem Live-Freeze, `scripts/dev_install.sh` mit `-c`, zwei Wächter, Dev-venv neu; Suite 1282 gruen auf den Live-Versionen) | 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in der Relay-Unit, Wächter 13/13, vier Gegenläufe; Block-0-Block rotiert) | 2026-10-22 (Block 0 **abgeschlossen**: 0.6 ROADMAP-Zeile P10.5 auf 🔄, 0.7 Ausführer-Vorbedingung protokolliert — Abnahme P10.5-1–4 ✅) | 2026-10-22 (Block 0: 0.2/0.3 — Phase-Head angelegt (Modulstatus, Deploy-Tabelle, Abnahmestand 61 Zeilen), DO-3-Wächter, `pytest.ini` ergänzt; davor 0.4 (ROADMAP-Wächter eingefroren), 0.5 (INDEX-Luft) und 0.8 (Register-Luft) gebaut — DO-2 vollständig; erster Block)
+updated: 2026-10-22 (Block 3 Schritt 3.1: `files.strip_image_metadata()` — JPEG/PNG/WebP, GIF unverändert, fail-closed; 8 neue Tests) | 2026-10-22 (Block-2-Nachzug: Item mit **neuem Ordner** im fremden Home-Space ist jetzt auf Web **und** MCP gesperrt (Nikinger-Entscheidung 2026-10-22) — P10.5-9 ⚠️ → ✅; `ui_budget.py`/`ui_smoke.py` haben das Home-Space-Prädikat, die `team`-Flags stimmen) | 2026-10-22 (Block 2.5 — Proben Web × MCP 28/28, M4 BG-1 behoben; Block 2 ✅, Abnahme 10-8/10/9 ✅, 10-9 ⚠️ (Befund: neuer Ordner per Item-Anlage im fremden Home-Space)) | 2026-10-22 (Block 2 Schritte 2.1–2.4 gebaut — eine Regel für Web und MCP (RE-1/RE-2/P10-I/P10.5-N) und BG-1; **2.5 Proben offen, Claude Code**; Suite 1299 grün) | 2026-10-22 (Block 2 Schritte 2.1–2.2: eine Regel für Web und MCP — SharePolicy mit Home-Space-Prädikat, RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N beide Richtungen; Suite 1296 grün) | 2026-10-22 (Block 2 Schritt 2.1: SharePolicy kennt Home-Spaces und Team-Spaces, Prädikat aus der Auth-DB, eine Regel für Web und MCP) | 2026-10-22 (Block 1 **abgeschlossen**: V200 vom Fleet-Lauf belegt — Unit installiert, `Result=success`, 0 failed units; Abnahme 10-5/6/7 ✅) | 2026-10-22 (Block 1 Schritte 1.1/1.2: BT-1 — Caddy-Vorlage in Blockform mit den V199-Live-Werten (10s/15s/1s) + neuer Waechter; Abnahme 10-5 auf ✅) | 2026-10-22 (Block 1 Schritt 1.4: BT-6 — `constraints.txt` aus dem Live-Freeze, `scripts/dev_install.sh` mit `-c`, zwei Wächter, Dev-venv neu; Suite 1282 gruen auf den Live-Versionen) | 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in der Relay-Unit, Wächter 13/13, vier Gegenläufe; Block-0-Block rotiert) | 2026-10-22 (Block 0 **abgeschlossen**: 0.6 ROADMAP-Zeile P10.5 auf 🔄, 0.7 Ausführer-Vorbedingung protokolliert — Abnahme P10.5-1–4 ✅) | 2026-10-22 (Block 0: 0.2/0.3 — Phase-Head angelegt (Modulstatus, Deploy-Tabelle, Abnahmestand 61 Zeilen), DO-3-Wächter, `pytest.ini` ergänzt; davor 0.4 (ROADMAP-Wächter eingefroren), 0.5 (INDEX-Luft) und 0.8 (Register-Luft) gebaut — DO-2 vollständig; erster Block)
 ---
 # Phase 10.5 — Finishing
 
@@ -32,7 +32,7 @@ updated: 2026-10-22 (Block-2-Nachzug: Item mit **neuem Ordner** im fremden Home-
 | 0 | Haushalt: Verifikation, Phase-Head, INDEX-Luft, Register-Luft, DO-2, DO-3, Ausführer-Vorbedingung | Claude Code | — | ✅ 2026-10-22 — 0.1–0.8 gebaut, Abnahme P10.5-1–4 ✅ |
 | 1 | Betrieb: BT-1, BT-2, BT-6 (+ `constraints.txt`) | Ausführer + Nikinger | A | ✅ 2026-10-22 — **1.1–1.4 gebaut und abgenommen** (V199 gelesen · BT-1 Caddy-Blockform · BT-2 `SuccessExitStatus=143`, live V200 ✅ · BT-6 `constraints.txt`); Abnahme 10-5/6/7 ✅, Suite 1283 grün |
 | 2 | Fehler, Parität, Regel: BG-1, RE-1, RE-2, P10-I, AL-1 | Ausführer (+ Claude Code Proben) | A | ✅ 2026-10-22 — **2.1–2.5 gebaut und geprobt** (Probe 2.5: 28/28 Zellen Web × MCP, M4 0 → 3 Zeilen ohne neues Öffnen) · **Nachzug 2026-10-22 (Nikinger):** ein Item mit **neuem Ordner** im fremden Home-Space ist jetzt auf beiden Flächen gesperrt (RE-1-Parität) — P10.5-9 damit ✅ statt ⚠️ — eine Regel für Web und MCP: RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N kein Verschieben in **oder aus** einem fremden Home-Space; BG-1: die Space-Liste füllt sich nach, wenn `/overview` spät kommt) |
-| 3 | Hygiene: LG-8 (P1-15), LG-7 | Ausführer | A | ⬜ |
+| 3 | Hygiene: LG-8 (P1-15), LG-7 | Ausführer | A | 🔄 2026-10-22 — **3.1 gebaut**: `files.strip_image_metadata()` (JPEG/PNG/WebP, GIF unverändert, fail-closed `ValidationError`), 8 neue Tests in `phase1_storage/tests/test_files.py` |
 | 4 | Performance: PF-1, PF-4, Z1–Z4 | Ausführer (+ Claude Code Proben) | A | ⬜ |
 | 5 | MCP-Schicht: PA-5 (FastMCP 4), LG-4 | Ausführer | B | ⬜ |
 | 6 | Anbieter: PA-1, PA-2, `/mcp`, PA-6, P10-J | Ausführer + Claude Code + Nikinger | B | ⬜ |
@@ -134,32 +134,34 @@ updated: 2026-10-22 (Block-2-Nachzug: Item mit **neuem Ordner** im fremden Home-
 - **Block 2, Zeile 15 (AL-1)** — Migration + Live-Check beim Nikinger.
 - ~~**Befund 2.5 (P10.5-9 ⚠️)**~~ ✅ 2026-10-22 (Block-2-Nachzug, Nikinger-Entscheidung „ja") — `create_item(space=, folder=<neu>)` und `POST /api/v1/items` legen im fremden Home-Space mit `write:` **keinen** neuen Ordner mehr an; die Regel ist `permissions.manages_space()` (eigener Space oder Team-Space mit Schreibrecht), auf beiden Flächen. Ohne `folder` bleibt das Anlegen an der Space-Wurzel erlaubt (P6-U).
 
-## Session stopped — 2026-10-22 (Block-2-Nachzug: RE-1-Parität beim Anlegen mit Ordner; P10.5-9 ✅)
+## Session stopped — 2026-10-22 (Block 2-Nachzug + Block 3.1 — RE-1-Parität und EXIF-Stripper)
 
-**Ergebnis.** Der Befund aus Probe 2.5 ist geschlossen (Nikinger 2026-10-22: „ja"): ein Item mit
-**neuem Ordner** in einem fremden Home-Space legt den Ordner nicht mehr an — Web **und** MCP.
-Die Regel ist `permissions.manages_space()` (eigener Space oder Team-Space mit Schreibrecht),
-dieselbe wie RE-1 (Ordner anlegen) und RE-2 (Ordner wechseln). **Ohne** `folder` bleibt das
-Anlegen an der Space-Wurzel erlaubt (P6-U). Zweite Entscheidung desselben Tages: `ui_budget.py`
-und `ui_smoke.py` bekommen das Home-Space-Prädikat — ohne es waren ihre `team`-Flags **immer**
-`false` und Team-Rechte nie greifbar.
+**Ergebnis (Nachzug).** Der Befund aus Probe 2.5 ist geschlossen (Nikinger 2026-10-22: „ja"):
+ein Item mit **neuem Ordner** in einem fremden Home-Space legt den Ordner nicht mehr an — Web
+**und** MCP. Regel: `permissions.manages_space()` (eigener Space oder Team-Space mit
+Schreibrecht), dieselbe wie RE-1 und RE-2. Ohne `folder` bleibt das Anlegen an der
+Space-Wurzel erlaubt (P6-U). Zweite Entscheidung desselben Tages: `ui_budget.py`/`ui_smoke.py`
+bekommen das Home-Space-Prädikat — ohne es waren ihre `team`-Flags **immer** `false`.
 
-**Geliefert (Commits).** Dieser Commit:
-- `mcpserver/tools.py :: create_item()` — Riegel vor `store.create()`; `PermissionDenied(reason=…)`,
-  damit die Meldung nicht „kein Schreibrecht" sagt (der Actor hat eines).
-- `webui/api.py :: _items_post()` — derselbe Riegel; zusätzlich `folder` auf String geprüft
-  (vorher 500 statt 422 — derselbe Feldname, dieselbe Zeile).
-- `scripts/ui_budget.py` + `scripts/ui_smoke.py` — Home-Space-Prädikat aus der Auth-DB,
-  dieselbe Zeile wie im Produktivpfad (`mcpserver/app.py :: create_app()`).
+**Ergebnis (Block 3.1).** `files.strip_image_metadata(data, mime)` ist gebaut (P1-Öffnung 15,
+angekündigt): JPEG (APP1/APP13/COM raus, APP0/APP2/APP14 bleiben, Orientation ≠ 1 wird als
+minimales APP1 neu geschrieben, ab SOS byte-genau), PNG (eXIf/tEXt/iTXt/zTXt/tIME raus), WebP
+(EXIF/XMP raus, VP8X-Flagbits gelöscht, RIFF-Größe neu), GIF unverändert. **Fail-closed:**
+was der Parser nicht versteht, ergibt `ValidationError` — nie ein halbbereinigtes Bild.
 
-**Gemessen** (Basis `725215f`): `pytest` **1306 grün** (287 s, +7) · `ui_smoke` **13/13** (neu:
-`/api/v1/spaces (team-Flags)` — `alpha: false`, `beta: true`) · **Gegenlauf:** ohne Prädikat
-`team={'alpha': False, 'beta': False}` → der neue Smoke-Check **rot** · `ui_budget` 5/5 (173,8 KB).
+**Geliefert (Commits).** `phase1_storage/storage/files.py` + `phase1_storage/tests/test_files.py`
+(8 neue Tests: GPS/ICC, Orientation, PNG-Text, WebP-Flags, byte-identisch, abgeschnitten,
+kaputter Exif-Block, Typ passt nicht).
+
+**Gemessen** (Basis `725215f`): `pytest` **1316 grün** (304 s) · `doc_health` 0 · `ui_smoke` 13/13
+· `ui_budget` 5/5 (173,8 KB) · **Gegenlauf:** ohne Prädikat `team={'alpha': False,
+'beta': False}` → der neue Smoke-Check **rot**.
 
 **Ausführer-Daten.** opencode/MiniMax-M3.1-Flash · Kontextgrenze 400.000 (P10.5-C erfüllt) ·
 keine Advisor-Runde · Eingriffe Nikinger/Claude Code: 0 · kein `systemctl`, kein `sudo`, kein
 echter `DATA_ROOT`.
 
-**Offen / nächster Schritt.** Block 3 (Hygiene): LG-8 = P1-Öffnung 15 (EXIF-Bereinigung in
-`Store.put_asset()`), LG-7 = `scripts/asset_orphans.py`. P1-Öffnung 15 ist angekündigt
-(Phase-Head, 2026-10-22); keine weitere Datei unter `phase1_storage/storage/`.
+**Offen / nächster Schritt.** Block 3.2 (Aufruf in `Store.put_asset()`), 3.3
+(`scripts/asset_orphans.py`), 3.4 (Tests). **Datenlage geändert:** die alten Dummy-PNG-Header
+in acht Testdateien sind jetzt **keine Bilder mehr** (fail-closed) — die Fixture liegt an
+einer Stelle (`phase1_storage/tests/sharefyx_image_bytes.py`).

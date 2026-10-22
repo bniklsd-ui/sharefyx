@@ -1,4 +1,5 @@
 import re
+import zlib
 from pathlib import Path
 
 import pytest
@@ -18,6 +19,7 @@ from storage.files import (
     new_asset_id,
     slugify,
     sniff_image_mime,
+    strip_image_metadata,
     validate_folder,
 )
 
@@ -255,3 +257,235 @@ def test_new_asset_id_format_and_uniqueness():
     ids = [new_asset_id() for _ in range(200)]
     assert all(re.match(r"\Aast_[0-9a-f]{8}\Z", i) for i in ids)
     assert len(set(ids)) == 200
+
+
+# -- EXIF-Bereinigung (P10.5, Block 3, LG-8 / P1-Öffnung 15) ------------------------------
+#
+# **Die Fixtures werden hier gebaut** (Bytes, keine Binärdateien im Repo) — Plan Block 3,
+# Schritt 3.4. Sie sind so gebaut, dass sie den Weg durch den Stripper **wirklich** prüfen:
+# eine echte Chunk-/Marker-Folge, keine bloßen Magic Bytes.
+
+
+def _jpeg_segment(marker: int, payload: bytes) -> bytes:
+    """Ein JPEG-Segment: `FF <marker>` + 2-Byte-Länge (inklusive sich selbst) + Nutzlast."""
+    return bytes([0xFF, marker]) + (len(payload) + 2).to_bytes(2, "big") + payload
+
+
+def _exif_payload(orientation: int | None = None, *, gps: bytes | None = None) -> bytes:
+    """Ein Exif-APP1-Inhalt (`Exif\\0\\0` + TIFF-Block, Little-Endian) mit optionaler
+    `Orientation` und einem optionalen GPS-IFD.
+
+    Der GPS-Marker ist ein **erkennbarer String** — nach dem Strippen muss er weg sein, und
+    genau daran prüft der Test, dass nicht nur die Orientation übrig bleibt.
+    """
+    entries: list[tuple[int, int, int, bytes]] = []
+    if orientation is not None:
+        entries.append((0x0112, 3, 1, orientation.to_bytes(2, "little") + b"\x00\x00"))
+    tail = b""
+    if gps is not None:
+        gps_ifd = 8 + 2 + 12 * (len(entries) + 1) + 4
+        gps_data = gps_ifd + 2 + 12 + 4
+        entries.append((0x8825, 4, 1, gps_ifd.to_bytes(4, "little")))
+        tail = (
+            (1).to_bytes(2, "little")
+            + (0x0001).to_bytes(2, "little")
+            + (2).to_bytes(2, "little")
+            + len(gps).to_bytes(4, "little")
+            + gps_data.to_bytes(4, "little")
+            + (0).to_bytes(4, "little")
+            + gps
+        )
+    out = bytearray(b"II\x2a\x00")
+    out += (8).to_bytes(4, "little")
+    out += len(entries).to_bytes(2, "little")
+    for tag, value_type, count, value in entries:
+        out += tag.to_bytes(2, "little") + value_type.to_bytes(2, "little")
+        out += count.to_bytes(4, "little") + value
+    out += (0).to_bytes(4, "little")
+    out += tail
+    return b"Exif\x00\x00" + bytes(out)
+
+
+def _png_chunk(chunk_type: bytes, payload: bytes) -> bytes:
+    """Ein PNG-Chunk: Länge + Typ + Daten + CRC."""
+    body = chunk_type + payload
+    return (
+        len(payload).to_bytes(4, "big")
+        + body
+        + (zlib.crc32(body) & 0xFFFFFFFF).to_bytes(4, "big")
+    )
+
+
+_PNG_IHDR = (1).to_bytes(4, "big") + (1).to_bytes(4, "big") + bytes([8, 2, 0, 0, 0])
+
+
+def _webp_chunk(chunk_type: bytes, payload: bytes) -> bytes:
+    """Ein WebP-Chunk: Typ + Größe + Daten (+ ein Füllbyte bei ungerader Größe)."""
+    pad = b"\x00" if len(payload) % 2 else b""
+    return chunk_type + len(payload).to_bytes(4, "little") + payload + pad
+
+
+def test_strip_jpeg_removes_gps_exif_and_keeps_icc():
+    """Der Kern von LG-8: GPS- und Gerätedaten fliegen raus — das **Farbprofil** bleibt.
+    Ohne ICC-Profil (`APP2`) würden die Farben des Bildes falsch: das wäre Datenverlust,
+    nicht Metadaten-Verlust. Ebenso bleibt JFIF (`APP0`) und Adobe (`APP14`, CMYK)."""
+    jpeg = (
+        b"\xff\xd8"
+        + _jpeg_segment(0xE1, _exif_payload(6, gps=b"GPSLATITUDE"))
+        + _jpeg_segment(0xE1, b"http://ns.adobe.com/xap/1.0/\x00XMP-DATEN")
+        + _jpeg_segment(0xE2, b"ICC_PROFILE\x00PROFILDATEN")
+        + _jpeg_segment(0xE0, b"JFIF\x00")
+        + _jpeg_segment(0xED, b"Photoshop 3.0\x00")
+        + _jpeg_segment(0xFE, b"ein Kommentar")
+        + b"\xff\xda" + (8).to_bytes(2, "big") + b"\x00\x01\x00\x00" + b"\x7f" * 16 + b"\xff\xd9"
+    )
+
+    out = strip_image_metadata(jpeg, "image/jpeg")
+
+    assert b"GPSLATITUDE" not in out
+    assert b"XMP-DATEN" not in out
+    assert b"ein Kommentar" not in out
+    assert b"Photoshop 3.0" not in out
+    assert b"ICC_PROFILE" in out
+    assert b"JFIF" in out
+    # Ab SOS wird alles byte-genau kopiert — der Bildinhalt ist unangetastet.
+    assert out.endswith(b"\x7f" * 16 + b"\xff\xd9")
+    assert out.startswith(b"\xff\xd8")
+
+
+def test_strip_jpeg_keeps_orientation_only():
+    """Ein Handyfoto mit Orientation 6 (90° gedreht) behält die Orientation — als
+    **minimales** `APP1` mit genau einem Tag. Der ganze Exif-Block (GPS, Kamera, Zeit) ist
+    weg; ohne Orientation stünde das Bild nach dem Hochladen quer."""
+    jpeg = (
+        b"\xff\xd8"
+        + _jpeg_segment(0xE1, _exif_payload(6, gps=b"GPSLATITUDE"))
+        + b"\xff\xda" + (8).to_bytes(2, "big") + b"\x00\x01\x00\x00" + b"\x00" * 8 + b"\xff\xd9"
+    )
+
+    out = strip_image_metadata(jpeg, "image/jpeg")
+
+    assert out.count(b"\xff\xe1") == 1
+    app1 = out[out.find(b"\xff\xe1"):]
+    assert b"GPSLATITUDE" not in app1
+    # Der Orientation-Tag 0x0112, Typ SHORT, Wert 6 (little endian im Wertfeld).
+    assert b"\x12\x01\x03\x00\x01\x00\x00\x00\x06\x00" in app1
+    # Sonst nichts: kein GPS-IFD-Pointer (0x8825), keine Kamera, keine Zeit.
+    assert b"\x88\x25" not in app1
+    # Das Minimal-APP1 ist 36 Byte lang (2 Marker + 2 Länge + 6 "Exif\0\0" + 26 TIFF).
+    assert len(app1.split(b"\xff\xda")[0]) == 36
+
+
+def test_strip_jpeg_drops_the_exif_when_the_orientation_is_one():
+    """**Gegenlauf** zu `test_strip_jpeg_keeps_orientation_only`: Orientation 1 ist „normal
+    stehend" — da gibt es nichts zu retten, das `APP1` fliegt vollständig weg."""
+    jpeg = (
+        b"\xff\xd8"
+        + _jpeg_segment(0xE1, _exif_payload(1, gps=b"GPSLATITUDE"))
+        + b"\xff\xda" + (8).to_bytes(2, "big") + b"\x00\x01\x00\x00" + b"\x00" * 8 + b"\xff\xd9"
+    )
+
+    out = strip_image_metadata(jpeg, "image/jpeg")
+
+    assert b"\xff\xe1" not in out
+    assert b"GPSLATITUDE" not in out
+
+
+def test_strip_png_removes_text_chunks():
+    """PNG: `tEXt`, `iTXt`, `zTXt`, `eXIf` und `tIME` fliegen weg, alle anderen Chunks
+    bleiben **in Reihenfolge** — ihre CRC bleibt gültig, weil kein Byte eines behaltenen
+    Chunks verändert wird."""
+    png = (
+        b"\x89PNG\r\n\x1a\n"
+        + _png_chunk(b"IHDR", _PNG_IHDR)
+        + _png_chunk(b"tEXt", b"Comment\x00geheim")
+        + _png_chunk(b"eXIf", b"Exif-Daten")
+        + _png_chunk(b"tIME", b"\x07\xe6\x01\x01\x00\x00\x00")
+        + _png_chunk(b"IDAT", b"\x00\x01")
+        + _png_chunk(b"IEND", b"")
+    )
+
+    out = strip_image_metadata(png, "image/png")
+
+    assert b"geheim" not in out
+    assert b"Exif-Daten" not in out
+    assert b"tEXt" not in out and b"eXIf" not in out and b"tIME" not in out
+    assert out.startswith(b"\x89PNG\r\n\x1a\n")
+    assert b"IHDR" in out and b"IDAT" in out
+    assert out.endswith(_png_chunk(b"IEND", b""))
+
+
+def test_strip_webp_removes_exif_and_clears_flags():
+    """WebP: die Chunks `EXIF` und `XMP ` fliegen weg, **und** die zugehörigen Flag-Bits in
+    `VP8X` werden gelöscht — sonst behauptet die Datei, sie hätte noch Metadaten, die sie
+    nicht mehr hat. Die RIFF-Größe wird neu gesetzt."""
+    body = (
+        _webp_chunk(b"VP8X", bytes([0x0C, 0, 0, 0, 0, 0, 0, 0, 0, 0]))  # EXIF-Bit | XMP-Bit
+        + _webp_chunk(b"EXIF", b"Exif-Daten")
+        + _webp_chunk(b"XMP ", b"XMP-Daten")
+        + _webp_chunk(b"VP8 ", b"\x00" * 10)
+    )
+    webp = b"RIFF" + (4 + len(body)).to_bytes(4, "little") + b"WEBP" + body
+
+    out = strip_image_metadata(webp, "image/webp")
+
+    assert b"Exif-Daten" not in out
+    assert b"XMP-Daten" not in out
+    flags = out[20]  # RIFF(4) + Größe(4) + WEBP(4) + Chunk-Typ(4) + Chunk-Größe(4)
+    assert flags & 0x08 == 0  # EXIF-Bit
+    assert flags & 0x04 == 0  # XMP-Bit
+    assert int.from_bytes(out[4:8], "little") == len(out) - 8
+
+
+def test_strip_leaves_clean_image_byte_identical():
+    """Ein Bild **ohne** Metadaten bleibt byte-identisch — es wird nichts neu kodiert, nichts
+    umgeschrieben, nichts „normalisiert“."""
+    jpeg = (
+        b"\xff\xd8"
+        + _jpeg_segment(0xE0, b"JFIF\x00")
+        + b"\xff\xda" + (8).to_bytes(2, "big") + b"\x00\x01\x00\x00" + b"\x11" * 8 + b"\xff\xd9"
+    )
+    png = b"\x89PNG\r\n\x1a\n" + _png_chunk(b"IHDR", _PNG_IHDR) + _png_chunk(b"IEND", b"")
+    gif = b"GIF89a" + b"restliche-bytes-egal"
+
+    assert strip_image_metadata(jpeg, "image/jpeg") == jpeg
+    assert strip_image_metadata(png, "image/png") == png
+    assert strip_image_metadata(gif, "image/gif") == gif
+
+
+def test_strip_rejects_truncated_jpeg():
+    """**Fail-closed:** ein abgeschnittenes JPEG wird **nicht** halbbereinigt gespeichert,
+    sondern abgelehnt (Geist von Hard Rule 5: nie ein halber Zustand auf der Platte)."""
+    voll = (
+        b"\xff\xd8"
+        + _jpeg_segment(0xE1, _exif_payload(6))
+        + b"\xff\xda" + (8).to_bytes(2, "big") + b"\x00\x01\x00\x00" + b"\x00" * 8
+    )
+
+    with pytest.raises(ValidationError):
+        strip_image_metadata(voll[:20], "image/jpeg")  # mitten im APP1 abgeschnitten
+    with pytest.raises(ValidationError):
+        strip_image_metadata(voll[:38], "image/jpeg")  # ohne SOS: kein Bildinhalt
+
+
+def test_strip_rejects_a_broken_exif_block():
+    """**Fail-closed:** ein Exif-Block, den der Parser nicht versteht, ergibt einen Fehler.
+    Wer die Orientation nicht sicher lesen kann, darf das Bild nicht halbbereinigt speichern."""
+    kaputt = b"Exif\x00\x00" + b"II" + b"\x00\x00"  # die Magic 42 fehlt
+    jpeg = (
+        b"\xff\xd8"
+        + _jpeg_segment(0xE1, kaputt)
+        + b"\xff\xda" + (8).to_bytes(2, "big") + b"\x00\x01\x00\x00" + b"\x00" * 8 + b"\xff\xd9"
+    )
+
+    with pytest.raises(ValidationError):
+        strip_image_metadata(jpeg, "image/jpeg")
+
+
+def test_strip_rejects_bytes_that_do_not_match_the_mime():
+    """Der Typ kommt aus den Magic Bytes, nicht vom Client — und die Bytes müssen zum
+    behaupteten Typ passen."""
+    with pytest.raises(ValidationError):
+        strip_image_metadata(b"\x89PNG\r\n\x1a\nrest", "image/jpeg")
+    with pytest.raises(ValidationError):
+        strip_image_metadata(b"egal", "image/tiff")
