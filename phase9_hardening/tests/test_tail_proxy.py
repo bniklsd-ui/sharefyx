@@ -15,16 +15,17 @@ gehen kann:
   4. test_execstart_carries_no_repo_path            # unabhaengig vom Release-Pfad
   5. test_the_port_is_the_one_the_app_listens_on   # Port darf nicht auseinanderlaufen
   6. test_health_route_correction_holds             # /health, nicht /healthz (Befund 2)
+  7. test_sigterm_exit_143_counts_as_success       # BT-2/D-11: ein Stopp ist kein Fehler
 
 Dazu vier Wächter für die Caddy-Vorlage (Stand 2026-10-01, aus der A4-Vorbereitungsrunde). Sie
 sind nicht theoretisch: der Platzhalter `<vps-tailnet>` war im Kopfkommentar als Adresse *des
 VPS* beschrieben, während `reverse_proxy` darunter auf die Heim-VM zeigt — wer nach der Kopfzeile
 einsetzt, proxt Caddy auf sich selbst und der Fehler sieht in A4 wie ein totes Relay aus.
 
-  7. test_the_upstream_placeholder_names_the_home_vm
-  8. test_the_template_and_its_header_name_the_same_placeholders
-  9. test_the_upstream_port_is_the_relay_port
- 10. test_no_second_hsts_header_and_no_admin_off
+  8. test_the_upstream_placeholder_names_the_home_vm
+  9. test_the_template_and_its_header_name_the_same_placeholders
+ 10. test_the_upstream_port_is_the_relay_port
+ 11. test_no_second_hsts_header_and_no_admin_off
 
 Kein Netz, kein Dienst, kein root — alles statisch gegen die Dateien im Repo. Die
 VPS-seitigen Artefakte (Caddyfile-Vorlage, ACL-Entwurf) haben je einen Wächter, weil ein
@@ -45,6 +46,7 @@ from __future__ import annotations
 
 import json
 import re
+import signal
 from ipaddress import ip_address, ip_network
 from pathlib import Path
 
@@ -197,6 +199,60 @@ def test_health_route_correction_holds():
     )
     assert "/healthz" not in caddy_config, \
         "die Caddy-Vorlage darf kein /healthz konfigurieren — die Route existiert nicht"
+
+
+# --- Test 7 -----------------------------------------------------------------
+
+def test_sigterm_exit_143_counts_as_success():
+    """Ein geordneter Stopp darf die Unit nicht auf `failed` lassen (BT-2, D-11).
+
+    Gemessen am 2026-10-11 von eurofyx-fleet (Session S6, `intake.md` §6): `socat` beendet
+    sich auf SIGTERM mit Exit-Code 143, systemd wertet das als Fehler ("Failed with result
+    'exit-code'"), und die Unit steht danach auf `failed` — obwohl der Stopp gewollt war.
+    Jeder Reboot, jedes Deploy mit Neustart und jeder manuelle Stopp hinterlässt so einen
+    Fehlalarm, und wer `systemctl --failed` als Gesundheitssignal nutzt (Fleet tut das in
+    `vm-dev.sh`: "0 failed units"), kann echte Ausfälle nicht mehr unterscheiden.
+
+    Die Zeile `SuccessExitStatus=143` erklärt genau diesen Exit-Code zum Erfolg. Die Zahl
+    wird hier nicht als Konstante behauptet, sondern aus dem Signal gerechnet: SIGTERM ist
+    Signal 15, und 128 + 15 = 143. Wer die Zahl im Unit ändert, ohne die Signalnummer zu
+    ändern, macht diesen Wächter rot.
+
+    Der Gegenlauf live (P10.5-6) ist **nicht** nachgestellt: ohne die Zeile meldet systemd
+    `Result=exit-code` — das ist der gemessene Fleet-Befund vom 2026-10-11, keine Behauptung
+    dieses Tests.
+    """
+    unit = PROXY_SERVICE.read_text()
+    # Nur die Anweisungen, ohne Kommentarzeilen — dieselbe Unterscheidung wie in
+    # `_directives_only` (ein Kommentar darf einen Namen nennen, eine Anweisung nicht).
+    directives = [
+        line.strip() for line in unit.splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+
+    assert "SuccessExitStatus=143" in directives, \
+        "erwartet `SuccessExitStatus=143` in der Unit — ohne sie steht die Unit nach jedem " \
+        "geordneten Stopp auf `failed` (BT-2, D-11, Fleet S6)"
+    assert directives.count("SuccessExitStatus=143") == 1, \
+        "genau eine SuccessExitStatus-Zeile — eine zweite wäre eine unbekannte Deklaration"
+
+    # 128 + SIGTERM: die Zahl muss zum Signal passen, das der Stopp sendet.
+    assert 128 + int(signal.SIGTERM) == 143, \
+        "die Deklaration 143 gehört zu SIGTERM — änderte sich die Signalnummer, müsste die " \
+        "Unit nachgezogen werden"
+
+    # Die Zeile gehört direkt unter `Restart=on-failure` (Plan Block 1, Schritt 1.3) und
+    # darf die Neustart-Semantik nicht aufheben: ein echter Fehler muss weiterhin neu
+    # starten, nur der geordnete Stopp darf Erfolg sein.
+    restart_idx = directives.index("Restart=on-failure")
+    assert directives[restart_idx + 1] == "SuccessExitStatus=143", \
+        "die SuccessExitStatus-Zeile gehört direkt unter `Restart=on-failure`"
+
+    # Der Zwilling in der MCP-Unit: uvicorn beendet ein SIGTERM mit Exit-Code 0. Eine
+    # dorthin kopierte Zeile wäre eine Erklärung für einen Fehler, den es nicht gibt.
+    assert "SuccessExitStatus" not in MCP_SERVICE.read_text(), \
+        "die MCP-Unit braucht die Zeile nicht — uvicorn beendet SIGTERM mit Exit-Code 0. " \
+        "Trägt sie dort doch einmal, ist das eine eigene Entscheidung, keine Kopie."
 
 
 # --- Wächter für die VPS-seite ----------------------------------------------

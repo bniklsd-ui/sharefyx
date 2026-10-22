@@ -33,6 +33,21 @@ Environment=APP_PORT=8765
 # zusaetzlicher IPv6-Pfad waere eine ungepruefte zweite Route, kein Vorteil.
 ExecStart=/usr/bin/socat TCP4-LISTEN:${APP_PORT},bind=${TAILNET_ADDR},fork,reuseaddr TCP4:${APP_ADDR}:${APP_PORT}
 Restart=on-failure
+# [2026-10-22, P10.5 Block 1, Schritt 1.3 — BT-2, D-11] Ein geordneter Stopp beendet `socat`
+# mit SIGTERM, und SIGTERM ist Exit-Code 143 (128 + 15). systemd wertet 143 als Fehler
+# ("Failed with result 'exit-code'"), die Unit steht danach auf `failed` — obwohl der Stopp
+# gewollt war. Gemessen am 2026-10-11 von eurofyx-fleet (Session S6, intake §6): Jeder Reboot,
+# jedes Deploy mit Neustart und jeder manuelle Stopp hinterlässt eine `failed`-Unit. Wer
+# `systemctl --failed` als Gesundheitssignal nutzt (Fleet tut das in `vm-dev.sh`: "0 failed
+# units"), sieht einen Fehlalarm, und echte Relay-Ausfälle sind davon nicht mehr zu
+# unterscheiden. `SuccessExitStatus=143` erklärt genau diesen Exit-Code zum Erfolg — die
+# Zeile ändert sonst nichts: ein Absturz (Segfault, 139) bleibt ein Fehler, und
+# `Restart=on-failure` greift weiterhin bei jedem echten Fehler.
+#
+# Bewusst NICHT in `sharefyx-mcp.service`: dort beendet uvicorn ein SIGTERM sauber mit
+# Exit-Code 0, es gibt also nichts zu deklarieren. Der Zusatz stünde dort als Schutzhaut
+# gegen einen Fehler, den es nicht gibt.
+SuccessExitStatus=143
 RestartSec=5
 # Härtung zeichengleich mit sharefyx-mcp.service und tailscaled-watchdog.service.
 # Wird von phase9_hardening/tests/test_tail_proxy.py gegen die MCP-Unit geprüft — eine
