@@ -94,11 +94,18 @@ MAX_MCP_ASSET_BYTES = 1 * 1024 * 1024
 
 
 class PermissionDenied(Exception):
-    """P2-eigen (kein `storage`-Fehlertyp) — `can_read`/`can_write` verweigert (Plan §3.6)."""
+    """P2-eigen (kein `storage`-Fehlertyp) — `can_read`/`can_write` verweigert (Plan §3.6).
 
-    def __init__(self, space: str) -> None:
+    **`reason` (P10.5, Block 2, 2026-10-22):** die Regel „dorthin darf nicht verschoben
+    werden" ist eine andere als „kein Schreibrecht" — ohne eigenes Reason wäre die Meldung
+    irreführend, und ein Agent, der sie liest, hielte sich für schreibrechtlos und versuchte
+    etwas anderes. Der Grundtext wird in `map_storage_error()` **statt** der Standardbegründung
+    ausgegeben."""
+
+    def __init__(self, space: str, *, reason: str | None = None) -> None:
         super().__init__(f"kein Zugriff auf Space {space!r}")
         self.space = space
+        self.reason = reason
 
 
 class AssetNotFound(Exception):
@@ -276,6 +283,12 @@ def map_storage_error(exc: Exception) -> ToolError:
         # error()` kennt an dieser Stelle nicht, ob can_read_item oder can_write_item verweigert
         # hat (beide werfen dasselbe PermissionDenied), und drei Texte für dieselbe Ursache
         # (kein Zugriff) wären mehr Verwirrung als Hilfe.
+        #
+        # **P10.5, Block 2 (2026-10-22):** ein eigener `reason` (P10-I/P10.5-N) verdrängt die
+        # Standardbegründung — dort ist „kein Schreibrecht" schlicht **falsch**, der Actor hat
+        # eines, nur die Regel verbietet den Weg.
+        if exc.reason:
+            return ToolError(f"write_denied: {exc.reason}")
         return ToolError(
             f"write_denied: kein Zugriff auf {exc.space} — kein Schreibrecht, das Item ist "
             "nicht mit dir geteilt, oder es ist als 'nur für Menschen' markiert"
@@ -735,6 +748,22 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
                 raise map_storage_error(PermissionDenied(acl.space)) from None
             if not permissions.can_write(principal.space, space):          # Ziel
                 raise map_storage_error(PermissionDenied(space)) from None
+            # **P10-I / P10.5-N (P10.5, Block 2, 2026-10-22):** Schreibrecht auf beiden Seiten
+            # ist die eine Frage, die *Regel*, wohin ein Item wandern darf, eine andere. Kein Item
+            # wandert in den Home-Space eines anderen hinein (P10-I) und keines aus einem fremden
+            # Home-Space heraus (P10.5-N, Nikinger 2026-10-21 — das wäre dort ein Löschen, und
+            # P9-K sperrt Löschen in fremden Home-Spaces). Team-Spaces bleiben frei. Dieselbe Regel
+            # auf der Web-Oberfläche: `webui/api.py :: _items_patch()`.
+            if not permissions.may_move_between(principal.space, acl.space, space):
+                raise map_storage_error(
+                    PermissionDenied(
+                        space,
+                        reason=(
+                            "Verschieben in oder aus dem Home-Space eines anderen ist nicht "
+                            "erlaubt (P10-I/P10.5-N)"
+                        ),
+                    )
+                ) from None
 
         # Fail-closed, Nikinger-Entscheidung 2026-08-12 (kein Plan-Text): `folder` ist zwar
         # generell agenten-setzbar (`Store.update()` erlaubt es seit Step 4), aber nur für den
@@ -744,16 +773,26 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         # der UI, Step 7 — und selbst dort nur für den Eigentümer, der SEINE eigene Freigabe
         # erweitert, nicht für einen Dritten, der fremden Besitz verschiebt).
         # **[2026-08-17, Step 7b Commit 2/3, Advisor-Fund vor dem Bauen]:** dieser Riegel greift
-        # nur noch beim reinen Ordner-Move (`space is None`) — bei einem Space-Wechsel ersetzt
-        # ihn die strengere P6-AE-Prüfung oben, die space-level statt item-level prüft. Ohne
+        # nur noch beim reinen Ordner-Move (`space is None`) — bei einem Space-Wechsel ersetzt ihn
+        # die strengere P6-AE-Prüfung oben, die space-level statt item-level prüft. Ohne
         # dieses `space is None` hätte der Riegel praktisch jeden legitimen Cross-Space-Move mit
         # gleichzeitig gesetztem `folder=` blockiert — kein Principal heißt wie ein geteilter
         # Space, `acl.space != principal.space` wäre also fast immer wahr gewesen.
-        if folder is not None and space is None and acl.space != principal.space:
+        #
+        # **RE-2 (P10.5, Block 2, 2026-10-22):** die Regel ist jetzt `manages_space()` — derselbe
+        # Aufruf wie auf der Web-Oberfläche (`webui/api.py :: _team_writer()`), also **eine**
+        # Regel für beide Flächen (D-17). Zwei Fälle bleiben erlaubt: der eigene Space
+        # (immer) und ein **Team-Space**, in dem der Actor space-level Schreibrecht hat
+        # (`write:` in der `.share.yml` des Space-Wurzelverzeichnisses). Ein fremder
+        # **Home-Space** bleibt gesperrt, auch mit `write:`-Grant (P10-I).
+        if folder is not None and space is None and not permissions.manages_space(
+            principal.space, acl.space
+        ):
             raise map_storage_error(
                 ValidationError(
-                    "folder ist nur vom Eigentümer-Space änderbar — ein geteilter "
-                    "Schreibzugriff erlaubt keine Verschiebung in einen anderen Ordner"
+                    "folder ist nur im eigenen Space oder in einem Team-Space mit Schreibrecht "
+                    "änderbar — ein geteilter Schreibzugriff auf ein Item erlaubt keine "
+                    "Verschiebung in einen anderen Ordner"
                 )
             ) from None
 

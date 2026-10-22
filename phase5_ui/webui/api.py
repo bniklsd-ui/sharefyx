@@ -453,14 +453,24 @@ def api_routes(
         return JSONResponse(payload, headers={"Cache-Control": "no-store"})
 
     async def _spaces_create_folder(request: Request) -> Response:
-        # Eigentümer-Space-Beschränkung wie `_items_patch`s `folder`-Riegel oben — ein geteilter
-        # Schreibzugriff auf EIN Item erlaubt keinen leeren, per Konstruktion einladenden neuen
-        # Ordner in einem fremden Space.
+        # **RE-1 (P10.5, Block 2, 2026-10-22):** die Regel ist jetzt dieselbe wie auf der
+        # Agentenfläche (`permissions.manages_space()`), nicht mehr „nur im eigenen Space".
+        # Vorher stand hier `space != session.space` — damit konnte **niemand** in einem
+        # Team-Space einen Ordner anlegen, auch nicht der space-level Schreiber (D-17).
+        #
+        # Ein geteilter Schreibzugriff auf **ein** Item erlaubt weiterhin keinen leeren, per
+        # Konstruktion einladenden neuen Ordner: `manages_space()` verlangt **space-level**
+        # Schreibrecht (`write:` in der `.share.yml` des Space-Wurzelverzeichnisses), kein
+        # `share_write` auf einem Item.
         session = await _require_session(request)
         await _require_csrf_json(request, session)
         space = request.path_params["space"]
-        if space != session.space:
-            raise ApiError("forbidden", "Ordner können nur im eigenen Space angelegt werden.")
+        if not permissions.manages_space(session.space, space):
+            raise ApiError(
+                "forbidden",
+                "Ordner können nur im eigenen Space oder in einem Team-Space mit Schreibrecht "
+                "angelegt werden.",
+            )
         body = await _json_body(request)
         folder = body.get("folder")
         if not isinstance(folder, str) or not folder:
@@ -975,6 +985,17 @@ def api_routes(
                 raise ApiError("forbidden", "Kein Schreibzugriff auf den Quell-Space.")
             if not permissions.can_write(session.space, target_space):
                 raise ApiError("forbidden", "Kein Schreibzugriff auf den Ziel-Space.")
+            # **P10-I / P10.5-N (P10.5, Block 2, 2026-10-22):** P6-AE oben prüft das
+            # Schreibrecht — die *Regel*, wohin ein Item wandern darf, ist eine andere. Kein Item
+            # wandert in den Home-Space eines anderen hinein (P10-I) und keines aus einem fremden
+            # Home-Space heraus (P10.5-N, Nikinger 2026-10-21 — das wäre dort ein Löschen, und
+            # P9-K sperrt Löschen in fremden Home-Spaces). Team-Spaces bleiben frei. Dieselbe
+            # Regel auf der Agentenfläche: `mcpserver/tools.py :: update_item()`.
+            if not permissions.may_move_between(session.space, acl.space, target_space):
+                raise ApiError(
+                    "forbidden",
+                    "Verschieben in oder aus dem Home-Space eines anderen ist nicht erlaubt.",
+                )
 
         # Fail-closed, Nikinger-Entscheidung 2026-08-12 (kein Plan-Text, siehe
         # `mcpserver/tools.py::update_item`s gleichnamige Begründung): `folder` ist nur vom

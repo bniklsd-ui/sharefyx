@@ -737,6 +737,64 @@ async def test_patch_with_space_and_folder_together_uses_space_level_check_not_o
 
 
 @pytest.mark.asyncio
+async def test_move_into_foreign_home_space_is_forbidden(
+    full_app_items, item_store, store, tmp_path, totp_code, clock
+):
+    """**P10-I (P10.5, Block 2, 2026-10-22):** kein Item wandert in den Home-Space eines
+    anderen — auch nicht mit `write:`-Grant dort. Schreibrecht auf beiden Seiten (P6-AE) ist
+    die eine Frage, die *Regel*, wohin ein Item wandern darf, eine andere.
+
+    Die Re-Auth-Credentials sind mitgeschickt, damit der Test die **Regel** prüft und nicht das
+    Re-Auth-Gate (das liefert bei fehlenden Credentials ebenfalls 403, aber mit
+    `"reauth_required"`)."""
+    item_store.create(FOREIGN_SPACE, type="note", title="Fremd")
+    _team(tmp_path)
+    _make_home(store)
+    item = item_store.create(SPACE, type="note", title="Umzug")
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        clock.advance(31)  # neues TOTP-Zeitfenster, sonst Replay-Ablehnung bei der Re-Auth
+        response = await client.patch(
+            f"/api/v1/items/{item.id}",
+            json={
+                "version": item.version, "space": FOREIGN_SPACE,
+                "password": PASSWORD, "totp": totp_code(),
+            },
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 403, response.text
+    assert response.json()["error"] == "forbidden"
+    assert item_store.get(item.id).space == SPACE  # kein stiller Teil-Move
+
+
+@pytest.mark.asyncio
+async def test_move_out_of_foreign_home_space_is_forbidden(
+    full_app_items, item_store, store, tmp_path, totp_code, clock
+):
+    """**P10.5-N (P10.5, Block 2, Nikinger 2026-10-21):** kein Item wandert **aus** dem
+    Home-Space eines anderen heraus — das wäre dort ein Löschen, und P9-K sperrt Löschen in
+    fremden Home-Spaces. Die Quelle ist diesmal der fremde Home-Space, das Ziel ein Team-Space."""
+    item_store.create(FOREIGN_SPACE, type="note", title="Fremd")
+    _team(tmp_path)
+    _make_home(store)
+    item = item_store.create(FOREIGN_SPACE, type="note", title="Wandert raus")
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        clock.advance(31)
+        response = await client.patch(
+            f"/api/v1/items/{item.id}",
+            json={
+                "version": item.version, "space": SPACE,
+                "password": PASSWORD, "totp": totp_code(),
+            },
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 403, response.text
+    assert response.json()["error"] == "forbidden"
+    assert item_store.get(item.id).space == FOREIGN_SPACE  # kein stiller Teil-Move
+
+
+@pytest.mark.asyncio
 async def test_narrowing_share_write_does_not_require_reauth(full_app_items, item_store, totp_code):
     item = item_store.create(SPACE, type="note", title="Original", share_write=["fabian"])
     async with _client(full_app_items) as client:
@@ -992,16 +1050,40 @@ async def test_create_folder_makes_an_empty_directory_visible_in_spaces(
 
 
 @pytest.mark.asyncio
-async def test_create_folder_rejects_foreign_space_even_with_write_share(
+async def test_team_writer_creates_folder_in_team_space(
     full_app_items, item_store, tmp_path, totp_code
 ):
-    """Derselbe Eigentümer-Riegel wie `_items_patch`s `folder`-Feld (2026-08-12): ein
-    `write:`-Grant erlaubt, einzelne Items zu ändern, aber keinen neuen, leeren Ordner in einem
-    fremden Space anzulegen."""
+    """**RE-1 (P10.5, Block 2, 2026-10-22):** im Team-Space darf der space-level Schreiber einen
+    Ordner anlegen. Vorher stand hier `space != session.space` — damit konnte auf der
+    Web-Oberfläche **niemand** in einem Team-Space einen Ordner anlegen, während die
+    Agentenfläche es seit E1a (P9-BG/BP) durfte: zwei Wege, zwei Regeln (D-17). Jetzt gilt
+    `permissions.manages_space()` — dieselbe Regel auf beiden Flächen.
+
+    Der Gegenlauf ist `test_folder_create_in_foreign_home_space_is_forbidden_even_with_write`:
+    dieselbe `.share.yml`, aber der Space ist der Home-Space eines Menschen."""
     item_store.create(FOREIGN_SPACE, type="note", title="Fremd")
-    (tmp_path / "data" / FOREIGN_SPACE / ".share.yml").write_text(
-        f"write: [{SPACE}]\n", encoding="utf-8"
-    )
+    _team(tmp_path)
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.post(
+            f"/api/v1/spaces/{FOREIGN_SPACE}/folders",
+            json={"folder": "Projekte"}, headers=_headers(csrf),
+        )
+    assert response.status_code == 201, response.text
+    assert response.json() == {"folder": "projekte"}
+
+
+@pytest.mark.asyncio
+async def test_folder_create_in_foreign_home_space_is_forbidden_even_with_write(
+    full_app_items, item_store, store, tmp_path, totp_code
+):
+    """**Gegenlauf** zu `test_team_writer_creates_folder_in_team_space`: dieselbe `.share.yml`
+    (`write:`), aber `FOREIGN_SPACE` ist jetzt der Home-Space eines Menschen. Dort wird kein
+    leerer, einladender Ordner angelegt — P9-K/P9-136, jetzt als *eine* Regel mit der
+    Agentenfläche (`permissions.manages_space()`)."""
+    item_store.create(FOREIGN_SPACE, type="note", title="Fremd")
+    _team(tmp_path)
+    _make_home(store)
     async with _client(full_app_items) as client:
         csrf = await _login(client, totp_code)
         response = await client.post(
@@ -1009,6 +1091,7 @@ async def test_create_folder_rejects_foreign_space_even_with_write_share(
             json={"folder": "Projekte"}, headers=_headers(csrf),
         )
     assert response.status_code == 403
+    assert response.json()["error"] == "forbidden"
 
 
 @pytest.mark.asyncio

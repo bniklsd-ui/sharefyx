@@ -282,6 +282,62 @@ async def test_api_items_reachable_through_create_app(app, auth_store, auth_sett
 
 
 @pytest.mark.asyncio
+async def test_mcp_move_into_a_foreign_home_space_is_denied(app, auth_store, token_alpha, store, tmp_path):
+    """**P10-I (P10.5, Block 2, 2026-10-22) gegen die echte App:** `create_app()` muss die
+    Policy mit dem Home-Space-Prädikat bauen — nur die Auth-DB weiß, welcher Space einem Nutzer
+    gehört. Ohne dieses Prädikat fiele die MCP-Fläche stillschweigend auf die alte Regel zurück
+    (Schreibrecht genügt), und **kein** Test in `phase2_mcp/tests/test_tools.py` würde es merken:
+    dort ist das Prädikat selbst gesetzt. Dieser Test ist der Wächter für die Verdrahtung in
+    `mcpserver/app.py`.
+
+    „beta" ist hier der Home-Space eines Menschen (`auth_store.upsert_user()`), „alpha" hat dort
+    space-level `write:` — der Move wäre also nach P6-AE erlaubt und scheitert nur an P10-I."""
+    auth_store.upsert_user(
+        "beta", password_hash="x", totp_secret_enc=None, totp_alg="SHA1",
+        totp_confirmed_at=None, status="active",
+    )
+    (tmp_path / "beta" / ".share.yml").write_text("write: [alpha]\n", encoding="utf-8")
+    item = store.create("alpha", type="note", title="Umzug")
+
+    async with app.router.lifespan_context(app):
+        async with _mcp_client(app, token_alpha) as client:
+            result = await client.call_tool(
+                "update_item",
+                {"item_id": item.id, "version": item.version, "space": "beta"},
+                raise_on_error=False,
+            )
+
+    assert result.is_error is True
+    assert "write_denied" in result.content[0].text
+    assert store.get(item.id).space == "alpha"  # kein stiller Teil-Move
+
+
+@pytest.mark.asyncio
+async def test_mcp_move_out_of_a_foreign_home_space_is_denied(app, auth_store, token_alpha, store, tmp_path):
+    """**P10.5-N (P10.5, Block 2, Nikinger 2026-10-21) gegen die echte App:** kein Item wandert
+    **aus** dem Home-Space eines anderen heraus — das wäre dort ein Löschen (P9-K sperrt Löschen
+    in fremden Home-Spaces). Die Quelle ist diesmal der fremde Home-Space."""
+    auth_store.upsert_user(
+        "beta", password_hash="x", totp_secret_enc=None, totp_alg="SHA1",
+        totp_confirmed_at=None, status="active",
+    )
+    (tmp_path / "beta" / ".share.yml").write_text("write: [alpha]\n", encoding="utf-8")
+    item = store.create("beta", type="note", title="Wandert raus")
+
+    async with app.router.lifespan_context(app):
+        async with _mcp_client(app, token_alpha) as client:
+            result = await client.call_tool(
+                "update_item",
+                {"item_id": item.id, "version": item.version, "space": "alpha"},
+                raise_on_error=False,
+            )
+
+    assert result.is_error is True
+    assert "write_denied" in result.content[0].text
+    assert store.get(item.id).space == "beta"  # kein stiller Teil-Move
+
+
+@pytest.mark.asyncio
 async def test_health_ok(app):
     async with httpx.AsyncClient(
         transport=httpx.ASGITransport(app=app), base_url="http://testserver"

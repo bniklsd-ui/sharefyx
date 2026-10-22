@@ -29,6 +29,17 @@ from storage.store import Store
 # Bewusst keine Nikinger-typischen Spacenamen (Plan §2.2 Erweiterungspfad).
 SPACE_A = "alpha"
 SPACE_B = "beta"
+# P10.5, Block 2 (2026-10-22): die Home-Space-Regeln brauchen Namen für „Home-Space eines
+# anderen" und für einen zweiten Team-Space.
+SPACE_C = "gamma"
+SPACE_D = "delta"
+
+# **Das Home-Space-Modell dieses Testkorpus** (P10.5, Block 2): `alpha` und `gamma` sind
+# Home-Spaces (zwei Nutzer), `beta` und `delta` sind Team-Spaces (sie gehören niemandem). Live
+# beantwortet das die Auth-DB (`mcpserver/app.py :: create_app()`:
+# `get_user(space) is not None`), dieser Testkorpus hat keine — das Modell steht deshalb
+# ausdrücklich hier, statt es zu erfinden.
+HOME_SPACES = frozenset({SPACE_A, SPACE_C})
 
 
 def _write_share_yml(directory, content: str) -> None:
@@ -57,7 +68,11 @@ def store(tmp_path) -> Store:
 
 @pytest.fixture
 def permissions(store) -> Permissions:
-    return SharePolicy(store.acl_reader)
+    """**P10.5, Block 2 (2026-10-22):** die Policy kennt jetzt Home-Spaces und Team-Spaces —
+    dafür braucht sie ein Prädikat. Ohne Prädikat kennt sie **keinen** Home-Space (fail-closed,
+    `permissions.py`), deshalb steht das Modell hier ausdrücklich: `alpha`/`gamma` sind
+    Home-Spaces, `beta`/`delta` sind Team-Spaces."""
+    return SharePolicy(store.acl_reader, is_home_space=lambda space: space in HOME_SPACES)
 
 
 @pytest.fixture
@@ -789,8 +804,6 @@ def test_share_write_cannot_move_item_to_a_different_folder(tools_map, store, tm
 
 # -- update_item(space=...) -- Step 7b, P6-AD-AJ, ITEM_MOVE_PLAN.md Sec4.2 -------------------
 
-SPACE_C = "gamma"
-
 
 def test_update_item_with_space_moves_between_shared_spaces(tools_map, store, tmp_path):
     _write_share_yml(tmp_path / SPACE_B, f"write: [{SPACE_A}]\n")
@@ -850,22 +863,94 @@ def test_update_item_with_space_and_folder_together_uses_space_level_check_not_o
     Eigentuemer-Riegel gegen Nicht-Eigentuemer-Ordnerwechsel haette einen legitimen
     Cross-Space-Move mit gleichzeitig gesetztem folder= faelschlich blockiert, weil kein
     Principal wie ein geteilter Space heisst. Ein Actor mit space-level Schreibrecht auf BEIDEN
-    Seiten, aber ohne Eigentuemerschaft an der Quelle, muss trotzdem verschieben duerfen."""
-    _write_share_yml(tmp_path / SPACE_A, f"write: [{SPACE_C}]\n")
+    Seiten, aber ohne Eigentuemerschaft an der Quelle, muss trotzdem verschieben duerfen.
+
+    **[Nachtrag P10.5, Block 2, 2026-10-22]:** Quelle und Ziel sind jetzt **Team-Spaces**
+    (`beta` → `delta`), nicht der Home-Space `alpha`. Grund: P10.5-N (Nikinger 2026-10-21)
+    verbietet, ein Item **aus** dem Home-Space eines anderen herauszutragen — das wäre dort ein
+    Löschen (P9-K sperrt Löschen in fremden Home-Spaces). Der Testzweck bleibt derselbe: der
+    Eigentuemer-Riegel darf einen legitimen Cross-Space-Move mit `folder=` nicht blockieren."""
     _write_share_yml(tmp_path / SPACE_B, f"write: [{SPACE_C}]\n")
-    item = store.create(SPACE_A, type="note", title="Umzug mit Ordner")
+    _write_share_yml(tmp_path / SPACE_D, f"write: [{SPACE_C}]\n")
+    item = store.create(SPACE_B, type="note", title="Umzug mit Ordner")
 
     with _as(SPACE_C):
         receipt = json.loads(
             tools_map["update_item"](
-                item.id, version=item.version, space=SPACE_B, folder="projekte"
+                item.id, version=item.version, space=SPACE_D, folder="projekte"
             )
         )
         assert receipt["version"] == item.version + 1
 
     moved = store.get(item.id)
-    assert moved.space == SPACE_B
+    assert moved.space == SPACE_D
     assert moved.folder == "projekte"
+
+
+# -- P10.5, Block 2: RE-2 (Ordner wechseln im Team-Space), P10-I, P10.5-N --------------------
+
+
+def test_update_item_folder_change_in_team_space_by_team_writer(tools_map, store, tmp_path):
+    """**RE-2 (P10.5, Block 2, 2026-10-22):** ein space-level Schreiber in einem **Team-Space**
+    darf den Ordner eines Items ändern. Vorher stand hier `acl.space != principal.space` — damit
+    durfte auf der Agentenfläche nur der Eigentümer-Space den Ordner wechseln, während die
+    Web-Oberfläche es seit E1a (P9-BG/BP) durfte: zwei Wege, zwei Regeln (D-17). Jetzt gilt
+    `permissions.manages_space()` auf beiden Flächen."""
+    _write_share_yml(tmp_path / SPACE_B, f"write: [{SPACE_A}]\n")
+    item = store.create(SPACE_B, type="note", title="Ordnerwechsel", folder="eng")
+
+    with _as(SPACE_A):
+        receipt = json.loads(
+            tools_map["update_item"](item.id, version=item.version, folder="weit")
+        )
+        assert receipt["version"] == item.version + 1
+
+    assert store.get(item.id).folder == "weit"
+
+
+def test_update_item_move_into_foreign_home_space_denied(tools_map, store, tmp_path):
+    """**P10-I (P10.5, Block 2, 2026-10-22):** kein Item wandert in den Home-Space eines
+    anderen — auch nicht mit space-level `write:` dort. Schreibrecht (P6-AE) ist die eine
+    Frage, die *Regel*, wohin ein Item wandern darf, eine andere."""
+    _write_share_yml(tmp_path / SPACE_C, f"write: [{SPACE_A}]\n")
+    item = store.create(SPACE_A, type="note", title="Umzug")
+
+    with _as(SPACE_A), pytest.raises(ToolError, match="write_denied"):
+        tools_map["update_item"](item.id, version=item.version, space=SPACE_C)
+
+    unchanged = store.get(item.id)
+    assert unchanged.space == SPACE_A
+
+
+def test_update_item_move_out_of_foreign_home_space_denied(tools_map, store, tmp_path):
+    """**P10.5-N (P10.5, Block 2, Nikinger 2026-10-21):** kein Item wandert **aus** dem
+    Home-Space eines anderen heraus — das wäre dort ein Löschen (P9-K sperrt Löschen in fremden
+    Home-Spaces). Die Quelle ist diesmal der fremde Home-Space, das Ziel ein Team-Space."""
+    _write_share_yml(tmp_path / SPACE_C, f"write: [{SPACE_A}]\n")
+    _write_share_yml(tmp_path / SPACE_B, f"write: [{SPACE_A}]\n")
+    item = store.create(SPACE_C, type="note", title="Wandert raus")
+
+    with _as(SPACE_A), pytest.raises(ToolError, match="write_denied"):
+        tools_map["update_item"](item.id, version=item.version, space=SPACE_B)
+
+    unchanged = store.get(item.id)
+    assert unchanged.space == SPACE_C
+
+
+def test_update_item_move_into_team_space_still_allowed(tools_map, store, tmp_path):
+    """**Gegenlauf** zu `test_update_item_move_into_foreign_home_space_denied`: dasselbe
+    Schreibrecht, aber das Ziel ist ein **Team-Space** — der Weg bleibt offen. Team-Spaces
+    gehören niemandem, also greift weder P10-I noch P10.5-N."""
+    _write_share_yml(tmp_path / SPACE_B, f"write: [{SPACE_A}]\n")
+    item = store.create(SPACE_A, type="note", title="Umzug")
+
+    with _as(SPACE_A):
+        receipt = json.loads(
+            tools_map["update_item"](item.id, version=item.version, space=SPACE_B)
+        )
+        assert receipt["version"] == item.version + 1
+
+    assert store.get(item.id).space == SPACE_B
 
 
 def test_update_item_with_space_rejects_combined_content_changes(tools_map, store):
