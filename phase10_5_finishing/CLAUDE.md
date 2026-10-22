@@ -9,7 +9,7 @@ down:
   - ../phase10_inventory/BAUSTELLENREGISTER.md      # 📗 die Arbeitsliste — hier wird abgehakt (P10-B)
   - ../phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md  # 📦 §12 Entscheidungsliste D-1–D-18, verbatim
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
-updated: 2026-10-22 (Block 3 Schritt 3.2: `Store.put_asset()` ruft den Stripper — **eine** Stelle für Web und MCP; die Dummy-PNG-Fixtures mussten zu echten Bytes werden) | 2026-10-22 (Block 3 Schritt 3.1: `files.strip_image_metadata()` — JPEG/PNG/WebP, GIF unverändert, fail-closed; 8 neue Tests) | 2026-10-22 (Block-2-Nachzug: Item mit **neuem Ordner** im fremden Home-Space ist jetzt auf Web **und** MCP gesperrt (Nikinger-Entscheidung 2026-10-22) — P10.5-9 ⚠️ → ✅; `ui_budget.py`/`ui_smoke.py` haben das Home-Space-Prädikat, die `team`-Flags stimmen) | 2026-10-22 (Block 2.5 — Proben Web × MCP 28/28, M4 BG-1 behoben; Block 2 ✅, Abnahme 10-8/10/9 ✅, 10-9 ⚠️ (Befund: neuer Ordner per Item-Anlage im fremden Home-Space)) | 2026-10-22 (Block 2 Schritte 2.1–2.4 gebaut — eine Regel für Web und MCP (RE-1/RE-2/P10-I/P10.5-N) und BG-1; **2.5 Proben offen, Claude Code**; Suite 1299 grün) | 2026-10-22 (Block 2 Schritte 2.1–2.2: eine Regel für Web und MCP — SharePolicy mit Home-Space-Prädikat, RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N beide Richtungen; Suite 1296 grün) | 2026-10-22 (Block 2 Schritt 2.1: SharePolicy kennt Home-Spaces und Team-Spaces, Prädikat aus der Auth-DB, eine Regel für Web und MCP) | 2026-10-22 (Block 1 **abgeschlossen**: V200 vom Fleet-Lauf belegt — Unit installiert, `Result=success`, 0 failed units; Abnahme 10-5/6/7 ✅) | 2026-10-22 (Block 1 Schritte 1.1/1.2: BT-1 — Caddy-Vorlage in Blockform mit den V199-Live-Werten (10s/15s/1s) + neuer Waechter; Abnahme 10-5 auf ✅) | 2026-10-22 (Block 1 Schritt 1.4: BT-6 — `constraints.txt` aus dem Live-Freeze, `scripts/dev_install.sh` mit `-c`, zwei Wächter, Dev-venv neu; Suite 1282 gruen auf den Live-Versionen) | 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in der Relay-Unit, Wächter 13/13, vier Gegenläufe; Block-0-Block rotiert) | 2026-10-22 (Block 0 **abgeschlossen**: 0.6 ROADMAP-Zeile P10.5 auf 🔄, 0.7 Ausführer-Vorbedingung protokolliert — Abnahme P10.5-1–4 ✅) | 2026-10-22 (Block 0: 0.2/0.3 — Phase-Head angelegt (Modulstatus, Deploy-Tabelle, Abnahmestand 61 Zeilen), DO-3-Wächter, `pytest.ini` ergänzt; davor 0.4 (ROADMAP-Wächter eingefroren), 0.5 (INDEX-Luft) und 0.8 (Register-Luft) gebaut — DO-2 vollständig; erster Block)
+updated: 2026-10-22 (Block 3 Schritte 3.3–3.4: `scripts/asset_orphans.py` (LG-7) + 7 Tests + Wegwerf-Probe `p105_b3_assets_probe.py` **14/14 Zellen** — Abnahme 10-12/10-13 ✅) | 2026-10-22 (Block 3 Schritt 3.2: `Store.put_asset()` ruft den Stripper — **eine** Stelle für Web und MCP; die Dummy-PNG-Fixtures mussten zu echten Bytes werden) | 2026-10-22 (Block 3 Schritt 3.1: `files.strip_image_metadata()` — JPEG/PNG/WebP, GIF unverändert, fail-closed; 8 neue Tests) | 2026-10-22 (Block-2-Nachzug: Item mit **neuem Ordner** im fremden Home-Space ist jetzt auf Web **und** MCP gesperrt (Nikinger-Entscheidung 2026-10-22) — P10.5-9 ⚠️ → ✅; `ui_budget.py`/`ui_smoke.py` haben das Home-Space-Prädikat, die `team`-Flags stimmen) | 2026-10-22 (Block 2.5 — Proben Web × MCP 28/28, M4 BG-1 behoben; Block 2 ✅, Abnahme 10-8/10/9 ✅, 10-9 ⚠️ (Befund: neuer Ordner per Item-Anlage im fremden Home-Space)) | 2026-10-22 (Block 2 Schritte 2.1–2.4 gebaut — eine Regel für Web und MCP (RE-1/RE-2/P10-I/P10.5-N) und BG-1; **2.5 Proben offen, Claude Code**; Suite 1299 grün) | 2026-10-22 (Block 2 Schritte 2.1–2.2: eine Regel für Web und MCP — SharePolicy mit Home-Space-Prädikat, RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N beide Richtungen; Suite 1296 grün) | 2026-10-22 (Block 2 Schritt 2.1: SharePolicy kennt Home-Spaces und Team-Spaces, Prädikat aus der Auth-DB, eine Regel für Web und MCP) | 2026-10-22 (Block 1 **abgeschlossen**: V200 vom Fleet-Lauf belegt — Unit installiert, `Result=success`, 0 failed units; Abnahme 10-5/6/7 ✅) | 2026-10-22 (Block 1 Schritte 1.1/1.2: BT-1 — Caddy-Vorlage in Blockform mit den V199-Live-Werten (10s/15s/1s) + neuer Waechter; Abnahme 10-5 auf ✅) | 2026-10-22 (Block 1 Schritt 1.4: BT-6 — `constraints.txt` aus dem Live-Freeze, `scripts/dev_install.sh` mit `-c`, zwei Wächter, Dev-venv neu; Suite 1282 gruen auf den Live-Versionen) | 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in der Relay-Unit, Wächter 13/13, vier Gegenläufe; Block-0-Block rotiert) | 2026-10-22 (Block 0 **abgeschlossen**: 0.6 ROADMAP-Zeile P10.5 auf 🔄, 0.7 Ausführer-Vorbedingung protokolliert — Abnahme P10.5-1–4 ✅) | 2026-10-22 (Block 0: 0.2/0.3 — Phase-Head angelegt (Modulstatus, Deploy-Tabelle, Abnahmestand 61 Zeilen), DO-3-Wächter, `pytest.ini` ergänzt; davor 0.4 (ROADMAP-Wächter eingefroren), 0.5 (INDEX-Luft) und 0.8 (Register-Luft) gebaut — DO-2 vollständig; erster Block)
 ---
 # Phase 10.5 — Finishing
 
@@ -32,7 +32,7 @@ updated: 2026-10-22 (Block 3 Schritt 3.2: `Store.put_asset()` ruft den Stripper 
 | 0 | Haushalt: Verifikation, Phase-Head, INDEX-Luft, Register-Luft, DO-2, DO-3, Ausführer-Vorbedingung | Claude Code | — | ✅ 2026-10-22 — 0.1–0.8 gebaut, Abnahme P10.5-1–4 ✅ |
 | 1 | Betrieb: BT-1, BT-2, BT-6 (+ `constraints.txt`) | Ausführer + Nikinger | A | ✅ 2026-10-22 — **1.1–1.4 gebaut und abgenommen** (V199 gelesen · BT-1 Caddy-Blockform · BT-2 `SuccessExitStatus=143`, live V200 ✅ · BT-6 `constraints.txt`); Abnahme 10-5/6/7 ✅, Suite 1283 grün |
 | 2 | Fehler, Parität, Regel: BG-1, RE-1, RE-2, P10-I, AL-1 | Ausführer (+ Claude Code Proben) | A | ✅ 2026-10-22 — **2.1–2.5 gebaut und geprobt** (Probe 2.5: 28/28 Zellen Web × MCP, M4 0 → 3 Zeilen ohne neues Öffnen) · **Nachzug 2026-10-22 (Nikinger):** ein Item mit **neuem Ordner** im fremden Home-Space ist jetzt auf beiden Flächen gesperrt (RE-1-Parität) — P10.5-9 damit ✅ statt ⚠️ — eine Regel für Web und MCP: RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N kein Verschieben in **oder aus** einem fremden Home-Space; BG-1: die Space-Liste füllt sich nach, wenn `/overview` spät kommt) |
-| 3 | Hygiene: LG-8 (P1-15), LG-7 | Ausführer | A | 🔄 2026-10-22 — **3.1–3.2 gebaut**: `files.strip_image_metadata()` (JPEG/PNG/WebP, GIF unverändert, fail-closed `ValidationError`), Aufruf in `Store.put_asset()` (**eine** Stelle für Web und MCP), 9 neue Tests · 3.3/3.4 offen |
+| 3 | Hygiene: LG-8 (P1-15), LG-7 | Ausführer | A | ✅ 2026-10-22 — **3.1–3.4 gebaut und geprobt**: `files.strip_image_metadata()` (JPEG/PNG/WebP, GIF unverändert, fail-closed `ValidationError`) + Aufruf in `Store.put_asset()` (**eine** Stelle für Web und MCP) · `scripts/asset_orphans.py` (LG-7, `--report`/`--move`, ein Commit) · 16 neue Tests · **Wegwerf 14/14 Zellen** (`probes/p105_b3_assets_probe.py`): GPS weg auf Web **und** MCP, Orientation bleibt, sauberes Bild byte-identisch, Waise gefunden und in den Papierkorb verschoben; Abnahme 10-12/10-13 ✅ |
 | 4 | Performance: PF-1, PF-4, Z1–Z4 | Ausführer (+ Claude Code Proben) | A | ⬜ |
 | 5 | MCP-Schicht: PA-5 (FastMCP 4), LG-4 | Ausführer | B | ⬜ |
 | 6 | Anbieter: PA-1, PA-2, `/mcp`, PA-6, P10-J | Ausführer + Claude Code + Nikinger | B | ⬜ |
@@ -72,8 +72,8 @@ updated: 2026-10-22 (Block 3 Schritt 3.2: `Store.put_asset()` ruft den Stripper 
 | P10.5-9 | RE-1/RE-2: dieselbe Matrix auf Web und MCP | ✅ | 2.5 · `probes/p105_b2_rights.json`: Matrix gleich auf beiden Flächen, fremder Home mit `write:` ❌ für Ordner-Endpunkt und Ordnerwechsel · **Nachzug 2026-10-22 (Nikinger):** auch ein Item mit **neuem Ordner** im fremden Home-Space legt den Ordner nicht mehr an (Web 403 `forbidden`, MCP `write_denied`) — 3 neue MCP-Tests + 4 neue Web-Tests, Suite 1306 grün |
 | P10.5-10 | P10-I auf beiden Flächen durchgesetzt | ✅ | 2.5 · `probes/p105_b2_rights.json`: in/aus fremdem Home ❌ (Web + MCP, Item bleibt an der Quelle), Team-Ziel ✅ |
 | P10.5-11 | AL-1: Zeilen 14 und 29 geschlossen; Zeile 15 mit Weg beim Nikinger (Migration + Live-Check) | ✅ | 2.5 · Zeile 29: MCP-Move alpha→gamma ✅ · Zeile 14: fremder Body im geteilten read-Space gewrappt, Schreiben ❌ · Zeile 15 beim Nikinger |
-| P10.5-12 | EXIF weg nach Upload über Web **und** MCP; Orientierung bleibt | ⬜ | — |
-| P10.5-13 | Verwaiste Asset-Ordner werden gefunden und nur auf Wunsch in den Papierkorb verschoben | ⬜ | — |
+| P10.5-12 | EXIF weg nach Upload über Web **und** MCP; Orientierung bleibt | ✅ | 3.1–3.2 + Wegwerf `probes/p105_b3_assets.json` (14/14): Web-Upload 148 B → 94 B, GPS-Marker **weg**, Orientation 6 **bleibt**, ICC bleibt · MCP-Upload 94 B, GPS weg, Orientation 6 · Gegenlauf: Bild ohne Metadaten byte-identisch (45 B = 45 B) |
+| P10.5-13 | Verwaiste Asset-Ordner werden gefunden und nur auf Wunsch in den Papierkorb verschoben | ✅ | 3.3/3.4 + Wegwerf `probes/p105_b3_assets.json`: Item mit Bild → `DELETE` (Web) → `store.trash()` → `--report` findet **genau** die Waise (die lebenden Assets nicht) → `--move` verschiebt sie nach `._trash/<space>/_assets/<id>/` (nie gelöscht) mit **einem** Commit (5 → 6) · 7 neue Tests in `phase10_5_finishing/tests/test_asset_orphans.py` |
 | P10.5-14 | Z1 im Bench: Median ≤ 300 ms (heute 2.405 ms) | ⬜ | — |
 | P10.5-15 | Parität: neue Zähler = alte `search().total` je Eimer | ⬜ | — |
 | P10.5-16 | Z2: kein Request wartet hinter `/overview` | ⬜ | — |
@@ -123,7 +123,7 @@ updated: 2026-10-22 (Block 3 Schritt 3.2: `Store.put_asset()` ruft den Stripper 
 | P10.5-60 | P10-J zweimal live belegt | ⬜ | — |
 | P10.5-61 | Closeout-Dokumente + Rotationen per Skript | ⬜ | — |
 
-**Summe:** 11 ✅ · 0 ⚠️ · 50 ⬜ (von 61).
+**Summe:** 13 ✅ · 0 ⚠️ · 48 ⬜ (von 61).
 
 ## Offen beim Nikinger
 
@@ -134,34 +134,41 @@ updated: 2026-10-22 (Block 3 Schritt 3.2: `Store.put_asset()` ruft den Stripper 
 - **Block 2, Zeile 15 (AL-1)** — Migration + Live-Check beim Nikinger.
 - ~~**Befund 2.5 (P10.5-9 ⚠️)**~~ ✅ 2026-10-22 (Block-2-Nachzug, Nikinger-Entscheidung „ja") — `create_item(space=, folder=<neu>)` und `POST /api/v1/items` legen im fremden Home-Space mit `write:` **keinen** neuen Ordner mehr an; die Regel ist `permissions.manages_space()` (eigener Space oder Team-Space mit Schreibrecht), auf beiden Flächen. Ohne `folder` bleibt das Anlegen an der Space-Wurzel erlaubt (P6-U).
 
-## Session stopped — 2026-10-22 (Block 2-Nachzug + Block 3.1 — RE-1-Parität und EXIF-Stripper)
+## Session stopped — 2026-10-22 (Block 2-Nachzug + Block 3 ✅ — RE-1-Parität, EXIF-Strip, Waisen)
 
 **Ergebnis (Nachzug).** Der Befund aus Probe 2.5 ist geschlossen (Nikinger 2026-10-22: „ja"):
 ein Item mit **neuem Ordner** in einem fremden Home-Space legt den Ordner nicht mehr an — Web
 **und** MCP. Regel: `permissions.manages_space()` (eigener Space oder Team-Space mit
 Schreibrecht), dieselbe wie RE-1 und RE-2. Ohne `folder` bleibt das Anlegen an der
-Space-Wurzel erlaubt (P6-U). Zweite Entscheidung desselben Tages: `ui_budget.py`/`ui_smoke.py`
-bekommen das Home-Space-Prädikat — ohne es waren ihre `team`-Flags **immer** `false`.
+Space-Wurzel erlaubt (P6-U). `ui_budget.py`/`ui_smoke.py` bekommen das Home-Space-Prädikat —
+ohne es waren ihre `team`-Flags **immer** `false`.
 
-**Ergebnis (Block 3.1).** `files.strip_image_metadata(data, mime)` ist gebaut (P1-Öffnung 15,
-angekündigt): JPEG (APP1/APP13/COM raus, APP0/APP2/APP14 bleiben, Orientation ≠ 1 wird als
-minimales APP1 neu geschrieben, ab SOS byte-genau), PNG (eXIf/tEXt/iTXt/zTXt/tIME raus), WebP
-(EXIF/XMP raus, VP8X-Flagbits gelöscht, RIFF-Größe neu), GIF unverändert. **Fail-closed:**
-was der Parser nicht versteht, ergibt `ValidationError` — nie ein halbbereinigtes Bild.
+**Ergebnis (Block 3 ✅).** LG-8: `files.strip_image_metadata()` (JPEG/PNG/WebP, GIF unverändert,
+**fail-closed**) + Aufruf in `Store.put_asset()` — **eine** Stelle für Web und MCP. LG-7:
+`scripts/asset_orphans.py` (`--report`/`--move`, **ein** Commit, nie gelöscht).
 
-**Geliefert (Commits).** `phase1_storage/storage/files.py` + `phase1_storage/tests/test_files.py`
-(8 neue Tests: GPS/ICC, Orientation, PNG-Text, WebP-Flags, byte-identisch, abgeschnitten,
-kaputter Exif-Block, Typ passt nicht).
+**Geliefert (Commits).** 3.1 `files.py` + 8 Tests · 3.2 `store.py` + 9 Tests + die
+Dummy-PNG-Fixtures (acht Dateien in fünf Paketen → jetzt **eine** Fixture in
+`phase1_storage/tests/sharefyx_image_bytes.py`, `pytest.ini` setzt `pythonpath`) · 3.3/3.4
+`asset_orphans.py` + 7 Tests + `probes/p105_b3_assets_probe.py`.
 
-**Gemessen** (Basis `725215f`): `pytest` **1316 grün** (304 s) · `doc_health` 0 · `ui_smoke` 13/13
-· `ui_budget` 5/5 (173,8 KB) · **Gegenlauf:** ohne Prädikat `team={'alpha': False,
-'beta': False}` → der neue Smoke-Check **rot**.
+**Gemessen** (Basis `725215f`): `pytest` **1316 grün** (304 s) · **Wegwerf 8799: 14/14 Zellen**
+(`probes/p105_b3_assets.json`): Web 148 B → 94 B, GPS weg, Orientation 6 bleibt, ICC bleibt ·
+MCP 94 B, GPS weg, Orientation 6 · sauberes Bild byte-identisch (45 B = 45 B) · Waise gefunden
+(und nur sie), `--move` → Papierkorb, **ein** Commit (5 → 6), lebende Assets unberührt ·
+`doc_health` 0 · `ui_smoke` 13/13 · `ui_budget` 5/5.
 
 **Ausführer-Daten.** opencode/MiniMax-M3.1-Flash · Kontextgrenze 400.000 (P10.5-C erfüllt) ·
 keine Advisor-Runde · Eingriffe Nikinger/Claude Code: 0 · kein `systemctl`, kein `sudo`, kein
-echter `DATA_ROOT`.
+echter `DATA_ROOT` · Wegwerf-Instanz nur über die PID-Datei gestoppt (Hard Rule 9), Port 8799
+danach frei.
 
-**Offen / nächster Schritt.** Block 3.2 (Aufruf in `Store.put_asset()`), 3.3
-(`scripts/asset_orphans.py`), 3.4 (Tests). **Datenlage geändert:** die alten Dummy-PNG-Header
-in acht Testdateien sind jetzt **keine Bilder mehr** (fail-closed) — die Fixture liegt an
-einer Stelle (`phase1_storage/tests/sharefyx_image_bytes.py`).
+**Plan-Drift, datiert 2026-10-22.** (1) Der Plan sagt „im **Index** keine Item-Zeile" — der
+Code prüft gegen die **Dateien** (Hard Rule 2): ein veralteter Index würde die Assets
+**lebender** Items als verwaist melden und in den Papierkorb schieben. (2) Der Plan sah die
+Proben bei Claude Code; ich habe sie selbst gefahren (stehende Erlaubnis, Wegwerf erlaubt).
+(3) `pytest.ini` (eine Zeile `pythonpath`) und acht Testdateien in fünf Pakaten wurden
+angefasst — die Dummy-PNG-Header waren nach 3.2 **keine Bilder mehr** (fail-closed).
+
+**Offen / nächster Schritt.** Block 4 (Performance: PF-1, PF-4, Z1–Z4) — Deploy A (`v3.1.5`)
+danach. Beim Nikinger offen: AL-1 Zeile 15 (Migration + Live-Check), V203, P10.5-27/28.

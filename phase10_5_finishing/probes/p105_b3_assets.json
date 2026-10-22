@@ -1,0 +1,79 @@
+{
+  "probe": "p105_b3_assets",
+  "head": "aec759b",
+  "base_url": "https://127.0.0.1:8799",
+  "cells": 14,
+  "passed": 14,
+  "details": [
+    {
+      "cell": "Web-Upload: GPS weg",
+      "pass": true,
+      "detail": "HTTP 201, Datei 94 B (Upload 148 B)"
+    },
+    {
+      "cell": "Web-Upload: Orientation bleibt",
+      "pass": true,
+      "detail": "Orientation=6 (erwartet 6)"
+    },
+    {
+      "cell": "Web-Upload: ICC bleibt",
+      "pass": true,
+      "detail": "Farbprofil erhalten"
+    },
+    {
+      "cell": "Web-Upload: sauberes Bild byte-identisch",
+      "pass": true,
+      "detail": "45 B gegen 45 B Upload"
+    },
+    {
+      "cell": "MCP-Upload: Datei liegt auf der Platte",
+      "pass": true,
+      "detail": "asset_id=ast_e82f716d, Datei 94 B (Upload 148 B)"
+    },
+    {
+      "cell": "MCP-Upload: GPS weg",
+      "pass": true,
+      "detail": "is_error=False, Datei 94 B"
+    },
+    {
+      "cell": "MCP-Upload: Orientation bleibt",
+      "pass": true,
+      "detail": "Orientation=6 (erwartet 6)"
+    },
+    {
+      "cell": "Waisen-Kandidat hat ein Bild",
+      "pass": true,
+      "detail": "HTTP 201"
+    },
+    {
+      "cell": "Löschen (Web) verschiebt nach ._trash",
+      "pass": true,
+      "detail": "HTTP 204"
+    },
+    {
+      "cell": "LG-7: Bericht findet genau die Waise",
+      "pass": true,
+      "detail": "gefunden=['itm_e4675243'], erwartet=itm_e4675243"
+    },
+    {
+      "cell": "LG-7: lebende Assets bleiben unberührt",
+      "pass": true,
+      "detail": "IDs im Bericht: ['itm_e4675243']"
+    },
+    {
+      "cell": "LG-7: --move verschiebt in den Papierkorb",
+      "pass": true,
+      "detail": "Quelle False, Ziel True"
+    },
+    {
+      "cell": "LG-7: genau ein Commit",
+      "pass": true,
+      "detail": "Commits 5 -> 6"
+    },
+    {
+      "cell": "LG-7: lebende Assets nach dem Move noch da",
+      "pass": true,
+      "detail": "vorher: ['itm_997ce22d', 'itm_bb60825b', 'itm_e4675243', 'itm_f7ec0990']"
+    }
+  ]
+}
