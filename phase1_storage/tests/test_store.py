@@ -10,6 +10,7 @@ from datetime import date, datetime, timedelta, timezone
 import pytest
 
 from storage.errors import ConflictError, ItemNotFound, ValidationError
+from sharefyx_image_bytes import png_bytes
 from storage.store import Store
 
 
@@ -939,7 +940,7 @@ def test_move_of_archived_item_produces_exactly_one_commit(store_git, tmp_path):
 
 # -- Bild-Assets (Phase 6.5 Step B1, fünfte Contract-Öffnung) ---------------------------
 
-_PNG = b"\x89PNG\r\n\x1a\n" + b"restliche-bytes-egal"
+_PNG = png_bytes()
 
 
 def test_put_asset_writes_atomically_and_commits_exactly_once(store_git, tmp_path):
@@ -954,6 +955,24 @@ def test_put_asset_writes_atomically_and_commits_exactly_once(store_git, tmp_pat
     messages = _git_log(tmp_path)
     asset_commits = [m for m in messages if m.startswith("asset ")]
     assert len(asset_commits) == 1
+
+
+def test_put_asset_stores_the_stripped_bytes(store, tmp_path):
+    """LG-8 / P1-Öffnung 15: auf der Platte liegt das **bereinigte** Bild, und
+    `AssetInfo.bytes` zählt die bereinigte Länge — nicht die des Uploads.
+
+    Der Weg über `put_asset()` ist der **eine** Weg: Web-Upload und `put_item_asset` laufen
+    beide hier durch, es gibt keinen zweiten Pfad, der die Bereinigung vergessen könnte."""
+    item = store.create("nikinger", type="note", title="Mit Metadaten")
+    upload = png_bytes(text=b"geheim")
+
+    asset = store.put_asset(item.id, data=upload)
+
+    path = tmp_path / "nikinger" / "_assets" / item.id / f"{asset.id}.png"
+    data = path.read_bytes()
+    assert b"geheim" not in data
+    assert asset.bytes == len(data)
+    assert len(data) < len(upload)
 
 
 def test_put_asset_rejects_unrecognized_bytes(store):

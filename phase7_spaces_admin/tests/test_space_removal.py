@@ -20,6 +20,7 @@ from authserver.store import AuthStore
 from authserver.userdir import UserDirectory
 from mcpserver.permissions import SharePolicy
 from starlette.applications import Starlette
+from sharefyx_image_bytes import png_bytes
 from storage.store import ConflictError, Store
 
 from webui.api import api_routes
@@ -35,7 +36,6 @@ TOTP_SECRET = totp.generate_secret()
 import re
 
 _CSRF_RE = re.compile(r'name="csrf" value="([^"]+)"')
-
 
 def _client(app) -> httpx.AsyncClient:
     return httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url=BASE_URL)
@@ -265,7 +265,7 @@ async def test_removal_clean_run_moves_and_archives_every_item(app, item_store, 
 async def test_removal_moves_the_asset_directory_along(app, item_store, totp_code, clock):
     _team_space(item_store)
     item = item_store.create("team", type="note", title="Mit Bild")
-    item_store.put_asset(item.id, filename="pic.png", data=b"\x89PNG\r\n\x1a\n" + b"0" * 20)
+    item_store.put_asset(item.id, filename="pic.png", data=png_bytes(payload=b"0" * 20))
 
     async with _client(app) as client:
         csrf = await _login(client, totp_code)

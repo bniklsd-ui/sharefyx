@@ -35,10 +35,8 @@ from authserver.userdir import UserDirectory
 from mcpserver import __version__
 from mcpserver.app import OAuthConfig, create_app
 from mcpserver.config import Settings
+from sharefyx_image_bytes import png_bytes
 from storage.store import Store
-
-# Bewusst keine Nikinger-typischen Spacenamen (Plan §2.2 Erweiterungspfad: "Space-Namen kommen
-# in keinem Produktivcode und in keinem Test vor") — Fixture-Namen wie im Plan gefordert.
 
 
 @pytest.fixture
@@ -531,7 +529,7 @@ async def test_all_ten_tools_are_callable_over_http(app, token_alpha, token_beta
                         {
                             "item_id": new_id,
                             "data_base64": base64.b64encode(
-                                b"\x89PNG\r\n\x1a\n" + b"http-roundtrip"
+                                png_bytes(payload=b"http-roundtrip")
                             ).decode(),
                         },
                     )
@@ -543,7 +541,7 @@ async def test_all_ten_tools_are_callable_over_http(app, token_alpha, token_beta
                 {"item_id": new_id, "asset_id": put_asset_receipt["asset_id"]},
             )
             asset_bytes = base64.b64decode(asset_image.content[0].data)
-            assert asset_bytes == b"\x89PNG\r\n\x1a\n" + b"http-roundtrip"
+            assert asset_bytes == png_bytes(payload=b"http-roundtrip")
 
             appended_text = (
                 await alpha.call_tool(

@@ -41,6 +41,7 @@ import logging
 import re
 import sys
 import tempfile
+import zlib
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -65,6 +66,37 @@ SPACE_FOREIGN = "beta"
 
 EXIT_OK = 0
 EXIT_FAILED = 1
+
+
+def _png_bytes(*, payload: bytes = b"\x00\xff\x00\x00", text: bytes | None = None) -> bytes:
+    """Ein 1×1-PNG als **echte** Bytes.
+
+    **Diese Kopie ist Absicht:** das Skript läuft **ohne** pytest (`python
+    phase2_mcp/scripts/mcp_smoke.py`), es kann sich also nicht auf die Test-Infrastruktur
+    verlassen. Die gemeinsame Fassung liegt in
+    `phase1_storage/tests/sharefyx_image_bytes.py` (dort ist sie dieselbe).
+
+    **Seit P10.5 Block 3 (LG-8) ist der alte Dummy-Header „\x89PNG\r\n\x1a\n + Rest“ nicht
+    mehr brauchbar:** `put_asset()` bereinigt das Bild jetzt, und der Stripper liest die
+    Chunk-Folge — fail-closed, ein Datenhaufen mit Signatur ist kein Bild. Die Fixture wird
+    deshalb hier **gebaut** (Plan Block 3, Schritt 3.4: keine Binärdateien im Repo).
+    """
+    def chunk(chunk_type: bytes, data: bytes) -> bytes:
+        body = chunk_type + data
+        return (
+            len(data).to_bytes(4, "big")
+            + body
+            + (zlib.crc32(body) & 0xFFFFFFFF).to_bytes(4, "big")
+        )
+
+    ihdr = (1).to_bytes(4, "big") + (1).to_bytes(4, "big") + bytes([8, 2, 0, 0, 0])
+    # Stufe 0 = „gespeichert“: die Bytes stehen wörtlich in der Datei (ein Marker im Bild-
+    # Inhalt muss dort auch wieder auftauchen, sonst beweist die Prüfung nichts).
+    parts = [chunk(b"IHDR", ihdr)]
+    if text is not None:
+        parts.append(chunk(b"tEXt", b"Comment\x00" + text))
+    parts += [chunk(b"IDAT", zlib.compress(payload, 0)), chunk(b"IEND", b"")]
+    return b"\x89PNG\r\n\x1a\n" + b"".join(parts)
 
 
 @dataclass
@@ -377,7 +409,7 @@ async def _run(data_root: Path, checks: list[Check]) -> None:
             # 9. put_item_asset -- Bild-Upload (Phase 6.5 Step B4). created_ids[1] statt [0]:
             # [0] ist seit Check 7 archiviert, ein Asset-Upload auf ein archiviertes Item wäre
             # ein anderer Testfall als der hier gewollte Erfolgspfad.
-            png = b"\x89PNG\r\n\x1a\n" + b"restliche-bytes-egal"
+            png = _png_bytes()
             put_text = (
                 await own.call_tool(
                     "put_item_asset",

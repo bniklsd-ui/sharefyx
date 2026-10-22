@@ -23,6 +23,7 @@ import pytest
 from starlette.applications import Starlette
 from storage.acl import AclDecision
 from storage.models import Item
+from sharefyx_image_bytes import png_bytes
 from storage.store import Store
 
 from webui.api import api_routes
@@ -1259,7 +1260,7 @@ async def test_updates_seen_sets_latest_id_and_is_separated_per_space(
 
 # -- Assets (Phase 6.5 Step B2) --------------------------------------------------------------
 
-_PNG = b"\x89PNG\r\n\x1a\n" + b"restliche-bytes-egal"
+_PNG = png_bytes()
 
 
 @pytest.mark.asyncio

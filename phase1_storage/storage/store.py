@@ -947,6 +947,17 @@ class Store:
                     "PNG/JPEG/GIF/WebP"
                 )
             mime, ext = sniffed
+            # **P10.5, Block 3 (LG-8, P1-Öffnung 15):** die Metadaten fliegen raus, **bevor**
+            # die Datei auf die Platte kommt (GPS, Kameratyp, XMP, IPTC, PNG-Textfelder). Reine
+            # Byte-Chirurgie in `files.strip_image_metadata()` — kein Bild wird neu kodiert, ein
+            # Bild ohne Metadaten bleibt byte-identisch. Die Orientation bleibt erhalten, sonst
+            # stünden Handyfotos nach dem Hochladen quer.
+            # **Eine** Stelle für beide Flächen: Web-Upload (`webui/api.py :: _assets_post()`)
+            # und `put_item_asset` laufen beide hier durch — kein zweiter Pfad, der die
+            # Bereinigung vergessen könnte.
+            # Fail-closed: eine Struktur, die der Stripper nicht versteht, ergibt
+            # `ValidationError` — **vor** dem Schreiben, nie danach.
+            data = files.strip_image_metadata(data, mime)
             asset_id = files.new_asset_id()
             target_dir = files.asset_dir(self._data_root, space, item_id)
             target_dir.mkdir(parents=True, exist_ok=True)

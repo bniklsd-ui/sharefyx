@@ -24,6 +24,7 @@ from mcpserver import context, tools
 from mcpserver.auth import AuthError, Principal
 from mcpserver.permissions import Permissions, SharePolicy
 from mcpserver.tools import UNTRUSTED_CLOSE, UNTRUSTED_OPEN, wrap_untrusted
+from sharefyx_image_bytes import png_bytes
 from storage.store import Store
 
 # Bewusst keine Nikinger-typischen Spacenamen (Plan §2.2 Erweiterungspfad).
@@ -1035,7 +1036,7 @@ def test_guard_auth_error_is_mapped_to_tool_error(tools_map, store, monkeypatch)
 
 # -- get_item_asset / put_item_asset (Phase 6.5 Step B4) -------------------------------------
 
-_PNG = b"\x89PNG\r\n\x1a\n" + b"restliche-bytes-egal"
+_PNG = png_bytes()
 
 
 def test_get_item_meta_lists_assets_without_bytes(tools_map, store):
@@ -1166,7 +1167,10 @@ def test_no_tool_response_ever_carries_a_base64_image_payload(tools_map, store):
     den die reine Base64-Suche nicht abdecken würde."""
     item = store.create(SPACE_A, type="note", title="Mit Bild", body="Text.")
     marker = b"MARKER-NIE-IN-EINER-ANTWORT"
-    png = b"\x89PNG\r\n\x1a\n" + marker
+    # Der Marker steckt **im Bildinhalt** (IDAT), nicht in einem Metadaten-Chunk: Metadaten
+    # werden beim Hochladen entfernt (P10.5 Block 3, LG-8) — der Marker müsste also gar nicht
+    # erst in der Datei stehen, und die Prüfung wäre wertlos.
+    png = png_bytes(payload=marker)
     data_b64 = base64.b64encode(png).decode()
 
     with _as(SPACE_A):

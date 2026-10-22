@@ -15,10 +15,13 @@ Space-Grenze hinweg folgen.
 from __future__ import annotations
 
 from mcpserver.permissions import SharePolicy
+from sharefyx_image_bytes import png_bytes
 from storage.store import Store
 
-_PNG = b"\x89PNG\r\n\x1a\n" + b"restliche-bytes-egal"
-
+# **Echte** Bytes, keine Dummy-Signatur: seit P10.5 Block 3 (LG-8) bereinigt
+# `put_asset()` das Bild und ist fail-closed — ein Datenhaufen mit PNG-Signatur
+# ist kein Bild. Die Fixture liegt an einer Stelle: `sharefyx_image_bytes.py`.
+_PNG = png_bytes()
 
 def _write_share_yml(directory, content: str) -> None:
     directory.mkdir(parents=True, exist_ok=True)
