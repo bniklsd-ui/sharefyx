@@ -189,6 +189,13 @@ export function loadOverview() {
       s.members = extra ? extra.members : [];
     });
     state.spaces = overview;
+    // **BG-1 (P10.5, Block 2, 2026-10-22):** der Weg über ein **Ereignis**, nicht über einen
+    // Import — `spaces.js` importiert `loadOverview()` aus dieser Datei, ein Import zurück wäre
+    // ein Zyklus (dieselbe Form wie bei `state.graphToken` weiter unten). Das Spaces-Panel liest
+    // `state.spaces`; es kann offen sein, **bevor** dieses `/overview` antwortet, und blieb dann
+    // leer, bis der Nutzer es schloss und wieder öffnete (V202, M4 reproduziert: 0 Zeilen).
+    // `spaces.js` hört auf dieses Ereignis und füllt die Liste nach, wenn das Panel offen ist.
+    window.dispatchEvent(new CustomEvent("sfx:overview-loaded"));
     renderRail();
     // Phase 8.6 Plan 2 Block G G4 (V128): loadOverview aktualisiert nur die Overview-
     // Daten. Die Sichtbarkeit im Listen-Slot schaltet renderListSlot() je nach

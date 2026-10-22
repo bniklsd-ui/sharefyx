@@ -138,6 +138,22 @@ function prepareSpacesPanel() {
 }
 registerPanel("spaces", prepareSpacesPanel);
 
+// **BG-1 (P10.5, Block 2, 2026-10-22):** das Panel füllt sich **auch**, wenn es schon offen
+// war, als `/overview` endlich ankam. `list.js` darf `spaces.js` nicht importieren (diese Datei
+// importiert `loadOverview()` von dort — ein Import zurück wäre ein Zyklus), deshalb läuft die
+// Kopplung über ein Ereignis: `list.js :: loadOverview()` feuert "sfx:overview-loaded", der
+// Listener sitzt hier.
+//
+// **Die Offen-Abfrage:** `settings.js` hält `openStage`, gibt sie aber nicht heraus (P9 Block
+// settings), und `settings.js` steht in Block 2 nicht auf der Liste der erlaubten Pfade. Der
+// Weg über das `hidden`-Attribut ist derselbe Zustand, den `settings.js :: show()` setzt: das
+// Panel ist genau dann sichtbar, wenn `node.hidden` `false` ist (`settings.js` holt die Elemente
+// als `document.getElementById("settings-" + name)`, hier also `#settings-spaces`).
+window.addEventListener("sfx:overview-loaded", function () {
+  var panel = document.getElementById("settings-spaces");
+  if (panel && !panel.hidden) renderSpaceList();
+});
+
 // P9-AH: „Schließen" schließt dieses Panel und alles rechts davon, nicht die ganze Kette.
 export function closeSpaceAdminDialog() {
   closeFrom("spaces");

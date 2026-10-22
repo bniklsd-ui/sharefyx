@@ -9,7 +9,7 @@ down:
   - ../phase10_inventory/BAUSTELLENREGISTER.md      # 📗 die Arbeitsliste — hier wird abgehakt (P10-B)
   - ../phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md  # 📦 §12 Entscheidungsliste D-1–D-18, verbatim
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
-updated: 2026-10-22 (Block 2 Schritte 2.1–2.2: eine Regel für Web und MCP — SharePolicy mit Home-Space-Prädikat, RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N beide Richtungen; Suite 1296 grün) | 2026-10-22 (Block 2 Schritt 2.1: SharePolicy kennt Home-Spaces und Team-Spaces, Prädikat aus der Auth-DB, eine Regel für Web und MCP) | 2026-10-22 (Block 1 **abgeschlossen**: V200 vom Fleet-Lauf belegt — Unit installiert, `Result=success`, 0 failed units; Abnahme 10-5/6/7 ✅) | 2026-10-22 (Block 1 Schritte 1.1/1.2: BT-1 — Caddy-Vorlage in Blockform mit den V199-Live-Werten (10s/15s/1s) + neuer Waechter; Abnahme 10-5 auf ✅) | 2026-10-22 (Block 1 Schritt 1.4: BT-6 — `constraints.txt` aus dem Live-Freeze, `scripts/dev_install.sh` mit `-c`, zwei Wächter, Dev-venv neu; Suite 1282 gruen auf den Live-Versionen) | 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in der Relay-Unit, Wächter 13/13, vier Gegenläufe; Block-0-Block rotiert) | 2026-10-22 (Block 0 **abgeschlossen**: 0.6 ROADMAP-Zeile P10.5 auf 🔄, 0.7 Ausführer-Vorbedingung protokolliert — Abnahme P10.5-1–4 ✅) | 2026-10-22 (Block 0: 0.2/0.3 — Phase-Head angelegt (Modulstatus, Deploy-Tabelle, Abnahmestand 61 Zeilen), DO-3-Wächter, `pytest.ini` ergänzt; davor 0.4 (ROADMAP-Wächter eingefroren), 0.5 (INDEX-Luft) und 0.8 (Register-Luft) gebaut — DO-2 vollständig; erster Block)
+updated: 2026-10-22 (Block 2 Schritte 2.1–2.4 gebaut — eine Regel für Web und MCP (RE-1/RE-2/P10-I/P10.5-N) und BG-1; **2.5 Proben offen, Claude Code**; Suite 1299 grün) | 2026-10-22 (Block 2 Schritte 2.1–2.2: eine Regel für Web und MCP — SharePolicy mit Home-Space-Prädikat, RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N beide Richtungen; Suite 1296 grün) | 2026-10-22 (Block 2 Schritt 2.1: SharePolicy kennt Home-Spaces und Team-Spaces, Prädikat aus der Auth-DB, eine Regel für Web und MCP) | 2026-10-22 (Block 1 **abgeschlossen**: V200 vom Fleet-Lauf belegt — Unit installiert, `Result=success`, 0 failed units; Abnahme 10-5/6/7 ✅) | 2026-10-22 (Block 1 Schritte 1.1/1.2: BT-1 — Caddy-Vorlage in Blockform mit den V199-Live-Werten (10s/15s/1s) + neuer Waechter; Abnahme 10-5 auf ✅) | 2026-10-22 (Block 1 Schritt 1.4: BT-6 — `constraints.txt` aus dem Live-Freeze, `scripts/dev_install.sh` mit `-c`, zwei Wächter, Dev-venv neu; Suite 1282 gruen auf den Live-Versionen) | 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in der Relay-Unit, Wächter 13/13, vier Gegenläufe; Block-0-Block rotiert) | 2026-10-22 (Block 0 **abgeschlossen**: 0.6 ROADMAP-Zeile P10.5 auf 🔄, 0.7 Ausführer-Vorbedingung protokolliert — Abnahme P10.5-1–4 ✅) | 2026-10-22 (Block 0: 0.2/0.3 — Phase-Head angelegt (Modulstatus, Deploy-Tabelle, Abnahmestand 61 Zeilen), DO-3-Wächter, `pytest.ini` ergänzt; davor 0.4 (ROADMAP-Wächter eingefroren), 0.5 (INDEX-Luft) und 0.8 (Register-Luft) gebaut — DO-2 vollständig; erster Block)
 ---
 # Phase 10.5 — Finishing
 
@@ -31,7 +31,7 @@ updated: 2026-10-22 (Block 2 Schritte 2.1–2.2: eine Regel für Web und MCP —
 |---|---|---|---|---|
 | 0 | Haushalt: Verifikation, Phase-Head, INDEX-Luft, Register-Luft, DO-2, DO-3, Ausführer-Vorbedingung | Claude Code | — | ✅ 2026-10-22 — 0.1–0.8 gebaut, Abnahme P10.5-1–4 ✅ |
 | 1 | Betrieb: BT-1, BT-2, BT-6 (+ `constraints.txt`) | Ausführer + Nikinger | A | ✅ 2026-10-22 — **1.1–1.4 gebaut und abgenommen** (V199 gelesen · BT-1 Caddy-Blockform · BT-2 `SuccessExitStatus=143`, live V200 ✅ · BT-6 `constraints.txt`); Abnahme 10-5/6/7 ✅, Suite 1283 grün |
-| 2 | Fehler, Parität, Regel: BG-1, RE-1, RE-2, P10-I, AL-1 | Ausführer (+ Claude Code Proben) | A | 🔄 2026-10-22 — **2.1 + 2.2 gebaut** (eine Regel für Web und MCP: RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N kein Verschieben in **oder aus** einem fremden Home-Space); 2.3 (BG-1), 2.4 (Tests mit den Regeln), 2.5 (Proben, Claude Code) offen |
+| 2 | Fehler, Parität, Regel: BG-1, RE-1, RE-2, P10-I, AL-1 | Ausführer (+ Claude Code Proben) | A | 🔄 2026-10-22 — **2.1–2.4 gebaut** (eine Regel für Web und MCP: RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N kein Verschieben in **oder aus** einem fremden Home-Space; BG-1: die Space-Liste füllt sich nach, wenn `/overview` spät kommt); **2.5 (Proben) offen — Claude Code** |
 | 3 | Hygiene: LG-8 (P1-15), LG-7 | Ausführer | A | ⬜ |
 | 4 | Performance: PF-1, PF-4, Z1–Z4 | Ausführer (+ Claude Code Proben) | A | ⬜ |
 | 5 | MCP-Schicht: PA-5 (FastMCP 4), LG-4 | Ausführer | B | ⬜ |
@@ -68,7 +68,7 @@ updated: 2026-10-22 (Block 2 Schritte 2.1–2.2: eine Regel für Web und MCP —
 | P10.5-5 | BT-1: Vorlage trägt die Live-Werte (V199 ✅) | ✅ | 1.2 · this commit · V199: dial_timeout 10 s · try_duration 15 s · try_interval 1 s |
 | P10.5-6 | BT-2: Unit installiert, `Result=success` bei Exit 143 (V200 ✅) | ✅ | 1.3 · Fleet-Lauf 2026-10-22: `Result=success`, 0 failed units, active |
 | P10.5-7 | `constraints.txt` = Live-Stand; Dev-venv daraus grün; Wächter grün | ✅ | 1.4 · this commit · Freeze byte-identisch zur Datei, Suite 1282 grün auf `mcp 1.30.0` / `starlette 1.7.0` |
-| P10.5-8 | BG-1: Die Liste füllt sich, sobald das verzögerte `/overview` ankommt, ohne Panel neu zu öffnen | ⬜ | — |
+| P10.5-8 | BG-1: Die Liste füllt sich, sobald das verzögerte `/overview` ankommt, ohne Panel neu zu öffnen | ⬜ | 2.3 gebaut (Ereignis `sfx:overview-loaded`) · M4-Probe offen (Claude Code) |
 | P10.5-9 | RE-1/RE-2: dieselbe Matrix auf Web und MCP | ⬜ | 2.2 gebaut (beide Flächen) · Probe 2.5 offen |
 | P10.5-10 | P10-I auf beiden Flächen durchgesetzt | ⬜ | 2.2 gebaut (P10-I + P10.5-N) · Probe 2.5 offen |
 | P10.5-11 | AL-1: Zeilen 14 und 29 geschlossen; Zeile 15 mit Weg beim Nikinger (Migration + Live-Check) | ⬜ | 2.2 gebaut (Zeilen 14/29 als Probe vorbereitet) · Probe 2.5 offen; Zeile 15 beim Nikinger |
@@ -133,48 +133,55 @@ updated: 2026-10-22 (Block 2 Schritte 2.1–2.2: eine Regel für Web und MCP —
 - **P10.5-27/28** — Live-Abnahme P10-J: zwei Modellanbieter, ein Server, ein Werkzeug (`list_spaces`) — Block 6 und Z.
 - **Block 2, Zeile 15 (AL-1)** — Migration + Live-Check beim Nikinger.
 
-## Session stopped — 2026-10-22 (Block 2 — Fehler, Parität, Regel: BG-1, RE-1, RE-2, P10-I; **in Arbeit**, Schritte 2.1 und 2.2 gebaut)
+## Session stopped — 2026-10-22 (Block 2 — Fehler, Parität, Regel: BG-1, RE-1, RE-2, P10-I; **2.1–2.4 gebaut**, 2.5 Proben offen)
 
-**Ergebnis.** Schritte 2.1 und 2.2 stehen: **eine** Regel für Web und MCP. `SharePolicy` kennt
-Home-Spaces (ein Space, der einem Nutzer gehört) und Team-Spaces (ein geteilter Space, der
-niemandem gehört); die Policy bekommt dafür ein Prädikat (`is_home_space`), das
-`mcpserver/app.py :: create_app()` aus der Auth-DB setzt (`oauth.store.get_user(space) is not
-None` — Zeilenabfrage **ohne** TOTP-Entschlüsselung). `webui/api.py :: _is_team_space()` und
-`_team_writer()` sind Einzeiler auf die Policy — die Home-Space-Abfrage gibt es im Code nur
-noch **einmal**. Durchgesetzt: **RE-1** (Ordner anlegen im Team-Space, Web), **RE-2** (Ordner
-wechseln im Team-Space, MCP), **P10-I** (kein Item wandert in den Home-Space eines anderen) und
-**P10.5-N** (auch nicht **aus** einem heraus — Nikinger 2026-10-21).
+**Ergebnis.** Die Schritte 2.1–2.4 stehen — **eine** Regel für Web und MCP, und die
+Space-Liste füllt sich nach, wenn das `/overview` spät kommt.
 
-**Fail-closed (Plan Block 2):** ohne Prädikat kennt die Policy **keinen** Home-Space — und
-damit auch keinen Team-Space. Wer kein Prädikat liefert, sperrt sich selbst.
+**Die Regel.** `SharePolicy` kennt Home-Spaces (ein Space, der einem Nutzer gehört) und
+Team-Spaces (ein geteilter Space, der niemandem gehört); die Policy bekommt dafür ein Prädikat
+(`is_home_space`), das `mcpserver/app.py :: create_app()` aus der Auth-DB setzt
+(`oauth.store.get_user(space) is not None` — Zeilenabfrage **ohne** TOTP-Entschlüsselung).
+`webui/api.py :: _is_team_space()` und `_team_writer()` sind Einzeiler auf die Policy — die
+Home-Space-Abfrage gibt es im Code nur noch **einmal**. Durchgesetzt: **RE-1** (Ordner anlegen
+im Team-Space, Web), **RE-2** (Ordner wechseln im Team-Space, MCP), **P10-I** (kein Item
+wandert in den Home-Space eines anderen) und **P10.5-N** (auch nicht **aus** einem heraus —
+Nikinger 2026-10-21). **Fail-closed:** ohne Prädikat kennt die Policy **keinen** Home-Space
+und damit auch keinen Team-Space — wer kein Prädikat liefert, sperrt sich selbst.
+
+**BG-1 (2.3).** `list.js` feuert nach dem Füllen von `state.spaces` das Ereignis
+`sfx:overview-loaded`; `spaces.js` hört darauf und zeichnet die Liste neu, **wenn** das Panel
+offen ist (`#settings-spaces` nicht `hidden`). Der Weg läuft über ein Ereignis, nicht über einen
+Import — `spaces.js` importiert `loadOverview()` aus `list.js`, ein Import zurück wäre ein
+Zyklus.
 
 **Ein Plan-Befund, datiert:** Schritt 2.4 („Tests") ist kein eigener Commit — die Tests kamen
-mit ihrer Regel (2.1/2.2), sonst gäbe es einen Commit mit Code ohne Beweis. Und: die
+mit ihrer Regel (2.1–2.3), sonst gäbe es einen Commit mit Code ohne Beweis. Und: die
 Test-Fixtures brauchten das Prädikat **auch** dort, wo es die Regel noch nicht prüft (webui,
 P7) — ohne Prädikat hätten die Web-Tests nach der Umstellung **keine** Team-Spaces mehr.
 
-**Geliefert (Commits).** `4f6e878` — 2.1. (dieser Commit) — 2.2: `mcpserver/tools.py`
-(RE-2, P10-I), `webui/api.py` (RE-1, P10-I), `PermissionDenied` mit optionalem Grund,
-`test_tools.py` 77 → 81, `test_app.py` 15 → 17, `test_api.py` 79 → 82.
+**Geliefert (Commits).** `4f6e878` — 2.1. `f4c63b6` — 2.2. (dieser Commit) — 2.3 (BG-1).
 
-**Gemessen.** Suite **1296 grün** (276 s). `doc_health` 0. **Sieben Gegenläufe, alle
-wirksam:** alte Web-Regel → Ordner-Test rot · P10-I-Prüfung entfernt → zwei Move-Tests rot ·
-alte MCP-Regel → RE-2-Test rot · MCP-P10-I entfernt → zwei Tests rot · Quellseite aus
-`may_move_between()` gestrichen → drei Tests rot · Ereignis aus `list.js` entfernt →
-Wächter rot · Prädikat aus `app.py` entfernt → zwei Integrations-Tests rot.
+**Gemessen.** Suite **1299 grün** (280 s). `doc_health` 0 · `ui_budget` 5/5 (173,8 KB gzip).
+**Sieben Gegenläufe, alle wirksam:** alte Web-Regel → Ordner-Test rot · P10-I-Prüfung
+entfernt → zwei Move-Tests rot · alte MCP-Regel → RE-2-Test rot · MCP-P10-I entfernt → zwei
+Tests rot · Quellseite aus `may_move_between()` gestrichen → drei Tests rot · Ereignis aus
+`list.js` entfernt → Wächter rot · Prädikat aus `app.py` entfernt → zwei Integrations-Tests
+rot.
 
-**Ein Test musste umgeschrieben werden, mit Begründung:** `test_update_item_with_space_and_
-folder_together_uses_space_level_check_not_owner_guard` (2026-08-17, Advisor-Fund) schob ein
-Item aus dem Home-Space `alpha` heraus — das verbietet P10.5-N jetzt. Der Testzweck (der
+**Ein Bestandstest musste umgeschrieben werden, mit Begründung:** `test_update_item_with_space_
+and_folder_together_uses_space_level_check_not_owner_guard` (2026-08-17, Advisor-Fund) schob
+ein Item aus dem Home-Space `alpha` heraus — das verbietet P10.5-N jetzt. Der Testzweck (der
 Eigentümer-Riegel darf einen legitimen Cross-Space-Move mit `folder=` nicht blockieren) bleibt,
 die Quelle ist jetzt ein Team-Space.
 
 **Ausführer-Daten.** **MiniMax M3.1 Flash** über opencode (P10.5-B), `limit.context`
-**400.000** (P10.5-C ✅). Wanduhrzeit: rund **1 h 10 min** für 2.1–2.2. Aufrufe/Kontingent:
+**400.000** (P10.5-C ✅). Wanduhrzeit: rund **1 h 40 min** für 2.1–2.4. Aufrufe/Kontingent:
 **nicht sichtbar**. Eingriffe: **0** vom Nikinger, **0** von Claude Code. Trailer je Commit:
 `Co-Authored-By: opencode/MiniMax-M3.1-Flash <noreply@minimax.io>`.
 
-**Offen / nächster Schritt.** **2.3** (BG-1: die Space-Liste füllt sich, wenn das verzögerte
-`/overview` ankommt) · **2.4** (Tests mit den Regeln) · **2.5** (Proben: Wegwerf, zwei
-Principale + ein Team-Space — **Claude Code**). Abnahme 10-9/10-10/10-11 bleiben ⬜, bis die
-Probe läuft.
+**Offen / nächster Schritt.** **2.5 — die Proben** (Plan Schritt 2.5, **Claude Code**):
+`phase10_5_finishing/probes/p105_b2_rights_probe.py` auf einer Wegwerf-Instanz (zwei Principale
++ ein Team-Space), Matrix Web × MCP, danach M4 erneut gegen die neue Instanz. Abnahme
+**10-8/10-9/10-10/10-11** bleiben ⬜, bis die Probe läuft; AL-1 Zeile 15 bleibt beim Nikinger.
+Danach: Deploy A (`v3.1.5`) nach Block 3–4.
