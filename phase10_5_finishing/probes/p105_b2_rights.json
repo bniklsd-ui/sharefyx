@@ -1,0 +1,532 @@
+{
+  "probe": "p105_b2_rights",
+  "head": "b299968",
+  "base_url": "https://127.0.0.1:8799",
+  "seed": {
+    "beta": "home B, read+write alpha",
+    "gamma": "team, read+write alpha",
+    "delta": "team, read alpha"
+  },
+  "graded": 28,
+  "passed": 28,
+  "measured": [
+    {
+      "row": "Ordner anlegen (implizit, create_item)",
+      "surface": "mcp",
+      "case": "alpha",
+      "expect": "measure",
+      "pass": null,
+      "raw": {
+        "is_error": false,
+        "text": "{\"op\":\"create\",\"id\":\"itm_3a3927ae\",\"space\":\"alpha\",\"title\":\"Neu MCP alpha\",\"version\":1,\"updated\":\"2026-10-22T11:41:30Z\",\"updated_by\":\"alpha\"}",
+        "folder_on_disk": true
+      }
+    },
+    {
+      "row": "Ordner anlegen (implizit, POST /items)",
+      "surface": "web",
+      "case": "alpha",
+      "expect": "measure",
+      "pass": null,
+      "raw": {
+        "status": 201,
+        "body": "{\"id\":\"itm_68090ccb\",\"space\":\"alpha\",\"type\":\"note\",\"title\":\"Neu Web alpha\",\"status\":\"active\",\"body\":\"\",\"due\":null,\"tags\":[],\"links\":[],\"created\":\"2026-10-22T11:41:30Z\",\"updated\":\"2026-10-22T11:41:30Z\",\"version\":1,\"format\":\"markdown\",\"extra\":{},\"folder\":\"ordner-item-web\",\"visibility\":\"private\",\"share_read\":[],\"share_write\":[],\"assignee\":\"\",\"updated_by\":\"alpha\",\"shared\":false,\"readonly\":false,\"asset",
+        "folder_on_disk": true
+      }
+    },
+    {
+      "row": "Ordner anlegen (implizit, create_item)",
+      "surface": "mcp",
+      "case": "gamma",
+      "expect": "measure",
+      "pass": null,
+      "raw": {
+        "is_error": false,
+        "text": "{\"op\":\"create\",\"id\":\"itm_604267fe\",\"space\":\"gamma\",\"title\":\"Neu MCP gamma\",\"version\":1,\"updated\":\"2026-10-22T11:41:30Z\",\"updated_by\":\"alpha\"}",
+        "folder_on_disk": true
+      }
+    },
+    {
+      "row": "Ordner anlegen (implizit, POST /items)",
+      "surface": "web",
+      "case": "gamma",
+      "expect": "measure",
+      "pass": null,
+      "raw": {
+        "status": 201,
+        "body": "{\"id\":\"itm_9a588111\",\"space\":\"gamma\",\"type\":\"note\",\"title\":\"Neu Web gamma\",\"status\":\"active\",\"body\":\"\",\"due\":null,\"tags\":[],\"links\":[],\"created\":\"2026-10-22T11:41:30Z\",\"updated\":\"2026-10-22T11:41:30Z\",\"version\":1,\"format\":\"markdown\",\"extra\":{},\"folder\":\"ordner-item-web\",\"visibility\":\"private\",\"share_read\":[],\"share_write\":[],\"assignee\":\"\",\"updated_by\":\"alpha\",\"shared\":true,\"readonly\":false,\"assets",
+        "folder_on_disk": true
+      }
+    },
+    {
+      "row": "Ordner anlegen (implizit, create_item)",
+      "surface": "mcp",
+      "case": "beta",
+      "expect": "measure",
+      "pass": null,
+      "raw": {
+        "is_error": false,
+        "text": "{\"op\":\"create\",\"id\":\"itm_42e2d184\",\"space\":\"beta\",\"title\":\"Neu MCP beta\",\"version\":1,\"updated\":\"2026-10-22T11:41:30Z\",\"updated_by\":\"alpha\"}",
+        "folder_on_disk": true
+      }
+    },
+    {
+      "row": "Ordner anlegen (implizit, POST /items)",
+      "surface": "web",
+      "case": "beta",
+      "expect": "measure",
+      "pass": null,
+      "raw": {
+        "status": 201,
+        "body": "{\"id\":\"itm_ab05973a\",\"space\":\"beta\",\"type\":\"note\",\"title\":\"Neu Web beta\",\"status\":\"active\",\"body\":\"\",\"due\":null,\"tags\":[],\"links\":[],\"created\":\"2026-10-22T11:41:30Z\",\"updated\":\"2026-10-22T11:41:30Z\",\"version\":1,\"format\":\"markdown\",\"extra\":{},\"folder\":\"ordner-item-web\",\"visibility\":\"private\",\"share_read\":[],\"share_write\":[],\"assignee\":\"\",\"updated_by\":\"alpha\",\"shared\":true,\"readonly\":false,\"assets\":",
+        "folder_on_disk": true
+      }
+    }
+  ],
+  "cells": [
+    {
+      "row": "RE-1 Ordner anlegen",
+      "surface": "web",
+      "case": "alpha",
+      "expect": "ok",
+      "pass": true,
+      "raw": {
+        "status": 201,
+        "body": "{\"folder\":\"neu-web\"}"
+      }
+    },
+    {
+      "row": "RE-1 Ordner anlegen",
+      "surface": "web",
+      "case": "gamma",
+      "expect": "ok",
+      "pass": true,
+      "raw": {
+        "status": 201,
+        "body": "{\"folder\":\"neu-web\"}"
+      }
+    },
+    {
+      "row": "RE-1 Ordner anlegen",
+      "surface": "web",
+      "case": "beta",
+      "expect": "deny",
+      "pass": true,
+      "raw": {
+        "status": 403,
+        "body": "{\"error\":\"forbidden\",\"message\":\"Ordner können nur im eigenen Space oder in einem Team-Space mit Schreibrecht angelegt werden.\",\"detail\":{}}"
+      }
+    },
+    {
+      "row": "RE-1 Ordner anlegen",
+      "surface": "web",
+      "case": "delta",
+      "expect": "deny",
+      "pass": true,
+      "raw": {
+        "status": 403,
+        "body": "{\"error\":\"forbidden\",\"message\":\"Ordner können nur im eigenen Space oder in einem Team-Space mit Schreibrecht angelegt werden.\",\"detail\":{}}"
+      }
+    },
+    {
+      "row": "Ordner anlegen (implizit, create_item)",
+      "surface": "mcp",
+      "case": "alpha",
+      "expect": "measure",
+      "pass": null,
+      "raw": {
+        "is_error": false,
+        "text": "{\"op\":\"create\",\"id\":\"itm_3a3927ae\",\"space\":\"alpha\",\"title\":\"Neu MCP alpha\",\"version\":1,\"updated\":\"2026-10-22T11:41:30Z\",\"updated_by\":\"alpha\"}",
+        "folder_on_disk": true
+      }
+    },
+    {
+      "row": "Ordner anlegen (implizit, POST /items)",
+      "surface": "web",
+      "case": "alpha",
+      "expect": "measure",
+      "pass": null,
+      "raw": {
+        "status": 201,
+        "body": "{\"id\":\"itm_68090ccb\",\"space\":\"alpha\",\"type\":\"note\",\"title\":\"Neu Web alpha\",\"status\":\"active\",\"body\":\"\",\"due\":null,\"tags\":[],\"links\":[],\"created\":\"2026-10-22T11:41:30Z\",\"updated\":\"2026-10-22T11:41:30Z\",\"version\":1,\"format\":\"markdown\",\"extra\":{},\"folder\":\"ordner-item-web\",\"visibility\":\"private\",\"share_read\":[],\"share_write\":[],\"assignee\":\"\",\"updated_by\":\"alpha\",\"shared\":false,\"readonly\":false,\"asset",
+        "folder_on_disk": true
+      }
+    },
+    {
+      "row": "Ordner anlegen (implizit, create_item)",
+      "surface": "mcp",
+      "case": "gamma",
+      "expect": "measure",
+      "pass": null,
+      "raw": {
+        "is_error": false,
+        "text": "{\"op\":\"create\",\"id\":\"itm_604267fe\",\"space\":\"gamma\",\"title\":\"Neu MCP gamma\",\"version\":1,\"updated\":\"2026-10-22T11:41:30Z\",\"updated_by\":\"alpha\"}",
+        "folder_on_disk": true
+      }
+    },
+    {
+      "row": "Ordner anlegen (implizit, POST /items)",
+      "surface": "web",
+      "case": "gamma",
+      "expect": "measure",
+      "pass": null,
+      "raw": {
+        "status": 201,
+        "body": "{\"id\":\"itm_9a588111\",\"space\":\"gamma\",\"type\":\"note\",\"title\":\"Neu Web gamma\",\"status\":\"active\",\"body\":\"\",\"due\":null,\"tags\":[],\"links\":[],\"created\":\"2026-10-22T11:41:30Z\",\"updated\":\"2026-10-22T11:41:30Z\",\"version\":1,\"format\":\"markdown\",\"extra\":{},\"folder\":\"ordner-item-web\",\"visibility\":\"private\",\"share_read\":[],\"share_write\":[],\"assignee\":\"\",\"updated_by\":\"alpha\",\"shared\":true,\"readonly\":false,\"assets",
+        "folder_on_disk": true
+      }
+    },
+    {
+      "row": "Ordner anlegen (implizit, create_item)",
+      "surface": "mcp",
+      "case": "beta",
+      "expect": "measure",
+      "pass": null,
+      "raw": {
+        "is_error": false,
+        "text": "{\"op\":\"create\",\"id\":\"itm_42e2d184\",\"space\":\"beta\",\"title\":\"Neu MCP beta\",\"version\":1,\"updated\":\"2026-10-22T11:41:30Z\",\"updated_by\":\"alpha\"}",
+        "folder_on_disk": true
+      }
+    },
+    {
+      "row": "Ordner anlegen (implizit, POST /items)",
+      "surface": "web",
+      "case": "beta",
+      "expect": "measure",
+      "pass": null,
+      "raw": {
+        "status": 201,
+        "body": "{\"id\":\"itm_ab05973a\",\"space\":\"beta\",\"type\":\"note\",\"title\":\"Neu Web beta\",\"status\":\"active\",\"body\":\"\",\"due\":null,\"tags\":[],\"links\":[],\"created\":\"2026-10-22T11:41:30Z\",\"updated\":\"2026-10-22T11:41:30Z\",\"version\":1,\"format\":\"markdown\",\"extra\":{},\"folder\":\"ordner-item-web\",\"visibility\":\"private\",\"share_read\":[],\"share_write\":[],\"assignee\":\"\",\"updated_by\":\"alpha\",\"shared\":true,\"readonly\":false,\"assets\":",
+        "folder_on_disk": true
+      }
+    },
+    {
+      "row": "Ordner anlegen (implizit, create_item)",
+      "surface": "mcp",
+      "case": "delta",
+      "expect": "deny",
+      "pass": true,
+      "raw": {
+        "is_error": true,
+        "text": "write_denied: kein Zugriff auf delta — kein Schreibrecht, das Item ist nicht mit dir geteilt, oder es ist als 'nur für Menschen' markiert",
+        "folder_on_disk": false
+      }
+    },
+    {
+      "row": "Ordner anlegen (implizit, POST /items)",
+      "surface": "web",
+      "case": "delta",
+      "expect": "deny",
+      "pass": true,
+      "raw": {
+        "status": 403,
+        "body": "{\"error\":\"forbidden\",\"message\":\"Kein Schreibzugriff auf diesen Space.\",\"detail\":{}}",
+        "folder_on_disk": false
+      }
+    },
+    {
+      "row": "RE-1/RE-2 Ordner wechseln",
+      "surface": "web",
+      "case": "alpha",
+      "expect": "ok",
+      "pass": true,
+      "raw": {
+        "status": 200,
+        "body": "{\"id\":\"itm_9f891be1\",\"space\":\"alpha\",\"type\":\"note\",\"title\":\"A Ordner Web\",\"status\":\"active\",\"body\":\"Inhalt von A Ordner Web — Wegwerf P10.5 B2.\",\"due\":null,\"tags\":[],\"links\":[],\"created\":\"2026-10-22T11:39:34Z\",\"updated\":\"2026-10-22T11:41:31Z\",\"version\":2,\"format\":\"markdown\",\"extra\":{},\"folder\":\"ziel-web\",\"visibility\":\"private\",\"share_read\":[],\"share_write\":[],\"assignee\":\"\",\"updated_by\":\"alpha\",\"sh",
+        "on_disk": {
+          "space": "alpha",
+          "folder": "ziel-web"
+        }
+      }
+    },
+    {
+      "row": "RE-2 Ordner wechseln",
+      "surface": "mcp",
+      "case": "alpha",
+      "expect": "ok",
+      "pass": true,
+      "raw": {
+        "is_error": false,
+        "text": "{\"op\":\"update\",\"id\":\"itm_8a5a8946\",\"space\":\"alpha\",\"title\":\"A Ordner MCP\",\"version\":2,\"updated\":\"2026-10-22T11:41:31Z\",\"updated_by\":\"alpha\"}",
+        "on_disk": {
+          "space": "alpha",
+          "folder": "ziel-mcp"
+        }
+      }
+    },
+    {
+      "row": "RE-1/RE-2 Ordner wechseln",
+      "surface": "web",
+      "case": "gamma",
+      "expect": "ok",
+      "pass": true,
+      "raw": {
+        "status": 200,
+        "body": "{\"id\":\"itm_9a371e3c\",\"space\":\"gamma\",\"type\":\"note\",\"title\":\"G Ordner Web\",\"status\":\"active\",\"body\":\"Inhalt von G Ordner Web — Wegwerf P10.5 B2.\",\"due\":null,\"tags\":[],\"links\":[],\"created\":\"2026-10-22T11:39:34Z\",\"updated\":\"2026-10-22T11:41:31Z\",\"version\":2,\"format\":\"markdown\",\"extra\":{},\"folder\":\"ziel-web\",\"visibility\":\"private\",\"share_read\":[],\"share_write\":[],\"assignee\":\"\",\"updated_by\":\"alpha\",\"sh",
+        "on_disk": {
+          "space": "gamma",
+          "folder": "ziel-web"
+        }
+      }
+    },
+    {
+      "row": "RE-2 Ordner wechseln",
+      "surface": "mcp",
+      "case": "gamma",
+      "expect": "ok",
+      "pass": true,
+      "raw": {
+        "is_error": false,
+        "text": "{\"op\":\"update\",\"id\":\"itm_ac039ba8\",\"space\":\"gamma\",\"title\":\"G Ordner MCP\",\"version\":2,\"updated\":\"2026-10-22T11:41:31Z\",\"updated_by\":\"alpha\"}",
+        "on_disk": {
+          "space": "gamma",
+          "folder": "ziel-mcp"
+        }
+      }
+    },
+    {
+      "row": "RE-1/RE-2 Ordner wechseln",
+      "surface": "web",
+      "case": "beta",
+      "expect": "deny",
+      "pass": true,
+      "raw": {
+        "status": 403,
+        "body": "{\"error\":\"forbidden\",\"message\":\"folder ist nur vom Eigentümer-Space änderbar — ein geteilter Schreibzugriff erlaubt keine Verschiebung in einen anderen Ordner.\",\"detail\":{}}",
+        "on_disk": {
+          "space": "beta",
+          "folder": ""
+        }
+      }
+    },
+    {
+      "row": "RE-2 Ordner wechseln",
+      "surface": "mcp",
+      "case": "beta",
+      "expect": "deny",
+      "pass": true,
+      "raw": {
+        "is_error": true,
+        "text": "invalid: folder ist nur im eigenen Space oder in einem Team-Space mit Schreibrecht änderbar — ein geteilter Schreibzugriff auf ein Item erlaubt keine Verschiebung in einen anderen Ordner",
+        "on_disk": {
+          "space": "beta",
+          "folder": ""
+        }
+      }
+    },
+    {
+      "row": "P10-I Team-Ziel (Gegenlauf)",
+      "surface": "web",
+      "case": "alpha->gamma",
+      "expect": "ok",
+      "pass": true,
+      "raw": {
+        "status": 200,
+        "body": "{\"id\":\"itm_a2043d59\",\"space\":\"gamma\",\"type\":\"note\",\"title\":\"A nach Team Web\",\"status\":\"active\",\"body\":\"Inhalt von A nach Team Web — Wegwerf P10.5 B2.\",\"due\":null,\"tags\":[],\"links\":[],\"created\":\"2026-10-22T11:39:34Z\",\"updated\":\"2026-10-22T11:41:31Z\",\"version\":2,\"format\":\"markdown\",\"extra\":{},\"folder\":\"\",\"visibility\":\"private\",\"share_read\":[],\"share_write\":[],\"assignee\":\"\",\"updated_by\":\"alpha\",\"shar",
+        "on_disk": {
+          "space": "gamma",
+          "folder": ""
+        }
+      }
+    },
+    {
+      "row": "P10-I Team-Ziel (Gegenlauf) · AL-1 Zeile 29",
+      "surface": "mcp",
+      "case": "alpha->gamma",
+      "expect": "ok",
+      "pass": true,
+      "raw": {
+        "is_error": false,
+        "text": "{\"op\":\"update\",\"id\":\"itm_f7559448\",\"space\":\"gamma\",\"title\":\"A nach Team MCP\",\"version\":2,\"updated\":\"2026-10-22T11:41:31Z\",\"updated_by\":\"alpha\"}",
+        "on_disk": {
+          "space": "gamma",
+          "folder": ""
+        }
+      }
+    },
+    {
+      "row": "P10-I in fremden Home",
+      "surface": "web",
+      "case": "alpha->beta",
+      "expect": "deny",
+      "pass": true,
+      "raw": {
+        "status": 403,
+        "body": "{\"error\":\"forbidden\",\"message\":\"Verschieben in oder aus dem Home-Space eines anderen ist nicht erlaubt.\",\"detail\":{}}",
+        "on_disk": {
+          "space": "alpha",
+          "folder": ""
+        }
+      },
+      "still_in_source": true
+    },
+    {
+      "row": "P10-I in fremden Home",
+      "surface": "mcp",
+      "case": "alpha->beta",
+      "expect": "deny",
+      "pass": true,
+      "raw": {
+        "is_error": true,
+        "text": "write_denied: Verschieben in oder aus dem Home-Space eines anderen ist nicht erlaubt (P10-I/P10.5-N)",
+        "on_disk": {
+          "space": "alpha",
+          "folder": ""
+        }
+      },
+      "still_in_source": true
+    },
+    {
+      "row": "P10.5-N aus fremdem Home",
+      "surface": "web",
+      "case": "beta->alpha",
+      "expect": "deny",
+      "pass": true,
+      "raw": {
+        "status": 403,
+        "body": "{\"error\":\"forbidden\",\"message\":\"Verschieben in oder aus dem Home-Space eines anderen ist nicht erlaubt.\",\"detail\":{}}",
+        "on_disk": {
+          "space": "beta",
+          "folder": ""
+        }
+      },
+      "still_in_source": true
+    },
+    {
+      "row": "P10.5-N aus fremdem Home",
+      "surface": "mcp",
+      "case": "beta->alpha",
+      "expect": "deny",
+      "pass": true,
+      "raw": {
+        "is_error": true,
+        "text": "write_denied: Verschieben in oder aus dem Home-Space eines anderen ist nicht erlaubt (P10-I/P10.5-N)",
+        "on_disk": {
+          "space": "beta",
+          "folder": ""
+        }
+      },
+      "still_in_source": true
+    },
+    {
+      "row": "P10.5-N aus fremdem Home",
+      "surface": "web",
+      "case": "beta->gamma",
+      "expect": "deny",
+      "pass": true,
+      "raw": {
+        "status": 403,
+        "body": "{\"error\":\"forbidden\",\"message\":\"Verschieben in oder aus dem Home-Space eines anderen ist nicht erlaubt.\",\"detail\":{}}",
+        "on_disk": {
+          "space": "beta",
+          "folder": ""
+        }
+      },
+      "still_in_source": true
+    },
+    {
+      "row": "P10.5-N aus fremdem Home",
+      "surface": "mcp",
+      "case": "beta->gamma",
+      "expect": "deny",
+      "pass": true,
+      "raw": {
+        "is_error": true,
+        "text": "write_denied: Verschieben in oder aus dem Home-Space eines anderen ist nicht erlaubt (P10-I/P10.5-N)",
+        "on_disk": {
+          "space": "beta",
+          "folder": ""
+        }
+      },
+      "still_in_source": true
+    },
+    {
+      "row": "Zeile 14 read-Space schreiben",
+      "surface": "web",
+      "case": "PATCH title",
+      "expect": "deny",
+      "pass": true,
+      "raw": {
+        "status": 403,
+        "body": "{\"error\":\"forbidden\",\"message\":\"Kein Schreibzugriff auf dieses Item.\",\"detail\":{}}"
+      }
+    },
+    {
+      "row": "Zeile 14 read-Space schreiben",
+      "surface": "mcp",
+      "case": "update_item title",
+      "expect": "deny",
+      "pass": true,
+      "raw": {
+        "is_error": true,
+        "text": "write_denied: kein Zugriff auf delta — kein Schreibrecht, das Item ist nicht mit dir geteilt, oder es ist als 'nur für Menschen' markiert"
+      }
+    },
+    {
+      "row": "Zeile 14 read-Space schreiben",
+      "surface": "mcp",
+      "case": "append_to_item",
+      "expect": "deny",
+      "pass": true,
+      "raw": {
+        "is_error": true,
+        "text": "write_denied: kein Zugriff auf delta — kein Schreibrecht, das Item ist nicht mit dir geteilt, oder es ist als 'nur für Menschen' markiert"
+      }
+    },
+    {
+      "row": "Zeile 14 fremder Body gewrappt (get_item)",
+      "surface": "mcp",
+      "case": "delta",
+      "expect": "ok",
+      "pass": true,
+      "raw": {
+        "is_error": false,
+        "text": "---\nid: itm_d063ecac\nspace: delta\ntype: note\ntitle: D Lesen\nstatus: active\ntags: []\nlinks: []\ncreated: 2026-10-22T11:39:34Z\nupdated: 2026-10-22T11:39:34Z\nversion: 1\n---\n<untrusted_content space=\"delta\">\nInhalt von D Lesen — Wegwerf P10.5 B2.\n</untrusted_content>"
+      }
+    },
+    {
+      "row": "Zeile 14 fremder Body gewrappt (get_item)",
+      "surface": "mcp",
+      "case": "gamma",
+      "expect": "ok",
+      "pass": true,
+      "raw": {
+        "is_error": false,
+        "text": "---\nid: itm_ac039ba8\nspace: gamma\ntype: note\ntitle: G Ordner MCP\nstatus: active\ntags: []\nlinks: []\ncreated: 2026-10-22T11:39:34Z\nupdated: 2026-10-22T11:41:31Z\nversion: 2\nupdated_by: alpha\n---\n<untrusted_content space=\"gamma\">\nInhalt von G Ordner MCP — Wegwerf P10.5 B2.\n</untrusted_content>"
+      }
+    },
+    {
+      "row": "Zeile 14 fremder Body gewrappt (get_item)",
+      "surface": "mcp",
+      "case": "beta",
+      "expect": "ok",
+      "pass": true,
+      "raw": {
+        "is_error": false,
+        "text": "---\nid: itm_a0a7642c\nspace: beta\ntype: note\ntitle: B Ordner MCP\nstatus: active\ntags: []\nlinks: []\ncreated: 2026-10-22T11:39:34Z\nupdated: 2026-10-22T11:39:34Z\nversion: 1\n---\n<untrusted_content space=\"beta\">\nInhalt von B Ordner MCP — Wegwerf P10.5 B2.\n</untrusted_content>"
+      }
+    },
+    {
+      "row": "Zeile 14 Gegenlauf: eigener Body ungewrappt",
+      "surface": "mcp",
+      "case": "alpha",
+      "expect": "ok",
+      "pass": true,
+      "raw": {
+        "is_error": false,
+        "text": "---\nid: itm_8a5a8946\nspace: alpha\ntype: note\ntitle: A Ordner MCP\nstatus: active\ntags: []\nlinks: []\ncreated: 2026-10-22T11:39:34Z\nupdated: 2026-10-22T11:41:31Z\nversion: 2\nupdated_by: alpha\n---\nInhalt von A Ordner MCP — Wegwerf P10.5 B2."
+      }
+    },
+    {
+      "row": "Zeile 14 fremder Snippet gewrappt (search_items)",
+      "surface": "mcp",
+      "case": "delta",
+      "expect": "ok",
+      "pass": true,
+      "raw": {
+        "is_error": false,
+        "text": "{\"items\":[{\"id\":\"itm_d063ecac\",\"space\":\"delta\",\"type\":\"note\",\"title\":\"D Lesen\",\"status\":\"active\",\"due\":null,\"tags\":[],\"links\":[],\"updated\":\"2026-10-22T11:39:34Z\",\"version\":1,\"assignee\":\"\",\"updated_by\":\"\",\"snippet\":\"<untrusted_content space=\\\"delta\\\">\\nInhalt von D Lesen — Wegwerf P10.5 B2.\\n</untrusted_content>\"}],\"total\":1,\"limit\":20,\"offset\":0,\"truncated\":false}"
+      }
+    }
+  ]
+}

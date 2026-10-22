@@ -1,0 +1,24 @@
+{
+  "probe": "p105_m4_bg1",
+  "head": "b299968",
+  "delay_s": 4.0,
+  "expected_writable_spaces": 3,
+  "delayed_path": {
+    "count_on_open": 0,
+    "count_after_delay_resolved": 3,
+    "count_after_reopen": 3
+  },
+  "immediate_path": {
+    "count_on_open": 3
+  },
+  "bg1_fixed": true,
+  "gegenlauf_ohne_ereignis": {
+    "note": "list.js ohne dispatchEvent(sfx:overview-loaded), danach git checkout",
+    "delayed_path": {
+      "count_on_open": 0,
+      "count_after_delay_resolved": 0,
+      "count_after_reopen": 3
+    },
+    "bg1_fixed": false
+  }
+}
