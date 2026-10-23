@@ -1,6 +1,6 @@
 {
   "probe": "p105_b4_loading",
-  "datum": "2026-10-22",
+  "datum": "2026-10-23",
   "grenzen": {
     "z2_verzoegerung_s": 2.0,
     "z2_grenze_s": 1.0,
@@ -8,7 +8,7 @@
     "z4_langsam_ms": 400,
     "z3_grenze_ms": 1000
   },
-  "z3_domcontentloaded_ms": 142.2,
+  "z3_domcontentloaded_ms": 58.3,
   "z3_erfuellt": true,
   "z4": {
     "schnell": {
@@ -34,9 +34,9 @@
     }
   },
   "z4_grenze_erfuellt": true,
-  "z2_raumwechsel_s": 0.813,
+  "z2_raumwechsel_s": 0.044,
   "z2_raumwechsel_erfuellt": true,
-  "z2_item_oeffnen_s": 0.053,
+  "z2_item_oeffnen_s": 0.068,
   "z2_item_oeffnen_erfuellt": true,
   "z2_erfuellt": true
 }

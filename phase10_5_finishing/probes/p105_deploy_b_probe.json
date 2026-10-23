@@ -1,0 +1,507 @@
+{
+  "probe": "p105_deploy_b",
+  "zeitpunkt": "2026-10-23T10:04:43.539519+00:00",
+  "basis": {
+    "repo_head": "main",
+    "badge_erwartet": "v3.1.6",
+    "live_dienst_port": 8765,
+    "wegwerf": "/tmp/opencode/sharefyx-wegwerf-p10"
+  },
+  "token": "ausgestellt (tmp-auth.sqlite3, nicht ausgegeben)",
+  "mcp": {
+    "werkzeuge": [
+      "append_to_item",
+      "append_to_items",
+      "create_item",
+      "get_item",
+      "get_item_asset",
+      "get_item_meta",
+      "list_spaces",
+      "patch_item",
+      "put_item_asset",
+      "search_items",
+      "update_item"
+    ],
+    "protocolVersion": "2025-11-25",
+    "quittung_append_to_items": {
+      "results": [
+        {
+          "item_id": "itm_84af4946",
+          "ok": true,
+          "version": 5,
+          "appended_bytes": 25
+        },
+        {
+          "item_id": "itm_61f4e358",
+          "ok": false,
+          "error": "conflict",
+          "detail": "itm_61f4e358 wurde geändert (deine Version 1001, aktuell 1, zuletzt 2026-10-23T09:40:31Z) — lies neu mit get_item und wiederhole"
+        }
+      ],
+      "ok": 1,
+      "failed": 1
+    },
+    "log_werkzeugzeilen": [
+      "{\"ts\":\"2026-10-23T10:04:43.843Z\",\"ev\":\"tool\",\"tool\":\"list_spaces\",\"space\":\"alpha\",\"ms\":4,\"ok\":true,\"proto\":\"2025-03-26\"}"
+    ]
+  },
+  "update_log": {
+    "eintraege": [
+      {
+        "id": "2026-10-23#2",
+        "datum": "2026-10-23",
+        "erste_zeile": "Die KI-Verbindung kann jetzt mehrere Notizen in einem einzigen Aufruf um Text ergänzen — jede Notiz bringt ihre eigene Version mit, ein Konflikt stoppt die anderen nicht."
+      },
+      {
+        "id": "2026-10-23#1",
+        "datum": "2026-10-23",
+        "erste_zeile": "Die Übersicht lädt jetzt deutlich schneller: die Zähler kommen in einem einzigen Durchgang statt einzeln je Ordner und Space."
+      },
+      {
+        "id": "2026-10-08#1",
+        "datum": "2026-10-08",
+        "erste_zeile": "Neue Notizen und Aufgaben landen jetzt in dem Space, in dem du gerade arbeitest — vorher wanderten sie aus einem Team-Space still in deinen eigenen. Der Anlegen-Dialog nennt oben das Ziel."
+      },
+      {
+        "id": "2026-10-07#1",
+        "datum": "2026-10-07",
+        "erste_zeile": "Die Einstellungen sind jetzt eine Fensterkette: das Menü bleibt sichtbar, während das Passwort-, das Spaces- und das Update-Log-Fenster daneben aufgehen. Aus „Spaces verwalten\" öffnet ein Klick auf einen Space ein drittes Fenster."
+      },
+      {
+        "id": "2026-10-03#1",
+        "datum": "2026-10-03",
+        "erste_zeile": "Die Kopfdaten haben ein neues Feld „Bei“: damit steht, wer eine Aufgabe übernommen hat. Setzt du den Status auf „In Arbeit“ und das Feld ist noch leer, trägt die Oberfläche deinen eigenen Space selbst ein."
+      },
+      {
+        "id": "2026-10-02#1",
+        "datum": "2026-10-02",
+        "erste_zeile": "Aufgaben können jetzt den Status „In Arbeit\" bekommen und tauchen in einem eigenen Ordner „In Arbeit\" in der Navigation auf — vorher war eine so markierte Aufgabe in keinem einzigen Ordner mehr auffindbar."
+      },
+      {
+        "id": "2026-09-18#1",
+        "datum": "2026-09-18",
+        "erste_zeile": "Die Übersicht zeigt deine Spaces jetzt direkt neben der Verknüpfungs-Karte statt darüber — beides auf einen Blick, kein Umschalten mehr nötig."
+      },
+      {
+        "id": "2026-09-05#1",
+        "datum": "2026-09-05",
+        "erste_zeile": "Im Suchdialog für Verknüpfungen kannst du wählen, ob eine Notiz als Text-Link im Notiztext oder als Eintrag im Links-Feld angelegt wird — die letzte Wahl wird gemerkt."
+      },
+      {
+        "id": "2026-09-02#1",
+        "datum": "2026-09-02",
+        "erste_zeile": "Die Übersicht ist jetzt tabellos: jede deiner Spaces bekommt eine eigene Zeile mit Zähler-Chips für „Offen\", „Erledigt\", „Notizen\" und „Archiv\" — ein Klick auf einen Chip öffnet die zugehörige Liste. Vier gleiche Kacheln gibt es nicht mehr."
+      },
+      {
+        "id": "2026-09-01#2",
+        "datum": "2026-09-01",
+        "erste_zeile": "Links zwischen Notizen werden anklickbar: ein `#item/...`-Link im Text einer Notiz öffnet direkt das verlinkte Gegenstück — vorher waren die Links sichtbar, aber ohne Funktion."
+      },
+      {
+        "id": "2026-09-01#1",
+        "datum": "2026-09-01",
+        "erste_zeile": "Claude nennt dir gegenüber jetzt den Titel einer Notiz statt einer internen ID — die Kennung bleibt im Hintergrund, der Titel ist, was du im Browser siehst."
+      },
+      {
+        "id": "2026-08-31#1",
+        "datum": "2026-08-31",
+        "erste_zeile": "Mehrere Notizen gleichzeitig in einen anderen Space verschieben: reicht jetzt ein Passwort und ein Code für alle aus, auch wenn die Aktion Schreibrechte erweitert — der Code wird intern genau einmal verwendet, danach ist für jede weitere Verschiebe-Aktion ein neuer Code nötig."
+      },
+      {
+        "id": "2026-08-27#1",
+        "datum": "2026-08-27",
+        "erste_zeile": "Neuer Menüpunkt \"Spaces verwalten\": eigene Spaces anlegen oder entfernen, Mitglieder mit Schreibrecht hinzufügen oder entfernen — direkt im Konto-Menü, ohne Kommandozeile."
+      },
+      {
+        "id": "2026-08-25#1",
+        "datum": "2026-08-25",
+        "erste_zeile": "Neuer Knopf zum Entfernen von Bildern aus einer Notiz — das Bild wandert in den Papierkorb, die Textstelle bleibt als reiner Bildname stehen."
+      },
+      {
+        "id": "2026-08-23#1",
+        "datum": "2026-08-23",
+        "erste_zeile": "Interner Aufräumschritt: jede bestehende Notiz trägt jetzt explizit \"privat\" in ihren Metadaten — das war schon vorher der geltende Standardwert, sichtbar ändert sich für dich nichts."
+      },
+      {
+        "id": "2026-08-21#1",
+        "datum": "2026-08-21",
+        "erste_zeile": "Bilder in Notizen: hochladen, ansehen, im Text einfügen — direkt im Editor."
+      },
+      {
+        "id": "2026-08-14#1",
+        "datum": "2026-08-14",
+        "erste_zeile": "Echte Ordner: anlegen und Notizen per Menü oder per Ziehen (Drag & Drop) hineinverschieben."
+      },
+      {
+        "id": "2026-08-13#2",
+        "datum": "2026-08-13",
+        "erste_zeile": "Grauer Text (Platzhalter, Meta-Angaben, Versionsband) ist jetzt deutlich besser lesbar — Kontrast auf WCAG AA angehoben."
+      },
+      {
+        "id": "2026-08-13#1",
+        "datum": "2026-08-13",
+        "erste_zeile": "Die angekündigte Umstellung ist jetzt live: fremde Spaces sind nicht mehr automatisch mitlesbar — nur noch, wo eine ausdrückliche Freigabe besteht."
+      },
+      {
+        "id": "2026-08-09#1",
+        "datum": "2026-08-09",
+        "erste_zeile": "Deine Notizen werden bald **standardmäßig privat**: alles Bestehende und alles Neue ist nach der nächsten Umstellung nur noch für dich sichtbar."
+      }
+    ],
+    "eintraege_alt_schema": [
+      {
+        "id": "2026-10-23#1",
+        "datum": "2026-10-23"
+      },
+      {
+        "id": "2026-10-23#2",
+        "datum": "2026-10-23"
+      },
+      {
+        "id": "2026-10-08#1",
+        "datum": "2026-10-08"
+      },
+      {
+        "id": "2026-10-07#1",
+        "datum": "2026-10-07"
+      },
+      {
+        "id": "2026-10-03#1",
+        "datum": "2026-10-03"
+      },
+      {
+        "id": "2026-10-02#1",
+        "datum": "2026-10-02"
+      },
+      {
+        "id": "2026-09-18#1",
+        "datum": "2026-09-18"
+      },
+      {
+        "id": "2026-09-05#1",
+        "datum": "2026-09-05"
+      },
+      {
+        "id": "2026-09-02#1",
+        "datum": "2026-09-02"
+      },
+      {
+        "id": "2026-09-01#1",
+        "datum": "2026-09-01"
+      },
+      {
+        "id": "2026-09-01#2",
+        "datum": "2026-09-01"
+      },
+      {
+        "id": "2026-08-31#1",
+        "datum": "2026-08-31"
+      },
+      {
+        "id": "2026-08-27#1",
+        "datum": "2026-08-27"
+      },
+      {
+        "id": "2026-08-25#1",
+        "datum": "2026-08-25"
+      },
+      {
+        "id": "2026-08-23#1",
+        "datum": "2026-08-23"
+      },
+      {
+        "id": "2026-08-21#1",
+        "datum": "2026-08-21"
+      },
+      {
+        "id": "2026-08-14#1",
+        "datum": "2026-08-14"
+      },
+      {
+        "id": "2026-08-13#1",
+        "datum": "2026-08-13"
+      },
+      {
+        "id": "2026-08-13#2",
+        "datum": "2026-08-13"
+      },
+      {
+        "id": "2026-08-09#1",
+        "datum": "2026-08-09"
+      }
+    ],
+    "eintraege_neu_schema": [
+      {
+        "id": "2026-10-23#2",
+        "datum": "2026-10-23"
+      },
+      {
+        "id": "2026-10-23#1",
+        "datum": "2026-10-23"
+      },
+      {
+        "id": "2026-10-08#1",
+        "datum": "2026-10-08"
+      },
+      {
+        "id": "2026-10-07#1",
+        "datum": "2026-10-07"
+      },
+      {
+        "id": "2026-10-03#1",
+        "datum": "2026-10-03"
+      },
+      {
+        "id": "2026-10-02#1",
+        "datum": "2026-10-02"
+      },
+      {
+        "id": "2026-09-18#1",
+        "datum": "2026-09-18"
+      },
+      {
+        "id": "2026-09-05#1",
+        "datum": "2026-09-05"
+      },
+      {
+        "id": "2026-09-02#1",
+        "datum": "2026-09-02"
+      },
+      {
+        "id": "2026-09-01#2",
+        "datum": "2026-09-01"
+      },
+      {
+        "id": "2026-09-01#1",
+        "datum": "2026-09-01"
+      },
+      {
+        "id": "2026-08-31#1",
+        "datum": "2026-08-31"
+      },
+      {
+        "id": "2026-08-27#1",
+        "datum": "2026-08-27"
+      },
+      {
+        "id": "2026-08-25#1",
+        "datum": "2026-08-25"
+      },
+      {
+        "id": "2026-08-23#1",
+        "datum": "2026-08-23"
+      },
+      {
+        "id": "2026-08-21#1",
+        "datum": "2026-08-21"
+      },
+      {
+        "id": "2026-08-14#1",
+        "datum": "2026-08-14"
+      },
+      {
+        "id": "2026-08-13#2",
+        "datum": "2026-08-13"
+      },
+      {
+        "id": "2026-08-13#1",
+        "datum": "2026-08-13"
+      },
+      {
+        "id": "2026-08-09#1",
+        "datum": "2026-08-09"
+      }
+    ],
+    "gesehen_vorher": "2026-10-23#1",
+    "latest_alt": "2026-10-23#1",
+    "latest_neu": "2026-10-23#2",
+    "banner_alt": false,
+    "banner_neu": true
+  },
+  "zellen": [
+    {
+      "id": "A1",
+      "gruppe": "health_gate",
+      "erwartet": 200,
+      "gemessen": 200,
+      "ok": true
+    },
+    {
+      "id": "A1b",
+      "gruppe": "health_gate",
+      "erwartet": "version-Feld vorhanden (Paketversion, nicht das Badge)",
+      "gemessen": "0.1.0",
+      "ok": true
+    },
+    {
+      "id": "A2",
+      "gruppe": "health_gate",
+      "erwartet": 200,
+      "gemessen": 200,
+      "ok": true
+    },
+    {
+      "id": "A3",
+      "gruppe": "health_gate",
+      "erwartet": 401,
+      "gemessen": 401,
+      "ok": true
+    },
+    {
+      "id": "A4",
+      "gruppe": "health_gate",
+      "erwartet": 401,
+      "gemessen": 401,
+      "ok": true
+    },
+    {
+      "id": "A5",
+      "gruppe": "health_gate",
+      "erwartet": "v3.1.6",
+      "gemessen": "v3.1.6",
+      "ok": true
+    },
+    {
+      "id": "A6",
+      "gruppe": "health_gate",
+      "erwartet": "heute (2026-10-23)",
+      "gemessen": "2026-10-23",
+      "ok": true
+    },
+    {
+      "id": "B1",
+      "gruppe": "transport",
+      "erwartet": "401 + WWW-Authenticate, kein 307",
+      "gemessen": "401 · challenge=ja",
+      "ok": true
+    },
+    {
+      "id": "B1b",
+      "gruppe": "transport",
+      "erwartet": "kein 3xx",
+      "gemessen": 401,
+      "ok": true
+    },
+    {
+      "id": "B2",
+      "gruppe": "transport",
+      "erwartet": "kein 3xx (mit Token)",
+      "gemessen": 200,
+      "ok": true
+    },
+    {
+      "id": "B3",
+      "gruppe": "transport",
+      "erwartet": "kein 3xx (GET /mcp/ mit Token)",
+      "gemessen": 405,
+      "ok": true
+    },
+    {
+      "id": "B4",
+      "gruppe": "transport",
+      "erwartet": "kein 3xx (GET /mcp mit Token)",
+      "gemessen": 405,
+      "ok": true
+    },
+    {
+      "id": "C1",
+      "gruppe": "mcp",
+      "erwartet": "initialize antwortet mit einer Protokollversion",
+      "gemessen": "2025-11-25",
+      "ok": true
+    },
+    {
+      "id": "C1b",
+      "gruppe": "mcp",
+      "erwartet": "serverInfo vorhanden",
+      "gemessen": "sharefyx-spaces",
+      "ok": true
+    },
+    {
+      "id": "C2",
+      "gruppe": "mcp",
+      "erwartet": "11 Werkzeuge",
+      "gemessen": 11,
+      "ok": true
+    },
+    {
+      "id": "C2b",
+      "gruppe": "mcp",
+      "erwartet": "append_to_items dabei",
+      "gemessen": true,
+      "ok": true
+    },
+    {
+      "id": "C3",
+      "gruppe": "mcp",
+      "erwartet": "jedes Werkzeug trägt annotations",
+      "gemessen": 11,
+      "ok": true
+    },
+    {
+      "id": "C4",
+      "gruppe": "mcp",
+      "erwartet": "list_spaces antwortet",
+      "gemessen": "[{\"name\":\"alpha\",\"item_count\":4,\"writable\":true,\"members\":[],\"folders\":[\"notizen\"]},{\"name\":\"beta\",\"item_count\":1,\"writa",
+      "ok": true
+    },
+    {
+      "id": "C5",
+      "gruppe": "mcp",
+      "erwartet": "ok:1, failed:1 (Teilerfolg)",
+      "gemessen": "ok=1 failed=1",
+      "ok": true
+    },
+    {
+      "id": "D1",
+      "gruppe": "log",
+      "erwartet": "min. eine ev=tool-Zeile",
+      "gemessen": 1,
+      "ok": true
+    },
+    {
+      "id": "D2",
+      "gruppe": "log",
+      "erwartet": "die Zeile trägt proto=",
+      "gemessen": [
+        "{\"ts\":\"2026-10-23T10:04:43.843Z\",\"ev\":\"tool\",\"tool\":\"list_spaces\",\"space\":\"alpha\",\"ms\":4,\"ok\":true,\"proto\":\"2025-03-26\"}"
+      ],
+      "ok": true
+    },
+    {
+      "id": "D3",
+      "gruppe": "log",
+      "erwartet": "mit MCP-Protocol-Version-Header steht die Version des Clients",
+      "gemessen": [
+        "{\"ts\":\"2026-10-23T10:04:44.249Z\",\"ev\":\"tool\",\"tool\":\"list_spaces\",\"space\":\"alpha\",\"ms\":4,\"ok\":true,\"proto\":\"2025-11-25\"}"
+      ],
+      "ok": true
+    },
+    {
+      "id": "E1",
+      "gruppe": "update_log",
+      "erwartet": "oberster Block ist der neueste",
+      "gemessen": "Die KI-Verbindung kann jetzt mehrere Notizen in einem einzigen Aufruf um Text er",
+      "ok": true
+    },
+    {
+      "id": "E2",
+      "gruppe": "update_log",
+      "erwartet": "Alt-Schema (Zaehler von oben): Banner bleibt STUMM",
+      "gemessen": "latest=2026-10-23#1 seen=2026-10-23#1 banner=False",
+      "ok": true
+    },
+    {
+      "id": "E3",
+      "gruppe": "update_log",
+      "erwartet": "Schema 'Zaehler von unten': Banner erscheint",
+      "gemessen": "latest=2026-10-23#2 seen=2026-10-23#1 banner=True",
+      "ok": true
+    }
+  ],
+  "bilanz": {
+    "gesamt": 25,
+    "gruen": 25,
+    "rot": 0
+  }
+}

@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz)pdated: 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,44 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-23 (Deploy B `v3.1.6` vorbereitet — Badge, Update-Log, Suite 1376 grün)
+
+**Ergebnis.** Deploy B ist **vorbereitet, nicht ausgeführt**: Badge `v3.1.6`
+(`phase5_ui/webui/static/app.html:20`), ein **eigener** `## 2026-10-23`-Block in
+`docs/UPDATE_LOG.md` (3 Zeilen für Menschen — der zweite Deploy am selben Tag bekommt seinen
+eigenen Block, nicht stillschweigend eine Ergänzung im ersten; Konvention `parse_update_log()`),
+und der Dev-venv trägt jetzt `fastmcp 4.1.3` / `mcp 2.3.0` / `starlette 1.9.0` — **identisch mit
+`constraints.txt`** (Block 5 hat die Datei neu erzeugt; `main` pinnte vorher noch 3.4.7).
+
+**Gemessen (Basis `2fdff03` = `main` nach dem Merge):** `pytest` **1376 grün** (338,9 s) ·
+`doc_health` 0 · `ui_budget` 5/5 (188,5 KB Erstaufruf) · `pip freeze` **byteweise** gleich
+`constraints.txt`.
+
+**Ein Nebenbefund, der in Block 7 oder 12 gehört (kein Produktcode hier).** Die Update-Log-IDs
+zählen die Blöcke **eines Datums in Dateireihenfolge** (`webui/updates.py :: parse_update_log()`),
+und der gesehen-Zustand hängt an genau dieser ID (`users.seen_update_id`). Ein **zweiter Deploy am
+selben Tag** bekommt den neuen Block oben — und damit die ID `#1`, die der erste Block **schon
+hatte** (`latest_id == seen_update_id` ⇒ **kein Banner**). Der neue Eintrag ist damit für den
+Benutzer stumm. Das ist ein Altbestand aus P6 (nicht von diesem Deploy erzeugt) — als Befund
+notiert, die Entscheidung (ID um die Inhaltslänge ergänzen? Zähler nach Einfüge-Reihenfolge?)
+gehört nicht in einen Deploy-Commit.
+
+**Nikinger-Entscheidung 2026-10-23 (Session-Ende): Deploy B wird jetzt **nicht** ausgeführt.**
+Die Vorbereitung steht (Commit `b75c446`) und wartet; der Deploy läuft erst, wenn die nächste
+Session **zuerst gründlich an der Wegwerf-Instanz** getestet hat — live wird erst danach
+deployt. Die Reihenfolge ist damit: **Wegwerf-Test → Deploy B → Live-Abnahmen** (10-22, 10-25,
+10-27/28).
+
+**Offen / nächster Schritt.** **Deploy B ist beim Nikinger**, sobald der Wegwerf-Test durch ist
+(Hard Rule 9, `sudo`): derselbe
+Aufruf wie bei Deploy A, danach `health_gate.sh --expected-version=v3.1.6
+--require-todays-update-log --expected-sha=<SHA>`. Live-Checks (Plan §Deploy B): **P10.5-22**
+(claude.ai-Connector `list_spaces`/`search_items`/`get_item`/`update_item`, Log-Feld `proto` zeigt
+die Ära, V208) · **P10.5-25** (`curl -si -X POST …/mcp` → **401 mit Challenge**, nicht 307) ·
+**P10.5-27/28** (Live P10-J, zwei Modellanbieter). **5.7:** Der Nikinger sagt Fabian Bescheid
+(„kurzer Neustart; der Connector sollte ohne neue Anmeldung weiterlaufen") — Token, Issuer und
+Auth-DB bleiben unverändert, also ist kein Re-Auth zu erwarten.
 
 ## Session stopped — 2026-10-23 (Deploy A `v3.1.5` **live** (Gate 9/9) · P10.5-26 ✅ geklärt · Merge `p105-block5` → `main`)
 
