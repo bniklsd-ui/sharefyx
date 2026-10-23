@@ -30,6 +30,7 @@ var listSelectionEl;
 var listSelectionCountEl;
 var listSelectionMoveEl;
 var listSelectionClearEl;
+var assigneeEl;
 
 var overviewTitleEl;
 var overviewSpacesEl;
@@ -59,8 +60,26 @@ export function renderListSlot() {
     listEmptyEl.hidden = true;
     renderOverview();
   } else {
+    syncAssigneeSelect();
     renderList();
   }
+}
+
+// P10.5 Block 7.6 (UI-6): "Zugewiesen"-Auswahl in der Listenkopfzeile. Die Optionen kommen aus
+// `state.spaces` (wie die Vorschlagsliste in editor.js); neu gebaut wird nur, wenn sich die
+// Space-Namen ändern -- sonst würde jeder Listen-Render die offene Auswahl zurücksetzen.
+function syncAssigneeSelect() {
+  assigneeEl.hidden = isGlobalScope();   // der Filter gilt nur im Space-Modus (filterParams)
+  var names = [""].concat(state.spaces.map(function (s) { return s.name; }));
+  if (assigneeEl.dataset.names === names.join("|")) return;
+  assigneeEl.dataset.names = names.join("|");
+  assigneeEl.textContent = "";
+  names.forEach(function (name) {
+    var option = el("option", "", name || "Zugewiesen: alle");
+    option.value = name;
+    assigneeEl.appendChild(option);
+  });
+  assigneeEl.value = state.assignee;
 }
 
 export function renderOverview() {
@@ -119,7 +138,7 @@ export function renderOverview() {
       // Das stopPropagation aus Block C bleibt tragend: ohne es würde der Eltern-Knopf
       // ebenfalls auslösen, mit anderer Semantik ("in den Space, Bucket = state.filter")
       // als der Chip ("in den Space mit explizitem Bucket").
-      var chip = el("span", "overview__space-count");
+      var chip = el("span", "overview__space-count" + (bucket === "doing" ? " overview__space-count--doing" : ""));   // P10.5 7.7 (KA-5)
       chip.setAttribute("role", "button");
       chip.setAttribute("tabindex", "0");
       chip.dataset.space = space.name;
@@ -570,6 +589,7 @@ export function loadItems() {
   var params = new URLSearchParams(filterParams());
   if (state.activeSpace && !isGlobalScope()) params.set("space", state.activeSpace);
   if (state.query) params.set("query", state.query);
+  if (state.assignee && !isGlobalScope()) params.set("assignee", state.assignee);
   return withLoading(listRowsEl, api("/items?" + params.toString())).then(function (result) {
     state.items = result.items;
     // Phase 8.6 Block C C5 (Plan §5.5 V117): nach jedem loadItems wird das Rail neu gerendert,
@@ -607,6 +627,12 @@ export function init() {
   listEmptyTextEl = document.getElementById("list-empty-text");
   listChipsEl = document.getElementById("list-chips");
   searchInputEl = document.getElementById("search-input");
+  assigneeEl = document.getElementById("list-assignee");
+  assigneeEl.addEventListener("change", function () {
+    state.assignee = assigneeEl.value;
+    clearSelection();
+    loadItems().catch(reportUnexpectedError);
+  });
   createButtonEl = document.getElementById("create-button");
 
   listSelectionEl = document.getElementById("list-selection");

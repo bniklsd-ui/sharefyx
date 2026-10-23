@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,58 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-23 (Deploy B live; Block 7.1 (UI-1), 7.2 (UI-2) und 7.3 (UI-3) gebaut)
+
+**Ergebnis.** Der Deploy-Befehl der letzten Session war **korrekt** — rot waren die **Release-Tests**,
+der Grund lag in **einer verklebten Zeile**: `phase10_5_finishing/SESSIONS_ARCHIVE.md:8` trug die
+`updated:`-Kette als `…Wegwerf-Instanz)pdated: 2026-10-23 (…` — der Trenner ` | ` war als `pdated: `
+verschluckt ⇒ der Wächter `test_no_thread_is_invisible_to_the_rotation_anchor` stand rot ⇒
+`deploy.sh` bricht in Schritt 4 ab, **vor** dem Symlink-Wechsel (gemessen: ein Release-Checkout auf
+`a7fe62c` ist rot — **nichts** deployed, **nichts** beschädigt). **Reparatur: eine Zeile**
+(`)pdated:` → `) | `, −5 B); `chain_defects` → `(False, 0, 0)`, `blind_positions` → `[]`, **12** Fäden
+sichtbar, `test_updated_chain.py` **7/7**. **Release-Stand vorab am Klon geprüft** (frisches venv, `constraints.txt`): **1380 grün**
+(337,2 s) — an der Stufe konnte der Deploy nicht mehr scheitern.
+
+**Der Deploy lief beim Nikinger (Hard Rule 9, `sudo`).** `sudo -n true` sagt „a password is
+required" — auch in einem pty; das Journal zeigte **keine** erfolgreiche `savefyx`-sudo seit
+Deploy A ⇒ der Deploy gehört ins Terminal des Ningkers. **Ein Deploy ohne Neustart wäre eine
+stille Halbdeplosion:** `static_routes.py` liest `app.html` pro Anfrage von der Platte — der
+Symlink stünde schon auf `v3.1.6`, der Prozess liefe aber mit dem alten Code; das Gate wäre
+**grün und falsch**.
+
+**Deploy B ist live.** Release-Tests im Release **1380 grün** (340,7 s) → Symlink auf
+`/opt/sharefyx/releases/20261023T165838.591015Z` → Dienst neu gestartet. Mein Gate danach:
+`health_gate.sh --expected-version=v3.1.6 --require-todays-update-log --expected-sha=e5c834e` →
+**9/9 OK** (`.rail__version` v3.1.6, Release-SHA `e5c834e…`, Update-Log 2026-10-23).
+**Block 7.1 ist gemergt** (`f0e76b0`) — im Release B **nicht** dabei, das kommt mit `v3.1.7`.
+
+**Block 7.1 (UI-1): die HTML-404.** `pages.py :: render_not_found_page()` und die Route
+`Route("/ui/{rest:path}", …)` **nach** allen `/ui`-Routen. **Datierte Korrektur zum Plan:** „API bleibt
+JSON" war gemessen **falsch** (unbekannter `/api/v1/…`-Pfad ⇒ Starlette-Klartext) ⇒ JSON-404 in der
+API-Fehlerform. 4 neue Tests gegen die **echte** `create_app()`, **4 Gegenläufe wirksam**.
+
+**Block 7.2 (UI-2): die Wortmarke.** `static/logo.svg` — Variante B („Überlagert") aus dem
+Logo-Board, **pixelgleich** gemessen (190 px 0,13/255 · 32 px 0,39/255 · 16 px **0,00**/255). Die
+Farben sind die App-Tokens **mit Ersatzwert**, weil `<img>` und Favicon **keine** Seiten-Variablen
+erben. **Zwei Befunde nur durch Messung:** `--` im XML-Kommentar ⇒ die Fehlerseite statt des
+Zeichens; `.svg` fehlte in der MIME-Tabelle ⇒ **der Browser rendert ein SVG mit falschem MIME-Typ
+nicht**. Probe an der Wegwerf-Instanz: `naturalWidth` 100, gerendert **16 × 16**, **Gegenlauf rot**.
+
+**Block 7.3 (UI-3): der Tab-Titel.** `state.js :: setViewTitle(part)` + `setPanelTitle(open)` — der
+Titel folgt der **Ansicht** (Übersicht · Space-Name · Item-Titel · Einstellungen), das Panel liegt
+als Overlay darüber und gibt den Ansichts-Titel zurück. **Datierte Korrektur zum Plan:** er nennt
+fünf Titel, gemessen sind es **vier Zustände** — die Karte ist kein eigener Zustand (Kontextbereich
+neben der Liste; `loadGraph()` läuft bei jedem Spacewechsel und würde den Item-Titel überschreiben).
+Probe an der Wegwerf-Instanz: **6/6 Schritte** ✓, **Gegenlauf rot** ✓.
+
+**Raum-Budget:** der Head stand bei **40.968 B** ⇒ die 24 älteren `updated:`-Fäden rotierten nach
+`UPDATES_ARCHIVE.md` ⇒ Basis 32.572 B — jetzt bindet wieder **DO-3** (Block ≤ 4.096 B). Nächster
+Hebel: der „Startauftrag" (5,8 KB) → L3-Archiv.
+
+**Offen / nächster Schritt.** Abzunehmen: **P10.5-22** · **P10.5-25** · **P10.5-27/28** (Live
+P10-J, zwei Modellanbieter) · **P10.5-18** · AL-1 Zeile 15 · V203. **5.7:** Fabian Bescheid.
+Baulich: **Block 7.4** (Sichtung, Claude Code) — `v3.1.7` folgt nach Block 7–8.
 
 ## Session stopped — 2026-10-23 (Deploy-B-Generalprobe 26/26 Zellen grün · Update-Log-ID (Block 7.0) behoben)
 

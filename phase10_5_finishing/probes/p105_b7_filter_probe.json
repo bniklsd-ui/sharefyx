@@ -1,0 +1,42 @@
+{
+  "probe": "p105_b7_filter",
+  "instanz": {
+    "basis": "http://127.0.0.1:18792",
+    "pid": 3300372,
+    "wegwerf": true
+  },
+  "befund": {
+    "auswahl_sichtbar": true,
+    "filter_verengt": true,
+    "alle_stellt_her": true,
+    "chip_doing_hervorgehoben": true,
+    "karten_ring_gezeichnet": true,
+    "andere_chips_gedaempft": true
+  },
+  "messung": {
+    "chips": [
+      {
+        "bucket": "open",
+        "doing": false,
+        "color": "rgb(196, 205, 216)"
+      },
+      {
+        "bucket": "doing",
+        "doing": true,
+        "color": "rgb(62, 141, 243)"
+      }
+    ],
+    "accent": "rgb(62, 141, 243)",
+    "zeilen_alle": 2,
+    "auswahl_da": true,
+    "optionen": [
+      "",
+      "alpha"
+    ],
+    "zeilen_alpha": 1,
+    "zeilen_wieder_alle": 2,
+    "ring_pixel": 39,
+    "seitenfehler": []
+  },
+  "alle_kriterien_erfuellt": true
+}

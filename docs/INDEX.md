@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-10-23 (Block 7.3: Abnahmestand des Phase-10.5-Heads 27 ✅ · 0 ⚠️ · 34 ⬜; Größen von Wurzel-Head und Phase-10.5-Head nachgezogen) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
+updated: 2026-10-24 (Block 7.5–7.7: Abnahmestand des Phase-10.5-Heads 30 ✅ · 0 ⚠️ · 31 ⬜; Größen von Head und Archiv nachgezogen) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 ---
 # Doc Index (L0)
 
@@ -28,8 +28,8 @@ updated: 2026-10-23 (Block 7.3: Abnahmestand des Phase-10.5-Heads 27 ✅ · 0 �
 
 ## Root & governance
 
-- [docs/INDEX.md](./INDEX.md) — 🔗 **diese Karte** (L0) · **38.398 B — unter dem 40-KiB-Softcap** (V145 ✅) · die Karten-Chronik steht in `docs/INDEX_ENTRIES_ARCHIVE.md` · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
-- [CLAUDE.md](../CLAUDE.md) — 📗 **38815 B** (vor der Rotation 114.771 B) · Wurzel-Regelwerk: Kernprinzip der dumme Server, **neun Hard Rules** (1 keine Secrets in Dateien · 3 kein Write ohne `version` · 4 Schreibrechte folgen der Mitgliedschaft · 6 nie ein offener Port · 8 Commit ⇒ Doc-Update · 9 nie `pkill -f`, nie den systemd-Dienst), Working style, Doku-Hygiene und **Current state** (Session-Bloecke, newest-first, **kein** Ein-Block-Limit — P9-A). **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+- [docs/INDEX.md](./INDEX.md) — 🔗 **diese Karte** (L0) · **38.442 B — unter dem 40-KiB-Softcap** (V145 ✅) · die Karten-Chronik steht in `docs/INDEX_ENTRIES_ARCHIVE.md` · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+- [CLAUDE.md](../CLAUDE.md) — 📗 **39342 B** (vor der Rotation 114.771 B) · Wurzel-Regelwerk: Kernprinzip der dumme Server, **neun Hard Rules** (1 keine Secrets in Dateien · 3 kein Write ohne `version` · 4 Schreibrechte folgen der Mitgliedschaft · 6 nie ein offener Port · 8 Commit ⇒ Doc-Update · 9 nie `pkill -f`, nie den systemd-Dienst), Working style, Doku-Hygiene und **Current state** (Session-Bloecke, newest-first, **kein** Ein-Block-Limit — P9-A). **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [README.md](../README.md) — 📗 ~7KB · human overview + machine setup (venv, keyring, run, smoke test); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [ROADMAP.md](../ROADMAP.md) — 📗 **37.197 B** · Phasen 1–10.5, Scope in/out je Phase, Status · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/ROADMAP_UPDATES_ARCHIVE.md](./ROADMAP_UPDATES_ARCHIVE.md) — 📦 **14.371 B** · L3: `updated:`-Kette von `ROADMAP.md`, verbatim (2026-10-07)
@@ -56,8 +56,8 @@ updated: 2026-10-23 (Block 7.3: Abnahmestand des Phase-10.5-Heads 27 ✅ · 0 �
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing — alle Baustellen schließen; Plan `docs/concepts/phase10_5_finishing_plan.md`, Ausführer M3.1 Flash als Open-Test)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **35550 B** · Phase-10.5-Head: Modulstatus der Blöcke 0–12/Z, Deploy-Tabelle A–D, Abnahmestand P10.5-1–61 (27 ✅ · 0 ⚠️ · 34 ⬜), offene Punkte beim Nikinger, genau ein Session-Block (≤ 4 KiB, DO-3)
-- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **45065 B** · L3-Archiv der älteren Session-Blöcke dieser Phase, verbatim, newest-first
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **34779 B** · Phase-10.5-Head: Modulstatus der Blöcke 0–12/Z, Deploy-Tabelle A–D, Abnahmestand P10.5-1–61 (30 ✅ · 0 ⚠️ · 31 ⬜), offene Punkte beim Nikinger, genau ein Session-Block (≤ 4 KiB, DO-3)
+- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **49230 B** · L3-Archiv der älteren Session-Blöcke dieser Phase, verbatim, newest-first
 - [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **7698 B** · L3-Archiv des **Startauftrags von Block 7** (verbatim verschoben 2026-10-23) — Schritte 7.4–7.7
 
 
@@ -189,7 +189,7 @@ doppelt hier gelistet.)*
 - [docs/INDEX_ENTRIES_ARCHIVE.md](./INDEX_ENTRIES_ARCHIVE.md) — 📦 **46.456 B** · L3-Archiv der **datierten Nachträge aus den Einträgen dieser Karte**, verbatim, ein Abschnitt je Karte in der Reihenfolge der Karte (nicht newest-first — wer einen Nachtrag sucht, sucht ihn über den Dateinamen, nicht über ein Datum). Angelegt am 2026-10-03, weil die Karte bei **71.573 B** stand und **37.391 B** davon Nachträge in 43 von 93 Einträgen waren — mehr als die Hälfte, und die seit Wochen als ungeklärt geführte Ursache der Überschreitung (P9-3/V145). **Regel für die nächste Session:** eine Kartenzeile bekommt wieder einen datierten Nachtrag, *wenn* er kurz ist — `test_no_entry_line_carries_a_dated_addendum_any_more` verbietet sie vollständig, und das ist Absicht: die Karte ist Stand, das Archiv ist Chronik
 - [docs/INDEX_KURZUNG_ARCHIVE.md](./INDEX_KURZUNG_ARCHIVE.md) — 📦 **9.736 B** · L3-Archiv der am 2026-10-22 aus der Karte gekürzten Texte — die acht Abschnittsköpfe und drei Kartenzeilen-Chroniken, verbatim; die Karte trägt wieder Stand, dieses Archiv die Chronik des Kürzens
 
-- [docs/INDEX_UPDATES_ARCHIVE.md](./INDEX_UPDATES_ARCHIVE.md) — 📦 **19.359 B** · L3-Archiv der `updated:`-Kette **dieser** Datei, verbatim, newest-first. Erste Rotation 2026-09-19 von Hand; **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+- [docs/INDEX_UPDATES_ARCHIVE.md](./INDEX_UPDATES_ARCHIVE.md) — 📦 **19.557 B** · L3-Archiv der `updated:`-Kette **dieser** Datei, verbatim, newest-first. Erste Rotation 2026-09-19 von Hand; **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/PROJECT_SESSION_LOG.md](./PROJECT_SESSION_LOG.md) — 📦 **245.629 B** (vor der 24-Block-Rotation 101.450 B) · L3-Archiv der historischen `[YYYY-MM-DD]`-Session-Bloecke aus `CLAUDE.md` §Current state, newest-first, plus §Frontmatter-Archiv (die `updated:`-Kette der Wurzel-`CLAUDE.md`, 28 Eintraege, verbatim seit 2026-09-13). Wer die Chronik einer alten Phase sucht, faengt hier an, nicht im Wurzel-Head
 
 ## Referenzmaterial (nicht Teil des Plan/Konzept/Handover-Trios)

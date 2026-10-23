@@ -973,6 +973,12 @@ def api_routes(
             i for i in result.items
             if permissions.can_read_item_as_human(session.space, _acl_for_summary(i))
         ]
+        # P10.5 Block 7.6 (UI-6): Zuständigen-Filter im Adapter, **nach** dem Leserechtfilter und
+        # **vor** der Paginierung — `total` zählt also nur sichtbare Treffer (kein Orakel über
+        # versteckte Items), und eine Seite wird nicht nachträglich ausgedünnt.
+        assignee = q.get("assignee")
+        if assignee:
+            items = [i for i in items if i.assignee == assignee]
         if id_lookup:
             # Kein Existenz-Orakel: eine ID ohne Leserecht liefert eine leere Liste, nie 403/404
             # (derselbe Grundsatz wie `permissions.can_read_item_as_human` oben).

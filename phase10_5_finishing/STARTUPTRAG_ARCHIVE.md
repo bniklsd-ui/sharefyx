@@ -16,9 +16,8 @@ updated: 2026-10-23 (aus dem Phase-Head verschoben: der Head stand bei 41.847 B 
 > Deploy-Gate zu. Der Head nannte den Hebel selbst: der „Startauftrag" (5,8 KB) wandert nach
 > Block 7 ins L3-Archiv. Er ist **hierher** gewandert, **verbatim** (`scripts/move_sections.py`).
 >
-> **Was noch offen ist:** die Schritte **7.4** (Sichtung — Claude Code/Nikinger), **7.5**
-> (Kontrast), **7.6** (Assignee-Filter) und **7.7** (KA-5). **7.1 bis 7.3 sind gebaut und
-> gemergt** (deren Abnahmestand steht in der Abnahmetabelle des Heads).
+> **Was noch offen ist:** nur Schritt **7.4** (Sichtung — Claude Code/Nikinger). **7.1 bis 7.3 sind gebaut und
+> gemergt, 7.5 bis 7.7 gebaut (2026-10-24)** (deren Abnahmestand steht in der Abnahmetabelle des Heads).
 >
 > **Zwei Korrekturen gegen den 📕-Plan stehen nur hier** (der Plan ist ein Snapshot und wird
 > nicht geändert): `--caution` ist der **Text**-Farbwert, nicht die Knopffläche (Schritt 7.5) ·
@@ -68,7 +67,7 @@ Dienst.
    der acht Hauptansichten (Konventionen: `docs/concepts/sichtpruefung_automation_conventions.md`),
    der Nikinger liefert daraus **höchstens 10** Posten, der Ausführer setzt sie in `app.css` um
    (Auswahl-Konvention v3, `phase8_ui_graph/CLAUDE.md`). Alles über 10 Posten wandert nach P11.
-5. **7.5 UI-5 — Kontrast (D-7).** **Drift gegen den Plan:** im Code ist `--caution` **selbst der
+5. **7.5 UI-5 — Kontrast (D-7).** ✅ **2026-10-24** — **Drift gegen den Plan:** im Code ist `--caution` **selbst der
    Text-Farbwert** (`app.css:92`: `--caution: var(--danger)`), nicht die Knopffläche — der Plan
    spricht von einem „neuen Token `--caution-text` (heller als `--caution`)". **Der Code gewinnt:**
    Ziel ist ein **hellerer Text** auf der Standardfläche, ohne eine eigene Flächen-Familie
@@ -76,13 +75,13 @@ Dienst.
    `phase10_5_finishing/tests/test_contrast.py::test_caution_text_meets_wcag_aa()`: liest die
    Token-Werte aus `app.css`, rechnet WCAG gegen den Knopfhintergrund, ≥ 4,5:1 — das alte Token
    liefert **4,38:1** (Gegenlauf: rot).
-6. **7.6 UI-6 — Assignee-Filter.** `phase5_ui/webui/api.py:932 _items_get` (Plan sagt 821 —
+6. **7.6 UI-6 — Assignee-Filter.** ✅ **2026-10-24** — `phase5_ui/webui/api.py:932 _items_get` (Plan sagt 821 —
    **Drift**) nimmt `assignee=<space>` an und filtert **im Adapter** (`i.assignee == value`), **vor**
    der Paginierung; `ItemSummary.assignee` existiert (`storage/models.py:90`). UI: Auswahl
    „Zugewiesen" in der Listenkopfzeile (`list.js:56` `<header class="list__head" id="list-head">`)
    mit den Spaces aus `state.spaces` + „alle". Tests: `test_api.py::test_items_filter_by_assignee`,
    `test_items_assignee_filter_respects_acl`.
-7. **7.7 KA-5 — `doing` hervorheben.** Übersicht: der Eimer „In Arbeit" bekommt die Akzentklasse
+7. **7.7 KA-5 — `doing` hervorheben.** ✅ **2026-10-24** — Übersicht: der Eimer „In Arbeit" bekommt die Akzentklasse
    (`app.css`; die Eimer kommen generisch aus `meta.buckets` — `static/js/app.js:371`) · Karte:
    `doing`-Knoten tragen einen statischen Akzentring, **ohne** Animation.
 

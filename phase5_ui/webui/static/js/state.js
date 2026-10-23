@@ -50,6 +50,7 @@ export var state = {
   // UND `folder` auf `null` (P6-AQ), `activeSpace` bleibt unangetastet (Rückweg).
   scope: "space",
   query: "",
+  assignee: "",   // P10.5 7.6: Zuständigen-Filter der Liste, "" = alle
   items: [],
   // Phase 8.6 Plan 2 Block G G3 (P8.6-AA): true = der Listen-Slot zeigt die Uebersicht
   // (Spaces + Zuletzt benutzt), false = er zeigt die Item-Liste. Eigenes Feld statt einer

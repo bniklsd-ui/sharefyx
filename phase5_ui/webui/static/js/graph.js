@@ -130,6 +130,7 @@ const COLORS = Object.freeze({
   spaceOwn: "#4A93F0",
   spaceShared: "#2EB8A6",
   spaceForeign: "#8B93A1",
+  doing: "#3E8DF3",       // P10.5 7.7 (KA-5): statischer Ring um "doing"-Knoten, Wert von --accent (nicht spaceOwn: ein eigener Knoten wäre sonst farbgleich zum Ring)
 });
 
 export function init() {
@@ -607,6 +608,14 @@ function drawNodes(dim) {
     ctx.beginPath();
     ctx.arc(n.x, n.y, r, 0, 2 * Math.PI);
     ctx.fill();
+    if (n.status === "doing") {
+      // P10.5 7.7 (KA-5): statischer Akzentring, bewusst ohne Animation.
+      ctx.strokeStyle = COLORS.doing;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r + 3, 0, 2 * Math.PI);
+      ctx.stroke();
+    }
   }
   ctx.globalAlpha = 1;
 }

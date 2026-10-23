@@ -1774,3 +1774,38 @@ async def test_repeating_the_own_space_does_not_skip_the_folder_lock(
         )
     assert patch.status_code == 403, patch.text
     assert item_store.get(item.id).folder == ""
+
+
+# -- Items: Zuständigen-Filter (P10.5 Block 7.6, UI-6) ---------------------------------------
+
+
+def _assign(item_store, space, title, assignee):
+    item = item_store.create(space, type="task", title=title)
+    item_store.update(item.id, version=item.version, assignee=assignee)
+    return item
+
+
+@pytest.mark.asyncio
+async def test_items_filter_by_assignee(full_app_items, item_store, totp_code):
+    _assign(item_store, SPACE, "Für Fabian", FOREIGN_SPACE)
+    _assign(item_store, SPACE, "Für mich", SPACE)
+    item_store.create(SPACE, type="task", title="Ohne")
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        gefiltert = await client.get("/api/v1/items", params={"space": SPACE, "assignee": FOREIGN_SPACE})
+        alle = await client.get("/api/v1/items", params={"space": SPACE})
+    assert [i["title"] for i in gefiltert.json()["items"]] == ["Für Fabian"]
+    assert gefiltert.json()["total"] == 1  # vor der Paginierung gefiltert
+    assert alle.json()["total"] == 3
+
+
+@pytest.mark.asyncio
+async def test_items_assignee_filter_respects_acl(full_app_items, item_store, totp_code):
+    """Ein ungeteiltes fremdes Item bleibt auch dann unsichtbar, wenn der Filter auf es passt."""
+    _assign(item_store, FOREIGN_SPACE, "Fremd, ungeteilt", FOREIGN_SPACE)
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        response = await client.get("/api/v1/items", params={"assignee": FOREIGN_SPACE})
+    assert response.status_code == 200
+    assert response.json()["items"] == []
+    assert response.json()["total"] == 0

@@ -88,8 +88,12 @@
   /* Vorsicht -- Aktionen mit Rueckweg-Kosten (Abmelden, Archivieren). Gleicher Wert wie
      --danger, anderer Anlass: --danger meldet, dass etwas schiefging; --caution warnt,
      bevor etwas passiert. Zwei Namen auf einem Wert ist hier ehrlicher als ein zweiter
-     Rotton (P8.6-F, Phase-8-Verbot 4: Farbe nur mit Bedeutung). */
-  --caution:        var(--danger);
+     Rotton (P8.6-F, Phase-8-Verbot 4: Farbe nur mit Bedeutung).
+     [2026-10-24, P10.5 7.5 UI-5, D-7] Nicht mehr derselbe Wert: --caution ist die *Text*-Farbe auf
+     der Standardknopf-Flaeche (Beschriftung, kein Fuellton) und ein Text braucht WCAG AA (4,5:1).
+     #E5484D hatte auf --btn-std-fill 4,38:1 (Hover 3,69:1); #F06A6E hat 5,70:1 (Hover 4,81:1).
+     Waechter: phase10_5_finishing/tests/test_contrast.py. */
+  --caution:        #F06A6E;
 
   /* Farbsemantik Space-Kategorien (Phase 8 Block C C3, Plan §4.C3 P8-I) -- drei Kategorien,
      eine Farbe pro Kategorie. Statusfarben oben bleiben unveraendert (Akzent=interaktiv,
@@ -822,6 +826,8 @@ select.input:focus {
   padding: 0 calc(var(--space) * 2) var(--space);
 }
 .list__chips:empty { display: none; }
+.list__assignee { width: 100%; margin-top: var(--space); }
+.list__assignee[hidden] { display: none; }
 
 /* Mehrfachauswahl-Werkzeugleiste (§9, P6-AK) — dieselbe visuelle Sprache wie `.list__chips`
    daneben (gedämpfter Begleittext + kleine Knöpfe), nur ohne die Pill-Form der Such-Chips. */
@@ -1183,6 +1189,8 @@ select.input:focus {
   font-family: inherit;
 }
 .overview__space-count:hover { color: var(--accent); border-color: var(--accent-line); }
+/* P10.5 7.7 (KA-5): "In Arbeit" trägt die Akzentfarbe, die anderen Eimer bleiben gedämpft. */
+.overview__space-count--doing { color: var(--accent); border-color: var(--accent-line); }
 .overview__space-count:focus-visible {
   outline: 2px solid var(--accent-line);
   outline-offset: 1px;
