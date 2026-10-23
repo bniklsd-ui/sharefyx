@@ -1,0 +1,41 @@
+{
+  "probe": "p105_b7_logo",
+  "instanz": {
+    "basis": "http://127.0.0.1:18790",
+    "data_root": "/tmp/opencode/sharefyx-wegwerf-b72/data",
+    "pid": 3204851,
+    "wegwerf": true
+  },
+  "logo_datei": {
+    "status": 200,
+    "content_type": "image/svg+xml",
+    "bytes": 6834,
+    "ist_svg": true
+  },
+  "csp": "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'",
+  "login_seite": {
+    "status": 200,
+    "hat_favicon_link": true,
+    "hat_marke": true
+  },
+  "marke_im_browser": {
+    "vorhanden": true,
+    "vollstaendig": true,
+    "natural_width": 100,
+    "natural_height": 100,
+    "breite": 16,
+    "hoehe": 16,
+    "alt": "S",
+    "src": "/ui/static/logo.svg"
+  },
+  "favicon_link": "/ui/static/logo.svg",
+  "logo_antworten": [
+    {
+      "url": "http://127.0.0.1:18790/ui/static/logo.svg",
+      "status": 200,
+      "content_type": "image/svg+xml"
+    }
+  ],
+  "screenshot": "/tmp/opencode/sharefyx-wegwerf-b72/login.png",
+  "alle_kriterien_erfuellt": true
+}

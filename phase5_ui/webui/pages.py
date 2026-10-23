@@ -37,9 +37,10 @@ import segno
 
 _PAGE = """<!doctype html>
 <html lang="de"><head><meta charset="utf-8"><title>{title}</title>
-<link rel="stylesheet" href="/ui/static/app.css"></head>
+<link rel="stylesheet" href="/ui/static/app.css">
+<link rel="icon" type="image/svg+xml" href="/ui/static/logo.svg"></head>
 <body><div class="auth"><div class="auth-card{extra_class}">
-<div class="auth__brand">sharefyx</div>
+<div class="auth__brand"><img class="brand__mark" src="/ui/static/logo.svg" alt="S">harefyx</div>
 {body}
 </div></div>
 <script type="module" src="/ui/static/js/app.js"></script>

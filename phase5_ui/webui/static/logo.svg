@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="sharefyx">
+<title>sharefyx</title>
+<!--
+  P10.5 Block 7, Schritt 7.2 (UI-2): die Wortmarke als EIN Austauschpunkt.
+
+  Herkunft: docs/concepts/phase10_logo_entwuerfe_final.svg, Gruppe Variante B
+  ("Überlagert"), wie am 2026-10-18 entschieden (D-6: "S" plus Teilen-Zeichen als
+  Wortmarke; "Eselsohr überlagert, ohne den Fortsatz, der hinausragte"). Der Board
+  trägt die Fassung ohne den Fortsatz, und der Plan verlangt genau diese.
+
+  Die Farben sind die Tokens der App: der Entwurf ist in der Palette der Oberfläche
+  gezeichnet worden, namely surface (Dokumentfläche), accent (Linie und Bahn),
+  select-line (die halbtransparente Innenlinie und die Fläche des Eselsohrs), bg (der
+  dunkle Halo unter der Bahn), space-own, space-shared und space-foreign (die drei
+  Knoten) und text (die Haare der Leuchtbahn). Der Verlauf der Dokumentfläche ist der
+  SVG-Zwilling von select-fill (dieselben zwei Stufen: rgba(62,141,243,.20) nach .08).
+
+  Warum var(token, ersatzwert) und nicht der Token allein: die Datei wird an zwei
+  Stellen benutzt, an denen CSS-Variablen der Seite nicht durchkommen, namely per
+  img-Element (das SVG ist ein eigenes Dokument) und als Favicon (ebenso). Ohne den
+  Ersatzwert wäre das Zeichen dort schwarz. Mit dem Ersatzwert stimmt die Darstellung
+  heute, und eine künftige Einbettung (SVG inline statt per img-Element) erbte die
+  Tokens der Seite ohne weitere Arbeit.
+
+  Größe: die Datei trägt width und height 100 (die natürliche Größe des Zeichens);
+  die Oberfläche setzt die Kantenlänge per CSS (.brand__mark), das Favicon skaliert
+  der Browser.
+-->
+<style>
+  .surface      { fill: var(--surface, #14181D); }
+  .accent-stroke{ stroke: var(--accent, #3E8DF3); }
+  .select-stroke{ stroke: var(--select-line, rgba(62,141,243,.40)); }
+  .select-fill  { fill: var(--select-line, rgba(62,141,243,.40)); }
+  .bg-fill      { fill: var(--bg, #0B0D10); }
+  .bg-stroke    { stroke: var(--bg, #0B0D10); }
+  .own-fill     { fill: var(--space-own, #4A93F0); }
+  .own-stroke   { stroke: var(--space-own, #4A93F0); }
+  .shared-fill  { fill: var(--space-shared, #2EB8A6); }
+  .shared-stroke{ stroke: var(--space-shared, #2EB8A6); }
+  .foreign-fill { fill: var(--space-foreign, #8B93A1); }
+  .foreign-stroke{ stroke: var(--space-foreign, #8B93A1); }
+  .text-stroke  { stroke: var(--text, #E9EDF2); }
+  .stop-accent  { stop-color: var(--accent, #3E8DF3); }
+</style>
+<defs>
+  <linearGradient id="logo-fill" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" class="stop-accent" stop-opacity=".20"/>
+    <stop offset="1" class="stop-accent" stop-opacity=".08"/>
+  </linearGradient>
+</defs>
+<!-- Die Zelle (das Dokument) mit der abgeschnittenen oberen Ecke -->
+<path d="M26,2 H72 L98,28 V74 Q98,98 74,98 H26 Q2,98 2,74 V26 Q2,2 26,2 Z" class="surface"/>
+<path d="M26,2 H72 L98,28 V74 Q98,98 74,98 H26 Q2,98 2,74 V26 Q2,2 26,2 Z" fill="url(#logo-fill)" class="accent-stroke" stroke-width="3" stroke-linejoin="round"/>
+<path d="M27,9 H69 L91,31 V73 Q91,91 73,91 H27 Q9,91 9,73 V27 Q9,9 27,9 Z" fill="none" class="select-stroke" stroke-width="1.5" stroke-linejoin="round"/>
+<!-- Die Leuchtbahn: die "S"-Kurve mit den drei Knoten -->
+<g transform="translate(50,51) scale(1.06) translate(-50,-51) translate(2,-2)">
+  <path d="M68,27 C44,22 30,33 34,43 C38,53 64,50 66,60 C68,71 50,80 32,76" fill="none" class="bg-stroke" stroke-width="8" stroke-linecap="round"/>
+  <path d="M68,27 C44,22 30,33 34,43 C38,53 64,50 66,60 C68,71 50,80 32,76" fill="none" class="accent-stroke" stroke-width="2.4" stroke-linecap="round"/>
+  <circle cx="68" cy="27" r="8.5" class="bg-fill"/>
+  <circle cx="68" cy="27" r="6.5" class="own-fill"/>
+  <circle cx="68" cy="27" r="12" fill="none" class="own-stroke" stroke-opacity=".6" stroke-width="1.5"/>
+  <circle cx="50" cy="51" r="8.5" class="bg-fill"/>
+  <circle cx="50" cy="51" r="6.5" class="shared-fill"/>
+  <circle cx="50" cy="51" r="12" fill="none" class="shared-stroke" stroke-opacity=".6" stroke-width="1.5"/>
+  <circle cx="32" cy="76" r="8.5" class="bg-fill"/>
+  <circle cx="32" cy="76" r="6.5" class="foreign-fill"/>
+  <circle cx="32" cy="76" r="12" fill="none" class="foreign-stroke" stroke-opacity=".6" stroke-width="1.5"/>
+  <line x1="74.8" y1="39.8" x2="76.7" y2="43.3" class="text-stroke" stroke-opacity=".55" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="60.3" y1="39.3" x2="58.2" y2="42.7" class="text-stroke" stroke-opacity=".55" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="53.5" y1="26.5" x2="49.5" y2="26.4" class="text-stroke" stroke-opacity=".55" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="61.2" y1="14.2" x2="59.3" y2="10.7" class="text-stroke" stroke-opacity=".55" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="82.5" y1="27.5" x2="86.5" y2="27.6" class="text-stroke" stroke-opacity=".55" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="59.0" y1="62.4" x2="61.5" y2="65.5" class="text-stroke" stroke-opacity=".55" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="44.7" y1="64.5" x2="43.2" y2="68.2" class="text-stroke" stroke-opacity=".55" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="35.7" y1="53.1" x2="31.7" y2="53.7" class="text-stroke" stroke-opacity=".55" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="41.0" y1="39.6" x2="38.5" y2="36.5" class="text-stroke" stroke-opacity=".55" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="55.3" y1="37.5" x2="56.8" y2="33.8" class="text-stroke" stroke-opacity=".55" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="64.3" y1="48.9" x2="68.3" y2="48.3" class="text-stroke" stroke-opacity=".55" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="42.9" y1="85.6" x2="45.9" y2="88.2" class="text-stroke" stroke-opacity=".55" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="29.2" y1="90.2" x2="28.4" y2="94.1" class="text-stroke" stroke-opacity=".55" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="18.3" y1="80.7" x2="14.5" y2="81.9" class="text-stroke" stroke-opacity=".55" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="21.1" y1="66.4" x2="18.1" y2="63.8" class="text-stroke" stroke-opacity=".55" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="34.8" y1="61.8" x2="35.6" y2="57.9" class="text-stroke" stroke-opacity=".55" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="45.7" y1="71.3" x2="49.5" y2="70.1" class="text-stroke" stroke-opacity=".55" stroke-width="1.4" stroke-linecap="round"/>
+</g>
+<!-- Das Eselsohr: liegt ÜBER der Bahn (Variante B, "Überlagert") und deckt sie dort ab -->
+<path d="M72,2 V20 Q72,28 80,28 H98 Z" class="surface"/>
+<path d="M72,2 V20 Q72,28 80,28 H98 Z" class="select-fill accent-stroke" stroke-width="3" stroke-linejoin="round"/>
+</svg>

@@ -37,6 +37,12 @@ _CONTENT_TYPES: dict[str, str] = {
     ".js": "text/javascript; charset=utf-8",
     ".woff2": "font/woff2",
     ".txt": "text/plain; charset=utf-8",
+    # [2026-10-23, P10.5 Block 7.2 — UI-2] Das Zeichen der Wortmarke (`logo.svg`).
+    # **Ohne diesen Eintrag** lieferte die Static-Route `application/octet-stream`, und der
+    # Browser **rendert ein SVG mit falschem MIME-Typ nicht** (ersetztes Bild, kein Zeichen).
+    # Das fällt nur auf, wenn man die Seite wirklich ansieht -- ein Test auf den Pfad ist
+    # grün, egal was der Server antwortet.
+    ".svg": "image/svg+xml",
 }
 _DEFAULT_CONTENT_TYPE = "application/octet-stream"
 

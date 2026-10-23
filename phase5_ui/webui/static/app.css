@@ -458,6 +458,17 @@ select.input:focus {
   color: var(--text);
 }
 
+/* P10.5 Block 7.2 (UI-2): das Zeichen der Wortmarke -- EINE Datei (`logo.svg`), an beiden
+   Stellen (`.rail__brand` und `.auth__brand`). Deshalb eine Klasse und kein zweites Markup.
+   Die Höhe in `em`, damit die Marke mit der Schriftgröße des jeweiligen Ortes mitwächst
+   (12,5 px in der Rail, 13 px auf der Anmeldeseite). */
+.brand__mark {
+  height: 1.25em;
+  width: auto;
+  vertical-align: -.22em;
+  margin-right: .45em;
+}
+
 .rail__version {
   margin-left: .5em;
   font-size: 9px;

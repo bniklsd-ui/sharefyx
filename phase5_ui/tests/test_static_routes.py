@@ -118,6 +118,7 @@ async def test_static_files_are_served_with_correct_content_type(static_app):
         "app.html": "text/html",
         "app.css": "text/css",
         f"fonts/{font_name}": "font/woff2",
+        "logo.svg": "image/svg+xml",
     }
     cases.update({f"js/{name}.js": "text/javascript" for name in _JS_MODULES})
     async with _client(static_app) as client:
@@ -125,6 +126,26 @@ async def test_static_files_are_served_with_correct_content_type(static_app):
             response = await client.get(f"/ui/static/{path}")
             assert response.status_code == 200, path
             assert expected in response.headers["content-type"], path
+
+
+@pytest.mark.asyncio
+async def test_the_logo_is_served_as_an_svg(static_app):
+    """Das Zeichen muss mit `image/svg+xml` kommen -- **nicht** mit `application/octet-stream`.
+
+    **Warum dieser Wächter existiert (2026-10-23, Block 7.2):** die Static-Route kannte nur
+    `.html`, `.css`, `.js`, `.woff2` und `.txt`; das neue `logo.svg` fiel auf den
+    Default-Content-Type zurück. Der Browser **rendert ein SVG mit falschem MIME-Typ nicht**
+    -- die Wortmarke wäre als Ersatzbild erschienen, in der Rail wie in der Anmeldeseite.
+    Ein Test auf den *Pfad* bleibt dabei grün: er prüft die URL, nicht die Antwort.
+
+    (Der Bug fiel nur auf, weil die Seite wirklich **angesehen** wurde -- die Datei ist
+    Text, und Text ist für die Suite Text.)"""
+    async with _client(static_app) as client:
+        response = await client.get("/ui/static/logo.svg")
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("image/svg+xml")
+    assert b"<svg" in response.content
 
 
 @pytest.mark.asyncio
