@@ -50,7 +50,7 @@ updated: 2026-10-23 (Deploy B `v3.1.6` vorbereitet — Badge, eigener `## 2026-1
 | # | Version | SHA | `health_gate` | Ausgabe |
 |---|---|---|---|---|
 | A | `v3.1.5` | `7358f22` | **9/9 OK** | nach Block 1–4 — **live seit 2026-10-23**, Release `20261023T065010.377336Z` |
-| B | `v3.1.6` | — | — | nach Block 5–6 — **2026-10-23 vorbereitet** (Badge, `UPDATE_LOG`, Suite 1376 grün), `deploy.sh` beim Nikinger |
+| B | `v3.1.6` | — | — | nach Block 5–6 — **2026-10-23 vorbereitet** (Badge, `UPDATE_LOG`, Suite 1376 grün), **Deploy zurückgestellt** (Nikinger: die nächste Session testet zuerst an der Wegwerf-Instanz) |
 | C | `v3.1.7` | — | — | nach Block 7–8 |
 | D | `v3.1.8` | — | — | nach Block 9–11 |
 
@@ -248,7 +248,14 @@ Benutzer stumm. Das ist ein Altbestand aus P6 (nicht von diesem Deploy erzeugt) 
 notiert, die Entscheidung (ID um die Inhaltslänge ergänzen? Zähler nach Einfüge-Reihenfolge?)
 gehört nicht in einen Deploy-Commit.
 
-**Offen / nächster Schritt.** **Deploy B ist beim Nikinger** (Hard Rule 9, `sudo`): derselbe
+**Nikinger-Entscheidung 2026-10-23 (Session-Ende): Deploy B wird jetzt **nicht** ausgeführt.**
+Die Vorbereitung steht (Commit `b75c446`) und wartet; der Deploy läuft erst, wenn die nächste
+Session **zuerst gründlich an der Wegwerf-Instanz** getestet hat — live wird erst danach
+deployt. Die Reihenfolge ist damit: **Wegwerf-Test → Deploy B → Live-Abnahmen** (10-22, 10-25,
+10-27/28).
+
+**Offen / nächster Schritt.** **Deploy B ist beim Nikinger**, sobald der Wegwerf-Test durch ist
+(Hard Rule 9, `sudo`): derselbe
 Aufruf wie bei Deploy A, danach `health_gate.sh --expected-version=v3.1.6
 --require-todays-update-log --expected-sha=<SHA>`. Live-Checks (Plan §Deploy B): **P10.5-22**
 (claude.ai-Connector `list_spaces`/`search_items`/`get_item`/`update_item`, Log-Feld `proto` zeigt
