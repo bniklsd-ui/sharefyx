@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz)pdated: 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,57 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-23 (Deploy-B-Generalprobe 26/26 Zellen grün · Update-Log-ID (Block 7.0) behoben)
+
+**Ergebnis.** Die Generalprobe vor Deploy B (`v3.1.6`) ist gebaut und gefahren:
+`phase10_5_finishing/probes/p105_deploy_b_probe.py` — **26 von 26 Zellen grün** gegen den Stand,
+der deployt werden soll (`main` mit Block 5 + 6, `fastmcp 4.1.3`), an der Wegwerf-Instanz (Port
+8799, tmp-`DATA_ROOT`, tmp-`auth.sqlite3`, selbstsigniertes TLS, File-Keyring) — **nicht** gegen
+den laufenden Dienst. **Der Befund, den sie gefunden hat, ist behoben** (Block 7, Schritt 7.0).
+
+**Fünf Gruppen.** **A · die Tore des `health_gate.sh` (1–5 + 7), an der Wegwerf-Instanz statt
+live** — Gate 4 (`/mcp/` → 401) ist das Tor, das Deploy B hätte reißen können: Block 6 bedient
+`/mcp` **ohne** Slash exakt (`_ExactMcpMount`), der Mount **mit** Slash muss weiter 401 liefern.
+**B · Transport `/mcp`**: 401 mit Challenge, **kein 307** (P10.5-25). **C · der MCP-Weg über
+HTTP**: 11 Werkzeuge, `append_to_items` → `ok:1, failed:1`. **D · das Log-Feld `proto`**: es zeigt
+die *Anfrage*, nicht die Aushandlung — ohne `MCP-Protocol-Version`-Header der Server-Standard
+(`2025-03-26`), mit Header die Version des Clients (`2025-11-25`). **E · der Update-Log-Banner**
+(siehe unten).
+
+**Gemessen.** `pytest` **1380 grün** (306 s) · `doc_health` 0 · `ui_budget` 5/5 (188,5 KB) ·
+**opencode 1.19.4** (Wegwerf-E2E): Login + TOTP + Consent im Chromium → **11** MCP-Werkzeuge im
+Modell-Request → `ev=tool, tool=list_spaces, ok=true, proto=2025-11-25` · **DCR**: derselbe
+Request **201** · `mcp_smoke.py` **17/17** · Protokoll-Probe: beide Ären · Browser: Z3 **58,3 ms**,
+Z4 beide Seiten der 200-ms-Grenze, Z2 **44 ms**/**68 ms**.
+
+**Der Befund aus Gruppe E (Bezug: das Session-Ende vom 2026-10-23) — behoben.** Die Update-Log-IDs
+zählten die Blöcke eines Datums **von oben** — ein zweiter Deploy **am selben Tag** bekam damit die
+ID `#1`, die der erste schon hatte ⇒ `latest_id == seen_update_id` ⇒ **kein Banner**. Gemessen:
+`latest=2026-10-23#1 seen=2026-10-23#1 banner=False` (Alt-Schema) gegen
+`latest=2026-10-23#2 … banner=True` (Zähler von unten). **`webui/updates.py` zählt jetzt von
+unten** (Block 7, Schritt 7.0 — dort sind Code-Pfade erlaubt, Block 12 darf nur `.md`
+anfassen): die IDs der bestehenden Blöcke **bleiben** stehen, ein neu oben eingefügter Block
+bekommt eine **neue**. Vier neue Wächter in `phase10_5_finishing/tests/test_update_log_ids.py`;
+der alte Basistest in `phase6_shares/tests/test_updates.py` trug die alte Zählung und wurde mit
+datierter Notiz nachgezogen. **Ein Sonderfall bleibt benannt:** bei einem Datum mit zwei Blöcken
+tauschen die beiden IDs ihre Plätze — wer damals den oberen Block gesehen hat, sieht ihn **einmal**
+wieder (harmlos).
+
+**Zwei eigene Fehler der Messung, beide behoben** (ein Messgerät, das etwas anderes misst als es
+behauptet, ist schlimmer als gar kein Messgerät): erstens trug das Token der Probe die
+**Metadata-Adresse** statt `<base_url>/mcp` als Ressource ⇒ 401 (der Resolver prüft die Audience,
+RFC 8707); zweitens war der `append_to_items`-Fall **nicht wiederholbar** — nach einem Lauf war
+das Item eine Version weiter, der „gute" Eintrag scheiterte also selbst am Konflikt (jetzt liest
+die Probe die Version vorher über `get_item_meta`).
+
+**Offen / nächster Schritt.** Deploy B ist beim Nikinger (Hard Rule 9, `sudo`): derselbe Aufruf
+wie bei Deploy A, danach `health_gate.sh --expected-version=v3.1.6 --require-todays-update-log
+--expected-sha=<SHA>` — die **echte** Ausgabe in den Session-Block, nie die Behauptung. Live danach:
+**P10.5-22** (Connector-Werkzeuge, Log-Feld `proto`) · **P10.5-25** (`POST …/mcp` → 401 mit
+Challenge) · **P10.5-27/28** (Live P10-J, zwei Modellanbieter). **5.7:** Fabian kurz Bescheid.
+**Danach:** Block 7, Schritte 7.1–7.7 (UI-1–UI-6, KA-5) auf einem Zweig `p105-block7` — **nicht**
+vor dem Deploy B auf `main`, sonst liefert `deploy.sh main` den Block-7-Stand unter `v3.1.6`.
 
 ## Session stopped — 2026-10-23 (Deploy B `v3.1.6` vorbereitet — Badge, Update-Log, Suite 1376 grün)
 

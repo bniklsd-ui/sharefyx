@@ -9,7 +9,7 @@ down:
   - ../phase10_inventory/BAUSTELLENREGISTER.md      # 📗 die Arbeitsliste — hier wird abgehakt (P10-B)
   - ../phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md  # 📦 §12 Entscheidungsliste D-1–D-18, verbatim
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
-updated: 2026-10-23 (Block 7 Schritt 7.0: die Update-Log-ID — Zähler von unten, der Banner beim zweiten Deploy am selben Tag; Generalprobe 26/26 grün, Suite 1380 grün) | 2026-10-23 (Deploy-B-Generalprobe 25/25 Zellen grün an der Wegwerf-Instanz — Probe `probes/p105_deploy_b_probe.py`, Suite 1376 grün; Deploy B beim Nikinger) | 2026-10-23 (Deploy B `v3.1.6` vorbereitet — Badge, eigener `## 2026-10-23`-Block im Update-Log, Venv `fastmcp 4.1.3` = `constraints.txt`, Suite 1376 grün) | 2026-10-23 (Deploy A `v3.1.5` live — Gate 9/9, Release `20261023T065010.377336Z`; P10.5-26 geklärt; Merge `p105-block5` → `main`) | 2026-10-23 (P10.5-26 ✅ — opencode führt `list_spaces` aus; die zwei Auslöser lagen im Messgerät (Stub-Endlosschleife, `mcp debug` vor dem Lauf), kein Produktcode) | 2026-10-22 (Block 6 ✅ — Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6; V209/V197 gemessen, Suite 1374 grün) | 2026-10-22 (Block 5 **abgeschlossen** — `fastmcp==4.1.3` + neu erzeugte `constraints.txt`, Suite 1354 grün mit Compat an und aus, `append_to_items` (LG-4) + Log-Feld `proto`, Protokoll-Probe beider Ären, Smoke 17/17; Abnahme 10-19/20/21 ✅, 10-22 beim Nikinger nach Deploy B) | 2026-10-22 (Block 4 **abgeschlossen** — Schritt 4.6: M2-Bench **Median 107,3 ms** (Z1 ≤ 300 ms), Event-Loop-Probe `/health` hinter `/overview` **23 ms** (P10: 4757 ms), Browser-Probe Z2/Z3/Z4 (150 ms → kein Platzhalter, 400 ms → Platzhalter); Abnahme 10-14/15/16/17 ✅, 10-18 bleibt beim Nikinger nach Deploy A) | 2026-10-22 (Block 4 Schritte 4.3/4.4: der Client holt nur noch `/overview`, `focus`/`visibilitychange` bekommen 10 s Mindestpause (PF-4) · neu `static/js/loading.js` (`withLoading`, 200 ms) + `.is-loading`-Gerüst in `app.css`, statisch unter `prefers-reduced-motion` (Z3/Z4) · 7 Wächter in `phase5_ui/tests/test_loading_state.py`) | 2026-10-22 (Block 4 Schritte 4.1/4.2: `_overview()` in **einem** `store.search()`-Durchgang (P10.5-G) + `asyncio.to_thread` in `_overview`/`_items_get`/`_graph_get` (Z2); 4 neue Tests (Parität, Rückfall, folders/members, Event-Loop) + 5 Gegenläufe; Suite 1334 grün) | 2026-10-22 (Block 3 Schritte 3.3–3.4: `scripts/asset_orphans.py` (LG-7) + 7 Tests + Wegwerf-Probe `p105_b3_assets_probe.py` **14/14 Zellen** — Abnahme 10-12/10-13 ✅) | 2026-10-22 (Block 3 Schritt 3.2: `Store.put_asset()` ruft den Stripper — **eine** Stelle für Web und MCP; die Dummy-PNG-Fixtures mussten zu echten Bytes werden) | 2026-10-22 (Block 3 Schritt 3.1: `files.strip_image_metadata()` — JPEG/PNG/WebP, GIF unverändert, fail-closed; 8 neue Tests) | 2026-10-22 (Block-2-Nachzug: Item mit **neuem Ordner** im fremden Home-Space ist jetzt auf Web **und** MCP gesperrt (Nikinger-Entscheidung 2026-10-22) — P10.5-9 ⚠️ → ✅; `ui_budget.py`/`ui_smoke.py` haben das Home-Space-Prädikat, die `team`-Flags stimmen) | 2026-10-22 (Block 2.5 — Proben Web × MCP 28/28, M4 BG-1 behoben; Block 2 ✅, Abnahme 10-8/10/9 ✅, 10-9 ⚠️ (Befund: neuer Ordner per Item-Anlage im fremden Home-Space)) | 2026-10-22 (Block 2 Schritte 2.1–2.4 gebaut — eine Regel für Web und MCP (RE-1/RE-2/P10-I/P10.5-N) und BG-1; **2.5 Proben offen, Claude Code**; Suite 1299 grün) | 2026-10-22 (Block 2 Schritte 2.1–2.2: eine Regel für Web und MCP — SharePolicy mit Home-Space-Prädikat, RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N beide Richtungen; Suite 1296 grün) | 2026-10-22 (Block 2 Schritt 2.1: SharePolicy kennt Home-Spaces und Team-Spaces, Prädikat aus der Auth-DB, eine Regel für Web und MCP) | 2026-10-22 (Block 1 **abgeschlossen**: V200 vom Fleet-Lauf belegt — Unit installiert, `Result=success`, 0 failed units; Abnahme 10-5/6/7 ✅) | 2026-10-22 (Block 1 Schritte 1.1/1.2: BT-1 — Caddy-Vorlage in Blockform mit den V199-Live-Werten (10s/15s/1s) + neuer Waechter; Abnahme 10-5 auf ✅) | 2026-10-22 (Block 1 Schritt 1.4: BT-6 — `constraints.txt` aus dem Live-Freeze, `scripts/dev_install.sh` mit `-c`, zwei Wächter, Dev-venv neu; Suite 1282 gruen auf den Live-Versionen) | 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in der Relay-Unit, Wächter 13/13, vier Gegenläufe; Block-0-Block rotiert) | 2026-10-22 (Block 0 **abgeschlossen**: 0.6 ROADMAP-Zeile P10.5 auf 🔄, 0.7 Ausführer-Vorbedingung protokolliert — Abnahme P10.5-1–4 ✅) | 2026-10-22 (Block 0: 0.2/0.3 — Phase-Head angelegt (Modulstatus, Deploy-Tabelle, Abnahmestand 61 Zeilen), DO-3-Wächter, `pytest.ini` ergänzt; davor 0.4 (ROADMAP-Wächter eingefroren), 0.5 (INDEX-Luft) und 0.8 (Register-Luft) gebaut — DO-2 vollständig; erster Block)
+updated: 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zeile `)pdated:` → `) | `; Release-Tests wieder grün, Suite 1380 grün) | 2026-10-23 (Block 7 Schritt 7.0: die Update-Log-ID — Zähler von unten, der Banner beim zweiten Deploy am selben Tag; Generalprobe 26/26 grün, Suite 1380 grün) | 2026-10-23 (Deploy-B-Generalprobe 25/25 Zellen grün an der Wegwerf-Instanz — Probe `probes/p105_deploy_b_probe.py`, Suite 1376 grün; Deploy B beim Nikinger) | 2026-10-23 (Deploy B `v3.1.6` vorbereitet — Badge, eigener `## 2026-10-23`-Block im Update-Log, Venv `fastmcp 4.1.3` = `constraints.txt`, Suite 1376 grün) | 2026-10-23 (Deploy A `v3.1.5` live — Gate 9/9, Release `20261023T065010.377336Z`; P10.5-26 geklärt; Merge `p105-block5` → `main`) | 2026-10-23 (P10.5-26 ✅ — opencode führt `list_spaces` aus; die zwei Auslöser lagen im Messgerät (Stub-Endlosschleife, `mcp debug` vor dem Lauf), kein Produktcode) | 2026-10-22 (Block 6 ✅ — Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6; V209/V197 gemessen, Suite 1374 grün) | 2026-10-22 (Block 5 **abgeschlossen** — `fastmcp==4.1.3` + neu erzeugte `constraints.txt`, Suite 1354 grün mit Compat an und aus, `append_to_items` (LG-4) + Log-Feld `proto`, Protokoll-Probe beider Ären, Smoke 17/17; Abnahme 10-19/20/21 ✅, 10-22 beim Nikinger nach Deploy B) | 2026-10-22 (Block 4 **abgeschlossen** — Schritt 4.6: M2-Bench **Median 107,3 ms** (Z1 ≤ 300 ms), Event-Loop-Probe `/health` hinter `/overview` **23 ms** (P10: 4757 ms), Browser-Probe Z2/Z3/Z4 (150 ms → kein Platzhalter, 400 ms → Platzhalter); Abnahme 10-14/15/16/17 ✅, 10-18 bleibt beim Nikinger nach Deploy A) | 2026-10-22 (Block 4 Schritte 4.3/4.4: der Client holt nur noch `/overview`, `focus`/`visibilitychange` bekommen 10 s Mindestpause (PF-4) · neu `static/js/loading.js` (`withLoading`, 200 ms) + `.is-loading`-Gerüst in `app.css`, statisch unter `prefers-reduced-motion` (Z3/Z4) · 7 Wächter in `phase5_ui/tests/test_loading_state.py`) | 2026-10-22 (Block 4 Schritte 4.1/4.2: `_overview()` in **einem** `store.search()`-Durchgang (P10.5-G) + `asyncio.to_thread` in `_overview`/`_items_get`/`_graph_get` (Z2); 4 neue Tests (Parität, Rückfall, folders/members, Event-Loop) + 5 Gegenläufe; Suite 1334 grün) | 2026-10-22 (Block 3 Schritte 3.3–3.4: `scripts/asset_orphans.py` (LG-7) + 7 Tests + Wegwerf-Probe `p105_b3_assets_probe.py` **14/14 Zellen** — Abnahme 10-12/10-13 ✅) | 2026-10-22 (Block 3 Schritt 3.2: `Store.put_asset()` ruft den Stripper — **eine** Stelle für Web und MCP; die Dummy-PNG-Fixtures mussten zu echten Bytes werden) | 2026-10-22 (Block 3 Schritt 3.1: `files.strip_image_metadata()` — JPEG/PNG/WebP, GIF unverändert, fail-closed; 8 neue Tests) | 2026-10-22 (Block-2-Nachzug: Item mit **neuem Ordner** im fremden Home-Space ist jetzt auf Web **und** MCP gesperrt (Nikinger-Entscheidung 2026-10-22) — P10.5-9 ⚠️ → ✅; `ui_budget.py`/`ui_smoke.py` haben das Home-Space-Prädikat, die `team`-Flags stimmen) | 2026-10-22 (Block 2.5 — Proben Web × MCP 28/28, M4 BG-1 behoben; Block 2 ✅, Abnahme 10-8/10/9 ✅, 10-9 ⚠️ (Befund: neuer Ordner per Item-Anlage im fremden Home-Space)) | 2026-10-22 (Block 2 Schritte 2.1–2.4 gebaut — eine Regel für Web und MCP (RE-1/RE-2/P10-I/P10.5-N) und BG-1; **2.5 Proben offen, Claude Code**; Suite 1299 grün) | 2026-10-22 (Block 2 Schritte 2.1–2.2: eine Regel für Web und MCP — SharePolicy mit Home-Space-Prädikat, RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N beide Richtungen; Suite 1296 grün) | 2026-10-22 (Block 2 Schritt 2.1: SharePolicy kennt Home-Spaces und Team-Spaces, Prädikat aus der Auth-DB, eine Regel für Web und MCP) | 2026-10-22 (Block 1 **abgeschlossen**: V200 vom Fleet-Lauf belegt — Unit installiert, `Result=success`, 0 failed units; Abnahme 10-5/6/7 ✅) | 2026-10-22 (Block 1 Schritte 1.1/1.2: BT-1 — Caddy-Vorlage in Blockform mit den V199-Live-Werten (10s/15s/1s) + neuer Waechter; Abnahme 10-5 auf ✅) | 2026-10-22 (Block 1 Schritt 1.4: BT-6 — `constraints.txt` aus dem Live-Freeze, `scripts/dev_install.sh` mit `-c`, zwei Wächter, Dev-venv neu; Suite 1282 gruen auf den Live-Versionen) | 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in der Relay-Unit, Wächter 13/13, vier Gegenläufe; Block-0-Block rotiert) | 2026-10-22 (Block 0 **abgeschlossen**: 0.6 ROADMAP-Zeile P10.5 auf 🔄, 0.7 Ausführer-Vorbedingung protokolliert — Abnahme P10.5-1–4 ✅) | 2026-10-22 (Block 0: 0.2/0.3 — Phase-Head angelegt (Modulstatus, Deploy-Tabelle, Abnahmestand 61 Zeilen), DO-3-Wächter, `pytest.ini` ergänzt; davor 0.4 (ROADMAP-Wächter eingefroren), 0.5 (INDEX-Luft) und 0.8 (Register-Luft) gebaut — DO-2 vollständig; erster Block)
 ---
 # Phase 10.5 — Finishing
 
@@ -50,11 +50,11 @@ updated: 2026-10-23 (Block 7 Schritt 7.0: die Update-Log-ID — Zähler von unte
 | # | Version | SHA | `health_gate` | Ausgabe |
 |---|---|---|---|---|
 | A | `v3.1.5` | `7358f22` | **9/9 OK** | nach Block 1–4 — **live seit 2026-10-23**, Release `20261023T065010.377336Z` |
-| B | `v3.1.6` | — | — | nach Block 5–6 (+ **Block 7.0**, die Update-Log-ID) — **2026-10-23 vorbereitet** (Badge, `UPDATE_LOG`, Suite grün) · **Wegwerf-Generalprobe 26/26 Zellen grün** (fünf Gruppen, `probes/p105_deploy_b_probe.py`) · **Deploy zurückgestellt** (Nikinger: die nächste Session testet zuerst an der Wegwerf-Instanz — **das ist diese Session, die Probe ist durch**) |
+| B | `v3.1.6` | — | — | nach Block 5–6 (+ **Block 7.0**, die Update-Log-ID) — **2026-10-23 vorbereitet** (Badge, `UPDATE_LOG`, Suite grün) · **Wegwerf-Generalprobe 26/26 Zellen grün** (fünf Gruppen, `probes/p105_deploy_b_probe.py`) · **Der Deploy-Aufruf der letzten Session ist an den Release-Tests gescheitert, nicht am Befehl** — Ursache: eine verklebte `updated:`-Zeile in `SESSIONS_ARCHIVE.md` (behoben, Suite 1380 grün) · **Deploy beim Nikinger** (Hard Rule 9, `sudo`) |
 | C | `v3.1.7` | — | — | nach Block 7–8 |
 | D | `v3.1.8` | — | — | nach Block 9–11 |
 
-**Stand 2026-10-23 (Abend):** Deploy A ist **live** (`v3.1.5`, Release `20261023T065010.377336Z`, SHA `7358f22`, `health_gate` **9/9 OK**). Der Branch `p105-block5` (Block 5 + 6 + P10.5-26) ist **gemergt**; Deploy B (`v3.1.6`) ist vorbereitet und geht aus `main` mit `fastmcp 4.1.3`. **Die Generalprobe davor ist gefahren: 25/25 Zellen grün an der Wegwerf-Instanz** (Details im Session-Block unten) — es fehlt nur noch der Deploy-Aufruf durch den Nikinger.
+**Stand 2026-10-23 (Abend):** Deploy A ist **live** (`v3.1.5`, Release `20261023T065010.377336Z`, SHA `7358f22`, `health_gate` **9/9 OK**). Der Branch `p105-block5` (Block 5 + 6 + P10.5-26) ist **gemergt**; Deploy B (`v3.1.6`) ist vorbereitet und geht aus `main` mit `fastmcp 4.1.3`. **Die Generalprobe davor ist gefahren: 26/26 Zellen grün an der Wegwerf-Instanz** (Details im Session-Block unten; die Zeile stand vorher auf „25/25" — **datierte Korrektur**, der Block-7.0-Commit hat die Probe um eine Zelle erweitert). **Der Deploy-Aufruf der letzten Session ist an den Release-Tests gescheitert — nicht am Befehl:** eine verklebte `updated:`-Zeile in `SESSIONS_ARCHIVE.md` (behoben, Details im Session-Block) — es fehlt nur noch der Deploy-Aufruf durch den Nikinger.
 
 **Ein Deploy ist vier Schritte, kein Commit** (Plan §2.5): volle Suite + `doc_health` + `ui_budget` grün · Badge und `docs/UPDATE_LOG.md` · Commit + Push · **`deploy.sh` durch den Nikinger** (Hard Rule 9) · `health_gate.sh` mit **echter Ausgabe** in den Commit — nie die Behauptung.
 
@@ -152,16 +152,22 @@ updated: 2026-10-23 (Block 7 Schritt 7.0: die Update-Log-ID — Zähler von unte
   gedreht) · Spaces-Panel direkt nach dem Laden (BG-1).
 - **P10.5-27/28** — Live-Abnahme P10-J: zwei Modellanbieter, ein Server, ein Werkzeug (`list_spaces`) — Block 6 und Z. **Voraussetzung ist erfüllt:** die Wegwerf-E2E (P10.5-26) zeigt, dass ein Nicht-Claude-Client (`list_spaces` gelingt) — offen ist nur noch der **Live**-Lauf mit zwei Modellanbietern.
 - **Block 2, Zeile 15 (AL-1)** — Migration + Live-Check beim Nikinger.
-- **Deploy B (`v3.1.6`) — die Generalprobe ist durch, es fehlt nur noch der Aufruf.**
-  25/25 Zellen grün an der Wegwerf-Instanz (Details im Session-Block unten), Suite 1376 grün,
-  `doc_health` 0, `ui_budget` 5/5. Der Deploy selbst ist Nikinger-Arbeit (Hard Rule 9, `sudo`):
+- **Deploy B (`v3.1.6`) — der Blocker ist weg, es fehlt nur noch der Aufruf.**
+  26/26 Zellen grün an der Wegwerf-Instanz (Details im Session-Block unten), Suite **1380** grün,
+  `doc_health` 0, `ui_budget` 5/5. **Der Deploy der letzten Session ist nicht am Befehl, sondern an
+  den Release-Tests gescheitert** — Ursache war eine verklebte `updated:`-Zeile in
+  `phase10_5_finishing/SESSIONS_ARCHIVE.md` (**behoben**, eine Zeile, byteweise belegt im
+  Session-Block). Der Deploy selbst ist Nikinger-Arbeit (Hard Rule 9, `sudo`):
   `SHAREFYX_RELEASES_DIR=/opt/sharefyx/releases SHAREFYX_CURRENT_LINK=/opt/sharefyx/current
   SHAREFYX_DATA_ROOT=/home/savefyx/savefyx-data SHAREFYX_BACKUP_DIR=/var/lib/sharefyx-backup
   SHAREFYX_SYSTEMCTL="sudo systemctl" phase5_ui/scripts/deploy.sh main` — **derselbe Aufruf wie
   bei Deploy A** — danach (lesend, ohne Rechte)
   `phase8_5_picker_release/scripts/health_gate.sh --expected-version=v3.1.6
   --require-todays-update-log --expected-sha=<SHA>`; die **echte** Ausgabe gehört in den
-  Session-Block, nie die Behauptung. **Live danach:** **P10.5-22** (claude.ai-Connector
+  Session-Block, nie die Behauptung. **Zur SHA (datierte Abweichung von der Notiz der letzten
+  Session, die `a7fe62c` nannte):** dieser Stand trägt den Ketten-Defekt, sein Release wäre rot —
+  `--expected-sha` muss der **Reparatur-Commit** sein (im Commit-Log des Phase-Heads). **Live
+  danach:** **P10.5-22** (claude.ai-Connector
   `list_spaces`/`search_items`/`get_item`/`update_item`, Log-Feld `proto` zeigt die Ära, V208) ·
   **P10.5-25** (`curl -si -X POST …/mcp` → **401 mit Challenge**, kein 307) · **P10.5-27/28**
   (Live P10-J, zwei Modellanbieter). **5.7:** Fabian kurz Bescheid („kurzer Neustart; der
@@ -240,53 +246,41 @@ liest es als Fläche) und `setViewTitle` **existiert noch nicht**.
 (Filter in API und UI) · 10-35 (KA-5 sichtbar). **Proben:** Playwright liest `document.title` je
 Ansicht; Screenshots für 10-30/10-32/10-35; **Wegwerf statt Live** (Freigabe 2026-10-22).
 
-## Session stopped — 2026-10-23 (Deploy-B-Generalprobe 26/26 Zellen grün · Update-Log-ID (Block 7.0) behoben)
+## Session stopped — 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — die Release-Tests waren rot, der Deploy-Befehl war richtig)
 
-**Ergebnis.** Die Generalprobe vor Deploy B (`v3.1.6`) ist gebaut und gefahren:
-`phase10_5_finishing/probes/p105_deploy_b_probe.py` — **26 von 26 Zellen grün** gegen den Stand,
-der deployt werden soll (`main` mit Block 5 + 6, `fastmcp 4.1.3`), an der Wegwerf-Instanz (Port
-8799, tmp-`DATA_ROOT`, tmp-`auth.sqlite3`, selbstsigniertes TLS, File-Keyring) — **nicht** gegen
-den laufenden Dienst. **Der Befund, den sie gefunden hat, ist behoben** (Block 7, Schritt 7.0).
+**Ergebnis.** Der Deploy-B-Aufruf der letzten Session war **korrekt** — rot waren die **Release-Tests**,
+und der Grund lag **nicht** im Deploy, sondern in **einer verklebten Zeile**:
+`phase10_5_finishing/SESSIONS_ARCHIVE.md:8` trug die `updated:`-Kette als
+`…Wegwerf-Instanz)pdated: 2026-10-23 (Deploy-A-live-Block …` — der Trenner ` | ` war als `pdated: `
+verschluckt. Der Faden war damit für `rotate_index_updates.sh` **unsichtbar**, und der Wächter
+`test_no_thread_is_invisible_to_the_rotation_anchor` (Phase 9) stand **rot** ⇒ `deploy.sh` bricht in
+Schritt 4 ab („Tests im Release rot"), **bevor** der Symlink umgelegt wird. **Gemessen:** ein
+Release-Checkout auf `a7fe62c` (dem Deploy-B-Kandidaten) ist an genau diesem Test rot
+(`1 failed, 6 passed`), und der `current`-Symlink zeigte danach weiter auf Deploy A
+(`20261023T065010.377336Z`) — der Fehler hat **nichts** deployed und **nichts** beschädigt.
 
-**Fünf Gruppen.** **A · die Tore des `health_gate.sh` (1–5 + 7), an der Wegwerf-Instanz statt
-live** — Gate 4 (`/mcp/` → 401) ist das Tor, das Deploy B hätte reißen können: Block 6 bedient
-`/mcp` **ohne** Slash exakt (`_ExactMcpMount`), der Mount **mit** Slash muss weiter 401 liefern.
-**B · Transport `/mcp`**: 401 mit Challenge, **kein 307** (P10.5-25). **C · der MCP-Weg über
-HTTP**: 11 Werkzeuge, `append_to_items` → `ok:1, failed:1`. **D · das Log-Feld `proto`**: es zeigt
-die *Anfrage*, nicht die Aushandlung — ohne `MCP-Protocol-Version`-Header der Server-Standard
-(`2025-03-26`), mit Header die Version des Clients (`2025-11-25`). **E · der Update-Log-Banner**
-(siehe unten).
+**Die Reparatur: eine Zeile, byteweise belegt.** `…)pdated: 2026-10-23 (` → `…) | 2026-10-23 (`
+(**−5 B**). Die Kette danach ist **der neue Faden + ` | ` + die Kette von vor dem Defekt** — die elf
+älteren Fäden sind byteweise identisch mit `git show 59d8c24^` (Gegenprobe in der Rechnung, nicht
+im Augenschein). **Am echten Wächter-Code geprüft:** `chain_defects` → `(False, 0, 0)` ·
+`blind_positions` → `[]` · **12** Fäden für `rotate_index_updates.sh` sichtbar (vorher 11 sichtbar
++ 1 klebender) · `test_updated_chain.py` **7/7 grün**.
 
-**Gemessen.** `pytest` **1380 grün** (306 s) · `doc_health` 0 · `ui_budget` 5/5 (188,5 KB) ·
-**opencode 1.19.4** (Wegwerf-E2E): Login + TOTP + Consent im Chromium → **11** MCP-Werkzeuge im
-Modell-Request → `ev=tool, tool=list_spaces, ok=true, proto=2025-11-25` · **DCR**: derselbe
-Request **201** · `mcp_smoke.py` **17/17** · Protokoll-Probe: beide Ären · Browser: Z3 **58,3 ms**,
-Z4 beide Seiten der 200-ms-Grenze, Z2 **44 ms**/**68 ms**.
+**Gemessen.** `pytest` **1380 grün** (313,6 s) · `doc_health` **0** (alle vier Kategorien) ·
+`ui_budget` **5/5** (188,5 KB Erstaufruf) · Update-Log-Gate: `## 2026-10-23` steht oben, Badge
+`v3.1.6` (`app.html:20`).
 
-**Der Befund aus Gruppe E (Bezug: das Session-Ende vom 2026-10-23) — behoben.** Die Update-Log-IDs
-zählten die Blöcke eines Datums **von oben** — ein zweiter Deploy **am selben Tag** bekam damit die
-ID `#1`, die der erste schon hatte ⇒ `latest_id == seen_update_id` ⇒ **kein Banner**. Gemessen:
-`latest=2026-10-23#1 seen=2026-10-23#1 banner=False` (Alt-Schema) gegen
-`latest=2026-10-23#2 … banner=True` (Zähler von unten). **`webui/updates.py` zählt jetzt von
-unten** (Block 7, Schritt 7.0 — dort sind Code-Pfade erlaubt, Block 12 darf nur `.md`
-anfassen): die IDs der bestehenden Blöcke **bleiben** stehen, ein neu oben eingefügter Block
-bekommt eine **neue**. Vier neue Wächter in `phase10_5_finishing/tests/test_update_log_ids.py`;
-der alte Basistest in `phase6_shares/tests/test_updates.py` trug die alte Zählung und wurde mit
-datierter Notiz nachgezogen. **Ein Sonderfall bleibt benannt:** bei einem Datum mit zwei Blöcken
-tauschen die beiden IDs ihre Plätze — wer damals den oberen Block gesehen hat, sieht ihn **einmal**
-wieder (harmlos).
+**Der Deploy-B-Aufruf — eine Abweichung von der Notiz der letzten Session, mit Grund.** Die Notiz
+nannte `--expected-sha=a7fe62c`. **Dieser Stand ist nicht deploybar** — er trägt den Defekt, sein
+Release wäre rot (gemessen oben). Der Deploy muss den **Reparatur-Commit** ausliefern; die SHA
+steht im Commit, der diese Zeile trägt. Sonst alles unverändert: derselbe Aufruf wie bei Deploy A,
+danach `health_gate.sh --expected-version=v3.1.6 --require-todays-update-log --expected-sha=<SHA>`
+— die **echte** Ausgabe in den Session-Block, nie die Behauptung.
 
-**Zwei eigene Fehler der Messung, beide behoben** (ein Messgerät, das etwas anderes misst als es
-behauptet, ist schlimmer als gar kein Messgerät): erstens trug das Token der Probe die
-**Metadata-Adresse** statt `<base_url>/mcp` als Ressource ⇒ 401 (der Resolver prüft die Audience,
-RFC 8707); zweitens war der `append_to_items`-Fall **nicht wiederholbar** — nach einem Lauf war
-das Item eine Version weiter, der „gute" Eintrag scheiterte also selbst am Konflikt (jetzt liest
-die Probe die Version vorher über `get_item_meta`).
-
-**Offen / nächster Schritt.** Deploy B ist beim Nikinger (Hard Rule 9, `sudo`): derselbe Aufruf
-wie bei Deploy A, danach `health_gate.sh --expected-version=v3.1.6 --require-todays-update-log
---expected-sha=<SHA>` — die **echte** Ausgabe in den Session-Block, nie die Behauptung. Live danach:
-**P10.5-22** (Connector-Werkzeuge, Log-Feld `proto`) · **P10.5-25** (`POST …/mcp` → 401 mit
-Challenge) · **P10.5-27/28** (Live P10-J, zwei Modellanbieter). **5.7:** Fabian kurz Bescheid.
-**Danach:** Block 7, Schritte 7.1–7.7 (UI-1–UI-6, KA-5) auf einem Zweig `p105-block7` — **nicht**
-vor dem Deploy B auf `main`, sonst liefert `deploy.sh main` den Block-7-Stand unter `v3.1.6`.
+**Offen / nächster Schritt.** Deploy B ist beim Nikinger (Hard Rule 9, `sudo`): der Neustart des
+**einen** `sharefyx-mcp.service` gehört ihm, nicht dem Ausführer — `sudo` verlangt hier ein
+Passwort, und ein Deploy ohne Neustart wäre eine stille Halbdeploiement (der Symlink zeigte dann
+schon `v3.1.6`, der Prozess liefe aber noch mit dem alten Code — `static_routes.py` liest
+`app.html` pro Anfrage von der Platte). Live danach: **P10.5-22** (Connector-Werkzeuge, Log-Feld
+`proto`) · **P10.5-25** (`POST …/mcp` → 401 mit Challenge) · **P10.5-27/28** (Live P10-J, zwei
+Modellanbieter). **5.7:** Fabian kurz Bescheid.
