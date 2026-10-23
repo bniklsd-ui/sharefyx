@@ -154,6 +154,82 @@ async def test_tool_event_has_tool_space_and_duration(app, token_alpha, request_
 
 
 @pytest.mark.asyncio
+async def test_tool_event_carries_the_negotiated_protocol_version(app, token_alpha, request_log_handler):
+    """P10.5 Block 5, Schritt 5.3 (V208): die Logzeile nennt die Protokoll-Ära des Aufrufs."""
+    async with app.router.lifespan_context(app):
+        async with _mcp_client(app, token_alpha) as client:
+            await client.call_tool("list_spaces", {})
+
+    event = next(r.msg for r in request_log_handler.records if r.msg.get("ev") == "tool")
+    assert event["proto"] in {"2025-11-25", "2026-07-28"}
+
+
+class _Msg:
+    name = "append_to_items"
+
+
+class _NoContext:
+    message = _Msg()
+
+
+class _Result:
+    def __init__(self, text: str) -> None:
+        self.content = [type("C", (), {"text": text})()]
+
+
+async def _run_middleware(request_log_handler, result):
+    async def call_next(_context):
+        return result
+
+    await ToolCallLogMiddleware().on_call_tool(_NoContext(), call_next)
+    return [r.msg for r in request_log_handler.records if r.msg.get("ev") == "tool"][-1]
+
+
+@pytest.mark.asyncio
+async def test_tool_event_omits_proto_when_no_context_is_available(request_log_handler):
+    event = await _run_middleware(request_log_handler, _Result('{"ok":2,"failed":0}'))
+    assert "proto" not in event
+
+
+@pytest.mark.asyncio
+async def test_append_to_items_with_a_failed_entry_logs_err_partial(request_log_handler):
+    event = await _run_middleware(request_log_handler, _Result('{"results":[],"ok":1,"failed":1}'))
+    assert event["ok"] is False and event["err"] == "partial"
+
+
+@pytest.mark.asyncio
+async def test_append_to_items_without_failures_logs_plain_success(request_log_handler):
+    event = await _run_middleware(request_log_handler, _Result('{"results":[],"ok":2,"failed":0}'))
+    assert event["ok"] is True and "err" not in event
+
+
+@pytest.mark.asyncio
+async def test_real_append_to_items_with_a_stale_entry_logs_err_partial(
+    app, token_alpha, store, request_log_handler
+):
+    """Derselbe Fall durch den **echten** Stack (Advisor-Fund 2026-10-22): `_is_partial()` schluckt
+    jede Ausnahme — hätte das echte Ergebnisobjekt von `call_next` eine andere Form als der Fake
+    oben, stünde im Log stillschweigend ein glatter Erfolg."""
+    fresh = store.create("alpha", type="note", title="Frisch", body="x")
+    stale = store.create("alpha", type="note", title="Veraltet", body="y")
+    async with app.router.lifespan_context(app):
+        async with _mcp_client(app, token_alpha) as client:
+            await client.call_tool(
+                "append_to_items",
+                {"entries": [
+                    {"item_id": fresh.id, "version": fresh.version, "text": "a"},
+                    {"item_id": stale.id, "version": stale.version + 99, "text": "b"},
+                ]},
+            )
+
+    event = next(
+        r.msg for r in request_log_handler.records
+        if r.msg.get("ev") == "tool" and r.msg.get("tool") == "append_to_items"
+    )
+    assert event["ok"] is False and event["err"] == "partial"
+
+
+@pytest.mark.asyncio
 async def test_tool_event_error_carries_class_not_message(app, token_alpha, request_log_handler):
     async with app.router.lifespan_context(app):
         async with _mcp_client(app, token_alpha) as client:

@@ -8,7 +8,7 @@ damit `test_app.py` unverändert gegen die nackte App läuft. Alle drei schreibe
 über `log_event()`, das die Feld-Whitelist erzwingt.
 
 **Feld-Whitelist** (Plan §3.1, erweitert P4 §4, P6 Step 2): `ts` · `ev` · `tool` · `space` · `ms` ·
-`ok` · `err` · `method` · `path` · `status` · `stage` · `client_id` · `grant` · `ua`. Alles andere
+`ok` · `err` · `method` · `path` · `status` · `stage` · `client_id` · `grant` · `ua` · `proto`. Alles andere
 wird von `log_event()` stillschweigend verworfen — insbesondere
 darf hier **nie** ein Token, ein Item-Titel/Body/Snippet, eine Item-ID oder eine rohe
 Fehlermeldung landen (`map_storage_error()`-Texte wie `conflict: itm_… wurde geändert (…)`
@@ -27,10 +27,16 @@ Zugriff, und `context.py` steht nicht auf P6 Step 2s Berührungsliste — ein Zu
 `ev="http"` über den gemeinsamen Zeitstempel reicht für V42 (welche Oberfläche stellte diese
 Anfrage), ohne die Tool-Schicht anzufassen.
 
+**`proto` (P10.5 Block 5, Schritt 5.3, V208/V219):** die ausgehandelte MCP-Protokollversion des
+Tool-Aufrufs (`2025-11-25` Handshake-Ära, `2026-07-28` zustandslose Ära). Quelle ist
+`Context.request_context.protocol_version` unter `fastmcp==4.1.3` — derselbe Pfad, den FastMCPs eigene
+Telemetrie benutzt (`server/telemetry.py`). Server-generiert aus einer festen Menge, kein Client-Freitext.
+Fehlt der Kontext, entfällt das Feld; ein Logging-Detail darf nie einen Tool-Aufruf stoeren.
+
 **Warum `classify_error()` den Nachrichtentext parst statt den Exception-Typ zu prüfen:**
 Bis diese Middleware eine Exception sieht, hat `tools.py :: map_storage_error()` sie bereits in
 eine `fastmcp.exceptions.ToolError` mit Präfix-Text (`"conflict: …"`, `"item_not_found: …"`, …)
-übersetzt — verifiziert gegen den echten Ausführungspfad in `fastmcp==3.4.4`
+übersetzt — verifiziert gegen den echten Ausführungspfad in `fastmcp==3.4.4` (gilt unverändert unter 4.1.x — Suite + Smokes, P10.5 Block 5, 2026-10-22)
 (`FastMCP.call_tool()`: die Middleware-Kette ruft die Kernlogik über `call_next()` auf, und jede
 dort erhobene `FastMCPError`/`ToolError` wird unverändert weitergereicht, nicht erneut
 verpackt). Der ursprüngliche `storage`-Exception-Typ (`ConflictError`, `ItemNotFound`, …) ist an
@@ -62,7 +68,7 @@ LOGGER_NAME = "sharefyx.request"
 _ALLOWED_FIELDS = frozenset(
     {
         "ts", "ev", "tool", "space", "ms", "ok", "err", "method", "path", "status",
-        "stage", "client_id", "grant", "ua",
+        "stage", "client_id", "grant", "ua", "proto",
     }
 )
 
@@ -127,6 +133,29 @@ def _current_space() -> str | None:
         return None
 
 
+def _is_partial(tool_name: str | None, result: Any) -> bool:
+    """`append_to_items` (P10.5-J) meldet Teilerfolg als normales Ergebnis mit `failed > 0`. Die
+    Logzeile bekommt dann `ok:false` + `err:"partial"` — sonst sähe ein Aufruf, bei dem ein Eintrag
+    am Konflikt scheiterte, im Log aus wie ein glatter Erfolg. Liest nur die Zahl `failed`, nie
+    Inhalte; kann nichts ermittelt werden, bleibt es beim Erfolg (Logging stört nie)."""
+    if tool_name != "append_to_items":
+        return False
+    try:
+        text = result.content[0].text
+        return int(json.loads(text)["failed"]) > 0
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def _protocol_version(context: MiddlewareContext) -> str | None:
+    """Ausgehandelte Protokollversion des laufenden Aufrufs (5.3) — `None`, wenn nicht ermittelbar."""
+    try:
+        version = context.fastmcp_context.request_context.protocol_version  # type: ignore[union-attr]
+    except Exception:  # noqa: BLE001 - Logging-Detail, nie ein Grund zu scheitern
+        return None
+    return version if isinstance(version, str) else None
+
+
 class ToolCallLogMiddleware(Middleware):
     """Misst Dauer und Ergebnis jedes Tool-Aufrufs. Kennt keine Argumente und keine Ergebnisse —
     nur Name (`context.message.name`), Space, Dauer, Erfolg, Fehlerklasse."""
@@ -136,7 +165,10 @@ class ToolCallLogMiddleware(Middleware):
         start = time.perf_counter()
         error_class: str | None = None
         try:
-            return await call_next(context)
+            result = await call_next(context)
+            if _is_partial(tool_name, result):
+                error_class = "partial"
+            return result
         except BaseException as exc:
             error_class = classify_error(exc)
             raise
@@ -151,6 +183,9 @@ class ToolCallLogMiddleware(Middleware):
             }
             if error_class is not None:
                 fields["err"] = error_class
+            proto = _protocol_version(context)
+            if proto is not None:
+                fields["proto"] = proto
             log_event(**fields)
 
 

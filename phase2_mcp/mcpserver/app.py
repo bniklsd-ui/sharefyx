@@ -93,6 +93,12 @@ die frühere Begründung oben ("ein Konstruktor-Austausch an dieser einen Stelle
 keine Signaturänderung. `store.acl_reader` (neu, `storage/store.py`) gibt denselben
 `AclReader` zurück, den `Store.__init__` schon für `list_spaces()`/`acl_of()` baut — ein
 Handle, kein zweiter, siehe `permissions.py`s Moduldocstring.
+
+**[2026-10-22, P10.5 Block 6, Schritt 6.3]:** `/mcp` wird jetzt **ohne** Slash exakt bedient
+(`Route("/mcp", ...)` vor `Mount("/mcp", ...)`) - vorher schickte Starlette jeden Request auf
+`/mcp` mit 307 auf `/mcp/` (P10-C nennt die Abnahme-URL ohne Slash, und ein Client, der der
+Umleitung nicht folgt, scheitert). Die Klasse `_ExactMcpMount` baut dafuer genau den Scope, den
+Starlettes `Mount` baut - die innere FastMCP-App sieht dieselbe Route wie zuvor.
 """
 from __future__ import annotations
 
@@ -162,6 +168,36 @@ async def _health(request: Request) -> JSONResponse:
     )
 
 
+class _ExactMcpMount:
+    """`/mcp` **ohne** Slash - exakt bedient, ohne 307 (P10.5 Block 6, Schritt 6.3).
+
+    Starlettes Router schickt einen Request auf `/mcp` mit **307** auf `/mcp/`, wenn keine Route
+    exakt passt (`redirect_slashes`). `Mount("/mcp")` deckt nur `/mcp/...` ab, also war `/mcp`
+    bisher eine Umleitung - und ein Client, der ihr nicht folgt (etwa `httpx` mit
+    `follow_redirects=False`), scheitert. Die Abnahme-URL aus P10-C steht **ohne** Slash.
+
+    **[VERIFY, 2026-10-22]** gegen das, was `Mount` in der installierten Starlette-Version
+    (1.9.0) in den `scope` schreibt: `Mount.matches()` setzt `root_path` auf
+    `root_path + matched_path` (hier `/mcp`), laesst `path` aber auf `/mcp/` stehen - die innere
+    App rechnet `path` minus `root_path` (`get_route_path()`) und sieht so die Route `/`.
+    Diese Klasse stellt **denselben** Scope her, mit `path = "/"`: `get_route_path()` liefert
+    dann ebenfalls `/`, die innere FastMCP-App sieht also exakt dieselbe Route wie beim Mount.
+    `raw_path` bleibt unveraendert (der echte Requestpfad), `app_root_path` wie beim Mount.
+    """
+
+    def __init__(self, app) -> None:
+        self._app = app
+
+    async def __call__(self, scope, receive, send) -> None:
+        scope = dict(
+            scope,
+            path="/",
+            root_path=scope.get("root_path", "") + "/mcp",
+            app_root_path=scope.get("app_root_path", scope.get("root_path", "")),
+        )
+        await self._app(scope, receive, send)
+
+
 def create_app(
     *,
     settings: Settings,
@@ -228,6 +264,10 @@ def create_app(
         middleware.append(Middleware(TrustedHostMiddleware, allowed_hosts=hosts))
 
     routes.append(Route("/health", _health, methods=["GET"]))
+    # [2026-10-22, P10.5 Block 6, Schritt 6.3] `/mcp` **ohne** Slash: die exakte Route kommt
+    # **vor** dem Mount, sonst schickt Starlette den Request mit 307 auf `/mcp/`. Beide Zeilen
+    # bedienen dieselbe innere App (`_ExactMcpMount` baut denselben Scope, den der Mount baut).
+    routes.append(Route("/mcp", endpoint=_ExactMcpMount(bearer), methods=["GET", "POST", "DELETE"]))
     routes.append(Mount("/mcp", app=bearer))
 
     app = Starlette(

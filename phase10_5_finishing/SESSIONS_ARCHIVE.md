@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-23 (Block-4-Block rotiert — Deploy A `v3.1.5` vorbereitet: Badge + Update-Log, Dev-venv frisch aus `main`) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,169 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-23 (P10.5-26 ✅ — opencode führt `list_spaces` aus; der Auslöser lag im Messgerät)
+
+**Ergebnis.** opencode 1.19.4 ruft gegen unseren Wegwerf-Server `list_spaces` auf — serverseitig
+belegt: `ev=tool, tool=list_spaces, ok=true, proto=2025-11-25`. **Kein Produktcode angefasst,
+P2-B unberührt.** Zwei Fehler lagen im **Messgerät**, nicht im Server:
+
+1. **Der Stub-Prototyp lief endlos.** Er erkannte sein eigenes Werkzeug-Ergebnis an der
+   Zeichenkette `list_spaces` **im Ergebnisinhalt** — dort steht sie nie (das Ergebnis ist die
+   Liste der Spaces). Der Name steht in der `tool_calls`-Liste der vorangegangenen
+   Assistenten-Nachricht. Folge: 1500 Nachrichten in 120 s, dann Timeout — der „Timeout" der
+   Notiz vom 2026-10-22 war **das Messgerät**, nicht der Client.
+2. **Der `opencode mcp debug`-Schritt stand vor dem Werkzeuglauf** und hat ihn kaputt gemacht:
+   direkt danach sah der Modell-Request **kein** MCP-Werkzeug, und der Server-Log enthielt
+   **null** `ev=tool`-Zeilen (in der ganzen Datei). Reihenfolge jetzt: Auth → Werkzeuglauf →
+   Debug.
+
+**Die zwei Verdachtsmomente sind widerlegt — gemessen, nicht behauptet.**
+- **„`GET /mcp` → 405 ist die Ursache"** (2026-10-22): **nein.** Gegen einen offenen
+  FastMCP-Server (`stateless_http` true **und** false) arbeitet opencode einwandfrei; der 405
+  steht auch im **erfolgreichen** Lauf gegen unseren Server im Log.
+- **„Der Werkzeugaufruf gelang serverseitig"** (2026-10-22): **damals nicht belegt** — die
+  Wegwerf-`serve.log` enthielt bis heute **null** `ev=tool`-Zeilen (die Zeile kam aus einem
+  anderen Lauf). Jetzt steht sie im Log **desselben** Laufs.
+
+**Weitere Messungen (Wegwerf, `phase10_5_finishing/probes/`).**
+- `p105_b6_transport_probe.py`: zwei FastMCP-Server (POST-only vs. POST+SSE) — **beide**
+  funktionieren; der Beleg ist die Werkzeugliste des Modell-Requests.
+- `p105_b6_opencode_matrix_probe.py`: vier Varianten gegen **unseren** Server (OAuth-Default,
+  statischer Bearer, `protocol: auto`, `protocol: 2026-07-28`) — **alle vier** sehen die 11
+  MCP-Werkzeuge. Der Wegwerf-Bearer-Token wird nirgends ausgegeben (maskiert).
+
+**Offen / nächster Schritt.** **P10.5-27/28** (Live P10-J, zwei Modellanbieter) bleiben beim
+Nikinger — nach Deploy B (`v3.1.6`). Die Live-Sichtprüfungen zu Deploy A (P10.5-18, Caddy-Zeile,
+Handyfoto-Upload, Spaces-Panel) ebenfalls beim Nikinger.
+
+## Session stopped — 2026-10-23 (Deploy A `v3.1.5` vorbereitet — Badge, Update-Log, Suite 1335 grün)
+
+**Ergebnis.** Deploy A ist **vorbereitet, nicht ausgeführt**: Badge `v3.1.5`
+(`phase5_ui/webui/static/app.html:20`), neuer `## 2026-10-23`-Block in `docs/UPDATE_LOG.md`
+(5 Zeilen für Menschen, am echten `parse_update_log()` gegengeprüft), Dev-venv **frisch** aus
+`main` gebaut — `main` pinnt `fastmcp 3.4.7`, das Venv trug vorher 4.1.3 aus dem Branch
+(zwei Wächter wären rot gewesen, P10.5-Q).
+
+**Gemessen (Basis `a1cc523` = `main`):** `pytest` **1335 grün** (337,9 s) · `doc_health` 0 ·
+`ui_budget` 5/5 (176,9 KB gzip; Erstaufruf 188,5 KB) · `pip freeze` = `constraints.txt`
+(`fastmcp 3.4.7`, `mcp 1.30.0`, `starlette 1.7.0`) — der Wächter
+`test_every_installed_distribution_matches_the_constraints` ist grün.
+
+**Ein Doku-Befund (Drift, behoben).** Die Summenzeile der Abnahmetabelle stand auf
+`18 ✅ · 0 ⚠️ · 43 ⬜`, die Tabelle trug **17** ✅ und **44** ⬜ → Zähler nachgezogen. Auf
+`p105-block5` ist dieselbe Zeile bereits richtig (23 ✅, Korrekturnotiz vom 2026-10-22) — nach
+dem Merge gilt deren Stand.
+
+**Offen / nächster Schritt.** **Deploy A ist beim Nikinger** (Hard Rule 9, `sudo`); der Aufruf
+steht wörtlich unter „Offen beim Nikinger", danach liest Claude Code `health_gate.sh` mit
+**echter Ausgabe**. **Reihenfolge (Nikinger-Entscheidung 2026-10-23): Deploy A aus `main`
+zuerst, dann der Merge von `p105-block5` nach `main`, dann Deploy B (`v3.1.6`)** — der Merge
+darf **nicht** vor dem Deploy A auf `main` landen, sonst deployt `deploy.sh main` den
+Block-5/6-Stand unter der Nummer `v3.1.5`. Merge-Konflikt absehbar in der Phase-Head-Datei
+(beide Seiten haben sie umgeschrieben) — von Hand auflösen, dann den Session-Block rotieren.
+**P10.5-26 bleibt ⬜** und ist **vor** 10-27/28 zu klären (der Werkzeugaufruf gelingt
+serverseitig, opencode setzt die Sitzung nicht fort).
+
+**Ausführer-Daten.** opencode/MiniMax-M3.1-Flash · Kontextgrenze 400.000 (P10.5-C erfüllt) ·
+kein `systemctl`, kein `sudo`, kein echter `DATA_ROOT`, kein Keyring, kein `pkill -f`;
+`/opt/sharefyx/current` nur **gelesen** (Release `20261008T201607.460757Z`).
+
+## Session stopped — 2026-10-22 (Block 6 ✅ — Anbieter: PA-1, PA-2, `/mcp` ohne Slash, PA-6)
+
+**Ergebnis.** Die zweite Vergleichsregel ist gebaut (`http://127.0.0.1:<port>`, Port explizit, P10.5-O),
+`application_type` kennt {fehlend, null, native, web}, die CSP `form-action` trägt `http://127.0.0.1:*`,
+und `/mcp` wird **ohne** Slash exakt bedient (kein 307). **V209 ✅** (opencode 1.19.4), **V197 ✅**
+(Chromium folgt dem Loopback-Redirect), **PA-6 ✅** (Wurzel-`CLAUDE.md`).
+
+**Geliefert.** `clients.py` (zweite Regel + `application_type`), `config.py` (CSP), `app.py`
+(`_ExactMcpMount` + `Route("/mcp")`), `CLAUDE.md` (eine Zeile), 22 neue Tests, drei Proben
+(`p105_b6_dcr_probe.py`, `p105_b6_opencode_e2e.py`, `p105_b6_consent_browser.py`).
+
+**Gemessen.** `pytest` **1376 grün** (1354 + 22) · `doc_health` 0 · `ui_budget` 5/5 · sieben Gegenläufe
+wirksam · **DCR**: derselbe opencode-Request → vorher 400 `invalid_redirect_uri`, jetzt **201** ·
+**V197**: Chromium folgt dem 302 auf `http://127.0.0.1:19876/…` (keine CSP-Verletzung); Gegenlauf ohne
+den CSP-Eintrag: Chromium blockiert das Formular lautlos, der Callback kommt nicht an · **`/mcp` ohne
+Slash**: opencode geht direkt auf `/mcp` (vorher 307 → zweiter Versuch auf `/mcp/`).
+
+**Vier Befunde.** (1) Der Issuer-Rewrite-Proxy aus M3 ist für diese Messung **schädlich**: er schreibt
+den `resource`-Parameter auf `http://…`, der Server erwartet `https://…` → opencode bricht mit
+„resource stimmt nicht mit der erwarteten Ressource überein" ab. **Der Server hat recht, der Proxy
+hat gelogen** — deshalb diese Messung ohne Proxy. (2) opencode 1.19.4 fährt mit
+`NODE_TLS_REJECT_UNAUTHORIZED=0` **auch im OAuth-Pfad** gegen ein selbstsigniertes Zertifikat — die
+M3-Messung (1.18.33) galt für 1.18.33. (3) Die MCP-Werkzeuge des `build`-Agenten sind **nicht**
+standardmäßig aktiv; das Muster ist `"<server>_*"` (`sharefyx_list_spaces`). (4) **`GET /mcp` → 405**:
+opencode öffnet einen SSE-Strom, unser stateless Server kennt nur POST/DELETE (P2-B). Der
+Werkzeugaufruf **selbst gelingt** (eigenes Log: `ev=tool, tool=list_spaces, ok=true`), opencode setzt
+die Sitzung danach aber nicht fort.
+
+**Nächster Block:** 7 (Darstellung) — der Startauftrag mit den **heute geprüften Ankern**
+steht oben in diesem Head.
+
+**Offen / nächster Schritt.** **P10.5-26 bleibt ⬜** (siehe „Offen beim Nikinger"): der Werkzeugaufruf
+ist serverseitig bewiesen, die opencode-Sitzung läuft nicht weiter — **vor** der Live-Abnahme
+10-27/28 zu klären. `phase4_auth/scripts/abnahme_run.sh:110` trägt einen Kommentar zum alten
+307-Verhalten (außerhalb der erlaubten Pfade → nicht angefasst). Deploy B (`v3.1.6`) steht aus
+(Block 5 + 6 zusammen); die Merge-Reihenfolge entscheidet der Nikinger.
+
+**Ein Dateigrößen-Befund (für Block 12).** Zwei lebende Dokumente stehen knapp unter der
+40-KiB-Grenze: `phase2_mcp/CLAUDE.md` (40.631 B, **329 B** Luft) und
+`phase10_inventory/BAUSTELLENREGISTER.md` (39.802 B, 1.158 B Luft — Block 0.8 hatte 3.386 B
+freigeräumt, Block 5 hat 1.676 B verbraucht, Block 6 0.5 B). Die Blöcke 7–12 haken im Register
+je Zeile ab: **ohne Rotation/Rotation der Langtexte läuft es über die Grenze.** Beide Dateien
+tragen jetzt einen Kürzungs-Weg, aber **kein automatischer** — das ist Doku-Arbeit, kein
+Code-Eingriff.
+
+**Auslegung von P10.5-E (hier offengelegt, nicht stillschweigend):** die drei Probe-Dateien
+liegen in `phase10_5_finishing/probes/` — der Blockkopf nennt den Ordner nicht, **Schritt 6.6 aber
+den Dateinamen** (`p105_b6_opencode_e2e.py`). Weitere Eingriffe außerhalb der Blockpfade: keine.
+
+**Ausführer-Daten.** opencode/MiniMax-M3.1-Flash (Open-Test, P10.5-B) · Kontextgrenze 400 K geprüft
+(`~/.config/opencode/opencode.json`: `MiniMax-M3.1-Flash` → `limit.context` 400000) · keine Eingriffe
+Nikinger · keine Claude-Code-Session in diesem Block · kein `systemctl`/`sudo`, kein echter
+`DATA_ROOT`, kein Zugriff auf die echte `auth.sqlite3` oder den Keyring.
+
+## Session stopped — 2026-10-22 (Block 5 ✅ — MCP-Schicht: PA-5 FastMCP 4, LG-4)
+
+**Ergebnis.** `fastmcp` steht exakt auf **4.1.3** (`mcp 2.3.0`, `starlette 1.9.0`); der Server bedient
+beide Protokoll-Ären (`legacy` `2025-11-25`, `auto` `2026-07-28`). Neu: Werkzeug `append_to_items`
+(LG-4, Lock P10.5-J) und das Log-Feld `proto`. **V207 ✅** (Changelog 4.1.1–4.1.3: keine Änderung an
+`http_app`/`Middleware`/`get_http_request`/`ToolError`/`Image`), **V219 ✅** (`Context.request_context.protocol_version`).
+
+**Geliefert.** `pyproject.toml` (Pin + datierte Ablösung von P9-R) · `constraints.txt` neu aus frischem
+venv · `request_log.py` (`proto`, `err:"partial"`) · `tools.py` (`AppendEntry`, `_append_checked` als
+**ein** Schreibpfad für beide Append-Werkzeuge, `append_to_items`) · Tests: 5 `append_to_items`, 3 Log,
+8 Probe-Wächter, `test_app.py` (11 Werkzeuge, snake_case), `test_step_h_deps.py` (4.1-Linie statt 3.4) ·
+`mcp_smoke.py` Check 17 · `probes/p105_b5_protocol_probe.py` + JSON.
+
+**Gemessen.** `pytest` **1354 grün** — mit Compat an, und mit `FASTMCP_MCP_CAMELCASE_COMPAT=false` +
+`-W error::DeprecationWarning` · `doc_health` 0 · Smoke **17/17** · Gegenläufe alle wirksam
+(`extra="forbid"`, `proto`, `partial` — auch durch den echten Stack, `mcp 2.2.0` → Constraint-Wächter rot) ·
+`constraints.txt`: −22/+25 Zeilen, u. a. `mcp 1.30→2.3`, `starlette 1.7→1.9`, `Authlib 1.8→1.9.1`,
+`joserfc 1.7.5→1.7.7`, `pydantic 2.14.0→2.14.1`, `certifi` neu, `truststore` neu; `cryptography`/`uvicorn`/`anyio` unverändert.
+
+**Vier Befunde.** (1) Der dokumentierte Kopf-Befehl `sed -n '1,/^$/p' constraints.txt` kopiert die
+**ganze** Datei (sie hat keine Leerzeile) — jetzt `grep '^#'`. (2) Beim Umbau von `append_to_item` rutschte
+der `@mcp.tool`-Decorator auf den Hilfsfunktions-Namen: **nur** der Smoke und `test_app.py` fingen es, die
+Unit-Tests rufen rohe Funktionen — Lehre: Registrierung gehört in einen Test über `tools/list`. (3) Planzeilen
+waren gedriftet (`test_app.py:438–441`, `test_tools.py:1062` statt 384–387/921) und ein Wächter, den der Plan
+nicht nannte (`…stays_inside_the_three_line`, plus der Kommentar-Wächter) war rot: Code gewinnt. (4) Unbekannte
+Version bei `initialize` → Antwort mit der eigenen Version, **kein** Fehler (der Plantext gilt nur für die
+zustandslose Ära, dort `-32022`). Nicht angefasst: `phase7_spaces_admin/scripts/p7_13_…probe.py:149` liest
+`mimeType` per `getattr` (liefert unter 4.x `None`) — Wegwerf-Skript außerhalb der erlaubten Pfade.
+
+**Ausführer-Daten.** **Abweichung:** diese Session lief als Claude Code, nicht als
+opencode/M3.1 Flash — kein Modell-Trailer des Open-Tests, P10.5-C (400 K) nicht anwendbar · Wanduhrzeit nicht
+gemessen · keine Eingriffe Nikinger · kein `systemctl`/`sudo`, kein echter `DATA_ROOT`, keine Wegwerf-Instanz.
+
+**Offen / nächster Schritt.** **Dieser Stand liegt auf dem Zweig `p105-block5`, nicht auf `main`** — `deploy.sh main`
+würde sonst FastMCP 4 in Deploy A mitnehmen (P10.5-R: vier getrennte Deploys; P10.5-18 messen). Ob/wann er nach
+`main` geht, entscheidet der Nikinger. **Auf `main` zuerst das Dev-venv neu bauen** (`.venv` trägt `fastmcp 4.1.3`,
+`main` pinnt `3.4.7` → zwei Wächter rot). Deploy A (`v3.1.5`, Block 1–4) steht aus, Deploy B nach Block 6.
+P10.5-E-Prüfung: ein Treffer außerhalb der Blockpfade, `tests/test_protocol_probe.py` (Plan 5.6 nennt ihn).
+**Vor Deploy B (5.7):** der Nikinger sagt Fabian Bescheid (kurzer Neustart, kein Re-Auth erwartet); live
+`.venv` im Release wird mit `-c constraints.txt` gebaut. **Beim Nikinger:** P10.5-18, P10.5-22 (Connector +
+Log-Feld `proto`, V208), AL-1 Zeile 15, V203, P10.5-27/28. Nächster Block: **6** (Anbieter: PA-1, PA-2, `/mcp`, PA-6).
 
 ## Session stopped — 2026-10-22 (Block 4 ✅ — Performance: PF-1, PF-4, Z1–Z4)
 

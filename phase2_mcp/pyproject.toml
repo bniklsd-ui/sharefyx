@@ -18,11 +18,12 @@ requires-python = ">=3.10"
 # bewusste Entscheidung; `phase9_hardening/tests/test_step_h_deps.py` vergleicht die installierte
 # Version gegen diese Zeile und läuft im Release-venv mit (deploy.sh:169) — ein Drift ist damit
 # ein roter Deploy statt ein stiller.
-# Obergrenze bleibt 3.4.x (P9-R): FastMCP 4 / MCP-Revision 2026-07-28 ist **nicht** diese Zeile,
-# sondern V79, eigene Mini-Phase seit P5-C. Ein Bump auf 4.x ist eine eigene Entscheidung, kein
-# Nebenbei-Update — und die drei Releases 3.4.5/3.4.6/3.4.7 änderten ausschließlich OAuth-,
-# SSRF- und JWKS-Pfade, die dieses Projekt nicht benutzt (V163, siehe Plan §10).
-dependencies = ["storage", "fastmcp==3.4.7", "keyring>=25", "uvicorn>=0.30"]
+# [2026-10-22, P10.5 Block 5] Obergrenze 3.4.x (P9-R) aufgehoben — FastMCP 4 / MCP 2026-07-28 ist
+# P10.5-P; Trockenlauf 2026-10-20: Suite 1267/1268 vor Testanpassung. V207: neueste 4.1.x ist
+# 4.1.3; Changelog 4.1.1–4.1.3 nennt keine Änderung an http_app, Middleware, get_http_request,
+# ToolError oder utilities.types.Image. Der Rückweg ist rollback.sh (eigenes venv je Release).
+# (Der Absatz davor — P9-R, 3.4.x, V79/P5-C, V163 — ist damit historisch.)
+dependencies = ["storage", "fastmcp==4.1.3", "keyring>=25", "uvicorn>=0.30"]
 
 [project.optional-dependencies]
 dev = ["pytest", "pytest-asyncio", "httpx"]

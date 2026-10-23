@@ -17,7 +17,7 @@ import os
 from contextlib import contextmanager
 
 import pytest
-from fastmcp import FastMCP
+from fastmcp import Client, FastMCP
 from fastmcp.exceptions import ToolError
 
 from mcpserver import context, tools
@@ -600,6 +600,93 @@ def test_append_to_item_foreign_space_denied(tools_map, store):
         tools_map["append_to_item"](item.id, version=item.version, text="Hack")
 
 
+# -- append_to_items (P10.5 Block 5, LG-4, Lock P10.5-J) --------------------------------
+
+
+def _entries(*items_and_texts):
+    return [
+        tools.AppendEntry(item_id=i.id, version=i.version, text=t) for i, t in items_and_texts
+    ]
+
+
+def test_append_to_items_appends_each_with_its_own_version(tools_map, store):
+    a = store.create(SPACE_A, type="note", title="A", body="eins")
+    b = store.create(SPACE_A, type="note", title="B", body="zwei")
+
+    with _as(SPACE_A):
+        out = json.loads(tools_map["append_to_items"](_entries((a, "+a"), (b, "+bb"))))
+
+    assert out["ok"] == 2 and out["failed"] == 0
+    assert [r["item_id"] for r in out["results"]] == [a.id, b.id]
+    assert [r["appended_bytes"] for r in out["results"]] == [2, 3]
+    # je Eintrag eigene Versionserhöhung und eigener Store-Write
+    assert [r["version"] for r in out["results"]] == [a.version + 1, b.version + 1]
+    assert "+a" in store.get(a.id).body and "+bb" in store.get(b.id).body
+
+
+def test_append_to_items_reports_conflict_and_continues(tools_map, store):
+    a = store.create(SPACE_A, type="note", title="A", body="eins")
+    b = store.create(SPACE_A, type="note", title="B", body="zwei")
+    store.update(a.id, version=a.version, title="Extern geändert")  # a.version ist jetzt veraltet
+
+    with _as(SPACE_A):
+        out = json.loads(tools_map["append_to_items"](_entries((a, "+a"), (b, "+b"))))
+
+    assert (out["ok"], out["failed"]) == (1, 1)
+    assert out["results"][0]["ok"] is False and out["results"][0]["error"] == "conflict"
+    assert out["results"][1]["ok"] is True
+    assert "+a" not in store.get(a.id).body  # Hard Rule 3: der veraltete Eintrag schrieb nichts
+    assert "+b" in store.get(b.id).body
+
+
+def test_append_to_items_denies_foreign_entry_and_continues(tools_map, store):
+    mine = store.create(SPACE_A, type="note", title="Mein", body="x")
+    foreign = store.create(SPACE_B, type="note", title="Fremd", body="y")
+
+    with _as(SPACE_A):
+        out = json.loads(
+            tools_map["append_to_items"](_entries((foreign, "Hack"), (mine, "ok")))
+        )
+
+    assert (out["ok"], out["failed"]) == (1, 1)
+    assert out["results"][0]["error"] == "write_denied"
+    assert "Hack" not in store.get(foreign.id).body
+    assert "ok" in store.get(mine.id).body
+
+
+@pytest.mark.parametrize("count", [0, 21])
+def test_append_to_items_rejects_empty_and_more_than_20(tools_map, store, count):
+    item = store.create(SPACE_A, type="note", title="A", body="x")
+    entries = [tools.AppendEntry(item_id=item.id, version=item.version, text="t")] * count
+
+    with _as(SPACE_A), pytest.raises(ToolError, match="validation_failed"):
+        tools_map["append_to_items"](entries)
+    assert store.get(item.id).version == item.version  # nichts geschrieben
+
+
+def test_append_to_items_rejects_unknown_entry_fields(store, permissions):
+    """`extra="forbid"` — ein `return_body` je Eintrag würde sonst still ignoriert."""
+    item = store.create(SPACE_A, type="note", title="A", body="x")
+    mcp = FastMCP("test-append-many")
+    tools.register(mcp, store=store, permissions=permissions)
+
+    async def _call():
+        async with Client(mcp) as client:
+            return await client.call_tool(
+                "append_to_items",
+                {"entries": [{"item_id": item.id, "version": item.version, "text": "t",
+                              "return_body": True}]},
+                raise_on_error=False,
+            )
+
+    with _as(SPACE_A):
+        result = asyncio.run(_call())
+
+    assert result.is_error
+    assert "return_body" in result.content[0].text  # der Fehler nennt das fremde Feld, kein Fremdfehler
+    assert store.get(item.id).version == item.version
+
+
 def test_update_item_conflict_message_contains_current_version(tools_map, store):
     item = store.create(SPACE_A, type="task", title="X")
     store.update(item.id, version=item.version, title="Extern geändert")
@@ -1059,7 +1146,7 @@ def test_get_item_asset_returns_image_content_for_own_item(tools_map, store):
         image = tools_map["get_item_asset"](item.id, asset.id)
 
     content = image.to_image_content()
-    assert content.mimeType == "image/png"
+    assert content.mime_type == "image/png"
     assert base64.b64decode(content.data) == _PNG
 
 

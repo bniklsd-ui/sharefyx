@@ -52,6 +52,7 @@ from datetime import date, datetime, timezone
 from typing import Any
 
 from fastmcp import FastMCP
+from pydantic import BaseModel, ConfigDict
 from fastmcp.exceptions import ToolError
 from fastmcp.utilities.types import Image
 
@@ -91,6 +92,20 @@ _STORE_FETCH_LIMIT = 5000
 # Screenshots hoch, nie großformatige Fotos) — Rohgröße NACH der Base64-Dekodierung, eigener,
 # kleinerer Riegel als der Web-UI-Weg (P6.5-L, MAX_ASSET_BYTES = 5 MiB dort).
 MAX_MCP_ASSET_BYTES = 1 * 1024 * 1024
+
+# P10.5-J / LG-4: Obergrenze der Einträge je `append_to_items`-Aufruf.
+MAX_APPEND_ENTRIES = 20
+
+
+class AppendEntry(BaseModel):
+    """Ein Eintrag von `append_to_items` — `extra="forbid"`: ein Tippfehler im Feldnamen ist ein
+    Fehler, kein stilles Weglassen (ein `return_body` etwa würde sonst unbemerkt ignoriert)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    item_id: str
+    version: int
+    text: str
 
 
 class PermissionDenied(Exception):
@@ -863,6 +878,22 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             return item_to_filetext(item)
         return write_receipt(item, op="update")
 
+    def _append_checked(principal: Any, item_id: str, version: int, text: str) -> Item:
+        """Der **eine** Schreibpfad von `append_to_item` und `append_to_items` (P10.5-J):
+        `acl_of` → `can_write_item(AGENT)` → `store.append(version, actor)`. Wirft `ToolError`."""
+        try:
+            acl = store.acl_of(item_id)
+        except ItemNotFound as exc:
+            raise map_storage_error(exc) from exc
+
+        if not permissions.can_write_item(principal.space, acl, surface=Surface.AGENT):
+            raise map_storage_error(PermissionDenied(acl.space)) from None
+
+        try:
+            return store.append(item_id, version=version, text=text, actor=principal.space)
+        except (ItemNotFound, ConflictError, ValidationError) as exc:
+            raise map_storage_error(exc) from exc
+
     @mcp.tool(
         title="Text an Item anhängen",
         description=(
@@ -886,21 +917,55 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         item_id: str, version: int, text: str, return_body: bool = False
     ) -> str:
         principal = _authenticated_principal()
-        try:
-            acl = store.acl_of(item_id)
-        except ItemNotFound as exc:
-            raise map_storage_error(exc) from exc
-
-        if not permissions.can_write_item(principal.space, acl, surface=Surface.AGENT):
-            raise map_storage_error(PermissionDenied(acl.space)) from None
-
-        try:
-            item = store.append(item_id, version=version, text=text, actor=principal.space)
-        except (ItemNotFound, ConflictError, ValidationError) as exc:
-            raise map_storage_error(exc) from exc
+        item = _append_checked(principal, item_id, version, text)
         if return_body:
             return item_to_filetext(item)
         return write_receipt(item, op="append", appended_bytes=len(text.encode("utf-8")))
+
+    @mcp.tool(
+        title="Text an mehrere Items anhängen",
+        description=(
+            "Hängt an bis zu 20 Items je einen Text an (LG-4). Jeder Eintrag braucht seine eigene "
+            "zuletzt gelesene version und ist ein eigener Schreibvorgang mit eigener Quittung — "
+            "Teilerfolg ist möglich, ein Konflikt oder ein fremdes Item stoppt die anderen Einträge "
+            "nicht. Das Ergebnis nennt je Eintrag ok:true (neue version) oder ok:false (error + "
+            "detail). Bei conflict: wie bei append_to_item — das Item neu lesen und nur diesen "
+            "Eintrag wiederholen. Für ein einzelnes Item reicht append_to_item. " + WRITE_TOOL_DIVISION
+        ),
+        annotations={
+            "readOnlyHint": False,
+            "destructiveHint": False,
+            "idempotentHint": False,
+            "openWorldHint": False,
+        },
+    )
+    def append_to_items(entries: list[AppendEntry]) -> str:
+        principal = _authenticated_principal()
+        if not 1 <= len(entries) <= MAX_APPEND_ENTRIES:
+            raise ToolError(
+                f"invalid: validation_failed — 1–{MAX_APPEND_ENTRIES} Einträge je Aufruf, "
+                f"übergeben wurden {len(entries)}"
+            )
+        results: list[dict[str, Any]] = []
+        for entry in entries:
+            try:
+                item = _append_checked(principal, entry.item_id, entry.version, entry.text)
+            except ToolError as exc:
+                error, _, detail = str(exc).partition(":")
+                results.append(
+                    {"item_id": entry.item_id, "ok": False, "error": error, "detail": detail.strip()}
+                )
+                continue
+            results.append(
+                {
+                    "item_id": entry.item_id,
+                    "ok": True,
+                    "version": item.version,
+                    "appended_bytes": len(entry.text.encode("utf-8")),
+                }
+            )
+        n_ok = sum(1 for r in results if r["ok"])
+        return compact_json({"results": results, "ok": n_ok, "failed": len(results) - n_ok})
 
     @mcp.tool(
         title="Item punktuell ändern",
@@ -1096,6 +1161,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
         "create_item": create_item,
         "update_item": update_item,
         "append_to_item": append_to_item,
+        "append_to_items": append_to_items,
         "patch_item": patch_item,
         "get_item_asset": get_item_asset,
         "put_item_asset": put_item_asset,

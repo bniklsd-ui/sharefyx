@@ -57,8 +57,17 @@ class AuthSettings:
         §2.6 [SEAM]). Kein Widerspruch zu diesem Seam: hier wird nichts gegen eine Redirect-URI
         verglichen, die Liste wird nur in einen Header-Wert übersetzt — trotzdem an der Stelle
         gebaut, an der `allowed_redirect_origins` schon lesbar ist, statt eine zweite Stelle zu
-        öffnen."""
-        return " ".join(("'self'", *self.allowed_redirect_origins))
+        öffnen.
+
+        **[2026-10-22, P10.5 Block 6, Lock P10.5-O]** Neu: `http://127.0.0.1:*`. Chromium
+        prüft `form-action` auch gegen das Redirect-Ziel einer Formularantwort (P4 Live-Fund
+        8c, 2026-07-30) — der Consent-POST nach dem Login endet bei einem nativen Client mit
+        einem Rücksprung auf `http://127.0.0.1:<port>/…`; ohne diesen Eintrag blockiert der
+        Browser **lautlos** (V197). Der Port steht als `*`, weil der native Client seinen Port
+        selbst wählt (RFC 8252 §7.3); `localhost` und `[::1]` stehen hier bewusst nicht — eine
+        CSP-Host-Quelle kann kein IPv6-Literal ausdrücken (V210).
+        """
+        return " ".join(("'self'", *self.allowed_redirect_origins, "http://127.0.0.1:*"))
 
 
 def _parse_redirect_origins(raw: str | None) -> tuple[str, ...]:

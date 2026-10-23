@@ -26,6 +26,7 @@ import pytest
 from fastmcp import Client
 from fastmcp.client.transports import StreamableHttpTransport
 from starlette.applications import Starlette
+from starlette.routing import Mount, get_route_path
 from starlette.responses import Response
 
 from authserver.config import AuthSettings
@@ -33,7 +34,7 @@ from authserver.store import AuthStore
 from authserver.userdir import UserDirectory
 
 from mcpserver import __version__
-from mcpserver.app import OAuthConfig, create_app
+from mcpserver.app import OAuthConfig, _ExactMcpMount, create_app
 from mcpserver.config import Settings
 from sharefyx_image_bytes import png_bytes
 from storage.store import Store
@@ -387,11 +388,49 @@ async def test_mcp_requires_token(app):
 
 
 @pytest.mark.asyncio
-async def test_mcp_bare_mount_redirects_without_leaking(app):
-    """`POST /mcp` (ohne Trailing-Slash) trifft Starlettes eigenes `redirect_slashes` **vor**
-    `BearerAuthASGI` — das ist eine dritte, von 401 unterscheidbare Antwortform (307), trägt aber
-    keine Space- oder Pfaddaten. Festgehalten, damit dieses Verhalten nicht erst bei der
-    Live-Probe überrascht (Advisor-Review, Step 5)."""
+async def test_mcp_without_trailing_slash_is_served_without_redirect(app, token_alpha):
+    """[2026-10-22, P10.5 Block 6, Schritt 6.3] `POST /mcp` (ohne Trailing-Slash) wird jetzt
+    **exakt** bedient, kein 307 mehr. Der alte Test `test_mcp_bare_mount_redirects_without_leaking`
+    (Zeile 390) behauptete das Gegenteil und ist mit dieser Aenderung **ersetzt** — nicht
+    gelöscht: die alte Antwortform (307, von 401 unterscheidbar) trug keine Space- oder
+    Pfaddaten, das war auch nach dem Umbau nicht der Grund fuer die Aenderung, sondern der
+    Umleitungszwang selbst (ein Client, der der 307 nicht folgt, scheitert; die Abnahme-URL aus
+    P10-C steht ohne Slash)."""
+    transport = httpx.ASGITransport(app=app)
+    async with app.router.lifespan_context(app):
+        async with httpx.AsyncClient(
+            transport=transport,
+            base_url="http://testserver",
+            follow_redirects=False,
+        ) as client:
+            response = await client.post(
+                "/mcp",
+                headers={
+                    "Authorization": f"Bearer {token_alpha}",
+                    "Accept": "application/json, text/event-stream",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "initialize",
+                    "params": {
+                        "protocolVersion": "2025-06-18",
+                        "capabilities": {},
+                        "clientInfo": {"name": "p105-b6", "version": "0.0.1"},
+                    },
+                },
+            )
+
+    assert response.status_code != 307
+    assert "location" not in response.headers
+
+
+@pytest.mark.asyncio
+async def test_mcp_without_trailing_slash_requires_bearer(app):
+    """Dieselbe Route ohne Token: 401 mit `WWW-Authenticate` — **kein** 307, kein 404. Die
+    Auth-Challenge muss auch auf der exakten Route ankommen, sonst faellt ein Client, der
+    `/mcp` benutzt, auf eine HTML-Fehlerseite zurueck statt die Challenge zu sehen."""
     async with httpx.AsyncClient(
         transport=httpx.ASGITransport(app=app),
         base_url="http://testserver",
@@ -399,13 +438,53 @@ async def test_mcp_bare_mount_redirects_without_leaking(app):
     ) as client:
         response = await client.post("/mcp", json={})
 
-    assert response.status_code == 307
+    assert response.status_code == 401
     assert response.text == ""
-    assert response.headers["location"] == "http://testserver/mcp/"
+    assert "WWW-Authenticate" in response.headers
 
 
 @pytest.mark.asyncio
-async def test_tools_list_returns_ten_tools(app, token_alpha):
+async def test_exact_mcp_mount_builds_the_same_scope_as_starlettes_mount():
+    """[2026-10-22, P10.5 Block 6, Schritt 6.3] `_ExactMcpMount` gibt der inneren App
+    **denselben** Scope, den Starlettes `Mount("/mcp")` gibt — das steht im Docstring der Klasse
+    und wird hier festgehalten: `root_path` und `app_root_path` gleich, und die Route, die die
+    innere App sieht (`get_route_path()` = `path` minus `root_path`), ebenfalls gleich.
+
+    Ohne diesen Test waere der Docstring eine Behauptung: ein Weglassen von `root_path` (Gegenlauf
+    G6 dieser Session) haette die beiden `/mcp`-Tests **gruen** gelassen, weil die innere App
+    ihre Route auch ohne `root_path` findet — nur ihre Basis-URL waere dann eine andere.
+    """
+    seen: list[dict] = []
+
+    async def _capture(scope, receive, send):
+        seen.append(scope)
+
+    base_scope = {
+        "type": "http",
+        "path": "/mcp/",
+        "raw_path": b"/mcp/",
+        "root_path": "",
+        "headers": [],
+        "method": "POST",
+        "scheme": "http",
+        "query_string": b"",
+        "server": ("testserver", 80),
+        "client": ("testclient", 123),
+    }
+
+    await Mount("/mcp", app=_capture)(dict(base_scope), None, None)
+    await _ExactMcpMount(_capture)(
+        {**base_scope, "path": "/mcp", "raw_path": b"/mcp"}, None, None
+    )
+
+    mounted, exact = seen
+    assert mounted["root_path"] == exact["root_path"] == "/mcp"
+    assert mounted["app_root_path"] == exact["app_root_path"] == ""
+    assert get_route_path(mounted) == get_route_path(exact) == "/"
+
+
+@pytest.mark.asyncio
+async def test_tools_list_returns_eleven_tools(app, token_alpha):
     async with app.router.lifespan_context(app):
         async with _mcp_client(app, token_alpha) as client:
             tools = await client.list_tools()
@@ -419,6 +498,7 @@ async def test_tools_list_returns_ten_tools(app, token_alpha):
         "create_item",
         "update_item",
         "append_to_item",
+        "append_to_items",
         "patch_item",
         "get_item_asset",
         "put_item_asset",
@@ -435,10 +515,10 @@ async def test_tools_list_annotations_present(app, token_alpha):
         assert tool.title, f"{tool.name} hat keinen Titel"
         assert tool.description, f"{tool.name} hat keine Beschreibung"
         assert tool.annotations is not None, f"{tool.name} hat keine Annotations"
-        assert tool.annotations.readOnlyHint is not None
-        assert tool.annotations.destructiveHint is not None
-        assert tool.annotations.idempotentHint is not None
-        assert tool.annotations.openWorldHint is not None
+        assert tool.annotations.read_only_hint is not None
+        assert tool.annotations.destructive_hint is not None
+        assert tool.annotations.idempotent_hint is not None
+        assert tool.annotations.open_world_hint is not None
 
 
 @pytest.mark.asyncio

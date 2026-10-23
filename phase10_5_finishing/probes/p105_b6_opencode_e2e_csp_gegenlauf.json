@@ -1,0 +1,63 @@
+{
+  "probe": "p105_b6_opencode_e2e",
+  "opencode_binary": "/tmp/opencode/p105-b6-oc/node_modules/.bin/opencode",
+  "base_url": "https://127.0.0.1:8799",
+  "opencode_config": {
+    "$schema": "https://opencode.ai/config.json",
+    "provider": {
+      "stub": {
+        "npm": "@ai-sdk/openai-compatible",
+        "name": "Stub",
+        "options": {
+          "baseURL": "http://127.0.0.1:18123/v1",
+          "apiKey": "stub"
+        },
+        "models": {
+          "stub-1": {
+            "name": "Stub 1",
+            "tool_call": true
+          }
+        }
+      }
+    },
+    "model": "stub/stub-1",
+    "agent": {
+      "build": {
+        "tools": {
+          "sharefyx_*": true,
+          "glob": true
+        }
+      }
+    },
+    "mcp": {
+      "sharefyx": {
+        "type": "remote",
+        "url": "https://127.0.0.1:8799/mcp",
+        "enabled": true
+      }
+    }
+  },
+  "authorize_url": "https://127.0.0.1:8799/oauth/authorize?response_type=code&client_id=DVZQA7ucgHLPW-iMoLPRqw&code_challenge=MProiyOw2F1sLy-3ihsy57mVTLcDM6QS-zUWU0NPI8I&code_challenge_method=S256&redirect_uri=http%3A%2F%2F127.0.0.1%3A19876%2Fmcp%2Foauth%2Fcallback&state=89f75273c48973753304a7f07b84f385cdb88c51963414ab9ffe89740c9726be&scope=space+offline_access&prompt=consent&resource=https%3A%2F%2F127.0.0.1%3A8799%2Fmcp",
+  "browser_exit": 0,
+  "browser_stderr_tail": "",
+  "browser": {
+    "authorize_url": "https://127.0.0.1:8799/oauth/authorize?response_type=code&client_id=DVZQA7ucgHLPW-iMoLPRqw&code_challenge=MProiyOw2F1sLy-3ihsy57mVTLcDM6QS-zUWU0NPI8I&code_challenge_method=S256&redirect_uri=http%3A%2F%2F127.0.0.1%3A19876%2Fmcp%2Foauth%2Fcallback&state=89f75273c48973753304a7f07b84f385cdb88c51963414ab9ffe89740c9726be&scope=space+offline_access&prompt=consent&resource=https%3A%2F%2F127.0.0.1%3A8799%2Fmcp",
+    "authorize_status": 200,
+    "has_login_form": true,
+    "final_url": "https://127.0.0.1:8799/oauth/authorize?response_type=code&client_id=DVZQA7ucgHLPW-iMoLPRqw&code_challenge=MProiyOw2F1sLy-3ihsy57mVTLcDM6QS-zUWU0NPI8I&code_challenge_method=S256&redirect_uri=http%3A%2F%2F127.0.0.1%3A19876%2Fmcp%2Foauth%2Fcallback&state=89f75273c48973753304a7f07b84f385cdb88c51963414ab9ffe89740c9726be&scope=space+offline_access&prompt=consent&resource=https%3A%2F%2F127.0.0.1%3A8799%2Fmcp",
+    "page_text": "SHAREFYX\nConnector autorisieren\n\nEin Connector fragt nach Zugriff auf deinen Space. Unabhängig von einer laufenden Browser-Sitzung — Passwort und Code werden bei jeder Autorisierung erneut geprüft (P5-G).\n\nSpace\nPasswort\nTOTP-Code\nAnmelden\nAblehnen",
+    "console": [
+      "error: Sending form data to 'https://127.0.0.1:8799/oauth/authorize' violates the following Content Security Policy directive: \"form-action 'self' https://claude.ai https://claude.com\". The request has been blocked.\n"
+    ],
+    "csp_violations": [
+      "error: Sending form data to 'https://127.0.0.1:8799/oauth/authorize' violates the following Content Security Policy directive: \"form-action 'self' https://claude.ai https://claude.com\". The request has been blocked.\n"
+    ],
+    "callback_reached": false
+  },
+  "auth_exit": -9,
+  "auth_log_tail": "rization\u001b[999D\u001b[J◒  Waiting for authorization.\u001b[999D\u001b[J◐  Waiting for authorization.\u001b[999D\u001b[J◓  Waiting for authorization.\u001b[999D\u001b[J◑  Waiting for authorization.\u001b[999D\u001b[J◒  Waiting for authorization.\u001b[999D\u001b[J◐  Waiting for authorization.\u001b[999D\u001b[J◓  Waiting for authorization.\u001b[999D\u001b[J◑  Waiting for authorization.\u001b[999D\u001b[J◒  Waiting for authorization..\u001b[999D\u001b[J◐  Waiting for authorization..\u001b[999D\u001b[J◓  Waiting for authorization..\u001b[999D\u001b[J◑  Waiting for authorization..\u001b[999D\u001b[J◒  Waiting for authorization..\u001b[999D\u001b[J◐  Waiting for authorization..\u001b[999D\u001b[J◓  Waiting for authorization..\u001b[999D\u001b[J◑  Waiting for authorization..\u001b[999D\u001b[J◒  Waiting for authorization...\u001b[999D\u001b[J◐  Waiting for authorization...\u001b[999D\u001b[J◓  Waiting for authorization...\u001b[999D\u001b[J◑  Waiting for authorization...\u001b[999D\u001b[J◒  Waiting for authorization...\u001b[999D\u001b[J◐  Waiting for authorization...\u001b[999D\u001b[J◓  Waiting for authorization...\u001b[999D\u001b[J◑  Waiting for authorization...\u001b[999D\u001b[J◒  Waiting for authorization...\u001b[999D\u001b[J◐  Waiting for authorization\u001b[999D\u001b[J◓  Waiting for authorization\u001b[999D\u001b[J◑  Waiting for authorization\u001b[999D\u001b[J◒  Waiting for authorization\u001b[999D\u001b[J◐  Waiting for authorization\u001b[999D\u001b[J◓  Waiting for authorization\u001b[999D\u001b[J◑  Waiting for authorization\u001b[999D\u001b[J◒  Waiting for authorization\u001b[999D\u001b[J◐  Waiting for authorization.\u001b[999D\u001b[J◓  Waiting for authorization.\u001b[999D\u001b[J◑  Waiting for authorization.\u001b[999D\u001b[J◒  Waiting for authorization.\u001b[999D\u001b[J◐  Waiting for authorization.\u001b[999D\u001b[J◓  Waiting for authorization.\u001b[999D\u001b[J◑  Waiting for authorization.\u001b[999D\u001b[J◒  Waiting for authorization.\u001b[999D\u001b[J◐  Waiting for authorization..\u001b[999D\u001b[J◓  Waiting for authorization..\u001b[999D\u001b[J◑  Waiting for authorization..\u001b[999D\u001b[J◒  Waiting for authorization..\u001b[999D\u001b[J◐  Waiting for authorization..\u001b[999D\u001b[J◓  Waiting for authorization..\u001b[999D\u001b[J◑  Waiting for authorization..\u001b[999D\u001b[J◒  Waiting for authorization..\u001b[999D\u001b[J◐  Waiting for authorization...\u001b[999D\u001b[J◓  Waiting for authorization...\u001b[999D\u001b[J◑  Waiting for authorization...\u001b[999D\u001b[J◒  Waiting for authorization...\u001b[999D\u001b[J◐  Waiting for authorization...\u001b[999D\u001b[J◓  Waiting for authorization...\u001b[999D\u001b[J◑  Waiting for authorization...\u001b[999D\u001b[J◒  Waiting for authorization...\u001b[999D\u001b[J◐  Waiting for authorization...\u001b[999D\u001b[J◓  Waiting for authorization\u001b[999D\u001b[J◑  Waiting for authorization\u001b[999D\u001b[J◒  Waiting for authorization\u001b[999D\u001b[J◐  Waiting for authorization\u001b[999D\u001b[J◓  Waiting for authorization\u001b[999D\u001b[J◑  Waiting for authorization\u001b[999D\u001b[J◒  Waiting for authorization\u001b[999D\u001b[J◐  Waiting for authorization\u001b[999D\u001b[J◓  Waiting for authorization.\u001b[999D\u001b[J◑  Waiting for authorization.\u001b[999D\u001b[J◒  Waiting for authorization.\u001b[999D\u001b[J◐  Waiting for authorization.\u001b[999D\u001b[J◓  Waiting for authorization.\u001b[999D\u001b[J◑  Waiting for authorization.\u001b[999D\u001b[J◒  Waiting for authorization.\u001b[999D\u001b[J◐  Waiting for authorization.\u001b[999D\u001b[J◓  Waiting for authorization..\u001b[999D\u001b[J◑  Waiting for authorization..\u001b[999D\u001b[J◒  Waiting for authorization..\u001b[999D\u001b[J■  Canceled\n\u001b[?25h",
+  "auth_ok": false,
+  "debug_exit": 0,
+  "debug_stdout_tail": "┌  MCP OAuth Debug\n│\n●  Server: sharefyx\n│\n●  URL: https://127.0.0.1:8799/mcp\n│\n●  Auth status: ✗ not authenticated\n│\n●    Client ID: MBn1YDJH2GeI_U0AfcuUnA\n\u001b[?25l│\n◇  HTTP response: 401 Unauthorized\n\u001b[?25h│\n●  WWW-Authenticate: Bearer error=\"invalid_token\", error_description=\"Authentication required\", resource_metadata=\"https://127.0.0.1:8799/.well-known/oauth-protected-resource/mcp\", scope=\"space\"\n│\n●  Initial unauthenticated check returned 401, so this server requires OAuth\n│\n●  Testing OAuth flow (without completing authorization)...\n│\n●  OAuth flow triggered: Unauthorized\n│\n●  Client ID available: MBn1YDJH2GeI_U0AfcuUnA\n│\n└  Debug complete\n\n",
+  "debug_stderr_tail": "timestamp=2026-10-22T18:46:59.679Z level=INFO run=34acbfea message=\"creating instance\" directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-22T18:46:59.680Z level=INFO run=34acbfea message=fromDirectory directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-22T18:46:59.707Z level=INFO run=34acbfea message=bootstrapping directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-22T18:46:59.711Z level=INFO run=34acbfea message=loading path=/tmp/opencode/p105-b6-opencode/config/opencode/config.json\ntimestamp=2026-10-22T18:46:59.711Z level=INFO run=34acbfea message=loading path=/tmp/opencode/p105-b6-opencode/config/opencode/opencode.json\ntimestamp=2026-10-22T18:46:59.716Z level=INFO run=34acbfea message=loading path=/tmp/opencode/p105-b6-opencode/config/opencode/opencode.jsonc\ntimestamp=2026-10-22T18:46:59.788Z level=INFO run=34acbfea message=\"all LSPs are disabled\"\ntimestamp=2026-10-22T18:46:59.789Z level=INFO run=34acbfea message=\"all formatters are disabled\"\ntimestamp=2026-10-22T18:46:59.789Z level=INFO run=34acbfea message=init\n\u001b[0m\ntimestamp=2026-10-22T18:46:59.823Z level=INFO run=34acbfea message=\"disposing instance\" directory=/home/savefyx/dev/savefxy\n"
+}

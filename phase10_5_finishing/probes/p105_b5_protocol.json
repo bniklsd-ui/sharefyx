@@ -1,0 +1,69 @@
+{
+  "legacy": {
+    "protocol_version": "2025-11-25",
+    "list_spaces": [
+      "alpha"
+    ],
+    "tool_names": [
+      "append_to_item",
+      "append_to_items",
+      "create_item",
+      "get_item",
+      "get_item_asset",
+      "get_item_meta",
+      "list_spaces",
+      "patch_item",
+      "put_item_asset",
+      "search_items",
+      "update_item"
+    ],
+    "annotations_complete": true,
+    "append_to_items": {
+      "ok": 1,
+      "failed": 1
+    },
+    "deprecation_warnings": [],
+    "expected_era": "2025-11-25"
+  },
+  "auto": {
+    "protocol_version": "2026-07-28",
+    "list_spaces": [
+      "alpha"
+    ],
+    "tool_names": [
+      "append_to_item",
+      "append_to_items",
+      "create_item",
+      "get_item",
+      "get_item_asset",
+      "get_item_meta",
+      "list_spaces",
+      "patch_item",
+      "put_item_asset",
+      "search_items",
+      "update_item"
+    ],
+    "annotations_complete": true,
+    "append_to_items": {
+      "ok": 1,
+      "failed": 1
+    },
+    "deprecation_warnings": [],
+    "expected_era": "2026-07-28"
+  },
+  "unknown_version": {
+    "initialize": {
+      "status": 200,
+      "echoes_unknown_version": false,
+      "answers_with_own_version": true
+    },
+    "stateless_tools_list": {
+      "status": 400,
+      "error_code": -32022,
+      "error_message": "Unsupported protocol version",
+      "supported": [
+        "2026-07-28"
+      ]
+    }
+  }
+}

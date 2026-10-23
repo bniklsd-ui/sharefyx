@@ -1,0 +1,536 @@
+{
+  "probe": "p105_b6_opencode_matrix",
+  "base_url": "https://127.0.0.1:8799",
+  "1_default": {
+    "variante": "1_default",
+    "server_konfiguration": {
+      "type": "remote",
+      "url": "https://127.0.0.1:8799/mcp",
+      "enabled": true
+    },
+    "run_exit": 0,
+    "run_text_tail": "snapshot\":\"099405025579a2a74371c8db2cd95085fa162aa1\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1792738476083,\"sessionID\":\"ses_e9875c6cbffeXJb7nwIjTuDKza\",\"part\":{\"id\":\"prt_1678a4030001Nx6ZwmifHtumbR\",\"messageID\":\"msg_1678a4010001nfAv4TNni2rn3f\",\"sessionID\":\"ses_e9875c6cbffeXJb7nwIjTuDKza\",\"type\":\"text\",\"text\":\"list_spaces gerufen.\",\"time\":{\"start\":1792738476080,\"end\":1792738476081}}}\n{\"type\":\"step_finish\",\"timestamp\":1792738476100,\"sessionID\":\"ses_e9875c6cbffeXJb7nwIjTuDKza\",\"part\":{\"id\":\"prt_1678a40400012W0MR6NOtJ8V51\",\"reason\":\"stop\",\"snapshot\":\"099405025579a2a74371c8db2cd95085fa162aa1\",\"messageID\":\"msg_1678a4010001nfAv4TNni2rn3f\",\"sessionID\":\"ses_e9875c6cbffeXJb7nwIjTuDKza\",\"type\":\"step-finish\",\"tokens\":{\"input\":0,\"output\":0,\"reasoning\":0,\"cache\":{\"write\":0,\"read\":0}},\"cost\":0}}\n",
+    "stub_requests": [
+      {
+        "runde": 1,
+        "werkzeuge": [],
+        "mcp_werkzeuge": [],
+        "zuletzt_gerufen": null,
+        "antwort": "text:kein_werkzeug"
+      },
+      {
+        "runde": 2,
+        "werkzeuge": [
+          "bash",
+          "edit",
+          "glob",
+          "grep",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "read",
+          "read_mcp_resource",
+          "sharefyx_append_to_item",
+          "sharefyx_append_to_items",
+          "sharefyx_create_item",
+          "sharefyx_get_item",
+          "sharefyx_get_item_asset",
+          "sharefyx_get_item_meta",
+          "sharefyx_list_spaces",
+          "sharefyx_patch_item",
+          "sharefyx_put_item_asset",
+          "sharefyx_search_items",
+          "sharefyx_update_item",
+          "skill",
+          "task",
+          "todowrite",
+          "webfetch",
+          "write"
+        ],
+        "mcp_werkzeuge": [
+          "sharefyx_append_to_item",
+          "sharefyx_append_to_items",
+          "sharefyx_create_item",
+          "sharefyx_get_item",
+          "sharefyx_get_item_asset",
+          "sharefyx_get_item_meta",
+          "sharefyx_list_spaces",
+          "sharefyx_patch_item",
+          "sharefyx_put_item_asset",
+          "sharefyx_search_items",
+          "sharefyx_update_item"
+        ],
+        "zuletzt_gerufen": null,
+        "antwort": "tool:sharefyx_append_to_item"
+      },
+      {
+        "runde": 3,
+        "werkzeuge": [
+          "bash",
+          "edit",
+          "glob",
+          "grep",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "read",
+          "read_mcp_resource",
+          "sharefyx_append_to_item",
+          "sharefyx_append_to_items",
+          "sharefyx_create_item",
+          "sharefyx_get_item",
+          "sharefyx_get_item_asset",
+          "sharefyx_get_item_meta",
+          "sharefyx_list_spaces",
+          "sharefyx_patch_item",
+          "sharefyx_put_item_asset",
+          "sharefyx_search_items",
+          "sharefyx_update_item",
+          "skill",
+          "task",
+          "todowrite",
+          "webfetch",
+          "write"
+        ],
+        "mcp_werkzeuge": [
+          "sharefyx_append_to_item",
+          "sharefyx_append_to_items",
+          "sharefyx_create_item",
+          "sharefyx_get_item",
+          "sharefyx_get_item_asset",
+          "sharefyx_get_item_meta",
+          "sharefyx_list_spaces",
+          "sharefyx_patch_item",
+          "sharefyx_put_item_asset",
+          "sharefyx_search_items",
+          "sharefyx_update_item"
+        ],
+        "zuletzt_gerufen": "sharefyx_append_to_item",
+        "antwort": "text:ergebnis"
+      }
+    ],
+    "mcp_werkzeuge_gesehen": [
+      "sharefyx_append_to_item",
+      "sharefyx_append_to_items",
+      "sharefyx_create_item",
+      "sharefyx_get_item",
+      "sharefyx_get_item_asset",
+      "sharefyx_get_item_meta",
+      "sharefyx_list_spaces",
+      "sharefyx_patch_item",
+      "sharefyx_put_item_asset",
+      "sharefyx_search_items",
+      "sharefyx_update_item"
+    ],
+    "werkzeug_aufgerufen": [
+      "sharefyx_append_to_item"
+    ],
+    "server_zugriffe": [
+      "{\"ts\":\"2026-10-23T06:54:35.135Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":200,\"ms\":136,\"ua\":\"opencode/1.19.4\"}",
+      "{\"ts\":\"2026-10-23T06:54:35.143Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":202,\"ms\":6,\"ua\":\"opencode/1.19.4\"}",
+      "{\"ts\":\"2026-10-23T06:54:35.148Z\",\"ev\":\"http\",\"method\":\"GET\",\"path\":\"/mcp\",\"status\":405,\"ms\":2,\"ua\":\"opencode/1.19.4\"}",
+      "{\"ts\":\"2026-10-23T06:54:35.290Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":200,\"ms\":57,\"ua\":\"opencode/1.19.4\"}",
+      "{\"ts\":\"2026-10-23T06:54:36.010Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":200,\"ms\":175,\"ua\":\"opencode/1.19.4\"}",
+      "{\"ts\":\"2026-10-23T06:54:36.061Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":202,\"ms\":6,\"ua\":\"opencode/1.19.4\"}"
+    ]
+  },
+  "2_bearer": {
+    "variante": "2_bearer",
+    "server_konfiguration": {
+      "type": "remote",
+      "url": "https://127.0.0.1:8799/mcp",
+      "enabled": true,
+      "oauth": false,
+      "headers": "<bearer>"
+    },
+    "run_exit": 0,
+    "run_text_tail": "snapshot\":\"099405025579a2a74371c8db2cd95085fa162aa1\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1792738478711,\"sessionID\":\"ses_e9875ba08ffeOf87Vekcgl0KR6\",\"part\":{\"id\":\"prt_1678a4a73001keFnOQBdgM1nUe\",\"messageID\":\"msg_1678a4a4c001NaAX2yEmr45fbT\",\"sessionID\":\"ses_e9875ba08ffeOf87Vekcgl0KR6\",\"type\":\"text\",\"text\":\"list_spaces gerufen.\",\"time\":{\"start\":1792738478707,\"end\":1792738478709}}}\n{\"type\":\"step_finish\",\"timestamp\":1792738478723,\"sessionID\":\"ses_e9875ba08ffeOf87Vekcgl0KR6\",\"part\":{\"id\":\"prt_1678a4a80001mzhoOoiXpH1wOR\",\"reason\":\"stop\",\"snapshot\":\"099405025579a2a74371c8db2cd95085fa162aa1\",\"messageID\":\"msg_1678a4a4c001NaAX2yEmr45fbT\",\"sessionID\":\"ses_e9875ba08ffeOf87Vekcgl0KR6\",\"type\":\"step-finish\",\"tokens\":{\"input\":0,\"output\":0,\"reasoning\":0,\"cache\":{\"write\":0,\"read\":0}},\"cost\":0}}\n",
+    "stub_requests": [
+      {
+        "runde": 1,
+        "werkzeuge": [],
+        "mcp_werkzeuge": [],
+        "zuletzt_gerufen": null,
+        "antwort": "text:kein_werkzeug"
+      },
+      {
+        "runde": 2,
+        "werkzeuge": [
+          "bash",
+          "edit",
+          "glob",
+          "grep",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "read",
+          "read_mcp_resource",
+          "sharefyx_append_to_item",
+          "sharefyx_append_to_items",
+          "sharefyx_create_item",
+          "sharefyx_get_item",
+          "sharefyx_get_item_asset",
+          "sharefyx_get_item_meta",
+          "sharefyx_list_spaces",
+          "sharefyx_patch_item",
+          "sharefyx_put_item_asset",
+          "sharefyx_search_items",
+          "sharefyx_update_item",
+          "skill",
+          "task",
+          "todowrite",
+          "webfetch",
+          "write"
+        ],
+        "mcp_werkzeuge": [
+          "sharefyx_append_to_item",
+          "sharefyx_append_to_items",
+          "sharefyx_create_item",
+          "sharefyx_get_item",
+          "sharefyx_get_item_asset",
+          "sharefyx_get_item_meta",
+          "sharefyx_list_spaces",
+          "sharefyx_patch_item",
+          "sharefyx_put_item_asset",
+          "sharefyx_search_items",
+          "sharefyx_update_item"
+        ],
+        "zuletzt_gerufen": null,
+        "antwort": "tool:sharefyx_append_to_item"
+      },
+      {
+        "runde": 3,
+        "werkzeuge": [
+          "bash",
+          "edit",
+          "glob",
+          "grep",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "read",
+          "read_mcp_resource",
+          "sharefyx_append_to_item",
+          "sharefyx_append_to_items",
+          "sharefyx_create_item",
+          "sharefyx_get_item",
+          "sharefyx_get_item_asset",
+          "sharefyx_get_item_meta",
+          "sharefyx_list_spaces",
+          "sharefyx_patch_item",
+          "sharefyx_put_item_asset",
+          "sharefyx_search_items",
+          "sharefyx_update_item",
+          "skill",
+          "task",
+          "todowrite",
+          "webfetch",
+          "write"
+        ],
+        "mcp_werkzeuge": [
+          "sharefyx_append_to_item",
+          "sharefyx_append_to_items",
+          "sharefyx_create_item",
+          "sharefyx_get_item",
+          "sharefyx_get_item_asset",
+          "sharefyx_get_item_meta",
+          "sharefyx_list_spaces",
+          "sharefyx_patch_item",
+          "sharefyx_put_item_asset",
+          "sharefyx_search_items",
+          "sharefyx_update_item"
+        ],
+        "zuletzt_gerufen": "sharefyx_append_to_item",
+        "antwort": "text:ergebnis"
+      }
+    ],
+    "mcp_werkzeuge_gesehen": [
+      "sharefyx_append_to_item",
+      "sharefyx_append_to_items",
+      "sharefyx_create_item",
+      "sharefyx_get_item",
+      "sharefyx_get_item_asset",
+      "sharefyx_get_item_meta",
+      "sharefyx_list_spaces",
+      "sharefyx_patch_item",
+      "sharefyx_put_item_asset",
+      "sharefyx_search_items",
+      "sharefyx_update_item"
+    ],
+    "werkzeug_aufgerufen": [
+      "sharefyx_append_to_item"
+    ],
+    "server_zugriffe": [
+      "{\"ts\":\"2026-10-23T06:54:38.111Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":200,\"ms\":3,\"ua\":\"opencode/1.19.4\"}",
+      "{\"ts\":\"2026-10-23T06:54:38.116Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":202,\"ms\":1,\"ua\":\"opencode/1.19.4\"}",
+      "{\"ts\":\"2026-10-23T06:54:38.118Z\",\"ev\":\"http\",\"method\":\"GET\",\"path\":\"/mcp\",\"status\":405,\"ms\":2,\"ua\":\"opencode/1.19.4\"}",
+      "{\"ts\":\"2026-10-23T06:54:38.143Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":200,\"ms\":13,\"ua\":\"opencode/1.19.4\"}",
+      "{\"ts\":\"2026-10-23T06:54:38.631Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":200,\"ms\":9,\"ua\":\"opencode/1.19.4\"}",
+      "{\"ts\":\"2026-10-23T06:54:38.673Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":202,\"ms\":3,\"ua\":\"opencode/1.19.4\"}"
+    ]
+  },
+  "3_bearer_auto": {
+    "variante": "3_bearer_auto",
+    "server_konfiguration": {
+      "type": "remote",
+      "url": "https://127.0.0.1:8799/mcp",
+      "enabled": true,
+      "oauth": false,
+      "headers": "<bearer>",
+      "protocol": "auto"
+    },
+    "run_exit": 0,
+    "run_text_tail": "snapshot\":\"099405025579a2a74371c8db2cd95085fa162aa1\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1792738481431,\"sessionID\":\"ses_e9875b000ffezaY0A2spbzA4Fv\",\"part\":{\"id\":\"prt_1678a5513001TQ2PFHX5rlTdxK\",\"messageID\":\"msg_1678a54ee0011IB4GLfIZ2CcYY\",\"sessionID\":\"ses_e9875b000ffezaY0A2spbzA4Fv\",\"type\":\"text\",\"text\":\"list_spaces gerufen.\",\"time\":{\"start\":1792738481427,\"end\":1792738481429}}}\n{\"type\":\"step_finish\",\"timestamp\":1792738481443,\"sessionID\":\"ses_e9875b000ffezaY0A2spbzA4Fv\",\"part\":{\"id\":\"prt_1678a5520001y4WabjjZD8jI9O\",\"reason\":\"stop\",\"snapshot\":\"099405025579a2a74371c8db2cd95085fa162aa1\",\"messageID\":\"msg_1678a54ee0011IB4GLfIZ2CcYY\",\"sessionID\":\"ses_e9875b000ffezaY0A2spbzA4Fv\",\"type\":\"step-finish\",\"tokens\":{\"input\":0,\"output\":0,\"reasoning\":0,\"cache\":{\"write\":0,\"read\":0}},\"cost\":0}}\n",
+    "stub_requests": [
+      {
+        "runde": 1,
+        "werkzeuge": [],
+        "mcp_werkzeuge": [],
+        "zuletzt_gerufen": null,
+        "antwort": "text:kein_werkzeug"
+      },
+      {
+        "runde": 2,
+        "werkzeuge": [
+          "bash",
+          "edit",
+          "glob",
+          "grep",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "read",
+          "read_mcp_resource",
+          "sharefyx_append_to_item",
+          "sharefyx_append_to_items",
+          "sharefyx_create_item",
+          "sharefyx_get_item",
+          "sharefyx_get_item_asset",
+          "sharefyx_get_item_meta",
+          "sharefyx_list_spaces",
+          "sharefyx_patch_item",
+          "sharefyx_put_item_asset",
+          "sharefyx_search_items",
+          "sharefyx_update_item",
+          "skill",
+          "task",
+          "todowrite",
+          "webfetch",
+          "write"
+        ],
+        "mcp_werkzeuge": [
+          "sharefyx_append_to_item",
+          "sharefyx_append_to_items",
+          "sharefyx_create_item",
+          "sharefyx_get_item",
+          "sharefyx_get_item_asset",
+          "sharefyx_get_item_meta",
+          "sharefyx_list_spaces",
+          "sharefyx_patch_item",
+          "sharefyx_put_item_asset",
+          "sharefyx_search_items",
+          "sharefyx_update_item"
+        ],
+        "zuletzt_gerufen": null,
+        "antwort": "tool:sharefyx_append_to_item"
+      },
+      {
+        "runde": 3,
+        "werkzeuge": [
+          "bash",
+          "edit",
+          "glob",
+          "grep",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "read",
+          "read_mcp_resource",
+          "sharefyx_append_to_item",
+          "sharefyx_append_to_items",
+          "sharefyx_create_item",
+          "sharefyx_get_item",
+          "sharefyx_get_item_asset",
+          "sharefyx_get_item_meta",
+          "sharefyx_list_spaces",
+          "sharefyx_patch_item",
+          "sharefyx_put_item_asset",
+          "sharefyx_search_items",
+          "sharefyx_update_item",
+          "skill",
+          "task",
+          "todowrite",
+          "webfetch",
+          "write"
+        ],
+        "mcp_werkzeuge": [
+          "sharefyx_append_to_item",
+          "sharefyx_append_to_items",
+          "sharefyx_create_item",
+          "sharefyx_get_item",
+          "sharefyx_get_item_asset",
+          "sharefyx_get_item_meta",
+          "sharefyx_list_spaces",
+          "sharefyx_patch_item",
+          "sharefyx_put_item_asset",
+          "sharefyx_search_items",
+          "sharefyx_update_item"
+        ],
+        "zuletzt_gerufen": "sharefyx_append_to_item",
+        "antwort": "text:ergebnis"
+      }
+    ],
+    "mcp_werkzeuge_gesehen": [
+      "sharefyx_append_to_item",
+      "sharefyx_append_to_items",
+      "sharefyx_create_item",
+      "sharefyx_get_item",
+      "sharefyx_get_item_asset",
+      "sharefyx_get_item_meta",
+      "sharefyx_list_spaces",
+      "sharefyx_patch_item",
+      "sharefyx_put_item_asset",
+      "sharefyx_search_items",
+      "sharefyx_update_item"
+    ],
+    "werkzeug_aufgerufen": [
+      "sharefyx_append_to_item"
+    ],
+    "server_zugriffe": [
+      "{\"ts\":\"2026-10-23T06:54:40.710Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":200,\"ms\":3,\"ua\":\"opencode/1.19.4\"}",
+      "{\"ts\":\"2026-10-23T06:54:40.715Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":202,\"ms\":1,\"ua\":\"opencode/1.19.4\"}",
+      "{\"ts\":\"2026-10-23T06:54:40.716Z\",\"ev\":\"http\",\"method\":\"GET\",\"path\":\"/mcp\",\"status\":405,\"ms\":0,\"ua\":\"opencode/1.19.4\"}",
+      "{\"ts\":\"2026-10-23T06:54:40.719Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":200,\"ms\":3,\"ua\":\"opencode/1.19.4\"}",
+      "{\"ts\":\"2026-10-23T06:54:41.337Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":200,\"ms\":7,\"ua\":\"opencode/1.19.4\"}",
+      "{\"ts\":\"2026-10-23T06:54:41.394Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":202,\"ms\":1,\"ua\":\"opencode/1.19.4\"}"
+    ]
+  },
+  "4_bearer_2026": {
+    "variante": "4_bearer_2026",
+    "server_konfiguration": {
+      "type": "remote",
+      "url": "https://127.0.0.1:8799/mcp",
+      "enabled": true,
+      "oauth": false,
+      "headers": "<bearer>",
+      "protocol": "2026-07-28"
+    },
+    "run_exit": 0,
+    "run_text_tail": "snapshot\":\"099405025579a2a74371c8db2cd95085fa162aa1\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1792738484072,\"sessionID\":\"ses_e9875a523ffeIW94MxuSdAstl8\",\"part\":{\"id\":\"prt_1678a5f62001GNdydqUwS4N8SO\",\"messageID\":\"msg_1678a5f44001bq1LxZ3OWUydwk\",\"sessionID\":\"ses_e9875a523ffeIW94MxuSdAstl8\",\"type\":\"text\",\"text\":\"list_spaces gerufen.\",\"time\":{\"start\":1792738484066,\"end\":1792738484070}}}\n{\"type\":\"step_finish\",\"timestamp\":1792738484086,\"sessionID\":\"ses_e9875a523ffeIW94MxuSdAstl8\",\"part\":{\"id\":\"prt_1678a5f73001MA5bitBci3OUFx\",\"reason\":\"stop\",\"snapshot\":\"099405025579a2a74371c8db2cd95085fa162aa1\",\"messageID\":\"msg_1678a5f44001bq1LxZ3OWUydwk\",\"sessionID\":\"ses_e9875a523ffeIW94MxuSdAstl8\",\"type\":\"step-finish\",\"tokens\":{\"input\":0,\"output\":0,\"reasoning\":0,\"cache\":{\"write\":0,\"read\":0}},\"cost\":0}}\n",
+    "stub_requests": [
+      {
+        "runde": 1,
+        "werkzeuge": [],
+        "mcp_werkzeuge": [],
+        "zuletzt_gerufen": null,
+        "antwort": "text:kein_werkzeug"
+      },
+      {
+        "runde": 2,
+        "werkzeuge": [
+          "bash",
+          "edit",
+          "glob",
+          "grep",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "read",
+          "read_mcp_resource",
+          "sharefyx_append_to_item",
+          "sharefyx_append_to_items",
+          "sharefyx_create_item",
+          "sharefyx_get_item",
+          "sharefyx_get_item_asset",
+          "sharefyx_get_item_meta",
+          "sharefyx_list_spaces",
+          "sharefyx_patch_item",
+          "sharefyx_put_item_asset",
+          "sharefyx_search_items",
+          "sharefyx_update_item",
+          "skill",
+          "task",
+          "todowrite",
+          "webfetch",
+          "write"
+        ],
+        "mcp_werkzeuge": [
+          "sharefyx_append_to_item",
+          "sharefyx_append_to_items",
+          "sharefyx_create_item",
+          "sharefyx_get_item",
+          "sharefyx_get_item_asset",
+          "sharefyx_get_item_meta",
+          "sharefyx_list_spaces",
+          "sharefyx_patch_item",
+          "sharefyx_put_item_asset",
+          "sharefyx_search_items",
+          "sharefyx_update_item"
+        ],
+        "zuletzt_gerufen": null,
+        "antwort": "tool:sharefyx_append_to_item"
+      },
+      {
+        "runde": 3,
+        "werkzeuge": [
+          "bash",
+          "edit",
+          "glob",
+          "grep",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "read",
+          "read_mcp_resource",
+          "sharefyx_append_to_item",
+          "sharefyx_append_to_items",
+          "sharefyx_create_item",
+          "sharefyx_get_item",
+          "sharefyx_get_item_asset",
+          "sharefyx_get_item_meta",
+          "sharefyx_list_spaces",
+          "sharefyx_patch_item",
+          "sharefyx_put_item_asset",
+          "sharefyx_search_items",
+          "sharefyx_update_item",
+          "skill",
+          "task",
+          "todowrite",
+          "webfetch",
+          "write"
+        ],
+        "mcp_werkzeuge": [
+          "sharefyx_append_to_item",
+          "sharefyx_append_to_items",
+          "sharefyx_create_item",
+          "sharefyx_get_item",
+          "sharefyx_get_item_asset",
+          "sharefyx_get_item_meta",
+          "sharefyx_list_spaces",
+          "sharefyx_patch_item",
+          "sharefyx_put_item_asset",
+          "sharefyx_search_items",
+          "sharefyx_update_item"
+        ],
+        "zuletzt_gerufen": "sharefyx_append_to_item",
+        "antwort": "text:ergebnis"
+      }
+    ],
+    "mcp_werkzeuge_gesehen": [
+      "sharefyx_append_to_item",
+      "sharefyx_append_to_items",
+      "sharefyx_create_item",
+      "sharefyx_get_item",
+      "sharefyx_get_item_asset",
+      "sharefyx_get_item_meta",
+      "sharefyx_list_spaces",
+      "sharefyx_patch_item",
+      "sharefyx_put_item_asset",
+      "sharefyx_search_items",
+      "sharefyx_update_item"
+    ],
+    "werkzeug_aufgerufen": [
+      "sharefyx_append_to_item"
+    ],
+    "server_zugriffe": [
+      "{\"ts\":\"2026-10-23T06:54:43.489Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":200,\"ms\":2,\"ua\":\"opencode/1.19.4\"}",
+      "{\"ts\":\"2026-10-23T06:54:43.496Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":202,\"ms\":1,\"ua\":\"opencode/1.19.4\"}",
+      "{\"ts\":\"2026-10-23T06:54:43.497Z\",\"ev\":\"http\",\"method\":\"GET\",\"path\":\"/mcp\",\"status\":405,\"ms\":0,\"ua\":\"opencode/1.19.4\"}",
+      "{\"ts\":\"2026-10-23T06:54:43.501Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":200,\"ms\":3,\"ua\":\"opencode/1.19.4\"}",
+      "{\"ts\":\"2026-10-23T06:54:44.006Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":200,\"ms\":6,\"ua\":\"opencode/1.19.4\"}",
+      "{\"ts\":\"2026-10-23T06:54:44.041Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":202,\"ms\":2,\"ua\":\"opencode/1.19.4\"}"
+    ]
+  }
+}

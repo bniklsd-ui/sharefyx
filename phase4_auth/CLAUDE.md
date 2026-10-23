@@ -8,7 +8,7 @@ down:
   - ../docs/concepts/phase4_auth_plan.md          # voller Plan, Entscheidungen P4-A–P4-R, Steps 0–7
   - ../docs/concepts/PHASE3_CLOSEOUT_HANDOVER.md  # Herkunft der offenen Entscheidungen, Doku-Drift, [VERIFY]-Bilanz
   - SESSIONS_ARCHIVE.md                            # ältere Session-Blöcke, newest-first
-updated: 2026-08-20 (Vormerkung: bekannter reihenfolgeabhaengiger pytest-Flake in test_authctl.py, ausserhalb P4-Scope entdeckt)
+updated: 2026-10-22 (P10.5 Block 6: zweite Vergleichsregel Loopback + `application_type` — die native-Rejection von 2026-07-28 ist datiert abgelöst; CSP `form-action` mit `http://127.0.0.1:*`) | 2026-08-20 (Vormerkung: bekannter reihenfolgeabhaengiger pytest-Flake in test_authctl.py, ausserhalb P4-Scope entdeckt)
 ---
 
 # CLAUDE.md — Phase 4: OAuth 2.1 + DCR (`phase4_auth/`)
@@ -53,7 +53,9 @@ CIMD, Port ignoriert, und Anthropic verlangt von AS-Betreibern, beide zu akzepti
 
 **Nikinger-Entscheidung (2026-07-28):** trotzdem draußen lassen für Step 4 — weniger Variablen,
 die parallel getestet werden müssten. Rejection von `application_type: native` bleibt wie
-geplant (§2.6). Diese Notiz dokumentiert den **einfacheren Weg für später**, damit er bei
+geplant (§2.6).
+
+**[2026-10-22 Korrektur, P10.5 Block 6 (Lock P10.5-O)]:** die Rejection von `application_type: native` ist **datiert abgelöst** — sie steht seit dem 2026-07-28 hier, weil es keine zweite Vergleichsregel für Loopback-Redirects gab. Die gibt es jetzt: `redirect_uri_allowed()` lässt `http://127.0.0.1:<port><pfad>` zu (Port **explizit**, kein Userinfo, keine Query, kein Fragment; **kein** `localhost`, **kein** `[::1]`), und `register_client()` nimmt `application_type` ∈ {fehlend, null, `native`, `web`} an („`web`“ + Loopback → `invalid_redirect_uri`). Der [SEAM] bleibt: `flows.py` ruft dieselbe Funktion, es gibt keine zweite Vergleichsstelle. **Gemessen** (V209, opencode 1.19.4): der echte DCR-Request trägt `redirect_uris: ["http://127.0.0.1:19876/mcp/oauth/callback"]` und **kein** `application_type` — die Ablehnung von 2026-07-28 hätte genau diesen Client getroffen. Details und Belege: `phase10_5_finishing/CLAUDE.md` (Session-Block 2026-10-22). Diese Notiz dokumentiert den **einfacheren Weg für später**, damit er bei
 Bedarf nicht neu recherchiert werden muss:
 
 1. **Redirect-Matching ist der leichte Teil**, nicht der ganze Umfang: `redirect_uri_allowed()`

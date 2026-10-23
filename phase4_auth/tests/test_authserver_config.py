@@ -6,6 +6,7 @@ import pytest
 from authserver import config
 from authserver.config import (
     DEK_LEN,
+    AuthSettings,
     decode_data_encryption_key,
     encode_data_encryption_key,
     generate_data_encryption_key,
@@ -146,6 +147,22 @@ def test_load_auth_settings_invalid_ttl_raises():
                 "SPACE_OAUTH_ACCESS_TTL_S": "not-a-number",
             }
         )
+
+
+def test_csp_form_action_allows_loopback_port_wildcard():
+    """[2026-10-22, P10.5 Block 6, Lock P10.5-O] Chromium prueft `form-action` auch gegen das
+    Redirect-Ziel einer Formularantwort (P4 Live-Fund 8c) — der Consent-POST eines nativen
+    Clients endet bei `http://127.0.0.1:<port>/...`; ohne diesen Eintrag blockiert der Browser
+    **lautlos** (V197). Der Port steht als `*`, weil der native Client ihn selbst waehlt."""
+    settings = AuthSettings(base_url="https://example.ts.net", db_path=Path("/tmp/auth.sqlite3"))
+    value = settings.csp_form_action
+    assert value.startswith("'self'")
+    assert "https://claude.ai" in value
+    assert "http://127.0.0.1:*" in value
+    # `localhost` und `[::1]` bleiben aussen: eine CSP-Host-Quelle kann kein IPv6-Literal
+    # ausdruecken (V210).
+    assert "localhost" not in value
+    assert "::1" not in value
 
 
 # -- load_data_encryption_key (Plan §2.4, P5-J) --------------------------------------------

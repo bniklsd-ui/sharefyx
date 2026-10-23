@@ -1,0 +1,176 @@
+{
+  "probe": "p105_b6_opencode_e2e",
+  "opencode_binary": "/tmp/opencode/p105-b6-oc/node_modules/.bin/opencode",
+  "base_url": "https://127.0.0.1:8799",
+  "opencode_config": {
+    "$schema": "https://opencode.ai/config.json",
+    "provider": {
+      "stub": {
+        "npm": "@ai-sdk/openai-compatible",
+        "name": "Stub",
+        "options": {
+          "baseURL": "http://127.0.0.1:18123/v1",
+          "apiKey": "stub"
+        },
+        "models": {
+          "stub-1": {
+            "name": "Stub 1",
+            "tool_call": true
+          }
+        }
+      }
+    },
+    "model": "stub/stub-1",
+    "agent": {
+      "build": {
+        "tools": {
+          "sharefyx_*": true,
+          "glob": true
+        }
+      }
+    },
+    "mcp": {
+      "sharefyx": {
+        "type": "remote",
+        "url": "https://127.0.0.1:8799/mcp",
+        "enabled": true
+      }
+    }
+  },
+  "authorize_url": "https://127.0.0.1:8799/oauth/authorize?response_type=code&client_id=UJXU4L40xfKbujVSrYOvgw&code_challenge=6Up4c1mhWlkz7dLjROON8_Iuj9atENdUDESM903cCmg&code_challenge_method=S256&redirect_uri=http%3A%2F%2F127.0.0.1%3A19876%2Fmcp%2Foauth%2Fcallback&state=833f57926b6ec0f7038e34445c64adbe39acacb5e35aa08dde73cf324cb24675&scope=space+offline_access&prompt=consent&resource=https%3A%2F%2F127.0.0.1%3A8799%2Fmcp",
+  "browser_exit": 0,
+  "browser_stderr_tail": "",
+  "browser": {
+    "authorize_url": "https://127.0.0.1:8799/oauth/authorize?response_type=code&client_id=UJXU4L40xfKbujVSrYOvgw&code_challenge=6Up4c1mhWlkz7dLjROON8_Iuj9atENdUDESM903cCmg&code_challenge_method=S256&redirect_uri=http%3A%2F%2F127.0.0.1%3A19876%2Fmcp%2Foauth%2Fcallback&state=833f57926b6ec0f7038e34445c64adbe39acacb5e35aa08dde73cf324cb24675&scope=space+offline_access&prompt=consent&resource=https%3A%2F%2F127.0.0.1%3A8799%2Fmcp",
+    "authorize_status": 200,
+    "has_login_form": true,
+    "final_url": "http://127.0.0.1:19876/mcp/oauth/callback?state=833f57926b6ec0f7038e34445c64adbe39acacb5e35aa08dde73cf324cb24675&iss=https%3A%2F%2F127.0.0.1%3A8799&code=e6UquYb_D9qHEUpMZ_DJjr1IAXxBqb1aDI7x90IopxI",
+    "page_text": "Authorization successful\n\nOpenCode is now connected to MCP.\n\nYou can close this window.",
+    "console": [],
+    "csp_violations": [],
+    "callback_reached": true
+  },
+  "auth_exit": 0,
+  "auth_log_tail": "timestamp=2026-10-23T07:03:30.390Z level=INFO run=6b18f638 message=\"creating instance\" directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-23T07:03:30.391Z level=INFO run=6b18f638 message=fromDirectory directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-23T07:03:30.418Z level=INFO run=6b18f638 message=bootstrapping directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-23T07:03:30.421Z level=INFO run=6b18f638 message=loading path=/tmp/opencode/p105-b6-opencode/config/opencode/config.json\ntimestamp=2026-10-23T07:03:30.422Z level=INFO run=6b18f638 message=loading path=/tmp/opencode/p105-b6-opencode/config/opencode/opencode.json\ntimestamp=2026-10-23T07:03:30.426Z level=INFO run=6b18f638 message=loading path=/tmp/opencode/p105-b6-opencode/config/opencode/opencode.jsonc\ntimestamp=2026-10-23T07:03:30.496Z level=INFO run=6b18f638 message=\"all LSPs are disabled\"\ntimestamp=2026-10-23T07:03:30.497Z level=INFO run=6b18f638 message=\"all formatters are disabled\"\ntimestamp=2026-10-23T07:03:30.497Z level=INFO run=6b18f638 message=init\n\u001b[0m\n┌  MCP OAuth Authentication\n\u001b[?25l│\ntimestamp=2026-10-23T07:03:49.342Z level=WARN run=6b18f638 message=\"server unavailable\" key=sharefyx type=remote status=needs_auth\n◇  Authorize in your browser:\n\u001b[?25h│\n●  https://127.0.0.1:8799/oauth/authorize?response_type=code&client_id=UJXU4L40xfKbujVSrYOvgw&code_challenge=6Up4c1mhWlkz7dLjROON8_Iuj9atENdUDESM903cCmg&code_challenge_method=S256&redirect_uri=http%3A%2F%2F127.0.0.1%3A19876%2Fmcp%2Foauth%2Fcallback&state=833f57926b6ec0f7038e34445c64adbe39acacb5e35aa08dde73cf324cb24675&scope=space+offline_access&prompt=consent&resource=https%3A%2F%2F127.0.0.1%3A8799%2Fmcp\n\u001b[?25l│\n◒  Waiting for authorization\u001b[999D\u001b[J◐  Waiting for authorization\u001b[999D\u001b[J◓  Waiting for authorization\u001b[999D\u001b[J◑  Waiting for authorization\u001b[999D\u001b[J◒  Waiting for authorization\u001b[999D\u001b[J◐  Waiting for authorization\u001b[999D\u001b[J◓  Waiting for authorization\u001b[999D\u001b[J◑  Waiting for authorization\u001b[999D\u001b[J◒  Waiting for authorization.\u001b[999D\u001b[J◐  Waiting for authorization.\u001b[999D\u001b[J◓  Waiting for authorization.\u001b[999D\u001b[J◑  Waiting for authorization.\u001b[999D\u001b[J◒  Waiting for authorization.\u001b[999D\u001b[J◐  Waiting for authorization.\u001b[999D\u001b[J◇  Authentication successful!\n\u001b[?25h│\n└  Done\n\ntimestamp=2026-10-23T07:03:50.521Z level=INFO run=6b18f638 message=\"disposing instance\" directory=/home/savefyx/dev/savefxy\n",
+  "auth_ok": true,
+  "run_exit": 0,
+  "run_stdout_tail": "{\"type\":\"step_start\",\"timestamp\":1792739032542,\"sessionID\":\"ses_e986d4604ffewMLQysFrEjsy8N\",\"part\":{\"id\":\"prt_16792bdd6001g7wsE82o62jgGr\",\"messageID\":\"msg_16792bbbe001x9xxHCu8xQDa8P\",\"sessionID\":\"ses_e986d4604ffewMLQysFrEjsy8N\",\"snapshot\":\"68ac03c2093c8171763b152657346441cf47b6a6\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1792739032847,\"sessionID\":\"ses_e986d4604ffewMLQysFrEjsy8N\",\"part\":{\"type\":\"tool\",\"tool\":\"sharefyx_list_spaces\",\"callID\":\"call_sharefyx_list_spaces\",\"state\":{\"status\":\"completed\",\"input\":{},\"output\":\"[{\\\"name\\\":\\\"alpha\\\",\\\"item_count\\\":504,\\\"writable\\\":true,\\\"members\\\":[],\\\"folders\\\":[\\\"b0\\\",\\\"b1\\\",\\\"b2\\\",\\\"b3\\\",\\\"b4\\\",\\\"b5\\\",\\\"b6\\\",\\\"b7\\\",\\\"b8\\\",\\\"b9\\\",\\\"notizen\\\"]},{\\\"name\\\":\\\"beta\\\",\\\"item_count\\\":1,\\\"writable\\\":false,\\\"members\\\":[],\\\"folders\\\":[]},{\\\"name\\\":\\\"gamma\\\",\\\"item_count\\\":1,\\\"writable\\\":true,\\\"members\\\":[\\\"alpha\\\"],\\\"folders\\\":[]}]\",\"metadata\":{\"truncated\":false},\"title\":\"\",\"time\":{\"start\":1792739032541,\"end\":1792739032843}},\"id\":\"prt_16792bdd8001W9kdgUghWa94dV\",\"sessionID\":\"ses_e986d4604ffewMLQysFrEjsy8N\",\"messageID\":\"msg_16792bbbe001x9xxHCu8xQDa8P\"}}\n{\"type\":\"step_finish\",\"timestamp\":1792739032859,\"sessionID\":\"ses_e986d4604ffewMLQysFrEjsy8N\",\"part\":{\"id\":\"prt_16792bf17001dcHMFgm68Nog7K\",\"reason\":\"tool-calls\",\"snapshot\":\"68ac03c2093c8171763b152657346441cf47b6a6\",\"messageID\":\"msg_16792bbbe001x9xxHCu8xQDa8P\",\"sessionID\":\"ses_e986d4604ffewMLQysFrEjsy8N\",\"type\":\"step-finish\",\"tokens\":{\"input\":0,\"output\":0,\"reasoning\":0,\"cache\":{\"write\":0,\"read\":0}},\"cost\":0}}\n{\"type\":\"step_start\",\"timestamp\":1792739032901,\"sessionID\":\"ses_e986d4604ffewMLQysFrEjsy8N\",\"part\":{\"id\":\"prt_16792bf41001xFbnx4KkbT5ryi\",\"messageID\":\"msg_16792bf26001GQbuI1o7fQ47eR\",\"sessionID\":\"ses_e986d4604ffewMLQysFrEjsy8N\",\"snapshot\":\"68ac03c2093c8171763b152657346441cf47b6a6\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1792739032901,\"sessionID\":\"ses_e986d4604ffewMLQysFrEjsy8N\",\"part\":{\"id\":\"prt_16792bf42001UxD0Rmof8och88\",\"messageID\":\"msg_16792bf26001GQbuI1o7fQ47eR\",\"sessionID\":\"ses_e986d4604ffewMLQysFrEjsy8N\",\"type\":\"text\",\"text\":\"list_spaces ausgefuehrt: [{\\\"name\\\":\\\"alpha\\\",\\\"item_count\\\":504,\\\"writable\\\":true,\\\"members\\\":[],\\\"folders\\\":[\\\"b0\\\",\\\"b1\\\",\\\"b2\\\",\\\"b3\\\",\\\"b4\\\",\\\"b5\\\",\\\"b6\\\",\\\"b7\\\",\\\"b8\\\",\\\"b9\\\",\\\"notizen\\\"]},{\\\"name\\\":\\\"beta\\\",\\\"item_count\\\":1,\\\"writable\\\":false,\\\"members\\\":[],\\\"folders\\\":[]},{\\\"name\\\":\\\"gamma\\\",\\\"item_count\\\":1,\\\"writable\\\":true,\\\"members\\\":[\\\"alpha\\\"],\\\"folders\\\":[]}]\",\"time\":{\"start\":1792739032898,\"end\":1792739032899}}}\n{\"type\":\"step_finish\",\"timestamp\":1792739032911,\"sessionID\":\"ses_e986d4604ffewMLQysFrEjsy8N\",\"part\":{\"id\":\"prt_16792bf4c00190W3z1jnCtEoOU\",\"reason\":\"stop\",\"snapshot\":\"68ac03c2093c8171763b152657346441cf47b6a6\",\"messageID\":\"msg_16792bf26001GQbuI1o7fQ47eR\",\"sessionID\":\"ses_e986d4604ffewMLQysFrEjsy8N\",\"type\":\"step-finish\",\"tokens\":{\"input\":0,\"output\":0,\"reasoning\":0,\"cache\":{\"write\":0,\"read\":0}},\"cost\":0}}\n",
+  "run_stderr_tail": ":03:52.520Z level=INFO run=1a16b1df message=process session.id=ses_e986d4604ffewMLQysFrEjsy8N messageID=msg_16792bbbe001x9xxHCu8xQDa8P\ntimestamp=2026-10-23T07:03:52.527Z level=INFO run=1a16b1df message=stream providerID=stub modelID=stub-1 session.id=ses_e986d4604ffewMLQysFrEjsy8N small=false agent=build mode=primary\ntimestamp=2026-10-23T07:03:52.529Z level=INFO run=1a16b1df message=\"llm runtime selected\" llm.runtime=ai-sdk llm.provider=stub llm.model=stub-1\ntimestamp=2026-10-23T07:03:52.539Z level=INFO run=1a16b1df message=evaluated permission=sharefyx_list_spaces pattern=* action.permission=sharefyx_* action.action=allow action.pattern=*\ntimestamp=2026-10-23T07:03:52.855Z level=INFO run=1a16b1df message=tracking hash=68ac03c2093c8171763b152657346441cf47b6a6 cwd=/home/savefyx/dev/savefxy git=/tmp/opencode/p105-b6-opencode/data/opencode/snapshot/d642a893b3cb11de44c91865f0e3dbd3b87e7479/78d584cd2abab7d28f4cc9d3007a9fce49f4c468\ntimestamp=2026-10-23T07:03:52.869Z level=INFO run=1a16b1df message=loop session.id=ses_e986d4604ffewMLQysFrEjsy8N step=1\ntimestamp=2026-10-23T07:03:52.883Z level=INFO run=1a16b1df message=tracking hash=68ac03c2093c8171763b152657346441cf47b6a6 cwd=/home/savefyx/dev/savefxy git=/tmp/opencode/p105-b6-opencode/data/opencode/snapshot/d642a893b3cb11de44c91865f0e3dbd3b87e7479/78d584cd2abab7d28f4cc9d3007a9fce49f4c468\ntimestamp=2026-10-23T07:03:52.889Z level=INFO run=1a16b1df message=process session.id=ses_e986d4604ffewMLQysFrEjsy8N messageID=msg_16792bf26001GQbuI1o7fQ47eR\ntimestamp=2026-10-23T07:03:52.890Z level=INFO run=1a16b1df message=stream providerID=stub modelID=stub-1 session.id=ses_e986d4604ffewMLQysFrEjsy8N small=false agent=build mode=primary\ntimestamp=2026-10-23T07:03:52.892Z level=INFO run=1a16b1df message=\"llm runtime selected\" llm.runtime=ai-sdk llm.provider=stub llm.model=stub-1\ntimestamp=2026-10-23T07:03:52.908Z level=INFO run=1a16b1df message=tracking hash=68ac03c2093c8171763b152657346441cf47b6a6 cwd=/home/savefyx/dev/savefxy git=/tmp/opencode/p105-b6-opencode/data/opencode/snapshot/d642a893b3cb11de44c91865f0e3dbd3b87e7479/78d584cd2abab7d28f4cc9d3007a9fce49f4c468\ntimestamp=2026-10-23T07:03:52.921Z level=INFO run=1a16b1df message=loop session.id=ses_e986d4604ffewMLQysFrEjsy8N step=2\ntimestamp=2026-10-23T07:03:52.921Z level=INFO run=1a16b1df message=\"exiting loop\" session.id=ses_e986d4604ffewMLQysFrEjsy8N\ntimestamp=2026-10-23T07:03:52.926Z level=INFO run=1a16b1df message=\"disposing instance\" directory=/home/savefyx/dev/savefxy\n",
+  "stub_requests": [
+    {
+      "runde": 1,
+      "werkzeuge": [],
+      "mcp_werkzeuge": [],
+      "zuletzt_gerufen": null,
+      "antwort": "tool:glob"
+    },
+    {
+      "runde": 2,
+      "werkzeuge": [
+        "bash",
+        "edit",
+        "glob",
+        "grep",
+        "list_mcp_resource_templates",
+        "list_mcp_resources",
+        "read",
+        "read_mcp_resource",
+        "sharefyx_append_to_item",
+        "sharefyx_append_to_items",
+        "sharefyx_create_item",
+        "sharefyx_get_item",
+        "sharefyx_get_item_asset",
+        "sharefyx_get_item_meta",
+        "sharefyx_list_spaces",
+        "sharefyx_patch_item",
+        "sharefyx_put_item_asset",
+        "sharefyx_search_items",
+        "sharefyx_update_item",
+        "skill",
+        "task",
+        "todowrite",
+        "webfetch",
+        "write"
+      ],
+      "mcp_werkzeuge": [
+        "sharefyx_append_to_item",
+        "sharefyx_append_to_items",
+        "sharefyx_create_item",
+        "sharefyx_get_item",
+        "sharefyx_get_item_asset",
+        "sharefyx_get_item_meta",
+        "sharefyx_list_spaces",
+        "sharefyx_patch_item",
+        "sharefyx_put_item_asset",
+        "sharefyx_search_items",
+        "sharefyx_update_item"
+      ],
+      "zuletzt_gerufen": null,
+      "antwort": "tool:sharefyx_list_spaces"
+    },
+    {
+      "runde": 3,
+      "werkzeuge": [
+        "bash",
+        "edit",
+        "glob",
+        "grep",
+        "list_mcp_resource_templates",
+        "list_mcp_resources",
+        "read",
+        "read_mcp_resource",
+        "sharefyx_append_to_item",
+        "sharefyx_append_to_items",
+        "sharefyx_create_item",
+        "sharefyx_get_item",
+        "sharefyx_get_item_asset",
+        "sharefyx_get_item_meta",
+        "sharefyx_list_spaces",
+        "sharefyx_patch_item",
+        "sharefyx_put_item_asset",
+        "sharefyx_search_items",
+        "sharefyx_update_item",
+        "skill",
+        "task",
+        "todowrite",
+        "webfetch",
+        "write"
+      ],
+      "mcp_werkzeuge": [
+        "sharefyx_append_to_item",
+        "sharefyx_append_to_items",
+        "sharefyx_create_item",
+        "sharefyx_get_item",
+        "sharefyx_get_item_asset",
+        "sharefyx_get_item_meta",
+        "sharefyx_list_spaces",
+        "sharefyx_patch_item",
+        "sharefyx_put_item_asset",
+        "sharefyx_search_items",
+        "sharefyx_update_item"
+      ],
+      "zuletzt_gerufen": "sharefyx_list_spaces",
+      "antwort": "text:ergebnis"
+    }
+  ],
+  "stub_mcp_tools_seen": [
+    "sharefyx_append_to_item",
+    "sharefyx_append_to_items",
+    "sharefyx_create_item",
+    "sharefyx_get_item",
+    "sharefyx_get_item_asset",
+    "sharefyx_get_item_meta",
+    "sharefyx_list_spaces",
+    "sharefyx_patch_item",
+    "sharefyx_put_item_asset",
+    "sharefyx_search_items",
+    "sharefyx_update_item"
+  ],
+  "server_log_neu": "Terminating session: None\n{\"ts\":\"2026-10-23T07:03:52.065Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":200,\"ms\":2,\"ua\":\"opencode/1.19.4\"}\nTerminating session: None\n{\"ts\":\"2026-10-23T07:03:52.069Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":202,\"ms\":1,\"ua\":\"opencode/1.19.4\"}\n{\"ts\":\"2026-10-23T07:03:52.072Z\",\"ev\":\"http\",\"method\":\"GET\",\"path\":\"/mcp\",\"status\":405,\"ms\":0,\"ua\":\"opencode/1.19.4\"}\nTerminating session: None\n{\"ts\":\"2026-10-23T07:03:52.157Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":200,\"ms\":3,\"ua\":\"opencode/1.19.4\"}\n{\"ts\":\"2026-10-23T07:03:52.839Z\",\"ev\":\"tool\",\"tool\":\"list_spaces\",\"space\":\"alpha\",\"ms\":295,\"ok\":true,\"proto\":\"2025-11-25\"}\nTerminating session: None\n{\"ts\":\"2026-10-23T07:03:52.840Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":200,\"ms\":297,\"ua\":\"opencode/1.19.4\"}\nTerminating session: None\n{\"ts\":\"2026-10-23T07:03:52.877Z\",\"ev\":\"http\",\"method\":\"POST\",\"path\":\"/mcp\",\"status\":202,\"ms\":1,\"ua\":\"opencode/1.19.4\"}\n",
+  "server_log_werkzeugaufrufe": [
+    "{\"ts\":\"2026-10-23T07:03:52.839Z\",\"ev\":\"tool\",\"tool\":\"list_spaces\",\"space\":\"alpha\",\"ms\":295,\"ok\":true,\"proto\":\"2025-11-25\"}"
+  ],
+  "debug_exit": 0,
+  "debug_stdout_tail": "┌  MCP OAuth Debug\n│\n●  Server: sharefyx\n│\n●  URL: https://127.0.0.1:8799/mcp\n│\n●  Auth status: ✓ authenticated\n│\n●    Access token: O7pI***HKp8\n│\n●    Expires: 2026-10-23T08:03:50.244Z \n│\n●    Refresh token: present\n│\n●    Client ID: UJXU4L40xfKbujVSrYOvgw\n\u001b[?25l│\n◇  HTTP response: 401 Unauthorized\n\u001b[?25h│\n●  WWW-Authenticate: Bearer error=\"invalid_token\", error_description=\"Authentication required\", resource_metadata=\"https://127.0.0.1:8799/.well-known/oauth-protected-resource/mcp\", scope=\"space\"\n│\n●  Initial unauthenticated check returned 401, so this server requires OAuth\n│\n●  Testing OAuth flow (without completing authorization)...\n│\n◆  Connection successful (already authenticated)\n│\n└  Debug complete\n\n",
+  "debug_stderr_tail": "timestamp=2026-10-23T07:03:53.884Z level=INFO run=7945196f message=\"creating instance\" directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-23T07:03:53.885Z level=INFO run=7945196f message=fromDirectory directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-23T07:03:53.916Z level=INFO run=7945196f message=bootstrapping directory=/home/savefyx/dev/savefxy\ntimestamp=2026-10-23T07:03:53.920Z level=INFO run=7945196f message=loading path=/tmp/opencode/p105-b6-opencode/config/opencode/config.json\ntimestamp=2026-10-23T07:03:53.920Z level=INFO run=7945196f message=loading path=/tmp/opencode/p105-b6-opencode/config/opencode/opencode.json\ntimestamp=2026-10-23T07:03:53.925Z level=INFO run=7945196f message=loading path=/tmp/opencode/p105-b6-opencode/config/opencode/opencode.jsonc\ntimestamp=2026-10-23T07:03:53.996Z level=INFO run=7945196f message=\"all LSPs are disabled\"\ntimestamp=2026-10-23T07:03:53.996Z level=INFO run=7945196f message=\"all formatters are disabled\"\ntimestamp=2026-10-23T07:03:53.996Z level=INFO run=7945196f message=init\n\u001b[0m\ntimestamp=2026-10-23T07:03:54.027Z level=INFO run=7945196f message=\"disposing instance\" directory=/home/savefyx/dev/savefxy\n"
+}

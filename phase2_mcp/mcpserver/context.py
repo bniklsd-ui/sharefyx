@@ -6,7 +6,7 @@ als "zieht das Token-Segment aus dessen Pfad" — das ist nicht umsetzbar, weil 
 das Token-Segment aus dem Pfad entfernen MUSS, bevor es an die innere FastMCP-App delegiert
 (sonst würde FastMCPs eigenes Routing das Segment als Teil des MCP-Pfads sehen). Ein Tool, das
 während seiner Ausführung `get_http_request().url.path` aufruft, sieht deshalb nur noch den
-bereits bereinigten Pfad — empirisch verifiziert gegen echtes `fastmcp==3.4.4` +
+bereits bereinigten Pfad — empirisch verifiziert gegen echtes `fastmcp==3.4.4` [gilt unverändert unter 4.1.x — Suite + Smokes, P10.5 Block 5, 2026-10-22] +
 `starlette` (Testprobe: `get_http_request().url.path` lieferte `"/mcp/"`, nicht den Token).
 
 Stattdessen: die ASGI-Auth-Schicht hinterlegt `token_hash` in `scope["state"]`, bevor sie an die

@@ -1,0 +1,164 @@
+{
+  "probe": "p105_b6_transport",
+  "opencode_binary": "/tmp/opencode/p105-b6-oc/node_modules/.bin/opencode",
+  "A": {
+    "tag": "A",
+    "server_name": "probea",
+    "port": 8801,
+    "stateless_http": true,
+    "run_exit": 0,
+    "run_stdout_tail": "{\"type\":\"step_start\",\"timestamp\":1792738260836,\"sessionID\":\"ses_e9879101bffeUTbsi7Dc9yHmLX\",\"part\":{\"id\":\"prt_16786f759001LvOZr1hVY4bVTv\",\"messageID\":\"msg_16786f23b001m8IqVDNpf3DyZY\",\"sessionID\":\"ses_e9879101bffeUTbsi7Dc9yHmLX\",\"snapshot\":\"5db62d3da4f1ce382926811672e5e2fadcad25a3\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1792738260847,\"sessionID\":\"ses_e9879101bffeUTbsi7Dc9yHmLX\",\"part\":{\"type\":\"tool\",\"tool\":\"probea_list_spaces\",\"callID\":\"call_probea_list_spaces\",\"state\":{\"status\":\"completed\",\"input\":{},\"output\":\"alpha, beta, gamma\",\"metadata\":{\"truncated\":false},\"title\":\"\",\"time\":{\"start\":1792738260834,\"end\":1792738260845}},\"id\":\"prt_16786f75b001ydKc3lkyX6fTgg\",\"sessionID\":\"ses_e9879101bffeUTbsi7Dc9yHmLX\",\"messageID\":\"msg_16786f23b001m8IqVDNpf3DyZY\"}}\n{\"type\":\"step_finish\",\"timestamp\":1792738260864,\"sessionID\":\"ses_e9879101bffeUTbsi7Dc9yHmLX\",\"part\":{\"id\":\"prt_16786f77b001NQf8yKbpHZVhCW\",\"reason\":\"tool-calls\",\"snapshot\":\"5db62d3da4f1ce382926811672e5e2fadcad25a3\",\"messageID\":\"msg_16786f23b001m8IqVDNpf3DyZY\",\"sessionID\":\"ses_e9879101bffeUTbsi7Dc9yHmLX\",\"type\":\"step-finish\",\"tokens\":{\"input\":0,\"output\":0,\"reasoning\":0,\"cache\":{\"write\":0,\"read\":0}},\"cost\":0}}\n{\"type\":\"step_start\",\"timestamp\":1792738260950,\"sessionID\":\"ses_e9879101bffeUTbsi7Dc9yHmLX\",\"part\":{\"id\":\"prt_16786f7d00014rRBQI8zwvrPdG\",\"messageID\":\"msg_16786f7b1001ssHmdPGE4GyKSI\",\"sessionID\":\"ses_e9879101bffeUTbsi7Dc9yHmLX\",\"snapshot\":\"5db62d3da4f1ce382926811672e5e2fadcad25a3\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1792738260950,\"sessionID\":\"ses_e9879101bffeUTbsi7Dc9yHmLX\",\"part\":{\"id\":\"prt_16786f7d2001W5UN76419bb97R\",\"messageID\":\"msg_16786f7b1001ssHmdPGE4GyKSI\",\"sessionID\":\"ses_e9879101bffeUTbsi7Dc9yHmLX\",\"type\":\"text\",\"text\":\"list_spaces gerufen: alpha, beta, gamma\",\"time\":{\"start\":1792738260946,\"end\":1792738260948}}}\n{\"type\":\"step_finish\",\"timestamp\":1792738260998,\"sessionID\":\"ses_e9879101bffeUTbsi7Dc9yHmLX\",\"part\":{\"id\":\"prt_16786f7ff001IizU97rp0ENB9x\",\"reason\":\"stop\",\"snapshot\":\"5db62d3da4f1ce382926811672e5e2fadcad25a3\",\"messageID\":\"msg_16786f7b1001ssHmdPGE4GyKSI\",\"sessionID\":\"ses_e9879101bffeUTbsi7Dc9yHmLX\",\"type\":\"step-finish\",\"tokens\":{\"input\":0,\"output\":0,\"reasoning\":0,\"cache\":{\"write\":0,\"read\":0}},\"cost\":0}}\n",
+    "run_stderr_tail": "session.id=ses_e9879101bffeUTbsi7Dc9yHmLX step=1\ntimestamp=2026-10-23T06:51:00.929Z level=INFO run=0391c001 message=tracking hash=5db62d3da4f1ce382926811672e5e2fadcad25a3 cwd=/home/savefyx/dev/savefxy git=/tmp/opencode/p105-b6-transport/oc_A/data/opencode/snapshot/d642a893b3cb11de44c91865f0e3dbd3b87e7479/78d584cd2abab7d28f4cc9d3007a9fce49f4c468\ntimestamp=2026-10-23T06:51:00.936Z level=INFO run=0391c001 message=process session.id=ses_e9879101bffeUTbsi7Dc9yHmLX messageID=msg_16786f7b1001ssHmdPGE4GyKSI\ntimestamp=2026-10-23T06:51:00.937Z level=INFO run=0391c001 message=stream providerID=stub modelID=stub-1 session.id=ses_e9879101bffeUTbsi7Dc9yHmLX small=false agent=build mode=primary\ntimestamp=2026-10-23T06:51:00.938Z level=INFO run=0391c001 message=\"llm runtime selected\" llm.runtime=ai-sdk llm.provider=stub llm.model=stub-1\ntimestamp=2026-10-23T06:51:00.991Z level=INFO run=0391c001 message=tracking hash=5db62d3da4f1ce382926811672e5e2fadcad25a3 cwd=/home/savefyx/dev/savefxy git=/tmp/opencode/p105-b6-transport/oc_A/data/opencode/snapshot/d642a893b3cb11de44c91865f0e3dbd3b87e7479/78d584cd2abab7d28f4cc9d3007a9fce49f4c468\ntimestamp=2026-10-23T06:51:01.008Z level=INFO run=0391c001 message=loop session.id=ses_e9879101bffeUTbsi7Dc9yHmLX step=2\ntimestamp=2026-10-23T06:51:01.009Z level=INFO run=0391c001 message=\"exiting loop\" session.id=ses_e9879101bffeUTbsi7Dc9yHmLX\ntimestamp=2026-10-23T06:51:01.015Z level=INFO run=0391c001 message=\"disposing instance\" directory=/home/savefyx/dev/savefxy\n",
+    "stub_requests": [
+      {
+        "runde": 1,
+        "werkzeuge": [],
+        "mcp_werkzeuge": [],
+        "zuletzt_gerufen": null,
+        "antwort": "text:kein_werkzeug"
+      },
+      {
+        "runde": 2,
+        "werkzeuge": [
+          "bash",
+          "edit",
+          "glob",
+          "grep",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "probea_list_spaces",
+          "read",
+          "read_mcp_resource",
+          "skill",
+          "task",
+          "todowrite",
+          "webfetch",
+          "write"
+        ],
+        "mcp_werkzeuge": [
+          "probea_list_spaces"
+        ],
+        "zuletzt_gerufen": null,
+        "antwort": "tool:probea_list_spaces"
+      },
+      {
+        "runde": 3,
+        "werkzeuge": [
+          "bash",
+          "edit",
+          "glob",
+          "grep",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "probea_list_spaces",
+          "read",
+          "read_mcp_resource",
+          "skill",
+          "task",
+          "todowrite",
+          "webfetch",
+          "write"
+        ],
+        "mcp_werkzeuge": [
+          "probea_list_spaces"
+        ],
+        "zuletzt_gerufen": "probea_list_spaces",
+        "antwort": "text:ergebnis"
+      }
+    ],
+    "mcp_werkzeuge_gesehen": [
+      "probea_list_spaces"
+    ],
+    "werkzeug_aufgerufen": [
+      "probea_list_spaces"
+    ],
+    "server_zugriffe": [
+      "INFO:     127.0.0.1:49372 - \"POST /mcp HTTP/1.1\" 200 OK",
+      "INFO:     127.0.0.1:49372 - \"POST /mcp HTTP/1.1\" 202 Accepted",
+      "INFO:     127.0.0.1:49372 - \"GET /mcp HTTP/1.1\" 405 Method Not Allowed",
+      "INFO:     127.0.0.1:49372 - \"POST /mcp HTTP/1.1\" 200 OK",
+      "INFO:     127.0.0.1:49372 - \"POST /mcp HTTP/1.1\" 200 OK",
+      "INFO:     127.0.0.1:49372 - \"POST /mcp HTTP/1.1\" 202 Accepted"
+    ]
+  },
+  "B": {
+    "tag": "B",
+    "server_name": "probeb",
+    "port": 8802,
+    "stateless_http": false,
+    "run_exit": 0,
+    "run_stdout_tail": "{\"type\":\"step_start\",\"timestamp\":1792738277002,\"sessionID\":\"ses_e9878cfedffeOtTlXC5AS7NyyW\",\"part\":{\"id\":\"prt_167873674001F4M9HbqdLvrUGm\",\"messageID\":\"msg_167873212001Wp2W2MyMKhhSl6\",\"sessionID\":\"ses_e9878cfedffeOtTlXC5AS7NyyW\",\"snapshot\":\"5db62d3da4f1ce382926811672e5e2fadcad25a3\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1792738277035,\"sessionID\":\"ses_e9878cfedffeOtTlXC5AS7NyyW\",\"part\":{\"type\":\"tool\",\"tool\":\"probeb_list_spaces\",\"callID\":\"call_probeb_list_spaces\",\"state\":{\"status\":\"completed\",\"input\":{},\"output\":\"alpha, beta, gamma\",\"metadata\":{\"truncated\":false},\"title\":\"\",\"time\":{\"start\":1792738276993,\"end\":1792738277033}},\"id\":\"prt_167873677001xGsh0HG12v6EZj\",\"sessionID\":\"ses_e9878cfedffeOtTlXC5AS7NyyW\",\"messageID\":\"msg_167873212001Wp2W2MyMKhhSl6\"}}\n{\"type\":\"step_finish\",\"timestamp\":1792738277049,\"sessionID\":\"ses_e9878cfedffeOtTlXC5AS7NyyW\",\"part\":{\"id\":\"prt_1678736b6001JD2kPksZ5vQgdO\",\"reason\":\"tool-calls\",\"snapshot\":\"5db62d3da4f1ce382926811672e5e2fadcad25a3\",\"messageID\":\"msg_167873212001Wp2W2MyMKhhSl6\",\"sessionID\":\"ses_e9878cfedffeOtTlXC5AS7NyyW\",\"type\":\"step-finish\",\"tokens\":{\"input\":0,\"output\":0,\"reasoning\":0,\"cache\":{\"write\":0,\"read\":0}},\"cost\":0}}\n{\"type\":\"step_start\",\"timestamp\":1792738277113,\"sessionID\":\"ses_e9878cfedffeOtTlXC5AS7NyyW\",\"part\":{\"id\":\"prt_1678736e400131EAgtGX7JKkmQ\",\"messageID\":\"msg_1678736c7001DIB3alGCmY3uP3\",\"sessionID\":\"ses_e9878cfedffeOtTlXC5AS7NyyW\",\"snapshot\":\"5db62d3da4f1ce382926811672e5e2fadcad25a3\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1792738277113,\"sessionID\":\"ses_e9878cfedffeOtTlXC5AS7NyyW\",\"part\":{\"id\":\"prt_1678736e6001PA5puwjm9ggThT\",\"messageID\":\"msg_1678736c7001DIB3alGCmY3uP3\",\"sessionID\":\"ses_e9878cfedffeOtTlXC5AS7NyyW\",\"type\":\"text\",\"text\":\"list_spaces gerufen: alpha, beta, gamma\",\"time\":{\"start\":1792738277094,\"end\":1792738277095}}}\n{\"type\":\"step_finish\",\"timestamp\":1792738277132,\"sessionID\":\"ses_e9878cfedffeOtTlXC5AS7NyyW\",\"part\":{\"id\":\"prt_1678737070012wR6qOIsDyM1hB\",\"reason\":\"stop\",\"snapshot\":\"5db62d3da4f1ce382926811672e5e2fadcad25a3\",\"messageID\":\"msg_1678736c7001DIB3alGCmY3uP3\",\"sessionID\":\"ses_e9878cfedffeOtTlXC5AS7NyyW\",\"type\":\"step-finish\",\"tokens\":{\"input\":0,\"output\":0,\"reasoning\":0,\"cache\":{\"write\":0,\"read\":0}},\"cost\":0}}\n",
+    "run_stderr_tail": "session.id=ses_e9878cfedffeOtTlXC5AS7NyyW step=1\ntimestamp=2026-10-23T06:51:17.078Z level=INFO run=6211931c message=tracking hash=5db62d3da4f1ce382926811672e5e2fadcad25a3 cwd=/home/savefyx/dev/savefxy git=/tmp/opencode/p105-b6-transport/oc_B/data/opencode/snapshot/d642a893b3cb11de44c91865f0e3dbd3b87e7479/78d584cd2abab7d28f4cc9d3007a9fce49f4c468\ntimestamp=2026-10-23T06:51:17.084Z level=INFO run=6211931c message=process session.id=ses_e9878cfedffeOtTlXC5AS7NyyW messageID=msg_1678736c7001DIB3alGCmY3uP3\ntimestamp=2026-10-23T06:51:17.084Z level=INFO run=6211931c message=stream providerID=stub modelID=stub-1 session.id=ses_e9878cfedffeOtTlXC5AS7NyyW small=false agent=build mode=primary\ntimestamp=2026-10-23T06:51:17.086Z level=INFO run=6211931c message=\"llm runtime selected\" llm.runtime=ai-sdk llm.provider=stub llm.model=stub-1\ntimestamp=2026-10-23T06:51:17.127Z level=INFO run=6211931c message=tracking hash=5db62d3da4f1ce382926811672e5e2fadcad25a3 cwd=/home/savefyx/dev/savefxy git=/tmp/opencode/p105-b6-transport/oc_B/data/opencode/snapshot/d642a893b3cb11de44c91865f0e3dbd3b87e7479/78d584cd2abab7d28f4cc9d3007a9fce49f4c468\ntimestamp=2026-10-23T06:51:17.141Z level=INFO run=6211931c message=loop session.id=ses_e9878cfedffeOtTlXC5AS7NyyW step=2\ntimestamp=2026-10-23T06:51:17.141Z level=INFO run=6211931c message=\"exiting loop\" session.id=ses_e9878cfedffeOtTlXC5AS7NyyW\ntimestamp=2026-10-23T06:51:17.147Z level=INFO run=6211931c message=\"disposing instance\" directory=/home/savefyx/dev/savefxy\n",
+    "stub_requests": [
+      {
+        "runde": 1,
+        "werkzeuge": [],
+        "mcp_werkzeuge": [],
+        "zuletzt_gerufen": null,
+        "antwort": "text:kein_werkzeug"
+      },
+      {
+        "runde": 2,
+        "werkzeuge": [
+          "bash",
+          "edit",
+          "glob",
+          "grep",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "probeb_list_spaces",
+          "read",
+          "read_mcp_resource",
+          "skill",
+          "task",
+          "todowrite",
+          "webfetch",
+          "write"
+        ],
+        "mcp_werkzeuge": [
+          "probeb_list_spaces"
+        ],
+        "zuletzt_gerufen": null,
+        "antwort": "tool:probeb_list_spaces"
+      },
+      {
+        "runde": 3,
+        "werkzeuge": [
+          "bash",
+          "edit",
+          "glob",
+          "grep",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "probeb_list_spaces",
+          "read",
+          "read_mcp_resource",
+          "skill",
+          "task",
+          "todowrite",
+          "webfetch",
+          "write"
+        ],
+        "mcp_werkzeuge": [
+          "probeb_list_spaces"
+        ],
+        "zuletzt_gerufen": "probeb_list_spaces",
+        "antwort": "text:ergebnis"
+      }
+    ],
+    "mcp_werkzeuge_gesehen": [
+      "probeb_list_spaces"
+    ],
+    "werkzeug_aufgerufen": [
+      "probeb_list_spaces"
+    ],
+    "server_zugriffe": [
+      "INFO:     127.0.0.1:54230 - \"POST /mcp HTTP/1.1\" 200 OK",
+      "INFO:     127.0.0.1:54230 - \"POST /mcp HTTP/1.1\" 202 Accepted",
+      "INFO:     127.0.0.1:54230 - \"GET /mcp HTTP/1.1\" 200 OK",
+      "INFO:     127.0.0.1:54236 - \"POST /mcp HTTP/1.1\" 200 OK",
+      "INFO:     127.0.0.1:54236 - \"POST /mcp HTTP/1.1\" 200 OK",
+      "INFO:     127.0.0.1:54236 - \"POST /mcp HTTP/1.1\" 202 Accepted"
+    ]
+  }
+}

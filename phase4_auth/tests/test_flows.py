@@ -145,6 +145,37 @@ def test_authorize_rejects_unregistered_redirect_uri_without_redirect(store, set
     assert isinstance(result, flows.ErrorPage)
 
 
+# -- Loopback-Redirect (P10.5 Block 6, Lock P10.5-O) --------------------------------------
+
+
+def test_authorize_accepts_registered_loopback_uri(store, settings):
+    """[2026-10-22, P10.5 Block 6] `flows.py` ruft dieselbe `redirect_uri_allowed()` — ein
+    registrierter Loopback-Redirect kommt jetzt durch (vorher: `ErrorPage`)."""
+    loopback = store.create_client(
+        client_name="OpenCode", application_type=None,
+        redirect_uris=["http://127.0.0.1:19876/mcp/oauth/callback"],
+    )
+    result = _start(
+        store, settings, loopback,
+        redirect_uri="http://127.0.0.1:19876/mcp/oauth/callback",
+    )
+    assert isinstance(result, flows.RenderForm), result
+
+
+def test_authorize_rejects_unregistered_loopback_port(store, settings):
+    """Der byte-genaue Abgleich (`flows.py`) bleibt: ein **anderer** Port als der registrierte
+    ist ein Fehler — P10.5-O baut bewusst keinen portagnostischen Vergleich (RFC 8252 §7.3)."""
+    loopback = store.create_client(
+        client_name="OpenCode", application_type=None,
+        redirect_uris=["http://127.0.0.1:19876/mcp/oauth/callback"],
+    )
+    result = _start(
+        store, settings, loopback,
+        redirect_uri="http://127.0.0.1:19877/mcp/oauth/callback",
+    )
+    assert isinstance(result, flows.ErrorPage), result
+
+
 def test_authorize_rejects_plain_pkce(store, settings, client):
     result = _start(store, settings, client, code_challenge_method="plain")
     assert isinstance(result, flows.RedirectError)
