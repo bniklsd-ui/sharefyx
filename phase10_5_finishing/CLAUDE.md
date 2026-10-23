@@ -10,7 +10,7 @@ down:
   - ../phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md  # 📦 §12 Entscheidungsliste D-1–D-18, verbatim
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
   - UPDATES_ARCHIVE.md                              # 📦 die älteren `updated:`-Fäden dieses Heads, verbatim
-updated: 2026-10-23 (Block 7.1 (UI-1) gebaut: HTML-404 für unbekannte `/ui`-Pfade + JSON-404 in der API — Branch `p105-block7`, nicht gemergt; 4 neue Tests, 4 Gegenläufe wirksam; Suite 1384 grün) | 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zeile `)pdated:` → `) | `; Release-Tests wieder grün, Suite 1380 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-10-23 (Deploy B ist live: `v3.1.6`, Release `20261023T165838.591015Z`, SHA `e5c834e`, health_gate 9/9 OK; Block 7.1 (UI-1) gemergt (`f0e76b0`) — kommt mit `v3.1.7`) | 2026-10-23 (Block 7.1 (UI-1) gebaut: HTML-404 für unbekannte `/ui`-Pfade + JSON-404 in der API — Branch `p105-block7`, nicht gemergt; 4 neue Tests, 4 Gegenläufe wirksam; Suite 1384 grün) | 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zeile `)pdated:` → `) | `; Release-Tests wieder grün, Suite 1380 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -51,11 +51,11 @@ updated: 2026-10-23 (Block 7.1 (UI-1) gebaut: HTML-404 für unbekannte `/ui`-Pfa
 | # | Version | SHA | `health_gate` | Ausgabe |
 |---|---|---|---|---|
 | A | `v3.1.5` | `7358f22` | **9/9 OK** | nach Block 1–4 — **live seit 2026-10-23**, Release `20261023T065010.377336Z` |
-| B | `v3.1.6` | — | — | nach Block 5–6 (+ **Block 7.0**, die Update-Log-ID) — **2026-10-23 vorbereitet** (Badge, `UPDATE_LOG`, Suite grün) · **Wegwerf-Generalprobe 26/26 Zellen grün** (fünf Gruppen, `probes/p105_deploy_b_probe.py`) · **Der Deploy-Aufruf der letzten Session ist an den Release-Tests gescheitert, nicht am Befehl** — Ursache: eine verklebte `updated:`-Zeile in `SESSIONS_ARCHIVE.md` (behoben, Suite 1380 grün) · **Deploy beim Nikinger** (Hard Rule 9, `sudo`) |
+| B | `v3.1.6` | `e5c834e` | **9/9 OK** | nach Block 5–6 (+ **Block 7.0**, die Update-Log-ID) — **live seit 2026-10-23**, Release `20261023T165838.591015Z` · **Deploy beim Nikinger** (Hard Rule 9, `sudo`; `deploy.sh main` → Release-Tests **1380 grün** (340,7 s) → Symlink-Wechsel → Dienst neu gestartet) · `health_gate.sh --expected-version=v3.1.6 --require-todays-update-log --expected-sha=e5c834e` → **9/9 OK** (`.rail__version` v3.1.6, Release-SHA `e5c834e…`, Update-Log 2026-10-23) · **Block 7.1 (UI-1) ist gemergt** (`f0e76b0`, aus `p105-block7`) — **nicht** in diesem Release, sondern in `v3.1.7` |
 | C | `v3.1.7` | — | — | nach Block 7–8 |
 | D | `v3.1.8` | — | — | nach Block 9–11 |
 
-**Stand 2026-10-23 (Abend):** Deploy A ist **live** (`v3.1.5`, Release `20261023T065010.377336Z`, SHA `7358f22`, `health_gate` **9/9 OK**). Der Branch `p105-block5` (Block 5 + 6 + P10.5-26) ist **gemergt**; Deploy B (`v3.1.6`) ist vorbereitet und geht aus `main` mit `fastmcp 4.1.3`. **Die Generalprobe davor ist gefahren: 26/26 Zellen grün an der Wegwerf-Instanz** (Details im Session-Block unten; die Zeile stand vorher auf „25/25" — **datierte Korrektur**, der Block-7.0-Commit hat die Probe um eine Zelle erweitert). **Der Deploy-Aufruf der letzten Session ist an den Release-Tests gescheitert — nicht am Befehl:** eine verklebte `updated:`-Zeile in `SESSIONS_ARCHIVE.md` (behoben, Details im Session-Block) — es fehlt nur noch der Deploy-Aufruf durch den Nikinger. **Block 7.1 (UI-1) ist gebaut** auf dem Branch `p105-block7` — **nicht gemergt** (Nikinger-Entscheidung: Deploy A vor dem Branch-Merge); der Merge wartet auf Deploy A/B.
+**Stand 2026-10-23 (Abend):** Deploy A ist **live** (`v3.1.5`, Release `20261023T065010.377336Z`, SHA `7358f22`, `health_gate` **9/9 OK**); der Branch `p105-block5` (Block 5 + 6 + P10.5-26) ist **gemergt**. **Deploy B ist ebenfalls live**: `v3.1.6`, Release `20261023T165838.591015Z`, SHA `e5c834e`, `health_gate` **9/9 OK** (aus `main` mit `fastmcp 4.1.3`; der Deploy lief beim Nikinger, die Release-Tests im Release **1380 grün** in 340,7 s). **Block 7.1 (UI-1) ist gemergt** (`f0e76b0`) und damit ab `v3.1.7` dabei. **Die Generalprobe davor ist gefahren: 26/26 Zellen grün an der Wegwerf-Instanz** (Details im Session-Block unten; die Zeile stand vorher auf „25/25" — **datierte Korrektur**, der Block-7.0-Commit hat die Probe um eine Zelle erweitert). **Der Deploy-Aufruf der letzten Session ist an den Release-Tests gescheitert — nicht am Befehl:** eine verklebte `updated:`-Zeile in `SESSIONS_ARCHIVE.md` (behoben, Details im Session-Block) — es fehlt nur noch der Deploy-Aufruf durch den Nikinger. **Block 7.1 (UI-1) ist gebaut** auf dem Branch `p105-block7` — **nicht gemergt** (Nikinger-Entscheidung: Deploy A vor dem Branch-Merge); der Merge wartet auf Deploy A/B.
 
 **Ein Deploy ist vier Schritte, kein Commit** (Plan §2.5): volle Suite + `doc_health` + `ui_budget` grün · Badge und `docs/UPDATE_LOG.md` · Commit + Push · **`deploy.sh` durch den Nikinger** (Hard Rule 9) · `health_gate.sh` mit **echter Ausgabe** in den Commit — nie die Behauptung.
 
@@ -269,20 +269,17 @@ sichtbar · `test_updated_chain.py` **7/7**.
 nicht mehr scheitern.
 
 **Warum der Deploy nicht von mir kam (gemessen).** `sudo` verlangt ein Passwort: `sudo -n true` sagt
-„a password is required" — auch in einem pty; das Journal zeigt **keine** erfolgreiche
-`savefyx`-sudo seit Deploy A (08:57), nur die `fleet`-Läufe. Der `sudo -v` lief also auf einem
-anderen Rechner oder an ein TTY gebunden (`tty_tickets`); **der Deploy läuft im Terminal
-des Nikingers.** **Ein Deploy ohne Neustart wäre eine stille Halbdeplosion:** `static_routes.py`
-liest `app.html` pro Anfrage von der Platte — der Symlink stünde schon auf `v3.1.6`, der Prozess
-liefe aber mit dem alten Code; das Health-Gate wäre **grün und falsch**.
+„a password is required" — auch in einem pty; das Journal zeigte **keine** erfolgreiche
+`savefyx`-sudo seit Deploy A, nur die `fleet`-Läufe ⇒ der Deploy lief im Terminal des Nikingers
+(Hard Rule 9). **Ein Deploy ohne Neustart wäre eine stille Halbdeplosion:** `static_routes.py` liest
+`app.html` pro Anfrage von der Platte — der Symlink stünde schon auf `v3.1.6`, der Prozess liefe
+aber mit dem alten Code; das Health-Gate wäre **grün und falsch**.
 
-**Der Deploy-B-Aufruf.** Die Notiz nannte `--expected-sha=a7fe62c`; **dieser Stand ist nicht
-deploybar** (sein Release wäre rot). Er muss den **Reparatur-Commit + Doku-Stand**
-ausliefern — SHA = letzter Commit auf `main` (`git log -1`), **nicht** `3183344` (Reparatur-Commit
-**ohne** die Ketten-Rotation darunter). Aufruf wie bei Deploy A, danach `health_gate.sh
---expected-version=v3.1.6 --require-todays-update-log --expected-sha=<SHA>` — die **echte** Ausgabe
-in den Session-Block, nie die Behauptung. **Baseline vorher gemessen:** das Gate
-ist rot — live läuft noch `v3.1.5`.
+**Deploy B ist live.** Der Nikinger hat den Aufruf ausgeführt (Hard Rule 9, `sudo`): Release-Tests im
+Release **1380 grün** (340,7 s) → Symlink auf `/opt/sharefyx/releases/20261023T165838.591015Z` → Dienst neu
+gestartet. Mein Gate danach: `health_gate.sh --expected-version=v3.1.6 --require-todays-update-log
+--expected-sha=e5c834e` → **9/9 OK** (`.rail__version` v3.1.6, Release-SHA `e5c834e…`, Update-Log 2026-10-23).
+**Block 7.1 (UI-1) ist gemergt** (`f0e76b0`) — im Release B **nicht** dabei, das kommt mit `v3.1.7`.
 
 **Block 7, Schritt 7.1 (UI-1) — gebaut auf dem Branch `p105-block7` (nicht gemergt).** Die
 HTML-404: `pages.py :: render_not_found_page()` (Text + Link „Zur Übersicht") und die Route `Route("/ui/{rest:path}", …)` in `mcpserver/app.py` **nach** allen
@@ -296,6 +293,7 @@ wirksam** (Fänger entfernt / vor die bekannten Routen / API-404 entfernt / glob
 (4.471 B) rotierten nach `UPDATES_ARCHIVE.md` ⇒ **36.664 B**, Basis 32.572 B — jetzt bindet wieder
 **DO-3** (Block ≤ 4.096 B). Nächster Hebel: der „Startauftrag" (5,8 KB) → L3-Archiv.
 
-**Offen / nächster Schritt.** Deploy B ist beim Nikinger (Hard Rule 9, `sudo`). Live danach:
-**P10.5-22** · **P10.5-25** · **P10.5-27/28** (Live P10-J, zwei Modellanbieter). **5.7:** Fabian
-Bescheid. Danach Block 7.2 (Logo) auf dem Branch — Merge **nach** Deploy A/B (Nikinger-Entscheidung).
+**Offen / nächster Schritt.** Live abgenommen werden jetzt **P10.5-22** (Connector-Werkzeuge, `proto`) ·
+**P10.5-25** (`POST …/mcp` → 401 mit Challenge) · **P10.5-27/28** (Live P10-J, zwei Modellanbieter) ·
+**P10.5-18** (nach Deploy A) · AL-1 Zeile 15 · V203. **5.7:** Fabian Bescheid. Baulich: **Block 7.2**
+(Logo/Favicon, Variante B) — `v3.1.7` wird nach Block 7–8 deployed.
