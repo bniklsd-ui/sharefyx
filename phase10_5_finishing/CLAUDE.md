@@ -9,7 +9,8 @@ down:
   - ../phase10_inventory/BAUSTELLENREGISTER.md      # 📗 die Arbeitsliste — hier wird abgehakt (P10-B)
   - ../phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md  # 📦 §12 Entscheidungsliste D-1–D-18, verbatim
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
-updated: 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zeile `)pdated:` → `) | `; Release-Tests wieder grün, Suite 1380 grün) | 2026-10-23 (Block 7 Schritt 7.0: die Update-Log-ID — Zähler von unten, der Banner beim zweiten Deploy am selben Tag; Generalprobe 26/26 grün, Suite 1380 grün) | 2026-10-23 (Deploy-B-Generalprobe 25/25 Zellen grün an der Wegwerf-Instanz — Probe `probes/p105_deploy_b_probe.py`, Suite 1376 grün; Deploy B beim Nikinger) | 2026-10-23 (Deploy B `v3.1.6` vorbereitet — Badge, eigener `## 2026-10-23`-Block im Update-Log, Venv `fastmcp 4.1.3` = `constraints.txt`, Suite 1376 grün) | 2026-10-23 (Deploy A `v3.1.5` live — Gate 9/9, Release `20261023T065010.377336Z`; P10.5-26 geklärt; Merge `p105-block5` → `main`) | 2026-10-23 (P10.5-26 ✅ — opencode führt `list_spaces` aus; die zwei Auslöser lagen im Messgerät (Stub-Endlosschleife, `mcp debug` vor dem Lauf), kein Produktcode) | 2026-10-22 (Block 6 ✅ — Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6; V209/V197 gemessen, Suite 1374 grün) | 2026-10-22 (Block 5 **abgeschlossen** — `fastmcp==4.1.3` + neu erzeugte `constraints.txt`, Suite 1354 grün mit Compat an und aus, `append_to_items` (LG-4) + Log-Feld `proto`, Protokoll-Probe beider Ären, Smoke 17/17; Abnahme 10-19/20/21 ✅, 10-22 beim Nikinger nach Deploy B) | 2026-10-22 (Block 4 **abgeschlossen** — Schritt 4.6: M2-Bench **Median 107,3 ms** (Z1 ≤ 300 ms), Event-Loop-Probe `/health` hinter `/overview` **23 ms** (P10: 4757 ms), Browser-Probe Z2/Z3/Z4 (150 ms → kein Platzhalter, 400 ms → Platzhalter); Abnahme 10-14/15/16/17 ✅, 10-18 bleibt beim Nikinger nach Deploy A) | 2026-10-22 (Block 4 Schritte 4.3/4.4: der Client holt nur noch `/overview`, `focus`/`visibilitychange` bekommen 10 s Mindestpause (PF-4) · neu `static/js/loading.js` (`withLoading`, 200 ms) + `.is-loading`-Gerüst in `app.css`, statisch unter `prefers-reduced-motion` (Z3/Z4) · 7 Wächter in `phase5_ui/tests/test_loading_state.py`) | 2026-10-22 (Block 4 Schritte 4.1/4.2: `_overview()` in **einem** `store.search()`-Durchgang (P10.5-G) + `asyncio.to_thread` in `_overview`/`_items_get`/`_graph_get` (Z2); 4 neue Tests (Parität, Rückfall, folders/members, Event-Loop) + 5 Gegenläufe; Suite 1334 grün) | 2026-10-22 (Block 3 Schritte 3.3–3.4: `scripts/asset_orphans.py` (LG-7) + 7 Tests + Wegwerf-Probe `p105_b3_assets_probe.py` **14/14 Zellen** — Abnahme 10-12/10-13 ✅) | 2026-10-22 (Block 3 Schritt 3.2: `Store.put_asset()` ruft den Stripper — **eine** Stelle für Web und MCP; die Dummy-PNG-Fixtures mussten zu echten Bytes werden) | 2026-10-22 (Block 3 Schritt 3.1: `files.strip_image_metadata()` — JPEG/PNG/WebP, GIF unverändert, fail-closed; 8 neue Tests) | 2026-10-22 (Block-2-Nachzug: Item mit **neuem Ordner** im fremden Home-Space ist jetzt auf Web **und** MCP gesperrt (Nikinger-Entscheidung 2026-10-22) — P10.5-9 ⚠️ → ✅; `ui_budget.py`/`ui_smoke.py` haben das Home-Space-Prädikat, die `team`-Flags stimmen) | 2026-10-22 (Block 2.5 — Proben Web × MCP 28/28, M4 BG-1 behoben; Block 2 ✅, Abnahme 10-8/10/9 ✅, 10-9 ⚠️ (Befund: neuer Ordner per Item-Anlage im fremden Home-Space)) | 2026-10-22 (Block 2 Schritte 2.1–2.4 gebaut — eine Regel für Web und MCP (RE-1/RE-2/P10-I/P10.5-N) und BG-1; **2.5 Proben offen, Claude Code**; Suite 1299 grün) | 2026-10-22 (Block 2 Schritte 2.1–2.2: eine Regel für Web und MCP — SharePolicy mit Home-Space-Prädikat, RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N beide Richtungen; Suite 1296 grün) | 2026-10-22 (Block 2 Schritt 2.1: SharePolicy kennt Home-Spaces und Team-Spaces, Prädikat aus der Auth-DB, eine Regel für Web und MCP) | 2026-10-22 (Block 1 **abgeschlossen**: V200 vom Fleet-Lauf belegt — Unit installiert, `Result=success`, 0 failed units; Abnahme 10-5/6/7 ✅) | 2026-10-22 (Block 1 Schritte 1.1/1.2: BT-1 — Caddy-Vorlage in Blockform mit den V199-Live-Werten (10s/15s/1s) + neuer Waechter; Abnahme 10-5 auf ✅) | 2026-10-22 (Block 1 Schritt 1.4: BT-6 — `constraints.txt` aus dem Live-Freeze, `scripts/dev_install.sh` mit `-c`, zwei Wächter, Dev-venv neu; Suite 1282 gruen auf den Live-Versionen) | 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in der Relay-Unit, Wächter 13/13, vier Gegenläufe; Block-0-Block rotiert) | 2026-10-22 (Block 0 **abgeschlossen**: 0.6 ROADMAP-Zeile P10.5 auf 🔄, 0.7 Ausführer-Vorbedingung protokolliert — Abnahme P10.5-1–4 ✅) | 2026-10-22 (Block 0: 0.2/0.3 — Phase-Head angelegt (Modulstatus, Deploy-Tabelle, Abnahmestand 61 Zeilen), DO-3-Wächter, `pytest.ini` ergänzt; davor 0.4 (ROADMAP-Wächter eingefroren), 0.5 (INDEX-Luft) und 0.8 (Register-Luft) gebaut — DO-2 vollständig; erster Block)
+  - UPDATES_ARCHIVE.md                              # 📦 die älteren `updated:`-Fäden dieses Heads, verbatim
+updated: 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zeile `)pdated:` → `) | `; Release-Tests wieder grün, Suite 1380 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -36,7 +37,7 @@ updated: 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zei
 | 3 | Hygiene: LG-8 (P1-15), LG-7 | Ausführer | A | ✅ 2026-10-22 — **3.1–3.4 gebaut und geprobt**: `files.strip_image_metadata()` (JPEG/PNG/WebP, GIF unverändert, fail-closed `ValidationError`) + Aufruf in `Store.put_asset()` (**eine** Stelle für Web und MCP) · `scripts/asset_orphans.py` (LG-7, `--report`/`--move`, ein Commit) · 16 neue Tests · **Wegwerf 14/14 Zellen** (`probes/p105_b3_assets_probe.py`): GPS weg auf Web **und** MCP, Orientation bleibt, sauberes Bild byte-identisch, Waise gefunden und in den Papierkorb verschoben; Abnahme 10-12/10-13 ✅ |
 | 4 | Performance: PF-1, PF-4, Z1–Z4 | Ausführer (+ Claude Code Proben) | A | ✅ 2026-10-22 — **4.1–4.6 gebaut und geprobt**: `_overview()` zählt alle Eimer aus **einem** `store.search()`-Durchgang (P10.5-G, Rückfall über `_STORE_FETCH_LIMIT`), `folders`/`members` wandern in die Antwort · `asyncio.to_thread` für `_overview`/`_items_get`/`_graph_get` (Z2) · Client: nur noch `/overview`, 10 s Mindestpause für `focus`/`visibilitychange` (PF-4) · neu `static/js/loading.js` + `.is-loading`-Gerüst (Z3/Z4) · **M2-Bench Median 107,3 ms** (vorher 2405,6) · **`/health` hinter `/overview` 23 ms** (P10: 4757 ms) · Browser: 150 ms → kein Platzhalter, 400 ms → Platzhalter; Abnahme 10-14/15/16/17 ✅, 10-18 beim Nikinger nach Deploy A |
 | 5 | MCP-Schicht: PA-5 (FastMCP 4), LG-4 | Ausführer | B | ✅ 2026-10-22 — **5.1–5.6 gebaut und geprobt**: `fastmcp==4.1.3` (V207 ✅), `constraints.txt` neu aus frischem venv, Suite 1354 grün mit Compat an **und** aus (Warnungen als Fehler) · `proto` im Tool-Log (V219 ✅: `Context.request_context.protocol_version`) · neues Werkzeug `append_to_items` (LG-4, ≤ 20 Einträge, je Eintrag eigene `version`, Teilerfolg, Log `err:"partial"`) · Probe beider Ären in-process: `legacy` → `2025-11-25`, `auto` → `2026-07-28` · Smoke 17/17; Abnahme 10-19/20/21 ✅, 10-22 beim Nikinger nach Deploy B |
-| 6 | Anbieter: PA-1, PA-2, `/mcp`, PA-6, P10-J | Ausführer + Claude Code + Nikinger | B | ✅ 2026-10-22 — **6.0–6.5 gebaut und gemessen**: zweite Vergleichsregel `http://127.0.0.1:<port>` (Port explizit, kein `localhost`/`[::1]`, P10.5-O) + `application_type` ∈ {fehlend, null, native, web} · CSP `form-action` mit `http://127.0.0.1:*` · `/mcp` **ohne** Slash exakt bedient (`_ExactMcpMount`, kein 307) · PA-6 (Wurzel-`CLAUDE.md` eine Zeile) · **V209 ✅** (opencode 1.19.4), **V197 ✅** (Chromium folgt dem Consent-Redirect) · **DCR-Gegenlauf**: derselbe Request 400 → **201** · Suite **1376 grün** (1354 + 22) · **10-23/10-24/10-25 ✅**, **10-26 ⬜** (Werkzeugaufruf serverseitig belegt, opencode-Sitzung läuft nicht weiter — `GET /mcp` → 405, siehe Session-Block), 10-27/28 beim Nikinger nach Deploy B |
+| 6 | Anbieter: PA-1, PA-2, `/mcp`, PA-6, P10-J | Ausführer + Claude Code + Nikinger | B | ✅ 2026-10-22 — **6.0–6.5 gebaut und gemessen**: zweite Vergleichsregel `http://127.0.0.1:<port>` (Port explizit, kein `localhost`/`[::1]`, P10.5-O) + `application_type` ∈ {fehlend, null, native, web} · CSP `form-action` mit `http://127.0.0.1:*` · `/mcp` **ohne** Slash exakt bedient (`_ExactMcpMount`, kein 307) · PA-6 (Wurzel-`CLAUDE.md` eine Zeile) · **V209 ✅** (opencode 1.19.4), **V197 ✅** (Chromium folgt dem Consent-Redirect) · **DCR-Gegenlauf**: derselbe Request 400 → **201** · Suite **1376 grün** (1354 + 22) · **10-23/10-24/10-25 ✅**, **10-26 ✅** (2026-10-23 geklärt: die zwei Auslöser lagen im Messgerät, kein Produktcode — siehe Session-Block), 10-27/28 beim Nikinger nach Deploy B |
 | 7 | Darstellung: UI-1–UI-6, KA-5 | Ausführer (+ Claude Code Sichtung) | C | 🔄 2026-10-23 — **Schritt 7.0: die Update-Log-ID** (Befund vom 2026-10-23, Altbestand aus P6): `webui/updates.py` zählt die IDs je Datum jetzt **von unten** ⇒ jeder neue Block bekommt eine ID, die **kein** bestehender Block trägt (gemessen: `latest=2026-10-23#2` gegen `seen=2026-10-23#1` ⇒ der Banner erscheint); 4 neue Wächter in `phase10_5_finishing/tests/test_update_log_ids.py` · **7.1–7.7 (UI-1–UI-6, KA-5) noch ⬜** |
 | 8 | Karte: Gehirnkarte C2 | Ausführer (+ Claude Code Smoke/Sichtung) | C | ⬜ |
 | 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | ⬜ |
@@ -248,39 +249,51 @@ Ansicht; Screenshots für 10-30/10-32/10-35; **Wegwerf statt Live** (Freigabe 20
 
 ## Session stopped — 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — die Release-Tests waren rot, der Deploy-Befehl war richtig)
 
-**Ergebnis.** Der Deploy-B-Aufruf der letzten Session war **korrekt** — rot waren die **Release-Tests**,
-und der Grund lag **nicht** im Deploy, sondern in **einer verklebten Zeile**:
+**Ergebnis.** Der Deploy-Befehl der letzten Session war **korrekt** — rot waren die **Release-Tests**,
+der Grund lag **nicht** im Deploy, sondern in **einer verklebten Zeile**:
 `phase10_5_finishing/SESSIONS_ARCHIVE.md:8` trug die `updated:`-Kette als
 `…Wegwerf-Instanz)pdated: 2026-10-23 (Deploy-A-live-Block …` — der Trenner ` | ` war als `pdated: `
 verschluckt. Der Faden war damit für `rotate_index_updates.sh` **unsichtbar**, und der Wächter
 `test_no_thread_is_invisible_to_the_rotation_anchor` (Phase 9) stand **rot** ⇒ `deploy.sh` bricht in
-Schritt 4 ab („Tests im Release rot"), **bevor** der Symlink umgelegt wird. **Gemessen:** ein
+Schritt 4 ab („Tests im Release rot"), **vor** dem Symlink-Wechsel. **Gemessen:** ein
 Release-Checkout auf `a7fe62c` (dem Deploy-B-Kandidaten) ist an genau diesem Test rot
-(`1 failed, 6 passed`), und der `current`-Symlink zeigte danach weiter auf Deploy A
-(`20261023T065010.377336Z`) — der Fehler hat **nichts** deployed und **nichts** beschädigt.
+(`1 failed, 6 passed`); der `current`-Symlink zeigte danach weiter auf Deploy A —
+**nichts** deployed, **nichts** beschädigt.
 
 **Die Reparatur: eine Zeile, byteweise belegt.** `…)pdated: 2026-10-23 (` → `…) | 2026-10-23 (`
-(**−5 B**). Die Kette danach ist **der neue Faden + ` | ` + die Kette von vor dem Defekt** — die elf
-älteren Fäden sind byteweise identisch mit `git show 59d8c24^` (Gegenprobe in der Rechnung, nicht
-im Augenschein). **Am echten Wächter-Code geprüft:** `chain_defects` → `(False, 0, 0)` ·
-`blind_positions` → `[]` · **12** Fäden für `rotate_index_updates.sh` sichtbar (vorher 11 sichtbar
-+ 1 klebender) · `test_updated_chain.py` **7/7 grün**.
+(**−5 B**). Die Kette danach ist **der neue Faden + ` | ` + die von vor dem Defekt** — die elf
+älteren Fäden byteweise identisch mit `git show 59d8c24^`. **Am echten Wächter-Code geprüft:**
+`chain_defects` → `(False, 0, 0)` · `blind_positions` → `[]` · **12** Fäden für
+`rotate_index_updates.sh` sichtbar (vorher 11 + 1 klebend) · `test_updated_chain.py` **7/7**.
 
-**Gemessen.** `pytest` **1380 grün** (313,6 s) · `doc_health` **0** (alle vier Kategorien) ·
-`ui_budget` **5/5** (188,5 KB Erstaufruf) · Update-Log-Gate: `## 2026-10-23` steht oben, Badge
-`v3.1.6` (`app.html:20`).
+**Gemessen.** `pytest` **1380 grün** (313,6 s) · `doc_health` **0** ·
+`ui_budget` **5/5** (188,5 KB) · **Release-Stand vorab am Klon geprüft**
+(`deploy.sh` Schritt 3+4 vorweggenommen): Clone von `main` (`3183344`), frisches venv, `dev_install.sh` **mit** `constraints.txt` (fastmcp 4.1.3),
+`pytest -q` → **1380 grün** (337,2 s) — **an der Stufe kann der Deploy nicht mehr scheitern, an der
+er gestern gescheitert ist.**
 
-**Der Deploy-B-Aufruf — eine Abweichung von der Notiz der letzten Session, mit Grund.** Die Notiz
-nannte `--expected-sha=a7fe62c`. **Dieser Stand ist nicht deploybar** — er trägt den Defekt, sein
-Release wäre rot (gemessen oben). Der Deploy muss den **Reparatur-Commit** ausliefern; die SHA
-steht im Commit, der diese Zeile trägt. Sonst alles unverändert: derselbe Aufruf wie bei Deploy A,
-danach `health_gate.sh --expected-version=v3.1.6 --require-todays-update-log --expected-sha=<SHA>`
-— die **echte** Ausgabe in den Session-Block, nie die Behauptung.
+**Warum der Deploy nicht von mir kam (gemessen).** `sudo` verlangt ein Passwort:
+`sudo -n true` sagt „a password is required" — auch in einem pty; das Journal (Gruppe `adm`) zeigt
+**keine** erfolgreiche `savefyx`-sudo seit Deploy A (08:57), nur die `fleet`-Läufe. Der
+`sudo -v` lief also entweder auf einem anderen Rechner oder ist an ein TTY gebunden
+(`tty_tickets`) — mein Shell hat kein solches TTY; **der Deploy läuft im Terminal des Nikingers.**
+**Ein Deploy ohne Neustart wäre eine stille Halbdeplosion:** `static_routes.py` liest `app.html` pro
+Anfrage von der Platte — der Symlink stünde schon auf `v3.1.6`, der Prozess liefe aber mit dem alten
+Code; das Health-Gate wäre **grün und falsch**.
+
+**Der Deploy-B-Aufruf — Abweichung von der Notiz der letzten Session.** Die Notiz
+nannte `--expected-sha=a7fe62c`; **dieser Stand ist nicht deploybar** (sein Release wäre rot). Der
+Deploy muss den **Reparatur-Commit samt Doku-Stand** ausliefern — SHA = letzter Commit auf
+`main` (`git log -1`), **nicht** `3183344` (Reparatur-Commit **ohne** die Ketten-Rotation darunter). Aufruf wie bei Deploy A, danach `health_gate.sh --expected-version=v3.1.6
+--require-todays-update-log --expected-sha=<SHA>` — die **echte** Ausgabe in den Session-Block, nie
+die Behauptung. **Baseline vorher gemessen:** das Gate ist rot — live läuft noch `v3.1.5`.
+
+**Raum-Budget:** der Head stand bei **40.968 B** — über dem Softcap, `doc_health` rot, damit auch
+das Deploy-Gate. Hebel gezogen: die 24 älteren `updated:`-Fäden (4.471 B) rotierten per
+`scripts/rotate_index_updates.sh` nach `UPDATES_ARCHIVE.md` (Form wie beim Phase-9-Head) ⇒ Head
+**36.664 B**, Basis **32.572 B** — jetzt bindet wieder **DO-3** (Block ≤ 4.096 B). Nächster Hebel:
+der „Startauftrag" (5,8 KB) wandert nach Block 7 verbatim ins L3-Archiv.
 
 **Offen / nächster Schritt.** Deploy B ist beim Nikinger (Hard Rule 9, `sudo`): der Neustart des
-**einen** `sharefyx-mcp.service` gehört ihm, nicht dem Ausführer — `sudo` verlangt hier ein
-Passwort, und ein Deploy ohne Neustart wäre eine stille Halbdeploiement (der Symlink zeigte dann
-schon `v3.1.6`, der Prozess liefe aber noch mit dem alten Code — `static_routes.py` liest
-`app.html` pro Anfrage von der Platte). Live danach: **P10.5-22** (Connector-Werkzeuge, Log-Feld
-`proto`) · **P10.5-25** (`POST …/mcp` → 401 mit Challenge) · **P10.5-27/28** (Live P10-J, zwei
-Modellanbieter). **5.7:** Fabian kurz Bescheid.
+**einen** `sharefyx-mcp.service` gehört ihm. Live danach: **P10.5-22** (Connector-Werkzeuge, `proto`) · **P10.5-25** (`POST …/mcp` → 401 mit Challenge) · **P10.5-27/28** (Live P10-J,
+zwei Modellanbieter). **5.7:** Fabian Bescheid.
