@@ -11,6 +11,9 @@ import httpx
 import pytest
 from starlette.applications import Starlette
 
+from authserver.config import AuthSettings
+from mcpserver.app import OAuthConfig, create_app
+from mcpserver.config import Settings
 from webui.config import DEFAULT_STATIC_DIR
 from webui.routes_auth import ui_auth_routes
 from webui.static_routes import _resolve_static_path, static_routes
@@ -32,6 +35,26 @@ def static_app(ui_settings, store, confirmed_users, sessions) -> Starlette:
         ui_settings, sessions
     )
     return Starlette(routes=routes)
+
+
+@pytest.fixture
+def real_app(tmp_path, store, confirmed_users, item_store) -> Starlette:
+    """Die **echte** App aus `mcpserver.app.create_app()` — mit der Route-Liste, in der der
+    `/ui`-Fänger hängt.
+
+    **Warum nicht die eigene Route-Liste:** die halbe Aufgabe von UI-1 ist die **Position**
+    des Fängers in der Liste (erst nach allen bekannten `/ui`-Routen). Ein Test gegen eine
+    selbstgebaute Liste würde die Position prüfen, die der echten App gar nicht hat — das wäre
+    ein Test, der die falsche Sache grün macht (derselbe Fehler, den der Phase-9-Wächter
+    „ein Wächter, der nur grün werden kann" beschreibt).
+
+    Die App bekommt dieselben Bausteine wie live: Auth-Store + UserDirectory (aus dem
+    `conftest.py`), der Storage-Kern (`item_store`) und die `UiSettings` aus
+    `oauth.settings.base_url`."""
+    settings = Settings(data_root=tmp_path / "data")
+    auth_settings = AuthSettings(base_url=BASE_URL, db_path=tmp_path / "auth.sqlite3")
+    oauth = OAuthConfig(settings=auth_settings, store=store, users=confirmed_users)
+    return create_app(settings=settings, store=item_store, oauth=oauth)
 
 
 async def _login(client: httpx.AsyncClient, totp_code) -> None:
@@ -2311,3 +2334,112 @@ def test_the_overview_name_has_priority_over_the_count_chips():
     assert "flex-wrap: wrap" in regel(".overview__space-open")
     js = (DEFAULT_STATIC_DIR / "js" / "list.js").read_text("utf-8")
     assert "nameLabel.title = space.name" in js
+
+
+# -- P10.5 Block 7, Schritt 7.1 (UI-1): die HTML-404 für unbekannte `/ui`-Pfade -----------
+
+
+@pytest.mark.asyncio
+async def test_unknown_ui_path_renders_html_404(real_app):
+    """UI-1: ein unbekannter `/ui`-Pfad antwortet mit der **HTML**-404-Seite.
+
+    Vorher antwortete Starlette mit Klartext-„Not Found" — in einer Oberfläche, deren
+    übrige Seiten HTML sind, ist das die Form, in der sich ein Tippfehler wie ein
+    Serverfehler anfühlt. Geprüft wird an der **echten** App (`create_app()`), nicht an einer
+    nachgebauten Route-Liste: die Position des Fängers ist Teil der Aufgabe."""
+    async with _client(real_app) as client:
+        response = await client.get("/ui/gibtsnicht")
+
+    assert response.status_code == 404
+    assert "text/html" in response.headers["content-type"]
+    assert "Diese Seite gibt es nicht." in response.text
+    assert 'href="/ui/"' in response.text, "die 404-Seite muss auf die Übersicht verweisen"
+    assert response.headers["cache-control"] == "no-store"
+
+
+@pytest.mark.asyncio
+async def test_known_ui_routes_win_over_the_catch_all(real_app, totp_code):
+    """Der Fänger darf **keinen** bekannten Pfad überdecken.
+
+    Starlette prüft die Route-Liste in Reihenfolge — der erste Treffer gewinnt. Deshalb
+    hängt der Fänger in `create_app()` **nach** `ui_auth_routes()`/`static_routes()`/
+    `account_routes()`. Geprüft wird je eine Route aus jeder Gruppe:
+
+    * `/ui/login` — der Login (Antwort 200, die Login-Seite),
+    * `/ui/invite/{token}` — die Einladung (unbekannter Token ⇒ Fehlerseite, **nicht** die
+      404-Seite des Fängers),
+    * `/ui/` — die App-Shell (ohne Sitzung ⇒ 303 auf die Anmeldung),
+    * `/api/v1/account/sessions` — die Konto-Routen (ohne Sitzung ⇒ 401 als JSON, **nicht**
+      die HTML-Seite)."""
+    async with _client(real_app) as client:
+        login = await client.get("/ui/login", follow_redirects=False)
+        invite = await client.get("/ui/invite/gibtsnicht", follow_redirects=False)
+        shell = await client.get("/ui/", follow_redirects=False)
+        account = await client.get("/api/v1/account/sessions", follow_redirects=False)
+
+    assert login.status_code == 200
+    assert "Diese Seite gibt es nicht." not in login.text
+    assert "Anmelden" in login.text or "Passwort" in login.text
+
+    assert invite.status_code != 404 or "Diese Seite gibt es nicht." not in invite.text
+    assert "Diese Seite gibt es nicht." not in invite.text
+
+    assert shell.status_code == 303
+    assert shell.headers["location"] == "/ui/login"
+
+    assert account.status_code == 401
+    assert "application/json" in account.headers["content-type"]
+    assert "Diese Seite gibt es nicht." not in account.text
+
+
+@pytest.mark.asyncio
+async def test_missing_static_file_stays_plain_text(real_app):
+    """`/ui/static/<fehlt>` bleibt **Klartext** — die 404-Seite des Fängers darf die
+    statischen Dateien nicht überdecken.
+
+    Die Static-Route steht in der Liste **vor** dem Fänger (`static_routes.py` vor dem
+    `/ui/{rest:path}`), deshalb antwortet ein fehlendes Bild weiterhin mit dem kurzen
+    Klartext-404 und **nicht** mit einer HTML-Seite: ein `<img src>`-Fehler soll kein
+    Dokument ausliefern, das der Browser als HTML rendert."""
+    async with _client(real_app) as client:
+        response = await client.get("/ui/static/gibtsnicht.js")
+
+    assert response.status_code == 404
+    assert "text/html" not in response.headers["content-type"]
+    assert response.text.strip() == "Nicht gefunden."
+
+
+@pytest.mark.asyncio
+async def test_api_404_stays_json(real_app):
+    """Die API antwortet **JSON** — der `/ui`-Fänger darf sie nicht verschlucken.
+
+    **Datierte Korrektur zum Plan (2026-10-23):** der Plan (Block 7, Schritt 7.1) nennt diesen
+    Test `test_api_404_stays_json` und schreibt „API und `/mcp` bleiben JSON". **Gemessen war
+    das für den unbekannten API-Pfad nicht wahr:** dort stand Starlettes Klartext-404
+    (`text/plain`) — die einzige Stelle, an der die JSON-API kein JSON lieferte. Der Plan ist
+    ein 📕-Snapshot und wird nicht geändert; der **Code** bekommt die Eigenschaft, die der
+    Plan verlangt: ein unbekannter `/api/v1/…`-Pfad antwortet jetzt mit derselben Fehlerform
+    wie jede andere API-Antwort (`error`/`message`/`detail`).
+
+    Geprüft wird beides: die API antwortet JSON (auch bei 404), und sie antwortet **nicht**
+    mit der HTML-Seite des Fängers.
+
+    **Zusätzlich die Reichweite:** die HTML-404 bleibt auf `/ui` beschränkt — ein unbekannter
+    OAuth-Pfad ist weiterhin Starlettes 404 und **nicht** die HTML-Seite. Dieser zweite Teil
+    ist der Gegenlauf gegen einen **globalen** Fänger (`/{rest:path}` statt `/ui/{rest:path}`):
+    ohne ihn bliebe dieser Test grün, weil die API ihre eigene Catch-all-Route hätte."""
+    async with _client(real_app) as client:
+        unknown = await client.get("/api/v1/gibtsnicht")
+        unauthenticated = await client.get("/api/v1/me")
+        unknown_oauth = await client.get("/oauth/gibtsnicht")
+
+    assert unknown.status_code == 404
+    assert "application/json" in unknown.headers["content-type"]
+    assert unknown.json()["error"] == "not_found"
+    assert "Diese Seite gibt es nicht." not in unknown.text
+
+    assert unauthenticated.status_code == 401
+    assert "application/json" in unauthenticated.headers["content-type"]
+
+    assert unknown_oauth.status_code == 404
+    assert "Diese Seite gibt es nicht." not in unknown_oauth.text

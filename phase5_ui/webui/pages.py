@@ -63,6 +63,29 @@ def render_error_page(message: str) -> str:
     return _page(title="Fehler", body=body)
 
 
+def render_not_found_page() -> str:
+    """**P10.5, Block 7, Schritt 7.1 (UI-1):** die HTML-404 für unbekannte `/ui`-Pfade.
+
+    **Warum eine HTML-Seite und nicht Starlettes Klartext-404:** ein Mensch, der einen
+    veralteten Link oder einen Tippfehler im Pfad trifft, soll dieselbe Oberfläche sehen wie
+    jeder andere Seitenaufruf — ein Klartext-„Not Found" zwischen JSON-Antworten der API ist
+    die Form, in der sich ein Fehler wie ein Datenfehler anfühlt. Die Route hängt bewusst
+    **nach** allen bekannten `/ui`-Routen (`mcpserver/app.py :: create_app()`), damit der
+    Fänger keinen bestehenden Pfad überdeckt.
+
+    **Bewusst ohne eigene Karten-Fläche:** die Seite benutzt dieselbe `.auth`/`.auth-card`
+    wie Login und Fehlerseite (`app.css`) — eine eigene Fläche für eine 404 wäre eine neue
+    Flächenfamilie, und die Auswahl-Konvention v3 hat dafür keine.
+
+    **Der Link führt auf `/ui/`** (die Übersicht), nicht auf `/ui/login`: wer eine
+    unbekannte Seite aufgerufen hat, ist in aller Regel angemeldet — die Anmeldeseite ist
+    der Fall für **nicht** angemeldete Besucher, und der Sitzungs-Gate (`static_routes.py`)
+    leitet sie ohnehin dorthin um."""
+    body = """<h1>Diese Seite gibt es nicht.</h1>
+<div class="auth__actions"><a class="btn-primary" href="/ui/">Zur Übersicht</a></div>"""
+    return _page(title="Nicht gefunden", body=body)
+
+
 def render_logged_in_page(*, csrf_token: str) -> str:
     """Bootstrap-Seite zur echten App-Shell (Step 6). Trägt den CSRF-Token als verstecktes
     Formularfeld — derselbe Grund wie `request_id` in `authserver/templates.py ::

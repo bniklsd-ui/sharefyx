@@ -10,7 +10,7 @@ down:
   - ../phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md  # 📦 §12 Entscheidungsliste D-1–D-18, verbatim
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
   - UPDATES_ARCHIVE.md                              # 📦 die älteren `updated:`-Fäden dieses Heads, verbatim
-updated: 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zeile `)pdated:` → `) | `; Release-Tests wieder grün, Suite 1380 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-10-23 (Block 7.1 (UI-1) gebaut: HTML-404 für unbekannte `/ui`-Pfade + JSON-404 in der API — Branch `p105-block7`, nicht gemergt; 4 neue Tests, 4 Gegenläufe wirksam; Suite 1384 grün) | 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zeile `)pdated:` → `) | `; Release-Tests wieder grün, Suite 1380 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -38,7 +38,7 @@ updated: 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zei
 | 4 | Performance: PF-1, PF-4, Z1–Z4 | Ausführer (+ Claude Code Proben) | A | ✅ 2026-10-22 — **4.1–4.6 gebaut und geprobt**: `_overview()` zählt alle Eimer aus **einem** `store.search()`-Durchgang (P10.5-G, Rückfall über `_STORE_FETCH_LIMIT`), `folders`/`members` wandern in die Antwort · `asyncio.to_thread` für `_overview`/`_items_get`/`_graph_get` (Z2) · Client: nur noch `/overview`, 10 s Mindestpause für `focus`/`visibilitychange` (PF-4) · neu `static/js/loading.js` + `.is-loading`-Gerüst (Z3/Z4) · **M2-Bench Median 107,3 ms** (vorher 2405,6) · **`/health` hinter `/overview` 23 ms** (P10: 4757 ms) · Browser: 150 ms → kein Platzhalter, 400 ms → Platzhalter; Abnahme 10-14/15/16/17 ✅, 10-18 beim Nikinger nach Deploy A |
 | 5 | MCP-Schicht: PA-5 (FastMCP 4), LG-4 | Ausführer | B | ✅ 2026-10-22 — **5.1–5.6 gebaut und geprobt**: `fastmcp==4.1.3` (V207 ✅), `constraints.txt` neu aus frischem venv, Suite 1354 grün mit Compat an **und** aus (Warnungen als Fehler) · `proto` im Tool-Log (V219 ✅: `Context.request_context.protocol_version`) · neues Werkzeug `append_to_items` (LG-4, ≤ 20 Einträge, je Eintrag eigene `version`, Teilerfolg, Log `err:"partial"`) · Probe beider Ären in-process: `legacy` → `2025-11-25`, `auto` → `2026-07-28` · Smoke 17/17; Abnahme 10-19/20/21 ✅, 10-22 beim Nikinger nach Deploy B |
 | 6 | Anbieter: PA-1, PA-2, `/mcp`, PA-6, P10-J | Ausführer + Claude Code + Nikinger | B | ✅ 2026-10-22 — **6.0–6.5 gebaut und gemessen**: zweite Vergleichsregel `http://127.0.0.1:<port>` (Port explizit, kein `localhost`/`[::1]`, P10.5-O) + `application_type` ∈ {fehlend, null, native, web} · CSP `form-action` mit `http://127.0.0.1:*` · `/mcp` **ohne** Slash exakt bedient (`_ExactMcpMount`, kein 307) · PA-6 (Wurzel-`CLAUDE.md` eine Zeile) · **V209 ✅** (opencode 1.19.4), **V197 ✅** (Chromium folgt dem Consent-Redirect) · **DCR-Gegenlauf**: derselbe Request 400 → **201** · Suite **1376 grün** (1354 + 22) · **10-23/10-24/10-25 ✅**, **10-26 ✅** (2026-10-23 geklärt: die zwei Auslöser lagen im Messgerät, kein Produktcode — siehe Session-Block), 10-27/28 beim Nikinger nach Deploy B |
-| 7 | Darstellung: UI-1–UI-6, KA-5 | Ausführer (+ Claude Code Sichtung) | C | 🔄 2026-10-23 — **Schritt 7.0: die Update-Log-ID** (Befund vom 2026-10-23, Altbestand aus P6): `webui/updates.py` zählt die IDs je Datum jetzt **von unten** ⇒ jeder neue Block bekommt eine ID, die **kein** bestehender Block trägt (gemessen: `latest=2026-10-23#2` gegen `seen=2026-10-23#1` ⇒ der Banner erscheint); 4 neue Wächter in `phase10_5_finishing/tests/test_update_log_ids.py` · **7.1–7.7 (UI-1–UI-6, KA-5) noch ⬜** |
+| 7 | Darstellung: UI-1–UI-6, KA-5 | Ausführer (+ Claude Code Sichtung) | C | 🔄 2026-10-23 — **7.1 UI-1 (HTML-404) gebaut** (Branch `p105-block7`, **nicht gemergt**): `render_not_found_page()` + `Route("/ui/{rest:path}", …)` **nach** allen `/ui`-Routen · **datierte Korrektur zum Plan**: „API bleibt JSON" war gemessen **falsch** (unbekannter `/api/v1/…`-Pfad ⇒ Starlette-Klartext) ⇒ JSON-404 in der API-Fehlerform · 4 Tests gegen die **echte** `create_app()`, **4 Gegenläufe wirksam** · **7.0: die Update-Log-ID** (Befund vom 2026-10-23, Altbestand aus P6): `webui/updates.py` zählt die IDs je Datum jetzt **von unten** ⇒ jeder neue Block bekommt eine ID, die **kein** bestehender Block trägt (gemessen: `latest=2026-10-23#2` gegen `seen=2026-10-23#1` ⇒ der Banner erscheint); 4 neue Wächter in `phase10_5_finishing/tests/test_update_log_ids.py` · **7.2–7.7 (UI-2–UI-6, KA-5) noch ⬜** |
 | 8 | Karte: Gehirnkarte C2 | Ausführer (+ Claude Code Smoke/Sichtung) | C | ⬜ |
 | 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | ⬜ |
 | 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | D | ⬜ |
@@ -55,7 +55,7 @@ updated: 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zei
 | C | `v3.1.7` | — | — | nach Block 7–8 |
 | D | `v3.1.8` | — | — | nach Block 9–11 |
 
-**Stand 2026-10-23 (Abend):** Deploy A ist **live** (`v3.1.5`, Release `20261023T065010.377336Z`, SHA `7358f22`, `health_gate` **9/9 OK**). Der Branch `p105-block5` (Block 5 + 6 + P10.5-26) ist **gemergt**; Deploy B (`v3.1.6`) ist vorbereitet und geht aus `main` mit `fastmcp 4.1.3`. **Die Generalprobe davor ist gefahren: 26/26 Zellen grün an der Wegwerf-Instanz** (Details im Session-Block unten; die Zeile stand vorher auf „25/25" — **datierte Korrektur**, der Block-7.0-Commit hat die Probe um eine Zelle erweitert). **Der Deploy-Aufruf der letzten Session ist an den Release-Tests gescheitert — nicht am Befehl:** eine verklebte `updated:`-Zeile in `SESSIONS_ARCHIVE.md` (behoben, Details im Session-Block) — es fehlt nur noch der Deploy-Aufruf durch den Nikinger.
+**Stand 2026-10-23 (Abend):** Deploy A ist **live** (`v3.1.5`, Release `20261023T065010.377336Z`, SHA `7358f22`, `health_gate` **9/9 OK**). Der Branch `p105-block5` (Block 5 + 6 + P10.5-26) ist **gemergt**; Deploy B (`v3.1.6`) ist vorbereitet und geht aus `main` mit `fastmcp 4.1.3`. **Die Generalprobe davor ist gefahren: 26/26 Zellen grün an der Wegwerf-Instanz** (Details im Session-Block unten; die Zeile stand vorher auf „25/25" — **datierte Korrektur**, der Block-7.0-Commit hat die Probe um eine Zelle erweitert). **Der Deploy-Aufruf der letzten Session ist an den Release-Tests gescheitert — nicht am Befehl:** eine verklebte `updated:`-Zeile in `SESSIONS_ARCHIVE.md` (behoben, Details im Session-Block) — es fehlt nur noch der Deploy-Aufruf durch den Nikinger. **Block 7.1 (UI-1) ist gebaut** auf dem Branch `p105-block7` — **nicht gemergt** (Nikinger-Entscheidung: Deploy A vor dem Branch-Merge); der Merge wartet auf Deploy A/B.
 
 **Ein Deploy ist vier Schritte, kein Commit** (Plan §2.5): volle Suite + `doc_health` + `ui_budget` grün · Badge und `docs/UPDATE_LOG.md` · Commit + Push · **`deploy.sh` durch den Nikinger** (Hard Rule 9) · `health_gate.sh` mit **echter Ausgabe** in den Commit — nie die Behauptung.
 
@@ -93,7 +93,7 @@ updated: 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zei
 | P10.5-26 | Wegwerf-E2E: opencode führt `list_spaces` aus | ✅ | **2026-10-23** · `probes/p105_b6_opencode_e2e.json`: der Modell-Request trägt **11** MCP-Werkzeuge, opencode ruft `sharefyx_list_spaces` · Server-Log: `ev=tool, tool=list_spaces, ok=true, proto=2025-11-25` · **beide Verdachtsmomente vom 2026-10-22 sind widerlegt** (der `405` auf `GET /mcp` ist **nicht** die Ursache · der behauptete Werkzeugaufruf war **nicht** belegt — null `ev=tool` in der Logdatei) · **zwei Auslöser lagen im Messgerät** (Stub-Endlosschleife · `mcp debug` vor dem Werkzeuglauf) — **kein Produktcode**, P2-B unberührt |
 | P10.5-27 | **Live P10-J Lauf 1** (M3.1 Flash) | ⬜ | — |
 | P10.5-28 | **Live P10-J Lauf 2** (lokales Modell, CT 111) — mit 27 die Abschlussbedingung der Phase | ⬜ | — |
-| P10.5-29 | UI-1: HTML-404 für unbekannte `/ui`-Pfade | ⬜ | — |
+| P10.5-29 | UI-1: HTML-404 für unbekannte `/ui`-Pfade | ✅ | 7.1 · `phase5_ui/webui/pages.py :: render_not_found_page()` + `phase2_mcp/mcpserver/app.py` (Route **nach** allen `/ui`-Routen) · 4 neue Tests in `phase5_ui/tests/test_static_routes.py` gegen die **echte** `create_app()` · **4 Gegenläufe wirksam** (Fänger entfernt / vor die bekannten Routen / API-404 entfernt / global statt `/ui`) · **datierte Korrektur zum Plan**: „API bleibt JSON" war gemessen falsch ⇒ `api.py` antwortet jetzt JSON |
 | P10.5-30 | UI-2: Logo an beiden Stellen + Favicon aus einer Datei | ⬜ | — |
 | P10.5-31 | UI-3: deutscher Titel je Ansicht (V120 ✅) | ⬜ | — |
 | P10.5-32 | UI-4: Sichtungsliste abgearbeitet (Nikinger bestätigt) | ⬜ | — |
@@ -127,7 +127,7 @@ updated: 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zei
 | P10.5-60 | P10-J zweimal live belegt | ⬜ | — |
 | P10.5-61 | Closeout-Dokumente + Rotationen per Skript | ⬜ | — |
 
-**Summe:** 24 ✅ · 0 ⚠️ · 37 ⬜ (von 61). **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`).
+**Summe:** 25 ✅ · 0 ⚠️ · 36 ⬜ (von 61). **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`). **[2026-10-23, Block 7.1]** +1 ✅ (10-29, UI-1) ⇒ 25 ✅ · 0 ⚠️ · 36 ⬜.
 
 ## Offen beim Nikinger
 
@@ -190,7 +190,7 @@ Dienst.
 
 **Schritte (in dieser Reihenfolge):**
 
-1. **7.1 UI-1 — HTML-404.** `phase5_ui/webui/pages.py`: neu `render_not_found_page()` über
+1. **7.1 UI-1 — HTML-404.** ✅ **2026-10-23** (Branch `p105-block7`, nicht gemergt) — `phase5_ui/webui/pages.py`: neu `render_not_found_page()` über
    `_page(title="Nicht gefunden", body=…)` (**`_page` steht heute in `pages.py:49`**), Text „Diese
    Seite gibt es nicht." + Link „Zur Übersicht" (`/ui/`). Route `Route("/ui/{rest:path}", …,
    methods=["GET"])` in `mcpserver/app.py` **nach** allen `/ui`-Routen (nach `api_routes(...)`) —
@@ -247,53 +247,55 @@ liest es als Fläche) und `setViewTitle` **existiert noch nicht**.
 (Filter in API und UI) · 10-35 (KA-5 sichtbar). **Proben:** Playwright liest `document.title` je
 Ansicht; Screenshots für 10-30/10-32/10-35; **Wegwerf statt Live** (Freigabe 2026-10-22).
 
-## Session stopped — 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — die Release-Tests waren rot, der Deploy-Befehl war richtig)
+## Session stopped — 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben; danach Block 7.1 (UI-1) gebaut)
 
 **Ergebnis.** Der Deploy-Befehl der letzten Session war **korrekt** — rot waren die **Release-Tests**,
 der Grund lag **nicht** im Deploy, sondern in **einer verklebten Zeile**:
 `phase10_5_finishing/SESSIONS_ARCHIVE.md:8` trug die `updated:`-Kette als
 `…Wegwerf-Instanz)pdated: 2026-10-23 (Deploy-A-live-Block …` — der Trenner ` | ` war als `pdated: `
-verschluckt. Der Faden war damit für `rotate_index_updates.sh` **unsichtbar**, und der Wächter
-`test_no_thread_is_invisible_to_the_rotation_anchor` (Phase 9) stand **rot** ⇒ `deploy.sh` bricht in
-Schritt 4 ab („Tests im Release rot"), **vor** dem Symlink-Wechsel. **Gemessen:** ein
-Release-Checkout auf `a7fe62c` (dem Deploy-B-Kandidaten) ist an genau diesem Test rot
-(`1 failed, 6 passed`); der `current`-Symlink zeigte danach weiter auf Deploy A —
-**nichts** deployed, **nichts** beschädigt.
+verschluckt. Der Faden war für `rotate_index_updates.sh` **unsichtbar**, und der Wächter
+`test_no_thread_is_invisible_to_the_rotation_anchor` stand **rot** ⇒ `deploy.sh` bricht in
+Schritt 4 ab, **vor** dem Symlink-Wechsel. **Gemessen:** ein Release-Checkout auf `a7fe62c` (dem
+Deploy-B-Kandidaten) ist an genau diesem Test rot (`1 failed, 6 passed`) — **nichts** deployed,
+**nichts** beschädigt.
 
-**Die Reparatur: eine Zeile, byteweise belegt.** `…)pdated: 2026-10-23 (` → `…) | 2026-10-23 (`
-(**−5 B**). Die Kette danach ist **der neue Faden + ` | ` + die von vor dem Defekt** — die elf
-älteren Fäden byteweise identisch mit `git show 59d8c24^`. **Am echten Wächter-Code geprüft:**
-`chain_defects` → `(False, 0, 0)` · `blind_positions` → `[]` · **12** Fäden für
-`rotate_index_updates.sh` sichtbar (vorher 11 + 1 klebend) · `test_updated_chain.py` **7/7**.
+**Die Reparatur: eine Zeile, belegt.** `…)pdated: 2026-10-23 (` → `…) | 2026-10-23 (`
+(**−5 B**); die elf älteren Fäden byteweise wie `git show 59d8c24^`. **Am Wächter-Code geprüft:** `chain_defects` → `(False, 0, 0)` · `blind_positions` → `[]` · **12** Fäden
+sichtbar · `test_updated_chain.py` **7/7**.
 
-**Gemessen.** `pytest` **1380 grün** (313,6 s) · `doc_health` **0** ·
-`ui_budget` **5/5** (188,5 KB) · **Release-Stand vorab am Klon geprüft**
-(`deploy.sh` Schritt 3+4 vorweggenommen): Clone von `main` (`3183344`), frisches venv, `dev_install.sh` **mit** `constraints.txt` (fastmcp 4.1.3),
-`pytest -q` → **1380 grün** (337,2 s) — **an der Stufe kann der Deploy nicht mehr scheitern, an der
-er gestern gescheitert ist.**
+**Gemessen.** `pytest` **1380 grün** (313,6 s) · `doc_health` **0** · `ui_budget` **5/5** (188,5 KB) ·
+**Release-Stand vorab am Klon geprüft** (Clone von `main` = `3183344`, frisches venv,
+`dev_install.sh` **mit** `constraints.txt`): **1380 grün** (337,2 s) — an der Stufe kann der Deploy
+nicht mehr scheitern.
 
-**Warum der Deploy nicht von mir kam (gemessen).** `sudo` verlangt ein Passwort:
-`sudo -n true` sagt „a password is required" — auch in einem pty; das Journal (Gruppe `adm`) zeigt
-**keine** erfolgreiche `savefyx`-sudo seit Deploy A (08:57), nur die `fleet`-Läufe. Der
-`sudo -v` lief also entweder auf einem anderen Rechner oder ist an ein TTY gebunden
-(`tty_tickets`) — mein Shell hat kein solches TTY; **der Deploy läuft im Terminal des Nikingers.**
-**Ein Deploy ohne Neustart wäre eine stille Halbdeplosion:** `static_routes.py` liest `app.html` pro
-Anfrage von der Platte — der Symlink stünde schon auf `v3.1.6`, der Prozess liefe aber mit dem alten
-Code; das Health-Gate wäre **grün und falsch**.
+**Warum der Deploy nicht von mir kam (gemessen).** `sudo` verlangt ein Passwort: `sudo -n true` sagt
+„a password is required" — auch in einem pty; das Journal zeigt **keine** erfolgreiche
+`savefyx`-sudo seit Deploy A (08:57), nur die `fleet`-Läufe. Der `sudo -v` lief also auf einem
+anderen Rechner oder an ein TTY gebunden (`tty_tickets`); **der Deploy läuft im Terminal
+des Nikingers.** **Ein Deploy ohne Neustart wäre eine stille Halbdeplosion:** `static_routes.py`
+liest `app.html` pro Anfrage von der Platte — der Symlink stünde schon auf `v3.1.6`, der Prozess
+liefe aber mit dem alten Code; das Health-Gate wäre **grün und falsch**.
 
-**Der Deploy-B-Aufruf — Abweichung von der Notiz der letzten Session.** Die Notiz
-nannte `--expected-sha=a7fe62c`; **dieser Stand ist nicht deploybar** (sein Release wäre rot). Der
-Deploy muss den **Reparatur-Commit samt Doku-Stand** ausliefern — SHA = letzter Commit auf
-`main` (`git log -1`), **nicht** `3183344` (Reparatur-Commit **ohne** die Ketten-Rotation darunter). Aufruf wie bei Deploy A, danach `health_gate.sh --expected-version=v3.1.6
---require-todays-update-log --expected-sha=<SHA>` — die **echte** Ausgabe in den Session-Block, nie
-die Behauptung. **Baseline vorher gemessen:** das Gate ist rot — live läuft noch `v3.1.5`.
+**Der Deploy-B-Aufruf.** Die Notiz nannte `--expected-sha=a7fe62c`; **dieser Stand ist nicht
+deploybar** (sein Release wäre rot). Er muss den **Reparatur-Commit + Doku-Stand**
+ausliefern — SHA = letzter Commit auf `main` (`git log -1`), **nicht** `3183344` (Reparatur-Commit
+**ohne** die Ketten-Rotation darunter). Aufruf wie bei Deploy A, danach `health_gate.sh
+--expected-version=v3.1.6 --require-todays-update-log --expected-sha=<SHA>` — die **echte** Ausgabe
+in den Session-Block, nie die Behauptung. **Baseline vorher gemessen:** das Gate
+ist rot — live läuft noch `v3.1.5`.
 
-**Raum-Budget:** der Head stand bei **40.968 B** — über dem Softcap, `doc_health` rot, damit auch
-das Deploy-Gate. Hebel gezogen: die 24 älteren `updated:`-Fäden (4.471 B) rotierten per
-`scripts/rotate_index_updates.sh` nach `UPDATES_ARCHIVE.md` (Form wie beim Phase-9-Head) ⇒ Head
-**36.664 B**, Basis **32.572 B** — jetzt bindet wieder **DO-3** (Block ≤ 4.096 B). Nächster Hebel:
-der „Startauftrag" (5,8 KB) wandert nach Block 7 verbatim ins L3-Archiv.
+**Block 7, Schritt 7.1 (UI-1) — gebaut auf dem Branch `p105-block7` (nicht gemergt).** Die
+HTML-404: `pages.py :: render_not_found_page()` (Text + Link „Zur Übersicht") und die Route `Route("/ui/{rest:path}", …)` in `mcpserver/app.py` **nach** allen
+`/ui`-Routen (sonst überdeckt sie `account_routes`). **Datierte Korrektur zum Plan:** er
+verlangt „API bleibt JSON" — **gemessen war das falsch** (unbekannter `/api/v1/…`-Pfad ⇒
+Starlette-Klartext). Der **Code** bekommt die Eigenschaft: JSON-404 in der API-Fehlerform
+(`error`/`message`/`detail`). 4 neue Tests gegen die **echte** `create_app()`; **4 Gegenläufe
+wirksam** (Fänger entfernt / vor die bekannten Routen / API-404 entfernt / global statt `/ui`).
 
-**Offen / nächster Schritt.** Deploy B ist beim Nikinger (Hard Rule 9, `sudo`): der Neustart des
-**einen** `sharefyx-mcp.service` gehört ihm. Live danach: **P10.5-22** (Connector-Werkzeuge, `proto`) · **P10.5-25** (`POST …/mcp` → 401 mit Challenge) · **P10.5-27/28** (Live P10-J,
-zwei Modellanbieter). **5.7:** Fabian Bescheid.
+**Raum-Budget:** der Head stand bei **40.968 B** (über dem Softcap) ⇒ die 24 älteren `updated:`-Fäden
+(4.471 B) rotierten nach `UPDATES_ARCHIVE.md` ⇒ **36.664 B**, Basis 32.572 B — jetzt bindet wieder
+**DO-3** (Block ≤ 4.096 B). Nächster Hebel: der „Startauftrag" (5,8 KB) → L3-Archiv.
+
+**Offen / nächster Schritt.** Deploy B ist beim Nikinger (Hard Rule 9, `sudo`). Live danach:
+**P10.5-22** · **P10.5-25** · **P10.5-27/28** (Live P10-J, zwei Modellanbieter). **5.7:** Fabian
+Bescheid. Danach Block 7.2 (Logo) auf dem Branch — Merge **nach** Deploy A/B (Nikinger-Entscheidung).

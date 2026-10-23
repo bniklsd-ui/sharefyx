@@ -114,14 +114,16 @@ from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.requests import Request
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 from starlette.routing import Mount, Route
 
 from storage.store import Store
 from webui.account import account_routes
 from webui.api import api_routes
 from webui.config import UiSettings
+from webui.pages import render_not_found_page
 from webui.routes_auth import ui_auth_routes
+from webui.security import ui_security_headers
 from webui.sessions import SessionManager
 from webui.static_routes import static_routes
 
@@ -259,6 +261,29 @@ def create_app(
     routes += static_routes(ui_settings, ui_sessions)
     routes += account_routes(ui_settings, oauth.store, oauth.users, ui_sessions)
     routes += api_routes(ui_settings, store, ui_sessions, permissions, oauth.store, oauth.users)
+
+    # [2026-10-23, P10.5 Block 7, Schritt 7.1 — UI-1] HTML-404 für unbekannte `/ui`-Pfade.
+    #
+    # **Die Position ist die halbe Aufgabe:** die Route hängt **nach** allen bekannten
+    # `/ui`-Routen (`ui_auth_routes` = `/ui/login`, `/ui/logout`, `/ui/invite/{token}`,
+    # `/ui/enroll/confirm`; `static_routes` = `/ui/`, `/ui/static/{path}`), sonst überdeckt
+    # der Fänger bestehende Pfade. Starlette prüft die Routenliste **in Reihenfolge** — der
+    # erste Treffer gewinnt, deshalb steht der Fänger hinten.
+    #
+    # **Was der Fänger nicht fasst:** `/ui/static/<fehlt>` bleibt Klartext (eigene Route
+    # davor, `static_routes.py:86`), `/api/v1/...` und `/mcp` haben andere Präfixe und
+    # antworten wie bisher (JSON bzw. das MCP-Protokoll). Der Präfix `/ui/` ist damit die
+    # ganze Reichweite des Fängers — kein globales 404.
+    async def _ui_not_found(request: Request) -> Response:
+        return Response(
+            render_not_found_page(),
+            status_code=404,
+            media_type="text/html",
+            headers=ui_security_headers(ui_settings),
+        )
+
+    routes.append(Route("/ui/{rest:path}", _ui_not_found, methods=["GET"]))
+
     middleware: list[Middleware] = []
     if hosts is not None:
         middleware.append(Middleware(TrustedHostMiddleware, allowed_hosts=hosts))

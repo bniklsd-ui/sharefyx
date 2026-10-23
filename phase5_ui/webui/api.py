@@ -1493,6 +1493,15 @@ def api_routes(
                 )
         return _inner
 
+    async def _api_not_found(request: Request) -> Response:
+        """**P10.5, Block 7, Schritt 7.1 (UI-1):** unbekannter API-Pfad → JSON-404.
+
+        `ApiError("not_found", …)` benutzt die **API-eigene** Fehlerform (`error`/`message`/
+        `detail`) — denselben Code, den ein nicht existierendes Item antwortet. Der Pfad wird
+        bewusst **nicht** in die Meldung gespiegelt: er kann Nutzerdaten tragen, und eine
+        Fehlermeldung ist kein Ort für eine zweite Kopie davon."""
+        raise ApiError("not_found", "Unbekannter API-Pfad.")
+
     return [
         Route("/api/v1/me", _catch(_me), methods=["GET"]),
         # P8-A: Reauth-Grant-Ausgabe (POST) — Passwort+TOTP → session-gebundenes Grant.
@@ -1533,4 +1542,16 @@ def api_routes(
             "/api/v1/items/{item_id}/assets/{asset_id}", _catch(_assets_delete),
             methods=["DELETE"],
         ),
+        # [2026-10-23, P10.5 Block 7, Schritt 7.1 — UI-1] JSON-404 für unbekannte API-Pfade.
+        #
+        # **Vorher** antwortete ein unbekannter `/api/v1/…`-Pfad mit Starlettes
+        # Klartext-404 (`text/plain`) — die einzige Stelle, an der die JSON-API kein JSON
+        # lieferte. **Nachher** antwortet sie mit derselben Fehlerform wie jede andere
+        # API-Antwort (`error`/`message`/`detail`), damit ein JSON-Client nicht an einem
+        # nicht parsebaren Body scheitert. Der Pfad wird **nicht** zurückgespiegelt (er kann
+        # Nutzerdaten tragen).
+        #
+        # **Letzte Route der Liste** — Starlette prüft in Reihenfolge, der erste Treffer
+        # gewinnt; alle bekannten API-Pfade stehen darüber.
+        Route("/api/v1/{rest:path}", _catch(_api_not_found), methods=["GET", "POST", "PATCH", "DELETE"]),
     ]
