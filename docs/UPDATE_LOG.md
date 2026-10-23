@@ -10,6 +10,11 @@
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
 ## 2026-10-23
+- Die KI-Verbindung kann jetzt mehrere Notizen in einem einzigen Aufruf um Text ergänzen — jede Notiz bringt ihre eigene Version mit, ein Konflikt stoppt die anderen nicht.
+- Die Verbindung spricht jetzt das neueste MCP-Protokoll (2026-07-28). Ältere Clients laufen unverändert weiter, sie bekommen dann weiterhin die bisherige Protokollstufe.
+- Lokale MCP-Clients — zum Beispiel eine App, die auf deinem eigenen Rechner läuft — melden sich jetzt ohne Umweg an.
+
+## 2026-10-23
 - Die Übersicht lädt jetzt deutlich schneller: die Zähler kommen in einem einzigen Durchgang statt einzeln je Ordner und Space.
 - Die Space-Liste füllt sich auch dann, wenn die Übersicht spät kommt — das Fenster musst du nicht mehr neu öffnen.
 - Beim Hochladen eines Fotos verschwinden Standort und Gerätedaten (GPS/EXIF) aus dem Bild; die Ausrichtung bleibt erhalten.

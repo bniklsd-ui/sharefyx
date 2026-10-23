@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,46 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-23 (Deploy A `v3.1.5` **live** (Gate 9/9) · P10.5-26 ✅ geklärt · Merge `p105-block5` → `main`)
+
+**Ergebnis.** Drei Dinge an einem Tag: **Deploy A ist live** (`v3.1.5`, Release
+`20261023T065010.377336Z`, SHA `7358f22`, `health_gate` **9/9 OK**), **P10.5-26 ist geklärt**
+(opencode 1.19.4 führt `list_spaces` aus — der Auslöser lag im **Messgerät**, nicht im Server),
+und der Branch `p105-block5` (Block 5 + 6 + P10.5-26) ist **nach `main` gemergt**.
+
+**Deploy A — die echte Gate-Ausgabe** (`health_gate.sh --expected-version=v3.1.5
+--require-todays-update-log --expected-sha=7358f22`, gelesen ohne Rechte):
+
+```
+OK  /health -> 200
+OK  /ui/login -> 200
+OK  /api/v1/me -> 401
+OK  /mcp/ -> 401
+OK  .rail__version -> v3.1.5
+OK  /opt/sharefyx/current -> /opt/sharefyx/releases/20261023T065010.377336Z
+OK  Release-SHA: 7358f227d75438c16b6f18b0ee38e77a5d83de07
+OK  docs/UPDATE_LOG.md oberster Eintrag: 2026-10-23
+OK  Release-SHA 7358f227d75438c16b6f18b0ee38e77a5d83de07 matched --expected-sha=7358f22
+{"ts":"2026-10-23T06:58:27.290Z","action":"health_gate","result":"ok","expected_version":"v3.1.5","actual_version":"v3.1.5","active_release":"/opt/sharefyx/releases/20261023T065010.377336Z","release_sha":"7358f227d75438c16b6f18b0ee38e77a5d83de07","port":8765}
+```
+
+**P10.5-26 in einem Satz.** Beide Verdachtsmomente vom 2026-10-22 sind **widerlegt**: der `405`
+auf `GET /mcp` ist nicht die Ursache (offener FastMCP-Server mit *und* ohne SSE-Strom: opencode
+arbeitet einwandfrei), und der behauptete serverseitige Werkzeugaufruf war **nicht belegt** (null
+`ev=tool` in der Wegwerf-Logdatei). Der Auslöser lag im Messgerät: der Stub-Prototyp lief endlos
+und der `mcp debug`-Schritt stand vor dem Werkzeuglauf. Beleg: `ev=tool, tool=list_spaces,
+ok=true, proto=2025-11-25` im Log **desselben** Laufs. **Kein Produktcode** — P2-B bleibt.
+
+**Reihenfolge (Nikinger-Entscheidung 2026-10-23).** Deploy A **zuerst** aus `main`
+(`fastmcp 3.4.7` im Dev-venv), **danach** der Merge, **dann** Deploy B (`v3.1.6`,
+`fastmcp 4.1.3`). Grund: `deploy.sh main` liefert aus, was auf `main` steht — ein Merge vor dem
+Deploy A hätte den Block-5/6-Stand unter der Nummer `v3.1.5` ausgeliefert.
+
+**Offen / nächster Schritt.** **Deploy B (`v3.1.6`)**: Badge + `docs/UPDATE_LOG.md` + Dev-venv neu
+(`fastmcp 4.1.3`) + Suite, dann der Deploy durch den Nikinger (Hard Rule 9). Beim Nikinger:
+**P10.5-18** (Live-Messung nach Deploy A), **P10.5-27/28** (Live P10-J, zwei Modellanbieter),
+AL-1 Zeile 15, V203.
 
 ## Session stopped — 2026-10-23 (P10.5-26 ✅ — opencode führt `list_spaces` aus; der Auslöser lag im Messgerät)
 
