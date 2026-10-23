@@ -205,6 +205,46 @@ export function setCreateControlsPresent(present) {
   activeSpaceWritable() ? createDialogPart.attach() : createDialogPart.detach();
 }
 
+// -- Tab-Titel (P10.5, Block 7.3 — UI-3, V120, D-5 deutsch) -----------------------------
+//
+// **Der Titel folgt der Ansicht, und die Ansicht ist der Zustand.** Zwei Felder, ein Ort:
+// `viewTitle` merkt sich den Titel der Ansicht, `panelOpen` den Zustand des
+// Einstellungs-Panels — das als **Overlay** über der Ansicht liegt und sie beim Schließen
+// wieder freigibt. Ohne das zweite Feld müsste jede Aufrufstelle sich merken, was der
+// Titel vor dem Panel war.
+//
+// **Warum zwei Funktionen und nicht eine:** `setViewTitle(part)` setzt den Titel der
+// Ansicht (der Plan nennt genau diese Unterschrift), `setPanelTitle(open)` schaltet das
+// Panel darüber. Beide rufen dieselbe Anwendung — der Titel kann so nie „hängen
+// bleiben", weil das Panel die Ansicht nicht überschreibt, sondern überlagert.
+var viewTitle = "";
+var panelOpen = false;
+
+export function setViewTitle(part) {
+  viewTitle = part || "";
+  applyViewTitle();
+}
+
+export function setPanelTitle(open) {
+  panelOpen = !!open;
+  applyViewTitle();
+}
+
+// Der Titel der **Listenansicht**: die Spaces-Übersicht, der globale Modus oder der
+// Name des aktiven Space. Eine Quelle für alle drei, weil die Liste an drei Stellen den
+// Space wechselt (Übersicht, Baum, „Alle Items") und drei Aufrufstellen sich sonst
+// widersprechen könnten.
+export function listViewTitle() {
+  if (state.overview) return "Übersicht";
+  if (isGlobalScope()) return "Alle Items";
+  return state.activeSpace || "";
+}
+
+function applyViewTitle() {
+  var part = panelOpen ? "Einstellungen" : viewTitle;
+  document.title = part ? part + " · sharefyx" : "sharefyx";
+}
+
 export function init() {
   var detailEditorEl = document.getElementById("detail-editor");
   var newItemButtonEl = document.getElementById("new-item-button");

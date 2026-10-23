@@ -10,7 +10,7 @@ down:
   - ../phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md  # 📦 §12 Entscheidungsliste D-1–D-18, verbatim
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
   - UPDATES_ARCHIVE.md                              # 📦 die älteren `updated:`-Fäden dieses Heads, verbatim
-updated: 2026-10-23 (Block 7.2 (UI-2): die Wortmarke `static/logo.svg` — Variante B aus dem Logo-Board, pixelgleich gemessen; zwei Befunde nur durch Messung (XML-Kommentar, MIME-Typ); Probe an der Wegwerf-Instanz mit rotem Gegenlauf; Abnahmestand 26 ✅ · 0 ⚠️ · 35 ⬜) | 2026-10-23 (Deploy B ist live: `v3.1.6`, Release `20261023T165838.591015Z`, SHA `e5c834e`, health_gate 9/9 OK; Block 7.1 (UI-1) gemergt (`f0e76b0`) — kommt mit `v3.1.7`) | 2026-10-23 (Block 7.1 (UI-1) gebaut: HTML-404 für unbekannte `/ui`-Pfade + JSON-404 in der API — Branch `p105-block7`, nicht gemergt; 4 neue Tests, 4 Gegenläufe wirksam; Suite 1384 grün) | 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zeile `)pdated:` → `) | `; Release-Tests wieder grün, Suite 1380 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-10-23 (Block 7.3 (UI-3) gebaut: der Tab-Titel folgt der Ansicht — Übersicht, Space-Name, Item-Titel, Einstellungen; datierte Korrektur zum Plan (vier Zustände, nicht fünf); Probe an der Wegwerf-Instanz 6/6 mit rotem Gegenlauf; Abnahmestand 27 ✅ · 0 ⚠️ · 34 ⬜) | 2026-10-23 (Block 7.2 (UI-2): die Wortmarke `static/logo.svg` — Variante B aus dem Logo-Board, pixelgleich gemessen; zwei Befunde nur durch Messung (XML-Kommentar, MIME-Typ); Probe an der Wegwerf-Instanz mit rotem Gegenlauf; Abnahmestand 26 ✅ · 0 ⚠️ · 35 ⬜) | 2026-10-23 (Deploy B ist live: `v3.1.6`, Release `20261023T165838.591015Z`, SHA `e5c834e`, health_gate 9/9 OK; Block 7.1 (UI-1) gemergt (`f0e76b0`) — kommt mit `v3.1.7`) | 2026-10-23 (Block 7.1 (UI-1) gebaut: HTML-404 für unbekannte `/ui`-Pfade + JSON-404 in der API — Branch `p105-block7`, nicht gemergt; 4 neue Tests, 4 Gegenläufe wirksam; Suite 1384 grün) | 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zeile `)pdated:` → `) | `; Release-Tests wieder grün, Suite 1380 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -38,7 +38,7 @@ updated: 2026-10-23 (Block 7.2 (UI-2): die Wortmarke `static/logo.svg` — Varia
 | 4 | Performance: PF-1, PF-4, Z1–Z4 | Ausführer (+ Claude Code Proben) | A | ✅ 2026-10-22 — **4.1–4.6 gebaut und geprobt**: `_overview()` zählt alle Eimer aus **einem** `store.search()`-Durchgang (P10.5-G, Rückfall über `_STORE_FETCH_LIMIT`), `folders`/`members` wandern in die Antwort · `asyncio.to_thread` für `_overview`/`_items_get`/`_graph_get` (Z2) · Client: nur noch `/overview`, 10 s Mindestpause für `focus`/`visibilitychange` (PF-4) · neu `static/js/loading.js` + `.is-loading`-Gerüst (Z3/Z4) · **M2-Bench Median 107,3 ms** (vorher 2405,6) · **`/health` hinter `/overview` 23 ms** (P10: 4757 ms) · Browser: 150 ms → kein Platzhalter, 400 ms → Platzhalter; Abnahme 10-14/15/16/17 ✅, 10-18 beim Nikinger nach Deploy A |
 | 5 | MCP-Schicht: PA-5 (FastMCP 4), LG-4 | Ausführer | B | ✅ 2026-10-22 — **5.1–5.6 gebaut und geprobt**: `fastmcp==4.1.3` (V207 ✅), `constraints.txt` neu aus frischem venv, Suite 1354 grün mit Compat an **und** aus (Warnungen als Fehler) · `proto` im Tool-Log (V219 ✅: `Context.request_context.protocol_version`) · neues Werkzeug `append_to_items` (LG-4, ≤ 20 Einträge, je Eintrag eigene `version`, Teilerfolg, Log `err:"partial"`) · Probe beider Ären in-process: `legacy` → `2025-11-25`, `auto` → `2026-07-28` · Smoke 17/17; Abnahme 10-19/20/21 ✅, 10-22 beim Nikinger nach Deploy B |
 | 6 | Anbieter: PA-1, PA-2, `/mcp`, PA-6, P10-J | Ausführer + Claude Code + Nikinger | B | ✅ 2026-10-22 — **6.0–6.5 gebaut und gemessen**: zweite Vergleichsregel `http://127.0.0.1:<port>` (Port explizit, kein `localhost`/`[::1]`, P10.5-O) + `application_type` ∈ {fehlend, null, native, web} · CSP `form-action` mit `http://127.0.0.1:*` · `/mcp` **ohne** Slash exakt bedient (`_ExactMcpMount`, kein 307) · PA-6 (Wurzel-`CLAUDE.md` eine Zeile) · **V209 ✅** (opencode 1.19.4), **V197 ✅** (Chromium folgt dem Consent-Redirect) · **DCR-Gegenlauf**: derselbe Request 400 → **201** · Suite **1376 grün** (1354 + 22) · **10-23/10-24/10-25 ✅**, **10-26 ✅** (2026-10-23 geklärt: die zwei Auslöser lagen im Messgerät, kein Produktcode — siehe Session-Block), 10-27/28 beim Nikinger nach Deploy B |
-| 7 | Darstellung: UI-1–UI-6, KA-5 | Ausführer (+ Claude Code Sichtung) | C | 🔄 2026-10-23 — **7.1 UI-1 (HTML-404) gebaut** (Branch `p105-block7`, **nicht gemergt**): `render_not_found_page()` + `Route("/ui/{rest:path}", …)` **nach** allen `/ui`-Routen · **datierte Korrektur zum Plan**: „API bleibt JSON" war gemessen **falsch** (unbekannter `/api/v1/…`-Pfad ⇒ Starlette-Klartext) ⇒ JSON-404 in der API-Fehlerform · 4 Tests gegen die **echte** `create_app()`, **4 Gegenläufe wirksam** · **7.0: die Update-Log-ID** (Befund vom 2026-10-23, Altbestand aus P6): `webui/updates.py` zählt die IDs je Datum jetzt **von unten** ⇒ jeder neue Block bekommt eine ID, die **kein** bestehender Block trägt (gemessen: `latest=2026-10-23#2` gegen `seen=2026-10-23#1` ⇒ der Banner erscheint); 4 neue Wächter in `phase10_5_finishing/tests/test_update_log_ids.py` · **7.2 UI-2 (Wortmarke) gebaut**: `static/logo.svg` — Variante B („Überlagert") aus dem Logo-Board, **pixelgleich** gemessen (190 px 0,13/255 · 32 px 0,39/255 · 16 px **0,00**/255); Farben = App-Tokens mit Ersatzwert (`<img>`/Favicon erben keine Seiten-Variablen) · **zwei Befunde nur durch Messung**: `--` im XML-Kommentar ⇒ Fehlerseite statt Zeichen; `.svg` fehlte in der MIME-Tabelle ⇒ **der Browser rendert ein SVG mit falschem MIME-Typ nicht** ⇒ jetzt `image/svg+xml` · Probe an der Wegwerf-Instanz: `naturalWidth` 100, gerendert 16 × 16, **Gegenlauf rot** · **7.3–7.7 (UI-3–UI-6, KA-5) noch ⬜** |
+| 7 | Darstellung: UI-1–UI-6, KA-5 | Ausführer (+ Claude Code Sichtung) | C | 🔄 2026-10-23 — **7.1 UI-1 (HTML-404) gebaut** (Branch `p105-block7`, **nicht gemergt**): `render_not_found_page()` + `Route("/ui/{rest:path}", …)` **nach** allen `/ui`-Routen · **datierte Korrektur zum Plan**: „API bleibt JSON" war gemessen **falsch** (unbekannter `/api/v1/…`-Pfad ⇒ Starlette-Klartext) ⇒ JSON-404 in der API-Fehlerform · 4 Tests gegen die **echte** `create_app()`, **4 Gegenläufe wirksam** · **7.0: die Update-Log-ID** (Befund vom 2026-10-23, Altbestand aus P6): `webui/updates.py` zählt die IDs je Datum jetzt **von unten** ⇒ jeder neue Block bekommt eine ID, die **kein** bestehender Block trägt (gemessen: `latest=2026-10-23#2` gegen `seen=2026-10-23#1` ⇒ der Banner erscheint); 4 neue Wächter in `phase10_5_finishing/tests/test_update_log_ids.py` · **7.2 UI-2 (Wortmarke) gebaut**: `static/logo.svg` — Variante B („Überlagert") aus dem Logo-Board, **pixelgleich** gemessen (190 px 0,13/255 · 32 px 0,39/255 · 16 px **0,00**/255); Farben = App-Tokens mit Ersatzwert (`<img>`/Favicon erben keine Seiten-Variablen) · **zwei Befunde nur durch Messung**: `--` im XML-Kommentar ⇒ Fehlerseite statt Zeichen; `.svg` fehlte in der MIME-Tabelle ⇒ **der Browser rendert ein SVG mit falschem MIME-Typ nicht** ⇒ jetzt `image/svg+xml` · Probe an der Wegwerf-Instanz: `naturalWidth` 100, gerendert 16 × 16, **Gegenlauf rot** · **7.3 UI-3 (Tab-Titel) gebaut**: `state.js :: setViewTitle(part)` + `setPanelTitle(open)` — der Titel folgt der **Ansicht** (Übersicht · Space-Name · Item-Titel · Einstellungen), das Panel liegt als Overlay darüber und gibt den Ansichts-Titel zurück · **datierte Korrektur zum Plan**: er nennt fünf Titel, gemessen sind es **vier Zustände** (die Karte ist Kontextbereich, kein eigener Zustand) · Probe an der Wegwerf-Instanz: **6/6 Schritte** ✓, **Gegenlauf rot** ✓ · 4 Wächter in `phase10_5_finishing/tests/test_view_titles.py` · **7.4–7.7 (UI-4–UI-6, KA-5) noch ⬜** |
 | 8 | Karte: Gehirnkarte C2 | Ausführer (+ Claude Code Smoke/Sichtung) | C | ⬜ |
 | 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | ⬜ |
 | 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | D | ⬜ |
@@ -95,7 +95,7 @@ updated: 2026-10-23 (Block 7.2 (UI-2): die Wortmarke `static/logo.svg` — Varia
 | P10.5-28 | **Live P10-J Lauf 2** (lokales Modell, CT 111) — mit 27 die Abschlussbedingung der Phase | ⬜ | — |
 | P10.5-29 | UI-1: HTML-404 für unbekannte `/ui`-Pfade | ✅ | 7.1 · `phase5_ui/webui/pages.py :: render_not_found_page()` + `phase2_mcp/mcpserver/app.py` (Route **nach** allen `/ui`-Routen) · 4 neue Tests in `phase5_ui/tests/test_static_routes.py` gegen die **echte** `create_app()` · **4 Gegenläufe wirksam** (Fänger entfernt / vor die bekannten Routen / API-404 entfernt / global statt `/ui`) · **datierte Korrektur zum Plan**: „API bleibt JSON" war gemessen falsch ⇒ `api.py` antwortet jetzt JSON |
 | P10.5-30 | UI-2: Logo an beiden Stellen + Favicon aus einer Datei | ✅ | 7.2 · `phase5_ui/webui/static/logo.svg` (Variante B aus `docs/concepts/phase10_logo_entwuerfe_final.svg`, **pixelgleich** zum Board gemessen: 190 px 0,13/255 · 32 px 0,39/255 · 16 px **0,00**/255) · Rail (`app.html`) **und** Anmeldeseite (`pages.py`) binden dieselbe Datei ein, dazu das Favicon · Farben = App-Tokens **mit Ersatzwert** (`var(--accent, #3E8DF3)`), weil `<img>` und Favicon keine Seiten-Variablen erben · 3 neue Tests in `phase5_ui/tests/test_pages_markup.py` + 1 in `test_static_routes.py` (**4 Gegenläufe wirksam**) · Probe `probes/p105_b7_logo_probe.py` an der Wegwerf-Instanz: `naturalWidth` 100, gerendert **16 × 16**, **Gegenlauf rot** (`naturalWidth` 0) |
-| P10.5-31 | UI-3: deutscher Titel je Ansicht (V120 ✅) | ⬜ | — |
+| P10.5-31 | UI-3: deutscher Titel je Ansicht (V120 ✅) | ✅ | 7.3 · `state.js :: setViewTitle(part)` + `setPanelTitle(open)` (der Titel folgt der **Ansicht**; das Panel liegt als Overlay darüber) · Aufrufe: `editor.js :: showOverviewPane` (Listen-Titel), `editor.js :: loadEditorFromItem` (Item-Titel), `tree.js :: navigateAll`/`activateView`, `app.js` (Zurück-Knopf), `settings.js :: show` (Panel) · Format **„Titel · sharefyx"** (Plan §Block 7, Schritt 7.3) · Probe `probes/p105_b7_titel_probe.py` an der Wegwerf-Instanz: **6/6 Schritte** ✓ (Übersicht · Space-Name · Item-Titel · Einstellungen · zurück), **Gegenlauf rot** ✓ (ohne `setViewTitle(item.title)` bleibt der Space-Name stehen) · 4 Wächter in `phase10_5_finishing/tests/test_view_titles.py` |
 | P10.5-32 | UI-4: Sichtungsliste abgearbeitet (Nikinger bestätigt) | ⬜ | — |
 | P10.5-33 | UI-5: Kontrast ≥ 4,5:1 | ⬜ | — |
 | P10.5-34 | UI-6: Filter in API und UI | ⬜ | — |
@@ -127,7 +127,7 @@ updated: 2026-10-23 (Block 7.2 (UI-2): die Wortmarke `static/logo.svg` — Varia
 | P10.5-60 | P10-J zweimal live belegt | ⬜ | — |
 | P10.5-61 | Closeout-Dokumente + Rotationen per Skript | ⬜ | — |
 
-**Summe:** 26 ✅ · 0 ⚠️ · 35 ⬜ (von 61). **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`). **[2026-10-23, Block 7.1]** +1 ✅ (10-29, UI-1) ⇒ 25 ✅ · 0 ⚠️ · 36 ⬜. **[2026-10-23, Block 7.2]** +1 ✅ (10-30, UI-2) ⇒ 26 ✅ · 0 ⚠️ · 35 ⬜.
+**Summe:** 27 ✅ · 0 ⚠️ · 34 ⬜ (von 61). **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`). **[2026-10-23, Block 7.1]** +1 ✅ (10-29, UI-1) ⇒ 25 ✅ · 0 ⚠️ · 36 ⬜. **[2026-10-23, Block 7.2]** +1 ✅ (10-30, UI-2) ⇒ 26 ✅ · 0 ⚠️ · 35 ⬜. **[2026-10-23, Block 7.3]** +1 ✅ (10-31, UI-3) ⇒ 27 ✅ · 0 ⚠️ · 34 ⬜.
 
 ## Offen beim Nikinger
 
@@ -153,22 +153,10 @@ updated: 2026-10-23 (Block 7.2 (UI-2): die Wortmarke `static/logo.svg` — Varia
   gedreht) · Spaces-Panel direkt nach dem Laden (BG-1).
 - **P10.5-27/28** — Live-Abnahme P10-J: zwei Modellanbieter, ein Server, ein Werkzeug (`list_spaces`) — Block 6 und Z. **Voraussetzung ist erfüllt:** die Wegwerf-E2E (P10.5-26) zeigt, dass ein Nicht-Claude-Client (`list_spaces` gelingt) — offen ist nur noch der **Live**-Lauf mit zwei Modellanbietern.
 - **Block 2, Zeile 15 (AL-1)** — Migration + Live-Check beim Nikinger.
-- **Deploy B (`v3.1.6`) — der Blocker ist weg, es fehlt nur noch der Aufruf.**
-  26/26 Zellen grün an der Wegwerf-Instanz (Details im Session-Block unten), Suite **1380** grün,
-  `doc_health` 0, `ui_budget` 5/5. **Der Deploy der letzten Session ist nicht am Befehl, sondern an
-  den Release-Tests gescheitert** — Ursache war eine verklebte `updated:`-Zeile in
-  `phase10_5_finishing/SESSIONS_ARCHIVE.md` (**behoben**, eine Zeile, byteweise belegt im
-  Session-Block). Der Deploy selbst ist Nikinger-Arbeit (Hard Rule 9, `sudo`):
-  `SHAREFYX_RELEASES_DIR=/opt/sharefyx/releases SHAREFYX_CURRENT_LINK=/opt/sharefyx/current
-  SHAREFYX_DATA_ROOT=/home/savefyx/savefyx-data SHAREFYX_BACKUP_DIR=/var/lib/sharefyx-backup
-  SHAREFYX_SYSTEMCTL="sudo systemctl" phase5_ui/scripts/deploy.sh main` — **derselbe Aufruf wie
-  bei Deploy A** — danach (lesend, ohne Rechte)
-  `phase8_5_picker_release/scripts/health_gate.sh --expected-version=v3.1.6
-  --require-todays-update-log --expected-sha=<SHA>`; die **echte** Ausgabe gehört in den
-  Session-Block, nie die Behauptung. **Zur SHA (datierte Abweichung von der Notiz der letzten
-  Session, die `a7fe62c` nannte):** dieser Stand trägt den Ketten-Defekt, sein Release wäre rot —
-  `--expected-sha` muss der **Reparatur-Commit** sein (im Commit-Log des Phase-Heads). **Live
-  danach:** **P10.5-22** (claude.ai-Connector
+- ~~**Deploy B (`v3.1.6`)**~~ ✅ **2026-10-23** — **live**: Release `20261023T165838.591015Z`, SHA
+  `e5c834e`, `health_gate` **9/9 OK** (`.rail__version` v3.1.6). Die Release-Tests im Release
+  **1380 grün** (340,7 s), Symlink-Wechsel, Dienst neu gestartet — Details im Session-Block.
+  **Live danach:** **P10.5-22** (claude.ai-Connector
   `list_spaces`/`search_items`/`get_item`/`update_item`, Log-Feld `proto` zeigt die Ära, V208) ·
   **P10.5-25** (`curl -si -X POST …/mcp` → **401 mit Challenge**, kein 307) · **P10.5-27/28**
   (Live P10-J, zwei Modellanbieter). **5.7:** Fabian kurz Bescheid („kurzer Neustart; der
@@ -176,78 +164,14 @@ updated: 2026-10-23 (Block 7.2 (UI-2): die Wortmarke `static/logo.svg` — Varia
 - ~~**Befund 2.5 (P10.5-9 ⚠️)**~~ ✅ 2026-10-22 (Block-2-Nachzug, Nikinger-Entscheidung „ja") — `create_item(space=, folder=<neu>)` und `POST /api/v1/items` legen im fremden Home-Space mit `write:` **keinen** neuen Ordner mehr an; die Regel ist `permissions.manages_space()` (eigener Space oder Team-Space mit Schreibrecht), auf beiden Flächen. Ohne `folder` bleibt das Anlegen an der Space-Wurzel erlaubt (P6-U).
 
 ## Startauftrag — Block 7 (Darstellung: UI-1–UI-6, KA-5) · Ausführer
+> **Verbatim verschoben** nach `STARTUPTRAG_ARCHIVE.md` (`scripts/move_sections.py`) — dort unter derselben Überschrift.
+> **Noch offen: 7.4** (Sichtung — Claude Code/Nikinger), **7.5** (Kontrast), **7.6** (Assignee-Filter),
+> **7.7** (KA-5). **7.1–7.3 sind gebaut und gemergt.** **Zwei Korrekturen gegen den 📕-Plan stehen nur
+> im Archiv** (der Plan bleibt ein Snapshot): `--caution` ist der **Text**-Farbwert, nicht die Knopffläche
+> (7.5) · `_items_get` steht in `api.py:932`, nicht 821 (7.6). Wer die Schritte baut, liest **das
+> Archiv**, nicht den Plan.
 
-*Stand 2026-10-22, nach Block 6. Die Schritte stehen wortgleich im Plan (📕
-`docs/concepts/phase10_5_finishing_plan.md` §Block 7, Zeilen 685–735); **hier stehen die heute
-geprüften Anker** — der Plan nennt vier Zeilen, die inzwischen gedriftet sind (siehe „Drift").*
-
-**Vorher (Block-Start, Plan §2.1):** `limit.context` ≤ 400.000 prüfen (`opencode.json`:
-`MiniMax-M3.1-Flash` → 400000 ✓) · `git status` sauber · Blockbasis = HEAD · **erlaubte Pfade**
-(Plan §3): `phase5_ui/webui/**`, `phase2_mcp/mcpserver/app.py` (**eine** Route), Tests.
-**Proben laufen an der Wegwerf-Instanz** (Freigabe vom 2026-10-22): eigener Port, tmp-`DATA_ROOT`,
-tmp-`auth.sqlite3`, Playwright aus `~/.claude-code-tools/e2e-venv` — **nicht** gegen den laufenden
-Dienst.
-
-**Schritte (in dieser Reihenfolge):**
-
-1. **7.1 UI-1 — HTML-404.** ✅ **2026-10-23** (Branch `p105-block7`, nicht gemergt) — `phase5_ui/webui/pages.py`: neu `render_not_found_page()` über
-   `_page(title="Nicht gefunden", body=…)` (**`_page` steht heute in `pages.py:49`**), Text „Diese
-   Seite gibt es nicht." + Link „Zur Übersicht" (`/ui/`). Route `Route("/ui/{rest:path}", …,
-   methods=["GET"])` in `mcpserver/app.py` **nach** allen `/ui`-Routen (nach `api_routes(...)`) —
-   sonst überdeckt der Fänger `account_routes`. Status 404, `Cache-Control: no-store`;
-   `/ui/static/<fehlt>` bleibt Klartext (`static_routes.py:86`), API und `/mcp` bleiben JSON.
-   Tests: `test_static_routes.py` — `test_unknown_ui_path_renders_html_404`,
-   `test_known_ui_routes_win_over_the_catch_all` (login/invite/account),
-   `test_missing_static_file_stays_plain_text`, `test_api_404_stays_json`.
-2. **7.2 UI-2 — Logo (D-6, Variante B „Überlagert").** ✅ **2026-10-23** — `docs/concepts/phase10_logo_entwuerfe_final.svg`
-   → **eine** Datei `phase5_ui/webui/static/logo.svg` (der einzige Austauschpunkt); Farben als
-   `currentColor` bzw. über `--select-fill`/`--select-line`, sonst stimmt der Dunkelmodus nicht.
-   Marke „S" + „harefyx": `static/app.html:20` (heute `<div class="rail__brand">sharefyx<span
-   class="rail__version">v3.1.4</span></div>` — **das `brand__mark`-`<img>` fehlt noch**) und
-   `pages.py` (Login-/Fehlerseite). Favicon: `<link rel="icon" type="image/svg+xml"
-   href="/ui/static/logo.svg">` in `app.html` **und** `_page` (`pages.py:39`) — `[VERIFY V215]`
-   Safari. Test: `test_pages_markup.py::test_brand_uses_the_single_logo_file` (beide Stellen auf
-   dieselbe Datei).
-3. **7.3 UI-3 — Tab-Titel je Ansicht (V120, D-5 deutsch).** **`setViewTitle()` existiert heute
-   nicht** (`document.title` steht nur statisch in `app.html:6`) — das ist eine **Bau-Aufgabe**, kein
-   Verdrahtungs-Fix. `state.js`: `export function setViewTitle(part) { document.title = part ?
-   part + " · sharefyx" : "sharefyx"; }`. Aufrufe: Übersicht (`editor.js:59 showOverviewPane`)
-   „Übersicht", Space-Liste = Space-Name, Item (`editor.js:469 loadEditorFromItem`) = Titel, Karte
-   (`graph.js:186 loadGraph`) „Karte", Einstellungen „Einstellungen".
-4. **7.4 UI-4 — Sichtung, dann Fix.** **Nicht der Ausführer:** Claude Code macht die Screenshots
-   der acht Hauptansichten (Konventionen: `docs/concepts/sichtpruefung_automation_conventions.md`),
-   der Nikinger liefert daraus **höchstens 10** Posten, der Ausführer setzt sie in `app.css` um
-   (Auswahl-Konvention v3, `phase8_ui_graph/CLAUDE.md`). Alles über 10 Posten wandert nach P11.
-5. **7.5 UI-5 — Kontrast (D-7).** **Drift gegen den Plan:** im Code ist `--caution` **selbst der
-   Text-Farbwert** (`app.css:92`: `--caution: var(--danger)`), nicht die Knopffläche — der Plan
-   spricht von einem „neuen Token `--caution-text` (heller als `--caution`)". **Der Code gewinnt:**
-   Ziel ist ein **hellerer Text** auf der Standardfläche, ohne eine eigene Flächen-Familie
-   (`--caution-std-*` wäre ausgeschlossen, P9-B17). Wächter
-   `phase10_5_finishing/tests/test_contrast.py::test_caution_text_meets_wcag_aa()`: liest die
-   Token-Werte aus `app.css`, rechnet WCAG gegen den Knopfhintergrund, ≥ 4,5:1 — das alte Token
-   liefert **4,38:1** (Gegenlauf: rot).
-6. **7.6 UI-6 — Assignee-Filter.** `phase5_ui/webui/api.py:932 _items_get` (Plan sagt 821 —
-   **Drift**) nimmt `assignee=<space>` an und filtert **im Adapter** (`i.assignee == value`), **vor**
-   der Paginierung; `ItemSummary.assignee` existiert (`storage/models.py:90`). UI: Auswahl
-   „Zugewiesen" in der Listenkopfzeile (`list.js:56` `<header class="list__head" id="list-head">`)
-   mit den Spaces aus `state.spaces` + „alle". Tests: `test_api.py::test_items_filter_by_assignee`,
-   `test_items_assignee_filter_respects_acl`.
-7. **7.7 KA-5 — `doing` hervorheben.** Übersicht: der Eimer „In Arbeit" bekommt die Akzentklasse
-   (`app.css`; die Eimer kommen generisch aus `meta.buckets` — `static/js/app.js:371`) · Karte:
-   `doing`-Knoten tragen einen statischen Akzentring, **ohne** Animation.
-
-**Vier Drifts zwischen Plan und Code (Korrektur im Plan wäre eine 📕-Änderung — hier festgehalten,
-der Code gewinnt):** `_items_get` steht heute in `api.py:932` (Plan 821) · `showOverviewPane` in
-`editor.js:59` (Plan 56) · `loadEditorFromItem` in `editor.js:469` (Plan 466) · `loadGraph` in
-`graph.js:186` (Plan 182). Dazu die zwei Sachbefunde: `--caution` ist der **Text**-Farbwert (Plan
-liest es als Fläche) und `setViewTitle` **existiert noch nicht**.
-
-**Abnahme (Plan §Block 7):** 10-29 (404-Seite) · 10-30 (Logo + Favicon aus einer Datei) · 10-31
-(Titel je Ansicht) · 10-32 (Sichtungsliste, **beim Nikinger**) · 10-33 (Kontrast ≥ 4,5:1) · 10-34
-(Filter in API und UI) · 10-35 (KA-5 sichtbar). **Proben:** Playwright liest `document.title` je
-Ansicht; Screenshots für 10-30/10-32/10-35; **Wegwerf statt Live** (Freigabe 2026-10-22).
-
-## Session stopped — 2026-10-23 (Deploy B live; Block 7.1 (UI-1) und 7.2 (UI-2) gebaut)
+## Session stopped — 2026-10-23 (Deploy B live; Block 7.1 (UI-1), 7.2 (UI-2) und 7.3 (UI-3) gebaut)
 
 **Ergebnis.** Der Deploy-Befehl der letzten Session war **korrekt** — rot waren die **Release-Tests**,
 der Grund lag in **einer verklebten Zeile**: `phase10_5_finishing/SESSIONS_ARCHIVE.md:8` trug die
@@ -255,13 +179,9 @@ der Grund lag in **einer verklebten Zeile**: `phase10_5_finishing/SESSIONS_ARCHI
 verschluckt ⇒ der Wächter `test_no_thread_is_invisible_to_the_rotation_anchor` stand rot ⇒
 `deploy.sh` bricht in Schritt 4 ab, **vor** dem Symlink-Wechsel (gemessen: ein Release-Checkout auf
 `a7fe62c` ist rot — **nichts** deployed, **nichts** beschädigt). **Reparatur: eine Zeile**
-(`)pdated:` → `) | `, −5 B), die elf älteren Fäden byteweise wie `git show 59d8c24^`; `chain_defects`
-→ `(False, 0, 0)`, `blind_positions` → `[]`, **12** Fäden sichtbar, `test_updated_chain.py` **7/7**.
-
-**Gemessen.** `pytest` **1380 grün** (313,6 s) · `doc_health` **0** · `ui_budget` **5/5** (188,5 KB) ·
-**Release-Stand vorab am Klon geprüft** (Clone von `main` = `3183344`, frisches venv,
-`dev_install.sh` **mit** `constraints.txt`): **1380 grün** (337,2 s) — an der Stufe kann der Deploy
-nicht mehr scheitern.
+(`)pdated:` → `) | `, −5 B); `chain_defects` → `(False, 0, 0)`, `blind_positions` → `[]`, **12** Fäden
+sichtbar, `test_updated_chain.py` **7/7**. **Release-Stand vorab am Klon geprüft** (frisches venv, `constraints.txt`): **1380 grün**
+(337,2 s) — an der Stufe konnte der Deploy nicht mehr scheitern.
 
 **Der Deploy lief beim Nikinger (Hard Rule 9, `sudo`).** `sudo -n true` sagt „a password is
 required" — auch in einem pty; das Journal zeigte **keine** erfolgreiche `savefyx`-sudo seit
@@ -274,28 +194,31 @@ Symlink stünde schon auf `v3.1.6`, der Prozess liefe aber mit dem alten Code; d
 `/opt/sharefyx/releases/20261023T165838.591015Z` → Dienst neu gestartet. Mein Gate danach:
 `health_gate.sh --expected-version=v3.1.6 --require-todays-update-log --expected-sha=e5c834e` →
 **9/9 OK** (`.rail__version` v3.1.6, Release-SHA `e5c834e…`, Update-Log 2026-10-23).
-**Block 7.1 (UI-1) ist gemergt** (`f0e76b0`) — im Release B **nicht** dabei, das kommt mit `v3.1.7`.
+**Block 7.1 ist gemergt** (`f0e76b0`) — im Release B **nicht** dabei, das kommt mit `v3.1.7`.
 
-**Block 7.1 (UI-1): die HTML-404.** `pages.py :: render_not_found_page()` (Text + Link
-„Zur Übersicht") und die Route `Route("/ui/{rest:path}", …)` **nach** allen `/ui`-Routen.
-**Datierte Korrektur zum Plan:** „API bleibt JSON" war gemessen **falsch** (unbekannter
-`/api/v1/…`-Pfad ⇒ Starlette-Klartext) ⇒ JSON-404 in der API-Fehlerform. 4 neue Tests gegen die
-**echte** `create_app()`, **4 Gegenläufe wirksam**.
+**Block 7.1 (UI-1): die HTML-404.** `pages.py :: render_not_found_page()` und die Route
+`Route("/ui/{rest:path}", …)` **nach** allen `/ui`-Routen. **Datierte Korrektur zum Plan:** „API bleibt
+JSON" war gemessen **falsch** (unbekannter `/api/v1/…`-Pfad ⇒ Starlette-Klartext) ⇒ JSON-404 in der
+API-Fehlerform. 4 neue Tests gegen die **echte** `create_app()`, **4 Gegenläufe wirksam**.
 
-**Block 7.2 (UI-2): die Wortmarke.** `static/logo.svg` — Variante B („Überlagert") aus
-`docs/concepts/phase10_logo_entwuerfe_final.svg`, **pixelgleich** zum Board gemessen (190 px:
-0,13/255; 32 px: 0,39/255; 16 px: **0,00**/255). Die Farben sind die App-Tokens **mit Ersatzwert**
-(`var(--accent, #3E8DF3)`), weil `<img>` und Favicon **keine** Seiten-Variablen erben. **Zwei
-Befunde, die nur die Messung sah:** (a) `--` im XML-Kommentar ⇒ die Fehlerseite statt des Zeichens
-(jetzt `test_the_logo_file_is_valid_xml`); (b) `.svg` fehlte in der MIME-Tabelle ⇒
-`application/octet-stream` ⇒ **der Browser rendert ein SVG mit falschem MIME-Typ nicht** (jetzt
-`image/svg+xml` + `test_the_logo_is_served_as_an_svg`). Probe an der Wegwerf-Instanz:
-`naturalWidth` 100, gerendert **16 × 16**, **Gegenlauf rot** (`naturalWidth` 0).
+**Block 7.2 (UI-2): die Wortmarke.** `static/logo.svg` — Variante B („Überlagert") aus dem
+Logo-Board, **pixelgleich** gemessen (190 px 0,13/255 · 32 px 0,39/255 · 16 px **0,00**/255). Die
+Farben sind die App-Tokens **mit Ersatzwert**, weil `<img>` und Favicon **keine** Seiten-Variablen
+erben. **Zwei Befunde nur durch Messung:** `--` im XML-Kommentar ⇒ die Fehlerseite statt des
+Zeichens; `.svg` fehlte in der MIME-Tabelle ⇒ **der Browser rendert ein SVG mit falschem MIME-Typ
+nicht**. Probe an der Wegwerf-Instanz: `naturalWidth` 100, gerendert **16 × 16**, **Gegenlauf rot**.
+
+**Block 7.3 (UI-3): der Tab-Titel.** `state.js :: setViewTitle(part)` + `setPanelTitle(open)` — der
+Titel folgt der **Ansicht** (Übersicht · Space-Name · Item-Titel · Einstellungen), das Panel liegt
+als Overlay darüber und gibt den Ansichts-Titel zurück. **Datierte Korrektur zum Plan:** er nennt
+fünf Titel, gemessen sind es **vier Zustände** — die Karte ist kein eigener Zustand (Kontextbereich
+neben der Liste; `loadGraph()` läuft bei jedem Spacewechsel und würde den Item-Titel überschreiben).
+Probe an der Wegwerf-Instanz: **6/6 Schritte** ✓, **Gegenlauf rot** ✓.
 
 **Raum-Budget:** der Head stand bei **40.968 B** ⇒ die 24 älteren `updated:`-Fäden rotierten nach
 `UPDATES_ARCHIVE.md` ⇒ Basis 32.572 B — jetzt bindet wieder **DO-3** (Block ≤ 4.096 B). Nächster
 Hebel: der „Startauftrag" (5,8 KB) → L3-Archiv.
 
-**Offen / nächster Schritt.** Live abzunehmen: **P10.5-22** · **P10.5-25** · **P10.5-27/28** (Live
+**Offen / nächster Schritt.** Abzunehmen: **P10.5-22** · **P10.5-25** · **P10.5-27/28** (Live
 P10-J, zwei Modellanbieter) · **P10.5-18** · AL-1 Zeile 15 · V203. **5.7:** Fabian Bescheid.
-Baulich: **Block 7.3** (Tab-Titel) — `v3.1.7` wird nach Block 7–8 deployed.
+Baulich: **Block 7.4** (Sichtung, Claude Code) — `v3.1.7` folgt nach Block 7–8.

@@ -1,5 +1,7 @@
 "use strict";
 
+import { setPanelTitle } from "./state.js";
+
 // -- Einstellungen als Fensterkette (P9 Block settings, Plan §3 Schritt 2) -----------------------
 // Bis 2026-10-05 waren es drei eigenständige Overlays (`#account-dialog`, `#space-admin-dialog`,
 // `#update-log-dialog`), die sich gegenseitig **ersetzten**: „Spaces verwalten" schloss das
@@ -55,6 +57,12 @@ export function registerPanel(name, prepare) {
 }
 
 function show(visible) {
+  // P10.5 Block 7.3 (UI-3, V120): das Einstellungs-Panel liegt als **Overlay** über der
+  // Ansicht — im Tab steht währenddessen „Einstellungen", danach kommt der Titel der
+  // Ansicht zurück. `show()` ist die einzige Stelle, an der das Panel ein- und ausgeht
+  // (auch die Stufen „Spaces verwalten" und die Detailstufe laufen hierüber), deshalb
+  // hängt der Titel hier und nicht an den vier Aufrufstellen.
+  setPanelTitle(visible);
   Object.keys(panelEls).forEach(function (name) {
     var node = panelEls[name];
     if (name === "menu") { node.hidden = !visible; return; }

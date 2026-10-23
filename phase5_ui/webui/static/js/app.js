@@ -2,6 +2,7 @@
 
 import {
   state, setCreateControlsPresent, activeSpaceWritable, init as initState,
+  setViewTitle, listViewTitle,
 } from "./state.js";
 import { init as initToasts } from "./toasts.js";
 import { api, csrfToken, reportUnexpectedError } from "./api.js";
@@ -163,6 +164,9 @@ function initShell() {
 
   document.getElementById("back-button").addEventListener("click", function () {
     shellEl.dataset.view = "list";
+    // P10.5 Block 7.3 (UI-3, V120): zurück in die Listenansicht heißt zurück zum Titel der
+    // Listenansicht — ohne diese Zeile stünde der Item-Titel weiter im Tab.
+    setViewTitle(listViewTitle());
   });
 
   // -- Tastatur (§4.6) ----------------------------------------------------------------------

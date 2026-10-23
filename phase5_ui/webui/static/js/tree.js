@@ -2,7 +2,7 @@
 
 // -- Navigationsbaum (Step 7b) --------------------------------------------------------------
 
-import { state, BUCKET_LABELS, activeSpaceWritable, setCreateControlsPresent, isGlobalScope, spaceCategory, spaceAllowsMove } from "./state.js";
+import { state, BUCKET_LABELS, activeSpaceWritable, setCreateControlsPresent, isGlobalScope, spaceCategory, spaceAllowsMove, setViewTitle, listViewTitle } from "./state.js";
 import { el, toast } from "./toasts.js";
 import { reportUnexpectedError } from "./api.js";
 import { closeEditor } from "./editor.js";
@@ -28,6 +28,8 @@ export function navigateAll() {
   // `state.overview` auf false, bevor renderListSlot() zur Frage kommt. Sonst bliebe
   // die Übersicht sichtbar, obwohl der globale Modus sie per Definition ausschließt.
   state.overview = false;
+  // P10.5 Block 7.3 (UI-3, V120): der Titel des globalen Modus.
+  setViewTitle(listViewTitle());
   // V117 (gleiche Begruendung wie in activateView): der erste renderRail() laeuft BEVOR
   // loadItems() resolved -- wenn state.itemsLoaded noch von einem frueheren Space-Modus
   // befuellt ist, wuerden Folder-Counter aus dem falschen Pool gezeigt. Reset auf {}.
@@ -313,6 +315,8 @@ export function activateView(spaceName) {
   // Verlassen der Übersicht. `renderListSlot()` wertet `state.overview` aus, um die
   // Item-Liste statt der Spaces-Übersicht anzuzeigen.
   state.overview = false;
+  // P10.5 Block 7.3 (UI-3, V120): der Tab-Titel nennt den Space, in den gesprungen wurde.
+  setViewTitle(listViewTitle());
   // V117: alle per "all" gesetzten Loaded-Flags zurücksetzen -- sonst zeigt das Rail
   // für ein paar ms Counts aus dem globalen Pool, die zum Ziel-Space gar nicht passen.
   state.itemsLoaded = {};

@@ -2,7 +2,7 @@
 
 // -- Detail: Nur-lesen (fremdes Item) vs. Editor (eigenes Item) -----------------------------
 
-import { state, editorPart, activeSpaceWritable, setCreateControlsPresent } from "./state.js";
+import { state, editorPart, activeSpaceWritable, setCreateControlsPresent, setViewTitle, listViewTitle } from "./state.js";
 import { el, toast } from "./toasts.js";
 import { api } from "./api.js";
 import { markdownToHtml } from "./markdown.js";
@@ -62,6 +62,10 @@ export function showOverviewPane() {
   detailEditorEl.hidden = true;
   editorPart.detach();
   shellEl.dataset.view = "list";
+  // P10.5 Block 7.3 (UI-3, V120): der Tab-Titel folgt der Listenansicht — Spaces-Übersicht,
+  // „Alle Items" oder der Name des aktiven Space. `listViewTitle()` ist die eine Quelle für
+  // alle drei (der Spacewechsel an drei Stellen würde sonst drei Aufrufstellen brauchen).
+  setViewTitle(listViewTitle());
 }
 
 export function clearDetail() {
@@ -467,6 +471,10 @@ function showEditableItem(item, opts) {
 }
 
 export function loadEditorFromItem(item, opts) {
+  // P10.5 Block 7.3 (UI-3, V120): der Tab-Titel nennt das Item, das offen ist — auch im
+  // Nur-Lesen-Fall (`showReadonlyItem`), denn der Titel folgt dem **Inhalt**, nicht der
+  // Ansicht, in der er gerade steht.
+  setViewTitle(item.title);
   state.selectedId = item.id;
   state.selectedReadonly = !!item.readonly;
   state.conflictCurrent = null;

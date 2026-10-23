@@ -1,0 +1,82 @@
+{
+  "probe": "p105_b7_titel",
+  "instanz": {
+    "basis": "http://127.0.0.1:18791",
+    "data_root": "/tmp/opencode/sharefyx-wegwerf-b73/data",
+    "pid": 3219153,
+    "wegwerf": true
+  },
+  "befunde": {
+    "nach_dem_login": {
+      "erwartet": "Übersicht · sharefyx",
+      "gemessen": "Übersicht · sharefyx",
+      "ok": true
+    },
+    "im_space": {
+      "erwartet": "alpha · sharefyx",
+      "gemessen": "alpha · sharefyx",
+      "ok": true
+    },
+    "im_item": {
+      "erwartet": "Erster Eintrag fuer den Tab-Titel · sharefyx",
+      "gemessen": "Erster Eintrag fuer den Tab-Titel · sharefyx",
+      "ok": true
+    },
+    "im_einstellungen_panel": {
+      "erwartet": "Einstellungen · sharefyx",
+      "gemessen": "Einstellungen · sharefyx",
+      "ok": true
+    },
+    "panel_geschlossen": {
+      "erwartet": "Erster Eintrag fuer den Tab-Titel · sharefyx",
+      "gemessen": "Erster Eintrag fuer den Tab-Titel · sharefyx",
+      "ok": true
+    },
+    "nach_zurueck": {
+      "erwartet": "alpha · sharefyx",
+      "gemessen": "alpha · sharefyx",
+      "ok": true
+    }
+  },
+  "schritte": [
+    {
+      "schritt": "nach_dem_login",
+      "titel": "Übersicht · sharefyx"
+    },
+    {
+      "schritt": "im_space",
+      "titel": "alpha · sharefyx"
+    },
+    {
+      "schritt": "im_item",
+      "titel": "Erster Eintrag fuer den Tab-Titel · sharefyx"
+    },
+    {
+      "schritt": "im_einstellungen_panel",
+      "titel": "Einstellungen · sharefyx"
+    },
+    {
+      "schritt": "panel_geschlossen",
+      "titel": "Erster Eintrag fuer den Tab-Titel · sharefyx"
+    },
+    {
+      "schritt": "nach_zurueck",
+      "titel": "alpha · sharefyx"
+    }
+  ],
+  "seitenfehler": [],
+  "browser_fehler": null,
+  "diagnose": {
+    "zeilen": 1,
+    "view": "list",
+    "leertext": "alpha › Offen\nErster Eintrag fuer den Tab-Titel\ntask · open\nprivat",
+    "view_nach_klick": "detail",
+    "zurueck_knopf": {
+      "anzahl": 1,
+      "sichtbar": false,
+      "view_davor": "detail"
+    },
+    "view_danach": "list"
+  },
+  "alle_kriterien_erfuellt": true
+}
