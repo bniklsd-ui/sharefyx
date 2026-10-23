@@ -321,8 +321,10 @@ def _gruppe_e(zellen: list[dict]) -> dict:
 
     latest_alt = ids_alt[0] if ids_alt else None
     latest_neu = ids_neu[0] if ids_neu else None
+    latest_ist = eintraege[0].id if eintraege else None
     banner_alt = (latest_alt != gesehen_vorher) if gesehen_vorher else None
     banner_neu = (latest_neu != gesehen_vorher) if gesehen_vorher else None
+    banner_ist = (latest_ist != gesehen_vorher) if gesehen_vorher else None
 
     _zelle(zellen, "E1", "update_log", "oberster Block ist der neueste",
            eintraege[0].lines[0][:80] if eintraege else None, bool(eintraege))
@@ -331,11 +333,15 @@ def _gruppe_e(zellen: list[dict]) -> dict:
     _zelle(zellen, "E2", "update_log", "Alt-Schema (Zaehler von oben): Banner bleibt STUMM",
            f"latest={latest_alt} seen={gesehen_vorher} banner={banner_alt}",
            banner_alt is False)
-    # **E3 zeigt den Weg der Behebung:** das Schema „Zähler von unten" ⇒ der neue Deploy
-    # ist hörbar.
-    _zelle(zellen, "E3", "update_log", "Schema 'Zaehler von unten': Banner erscheint",
-           f"latest={latest_neu} seen={gesehen_vorher} banner={banner_neu}",
-           banner_neu is True)
+    # **E3 ist der Ist-Stand:** der Zähler läuft von unten ⇒ der neue Deploy ist hörbar.
+    _zelle(zellen, "E3", "update_log", "Ist-Stand: Banner erscheint",
+           f"latest={latest_ist} seen={gesehen_vorher} banner={banner_ist}",
+           banner_ist is True)
+    # **E4 vergleicht den Ist-Code mit dem Schema** — sonst wäre E3 auch dann grün, wenn
+    # der Code die IDs aus einem ganz anderen Grund richtig verteilt hätte.
+    _zelle(zellen, "E4", "update_log", "der Ist-Code verteilt die IDs wie das Schema",
+           {"ist": [e.id for e in eintraege][:4], "schema": ids_neu[:4]},
+           [e.id for e in eintraege] == ids_neu)
 
     return {
         "eintraege": [{"id": e.id, "datum": e.date,
@@ -347,8 +353,10 @@ def _gruppe_e(zellen: list[dict]) -> dict:
         "gesehen_vorher": gesehen_vorher,
         "latest_alt": latest_alt,
         "latest_neu": latest_neu,
+        "latest_ist": latest_ist,
         "banner_alt": banner_alt,
         "banner_neu": banner_neu,
+        "banner_ist": banner_ist,
     }
 
 

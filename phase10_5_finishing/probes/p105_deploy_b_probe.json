@@ -1,6 +1,6 @@
 {
   "probe": "p105_deploy_b",
-  "zeitpunkt": "2026-10-23T10:04:43.539519+00:00",
+  "zeitpunkt": "2026-10-23T10:08:27.501825+00:00",
   "basis": {
     "repo_head": "main",
     "badge_erwartet": "v3.1.6",
@@ -28,7 +28,7 @@
         {
           "item_id": "itm_84af4946",
           "ok": true,
-          "version": 5,
+          "version": 6,
           "appended_bytes": 25
         },
         {
@@ -42,7 +42,7 @@
       "failed": 1
     },
     "log_werkzeugzeilen": [
-      "{\"ts\":\"2026-10-23T10:04:43.843Z\",\"ev\":\"tool\",\"tool\":\"list_spaces\",\"space\":\"alpha\",\"ms\":4,\"ok\":true,\"proto\":\"2025-03-26\"}"
+      "{\"ts\":\"2026-10-23T10:08:27.662Z\",\"ev\":\"tool\",\"tool\":\"list_spaces\",\"space\":\"alpha\",\"ms\":4,\"ok\":true,\"proto\":\"2025-03-26\"}"
     ]
   },
   "update_log": {
@@ -315,8 +315,10 @@
     "gesehen_vorher": "2026-10-23#1",
     "latest_alt": "2026-10-23#1",
     "latest_neu": "2026-10-23#2",
+    "latest_ist": "2026-10-23#2",
     "banner_alt": false,
-    "banner_neu": true
+    "banner_neu": true,
+    "banner_ist": true
   },
   "zellen": [
     {
@@ -464,7 +466,7 @@
       "gruppe": "log",
       "erwartet": "die Zeile trägt proto=",
       "gemessen": [
-        "{\"ts\":\"2026-10-23T10:04:43.843Z\",\"ev\":\"tool\",\"tool\":\"list_spaces\",\"space\":\"alpha\",\"ms\":4,\"ok\":true,\"proto\":\"2025-03-26\"}"
+        "{\"ts\":\"2026-10-23T10:08:27.662Z\",\"ev\":\"tool\",\"tool\":\"list_spaces\",\"space\":\"alpha\",\"ms\":4,\"ok\":true,\"proto\":\"2025-03-26\"}"
       ],
       "ok": true
     },
@@ -473,7 +475,7 @@
       "gruppe": "log",
       "erwartet": "mit MCP-Protocol-Version-Header steht die Version des Clients",
       "gemessen": [
-        "{\"ts\":\"2026-10-23T10:04:44.249Z\",\"ev\":\"tool\",\"tool\":\"list_spaces\",\"space\":\"alpha\",\"ms\":4,\"ok\":true,\"proto\":\"2025-11-25\"}"
+        "{\"ts\":\"2026-10-23T10:08:28.068Z\",\"ev\":\"tool\",\"tool\":\"list_spaces\",\"space\":\"alpha\",\"ms\":4,\"ok\":true,\"proto\":\"2025-11-25\"}"
       ],
       "ok": true
     },
@@ -494,14 +496,34 @@
     {
       "id": "E3",
       "gruppe": "update_log",
-      "erwartet": "Schema 'Zaehler von unten': Banner erscheint",
+      "erwartet": "Ist-Stand: Banner erscheint",
       "gemessen": "latest=2026-10-23#2 seen=2026-10-23#1 banner=True",
+      "ok": true
+    },
+    {
+      "id": "E4",
+      "gruppe": "update_log",
+      "erwartet": "der Ist-Code verteilt die IDs wie das Schema",
+      "gemessen": {
+        "ist": [
+          "2026-10-23#2",
+          "2026-10-23#1",
+          "2026-10-08#1",
+          "2026-10-07#1"
+        ],
+        "schema": [
+          "2026-10-23#2",
+          "2026-10-23#1",
+          "2026-10-08#1",
+          "2026-10-07#1"
+        ]
+      },
       "ok": true
     }
   ],
   "bilanz": {
-    "gesamt": 25,
-    "gruen": 25,
+    "gesamt": 26,
+    "gruen": 26,
     "rot": 0
   }
 }

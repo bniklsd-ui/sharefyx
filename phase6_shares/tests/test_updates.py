@@ -41,10 +41,19 @@ def test_parse_preserves_file_order_newest_first():
 
 
 def test_parse_assigns_sequential_ids_within_the_same_date():
+    """**[2026-10-23, P10.5 Block 7, Schritt 7.0 — datierte Korrektur.]** Vorher lief der
+    Zähler **von oben** (Dateireihenfolge) — damit bekam ein **zweiter Deploy am selben Tag**
+    die ID `#1`, die der erste **schon** hatte; der gesehen-Zustand hängt an genau dieser ID
+    (`users.seen_update_id`), also blieb der Banner stumm. Der Zähler läuft jetzt **von
+    unten** (der älteste Block eines Datums = #1): die IDs der bestehenden Blöcke bleiben
+    stehen, ein neu oben eingefügter Block bekommt eine **neue** ID. Die Wächter dafür stehen
+    in `phase10_5_finishing/tests/test_update_log_ids.py`, der Befund samt Messung in
+    `phase10_5_finishing/probes/p105_deploy_b_probe.py` (Gruppe E)."""
     text = "## 2026-08-09\n- erster Block\n## 2026-08-09\n- zweiter Block\n"
     entries = parse_update_log(text)
-    assert [e.id for e in entries] == ["2026-08-09#1", "2026-08-09#2"]
-    assert entries[1].lines == ["zweiter Block"]
+    # Der **untere** (ältere) Block trägt die #1, der obere die #2.
+    assert [e.id for e in entries] == ["2026-08-09#2", "2026-08-09#1"]
+    assert entries[0].lines == ["erster Block"]
 
 
 def test_load_update_log_returns_empty_list_for_missing_file(tmp_path):
