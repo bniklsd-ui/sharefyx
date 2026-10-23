@@ -9,7 +9,7 @@ down:
   - ../phase10_inventory/BAUSTELLENREGISTER.md      # 📗 die Arbeitsliste — hier wird abgehakt (P10-B)
   - ../phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md  # 📦 §12 Entscheidungsliste D-1–D-18, verbatim
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
-updated: 2026-10-22 (Block 4 **abgeschlossen** — Schritt 4.6: M2-Bench **Median 107,3 ms** (Z1 ≤ 300 ms), Event-Loop-Probe `/health` hinter `/overview` **23 ms** (P10: 4757 ms), Browser-Probe Z2/Z3/Z4 (150 ms → kein Platzhalter, 400 ms → Platzhalter); Abnahme 10-14/15/16/17 ✅, 10-18 bleibt beim Nikinger nach Deploy A) | 2026-10-22 (Block 4 Schritte 4.3/4.4: der Client holt nur noch `/overview`, `focus`/`visibilitychange` bekommen 10 s Mindestpause (PF-4) · neu `static/js/loading.js` (`withLoading`, 200 ms) + `.is-loading`-Gerüst in `app.css`, statisch unter `prefers-reduced-motion` (Z3/Z4) · 7 Wächter in `phase5_ui/tests/test_loading_state.py`) | 2026-10-22 (Block 4 Schritte 4.1/4.2: `_overview()` in **einem** `store.search()`-Durchgang (P10.5-G) + `asyncio.to_thread` in `_overview`/`_items_get`/`_graph_get` (Z2); 4 neue Tests (Parität, Rückfall, folders/members, Event-Loop) + 5 Gegenläufe; Suite 1334 grün) | 2026-10-22 (Block 3 Schritte 3.3–3.4: `scripts/asset_orphans.py` (LG-7) + 7 Tests + Wegwerf-Probe `p105_b3_assets_probe.py` **14/14 Zellen** — Abnahme 10-12/10-13 ✅) | 2026-10-22 (Block 3 Schritt 3.2: `Store.put_asset()` ruft den Stripper — **eine** Stelle für Web und MCP; die Dummy-PNG-Fixtures mussten zu echten Bytes werden) | 2026-10-22 (Block 3 Schritt 3.1: `files.strip_image_metadata()` — JPEG/PNG/WebP, GIF unverändert, fail-closed; 8 neue Tests) | 2026-10-22 (Block-2-Nachzug: Item mit **neuem Ordner** im fremden Home-Space ist jetzt auf Web **und** MCP gesperrt (Nikinger-Entscheidung 2026-10-22) — P10.5-9 ⚠️ → ✅; `ui_budget.py`/`ui_smoke.py` haben das Home-Space-Prädikat, die `team`-Flags stimmen) | 2026-10-22 (Block 2.5 — Proben Web × MCP 28/28, M4 BG-1 behoben; Block 2 ✅, Abnahme 10-8/10/9 ✅, 10-9 ⚠️ (Befund: neuer Ordner per Item-Anlage im fremden Home-Space)) | 2026-10-22 (Block 2 Schritte 2.1–2.4 gebaut — eine Regel für Web und MCP (RE-1/RE-2/P10-I/P10.5-N) und BG-1; **2.5 Proben offen, Claude Code**; Suite 1299 grün) | 2026-10-22 (Block 2 Schritte 2.1–2.2: eine Regel für Web und MCP — SharePolicy mit Home-Space-Prädikat, RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N beide Richtungen; Suite 1296 grün) | 2026-10-22 (Block 2 Schritt 2.1: SharePolicy kennt Home-Spaces und Team-Spaces, Prädikat aus der Auth-DB, eine Regel für Web und MCP) | 2026-10-22 (Block 1 **abgeschlossen**: V200 vom Fleet-Lauf belegt — Unit installiert, `Result=success`, 0 failed units; Abnahme 10-5/6/7 ✅) | 2026-10-22 (Block 1 Schritte 1.1/1.2: BT-1 — Caddy-Vorlage in Blockform mit den V199-Live-Werten (10s/15s/1s) + neuer Waechter; Abnahme 10-5 auf ✅) | 2026-10-22 (Block 1 Schritt 1.4: BT-6 — `constraints.txt` aus dem Live-Freeze, `scripts/dev_install.sh` mit `-c`, zwei Wächter, Dev-venv neu; Suite 1282 gruen auf den Live-Versionen) | 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in der Relay-Unit, Wächter 13/13, vier Gegenläufe; Block-0-Block rotiert) | 2026-10-22 (Block 0 **abgeschlossen**: 0.6 ROADMAP-Zeile P10.5 auf 🔄, 0.7 Ausführer-Vorbedingung protokolliert — Abnahme P10.5-1–4 ✅) | 2026-10-22 (Block 0: 0.2/0.3 — Phase-Head angelegt (Modulstatus, Deploy-Tabelle, Abnahmestand 61 Zeilen), DO-3-Wächter, `pytest.ini` ergänzt; davor 0.4 (ROADMAP-Wächter eingefroren), 0.5 (INDEX-Luft) und 0.8 (Register-Luft) gebaut — DO-2 vollständig; erster Block)
+updated: 2026-10-23 (Deploy A `v3.1.5` vorbereitet — Badge + `docs/UPDATE_LOG.md` (2026-10-23), Dev-venv frisch aus `main` (`fastmcp 3.4.7`), Suite 1335 grün, `doc_health` 0, `ui_budget` 5/5; der Deploy selbst ist beim Nikinger) | 2026-10-22 (Block 4 **abgeschlossen** — Schritt 4.6: M2-Bench **Median 107,3 ms** (Z1 ≤ 300 ms), Event-Loop-Probe `/health` hinter `/overview` **23 ms** (P10: 4757 ms), Browser-Probe Z2/Z3/Z4 (150 ms → kein Platzhalter, 400 ms → Platzhalter); Abnahme 10-14/15/16/17 ✅, 10-18 bleibt beim Nikinger nach Deploy A) | 2026-10-22 (Block 4 Schritte 4.3/4.4: der Client holt nur noch `/overview`, `focus`/`visibilitychange` bekommen 10 s Mindestpause (PF-4) · neu `static/js/loading.js` (`withLoading`, 200 ms) + `.is-loading`-Gerüst in `app.css`, statisch unter `prefers-reduced-motion` (Z3/Z4) · 7 Wächter in `phase5_ui/tests/test_loading_state.py`) | 2026-10-22 (Block 4 Schritte 4.1/4.2: `_overview()` in **einem** `store.search()`-Durchgang (P10.5-G) + `asyncio.to_thread` in `_overview`/`_items_get`/`_graph_get` (Z2); 4 neue Tests (Parität, Rückfall, folders/members, Event-Loop) + 5 Gegenläufe; Suite 1334 grün) | 2026-10-22 (Block 3 Schritte 3.3–3.4: `scripts/asset_orphans.py` (LG-7) + 7 Tests + Wegwerf-Probe `p105_b3_assets_probe.py` **14/14 Zellen** — Abnahme 10-12/10-13 ✅) | 2026-10-22 (Block 3 Schritt 3.2: `Store.put_asset()` ruft den Stripper — **eine** Stelle für Web und MCP; die Dummy-PNG-Fixtures mussten zu echten Bytes werden) | 2026-10-22 (Block 3 Schritt 3.1: `files.strip_image_metadata()` — JPEG/PNG/WebP, GIF unverändert, fail-closed; 8 neue Tests) | 2026-10-22 (Block-2-Nachzug: Item mit **neuem Ordner** im fremden Home-Space ist jetzt auf Web **und** MCP gesperrt (Nikinger-Entscheidung 2026-10-22) — P10.5-9 ⚠️ → ✅; `ui_budget.py`/`ui_smoke.py` haben das Home-Space-Prädikat, die `team`-Flags stimmen) | 2026-10-22 (Block 2.5 — Proben Web × MCP 28/28, M4 BG-1 behoben; Block 2 ✅, Abnahme 10-8/10/9 ✅, 10-9 ⚠️ (Befund: neuer Ordner per Item-Anlage im fremden Home-Space)) | 2026-10-22 (Block 2 Schritte 2.1–2.4 gebaut — eine Regel für Web und MCP (RE-1/RE-2/P10-I/P10.5-N) und BG-1; **2.5 Proben offen, Claude Code**; Suite 1299 grün) | 2026-10-22 (Block 2 Schritte 2.1–2.2: eine Regel für Web und MCP — SharePolicy mit Home-Space-Prädikat, RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N beide Richtungen; Suite 1296 grün) | 2026-10-22 (Block 2 Schritt 2.1: SharePolicy kennt Home-Spaces und Team-Spaces, Prädikat aus der Auth-DB, eine Regel für Web und MCP) | 2026-10-22 (Block 1 **abgeschlossen**: V200 vom Fleet-Lauf belegt — Unit installiert, `Result=success`, 0 failed units; Abnahme 10-5/6/7 ✅) | 2026-10-22 (Block 1 Schritte 1.1/1.2: BT-1 — Caddy-Vorlage in Blockform mit den V199-Live-Werten (10s/15s/1s) + neuer Waechter; Abnahme 10-5 auf ✅) | 2026-10-22 (Block 1 Schritt 1.4: BT-6 — `constraints.txt` aus dem Live-Freeze, `scripts/dev_install.sh` mit `-c`, zwei Wächter, Dev-venv neu; Suite 1282 gruen auf den Live-Versionen) | 2026-10-22 (Block 1 Schritt 1.3: BT-2 — `SuccessExitStatus=143` in der Relay-Unit, Wächter 13/13, vier Gegenläufe; Block-0-Block rotiert) | 2026-10-22 (Block 0 **abgeschlossen**: 0.6 ROADMAP-Zeile P10.5 auf 🔄, 0.7 Ausführer-Vorbedingung protokolliert — Abnahme P10.5-1–4 ✅) | 2026-10-22 (Block 0: 0.2/0.3 — Phase-Head angelegt (Modulstatus, Deploy-Tabelle, Abnahmestand 61 Zeilen), DO-3-Wächter, `pytest.ini` ergänzt; davor 0.4 (ROADMAP-Wächter eingefroren), 0.5 (INDEX-Luft) und 0.8 (Register-Luft) gebaut — DO-2 vollständig; erster Block)
 ---
 # Phase 10.5 — Finishing
 
@@ -48,7 +48,7 @@ updated: 2026-10-22 (Block 4 **abgeschlossen** — Schritt 4.6: M2-Bench **Media
 
 | # | Version | SHA | `health_gate` | Ausgabe |
 |---|---|---|---|---|
-| A | `v3.1.5` | — | — | nach Block 1–4 |
+| A | `v3.1.5` | — | — | nach Block 1–4 — **2026-10-23 vorbereitet** (Badge, `UPDATE_LOG`, Suite 1335 grün), `deploy.sh` beim Nikinger |
 | B | `v3.1.6` | — | — | nach Block 5–6 |
 | C | `v3.1.7` | — | — | nach Block 7–8 |
 | D | `v3.1.8` | — | — | nach Block 9–11 |
@@ -123,54 +123,48 @@ updated: 2026-10-22 (Block 4 **abgeschlossen** — Schritt 4.6: M2-Bench **Media
 | P10.5-60 | P10-J zweimal live belegt | ⬜ | — |
 | P10.5-61 | Closeout-Dokumente + Rotationen per Skript | ⬜ | — |
 
-**Summe:** 18 ✅ · 0 ⚠️ · 43 ⬜ (von 61).
+**Summe:** 17 ✅ · 0 ⚠️ · 44 ⬜ (von 61). **[Korrektur 2026-10-23, Deploy-A-Vorbereitung]** Die Zeile stand auf `18 ✅ · 0 ⚠️ · 43 ⬜` — die Tabelle trug **17** ✅ und **44** ⬜ (P10.5-17 ist die letzte grüne Zeile, 18–61 sind ⬜). Zähler ist nachgezogen, nicht die Tabelle. Auf `p105-block5` steht dieselbe Zeile bereits richtig (23 ✅, mit Korrekturnotiz vom 2026-10-22) — nach dem Merge gilt deren Stand.
 
 ## Offen beim Nikinger
 
 - ~~**V199**~~ ✅ 2026-10-22 (Block 1.1) — Live-Werte auf dem VPS: `dial_timeout` 10 s, `try_duration` 15 s, `try_interval` 1 s, Upstream `100.93.43.122:8765`. Die Vorlage trägt jetzt genau diese Werte.
 - ~~**V200**~~ ✅ 2026-10-22 (Block 1.3) — Fleet-Playbook auf VM 200: `ok=11 changed=3 failed=0`, `sharefyx-tail-proxy` **active** mit `SuccessExitStatus=143`, nach dem Stopp **`Result=success`**, **0 failed units**, zweiter `--check` meldet `changed=0`. **Nicht gemessen:** der Domain-Weg während des Stopps (der Stopp dauerte Sekunden; der öffentliche Pfad war nicht beteiligt). Die alte Unit liegt als Kopie mit Suffix `~` unter `/etc/systemd/system/` — systemd liest sie nicht.
 - **V203** — Funnel-Pfad von außen gewacht? (BT-10, Klärung eurofyx-fleet).
+- **Deploy A (`v3.1.5`)** — am 2026-10-23 vorbereitet (Badge, `docs/UPDATE_LOG.md`, Suite 1335 grün, `doc_health` 0, `ui_budget` 5/5). **Aufruf (Hard Rule 9, braucht `sudo`):**
+  `SHAREFYX_RELEASES_DIR=/opt/sharefyx/releases SHAREFYX_CURRENT_LINK=/opt/sharefyx/current SHAREFYX_DATA_ROOT=/home/savefyx/savefyx-data SHAREFYX_BACKUP_DIR=/var/lib/sharefyx-backup SHAREFYX_SYSTEMCTL="sudo systemctl" phase5_ui/scripts/deploy.sh main`
+  Danach (lesend, ohne Rechte): `phase8_5_picker_release/scripts/health_gate.sh --expected-version=v3.1.5 --require-todays-update-log --expected-sha=<SHA>` — die **echte Ausgabe** kommt in den nächsten Commit. Live-Checks (Plan §Deploy A): P10.5-18 (`/overview` Waiting ≤ 300 ms, Space-Wechsel ≤ 1 s, beide Eingänge) · eine Zeile Caddy (V199 bleibt Fleet-Sache) · Handyfoto-Upload (EXIF weg, richtig gedreht) · Spaces-Panel direkt nach dem Laden (BG-1).
 - **P10.5-27/28** — Live-Abnahme P10-J: zwei Modellanbieter, ein Server, ein Werkzeug (`list_spaces`) — Block 6 und Z.
 - **Block 2, Zeile 15 (AL-1)** — Migration + Live-Check beim Nikinger.
 - ~~**Befund 2.5 (P10.5-9 ⚠️)**~~ ✅ 2026-10-22 (Block-2-Nachzug, Nikinger-Entscheidung „ja") — `create_item(space=, folder=<neu>)` und `POST /api/v1/items` legen im fremden Home-Space mit `write:` **keinen** neuen Ordner mehr an; die Regel ist `permissions.manages_space()` (eigener Space oder Team-Space mit Schreibrecht), auf beiden Flächen. Ohne `folder` bleibt das Anlegen an der Space-Wurzel erlaubt (P6-U).
 
-## Session stopped — 2026-10-22 (Block 4 ✅ — Performance: PF-1, PF-4, Z1–Z4)
+## Session stopped — 2026-10-23 (Deploy A `v3.1.5` vorbereitet — Badge, Update-Log, Suite 1335 grün)
 
-**Ergebnis.** `_overview()` zählt alle fünf Eimer aus **einem** `store.search()`-Durchgang
-(P10.5-G) statt aus einem Aufruf je Eimer **und** je Space; `folders`/`members` wandern in
-dieselbe Antwort. `asyncio.to_thread` für `_overview`, `_items_get` und `_graph_get` (Z2). Der
-Client holt nur noch `/overview`; `focus`/`visibilitychange` bekommen 10 s Mindestpause (PF-4).
-Neu: `static/js/loading.js` (`withLoading(el, promise, {delayMs: 200})`) + `.is-loading`-Gerüst
-in `app.css` — statisch unter `prefers-reduced-motion`.
+**Ergebnis.** Deploy A ist **vorbereitet, nicht ausgeführt**: Badge `v3.1.5`
+(`phase5_ui/webui/static/app.html:20`), neuer `## 2026-10-23`-Block in `docs/UPDATE_LOG.md`
+(5 Zeilen für Menschen, am echten `parse_update_log()` gegengeprüft), Dev-venv **frisch** aus
+`main` gebaut — `main` pinnt `fastmcp 3.4.7`, das Venv trug vorher 4.1.3 aus dem Branch
+(zwei Wächter wären rot gewesen, P10.5-Q).
 
-**Geliefert (Commits).** 4.1/4.2 `webui/api.py` (ein Durchgang + Rückfall über
-`_STORE_FETCH_LIMIT` + `to_thread`) + 4 Tests in `phase5_ui/tests/test_overview.py` · 4.3/4.4
-`static/js/{list,app,editor,graph}.js`, `static/js/loading.js` (neu), `static/app.css` +
-8 Wächter in `phase5_ui/tests/test_loading_state.py` · 4.6 drei Proben unter
-`phase10_5_finishing/probes/` (M2-Bench, Event-Loop, Browser).
+**Gemessen (Basis `a1cc523` = `main`):** `pytest` **1335 grün** (337,9 s) · `doc_health` 0 ·
+`ui_budget` 5/5 (176,9 KB gzip; Erstaufruf 188,5 KB) · `pip freeze` = `constraints.txt`
+(`fastmcp 3.4.7`, `mcp 1.30.0`, `starlette 1.7.0`) — der Wächter
+`test_every_installed_distribution_matches_the_constraints` ist grün.
 
-**Gemessen** (Basis `37186d5`): `pytest` **1335 grün** · `doc_health` 0 · `ui_budget` 5/5
-(176,6 KB gzip) · **M2-Bench Median 107,3 ms** (Grundlinie 2405,6 ms — 22,4×) · **Event-Loop:
-`/health` hinter `/overview` 23 ms** (P10: 4757 ms), `blockade_health` false (P10: true) ·
-**Browser:** `DOMContentLoaded` 142,2 ms · 150 ms → **kein** Platzhalter, 400 ms → Platzhalter
-sichtbar · `/overview` 2 s verzögert: Space-Wechsel 0,315 s, Item-Öffnen 0,053 s · **dreizehn
-Gegenläufe**, alle wirksam (davon zwei an der 200-ms-Grenze selbst).
+**Ein Doku-Befund (Drift, behoben).** Die Summenzeile der Abnahmetabelle stand auf
+`18 ✅ · 0 ⚠️ · 43 ⬜`, die Tabelle trug **17** ✅ und **44** ⬜ → Zähler nachgezogen. Auf
+`p105-block5` ist dieselbe Zeile bereits richtig (23 ✅, Korrekturnotiz vom 2026-10-22) — nach
+dem Merge gilt deren Stand.
 
-**Zwei eigene Befunde.** (1) Der erste Entwurf von `withLoading()` nahm die Klasse im
-`done()`-Zweig **immer** ab — bei zwei gleichzeitigen Abrufen (Poll + Schreibvorgang) hätte
-der schnellere den Ladezustand des langsameren gelöscht. Jetzt läuft ein Zähler je Element
-(`WeakMap`), die Klasse fällt erst beim letzten Abruf. (2) Die erste Fassung der Browser-Probe
-maß **Route-Verzögerung plus Serverzeit** — die 200-ms-Grenze war damit nicht prüfbar; die
-Route liefert jetzt eine **kontrollierte** Antwort (`route.fulfill`), die Serverzeit ist
-ausgeschlossen.
+**Offen / nächster Schritt.** **Deploy A ist beim Nikinger** (Hard Rule 9, `sudo`); der Aufruf
+steht wörtlich unter „Offen beim Nikinger", danach liest Claude Code `health_gate.sh` mit
+**echter Ausgabe**. **Reihenfolge (Nikinger-Entscheidung 2026-10-23): Deploy A aus `main`
+zuerst, dann der Merge von `p105-block5` nach `main`, dann Deploy B (`v3.1.6`)** — der Merge
+darf **nicht** vor dem Deploy A auf `main` landen, sonst deployt `deploy.sh main` den
+Block-5/6-Stand unter der Nummer `v3.1.5`. Merge-Konflikt absehbar in der Phase-Head-Datei
+(beide Seiten haben sie umgeschrieben) — von Hand auflösen, dann den Session-Block rotieren.
+**P10.5-26 bleibt ⬜** und ist **vor** 10-27/28 zu klären (der Werkzeugaufruf gelingt
+serverseitig, opencode setzt die Sitzung nicht fort).
 
 **Ausführer-Daten.** opencode/MiniMax-M3.1-Flash · Kontextgrenze 400.000 (P10.5-C erfüllt) ·
-keine Advisor-Runde · Eingriffe Nikinger/Claude Code: 0 · kein `systemctl`, kein `sudo`, kein
-echter `DATA_ROOT` · Wegwerf-Instanz nur über die PID-Datei gestoppt (Hard Rule 9), Port 8799
-danach frei.
-
-**Offen / nächster Schritt.** Deploy A (`v3.1.5`) nach Block 1–4 — Badge + `UPDATE_LOG` +
-`health_gate.sh` sind Nikinger-/Claude-Code-Arbeit. **Beim Nikinger offen:** P10.5-18 (Live-Messung
-nach Deploy A: `/overview` Waiting ≤ 300 ms, Space-Wechsel während des Polls ≤ 1 s, beide
-Eingänge), AL-1 Zeile 15 (Migration + Live-Check), V203, P10.5-27/28. Nächster Block: 5
-(MCP-Schicht: PA-5 FastMCP 4, LG-4).
+kein `systemctl`, kein `sudo`, kein echter `DATA_ROOT`, kein Keyring, kein `pkill -f`;
+`/opt/sharefyx/current` nur **gelesen** (Release `20261008T201607.460757Z`).

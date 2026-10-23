@@ -9,6 +9,13 @@
      (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
+## 2026-10-23
+- Die Übersicht lädt jetzt deutlich schneller: die Zähler kommen in einem einzigen Durchgang statt einzeln je Ordner und Space.
+- Die Space-Liste füllt sich auch dann, wenn die Übersicht spät kommt — das Fenster musst du nicht mehr neu öffnen.
+- Beim Hochladen eines Fotos verschwinden Standort und Gerätedaten (GPS/EXIF) aus dem Bild; die Ausrichtung bleibt erhalten.
+- Notizen und Aufgaben lassen sich nicht mehr in den persönlichen Space einer anderen Person hinein- oder daraus herausverschieben — in der Web-Oberfläche und in der KI-Verbindung gilt jetzt dieselbe Regel.
+- Dauert eine Anfrage länger als 0,2 Sekunden, zeigt die Oberfläche einen Ladezustand, statt zu warten.
+
 ## 2026-10-08
 - Neue Notizen und Aufgaben landen jetzt in dem Space, in dem du gerade arbeitest — vorher wanderten sie aus einem Team-Space still in deinen eigenen. Der Anlegen-Dialog nennt oben das Ziel.
 - In Team-Spaces kann jedes Mitglied mit Schreibrecht Items verschieben, archivieren und löschen, auch solche, die jemand anderes angelegt hat. Der Löschdialog nennt, von wem das Item zuletzt geändert wurde.
