@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,53 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-24 (Block 7.4 umgesetzt — die vier Posten der Sichtung; P10.5-32 wartet auf die Bestätigung)
+
+**Ergebnis.** Die vier Posten aus `STARTUPTRAG_ARCHIVE.md` Schritt 7.4 sind gebaut und an der
+Wegwerf-Instanz gemessen. **1 Wortmarke:** der Abstand zwischen Zeichen und Wortrest war
+`.45em` (5,6 px), jetzt `.2em` — **gemessen 2,5 px** (eine Klasse, also Rail **und**
+Anmeldeseite). **2 „Zugewiesen"-Auswahl:** sie lief bündig an den Listenrand (x = 0), die
+Suchzeile darüber mit 16 px Innenabstand; jetzt dieselben Kanten — **gemessen: linke Kante
+identisch mit dem Suchfeld (0 px Versatz), rechte Kante identisch mit dem „+"-Knopf (0 px)**.
+**3 Update-Banner:** er war bis zu ~140 px hoch (alle Zeilen des neuesten Eintrags) und schob
+jede angemeldete Ansicht nach unten; jetzt eine **einzeilige Leiste (49 px)**: die erste Zeile
+des Eintrags als Schlagzeile, der Rest über den neuen Knopf **„Alle Änderungen"**, der den
+Update-Log in den Einstellungen öffnet (**gemessen: der Log öffnet, 20 Einträge sichtbar**).
+**4 Versionsanzeige:** „v3.1.6" las sich als „v316" — bei 9 px war der hellste Pixel des
+Punktes **155/255 (61 %)**, er verblasste in den Grund; jetzt 11 px und `.03em` Laufweite →
+**203/255 (80 %)**.
+
+**Befund für den Nikinger.** Der Punkt wird in dieser Schrift erst bei **13 px** ein Quadrat
+(2 × 2 px statt 1 × 2) — 13 px wären größer als die Wortmarke (12,5 px). Mit der
+vorgeschlagenen Schriftgröße ist der Punkt **erkennbar, aber nicht quadratisch**; eine eigene
+Schriftart für die Version (Monospace) würde es runden, **widerspricht aber der gelockten
+Entscheidung P6 vom 2026-08-13** („keine eigene Schriftart") — das ist Deine Entscheidung.
+Das Auge entscheidet bei der Nachsichtung.
+
+**Belege.** Wächter `phase10_5_finishing/tests/test_sichtung_7_4.py` (8 Tests, **4 Gegenproben
+im Wächter selbst**: der alte Wert muss rot werden — die Anker sind die *Regeln*, nicht die
+Werte, weil `margin-right: .2em;` auch im Kommentar stand und der erste Gegenlauf deshalb
+den Kommentar gepatcht hätte). Probe `probes/p105_b7_sichtung_probe.py` (Wegwerf-Instanz
+**18793**, PID-Datei): **5/5 Kriterien** grün, **5 Gegenläufe** (`mark`/`auswahl`/`banner`/
+`version`/`alle`) je rot — der erste Entwurf des Gegenlaufs stellte die Datei **halb** wieder
+her (die Restore-Logik schrieb die Zwischensätze) und der Anker traf den Kommentar; beides
+gemessen und behoben. Suite **1404 grün** (1396 + 8), `doc_health` 0, `ui_budget` **5/5** (192,7 KB).
+
+**Stand.** `main`, Baum sauber, keine Wegwerf-Instanz läuft. **P10.5-32 bleibt ⬜** — die Zeile
+wird erst ✅, wenn Du die vier Posten bestätigt hast.
+
+**Nächste Session, in dieser Reihenfolge.**
+1. **Block 8** (Karte C2): Plan § „Block 8"; Abnahme P10.5-36/37. Vorher `git log` auf Stand
+   prüfen und die Kontextgrenze 400 K (P10.5-C) bestätigen.
+2. **Deploy C `v3.1.7`** nach Block 7–8: Suite + `doc_health` + `ui_budget`, Badge und
+   `docs/UPDATE_LOG.md`, Commit + Push, **`deploy.sh` durch den Nikinger** (Hard Rule 9),
+   `health_gate.sh` mit echter Ausgabe.
+3. **Nachsichtung** (Sichtung des Nikingers, ≤ 6 weitere Posten) — nach Block 11, denn der
+   Alles-in-einem-Editor ändert das Bild.
+
+**Beim Nikinger unverändert offen:** P10.5-22 · 25 · 27/28 · 18 · AL-1 Zeile 15 · V203 ·
+5.7 (Fabian Bescheid) · **neu: die Schriftart der Versionsanzeige** (Befund oben).
 
 ## Session stopped — 2026-10-24 (Block 7.5–7.7 gebaut und gepusht; 7.4 Sichtungsliste liegt beim Ausführer)
 

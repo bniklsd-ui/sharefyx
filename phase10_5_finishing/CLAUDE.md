@@ -10,7 +10,7 @@ down:
   - ../phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md  # 📦 §12 Entscheidungsliste D-1–D-18, verbatim
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
   - UPDATES_ARCHIVE.md                              # 📦 die älteren `updated:`-Fäden dieses Heads, verbatim
-updated: 2026-10-24 (Block 7.4 (UI-4) umgesetzt — die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen: Wortmarken-Abstand 2,5 px · „Zugewiesen"-Auswahl mit den Kanten der Suchzeile · Update-Banner als einzeilige Leiste (49 px) mit dem Knopf „Alle Änderungen" · Versionsanzeige 11 px (Punkt 203/255 statt 155/255); Wächter 8/8 mit 4 Gegenproben, Probe 5/5 mit 5 roten Gegenläufen; P10.5-32 bleibt ⬜ bis zur Bestätigung) | 2026-10-24 (Session-Schluss: Handover für 7.4-Umsetzung, Block 8, Deploy C; Rotations-Fallstrick notiert) | 2026-10-24 (Block 7.4: Sichtungsliste des Nikingers notiert — 4 Posten im Archiv Schritt 7.4, Ausführer setzt um, Nachsichtung nach Block 11) | 2026-10-24 (Block 7.5 Kontrast (`--caution` #F06A6E, Wächter), 7.6 Assignee-Filter (API + Auswahl), 7.7 KA-5 (Chip + Karten-Ring) gebaut; Probe an der Wegwerf-Instanz 6/6 mit zwei roten Gegenläufen; Suite 1396 grün; Abnahmestand 30 ✅ · 0 ⚠️ · 31 ⬜) | 2026-10-23 (Block 7.3 (UI-3) gebaut: der Tab-Titel folgt der Ansicht — Übersicht, Space-Name, Item-Titel, Einstellungen; datierte Korrektur zum Plan (vier Zustände, nicht fünf); Probe an der Wegwerf-Instanz 6/6 mit rotem Gegenlauf; Abnahmestand 27 ✅ · 0 ⚠️ · 34 ⬜) | 2026-10-23 (Block 7.2 (UI-2): die Wortmarke `static/logo.svg` — Variante B aus dem Logo-Board, pixelgleich gemessen; zwei Befunde nur durch Messung (XML-Kommentar, MIME-Typ); Probe an der Wegwerf-Instanz mit rotem Gegenlauf; Abnahmestand 26 ✅ · 0 ⚠️ · 35 ⬜) | 2026-10-23 (Deploy B ist live: `v3.1.6`, Release `20261023T165838.591015Z`, SHA `e5c834e`, health_gate 9/9 OK; Block 7.1 (UI-1) gemergt (`f0e76b0`) — kommt mit `v3.1.7`) | 2026-10-23 (Block 7.1 (UI-1) gebaut: HTML-404 für unbekannte `/ui`-Pfade + JSON-404 in der API — Branch `p105-block7`, nicht gemergt; 4 neue Tests, 4 Gegenläufe wirksam; Suite 1384 grün) | 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zeile `)pdated:` → `) | `; Release-Tests wieder grün, Suite 1380 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-10-24 (Block 8 gebaut — die Gehirnkarte C2: Lappen/Furchen/Zellen/Aktivierung, KA-2 Layout merken, KA-3 Suche/Filter, reduced motion 0 Frames; Browser-Probe an der 200-Knoten-Wegwerf-Instanz 4/4 mit 3 roten Gegenläufen; **drei Fehler fand erst der Browser** (gezogener Knoten wurde zurückgezogen · Fokus überlebte den Zeiger · Layout-Hinweis überschrieb die Trefferzahl) — behoben und gewächtert; Smoke 5/5; Suite 1422 grün; Abnahmestand 34 ✅ · 0 ⚠️ · 27 ⬜) | 2026-10-24 (Block 7.4 (UI-4) umgesetzt — die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen: Wortmarken-Abstand 2,5 px · „Zugewiesen"-Auswahl mit den Kanten der Suchzeile · Update-Banner als einzeilige Leiste (49 px) mit dem Knopf „Alle Änderungen" · Versionsanzeige 11 px (Punkt 203/255 statt 155/255); Wächter 8/8 mit 4 Gegenproben, Probe 5/5 mit 5 roten Gegenläufen; P10.5-32 bleibt ⬜ bis zur Bestätigung) | 2026-10-24 (Session-Schluss: Handover für 7.4-Umsetzung, Block 8, Deploy C; Rotations-Fallstrick notiert) | 2026-10-24 (Block 7.4: Sichtungsliste des Nikingers notiert — 4 Posten im Archiv Schritt 7.4, Ausführer setzt um, Nachsichtung nach Block 11) | 2026-10-24 (Block 7.5 Kontrast (`--caution` #F06A6E, Wächter), 7.6 Assignee-Filter (API + Auswahl), 7.7 KA-5 (Chip + Karten-Ring) gebaut; Probe an der Wegwerf-Instanz 6/6 mit zwei roten Gegenläufen; Suite 1396 grün; Abnahmestand 30 ✅ · 0 ⚠️ · 31 ⬜) | 2026-10-23 (Block 7.3 (UI-3) gebaut: der Tab-Titel folgt der Ansicht — Übersicht, Space-Name, Item-Titel, Einstellungen; datierte Korrektur zum Plan (vier Zustände, nicht fünf); Probe an der Wegwerf-Instanz 6/6 mit rotem Gegenlauf; Abnahmestand 27 ✅ · 0 ⚠️ · 34 ⬜) | 2026-10-23 (Block 7.2 (UI-2): die Wortmarke `static/logo.svg` — Variante B aus dem Logo-Board, pixelgleich gemessen; zwei Befunde nur durch Messung (XML-Kommentar, MIME-Typ); Probe an der Wegwerf-Instanz mit rotem Gegenlauf; Abnahmestand 26 ✅ · 0 ⚠️ · 35 ⬜) | 2026-10-23 (Deploy B ist live: `v3.1.6`, Release `20261023T165838.591015Z`, SHA `e5c834e`, health_gate 9/9 OK; Block 7.1 (UI-1) gemergt (`f0e76b0`) — kommt mit `v3.1.7`) | 2026-10-23 (Block 7.1 (UI-1) gebaut: HTML-404 für unbekannte `/ui`-Pfade + JSON-404 in der API — Branch `p105-block7`, nicht gemergt; 4 neue Tests, 4 Gegenläufe wirksam; Suite 1384 grün) | 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zeile `)pdated:` → `) | `; Release-Tests wieder grün, Suite 1380 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -38,8 +38,8 @@ updated: 2026-10-24 (Block 7.4 (UI-4) umgesetzt — die vier Posten der Sichtung
 | 4 | Performance: PF-1, PF-4, Z1–Z4 | Ausführer (+ Claude Code Proben) | A | ✅ 2026-10-22 — **4.1–4.6 gebaut und geprobt**: `_overview()` zählt alle Eimer aus **einem** `store.search()`-Durchgang (P10.5-G, Rückfall über `_STORE_FETCH_LIMIT`), `folders`/`members` wandern in die Antwort · `asyncio.to_thread` für `_overview`/`_items_get`/`_graph_get` (Z2) · Client: nur noch `/overview`, 10 s Mindestpause für `focus`/`visibilitychange` (PF-4) · neu `static/js/loading.js` + `.is-loading`-Gerüst (Z3/Z4) · **M2-Bench Median 107,3 ms** (vorher 2405,6) · **`/health` hinter `/overview` 23 ms** (P10: 4757 ms) · Browser: 150 ms → kein Platzhalter, 400 ms → Platzhalter; Abnahme 10-14/15/16/17 ✅, 10-18 beim Nikinger nach Deploy A |
 | 5 | MCP-Schicht: PA-5 (FastMCP 4), LG-4 | Ausführer | B | ✅ 2026-10-22 — **5.1–5.6 gebaut und geprobt**: `fastmcp==4.1.3` (V207 ✅), `constraints.txt` neu aus frischem venv, Suite 1354 grün mit Compat an **und** aus (Warnungen als Fehler) · `proto` im Tool-Log (V219 ✅: `Context.request_context.protocol_version`) · neues Werkzeug `append_to_items` (LG-4, ≤ 20 Einträge, je Eintrag eigene `version`, Teilerfolg, Log `err:"partial"`) · Probe beider Ären in-process: `legacy` → `2025-11-25`, `auto` → `2026-07-28` · Smoke 17/17; Abnahme 10-19/20/21 ✅, 10-22 beim Nikinger nach Deploy B |
 | 6 | Anbieter: PA-1, PA-2, `/mcp`, PA-6, P10-J | Ausführer + Claude Code + Nikinger | B | ✅ 2026-10-22 — **6.0–6.5 gebaut und gemessen**: zweite Vergleichsregel `http://127.0.0.1:<port>` (Port explizit, kein `localhost`/`[::1]`, P10.5-O) + `application_type` ∈ {fehlend, null, native, web} · CSP `form-action` mit `http://127.0.0.1:*` · `/mcp` **ohne** Slash exakt bedient (`_ExactMcpMount`, kein 307) · PA-6 (Wurzel-`CLAUDE.md` eine Zeile) · **V209 ✅** (opencode 1.19.4), **V197 ✅** (Chromium folgt dem Consent-Redirect) · **DCR-Gegenlauf**: derselbe Request 400 → **201** · Suite **1376 grün** (1354 + 22) · **10-23/10-24/10-25 ✅**, **10-26 ✅** (2026-10-23 geklärt: die zwei Auslöser lagen im Messgerät, kein Produktcode — siehe Session-Block), 10-27/28 beim Nikinger nach Deploy B |
-| 7 | Darstellung: UI-1–UI-6, KA-5 | Ausführer (+ Claude Code Sichtung) | C | 🔄 2026-10-24 — **7.1 UI-1 (HTML-404) gebaut** (Branch `p105-block7`, **nicht gemergt**): `render_not_found_page()` + `Route("/ui/{rest:path}", …)` **nach** allen `/ui`-Routen · **datierte Korrektur zum Plan**: „API bleibt JSON" war gemessen **falsch** (unbekannter `/api/v1/…`-Pfad ⇒ Starlette-Klartext) ⇒ JSON-404 in der API-Fehlerform · 4 Tests gegen die **echte** `create_app()`, **4 Gegenläufe wirksam** · **7.0: die Update-Log-ID** (Befund vom 2026-10-23, Altbestand aus P6): `webui/updates.py` zählt die IDs je Datum jetzt **von unten** ⇒ jeder neue Block bekommt eine ID, die **kein** bestehender Block trägt (gemessen: `latest=2026-10-23#2` gegen `seen=2026-10-23#1` ⇒ der Banner erscheint); 4 neue Wächter in `phase10_5_finishing/tests/test_update_log_ids.py` · **7.2 UI-2 (Wortmarke) gebaut**: `static/logo.svg` — Variante B („Überlagert") aus dem Logo-Board, **pixelgleich** gemessen (190 px 0,13/255 · 32 px 0,39/255 · 16 px **0,00**/255); Farben = App-Tokens mit Ersatzwert (`<img>`/Favicon erben keine Seiten-Variablen) · **zwei Befunde nur durch Messung**: `--` im XML-Kommentar ⇒ Fehlerseite statt Zeichen; `.svg` fehlte in der MIME-Tabelle ⇒ **der Browser rendert ein SVG mit falschem MIME-Typ nicht** ⇒ jetzt `image/svg+xml` · Probe an der Wegwerf-Instanz: `naturalWidth` 100, gerendert 16 × 16, **Gegenlauf rot** · **7.3 UI-3 (Tab-Titel) gebaut**: `state.js :: setViewTitle(part)` + `setPanelTitle(open)` — der Titel folgt der **Ansicht** (Übersicht · Space-Name · Item-Titel · Einstellungen), das Panel liegt als Overlay darüber und gibt den Ansichts-Titel zurück · **datierte Korrektur zum Plan**: er nennt fünf Titel, gemessen sind es **vier Zustände** (die Karte ist Kontextbereich, kein eigener Zustand) · Probe an der Wegwerf-Instanz: **6/6 Schritte** ✓, **Gegenlauf rot** ✓ · 4 Wächter in `phase10_5_finishing/tests/test_view_titles.py` · **7.5 UI-5 (Kontrast)**: `--caution` von `var(--danger)` auf `#F06A6E` (Ruhe 5,70:1 · Hover 4,81:1; vorher 4,38 / 3,69), Wächter `tests/test_contrast.py` (Gegenlauf rot: 4,376) · **7.6 UI-6**: `?assignee=` in `api.py :: _items_get` (nach Leserechtfilter, vor Paginierung) + Auswahl `#list-assignee` in der Listenkopfzeile, 2 Tests, Gegenlauf rot · **7.7 KA-5**: Chip „In Arbeit" (`overview__space-count--doing`) + statischer Ring um `doing`-Knoten in `graph.js` · Probe `probes/p105_b7_filter_probe.py` an der Wegwerf-Instanz (Port 18792): 6/6 ✓ inkl. Canvas-Ringpixel, zwei Gegenläufe (`filter`, `ring`) rot · **7.4 UI-4 (Sichtung) umgesetzt — die vier Posten des Nikingers gebaut** (2026-10-24): Wortmarken-Abstand `.45em` → `.2em` (**gemessen 2,5 px**, eine Klasse für Rail + Anmeldeseite) · „Zugewiesen"-Auswahl trägt jetzt die Kanten der Suchzeile (**gemessen 0 px Versatz links wie rechts**) · Update-Banner als **einzeilige Leiste (49 px statt ~140 px)** — Schlagzeile + Knopf „Alle Änderungen", der den Update-Log öffnet (**gemessen: Log öffnet, 20 Einträge**) · Versionsanzeige 9 px → 11 px mit `.03em` Laufweite (der hellste Pixel des Punktes **155/255 → 203/255**) · Wächter `tests/test_sichtung_7_4.py` (8 Tests, 4 Gegenproben) + Probe `probes/p105_b7_sichtung_probe.py` (Wegwerf-Instanz 18793): **5/5 Kriterien**, **5 Gegenläufe** rot · **P10.5-32 bleibt ⬜ bis zur Bestätigung des Nikingers** |
-| 8 | Karte: Gehirnkarte C2 | Ausführer (+ Claude Code Smoke/Sichtung) | C | ⬜ |
+| 7 | Darstellung: UI-1–UI-6, KA-5 | Ausführer (+ Claude Code Sichtung) | C | 🔄 2026-10-24 — **7.1–7.7 gebaut und gemessen** (HTML-404 für unbekannte `/ui`-Pfade · Wortmarke `static/logo.svg` · Tab-Titel folgt der Ansicht · vier Posten der Sichtung umgesetzt · Kontrast `--caution` 5,70:1 · Assignee-Filter in API und UI · `doing`-Ring auf der Karte) · Probe an der Wegwerf-Instanz, Gegenläufe je rot · **P10.5-32 bleibt ⬜ bis zur Bestätigung** — die Herleitung je Schritt steht im Session-Archiv (`SESSIONS_ARCHIVE.md`, Block 7.1–7.4) und in den Commits |
+| 8 | Karte: Gehirnkarte C2 | Ausführer (+ Claude Code Smoke/Sichtung) | C | 🔄 2026-10-24 — **8.1–8.8 gebaut und gemessen** (Lappen/Furchen/Zellen/Aktivierung in `graph.js`, KA-2 Layout-Ablage, KA-3 Suche/Filter, reduced motion 0 Ticks) · **Browser-Probe `probes/p105_b8_karte_probe.py` an der 200-Knoten-Wegwerf-Instanz: 4/4 Messungen grün, 3 Gegenläufe je rot** · **Smoke `p8_22_smoke.py` 5/5** (Ruhe 2712,1 ms ≤ 3000, Frame p95 1,7 ms ≤ 16,7, reduced motion **0** Frames) · **drei Fehler hat erst der Browser gefunden** (gezogener Knoten wurde zurückgezogen · Fokus blieb nach dem Zeigerwechsel · Trefferzahl wurde vom Layout-Hinweis überschrieben) — alle drei behoben und gewächtert · **Abnahme 10-36/38/39/40 ✅, 10-37 wartet auf die Sichtung** (4 Screenshots liegen vor) · **Befund: das Plan-Budget für `graph.js` ist überschritten** (+11,1 KB gzip statt +8 KB; davon +9,8 KB Kommentar, der Code selbst +2,9 KB) — Entscheidung beim Nikinger · **drei Pfade außerhalb der §3-Liste** (bewusst, datiert): `phase9_hardening/scripts/graph_reload_probe.mjs` (der P9-Harness malt die alte Strichzeichnung — ohne Anpassung wäre der P9-Wächter rot) · `phase10_5_finishing/{probes,tests}/` (Plan 8.8 verlangt Proben und Wächter) · `docs/screenshots/p105_b8_*.png` (Plan 8.8 verlangt die vier Bilder für die Sichtung) |
 | 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | ⬜ |
 | 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | D | ⬜ |
 | 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | ⬜ |
@@ -100,11 +100,11 @@ updated: 2026-10-24 (Block 7.4 (UI-4) umgesetzt — die vier Posten der Sichtung
 | P10.5-33 | UI-5: Kontrast ≥ 4,5:1 | ✅ | 7.5 · `--caution` `#F06A6E`: 5,70:1 Ruhe, 4,81:1 Hover · `tests/test_contrast.py` (Gegenlauf mit altem Wert rot) |
 | P10.5-34 | UI-6: Filter in API und UI | ✅ | 7.6 · `test_items_filter_by_assignee`, `test_items_assignee_filter_respects_acl` · Probe `p105_b7_filter_probe.py`: Auswahl sichtbar, Filter verengt, „alle" stellt her; Gegenlauf rot |
 | P10.5-35 | KA-5 sichtbar auf Übersicht und Karte | ✅ | 7.7 · Chip trägt `rgb(62,141,243)` (= `--accent`), die anderen nicht · Karte: Canvas-Probe zählt 44 Ringpixel in der Akzentfarbe, Gegenlauf (Ring abgeschaltet) 0 · Augen-Urteil bleibt der Sichtung (7.4) |
-| P10.5-36 | 200 Knoten: Ruhe ≤ 3 s, Frame p95 ≤ 16,7 ms | ⬜ | — |
-| P10.5-37 | C2-Stil: Lappen, Furchen, Zellen, Aktivierung (Nikinger-Sichtung) | ⬜ | — |
-| P10.5-38 | KA-2: Layout überlebt das Neuladen | ⬜ | — |
-| P10.5-39 | KA-3: Suche/Filter/Titel | ⬜ | — |
-| P10.5-40 | reduced motion: statisch, 0 Ticks | ⬜ | — |
+| P10.5-36 | 200 Knoten: Ruhe ≤ 3 s, Frame p95 ≤ 16,7 ms | ✅ | 8.8 · `p8_22_smoke.py` **5/5**: Ruhe **2712,1 ms** (Budget 3000, M6-Baseline 2694,6) · Frame p95 **1,7 ms** (Grenze 16,7) · 200 Knoten, 1006 Kanten · reduced motion **0** Frames bei gemaltem Canvas |
+| P10.5-37 | C2-Stil: Lappen, Furchen, Zellen, Aktivierung (Nikinger-Sichtung) | ⬜ | 8.1–8.4 gebaut und **gemessen**: Lappenfläche **137 492 px** (Deckung 5 % wie die Vorlage), Kontur 55 %, Zellen mit Membranring und 2–4 Fortsätzen, drei Aktivierungsstufen · Screenshots `docs/screenshots/p105_b8_0{1..4}_*.png` — **die Zeile wird erst ✅, wenn der Nikinger das Bild beurteilt hat** |
+| P10.5-38 | KA-2: Layout überlebt das Neuladen | ✅ | 8.5/8.8 · Browser-Probe: der gezogene Knoten steht **nach dem Neuladen** noch dort (**106 Kernpixel** am Ziel) · **Gegenlauf**: 0 → rot · Node-Harness: Abweichung **≤ 0,71 px** (die Ablage rundet auf ganze Pixel) |
+| P10.5-39 | KA-3: Suche/Filter/Titel | ✅ | 8.6/8.8 · Browser-Probe: „**10 Treffer**", Nicht-Treffer gedimmt (7280 px), Typfilter blendet Knoten **und** Bahnen aus (26165 → 4364 px) · **Gegenlauf**: wirkungslos → rot · Node-Harness: Zellen 6 → 3, Kanten 5 → 1 |
+| P10.5-40 | reduced motion: statisch, 0 Ticks | ✅ | 8.7/8.8 · Browser-Probe: **0** rAF-Aufrufe aus `graph.js`, **13989** Kernpixel gemalt · Node-Harness: `raf_calls = 0` · **der M6-Nebenbefund („1 Tick statt 0") ist erledigt** |
 | P10.5-41 | RE-7: `created_by` auf neuen Items über Web und MCP sichtbar | ⬜ | — |
 | P10.5-42 | RE-4 atomar (V193 ✅): ein Commit, Versionen unverändert, Freigabe wandert mit | ⬜ | — |
 | P10.5-43 | RE-3 nur Team-Space (V194 ✅): Frontmatter = Verzeichnis, ein Commit, Absturz wird wiederaufgenommen | ⬜ | — |
@@ -127,7 +127,7 @@ updated: 2026-10-24 (Block 7.4 (UI-4) umgesetzt — die vier Posten der Sichtung
 | P10.5-60 | P10-J zweimal live belegt | ⬜ | — |
 | P10.5-61 | Closeout-Dokumente + Rotationen per Skript | ⬜ | — |
 
-**Summe:** 30 ✅ · 0 ⚠️ · 31 ⬜ (von 61). **[Stand 2026-10-24, Block 7.5–7.7]** 33, 34 und 35 ✅. **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`). **[2026-10-23, Block 7.1]** +1 ✅ (10-29, UI-1) ⇒ 25 ✅ · 0 ⚠️ · 36 ⬜. **[2026-10-23, Block 7.2]** +1 ✅ (10-30, UI-2) ⇒ 26 ✅ · 0 ⚠️ · 35 ⬜. **[2026-10-23, Block 7.3]** +1 ✅ (10-31, UI-3) ⇒ 27 ✅ · 0 ⚠️ · 34 ⬜.
+**Summe:** 34 ✅ · 0 ⚠️ · 27 ⬜ (von 61). **[2026-10-24, Block 8]** +4 ✅ (10-36, 10-38, 10-39, 10-40) ⇒ 34 ✅ · 0 ⚠️ · 27 ⬜. **[Stand 2026-10-24, Block 7.5–7.7]** 33, 34 und 35 ✅. **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`). **[2026-10-23, Block 7.1]** +1 ✅ (10-29, UI-1) ⇒ 25 ✅ · 0 ⚠️ · 36 ⬜. **[2026-10-23, Block 7.2]** +1 ✅ (10-30, UI-2) ⇒ 26 ✅ · 0 ⚠️ · 35 ⬜. **[2026-10-23, Block 7.3]** +1 ✅ (10-31, UI-3) ⇒ 27 ✅ · 0 ⚠️ · 34 ⬜.
 
 ## Offen beim Nikinger
 
@@ -172,49 +172,59 @@ updated: 2026-10-24 (Block 7.4 (UI-4) umgesetzt — die vier Posten der Sichtung
 > (7.5) · `_items_get` steht in `api.py:932`, nicht 821 (7.6). Wer die Schritte baut, liest **das
 > Archiv**, nicht den Plan.
 
-## Session stopped — 2026-10-24 (Block 7.4 umgesetzt — die vier Posten der Sichtung; P10.5-32 wartet auf die Bestätigung)
+## Session stopped — 2026-10-24 (Block 8 gebaut — die Gehirnkarte C2; drei Fehler fand erst der Browser)
 
-**Ergebnis.** Die vier Posten aus `STARTUPTRAG_ARCHIVE.md` Schritt 7.4 sind gebaut und an der
-Wegwerf-Instanz gemessen. **1 Wortmarke:** der Abstand zwischen Zeichen und Wortrest war
-`.45em` (5,6 px), jetzt `.2em` — **gemessen 2,5 px** (eine Klasse, also Rail **und**
-Anmeldeseite). **2 „Zugewiesen"-Auswahl:** sie lief bündig an den Listenrand (x = 0), die
-Suchzeile darüber mit 16 px Innenabstand; jetzt dieselben Kanten — **gemessen: linke Kante
-identisch mit dem Suchfeld (0 px Versatz), rechte Kante identisch mit dem „+"-Knopf (0 px)**.
-**3 Update-Banner:** er war bis zu ~140 px hoch (alle Zeilen des neuesten Eintrags) und schob
-jede angemeldete Ansicht nach unten; jetzt eine **einzeilige Leiste (49 px)**: die erste Zeile
-des Eintrags als Schlagzeile, der Rest über den neuen Knopf **„Alle Änderungen"**, der den
-Update-Log in den Einstellungen öffnet (**gemessen: der Log öffnet, 20 Einträge sichtbar**).
-**4 Versionsanzeige:** „v3.1.6" las sich als „v316" — bei 9 px war der hellste Pixel des
-Punktes **155/255 (61 %)**, er verblasste in den Grund; jetzt 11 px und `.03em` Laufweite →
-**203/255 (80 %)**.
+**Ergebnis.** Die Karte trägt jetzt den Stil C2 (`docs/concepts/phase10_karte_c_stil_2.svg`):
+**Lappen** (der Körper, in Space-Gruppen geteilt, mit Innenlinie), **Furchen** (die
+Space-Grenze), **Bahnen** (quadratische Bézier, Breite `1 + log2(1 + min(deg))`), **Zellen**
+(Kreis, Membranring 2 px, 2–4 deterministische Fortsätze), **Aktivierung** (Fokus hell, erster
+Ring 1, zweiter Ring 0,5, Rest 0,45 — in Ruhe voll deckend), **KA-2** (Layout merken:
+`localStorage`, gedrosselt 1 s), **KA-3** (Suche, Typ-/Statusfilter, Titel ohne Zoom) und
+**reduced motion mit 0 Animationsframes** (M6-Nebenbefund „1 Tick statt 0" erledigt). Nichts
+deployed — `v3.1.7` steht aus.
 
-**Befund für den Nikinger.** Der Punkt wird in dieser Schrift erst bei **13 px** ein Quadrat
-(2 × 2 px statt 1 × 2) — 13 px wären größer als die Wortmarke (12,5 px). Mit der
-vorgeschlagenen Schriftgröße ist der Punkt **erkennbar, aber nicht quadratisch**; eine eigene
-Schriftart für die Version (Monospace) würde es runden, **widerspricht aber der gelockten
-Entscheidung P6 vom 2026-08-13** („keine eigene Schriftart") — das ist Deine Entscheidung.
-Das Auge entscheidet bei der Nachsichtung.
+**Drei Fehler, die erst der Browser fand** (der Node-Harness sieht die Zeichenbefehle, aber
+keinen echten Zeiger und keine echte Zeit): (1) der **gezogene Knoten wurde wieder
+freigegeben** (`fixed = false`) — die Simulation zog ihn zurück, die Ablage speicherte die
+zurückgezogene Position, der Zug des Menschen war beim nächsten Öffnen weg; er wird jetzt
+**gepinnt**. (2) **Der Fokus überlebte den Zeiger** (`onMouseLeave()` räumte `hoverId` nicht ab):
+die Karte blieb abgedunkelt (26 164 statt 13 989 Kernpixel) — Plan 8.4 sagt „Ruhezustand ohne
+Fokus: alles voll deckend". (3) **Der Layout-Hinweis hat die Trefferzahl überschrieben** (sie stand
+in derselben Statuszeile): sie hat jetzt ein **eigenes** Feld (`#overview-graph-hits`).
+Alle drei sind behoben und in `tests/test_graph_c2.py` gewächtert (Anker: die **Regeln**).
 
-**Belege.** Wächter `phase10_5_finishing/tests/test_sichtung_7_4.py` (8 Tests, **4 Gegenproben
-im Wächter selbst**: der alte Wert muss rot werden — die Anker sind die *Regeln*, nicht die
-Werte, weil `margin-right: .2em;` auch im Kommentar stand und der erste Gegenlauf deshalb
-den Kommentar gepatcht hätte). Probe `probes/p105_b7_sichtung_probe.py` (Wegwerf-Instanz
-**18793**, PID-Datei): **5/5 Kriterien** grün, **5 Gegenläufe** (`mark`/`auswahl`/`banner`/
-`version`/`alle`) je rot — der erste Entwurf des Gegenlaufs stellte die Datei **halb** wieder
-her (die Restore-Logik schrieb die Zwischensätze) und der Anker traf den Kommentar; beides
-gemessen und behoben. Suite **1404 grün** (1396 + 8), `doc_health` 0, `ui_budget` **5/5** (192,7 KB).
+**Zwei Befunde für den Nikinger.**
+- **Das Plan-Budget für `graph.js` ist überschritten:** erlaubt +8 KB gzip, gemessen **+11,1 KB**
+  — davon **+9,8 KB Kommentar**, der **Code** wächst nur **+2,9 KB**. Die *Gesamt*budgets halten
+  (`ui_budget` **5/5**, app.js+css+Font **192,7 KB**, Erstaufruf **205 KB**). Kürzen ginge nur
+  auf Kosten der datierten P8/P9-Kommentare. Entscheidung: Budget anheben oder Kommentare
+  kürzen.
+- **Die Lappen brauchen räumlich zusammenhängende Spaces** — die Furche liegt an der
+  Space-Grenze; liegen die Spaces **ineinander** (der Phase-8-Seed verlinkt die 200 Knoten zu
+  *einem* Ring über alle Spaces), zerfallen die Lappen zu Fragmenten (252 px, im Bild nicht als
+  Fläche erkennbar). Für die Screenshots habe ich die Wegwerf-Instanz deshalb **je Space
+  gebündelt** verlinkt (`probes/p105_b8_cluster_links.py` — nur die Kanten der Wegwerf-Daten):
+  **137 492 px** Lappenfläche, drei getrennte Gruppen, im Bild erkennbar.
 
-**Stand.** `main`, Baum sauber, keine Wegwerf-Instanz läuft. **P10.5-32 bleibt ⬜** — die Zeile
-wird erst ✅, wenn Du die vier Posten bestätigt hast.
+**Belege.** Browser-Probe `probes/p105_b8_karte_probe.py` an der 200-Knoten-Wegwerf-Instanz
+(Port 18772, tmp-`DATA_ROOT`, PID-Datei): **4/4 Messungen grün**, **3 Gegenläufe je rot**
+(`lappen` → 0 Pixel, `layout` → 0 Kernpixel am Ziel, `filter` → wirkungslos). Node-Harness
+`probes/p105_b8_c2_probe.mjs`: 8 Messungen, 8 Gegenläufe. Wächter `tests/test_graph_c2.py`
+**21 Tests** grün. Smoke `p8_22_smoke.py`: **5/5**. Suite **1422 grün**, `ui_budget` **5/5**,
+`doc_health` 0. Screenshots `docs/screenshots/p105_b8_0{1..4}_*.png` (die P8-22-Bilder sind
+durch den Smoke-Lauf erneuert — mit C2-Look).
 
-**Nächste Session, in dieser Reihenfolge.**
-1. **Block 8** (Karte C2): Plan § „Block 8"; Abnahme P10.5-36/37. Vorher `git log` auf Stand
-   prüfen und die Kontextgrenze 400 K (P10.5-C) bestätigen.
-2. **Deploy C `v3.1.7`** nach Block 7–8: Suite + `doc_health` + `ui_budget`, Badge und
-   `docs/UPDATE_LOG.md`, Commit + Push, **`deploy.sh` durch den Nikinger** (Hard Rule 9),
-   `health_gate.sh` mit echter Ausgabe.
-3. **Nachsichtung** (Sichtung des Nikingers, ≤ 6 weitere Posten) — nach Block 11, denn der
-   Alles-in-einem-Editor ändert das Bild.
+**Datierte Abweichung vom 📕-Plan (Code schlägt Plan).** Der Plan nennt nur den *Saatpunkt* der
+gemerkten Position — ohne Festhalten schiebt die Simulation die gemerkte Karte auseinander und
+KA-2 wäre nicht erfüllt: ein gemerkter Knoten wird **gepinnt**.
 
-**Beim Nikinger unverändert offen:** P10.5-22 · 25 · 27/28 · 18 · AL-1 Zeile 15 · V203 ·
-5.7 (Fabian Bescheid) · **neu: die Schriftart der Versionsanzeige** (Befund oben).
+**Stand.** `main`, Baum sauber, Wegwerf-Instanz gestoppt. **P10.5-37 bleibt ⬜** — die Zeile wird
+erst ✅, wenn Du die vier Screenshots beurteilt hast.
+
+**Nächste Session.** (1) **Deploy C `v3.1.7`**: Suite + `doc_health` + `ui_budget` grün · Badge
+und `docs/UPDATE_LOG.md` · Commit + Push · **`deploy.sh` durch den Nikinger** (Hard Rule 9) ·
+`health_gate.sh` mit echter Ausgabe. (2) **P10.5-37**: Sichtung der vier Screenshots.
+(3) **Nachsichtung** (≤ 6 Posten) — nach Block 11.
+
+**Beim Nikinger offen:** siehe *Offen beim Nikinger* oben — **neu: das Budget für `graph.js`
+(Block 8)**.

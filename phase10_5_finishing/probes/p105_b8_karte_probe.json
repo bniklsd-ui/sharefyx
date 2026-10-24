@@ -1,0 +1,45 @@
+{
+  "gegenlauf": null,
+  "messungen": {
+    "lappen": {
+      "lappen_pixel": 137492,
+      "kern_pixel": 13989,
+      "ok": true
+    },
+    "filter": {
+      "treffer_text": "10 Treffer",
+      "kern_ohne_suche": 13989,
+      "kern_mit_suche": 129,
+      "gedimmt_mit_suche": 11276,
+      "filter_typ": "task",
+      "kern_mit_filter": 4364,
+      "ok": true
+    },
+    "layout": {
+      "quelle_px": [
+        325,
+        71
+      ],
+      "ziel_px": [
+        24,
+        24
+      ],
+      "kerne": 13989,
+      "abstand": 25,
+      "ablage_geaendert": true,
+      "eintraege": 200,
+      "pixel_vorher": 116,
+      "pixel_nachher": 106,
+      "bild_vorher": 2489309704,
+      "bild_nachher": 404097232,
+      "bild_gleich": false,
+      "ok": true
+    },
+    "reducedmotion": {
+      "raf_calls": 0,
+      "kern_pixel": 13989,
+      "ok": true
+    }
+  },
+  "seitenfehler": []
+}

@@ -1,0 +1,93 @@
+{
+  "lappen": {
+    "lobe_fills": 3,
+    "lobe_fill_colors": [
+      "#2EB8A6",
+      "#4A93F0",
+      "#8B93A1"
+    ],
+    "lobe_contour_colors": [
+      "#2EB8A6",
+      "#4A93F0",
+      "#8B93A1",
+      "rgb(31,91,87)",
+      "rgb(43,76,118)",
+      "rgb(70,76,84)"
+    ],
+    "inner_contours": 3,
+    "fill_alpha": [
+      0.05
+    ],
+    "contour_alpha": [
+      0.55,
+      1
+    ],
+    "ok": true
+  },
+  "furche": {
+    "contours_compared": 3,
+    "separation_px": 16.5,
+    "ok": true
+  },
+  "bahnen": {
+    "edges_drawn": 5,
+    "widths": [
+      2,
+      2.58
+    ],
+    "ok": true
+  },
+  "zellen": {
+    "cells": 6,
+    "arcs": 13,
+    "process_strokes": 6,
+    "process_segments": 13,
+    "deterministic": true,
+    "ok": true
+  },
+  "aktivierung": {
+    "alphas_at_rest": [
+      1
+    ],
+    "alphas_with_focus": [
+      0.45,
+      0.5,
+      1
+    ],
+    "ok": true
+  },
+  "layout": {
+    "key": "sfx:graph:layout:v1:alpha",
+    "stored_entries": 6,
+    "stored_version": 1,
+    "dragged_to": [
+      123,
+      456
+    ],
+    "deviation_px": 0,
+    "ok": true
+  },
+  "filter": {
+    "search_alphas": [
+      0.45,
+      1
+    ],
+    "hit_counter": "3 Treffer",
+    "status_text": "Layout gemerkt",
+    "cells_without_filter": 6,
+    "cells_with_type_filter": 3,
+    "edges_without_filter": 5,
+    "edges_with_type_filter": 1,
+    "ok": true
+  },
+  "reducedmotion": {
+    "raf_calls": 0,
+    "painted_nodes": 26,
+    "ok": true
+  },
+  "ausfuehrer": {
+    "ticks": 152,
+    "fetch_calls": 3,
+    "gegenlauf": null
+  }
+}

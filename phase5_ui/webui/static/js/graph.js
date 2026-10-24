@@ -31,9 +31,21 @@
 // gerechnet -- Zahl steht im Phase-Head-Session-Block und in Plan §9.4.6.
 
 import { api, reportUnexpectedError } from "./api.js";
-import { spaceCategory, state } from "./state.js";
+import { spaceCategory, state, TYPE_LABELS } from "./state.js";
 import { selectItem } from "./editor.js";
 import { withLoading } from "./loading.js";
+
+// P10.5 Block 8, Schritt 8.6 (KA-3): die deutschen Bezeichnungen fuer Typ und Status der
+// Karte. `TYPE_LABELS` kommt aus `state.js` (dieselbe Tabelle wie der Anlegen-Dialog),
+// die Statuse kommen aus `BUCKET_LABELS` -- plus "aktiv", die Notiz-Status, die es nur beim
+// Typ Notiz gibt.
+var STATUS_LABELS = {
+  active: "Aktiv",
+  open: "Offen",
+  doing: "In Arbeit",
+  done: "Erledigt",
+  archived: "Archiv",
+};
 
 var nodes = [];
 var explicitEdges = [];   // {src, dst, kind} -- vom Server (frontmatter|body)
@@ -63,6 +75,20 @@ var pressStart = null;
 
 var tagsEnabled = false;    // Default aus (Plan §5 D2: "Default zeigt nur explizite Kanten")
 var foldersEnabled = false;
+
+// -- P10.5 Block 8: Zustand der Karte (C2) ----------------------------------------------------
+var lobeCache = null;        // {lobes: [{space, color, outer: [[x,y]…], inner: [[x,y]…]|null}]}
+                              // -- **Punkte, kein Path2D**: ein `Path2D` lässt sich im Testharness
+                              // nicht messen, Punkte schon (und der Aufbau ist der teure Teil).
+var layoutSavePending = false;  // Plan 8.5: das Drosseln des Speicherns
+var pendingReducedStart = false;  // Schritt 8.7: der reduced-motion-Aufbau wartet auf die Box
+var pinnedIds = Object.create(null);  // Plan 8.5: Knoten mit gemerkter Position -- sie werden
+                                      // beim nächsten Laden nicht wieder auseinandergeschoben
+var searchQuery = "";        // Plan 8.6 (KA-3): die Suche im Titel
+var filterType = "";         // Plan 8.6: "" = alle Typen, sonst "note"/"task"
+var filterStatus = "";       // Plan 8.6: "" = alle Status, sonst "open"/"doing"/"done"
+var statusEl = null;         // die Statuszeile der Werkzeugleiste (Plan 8.5/8.6)
+var hitsEl = null;           // die Trefferzahl der Suche -- **eigenes** Feld (Plan 8.6)
 
 // -- P9 Step E: Reload-Overload (Plan §7.2a, Abnahme P9-33) ----------------------------------
 //
@@ -115,12 +141,35 @@ const NODE_RADIUS_MAX = 12;
 const ZOOM_MIN = 0.5;
 const ZOOM_MAX = 2.5;
 const ZOOM_LABEL_THRESHOLD = 1.2;  // Plan §5 D2: Labels nur bei Zoom > 1.2 oder Hover-Nachbarschaft
-const DIM_ALPHA = 0.15;            // Nicht-Nachbarn auf 15% Alpha (Plan §5 D2)
+// P10.5 Block 8, Schritt 8.4 (D-1b): der Plan setzt 0,15 auf 0,45 -- "Abdunkeln nur bei Hover
+// oder Treffer", der Ruhezustand ohne Fokus bleibt **voll deckend**. Die alte 0,15 war der
+// P8-Wert und make-die-Karte-zur-Asche.
+const DIM_ALPHA = 0.45;            // Nicht-Nachbarn auf 45% Alpha (Plan §Block 8, Schritt 8.4)
+const HALF_ALPHA = 0.5;            // der zweite Ring um den Fokus (Plan §Block 8, Schritt 8.4)
 const HOVER_HIT_RADIUS = 14;       // Klick-Toleranz ueber den sichtbaren Radius hinaus
 const TAG_CLIQUE_LIMIT = 15;       // Plan §5 D2: Tags auf >15 Knoten erzeugen keine Clique
 // Fix C (Plan §9.4.6 Befund C, 2026-09-02): maximale Pointer-Bewegung zwischen mousedown und
 // mouseup, die noch als Klick (nicht Drag) zaehlt -- Klick oeffnet das Item.
 const CLICK_SLOP = 4;
+
+// -- P10.5 Block 8: Gehirnkarte C2 (Plan §Block 8, Schritt 8.1-8.7) --------------------------------
+//
+// Der Stil C2 ("Nervenbahnen", Vorlage `docs/concepts/phase10_karte_c_stil_2.svg`) hat vier
+// Teile: **Lappen** (der Koerper, in Space-Gruppen geteilt), **Furchen** (die Grenze zwischen
+// zwei Lappen), **Bahnen** (geschwungene Kanten) und **Zellen** (die Knoten). Die Zahlen
+// unten sind die Vorgaben aus dem Plan, nicht Schaetzwerte.
+const LOBE_CELL_PX = 8;        // Zellgröße des Lappen-Rasters (Plan 8.1)
+const LOBE_REACH = 48;         // Radius der Körpermaske um den nächsten Knoten (Plan 8.1)
+const LOBE_MAX_CELLS = 200;    // Deckel je Achse -- ein weit auseinandergezogenes Layout darf
+                               // das Raster nicht unbegrenzt wachsen lassen
+const LOBE_INNER_CELLS = 3;    // Erosionstiefe der inneren Kontur (3 Zellen = 24 px)
+const EDGE_CURVE = 0.24;       // Krümmung der Bahn: Kontrollpunkt = Mitte + 0,24·(−dy, dx)
+const EDGE_WIDTH_BASE = 1;     // Plan 8.2: Breite = 1 + log2(1 + min(deg(a), deg(b)))
+const CANVAS_SURFACE = "#14181D";  // `--surface` -- die Fläche unter dem Canvas; Mix-Ziel für
+                                   // den dunkleren Ton der inneren Kontur (Plan 8.1)
+const LAYOUT_KEY_PREFIX = "sfx:graph:layout:v1:";  // Plan 8.5 (KA-2)
+const LAYOUT_MAX_ENTRIES = 2000;                    // Plan 8.5
+const LAYOUT_SAVE_DELAY_MS = 1000;                  // Plan 8.5: gedrosselt 1 s
 
 const COLORS = Object.freeze({
   bg: "#0B0D10",          // wird nicht gezeichnet -- Canvas ist transparent, darunter die .surface
@@ -131,6 +180,7 @@ const COLORS = Object.freeze({
   spaceShared: "#2EB8A6",
   spaceForeign: "#8B93A1",
   doing: "#3E8DF3",       // P10.5 7.7 (KA-5): statischer Ring um "doing"-Knoten, Wert von --accent (nicht spaceOwn: ein eigener Knoten wäre sonst farbgleich zum Ring)
+  accent: "#3E8DF3",     // P10.5 Block 8 (8.4): der Fokus und seine Bahnen -- `--accent`
 });
 
 export function init() {
@@ -156,6 +206,35 @@ export function init() {
     rebuildImplicitEdges();
     draw();
   });
+
+  // -- P10.5 Block 8, Schritt 8.5/8.6 (KA-2/KA-3): die Werkzeugleiste der Karte ----------
+  // Suche (Titel-Teilstring), Typ- und Statusauswahl, der Knopf "Layout zurücksetzen" und
+  // die Statuszeile. Alles **optional**: fehlt ein Element (alte Markup-Version, Testharness),
+  // läuft die Karte weiter -- kein harter Fehler, kein halber Zustand.
+  var searchInput = document.getElementById("overview-graph-search");
+  if (searchInput) searchInput.addEventListener("input", function () {
+    searchQuery = (searchInput.value || "").trim().toLowerCase();
+    updateHitCount();
+    draw();
+  });
+  var typeSelect = document.getElementById("overview-graph-filter-type");
+  if (typeSelect) typeSelect.addEventListener("change", function () {
+    filterType = typeSelect.value || "";
+    draw();
+  });
+  var statusSelect = document.getElementById("overview-graph-filter-status");
+  if (statusSelect) statusSelect.addEventListener("change", function () {
+    filterStatus = statusSelect.value || "";
+    draw();
+  });
+  var resetLayout = document.getElementById("overview-graph-reset-layout");
+  if (resetLayout) resetLayout.addEventListener("click", function () {
+    clearStoredLayout();
+    setGraphStatus("Layout zurückgesetzt");
+    draw();
+  });
+  statusEl = document.getElementById("overview-graph-status");
+  hitsEl = document.getElementById("overview-graph-hits");
 
   canvasEl.addEventListener("mousedown", onMouseDown);
   canvasEl.addEventListener("mousemove", onMouseMove);
@@ -214,6 +293,7 @@ export function loadGraph(opts) {
     nodeById = Object.create(null);
     nodes.forEach(function (n) { nodeById[n.id] = n; });
     rebuildImplicitEdges();
+    populateFilters();
     updateEmptyState();
     updateZoomReadout();
     // Die Signatur wird NACH dem Abruf gesetzt, nicht davor: ein /overview, das während des
@@ -228,6 +308,21 @@ export function loadGraph(opts) {
     // garantiert, dass resize() nach dem nächsten Layout-Pass läuft (Browser hat das Grid dann
     // committed). [VERIFY] V115: gemessen, dass der ResizeObserver allein beim ersten Mount
     // nicht ausreicht -- der Fix ist drei Zeilen, kein neuer Mechanismus.
+    //
+    // **P10.5 Block 8, Schritt 8.7 (reduced motion, Abnahme P10.5-40):** im reduced-motion-Pfad
+    // läuft der Aufbau **ohne** requestAnimationFrame -- 0 Animationsframes aus `graph.js`.
+    // Vorher stand auch dieser Aufbau in einem rAF, und die Abnahme verlangt 0. Der Canvas kann
+    // beim ersten Laden noch 0x0 sein; dann wartet der Aufbau auf den ResizeObserver
+    // (`resize()`), ebenfalls ohne rAF.
+    if (reducedMotion) {
+      resize();
+      if (cssWidth > 0 && cssHeight > 0) {
+        startLayout();
+      } else {
+        pendingReducedStart = true;   // `resize()` startet den Aufbau, sobald die Box steht
+      }
+      return;
+    }
     requestAnimationFrame(function () {
       if (canvasEl && !canvasEl.isConnected) return;
       resize();
@@ -236,8 +331,7 @@ export function loadGraph(opts) {
         draw();
         return;
       }
-      seedInitialPositions();
-      runSimulation();
+      startLayout();
     });
   }).catch(reportUnexpectedError);
 }
@@ -381,16 +475,30 @@ function buildFolderEdges(nodeList) {
 }
 
 function seedInitialPositions() {
-  // Streuung um den Canvas-Mittelpunkt -- deterministisch per Item-ID (P8.6-D2,
-  // P8.6-M). Vorher Math.random() -- dieselben Daten ergaben jedes Mal ein
-  // anderes Bild und "die Karte fliegt" beim Oeffnen. Der Ring nach Index ist
-  // schon deterministisch; nur der Jitter brauchte den Hash.
+  // Streuung um den Canvas-Mittelpunkt -- deterministisch per Item-ID (P8.6-D2, P8.6-M;
+  // vorher Math.random(), die Karte "flog" beim Oeffnen).
+  //
+  // **P10.5 Block 8, Schritt 8.5 (KA-2):** zuerst die **gemerkten** Positionen (Plan 8.5),
+  // fuer den Rest der Ring mit dem Hash-Jitter; unbekannte IDs werden ignoriert.
+  //
+  // **Datierte Entscheidung (2026-10-24, Abweichung vom Plan-Wortlaut, Code schlaegt Plan):**
+  // ein gemerkter Knoten wird **festgehalten** (`pinned`), nicht nur gesaet -- sonst schiebt
+  // die Simulation die gemerkte Karte beim naechsten Oeffnen wieder auseinander und KA-2
+  // waere nicht erfuellt. Belegt von `probes/p105_b8_karte_probe.py` (Neuladen haelt die
+  // Position) und `probes/p105_b8_c2_probe.mjs`.
+  var stored = loadStoredLayout();
   var cx = cssWidth / 2;
   var cy = cssHeight / 2;
   var spread = Math.min(cssWidth, cssHeight) / 4;
   for (var i = 0; i < nodes.length; i++) {
     var n = nodes[i];
-    if (n.x === 0 && n.y === 0) {
+    var pos = stored[n.id];
+    if (pos && typeof pos[0] === "number" && typeof pos[1] === "number") {
+      n.x = pos[0];
+      n.y = pos[1];
+      n.pinned = true;
+      pinnedIds[n.id] = true;
+    } else if (n.x === 0 && n.y === 0) {
       var angle = (i / Math.max(1, nodes.length)) * 2 * Math.PI;
       n.x = cx + Math.cos(angle) * spread + seedJitter(n.id, 1) * 30;
       n.y = cy + Math.sin(angle) * spread + seedJitter(n.id, 2) * 30;
@@ -398,6 +506,18 @@ function seedInitialPositions() {
     n.vx = 0;
     n.vy = 0;
   }
+}
+
+// Aufbau nach dem Laden: säen und simulieren. Steht als eigene Funktion, weil der
+// reduced-motion-Pfad (Schritt 8.7) sie **synchron** braucht und der normale Pfad sie im
+// requestAnimationFrame aufruft.
+function startLayout() {
+  if (nodes.length === 0) {
+    draw();
+    return;
+  }
+  seedInitialPositions();
+  runSimulation();
 }
 
 // FNV-1a, 32 Bit. Zweck ist nicht Kryptographie, sondern Reproduzierbarkeit:
@@ -434,9 +554,20 @@ function runSimulation() {
     cancelAnimationFrame(activeRafId);
   }
 
+  // Die Karte ist zur Ruhe gekommen: jetzt werden die Lappen berechnet (Plan 8.1: "Berechnet
+  // wird einmal nach dem Einschwingen und nach dem Drag-Ende, nicht je Frame") und die
+  // Positionen gemerkt (Plan 8.5). Eigene Funktion, weil **zwei** Wege hierher fuehren:
+  // das Ende der Tick-Kette und der reduced-motion-Pfad.
+  function settle() {
+    lobeCache = computeLobes(visibleNodes());
+    scheduleLayoutSave();
+    draw();
+  }
+
   function tick() {
     if (alpha < ALPHA_MIN) {
       activeRafId = null;
+      settle();
       return;
     }
     applyForces(alpha);
@@ -447,6 +578,7 @@ function runSimulation() {
       activeRafId = requestAnimationFrame(tick);
     } else {
       activeRafId = null;
+      settle();
     }
   }
 
@@ -457,7 +589,8 @@ function runSimulation() {
       integrate(alpha);
       alpha *= ALPHA_DECAY;
     }
-    draw();
+    // P10.5 Block 8, Schritt 8.7: dasselbe Bild, **ohne** Animationsframe.
+    settle();
     activeRafId = null;
   } else {
     activeRafId = requestAnimationFrame(tick);
@@ -482,10 +615,12 @@ function applyForces(alpha) {
       var force = REPULSION_STRENGTH / dist2;
       var fx = (dx / dist) * force;
       var fy = (dy / dist) * force;
-      a.vx += fx;
-      a.vy += fy;
-      b.vx -= fx;
-      b.vy -= fy;
+      // P10.5 Block 8, Schritt 8.5: ein **festgehaltener** Knoten bewegt sich nicht, aber er
+      // drueckt weiter. Vorher war `fixed` (aus dem Drag) ein wirkungsloses Feld -- es wurde
+      // gesetzt, aber nie gelesen; die Simulation hat den gezogenen Knoten wieder weggezogen.
+      // `pinned` ist der neue Partner: die gemerkte Position (KA-2).
+      if (!isHeld(a)) { a.vx += fx; a.vy += fy; }
+      if (!isHeld(b)) { b.vx -= fx; b.vy -= fy; }
     }
   }
 
@@ -508,31 +643,36 @@ function applyForces(alpha) {
     var f = stretch * SPRING_STRENGTH;
     var ffx = (ddx / d) * f;
     var ffy = (ddy / d) * f;
-    aa.vx += ffx;
-    aa.vy += ffy;
-    bb.vx -= ffx;
-    bb.vy -= ffy;
+    if (!isHeld(aa)) { aa.vx += ffx; aa.vy += ffy; }
+    if (!isHeld(bb)) { bb.vx -= ffx; bb.vy -= ffy; }
   }
 
   // 3. Zentrums-Gravitation -- haelt den Graphen in der Panel-Mitte, auch wenn der Grossteil
   //    der Knoten am Rand landen wuerde.
   for (var n = 0; n < nodes.length; n++) {
     var node = nodes[n];
+    if (isHeld(node)) continue;
     node.vx += (cx - node.x) * CENTER_GRAVITY * alpha;
     node.vy += (cy - node.y) * CENTER_GRAVITY * alpha;
   }
 }
 
+// P10.5 Block 8, Schritt 8.5: steht der Knoten fest? `fixed` = beim Drag (P9, bisher ohne
+// Wirkung -- siehe `applyForces()`), `pinned` = gemerkte Position aus dem localStorage (KA-2).
+function isHeld(n) {
+  return n.fixed === true || n.pinned === true;
+}
+
 function integrate(alpha) {
   for (var i = 0; i < nodes.length; i++) {
     var n = nodes[i];
+    if (isHeld(n)) { n.vx = 0; n.vy = 0; continue; }
     n.x += n.vx * alpha;
     n.y += n.vy * alpha;
     n.vx *= DAMPING;
     n.vy *= DAMPING;
   }
 }
-
 function draw() {
   if (!ctx) return;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -549,40 +689,109 @@ function draw() {
   ctx.scale(zoom, zoom);
 
   var all = explicitEdges.concat(implicitEdges);
-  var neighbors = hoverId ? neighborSet(hoverId, all) : null;
-  var dim = function (id) { return neighbors && !neighbors[id]; };
+  // P10.5 Block 8, Schritt 8.4: statt "der Fokus und seine Nachbarn hell, der Rest gedimmt"
+  // gibt es jetzt **drei** Stufen: Fokus, erster Ring, zweiter Ring, Rest.
+  var rings = hoverId ? neighborRings(hoverId, all) : null;
+  // P10.5 Block 8, Schritt 8.6 (KA-3): der Filter blendet Knoten **und** Bahnen aus.
+  var shown = visibleNodes();
+  var hits = searchQuery ? searchHits(shown) : null;
 
-  drawEdges(all, dim);
-  drawNodes(dim);
+  drawLobes(shown);
+  drawEdges(all, rings, shown);
+  drawNodes(rings, shown, hits);
 
   ctx.restore();
 
   // Labels werden in CSS-Koordinaten gerendert (nach restore), damit sie nicht mit-skaliert
   // werden -- ein 12px-Label bei Zoom 0.5 wuerde sonst 6px winzig werden.
-  drawLabels(neighbors);
+  drawLabels(rings, shown, hits);
 }
 
-function drawEdges(all, dim) {
+// P10.5 Block 8, Schritt 8.6 (KA-3): welche Knoten ueberleben den Filter? Typ (alle/Notiz/
+// Aufgabe) und Status (alle/offen/in Arbeit/erledigt). Leerer Wert = "alle".
+function visibleNodes() {
+  var out = Object.create(null);
+  for (var i = 0; i < nodes.length; i++) {
+    var n = nodes[i];
+    if (filterType && n.type !== filterType) continue;
+    if (filterStatus && n.status !== filterStatus) continue;
+    out[n.id] = true;
+  }
+  return out;
+}
+
+// Die Suche (KA-3): Titel-Teilstring, ohne Gross/Klein. Treffer hell, der Rest gedimmt --
+// und die Zahl der Treffer steht in der Statuszeile.
+function searchHits(shown) {
+  var hits = Object.create(null);
+  var count = 0;
+  for (var i = 0; i < nodes.length; i++) {
+    var n = nodes[i];
+    if (!shown[n.id]) continue;
+    var title = (n.title || "").toLowerCase();
+    if (title.indexOf(searchQuery) >= 0) {
+      hits[n.id] = true;
+      count += 1;
+    }
+  }
+  updateHitCount(count);
+  return hits;
+}
+
+function updateHitCount(count) {
+  // **Die Trefferzahl hat ihr eigenes Feld** (`#overview-graph-hits`). Vorher stand sie in
+  // der Statuszeile — und der Layout-Hinweis ("Layout gemerkt", der 1 s nach dem Speichern
+  // kommt) hat sie ueberschrieben: die Zahl war dann weg, obwohl die Suche lief. Gemessen
+  // an der Wegwerf-Instanz am 2026-10-24 (Probe `p105_b8_karte_probe.py`).
+  if (!hitsEl) return;
+  if (!searchQuery) {
+    hitsEl.textContent = "";
+    hitsEl.removeAttribute("data-kind");
+    return;
+  }
+  if (count === undefined) {
+    // Ohne Knotenmenge laesst sich die Zahl nicht bestimmen -- der Aufrufer setzt sie.
+    return;
+  }
+  hitsEl.setAttribute("data-kind", "hits");
+  hitsEl.textContent = count + (count === 1 ? " Treffer" : " Treffer");
+}
+
+function setGraphStatus(text) {
+  if (!statusEl) return;
+  statusEl.textContent = text;
+  statusEl.removeAttribute("data-kind");
+}
+
+function drawEdges(all, rings, shown) {
   // **V118, zwei Lesarten, beide datiert:**
   //  *2026-09-26 (Antwort des Nikingers auf P9 Step E):* eine Tag-Kante UND eine explizite
-  // Kante zwischen denselben zwei Knoten ergeben **zwei Linien** (solid + gestrichelt), weil
-  // `dedupeEdges()` nur die expliziten Kanten zusammenfasst und `buildTagEdges()` nur die
-  // Tag-Kanten -- die Zusammenführung beider Listen passiert erst hier, ohne Dedup.
+  //  Kante zwischen denselben zwei Knoten ergeben **zwei Linien** (solid + gestrichelt), weil
+  //  `dedupeEdges()` nur die expliziten Kanten zusammenfasst und `buildTagEdges()` nur die
+  //  Tag-Kanten -- die Zusammenführung beider Listen passiert erst hier, ohne Dedup.
   //  *2026-10-05 (zweite Antwort, P9-36):* **eine Linie.** *"Wenn A auf B verlinkt, ist B für A
-  // automatisch relevant."* Die explizite Kante gewinnt, die implizite entfällt -- gefiltert
-  // wird bei der Übernahme in `rebuildImplicitEdges()`, nicht erst hier, damit die Gradzählung
-  // dasselbe Bild zeigt (P8.6-N). `drawEdges()` zeichnet nur noch, wonach es gefragt wird.
-  // Der alte Kommentarstand wurde **ersetzt**, nicht ergänzt: eine Notiz, die beides behauptet,
-  // erklärt gar nichts.
-  ctx.lineWidth = 1;
-  ctx.strokeStyle = COLORS.edge;
+  //  automatisch relevant."* Die explizite Kante gewinnt, die implizite entfällt -- gefiltert
+  //  wird bei der Übernahme in `rebuildImplicitEdges()`, nicht erst hier, damit die Gradzählung
+  //  dasselbe Bild zeigt (P8.6-N). `drawEdges()` zeichnet nur noch, wonach es gefragt wird.
+  //  Der alte Kommentarstand wurde **ersetzt**, nicht ergänzt: eine Notiz, die beides behauptet,
+  //  erklärt gar nichts.
+  //
+  // **P10.5 Block 8, Schritt 8.2 (Bahnen):** die Kante ist jetzt eine **quadratische Bézier**
+  // (Plan: "der Kontrollpunkt liegt senkrecht zur Mitte und wächst mit der Länge"), die Breite
+  // folgt dem Grad (`1 + log2(1 + min(deg(a), deg(b)))`), und die Kanten des Fokus tragen den
+  // Akzentton (Vorlage C2).
+  ctx.lineCap = "round";
   for (var i = 0; i < all.length; i++) {
     var e = all[i];
     var a = nodeById[e.src];
     var b = nodeById[e.dst];
     if (!a || !b) continue;
-    var isDim = dim(a.id) || dim(b.id);
-    ctx.globalAlpha = isDim ? DIM_ALPHA : 1;
+    // KA-3: ein ausgeblendeter Knoten nimmt seine Bahnen mit.
+    if (!shown[a.id] || !shown[b.id]) continue;
+    var focusEdge = rings && (a.id === rings.focus || b.id === rings.focus);
+    ctx.globalAlpha = edgeAlpha(a, b, rings);
+    ctx.strokeStyle = focusEdge ? COLORS.accent : COLORS.edge;
+    ctx.lineWidth = EDGE_WIDTH_BASE + Math.log2(1 + Math.min(a.deg, b.deg));
     if (e.kind === "tag") {
       ctx.setLineDash([4, 4]);
     } else if (e.kind === "folder") {
@@ -590,24 +799,92 @@ function drawEdges(all, dim) {
     } else {
       ctx.setLineDash([]);
     }
+    var geo = edgeGeometry(a, b);
     ctx.beginPath();
     ctx.moveTo(a.x, a.y);
-    ctx.lineTo(b.x, b.y);
+    ctx.quadraticCurveTo(geo.cx, geo.cy, b.x, b.y);
     ctx.stroke();
   }
   ctx.setLineDash([]);
   ctx.globalAlpha = 1;
 }
 
-function drawNodes(dim) {
+// Die Bahn-Geometrie (Plan 8.2): Kontrollpunkt senkrecht zur Mitte, waechst mit der Laenge.
+// Die **Richtung** ist kanonisch (nach ID sortiert), damit dieselbe Kante immer dieselbe
+// Krümmung hat -- sonst hinge die Form davon ab, in welcher Reihenfolge der Server sie
+// geliefert hat.
+function edgeGeometry(a, b) {
+  var p = a;
+  var q = b;
+  if (String(a.id) > String(b.id)) { p = b; q = a; }
+  var dx = q.x - p.x;
+  var dy = q.y - p.y;
+  return {
+    cx: (p.x + q.x) / 2 - dy * EDGE_CURVE,
+    cy: (p.y + q.y) / 2 + dx * EDGE_CURVE,
+  };
+}
+
+// Die Helligkeit einer Bahn (Plan 8.4): Fokus und erster Ring voll, zweiter Ring halb,
+// der Rest gedimmt. Ohne Fokus (Ruhezustand) ist **alles** voll deckend.
+function edgeAlpha(a, b, rings) {
+  if (!rings) return 1;
+  if (a.id === rings.focus || b.id === rings.focus) return 1;
+  if (rings.first.has(a.id) || rings.first.has(b.id)) return 1;
+  if (rings.second.has(a.id) || rings.second.has(b.id)) return HALF_ALPHA;
+  return DIM_ALPHA;
+}
+
+// Die Helligkeit eines Knotens (Plan 8.4) -- dieselbe Stufenfolge wie bei den Bahnen.
+function nodeAlpha(id, rings, hits) {
+  if (hits) return hits[id] ? 1 : DIM_ALPHA;
+  if (!rings) return 1;
+  if (id === rings.focus) return 1;
+  if (rings.first.has(id)) return 1;
+  if (rings.second.has(id)) return HALF_ALPHA;
+  return DIM_ALPHA;
+}
+
+function nodeRadius(n) {
+  return Math.min(NODE_RADIUS_MAX, NODE_RADIUS_BASE + NODE_RADIUS_PER_LOG * Math.log2(1 + n.deg));
+}
+
+function drawNodes(rings, shown, hits) {
   for (var i = 0; i < nodes.length; i++) {
     var n = nodes[i];
-    var r = Math.min(NODE_RADIUS_MAX, NODE_RADIUS_BASE + NODE_RADIUS_PER_LOG * Math.log2(1 + n.deg));
-    ctx.globalAlpha = dim(n.id) ? DIM_ALPHA : 1;
-    ctx.fillStyle = nodeColor(n);
+    if (!shown[n.id]) continue;
+    var r = nodeRadius(n);
+    var alpha = nodeAlpha(n.id, rings, hits);
+    var isFocus = rings && n.id === rings.focus;
+    var color = isFocus ? COLORS.accent : nodeColor(n);
+    ctx.globalAlpha = alpha;
+
+    // -- P10.5 Block 8, Schritt 8.3 (Zellen): die Zelle ist ein **Kern** (gefuellt), ein
+    //    **Membranring** (2 px, Space-Farbe) und 2-4 kurze **Fortsaetze** -- deterministisch
+    //    aus dem Hash der Item-ID, damit dieselbe Item bei jedem Laden gleich aussieht.
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, Math.max(2.5, r * 0.55), 0, 2 * Math.PI);
+    ctx.fill();
+
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.arc(n.x, n.y, r, 0, 2 * Math.PI);
-    ctx.fill();
+    ctx.stroke();
+
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    var procs = cellProcesses(n.id);
+    for (var p = 0; p < procs.length; p++) {
+      var pr = procs[p];
+      var ca = Math.cos(pr.angle);
+      var sa = Math.sin(pr.angle);
+      ctx.moveTo(n.x + ca * r, n.y + sa * r);
+      ctx.lineTo(n.x + ca * (r + pr.len), n.y + sa * (r + pr.len));
+    }
+    ctx.stroke();
+
     if (n.status === "doing") {
       // P10.5 7.7 (KA-5): statischer Akzentring, bewusst ohne Animation.
       ctx.strokeStyle = COLORS.doing;
@@ -616,25 +893,57 @@ function drawNodes(dim) {
       ctx.arc(n.x, n.y, r + 3, 0, 2 * Math.PI);
       ctx.stroke();
     }
+    if (isFocus) {
+      // P10.5 Block 8 (8.4): der Fokus bekommt den hellen Ring der Vorlage C2.
+      ctx.strokeStyle = COLORS.accent;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r + 6, 0, 2 * Math.PI);
+      ctx.stroke();
+    }
   }
   ctx.globalAlpha = 1;
 }
 
-function drawLabels(neighbors) {
-  if (zoom < ZOOM_LABEL_THRESHOLD && !hoverId) return;
+// Die Fortsaetze der Zelle (Plan 8.3): 2-4 kurze Striche, Winkel und Laenge aus dem Hash
+// der Item-ID -- derselbe Hash, den schon `seedJitter()` benutzt (FNV-1a, 32 Bit).
+function cellProcesses(id) {
+  var count = 2 + Math.floor(Math.abs(seedJitter(id, 20)) * 3);   // 2, 3 oder 4
+  var base = seedJitter(id, 21) * Math.PI * 2;
+  var out = [];
+  for (var i = 0; i < count; i++) {
+    out.push({
+      angle: base + i * (Math.PI * 2 / count) + seedJitter(id, 30 + i) * 0.5,
+      len: 4 + Math.abs(seedJitter(id, 40 + i)) * 4,
+    });
+  }
+  return out;
+}
+
+function drawLabels(rings, shown, hits) {
+  // Plan 8.6: "Titel: Fokus + erster Ring immer, sonst weiter ab ZOOM_LABEL_THRESHOLD".
+  var zoomedIn = zoom >= ZOOM_LABEL_THRESHOLD;
+  if (!rings && !zoomedIn) return;
   ctx.fillStyle = COLORS.label;
   ctx.font = '12px "IBM Plex Sans Var", system-ui, sans-serif';
   ctx.textBaseline = "middle";
   for (var i = 0; i < nodes.length; i++) {
     var n = nodes[i];
-    if (neighbors && !neighbors[n.id]) continue;
-    var r = Math.min(NODE_RADIUS_MAX, NODE_RADIUS_BASE + NODE_RADIUS_PER_LOG * Math.log2(1 + n.deg));
+    if (!shown[n.id]) continue;
+    var near = rings && (n.id === rings.focus || rings.first.has(n.id));
+    if (!near && !zoomedIn) continue;
+    var r = nodeRadius(n);
     // Position in CSS-Koordinaten (nach pan/zoom-Transform).
     var sx = n.x * zoom + panX;
     var sy = n.y * zoom + panY;
+    // Die Beschriftung folgt derselben Helligkeit wie der Knoten -- sonst leuchtet der Titel
+    // eines getroffenen Knotens weiter, obwohl der Knoten selbst gedimmt ist.
+    ctx.globalAlpha = nodeAlpha(n.id, rings, hits);
     ctx.fillText(truncate(n.title, 28), sx + r + 6, sy);
   }
+  ctx.globalAlpha = 1;
 }
+
 
 function nodeColor(n) {
   // Fix B (Plan §9.4.6 Befund B, 2026-09-02): der Knoten traegt jetzt own/writable in exakt
@@ -655,15 +964,25 @@ function truncate(s, n) {
   return s.length <= n ? s : s.slice(0, n - 1) + "\u2026";
 }
 
-function neighborSet(id, all) {
-  var set = Object.create(null);
-  set[id] = true;
+// P10.5 Block 8, Schritt 8.4: die Nachbarschaft als **Ringe**. `first` = die direkt
+// verbundenen Knoten, `second` = deren Nachbarn (ohne Fokus und ohne ersten Ring).
+// Vorher gab es nur `neighborSet` (ein flacher Kreis um den Fokus) -- der zweite Ring ist neu.
+function neighborRings(id, all) {
+  var first = new Set();
+  var second = new Set();
   for (var i = 0; i < all.length; i++) {
     var e = all[i];
-    if (e.src === id) set[e.dst] = true;
-    if (e.dst === id) set[e.src] = true;
+    if (e.src === id) first.add(e.dst);
+    if (e.dst === id) first.add(e.src);
   }
-  return set;
+  for (var j = 0; j < all.length; j++) {
+    var f = all[j];
+    var other = null;
+    if (first.has(f.src)) other = f.dst;
+    else if (first.has(f.dst)) other = f.src;
+    if (other && other !== id && !first.has(other)) second.add(other);
+  }
+  return { focus: id, first: first, second: second };
 }
 
 function resize() {
@@ -675,7 +994,438 @@ function resize() {
   canvasEl.width = Math.floor(cssWidth * dpr);
   canvasEl.height = Math.floor(cssHeight * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  // P10.5 Block 8, Schritt 8.7: im reduced-motion-Pfad wartet der Aufbau auf die erste Box
+  // mit echter Groesse -- auch das ohne requestAnimationFrame (0 Frames, Abnahme P10.5-40).
+  if (pendingReducedStart) {
+    pendingReducedStart = false;
+    startLayout();
+    return;
+  }
   draw();
+}
+
+// P10.5 Block 8, Schritt 8.6 (KA-3): die Auswahllisten tragen nur, was **im Bild** vorkommt.
+// Grund: eine Auswahl "Erledigt", die keine erledigte Aufgabe enthaelt, wuerde die Karte
+// leerzeichnen -- und der Nutzer wuerde nicht wissen, ob die Karte leer ist oder der Filter
+// zu streng. Die Werte selbst kommen aus den neun Feldern des Graph-Knotens (`type`,
+// `status`) -- **kein** zehntes Feld, keine API-Oeffnung (P10-D).
+function populateFilters() {
+  var types = Object.create(null);
+  var statuses = Object.create(null);
+  for (var i = 0; i < nodes.length; i++) {
+    if (nodes[i].type) types[nodes[i].type] = true;
+    if (nodes[i].status) statuses[nodes[i].status] = true;
+  }
+  pruneSelect(document.getElementById("overview-graph-filter-type"), types);
+  pruneSelect(document.getElementById("overview-graph-filter-status"), statuses);
+}
+
+function pruneSelect(el, present) {
+  if (!el || !el.options || typeof document === "undefined" || !document.createElement) return;
+  var keep = [];
+  for (var i = 0; i < el.options.length; i++) {
+    var opt = el.options[i];
+    if (!opt.value || present[opt.value]) keep.push(opt.value);
+  }
+  var current = el.value;
+  while (el.options.length) el.removeChild(el.options[0]);
+  for (var k = 0; k < keep.length; k++) {
+    var value = keep[k];
+    var option = document.createElement("option");
+    option.value = value;
+    option.textContent = value ? filterLabel(value) : "alle";
+    el.appendChild(option);
+  }
+  el.value = (keep.indexOf(current) >= 0) ? current : "";
+}
+
+// Die Beschriftung eines Filterwerts: Typen aus `TYPE_LABELS`, Statuse aus `STATUS_LABELS`.
+function filterLabel(value) {
+  if (TYPE_LABELS[value]) return TYPE_LABELS[value];
+  if (STATUS_LABELS[value]) return STATUS_LABELS[value];
+  return value;
+}
+
+// ============================================================================================
+// P10.5 Block 8, Schritt 8.1 — die Lappen (der Körper der Gehirnkarte)
+// ============================================================================================
+//
+// Die Pipeline ist die aus M6 (`phase10_inventory/probes/p10_m6_lobe_probe.py :: LOBE_PIPELINE`)
+// mit den zwei Aenderungen aus Plan 8.1: (a) die Zuordnung "naechster Knoten" ergibt den
+// **Space** des Knotens als Lappen-ID, und die **Furche** liegt dort, wo ein 4-Nachbar einem
+// anderen Space gehoert; (b) die Koerpermaske sind die Zellen innerhalb von `LOBE_REACH` um
+// den naechsten Knoten. Die Kontur ist eine Gittertreppe und wird ueber die Kantenmittelpunkte
+// geglaettet gezeichnet (organische Raender wie in der Vorlage C2). Kosten laut M6: 0,2-1,9 ms
+// je Lauf bei 200 Knoten -- **einmal** nach dem Einschwingen und nach dem Drag-Ende, nie je
+// Frame (Plan 8.1). Die Herleitung steht in `phase10_5_finishing/CLAUDE.md`.
+
+// Der Lappen-Zustand: {key, lobes: [{space, color, outer: [[x,y]…], inner: [[x,y]…]|null}]}.
+// `key` haelt fest, fuer welche Knotenmenge (Filter) er berechnet wurde.
+function computeLobes(shown) {
+  var list = [];
+  for (var i = 0; i < nodes.length; i++) {
+    if (!shown || shown[nodes[i].id]) list.push(nodes[i]);
+  }
+  if (!list.length) return null;
+
+  // -- Weltbereich: die Knoten plus der Reach-Radius -------------------------------------------------
+  var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (var j = 0; j < list.length; j++) {
+    var n = list[j];
+    if (n.x < minX) minX = n.x;
+    if (n.y < minY) minY = n.y;
+    if (n.x > maxX) maxX = n.x;
+    if (n.y > maxY) maxY = n.y;
+  }
+  minX -= LOBE_REACH;
+  minY -= LOBE_REACH;
+  maxX += LOBE_REACH;
+  maxY += LOBE_REACH;
+
+  // Zellgroesse: 8 px (Plan), aber gedeckelt, damit ein weit auseinandergezogenes Layout
+  // das Raster nicht explodieren laesst (Deckel LOBE_MAX_CELLS je Achse).
+  var cell = LOBE_CELL_PX;
+  var spanX = maxX - minX;
+  var spanY = maxY - minY;
+  if (spanX / cell > LOBE_MAX_CELLS) cell = spanX / LOBE_MAX_CELLS;
+  if (spanY / cell > LOBE_MAX_CELLS) cell = Math.max(cell, spanY / LOBE_MAX_CELLS);
+  var cols = Math.max(1, Math.ceil(spanX / cell));
+  var rows = Math.max(1, Math.ceil(spanY / cell));
+
+  // -- 1) Zuordnung: je Zelle der naechste Knoten (und damit sein Space) ----------------------
+  var assign = new Int32Array(cols * rows);      // Index des naechsten Knoten, -1 = ausserhalb
+  var spaceOf = new Array(cols * rows);           // der Space-Name (oder null)
+  var reachSq = LOBE_REACH * LOBE_REACH;
+  for (var gy = 0; gy < rows; gy++) {
+    var cy = minY + gy * cell + cell / 2;
+    for (var gx = 0; gx < cols; gx++) {
+      var cx = minX + gx * cell + cell / 2;
+      var best = -1;
+      var bestD = Infinity;
+      for (var k = 0; k < list.length; k++) {
+        var dx = list[k].x - cx;
+        var dy = list[k].y - cy;
+        var d = dx * dx + dy * dy;
+        if (d < bestD) { bestD = d; best = k; }
+      }
+      var idx = gy * cols + gx;
+      // (b) die Koerpermaske: nur Zellen innerhalb des Reach-Radius um den naechsten Knoten
+      if (best < 0 || bestD > reachSq) { assign[idx] = -1; spaceOf[idx] = null; continue; }
+      assign[idx] = best;
+      spaceOf[idx] = list[best].space || "";
+    }
+  }
+
+  // -- 2) Furche: ein 4-Nachbar aus einem anderen Space macht die Zelle zur Furche ----------
+  var furrow = new Uint8Array(cols * rows);
+  for (var fy = 0; fy < rows; fy++) {
+    for (var fx = 0; fx < cols; fx++) {
+      var fi = fy * cols + fx;
+      var mine = spaceOf[fi];
+      if (mine === null || mine === undefined) continue;
+      var different = false;
+      if (fx > 0 && spaceOf[fi - 1] !== null && spaceOf[fi - 1] !== undefined && spaceOf[fi - 1] !== mine) different = true;
+      if (!different && fx < cols - 1 && spaceOf[fi + 1] !== null && spaceOf[fi + 1] !== undefined && spaceOf[fi + 1] !== mine) different = true;
+      if (!different && fy > 0 && spaceOf[fi - cols] !== null && spaceOf[fi - cols] !== undefined && spaceOf[fi - cols] !== mine) different = true;
+      if (!different && fy < rows - 1 && spaceOf[fi + cols] !== null && spaceOf[fi + cols] !== undefined && spaceOf[fi + cols] !== mine) different = true;
+      if (different) furrow[fi] = 1;
+    }
+  }
+
+  // -- 3) Kontur je Space ----------------------------------------------------------------------
+  var spaces = Object.create(null);
+  for (var s = 0; s < list.length; s++) {
+    var sp = list[s].space || "";
+    if (!spaces[sp]) spaces[sp] = { name: sp, color: nodeColor(list[s]), cells: [] };
+  }
+  for (var ci = 0; ci < cols * rows; ci++) {
+    var space = spaceOf[ci];
+    if (space === null || space === undefined) continue;
+    if (furrow[ci]) continue;                 // die Furche gehoert zu keinem Lappen
+    if (!spaces[space]) continue;
+    spaces[space].cells.push(ci);
+  }
+
+  var lobes = [];
+  for (var key in spaces) {
+    if (!Object.prototype.hasOwnProperty.call(spaces, key)) continue;
+    var entry = spaces[key];
+    if (!entry.cells.length) continue;
+    var member = Object.create(null);
+    for (var m = 0; m < entry.cells.length; m++) member[entry.cells[m]] = true;
+    var outer = traceContour(member, cols, rows, cell, minX, minY);
+    if (!outer || !outer.length) continue;
+    // Die innere Kontur: dieselbe Zellmenge, dreimal erodiert (3 Zellen = 24 px) -- die
+    // "leise zweite Linie" der Vorlage C2.
+    var inner = traceContour(erode(member, cols, rows, LOBE_INNER_CELLS), cols, rows, cell, minX, minY);
+    lobes.push({ space: entry.name, color: entry.color, outer: outer, inner: inner && inner.length ? inner : null });
+
+  }
+  return { key: lobeKey(shown), lobes: lobes };
+}
+
+// Der Schluessel des Lappen-Zustands: welcher Filter stand bei der Berechnung.
+function lobeKey(shown) {
+  return filterType + "|" + filterStatus + "|" + (shown ? Object.keys(shown).length : 0);
+}
+
+// Erosion: Zellen, deren 4-Nachbarn alle zur Menge gehoeren. `times` Schritte.
+function erode(member, cols, rows, times) {
+  var current = member;
+  for (var t = 0; t < times; t++) {
+    var next = Object.create(null);
+    for (var key in current) {
+      if (!Object.prototype.hasOwnProperty.call(current, key)) continue;
+      var idx = Number(key);
+      var gx = idx % cols;
+      var gy = Math.floor(idx / cols);
+      if (gx === 0 || gy === 0 || gx === cols - 1 || gy === rows - 1) continue;
+      if (!current[idx - 1] || !current[idx + 1] || !current[idx - cols] || !current[idx + cols]) continue;
+      next[idx] = true;
+    }
+    current = next;
+  }
+  return current;
+}
+
+// Die Kontur einer Zellmenge: die Randkanten (Zelle drin, Nachbar draussen) als gerichtete
+// Kanten sammeln und zu geschlossenen Konturen verketten.
+//
+// **Es kann mehrere Konturen geben** -- bei 200 verstreuten Knoten ist die Region eines
+// Spaces nicht ein Fleck, sondern viele (der Reach-Radius um jeden Knoten). Frueher (2026-10-24,
+// derselbe Tag) wurde **nur die groesste** Kontur gezeichnet: die uebrigen Flecken des Spaces
+// fehlten im Bild, und die Karte zeigte bei 200 Knoten fast keine Lappen (gemessen an den
+// Kontur-Pixeln im Screenshot: 144 statt 509). Jetzt werden **alle** Konturen gezeichnet.
+function traceContour(member, cols, rows, cell, minX, minY) {
+  var edges = [];
+  for (var key in member) {
+    if (!Object.prototype.hasOwnProperty.call(member, key)) continue;
+    var idx = Number(key);
+    var gx = idx % cols;
+    var gy = Math.floor(idx / cols);
+    var x0 = minX + gx * cell;
+    var y0 = minY + gy * cell;
+    var x1 = x0 + cell;
+    var y1 = y0 + cell;
+    // Orientierung im Uhrzeigersinn (y nach unten): oben (x1→x0), links (y0→y1),
+    // unten (x0→x1), rechts (y1→y0). So laeuft die Kontur geschlossen um die Menge.
+    if (!member[idx - cols] && gy > 0) edges.push([x1, y0, x0, y0]);
+    if (!member[idx - 1] && gx > 0) edges.push([x0, y0, x0, y1]);
+    if (!member[idx + cols] && gy < rows - 1) edges.push([x0, y1, x1, y1]);
+    if (!member[idx + 1] && gx < cols - 1) edges.push([x1, y1, x1, y0]);
+  }
+  if (!edges.length) return null;
+  return chainEdges(edges);
+}
+
+// Die Kanten zu Konturen verketten: eine Kante beginnt dort, wo die vorige endet.
+function chainEdges(edges) {
+  var byStart = Object.create(null);
+  for (var i = 0; i < edges.length; i++) {
+    var k = edges[i][0] + "," + edges[i][1];
+    if (!byStart[k]) byStart[k] = [];
+    byStart[k].push(i);
+  }
+  var used = new Uint8Array(edges.length);
+  var loops = [];
+  for (var e = 0; e < edges.length; e++) {
+    if (used[e]) continue;
+    var startIdx = e;
+    var loop = [];
+    var current = e;
+    var guard = 0;
+    while (guard <= edges.length) {
+      guard += 1;
+      var edge = edges[current];
+      used[current] = 1;
+      loop.push([edge[0], edge[1]]);
+      var bucket = byStart[edge[2] + "," + edge[3]];
+      var next = -1;
+      if (bucket) {
+        for (var b = 0; b < bucket.length; b++) {
+          if (!used[bucket[b]]) { next = bucket[b]; break; }
+        }
+      }
+      if (next < 0) break;
+      current = next;
+      if (current === startIdx) break;
+    }
+    if (loop.length >= 3) loops.push(loop);
+  }
+  if (!loops.length) return null;
+  // Die Konturen sind alle gleich orientiert (die Randkanten sind gleich gerichtet), also
+  // fuellt die Non-Zero-Regel ihre Vereinigung -- und jede einzelne wird fuer sich gestrichen.
+  return loops.map(function (l) { return simplifyLoop(l); }).filter(function (l) { return l.length >= 3; });
+}
+
+// Gerade Kanten zusammenfassen: ein Punkt, der auf der Linie der beiden Nachbarn liegt,
+// traegt nichts zur Form bei.
+function simplifyLoop(pts) {
+  var out = [];
+  var n = pts.length;
+  for (var i = 0; i < n; i++) {
+    var prev = pts[(i - 1 + n) % n];
+    var cur = pts[i];
+    var next = pts[(i + 1) % n];
+    var cross = (cur[0] - prev[0]) * (next[1] - prev[1]) - (cur[1] - prev[1]) * (next[0] - prev[0]);
+    if (Math.abs(cross) < 1e-9) continue;
+    out.push(cur);
+  }
+  return out.length >= 3 ? out : pts;
+}
+
+// Die Kontur zeichnen: eine weiche Kurve durch die Mittelpunkte der Kanten (quadratische
+// Kurve mit den Originalpunkten als Kontrollpunkten). Das ist die Form der Vorlage C2 --
+// organische Raender statt einer Pixeltreppe.
+function traceSmooth(ctx, pts) {
+  var n = pts.length;
+  if (n < 3) return;
+  var mx = (pts[n - 1][0] + pts[0][0]) / 2;
+  var my = (pts[n - 1][1] + pts[0][1]) / 2;
+  ctx.moveTo(mx, my);
+  for (var i = 0; i < n; i++) {
+    var p = pts[i];
+    var q = pts[(i + 1) % n];
+    ctx.quadraticCurveTo(p[0], p[1], (p[0] + q[0]) / 2, (p[1] + q[1]) / 2);
+  }
+  ctx.closePath();
+}
+
+// Die Lappen zeichnen (Plan 8.1): die Kontur in der Space-Farbe, innen eine leise zweite
+// Linie in einem **dunkleren Ton desselben Tokens** (nicht ueber Alpha, P8 §0.3 Nr. 6).
+function drawLobes(shown) {
+  if (!lobeCache || lobeCache.key !== lobeKey(shown)) {
+    lobeCache = computeLobes(shown);
+  }
+  if (!lobeCache || !lobeCache.lobes.length) return;
+  for (var i = 0; i < lobeCache.lobes.length; i++) {
+    var lobe = lobeCache.lobes[i];
+    // Die Flaeche: derselbe Ton, sehr leise (die Vorlage C2 nutzt 5% Fuellung). Alle
+    // Konturen des Lappens liegen in **einem** Pfad -- die Non-Zero-Regel fuellt ihre
+    // Vereinigung (die Konturen sind gleich orientiert).
+    ctx.globalAlpha = 0.05;
+    ctx.fillStyle = lobe.color;
+    ctx.beginPath();
+    for (var o = 0; o < lobe.outer.length; o++) traceSmooth(ctx, lobe.outer[o]);
+    ctx.fill();
+    // Die Kontur: der Space-Ton, halb deckend (die Vorlage C2 nutzt 55%).
+    ctx.globalAlpha = 0.55;
+    ctx.strokeStyle = lobe.color;
+    ctx.lineWidth = 1.1;
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    for (var s = 0; s < lobe.outer.length; s++) traceSmooth(ctx, lobe.outer[s]);
+    ctx.stroke();
+    if (lobe.inner) {
+      // Die innere Linie: ein **dunklerer Ton** desselben Tokens -- als feste Farbe
+      // gerechnet, nicht als Alpha ueber dem Grund.
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = mixTone(lobe.color, CANVAS_SURFACE, 0.42);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (var n = 0; n < lobe.inner.length; n++) traceSmooth(ctx, lobe.inner[n]);
+      ctx.stroke();
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+
+// Zwei Farben mischen (feste Farbe, kein Alpha): `ratio` ist der Anteil der ersten Farbe.
+function mixTone(hex, bg, ratio) {
+  var a = hexToRgb(hex);
+  var b = hexToRgb(bg);
+  var r = Math.round(a[0] * ratio + b[0] * (1 - ratio));
+  var g = Math.round(a[1] * ratio + b[1] * (1 - ratio));
+  var bl = Math.round(a[2] * ratio + b[2] * (1 - ratio));
+  return "rgb(" + r + "," + g + "," + bl + ")";
+}
+
+function hexToRgb(hex) {
+  var h = String(hex).replace("#", "");
+  if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+  var v = parseInt(h, 16);
+  return [(v >> 16) & 255, (v >> 8) & 255, v & 255];
+}
+
+// ============================================================================================
+// P10.5 Block 8, Schritt 8.5 — das Layout merken (KA-2)
+// ============================================================================================
+//
+// Kein Serverzustand: der Ablageort ist der `localStorage` des Browsers, der Schluessel
+// `sfx:graph:layout:v1:<eigener Space>` (Plan 8.5), der Wert `{"v":1,"pos":{"<id>":[x,y]}}`
+// mit hoechstens 2000 Eintraegen. Gespeichert wird nach dem Einschwingen und nach dem
+// Drag-Ende (gedrosselt 1 s).
+
+function layoutKey() {
+  var space = state.ownSpace || "default";
+  return LAYOUT_KEY_PREFIX + space;
+}
+
+function loadStoredLayout() {
+  try {
+    if (typeof window === "undefined" || !window.localStorage) return {};
+    var raw = window.localStorage.getItem(layoutKey());
+    if (!raw) return {};
+    var data = JSON.parse(raw);
+    if (!data || data.v !== 1 || !data.pos) return {};
+    return data.pos;
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveLayout() {
+  try {
+    if (typeof window === "undefined" || !window.localStorage) return;
+    var pos = {};
+    var count = 0;
+    for (var i = 0; i < nodes.length && count < LAYOUT_MAX_ENTRIES; i++) {
+      var n = nodes[i];
+      pos[n.id] = [Math.round(n.x), Math.round(n.y)];
+      count += 1;
+    }
+    window.localStorage.setItem(layoutKey(), JSON.stringify({ v: 1, pos: pos }));
+    setGraphStatus("Layout gemerkt");
+  } catch (e) {
+    // localStorage kann gesperrt oder voll sein -- die Karte lebt weiter, nur die
+    // Erinnerung faellt aus. Kein Fehler nach oben: der Nutzer muss nichts merken.
+  }
+}
+
+// Gedrosselt: der erste Wunsch stellt den Timer, weitere werden nicht nachgestellt -- der
+// laufende Timer speichert ohnehin den dann aktuellen Stand. Das Flag statt der Timer-Nummer:
+// manche Testumgebungen fuehren `setTimeout` **synchron** aus, dann bliebe eine Timer-Nummer
+// stehen und das Drosseln wuerde stillstehen.
+function scheduleLayoutSave() {
+  if (layoutSavePending) return;
+  if (typeof window === "undefined" || !window.setTimeout) return;
+  layoutSavePending = true;
+  window.setTimeout(function () {
+    layoutSavePending = false;
+    saveLayout();
+  }, LAYOUT_SAVE_DELAY_MS);
+}
+
+// "Layout zurücksetzen": die Ablage loeschen **und** die sichtbare Karte auf den
+// deterministischen Seed zuruecksetzen -- sonst waere der Knopf eine Täuschung (der
+// Speicher waere leer, das Bild aber die alte Karte).
+function clearStoredLayout() {
+  try {
+    if (typeof window !== "undefined" && window.localStorage) {
+      window.localStorage.removeItem(layoutKey());
+    }
+  } catch (e) {
+    // siehe saveLayout()
+  }
+  pinnedIds = Object.create(null);
+  for (var i = 0; i < nodes.length; i++) {
+    nodes[i].pinned = false;
+    nodes[i].x = 0;
+    nodes[i].y = 0;
+  }
+  seedInitialPositions();
+  lobeCache = computeLobes(visibleNodes());
+  runSimulation();
 }
 
 function updateEmptyState() {
@@ -767,6 +1517,21 @@ function onMouseUp(e) {
     }
   }
   if (dragNode) {
+    // P10.5 Block 8: nach dem Drag-Ende werden die Lappen neu berechnet (Plan 8.1: "Berechnet
+    // wird einmal nach dem Einschwingen und nach dem Drag-Ende") und die Positionen gemerkt
+    // (Plan 8.5, gedrosselt 1 s).
+    lobeCache = computeLobes(visibleNodes());
+    // **Korrektur 2026-10-24 (an der Wegwerf-Instanz gemessen, Browser-Probe
+    // `p105_b8_karte_probe.py`):** der gezogene Knoten wird **gepinnt**, nicht wieder
+    // freigegeben. Vorher setzte `onMouseUp()` `fixed = false` -- der Knoten fiel damit
+    // zurueck in die Simulation, und die Ablage speicherte die **zurueckgezogene**
+    // Position: der Zug des Menschen war beim naechsten Oeffnen weg. (Die Simulation laeuft
+    // beim Zug in der Regel noch: das Ziehen dauert laenger als das Einschwingen.) Der
+    // Nutzer hat die Position **gewuellt** -- sie zu merken ist genau KA-2, und derselbe
+    // Weg wie bei der gemerkten Position (`seedInitialPositions()` setzt `pinned`).
+    dragNode.pinned = true;
+    pinnedIds[dragNode.id] = true;
+    scheduleLayoutSave();
     dragNode.fixed = false;
     dragNode = null;
   }
@@ -784,6 +1549,15 @@ function onMouseLeave() {
   }
   panStart = null;
   pressStart = null;
+  // **P10.5 Block 8, Korrektur 2026-10-24 (an der Wegwerf-Instanz gemessen, Browser-Probe
+  // `p105_b8_karte_probe.py`):** der Fokus gehoert zum Zeiger. Verlaesst der Zeiger das
+  // Canvas, endet der Fokus -- und mit ihm das Abdunkeln (Plan 8.4: "Ruhezustand ohne
+  // Fokus: alles voll deckend"). Vorher blieb `hoverId` stehen: die Karte blieb
+  // abgedunkelt, bis der Zeiger wieder ueber sie fuhr.
+  if (hoverId !== null) {
+    hoverId = null;
+    draw();
+  }
 }
 
 function onWheel(e) {

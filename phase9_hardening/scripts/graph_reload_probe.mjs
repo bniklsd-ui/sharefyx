@@ -28,8 +28,9 @@ const rafQueue = [];
 
 function makeCtx() {
   return {
-    strokes: [],      // [x1, y1, x2, y2] je ctx.stroke()
+    strokes: [],      // [x1, y1, x2, y2, quads] je gestrichenem Pfadsegment
     dashes: [],       // setLineDash()-Argumente in Aufrufreihenfolge
+    arcs: [],         // {x, y, r} je ctx.arc() -- die **Knotenpositionen**
     // **[2026-10-05, P9 Block settings] Frame-Grenzen statt geratenem Slice.** `draw()`
     // ruft genau einmal `clearRect()` am Anfang — das ist die einzige Stelle, an der der
     // echte Code einen Frame beginnt. Die V118-Messung nahm vorher `strokes.slice(-2)` und
@@ -38,6 +39,19 @@ function makeCtx() {
     // viel, ohne dass der Test es merkte. `frames` haelt die Striche je Frame, damit die
     // Messung eine Grenze liest statt eine zu setzen.
     frames: [],
+    // **[2026-10-24, P10.5 Block 8] Die Pfade werden erst beim `stroke()` uebernommen, und
+    // jeder Segmenttraeger zaehlt die quadratischen Kurven seines Pfades (Feld `quads`).
+    // Grund: der Graph zeichnet die Kanten jetzt als **quadratische Bézier** (Plan 8.2) und
+    // die Lappen als geschlossene Kurve mit **vielen** Quadratsegmenten (Plan 8.1); die Zelle
+    // zeichnet Fortsaetze als gerade Linien. "Eine Linie" im Sinne von V118 ist damit "ein
+    // Pfad mit **genau einer** quadratischen Kurve" -- die Kante. Vorher war jeder `lineTo`
+    // ein Segment, und die Lappen gab es nicht.
+    //
+    // Der Fill landet **nicht** in `strokes`: eine gefuellte Flaeche (die Lappenflaeche, der
+    // Zellkern) ist kein Strich. Das ist der Unterschied zur alten Fassung, die beim
+    // `lineTo` aufzeichnete -- dort gab es ausser den Kanten keine Pfade.
+    _path: [],
+    _quads: 0,
     _x: 0,
     _y: 0,
     setTransform() {},
@@ -46,16 +60,38 @@ function makeCtx() {
     restore() {},
     translate() {},
     scale() {},
-    beginPath() { this._x = 0; this._y = 0; },
+    beginPath() { this._x = 0; this._y = 0; this._quads = 0; this._path = []; },
     moveTo(x, y) { this._x = x; this._y = y; },
     lineTo(x, y) {
-      this.strokes.push([this._x, this._y, x, y]);
-      if (!this.frames.length) this.frames.push([]);
-      this.frames[this.frames.length - 1].push([this._x, this._y, x, y]);
+      this._path.push([this._x, this._y, x, y]);
+      this._x = x;
+      this._y = y;
     },
-    stroke() {},
-    arc() {},
-    fill() {},
+    quadraticCurveTo(cx, cy, x, y) {
+      this._quads += 1;
+      this._path.push([this._x, this._y, x, y]);
+      this._x = x;
+      this._y = y;
+    },
+    stroke() {
+      for (var i = 0; i < this._path.length; i++) {
+        this._path[i].push(this._quads);
+        this.strokes.push(this._path[i]);
+        if (!this.frames.length) this.frames.push([]);
+        this.frames[this.frames.length - 1].push(this._path[i]);
+      }
+      this._path = [];
+    },
+    arc(x, y, r) {
+      this.arcs.push({ x: x, y: y, r: r });
+      this._x = x;
+      this._y = y;
+    },
+    // **[2026-10-24, P10.5 Block 8]** `closePath()` kam mit den Lappen (Plan 8.1): die
+    // Kontur ist eine geschlossene Kurve. Der Pfad zaehlt kein Segment -- `closePath()`
+    // verbindet nur den Anfangs- mit dem Endpunkt.
+    closePath() {},
+    fill() { this._path = []; },
     fillText() {},
     setLineDash(d) { this.dashes.push(d.slice()); },
   };
@@ -189,11 +225,15 @@ function points(strokes) {
   strokes.forEach(([x1, y1, x2, y2]) => { out.add(x1 + "|" + y1); out.add(x2 + "|" + y2); });
   return out;
 }
-function distanceToNearest(strokes, x, y) {
+// **[2026-10-24, P10.5 Block 8] Die Abstandsmessung liest jetzt die **Knotenpositionen**
+// (die Kreise der Zellen) statt der Strichpunkte. Grund: seit Block 8 hat der Graph neben
+// den Kanten die Lappen (geschlossene Kurven) und die Fortsaetze der Zellen (gerade Linien)
+// -- Strichpunkte sind nicht mehr "die Knoten", und die Lappenpunkte koennten der
+// Kontrollmessung ("die Ablegestelle liegt weit vom Seed-Ring weg") in die Quante kommen.
+function distanceToNearest(arcs, x, y) {
   let best = Infinity;
-  points(strokes).forEach((p) => {
-    const [px, py] = p.split("|").map(Number);
-    best = Math.min(best, Math.hypot(px - x, py - y));
+  arcs.forEach((a) => {
+    best = Math.min(best, Math.hypot(a.x - x, a.y - y));
   });
   return best;
 }
@@ -230,6 +270,7 @@ flushOneFrame();
 runTicks(400);                       // die Simulation auslaufen lassen (ALPHA_DECAY 0.97 ≈ 151 Ticks)
 const firstFetches = fetchLog.length;
 const settledStrokes = canvasCtx.strokes.slice();
+const settledArcs = canvasCtx.arcs.slice();
 
 // Messgröße für "kein neuer Simulations-Loop": die Warteschlange muss beim Wiedereintritt **leer**
 // sein und danach leer bleiben. Ein liegengebliebener Rest-Tick der ersten Ladung würde den
@@ -267,12 +308,17 @@ const DROP_Y = 456;
 
 // Position von `itm_...a` aus dem letzten gezeichneten Frame holen: `drawEdges()` iteriert
 // `explicitEdges` in Payload-Reihenfolge, `moveTo` ist die Quelle.
+// **[2026-10-24, P10.5 Block 8]** Die Kante ist jetzt eine quadratische Bézier (Plan 8.2);
+// die gesuchte Zeile ist deshalb die mit **genau einer** quadratischen Kurve (`quads === 1`).
+// Die Lappen (viele Kurven) und die Fortsaetze der Zellen (keine) fallen heraus.
 function positionOfSource(strokes) {
-  const [x1, y1] = strokes[strokes.length - 1];
+  const edges = strokes.filter((s) => s[4] === 1);
+  if (!edges.length) return { x: 0, y: 0 };
+  const [x1, y1] = edges[edges.length - 1];
   return { x: x1, y: y1 };
 }
 
-const before = distanceToNearest(settledStrokes, DROP_X, DROP_Y);
+const before = distanceToNearest(settledArcs, DROP_X, DROP_Y);
 const srcPos = positionOfSource(settledStrokes);
 
 // Drag über die echten Event-Handler des Moduls (Maus-Press auf den Knoten, Ziehen, Loslassen).
@@ -287,10 +333,11 @@ graphPayloads = [
 setToken(overview(2, 2));      // Token wandert -> es MUSS neu geladen werden
 canvasCtx.strokes = [];
 canvasCtx.frames = [];
+canvasCtx.arcs = [];
 const fetchesBeforeRefetch = fetchLog.length;
 await graph.loadGraph();
 flushOneFrame();                        // resize() + seed + runSimulation() stellt den Tick ein
-const after = distanceToNearest(canvasCtx.strokes, DROP_X, DROP_Y);
+const after = distanceToNearest(canvasCtx.arcs, DROP_X, DROP_Y);
 
 results.p9_34_known_nodes_keep_their_position = {
   distance_before_drag: Math.round(before * 10) / 10,
@@ -396,9 +443,15 @@ tagsHandlers.forEach((fn) => fn({ target: tagsToggleEl }));   // wieder zurücks
 
 // **Der letzte Frame, an dem der Tag-Toggle noch an war** (siehe `frames` im Shim). Vorher
 // stand hier ein Slice mit geratener Laenge; die Laenge haengte an der Antwort, die gerade
-// gebaut wurde — ein Messaufbau, der von der erwarteten Loesung abhaengt.
+// gebaut wurde — sie haengt nicht von der erwarteten Loesung ab.
+//
+// **[2026-10-24, P10.5 Block 8] Aus dem Frame werden nur die **Kanten** gezählt** (ein Pfad
+// mit genau einer quadratischen Kurve). Seit Block 8 zeichnet der Graph neben den Kanten die
+// Lappen (eine geschlossene Kurve mit vielen Quadratsegmenten) und die Fortsaetze der Zellen
+// (gerade Linien) -- beide wuerden in der Zahl mitlaufen und die Aussage "eine Linie" zerlegen.
 const lastFrame = framesMitTags[framesMitTags.length - 1] || [];
-const drawn = lastFrame;
+const drawn = lastFrame.filter((s) => s[4] === 1);
+
 const counts = new Map();
 drawn.forEach((s) => {
   const key = s.join(",");

@@ -128,6 +128,38 @@
             <input type="checkbox" id="overview-graph-toggle-folders">
             <span>Ordner</span>
           </label>
+          <!-- P10.5 Block 8, Schritt 8.6 (KA-3): Suche und Filter. Die Auswahllisten tragen
+               alle moeglichen Werte im Markup; `graph.js` entfernt die, die im Bild nicht
+               vorkommen -- eine Auswahl ohne Treffer wuerde die Karte leerzeichnen, ohne
+               erklaerbaren Grund. -->
+          <input type="search" class="overview__graph-search" id="overview-graph-search"
+                 placeholder="Titel suchen" aria-label="Titel in der Karte suchen">
+          <label class="overview__graph-select">
+            <span class="overview__graph-select-label">Typ</span>
+            <select id="overview-graph-filter-type" aria-label="Nach Typ filtern">
+              <option value="">alle</option>
+              <option value="note">Notiz</option>
+              <option value="task">Aufgabe</option>
+            </select>
+          </label>
+          <label class="overview__graph-select">
+            <span class="overview__graph-select-label">Status</span>
+            <select id="overview-graph-filter-status" aria-label="Nach Status filtern">
+              <option value="">alle</option>
+              <option value="active">Aktiv</option>
+              <option value="open">Offen</option>
+              <option value="doing">In Arbeit</option>
+              <option value="done">Erledigt</option>
+            </select>
+          </label>
+          <!-- P10.5 Block 8, Schritt 8.5 (KA-2): das Layout merken bzw. zuruecksetzen. -->
+          <button type="button" class="overview__graph-reset" id="overview-graph-reset-layout">Layout zur&uuml;cksetzen</button>
+          <!-- P10.5 Block 8, Schritt 8.6 (KA-3): die Trefferzahl steht in einem **eigenen**
+               Feld. Vorher teilte sie sich mit der Statuszeile — und der Layout-Hinweis
+               ("Layout gemerkt") hat die Zahl ueberschrieben, sobald er nach dem Speichern
+               kam. Zwei Anzeigen, zwei Felder. -->
+          <span class="overview__graph-hits" id="overview-graph-hits" role="status"></span>
+          <span class="overview__graph-status" id="overview-graph-status" role="status"></span>
           <span class="overview__graph-zoom tnum" id="overview-graph-zoom"></span>
         </div>
         <canvas id="overview-graph-canvas" aria-label="Verkn&uuml;pfungsgraph"

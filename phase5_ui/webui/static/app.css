@@ -1272,7 +1272,11 @@ select.input:focus {
   left: calc(var(--space) * 1.5);
   display: flex;
   align-items: center;
+  flex-wrap: wrap;                                   /* P10.5 Block 8 (8.6): die Leiste waechst
+                                                         mit Suche und Filter -- umbrechen statt
+                                                         ueber den Canvas hinausragen */
   gap: calc(var(--space) * 2);
+  max-width: calc(100% - var(--space) * 3);
   padding: calc(var(--space) * 0.75) calc(var(--space) * 1.25);
   background: var(--surface-raised);
   border: 1px solid var(--line);
@@ -1299,6 +1303,62 @@ select.input:focus {
   font-size: var(--fs-meta);
   min-width: 3ch;
   text-align: right;
+}
+
+/* P10.5 Block 8, Schritt 8.5/8.6 (KA-2/KA-3): Suchfeld, Auswahllisten, Reset-Knopf und
+   Statuszeile der Karte. Die Form follows the app's own fields: `--surface` als Flaeche,
+   `--line` als Kante, `--text` als Schrift. Kein eigener Look, kein neuer Farbton. */
+.overview__graph-search {
+  min-width: 11ch;
+  padding: 3px calc(var(--space) * 0.75);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: var(--fs-meta);
+  font-family: inherit;
+}
+.overview__graph-search::placeholder { color: var(--text-faint); }
+.overview__graph-select {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--space) * 0.5);
+  cursor: pointer;
+  user-select: none;
+}
+.overview__graph-select-label { color: var(--text-faint); }
+.overview__graph-select select {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: var(--fs-meta);
+  font-family: inherit;
+  padding: 3px calc(var(--space) * 0.5);
+}
+.overview__graph-reset {
+  padding: 3px calc(var(--space) * 0.75);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: var(--fs-meta);
+  font-family: inherit;
+  cursor: pointer;
+}
+.overview__graph-reset:hover { color: var(--text); }
+.overview__graph-status {
+  color: var(--text-faint);
+  font-size: var(--fs-meta);
+  min-width: 8ch;
+}
+/* Die Trefferzahl der Suche (KA-3) — ein eigenes Feld neben der Statuszeile, damit der
+   Layout-Hinweis sie nicht ueberschreibt (Block 8, Schritt 8.6). */
+.overview__graph-hits {
+  color: var(--text);
+  font-size: var(--fs-meta);
+  min-width: 9ch;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Leerzustand-Hinweis (Plan §5 D2: kein Knoten mit Kante). Statisch in HTML, Sichtbarkeit
