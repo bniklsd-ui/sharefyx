@@ -620,6 +620,130 @@ class Store:
             self._clear_rename_marker()
             return betroffen
 
+    def rename_space(self, old: str, new: str, *, actor: str = "") -> int:
+        """**RE-3 (P1-Öffnung 14):** benennt einen Space um und gibt die Zahl der betroffenen
+        Items zurück.
+
+        **Warum das aufwendiger ist als ein Ordner-Umbenennen:** der Space-Namen steht **im
+        Frontmatter** jeder Item-Datei (§1.5) — er ist also **keine** abgeleitete Größe wie der
+        Ordner (RE-4). Verzeichnis und Frontmatter dürfen nie auseinanderlaufen (B2-Schutz), also
+        gilt hier die Semantik von `move()`: jedes Item des Spaces bekommt `space=new`,
+        `version+1`, `updated=now` und `updated_by=actor` (oder den bisherigen Wert, wenn kein
+        Actor genannt ist).
+
+        **Was passiert (unter beiden Locks):**
+        - Der neue Name wird nach **derselben Regel** geprüft wie beim Anlegen eines Spaces
+          (`acl.create_space()`: kein `/`, kein Punkt am Anfang, kein reservierter Name).
+        - **Marker** schreiben (9.4) → `os.rename(DATA_ROOT/<old>, DATA_ROOT/<new>)` (atomar,
+          gleiches Dateisystem) + `fsync` des Elternverzeichnisses.
+        - Jede Item-Datei unter dem neuen Verzeichnis (inkl. `_archive/`) wird mit `space: new`
+          neu geschrieben — **atomar je Datei**, **ohne** Einzel-Commit.
+        - `._trash/<old>` → `._trash/<new>`, falls vorhanden (die Dateien dort bleiben
+          **unverändert**: sie sind Historie, und `._trash` wird von keinem Scan gelesen).
+        - Die Index-Zeilen werden aus den **Dateien** neu gelesen (`index.row_from_file()`) — der
+          Index ist Ableitung (Hard Rule 2), er wird nie gerechnet.
+        - **Ein** Commit `rename-space <old>→<new>` → Marker löschen.
+
+        **Fremdverweise werden nicht angefasst.** Eine fremde `.share.yml`, die den alten Namen
+        nennt, und Items mit `assignee == old` bleiben, wie sie sind — sie zu „reparieren" wäre
+        eine stille Rechteänderung. Sie werden **gemeldet** (die Web-Fläche macht das vor dem
+        Aufruf, wie `_spaces_delete` es mit `orphan_refs` macht).
+
+        Autorisierung passiert **nicht** hier (wie überall im Store) — der Aufrufer prüft die
+        Rechte VOR diesem Call (die Web-Fläche: `permissions.is_team_space()` +
+        `permissions.manages_space()`; P10.5-M: **nur Team-Spaces**)."""
+        with self._lock, self._file_write_lock():
+            if not new or "/" in new or new.startswith(".") or new in files.RESERVED_DIR_NAMES:
+                raise ValidationError(f"'{new}' ist kein gültiger Space-Name.")
+            if old == new:
+                raise ValidationError(
+                    f"Der neue Name ist der alte — der Space '{old}' heisst bereits so."
+                )
+            alt_dir = self._data_root / old
+            neu_dir = self._data_root / new
+            if not alt_dir.is_dir():
+                raise ValidationError(f"Space '{old}' existiert nicht.")
+            if neu_dir.exists():
+                raise ValidationError(
+                    f"Space '{new}' existiert bereits — es wurde nichts bewegt."
+                )
+
+            self._ensure_rename_marker_ignored()
+            self._write_rename_marker({
+                "kind": "space", "old": old, "new": new,
+                "actor": actor, "started": _format_dt(self._now_fn()),
+            })
+            try:
+                self._rename_directory(alt_dir, neu_dir)
+                betroffen = self._rewrite_space_frontmatter(old, new, actor)
+                self._move_trash_dir(old, new)
+            except BaseException:
+                # Der Marker bleibt liegen: `Store.__init__` führt den Rename zu Ende (9.4).
+                raise
+            self._commit_rename(f"rename-space {old}→{new}", actor)
+            self._clear_rename_marker()
+            return betroffen
+
+    def _rewrite_space_frontmatter(self, old: str, new: str, actor: str) -> int:
+        """Schreibt **jede** Item-Datei des (bereits verschobenen) Space-Verzeichnisses mit
+        `space: new` neu. **Atomar je Datei, ohne Einzel-Commit** — der eine Commit des
+        Umbenennens kommt am Ende (Plan §9.3).
+
+        **Idempotent:** eine Datei, deren Frontmatter **nicht** mehr `old` sagt, wird **nicht**
+        angefasst. Das ist die Grundlage der Wiederaufnahme nach einem Absturz (9.4): die bereits
+        umgeschriebenen Dateien bekommen **keinen** zweiten Versionssprung.
+
+        Die Datei wird **an ihren Platz** geschrieben (`files.atomic_write()`), nicht umbenannt:
+        der Dateiname trägt die Item-ID und den Titel-Slug, und der Titel ändert sich nicht.
+        """
+        neu_dir = self._data_root / new
+        jetzt = self._now_fn()
+        betroffen = 0
+        for path in sorted(neu_dir.rglob("*.md")):
+            if path.name.startswith("."):
+                continue
+            try:
+                item = _item_from_text(path.read_text(encoding="utf-8"))
+            except (OSError, ValueError, KeyError) as exc:
+                # Eine kaputte Datei darf den Rename nicht abbrechen — aber sie wird **nicht**
+                # stillschweigend übergangen: `logger.critical`, und der Index zählt sie nicht.
+                logger.critical(
+                    "Space-Umbenennung: %s ist unlesbar (%s) — die Datei bleibt, wie sie ist.",
+                    path, exc,
+                )
+                continue
+            if item.space != old:
+                continue
+            neu_item = replace(
+                item, space=new, version=item.version + 1, updated=jetzt,
+                updated_by=actor or item.updated_by,
+            )
+            files.atomic_write(path, _item_to_text(neu_item))
+            index.upsert_item(self._conn, index.row_from_file(self._data_root, path))
+            betroffen += 1
+        return betroffen
+
+    def _move_trash_dir(self, old: str, new: str) -> None:
+        """`._trash/<old>` → `._trash/<new>`. Die Dateien darin bleiben **unverändert** — sie
+        sind Historie (ein gelöschtes Item trägt weiter sein altes `space:` im Frontmatter, und
+        das ist genau richtig: es war im alten Space).
+
+        Existiert **beide**, wird **nicht** zusammengeführt: ein Merge wäre ein Datenumbau ohne
+        Commit und ohne Index — und der Müll wird von keinem Scan gelesen. Der Fall wird
+        geloggt, nicht stillschweigend entschieden."""
+        trash_alt = self._data_root / TRASH_DIR / old
+        trash_neu = self._data_root / TRASH_DIR / new
+        if not trash_alt.is_dir():
+            return
+        if trash_neu.exists():
+            logger.critical(
+                "Space-Umbenennung: %s und %s existieren beide — der Müll wird nicht "
+                "zusammengefuehrt.", trash_alt, trash_neu,
+            )
+            return
+        trash_neu.parent.mkdir(parents=True, exist_ok=True)
+        self._rename_directory(trash_alt, trash_neu)
+
     def _reindex_moved_folder(self, space: str, alt: str, neu: str) -> int:
         """Zieht die Index-Zeilen der verschobenen Items nach. **Aus den Dateien**, nicht
         gerechnet: `index.row_from_file()` liest die Item-Datei am neuen Pfad und liefert
@@ -670,6 +794,8 @@ class Store:
         with self._lock, self._file_write_lock():
             if kind == "folder":
                 self._resume_folder_rename(marker)
+            elif kind == "space":
+                self._resume_space_rename(marker)
             else:
                 logger.critical(
                     "Rename-Marker mit unbekannter Art %r — der Marker bleibt liegen, "
@@ -697,6 +823,35 @@ class Store:
         self._reindex_moved_folder(space, alt, neu)
         self.rebuild_index()
         self._commit_rename(f"rename-folder {space}:{alt}→{neu}", actor)
+        self._clear_rename_marker()
+
+    def _resume_space_rename(self, marker: dict[str, Any]) -> None:
+        """Setzt einen unterbrochenen Space-Rename zu Ende. Idempotent auf drei Ebenen:
+
+        - Das Verzeichnis wandert **nur**, wenn `old` noch existiert und `new` noch nicht.
+        - Das Frontmatter wird **nur** dort umgeschrieben, wo es noch `old` sagt — eine bereits
+          umgeschriebene Datei bekommt **keinen** zweiten Versionssprung.
+        - Der Müll wandert **nur**, wenn `old` noch da ist.
+
+        Danach `rebuild_index()` (Hard Rule 2: der Index ist ableitbar — ein halb umbenannter
+        Index wird nie zur Wahrheit), ein Commit, und zuletzt wird der Marker gelöscht."""
+        old = str(marker.get("old", ""))
+        new = str(marker.get("new", ""))
+        actor = str(marker.get("actor", ""))
+        alt_dir = self._data_root / old
+        neu_dir = self._data_root / new
+        if alt_dir.is_dir() and not neu_dir.exists():
+            self._rename_directory(alt_dir, neu_dir)
+        elif not neu_dir.is_dir():
+            logger.critical(
+                "Rename-Wiederaufnahme: weder '%s' noch '%s' existiert — der Space ist weg.",
+                alt_dir, neu_dir,
+            )
+            return
+        self._rewrite_space_frontmatter(old, new, actor)
+        self._move_trash_dir(old, new)
+        self.rebuild_index()
+        self._commit_rename(f"rename-space {old}→{new}", actor)
         self._clear_rename_marker()
 
     @property

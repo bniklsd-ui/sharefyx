@@ -33,6 +33,18 @@ var spaceMemberReauthTotpEl;
 var spaceRemoveOpenEl;
 var spaceDetailCloseEl;
 
+// P10.5 Block 9 (RE-3): Space umbenennen. `pendingRenameSpace` haelt den **Space** fest,
+// solange der Dialog offen ist -- ein Space-Wechsel im Hintergrund (etwa durch ein
+// Overview-Neuladen) darf das Ziel nicht stillschweigend verschieben.
+var spaceRenameDialogEl;
+var spaceRenameHintEl;
+var spaceRenameErrorEl;
+var spaceRenameNameInputEl;
+var spaceRenameSubmitEl;
+var spaceRenameCancelEl;
+var spaceRenameOpenEl;
+var pendingRenameSpace = null;
+
 var spaceRemoveDialogEl;
 var spaceRemoveConsequenceEl;
 var spaceRemoveErrorEl;
@@ -81,6 +93,9 @@ function selectSpace(name) {
     spaceDetailNameEl.textContent = name;
     spaceDetailHomeHintEl.hidden = !info.home;
     spaceRemoveOpenEl.hidden = info.home;
+    // Umbenennen ist nur fuer Team-Spaces (P10.5-M) -- ein Home-Space traegt den Namen
+    // seines Principals; der Server weist ihn ohnehin ab, der Knopf wird nicht angeboten.
+    spaceRenameOpenEl.hidden = info.home;
     spaceMemberListEl.textContent = "";
     info.write.forEach(function (member) { spaceMemberListEl.appendChild(memberRow(name, member, true)); });
     info.read.forEach(function (member) { spaceMemberListEl.appendChild(memberRow(name, member, false)); });
@@ -164,6 +179,24 @@ function spaceRemoveError(message) {
   spaceRemoveErrorEl.hidden = false;
 }
 
+export function openRenameSpaceDialog(space) {
+  pendingRenameSpace = space;
+  spaceRenameErrorEl.hidden = true;
+  spaceRenameNameInputEl.value = space;
+  spaceRenameHintEl.textContent =
+    "Der Space " + space + " bekommt einen neuen Namen. Alle Items wandern mit, und jede "
+    + "Version springt einmal — der Space-Name steht in jeder Datei. Verweise auf den alten "
+    + "Namen (Freigaben, Zuordnungen) bleiben stehen und werden dir gemeldet.";
+  spaceRenameDialogEl.hidden = false;
+  spaceRenameNameInputEl.focus();
+  spaceRenameNameInputEl.select();
+}
+
+export function closeRenameSpaceDialog() {
+  spaceRenameDialogEl.hidden = true;
+  pendingRenameSpace = null;
+}
+
 export function openRemoveSpaceDialog(space) {
   spaceRemoveErrorEl.hidden = true;
   spaceRemoveReauthFieldsEl.hidden = true;
@@ -202,6 +235,13 @@ export function init() {
   spaceMemberReauthPasswordEl = document.getElementById("space-member-reauth-password");
   spaceMemberReauthTotpEl = document.getElementById("space-member-reauth-totp");
   spaceRemoveOpenEl = document.getElementById("space-remove-open");
+  spaceRenameOpenEl = document.getElementById("space-rename-open");
+  spaceRenameDialogEl = document.getElementById("space-rename-dialog");
+  spaceRenameHintEl = document.getElementById("space-rename-hint");
+  spaceRenameErrorEl = document.getElementById("space-rename-error");
+  spaceRenameNameInputEl = document.getElementById("space-rename-name-input");
+  spaceRenameSubmitEl = document.getElementById("space-rename-submit");
+  spaceRenameCancelEl = document.getElementById("space-rename-cancel");
   spaceDetailCloseEl = document.getElementById("space-detail-close");
 
   spaceRemoveDialogEl = document.getElementById("space-remove-dialog");
@@ -268,6 +308,33 @@ export function init() {
     });
   });
 
+  spaceRenameOpenEl.addEventListener("click", function () {
+    if (!selectedSpaceName) return;
+    openRenameSpaceDialog(selectedSpaceName);
+  });
+  spaceRenameCancelEl.addEventListener("click", closeRenameSpaceDialog);
+  spaceRenameSubmitEl.addEventListener("click", function () {
+    if (!pendingRenameSpace) return;
+    var alt = pendingRenameSpace;
+    var neu = spaceRenameNameInputEl.value.trim();
+    if (!neu) { spaceRenameNameInputEl.focus(); return; }
+    api("/spaces/" + encodeURIComponent(alt), {
+      method: "PATCH", body: JSON.stringify({ name: neu }),
+    }).then(function (result) {
+      closeRenameSpaceDialog();
+      var hinweis = "Space umbenannt · " + result.items + " Notiz(en) mitgezogen";
+      // Fremdverweise nennen: sie stehen still, der Mensch soll es wissen.
+      var verweise = (result.orphan_refs || []).length + (result.assignee_refs || []).length;
+      if (verweise) {
+        hinweis += " · " + verweise + " Verweis(e) auf den alten Namen bleiben";
+      }
+      return loadOverview().then(function () { toast(hinweis); });
+    }).catch(function (err) {
+      if (err.message === "unauthenticated") return;
+      spaceRenameErrorEl.textContent = err.message || "Umbenennen fehlgeschlagen.";
+      spaceRenameErrorEl.hidden = false;
+    });
+  });
   spaceRemoveOpenEl.addEventListener("click", function () {
     if (selectedSpaceName) openRemoveSpaceDialog(selectedSpaceName);
   });

@@ -262,6 +262,26 @@ _PATCH_FIELDS = frozenset({
 })
 
 
+def _alle_items(store, space: str) -> list:
+    """**Alle** Items eines Spaces — ohne Seitengrenze.
+
+    `_STORE_FETCH_LIMIT` ist eine echte Obergrenze, kein Seitenmaß: ein einzelner Aufruf über
+    einem großen Space prüfte sonst nur eine Teilmenge, meldete „sauber", und der Durchlauf
+    übersah den Rest. Genau der Fehler, den N8/N9 beim Space-Entfernen verhindern sollen.
+
+    Der Aufrufer hält dabei **nicht** den `.write.lock` (P7-M) — `store.search()` sperrt für
+    sich, in seiner eigenen Sektion."""
+    items = []
+    offset = 0
+    while True:
+        page = store.search(space=space, limit=_STORE_FETCH_LIMIT, offset=offset)
+        items.extend(page.items)
+        offset += len(page.items)
+        if len(items) >= page.total or not page.items:
+            break
+    return items
+
+
 def _map_store_error(exc: Exception, *, own_space: str) -> ApiError:
     if isinstance(exc, ItemNotFound):
         return ApiError("not_found", f"Item nicht gefunden: {exc.item_id}")
@@ -522,6 +542,76 @@ def api_routes(
             {"folder": created}, status_code=201, headers={"Cache-Control": "no-store"},
         )
 
+    async def _spaces_rename_space(request: Request) -> Response:
+        """**RE-3 (P10.5 Block 9):** benennt einen **Team-Space** um.
+
+        **Warum nur Team-Spaces (P10.5-M):** ein Home-Space traegt den Namen seines Principals —
+        die Auth-DB kennt ihn unter diesem Namen (`users.space`), und ein Umbenennen wuerde
+        Verzeichnis und Auth-DB trennen. Ein Team-Space hat keinen Principal; sein Name ist frei
+        und wird in keiner Auth-Zeile gefuehrt.
+
+        **Weitere Sperren:** der Actor muss den Space **verwalten**
+        (`permissions.manages_space()` — space-level `write:` in der `.share.yml`), und der neue
+        Name darf **kein Principal-Name** sein (`auth_store.get_user(new) is None`), sonst
+        wuerde der neue Name mit einem Home-Space kollidieren.
+
+        **Fremdverweise werden gemeldet, nicht angefasst:** fremde `.share.yml`-Dateien, die den
+        alten Namen nennen, und Items mit `assignee == <alter Name>` bleiben, wie sie sind — sie
+        zu reparieren waere eine stille Rechteaenderung. Sie stehen in der Antwort
+        (`orphan_refs`, `assignee_refs`), damit der Mensch sie kennt.
+
+        **Kein MCP-Werkzeug** (Lock P10.5-M, human-only wie RE-4).
+        """
+        session = await _require_session(request)
+        if not settings.space_admin_enabled:
+            raise ApiError("not_found", "Nicht gefunden.")
+        await _require_csrf_json(request, session)
+        space = request.path_params["space"]
+        if not permissions.is_team_space(space):
+            raise ApiError(
+                "forbidden",
+                "Nur Team-Spaces koennen umbenannt werden — ein Home-Space traegt den Namen "
+                "seines Principals.",
+            )
+        if not permissions.manages_space(session.space, space):
+            raise ApiError(
+                "forbidden", "Du verwaltest diesen Space nicht — es wurde nichts geaendert."
+            )
+        body = await _json_body(request)
+        neu = body.get("name")
+        if not isinstance(neu, str) or not neu.strip():
+            raise ApiError("validation_failed", "'name' ist Pflichtfeld (nicht-leerer str).")
+        neu = neu.strip()
+        if neu == space:
+            raise ApiError(
+                "validation_failed", f"Der neue Name ist der alte — der Space heisst bereits '{neu}'."
+            )
+        if auth_store.get_user(neu) is not None:
+            raise ApiError(
+                "validation_failed", f"'{neu}' ist ein bestehender Principal-Name."
+            )
+
+        # VORLAUF — reine Information, kein Schreibvorgang: welche fremden `.share.yml` den
+        # alten Namen nennen (`acl.spaces_referencing()`, dieselbe Pruefung wie beim
+        # Space-Entfernen) und welche Items den alten Namen als `assignee` tragen.
+        orphan_refs = acl.spaces_referencing(
+            store.data_root, space, exclude=store.data_root / space / acl.ACL_FILENAME,
+        )
+        assignee_refs = [
+            item.id for item in _alle_items(store, space) if item.assignee == space
+        ]
+
+        try:
+            betroffen = store.rename_space(space, neu, actor=session.space)
+        except (ValidationError, ValueError) as exc:
+            raise _map_store_error(exc, own_space=session.space) from exc
+
+        return JSONResponse(
+            {"from": space, "to": neu, "items": betroffen,
+             "orphan_refs": orphan_refs, "assignee_refs": assignee_refs},
+            headers={"Cache-Control": "no-store"},
+        )
+
     async def _spaces_rename_folder(request: Request) -> Response:
         """**RE-4 (P10.5 Block 9):** benennt einen Ordner im Space um.
 
@@ -693,14 +783,7 @@ def api_routes(
         # Aufruf über einem großen Space prüfte sonst nur eine Teilmenge, meldete "sauber", der
         # Durchlauf verschöbe nur diese Teilmenge, und Schritt 4 rmtree'te den Rest. Genau der
         # Datenverlust, den N8/N9 verhindern sollen.
-        items = []
-        offset = 0
-        while True:
-            page = store.search(space=space, limit=_STORE_FETCH_LIMIT, offset=offset)
-            items.extend(page.items)
-            offset += len(page.items)
-            if len(items) >= page.total or not page.items:
-                break
+        items = _alle_items(store, space)
         total = len(items)
 
         blockers = [
@@ -1569,6 +1652,10 @@ def api_routes(
             methods=["DELETE"],
         ),
         Route("/api/v1/spaces/{space}", _catch(_spaces_delete), methods=["DELETE"]),
+        # P10.5 Block 9 (RE-3): Space umbenennen — `PATCH` mit `{"name": "…"}`.
+        # **Nur Team-Spaces** (P10.5-M): ein Home-Space haengt am Principal-Namen, ein
+        # Umbenennen wuerde ihn von der Auth-DB trennen.
+        Route("/api/v1/spaces/{space}", _catch(_spaces_rename_space), methods=["PATCH"]),
         Route("/api/v1/meta", _catch(_meta), methods=["GET"]),
         Route("/api/v1/overview", _catch(_overview), methods=["GET"]),
         # Phase 8 Block B Step B3 (Plan §3 P8-M): Knoten + Kanten für die Graph-Ansicht.

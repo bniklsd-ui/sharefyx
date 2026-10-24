@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,56 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-24 (Block 9.2 RE-4 `rename_folder` gebaut und gemessen)
+
+**Ergebnis.** Block 9.2 steht: `Store.rename_folder(space, old, new, *, actor="") -> int` im
+Kern, die Web-Route `PATCH /api/v1/spaces/{space}/folders` und die Kontextaktion „Umbenennen"
+am Ordner im Baum (Rechtsklick → ein Menü mit einem Eintrag). **RE-4 ist damit im Kern
+geschlossen** — die billige Frontend-Fassung, die die `.share.yml` eines geteilten Ordners
+zurückließ, gibt es nicht mehr: die Freigabe wandert mit dem Verzeichnis.
+
+**Was der Kern tut.** Die Ordner stehen **nicht** im Frontmatter (der Pfad wird abgeleitet) —
+deshalb wird **keine** Item-Datei umgeschrieben und **keine** Version angehoben. Ablauf unter
+beiden Locks: beide Namen über `files.validate_folder()` → `old` muss existieren, `new` darf
+nicht existieren, `new` darf nicht unter `old` liegen → **Marker** (`DATA_ROOT/
+.rename-pending.json`, 9.4) → `os.rename` + `fsync` des Elternverzeichnisses → Index-Zeilen
+(`folder`, `path`) nachziehen → **ein** Commit `rename-folder <space>:<old>→<new>` → Marker
+löschen. Rückgabe: die Zahl der betroffenen Items.
+
+**Gemessen.** Wegwerf-Probe `probes/p105_b9_rename_folder_probe.py` **13/13 Zellen** (Port
+8799, PID-Datei, Stopp nur über die PID-Datei): HTTP 200 und `items == 1` · die Datei liegt am
+**neuen** Pfad, der alte Ordner ist weg · `version:` **1 → 1** · die `.share.yml` wandert mit ·
+**ein** Commit `rename-folder alpha:projekte→vorhaben` · der Index meldet `folder ==
+"vorhaben"` · **Gegenlauf**: Ziel existiert → **422** und **nichts** bewegt · Ziel unter dem
+alten Ordner → 422 · ohne CSRF → **403**, nichts bewegt. 11 neue Tests (`test_store.py` × 5,
+`test_api.py` × 4, `test_static_routes.py` × 2).
+
+**Ein Fund beim Bauen — das Register stand an der Grenze.** Die Abhakung von RE-4 hat das
+Baustellenregister über **40.960 B** gehoben (40.958 B — **2 B Luft**). Der Hebel war die
+`updated:`-Kette im L1-Kopf: neu `phase10_inventory/UPDATES_ARCHIVE.md` (L3, verbatim), 17
+Fäden rotiert (Skript `scripts/rotate_index_updates.sh`, sechs Gegenproben grün), Register
+**40.958 → 39.117 B**. Ein Archiv entsteht, ein Posten wird nicht gekürzt.
+
+**Ein Drift gegen den Plan, datiert.** Der Plan nennt **einen** Test
+`test_rename_folder_by_owner_and_team_writer` (Plan §9.5). Gebaut sind **zwei**
+(`…_by_owner`, `…_in_team_space_is_allowed`): der Gegenlauf zum gesperrten fremden
+Home-Space braucht getrennte Tests, sonst ist der „Gegenlauf" dieselbe Behauptung. Der
+Plan-Eintrag bekommt einen `[Nachtrag 2026-10-24]`.
+
+**Bewusst nicht gebaut:** kein MCP-Werkzeug (Lock P10.5-M: das Umbenennen ist **human-only**,
+RE-6-Linie) — der Agent darf Ordner nicht umbenennen.
+
+**Ausführer-Daten.** `opencode/MiniMax-M3.1-Flash`, Kontextgrenze **400.000** (P10.5-C
+erfüllt), keine Eingriffe des Nikingers in dieser Session.
+
+**Stand.** Branch `p105-block9`, Wegwerf-Instanz gestoppt und aufgeräumt. **P10.5-37 und
+P10.5-32 bleiben ⬜** (Augen-Urteil); das **Budget für `graph.js`** entscheidet der Nikinger.
+
+**Nächster Schritt.** (1) Deploy C (`v3.1.7`) durch den Nikinger, dann `health_gate.sh` mit
+echter Ausgabe in den Commit. (2) **Block 9.3** `Store.rename_space()` (RE-3, nur Team-Spaces,
+Frontmatter-Umschreiben, ein Commit) + der Space-Teil des Absturz-Markers. (3) Merge
+`p105-block9` → `main` **nach** dem Deploy.
 
 ## Session stopped — 2026-10-24 (Deploy C `v3.1.7` vorbereitet · Block 9.1 RE-7 `created_by` gebaut und gemessen)
 

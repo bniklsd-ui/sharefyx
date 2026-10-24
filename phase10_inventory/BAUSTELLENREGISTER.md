@@ -10,7 +10,7 @@ down:
   - ../docs/concepts/PHASE9_CLOSEOUT_HANDOVER.md  # Herkunft §4.1–§4.10
   - ENTSCHEIDUNGEN_ARCHIVE.md               # 📦 §12 Entscheidungsliste D-1–D-18, verbatim (2026-10-22 gewandert)
   - UPDATES_ARCHIVE.md                      # 📦 die älteren `updated:`-Fäden dieses Registers, verbatim (2026-10-24 rotiert)
-updated: 2026-10-24 (B9.2 ✅ — RE-4; RE-7 ✅ aus B9.1 nachgezogen) | ältere Einträge: phase10_inventory/UPDATES_ARCHIVE.md
+updated: 2026-10-24 (B9.3 ✅ — RE-3 Space umbenennen; B9.2 ✅ — RE-4) | ältere Einträge: phase10_inventory/UPDATES_ARCHIVE.md
 ---
 # Phase 10 — Baustellenregister
 
@@ -112,7 +112,7 @@ P10 Step 2) · Wissen (kein Bau, nur festgehalten) · erledigt (mit Beleg). „E
 |---|---|---|---|---|---|---|---|
 | RE-1 | Ordner in Team-Spaces anlegen | Block feedback | `phase5_ui/webui/api.py:459–460`: `space != session.space` → „Ordner können nur im eigenen Space angelegt werden." · **[2026-10-18]** D-17 ja, mit RE-2 als eine Regel für Web und MCP | S | R | D-17 | ✅ 10-9 (B2.5 + Nachzug 10-22) |
 | RE-2 | MCP `update_item`: Ordner wechseln in Team-Spaces | Block feedback, Handover §6 | `phase2_mcp/mcpserver/tools.py:752` erlaubt `folder` nur dem Eigentümer-Space; die Web-Oberfläche darf es seit E1a (P9-BG/BP) → zwei Wege, zwei Regeln | S | R | nein (Parität) | ✅ 10-9 (B2.5) |
-| RE-3 | Space umbenennen (V194) | feedback E2 | es gibt keine Umbenenn-Funktion (`spacectl.py`, `storage/`). Verweise: Verzeichnis, `.share.yml`, Mitglieder, Index, Links, Auth (`users.space`), `assignee` (Space-Name ohne Validierung, V160) · **[2026-10-18]** D-17 ja (L) | L | R, F, A | D-17 | P10.5 |
+| RE-3 | Space umbenennen (V194) | feedback E2 | es gibt keine Umbenenn-Funktion (`spacectl.py`, `storage/`). Verweise: Verzeichnis, `.share.yml`, Mitglieder, Index, Links, Auth (`users.space`), `assignee` (Space-Name ohne Validierung, V160) · **[2026-10-18]** D-17 ja (L) · **[2026-10-24, B9.3]** `Store.rename_space()` im Kern: Verzeichnis **und** Frontmatter wandern (der Space-Name steht im Frontmatter), ein Commit, `version+1` je Item; **nur Team-Spaces** (P10.5-M); Fremdverweise (`.share.yml`, `assignee`) werden **gemeldet, nicht angefasst**; Wegwerf 15/15 | L | R, F, A | D-17 | ✅ 10-24 (B9.3) |
 | RE-4 | Ordner umbenennen (V193) | P9-Plan §15 | die billige Frontend-Fassung lässt die `.share.yml` eines geteilten Ordners zurück (P8.6-Plan §0.4.1) · **[2026-10-18]** D-17 ja · **[2026-10-24, B9.2]** `Store.rename_folder()` im Kern: ein Commit, **keine** Version angehoben (Ordner stehen nicht im Frontmatter), die `.share.yml` wandert mit; Web `PATCH …/folders` (Rechte wie RE-1), UI-Kontextaktion; Wegwerf 13/13 | M | R | D-17 | ✅ 10-24 (B9.2) |
 | RE-5 | Verschieben in fremde Spaces | P9-Plan §15 | `store.move()` und P6-AE existieren; offen ist die Regel, nicht der Code · **[2026-10-18]** **Niemand verschiebt je ein Item in den Home-Space eines anderen** — das zählt wie Löschen dort als destruktive Aktion. Verschieben in Team-Spaces mit `write:` bleibt erlaubt (P6-AE, P9-BP) | S | R | D-17 | ✅ 10-10 (B2.5) |
 | RE-6 | Rechteverwaltung über MCP (P6-M) | Ledger | Hard Rule 4: die Freigabeliste ist „über kein Item-Tool änderbar"; P6-17 belegt, dass kein Tool `share_*` setzt · **[2026-10-18]** nicht gewählt | M | R, A | D-17 | verworfen |

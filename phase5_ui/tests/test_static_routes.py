@@ -2504,3 +2504,41 @@ def test_the_rename_dialog_sends_a_patch_with_from_and_to():
     assert '"/folders"' in js
     assert 'from: target.folder' in js
     assert 'to: neu' in js
+
+
+def test_the_space_detail_offers_a_rename_only_for_team_spaces():
+    """**RE-3 (P10.5 Block 9):** der Knopf „Space umbenennen" steht im Space-Detail-Panel —
+    und er wird **nur für Team-Spaces** angeboten (`info.home` blendet ihn aus, dieselbe
+    Bedingung wie beim „Space entfernen"-Knopf).
+
+    Der Wächter prüft beide Haelften: **der Knopf existiert** (sonst gäbe es die Funktion gar
+    nicht) und **die Bedingung** (ein Home-Space traegt den Namen seines Principals — P10.5-M).
+    """
+    html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
+    assert 'id="space-rename-open"' in html
+    assert 'id="space-rename-dialog"' in html
+    assert 'id="space-rename-name-input"' in html
+    assert 'id="space-rename-submit"' in html
+
+    js = (DEFAULT_STATIC_DIR / "js" / "spaces.js").read_text("utf-8")
+    # Die beiden Bedingungen stehen **nebeneinander** — dazwischen steht nur ein Kommentar.
+    block = re.search(
+        r"spaceRemoveOpenEl\.hidden = info\.home;(.*?)spaceRenameOpenEl\.hidden = info\.home;",
+        js, re.DOTALL,
+    )
+    assert block, "die Home-Space-Bedingung fuer den Umbenennen-Knopf nicht gefunden"
+    # Und dazwischen steht **nur** ein Kommentar -- kein weiterer Code, der die Rechte
+    # zwischen den beiden Bedingungen veraendern wuerde.
+    zwischen = block.group(1)
+    assert "=" not in zwischen.replace("==", ""), zwischen
+
+
+def test_the_space_rename_sends_a_patch_with_the_new_name():
+    """Die Aktion spricht **die Route** an, die der Server gebaut hat:
+    `PATCH /spaces/{space}` mit `{"name": "…"}`.
+
+    Der Wächter prüft die Methode **und** den Body — ein `POST` waere ein stiller Erfolg ohne
+    Umbenennen, und ein Body ohne `name` wuerde den Server mit 422 zurueckweisen."""
+    js = (DEFAULT_STATIC_DIR / "js" / "spaces.js").read_text("utf-8")
+    assert 'method: "PATCH"' in js
+    assert "JSON.stringify({ name: neu })" in js

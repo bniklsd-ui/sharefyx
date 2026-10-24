@@ -1983,3 +1983,132 @@ async def test_rename_folder_needs_csrf_and_rejects_a_missing_target(
     assert belegt.json()["error"] == "validation_failed"
     assert unvollstaendig.status_code == 422
     assert unvollstaendig.json()["error"] == "validation_failed"
+
+
+# -- P10.5 Block 9: RE-3 Space umbenennen über REST -------------------------------------------
+#
+# Drei Behauptungen: ein **Team-Space** darf umbenannt werden, ein **Home-Space** wird
+# abgelehnt (P10.5-M), und ein Name, der schon vergeben ist (existierender Space oder
+# Principal), wird abgelehnt — **ohne** dass sich etwas bewegt.
+
+
+@pytest.mark.asyncio
+async def test_rename_team_space(full_app_items, item_store, tmp_path, totp_code):
+    """Der Team-Space wird umbenannt: die Items sagen danach den neuen Space, die **Version
+    springt einmal** (die Semantik von `move()` — der Space-Name steht im Frontmatter), und die
+    **Fremdverweise werden gemeldet, nicht angefasst**."""
+    item = item_store.create(FOREIGN_SPACE, type="note", title="Team-Notiz", assignee=FOREIGN_SPACE)
+    _team(tmp_path)
+    # Eine fremde `.share.yml`, die den alten Namen nennt — sie darf **nicht** angefasst werden.
+    fremd = tmp_path / "data" / SPACE / "fremd"
+    fremd.mkdir(parents=True, exist_ok=True)
+    (fremd / ".share.yml").write_text(f"read: [{FOREIGN_SPACE}]\n", encoding="utf-8")
+    version_vorher = item.version
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.patch(
+            f"/api/v1/spaces/{FOREIGN_SPACE}",
+            json={"name": "team-neu"},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["from"] == FOREIGN_SPACE
+    assert body["to"] == "team-neu"
+    assert body["items"] == 1
+    # Die Fremdverweise stehen in der Antwort — angefasst wurde nichts.
+    assert body["orphan_refs"], "die fremde .share.yml muss gemeldet werden"
+    assert body["assignee_refs"] == [item.id]
+    assert (fremd / ".share.yml").read_text(encoding="utf-8") == f"read: [{FOREIGN_SPACE}]\n"
+    # Und die Datei sagt den neuen Space, die Version ist +1.
+    gelesen = item_store.get(item.id)
+    assert gelesen.space == "team-neu"
+    assert gelesen.version == version_vorher + 1
+
+
+@pytest.mark.asyncio
+async def test_rename_home_space_is_refused(full_app_items, item_store, store, tmp_path, totp_code):
+    """**P10.5-M:** ein **Home-Space** wird abgelehnt — sein Name ist der Name seines
+    Principals; ein Umbenennen würde Verzeichnis und Auth-DB trennen."""
+    item_store.create(SPACE, type="note", title="Eigen")
+    _make_home(store)
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.patch(
+            f"/api/v1/spaces/{SPACE}",
+            json={"name": "anders"},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 403, response.text
+    assert response.json()["error"] == "forbidden"
+    # Nichts bewegt: der Space steht noch, mit seiner Datei.
+    assert (tmp_path / "data" / SPACE).is_dir()
+    assert item_store.get(item_store.search(space=SPACE, limit=1).items[0].id).space == SPACE
+
+
+@pytest.mark.asyncio
+async def test_rename_space_to_existing_or_user_name_is_refused(
+    full_app_items, item_store, store, tmp_path, totp_code
+):
+    """**Gegenlauf:** ein **existierender** Space-Name und ein **Principal-Name** werden
+    abgelehnt — ohne dass sich etwas bewegt."""
+    item_store.create(FOREIGN_SPACE, type="note", title="Team")
+    item_store.create("belegt", type="note", title="Belegt")
+    _team(tmp_path)
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        existiert = await client.patch(
+            f"/api/v1/spaces/{FOREIGN_SPACE}",
+            json={"name": "belegt"},
+            headers=_headers(csrf),
+        )
+        principal = await client.patch(
+            f"/api/v1/spaces/{FOREIGN_SPACE}",
+            json={"name": SPACE},
+            headers=_headers(csrf),
+        )
+        ohne_csrf = await client.patch(
+            f"/api/v1/spaces/{FOREIGN_SPACE}",
+            json={"name": "team-neu"},
+        )
+    assert existiert.status_code == 422, existiert.text
+    assert existiert.json()["error"] == "validation_failed"
+    assert principal.status_code == 422, principal.text
+    assert ohne_csrf.status_code == 403
+    # Nichts bewegt: beide Spaces stehen noch.
+    assert (tmp_path / "data" / FOREIGN_SPACE).is_dir()
+    assert (tmp_path / "data" / "belegt").is_dir()
+    assert not (tmp_path / "data" / "team-neu").exists()
+
+
+@pytest.mark.asyncio
+async def test_rename_space_reports_foreign_references_without_touching_them(
+    full_app_items, item_store, tmp_path, totp_code
+):
+    """**RE-3, der Fremdverweis-Teil:** eine fremde `.share.yml`, die den alten Space-Namen
+    nennt, und ein Item mit `assignee == <alter Name>` werden **gemeldet, nicht angefasst**.
+
+    Das Reparieren waere eine **stille Rechteaenderung** — ein Fremdverweis wird nicht
+    umgeschrieben, sondern dem Menschen gesagt. Der Test prueft beides: gemeldet **und**
+    unveraendert."""
+    item = item_store.create(FOREIGN_SPACE, type="note", title="Team", assignee=FOREIGN_SPACE)
+    _team(tmp_path)
+    fremd = tmp_path / "data" / SPACE / "fremd"
+    fremd.mkdir(parents=True, exist_ok=True)
+    (fremd / ".share.yml").write_text(f"read: [{FOREIGN_SPACE}]\n", encoding="utf-8")
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.patch(
+            f"/api/v1/spaces/{FOREIGN_SPACE}",
+            json={"name": "team-neu"},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["orphan_refs"], "die fremde .share.yml muss gemeldet werden"
+    assert body["assignee_refs"] == [item.id]
+    # **Unangetastet:** die fremde Freigabe nennt weiter den alten Namen, und das Item traegt
+    # denselben `assignee`.
+    assert (fremd / ".share.yml").read_text(encoding="utf-8") == f"read: [{FOREIGN_SPACE}]\n"
+    gelesen = item_store.get(item.id)
+    assert gelesen.assignee == FOREIGN_SPACE

@@ -570,6 +570,10 @@
         </label>
       </div>
       <div class="overlay__actions">
+        <!-- P10.5 Block 9 (RE-3): Umbenennen ist nur fuer **Team-Spaces** moeglich
+             (P10.5-M) -- der Server weist einen Home-Space ohnehin ab, der Knopf wird
+             also gar nicht erst angeboten. -->
+        <button type="button" class="btn" id="space-rename-open">Space umbenennen</button>
         <button type="button" class="btn" id="space-remove-open">Space entfernen</button>
         <button type="button" class="btn" id="space-detail-close">Schlie&szlig;en</button>
       </div>
@@ -611,6 +615,24 @@
     <div class="overlay__actions">
       <button type="button" class="btn-primary" id="space-remove-submit">Entfernen</button>
       <button type="button" class="btn" id="space-remove-cancel">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- P10.5 Block 9 (RE-3): Space umbenennen. Der Dialog sagt, **was** passiert: die Items
+     wandern mit, jede Version springt einmal (der Space-Name steht im Frontmatter), und
+     Verweise auf den alten Namen bleiben stehen -- sie werden gemeldet, nicht repariert. -->
+<div class="overlay" id="space-rename-dialog" hidden>
+  <div class="overlay__panel">
+    <h2>Space umbenennen</h2>
+    <p class="overlay__hint" id="space-rename-hint"></p>
+    <p class="form-error" id="space-rename-error" hidden></p>
+    <label>Neuer Name
+      <input type="text" class="input" id="space-rename-name-input">
+    </label>
+    <div class="overlay__actions">
+      <button type="button" class="btn-primary" id="space-rename-submit">Umbenennen</button>
+      <button type="button" class="btn" id="space-rename-cancel">Abbrechen</button>
     </div>
   </div>
 </div>

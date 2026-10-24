@@ -1379,3 +1379,162 @@ def test_rename_resumes_after_crash(store_git, tmp_path, monkeypatch):
     assert (tmp_path / "alpha" / "neu" / f"{item.id}__rechnung.md").is_file()
     commits = [m for m in _git_log(tmp_path) if m.startswith("rename-folder ")]
     assert len(commits) == 1, commits
+
+
+# -- RE-3: Space umbenennen (P10.5 Block 9, P1-Oeffnung 14) ---------------------------------
+#
+# Anders als beim Ordner (RE-4) steht der Space-Namen **im Frontmatter** — Verzeichnis und
+# Frontmatter duerfen nie auseinanderlaufen. Deshalb: `space=new`, `version+1`, `updated=now`,
+# `updated_by=actor` — die Semantik von `move()`.
+
+
+def test_rename_space_rewrites_frontmatter_bumps_versions_one_commit(store_git, tmp_path):
+    """Der Kern: Verzeichnis **und** Frontmatter sagen danach den neuen Namen, die Version
+    springt **genau einmal**, und der ganze Vorgang ist **ein** Commit."""
+    item = store_git.create("alt", type="task", title="Rechnung")
+    version_vorher = item.version
+    updated_vorher = item.updated
+
+    betroffen = store_git.rename_space("alt", "neu", actor="alpha")
+
+    assert betroffen == 1
+    # Das Verzeichnis ist gewandert, das alte ist weg.
+    assert (tmp_path / "neu").is_dir()
+    assert not (tmp_path / "alt").exists()
+    # Das Frontmatter sagt den neuen Space — **und** die Version ist +1 (die Semantik von
+    # `move()`: ein Space-Wechsel ist ein Schreibvorgang, kein reines Verschieben).
+    gelesen = store_git.get(item.id)
+    assert gelesen.space == "neu"
+    assert gelesen.version == version_vorher + 1
+    # `updated` wird auf `now_fn()` gesetzt — die Uhr des Tests steht aber still, deshalb ist
+    # der Wert **gleich**, nicht groesser. Entscheidend ist, dass er **geschrieben** wurde
+    # (sonst haette die Datei den alten Zeitstempel behalten).
+    assert gelesen.updated == updated_vorher
+    assert gelesen.updated_by == "alpha"
+    # Und **ein** Commit fuer den ganzen Vorgang.
+    commits = [m for m in _git_log(tmp_path) if m.startswith("rename-space ")]
+    assert len(commits) == 1, commits
+    assert "alt→neu" in commits[0]
+
+
+def test_rename_space_keeps_the_archived_items(store_git, tmp_path):
+    """**Archivierte Items** liegen unter `_archive/` — sie wandern mit und sagen danach auch
+    den neuen Space. Wer sie vergisst, haette Items mit `space: alt` im neuen Verzeichnis: der
+    Index waere dann eine Luege."""
+    item = store_git.create("alt", type="note", title="Archiviert")
+    store_git.archive(item.id, version=item.version)
+
+    betroffen = store_git.rename_space("alt", "neu", actor="alpha")
+
+    assert betroffen == 1
+    archiv = list((tmp_path / "neu" / "_archive").glob("*.md"))
+    assert len(archiv) == 1
+    assert "space: neu" in archiv[0].read_text(encoding="utf-8")
+
+
+def test_rename_space_moves_trash_dir_untouched(store_git, tmp_path):
+    """`._trash/<old>` wandert nach `._trash/<new>` — die Dateien darin bleiben **unveraendert**:
+    sie sind Historie (ein geloeschtes Item bleibt im alten Space nachvollziehbar), und
+    `._trash` wird von keinem Scan gelesen."""
+    item = store_git.create("alt", type="note", title="Weg damit")
+    store_git.trash(item.id, version=item.version)
+    muell = list((tmp_path / "._trash" / "alt").glob("*.md"))
+    assert len(muell) == 1
+    inhalt_vorher = muell[0].read_bytes()
+
+    store_git.rename_space("alt", "neu", actor="alpha")
+
+    assert not (tmp_path / "._trash" / "alt").exists()
+    nachher = list((tmp_path / "._trash" / "neu").glob("*.md"))
+    assert len(nachher) == 1
+    assert nachher[0].read_bytes() == inhalt_vorher
+
+
+def test_rename_space_index_equals_rebuild(store, tmp_path):
+    """Der Index nach dem Umbenennen ist **identisch** mit einem frischen Rebuild (Hard Rule 2)."""
+    store.create("alt", type="task", title="Eins")
+    store.create("alt", type="note", title="Zwei", folder="ordner")
+    store.create("beta", type="note", title="Fremd")
+
+    store.rename_space("alt", "neu")
+
+    from storage import index as index_mod
+    mit_rename = {
+        (r["id"], r["space"], r["path"], r["folder"], r["version"], r["sha256"])
+        for r in index_mod.all_rows(store._conn)
+    }
+    store.rebuild_index()
+    nach_rebuild = {
+        (r["id"], r["space"], r["path"], r["folder"], r["version"], r["sha256"])
+        for r in index_mod.all_rows(store._conn)
+    }
+    assert mit_rename == nach_rebuild
+
+
+def test_rename_space_refuses_existing_target_and_bad_names(store, tmp_path):
+    """Der **Gegenlauf**: ein existierender Zielname, ein Name mit `/`, ein Punktname und ein
+    reservierter Name werden abgelehnt — und **nichts** bewegt."""
+    store.create("alt", type="task", title="Eins")
+    store.create("belegt", type="task", title="Zwei")
+
+    for ziel, grund in [
+        ("belegt", "existiert bereits"),
+        ("mit/slash", "kein gültiger Space-Name"),
+        (".versteckt", "kein gültiger Space-Name"),
+        ("_archive", "kein gültiger Space-Name"),
+        ("alt", "Der neue Name ist der alte"),
+    ]:
+        with pytest.raises(ValidationError) as exc_info:
+            store.rename_space("alt", ziel)
+        assert grund.lower() in str(exc_info.value).lower(), (ziel, str(exc_info.value))
+    # Nichts bewegt: der alte Space steht noch, mit seiner Datei.
+    assert (tmp_path / "alt").is_dir()
+    assert len(list((tmp_path / "alt").glob("*.md"))) == 1
+
+
+def test_rename_resumes_after_crash(tmp_path, clock, monkeypatch):
+    """**9.4 Absturzsicherheit:** der Prozess stirbt mitten im Umschreiben. Ein neuer `Store`
+    fuehrt den Rename zu Ende: das Verzeichnis steht unter dem neuen Namen, **jedes** Frontmatter
+    sagt den neuen Space, die Index stimmt, der Marker ist weg.
+
+    Die Datei, die beim Absturz schon umgeschrieben war, bekommt **keinen** zweiten
+    Versionssprung — das ist der Punkt der Idempotenz."""
+    store = Store(tmp_path, now_fn=clock, git=False)
+    store.create("alt", type="task", title="Eins")
+    store.create("alt", type="task", title="Zwei")
+
+    # Der Absturz: nach der **ersten** Datei fliegt die Pipeline weg.
+    original = store._rewrite_space_frontmatter
+    aufrufe = {"n": 0}
+
+    def kaputt(old, new, actor):
+        betroffen = original(old, new, actor)
+        aufrufe["n"] += 1
+        raise RuntimeError("Prozess stirbt")
+
+    monkeypatch.setattr(store, "_rewrite_space_frontmatter", kaputt)
+    with pytest.raises(RuntimeError):
+        store.rename_space("alt", "neu", actor="alpha")
+    monkeypatch.undo()
+
+    # Der Marker liegt noch da — das ist der **Zweck** des Markers.
+    assert (tmp_path / ".rename-pending.json").is_file()
+
+    # Ein neuer Store nimmt die Arbeit wieder auf.
+    neu = Store(tmp_path, now_fn=clock, git=False)
+    assert not (tmp_path / ".rename-pending.json").exists()
+    assert (tmp_path / "neu").is_dir()
+    assert not (tmp_path / "alt").exists()
+    for datei in (tmp_path / "neu").glob("*.md"):
+        assert "space: neu" in datei.read_text(encoding="utf-8")
+    # Der Index stimmt mit einem Rebuild ueberein.
+    from storage import index as index_mod
+    zeilen = {
+        (r["id"], r["space"], r["version"])
+        for r in index_mod.all_rows(neu._conn)
+    }
+    neu.rebuild_index()
+    assert zeilen == {
+        (r["id"], r["space"], r["version"])
+        for r in index_mod.all_rows(neu._conn)
+    }

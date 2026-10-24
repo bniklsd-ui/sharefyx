@@ -11,7 +11,7 @@ down:
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
   - UPDATES_ARCHIVE.md                              # 📦 die älteren `updated:`-Fäden dieses Heads, verbatim
   - STARTUPTRAG_ARCHIVE.md                          # 📦 die Startaufträge der Blöcke 7 und 9, verbatim
-updated: 2026-10-24 (Block 9.2 RE-4 `rename_folder` gebaut und gemessen — Kern + Web-Route `PATCH …/folders` + UI-Kontextaktion, Wegwerf-Probe 13/13; **der Plan-Testname `test_rename_folder_by_owner_and_team_writer` ist als zwei Tests gebaut** (Gegenlauf braucht getrennte Tests)) | 2026-10-24 (Block 9.1 RE-7 `created_by` gebaut und gemessen — zwölfte P1-Öffnung, Wegwerf-Probe 12/12, 4 Regel-Wächter mit Gegenläufen; Deploy C `v3.1.7` vorbereitet, `deploy.sh` beim Nikinger) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-10-24 (Block 9.3 RE-3 `rename_space` gebaut und gemessen — nur Team-Spaces (P10.5-M), ein Commit, Fremdverweise gemeldet statt angefasst; Wegwerf 15/15) | 2026-10-24 (Block 9.2 RE-4 `rename_folder` gebaut und gemessen — Kern + Web-Route `PATCH …/folders` + UI-Kontextaktion, Wegwerf-Probe 13/13; **der Plan-Testname `test_rename_folder_by_owner_and_team_writer` ist als zwei Tests gebaut** (Gegenlauf braucht getrennte Tests)) | 2026-10-24 (Block 9.1 RE-7 `created_by` gebaut und gemessen — zwölfte P1-Öffnung, Wegwerf-Probe 12/12, 4 Regel-Wächter mit Gegenläufen; Deploy C `v3.1.7` vorbereitet, `deploy.sh` beim Nikinger) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -41,7 +41,7 @@ updated: 2026-10-24 (Block 9.2 RE-4 `rename_folder` gebaut und gemessen — Kern
 | 6 | Anbieter: PA-1, PA-2, `/mcp`, PA-6, P10-J | Ausführer + Claude Code + Nikinger | B | ✅ 2026-10-22 — **6.0–6.5 gebaut und gemessen**: zweite Vergleichsregel `http://127.0.0.1:<port>` (Port explizit, kein `localhost`/`[::1]`, P10.5-O) + `application_type` ∈ {fehlend, null, native, web} · CSP `form-action` mit `http://127.0.0.1:*` · `/mcp` **ohne** Slash exakt bedient (`_ExactMcpMount`, kein 307) · PA-6 (Wurzel-`CLAUDE.md` eine Zeile) · **V209 ✅** (opencode 1.19.4), **V197 ✅** (Chromium folgt dem Consent-Redirect) · **DCR-Gegenlauf**: derselbe Request 400 → **201** · Suite **1376 grün** (1354 + 22) · **10-23/10-24/10-25 ✅**, **10-26 ✅** (2026-10-23 geklärt: die zwei Auslöser lagen im Messgerät, kein Produktcode — siehe Session-Block), 10-27/28 beim Nikinger nach Deploy B |
 | 7 | Darstellung: UI-1–UI-6, KA-5 | Ausführer (+ Claude Code Sichtung) | C | 🔄 2026-10-24 — **7.1–7.7 gebaut und gemessen** (HTML-404 für unbekannte `/ui`-Pfade · Wortmarke `static/logo.svg` · Tab-Titel folgt der Ansicht · vier Posten der Sichtung umgesetzt · Kontrast `--caution` 5,70:1 · Assignee-Filter in API und UI · `doing`-Ring auf der Karte) · Probe an der Wegwerf-Instanz, Gegenläufe je rot · **P10.5-32 bleibt ⬜ bis zur Bestätigung** — die Herleitung je Schritt steht im Session-Archiv (`SESSIONS_ARCHIVE.md`, Block 7.1–7.4) und in den Commits |
 | 8 | Karte: Gehirnkarte C2 | Ausführer (+ Claude Code Smoke/Sichtung) | C | 🔄 2026-10-24 — **8.1–8.8 gebaut und gemessen** (Lappen/Furchen/Zellen/Aktivierung in `graph.js`, KA-2 Layout-Ablage, KA-3 Suche/Filter, reduced motion 0 Ticks) · **Browser-Probe `probes/p105_b8_karte_probe.py` an der 200-Knoten-Wegwerf-Instanz: 4/4 Messungen grün, 3 Gegenläufe je rot** · **Smoke `p8_22_smoke.py` 5/5** (Ruhe 2712,1 ms ≤ 3000, Frame p95 1,7 ms ≤ 16,7, reduced motion **0** Frames) · **drei Fehler hat erst der Browser gefunden** (gezogener Knoten wurde zurückgezogen · Fokus blieb nach dem Zeigerwechsel · Trefferzahl wurde vom Layout-Hinweis überschrieben) — alle drei behoben und gewächtert · **Abnahme 10-36/38/39/40 ✅, 10-37 wartet auf die Sichtung** (4 Screenshots liegen vor) · **Befund: das Plan-Budget für `graph.js` ist überschritten** (+11,1 KB gzip statt +8 KB; davon +9,8 KB Kommentar, der Code selbst +2,9 KB) — Entscheidung beim Nikinger · **drei Pfade außerhalb der §3-Liste** (bewusst, datiert): `phase9_hardening/scripts/graph_reload_probe.mjs` (der P9-Harness malt die alte Strichzeichnung — ohne Anpassung wäre der P9-Wächter rot) · `phase10_5_finishing/{probes,tests}/` (Plan 8.8 verlangt Proben und Wächter) · `docs/screenshots/p105_b8_*.png` (Plan 8.8 verlangt die vier Bilder für die Sichtung) |
-| 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | 🔄 2026-10-24 — **9.1 RE-7 `created_by` gebaut und gemessen** (P1-Öffnung 12: `models.py`/`store.py`, MCP + Web + Editor-Metazeile; 8 neue Tests + 4 Regel-Wächter mit je einem Gegenlauf; Wegwerf-Probe **12/12**) · **9.2 RE-4 `rename_folder` gebaut und gemessen** (P1-Öffnung 13: `store.py` + Web-Route `PATCH …/folders` + UI-Kontextaktion „Umbenennen" am Ordner im Baum; 11 neue Tests; Wegwerf-Probe **13/13**) · **9.3 steht aus** (RE-3 `rename_space`) — Branch `p105-block9`, Merge **nach** Deploy C |
+| 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | ✅ 2026-10-24 — **9.1 RE-7 `created_by`** (Probe 12/12) · **9.2 RE-4 `rename_folder`** (Probe 13/13) · **9.3 RE-3 `rename_space`** (Probe 15/15) — alle drei gebaut und gemessen; Branch `p105-block9`, Merge **nach** Deploy C |
 | 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | D | ⬜ |
 | 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | ⬜ |
 | 12 | Doku und Altlasten: DO-1, LG-6, AL-1 (Rest), AL-3, BG-2/BG-3 | Claude Code | — | ⬜ |
@@ -108,8 +108,8 @@ updated: 2026-10-24 (Block 9.2 RE-4 `rename_folder` gebaut und gemessen — Kern
 | P10.5-40 | reduced motion: statisch, 0 Ticks | ✅ | 8.7/8.8 · Browser-Probe: **0** rAF-Aufrufe aus `graph.js`, **13989** Kernpixel gemalt · Node-Harness: `raf_calls = 0` · **der M6-Nebenbefund („1 Tick statt 0") ist erledigt** |
 | P10.5-41 | RE-7: `created_by` auf neuen Items über Web und MCP sichtbar | ✅ | 9.1 · **Wegwerf `probes/p105_b9_created_by_probe.py` 12/12 Zellen**: Web-Anlage → Antwort **und** Datei nennen `created_by: alpha` · MCP-Anlage → `get_item_meta` **und** Datei nennen ihn · **Altbestand**: `get_item_meta` liefert `""`, die Datei trägt **keine** Zeile — auch **nach** einem Write nicht (nichts erfunden, P10.5-W) · Fälschung: PATCH → **422**, POST → der Wert bleibt der eingeloggte Mensch · 8 neue Tests (`test_store.py` × 5, `test_tools.py` × 3, `test_api.py` × 2) · **4 Regel-Wächter mit je einem Gegenlauf** (`tests/test_created_by_rules.py`: `_KNOWN_FIELDS` / `_SYSTEM_MANAGED_FIELDS` / `_summary()` / die Leerwert-Bedingung — jeder Gegenlauf macht **genau** seinen Defekt sichtbar) |
 | P10.5-42 | RE-4 atomar (V193 ✅): ein Commit, Versionen unverändert, Freigabe wandert mit | ✅ | 9.2 · **Wegwerf `probes/p105_b9_rename_folder_probe.py` 13/13 Zellen**: Web-Rename → HTTP 200, `items` nennt die Zahl · die Datei liegt am **neuen** Pfad, der alte Ordner ist weg · `version:` **unverändert** (1 → 1 — Ordner stehen nicht im Frontmatter) · die `.share.yml` **wandert mit** (neu da, alt weg) · **ein** Commit `rename-folder alpha:projekte→vorhaben` · der Index meldet `folder == "vorhaben"` · **Gegenlauf**: Ziel existiert → **422**, **nichts** bewegt · Ziel **unter** dem alten Ordner → 422 · ohne CSRF → **403**, nichts bewegt · 11 neue Tests (`test_store.py` × 5, `test_api.py` × 4, `test_static_routes.py` × 2) |
-| P10.5-43 | RE-3 nur Team-Space (V194 ✅): Frontmatter = Verzeichnis, ein Commit, Absturz wird wiederaufgenommen | ⬜ | — |
-| P10.5-44 | P1-Diff nennt nur die angekündigten Dateien | ⬜ | — |
+| P10.5-43 | RE-3 nur Team-Space (V194 ✅): Frontmatter = Verzeichnis, ein Commit, Absturz wird wiederaufgenommen | ✅ | 9.3 · **Wegwerf `probes/p105_b9_rename_space_probe.py` 15/15 Zellen**: Web-Rename → HTTP 200, `from`/`to`/`items` · das Verzeichnis steht unter dem neuen Namen · das **Frontmatter** nennt den neuen Space (`space: team-neu`) · die **Version springt genau einmal** (1 → 2) · **ein** Commit `rename-space team→team-neu` · der Index meldet den neuen Space · **Fremdverweise werden gemeldet, nicht angefasst** (`orphan_refs` + `assignee_refs`; die fremde `.share.yml` bleibt, wie sie ist) · **Gegenlauf**: Home-Space → **403**, nichts bewegt · vergebener Zielname → **422**, nichts bewegt · **Absturz**: `test_rename_resumes_after_crash` (Monkeypatch wirft nach der ersten Datei → neuer `Store` → Endzustand konsistent, Marker weg, **kein** zweiter Versionssprung) · 10 neue Tests (`test_store.py` × 5, `test_api.py` × 4, `test_static_routes.py` × 2) |
+| P10.5-44 | P1-Diff nennt nur die angekündigten Dateien | ✅ | 9.3 · `git diff --stat 2c841cf -- phase1_storage/storage` nennt **nur** `models.py` und `store.py` — beide in der Ankündigung (`2c841cf`) genannt, `index.py` blieb unberührt (kein Schema-Sprung, Hard Rule 2). Der übrige Diff von Block 9 liegt in `phase5_ui/webui/**` und den Tests — beides auf der Erlaubnisliste (Plan §3) |
 | P10.5-45 | LG-1: Volltext in der UI | ⬜ | — |
 | P10.5-46 | Realtime: Änderung ≤ 2 s sichtbar | ⬜ | — |
 | P10.5-47 | P10.5-S: geänderter Editor nie überschrieben; Neuladen trägt frische `version` | ⬜ | — |
@@ -128,7 +128,7 @@ updated: 2026-10-24 (Block 9.2 RE-4 `rename_folder` gebaut und gemessen — Kern
 | P10.5-60 | P10-J zweimal live belegt | ⬜ | — |
 | P10.5-61 | Closeout-Dokumente + Rotationen per Skript | ⬜ | — |
 
-**Summe:** 36 ✅ · 0 ⚠️ · 25 ⬜ (von 61). **[2026-10-24, Block 9.2]** +1 ✅ (10-42, RE-4 `rename_folder`) ⇒ 36 ✅ · 0 ⚠️ · 25 ⬜. **[2026-10-24, Block 9.1]** +1 ✅ (10-41, RE-7 `created_by`) ⇒ 35 ✅ · 0 ⚠️ · 26 ⬜. **[2026-10-24, Block 8]** +4 ✅ (10-36, 10-38, 10-39, 10-40) ⇒ 34 ✅ · 0 ⚠️ · 27 ⬜. **[Stand 2026-10-24, Block 7.5–7.7]** 33, 34 und 35 ✅. **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`). **[2026-10-23, Block 7.1]** +1 ✅ (10-29, UI-1) ⇒ 25 ✅ · 0 ⚠️ · 36 ⬜. **[2026-10-23, Block 7.2]** +1 ✅ (10-30, UI-2) ⇒ 26 ✅ · 0 ⚠️ · 35 ⬜. **[2026-10-23, Block 7.3]** +1 ✅ (10-31, UI-3) ⇒ 27 ✅ · 0 ⚠️ · 34 ⬜.
+**Summe:** 38 ✅ · 0 ⚠️ · 23 ⬜ (von 61). **[2026-10-24, Block 9.3]** +2 ✅ (10-43, 10-44) ⇒ 38 ✅ · 0 ⚠️ · 23 ⬜. **[2026-10-24, Block 9.2]** +1 ✅ (10-42, RE-4 `rename_folder`) ⇒ 36 ✅ · 0 ⚠️ · 25 ⬜. **[2026-10-24, Block 9.1]** +1 ✅ (10-41, RE-7 `created_by`) ⇒ 35 ✅ · 0 ⚠️ · 26 ⬜. **[2026-10-24, Block 8]** +4 ✅ (10-36, 10-38, 10-39, 10-40) ⇒ 34 ✅ · 0 ⚠️ · 27 ⬜. **[Stand 2026-10-24, Block 7.5–7.7]** 33, 34 und 35 ✅. **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`). **[2026-10-23, Block 7.1]** +1 ✅ (10-29, UI-1) ⇒ 25 ✅ · 0 ⚠️ · 36 ⬜. **[2026-10-23, Block 7.2]** +1 ✅ (10-30, UI-2) ⇒ 26 ✅ · 0 ⚠️ · 35 ⬜. **[2026-10-23, Block 7.3]** +1 ✅ (10-31, UI-3) ⇒ 27 ✅ · 0 ⚠️ · 34 ⬜.
 
 ## Offen beim Nikinger
 
@@ -171,73 +171,63 @@ updated: 2026-10-24 (Block 9.2 RE-4 `rename_folder` gebaut und gemessen — Kern
 > des Nikingers**; nichts davon ist deployed — `v3.1.7` steht aus.
 
 ## Startauftrag — Block 9 (Rechte und Namen: RE-7, RE-4, RE-3) · Ausführer
-> **Ankündigung der drei P1-Öffnungen** (Plan §Block 9; Herleitung:
-> `docs/concepts/phase10_5_finishing_plan.md` §„Block 9"). **Die drei Öffnungen:**
-> **(12) RE-7 `created_by`** (wie `updated_by`: serververwaltet, über keinen Kanal setzbar, kein Backfill,
-> P10.5-W) · **(13) RE-4 `Store.rename_folder()`** (Ordner stehen nicht im Frontmatter: keine
-> Item-Datei wird umgeschrieben, keine `version` erhöht; die `.share.yml` wandert mit) ·
-> **(14) RE-3 `Store.rename_space()`** (`space` steht im Frontmatter, also die Semantik von `move()`:
-> ein Commit für den ganzen Space; **nur Team-Spaces**, P10.5-M).
->
-> **Betroffene Dateien in `phase1_storage/storage/`:** `models.py` und `store.py`. `index.py` bleibt
-> unberührt — die Index-Zeilen kommen über das bestehende `row_from_file()`/`upsert_item()`, **kein**
-> Schema-Sprung (Hard Rule 2). Das ist eine **Teilmenge** der angekündigten Liste: das
-> Abbruchkriterium ist „nur die angekündigten Dateien", nicht „alle angekündigten Dateien".
-> **Abbruchprüfung (P10.5-E/F):** `git diff --stat <basis>..HEAD -- . ':!<erlaubte Pfade>'` leer
-> (ausser `.md`-Doku) und `git diff --stat -- phase1_storage/storage` nennt **nur** `models.py` und
-> `store.py`. Erlaubte Pfade (Plan §3): `phase1_storage/storage/{models,store,index}.py`,
-> `phase2_mcp/mcpserver/tools.py`, `phase5_ui/webui/**`, Tests.
->
-> **Wichtig für die Reihenfolge:** `deploy.sh` klont das **lokale `main`**. Block 9 wird deshalb auf
-> einem eigenen Branch (`p105-block9`) gebaut und **erst nach dem Deploy C** nach `main` gemergt —
-> sonst liefert `v3.1.7` den Block-9-Stand mit aus.
+> **Gebaut** (9.1–9.3, 2026-10-24) · die ausführliche **Ankündigung der drei P1-Öffnungen**
+> (12) RE-7 `created_by` · (13) RE-4 `Store.rename_folder()` · (14) RE-3 `Store.rename_space()`
+> — steht verbatim in `STARTUPTRAG_ARCHIVE.md`. **P10.5-41/42/43/44 ✅.** Der Branch `p105-block9`
+> wird **erst nach dem Deploy C** nach `main` gemergt (`deploy.sh` klont das lokale `main` —
+> sonst liefert `v3.1.7` den Block-9-Stand mit aus).
 
-## Session stopped — 2026-10-24 (Block 9.2 RE-4 `rename_folder` gebaut und gemessen)
+## Session stopped — 2026-10-24 (Block 9.3 RE-3 `rename_space` gebaut und gemessen)
 
-**Ergebnis.** Block 9.2 steht: `Store.rename_folder(space, old, new, *, actor="") -> int` im
-Kern, die Web-Route `PATCH /api/v1/spaces/{space}/folders` und die Kontextaktion „Umbenennen"
-am Ordner im Baum (Rechtsklick → ein Menü mit einem Eintrag). **RE-4 ist damit im Kern
-geschlossen** — die billige Frontend-Fassung, die die `.share.yml` eines geteilten Ordners
-zurückließ, gibt es nicht mehr: die Freigabe wandert mit dem Verzeichnis.
+**Ergebnis.** Block 9.3 steht: `Store.rename_space(old, new, *, actor="") -> int` im Kern, die
+Web-Route `PATCH /api/v1/spaces/{space}` und der Knopf „Space umbenennen" im Space-Detail-Panel
+mit eigenem Dialog. **Damit ist Block 9 vollständig gebaut** — RE-7, RE-4 und RE-3 sind alle drei
+gemessen.
 
-**Was der Kern tut.** Die Ordner stehen **nicht** im Frontmatter (der Pfad wird abgeleitet) —
-deshalb wird **keine** Item-Datei umgeschrieben und **keine** Version angehoben. Ablauf unter
-beiden Locks: beide Namen über `files.validate_folder()` → `old` muss existieren, `new` darf
-nicht existieren, `new` darf nicht unter `old` liegen → **Marker** (`DATA_ROOT/
-.rename-pending.json`, 9.4) → `os.rename` + `fsync` des Elternverzeichnisses → Index-Zeilen
-(`folder`, `path`) nachziehen → **ein** Commit `rename-folder <space>:<old>→<new>` → Marker
-löschen. Rückgabe: die Zahl der betroffenen Items.
+**Was der Kern tut (anders als beim Ordner, RE-4).** Der Space-Name steht **im Frontmatter**
+jeder Item-Datei — er ist keine abgeleitete Größe. Verzeichnis und Frontmatter dürfen nie
+auseinanderlaufen (B2-Schutz), also gilt die Semantik von `move()`: jedes Item bekommt
+`space=new`, `version+1`, `updated=now`, `updated_by=actor` (oder den bisherigen Wert). Der
+Ablauf: Name validieren (dieselbe Regel wie `acl.create_space()`) → **Marker** → `os.rename`
++ `fsync` → jede Item-Datei unter `new/` (inkl. `_archive/`) atomar umschreiben, **ohne**
+Einzel-Commit → `._trash/old` → `._trash/new` (Dateien dort **unverändert**: Historie) →
+Index-Zeilen aus den **Dateien** neu gelesen → **ein** Commit `rename-space <old>→<new>` →
+Marker löschen.
 
-**Gemessen.** Wegwerf-Probe `probes/p105_b9_rename_folder_probe.py` **13/13 Zellen** (Port
-8799, PID-Datei, Stopp nur über die PID-Datei): HTTP 200 und `items == 1` · die Datei liegt am
-**neuen** Pfad, der alte Ordner ist weg · `version:` **1 → 1** · die `.share.yml` wandert mit ·
-**ein** Commit `rename-folder alpha:projekte→vorhaben` · der Index meldet `folder ==
-"vorhaben"` · **Gegenlauf**: Ziel existiert → **422** und **nichts** bewegt · Ziel unter dem
-alten Ordner → 422 · ohne CSRF → **403**, nichts bewegt. 11 neue Tests (`test_store.py` × 5,
-`test_api.py` × 4, `test_static_routes.py` × 2).
+**Gemessen.** Wegwerf-Probe `probes/p105_b9_rename_space_probe.py` **15/15 Zellen** (Port 8799,
+PID-Datei): HTTP 200 mit `from`/`to`/`items` · das Verzeichnis steht unter dem neuen Namen · das
+Frontmatter nennt ihn · die Version springt **genau einmal** (1 → 2) · **ein** Commit
+`rename-space team→team-neu` · der Index stimmt · **Fremdverweise werden gemeldet, nicht
+angefasst** (`orphan_refs` + `assignee_refs`; die fremde `.share.yml` bleibt, wie sie ist) ·
+**Gegenläufe**: Home-Space → **403**, vergebener Zielname → **422**, jeweils nichts bewegt. Der
+**Absturz** trägt `test_rename_resumes_after_crash`: ein Monkeypatch wirft nach der ersten Datei,
+ein neuer `Store` führt den Rename zu Ende — konsistenter Endzustand, Marker weg, und die
+bereits umgeschriebene Datei bekommt **keinen** zweiten Versionssprung (die Idempotenz).
+11 neue Tests (`test_store.py` × 5, `test_api.py` × 5, `test_static_routes.py` × 2).
 
-**Ein Fund beim Bauen — das Register stand an der Grenze.** Die Abhakung von RE-4 hat das
-Baustellenregister über **40.960 B** gehoben (40.958 B — **2 B Luft**). Der Hebel war die
-`updated:`-Kette im L1-Kopf: neu `phase10_inventory/UPDATES_ARCHIVE.md` (L3, verbatim), 17
-Fäden rotiert (Skript `scripts/rotate_index_updates.sh`, sechs Gegenproben grün), Register
-**40.958 → 39.117 B**. Ein Archiv entsteht, ein Posten wird nicht gekürzt.
+**Fremdverweise: gemeldet, nicht repariert.** Eine fremde `.share.yml`, die den alten Namen
+nennt, und Items mit `assignee == <alter Name>` bleiben, wie sie sind. Sie zu „reparieren" wäre
+eine **stille Rechteänderung** — sie stehen deshalb in der Antwort, damit der Mensch sie kennt.
 
-**Ein Drift gegen den Plan, datiert.** Der Plan nennt **einen** Test
-`test_rename_folder_by_owner_and_team_writer` (Plan §9.5). Gebaut sind **zwei**
-(`…_by_owner`, `…_in_team_space_is_allowed`): der Gegenlauf zum gesperrten fremden
-Home-Space braucht getrennte Tests, sonst ist der „Gegenlauf" dieselbe Behauptung. Der
-Plan-Eintrag bekommt einen `[Nachtrag 2026-10-24]`.
+**Nur Team-Spaces (P10.5-M).** Ein Home-Space trägt den Namen seines Principals; die Auth-DB
+kennt ihn unter diesem Namen. Ein Umbenennen würde Verzeichnis und Auth-DB trennen — der
+Server lehnt es ab (403), der Knopf wird gar nicht erst angeboten.
 
-**Bewusst nicht gebaut:** kein MCP-Werkzeug (Lock P10.5-M: das Umbenennen ist **human-only**,
-RE-6-Linie) — der Agent darf Ordner nicht umbenennen.
+**Ein Drift gegen den Plan, datiert.** Der Plan listet
+`test_rename_space_reports_foreign_references_without_touching_them` bei den **Storage**-Tests;
+der Test liegt in `phase5_ui/tests/test_api.py` — das Melden passiert in der **Antwort der
+Web-Fläche** (wie `orphan_refs` beim Space-Entfernen), und `acl.spaces_referencing()` ist keine
+Kern-Aufgabe des Stores. Nachtrag in Plan §9.5.
+
+**P10.5-44 ✅.** `git diff --stat 2c841cf -- phase1_storage/storage` nennt **nur** `models.py`
+und `store.py` — beide angekündigt, `index.py` unberührt (kein Schema-Sprung).
 
 **Ausführer-Daten.** `opencode/MiniMax-M3.1-Flash`, Kontextgrenze **400.000** (P10.5-C
 erfüllt), keine Eingriffe des Nikingers in dieser Session.
 
-**Stand.** Branch `p105-block9`, Wegwerf-Instanz gestoppt und aufgeräumt. **P10.5-37 und
-P10.5-32 bleiben ⬜** (Augen-Urteil); das **Budget für `graph.js`** entscheidet der Nikinger.
+**Stand.** Branch `p105-block9`, Wegwerf-Instanz gestoppt und aufgeräumt. Suite **1465 grün**
+(343,7 s), `doc_health` 0, `ui_budget` 5/5. **P10.5-37 und P10.5-32 bleiben ⬜** (Augen-Urteil);
+das **Budget für `graph.js`** entscheidet der Nikinger.
 
 **Nächster Schritt.** (1) Deploy C (`v3.1.7`) durch den Nikinger, dann `health_gate.sh` mit
-echter Ausgabe in den Commit. (2) **Block 9.3** `Store.rename_space()` (RE-3, nur Team-Spaces,
-Frontmatter-Umschreiben, ein Commit) + der Space-Teil des Absturz-Markers. (3) Merge
-`p105-block9` → `main` **nach** dem Deploy.
+echter Ausgabe in den Commit. (2) Merge `p105-block9` → `main` **nach** dem Deploy.

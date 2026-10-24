@@ -840,7 +840,7 @@ beiden Scans heraus (wie `._trash`, P9 Step G).
 `test_rename_folder_index_equals_rebuild`, `test_rename_folder_refuses_existing_target_and_descendant`,
 `test_rename_space_rewrites_frontmatter_bumps_versions_one_commit`, `test_rename_space_moves_trash_dir_untouched`,
 `test_rename_space_index_equals_rebuild`, `test_rename_resumes_after_crash` (Monkeypatch wirft nach k Dateien → neuer `Store` → Endzustand
-konsistent, Marker weg), `test_rename_space_reports_foreign_references_without_touching_them`. Golden-Tests bleiben unverändert grün.
+konsistent, Marker weg), `test_rename_space_reports_foreign_references_without_touching_them` **[Nachtrag 2026-10-24: liegt in `phase5_ui/tests/test_api.py`, nicht hier — das Melden der Fremdverweise passiert in der Antwort der Web-Fläche (wie `orphan_refs` beim Space-Entfernen), und `acl.spaces_referencing()` ist keine Kern-Aufgabe des Stores]**. Golden-Tests bleiben unverändert grün.
 `phase5_ui/tests/test_api.py`: `test_rename_folder_by_owner_and_team_writer` **[Nachtrag 2026-10-24]** *als **zwei** Tests gebaut — `…_by_owner` und `…_in_team_space_is_allowed`; der Gegenlauf zum gesperrten fremden Home-Space braucht getrennte Tests*, `test_rename_folder_in_foreign_home_space_forbidden`,
 `test_rename_team_space`, `test_rename_home_space_is_refused` (P10.5-M), `test_rename_space_to_existing_or_user_name_is_refused`.
 `phase2_mcp/tests/test_tools.py`: `test_get_item_meta_shows_created_by`.

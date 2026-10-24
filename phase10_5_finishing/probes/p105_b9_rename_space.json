@@ -1,0 +1,83 @@
+{
+  "probe": "p105_b9_rename_space",
+  "date": "2026-10-24T16:20:01.074531+00:00",
+  "all_ok": true,
+  "zellen": 15,
+  "cells": [
+    {
+      "name": "Web-Rename: HTTP 200",
+      "ok": true,
+      "detail": "HTTP 200 {\"from\":\"team\",\"to\":\"team-neu\",\"items\":1,\"orphan_refs\":[\"alpha/fremd/.share.yml\"],\"assignee_refs\":[\"itm_98e3dd54\"]}"
+    },
+    {
+      "name": "Web-Rename: die Antwort nennt alt und neu",
+      "ok": true,
+      "detail": "from='team', to='team-neu'"
+    },
+    {
+      "name": "Web-Rename: die Antwort nennt die Zahl der Items",
+      "ok": true,
+      "detail": "items=1 (erwartet 1)"
+    },
+    {
+      "name": "Das Verzeichnis steht unter dem neuen Namen",
+      "ok": true,
+      "detail": "neu=True, alt=False"
+    },
+    {
+      "name": "Das Frontmatter nennt den neuen Space",
+      "ok": true,
+      "detail": "space='team-neu' (erwartet 'team-neu')"
+    },
+    {
+      "name": "Die Version springt genau einmal",
+      "ok": true,
+      "detail": "version '1' -> '2'"
+    },
+    {
+      "name": "Ein Commit für das Umbenennen",
+      "ok": true,
+      "detail": "Commit-Meldungen: ['rename-space team→team-neu']"
+    },
+    {
+      "name": "Der Index meldet den neuen Space",
+      "ok": true,
+      "detail": "space='team-neu' (erwartet 'team-neu')"
+    },
+    {
+      "name": "Die fremde .share.yml wird gemeldet",
+      "ok": true,
+      "detail": "orphan_refs=['alpha/fremd/.share.yml']"
+    },
+    {
+      "name": "Die fremde .share.yml wird nicht angefasst",
+      "ok": true,
+      "detail": "/tmp/opencode/sharefyx-wegwerf-p105-b9s/data/alpha/fremd/.share.yml unveraendert"
+    },
+    {
+      "name": "Das Item mit `assignee` wird gemeldet",
+      "ok": true,
+      "detail": "assignee_refs=['itm_98e3dd54']"
+    },
+    {
+      "name": "Gegenlauf: ein Home-Space wird abgelehnt",
+      "ok": true,
+      "detail": "HTTP 403 {\"error\":\"forbidden\",\"message\":\"Nur Team-Spaces koennen umbenannt werden — ein Home-Space traegt den Namen seines Princi"
+    },
+    {
+      "name": "Gegenlauf: der Home-Space steht noch",
+      "ok": true,
+      "detail": "alpha=True, alpha-neu=False"
+    },
+    {
+      "name": "Gegenlauf: ein vergebener Zielname wird abgelehnt",
+      "ok": true,
+      "detail": "HTTP 422 {\"error\":\"validation_failed\",\"message\":\"'alpha' ist ein bestehender Principal-Name.\",\"detail\":{}}"
+    },
+    {
+      "name": "Gegenlauf: nichts bewegt",
+      "ok": true,
+      "detail": "team-neu steht"
+    }
+  ]
+}
