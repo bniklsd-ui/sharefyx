@@ -29,7 +29,7 @@ updated: 2026-10-24 (Block 7.4 (UI-4) umgesetzt — die vier Posten der Sichtung
 ## Root & governance
 
 - [docs/INDEX.md](./INDEX.md) — 🔗 **diese Karte** (L0) · **37.778 B — unter dem 40-KiB-Softcap** (V145 ✅) · die Karten-Chronik steht in `docs/INDEX_ENTRIES_ARCHIVE.md` · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
-- [CLAUDE.md](../CLAUDE.md) — 📗 **37476 B** (vor der Rotation 114.771 B) · Wurzel-Regelwerk: Kernprinzip der dumme Server, **neun Hard Rules** (1 keine Secrets in Dateien · 3 kein Write ohne `version` · 4 Schreibrechte folgen der Mitgliedschaft · 6 nie ein offener Port · 8 Commit ⇒ Doc-Update · 9 nie `pkill -f`, nie den systemd-Dienst), Working style, Doku-Hygiene und **Current state** (Session-Bloecke, newest-first, **kein** Ein-Block-Limit — P9-A). **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+- [CLAUDE.md](../CLAUDE.md) — 📗 **38357 B** (vor der Rotation 114.771 B) · Wurzel-Regelwerk: Kernprinzip der dumme Server, **neun Hard Rules** (1 keine Secrets in Dateien · 3 kein Write ohne `version` · 4 Schreibrechte folgen der Mitgliedschaft · 6 nie ein offener Port · 8 Commit ⇒ Doc-Update · 9 nie `pkill -f`, nie den systemd-Dienst), Working style, Doku-Hygiene und **Current state** (Session-Bloecke, newest-first, **kein** Ein-Block-Limit — P9-A). **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [README.md](../README.md) — 📗 ~7KB · human overview + machine setup (venv, keyring, run, smoke test); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [ROADMAP.md](../ROADMAP.md) — 📗 **37.197 B** · Phasen 1–10.5, Scope in/out je Phase, Status · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/ROADMAP_UPDATES_ARCHIVE.md](./ROADMAP_UPDATES_ARCHIVE.md) — 📦 **14.371 B** · L3: `updated:`-Kette von `ROADMAP.md`, verbatim (2026-10-07)
@@ -189,7 +189,7 @@ doppelt hier gelistet.)*
 - [docs/INDEX_KURZUNG_ARCHIVE.md](./INDEX_KURZUNG_ARCHIVE.md) — 📦 **11.961 B** · L3-Archiv der aus der Karte gekürzten Texte — die acht Abschnittsköpfe und fünf Kartenzeilen-Chroniken, verbatim (die letzten zwei am 2026-10-24, DO-2-Luft); die Karte trägt wieder Stand, dieses Archiv die Chronik des Kürzens
 
 - [docs/INDEX_UPDATES_ARCHIVE.md](./INDEX_UPDATES_ARCHIVE.md) — 📦 **19.557 B** · L3-Archiv der `updated:`-Kette **dieser** Datei, verbatim, newest-first. Erste Rotation 2026-09-19 von Hand; **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
-- [docs/PROJECT_SESSION_LOG.md](./PROJECT_SESSION_LOG.md) — 📦 **255.420 B** (vor der 24-Block-Rotation 101.450 B) · L3-Archiv der historischen `[YYYY-MM-DD]`-Session-Bloecke aus `CLAUDE.md` §Current state, newest-first, plus §Frontmatter-Archiv (die `updated:`-Kette der Wurzel-`CLAUDE.md`, 28 Eintraege, verbatim seit 2026-09-13). Wer die Chronik einer alten Phase sucht, faengt hier an, nicht im Wurzel-Head
+- [docs/PROJECT_SESSION_LOG.md](./PROJECT_SESSION_LOG.md) — 📦 **257.284 B** (vor der 24-Block-Rotation 101.450 B) · L3-Archiv der historischen `[YYYY-MM-DD]`-Session-Bloecke aus `CLAUDE.md` §Current state, newest-first, plus §Frontmatter-Archiv (die `updated:`-Kette der Wurzel-`CLAUDE.md`, 28 Eintraege, verbatim seit 2026-09-13). Wer die Chronik einer alten Phase sucht, faengt hier an, nicht im Wurzel-Head
 
 ## Referenzmaterial (nicht Teil des Plan/Konzept/Handover-Trios)
 
