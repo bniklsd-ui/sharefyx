@@ -1,11 +1,11 @@
 ---
 status: archive
-purpose: L3-Archiv der am 2026-10-22 aus `docs/INDEX.md` gekürzten Texte — die Abschnittsköpfe und die Kartenzeilen, die dort standen, verbatim. Die Karte trägt wieder Stand, dieses Archiv trägt die Chronik des Kürzens.
+purpose: L3-Archiv der aus `docs/INDEX.md` gekürzten Texte (2026-10-22 und 2026-10-24) — die Abschnittsköpfe und die Kartenzeilen, die dort standen, verbatim. Die Karte trägt wieder Stand, dieses Archiv trägt die Chronik des Kürzens.
 read-when: beim Audit, wenn eine alte Kartenzeile rekonstruiert werden muss, oder wenn die Herleitung einer Zahl aus der Karte gesucht wird, die am 2026-10-22 dort verschwand
 detail: L3
 up: ./INDEX.md
 down:
-updated: 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.5, DO-2: die Karte brauchte Luft; der Plan nannte als Hebel die Abschnittsköpfe, gemessen tragen die acht Köpfe zusammen 2.478 B, aus den Köpfen allein waren die geforderten 3.000 B nicht erreichbar — deshalb wandern auch drei Kartenzeilen-Chroniken hierher)
+updated: 2026-10-24 (zwei weitere Kartenzeilen verschoben — die Karte stand wieder nur 2.162 B unter der Grenze (DO-2 verlangt 2.500 B); verschoben: die Zeile der Sichtprüfungs-Konventionen (mit ihrer Datums-Korrektur) und der Screenshot-Eintrag (mit der Chronik der Bild-Präfixe), verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.5, DO-2: die Karte brauchte Luft; der Plan nannte als Hebel die Abschnittsköpfe, gemessen tragen die acht Köpfe zusammen 2.478 B, aus den Köpfen allein waren die geforderten 3.000 B nicht erreichbar — deshalb wandern auch drei Kartenzeilen-Chroniken hierher)
 ---
 # Kürzungs-Archiv der INDEX-Karte
 
@@ -72,6 +72,15 @@ verschiedene Fragen: Nachtrag, Kette, Kürzung.
 
 ## Kartenzeilen vor der Kürzung (2026-10-22), verbatim
 > **Aus der Karte verschoben (2026-10-22, P10.5 Block 0 Schritt 0.5 — DO-2), verbatim:**
+
+> **Aus der Karte verschoben (2026-10-24, P10.5 Block 7.4 — DO-2-Luft), verbatim:**
+
+- [docs/concepts/sichtpruefung_automation_conventions.md](./concepts/sichtpruefung_automation_conventions.md) — 📗 **21.765 B** (die Kartenzeile nannte bis 2026-10-05 `~8KB` für eine seit dem 2026-09-11 ~18 KB große Datei — zwei Appends ohne Nachzug, und `doc_health` liest keine KB-Angaben, also meldete es niemand) · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+
+- [docs/screenshots/](./screenshots/README.md) — 📗 ~1.1MB · kanonische Ablage aller Sichtpruefungs-Bilder, pro Phase praefixiert (`sp2_*`, `c4c5_*`, `p86_block_*`, `p86_probe_*`, **`p86_smoke_*` = die 17 Gate-Belege von `v3.0.2`**, **die P9-Praefixe: `p9_step_e_*` (Karten-Reload, 2026-09-28) · **`p9_step_d_*`** (Step-D-Probe: der gestrichelte Drop-Zustand an der Space-Zeile, 2026-10-03 — Build-Beleg, **nicht** die offene Sichtfrage) · `p9_step_g_*` (Loeschen) · `p9_btn_*`/`p9_btn2_*` (Standardoptik der Knoepfe, 2026-10-01) · **`p9_btn3_*` (B17:
+Vorsichtsknopf auf die Standardflaeche, 2026-10-02 — die vier aktuellen Bilder, in
+`screenshots_latest/` verlinkt)** · `p9_doing_*` (der fuenfte Eimer „In Arbeit", 2026-10-02 — **die aktuellen vier Bilder, in `screenshots_latest/` verlinkt**) · `p9_trace_0*` (**die fünf Bilder und die Probe sind am 2026-10-02 neu aufgenommen**: der alte Beleg war der Gegenlauf des trace-Blocks selbst — Probe rot, Bild 05 zeigte `beta`; Wächter `test_committed_probe_evidence.py` verhindert das) · `p9_step_a_01..04_*` (Tailscale-Infra-Beleg aus A3 — **keine Sichtpruefung**, deshalb nicht in `screenshots_latest/`) · `p9a_legacy_*` (Uebergangsfenster)**). Die `c4c5_*`-Bilder besetzen die „Sneak Peak"-Tabelle im `README.md`. Schnellzugriff auf die jeweils aktuellen: `screenshots_latest/`. L1-Header-Card in `docs/screenshots/README.md`. Keine Geheimnisse in den Bildern, nur UI-Rendering
+
 
 - [docs/INDEX.md](./INDEX.md) — 🔗 **diese Karte** (L0) · **38.288 B — unter dem 40-KiB-Softcap** (V145 ✅ seit 2026-10-03; **Nikinger-Entscheidung 2026-10-03: die datierten Nachträge wandern nach `docs/INDEX_ENTRIES_ARCHIVE.md`, das Kriterium von 38.912 B (P8.6 Plan 2 §1.2) auf den 40-KiB-Softcap neu baseliniert** — die 38.912 B waren für eine Datei mit weniger Zeilen gesetzt und waren **per Kürzen unerreichbar**: gemessen waren 71.573 B, davon **37.391 B Nachträge in 43 von 93 Einträgen**, und selbst 300 B je Zeile hätten 39.971 B ergeben. Verschoben per `scripts/archive_index_entries.sh` mit fünf Gegenproben, darunter die byteweise Reassemblierung des Originals; **4 Gegenproben des Skripts rot** (Schnitt mitten im Satz · `**` am falschen Ort · im INDEX vergessener Nachtrag · der Zeiger als Markdown-Link, den `doc_health` für die INDEX-Zeile des Archivs hielt) · **Wächter**: `phase9_hardening/tests/test_index_archive.py` — harter Größen-Gate, kein Nachtrag im INDEX, Archiv vollständig) · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 

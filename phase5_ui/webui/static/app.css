@@ -465,19 +465,30 @@ select.input:focus {
 /* P10.5 Block 7.2 (UI-2): das Zeichen der Wortmarke -- EINE Datei (`logo.svg`), an beiden
    Stellen (`.rail__brand` und `.auth__brand`). Deshalb eine Klasse und kein zweites Markup.
    Die Höhe in `em`, damit die Marke mit der Schriftgröße des jeweiligen Ortes mitwächst
-   (12,5 px in der Rail, 13 px auf der Anmeldeseite). */
+   (12,5 px in der Rail, 13 px auf der Anmeldeseite).
+
+   P10.5 Block 7.4, Posten 1 (Sichtung des Nikingers vom 2026-10-24): der Abstand zwischen
+   dem Zeichen und dem Wortrest war zu groß (`.45em` = 5,6 px in der Rail) -- der Nikinger
+   las die Wortmarke als zwei getrennte Zeichen. Jetzt `.2em` (2,5 px). Die Klassenregel
+   gilt für BEIDE Stellen, weil es eine Klasse ist -- die Anmeldeseite zieht automatisch nach. */
 .brand__mark {
   height: 1.25em;
   width: auto;
   vertical-align: -.22em;
-  margin-right: .45em;
+  margin-right: .2em;
 }
 
+/* P10.5 Block 7.4, Posten 4 (Sichtung des Nikingers vom 2026-10-24): die Versionsanzeige
+   las sich als "v316" -- bei 9 px war der Punkt ein 1-px-Schmier (gemessen: der hellste
+   Pixel des Punktes lag bei 155 von 255, also 61 % -- er verblasste in den Grund).
+   Jetzt 11 px und `.03em` Laufweite: der hellste Pixel liegt bei 203 (80 %), der Punkt ist
+   ein Zeichen und kein Schmier. Die Schrift bleibt die der Wortmarke (P6-Entscheidung vom
+   2026-08-13: keine eigene Schriftart fuer die Version). */
 .rail__version {
-  margin-left: .5em;
-  font-size: 9px;
+  margin-left: .45em;
+  font-size: 11px;
   font-weight: 400;
-  letter-spacing: 0;
+  letter-spacing: .03em;
   text-transform: none;
   vertical-align: super;
 }
@@ -826,7 +837,14 @@ select.input:focus {
   padding: 0 calc(var(--space) * 2) var(--space);
 }
 .list__chips:empty { display: none; }
-.list__assignee { width: 100%; margin-top: var(--space); }
+/* P10.5 Block 7.4, Posten 2 (Sichtung des Nikingers vom 2026-10-24): die Auswahl lief
+   buendig an den Listenrand (x = 0), waehrend die Suchzeile darueber mit 16 px Innenabstand
+   beginnt -- zwei Zeilen, zwei Kanten. Jetzt derselbe Innenabstand und dieselbe Breite
+   wie die Suchzeile: die Auswahl traegt die Kanten der Zeile, in der sie steht. */
+.list__assignee {
+  width: calc(100% - var(--space) * 4);
+  margin: var(--space) calc(var(--space) * 2) 0;
+}
 .list__assignee[hidden] { display: none; }
 
 /* Mehrfachauswahl-Werkzeugleiste (§9, P6-AK) — dieselbe visuelle Sprache wie `.list__chips`
@@ -2332,16 +2350,29 @@ select.input:focus {
 
 /* --banner-h ist ein FALLBACK für den Moment zwischen "Klasse gesetzt" und "JS hat die reale
    Höhe gemessen" (js/updates.js :: showBanner(), `offsetHeight` nach dem Sichtbarmachen) —
-   grosszügig bemessen (drei Zeilen bei 13px), nicht die tatsächliche Höhe: der Bannertext ist
+   großzügig bemessen, nicht die tatsächliche Höhe: der Bannertext ist
    variabel lang (jeder UPDATE_LOG.md-Eintrag), eine feste `height` auf `.update-banner` hätte
    mehrzeiligen Text abgeschnitten oder über die Rail-/Listenköpfe gelegt.
    Erster Entwurf hatte genau das (`height: 44px` fest) — weder `pytest` noch die jsdom-
    Simulation dieser Session hätten es je gefunden, keine der beiden Prüfstufen hat eine
    Layout-Engine (jsdom kennt kein CSS-Rendering, `offsetHeight` liefert dort 0). Diese Klasse
    Bug (Überlauf/Layout-Bruch bei variabler Textlänge) ist strukturell nur im echten Browser
-   sichtbar — genau das prüft Gate-A→B-Punkt 4. */
-:root { --banner-h: 80px; }
+   sichtbar — genau das prüft Gate-A→B-Punkt 4.
+   P10.5 Block 7.4, Posten 3: der Fallback ist von 80 px auf 40 px gewandert, weil der Banner
+   jetzt eine einzeilige Leiste ist (siehe `.update-banner` unten) — 80 px wären wieder
+   "Reserve, die keiner braucht". */
+:root { --banner-h: 40px; }
 
+/* P10.5 Block 7.4, Posten 3 (Sichtung des Nikingers vom 2026-10-24): der Banner verdeckte
+   bis zu ~140 px am oberen Rand jeder angemeldeten Ansicht und schob das Layout darunter --
+   der Nikinger nennt es "echter Mangel". Jetzt ist er eine einzeilige Leiste:
+   die ERSTE Zeile des neuesten Eintrags als Schlagzeile, der Rest über „Alle Änderungen"
+   (Einstellungen -> Update-Log, js/updates.js).
+
+   Die Leiste ist bewusst einzeilig und schneidet den Rest der Schlagzeile ab (Ellipse):
+   ihre Höhe darf nicht von der Länge des Log-Eintrags abhängen -- genau das war die
+   Eigenschaft, die die alte Fassung (alle Zeilen des Eintrags als Liste) unberechenbar
+   machte. Wer den ganzen Eintrag lesen will, nimmt „Alle Änderungen". */
 .update-banner {
   position: fixed;
   top: 0;
@@ -2350,16 +2381,21 @@ select.input:focus {
   z-index: 25;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: calc(var(--space) * 2);
+  justify-content: flex-start;
+  gap: var(--space);
   background: var(--surface-raised);
   border-bottom: 1px solid var(--glass-border);
   box-shadow: 0 8px 28px rgba(0,0,0,.35);
-  padding: var(--space) calc(var(--space) * 3);
-  font-size: 13px;
+  padding: 5px calc(var(--space) * 2);
+  font-size: var(--fs-meta);
 }
-.update-banner__body { margin: 0; max-width: 70ch; }
-.update-banner__body p { margin: 0; }
+.update-banner__body { margin: 0; flex: 1; min-width: 0; }
+.update-banner__body p {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .update-banner__body ul { margin: 0; padding-left: 1.2em; }
 
 body.has-update-banner .shell { height: calc(100vh - var(--banner-h)); margin-top: var(--banner-h); }

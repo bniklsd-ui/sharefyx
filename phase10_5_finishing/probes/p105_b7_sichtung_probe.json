@@ -1,0 +1,137 @@
+{
+  "probe": "p105_b7_sichtung",
+  "instanz": {
+    "basis": "http://127.0.0.1:18793",
+    "pid": 3522875,
+    "wegwerf": true
+  },
+  "grenzwerte": {
+    "marke_max_px": 4.0,
+    "banner_max_px": 60.0,
+    "punkt_spitze_min": 190.0,
+    "punkt_flaeche_min": 2,
+    "punkt_abstand_min_px": 1.0
+  },
+  "befund": {
+    "marke_abstand_klein": true,
+    "auswahl_traegt_die_kanten": true,
+    "banner_einzeilig": true,
+    "log_erreichbar": true,
+    "version_punkt_erkennbar": true
+  },
+  "messung": {
+    "marke": {
+      "abstand": 2.5,
+      "img_breite": 15.625,
+      "margin": "2.5px",
+      "text": "harefyx"
+    },
+    "auswahl": {
+      "sichtbar": true,
+      "links": 257,
+      "rechts": 702,
+      "breite": 445,
+      "suche_links": 257,
+      "suche_rechts": 664,
+      "knopf_rechts": 702,
+      "liste_links": 240,
+      "liste_rechts": 720,
+      "abstand_links": 0,
+      "abstand_rechts": 0,
+      "abstand_liste": 18,
+      "margin": "8px 16px 0px"
+    },
+    "banner": {
+      "sichtbar": true,
+      "hoehe": 49,
+      "text": "Die KI-Verbindung kann jetzt mehrere Notizen in einem einzigen Aufruf um Text ergänzen — jede Notiz bringt ihre eigene Version mit, ein Konflikt stoppt die anderen nicht.",
+      "zeilen": 1,
+      "hat_log_knopf": true,
+      "schiebt_layout": true
+    },
+    "version": {
+      "text": "v3.1.6",
+      "font_size": "11px",
+      "laufweite": "0.33px",
+      "schrift": "11px \"IBM Plex Sans Var\", ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "dpr": 1,
+      "punkt_breite": 1,
+      "punkt_hoehe": 2,
+      "punkt_spitze": 203,
+      "punkt_tinte": 237,
+      "punkt_stufen": {
+        "9px": {
+          "breite": 2,
+          "hoehe": 1,
+          "tinte": 227,
+          "spitze": 155
+        },
+        "10px": {
+          "breite": 2,
+          "hoehe": 1,
+          "tinte": 248,
+          "spitze": 192
+        },
+        "11px": {
+          "breite": 1,
+          "hoehe": 2,
+          "tinte": 237,
+          "spitze": 203
+        },
+        "12px": {
+          "breite": 1,
+          "hoehe": 2,
+          "tinte": 242,
+          "spitze": 205
+        },
+        "13px": {
+          "breite": 2,
+          "hoehe": 2,
+          "tinte": 420,
+          "spitze": 227
+        },
+        "14px": {
+          "breite": 2,
+          "hoehe": 2,
+          "tinte": 531,
+          "spitze": 234
+        }
+      },
+      "gruppen_3_punkt": [
+        [
+          20,
+          24
+        ],
+        [
+          28,
+          28
+        ]
+      ],
+      "gruppen_punkt_1": [
+        [
+          21,
+          21
+        ],
+        [
+          23,
+          28
+        ]
+      ]
+    },
+    "zustand": {
+      "kopf_versteckt": false,
+      "uebersicht_versteckt": true,
+      "zeilen": 1,
+      "titel": "alpha · sharefyx"
+    },
+    "log": {
+      "sichtbar": true,
+      "eintraege": 20,
+      "text": "2026-10-23Die KI-Verbindung kann jetzt mehrere Notizen in einem einzigen Aufruf um Text ergänzen — j"
+    },
+    "punkt_abstand": 1.0
+  },
+  "seitenfehler": [],
+  "browser_fehler": null,
+  "alle_kriterien_erfuellt": true
+}

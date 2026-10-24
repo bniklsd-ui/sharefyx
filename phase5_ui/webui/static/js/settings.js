@@ -183,6 +183,19 @@ export function init() {
     });
   });
 
+  // P10.5 Block 7.4 (Posten 3): das Update-Banner (js/updates.js) traegt einen Knopf
+  // „Alle Aenderungen" -- er soll das Update-Log dieser Kette oeffnen. Der Weg dorthin ist
+  // ein **Ereignis**, kein Import und kein zweiter `openPanel`-Aufrufer: der Waechter
+  // `test_only_one_module_opens_a_panel` (Phase 9) haelt fest, dass es genau EINEN Oeffner
+  // fuer die Fensterkette gibt -- `settings.js`. Das Banner fragt, die Kette entscheidet:
+  // dieselbe Form wie `sfx:overview-loaded` (dort der Grund: ein Import zurueck waere ein
+  // Zyklus).
+  window.addEventListener("sfx:open-panel", function (event) {
+    var name = event && event.detail ? event.detail.name : null;
+    if (!name) return;
+    openPanel(name);
+  });
+
   // P9-BN: „Schließen" im Menü schließt die ganze Kette, wie ESC auf der letzten Stufe.
   document.getElementById("settings-menu-close").addEventListener("click", closeSettings);
 

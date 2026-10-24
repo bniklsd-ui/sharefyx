@@ -16,8 +16,10 @@ updated: 2026-10-23 (aus dem Phase-Head verschoben: der Head stand bei 41.847 B 
 > Deploy-Gate zu. Der Head nannte den Hebel selbst: der „Startauftrag" (5,8 KB) wandert nach
 > Block 7 ins L3-Archiv. Er ist **hierher** gewandert, **verbatim** (`scripts/move_sections.py`).
 >
-> **Was noch offen ist:** nur Schritt **7.4** (Sichtung — Claude Code/Nikinger). **7.1 bis 7.3 sind gebaut und
-> gemergt, 7.5 bis 7.7 gebaut (2026-10-24)** (deren Abnahmestand steht in der Abnahmetabelle des Heads).
+> **Was noch offen ist:** **nichts mehr im Bau** — Schritt **7.4** ist am 2026-10-24 umgesetzt
+> (die vier Posten der Sichtung; **P10.5-32 wartet auf die Bestätigung des Nikingers**). **7.1 bis 7.3
+> sind gebaut und gemergt, 7.5 bis 7.7 gebaut (2026-10-24)** (deren Abnahmestand steht in der
+> Abnahmetabelle des Heads).
 >
 > **Zwei Korrekturen gegen den 📕-Plan stehen nur hier** (der Plan ist ein Snapshot und wird
 > nicht geändert): `--caution` ist der **Text**-Farbwert, nicht die Knopffläche (Schritt 7.5) ·
@@ -80,6 +82,20 @@ Dienst.
       (Quelle ist `v3.1.6`): Schriftgröße/Laufweite prüfen (Nikinger: echter Mangel).
    **Nachsichtung:** der Nikinger macht eine **zweite Sichtung der Gestaltung**, sobald der
    Alles-in-einem-Editor (Block 11) steht — weitere Posten bis zur Grenze 10 kommen dann dazu.
+   **✅ 2026-10-24 — der Ausführer hat alle vier Posten umgesetzt** (Wächter
+   `phase10_5_finishing/tests/test_sichtung_7_4.py`, 8 Tests mit **4 Gegenproben**; Probe
+   `phase10_5_finishing/probes/p105_b7_sichtung_probe.py` an der Wegwerf-Instanz **18793**:
+   **5/5 Kriterien**, **5 Gegenläufe** rot). **Gemessen:** (1) Abstand **2,5 px** (vorher 5,6 px;
+   `.45em` → `.2em`, eine Klasse für Rail **und** Anmeldeseite) · (2) die Auswahl trägt jetzt die
+   Kanten der Suchzeile (**0 px** Versatz links wie rechts) · (3) der Banner ist eine **einzeilige
+   Leiste (49 px statt ~140 px)**: Schlagzeile (erste Zeile des Eintrags) + Knopf **„Alle
+   Änderungen"**, der den Update-Log in den Einstellungen öffnet (gemessen: 20 Einträge sichtbar) ·
+   (4) die Versionsanzeige ist 11 px mit `.03em` Laufweite — der hellste Pixel des Punktes steigt
+   von **155/255 auf 203/255** (bei 9 px verblasste er in den Grund: das ist der Befund „v316").
+   **Befund für den Nikinger:** ein *quadratischer* Punkt braucht in dieser Schrift **13 px** — größer
+   als die Wortmarke (12,5 px). Eine eigene Schriftart (Monospace) für die Version würde es runden,
+   **widerspricht aber der gelockten Entscheidung P6 vom 2026-08-13** („keine eigene Schriftart").
+   **P10.5-32 bleibt ⬜**, bis der Nikinger die Umsetzung bestätigt.
 5. **7.5 UI-5 — Kontrast (D-7).** ✅ **2026-10-24** — **Drift gegen den Plan:** im Code ist `--caution` **selbst der
    Text-Farbwert** (`app.css:92`: `--caution: var(--danger)`), nicht die Knopffläche — der Plan
    spricht von einem „neuen Token `--caution-text` (heller als `--caution`)". **Der Code gewinnt:**

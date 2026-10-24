@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-10-24 (Block 7.5–7.7: Abnahmestand des Phase-10.5-Heads 30 ✅ · 0 ⚠️ · 31 ⬜; Größen von Head und Archiv nachgezogen) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
+updated: 2026-10-24 (Block 7.4 (UI-4) umgesetzt — die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen: Wortmarken-Abstand 2,5 px · „Zugewiesen"-Auswahl mit den Kanten der Suchzeile · Update-Banner als einzeilige Leiste (49 px) mit dem Knopf „Alle Änderungen" · Versionsanzeige 11 px (Punkt 203/255 statt 155/255); Wächter 8/8, Probe 5/5 mit 5 roten Gegenläufen; P10.5-32 bleibt ⬜ bis zur Bestätigung; Größen von Wurzel-Head, Phase-Head und Archiven nachgezogen) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 ---
 # Doc Index (L0)
 
@@ -28,13 +28,13 @@ updated: 2026-10-24 (Block 7.5–7.7: Abnahmestand des Phase-10.5-Heads 30 ✅ �
 
 ## Root & governance
 
-- [docs/INDEX.md](./INDEX.md) — 🔗 **diese Karte** (L0) · **38.442 B — unter dem 40-KiB-Softcap** (V145 ✅) · die Karten-Chronik steht in `docs/INDEX_ENTRIES_ARCHIVE.md` · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
-- [CLAUDE.md](../CLAUDE.md) — 📗 **39342 B** (vor der Rotation 114.771 B) · Wurzel-Regelwerk: Kernprinzip der dumme Server, **neun Hard Rules** (1 keine Secrets in Dateien · 3 kein Write ohne `version` · 4 Schreibrechte folgen der Mitgliedschaft · 6 nie ein offener Port · 8 Commit ⇒ Doc-Update · 9 nie `pkill -f`, nie den systemd-Dienst), Working style, Doku-Hygiene und **Current state** (Session-Bloecke, newest-first, **kein** Ein-Block-Limit — P9-A). **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+- [docs/INDEX.md](./INDEX.md) — 🔗 **diese Karte** (L0) · **37.778 B — unter dem 40-KiB-Softcap** (V145 ✅) · die Karten-Chronik steht in `docs/INDEX_ENTRIES_ARCHIVE.md` · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+- [CLAUDE.md](../CLAUDE.md) — 📗 **36881 B** (vor der Rotation 114.771 B) · Wurzel-Regelwerk: Kernprinzip der dumme Server, **neun Hard Rules** (1 keine Secrets in Dateien · 3 kein Write ohne `version` · 4 Schreibrechte folgen der Mitgliedschaft · 6 nie ein offener Port · 8 Commit ⇒ Doc-Update · 9 nie `pkill -f`, nie den systemd-Dienst), Working style, Doku-Hygiene und **Current state** (Session-Bloecke, newest-first, **kein** Ein-Block-Limit — P9-A). **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [README.md](../README.md) — 📗 ~7KB · human overview + machine setup (venv, keyring, run, smoke test); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [ROADMAP.md](../ROADMAP.md) — 📗 **37.197 B** · Phasen 1–10.5, Scope in/out je Phase, Status · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/ROADMAP_UPDATES_ARCHIVE.md](./ROADMAP_UPDATES_ARCHIVE.md) — 📦 **14.371 B** · L3: `updated:`-Kette von `ROADMAP.md`, verbatim (2026-10-07)
 - [docs/DOC_LAYERS_CONVENTION.md](./DOC_LAYERS_CONVENTION.md) — 📗 ~5KB · Doc-Layers-Spec (v1, 2026-07-06) · **byte-identische Kopie aus dem Trading-Bot-Repo — nicht projektspezifisch anpassen, sonst divergieren zwei Kopien derselben Regel**
-- [docs/concepts/sichtpruefung_automation_conventions.md](./concepts/sichtpruefung_automation_conventions.md) — 📗 **21.765 B** (die Kartenzeile nannte bis 2026-10-05 `~8KB` für eine seit dem 2026-09-11 ~18 KB große Datei — zwei Appends ohne Nachzug, und `doc_health` liest keine KB-Angaben, also meldete es niemand) · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+- [docs/concepts/sichtpruefung_automation_conventions.md](./concepts/sichtpruefung_automation_conventions.md) — 📗 **21.765 B** · Konventionen der Sichtprüfungs-Automatisierung · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/concepts/sichtpruefung_automation_tooling.md](./concepts/sichtpruefung_automation_tooling.md) — 📗 ~26KB · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/PROMPTS.md](./PROMPTS.md) — 📗 ~20KB · die drei Workflow-Prompts (Claude-Code-Session-Start, Phasen-Kickoff — seit P9 in Claude Code, Phasen-Abschluss); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 
@@ -56,9 +56,9 @@ updated: 2026-10-24 (Block 7.5–7.7: Abnahmestand des Phase-10.5-Heads 30 ✅ �
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing — alle Baustellen schließen; Plan `docs/concepts/phase10_5_finishing_plan.md`, Ausführer M3.1 Flash als Open-Test)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **36213 B** · Phase-10.5-Head: Modulstatus der Blöcke 0–12/Z, Deploy-Tabelle A–D, Abnahmestand P10.5-1–61 (30 ✅ · 0 ⚠️ · 31 ⬜), offene Punkte beim Nikinger, genau ein Session-Block (≤ 4 KiB, DO-3)
-- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **49230 B** · L3-Archiv der älteren Session-Blöcke dieser Phase, verbatim, newest-first
-- [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **7698 B** · L3-Archiv des **Startauftrags von Block 7** (verbatim verschoben 2026-10-23) — Schritte 7.4–7.7
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **38405 B** · Phase-10.5-Head: Modulstatus der Blöcke 0–12/Z, Deploy-Tabelle A–D, Abnahmestand P10.5-1–61 (30 ✅ · 0 ⚠️ · 31 ⬜), offene Punkte beim Nikinger, genau ein Session-Block (≤ 4 KiB, DO-3)
+- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **52225 B** · L3-Archiv der älteren Session-Blöcke dieser Phase, verbatim, newest-first
+- [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **10396 B** · L3-Archiv des **Startauftrags von Block 7** (verbatim verschoben 2026-10-23) — Schritte 7.4–7.7
 
 
 
@@ -114,9 +114,7 @@ updated: 2026-10-24 (Block 7.5–7.7: Abnahmestand des Phase-10.5-Heads 30 ✅ �
 - [phase8_ui_graph/CLAUDE.md](../phase8_ui_graph/CLAUDE.md) — 📗 ~47KB — **6.901 B ÜBER dem 40-KiB-Softcap, benannt statt versteckt** (P8-P; die Lösung ist die Rotation, kein Kürzen) · Phase-8-Head, alle Bloecke ✅, Abnahmestand **26 ✅ · 0 🟡 · 0 ⬜**, trägt die **Selection/Choice-Konvention v3** (fünfte Kategorie Vorsicht) · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [phase8_ui_graph/SESSIONS_ARCHIVE.md](../phase8_ui_graph/SESSIONS_ARCHIVE.md) — 📦 ~218KB · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/concepts/phase8_ui_graph_plan.md](./concepts/phase8_ui_graph_plan.md) — 📕 ~83KB · ausfuehrungsreifer P8-Plan gegen `main@8f46745`, **erstmals fuer opencode/M3 als Ausfuehrenden**. N1–N12 in §0.1 gelockt, Entscheidungen P8-A–P8-Q, vier Bloecke (0 → A → B → Gate → C → D → Z), Abnahme P8-1–P8-24, `[VERIFY]` V81–V92. **§9 ist der kanonische P8-Closeout** (P8-N: ein Dokument pro Phase) — §9.4.1–§9.4.3 stehen seit Phase 8.5 auf ERLEDIGT, §9.4.7 auf 26/0/0, §9.4.5 traegt das geerbte Ledger. Kein Advisor (P8-L). Als 📕-Snapshot ausgenommen
-- [docs/screenshots/](./screenshots/README.md) — 📗 ~1.1MB · kanonische Ablage aller Sichtpruefungs-Bilder, pro Phase praefixiert (`sp2_*`, `c4c5_*`, `p86_block_*`, `p86_probe_*`, **`p86_smoke_*` = die 17 Gate-Belege von `v3.0.2`**, **die P9-Praefixe: `p9_step_e_*` (Karten-Reload, 2026-09-28) · **`p9_step_d_*`** (Step-D-Probe: der gestrichelte Drop-Zustand an der Space-Zeile, 2026-10-03 — Build-Beleg, **nicht** die offene Sichtfrage) · `p9_step_g_*` (Loeschen) · `p9_btn_*`/`p9_btn2_*` (Standardoptik der Knoepfe, 2026-10-01) · **`p9_btn3_*` (B17:
-Vorsichtsknopf auf die Standardflaeche, 2026-10-02 — die vier aktuellen Bilder, in
-`screenshots_latest/` verlinkt)** · `p9_doing_*` (der fuenfte Eimer „In Arbeit", 2026-10-02 — **die aktuellen vier Bilder, in `screenshots_latest/` verlinkt**) · `p9_trace_0*` (**die fünf Bilder und die Probe sind am 2026-10-02 neu aufgenommen**: der alte Beleg war der Gegenlauf des trace-Blocks selbst — Probe rot, Bild 05 zeigte `beta`; Wächter `test_committed_probe_evidence.py` verhindert das) · `p9_step_a_01..04_*` (Tailscale-Infra-Beleg aus A3 — **keine Sichtpruefung**, deshalb nicht in `screenshots_latest/`) · `p9a_legacy_*` (Uebergangsfenster)**). Die `c4c5_*`-Bilder besetzen die „Sneak Peak"-Tabelle im `README.md`. Schnellzugriff auf die jeweils aktuellen: `screenshots_latest/`. L1-Header-Card in `docs/screenshots/README.md`. Keine Geheimnisse in den Bildern, nur UI-Rendering
+- [docs/screenshots/](./screenshots/README.md) — 📗 ~1.1MB · kanonische Ablage aller Sichtpruefungs-Bilder, pro Phase praefixiert (`sp2_*`, `c4c5_*`, `p86_block_*`, `p86_probe_*`, `p86_smoke_*` = die 17 Gate-Belege von `v3.0.2`, `p9_step_*`, `p9_btn*`, `p9_doing_*`, `p9_trace_0*`, `p9a_legacy_*`) · die `c4c5_*`-Bilder besetzen die „Sneak Peak"-Tabelle im `README.md` · Schnellzugriff auf die jeweils aktuellen: `screenshots_latest/` · L1-Header-Card in `docs/screenshots/README.md` · keine Geheimnisse in den Bildern, nur UI-Rendering
 
 ## Phase 7 — ✅ abgeschlossen (Space-Verwaltung, Mehrfachauswahl; live `e88a624`)
 
@@ -187,10 +185,10 @@ doppelt hier gelistet.)*
 ## Project-wide session log (Wurzel-Current-State-Archiv)
 
 - [docs/INDEX_ENTRIES_ARCHIVE.md](./INDEX_ENTRIES_ARCHIVE.md) — 📦 **46.456 B** · L3-Archiv der **datierten Nachträge aus den Einträgen dieser Karte**, verbatim, ein Abschnitt je Karte in der Reihenfolge der Karte (nicht newest-first — wer einen Nachtrag sucht, sucht ihn über den Dateinamen, nicht über ein Datum). Angelegt am 2026-10-03, weil die Karte bei **71.573 B** stand und **37.391 B** davon Nachträge in 43 von 93 Einträgen waren — mehr als die Hälfte, und die seit Wochen als ungeklärt geführte Ursache der Überschreitung (P9-3/V145). **Regel für die nächste Session:** eine Kartenzeile bekommt wieder einen datierten Nachtrag, *wenn* er kurz ist — `test_no_entry_line_carries_a_dated_addendum_any_more` verbietet sie vollständig, und das ist Absicht: die Karte ist Stand, das Archiv ist Chronik
-- [docs/INDEX_KURZUNG_ARCHIVE.md](./INDEX_KURZUNG_ARCHIVE.md) — 📦 **9.736 B** · L3-Archiv der am 2026-10-22 aus der Karte gekürzten Texte — die acht Abschnittsköpfe und drei Kartenzeilen-Chroniken, verbatim; die Karte trägt wieder Stand, dieses Archiv die Chronik des Kürzens
+- [docs/INDEX_KURZUNG_ARCHIVE.md](./INDEX_KURZUNG_ARCHIVE.md) — 📦 **11.961 B** · L3-Archiv der aus der Karte gekürzten Texte — die acht Abschnittsköpfe und fünf Kartenzeilen-Chroniken, verbatim (die letzten zwei am 2026-10-24, DO-2-Luft); die Karte trägt wieder Stand, dieses Archiv die Chronik des Kürzens
 
 - [docs/INDEX_UPDATES_ARCHIVE.md](./INDEX_UPDATES_ARCHIVE.md) — 📦 **19.557 B** · L3-Archiv der `updated:`-Kette **dieser** Datei, verbatim, newest-first. Erste Rotation 2026-09-19 von Hand; **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
-- [docs/PROJECT_SESSION_LOG.md](./PROJECT_SESSION_LOG.md) — 📦 **245.629 B** (vor der 24-Block-Rotation 101.450 B) · L3-Archiv der historischen `[YYYY-MM-DD]`-Session-Bloecke aus `CLAUDE.md` §Current state, newest-first, plus §Frontmatter-Archiv (die `updated:`-Kette der Wurzel-`CLAUDE.md`, 28 Eintraege, verbatim seit 2026-09-13). Wer die Chronik einer alten Phase sucht, faengt hier an, nicht im Wurzel-Head
+- [docs/PROJECT_SESSION_LOG.md](./PROJECT_SESSION_LOG.md) — 📦 **250.471 B** (vor der 24-Block-Rotation 101.450 B) · L3-Archiv der historischen `[YYYY-MM-DD]`-Session-Bloecke aus `CLAUDE.md` §Current state, newest-first, plus §Frontmatter-Archiv (die `updated:`-Kette der Wurzel-`CLAUDE.md`, 28 Eintraege, verbatim seit 2026-09-13). Wer die Chronik einer alten Phase sucht, faengt hier an, nicht im Wurzel-Head
 
 ## Referenzmaterial (nicht Teil des Plan/Konzept/Handover-Trios)
 

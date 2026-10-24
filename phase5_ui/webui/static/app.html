@@ -10,9 +10,13 @@
 <body>
 <!-- Update-Banner (P6 Step 3, Plan §1.8) -- ausserhalb von .shell (position:fixed in app.css),
      damit der bestehende Drei-Spalten-Grid unveraendert bleibt. body.has-update-banner (von
-     js/updates.js gesetzt) schiebt .shell darunter statt es zu ueberdecken. -->
+     js/updates.js gesetzt) schiebt .shell darunter statt es zu ueberdecken.
+     P10.5 Block 7.4, Posten 3: der Banner war bis zu ~140 px hoch (alle Zeilen des neuesten
+     Eintrags). Jetzt eine einzeilige Leiste: die erste Zeile als Schlagzeile, der ganze
+     Eintrag ueber "Alle Aenderungen" (Einstellungen -> Update-Log). -->
 <div class="update-banner" id="update-banner" hidden>
   <div class="update-banner__body" id="update-banner-body"></div>
+  <button type="button" class="btn" id="update-banner-log">Alle Änderungen</button>
   <button type="button" class="btn btn-primary" id="update-banner-dismiss">Verstanden</button>
 </div>
 

@@ -18,6 +18,7 @@ export function init() {
   var bannerEl = document.getElementById("update-banner");
   var bannerBodyEl = document.getElementById("update-banner-body");
   var bannerDismissEl = document.getElementById("update-banner-dismiss");
+  var bannerLogEl = document.getElementById("update-banner-log");
   // P9 Block settings: Stufe 2 der Fensterkette, kein eigenes Overlay mehr. Der Container
   // heißt weiter `#update-log-list` (unveränderte ID, die Renders hängen daran).
   var logListEl = document.getElementById("update-log-list");
@@ -54,7 +55,16 @@ export function init() {
   }
 
   function showBanner(latest) {
-    bannerBodyEl.innerHTML = markdownToHtml(markdownList(latest.lines));
+    // P10.5 Block 7.4, Posten 3 (Sichtung des Nikingers vom 2026-10-24): der Banner zeigte
+    // ALLE Zeilen des neuesten Eintrags und war dadurch bis zu ~140 px hoch — er verdeckte
+    // oben eine halbe Bildschirmhöhe und schob jede angemeldete Ansicht darunter. Jetzt
+    // trägt er nur die ERSTE Zeile als Schlagzeile; der ganze Eintrag steht im Update-Log
+    // (Einstellungen), das der Knopf „Alle Änderungen" direkt öffnet.
+    //
+    // Die Zeile kommt als Markdown (der Log-Text darf `**fett**` tragen), aber ohne Liste:
+    // eine Liste würde wieder Hoehe in die Zeile bringen, die der Banner nicht haben darf.
+    var zeilen = latest.lines || [];
+    bannerBodyEl.innerHTML = markdownToHtml(zeilen.length ? zeilen[0] : "");
     bannerEl.hidden = false;
     document.body.classList.add("has-update-banner");
     syncBannerHeight();
@@ -80,10 +90,30 @@ export function init() {
     api("/updates/seen", { method: "POST" }).catch(function () {});
   });
 
+  // P10.5 Block 7.4, Posten 3: „Alle Änderungen" öffnet den vollständigen Update-Log in den
+  // Einstellungen (dieselbe Fensterkette, dasselbe `renderLog` wie der Menüpunkt) — der
+  // Banner zeigt nur noch die Schlagzeile, der Rest des Eintrags verschwindet sonst.
+  // Das Banner bleibt dabei stehen: „Verstanden" bleibt der einzige Weg, es wegzuklicken.
+  if (bannerLogEl) {
+    bannerLogEl.addEventListener("click", function () {
+      // Der Weg zum Update-Log: ein **Ereignis**, kein `openPanel` -- der Wächter
+      // `test_only_one_module_opens_a_panel` (Phase 9) hält fest, dass es genau einen Öffner
+      // für die Fensterkette gibt (`settings.js`). Das Banner fragt, die Kette entscheidet.
+      window.dispatchEvent(new CustomEvent("sfx:open-panel", { detail: { name: "updates" } }));
+    });
+  }
+
   // [VERIFY] V186 (2026-10-05, beantwortet): das Update-Banner öffnet das Log **nicht** — es
   // trägt nur „Verstanden" (`#update-banner-dismiss`), keinen zweiten Knopf. Der einzige Weg
   // ins Log ist der Menüpunkt „Update-Log" in den Einstellungen. Plan §3 Schritt 1 nannte
   // „Alle Updates ansehen" — das war eine Annahme über ein Bedienelement, das es nicht gibt.
+  //
+  // **[2026-10-24, P10.5 Block 7.4, Posten 3 — datierte Korrektur zu V186:]** das Banner
+  // trägt **jetzt** einen zweiten Knopf, „Alle Änderungen" (`#update-banner-log`). Grund: der
+  // Banner zeigt nur noch die **erste Zeile** des neuesten Eintrags (vorher alle Zeilen, bis zu
+  // ~140 px Höhe) — ohne diesen Knopf wäre der Rest des Eintrags unerreichbar. Der Knopf
+  // öffnet **denselben** Update-Log in den Einstellungen (das Ereignis `sfx:open-panel`, das
+  // `settings.js` entgegennimmt); am Update-Log selbst ändert sich nichts.
   //
   // Das Rendern ist der `prepare`-Eintrag dieses Panels (P9 Block settings): das Öffnen macht
   // `settings.js`, und genau ein Ort soll entscheiden, wann ein Panel aufgeht.
