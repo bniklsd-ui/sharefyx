@@ -1174,7 +1174,7 @@ export function init() {
           // Trap beim Vorschau-Default (Advisor-Fund): ein frisch angelegtes Item hat einen
           // leeren Body — in "preview" öffnend stünde man vor einer leeren Vorschau statt der
           // Textarea, in die man eigentlich sofort tippen will.
-          loadEditorFromItem(item, { mode: "edit" });
+          loadEditorFromItem(item, { mode: "live" });
           toast("Angelegt · " + item.title);
           document.getElementById("field-title").focus();
         });

@@ -7,6 +7,7 @@ up: ./BAUSTELLENREGISTER.md
 down:
 updated: 2026-10-24 (angelegt — die `updated:`-Kette des Baustellenregisters rotiert hierher; im Register bleibt der neueste Faden plus Zeiger)
 ---
+- 2026-10-24 (B11.1 ✅ — der vendorte Editor liegt: CodeMirror 5.65.16, fünf Dateien statt drei, 71.280 B gzip) | ältere Einträge: phase10_inventory/UPDATES_ARCHIVE.md
 - 2026-10-24 (B10.5 ✅ — LG-1 und LG-2 gemessen: Wegwerf-Probe 11/11 Zellen grün, Gegenlauf rot) | ältere Einträge: phase10_inventory/UPDATES_ARCHIVE.md
 - 2026-10-24 (B9.3 ✅ — RE-3 Space umbenennen; B9.2 ✅ — RE-4) | ältere Einträge: phase10_inventory/UPDATES_ARCHIVE.md
 - 2026-10-22 (Block 6 ✅ — PA-1/PA-2 abgehakt, `/mcp` ohne Slash, PA-6)

@@ -11,6 +11,7 @@ import { renderRail } from "./tree.js";
 import { confirmDialog, showConflictDialog, openLinkPicker } from "./dialogs.js";
 import { iconSvg } from "./icons.js";
 import { withLoading } from "./loading.js";
+import { ensureCodeMirror } from "./editor_cm.js";
 
 var shellEl;
 // P10.5, Block 4 (2026-10-22, Z4): der Detail-Slot traegt den Ladezustand beim Oeffnen.
@@ -46,7 +47,18 @@ var fieldLinksEl;
 var editorToolbarEl;
 var togglePreviewButtonEl;
 var editorTextareaEl;
+// P10.5, Block 11, Schritt 11.3 (ED-1): **unbenutzt seit dem Live-Editor.** Die Vorschau-
+// Paneele im Editor (getrenntes HTML) gibt es nicht mehr -- der Live-Editor ist die Ansicht
+// (Schritt 11.4 raeumt das Element aus dem Markup ab). Die **Lesesicht** fremder Items
+// rendert weiter ueber `markdown.js` (`roPreviewEl`).
 var editorPreviewEl;
+// P10.5, Block 11, Schritt 11.3 (ED-1): der **Live-Editor**. `cm` ist die CodeMirror-Instanz
+// (null = nicht geladen oder nicht ladbar). **Die Textarea ist der Notausgang** (ED-5, der
+// Rohmodus): solange `cm` null ist, traegt die Textarea den Text, und alle Zugriffe gehen
+// ueber `getBody()`/`setBody()` -- nie direkt ueber `.value`.
+var cm = null;
+//: Laedt der Editor gerade? (Dann darf kein zweiter Ladevorgang starten.)
+var cmLaden = false;
 var saveButtonEl;
 var archiveButtonEl;
 var closeButtonEl;
@@ -142,6 +154,15 @@ function _appendLinkId(id) {
 // Alle Alt-Aufrufstellen innerhalb von `init()` (Bild-Knopf, Zeile ~632) sehen die
 // Modulebene ebenfalls, function-Deklarationen sind gehoistet.
 function insertAtCursor(textarea, text) {
+  // P10.5, Block 11, Schritt 11.3 (ED-1): im Live-Editor ersetzt CodeMirror die Auswahl
+  // (`replaceSelection`) -- der Cursor bleibt hinter dem eingefuegten Text stehen, wie in der
+  // Textarea. **Der Aufrufer uebergibt die Textarea weiterhin**, damit der Notausgang
+  // (ED-5) unveraendert funktioniert.
+  if (cm) {
+    cm.replaceSelection(text);
+    cm.focus();
+    return;
+  }
   var start = textarea.selectionStart;
   var end = textarea.selectionEnd;
   var value = textarea.value;
@@ -182,10 +203,70 @@ function _onLinkPicked(picked) {
   else _appendLinkMarkdown(picked.title, picked.id);
 }
 
+// -- Der Text des Editors (P10.5, Block 11, Schritt 11.3 — ED-1/ED-5) ----------------------
+//
+// **Ein Zugriff, eine Quelle.** Vor dem Live-Editor gab es nur die Textarea; jetzt trägt
+// der Live-Editor (CodeMirror) den Text, und die Textarea ist der **Notausgang** (ED-5).
+// Wer direkt `editorTextareaEl.value` liest, liest im Live-Modus den **alten** Text --
+// deshalb gehen alle Zugriffe ueber diese zwei Funktionen.
+//
+// `getBody()` liest, `setBody(text)` schreibt. Ist der Editor nicht ladbar, bleibt die
+// Textarea die Quelle -- der Rohmodus ist kein halber Editor, sondern ein vollwertiger.
+
+export function getBody() {
+  if (cm) return cm.getValue();
+  return editorTextareaEl ? editorTextareaEl.value : "";
+}
+
+export function setBody(text) {
+  if (cm) {
+    cm.setValue(text);
+    return;
+  }
+  if (editorTextareaEl) editorTextareaEl.value = text;
+}
+
+// Text und Auswahl, unabhaengig vom Editor (Formatierhilfen, Einfuegen an der Cursorposition).
+function _textUndAuswahl() {
+  if (cm) {
+    var von = cm.getCursor("from");
+    var bis = cm.getCursor("to");
+    return {
+      text: cm.getValue(),
+      start: cm.indexFromPos(von),
+      end: cm.indexFromPos(bis),
+    };
+  }
+  return {
+    text: editorTextareaEl.value,
+    start: editorTextareaEl.selectionStart,
+    end: editorTextareaEl.selectionEnd,
+  };
+}
+
+// Ersetzt einen Textbereich und setzt die Auswahl danach. **Dieselbe Wirkung in beiden
+// Editoren** -- der Notausgang (Textarea) verhaelt sich wie der Live-Editor.
+function _ersetze(start, end, neuerText, auswahlStart, auswahlEnde) {
+  if (start > end) {
+    var tausch = start; start = end; end = tausch;
+  }
+  if (cm) {
+    cm.replaceRange(neuerText, cm.posFromIndex(start), cm.posFromIndex(end));
+    cm.setSelection(cm.posFromIndex(auswahlStart), cm.posFromIndex(auswahlEnde));
+    cm.focus();
+    return;
+  }
+  var wert = editorTextareaEl.value;
+  editorTextareaEl.value = wert.slice(0, start) + neuerText + wert.slice(end);
+  editorTextareaEl.selectionStart = editorTextareaEl.selectionEnd = auswahlStart;
+  editorTextareaEl.focus();
+  editorTextareaEl.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
 export function currentFormValues() {
   return {
     title: fieldTitleEl.value,
-    body: editorTextareaEl.value,
+    body: getBody(),
     status: fieldStatusEl.value,
     due: fieldDueEl.value || null,
     // P9 Block trace: getrimmt, weil `_coerce_assignee()` den Wert ebenfalls `.strip()`t —
@@ -319,23 +400,68 @@ function renderCreatedByLine(item) {
     : "";
 }
 
-function setEditorMode(mode) {
-  state.mode = mode;
-  editorTextareaEl.hidden = mode !== "edit";
-  editorPreviewEl.hidden = mode !== "preview";
-  togglePreviewButtonEl.textContent = mode === "edit" ? "Vorschau" : "Bearbeiten";
-  // Die Formatierhilfen bleiben sichtbar (sie sitzen in derselben Leiste wie der
-  // Vorschau-Umschalter), sind in der Vorschau aber deaktiviert — sonst würden sie unsichtbar
-  // in die Textarea schreiben.
-  Array.prototype.forEach.call(editorToolbarEl.querySelectorAll("[data-md]"), function (b) {
-    b.disabled = mode !== "edit";
-  });
-  if (mode === "preview") {
-    editorPreviewEl.innerHTML = markdownToHtml(editorTextareaEl.value, {
-      itemId: state.editingSnapshot && state.editingSnapshot.id,
-      assetIds: assetIdsOf(state.editingSnapshot && state.editingSnapshot.assets),
+// P10.5, Block 11, Schritt 11.3 (ED-1): der Live-Editor entsteht **beim Öffnen** eines
+// Items, nicht beim Laden der Seite — der Erstaufruf bleibt ohne Editor (das Budget
+// „Editor nachgeladen"). Bis der Editor da ist, trägt die **Textarea** den Text (der
+// Notausgang, ED-5): der Mensch kann also sofort tippen, und der Editor übernimmt, sobald
+// er geladen ist.
+function _editorBereit() {
+  if (cm || cmLaden) return;
+  cmLaden = true;
+  ensureCodeMirror().then(function (CodeMirror) {
+    cmLaden = false;
+    // **Nicht ladbar?** Dann bleibt die Textarea — der Rohmodus ist der Notausgang (ED-5).
+    if (!CodeMirror || cm) return;
+    // **Vor** `cm` gesetzt: `getBody()` liest ab dann den Editor, nicht mehr die Textarea.
+    var text = editorTextareaEl.value;
+    var cursor = editorTextareaEl.selectionStart;
+    cm = CodeMirror.fromTextArea(editorTextareaEl, {
+      mode: { name: "markdown", highlightFormatting: true },
+      lineWrapping: true,
+      lineNumbers: false,
+      // Kein Faltbalken, keine Zeilennummern: die Flaeche gehoert dem Text.
+      viewportMargin: 20,
     });
+    cm.on("change", _editorGeaendert);
+    if (cm.getValue() !== text) cm.setValue(text);
+    // Der Editor kann mitten im Tippen eintreffen — der Cursor bleibt, wo der Mensch war.
+    try {
+      cm.setCursor(cm.posFromIndex(cursor));
+      cm.focus();
+    } catch (err) { /* der Cursor ist kein Pfad */ }
+    setRawMode(state.mode === "raw");
+  });
+}
+
+// **Eine Aenderung, ein Ort:** der Live-Editor feuert „change", die Textarea feuert „input".
+// Beides heisst dasselbe: Version neu rechnen und den Entwurf sichern.
+function _editorGeaendert() {
+  updateVersionBand();
+  saveDraft();
+}
+
+// P10.5, Block 11, Schritt 11.3 (ED-1): **kein Moduswechsel mehr.** Vorher wechselte der
+// Editor zwischen „Vorschau" (HTML) und „Bearbeiten" (Textarea) — der Wechsel war eine
+// eigene Ansicht und damit ein Weg, auf dem ein ungespeicherter Text verloren gehen konnte.
+// Jetzt ist der Editor **immer** der Live-Editor (CodeMirror mit Markdown-Hervorhebung); der
+// Schalter heisst „Rohtext" und schaltet **innerhalb** desselben Editors zwischen der
+// Live-Darstellung und dem **Rohtext** (ED-5: jedes Zeichen sichtbar).
+//
+// **Der Rohmodus ist kein halber Editor, sondern ein vollwertiger:** im Live-Editor heisst
+// „Rohtext" nur, dass die Hervorhebung wegaellt — der Text bleibt derselbe, und im Notausgang
+// (CM nicht ladbar) ist die Textarea ohnehin der Rohmodus.
+function setRawMode(on) {
+  state.mode = on ? "raw" : "live";
+  if (cm) {
+    // Ohne Modus faellt die Hervorhebung weg -- jede Zeile bleibt sichtbar (ED-5).
+    cm.setOption("mode", on ? null : { name: "markdown", highlightFormatting: true });
+    var huelle = cm.getWrapperElement();
+    if (huelle) huelle.classList.toggle("is-raw", !!on);
   }
+  togglePreviewButtonEl.textContent = on ? "Live" : "Rohtext";
+  togglePreviewButtonEl.setAttribute("aria-pressed", on ? "true" : "false");
+  // Die Formatierhilfen bleiben **aktiv** (sie schreiben in den Puffer, in beiden Ansichten
+  // gleich) — sie sind kein Vorschau-Feature, sondern ein Schreibbefehl.
 }
 
 // P7-A1: die ID ist eine interne Adresse, kein Anzeigename — deshalb nur als Kopierfeld, nie
@@ -381,11 +507,6 @@ function renderAssetStrip(item) {
         }).then(function () {
           item.assets = item.assets.filter(function (a) { return a.id !== asset.id; });
           renderAssetStrip(item);
-          if (state.mode === "preview") {
-            editorPreviewEl.innerHTML = markdownToHtml(editorTextareaEl.value, {
-              itemId: item.id, assetIds: assetIdsOf(item.assets),
-            });
-          }
           toast("Bild entfernt.");
         }).catch(function (err) {
           toast(err.message || "Entfernen fehlgeschlagen.", "error");
@@ -455,14 +576,16 @@ function showEditableItem(item, opts) {
   fillAssigneeOptions();
   fieldTagsEl.value = item.tags.join(", ");
   fieldLinksEl.value = item.links.join(", ");
-  editorTextareaEl.value = item.body;
+  // P10.5, Block 11, Schritt 11.3 (ED-1): der **Live-Editor** trägt den Text — vor dem
+  // Laden des Editors die Textarea (der Notausgang, ED-5).
+  _editorBereit();
+  setBody(item.body);
 
-  // Meldung des Nikingers: der Editor öffnete immer in der Bearbeiten-Ansicht, auch beim
-  // bloßen Betrachten. Vorgabe jetzt "Vorschau" — außer `opts.mode` sagt etwas anderes:
-  // ein frisch angelegtes Item (dialogs.js :: createSubmitButtonEl) will sofort tippen können
-  // ("edit"), und ein Neuladen NACH einem Schreibvorgang (afterWrite/Konflikt) behält den
-  // Modus bei, den man gerade benutzt hat, statt mitten im Tippen in die Vorschau zu springen.
-  setEditorMode(opts.mode || "preview");
+  // **Die Vorgabe beim Öffnen ist der Live-Modus** (Plan §Block 11, Schritt 11.3): es gibt
+  // keinen Moduswechsel mehr, also beginnt der Editor in der Live-Darstellung. `opts.mode`
+  // darf den **Rohmodus** verlangen ("raw") — das tut derzeit niemand, aber der Pfad ist
+  // derselbe wie für "live" und damit nicht zukunftsblind.
+  setRawMode(opts.mode === "raw");
 
   var draft = loadDraftIfAny(item.id);
   if (draft && (draft.title !== item.title || draft.body !== item.body)) {
@@ -476,22 +599,13 @@ function showEditableItem(item, opts) {
         return;
       }
       fieldTitleEl.value = draft.title;
-      editorTextareaEl.value = draft.body;
+      setBody(draft.body);
       fieldStatusEl.value = draft.status;
       fieldDueEl.value = draft.due || "";
       fieldAssigneeEl.value = draft.assignee || "";
       fieldTagsEl.value = draft.tags.join(", ");
       fieldLinksEl.value = draft.links.join(", ");
       updateVersionBand();
-      // Advisor-Fund: `setEditorMode()` rendert die Vorschau nur BEIM WECHSEL nach "preview" —
-      // stehen wir (Vorgabe seit diesem Fund) schon dort, während der Entwurf asynchron
-      // ankommt, zeigte die Vorschau bis hierhin weiter den ALTEN, gespeicherten Text.
-      if (state.mode === "preview") {
-        editorPreviewEl.innerHTML = markdownToHtml(editorTextareaEl.value, {
-          itemId: state.editingSnapshot && state.editingSnapshot.id,
-          assetIds: assetIdsOf(state.editingSnapshot && state.editingSnapshot.assets),
-        });
-      }
     });
   }
   updateVersionBand();
@@ -767,71 +881,61 @@ export function init() {
   // -- Formatierhilfen (P5-U: fügt Markdown-Syntax in die Textarea ein, kein `execCommand`,
   // kein WYSIWYG) -----------------------------------------------------------------------------
 
-  function wrapSelection(textarea, marker) {
-    var start = textarea.selectionStart;
-    var end = textarea.selectionEnd;
-    var value = textarea.value;
-    var selected = value.slice(start, end);
-    textarea.value = value.slice(0, start) + marker + selected + marker + value.slice(end);
-    textarea.selectionStart = start + marker.length;
-    textarea.selectionEnd = start + marker.length + selected.length;
-    textarea.focus();
-    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  // P10.5, Block 11, Schritt 11.3 (ED-1): die Formatierhilfen arbeiten ueber
+  // `_textUndAuswahl()`/`_ersetze()` — damit wirken sie im Live-Editor (CodeMirror) **und**
+  // im Notausgang (Textarea) gleich. Der Code ist damit **einer**, nicht zweier.
+  function wrapSelection(marker) {
+    var a = _textUndAuswahl();
+    var gewaehlt = a.text.slice(a.start, a.end);
+    _ersetze(a.start, a.end, marker + gewaehlt + marker,
+             a.start + marker.length, a.start + marker.length + gewaehlt.length);
   }
 
-  function insertLinePrefix(textarea, prefix) {
-    var start = textarea.selectionStart;
-    var value = textarea.value;
-    var lineStart = value.lastIndexOf("\n", start - 1) + 1;
-    textarea.value = value.slice(0, lineStart) + prefix + value.slice(lineStart);
-    textarea.selectionStart = textarea.selectionEnd = start + prefix.length;
-    textarea.focus();
-    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  function insertLinePrefix(prefix) {
+    var a = _textUndAuswahl();
+    var lineStart = a.text.lastIndexOf("\n", a.start - 1) + 1;
+    _ersetze(lineStart, lineStart, prefix, a.start + prefix.length, a.start + prefix.length);
   }
 
   var TOOLBAR_ACTIONS = {
-    bold: function (t) { wrapSelection(t, "**"); },
-    italic: function (t) { wrapSelection(t, "*"); },
-    code: function (t) { wrapSelection(t, "`"); },
-    h: function (t) { insertLinePrefix(t, "## "); },
-    quote: function (t) { insertLinePrefix(t, "> "); },
-    ul: function (t) { insertLinePrefix(t, "- "); },
-    ol: function (t) { insertLinePrefix(t, "1. "); },
-    hr: function (t) {
-      var start = t.selectionStart;
-      var before = t.value.slice(0, start);
+    bold: function () { wrapSelection("**"); },
+    italic: function () { wrapSelection("*"); },
+    code: function () { wrapSelection("`"); },
+    h: function () { insertLinePrefix("## "); },
+    quote: function () { insertLinePrefix("> "); },
+    ul: function () { insertLinePrefix("- "); },
+    ol: function () { insertLinePrefix("1. "); },
+    hr: function () {
+      var a = _textUndAuswahl();
+      var before = a.text.slice(0, a.start);
       var prefix = before === "" || before.charAt(before.length - 1) === "\n" ? "" : "\n";
-      t.value = before + prefix + "\n---\n\n" + t.value.slice(start);
-      t.focus();
-      t.dispatchEvent(new Event("input", { bubbles: true }));
+      _ersetze(a.start, a.start, prefix + "\n---\n\n", a.start, a.start);
     },
-    link: function (t) {
+    link: function () {
       // Platzhalter statt einer echten URL-Vorlage — ein Schema-Präfix im Quelltext würde
       // `test_app_js_makes_no_external_requests` als externe Referenz auffassen; ein
       // Platzhalter-Wort ist ohnehin klarer als eine Vorlage, die wie ein echter Link aussieht.
-      var start = t.selectionStart;
-      var end = t.selectionEnd;
-      var selected = t.value.slice(start, end) || "Linktext";
+      var a = _textUndAuswahl();
+      var selected = a.text.slice(a.start, a.end) || "Linktext";
       var url = "Ziel-URL";
       var snippet = "[" + selected + "](" + url + ")";
-      t.value = t.value.slice(0, start) + snippet + t.value.slice(end);
-      var urlStart = start + selected.length + 3;
-      t.selectionStart = urlStart;
-      t.selectionEnd = urlStart + url.length;
-      t.focus();
-      t.dispatchEvent(new Event("input", { bubbles: true }));
+      var urlStart = a.start + selected.length + 3;
+      _ersetze(a.start, a.end, snippet, urlStart, urlStart + url.length);
     },
   };
 
   Array.prototype.forEach.call(editorToolbarEl.querySelectorAll("[data-md]"), function (button) {
     button.addEventListener("click", function () {
       var action = TOOLBAR_ACTIONS[button.dataset.md];
-      if (action) action(editorTextareaEl);
+      if (action) action();
     });
   });
 
+  // P10.5, Block 11, Schritt 11.3 (ED-1/ED-5): der Schalter heißt "Rohtext" und schaltet
+  // **innerhalb** des Live-Editors zwischen Live-Darstellung und Rohtext (kein Moduswechsel
+  // mehr — s. `setRawMode()`).
   togglePreviewButtonEl.addEventListener("click", function () {
-    setEditorMode(state.mode === "edit" ? "preview" : "edit");
+    setRawMode(state.mode !== "raw");
   });
 
   // -- Bild einfügen (Block B Step B3, P6.5-J) — der Pflichtweg ist dieser Knopf, kein
@@ -853,11 +957,6 @@ export function init() {
       state.editingSnapshot.assets.push(asset);
       renderAssetStrip(state.editingSnapshot);
       insertAtCursor(editorTextareaEl, "![" + (file.name || "Bild") + "](asset:" + asset.id + ")");
-      if (state.mode === "preview") {
-        editorPreviewEl.innerHTML = markdownToHtml(editorTextareaEl.value, {
-          itemId: itemId, assetIds: assetIdsOf(state.editingSnapshot.assets),
-        });
-      }
     }).catch(function (err) {
       toast(err.message || "Bild-Upload fehlgeschlagen.", "error");
     });
@@ -887,17 +986,14 @@ export function init() {
     renderMetaDigest();
   });
 
+  // P10.5, Block 11, Schritt 11.3 (ED-1): die Felder **und** die Textarea (der Notausgang)
+  // melden ihre Aenderung ueber `_editorGeaendert()` — derselbe Ort wie beim Live-Editor
+  // (CodeMirror feuert „change").
   [fieldTitleEl, fieldStatusEl, fieldDueEl, fieldAssigneeEl, fieldTagsEl, fieldLinksEl, editorTextareaEl].forEach(
     function (input) {
-      input.addEventListener("input", function () {
-        updateVersionBand();
-        saveDraft();
-      });
+      input.addEventListener("input", _editorGeaendert);
       // `<select>`/`<input type=date>` feuern in manchen Browsern nur `change`, nicht `input`.
-      input.addEventListener("change", function () {
-        updateVersionBand();
-        saveDraft();
-      });
+      input.addEventListener("change", _editorGeaendert);
     }
   );
 

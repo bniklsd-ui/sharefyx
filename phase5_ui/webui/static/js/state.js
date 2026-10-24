@@ -96,7 +96,9 @@ export var state = {
   // (dieselbe Exklusivitäts-Disziplin wie `folder`/`filter`, siehe tree.js :: activateView()).
   selectedItemIds: new Set(),
   meta: null,
-  mode: "edit",
+  // P10.5, Block 11, Schritt 11.3 (ED-1): "live" (Live-Darstellung) oder "raw" (Rohtext).
+  // **Kein "preview"/"edit" mehr** -- es gibt keinen Moduswechsel (s. `editor.js :: setRawMode()`).
+  mode: "live",
   editingSnapshot: null,
   conflictCurrent: null,
 };

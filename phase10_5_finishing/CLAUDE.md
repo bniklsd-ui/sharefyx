@@ -12,7 +12,7 @@ down:
   - UPDATES_ARCHIVE.md                              # 📦 die älteren `updated:`-Fäden dieses Heads, verbatim
   - STARTUPTRAG_ARCHIVE.md                          # 📦 die Startaufträge der Blöcke 7 und 9, verbatim
   - FREIGABEN_ARCHIVE.md                           # 📦 die Freigaben der Phase, verbatim
-updated: 2026-10-24 (Block 11.2: der Nachlader (js/editor_cm.js) — Promise gecacht, Fehler → null = Rohmodus; 6 Wächter) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-10-24 (Block 11.3: der Live-Editor — ein Text, eine Quelle, kein Moduswechsel; Probe 12/12 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -36,7 +36,7 @@ updated: 2026-10-24 (Block 11.2: der Nachlader (js/editor_cm.js) — Promise gec
 | 8 | Karte: Gehirnkarte C2 | Ausführer (+ Claude Code Smoke/Sichtung) | C | 🔄 2026-10-24 — **8.1–8.8 gebaut und gemessen** (Lappen/Furchen/Zellen/Aktivierung in `graph.js`, KA-2 Layout-Ablage, KA-3 Suche/Filter, reduced motion 0 Ticks) · **Browser-Probe `probes/p105_b8_karte_probe.py` an der 200-Knoten-Wegwerf-Instanz: 4/4 Messungen grün, 3 Gegenläufe je rot** · **Smoke `p8_22_smoke.py` 5/5** (Ruhe 2712,1 ms ≤ 3000, Frame p95 1,7 ms ≤ 16,7, reduced motion **0** Frames) · **drei Fehler hat erst der Browser gefunden** (gezogener Knoten wurde zurückgezogen · Fokus blieb nach dem Zeigerwechsel · Trefferzahl wurde vom Layout-Hinweis überschrieben) — alle drei behoben und gewächtert · **Abnahme 10-36/38/39/40 ✅, 10-37 wartet auf die Sichtung** (4 Screenshots liegen vor) · **Befund: das Plan-Budget für `graph.js` ist überschritten** (+11,1 KB gzip statt +8 KB; davon +9,8 KB Kommentar, der Code selbst +2,9 KB) — Entscheidung beim Nikinger · **drei Pfade außerhalb der §3-Liste** (bewusst, datiert): `phase9_hardening/scripts/graph_reload_probe.mjs` (der P9-Harness malt die alte Strichzeichnung — ohne Anpassung wäre der P9-Wächter rot) · `phase10_5_finishing/{probes,tests}/` (Plan 8.8 verlangt Proben und Wächter) · `docs/screenshots/p105_b8_*.png` (Plan 8.8 verlangt die vier Bilder für die Sichtung) |
 | 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | ✅ 2026-10-24 — **9.1 RE-7 `created_by`** (Probe 12/12) · **9.2 RE-4 `rename_folder`** (Probe 13/13) · **9.3 RE-3 `rename_space`** (Probe 15/15) — alle drei gebaut und gemessen; Branch `p105-block9`, Merge **nach** Deploy C |
 | 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | D | ✅ 2026-10-24 — **10.1** LG-1 Volltext (`in_body`, Schalter) · **10.2** LG-2 serverseitig (`events.py`, Route, `timeout_graceful_shutdown=5`) · **10.3** LG-2 Client (`realtime.js`, Poll-Rückfall 120 s, Hinweisband P10.5-S) · **10.5 Probe**: 11/11 Zellen grün an der Wegwerf-Instanz (18810) — **Latenz 141,1 ms** (Grenze 2000), **Shutdown 5,22 s** (Grenze 10), Volltext 0 → 1 Treffer mit dem Schalter, Band „Geändert von alpha — neu laden?", unsichtbarer Space **ohne** Ereignis; **Gegenlauf rot** (Filter aus → das Ereignis kommt) — 33 neue Tests, 7 Gegenläufe |
-| 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | 🔄 2026-10-24 — **11.1 Vendor** (CodeMirror 5.65.16, **fünf** Dateien statt drei — gemessen: der UMD-Browser-Zweig der `markdown.min.js` löst `require("../xml/xml")` **nicht** auf) · **11.2 Nachlader** (`js/editor_cm.js`: CSS → Kern → Modus-Dateien, Promise gecacht, Fehler → `null` = Textarea/Rohmodus) |
+| 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | 🔄 2026-10-24 — **11.1 Vendor** (CodeMirror 5.65.16, **fünf** Dateien statt drei — gemessen: der UMD-Browser-Zweig der `markdown.min.js` löst `require("../xml/xml")` **nicht** auf) · **11.2 Nachlader** (`js/editor_cm.js`: CSS → Kern → Modus-Dateien, Promise gecacht, Fehler → `null` = Textarea/Rohmodus) · **11.3 Live-Editor** (`editor.js`: `getBody()`/`setBody()`, `setRawMode(on)`, Schalter „Rohtext", Probe 12/12 grün) |
 | 12 | Doku und Altlasten: DO-1, LG-6, AL-1 (Rest), AL-3, BG-2/BG-3 | Claude Code | — | ⬜ |
 | Z | Closeout P10.5 (Handover, Grafik, Rotationen) | Claude Code + Nikinger | — | ⬜ |
 
@@ -169,27 +169,37 @@ updated: 2026-10-24 (Block 11.2: der Nachlader (js/editor_cm.js) — Promise gec
 > wird **erst nach dem Deploy C** nach `main` gemergt (`deploy.sh` klont das lokale `main` —
 > sonst liefert `v3.1.7` den Block-9-Stand mit aus).
 
-## Session stopped — 2026-10-24 (Block 11.2: der Nachlader — CSS, dann der Kern, dann die Modus-Dateien)
+## Session stopped — 2026-10-24 (Block 11.3: der Live-Editor — ein Text, eine Quelle, kein Moduswechsel)
 
-**Ergebnis.** `static/js/editor_cm.js` (neu) lädt den Editor **nach**: erst das CSS, dann
-`codemirror.min.js`, dann `meta.min.js`, `xml.min.js` und zuletzt `markdown.min.js`. Das
-Promise wird **gecacht** (ein zweiter Aufruf wartet auf dasselbe Laden), und ein Fehler
-löst mit `null` auf — **der Editor bleibt dann die Textarea**, also der Rohmodus (ED-5).
-Ein Wurf nach oben wäre die falsche Richtung: der Editor ist ein Komfort, kein Pfad.
+**Ergebnis.** `editor.js` ist auf den Live-Editor umgestellt: **ein** Text, **eine** Quelle.
+`getBody()`/`setBody(text)` ersetzen jeden direkten Zugriff auf `editorTextareaEl.value`
+(der Wächter `tests/test_editor_live.py` prüft das — neun Tests, jeder mit einer Gegenprobe am
+Rand). `setEditorMode()` ist **weg**, `setRawMode(on)` ist da, der Schalter heißt „Rohtext", und
+die Vorgabe beim Öffnen ist der **Live-Modus** (kein Moduswechsel mehr, ED-1). Die
+Formatierhilfen laufen über `_textUndAuswahl()`/`_ersetze()` — **ein** Code für Live-Editor und
+Notausgang, nicht zwei.
 
-**Sechs Wächter** (`tests/test_editor_cm.py`), darunter der wichtigste: die Dateiliste des
-Laders muss **exakt** den Dateien im Verzeichnis `static/vendor/codemirror/` entsprechen —
-ein Vendor-File, das der Lader nicht kennt, wäre sonst ein stiller Fehler (der Editor liefe
-ohne den Modus, und nichts würde rot). Zusammen mit dem SHA-Wächter aus 11.1 ist der
-Vendor-Pfad jetzt von beiden Seiten geschlossen.
+**Der Notausgang ist ein vollwertiger Editor.** Ist CodeMirror nicht ladbar, trägt die Textarea
+den Text, und alle Aktionen funktionieren unverändert (ED-5). Der Live-Editor entsteht **beim
+Öffnen** eines Items, nicht beim Laden der Seite (der Erstaufruf bleibt ohne Editor — das
+Budget „Erstaufruf" und „Editor nachgeladen" sind zwei getrennte Messungen).
 
-**Was noch nicht gebaut ist.** Der Editor selbst: `editor.js` wird auf `getBody()`/`setBody()`
-umgestellt (ohne Moduswechsel, ED-1), die Live-Darstellung (11.4), ED-2 (To-do-Kästchen),
-ED-3 (Stufe 2), das Budget (11.7) und der Roundtrip (11.8).
+**Gemessen an der Wegwerf-Instanz** (die Probe aus 10.5, auf den Live-Editor umgestellt):
+**12 von 12 Zellen grün** — der Editor lädt, das **Tippen über die Tastatur** landet im Editor,
+der getippte Text steht nach dem fremden Write **noch** drin, das Band erscheint. Latenz
+**105,0 ms**, Shutdown **5,17 s**. Der Gegenlauf bleibt rot (genau eine Zelle).
 
-Suite **1513 grün** (345,0 s), `doc_health` 0.
+**Ein Flake, benannt statt weggefunden:** im ersten Suite-Lauf war `test_graph_c2.py ::
+test_der_gegenlauf_macht_die_messung_rot[zellen-zellen]` rot, im zweiten grün, und einzeln
+grün — der Graph-Test (Block 8) hat mit dem Editor nichts zu tun; es ist eine Zeitmessung
+unter Last.
 
-**Nächster Schritt.** 11.3: `editor.js` — alle Zugriffe auf `editorTextareaEl.value` gehen
-über `getBody()`/`setBody(text)` (CM vorhanden → `cm.getValue()`/`cm.setValue()`, sonst
-Textarea); `setEditorMode` wird `setRawMode(on)`, der Knopf heißt „Rohtext", und beim Öffnen
-ist der **Live**-Modus die Vorgabe.
+**Suite 1522 grün** (347,7 s), `doc_health` 0, `ui_budget` 5/5.
+
+**Was noch nicht gebaut ist.** 11.4 (die Live-Darstellung: die Stile für `.cm-header-1…6`,
+`.cm-strong`, `.cm-em`, `.cm-link`, `.cm-quote`, der gedimmte `.cm-formatting`, die
+Cursorzeile), ED-2 (To-do-Kästchen), ED-3 (Stufe 2), das Budget (11.7) und der Roundtrip
+(11.8). Die Vorschau-Paneele im Editor wird **nicht mehr befüllt** — der Live-Editor ist die
+Ansicht; die Lesesicht fremder Items rendert weiter über `markdown.js`.
+
+**Nächster Schritt.** 11.4: das CSS der Live-Darstellung und der Raw-Modus (`.is-raw`).

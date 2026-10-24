@@ -270,15 +270,22 @@ with sync_playwright() as p:
     page.locator(".list__row", has_text=titel_editor).first.click()
     page.wait_for_timeout(1200)
     out["editor_offen"] = page.locator("#detail-editor").is_visible()
-    # Der Editor öffnet in der **Vorschau** (Vorgabe seit P5) -- zum Tippen muss der
-    # Umschalter gedrückt werden, sonst ist die Textarea unsichtbar.
-    if page.locator("#toggle-preview").count():
-        page.click("#toggle-preview")
-        page.wait_for_timeout(500)
-    out["textarea_sichtbar"] = page.locator("#editor-textarea").is_visible()
+    # P10.5 Block 11 (Schritt 11.3): der **Live-Editor** (CodeMirror) laedt nach -- auf ihn
+    # warten. Der Notausgang waere die Textarea, aber die Probe misst den Live-Editor.
+    try:
+        page.wait_for_selector(".CodeMirror", timeout=30000)
+        out["live_editor_da"] = True
+    except Exception:
+        out["live_editor_da"] = False
+    # Der Schalter heisst seit Block 11 "Rohtext" (vorher "Vorschau") -- das wird mitgemessen.
+    out["schalter_text"] = page.locator("#toggle-preview").inner_text()
     out["version_vorher"] = page.locator("#version-band-number").inner_text()
-    page.fill("#editor-textarea", "Getippt von mir")
-    page.wait_for_timeout(600)
+    # **Tippen ueber die Tastatur** -- der ehrliche Weg: der Editor behaelt die Tasten, nicht
+    # ein Programmbefehl, der ihm den Text unterschiebt.
+    page.click(".CodeMirror")
+    page.wait_for_timeout(400)
+    page.keyboard.type("Getippt von mir")
+    page.wait_for_timeout(700)
     out["version_ungespeichert"] = page.locator("#version-band-number").inner_text()
     out["dirty_vorher"] = page.evaluate("() => window.__changed")
     (work / "ready2.flag").write_text("ready")
@@ -286,7 +293,12 @@ with sync_playwright() as p:
     page.wait_for_timeout(2500)
     out["band_sichtbar"] = page.locator("#editor-changed").is_visible()
     out["band_text"] = page.locator("#editor-changed-text").inner_text()
-    out["text_erhalten"] = page.input_value("#editor-textarea")
+    # Der Text kommt aus dem **Editor** (`.CodeMirror.CodeMirror` ist die Instanz), nicht aus
+    # der Textarea -- im Live-Modus traegt die Textarea den alten Stand.
+    out["text_erhalten"] = page.evaluate(
+        "() => { const w = document.querySelector('.CodeMirror');"
+        " return w && w.CodeMirror ? w.CodeMirror.getValue() : null; }"
+    )
     out["changed_nach_write2"] = page.evaluate("() => window.__changed")
     (work / "phase2.json").write_text(json.dumps(out))
 
@@ -660,7 +672,13 @@ def main(argv: list[str] | None = None) -> int:
             "ereignis_angekommen": (messung.get("changed_nach_write1") or 0) >= 1,
             "latenz_ms": latenz,
             "latenz_ok": latenz is not None and latenz <= LATENZ_MAX_MS,
-            "editor_text_erhalten": messung.get("text_erhalten") == TIPP_TEXT,
+            # **Der getippte Text steht noch drin** (P10.5-S). Im Live-Editor wird *getippt*
+            # (nicht ersetzt) -- der Wert enthaelt also den Originaltext **und** die Eingabe.
+            "editor_text_erhalten": (
+                isinstance(messung.get("text_erhalten"), str)
+                and TIPP_TEXT in messung["text_erhalten"]
+            ),
+            "live_editor_geladen": messung.get("live_editor_da") is True,
             "editor_band_sichtbar": messung.get("band_sichtbar") is True,
             "unsichtbarer_space_kein_ereignis": (
                 messung.get("changed_nach_write3") == messung.get("changed_nach_write2")
