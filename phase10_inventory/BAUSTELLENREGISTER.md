@@ -131,7 +131,7 @@ P10 Step 2) · Wissen (kein Bau, nur festgehalten) · erledigt (mit Beleg). „E
 | ID | Posten | Herkunft | Befund am Code / Stand | Gr. | Risiko | Entsch. | Ziel |
 |---|---|---|---|---|---|---|---|
 | LG-1 | Body-Volltextsuche in der Web-UI (Q1) | Ledger | MCP kann es (`search_items(in_body=True)`), `api.py` und die UI nicht · **[2026-10-18]** D-17 ja · **[2026-10-24, B10.1]** API-Parameter `in_body` (`_parse_bool` → `store.search(in_body=True)`), Schalter „Volltext“ am Suchfeld; 2 API-Tests + 6 Wächter grün, 3 Gegenläufe rot | M | — | D-17 | P10.5 — 10-45 (B10.1 gebaut; die Playwright-Bestätigung folgt mit 10.5) |
-| LG-2 | Realtime | Ledger | der 20-s-Poll reicht für zwei Personen · **[2026-10-18]** D-17 ja — L, eigener Block | L | — | D-17 | P10.5 |
+| LG-2 | Realtime | Ledger | der 20-s-Poll reicht für zwei Personen · **[2026-10-18]** D-17 ja — L, eigener Block · **[2026-10-24, B10.2]** Server-Hälfte: `webui/events.py` (Git-HEAD als Quelle, `ChangeFeed`), Route `GET /api/v1/events` (nur Space-Namen, Heartschlag 25 s, 3 Streams je Sitzung), Lifespan, `timeout_graceful_shutdown=5`; 16 neue Tests, 6 Gegenläufe rot | L | — | D-17 | P10.5 — 10-46/47/48 (B10.2 gebaut; der Client 10.3 und die Proben 10.5 stehen aus) |
 | LG-3 | Light-Mode (P5-X) | Ledger | Dunkel-first ist gelockt · **[2026-10-18]** nicht gewählt | M | — | D-17 | verworfen |
 | LG-4 | Bulk-Append-MCP-Werkzeug | Ledger | ein neues Tool ist eine neue Fähigkeit · **[2026-10-18]** D-17 ja — neues MCP-Werkzeug | M | S | D-17 | ✅ 10-21 (B5) |
 | LG-5 | `_trash/` räumen | Ledger | `DATA_ROOT/._trash/<space>/` wächst; erste Live-Löschung 2026-10-07 (V162 A). Werkzeug human-only, wie `spacectl.py` · **[2026-10-18]** D-17: der Papierkorb wird nicht geleert | S | B | D-17 | verworfen |

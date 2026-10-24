@@ -60,9 +60,9 @@ mitgeschickte ID — eine Client-ID wäre eine unnötige Validierungsfläche und
 Rennen ohne Nutzen.
 
 **Re-Auth-Gate auf `PATCH /api/v1/items/{id}` (Step 7 Commit 5a, `shares.py`):** `api_routes()`
-bekommt einen sechsten Parameter, `users: UserDirectory` — `shares.py :: require_share_reauth()`
+bekommt dafür einen sechsten Parameter, `users: UserDirectory` — `shares.py :: require_share_reauth()`
 braucht ihn für dieselbe `reauth.verify_reauth()`-Prüfung, die `account.py`s Passwortwechsel
-schon nutzt. `LoginThrottle` wird lokal aus `auth_store` gebaut (keine geteilte Instanz nötig,
+schon nutzen. `LoginThrottle` wird lokal aus `auth_store` gebaut (keine geteilte Instanz nötig,
 zustandslos gegenüber der DB-Tabelle). **Dokumentierte Abweichung vom Ausführungsplan**
 (`serialized-seeking-aurora.md`, Commit 5): die dort vorgeschlagene UI-Hälfte (Freigabe-Dialog,
 Re-Auth-Mini-Formular in `dialogs.js`/`app.html`) ist auf einen eigenen Commit 5b verschoben —
@@ -70,6 +70,18 @@ Backend-Gate und Frontend-Dialog haben unterschiedliche Verifikationswege (`pyte
 hier, nur Screenshot dort) und würden als ein Commit den bisherigen Atomar-Rhythmus dieses Steps
 brechen. `mcpserver/app.py`s `api_routes(...)`-Aufruf zieht im selben Commit nach (`oauth.users`
 als sechstes Argument).
+
+**`GET /api/v1/events` (P10.5, Block 10, Schritt 10.2 — LG-2, Lock P10.5-L):** der
+Ereignis-Stream (Server-Sent Events). `api_routes()` bekommt dafür einen **optionalen** siebten
+Parameter, `events: ChangeFeed | None = None` — **optional**, weil die Route sonst jeden
+Aufrufer zwingen würde, einen Feed zu bauen: die App (`mcpserver/app.py :: create_app()`)
+besitzt genau einen Feed (pro App, nicht pro Route), und die Test-Apps, die nur die Items-API
+brauchen, bauen keinen. Ohne Feed antwortet die Route ehrlich mit `501 not_configured`
+statt still zu schweigen. **Datierte Abweichung vom Plan-Dateiwortlaut** (der die Route in
+`api_routes` nennt, ohne die Verdrahtung zu beschreiben): der Feed wird **außerhalb** von
+`api_routes()` gebaut und durchgereicht, weil `create_app()` ihn beim Shutdown schließen muss
+(`await feed.aclose()`, Plan §Block 10, Schritt 10.2) — ein Feed, den die Route selbst erzeugt,
+könnte nicht geschlossen werden.
 """
 from __future__ import annotations
 
@@ -83,7 +95,7 @@ from authserver.ratelimit import LoginThrottle
 from authserver.store import AuthStore
 from authserver.userdir import UserDirectory
 from starlette.requests import Request
-from starlette.responses import JSONResponse, Response
+from starlette.responses import JSONResponse, Response, StreamingResponse
 from starlette.routing import Route
 
 from mcpserver.permissions import SharePolicy
@@ -95,6 +107,7 @@ from storage.store import Store
 
 from .config import UiSettings
 from .errors import ApiError, CsrfError
+from .events import HEARTBEAT_SECONDS, HEAD_CHARS, ChangeFeed
 from .security import require_csrf
 from .serializers import (
     asset_to_json, item_to_json, overview_row_to_json, search_to_json, space_to_json,
@@ -115,6 +128,11 @@ MAX_BODY_BYTES = 1 * 1024 * 1024  # Plan §3.1
 # gehalten ist, weil ein JSON-Body sonst ohnehin nie so groß werden sollte (Plan §3.1). Zwei
 # unterschiedliche Grenzen für zwei unterschiedliche Datenarten, keine gemeinsame Zahl.
 MAX_ASSET_BYTES = 5 * 1024 * 1024
+
+# P10.5, Block 10 (2026-10-24, LG-2): höchstens drei offene Ereignis-Streams je Sitzung
+# (Plan §Block 10, Schritt 10.2). Darüber 429 — ein Browser, der den Stream
+# sechsmal öffnet, ist kein Nutzungsfall, sondern ein Fehler.
+MAX_EVENT_STREAMS = 3
 
 # Die Ordner des Navigationsbaums, einmal definiert (Step 7b; seit 2026-10-02 sind es fünf, siehe
 # den P9-Block darunter — die Begründungen dieses Absatzes gelten unverändert). Vorher standen
@@ -343,6 +361,8 @@ def api_routes(
     permissions: SharePolicy,
     auth_store: AuthStore,
     users: UserDirectory,
+    *,
+    events: ChangeFeed | None = None,
 ) -> list[Route]:
     # Re-Auth-Gate (Step 7 Commit 5a, `shares.py :: require_share_reauth()`) braucht dieselben
     # drei Bausteine wie `account.py :: _require_reauth()` — `throttle` wird hier genauso lokal
@@ -394,6 +414,15 @@ def api_routes(
 
     def _visible_spaces(actor: str, names: list[str]) -> set[str]:
         return set(permissions.visible_spaces(actor, names))
+
+    # P10.5, Block 10 (2026-10-24, LG-2): höchstens drei offene Ereignis-Streams je Sitzung
+    # (Plan §Block 10, Schritt 10.2); darüber 429.
+    #
+    # **Gezählt wird über den Request-Task, nicht über den Generator.** Der Task ist fertig,
+    # sobald der Stream endet — auch wenn der Client abbricht und der Generator dabei nur
+    # *suspendiert* (nicht geschlossen) wird. Ein Zähler im Generator würde sich bei einem
+    # Abbruch nicht aufräumen, und die Sitzung wäre nach drei Abbruchversuchen blockiert.
+    offene_streams: dict[str, set[asyncio.Task]] = {}
 
     def _acl_for_summary(item):
         """Baut die `AclDecision` einer bereits geladenen `ItemSummary`-Zeile (P6 Step 5) —
@@ -473,6 +502,99 @@ def api_routes(
                 },
             },
             headers={"Cache-Control": "no-store"},
+        )
+
+    async def _events(request: Request) -> Response:
+        """Der Ereignis-Stream (SSE) — P10.5, Block 10, Schritt 10.2 (LG-2, Lock P10.5-L).
+
+        **Sitzung ist Pflicht** (Cookie; `/api` kennt keine Bearer-Token, P5-D). GET
+        verändert nichts, also braucht es kein CSRF.
+
+        **Gemeldet wird nur, was die Sitzung sehen darf.** Die Ereignisse nennen
+        Space-Namen; jeder Name wird gegen `_visible_space_infos()` geprüft — ein
+        unsichtbarer Space-Name verlässt den Server nie (Hard Rule 4, dieselbe Regel wie
+        in `_items_get()`). Der Server meldet **keine Inhalte**: der Client holt sich die
+        Daten über die normale API (Kernprinzip: der Server ist dumm).
+
+        **Der Heartschlag** (alle `HEARTBEAT_SECONDS` = 25 s) hält die Verbindung durch
+        Proxies offen; bei jedem Herzschlag wird die Sitzung **neu geprüft** — eine
+        abgelaufene Sitzung beendet den Stream, statt ihn offenzuhalten.
+
+        **Höchstens `MAX_EVENT_STREAMS` Streams je Sitzung**, darüber 429. Gezählt wird über
+        den Request-Task (siehe `offene_streams` oben) — ein abgebrochener Client zählt
+        nicht als belegt.
+        """
+        session = await _require_session(request)
+        key = session.session_hash
+        task = asyncio.current_task()
+        offen = {t for t in offene_streams.get(key, set()) if not t.done()}
+        if len(offen) >= MAX_EVENT_STREAMS:
+            raise ApiError(
+                "rate_limited",
+                f"Höchstens {MAX_EVENT_STREAMS} offene Ereignis-Streams je Sitzung.",
+            )
+        if task is not None:
+            offen.add(task)
+        offene_streams[key] = offen
+
+        async def _stream():
+            agen = events.subscribe()
+            pending: asyncio.Task | None = None
+            try:
+                while True:
+                    if pending is None:
+                        pending = asyncio.ensure_future(agen.__anext__())
+                    # `asyncio.wait` mit Timeout lässt `pending` **laufen** — anders als
+                    # `wait_for`, das die Aufgabe abbrechen würde (und damit das Abonnement
+                    # des Feeds zerstören würde).
+                    done, _ = await asyncio.wait({pending}, timeout=HEARTBEAT_SECONDS)
+                    if not done:
+                        # Herzschlag — und die Sitzung wird neu geprüft.
+                        if sessions.load(request) is None:
+                            break
+                        yield ": ping\n\n"
+                        continue
+                    try:
+                        event = pending.result()
+                    except StopAsyncIteration:
+                        break
+                    finally:
+                        pending = None
+                    sichtbar = {s.name for s in _visible_space_infos(session.space)}
+                    payload = {
+                        "spaces": sorted(s for s in event.spaces if s in sichtbar),
+                        "head": event.head[:HEAD_CHARS],
+                    }
+                    yield "event: changed\ndata: " + json.dumps(payload) + "\n\n"
+            finally:
+                # **Erst die wartende Aufgabe beenden, dann den Generator schließen.**
+                # `aclose()` auf einen Generator, in dem gerade `__anext__()` läuft, ist ein
+                # `RuntimeError` — und genau das passiert, wenn der Client abbricht: der
+                # Stream-Generator wird abgebrochen, während er auf das nächste Ereignis
+                # wartet. Der Abbruch der wartenden Aufgabe räumt das Abonnement auf
+                # (der Generator wird dabei geschlossen), das `aclose()` danach ist der
+                # Abschluss für den Fall, dass gar nichts wartete.
+                if pending is not None:
+                    if not pending.done():
+                        pending.cancel()
+                        try:
+                            await pending
+                        except (asyncio.CancelledError, StopAsyncIteration):
+                            pass
+                    pending = None
+                await agen.aclose()
+                aktuell = offene_streams.get(key)
+                if aktuell is not None:
+                    aktuell.discard(task)  # type: ignore[arg-type]
+
+        return StreamingResponse(
+            _stream(),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-store",
+                # Nginx puffert sonst die Antwort — der Stream käme in Blöcken an.
+                "X-Accel-Buffering": "no",
+            },
         )
 
     def _visible_space_infos(own_space: str) -> list[SpaceInfo]:
@@ -1650,7 +1772,7 @@ def api_routes(
         Fehlermeldung ist kein Ort für eine zweite Kopie davon."""
         raise ApiError("not_found", "Unbekannter API-Pfad.")
 
-    return [
+    routes = [
         Route("/api/v1/me", _catch(_me), methods=["GET"]),
         # P8-A: Reauth-Grant-Ausgabe (POST) — Passwort+TOTP → session-gebundenes Grant.
         # Sitzungs-/CSRF-Pflicht sitzt im Handler (`_reauth_post`), nicht in der Middleware,
@@ -1712,3 +1834,17 @@ def api_routes(
         # gewinnt; alle bekannten API-Pfade stehen darüber.
         Route("/api/v1/{rest:path}", _catch(_api_not_found), methods=["GET", "POST", "PATCH", "DELETE"]),
     ]
+
+    # P10.5, Block 10 (2026-10-24, LG-2): der Ereignis-Stream — **nur wenn die App einen
+    # Feed besitzt**. Ohne Feed gibt es die Route nicht, und der JSON-404 oben antwortet;
+    # ein stilles No-op oder ein neuer Fehlercode wäre schlechter (die elf Codes in
+    # `errors.py` sind geschlossen — `not_configured` gibt es nicht).
+    #
+    # **Vor dem Catch-all** — Starlette prüft die Routen in Reihenfolge, der erste Treffer
+    # gewinnt. `/api/v1/events` wäre sonst ein „unbekannter API-Pfad".
+    if events is not None:
+        routes.insert(
+            len(routes) - 1,
+            Route("/api/v1/events", _catch(_events), methods=["GET"]),
+        )
+    return routes

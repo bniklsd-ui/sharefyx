@@ -74,12 +74,24 @@ def main(argv: list[str] | None = None) -> int:
     # uvicorns eigenes access_log=False bleibt bestehen (Hard Rule, §8 Risiko 3 aus P2): dessen
     # Access-Log schreibt die komplette URL inklusive Token. AccessLogASGI ersetzt es durch die
     # token-redigierte, whitelist-begrenzte Variante aus request_log.py.
+    #
+    # [2026-10-24, P10.5 Block 10, Schritt 10.2 -- LG-2] `timeout_graceful_shutdown=5`:
+    # ohne diese Frist wartet uvicorn **unbegrenzt** auf offene Streams -- mit dem
+    # Ereignis-Stream (SSE) waere ein Neustart nie fertig (Plan §1.5, Zeile "Uvicorn wartet
+    # unbegrenzt auf offene Streams"). Nach der Frist bricht uvicorn die hängenden Tasks ab
+    # und fährt die Lifespan herunter. **[VERIFY] V213 (gemessen 2026-10-24, uvicorn 0.54.0):**
+    # der Parameter heisst genau so und wirkt genau so -- `Server.shutdown()` wartet mit
+    # `asyncio.wait_for(self._wait_tasks_to_complete(), timeout=self.config.
+    # timeout_graceful_shutdown)` und bricht danach die Tasks ab; die Lifespan-Shutdown
+    # laeuft **danach**. Fuenf Sekunden sind hier die *innere* Frist, die Abnahme P10.5-48
+    # verlangt "Shutdown <= 10 s mit offenen Streams".
     uvicorn.run(
         app,
         host=settings.host,
         port=settings.port,
         access_log=False,
         log_level=settings.log_level.lower(),
+        timeout_graceful_shutdown=5,
     )
     return 0
 

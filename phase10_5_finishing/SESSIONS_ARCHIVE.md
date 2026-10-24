@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,45 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-24 (Block 10.1 LG-1 Volltext gebaut — die Suche erreicht jetzt auch den Text)
+
+**Ergebnis.** Block 10.1 steht: die Web-UI kann jetzt **im Text** der Notizen und Aufgaben
+suchen. Der Schalter „Volltext" sitzt links am Suchfeld; ohne ihn sucht die Liste wie bisher
+nur Titel und Tags, mit ihm kommt der Body dazu — auf der Agentenfläche war das seit
+P6.5-N4 (`search_items(in_body=True)`) möglich, auf der Web-Fläche gab es diese Möglichkeit
+nie (Register LG-1).
+
+**Was der Server daraus macht.** `api.py :: _items_get()` liest den Query-Parameter `in_body`
+als **Wahrheitswert** (`_parse_bool`: `1`/`true`/`yes`/`on`, sonst aus) und reicht ihn an
+`store.search(..., in_body=True)` durch. Bewusst kein `bool(value)` — `in_body=0` ist „aus",
+ein fehlender Parameter ist „aus". Die **ACL-Filterung bleibt unverändert** danach: gefunden
+wird nur, was die Sitzung lesen darf (Hard Rule 4) — der Volltext ist eine Suchart, keine
+Rechteausnahme.
+
+**Gemessen.** 2 API-Tests (`test_items_query_in_body_only_when_requested`,
+`test_in_body_search_never_returns_unreadable_items`) gegen den echten Store + 6
+Verdrahtungs-Wächter in `phase10_5_finishing/tests/test_fulltext.py` (Markup, Zustand,
+Parameter, globaler Modus, Server). **Gegenlauf:** `in_body=in_body` aus `api.py` entfernt
+und `params.set("in_body", "1")` aus `list.js` entfernt ⇒ **3 Tests rot** (der API-Test und
+zwei Wächter) — die Wächter prüfen etwas anderes als sie behaupten.
+
+**Eine Design-Entscheidung, die der Plan nicht vorgibt.** Der Parameter gehört **nicht** in
+`filterParams()` (das ist der Raum der Filter: Bucket/Ordner/Zugewiesen), sondern direkt in
+`loadItems()` — der Volltext ist eine *Suchart* und gilt im globalen Modus („Alle Items")
+genauso wie im Space-Modus. Ein Wächter prüft genau das (`in_body` darf nicht an
+`isGlobalScope()` hängen).
+
+**Ausführer-Daten.** `opencode/MiniMax-M3.1-Flash`, Kontextgrenze 400.000 (P10.5-C erfüllt),
+keine Eingriffe des Nikingers in dieser Session.
+
+**Stand.** Branch `p105-block9` (Block 10 läuft darauf weiter), Suite grün auf den berührten
+Dateien. **P10.5-45 bleibt ⬜** — die Abnahme verlangt Tests **und** Playwright; die Probe
+kommt mit Schritt 10.5.
+
+**Nächster Schritt.** (1) 10.2 LG-2 Realtime serverseitig (`webui/events.py`, Route
+`GET /api/v1/events`, Lifespan, `timeout_graceful_shutdown`). (2) 10.3 Client
+(`realtime.js`, Poll-Rückfall 120 s, Hinweisband P10.5-S). (3) 10.5 Proben.
 
 ## Session stopped — 2026-10-24 (Block 9.3 RE-3 `rename_space` gebaut und gemessen)
 

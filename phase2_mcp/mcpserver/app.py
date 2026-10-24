@@ -102,6 +102,7 @@ Starlettes `Mount` baut - die innere FastMCP-App sieht dieselbe Route wie zuvor.
 """
 from __future__ import annotations
 
+import contextlib
 import time
 from dataclasses import dataclass
 
@@ -121,6 +122,7 @@ from storage.store import Store
 from webui.account import account_routes
 from webui.api import api_routes
 from webui.config import UiSettings
+from webui.events import ChangeFeed
 from webui.pages import render_not_found_page
 from webui.routes_auth import ui_auth_routes
 from webui.security import ui_security_headers
@@ -260,7 +262,19 @@ def create_app(
     routes += ui_auth_routes(ui_settings, oauth.store, oauth.users, ui_sessions)
     routes += static_routes(ui_settings, ui_sessions)
     routes += account_routes(ui_settings, oauth.store, oauth.users, ui_sessions)
-    routes += api_routes(ui_settings, store, ui_sessions, permissions, oauth.store, oauth.users)
+    # [2026-10-24, P10.5 Block 10, Schritt 10.2 -- LG-2, Lock P10.5-L] Der Ereignis-Feed der
+    # App: EIN Feed je App (nicht je Route), er pollt den Git-HEAD des DATA_ROOT und meldet
+    # die geaenderten Space-Namen. Die Quelle ist der HEAD, weil Hard Rule 5 aus jedem
+    # erfolgreichen Write einen Commit macht -- Web, MCP und Hand-Edit gleichermassen, ohne
+    # Eingriff in einen Schreibpfad.
+    #
+    # **Er wird hier gebaut, nicht in `api_routes()`** -- die App muss ihn beim Shutdown
+    # schliessen (`await feed.aclose()`, Plan §Block 10, Schritt 10.2), und die Route kann das
+    # nicht: sie kennt die App nicht.
+    events = ChangeFeed(store.data_root)
+    routes += api_routes(
+        ui_settings, store, ui_sessions, permissions, oauth.store, oauth.users, events=events,
+    )
 
     # [2026-10-23, P10.5 Block 7, Schritt 7.1 — UI-1] HTML-404 für unbekannte `/ui`-Pfade.
     #
@@ -295,14 +309,25 @@ def create_app(
     routes.append(Route("/mcp", endpoint=_ExactMcpMount(bearer), methods=["GET", "POST", "DELETE"]))
     routes.append(Mount("/mcp", app=bearer))
 
+    # [2026-10-24, P10.5 Block 10, Schritt 10.2 -- LG-2] Die Lifespan wird **umhuellt**:
+    # FastMCPs eigene bleibt unveraendert drin (sie ist PFLICHT -- ohne sie initialisiert der
+    # Streamable-HTTP-Session-Manager nie, Plan §4 Step 5), danach wird der Ereignis-Feed
+    # geschlossen. Ohne das bliebe der Poll-Task nach dem Shutdown haengen.
+    @contextlib.asynccontextmanager
+    async def lifespan(app):
+        async with mcp_app.lifespan(app):
+            yield
+        await events.aclose()
+
     app = Starlette(
         routes=routes,
         middleware=middleware,
-        # PFLICHT: ohne die durchgereichte Lifespan initialisiert FastMCPs
-        # Streamable-HTTP-Session-Manager nie (Plan §4 Step 5).
-        lifespan=mcp_app.lifespan,
+        lifespan=lifespan,
     )
     # Pro App-Instanz, nicht Modulebene — sonst würden mehrere `create_app()`-Aufrufe (z. B. in
     # Tests) sich einen Startzeitpunkt teilen.
     app.state.start_time = time.monotonic()
+    # [P10-10-24, P10.5 Block 10, Schritt 10.2] Der Feed liegt auf `app.state`, damit ein
+    # Test (und ein Diagnose-Weg) ihn erreichen kann — die App besitzt genau einen.
+    app.state.events_feed = events
     return app

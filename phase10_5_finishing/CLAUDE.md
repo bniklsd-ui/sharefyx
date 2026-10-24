@@ -11,7 +11,7 @@ down:
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
   - UPDATES_ARCHIVE.md                              # 📦 die älteren `updated:`-Fäden dieses Heads, verbatim
   - STARTUPTRAG_ARCHIVE.md                          # 📦 die Startaufträge der Blöcke 7 und 9, verbatim
-updated: 2026-10-24 (Block 10.1 LG-1 Volltext gebaut — API-Parameter `in_body`, Schalter am Suchfeld, 2 Tests + 6 Wächter, 3 Gegenläufe rot) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-10-24 (Block 10.2 LG-2 Realtime serverseitig gebaut — `webui/events.py`, Route `GET /api/v1/events`, Lifespan, `timeout_graceful_shutdown=5`; 16 neue Tests, 6 Gegenläufe) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -42,7 +42,7 @@ updated: 2026-10-24 (Block 10.1 LG-1 Volltext gebaut — API-Parameter `in_body`
 | 7 | Darstellung: UI-1–UI-6, KA-5 | Ausführer (+ Claude Code Sichtung) | C | 🔄 2026-10-24 — **7.1–7.7 gebaut und gemessen** (HTML-404 für unbekannte `/ui`-Pfade · Wortmarke `static/logo.svg` · Tab-Titel folgt der Ansicht · vier Posten der Sichtung umgesetzt · Kontrast `--caution` 5,70:1 · Assignee-Filter in API und UI · `doing`-Ring auf der Karte) · Probe an der Wegwerf-Instanz, Gegenläufe je rot · **P10.5-32 bleibt ⬜ bis zur Bestätigung** — die Herleitung je Schritt steht im Session-Archiv (`SESSIONS_ARCHIVE.md`, Block 7.1–7.4) und in den Commits |
 | 8 | Karte: Gehirnkarte C2 | Ausführer (+ Claude Code Smoke/Sichtung) | C | 🔄 2026-10-24 — **8.1–8.8 gebaut und gemessen** (Lappen/Furchen/Zellen/Aktivierung in `graph.js`, KA-2 Layout-Ablage, KA-3 Suche/Filter, reduced motion 0 Ticks) · **Browser-Probe `probes/p105_b8_karte_probe.py` an der 200-Knoten-Wegwerf-Instanz: 4/4 Messungen grün, 3 Gegenläufe je rot** · **Smoke `p8_22_smoke.py` 5/5** (Ruhe 2712,1 ms ≤ 3000, Frame p95 1,7 ms ≤ 16,7, reduced motion **0** Frames) · **drei Fehler hat erst der Browser gefunden** (gezogener Knoten wurde zurückgezogen · Fokus blieb nach dem Zeigerwechsel · Trefferzahl wurde vom Layout-Hinweis überschrieben) — alle drei behoben und gewächtert · **Abnahme 10-36/38/39/40 ✅, 10-37 wartet auf die Sichtung** (4 Screenshots liegen vor) · **Befund: das Plan-Budget für `graph.js` ist überschritten** (+11,1 KB gzip statt +8 KB; davon +9,8 KB Kommentar, der Code selbst +2,9 KB) — Entscheidung beim Nikinger · **drei Pfade außerhalb der §3-Liste** (bewusst, datiert): `phase9_hardening/scripts/graph_reload_probe.mjs` (der P9-Harness malt die alte Strichzeichnung — ohne Anpassung wäre der P9-Wächter rot) · `phase10_5_finishing/{probes,tests}/` (Plan 8.8 verlangt Proben und Wächter) · `docs/screenshots/p105_b8_*.png` (Plan 8.8 verlangt die vier Bilder für die Sichtung) |
 | 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | ✅ 2026-10-24 — **9.1 RE-7 `created_by`** (Probe 12/12) · **9.2 RE-4 `rename_folder`** (Probe 13/13) · **9.3 RE-3 `rename_space`** (Probe 15/15) — alle drei gebaut und gemessen; Branch `p105-block9`, Merge **nach** Deploy C |
-| 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | D | 🔄 2026-10-24 — **10.1 LG-1 Volltext gebaut** (`in_body` in der API, Schalter am Suchfeld, 2 Tests + 6 Wächter; die Playwright-Bestätigung folgt mit 10.5) |
+| 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | D | 🔄 2026-10-24 — **10.1 LG-1 Volltext** (API-Parameter `in_body`, Schalter am Suchfeld, 2 Tests + 6 Wächter) · **10.2 LG-2 serverseitig** (`webui/events.py`: Git-HEAD als Quelle, `ChangeFeed`, Route `GET /api/v1/events`, Lifespan, `timeout_graceful_shutdown=5`; 16 neue Tests, 6 Gegenläufe) — der Client (10.3) und die Proben (10.5) stehen aus |
 | 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | ⬜ |
 | 12 | Doku und Altlasten: DO-1, LG-6, AL-1 (Rest), AL-3, BG-2/BG-3 | Claude Code | — | ⬜ |
 | Z | Closeout P10.5 (Handover, Grafik, Rotationen) | Claude Code + Nikinger | — | ⬜ |
@@ -111,9 +111,9 @@ updated: 2026-10-24 (Block 10.1 LG-1 Volltext gebaut — API-Parameter `in_body`
 | P10.5-43 | RE-3 nur Team-Space (V194 ✅): Frontmatter = Verzeichnis, ein Commit, Absturz wird wiederaufgenommen | ✅ | 9.3 · **Wegwerf `probes/p105_b9_rename_space_probe.py` 15/15 Zellen**: Web-Rename → HTTP 200, `from`/`to`/`items` · das Verzeichnis steht unter dem neuen Namen · das **Frontmatter** nennt den neuen Space (`space: team-neu`) · die **Version springt genau einmal** (1 → 2) · **ein** Commit `rename-space team→team-neu` · der Index meldet den neuen Space · **Fremdverweise werden gemeldet, nicht angefasst** (`orphan_refs` + `assignee_refs`; die fremde `.share.yml` bleibt, wie sie ist) · **Gegenlauf**: Home-Space → **403**, nichts bewegt · vergebener Zielname → **422**, nichts bewegt · **Absturz**: `test_rename_resumes_after_crash` (Monkeypatch wirft nach der ersten Datei → neuer `Store` → Endzustand konsistent, Marker weg, **kein** zweiter Versionssprung) · 10 neue Tests (`test_store.py` × 5, `test_api.py` × 4, `test_static_routes.py` × 2) |
 | P10.5-44 | P1-Diff nennt nur die angekündigten Dateien | ✅ | 9.3 · `git diff --stat 2c841cf -- phase1_storage/storage` nennt **nur** `models.py` und `store.py` — beide in der Ankündigung (`2c841cf`) genannt, `index.py` blieb unberührt (kein Schema-Sprung, Hard Rule 2). Der übrige Diff von Block 9 liegt in `phase5_ui/webui/**` und den Tests — beides auf der Erlaubnisliste (Plan §3) |
 | P10.5-45 | LG-1: Volltext in der UI | ⬜ | 10.1 gebaut: `api.py` liest `in_body` (`_parse_bool`), `store.search(in_body=True)`; Schalter „Volltext" am Suchfeld (`list.js`/`state.js`/`app.html`) · 2 API-Tests + 6 Verdrahtungs-Wächter (`tests/test_fulltext.py`), 3 Gegenläufe rot · **die Playwright-Bestätigung (10.5) steht aus** — die Zeile wird erst ✅ mit ihr |
-| P10.5-46 | Realtime: Änderung ≤ 2 s sichtbar | ⬜ | — |
-| P10.5-47 | P10.5-S: geänderter Editor nie überschrieben; Neuladen trägt frische `version` | ⬜ | — |
-| P10.5-48 | Shutdown ≤ 10 s mit offenen Streams | ⬜ | — |
+| P10.5-46 | Realtime: Änderung ≤ 2 s sichtbar | ⬜ | 10.2 gebaut (Server: `webui/events.py`, Route, Heartschlag 25 s); **der Client (10.3) und die Wegwerf-Probe (10.5) stehen aus** |
+| P10.5-47 | P10.5-S: geänderter Editor nie überschrieben; Neuladen trägt frische `version` | ⬜ | 10.2 gebaut (Server meldet nur Space + HEAD); **das Hinweisband ist Client-Arbeit (10.3)** |
+| P10.5-48 | Shutdown ≤ 10 s mit offenen Streams | ⬜ | 10.2 gebaut: `timeout_graceful_shutdown=5` (**V213**: uvicorn 0.54.0, Name und Wirkung gemessen), Lifespan schließt den Feed; **die Wegwerf-SIGTERM-Probe (10.5) steht aus** |
 | P10.5-49 | Live nach Deploy D: Ereignisse kommen über **beide** Eingänge an (V212 ✅) | ⬜ | — |
 | P10.5-50 | Budget: Erstaufruf ≤ 250 KB, Editor ≤ 80 KB, jede Datei gezählt | ⬜ | — |
 | P10.5-51 | ED-1: kein Moduswechsel, Live-Darstellung (Nikinger-Sichtung) | ⬜ | — |
@@ -177,41 +177,49 @@ updated: 2026-10-24 (Block 10.1 LG-1 Volltext gebaut — API-Parameter `in_body`
 > wird **erst nach dem Deploy C** nach `main` gemergt (`deploy.sh` klont das lokale `main` —
 > sonst liefert `v3.1.7` den Block-9-Stand mit aus).
 
-## Session stopped — 2026-10-24 (Block 10.1 LG-1 Volltext gebaut — die Suche erreicht jetzt auch den Text)
+## Session stopped — 2026-10-24 (Block 10.2 LG-2 Realtime serverseitig gebaut — der Git-HEAD ist die Quelle)
 
-**Ergebnis.** Block 10.1 steht: die Web-UI kann jetzt **im Text** der Notizen und Aufgaben
-suchen. Der Schalter „Volltext" sitzt links am Suchfeld; ohne ihn sucht die Liste wie bisher
-nur Titel und Tags, mit ihm kommt der Body dazu — auf der Agentenfläche war das seit
-P6.5-N4 (`search_items(in_body=True)`) möglich, auf der Web-Fläche gab es diese Möglichkeit
-nie (Register LG-1).
+**Ergebnis.** Die Server-Hälfte von Realtime steht: `phase5_ui/webui/events.py` (neu) mit
+`read_git_head()`, `changed_spaces()` und `ChangeFeed`, die Route `GET /api/v1/events`
+(SSE), der umhüllte Lifespan und `timeout_graceful_shutdown=5` in `serve.py`.
 
-**Was der Server daraus macht.** `api.py :: _items_get()` liest den Query-Parameter `in_body`
-als **Wahrheitswert** (`_parse_bool`: `1`/`true`/`yes`/`on`, sonst aus) und reicht ihn an
-`store.search(..., in_body=True)` durch. Bewusst kein `bool(value)` — `in_body=0` ist „aus",
-ein fehlender Parameter ist „aus". Die **ACL-Filterung bleibt unverändert** danach: gefunden
-wird nur, was die Sitzung lesen darf (Hard Rule 4) — der Volltext ist eine Suchart, keine
-Rechteausnahme.
+**Die Quelle ist der Git-HEAD, nicht ein Write-Hook.** Hard Rule 5 macht aus jedem
+erfolgreichen Write einen Commit — „HEAD hat sich bewegt" heißt also genau „die Daten haben
+sich geändert", für Web, MCP und Hand-Edit gleichermaßen. Ein Eingriff in
+`Store.create()`/`update()`/`append()` wäre doppelt schlecht: er säße im `storage/`-Kern
+(P10.5-F) und sähe eine Hand-Edit von außen nicht.
 
-**Gemessen.** 2 API-Tests (`test_items_query_in_body_only_when_requested`,
-`test_in_body_search_never_returns_unreadable_items`) gegen den echten Store + 6
-Verdrahtungs-Wächter in `phase10_5_finishing/tests/test_fulltext.py` (Markup, Zustand,
-Parameter, globaler Modus, Server). **Gegenlauf:** `in_body=in_body` aus `api.py` entfernt
-und `params.set("in_body", "1")` aus `list.js` entfernt ⇒ **3 Tests rot** (der API-Test und
-zwei Wächter) — die Wächter prüfen etwas anderes als sie behaupten.
+**Was der Server meldet: Space-Namen und ein Commit-Hash. Sonst nichts.** Kein Body, kein
+Titel — der Client holt sich die Daten über die normale API, die ihre Rechte prüft. Jeder
+Space-Name wird gegen `_visible_space_infos()` gefiltert: **ein unsichtbarer Space-Name
+verlässt den Server nie.**
 
-**Eine Design-Entscheidung, die der Plan nicht vorgibt.** Der Parameter gehört **nicht** in
-`filterParams()` (das ist der Raum der Filter: Bucket/Ordner/Zugewiesen), sondern direkt in
-`loadItems()` — der Volltext ist eine *Suchart* und gilt im globalen Modus („Alle Items")
-genauso wie im Space-Modus. Ein Wächter prüft genau das (`in_body` darf nicht an
-`isGlobalScope()` hängen).
+**Der Heartschlag** (alle 25 s) prüft die Sitzung neu; eine abgelaufene beendet den Stream.
+**Höchstens drei Streams je Sitzung**, darüber 429 — gezählt über den Request-Task, damit ein
+abgebrochener Client nicht als „belegt" zählt.
+
+**Zwei Abweichungen vom 📕-Plan, datiert.** (1) `subscribe()` liefert ein Tupel
+`(head, spaces)` statt `set[str]` — der Route sonst den Kopf des *nächsten* Ereignisses lesen
+müsste (ein Rennen bei zwei schnellen Schreibvorgängen). (2) Der Feed wird **außerhalb** von
+`api_routes()` gebaut und als **optionaler** siebter Parameter durchgereicht: die App muss
+ihn beim Shutdown schließen, und die Route kann das nicht.
+
+**Ein Fehler, den erst der Abbruch-Test fand.** `aclose()` auf einen Generator, in dem
+gerade `__anext__()` läuft, ist ein `RuntimeError` — und genau das passiert, wenn der Client
+abbricht. Gefixt: erst die wartende Aufgabe abbrechen, dann den Generator schließen.
+
+**Gemessen.** 14 neue Tests in `phase5_ui/tests/test_events.py` (echtes tmp-Git, echter
+`Store(git=True)`-Write, ASGI-Harness statt `httpx.ASGITransport` — der sammelt den ganzen
+Body und käme bei einem endlosen Stream nie zurück) + 2 in `phase2_mcp` (Route in der echten
+App, Feed-Schluss beim Shutdown, `timeout_graceful_shutdown`). **Sechs Gegenläufe rot:**
+Sichtbarkeits-Filter, Stream-Grenze, Herzschlag-Prüfung, Papierkorb-Zuordnung, gepackte Refs,
+Volltext-Parameter. Suite **1489 grün** (338,4 s).
 
 **Ausführer-Daten.** `opencode/MiniMax-M3.1-Flash`, Kontextgrenze 400.000 (P10.5-C erfüllt),
 keine Eingriffe des Nikingers in dieser Session.
 
-**Stand.** Branch `p105-block9` (Block 10 läuft darauf weiter), Suite grün auf den berührten
-Dateien. **P10.5-45 bleibt ⬜** — die Abnahme verlangt Tests **und** Playwright; die Probe
-kommt mit Schritt 10.5.
+**Stand.** Branch `p105-block9`. **P10.5-46/47/48 bleiben ⬜** — sie verlangen den Client
+(10.3) und die Wegwerf-Proben (10.5).
 
-**Nächster Schritt.** (1) 10.2 LG-2 Realtime serverseitig (`webui/events.py`, Route
-`GET /api/v1/events`, Lifespan, `timeout_graceful_shutdown`). (2) 10.3 Client
-(`realtime.js`, Poll-Rückfall 120 s, Hinweisband P10.5-S). (3) 10.5 Proben.
+**Nächster Schritt.** (1) 10.3 Client: `realtime.js`, Poll-Rückfall 120 s, Hinweisband
+(P10.5-S). (2) 10.5 Proben: ≤ 2 s bis zur Änderung, unsichtbarer Space, SIGTERM ≤ 10 s.

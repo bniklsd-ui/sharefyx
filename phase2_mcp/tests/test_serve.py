@@ -61,6 +61,11 @@ def test_main_wires_a_real_app_and_calls_uvicorn_run(tmp_path, monkeypatch):
     # das ist die Verdrahtung, die dieser Test beweist, kein Umweg.
     assert isinstance(calls[0]["app"], AccessLogASGI)
     assert calls[0]["access_log"] is False
+    # [P10.5, Block 10, Schritt 10.2 -- LG-2] `timeout_graceful_shutdown` ist **Pflicht**:
+    # ohne diese Frist wartet uvicorn unbegrenzt auf offene Streams -- mit dem
+    # Ereignis-Stream (SSE) waere ein Neustart nie fertig. [VERIFY] V213 (uvicorn 0.54.0):
+    # der Parameter heisst genau so und wirkt genau so.
+    assert calls[0]["timeout_graceful_shutdown"] == 5
 
 
 def test_main_dies_loudly_without_public_base_url(tmp_path, monkeypatch):

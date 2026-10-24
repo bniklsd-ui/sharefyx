@@ -5,8 +5,9 @@ read-when: beim Audit, wenn nachvollzogen werden soll, wann welcher Block der Ph
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-24 (drei Fäden der `updated:`-Kette des Phase-10.5-Heads rotiert — Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (11 Fäden der `updated:`-Kette des Phase-10.5-Heads rotiert — der Head stand bei 43.545 B und damit über dem Softcap) | 2026-10-23 (angelegt — die `updated:`-Kette des Phase-10.5-Heads rotiert hierher; im Head bleibt der neueste Faden plus Zeiger)
+updated: 2026-10-24 (zwei Fäden der `updated:`-Kette des Phase-10.5-Heads rotiert — Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (drei Fäden der `updated:`-Kette des Phase-10.5-Heads rotiert — Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (11 Fäden der `updated:`-Kette des Phase-10.5-Heads rotiert — der Head stand bei 43.545 B und damit über dem Softcap) | 2026-10-23 (angelegt — die `updated:`-Kette des Phase-10.5-Heads rotiert hierher; im Head bleibt der neueste Faden plus Zeiger)
 ---
+- 2026-10-24 (Block 10.1 LG-1 Volltext gebaut — API-Parameter `in_body`, Schalter am Suchfeld, 2 Tests + 6 Wächter, 3 Gegenläufe rot) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 - 2026-10-24 (Block 9.3 RE-3 `rename_space` gebaut und gemessen — nur Team-Spaces (P10.5-M), ein Commit, Fremdverweise gemeldet statt angefasst; Wegwerf 15/15)
 - 2026-10-24 (Block 9.2 RE-4 `rename_folder` gebaut und gemessen — Kern + Web-Route `PATCH …/folders` + UI-Kontextaktion, Wegwerf-Probe 13/13; **der Plan-Testname `test_rename_folder_by_owner_and_team_writer` ist als zwei Tests gebaut** (Gegenlauf braucht getrennte Tests))
 - 2026-10-24 (Block 9.1 RE-7 `created_by` gebaut und gemessen — zwölfte P1-Öffnung, Wegwerf-Probe 12/12, 4 Regel-Wächter mit Gegenläufen; Deploy C `v3.1.7` vorbereitet, `deploy.sh` beim Nikinger) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md

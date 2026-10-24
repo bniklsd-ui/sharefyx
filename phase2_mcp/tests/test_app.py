@@ -94,6 +94,35 @@ def app(tmp_path, store, oauth) -> Starlette:
     return create_app(settings=settings, store=store, oauth=oauth)
 
 
+@pytest.mark.asyncio
+async def test_create_app_registers_the_events_route(app):
+    """[P10.5, Block 10, Schritt 10.2 -- LG-2] Die echte App besitzt die Route
+    `/api/v1/events` -- der Feed wird in `create_app()` gebaut und durchgereicht, nicht in
+    `api_routes()` (das kann ihn beim Shutdown nicht schliessen).
+
+    **Ohne Sitzung antwortet die Route 401** -- der Stream ist eine Session-Flaeche wie
+    jede andere (`/api` kennt keine Bearer-Token, P5-D)."""
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app), base_url="https://space.example.ts.net"
+    ) as client:
+        response = await client.get("/api/v1/events")
+    assert response.status_code == 401
+    assert response.json()["error"] == "unauthenticated"
+
+
+@pytest.mark.asyncio
+async def test_the_lifespan_closes_the_events_feed(app):
+    """[P10.5, Block 10, Schritt 10.2 -- LG-2] Beim Shutdown wird der Feed geschlossen --
+    sonst haengt der Poll-Task nach dem Herunterfahren weiter im Prozess.
+
+    **Die Lifespan ist umhuellt**, nicht ersetzt: FastMCPs eigene bleibt drin (ohne sie
+    initialisiert der Streamable-HTTP-Session-Manager nie)."""
+    async with app.router.lifespan_context(app):
+        feed = app.state.events_feed
+        assert feed.closed is False
+    assert feed.closed is True
+
+
 class _CapturingFastMCP:
     """Ersetzt `build_mcp()`'s Rückgabewert nur, um zu sehen, welcher `allowed_hosts`-Wert bei
     `http_app()` ankommt — P3-C testet die Präzedenz explizit vs. Settings, nicht FastMCP selbst."""
