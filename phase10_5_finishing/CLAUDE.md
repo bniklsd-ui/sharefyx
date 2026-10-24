@@ -12,7 +12,7 @@ down:
   - UPDATES_ARCHIVE.md                              # 📦 die älteren `updated:`-Fäden dieses Heads, verbatim
   - STARTUPTRAG_ARCHIVE.md                          # 📦 die Startaufträge der Blöcke 7 und 9, verbatim
   - FREIGABEN_ARCHIVE.md                           # 📦 die Freigaben der Phase, verbatim
-updated: 2026-10-24 (Block 11.1: der vendorte Editor — CodeMirror 5.65.16, fünf Dateien statt drei (gemessen), 71.280 B gzip; Wächter mit Gegenprobe) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-10-24 (Block 11.2: der Nachlader (js/editor_cm.js) — Promise gecacht, Fehler → null = Rohmodus; 6 Wächter) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -36,7 +36,7 @@ updated: 2026-10-24 (Block 11.1: der vendorte Editor — CodeMirror 5.65.16, fü
 | 8 | Karte: Gehirnkarte C2 | Ausführer (+ Claude Code Smoke/Sichtung) | C | 🔄 2026-10-24 — **8.1–8.8 gebaut und gemessen** (Lappen/Furchen/Zellen/Aktivierung in `graph.js`, KA-2 Layout-Ablage, KA-3 Suche/Filter, reduced motion 0 Ticks) · **Browser-Probe `probes/p105_b8_karte_probe.py` an der 200-Knoten-Wegwerf-Instanz: 4/4 Messungen grün, 3 Gegenläufe je rot** · **Smoke `p8_22_smoke.py` 5/5** (Ruhe 2712,1 ms ≤ 3000, Frame p95 1,7 ms ≤ 16,7, reduced motion **0** Frames) · **drei Fehler hat erst der Browser gefunden** (gezogener Knoten wurde zurückgezogen · Fokus blieb nach dem Zeigerwechsel · Trefferzahl wurde vom Layout-Hinweis überschrieben) — alle drei behoben und gewächtert · **Abnahme 10-36/38/39/40 ✅, 10-37 wartet auf die Sichtung** (4 Screenshots liegen vor) · **Befund: das Plan-Budget für `graph.js` ist überschritten** (+11,1 KB gzip statt +8 KB; davon +9,8 KB Kommentar, der Code selbst +2,9 KB) — Entscheidung beim Nikinger · **drei Pfade außerhalb der §3-Liste** (bewusst, datiert): `phase9_hardening/scripts/graph_reload_probe.mjs` (der P9-Harness malt die alte Strichzeichnung — ohne Anpassung wäre der P9-Wächter rot) · `phase10_5_finishing/{probes,tests}/` (Plan 8.8 verlangt Proben und Wächter) · `docs/screenshots/p105_b8_*.png` (Plan 8.8 verlangt die vier Bilder für die Sichtung) |
 | 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | ✅ 2026-10-24 — **9.1 RE-7 `created_by`** (Probe 12/12) · **9.2 RE-4 `rename_folder`** (Probe 13/13) · **9.3 RE-3 `rename_space`** (Probe 15/15) — alle drei gebaut und gemessen; Branch `p105-block9`, Merge **nach** Deploy C |
 | 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | D | ✅ 2026-10-24 — **10.1** LG-1 Volltext (`in_body`, Schalter) · **10.2** LG-2 serverseitig (`events.py`, Route, `timeout_graceful_shutdown=5`) · **10.3** LG-2 Client (`realtime.js`, Poll-Rückfall 120 s, Hinweisband P10.5-S) · **10.5 Probe**: 11/11 Zellen grün an der Wegwerf-Instanz (18810) — **Latenz 141,1 ms** (Grenze 2000), **Shutdown 5,22 s** (Grenze 10), Volltext 0 → 1 Treffer mit dem Schalter, Band „Geändert von alpha — neu laden?", unsichtbarer Space **ohne** Ereignis; **Gegenlauf rot** (Filter aus → das Ereignis kommt) — 33 neue Tests, 7 Gegenläufe |
-| 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | 🔄 2026-10-24 — **11.1 Vendor** (CodeMirror 5.65.16, **fünf** Dateien statt drei — gemessen: der UMD-Browser-Zweig der `markdown.min.js` löst `require("../xml/xml")` **nicht** auf) |
+| 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | 🔄 2026-10-24 — **11.1 Vendor** (CodeMirror 5.65.16, **fünf** Dateien statt drei — gemessen: der UMD-Browser-Zweig der `markdown.min.js` löst `require("../xml/xml")` **nicht** auf) · **11.2 Nachlader** (`js/editor_cm.js`: CSS → Kern → Modus-Dateien, Promise gecacht, Fehler → `null` = Textarea/Rohmodus) |
 | 12 | Doku und Altlasten: DO-1, LG-6, AL-1 (Rest), AL-3, BG-2/BG-3 | Claude Code | — | ⬜ |
 | Z | Closeout P10.5 (Handover, Grafik, Rotationen) | Claude Code + Nikinger | — | ⬜ |
 
@@ -169,28 +169,27 @@ updated: 2026-10-24 (Block 11.1: der vendorte Editor — CodeMirror 5.65.16, fü
 > wird **erst nach dem Deploy C** nach `main` gemergt (`deploy.sh` klont das lokale `main` —
 > sonst liefert `v3.1.7` den Block-9-Stand mit aus).
 
-## Session stopped — 2026-10-24 (Block 11.1: der vendorte Editor — **fünf** Dateien, nicht drei)
+## Session stopped — 2026-10-24 (Block 11.2: der Nachlader — CSS, dann der Kern, dann die Modus-Dateien)
 
-**Ergebnis.** `phase5_ui/webui/static/vendor/codemirror/` liegt im Baum: CodeMirror **5.65.16**
-(von jsDelivr), die SHA-256-Summe jeder Datei und der MIT-Lizenztext in
-`phase5_ui/THIRD_PARTY_LICENSES.md`. **71.280 B gzip** — das Budget „Editor nachgeladen ≤ 80 KB"
-(P10.5-50) hält mit 8,7 KB Luft. Ein Wächter (`tests/test_codemirror_vendor.py`, 4 Tests)
-vergleicht den Baum mit dem Lizenzdokument — **mit Gegenprobe**: ein untergeschobener
-CodeMirror (gleichlang, gleicher Name) muss rot werden, sonst prüft der Wächter ins Leere.
-Suite **1507 grün** (351,1 s), `doc_health` 0.
+**Ergebnis.** `static/js/editor_cm.js` (neu) lädt den Editor **nach**: erst das CSS, dann
+`codemirror.min.js`, dann `meta.min.js`, `xml.min.js` und zuletzt `markdown.min.js`. Das
+Promise wird **gecacht** (ein zweiter Aufruf wartet auf dasselbe Laden), und ein Fehler
+löst mit `null` auf — **der Editor bleibt dann die Textarea**, also der Rohmodus (ED-5).
+Ein Wurf nach oben wäre die falsche Richtung: der Editor ist ein Komfort, kein Pfad.
 
-**Der Plan nennt drei Dateien, gemessen sind es fünf.** Die gebaute `markdown.min.js` ist ein
-**UMD-Wrapper**; im Browser-Zweig ruft sie nur `t(CodeMirror)` auf — die beiden `require(...)`
-Zweige (`require("../xml/xml")`, `require("../meta")`) werden **nicht** abgearbeitet. Im echten
-Chromium gemessen: mit den drei Dateien registriert sich der Modus zwar
-(`CodeMirror.modes.markdown` ist eine Funktion, **null** Seitenfehler), aber der HTML/XML-Teil
-des Markdown-Modus fehlt — `xml.min.js` ist **kein** Zusatz, sondern die fehlende Hälfte.
-Mit allen fünf Dateien bleibt das Verhalten identisch und vollständig. Der Zuschlag beträgt
-**6.499 B gzip** und ist damit im Budget.
+**Sechs Wächter** (`tests/test_editor_cm.py`), darunter der wichtigste: die Dateiliste des
+Laders muss **exakt** den Dateien im Verzeichnis `static/vendor/codemirror/` entsprechen —
+ein Vendor-File, das der Lader nicht kennt, wäre sonst ein stiller Fehler (der Editor liefe
+ohne den Modus, und nichts würde rot). Zusammen mit dem SHA-Wächter aus 11.1 ist der
+Vendor-Pfad jetzt von beiden Seiten geschlossen.
 
-**Was noch nicht gebaut ist.** Der Editor selbst: `js/editor_cm.js` (Nachladen), der Umbau von
-`editor.js` auf `getBody()`/`setBody()` (ohne Moduswechsel), die Live-Darstellung, ED-2
-(To-do-Kästchen), ED-3 (Stufe 2), das Budget und der Roundtrip (11.2–11.8).
+**Was noch nicht gebaut ist.** Der Editor selbst: `editor.js` wird auf `getBody()`/`setBody()`
+umgestellt (ohne Moduswechsel, ED-1), die Live-Darstellung (11.4), ED-2 (To-do-Kästchen),
+ED-3 (Stufe 2), das Budget (11.7) und der Roundtrip (11.8).
 
-**Nächster Schritt.** 11.2: `js/editor_cm.js` — die CSS und dann beide Skripte laden, das
-Promise gecacht, bei einem Fehler `null` (der Editor bleibt Textarea = Rohmodus, ED-5).
+Suite **1513 grün** (345,0 s), `doc_health` 0.
+
+**Nächster Schritt.** 11.3: `editor.js` — alle Zugriffe auf `editorTextareaEl.value` gehen
+über `getBody()`/`setBody(text)` (CM vorhanden → `cm.getValue()`/`cm.setValue()`, sonst
+Textarea); `setEditorMode` wird `setRawMode(on)`, der Knopf heißt „Rohtext", und beim Öffnen
+ist der **Live**-Modus die Vorgabe.
