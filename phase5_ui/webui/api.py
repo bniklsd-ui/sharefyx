@@ -522,8 +522,48 @@ def api_routes(
             {"folder": created}, status_code=201, headers={"Cache-Control": "no-store"},
         )
 
-    # -- Space-Verwaltung (P7 Step C2/C4) -------------------------------------------------
-    #
+    async def _spaces_rename_folder(request: Request) -> Response:
+        """**RE-4 (P10.5 Block 9):** benennt einen Ordner im Space um.
+
+        **Die Rechte sind dieselben wie beim Anlegen** (`permissions.manages_space()`): der
+        eigene Space und Team-Spaces mit space-level Schreibrecht. Wer einen Ordner **anlegen**
+        darf, darf ihn auch umbenennen — ein Ordner anlegen und einen Ordner umbenennen sind
+        dieselbe Klasse von Rechten (beide verändern die Ordnerstruktur eines Spaces).
+
+        **Kein Item wird angefasst:** Ordner stehen nicht im Frontmatter, ein Umbenennen ist ein
+        reines Verzeichnis-Rename — keine Datei wird umgeschrieben, keine Version erhöht. Die
+        `.share.yml` im Ordner wandert mit (sonst wäre der Ordner danach eine Sackgasse).
+
+        **Kein MCP-Werkzeug:** das Umbenennen ist **human-only** (Lock P10.5-M, Linie von RE-6) —
+        ein Agent soll Ordner nicht umbenennen.
+        """
+        session = await _require_session(request)
+        await _require_csrf_json(request, session)
+        space = request.path_params["space"]
+        if not permissions.manages_space(session.space, space):
+            raise ApiError(
+                "forbidden",
+                "Ordner können nur im eigenen Space oder in einem Team-Space mit Schreibrecht "
+                "umbenannt werden.",
+            )
+        body = await _json_body(request)
+        alt = body.get("from")
+        neu = body.get("to")
+        for name, wert in (("'from'", alt), ("'to'", neu)):
+            if not isinstance(wert, str) or not wert:
+                raise ApiError(
+                    "validation_failed", f"{name} ist Pflichtfeld (nicht-leerer str)."
+                )
+        try:
+            betroffen = store.rename_folder(space, alt, neu, actor=session.space)
+        except (ValidationError, ValueError) as exc:
+            raise _map_store_error(exc, own_space=session.space) from exc
+        return JSONResponse(
+            {"from": alt, "to": neu, "items": betroffen},
+            headers={"Cache-Control": "no-store"},
+        )
+
+    # -- Space-Verwaltung (P7 Step C2/C4) -------------------------------------------------    #
     # Fünf der fünf in `docs/concepts/phase7_spaces_admin_plan.md` §4.C2 genannten Routen
     # (`DELETE /api/v1/spaces/{space}` kam mit C4 dazu — sein Vorlauf/Durchlauf-Algorithmus
     # braucht `store.search()`/`store.move()`/`store.archive()`, die die übrigen vier Routen
@@ -1517,6 +1557,11 @@ def api_routes(
         Route("/api/v1/spaces", _catch(_spaces), methods=["GET"]),
         Route("/api/v1/spaces", _catch(_spaces_post), methods=["POST"]),
         Route("/api/v1/spaces/{space}/folders", _catch(_spaces_create_folder), methods=["POST"]),
+        # P10.5 Block 9 (RE-4): Ordner umbenennen — `PATCH` mit `{"from": …, "to": …}`.
+        # **GET/PATCH auf derselben Route** ist Absicht: der Pfad benennt die *Sammlung* der
+        # Ordner, die PATCH-Operation darauf ist das Umbenennen eines davon (die gleiche Form
+        # wie bei `/api/v1/items/{id}`, das PATCH ist und ein einzelnes Item meint).
+        Route("/api/v1/spaces/{space}/folders", _catch(_spaces_rename_folder), methods=["PATCH"]),
         Route("/api/v1/spaces/{space}/members", _catch(_space_members_get), methods=["GET"]),
         Route("/api/v1/spaces/{space}/members", _catch(_space_members_post), methods=["POST"]),
         Route(

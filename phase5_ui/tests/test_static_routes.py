@@ -2464,3 +2464,43 @@ async def test_api_404_stays_json(real_app):
 
     assert unknown_oauth.status_code == 404
     assert "Diese Seite gibt es nicht." not in unknown_oauth.text
+
+
+def test_the_tree_has_a_rename_context_action_for_folders():
+    """**RE-4 (P10.5 Block 9):** die Kontextaktion „Umbenennen" am Ordner im Baum.
+
+    Der Wächter prüft **drei** Dinge, weil jede Lücke einzeln sichtbar wird:
+    das Menü im Markup, die **Rechtsklick-Bindung** am Ordner-Knopf (`contextmenu`) und die
+    **Rechtebedingung** — die Aktion existiert nur dort, wo der Server sie auch erlaubt
+    (`spaceAllowsMove`, derselbe Riegel wie `permissions.manages_space()`).
+    """
+    html = (DEFAULT_STATIC_DIR / "app.html").read_text("utf-8")
+    assert 'id="folder-context-menu"' in html
+    assert 'id="folder-context-rename"' in html
+    assert 'id="rename-folder-dialog"' in html
+    assert 'id="rename-folder-name-input"' in html
+    assert 'id="rename-folder-submit"' in html
+
+    js = (DEFAULT_STATIC_DIR / "js" / "tree.js").read_text("utf-8")
+    knopf = re.search(r"function folderButton\(space, node, isChild\) \{(.*?)\n\}", js, re.DOTALL)
+    assert knopf, "folderButton() nicht gefunden"
+    koerper = knopf.group(1)
+    assert '"contextmenu"' in koerper, "kein Rechtsklick am Ordner-Knopf"
+    assert "spaceAllowsMove(space)" in koerper, (
+        "die Kontextaktion darf nur erscheinen, wo der Server das Umbenennen erlaubt "
+        "(eigener Space oder Team-Space mit Schreibrecht)"
+    )
+
+
+def test_the_rename_dialog_sends_a_patch_with_from_and_to():
+    """Die Aktion spricht **die Rroute** an, die der Server gebaut hat:
+    `PATCH /spaces/{space}/folders` mit `{"from": …, "to": …}`.
+
+    Der Wächter prüft beide Haelften — ein `POST` (Anlegen) waere ein stiller Erfolg ohne
+    Umbenennen, und ein Body ohne `to` wuerde den Server mit 422 zurueckweisen.
+    """
+    js = (DEFAULT_STATIC_DIR / "js" / "dialogs.js").read_text("utf-8")
+    assert 'method: "PATCH"' in js, "die Umbenennen-Aktion nutzt kein PATCH"
+    assert '"/folders"' in js
+    assert 'from: target.folder' in js
+    assert 'to: neu' in js

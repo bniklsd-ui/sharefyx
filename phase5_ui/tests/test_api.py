@@ -1881,3 +1881,105 @@ async def test_a_posted_created_by_is_ignored(full_app_items, item_store, totp_c
         assert created.status_code == 201
         assert created.json()["created_by"] == SPACE
         assert item_store.get(created.json()["id"]).created_by == SPACE
+
+
+# -- P10.5 Block 9: RE-4 Ordner umbenennen über REST --------------------------------------------
+#
+# Zwei Behauptungen: **der eigene Space** darf umbenennen, ein **fremder Home-Space** nicht —
+# dieselbe Regel wie beim Anlegen eines Ordners (RE-1, `permissions.manages_space()`), weil
+# Anlegen und Umbenennen dieselbe Klasse von Rechten sind (beide verändern die Ordnerstruktur
+# eines Spaces).
+
+
+@pytest.mark.asyncio
+async def test_rename_folder_by_owner(full_app_items, item_store, totp_code):
+    """Der eigene Space: der Ordner wandert, das Item bleibt, die **Version bleibt** (RE-4 hebt
+    keine Version an — der Ordner steht nicht im Frontmatter, es wird keine Datei
+    umgeschrieben)."""
+    item = item_store.create(SPACE, type="note", title="Im Ordner", folder="Projekte")
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.patch(
+            f"/api/v1/spaces/{SPACE}/folders",
+            json={"from": "Projekte", "to": "Vorhaben"},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 200, response.text
+    assert response.json()["items"] == 1
+    gelesen = item_store.get(item.id)
+    assert gelesen.folder == "vorhaben"
+    assert gelesen.version == item.version
+
+
+@pytest.mark.asyncio
+async def test_rename_folder_in_foreign_home_space_is_forbidden(
+    full_app_items, item_store, store, tmp_path, totp_code
+):
+    """Ein fremder **Home-Space** bleibt gesperrt — derselbe Riegel wie beim Anlegen eines
+    Ordners (RE-1). Fail-closed: **nichts** umbenannt, der alte Ordner steht noch."""
+    item_store.create(FOREIGN_SPACE, type="note", title="Fremd", folder="Projekte")
+    _team(tmp_path)
+    _make_home(store)
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.patch(
+            f"/api/v1/spaces/{FOREIGN_SPACE}/folders",
+            json={"from": "Projekte", "to": "Vorhaben"},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 403, response.text
+    assert response.json()["error"] == "forbidden"
+    assert (tmp_path / "data" / FOREIGN_SPACE / "projekte").is_dir()
+    assert not (tmp_path / "data" / FOREIGN_SPACE / "vorhaben").exists()
+
+
+@pytest.mark.asyncio
+async def test_rename_folder_in_team_space_is_allowed(
+    full_app_items, item_store, tmp_path, totp_code
+):
+    """**Gegenlauf** zu `test_rename_folder_in_foreign_home_space_is_forbidden`: dieselbe
+    `.share.yml` mit `write:`, aber `FOREIGN_SPACE` ist ein **Team-Space** — dort darf
+    umbenannt werden (Team-Spaces gehören niemandem, P10-I greift nicht)."""
+    item = item_store.create(FOREIGN_SPACE, type="note", title="Fremd", folder="Projekte")
+    _team(tmp_path)
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.patch(
+            f"/api/v1/spaces/{FOREIGN_SPACE}/folders",
+            json={"from": "Projekte", "to": "Vorhaben"},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 200, response.text
+    assert item_store.get(item.id).folder == "vorhaben"
+
+
+@pytest.mark.asyncio
+async def test_rename_folder_needs_csrf_and_rejects_a_missing_target(
+    full_app_items, item_store, totp_code
+):
+    """Zwei Schutzschranken: **ohne CSRF** geht nichts, und ein **existierender Zielordner**
+    wird abgelehnt — ohne dass sich etwas bewegt (der Kern prüft das, die API meldet es als
+    422)."""
+    item_store.create(SPACE, type="note", title="Im Ordner", folder="Projekte")
+    item_store.create(SPACE, type="note", title="Belegt", folder="Belegt")
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        ohne_csrf = await client.patch(
+            f"/api/v1/spaces/{SPACE}/folders",
+            json={"from": "Projekte", "to": "Vorhaben"},
+        )
+        belegt = await client.patch(
+            f"/api/v1/spaces/{SPACE}/folders",
+            json={"from": "Projekte", "to": "Belegt"},
+            headers=_headers(csrf),
+        )
+        unvollstaendig = await client.patch(
+            f"/api/v1/spaces/{SPACE}/folders",
+            json={"from": "Projekte"},
+            headers=_headers(csrf),
+        )
+    assert ohne_csrf.status_code == 403
+    assert belegt.status_code == 422, belegt.text
+    assert belegt.json()["error"] == "validation_failed"
+    assert unvollstaendig.status_code == 422
+    assert unvollstaendig.json()["error"] == "validation_failed"

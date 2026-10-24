@@ -54,6 +54,17 @@ var newFolderNameInputEl;
 var newFolderSubmitEl;
 var newFolderCancelEl;
 
+// P10.5 Block 9 (RE-4): das Umbenennen eines Ordners. `renameFolderTarget` haelt den
+// Zielordner **eingefroren**, bis der Dialog zu ist — derselbe Grund wie bei
+// `pendingMoveBody`: ein Wechsel im Dialog (hier: ein Klick in die Leiste) darf das Ziel
+// nicht stillschweigend verschieben.
+var renameFolderDialogEl;
+var renameFolderHintEl;
+var renameFolderNameInputEl;
+var renameFolderSubmitEl;
+var renameFolderCancelEl;
+var renameFolderTarget = null;
+
 var moveDialogEl;
 var moveDialogTitleEl;
 var moveSpaceSelectEl;
@@ -520,6 +531,28 @@ export function closeNewFolderDialog() {
   newFolderDialogEl.hidden = true;
 }
 
+// -- Ordner umbenennen (P10.5 Block 9, RE-4) ------------------------------------------------
+//
+// **Kein MCP-Werkzeug** (Lock P10.5-M, Linie von RE-6): das Umbenennen ist human-only.
+// Der Server antwortet mit der Zahl der betroffenen Items; die UI meldet das im Toast, weil
+// „umbenannt" ohne Zahl nach einem Zufall aussieht.
+export function openRenameFolderDialog(space, folder) {
+  renameFolderTarget = { space: space, folder: folder };
+  var blatt = folder.split("/").pop();
+  renameFolderHintEl.textContent =
+    "„" + folder + "“ bekommt einen neuen Namen. Die Inhalte und die Freigaben des Ordners "
+    + "wandern mit.";
+  renameFolderNameInputEl.value = blatt;
+  renameFolderDialogEl.hidden = false;
+  renameFolderNameInputEl.focus();
+  renameFolderNameInputEl.select();
+}
+
+export function closeRenameFolderDialog() {
+  renameFolderDialogEl.hidden = true;
+  renameFolderTarget = null;
+}
+
 // -- Verschieben (Step 7 Commit 3, Step 7b: Space-Auswahl) --------------------------------------
 // Bewusst KEIN Wiederverwenden von `handleWriteError()`/`showConflictDialog()`: die sind an
 // `state.editingSnapshot` gekoppelt (das aktuell IM EDITOR offene Item) — ein Verschieben aus
@@ -810,6 +843,12 @@ export function init() {
   newFolderSubmitEl = document.getElementById("new-folder-submit");
   newFolderCancelEl = document.getElementById("new-folder-cancel");
 
+  renameFolderDialogEl = document.getElementById("rename-folder-dialog");
+  renameFolderHintEl = document.getElementById("rename-folder-hint");
+  renameFolderNameInputEl = document.getElementById("rename-folder-name-input");
+  renameFolderSubmitEl = document.getElementById("rename-folder-submit");
+  renameFolderCancelEl = document.getElementById("rename-folder-cancel");
+
   moveDialogEl = document.getElementById("move-dialog");
   moveDialogTitleEl = document.getElementById("move-dialog-title");
   moveSpaceSelectEl = document.getElementById("move-space-select");
@@ -834,6 +873,28 @@ export function init() {
   shareCancelEl = document.getElementById("share-cancel");
 
   newFolderCancelEl.addEventListener("click", closeNewFolderDialog);
+  renameFolderCancelEl.addEventListener("click", closeRenameFolderDialog);
+  renameFolderSubmitEl.addEventListener("click", function () {
+    if (!renameFolderTarget) return;
+    var target = renameFolderTarget;
+    var name = renameFolderNameInputEl.value.trim();
+    if (!name) { renameFolderNameInputEl.focus(); return; }
+    var teile = target.folder.split("/");
+    teile[teile.length - 1] = name;
+    var neu = teile.join("/");
+    if (neu === target.folder) { closeRenameFolderDialog(); return; }
+    api("/spaces/" + encodeURIComponent(target.space) + "/folders", {
+      method: "PATCH", body: JSON.stringify({ from: target.folder, to: neu }),
+    }).then(function (result) {
+      closeRenameFolderDialog();
+      return loadOverview().then(function () {
+        toast("Ordner umbenannt · " + result.items + " Notiz(en) mitgezogen");
+      });
+    }).catch(function (err) {
+      if (err.message === "unauthenticated") return;
+      toast(err.message || "Umbenennen fehlgeschlagen.", "error");
+    });
+  });
   newFolderSubmitEl.addEventListener("click", function () {
     var name = newFolderNameInputEl.value.trim();
     if (!name) { newFolderNameInputEl.focus(); return; }

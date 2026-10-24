@@ -1,0 +1,73 @@
+{
+  "probe": "p105_b9_rename_folder",
+  "date": "2026-10-24T16:07:04.907774+00:00",
+  "all_ok": true,
+  "zellen": 13,
+  "cells": [
+    {
+      "name": "Web-Rename: HTTP 200",
+      "ok": true,
+      "detail": "HTTP 200 {\"from\":\"projekte\",\"to\":\"vorhaben\",\"items\":1}"
+    },
+    {
+      "name": "Web-Rename: die Antwort nennt die Zahl der Items",
+      "ok": true,
+      "detail": "items=1 (erwartet 1)"
+    },
+    {
+      "name": "Die Datei liegt am neuen Pfad",
+      "ok": true,
+      "detail": "neu=/tmp/opencode/sharefyx-wegwerf-p105-b9r/data/alpha/vorhaben/itm_a768f2c5__projekt.md, alt=/tmp/opencode/sharefyx-wegwerf-p105-b9r/data/alpha/projekte/itm_a768f2c5__projekt.md"
+    },
+    {
+      "name": "Der alte Ordner ist weg",
+      "ok": true,
+      "detail": "alt=/tmp/opencode/sharefyx-wegwerf-p105-b9r/data/alpha/projekte existiert=False"
+    },
+    {
+      "name": "Die Version ist unverändert",
+      "ok": true,
+      "detail": "version='1' -> '1'"
+    },
+    {
+      "name": "Die Freigabe wandert mit",
+      "ok": true,
+      "detail": "neu=True, alt=False"
+    },
+    {
+      "name": "Ein Commit für das Umbenennen",
+      "ok": true,
+      "detail": "Commit-Meldungen: ['rename-folder alpha:projekte→vorhaben']"
+    },
+    {
+      "name": "Der Index meldet den neuen Ordner",
+      "ok": true,
+      "detail": "folder='vorhaben' (erwartet 'vorhaben')"
+    },
+    {
+      "name": "Gegenlauf: ein existierendes Ziel wird abgelehnt",
+      "ok": true,
+      "detail": "HTTP 422, error='validation_failed'"
+    },
+    {
+      "name": "Gegenlauf: nichts bewegt",
+      "ok": true,
+      "detail": "Datei /tmp/opencode/sharefyx-wegwerf-p105-b9r/data/alpha/belegt/itm_4be5ceae__belegt.md, Ordner True"
+    },
+    {
+      "name": "Ablehnung: das Ziel darf nicht unter dem alten Ordner liegen",
+      "ok": true,
+      "detail": "HTTP 422 {\"error\":\"validation_failed\",\"message\":\"Der neue Name 'vorhaben/tiefer' liegt unter dem alten 'vorhaben' — das ist nicht"
+    },
+    {
+      "name": "Ohne CSRF-Token: 403",
+      "ok": true,
+      "detail": "HTTP 403"
+    },
+    {
+      "name": "Ohne CSRF-Token: nichts bewegt",
+      "ok": true,
+      "detail": "vorhaben steht, 'anders' steht nicht"
+    }
+  ]
+}

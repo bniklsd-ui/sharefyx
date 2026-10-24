@@ -1242,3 +1242,140 @@ def test_created_by_survives_a_git_commit_as_the_author_of_the_creating_commit(s
     assert store_git.get(item.id).created_by == "niklas"
     commits = _git_log(tmp_path)
     assert len([m for m in commits if m.startswith("create ")]) == 1
+
+
+# -- P10.5 Block 9: RE-4 `Store.rename_folder()` (P1-Öffnung 13) -----------------------------
+#
+# Die Behauptung, die diese Tests tragen: **ein Ordner-Umbenennen ist ein reines
+# Verzeichnis-Rename.** Der Ordner steht nicht im Frontmatter (P6 Step 4), also wird keine
+# Item-Datei umgeschrieben, keine `version` erhoeht und kein Byte des Inhalts angefasst.
+# Was sich aendert, ist der Pfad — und damit die Ableitung `folder`.
+
+
+def test_rename_folder_moves_nested_and_share_file_keeps_versions(store_git, tmp_path):
+    """Der Kern: die Dateien wandern, die **Versionen bleiben**, die `.share.yml` wandert mit.
+
+    Die `.share.yml` ist der eigentliche Fund (P8.6 §0.4.1): die „billige Frontend-Fassung"
+    liess die Freigabe eines geteilten Ordners zurueck, und der Ordner war danach eine
+    Sackgasse — sichtbar, aber nicht mehr teilbar. Wer sie verliert, verliert eine
+    Rechteeinstellung, die ein Mensch absichtlich gemacht hat."""
+    item = store_git.create("alpha", type="task", title="Rechnung", folder="alt/unter")
+    version_vorher = item.version
+    inhalt_vorher = (tmp_path / "alpha" / "alt" / "unter" / f"{item.id}__rechnung.md").read_bytes()
+
+    # Die Ordnerfreigabe: ein zweiter Mensch darf in diesem Ordner schreiben.
+    (tmp_path / "alpha" / "alt" / ".share.yml").write_text(
+        "read: [beta]\nwrite: [beta]\n", encoding="utf-8"
+    )
+
+    betroffen = store_git.rename_folder("alpha", "alt", "neu", actor="alpha")
+
+    assert betroffen == 1
+    # Die Datei ist am neuen Ort — **byte-identisch** (kein Umschreiben, kein Frontmatter-Diff).
+    neue_datei = tmp_path / "alpha" / "neu" / "unter" / f"{item.id}__rechnung.md"
+    assert neue_datei.is_file()
+    assert neue_datei.read_bytes() == inhalt_vorher
+    assert not (tmp_path / "alpha" / "alt").exists()
+    # Die Version ist **unveraendert** — RE-4 hebt keine Version an.
+    gelesen = store_git.get(item.id)
+    assert gelesen.version == version_vorher
+    assert gelesen.folder == "neu/unter"
+    # Und die Freigabe ist mitgewandert — und wird am neuen Pfad **frisch** gelesen
+    # (`AclReader`s Cache-Schluessel enthaelt den Pfad).
+    assert (tmp_path / "alpha" / "neu" / ".share.yml").is_file()
+    assert "beta" in store_git.acl_of(item.id).write
+
+
+def test_rename_folder_produces_exactly_one_commit(store_git, tmp_path):
+    """**Ein** Commit fuer das ganze Umbenennen — derselbe Autor wie bei jedem anderen
+    Schreibvorgang. Zwei Commits wuerden die Historie der Dateien in zwei Haelften zerlegen,
+    von denen die erste allein schon den neuen Pfad zeigt."""
+    store_git.create("alpha", type="task", title="Rechnung", folder="alt")
+
+    store_git.rename_folder("alpha", "alt", "neu", actor="alpha")
+
+    commits = [m for m in _git_log(tmp_path) if m.startswith("rename-folder ")]
+    assert len(commits) == 1, commits
+    assert "alpha:alt→neu" in commits[0]
+
+
+def test_rename_folder_index_equals_rebuild(store, tmp_path):
+    """Der Index nach dem Umbenennen ist **identisch** mit einem frischen Rebuild (Hard Rule 2:
+    der Index ist Ableitung, nie Wahrheit). Der Test vergleicht beide Zeilen fuer Zeile."""
+    store.create("alpha", type="task", title="Eins", folder="alt")
+    store.create("alpha", type="task", title="Zwei", folder="alt/unter")
+    store.create("alpha", type="note", title="Drei", folder="anders")
+
+    store.rename_folder("alpha", "alt", "neu")
+
+    from storage import index as index_mod
+    mit_rename = {
+        (r["id"], r["space"], r["path"], r["folder"], r["version"], r["sha256"])
+        for r in index_mod.all_rows(store._conn)
+    }
+    store.rebuild_index()
+    nach_rebuild = {
+        (r["id"], r["space"], r["path"], r["folder"], r["version"], r["sha256"])
+        for r in index_mod.all_rows(store._conn)
+    }
+    assert mit_rename == nach_rebuild
+
+
+def test_rename_folder_refuses_existing_target_and_descendant(store, tmp_path):
+    """Zwei Ablehnungen, und **nichts** bewegt in beiden Fällen:
+    - der Zielname existiert bereits,
+    - der Zielname liegt **unter** dem alten Ordner (`neu/unter` unter `alt`).
+    Das zweite ist der Fall, in dem `os.rename()` sonst mit einem nüchternen `EINVAL` abbräche —
+    hier steht eine lesbare Meldung, und der Ordner bleibt unangetastet."""
+    store.create("alpha", type="task", title="Eins", folder="alt")
+    store.create("alpha", type="task", title="Zwei", folder="belegt")
+
+    with pytest.raises(ValidationError):
+        store.rename_folder("alpha", "alt", "belegt")
+    with pytest.raises(ValidationError):
+        store.rename_folder("alpha", "alt", "alt/unter")
+    with pytest.raises(ValidationError):
+        store.rename_folder("alpha", "gibtsnicht", "neu")
+
+    assert (tmp_path / "alpha" / "alt").is_dir()
+    assert not (tmp_path / "alpha" / "neu").exists()
+    assert not (tmp_path / "alpha" / "alt" / "unter").exists()
+
+
+def test_rename_resumes_after_crash(store_git, tmp_path, monkeypatch):
+    """**9.4: Absturzsicherheit.** Der Absturz kommt **nach** dem Verzeichnis-Rename (der
+    kritische Moment: das Verzeichnis ist schon gewandert, der Index noch nicht nachgezogen).
+
+    Erwartet: ein neuer `Store` **beendet** den Rename von allein — der Ordner steht unter dem
+    neuen Namen, der Index stimmt, der Marker ist **weg**, und es gibt **einen** Commit.
+
+    Der Weg dahin ist derselbe wie im Plan: `Store.__init__` findet den Marker, fuehrt den
+    Rename idempotent zu Ende (das Verzeichnis wandert **nicht** noch einmal — `old` existiert
+    nicht mehr) und loescht den Marker."""
+    store_git.create("alpha", type="task", title="Rechnung", folder="alt")
+    item = store_git.search(space="alpha").items[0]
+
+    def _absturz(*_args, **_kwargs):
+        raise RuntimeError("Absturz mitten im Rename")
+
+    monkeypatch.setattr(Store, "_reindex_moved_folder", _absturz)
+    with pytest.raises(RuntimeError):
+        store_git.rename_folder("alpha", "alt", "neu", actor="alpha")
+
+    # Der Marker liegt noch da — das ist der Beweis, dass die Wiederaufnahme ueberhaupt
+    # etwas zu tun hat.
+    marker = tmp_path / ".rename-pending.json"
+    assert marker.is_file()
+    # Das Verzeichnis ist schon gewandert (der Absturz kam danach).
+    assert (tmp_path / "alpha" / "neu").is_dir()
+
+    monkeypatch.undo()
+    neuer_store = Store(tmp_path, git=True)
+
+    # Endzustand: der Ordner steht unter dem neuen Namen, der Index stimmt, der Marker ist weg.
+    assert not marker.exists()
+    gelesen = neuer_store.get(item.id)
+    assert gelesen.folder == "neu"
+    assert (tmp_path / "alpha" / "neu" / f"{item.id}__rechnung.md").is_file()
+    commits = [m for m in _git_log(tmp_path) if m.startswith("rename-folder ")]
+    assert len(commits) == 1, commits

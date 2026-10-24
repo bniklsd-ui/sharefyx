@@ -1991,6 +1991,36 @@ select.input:focus {
   margin-top: calc(var(--space) * 2);
 }
 
+/* -- Kontextmenü (P10.5 Block 9, RE-4) --------------------------------------------------------
+   Eine **kleine** Fläche am Zeiger, kein Overlay: die Kontextaktion ist ein Nebenweg, kein
+   Dialog im Dialog. `position: fixed` am Zeiger, damit sie nicht vom Rail-Rand verschoben
+   wird. Dieselben Tokens wie die Overlays, damit sie nicht als Fremdkörper wirkt. */
+.ctxmenu {
+  position: fixed;
+  z-index: 40;
+  min-width: 160px;
+  padding: var(--space);
+  background: var(--surface-raised);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+}
+.ctxmenu[hidden] { display: none; }
+.ctxmenu__item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: calc(var(--space) * .75) var(--space);
+  border: 0;
+  border-radius: var(--radius-sm, 6px);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-meta);
+  cursor: pointer;
+}
+.ctxmenu__item:hover { background: var(--surface); }
+
 /* -- Einstellungen als Fensterkette (P9 Block settings, P9-AG/AH/AI/AL) --------------------
    Eine Reihe von Panels nebeneinander statt drei Overlays übereinander. Der Zustand — was
    offen ist — liegt in `settings.js` (`hidden` je Panel); hier steht nur die Geometrie.

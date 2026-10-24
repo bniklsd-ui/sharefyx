@@ -7,11 +7,18 @@ import { el, toast } from "./toasts.js";
 import { reportUnexpectedError } from "./api.js";
 import { closeEditor } from "./editor.js";
 import { loadItems, renderCrumb, moveItemToFolder, clearSelection } from "./list.js";
-import { openNewFolderDialog } from "./dialogs.js";
+import { openNewFolderDialog, openRenameFolderDialog } from "./dialogs.js";
 import { iconSvg } from "./icons.js";
 
 var railTreeEl;
 var homeButtonEl;
+
+// P10.5 Block 9 (RE-4): das Kontextmenue am Ordner. `folderMenuTarget` haelt den Ordner, auf
+// den geklickt wurde — zwischen Klick und Auswahl kann der Baum neu gezeichnet werden, und der
+// Menue-Eintrag darf dann nicht auf einen *anderen* Ordner zeigen.
+var folderMenuEl;
+var folderMenuRenameEl;
+var folderMenuTarget = null;
 
 export function bucketNames() {
   return state.meta ? Object.keys(state.meta.buckets) : [];
@@ -187,6 +194,50 @@ function folderItemCount(spaceName, folderPath) {
   return n;
 }
 
+// -- Kontextmenue am Ordner (P10.5 Block 9, RE-4) ---------------------------------------------
+//
+// Das Menue ist **ein** Eintrag: „Umbenennen". Mehr waere eine Wunschliste, und jeder weitere
+// Eintrag braucht eine eigene Rechtefrage — das Umbenennen ist die einzige Ordner-Aktion, die
+// RE-4 ueberhaupt vorsieht.
+function ensureFolderMenu() {
+  if (folderMenuEl) return;
+  folderMenuEl = document.getElementById("folder-context-menu");
+  folderMenuRenameEl = document.getElementById("folder-context-rename");
+  if (!folderMenuEl || !folderMenuRenameEl) return;
+  folderMenuRenameEl.addEventListener("click", function () {
+    var target = folderMenuTarget;
+    hideFolderMenu();
+    if (!target) return;
+    openRenameFolderDialog(target.space, target.folder);
+  });
+  // Ein Klick daneben schliesst das Menue. `capture: true`, weil der Klick auf einen anderen
+  // Ordner sonst zuerst dessen eigenes `contextmenu` ausloest.
+  document.addEventListener("click", function () { hideFolderMenu(); }, true);
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") hideFolderMenu();
+  });
+}
+
+function showFolderMenu(spaceName, folderPath, x, y) {
+  ensureFolderMenu();
+  if (!folderMenuEl) return;
+  folderMenuTarget = { space: spaceName, folder: folderPath };
+  folderMenuEl.hidden = false;
+  // Direkt am Zeiger, aber **nicht** ueber den Fensterrand hinaus: das Menue wird nach dem
+  // Einblenden gemessen und zurueckgeschoben, wenn es nicht mehr hineinpasst.
+  var breite = folderMenuEl.offsetWidth;
+  var hoehe = folderMenuEl.offsetHeight;
+  var links = Math.min(x, window.innerWidth - breite - 8);
+  var oben = Math.min(y, window.innerHeight - hoehe - 8);
+  folderMenuEl.style.left = Math.max(8, links) + "px";
+  folderMenuEl.style.top = Math.max(8, oben) + "px";
+}
+
+function hideFolderMenu() {
+  if (folderMenuEl) folderMenuEl.hidden = true;
+  folderMenuTarget = null;
+}
+
 function folderButton(space, node, isChild) {
   var button = el("button", "tree__folder tree__realfolder" + (isChild ? " tree__realfolder--child" : ""));
   button.type = "button";
@@ -216,6 +267,15 @@ function folderButton(space, node, isChild) {
     }).catch(reportUnexpectedError);
   });
   if (spaceAllowsMove(space)) bindFolderDropTarget(button, space.name, node.path);   // P9-BP: auch Team-Spaces
+  // P10.5 Block 9 (RE-4): Rechtsklick auf den Ordner → „Umbenennen". **Nur** im eigenen Space
+  // und in Team-Spaces mit Schreibrecht (`spaceAllowsMove` ist genau diese Bedingung, siehe
+  // `state.js`) — sonst gibt es den Knopf gar nicht erst, statt ihn ins Leere laufen zu lassen.
+  if (spaceAllowsMove(space)) {
+    button.addEventListener("contextmenu", function (event) {
+      event.preventDefault();
+      showFolderMenu(space.name, node.path, event.clientX, event.clientY);
+    });
+  }
   return button;
 }
 

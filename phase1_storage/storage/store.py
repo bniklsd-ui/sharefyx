@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import fcntl
 import json
+import logging
+import os
 import sqlite3
 import threading
 from collections.abc import Sequence
@@ -34,6 +36,8 @@ from .models import (
     valid_statuses,
 )
 from .patch import PatchResult, TextEdit, apply_edits
+
+logger = logging.getLogger(__name__)
 
 # P9 Step G (P9-I/J): Ziel des „Löschens" — **Verschieben, nie `unlink`**. Der Punkt-Praefix ist
 # keine Kosmetik, sondern die ganze Unsichtbarkeit, und er ist **gemessen** (Plan §9.1 behauptete
@@ -267,6 +271,27 @@ def _summary(item: Item) -> ItemSummary:
     )
 
 
+# -- P10.5 Block 9 (RE-4/RE-3): Umbenennen mit Absturzsicherheit -----------------------------
+#
+# **Warum es überhaupt einen Marker gibt.** Ein Umbenennen ist die erste Operation in diesem
+# System, die **zwei** Dinge anfasst: ein Verzeichnis (oder ein Space-Verzeichnis) **und** die
+# Item-Dateien darin. Ein Absturz dazwischen hinterlässt einen Zwischenstand, den kein
+# Einzelschritt zurücknehmen kann — und der Index (Hard Rule 2: reine Ableitung) waere dann
+# stale. Der Marker beantwortet die einzige Frage, die nach einem Absturz zaehlt: **was war
+# gerade in Bewegung?**
+#
+# Der Marker liegt unter `DATA_ROOT` mit **Punkt-Praefix** — derselbe Trick wie `._trash`
+# (P9 Step G): `rebuild_index()` iteriert `data_root.iterdir()` und ueberspringt Punkt-Verzeichnisse,
+# `list_spaces()` ebenso. Der Marker ist damit fuer beide Scans unsichtbar, ohne dass ein
+# P1-Code sich aendern muss.
+#
+# **Er wird nie committet.** Die `.gitignore` im `DATA_ROOT` (geschrieben von
+# `history.ensure_repo()`) bekommt eine Zeile dafuer — sonst wuerde `git add -A` den Marker
+# mitnehmen, und die Historie zeigte bei jedem Rename eine Datei, die es nicht mehr gibt.
+RENAME_MARKER = ".rename-pending.json"
+_RENAME_MARKER_IGNORE = ".rename-pending.json"
+
+
 class Store:
     def __init__(
         self,
@@ -284,6 +309,10 @@ class Store:
         self._acl = AclReader(self._data_root)
         if self._git_enabled:
             history.ensure_repo(self._data_root)
+        # P10.5 Block 9 (9.4): ein unterbrochener Rename wird **hier** zu Ende gefuehrt — nach
+        # dem Index-Verbinden (die Wiederaufnahme schreibt Index-Zeilen) und vor dem ersten
+        # Zugriff. Ohne diesen Aufruf bliebe ein halb umbenannter Ordner fuer immer halb.
+        self._resume_pending_rename()
         if rebuilt:
             # Das Schema wurde gerade leer (neu) angelegt (V46-Fix, siehe index.connect()) --
             # ohne diesen Aufruf bliebe ein echter Dienst-Neustart nach einem Schema-Sprung
@@ -515,6 +544,161 @@ class Store:
             (self._data_root / space / folder).mkdir(parents=True, exist_ok=True)
             return folder
 
+    def rename_folder(self, space: str, old: str, new: str, *, actor: str = "") -> int:
+        """**RE-4 (P1-Öffnung 13):** benennt einen Ordner im Space um und gibt die Zahl der
+        betroffenen Items zurück.
+
+        **Warum das so harmlos ist:** Ordner stehen **nicht** im Frontmatter, sie werden aus dem
+        Pfad abgeleitet (P6 Step 4, `files.folder_from_path()`). Ein Ordner-Umbenennen ist
+        deshalb ein **reines Verzeichnis-Rename** — es wird **keine** Item-Datei umgeschrieben und
+        **keine** `version` erhöht. Der Inhalt der Dateien bleibt byte-identisch; was sich ändert,
+        ist ihr Pfad.
+
+        **Was trotzdem passiert (und warum es nicht-trivial ist):**
+        - Die `.share.yml` im Ordner **wandert mit** — das ist der eigentliche Fund aus P8.6
+          §0.4.1 (die „billige Frontend-Fassung" ließ die Freigabe eines geteilten Ordners
+          zurück, und der Ordner war danach eine Sackgasse: sichtbar, aber nicht mehr teilbar).
+        - Die **Index-Zeilen** der betroffenen Items tragen `folder` und `path` — beide müssen
+          nachziehen. Der Index ist Ableitung (Hard Rule 2), also wird er aus den **Dateien**
+          neu gelesen (`index.row_from_file()`), nicht gerechnet.
+        - `AclReader`s `stat()`-Cache: der Cache-Schlüssel ist `(Pfad, mtime, size)` — der
+          **Pfad** ist Teil des Schlüssels, die verschobene `.share.yml` wird also am neuen Pfad
+          **frisch** gelesen. (Der alte Cache-Eintrag ist harmlos: `stat()` auf dem alten Pfad
+          schlägt fehl, `_read_one()` liefert dann eine leere `Grant`.)
+
+        **Ein Commit** für das ganze Umbenennen (`rename-folder <space>:<old>→<new>`) — derselbe
+        Autor wie bei jedem anderen Schreibvorgang (`actor`).
+
+        **Absturzsicherheit (9.4):** vor dem ersten Verzeichniswechsel wird der Marker
+        `.rename-pending.json` geschrieben; `Store.__init__` führt ihn zu Ende, falls der Prozess
+        dazwischen stirbt.
+
+        Autorisierung passiert **nicht** hier (wie überall im Store) — der Aufrufer prüft die
+        Rechte VOR diesem Call (die Web-Fläche: `permissions.manages_space()`)."""
+        with self._lock, self._file_write_lock():
+            alt = files.validate_folder(old)
+            neu = files.validate_folder(new)
+            if not alt or not neu:
+                raise ValidationError("Ordnername darf nicht leer sein")
+            if alt == neu:
+                raise ValidationError(
+                    f"Der neue Name ist der alte — der Ordner '{alt}' heisst bereits so."
+                )
+            if neu.startswith(alt + "/"):
+                # Sonst wuerde der Ordner in sich selbst hineinrennen (`os.rename()` auf ein
+                # Verzeichnis in sich selbst ist ein `EINVAL` — der Fehler waere da, aber nicht
+                # mit einer lesbaren Meldung).
+                raise ValidationError(
+                    f"Der neue Name '{neu}' liegt unter dem alten '{alt}' — das ist nicht möglich."
+                )
+            alt_dir = self._data_root / space / alt
+            neu_dir = self._data_root / space / neu
+            if not alt_dir.is_dir():
+                raise ValidationError(f"Ordner '{alt}' existiert im Space '{space}' nicht.")
+            if neu_dir.exists():
+                raise ValidationError(
+                    f"Ordner '{neu}' existiert im Space '{space}' bereits — es wurde nichts "
+                    "bewegt."
+                )
+            if not (self._data_root / space).is_dir():
+                raise ValidationError(f"Space '{space}' existiert nicht.")
+
+            self._ensure_rename_marker_ignored()
+            self._write_rename_marker({
+                "kind": "folder", "space": space, "old": alt, "new": neu,
+                "actor": actor, "started": _format_dt(self._now_fn()),
+            })
+            try:
+                self._rename_directory(alt_dir, neu_dir)
+                betroffen = self._reindex_moved_folder(space, alt, neu)
+            except BaseException:
+                # Der Marker bleibt liegen: `Store.__init__` führt den Rename zu Ende. Ohne ihn
+                # waere ein Absturz mitten im Rename ein halb umbenannter Ordner ohne jede
+                # Spur — die schlimmste Variante, weil niemand merkt, dass etwas halb ist.
+                raise
+            self._commit_rename(f"rename-folder {space}:{alt}→{neu}", actor)
+            self._clear_rename_marker()
+            return betroffen
+
+    def _reindex_moved_folder(self, space: str, alt: str, neu: str) -> int:
+        """Zieht die Index-Zeilen der verschobenen Items nach. **Aus den Dateien**, nicht
+        gerechnet: `index.row_from_file()` liest die Item-Datei am neuen Pfad und liefert
+        `path`, `folder`, `mtime`, `size` und `sha256` — genau die Spalten, die sich geändert
+        haben. `version` kommt aus dem Frontmatter der Datei und ist damit **unverändert**
+        (RE-4 hebt keine Version an).
+
+        Betroffen ist ein Item, dessen Ordner **gleich** `alt` ist oder **unterhalb** von `alt`
+        beginnt (verschachtelte Ordner). `folder` ist der aus dem Pfad abgeleitete Relative-Pfad
+        innerhalb des Spaces (`""` = Space-Wurzel, `_archive` = nie ein Ordner)."""
+        betroffen = 0
+        alt_rel = Path(space) / alt
+        for row in index.all_rows(self._conn):
+            folder = row["folder"]
+            if folder != alt and not folder.startswith(alt + "/"):
+                continue
+            alter_pfad = Path(row["path"])
+            try:
+                relativer = alter_pfad.relative_to(alt_rel)
+            except ValueError:  # pragma: no cover - der Ordner steht im Pfad, also passt es
+                continue
+            neuer_pfad = self._data_root / space / neu / relativer
+            if not neuer_pfad.is_file():
+                # Die Datei ist weg (externer Eingriff zwischen Rename und Index). Der Index
+                # darf dann keine Zeile erfinden — `rebuild_index()` ist die Wahrheit.
+                continue
+            index.upsert_item(self._conn, index.row_from_file(self._data_root, neuer_pfad))
+            betroffen += 1
+        return betroffen
+
+    def _resume_pending_rename(self) -> None:
+        """**9.4: Absturzsicherheit.** Wird aus `Store.__init__` aufgerufen, **nach** dem
+        Index-Verbinden und **vor** dem ersten Zugriff.
+
+        Der Ablauf ist der des Plan-Abschnitts 9.4: der Rename wird **idempotent** zu Ende
+        gefuehrt (das Verzeichnis wandert **nur**, wenn `old` noch existiert — ein bereits
+        umbenannter Ordner wird nicht noch einmal umbenannt), danach `rebuild_index()` (Hard
+        Rule 2: der Index ist ableitbar, ein halb umbenannter Index wird nie zur Wahrheit), ein
+        Commit, und zuletzt wird der Marker geloescht.
+
+        **Ein unbekannter `kind` loescht den Marker NICHT.** Ein Marker, den niemand versteht,
+        bleibt liegen und wird geloggt — ein stilles Wegwerfen waere genau die Fehlerklasse, die
+        dieser ganze Abschnitt verhindern soll."""
+        marker = self._read_rename_marker()
+        if marker is None:
+            return
+        kind = marker.get("kind")
+        with self._lock, self._file_write_lock():
+            if kind == "folder":
+                self._resume_folder_rename(marker)
+            else:
+                logger.critical(
+                    "Rename-Marker mit unbekannter Art %r — der Marker bleibt liegen, "
+                    "bis ein Mensch ihn prueft: %s", kind, marker,
+                )
+                return
+
+    def _resume_folder_rename(self, marker: dict[str, Any]) -> None:
+        """Setzt einen unterbrochenen Ordner-Rename zu Ende. Idempotent: das Verzeichnis
+        wandert **nur**, wenn `old` noch existiert und `new` noch nicht."""
+        space = str(marker.get("space", ""))
+        alt = str(marker.get("old", ""))
+        neu = str(marker.get("new", ""))
+        actor = str(marker.get("actor", ""))
+        alt_dir = self._data_root / space / alt
+        neu_dir = self._data_root / space / neu
+        if alt_dir.is_dir() and not neu_dir.exists():
+            self._rename_directory(alt_dir, neu_dir)
+        elif not neu_dir.is_dir():
+            logger.critical(
+                "Rename-Wiederaufnahme: weder '%s' noch '%s' existiert — der Ordner ist weg.",
+                alt_dir, neu_dir,
+            )
+            return
+        self._reindex_moved_folder(space, alt, neu)
+        self.rebuild_index()
+        self._commit_rename(f"rename-folder {space}:{alt}→{neu}", actor)
+        self._clear_rename_marker()
+
     @property
     def data_root(self) -> Path:
         """Roher `DATA_ROOT`-Pfad (P7 Step C2) — für Aufrufer, die `storage.acl`s Schreibseite
@@ -522,6 +706,102 @@ class Store:
         operation zu bekommen (dieselbe Zurückhaltung wie `spacectl.py`s eigener Docstring zur
         `Store`-Fläche)."""
         return self._data_root
+
+    # -- P10.5 Block 9: Umbenennen (RE-4/RE-3) + Absturzsicherheit (9.4) --------------------
+
+    def _rename_marker_path(self) -> Path:
+        return self._data_root / RENAME_MARKER
+
+    def _write_rename_marker(self, payload: dict[str, Any]) -> None:
+        """Schreibt den Marker **atomar** (`files.atomic_write()` — dieselbe Mechanik wie bei
+        einer Item-Datei). Er wird geschrieben, **bevor** das erste Verzeichnis wandert: ein
+        Marker, der nach dem Umbenennen entsteht, kann den entscheidenden Absturz nicht mehr
+        abdecken."""
+        files.atomic_write(
+            self._rename_marker_path(),
+            json.dumps(payload, ensure_ascii=False, sort_keys=True),
+        )
+
+    def _read_rename_marker(self) -> dict[str, Any] | None:
+        """Liest den Marker. `None` heisst „kein Rename in Bewegung" — auch dann, wenn die Datei
+        kaputt ist: eine kaputte Markerdatei darf keinen Start blockieren, sie muss aber
+        **sichtbar** sein (`logger.critical`, wie überall im Kern)."""
+        path = self._rename_marker_path()
+        if not path.is_file():
+            return None
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            logger.critical("Rename-Marker %s ist unlesbar: %s", path, exc)
+            return None
+        if not isinstance(data, dict):
+            logger.critical("Rename-Marker %s ist kein JSON-Objekt — ignoriert", path)
+            return None
+        return data
+
+    def _clear_rename_marker(self) -> None:
+        try:
+            self._rename_marker_path().unlink()
+        except FileNotFoundError:
+            pass
+
+    def _ensure_rename_marker_ignored(self) -> None:
+        """Sorgt dafuer, dass der Marker **nie** in die Git-Historie wandert.
+
+        `history.commit()` macht `git add -A` — und der Marker existiert in genau dem Moment, in
+        dem der Rename committet wird (Plan §9.2: „ein Commit → Marker löschen"). Ohne diese
+        Zeile stuende in der Historie jedes Renames eine Datei, die es nicht mehr gibt.
+
+        Die `.gitignore` im `DATA_ROOT` schreibt `history.ensure_repo()` — **hier** wird sie nur
+        **ergänzt**, nie überschrieben: `ensure_repo()` fasst eine vorhandene Datei nicht an, und
+        das bleibt so (sonst würde ein spaeterer `ensure_repo()`-Aufruf die Zeile wieder
+        wegschreiben)."""
+        gitignore = self._data_root / ".gitignore"
+        try:
+            inhalt = gitignore.read_text(encoding="utf-8") if gitignore.is_file() else ""
+        except OSError:
+            return
+        if _RENAME_MARKER_IGNORE in inhalt.split("\n"):
+            return
+        try:
+            with open(gitignore, "a", encoding="utf-8") as f:
+                if inhalt and not inhalt.endswith("\n"):
+                    f.write("\n")
+                f.write(_RENAME_MARKER_IGNORE + "\n")
+        except OSError as exc:  # pragma: no cover - der Commit laeuft auch ohne die Zeile
+            logger.critical(".gitignore im DATA_ROOT nicht ergaenzbar: %s", exc)
+
+    @staticmethod
+    def _rename_directory(old_dir: Path, new_dir: Path) -> None:
+        """`os.rename()` fuer **Verzeichnisse** + `fsync` des Elternverzeichnisses.
+
+        Warum nicht `files.move_file()`: das benutzt `os.replace()` und ist fuer **Dateien**
+        gedacht (es macht `new_path.parent.mkdir()`). `os.replace()` auf ein nicht leeres
+        Zielverzeichnis schlaegt fehl — und ein Ordner, der beim Umbenennen atomar verschwinden
+        soll, darf nicht erst kopiert und dann geloescht werden. `os.rename()` auf ein
+        Verzeichnis ist der eine Syscall, der genau das tut.
+
+        Das `fsync` auf dem Elternverzeichnis ist derselbe Schritt wie bei `files.atomic_write()`:
+        ohne ihn kann ein Absturz den Verzeichniseintrag zurueckrollen, obwohl `rename()`
+        zurueckgemeldet wurde."""
+        os.rename(old_dir, new_dir)
+        dir_fd = os.open(old_dir.parent, os.O_RDONLY)
+        try:
+            os.fsync(dir_fd)
+        finally:
+            os.close(dir_fd)
+
+    def _commit_rename(self, message: str, actor: str = "") -> None:
+        """**Ein** Commit fuer das ganze Umbenennen (Plan §9.2/§9.3: „ein Commit"). Die
+        `_commit()`-Hilfe baut ihre Message aus `op`/`item_id`/`space` — fuer ein Rename passt
+        das nicht (ein Ordner hat keine Item-ID, ein Space-Umbenennen keinen einzelnen Space-Namen
+        im Klammern-Feld). Deshalb direkt `history.commit()` mit der Message, die der Plan
+        vorschreibt: `rename-folder <space>:<old>→<new>` bzw. `rename-space <old>→<new>`.
+
+        Wie `_commit()` ist der Aufruf **nie fatal**: `history.commit()` loggt selbst `critical`
+        und wirft nie."""
+        if self._git_enabled:
+            history.commit(self._data_root, message, author=actor)
 
     @property
     def acl_reader(self) -> AclReader:

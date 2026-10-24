@@ -332,6 +332,29 @@
   </div>
 </div>
 
+<!-- P10.5 Block 9 (RE-4): Ordner umbenennen. Der Dialog nennt **den alten und den neuen
+     Namen**, weil das Umbenennen sonst wie ein Ersetzen aussieht — und es sagt, dass die
+     Inhalte und die Freigaben des Ordners mitwandern (das ist der Punkt der ganzen
+     Funktion: eine geteilte `.share.yml` bleibt am Ordner). -->
+<div class="overlay" id="rename-folder-dialog" hidden>
+  <div class="overlay__panel">
+    <h2>Ordner umbenennen</h2>
+    <p class="overlay__hint" id="rename-folder-hint"></p>
+    <label>Neuer Name
+      <input type="text" class="input" id="rename-folder-name-input">
+    </label>
+    <div class="overlay__actions">
+      <button type="button" class="btn-primary" id="rename-folder-submit">Umbenennen</button>
+      <button type="button" class="btn" id="rename-folder-cancel">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- P10.5 Block 9 (RE-4): die Kontextaktion am Ordner im Baum (Rechtsklick). -->
+<div class="ctxmenu" id="folder-context-menu" hidden>
+  <button type="button" class="ctxmenu__item" id="folder-context-rename">Umbenennen</button>
+</div>
+
 <!-- Phase 8 Block B Step B4 (Plan §3 P4): Link-Picker-Dialog. Reine UI-Komponente,
      kein eigenes MCP-Tool (Plan §0.5: Graph ist Mensch-UI, Claude erreicht Links ueber
      `links:`/`get_item`). Sucht via `GET /api/v1/items?query=...` (existierender globaler

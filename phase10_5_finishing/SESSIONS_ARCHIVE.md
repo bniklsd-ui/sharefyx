@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,60 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-24 (Deploy C `v3.1.7` vorbereitet · Block 9.1 RE-7 `created_by` gebaut und gemessen)
+
+**Ergebnis.** Zwei Dinge. **(1) Deploy C ist vorbereitet, nicht ausgeführt** — Badge `v3.1.7`,
+ein eigener `## 2026-10-24`-Block in `docs/UPDATE_LOG.md` (9 Zeilen für Menschen), Suite **1425
+grün**, `doc_health` **0**, `ui_budget` **5/5**. Commit `7d8c28e`, gepusht. **`deploy.sh` liegt
+beim Nikinger** (Hard Rule 9):
+
+    SHAREFYX_RELEASES_DIR=/opt/sharefyx/releases SHAREFYX_CURRENT_LINK=/opt/sharefyx/current \
+    SHAREFYX_DATA_ROOT=/home/savefyx/savefyx-data SHAREFYX_BACKUP_DIR=/var/lib/sharefyx-backup \
+    SHAREFYX_SYSTEMCTL="sudo systemctl" phase5_ui/scripts/deploy.sh main
+
+Danach lese ich `health_gate.sh --expected-version=v3.1.7 --require-todays-update-log
+--expected-sha=<sha>` und lege die **echte** Ausgabe in den Commit.
+
+**(2) Block 9.1 (RE-7 `created_by`) ist gebaut und gemessen** — die zwölfte P1-Öffnung:
+`Item.created_by` / `ItemSummary.created_by`, dieselbe Klasse wie `updated_by` (P9 Block trace):
+serververwaltet, über **keinen** Kanal setzbar, **kein Backfill** (Lock P10.5-W). Betroffene
+Dateien: `phase1_storage/storage/{models,store}.py` (der P1-Diff nennt **nur** diese beiden),
+`phase2_mcp/mcpserver/tools.py`, `phase5_ui/webui/serializers.py`,
+`phase5_ui/webui/static/{app.html,js/editor.js}` (eine **eigene** Lesezeile „Erstellt von X" —
+eine leere `created_by` (Altbestand) darf die `updated_by`-Zeile nicht verschlucken).
+
+**Gemessen.** Wegwerf-Probe `probes/p105_b9_created_by_probe.py` **12/12 Zellen** (Port 8799,
+PID-Datei): Web-Anlage → Antwort **und** Datei nennen `created_by: alpha` · MCP-Anlage →
+`get_item_meta` **und** Datei nennen ihn · **Altbestand**: `""`, **keine** Zeile in der Datei —
+auch **nach** einem Write nicht (nichts erfunden) · Fälschung per PATCH → **422**, per POST → der
+Wert bleibt der eingeloggte Mensch. 8 neue Tests (`test_store.py` × 5, `test_tools.py` × 3,
+`test_api.py` × 2) und **4 Regel-Wächter mit je einem Gegenlauf**
+(`tests/test_created_by_rules.py`: `_KNOWN_FIELDS` · `_SYSTEM_MANAGED_FIELDS` · `_summary()` ·
+die Leerwert-Bedingung — jeder Gegenlauf macht **genau** seinen Defekt sichtbar).
+
+**Ein Fund beim Bauen — die Probe selbst:** die Zelle „Altbestand nach einem Write" war
+**vakuos**: der Titelwechsel benennt die Datei um (Slug!), der zwischengespeicherte Pfad zeigte
+ins Leere, und „`created_by` nicht in ''" wäre grün gewesen. Der Pfad wird jetzt **neu geholt**
+(`rglob` über die ID) und die Zelle prüft zusätzlich, dass die Datei **nicht leer** ist.
+
+**Bewusst nicht gebaut:** `receipts.py :: write_receipt()` trägt `created_by` **nicht** —
+`phase2_mcp/mcpserver/receipts.py` steht **nicht** auf der Block-9-Erlaubnisliste (Plan §3), und
+`test_app.py` prüft die Patch-Quittung als **exaktes** Dict (eine Zeile mehr wäre dort ein
+Testbruch). Beim Anlegen ist nichts verloren: die Quittung trägt `updated_by` = denselben Actor.
+
+**Ausführer-Daten.** `opencode/MiniMax-M3.1-Flash`, Kontextgrenze **400.000** (P10.5-C erfüllt,
+`~/.config/opencode/opencode.json`), keine Eingriffe des Nikingers in dieser Session, **ein**
+Fehler beim Gegenlesen gefunden (die vakuose Zelle oben) und behoben.
+
+**Stand.** Branch `p105-block9`, Baum sauber, Wegwerf-Instanz gestoppt. **P10.5-37 und P10.5-32
+bleiben ⬜** (Augen-Urteil des Nikingers); das **Budget für `graph.js`** (+11,1 KB gzip statt
++8 KB) entscheidet der Nikinger.
+
+**Nächster Schritt.** (1) Deploy C durch den Nikinger, dann `health_gate.sh` mit echter Ausgabe
+in den Commit. (2) **Block 9.2** `Store.rename_folder()` (RE-4) und **9.3**
+`Store.rename_space()` (RE-3), beide mit dem Absturz-Marker aus 9.4. (3) Merge `p105-block9` →
+`main` **nach** dem Deploy.
 
 ## Session stopped — 2026-10-24 (Deploy C `v3.1.7` vorbereitet — Badge, Update-Log, Suite 1425 grün)
 
