@@ -67,6 +67,19 @@ Dienst.
    der acht Hauptansichten (Konventionen: `docs/concepts/sichtpruefung_automation_conventions.md`),
    der Nikinger liefert daraus **höchstens 10** Posten, der Ausführer setzt sie in `app.css` um
    (Auswahl-Konvention v3, `phase8_ui_graph/CLAUDE.md`). Alles über 10 Posten wandert nach P11.
+   **Screenshots gemacht 2026-10-24** (acht Ansichten, Wegwerf-Instanz mit 5 Beispiel-Items; liegen
+   nur in `/tmp/opencode/sichtung-7-4/`, nicht im Repo). **Sichtungsliste des Nikingers (4 von 10 Posten,
+   für den Ausführer, nur `app.css`/Markup):**
+   1. **Wortmarke:** der Abstand zwischen Logo-Zeichen und „harefyx" wird **kleiner** (`.rail__brand`
+      `app.css:456` und `.auth__brand`; das Zeichen **ist** das S — `app.html:21` `alt="S"`).
+   2. **„Zugewiesen"-Auswahl** (`#list-assignee`, 7.6): Innenabstand/Breite wie das Suchfeld darüber
+      angleichen — sie läuft bündig an den Listenrand.
+   3. **Update-Banner** verdeckt oben ~140 px jeder angemeldeten Ansicht und schiebt das Layout: **kompakter**
+      machen (Nikinger: echter Mangel; Form ist Sache des Ausführers, Vorschlag mit Begründung).
+   4. **Versionsanzeige** `.rail__version` (`app.css:476`) liest sich als „v316" — Punkte nicht erkennbar
+      (Quelle ist `v3.1.6`): Schriftgröße/Laufweite prüfen (Nikinger: echter Mangel).
+   **Nachsichtung:** der Nikinger macht eine **zweite Sichtung der Gestaltung**, sobald der
+   Alles-in-einem-Editor (Block 11) steht — weitere Posten bis zur Grenze 10 kommen dann dazu.
 5. **7.5 UI-5 — Kontrast (D-7).** ✅ **2026-10-24** — **Drift gegen den Plan:** im Code ist `--caution` **selbst der
    Text-Farbwert** (`app.css:92`: `--caution: var(--danger)`), nicht die Knopffläche — der Plan
    spricht von einem „neuen Token `--caution-text` (heller als `--caution`)". **Der Code gewinnt:**
