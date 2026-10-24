@@ -794,6 +794,12 @@ Screenshots: Ruhe, Fokus mit zwei Ringen, Suche, Filter → Sichtung.
 **Register:** RE-7 (P1-12), RE-4 (P1-13, V193), RE-3 (P1-14, V194). **Erlaubte Pfade:** siehe §3. **Ankündigung im Phase-Head vor dem ersten
 Commit** mit den drei Öffnungen und den betroffenen Dateien `models.py`, `store.py`, `index.py`. Abbruch, wenn
 `git diff --stat -- phase1_storage/storage` mehr nennt.
+**[Nachtrag 2026-10-24]** Die Erlaubnispfade (§3) nennen für diesen Block **keine** Probe-Dateien — die Abnahmekriterien unten verlangen aber
+ausdrücklich eine **Wegwerf-Messung** („Tests + Wegwerf"). Die Proben liegen deshalb wie in den Blöcken 2/4/5/6 in
+`phase10_5_finishing/probes/` (`p105_b9_created_by_probe.py` · `p105_b9_rename_folder_probe.py` · `p105_b9_rename_space_probe.py` mit
+ihren JSON-Belegen) und die Regel-Wächter in `phase10_5_finishing/tests/` („Tests", §3). Der Block-9-Diff nennt damit
+**keinen** Pfad außerhalb von `phase1_storage/storage/{models,store}.py`, `phase2_mcp/mcpserver/tools.py`, `phase5_ui/webui/**`,
+den Tests, `phase10_5_finishing/{probes,tests}/` und `.md`-Doku.
 
 **9.1 RE-7 `created_by`** (wie `updated_by`, P9 Block trace). `models.py`: `Item.created_by: str = ""` (nach `updated_by`, `:51`) und
 `ItemSummary.created_by: str = ""` (`:95`). In `store.py` an **zwei** Stellen eintragen: `_KNOWN_FIELDS` (`:54`), sonst landet das Feld
