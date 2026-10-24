@@ -12,7 +12,7 @@ down:
   - UPDATES_ARCHIVE.md                              # 📦 die älteren `updated:`-Fäden dieses Heads, verbatim
   - STARTUPTRAG_ARCHIVE.md                          # 📦 die Startaufträge der Blöcke 7 und 9, verbatim
   - FREIGABEN_ARCHIVE.md                           # 📦 die Freigaben der Phase, verbatim
-updated: 2026-10-24 (Block 10.5: die Probe ist grün — Volltext 0 → 1 Treffer, Latenz 141,1 ms, P10.5-S-Band, Shutdown 5,22 s; P10.5-45/46/47/48 ✅, Gegenlauf rot) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-10-24 (Block 11.1: der vendorte Editor — CodeMirror 5.65.16, fünf Dateien statt drei (gemessen), 71.280 B gzip; Wächter mit Gegenprobe) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -36,7 +36,7 @@ updated: 2026-10-24 (Block 10.5: die Probe ist grün — Volltext 0 → 1 Treffe
 | 8 | Karte: Gehirnkarte C2 | Ausführer (+ Claude Code Smoke/Sichtung) | C | 🔄 2026-10-24 — **8.1–8.8 gebaut und gemessen** (Lappen/Furchen/Zellen/Aktivierung in `graph.js`, KA-2 Layout-Ablage, KA-3 Suche/Filter, reduced motion 0 Ticks) · **Browser-Probe `probes/p105_b8_karte_probe.py` an der 200-Knoten-Wegwerf-Instanz: 4/4 Messungen grün, 3 Gegenläufe je rot** · **Smoke `p8_22_smoke.py` 5/5** (Ruhe 2712,1 ms ≤ 3000, Frame p95 1,7 ms ≤ 16,7, reduced motion **0** Frames) · **drei Fehler hat erst der Browser gefunden** (gezogener Knoten wurde zurückgezogen · Fokus blieb nach dem Zeigerwechsel · Trefferzahl wurde vom Layout-Hinweis überschrieben) — alle drei behoben und gewächtert · **Abnahme 10-36/38/39/40 ✅, 10-37 wartet auf die Sichtung** (4 Screenshots liegen vor) · **Befund: das Plan-Budget für `graph.js` ist überschritten** (+11,1 KB gzip statt +8 KB; davon +9,8 KB Kommentar, der Code selbst +2,9 KB) — Entscheidung beim Nikinger · **drei Pfade außerhalb der §3-Liste** (bewusst, datiert): `phase9_hardening/scripts/graph_reload_probe.mjs` (der P9-Harness malt die alte Strichzeichnung — ohne Anpassung wäre der P9-Wächter rot) · `phase10_5_finishing/{probes,tests}/` (Plan 8.8 verlangt Proben und Wächter) · `docs/screenshots/p105_b8_*.png` (Plan 8.8 verlangt die vier Bilder für die Sichtung) |
 | 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | ✅ 2026-10-24 — **9.1 RE-7 `created_by`** (Probe 12/12) · **9.2 RE-4 `rename_folder`** (Probe 13/13) · **9.3 RE-3 `rename_space`** (Probe 15/15) — alle drei gebaut und gemessen; Branch `p105-block9`, Merge **nach** Deploy C |
 | 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | D | ✅ 2026-10-24 — **10.1** LG-1 Volltext (`in_body`, Schalter) · **10.2** LG-2 serverseitig (`events.py`, Route, `timeout_graceful_shutdown=5`) · **10.3** LG-2 Client (`realtime.js`, Poll-Rückfall 120 s, Hinweisband P10.5-S) · **10.5 Probe**: 11/11 Zellen grün an der Wegwerf-Instanz (18810) — **Latenz 141,1 ms** (Grenze 2000), **Shutdown 5,22 s** (Grenze 10), Volltext 0 → 1 Treffer mit dem Schalter, Band „Geändert von alpha — neu laden?", unsichtbarer Space **ohne** Ereignis; **Gegenlauf rot** (Filter aus → das Ereignis kommt) — 33 neue Tests, 7 Gegenläufe |
-| 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | ⬜ |
+| 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | 🔄 2026-10-24 — **11.1 Vendor** (CodeMirror 5.65.16, **fünf** Dateien statt drei — gemessen: der UMD-Browser-Zweig der `markdown.min.js` löst `require("../xml/xml")` **nicht** auf) |
 | 12 | Doku und Altlasten: DO-1, LG-6, AL-1 (Rest), AL-3, BG-2/BG-3 | Claude Code | — | ⬜ |
 | Z | Closeout P10.5 (Handover, Grafik, Rotationen) | Claude Code + Nikinger | — | ⬜ |
 
@@ -169,38 +169,28 @@ updated: 2026-10-24 (Block 10.5: die Probe ist grün — Volltext 0 → 1 Treffe
 > wird **erst nach dem Deploy C** nach `main` gemergt (`deploy.sh` klont das lokale `main` —
 > sonst liefert `v3.1.7` den Block-9-Stand mit aus).
 
-## Session stopped — 2026-10-24 (Block 10.5: die Probe ist grün — Volltext, Latenz, P10.5-S und Shutdown an der Wegwerf-Instanz)
+## Session stopped — 2026-10-24 (Block 11.1: der vendorte Editor — **fünf** Dateien, nicht drei)
 
-**Ergebnis.** Die Probe `probes/p105_b10_realtime_probe.py` fährt gegen die Wegwerf-Instanz
-(Port 18810, TLS, eigene PID-Datei) und misst **11 von 11 Zellen grün**: Volltext **0 → 1
-Treffer** mit dem Schalter · das Ereignis kommt an · **Latenz 141,1 ms** (Grenze 2000) · der
-getippte Text bleibt stehen, das Band erscheint · ein unsichtbarer Space löst **kein** Ereignis
-aus · **Shutdown 5,22 s** (Grenze 10). Der **Gegenlauf** (Ereignis-Filter in `api.py` aus) ist
-**rot** — genau an der Zelle, die er brechen soll. Belege: `p105_b10_realtime.json` (grün),
-`p105_b10_realtime_gegenlauf.json` (rot). **Abnahme P10.5-45, 46, 47, 48 ✅** — Block 10 ist
-fertig.
+**Ergebnis.** `phase5_ui/webui/static/vendor/codemirror/` liegt im Baum: CodeMirror **5.65.16**
+(von jsDelivr), die SHA-256-Summe jeder Datei und der MIT-Lizenztext in
+`phase5_ui/THIRD_PARTY_LICENSES.md`. **71.280 B gzip** — das Budget „Editor nachgeladen ≤ 80 KB"
+(P10.5-50) hält mit 8,7 KB Luft. Ein Wächter (`tests/test_codemirror_vendor.py`, 4 Tests)
+vergleicht den Baum mit dem Lizenzdokument — **mit Gegenprobe**: ein untergeschobener
+CodeMirror (gleichlang, gleicher Name) muss rot werden, sonst prüft der Wächter ins Leere.
+Suite **1507 grün** (351,1 s), `doc_health` 0.
 
-**Vier Fehler lagen im Messgerät, nicht im Produkt** (jeder hätte die Probe rot gemeldet, ohne
-den Defekt zu zeigen): (1) Das Flag-Protokoll war verdreht — der Browser wartete auf
-`ready.flag`, das er selbst schreiben sollte. (2) Der **CSRF-Origin** passte nicht:
-`require_csrf()` vergleicht ihn gegen `SPACE_PUBLIC_BASE_URL`, die Auth-Konfiguration erzwingt
-https ⇒ die Wegwerf-Instanz braucht **TLS** (derselbe Weg wie `p10_wegwerf.py`). (3) Der Editor
-öffnet in der **Vorschau** (die Textarea ist unsichtbar), und die Zeile in der Liste zeigt den
-**Titel**, nicht den Text. (4) Die Shutdown-Messung sah einen **Zombie** (ein beendeter
-Prozess bleibt in `/proc`); die erste Fassung meldete 30,03 s.
+**Der Plan nennt drei Dateien, gemessen sind es fünf.** Die gebaute `markdown.min.js` ist ein
+**UMD-Wrapper**; im Browser-Zweig ruft sie nur `t(CodeMirror)` auf — die beiden `require(...)`
+Zweige (`require("../xml/xml")`, `require("../meta")`) werden **nicht** abgearbeitet. Im echten
+Chromium gemessen: mit den drei Dateien registriert sich der Modus zwar
+(`CodeMirror.modes.markdown` ist eine Funktion, **null** Seitenfehler), aber der HTML/XML-Teil
+des Markdown-Modus fehlt — `xml.min.js` ist **kein** Zusatz, sondern die fehlende Hälfte.
+Mit allen fünf Dateien bleibt das Verhalten identisch und vollständig. Der Zuschlag beträgt
+**6.499 B gzip** und ist damit im Budget.
 
-**Eine Frage an die Attrappe.** Die erste Fassung der Probe startete eine **Kopie** des
-App-Aufbaus — damit hätte sie die Frist `timeout_graceful_shutdown=5` mitkopiert oder
-weggelassen; weggelassen hätte die Probe **grün** gemeldet, obwohl der Produktivpfad
-unbegrenzt auf offene Streams wartet. Die Probe startet jetzt **den Produktiv-Code**
-(`phase2_mcp/scripts/serve.py`) und ergänzt nur die beiden TLS-Parameter. Der Write läuft über
-die **Web-API**, nicht über MCP (der Plan nennt einen MCP-Write) — nach dem Adapter ist der
-Serverpfad derselbe (datierte Abweichung, im Probekopf benannt).
+**Was noch nicht gebaut ist.** Der Editor selbst: `js/editor_cm.js` (Nachladen), der Umbau von
+`editor.js` auf `getBody()`/`setBody()` (ohne Moduswechsel), die Live-Darstellung, ED-2
+(To-do-Kästchen), ED-3 (Stufe 2), das Budget und der Roundtrip (11.2–11.8).
 
-**Gemessen.** 38 neue Tests (2 API + 6 Volltext-Wächter + 15 Events + 2 `phase2_mcp` + 8
-Client-Wächter + 5 Probe-Wächter) · Suite **1503 grün** (350,8 s) · `doc_health` 0 ·
-`ui_budget` 5/5 (198,7 KB gzip). Der Abschnitt „Freigaben" ist aus dem Head nach
-`FREIGABEN_ARCHIVE.md` gewandert (verbatim) — der Head stand bei 41.343 B, über dem Softcap.
-
-**Nächster Schritt.** Deploy C (`v3.1.7`) beim Nikinger (`deploy.sh`, Hard Rule 9) ·
-`health_gate.sh` mit echter Ausgabe · Merge `p105-block9` → `main` · danach Block 11 (Editor).
+**Nächster Schritt.** 11.2: `js/editor_cm.js` — die CSS und dann beide Skripte laden, das
+Promise gecacht, bei einem Fehler `null` (der Editor bleibt Textarea = Rohmodus, ED-5).

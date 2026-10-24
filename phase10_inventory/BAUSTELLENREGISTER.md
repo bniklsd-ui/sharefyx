@@ -10,7 +10,7 @@ down:
   - ../docs/concepts/PHASE9_CLOSEOUT_HANDOVER.md  # Herkunft §4.1–§4.10
   - ENTSCHEIDUNGEN_ARCHIVE.md               # 📦 §12 Entscheidungsliste D-1–D-18, verbatim (2026-10-22 gewandert)
   - UPDATES_ARCHIVE.md                      # 📦 die älteren `updated:`-Fäden dieses Registers, verbatim (2026-10-24 rotiert)
-updated: 2026-10-24 (B10.5 ✅ — LG-1 und LG-2 gemessen: Wegwerf-Probe 11/11 Zellen grün, Gegenlauf rot) | ältere Einträge: phase10_inventory/UPDATES_ARCHIVE.md
+updated: 2026-10-24 (B11.1 ✅ — der vendorte Editor liegt: CodeMirror 5.65.16, fünf Dateien statt drei, 71.280 B gzip) | ältere Einträge: phase10_inventory/UPDATES_ARCHIVE.md
 ---
 # Phase 10 — Baustellenregister
 
@@ -88,7 +88,7 @@ P10 Step 2) · Wissen (kein Bau, nur festgehalten) · erledigt (mit Beleg). „E
 
 | ID | Posten | Herkunft | Befund am Code / Stand | Gr. | Risiko | Entsch. | Ziel |
 |---|---|---|---|---|---|---|---|
-| ED-1 | Schreiben ohne Wechsel zwischen Vorschau und Bearbeiten (Stufe 1: Live-Darstellung über Markdown) | intake §2.3, feedback E3 | `phase5_ui/webui/static/js/editor.js:294–302 setEditorMode()` schaltet `preview`/`edit`, Vorgabe `preview` (`:431`). **Widerspricht dem gelockten P5-U** („Markdown-Textarea + Formatierhilfen, kein WYSIWYG") — Umkehr nur als datierte Nikinger-Entscheidung. Eine Bibliothek muss ohne Build-Schritt laufen (P5-T) und ins `ui_budget` passen · V201 · **[2026-10-18]** D-4: Stufe 1 ja — **P5-U ist damit datiert aufgehoben** · **[2026-10-19, M7]** gemessen (`messung/M7_editor.md`): **CM5 65,6 KB gz, Roundtrip 10/10 verlustfrei, 239,0 KB < 250 KB Korridor ✅**; EasyMDE Roundtrip ok, aber 282,1 KB ❌ (V201); markdown-it redundant zum vorhandenen `js/markdown.js`; Empfehlung CM5 + vorhandene Vorschau (0-Byte-Textarea-Variante als Alternative) — Wahl im Plan P10.5 | L | S | D-4 | P10.5 |
+| ED-1 | Schreiben ohne Wechsel zwischen Vorschau und Bearbeiten (Stufe 1: Live-Darstellung über Markdown) | intake §2.3, feedback E3 | `phase5_ui/webui/static/js/editor.js:294–302 setEditorMode()` schaltet `preview`/`edit`, Vorgabe `preview` (`:431`). **Widerspricht dem gelockten P5-U** („Markdown-Textarea + Formatierhilfen, kein WYSIWYG") — Umkehr nur als datierte Nikinger-Entscheidung. Eine Bibliothek muss ohne Build-Schritt laufen (P5-T) und ins `ui_budget` passen · V201 · **[2026-10-18]** D-4: Stufe 1 ja — **P5-U ist damit datiert aufgehoben** · **[2026-10-19, M7]** gemessen (`messung/M7_editor.md`): **CM5 65,6 KB gz, Roundtrip 10/10 verlustfrei, 239,0 KB < 250 KB Korridor ✅**; EasyMDE Roundtrip ok, aber 282,1 KB ❌ (V201); markdown-it redundant zum vorhandenen `js/markdown.js`; Empfehlung CM5 + vorhandene Vorschau (0-Byte-Textarea-Variante als Alternative) — Wahl im Plan P10.5 · **[2026-10-24, B11.1]** der vendorte Editor liegt (CM **5.65.16**, **fünf** Dateien statt drei — gemessen: der UMD-Browser-Zweig löst die `require`s nicht auf; 71.280 B gzip) | L | S | D-4 | P10.5 |
 | ED-2 | To-do-Kästchen im Text, anklickbar | P9-Plan §15, intake §2.3 | `markdown.js` plus Schreibpfad: ein Klick ist ein Write mit `version` (Hard Rule 3) | M | S | D-4 | P10.5, mit ED-1 |
 | ED-3 | Erweiterte Formatierung (Farbe, Ausrichtung, Größe) | intake §2.3 Stufe 2 | in Markdown nicht ausdrückbar → elfte P1-Contract-Öffnung, alle MCP-Clients lesen mit · **[2026-10-18]** D-4: Stufe 2 ja — definierter Markdown-Zusatz, **P1-Öffnung Dateiformat**, alle MCP-Clients lesen mit; eigener Mini-Plan | L | F | D-4 | P10.5 |
 | ED-4 | Excel-artige Tabellen | intake §2.3 Stufe 3 | eigener Item-Typ = neue Fähigkeit | L | F | nein | P11 |
