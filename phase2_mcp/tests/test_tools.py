@@ -1413,3 +1413,59 @@ def test_read_paths_and_the_receipt_carry_updated_by(tools_map, store):
     # sieht. `return_body=True` holt denselben Inhalt als YAML-Frontmatter.
     assert json.loads(quittung)["updated_by"] == SPACE_A
     assert "updated_by: alpha" in volltext
+
+
+# -- P10.5 Block 9: RE-7 `created_by` (P1-Öffnung 12) -------------------------------------
+#
+# Der MCP-Pfad hat **drei** Leseflächen, und alle drei muessen dasselbe zeigen: die
+# Trefferliste (`search_items`), die Metadaten-Ansicht (`get_item_meta`) und der
+# Volltext (`item_to_filetext()`, `return_body=True`). Ein Feld, das auf einer Flaeche lesbar
+# ist und auf der anderen fehlt, ist genau die Divergenz, die P9 Step F als F10 aufgedeckt hat
+# (`assignee` in `_summary()`) und P9-72 fuer `updated_by`.
+
+
+def test_get_item_meta_shows_created_by(tools_map, store):
+    """`get_item_meta` nennt den Anleger — und der kommt aus dem **Token**, nicht aus dem
+    Aufruf: das Werkzeug hat keinen `created_by`-Parameter (das Waechter
+    `test_no_mcp_tool_accepts_updated_by` deckt das fuer `updated_by` ab, `created_by` ist
+    derselbe Fall und wird hiermit genauso behandelt)."""
+    item = store.create(SPACE_A, type="task", title="Rechnung", actor=SPACE_A)
+
+    with _as(SPACE_A):
+        meta = json.loads(tools_map["get_item_meta"](item.id))
+
+    assert meta["created_by"] == SPACE_A
+
+
+def test_the_read_paths_carry_created_by(tools_map, store):
+    """Alle drei Leseflaechen nennen den Anleger: die Trefferliste, die Metadaten und der
+    Volltext. Der Volltext ist der Weg, den `create_item(return_body=True)` zurueckgibt — er
+    muss die Datei **zeichengleich** abbilden, sonst behauptet das Werkzeug etwas anderes, als
+    es geschrieben hat (`item_to_filetext()` vs. `storage.store._item_to_text()`)."""
+    item = store.create(SPACE_A, type="task", title="Rechnung", actor=SPACE_A)
+
+    with _as(SPACE_A):
+        treffer = json.loads(tools_map["search_items"]())
+        meta = json.loads(tools_map["get_item_meta"](item.id))
+        volltext = tools_map["update_item"](
+            item.id, version=item.version, title="Rechnung II", return_body=True
+        )
+
+    assert treffer["items"][0]["created_by"] == SPACE_A
+    assert meta["created_by"] == SPACE_A
+    assert "created_by: alpha" in volltext
+
+
+def test_no_mcp_tool_accepts_created_by(tools_map, store):
+    """**Kein** Werkzeug nimmt `created_by` an — weder beim Anlegen noch beim Aendern. Der Wert
+    ist serververwaltet (`store._SYSTEM_MANAGED_FIELDS`); ein Agent, der sich als jemand anderes
+    ausgeben will, bekommt eine **laute** Ablehnung, keine stille Fehlannahme."""
+    with pytest.raises(Exception) as excinfo:
+        tools_map["create_item"](type="task", title="Erfunden", created_by="beta")
+    assert "created_by" in str(excinfo.value) or "unexpected" in str(excinfo.value).lower()
+
+    item = store.create(SPACE_A, type="task", title="Echt", actor=SPACE_A)
+    with _as(SPACE_A):
+        with pytest.raises(Exception) as excinfo:
+            tools_map["update_item"](item.id, version=item.version, created_by="beta")
+    assert "created_by" in str(excinfo.value) or "unexpected" in str(excinfo.value).lower()

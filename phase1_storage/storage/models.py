@@ -49,6 +49,16 @@ class Item:
     # erfundener. Ein Item ohne Feld bleibt ohne Feld, es wird nie ein leeres `updated_by:`
     # geschrieben (`store._item_to_text`).
     updated_by: str = ""
+    # P10.5 Block 9 (RE-7, P1-Öffnung 12): Name des Space, aus dessen **authentifiziertem**
+    # Principal das Item **angelegt** wurde — dieselbe Form wie `updated_by` eine Zeile darüber,
+    # dieselbe Herkunft: der Server setzt es aus dem `actor`-Argument, **über kein Werkzeug und
+    # keine REST-Route setzbar** (es steht in `store._SYSTEM_MANAGED_FIELDS`).
+    #
+    # **Kein Backfill** (Lock P10.5-W): ein Item, das vor diesem Feld existierte, trägt es nicht
+    # und wird es nie bekommen — die UI zeigt dann nichts an. Ein leeres Feld wird **nie**
+    # erfunden: `store._item_to_text()` schreibt es nur bei nicht-leerem Wert, genau wie
+    # `updated_by` (P9-AB). Wer den Anleger braucht, findet ihn im Git-Autor des Anlege-Commits.
+    created_by: str = ""
     # Unbekannte Frontmatter-Felder — überleben Round-Trips unangetastet (Entscheidung A).
     extra: dict[str, Any] = field(default_factory=dict)
 
@@ -93,6 +103,11 @@ class ItemSummary:
     # etwas bearbeitet hat, aber nicht, **ob** es seit dem letzten Lesen jemand getan hat.
     # Gefüllt wird es in `store._summary()` — genau die Stelle, die P9 Step F als F10 benannt hat.
     updated_by: str = ""
+    # P10.5 Block 9 (RE-7): dasselbe Feld wie auf `Item` — aus demselben Grund wie `assignee` und
+    # `updated_by` darunter. Eine Trefferliste ohne `created_by` wäre eine Liste, in der ein Agent
+    # sieht, **wer** etwas bearbeitet hat, aber nicht, **wer es angelegt** hat. Gefüllt wird es in
+    # `store._summary()` — genau die Stelle, die P9 Step F als F10 benannt hat.
+    created_by: str = ""
 
 
 @dataclass(kw_only=True)

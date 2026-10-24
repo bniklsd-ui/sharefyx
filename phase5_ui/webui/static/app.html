@@ -246,6 +246,10 @@
           <!-- P9 Block trace: reine Lesezeile, kein Feld. `updated_by` ist serververwaltet
                (P9-AA) und ueber keinen Kanal setzbar — ein Eingabefeld waere eine
                Bedienmoeglichkeit, die nichts bewirkt. Leer bei Altbestand (P9-AB). -->
+          <!-- P10.5 Block 9 (RE-7): `created_by` genauso — serververwaltet, ueber keinen Kanal
+               setzbar, **kein Backfill** (P10.5-W). Eigene Zeile, damit ein Altbestand-Item
+               ohne Anleger die `updated_by`-Zeile nicht wegschluckt. -->
+          <p class="panel__readline" id="meta-created-by"></p>
           <p class="panel__readline" id="meta-updated-by"></p>
           <datalist id="assignee-options"></datalist>
         </div>

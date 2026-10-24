@@ -1,15 +1,15 @@
 ---
 status: archive
-purpose: L3-Archiv des Startauftrags von Block 7 (Darstellung: UI-1–UI-6, KA-5) — verbatim aus dem Phase-Head verschoben, weil der Head über dem Softcap stand.
-read-when: wenn die Schritte 7.4–7.7 gebaut werden — sie stehen hier mit den Korrekturen zum Plan, die im 📕-Plan noch fehlen
+purpose: L3-Archiv der Startaufträge der Blöcke 7 (Darstellung) und 9 (Rechte und Namen) — verbatim aus dem Phase-Head verschoben, weil der Head über dem Softcap stand.
+read-when: wenn die Schritte 7.4–7.7 oder 9.2/9.3 gebaut werden — hier stehen die Korrekturen zum 📕-Plan, die dort fehlen, und die Ankündigung der drei P1-Öffnungen
 detail: L3
 up: ../ROADMAP.md
 down:
   - CLAUDE.md                                          # der Phase-Head, aus dem die Abschnitte verschoben wurden
   - ../docs/concepts/phase10_5_finishing_plan.md       # 📕 der Plan (Schritte 7.4–7.7 wortgleich, aber ohne die Korrekturen)
-updated: 2026-10-23 (aus dem Phase-Head verschoben: der Head stand bei 41.847 B und damit über dem Softcap; die Schritte 7.4–7.7 stehen hier weiter)
+updated: 2026-10-24 (der Startauftrag von Block 9 — die Ankündigung der drei P1-Öffnungen — ist aus dem Head hierher gewandert; der Head stand bei 43.545 B und damit über dem Softcap) | 2026-10-23 (aus dem Phase-Head verschoben: der Head stand bei 41.847 B und damit über dem Softcap; die Schritte 7.4–7.7 stehen hier weiter)
 ---
-# Startauftrag-Archiv — Block 7 (Darstellung: UI-1–UI-6, KA-5)
+# Startauftrag-Archiv — die Blöcke 7 (Darstellung) und 9 (Rechte und Namen)
 
 > **Warum dieses Archiv existiert (2026-10-23).** Der Phase-Head war beim Bau von Block 7.3
 > auf **41.847 B** gewachsen — über dem Softcap (40.960 B), damit `doc_health` rot und das
@@ -124,3 +124,40 @@ liest es als Fläche) und `setViewTitle` **existiert noch nicht**.
 (Titel je Ansicht) · 10-32 (Sichtungsliste, **beim Nikinger**) · 10-33 (Kontrast ≥ 4,5:1) · 10-34
 (Filter in API und UI) · 10-35 (KA-5 sichtbar). **Proben:** Playwright liest `document.title` je
 Ansicht; Screenshots für 10-30/10-32/10-35; **Wegwerf statt Live** (Freigabe 2026-10-22).
+
+## Startauftrag — Block 9 (Rechte und Namen: RE-7, RE-4, RE-3) · Ausführer
+> **Ankündigung der drei P1-Öffnungen** (Plan §Block 9: „Ankündigung im Phase-Head vor dem ersten
+> Commit mit den drei Öffnungen und den betroffenen Dateien"). Der 📕-Plan bleibt ein Snapshot; die
+> Herleitung steht in `docs/concepts/phase10_5_finishing_plan.md` §„Block 9".
+>
+> **Die drei Öffnungen** (elfte, zwölfte, dreizehnte P1-Contract-Öffnung; die elfte war P9-F
+> `assignee`):
+> 1. **(12) RE-7 `created_by`** — `Item.created_by` / `ItemSummary.created_by`, wie `updated_by`
+>    (P9 Block trace): vom Server gesetzt, **über keinen Kanal setzbar**, **kein Backfill**
+>    (P10.5-W): ein Altbestand-Item ohne Feld bleibt ohne Feld, und ein leeres Feld wird **nie**
+>    erfunden. Kein Index-Schema-Sprung (wie `updated_by`).
+> 2. **(13) RE-4 `Store.rename_folder()`** — Ordner stehen **nicht** im Frontmatter (P6 Step 4),
+>    also wird **keine Item-Datei umgeschrieben** und **keine `version` erhöht**. Die
+>    `.share.yml` im Ordner **wandert mit** (das ist der Fund aus P8.6 §0.4.1: die billige
+>    Frontend-Fassung ließ sie zurück).
+> 3. **(14) RE-3 `Store.rename_space()`** — `space` steht **im Frontmatter** jeder Datei, also
+>    gilt die Semantik von `move()`: jede Item-Datei des Spaces bekommt `space=new`,
+>    `version+1`, `updated=now` — **ein** Commit für den ganzen Space. **Nur Team-Spaces**
+>    (P10.5-M): ein Home-Space-Name ist Identität (Auth-DB, Token-Familien, `assignee`,
+>    `updated_by`) und wird in P10.5 nie umbenannt.
+>
+> **Betroffene Dateien in `phase1_storage/storage/`:** `models.py` und `store.py`. `index.py`
+> **bleibt unberührt** — die Index-Zeilen werden über das bestehende `index.row_from_file()` /
+> `index.upsert_item()` nachgezogen, es gibt **keinen** Schema-Sprung (Hard Rule 2: der Index
+> ist Ableitung, kein Ort für eigene Wahrheiten). Das ist eine **Teilmenge** der angekündigten
+> Liste (`models.py`, `store.py`, `index.py`) — zulässig, denn das Abbruchkriterium ist „nur die
+> angekündigten Dateien", nicht „alle angekündigten Dateien".
+>
+> **Abbruchprüfung am Blockende (P10.5-E/F):** `git diff --stat <block-basis>..HEAD -- . ':!<erlaubte Pfade>'`
+> muss leer sein (außer `.md`-Doku) und `git diff --stat -- phase1_storage/storage` darf **nur**
+> `models.py` und `store.py` nennen. Erlaubte Pfade (Plan §3, Block 9): `phase1_storage/storage/{models,store,index}.py`,
+> `phase2_mcp/mcpserver/tools.py`, `phase5_ui/webui/**`, Tests.
+>
+> **Wichtig für die Reihenfolge:** `deploy.sh` klont das **lokale `main`**. Block 9 wird deshalb auf
+> einem eigenen Branch (`p105-block9`) gebaut und **erst nach dem Deploy C** nach `main` gemergt —
+> sonst liefert `v3.1.7` den Block-9-Stand mit aus.

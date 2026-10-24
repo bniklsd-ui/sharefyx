@@ -1,0 +1,68 @@
+{
+  "probe": "p105_b9_created_by",
+  "date": "2026-10-24T15:50:30.782097+00:00",
+  "all_ok": true,
+  "zellen": 12,
+  "cells": [
+    {
+      "name": "Web-Anlage: HTTP 201",
+      "ok": true,
+      "detail": "HTTP 201"
+    },
+    {
+      "name": "Web-Anlage: die Antwort nennt den Anleger",
+      "ok": true,
+      "detail": "created_by='alpha' (erwartet 'alpha')"
+    },
+    {
+      "name": "Web-Anlage: die Datei auf der Platte nennt ihn",
+      "ok": true,
+      "detail": "Datei itm_eb8007cb__web-anlage.md, 206 B"
+    },
+    {
+      "name": "MCP-Anlage: die Quittung nennt eine ID",
+      "ok": true,
+      "detail": "is_error=False, id=itm_e248596a"
+    },
+    {
+      "name": "MCP-Anlage: `get_item_meta` nennt den Anleger",
+      "ok": true,
+      "detail": "created_by='alpha' (erwartet 'alpha')"
+    },
+    {
+      "name": "MCP-Anlage: die Datei auf der Platte nennt ihn",
+      "ok": true,
+      "detail": "Datei itm_e248596a__mcp-anlage.md, 214 B"
+    },
+    {
+      "name": "Altbestand: `get_item_meta` nennt keinen Anleger",
+      "ok": true,
+      "detail": "created_by='' (erwartet '')"
+    },
+    {
+      "name": "Altbestand: die Datei trägt keine Zeile",
+      "ok": true,
+      "detail": "Datei itm_31de5b3d__altbestand.md, 189 B"
+    },
+    {
+      "name": "Altbestand: nach einem Write immer noch keine Zeile",
+      "ok": true,
+      "detail": "HTTP 200, Datei itm_31de5b3d__altbestand-neu.md, 213 B"
+    },
+    {
+      "name": "Fälschung per PATCH: 422",
+      "ok": true,
+      "detail": "HTTP 422, error='validation_failed'"
+    },
+    {
+      "name": "Fälschung per PATCH: die Datei bleibt unberührt",
+      "ok": true,
+      "detail": "Datei itm_eb8007cb__web-anlage.md"
+    },
+    {
+      "name": "Fälschung per POST: der Wert bleibt der eingeloggte Mensch",
+      "ok": true,
+      "detail": "created_by='alpha' (erwartet 'alpha')"
+    }
+  ]
+}

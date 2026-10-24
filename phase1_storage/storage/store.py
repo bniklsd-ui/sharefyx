@@ -60,6 +60,11 @@ _KNOWN_FIELDS = {
     # P9 Block trace: ohne diesen Eintrag landet `updated_by` in `Item.extra` — dieselbe
     # Konsequenz wie bei `assignee` zwei Zeilen darüber (F4).
     "updated_by",
+    # P10.5 Block 9 (RE-7): ohne diesen Eintrag landet `created_by` in `Item.extra` — dieselbe
+    # Konsequenz, dritte Wiederholung derselben Falle. Ein Feld in `extra` überlebt zwar den
+    # Round-Trip, hat aber **keinen** Default, **keine** Index-Spalte und **keinen** Platz im
+    # `ItemSummary` — es wäre ein Feld, das nur beim Lesen existiert.
+    "created_by",
 }
 _DEFAULT_STATUS = {"task": "open", "note": "active"}
 # Vom Store selbst verwaltet — dürfen nie über **fields/**changes hereinkommen, sonst
@@ -71,7 +76,12 @@ _DEFAULT_STATUS = {"task": "open", "note": "active"}
 # weiter. Gesetzt wird es aus dem `actor`-Argument, das die aufrufende Schicht aus dem
 # authentifizierten Principal fuellt. Das ist dieselbe Klasse wie `updated`: ein Feld, dessen
 # Wert die Identitaet behauptet, die der Server kennt, nicht die der Client behauptet.
-_SYSTEM_MANAGED_FIELDS = {"id", "space", "created", "updated", "version", "updated_by"}
+#
+# P10.5 Block 9 (RE-7): `created_by` steht ab hier mit drin — **zweite** Oeffnung derselben
+# Art. `create(created_by=…)` wirft damit `ValidationError`, `update(created_by=…)` ebenfalls,
+# und die Adapter geben es nicht weiter (die REST-Whitelist `_PATCH_FIELDS` kennt es nicht,
+# der POST filtert es weg). Der Wert kommt allein aus dem `actor` des Anlegevorgangs.
+_SYSTEM_MANAGED_FIELDS = {"id", "space", "created", "updated", "version", "updated_by", "created_by"}
 
 
 
@@ -143,6 +153,12 @@ def _item_from_text(text: str, *, version_override: int | None = None, folder_ov
         # praktisch jedes vorhandene Item —, gilt der Default. `str(... or "")` faengt dazu
         # ein `updated_by:` mit leerem Wert ab, das jemand von Hand eingetragen hat.
         updated_by=str(fields.get("updated_by", "") or ""),
+        # P10.5 Block 9 (RE-7): dasselbe Muster ein drittes Mal — fehlt das Feld (jeder
+        # Altbestand-Item, und nach dem Deploy praktisch jedes vorhandene Item), gilt der
+        # Default. `str(... or "")` faengt dazu ein `created_by:` mit leerem Wert ab, das
+        # jemand von Hand eingetragen hat. **Kein Backfill** (P10.5-W): der Wert wird nie
+        # nachtraeglich erfunden.
+        created_by=str(fields.get("created_by", "") or ""),
         extra=extra,
     )
 
@@ -186,6 +202,14 @@ def _item_to_text(item: Item) -> str:
     # waere eine leere Anzeige an prominenter Stelle, kein unauffaelliger Diff).
     if item.updated_by:
         fields["updated_by"] = item.updated_by
+    # P10.5 Block 9 (RE-7): **direkt nach `updated_by`**, dieselbe Bedingung (nur bei
+    # nicht-leerem Wert), derselbe Grund. Ohne sie bekaeme jeder Altbestand-Item beim
+    # naechsten beliebigen Write ein stilles `created_by: ""` — ein Frontmatter-Diff, den
+    # niemand bestellt hat, in jedem einzelnen Altbestand-Item (P9-42, dieselbe Lehre).
+    # **Kein Backfill** (P10.5-W): die Reihenfolge im Dict ist damit auch die Reihenfolge
+    # im Frontmatter — `created_by` steht hinter `updated_by`, nicht davor.
+    if item.created_by:
+        fields["created_by"] = item.created_by
     fields.update(item.extra)
     return serialize_frontmatter(fields, item.body)
 
@@ -235,6 +259,11 @@ def _summary(item: Item) -> ItemSummary:
         # geschrieben hat. Ohne diese Zeile stuende dort dauerhaft `""`, waehrend `get()` den
         # echten Wert lieferte.
         updated_by=item.updated_by,
+        # P10.5 Block 9 (RE-7): die Pflichtstelle, die der Plan nicht nennt und ohne die es ein
+        # totes Feld waere — exakt F10 aus P9 Step F, jetzt fuer `created_by`. `search()` ist der
+        # Weg, ueber den ein Agent sieht, **wer** etwas angelegt hat; ohne diese Zeile stuende
+        # dort dauerhaft `""`, waehrend `get()` den echten Wert lieferte.
+        created_by=item.created_by,
     )
 
 
@@ -671,6 +700,13 @@ class Store:
                 # Vorgaenger, dessen `updated_by` bleiben koennte — der Wert kommt allein aus
                 # dem Akteur (leer = unbekannt, dann steht das Feld gar nicht in der Datei).
                 updated_by=actor,
+                # P10.5 Block 9 (RE-7): das Anlegen ist der einzige Moment, in dem es einen
+                # "Ersteller" gibt — danach aendert sich der Wert **nie** (kein Schreibweg
+                # aendert ihn: `update`/`append`/`patch`/`move`/`archive`/`trash` benutzen alle
+                # `replace(current, ...)`, das den alten Wert mitnimmt). Leer heisst
+                # "unbekannt" (Operator-Skript ohne Akteur) — dann steht das Feld **gar nicht**
+                # in der Datei (P10.5-W: kein erfundenes Leerfeld).
+                created_by=actor,
                 extra=fields,
             )
             self._write_item_file(item, old_path=None, op="create", actor=actor)

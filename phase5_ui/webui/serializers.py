@@ -65,6 +65,10 @@ def item_to_json(
         # **nicht** in der PATCH-Whitelist, das Feld ist ueber keinen Kanal setzbar
         # (`api.py :: _PATCH_FIELDS`). `item_to_json()` gibt aus, was auf der Platte steht.
         "updated_by": item.updated_by,
+        # P10.5 Block 9 (RE-7): Teil des Frontmatter-Vertrags, deshalb bei jedem Item mit — und
+        # **nicht** in der PATCH-Whitelist, das Feld ist ueber keinen Kanal setzbar
+        # (`api.py :: _PATCH_FIELDS`). `item_to_json()` gibt aus, was auf der Platte steht.
+        "created_by": item.created_by,
         "shared": item.space != own_space,
         "readonly": readonly,
         "assets": [asset_to_json(a) for a in assets] if assets is not None else [],
@@ -98,6 +102,9 @@ def summary_to_json(
         # Trefferlisten (Itemliste **und** `overview_row_to_json()`), ein zweites `updated_by`
         # in einer zweiten Funktion wäre die Divergenz, die F10/F11 in P9 Step F aufgedeckt hat.
         "updated_by": s.updated_by,
+        # P10.5 Block 9 (RE-7): derselbe Grund — `summary_to_json()` ist die eine Quelle für
+        # Trefferlisten (Itemliste **und** `overview_row_to_json()`).
+        "created_by": s.created_by,
         "shared": s.space != own_space,
         "readonly": readonly,
     }

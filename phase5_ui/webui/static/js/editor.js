@@ -39,6 +39,8 @@ var fieldDueEl;
 // P9 Block trace: `assignee` (editierbar) und `updated_by` (reine Anzeige, P9-AA).
 var fieldAssigneeEl;
 var metaUpdatedByEl;
+// P10.5 Block 9 (RE-7): `created_by` (reine Anzeige, wie `updated_by`).
+var metaCreatedByEl;
 var fieldTagsEl;
 var fieldLinksEl;
 var editorToolbarEl;
@@ -295,6 +297,18 @@ function renderUpdatedByLine(item) {
     : "";
 }
 
+// P10.5 Block 9 (RE-7): die Lesezeile "erstellt von X". Leer, wenn das Item das Feld nicht
+// trägt — **kein Backfill** (Lock P10.5-W): ein Altbestand-Item zeigt hier nichts, und es wird
+// auch nichts erfunden. Eine **eigene** Zeile, nicht eine zweite Angabe in der `updated_by`-Zeile:
+// die beiden Aussagen beziehen sich auf verschiedene Zeitpunkte, und eine leere `created_by`
+// (Altbestand) darf die `updated_by`-Zeile nicht verschlucken.
+function renderCreatedByLine(item) {
+  if (!metaCreatedByEl) return;
+  metaCreatedByEl.textContent = item.created_by
+    ? "Erstellt von " + item.created_by + " · " + (item.created || "")
+    : "";
+}
+
 function setEditorMode(mode) {
   state.mode = mode;
   editorTextareaEl.hidden = mode !== "edit";
@@ -425,6 +439,7 @@ function showEditableItem(item, opts) {
   fieldDueEl.value = item.due || "";
   fieldAssigneeEl.value = item.assignee || "";
   renderUpdatedByLine(item);
+  renderCreatedByLine(item);
   fillAssigneeOptions();
   fieldTagsEl.value = item.tags.join(", ");
   fieldLinksEl.value = item.links.join(", ");
@@ -598,6 +613,7 @@ export function init() {
   fieldDueEl = document.getElementById("field-due");
   fieldAssigneeEl = document.getElementById("field-assignee");
   metaUpdatedByEl = document.getElementById("meta-updated-by");
+  metaCreatedByEl = document.getElementById("meta-created-by");
   fieldTagsEl = document.getElementById("field-tags");
   fieldLinksEl = document.getElementById("field-links");
   editorToolbarEl = document.getElementById("editor-toolbar");

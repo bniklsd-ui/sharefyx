@@ -249,6 +249,10 @@ def item_to_filetext(item: Item) -> str:
     # als es geschrieben hat, ist schlimmer als ein fehlendes (Kommentar direkt darüber).
     if item.updated_by:
         fields["updated_by"] = item.updated_by
+    # P10.5 Block 9 (RE-7): dasselbe Argument ein drittes Mal — die Datei auf der Platte hätte das
+    # Feld, `return_body=True` lieferte eines ohne.
+    if item.created_by:
+        fields["created_by"] = item.created_by
     fields.update(item.extra)
     return serialize_frontmatter(fields, item.body)
 
@@ -277,6 +281,11 @@ def summary_to_dict(item: ItemSummary, *, own: bool) -> dict[str, Any]:
         # Bewusst neben `assignee` und **nicht** im gewrappten Snippet: beides sind vom Server
         # gesetzte Metadaten, keine Fremdinhalte (Rule 4 / V182).
         "updated_by": item.updated_by,
+        # P10.5 Block 9 (RE-7): dasselbe Feld, derselbe Grund — der Name des Spaces, aus dessen
+        # authentifiziertem Principal das Item **angelegt** wurde. Neben `assignee` und
+        # `updated_by` und **nicht** im gewrappten Snippet: beides sind vom Server gesetzte
+        # Metadaten, keine Fremdinhalte (Rule 4 / V182).
+        "created_by": item.created_by,
         "snippet": item.snippet if own else wrap_untrusted(item.snippet, space=item.space),
     }
 
@@ -619,6 +628,10 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             # einen Flaeche lesbar ist und auf der anderen fehlt, ist genau die Divergenz, die
             # der Kommentar zur `assignee`-Zeile darueber beschreibt.
             "updated_by": item.updated_by,
+            # P10.5 Block 9 (RE-7): dasselbe Muster ein drittes Mal — der Volltext-Pfad muss
+            # dasselbe zeigen wie die Liste, sonst kann ein Agent die beiden nicht gegeneinander
+            # halten.
+            "created_by": item.created_by,
             "version": item.version,
             "created": _format_dt(item.created),
             "updated": _format_dt(item.updated),

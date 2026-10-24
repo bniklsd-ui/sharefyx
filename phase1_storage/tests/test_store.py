@@ -1129,3 +1129,116 @@ def test_updated_by_cannot_be_set_by_the_caller(store):
     with pytest.raises(ValidationError):
         store.update(item.id, version=item.version, updated_by="fabian")
     assert store.get(item.id).updated_by == "niklas"
+
+
+# -- P10.5 Block 9: RE-7 `created_by` (P1-Öffnung 12) -------------------------------------
+#
+# Die Behauptung, die diese Tests tragen: **der Server weiss, wer ein Item angelegt hat, und
+# der Wert bleibt das.** Anders als `updated_by` (P9 Block trace) ist `created_by` **einmalig**:
+# es gibt genau einen Schreibvorgang, der es setzt — das Anlegen. Kein spaeterer Schreibpfad
+# aendert es, kein Backfill erfindet es (Lock P10.5-W), und ueber keinen Kanal ist es setzbar.
+#
+# Die Muster sind dieselben wie bei `updated_by` (P9-AA–AD) — dieselbe Klasse Feld, dieselbe
+# Herkunft (`actor`), dieselbe Sperre (`_SYSTEM_MANAGED_FIELDS`). Der Unterschied ist die
+# Richtung: `updated_by` wandert mit dem letzten Schreiber, `created_by` steht fest.
+
+
+def test_created_by_set_on_create_and_never_changed(store, tmp_path):
+    """Der positive Fall: `create(actor=…)` setzt das Feld, es landet in der Datei, und **kein**
+    spaeterer Schreibpfad aendert es — nicht `update`, nicht `append`, nicht `patch`, nicht
+    `move`, nicht `archive`.
+
+    Die Kette `update` → `append` → `patch` → `move` → `archive` ist keine Redundanz: jeder dieser
+    Wege baut ein **neues** `Item` (ueber `dataclasses.replace`), und `replace()` nimmt den
+    Feldwert mit — ein Weg, der ihn versehentlich zuruecksetzt, wuerde hier auffallen."""
+    item = store.create("nikinger", type="task", title="Kühlschrank prüfen", actor="niklas")
+
+    (pfad,) = list((tmp_path / "nikinger").glob(f"{item.id}__*.md"))
+    assert "created_by: niklas" in pfad.read_text(encoding="utf-8")
+    assert store.get(item.id).created_by == "niklas"
+    assert store.search(space="nikinger").items[0].created_by == "niklas"
+
+    updated = store.update(item.id, version=item.version, title="Kühlschrank (Dringend)")
+    assert updated.created_by == "niklas"
+
+    appended = store.append(item.id, version=updated.version, text="notiert")
+    assert appended.created_by == "niklas"
+
+    patched = store.patch(
+        item.id, version=appended.version,
+        edits=[{"old_text": "notiert", "new_text": "notiert!"}],
+    )
+    assert patched.item.created_by == "niklas"
+
+    (tmp_path / "fabian").mkdir()
+    moved = store.move(item.id, version=patched.item.version, space="fabian")
+    assert moved.created_by == "niklas"
+
+    archived = store.archive(item.id, version=moved.version)
+    assert archived.created_by == "niklas"
+    assert store.get(item.id).created_by == "niklas"
+
+
+def test_created_by_absent_without_actor(store, tmp_path):
+    """Ohne Akteur steht das Feld **gar nicht** in der Datei (P10.5-W: kein erfundenes
+    Leerfeld). Ein leeres `created_by: ""` waere eine Aussage ("jemand ohne Namen"), die der
+    Server nicht belegen kann — dieselbe Regel wie bei `assignee` (F6) und `updated_by` (P9-AB)."""
+    item = store.create("nikinger", type="task", title="Ohne Namen", actor="")
+
+    (pfad,) = list((tmp_path / "nikinger").glob(f"{item.id}__*.md"))
+    text = pfad.read_text(encoding="utf-8")
+    assert "created_by" not in text
+    assert store.get(item.id).created_by == ""
+
+
+def test_old_file_without_created_by_reads_as_empty(store, tmp_path):
+    """Der **Altbestand**: ein Item, das vor diesem Feld existierte, liest sich als leer — und
+    bekommt durch einen schreibenden Zugriff **keine** leere Zeile angehaengt.
+
+    Der zweite Teil ist der eigentliche Test: ohne die Bedingung `if item.created_by:` in
+    `_item_to_text()` bekaeme **jedes** bestehende Item beim naechsten beliebigen Write ein
+    stilles `created_by: ""` — ein Frontmatter-Diff, den niemand bestellt hat, in jedem einzelnen
+    Altbestand-Item (dieselbe Lehre wie P9-42 bei `assignee`)."""
+    item = store.create("nikinger", type="task", title="Altbestand", actor="")
+
+    def _datei():
+        (treffer,) = list((tmp_path / "nikinger").glob(f"{item.id}__*.md"))
+        return treffer
+
+    assert "created_by" not in _datei().read_text(encoding="utf-8")
+
+    store.update(item.id, version=item.version, title="Altbestand (neu)")
+
+    text = _datei().read_text(encoding="utf-8")
+    assert "created_by" not in text
+    assert store.get(item.id).created_by == ""
+
+
+def test_created_by_cannot_be_set_by_the_caller(store):
+    """**Kein** Schreibpfad nimmt das Feld an — weder beim Anlegen noch beim Aendern.
+    `created_by` steht in `_SYSTEM_MANAGED_FIELDS`; die Ablehnung ist eine `ValidationError`,
+    also derselbe Fehler, den heute `created`/`updated` bekommen. Wer sich als jemand anderes
+    ausgeben will, bekommt damit nicht eine stille Fehlannahme, sondern eine laute."""
+    with pytest.raises(ValidationError):
+        store.create("nikinger", type="task", title="Erfunden", created_by="fabian")
+
+    item = store.create("nikinger", type="task", title="Echt", actor="niklas")
+    with pytest.raises(ValidationError):
+        store.update(item.id, version=item.version, created_by="fabian")
+    assert store.get(item.id).created_by == "niklas"
+
+
+def test_created_by_survives_a_git_commit_as_the_author_of_the_creating_commit(store_git, tmp_path):
+    """Das Feld und der Git-Autor muessen **dasselbe** sein: ein Item, dessen Datei
+    `created_by: niklas` traegt, wurde in einem Commit von `niklas` angelegt. Der Test haelt die
+    beiden Spuren zusammen — sie stammen aus derselben Quelle (`actor`), und eine der beiden
+    verliesse den Akteur waere ein halbfertiger Zugang.
+
+    Das ist bewusst **kein** Git-Autor-Test: der Autor-Zweig ist P9-AC (und P9-AB: eine
+    Fremdaenderung bekommt **keinen** Autor). Hier geht es nur darum, dass der Actor nicht auf
+    dem Weg in die Datei verloren geht."""
+    item = store_git.create("nikinger", type="task", title="Mit Autor", actor="niklas")
+
+    assert store_git.get(item.id).created_by == "niklas"
+    commits = _git_log(tmp_path)
+    assert len([m for m in commits if m.startswith("create ")]) == 1

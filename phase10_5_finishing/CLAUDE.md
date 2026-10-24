@@ -10,7 +10,8 @@ down:
   - ../phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md  # 📦 §12 Entscheidungsliste D-1–D-18, verbatim
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
   - UPDATES_ARCHIVE.md                              # 📦 die älteren `updated:`-Fäden dieses Heads, verbatim
-updated: 2026-10-24 (Deploy C `v3.1.7` vorbereitet — Badge, eigener `## 2026-10-24`-Block im Update-Log, Suite 1425 grün, `doc_health` 0, `ui_budget` 5/5; `deploy.sh` beim Nikinger) | 2026-10-24 (Block 8 gebaut — die Gehirnkarte C2: Lappen/Furchen/Zellen/Aktivierung, KA-2 Layout merken, KA-3 Suche/Filter, reduced motion 0 Frames; Browser-Probe an der 200-Knoten-Wegwerf-Instanz 4/4 mit 3 roten Gegenläufen; **drei Fehler fand erst der Browser** (gezogener Knoten wurde zurückgezogen · Fokus überlebte den Zeiger · Layout-Hinweis überschrieb die Trefferzahl) — behoben und gewächtert; Smoke 5/5; Suite 1422 grün; Abnahmestand 34 ✅ · 0 ⚠️ · 27 ⬜) | 2026-10-24 (Block 7.4 (UI-4) umgesetzt — die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen: Wortmarken-Abstand 2,5 px · „Zugewiesen"-Auswahl mit den Kanten der Suchzeile · Update-Banner als einzeilige Leiste (49 px) mit dem Knopf „Alle Änderungen" · Versionsanzeige 11 px (Punkt 203/255 statt 155/255); Wächter 8/8 mit 4 Gegenproben, Probe 5/5 mit 5 roten Gegenläufen; P10.5-32 bleibt ⬜ bis zur Bestätigung) | 2026-10-24 (Session-Schluss: Handover für 7.4-Umsetzung, Block 8, Deploy C; Rotations-Fallstrick notiert) | 2026-10-24 (Block 7.4: Sichtungsliste des Nikingers notiert — 4 Posten im Archiv Schritt 7.4, Ausführer setzt um, Nachsichtung nach Block 11) | 2026-10-24 (Block 7.5 Kontrast (`--caution` #F06A6E, Wächter), 7.6 Assignee-Filter (API + Auswahl), 7.7 KA-5 (Chip + Karten-Ring) gebaut; Probe an der Wegwerf-Instanz 6/6 mit zwei roten Gegenläufen; Suite 1396 grün; Abnahmestand 30 ✅ · 0 ⚠️ · 31 ⬜) | 2026-10-23 (Block 7.3 (UI-3) gebaut: der Tab-Titel folgt der Ansicht — Übersicht, Space-Name, Item-Titel, Einstellungen; datierte Korrektur zum Plan (vier Zustände, nicht fünf); Probe an der Wegwerf-Instanz 6/6 mit rotem Gegenlauf; Abnahmestand 27 ✅ · 0 ⚠️ · 34 ⬜) | 2026-10-23 (Block 7.2 (UI-2): die Wortmarke `static/logo.svg` — Variante B aus dem Logo-Board, pixelgleich gemessen; zwei Befunde nur durch Messung (XML-Kommentar, MIME-Typ); Probe an der Wegwerf-Instanz mit rotem Gegenlauf; Abnahmestand 26 ✅ · 0 ⚠️ · 35 ⬜) | 2026-10-23 (Deploy B ist live: `v3.1.6`, Release `20261023T165838.591015Z`, SHA `e5c834e`, health_gate 9/9 OK; Block 7.1 (UI-1) gemergt (`f0e76b0`) — kommt mit `v3.1.7`) | 2026-10-23 (Block 7.1 (UI-1) gebaut: HTML-404 für unbekannte `/ui`-Pfade + JSON-404 in der API — Branch `p105-block7`, nicht gemergt; 4 neue Tests, 4 Gegenläufe wirksam; Suite 1384 grün) | 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zeile `)pdated:` → `) | `; Release-Tests wieder grün, Suite 1380 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+  - STARTUPTRAG_ARCHIVE.md                          # 📦 die Startaufträge der Blöcke 7 und 9, verbatim
+updated: 2026-10-24 (Block 9.1 RE-7 `created_by` gebaut und gemessen — zwölfte P1-Öffnung, Wegwerf-Probe 12/12, 4 Regel-Wächter mit Gegenläufen; Deploy C `v3.1.7` vorbereitet, `deploy.sh` beim Nikinger) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -40,7 +41,7 @@ updated: 2026-10-24 (Deploy C `v3.1.7` vorbereitet — Badge, eigener `## 2026-1
 | 6 | Anbieter: PA-1, PA-2, `/mcp`, PA-6, P10-J | Ausführer + Claude Code + Nikinger | B | ✅ 2026-10-22 — **6.0–6.5 gebaut und gemessen**: zweite Vergleichsregel `http://127.0.0.1:<port>` (Port explizit, kein `localhost`/`[::1]`, P10.5-O) + `application_type` ∈ {fehlend, null, native, web} · CSP `form-action` mit `http://127.0.0.1:*` · `/mcp` **ohne** Slash exakt bedient (`_ExactMcpMount`, kein 307) · PA-6 (Wurzel-`CLAUDE.md` eine Zeile) · **V209 ✅** (opencode 1.19.4), **V197 ✅** (Chromium folgt dem Consent-Redirect) · **DCR-Gegenlauf**: derselbe Request 400 → **201** · Suite **1376 grün** (1354 + 22) · **10-23/10-24/10-25 ✅**, **10-26 ✅** (2026-10-23 geklärt: die zwei Auslöser lagen im Messgerät, kein Produktcode — siehe Session-Block), 10-27/28 beim Nikinger nach Deploy B |
 | 7 | Darstellung: UI-1–UI-6, KA-5 | Ausführer (+ Claude Code Sichtung) | C | 🔄 2026-10-24 — **7.1–7.7 gebaut und gemessen** (HTML-404 für unbekannte `/ui`-Pfade · Wortmarke `static/logo.svg` · Tab-Titel folgt der Ansicht · vier Posten der Sichtung umgesetzt · Kontrast `--caution` 5,70:1 · Assignee-Filter in API und UI · `doing`-Ring auf der Karte) · Probe an der Wegwerf-Instanz, Gegenläufe je rot · **P10.5-32 bleibt ⬜ bis zur Bestätigung** — die Herleitung je Schritt steht im Session-Archiv (`SESSIONS_ARCHIVE.md`, Block 7.1–7.4) und in den Commits |
 | 8 | Karte: Gehirnkarte C2 | Ausführer (+ Claude Code Smoke/Sichtung) | C | 🔄 2026-10-24 — **8.1–8.8 gebaut und gemessen** (Lappen/Furchen/Zellen/Aktivierung in `graph.js`, KA-2 Layout-Ablage, KA-3 Suche/Filter, reduced motion 0 Ticks) · **Browser-Probe `probes/p105_b8_karte_probe.py` an der 200-Knoten-Wegwerf-Instanz: 4/4 Messungen grün, 3 Gegenläufe je rot** · **Smoke `p8_22_smoke.py` 5/5** (Ruhe 2712,1 ms ≤ 3000, Frame p95 1,7 ms ≤ 16,7, reduced motion **0** Frames) · **drei Fehler hat erst der Browser gefunden** (gezogener Knoten wurde zurückgezogen · Fokus blieb nach dem Zeigerwechsel · Trefferzahl wurde vom Layout-Hinweis überschrieben) — alle drei behoben und gewächtert · **Abnahme 10-36/38/39/40 ✅, 10-37 wartet auf die Sichtung** (4 Screenshots liegen vor) · **Befund: das Plan-Budget für `graph.js` ist überschritten** (+11,1 KB gzip statt +8 KB; davon +9,8 KB Kommentar, der Code selbst +2,9 KB) — Entscheidung beim Nikinger · **drei Pfade außerhalb der §3-Liste** (bewusst, datiert): `phase9_hardening/scripts/graph_reload_probe.mjs` (der P9-Harness malt die alte Strichzeichnung — ohne Anpassung wäre der P9-Wächter rot) · `phase10_5_finishing/{probes,tests}/` (Plan 8.8 verlangt Proben und Wächter) · `docs/screenshots/p105_b8_*.png` (Plan 8.8 verlangt die vier Bilder für die Sichtung) |
-| 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | 🔄 2026-10-24 — **angekündigt** (die drei P1-Öffnungen, die betroffenen Dateien `models.py`/`store.py`, das Abbruchkriterium: siehe *Startauftrag — Block 9*); Branch `p105-block9`, Merge **nach** Deploy C |
+| 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | 🔄 2026-10-24 — **9.1 RE-7 `created_by` gebaut und gemessen** (P1-Öffnung 12: `models.py`/`store.py`, MCP + Web + Editor-Metazeile; 8 neue Tests + 4 Regel-Wächter mit je einem Gegenlauf; Wegwerf-Probe **12/12**); **9.2/9.3 stehen aus** — Branch `p105-block9`, Merge **nach** Deploy C |
 | 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | D | ⬜ |
 | 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | ⬜ |
 | 12 | Doku und Altlasten: DO-1, LG-6, AL-1 (Rest), AL-3, BG-2/BG-3 | Claude Code | — | ⬜ |
@@ -105,7 +106,7 @@ updated: 2026-10-24 (Deploy C `v3.1.7` vorbereitet — Badge, eigener `## 2026-1
 | P10.5-38 | KA-2: Layout überlebt das Neuladen | ✅ | 8.5/8.8 · Browser-Probe: der gezogene Knoten steht **nach dem Neuladen** noch dort (**106 Kernpixel** am Ziel) · **Gegenlauf**: 0 → rot · Node-Harness: Abweichung **≤ 0,71 px** (die Ablage rundet auf ganze Pixel) |
 | P10.5-39 | KA-3: Suche/Filter/Titel | ✅ | 8.6/8.8 · Browser-Probe: „**10 Treffer**", Nicht-Treffer gedimmt (7280 px), Typfilter blendet Knoten **und** Bahnen aus (26165 → 4364 px) · **Gegenlauf**: wirkungslos → rot · Node-Harness: Zellen 6 → 3, Kanten 5 → 1 |
 | P10.5-40 | reduced motion: statisch, 0 Ticks | ✅ | 8.7/8.8 · Browser-Probe: **0** rAF-Aufrufe aus `graph.js`, **13989** Kernpixel gemalt · Node-Harness: `raf_calls = 0` · **der M6-Nebenbefund („1 Tick statt 0") ist erledigt** |
-| P10.5-41 | RE-7: `created_by` auf neuen Items über Web und MCP sichtbar | ⬜ | — |
+| P10.5-41 | RE-7: `created_by` auf neuen Items über Web und MCP sichtbar | ✅ | 9.1 · **Wegwerf `probes/p105_b9_created_by_probe.py` 12/12 Zellen**: Web-Anlage → Antwort **und** Datei nennen `created_by: alpha` · MCP-Anlage → `get_item_meta` **und** Datei nennen ihn · **Altbestand**: `get_item_meta` liefert `""`, die Datei trägt **keine** Zeile — auch **nach** einem Write nicht (nichts erfunden, P10.5-W) · Fälschung: PATCH → **422**, POST → der Wert bleibt der eingeloggte Mensch · 8 neue Tests (`test_store.py` × 5, `test_tools.py` × 3, `test_api.py` × 2) · **4 Regel-Wächter mit je einem Gegenlauf** (`tests/test_created_by_rules.py`: `_KNOWN_FIELDS` / `_SYSTEM_MANAGED_FIELDS` / `_summary()` / die Leerwert-Bedingung — jeder Gegenlauf macht **genau** seinen Defekt sichtbar) |
 | P10.5-42 | RE-4 atomar (V193 ✅): ein Commit, Versionen unverändert, Freigabe wandert mit | ⬜ | — |
 | P10.5-43 | RE-3 nur Team-Space (V194 ✅): Frontmatter = Verzeichnis, ein Commit, Absturz wird wiederaufgenommen | ⬜ | — |
 | P10.5-44 | P1-Diff nennt nur die angekündigten Dateien | ⬜ | — |
@@ -127,7 +128,7 @@ updated: 2026-10-24 (Deploy C `v3.1.7` vorbereitet — Badge, eigener `## 2026-1
 | P10.5-60 | P10-J zweimal live belegt | ⬜ | — |
 | P10.5-61 | Closeout-Dokumente + Rotationen per Skript | ⬜ | — |
 
-**Summe:** 34 ✅ · 0 ⚠️ · 27 ⬜ (von 61). **[2026-10-24, Block 8]** +4 ✅ (10-36, 10-38, 10-39, 10-40) ⇒ 34 ✅ · 0 ⚠️ · 27 ⬜. **[Stand 2026-10-24, Block 7.5–7.7]** 33, 34 und 35 ✅. **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`). **[2026-10-23, Block 7.1]** +1 ✅ (10-29, UI-1) ⇒ 25 ✅ · 0 ⚠️ · 36 ⬜. **[2026-10-23, Block 7.2]** +1 ✅ (10-30, UI-2) ⇒ 26 ✅ · 0 ⚠️ · 35 ⬜. **[2026-10-23, Block 7.3]** +1 ✅ (10-31, UI-3) ⇒ 27 ✅ · 0 ⚠️ · 34 ⬜.
+**Summe:** 35 ✅ · 0 ⚠️ · 26 ⬜ (von 61). **[2026-10-24, Block 9.1]** +1 ✅ (10-41, RE-7 `created_by`) ⇒ 35 ✅ · 0 ⚠️ · 26 ⬜. **[2026-10-24, Block 8]** +4 ✅ (10-36, 10-38, 10-39, 10-40) ⇒ 34 ✅ · 0 ⚠️ · 27 ⬜. **[Stand 2026-10-24, Block 7.5–7.7]** 33, 34 und 35 ✅. **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`). **[2026-10-23, Block 7.1]** +1 ✅ (10-29, UI-1) ⇒ 25 ✅ · 0 ⚠️ · 36 ⬜. **[2026-10-23, Block 7.2]** +1 ✅ (10-30, UI-2) ⇒ 26 ✅ · 0 ⚠️ · 35 ⬜. **[2026-10-23, Block 7.3]** +1 ✅ (10-31, UI-3) ⇒ 27 ✅ · 0 ⚠️ · 34 ⬜.
 
 ## Offen beim Nikinger
 
@@ -164,84 +165,83 @@ updated: 2026-10-24 (Deploy C `v3.1.7` vorbereitet — Badge, eigener `## 2026-1
 - ~~**Befund 2.5 (P10.5-9 ⚠️)**~~ ✅ 2026-10-22 (Block-2-Nachzug, Nikinger-Entscheidung „ja") — `create_item(space=, folder=<neu>)` und `POST /api/v1/items` legen im fremden Home-Space mit `write:` **keinen** neuen Ordner mehr an; die Regel ist `permissions.manages_space()` (eigener Space oder Team-Space mit Schreibrecht), auf beiden Flächen. Ohne `folder` bleibt das Anlegen an der Space-Wurzel erlaubt (P6-U).
 
 ## Startauftrag — Block 7 (Darstellung: UI-1–UI-6, KA-5) · Ausführer
-> **Verbatim verschoben** nach `STARTUPTRAG_ARCHIVE.md` (`scripts/move_sections.py`) — dort unter derselben Überschrift.
-> **Stand 2026-10-24: 7.1–7.3 gemergt, 7.5–7.7 gebaut, 7.4 umgesetzt** (die vier Posten der Sichtung sind
-> gebaut und gemessen; **P10.5-32 bleibt ⬜ bis zur Bestätigung des Nikingers**). Nichts davon ist deployed
-> — `v3.1.7` steht aus. **Zwei Korrekturen gegen den 📕-Plan stehen nur
-> im Archiv** (der Plan bleibt ein Snapshot): `--caution` ist der **Text**-Farbwert, nicht die Knopffläche
-> (7.5) · `_items_get` steht in `api.py:932`, nicht 821 (7.6). Wer die Schritte baut, liest **das
-> Archiv**, nicht den Plan.
+> **Gebaut** (7.1–7.7, 2026-10-23/24) · die ausführliche Fassung und die **zwei Korrekturen gegen den
+> 📕-Plan** (`--caution` ist der **Text**-Farbwert, nicht die Knopffläche · `_items_get` steht in
+> `api.py:932`, nicht 821) stehen in `STARTUPTRAG_ARCHIVE.md`. **P10.5-32 bleibt ⬜ bis zur Bestätigung
+> des Nikingers**; nichts davon ist deployed — `v3.1.7` steht aus.
 
 ## Startauftrag — Block 9 (Rechte und Namen: RE-7, RE-4, RE-3) · Ausführer
-> **Ankündigung der drei P1-Öffnungen** (Plan §Block 9: „Ankündigung im Phase-Head vor dem ersten
-> Commit mit den drei Öffnungen und den betroffenen Dateien"). Der 📕-Plan bleibt ein Snapshot; die
-> Herleitung steht in `docs/concepts/phase10_5_finishing_plan.md` §„Block 9".
+> **Ankündigung der drei P1-Öffnungen** (Plan §Block 9; Herleitung:
+> `docs/concepts/phase10_5_finishing_plan.md` §„Block 9"). **Die drei Öffnungen:**
+> **(12) RE-7 `created_by`** (wie `updated_by`: serververwaltet, über keinen Kanal setzbar, kein Backfill,
+> P10.5-W) · **(13) RE-4 `Store.rename_folder()`** (Ordner stehen nicht im Frontmatter: keine
+> Item-Datei wird umgeschrieben, keine `version` erhöht; die `.share.yml` wandert mit) ·
+> **(14) RE-3 `Store.rename_space()`** (`space` steht im Frontmatter, also die Semantik von `move()`:
+> ein Commit für den ganzen Space; **nur Team-Spaces**, P10.5-M).
 >
-> **Die drei Öffnungen** (elfte, zwölfte, dreizehnte P1-Contract-Öffnung; die elfte war P9-F
-> `assignee`):
-> 1. **(12) RE-7 `created_by`** — `Item.created_by` / `ItemSummary.created_by`, wie `updated_by`
->    (P9 Block trace): vom Server gesetzt, **über keinen Kanal setzbar**, **kein Backfill**
->    (P10.5-W): ein Altbestand-Item ohne Feld bleibt ohne Feld, und ein leeres Feld wird **nie**
->    erfunden. Kein Index-Schema-Sprung (wie `updated_by`).
-> 2. **(13) RE-4 `Store.rename_folder()`** — Ordner stehen **nicht** im Frontmatter (P6 Step 4),
->    also wird **keine Item-Datei umgeschrieben** und **keine `version` erhöht**. Die
->    `.share.yml` im Ordner **wandert mit** (das ist der Fund aus P8.6 §0.4.1: die billige
->    Frontend-Fassung ließ sie zurück).
-> 3. **(14) RE-3 `Store.rename_space()`** — `space` steht **im Frontmatter** jeder Datei, also
->    gilt die Semantik von `move()`: jede Item-Datei des Spaces bekommt `space=new`,
->    `version+1`, `updated=now` — **ein** Commit für den ganzen Space. **Nur Team-Spaces**
->    (P10.5-M): ein Home-Space-Name ist Identität (Auth-DB, Token-Familien, `assignee`,
->    `updated_by`) und wird in P10.5 nie umbenannt.
->
-> **Betroffene Dateien in `phase1_storage/storage/`:** `models.py` und `store.py`. `index.py`
-> **bleibt unberührt** — die Index-Zeilen werden über das bestehende `index.row_from_file()` /
-> `index.upsert_item()` nachgezogen, es gibt **keinen** Schema-Sprung (Hard Rule 2: der Index
-> ist Ableitung, kein Ort für eigene Wahrheiten). Das ist eine **Teilmenge** der angekündigten
-> Liste (`models.py`, `store.py`, `index.py`) — zulässig, denn das Abbruchkriterium ist „nur die
-> angekündigten Dateien", nicht „alle angekündigten Dateien".
->
-> **Abbruchprüfung am Blockende (P10.5-E/F):** `git diff --stat <block-basis>..HEAD -- . ':!<erlaubte Pfade>'`
-> muss leer sein (außer `.md`-Doku) und `git diff --stat -- phase1_storage/storage` darf **nur**
-> `models.py` und `store.py` nennen. Erlaubte Pfade (Plan §3, Block 9): `phase1_storage/storage/{models,store,index}.py`,
+> **Betroffene Dateien in `phase1_storage/storage/`:** `models.py` und `store.py`. `index.py` bleibt
+> unberührt — die Index-Zeilen kommen über das bestehende `row_from_file()`/`upsert_item()`, **kein**
+> Schema-Sprung (Hard Rule 2). Das ist eine **Teilmenge** der angekündigten Liste: das
+> Abbruchkriterium ist „nur die angekündigten Dateien", nicht „alle angekündigten Dateien".
+> **Abbruchprüfung (P10.5-E/F):** `git diff --stat <basis>..HEAD -- . ':!<erlaubte Pfade>'` leer
+> (ausser `.md`-Doku) und `git diff --stat -- phase1_storage/storage` nennt **nur** `models.py` und
+> `store.py`. Erlaubte Pfade (Plan §3): `phase1_storage/storage/{models,store,index}.py`,
 > `phase2_mcp/mcpserver/tools.py`, `phase5_ui/webui/**`, Tests.
 >
 > **Wichtig für die Reihenfolge:** `deploy.sh` klont das **lokale `main`**. Block 9 wird deshalb auf
 > einem eigenen Branch (`p105-block9`) gebaut und **erst nach dem Deploy C** nach `main` gemergt —
 > sonst liefert `v3.1.7` den Block-9-Stand mit aus.
 
-## Session stopped — 2026-10-24 (Deploy C `v3.1.7` vorbereitet — Badge, Update-Log, Suite 1425 grün)
+## Session stopped — 2026-10-24 (Deploy C `v3.1.7` vorbereitet · Block 9.1 RE-7 `created_by` gebaut und gemessen)
 
-**Ergebnis.** Deploy C ist **vorbereitet, nicht ausgeführt**: Badge `v3.1.7`
-(`phase5_ui/webui/static/app.html:25`) und ein eigener `## 2026-10-24`-Block in
-`docs/UPDATE_LOG.md` — **9 Zeilen für Menschen**: die Karte im neuen Look, Suche/Filter und
-„bleibt liegen" auf der Karte, die 404-Seite, die Wortmarke, der Tab-Titel, der „Zugewiesen"-Filter,
-die doing-Hervorhebung, das einzeilige Update-Banner und die lesbarere Versionsanzeige. Das
-Deploy-Gate (P6-X) liest den **obersten** Block: `2026-10-24` = heute ✓.
-
-**Gemessen (Basis `45d3616`):** `pytest` **1425 grün** (332,6 s) · `doc_health` **0** ·
-`ui_budget` **5/5** (app.js+css+Font **192,2 KB**, Erstaufruf **204,5 KB**) ·
-`parse_update_log()` liest den neuen Block als `2026-10-24#1`, alle **21** IDs eindeutig.
-
-**Was jetzt beim Nikinger liegt — der Deploy-Aufruf** (Hard Rule 9, `sudo`):
+**Ergebnis.** Zwei Dinge. **(1) Deploy C ist vorbereitet, nicht ausgeführt** — Badge `v3.1.7`,
+ein eigener `## 2026-10-24`-Block in `docs/UPDATE_LOG.md` (9 Zeilen für Menschen), Suite **1425
+grün**, `doc_health` **0**, `ui_budget` **5/5**. Commit `7d8c28e`, gepusht. **`deploy.sh` liegt
+beim Nikinger** (Hard Rule 9):
 
     SHAREFYX_RELEASES_DIR=/opt/sharefyx/releases SHAREFYX_CURRENT_LINK=/opt/sharefyx/current \
     SHAREFYX_DATA_ROOT=/home/savefyx/savefyx-data SHAREFYX_BACKUP_DIR=/var/lib/sharefyx-backup \
     SHAREFYX_SYSTEMCTL="sudo systemctl" phase5_ui/scripts/deploy.sh main
 
 Danach lese ich `health_gate.sh --expected-version=v3.1.7 --require-todays-update-log
---expected-sha=<sha>` und lege die **echte** Ausgabe in den Commit — nie die Behauptung.
-Live-Prüfungen laut Plan §Deploy C: Karte mit echten Daten (Sichtung), Logo/Favicon in Firefox
-und Safari, 404-Seite, Titel.
+--expected-sha=<sha>` und lege die **echte** Ausgabe in den Commit.
 
-**Drei Dinge warten weiter auf Dein Augen-Urteil bzw. Deine Entscheidung:**
-1. **P10.5-37** — die vier Kartenbilder `docs/screenshots/p105_b8_0{1..4}_*.png` (C2-Stil).
-2. **P10.5-32** — die Bestätigung der vier Sichtungsposten aus 7.4.
-3. **Das Budget für `graph.js`** — erlaubt +8 KB gzip, gemessen **+11,1 KB** (davon +9,8 KB
-   Kommentar, der Code selbst +2,9 KB): Budget anheben oder Kommentare kürzen.
+**(2) Block 9.1 (RE-7 `created_by`) ist gebaut und gemessen** — die zwölfte P1-Öffnung:
+`Item.created_by` / `ItemSummary.created_by`, dieselbe Klasse wie `updated_by` (P9 Block trace):
+serververwaltet, über **keinen** Kanal setzbar, **kein Backfill** (Lock P10.5-W). Betroffene
+Dateien: `phase1_storage/storage/{models,store}.py` (der P1-Diff nennt **nur** diese beiden),
+`phase2_mcp/mcpserver/tools.py`, `phase5_ui/webui/serializers.py`,
+`phase5_ui/webui/static/{app.html,js/editor.js}` (eine **eigene** Lesezeile „Erstellt von X" —
+eine leere `created_by` (Altbestand) darf die `updated_by`-Zeile nicht verschlucken).
 
-**Reihenfolge-Hinweis für Block 9.** Block 9 (RE-7/RE-4/RE-3) wird auf einem **eigenen Branch**
-(`p105-block9`) gebaut, **nicht** in `main`: `deploy.sh` klont das lokale `main`, ein Merge vor
-dem Deploy würde Block 9 mit `v3.1.7` ausliefern. Erst der Merge **nach** dem Deploy.
+**Gemessen.** Wegwerf-Probe `probes/p105_b9_created_by_probe.py` **12/12 Zellen** (Port 8799,
+PID-Datei): Web-Anlage → Antwort **und** Datei nennen `created_by: alpha` · MCP-Anlage →
+`get_item_meta` **und** Datei nennen ihn · **Altbestand**: `""`, **keine** Zeile in der Datei —
+auch **nach** einem Write nicht (nichts erfunden) · Fälschung per PATCH → **422**, per POST → der
+Wert bleibt der eingeloggte Mensch. 8 neue Tests (`test_store.py` × 5, `test_tools.py` × 3,
+`test_api.py` × 2) und **4 Regel-Wächter mit je einem Gegenlauf**
+(`tests/test_created_by_rules.py`: `_KNOWN_FIELDS` · `_SYSTEM_MANAGED_FIELDS` · `_summary()` ·
+die Leerwert-Bedingung — jeder Gegenlauf macht **genau** seinen Defekt sichtbar).
 
-**Beim Nikinger offen (unverändert):** P10.5-22 · 25 · 27/28 · 18 · AL-1 Zeile 15 · V203 ·
-5.7 (Fabian Bescheid) · die Schriftart der Versionsanzeige.
+**Ein Fund beim Bauen — die Probe selbst:** die Zelle „Altbestand nach einem Write" war
+**vakuos**: der Titelwechsel benennt die Datei um (Slug!), der zwischengespeicherte Pfad zeigte
+ins Leere, und „`created_by` nicht in ''" wäre grün gewesen. Der Pfad wird jetzt **neu geholt**
+(`rglob` über die ID) und die Zelle prüft zusätzlich, dass die Datei **nicht leer** ist.
+
+**Bewusst nicht gebaut:** `receipts.py :: write_receipt()` trägt `created_by` **nicht** —
+`phase2_mcp/mcpserver/receipts.py` steht **nicht** auf der Block-9-Erlaubnisliste (Plan §3), und
+`test_app.py` prüft die Patch-Quittung als **exaktes** Dict (eine Zeile mehr wäre dort ein
+Testbruch). Beim Anlegen ist nichts verloren: die Quittung trägt `updated_by` = denselben Actor.
+
+**Ausführer-Daten.** `opencode/MiniMax-M3.1-Flash`, Kontextgrenze **400.000** (P10.5-C erfüllt,
+`~/.config/opencode/opencode.json`), keine Eingriffe des Nikingers in dieser Session, **ein**
+Fehler beim Gegenlesen gefunden (die vakuose Zelle oben) und behoben.
+
+**Stand.** Branch `p105-block9`, Baum sauber, Wegwerf-Instanz gestoppt. **P10.5-37 und P10.5-32
+bleiben ⬜** (Augen-Urteil des Nikingers); das **Budget für `graph.js`** (+11,1 KB gzip statt
++8 KB) entscheidet der Nikinger.
+
+**Nächster Schritt.** (1) Deploy C durch den Nikinger, dann `health_gate.sh` mit echter Ausgabe
+in den Commit. (2) **Block 9.2** `Store.rename_folder()` (RE-4) und **9.3**
+`Store.rename_space()` (RE-3), beide mit dem Absturz-Marker aus 9.4. (3) Merge `p105-block9` →
+`main` **nach** dem Deploy.

@@ -56,13 +56,13 @@ updated: 2026-10-24 (Block 7.4 (UI-4) umgesetzt — die vier Posten der Sichtung
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing — alle Baustellen schließen; Plan `docs/concepts/phase10_5_finishing_plan.md`, Ausführer M3.1 Flash als Open-Test)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **38082 B** · Phase-10.5-Head: Modulstatus der Blöcke 0–12/Z, Deploy-Tabelle A–D, Abnahmestand P10.5-1–61 (34 ✅ · 0 ⚠️ · 27 ⬜), offene Punkte beim Nikinger, genau ein Session-Block (≤ 4 KiB, DO-3)
-- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **59994 B** · L3-Archiv der älteren Session-Blöcke dieser Phase, verbatim, newest-first
-- [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **10396 B** · L3-Archiv des **Startauftrags von Block 7** (verbatim verschoben 2026-10-23) — Schritte 7.4–7.7
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **39611 B** · Phase-10.5-Head: Modulstatus der Blöcke 0–12/Z, Deploy-Tabelle A–D, Abnahmestand P10.5-1–61 (35 ✅ · 0 ⚠️ · 26 ⬜), offene Punkte beim Nikinger, genau ein Session-Block (≤ 4 KiB, DO-3)
+- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **62507 B** · L3-Archiv der älteren Session-Blöcke dieser Phase, verbatim, newest-first
+- [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **13420 B** · L3-Archiv der **Startaufträge von Block 7 und Block 9** (verbatim verschoben 2026-10-23 bzw. 2026-10-24) — Schritte 7.4–7.7 und die Ankündigung der drei P1-Öffnungen
 
 
 
-- [phase10_5_finishing/UPDATES_ARCHIVE.md](../phase10_5_finishing/UPDATES_ARCHIVE.md) — 📦 **5824 B** · L3-Archiv der älteren `updated:`-Fäden des Phase-10.5-Heads, verbatim, newest-first (rotiert 2026-10-23 mit `scripts/rotate_index_updates.sh`, wie beim Phase-9-Head)
+- [phase10_5_finishing/UPDATES_ARCHIVE.md](../phase10_5_finishing/UPDATES_ARCHIVE.md) — 📦 **8718 B** · L3-Archiv der älteren `updated:`-Fäden des Phase-10.5-Heads, verbatim, newest-first (rotiert 2026-10-23 mit `scripts/rotate_index_updates.sh`, wie beim Phase-9-Head)
 
 ## Phase 8.6 — ✅ abgeschlossen 2026-09-19 (UI-Politur, live `v3.0.2`; zwei Pläne)
 

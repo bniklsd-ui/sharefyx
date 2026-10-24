@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,43 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-24 (Deploy C `v3.1.7` vorbereitet — Badge, Update-Log, Suite 1425 grün)
+
+**Ergebnis.** Deploy C ist **vorbereitet, nicht ausgeführt**: Badge `v3.1.7`
+(`phase5_ui/webui/static/app.html:25`) und ein eigener `## 2026-10-24`-Block in
+`docs/UPDATE_LOG.md` — **9 Zeilen für Menschen**: die Karte im neuen Look, Suche/Filter und
+„bleibt liegen" auf der Karte, die 404-Seite, die Wortmarke, der Tab-Titel, der „Zugewiesen"-Filter,
+die doing-Hervorhebung, das einzeilige Update-Banner und die lesbarere Versionsanzeige. Das
+Deploy-Gate (P6-X) liest den **obersten** Block: `2026-10-24` = heute ✓.
+
+**Gemessen (Basis `45d3616`):** `pytest` **1425 grün** (332,6 s) · `doc_health` **0** ·
+`ui_budget` **5/5** (app.js+css+Font **192,2 KB**, Erstaufruf **204,5 KB**) ·
+`parse_update_log()` liest den neuen Block als `2026-10-24#1`, alle **21** IDs eindeutig.
+
+**Was jetzt beim Nikinger liegt — der Deploy-Aufruf** (Hard Rule 9, `sudo`):
+
+    SHAREFYX_RELEASES_DIR=/opt/sharefyx/releases SHAREFYX_CURRENT_LINK=/opt/sharefyx/current \
+    SHAREFYX_DATA_ROOT=/home/savefyx/savefyx-data SHAREFYX_BACKUP_DIR=/var/lib/sharefyx-backup \
+    SHAREFYX_SYSTEMCTL="sudo systemctl" phase5_ui/scripts/deploy.sh main
+
+Danach lese ich `health_gate.sh --expected-version=v3.1.7 --require-todays-update-log
+--expected-sha=<sha>` und lege die **echte** Ausgabe in den Commit — nie die Behauptung.
+Live-Prüfungen laut Plan §Deploy C: Karte mit echten Daten (Sichtung), Logo/Favicon in Firefox
+und Safari, 404-Seite, Titel.
+
+**Drei Dinge warten weiter auf Dein Augen-Urteil bzw. Deine Entscheidung:**
+1. **P10.5-37** — die vier Kartenbilder `docs/screenshots/p105_b8_0{1..4}_*.png` (C2-Stil).
+2. **P10.5-32** — die Bestätigung der vier Sichtungsposten aus 7.4.
+3. **Das Budget für `graph.js`** — erlaubt +8 KB gzip, gemessen **+11,1 KB** (davon +9,8 KB
+   Kommentar, der Code selbst +2,9 KB): Budget anheben oder Kommentare kürzen.
+
+**Reihenfolge-Hinweis für Block 9.** Block 9 (RE-7/RE-4/RE-3) wird auf einem **eigenen Branch**
+(`p105-block9`) gebaut, **nicht** in `main`: `deploy.sh` klont das lokale `main`, ein Merge vor
+dem Deploy würde Block 9 mit `v3.1.7` ausliefern. Erst der Merge **nach** dem Deploy.
+
+**Beim Nikinger offen (unverändert):** P10.5-22 · 25 · 27/28 · 18 · AL-1 Zeile 15 · V203 ·
+5.7 (Fabian Bescheid) · die Schriftart der Versionsanzeige.
 
 ## Session stopped — 2026-10-24 (Block 8 gebaut — die Gehirnkarte C2; drei Fehler fand erst der Browser)
 

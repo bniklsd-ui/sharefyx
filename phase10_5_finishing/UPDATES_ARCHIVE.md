@@ -5,8 +5,19 @@ read-when: beim Audit, wenn nachvollzogen werden soll, wann welcher Block der Ph
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-23 (angelegt — die `updated:`-Kette des Phase-10.5-Heads rotiert hierher; im Head bleibt der neueste Faden plus Zeiger)
+updated: 2026-10-24 (11 Fäden der `updated:`-Kette des Phase-10.5-Heads rotiert — der Head stand bei 43.545 B und damit über dem Softcap) | 2026-10-23 (angelegt — die `updated:`-Kette des Phase-10.5-Heads rotiert hierher; im Head bleibt der neueste Faden plus Zeiger)
 ---
+- 2026-10-24 (Deploy C `v3.1.7` vorbereitet — Badge, eigener `## 2026-10-24`-Block im Update-Log, Suite 1425 grün, `doc_health` 0, `ui_budget` 5/5; `deploy.sh` beim Nikinger)
+- 2026-10-24 (Block 8 gebaut — die Gehirnkarte C2: Lappen/Furchen/Zellen/Aktivierung, KA-2 Layout merken, KA-3 Suche/Filter, reduced motion 0 Frames; Browser-Probe an der 200-Knoten-Wegwerf-Instanz 4/4 mit 3 roten Gegenläufen; **drei Fehler fand erst der Browser** (gezogener Knoten wurde zurückgezogen · Fokus überlebte den Zeiger · Layout-Hinweis überschrieb die Trefferzahl) — behoben und gewächtert; Smoke 5/5; Suite 1422 grün; Abnahmestand 34 ✅ · 0 ⚠️ · 27 ⬜)
+- 2026-10-24 (Block 7.4 (UI-4) umgesetzt — die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen: Wortmarken-Abstand 2,5 px · „Zugewiesen"-Auswahl mit den Kanten der Suchzeile · Update-Banner als einzeilige Leiste (49 px) mit dem Knopf „Alle Änderungen" · Versionsanzeige 11 px (Punkt 203/255 statt 155/255); Wächter 8/8 mit 4 Gegenproben, Probe 5/5 mit 5 roten Gegenläufen; P10.5-32 bleibt ⬜ bis zur Bestätigung)
+- 2026-10-24 (Session-Schluss: Handover für 7.4-Umsetzung, Block 8, Deploy C; Rotations-Fallstrick notiert)
+- 2026-10-24 (Block 7.4: Sichtungsliste des Nikingers notiert — 4 Posten im Archiv Schritt 7.4, Ausführer setzt um, Nachsichtung nach Block 11)
+- 2026-10-24 (Block 7.5 Kontrast (`--caution` #F06A6E, Wächter), 7.6 Assignee-Filter (API + Auswahl), 7.7 KA-5 (Chip + Karten-Ring) gebaut; Probe an der Wegwerf-Instanz 6/6 mit zwei roten Gegenläufen; Suite 1396 grün; Abnahmestand 30 ✅ · 0 ⚠️ · 31 ⬜)
+- 2026-10-23 (Block 7.3 (UI-3) gebaut: der Tab-Titel folgt der Ansicht — Übersicht, Space-Name, Item-Titel, Einstellungen; datierte Korrektur zum Plan (vier Zustände, nicht fünf); Probe an der Wegwerf-Instanz 6/6 mit rotem Gegenlauf; Abnahmestand 27 ✅ · 0 ⚠️ · 34 ⬜)
+- 2026-10-23 (Block 7.2 (UI-2): die Wortmarke `static/logo.svg` — Variante B aus dem Logo-Board, pixelgleich gemessen; zwei Befunde nur durch Messung (XML-Kommentar, MIME-Typ); Probe an der Wegwerf-Instanz mit rotem Gegenlauf; Abnahmestand 26 ✅ · 0 ⚠️ · 35 ⬜)
+- 2026-10-23 (Deploy B ist live: `v3.1.6`, Release `20261023T165838.591015Z`, SHA `e5c834e`, health_gate 9/9 OK; Block 7.1 (UI-1) gemergt (`f0e76b0`) — kommt mit `v3.1.7`)
+- 2026-10-23 (Block 7.1 (UI-1) gebaut: HTML-404 für unbekannte `/ui`-Pfade + JSON-404 in der API — Branch `p105-block7`, nicht gemergt; 4 neue Tests, 4 Gegenläufe wirksam; Suite 1384 grün)
+- 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zeile `)pdated:` → `) | `; Release-Tests wieder grün, Suite 1380 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 - 2026-10-23 (Block 7 Schritt 7.0: die Update-Log-ID — Zähler von unten, der Banner beim zweiten Deploy am selben Tag; Generalprobe 26/26 grün, Suite 1380 grün)
 - 2026-10-23 (Deploy-B-Generalprobe 25/25 Zellen grün an der Wegwerf-Instanz — Probe `probes/p105_deploy_b_probe.py`, Suite 1376 grün; Deploy B beim Nikinger)
 - 2026-10-23 (Deploy B `v3.1.6` vorbereitet — Badge, eigener `## 2026-10-23`-Block im Update-Log, Venv `fastmcp 4.1.3` = `constraints.txt`, Suite 1376 grün)

@@ -1809,3 +1809,75 @@ async def test_items_assignee_filter_respects_acl(full_app_items, item_store, to
     assert response.status_code == 200
     assert response.json()["items"] == []
     assert response.json()["total"] == 0
+
+
+# -- P10.5 Block 9: RE-7 `created_by` über REST ------------------------------------------------
+#
+# Dieselbe Behauptung wie bei `updated_by` (P9 Block trace), mit einer anderen Richtung: der Wert
+# nennt den **Anleger**, und er steht danach **fest**. Kein Kanal kann ihn setzen, und kein
+# Schreibvorgang aendert ihn.
+
+
+@pytest.mark.asyncio
+async def test_created_by_is_recorded_from_the_session_and_cannot_be_written(
+    full_app_items, item_store, totp_code
+):
+    """Der Wert kommt aus der **Sitzung** und aus dem **Anlegen** — nicht aus dem Request.
+
+    Beide Haelften in einem Test, weil eine davon ohne die andere nicht pruefbar ist: gibt die
+    API `created_by: ""` zurueck (positiver Fall fehlt), sieht es aus, als waere der Wert
+    schreibgeschuetzt; nimmt die API einen mitgeschickten Wert an (negativer Fall fehlt), sieht
+    es aus, als waere alles in Ordnung."""
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+
+        created = await client.post(
+            "/api/v1/items", json={"type": "task", "title": "Rechnung"}, headers=_headers(csrf)
+        )
+        assert created.status_code == 201
+        created_body = created.json()
+        # Der eingeloggte Mensch ist `SPACE` (die Fixture-Sitzung) — nicht irgendein Wert
+        # aus dem Request.
+        assert created_body["created_by"] == SPACE
+        assert item_store.get(created_body["id"]).created_by == SPACE
+
+        # Der negative Fall: PATCH mit `created_by` → 422, Datei unangetastet. `_PATCH_FIELDS`
+        # kennt das Feld absichtlich nicht (P10.5-W / P9-AA).
+        patched = await client.patch(
+            f"/api/v1/items/{created_body['id']}",
+            json={"version": created_body["version"], "title": "Rechnung II",
+                  "created_by": FOREIGN_SPACE},
+            headers=_headers(csrf),
+        )
+        assert patched.status_code == 422
+        assert patched.json()["error"] == "validation_failed"
+        unangetastet = item_store.get(created_body["id"])
+        assert unangetastet.title == "Rechnung"
+        assert unangetastet.created_by == SPACE
+
+        # Und der Listenpfad liefert denselben Stand (dieselbe Quelle wie `summary_to_json()`).
+        listed = await client.get("/api/v1/items?space=" + SPACE, headers=_headers(csrf))
+        row = next(r for r in listed.json()["items"] if r["id"] == created_body["id"])
+        assert row["created_by"] == SPACE
+
+
+@pytest.mark.asyncio
+async def test_a_posted_created_by_is_ignored(full_app_items, item_store, totp_code):
+    """**POST** schluckt ein mitgeschicktes `created_by` stillschweigend (die Whitelist von
+    `_items_post` filtert es weg) — der Wert kommt trotzdem aus der Sitzung.
+
+    Das ist eine **gemessene** Abweichung zwischen den beiden Flächen: PATCH antwortet mit 422
+    ("Unbekannte Felder"), POST quittiert unbekannte Felder nicht. Der Test haelt die
+    *Wirkung* fest, nicht die Reject-Maske: niemand darf sich als jemand anderes eintragen,
+    und niemand sieht einen erfundenen Anleger."""
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+
+        created = await client.post(
+            "/api/v1/items",
+            json={"type": "task", "title": "Erfunden", "created_by": FOREIGN_SPACE},
+            headers=_headers(csrf),
+        )
+        assert created.status_code == 201
+        assert created.json()["created_by"] == SPACE
+        assert item_store.get(created.json()["id"]).created_by == SPACE
