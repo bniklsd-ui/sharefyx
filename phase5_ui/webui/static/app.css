@@ -830,6 +830,25 @@ select.input:focus {
 
 .list__search-input { flex: 1; min-width: 0; }
 
+/* P10.5, Block 10 (2026-10-24, LG-1): der Volltext-Schalter. Bewusst klein und gedeckt --
+   er ist ein Zusatz zum Suchfeld, kein gleichwertiges Bedienelement; die Zeile soll auf
+   380 px Spaltenbreite nicht brechen (der Platz geht sonst dem Eingabefeld verloren). */
+.list__fulltext {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  font-size: var(--fs-meta);
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+}
+.list__fulltext input {
+  margin: 0;
+  accent-color: var(--accent);
+}
+
 .list__chips {
   display: flex;
   flex-wrap: wrap;

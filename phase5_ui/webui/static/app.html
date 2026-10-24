@@ -62,6 +62,15 @@
       <div class="list__crumb" id="list-crumb"></div>
       <p class="list__readonly" id="list-readonly" hidden>Nur lesen &mdash; fremder Space</p>
       <div class="list__search">
+        <!-- P10.5, Block 10 (2026-10-24, LG-1): der Volltext-Schalter. Links neben dem
+             Suchfeld, damit das Eingabefeld seine volle Breite behält und der "+"-Knopf
+             rechts stehen bleibt. Ohne den Schalter sucht die Liste nur Titel und Tags (so wie
+             die Agentenfläche seit P6.5-N4); mit ihm kommt der Text der Notizen und Aufgaben
+             dazu. -->
+        <label class="list__fulltext" title="Auch im Text der Notizen und Aufgaben suchen">
+          <input type="checkbox" id="search-in-body">
+          <span>Volltext</span>
+        </label>
         <input type="search" class="input list__search-input" id="search-input" placeholder="Titel, Tag oder itm_&hellip;" aria-label="Suche">
         <button class="btn btn--icon" type="button" id="new-item-button" title="Neu anlegen" aria-label="Neu anlegen"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg></button>
       </div>

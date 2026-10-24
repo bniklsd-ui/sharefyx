@@ -11,7 +11,7 @@ down:
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
   - UPDATES_ARCHIVE.md                              # 📦 die älteren `updated:`-Fäden dieses Heads, verbatim
   - STARTUPTRAG_ARCHIVE.md                          # 📦 die Startaufträge der Blöcke 7 und 9, verbatim
-updated: 2026-10-24 (Block 9.3 RE-3 `rename_space` gebaut und gemessen — nur Team-Spaces (P10.5-M), ein Commit, Fremdverweise gemeldet statt angefasst; Wegwerf 15/15) | 2026-10-24 (Block 9.2 RE-4 `rename_folder` gebaut und gemessen — Kern + Web-Route `PATCH …/folders` + UI-Kontextaktion, Wegwerf-Probe 13/13; **der Plan-Testname `test_rename_folder_by_owner_and_team_writer` ist als zwei Tests gebaut** (Gegenlauf braucht getrennte Tests)) | 2026-10-24 (Block 9.1 RE-7 `created_by` gebaut und gemessen — zwölfte P1-Öffnung, Wegwerf-Probe 12/12, 4 Regel-Wächter mit Gegenläufen; Deploy C `v3.1.7` vorbereitet, `deploy.sh` beim Nikinger) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-10-24 (Block 10.1 LG-1 Volltext gebaut — API-Parameter `in_body`, Schalter am Suchfeld, 2 Tests + 6 Wächter, 3 Gegenläufe rot) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -42,7 +42,7 @@ updated: 2026-10-24 (Block 9.3 RE-3 `rename_space` gebaut und gemessen — nur T
 | 7 | Darstellung: UI-1–UI-6, KA-5 | Ausführer (+ Claude Code Sichtung) | C | 🔄 2026-10-24 — **7.1–7.7 gebaut und gemessen** (HTML-404 für unbekannte `/ui`-Pfade · Wortmarke `static/logo.svg` · Tab-Titel folgt der Ansicht · vier Posten der Sichtung umgesetzt · Kontrast `--caution` 5,70:1 · Assignee-Filter in API und UI · `doing`-Ring auf der Karte) · Probe an der Wegwerf-Instanz, Gegenläufe je rot · **P10.5-32 bleibt ⬜ bis zur Bestätigung** — die Herleitung je Schritt steht im Session-Archiv (`SESSIONS_ARCHIVE.md`, Block 7.1–7.4) und in den Commits |
 | 8 | Karte: Gehirnkarte C2 | Ausführer (+ Claude Code Smoke/Sichtung) | C | 🔄 2026-10-24 — **8.1–8.8 gebaut und gemessen** (Lappen/Furchen/Zellen/Aktivierung in `graph.js`, KA-2 Layout-Ablage, KA-3 Suche/Filter, reduced motion 0 Ticks) · **Browser-Probe `probes/p105_b8_karte_probe.py` an der 200-Knoten-Wegwerf-Instanz: 4/4 Messungen grün, 3 Gegenläufe je rot** · **Smoke `p8_22_smoke.py` 5/5** (Ruhe 2712,1 ms ≤ 3000, Frame p95 1,7 ms ≤ 16,7, reduced motion **0** Frames) · **drei Fehler hat erst der Browser gefunden** (gezogener Knoten wurde zurückgezogen · Fokus blieb nach dem Zeigerwechsel · Trefferzahl wurde vom Layout-Hinweis überschrieben) — alle drei behoben und gewächtert · **Abnahme 10-36/38/39/40 ✅, 10-37 wartet auf die Sichtung** (4 Screenshots liegen vor) · **Befund: das Plan-Budget für `graph.js` ist überschritten** (+11,1 KB gzip statt +8 KB; davon +9,8 KB Kommentar, der Code selbst +2,9 KB) — Entscheidung beim Nikinger · **drei Pfade außerhalb der §3-Liste** (bewusst, datiert): `phase9_hardening/scripts/graph_reload_probe.mjs` (der P9-Harness malt die alte Strichzeichnung — ohne Anpassung wäre der P9-Wächter rot) · `phase10_5_finishing/{probes,tests}/` (Plan 8.8 verlangt Proben und Wächter) · `docs/screenshots/p105_b8_*.png` (Plan 8.8 verlangt die vier Bilder für die Sichtung) |
 | 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | ✅ 2026-10-24 — **9.1 RE-7 `created_by`** (Probe 12/12) · **9.2 RE-4 `rename_folder`** (Probe 13/13) · **9.3 RE-3 `rename_space`** (Probe 15/15) — alle drei gebaut und gemessen; Branch `p105-block9`, Merge **nach** Deploy C |
-| 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | D | ⬜ |
+| 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | D | 🔄 2026-10-24 — **10.1 LG-1 Volltext gebaut** (`in_body` in der API, Schalter am Suchfeld, 2 Tests + 6 Wächter; die Playwright-Bestätigung folgt mit 10.5) |
 | 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | ⬜ |
 | 12 | Doku und Altlasten: DO-1, LG-6, AL-1 (Rest), AL-3, BG-2/BG-3 | Claude Code | — | ⬜ |
 | Z | Closeout P10.5 (Handover, Grafik, Rotationen) | Claude Code + Nikinger | — | ⬜ |
@@ -110,7 +110,7 @@ updated: 2026-10-24 (Block 9.3 RE-3 `rename_space` gebaut und gemessen — nur T
 | P10.5-42 | RE-4 atomar (V193 ✅): ein Commit, Versionen unverändert, Freigabe wandert mit | ✅ | 9.2 · **Wegwerf `probes/p105_b9_rename_folder_probe.py` 13/13 Zellen**: Web-Rename → HTTP 200, `items` nennt die Zahl · die Datei liegt am **neuen** Pfad, der alte Ordner ist weg · `version:` **unverändert** (1 → 1 — Ordner stehen nicht im Frontmatter) · die `.share.yml` **wandert mit** (neu da, alt weg) · **ein** Commit `rename-folder alpha:projekte→vorhaben` · der Index meldet `folder == "vorhaben"` · **Gegenlauf**: Ziel existiert → **422**, **nichts** bewegt · Ziel **unter** dem alten Ordner → 422 · ohne CSRF → **403**, nichts bewegt · 11 neue Tests (`test_store.py` × 5, `test_api.py` × 4, `test_static_routes.py` × 2) |
 | P10.5-43 | RE-3 nur Team-Space (V194 ✅): Frontmatter = Verzeichnis, ein Commit, Absturz wird wiederaufgenommen | ✅ | 9.3 · **Wegwerf `probes/p105_b9_rename_space_probe.py` 15/15 Zellen**: Web-Rename → HTTP 200, `from`/`to`/`items` · das Verzeichnis steht unter dem neuen Namen · das **Frontmatter** nennt den neuen Space (`space: team-neu`) · die **Version springt genau einmal** (1 → 2) · **ein** Commit `rename-space team→team-neu` · der Index meldet den neuen Space · **Fremdverweise werden gemeldet, nicht angefasst** (`orphan_refs` + `assignee_refs`; die fremde `.share.yml` bleibt, wie sie ist) · **Gegenlauf**: Home-Space → **403**, nichts bewegt · vergebener Zielname → **422**, nichts bewegt · **Absturz**: `test_rename_resumes_after_crash` (Monkeypatch wirft nach der ersten Datei → neuer `Store` → Endzustand konsistent, Marker weg, **kein** zweiter Versionssprung) · 10 neue Tests (`test_store.py` × 5, `test_api.py` × 4, `test_static_routes.py` × 2) |
 | P10.5-44 | P1-Diff nennt nur die angekündigten Dateien | ✅ | 9.3 · `git diff --stat 2c841cf -- phase1_storage/storage` nennt **nur** `models.py` und `store.py` — beide in der Ankündigung (`2c841cf`) genannt, `index.py` blieb unberührt (kein Schema-Sprung, Hard Rule 2). Der übrige Diff von Block 9 liegt in `phase5_ui/webui/**` und den Tests — beides auf der Erlaubnisliste (Plan §3) |
-| P10.5-45 | LG-1: Volltext in der UI | ⬜ | — |
+| P10.5-45 | LG-1: Volltext in der UI | ⬜ | 10.1 gebaut: `api.py` liest `in_body` (`_parse_bool`), `store.search(in_body=True)`; Schalter „Volltext" am Suchfeld (`list.js`/`state.js`/`app.html`) · 2 API-Tests + 6 Verdrahtungs-Wächter (`tests/test_fulltext.py`), 3 Gegenläufe rot · **die Playwright-Bestätigung (10.5) steht aus** — die Zeile wird erst ✅ mit ihr |
 | P10.5-46 | Realtime: Änderung ≤ 2 s sichtbar | ⬜ | — |
 | P10.5-47 | P10.5-S: geänderter Editor nie überschrieben; Neuladen trägt frische `version` | ⬜ | — |
 | P10.5-48 | Shutdown ≤ 10 s mit offenen Streams | ⬜ | — |
@@ -177,57 +177,41 @@ updated: 2026-10-24 (Block 9.3 RE-3 `rename_space` gebaut und gemessen — nur T
 > wird **erst nach dem Deploy C** nach `main` gemergt (`deploy.sh` klont das lokale `main` —
 > sonst liefert `v3.1.7` den Block-9-Stand mit aus).
 
-## Session stopped — 2026-10-24 (Block 9.3 RE-3 `rename_space` gebaut und gemessen)
+## Session stopped — 2026-10-24 (Block 10.1 LG-1 Volltext gebaut — die Suche erreicht jetzt auch den Text)
 
-**Ergebnis.** Block 9.3 steht: `Store.rename_space(old, new, *, actor="") -> int` im Kern, die
-Web-Route `PATCH /api/v1/spaces/{space}` und der Knopf „Space umbenennen" im Space-Detail-Panel
-mit eigenem Dialog. **Damit ist Block 9 vollständig gebaut** — RE-7, RE-4 und RE-3 sind alle drei
-gemessen.
+**Ergebnis.** Block 10.1 steht: die Web-UI kann jetzt **im Text** der Notizen und Aufgaben
+suchen. Der Schalter „Volltext" sitzt links am Suchfeld; ohne ihn sucht die Liste wie bisher
+nur Titel und Tags, mit ihm kommt der Body dazu — auf der Agentenfläche war das seit
+P6.5-N4 (`search_items(in_body=True)`) möglich, auf der Web-Fläche gab es diese Möglichkeit
+nie (Register LG-1).
 
-**Was der Kern tut (anders als beim Ordner, RE-4).** Der Space-Name steht **im Frontmatter**
-jeder Item-Datei — er ist keine abgeleitete Größe. Verzeichnis und Frontmatter dürfen nie
-auseinanderlaufen (B2-Schutz), also gilt die Semantik von `move()`: jedes Item bekommt
-`space=new`, `version+1`, `updated=now`, `updated_by=actor` (oder den bisherigen Wert). Der
-Ablauf: Name validieren (dieselbe Regel wie `acl.create_space()`) → **Marker** → `os.rename`
-+ `fsync` → jede Item-Datei unter `new/` (inkl. `_archive/`) atomar umschreiben, **ohne**
-Einzel-Commit → `._trash/old` → `._trash/new` (Dateien dort **unverändert**: Historie) →
-Index-Zeilen aus den **Dateien** neu gelesen → **ein** Commit `rename-space <old>→<new>` →
-Marker löschen.
+**Was der Server daraus macht.** `api.py :: _items_get()` liest den Query-Parameter `in_body`
+als **Wahrheitswert** (`_parse_bool`: `1`/`true`/`yes`/`on`, sonst aus) und reicht ihn an
+`store.search(..., in_body=True)` durch. Bewusst kein `bool(value)` — `in_body=0` ist „aus",
+ein fehlender Parameter ist „aus". Die **ACL-Filterung bleibt unverändert** danach: gefunden
+wird nur, was die Sitzung lesen darf (Hard Rule 4) — der Volltext ist eine Suchart, keine
+Rechteausnahme.
 
-**Gemessen.** Wegwerf-Probe `probes/p105_b9_rename_space_probe.py` **15/15 Zellen** (Port 8799,
-PID-Datei): HTTP 200 mit `from`/`to`/`items` · das Verzeichnis steht unter dem neuen Namen · das
-Frontmatter nennt ihn · die Version springt **genau einmal** (1 → 2) · **ein** Commit
-`rename-space team→team-neu` · der Index stimmt · **Fremdverweise werden gemeldet, nicht
-angefasst** (`orphan_refs` + `assignee_refs`; die fremde `.share.yml` bleibt, wie sie ist) ·
-**Gegenläufe**: Home-Space → **403**, vergebener Zielname → **422**, jeweils nichts bewegt. Der
-**Absturz** trägt `test_rename_resumes_after_crash`: ein Monkeypatch wirft nach der ersten Datei,
-ein neuer `Store` führt den Rename zu Ende — konsistenter Endzustand, Marker weg, und die
-bereits umgeschriebene Datei bekommt **keinen** zweiten Versionssprung (die Idempotenz).
-11 neue Tests (`test_store.py` × 5, `test_api.py` × 5, `test_static_routes.py` × 2).
+**Gemessen.** 2 API-Tests (`test_items_query_in_body_only_when_requested`,
+`test_in_body_search_never_returns_unreadable_items`) gegen den echten Store + 6
+Verdrahtungs-Wächter in `phase10_5_finishing/tests/test_fulltext.py` (Markup, Zustand,
+Parameter, globaler Modus, Server). **Gegenlauf:** `in_body=in_body` aus `api.py` entfernt
+und `params.set("in_body", "1")` aus `list.js` entfernt ⇒ **3 Tests rot** (der API-Test und
+zwei Wächter) — die Wächter prüfen etwas anderes als sie behaupten.
 
-**Fremdverweise: gemeldet, nicht repariert.** Eine fremde `.share.yml`, die den alten Namen
-nennt, und Items mit `assignee == <alter Name>` bleiben, wie sie sind. Sie zu „reparieren" wäre
-eine **stille Rechteänderung** — sie stehen deshalb in der Antwort, damit der Mensch sie kennt.
+**Eine Design-Entscheidung, die der Plan nicht vorgibt.** Der Parameter gehört **nicht** in
+`filterParams()` (das ist der Raum der Filter: Bucket/Ordner/Zugewiesen), sondern direkt in
+`loadItems()` — der Volltext ist eine *Suchart* und gilt im globalen Modus („Alle Items")
+genauso wie im Space-Modus. Ein Wächter prüft genau das (`in_body` darf nicht an
+`isGlobalScope()` hängen).
 
-**Nur Team-Spaces (P10.5-M).** Ein Home-Space trägt den Namen seines Principals; die Auth-DB
-kennt ihn unter diesem Namen. Ein Umbenennen würde Verzeichnis und Auth-DB trennen — der
-Server lehnt es ab (403), der Knopf wird gar nicht erst angeboten.
+**Ausführer-Daten.** `opencode/MiniMax-M3.1-Flash`, Kontextgrenze 400.000 (P10.5-C erfüllt),
+keine Eingriffe des Nikingers in dieser Session.
 
-**Ein Drift gegen den Plan, datiert.** Der Plan listet
-`test_rename_space_reports_foreign_references_without_touching_them` bei den **Storage**-Tests;
-der Test liegt in `phase5_ui/tests/test_api.py` — das Melden passiert in der **Antwort der
-Web-Fläche** (wie `orphan_refs` beim Space-Entfernen), und `acl.spaces_referencing()` ist keine
-Kern-Aufgabe des Stores. Nachtrag in Plan §9.5.
+**Stand.** Branch `p105-block9` (Block 10 läuft darauf weiter), Suite grün auf den berührten
+Dateien. **P10.5-45 bleibt ⬜** — die Abnahme verlangt Tests **und** Playwright; die Probe
+kommt mit Schritt 10.5.
 
-**P10.5-44 ✅.** `git diff --stat 2c841cf -- phase1_storage/storage` nennt **nur** `models.py`
-und `store.py` — beide angekündigt, `index.py` unberührt (kein Schema-Sprung).
-
-**Ausführer-Daten.** `opencode/MiniMax-M3.1-Flash`, Kontextgrenze **400.000** (P10.5-C
-erfüllt), keine Eingriffe des Nikingers in dieser Session.
-
-**Stand.** Branch `p105-block9`, Wegwerf-Instanz gestoppt und aufgeräumt. Suite **1465 grün**
-(343,7 s), `doc_health` 0, `ui_budget` 5/5. **P10.5-37 und P10.5-32 bleiben ⬜** (Augen-Urteil);
-das **Budget für `graph.js`** entscheidet der Nikinger.
-
-**Nächster Schritt.** (1) Deploy C (`v3.1.7`) durch den Nikinger, dann `health_gate.sh` mit
-echter Ausgabe in den Commit. (2) Merge `p105-block9` → `main` **nach** dem Deploy.
+**Nächster Schritt.** (1) 10.2 LG-2 Realtime serverseitig (`webui/events.py`, Route
+`GET /api/v1/events`, Lifespan, `timeout_graceful_shutdown`). (2) 10.3 Client
+(`realtime.js`, Poll-Rückfall 120 s, Hinweisband P10.5-S). (3) 10.5 Proben.

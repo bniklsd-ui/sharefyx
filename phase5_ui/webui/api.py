@@ -323,6 +323,19 @@ def _parse_int(value: str | None, *, default: int) -> int:
         raise ApiError("validation_failed", f"'{value}' ist keine gültige Ganzzahl.") from exc
 
 
+def _parse_bool(value: str | None) -> bool:
+    """Ein Schalter, **ein** Wahrheitswert (P10.5, Block 10, 2026-10-24, LG-1).
+
+    `1`/`true`/`yes`/`on` (Groß-/Kleinschreibung egal, Leerzeichen ignored) sind wahr, alles
+    andere — auch `0`, `false` und ein **fehlender** Parameter — ist falsch. Bewusst **nicht**
+    `bool(value)`: das würde `in_body=0` als „an" lesen, und ein Query-Parameter ist kein
+    Python-Objekt, sondern Text. Ein fehlender Parameter ist kein Fehler, sondern die
+    Voreinstellung (Titel + Tags, wie seit P6.5-N4 auf der Agentenfläche)."""
+    if not isinstance(value, str):
+        return False
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
 def api_routes(
     settings: UiSettings,
     store: Store,
@@ -1067,6 +1080,11 @@ def api_routes(
         # P7-E: eine ID-Suche ignoriert Space- und Ordnerfilter — wer die ID hat, weiß nicht,
         # wo das Item liegt.
         global_scope = q.get("space") is None or id_lookup
+        # P10.5, Block 10 (2026-10-24, LG-1): der Volltext-Schalter. `store.search(in_body=True)`
+        # nimmt den **Body** in den Such-Haystack auf (P6.5-N4) — der MCP-Adapter kann das
+        # seit P6.5, die Web-Fläche konnte es bis hier nicht. Die ACL-Filterung unten bleibt
+        # unverändert: gefunden wird nur, was die Sitzung lesen darf (Hard Rule 4).
+        in_body = _parse_bool(q.get("in_body"))
 
         try:
             # P10.5, Block 4 (2026-10-22, Schritt 4.2): der Store liest Dateien — der Aufruf
@@ -1084,6 +1102,7 @@ def api_routes(
                 due_before=due_before,
                 limit=_STORE_FETCH_LIMIT,
                 offset=0,
+                in_body=in_body,
             )
         except (ValidationError, ValueError) as exc:
             raise _map_store_error(exc, own_space=session.space) from exc

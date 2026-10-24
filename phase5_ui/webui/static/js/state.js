@@ -50,6 +50,12 @@ export var state = {
   // UND `folder` auf `null` (P6-AQ), `activeSpace` bleibt unangetastet (Rückweg).
   scope: "space",
   query: "",
+  // P10.5, Block 10 (2026-10-24, LG-1): der Volltext-Schalter am Suchfeld. false = nur Titel
+  // und Tags (die Voreinstellung, seit P6.5-N4 auch auf der Agentenflaeche), true = der Body
+  // kommt in den Such-Haystack dazu. Ein eigenes Feld statt einer Ableitung aus dem
+  // Suchtext: der Schalter ist eine **Suchart**, kein Filter — er gilt im Space-Modus wie im
+  // globalen Modus ("Alle Items") gleichermassen.
+  inBody: false,
   assignee: "",   // P10.5 7.6: Zuständigen-Filter der Liste, "" = alle
   items: [],
   // Phase 8.6 Plan 2 Block G G3 (P8.6-AA): true = der Listen-Slot zeigt die Uebersicht

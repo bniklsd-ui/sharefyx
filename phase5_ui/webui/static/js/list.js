@@ -24,6 +24,8 @@ var listEmptyEl;
 var listEmptyTextEl;
 var listChipsEl;
 var searchInputEl;
+// P10.5, Block 10 (LG-1): der Volltext-Schalter neben dem Suchfeld.
+var fulltextEl;
 var createButtonEl;
 
 var listSelectionEl;
@@ -589,6 +591,11 @@ export function loadItems() {
   var params = new URLSearchParams(filterParams());
   if (state.activeSpace && !isGlobalScope()) params.set("space", state.activeSpace);
   if (state.query) params.set("query", state.query);
+  // P10.5, Block 10 (LG-1): der Volltext-Schalter. Er gehoert **nicht** in `filterParams()` —
+  // das ist der Raum fuer die *Filter* (Bucket/Ordner/Zustaendiger), der Volltext ist eine
+  // *Suchart* und gilt im globalen Modus ("Alle Items") genauso wie im Space-Modus. Deshalb
+  // steht er hier, unabhängig von `isGlobalScope()`.
+  if (state.inBody) params.set("in_body", "1");
   if (state.assignee && !isGlobalScope()) params.set("assignee", state.assignee);
   return withLoading(listRowsEl, api("/items?" + params.toString())).then(function (result) {
     state.items = result.items;
@@ -662,6 +669,20 @@ export function init() {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(function () { loadItems().catch(reportUnexpectedError); }, 200);
   });
+
+  // P10.5, Block 10 (2026-10-24, LG-1): der Volltext-Schalter. Er lädt die Liste sofort
+  // neu (kein Debounce — ein Schalter ist ein Klick, keine Eingabe), und er leert die
+  // Mehrfachauswahl: die Trefferlage aendert sich, eine Auswahl "Task 3" waere danach
+  // etwas anderes (dieselbe Regel wie beim Tippen im Suchfeld).
+  fulltextEl = document.getElementById("search-in-body");
+  if (fulltextEl) {
+    fulltextEl.checked = !!state.inBody;
+    fulltextEl.addEventListener("change", function () {
+      state.inBody = !!fulltextEl.checked;
+      clearSelection();
+      loadItems().catch(reportUnexpectedError);
+    });
+  }
 
   // P10.5, Block 4 (2026-10-22, Z3): der Listen-Slot **vor** dem ersten Abruf in den
   // Übersichts-Zustand setzen. Vorher stand `#list-overview` bis zum ersten

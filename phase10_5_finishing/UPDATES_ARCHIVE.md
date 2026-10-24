@@ -5,8 +5,11 @@ read-when: beim Audit, wenn nachvollzogen werden soll, wann welcher Block der Ph
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-24 (11 Fäden der `updated:`-Kette des Phase-10.5-Heads rotiert — der Head stand bei 43.545 B und damit über dem Softcap) | 2026-10-23 (angelegt — die `updated:`-Kette des Phase-10.5-Heads rotiert hierher; im Head bleibt der neueste Faden plus Zeiger)
+updated: 2026-10-24 (drei Fäden der `updated:`-Kette des Phase-10.5-Heads rotiert — Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (11 Fäden der `updated:`-Kette des Phase-10.5-Heads rotiert — der Head stand bei 43.545 B und damit über dem Softcap) | 2026-10-23 (angelegt — die `updated:`-Kette des Phase-10.5-Heads rotiert hierher; im Head bleibt der neueste Faden plus Zeiger)
 ---
+- 2026-10-24 (Block 9.3 RE-3 `rename_space` gebaut und gemessen — nur Team-Spaces (P10.5-M), ein Commit, Fremdverweise gemeldet statt angefasst; Wegwerf 15/15)
+- 2026-10-24 (Block 9.2 RE-4 `rename_folder` gebaut und gemessen — Kern + Web-Route `PATCH …/folders` + UI-Kontextaktion, Wegwerf-Probe 13/13; **der Plan-Testname `test_rename_folder_by_owner_and_team_writer` ist als zwei Tests gebaut** (Gegenlauf braucht getrennte Tests))
+- 2026-10-24 (Block 9.1 RE-7 `created_by` gebaut und gemessen — zwölfte P1-Öffnung, Wegwerf-Probe 12/12, 4 Regel-Wächter mit Gegenläufen; Deploy C `v3.1.7` vorbereitet, `deploy.sh` beim Nikinger) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 - 2026-10-24 (Deploy C `v3.1.7` vorbereitet — Badge, eigener `## 2026-10-24`-Block im Update-Log, Suite 1425 grün, `doc_health` 0, `ui_budget` 5/5; `deploy.sh` beim Nikinger)
 - 2026-10-24 (Block 8 gebaut — die Gehirnkarte C2: Lappen/Furchen/Zellen/Aktivierung, KA-2 Layout merken, KA-3 Suche/Filter, reduced motion 0 Frames; Browser-Probe an der 200-Knoten-Wegwerf-Instanz 4/4 mit 3 roten Gegenläufen; **drei Fehler fand erst der Browser** (gezogener Knoten wurde zurückgezogen · Fokus überlebte den Zeiger · Layout-Hinweis überschrieb die Trefferzahl) — behoben und gewächtert; Smoke 5/5; Suite 1422 grün; Abnahmestand 34 ✅ · 0 ⚠️ · 27 ⬜)
 - 2026-10-24 (Block 7.4 (UI-4) umgesetzt — die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen: Wortmarken-Abstand 2,5 px · „Zugewiesen"-Auswahl mit den Kanten der Suchzeile · Update-Banner als einzeilige Leiste (49 px) mit dem Knopf „Alle Änderungen" · Versionsanzeige 11 px (Punkt 203/255 statt 155/255); Wächter 8/8 mit 4 Gegenproben, Probe 5/5 mit 5 roten Gegenläufen; P10.5-32 bleibt ⬜ bis zur Bestätigung)

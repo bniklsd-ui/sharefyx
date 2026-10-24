@@ -101,6 +101,60 @@ async def test_items_search_limit_is_capped_at_200(full_app_items, totp_code):
     assert response.json()["limit"] == 200
 
 
+# -- Items: Volltext (P10.5 Block 10, LG-1) ---------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_items_query_in_body_only_when_requested(
+    full_app_items, item_store, totp_code,
+):
+    """LG-1: der Body kommt **nur** auf ausdrücklichen Wunsch in den Such-Haystack.
+
+    Ohne `in_body` findet die Suche nur Titel und Tags (so wie die Agentenfläche seit
+    P6.5-N4, `search_items(in_body=False)`); mit `in_body=1` zusätzlich den Text der Notiz.
+    Das ist die einzige Stelle, an der die Web-Fläche von der Agentenfläche abweicht — vorher
+    konnte die Web-UI keinen Body-Treffer überhaupt anbieten."""
+    item = item_store.create(
+        SPACE, type="note", title="Titel ohne Marker",
+        body="Der Marker EinBodyMarkerXYZ steckt im Text.",
+    )
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        ohne = await client.get("/api/v1/items", params={"query": "EinBodyMarkerXYZ"})
+        mit = await client.get(
+            "/api/v1/items", params={"query": "EinBodyMarkerXYZ", "in_body": "1"},
+        )
+    assert ohne.status_code == 200
+    assert ohne.json()["total"] == 0
+    assert ohne.json()["items"] == []
+    assert mit.status_code == 200
+    assert mit.json()["total"] == 1
+    assert mit.json()["items"][0]["id"] == item.id
+
+
+@pytest.mark.asyncio
+async def test_in_body_search_never_returns_unreadable_items(
+    full_app_items, item_store, totp_code,
+):
+    """Gegenprobe zu LG-1: der Volltext macht **keine** Rechteausnahme.
+
+    Ein fremdes Item ohne jede Freigabe bleibt unsichtbar — auch wenn sein Text das Suchwort
+    enthält. Die ACL-Filterung läuft nach dem Store-Suchlauf (P6 Step 5), der Volltext ändert
+    daran nichts: gefunden wird nur, was die Sitzung lesen darf."""
+    item = item_store.create(
+        FOREIGN_SPACE, type="note", title="Fremd, ungeteilt",
+        body="Der Marker EinBodyMarkerXYZ steckt im Text.",
+    )
+    async with _client(full_app_items) as client:
+        await _login(client, totp_code)
+        response = await client.get(
+            "/api/v1/items", params={"query": "EinBodyMarkerXYZ", "in_body": "1"},
+        )
+    assert response.status_code == 200
+    ids = {row["id"] for row in response.json()["items"]}
+    assert item.id not in ids
+
+
 # -- Items: einzelnes lesen ------------------------------------------------------------------
 
 
