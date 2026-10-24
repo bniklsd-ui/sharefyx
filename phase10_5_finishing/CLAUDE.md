@@ -40,7 +40,7 @@ updated: 2026-10-24 (Deploy C `v3.1.7` vorbereitet — Badge, eigener `## 2026-1
 | 6 | Anbieter: PA-1, PA-2, `/mcp`, PA-6, P10-J | Ausführer + Claude Code + Nikinger | B | ✅ 2026-10-22 — **6.0–6.5 gebaut und gemessen**: zweite Vergleichsregel `http://127.0.0.1:<port>` (Port explizit, kein `localhost`/`[::1]`, P10.5-O) + `application_type` ∈ {fehlend, null, native, web} · CSP `form-action` mit `http://127.0.0.1:*` · `/mcp` **ohne** Slash exakt bedient (`_ExactMcpMount`, kein 307) · PA-6 (Wurzel-`CLAUDE.md` eine Zeile) · **V209 ✅** (opencode 1.19.4), **V197 ✅** (Chromium folgt dem Consent-Redirect) · **DCR-Gegenlauf**: derselbe Request 400 → **201** · Suite **1376 grün** (1354 + 22) · **10-23/10-24/10-25 ✅**, **10-26 ✅** (2026-10-23 geklärt: die zwei Auslöser lagen im Messgerät, kein Produktcode — siehe Session-Block), 10-27/28 beim Nikinger nach Deploy B |
 | 7 | Darstellung: UI-1–UI-6, KA-5 | Ausführer (+ Claude Code Sichtung) | C | 🔄 2026-10-24 — **7.1–7.7 gebaut und gemessen** (HTML-404 für unbekannte `/ui`-Pfade · Wortmarke `static/logo.svg` · Tab-Titel folgt der Ansicht · vier Posten der Sichtung umgesetzt · Kontrast `--caution` 5,70:1 · Assignee-Filter in API und UI · `doing`-Ring auf der Karte) · Probe an der Wegwerf-Instanz, Gegenläufe je rot · **P10.5-32 bleibt ⬜ bis zur Bestätigung** — die Herleitung je Schritt steht im Session-Archiv (`SESSIONS_ARCHIVE.md`, Block 7.1–7.4) und in den Commits |
 | 8 | Karte: Gehirnkarte C2 | Ausführer (+ Claude Code Smoke/Sichtung) | C | 🔄 2026-10-24 — **8.1–8.8 gebaut und gemessen** (Lappen/Furchen/Zellen/Aktivierung in `graph.js`, KA-2 Layout-Ablage, KA-3 Suche/Filter, reduced motion 0 Ticks) · **Browser-Probe `probes/p105_b8_karte_probe.py` an der 200-Knoten-Wegwerf-Instanz: 4/4 Messungen grün, 3 Gegenläufe je rot** · **Smoke `p8_22_smoke.py` 5/5** (Ruhe 2712,1 ms ≤ 3000, Frame p95 1,7 ms ≤ 16,7, reduced motion **0** Frames) · **drei Fehler hat erst der Browser gefunden** (gezogener Knoten wurde zurückgezogen · Fokus blieb nach dem Zeigerwechsel · Trefferzahl wurde vom Layout-Hinweis überschrieben) — alle drei behoben und gewächtert · **Abnahme 10-36/38/39/40 ✅, 10-37 wartet auf die Sichtung** (4 Screenshots liegen vor) · **Befund: das Plan-Budget für `graph.js` ist überschritten** (+11,1 KB gzip statt +8 KB; davon +9,8 KB Kommentar, der Code selbst +2,9 KB) — Entscheidung beim Nikinger · **drei Pfade außerhalb der §3-Liste** (bewusst, datiert): `phase9_hardening/scripts/graph_reload_probe.mjs` (der P9-Harness malt die alte Strichzeichnung — ohne Anpassung wäre der P9-Wächter rot) · `phase10_5_finishing/{probes,tests}/` (Plan 8.8 verlangt Proben und Wächter) · `docs/screenshots/p105_b8_*.png` (Plan 8.8 verlangt die vier Bilder für die Sichtung) |
-| 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | ⬜ |
+| 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | 🔄 2026-10-24 — **angekündigt** (die drei P1-Öffnungen, die betroffenen Dateien `models.py`/`store.py`, das Abbruchkriterium: siehe *Startauftrag — Block 9*); Branch `p105-block9`, Merge **nach** Deploy C |
 | 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | D | ⬜ |
 | 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | ⬜ |
 | 12 | Doku und Altlasten: DO-1, LG-6, AL-1 (Rest), AL-3, BG-2/BG-3 | Claude Code | — | ⬜ |
@@ -171,6 +171,43 @@ updated: 2026-10-24 (Deploy C `v3.1.7` vorbereitet — Badge, eigener `## 2026-1
 > im Archiv** (der Plan bleibt ein Snapshot): `--caution` ist der **Text**-Farbwert, nicht die Knopffläche
 > (7.5) · `_items_get` steht in `api.py:932`, nicht 821 (7.6). Wer die Schritte baut, liest **das
 > Archiv**, nicht den Plan.
+
+## Startauftrag — Block 9 (Rechte und Namen: RE-7, RE-4, RE-3) · Ausführer
+> **Ankündigung der drei P1-Öffnungen** (Plan §Block 9: „Ankündigung im Phase-Head vor dem ersten
+> Commit mit den drei Öffnungen und den betroffenen Dateien"). Der 📕-Plan bleibt ein Snapshot; die
+> Herleitung steht in `docs/concepts/phase10_5_finishing_plan.md` §„Block 9".
+>
+> **Die drei Öffnungen** (elfte, zwölfte, dreizehnte P1-Contract-Öffnung; die elfte war P9-F
+> `assignee`):
+> 1. **(12) RE-7 `created_by`** — `Item.created_by` / `ItemSummary.created_by`, wie `updated_by`
+>    (P9 Block trace): vom Server gesetzt, **über keinen Kanal setzbar**, **kein Backfill**
+>    (P10.5-W): ein Altbestand-Item ohne Feld bleibt ohne Feld, und ein leeres Feld wird **nie**
+>    erfunden. Kein Index-Schema-Sprung (wie `updated_by`).
+> 2. **(13) RE-4 `Store.rename_folder()`** — Ordner stehen **nicht** im Frontmatter (P6 Step 4),
+>    also wird **keine Item-Datei umgeschrieben** und **keine `version` erhöht**. Die
+>    `.share.yml` im Ordner **wandert mit** (das ist der Fund aus P8.6 §0.4.1: die billige
+>    Frontend-Fassung ließ sie zurück).
+> 3. **(14) RE-3 `Store.rename_space()`** — `space` steht **im Frontmatter** jeder Datei, also
+>    gilt die Semantik von `move()`: jede Item-Datei des Spaces bekommt `space=new`,
+>    `version+1`, `updated=now` — **ein** Commit für den ganzen Space. **Nur Team-Spaces**
+>    (P10.5-M): ein Home-Space-Name ist Identität (Auth-DB, Token-Familien, `assignee`,
+>    `updated_by`) und wird in P10.5 nie umbenannt.
+>
+> **Betroffene Dateien in `phase1_storage/storage/`:** `models.py` und `store.py`. `index.py`
+> **bleibt unberührt** — die Index-Zeilen werden über das bestehende `index.row_from_file()` /
+> `index.upsert_item()` nachgezogen, es gibt **keinen** Schema-Sprung (Hard Rule 2: der Index
+> ist Ableitung, kein Ort für eigene Wahrheiten). Das ist eine **Teilmenge** der angekündigten
+> Liste (`models.py`, `store.py`, `index.py`) — zulässig, denn das Abbruchkriterium ist „nur die
+> angekündigten Dateien", nicht „alle angekündigten Dateien".
+>
+> **Abbruchprüfung am Blockende (P10.5-E/F):** `git diff --stat <block-basis>..HEAD -- . ':!<erlaubte Pfade>'`
+> muss leer sein (außer `.md`-Doku) und `git diff --stat -- phase1_storage/storage` darf **nur**
+> `models.py` und `store.py` nennen. Erlaubte Pfade (Plan §3, Block 9): `phase1_storage/storage/{models,store,index}.py`,
+> `phase2_mcp/mcpserver/tools.py`, `phase5_ui/webui/**`, Tests.
+>
+> **Wichtig für die Reihenfolge:** `deploy.sh` klont das **lokale `main`**. Block 9 wird deshalb auf
+> einem eigenen Branch (`p105-block9`) gebaut und **erst nach dem Deploy C** nach `main` gemergt —
+> sonst liefert `v3.1.7` den Block-9-Stand mit aus.
 
 ## Session stopped — 2026-10-24 (Deploy C `v3.1.7` vorbereitet — Badge, Update-Log, Suite 1425 grün)
 
