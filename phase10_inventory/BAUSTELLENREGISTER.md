@@ -10,7 +10,7 @@ down:
   - ../docs/concepts/PHASE9_CLOSEOUT_HANDOVER.md  # Herkunft §4.1–§4.10
   - ENTSCHEIDUNGEN_ARCHIVE.md               # 📦 §12 Entscheidungsliste D-1–D-18, verbatim (2026-10-22 gewandert)
   - UPDATES_ARCHIVE.md                      # 📦 die älteren `updated:`-Fäden dieses Registers, verbatim (2026-10-24 rotiert)
-updated: 2026-10-24 (B9.3 ✅ — RE-3 Space umbenennen; B9.2 ✅ — RE-4) | ältere Einträge: phase10_inventory/UPDATES_ARCHIVE.md
+updated: 2026-10-24 (B10.5 ✅ — LG-1 und LG-2 gemessen: Wegwerf-Probe 11/11 Zellen grün, Gegenlauf rot) | ältere Einträge: phase10_inventory/UPDATES_ARCHIVE.md
 ---
 # Phase 10 — Baustellenregister
 
@@ -130,8 +130,8 @@ P10 Step 2) · Wissen (kein Bau, nur festgehalten) · erledigt (mit Beleg). „E
 
 | ID | Posten | Herkunft | Befund am Code / Stand | Gr. | Risiko | Entsch. | Ziel |
 |---|---|---|---|---|---|---|---|
-| LG-1 | Body-Volltextsuche in der Web-UI (Q1) | Ledger | MCP kann es (`search_items(in_body=True)`), `api.py` und die UI nicht · **[2026-10-18]** D-17 ja · **[2026-10-24, B10.1]** API-Parameter `in_body` (`_parse_bool` → `store.search(in_body=True)`), Schalter „Volltext“ am Suchfeld; 2 API-Tests + 6 Wächter grün, 3 Gegenläufe rot | M | — | D-17 | P10.5 — 10-45 (B10.1 gebaut; die Playwright-Bestätigung folgt mit 10.5) |
-| LG-2 | Realtime | Ledger | der 20-s-Poll reicht für zwei Personen · **[2026-10-18]** D-17 ja — L, eigener Block · **[2026-10-24, B10.2]** Server-Hälfte: `webui/events.py` (Git-HEAD als Quelle, `ChangeFeed`), Route `GET /api/v1/events` (nur Space-Namen, Heartschlag 25 s, 3 Streams je Sitzung), Lifespan, `timeout_graceful_shutdown=5`; 16 neue Tests, 6 Gegenläufe rot · **[2026-10-24, B10.3]** Client: `static/js/realtime.js` (`EventSource`), Poll-Rückfall 120 s, Hinweisband „Geändert von X — neu laden?“ (P10.5-S: ein geänderter Editor wird nie überschrieben); 8 Wächter, `ui_budget` 5/5 | L | — | D-17 | P10.5 — 10-46/47/48 (B10.2 + B10.3 gebaut; die Proben 10.5 stehen aus) |
+| LG-1 | Body-Volltextsuche in der Web-UI (Q1) | Ledger | MCP kann es (`search_items(in_body=True)`), `api.py` und die UI nicht · **[2026-10-18]** D-17 ja · **[2026-10-24, B10.1]** API-Parameter `in_body` (`_parse_bool` → `store.search(in_body=True)`), Schalter „Volltext“ am Suchfeld; 2 API-Tests + 6 Wächter grün, 3 Gegenläufe rot · **[2026-10-24, B10.5]** Wegwerf-Probe: der Marker im **Text** ergibt **0 Treffer** ohne Schalter und **1 Treffer** mit Schalter (echter Browser, echte API) | M | — | D-17 | ✅ 10-45 (B10.1 + B10.5) |
+| LG-2 | Realtime | Ledger | der 20-s-Poll reicht für zwei Personen · **[2026-10-18]** D-17 ja — L, eigener Block · **[2026-10-24, B10.2]** Server-Hälfte: `webui/events.py` (Git-HEAD als Quelle, `ChangeFeed`), Route `GET /api/v1/events` (nur Space-Namen, Heartschlag 25 s, 3 Streams je Sitzung), Lifespan, `timeout_graceful_shutdown=5`; 16 neue Tests, 6 Gegenläufe rot · **[2026-10-24, B10.3]** Client: `static/js/realtime.js` (`EventSource`), Poll-Rückfall 120 s, Hinweisband „Geändert von X — neu laden?“ (P10.5-S: ein geänderter Editor wird nie überschrieben); 8 Wächter, `ui_budget` 5/5 · **[2026-10-24, B10.5]** Wegwerf-Probe 11/11 Zellen grün (Port 18810, TLS): **Latenz 141,1 ms** (Grenze 2000) · der getippte Text bleibt stehen, das Band erscheint · ein unsichtbarer Space löst **kein** Ereignis aus · **Shutdown 5,22 s** (Grenze 10); **Gegenlauf rot** | L | — | D-17 | ✅ 10-46/47/48 (B10.2 + B10.3 + B10.5) |
 | LG-3 | Light-Mode (P5-X) | Ledger | Dunkel-first ist gelockt · **[2026-10-18]** nicht gewählt | M | — | D-17 | verworfen |
 | LG-4 | Bulk-Append-MCP-Werkzeug | Ledger | ein neues Tool ist eine neue Fähigkeit · **[2026-10-18]** D-17 ja — neues MCP-Werkzeug | M | S | D-17 | ✅ 10-21 (B5) |
 | LG-5 | `_trash/` räumen | Ledger | `DATA_ROOT/._trash/<space>/` wächst; erste Live-Löschung 2026-10-07 (V162 A). Werkzeug human-only, wie `spacectl.py` · **[2026-10-18]** D-17: der Papierkorb wird nicht geleert | S | B | D-17 | verworfen |
@@ -163,9 +163,6 @@ P10 Step 2) · Wissen (kein Bau, nur festgehalten) · erledigt (mit Beleg). „E
 | DO-3 | Ausführlichkeit der Session-Blöcke (10–17 KB, P9-Archiv 396 KB) | Handover §7 | Kostenfaktor jeder Lesesitzung · **[2026-10-18]** D-17 ja: Session-Block ≤ 4 KB | S | — | D-17 | P10.5 (Obergrenze je Block im Plan) |
 | DO-4 | Planungsprompt „verloren" | Nikinger 2026-10-16 | war nie verloren: `docs/PROMPTS.md` Prompt 2, datierte Korrektur in `0a7aaf4` | — | — | nein | erledigt (`0a7aaf4`) |
 | DO-5 | Fleet-Notiz §7 nennt `step_a/Caddyfile` | Step 0 | die Datei heißt `Caddyfile.template`; datierte Korrektur in intake §7 | — | — | nein | erledigt (Plan-Commit) |
-
-## 12 Entscheidungsliste (für P10 Step 3)
-> **Verbatim verschoben** nach `ENTSCHEIDUNGEN_ARCHIVE.md` (`scripts/move_sections.py`) — dort unter derselben Überschrift.
 
 ## Bilanz (nach den Entscheidungen, 2026-10-18)
 

@@ -561,8 +561,17 @@ def api_routes(
                     finally:
                         pending = None
                     sichtbar = {s.name for s in _visible_space_infos(session.space)}
+                    spaces = sorted(s for s in event.spaces if s in sichtbar)
+                    if not spaces:
+                        # **Kein Ereignis, wenn sich nur Unsichtbares geändert hat.** Der
+                        # Space-Name dürfte den Server ohnehin nicht verlassen (Hard Rule 4);
+                        # ein leeres Ereignis würde den Client trotzdem auffordern, die
+                        # Übersicht neu zu laden — also wird es gar nicht erst gesendet
+                        # (Abnahme P10.5-46, Gegenlauf: „unsichtbarer Space → kein
+                        # Ereignis").
+                        continue
                     payload = {
-                        "spaces": sorted(s for s in event.spaces if s in sichtbar),
+                        "spaces": spaces,
                         "head": event.head[:HEAD_CHARS],
                     }
                     yield "event: changed\ndata: " + json.dumps(payload) + "\n\n"

@@ -7,6 +7,7 @@ up: ./BAUSTELLENREGISTER.md
 down:
 updated: 2026-10-24 (angelegt — die `updated:`-Kette des Baustellenregisters rotiert hierher; im Register bleibt der neueste Faden plus Zeiger)
 ---
+- 2026-10-24 (B9.3 ✅ — RE-3 Space umbenennen; B9.2 ✅ — RE-4) | ältere Einträge: phase10_inventory/UPDATES_ARCHIVE.md
 - 2026-10-22 (Block 6 ✅ — PA-1/PA-2 abgehakt, `/mcp` ohne Slash, PA-6)
 - 2026-10-22 (Block 4: PF-1 ✅ (ein Durchgang, M2-Median 107,3 ms), PF-4 ✅ (ein Request, 10 s Mindestpause, `/health` hinter `/overview` 23 ms), PF-6 ✅ (ui_budget 176,6 KB) · Z1–Z4 gemessen)
 - 2026-10-22 (Block 3: LG-7 ✅ (asset_orphans.py), LG-8 ✅ (EXIF-Strip) — Wegwerf 14/14)

@@ -1,0 +1,98 @@
+{
+  "probe": "p105_b10_realtime",
+  "instanz": {
+    "basis": "https://127.0.0.1:18810",
+    "pid": 3750071,
+    "wegwerf": true
+  },
+  "befund": {
+    "volltext_schalter_vorhanden": true,
+    "volltext_ohne_schalter_kein_treffer": true,
+    "volltext_mit_schalter_treffer": true,
+    "ereignis_angekommen": true,
+    "latenz_ms": 141.096435546875,
+    "latenz_ok": true,
+    "editor_text_erhalten": true,
+    "editor_band_sichtbar": true,
+    "unsichtbarer_space_kein_ereignis": true,
+    "shutdown_s": 5.22,
+    "shutdown_ok": true,
+    "keine_seitenfehler": true
+  },
+  "messung": {
+    "schalter_vorhanden": true,
+    "treffer_ohne_schalter": 0,
+    "treffer_mit_schalter": 1,
+    "stream_ready_state": 1,
+    "erscheint_at": 1792865512300,
+    "changed_nach_write1": 1,
+    "changed_at_nach_write1": [
+      1792865512281
+    ],
+    "editor_offen": true,
+    "textarea_sichtbar": true,
+    "version_vorher": "v1",
+    "version_ungespeichert": "v1+",
+    "dirty_vorher": 1,
+    "band_sichtbar": true,
+    "band_text": "Geaendert von alpha — neu laden?",
+    "text_erhalten": "Getippt von mir",
+    "changed_nach_write2": 2,
+    "changed_nach_write3": 2,
+    "seitenfehler": []
+  },
+  "phase1": {
+    "schalter_vorhanden": true,
+    "treffer_ohne_schalter": 0,
+    "treffer_mit_schalter": 1,
+    "stream_ready_state": 1,
+    "erscheint_at": 1792865512300,
+    "changed_nach_write1": 1,
+    "changed_at_nach_write1": [
+      1792865512281
+    ]
+  },
+  "phase2": {
+    "schalter_vorhanden": true,
+    "treffer_ohne_schalter": 0,
+    "treffer_mit_schalter": 1,
+    "stream_ready_state": 1,
+    "erscheint_at": 1792865512300,
+    "changed_nach_write1": 1,
+    "changed_at_nach_write1": [
+      1792865512281
+    ],
+    "editor_offen": true,
+    "textarea_sichtbar": true,
+    "version_vorher": "v1",
+    "version_ungespeichert": "v1+",
+    "dirty_vorher": 1,
+    "band_sichtbar": true,
+    "band_text": "Geaendert von alpha — neu laden?",
+    "text_erhalten": "Getippt von mir",
+    "changed_nach_write2": 2
+  },
+  "phase3": {
+    "schalter_vorhanden": true,
+    "treffer_ohne_schalter": 0,
+    "treffer_mit_schalter": 1,
+    "stream_ready_state": 1,
+    "erscheint_at": 1792865512300,
+    "changed_nach_write1": 1,
+    "changed_at_nach_write1": [
+      1792865512281
+    ],
+    "editor_offen": true,
+    "textarea_sichtbar": true,
+    "version_vorher": "v1",
+    "version_ungespeichert": "v1+",
+    "dirty_vorher": 1,
+    "band_sichtbar": true,
+    "band_text": "Geaendert von alpha — neu laden?",
+    "text_erhalten": "Getippt von mir",
+    "changed_nach_write2": 2,
+    "changed_nach_write3": 2,
+    "seitenfehler": []
+  },
+  "alle_kriterien_erfuellt": true
+}

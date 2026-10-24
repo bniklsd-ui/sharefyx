@@ -384,6 +384,31 @@ async def test_events_limit_three_streams_per_session(events_app, store, tmp_pat
 
 
 @pytest.mark.asyncio
+async def test_events_send_nothing_when_only_invisible_spaces_changed(
+    events_app, item_store, store, tmp_path
+):
+    """**Kein Ereignis, wenn sich nur Unsichtbares geändert hat** (Abnahme P10.5-46,
+    Gegenlauf: „unsichtbarer Space → kein Ereignis").
+
+    Der Space-Name dürfte den Server ohnehin nicht verlassen (Hard Rule 4); ein leeres
+    Ereignis würde den Client trotzdem zum Nachladen auffordern — also wird gar keines
+    gesendet. **Gegenprobe:** derselbe Feed, aber der Feed meldet einen **sichtbaren**
+    Space — dann kommt ein Ereignis an."""
+    item_store.create(FOREIGN_SPACE, type="note", title="Fremd, ungeteilt")
+    feed = ChangeFeed(
+        tmp_path, interval_s=0.02, head_reader=_fake_head([0]),
+        differ=lambda _root, _old, _new: {FOREIGN_SPACE},
+    )
+    app = events_app(feed)
+    task, state = await _call(app, cookie=_session_cookie(store))
+    await asyncio.sleep(0.25)
+    task.cancel()
+    assert "event: changed" not in _text(state), (
+        "es wurde ein Ereignis gesendet, obwohl sich nur ein unsichtbarer Space geaendert hat"
+    )
+
+
+@pytest.mark.asyncio
 async def test_events_report_the_head_and_the_changed_spaces(
     events_app, item_store, store, tmp_path
 ):

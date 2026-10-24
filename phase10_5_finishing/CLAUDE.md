@@ -11,22 +11,15 @@ down:
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
   - UPDATES_ARCHIVE.md                              # 📦 die älteren `updated:`-Fäden dieses Heads, verbatim
   - STARTUPTRAG_ARCHIVE.md                          # 📦 die Startaufträge der Blöcke 7 und 9, verbatim
-updated: 2026-10-24 (Block 10.3 LG-2 Realtime-Client gebaut — `realtime.js`, Poll-Rückfall 120 s, Hinweisband P10.5-S; 8 Wächter, ui_budget 5/5) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+  - FREIGABEN_ARCHIVE.md                           # 📦 die Freigaben der Phase, verbatim
+updated: 2026-10-24 (Block 10.5: die Probe ist grün — Volltext 0 → 1 Treffer, Latenz 141,1 ms, P10.5-S-Band, Shutdown 5,22 s; P10.5-45/46/47/48 ✅, Gegenlauf rot) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
 > **Auftrag:** P10.5 schließt jede Baustelle, die im Register als „Ziel P10.5" steht — Betrieb, Fehler, Parität, Performance, MCP-Schicht, Anbieter-Unabhängigkeit, Darstellung, Gehirnkarte, Umbenennen, Suche, Realtime, Editor Stufe 1+2 und Doku. Die Phase endet erst, wenn ein Nicht-Claude-Client live `list_spaces` ausführt, mit zwei Modellanbietern (P10-J); neues Feature kommt erst in P11.
 
 ## Freigaben
-
-| Was | Wann | Wer |
-|---|---|---|
-| Plan `docs/concepts/phase10_5_finishing_plan.md` (Locks P10.5-A–W) | 2026-10-21 | Nikinger |
-| Register-Tor **P10-8** — die Spalte „Ziel" wird verbindlich, abgehakt wird im Register | 2026-10-21 | Nikinger |
-| **P10-C** — Eingriff in `phase4_auth/` (Lock **P10.5-O**): Loopback-Redirect mit Port, `application_type`, CSP `form-action` | 2026-10-21 | Nikinger |
-| **P10.5-N** — P10-I in **beiden** Richtungen: kein Item wandert *in* einen fremden Home-Space hinein **und** nicht *aus* einem heraus | 2026-10-21 | Nikinger |
-| Kontextgrenze **400.000** für `MiniMax-M3` und `MiniMax-M3.1-Flash` (P10.5-C, gesetzt von eurofyx-fleet, Neustart 22.10.) | 2026-10-22 | eurofyx-fleet |
-| **Alles Messbare an der Wegwerf-Instanz** — Tests gegen die Live-Umgebung (echter `DATA_ROOT`, echte `auth.sqlite3`, Keyring, laufender Dienst, Funnel/Domain) nur, wenn der Server das nicht selbst entscheiden kann; die Entscheidung trifft der Nikinger (Wurzel-`CLAUDE.md` §Working style) | 2026-10-22 | Nikinger |
+> **Verbatim verschoben** nach `FREIGABEN_ARCHIVE.md` (`scripts/move_sections.py`) — dort unter derselben Überschrift.
 
 ## Modulstatus
 
@@ -42,7 +35,7 @@ updated: 2026-10-24 (Block 10.3 LG-2 Realtime-Client gebaut — `realtime.js`, P
 | 7 | Darstellung: UI-1–UI-6, KA-5 | Ausführer (+ Claude Code Sichtung) | C | 🔄 2026-10-24 — **7.1–7.7 gebaut und gemessen** (HTML-404 für unbekannte `/ui`-Pfade · Wortmarke `static/logo.svg` · Tab-Titel folgt der Ansicht · vier Posten der Sichtung umgesetzt · Kontrast `--caution` 5,70:1 · Assignee-Filter in API und UI · `doing`-Ring auf der Karte) · Probe an der Wegwerf-Instanz, Gegenläufe je rot · **P10.5-32 bleibt ⬜ bis zur Bestätigung** — die Herleitung je Schritt steht im Session-Archiv (`SESSIONS_ARCHIVE.md`, Block 7.1–7.4) und in den Commits |
 | 8 | Karte: Gehirnkarte C2 | Ausführer (+ Claude Code Smoke/Sichtung) | C | 🔄 2026-10-24 — **8.1–8.8 gebaut und gemessen** (Lappen/Furchen/Zellen/Aktivierung in `graph.js`, KA-2 Layout-Ablage, KA-3 Suche/Filter, reduced motion 0 Ticks) · **Browser-Probe `probes/p105_b8_karte_probe.py` an der 200-Knoten-Wegwerf-Instanz: 4/4 Messungen grün, 3 Gegenläufe je rot** · **Smoke `p8_22_smoke.py` 5/5** (Ruhe 2712,1 ms ≤ 3000, Frame p95 1,7 ms ≤ 16,7, reduced motion **0** Frames) · **drei Fehler hat erst der Browser gefunden** (gezogener Knoten wurde zurückgezogen · Fokus blieb nach dem Zeigerwechsel · Trefferzahl wurde vom Layout-Hinweis überschrieben) — alle drei behoben und gewächtert · **Abnahme 10-36/38/39/40 ✅, 10-37 wartet auf die Sichtung** (4 Screenshots liegen vor) · **Befund: das Plan-Budget für `graph.js` ist überschritten** (+11,1 KB gzip statt +8 KB; davon +9,8 KB Kommentar, der Code selbst +2,9 KB) — Entscheidung beim Nikinger · **drei Pfade außerhalb der §3-Liste** (bewusst, datiert): `phase9_hardening/scripts/graph_reload_probe.mjs` (der P9-Harness malt die alte Strichzeichnung — ohne Anpassung wäre der P9-Wächter rot) · `phase10_5_finishing/{probes,tests}/` (Plan 8.8 verlangt Proben und Wächter) · `docs/screenshots/p105_b8_*.png` (Plan 8.8 verlangt die vier Bilder für die Sichtung) |
 | 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | ✅ 2026-10-24 — **9.1 RE-7 `created_by`** (Probe 12/12) · **9.2 RE-4 `rename_folder`** (Probe 13/13) · **9.3 RE-3 `rename_space`** (Probe 15/15) — alle drei gebaut und gemessen; Branch `p105-block9`, Merge **nach** Deploy C |
-| 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | D | 🔄 2026-10-24 — **10.1** LG-1 Volltext (`in_body`, Schalter) · **10.2** LG-2 serverseitig (`events.py`, Route, `timeout_graceful_shutdown=5`) · **10.3** LG-2 Client (`realtime.js`, Poll-Rückfall 120 s, Hinweisband P10.5-S) — 32 neue Tests, 6 Gegenläufe; **die Proben (10.5) stehen aus** |
+| 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | D | ✅ 2026-10-24 — **10.1** LG-1 Volltext (`in_body`, Schalter) · **10.2** LG-2 serverseitig (`events.py`, Route, `timeout_graceful_shutdown=5`) · **10.3** LG-2 Client (`realtime.js`, Poll-Rückfall 120 s, Hinweisband P10.5-S) · **10.5 Probe**: 11/11 Zellen grün an der Wegwerf-Instanz (18810) — **Latenz 141,1 ms** (Grenze 2000), **Shutdown 5,22 s** (Grenze 10), Volltext 0 → 1 Treffer mit dem Schalter, Band „Geändert von alpha — neu laden?", unsichtbarer Space **ohne** Ereignis; **Gegenlauf rot** (Filter aus → das Ereignis kommt) — 33 neue Tests, 7 Gegenläufe |
 | 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | ⬜ |
 | 12 | Doku und Altlasten: DO-1, LG-6, AL-1 (Rest), AL-3, BG-2/BG-3 | Claude Code | — | ⬜ |
 | Z | Closeout P10.5 (Handover, Grafik, Rotationen) | Claude Code + Nikinger | — | ⬜ |
@@ -110,10 +103,10 @@ updated: 2026-10-24 (Block 10.3 LG-2 Realtime-Client gebaut — `realtime.js`, P
 | P10.5-42 | RE-4 atomar (V193 ✅): ein Commit, Versionen unverändert, Freigabe wandert mit | ✅ | 9.2 · **Wegwerf `probes/p105_b9_rename_folder_probe.py` 13/13 Zellen**: Web-Rename → HTTP 200, `items` nennt die Zahl · die Datei liegt am **neuen** Pfad, der alte Ordner ist weg · `version:` **unverändert** (1 → 1 — Ordner stehen nicht im Frontmatter) · die `.share.yml` **wandert mit** (neu da, alt weg) · **ein** Commit `rename-folder alpha:projekte→vorhaben` · der Index meldet `folder == "vorhaben"` · **Gegenlauf**: Ziel existiert → **422**, **nichts** bewegt · Ziel **unter** dem alten Ordner → 422 · ohne CSRF → **403**, nichts bewegt · 11 neue Tests (`test_store.py` × 5, `test_api.py` × 4, `test_static_routes.py` × 2) |
 | P10.5-43 | RE-3 nur Team-Space (V194 ✅): Frontmatter = Verzeichnis, ein Commit, Absturz wird wiederaufgenommen | ✅ | 9.3 · **Wegwerf `probes/p105_b9_rename_space_probe.py` 15/15 Zellen**: Web-Rename → HTTP 200, `from`/`to`/`items` · das Verzeichnis steht unter dem neuen Namen · das **Frontmatter** nennt den neuen Space (`space: team-neu`) · die **Version springt genau einmal** (1 → 2) · **ein** Commit `rename-space team→team-neu` · der Index meldet den neuen Space · **Fremdverweise werden gemeldet, nicht angefasst** (`orphan_refs` + `assignee_refs`; die fremde `.share.yml` bleibt, wie sie ist) · **Gegenlauf**: Home-Space → **403**, nichts bewegt · vergebener Zielname → **422**, nichts bewegt · **Absturz**: `test_rename_resumes_after_crash` (Monkeypatch wirft nach der ersten Datei → neuer `Store` → Endzustand konsistent, Marker weg, **kein** zweiter Versionssprung) · 10 neue Tests (`test_store.py` × 5, `test_api.py` × 4, `test_static_routes.py` × 2) |
 | P10.5-44 | P1-Diff nennt nur die angekündigten Dateien | ✅ | 9.3 · `git diff --stat 2c841cf -- phase1_storage/storage` nennt **nur** `models.py` und `store.py` — beide in der Ankündigung (`2c841cf`) genannt, `index.py` blieb unberührt (kein Schema-Sprung, Hard Rule 2). Der übrige Diff von Block 9 liegt in `phase5_ui/webui/**` und den Tests — beides auf der Erlaubnisliste (Plan §3) |
-| P10.5-45 | LG-1: Volltext in der UI | ⬜ | 10.1 gebaut: `api.py` liest `in_body` (`_parse_bool`), `store.search(in_body=True)`; Schalter „Volltext" am Suchfeld (`list.js`/`state.js`/`app.html`) · 2 API-Tests + 6 Verdrahtungs-Wächter (`tests/test_fulltext.py`), 3 Gegenläufe rot · **die Playwright-Bestätigung (10.5) steht aus** — die Zeile wird erst ✅ mit ihr |
-| P10.5-46 | Realtime: Änderung ≤ 2 s sichtbar | ⬜ | 10.2 + 10.3 gebaut; **die Wegwerf-Probe (10.5) steht aus** |
-| P10.5-47 | P10.5-S: geänderter Editor nie überschrieben; Neuladen trägt frische `version` | ⬜ | 10.2 + 10.3 gebaut (Hinweisband, `reloadFromServer`); **die Probe (10.5) steht aus** |
-| P10.5-48 | Shutdown ≤ 10 s mit offenen Streams | ⬜ | 10.2 gebaut (`timeout_graceful_shutdown=5`, **V213**: uvicorn 0.54.0); **die SIGTERM-Probe (10.5) steht aus** |
+| P10.5-45 | LG-1: Volltext in der UI | ✅ | 10.1 gebaut: `api.py` liest `in_body` (`_parse_bool`), `store.search(in_body=True)`; Schalter „Volltext" am Suchfeld (`list.js`/`state.js`/`app.html`) · 2 API-Tests + 6 Verdrahtungs-Wächter (`tests/test_fulltext.py`), 3 Gegenläufe rot · **10.5 Wegwerf `probes/p105_b10_realtime_probe.py`**: der Marker im **Text** ergibt **0 Treffer** ohne Schalter und **1 Treffer** mit Schalter (echter Browser, echte API) |
+| P10.5-46 | Realtime: Änderung ≤ 2 s sichtbar | ✅ | 10.2 + 10.3 gebaut · **10.5 Wegwerf**: der Write in `alpha` → der Browser bekommt **1** `changed`-Ereignis, die neue Zeile steht **141,1 ms** später in der Liste (Grenze 2000 ms; Wanduhr im Browser gegen die Wanduhr des Schreibers) · der Stream steht auf `readyState 1` (offen) · **Gegenlauf**: ein Write in `beta` (für `alpha` unsichtbar) löst **kein** Ereignis aus — genau dafür die Zeile `if not spaces: continue` in `api.py` |
+| P10.5-47 | P10.5-S: geänderter Editor nie überschrieben; Neuladen trägt frische `version` | ✅ | 10.2 + 10.3 gebaut (Hinweisband, `reloadFromServer`) · **10.5 Wegwerf**: der Browser tippt in das offene Item (`v1` → `v1+`), **danach** schreibt ein zweiter Principal denselben Space → das Band erscheint („Geändert von alpha — neu laden?"), der **getippte Text steht unverändert drin** (kein Überschreiben) · die Versionsanzeige stand vorher auf `v1` und bleibt `v1+` (der Entwurf ist ungespeichert, die Serverversion ist die alte) |
+| P10.5-48 | Shutdown ≤ 10 s mit offenen Streams | ✅ | 10.2 gebaut (`timeout_graceful_shutdown=5`, **V213**: uvicorn 0.54.0) · **10.5 Wegwerf**: SIGTERM (nur über die PID-Datei) bei **offenem Stream** → der Prozess ist nach **5,22 s** weg (Grenze 10); das Server-Log zeigt „Cancel 1 running task(s), timeout graceful shutdown exceeded" nach 5 s · **die Probe startet den Produktiv-Code** (`phase2_mcp/scripts/serve.py`), nicht eine Kopie — sonst würde sie eine Attrappe messen |
 | P10.5-49 | Live nach Deploy D: Ereignisse kommen über **beide** Eingänge an (V212 ✅) | ⬜ | — |
 | P10.5-50 | Budget: Erstaufruf ≤ 250 KB, Editor ≤ 80 KB, jede Datei gezählt | ⬜ | — |
 | P10.5-51 | ED-1: kein Moduswechsel, Live-Darstellung (Nikinger-Sichtung) | ⬜ | — |
@@ -128,7 +121,7 @@ updated: 2026-10-24 (Block 10.3 LG-2 Realtime-Client gebaut — `realtime.js`, P
 | P10.5-60 | P10-J zweimal live belegt | ⬜ | — |
 | P10.5-61 | Closeout-Dokumente + Rotationen per Skript | ⬜ | — |
 
-**Summe:** 38 ✅ · 0 ⚠️ · 23 ⬜ (von 61). **[2026-10-24, Block 9.3]** +2 ✅ (10-43, 10-44) ⇒ 38 ✅ · 0 ⚠️ · 23 ⬜. **[2026-10-24, Block 9.2]** +1 ✅ (10-42, RE-4 `rename_folder`) ⇒ 36 ✅ · 0 ⚠️ · 25 ⬜. **[2026-10-24, Block 9.1]** +1 ✅ (10-41, RE-7 `created_by`) ⇒ 35 ✅ · 0 ⚠️ · 26 ⬜. **[2026-10-24, Block 8]** +4 ✅ (10-36, 10-38, 10-39, 10-40) ⇒ 34 ✅ · 0 ⚠️ · 27 ⬜. **[Stand 2026-10-24, Block 7.5–7.7]** 33, 34 und 35 ✅. **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`). **[2026-10-23, Block 7.1]** +1 ✅ (10-29, UI-1) ⇒ 25 ✅ · 0 ⚠️ · 36 ⬜. **[2026-10-23, Block 7.2]** +1 ✅ (10-30, UI-2) ⇒ 26 ✅ · 0 ⚠️ · 35 ⬜. **[2026-10-23, Block 7.3]** +1 ✅ (10-31, UI-3) ⇒ 27 ✅ · 0 ⚠️ · 34 ⬜.
+**Summe:** 42 ✅ · 0 ⚠️ · 19 ⬜ (von 61). **[2026-10-24, Block 10.5]** +4 ✅ (10-45, 10-46, 10-47, 10-48) ⇒ 42 ✅ · 0 ⚠️ · 19 ⬜. **[2026-10-24, Block 9.3]** +2 ✅ (10-43, 10-44) ⇒ 38 ✅ · 0 ⚠️ · 23 ⬜. **[2026-10-24, Block 9.3]** +2 ✅ (10-43, 10-44) ⇒ 38 ✅ · 0 ⚠️ · 23 ⬜. **[2026-10-24, Block 9.2]** +1 ✅ (10-42, RE-4 `rename_folder`) ⇒ 36 ✅ · 0 ⚠️ · 25 ⬜. **[2026-10-24, Block 9.1]** +1 ✅ (10-41, RE-7 `created_by`) ⇒ 35 ✅ · 0 ⚠️ · 26 ⬜. **[2026-10-24, Block 8]** +4 ✅ (10-36, 10-38, 10-39, 10-40) ⇒ 34 ✅ · 0 ⚠️ · 27 ⬜. **[Stand 2026-10-24, Block 7.5–7.7]** 33, 34 und 35 ✅. **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`). **[2026-10-23, Block 7.1]** +1 ✅ (10-29, UI-1) ⇒ 25 ✅ · 0 ⚠️ · 36 ⬜. **[2026-10-23, Block 7.2]** +1 ✅ (10-30, UI-2) ⇒ 26 ✅ · 0 ⚠️ · 35 ⬜. **[2026-10-23, Block 7.3]** +1 ✅ (10-31, UI-3) ⇒ 27 ✅ · 0 ⚠️ · 34 ⬜.
 
 ## Offen beim Nikinger
 
@@ -166,9 +159,8 @@ updated: 2026-10-24 (Block 10.3 LG-2 Realtime-Client gebaut — `realtime.js`, P
 
 ## Startauftrag — Block 7 (Darstellung: UI-1–UI-6, KA-5) · Ausführer
 > **Gebaut** (7.1–7.7, 2026-10-23/24) · die ausführliche Fassung und die **zwei Korrekturen gegen den
-> 📕-Plan** (`--caution` ist der **Text**-Farbwert, nicht die Knopffläche · `_items_get` steht in
-> `api.py:932`, nicht 821) stehen in `STARTUPTRAG_ARCHIVE.md`. **P10.5-32 bleibt ⬜ bis zur Bestätigung
-> des Nikingers**; nichts davon ist deployed — `v3.1.7` steht aus.
+> 📕-Plan** stehen in `STARTUPTRAG_ARCHIVE.md`. **P10.5-32 bleibt ⬜ bis zur Bestätigung des
+> Nikingers**; nichts davon ist deployed — `v3.1.7` steht aus.
 
 ## Startauftrag — Block 9 (Rechte und Namen: RE-7, RE-4, RE-3) · Ausführer
 > **Gebaut** (9.1–9.3, 2026-10-24) · die ausführliche **Ankündigung der drei P1-Öffnungen**
@@ -177,39 +169,38 @@ updated: 2026-10-24 (Block 10.3 LG-2 Realtime-Client gebaut — `realtime.js`, P
 > wird **erst nach dem Deploy C** nach `main` gemergt (`deploy.sh` klont das lokale `main` —
 > sonst liefert `v3.1.7` den Block-9-Stand mit aus).
 
-## Session stopped — 2026-10-24 (Block 10.3 LG-2 Realtime-Client gebaut — der Editor wird nie überschrieben)
+## Session stopped — 2026-10-24 (Block 10.5: die Probe ist grün — Volltext, Latenz, P10.5-S und Shutdown an der Wegwerf-Instanz)
 
-**Ergebnis.** Die Client-Hälfte steht: `static/js/realtime.js` (neu) öffnet den Ereignis-Stream,
-`app.js` macht den 20-s-Poll zum **Rückfall** (120 s), `editor.js` bekommt das Hinweisband
-(P10.5-S) und `app.html`/`app.css` die Strippe dazu.
+**Ergebnis.** Die Probe `probes/p105_b10_realtime_probe.py` fährt gegen die Wegwerf-Instanz
+(Port 18810, TLS, eigene PID-Datei) und misst **11 von 11 Zellen grün**: Volltext **0 → 1
+Treffer** mit dem Schalter · das Ereignis kommt an · **Latenz 141,1 ms** (Grenze 2000) · der
+getippte Text bleibt stehen, das Band erscheint · ein unsichtbarer Space löst **kein** Ereignis
+aus · **Shutdown 5,22 s** (Grenze 10). Der **Gegenlauf** (Ereignis-Filter in `api.py` aus) ist
+**rot** — genau an der Zelle, die er brechen soll. Belege: `p105_b10_realtime.json` (grün),
+`p105_b10_realtime_gegenlauf.json` (rot). **Abnahme P10.5-45, 46, 47, 48 ✅** — Block 10 ist
+fertig.
 
-**Drei Folgen eines Ereignisses.** (1) `List.loadOverview()` — Zähler und Übersicht; das setzt
-auch `state.graphToken`, an dem die Karte hängt (P9-33), die Karte braucht keinen eigenen
-Abruf. (2) `List.loadItems()` — **nur**, wenn der aktive Space betroffen ist; im globalen
-Modus („Alle Items") immer. (3) Das **offene Item**.
+**Vier Fehler lagen im Messgerät, nicht im Produkt** (jeder hätte die Probe rot gemeldet, ohne
+den Defekt zu zeigen): (1) Das Flag-Protokoll war verdreht — der Browser wartete auf
+`ready.flag`, das er selbst schreiben sollte. (2) Der **CSRF-Origin** passte nicht:
+`require_csrf()` vergleicht ihn gegen `SPACE_PUBLIC_BASE_URL`, die Auth-Konfiguration erzwingt
+https ⇒ die Wegwerf-Instanz braucht **TLS** (derselbe Weg wie `p10_wegwerf.py`). (3) Der Editor
+öffnet in der **Vorschau** (die Textarea ist unsichtbar), und die Zeile in der Liste zeigt den
+**Titel**, nicht den Text. (4) Die Shutdown-Messung sah einen **Zombie** (ein beendeter
+Prozess bleibt in `/proc`); die erste Fassung meldete 30,03 s.
 
-**P10.5-S: ein geänderter Editor wird nie überschrieben.** Sauberer Editor → der
-Serverstand wird geholt, und bei neuerer `version` neu geladen (**Inhalt und Version
-zusammen** — sonst zeigte der Editor eine Version, die es nicht gibt). Geänderter Editor →
-ein Hinweisband „Geändert von X — neu laden?"; der Mensch entscheidet, und das Speichern
-läuft über die alte Version in den Konfliktdialog (Hard Rule 3).
+**Eine Frage an die Attrappe.** Die erste Fassung der Probe startete eine **Kopie** des
+App-Aufbaus — damit hätte sie die Frist `timeout_graceful_shutdown=5` mitkopiert oder
+weggelassen; weggelassen hätte die Probe **grün** gemeldet, obwohl der Produktivpfad
+unbegrenzt auf offene Streams wartet. Die Probe startet jetzt **den Produktiv-Code**
+(`phase2_mcp/scripts/serve.py`) und ergänzt nur die beiden TLS-Parameter. Der Write läuft über
+die **Web-API**, nicht über MCP (der Plan nennt einen MCP-Write) — nach dem Adapter ist der
+Serverpfad derselbe (datierte Abweichung, im Probekopf benannt).
 
-**Eine datierte Korrektur an einem Kommentar.** `app.js` behauptete im Absatz über den
-Zähler-Poll, das Polling sei „der einzige Weg der Zähler-Synchronisation" — seit diesem
-Block trägt der Ereignis-Stream die Änderungen, der Poll ist der Rückfall. Der Kommentar
-sagt das jetzt (datierte Korrektur, 2026-10-24).
+**Gemessen.** 38 neue Tests (2 API + 6 Volltext-Wächter + 15 Events + 2 `phase2_mcp` + 8
+Client-Wächter + 5 Probe-Wächter) · Suite **1503 grün** (350,8 s) · `doc_health` 0 ·
+`ui_budget` 5/5 (198,7 KB gzip). Der Abschnitt „Freigaben" ist aus dem Head nach
+`FREIGABEN_ARCHIVE.md` gewandert (verbatim) — der Head stand bei 41.343 B, über dem Softcap.
 
-**Gemessen.** 8 Verdrahtungs-Wächter in `phase10_5_finishing/tests/test_realtime_client.py`
-(Markup, `EventSource`, die drei Folgen, „nie überschreiben", Poll-Rückfall) · `ui_budget`
-**5/5** (Erstaufruf 198,7 KB gzip — `realtime.js` 1,5 KB) · JS-Syntax mit `node --check`
-geprüft (alle fünf berührten Module) · Suite **1497 grün** (366,0 s).
-
-**Ausführer-Daten.** `opencode/MiniMax-M3.1-Flash`, Kontextgrenze 400.000 (P10.5-C erfüllt),
-keine Eingriffe des Nikingers in dieser Session.
-
-**Stand.** Branch `p105-block9`. **P10.5-45/46/47/48 bleiben ⬜** — die Abnahme verlangt
-Playwright bzw. die Wegwerf-Probe (10.5).
-
-**Nächster Schritt.** (1) 10.5: die Probe an der Wegwerf-Instanz — Volltext, Änderung ≤ 2 s,
-unsichtbarer Space, SIGTERM ≤ 10 s. (2) Danach Deploy C (`v3.1.7`) beim Nikinger, Merge,
-dann Block 11 (Editor).
+**Nächster Schritt.** Deploy C (`v3.1.7`) beim Nikinger (`deploy.sh`, Hard Rule 9) ·
+`health_gate.sh` mit echter Ausgabe · Merge `p105-block9` → `main` · danach Block 11 (Editor).
