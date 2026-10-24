@@ -10,7 +10,7 @@ down:
   - ../phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md  # 📦 §12 Entscheidungsliste D-1–D-18, verbatim
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
   - UPDATES_ARCHIVE.md                              # 📦 die älteren `updated:`-Fäden dieses Heads, verbatim
-updated: 2026-10-24 (Block 7.4: Sichtungsliste des Nikingers notiert — 4 Posten im Archiv Schritt 7.4, Ausführer setzt um, Nachsichtung nach Block 11) | 2026-10-24 (Block 7.5 Kontrast (`--caution` #F06A6E, Wächter), 7.6 Assignee-Filter (API + Auswahl), 7.7 KA-5 (Chip + Karten-Ring) gebaut; Probe an der Wegwerf-Instanz 6/6 mit zwei roten Gegenläufen; Suite 1396 grün; Abnahmestand 30 ✅ · 0 ⚠️ · 31 ⬜) | 2026-10-23 (Block 7.3 (UI-3) gebaut: der Tab-Titel folgt der Ansicht — Übersicht, Space-Name, Item-Titel, Einstellungen; datierte Korrektur zum Plan (vier Zustände, nicht fünf); Probe an der Wegwerf-Instanz 6/6 mit rotem Gegenlauf; Abnahmestand 27 ✅ · 0 ⚠️ · 34 ⬜) | 2026-10-23 (Block 7.2 (UI-2): die Wortmarke `static/logo.svg` — Variante B aus dem Logo-Board, pixelgleich gemessen; zwei Befunde nur durch Messung (XML-Kommentar, MIME-Typ); Probe an der Wegwerf-Instanz mit rotem Gegenlauf; Abnahmestand 26 ✅ · 0 ⚠️ · 35 ⬜) | 2026-10-23 (Deploy B ist live: `v3.1.6`, Release `20261023T165838.591015Z`, SHA `e5c834e`, health_gate 9/9 OK; Block 7.1 (UI-1) gemergt (`f0e76b0`) — kommt mit `v3.1.7`) | 2026-10-23 (Block 7.1 (UI-1) gebaut: HTML-404 für unbekannte `/ui`-Pfade + JSON-404 in der API — Branch `p105-block7`, nicht gemergt; 4 neue Tests, 4 Gegenläufe wirksam; Suite 1384 grün) | 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zeile `)pdated:` → `) | `; Release-Tests wieder grün, Suite 1380 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-10-24 (Session-Schluss: Handover für 7.4-Umsetzung, Block 8, Deploy C; Rotations-Fallstrick notiert) | 2026-10-24 (Block 7.4: Sichtungsliste des Nikingers notiert — 4 Posten im Archiv Schritt 7.4, Ausführer setzt um, Nachsichtung nach Block 11) | 2026-10-24 (Block 7.5 Kontrast (`--caution` #F06A6E, Wächter), 7.6 Assignee-Filter (API + Auswahl), 7.7 KA-5 (Chip + Karten-Ring) gebaut; Probe an der Wegwerf-Instanz 6/6 mit zwei roten Gegenläufen; Suite 1396 grün; Abnahmestand 30 ✅ · 0 ⚠️ · 31 ⬜) | 2026-10-23 (Block 7.3 (UI-3) gebaut: der Tab-Titel folgt der Ansicht — Übersicht, Space-Name, Item-Titel, Einstellungen; datierte Korrektur zum Plan (vier Zustände, nicht fünf); Probe an der Wegwerf-Instanz 6/6 mit rotem Gegenlauf; Abnahmestand 27 ✅ · 0 ⚠️ · 34 ⬜) | 2026-10-23 (Block 7.2 (UI-2): die Wortmarke `static/logo.svg` — Variante B aus dem Logo-Board, pixelgleich gemessen; zwei Befunde nur durch Messung (XML-Kommentar, MIME-Typ); Probe an der Wegwerf-Instanz mit rotem Gegenlauf; Abnahmestand 26 ✅ · 0 ⚠️ · 35 ⬜) | 2026-10-23 (Deploy B ist live: `v3.1.6`, Release `20261023T165838.591015Z`, SHA `e5c834e`, health_gate 9/9 OK; Block 7.1 (UI-1) gemergt (`f0e76b0`) — kommt mit `v3.1.7`) | 2026-10-23 (Block 7.1 (UI-1) gebaut: HTML-404 für unbekannte `/ui`-Pfade + JSON-404 in der API — Branch `p105-block7`, nicht gemergt; 4 neue Tests, 4 Gegenläufe wirksam; Suite 1384 grün) | 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zeile `)pdated:` → `) | `; Release-Tests wieder grün, Suite 1380 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -170,7 +170,7 @@ updated: 2026-10-24 (Block 7.4: Sichtungsliste des Nikingers notiert — 4 Poste
 > (7.5) · `_items_get` steht in `api.py:932`, nicht 821 (7.6). Wer die Schritte baut, liest **das
 > Archiv**, nicht den Plan.
 
-## Session stopped — 2026-10-24 (Block 7.5, 7.6 und 7.7 gebaut; 7.4 wartet auf Screenshots + Nikinger)
+## Session stopped — 2026-10-24 (Block 7.5–7.7 gebaut und gepusht; 7.4 Sichtungsliste liegt beim Ausführer)
 
 **Ergebnis.** Drei Schritte gebaut, Suite **1396 grün**, `ui_budget` 5/5 OK, `doc_health` 0.
 **7.5 (UI-5):** `--caution` ist nicht mehr `var(--danger)`, sondern `#F06A6E` — Text auf der
@@ -187,6 +187,18 @@ aber eine gelockte Entscheidung, die sich bewegt. Der Ring nutzt `--accent` (`#3
 (`#4A93F0`): sonst wäre er auf eigenen Knoten farbgleich zur Füllung. Der Filter gilt auch bei ID-Suche
 (wie `type`/`status`). **P10.5-35 ✅**: Canvas-Probe zählt 44 Ringpixel, ohne Ring 0.
 
-**Nächster Schritt.** **7.4:** Screenshots sind gemacht, der Nikinger hat **4 Posten** geliefert (Archiv,
-Schritt 7.4); der **Ausführer setzt sie um**, der Nikinger sichtet nach Block 11 erneut. Danach Block 8 (Karte C2), dann `v3.1.7`-Deploy. Abzunehmen beim Nikinger unverändert:
-P10.5-22 · 25 · 27/28 · 18 · AL-1 Zeile 15 · V203.
+**Stand beim Schluss.** `main` = `origin/main` (Commits `a56d52d` 7.5–7.7, `94d5df2` Sichtungsliste), Baum sauber,
+keine Wegwerf-Instanz läuft (PID-Dateien weg). Nichts deployed — `v3.1.7` steht aus.
+
+**Nächste Session, in dieser Reihenfolge.**
+1. **7.4 umsetzen** (Ausführer): die **4 Posten** aus `STARTUPTRAG_ARCHIVE.md` Schritt 7.4 — Wortmarken-Abstand,
+   „Zugewiesen"-Auswahl, Update-Banner kompakter, Versionsanzeige. Danach P10.5-32 erst ⬜ → ✅, wenn der
+   Nikinger bestätigt; die **Nachsichtung** (≤ 6 weitere Posten) kommt nach Block 11.
+2. **Block 8** (Karte C2): Plan `docs/concepts/phase10_5_finishing_plan.md` § „Block 8"; Abnahme P10.5-36/37.
+   Vorher `git log` auf Stand prüfen und die Kontextgrenze 400 K (P10.5-C) bestätigen.
+3. **Deploy C `v3.1.7`** nach Block 7–8: Suite + `doc_health` + `ui_budget`, Badge und `docs/UPDATE_LOG.md`,
+   Commit + Push, **`deploy.sh` durch den Nikinger** (Hard Rule 9), `health_gate.sh` mit echter Ausgabe.
+
+**Beim Nikinger unverändert offen:** P10.5-22 · 25 · 27/28 · 18 · AL-1 Zeile 15 · V203 · 5.7 (Fabian Bescheid).
+**Fallstrick für die Rotation:** `rotate_session_block.sh` behält den **letzten** Block der Datei, nicht den
+obersten — den neuen Block **unter** den alten setzen, dann rotieren.
