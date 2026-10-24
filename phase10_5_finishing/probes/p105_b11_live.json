@@ -1,0 +1,383 @@
+{
+  "probe": "p105_b11_live",
+  "instanz": {
+    "basis": "https://127.0.0.1:18811",
+    "pid": 3844507,
+    "wegwerf": true
+  },
+  "befund": {
+    "live_editor_geladen": true,
+    "cursor_auf_das_geklickte_zeichen": true,
+    "cursor_bleibt_auf_dem_zeichen_stehen": true,
+    "getipptes_zeichen_an_der_geklickten_stelle": true,
+    "cursorzeile_markiert": true,
+    "cursorzeile_markiert_beim_oeffnen": true,
+    "cursorzeile_markiert_nach_itemwechsel": true,
+    "cursorzeile_markiert_nach_zurueck": true,
+    "formatierung_auf_der_cursorzeile_sichtbar": true,
+    "formatierung_auf_anderen_zeilen_unsichtbar": true,
+    "rohmodus_zeigt_alle_zeichen": true,
+    "rohmodus_klasse_gesetzt": true,
+    "notausgang_ohne_editor": true,
+    "keine_seitenfehler": true,
+    "alle_varianten_ausgeliefert": true,
+    "varianten_belege": {
+      "visibility": {
+        "ausgeliefert": "visibility",
+        "ausgeliefert_ist_die_variante": true,
+        "cursor_auf_dem_zeichen": true,
+        "cursor_bleibt_stehen": true,
+        "getipptes_zeichen_an_der_stelle": true,
+        "cursorzeilen": 1,
+        "fehler": null
+      },
+      "display": {
+        "ausgeliefert": "display",
+        "ausgeliefert_ist_die_variante": true,
+        "cursor_auf_dem_zeichen": false,
+        "cursor_bleibt_stehen": false,
+        "getipptes_zeichen_an_der_stelle": false,
+        "cursorzeilen": 1,
+        "fehler": null
+      },
+      "fontsize": {
+        "ausgeliefert": "fontsize",
+        "ausgeliefert_ist_die_variante": true,
+        "cursor_auf_dem_zeichen": false,
+        "cursor_bleibt_stehen": false,
+        "getipptes_zeichen_an_der_stelle": false,
+        "cursorzeilen": 1,
+        "fehler": null
+      }
+    }
+  },
+  "messung": {
+    "varianten": {
+      "visibility": {
+        "variante_ausgeliefert": "visibility",
+        "erwarteter_index": 15,
+        "zeile_im_wert_gefunden": true,
+        "cursor": {
+          "line": 2,
+          "ch": 15
+        },
+        "cursor_x": 373.40625,
+        "zeichen_x": 373.40625,
+        "kante_vorher": 373.40625,
+        "sprung": 0.0,
+        "wert": "# WortmitMarke\n\nEin Satz mit **WortmitMarke** und mehr Text.\n",
+        "x_ist_das_zeichen": true,
+        "cursor_auf_dem_zeichen": true,
+        "cursor_bleibt_stehen": true,
+        "stellen": [
+          {
+            "zeichen": "W",
+            "erwarteter_index": 15,
+            "erwarteter_dokument_index": 31,
+            "cursor": {
+              "line": 2,
+              "ch": 15
+            },
+            "cursor_x": 373.40625,
+            "zeichen_x": 373.40625,
+            "sprung": 0.0,
+            "cursor_auf_dem_zeichen": true,
+            "cursor_bleibt_stehen": true,
+            "x_ist_das_zeichen": true
+          },
+          {
+            "zeichen": "t",
+            "erwarteter_index": 18,
+            "erwarteter_dokument_index": 34,
+            "cursor": {
+              "line": 2,
+              "ch": 18
+            },
+            "cursor_x": 396.875,
+            "zeichen_x": 396.875,
+            "sprung": 0.0,
+            "cursor_auf_dem_zeichen": true,
+            "cursor_bleibt_stehen": true,
+            "x_ist_das_zeichen": true
+          },
+          {
+            "zeichen": "e",
+            "erwarteter_index": 26,
+            "erwarteter_dokument_index": 42,
+            "cursor": {
+              "line": 2,
+              "ch": 26
+            },
+            "cursor_x": 459.484375,
+            "zeichen_x": 459.484375,
+            "sprung": 0.0,
+            "cursor_auf_dem_zeichen": true,
+            "cursor_bleibt_stehen": true,
+            "x_ist_das_zeichen": true
+          }
+        ],
+        "geklickter_text": "Ein Satz mit **WortmitMarke** und mehr Text.",
+        "cursorzeilen_beim_oeffnen": 1,
+        "cursorzeilen_nach_itemwechsel": 1,
+        "cursorzeilen_nach_zurueck": 1,
+        "cursorzeilen": 1,
+        "formatierung_auf_zeilen": [
+          {
+            "istCursorzeile": true,
+            "formatierung": [
+              {
+                "sichtbar": true,
+                "platz": true,
+                "breite": 20.34375
+              }
+            ]
+          },
+          {
+            "istCursorzeile": false,
+            "formatierung": []
+          },
+          {
+            "istCursorzeile": false,
+            "formatierung": [
+              {
+                "sichtbar": false,
+                "platz": true,
+                "breite": 15.65625
+              },
+              {
+                "sichtbar": false,
+                "platz": true,
+                "breite": 15.65625
+              }
+            ]
+          },
+          {
+            "istCursorzeile": false,
+            "formatierung": []
+          }
+        ]
+      },
+      "display": {
+        "variante_ausgeliefert": "display",
+        "erwarteter_index": 15,
+        "zeile_im_wert_gefunden": true,
+        "cursor": {
+          "line": 2,
+          "ch": 15
+        },
+        "cursor_x": 373.40625,
+        "zeichen_x": 373.40625,
+        "kante_vorher": 357.75,
+        "sprung": 15.65625,
+        "wert": "# WortmitMarke\n\nEin Satz mit **WortmitMarke** und mehr Text.\n",
+        "x_ist_das_zeichen": false,
+        "cursor_auf_dem_zeichen": false,
+        "cursor_bleibt_stehen": false,
+        "stellen": [
+          {
+            "zeichen": "W",
+            "erwarteter_index": 15,
+            "erwarteter_dokument_index": 31,
+            "cursor": {
+              "line": 2,
+              "ch": 15
+            },
+            "cursor_x": 373.40625,
+            "zeichen_x": 373.40625,
+            "sprung": 15.65625,
+            "cursor_auf_dem_zeichen": true,
+            "cursor_bleibt_stehen": true,
+            "x_ist_das_zeichen": true
+          },
+          {
+            "zeichen": "t",
+            "erwarteter_index": 18,
+            "erwarteter_dokument_index": 34,
+            "cursor": {
+              "line": 2,
+              "ch": 16
+            },
+            "cursor_x": 381.21875,
+            "zeichen_x": 396.875,
+            "sprung": 0.0,
+            "cursor_auf_dem_zeichen": false,
+            "cursor_bleibt_stehen": false,
+            "x_ist_das_zeichen": false
+          },
+          {
+            "zeichen": "e",
+            "erwarteter_index": 26,
+            "erwarteter_dokument_index": 42,
+            "cursor": {
+              "line": 2,
+              "ch": 24
+            },
+            "cursor_x": 443.84375,
+            "zeichen_x": 459.484375,
+            "sprung": 0.015625,
+            "cursor_auf_dem_zeichen": false,
+            "cursor_bleibt_stehen": false,
+            "x_ist_das_zeichen": false
+          }
+        ],
+        "geklickter_text": "Ein Satz mit **WortmitMarke** und mehr Text.",
+        "cursorzeilen_beim_oeffnen": 1,
+        "cursorzeilen_nach_itemwechsel": 1,
+        "cursorzeilen_nach_zurueck": 1,
+        "cursorzeilen": 1,
+        "formatierung_auf_zeilen": [
+          {
+            "istCursorzeile": true,
+            "formatierung": [
+              {
+                "sichtbar": true,
+                "platz": true,
+                "breite": 20.34375
+              }
+            ]
+          },
+          {
+            "istCursorzeile": false,
+            "formatierung": []
+          },
+          {
+            "istCursorzeile": false,
+            "formatierung": [
+              {
+                "sichtbar": false,
+                "platz": false,
+                "breite": 0
+              },
+              {
+                "sichtbar": false,
+                "platz": false,
+                "breite": 0
+              }
+            ]
+          },
+          {
+            "istCursorzeile": false,
+            "formatierung": []
+          }
+        ]
+      },
+      "fontsize": {
+        "variante_ausgeliefert": "fontsize",
+        "erwarteter_index": 15,
+        "zeile_im_wert_gefunden": true,
+        "cursor": {
+          "line": 2,
+          "ch": 15
+        },
+        "cursor_x": 373.40625,
+        "zeichen_x": 373.40625,
+        "kante_vorher": 357.75,
+        "sprung": 15.65625,
+        "wert": "# WortmitMarke\n\nEin Satz mit **WortmitMarke** und mehr Text.\n",
+        "x_ist_das_zeichen": false,
+        "cursor_auf_dem_zeichen": false,
+        "cursor_bleibt_stehen": false,
+        "stellen": [
+          {
+            "zeichen": "W",
+            "erwarteter_index": 15,
+            "erwarteter_dokument_index": 31,
+            "cursor": {
+              "line": 2,
+              "ch": 15
+            },
+            "cursor_x": 373.40625,
+            "zeichen_x": 373.40625,
+            "sprung": 15.65625,
+            "cursor_auf_dem_zeichen": true,
+            "cursor_bleibt_stehen": true,
+            "x_ist_das_zeichen": true
+          },
+          {
+            "zeichen": "t",
+            "erwarteter_index": 18,
+            "erwarteter_dokument_index": 34,
+            "cursor": {
+              "line": 2,
+              "ch": 16
+            },
+            "cursor_x": 381.21875,
+            "zeichen_x": 396.875,
+            "sprung": 0.0,
+            "cursor_auf_dem_zeichen": false,
+            "cursor_bleibt_stehen": false,
+            "x_ist_das_zeichen": false
+          },
+          {
+            "zeichen": "e",
+            "erwarteter_index": 26,
+            "erwarteter_dokument_index": 42,
+            "cursor": {
+              "line": 2,
+              "ch": 24
+            },
+            "cursor_x": 443.84375,
+            "zeichen_x": 459.484375,
+            "sprung": 0.015625,
+            "cursor_auf_dem_zeichen": false,
+            "cursor_bleibt_stehen": false,
+            "x_ist_das_zeichen": false
+          }
+        ],
+        "geklickter_text": "Ein Satz mit **WortmitMarke** und mehr Text.",
+        "cursorzeilen_beim_oeffnen": 1,
+        "cursorzeilen_nach_itemwechsel": 1,
+        "cursorzeilen_nach_zurueck": 1,
+        "cursorzeilen": 1,
+        "formatierung_auf_zeilen": [
+          {
+            "istCursorzeile": true,
+            "formatierung": [
+              {
+                "sichtbar": true,
+                "platz": true,
+                "breite": 15.65625
+              }
+            ]
+          },
+          {
+            "istCursorzeile": false,
+            "formatierung": []
+          },
+          {
+            "istCursorzeile": false,
+            "formatierung": [
+              {
+                "sichtbar": false,
+                "platz": false,
+                "breite": 0
+              },
+              {
+                "sichtbar": false,
+                "platz": false,
+                "breite": 0
+              }
+            ]
+          },
+          {
+            "istCursorzeile": false,
+            "formatierung": []
+          }
+        ]
+      }
+    },
+    "live_editor_da": true,
+    "schalter_text": "Rohtext",
+    "formatierung_im_rohmodus": "keine Formatierungszeichen (Modus aus)",
+    "rohmodus_klasse": true,
+    "schalter_text_nachher": "Live",
+    "notausgang": {
+      "editor_da": false,
+      "textarea_da": true,
+      "text": "# WortmitMarke\n\nEin Satz mit **WortmitMarke** und mehr Text.\n",
+      "nach_tippen": "Notausgang"
+    },
+    "seitenfehler": []
+  },
+  "alle_kriterien_erfuellt": true
+}

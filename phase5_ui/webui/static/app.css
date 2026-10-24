@@ -1933,6 +1933,68 @@ select.input:focus {
 }
 .editor__textarea:focus { outline: none; }
 
+/* -- Live-Editor (P10.5, Block 11, Schritt 11.4 -- ED-1) ---------------------------------
+ *
+ * Der Editor zeigt jetzt **Markdown in Live-Darstellung**: die Syntax-Zeichen bekommen die
+ * Optik der Ausgabe (Ueberschriften, Fett, Kursiv, Links, Zitate), und die **Formatierungs-
+ * zeichen** (`**`, `#`, `-` …) sind auf allen Zeilen ausser der Cursorzeile unsichtbar
+ * (Obsidian-artig). Auf der Cursorzeile stehen sie, weil man dort gerade schreibt.
+ *
+ * **Warum `visibility: hidden` und nicht `display: none`.** Beide Varianten wurden im Browser
+ * gemessen (2026-10-24, Kriterium des Plans: die Cursorposition muss nach einem Klick stimmen):
+ * `display: none` **und** `font-size: 0` lassen die Formatierungszeichen keinen Platz
+ * behalten -- der Text rutscht nach links, und CM5 rechnet die Cursorposition aus den
+ * DOM-Massen: ein Klick auf ein Wort landet **genau so viele Zeichen daneben**, wie
+ * verdeckte Formatierungszeichen vor ihm stehen (gemessen: **zwei**, die `**` eines starken
+ * Textes), und der getippte Text kommt an der falschen Stelle heraus.
+ * `visibility: hidden` behaelt den Platz, haelt also
+ * die Cursorposition richtig -- der Zeichen verschwindet, der Text rutscht nicht. (Der
+ * Nachteil: der Text rutscht nicht nach links wie in Obsidian. Das ist der Preis der
+ * korrekten Cursorposition, und der Plan nennt sie als Kriterium.)
+ */
+.CodeMirror {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  background: none;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.CodeMirror-lines { padding: calc(var(--space) * 2) calc(var(--space) * 3); }
+.CodeMirror-cursor { border-left: 2px solid var(--text); }
+.CodeMirror-selected { background: var(--accent-quiet); }
+.CodeMirror-focused .CodeMirror-selected { background: var(--accent-quiet); }
+.CodeMirror pre.CodeMirror-line { padding: 0; }
+
+/* Die Live-Darstellung: die Markdown-Zeichen bekommen die Optik der Ausgabe. */
+.CodeMirror .cm-header { color: var(--text); font-weight: 600; }
+.CodeMirror .cm-header-1 { font-size: 1.3em; line-height: 1.35; }
+.CodeMirror .cm-header-2 { font-size: 1.18em; }
+.CodeMirror .cm-header-3 { font-size: 1.08em; }
+.CodeMirror .cm-header-4,
+.CodeMirror .cm-header-5,
+.CodeMirror .cm-header-6 { font-size: 1em; }
+.CodeMirror .cm-strong { font-weight: 700; }
+.CodeMirror .cm-em { font-style: italic; }
+.CodeMirror .cm-link { color: var(--accent); text-decoration: underline; }
+.CodeMirror .cm-url { color: var(--text-faint); }
+.CodeMirror .cm-quote { color: var(--text-muted); font-style: italic; }
+.CodeMirror .cm-comment { color: var(--text-faint); }
+.CodeMirror .cm-formatting { color: var(--text-faint); }
+
+/* Die Formatierungszeichen sind auf den **anderen** Zeilen unsichtbar (s. der Kommentar
+ * oben). Die Cursorzeile traegt sie sichtbar -- dort schreibt der Mensch gerade. */
+.CodeMirror .cm-formatting { visibility: hidden; }
+.CodeMirror .sfx-active-line .cm-formatting { visibility: visible; }
+
+/* Der Rohmodus (ED-5): **jedes** Zeichen sichtbar, keine Auszeichnung. */
+.CodeMirror.is-raw .cm-formatting { visibility: visible; }
+
+/* Die Cursorzeile traegt die Klasse `sfx-active-line` (am **Wrap-Layer**, der den Text
+ * enthaelt) -- daher greift die Regel oben fuer ihre Formatierungszeichen. */
+
 .editor__append {
   display: flex;
   gap: var(--space);

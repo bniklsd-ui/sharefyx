@@ -11,8 +11,9 @@ down:
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
   - UPDATES_ARCHIVE.md                              # 📦 die älteren `updated:`-Fäden dieses Heads, verbatim
   - STARTUPTRAG_ARCHIVE.md                          # 📦 die Startaufträge der Blöcke 7 und 9, verbatim
+  - MODULSTATUS_ARCHIVE.md                         # 📦 die ausführlichen Statusspalten der Blöcke 0–10, verbatim
   - FREIGABEN_ARCHIVE.md                           # 📦 die Freigaben der Phase, verbatim
-updated: 2026-10-24 (Block 11.3: der Live-Editor — ein Text, eine Quelle, kein Moduswechsel; Probe 12/12 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-10-24 (Block 11.4: die Live-Darstellung — V211 gemessen, nicht behauptet; Probe 15/15 grün, Gegenlauf rot; der Modulstatus der Blöcke 0–10 liegt jetzt im L3-Archiv) | 2026-10-24 (Block 11.3: der Live-Editor — ein Text, eine Quelle, kein Moduswechsel; Probe 12/12 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -25,20 +26,23 @@ updated: 2026-10-24 (Block 11.3: der Live-Editor — ein Text, eine Quelle, kein
 
 | Block | Inhalt (Register) | Wer | Deploy | Status |
 |---|---|---|---|---|
-| 0 | Haushalt: Verifikation, Phase-Head, INDEX-Luft, Register-Luft, DO-2, DO-3, Ausführer-Vorbedingung | Claude Code | — | ✅ 2026-10-22 — 0.1–0.8 gebaut, Abnahme P10.5-1–4 ✅ |
-| 1 | Betrieb: BT-1, BT-2, BT-6 (+ `constraints.txt`) | Ausführer + Nikinger | A | ✅ 2026-10-22 — **1.1–1.4 gebaut und abgenommen** (V199 gelesen · BT-1 Caddy-Blockform · BT-2 `SuccessExitStatus=143`, live V200 ✅ · BT-6 `constraints.txt`); Abnahme 10-5/6/7 ✅, Suite 1283 grün |
-| 2 | Fehler, Parität, Regel: BG-1, RE-1, RE-2, P10-I, AL-1 | Ausführer (+ Claude Code Proben) | A | ✅ 2026-10-22 — **2.1–2.5 gebaut und geprobt** (Probe 2.5: 28/28 Zellen Web × MCP, M4 0 → 3 Zeilen ohne neues Öffnen) · **Nachzug 2026-10-22 (Nikinger):** ein Item mit **neuem Ordner** im fremden Home-Space ist jetzt auf beiden Flächen gesperrt (RE-1-Parität) — P10.5-9 damit ✅ statt ⚠️ — eine Regel für Web und MCP: RE-1 Ordner anlegen, RE-2 Ordner wechseln, P10-I/P10.5-N kein Verschieben in **oder aus** einem fremden Home-Space; BG-1: die Space-Liste füllt sich nach, wenn `/overview` spät kommt) |
-| 3 | Hygiene: LG-8 (P1-15), LG-7 | Ausführer | A | ✅ 2026-10-22 — **3.1–3.4 gebaut und geprobt**: `files.strip_image_metadata()` (JPEG/PNG/WebP, GIF unverändert, fail-closed `ValidationError`) + Aufruf in `Store.put_asset()` (**eine** Stelle für Web und MCP) · `scripts/asset_orphans.py` (LG-7, `--report`/`--move`, ein Commit) · 16 neue Tests · **Wegwerf 14/14 Zellen** (`probes/p105_b3_assets_probe.py`): GPS weg auf Web **und** MCP, Orientation bleibt, sauberes Bild byte-identisch, Waise gefunden und in den Papierkorb verschoben; Abnahme 10-12/10-13 ✅ |
-| 4 | Performance: PF-1, PF-4, Z1–Z4 | Ausführer (+ Claude Code Proben) | A | ✅ 2026-10-22 — **4.1–4.6 gebaut und geprobt**: `_overview()` zählt alle Eimer aus **einem** `store.search()`-Durchgang (P10.5-G, Rückfall über `_STORE_FETCH_LIMIT`), `folders`/`members` wandern in die Antwort · `asyncio.to_thread` für `_overview`/`_items_get`/`_graph_get` (Z2) · Client: nur noch `/overview`, 10 s Mindestpause für `focus`/`visibilitychange` (PF-4) · neu `static/js/loading.js` + `.is-loading`-Gerüst (Z3/Z4) · **M2-Bench Median 107,3 ms** (vorher 2405,6) · **`/health` hinter `/overview` 23 ms** (P10: 4757 ms) · Browser: 150 ms → kein Platzhalter, 400 ms → Platzhalter; Abnahme 10-14/15/16/17 ✅, 10-18 beim Nikinger nach Deploy A |
-| 5 | MCP-Schicht: PA-5 (FastMCP 4), LG-4 | Ausführer | B | ✅ 2026-10-22 — **5.1–5.6 gebaut und geprobt**: `fastmcp==4.1.3` (V207 ✅), `constraints.txt` neu aus frischem venv, Suite 1354 grün mit Compat an **und** aus (Warnungen als Fehler) · `proto` im Tool-Log (V219 ✅: `Context.request_context.protocol_version`) · neues Werkzeug `append_to_items` (LG-4, ≤ 20 Einträge, je Eintrag eigene `version`, Teilerfolg, Log `err:"partial"`) · Probe beider Ären in-process: `legacy` → `2025-11-25`, `auto` → `2026-07-28` · Smoke 17/17; Abnahme 10-19/20/21 ✅, 10-22 beim Nikinger nach Deploy B |
-| 6 | Anbieter: PA-1, PA-2, `/mcp`, PA-6, P10-J | Ausführer + Claude Code + Nikinger | B | ✅ 2026-10-22 — **6.0–6.5 gebaut und gemessen**: zweite Vergleichsregel `http://127.0.0.1:<port>` (Port explizit, kein `localhost`/`[::1]`, P10.5-O) + `application_type` ∈ {fehlend, null, native, web} · CSP `form-action` mit `http://127.0.0.1:*` · `/mcp` **ohne** Slash exakt bedient (`_ExactMcpMount`, kein 307) · PA-6 (Wurzel-`CLAUDE.md` eine Zeile) · **V209 ✅** (opencode 1.19.4), **V197 ✅** (Chromium folgt dem Consent-Redirect) · **DCR-Gegenlauf**: derselbe Request 400 → **201** · Suite **1376 grün** (1354 + 22) · **10-23/10-24/10-25 ✅**, **10-26 ✅** (2026-10-23 geklärt: die zwei Auslöser lagen im Messgerät, kein Produktcode — siehe Session-Block), 10-27/28 beim Nikinger nach Deploy B |
-| 7 | Darstellung: UI-1–UI-6, KA-5 | Ausführer (+ Claude Code Sichtung) | C | 🔄 2026-10-24 — **7.1–7.7 gebaut und gemessen** (HTML-404 für unbekannte `/ui`-Pfade · Wortmarke `static/logo.svg` · Tab-Titel folgt der Ansicht · vier Posten der Sichtung umgesetzt · Kontrast `--caution` 5,70:1 · Assignee-Filter in API und UI · `doing`-Ring auf der Karte) · Probe an der Wegwerf-Instanz, Gegenläufe je rot · **P10.5-32 bleibt ⬜ bis zur Bestätigung** — die Herleitung je Schritt steht im Session-Archiv (`SESSIONS_ARCHIVE.md`, Block 7.1–7.4) und in den Commits |
-| 8 | Karte: Gehirnkarte C2 | Ausführer (+ Claude Code Smoke/Sichtung) | C | 🔄 2026-10-24 — **8.1–8.8 gebaut und gemessen** (Lappen/Furchen/Zellen/Aktivierung in `graph.js`, KA-2 Layout-Ablage, KA-3 Suche/Filter, reduced motion 0 Ticks) · **Browser-Probe `probes/p105_b8_karte_probe.py` an der 200-Knoten-Wegwerf-Instanz: 4/4 Messungen grün, 3 Gegenläufe je rot** · **Smoke `p8_22_smoke.py` 5/5** (Ruhe 2712,1 ms ≤ 3000, Frame p95 1,7 ms ≤ 16,7, reduced motion **0** Frames) · **drei Fehler hat erst der Browser gefunden** (gezogener Knoten wurde zurückgezogen · Fokus blieb nach dem Zeigerwechsel · Trefferzahl wurde vom Layout-Hinweis überschrieben) — alle drei behoben und gewächtert · **Abnahme 10-36/38/39/40 ✅, 10-37 wartet auf die Sichtung** (4 Screenshots liegen vor) · **Befund: das Plan-Budget für `graph.js` ist überschritten** (+11,1 KB gzip statt +8 KB; davon +9,8 KB Kommentar, der Code selbst +2,9 KB) — Entscheidung beim Nikinger · **drei Pfade außerhalb der §3-Liste** (bewusst, datiert): `phase9_hardening/scripts/graph_reload_probe.mjs` (der P9-Harness malt die alte Strichzeichnung — ohne Anpassung wäre der P9-Wächter rot) · `phase10_5_finishing/{probes,tests}/` (Plan 8.8 verlangt Proben und Wächter) · `docs/screenshots/p105_b8_*.png` (Plan 8.8 verlangt die vier Bilder für die Sichtung) |
-| 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | ✅ 2026-10-24 — **9.1 RE-7 `created_by`** (Probe 12/12) · **9.2 RE-4 `rename_folder`** (Probe 13/13) · **9.3 RE-3 `rename_space`** (Probe 15/15) — alle drei gebaut und gemessen; Branch `p105-block9`, Merge **nach** Deploy C |
-| 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | D | ✅ 2026-10-24 — **10.1** LG-1 Volltext (`in_body`, Schalter) · **10.2** LG-2 serverseitig (`events.py`, Route, `timeout_graceful_shutdown=5`) · **10.3** LG-2 Client (`realtime.js`, Poll-Rückfall 120 s, Hinweisband P10.5-S) · **10.5 Probe**: 11/11 Zellen grün an der Wegwerf-Instanz (18810) — **Latenz 141,1 ms** (Grenze 2000), **Shutdown 5,22 s** (Grenze 10), Volltext 0 → 1 Treffer mit dem Schalter, Band „Geändert von alpha — neu laden?", unsichtbarer Space **ohne** Ereignis; **Gegenlauf rot** (Filter aus → das Ereignis kommt) — 33 neue Tests, 7 Gegenläufe |
-| 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | 🔄 2026-10-24 — **11.1 Vendor** (CodeMirror 5.65.16, **fünf** Dateien statt drei — gemessen: der UMD-Browser-Zweig der `markdown.min.js` löst `require("../xml/xml")` **nicht** auf) · **11.2 Nachlader** (`js/editor_cm.js`: CSS → Kern → Modus-Dateien, Promise gecacht, Fehler → `null` = Textarea/Rohmodus) · **11.3 Live-Editor** (`editor.js`: `getBody()`/`setBody()`, `setRawMode(on)`, Schalter „Rohtext", Probe 12/12 grün) |
-| 12 | Doku und Altlasten: DO-1, LG-6, AL-1 (Rest), AL-3, BG-2/BG-3 | Claude Code | — | ⬜ |
-| Z | Closeout P10.5 (Handover, Grafik, Rotationen) | Claude Code + Nikinger | — | ⬜ |
+| 0 | Haushalt: Verifikation, Phase-Head, INDEX-Luft, Register-Luft, DO-2, DO-3, Ausführer-Vorbedingung | Claude Code | — | ✅ 2026-10-22 |
+| 1 | Betrieb: BT-1, BT-2, BT-6 (+ `constraints.txt`) | Ausführer + Nikinger | A | ✅ 2026-10-22 |
+| 2 | Fehler, Parität, Regel: BG-1, RE-1, RE-2, P10-I, AL-1 | Ausführer (+ Claude Code Proben) | A | ✅ 2026-10-22 |
+| 3 | Hygiene: LG-8 (P1-15), LG-7 | Ausführer | A | ✅ 2026-10-22 |
+| 4 | Performance: PF-1, PF-4, Z1–Z4 | Ausführer (+ Claude Code Proben) | A | ✅ 2026-10-22 |
+| 5 | MCP-Schicht: PA-5 (FastMCP 4), LG-4 | Ausführer | B | ✅ 2026-10-22 |
+| 6 | Anbieter: PA-1, PA-2, `/mcp`, PA-6, P10-J | Ausführer + Claude Code + Nikinger | B | ✅ 2026-10-22 |
+| 7 | Darstellung: UI-1–UI-6, KA-5 | Ausführer (+ Claude Code Sichtung) | C | 🔄 2026-10-24 |
+| 8 | Karte: Gehirnkarte C2 | Ausführer (+ Claude Code Smoke/Sichtung) | C | 🔄 2026-10-24 |
+| 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | ✅ 2026-10-24 |
+| 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | D | ✅ 2026-10-24 |
+
+> **Die ausführlichen Statusspalten der Blöcke 0–10 stehen verbatim in
+> [`MODULSTATUS_ARCHIVE.md`](MODULSTATUS_ARCHIVE.md) (L3) — hier trägt der Modulstatus den
+> **Kurzstand**. Grund: der Head stand beim Bau von Block 11.4 über dem Softcap; die
+> Details der geschlossenen Blöcke bleiben im Archiv nachlesbar, der Head bleibt der
+> *live* Stand.
 
 ## Deploy-Tabelle
 
@@ -109,7 +113,7 @@ updated: 2026-10-24 (Block 11.3: der Live-Editor — ein Text, eine Quelle, kein
 | P10.5-48 | Shutdown ≤ 10 s mit offenen Streams | ✅ | 10.2 gebaut (`timeout_graceful_shutdown=5`, **V213**: uvicorn 0.54.0) · **10.5 Wegwerf**: SIGTERM (nur über die PID-Datei) bei **offenem Stream** → der Prozess ist nach **5,22 s** weg (Grenze 10); das Server-Log zeigt „Cancel 1 running task(s), timeout graceful shutdown exceeded" nach 5 s · **die Probe startet den Produktiv-Code** (`phase2_mcp/scripts/serve.py`), nicht eine Kopie — sonst würde sie eine Attrappe messen |
 | P10.5-49 | Live nach Deploy D: Ereignisse kommen über **beide** Eingänge an (V212 ✅) | ⬜ | — |
 | P10.5-50 | Budget: Erstaufruf ≤ 250 KB, Editor ≤ 80 KB, jede Datei gezählt | ⬜ | — |
-| P10.5-51 | ED-1: kein Moduswechsel, Live-Darstellung (Nikinger-Sichtung) | ⬜ | — |
+| P10.5-51 | ED-1: kein Moduswechsel, Live-Darstellung (Nikinger-Sichtung) | ⬜ | 11.3 + 11.4 gebaut · **Wegwerf `probes/p105_b11_live_probe.py`: 15 von 15 Zellen grün** — der Cursor steht nach dem Klick **exakt** auf dem geklickten Zeichen (ch 15/18/26 = erwartet), die Formatierungszeichen sind **nur auf der Cursorzeile** sichtbar, der Rohmodus zeigt jedes Zeichen, der Notausgang (Nachlader scheitert → Textarea) funktioniert, keine Seitenfehler · **V211 ✅**: die Verbergungs-Art ist **gemessen**, nicht geschätzt — `visibility: hidden` hält die Cursorposition und lässt die Zeile **nicht** springen (0,0 px), `display: none` **und** `font-size: 0` setzen den Cursor **2 Zeichen zu früh** (18 → 16, 26 → 24: genau die zwei verdeckten `**`) und lassen die Zeile um **15,66 px** springen · **Gegenlauf**: ohne den `setValue`-Fix in `editor.js` sind genau **drei** Zellen rot · **die Sichtung des Nikingers steht aus** — die Zeile wird erst ✅, wenn er das Urteil gefällt hat |
 | P10.5-52 | Roundtrip 10/10 byte-identisch, Öffnen macht nie „geändert" | ⬜ | — |
 | P10.5-53 | ED-2: Klick bei sauberem Editor schreibt mit `version`; bei geändertem nur Puffer | ⬜ | — |
 | P10.5-54 | ED-3: Vokabular gerendert, unbekannte Klasse wörtlich; `get_item` zeigt Rohtext | ⬜ | — |
@@ -158,48 +162,59 @@ updated: 2026-10-24 (Block 11.3: der Live-Editor — ein Text, eine Quelle, kein
 - ~~**Befund 2.5 (P10.5-9 ⚠️)**~~ ✅ 2026-10-22 (Block-2-Nachzug, Nikinger-Entscheidung „ja") — `create_item(space=, folder=<neu>)` und `POST /api/v1/items` legen im fremden Home-Space mit `write:` **keinen** neuen Ordner mehr an; die Regel ist `permissions.manages_space()` (eigener Space oder Team-Space mit Schreibrecht), auf beiden Flächen. Ohne `folder` bleibt das Anlegen an der Space-Wurzel erlaubt (P6-U).
 
 ## Startauftrag — Block 7 (Darstellung: UI-1–UI-6, KA-5) · Ausführer
-> **Gebaut** (7.1–7.7, 2026-10-23/24) · die ausführliche Fassung und die **zwei Korrekturen gegen den
-> 📕-Plan** stehen in `STARTUPTRAG_ARCHIVE.md`. **P10.5-32 bleibt ⬜ bis zur Bestätigung des
-> Nikingers**; nichts davon ist deployed — `v3.1.7` steht aus.
+> **Verbatim verschoben** nach `STARTUPTRAG_ARCHIVE.md` (`scripts/move_sections.py`) — dort unter derselben Überschrift.
 
 ## Startauftrag — Block 9 (Rechte und Namen: RE-7, RE-4, RE-3) · Ausführer
-> **Gebaut** (9.1–9.3, 2026-10-24) · die ausführliche **Ankündigung der drei P1-Öffnungen**
-> (12) RE-7 `created_by` · (13) RE-4 `Store.rename_folder()` · (14) RE-3 `Store.rename_space()`
-> — steht verbatim in `STARTUPTRAG_ARCHIVE.md`. **P10.5-41/42/43/44 ✅.** Der Branch `p105-block9`
-> wird **erst nach dem Deploy C** nach `main` gemergt (`deploy.sh` klont das lokale `main` —
-> sonst liefert `v3.1.7` den Block-9-Stand mit aus).
+> **Verbatim verschoben** nach `STARTUPTRAG_ARCHIVE.md` (`scripts/move_sections.py`) — dort unter derselben Überschrift.
 
-## Session stopped — 2026-10-24 (Block 11.3: der Live-Editor — ein Text, eine Quelle, kein Moduswechsel)
+## Session stopped — 2026-10-24 (Block 11.4: die Live-Darstellung — V211 gemessen, nicht behauptet)
 
-**Ergebnis.** `editor.js` ist auf den Live-Editor umgestellt: **ein** Text, **eine** Quelle.
-`getBody()`/`setBody(text)` ersetzen jeden direkten Zugriff auf `editorTextareaEl.value`
-(der Wächter `tests/test_editor_live.py` prüft das — neun Tests, jeder mit einer Gegenprobe am
-Rand). `setEditorMode()` ist **weg**, `setRawMode(on)` ist da, der Schalter heißt „Rohtext", und
-die Vorgabe beim Öffnen ist der **Live-Modus** (kein Moduswechsel mehr, ED-1). Die
-Formatierhilfen laufen über `_textUndAuswahl()`/`_ersetze()` — **ein** Code für Live-Editor und
-Notausgang, nicht zwei.
+**Ergebnis.** Die Live-Darstellung steht: das CM5-Grundlayout, die Token-Stile (`.cm-header-1…6`,
+`.cm-strong`, `.cm-em`, `.cm-link`, `.cm-quote`, `.cm-comment`), der gedimmte `.cm-formatting` und
+die **Cursorzeile** (`sfx-active-line` auf dem **Wrap**-Layer — der Background-Layer ist eine
+eigene Ebene hinter der Zeile, dort findet der Nachfahr die Formatierungszeichen nicht). Der
+Rohmodus (`.is-raw`) blendet die Hervorhebung weg.
 
-**Der Notausgang ist ein vollwertiger Editor.** Ist CodeMirror nicht ladbar, trägt die Textarea
-den Text, und alle Aktionen funktionieren unverändert (ED-5). Der Live-Editor entsteht **beim
-Öffnen** eines Items, nicht beim Laden der Seite (der Erstaufruf bleibt ohne Editor — das
-Budget „Erstaufruf" und „Editor nachgeladen" sind zwei getrennte Messungen).
+**V211 ist gemessen, nicht behauptet.** Der Plan verlangt den Vergleich `display: none` gegen
+`font-size: 0`, Kriterium ist die **korrekte Cursorposition nach dem Klick**. Die Probe fährt
+**alle drei** Arten an der Wegwerf-Instanz (`probes/p105_b11_live_probe.py`, Port 18811) und misst
+je **drei** Klickstellen: `visibility: hidden` hält den Cursor **exakt** (ch 15/18/26 = erwartet)
+und die Zeile springt **nicht** (0,0 px); `display: none` **und** `font-size: 0` setzen ihn
+**2 Zeichen zu früh** (18 → 16, 26 → 24 — genau die Zahl der verdeckten `**`) und die Zeile
+springt beim Hineinwechseln um **15,66 px**. **Ausgeliefert wird `visibility: hidden`.**
 
-**Gemessen an der Wegwerf-Instanz** (die Probe aus 10.5, auf den Live-Editor umgestellt):
-**12 von 12 Zellen grün** — der Editor lädt, das **Tippen über die Tastatur** landet im Editor,
-der getippte Text steht nach dem fremden Write **noch** drin, das Band erscheint. Latenz
-**105,0 ms**, Shutdown **5,17 s**. Der Gegenlauf bleibt rot (genau eine Zelle).
+**Drei Fehler lagen im Messgerät, nicht im Produkt.** Die CSP (`style-src 'self'`, ohne
+`'unsafe-inline'`) **blockiert Inline-`<style>`** — die erste Fassung schaltete die Variante so
+um und maß **drei gleiche Werte**: grün, ohne etwas gemessen zu haben. Die Variante kommt jetzt
+**same-origin** (`page.route` auf `/ui/static/app.css`) und wird **im Browser zurückgelesen**
+(`--p105-variante`). Der Anker war **deklarations**spezifisch (`visibility: hidden`), sonst traf
+er die **Farb**-Regel `.CodeMirror .cm-formatting` — dieselbe Datei, und die Verbergung blieb
+unberührt. Und `display: none` lässt `visibility` auf „visible" stehen: sichtbar ist nur, was
+**Geometrie** hat (Breite > 0).
 
-**Ein Flake, benannt statt weggefunden:** im ersten Suite-Lauf war `test_graph_c2.py ::
-test_der_gegenlauf_macht_die_messung_rot[zellen-zellen]` rot, im zweiten grün, und einzeln
-grün — der Graph-Test (Block 8) hat mit dem Editor nichts zu tun; es ist eine Zeitmessung
-unter Last.
+**Ein Produktfehler, gefunden und behoben.** `cm.setValue()` ersetzt das ganze Dokument und
+nimmt die Zeilenklassen mit; CM5 feuert dabei **kein** `cursorActivity`. `clearDetail()` setzt
+`cm` **nicht** auf null — beim **Wechsel** auf ein zweites Item bleibt der Editor also geladen,
+und `setBody` setzt ihn über `cm.setValue`. Steht der Cursor dabei auf Zeile 0 (so ist es
+direkt nach dem Öffnen), greift die Kurzprüfung in `_cursorZeileSetzen()`
+(`cmCursorZeile === zeile`) — und die Cursorzeile bleibt **unmarkiert**, ihre
+Formatierungszeichen unsichtbar. `setBody()` setzt den Marker-Zustand deshalb **vor** dem
+`setValue` zurück und setzt ihn danach neu. **Gegenlauf:** ohne den Fix sind genau **drei** Zellen
+rot (`cursorzeile_markiert`, `cursorzeile_markiert_nach_zurueck`,
+`formatierung_auf_der_cursorzeile_sichtbar`).
 
-**Suite 1522 grün** (347,7 s), `doc_health` 0, `ui_budget` 5/5.
+**Weiter gemessen (Block 11.3 unverändert):** der Notausgang (der Nachlader scheitert → die
+Textarea trägt den Text), der Rohmodus (jedes Zeichen sichtbar), keine Seitenfehler.
+**15 von 15 Zellen grün** (`probes/p105_b11_live.json`); der Gegenlauf liegt daneben
+(`p105_b11_live_gegenlauf.json`). Sieben neue Wächter in `tests/test_probe_b11_live.py` — einer
+prüft, dass **jede** Variante wirklich ausgeliefert wurde (die CSP-Falle), einer die
+V211-Entscheidung an den Beleg, einer den `setValue`-Fix am Quelltext.
 
-**Was noch nicht gebaut ist.** 11.4 (die Live-Darstellung: die Stile für `.cm-header-1…6`,
-`.cm-strong`, `.cm-em`, `.cm-link`, `.cm-quote`, der gedimmte `.cm-formatting`, die
-Cursorzeile), ED-2 (To-do-Kästchen), ED-3 (Stufe 2), das Budget (11.7) und der Roundtrip
-(11.8). Die Vorschau-Paneele im Editor wird **nicht mehr befüllt** — der Live-Editor ist die
-Ansicht; die Lesesicht fremder Items rendert weiter über `markdown.js`.
+**Suite 1529 grün** (345,98 s), `doc_health` 0, `ui_budget` 5/5.
 
-**Nächster Schritt.** 11.4: das CSS der Live-Darstellung und der Raw-Modus (`.is-raw`).
+**Was noch nicht gebaut ist.** ED-2 (To-do-Kästchen, 11.5), ED-3 (Stufe 2, 11.6), das Budget
+(11.7) und der Roundtrip (11.8). **P10.5-51 bleibt ⬜** — die Live-Darstellung ist gebaut und
+gemessen, aber das **Augen-Urteil** des Nikingers steht aus.
+
+**Nächster Schritt.** 11.7 (der Budget-Wächter „Editor nachgeladen ≤ 80 KB") — das ist die
+Abnahme P10.5-50 und der kürzeste Weg zu einer geschlossenen Block-11-Zeile; danach 11.5 (ED-2).

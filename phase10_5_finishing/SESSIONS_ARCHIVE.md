@@ -21,6 +21,41 @@ sucht, findet ihn hier — nicht im Head.
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
 
+## Session stopped — 2026-10-24 (Block 11.3: der Live-Editor — ein Text, eine Quelle, kein Moduswechsel)
+
+**Ergebnis.** `editor.js` ist auf den Live-Editor umgestellt: **ein** Text, **eine** Quelle.
+`getBody()`/`setBody(text)` ersetzen jeden direkten Zugriff auf `editorTextareaEl.value`
+(der Wächter `tests/test_editor_live.py` prüft das — neun Tests, jeder mit einer Gegenprobe am
+Rand). `setEditorMode()` ist **weg**, `setRawMode(on)` ist da, der Schalter heißt „Rohtext", und
+die Vorgabe beim Öffnen ist der **Live-Modus** (kein Moduswechsel mehr, ED-1). Die
+Formatierhilfen laufen über `_textUndAuswahl()`/`_ersetze()` — **ein** Code für Live-Editor und
+Notausgang, nicht zwei.
+
+**Der Notausgang ist ein vollwertiger Editor.** Ist CodeMirror nicht ladbar, trägt die Textarea
+den Text, und alle Aktionen funktionieren unverändert (ED-5). Der Live-Editor entsteht **beim
+Öffnen** eines Items, nicht beim Laden der Seite (der Erstaufruf bleibt ohne Editor — das
+Budget „Erstaufruf" und „Editor nachgeladen" sind zwei getrennte Messungen).
+
+**Gemessen an der Wegwerf-Instanz** (die Probe aus 10.5, auf den Live-Editor umgestellt):
+**12 von 12 Zellen grün** — der Editor lädt, das **Tippen über die Tastatur** landet im Editor,
+der getippte Text steht nach dem fremden Write **noch** drin, das Band erscheint. Latenz
+**105,0 ms**, Shutdown **5,17 s**. Der Gegenlauf bleibt rot (genau eine Zelle).
+
+**Ein Flake, benannt statt weggefunden:** im ersten Suite-Lauf war `test_graph_c2.py ::
+test_der_gegenlauf_macht_die_messung_rot[zellen-zellen]` rot, im zweiten grün, und einzeln
+grün — der Graph-Test (Block 8) hat mit dem Editor nichts zu tun; es ist eine Zeitmessung
+unter Last.
+
+**Suite 1522 grün** (347,7 s), `doc_health` 0, `ui_budget` 5/5.
+
+**Was noch nicht gebaut ist.** 11.4 (die Live-Darstellung: die Stile für `.cm-header-1…6`,
+`.cm-strong`, `.cm-em`, `.cm-link`, `.cm-quote`, der gedimmte `.cm-formatting`, die
+Cursorzeile), ED-2 (To-do-Kästchen), ED-3 (Stufe 2), das Budget (11.7) und der Roundtrip
+(11.8). Die Vorschau-Paneele im Editor wird **nicht mehr befüllt** — der Live-Editor ist die
+Ansicht; die Lesesicht fremder Items rendert weiter über `markdown.js`.
+
+**Nächster Schritt.** 11.4: das CSS der Live-Darstellung und der Raw-Modus (`.is-raw`).
+
 ## Session stopped — 2026-10-24 (Block 11.2: der Nachlader — CSS, dann der Kern, dann die Modus-Dateien)
 
 **Ergebnis.** `static/js/editor_cm.js` (neu) lädt den Editor **nach**: erst das CSS, dann

@@ -59,6 +59,8 @@ var editorPreviewEl;
 var cm = null;
 //: Laedt der Editor gerade? (Dann darf kein zweiter Ladevorgang starten.)
 var cmLaden = false;
+//: Die zuletzt markierte Cursorzeile (fuer `sfx-active-line`, Schritt 11.4).
+var cmCursorZeile = null;
 var saveButtonEl;
 var archiveButtonEl;
 var closeButtonEl;
@@ -220,7 +222,21 @@ export function getBody() {
 
 export function setBody(text) {
   if (cm) {
+    // P10.5, Block 11, Schritt 11.4: `setValue` **ersetzt das ganze Dokument** -- und die
+    // Zeilenklassen haengen am Dokument, nicht am Editor. Die Cursorzeile verliert dabei
+    // ihre Markierung (`sfx-active-line`), ohne dass CM5 ein `cursorActivity` feuert: der
+    // Cursor steht danach auf Zeile 0, `cmCursorZeile` steht auch auf 0, und die
+    // Kurzpruefung in `_cursorZeileSetzen()` haelt die alte (falsche) Meinung.
+    //
+    // **Gemessen am 2026-10-24 an der Wegwerf-Instanz:** nach dem Wechsel auf ein zweites
+    // Item war **keine** Zeile mehr mit `sfx-active-line` markiert -- die Formatierungszeichen
+    // der Cursorzeile blieben unsichtbar (der Gegenlauf der Probe bricht genau diese Zellen:
+    // `cursorzeile_markiert`, `cursorzeile_markiert_nach_zurueck`,
+    // `formatierung_auf_der_cursorzeile_sichtbar`).
+    // Deshalb: den Marker-Zustand **vor** dem `setValue` zuruecksetzen und danach neu setzen.
+    cmCursorZeile = null;
     cm.setValue(text);
+    _cursorZeileSetzen();
     return;
   }
   if (editorTextareaEl) editorTextareaEl.value = text;
@@ -423,6 +439,10 @@ function _editorBereit() {
       viewportMargin: 20,
     });
     cm.on("change", _editorGeaendert);
+    // P10.5, Block 11, Schritt 11.4 (ED-1): die **Cursorzeile** traegt die Klasse
+    // `sfx-active-line` -- sie ist die Zeile, in der gerade geschrieben wird. Dort bleiben
+    // auch die Formatierungszeichen sichtbar (s. `app.css`).
+    cm.on("cursorActivity", function () { _cursorZeileSetzen(); });
     if (cm.getValue() !== text) cm.setValue(text);
     // Der Editor kann mitten im Tippen eintreffen — der Cursor bleibt, wo der Mensch war.
     try {
@@ -430,7 +450,28 @@ function _editorBereit() {
       cm.focus();
     } catch (err) { /* der Cursor ist kein Pfad */ }
     setRawMode(state.mode === "raw");
+    // Die Cursorzeile von Anfang an markieren (CM feuert „cursorActivity" erst bei einer
+    // Bewegung).
+    _cursorZeileSetzen();
   });
+}
+
+// P10.5, Block 11, Schritt 11.4 (ED-1): die Cursorzeile markieren. **Nur eine** Klasse an
+// **einer** Zeile -- sonst sammeln sich die Markierungen ueber die Sitzung.
+function _cursorZeileSetzen() {
+  if (!cm) return;
+  var zeile = cm.getCursor().line;
+  if (cmCursorZeile === zeile) return;
+  if (cmCursorZeile !== null) {
+    cm.removeLineClass(cmCursorZeile, "wrap", "sfx-active-line");
+  }
+  // **Der „wrap"-Layer**, nicht der „background"-Layer: nur der Wrap-Layer **enthaelt den
+  // Text** -- der Background-Layer ist eine eigene Ebene hinter der Zeile (dort landet die
+  // Klasse, ohne dass ein Nachfahr die Formatierungszeichen finden koennte). Gemessen am
+  // 2026-10-24 im echten Browser (CM5 5.65.16): die Klasse sitzt am Wrap-Layer, und
+  // `.sfx-active-line .cm-formatting` trifft die Formatierungszeichen der Cursorzeile.
+  cm.addLineClass(zeile, "wrap", "sfx-active-line");
+  cmCursorZeile = zeile;
 }
 
 // **Eine Aenderung, ein Ort:** der Live-Editor feuert „change", die Textarea feuert „input".

@@ -161,3 +161,16 @@ Ansicht; Screenshots für 10-30/10-32/10-35; **Wegwerf statt Live** (Freigabe 20
 > **Wichtig für die Reihenfolge:** `deploy.sh` klont das **lokale `main`**. Block 9 wird deshalb auf
 > einem eigenen Branch (`p105-block9`) gebaut und **erst nach dem Deploy C** nach `main` gemergt —
 > sonst liefert `v3.1.7` den Block-9-Stand mit aus.
+
+## Startauftrag — Block 7 (Darstellung: UI-1–UI-6, KA-5) · Ausführer
+> **Gebaut** (7.1–7.7, 2026-10-23/24) · die ausführliche Fassung und die **zwei Korrekturen gegen den
+> 📕-Plan** stehen in `STARTUPTRAG_ARCHIVE.md`. **P10.5-32 bleibt ⬜ bis zur Bestätigung des
+> Nikingers**; nichts davon ist deployed — `v3.1.7` steht aus.
+
+
+## Startauftrag — Block 9 (Rechte und Namen: RE-7, RE-4, RE-3) · Ausführer
+> **Gebaut** (9.1–9.3, 2026-10-24) · die ausführliche **Ankündigung der drei P1-Öffnungen**
+> (12) RE-7 `created_by` · (13) RE-4 `Store.rename_folder()` · (14) RE-3 `Store.rename_space()`
+> — steht verbatim in `STARTUPTRAG_ARCHIVE.md`. **P10.5-41/42/43/44 ✅.** Der Branch `p105-block9`
+> wird **erst nach dem Deploy C** nach `main` gemergt (`deploy.sh` klont das lokale `main` —
+> sonst liefert `v3.1.7` den Block-9-Stand mit aus).

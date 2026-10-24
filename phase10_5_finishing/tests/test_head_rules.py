@@ -104,3 +104,78 @@ def test_the_acceptance_sum_matches_the_table():
         f"({counted['✅']}, {counted['⚠️']}, {counted['⬜']}) — eine Zeile abhaken heißt auch, "
         f"die Summe nachzuziehen"
     )
+
+
+#: Das L3-Archiv, in das die ausführlichen Statusspalten der geschlossenen Blöcke wanderten.
+MODULSTATUS_ARCHIV = REPO_ROOT / "phase10_5_finishing" / "MODULSTATUS_ARCHIVE.md"
+
+
+def _modulstatus_zeilen(text: str) -> dict[str, list[str]]:
+    """Die Modulstatus-Zeilen je Block.
+
+    Gesucht wird **an der Tabellenkopfzeile** (`| Block | Inhalt (Register) |`), nicht an einer
+    Überschrift: das L3-Archiv trägt die Kopfzeile in der L1-Karte und im Fließtext, aber keine
+    `##`-Überschrift mit dem Wort „Modulstatus" — und der Head hat mehrere Tabellen.
+    """
+    zeilen: dict[str, list[str]] = {}
+    gefunden = False
+    for line in text.split("\n"):
+        if line.startswith("| Block | Inhalt (Register) |"):
+            gefunden = True
+            continue
+        if not gefunden:
+            continue
+        if not line.startswith("|"):
+            break
+        spalten = [s.strip() for s in line.split("|")]
+        if len(spalten) < 6 or not spalten[1].isdigit():
+            continue
+        zeilen.setdefault(spalten[1], []).append(line)
+    return zeilen
+
+
+def test_the_modulstatus_short_rows_and_the_archive_agree():
+    """**Der Kurzstand im Head und die Vollzeilen im Archiv sind derselbe Stand.**
+
+    Der Modulstatus wurde am 2026-10-24 (Block 11.4) aufgeteilt: der Head trägt den **Kurzstand**
+    (Block, Inhalt, Zuständigkeit, Deploy, Status), das L3-Archiv die **ausführlichen**
+    Statusspalten. Die vier Spalten, die der Head noch trägt, müssen im Archiv **byte-gleich**
+    wiederkehren — sonst wäre der Head eine Zusammenfassung, die irgendwann falsch wird.
+    """
+    head = HEAD.read_text(encoding="utf-8")
+    assert MODULSTATUS_ARCHIV.exists(), f"das Archiv fehlt: {MODULSTATUS_ARCHIV}"
+    archiv = MODULSTATUS_ARCHIV.read_text(encoding="utf-8")
+
+    kurz_zeilen = _modulstatus_zeilen(head)
+    voll_zeilen = _modulstatus_zeilen(archiv)
+    assert kurz_zeilen, "der Modulstatus des Heads trägt keine Block-Zeilen"
+    assert voll_zeilen, "das Archiv trägt keine Block-Zeilen"
+
+    for nummer, zeilen in kurz_zeilen.items():
+        assert nummer in voll_zeilen, (
+            f"der Block {nummer} steht im Head, aber nicht im Archiv — die Aufteilung ist "
+            "unvollständig"
+        )
+        kurz = zeilen[0]
+        voll = voll_zeilen[nummer][0]
+        for spalte in range(1, 5):     # Block, Inhalt, Wer, Deploy
+            assert kurz.split("|")[spalte] == voll.split("|")[spalte], (
+                f"Block {nummer}: Spalte {spalte} weicht zwischen Head und Archiv ab — "
+                f"{kurz.split('|')[spalte]!r} != {voll.split('|')[spalte]!r}"
+            )
+        assert len(kurz) <= len(voll), (
+            f"Block {nummer}: die Kurzzeile im Head ist länger als die Vollzeile im Archiv — "
+            "dann ist nichts verschoben worden"
+        )
+
+
+def test_the_head_stays_under_the_softcap():
+    """**Der Softcap ist eine Obergrenze, kein Ziel** — der Head stand am 2026-10-24 (Block 11.4)
+    bei **43.183 B**, über den 40.960 B. Erschöpft ist die Reserve für die nächsten Blöcke, sonst
+    muss wieder ein Abschnitt verschoben werden — und das ist teurer als der rechtzeitige Schnitt.
+    """
+    groesse = len(HEAD.read_bytes())
+    assert groesse <= 40 * 1024, (
+        f"der Phase-Head ist {groesse} B und damit über dem Softcap (40.960 B) — "
+        "einen Abschnitt verbatim in ein L3-Archiv verschieben, nicht die Grenze heben"
+    )

@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-10-24 (Block 10.5: die Probe ist grün — P10.5-45/46/47/48 ✅; Größen von Phase-Head und Archiven nachgezogen, `FREIGABEN_ARCHIVE.md` neu) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
+updated: 2026-10-24 (B11.4: V211 gemessen; zwei neue L3-Archive) | 2026-10-24 (Block 10.5: die Probe ist grün — P10.5-45/46/47/48 ✅; Größen von Phase-Head und Archiven nachgezogen, `FREIGABEN_ARCHIVE.md` neu) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 ---
 # Doc Index (L0)
 
@@ -42,7 +42,8 @@ updated: 2026-10-24 (Block 10.5: die Probe ist grün — P10.5-45/46/47/48 ✅; 
 
 - [phase10_inventory/CLAUDE.md](../phase10_inventory/CLAUDE.md) — 📗 ~8KB · Phase-10-Head: Modulstatus Steps 0–4/Z (✅; Step 4 = Plan P10.5, 2026-10-21), ein Session-Block (Planungschat)
 - [phase10_inventory/SESSIONS_ARCHIVE.md](../phase10_inventory/SESSIONS_ARCHIVE.md) — 📦 ~27KB · ältere Session-Blöcke, verbatim
-- [phase10_inventory/BAUSTELLENREGISTER.md](../phase10_inventory/BAUSTELLENREGISTER.md) — 📗 **40.781 B** (179 B Luft — **DO-2 verlangt 3.000 B; die Luft war schon vor Block 10 knapp**) — Belege nach `messung/` · 76 Baustellen; die Arbeitsliste für P10.5 (Tor P10-8 offen seit 2026-10-21)
+- [phase10_inventory/BAUSTELLENREGISTER.md](../phase10_inventory/BAUSTELLENREGISTER.md) — 📗 **30.822 B** (10.138 B Luft) — 76 Baustellen; die Arbeitsliste für P10.5 (Tor P10-8 offen) · die **geschlossenen** Zeilen zeigen auf `REGISTER_ARCHIVE.md`
+- [phase10_inventory/REGISTER_ARCHIVE.md](../phase10_inventory/REGISTER_ARCHIVE.md) — 📦 **17.549 B** · die **geschlossenen** Registerzeilen (26), verbatim (2026-10-24 gewandert)
 - [phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md](../phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md) — 📦 **5.615 B** · L3-Archiv der Entscheidungsliste D-1–D-18 des Phase-10-Registers — jede Frage, ihre Empfehlung und die Antwort des Nikingers, verbatim; am 2026-10-22 aus dem Register gewandert (P10.5 Block 0, Schritt 0.8)
 - [phase10_inventory/UPDATES_ARCHIVE.md](../phase10_inventory/UPDATES_ARCHIVE.md) — 📦 **4.509 B** · L3-Archiv der `updated:`-Fäden des Phase-10-Registers, verbatim — am 2026-10-24 rotiert, weil das Register an der Grenze stand
 - [phase10_inventory/messung/M1_browser.md](../phase10_inventory/messung/M1_browser.md) — 📗 ~13KB · M1: Browser-Messung (Firefox/Safari, Funnel/Domain): `/overview` 4,8–5,2 s auf allen Wegen, Stau hinter `overview`; D-3-Ziele Z1–Z4 (> 200 ms Ladeanimation)
@@ -57,13 +58,14 @@ updated: 2026-10-24 (Block 10.5: die Probe ist grün — P10.5-45/46/47/48 ✅; 
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing — alle Baustellen schließen; Plan `docs/concepts/phase10_5_finishing_plan.md`, Ausführer M3.1 Flash als Open-Test)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **40804 B** · Phase-10.5-Head: Modulstatus der Blöcke 0–12/Z, Deploy-Tabelle A–D, Abnahmestand P10.5-1–61 (42 ✅ · 0 ⚠️ · 19 ⬜), offene Punkte beim Nikinger, ein Session-Block (≤ 4 KiB, DO-3)
-- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **88365 B** · L3-Archiv der älteren Session-Blöcke dieser Phase, verbatim, newest-first
-- [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **13420 B** · L3-Archiv der **Startaufträge von Block 7 und Block 9** (verbatim verschoben 2026-10-23 bzw. 2026-10-24) — Schritte 7.4–7.7 und die Ankündigung der drei P1-Öffnungen
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **36.972 B** · Phase-10.5-Head: Modulstatus der Blöcke 0–12/Z, Deploy-Tabelle A–D, Abnahmestand P10.5-1–61 (42 ✅ · 0 ⚠️ · 19 ⬜), offene Punkte beim Nikinger, ein Session-Block (≤ 4 KiB, DO-3)
+- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **90673 B** · L3-Archiv der älteren Session-Blöcke dieser Phase, verbatim, newest-first
+- [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **14291 B** · L3-Archiv der **Startaufträge von Block 7 und Block 9** (verbatim verschoben 2026-10-23 bzw. 2026-10-24) — Schritte 7.4–7.7 und die Ankündigung der drei P1-Öffnungen
 
 
 
 - [phase10_5_finishing/FREIGABEN_ARCHIVE.md](../phase10_5_finishing/FREIGABEN_ARCHIVE.md) — 📦 **3.577 B** · die Freigaben der Phase 10.5, verbatim aus dem Head verschoben
+- [phase10_5_finishing/MODULSTATUS_ARCHIVE.md](../phase10_5_finishing/MODULSTATUS_ARCHIVE.md) — 📦 **8.581 B** · die **ausführlichen** Statusspalten der Blöcke 0–10 (11), verbatim (2026-10-24 gewandert)
 - [phase10_5_finishing/UPDATES_ARCHIVE.md](../phase10_5_finishing/UPDATES_ARCHIVE.md) — 📦 **11465 B** · L3-Archiv der älteren `updated:`-Fäden des Phase-10.5-Heads, verbatim, newest-first (rotiert 2026-10-23 mit `scripts/rotate_index_updates.sh`, wie beim Phase-9-Head)
 
 ## Phase 8.6 — ✅ abgeschlossen 2026-09-19 (UI-Politur, live `v3.0.2`; zwei Pläne)
@@ -186,7 +188,7 @@ doppelt hier gelistet.)*
 
 ## Project-wide session log (Wurzel-Current-State-Archiv)
 
-- [docs/INDEX_ENTRIES_ARCHIVE.md](./INDEX_ENTRIES_ARCHIVE.md) — 📦 **46.456 B** · L3-Archiv der **datierten Nachträge aus den Einträgen dieser Karte**, verbatim, ein Abschnitt je Karte in der Reihenfolge der Karte (nicht newest-first — wer einen Nachtrag sucht, sucht ihn über den Dateinamen, nicht über ein Datum). Angelegt am 2026-10-03, weil die Karte bei **71.573 B** stand und **37.391 B** davon Nachträge in 43 von 93 Einträgen waren — mehr als die Hälfte, und die seit Wochen als ungeklärt geführte Ursache der Überschreitung (P9-3/V145). **Regel für die nächste Session:** eine Kartenzeile bekommt wieder einen datierten Nachtrag, *wenn* er kurz ist — `test_no_entry_line_carries_a_dated_addendum_any_more` verbietet sie vollständig, und das ist Absicht: die Karte ist Stand, das Archiv ist Chronik
+- [docs/INDEX_ENTRIES_ARCHIVE.md](./INDEX_ENTRIES_ARCHIVE.md) — 📦 **46.456 B** · L3-Archiv der **datierten Nachträge aus den Einträgen dieser Karte**, verbatim, ein Abschnitt je Karte in der Reihenfolge der Karte (nicht newest-first). **Regel:** eine Kartenzeile bekommt **keinen** datierten Nachtrag mehr (`test_no_entry_line_carries_a_dated_addendum_any_more`) — die Karte ist **Stand**, das Archiv ist **Chronik**
 - [docs/INDEX_KURZUNG_ARCHIVE.md](./INDEX_KURZUNG_ARCHIVE.md) — 📦 **11.961 B** · L3-Archiv der aus der Karte gekürzten Texte — die acht Abschnittsköpfe und fünf Kartenzeilen-Chroniken, verbatim (die letzten zwei am 2026-10-24, DO-2-Luft); die Karte trägt wieder Stand, dieses Archiv die Chronik des Kürzens
 
 - [docs/INDEX_UPDATES_ARCHIVE.md](./INDEX_UPDATES_ARCHIVE.md) — 📦 **19.557 B** · L3-Archiv der `updated:`-Kette **dieser** Datei, verbatim, newest-first. Erste Rotation 2026-09-19 von Hand; **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
