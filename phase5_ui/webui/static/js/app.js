@@ -18,6 +18,7 @@ import { init as initUpdates } from "./updates.js";
 import { init as initSpaces, closeRemoveSpaceDialog } from "./spaces.js";
 import { init as initSettings, closeRightmost } from "./settings.js";
 import { init as initGraph, loadGraph as loadGraphPanel } from "./graph.js";
+import { init as initRealtime, isOpen as realtimeOpen } from "./realtime.js";
 
 // -- Bootstrap: Übernahme des CSRF-Tokens von der Login-Erfolgsseite (Plan-Abweichung 2,
 // phase5_ui/CLAUDE.md Session-Block 2026-08-05) --------------------------------------------
@@ -396,7 +397,7 @@ function initShell() {
 
   // -- Zähler-Synchronisation (Meldung des Nikingers: „wenn eine neue Notiz dazu kommt, geht der
   // Counter nicht hoch") -----------------------------------------------------------------------
-  // Reines Polling auf der bereits vorhandenen REST-API — P5 schließt Realtime/WebSocket aus
+  // Reines Polling auf der bereits vorhandenen REST-API — P5 schloss Realtime/WebSocket aus
   // (Plan §0.5), nicht ein periodisches Nachfragen einer bestehenden Route. `loadOverview()`
   // fasst ausschließlich Baum-Zähler und die (ohnehin nur ohne offenes Item sichtbare)
   // Übersichtsseite an, nie den Editor — sicher neben einer laufenden Bearbeitung. 20s statt der
@@ -404,12 +405,24 @@ function initShell() {
   // (`api.py :: _overview()`), 5s wäre für einen Zwei-Personen-Server unnötig oft. Pausiert,
   // solange der Tab nicht sichtbar ist, holt dafür sofort bei Rückkehr/Fokus nach.
   //
+  // **[Datierte Korrektur, P10.5 Block 10, Schritt 10.3 — 2026-10-24]:** der Absatz oben
+  // beschrieb den Poll als den **einzigen** Weg der Zähler-Synchronisation — seit diesem
+  // Block trägt der Ereignis-Stream (`GET /api/v1/events`) die Änderungen, und der Poll ist
+  // nur noch der **Rückfall** (siehe `COUNTER_POLL_FALLBACK_MS` unten). Die Begründung des
+  // Intervalls (20 s) gilt für den Rückfall nicht mehr — dort sind es 120 s.
+  //
   // P10.5, Block 4 (2026-10-22, PF-4): der Intervall bleibt bei 20 s, aber `focus` und
   // `visibilitychange` bekommen eine **Mindestpause von 10 s**. Vorher feuerte jeder
   // Tab-Wechsel sofort einen `/overview` — auf der langsamen Strecke (M1: 4,8 s) stapelten
   // sich die Anfragen, und ein Space-Wechsel wartete dann hinter dem eigenen Poll (Z2).
   var COUNTER_POLL_MS = 20000;
   var COUNTER_MIN_PAUSE_MS = 10000;
+  // P10.5, Block 10, Schritt 10.3 (LG-2): der Poll ist jetzt der **Rueckfall**. Solange der
+  // Ereignis-Stream offen ist, traegt er die Aenderungen -- der Poll laeuft dann gar nicht
+  // (er wuerde dieselben Daten zweimal holen). Faellt der Stream aus (kein SSE im Browser,
+  // Proxy puffert, Seite war schlief), uebernimmt der Poll mit **120 s** Abstand. Fokus und
+  // Sichtbarkeit loesen weiter aus -- mit der Mindestpause von oben (PF-4).
+  var COUNTER_POLL_FALLBACK_MS = 120000;
   var lastPollAt = 0;
 
   function pollCounters(options) {
@@ -429,7 +442,13 @@ function initShell() {
     List.loadOverview().catch(reportUnexpectedError);
   }
 
-  window.setInterval(function () { pollCounters(); }, COUNTER_POLL_MS);
+  window.setInterval(function () {
+    // Der Stream offen? Dann traegt er die Aenderungen -- der Poll waere doppelt.
+    if (realtimeOpen()) return;
+    // Ohne Stream: nur alle 120 s (der Intervall above prueft nur alle 20 s).
+    if (Date.now() - lastPollAt < COUNTER_POLL_FALLBACK_MS) return;
+    pollCounters();
+  }, COUNTER_POLL_MS);
   document.addEventListener("visibilitychange", function () {
     if (!document.hidden) pollCounters({ throttle: true });
   });
@@ -437,6 +456,11 @@ function initShell() {
 
   // -- Update-Banner (P6 Step 3) -----------------------------------------------------------
   initUpdates();
+
+  // -- Realtime (P10.5, Block 10, Schritt 10.3 -- LG-2) ---------------------------------------
+  // Der Ereignis-Stream wird **nach** den Modulen verdrahtet, die er aufruft (`List`/
+  // `Editor`): er loest beim Eintreffen eines Ereignisses einen Neuladen aus.
+  initRealtime();
 
   Editor.showOverviewPane();
   init();

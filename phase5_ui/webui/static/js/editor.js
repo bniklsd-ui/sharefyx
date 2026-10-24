@@ -4,7 +4,7 @@
 
 import { state, editorPart, activeSpaceWritable, setCreateControlsPresent, setViewTitle, listViewTitle } from "./state.js";
 import { el, toast } from "./toasts.js";
-import { api } from "./api.js";
+import { api, reportUnexpectedError } from "./api.js";
 import { markdownToHtml } from "./markdown.js";
 import { loadItems, loadOverview, renderList, renderListSlot } from "./list.js";
 import { renderRail } from "./tree.js";
@@ -57,6 +57,11 @@ var insertImageButtonEl;
 var insertImageInputEl;
 var assetStripEl;
 var linkPickerButtonEl;  // Phase 8 Block B Step B4 (Plan §3 B4)
+// P10.5, Block 10, Schritt 10.3 (P10.5-S): das Hinweisband "Geaendert von ... -- neu laden?".
+var changedBannerEl;
+var changedBannerTextEl;
+var changedReloadButtonEl;
+var changedCloseButtonEl;
 
 export function showOverviewPane() {
   graphPaneEl.hidden = false;
@@ -75,6 +80,8 @@ export function clearDetail() {
   state.selectedReadonly = false;
   state.editingSnapshot = null;
   state.conflictCurrent = null;
+  // P10.5-S: das Hinweisband gehoert zum Item -- mit dem Item verschwindet es.
+  hideChangedBanner();
   // Advisor-Fund vor dem Commit (GLOBAL_SEARCH_PLAN.md): ohne diesen Reset blieb
   // `state.scope === "all"` nach "Alle Items" -> Home stehen, `activeSpaceWritable()` gab dort
   // faelschlich `false` zurueck und liess den Anlegen-Knopf auf der eigenen, schreibbaren
@@ -189,7 +196,10 @@ export function currentFormValues() {
   };
 }
 
-function isDirty() {
+// [P10.5, Block 10, Schritt 10.3 -- LG-2/P10.5-S] `export`, weil der Realtime-Client
+// entscheiden muss, ob er den Editor ueberschreiben darf: ein **geaenderter** Editor wird
+// nie ueberschrieben (P10.5-S), ein sauberer schon.
+export function isDirty() {
   if (!state.editingSnapshot) return false;
   var current = currentFormValues();
   var snap = state.editingSnapshot;
@@ -429,6 +439,8 @@ function showEditableItem(item, opts) {
   detailReadonlyEl.hidden = true;
   detailEditorEl.hidden = false;
 
+  // P10.5-S: ein neu geoeffnetes Item hat keine fremde Aenderung -- das Band ist zuerst weg.
+  hideChangedBanner();
   state.editingSnapshot = snapshotFromItem(item);
   metaItemIdEl.textContent = "";
   metaItemIdEl.appendChild(idChip(item.id));
@@ -555,6 +567,38 @@ export function afterWrite(item, message) {
     });
 }
 
+// -- Fremde Aenderung waehrend des Editierens (P10.5, Block 10, Schritt 10.3 -- P10.5-S) -------
+//
+// **Die Regel: ein geaenderter Editor wird nie ueberschrieben.** Wer tippt, hat eine
+// aeltere Version des Items offen; ein fremder Write hebt sie nicht auf. Hard Rule 3 (kein
+// Write ohne `version`) macht den Konflikt sichtbar -- das Speichern mit der alten Version
+// laeuft in den Konfliktdialog, wie heute. Der Server meldet nur, dass sich etwas
+// geaendert hat; **die Entscheidung trifft der Mensch**.
+
+export function showChangedBanner(item) {
+  if (!changedBannerEl) return;
+  changedBannerEl.dataset.itemId = item.id;
+  var von = item.updated_by ? ("Geaendert von " + item.updated_by) : "Geaendert";
+  changedBannerTextEl.textContent = von + " \u2014 neu laden?";
+  changedBannerEl.hidden = false;
+}
+
+export function hideChangedBanner() {
+  if (!changedBannerEl) return;
+  changedBannerEl.hidden = true;
+  changedBannerEl.dataset.itemId = "";
+}
+
+// Der Serverstand ist neuer als der angezeigte: **Inhalt und Version zusammen** uebernehmen
+// (sonst zeigte der Editor eine Version, die es nicht gibt). Der Entwurf wird verworfen --
+// der Editor war sauber, der Entwurf kann also nichts Neues enthalten.
+export function reloadFromServer(item) {
+  clearDraft(item.id);
+  hideChangedBanner();
+  var mode = state.mode;
+  loadEditorFromItem(item, { mode: mode });
+}
+
 export function handleWriteError(err, fallback) {
   if (err.code === "conflict" && err.detail && err.detail.current) {
     showConflictDialog(err.detail.current);
@@ -630,8 +674,38 @@ export function init() {
   insertImageInputEl = document.getElementById("insert-image-input");
   assetStripEl = document.getElementById("asset-strip");
   linkPickerButtonEl = document.getElementById("link-picker-button");
+  changedBannerEl = document.getElementById("editor-changed");
+  changedBannerTextEl = document.getElementById("editor-changed-text");
+  changedReloadButtonEl = document.getElementById("editor-changed-reload");
+  changedCloseButtonEl = document.getElementById("editor-changed-close");
 
   closeButtonEl.addEventListener("click", function () { closeEditor(); });
+
+  // -- Hinweisband (P10.5-S): das Item wurde von aussen geaendert, waehrend der Editor
+  // ungespeicherte Aenderungen traegt. **Nichts wird ueberschrieben** -- der Knopf laedt
+  // den Serverstand erst auf ausdruecklichen Wunsch, und dann mit Rueckfrage (die
+  // ungespeicherten Aenderungen gehen dabei verloren).
+  if (changedReloadButtonEl) {
+    changedReloadButtonEl.addEventListener("click", function () {
+      var id = changedBannerEl && changedBannerEl.dataset.itemId;
+      if (!id) return;
+      confirmDialog({
+        title: "Neu laden",
+        message: "Die ungespeicherten Aenderungen in diesem Editor gehen verloren. "
+          + "Der Serverstand wird geladen.",
+        ok: "Neu laden",
+      }).then(function (ok) {
+        if (!ok) return;
+        return api("/items/" + encodeURIComponent(id)).then(function (item) {
+          reloadFromServer(item);
+          toast("Neu geladen \u00b7 v" + item.version);
+        }).catch(reportUnexpectedError);
+      });
+    });
+  }
+  if (changedCloseButtonEl) {
+    changedCloseButtonEl.addEventListener("click", function () { hideChangedBanner(); });
+  }
 
   // Phase 8 Block B Step B4 (Plan §3 B4) + Phase 8.5 A1: Link-Picker-Knopf öffnet den Dialog;
   // der Callback routet je nach gewaehltem Modus (`body` / `frontmatter`) den Treffer entweder

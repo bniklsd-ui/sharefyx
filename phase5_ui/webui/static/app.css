@@ -1585,6 +1585,24 @@ select.input:focus {
   flex-shrink: 0;
 }
 
+/* P10.5, Block 10, Schritt 10.3 (P10.5-S): das Hinweisband -- ein Item wurde von aussen
+   geaendert, waehrend der Editor ungespeicherte Aenderungen traegt. Die Warnfarbe steht
+   hier fuer "Achtung, zwei Staende", nicht fuer "Fehler": die Aenderung ist kein Fehler,
+   sondern eine Entscheidung, die der Mensch treffen muss (nichts wird ueberschrieben,
+   Hard Rule 3). Dieselbe Warnfarbe wie `.list__readonly`. */
+.editor__changed {
+  display: flex;
+  align-items: center;
+  gap: var(--space);
+  padding: 6px calc(var(--space) * 3);
+  border-bottom: 1px solid var(--line);
+  background: rgba(229, 169, 60, .10);
+  color: var(--text);
+  font-size: var(--fs-meta);
+}
+.editor__changed[hidden] { display: none; }
+.editor__changed-text { flex: 1; min-width: 0; }
+
 /* F6 (Plan §4.C1): IDs, Versions-Badge und Metazeilen in Plex Mono -- die Schrift macht die
    Information "das ist eine technische Referenz" sichtbar. itm_-ID-Chips aus P7-A1 sind der
    Hauptnutzer; #meta-item-id im Kopfdaten-Panel und der Editor-Versions-Badge daneben. */

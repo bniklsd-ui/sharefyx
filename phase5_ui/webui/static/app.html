@@ -210,6 +210,18 @@
         </div>
       </header>
 
+      <!-- P10.5, Block 10, Schritt 10.3 (P10.5-S): das Hinweisband. Ein Item wurde von
+           aussen geaendert, waehrend dieser Editor ungespeicherte Aenderungen traegt --
+           **nichts wird ueberschrieben** (Hard Rule 3). Der Mensch entscheidet: neu laden
+           (mit Rueckfrage, die ungespeicherten Aenderungen gehen verloren) oder den Hinweis
+           wegklicken und weiter tippen; das Speichern laeuft ueber die alte Version in den
+           Konfliktdialog. -->
+      <div class="editor__changed" id="editor-changed" hidden>
+        <span class="editor__changed-text" id="editor-changed-text"></span>
+        <button class="btn" type="button" id="editor-changed-reload">Neu laden</button>
+        <button class="btn btn--icon" type="button" id="editor-changed-close" title="Hinweis schlie&szlig;en" aria-label="Hinweis schlie&szlig;en"><svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg></button>
+      </div>
+
       <!-- Kopfdaten: eigene Flaeche, eigene Farbe, standardmaessig zugeklappt. `<details>` statt
            eigener Klapplogik — das Aufklappen funktioniert dann auch ohne app.js. -->
       <details class="panel panel--meta" id="meta-panel">

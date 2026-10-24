@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-24 (Session-Block Block 10.2 rotiert — LG-2 Realtime serverseitig gebaut; Block 10.3 LG-2 Client folgt im Head) | 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,53 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-24 (Block 10.2 LG-2 Realtime serverseitig gebaut — der Git-HEAD ist die Quelle)
+
+**Ergebnis.** Die Server-Hälfte von Realtime steht: `phase5_ui/webui/events.py` (neu) mit
+`read_git_head()`, `changed_spaces()` und `ChangeFeed`, die Route `GET /api/v1/events`
+(SSE), der umhüllte Lifespan und `timeout_graceful_shutdown=5` in `serve.py`.
+
+**Die Quelle ist der Git-HEAD, nicht ein Write-Hook.** Hard Rule 5 macht aus jedem
+erfolgreichen Write einen Commit — „HEAD hat sich bewegt" heißt also genau „die Daten haben
+sich geändert", für Web, MCP und Hand-Edit gleichermaßen. Ein Eingriff in
+`Store.create()`/`update()`/`append()` wäre doppelt schlecht: er säße im `storage/`-Kern
+(P10.5-F) und sähe eine Hand-Edit von außen nicht.
+
+**Was der Server meldet: Space-Namen und ein Commit-Hash. Sonst nichts.** Kein Body, kein
+Titel — der Client holt sich die Daten über die normale API, die ihre Rechte prüft. Jeder
+Space-Name wird gegen `_visible_space_infos()` gefiltert: **ein unsichtbarer Space-Name
+verlässt den Server nie.**
+
+**Der Heartschlag** (alle 25 s) prüft die Sitzung neu; eine abgelaufene beendet den Stream.
+**Höchstens drei Streams je Sitzung**, darüber 429 — gezählt über den Request-Task, damit ein
+abgebrochener Client nicht als „belegt" zählt.
+
+**Zwei Abweichungen vom 📕-Plan, datiert.** (1) `subscribe()` liefert ein Tupel
+`(head, spaces)` statt `set[str]` — der Route sonst den Kopf des *nächsten* Ereignisses lesen
+müsste (ein Rennen bei zwei schnellen Schreibvorgängen). (2) Der Feed wird **außerhalb** von
+`api_routes()` gebaut und als **optionaler** siebter Parameter durchgereicht: die App muss
+ihn beim Shutdown schließen, und die Route kann das nicht.
+
+**Ein Fehler, den erst der Abbruch-Test fand.** `aclose()` auf einen Generator, in dem
+gerade `__anext__()` läuft, ist ein `RuntimeError` — und genau das passiert, wenn der Client
+abbricht. Gefixt: erst die wartende Aufgabe abbrechen, dann den Generator schließen.
+
+**Gemessen.** 14 neue Tests in `phase5_ui/tests/test_events.py` (echtes tmp-Git, echter
+`Store(git=True)`-Write, ASGI-Harness statt `httpx.ASGITransport` — der sammelt den ganzen
+Body und käme bei einem endlosen Stream nie zurück) + 2 in `phase2_mcp` (Route in der echten
+App, Feed-Schluss beim Shutdown, `timeout_graceful_shutdown`). **Sechs Gegenläufe rot:**
+Sichtbarkeits-Filter, Stream-Grenze, Herzschlag-Prüfung, Papierkorb-Zuordnung, gepackte Refs,
+Volltext-Parameter. Suite **1489 grün** (338,4 s).
+
+**Ausführer-Daten.** `opencode/MiniMax-M3.1-Flash`, Kontextgrenze 400.000 (P10.5-C erfüllt),
+keine Eingriffe des Nikingers in dieser Session.
+
+**Stand.** Branch `p105-block9`. **P10.5-46/47/48 bleiben ⬜** — sie verlangen den Client
+(10.3) und die Wegwerf-Proben (10.5).
+
+**Nächster Schritt.** (1) 10.3 Client: `realtime.js`, Poll-Rückfall 120 s, Hinweisband
+(P10.5-S). (2) 10.5 Proben: ≤ 2 s bis zur Änderung, unsichtbarer Space, SIGTERM ≤ 10 s.
 
 ## Session stopped — 2026-10-24 (Block 10.1 LG-1 Volltext gebaut — die Suche erreicht jetzt auch den Text)
 
