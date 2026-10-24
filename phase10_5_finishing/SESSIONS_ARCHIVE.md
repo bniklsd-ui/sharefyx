@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,63 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-24 (Block 8 gebaut — die Gehirnkarte C2; drei Fehler fand erst der Browser)
+
+**Ergebnis.** Die Karte trägt jetzt den Stil C2 (`docs/concepts/phase10_karte_c_stil_2.svg`):
+**Lappen** (der Körper, in Space-Gruppen geteilt, mit Innenlinie), **Furchen** (die
+Space-Grenze), **Bahnen** (quadratische Bézier, Breite `1 + log2(1 + min(deg))`), **Zellen**
+(Kreis, Membranring 2 px, 2–4 deterministische Fortsätze), **Aktivierung** (Fokus hell, erster
+Ring 1, zweiter Ring 0,5, Rest 0,45 — in Ruhe voll deckend), **KA-2** (Layout merken:
+`localStorage`, gedrosselt 1 s), **KA-3** (Suche, Typ-/Statusfilter, Titel ohne Zoom) und
+**reduced motion mit 0 Animationsframes** (M6-Nebenbefund „1 Tick statt 0" erledigt). Nichts
+deployed — `v3.1.7` steht aus.
+
+**Drei Fehler, die erst der Browser fand** (der Node-Harness sieht die Zeichenbefehle, aber
+keinen echten Zeiger und keine echte Zeit): (1) der **gezogene Knoten wurde wieder
+freigegeben** (`fixed = false`) — die Simulation zog ihn zurück, die Ablage speicherte die
+zurückgezogene Position, der Zug des Menschen war beim nächsten Öffnen weg; er wird jetzt
+**gepinnt**. (2) **Der Fokus überlebte den Zeiger** (`onMouseLeave()` räumte `hoverId` nicht ab):
+die Karte blieb abgedunkelt (26 164 statt 13 989 Kernpixel) — Plan 8.4 sagt „Ruhezustand ohne
+Fokus: alles voll deckend". (3) **Der Layout-Hinweis hat die Trefferzahl überschrieben** (sie stand
+in derselben Statuszeile): sie hat jetzt ein **eigenes** Feld (`#overview-graph-hits`).
+Alle drei sind behoben und in `tests/test_graph_c2.py` gewächtert (Anker: die **Regeln**).
+
+**Zwei Befunde für den Nikinger.**
+- **Das Plan-Budget für `graph.js` ist überschritten:** erlaubt +8 KB gzip, gemessen **+11,1 KB**
+  — davon **+9,8 KB Kommentar**, der **Code** wächst nur **+2,9 KB**. Die *Gesamt*budgets halten
+  (`ui_budget` **5/5**, app.js+css+Font **192,7 KB**, Erstaufruf **205 KB**). Kürzen ginge nur
+  auf Kosten der datierten P8/P9-Kommentare. Entscheidung: Budget anheben oder Kommentare
+  kürzen.
+- **Die Lappen brauchen räumlich zusammenhängende Spaces** — die Furche liegt an der
+  Space-Grenze; liegen die Spaces **ineinander** (der Phase-8-Seed verlinkt die 200 Knoten zu
+  *einem* Ring über alle Spaces), zerfallen die Lappen zu Fragmenten (252 px, im Bild nicht als
+  Fläche erkennbar). Für die Screenshots habe ich die Wegwerf-Instanz deshalb **je Space
+  gebündelt** verlinkt (`probes/p105_b8_cluster_links.py` — nur die Kanten der Wegwerf-Daten):
+  **137 492 px** Lappenfläche, drei getrennte Gruppen, im Bild erkennbar.
+
+**Belege.** Browser-Probe `probes/p105_b8_karte_probe.py` an der 200-Knoten-Wegwerf-Instanz
+(Port 18772, tmp-`DATA_ROOT`, PID-Datei): **4/4 Messungen grün**, **3 Gegenläufe je rot**
+(`lappen` → 0 Pixel, `layout` → 0 Kernpixel am Ziel, `filter` → wirkungslos). Node-Harness
+`probes/p105_b8_c2_probe.mjs`: 8 Messungen, 8 Gegenläufe. Wächter `tests/test_graph_c2.py`
+**21 Tests** grün. Smoke `p8_22_smoke.py`: **5/5**. Suite **1422 grün**, `ui_budget` **5/5**,
+`doc_health` 0. Screenshots `docs/screenshots/p105_b8_0{1..4}_*.png` (die P8-22-Bilder sind
+durch den Smoke-Lauf erneuert — mit C2-Look).
+
+**Datierte Abweichung vom 📕-Plan (Code schlägt Plan).** Der Plan nennt nur den *Saatpunkt* der
+gemerkten Position — ohne Festhalten schiebt die Simulation die gemerkte Karte auseinander und
+KA-2 wäre nicht erfüllt: ein gemerkter Knoten wird **gepinnt**.
+
+**Stand.** `main`, Baum sauber, Wegwerf-Instanz gestoppt. **P10.5-37 bleibt ⬜** — die Zeile wird
+erst ✅, wenn Du die vier Screenshots beurteilt hast.
+
+**Nächste Session.** (1) **Deploy C `v3.1.7`**: Suite + `doc_health` + `ui_budget` grün · Badge
+und `docs/UPDATE_LOG.md` · Commit + Push · **`deploy.sh` durch den Nikinger** (Hard Rule 9) ·
+`health_gate.sh` mit echter Ausgabe. (2) **P10.5-37**: Sichtung der vier Screenshots.
+(3) **Nachsichtung** (≤ 6 Posten) — nach Block 11.
+
+**Beim Nikinger offen:** siehe *Offen beim Nikinger* oben — **neu: das Budget für `graph.js`
+(Block 8)**.
 
 ## Session stopped — 2026-10-24 (Block 7.4 umgesetzt — die vier Posten der Sichtung; P10.5-32 wartet auf die Bestätigung)
 

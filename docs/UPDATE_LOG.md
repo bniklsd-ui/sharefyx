@@ -9,6 +9,17 @@
      (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
+## 2026-10-24
+- Die Verknüpfungskarte hat einen neuen Look: Die Verbindungen laufen als Bahnen zwischen runden Zellen, und jeder Space bekommt einen eigenen Bereich.
+- In der Karte kannst du jetzt suchen und filtern — nach Text, nach Art und nach Status. Die Zahl der Treffer steht in der Statuszeile.
+- Was du auf der Karte verschiebst, steht beim nächsten Öffnen wieder an derselben Stelle.
+- Eine unbekannte Adresse in der Web-Oberfläche zeigt jetzt eine eigene Fehlerseite statt einer leeren Seite.
+- Die Oberfläche trägt jetzt ein eigenes Zeichen — in der Leiste und als Symbol im Tab.
+- Der Titel des Browser-Tabs folgt der Ansicht: Übersicht, Space, Eintrag oder Einstellungen.
+- In der Liste kannst du jetzt nach „Zugewiesen" filtern — nach dir, nach deinem Kollegen oder nach niemandem.
+- Aufgaben, an denen gerade gearbeitet wird, sind in der Übersicht und auf der Karte hervorgehoben.
+- Der Hinweis auf neue Versionen ist jetzt eine einzige Zeile, und die Versionsangabe in der Leiste ist besser lesbar.
+
 ## 2026-10-23
 - Die KI-Verbindung kann jetzt mehrere Notizen in einem einzigen Aufruf um Text ergänzen — jede Notiz bringt ihre eigene Version mit, ein Konflikt stoppt die anderen nicht.
 - Die Verbindung spricht jetzt das neueste MCP-Protokoll (2026-07-28). Ältere Clients laufen unverändert weiter, sie bekommen dann weiterhin die bisherige Protokollstufe.

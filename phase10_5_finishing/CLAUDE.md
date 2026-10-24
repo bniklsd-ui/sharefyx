@@ -10,7 +10,7 @@ down:
   - ../phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md  # 📦 §12 Entscheidungsliste D-1–D-18, verbatim
   - SESSIONS_ARCHIVE.md                             # 📦 ältere Session-Blöcke, verbatim, newest-first
   - UPDATES_ARCHIVE.md                              # 📦 die älteren `updated:`-Fäden dieses Heads, verbatim
-updated: 2026-10-24 (Block 8 gebaut — die Gehirnkarte C2: Lappen/Furchen/Zellen/Aktivierung, KA-2 Layout merken, KA-3 Suche/Filter, reduced motion 0 Frames; Browser-Probe an der 200-Knoten-Wegwerf-Instanz 4/4 mit 3 roten Gegenläufen; **drei Fehler fand erst der Browser** (gezogener Knoten wurde zurückgezogen · Fokus überlebte den Zeiger · Layout-Hinweis überschrieb die Trefferzahl) — behoben und gewächtert; Smoke 5/5; Suite 1422 grün; Abnahmestand 34 ✅ · 0 ⚠️ · 27 ⬜) | 2026-10-24 (Block 7.4 (UI-4) umgesetzt — die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen: Wortmarken-Abstand 2,5 px · „Zugewiesen"-Auswahl mit den Kanten der Suchzeile · Update-Banner als einzeilige Leiste (49 px) mit dem Knopf „Alle Änderungen" · Versionsanzeige 11 px (Punkt 203/255 statt 155/255); Wächter 8/8 mit 4 Gegenproben, Probe 5/5 mit 5 roten Gegenläufen; P10.5-32 bleibt ⬜ bis zur Bestätigung) | 2026-10-24 (Session-Schluss: Handover für 7.4-Umsetzung, Block 8, Deploy C; Rotations-Fallstrick notiert) | 2026-10-24 (Block 7.4: Sichtungsliste des Nikingers notiert — 4 Posten im Archiv Schritt 7.4, Ausführer setzt um, Nachsichtung nach Block 11) | 2026-10-24 (Block 7.5 Kontrast (`--caution` #F06A6E, Wächter), 7.6 Assignee-Filter (API + Auswahl), 7.7 KA-5 (Chip + Karten-Ring) gebaut; Probe an der Wegwerf-Instanz 6/6 mit zwei roten Gegenläufen; Suite 1396 grün; Abnahmestand 30 ✅ · 0 ⚠️ · 31 ⬜) | 2026-10-23 (Block 7.3 (UI-3) gebaut: der Tab-Titel folgt der Ansicht — Übersicht, Space-Name, Item-Titel, Einstellungen; datierte Korrektur zum Plan (vier Zustände, nicht fünf); Probe an der Wegwerf-Instanz 6/6 mit rotem Gegenlauf; Abnahmestand 27 ✅ · 0 ⚠️ · 34 ⬜) | 2026-10-23 (Block 7.2 (UI-2): die Wortmarke `static/logo.svg` — Variante B aus dem Logo-Board, pixelgleich gemessen; zwei Befunde nur durch Messung (XML-Kommentar, MIME-Typ); Probe an der Wegwerf-Instanz mit rotem Gegenlauf; Abnahmestand 26 ✅ · 0 ⚠️ · 35 ⬜) | 2026-10-23 (Deploy B ist live: `v3.1.6`, Release `20261023T165838.591015Z`, SHA `e5c834e`, health_gate 9/9 OK; Block 7.1 (UI-1) gemergt (`f0e76b0`) — kommt mit `v3.1.7`) | 2026-10-23 (Block 7.1 (UI-1) gebaut: HTML-404 für unbekannte `/ui`-Pfade + JSON-404 in der API — Branch `p105-block7`, nicht gemergt; 4 neue Tests, 4 Gegenläufe wirksam; Suite 1384 grün) | 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zeile `)pdated:` → `) | `; Release-Tests wieder grün, Suite 1380 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-10-24 (Deploy C `v3.1.7` vorbereitet — Badge, eigener `## 2026-10-24`-Block im Update-Log, Suite 1425 grün, `doc_health` 0, `ui_budget` 5/5; `deploy.sh` beim Nikinger) | 2026-10-24 (Block 8 gebaut — die Gehirnkarte C2: Lappen/Furchen/Zellen/Aktivierung, KA-2 Layout merken, KA-3 Suche/Filter, reduced motion 0 Frames; Browser-Probe an der 200-Knoten-Wegwerf-Instanz 4/4 mit 3 roten Gegenläufen; **drei Fehler fand erst der Browser** (gezogener Knoten wurde zurückgezogen · Fokus überlebte den Zeiger · Layout-Hinweis überschrieb die Trefferzahl) — behoben und gewächtert; Smoke 5/5; Suite 1422 grün; Abnahmestand 34 ✅ · 0 ⚠️ · 27 ⬜) | 2026-10-24 (Block 7.4 (UI-4) umgesetzt — die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen: Wortmarken-Abstand 2,5 px · „Zugewiesen"-Auswahl mit den Kanten der Suchzeile · Update-Banner als einzeilige Leiste (49 px) mit dem Knopf „Alle Änderungen" · Versionsanzeige 11 px (Punkt 203/255 statt 155/255); Wächter 8/8 mit 4 Gegenproben, Probe 5/5 mit 5 roten Gegenläufen; P10.5-32 bleibt ⬜ bis zur Bestätigung) | 2026-10-24 (Session-Schluss: Handover für 7.4-Umsetzung, Block 8, Deploy C; Rotations-Fallstrick notiert) | 2026-10-24 (Block 7.4: Sichtungsliste des Nikingers notiert — 4 Posten im Archiv Schritt 7.4, Ausführer setzt um, Nachsichtung nach Block 11) | 2026-10-24 (Block 7.5 Kontrast (`--caution` #F06A6E, Wächter), 7.6 Assignee-Filter (API + Auswahl), 7.7 KA-5 (Chip + Karten-Ring) gebaut; Probe an der Wegwerf-Instanz 6/6 mit zwei roten Gegenläufen; Suite 1396 grün; Abnahmestand 30 ✅ · 0 ⚠️ · 31 ⬜) | 2026-10-23 (Block 7.3 (UI-3) gebaut: der Tab-Titel folgt der Ansicht — Übersicht, Space-Name, Item-Titel, Einstellungen; datierte Korrektur zum Plan (vier Zustände, nicht fünf); Probe an der Wegwerf-Instanz 6/6 mit rotem Gegenlauf; Abnahmestand 27 ✅ · 0 ⚠️ · 34 ⬜) | 2026-10-23 (Block 7.2 (UI-2): die Wortmarke `static/logo.svg` — Variante B aus dem Logo-Board, pixelgleich gemessen; zwei Befunde nur durch Messung (XML-Kommentar, MIME-Typ); Probe an der Wegwerf-Instanz mit rotem Gegenlauf; Abnahmestand 26 ✅ · 0 ⚠️ · 35 ⬜) | 2026-10-23 (Deploy B ist live: `v3.1.6`, Release `20261023T165838.591015Z`, SHA `e5c834e`, health_gate 9/9 OK; Block 7.1 (UI-1) gemergt (`f0e76b0`) — kommt mit `v3.1.7`) | 2026-10-23 (Block 7.1 (UI-1) gebaut: HTML-404 für unbekannte `/ui`-Pfade + JSON-404 in der API — Branch `p105-block7`, nicht gemergt; 4 neue Tests, 4 Gegenläufe wirksam; Suite 1384 grün) | 2026-10-23 (Ketten-Defekt in `SESSIONS_ARCHIVE.md` behoben — eine Zeile `)pdated:` → `) | `; Release-Tests wieder grün, Suite 1380 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -52,10 +52,10 @@ updated: 2026-10-24 (Block 8 gebaut — die Gehirnkarte C2: Lappen/Furchen/Zelle
 |---|---|---|---|---|
 | A | `v3.1.5` | `7358f22` | **9/9 OK** | nach Block 1–4 — **live seit 2026-10-23**, Release `20261023T065010.377336Z` |
 | B | `v3.1.6` | `e5c834e` | **9/9 OK** | nach Block 5–6 (+ **Block 7.0**, die Update-Log-ID) — **live seit 2026-10-23**, Release `20261023T165838.591015Z` · **Deploy beim Nikinger** (Hard Rule 9, `sudo`; `deploy.sh main` → Release-Tests **1380 grün** (340,7 s) → Symlink-Wechsel → Dienst neu gestartet) · `health_gate.sh --expected-version=v3.1.6 --require-todays-update-log --expected-sha=e5c834e` → **9/9 OK** (`.rail__version` v3.1.6, Release-SHA `e5c834e…`, Update-Log 2026-10-23) · **Block 7.1 (UI-1) ist gemergt** (`f0e76b0`, aus `p105-block7`) — **nicht** in diesem Release, sondern in `v3.1.7` |
-| C | `v3.1.7` | — | — | nach Block 7–8 |
+| C | `v3.1.7` | — | — | nach Block 7–8 — **2026-10-24 vorbereitet** (Badge, eigener `## 2026-10-24`-Block im Update-Log, Suite 1425 grün, `doc_health` 0, `ui_budget` 5/5), **`deploy.sh` beim Nikinger** |
 | D | `v3.1.8` | — | — | nach Block 9–11 |
 
-**Stand 2026-10-23 (Abend):** Deploy A ist **live** (`v3.1.5`, Release `20261023T065010.377336Z`, SHA `7358f22`, `health_gate` **9/9 OK**); der Branch `p105-block5` (Block 5 + 6 + P10.5-26) ist **gemergt**. **Deploy B ist ebenfalls live**: `v3.1.6`, Release `20261023T165838.591015Z`, SHA `e5c834e`, `health_gate` **9/9 OK** (aus `main` mit `fastmcp 4.1.3`; der Deploy lief beim Nikinger, die Release-Tests im Release **1380 grün** in 340,7 s). **Block 7.1 (UI-1) ist gemergt** (`f0e76b0`) und damit ab `v3.1.7` dabei. **Die Generalprobe davor ist gefahren: 26/26 Zellen grün an der Wegwerf-Instanz** (Details im Session-Block unten; die Zeile stand vorher auf „25/25" — **datierte Korrektur**, der Block-7.0-Commit hat die Probe um eine Zelle erweitert). **Der Deploy-Aufruf der letzten Session ist an den Release-Tests gescheitert — nicht am Befehl:** eine verklebte `updated:`-Zeile in `SESSIONS_ARCHIVE.md` (behoben, Details im Session-Block) — es fehlt nur noch der Deploy-Aufruf durch den Nikinger. **Block 7.1 (UI-1) ist gebaut** auf dem Branch `p105-block7` — **nicht gemergt** (Nikinger-Entscheidung: Deploy A vor dem Branch-Merge); der Merge wartet auf Deploy A/B.
+**Stand 2026-10-24 (Abend):** Deploy A ist **live** (`v3.1.5`, Release `20261023T065010.377336Z`, SHA `7358f22`, `health_gate` **9/9 OK**); der Branch `p105-block5` (Block 5 + 6 + P10.5-26) ist **gemergt**. **Deploy B ist ebenfalls live**: `v3.1.6`, Release `20261023T165838.591015Z`, SHA `e5c834e`, `health_gate` **9/9 OK** (aus `main` mit `fastmcp 4.1.3`; der Deploy lief beim Nikinger, die Release-Tests im Release **1380 grün** in 340,7 s). **Block 7.1 (UI-1) ist gemergt** (`f0e76b0`) und damit ab `v3.1.7` dabei. **Deploy C (`v3.1.7`) ist vorbereitet** — Badge, eigener Update-Log-Block `## 2026-10-24` (9 Zeilen für Menschen), Suite **1425 grün** (332,6 s), `doc_health` 0, `ui_budget` **5/5** (Erstaufruf 204,5 KB); **`deploy.sh` liegt beim Nikinger**. **Die Generalprobe davor ist gefahren: 26/26 Zellen grün an der Wegwerf-Instanz** (Details im Session-Block unten; die Zeile stand vorher auf „25/25" — **datierte Korrektur**, der Block-7.0-Commit hat die Probe um eine Zelle erweitert). **Der Deploy-Aufruf der letzten Session ist an den Release-Tests gescheitert — nicht am Befehl:** eine verklebte `updated:`-Zeile in `SESSIONS_ARCHIVE.md` (behoben, Details im Session-Block) — es fehlt nur noch der Deploy-Aufruf durch den Nikinger. **Block 7.1 (UI-1) ist gebaut** auf dem Branch `p105-block7` — **nicht gemergt** (Nikinger-Entscheidung: Deploy A vor dem Branch-Merge); der Merge wartet auf Deploy A/B.
 
 **Ein Deploy ist vier Schritte, kein Commit** (Plan §2.5): volle Suite + `doc_health` + `ui_budget` grün · Badge und `docs/UPDATE_LOG.md` · Commit + Push · **`deploy.sh` durch den Nikinger** (Hard Rule 9) · `health_gate.sh` mit **echter Ausgabe** in den Commit — nie die Behauptung.
 
@@ -172,59 +172,39 @@ updated: 2026-10-24 (Block 8 gebaut — die Gehirnkarte C2: Lappen/Furchen/Zelle
 > (7.5) · `_items_get` steht in `api.py:932`, nicht 821 (7.6). Wer die Schritte baut, liest **das
 > Archiv**, nicht den Plan.
 
-## Session stopped — 2026-10-24 (Block 8 gebaut — die Gehirnkarte C2; drei Fehler fand erst der Browser)
+## Session stopped — 2026-10-24 (Deploy C `v3.1.7` vorbereitet — Badge, Update-Log, Suite 1425 grün)
 
-**Ergebnis.** Die Karte trägt jetzt den Stil C2 (`docs/concepts/phase10_karte_c_stil_2.svg`):
-**Lappen** (der Körper, in Space-Gruppen geteilt, mit Innenlinie), **Furchen** (die
-Space-Grenze), **Bahnen** (quadratische Bézier, Breite `1 + log2(1 + min(deg))`), **Zellen**
-(Kreis, Membranring 2 px, 2–4 deterministische Fortsätze), **Aktivierung** (Fokus hell, erster
-Ring 1, zweiter Ring 0,5, Rest 0,45 — in Ruhe voll deckend), **KA-2** (Layout merken:
-`localStorage`, gedrosselt 1 s), **KA-3** (Suche, Typ-/Statusfilter, Titel ohne Zoom) und
-**reduced motion mit 0 Animationsframes** (M6-Nebenbefund „1 Tick statt 0" erledigt). Nichts
-deployed — `v3.1.7` steht aus.
+**Ergebnis.** Deploy C ist **vorbereitet, nicht ausgeführt**: Badge `v3.1.7`
+(`phase5_ui/webui/static/app.html:25`) und ein eigener `## 2026-10-24`-Block in
+`docs/UPDATE_LOG.md` — **9 Zeilen für Menschen**: die Karte im neuen Look, Suche/Filter und
+„bleibt liegen" auf der Karte, die 404-Seite, die Wortmarke, der Tab-Titel, der „Zugewiesen"-Filter,
+die doing-Hervorhebung, das einzeilige Update-Banner und die lesbarere Versionsanzeige. Das
+Deploy-Gate (P6-X) liest den **obersten** Block: `2026-10-24` = heute ✓.
 
-**Drei Fehler, die erst der Browser fand** (der Node-Harness sieht die Zeichenbefehle, aber
-keinen echten Zeiger und keine echte Zeit): (1) der **gezogene Knoten wurde wieder
-freigegeben** (`fixed = false`) — die Simulation zog ihn zurück, die Ablage speicherte die
-zurückgezogene Position, der Zug des Menschen war beim nächsten Öffnen weg; er wird jetzt
-**gepinnt**. (2) **Der Fokus überlebte den Zeiger** (`onMouseLeave()` räumte `hoverId` nicht ab):
-die Karte blieb abgedunkelt (26 164 statt 13 989 Kernpixel) — Plan 8.4 sagt „Ruhezustand ohne
-Fokus: alles voll deckend". (3) **Der Layout-Hinweis hat die Trefferzahl überschrieben** (sie stand
-in derselben Statuszeile): sie hat jetzt ein **eigenes** Feld (`#overview-graph-hits`).
-Alle drei sind behoben und in `tests/test_graph_c2.py` gewächtert (Anker: die **Regeln**).
+**Gemessen (Basis `45d3616`):** `pytest` **1425 grün** (332,6 s) · `doc_health` **0** ·
+`ui_budget` **5/5** (app.js+css+Font **192,2 KB**, Erstaufruf **204,5 KB**) ·
+`parse_update_log()` liest den neuen Block als `2026-10-24#1`, alle **21** IDs eindeutig.
 
-**Zwei Befunde für den Nikinger.**
-- **Das Plan-Budget für `graph.js` ist überschritten:** erlaubt +8 KB gzip, gemessen **+11,1 KB**
-  — davon **+9,8 KB Kommentar**, der **Code** wächst nur **+2,9 KB**. Die *Gesamt*budgets halten
-  (`ui_budget` **5/5**, app.js+css+Font **192,7 KB**, Erstaufruf **205 KB**). Kürzen ginge nur
-  auf Kosten der datierten P8/P9-Kommentare. Entscheidung: Budget anheben oder Kommentare
-  kürzen.
-- **Die Lappen brauchen räumlich zusammenhängende Spaces** — die Furche liegt an der
-  Space-Grenze; liegen die Spaces **ineinander** (der Phase-8-Seed verlinkt die 200 Knoten zu
-  *einem* Ring über alle Spaces), zerfallen die Lappen zu Fragmenten (252 px, im Bild nicht als
-  Fläche erkennbar). Für die Screenshots habe ich die Wegwerf-Instanz deshalb **je Space
-  gebündelt** verlinkt (`probes/p105_b8_cluster_links.py` — nur die Kanten der Wegwerf-Daten):
-  **137 492 px** Lappenfläche, drei getrennte Gruppen, im Bild erkennbar.
+**Was jetzt beim Nikinger liegt — der Deploy-Aufruf** (Hard Rule 9, `sudo`):
 
-**Belege.** Browser-Probe `probes/p105_b8_karte_probe.py` an der 200-Knoten-Wegwerf-Instanz
-(Port 18772, tmp-`DATA_ROOT`, PID-Datei): **4/4 Messungen grün**, **3 Gegenläufe je rot**
-(`lappen` → 0 Pixel, `layout` → 0 Kernpixel am Ziel, `filter` → wirkungslos). Node-Harness
-`probes/p105_b8_c2_probe.mjs`: 8 Messungen, 8 Gegenläufe. Wächter `tests/test_graph_c2.py`
-**21 Tests** grün. Smoke `p8_22_smoke.py`: **5/5**. Suite **1422 grün**, `ui_budget` **5/5**,
-`doc_health` 0. Screenshots `docs/screenshots/p105_b8_0{1..4}_*.png` (die P8-22-Bilder sind
-durch den Smoke-Lauf erneuert — mit C2-Look).
+    SHAREFYX_RELEASES_DIR=/opt/sharefyx/releases SHAREFYX_CURRENT_LINK=/opt/sharefyx/current \
+    SHAREFYX_DATA_ROOT=/home/savefyx/savefyx-data SHAREFYX_BACKUP_DIR=/var/lib/sharefyx-backup \
+    SHAREFYX_SYSTEMCTL="sudo systemctl" phase5_ui/scripts/deploy.sh main
 
-**Datierte Abweichung vom 📕-Plan (Code schlägt Plan).** Der Plan nennt nur den *Saatpunkt* der
-gemerkten Position — ohne Festhalten schiebt die Simulation die gemerkte Karte auseinander und
-KA-2 wäre nicht erfüllt: ein gemerkter Knoten wird **gepinnt**.
+Danach lese ich `health_gate.sh --expected-version=v3.1.7 --require-todays-update-log
+--expected-sha=<sha>` und lege die **echte** Ausgabe in den Commit — nie die Behauptung.
+Live-Prüfungen laut Plan §Deploy C: Karte mit echten Daten (Sichtung), Logo/Favicon in Firefox
+und Safari, 404-Seite, Titel.
 
-**Stand.** `main`, Baum sauber, Wegwerf-Instanz gestoppt. **P10.5-37 bleibt ⬜** — die Zeile wird
-erst ✅, wenn Du die vier Screenshots beurteilt hast.
+**Drei Dinge warten weiter auf Dein Augen-Urteil bzw. Deine Entscheidung:**
+1. **P10.5-37** — die vier Kartenbilder `docs/screenshots/p105_b8_0{1..4}_*.png` (C2-Stil).
+2. **P10.5-32** — die Bestätigung der vier Sichtungsposten aus 7.4.
+3. **Das Budget für `graph.js`** — erlaubt +8 KB gzip, gemessen **+11,1 KB** (davon +9,8 KB
+   Kommentar, der Code selbst +2,9 KB): Budget anheben oder Kommentare kürzen.
 
-**Nächste Session.** (1) **Deploy C `v3.1.7`**: Suite + `doc_health` + `ui_budget` grün · Badge
-und `docs/UPDATE_LOG.md` · Commit + Push · **`deploy.sh` durch den Nikinger** (Hard Rule 9) ·
-`health_gate.sh` mit echter Ausgabe. (2) **P10.5-37**: Sichtung der vier Screenshots.
-(3) **Nachsichtung** (≤ 6 Posten) — nach Block 11.
+**Reihenfolge-Hinweis für Block 9.** Block 9 (RE-7/RE-4/RE-3) wird auf einem **eigenen Branch**
+(`p105-block9`) gebaut, **nicht** in `main`: `deploy.sh` klont das lokale `main`, ein Merge vor
+dem Deploy würde Block 9 mit `v3.1.7` ausliefern. Erst der Merge **nach** dem Deploy.
 
-**Beim Nikinger offen:** siehe *Offen beim Nikinger* oben — **neu: das Budget für `graph.js`
-(Block 8)**.
+**Beim Nikinger offen (unverändert):** P10.5-22 · 25 · 27/28 · 18 · AL-1 Zeile 15 · V203 ·
+5.7 (Fabian Bescheid) · die Schriftart der Versionsanzeige.
