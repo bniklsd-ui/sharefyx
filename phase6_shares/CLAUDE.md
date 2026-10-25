@@ -12,7 +12,7 @@ down:
   - ../docs/concepts/PHASE6_CLOSEOUT_HANDOVER.md   # Abschluss-Handover: Zeilenstatus 12/39, offene Entscheidungen, [VERIFY]-Bilanz V39–V58 — wichtigstes Folgedokument dieser Phase
   - ../docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md   # Herkunft der offenen Entscheidungen §4.1–§4.6, [VERIFY]-Bilanz V27–V38
   - ./SESSIONS_ARCHIVE.md                          # Steps 0-7 + v2.1-Deploy + Deploy-Blocker verbatim (vierzehn Eintraege), L3, kein Softcap
-updated: 2026-08-23 (P7 Step-0-Audit: Modul-Zeilen 8-16 + Vormerkungspunkt 2 von "noch nicht deployt" auf "live deployt" korrigiert, SHA-Beweis je Zeile -- reiner Deploy-Status, Abnahmestand 12/39 unveraendert) | 2026-08-23, vierzehnter (Phasenabschluss: PHASE6_CLOSEOUT_HANDOVER.md + phase6_shares_uebersicht.svg, Status 🟡 statt ✅ -- 12 von 39 Abnahmezeilen live; drei neue Befunde gegen den echten DATA_ROOT; Doku-Audit der Modul-Zeilen 8-16 bewusst der naechsten Phase ueberlassen; 828 pytest gruen; danach rotiert, dreizehnter Block verbatim ins Archiv)
+updated: 2026-10-25 (P10.5 Block 12: Vormerkungen verbatim nach SESSIONS_ARCHIVE.md, Abschnitt Abnahmestand-Nachzug für AL-1/AL-3 — 41.032 → 34.801 B) | 2026-08-23 (P7 Step-0-Audit: Modul-Zeilen 8-16 + Vormerkungspunkt 2 von "noch nicht deployt" auf "live deployt" korrigiert, SHA-Beweis je Zeile -- reiner Deploy-Status, Abnahmestand 12/39 unveraendert) | 2026-08-23, vierzehnter (Phasenabschluss: PHASE6_CLOSEOUT_HANDOVER.md + phase6_shares_uebersicht.svg, Status 🟡 statt ✅ -- 12 von 39 Abnahmezeilen live; drei neue Befunde gegen den echten DATA_ROOT; Doku-Audit der Modul-Zeilen 8-16 bewusst der naechsten Phase ueberlassen; 828 pytest gruen; danach rotiert, dreizehnter Block verbatim ins Archiv)
 ---
 
 # CLAUDE.md — Phase 6: Freigaben, Ordner, Werkzeug-Ergonomie (`phase6_shares/`)
@@ -130,116 +130,32 @@ dritten Öffnung, kein bestehendes Signatur wird geändert. Wird mit Step 7b umg
 angekündigt — schließt zusammen mit der dritten Öffnung nach Phasenabschluss.
 
 ## Vormerkungen (nicht Teil eines aktuellen Steps)
+> **Verbatim verschoben** nach `SESSIONS_ARCHIVE.md` (`scripts/move_sections.py`) — dort unter derselben Überschrift.
 
-**[2026-08-14] UI-Feedback nach dem Live-Deploy von v2.1 (Nikinger, direkt nach der ersten
-Nutzung) — ausdrücklich nur vormerken, nichts davon diese Session umgesetzt, kein Code
-angefasst:**
+## Abnahmestand P6 — Nachzug (2026-10-25, P10.5 Block 12: AL-1, AL-3)
 
-1. **✅ Behoben (2026-08-16).** Dropdown-Lila (`select.input { accent-color }`). Herleitung:
-   `SESSIONS_ARCHIVE.md`, zehnter Block.
-2. **✅ Gebaut (2026-08-17), Step 7b vollständig.** Space-zu-Space-Verschieben,
-   `ITEM_MOVE_PLAN.md` §4 (P6-AD–AJ), drei Commits — Details in den „[2026-08-17]"-Einträgen der
-   Phase-Heads P1/P2/P5. **[2026-08-23 P7 Step-0-Audit] Live deployt** (`9274346`/`3f476c7`/
-   `abeaba6` sind Vorfahren von `main`@`f96125e`) — Abnahmezeilen 25–30 bleiben unverändert offen,
-   das war nur der Deploy-Status.
-3. **✅ Subplan geschrieben (2026-08-17), noch nicht gebaut, setzt Step 7b voraus.**
-   Mehrfachauswahl = **§9** in `phase6_shares/ITEM_MOVE_PLAN.md` (**P6-AK–P6-AN**): kein neuer
-   Endpunkt/MCP-Tool, In-Space-Mehrfachauswahl braucht keine neue Rechteprüfung (P6-AN).
-4. **✅ Behoben (2026-08-16).** `--ok` (Grün) auf `var(--accent)` (Blau), Token entfernt; Orange
-   „nur lesen" bewusst unangetastet. Herleitung: `SESSIONS_ARCHIVE.md`, zehnter Block.
+Die Zeilenmatrix steht im 📕 `PHASE6_CLOSEOUT_HANDOVER.md` §3 (Snapshot, wird nicht editiert);
+hier steht der **Nachzug** der Zeilen, die dort „offen" blieben. Beleg: Register `AL-1` (V205,
+2026-10-18, Abgleich mit P7–P9 plus M3/M5-Wegwerf-Belege) und P10.5-11 (Block 2.5).
 
-**[2026-08-14] MCP-Werkzeug-Ergonomie, Live-Feedback einer arbeitenden Claude-Instanz** — nach
-einem sitzungsreichen Tag (OTOBO-Protokollierung, `itm_7cf94a2c`, 40+ `append_to_item`-Aufrufe für
-ein einziges Log-Dokument). Vom Nikinger verbatim weitergegeben; betrifft
-ausschließlich `mcpserver/tools.py` (P6-C erlaubt das, aber außerhalb des Step-7-Scopes).
+| # | Stand | Beleg |
+|---|---|---|
+| 7 | ✅ | `deploy.sh`-Gate in jedem P9-Deploy aktiv; Unit-Tests; der Vorfall vom 2026-08-14 selbst |
+| 9 | ✅ | echte Ordner am `DATA_ROOT`, 2026-08-23 nachgeprüft |
+| 14 | ✅ | Block 2.5: fremder Body im geteilten read-Space gewrappt, Schreiben ❌ (P10.5-11) |
+| 15 | ⬜ | braucht gelaufene visibility-Migration + Live-Check — **beim Nikinger** |
+| 16 | ✅ | Re-Auth beim Widen am Browser: M5-Station `share`, `reauth_appeared`; Rücknahme bleibt gate-frei (Wegwerf, zählt seit P8.5 als live) |
+| 17 | ✅ | p8_8-Zweitnutzer-Probe: `update_item` mit `share_read`/`share_write` live abgelehnt |
+| 23 | ⚠️ | 2026-08-19 live widerlegt; P9-B-Watchdog läuft live gegen dieselbe Fehlerklasse — erfüllt in anderer Form |
+| 25 | ⚠️ | gegenstandslos: die UI, auf die sich die Zeile bezog, ist seit P8 (v3) ganz neu |
+| 29 | ✅ | Block 2.5: MCP-Move alpha→gamma (P10.5-11) |
+| 30 | ✅ | Wegwerf-belegt, zählt seit P8.5 als live; deckt LG-9 mit ab |
+| 31–34 | → P7 | Mehrfachauswahl **in P7 gebaut** (ROADMAP P7, `phase7_spaces_admin/CLAUDE.md` Modulzeile 15) — der Handover-Stand „nie gebaut" ist überholt |
 
-**Technisch fehlend:**
-- **Kein Bulk-Append.** Ein sequenziell wachsendes Log-Dokument lässt sich nicht komplett ohne
-  Einzel-Calls schreiben, aber „mehrere Appends in einem Aufruf" wäre spürbar günstiger gewesen
-  als 40+ Einzelaufrufe an einem Tag.
-- **`list_spaces` schlecht auffindbar.** Die Instanz fand das Tool nicht in ihrer eigenen
-  Tool-Exploration, bis sie gezielt danach suchte — und sagte dem Nikinger fälschlich „Claude
-  kann nur im eigenen Space schreiben" (stimmt nur für einen Space mit `writable: false`, nicht
-  generell). Eine falsche Aussage, die auf einer Lücke in der Tool-Auffindbarkeit beruhte, nicht
-  auf einem Denkfehler.
-- **`patch_item` vs. `update_item` nirgends zusammengefasst.** Die Aufgabenteilung (`patch_item`
-  nur Body, `update_item` nur Frontmatter mit optionalem Body) musste über zwei Fehlversuche und
-  einen Hinweis auf den Quellcode gelernt werden, statt aus den Tool-Beschreibungen ableitbar zu
-  sein.
-
-**Tokens/Zeit gekostet:**
-- **`get_item` liefert immer den vollen Body**, auch wenn nur die aktuelle Versionsnummer für den
-  nächsten Append gebraucht wird — gegen Ende der Session ein mehrere-tausend-Token-Dump für eine
-  einzige Zahl. Ein `get_item_meta` (nur Frontmatter/Version, kein Body) wäre hier der Hebel.
-- **Status-Enum-Werte nicht dokumentiert** — die Instanz riet „archiviert", bekam einen Fehler,
-  riet dann richtig „archived". Ein Satz in der Tool-Beschreibung mit den erlaubten Werten hätte
-  einen kompletten Roundtrip gespart.
-- **Suchtreffer gelegentlich unzuverlässig** — mehrfach leere Ergebnisse bei plausiblen
-  Suchbegriffen (Beispiel: eine Aufgabe erst beim dritten Versuch gefunden), kostete mehrere
-  Suchrunden statt einer.
-
-**Ein echter Bug, kein reiner Ergonomie-Wunsch:** die Fehlermeldung von `patch_item` bei einem
-Frontmatter-Zugriffsversuch — `patch_failed: edits[0] fand 0 Treffer — lies das Item neu mit
-get_item und prüfe den exakten Text` — ist irreführend. Sie suggeriert ein Textmatching-Problem
-(„lies neu, prüf den Text"), obwohl die Ursache kategorisch ist: `patch_item` kann Frontmatter
-grundsätzlich nicht erreichen, kein erneutes Lesen hätte geholfen. Eine Fehlermeldung, die in
-diesem Fall „Frontmatter-Felder sind mit `patch_item` nicht erreichbar, nutze `update_item`"
-sagt statt „0 Treffer, versuch's nochmal", hätte zwei Fehlversuche und zwei überflüssige
-Nachrichten an den Nikinger erspart.
-
-**Noch nicht geplant.** Kandidat für einen eigenen kleinen Werkzeug-Ergonomie-Schnitt, wenn eine
-Planungssession dafür ansteht — dieselbe Kategorie wie das ursprüngliche `patch_item`-Feedback,
-das P6 selbst mit ausgelöst hat (`docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` §4.6).
-
-**[2026-08-18] Zwei UI-Reichweiten-Funde aus dem Step-7b-E2E-Lauf gegen die Wegwerf-Instanz,
-beide Nikinger-Entscheidungen eingeholt** (volle Herleitung + Mechanismus: Session-Block unten,
-„Zwei echte Funde"):
-
-1. **🟢 Geplant und gebaut (2026-08-19). [2026-08-23 Korrektur] Live deployt** — `d348e2e` ist
-   Vorfahre von `main`@`f96125e` (Phase-6.5-Deploy, 2026-08-21), per `git merge-base
-   --is-ancestor` bestätigt; die Doku hier hinkte hinterher. Kein „über alle lesbaren Items
-   suchen"-Modus in der UI — ein item-level geteiltes Item ohne space-level Grant war
-   unauffindbar, nicht nur unverschiebbar. `GLOBAL_SEARCH_PLAN.md` + Code, siehe unten.
-   **Nikinger-Live-Probe (Zeilen 35–39): 35/38/39 ✅ per echtem `claude-in-chrome`-Connector,
-   2026-08-23** — „Alle Items" im Baum sichtbar+aktivierbar, Klick auf `niklas` führt zurück
-   (Breadcrumb wechselt, Nav-Highlight verschwindet); Notizen und Aufgaben gemeinsam gelistet
-   (`EPP-Zeitabgleich...`, `task·open`, neben Notizen); kein Anlegen-Knopf/-Dialog im DOM (die
-   beiden einzigen `Anlegen`-Buttons sitzen nachweislich hinter `[hidden]`-Vorfahren). **36/37
-   unverändert offen** — beide prüfen, was ein Empfänger sieht, der ausschließlich einen
-   item-level Grant ohne Space-Mitgliedschaft hat; als `niklas` mit voller Space-Mitgliedschaft
-   in `fabian` nicht erzeugbar, braucht Fabians eigenen Login.
-2. **🟡 Kein Bug, nicht blockierend.** Verschieben-/Freigeben-Knopf nur für Items im eigenen
-   Space sichtbar (`list.js`, seit Step 7) — ein UI-Rückweg aus einem geteilten Space fehlt.
-   Reine Vormerkung, kein Handlungsbedarf.
-
-**[2026-08-19, Planungssession] Fund 1 ist geplant:** `GLOBAL_SEARCH_PLAN.md` (P6-AO–AT, Zeilen
-35–39). Kernbefund: `GET /api/v1/items` **ohne** `space`-Parameter ist bereits die globale,
-item-weise ACL-gefilterte Suche — es fehlt nur die UI-Fläche. Block C ebenfalls geplant:
-`IMAGES_PLAN.md` (P6-AU–BB, Zeilen 40–47, **fünf offene Nikinger-Entscheidungen B1–B5**).
-
-**[2026-08-19, direkt danach] ✅ Gebaut UND Playwright-verifiziert, Steps G1–G3 vollständig.
-[2026-08-23 Korrektur] Live deployt, siehe oben — Nikinger-Live-Probe teilweise bestanden
-(35/38/39 ✅, 36/37 brauchen Fabian).** Q1/Bilder-Priorität vom Nikinger entschieden, ein
-Advisor-Fund vor dem Commit gefunden und behoben (`editor.js`). 772 pytest grün, 10/10
-Playwright grün, Tabu-Diff leer. Details: aktueller Session-Block.
-**[2026-08-27 Korrektur, P7-Sitzung]:** „36/37 brauchen Fabian" war zu eng gedacht — der Plan
-selbst erkannte später (`phase7_spaces_admin_plan.md` P7-J/§540), dass Fabian den Fall „nur
-item-level Share, kein Space-Grant" strukturell nie zeigen konnte (`niklas` steht in
-`fabian/.share.yml` unter `read:`, Fabian sieht ohnehin alles). `testnutzer-p7` wurde genau
-dafür gebaut; P7-11 (Web-UI **und** MCP) schließt 36/37 damit tatsächlich, nicht Fabians Login.
-Siehe `phase7_spaces_admin/CLAUDE.md`, Session-Block vom selben Tag.
-
-**[2026-08-19] Kurzprüfung „trägt die Architektur >2 Nutzer?" — Befund, kein Plan nötig.**
-Architektur ist offen: `.share.yml`s `read:`/`write:` sind beliebig lange Namenslisten
-(`acl.py :: _names()`), `SharePolicy` prüft nur Mengenzugehörigkeit, `spacectl.py add-member`
-nimmt jeden Namen, Principals sind `auth.sqlite3`-Zeilen ohne Obergrenze. **Keine Stelle im
-Laufzeitcode ist auf zwei Principals hartkodiert** (`grep niklas|fabian` trifft nur
-`abnahme_run.sh`-Defaults). Einzige Skalierungsnotiz, kein Blocker: `Store.search()` liest je
-Aufruf **jede** indizierte Item-Datei (`_row_to_item()`) — bekannter P6-S-Kostenpunkt, wächst mit
-der Item-, nicht der Nutzerzahl. Der globale Suchmodus kostet dabei **nichts zusätzlich** (der
-`space`-Filter wirkt erst nach dem Lesen aller Zeilen).
-
----
+**Zählung.** Die zehn Zeilen aus AL-1 (7, 9, 14, 15, 16, 17, 23, 25, 29, 30): **7 ✅ · 2 ⚠️ · 1 ⬜**
+(Zeile 15). Über die ganze Matrix (Zeilen 1–39): vorher 12 live → **19 ✅**; 31–34 sind nach P7
+gewandert. Unverändert offen: 18 und 24 (dritter Nutzer, nie angelegt) sowie 27, 28, 36, 37
+(brauchen Fabian) — zurückgestellt, kein Blocker.
 
 ## Session stopped — 2026-08-23 (Phasenabschluss: Handover + Übersichtsgrafik, Status 🟡 statt ✅)
 

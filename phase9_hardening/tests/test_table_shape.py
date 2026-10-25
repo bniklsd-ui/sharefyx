@@ -80,7 +80,7 @@ KNOWN_OFFENDERS: dict[str, list[tuple[str, int, int]]] = {
         ("| **V57** | ~~`listReadonlyEl`-Verhalten im ", 3, 2),
         ("| **V58** | ~~Kein Render-Pfad dereferenzier", 3, 2),
     ],
-    "phase8_6_ui_polish/CLAUDE.md": [("| 2 | Step V — **umgesetzt** (Nikinger-Aktio", 5, 6)],  # abgeschlossene Phase
+    "phase8_6_ui_polish/MODULE_STATUS_ARCHIVE.md": [("| 2 | Step V — **umgesetzt** (Nikinger-Aktio", 5, 6)],  # abgeschlossene Phase; mit DO-1 (2026-10-25) aus dem Head hierher verschoben
     "phase9_hardening/step_a/RUNBOOK_STEP_A.md": [("| **V151** (Vorabmessung, 2026-09-30) | Wie ", 3, 4)],
 }
 # `phase9_hardening/CLAUDE.md` steht **nicht** in der Liste: die beiden Fundstellen dort sind am

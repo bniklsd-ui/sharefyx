@@ -106,7 +106,8 @@ CAP_BYTES = 300  # der Cap, mit dem P9-3/V145 die Unerreichbarkeit des Kriterium
 # 2026-10-08: +2 Zeilen P9-127 (⚠️, nur Teile im Browser) und P9-128 (✅), Block feedback B6, Lock P9-BK.
 # 2026-10-08: +1 Zeile P9-126 (⚠️: 390 px physisch unerreichbar), Block feedback B7, Lock P9-BJ.
 # 2026-10-08: P9-126 ⚠️ → ✅ (Nikinger: 390 px kein Ziel); +1 Zeile P9-132 (✅, B8, Befundzweig).
-ABNAHME_BILANCE = {"✅": 121, "⚠️": 12, "⬜": 1}
+# 2026-10-25 (P10.5 Block 12, BG-2/BG-3): P9-124 und P9-127 ⚠️ → ✅ -- die M5-Belege (2026-10-18) schließen beide Lücken.
+ABNAHME_BILANCE = {"✅": 123, "⚠️": 10, "⬜": 1}
 # 2026-10-05: +7 Zeilen aus dem settings-Nachtrag P9-96–P9-102 (die sieben Punkte aus der
 # Bildsichtung des Nikingers, §10 des Mini-Plans). Die zwei neuen ⚠️ sind **benannte
 # Abweichungen**, keine offenen Punkte: P9-97 (linker Polsterwert, Nikinger-Entscheidung vom

@@ -2358,3 +2358,115 @@ Tage journald auf der Live-VM; Gate A→B Punkt 3 braucht einen echten Purge-Lau
 `clients`-Zeilenzahl. Beide sind Nikinger-Sache, nicht in dieser Session baubar — Status bewusst
 **„gebaut, Live-Teile beim Nikinger"** (P5 Step 8s Präzedenzformulierung), V42 in der
 Modul-Status-Tabelle namentlich offen.
+
+## Vormerkungen (nicht Teil eines aktuellen Steps)
+
+**[2026-08-14] UI-Feedback nach dem Live-Deploy von v2.1 (Nikinger, direkt nach der ersten
+Nutzung) — ausdrücklich nur vormerken, nichts davon diese Session umgesetzt, kein Code
+angefasst:**
+
+1. **✅ Behoben (2026-08-16).** Dropdown-Lila (`select.input { accent-color }`). Herleitung:
+   `SESSIONS_ARCHIVE.md`, zehnter Block.
+2. **✅ Gebaut (2026-08-17), Step 7b vollständig.** Space-zu-Space-Verschieben,
+   `ITEM_MOVE_PLAN.md` §4 (P6-AD–AJ), drei Commits — Details in den „[2026-08-17]"-Einträgen der
+   Phase-Heads P1/P2/P5. **[2026-08-23 P7 Step-0-Audit] Live deployt** (`9274346`/`3f476c7`/
+   `abeaba6` sind Vorfahren von `main`@`f96125e`) — Abnahmezeilen 25–30 bleiben unverändert offen,
+   das war nur der Deploy-Status.
+3. **✅ Subplan geschrieben (2026-08-17), noch nicht gebaut, setzt Step 7b voraus.**
+   Mehrfachauswahl = **§9** in `phase6_shares/ITEM_MOVE_PLAN.md` (**P6-AK–P6-AN**): kein neuer
+   Endpunkt/MCP-Tool, In-Space-Mehrfachauswahl braucht keine neue Rechteprüfung (P6-AN).
+4. **✅ Behoben (2026-08-16).** `--ok` (Grün) auf `var(--accent)` (Blau), Token entfernt; Orange
+   „nur lesen" bewusst unangetastet. Herleitung: `SESSIONS_ARCHIVE.md`, zehnter Block.
+
+**[2026-08-14] MCP-Werkzeug-Ergonomie, Live-Feedback einer arbeitenden Claude-Instanz** — nach
+einem sitzungsreichen Tag (OTOBO-Protokollierung, `itm_7cf94a2c`, 40+ `append_to_item`-Aufrufe für
+ein einziges Log-Dokument). Vom Nikinger verbatim weitergegeben; betrifft
+ausschließlich `mcpserver/tools.py` (P6-C erlaubt das, aber außerhalb des Step-7-Scopes).
+
+**Technisch fehlend:**
+- **Kein Bulk-Append.** Ein sequenziell wachsendes Log-Dokument lässt sich nicht komplett ohne
+  Einzel-Calls schreiben, aber „mehrere Appends in einem Aufruf" wäre spürbar günstiger gewesen
+  als 40+ Einzelaufrufe an einem Tag.
+- **`list_spaces` schlecht auffindbar.** Die Instanz fand das Tool nicht in ihrer eigenen
+  Tool-Exploration, bis sie gezielt danach suchte — und sagte dem Nikinger fälschlich „Claude
+  kann nur im eigenen Space schreiben" (stimmt nur für einen Space mit `writable: false`, nicht
+  generell). Eine falsche Aussage, die auf einer Lücke in der Tool-Auffindbarkeit beruhte, nicht
+  auf einem Denkfehler.
+- **`patch_item` vs. `update_item` nirgends zusammengefasst.** Die Aufgabenteilung (`patch_item`
+  nur Body, `update_item` nur Frontmatter mit optionalem Body) musste über zwei Fehlversuche und
+  einen Hinweis auf den Quellcode gelernt werden, statt aus den Tool-Beschreibungen ableitbar zu
+  sein.
+
+**Tokens/Zeit gekostet:**
+- **`get_item` liefert immer den vollen Body**, auch wenn nur die aktuelle Versionsnummer für den
+  nächsten Append gebraucht wird — gegen Ende der Session ein mehrere-tausend-Token-Dump für eine
+  einzige Zahl. Ein `get_item_meta` (nur Frontmatter/Version, kein Body) wäre hier der Hebel.
+- **Status-Enum-Werte nicht dokumentiert** — die Instanz riet „archiviert", bekam einen Fehler,
+  riet dann richtig „archived". Ein Satz in der Tool-Beschreibung mit den erlaubten Werten hätte
+  einen kompletten Roundtrip gespart.
+- **Suchtreffer gelegentlich unzuverlässig** — mehrfach leere Ergebnisse bei plausiblen
+  Suchbegriffen (Beispiel: eine Aufgabe erst beim dritten Versuch gefunden), kostete mehrere
+  Suchrunden statt einer.
+
+**Ein echter Bug, kein reiner Ergonomie-Wunsch:** die Fehlermeldung von `patch_item` bei einem
+Frontmatter-Zugriffsversuch — `patch_failed: edits[0] fand 0 Treffer — lies das Item neu mit
+get_item und prüfe den exakten Text` — ist irreführend. Sie suggeriert ein Textmatching-Problem
+(„lies neu, prüf den Text"), obwohl die Ursache kategorisch ist: `patch_item` kann Frontmatter
+grundsätzlich nicht erreichen, kein erneutes Lesen hätte geholfen. Eine Fehlermeldung, die in
+diesem Fall „Frontmatter-Felder sind mit `patch_item` nicht erreichbar, nutze `update_item`"
+sagt statt „0 Treffer, versuch's nochmal", hätte zwei Fehlversuche und zwei überflüssige
+Nachrichten an den Nikinger erspart.
+
+**Noch nicht geplant.** Kandidat für einen eigenen kleinen Werkzeug-Ergonomie-Schnitt, wenn eine
+Planungssession dafür ansteht — dieselbe Kategorie wie das ursprüngliche `patch_item`-Feedback,
+das P6 selbst mit ausgelöst hat (`docs/concepts/PHASE5_CLOSEOUT_HANDOVER.md` §4.6).
+
+**[2026-08-18] Zwei UI-Reichweiten-Funde aus dem Step-7b-E2E-Lauf gegen die Wegwerf-Instanz,
+beide Nikinger-Entscheidungen eingeholt** (volle Herleitung + Mechanismus: Session-Block unten,
+„Zwei echte Funde"):
+
+1. **🟢 Geplant und gebaut (2026-08-19). [2026-08-23 Korrektur] Live deployt** — `d348e2e` ist
+   Vorfahre von `main`@`f96125e` (Phase-6.5-Deploy, 2026-08-21), per `git merge-base
+   --is-ancestor` bestätigt; die Doku hier hinkte hinterher. Kein „über alle lesbaren Items
+   suchen"-Modus in der UI — ein item-level geteiltes Item ohne space-level Grant war
+   unauffindbar, nicht nur unverschiebbar. `GLOBAL_SEARCH_PLAN.md` + Code, siehe unten.
+   **Nikinger-Live-Probe (Zeilen 35–39): 35/38/39 ✅ per echtem `claude-in-chrome`-Connector,
+   2026-08-23** — „Alle Items" im Baum sichtbar+aktivierbar, Klick auf `niklas` führt zurück
+   (Breadcrumb wechselt, Nav-Highlight verschwindet); Notizen und Aufgaben gemeinsam gelistet
+   (`EPP-Zeitabgleich...`, `task·open`, neben Notizen); kein Anlegen-Knopf/-Dialog im DOM (die
+   beiden einzigen `Anlegen`-Buttons sitzen nachweislich hinter `[hidden]`-Vorfahren). **36/37
+   unverändert offen** — beide prüfen, was ein Empfänger sieht, der ausschließlich einen
+   item-level Grant ohne Space-Mitgliedschaft hat; als `niklas` mit voller Space-Mitgliedschaft
+   in `fabian` nicht erzeugbar, braucht Fabians eigenen Login.
+2. **🟡 Kein Bug, nicht blockierend.** Verschieben-/Freigeben-Knopf nur für Items im eigenen
+   Space sichtbar (`list.js`, seit Step 7) — ein UI-Rückweg aus einem geteilten Space fehlt.
+   Reine Vormerkung, kein Handlungsbedarf.
+
+**[2026-08-19, Planungssession] Fund 1 ist geplant:** `GLOBAL_SEARCH_PLAN.md` (P6-AO–AT, Zeilen
+35–39). Kernbefund: `GET /api/v1/items` **ohne** `space`-Parameter ist bereits die globale,
+item-weise ACL-gefilterte Suche — es fehlt nur die UI-Fläche. Block C ebenfalls geplant:
+`IMAGES_PLAN.md` (P6-AU–BB, Zeilen 40–47, **fünf offene Nikinger-Entscheidungen B1–B5**).
+
+**[2026-08-19, direkt danach] ✅ Gebaut UND Playwright-verifiziert, Steps G1–G3 vollständig.
+[2026-08-23 Korrektur] Live deployt, siehe oben — Nikinger-Live-Probe teilweise bestanden
+(35/38/39 ✅, 36/37 brauchen Fabian).** Q1/Bilder-Priorität vom Nikinger entschieden, ein
+Advisor-Fund vor dem Commit gefunden und behoben (`editor.js`). 772 pytest grün, 10/10
+Playwright grün, Tabu-Diff leer. Details: aktueller Session-Block.
+**[2026-08-27 Korrektur, P7-Sitzung]:** „36/37 brauchen Fabian" war zu eng gedacht — der Plan
+selbst erkannte später (`phase7_spaces_admin_plan.md` P7-J/§540), dass Fabian den Fall „nur
+item-level Share, kein Space-Grant" strukturell nie zeigen konnte (`niklas` steht in
+`fabian/.share.yml` unter `read:`, Fabian sieht ohnehin alles). `testnutzer-p7` wurde genau
+dafür gebaut; P7-11 (Web-UI **und** MCP) schließt 36/37 damit tatsächlich, nicht Fabians Login.
+Siehe `phase7_spaces_admin/CLAUDE.md`, Session-Block vom selben Tag.
+
+**[2026-08-19] Kurzprüfung „trägt die Architektur >2 Nutzer?" — Befund, kein Plan nötig.**
+Architektur ist offen: `.share.yml`s `read:`/`write:` sind beliebig lange Namenslisten
+(`acl.py :: _names()`), `SharePolicy` prüft nur Mengenzugehörigkeit, `spacectl.py add-member`
+nimmt jeden Namen, Principals sind `auth.sqlite3`-Zeilen ohne Obergrenze. **Keine Stelle im
+Laufzeitcode ist auf zwei Principals hartkodiert** (`grep niklas|fabian` trifft nur
+`abnahme_run.sh`-Defaults). Einzige Skalierungsnotiz, kein Blocker: `Store.search()` liest je
+Aufruf **jede** indizierte Item-Datei (`_row_to_item()`) — bekannter P6-S-Kostenpunkt, wächst mit
+der Item-, nicht der Nutzerzahl. Der globale Suchmodus kostet dabei **nichts zusätzlich** (der
+`space`-Filter wirkt erst nach dem Lesen aller Zeilen).
+
+---

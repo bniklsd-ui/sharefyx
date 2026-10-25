@@ -21,6 +21,55 @@ sucht, findet ihn hier — nicht im Head.
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
 
+## Session stopped — 2026-10-25 (Block 11.6: die Format-Konvention — ED-3)
+
+**Ergebnis.** Die **Format-Konvention Stufe 2** ist gebaut und an der Wegwerf-Instanz
+(Port 18814) gemessen: **neun von neun Zellen grün**, der **Gegenlauf** bricht **genau die
+eine** Zelle, die er brechen soll. P10.5-54 ✅ und P10.5-56 ✅ ⇒ **48 ✅ · 0 ⚠️ · 13 ⬜**.
+
+**Das Vokabular (eine Entscheidung dieser Session — im Plan nicht festgelegt):** Farbe
+`rot|blau|gruen|gelb`, Größe `klein|normal|gross`, Ausrichtung `links|zentriert|rechts`.
+Inline `[Text]{.rot}` (höchstens **eine** Farbe und **eine** Größe), Block `::: {.zentriert}`
+… `:::`. Eine **unbekannte** Klasse bleibt **wörtlich** — der Renderer erfindet keine Klasse,
+die es nicht gibt.
+
+**Der Server kennt die Formate nicht — und soll es nicht.** `_FORMAT_HINT` steht in
+`tools.py` **wörtlich identisch** an allen fünf Werkzeugen, die einen Body schreiben
+(`create_item`, `update_item`, `append_to_item`, `append_to_items`, `patch_item`): ein Satz im
+Text, den der Agent liest. Der Server **prüft** die Form nicht und **wandelt** sie nicht um —
+er speichert `[Text]{.rot}` als das, was es ist (der MCP-`get_item` gibt es unverändert
+zurück, in der Probe gemessen). Die Ankündigung „P1-Öffnung 11: Format-Konvention, kein Code
+in `storage/`“ steht im Öffnungs-Index von `phase1_storage/CLAUDE.md`;
+`git diff -- phase1_storage/storage` ist **leer**.
+
+**Ein Alt-Fehler mitbehoben (datiert).** Die Codespans sind jetzt **ausgeschnitten**: die
+Regeln laufen nur über den Rest. Vorher lief die Kette über den ganzen Text — `**fett**` in
+`` `**fett**` `` wurde **fett**. Das war schon vor dieser Session falsch, und die
+Format-Regel hätte denselben Fehler geerbt. Die Ausgabe ändert sich **nur** dort, wo sie
+vorher **falsch** war.
+
+**Drei Fehler lagen im Messgerät, nicht im Produkt.** Der MCP-Token war an die **falsche**
+Resource gebunden (`AuthSettings.resource` = `<base_url>/mcp` — ein anderer Resource ergibt
+**401**). Die Werkzeugleiste war im **DOM** nicht zu finden, weil das `app.js` den Editor beim
+Start **aus** dem DOM löst (`detachable()`, P5-AJ) — die Probe liest die ausgelieferte
+`app.html` jetzt mit dem `DOMParser` (der führt **kein** Skript aus). Und ein **Tippfehler**
+im Renderer (`nnamen` statt `namen`) wäre im Produkt **stillschweigend** gewesen: die Probe
+zeigte ihn beim ersten Lauf als `ReferenceError`.
+
+**Nicht gemessen (bewusst, mit Grund):** das **CM5-Overlay** (der Editor färbt `[…]{.rot}`
+schon beim Schreiben) ist gebaut, aber **nicht** an der Wegwerf-Instanz gemessen — die Probe
+liest das Modul `markdown.js` direkt und öffnet **keinen** Editor. Die **Sichtung** des
+Nikingers steht für 11.6 wie für 11.4 und 11.5 aus.
+
+**Suite 1573 grün** (342,04 s), `doc_health` 0, `ui_budget` **6/6** — der Erstaufruf ist seit 11.7 um **4,4 KB** gewachsen (die Werkzeugleiste, die neun Klassen, der Overlay): **213,7 KB** ≤ 250 KB, der Editor **69,7 KB** ≤ 80 KB.
+
+**Die Abbruchprüfung am Blockende (P10.5-E, Basis `f43a7a4~1`).** `git diff --stat f43a7a4~1..HEAD -- . ':!<die Blockpfade>'` nennt neben den erlaubten Pfaden **zwei** Dateien: `scripts/doc_health.py` (der Fixture-Präfix-Ausgleich aus 11.8 — **bewusst, datiert**, im Archiv-Block vom 2026-10-25 offengelegt) und `phase10_5_finishing/scripts/shorten_index_headings.py` (aus 11.4: der Karten-Text des `INDEX_ENTRIES_ARCHIVE`-Eintrags nachgezogen, damit das Skript den Index wieder erzeugen kann). Beides **Doku-Werkzeuge**, kein Produktcode — **hier offengelegt, nicht stillschweigend**.
+
+**Nächster Schritt.** **Block 12 (Doku und Altlasten)** — der letzte Vollblock, und er ist
+**nur `.md`**: DO-1 (die drei Heads unter 40 KB, `move_sections.py`), LG-6 (`ROADMAP.md` < 30 KB
+→ `docs/ROADMAP_ARCHIVE.md`), AL-1/AL-3 (die P6-Matrix), BG-2/BG-3 (die P9-Matrix), und die
+Register-Bilanz per Skript (P10.5-57/58/59). Danach **Block Z** (Closeout).
+
 ## Session stopped — 2026-10-25 (Block 11.8: der Roundtrip — 10/10 byte-identisch)
 
 **Ergebnis.** Die **zehn** M7-Fixtures (Frontmatter, Listen, Tabelle, Code, Links,

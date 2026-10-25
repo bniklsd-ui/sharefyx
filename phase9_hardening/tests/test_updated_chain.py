@@ -72,7 +72,6 @@ DOT_SEPARATOR_RE = re.compile(r" · (?=\d{4}-\d{2}-\d{2}\s*\()")
 # per `scripts/rotate_index_updates.sh` nach `docs/ROADMAP_UPDATES_ARCHIVE.md` rotiert. Gestrichen.
 KNOWN_OFFENDERS: dict[str, tuple[bool, int, int]] = {
     "docs/concepts/phase9_hardening_block_trace_plan.md": (False, 1, 0),  # 📕, nie editieren
-    "phase8_6_ui_polish/CLAUDE.md": (False, 1, 0),  # abgeschlossene Phase
 }
 
 

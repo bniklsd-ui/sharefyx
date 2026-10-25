@@ -7,6 +7,12 @@ up: ./CLAUDE.md
 down:
 updated: 2026-10-24 (ein Faden der `updated:`-Kette des Phase-10.5-Heads rotiert — Block 11.3 folgt im Head) | 2026-10-24 (ein Faden der `updated:`-Kette des Phase-10.5-Heads rotiert — Block 11.2 folgt im Head) | 2026-10-24 (ein Faden der `updated:`-Kette des Phase-10.5-Heads rotiert — Block 11.1 folgt im Head) | 2026-10-24 (ein Faden der `updated:`-Kette des Phase-10.5-Heads rotiert — Block 10.5 folgt im Head) | 2026-10-24 (zwei Fäden der `updated:`-Kette des Phase-10.5-Heads rotiert — Block 10.3 LG-2 Realtime-Client folgt im Head) | 2026-10-24 (zwei Fäden der `updated:`-Kette des Phase-10.5-Heads rotiert — Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (drei Fäden der `updated:`-Kette des Phase-10.5-Heads rotiert — Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (11 Fäden der `updated:`-Kette des Phase-10.5-Heads rotiert — der Head stand bei 43.545 B und damit über dem Softcap) | 2026-10-23 (angelegt — die `updated:`-Kette des Phase-10.5-Heads rotiert hierher; im Head bleibt der neueste Faden plus Zeiger)
 ---
+- 2026-10-25 (Block 11.6: die Format-Konvention Stufe 2 — ED-3; das Vokabular festgelegt, 9/9 Zellen grün, der Gegenlauf bricht genau die wörtlich-Zelle)
+- 2026-10-25 (Block 11.8: der Roundtrip — 10/10 byte-identisch; die M7-Fixtures liegen jetzt im Repo)
+- 2026-10-25 (Block 11.5: die To-do-Kästchen — der Text bleibt die Quelle; Probe 8/8 grün, Gegenlauf rot)
+- 2026-10-25 (Block 11.7: das Budget — jede Datei genau einmal; Erstaufruf 206,4 KB, Editor 69,7 KB)
+- 2026-10-24 (Block 11.4: die Live-Darstellung — V211 gemessen, nicht behauptet; Probe 15/15 grün, Gegenlauf rot; der Modulstatus der Blöcke 0–10 liegt jetzt im L3-Archiv)
+- 2026-10-24 (Block 11.3: der Live-Editor — ein Text, eine Quelle, kein Moduswechsel; Probe 12/12 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 - 2026-10-24 (Block 11.2: der Nachlader (js/editor_cm.js) — Promise gecacht, Fehler → null = Rohmodus; 6 Wächter) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 - 2026-10-24 (Block 11.1: der vendorte Editor — CodeMirror 5.65.16, fünf Dateien statt drei (gemessen), 71.280 B gzip; Wächter mit Gegenprobe) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 - 2026-10-24 (Block 10.5: die Probe ist grün — Volltext 0 → 1 Treffer, Latenz 141,1 ms, P10.5-S-Band, Shutdown 5,22 s; P10.5-45/46/47/48 ✅, Gegenlauf rot) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
