@@ -115,6 +115,7 @@ Ende); die **Belegte** stehen im Commit und im Session-Block.
   §Deploy A: eine Zeile Caddy (V199 bleibt Fleet-Sache) · Handyfoto-Upload (EXIF weg, richtig
   gedreht) · Spaces-Panel direkt nach dem Laden (BG-1).
 - **P10.5-27/28** — Live-Abnahme P10-J: zwei Modellanbieter, ein Server, ein Werkzeug (`list_spaces`) — Block 6 und Z. **Voraussetzung ist erfüllt:** die Wegwerf-E2E (P10.5-26) zeigt, dass ein Nicht-Claude-Client (`list_spaces` gelingt) — offen ist nur noch der **Live**-Lauf mit zwei Modellanbietern.
+- **Handover-Posten (Regelkandidat, Nikinger 2026-10-25):** Sichtungen **zuerst als Bilder an der Wegwerf-Instanz**, live nur, was der Server nicht selbst entscheiden kann — steht als Arbeitsweise schon in der Wurzel-`CLAUDE.md` (2026-10-22); für den Closeout-Handover als feste Regel prüfen.
 - **Block 2, Zeile 15 (AL-1)** — Migration + Live-Check beim Nikinger.
 - ~~**Deploy B (`v3.1.6`)**~~ ✅ **2026-10-23** — **live**: Release `20261023T165838.591015Z`, SHA
   `e5c834e`, `health_gate` **9/9 OK** (`.rail__version` v3.1.6). Die Release-Tests im Release
@@ -160,7 +161,14 @@ bzw. sind repariert) · `shorten_index_headings.py` (Kartentext der Phase-8-Zeil
 neu `register_bilanz.py` + `test_register_bilanz.py` (Auftrag „per Skript“). Kein Produktcode;
 **die drei Phase-9-Test-Edits kann der Nikinger vetoen.**
 
-**Nicht gemessen:** keine Browser-/Live-Probe (Block ist nur `.md`).
+**Nachtrag, Sichtungsbilder (Wegwerf, Port 18793)** — `probes/p105_sichtung_screens.py`, Bilder
+`docs/screenshots/p105_sichtung_01–07_*.png` (rote Kästen mit Nummern). **Drei Befunde, die erst das
+Bild zeigt:** (A) Der Editor ist **weiß** in der dunklen UI — `editor_cm.js` hängt das vendorte
+CSS **hinter** `app.css` an, bei gleicher Spezifität gewinnt es (`.CodeMirror`, `.cm-header`,
+`.cm-link`). (B) Das **Format-Overlay färbt nichts**: `[rot]{.rot}` erscheint als blauer Link plus
+Text `{.rot}`, `app.css` kennt keine `cm-…`-Regel dazu (11.6 hatte das als „nicht gemessen“ benannt).
+(C) `::: {.zentriert}` bleibt Rohtext. Cursorzeile, To-do-Kästchen, Rohtext, UI-4 sehen richtig aus.
+**⇒ P10.5-51 bleibt ⬜, bis (A)–(C) behoben sind.**
 
 **Nächster Schritt.** **Block Z (Closeout)** — erst nach P10.5-27/28 live (Nikinger). Beim
 Nikinger: Deploy C `v3.1.7`, P10.5-37/32/51 (Sichtung), 22, 18, 25, 27/28, AL-1 Zeile 15, V203.
